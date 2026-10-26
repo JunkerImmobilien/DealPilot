@@ -572,7 +572,9 @@
       '.atl-wahl button{flex:0 0 auto;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent);background:rgba(20,18,16,.75);color:#d9cfb8;border-radius:999px;padding:7px 13px;font:600 12.5px Inter,sans-serif;cursor:pointer;transition:all .2s}',
       '.atl-wahl button.an{background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');color:#1a1407;border-color:transparent}',
       '.atl-rumpf{position:relative;z-index:2;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;padding:0 20px 18px}',
-      '.atl-netz{position:relative;min-height:0;overflow:auto;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);border-radius:16px;background:rgba(14,12,10,.72)}',
+      /* v2966d · Messkabine 26.10.2026: die Flaeche wurde mit der Breite OHNE Rollbalken gelegt; kam der senkrechte
+         Balken dazu, ragte sie 9 px ueber (390: 364 > 355, 768: 726 > 717) - Platz fuer den Balken immer freihalten */
+      '.atl-netz{position:relative;min-height:0;overflow:auto;scrollbar-gutter:stable;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);border-radius:16px;background:rgba(14,12,10,.72)}',
       '.atl-flaeche{position:relative}',
       '.atl-flaeche svg.kt{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}',
       '.atl-sp{position:absolute;top:12px;font:500 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:' + G + ';text-align:center;padding:5px 6px;border-bottom:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);opacity:0;animation:atl-pop .5s ease forwards}',
