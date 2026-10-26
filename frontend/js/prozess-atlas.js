@@ -676,7 +676,9 @@
       if (!e[2]) pfade.push(d);
     });
     if (pfade.length && !ruhig) {
-      sv += '<g class="flieger"><path d="M-11 -1.6 L-3 -1.6 L4 -8 L7 -8 L3 -1.6 L9 -1.6 L12 -4 L13.5 -4 L12 0 L13.5 4 L12 4 L9 1.6 L3 1.6 L7 8 L4 8 L-3 1.6 L-11 1.6 Z"/>'
+      /* v2965 · Marcel 26.10.2026: „die Flugzeuge fliegen rueckwaerts". rotate="auto" legt die +x-Achse
+         in Flugrichtung; der Umriss hatte die Nase bei x -11 (Fluegel und Leitwerk bei +x). Gespiegelt: Nase bei +11. */
+      sv += '<g class="flieger"><path d="M11 -1.6 L3 -1.6 L-4 -8 L-7 -8 L-3 -1.6 L-9 -1.6 L-12 -4 L-13.5 -4 L-12 0 L-13.5 4 L-12 4 L-9 1.6 L-3 1.6 L-7 8 L-4 8 L3 1.6 L11 1.6 Z"/>'
         + '<animateMotion dur="' + (pfade.length * 1.5) + 's" begin="' + (tA ? '1.2s' : '0s') + '" repeatCount="indefinite" rotate="auto" path="' + pfade.join(' ') + '"/></g>';
     }
     P.knoten.forEach(function (k) {

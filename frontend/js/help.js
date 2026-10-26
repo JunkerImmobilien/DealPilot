@@ -1044,7 +1044,7 @@
       + '<rect x="2" y="12" width="86" height="36" rx="9"/><text x="45" y="34" text-anchor="middle">Quick-Check</text>'
       + '<rect x="136" y="12" width="88" height="36" rx="9"/><text x="180" y="34" text-anchor="middle">Ankauf</text>'
       + '<rect x="272" y="12" width="86" height="36" rx="9"/><text x="315" y="34" text-anchor="middle">Bestand</text>'
-      + '<path class="fl" d="M-9 -1.4 L-2 -1.4 L3 -6.5 L5.6 -6.5 L2.4 -1.4 L7 -1.4 L9.5 -3.2 L10.8 -3.2 L9.6 0 L10.8 3.2 L9.5 3.2 L7 1.4 L2.4 1.4 L5.6 6.5 L3 6.5 L-2 1.4 L-9 1.4 Z"><animateMotion dur="3s" repeatCount="indefinite" rotate="auto" path="' + pfad + '"/></path>'
+      + '<path class="fl" d="M9 -1.4 L2 -1.4 L-3 -6.5 L-5.6 -6.5 L-2.4 -1.4 L-7 -1.4 L-9.5 -3.2 L-10.8 -3.2 L-9.6 0 L-10.8 3.2 L-9.5 3.2 L-7 1.4 L-2.4 1.4 L-5.6 6.5 L-3 6.5 L2 1.4 L9 1.4 Z"><animateMotion dur="3s" repeatCount="indefinite" rotate="auto" path="' + pfad + '"/></path>'
       + '</svg>'
       + '<div class="t">Prozess-Atlas — alle Abläufe als Netzplan</div>'
       + '<div class="s">Klick eine Station: Schritte klappen auf, Daten fliegen ein. Grün: wo dein Objekt gerade steht.</div></div>'
