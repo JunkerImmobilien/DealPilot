@@ -265,8 +265,8 @@ export const ABLAEUFE = [
     schritte: [
       { t: 'Reiter **Steuer**, Karte **Persönliche Steuer**: dein zu versteuerndes Einkommen (zvE) vor der Immobilie eintragen. Mit dem Haken **Grenzsteuersatz automatisch aus zvE berechnen** rechnet DealPilot den Satz selbst.',
         belege: [[IX, 'Persönliche Steuer'], [IX, 'Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr'], [IX, 'Grenzsteuersatz automatisch aus zvE berechnen']] },
-      { t: 'Ändert sich dein Einkommen über die Jahre: **📅 Steuerzeiträume verwalten →**. Unter **Neuen Zeitraum hinzufügen** **Gültig von**, **Gültig bis (leer = laufend)**, **zvE / Jahr (€)** und einen **Grund** eintragen, dann **Hinzufügen**. Überschneidet sich ein Zeitraum, zeigt DealPilot den Konflikt — du kannst abbrechen oder **Trotzdem als neuen Zeitraum anlegen**.',
-        belege: [[IX, '📅 Steuerzeiträume verwalten →'], [J('tax-periods.js'), 'Neuen Zeitraum hinzufügen'], [J('tax-periods.js'), 'Gültig bis (leer = laufend)'], [J('tax-periods.js'), 'zvE / Jahr (€)'], [J('tax-periods.js'), 'Trotzdem als neuen Zeitraum anlegen']] },
+      { t: 'Ändert sich dein Einkommen über die Jahre: **Steuerzeiträume verwalten →**. Unter **Neuen Zeitraum hinzufügen** **Gültig von**, **Gültig bis (leer = laufend)**, **zvE / Jahr (€)** und einen **Grund** eintragen, dann **Hinzufügen**. Überschneidet sich ein Zeitraum, zeigt DealPilot den Konflikt — du kannst abbrechen oder **Trotzdem als neuen Zeitraum anlegen**.',
+        belege: [[IX, 'Steuerzeiträume verwalten →</a>'], [J('tax-periods.js'), 'Neuen Zeitraum hinzufügen'], [J('tax-periods.js'), 'Gültig bis (leer = laufend)'], [J('tax-periods.js'), 'zvE / Jahr (€)'], [J('tax-periods.js'), 'Trotzdem als neuen Zeitraum anlegen']] },
       { t: 'Karte **AfA-Konfiguration**: **AfA-Satz** und **Gebäudeanteil am KP (%)** prüfen. Für einen genaueren Gebäudeanteil rechts in der Karte den Knopf **BMF-Rechner** öffnen (nicht den Link unter „Hilfreiche Links“).',
         plan: 'BMF-Rechner ab Pro',
         belege: [[IX, 'Gebäudeanteil am KP (%)'], [IX, 'id="btnBmfAdvanced"'], [IX, 'onclick="openBMFModal()"'], [IX, 'plan-badge plan-badge-gold']] },
@@ -300,5 +300,37 @@ export const ABLAEUFE = [
         belege: [[J('dashboard.js'), 'Veranlagungsjahr'], [J('dashboard.js'), 'Anlage-V-Zuordnung anhängen'], [J('dashboard.js'), 'Steuer-Mappe erstellen']] }
     ],
     hinweis: 'Das Portfolio zählt nur Objekte mit Status Gewonnen. Verlorene Objekte bleiben mit allen Zahlen erhalten.'
+  },
+  /* v2965b · Marcel 26.10.2026: „Können wir auch beschreiben und erklären, wie Zielbilder angelegt werden?“
+     Fakten aus potenzial.js, wert-zielbild.js, mfh-einheiten.js, dashboard.js — jede Zeile belegt. */
+  {
+    id: 'zielbild',
+    titel: 'Mieterhöhung und Zielbild anlegen',
+    kurz: 'Zeigen, was im Haus steckt: welche Miete der heutige Mieter nach normalen Erhöhungen zahlt (Soll-Miete), was nach Umbau oder Neuvermietung drin ist (Zielbild) — und was das am Ertragswert ausmacht.',
+    wann: 'Freiwillig, für Objekte im Bestand oder im Ankauf. Ohne Angaben ändert sich nichts.',
+    schritte: [
+      { t: 'Das Objekt öffnen, Reiter **Objekt**, Karte **Mieterhöhung und Zielbild (optional)** aufklappen. Beim Mehrfamilienhaus weiter mit Schritt 7.',
+        belege: [[IX, 'Mieterhöhung und Zielbild (optional)']] },
+      { t: '**Vergleichsmiete (€/m²)** eintragen, wenn du den Mietspiegel kennst. Leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.',
+        belege: [[IX, 'Vergleichsmiete (€/m²)'], [IX, 'Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.']] },
+      { t: '**Soll-Miete (Mieter bleibt, €/m²)** leer lassen: Darunter steht „DealPilot rechnet vor: …“ — bis zur Vergleichsmiete, frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze. Eine eigene Zahl überschreibt den Vorschlag. **Soll erreichbar ab** ist ohne Angabe 15 Monate nach der letzten Erhöhung.',
+        belege: [[IX, 'Soll-Miete (Mieter bleibt, €/m²)'], [J('potenzial.js'), 'DealPilot rechnet vor: '], [IX, 'Soll erreichbar ab']] },
+      { t: 'Fürs Zielbild die **Zielmiete (€/m²)** eintragen — was nach Umbau oder Neuvermietung erzielbar ist — und unter **Zielbild ab wann** den Anlass (z. B. bei Mieterwechsel).',
+        belege: [[IX, 'Zielmiete (€/m²)'], [IX, 'Zielbild ab wann']] },
+      { t: 'Unter **Maßnahmen** die Chips anklicken (Bad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Dach, Fassade/Dämmung, Heizung, Leitungen, Renovierung, Küche, Sonstiges) und je Maßnahme die **Kosten €** eintragen. Der Chip zeigt, wie viele Modernisierungspunkte nach Anlage 2 ImmoWertV das Gewerk noch bringt; die Punkte verlängern die Restnutzungsdauer von Mieterhöhung und Zielbild.',
+        belege: [[J('potenzial.js'), "t: 'Fassade/Dämmung'"], [J('potenzial.js'), '<span>Kosten €</span>'], [J('potenzial.js'), ' Modernisierungspunkte (Anlage 2)']] },
+      { t: 'Wird mit Mieter in der Wohnung modernisiert, den Haken **bewohnt (§ 559)** setzen: 8 % der Kosten im Jahr kommen auf die Soll-Miete, gedeckelt. **Zielbild fertig (Jahr)** setzt das Jahr für Pilot-Analyse und PDF.',
+        belege: [[J('potenzial.js'), 'bewohnt (§ 559)'], [IX, 'Zielbild fertig (Jahr)']] },
+      { t: 'Mehrfamilienhaus: unter der Wohnfläche **Einheiten erfassen** öffnen, in der Liste bei jeder Wohnung **Details** — dort stehen Mietvertrag, Soll-Miete, **Zielbild · nach Umbau** mit den Maßnahmen der Wohnung und der Ertragswert. Ist das Haus aufgeteilt, im Schritt Gebäude **In Wohnungseigentum aufgeteilt** anhaken und die **Kosten der Aufteilung** prüfen (Vorbelegung 1.800 € je Wohnung).',
+        belege: [[J('mfh-einheiten.js'), 'Einheiten erfassen'], [J('mfh-einheiten.js'), 'Zielbild · nach Umbau'], [J('mfh-einheiten.js'), 'In Wohnungseigentum aufgeteilt'], [J('mfh-einheiten.js'), 'Kosten der Aufteilung']] },
+      { t: 'Reiter **Bewertung**, Karte **Wert & Zielbild**: Fehlen die Ertragswerte oder sind sie veraltet, rechnet DealPilot sie beim Öffnen von selbst nach; sonst **Jetzt rechnen** (oder **Ertragswerte rechnen** in der Pilot-Analyse). Das Ergebnis wird mit dem Objekt gespeichert.',
+        kosten: 'Kostenlos — kein Kontingent. Der Ertragswert je Stufe erscheint aber nur, wenn für das Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält.',
+        belege: [[J('wert-zielbild.js'), 'Wert &amp; Zielbild'], [J('wert-zielbild.js'), 'Jetzt rechnen'], [J('potenzial.js'), 'Ertragswerte rechnen'], [J('potenzial.js'), 'Ertragswert je Stufe mit DealPilot Stufe 3']] },
+      { t: 'Lesen: Kacheln mit Kaltmiete, Rendite, Ertragswert und **Wertzuwachs nach Kosten** (Ertragswert der Stufe minus Bestand minus Maßnahmen); **Im Detail** zeigt Wohnungen, Wertüberleitung und Kennzahlen je Stufe. Dasselbe steht in der Pilot-Analyse unter „Ankauf · Bestand · Zielbild“ und in beiden PDFs.',
+        belege: [[J('wert-zielbild.js'), 'Wertzuwachs nach Kosten'], [J('wert-zielbild.js'), 'Im Detail: Wohnungen, Wertüberleitung, Kennzahlen je Stufe'], [IX, 'Ankauf &middot; Bestand &middot; Zielbild']] },
+      { t: 'Über alle Objekte: **Portfolio-Cockpit**, Abschnitt **03 Bestand & Zielbild**. Fehlt ein Objekt, steht es unter „Nicht oder nur teilweise enthalten · mit Grund“ — mit **Im Objekt öffnen** und **neu rechnen ↻** (öffnet das Objekt, rechnet kostenlos und speichert).',
+        belege: [[J('dashboard.js'), 'Bestand &amp; Zielbild'], [J('dashboard.js'), 'Nicht oder nur teilweise enthalten · mit Grund'], [J('dashboard.js'), 'neu rechnen ↻']] }
+    ],
+    hinweis: 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert zum heutigen Stichtag. Score, Verkehrswert und Marktbericht rechnen weiter mit dem Bestand.'
   }
 ];

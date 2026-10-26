@@ -38,7 +38,7 @@
         },
         {
           h: 'Der Prozess-Atlas',
-          body: 'Sieben Abläufe als Netzplan: die ganze Reise vom Inserat bis zum Portfolio, der Quick-Check, der Netzplan der Datenaufnahme, der Deal bis „gewonnen“, das Steuerjahr, der Marktbericht und woraus die Scores bestehen.\n\nKlick eine Station an: die Schritte klappen auf, die Eingaben fliegen ein, die Ergebnisse erscheinen. „Ablauf abspielen“ geht alle Stationen nacheinander durch, „Hinfliegen“ öffnet die Stelle in der App. Grün markiert ist, wo dein geöffnetes Objekt gerade steht.'
+          body: 'Elf Abläufe als Netzplan: die ganze Reise vom Inserat bis zum Portfolio, der Quick-Check, der Sprechlauf, der Dokument-Import, der Netzplan der Datenaufnahme, der Deal bis „gewonnen“, das Steuerjahr, der Marktbericht, woraus die Scores bestehen, Mieterhöhung und Zielbild und der Telegram-Bot.\n\nKlick eine Station an: rechts steht ihre <strong>Beschreibung</strong>, darunter klappen die Schritte auf („Schritt für Schritt“), die Eingaben fliegen ein, die Ergebnisse erscheinen. „Ablauf abspielen“ geht alle Stationen nacheinander durch, „Hinfliegen“ öffnet die Stelle in der App. Grün markiert ist, wo dein geöffnetes Objekt gerade steht.\n\nWo es zur Station eine ausführliche Anleitung gibt, führt <strong>Schritt für Schritt im Flughandbuch →</strong> direkt zum passenden Ablauf im Flughandbuch — mit jedem Klick zum Nachmachen und Ausdrucken.'
         },
         {
           h: 'Die Reise in drei Phasen',
@@ -64,7 +64,7 @@
         /* v2560 · Flughandbuch: die Seite handbuch.html, oben im Thema als Knopf (_handbuchBannerHtml) */
         {
           h: 'Handbuch: Schritt für Schritt und alle Felder',
-          body: 'Das <strong>Flughandbuch</strong> beginnt mit <strong>Teil A · Schritt für Schritt</strong>: 11 Abläufe von der Ersteinrichtung über Quick Boarding, Finanzierung, RND-Assistent und Pilot-Analyse bis zu Bank, Steuer und Portfolio. Danach führt es je Objektart — Eigentumswohnung, Einfamilienhaus, Mehrfamilienhaus — Reiter für Reiter durch alle Felder: was du einträgst, woher der Wert kommt und was er bewirkt. Mit Bildern aus der App und als PDF zum Ausdrucken. Öffnen über den Knopf <strong>Handbuch öffnen</strong> oben in diesem Thema.'
+          body: 'Das <strong>Flughandbuch</strong> beginnt mit <strong>Teil A · Schritt für Schritt</strong>: 12 Abläufe von der Ersteinrichtung über Quick Boarding, Finanzierung, RND-Assistent und Pilot-Analyse bis zu Bank, Steuer, Portfolio sowie Mieterhöhung und Zielbild. Danach führt es je Objektart — Eigentumswohnung, Einfamilienhaus, Mehrfamilienhaus — Reiter für Reiter durch alle Felder: was du einträgst, woher der Wert kommt und was er bewirkt. Mit Bildern aus der App und als PDF zum Ausdrucken. Öffnen über den Knopf <strong>Handbuch öffnen</strong> oben in diesem Thema.'
         },
         {
           h: 'Objekt — Grunddaten, Lage und Eingabetiefe',
@@ -388,6 +388,30 @@
         {
           h: 'Drei Mieten je Wohnung',
           body: '<strong>Ist</strong> ist, was heute gezahlt wird. Die <strong>Soll-Miete (Mieter bleibt)</strong> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Das <strong>Zielbild</strong> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig — ohne Angaben ändert sich nichts.'
+        },
+        {
+          h: 'Schritt für Schritt: ein Zielbild anlegen',
+          body: 'So legst du bei Eigentumswohnung, Einfamilien- oder Zweifamilienhaus ein Zielbild an:\n\n1. Objekt öffnen, Reiter <strong>Objekt</strong>, Karte <strong>Mieterhöhung und Zielbild (optional)</strong> aufklappen.\n2. <strong>Vergleichsmiete (€/m²)</strong> eintragen, wenn du den Mietspiegel kennst — leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.\n3. <strong>Soll-Miete (Mieter bleibt, €/m²)</strong> leer lassen: Darunter steht „DealPilot rechnet vor: …“ mit Begründung. Eine eigene Zahl überschreibt den Vorschlag. <strong>Soll erreichbar ab</strong> ist ohne Angabe 15 Monate nach der letzten Erhöhung.\n4. <strong>Zielmiete (€/m²)</strong> eintragen — was nach Umbau oder bei einem neuen Mieter erzielbar ist — und unter <strong>Zielbild ab wann</strong> den Anlass, z. B. „bei Mieterwechsel“.\n5. Unter <strong>Maßnahmen</strong> die Chips anklicken, die du planst, und je Maßnahme die <strong>Kosten €</strong> eintragen.\n6. Wird mit Mieter in der Wohnung modernisiert: Haken <strong>bewohnt (§ 559)</strong>.\n7. <strong>Zielbild fertig (Jahr)</strong> eintragen, damit Pilot-Analyse und PDF ein Jahr nennen (leer = offen).\n\nUnter der Karte steht sofort die Summe: Ist, Mieterhöhung und Zielbild je Monat, die Maßnahmenkosten und die gewonnenen Modernisierungspunkte. DealPilot speichert die Angaben mit dem Objekt.'
+        },
+        {
+          h: 'Maßnahmen: Kosten und Modernisierungspunkte',
+          body: 'Zur Wahl stehen Bad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Renovierung, Küche, Dach, Fassade/Dämmung, Heizung, Leitungen und Sonstiges (mit eigener Bezeichnung).\n\nBad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Dach, Fassade, Heizung und Leitungen tragen <strong>Modernisierungspunkte nach Anlage 2 ImmoWertV</strong>. Der Chip zeigt, wie viele Punkte das Gewerk noch bringt (z. B. „+2 P.“) — ist es schon voll modernisiert, bringt es keine weiteren. Elektrik zählt als ein Punkt der Leitungssysteme. Renovierung, Küche und Sonstiges kosten Geld, tragen aber keine Punkte.\n\nMehr Punkte heißen eine <strong>längere Restnutzungsdauer</strong>. Mieterhöhung und Zielbild rechnen mit dieser längeren Restnutzungsdauer, der Bestand mit der heutigen — so wird sichtbar, was die Maßnahme am Wert bewirkt.'
+        },
+        {
+          h: 'Beim Mehrfamilienhaus: je Wohnung',
+          body: 'Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche <strong>Einheiten erfassen</strong> öffnen.\n2. Im Schritt <strong>Gebäude</strong> den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken <strong>In Wohnungseigentum aufgeteilt</strong> setzen und die <strong>Kosten der Aufteilung</strong> prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch <strong>Zielbild fertig (Jahr)</strong>.\n3. In der Liste bei jeder Wohnung <strong>Details</strong>: Mietvertrag, Soll-Miete, <strong>Zielbild · nach Umbau</strong> mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n4. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n5. Mit <strong>Übernehmen</strong> schließen.'
+        },
+        {
+          h: 'Ertragswerte rechnen — kostenlos',
+          body: 'Den Ertragswert je Stufe (Bestand, Mieterhöhung, Zielbild) rechnet DealPilot mit demselben Rechenkern wie den Marktbericht Stufe 3. Das kostet <strong>kein Kontingent</strong>.\n\n• <strong>Von selbst:</strong> Öffnest du den Reiter <strong>Bewertung</strong>, rechnet DealPilot fehlende oder veraltete Ertragswerte nach. Bis dahin steht dort „werden gerechnet (kostenlos)“.\n• <strong>Von Hand:</strong> <strong>Jetzt rechnen</strong> in der Karte Wert & Zielbild oder <strong>Ertragswerte rechnen</strong> in der Pilot-Analyse.\n• <strong>Im Cockpit:</strong> <strong>neu rechnen ↻</strong> öffnet das Objekt, rechnet und speichert.\n\n<strong>Voraussetzung:</strong> Der Ertragswert gehört zur Wertermittlung nach ImmoWertV (Stufe 3). Er erscheint, sobald für das Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält. Ohne das siehst du „Ertragswert je Stufe mit DealPilot Stufe 3“ — Mieten, Maßnahmen und Rendite stehen trotzdem da.\n\nKostenpflichtig ist nur, was ausdrücklich danach fragt: ein neuer Marktbericht und der Abruf „Marktpreise abrufen“ in der Pilot-Analyse (1 × erweiterte Marktpreisindikation, DealPilot fragt vorher).'
+        },
+        {
+          h: 'Was die Zahlen bedeuten',
+          body: 'Im Reiter <strong>Bewertung</strong>, Karte <strong>Wert & Zielbild</strong>:\n\n• <strong>Kaltmiete</strong> je Stufe und der Mehrertrag gegen heute.\n• <strong>Maßnahmen</strong> — die Summe der eingetragenen Kosten, ohne Finanzierung.\n• <strong>Ertragswert</strong> je Stufe — mit Liegenschaftszins, Bewirtschaftung und Bodenwert wie im Marktbericht; je Stufe wechseln nur Miete und Restnutzungsdauer.\n• <strong>Wertzuwachs nach Kosten</strong> = Ertragswert der Stufe − Ertragswert heute − Maßnahmen. Ist er positiv, bringen die Maßnahmen mehr Wert, als sie kosten.\n\nLiegt eine Mehrmiete über der marktüblichen Miete, setzt der Ertragswert sie nicht an — die Miete steigt dann, der Wert nicht.\n\n<strong>Wichtig:</strong> Mieterhöhung und Zielbild sind ein <strong>Ausblick</strong>. Die Werte unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag; maßgeblich für heute bleibt der Ertragswert im Bestand. Score, Verkehrswert und Marktbericht rechnen weiter mit dem Bestand.'
+        },
+        {
+          h: 'Zielbild im Portfolio-Cockpit',
+          body: 'Im <strong>Portfolio-Cockpit</strong>, Abschnitt <strong>03 Bestand & Zielbild</strong>, addiert DealPilot Mieterhöhung und Zielbild aller Objekte, für die sie erfasst und gerechnet sind: Kaltmiete, Bruttomietrendite, Maßnahmen und Wertzuwachs nach Kosten, dazu je Objekt die Steigerung der Kaltmiete.\n\nFehlt ein Objekt oder zählt es nur teilweise, steht es unter „Nicht oder nur teilweise enthalten · mit Grund“, zum Beispiel:\n• Noch nicht erfasst — weder Soll-Miete noch Zielbild eingetragen.\n• Ertragswert je Stufe nur mit DealPilot Stufe 3 — Miete und Maßnahmen zählen, der Wert nicht.\n• Ertragswert noch nicht gerechnet — im Objekt unter Bewertung kostenlos rechnen.\n• Die Berechnung ist älter und hat noch keine Stufen — einmal neu rechnen.\n• Nur Mieterhöhung erfasst — zählt mit der Mieterhöhung als höchster Stufe.\n\nDaneben führen <strong>Im Objekt öffnen</strong> und <strong>neu rechnen ↻</strong> (kostenlos) direkt dorthin. Das Cockpit liest die Berechnung, die am Objekt gespeichert ist — nach dem Neurechnen das Cockpit wieder öffnen.'
         },
         {
           h: 'Wo du es einträgst',
@@ -1053,11 +1077,19 @@
       + '<div class="kn"><button type="button" onclick="window.DealPilotAtlas && DealPilotAtlas.oeffne()">✈ Atlas öffnen</button>'
       + '<button type="button" class="z" onclick="hideHelp(); window.DealPilotPilot && DealPilotPilot.rufen()">Pilot rufen · F1</button></div></div>';
   }
-  function _handbuchBannerHtml() {
+  /* v2965a · anker: Sprung zu einem Ablauf in Teil A (handbuch.html#a-<id>), dann eigener Titel */
+  function _handbuchBannerHtml(anker, titel, text) {
+    if (anker) {
+      return '<div class="hb-banner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px">'
+        + '<div style="flex:1;min-width:200px"><div style="font:700 10.5px JetBrains Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A)">Flughandbuch · Schritt für Schritt</div>'
+        + '<div style="font:600 16px Space Grotesk,sans-serif;color:#fdfcfa;margin-top:4px">' + _escHtml(titel) + '</div>'
+        + '<div style="font-size:12.5px;color:#b9ad8f;margin-top:2px">' + _escHtml(text) + '</div></div>'
+        + '<button type="button" class="help-handbuch-sprung" data-anker="' + _escHtml(anker) + '" onclick="window.open(&quot;handbuch.html#a-' + _escHtml(anker) + '&quot;, &quot;_blank&quot;, &quot;noopener&quot;)" style="border:0;border-radius:10px;padding:10px 14px;font:600 13px Space Grotesk,sans-serif;cursor:pointer;color:#1a1407;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))">Anleitung öffnen</button></div>';
+    }
     return '<div class="hb-banner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px">'
       + '<div style="flex:1;min-width:200px"><div style="font:700 10.5px JetBrains Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A)">Flughandbuch</div>'
       + '<div style="font:600 16px Space Grotesk,sans-serif;color:#fdfcfa;margin-top:4px">Handbuch: Schritt für Schritt und alle Felder</div>'
-      + '<div style="font-size:12.5px;color:#b9ad8f;margin-top:2px">11 Abläufe von der Einrichtung bis zur Steuer, dazu jedes Feld mit Bild, Beispiel, Herkunft und Wirkung — auch als PDF.</div></div>'
+      + '<div style="font-size:12.5px;color:#b9ad8f;margin-top:2px">12 Abläufe von der Einrichtung bis zum Zielbild, dazu jedes Feld mit Bild, Beispiel, Herkunft und Wirkung — auch als PDF.</div></div>'
       + '<button type="button" id="help-handbuch-btn" onclick="window.open(&quot;handbuch.html&quot;, &quot;_blank&quot;, &quot;noopener&quot;)" style="border:0;border-radius:10px;padding:10px 14px;font:600 13px Space Grotesk,sans-serif;cursor:pointer;color:#1a1407;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))">Handbuch öffnen</button></div>';
   }
   function _renderTopic(topic) {
@@ -1075,6 +1107,9 @@
     '</div>';   /* v2741 · ohne Untertext (topic.desc), siehe Seitenleiste */
     /* v2188: Prozess-Atlas und Pilot oben im Thema „Abläufe & Pilot“ (v2200: vor der Tour) */
     if (topic.id === 'ablaeufe') { html += _atlasBannerHtml(); }
+    /* v2965a · die ausführliche Anleitung (Flughandbuch Teil A) stand nur im Thema „Die Reiter im Objekt“ */
+    if (topic.id === 'ablaeufe') { html += _handbuchBannerHtml(); }
+    if (topic.id === 'zielbild') { html += _handbuchBannerHtml('zielbild', 'Mieterhöhung und Zielbild anlegen', '10 Schritte zum Nachklicken: Soll-Miete, Zielmiete, Maßnahmen mit Kosten, Mehrfamilienhaus, Ertragswert je Stufe, Portfolio-Cockpit.'); }
     // BlockA3: Tour-Banner OBEN im Einstieg-Topic — direkter innerHTML, kein Filter
     if (topic.id === 'ablaeufe') {   /* v2200: Einstieg ist in „Abläufe“ aufgegangen */
       html +=
