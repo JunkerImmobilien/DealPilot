@@ -122,6 +122,10 @@
   #dashboard-main .hgate .tot div{text-align:center}
 #dashboard-main .hgate .tot .k{font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-pmut)}
 #dashboard-main .hgate .tot .v{font-family:'JetBrains Mono';font-weight:700;font-size:12px;color:var(--c-ptext);margin-top:2px}
+/* v2966e · Messkabine 26.10.2026: drei gleich breite Spalten (flex 1 1 0, je 47 px) - „5,52 Mio“ (60 px) lief in „CF/MON“ hinein, auf JEDER Breite. Spalten nach Inhalt, Abstand 6 px, zur Not Umbruch statt Ueberlappung. */
+#dashboard-main .hgate .tot{gap:6px;flex-wrap:wrap;row-gap:6px}
+#dashboard-main .hgate .tot > div{flex:0 1 auto !important;min-width:0}
+#dashboard-main .hgate .tot .v{white-space:nowrap}
 
   #dashboard-main .hbars{flex:1;display:flex;flex-direction:column;gap:11px;justify-content:center}
 
@@ -1070,7 +1074,7 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .zb-o{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) 128px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,transparent)}
 #dashboard-main .zb-o:last-child{border-bottom:0}
 #dashboard-main .zb-o-n{font:500 12.5px/1.3 Inter,system-ui,sans-serif;color:var(--c-ptext);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-#dashboard-main .zb-o-n small{display:block;font:400 9.5px 'JetBrains Mono',monospace;color:var(--c-pmut);margin-top:2px}
+#dashboard-main .zb-o-n small{display:block;font:400 9.5px 'JetBrains Mono',monospace;color:var(--c-pmut);margin-top:2px;white-space:normal}   /* v2966e: 390 px schnitt „gerechnet am 25.10.2026“ nach „25“ ab */
 #dashboard-main .zb-o-g{min-width:0}
 #dashboard-main .zb-o-track{position:relative;display:block;height:12px;margin:0 5px}
 #dashboard-main .zb-o-track::before{content:"";position:absolute;left:0;right:0;top:5.5px;height:1px;background:var(--c-line)}

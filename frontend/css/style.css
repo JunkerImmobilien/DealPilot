@@ -41273,7 +41273,9 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
    Varianten mit eigener Kartenform (html[data-ui-cards], data-dp-objkarte, Schiene) bleiben
    unberuehrt - sie stehen hoeher in der Spezifitaet. */
 @media (min-width: 1025px) {
-  body aside.sidebar .sb-card .sbc-address { padding-right: 74px !important; }
+  /* v2966e: zweizeilig statt „Bismarckstr. 27, De…“ - der Ort (auch „Bad Oeynhausen“) bleibt lesbar */
+  body aside.sidebar .sb-card .sbc-address { padding-right: 74px !important; white-space: normal !important; display: -webkit-box !important;
+    -webkit-box-orient: vertical !important; -webkit-line-clamp: 2 !important; overflow: hidden !important; line-height: 1.25 !important; }
 }
 @media (min-width: 901px) and (max-width: 1024px) {
   body aside.sidebar .sb-card .sbc-thumb { display: none !important; }
