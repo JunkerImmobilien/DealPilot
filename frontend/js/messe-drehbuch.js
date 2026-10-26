@@ -2621,6 +2621,14 @@
     /* v2263 · opt.behalte: Gewonnen-Status bleibt (Modul 14, Bestand) */
     (opt.behalte ? ['_obj_seq'] : ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost']).forEach(function (k) { delete d[k]; });   /* wie dupSaved() */
     if (opt.ohneAnkauf) delete d._ankauf;   /* v2263: ein offener Deal hat noch keinen eingefrorenen Ankauf-Stand */
+    /* v2967 · opt.ankauf: der Ankauf-Stand der KOPIE wird nachgezogen (Modul 14, siehe R14_ANKAUF) -
+       das echte Objekt behält seinen */
+    if (opt.ankauf && d._ankauf && d._ankauf.daten) {
+      Object.keys(opt.ankauf.daten).forEach(function (k) { d._ankauf.daten[k] = opt.ankauf.daten[k]; });
+      delete d._ankauf.daten._ds2_categories;   /* rechnet die App beim Laden des Soll neu */
+      d._ankauf.kurz = JSON.parse(JSON.stringify(opt.ankauf.kurz));
+      if (opt.ankauf.stichtag) d._ankauf.stichtag = opt.ankauf.stichtag;
+    }
     /* v2263 · die Analyse trägt die Kennung ihres Objekts (_fuer.objekt_id) - an
        der Kopie hieße es sonst „gehört zu einem anderen Objekt". Ohne Kennung
        prüft die App nur den Zahlenabdruck, wie bei jeder Analyse. */
@@ -3273,6 +3281,15 @@
   };
 
   /* ── MODUL 14 · VOM ANKAUF IN DEN BESTAND ────────────────────────── */
+  /* v2967 · Ankauf-Stand der Parkstr. 9 zum Kaufpreis 395.000 € (Marcel 26.10.2026: Module 14/18
+     auf den heutigen Demo-Stand). Der Stand am echten Objekt (DEMO-BO6) ist zum 23.12.2024 mit
+     Kaufpreis 780.000 € / Darlehen 640.000 € eingefroren - die Kaufpreise wurden am 25.10. nur im
+     Ist angeglichen. Gegen ihn zeigte die Soll/Ist-Tafel „Kaufpreis 780.000 -> 395.000 €“.
+     Erzeugt EINMAL von der App selbst (26.10.2026): Kopie mit dem eingefrorenen Datensatz, darin
+     nur Kaufpreis, Darlehen, EK, Nebenkosten-Sätze und Grenzsteuersatz vom heutigen Objekt;
+     geladen, gerechnet, DealPilotAnkauf.festschreiben('2024-12-23'), Kopie gelöscht. Mieten,
+     Leerstand und Modernisierung bleiben der Stand beim Kauf. Kein Abruf mit Kosten. */
+  var R14_ANKAUF = {"stichtag":"2024-12-23","kurz":{"kp":395000,"nkm":2321,"_kpis_miete_j":28932,"_kpis_bmy":7.324556962025317,"_kpis_nmy":3.624199873292843,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_steuerwirkung":-1453,"_nkm_qm":5.44,"_leer_einheiten":1,"_kpis_bwk_nul_y":7680,"eigen_r":0,"d1z":4,"_kpis_cf_vs":5052,"geb_ant":54.31,"afa_satz":2},"daten":{"d1":"324000","ek":"262392","kp":"395000","ji_p":"1.5","gba_p":"0.5","grenz":"47.00","gest_p":"6.5","notar_p":"1.7","makler_p":"3.57","_kpis_bmy":7.324556962025317,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_cf_vs":5052,"ds2_marktfaktor":"8,2","_dealpilot_score":87,"_kpis_miete_j":28932,"_kpis_nmy":3.624199873292843}};
   function r14Seg(re) { return [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return re.test(b.textContent); })[0] || null; }
   DREHBUECHER['reihe-bestand'] = {
     titel: 'Vom Ankauf in den Bestand', unterzeile: 'Gewonnen, eingefroren, verglichen', objekt: null,
@@ -3280,7 +3297,7 @@
     aufraeumen: function () { try { var i = r14Seg(/Ist/); if (i && window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) i.click(); } catch (e) {} rhAufraeumen(); },
     szenen: [
       async function (s) {   /* 1 · das Objekt */
-        await r6KopieStart(R11_PARK, { behalte: true });
+        await r6KopieStart(R11_PARK, { behalte: true, ankauf: R14_ANKAUF });
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         var we = wert('einheiten');
@@ -4138,7 +4155,9 @@
      für diesen Aufruf auf Blob umgelenkt) und wird im Bild gezeigt.
      Keine Anbieter- oder Portalnamen in den Kapiteltexten; der Prüflauf
      misst Portal- und Dienstnamen auch im Fenster und im PDF. */
-  var R18_BERICHT = 205;
+  /* v2967 · Bericht 346 (Stufe 3, 25.10.2026, Kaufpreis 395.000 €, Modernisierung eingetragen,
+     RND 32 J.) statt 205 (14.10.2026, Kaufpreis 780.000 €) - gelesen, nicht neu abgerufen */
+  var R18_BERICHT = 346;
   var _r18 = { pdf: null, url: null, save: null };
   function r18Zu() {
     var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
