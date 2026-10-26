@@ -123,9 +123,9 @@
 #dashboard-main .hgate .tot .k{font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-pmut)}
 #dashboard-main .hgate .tot .v{font-family:'JetBrains Mono';font-weight:700;font-size:12px;color:var(--c-ptext);margin-top:2px}
 /* v2966e · Messkabine 26.10.2026: drei gleich breite Spalten (flex 1 1 0, je 47 px) - „5,52 Mio“ (60 px) lief in „CF/MON“ hinein, auf JEDER Breite. Spalten nach Inhalt, Abstand 6 px, zur Not Umbruch statt Ueberlappung. */
-#dashboard-main .hgate .tot{gap:6px;flex-wrap:wrap;row-gap:6px}
+#dashboard-main .hgate .tot{gap:4px;flex-wrap:wrap;row-gap:6px}
 #dashboard-main .hgate .tot > div{flex:0 1 auto !important;min-width:0}
-#dashboard-main .hgate .tot .v{white-space:nowrap}
+#dashboard-main .hgate .tot .v{white-space:nowrap;font-size:11px}   /* v2966f: bei 150 px Spalte (ab 1024) brach CF/MON sonst in die zweite Zeile */
 
   #dashboard-main .hbars{flex:1;display:flex;flex-direction:column;gap:11px;justify-content:center}
 
