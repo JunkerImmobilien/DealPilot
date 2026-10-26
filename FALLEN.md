@@ -4608,3 +4608,18 @@ Windows **13 px** hoch (`offsetHeight − clientHeight`), auf Mac/iPad mit
 Überlagerungsbalken 0. Er erscheint nur, wenn die Leiste überläuft. Wer an
 Höhenverträgen unter `nav.tabs` rechnet (`top:178px`-Muster), misst auf
 beiden Systemen.
+
+## `loadData()` eines gewonnenen Objekts ohne `_ankauf` speichert sofort
+
+Gemessen am 26.10.2026 an Parkstr. 9 (Staging): Wer per Skript einen
+Datensatz ohne `_ankauf` in ein Objekt mit `_deal_won` lädt (etwa um einen
+früheren Stand nachzurechnen), löst `DealPilotAnkauf.vonSelbst()` aus. Das
+schreibt einen Ankauf-Stand fest **und speichert das Objekt** — der
+Zwischenstand stand nach einer Sekunde in der Datenbank, der alte
+Ankauf-Stand samt Korrekturnachweis war überschrieben. Behoben nur, weil der
+heutige Stand vorher als Kopie im Fenster lag und die DB gesichert war.
+
+**Regel:** Vor jedem Skript-`loadData` mit fremdem Stand `saveObj` stummschalten
+(`window.__saveOrig = saveObj; saveObj = async function(){}`), danach
+zurücksetzen und den Endstand gegen einen vorher gezogenen DB-Abzug
+Feld für Feld vergleichen. Auch `runAI()` speichert von selbst.
