@@ -2669,7 +2669,19 @@ Stripe LIVE seit 15.07. · Caddyfile repo-gepflegt ·
 
 ## OFFENE PUNKTE
 
-**Demo-Konto info@ — Staging und Prod laufen seit 25.10.2026 auseinander.**
+**Demo-Konto info@ — seit 26.10.2026 wieder gespiegelt.** Die 19 Objekte, die
+es auf beiden Seiten gibt, sind am 26.10. per ID von Staging nach Prod
+übertragen (md5 19/19), dazu die 17 Marktberichte. 9 Testobjekte liegen nur
+auf Staging, 5 nur auf Prod. **Parkstr. 9 (DEMO-BO6) seit v2968b:** Ankauf-Stand
+zum 23.12.2024 mit KP 395.000 / Darlehen 324.000 (DSCR 1,79, Score 65; Mieten,
+Leerstand, Modernisierung = Stand beim Kauf), heute DSCR 2,43, Score 69; zwei
+Pilot-Analysen vom 26.10. (Ankauf „Kaufen“ 372.000, heute „Kaufen“ 395.000).
+Auf beiden Servern md5-gleich in `_ankauf` und `_ai`; übrige Felder des
+Prod-Objekts weichen in Rechenfeldern leicht ab (dort geöffnet).
+**Vor jedem Skript-`loadData` an einem Demo-Objekt `saveObj` stummschalten**
+(FALLEN.md, 26.10.).
+
+*Vorgeschichte:*
 Am 23.10. wurden die 17 Demo-Objekte per ID nach Prod gespiegelt. Am 25.10.
 nur auf **Staging** geändert (mit Marcels Freigabe): Kaufpreise Parkstr. 9
 395.000 (vorher 780.000), Bismarckstr. 27 850.000 (1,15 Mio), Hölderlinstr. 1
@@ -2678,8 +2690,24 @@ Darlehen im selben Verhältnis, EK = Gesamtinvestition − Darlehen; Parkstr. 9
 Modernisierung eingetragen; Musterstraße 12 Grundstück 1.200 m²; Westerfeld-
 Kopie `c5a78c89` („E2E“) und Am Markt 9 privat `cea958eb` auf „Verloren“
 (endgültig löschen macht Marcel). Behalten: Westerfeld `ae155d38`
-(Spot/Videos), Am Markt 9 VV-GmbH `ec2d0f32`. Soll Prod für die Messe
-denselben Stand zeigen, muss wieder gespiegelt werden (vorher sichern).
+(Spot/Videos), Am Markt 9 VV-GmbH `ec2d0f32`. Seit dem Spiegel vom 26.10. erledigt; bei neuen Änderungen
+wieder spiegeln (vorher sichern).
+
+**Stand 26.10.2026 abends (Sitzungsende, Prod = Staging `24578bd` + Journal):**
+- Videothek 30 von 30 mit Marcels Stimme, Modul 14 neu (v2968), Vorschaubilder
+  14/18 neu; Video-URLs `?v=marcel-20261026b`, Bilder `?v=v2968`,
+  `dp2-live.js` Buster `landing-videothek-4f` in `index.html` UND
+  `videothek.html` (die zweite Seite hat einen EIGENEN Buster — beim nächsten
+  Mal beide ziehen). Higgsfield-Rest rund 82 Credits.
+- Offen bei Marcel: echter Telegram-Dialog (Hilfe, Bewertung bis „Ja“, PDFs);
+  Social-Media-Paket `Dateien/Social-Media/2026-10-26-messe-immocation/`
+  (welches Instagram-Profil, Festival-Hashtag, Ticketcodes); Pilot-Analyse nennt
+  den DealScore (97), die Karte den Investor Deal Score (69) — auf einen Score
+  ausrichten?; Kopien Westerfeld `c5a78c89` und Am Markt 9 `cea958eb` endgültig
+  löschen (macht Marcel); Anzeige-Widerspruch MFH-Gebäudezustand gegen
+  Objektfelder (Parkstr. 9).
+- Aufräumen: Sicherungsreste mit `\r` im Namen in `/root/backups` auf Prod
+  (`…-1649`, 25.10.); Rohaufnahmen in `Dateien/Messe/Videos/alt-vor-*`.
 
 **Messe-Material (Messe Leipzig 31.10.–01.11.2026):** Storybook aus
 `tools/messe-storybook.mjs` → `Dateien/Messe/DealPilot Messe-Storybook.pdf`
