@@ -7,9 +7,10 @@
 import fs from 'fs';
 import vm from 'vm';
 const MAX = { dach: 4, aussenwand: 4, fenster: 2, leitungen: 2, heizung: 2, baeder: 2, innenausbau: 2, grundriss: 2 };
-const doc = { getElementById: () => null, addEventListener() {}, querySelector: () => null, querySelectorAll: () => [], readyState: 'complete',
+const FELD = {};
+const doc = { getElementById: (id) => (id in FELD ? { value: FELD[id] } : null), addEventListener() {}, querySelector: () => null, querySelectorAll: () => [], readyState: 'complete',
   createElement: () => ({ style: {}, setAttribute() {}, appendChild() {} }), head: { appendChild() {} }, body: { appendChild() {} } };
-const win = { DpMfhEinheiten: { maxPunkte: (g) => MAX[g] || 2, punkteVon: (g, st) => ({ '0': 0, 'h': MAX[g] / 2 })[st] || 0 } };
+const win = { DpMfhEinheiten: { maxPunkte: (g) => MAX[g] || 2, punkteVon: (g, st) => ({ '0': 0, 'h': MAX[g] / 2 })[st] || 0, punkteObjekt: (g, v) => (v === 'neu' ? MAX[g] : 0) } };
 win.window = win; win.document = doc; win.addEventListener = () => {};
 const ctx = vm.createContext(Object.assign(win, { console, setTimeout, Promise, JSON, Math, Date, isFinite, parseFloat, String, Number, Array, Object, fetch: undefined }));
 vm.runInContext(fs.readFileSync('frontend/js/potenzial.js', 'utf8'), ctx);
@@ -44,4 +45,10 @@ ist('WE1 Liste nur eigene Massnahmen', m1.wohnungen[0].massnahmen.length, 1);
 // nicht-Haus-Katalog wird ignoriert (Bad am Haus)
 const m4 = P.modell({ einheiten: E(), gebaeude: {}, haus_massnahmen: [{ id: 'bad', t: 'Bad', k: 9999 }] });
 ist('Bad als Hausmassnahme ignoriert', m4.stufen.zielbild.kosten, 15000);
+// Objektfeld sagt Heizung modernisiert (wie Parkstr. 9), Gebaeude-Zustand 0: Heizung bringt nichts mehr
+FELD.mod_heizung = 'neu';
+const m5 = P.modell({ einheiten: E(), gebaeude: { heizung: '0' }, haus_massnahmen: [{ id: 'heizung', t: 'Heizung', k: 20000 }, { id: 'dach', t: 'Dach', k: 1000 }] });
+ist('Objektfeld Heizung modernisiert: WE3 nur Dach 4', m5.wohnungen[2].plus_ziel, 4);
+ist('... Kosten zaehlen trotzdem', m5.stufen.zielbild.kosten, 15000 + 21000);
+delete FELD.mod_heizung;
 console.log(fehler ? fehler + ' Fehler' : 'sauber'); process.exit(fehler ? 1 : 0);

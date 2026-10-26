@@ -181,11 +181,16 @@
   function maxP(g) { return (M().maxPunkte ? M().maxPunkte(g) : 2); }
   function katalog(id) { return MASSNAHMEN.filter(function (m) { return m.id === id; })[0] || null; }
   /** Heutige Punkte eines Gewerks: in der Wohnung (eigen, sonst Haus) oder am Objekt. */
+  /* v2966 · N80 · GEMESSEN Parkstr. 9 (26.10.2026): im Reiter Objekt Heizung, Leitungen, Bäder,
+     Innenausbau „< 5 Jahre" (mod_punkte 8 - damit rechnet der Dienst die RND im Bestand), im MFH-Fenster
+     stand der Gebaeude-Zustand aber auf „nicht modernisiert". Der Chip bot +2 fuer Heizung an, die schon
+     im Bestand zaehlt - doppelt. Heute gilt deshalb das Hoehere aus Wohnung/Gebaeude und Objektfeld:
+     dieselbe Basis, auf die der Dienst den Gewinn aufschlaegt. */
   function punkteJetzt(gewerk, e, geb) {
-    var MM = M();
-    if ((e || geb) && MM.punkteVon) return MM.punkteVon(gewerk, (e && e.mod && e.mod[gewerk]) || (geb && geb[gewerk]) || '0');   /* v2966: auch ohne Wohnung (Haus) */
-    if (MM.punkteObjekt) return MM.punkteObjekt(gewerk, wert('mod_' + gewerk));
-    return 0;
+    var MM = M(), p = 0;
+    if ((e || geb) && MM.punkteVon) p = MM.punkteVon(gewerk, (e && e.mod && e.mod[gewerk]) || (geb && geb[gewerk]) || '0');
+    if (MM.punkteObjekt) { var o = wert('mod_' + gewerk); if (o) p = Math.max(p, MM.punkteObjekt(gewerk, o) || 0); }
+    return p;
   }
   /** Gewinn an Punkten aus einer Maßnahmenliste: je Gewerk höchstens bis zum
       Anlage-2-Maximum, nie doppelt gezählt. */
