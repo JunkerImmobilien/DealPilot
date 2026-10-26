@@ -4248,7 +4248,10 @@
         var ag = function () { return r16Mb('#assessGrid'); };
         await r16Hin(r16Mb('#map'), true);
         await zeigeGruppe(function () { return r16Mb('#map'); }, r18AssessEl(/^Mietentwicklung/), 8);
-        await b2oZeile(s, 'Lage', 'Mikrolage <b>' + (r18Assess(/^Mikrolage$/) || '–') + '</b>, Makrolage ' + (r18Assess(/^Makrolage$/) || '–') + ', Nachfrage ' + (r18Assess(/^Nachfrage$/) || '–') + ', Entwicklung ' + (r18Assess(/^Entwicklung$/) || '–') + ' — gemessen, nicht geschätzt.');
+        /* v2967 · GEMESSEN 26.10.: die Beschriftung trägt jetzt eine Erläuterung („Mikrolage · Umfeld-Score …“),
+           der Wert eine Zahl („sehr gut · 98 Score“) - mit /^Mikrolage$/ stand im Satz „Mikrolage –“ */
+        var lg = function (re) { var v = r18Assess(re); return v ? v.split(' · ')[0] : '–'; };
+        await b2oZeile(s, 'Lage', 'Mikrolage <b>' + lg(/^Mikrolage(\s*·|$)/) + '</b>, Makrolage ' + lg(/^Makrolage(\s*·|$)/) + ', Nachfrage ' + lg(/^Nachfrage(\s*·|$)/) + ', Entwicklung ' + lg(/^Entwicklung(\s*·|$)/) + ' — gemessen, nicht geschätzt.');
       },
       async function (s) {   /* 5 · Bodenrichtwert und Zensus */
         var a = r18AssessEl(/^Bodenrichtwert/), b = r18AssessEl(/^Eigentümerquote/);
