@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-26T09:02:05.274Z",
+ "erzeugt_am": "2026-10-26T09:12:57.867Z",
  "quellen": {
   "voice-import": "3cbd37d2be829d1c",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "bfeee360cb73ba5d",
-  "index-html": "76dcdf5aa4c7cf44",
+  "index-html": "764deca3e4308b77",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -3776,7 +3776,7 @@
      },
      {
       "h": "Beim Mehrfamilienhaus: je Wohnung",
-      "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche Einheiten erfassen öffnen.\n2. Im Schritt Gebäude den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken In Wohnungseigentum aufgeteilt setzen und die Kosten der Aufteilung prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch Zielbild fertig (Jahr).\n3. In der Liste bei jeder Wohnung Details: Mietvertrag, Soll-Miete, Zielbild · nach Umbau mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n4. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n5. Mit Übernehmen schließen."
+      "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche Einheiten erfassen öffnen.\n2. Im Schritt Gebäude den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken In Wohnungseigentum aufgeteilt setzen und die Kosten der Aufteilung prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch Zielbild fertig (Jahr).\n3. Ebenfalls im Schritt Gebäude, unter Maßnahmen am ganzen Haus · Zielbild: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die Kosten € eintragen (bei Modernisierung mit Mietern: bewohnt (§ 559)). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung Details: Mietvertrag, Soll-Miete, Zielbild · nach Umbau mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit Übernehmen schließen."
      },
      {
       "h": "Ertragswerte rechnen — kostenlos",
@@ -5152,7 +5152,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "e48a06830ed4a3cb",
+  "hilfe": "57a6354605112c4e",
   "bewertung": "78f03bef50ae93e7"
  }
 }

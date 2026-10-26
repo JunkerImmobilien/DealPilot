@@ -2,14 +2,14 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "76dcdf5aa4c7cf44",
+  "index.html": "764deca3e4308b77",
   "tooltip-content.js": "ede920d2f6583fdc",
-  "help.js": "7f79269a95120e94",
+  "help.js": "b74be784baf941a9",
   "tour-content.js": "e85775a89313350d",
   "objekt-reiter.js": "146e176f961a3b25",
   "deal-action-readycheck.js": "4d9c815073f8d2ab",
   "feld-hilfe.js": "db5913c4ec4dc08e",
-  "mfh-einheiten.js": "e2ffecf4ab9bd4fc",
+  "mfh-einheiten.js": "ca99c3fbf9c111f4",
   "calc.js": "3228bc67dcae9693",
   "ui.js": "6b89df3942f02a34",
   "pdf.js": "49d7957ea03775f6",
@@ -18,9 +18,9 @@ window.DP_HANDBUCH = {
   "werbungskosten-pdf.js": "663a552eebc9b241",
   "pdf-anlage-bmf.js": "41997cf31f29fb07",
   "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
-  "frontend-konstanten.json": "926378861dc4b83a",
+  "frontend-konstanten.json": "fb502c99d1052dec",
   "aufnahme.json": "433c9aa7f5c9ec56",
-  "handbuch-ablaeufe.mjs": "a3491f0a492991fb"
+  "handbuch-ablaeufe.mjs": "4882e1047f133976"
  },
  "reiter": [
   {
@@ -17083,7 +17083,7 @@ window.DP_HANDBUCH = {
    },
    {
     "titel": "Beim Mehrfamilienhaus: je Wohnung",
-    "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche <strong>Einheiten erfassen</strong> öffnen.\n2. Im Schritt <strong>Gebäude</strong> den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken <strong>In Wohnungseigentum aufgeteilt</strong> setzen und die <strong>Kosten der Aufteilung</strong> prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch <strong>Zielbild fertig (Jahr)</strong>.\n3. In der Liste bei jeder Wohnung <strong>Details</strong>: Mietvertrag, Soll-Miete, <strong>Zielbild · nach Umbau</strong> mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n4. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n5. Mit <strong>Übernehmen</strong> schließen."
+    "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche <strong>Einheiten erfassen</strong> öffnen.\n2. Im Schritt <strong>Gebäude</strong> den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken <strong>In Wohnungseigentum aufgeteilt</strong> setzen und die <strong>Kosten der Aufteilung</strong> prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch <strong>Zielbild fertig (Jahr)</strong>.\n3. Ebenfalls im Schritt Gebäude, unter <strong>Maßnahmen am ganzen Haus · Zielbild</strong>: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die <strong>Kosten €</strong> eintragen (bei Modernisierung mit Mietern: <strong>bewohnt (§ 559)</strong>). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung <strong>Details</strong>: Mietvertrag, Soll-Miete, <strong>Zielbild · nach Umbau</strong> mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit <strong>Übernehmen</strong> schließen."
    },
    {
     "titel": "Ertragswerte rechnen — kostenlos",
@@ -18119,6 +18119,16 @@ window.DP_HANDBUCH = {
       "js/mfh-einheiten.js: Zielbild · nach Umbau",
       "js/mfh-einheiten.js: In Wohnungseigentum aufgeteilt",
       "js/mfh-einheiten.js: Kosten der Aufteilung"
+     ]
+    },
+    {
+     "t": "Mehrfamilienhaus, Maßnahmen am ganzen Haus: im Schritt **Gebäude** unter **Maßnahmen am ganzen Haus · Zielbild** Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen anklicken und die **Kosten €** eintragen. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal. Der Zustand darüber bleibt der heutige.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/mfh-einheiten.js: Maßnahmen am ganzen Haus · Zielbild",
+      "js/mfh-einheiten.js: davon Anteil Haus ",
+      "js/potenzial.js: haus: true"
      ]
     },
     {
