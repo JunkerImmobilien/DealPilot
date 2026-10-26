@@ -44,15 +44,6 @@ Gebaut und auf Staging gemessen in v2960–v2961 (`4b87c710`, `7bc8b184`, s. Fer
 2. **PDF-Dienst auf Prod** nur mit Freigabe: `.env` um `PDF_DIENST_SECRET`, Dienst über `pdf-dienst/docker-compose.pdf.yml` starten (oder Block in `docker-compose.prod.yml` übernehmen, Beschreibung im Journal v2960–v2961), Backend neu erzeugen. Abbild 1,38 GB, Spitze bis 710 MB je PDF. Ohne Dienst sagt der Bot ehrlich „noch nicht“.
 3. Klein: `mod_punkte` beim MFH und der eigene Angebotsabschlag kommen im Bot nicht wie im Browser an (Browser-Zustand); Sammelabruf „für alle Objekte“ nur einzeln.
 
-### N80 · Zielbild beim Mehrfamilienhaus: Haus-Maßnahmen mit Kosten — Entscheidung Marcel (26.10.2026)
-
-Gefunden beim Hilfetext v2965b: Dach, Fassade/Dämmung, Heizung und Leitungen gibt es beim MFH nur als
-**Zustand** im Schritt „Gebäude“ (`mfh-einheiten.js` `schritt1`). Die Maßnahmen-Chips je Wohnung sind auf
-Wohnungsmaßnahmen beschränkt (`potenzial.js` `chipsHtml(..., fuerEinheit)`), und die Karte im Reiter Objekt
-blendet ihre Chips beim MFH aus (`objektKarte()`). Eine Dachsanierung am MFH lässt sich damit weder mit
-Kosten noch mit Modernisierungspunkten ins Zielbild nehmen. Frage an Marcel: Haus-Maßnahmen im Schritt
-„Gebäude“ mit Kosten (auf die Wohnungen nach Fläche verteilt) — ja/nein? Demo-first.
-
 ### N79 · Portfolio-Cockpit Runde 2 (25.10.2026) — Rest nach v2955a
 
 Erledigt in v2952–v2955a (25.10.2026, s. Journal): Parkstr. 9 (Ankauf-Sanierung im Bestand kein Stau, Modernisierung eingetragen), zweiter und dritter Pilot-Lauf abgenommen (Prüfregel e), Bewertung je Objekt im Cockpit, alle 10 Bestandsobjekte mit Bericht Stufe 3, Kaufpreise der Demo angeglichen, Messe-Storybook neu, Zeitraum 10/20/30 zieht überall mit, Co-Pilot-Limits 10/20/50/100, Migration (3 h) raus. Optik (gekürzte Achse, Einfach als Standard) bleibt so. Rest:
@@ -4014,6 +4005,16 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+### N80 · Maßnahmen am ganzen Haus im MFH-Zielbild, Messkabine Handy/Tablet — 26.10.2026 (`v2966`–`v2966g`, `eb9cef00` … `da20f550`)
+
+Haus-Maßnahmen (Dach, Fassade, Fenster, Heizung, Leitungen) mit Kosten und Punkten im Schritt Gebäude; Kosten
+nach Fläche auf die Wohnungen, Punkte je Gewerk nur einmal, Ausgangspunkt das Höhere aus Gebäude-Zustand und
+Objektfeld (v2966a: Parkstr. 9 zählte Bäder/Heizung doppelt). Parkstr. 9 mit Dach 60.000 €: Kosten 136.000 →
+196.000 €, Punkte +1,1 → +5,1, RND 34,4 → 43,8 J., Ertragswert Zielbild 436.000 → 473.000 €. Messkabine 390 /
+768×1024 / 1024×768, 11 Ansichten: sieben Funde behoben (Objektkarte 1024, Portfolio-Pass, Investor-Co-Pilot-Zeile,
+Landing-Knopf, Atlas quer, Pass-Tabelle, Datumszeile). Rest: Gebäude-Zustand vs. Objektfelder bei Parkstr. (Anzeige).
+
 
 ### Telegram-Bot: Hilfe-Fragen, Bewertung Stufe 1–3 mit fester Bestätigung, PDFs als Datei — 26.10.2026 (`v2960`/`v2960a` `4b87c710`, `v2961` `7bc8b184`)
 
