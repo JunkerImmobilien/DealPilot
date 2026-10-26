@@ -172,6 +172,10 @@
       if (zahl(e.soll) > 0) s.hatSoll = true;
       s.kosten += zahl(e.kosten);
     });
+    /* v2966 · Massnahmen am ganzen Haus gehoeren in die Summe (und in „als Sanierung uebernehmen“) -
+       im offenen Fenster der Arbeitsstand, sonst das Gespeicherte */
+    s.kostenHaus = (el('mfh-modal') ? _hausM : (daten().haus_massnahmen || [])).reduce(function (a, m) { return a + zahl(m && m.k); }, 0);
+    s.kosten += s.kostenHaus;
     /* ══ v2486 · DIE SOLL-MIETE AUS DERSELBEN QUELLE WIE DAS WOHNUNGSFENSTER ══
        Hier zaehlte nur die VON HAND eingetragene Soll-Miete (e.soll), sonst die
        Ist-Miete. Seit v2430 rechnet DealPilot die Soll-Miete selbst
@@ -956,7 +960,7 @@
   function hausBinden() {
     var host = el('mfh-haus-mass'), P = window.DpPotenzial;
     if (!host || !P || typeof P.massnahmenBinden !== 'function') return;
-    P.massnahmenBinden(host, _hausM, { geb: _geb, fuerHaus: true, geaendert: function () { hausSumme(); } });
+    P.massnahmenBinden(host, _hausM, { geb: _geb, fuerHaus: true, geaendert: function () { hausSumme(); zeichnenSumme(); } });
     hausSumme();
   }
   function punkteZeigen() {
