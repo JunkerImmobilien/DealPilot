@@ -2,14 +2,14 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "764deca3e4308b77",
+  "index.html": "6449e46159b7604e",
   "tooltip-content.js": "ede920d2f6583fdc",
   "help.js": "b74be784baf941a9",
   "tour-content.js": "e85775a89313350d",
   "objekt-reiter.js": "146e176f961a3b25",
   "deal-action-readycheck.js": "4d9c815073f8d2ab",
   "feld-hilfe.js": "db5913c4ec4dc08e",
-  "mfh-einheiten.js": "ca99c3fbf9c111f4",
+  "mfh-einheiten.js": "5e60dcc317b72017",
   "calc.js": "3228bc67dcae9693",
   "ui.js": "6b89df3942f02a34",
   "pdf.js": "49d7957ea03775f6",
@@ -18,7 +18,7 @@ window.DP_HANDBUCH = {
   "werbungskosten-pdf.js": "663a552eebc9b241",
   "pdf-anlage-bmf.js": "41997cf31f29fb07",
   "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
-  "frontend-konstanten.json": "fb502c99d1052dec",
+  "frontend-konstanten.json": "e513f745366f5d80",
   "aufnahme.json": "433c9aa7f5c9ec56",
   "handbuch-ablaeufe.mjs": "4882e1047f133976"
  },

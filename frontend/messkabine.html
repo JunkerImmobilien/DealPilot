@@ -2136,7 +2136,7 @@
     await lade(breite, layout === undefined ? '' : layout, hoehe, extra);
     var z = ziel(), d = z.d, win = z.win;
     var geoeffnet = null;
-    if (typeof vorher === 'function') { try { geoeffnet = vorher(win, d); } catch (e) { geoeffnet = 'Fehler: '+e; } }
+    if (typeof vorher === 'function') { try { geoeffnet = await vorher(win, d);   /* v2966c: vorher darf asynchron sein (Objekt laden, dann Reiter) */ } catch (e) { geoeffnet = 'Fehler: '+e; } }
     await warte(1800);
     var sc = apScroller(d, win);
     var h = sc ? sc.clientHeight : win.innerHeight;
