@@ -36,6 +36,15 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N80 · Zielbild beim Mehrfamilienhaus: Haus-Maßnahmen mit Kosten — Entscheidung Marcel (26.10.2026)
+
+Gefunden beim Hilfetext v2965b: Dach, Fassade/Dämmung, Heizung und Leitungen gibt es beim MFH nur als
+**Zustand** im Schritt „Gebäude“ (`mfh-einheiten.js` `schritt1`). Die Maßnahmen-Chips je Wohnung sind auf
+Wohnungsmaßnahmen beschränkt (`potenzial.js` `chipsHtml(..., fuerEinheit)`), und die Karte im Reiter Objekt
+blendet ihre Chips beim MFH aus (`objektKarte()`). Eine Dachsanierung am MFH lässt sich damit weder mit
+Kosten noch mit Modernisierungspunkten ins Zielbild nehmen. Frage an Marcel: Haus-Maßnahmen im Schritt
+„Gebäude“ mit Kosten (auf die Wohnungen nach Fläche verteilt) — ja/nein? Demo-first.
+
 ### N79 · Portfolio-Cockpit Runde 2 (25.10.2026) — Rest nach v2955a
 
 Erledigt in v2952–v2955a (25.10.2026, s. Journal): Parkstr. 9 (Ankauf-Sanierung im Bestand kein Stau, Modernisierung eingetragen), zweiter und dritter Pilot-Lauf abgenommen (Prüfregel e), Bewertung je Objekt im Cockpit, alle 10 Bestandsobjekte mit Bericht Stufe 3, Kaufpreise der Demo angeglichen, Messe-Storybook neu, Zeitraum 10/20/30 zieht überall mit, Co-Pilot-Limits 10/20/50/100, Migration (3 h) raus. Optik (gekürzte Achse, Einfach als Standard) bleibt so. Rest:
@@ -3997,6 +4006,16 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+### Prozess-Atlas: Flugzeug vorwärts, Handbuch-Anleitung erreichbar, Zielbild erklärt — 26.10.2026 (`v2965`, `83d70efd`; `v2965a/b`, `1d06b7a7`)
+
+Ursache Rückwärtsflug: `animateMotion rotate="auto"` richtet die +x-Achse in Flugrichtung aus, der Umriss
+hatte die Nase bei x −11 — gespiegelt (Atlas und Hilfe-Kasten), nachgemessen cos 1,000 zwischen Nase und
+Pfadtangente, Pfade laufen Quelle → Ziel. „Genaue Beschreibung“ = Flughandbuch Teil A: war vom Atlas nicht
+erreichbar — jetzt Knopf je Station (16 Verweise, vom Prüfer gedeckt), Banner im Thema Abläufe, Hilfe nannte
+„Sieben Abläufe“ statt elf. Zielbild: sechs Hilfe-Abschnitte, Handbuch A12 (10 Schritte, belegt), Atlas-Ablauf
+mit 6 Stationen; Ortsangabe „Bewertung“ → Reiter Objekt berichtigt. Rest: N80 (MFH-Haus-Maßnahmen).
+
 
 ### N78 · Pilot-Analyse durchgesehen — Punkte 1–6 — 25.10.2026 (`v2947`, `cb9043be`; `v2947a`, `fde07f9b`)
 
