@@ -21,13 +21,13 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-4d';
+  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-4e';
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */
   var TON = true;
   try { TON = localStorage.getItem('dp_vt_ton') !== '0'; } catch (e) {}
-  function datei(v) { return (TON && v && v.datei_ton) ? v.datei_ton : v.datei; }
+  function datei(v) { return ((TON && v && v.datei_ton) ? v.datei_ton : v.datei) + '?v=marcel-20261026'; }   /* v2967 · neue Stimme: Videos neu laden statt aus dem Cache */
   function tonText() { return TON ? 'Mit Sprecher ✓' : 'Ohne Sprecher'; }
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>';

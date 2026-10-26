@@ -2621,6 +2621,14 @@
     /* v2263 · opt.behalte: Gewonnen-Status bleibt (Modul 14, Bestand) */
     (opt.behalte ? ['_obj_seq'] : ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost']).forEach(function (k) { delete d[k]; });   /* wie dupSaved() */
     if (opt.ohneAnkauf) delete d._ankauf;   /* v2263: ein offener Deal hat noch keinen eingefrorenen Ankauf-Stand */
+    /* v2967 · opt.ankauf: der Ankauf-Stand der KOPIE wird nachgezogen (Modul 14, siehe R14_ANKAUF) -
+       das echte Objekt behält seinen */
+    if (opt.ankauf && d._ankauf && d._ankauf.daten) {
+      Object.keys(opt.ankauf.daten).forEach(function (k) { d._ankauf.daten[k] = opt.ankauf.daten[k]; });
+      delete d._ankauf.daten._ds2_categories;   /* rechnet die App beim Laden des Soll neu */
+      d._ankauf.kurz = JSON.parse(JSON.stringify(opt.ankauf.kurz));
+      if (opt.ankauf.stichtag) d._ankauf.stichtag = opt.ankauf.stichtag;
+    }
     /* v2263 · die Analyse trägt die Kennung ihres Objekts (_fuer.objekt_id) - an
        der Kopie hieße es sonst „gehört zu einem anderen Objekt". Ohne Kennung
        prüft die App nur den Zahlenabdruck, wie bei jeder Analyse. */
@@ -3273,14 +3281,29 @@
   };
 
   /* ── MODUL 14 · VOM ANKAUF IN DEN BESTAND ────────────────────────── */
+  /* v2967 · Ankauf-Stand der Parkstr. 9 zum Kaufpreis 395.000 € (Marcel 26.10.2026: Module 14/18
+     auf den heutigen Demo-Stand). Der Stand am echten Objekt (DEMO-BO6) ist zum 23.12.2024 mit
+     Kaufpreis 780.000 € / Darlehen 640.000 € eingefroren - die Kaufpreise wurden am 25.10. nur im
+     Ist angeglichen. Gegen ihn zeigte die Soll/Ist-Tafel „Kaufpreis 780.000 -> 395.000 €“.
+     Erzeugt EINMAL von der App selbst (26.10.2026): Kopie mit dem eingefrorenen Datensatz, darin
+     nur Kaufpreis, Darlehen, EK, Nebenkosten-Sätze und Grenzsteuersatz vom heutigen Objekt;
+     geladen, gerechnet, DealPilotAnkauf.festschreiben('2024-12-23'), Kopie gelöscht. Mieten,
+     Leerstand und Modernisierung bleiben der Stand beim Kauf. Kein Abruf mit Kosten. */
+  var R14_ANKAUF = {"stichtag":"2024-12-23","kurz":{"kp":395000,"nkm":2321,"_kpis_miete_j":28932,"_kpis_bmy":7.324556962025317,"_kpis_nmy":3.624199873292843,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_steuerwirkung":-1453,"_nkm_qm":5.44,"_leer_einheiten":1,"_kpis_bwk_nul_y":7680,"eigen_r":0,"d1z":4,"_kpis_cf_vs":5052,"geb_ant":54.31,"afa_satz":2},"daten":{"d1":"324000","ek":"262392","kp":"395000","ji_p":"1.5","gba_p":"0.5","grenz":"47.00","gest_p":"6.5","notar_p":"1.7","makler_p":"3.57","_kpis_bmy":7.324556962025317,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_cf_vs":5052,"ds2_marktfaktor":"8,2","_dealpilot_score":87,"_kpis_miete_j":28932,"_kpis_nmy":3.624199873292843}};
+  var _r14 = { merker: undefined };   /* v2967 · Merker Einfach|Genau des Unterreiters (dp_pa_si_ansicht) */
   function r14Seg(re) { return [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return re.test(b.textContent); })[0] || null; }
   DREHBUECHER['reihe-bestand'] = {
     titel: 'Vom Ankauf in den Bestand', unterzeile: 'Gewonnen, eingefroren, verglichen', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { try { var i = r14Seg(/Ist/); if (i && window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) i.click(); } catch (e) {} rhAufraeumen(); },
+    aufraeumen: function () {
+      try { var i = r14Seg(/Ist/); if (i && window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) i.click(); } catch (e) {}
+      try { if (_r14.merker !== undefined) { if (_r14.merker === null) localStorage.removeItem('dp_pa_si_ansicht'); else localStorage.setItem('dp_pa_si_ansicht', _r14.merker); } } catch (e) {}
+      _r14.merker = undefined;
+      rhAufraeumen();
+    },
     szenen: [
       async function (s) {   /* 1 · das Objekt */
-        await r6KopieStart(R11_PARK, { behalte: true });
+        await r6KopieStart(R11_PARK, { behalte: true, ankauf: R14_ANKAUF });
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         var we = wert('einheiten');
@@ -3325,7 +3348,15 @@
       },
       async function (s) {   /* 6 · Soll/Ist-Abgleich */
         reiter('s5'); await warte(1200);
-        await r11PaTab(/Soll\/Ist/);
+        /* v2967 · GEMESSEN 26.10.: der Unterreiter heißt seit v2430 „Ankauf · Bestand · Zielbild“ und
+           hat seit v2951 Einfach | Genau - mit /Soll\/Ist/ fand das Drehbuch ihn nicht, Szenen 6-9
+           liefen ohne Kegel auf dem Briefing. Genau zeigt die Tafel; der Merker kommt beim Aufräumen zurück. */
+        await r11PaTab(/Soll\/Ist|Ankauf · Bestand/);
+        try { if (_r14.merker === undefined) _r14.merker = localStorage.getItem('dp_pa_si_ansicht'); } catch (e) {}
+        var gk = r11Panel() && r11Panel().querySelector('.dp-si-um [data-dp-si-knopf="genau"]');
+        if (gk && gk.getAttribute('aria-pressed') !== 'true') { gk.click(); await warte(700); }
+        var ah = function () { var x = r11Panel(); return x && x.querySelector('.abw-tafel-host'); };
+        var sx = scroller(ah()); if (sx && ah()) { sx.scrollTop += rect(ah()).top - 120; await warte(500); }
         var p = r11Panel(), t = r6Inner(p);
         var vg = /Von (\d+) vergleichbaren Kennzahlen stehen (\d+) besser und (\d+) schlechter/.exec(t);
         /* GEMESSEN (Aufnahme 14): die erste .dp-pa-card des Panels ist die Analyse-Tafel weiter unten - der Kegel lag dort */
@@ -3338,9 +3369,9 @@
         function z(w) { return a && a.zeilen.filter(function (x) { return x.wort === w; })[0]; }
         var d = z('DSCR'), c = z('Cashflow n. Steuer'), sc = z('DealScore'), teile = [];
         if (d) teile.push('DSCR <b>' + de(d.ankauf, 2) + ' → ' + de(d.bestand, 2) + '</b>');
-        if (c) teile.push('Cashflow nach Steuer <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
+        if (c) teile.push('Cashflow nach Steuer im Jahr <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
         if (sc) teile.push('DealScore <b>' + de(sc.ankauf) + ' → ' + de(sc.bestand) + '</b>');
-        await b2oZeile(s, 'Was sich bewegt hat', (teile.join(' · ') || '–') + ' — im Jahr.');
+        await b2oZeile(s, 'Was sich bewegt hat', (teile.join(' · ') || '–') + '.');
       },
       async function (s) {   /* 8 · die Tafel */
         await zeige(function () { return q('#ai-content .abw-tafel'); }, 6);
@@ -3350,8 +3381,10 @@
       async function (s) {   /* 9 · Entwicklung in der Pilot-Analyse */
         var k = function () { var x = rhIm('#ai-content', /^PILOT-ANALYSE: ANKAUF GEGEN HEUTE$/); return x && x.closest('.dp-pa-card'); };
         await zeige(k, 8);
-        var t = r6Inner(k()), e = /Empfehlung\s+([^\t\n]+)\t\s*([^\n]+)/.exec(t), st = /Stand\s+([\d.]+)\s+([\d.]+)/.exec(t);
-        await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt' + (e ? ' — hier beide <b>' + e[1].trim() + '</b>' : '') + '. Ein neuer Abruf füllt die Spalte „Heute“.', 600);
+        /* v2967 · die gespeicherte Analyse ist vom 13.10. (Kaufpreis 780.000 €) - keine Empfehlung
+           daraus vorlesen; der Satz sagt, was die Karte selbst sagt (dieselbe Analyse in beiden Spalten) */
+        var t = r6Inner(k()), gleich = /beide Spalten zeigen dieselbe/i.test(t);
+        await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt.' + (gleich ? ' Seit dem Festschreiben kein neuer Abruf — DealPilot sagt das dazu.' : '') + ' Ein neuer Abruf füllt die Spalte „Heute“.', 600);
       }
     ]
   };
@@ -4138,7 +4171,9 @@
      für diesen Aufruf auf Blob umgelenkt) und wird im Bild gezeigt.
      Keine Anbieter- oder Portalnamen in den Kapiteltexten; der Prüflauf
      misst Portal- und Dienstnamen auch im Fenster und im PDF. */
-  var R18_BERICHT = 205;
+  /* v2967 · Bericht 346 (Stufe 3, 25.10.2026, Kaufpreis 395.000 €, Modernisierung eingetragen,
+     RND 32 J.) statt 205 (14.10.2026, Kaufpreis 780.000 €) - gelesen, nicht neu abgerufen */
+  var R18_BERICHT = 346;
   var _r18 = { pdf: null, url: null, save: null };
   function r18Zu() {
     var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
@@ -4148,7 +4183,18 @@
   }
   function r18Mb(re) { var d = r16Doc(); return d ? rhIm(d.body, re) : null; }
   /* Karte eines Abschnitts im Bericht: der Kasten um die Überschrift */
-  function r18Karte(re) { return function () { var h = r18Mb(re); return h && (h.closest('.card,.panel,section,.box') || h.parentElement); }; }
+  /* v2967 · GEMESSEN 26.10. (Bericht 346): „Marktentwicklung“ und „Vergleichspreise“ sind H1 direkt im
+     5.400 px hohen .panel, ohne eigene Karte - der Kegel lag auf dem ganzen Bericht, gerollt wurde zum
+     Ergebnis oben. Jetzt: Überschrift + der Block darunter (#histChart/#histNote bzw. #chart). */
+  function r18Karte(re) { return function () {
+    var h = r18Mb(re); if (!h) return null;
+    var c = h.closest('.card,.panel,section,.box'), n = h.nextElementSibling;
+    if (n && !/^H\d$/.test(n.tagName) && (!c || rect(c).height > 2.5 * (rect(n).height + rect(h).height + 40))) {
+      var n2 = n.nextElementSibling;
+      return b2oHuelle(h, (n2 && !/^H\d$/.test(n2.tagName) && rect(n2).height < 60) ? n2 : n);
+    }
+    return c || h.parentElement;
+  }; }
   function r18Assess(re) { var d = r16Doc(); if (!d) return null; var a = [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; return a ? r6Text(a.querySelector('.v')) : null; }
   function r18AssessEl(re) { return function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; }; }
   async function r18Pdf() {
@@ -4202,7 +4248,10 @@
         var ag = function () { return r16Mb('#assessGrid'); };
         await r16Hin(r16Mb('#map'), true);
         await zeigeGruppe(function () { return r16Mb('#map'); }, r18AssessEl(/^Mietentwicklung/), 8);
-        await b2oZeile(s, 'Lage', 'Mikrolage <b>' + (r18Assess(/^Mikrolage$/) || '–') + '</b>, Makrolage ' + (r18Assess(/^Makrolage$/) || '–') + ', Nachfrage ' + (r18Assess(/^Nachfrage$/) || '–') + ', Entwicklung ' + (r18Assess(/^Entwicklung$/) || '–') + ' — gemessen, nicht geschätzt.');
+        /* v2967 · GEMESSEN 26.10.: die Beschriftung trägt jetzt eine Erläuterung („Mikrolage · Umfeld-Score …“),
+           der Wert eine Zahl („sehr gut · 98 Score“) - mit /^Mikrolage$/ stand im Satz „Mikrolage –“ */
+        var lg = function (re) { var v = r18Assess(re); return v ? v.split(' · ')[0] : '–'; };
+        await b2oZeile(s, 'Lage', 'Mikrolage <b>' + lg(/^Mikrolage(\s*·|$)/) + '</b>, Makrolage ' + lg(/^Makrolage(\s*·|$)/) + ', Nachfrage ' + lg(/^Nachfrage(\s*·|$)/) + ', Entwicklung ' + lg(/^Entwicklung(\s*·|$)/) + ' — gemessen, nicht geschätzt.');
       },
       async function (s) {   /* 5 · Bodenrichtwert und Zensus */
         var a = r18AssessEl(/^Bodenrichtwert/), b = r18AssessEl(/^Eigentümerquote/);
@@ -4212,11 +4261,11 @@
       },
       async function (s) {   /* 6 · Marktentwicklung und Vergleichspreise */
         var h = r18Karte(/^Marktentwicklung/i);
-        await r16Hin(h(), true);
+        await r16Hin(r18Mb(/^Marktentwicklung/i), true);   /* v2967: zur Überschrift, nicht zum ganzen Panel */
         await zeige(h, 8);
         await b2oZeile(s, 'Marktentwicklung', 'Wie sich die Preise je m² hier entwickelt haben — echte Historie, keine Prognose.');
         var c = r18Karte(/^Vergleichspreise/i);
-        await r16Hin(c(), false);
+        await r16Hin(r18Mb(/^Vergleichspreise/i), true);
         await zeige(c, 8);
         var kp = r6Text(r16Mb('#kSqmSp')) || '';
         await b2oZeile(s, 'Vergleichspreise', 'Die Verteilung der Angebotspreise je m² — und wo dein Kaufpreis darin liegt.');
@@ -4229,6 +4278,20 @@
         var t = r6Inner(wv()), bw = /Bodenwert\s*\n?\s*([\d.]+ €)/i.exec(t), lz = /Liegenschaftszinssatz:\s*([\d,]+ %)/.exec(t);
         function karte(re) { var d = r16Doc(); var k = d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return re.test(r6Text(x.querySelector('.wv-t'))); })[0]; return k ? r6Text(k.querySelector('.wv-v')) : '–'; }
         await b2oZeile(s, 'Wertermittlung · Stufe 3', 'Bodenwert <b>' + (bw ? bw[1] : '–') + '</b>, Liegenschaftszins ' + (lz ? lz[1] : '–') + '. Ertragswert <b>' + karte(/^Ertragswert/i) + '</b>, Sachwert ' + karte(/^Sachwert/i) + ' — mit Rechenweg zum Aufklappen.');
+        /* v2967 · Bericht 346: die eingetragene Modernisierung trägt die Restnutzungsdauer (32 J. statt 12) -
+           sichtbar im Rechenweg des Ertragswerts, Zeile „Barwertfaktor (Zins / Jahre)“ */
+        var ewK = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Ertragswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+        var rw = ewK() && [].filter.call(ewK().querySelectorAll('.wv-mehr'), function (x) { return /Rechenweg/.test(x.textContent) && /▸/.test(x.textContent); })[0];
+        if (rw) {
+          rw.click(); await warte(700);
+          var bwz = function () { var k = ewK(); return k && [].filter.call(k.querySelectorAll('tr'), function (r) { return /Barwertfaktor/.test(r.textContent); })[0]; };
+          var bt = bwz() ? /Barwertfaktor\s*\(([\d,]+\s*%)\s*\/\s*(\d+)\s*Jahre\)/.exec(r6Text(bwz())) : null;
+          if (bt) {
+            await r16Hin(bwz(), false);
+            await zeige(bwz, 8);
+            await b2oZeile(s, 'Im Rechenweg', 'Der Barwertfaktor aus <b>' + bt[1] + '</b> und <b>' + bt[2] + ' Jahren</b> Restnutzungsdauer — Zeile für Zeile bis zum Ertragswert.');
+          }
+        }
       },
       async function (s) {   /* 8 · Quellennachweis */
         var nw = function () { return r16Mb('#wv-box .wv-nachweis') || r16Mb('#wv-box .wv-hk'); };
