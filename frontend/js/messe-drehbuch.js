@@ -4183,7 +4183,18 @@
   }
   function r18Mb(re) { var d = r16Doc(); return d ? rhIm(d.body, re) : null; }
   /* Karte eines Abschnitts im Bericht: der Kasten um die Überschrift */
-  function r18Karte(re) { return function () { var h = r18Mb(re); return h && (h.closest('.card,.panel,section,.box') || h.parentElement); }; }
+  /* v2967 · GEMESSEN 26.10. (Bericht 346): „Marktentwicklung“ und „Vergleichspreise“ sind H1 direkt im
+     5.400 px hohen .panel, ohne eigene Karte - der Kegel lag auf dem ganzen Bericht, gerollt wurde zum
+     Ergebnis oben. Jetzt: Überschrift + der Block darunter (#histChart/#histNote bzw. #chart). */
+  function r18Karte(re) { return function () {
+    var h = r18Mb(re); if (!h) return null;
+    var c = h.closest('.card,.panel,section,.box'), n = h.nextElementSibling;
+    if (n && !/^H\d$/.test(n.tagName) && (!c || rect(c).height > 2.5 * (rect(n).height + rect(h).height + 40))) {
+      var n2 = n.nextElementSibling;
+      return b2oHuelle(h, (n2 && !/^H\d$/.test(n2.tagName) && rect(n2).height < 60) ? n2 : n);
+    }
+    return c || h.parentElement;
+  }; }
   function r18Assess(re) { var d = r16Doc(); if (!d) return null; var a = [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; return a ? r6Text(a.querySelector('.v')) : null; }
   function r18AssessEl(re) { return function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; }; }
   async function r18Pdf() {
@@ -4247,11 +4258,11 @@
       },
       async function (s) {   /* 6 · Marktentwicklung und Vergleichspreise */
         var h = r18Karte(/^Marktentwicklung/i);
-        await r16Hin(h(), true);
+        await r16Hin(r18Mb(/^Marktentwicklung/i), true);   /* v2967: zur Überschrift, nicht zum ganzen Panel */
         await zeige(h, 8);
         await b2oZeile(s, 'Marktentwicklung', 'Wie sich die Preise je m² hier entwickelt haben — echte Historie, keine Prognose.');
         var c = r18Karte(/^Vergleichspreise/i);
-        await r16Hin(c(), false);
+        await r16Hin(r18Mb(/^Vergleichspreise/i), true);
         await zeige(c, 8);
         var kp = r6Text(r16Mb('#kSqmSp')) || '';
         await b2oZeile(s, 'Vergleichspreise', 'Die Verteilung der Angebotspreise je m² — und wo dein Kaufpreis darin liegt.');
@@ -4264,6 +4275,20 @@
         var t = r6Inner(wv()), bw = /Bodenwert\s*\n?\s*([\d.]+ €)/i.exec(t), lz = /Liegenschaftszinssatz:\s*([\d,]+ %)/.exec(t);
         function karte(re) { var d = r16Doc(); var k = d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return re.test(r6Text(x.querySelector('.wv-t'))); })[0]; return k ? r6Text(k.querySelector('.wv-v')) : '–'; }
         await b2oZeile(s, 'Wertermittlung · Stufe 3', 'Bodenwert <b>' + (bw ? bw[1] : '–') + '</b>, Liegenschaftszins ' + (lz ? lz[1] : '–') + '. Ertragswert <b>' + karte(/^Ertragswert/i) + '</b>, Sachwert ' + karte(/^Sachwert/i) + ' — mit Rechenweg zum Aufklappen.');
+        /* v2967 · Bericht 346: die eingetragene Modernisierung trägt die Restnutzungsdauer (32 J. statt 12) -
+           sichtbar im Rechenweg des Ertragswerts, Zeile „Barwertfaktor (Zins / Jahre)“ */
+        var ewK = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Ertragswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+        var rw = ewK() && [].filter.call(ewK().querySelectorAll('.wv-mehr'), function (x) { return /Rechenweg/.test(x.textContent) && /▸/.test(x.textContent); })[0];
+        if (rw) {
+          rw.click(); await warte(700);
+          var bwz = function () { var k = ewK(); return k && [].filter.call(k.querySelectorAll('tr'), function (r) { return /Barwertfaktor/.test(r.textContent); })[0]; };
+          var bt = bwz() ? /Barwertfaktor\s*\(([\d,]+\s*%)\s*\/\s*(\d+)\s*Jahre\)/.exec(r6Text(bwz())) : null;
+          if (bt) {
+            await r16Hin(bwz(), false);
+            await zeige(bwz, 8);
+            await b2oZeile(s, 'Im Rechenweg', 'Der Barwertfaktor aus <b>' + bt[1] + '</b> und <b>' + bt[2] + ' Jahren</b> Restnutzungsdauer — Zeile für Zeile bis zum Ertragswert.');
+          }
+        }
       },
       async function (s) {   /* 8 · Quellennachweis */
         var nw = function () { return r16Mb('#wv-box .wv-nachweis') || r16Mb('#wv-box .wv-hk'); };
