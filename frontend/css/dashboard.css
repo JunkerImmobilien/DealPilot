@@ -122,10 +122,6 @@
   #dashboard-main .hgate .tot div{text-align:center}
 #dashboard-main .hgate .tot .k{font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-pmut)}
 #dashboard-main .hgate .tot .v{font-family:'JetBrains Mono';font-weight:700;font-size:12px;color:var(--c-ptext);margin-top:2px}
-/* v2966e · Messkabine 26.10.2026: drei gleich breite Spalten (flex 1 1 0, je 47 px) - „5,52 Mio“ (60 px) lief in „CF/MON“ hinein, auf JEDER Breite. Spalten nach Inhalt, Abstand 6 px, zur Not Umbruch statt Ueberlappung. */
-#dashboard-main .hgate .tot{gap:4px;flex-wrap:wrap;row-gap:6px}
-#dashboard-main .hgate .tot > div{flex:0 1 auto !important;min-width:0}
-#dashboard-main .hgate .tot .v{white-space:nowrap;font-size:11px}   /* v2966f: bei 150 px Spalte (ab 1024) brach CF/MON sonst in die zweite Zeile */
 
   #dashboard-main .hbars{flex:1;display:flex;flex-direction:column;gap:11px;justify-content:center}
 
@@ -694,8 +690,10 @@
    v750d - Hero-Tot lesbar + klickbarer QR
    ================================================================ */
 #dashboard-main .hgate{flex-basis:174px}
-#dashboard-main .hgate .tot{gap:8px}
-#dashboard-main .hgate .tot div{flex:1 1 0;min-width:0}
+/* v2966f · Messkabine 26.10.2026: flex 1 1 0 gab jeder Spalte 47 px - „5,52 Mio“ (60 px) lief auf JEDER Breite in „CF/MON“.
+   Spalten nach Inhalt, 4 px Abstand; wird es doch zu eng, bricht die letzte um statt zu ueberlappen. */
+#dashboard-main .hgate .tot{gap:6px 4px;flex-wrap:wrap}
+#dashboard-main .hgate .tot div{flex:0 1 auto;min-width:0}
 #dashboard-main .hgate .tot .k{font-size:8.5px;letter-spacing:.2px;white-space:nowrap}
 #dashboard-main .hgate .tot .v{font-size:12.5px;white-space:nowrap;margin-top:4px}
 #dashboard-main .kc-share a.qb{display:block;text-decoration:none;cursor:pointer}
