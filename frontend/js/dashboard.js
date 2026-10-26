@@ -916,7 +916,7 @@
       + '. <b>„neu rechnen ↻“</b> an jedem Objekt öffnet es, rechnet die Ertragswerte je Stufe <b>kostenlos</b> neu (kein Kontingent) und speichert; danach das Cockpit wieder öffnen. Dasselbe geschieht im Objekt unter <i>Bewertung › Wert &amp; Zielbild</i>. Kostenpflichtig (ein Kontingent) ist nur ein neuer Marktbericht.</div>';
     if (!nMit) {
       host.innerHTML = '<div class="zb-card"><div class="zb-zahl">' + kopfZahl + '</div>'
-        + '<p class="zb-text">Für keines der ' + A.n + ' Objekte sind Mieterhöhung oder Zielbild erfasst. Eintragen lässt es sich im Objekt unter Bewertung › Mieterhöhung und Zielbild.</p>' + gruendeHtml + neuHtml + '</div>';
+        + '<p class="zb-text">Für keines der ' + A.n + ' Objekte sind Mieterhöhung oder Zielbild erfasst. Eintragen lässt es sich im Objekt im Reiter Objekt, Karte „Mieterhöhung und Zielbild“.</p>' + gruendeHtml + neuHtml + '</div>';
       return;
     }
     var mehrM = A.mieteM - A.mieteB, mehrZ = A.mieteZ - A.mieteB;

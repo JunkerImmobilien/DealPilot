@@ -456,6 +456,45 @@
       ],
       kanten: [['c1', 'c3'], ['c1', 'c4'], ['c2', 'c3'], ['c2', 'c4'], ['c3', 'c5'], ['c4', 'c5']]
     },
+    /* v2965b · Marcel 26.10.2026: „Können wir auch beschreiben und erklären, wie Zielbilder angelegt werden?"
+       Fakten aus potenzial.js, wert-zielbild.js, mfh-einheiten.js und dashboard.js (renderZielbild). */
+    {
+      id: 'zielbild', name: 'Mieterhöhung und Zielbild', sub: 'Was im Haus steckt — Soll-Miete, Umbau, Ertragswert je Stufe',
+      spalten: ['Eintragen · im Reiter Objekt', 'Rechnen · kostenlos', 'Lesen'],
+      knoten: [
+        { id: 'z1', s: 0, z: 0, t: 'Soll-Miete eintragen', k: 'Mieter bleibt · § 558 BGB',
+          d: 'Die Soll-Miete ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Lässt du das Feld leer, rechnet DealPilot sie vor: bis zur Vergleichsmiete, frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze (15 % oder 20 % in drei Jahren). Deine eigene Angabe überschreibt immer.',
+          unter: [['Karte öffnen', 'Reiter Objekt, Karte „Mieterhöhung und Zielbild (optional)“.'], ['Vergleichsmiete (€/m²)', 'Die ortsübliche Vergleichsmiete. Leer: die Marktmiete aus dem Reiter Miete.'], ['Soll-Miete (Mieter bleibt, €/m²)', 'Leer lassen, dann steht darunter der Vorschlag mit Begründung — oder eine eigene Zahl eintragen.'], ['Soll erreichbar ab', 'Leer: 15 Monate nach der letzten Erhöhung aus dem Mietvertrag.']],
+          ein: ['Ist-Miete', 'Vergleichsmiete', 'letzte Mieterhöhung', 'Kappungsgrenze'], aus: ['Soll-Miete', 'Mieterhöhung je Monat'],
+          ziel: { tab: 's0' }, beleg: 'frontend/index.html:Soll-Miete (Mieter bleibt, €/m²)' },
+        { id: 'z2', s: 0, z: 1, t: 'Zielbild und Maßnahmen', k: 'nach Umbau oder Neuvermietung',
+          d: 'Das Zielbild ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Jede Maßnahme ist ein Chip mit Kosten. Bad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Dach, Fassade, Heizung und Leitungen tragen Modernisierungspunkte nach Anlage 2 ImmoWertV — das verlängert die Restnutzungsdauer und hebt den Ertragswert.',
+          unter: [['Zielmiete (€/m²)', 'Was nach Umbau oder Neuvermietung erzielbar ist.'], ['Maßnahmen anklicken', 'Der Chip zeigt, wie viele Punkte das Gewerk noch bringt (z. B. „+2 P.“).'], ['Kosten € je Maßnahme', 'Die Summe steht unter der Karte.'], ['Haken „bewohnt (§ 559)“', 'Modernisierung mit Mieter in der Wohnung: 8 % der Kosten im Jahr auf die Soll-Miete, gedeckelt.'], ['Zielbild fertig (Jahr)', 'Für Pilot-Analyse und PDF; leer heißt offen.']],
+          ein: ['Zielmiete', 'Maßnahmen', 'Kosten'], aus: ['Zielbild', 'Modernisierungspunkte', 'Maßnahmenkosten'],
+          ziel: { tab: 's0' }, beleg: 'frontend/js/potenzial.js:MASSNAHMEN' },
+        { id: 'z3', s: 0, z: 2, t: 'Mehrfamilienhaus: je Wohnung', k: 'Einheiten erfassen › Details', opt: true,
+          d: 'Beim Mehrfamilienhaus stehen Soll-Miete und Zielbild je Wohnung. Die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.',
+          unter: [['Einheiten erfassen', 'Knopf unter der Wohnfläche im Reiter Objekt.'], ['Details', 'In der Liste die Wohnung öffnen: Mietvertrag, Soll-Miete, Zielbild mit Maßnahmen, Ertragswert.'], ['Maßnahmen am ganzen Haus', 'Im Schritt Gebäude: Dach, Fassade, Fenster, Heizung, Leitungen mit Kosten. Kosten nach Wohnfläche verteilt, Punkte für jede Wohnung, je Gewerk nur einmal.'], ['Aufgeteilt?', 'Im Schritt Gebäude der Haken „In Wohnungseigentum aufgeteilt“ und die Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung).']],
+          ein: ['Wohnungen', 'Ist-Miete je Wohnung'], aus: ['Summe aus den Wohnungen', 'Anteil Haus je Wohnung', 'Ertragswert je Wohnung'],
+          ziel: { tab: 's0' }, beleg: 'frontend/js/mfh-einheiten.js:Zielbild · nach Umbau' },
+        { id: 'z4', s: 1, z: 1, t: 'Ertragswert je Stufe', k: 'kein Kontingent · mit Stufe 3',
+          d: 'Derselbe Rechenkern wie der Marktbericht Stufe 3, mit denselben Ansätzen (Liegenschaftszins, Bewirtschaftung, Bodenwert). Je Stufe wechseln nur die Miete und die Restnutzungsdauer nach den Modernisierungspunkten. Das kostet kein Kontingent. Der Ertragswert erscheint, sobald für das Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält.',
+          unter: [['Von selbst', 'Öffnest du den Reiter Bewertung, rechnet DealPilot fehlende oder veraltete Ertragswerte von selbst nach.'], ['Von Hand', '„Ertragswerte rechnen“ in der Pilot-Analyse, „Jetzt rechnen“ in Wert & Zielbild.'], ['Gespeichert', 'Das Ergebnis reist mit dem Objekt — das Portfolio-Cockpit liest es von dort.']],
+          ein: ['Soll-Miete', 'Zielbild', 'Modernisierungspunkte', 'Liegenschaftszins', 'Bodenwert'], aus: ['Ertragswert Bestand', 'Ertragswert Mieterhöhung', 'Ertragswert Zielbild'],
+          ziel: { tab: 's6' }, beleg: 'frontend/js/potenzial.js:Ertragswert je Stufe mit DealPilot Stufe 3' },
+        { id: 'z5', s: 2, z: 0, t: 'Wert & Zielbild lesen', k: 'Bewertung · Pilot-Analyse · PDF',
+          d: 'Im Reiter Bewertung die Karte „Wert & Zielbild“: Kaltmiete, Maßnahmen, Ertragswert je Stufe und der Wertzuwachs nach Kosten (Ertragswert der Stufe minus Bestand minus Maßnahmen). Alles ist ein Ausblick, kein Verkehrswert zum heutigen Stichtag — maßgeblich für heute bleibt der Bestand.',
+          unter: [['Kacheln', 'Die Kernaussagen auf einen Blick.'], ['Im Detail', 'Wohnungen, Wertüberleitung, Kennzahlen je Stufe.'], ['Pilot-Analyse', 'Bereich „Ankauf · Bestand · Zielbild“ mit Einfach und Genau.'], ['PDF', 'Seite Wertpotenzial in beiden PDFs.']],
+          ein: ['Ertragswert je Stufe', 'Maßnahmenkosten'], aus: ['Wertzuwachs nach Kosten', 'Bruttomietrendite je Stufe'],
+          ziel: { tab: 's6' }, beleg: 'frontend/js/wert-zielbild.js:Wertzuwachs nach Kosten' },
+        { id: 'z6', s: 2, z: 2, t: 'Im Portfolio-Cockpit', k: '03 Bestand & Zielbild',
+          d: 'Das Cockpit addiert Mieterhöhung und Zielbild aller Objekte, für die sie erfasst und gerechnet sind. Fehlt ein Objekt, steht der Grund daneben — mit einem Knopf ins Objekt und „neu rechnen ↻“ (kostenlos).',
+          unter: [['Kacheln und Brücken', 'Kaltmiete, Rendite, Maßnahmen, Wertzuwachs nach Kosten.'], ['Je Objekt', 'Steigerung der Kaltmiete und Wertzuwachs nach Kosten.'], ['Mit Grund', 'Nicht oder nur teilweise enthalten — z. B. noch nichts eingetragen, Ertragswert nur mit Stufe 3, noch nicht gerechnet.']],
+          ein: ['Ertragswert je Stufe', 'alle Objekte'], aus: ['Wertzuwachs Portfolio', 'Gründe fehlender Objekte'],
+          ziel: { aktion: 'cockpit' }, beleg: 'frontend/js/dashboard.js:Nicht oder nur teilweise enthalten · mit Grund' }
+      ],
+      kanten: [['z1', 'z4'], ['z2', 'z4'], ['z3', 'z4', 'opt'], ['z4', 'z5'], ['z5', 'z6']]
+    },
     /* v2217 · Marcel 14.10.2026: „Ist der Telegram-Bot … auch in dem Atlas
        passend integriert?" Er war es nicht - kein Ablauf, keine Station.
        Jede Station hier hat ihr Werkzeug in agentWerkzeuge.js als Beleg. */
@@ -477,6 +516,18 @@
   ];
 
   /* ── Hilfsmittel ──────────────────────────────────────────────────── */
+
+  /* v2965a · Marcel 26.10.2026: „Hat die Hilfe und der Prozess-Atlas auch die genaue Beschreibung,
+     die wir mal gemacht haben, dabei?" Die Schritt-für-Schritt-Anleitung (Flughandbuch Teil A, v2574,
+     tools/handbuch-ablaeufe.mjs) war vom Atlas aus nicht erreichbar. Je Station der passende Ablauf;
+     tools/prozess-atlas-pruefen.mjs prüft, dass es jede Ablauf-Id im Handbuch gibt. */
+  var HANDBUCH = {
+    'reise:qc1': 'quickcheck', 'reise:qc2': 'quickcheck', 'reise:qc3': 'quickcheck', 'reise:an1': 'erfassen',
+    'reise:an2': 'marktbericht', 'reise:an3': 'bank', 'reise:be3': 'portfolio',
+    'quickcheck:*': 'quickcheck', 'dokumente:*': 'import', 'boarding:*': 'erfassen', 'deal:d2': 'pilot', 'deal:d3': 'bank',
+    'deal:d4': 'portfolio', 'steuer:*': 'steuer', 'marktbericht:*': 'marktbericht', 'zielbild:*': 'zielbild'
+  };
+  function handbuchFuer(pid, kid) { return HANDBUCH[pid + ':' + kid] || HANDBUCH[pid + ':*'] || null; }
   var G = 'var(--wl-c9a84c, #C9A84C)', GH = 'var(--wl-e8cc7a, #E8CC7A)', GL = 'var(--wl-b8932f, #b8932f)';
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function proz(id) { for (var i = 0; i < PROZESSE.length; i++) if (PROZESSE[i].id === id) return PROZESSE[i]; return PROZESSE[0]; }
@@ -521,7 +572,11 @@
       '.atl-wahl button{flex:0 0 auto;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent);background:rgba(20,18,16,.75);color:#d9cfb8;border-radius:999px;padding:7px 13px;font:600 12.5px Inter,sans-serif;cursor:pointer;transition:all .2s}',
       '.atl-wahl button.an{background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');color:#1a1407;border-color:transparent}',
       '.atl-rumpf{position:relative;z-index:2;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;padding:0 20px 18px}',
-      '.atl-netz{position:relative;min-height:0;overflow:auto;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);border-radius:16px;background:rgba(14,12,10,.72)}',
+      /* v2966d · Messkabine 26.10.2026: die Flaeche wurde mit der Breite OHNE Rollbalken gelegt; kam der senkrechte
+         Balken dazu, ragte sie 9 px ueber (390: 364 > 355, 768: 726 > 717) - Platz fuer den Balken immer freihalten.
+         v2966f: nachgemessen blieben 4 px (Flaeche beim Oeffnen 359, danach 355) - die Flaeche ist per
+         Bau nie breiter als noetig (Knoten enden bei breite - 18), quer wird deshalb nicht gerollt. */
+      '.atl-netz{position:relative;min-height:0;overflow:hidden auto;scrollbar-gutter:stable;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);border-radius:16px;background:rgba(14,12,10,.72)}',
       '.atl-flaeche{position:relative}',
       '.atl-flaeche svg.kt{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}',
       '.atl-sp{position:absolute;top:12px;font:500 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:' + G + ';text-align:center;padding:5px 6px;border-bottom:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);opacity:0;animation:atl-pop .5s ease forwards}',
@@ -579,6 +634,7 @@
       '.atl-hin{margin-top:16px;width:100%;padding:10px;border:0;border-radius:10px;background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');color:#1a1407;font:600 13.5px "Space Grotesk",sans-serif;cursor:pointer}',
       '.atl-kap{position:absolute;width:46px;height:73px;z-index:3;pointer-events:none;transition:left 1.1s cubic-bezier(.45,0,.3,1),top 1.1s cubic-bezier(.45,0,.3,1)}',
       '.atl-kap .pf-wrap{display:block;width:100%;height:100%}.atl-kap svg.pf{width:100%;height:100%}',
+      '.atl-hb{display:block;margin-top:8px;padding:9px 10px;border:1px solid ' + G + ';border-radius:10px;color:' + GH + ';font:600 13px "Space Grotesk",sans-serif;text-align:center;text-decoration:none}.atl-hb:hover{background:color-mix(in srgb, ' + G + ' 12%, transparent)}',
       '.atl-beleg{margin-top:10px;font:500 10.5px "JetBrains Mono",monospace;color:#7f7663;word-break:break-all}',
       '@media (max-width:900px){.atl-rumpf{grid-template-columns:1fr;grid-template-rows:minmax(260px,1fr) auto;overflow:auto}.atl-panel{max-height:none;overflow:visible}#dp-atlas{overflow:auto}.atl-rumpf{flex:none}}',
       '.atl-kopf,.atl-wahl{flex:0 0 auto}',
@@ -676,7 +732,9 @@
       if (!e[2]) pfade.push(d);
     });
     if (pfade.length && !ruhig) {
-      sv += '<g class="flieger"><path d="M-11 -1.6 L-3 -1.6 L4 -8 L7 -8 L3 -1.6 L9 -1.6 L12 -4 L13.5 -4 L12 0 L13.5 4 L12 4 L9 1.6 L3 1.6 L7 8 L4 8 L-3 1.6 L-11 1.6 Z"/>'
+      /* v2965 · Marcel 26.10.2026: „die Flugzeuge fliegen rueckwaerts". rotate="auto" legt die +x-Achse
+         in Flugrichtung; der Umriss hatte die Nase bei x -11 (Fluegel und Leitwerk bei +x). Gespiegelt: Nase bei +11. */
+      sv += '<g class="flieger"><path d="M11 -1.6 L3 -1.6 L-4 -8 L-7 -8 L-3 -1.6 L-9 -1.6 L-12 -4 L-13.5 -4 L-12 0 L-13.5 4 L-12 4 L-9 1.6 L-3 1.6 L-7 8 L-4 8 L3 1.6 L11 1.6 Z"/>'
         + '<animateMotion dur="' + (pfade.length * 1.5) + 's" begin="' + (tA ? '1.2s' : '0s') + '" repeatCount="indefinite" rotate="auto" path="' + pfade.join(' ') + '"/></g>';
     }
     P.knoten.forEach(function (k) {
@@ -783,6 +841,8 @@
     if (k.aus && k.aus.length) h += '<div class="bl">Was herauskommt</div><div class="atl-chips aus"></div>';
     if (weiter) h += '<div class="bl">Wie es weitergeht</div><div class="atl-weiter">' + weiter + '</div>';
     if (k.ziel) h += '<button type="button" class="atl-hin">✈ Hinfliegen — in der App öffnen</button>';
+    var hbId = handbuchFuer(P.id, k.id);
+    if (hbId) h += '<a class="atl-hb" href="handbuch.html#a-' + esc(hbId) + '" target="_blank" rel="noopener">Schritt für Schritt im Flughandbuch →</a>';
     h += '<div class="atl-beleg">Beleg im Code: ' + esc(k.beleg) + '</div>';
     var pan = root.querySelector('.atl-panel'); pan.innerHTML = h; pan.scrollTop = 0;
     /* schmal: die Erklaerung steht UNTER dem Netz - nach dem Klick dorthin, sonst fliegen die Daten ins Unsichtbare */
@@ -839,5 +899,5 @@
     return L;
   }
 
-  window.DealPilotAtlas = { PROZESSE: PROZESSE, oeffne: oeffne, schliessen: schliessen, stationen: stationen, hierIn: hierIn };
+  window.DealPilotAtlas = { PROZESSE: PROZESSE, HANDBUCH: HANDBUCH, oeffne: oeffne, schliessen: schliessen, stationen: stationen, hierIn: hierIn };
 })();

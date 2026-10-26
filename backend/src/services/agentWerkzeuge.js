@@ -3144,6 +3144,74 @@ async function anlage_luecken(ctx, args) {
   };
 }
 
+/* ═══ v2960 · HILFE ════════════════════════════════════════════════════
+ * Die Abschnitte des Hilfe-Fensters, gespiegelt aus help.js (siehe
+ * services/hilfeWissen.js). Das Modell bekommt sie woertlich und darf nur
+ * daraus antworten — eine erfundene Bedienung ist schlimmer als „steht
+ * nicht in der Hilfe". */
+async function hilfe_suchen(ctx, args) {
+  const hilfe = require('./hilfeWissen');
+  const t = hilfe.suchen((args && args.frage) || '', 4);
+  if (!t.length) {
+    return { treffer: 0,
+      hinweis: 'Dazu steht nichts in der Hilfe der App. Sag das ehrlich; erfinde keine '
+             + 'Bedienung. Wenn das Projektwissen es beantwortet, nimm das; sonst nenne den '
+             + 'Weg: in DealPilot F1 druecken (der Pilot) oder Marcel fragen.' };
+  }
+  return {
+    treffer: t.length,
+    abschnitte: t.map((x) => ({ thema: x.thema, ueberschrift: x.ueberschrift,
+      text: String(x.text).slice(0, 2500) })),
+    hinweis: 'Antworte NUR aus diesen Abschnitten, knapp und in eigenen Worten. Passt keiner '
+           + 'zur Frage, sag, dass die Hilfe dazu nichts sagt — nicht raten. Nenne am Ende, '
+           + 'wo es in der App steht: "Hilfe › <thema>". Fragen zu Preisen gehoeren an '
+           + 'pakete_und_preise, nicht hierher.'
+  };
+}
+
+/* ═══ v2961 · PDFs ═════════════════════════════════════════════════════
+ * Das Werkzeug ERZEUGT nichts. Es prueft, was gewollt ist, und legt einen
+ * Auftrag ab; der Webhook sagt „PDF wird erstellt …" und schickt die Datei,
+ * sobald der PDF-Dienst sie aus der echten App geholt hat (telegramPdfService).
+ * So wartet das Modell nicht 15 Sekunden auf einen Browser, und die Datei
+ * geht nicht durch das Modell. */
+async function pdf_erstellen(ctx, args) {
+  const pdf = require('./telegramPdfService');
+  const art = String((args && args.art) || '');
+  const A = pdf.ARTEN[art];
+  if (!A) {
+    return { ok: false, hinweis: 'Unbekannte PDF-Art. Moeglich: ' + Object.keys(pdf.ARTEN).join(', ') + '.' };
+  }
+  if (!pdf.verfuegbar()) {
+    return { ok: false, kein_dienst: true, app: pdf.appLink(),
+      hinweis: 'PDFs kann der Bot hier noch nicht erzeugen. Sag das ehrlich und nenne den Weg: '
+             + 'in DealPilot Aktionen › Export (Link "app"). Nichts versprechen.' };
+  }
+  let id = null, adr = null, reportId = null;
+  if (A.objekt) {
+    id = await _findeObjekt(ctx, args);
+    if (!id) return { ok: false, hinweis: 'Kein Objekt gefunden. Frag, fuer welches Objekt.' };
+    ctx.merkeObjekt(id);
+    adr = _adrVon(await dialog.objektKontext(ctx.userId, id)) || null;
+  }
+  if (A.bericht) {
+    const b = await markt.berichte(ctx.userId, id);
+    if (!b.ok) return { ok: false, gilt_fuer: adr, hinweis: 'Die Berichte liessen sich nicht lesen: ' + b.grund };
+    const letzter = b.berichte[b.berichte.length - 1];
+    if (!letzter) {
+      return { ok: false, gilt_fuer: adr, kein_bericht: true,
+        hinweis: 'Fuer dieses Objekt gibt es noch keinen Marktbericht. Biete eine Bewertung an '
+               + '(marktbericht_preis) — erfinde keinen Bericht.' };
+    }
+    reportId = letzter.report_id;
+  }
+  ctx.pdfAuftrag = { art: art, name: A.name, objekt_id: id, adresse: adr, report_id: reportId };
+  return { ok: true, gilt_fuer: adr, art: A.name,
+    hinweis: 'Der Auftrag steht. DealPilot meldet "PDF wird erstellt …" und schickt die Datei '
+           + 'selbst, in der Regel nach 10 bis 30 Sekunden. Sag in EINEM Satz, welches PDF fuer '
+           + 'welches Objekt kommt. Keine Links, keine Wiederholung.' };
+}
+
 /* ═══ KOSTET (braucht Bestaetigung MIT PREIS) ═════════════════════════ */
 
 async function marktbericht_preis(ctx, args) {
@@ -3166,6 +3234,70 @@ async function marktbericht_preis(ctx, args) {
   ctx.merkeObjekt(id);
   const _o = await dialog.objektKontext(ctx.userId, id);
   const _adr = _adrVon(_o) || null;   /* EINE Stelle, siehe _adrVon */
+  const _daten = (_o && _o.daten) || {};
+
+  /* ══ v2960a · EINE GENANNTE STUFE WIRD ZUM ANGEBOT — MIT STUFE ════════
+   *
+   * Bis hierher hielt das Angebot nur das OBJEKT fest. Die Stufe waehlte
+   * beim Abruf das Modell (`args.stufe`). Gemessen am Code: Preis fuer
+   * alle drei Stufen angesagt, Nutzer sagt „die einfache, ja", das Modell
+   * gibt `stufe: 3` mit — und gebucht wird eine Wertermittlung.
+   *
+   *   > Was Geld kostet, darf das Modell nicht adressieren (v1821). Die
+   *   > Stufe IST ein Teil der Adresse: eine andere Stufe ist ein anderer
+   *   > Posten auf derselben Rechnung.
+   *
+   * Jetzt: nennt der Nutzer eine Stufe, ruft das Modell dieses Werkzeug
+   * MIT ihr. Erst dann entsteht ein Angebot mit Objekt UND Stufe, und
+   * DealPilot stellt die Bestaetigungsfrage selbst, woertlich, mit dem
+   * Bestand („noch N frei — Ja/Nein"). Der Abruf nimmt die Stufe nur
+   * noch aus diesem Angebot.
+   *
+   * UND: fehlt eine Pflichtangabe der Stufe, gibt es KEIN Angebot. Der
+   * Bericht rechnet nie halb (objekt-reiter.js stufeAbrufen) — und eine
+   * Bestaetigung fuer etwas, das gar nicht abrufbar ist, waere eine
+   * Frage, deren Ja ins Leere geht. */
+  const gewaehlt = Number(args && args.stufe);
+  if (gewaehlt === 1 || gewaehlt === 2 || gewaehlt === 3) {
+    const v = await markt.voranschlag(ctx.userId, id, gewaehlt);
+    const fehlt = markt.fehlendeAngaben(_daten, gewaehlt);
+    if (!v.moeglich) {
+      return { ok: false, gilt_fuer: _adr, fehler: v.grund,
+        hinweis: 'Der Preis liess sich gerade nicht ermitteln. Sag das dem Nutzer; nichts abrufen.' };
+    }
+    if (fehlt.length) {
+      if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
+      return { ok: false, abrufbar: false, gilt_fuer: _adr, stufe: gewaehlt, name: v.name,
+        fehlende_angaben: fehlt.map((f) => f.name),
+        hinweis: 'Diese Stufe ist fuer "gilt_fuer" NICHT abrufbar, weil Pflichtangaben fehlen — '
+               + 'der Bericht rechnet nie halb. Nenne dem Nutzer ALLE fehlenden Angaben '
+               + 'woertlich (fehlende_angaben) und sag, dass er sie hier nennen kann '
+               + '("setz die Grundstuecksflaeche auf 450") oder in DealPilot im Reiter Objekt '
+               + 'eintraegt. Nichts abrufen, keine Kosten nennen, keine Bestaetigung erfragen.' };
+    }
+    if (v.verbraucht_einen_abruf && v.bestand != null && v.bestand < 1) {
+      if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
+      return { ok: false, abrufbar: false, gilt_fuer: _adr, stufe: gewaehlt, name: v.name,
+        kontingent_leer: true,
+        hinweis: 'Fuer diese Stufe ist das Kontingent aufgebraucht (0 frei). Sag das dem Nutzer; '
+               + 'nachkaufen oder hoeherer Plan geht in DealPilot (pakete_und_preise nennt die Preise).' };
+    }
+    const frage = 'Bestätigung: *' + v.name + '* für *' + (_adr || 'dieses Objekt') + '*. '
+      + (v.verbraucht_einen_abruf
+          ? 'Das verbraucht 1 ' + v.name + ' aus deinem Kontingent'
+            + (v.bestand != null ? ' (noch ' + v.bestand + ' frei)' : '') + '.'
+          : 'Diese Tiefe ist für dieses Objekt bereits bezahlt — es wird nichts verbraucht.')
+      + '\nSoll ich sie abrufen? Antworte *Ja* oder *Nein*.';
+    if (typeof ctx.merkeAngebot === 'function') await ctx.merkeAngebot(id, _adr, gewaehlt);
+    ctx.bestaetigung = frage;
+    return { ok: true, abrufbar: true, gilt_fuer: _adr, stufe: gewaehlt, name: v.name,
+      was_drin_ist: v.was_drin_ist,
+      hinweis: 'Das Angebot steht. DealPilot schickt direkt nach deiner Antwort die '
+             + 'Bestaetigungsfrage mit Kontingent und Bestand SELBST. Stelle sie NICHT selbst '
+             + 'und nenne keine Kosten — sag in ein bis zwei Saetzen, was diese Stufe fuer '
+             + '"gilt_fuer" liefert. Abgerufen wird erst nach dem Ja des Nutzers.' };
+  }
+
   if (typeof ctx.merkeAngebot === 'function') await ctx.merkeAngebot(id, _adr);
 
   /* ── v1811b · OHNE STUFE GIBT ES ALLE DREI ───────────────────────────
@@ -3186,11 +3318,14 @@ async function marktbericht_preis(ctx, args) {
     for (const s of [1, 2, 3]) {
       const v = await markt.voranschlag(ctx.userId, id, s);
       if (!v.moeglich) continue;
+      const _f = markt.fehlendeAngaben(_daten, s);   /* v2960a */
       alle.push({
         stufe: s, name: v.name, was_drin_ist: v.was_drin_ist,
         verbraucht_einen_abruf: v.verbraucht_einen_abruf,
         guthaben_abrufe_uebrig: v.bestand,
-        so_sagen: v.so_sagen
+        so_sagen: v.so_sagen,
+        abrufbar: !_f.length,
+        fehlende_angaben: _f.length ? _f.map((f) => f.name) : undefined
       });
     }
     return {
@@ -3221,13 +3356,14 @@ async function marktbericht_preis(ctx, args) {
              + 'in dem Fall ausdruecklich, dass du ein anderes Objekt gefunden hast, '
              + 'und frage nach.\n'
              + 'HAT DER NUTZER EINE STUFE GENANNT (z.B. "erweiterte", "vollstaendige '
-             + 'Wertermittlung", "Marktpreisindikation")? Dann nenne NUR DIESE, mit '
-             + 'ihrem so_sagen-Satz, und frage, ob du sie abrufen sollst.\n'
+             + 'Wertermittlung", "Marktpreisindikation")? Dann rufe marktbericht_preis '
+             + 'SOFORT NOCHMAL mit dieser stufe auf — erst dann entsteht das Angebot.\n'
              + 'HAT ER KEINE GENANNT? Dann zeige ihm alle drei mit dem, was sie '
-             + 'unterscheidet, und frage, welche er moechte. Waehle KEINE selbst.\n'
-             + 'In beiden Faellen: marktbericht_abrufen erst nach einem '
-             + 'ausdruecklichen Ja. Dieser Voranschlag verbraucht selbst kein '
-             + 'Guthaben — das ist eine Angabe fuer dich, nicht fuer den Nutzer.'
+             + 'unterscheidet, mit so_sagen, und bei abrufbar=false mit den fehlenden '
+             + 'Angaben. Frage, welche er moechte. Waehle KEINE selbst.\n'
+             + 'Abgerufen wird NIE aus dieser Uebersicht: erst marktbericht_preis mit '
+             + 'stufe, dann die Bestaetigung, dann das Ja. Dieser Voranschlag verbraucht '
+             + 'selbst kein Guthaben — das ist eine Angabe fuer dich, nicht fuer den Nutzer.'
     };
   }
 
@@ -3293,8 +3429,13 @@ async function marktbericht_preis_alle(ctx, args) {
            + 'Angabe fuer dich, NICHT fuer den Nutzer. Sag ihm woertlich, was unter '
            + '"so_sagen" steht, nenne wie viele Objekte unvollstaendig sind, und '
            + 'frage dann. Schreibe NIE "kostet nichts", wenn kostenpflichtige_abrufe '
-           + 'groesser null ist. Erst nach einem ausdruecklichen Ja '
-           + 'marktbericht_abrufen je Objekt aufrufen.'
+           + 'groesser null ist. '
+           /* v2960a · Ein Sammelabruf ging nie: das Angebot haelt EIN Objekt.
+              Gemessen am Code liefen alle Abrufe eines Laufs auf dasselbe
+              Angebotsobjekt. Jetzt ehrlich: einzeln, mit Bestaetigung je Objekt. */
+           + 'ABRUFEN GEHT IM CHAT NUR EINZELN: je Objekt marktbericht_preis mit stufe, '
+           + 'Bestaetigung, Ja. Sag das dem Nutzer; fuer alle auf einmal ist DealPilot im '
+           + 'Browser der Weg.'
   };
 }
 
@@ -3325,12 +3466,39 @@ async function marktbericht_abrufen(ctx, args) {
            + '(marktbericht_preis) und lass den Nutzer zustimmen — erst dann gibt es '
            + 'ein Objekt, auf das sich der Abruf beziehen darf.' };
   }
-  const stufe = _stufe(args);
+  /* ══ v2960a · DIE STUFE KOMMT AUS DEM ANGEBOT, NIE VOM MODELL ════════
+   * Siehe marktbericht_preis. Ohne Angebot MIT Stufe gibt es keinen Abruf
+   * — auch dann nicht, wenn die Zustimmung sonst durchging. */
+  const stufe = (ctx.angebotStufe === 1 || ctx.angebotStufe === 2 || ctx.angebotStufe === 3)
+    ? ctx.angebotStufe : null;
+  if (!stufe) {
+    return { ok: false, hinweis: 'Fuer dieses Angebot ist keine Stufe bestaetigt. Rufe '
+           + 'marktbericht_preis mit der Stufe auf, die der Nutzer will — DealPilot stellt '
+           + 'dann die Bestaetigungsfrage. Nichts abgerufen, nichts verbraucht.' };
+  }
+  const stufeAbweichung = (args && args.stufe != null && Number(args.stufe) !== stufe)
+    ? Number(args.stufe) : null;
   const o = await dialog.objektKontext(ctx.userId, id);
+  /* Die Pflicht noch einmal am ABRUF: zwischen Preisansage und Ja kann
+     sich das Objekt geaendert haben. */
+  const fehlt = markt.fehlendeAngaben((o && o.daten) || {}, stufe);
+  if (fehlt.length) {
+    return { ok: false, abrufbar: false, abgerufen_fuer: _adrVon(o), stufe: stufe,
+      fehlende_angaben: fehlt.map((f) => f.name),
+      hinweis: 'Nicht abgerufen, nichts verbraucht: Pflichtangaben fehlen. Nenne sie dem Nutzer.' };
+  }
+  /* Ein Angebot traegt genau EINEN Abruf. Ein zweiter Aufruf im selben
+     Lauf findet es nicht mehr. */
+  ctx.angebotObjekt = null; ctx.angebotStufe = null;
   try {
     const r = await markt.abrufen(ctx.userId, o, stufe);
     ctx.merkeObjekt(id);
     if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
+    if (r && r.no_data) {
+      return { ok: false, keine_daten: true, abgerufen_fuer: _adrVon(o), stufe: stufe,
+        hinweis: 'Fuer diese Adresse lagen keine Marktdaten vor. Es wurde nichts berechnet '
+               + 'und nichts abgebucht. Sag das so.' };
+    }
 
     /* ── v1808 · DAS ERGEBNIS IST MEHR ALS EINE ZAHL ───────────────────
      *
@@ -3345,6 +3513,14 @@ async function marktbericht_abrufen(ctx, args) {
      *   > Eine Wertauskunft ohne ihre Herkunft verstoesst gegen die
      *   > Wertermittlungsdoktrin, egal wie gut sie formuliert ist. */
     const bericht = r.report_md || r.bericht_md || r.markdown || null;
+    if (r.report_id) ctx.berichtPdfLink = markt.berichtPdfLink(r.report_id);   /* v2960a */
+    /* v2961 · Gibt es den PDF-Dienst, kommt der Bericht gleich als Datei
+       statt als Link. */
+    if (r.report_id && require('./telegramPdfService').verfuegbar()) {
+      ctx.pdfAuftrag = { art: 'marktbericht', name: (markt.STUFEN[stufe] || {}).name || 'Marktbericht', objekt_id: id,
+        adresse: _adrVon(o), report_id: r.report_id };
+      ctx.berichtPdfLink = null;
+    }
     const stufeInfo = markt.STUFEN[stufe] || markt.STUFEN[1];
 
     return {
@@ -3358,15 +3534,25 @@ async function marktbericht_abrufen(ctx, args) {
           + 'Objekt der Preisansage. Sag dem Nutzer ausdruecklich, WELCHES Objekt '
           + 'berechnet wurde.'
         : undefined,
+      stufe_abweichung_gemeldet: stufeAbweichung
+        ? 'Das Modell wollte Stufe ' + stufeAbweichung + '. Abgerufen wurde die bestaetigte '
+          + 'Stufe ' + stufe + '. Nenne die abgerufene Stufe.'
+        : undefined,
       zahlen: _berichtZahlen(r),
       bericht_text: bericht ? String(bericht).slice(0, 14000) : null,
       rumpf: _ohneGrosseFelder(r),
+      /* v2960a · Der PDF entsteht im Browser; der Link oeffnet den Bericht
+         und speichert ihn als PDF, wenn der Nutzer dort angemeldet ist. */
+      report_id: r.report_id || null,
+      pdf_link: r.report_id ? markt.berichtPdfLink(r.report_id) : null,
       hinweis: 'Fasse fuer den Nutzer zusammen: Wert bzw. Spanne, die verwendeten '
              + 'Objektangaben, Lage, Marktdaten, Annahmen und Besonderheiten — und '
              + 'NENNE DIE QUELLEN, wenn welche dastehen. Erfinde nichts dazu. '
              + 'Sag ausdruecklich, dass es eine Indikation ist und kein Gutachten '
              + '(ausser bei der Wertermittlung nach ImmoWertV). '
-             + 'Nenne Anbieter nie beim Namen — "unabhaengiger Bewertungspartner".'
+             + 'Nenne Anbieter nie beim Namen — "unabhaengiger Bewertungspartner". '
+             + 'Steht in "zahlen" ein sachwert_nicht_ausgewiesen, nenne den Grund. '
+             + 'Den PDF-Link schickt DealPilot selbst hinterher — nenne ihn nicht.'
     };
   } catch (e) {
     /* ── v1821 · EINE GELDAKTION DARF NICHT SPURLOS SCHEITERN ──────────
@@ -3397,7 +3583,53 @@ async function marktbericht_abrufen(ctx, args) {
 
 /* Zahlen aus dem Berichtsrumpf, unter den Namen, die dort vorkommen
    koennen. Was nicht da ist, kommt nicht vor — nichts wird geraten. */
+/* ══ v2960a · DIE ZAHLEN STEHEN UNTER `data`, NICHT IM RUMPF ════════════
+ *
+ * GEMESSEN am 26.10.2026 an Bericht 350 (Staging, Stufe 3): die Antwort ist
+ * { report_id, data: {…54 KB…}, report_md, trace, … }. Die alte Suche
+ * unten sah nur auf die oberste Ebene und fand dort NICHTS — `zahlen` war
+ * bei jedem echten Bericht null. Und `_ohneGrosseFelder` liess `data` als
+ * Objekt durch: 54 KB JSON gingen ans Modell und wurden bei 24.000 Zeichen
+ * mitten im Objekt abgeschnitten.
+ *
+ *   > Ein Feld, das nie gefuellt ist, sieht im Code aus wie eine Auskunft.
+ *
+ * Gelesen wird jetzt, wo die Zahlen wirklich stehen. Was fehlt, fehlt. */
 function _berichtZahlen(r) {
+  const p = (r && r.data && typeof r.data === 'object') ? r.data : null;
+  if (p) {
+    const z = {};
+    const eur = (v) => (v != null && Number.isFinite(Number(v))) ? Number(v).toLocaleString('de-DE') : undefined;
+    const mv = (p.valuation && p.valuation.market_value) || {};
+    z.marktwert_eur = eur(mv.estimated);
+    z.spanne_von_eur = eur(mv.low);
+    z.spanne_bis_eur = eur(mv.high);
+    z.verlaesslichkeit = mv.confidence_label || undefined;
+    const rent = p.rent || {};
+    z.marktmiete_median_eur_qm = eur(rent.median_per_sqm);
+    const cc = p.cross_check || {};
+    if (cc.ertragswert && cc.ertragswert.available) {
+      z.ertragswert_eur = eur(cc.ertragswert.value_eur);
+      z.liegenschaftszins_pct = cc.ertragswert.liegenschaftszins_pct;
+      z.liegenschaftszins_stufe = cc.ertragswert.liegenschaftszins_stufe;
+    }
+    if (cc.sachwert) {
+      if (cc.sachwert.available) z.sachwert_eur = eur(cc.sachwert.value_eur);
+      else if (cc.sachwert.grund) z.sachwert_nicht_ausgewiesen = String(cc.sachwert.grund).slice(0, 300);
+    }
+    if (cc.bodenwert) z.bodenwert_eur = eur(cc.bodenwert.wert);
+    if (cc.comparison) z.vergleichswert_eur = eur(cc.comparison.vergleichswert_eur);
+    if (cc.verfahrenswahl) {
+      z.fuehrendes_verfahren = cc.verfahrenswahl.verfahren;
+      z.verfahrenswahl_grund = String(cc.verfahrenswahl.grund || '').slice(0, 300) || undefined;
+    }
+    if (Array.isArray(cc.quellen_nachweis)) {
+      z.quellen = cc.quellen_nachweis.slice(0, 8).map((q) => (typeof q === 'string' ? q
+        : (q && (q.vermerk || q.text || q.quelle || q.name)) || null)).filter(Boolean);
+    }
+    Object.keys(z).forEach((k) => { if (z[k] === undefined) delete z[k]; });
+    return Object.keys(z).length ? z : null;
+  }
   const w = r.wert || r.ergebnis || r.result || r || {};
   const z = {};
   const nimm = (ziel, ...kandidaten) => {
@@ -3422,6 +3654,9 @@ function _ohneGrosseFelder(r) {
   const o = {};
   Object.keys(r || {}).forEach((k) => {
     if (/report_md|bericht_md|markdown|html/i.test(k)) return;
+    /* v2960a · `data` (54 KB) und `trace` sind keine Auskunft fuer das
+       Modell; die Zahlen daraus stehen in `zahlen`. */
+    if (k === 'data' || k === 'trace') return;
     const v = r[k];
     if (typeof v === 'string' && v.length > 600) return;
     o[k] = v;
@@ -4022,6 +4257,27 @@ const WERKZEUGE = [
         felder: { type: 'object', description: 'Feld-Id zu Wert, soweit sicher bekannt' }
       }, additionalProperties: false } },
 
+  { name: 'hilfe_suchen', stufe: 'lesen', fn: hilfe_suchen,
+    beschreibung: 'Sucht in der Hilfe der DealPilot-App (dieselben Texte wie im Hilfe-Fenster: '
+      + 'Bedienung, Reiter, Kennzahlen, Quick-Check, Marktbericht, PDF-Export, Import, '
+      + 'Einstellungen, FAQ, Glossar). IMMER bei Fragen zur Bedienung ("wie mache ich", '
+      + '"wo finde ich", "was bedeutet", "wie funktioniert"). Kostet nichts.',
+    parameter: { type: 'object',
+      properties: { frage: { type: 'string', description: 'Die Frage des Nutzers, woertlich' } },
+      required: ['frage'], additionalProperties: false } },
+
+  { name: 'pdf_erstellen', stufe: 'lesen', fn: pdf_erstellen,
+    beschreibung: 'Schickt dem Nutzer ein PDF aus DealPilot als Datei in den Chat — dasselbe PDF '
+      + 'wie der Export-Knopf der App. Arten: investment (Investment-PDF, hell), '
+      + 'investment_dunkel (Investment-PDF, Obsidian), bank (Investment Case Bankfassung), '
+      + 'bank_kurz (Kurzfassung), bankexport (alle Darlehen aller Objekte, ohne Objekt), '
+      + 'marktbericht (der letzte Marktbericht des Objekts). Ist unklar, welche Fassung, frag. '
+      + 'Kostet kein Bewertungskontingent.',
+    parameter: { type: 'object',
+      properties: Object.assign({}, OBJEKT_ARGS, { art: { type: 'string',
+        enum: ['investment', 'investment_dunkel', 'bank', 'bank_kurz', 'bankexport', 'marktbericht'] } }),
+      required: ['art'], additionalProperties: false } },
+
   { name: 'marktbericht_preis', stufe: 'lesen', fn: marktbericht_preis,
     beschreibung: 'Was kosten die Bewertungen? Liefert IMMER ALLE DREI Stufen '
       + 'mit Preis und Inhalt — du waehlst keine aus, der Nutzer waehlt. Drei Stufen: '
@@ -4031,8 +4287,15 @@ const WERKZEUGE = [
       + '3 = Wertermittlung nach ImmoWertV (Boden-, Ertrags- und Sachwert mit '
       + 'Rechenweg). Kostet selbst nichts. IMMER vor marktbericht_abrufen. '
       + 'Geht aus der Frage nicht hervor, welche Stufe gemeint ist, FRAG den Nutzer '
-      + 'und nenne dabei, was die Stufen unterscheiden.',
-    parameter: { type: 'object', properties: OBJEKT_ARGS,
+      + 'und nenne dabei, was die Stufen unterscheiden. '
+      /* v2960a */
+      + 'Hat der NUTZER eine Stufe genannt, rufe es MIT stufe auf: dann prueft es die '
+      + 'Pflichtangaben und legt das Angebot ab, und DealPilot stellt die '
+      + 'Bestaetigungsfrage selbst. Ohne diesen Aufruf mit stufe gibt es keinen Abruf.',
+    parameter: { type: 'object',
+      properties: Object.assign({}, OBJEKT_ARGS, { stufe: { type: 'integer',
+        description: 'NUR wenn der Nutzer die Stufe selbst genannt hat: 1 Marktpreisindikation, '
+          + '2 erweiterte, 3 Wertermittlung. Sonst weglassen.' } }),
       additionalProperties: false } },
 
   { name: 'marktbericht_preis_alle', stufe: 'lesen', fn: marktbericht_preis_alle,
@@ -4045,7 +4308,8 @@ const WERKZEUGE = [
 
   { name: 'marktbericht_abrufen', stufe: 'kostet', fn: marktbericht_abrufen,
     beschreibung: 'Ruft die Bewertung ab. KOSTET GUTHABEN. Nur aufrufen, wenn der Nutzer '
-      + 'nach einer Preisansage ausdruecklich zugestimmt hat.',
+      + 'nach der Bestaetigungsfrage ausdruecklich zugestimmt hat. Objekt und Stufe kommen '
+      + 'aus dem bestaetigten Angebot, nicht aus deinen Angaben.',
     parameter: { type: 'object',
       properties: Object.assign({}, OBJEKT_ARGS,
         { stufe: { type: 'integer', description: '1, 2 oder 3' } }),

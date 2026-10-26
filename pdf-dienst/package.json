@@ -1,0 +1,13 @@
+{
+  "name": "dealpilot-pdf-dienst",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Erzeugt die PDFs der App serverseitig, indem es die echte App in Headless-Chrome oeffnet (v2961). Kein Nachbau des PDF-Codes.",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "puppeteer-core": "23.11.1"
+  },
+  "engines": { "node": ">=20" },
+  "license": "Proprietary"
+}

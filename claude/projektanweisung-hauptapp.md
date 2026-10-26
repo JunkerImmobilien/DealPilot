@@ -401,6 +401,25 @@ entfernt (v848).
 **Portfolio-Cockpit:** `dashboard.js`/`.css` v750k, Mount `dashboard-main`,
 Creme `#FDFCFA`, CSS-Idempotenz-Marker exakt.
 
+**Portfolio-Cockpit seit v2951–v2953 (25.10.2026):** Umschalter **Einfach |
+Genau** (Merker `dp_cockpit_ansicht`, Einfach = sechs Kernkacheln). Bestand =
+`_deal_won` und nicht `_deal_lost` — „Verloren“ nimmt ein Objekt aus dem
+Cockpit, ohne es zu löschen (Löschen ist endgültig, kein Papierkorb).
+**Gesamtbewertung** in drei Spalten (investiert · Bilanz · nach Bewertung) plus
+Tabelle **„Bewertung je Objekt“**: Kaufpreis, Marktpreisindikation, Ertragswert
+mit Abstand zum Kaufpreis; Ertragswert/MPI aus dem Zielbild-Lauf
+(`_potenzial`), sonst aus dem letzten Marktbericht (`GET
+/marktbericht/objects/history`, kein Kontingent). Fehlende Objekte: rote Box
+mit Namen und Grund. **Projektionszeitraum 10/20/30:** Kopfleiste,
+`dpc-vb-eq`, `dpc-vb-quellen`, `dpc-proj-mix`, Tabelle und Einfach-Kachel
+ziehen mit (`setProjYears` → `renderProjTable`, `buildCharts`,
+`renderEinfach`); die „Vermögensbilanz heute“ bleibt absichtlich heute.
+**Portfolio-Pilot** unter der Auswertung („Bestand & Zielbild erklären“): die
+KI bekommt fertige Faktensätze, danach prüft `portfolio-pilot.js` jede Zahl
+UND ihre Zuordnung (Begriff→Betrag, Betrag→Prozent, Richtung, Namen, Abstand
+als Anteil gelesen) — `tools/portfolio-pilot-pruefen.mjs` hält die echten
+Fehler der Läufe 1 und 2 als Testfälle (RC 0).
+
 **Schließen-X im schwarzen Band (v843):** `dp-band-close` im
 `dp-modal-topband` (Settings + Hilfe), CSS-Marker `v843-band-close`.
 
@@ -1612,6 +1631,19 @@ versuchen, statt Feldnamen von `getStatus` zu raten (402 = Feldnamen).
 ---
 ---
 
+### Ankauf-Sanierung im Bestand ist kein Sanierungsstau (v2952, 25.10.2026)
+
+Das Feld `san` (Reiter Investition) geht über `DealPilotObjectMapper.bomAus`
+als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV)
+in den Bericht — für eine **Ankaufsprüfung** richtig. Liegt das **Kaufdatum
+mindestens 12 Monate zurück**, gilt die Sanierung als ausgeführt und wird
+**nicht** mehr abgezogen (`kaufdat` reist dafür seit v2952 mit). Gemessen an
+Parkstr. 9: 137.000 € drückten den Ertragswert im Bestand auf 161.000 €.
+**Die ausgeführte Sanierung gehört dann in die acht Modernisierungsfelder**
+(Anlage 2) — beim MFH mit Quelle „aus den acht Feldern“ (`mod_quelle =
+felder`), sonst gelten die Punkte der Einheiten. Parkstr. 9 nach Eintrag:
+8 Punkte, RND 12 → 32 J., Ertragswert 425.000 €.
+
 # TEIL IV — MARKE, ARCHITEKTUR, GELD, DATEN, SERVER
 
 ## PRODUKT
@@ -1737,9 +1769,38 @@ window.addEventListener('dp:plan-ready', e => e.detail.plan);
 `getCurrentPlanKey()` darf NIE wortlos auf `'free'` fallen; `dp_last_plan` ist
 der Merker.
 
-**Pläne:** Free · Starter 29 € · Investor 59 € ★ · Pro 99 €.
-**Kerosin-Pakete:** 10 L / 2 € · 28 L / 5 € · 90 L / 15 € (beliebt) ·
-160 L / 25 €.
+**Pläne (Stand 25.10.2026, `config.js` PRICING):** Free · Starter 19,99 € ·
+Investor 34,99 € ★ · Pro 49,99 € · Partner 99 € (Pro-Klon). Kerosin/Liter gibt
+es seit v1176 nicht mehr — es heißt **Kontingent** (Bewertungen je Monat):
+Marktpreisindikation 1/5/5/5, erweiterte –/–/5/5, Wertermittlung –/–/–/5
+(Free/Starter/Investor/Pro).
+
+**Co-Pilot-Tageslimit (seit v2955, Marcel 25.10.2026):** Free **10** · Starter
+**20** · Investor **50** · Pro **100** · Partner **100** Antworten am Tag
+(vorher 10/50/150/300/300). Quelle der Wahrheit ist
+`backend/src/routes/ai.js` `COPILOT_PLAN_LIMITS` (Zähler `_cpDaily` im
+Speicher, je Nutzer und Tag; Browser, Portfolio-Pilot und Telegram-Bot teilen
+ihn über `copilotKontingent.verbrauchen`). Gespiegelt — **bei jeder Änderung
+alle vier nachziehen:** `config.js` `limits.copilot_tag` (Einstellungen ›
+Plan, auch der Kopf zahlender Kunden), `pricing-modal.js` (beide Matrizen
+und die Planlisten), `landing/index.html` (Zeile „Co-Pilot: N Fragen am Tag“
+je Plan). Kein Kontingent, kein Geld — nur das Tageslimit.
+
+**Spracheingabe zählt mit (v2956):** je angefangene **2 Minuten gesprochene
+Zeit am Tag eine Frage** (`_spracheRechnen`/`_spracheBuchen` in
+`/ai/extract-voice`, derselbe Zähler). Bewusst NICHT „je Aufnahme“: der
+geführte Sprechlauf schickt 30–40 kurze Antworten und hätte sonst das
+Starter-Limit allein verbraucht. Dauer kommt vom Browser (`dauer_s`), mit
+Untergrenze aus der Dateigröße; abgezogen wird erst nach erfolgreicher
+Auswertung; eigener API-Schlüssel ist frei. **Nicht** gezählt:
+`transcribe-chunk` (Live-Vorschau schickt den wachsenden Mitschnitt mehrfach)
+und `voice-stream`.
+
+**Abgeschafft:** „Migration & Einrichtung (bis 3 h)“ bei Pro (Marcel
+25.10.2026: „haben wir schon lange nicht mehr“) — aus Preisfenster, Landing,
+`config.js` (`migration_service`) entfernt. Der KI-Hinweistext „kein
+Kontingent, zählt zum Tageslimit … 10 bis 300“ im Cockpit/Portfolio-Pilot ist
+raus.
 
 ---
 
@@ -2544,6 +2605,22 @@ bereits gelöschte mb-Berichte NICHT wieder her.**
 
 ---
 
+### Produktion per `tools/rollout-prod.ps1 -Freigabe` (Stand 25.10.2026)
+
+`-Freigabe` nur, wenn Marcel den Rollout ausdrücklich genannt hat. Das Skript
+sichert beide Prod-DBs und liest ihre Köpfe, lässt den Gold-Audit auf Staging
+laufen, merged `staging → main`, zieht auf Prod, baut `backend` und
+`mb-backend` und misst nach. **Zwei Fehler am 25.10. behoben:** (1) die
+Sicherungsbefehle kamen mit `\r` an (die .ps1 liegt mit CRLF auf der Platte) —
+Dateinamen auf dem Server mit unsichtbarem `\r`, Kopfprüfung fand nichts;
+jetzt `-replace "`r"` vor dem ssh. (2) der Gold-Audit wurde am Satz „Kein neues
+Hartgold“ gemessen, unter der Basislinie steht aber „[OK] Unter der
+Basislinie“ — jetzt am Rückgabewert (`AUDIT_RC=0`). Meldet der Audit
+„unter der Basislinie“: `--basislinie-schreiben` auf Staging, Datei
+zurückholen, committen (der Deckel darf sinken, 25.10.: 438 → 429).
+Sicherungsreste mit `\r` im Namen vom 25.10. (`…-1649`) liegen noch in
+`/root/backups/` — harmlos.
+
 ## CHRONIK — DIE ROLLBACK-KETTE
 
 **Marktbericht-Strang (neueste zuerst):**
@@ -2591,6 +2668,27 @@ Stripe LIVE seit 15.07. · Caddyfile repo-gepflegt ·
 ---
 
 ## OFFENE PUNKTE
+
+**Demo-Konto info@ — Staging und Prod laufen seit 25.10.2026 auseinander.**
+Am 23.10. wurden die 17 Demo-Objekte per ID nach Prod gespiegelt. Am 25.10.
+nur auf **Staging** geändert (mit Marcels Freigabe): Kaufpreise Parkstr. 9
+395.000 (vorher 780.000), Bismarckstr. 27 850.000 (1,15 Mio), Hölderlinstr. 1
+125.000 (139.000), Bäckerstr. 7 165.000 (195.000) und nach 32423 Minden;
+Darlehen im selben Verhältnis, EK = Gesamtinvestition − Darlehen; Parkstr. 9
+Modernisierung eingetragen; Musterstraße 12 Grundstück 1.200 m²; Westerfeld-
+Kopie `c5a78c89` („E2E“) und Am Markt 9 privat `cea958eb` auf „Verloren“
+(endgültig löschen macht Marcel). Behalten: Westerfeld `ae155d38`
+(Spot/Videos), Am Markt 9 VV-GmbH `ec2d0f32`. Soll Prod für die Messe
+denselben Stand zeigen, muss wieder gespiegelt werden (vorher sichern).
+
+**Messe-Material (Messe Leipzig 31.10.–01.11.2026):** Storybook aus
+`tools/messe-storybook.mjs` → `Dateien/Messe/DealPilot Messe-Storybook.pdf`
+(23 Seiten: Pitch, Rundgang in fünf Akten Finden → Prüfen → Bewerten → Halten
+→ Überblick, Portfolio-Cockpit, „Lohnt sich, was ich vorhabe?“, je Objekt eine
+Seite). Alle Zahlen aus der Staging-DB und `mb.object_snapshots`, nichts von
+Hand — **nach jeder Änderung an den Demo-Objekten neu laufen lassen.**
+Werbespot v13 (90 s) mit Marcels Stimmklon: `Dateien/Messe/Videos/
+dealpilot-spot-immocation-v13-*.mp4`.
 
 ### Sofort — Abnahme des letzten Rollouts
 
@@ -42398,7 +42496,18 @@ Marcel 22.10.2026: „ja rollout 62".
 - **✅ PROD-ROLLOUT 25.10.2026 — v2944 bis v2955a** (Marcel: „ja bitte prod rollout“). **Was:** 32 Commits, 38 Dateien, keine Migrationen; Prod vorher `cb5508a`, jetzt Merge `d526f8a0`; Backend und mb-backend neu gebaut. `rollout-prod.ps1 -Freigabe` brach in Schritt 2 sicher ab (vor dem Merge): die Here-String-Befehle kamen mit `\r` an (Datei liegt mit CRLF auf der Platte), Dateinamen auf dem Server trugen ein `\r`, die Kopfprüfung fand nichts. Sicherung deshalb von Hand, Rest von Hand nach demselben Ablauf; Skript repariert (`-replace "`r"` vor dem ssh).
   **Nachweis:** Sicherungen `/root/backups/haupt-20261025-1549.sql.gz` (14 MB, 74 CREATE TABLE, Kopf „PostgreSQL database dump“, Ende „dump complete“) und `mb-20261025-1549.sql.gz` (27 MB, 34 Tabellen, ebenso). Prod-Server `d526f8a0`, Container backend healthy, mb-backend läuft (Migrationen skip), `COPILOT_PLAN_LIMITS` im Container 10/20/50/100/100, Mapper mit v2952; app.dealpilot.immo lädt config.js/dashboard.js v2955, dealpilot.immo zeigt „Co-Pilot: 10/20/50/100 Fragen am Tag“, beide HTTP 200. Gold-Audit auf Staging RC 0 — **erst nach dem Rollout gelaufen** (das Skript hätte ihn vorher gemacht).
   **Rest:** auf Prod liegen aus dem abgebrochenen Skriptlauf Sicherungsreste mit `\r` im Namen (`…-1649.sql.gz\r`) — harmlos, bei Gelegenheit aufräumen. Die Demo-Datenänderungen (Kaufpreise, „Verloren“) betreffen nur Staging.
+- **v2956 + ✅ PROD-ROLLOUT 25.10.2026** (Marcel: „ja so umsetzen und rollout bitte“). **Was:** Spracheingabe zählt aufs Co-Pilot-Tageslimit — je angefangene 2 Minuten gesprochene Zeit am Tag eine Frage (`routes/ai.js` `_spracheRechnen`/`_spracheBuchen`, derselbe Zähler `_cpDaily`; Vorprüfung → 429, gebucht nach erfolgreicher Auswertung; eigener Schlüssel frei). Dauer vom Browser (`dauer_s`: Aufnahme `st.elapsed`, Sprechlauf `_fs.sprechMs`), Untergrenze aus der Dateigröße. Bewusst NICHT je Aufnahme: ein Sprechlauf hat 30–40 kurze Antworten und hätte sonst das Starter-Limit allein verbraucht (nachgerechnet: 30-s-Aufnahme 1, danach 35 Antworten à 6 s zusammen 1, 3-min-Aufnahme 2). Hinweis in Einstellungen › Plan und im Preisfenster. Nicht gezählt: `transcribe-chunk` (Live-Vorschau, schickt den wachsenden Mitschnitt mehrfach) und `voice-stream`. **Commit:** `1eb27404`; dazu `f0ad68b1` (Gold-Basislinie 438 → 429, `rollout-prod.ps1` prüft den Audit am Rückgabewert statt am Satz „Kein neues Hartgold“ — der erste Lauf brach bei grünem Audit ab). **Nachweis:** `rollout-prod.ps1 -Freigabe` diesmal durchgelaufen: Sicherungen `haupt-20261025-1658` (14 MB) und `mb-20261025-1658` (27 MB) mit gelesenem Kopf, AUDIT_RC=0, Prod `7833ef87`, backend healthy, `_spracheRechnen` im Container, App lädt voice-import/settings/pricing-modal v2956. **Abnahmepunkt (Marcel):** eine echte Aufnahme — ohne Mikrofon nicht nachstellbar.
 - **v2947/v2947a** (25.10.2026, Staging, Marcel: „ja alles fertig machen“ zu N78). **Was:** (1) `openaiService._offerteDeckeln`: liegt die Offerte über dem Kaufpreis, fällt `offerte_mail` weg (`offerte_mail_entfallen` mit Grund — die Mail leitet den Betrag im Fließtext her, ein Austausch der Zahl ließe die Herleitung stehen und verfehlt „910 T€“), `verhandlungsempfehlung` bekommt einen Vermerk, `offerte_gedeckelt` hält Vorschlag und KP; ui.js zeigt den Grund. (2) Verlauf: „Marktpreisindikation nach Abschlag“ nur für Berichte mit Abschlag (`mpi_nach_abschlag`), Δ und Index vom ersten vorhandenen Wert, Trend in Lage & Markt über den Wert ohne Abschlag, Prozent deutsch, KI-Verlaufstext bekommt `mpi_ohne_abschlag`/`abschlag_pct`. (3) `_ohnePortal()` in `_escClean`, `_quelleZeile` (Portalquelle → „Aktueller Marktdurchschnitt (Angebotsdaten)“, ohne Link, entdoppelt) und in pdf.js/pdf-investment-bank.js (`window._dpOhnePortal`). (4) mb `api.js` liefert `mpi_faktoren` (= `valuation.factors`); wertvergleich.js rechnet Median × Fläche × wirksame Faktoren + Zuschläge nur aus, wenn es auf ±1 % aufgeht. (5) „Score laut Marktbericht“, „Bruttomietrendite laut Marktbericht (ohne Zusatzeinnahmen)“ in Verlauf, `pilot-berichte.js` und Prompt; Score-Vergleich nennt DealPilot-Score und Investor Deal Score (Objektkarte) von heute. (6) Einheit `score` für den DealScore im Soll/Ist (ankauf.js, abweichung.js, ui.js), `ankaufKurz()` ergänzt fehlende Kennzahlen aus `stand().daten`, Ertragswert-Satz erklärt den Rohertrag-Unterschied. **Commit:** `cb9043be` (v2947), `fde07f9b` (v2947a); Buster v2947/v2947a; backend + mb-backend auf Staging neu gebaut (`mpi_faktoren` bzw. `offerte_mail_entfallen` im Container). **Nachweis** (Westerfeldstr. 140, Staging, nach Strg+Shift+R): Verlauf „nach Abschlag“ ▲ +3,1 % (Bericht 4–10) statt Mischvergleich, Lage & Markt „1.055.000 → 960.000 € (−9,0 %)“ statt „−22,3 %“; Lage & Markt ohne Portalnamen (vorher „Immowelt/Scout24“, „(Scout24, Stand 04/2024)“, immobilienscout24.de, wohnungsboerse.net), Quellen 6 → 5; Satz „Median 2.165 €/m² × 390 m² = 844.350 €, … = 887.074 €, zuzüglich 73.615 € … gerundet 960.000 € vor Abschlag“ (Faktoren 1,02 × 1,03 aus dem Bericht); Score-Vergleich „Heute: DealPilot-Score 78 · Investor Deal Score 73“; DealScore „74 → 73 / −1“ statt „74,00 → 73,00“; Ankauf-Cashflow 677 € statt „—“. `_offerteDeckeln` und `_ohnePortal` am echten Code im Skript geprüft (910.000 bei KP 545.000 → Mail null, Vermerk; „Wohnpreisindex“ bleibt). prompt-lecks, ankauf-abweichung (57), score-ketten (216), buster SAUBER, Wertermittlung im Deploy grün. **Rest:** Steuer (nur geprüft, plausibel: 2025 zvE 2.180 € nach −65.820 € Vorobjekten → 0 €; 2026 33 % Grenzsatz; 2027 47 % = 42 % + Soli-Milderungszone) — Einzelveranlagung prüft Marcel; § 7b „angehakt“ nicht nachstellbar (alle Felder `false`); Δ „+0,0 %“ beim Abschlag; Prod mit dem nächsten Rollout.
+- **v2965–v2965b** (26.10.2026, Staging, Marcel: „In dem Prozess-Atlas fliegen die Flugzeuge auf den Verbindungen rückwärts.“ – „Hat die Hilfe und der Prozess-Atlas auch die genaue Beschreibung, die wir mal gemacht haben, dabei?“ – „Können wir auch beschreiben und erklären, wie Zielbilder angelegt werden?“). **Was:** **v2965** `83d70efd`: Flugzeug-Umriss in `prozess-atlas.js` und im Atlas-Kasten von `help.js` an der y-Achse gespiegelt. **Ursache:** `animateMotion rotate="auto"` legt die +x-Achse in Flugrichtung, der Umriss hatte die Nase bei x −11 (Flügelspitzen und Leitwerk bei +x) – die Pfade selbst liefen richtig von Quelle zu Ziel. **v2965a/b** `1d06b7a7`: (1) Die „genaue Beschreibung“ ist das Flughandbuch Teil A „Schritt für Schritt“ (v2574, `tools/handbuch-ablaeufe.mjs`); die Stationsbeschreibungen des Atlas (`d`, `unter`) waren nie weg. Gemessen: das Handbuch war nur aus dem Hilfe-Thema „Die Reiter im Objekt“ erreichbar, vom Atlas gar nicht, und die Hilfe nannte „Sieben Abläufe“ (es sind elf). Jetzt je Atlas-Station „Schritt für Schritt im Flughandbuch →“ auf `handbuch.html#a-<ablauf>` (Tabelle `HANDBUCH`, 16 Verweise, `prozess-atlas-pruefen.mjs` prüft Ablauf-Id und Station), Handbuch-Banner auch im Thema „Einstieg, Abläufe & Pilot“, Atlas-Text berichtigt. Nebenbei: der Handbuch-Erzeuger war ROT (Beleg „📅 Steuerzeiträume verwalten“, seit v2949 Kalender-Symbol) – Beleg berichtigt, `handbuch-daten.js` neu erzeugt (stand seit v2574). (2) Zielbild erklärt: Hilfe-Thema „Mieterhöhung und Zielbild“ mit sechs neuen Abschnitten (Schritt für Schritt, Maßnahmen und Punkte, Mehrfamilienhaus, Ertragswerte kostenlos rechnen, was die Zahlen bedeuten, Portfolio-Cockpit) und Banner auf **Handbuch A12 „Mieterhöhung und Zielbild anlegen“** (10 Schritte, jeder mit Belegen); Atlas-Ablauf „Mieterhöhung und Zielbild“ (6 Stationen, im Gesamtnetz unter HALTEN). Ortsangabe berichtigt: die Karte steht im Reiter **Objekt** (gemessen `#zb-karte` in `#s0`), zwei Texte sagten „Bewertung“ (`wert-zielbild.js` `zielbildGrund`, `dashboard.js` `renderZielbild`).
+  **Nachweis:** vorher gemessen: Bewegung (1041,310)→(1052,257) parallel zur +x-Achse (cos 1,0), Nase bei x −11. Nachher (Staging, Animation angehalten): Nasenachse (0,31/−0,95) gegen Pfadtangente (0,33/−0,95), cos 1,000; alle 9 Teilpfade des Quick-Check laufen Quelle → Ziel wie `kanten`; Bildausschnitt: Nase zeigt auf die Zielstation, im Atlas und im Hilfe-Kasten. Atlas „Mieterhöhung und Zielbild“: 6 Stationen, Knopf `handbuch.html#a-zielbild` sichtbar und oben (`elementFromPoint`). `handbuch.html#a-zielbild` landet auf A12 (top 80 px), 12 Abläufe, 10 Schritte, `handbuch-daten.js?v=v2965b`. Hilfe Zielbild: 12 Abschnitte, Knopf „Anleitung öffnen“ klickbar. `prozess-atlas-pruefen` 11 Abläufe, 73/73 Belege, 16 Handbuch-Verweise, sauber; `handbuch-erzeugen --pruefen` GRÜN (12 Abläufe, 87 Schritte, 218 Belege); `buster-ebenen` SAUBER; `gold-audit` auf Staging RC 0 (429, Basislinie).
+  **Rest:** (a) **Mehrfamilienhaus: Haus-Maßnahmen ohne Kosten** – Dach, Fassade, Heizung, Leitungen gibt es beim MFH nur als Zustand im Schritt „Gebäude“; die Chips je Wohnung sind auf Wohnungsmaßnahmen beschränkt, die Karte im Reiter Objekt blendet ihre Chips beim MFH aus. Eine Dachsanierung am MFH lässt sich damit weder mit Kosten noch mit Punkten ins Zielbild nehmen (Backlog N80, Entscheidung Marcel). (b) Handy (390 px) für den neuen Atlas-Ablauf und die Hilfe-Abschnitte nicht nachgemessen. (c) Prod.
+- **v2966–v2966g** (26.10.2026, Staging, Marcel zu N80: „ja bitte“, danach „alles in der Messkabine auf Handy UND Tablet“). **Was:** **v2966** `eb9cef00` N80 – Maßnahmen am ganzen Haus im MFH-Zielbild: Schritt „Gebäude“ hat „Maßnahmen am ganzen Haus · Zielbild“ (Dach, Fassade/Dämmung, Fenster, Heizung, Leitungen, Kosten, bewohnt § 559), gespeichert als `_dpMfh.haus_massnahmen`. `potenzial.js modell()` gibt jeder Wohnung ihren Flächenanteil der Kosten (Summe = Hauskosten) und das Gewerk für die Punkte; `punkteGewinn` nimmt je Gewerk das Höchste (Elektrik 1 + Leitungen 2 = 2). Der Dienst bekommt wie bisher Kosten und `mod_punkte_plus` je Stufe – PotenzialService unverändert, kein Backend-Bau. Hilfe, Handbuch A12 (Schritt 8, 88 Schritte), Atlas z3 nachgezogen; Prüfer `tools/zielbild-haus-pruefen.mjs` (14 Fälle, echte potenzial.js). **v2966a** `82073524`: **Doppelzählung mit dem Bestand** – gemessen Parkstr. 9: Reiter Objekt Heizung/Leitungen/Bäder/Innenausbau „< 5 Jahre“ (mod_punkte 8, damit rechnet der Dienst die RND im Bestand), der Gebäude-Zustand im MFH-Fenster stand auf „nicht modernisiert“; Chips boten +2 für Heizung und Bad an. `punkteJetzt` nimmt jetzt das Höhere aus Wohnung/Gebäude und Objektfeld. **v2966b** `1b3b57ba`: Summenzeile und „als Sanierung übernehmen“ zählen die Hausmaßnahmen mit. **v2966c** `437be4f2`: Messkabine `pruefeAnsicht` wartet auf ein asynchrones `vorher`. **v2966d–g** `7a4c6e69`, `63b2e004`, `1158b38c`, `da20f550` – Messkabine-Funde: Objektkarte Seitenleiste 1024 px (Ring + Pille über Adresse/Preis → 901–1024 ohne Bild, Ring 40 px, Adresse zweizeilig; ab 1025 Adresse zweizeilig mit 74 px Abstand), Portfolio-Pass „5,52 Mio“ lief auf jeder Breite in „CF/MON“ (v750d flex 1 1 0 → nach Inhalt; meine erste Regel stand VOR v750d und verlor – zurückgenommen in v2966g), Preisfenster Investor ohne „50 Co-Pilot-Fragen“ (slice(0,8) schnitt die 9. Zeile), Landing-Kopf 390 px „Koste/starte“ abgeschnitten (Kurzfassung bis 420 px, Knopf schrumpft nie), Prozess-Atlas 9 px quer (Rollbalken), Pass-Tabelle „Beenden“ 26 px über der Spalte, „gerechnet am 25.10.2026“ abgeschnitten.
+  **Nachweis:** Parkstr. 9 (Staging, MFH, Dienst direkt mit `_auftrag`, nichts gespeichert): ohne Hausmaßnahme Zielbild Kosten 136.000 €, +1,1 P., RND 34,4 J., Ertragswert 436.000 €; mit Dach 60.000 € am Haus 196.000 €, +5,1 P. (Dienst meldet dieselbe 5,1), RND 43,8 J., 473.000 €; Bestand 425.000 € / RND 32 unverändert. Im Fenster: Chips Fenster +2, Dach +4, Fassade +4, Heizung und Leitungen ohne Punkte (schon modernisiert); Wohnung 1 „davon Anteil Haus 12.927 €“ (60.000 × 92/427), +4 P.; Summenzeile 196.000 €. Abgebrochen, `haus_massnahmen` danach `null`. Messkabine 390/768×1024/1024×768, 11 Ansichten: Seite nirgends quer, Modals ohne toten Knopf (MFH 26, Hilfe 21, Atlas 20, Plan 31/42, Preise 25/23), nach den Korrekturen Pass 1 Zeile frei (390/768/1024/1280), Karte „Adresse frei“, Atlas rollt nicht quer, Landing-Knopf passt (390 „Starten“), Investor mit Co-Pilot-Zeile. gold-audit RC 0, buster-ebenen SAUBER, wertermittlung-pruefen und rnd-kerne RC 0.
+  **Rest:** (a) Parkstr. 9 wurde beim Öffnen kostenlos neu gerechnet und gespeichert: Zielbild jetzt +1,1 P. / 436.000 € statt +3,7 P. / 465.000 € – das ist die Korrektur aus v2966a (Bäder/Innenausbau zählten doppelt), keine Datenänderung durch den Test. (b) Gebäude-Zustand im MFH-Fenster und Objektfelder `mod_*` laufen bei Parkstr. auseinander (Fenster zeigt „nicht modernisiert“, Objekt „< 5 Jahre“) – Anzeige, nicht Rechnung; eigener Punkt. (c) Messkabine meldet als „nicht erreichbar“ alles hinter offenen Fenstern und als Querroller die gewollten Streifen (Reiterleisten, Video-Streifen, Vergleichstabelle) – geprüft, kein Befund. (d) Prod.
+- **v2960–v2961** (26.10.2026, Staging, Marcel: „Kann der Telegram Bot auch Fragen beantworten in Bezug auf die Hilfe? Kann er auch eine Marktpreisindikation abrufen bzw. alle 3 Stufen der Bewertung? Kann der Bot auch die PDFs ausgeben?“ – Nachtrag: PDFs auf dem Server per Headless-Chrome, kein Nachbau). **Was:** (1) **v2960 Hilfe:** `tools/frontend-konstanten.mjs` spiegelt `help.js` (`DealPilotHilfe.themen()`, 18 Themen / 161 Abschnitte) nach `generated/frontend-konstanten.json`; `--pruefen` vergleicht den geernteten INHALT (Hilfe, Bewertungspflicht), nicht die Datei — wer `help.js`, `objekt-reiter.js` (pflichtFuer) oder `dealpilot-mb.js` (ZUSATZ) inhaltlich ändert, muss `node tools/frontend-konstanten.mjs` laufen lassen, sonst bricht `deploy-staging.ps1` ab. Werkzeug `hilfe_suchen` (`services/hilfeWissen.js`), Regel 7n. Vorher traf „wie funktioniert …“ das Schnellmuster und bekam die feste Befehlsliste. (2) **v2960a Bewertung:** der Bot schickte dem Bericht **12 Felder, der Browser 88** — Stufe 2 aus dem Bot kannte weder Zustand noch Qualität; jetzt `objektNutzlast()` mit der gespiegelten ZUSATZ-Liste und Typfilter. Pflicht je Stufe = `pflichtFuer()` aus `objekt-reiter.js`, Zelle für Zelle gespiegelt; fehlt etwas, kein Angebot, kein Abruf (auch am Abruf erneut geprüft). Das Angebot trägt jetzt die **Stufe**, der Abruf nimmt sie nur von dort (vorher wählte das Modell sie beim Abruf). Die Bestätigung schreibt der Webhook wörtlich („Bestätigung: *Wertermittlung …* für *Adresse*. Das verbraucht 1 … (noch N frei). Ja/Nein“), „Nein“ räumt das Angebot ab, ein Angebot trägt genau einen Abruf. `_berichtZahlen` las auf der falschen Ebene (bei jedem echten Bericht `null`) und `data` (54 KB) ging roh ans Modell — behoben. (3) **v2961 PDF-Dienst** `pdf-dienst/` (eigener Container `dealpilot-pdf`, NUR Staging, eigene Compose-Datei `pdf-dienst/docker-compose.pdf.yml`): Headless-Chromium öffnet die echte App mit 5-Minuten-Token (`jwt.signKurz`), lädt das Objekt, ruft dieselbe Funktion wie der Knopf (Weg von `pdf-wahl.js fuehreAus`: Hell-Schalter + `ohneRueckfrage`), fängt den Blob an `URL.createObjectURL` ab. Schreibt nichts (nicht-lesende `/api/v1`-Aufrufe abgewiesen außer track-usage und vier Rechnungen). Warteschlange 1 + 4, Frist 120 s auf den ganzen Lauf, Browser je Lauf, SIGKILL-Rückfall. Bot: `pdf_erstellen` (investment, investment_dunkel, bank, bank_kurz, bankexport, marktbericht) → „PDF wird erstellt …“ → `sendDocument`; nach einem Bewertungsabruf kommt der Bericht als Datei.
+  **Commits:** `4b87c710` (v2960/v2960a), `7bc8b184` (v2961).
+  **Nachweis:** `tools/agent-pruefung/pruef-telegram-bewertung.js` 52 Proben grün im Staging-Container (Gegentest: altes Abbild bricht ab), `pruef-geldweg.js` 8/8; mit echtem Bericht 350 (Stufe 3): Marktwert 171.000, Ertragswert 81.000, Zins 3,9 % Stufe B, Sachwert-Grund, Quellen. Echter Agentenlauf (Modell ja, Kontingent nein): „Wie funktioniert der Quick-Check?“ → `hilfe_suchen`, Antwort aus der Hilfe; „Wertermittlung für Am Markt 9“ → `marktbericht_preis(stufe 3)` → nennt die fehlende BGF, kein Angebot; Parkstr. 9 → Angebot Stufe 3 + Bestätigungssatz; „Bankexport als PDF“ → `pdf_erstellen`. PDF-Dienst gemessen auf Staging (Am Markt 9 / Minden): **Abbild 1,38 GB**; Investment hell 2,9 MB in 12,0 s, Obsidian 2,9 MB 11,9 s, Bankfassung 1,2 MB 10,9 s, Kurzfassung 0,11 MB 10,5 s, Bankexport 0,07 MB 6,3 s, Marktbericht 7,7 MB 9,5 s; **Container-Spitze 470–710 MB** (cgroup), Leerlauf 56–61 MB, keine Chromium-Prozesse nach dem Lauf; 6 gleichzeitige Aufträge: 5 nacheinander, der 6. „voll“. `objects.updated_at` vor/nach jedem Lauf unverändert. PDF-Inhalt angesehen (Kurzfassung: Logo, Objekt, Finanzierung, Kennzahlen). Staging `.env` um `PDF_DIENST_SECRET` ergänzt (Sicherung `.env.pre-v2961`).
+  **Rest / Abnahme Marcel:** (a) Echter Dialog im eigenen Telegram-Chat (nicht getestet, kein Versand): Bestätigung → „Ja“ → Abruf → Bericht als PDF-Datei; „schick mir das Bank-PDF“. (b) **Prod:** PDF-Dienst ist NICHT auf Prod; ohne `PDF_DIENST_SECRET` sagt der Bot ehrlich „noch nicht“ und nennt Aktionen › Export. Für Prod: `.env` um `PDF_DIENST_SECRET` ergänzen und `docker compose -p dealpilot-pdf -f pdf-dienst/docker-compose.pdf.yml --env-file .env up -d --build` (oder den Block `pdf-dienst` aus der Compose-Datei in `docker-compose.prod.yml` übernehmen: `build: ./pdf-dienst`, `container_name: dealpilot-pdf`, `environment` APP_URL=${FRONTEND_BASE_URL}, PDF_DIENST_SECRET, PDF_GLEICHZEITIG=1, `mem_limit: 1200m`, `shm_size: 256m`, Netz `dealpilot-net`, KEIN Port, KEIN Caddy-Eintrag); Backend danach neu erzeugen, damit es das Geheimnis sieht. (c) Der Marktbericht-Link (Rückfall ohne Dienst) öffnet `marktbericht-app/?report=&autopdf=1` und braucht eine Anmeldung im Browser — im Telegram-In-App-Browser meist nicht. (d) Was die App beim Laden schreiben will, wird abgewiesen; dabei erscheint im Dienst-Log „Fehler beim Speichern“ — gewollt. (e) Offen aus der Nutzlast: `mod_punkte` beim MFH kommt im Browser aus `DpMfhEinheiten.hausPunkte()`, im Bot aus dem gespeicherten Feld; der eigene Angebotsabschlag (Investmentprofil) liegt nur im Browser (`profil-nur-im-browser`). (f) Sammelabruf „für alle Objekte“ geht im Chat nur einzeln (ehrlich so gesagt). (g) Abbild 1,38 GB ließe sich mit Alpine-Chromium etwa halbieren, wenn Platz knapp wird.
 
 ### v2880–v2885 (Ernte-Strang) · NI-Sachwertfaktoren über die Kalkulator-Sitzung, Bestand berichtigt, Index-Bezug Kassel/Offenbach (22./23.10.2026)
 - **Was:** (1) **Kassel** (IMB 2026 S. 64, IMB 2024 S. 58) und **Offenbach** (IMB 2024 S. 62): Baupreisindex „zum Vertragsabschluss“ bzw. „zum Verkaufszeitpunkt“ → `baupreisindex_bezug: kaufzeitpunkt` (8 Sätze, v2720-Regel). (2) **Der NI-Lage-Parameter ist gelöst, ohne Browser:** VizQL-Sitzung per HTTP, Parameter per `set-parameter-value(-from-index)`, Gemeinde-Filter per `categorical-filter-by-index`, Wert aus dem SVG-Export des Blatts „Berechnung“ (gegen die PDF-Route nachgerechnet). Die Memory-Aussage „URL-Weg endgültig tot“ war falsch: `Lagefaktor=0.7` geht, aber nur mit EINEM rechnenden Parameter daneben. (3) **GAG Northeim** (Goslar, Northeim, Holzminden, LK + Stadt Göttingen): 32 Werte, Lage über die Gemarkungstabelle des Kalkulators. **GAG Oldenburg-Cloppenburg**: 48 Werte je Gemeinde (Gemeindekoeffizient), 7 Kreise. (4) **Bestand berichtigt:** Salzgitter, Helmstedt, Peine (EZFH+RH) und Hameln-Pyrmont (EZFH) standen an der Vorgabe-Lage für den ganzen Kreis; Stadt Nienburg galt für den Landkreis; Diepholz-RH galt auch in Stuhr/Syke/Weyhe (eigener Kalkulator). Jetzt je Lage ein Satz bzw. Sperre. (5) 21 Sperren mit Weg: GAG Aurich (6 Kreise), GAG Lüneburg (4 Kreise), SG Harpstedt.

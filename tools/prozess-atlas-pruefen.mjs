@@ -97,6 +97,20 @@ if (etKern.join('|') !== etAtlas.join('|')) rot('Marktbericht-Etappen: Atlas ' +
 const nutz = JSON.stringify(A.PROZESSE.map((P) => [P.name, P.sub, P.spalten, P.knoten.map((k) => [k.t, k.k, k.d, k.unter, k.ein, k.aus])]));
 for (const w of ['Sprengnetter', 'PriceHubble', 'Kerosin', 'Liter']) if (nutz.includes(w)) rot('Nutztext nennt „' + w + '“');
 
+/* 5 · v2965a · Verweise ins Flughandbuch: jede Ablauf-Id gibt es in tools/handbuch-ablaeufe.mjs,
+   jeder Schluessel trifft einen Ablauf (und eine Station), sonst zeigt der Knopf ins Leere */
+const { ABLAEUFE } = await import(new URL('./handbuch-ablaeufe.mjs', import.meta.url));
+const hbIds = new Set(ABLAEUFE.map((a) => a.id));
+let nHb = 0;
+for (const [sch, ziel] of Object.entries(A.HANDBUCH || {})) {
+  nHb++;
+  if (!hbIds.has(ziel)) rot('Handbuch-Verweis ' + sch + ' → „' + ziel + '“ gibt es in handbuch-ablaeufe.mjs nicht');
+  const [pid, kid] = sch.split(':'); const P = A.PROZESSE.find((p) => p.id === pid);
+  if (!P) rot('Handbuch-Verweis ' + sch + ': Ablauf fehlt');
+  else if (kid !== '*' && !P.knoten.some((k) => k.id === kid)) rot('Handbuch-Verweis ' + sch + ': Station fehlt');
+}
+
+console.log('Handbuch-Verweise: ' + nHb + ' (Ablaeufe im Handbuch: ' + hbIds.size + ')');
 console.log('Prozess-Atlas: ' + A.PROZESSE.length + ' Ablaeufe, ' + nSt + ' Stationen, ' + nKa + ' Kanten, ' + nBe + '/' + nSt + ' Belege im Code gefunden');
 console.log('Kerne: DealScore ' + dsKern.join('/') + ' · Investor ' + ds2Kern.join('/') + ' · Schwellen ' + schwAtlas.join('/') + ' · Etappen ' + etKern.length);
 console.log(fehler ? fehler + ' Fehler' : 'sauber');

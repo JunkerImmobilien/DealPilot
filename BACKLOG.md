@@ -36,12 +36,19 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N81 · Telegram-Bot: Hilfe, Bewertung Stufe 1–3, PDFs — Rest: Abnahme und Prod (26.10.2026)
+
+Gebaut und auf Staging gemessen in v2960–v2961 (`4b87c710`, `7bc8b184`, s. Fertig). Offen:
+
+1. **Abnahme im eigenen Telegram-Chat** (nicht automatisch getestet, kein Versand): „wie funktioniert der Quick-Check?“ · „hol mir die Wertermittlung für …“ → Bestätigungssatz → „Ja“ → Bericht als PDF-Datei · „schick mir das Bank-PDF / die Kurzfassung / den Bankexport“.
+2. **PDF-Dienst auf Prod** nur mit Freigabe: `.env` um `PDF_DIENST_SECRET`, Dienst über `pdf-dienst/docker-compose.pdf.yml` starten (oder Block in `docker-compose.prod.yml` übernehmen, Beschreibung im Journal v2960–v2961), Backend neu erzeugen. Abbild 1,38 GB, Spitze bis 710 MB je PDF. Ohne Dienst sagt der Bot ehrlich „noch nicht“.
+3. Klein: `mod_punkte` beim MFH und der eigene Angebotsabschlag kommen im Bot nicht wie im Browser an (Browser-Zustand); Sammelabruf „für alle Objekte“ nur einzeln.
+
 ### N79 · Portfolio-Cockpit Runde 2 (25.10.2026) — Rest nach v2955a
 
 Erledigt in v2952–v2955a (25.10.2026, s. Journal): Parkstr. 9 (Ankauf-Sanierung im Bestand kein Stau, Modernisierung eingetragen), zweiter und dritter Pilot-Lauf abgenommen (Prüfregel e), Bewertung je Objekt im Cockpit, alle 10 Bestandsobjekte mit Bericht Stufe 3, Kaufpreise der Demo angeglichen, Messe-Storybook neu, Zeitraum 10/20/30 zieht überall mit, Co-Pilot-Limits 10/20/50/100, Migration (3 h) raus. Optik (gekürzte Achse, Einfach als Standard) bleibt so. Rest:
 - **Endgültig löschen (Marcel selbst):** Westerfeldstr. 140 Kopie `c5a78c89` (Kürzel E2E) und Am Markt 9 privat `cea958eb` stehen auf „Verloren“ — aus dem Bestand raus, aber noch da. Behalten: `ae155d38` (Spot/Videos) und `ec2d0f32` (VV-GmbH).
-- **Spracheingabe aufs Co-Pilot-Limit:** Vorschlag 1 Spracheingabe = 1 Frage (ab 2 Minuten Aufnahme 2) — Entscheidung Marcel.
-- **Prod-Rollout v2944–v2955a:** Backend und mb-backend neu bauen, vorher beide DBs sichern.
+- **Spracheingabe:** seit v2956 je angefangene 2 Minuten eine Frage (Prod 25.10.) — Abnahme mit echter Aufnahme durch Marcel; Live-Vorschau (`transcribe-chunk`) und `voice-stream` zählen nicht.
 
 ### N78 · Pilot-Analyse durchgesehen (25.10.2026) — Rest nach v2946
 
@@ -3998,6 +4005,30 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+### N80 · Maßnahmen am ganzen Haus im MFH-Zielbild, Messkabine Handy/Tablet — 26.10.2026 (`v2966`–`v2966g`, `eb9cef00` … `da20f550`)
+
+Haus-Maßnahmen (Dach, Fassade, Fenster, Heizung, Leitungen) mit Kosten und Punkten im Schritt Gebäude; Kosten
+nach Fläche auf die Wohnungen, Punkte je Gewerk nur einmal, Ausgangspunkt das Höhere aus Gebäude-Zustand und
+Objektfeld (v2966a: Parkstr. 9 zählte Bäder/Heizung doppelt). Parkstr. 9 mit Dach 60.000 €: Kosten 136.000 →
+196.000 €, Punkte +1,1 → +5,1, RND 34,4 → 43,8 J., Ertragswert Zielbild 436.000 → 473.000 €. Messkabine 390 /
+768×1024 / 1024×768, 11 Ansichten: sieben Funde behoben (Objektkarte 1024, Portfolio-Pass, Investor-Co-Pilot-Zeile,
+Landing-Knopf, Atlas quer, Pass-Tabelle, Datumszeile). Rest: Gebäude-Zustand vs. Objektfelder bei Parkstr. (Anzeige).
+
+
+### Telegram-Bot: Hilfe-Fragen, Bewertung Stufe 1–3 mit fester Bestätigung, PDFs als Datei — 26.10.2026 (`v2960`/`v2960a` `4b87c710`, `v2961` `7bc8b184`)
+
+Hilfe aus `help.js` gespiegelt (`hilfe_suchen`), „wie funktioniert …“ nicht mehr an die Befehlsliste. Bewertung: volle Nutzlast wie im Browser (88 statt 12 Felder), Pflicht je Stufe aus `pflichtFuer()`, Stufe im Angebot, Bestätigung „noch N frei — Ja/Nein“ vom Webhook, „Nein“ räumt ab, Ergebniszahlen unter `data` gefunden. PDF-Dienst (Headless-Chromium, echte App, schreibt nichts, Warteschlange 1+4, Frist 120 s) auf Staging: sechs Arten, 6–12 s, bis 710 MB. Prüfer `pruef-telegram-bewertung.js` 52/52. Rest unter N81.
+
+### Prozess-Atlas: Flugzeug vorwärts, Handbuch-Anleitung erreichbar, Zielbild erklärt — 26.10.2026 (`v2965`, `83d70efd`; `v2965a/b`, `1d06b7a7`)
+
+Ursache Rückwärtsflug: `animateMotion rotate="auto"` richtet die +x-Achse in Flugrichtung aus, der Umriss
+hatte die Nase bei x −11 — gespiegelt (Atlas und Hilfe-Kasten), nachgemessen cos 1,000 zwischen Nase und
+Pfadtangente, Pfade laufen Quelle → Ziel. „Genaue Beschreibung“ = Flughandbuch Teil A: war vom Atlas nicht
+erreichbar — jetzt Knopf je Station (16 Verweise, vom Prüfer gedeckt), Banner im Thema Abläufe, Hilfe nannte
+„Sieben Abläufe“ statt elf. Zielbild: sechs Hilfe-Abschnitte, Handbuch A12 (10 Schritte, belegt), Atlas-Ablauf
+mit 6 Stationen; Ortsangabe „Bewertung“ → Reiter Objekt berichtigt. Rest: N80 (MFH-Haus-Maßnahmen).
+
 
 ### N78 · Pilot-Analyse durchgesehen — Punkte 1–6 — 25.10.2026 (`v2947`, `cb9043be`; `v2947a`, `fde07f9b`)
 

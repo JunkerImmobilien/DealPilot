@@ -266,7 +266,8 @@
         return '<tr><td>' + _esc(p.title || '\u2014') + '</td>' +
           '<td style="font-family:\'JetBrains Mono\',monospace;font-size:12px">' + c + '</td>' +
           '<td>' + datum + '</td><td>' + rest + '</td>' +
-          '<td style="white-space:nowrap">' +
+          /* v2966d · Messkabine 26.10.2026: bei 768/1024 px ragte „Beenden“ 26 px aus der Spalte (Tabelle scrollte seitlich) - die Knoepfe duerfen umbrechen */
+          '<td style="white-space:normal;line-height:2.1">' +
             '<button type="button" style="font:600 11px/1 \'DM Sans\',sans-serif;padding:5px 9px;border-radius:7px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);background:#fff;color:var(--wl-7a5d18, #7a5d18);cursor:pointer" onclick="_aoPassExtend(\'' + c + '\')">Verl\u00e4ngern</button> ' +
             '<button type="button" style="font:600 11px/1 \'DM Sans\',sans-serif;padding:5px 9px;border-radius:7px;border:1px solid rgba(184,98,92,.5);background:#fff;color:#B8625C;cursor:pointer" onclick="_aoPassRevoke(\'' + c + '\')">Beenden</button>' +
           '</td></tr>';

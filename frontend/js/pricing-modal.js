@@ -169,7 +169,10 @@
       /* v1176: die Kontingentzeile steht schon als eigene Zeile ueber der
          Liste (tk-ker) — in der Liste waere sie doppelt. Frueher filterte
          derselbe Ausdruck das Wort „Kerosin". */
-      var feats=(p.features||[]).filter(function(f){return !/Kerosin|\/ Monat/.test(f);}).slice(0,8);
+      /* v2966e · Messkabine 26.10.2026: Investor hat 9 Zeilen - slice(0,8) schnitt die letzte ab, und das war „50 Co-Pilot-Fragen am Tag“ (seit v2955). Die Co-Pilot-Zeile bleibt immer stehen. */
+      var feats=(p.features||[]).filter(function(f){return !/Kerosin|\/ Monat/.test(f);});
+      var _cp=feats.filter(function(f){return /Co-Pilot/.test(f);});
+      feats=feats.filter(function(f){return !/Co-Pilot/.test(f);}).slice(0,8).concat(_cp);
       var note=(p.price_yearly>0)?('oder '+p.price_yearly+' \u20ac/Jahr'):(p.footnote||'');
       return '<div class="tk'+(p.best?' best':'')+'" data-plan="'+p.key+'">'+
         '<div class="tk-stub"><div class="tk-stars">'+stars+'</div>'+

@@ -56,6 +56,91 @@ const STUFEN = {
        was: 'Boden-, Ertrags- und Sachwert mit Rechenweg' }
 };
 
+/* ══ v2960a · WAS DER BERICHT VOM OBJEKT BEKOMMT, UND WAS ER BRAUCHT ═══
+ *
+ * GEMESSEN am 26.10.2026: `abrufen()` schickte ZWOELF Felder (plz, ort,
+ * str, hnr, objektart, objart, wfl, baujahr, kp, zimmer, nkm, gsfl, mea).
+ * Der Browser schickt aus demselben Objekt 88 weitere (`dealpilot-mb.js`
+ * ZUSATZ): Zustand, Ausstattung, Energieklasse, Einheiten, Bodenrichtwert,
+ * Standardstufe, BGF, Modernisierung … Eine erweiterte Marktpreisindikation
+ * aus dem Bot kannte also weder Zustand noch Qualitaet — genau das, wofuer
+ * Stufe 2 bezahlt wird —, und eine Wertermittlung aus dem Bot haette ohne
+ * Bodenrichtwert und Standardstufe gerechnet.
+ *
+ *   > Derselbe Bericht aus zwei Tueren muss dieselben Angaben bekommen.
+ *   > Sonst kostet er gleich viel und sagt verschieden viel.
+ *
+ * Die Feldliste, die Pflicht je Stufe und die typabhaengigen Felder kommen
+ * aus `generated/frontend-konstanten.json` — geerntet aus dealpilot-mb.js,
+ * objekt-reiter.js und objektart-felder.js, nicht abgeschrieben. */
+let _bew = null, _labels = null, _arten = null;
+function _konst() {
+  if (_bew) return;
+  const k = require('../generated/frontend-konstanten.json').daten;
+  _bew = k.bewertung;
+  _arten = k.objektarten || {};
+  _labels = {};
+  (k.felder || []).forEach((f) => { if (f.label) _labels[f.id] = f.label.replace(/\s+DS2\b/g, '').trim(); });
+}
+
+function _leer(v) { return v == null || (typeof v === 'string' && v.trim() === ''); }
+function _art(d) { return String((d && (d.objart || d.objektart)) || '').toUpperCase(); }
+function _wert(d, id) {
+  if (id === 'objart') return _leer(d.objart) ? d.objektart : d.objart;
+  return d[id];
+}
+
+/** Bezeichnung eines Feldes, wie sie im Formular steht. */
+function feldName(id) { _konst(); return _labels[id] || id; }
+
+/** Was fehlt fuer diese Stufe? Dieselbe Liste wie im Reiter Objekt
+ *  (pflichtFuer), Zelle fuer Zelle. [] heisst: abrufbar. */
+function fehlendeAngaben(daten, stufe) {
+  _konst();
+  const d = daten || {};
+  const art = _art(d);
+  const tab = _bew.pflicht[art] || _bew.pflicht[''];
+  const gar = parseFloat(String(d.garagen == null ? '' : d.garagen).replace(',', '.'));
+  const s = (stufe === 3 && gar > 0) ? '3_mit_garage' : String(stufe);
+  return (tab[s] || tab['1']).filter((id) => _leer(_wert(d, id)))
+    .map((id) => ({ id: id, name: feldName(id) }));
+}
+
+/** Das Objekt, wie `dealpilot-mb.js inputs()` es dem Bericht schickt. */
+function objektNutzlast(objekt) {
+  _konst();
+  const d = (objekt && objekt.daten) || {};
+  const art = _art(d);
+  const a = _arten[art];
+  const o = { id: objekt && objekt.objekt_id };
+  _bew.grundfelder.forEach((id) => { if (!_leer(d[id])) o[id] = d[id]; });
+  if (_leer(o.objart) && !_leer(d.objektart)) o.objart = d.objektart;
+  if (_leer(o.objektart) && !_leer(o.objart)) o.objektart = o.objart;
+  _bew.zusatz.forEach((id) => {
+    const v = d[id];
+    /* wie im Browser (v1851): ein Haekchen reist nur mit, wenn es gesetzt ist */
+    if (typeof v === 'boolean') { if (v) o[id] = true; return; }
+    if (_leer(v)) return;
+    /* wie im Browser (v1437): nur, was zur Objektart passt */
+    if (a && _bew.objektart_typfelder.indexOf(id) >= 0 && a.passt.indexOf(id) < 0) return;
+    o[id] = v;
+  });
+  /* v2210 im Browser: die Einheiten des MFH reisen schlank mit — dieselben
+     Felder, kein Bild, kein Mietername. */
+  const ein = d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null;
+  if (ein && ein.length) {
+    o._mfh_einheiten = ein.map((e) => {
+      const x = {};
+      _bew.mfh_einheit_felder.forEach((f) => { x[f] = (e && e[f] != null && e[f] !== '') ? e[f] : null; });
+      x.art = x.art || 'wohnen';
+      x.status = x.status || 'vermietet';
+      x.leer_abzug = Boolean(e && e.leer_abzug === true);
+      return x;
+    });
+  }
+  return o;
+}
+
 function basis() {
   return 'http://127.0.0.1:' + config.port + '/api/v1';
 }
@@ -188,14 +273,8 @@ async function abrufen(userId, objekt, stufe, opts) {
       fast: schnell,
       external_ref: objekt.objekt_id,
       wert_stufe: s,            /* NIE weglassen — der Default waere 2 */
-      object: {
-        id: objekt.objekt_id,
-        plz: d.plz, ort: d.ort, str: d.str, hnr: d.hnr,
-        objektart: d.objektart || d.objart,
-        objart: d.objart || d.objektart,
-        wfl: d.wfl, baujahr: d.baujahr, kp: d.kp, zimmer: d.zimmer,
-        nkm: d.nkm, gsfl: d.gsfl, mea: d.mea
-      }
+      /* v2960a · dieselben Felder wie der Browser, nicht zwoelf */
+      object: objektNutzlast(objekt)
     }
   });
 
@@ -213,4 +292,25 @@ async function abrufen(userId, objekt, stufe, opts) {
   return r.body;
 }
 
-module.exports = { voranschlag, abrufen, STUFEN };
+/* ── v2960b · Die Berichte eines Objekts (kostet nichts) ─────────────────
+ * Derselbe Weg wie die Historie im Browser: /marktbericht/objects/history
+ * mit ref = Objekt-Id. Der Proxy bindet den Nutzer selbst (v942). */
+async function berichte(userId, objektId) {
+  const r = await ruf(userId, '/marktbericht/objects/history?ref=' + encodeURIComponent(objektId || ''),
+    { timeoutMs: 20000 });
+  if (r.status !== 200) return { ok: false, grund: (r.body && (r.body.message || r.body.error)) || ('HTTP ' + r.status) };
+  const h = (r.body && r.body.history) || [];
+  return { ok: true, berichte: h.filter((x) => x && x.report_id).map((x) => ({
+    report_id: x.report_id, erstellt: x.created_at, adresse: x.address || null })) };
+}
+
+/* Der Marktbericht-PDF entsteht im Browser (marktbericht-app/app.js
+   exportPdf, jsPDF). `?report=ID&autopdf=1` oeffnet den Bericht und
+   speichert das PDF — derselbe Weg wie die Deal-Aktion (v949). */
+function berichtPdfLink(reportId) {
+  const b = String((config.frontend && config.frontend.baseUrl) || '').replace(/\/+$/, '');
+  return b + '/marktbericht-app/index.html?report=' + encodeURIComponent(reportId) + '&autopdf=1';
+}
+
+module.exports = { voranschlag, abrufen, STUFEN, fehlendeAngaben, objektNutzlast, feldName,
+  berichte, berichtPdfLink };

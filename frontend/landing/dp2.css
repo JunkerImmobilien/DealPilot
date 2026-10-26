@@ -336,9 +336,12 @@ img{max-width:100%;display:block}
    21.10.2026): Logo + Anmelden + Burger + "Kostenlos starten" passen
    nicht. Marcels Entscheidung: unter 380 px heisst der Knopf "Starten". */
 .b-cta-kurz{display:none}
-@media(max-width:380px){
-  .b-cta{padding:10px 14px}
+/* v2966e · Messkabine 26.10.2026: bei 390 px bekam der Knopf 55 px, "Kostenlos" braucht 67 + 40 Polster -
+   overflow:hidden schnitt "Koste / starte" ab. Die kurze Fassung gilt deshalb bis 420 px (alle Handys hochkant). */
+@media(max-width:420px){
+  .b-cta{padding:10px 14px;flex:0 0 auto}   /* v2966f: auch "Starten" (78 px) bekam nur 55 px - der Knopf schrumpft nie */
+  .nav .wrap{gap:14px;padding:0 16px}
   .b-cta-voll{display:none}
   .b-cta-kurz{display:inline}
 }
-@media(max-width:340px){ .b-cta{padding:9px 10px} }
+@media(max-width:340px){ .b-cta{padding:9px 10px} .nav .wrap{gap:10px;padding:0 12px} }   /* v2966f: 320 px mit Rollbalken 300 <= 303 */

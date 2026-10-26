@@ -172,6 +172,10 @@
       if (zahl(e.soll) > 0) s.hatSoll = true;
       s.kosten += zahl(e.kosten);
     });
+    /* v2966 · Massnahmen am ganzen Haus gehoeren in die Summe (und in „als Sanierung uebernehmen“) -
+       im offenen Fenster der Arbeitsstand, sonst das Gespeicherte */
+    s.kostenHaus = (el('mfh-modal') ? _hausM : (daten().haus_massnahmen || [])).reduce(function (a, m) { return a + zahl(m && m.k); }, 0);
+    s.kosten += s.kostenHaus;
     /* ══ v2486 · DIE SOLL-MIETE AUS DERSELBEN QUELLE WIE DAS WOHNUNGSFENSTER ══
        Hier zaehlte nur die VON HAND eingetragene Soll-Miete (e.soll), sonst die
        Ist-Miete. Seit v2430 rechnet DealPilot die Soll-Miete selbst
@@ -332,7 +336,7 @@
   }
 
   /* ── Modal mit vier Schritten ───────────────────────────────────── */
-  var _arbeit = [], _geb = {}, _schritt = 0, _weg = false, _auftK = null;   /* v2430: _auftK Kosten der Aufteilung */
+  var _arbeit = [], _geb = {}, _schritt = 0, _weg = false, _auftK = null, _hausM = [];   /* v2966: _hausM Massnahmen am ganzen Haus (N80) */   /* v2430: _auftK Kosten der Aufteilung */
 
   function selHtml(attrs, wert, opts) {
     return '<select class="mfh-in mfh-sel" ' + attrs + '>'
@@ -369,7 +373,14 @@
       + '<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Zielbild fertig (Jahr) '
         + '<input class="mfh-in mfh-md" id="mfh-zbjahr" inputmode="numeric" maxlength="4" style="width:80px" value="' + esc((el('zb_fertig_jahr') && el('zb_fertig_jahr').value) || '') + '" placeholder="z. B. 2028">'
         + '<span style="font-size:11.5px;color:#8A8272">für Pilot-Analyse und PDF · leer = offen</span></div>'
-      + '<div class="cf-hint" style="margin-top:8px">Gebäudepunkte: <b id="mfh-geb-p">—</b> von 20 (Anlage 2). Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben.</div>';
+      + '<div class="cf-hint" style="margin-top:8px">Gebäudepunkte: <b id="mfh-geb-p">—</b> von 20 (Anlage 2). Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben.</div>'
+      /* v2966 · N80 (Marcel 26.10.2026): Massnahmen am GANZEN Haus fuer das Zielbild. Der Zustand oben
+         ist heute, die Massnahme hier das Ziel. Kosten nach Wohnflaeche auf die Wohnungen, Punkte fuer jede
+         Wohnung (je Gewerk hoechstens einmal, auch neben der Elektrik einer Wohnung). */
+      + '<div class="mfh-haus-mass" style="margin-top:14px;padding:10px 11px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7">'
+        + '<div style="font:600 11px/1.3 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Maßnahmen am ganzen Haus · Zielbild <span style="text-transform:none;letter-spacing:0;font-weight:400">kann, nicht muss</span></div>'
+        + '<div style="font-size:11.5px;color:#8A8272;margin:4px 0 8px">Dach, Fassade, Fenster, Heizung oder Leitungen für das ganze Haus — mit Kosten. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung. Was eine einzelne Wohnung bekommt (z. B. ihr Bad), steht unter Einheiten › Details.</div>'
+        + '<div id="mfh-haus-mass"></div><div class="cf-hint" id="mfh-haus-sum" style="margin-top:6px"></div></div>';
   }
 
   /* Schritt 2 — Einheitenliste */
@@ -585,7 +596,7 @@
 
     /* ── Rechnungen der Blöcke (nichts davon ist ein Ertragswert) ── */
     var _ewArt = _weg ? 'etw' : 'haus';
-    function opts() { return { einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK }; }
+    function opts() { return { einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM }; }
     function aktualisieren() {
       var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist);
       var u = el('mfh-we-unter');
@@ -613,9 +624,9 @@
         var pkt = w.plus_ziel || 0;
         hZ.innerHTML = '<div class="mfh-we-kv">'
           + '<div><span>Zielmiete</span><b class="c-ziel">' + (w.ziel != null ? eur(w.ziel) + '/Monat' : '—') + '</b></div>'
-          + '<div><span>Kosten gesamt</span><b>' + eur(w.kosten) + '</b></div>'
+          + '<div><span>Kosten gesamt</span><b>' + eur(w.kosten) + (w.kosten_haus ? '<small style="display:block;font-weight:400;color:#8A8272">davon Anteil Haus ' + eur(w.kosten_haus) + '</small>' : '') + '</b></div>'
           + '<div><span>Modernisierungspunkte</span><b>' + (pkt ? '+' + pkt : '0') + ' (Anlage 2)</b></div></div>'
-          + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus (Schritt 1). Die Zielmiete fließt nicht in die Mietentwicklung — nur in Pilot-Analyse und PDF.</p>';
+          + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus: Maßnahmen dafür trägst du im Schritt Gebäude unter „Maßnahmen am ganzen Haus“ ein — ihr Kostenanteil und ihre Punkte sind hier schon enthalten. Die Zielmiete fließt nicht in die Mietentwicklung — nur in Pilot-Analyse und PDF.</p>';
       }
       ewZeichnen(m);
     }
@@ -937,8 +948,20 @@
     }).join('<span style="color:#D8D2C6">›</span>');
     el('mfh-zurueck').style.visibility = _schritt === 0 ? 'hidden' : 'visible';
     el('mfh-weiter').textContent = _schritt === SCHRITTE.length - 1 ? 'Übernehmen' : 'Weiter ›';
-    zeichnenSumme(); punkteZeigen();
+    zeichnenSumme(); punkteZeigen(); hausBinden();
     var neu = el('mfh-neu'); if (neu) neu.onclick = function () { _arbeit.push({ nr: String(_arbeit.length + 1), art: standardArt(), status: 'vermietet' }); zeichnen(); };
+  }
+  /* v2966 · N80 · Chips und Kosten der Hausmassnahmen (dieselbe Bedienung wie je Wohnung) */
+  function hausSumme() {
+    var h = el('mfh-haus-sum'); if (!h) return;
+    var k = _hausM.reduce(function (a, m) { return a + zahl(m.k); }, 0);
+    h.textContent = _hausM.length ? 'Am Haus: ' + _hausM.length + ' Maßnahme' + (_hausM.length === 1 ? '' : 'n') + ' · ' + Math.round(k).toLocaleString('de-DE') + ' € — in den Kosten der Wohnungen nach Fläche enthalten.' : 'Keine Maßnahme am ganzen Haus.';
+  }
+  function hausBinden() {
+    var host = el('mfh-haus-mass'), P = window.DpPotenzial;
+    if (!host || !P || typeof P.massnahmenBinden !== 'function') return;
+    P.massnahmenBinden(host, _hausM, { geb: _geb, fuerHaus: true, geaendert: function () { hausSumme(); zeichnenSumme(); } });
+    hausSumme();
   }
   function punkteZeigen() {
     var g = el('mfh-geb-p');
@@ -1100,6 +1123,7 @@
     _geb = JSON.parse(JSON.stringify(d.gebaeude || {}));
     _weg = !!d.aufgeteilt;
     _auftK = (d.aufteilungskosten != null && String(d.aufteilungskosten).trim() !== '') ? d.aufteilungskosten : null;   /* v2430 */
+    _hausM = JSON.parse(JSON.stringify(Array.isArray(d.haus_massnahmen) ? d.haus_massnahmen : []));   /* v2966 */
     _schritt = schritt || 0;
     if (!_arbeit.length) _arbeit.push({ nr: '1', art: standardArt(), status: 'vermietet' });
     var m = document.createElement('div'); m.id = 'mfh-modal';
@@ -1193,7 +1217,7 @@
     var jahrFeld = el('mfh-soll-jahr');
     var sollAb = jahrFeld ? Math.round(zahl(jahrFeld.value)) : Math.round(zahl(daten().sollAbJahr));
     var wegFeld = el('mfh-weg');
-    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), aufgeteilt: wegFeld ? wegFeld.checked : _weg, sollAbJahr: sollAb > 0 ? sollAb : null, aufteilungskosten: _auftK, stand: new Date().toISOString().slice(0, 10) };   /* v2430: aufteilungskosten */
+    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), aufgeteilt: wegFeld ? wegFeld.checked : _weg, sollAbJahr: sollAb > 0 ? sollAb : null, aufteilungskosten: _auftK, haus_massnahmen: _hausM.filter(function (m) { return m && m.id; }), stand: new Date().toISOString().slice(0, 10) };   /* v2430: aufteilungskosten · v2966: haus_massnahmen */
     var s = summe(list), meldung = list.length + ' Einheiten übernommen';
     if (list.length) {
       if (s.flaeche > 0) setzen('wfl', s.flaeche);

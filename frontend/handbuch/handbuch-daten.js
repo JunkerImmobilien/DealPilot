@@ -2,25 +2,25 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "1c94fd03702f9354",
+  "index.html": "bee0d983ce22dc84",
   "tooltip-content.js": "ede920d2f6583fdc",
-  "help.js": "f7e7ccb0d347a0e2",
-  "tour-content.js": "337253bde80bf1e1",
+  "help.js": "b74be784baf941a9",
+  "tour-content.js": "e85775a89313350d",
   "objekt-reiter.js": "146e176f961a3b25",
   "deal-action-readycheck.js": "4d9c815073f8d2ab",
   "feld-hilfe.js": "db5913c4ec4dc08e",
-  "mfh-einheiten.js": "9fdc26a09d7d7669",
-  "calc.js": "c43592c29e191de1",
-  "ui.js": "c2c22102bef4ef5e",
-  "pdf.js": "315c92dfeefac6e7",
-  "pdf-investment-bank.js": "cd661801c609d54c",
-  "financing-pdf.js": "499286d3cab32382",
-  "werbungskosten-pdf.js": "4048d673682f3acb",
+  "mfh-einheiten.js": "5e60dcc317b72017",
+  "calc.js": "3228bc67dcae9693",
+  "ui.js": "6b89df3942f02a34",
+  "pdf.js": "49d7957ea03775f6",
+  "pdf-investment-bank.js": "10cbfde495bf4f0d",
+  "financing-pdf.js": "f6581f49c29dab13",
+  "werbungskosten-pdf.js": "663a552eebc9b241",
   "pdf-anlage-bmf.js": "41997cf31f29fb07",
   "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
-  "frontend-konstanten.json": "0a7cb96f8371632c",
+  "frontend-konstanten.json": "79c6746b87625bae",
   "aufnahme.json": "433c9aa7f5c9ec56",
-  "handbuch-ablaeufe.mjs": "4a50fccab170f185"
+  "handbuch-ablaeufe.mjs": "4882e1047f133976"
  },
  "reiter": [
   {
@@ -287,7 +287,10 @@ window.DP_HANDBUCH = {
       "mv_art",
       "mv_beginn",
       "mv_letzte_erhoehung",
-      "mv_letzte_erhoehung_betrag"
+      "mv_letzte_erhoehung_betrag",
+      "mv_befristet_bis",
+      "mv_kuendigungsverzicht_bis",
+      "mv_abw_jahre"
      ]
     },
     {
@@ -444,6 +447,8 @@ window.DP_HANDBUCH = {
      "felder": [
       "zve",
       "grenz",
+      "st_splitting",
+      "st_kist",
       "grenz_auto"
      ]
     },
@@ -3458,7 +3463,8 @@ window.DP_HANDBUCH = {
    "wirkung": [
     "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
     "geht in die Pilot-Analyse ein",
-    "steht im Investment-PDF"
+    "steht im Investment-PDF",
+    "steht im Bank-PDF (Investment Case)"
    ]
   },
   "wert_soll": {
@@ -4802,6 +4808,57 @@ window.DP_HANDBUCH = {
    "woher": "",
    "wirkung": []
   },
+  "mv_befristet_bis": {
+   "id": "mv_befristet_bis",
+   "reiter": "s2",
+   "karte": "Mietvertrag",
+   "label": "Befristet bis",
+   "typ": "datum",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Ist der Mietvertrag befristet, endet eine Abweichung der Miete vom Markt spätestens dann. Liegt die Ist-Miete mehr als 20 % über der marktüblichen Miete, rechnet der Ertragswert den Mehrertrag nur bis zu diesem Datum als besonderes Merkmal — ohne Datum nur als Szenario.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "mv_kuendigungsverzicht_bis": {
+   "id": "mv_kuendigungsverzicht_bis",
+   "reiter": "s2",
+   "karte": "Mietvertrag",
+   "label": "Kündigungsverzicht bis",
+   "typ": "datum",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Bis wann der Mieter auf seine Kündigung verzichtet hat. Wie bei der Befristung: so lange ist eine Miete über dem Markt gesichert und wird als besonderes Merkmal über diese Restlaufzeit angesetzt.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "mv_abw_jahre": {
+   "id": "mv_abw_jahre",
+   "reiter": "s2",
+   "karte": "Mietvertrag",
+   "label": "Abweichung erwartet noch (Jahre)",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "nur bei Miete unter Markt",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Nur bei einer Miete mehr als 20 % UNTER dem Markt: wie viele Jahre die Abweichung voraussichtlich noch besteht, bis die Miete rechtlich angepasst werden kann (Kappungsgrenze, Mieterhöhungsverlangen). Ohne Angabe zeigt der Bericht Szenarien über 3, 5 und 10 Jahre und setzt nichts an.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
   "me_soll": {
    "id": "me_soll",
    "reiter": "s2",
@@ -4837,7 +4894,8 @@ window.DP_HANDBUCH = {
    "pflichtMarke": false,
    "woher": "",
    "wirkung": [
-    "geht in die Pilot-Analyse ein"
+    "geht in die Pilot-Analyse ein",
+    "steht im Investment-PDF"
    ]
   },
   "me_int": {
@@ -4856,7 +4914,8 @@ window.DP_HANDBUCH = {
    "pflichtMarke": false,
    "woher": "",
    "wirkung": [
-    "geht in die Pilot-Analyse ein"
+    "geht in die Pilot-Analyse ein",
+    "steht im Investment-PDF"
    ]
   },
   "me_pct": {
@@ -4875,7 +4934,8 @@ window.DP_HANDBUCH = {
    "pflichtMarke": false,
    "woher": "",
    "wirkung": [
-    "geht in die Pilot-Analyse ein"
+    "geht in die Pilot-Analyse ein",
+    "steht im Investment-PDF"
    ]
   },
   "bank_inst": {
@@ -6129,6 +6189,62 @@ window.DP_HANDBUCH = {
     "steht im Investment-PDF",
     "steht im Bank-PDF (Investment Case)"
    ]
+  },
+  "st_splitting": {
+   "id": "st_splitting",
+   "reiter": "s3-tax",
+   "karte": "Persönliche Steuer",
+   "label": "Veranlagung",
+   "typ": "auswahl",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": [
+    {
+     "wert": "0",
+     "text": "Einzelveranlagung (Grundtabelle)"
+    },
+    {
+     "wert": "1",
+     "text": "Zusammenveranlagung (Splitting)"
+    }
+   ],
+   "hinweis": "",
+   "titel": "",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "st_kist": {
+   "id": "st_kist",
+   "reiter": "s3-tax",
+   "karte": "Persönliche Steuer",
+   "label": "Kirchensteuer",
+   "typ": "auswahl",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": [
+    {
+     "wert": "0",
+     "text": "keine"
+    },
+    {
+     "wert": "8",
+     "text": "8 % (Bayern, Baden-Württemberg)"
+    },
+    {
+     "wert": "9",
+     "text": "9 % (übrige Länder)"
+    }
+   ],
+   "hinweis": "",
+   "titel": "",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
   },
   "grenz_auto": {
    "id": "grenz_auto",
@@ -8593,7 +8709,23 @@ window.DP_HANDBUCH = {
        "nachAuswahl": false
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "mv_befristet_bis",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "mv_kuendigungsverzicht_bis",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "mv_abw_jahre",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-etw-s2-1.webp",
@@ -9691,7 +9823,18 @@ window.DP_HANDBUCH = {
        "nachAuswahl": true
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "st_splitting",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "st_kist",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-etw-s3-tax-1.webp",
@@ -12026,7 +12169,23 @@ window.DP_HANDBUCH = {
        "nachAuswahl": false
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "mv_befristet_bis",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "mv_kuendigungsverzicht_bis",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "mv_abw_jahre",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-efh-s2-1.webp",
@@ -13124,7 +13283,18 @@ window.DP_HANDBUCH = {
        "nachAuswahl": true
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "st_splitting",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "st_kist",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-efh-s3-tax-1.webp",
@@ -15365,7 +15535,23 @@ window.DP_HANDBUCH = {
        "nachAuswahl": false
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "mv_befristet_bis",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "mv_kuendigungsverzicht_bis",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "mv_abw_jahre",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-mfh-s2-1.webp",
@@ -16463,7 +16649,18 @@ window.DP_HANDBUCH = {
        "nachAuswahl": true
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "st_splitting",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "st_kist",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-mfh-s3-tax-1.webp",
@@ -16766,6 +16963,13 @@ window.DP_HANDBUCH = {
     "platzhalter": ""
    },
    {
+    "key": "mv_abw_jahre",
+    "label": "Abweichung erwartet noch (Jahre)",
+    "block": "Mietvertrag · Ist",
+    "typ": "eingabe",
+    "platzhalter": "nur bei Miete unter Markt"
+   },
+   {
     "key": "mv_mieter",
     "label": "Mieter (Name, optional)",
     "block": "Mietvertrag · Ist",
@@ -16778,6 +16982,20 @@ window.DP_HANDBUCH = {
     "block": "Mietvertrag · Ist",
     "typ": "eingabe",
     "platzhalter": ""
+   },
+   {
+    "key": "leer_monate",
+    "label": "Monate bis zur Vermietung",
+    "block": "Leerstand",
+    "typ": "eingabe",
+    "platzhalter": "z. B. 4"
+   },
+   {
+    "key": "herrichtung_eur",
+    "label": "Herrichtung (€)",
+    "block": "Leerstand",
+    "typ": "eingabe",
+    "platzhalter": "z. B. 6.000"
    },
    {
     "key": "mv_erhoehung_art",
@@ -16845,6 +17063,8 @@ window.DP_HANDBUCH = {
   ],
   "hinweise": [
    "Die Fläche gilt hier als Nutzfläche. Für den Ertragswert zählt die marktübliche Miete (§ 31 Abs. 2 ImmoWertV). Fehlt sie, setzt der Marktbericht die Ist-Miete an und kennzeichnet das Ergebnis als indikativ.",
+   "Liegt die Ist-Miete außerhalb von ± 20 % um die marktübliche Miete, rechnet der Ertragswert mit der marktüblichen Miete; die Abweichung wird über die Restlaufzeit beziffert: bei Miete über dem Markt nur mit Befristet bis oder Kündigungsverzicht bis, bei Miete darunter auch mit „Abweichung erwartet noch\". Ohne Angabe zeigt der Bericht Szenarien (3/5/10 Jahre).",
+   "Standard: voll vermietet zur marktüblichen Miete. Wahlweise ziehen Mietausfall bis zur Vermietung und Herrichtung vom Ertragswert ab.",
    "Staffel- und Indexmiete tragen ihre nächste Erhöhung schon im Vertrag — sie sind ein Termin, kein Potenzial. Kündigungsverzicht heißt: beide Seiten verzichten bis zu diesem Datum auf die ordentliche Kündigung (bei Staffelmiete höchstens vier Jahre, § 557a Abs. 3 BGB).",
    "Höchstens … Bilder je Wohnung, automatisch verkleinert."
   ],
@@ -16852,6 +17072,30 @@ window.DP_HANDBUCH = {
    {
     "titel": "Drei Mieten je Wohnung",
     "text": "<strong>Ist</strong> ist, was heute gezahlt wird. Die <strong>Soll-Miete (Mieter bleibt)</strong> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Das <strong>Zielbild</strong> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig — ohne Angaben ändert sich nichts."
+   },
+   {
+    "titel": "Schritt für Schritt: ein Zielbild anlegen",
+    "text": "So legst du bei Eigentumswohnung, Einfamilien- oder Zweifamilienhaus ein Zielbild an:\n\n1. Objekt öffnen, Reiter <strong>Objekt</strong>, Karte <strong>Mieterhöhung und Zielbild (optional)</strong> aufklappen.\n2. <strong>Vergleichsmiete (€/m²)</strong> eintragen, wenn du den Mietspiegel kennst — leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.\n3. <strong>Soll-Miete (Mieter bleibt, €/m²)</strong> leer lassen: Darunter steht „DealPilot rechnet vor: …“ mit Begründung. Eine eigene Zahl überschreibt den Vorschlag. <strong>Soll erreichbar ab</strong> ist ohne Angabe 15 Monate nach der letzten Erhöhung.\n4. <strong>Zielmiete (€/m²)</strong> eintragen — was nach Umbau oder bei einem neuen Mieter erzielbar ist — und unter <strong>Zielbild ab wann</strong> den Anlass, z. B. „bei Mieterwechsel“.\n5. Unter <strong>Maßnahmen</strong> die Chips anklicken, die du planst, und je Maßnahme die <strong>Kosten €</strong> eintragen.\n6. Wird mit Mieter in der Wohnung modernisiert: Haken <strong>bewohnt (§ 559)</strong>.\n7. <strong>Zielbild fertig (Jahr)</strong> eintragen, damit Pilot-Analyse und PDF ein Jahr nennen (leer = offen).\n\nUnter der Karte steht sofort die Summe: Ist, Mieterhöhung und Zielbild je Monat, die Maßnahmenkosten und die gewonnenen Modernisierungspunkte. DealPilot speichert die Angaben mit dem Objekt."
+   },
+   {
+    "titel": "Maßnahmen: Kosten und Modernisierungspunkte",
+    "text": "Zur Wahl stehen Bad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Renovierung, Küche, Dach, Fassade/Dämmung, Heizung, Leitungen und Sonstiges (mit eigener Bezeichnung).\n\nBad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Dach, Fassade, Heizung und Leitungen tragen <strong>Modernisierungspunkte nach Anlage 2 ImmoWertV</strong>. Der Chip zeigt, wie viele Punkte das Gewerk noch bringt (z. B. „+2 P.“) — ist es schon voll modernisiert, bringt es keine weiteren. Elektrik zählt als ein Punkt der Leitungssysteme. Renovierung, Küche und Sonstiges kosten Geld, tragen aber keine Punkte.\n\nMehr Punkte heißen eine <strong>längere Restnutzungsdauer</strong>. Mieterhöhung und Zielbild rechnen mit dieser längeren Restnutzungsdauer, der Bestand mit der heutigen — so wird sichtbar, was die Maßnahme am Wert bewirkt."
+   },
+   {
+    "titel": "Beim Mehrfamilienhaus: je Wohnung",
+    "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche <strong>Einheiten erfassen</strong> öffnen.\n2. Im Schritt <strong>Gebäude</strong> den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken <strong>In Wohnungseigentum aufgeteilt</strong> setzen und die <strong>Kosten der Aufteilung</strong> prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch <strong>Zielbild fertig (Jahr)</strong>.\n3. Ebenfalls im Schritt Gebäude, unter <strong>Maßnahmen am ganzen Haus · Zielbild</strong>: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die <strong>Kosten €</strong> eintragen (bei Modernisierung mit Mietern: <strong>bewohnt (§ 559)</strong>). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung <strong>Details</strong>: Mietvertrag, Soll-Miete, <strong>Zielbild · nach Umbau</strong> mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit <strong>Übernehmen</strong> schließen."
+   },
+   {
+    "titel": "Ertragswerte rechnen — kostenlos",
+    "text": "Den Ertragswert je Stufe (Bestand, Mieterhöhung, Zielbild) rechnet DealPilot mit demselben Rechenkern wie den Marktbericht Stufe 3. Das kostet <strong>kein Kontingent</strong>.\n\n• <strong>Von selbst:</strong> Öffnest du den Reiter <strong>Bewertung</strong>, rechnet DealPilot fehlende oder veraltete Ertragswerte nach. Bis dahin steht dort „werden gerechnet (kostenlos)“.\n• <strong>Von Hand:</strong> <strong>Jetzt rechnen</strong> in der Karte Wert & Zielbild oder <strong>Ertragswerte rechnen</strong> in der Pilot-Analyse.\n• <strong>Im Cockpit:</strong> <strong>neu rechnen ↻</strong> öffnet das Objekt, rechnet und speichert.\n\n<strong>Voraussetzung:</strong> Der Ertragswert gehört zur Wertermittlung nach ImmoWertV (Stufe 3). Er erscheint, sobald für das Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält. Ohne das siehst du „Ertragswert je Stufe mit DealPilot Stufe 3“ — Mieten, Maßnahmen und Rendite stehen trotzdem da.\n\nKostenpflichtig ist nur, was ausdrücklich danach fragt: ein neuer Marktbericht und der Abruf „Marktpreise abrufen“ in der Pilot-Analyse (1 × erweiterte Marktpreisindikation, DealPilot fragt vorher)."
+   },
+   {
+    "titel": "Was die Zahlen bedeuten",
+    "text": "Im Reiter <strong>Bewertung</strong>, Karte <strong>Wert & Zielbild</strong>:\n\n• <strong>Kaltmiete</strong> je Stufe und der Mehrertrag gegen heute.\n• <strong>Maßnahmen</strong> — die Summe der eingetragenen Kosten, ohne Finanzierung.\n• <strong>Ertragswert</strong> je Stufe — mit Liegenschaftszins, Bewirtschaftung und Bodenwert wie im Marktbericht; je Stufe wechseln nur Miete und Restnutzungsdauer.\n• <strong>Wertzuwachs nach Kosten</strong> = Ertragswert der Stufe − Ertragswert heute − Maßnahmen. Ist er positiv, bringen die Maßnahmen mehr Wert, als sie kosten.\n\nLiegt eine Mehrmiete über der marktüblichen Miete, setzt der Ertragswert sie nicht an — die Miete steigt dann, der Wert nicht.\n\n<strong>Wichtig:</strong> Mieterhöhung und Zielbild sind ein <strong>Ausblick</strong>. Die Werte unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag; maßgeblich für heute bleibt der Ertragswert im Bestand. Score, Verkehrswert und Marktbericht rechnen weiter mit dem Bestand."
+   },
+   {
+    "titel": "Zielbild im Portfolio-Cockpit",
+    "text": "Im <strong>Portfolio-Cockpit</strong>, Abschnitt <strong>03 Bestand & Zielbild</strong>, addiert DealPilot Mieterhöhung und Zielbild aller Objekte, für die sie erfasst und gerechnet sind: Kaltmiete, Bruttomietrendite, Maßnahmen und Wertzuwachs nach Kosten, dazu je Objekt die Steigerung der Kaltmiete.\n\nFehlt ein Objekt oder zählt es nur teilweise, steht es unter „Nicht oder nur teilweise enthalten · mit Grund“, zum Beispiel:\n• Noch nicht erfasst — weder Soll-Miete noch Zielbild eingetragen.\n• Ertragswert je Stufe nur mit DealPilot Stufe 3 — Miete und Maßnahmen zählen, der Wert nicht.\n• Ertragswert noch nicht gerechnet — im Objekt unter Bewertung kostenlos rechnen.\n• Die Berechnung ist älter und hat noch keine Stufen — einmal neu rechnen.\n• Nur Mieterhöhung erfasst — zählt mit der Mieterhöhung als höchster Stufe.\n\nDaneben führen <strong>Im Objekt öffnen</strong> und <strong>neu rechnen ↻</strong> (kostenlos) direkt dorthin. Das Cockpit liest die Berechnung, die am Objekt gespeichert ist — nach dem Neurechnen das Cockpit wieder öffnen."
    },
    {
     "titel": "Wo du es einträgst",
@@ -16867,7 +17111,7 @@ window.DP_HANDBUCH = {
    },
    {
     "titel": "Ertragswert je Stufe und Aufteilung",
-    "text": "DealPilot rechnet den Ertragswert für Bestand, Mieterhöhung und Zielbild mit demselben Rechenkern und denselben Ansätzen wie der Marktbericht Stufe 3 (Liegenschaftszins, Bewirtschaftung, Bodenwert); je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent. Beim MFH zusätzlich je Wohnung — als Anteil am Haus oder, mit dem Haken „aufgeteilt“, als Eigentumswohnung mit dem Zins für Wohnungseigentum. Die Summe nach Aufteilung steht dem Haus als Ganzes gegenüber, abzüglich der Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe möglich). Alles ist ein <strong>Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung</strong>."
+    "text": "DealPilot rechnet den Ertragswert für Bestand, Mieterhöhung und Zielbild mit demselben Rechenkern und denselben Ansätzen wie der Marktbericht Stufe 3 (Liegenschaftszins, Bewirtschaftung, Bodenwert); je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent. Beim MFH zusätzlich je Wohnung — als Anteil am Haus oder, mit dem Haken „aufgeteilt“, als Eigentumswohnung mit dem Zins für Wohnungseigentum. Die Summe nach Aufteilung steht dem Haus als Ganzes gegenüber, abzüglich der Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe möglich). Alles ist <strong>ein Ausblick</strong>: Die Werte unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind, und sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand."
    },
    {
     "titel": "Wo es erscheint — und wo nicht",
@@ -17683,11 +17927,11 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "Ändert sich dein Einkommen über die Jahre: **📅 Steuerzeiträume verwalten →**. Unter **Neuen Zeitraum hinzufügen** **Gültig von**, **Gültig bis (leer = laufend)**, **zvE / Jahr (€)** und einen **Grund** eintragen, dann **Hinzufügen**. Überschneidet sich ein Zeitraum, zeigt DealPilot den Konflikt — du kannst abbrechen oder **Trotzdem als neuen Zeitraum anlegen**.",
+     "t": "Ändert sich dein Einkommen über die Jahre: **Steuerzeiträume verwalten →**. Unter **Neuen Zeitraum hinzufügen** **Gültig von**, **Gültig bis (leer = laufend)**, **zvE / Jahr (€)** und einen **Grund** eintragen, dann **Hinzufügen**. Überschneidet sich ein Zeitraum, zeigt DealPilot den Konflikt — du kannst abbrechen oder **Trotzdem als neuen Zeitraum anlegen**.",
      "kosten": "",
      "plan": "",
      "belege": [
-      "index.html: 📅 Steuerzeiträume verwalten →",
+      "index.html: Steuerzeiträume verwalten →</a>",
       "js/tax-periods.js: Neuen Zeitraum hinzufügen",
       "js/tax-periods.js: Gültig bis (leer = laufend)",
       "js/tax-periods.js: zvE / Jahr (€)",
@@ -17798,6 +18042,124 @@ window.DP_HANDBUCH = {
       "js/dashboard.js: Veranlagungsjahr",
       "js/dashboard.js: Anlage-V-Zuordnung anhängen",
       "js/dashboard.js: Steuer-Mappe erstellen"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "zielbild",
+   "titel": "Mieterhöhung und Zielbild anlegen",
+   "kurz": "Zeigen, was im Haus steckt: welche Miete der heutige Mieter nach normalen Erhöhungen zahlt (Soll-Miete), was nach Umbau oder Neuvermietung drin ist (Zielbild) — und was das am Ertragswert ausmacht.",
+   "wann": "Freiwillig, für Objekte im Bestand oder im Ankauf. Ohne Angaben ändert sich nichts.",
+   "hinweis": "Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert zum heutigen Stichtag. Score, Verkehrswert und Marktbericht rechnen weiter mit dem Bestand.",
+   "bilder": [],
+   "siehe": [],
+   "schritte": [
+    {
+     "t": "Das Objekt öffnen, Reiter **Objekt**, Karte **Mieterhöhung und Zielbild (optional)** aufklappen. Beim Mehrfamilienhaus weiter mit Schritt 7.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Mieterhöhung und Zielbild (optional)"
+     ]
+    },
+    {
+     "t": "**Vergleichsmiete (€/m²)** eintragen, wenn du den Mietspiegel kennst. Leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Vergleichsmiete (€/m²)",
+      "index.html: Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete."
+     ]
+    },
+    {
+     "t": "**Soll-Miete (Mieter bleibt, €/m²)** leer lassen: Darunter steht „DealPilot rechnet vor: …“ — bis zur Vergleichsmiete, frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze. Eine eigene Zahl überschreibt den Vorschlag. **Soll erreichbar ab** ist ohne Angabe 15 Monate nach der letzten Erhöhung.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Soll-Miete (Mieter bleibt, €/m²)",
+      "js/potenzial.js: DealPilot rechnet vor: ",
+      "index.html: Soll erreichbar ab"
+     ]
+    },
+    {
+     "t": "Fürs Zielbild die **Zielmiete (€/m²)** eintragen — was nach Umbau oder Neuvermietung erzielbar ist — und unter **Zielbild ab wann** den Anlass (z. B. bei Mieterwechsel).",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Zielmiete (€/m²)",
+      "index.html: Zielbild ab wann"
+     ]
+    },
+    {
+     "t": "Unter **Maßnahmen** die Chips anklicken (Bad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Dach, Fassade/Dämmung, Heizung, Leitungen, Renovierung, Küche, Sonstiges) und je Maßnahme die **Kosten €** eintragen. Der Chip zeigt, wie viele Modernisierungspunkte nach Anlage 2 ImmoWertV das Gewerk noch bringt; die Punkte verlängern die Restnutzungsdauer von Mieterhöhung und Zielbild.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/potenzial.js: t: 'Fassade/Dämmung'",
+      "js/potenzial.js: <span>Kosten €</span>",
+      "js/potenzial.js:  Modernisierungspunkte (Anlage 2)"
+     ]
+    },
+    {
+     "t": "Wird mit Mieter in der Wohnung modernisiert, den Haken **bewohnt (§ 559)** setzen: 8 % der Kosten im Jahr kommen auf die Soll-Miete, gedeckelt. **Zielbild fertig (Jahr)** setzt das Jahr für Pilot-Analyse und PDF.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/potenzial.js: bewohnt (§ 559)",
+      "index.html: Zielbild fertig (Jahr)"
+     ]
+    },
+    {
+     "t": "Mehrfamilienhaus: unter der Wohnfläche **Einheiten erfassen** öffnen, in der Liste bei jeder Wohnung **Details** — dort stehen Mietvertrag, Soll-Miete, **Zielbild · nach Umbau** mit den Maßnahmen der Wohnung und der Ertragswert. Ist das Haus aufgeteilt, im Schritt Gebäude **In Wohnungseigentum aufgeteilt** anhaken und die **Kosten der Aufteilung** prüfen (Vorbelegung 1.800 € je Wohnung).",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/mfh-einheiten.js: Einheiten erfassen",
+      "js/mfh-einheiten.js: Zielbild · nach Umbau",
+      "js/mfh-einheiten.js: In Wohnungseigentum aufgeteilt",
+      "js/mfh-einheiten.js: Kosten der Aufteilung"
+     ]
+    },
+    {
+     "t": "Mehrfamilienhaus, Maßnahmen am ganzen Haus: im Schritt **Gebäude** unter **Maßnahmen am ganzen Haus · Zielbild** Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen anklicken und die **Kosten €** eintragen. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal. Der Zustand darüber bleibt der heutige.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/mfh-einheiten.js: Maßnahmen am ganzen Haus · Zielbild",
+      "js/mfh-einheiten.js: davon Anteil Haus ",
+      "js/potenzial.js: haus: true"
+     ]
+    },
+    {
+     "t": "Reiter **Bewertung**, Karte **Wert & Zielbild**: Fehlen die Ertragswerte oder sind sie veraltet, rechnet DealPilot sie beim Öffnen von selbst nach; sonst **Jetzt rechnen** (oder **Ertragswerte rechnen** in der Pilot-Analyse). Das Ergebnis wird mit dem Objekt gespeichert.",
+     "kosten": "Kostenlos — kein Kontingent. Der Ertragswert je Stufe erscheint aber nur, wenn für das Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält.",
+     "plan": "",
+     "belege": [
+      "js/wert-zielbild.js: Wert &amp; Zielbild",
+      "js/wert-zielbild.js: Jetzt rechnen",
+      "js/potenzial.js: Ertragswerte rechnen",
+      "js/potenzial.js: Ertragswert je Stufe mit DealPilot Stufe 3"
+     ]
+    },
+    {
+     "t": "Lesen: Kacheln mit Kaltmiete, Rendite, Ertragswert und **Wertzuwachs nach Kosten** (Ertragswert der Stufe minus Bestand minus Maßnahmen); **Im Detail** zeigt Wohnungen, Wertüberleitung und Kennzahlen je Stufe. Dasselbe steht in der Pilot-Analyse unter „Ankauf · Bestand · Zielbild“ und in beiden PDFs.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/wert-zielbild.js: Wertzuwachs nach Kosten",
+      "js/wert-zielbild.js: Im Detail: Wohnungen, Wertüberleitung, Kennzahlen je Stufe",
+      "index.html: Ankauf &middot; Bestand &middot; Zielbild"
+     ]
+    },
+    {
+     "t": "Über alle Objekte: **Portfolio-Cockpit**, Abschnitt **03 Bestand & Zielbild**. Fehlt ein Objekt, steht es unter „Nicht oder nur teilweise enthalten · mit Grund“ — mit **Im Objekt öffnen** und **neu rechnen ↻** (öffnet das Objekt, rechnet kostenlos und speichert).",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/dashboard.js: Bestand &amp; Zielbild",
+      "js/dashboard.js: Nicht oder nur teilweise enthalten · mit Grund",
+      "js/dashboard.js: neu rechnen ↻"
      ]
     }
    ]

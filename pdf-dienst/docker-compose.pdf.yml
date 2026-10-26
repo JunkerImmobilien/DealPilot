@@ -1,0 +1,35 @@
+# pdf-dienst — v2961 · NUR STAGING
+#
+# Eigene Compose-Datei, damit docker-compose.prod.yml (nie committet) nicht
+# angefasst wird. Start auf Staging, aus /opt/dealpilot:
+#
+#   docker compose -p dealpilot-pdf -f pdf-dienst/docker-compose.pdf.yml --env-file .env up -d --build
+#
+# Er haengt im selben Netz wie das Backend (dealpilot-net, extern) und ist
+# von aussen NICHT erreichbar: kein Port nach draussen, Caddy kennt ihn nicht.
+# Das Backend ruft ihn unter http://dealpilot-pdf:4100 mit PDF_DIENST_SECRET.
+services:
+  pdf-dienst:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dealpilot-pdf
+    restart: unless-stopped
+    environment:
+      PORT: 4100
+      APP_URL: ${FRONTEND_BASE_URL:?FRONTEND_BASE_URL fehlt in .env}
+      PDF_DIENST_SECRET: ${PDF_DIENST_SECRET:?PDF_DIENST_SECRET fehlt in .env}
+      PDF_GLEICHZEITIG: ${PDF_GLEICHZEITIG:-1}
+      PDF_WARTESCHLANGE: ${PDF_WARTESCHLANGE:-4}
+      PDF_FRIST_MS: ${PDF_FRIST_MS:-120000}
+    # Chromium braucht Platz; ohne Grenze kann ein haengender Lauf das
+    # Backend mitreissen (Staging hat 3,8 GB).
+    mem_limit: 1200m
+    shm_size: 256m
+    networks:
+      - dealpilot-net
+
+networks:
+  dealpilot-net:
+    name: dealpilot-net
+    external: true

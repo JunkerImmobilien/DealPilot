@@ -45,6 +45,7 @@
     scores: 'Eine Stufenleiter für alles — dasselbe Objekt trägt überall dieselbe Note.',
     deal: 'Der Plan beim Kauf bleibt stehen. Später siehst du schwarz auf weiß, was daraus geworden ist.',
     steuer: 'Anlage V und Werbungskosten aus denselben Zahlen, die schon im Objekt stehen.',
+    zielbild: 'Was im Haus steckt: Soll-Miete und Umbau mit Ertragswert je Stufe — kostenlos gerechnet, im Cockpit über alle Objekte.',   /* v2965b */
     telegram: 'DealPilot in der Hosentasche: Kennzahlen, Soll/Ist und Anlegen per Sprachnachricht — mit denselben Rechenkernen wie die App.'
   };
   /* Unterkarten: welche Station spielt welche Seite ab (frontend/atlas/) */
@@ -58,10 +59,10 @@
     'deal:d6': ['atlas/6-flugschreiber.html', 'Beispielflug Parkstraße', 'Soll gegen Ist an der Parkstraße'],
     'reise:be2': ['atlas/6-flugschreiber.html', 'Beispielflug Parkstraße', 'Ist pflegen an der Parkstraße']
   };
-  var BUSTER = 'v2218f';
+  var BUSTER = 'v2966f';   /* v2965b: Atlas-Seiten laden prozess-atlas.js neu (Flieger, Ablauf Zielbild) */
   function unterFuer(pid, kid) { return UNTER[pid + ':' + kid] || UNTER[pid + ':*']; }
   var PHASEN = [['PRÜFEN', ['reise', 'quickcheck', 'sprache', 'dokumente']], ['ANALYSIEREN', ['boarding', 'marktbericht', 'scores', 'deal']],
-                ['HALTEN', ['steuer']], ['UNTERWEGS', ['telegram']]];
+                ['HALTEN', ['steuer', 'zielbild']], ['UNTERWEGS', ['telegram']]];
 
   /* Daten-Spur */
   function norm(s) { return String(s).toLowerCase().replace(/[^a-zäöüß0-9]/g, ''); }

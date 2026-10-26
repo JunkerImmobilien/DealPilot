@@ -41263,3 +41263,26 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
     max-height: calc(100dvh - 16px) !important;
   }
 }
+
+/* ═══ v2966d · Objektkarte in der Seitenleiste: Score-Ring ueberdeckte die Adresse ══════
+   Messkabine 26.10.2026 (Marcel: alles auf Handy UND Tablet). Gemessen am Standard-Layout:
+   - 1024 px (Seitenleiste 260 px, Textspalte 90 px): Ring + Stufe (67 px breit) lagen ueber
+     Adresse und Kaufpreis - „Bi…“, „SOLIDE“ ueber „850.000 €“, „1.680.000 €“ brach unter die Pille.
+   - 1100-1280 px: Adresse endete 10 px unter dem Ring (padding 60 < Ring 67 + Abstand 12).
+   901-1024: Bild aus, Ring 40 px ohne Stufen-Pille, Adresse zweizeilig neben dem Ring.
+   Varianten mit eigener Kartenform (html[data-ui-cards], data-dp-objkarte, Schiene) bleiben
+   unberuehrt - sie stehen hoeher in der Spezifitaet. */
+@media (min-width: 1025px) {
+  /* v2966e: zweizeilig statt „Bismarckstr. 27, De…“ - der Ort (auch „Bad Oeynhausen“) bleibt lesbar */
+  body aside.sidebar .sb-card .sbc-address { padding-right: 74px !important; white-space: normal !important; display: -webkit-box !important;
+    -webkit-box-orient: vertical !important; -webkit-line-clamp: 2 !important; overflow: hidden !important; line-height: 1.25 !important; }
+}
+@media (min-width: 901px) and (max-width: 1024px) {
+  body aside.sidebar .sb-card .sbc-thumb { display: none !important; }
+  body aside.sidebar .sb-card .sbc-score-overlay .sbc-score-label { display: none !important; }
+  body aside.sidebar .sb-card .sbc-score-overlay .sbc-mini-score,
+  body aside.sidebar .sb-card .sbc-score-overlay .sbc-mini-score svg { width: 40px !important; height: 40px !important; }
+  body aside.sidebar .sb-card .sbc-top-body { padding-right: 48px !important; min-width: 0 !important; }
+  body aside.sidebar .sb-card .sbc-address { padding-right: 0 !important; white-space: normal !important; display: -webkit-box !important;
+    -webkit-box-orient: vertical !important; -webkit-line-clamp: 2 !important; overflow: hidden !important; line-height: 1.25 !important; }
+}

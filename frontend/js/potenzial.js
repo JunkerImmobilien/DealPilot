@@ -63,7 +63,10 @@
      Leitungen gehören dem Haus (dieselbe Teilung wie mfh-einheiten.js). */
   var MASSNAHMEN = [
     { id: 'bad',        t: 'Bad',                 gewerk: 'baeder',      einheit: true },
-    { id: 'fenster',    t: 'Fenster',             gewerk: 'fenster',     einheit: true },
+    /* v2966 · N80 (Marcel 26.10.2026 „ja bitte“): `haus` = waehlbar als Massnahme am GANZEN Haus
+       beim MFH (Schritt „Gebäude“). Kosten nach Flaeche auf die Wohnungen, Punkte je Wohnung -
+       zusammen mit deren eigenen Massnahmen je Gewerk hoechstens einmal (punkteGewinn). */
+    { id: 'fenster',    t: 'Fenster',             gewerk: 'fenster',     einheit: true, haus: true },
     { id: 'boeden',     t: 'Böden/Innenausbau',   gewerk: 'innenausbau', einheit: true },
     { id: 'grundriss',  t: 'Grundriss',           gewerk: 'grundriss',   einheit: true },
     /* v2938 · Elektrik ist ein Teil des Elements „Leitungssysteme (Strom, Gas, Wasser, Abwasser)" der
@@ -72,10 +75,10 @@
     { id: 'elektrik',   t: 'Elektrik',            gewerk: 'leitungen',   einheit: true, max: 1, hinweis: 'Teil der Leitungssysteme (Anlage 2): 1 von 2 Punkten' },
     { id: 'renovierung', t: 'Renovierung',        gewerk: null,          einheit: true },
     { id: 'kueche',     t: 'Küche',               gewerk: null,          einheit: true },
-    { id: 'dach',       t: 'Dach',                gewerk: 'dach',        einheit: false },
-    { id: 'fassade',    t: 'Fassade/Dämmung',     gewerk: 'aussenwand',  einheit: false },
-    { id: 'heizung',    t: 'Heizung',             gewerk: 'heizung',     einheit: false },
-    { id: 'leitungen',  t: 'Leitungen',           gewerk: 'leitungen',   einheit: false },
+    { id: 'dach',       t: 'Dach',                gewerk: 'dach',        einheit: false, haus: true },
+    { id: 'fassade',    t: 'Fassade/Dämmung',     gewerk: 'aussenwand',  einheit: false, haus: true },
+    { id: 'heizung',    t: 'Heizung',             gewerk: 'heizung',     einheit: false, haus: true },
+    { id: 'leitungen',  t: 'Leitungen',           gewerk: 'leitungen',   einheit: false, haus: true },
     { id: 'sonst',      t: 'Sonstiges',           gewerk: null,          einheit: true }
   ];
 
@@ -178,11 +181,16 @@
   function maxP(g) { return (M().maxPunkte ? M().maxPunkte(g) : 2); }
   function katalog(id) { return MASSNAHMEN.filter(function (m) { return m.id === id; })[0] || null; }
   /** Heutige Punkte eines Gewerks: in der Wohnung (eigen, sonst Haus) oder am Objekt. */
+  /* v2966 · N80 · GEMESSEN Parkstr. 9 (26.10.2026): im Reiter Objekt Heizung, Leitungen, Bäder,
+     Innenausbau „< 5 Jahre" (mod_punkte 8 - damit rechnet der Dienst die RND im Bestand), im MFH-Fenster
+     stand der Gebaeude-Zustand aber auf „nicht modernisiert". Der Chip bot +2 fuer Heizung an, die schon
+     im Bestand zaehlt - doppelt. Heute gilt deshalb das Hoehere aus Wohnung/Gebaeude und Objektfeld:
+     dieselbe Basis, auf die der Dienst den Gewinn aufschlaegt. */
   function punkteJetzt(gewerk, e, geb) {
-    var MM = M();
-    if (e && MM.punkteVon) return MM.punkteVon(gewerk, (e.mod && e.mod[gewerk]) || (geb && geb[gewerk]) || '0');
-    if (MM.punkteObjekt) return MM.punkteObjekt(gewerk, wert('mod_' + gewerk));
-    return 0;
+    var MM = M(), p = 0;
+    if ((e || geb) && MM.punkteVon) p = MM.punkteVon(gewerk, (e && e.mod && e.mod[gewerk]) || (geb && geb[gewerk]) || '0');
+    if (MM.punkteObjekt) { var o = wert('mod_' + gewerk); if (o) p = Math.max(p, MM.punkteObjekt(gewerk, o) || 0); }
+    return p;
   }
   /** Gewinn an Punkten aus einer Maßnahmenliste: je Gewerk höchstens bis zum
       Anlage-2-Maximum, nie doppelt gezählt. */
@@ -356,11 +364,22 @@
                 hat_soll: false, hat_ziel: false, kennzeichnung: KENNZEICHNUNG };
     if (liste && liste.length) {
       var flSum = 0;
+      /* v2966 · N80 · Massnahmen am ganzen Haus. Jede Wohnung traegt ihren FLAECHENANTEIL der Kosten
+         (Summe = Hauskosten, ungerundet) und das Gewerk fuer ihre Punkte; punkteGewinn nimmt je Gewerk
+         das Hoechste aus Wohnungs- und Hausmassnahme (Elektrik 1 + Leitungen 2 = 2, nie 3). Bewohnt
+         modernisiert: der Anteil geht in die § 559-Umlage der Wohnung. Der Gebaeude-Zustand bleibt
+         der Ausgangspunkt (heute), die Massnahme ist das Ziel. */
+      var hausL = (opts.haus_massnahmen || D.haus_massnahmen || []).filter(function (m) { var k = m && katalog(m.id); return k && k.haus; });
+      var flAll = liste.reduce(function (a, e) { return a + ((e && (zahl(e.wfl) > 0 || zahl(e.ist) > 0)) ? zahl(e.wfl) : 0); }, 0);
+      out.haus = { massnahmen: hausL.map(function (m) { return { id: m.id, t: m.t, k: zahl(m.k), bewohnt: !!m.bewohnt }; }),
+        kosten: hausL.reduce(function (a, m) { return a + zahl(m.k); }, 0) };
       out.wohnungen = liste.map(function (e, i) { return { e: e, i: i }; }).filter(function (o) { return o.e && (zahl(o.e.wfl) > 0 || zahl(o.e.ist) > 0); }).map(function (o) {
         var e = o.e, i = o.i;
         var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist);
-        var ml = massnahmenVon(e);
-        var s = sollFuer(e, ctx);
+        var anteil = flAll > 0 ? wfl / flAll : 0;
+        var mlEigen = massnahmenVon(e);
+        var ml = mlEigen.concat(hausL.map(function (m) { return { id: m.id, t: m.t, k: zahl(m.k) * anteil, bewohnt: !!m.bewohnt, haus: true }; }));
+        var s = sollFuer(hausL.length ? Object.assign({}, e, { massnahmen: ml }) : e, ctx);
         var zielQm = zahl(e.ziel_qm);
         var zielM = zielQm > 0 && wfl > 0 ? zielQm * wfl : 0;
         var kAlle = ml.reduce(function (a, m) { return a + zahl(m.k); }, 0);
@@ -370,7 +389,8 @@
         if (zielM > 0 || ml.length) out.hat_ziel = true;
         return { i: i, nr: e.nr || String(i + 1), lage: e.lage || '', art: e.art || 'wohnen', wfl: wfl, zimmer: zahl(e.zimmer) || null,
           status: e.status || 'vermietet', ist: ist, soll: s, ziel: zielM || null, ziel_qm: zielQm || null, ziel_wann: e.ziel_wann || '',
-          massnahmen: ml, kosten: kAlle, kosten_bewohnt: kBew, mea: zahl(e.mea_anteil) || null,
+          massnahmen: mlEigen, kosten: kAlle, kosten_bewohnt: kBew, mea: zahl(e.mea_anteil) || null,
+          kosten_haus: ml.filter(function (m) { return m.haus; }).reduce(function (a, m) { return a + m.k; }, 0),   /* v2966 */
           plus_soll: Math.min(20, punkteGewinn(ml, e, geb, true)), plus_ziel: Math.min(20, punkteGewinn(ml, e, geb, false)),
           vgl_qm: s.vgl_qm || null };
       });
@@ -629,6 +649,9 @@
         negativ_hinweis: r.aufteilung.negativ_hinweis || null,   /* v2431 */
         marktpreisindikation_etw: r.aufteilung.mpi_etw || null };   /* v2541 */
     }
+    if (m.haus && m.haus.massnahmen.length) z.haus_massnahmen = { kosten: Math.round(m.haus.kosten),   /* v2966 */
+      text: m.haus.massnahmen.map(function (x) { return x.t + (x.k ? ' ' + Math.round(x.k) + ' €' : '') + (x.bewohnt ? ' (bewohnt, § 559)' : ''); }).join(', '),
+      hinweis: 'Kosten nach Wohnfläche auf die Wohnungen verteilt und in deren Kosten enthalten.' };
     z.wohnungen = m.wohnungen.slice(0, 30).map(function (w) {
       return { nr: w.nr, lage: w.lage, wfl: w.wfl, status: w.status, ist: Math.round(w.ist),
         soll: w.soll && w.soll.miete != null ? Math.round(w.soll.miete) : null, soll_ab: w.soll ? w.soll.ab_text || null : null,
@@ -1237,7 +1260,9 @@
     var abs = m.wohnungen.map(function (w) { return w.soll && w.soll.ab && w.soll.miete > w.ist ? w.soll.ab : null; }).filter(Boolean).sort();
     d.satz_bank = (S.mieterhoehung ? 'Ohne Mieterwechsel ist ' + (abs.length ? 'ab ' + monatText(abs[0]) + ' ' : '') + 'ein Mehrertrag von ' + eur(mehr1) + ' p. a. erreichbar' : 'Eine Mieterhöhung im Bestand ist nicht angesetzt')
       + (S.zielbild ? (S.mieterhoehung ? ', mit den geplanten Maßnahmen weitere ' : '; mit den geplanten Maßnahmen ') + eur(mehr2) + ' p. a.' : '.')
-      + (S.zielbild && S.zielbild.kosten ? ' Maßnahmenkosten ' + eur(S.zielbild.kosten) + '.' : '');
+      + (S.zielbild && S.zielbild.kosten ? ' Maßnahmenkosten ' + eur(S.zielbild.kosten)
+        + (m.haus && m.haus.kosten ? ', davon am ganzen Haus ' + eur(m.haus.kosten) + ' (' + m.haus.massnahmen.map(function (x) { return x.t; }).join(', ') + ')' : '') + '.' : '');   /* v2966 */
+    d.haus_massnahmen = m.haus && m.haus.massnahmen.length ? m.haus : null;
     var zu = gesperrt(r);   /* v2431 */
     d.ertragswert_gesperrt = zu;
     d.satz_invest = zu ? 'Drei Stufen der Mietentwicklung mit Kosten und Rendite je Stufe.'
@@ -1501,7 +1526,9 @@
       html += '<div class="dp-wp-h">Wohnungen · Ist, Soll-Miete und Zielbild</div><div class="dp-pot-scroll"><table class="dp-wp-we"><thead><tr><th>WE</th><th>m²</th><th>Ist / Monat</th><th class="c-soll">Mieterhöhung</th><th class="c-ziel">Zielmiete</th><th>Maßnahmen</th></tr></thead><tbody>'
         + d.wohnungen.map(function (w) {
             return '<tr><td>' + esc(w.we || '—') + '</td><td>' + esc(dez(w.wfl, 0)) + '</td><td>' + esc(w.ist) + '</td><td class="c-soll">' + esc(w.soll) + '</td><td class="c-ziel">' + esc(w.ziel) + '</td><td>' + esc(w.massnahmen) + '</td></tr>';
-          }).join('') + '</tbody></table></div>';
+          }).join('') + '</tbody></table></div>'
+        + (d.haus_massnahmen ? '<p class="dp-pot-hin">Am ganzen Haus: ' + esc(d.haus_massnahmen.massnahmen.map(function (x) { return x.t + (x.k ? ' ' + eur(x.k) : ''); }).join(', '))
+          + ' — Kosten nach Wohnfläche auf die Wohnungen verteilt, Modernisierungspunkte für jede Wohnung.</p>' : '');   /* v2966 */
     }
     if (d.bruecke) {
       html += '<div class="dp-wp-h">Ertragswert je Stufe</div><div class="dp-wp-kacheln">'
@@ -1603,8 +1630,8 @@
   }
 
   /* ── Tab Objekt: „Mieterhöhung und Zielbild (optional)" ──────────────── */
-  function chipsHtml(liste, mitPunkte, e, geb, fuerEinheit) {
-    return '<div class="dp-zb-chips">' + MASSNAHMEN.filter(function (k) { return fuerEinheit ? k.einheit : true; }).map(function (k) {
+  function chipsHtml(liste, mitPunkte, e, geb, fuerEinheit, fuerHaus) {
+    return '<div class="dp-zb-chips">' + MASSNAHMEN.filter(function (k) { return fuerHaus ? k.haus : (fuerEinheit ? k.einheit : true); }).map(function (k) {
       var m = (liste || []).filter(function (x) { return x.id === k.id; })[0];
       var p = k.gewerk ? Math.max(0, maxP(k.gewerk) - punkteJetzt(k.gewerk, e, geb)) : 0;
       return '<button type="button" class="dp-zb-chip' + (m ? ' on' : '') + '" data-zb-chip="' + k.id + '" aria-pressed="' + (m ? 'true' : 'false') + '"'
@@ -1647,7 +1674,7 @@
     opts = opts || {};
     chipStil();
     function zeichne() {
-      host.innerHTML = chipsHtml(liste, true, opts.e || null, opts.geb || null, !!opts.fuerEinheit)
+      host.innerHTML = chipsHtml(liste, true, opts.e || null, opts.geb || null, !!opts.fuerEinheit, !!opts.fuerHaus)
         + '<div class="dp-zb-mliste">' + massnahmenZeilen(liste) + '</div>';
       host.querySelectorAll('[data-zb-chip]').forEach(function (b) {
         b.onclick = function () {

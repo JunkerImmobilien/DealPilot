@@ -43,7 +43,13 @@ const MUSTER = [
      stehen die engeren Formulierungen oben. */
   { art: 'abbrechen', re: /^\/abbrechen|^(abbrechen|abbruch|vergiss es|lass gut sein)\b/i },
   { art: 'stop',      re: /^\/stop\b/i },
-  { art: 'hilfe',     re: /^\/(hilfe|help|start)\b|^(was kannst du|hilfe|wie funktioniert)\b/i },
+  /* v2960 · „wie funktioniert der Quick-Check?" ist eine FRAGE AN DIE HILFE,
+     nicht der Wunsch nach der Befehlsliste. Bis hierher traf `^wie
+     funktioniert\b` jeden solchen Satz und schickte die feste Liste des
+     Bots — die Frage kam nie an. Fest beantwortet wird nur noch, was
+     wirklich nach dem Bot selbst fragt; alles andere geht an den Agenten,
+     der die Hilfe der App durchsucht (hilfe_suchen). */
+  { art: 'hilfe',     re: /^\/(hilfe|help|start)\b|^\s*(hilfe|help)\s*[!?.]*\s*$|^\s*was kannst du( alles)?( so)?( machen| tun)?\s*[?!.]*\s*$|^\s*wie funktionierst du\s*[?!.]*\s*$/i },
 
   { art: 'liste',     re: /^\/objekte\b/i },
   { art: 'liste',     re: /\b(liste|auflisten|auflistung|uebersicht|übersicht|zeig( mir)? (alle|meine)|welche objekte|alle objekte)\b/i },

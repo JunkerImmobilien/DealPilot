@@ -59,7 +59,16 @@ const HILFE =
   + '„wie steht die Parkstraße gegen den Plan?" — Soll/Ist seit dem Ankauf\n\n'
   + '*Bewertung*\n'
   + '„wie ist der DealScore?" · „Investor Deal Score von Objekt 3"\n'
-  + '„hol mir eine Marktpreisindikation" — oder „erweiterte"\n\n'
+  + '„hol mir eine Marktpreisindikation" — oder „erweiterte" oder „Wertermittlung". '
+  + 'Vor jedem Abruf frage ich nach, was er aus deinem Kontingent verbraucht.\n\n'
+  /* v2960 · Bedienfragen gehen an die Hilfe der App */
+  /* v2961 */
+  + '*PDFs*\n'
+  + '„schick mir das Bank-PDF zur Parkstraße" · „Kurzfassung für Objekt 3" · '
+  + '„den Bankexport" · „den Marktbericht als PDF"\n\n'
+  + '*Fragen zur App*\n'
+  + '„wie funktioniert der Quick-Check?" · „wo exportiere ich das Bank-PDF?" — '
+  + 'ich antworte aus der Hilfe von DealPilot\n\n'
   + '*Anlegen und ändern*\n'
   + '„leg mir ein Objekt an" — dann sprich einfach drauf los, '
   + 'schick ein Foto vom Exposé oder tippe\n'
@@ -184,6 +193,47 @@ async function sendenHtml(token, chatId, html) {
   }
 }
 
+/* ── v2961 · PDFs als Datei in den Chat ──────────────────────────────────
+ *
+ * Die Datei kommt vom PDF-Dienst (pdf-dienst/, Headless-Chromium mit der
+ * ECHTEN App) — siehe services/telegramPdfService.js. Hier nur: ansagen,
+ * holen, schicken. Telegram nimmt Dokumente bis 50 MB; gemessen sind es
+ * 0,07 bis 2,9 MB. */
+async function sendenDokument(token, chatId, buf, dateiname, beschriftung) {
+  const fd = new FormData();
+  fd.append('chat_id', String(chatId));
+  if (beschriftung) fd.append('caption', String(beschriftung).slice(0, 1000));
+  fd.append('document', new Blob([buf], { type: 'application/pdf' }), dateiname || 'DealPilot.pdf');
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 60000);
+  try {
+    const r = await fetch(TG + token + '/sendDocument', { method: 'POST', body: fd, signal: ctrl.signal });
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) throw new Error(j.description || ('HTTP ' + r.status));
+  } finally { clearTimeout(t); }
+}
+
+async function pdfAusliefern(token, chatId, userId, auftrag) {
+  const pdf = require('../services/telegramPdfService');
+  await botSagt(token, chatId, userId, 'PDF wird erstellt … _(' + auftrag.name
+    + (auftrag.adresse ? ' · ' + auftrag.adresse : '') + ')_');
+  try { await tgGet(token, 'sendChatAction', { chat_id: chatId, action: 'upload_document' }); } catch (e) {}
+  let r;
+  try {
+    r = await pdf.erzeugen(userId, auftrag.art, auftrag.objekt_id, auftrag.report_id);
+  } catch (e) {
+    await botSagt(token, chatId, userId, pdf.fehlerSatz(e, auftrag.art));
+    return;
+  }
+  try {
+    await sendenDokument(token, chatId, r.pdf, r.dateiname,
+      auftrag.name + (auftrag.adresse ? ' · ' + auftrag.adresse : ''));
+    await verlaufMerken(chatId, userId, 'assistant', 'PDF geschickt: ' + r.dateiname);
+  } catch (e) {
+    await botSagt(token, chatId, userId, 'Das PDF ist fertig, kam aber nicht durch: ' + (e.message || e));
+  }
+}
+
 function unterlagenKontext(token, chatId, userId, z) {
   return {
     userId: userId,
@@ -211,6 +261,21 @@ function unterlagenKontext(token, chatId, userId, z) {
  * wird, was der Nutzer bekommt, nicht was intern passiert.
  */
 async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
+  /* ── v2960a · EIN NEIN AUF DIE BESTAETIGUNG RAEUMT DAS ANGEBOT AB ─────
+   * Bis hierher blieb ein abgelehntes Angebot 30 Minuten stehen; ein
+   * spaeteres Ja auf eine andere Frage mit Preiswort davor haette es noch
+   * getroffen. Ein Nein auf die Bestaetigungsfrage kostet keine
+   * Co-Pilot-Antwort und kein Modell. */
+  {
+    const _a = angebotGueltig(z && z.angebot);
+    const _lb = (((z && z.verlauf) || []).filter((e) => e.rolle !== 'user').slice(-1)[0] || {}).text || '';
+    if (_a && _a.stufe && /^Best(ä|ae)tigung:/.test(_lb)
+        && /^\s*(nein|ne|nee|noe|nö|lieber nicht|doch nicht|abbrechen|stopp?)(\W|$)/i.test(String(text || ''))) {
+      await angebotLoeschen(chatId, userId);
+      await botSagt(token, chatId, userId, 'Alles klar — nichts abgerufen, nichts verbraucht.');
+      return;
+    }
+  }
   const k = await copilotKontingent.verbrauchen(userId);
   if (!k.ok) {
     await senden(token, chatId,
@@ -359,8 +424,12 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
      * `merkeAngebot` ruft die Preisansage, `angebotVerbraucht` der Abruf:
      * eine zweite Zustimmung darf denselben Abruf nicht erneut auslösen. */
     angebotObjekt: (angebot && angebot.objekt_id) || null,
-    merkeAngebot: async function (id, adresse) {
-      try { await angebotSetzen(chatId, userId, id, adresse); } catch (e) {}
+    /* v2960a · die bestaetigte Stufe, nur aus dem Angebot */
+    angebotStufe: (angebot && [1, 2, 3].indexOf(Number(angebot.stufe)) >= 0) ? Number(angebot.stufe) : null,
+    bestaetigung: null,
+    berichtPdfLink: null,
+    merkeAngebot: async function (id, adresse, stufe) {
+      try { await angebotSetzen(chatId, userId, id, adresse, stufe); } catch (e) {}
     },
     angebotVerbraucht: async function () {
       try { await angebotLoeschen(chatId, userId); } catch (e) {}
@@ -394,6 +463,23 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
   if (!out) { await senden(token, chatId, 'Dazu fällt mir gerade nichts ein.'); return; }
   await sendenLang(token, chatId, out);
   await verlaufMerken(chatId, userId, 'assistant', out);
+
+  /* ── v2960a · DIE BESTAETIGUNGSFRAGE STELLT DEALPILOT, NICHT DAS MODELL ─
+   * Woertlich, mit Stufe, Objekt, Verbrauch und Bestand. Sie ist danach
+   * die letzte Botzeile — genau die liest die Geldsperre oben. */
+  if (ctx.bestaetigung) await botSagt(token, chatId, userId, ctx.bestaetigung);
+  /* v2961 · Ein PDF-Auftrag laeuft NACH der Antwort und blockiert sie nicht. */
+  if (ctx.pdfAuftrag) {
+    const auftrag = ctx.pdfAuftrag;
+    pdfAusliefern(token, chatId, userId, auftrag).catch((e) => {
+      try { console.warn('[telegram v2961] PDF-Auslieferung: ' + (e && e.message)); } catch (_) {}
+    });
+  }
+  if (ctx.berichtPdfLink) {
+    await botSagt(token, chatId, userId,
+      'Den Bericht als PDF: der Link öffnet ihn in DealPilot und speichert das PDF, '
+      + 'wenn du in diesem Browser angemeldet bist.\n' + ctx.berichtPdfLink);
+  }
 
   /* ── v1887 · DAS PROTOKOLL FUEHRT SCHON DIE ARGUMENTE — DER LOG NICHT ──
    *
@@ -621,13 +707,14 @@ async function zustandSetzen(chatId, userId, z) {
  */
 const ANGEBOT_FRIST_MS = 30 * 60 * 1000;
 
-async function angebotSetzen(chatId, userId, objektId, adresse) {
+async function angebotSetzen(chatId, userId, objektId, adresse, stufe) {
   await zeileSichern(chatId, userId);
   await query(
     `UPDATE telegram_dialog SET angebot = $3::jsonb, aktualisiert = now()
       WHERE chat_id = $1::bigint AND bot_user_id = $2`,
     [String(chatId), userId,
      JSON.stringify({ objekt_id: objektId, adresse: adresse || null,
+                      stufe: stufe || null,   /* v2960a */
                       zeit: new Date().toISOString() })]);
 }
 
