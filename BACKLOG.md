@@ -36,6 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N81 · Telegram-Bot: Hilfe, Bewertung Stufe 1–3, PDFs — Rest: Abnahme und Prod (26.10.2026)
+
+Gebaut und auf Staging gemessen in v2960–v2961 (`4b87c710`, `7bc8b184`, s. Fertig). Offen:
+
+1. **Abnahme im eigenen Telegram-Chat** (nicht automatisch getestet, kein Versand): „wie funktioniert der Quick-Check?“ · „hol mir die Wertermittlung für …“ → Bestätigungssatz → „Ja“ → Bericht als PDF-Datei · „schick mir das Bank-PDF / die Kurzfassung / den Bankexport“.
+2. **PDF-Dienst auf Prod** nur mit Freigabe: `.env` um `PDF_DIENST_SECRET`, Dienst über `pdf-dienst/docker-compose.pdf.yml` starten (oder Block in `docker-compose.prod.yml` übernehmen, Beschreibung im Journal v2960–v2961), Backend neu erzeugen. Abbild 1,38 GB, Spitze bis 710 MB je PDF. Ohne Dienst sagt der Bot ehrlich „noch nicht“.
+3. Klein: `mod_punkte` beim MFH und der eigene Angebotsabschlag kommen im Bot nicht wie im Browser an (Browser-Zustand); Sammelabruf „für alle Objekte“ nur einzeln.
+
 ### N80 · Zielbild beim Mehrfamilienhaus: Haus-Maßnahmen mit Kosten — Entscheidung Marcel (26.10.2026)
 
 Gefunden beim Hilfetext v2965b: Dach, Fassade/Dämmung, Heizung und Leitungen gibt es beim MFH nur als
@@ -4006,6 +4014,10 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+### Telegram-Bot: Hilfe-Fragen, Bewertung Stufe 1–3 mit fester Bestätigung, PDFs als Datei — 26.10.2026 (`v2960`/`v2960a` `4b87c710`, `v2961` `7bc8b184`)
+
+Hilfe aus `help.js` gespiegelt (`hilfe_suchen`), „wie funktioniert …“ nicht mehr an die Befehlsliste. Bewertung: volle Nutzlast wie im Browser (88 statt 12 Felder), Pflicht je Stufe aus `pflichtFuer()`, Stufe im Angebot, Bestätigung „noch N frei — Ja/Nein“ vom Webhook, „Nein“ räumt ab, Ergebniszahlen unter `data` gefunden. PDF-Dienst (Headless-Chromium, echte App, schreibt nichts, Warteschlange 1+4, Frist 120 s) auf Staging: sechs Arten, 6–12 s, bis 710 MB. Prüfer `pruef-telegram-bewertung.js` 52/52. Rest unter N81.
 
 ### Prozess-Atlas: Flugzeug vorwärts, Handbuch-Anleitung erreichbar, Zielbild erklärt — 26.10.2026 (`v2965`, `83d70efd`; `v2965a/b`, `1d06b7a7`)
 
