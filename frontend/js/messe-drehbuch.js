@@ -3290,11 +3290,17 @@
      geladen, gerechnet, DealPilotAnkauf.festschreiben('2024-12-23'), Kopie gelöscht. Mieten,
      Leerstand und Modernisierung bleiben der Stand beim Kauf. Kein Abruf mit Kosten. */
   var R14_ANKAUF = {"stichtag":"2024-12-23","kurz":{"kp":395000,"nkm":2321,"_kpis_miete_j":28932,"_kpis_bmy":7.324556962025317,"_kpis_nmy":3.624199873292843,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_steuerwirkung":-1453,"_nkm_qm":5.44,"_leer_einheiten":1,"_kpis_bwk_nul_y":7680,"eigen_r":0,"d1z":4,"_kpis_cf_vs":5052,"geb_ant":54.31,"afa_satz":2},"daten":{"d1":"324000","ek":"262392","kp":"395000","ji_p":"1.5","gba_p":"0.5","grenz":"47.00","gest_p":"6.5","notar_p":"1.7","makler_p":"3.57","_kpis_bmy":7.324556962025317,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_cf_vs":5052,"ds2_marktfaktor":"8,2","_dealpilot_score":87,"_kpis_miete_j":28932,"_kpis_nmy":3.624199873292843}};
+  var _r14 = { merker: undefined };   /* v2967 · Merker Einfach|Genau des Unterreiters (dp_pa_si_ansicht) */
   function r14Seg(re) { return [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return re.test(b.textContent); })[0] || null; }
   DREHBUECHER['reihe-bestand'] = {
     titel: 'Vom Ankauf in den Bestand', unterzeile: 'Gewonnen, eingefroren, verglichen', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { try { var i = r14Seg(/Ist/); if (i && window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) i.click(); } catch (e) {} rhAufraeumen(); },
+    aufraeumen: function () {
+      try { var i = r14Seg(/Ist/); if (i && window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) i.click(); } catch (e) {}
+      try { if (_r14.merker !== undefined) { if (_r14.merker === null) localStorage.removeItem('dp_pa_si_ansicht'); else localStorage.setItem('dp_pa_si_ansicht', _r14.merker); } } catch (e) {}
+      _r14.merker = undefined;
+      rhAufraeumen();
+    },
     szenen: [
       async function (s) {   /* 1 · das Objekt */
         await r6KopieStart(R11_PARK, { behalte: true, ankauf: R14_ANKAUF });
@@ -3342,7 +3348,15 @@
       },
       async function (s) {   /* 6 · Soll/Ist-Abgleich */
         reiter('s5'); await warte(1200);
-        await r11PaTab(/Soll\/Ist/);
+        /* v2967 · GEMESSEN 26.10.: der Unterreiter heißt seit v2430 „Ankauf · Bestand · Zielbild“ und
+           hat seit v2951 Einfach | Genau - mit /Soll\/Ist/ fand das Drehbuch ihn nicht, Szenen 6-9
+           liefen ohne Kegel auf dem Briefing. Genau zeigt die Tafel; der Merker kommt beim Aufräumen zurück. */
+        await r11PaTab(/Soll\/Ist|Ankauf · Bestand/);
+        try { if (_r14.merker === undefined) _r14.merker = localStorage.getItem('dp_pa_si_ansicht'); } catch (e) {}
+        var gk = r11Panel() && r11Panel().querySelector('.dp-si-um [data-dp-si-knopf="genau"]');
+        if (gk && gk.getAttribute('aria-pressed') !== 'true') { gk.click(); await warte(700); }
+        var ah = function () { var x = r11Panel(); return x && x.querySelector('.abw-tafel-host'); };
+        var sx = scroller(ah()); if (sx && ah()) { sx.scrollTop += rect(ah()).top - 120; await warte(500); }
         var p = r11Panel(), t = r6Inner(p);
         var vg = /Von (\d+) vergleichbaren Kennzahlen stehen (\d+) besser und (\d+) schlechter/.exec(t);
         /* GEMESSEN (Aufnahme 14): die erste .dp-pa-card des Panels ist die Analyse-Tafel weiter unten - der Kegel lag dort */
@@ -3355,9 +3369,9 @@
         function z(w) { return a && a.zeilen.filter(function (x) { return x.wort === w; })[0]; }
         var d = z('DSCR'), c = z('Cashflow n. Steuer'), sc = z('DealScore'), teile = [];
         if (d) teile.push('DSCR <b>' + de(d.ankauf, 2) + ' → ' + de(d.bestand, 2) + '</b>');
-        if (c) teile.push('Cashflow nach Steuer <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
+        if (c) teile.push('Cashflow nach Steuer im Jahr <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
         if (sc) teile.push('DealScore <b>' + de(sc.ankauf) + ' → ' + de(sc.bestand) + '</b>');
-        await b2oZeile(s, 'Was sich bewegt hat', (teile.join(' · ') || '–') + ' — im Jahr.');
+        await b2oZeile(s, 'Was sich bewegt hat', (teile.join(' · ') || '–') + '.');
       },
       async function (s) {   /* 8 · die Tafel */
         await zeige(function () { return q('#ai-content .abw-tafel'); }, 6);
@@ -3367,8 +3381,10 @@
       async function (s) {   /* 9 · Entwicklung in der Pilot-Analyse */
         var k = function () { var x = rhIm('#ai-content', /^PILOT-ANALYSE: ANKAUF GEGEN HEUTE$/); return x && x.closest('.dp-pa-card'); };
         await zeige(k, 8);
-        var t = r6Inner(k()), e = /Empfehlung\s+([^\t\n]+)\t\s*([^\n]+)/.exec(t), st = /Stand\s+([\d.]+)\s+([\d.]+)/.exec(t);
-        await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt' + (e ? ' — hier beide <b>' + e[1].trim() + '</b>' : '') + '. Ein neuer Abruf füllt die Spalte „Heute“.', 600);
+        /* v2967 · die gespeicherte Analyse ist vom 13.10. (Kaufpreis 780.000 €) - keine Empfehlung
+           daraus vorlesen; der Satz sagt, was die Karte selbst sagt (dieselbe Analyse in beiden Spalten) */
+        var t = r6Inner(k()), gleich = /beide Spalten zeigen dieselbe/i.test(t);
+        await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt.' + (gleich ? ' Seit dem Festschreiben kein neuer Abruf — DealPilot sagt das dazu.' : '') + ' Ein neuer Abruf füllt die Spalte „Heute“.', 600);
       }
     ]
   };
