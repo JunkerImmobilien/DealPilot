@@ -76,6 +76,56 @@ const QUELLEN = {
   'grest': path.join(FE, 'js', 'grest-plz-lookup.js')
 };
 
+/* ── v2960 · HILFE UND BEWERTUNG FUER DEN TELEGRAM-BOT ─────────────────
+ *
+ * Marcel am 26.10.2026: „Kann der Telegram Bot auch Fragen beantworten in
+ * Bezug auf die Hilfe? … alle 3 Stufen der Bewertung?"
+ *
+ * Drei Dinge, die der Bot braucht und die nur im Frontend stehen:
+ *
+ *   help.js           HELP_TOPICS   18 Themen, 161 Abschnitte (Hilfe-Fenster)
+ *   objekt-reiter.js  pflichtFuer() was jede Bewertungsstufe zwingend braucht
+ *   dealpilot-mb.js   ZUSATZ        welche Objektfelder der Browser an den
+ *                                   Bericht schickt (88 Felder)
+ *
+ * GEMESSEN am 26.10.2026: der Bot schickte dem Bericht ZWOELF Felder, der
+ * Browser 88. Eine „erweiterte Marktpreisindikation" aus dem Bot kannte
+ * damit weder Zustand noch Ausstattung — genau das, wofuer Stufe 2 bezahlt
+ * wird. Eine handgeschriebene Liste im Backend waere die naechste Kopie.
+ *
+ * ANDERS ALS OBEN wird hier nicht die ganze Datei gehasht, sondern der
+ * GEERNTETE INHALT. Diese drei Dateien aendern sich oft an Stellen, die
+ * den Bot nichts angehen (Layout, Texte daneben). Der Waechter soll
+ * anschlagen, wenn sich die HILFE oder die PFLICHT aendert — nicht, wenn
+ * jemand einen Abstand im Hilfe-Fenster korrigiert. */
+const INHALT_QUELLEN = {
+  'hilfe': path.join(FE, 'js', 'help.js'),
+  'objekt-reiter': path.join(FE, 'js', 'objekt-reiter.js'),
+  'dealpilot-mb': path.join(FE, 'js', 'dealpilot-mb.js')
+};
+
+function inhaltSumme(wert) {
+  return crypto.createHash('sha256').update(JSON.stringify(wert)).digest('hex').slice(0, 16);
+}
+
+/* HTML der Hilfe -> lesbarer Text. Absaetze bleiben, Auszeichnung faellt. */
+function hilfeText(s) {
+  return String(s == null ? '' : s)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|li|div|h\d)>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '- ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&')
+    .replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/* Eine Liste '...'-Strings aus einem Array-Literal, Kommentare entfernt. */
+function stringListe(literal) {
+  return (String(literal).replace(/\/\*[\s\S]*?\*\//g, '').match(/'[^']+'/g) || [])
+    .map((s) => s.slice(1, -1));
+}
+
 const nurPruefen = process.argv.includes('--pruefen');
 
 function summe(datei) {
@@ -180,6 +230,54 @@ function ernte() {
     hinweis: 'Saetze je Bundesland in Prozent. plz_bereiche ist [von, bis, '
            + 'Landeskuerzel] und wird der Reihe nach geprueft — der erste '
            + 'Treffer gilt, wie im Frontend.'
+  };
+
+  /* ── 6 · v2960 · Die Hilfe, wie sie im Hilfe-Fenster steht ─────────── */
+  ladeModul(INHALT_QUELLEN['hilfe'], kontext);
+  const H = kontext.DealPilotHilfe;
+  if (!H || typeof H.themen !== 'function') throw new Error('DealPilotHilfe.themen() nicht erreichbar');
+  ergebnis.daten.hilfe = H.themen().map((t) => ({
+    id: t.id,
+    titel: hilfeText(t.title),
+    beschreibung: hilfeText(t.desc || ''),
+    abschnitte: (t.sections || []).map((s) => ({ h: hilfeText(s.h), text: hilfeText(s.body) }))
+  }));
+
+  /* ── 7 · v2960 · Was jede Bewertungsstufe braucht, und was mitreist ── */
+  ladeModul(INHALT_QUELLEN['objekt-reiter'], kontext);
+  const OR = kontext.DealPilotObjektReiter;
+  if (!OR || typeof OR.pflichtFuer !== 'function') throw new Error('DealPilotObjektReiter.pflichtFuer() nicht erreichbar');
+  /* pflichtFuer(stufe, art, garagen) liest ohne die beiden letzten
+     Angaben das FORMULAR. Mit ihnen ist sie rein — die Tabelle unten ist
+     also genau ihr Ergebnis, Zelle fuer Zelle, nicht eine Nachbildung. */
+  const pflicht = {};
+  for (const art of [''].concat(Object.keys(OA._arten))) {
+    pflicht[art] = {};
+    for (const s of [1, 2, 3]) pflicht[art][s] = OR.pflichtFuer(s, art || '-', '0');
+    pflicht[art]['3_mit_garage'] = OR.pflichtFuer(3, art || '-', '1');
+  }
+  const mbQuelle = fs.readFileSync(INHALT_QUELLEN['dealpilot-mb'], 'utf8');
+  const z = /var ZUSATZ = \[([\s\S]*?)\];/.exec(mbQuelle);
+  if (!z) throw new Error('dealpilot-mb.js: var ZUSATZ nicht gefunden');
+  const mfh = /o\._mfh_einheiten = m\.einheiten\.map\(function \(e\) \{([\s\S]*?)\}\);/.exec(mbQuelle);
+  if (!mfh) throw new Error('dealpilot-mb.js: _mfh_einheiten-Abbildung nicht gefunden');
+  const oaQuelle = fs.readFileSync(QUELLEN['objektart-felder'], 'utf8');
+  const alle = /var ALLE = \[([\s\S]*?)\];/.exec(oaQuelle);
+  if (!alle) throw new Error('objektart-felder.js: var ALLE nicht gefunden');
+  ergebnis.daten.bewertung = {
+    pflicht: pflicht,
+    grundfelder: ['plz', 'ort', 'str', 'hnr', 'objektart', 'objart', 'wfl', 'baujahr', 'kp'],
+    zusatz: stringListe(z[1]),
+    mfh_einheit_felder: [...mfh[1].replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(\w+):\s*e\./g)].map((x) => x[1]),
+    objektart_typfelder: stringListe(alle[1]),
+    hinweis: 'pflicht[art][stufe] ist das Ergebnis von DealPilotObjektReiter.pflichtFuer(stufe, art, garagen) '
+           + '(objekt-reiter.js). zusatz ist die Feldliste, mit der dealpilot-mb.js inputs() den Bericht '
+           + 'fuettert; grundfelder steht dort literal in der ersten Zeile von inputs().'
+  };
+
+  ergebnis.inhalt = {
+    hilfe: inhaltSumme(ergebnis.daten.hilfe),
+    bewertung: inhaltSumme(ergebnis.daten.bewertung)
   };
 
   return ergebnis;
@@ -294,7 +392,12 @@ const bericht = [
   'Felder mit Form aus dem HTML: ' + d.felder.length
     + '  (davon select ' + d.felder.filter((f) => f.kind === 'select').length
     + ', bool ' + d.felder.filter((f) => f.kind === 'bool').length
-    + ', mit Beschriftung ' + d.felder.filter((f) => f.label).length + ')'
+    + ', mit Beschriftung ' + d.felder.filter((f) => f.label).length + ')',
+  'Hilfe       : ' + d.hilfe.length + ' Themen, '
+    + d.hilfe.reduce((a, t) => a + t.abschnitte.length, 0) + ' Abschnitte',
+  'Bewertung   : ' + Object.keys(d.bewertung.pflicht).length + ' Objektarten, '
+    + d.bewertung.zusatz.length + ' Zusatzfelder, '
+    + d.bewertung.mfh_einheit_felder.length + ' Einheitenfelder'
 ].join('\n  ');
 
 if (nurPruefen) {
@@ -304,6 +407,14 @@ if (nurPruefen) {
   }
   const alt = JSON.parse(fs.readFileSync(ZIEL, 'utf8'));
   const abweichung = Object.keys(neu.quellen).filter((k) => alt.quellen[k] !== neu.quellen[k]);
+  /* v2960 · Hilfe und Bewertung werden am geernteten INHALT gemessen. */
+  Object.keys(neu.inhalt || {}).forEach((k) => {
+    if (!alt.inhalt || alt.inhalt[k] !== neu.inhalt[k]) {
+      neu.quellen['inhalt:' + k] = neu.inhalt[k];
+      alt.quellen['inhalt:' + k] = (alt.inhalt && alt.inhalt[k]) || '(fehlt)';
+      abweichung.push('inhalt:' + k);
+    }
+  });
   if (abweichung.length) {
     console.error('VERALTET. Diese Quellen haben sich geaendert, seit die Datei erzeugt wurde:');
     abweichung.forEach((k) => console.error('  ' + k + '  ' + alt.quellen[k] + ' -> ' + neu.quellen[k]));
@@ -317,7 +428,14 @@ if (nurPruefen) {
 
 /* Mindestmengen: ein Extraktor, der still NICHTS findet, ist schlimmer als
    einer, der abbricht. Die Zahlen stammen aus der Messung vom 02.10.2026. */
-const mindest = { etappen: 6, fragen: 12, feld_ids: 150, felder: 120 };
+const mindest = { etappen: 6, fragen: 12, feld_ids: 150, felder: 120, hilfe: 12 };
+/* v2960 · gemessen 26.10.2026: 161 Abschnitte, 88 Zusatzfelder, 16 Einheitenfelder */
+if (d.hilfe.reduce((a, t) => a + t.abschnitte.length, 0) < 100
+    || d.bewertung.zusatz.length < 60 || d.bewertung.mfh_einheit_felder.length < 10
+    || d.bewertung.zusatz.indexOf('ds2_zustand') < 0 || d.bewertung.zusatz.indexOf('baustatus') < 0) {
+  console.error('ABBRUCH — Hilfe oder Bewertungsfelder zu duenn geerntet, das ist ein Ausfall.');
+  process.exit(2);
+}
 const zuwenig = Object.entries(mindest).filter(([k, n]) =>
   (k === 'objektarten' ? Object.keys(d[k]).length : d[k].length) < n);
 if (zuwenig.length) {

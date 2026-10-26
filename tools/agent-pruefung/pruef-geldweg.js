@@ -37,6 +37,9 @@ function machCtx(uid, angebotObjekt) {
     ctx: {
       userId: uid, letzteListe: null, letztesObjekt: null, protokoll: [],
       angebotObjekt: angebotObjekt || null,
+      /* v2960a · ein Angebot traegt jetzt auch die Stufe; ohne sie ruft
+         der Abruf nichts (Probe dazu in pruef-telegram-bewertung.js) */
+      angebotStufe: angebotObjekt ? 1 : null,
       merkeObjekt(id) { this.letztesObjekt = id; spur.gemerkt = id; },
       merkeListe(ids) { this.letzteListe = ids; },
       async merkeAngebot(id, adr) { spur.angebot = { objekt_id: id, adresse: adr }; },

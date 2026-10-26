@@ -59,7 +59,12 @@ const HILFE =
   + '„wie steht die Parkstraße gegen den Plan?" — Soll/Ist seit dem Ankauf\n\n'
   + '*Bewertung*\n'
   + '„wie ist der DealScore?" · „Investor Deal Score von Objekt 3"\n'
-  + '„hol mir eine Marktpreisindikation" — oder „erweiterte"\n\n'
+  + '„hol mir eine Marktpreisindikation" — oder „erweiterte" oder „Wertermittlung". '
+  + 'Vor jedem Abruf frage ich nach, was er aus deinem Kontingent verbraucht.\n\n'
+  /* v2960 · Bedienfragen gehen an die Hilfe der App */
+  + '*Fragen zur App*\n'
+  + '„wie funktioniert der Quick-Check?" · „wo exportiere ich das Bank-PDF?" — '
+  + 'ich antworte aus der Hilfe von DealPilot\n\n'
   + '*Anlegen und ändern*\n'
   + '„leg mir ein Objekt an" — dann sprich einfach drauf los, '
   + 'schick ein Foto vom Exposé oder tippe\n'
@@ -211,6 +216,21 @@ function unterlagenKontext(token, chatId, userId, z) {
  * wird, was der Nutzer bekommt, nicht was intern passiert.
  */
 async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
+  /* ── v2960a · EIN NEIN AUF DIE BESTAETIGUNG RAEUMT DAS ANGEBOT AB ─────
+   * Bis hierher blieb ein abgelehntes Angebot 30 Minuten stehen; ein
+   * spaeteres Ja auf eine andere Frage mit Preiswort davor haette es noch
+   * getroffen. Ein Nein auf die Bestaetigungsfrage kostet keine
+   * Co-Pilot-Antwort und kein Modell. */
+  {
+    const _a = angebotGueltig(z && z.angebot);
+    const _lb = (((z && z.verlauf) || []).filter((e) => e.rolle !== 'user').slice(-1)[0] || {}).text || '';
+    if (_a && _a.stufe && /^Best(ä|ae)tigung:/.test(_lb)
+        && /^\s*(nein|ne|nee|noe|nö|lieber nicht|doch nicht|abbrechen|stopp?)(\W|$)/i.test(String(text || ''))) {
+      await angebotLoeschen(chatId, userId);
+      await botSagt(token, chatId, userId, 'Alles klar — nichts abgerufen, nichts verbraucht.');
+      return;
+    }
+  }
   const k = await copilotKontingent.verbrauchen(userId);
   if (!k.ok) {
     await senden(token, chatId,
@@ -359,8 +379,12 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
      * `merkeAngebot` ruft die Preisansage, `angebotVerbraucht` der Abruf:
      * eine zweite Zustimmung darf denselben Abruf nicht erneut auslösen. */
     angebotObjekt: (angebot && angebot.objekt_id) || null,
-    merkeAngebot: async function (id, adresse) {
-      try { await angebotSetzen(chatId, userId, id, adresse); } catch (e) {}
+    /* v2960a · die bestaetigte Stufe, nur aus dem Angebot */
+    angebotStufe: (angebot && [1, 2, 3].indexOf(Number(angebot.stufe)) >= 0) ? Number(angebot.stufe) : null,
+    bestaetigung: null,
+    berichtPdfLink: null,
+    merkeAngebot: async function (id, adresse, stufe) {
+      try { await angebotSetzen(chatId, userId, id, adresse, stufe); } catch (e) {}
     },
     angebotVerbraucht: async function () {
       try { await angebotLoeschen(chatId, userId); } catch (e) {}
@@ -394,6 +418,16 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
   if (!out) { await senden(token, chatId, 'Dazu fällt mir gerade nichts ein.'); return; }
   await sendenLang(token, chatId, out);
   await verlaufMerken(chatId, userId, 'assistant', out);
+
+  /* ── v2960a · DIE BESTAETIGUNGSFRAGE STELLT DEALPILOT, NICHT DAS MODELL ─
+   * Woertlich, mit Stufe, Objekt, Verbrauch und Bestand. Sie ist danach
+   * die letzte Botzeile — genau die liest die Geldsperre oben. */
+  if (ctx.bestaetigung) await botSagt(token, chatId, userId, ctx.bestaetigung);
+  if (ctx.berichtPdfLink) {
+    await botSagt(token, chatId, userId,
+      'Den Bericht als PDF: der Link öffnet ihn in DealPilot und speichert das PDF, '
+      + 'wenn du in diesem Browser angemeldet bist.\n' + ctx.berichtPdfLink);
+  }
 
   /* ── v1887 · DAS PROTOKOLL FUEHRT SCHON DIE ARGUMENTE — DER LOG NICHT ──
    *
@@ -621,13 +655,14 @@ async function zustandSetzen(chatId, userId, z) {
  */
 const ANGEBOT_FRIST_MS = 30 * 60 * 1000;
 
-async function angebotSetzen(chatId, userId, objektId, adresse) {
+async function angebotSetzen(chatId, userId, objektId, adresse, stufe) {
   await zeileSichern(chatId, userId);
   await query(
     `UPDATE telegram_dialog SET angebot = $3::jsonb, aktualisiert = now()
       WHERE chat_id = $1::bigint AND bot_user_id = $2`,
     [String(chatId), userId,
      JSON.stringify({ objekt_id: objektId, adresse: adresse || null,
+                      stufe: stufe || null,   /* v2960a */
                       zeit: new Date().toISOString() })]);
 }
 
