@@ -170,6 +170,10 @@ const SYSTEM =
 + 'Wertermittlung), rufe marktbericht_preis MIT stufe auf. Fehlen Pflichtangaben, '
 + 'nennst du sie alle. Die Bestaetigungsfrage mit Kontingent stellt DealPilot selbst — '
 + 'du stellst sie nicht und nennst keine Kosten.\n'
+/* v2961 */
++ '7p. PDFs ("schick mir das Bank-PDF", "Investment-PDF", "Kurzfassung", "Bankexport", '
++ '"Marktbericht als PDF") -> pdf_erstellen. DealPilot schickt die Datei selbst; du '
++ 'sagst nur in einem Satz, was kommt.\n'
 /* ══ v2016 · WAS IN EINER AUSKUNFT IMMER DRINSTEHT ══════════════════
 
    Marcels Vorgabe woertlich: "Wenn ich nach wichtigen Daten frage,

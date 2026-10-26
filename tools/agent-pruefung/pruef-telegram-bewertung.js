@@ -208,6 +208,39 @@ function ctxMit(over) {
   pruef('Werkzeugergebnis passt unter die 24.000-Zeichen-Kappe', laenge < 24000, 'Laenge ' + laenge);
   if (echt) console.log('         zahlen: ' + JSON.stringify(r.zahlen).slice(0, 400));
 
+  /* ══ F · v2961 PDF-Auftrag (ohne Dienst, ohne Browser) ══════════════ */
+  console.log('\n=== F · PDF-Auftrag ===');
+  const W2 = W.finde('pdf_erstellen');
+  const altGeheim = process.env.PDF_DIENST_SECRET;
+  delete process.env.PDF_DIENST_SECRET;
+  x = ctxMit({ letztesObjekt: 'etw_voll' });
+  r = await W2.fn(x.c, { art: 'bank' });
+  pruef('ohne Dienst: ehrliche Absage, kein Auftrag', r.kein_dienst === true && !x.c.pdfAuftrag);
+  process.env.PDF_DIENST_SECRET = 'probe';
+  x = ctxMit({ letztesObjekt: 'etw_voll' });
+  r = await W2.fn(x.c, { art: 'bank_kurz' });
+  pruef('mit Dienst: Auftrag fuer das Objekt, Datei geht NICHT durchs Modell',
+    x.c.pdfAuftrag && x.c.pdfAuftrag.art === 'bank_kurz' && x.c.pdfAuftrag.objekt_id === 'etw_voll' && !('pdf' in r));
+  x = ctxMit({});
+  r = await W2.fn(x.c, { art: 'bankexport' });
+  pruef('Bankexport braucht kein Objekt', x.c.pdfAuftrag && x.c.pdfAuftrag.art === 'bankexport');
+  markt.berichte = async () => ({ ok: true, berichte: [] });
+  x = ctxMit({ letztesObjekt: 'etw_voll' });
+  r = await W2.fn(x.c, { art: 'marktbericht' });
+  pruef('Marktbericht ohne Bericht: kein Auftrag, kein erfundener Bericht', r.kein_bericht === true && !x.c.pdfAuftrag);
+  markt.berichte = async () => ({ ok: true, berichte: [{ report_id: 349 }, { report_id: 350 }] });
+  x = ctxMit({ letztesObjekt: 'etw_voll' });
+  r = await W2.fn(x.c, { art: 'marktbericht' });
+  pruef('Marktbericht: der LETZTE Bericht wird geholt', x.c.pdfAuftrag && x.c.pdfAuftrag.report_id === 350);
+  r = await W2.fn(ctxMit({}).c, { art: 'gutachten' });
+  pruef('unbekannte Art wird abgewiesen', r.ok === false);
+  x = ctxMit({ angebotObjekt: 'etw_voll', angebotStufe: 2 });
+  antwort = { report_id: 77, data: {} };
+  r = await W.finde('marktbericht_abrufen').fn(x.c, {});
+  pruef('nach dem Abruf kommt der Bericht als Datei, nicht als Link',
+    x.c.pdfAuftrag && x.c.pdfAuftrag.report_id === 77 && !x.c.berichtPdfLink);
+  if (altGeheim) process.env.PDF_DIENST_SECRET = altGeheim; else delete process.env.PDF_DIENST_SECRET;
+
   console.log('\n──────────────────────────────────────────────');
   console.log('DECKUNG: ' + proben + ' Proben, ' + fehler + ' fehlgeschlagen.');
   console.log('KEIN Abruf, keine Datenbank, kein Modell.');

@@ -62,6 +62,10 @@ const HILFE =
   + '„hol mir eine Marktpreisindikation" — oder „erweiterte" oder „Wertermittlung". '
   + 'Vor jedem Abruf frage ich nach, was er aus deinem Kontingent verbraucht.\n\n'
   /* v2960 · Bedienfragen gehen an die Hilfe der App */
+  /* v2961 */
+  + '*PDFs*\n'
+  + '„schick mir das Bank-PDF zur Parkstraße" · „Kurzfassung für Objekt 3" · '
+  + '„den Bankexport" · „den Marktbericht als PDF"\n\n'
   + '*Fragen zur App*\n'
   + '„wie funktioniert der Quick-Check?" · „wo exportiere ich das Bank-PDF?" — '
   + 'ich antworte aus der Hilfe von DealPilot\n\n'
@@ -186,6 +190,47 @@ async function sendenHtml(token, chatId, html) {
     const roh = String(html).replace(/<[^>]+>/g, '')
       .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
     await senden(token, chatId, roh, { parse_mode: undefined, disable_web_page_preview: true });
+  }
+}
+
+/* ── v2961 · PDFs als Datei in den Chat ──────────────────────────────────
+ *
+ * Die Datei kommt vom PDF-Dienst (pdf-dienst/, Headless-Chromium mit der
+ * ECHTEN App) — siehe services/telegramPdfService.js. Hier nur: ansagen,
+ * holen, schicken. Telegram nimmt Dokumente bis 50 MB; gemessen sind es
+ * 0,07 bis 2,9 MB. */
+async function sendenDokument(token, chatId, buf, dateiname, beschriftung) {
+  const fd = new FormData();
+  fd.append('chat_id', String(chatId));
+  if (beschriftung) fd.append('caption', String(beschriftung).slice(0, 1000));
+  fd.append('document', new Blob([buf], { type: 'application/pdf' }), dateiname || 'DealPilot.pdf');
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 60000);
+  try {
+    const r = await fetch(TG + token + '/sendDocument', { method: 'POST', body: fd, signal: ctrl.signal });
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) throw new Error(j.description || ('HTTP ' + r.status));
+  } finally { clearTimeout(t); }
+}
+
+async function pdfAusliefern(token, chatId, userId, auftrag) {
+  const pdf = require('../services/telegramPdfService');
+  await botSagt(token, chatId, userId, 'PDF wird erstellt … _(' + auftrag.name
+    + (auftrag.adresse ? ' · ' + auftrag.adresse : '') + ')_');
+  try { await tgGet(token, 'sendChatAction', { chat_id: chatId, action: 'upload_document' }); } catch (e) {}
+  let r;
+  try {
+    r = await pdf.erzeugen(userId, auftrag.art, auftrag.objekt_id, auftrag.report_id);
+  } catch (e) {
+    await botSagt(token, chatId, userId, pdf.fehlerSatz(e, auftrag.art));
+    return;
+  }
+  try {
+    await sendenDokument(token, chatId, r.pdf, r.dateiname,
+      auftrag.name + (auftrag.adresse ? ' · ' + auftrag.adresse : ''));
+    await verlaufMerken(chatId, userId, 'assistant', 'PDF geschickt: ' + r.dateiname);
+  } catch (e) {
+    await botSagt(token, chatId, userId, 'Das PDF ist fertig, kam aber nicht durch: ' + (e.message || e));
   }
 }
 
@@ -423,6 +468,13 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
    * Woertlich, mit Stufe, Objekt, Verbrauch und Bestand. Sie ist danach
    * die letzte Botzeile — genau die liest die Geldsperre oben. */
   if (ctx.bestaetigung) await botSagt(token, chatId, userId, ctx.bestaetigung);
+  /* v2961 · Ein PDF-Auftrag laeuft NACH der Antwort und blockiert sie nicht. */
+  if (ctx.pdfAuftrag) {
+    const auftrag = ctx.pdfAuftrag;
+    pdfAusliefern(token, chatId, userId, auftrag).catch((e) => {
+      try { console.warn('[telegram v2961] PDF-Auslieferung: ' + (e && e.message)); } catch (_) {}
+    });
+  }
   if (ctx.berichtPdfLink) {
     await botSagt(token, chatId, userId,
       'Den Bericht als PDF: der Link öffnet ihn in DealPilot und speichert das PDF, '

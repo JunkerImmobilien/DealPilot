@@ -3169,6 +3169,49 @@ async function hilfe_suchen(ctx, args) {
   };
 }
 
+/* ═══ v2961 · PDFs ═════════════════════════════════════════════════════
+ * Das Werkzeug ERZEUGT nichts. Es prueft, was gewollt ist, und legt einen
+ * Auftrag ab; der Webhook sagt „PDF wird erstellt …" und schickt die Datei,
+ * sobald der PDF-Dienst sie aus der echten App geholt hat (telegramPdfService).
+ * So wartet das Modell nicht 15 Sekunden auf einen Browser, und die Datei
+ * geht nicht durch das Modell. */
+async function pdf_erstellen(ctx, args) {
+  const pdf = require('./telegramPdfService');
+  const art = String((args && args.art) || '');
+  const A = pdf.ARTEN[art];
+  if (!A) {
+    return { ok: false, hinweis: 'Unbekannte PDF-Art. Moeglich: ' + Object.keys(pdf.ARTEN).join(', ') + '.' };
+  }
+  if (!pdf.verfuegbar()) {
+    return { ok: false, kein_dienst: true, app: pdf.appLink(),
+      hinweis: 'PDFs kann der Bot hier noch nicht erzeugen. Sag das ehrlich und nenne den Weg: '
+             + 'in DealPilot Aktionen › Export (Link "app"). Nichts versprechen.' };
+  }
+  let id = null, adr = null, reportId = null;
+  if (A.objekt) {
+    id = await _findeObjekt(ctx, args);
+    if (!id) return { ok: false, hinweis: 'Kein Objekt gefunden. Frag, fuer welches Objekt.' };
+    ctx.merkeObjekt(id);
+    adr = _adrVon(await dialog.objektKontext(ctx.userId, id)) || null;
+  }
+  if (A.bericht) {
+    const b = await markt.berichte(ctx.userId, id);
+    if (!b.ok) return { ok: false, gilt_fuer: adr, hinweis: 'Die Berichte liessen sich nicht lesen: ' + b.grund };
+    const letzter = b.berichte[b.berichte.length - 1];
+    if (!letzter) {
+      return { ok: false, gilt_fuer: adr, kein_bericht: true,
+        hinweis: 'Fuer dieses Objekt gibt es noch keinen Marktbericht. Biete eine Bewertung an '
+               + '(marktbericht_preis) — erfinde keinen Bericht.' };
+    }
+    reportId = letzter.report_id;
+  }
+  ctx.pdfAuftrag = { art: art, name: A.name, objekt_id: id, adresse: adr, report_id: reportId };
+  return { ok: true, gilt_fuer: adr, art: A.name,
+    hinweis: 'Der Auftrag steht. DealPilot meldet "PDF wird erstellt …" und schickt die Datei '
+           + 'selbst, in der Regel nach 10 bis 30 Sekunden. Sag in EINEM Satz, welches PDF fuer '
+           + 'welches Objekt kommt. Keine Links, keine Wiederholung.' };
+}
+
 /* ═══ KOSTET (braucht Bestaetigung MIT PREIS) ═════════════════════════ */
 
 async function marktbericht_preis(ctx, args) {
@@ -3471,6 +3514,13 @@ async function marktbericht_abrufen(ctx, args) {
      *   > Wertermittlungsdoktrin, egal wie gut sie formuliert ist. */
     const bericht = r.report_md || r.bericht_md || r.markdown || null;
     if (r.report_id) ctx.berichtPdfLink = markt.berichtPdfLink(r.report_id);   /* v2960a */
+    /* v2961 · Gibt es den PDF-Dienst, kommt der Bericht gleich als Datei
+       statt als Link. */
+    if (r.report_id && require('./telegramPdfService').verfuegbar()) {
+      ctx.pdfAuftrag = { art: 'marktbericht', name: (markt.STUFEN[stufe] || {}).name || 'Marktbericht', objekt_id: id,
+        adresse: _adrVon(o), report_id: r.report_id };
+      ctx.berichtPdfLink = null;
+    }
     const stufeInfo = markt.STUFEN[stufe] || markt.STUFEN[1];
 
     return {
@@ -4215,6 +4265,18 @@ const WERKZEUGE = [
     parameter: { type: 'object',
       properties: { frage: { type: 'string', description: 'Die Frage des Nutzers, woertlich' } },
       required: ['frage'], additionalProperties: false } },
+
+  { name: 'pdf_erstellen', stufe: 'lesen', fn: pdf_erstellen,
+    beschreibung: 'Schickt dem Nutzer ein PDF aus DealPilot als Datei in den Chat — dasselbe PDF '
+      + 'wie der Export-Knopf der App. Arten: investment (Investment-PDF, hell), '
+      + 'investment_dunkel (Investment-PDF, Obsidian), bank (Investment Case Bankfassung), '
+      + 'bank_kurz (Kurzfassung), bankexport (alle Darlehen aller Objekte, ohne Objekt), '
+      + 'marktbericht (der letzte Marktbericht des Objekts). Ist unklar, welche Fassung, frag. '
+      + 'Kostet kein Bewertungskontingent.',
+    parameter: { type: 'object',
+      properties: Object.assign({}, OBJEKT_ARGS, { art: { type: 'string',
+        enum: ['investment', 'investment_dunkel', 'bank', 'bank_kurz', 'bankexport', 'marktbericht'] } }),
+      required: ['art'], additionalProperties: false } },
 
   { name: 'marktbericht_preis', stufe: 'lesen', fn: marktbericht_preis,
     beschreibung: 'Was kosten die Bewertungen? Liefert IMMER ALLE DREI Stufen '
