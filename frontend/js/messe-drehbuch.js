@@ -2621,8 +2621,8 @@
     /* v2263 · opt.behalte: Gewonnen-Status bleibt (Modul 14, Bestand) */
     (opt.behalte ? ['_obj_seq'] : ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost']).forEach(function (k) { delete d[k]; });   /* wie dupSaved() */
     if (opt.ohneAnkauf) delete d._ankauf;   /* v2263: ein offener Deal hat noch keinen eingefrorenen Ankauf-Stand */
-    /* v2967 · opt.ankauf: der Ankauf-Stand der KOPIE wird nachgezogen (Modul 14, siehe R14_ANKAUF) -
-       das echte Objekt behält seinen */
+    /* v2967 · opt.ankauf: der Ankauf-Stand der KOPIE wird nachgezogen - das echte Objekt behält
+       seinen. Seit v2968 von keinem Drehbuch benutzt (Modul 14 nimmt den Stand des echten Objekts). */
     if (opt.ankauf && d._ankauf && d._ankauf.daten) {
       Object.keys(opt.ankauf.daten).forEach(function (k) { d._ankauf.daten[k] = opt.ankauf.daten[k]; });
       delete d._ankauf.daten._ds2_categories;   /* rechnet die App beim Laden des Soll neu */
@@ -3288,7 +3288,12 @@
      Erzeugt EINMAL von der App selbst (26.10.2026): Kopie mit dem eingefrorenen Datensatz, darin
      nur Kaufpreis, Darlehen, EK, Nebenkosten-Sätze und Grenzsteuersatz vom heutigen Objekt;
      geladen, gerechnet, DealPilotAnkauf.festschreiben('2024-12-23'), Kopie gelöscht. Mieten,
-     Leerstand und Modernisierung bleiben der Stand beim Kauf. Kein Abruf mit Kosten. */
+     Leerstand und Modernisierung bleiben der Stand beim Kauf. Kein Abruf mit Kosten.
+     v2968 · NICHT MEHR BENUTZT: seit 26.10.2026 trägt das echte Objekt selbst diesen Ankauf-Stand
+     (23.12.2024, KP 395.000 €, Darlehen 324.000 €, Miete 2.321 €, DSCR 1,79, Score 65) und dazu
+     eine eigene Pilot-Analyse im Ankauf-Stand. Die Kopie übernimmt beides unverändert (gemessen:
+     _ankauf.kurz der DB = R14_ANKAUF bis auf CF n. St. 3.626 statt 3.599). Kein anderes Drehbuch
+     nutzt R14_ANKAUF; der Weg opt.ankauf in r6KopieStart bleibt für einen späteren Bedarf. */
   var R14_ANKAUF = {"stichtag":"2024-12-23","kurz":{"kp":395000,"nkm":2321,"_kpis_miete_j":28932,"_kpis_bmy":7.324556962025317,"_kpis_nmy":3.624199873292843,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_steuerwirkung":-1453,"_nkm_qm":5.44,"_leer_einheiten":1,"_kpis_bwk_nul_y":7680,"eigen_r":0,"d1z":4,"_kpis_cf_vs":5052,"geb_ant":54.31,"afa_satz":2},"daten":{"d1":"324000","ek":"262392","kp":"395000","ji_p":"1.5","gba_p":"0.5","grenz":"47.00","gest_p":"6.5","notar_p":"1.7","makler_p":"3.57","_kpis_bmy":7.324556962025317,"_kpis_ltv":66.52977412731006,"_ds2_score":65,"_kpis_dscr":1.785925925925926,"_kpis_cf_ns":3599,"_kpis_cf_vs":5052,"ds2_marktfaktor":"8,2","_dealpilot_score":87,"_kpis_miete_j":28932,"_kpis_nmy":3.624199873292843}};
   var _r14 = { merker: undefined };   /* v2967 · Merker Einfach|Genau des Unterreiters (dp_pa_si_ansicht) */
   function r14Seg(re) { return [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return re.test(b.textContent); })[0] || null; }
@@ -3303,7 +3308,7 @@
     },
     szenen: [
       async function (s) {   /* 1 · das Objekt */
-        await r6KopieStart(R11_PARK, { behalte: true, ankauf: R14_ANKAUF });
+        await r6KopieStart(R11_PARK, { behalte: true });   /* v2968: Ankauf-Stand kommt vom echten Objekt */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         var we = wert('einheiten');
@@ -3381,10 +3386,16 @@
       async function (s) {   /* 9 · Entwicklung in der Pilot-Analyse */
         var k = function () { var x = rhIm('#ai-content', /^PILOT-ANALYSE: ANKAUF GEGEN HEUTE$/); return x && x.closest('.dp-pa-card'); };
         await zeige(k, 8);
-        /* v2967 · die gespeicherte Analyse ist vom 13.10. (Kaufpreis 780.000 €) - keine Empfehlung
-           daraus vorlesen; der Satz sagt, was die Karte selbst sagt (dieselbe Analyse in beiden Spalten) */
+        /* v2968 · seit 26.10.2026 trägt die Parkstr. 9 ZWEI Analysen (Ankauf-Stand und heute, beide
+           mit KP 395.000 €). Empfehlung und empfohlener Kaufpreis werden aus der Tabelle der Karte
+           gelesen (Zeilen „Empfehlung“, „Empfohlener Kaufpreis“: td Wort | Beim Ankauf | Heute).
+           Zeigt die Karte noch dieselbe Analyse in beiden Spalten, bleibt der alte Satz. */
         var t = r6Inner(k()), gleich = /beide Spalten zeigen dieselbe/i.test(t);
-        await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt.' + (gleich ? ' Seit dem Festschreiben kein neuer Abruf — DealPilot sagt das dazu.' : '') + ' Ein neuer Abruf füllt die Spalte „Heute“.', 600);
+        function pz(re) { var c = k(), tr = c ? [].filter.call(c.querySelectorAll('tr'), function (r) { var w = r.querySelector('td.abw-wort'); return w && re.test(r6Text(w)); })[0] : null, td = tr ? tr.querySelectorAll('td') : []; return td.length > 2 ? [r6Text(td[1]), r6Text(td[2])] : null; }
+        var em = pz(/^Empfehlung$/), kp = pz(/^Empfohlener Kaufpreis$/);
+        function sp(i) { return '<b>' + em[i] + '</b>' + (kp && kp[i] && kp[i] !== '–' ? ', empfohlener Kaufpreis <b>' + kp[i] + '</b>' : ''); }
+        if (gleich || !em) await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt.' + (gleich ? ' Seit dem Festschreiben kein neuer Abruf — DealPilot sagt das dazu.' : '') + ' Ein neuer Abruf füllt die Spalte „Heute“.', 600);
+        else await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Beim Ankauf: ' + sp(0) + '. Heute: ' + sp(1) + '. Beide Analysen bleiben nebeneinander stehen.', 600);
       }
     ]
   };
