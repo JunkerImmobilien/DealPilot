@@ -1825,7 +1825,10 @@ async function callOpenAI(prompt, opts) {
 
        12000 statt 8000. Die Kappe bleibt eine Kappe — sie soll nur nicht
        vor dem Ende der Aufgabenliste greifen. */
-    max_output_tokens: 16000,   /* v2166: laengere Texte; gpt-4o-mini erlaubt 16.384 */
+    /* v2986 · Hüllhorst 27.10.2026: mit den Bestandsfeldern (Anschlussfinanzierung, Exit-Strategien)
+       riss die Antwort bei 16.000 ab (31.011 Zeichen, JSON-Parse fehlgeschlagen), der zweite Anlauf
+       kam nach dem Zeitlimit des Browsers. gpt-4.1 erlaubt 32.768 Ausgabe-Tokens, gpt-4o-mini 16.384. */
+    max_output_tokens: /4o-mini/i.test(String(model || '')) ? 16000 : 32000,
     /* v1264: Web-Suche abschaltbar. Additiv — wer die Option nicht setzt,
        bekommt sie weiter, also ändert sich für alle bestehenden Aufrufer
        nichts. Gebraucht wird das für Nachbearbeitungs-Aufrufe, die einen
