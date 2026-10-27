@@ -585,7 +585,19 @@
     const parabel = calcParabel(alter, gnd);
     const kernsaniert = input.kernsaniert === true;
     const punktraster = calcPunktraster(alter, gnd, modPoints, kernsaniert);
-    const technisch = calcTechnisch(alter, gnd, gewerke, weights, gewerkeRLD);
+    /* v2975 · DIE TECHNIK RECHNET VOM MODELL BEI 0 PUNKTEN AUS, NICHT VON GND - ALTER.
+       Marcel 27.10.2026 („ja bau das so"), nach Recherche (ImmoWertA zu Anlage 2 II.5,
+       BFH IX R 25/19 und IX R 14/23, BTE-Arbeitsblatt, Heid): eine Bauteilrechnung auf
+       GND - Alter faellt zur GND hin auf 0 (Homepage 26B0025: Bj 1947 1,5 J., ab 1946
+       keine Zahl); die Literatur laesst alte Substanz nie auf 0 fallen. Basis ist deshalb
+       die RND nach Anlage 2 mit 0 Punkten (Alter hoechstens GND). Unter der Schwelle ist
+       das GND - Alter, die Gutachten Am Markt 18/9 bleiben unberuehrt. Gerechnet wird ueber
+       ein Ersatzalter (GND - Basis), denn calcTechnisch kennt nur „GND - Alter". */
+    const punktraster0 = modPoints === 0 ? punktraster
+      : calcPunktraster(alter, gnd, 0, kernsaniert);
+    const basisModell0 = Math.max(0, punktraster0.restnutzungsdauer);
+    const technisch = calcTechnisch(Math.max(0, gnd - basisModell0), gnd, gewerke, weights, gewerkeRLD);
+    technisch.basis_herkunft = 'RND nach Anlage 2 ImmoWertV mit 0 Modernisierungspunkten (' + round2(basisModell0) + ' Jahre)';
 
     const schadensInfo = processSchaeden(schaeden);
 
@@ -655,10 +667,36 @@
        am unterschriebenen Gutachten Am Markt 18 (25DG02661): dort gilt unter der Schwelle
        die technische RND 26 J., nicht GND - Alter 40 J. (rnd-gutachten-test.mjs). Ob ueber
        der Schwelle die Technik ebenfalls fuehren soll, ist Marcels Fachfrage (Journal v2974). */
-    if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
+    /* v2975 · VERFAHRENSWAHL (Marcel 27.10.2026, Recherche im Journal v2975):
+         ab 1 Punkt   Anlage 2 fuehrt durchgehend - unter der Schwelle GND - Alter,
+                      darueber die Formel, ueber der GND Alter = GND (ImmoWertA II.5).
+                      So rechnen die Gutachten Alexanderstr. (33) und Westerfeldstr. (16).
+                      Die Technik prueft (Abweichung >= 20 % wird gemeldet).
+         0 Punkte     das Niedrigere aus Technik (Basis: Anlage 2 mit 0 Punkten) und
+                      Modell - Am Markt 18 (26) und Am Markt 9 (22). Die Technik darf
+                      die RND nur KUERZEN: ein Gebaeude ohne Modernisierung bekommt
+                      durch „erneuerte" Gewerke nicht mehr als das Modell, sonst gaebe
+                      1 Punkt weniger als 0 (gemessen 507 Rasterfaelle).
+       Ergebnis rnd-strecke-pruefen: nie keine Zahl, aelter nie mehr, mehr Punkte nie
+       weniger, groesster Sprung 1,1 J. (vorher mit Gewerken 28 J.). */
+    const modellFuehrt = modPoints >= 1
+      && (punktraster.anwendbar || punktraster.grenze === 'unter_schwelle')
+      && punktraster.restnutzungsdauer > 0;
+    const technikKuerzt = modPoints === 0 && punktraster.restnutzungsdauer > 0
+      && recommendedNachSchaden != null && recommendedNachSchaden < punktraster.restnutzungsdauer - 0.005;
+    if (technikKuerzt) {
+      final = recommendedNachSchaden;
+      verfahren = 'technisch';
+      finalSource = (applySchadensAbschlag && schadensInfo.gesamtAbschlag_pct > 0
+        ? 'technische Alterswertminderung + Schadensabschlag (-' + schadensInfo.gesamtAbschlag_pct + '%)'
+        : 'technische Alterswertminderung')
+        + ' - Basis Anlage 2 mit 0 Punkten, niedriger als das Modellergebnis';
+    } else if (modellFuehrt || (modPoints === 0 && punktraster.restnutzungsdauer > 0)) {
       final = punktraster.restnutzungsdauer;
       verfahren = 'punktraster';
-      finalSource = 'Punktrastermethode (Anlage 2 ImmoWertV) - Modellergebnis';
+      finalSource = punktraster.grenze === 'unter_schwelle'
+        ? 'Anlage 2 ImmoWertV - unter der Schwelle: Gesamtnutzungsdauer minus Alter (Modellergebnis)'
+        : 'Punktrastermethode (Anlage 2 ImmoWertV) - Modellergebnis';
       /* Schritt 5: die Technik prueft das Modell, ersetzt es nicht. */
       if (basisTechnisch > 0 && recommendedNachSchaden != null) {
         const abw = recommendedNachSchaden - final;

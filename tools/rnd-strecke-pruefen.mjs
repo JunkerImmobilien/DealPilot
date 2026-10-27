@@ -91,9 +91,9 @@ for (const o of OBJ) {
 console.log('\nTEIL B · Raster Baujahr 1850–' + JAHR + ' × Punkte 0–20 × GND 60/70/80 × Gewerke (keine / alle erneuert / alle veraltet)\n');
 /* TOL: an der Schwelle liegt die Formel der Anlage 2 bis 0,14 J. unter GND - Alter (gemessen
    27.10.2026, GND 80, 3 P., Bj 1982/83: 37,14 / 37,00) - Eigenschaft der Verordnungstabelle.
-   MIT Gewerken fuehrt unter der Schwelle die technische RND (so im Gutachten Am Markt 18,
-   25DG02661) und ueber ihr das Modell; die Spruenge dort sind Marcels offene Fachfrage,
-   kein Kernfehler - sie werden als HINWEIS gezaehlt und gezeigt, nicht verschwiegen. */
+   Seit v2975 gelten alle Invarianten auch MIT Gewerken (Verfahrenswahl: ab 1 Punkt
+   Anlage 2, bei 0 Punkten das Niedrigere aus Technik [Basis Anlage 2 mit 0 Punkten] und
+   Modell). Vorher sprang die RND mit Gewerken an der Schwelle um bis zu 28 J. */
 const TOL = 0.15;
 const N = { b1: 0, b2: 0, b3: 0, b4: 0, b5: 0, b6: 0, h: 0, faelle: 0 };
 const BEISP = { b1: [], b2: [], b3: [], b4: [], b5: [], b6: [], h: [] };
@@ -107,7 +107,7 @@ for (const gnd of [60, 70, 80]) for (const grad of [null, 'erneuert', 'veraltet'
     const wo = 'GND ' + gnd + ', ' + (grad || 'ohne Gewerke') + ', Bj ' + bj + ', ' + p + ' P.';
     if (!(a.final_rnd > 0) || a.verfahren === 'keines') merk('b1', wo + ': ' + a.verfahren);
     /* der Deckel gilt fuer die STRECKUNG - GND minus Alter darf darueber liegen */
-    if (a.final_rnd > Math.max(0.70 * gnd, gnd - (JAHR - bj)) + 0.01) merk(grad ? 'h' : 'b5', wo + ': ' + r1(a.final_rnd) + ' > ' + r1(Math.max(0.7 * gnd, gnd - (JAHR - bj))));
+    if (a.final_rnd > Math.max(0.70 * gnd, gnd - (JAHR - bj)) + 0.01) merk('b5', wo + ': ' + r1(a.final_rnd) + ' > ' + r1(Math.max(0.7 * gnd, gnd - (JAHR - bj))));
     if (!grad) {
       const w = wert(bj, p, gnd).rnd;
       const soll = Math.min(gnd - 10, Math.max(a.final_rnd, 10));
@@ -117,24 +117,22 @@ for (const gnd of [60, 70, 80]) for (const grad of [null, 'erneuert', 'veraltet'
   for (let p = 0; p <= 20; p++) for (let bj = 1851; bj <= JAHR; bj++) {
     const alt = tab[p + '|' + (bj - 1)], neu = tab[p + '|' + bj];   /* bj-1 ist das AELTERE Haus */
     const wo = 'GND ' + gnd + ', ' + (grad || 'ohne Gewerke') + ', ' + p + ' P., Bj ' + (bj - 1) + '→' + bj;
-    if (alt > neu + TOL) merk(grad ? 'h' : 'b2', wo + ': älter mehr ' + r1(alt) + ' > ' + r1(neu));
+    if (alt > neu + TOL) merk('b2', wo + ': älter mehr ' + r1(alt) + ' > ' + r1(neu));
     const s = Math.abs(neu - alt);
-    if (!grad && s > maxSprung) { maxSprung = s; maxSprungWo = wo + ': ' + r1(alt) + ' → ' + r1(neu); }
-    if (s > 2) merk(grad ? 'h' : 'b4', wo + ': Sprung ' + r1(alt) + ' → ' + r1(neu));
+    if (s > maxSprung) { maxSprung = s; maxSprungWo = wo + ': ' + r1(alt) + ' → ' + r1(neu); }
+    if (s > 2) merk('b4', wo + ': Sprung ' + r1(alt) + ' → ' + r1(neu));
   }
   for (let bj = 1850; bj <= JAHR; bj++) for (let p = 1; p <= 20; p++) {
     if (tab[(p - 1) + '|' + bj] > tab[p + '|' + bj] + TOL)
-      merk(grad ? 'h' : 'b3', 'GND ' + gnd + ', ' + (grad || 'ohne Gewerke') + ', Bj ' + bj + ': ' + (p - 1) + ' P. ' + r1(tab[(p - 1) + '|' + bj]) + ' > ' + p + ' P. ' + r1(tab[p + '|' + bj]));
+      merk('b3', 'GND ' + gnd + ', ' + (grad || 'ohne Gewerke') + ', Bj ' + bj + ': ' + (p - 1) + ' P. ' + r1(tab[(p - 1) + '|' + bj]) + ' > ' + p + ' P. ' + r1(tab[p + '|' + bj]));
   }
 }
-const T = { b1: 'B1 immer eine Zahl > 0', b2: 'B2 älter nie mehr RND (ohne Gewerke, Tol. 0,15 J.)', b3: 'B3 mehr Punkte nie weniger (ohne Gewerke, Tol. 0,15 J.)',
-  b4: 'B4 kein Sprung > 2 J. je Baujahr (ohne Gewerke)', b5: 'B5 Deckel 70 % GND oder GND − Alter (ohne Gewerke)', b6: 'B6 App = Wertermittlung (ohne Gewerke)' };
+const T = { b1: 'B1 immer eine Zahl > 0', b2: 'B2 älter nie mehr RND (Tol. 0,15 J.)', b3: 'B3 mehr Punkte nie weniger (Tol. 0,15 J.)',
+  b4: 'B4 kein Sprung > 2 J. je Baujahr', b5: 'B5 Deckel 70 % GND oder GND − Alter', b6: 'B6 App = Wertermittlung (ohne Gewerke)' };
 for (const k of Object.keys(T)) {
   zeile(N[k] === 0, T[k] + ' — ' + N[k] + ' Verstöße');
   BEISP[k].forEach((t) => console.log('           z. B. ' + t));
 }
-console.log((N.h ? '  HINWEIS' : '  ok    ') + ' Fachfrage (mit Gewerken): Technik unter, Modell über der Schwelle — ' + N.h + ' Stellen');
-BEISP.h.forEach((t) => console.log('           z. B. ' + t));
-console.log('\n  Deckung: ' + N.faelle + ' Fälle; größter Sprung je Baujahr ohne Gewerke ' + r1(maxSprung) + ' J. (' + maxSprungWo + ')');
+console.log('\n  Deckung: ' + N.faelle + ' Fälle; größter Sprung je Baujahr ' + r1(maxSprung) + ' J. (' + maxSprungWo + ')');
 console.log('\n' + (fehler ? 'ERGEBNIS: ' + fehler + ' Befund(e)' : 'ERGEBNIS: sauber'));
 process.exit(fehler ? 1 : 0);
