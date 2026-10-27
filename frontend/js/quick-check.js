@@ -519,7 +519,16 @@
       if (afaSatzEl && gebAntEl) {
         var afaSatz = parseDe(afaSatzEl.value || '2') || 2;
         var gebAnt = parseDe(gebAntEl.value || '0') || 0;
-        if (gebAnt > 0) afaQc = kp * (gebAnt / 100) * (afaSatz / 100);
+        /* v3006b · Bemessungsgrundlage sind die Gebaeude-ANSCHAFFUNGSKOSTEN mit den anteiligen
+           Erwerbsnebenkosten, ohne Inventar - dieselbe Rechnung wie im Reiter Investition
+           (DealKpis.gebaeudeAhk). Bis v3006a: kp x geb_ant, ohne Nebenkosten. */
+        var _invQc = 0;
+        var _invE1 = document.getElementById('inv_kueche'), _invE2 = document.getElementById('moebl');
+        _invQc = Math.max(0, _invE1 ? (parseDe(_invE1.value || '0') || 0) : 0, _invE2 ? (parseDe(_invE2.value || '0') || 0) : 0);
+        var _ahkQc = (window.DealKpis && DealKpis.gebaeudeAhk)
+          ? DealKpis.gebaeudeAhk({ kp: kp, nk: knkAbs, gebAntPct: gebAnt, inventar: _invQc }).gebAhk
+          : (kp + knkAbs) * (gebAnt / 100);
+        if (gebAnt > 0) afaQc = _ahkQc * (afaSatz / 100);
       }
       var grenzEl = document.getElementById('grenz');
       if (grenzEl) grenzQc = parseDe(grenzEl.value || '0') || 0;

@@ -1372,9 +1372,16 @@ function _computeAutoForYear(yearIdx, year) {
   var afa_parsed_for_san = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(afa_sel_val) : { methode: 'linear', satzPct: parseDe(afa_sel_val) || 2 };
   var afa_satz_pct = afa_parsed_for_san.satzPct;
   // Effektive Nutzungsdauer für anschaffungsnahe HK:
-  var afa_nutzungsdauer = (afa_parsed_for_san.methode === 'linear')
-    ? Math.round(100 / afa_satz_pct)
-    : 33;  // Degressiv → Wohnbau-Neubau-Nutzungsdauer
+  /* v3006b · KEIN RUNDEN DES KEHRWERTS. Anschaffungsnahe HK sind Herstellungskosten des
+     Gebaeudes und laufen mit dessen Satz (§ 7 Abs. 4 EStG). Bis v3006a stand hier
+     Math.round(100 / Satz): bei 3 % 33 Jahre, also 3,03 % im Jahr - 60.000 € gaben
+     1.818,18 statt 1.800 € und waren nach 33 Jahren zu Ende statt nach 33 1/3.
+     Jetzt: Jahresbetrag = Betrag x Satz, das letzte Jahr nimmt den Rest
+     (3 %: 33 volle Jahre, im 34. Jahr 1 %). 2 % und 2,5 % gehen glatt auf (50/40).
+     Degressiv: weiter die Naeherung mit 3 % linear (bis v3006a: 33 Jahre). */
+  var afa_satz_eff = (afa_parsed_for_san.methode === 'linear' && afa_satz_pct > 0) ? afa_satz_pct : 3.0;
+  var afa_nd_exakt = 100 / afa_satz_eff;                       /* 33,33 / 40 / 50 */
+  var afa_nutzungsdauer = Math.ceil(afa_nd_exakt - 1e-9);      /* Jahre mit Abschreibung */
   /* v2890 · DIE 15-%-GRENZE AUS DERSELBEN RECHNUNG WIE IM TAB INVESTITION.
      Hier stand `kp × 0,15`, verglichen mit dem Bruttobetrag. calc.js rechnet
      seit v1261 richtig (§ 6 Abs. 1 Nr. 1a EStG): 15 % der Gebaeude-
@@ -1403,23 +1410,30 @@ function _computeAutoForYear(yearIdx, year) {
        Wahlrecht und steht in der Auswahl daneben - bis v2890 verteilte die
        Automatik stillschweigend auf 5 Jahre. */
     sanLaufzeit = sanAnschaffungsnah ? afa_nutzungsdauer : 1;
-    sanAfaJaehrlich = san_inp / sanLaufzeit;
+    sanAfaJaehrlich = sanAnschaffungsnah ? (san_inp * afa_satz_eff / 100) : san_inp;   /* v3006b */
   } else if (sanYearsChoice === '50') {
     // Manuell: anschaffungsnah, also Gebäude-AfA-Nutzungsdauer
     sanAnschaffungsnah = true;
     sanLaufzeit = afa_nutzungsdauer;
-    sanAfaJaehrlich = san_inp / sanLaufzeit;
+    sanAfaJaehrlich = san_inp * afa_satz_eff / 100;   /* v3006b */
   } else {
     // Manuell: feste Jahresanzahl als Erhaltungsaufwand
     sanAnschaffungsnah = false;
     sanLaufzeit = parseInt(sanYearsChoice);
     sanAfaJaehrlich = san_inp / sanLaufzeit;
   }
-  var sanThisYear = (sanLaufzeit > 0 && yearIdx < sanLaufzeit) ? sanAfaJaehrlich : 0;
+  /* v3006b: das letzte Jahr nimmt nur den Rest (bei 3 %: 1 % im 34. Jahr) */
+  var sanThisYear = (sanLaufzeit > 0 && yearIdx < sanLaufzeit)
+    ? Math.max(0, Math.min(sanAfaJaehrlich, san_inp - sanAfaJaehrlich * yearIdx)) : 0;
 
   // MÖBLIERUNG
   var moeblLaufzeit = moeblYearsChoice;
-  var moeblPerYear = moeblActive ? (moebl_inp / moeblLaufzeit) : 0;
+  /* v3006b · Das Inventar traegt seinen Anteil an den Erwerbsnebenkosten (Verteilung im
+     Verhaeltnis der Kaufpreisanteile, DealKpis.gebaeudeAhk). Bis v3006a lag dieser Anteil
+     in Gebaeude und Boden, und die Inventar-AfA lief auf dem nackten Betrag. */
+  var _nkQ = (window.State && State._ahk && isFinite(State._ahk.nkQuote)) ? State._ahk.nkQuote : 0;
+  var moeblBasis = moebl_inp * (1 + _nkQ);
+  var moeblPerYear = moeblActive ? (moeblBasis / moeblLaufzeit) : 0;
   var moeblThisYear = (moeblActive && yearIdx < moeblLaufzeit) ? moeblPerYear : 0;
 
   // Einnahmen: Nettokaltmiete + zusätzliche Einnahmen (z.B. Stellplatz, Garage)

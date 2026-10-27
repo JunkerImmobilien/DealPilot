@@ -199,6 +199,11 @@ function kpis(eingabe) {
   return _oder_wirf().DealKpis.compute(eingabe || {});
 }
 
+/** v3006b · DealKpis.gebaeudeAhk() der App - Gebaeude-AHK mit anteiligen Nebenkosten, ohne Inventar. */
+function gebaeudeAhk(eingabe) {
+  return _oder_wirf().DealKpis.gebaeudeAhk(eingabe || {});
+}
+
 /** Dscr.compute() der App. */
 function dscr(eingabe) {
   return _oder_wirf().Dscr.compute(eingabe || {});
@@ -295,6 +300,7 @@ function herkunft() {
 
 module.exports = {
   kpis, dscr, score, stufe, heuristik,
+  gebaeudeAhk,                 /* v3006b */
   heuristikTeil,               /* v1936 — stufensatz / kennzahlenAmpel / kategorien */
   rnd, rndAusObjekt, rndAfaVergleich,   /* v2071 — Restnutzungsdauer */
   vorhanden, herkunft,

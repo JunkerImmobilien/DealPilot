@@ -1485,8 +1485,12 @@ function renderVarImpact(){
   var afaBmf = gebAkBmf * afaSatz/100;
   var deltaAfa = afaChosen - afaBmf;
   var deltaSpar = deltaAfa * grenz;
-  var rnd = Math.round(100/afaSatz);
-  var deltaTotal = deltaSpar * rnd;
+  /* v3006b · Kehrwert ohne Runden: ueber die ganze Nutzungsdauer wird genau die
+     Mehr-AfA abgeschrieben, also deltaSpar x 100/Satz (3 %: x 33 1/3, nicht x 33). */
+  var rndExakt = afaSatz > 0 ? 100 / afaSatz : 50;
+  var rnd = (Math.abs(rndExakt - Math.round(rndExakt)) < 1e-9) ? String(Math.round(rndExakt))
+    : (Math.abs(rndExakt - 100 / 3) < 1e-9 ? '33⅓' : rndExakt.toFixed(1).replace('.', ','));
+  var deltaTotal = deltaSpar * rndExakt;
 
   var txtEl = $('varImpactText');
   if(!txtEl) return;

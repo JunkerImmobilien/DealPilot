@@ -1028,8 +1028,14 @@ function _calcImmediate(){
   } catch (_eGs) {}
   State.gs_kosten_ak = _gsKosten;
   nkGesamt = Math.max(0, nkGesamt - _gsKosten);
-  var nkGebAnteil = nkGesamt * gebQuoteOhneK;
-  var gebAHK = gebOhneK + nkGebAnteil;
+  /* v3006b · Gebaeude-AHK aus dem Kern (DealKpis.gebaeudeAhk, auch Quick-Check und Bot):
+     die Nebenkosten verteilen sich jetzt anteilig auf Grundstueck UND Inventar. Bis v3006a
+     ging der Inventaranteil der Nebenkosten mit in Gebaeude und Boden (nkGesamt x geb_ant). */
+  var _ahkK = (window.DealKpis && DealKpis.gebaeudeAhk)
+    ? DealKpis.gebaeudeAhk({ kp: kp, nk: nkGesamt, gebAntPct: gebAnt * 100, inventar: kuecheVal })
+    : { gebKp: gebOhneK, nkGeb: nkGesamt * gebQuoteOhneK, gebAhk: gebOhneK + nkGesamt * gebQuoteOhneK, nkInv: 0, nkQuote: kp > 0 ? nkGesamt / kp : 0 };
+  var nkGebAnteil = _ahkK.nkGeb;
+  var gebAHK = _ahkK.gebAhk;
   var sanLimit = gebAHK * 0.15;
 
   var sanIst = v('san');
@@ -1075,9 +1081,12 @@ function _calcImmediate(){
     var _p = (window.Afa && Afa.parseSelectValue)
       ? Afa.parseSelectValue(_sel)
       : { methode: 'linear', satzPct: parseDe(_sel) || 2 };
-    if (_p.methode !== 'linear') return 33;
-    var _s = _p.satzPct;
-    return (_s > 0) ? Math.round(100 / _s) : 50;
+    /* v3006b · ohne Runden: 3 % sind 33 1/3 Jahre, nicht 33 (tax.js rechnet seit v3006b mit dem Satz) */
+    var _s = (_p.methode !== 'linear') ? 3.0 : _p.satzPct;
+    if (!(_s > 0)) return '50';
+    var _nd = 100 / _s;
+    return (Math.abs(_nd - Math.round(_nd)) < 1e-9) ? String(Math.round(_nd))
+      : (Math.abs(_nd - 100 / 3) < 1e-9 ? '33⅓' : _nd.toFixed(1).replace('.', ','));
   })();
   var sanStatusEl = el('san_limit_status');
   if (sanStatusEl) {
@@ -1166,7 +1175,7 @@ function _calcImmediate(){
         if (kuecheRow) kuecheRow.style.display = 'none';
         if (gebNettoRow) gebNettoRow.style.display = 'none';
       }
-      st('ahk_nk_anteil', fE(nkGebAnteil, 0) + ' (= ' + (gebQuoteOhneK*100).toFixed(1).replace('.', ',') + ' % der NK'
+      st('ahk_nk_anteil', fE(nkGebAnteil, 0) + ' (= ' + ((nkGesamt > 0 ? nkGebAnteil / nkGesamt : gebQuoteOhneK)*100).toFixed(1).replace('.', ',') + ' % der NK'
         + (_gsKosten > 0 ? ' ohne ' + fE(_gsKosten, 0) + ' Grundschuld' : '') + ')');   /* v3006 */
       st('ahk_basis', fE(gebAHK, 0));
       st('ahk_15pct', fE(sanLimit, 0));
@@ -1182,7 +1191,9 @@ function _calcImmediate(){
       sanLimit:      sanLimit,
       kuecheVal:     kuecheVal,
       kuecheActive:  kuecheActive,
-      gebQuoteOhneK: gebQuoteOhneK
+      gebQuoteOhneK: gebQuoteOhneK,
+      nkInv:         _ahkK.nkInv,     /* v3006b: Nebenkosten, die auf das Inventar entfallen */
+      nkQuote:       _ahkK.nkQuote    /* v3006b: Nebenkosten (ohne Grundschuld) je Euro Kaufpreis */
     };
   }
   /* ═══ v1313 · Der Erbbau-Abschlag greift VOR jedem Wertvergleich ═══════

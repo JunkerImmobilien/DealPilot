@@ -241,5 +241,44 @@ window.DealKpis = (function() {
     };
   }
 
-  return { compute: compute };
+  /* ═══ v3006b · GEBAEUDE-ANSCHAFFUNGSKOSTEN, EINE RECHNUNG ══════════════════
+     Bemessungsgrundlage der Gebaeude-AfA (§ 7 Abs. 4 EStG) sind die
+     Anschaffungskosten des Gebaeudes EINSCHLIESSLICH der anteiligen
+     Erwerbsnebenkosten (§ 255 Abs. 1 HGB). Bis v3006a stand die Formel dreimal:
+     calc.js (mit Nebenkosten), quick-check.js (OHNE Nebenkosten: kp x geb_ant x
+     Satz) und agentWerkzeuge.js (mit Nebenkosten, ohne Inventar). Jetzt hier,
+     und alle drei lesen sie.
+
+     Inventar (Kueche, Moebel), das im Kaufpreis steckt und ausgewiesen ist,
+     ist ein eigenes Wirtschaftsgut: es kommt VOR der Aufteilung Gebaeude/Boden
+     vom Kaufpreis ab, und die Nebenkosten verteilen sich im Verhaeltnis der
+     Kaufpreisanteile auf Grundstueck und Inventar. Bis v3006a lief der Anteil
+     der Nebenkosten, der auf das Inventar entfaellt, mit in Gebaeude und Boden.
+
+     Eingabe: kp (€), nk (€, alle Erwerbsnebenkosten), gebAntPct (0-100),
+       inventar (€, im Kaufpreis enthalten, default 0), nkAbzug (€, Nebenkosten,
+       die keine Anschaffungskosten sind - die Grundschuld, calc.js v3006).
+     Liest keine Einstellung und kein DOM. */
+  function gebaeudeAhk(i) {
+    i = i || {};
+    var kp = +i.kp || 0;
+    var geb = (i.gebAntPct == null || !isFinite(+i.gebAntPct)) ? 0 : (+i.gebAntPct / 100);
+    var inv = Math.max(0, +i.inventar || 0);
+    if (inv > kp * geb) inv = kp * geb;            /* wie calc.js: nie mehr als der Gebaeudeanteil */
+    var nk = Math.max(0, (+i.nk || 0) - Math.max(0, +i.nkAbzug || 0));
+    var kpOhneInv = kp - inv;
+    var anteilImmo = kp > 0 ? kpOhneInv / kp : 1;
+    var nkImmo = nk * anteilImmo;
+    var nkInv = nk - nkImmo;
+    var gebKp = kpOhneInv * geb;
+    var nkGeb = nkImmo * geb;
+    return {
+      kpOhneInv: kpOhneInv, inventar: inv,
+      gebKp: gebKp, nkGeb: nkGeb, gebAhk: gebKp + nkGeb,
+      nkImmo: nkImmo, nkInv: nkInv, invAk: inv + nkInv,
+      nkQuote: kp > 0 ? nk / kp : 0                 /* Nebenkosten je Euro Kaufpreis */
+    };
+  }
+
+  return { compute: compute, gebaeudeAhk: gebaeudeAhk };
 })();

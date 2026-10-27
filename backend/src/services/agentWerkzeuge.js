@@ -2274,8 +2274,12 @@ async function objekt_schnellblick(ctx, args) {
     /* AfA und Grenzsteuersatz nur, wenn sie am Objekt stehen — sonst 0,
        dann ist der Cashflow vor Steuer gleich dem nach Steuer. */
     const gebAnt = dez(d.geb_ant), afaSatz = dez(d.afa_satz);
+    /* v3006b · Gebaeude-AHK aus dem Kern der App (DealKpis.gebaeudeAhk): Nebenkosten anteilig,
+       Inventar (moebl / inv_kueche) vor der Aufteilung abgezogen. Bis v3006a (kp + NK) x geb_ant. */
+    const _invB = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
     const afa = (gebAnt != null && gebAnt > 0)
-      ? (kp + knkSumme) * (gebAnt / 100) * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
+      ? rechenkerne.gebaeudeAhk({ kp: kp, nk: knkSumme, gebAntPct: gebAnt, inventar: _invB }).gebAhk
+        * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
     /* v3006 · LTV-Basis wie die App (calc.js v2996, deal-kpis v3006): der Wert mit
        seiner Herkunft, die Bankbewertung getrennt. Ohne gespeicherte Herkunft gilt
        „eigene" - so liest calc.js ein Objekt ohne Auswahl (ohne Marktbericht-Vermerk). */
@@ -2387,11 +2391,17 @@ async function objekt_schnellblick(ctx, args) {
   if (!zins || !tilg) scoreFehlt.push('Zinssatz und Tilgung');
   if (!bwkDa) scoreFehlt.push('Hausgeld bzw. Bewirtschaftungskosten');
 
-  const svw2 = wertangabe(d).wert || 0;   /* v3003a */
+  /* v3006b · Dieselbe Herkunftsregel wie Kachel und Score (calc.js wp / wp_kpi): eine
+     Marktpreisindikation aus Angebotspreisen traegt keinen Wertpuffer. Bis v3006a rechnete der
+     Schnellblick sie als „Verkehrswert minus Kaufpreis“. Ohne Wertangabe bleibt die
+     5-%-Annahme des Quick-Checks. */
+  const _wa2 = wertangabe(d);
+  const svwIndikation = (_wa2.wert || 0) > 0 && _wa2.herkunft === 'indikation';
+  const svw2 = svwIndikation ? 0 : (_wa2.wert || 0);   /* v3003a */
   /* Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
      Ohne Verkehrswert nimmt der Quick-Check 5 % vom Kaufpreis an — das
      ist eine ANNAHME und steht als solche im Ergebnis. */
-  const wp = svw2 > 0 ? svw2 - kp : kp * 0.05;
+  const wp = svw2 > 0 ? svw2 - kp : (svwIndikation ? 0 : kp * 0.05);
 
   /* ── 1 · WELCHER SCORE GILT — genau einer ─────────────────────────────
    * Liegt ein in DealPilot gerechneter vor, gilt DIESER, und es wird kein
@@ -2542,8 +2552,11 @@ async function objekt_schnellblick(ctx, args) {
           + '. Sie werden nicht geschaetzt — frag danach.',
       wertpuffer: !K ? undefined : (svw2 > 0
         ? eur(wp) + '  (Verkehrswert ' + eur(svw2) + ' minus Kaufpreis)'
-        : eur(wp) + '  ANGENOMMEN: 5 % vom Kaufpreis, weil kein Verkehrswert '
-          + 'hinterlegt ist. Sag das dem Nutzer.'),
+        : svwIndikation
+          ? 'keiner: am Objekt steht nur eine Marktpreisindikation aus Angebotspreisen, '
+            + 'die traegt keinen Wertpuffer (wie in der App). Sag das dem Nutzer.'
+          : eur(wp) + '  ANGENOMMEN: 5 % vom Kaufpreis, weil kein Verkehrswert '
+            + 'hinterlegt ist. Sag das dem Nutzer.'),
       /* ── DIE HEURISTIK, VOLLUMFAENGLICH ──────────────────────────────
        *
        * v1936. Marcel am 07.10.2026: „beim Quickcheck geben wir doch immer
@@ -2657,8 +2670,11 @@ async function objekt_schnellblick(ctx, args) {
           : 'Bei den Kaufnebenkosten fehlt ein Posten; Darlehen und Kapitaldienst '
             + 'sind dadurch eher zu niedrig.',
         (svw2 > 0) ? null
-          : 'Es ist kein Verkehrswert hinterlegt; der Wertpuffer ist mit 5 % vom '
-            + 'Kaufpreis ANGENOMMEN, nicht gemessen.',
+          : svwIndikation
+            ? 'Am Objekt steht nur eine Marktpreisindikation aus Angebotspreisen; sie traegt '
+              + 'keinen Wertpuffer, er geht mit 0 in die Bewertung.'
+            : 'Es ist kein Verkehrswert hinterlegt; der Wertpuffer ist mit 5 % vom '
+              + 'Kaufpreis ANGENOMMEN, nicht gemessen.',
         bwkDa ? null
           : 'Am Objekt ist keine Bewirtschaftung hinterlegt. Der Cashflow ist '
             + 'dadurch ZU HOCH — die nicht umlagefaehigen Kosten fehlen darin.',
