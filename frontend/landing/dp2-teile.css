@@ -678,7 +678,7 @@ footer .mark-gross .wort{font-size:21px}
      "Nachlegen" 35, "Guthaben aufladen" 37. */
 @media(max-width:640px){
   .mx{min-width:470px;font-size:12px}
-  .mx th,.mx td{padding:10px 6px}
+  .mx th,.mx td{padding:9px 6px;line-height:1.35}
   .mx thead th{font-size:9.5px;letter-spacing:.08em}
   .mx .wert{font-size:10.5px;line-height:1.35}
   .mx th:first-child,.mx td:first-child{position:sticky;left:0;z-index:1;width:118px;min-width:118px;

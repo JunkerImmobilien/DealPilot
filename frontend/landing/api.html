@@ -6,8 +6,8 @@
 <title>API · DealPilot</title>
 <meta name="description" content="Die DealPilot REST-API: Objekte programmatisch anlegen, lesen, ändern und löschen. JSON über HTTPS, Header X-API-Key, 120 Anfragen pro Minute. Enthalten im Pro- und im Partner-Plan.">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="dp2.css?v=v2971a">
-<link rel="stylesheet" href="dp2-teile.css?v=v2971a">
+<link rel="stylesheet" href="dp2.css?v=v2971b">
+<link rel="stylesheet" href="dp2-teile.css?v=v2971b">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    API-Dokumentation aus frontend/landing/index.html Z.1348-1446 (7 Kapitel).
@@ -63,7 +63,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .fldt td{padding:6px 10px;border-top:1px solid rgba(127,127,127,.16);font-size:13px;vertical-align:top}
 .fldt td:first-child{white-space:nowrap;width:1%}
 @media(max-width:820px){
-.api-layout{grid-template-columns:1fr;gap:20px}
+.api-layout{grid-template-columns:minmax(0,1fr);gap:20px}  /* v2971: 1fr wuchs bei 360 px auf 1033 px (min-content der Codebloecke) */
 .api-nav{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
 .api-nav a{border-left:0;border-bottom:2px solid transparent}
 .api-nav a.on{border-left:0;border-bottom-color:var(--gd)}
@@ -133,7 +133,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       </ul></li>
   </ul>
   <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
-  <a class="b-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1"><span class="b-cta-voll">Kostenlos starten</span><span class="b-cta-kurz">Starten</span></a>
 </div></nav>
 
 

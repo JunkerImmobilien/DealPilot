@@ -359,6 +359,7 @@ img{max-width:100%;display:block}
 @media(max-width:640px){
   .hero-btn{flex-direction:column;gap:12px}
   .hero-btn .btn-p,.hero-btn .btn-l{width:100%;justify-content:center;text-align:center}
+  .hero-btn .btn-p{padding:15px 16px}
   .btn-reihe{flex-direction:column;align-items:stretch}
   .btn-reihe .btn-l{justify-content:space-between;text-align:left}
   .burger{padding:11px}
