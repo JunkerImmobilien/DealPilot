@@ -2184,7 +2184,7 @@
   "stichtag": "2026-01-01",
   "berichtsjahr": 2026,
   "jahrgang": 2026,
-  "vollstaendig": false,
+  "vollstaendig": true,
   "lizenz": "dl-de/zero-2-0",
   "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
   "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
@@ -2205,8 +2205,19 @@
    "gemeinden": "Ahaus, Borken, Gescher, Gronau (Westf.), Heek, Heiden, Isselburg, Legden, Raesfeld, Reken, Rhede, Schöppingen, Stadtlohn, Südlohn, Velen, Vreden (Kreis Borken ohne Stadt Bocholt)",
    "hinweis": "Ein Teilmarkt für Ein- und Zweifamilienhäuser einschließlich Doppel-, Reihenend- und Reihenmittelhäusern (Gebäudeart-Koeffizient); 19 Richtwertzonen."
   },
-  "warum_kein_wert": "Der Ausschuss verknüpft die Umrechnungskoeffizienten additiv: „Ausgehend vom Normobjekt können die entsprechenden Umrechnungskoeffizienten zum Immobilienrichtwert der Gemeinde addiert bzw. subtrahiert werden“ (angepasster IRW = IRW + Σ IRW × (UK − 1); BORIS-Feld BRECHV = 1 „additiv“). Der Kern rechnet nur multiplikativ — eine Multiplikation würde vom amtlichen Ergebnis abweichen. Außerdem rechnet der Ausschuss mit dem Alter (tatsächlich, bei Modernisierungen fiktiv) statt mit dem Baujahr. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW oder Geodatenatlas des Kreises Borken.",
-  "formel_vorgemerkt": {
+  "belege": [
+   "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser, Stichtag 01.01.2026 (7 Seiten): S. 1–2 Hinweise (Nebengebäude enthalten, Preisspannen), S. 2 Gemeindegruppen und Zonen, S. 3 Normobjekt, S. 4 IRW-Tabelle und Anwendungsbeispiel (additiv), S. 5 Preisindex, S. 6 Tabelle der Umrechnungskoeffizienten.",
+   "S. 4: „Ausgehend vom Normobjekt können die entsprechenden Umrechnungskoeffizienten zum Immobilienrichtwert der Gemeinde addiert bzw. subtrahiert werden“. Shape IRW_2026: BRECHV = 1 (additiv) für alle 19 Zonen.",
+   "S. 3, Fußnote 2: „Es handelt sich grundsätzlich um das tatsächliche Alter. Bei mitgeteilten und beurteilbaren Modernisierungen handelt es sich um das daraus resultierende „fiktive Alter“.“"
+  ],
+  "seite": "S. 1–6",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0530200_2026.pdf",
+  "modellansaetze": {
+   "teilmarkt_code": 2,
+   "rundung_uk": 3,
+   "brechv": 1
+  },
+  "formel": {
    "form": "irw_umrechnung",
    "verknuepfung": "additiv",
    "formel_ausschuss": "angepasster IRW = IRW + IRW × (UK₁ − 1) + IRW × (UK₂ − 1) + … = IRW × (1 + Σ (UKᵢ − 1))",
@@ -2236,9 +2247,6 @@
     "ausstattung": "mittlere Ausstattung",
     "hinweis": "S. 3: „Da die Darstellung in BORIS bei den Merkmalen Alter und Bodenrichtwert nur Einzelwerte erlaubt, ist dort der Mittelwert der hier angegebenen Normklasse gegeben.“ (Zonen: ALTERJ 36, BOWL 185)"
    },
-   "vorschlag_eingaben": {
-    "alter": "Gebäudealter in Jahren am Stichtag (bei Modernisierungen fiktives Alter) — ableitbar aus baujahr bzw. Anlage 2"
-   },
    "merkmale": [
     {
      "id": "gebaeudeart",
@@ -2260,7 +2268,7 @@
     {
      "id": "alter",
      "art": "klassen",
-     "eingabe": "alter (neu)",
+     "eingabe": "alter",
      "norm_feld": "ALTERJ",
      "norm": "26 - 45",
      "klassen": [
@@ -2288,7 +2296,8 @@
        "bis": 70,
        "uk": 0.84
       }
-     ]
+     ],
+     "name": "Gebäudealter (tatsächlich, bei Modernisierung fiktiv)"
     },
     {
      "id": "wohnflaeche",
@@ -2356,6 +2365,14 @@
      "werte": {
       "nicht vorhanden": 0.997,
       "vorhanden": 1
+     },
+     "norm_zuordnung": {
+      "0": "nicht vorhanden",
+      "1": "vorhanden"
+     },
+     "zuordnung": {
+      "ja": "vorhanden",
+      "nein": "nicht vorhanden"
      }
     },
     {
@@ -2367,6 +2384,14 @@
      "werte": {
       "unvermietet": 1,
       "vermietet": 0.923
+     },
+     "norm_zuordnung": {
+      "1": "unvermietet",
+      "2": "vermietet"
+     },
+     "zuordnung": {
+      "ja": "vermietet",
+      "nein": "unvermietet"
      }
     },
     {
@@ -2462,7 +2487,7 @@
     {
      "id": "ausstattung",
      "art": "kategorien",
-     "eingabe": "standardstufe",
+     "eingabe": "ausstattung",
      "norm_feld": "AKL",
      "norm": "mittel",
      "werte": {
@@ -2470,39 +2495,47 @@
       "mittel": 1,
       "gut": 1.101
      },
-     "hinweis": "Das Dokument nennt keine Zuordnung Standardstufe → Klasse."
+     "hinweis": "Das Dokument nennt keine Zuordnung Standardstufe → Ausstattungsklasse; deshalb nur mit der Klasse des Ausschusses als Angabe (Eingabe ausstattung).",
+     "norm_zuordnung": {
+      "6": "mittel"
+     }
     }
-   ],
-   "anwendungsbeispiel": {
-    "seite": "S. 4",
-    "irw": 2510,
-    "objekt": {
-     "alter": 50,
-     "wohnflaeche": 155,
-     "grundstuecksflaeche": 815
-    },
-    "faktoren": {
-     "alter": 0.84,
-     "wohnflaeche": 0.942,
-     "grundstuecksgroesse": 1.054
-    },
-    "ergebnis_eur_qm": 2098.4,
-    "wortlaut": "Südlohn, 50 Jahre alt, 155 m² Wohnfläche, Grundstücksgröße 815 m²: 2.510 €/m² + 2.510 €/m² * (0,840 – 1) + 2.510 €/m² * (0,942 - 1) + 2.510 €/m² * (1,054 – 1) = 2.098,40 €/m²",
-    "nachgerechnet": "2.510 × (1 − 0,160 − 0,058 + 0,054) = 2.510 × 0,836 = 2.098,36 €/m² (gedruckt 2.098,40); multiplikativ ergäbe sich 2.510 × 0,840 × 0,942 × 1,054 = 2.093,4 €/m²"
-   }
+   ]
   },
-  "belege": [
-   "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser, Stichtag 01.01.2026 (7 Seiten): S. 1–2 Hinweise (Nebengebäude enthalten, Preisspannen), S. 2 Gemeindegruppen und Zonen, S. 3 Normobjekt, S. 4 IRW-Tabelle und Anwendungsbeispiel (additiv), S. 5 Preisindex, S. 6 Tabelle der Umrechnungskoeffizienten.",
-   "S. 4: „Ausgehend vom Normobjekt können die entsprechenden Umrechnungskoeffizienten zum Immobilienrichtwert der Gemeinde addiert bzw. subtrahiert werden“. Shape IRW_2026: BRECHV = 1 (additiv) für alle 19 Zonen.",
-   "S. 3, Fußnote 2: „Es handelt sich grundsätzlich um das tatsächliche Alter. Bei mitgeteilten und beurteilbaren Modernisierungen handelt es sich um das daraus resultierende „fiktive Alter“.“"
-  ],
-  "seite": "S. 1–6",
-  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0530200_2026.pdf",
-  "modellansaetze": {
-   "teilmarkt_code": 2,
-   "rundung_uk": 3,
-   "brechv": 1
-  }
+  "anwendungsbeispiel": {
+   "seite": "S. 4",
+   "irw": 2510,
+   "objekt": {
+    "anbauweise": "freistehend",
+    "keller": true,
+    "vermietet": false,
+    "bodenrichtwert": 185,
+    "ausstattung": "mittel",
+    "alter": 50,
+    "wohnflaeche": 155,
+    "grundstuecksflaeche": 815
+   },
+   "faktoren": {
+    "alter": 0.84,
+    "wohnflaeche": 0.942,
+    "grundstuecksgroesse": 1.054
+   },
+   "ergebnis_eur_qm": 2098.4,
+   "wortlaut": "Südlohn, 50 Jahre alt, 155 m² Wohnfläche, Grundstücksgröße 815 m²: 2.510 €/m² + 2.510 €/m² * (0,840 – 1) + 2.510 €/m² * (0,942 - 1) + 2.510 €/m² * (1,054 – 1) = 2.098,40 €/m²",
+   "nachgerechnet": "2.510 × (1 − 0,160 − 0,058 + 0,054) = 2.510 × 0,836 = 2.098,36 €/m² (gedruckt 2.098,40); multiplikativ ergäbe sich 2.510 × 0,840 × 0,942 × 1,054 = 2.093,4 €/m²",
+   "norm_zone": {
+    "ALTERJ": "36",
+    "WHNFL": "121-140",
+    "FLAE": "401-600",
+    "BOWL": "185",
+    "KELLER": "1",
+    "MIETS": "1",
+    "AKL": "6"
+   },
+   "objekt_hinweis": "Das Beispiel nennt nur die abweichenden Merkmale; die übrigen sind mit den Werten des Normobjekts eingesetzt (Beitrag 0).",
+   "toleranz_eur_qm": 0.1
+  },
+  "kernausbau": "v3015 Kernausbau: additive Verknüpfung nach S. 4 des Dokuments; Anwendungsbeispiel S. 4 am echten Kern getroffen"
  },
  {
   "land_code": "NW",
@@ -2512,7 +2545,7 @@
   "stichtag": "2026-01-01",
   "berichtsjahr": 2026,
   "jahrgang": 2026,
-  "vollstaendig": false,
+  "vollstaendig": true,
   "lizenz": "dl-de/zero-2-0",
   "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
   "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
@@ -2530,8 +2563,18 @@
    "gemeinden": "Ahaus, Borken, Gescher, Gronau (Westf.), Heek, Heiden, Isselburg, Legden, Raesfeld, Reken, Rhede, Schöppingen, Stadtlohn, Südlohn, Velen, Vreden (Kreis Borken ohne Stadt Bocholt)",
    "hinweis": "Nur Weiterverkäufe in Gebäuden mit mehr als zwei Wohneinheiten, Baujahr ab 1950, Alter mindestens drei Jahre; eine Zone je Gemeinde bzw. Gemeindegruppe."
   },
-  "warum_kein_wert": "Der Ausschuss verknüpft die Umrechnungskoeffizienten additiv: „Ausgehend vom Normobjekt können die entsprechenden Umrechnungskoeffizienten zum Immobilienrichtwert der Gemeinde addiert bzw. subtrahiert werden“ (angepasster IRW = IRW + Σ IRW × (UK − 1); BORIS-Feld BRECHV = 1 „additiv“). Der Kern rechnet nur multiplikativ — eine Multiplikation würde vom amtlichen Ergebnis abweichen. Außerdem rechnet der Ausschuss mit dem Alter (tatsächlich, bei Modernisierungen fiktiv) statt mit dem Baujahr. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW oder Geodatenatlas des Kreises Borken.",
-  "formel_vorgemerkt": {
+  "belege": [
+   "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Wohnungseigentum, Stichtag 01.01.2026 (6 Seiten): S. 1 Hinweise und Stellplatz-Größenordnungen, S. 2 Datenauswahl und Ortsteile, S. 3 Normobjekt, S. 4 IRW-Tabelle und Anwendungsbeispiel (additiv), S. 5 Preisindex, S. 6 Tabelle der Umrechnungskoeffizienten.",
+   "S. 4: „Ausgehend vom Normobjekt können die entsprechenden Umrechnungskoeffizienten zum Immobilienrichtwert der Gemeinde addiert bzw. subtrahiert werden“. Shape: BRECHV = 1 (additiv) für alle 16 Zonen."
+  ],
+  "seite": "S. 1–6",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0530200_2026.pdf",
+  "modellansaetze": {
+   "teilmarkt_code": 1,
+   "rundung_uk": 3,
+   "brechv": 1
+  },
+  "formel": {
    "form": "irw_umrechnung",
    "verknuepfung": "additiv",
    "formel_ausschuss": "angepasster IRW = IRW + Σ IRW × (UKᵢ − 1)",
@@ -2550,14 +2593,11 @@
     "mietsituation": "unvermietet",
     "balkon": "vorhanden"
    },
-   "vorschlag_eingaben": {
-    "alter": "Gebäudealter in Jahren am Stichtag"
-   },
    "merkmale": [
     {
      "id": "alter",
      "art": "klassen",
-     "eingabe": "alter (neu)",
+     "eingabe": "alter",
      "norm_feld": "ALTERJ",
      "norm": "16 - 30",
      "klassen": [
@@ -2585,7 +2625,8 @@
        "bis": 70,
        "uk": 0.787
       }
-     ]
+     ],
+     "name": "Gebäudealter (tatsächlich, bei Modernisierung fiktiv)"
     },
     {
      "id": "wohnflaeche",
@@ -2671,14 +2712,18 @@
     {
      "id": "ausstattung",
      "art": "kategorien",
-     "eingabe": "standardstufe",
+     "eingabe": "ausstattung",
      "norm_feld": "AKL",
      "norm": "mittel",
      "werte": {
       "einfach": 0.922,
       "mittel": 1,
       "gehoben": 1.167
-     }
+     },
+     "norm_zuordnung": {
+      "6": "mittel"
+     },
+     "hinweis": "Das Dokument nennt keine Zuordnung Standardstufe → Ausstattungsklasse; deshalb nur mit der Klasse des Ausschusses als Angabe (Eingabe ausstattung)."
     },
     {
      "id": "geschosslage",
@@ -2690,7 +2735,96 @@
       "EG/Souterrain": 1,
       "1. OG": 0.977,
       ">= 2. OG": 0.958
-     }
+     },
+     "zuordnung": {
+      "1": "1. OG",
+      "2": ">= 2. OG",
+      "3": ">= 2. OG",
+      "4": ">= 2. OG",
+      "5": ">= 2. OG",
+      "6": ">= 2. OG",
+      "7": ">= 2. OG",
+      "8": ">= 2. OG",
+      "9": ">= 2. OG",
+      "10": ">= 2. OG",
+      "11": ">= 2. OG",
+      "12": ">= 2. OG",
+      "13": ">= 2. OG",
+      "14": ">= 2. OG",
+      "15": ">= 2. OG",
+      "16": ">= 2. OG",
+      "17": ">= 2. OG",
+      "18": ">= 2. OG",
+      "19": ">= 2. OG",
+      "20": ">= 2. OG",
+      "21": ">= 2. OG",
+      "22": ">= 2. OG",
+      "23": ">= 2. OG",
+      "24": ">= 2. OG",
+      "25": ">= 2. OG",
+      "26": ">= 2. OG",
+      "27": ">= 2. OG",
+      "28": ">= 2. OG",
+      "29": ">= 2. OG",
+      "30": ">= 2. OG",
+      "31": ">= 2. OG",
+      "32": ">= 2. OG",
+      "33": ">= 2. OG",
+      "34": ">= 2. OG",
+      "35": ">= 2. OG",
+      "36": ">= 2. OG",
+      "37": ">= 2. OG",
+      "38": ">= 2. OG",
+      "39": ">= 2. OG",
+      "40": ">= 2. OG",
+      "88": "EG/Souterrain",
+      "99": "EG/Souterrain"
+     },
+     "norm_zuordnung": {
+      "1": "1. OG",
+      "2": ">= 2. OG",
+      "3": ">= 2. OG",
+      "4": ">= 2. OG",
+      "5": ">= 2. OG",
+      "6": ">= 2. OG",
+      "7": ">= 2. OG",
+      "8": ">= 2. OG",
+      "9": ">= 2. OG",
+      "10": ">= 2. OG",
+      "11": ">= 2. OG",
+      "12": ">= 2. OG",
+      "13": ">= 2. OG",
+      "14": ">= 2. OG",
+      "15": ">= 2. OG",
+      "16": ">= 2. OG",
+      "17": ">= 2. OG",
+      "18": ">= 2. OG",
+      "19": ">= 2. OG",
+      "20": ">= 2. OG",
+      "21": ">= 2. OG",
+      "22": ">= 2. OG",
+      "23": ">= 2. OG",
+      "24": ">= 2. OG",
+      "25": ">= 2. OG",
+      "26": ">= 2. OG",
+      "27": ">= 2. OG",
+      "28": ">= 2. OG",
+      "29": ">= 2. OG",
+      "30": ">= 2. OG",
+      "31": ">= 2. OG",
+      "32": ">= 2. OG",
+      "33": ">= 2. OG",
+      "34": ">= 2. OG",
+      "35": ">= 2. OG",
+      "36": ">= 2. OG",
+      "37": ">= 2. OG",
+      "38": ">= 2. OG",
+      "39": ">= 2. OG",
+      "40": ">= 2. OG",
+      "88": "EG/Souterrain",
+      "99": "EG/Souterrain"
+     },
+     "hinweis": "Dachgeschoss (77) und Maisonette führt die Tabelle nicht — kein Wert."
     },
     {
      "id": "mietsituation",
@@ -2701,6 +2835,14 @@
      "werte": {
       "unvermietet": 1,
       "vermietet": 0.958
+     },
+     "norm_zuordnung": {
+      "1": "unvermietet",
+      "2": "vermietet"
+     },
+     "zuordnung": {
+      "ja": "vermietet",
+      "nein": "unvermietet"
      }
     },
     {
@@ -2712,38 +2854,53 @@
      "werte": {
       "vorhanden": 1,
       "nicht vorhanden": 0.967
+     },
+     "norm_zuordnung": {
+      "0": "nicht vorhanden",
+      "1": "vorhanden"
+     },
+     "zuordnung": {
+      "ja": "vorhanden",
+      "nein": "nicht vorhanden"
      }
     }
-   ],
-   "anwendungsbeispiel": {
-    "seite": "S. 4",
-    "irw": 2700,
-    "objekt": {
-     "alter": 40,
-     "wohnflaeche": 53,
-     "bodenrichtwert": 250
-    },
-    "faktoren": {
-     "alter": 0.837,
-     "wohnflaeche": 1.006,
-     "bodenrichtwert": 1.033
-    },
-    "ergebnis_eur_qm": 2365.2,
-    "wortlaut": "Borken, 40 Jahre alt (=> Alter 31-45), 53 m² Wohnfläche (=> 41-60), Bodenrichtwert 250 €/m² (=> 231–360): 2.700 €/m² + 2.700 €/m² * (0,837 - 1) + 2.700€/m² * (1,006 - 1) + 2.700€/m² * (1,033 - 1) = 2.365,20€/m²",
-    "nachgerechnet": "2.700 × 0,876 = 2.365,20 €/m²; multiplikativ ergäbe sich 2.348,4 €/m²"
-   }
+   ]
   },
-  "belege": [
-   "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Wohnungseigentum, Stichtag 01.01.2026 (6 Seiten): S. 1 Hinweise und Stellplatz-Größenordnungen, S. 2 Datenauswahl und Ortsteile, S. 3 Normobjekt, S. 4 IRW-Tabelle und Anwendungsbeispiel (additiv), S. 5 Preisindex, S. 6 Tabelle der Umrechnungskoeffizienten.",
-   "S. 4: „Ausgehend vom Normobjekt können die entsprechenden Umrechnungskoeffizienten zum Immobilienrichtwert der Gemeinde addiert bzw. subtrahiert werden“. Shape: BRECHV = 1 (additiv) für alle 16 Zonen."
-  ],
-  "seite": "S. 1–6",
-  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0530200_2026.pdf",
-  "modellansaetze": {
-   "teilmarkt_code": 1,
-   "rundung_uk": 3,
-   "brechv": 1
-  }
+  "anwendungsbeispiel": {
+   "seite": "S. 4",
+   "irw": 2700,
+   "objekt": {
+    "einheiten": 5,
+    "ausstattung": "mittel",
+    "geschoss": 88,
+    "vermietet": false,
+    "balkon": true,
+    "alter": 40,
+    "wohnflaeche": 53,
+    "bodenrichtwert": 250
+   },
+   "faktoren": {
+    "alter": 0.837,
+    "wohnflaeche": 1.006,
+    "bodenrichtwert": 1.033
+   },
+   "ergebnis_eur_qm": 2365.2,
+   "wortlaut": "Borken, 40 Jahre alt (=> Alter 31-45), 53 m² Wohnfläche (=> 41-60), Bodenrichtwert 250 €/m² (=> 231–360): 2.700 €/m² + 2.700 €/m² * (0,837 - 1) + 2.700€/m² * (1,006 - 1) + 2.700€/m² * (1,033 - 1) = 2.365,20€/m²",
+   "nachgerechnet": "2.700 × 0,876 = 2.365,20 €/m²; multiplikativ ergäbe sich 2.348,4 €/m²",
+   "norm_zone": {
+    "ALTERJ": "23",
+    "WHNFL": "61-90",
+    "BOWL": "210",
+    "WHNA": "3-10",
+    "AKL": "6",
+    "GESLA": "88",
+    "MIETS": "1",
+    "BK": "1"
+   },
+   "objekt_hinweis": "Das Beispiel nennt nur die abweichenden Merkmale; die übrigen sind mit den Werten des Normobjekts eingesetzt (Beitrag 0).",
+   "toleranz_eur_qm": 0.1
+  },
+  "kernausbau": "v3015 Kernausbau: additive Verknüpfung nach S. 4 des Dokuments; Anwendungsbeispiel S. 4 am echten Kern getroffen"
  },
  {
   "land_code": "NW",
@@ -2771,7 +2928,7 @@
    "gemeinden": "Ahlen, Beckum, Beelen, Drensteinfurt, Ennigerloh, Everswinkel, Oelde, Ostbevern, Sassenberg, Sendenhorst, Telgte, Wadersloh, Warendorf (Kreis Warendorf)",
    "hinweis": "Weiterverkäufe, Gebäudealter mindestens 4 Jahre; 3 bis 65 Wohnungseigentume in der Wohnanlage, bis 150 m²."
   },
-  "warum_kein_wert": "Der Ausschuss verknüpft die Zu- und Abschläge additiv: „Weichen mehrere Merkmale ab, so sind die einzelnen prozentualen Zu- und Abschläge additiv zusammenzufassen und die summierte prozentuale Änderung ist auf den Immobilienrichtwert anzuwenden“ (S. 3; BORIS-Feld BRECHV = 1). Der Kern rechnet nur multiplikativ. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
+  "warum_kein_wert": "Gelesen 27.10.2026: Örtliche Fachinformationen LGDIR_1_0533000_2026 (vollständig) und Grundstücksmarktbericht 2026 des Kreises Warendorf (GMB_33000_2026.pdf, Nr. 5.1.2, 5.2.2, 6.1.2): kein Beispiel im Dokument für die Umrechnung der Immobilienrichtwerte (die vier „Anwendungsbeispiele“ des GMB, S. 83, 86, 110, 113, betreffen Sachwertfaktoren und Erbbaurechte). Die additive Verknüpfung rechnet der Kern seit v3015; ohne amtliches Beispiel wird der Satz nicht nach eigener Rechnung freigeschaltet. Offen außerdem: die Zonen führen vom kreisweiten Normobjekt abweichende Normwerte (BJ, WHNA, BOWL), und das Dokument sagt nicht, wie dann additiv umzurechnen ist (der Kern würde (1+Σ(UKo−1))/(1+Σ(UKn−1)) rechnen). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW. Ursprünglicher Befund: Der Ausschuss verknüpft die Zu- und Abschläge additiv: „Weichen mehrere Merkmale ab, so sind die einzelnen prozentualen Zu- und Abschläge additiv zusammenzufassen und die summierte prozentuale Änderung ist auf den Immobilienrichtwert anzuwenden“ (S. 3; BORIS-Feld BRECHV = 1). Der Kern rechnet nur multiplikativ. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
   "formel_vorgemerkt": {
    "form": "irw_umrechnung",
    "verknuepfung": "additiv",
@@ -3144,7 +3301,7 @@
    "gemeinden": "Ahlen, Beckum, Beelen, Drensteinfurt, Ennigerloh, Everswinkel, Oelde, Ostbevern, Sassenberg, Sendenhorst, Telgte, Wadersloh, Warendorf (Kreis Warendorf)",
    "hinweis": "Freistehende Ein- und Zweifamilienhäuser, Weiterverkäufe, Mindestalter 4 Jahre, Grundstück 150–5.000 m², bis 300 m² Wohnfläche."
   },
-  "warum_kein_wert": "Der Ausschuss verknüpft die Zu- und Abschläge additiv: „Weichen mehrere Merkmale ab, so sind die einzelnen prozentualen Zu- und Abschläge additiv zusammenzufassen und die summierte prozentuale Änderung ist auf den Immobilienrichtwert anzuwenden“ (S. 3; BORIS-Feld BRECHV = 1). Der Kern rechnet nur multiplikativ. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
+  "warum_kein_wert": "Gelesen 27.10.2026: Örtliche Fachinformationen LGDIR_2_0533000_2026 (vollständig) und Grundstücksmarktbericht 2026 des Kreises Warendorf (GMB_33000_2026.pdf, Nr. 5.1.2, 5.2.2, 6.1.2): kein Beispiel im Dokument für die Umrechnung der Immobilienrichtwerte (die vier „Anwendungsbeispiele“ des GMB, S. 83, 86, 110, 113, betreffen Sachwertfaktoren und Erbbaurechte). Die additive Verknüpfung rechnet der Kern seit v3015; ohne amtliches Beispiel wird der Satz nicht nach eigener Rechnung freigeschaltet. Offen außerdem: die Zonen führen vom kreisweiten Normobjekt abweichende Normwerte (BJ, WHNA, BOWL), und das Dokument sagt nicht, wie dann additiv umzurechnen ist (der Kern würde (1+Σ(UKo−1))/(1+Σ(UKn−1)) rechnen). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW. Ursprünglicher Befund: Der Ausschuss verknüpft die Zu- und Abschläge additiv: „Weichen mehrere Merkmale ab, so sind die einzelnen prozentualen Zu- und Abschläge additiv zusammenzufassen und die summierte prozentuale Änderung ist auf den Immobilienrichtwert anzuwenden“ (S. 3; BORIS-Feld BRECHV = 1). Der Kern rechnet nur multiplikativ. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
   "formel_vorgemerkt": {
    "form": "irw_umrechnung",
    "verknuepfung": "additiv",
@@ -3545,7 +3702,7 @@
    "gemeinden": "Ahlen, Beckum, Beelen, Drensteinfurt, Ennigerloh, Everswinkel, Oelde, Ostbevern, Sassenberg, Sendenhorst, Telgte, Wadersloh, Warendorf (Kreis Warendorf)",
    "hinweis": "Doppelhaushälften und Reihenhäuser, Weiterverkäufe, Mindestalter 4 Jahre, Grundstück 150–1.500 m², bis 300 m² Wohnfläche."
   },
-  "warum_kein_wert": "Der Ausschuss verknüpft die Zu- und Abschläge additiv: „Weichen mehrere Merkmale ab, so sind die einzelnen prozentualen Zu- und Abschläge additiv zusammenzufassen und die summierte prozentuale Änderung ist auf den Immobilienrichtwert anzuwenden“ (S. 3; BORIS-Feld BRECHV = 1). Der Kern rechnet nur multiplikativ. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
+  "warum_kein_wert": "Gelesen 27.10.2026: Örtliche Fachinformationen LGDIR_3_0533000_2026 (vollständig) und Grundstücksmarktbericht 2026 des Kreises Warendorf (GMB_33000_2026.pdf, Nr. 5.1.2, 5.2.2, 6.1.2): kein Beispiel im Dokument für die Umrechnung der Immobilienrichtwerte (die vier „Anwendungsbeispiele“ des GMB, S. 83, 86, 110, 113, betreffen Sachwertfaktoren und Erbbaurechte). Die additive Verknüpfung rechnet der Kern seit v3015; ohne amtliches Beispiel wird der Satz nicht nach eigener Rechnung freigeschaltet. Offen außerdem: die Zonen führen vom kreisweiten Normobjekt abweichende Normwerte (BJ, WHNA, BOWL), und das Dokument sagt nicht, wie dann additiv umzurechnen ist (der Kern würde (1+Σ(UKo−1))/(1+Σ(UKn−1)) rechnen). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW. Ursprünglicher Befund: Der Ausschuss verknüpft die Zu- und Abschläge additiv: „Weichen mehrere Merkmale ab, so sind die einzelnen prozentualen Zu- und Abschläge additiv zusammenzufassen und die summierte prozentuale Änderung ist auf den Immobilienrichtwert anzuwenden“ (S. 3; BORIS-Feld BRECHV = 1). Der Kern rechnet nur multiplikativ. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
   "formel_vorgemerkt": {
    "form": "irw_umrechnung",
    "verknuepfung": "additiv",
@@ -4542,13 +4699,70 @@
    "gemeinden": "Stadt Rheine",
    "hinweis": "Freistehende Ein-/Zweifamilienhäuser, nur Wiederverkäufe; Datengrundlage Baujahr 1960–2018, Grundstück 350–950 m², Wohnfläche 90–250 m², BRW 2023 80–500 €/m²."
   },
-  "warum_kein_wert": "Die Zu- und Abschläge des Dokuments sind Prozentwerte einer ADDITIVEN linearen Regressionsfunktion (Grundstücksmarktbericht 2026 der Stadt Rheine, Nr. 5.1.2, S. 39): y [€/m²] = (a + Σ bᵢ × xᵢ) × Faktor Stichtag. Prozentabweichungen mehrerer Merkmale addieren sich; der Kern rechnet nur multiplikativ und kennt keine Regressionsfunktion. Die Lage geht über den Bodenrichtwert 2023 ein (nicht über den aktuellen). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW oder Grundstücksmarktbericht 2026 (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf).",
+  "warum_kein_wert": "Gelesen 27.10.2026: Örtliche Fachinformationen LGDIR_2_0527900_2026 und Grundstücksmarktbericht 2026 der Stadt Rheine (GMB_27900_2026.pdf, Nr. 5.1.2 S. 39/40, 6.1.2 S. 54, 8.1 S. 57–60). Der Ausschuss beschließt keine Umrechnungstabellen, sondern Regressionsfunktionen, aus denen er die Immobilienrichtwerte darstellt (Richtwertsitzung 29.01.2026); „Für die Ermittlung des Vergleichswertes ist zusätzlich der folgende Faktor anzubringen“ (Faktor Stichtag). Die Prozenttabellen der UDOK sind diese Funktion, linearisiert am Normgrundstück. Gemessen am IRW-Shape 2026: der veröffentlichte Richtwert jeder Zone ist die Funktion am Zonen-Normobjekt mit dem Zonenfeld BOWL als Bodenrichtwert 2023, gerundet auf 50/100 €/m² (Abweichung höchstens 48,5 €/m²). Der Kern hat dafür die Form irw_regression (v3015). Ein-/Zweifamilienhäuser: die Funktion trifft das Anwendungsbeispiel GMB S. 59 am Kern (2.611,12 €/m² zum 01.01.2024, × 1,007 = 2.629,40 €/m²; gedruckt rd. 2.611 €/m² und 354.952 € = 2.629,27 €/m²). Gesperrt bleibt der Satz, weil der Ausschuss nicht sagt, ob Garagen/Stellplätze in den Kaufpreisen der Funktion enthalten sind (formel.stellplaetze_im_irw ist Pflicht). Außerdem braucht die Funktion den Bodenrichtwert 2023 am Objekt (GMB S. 60 ff. je Richtwertgebiet) und den Dachgeschossausbau — beides führt der Reiter Objekt nicht. Weg: Grundstücksmarktbericht 2026 der Stadt Rheine (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf).",
   "formel_vorgemerkt": {
    "form": "irw_regression",
-   "verknuepfung": "additiv",
+   "verknuepfung": "regression",
    "formel_ausschuss": "y [€/m²] = (−44446,436779 + 23,790489 × Baujahr − 7,816921 × Wohnfläche + 2,267695 × Bodenrichtwert2023 + 0,618203 × Grundstücksgröße − 68,617031 × Dachgeschoss) × FaktorStichtag; Dachgeschoss: Flachdach = 1 / nicht ausgebaut = 2 / teilweise ausgebaut = 3 / voll ausgebaut = 4; FaktorStichtag 01.01.2025 = 0,949, 01.01.2026 = 1,007",
    "formel_seite": "GMB 2026 S. 39",
+   "stichtag_funktion": "01.01.2024",
+   "konstante": -44446.436779,
+   "terme": [
+    {
+     "id": "baujahr",
+     "name": "Baujahr",
+     "eingabe": "baujahr",
+     "koeffizient": 23.790489,
+     "von": 1960,
+     "bis": 2018
+    },
+    {
+     "id": "wohnflaeche",
+     "name": "Wohnfläche",
+     "eingabe": "wohnflaeche",
+     "koeffizient": -7.816921,
+     "von": 90,
+     "bis": 250
+    },
+    {
+     "id": "bodenrichtwert_2023",
+     "name": "Bodenrichtwert 2023",
+     "eingabe": "bodenrichtwert_2023",
+     "koeffizient": 2.267695,
+     "von": 80,
+     "bis": 500
+    },
+    {
+     "id": "grundstuecksgroesse",
+     "name": "Grundstücksgröße",
+     "eingabe": "grundstuecksflaeche",
+     "koeffizient": 0.618203,
+     "von": 350,
+     "bis": 950
+    },
+    {
+     "id": "dachgeschoss",
+     "name": "Dachgeschoss (1 Flachdach … 4 voll ausgebaut)",
+     "eingabe": "dachgeschoss_ausbau",
+     "koeffizient": -68.617031,
+     "von": 1,
+     "bis": 4,
+     "zuordnung": {
+      "flachdach": "1",
+      "nicht": "2",
+      "teilweise": "3",
+      "voll": "4"
+     }
+    }
+   ],
+   "faktor_stichtag": {
+    "2025": 0.949,
+    "2026": 1.007
+   },
+   "faktor_stichtag_seite": "GMB 2026 S. 39",
+   "datengrundlage": "GMB 2026 S. 39: Baujahr 1960–2018 (normale Unterhaltung), Grundstücksgröße 350–950 m², Wohnfläche 90–250 m², Bodenrichtwert 2023 80–500 €/m² ebf., Vertragsjahre 2019–2023, 421 Kauffälle, nur Wiederverkäufe",
    "stellplaetze_im_irw": null,
+   "stellplaetze_offen": "Der GMB sagt für Ein-/Zweifamilienhäuser nicht, ob Garagen/Stellplätze im Kaufpreis der Regression enthalten sind (für Wohnungseigentum S. 54: „Stellplatz: nicht enthalten“; die Abspaltung S. 61 betrifft nur die Liegenschaftszins-Auswertung).",
    "normobjekt": {
     "baujahr": 1980,
     "grundstuecksgroesse": 615,
@@ -4667,23 +4881,24 @@
     },
     "seite": "LGDIR_2_0527900_2026.pdf S. 1–2"
    },
-   "vorschlag_eingaben": {
-    "bodenrichtwert_2023": "Bodenrichtwert am Objekt zum 01.01.2023, €/m² (GMB S. 60 ff. listet sie je Richtwertgebiet)",
-    "dachgeschoss_ausbau": "'flachdach' | 'nicht' | 'teilweise' | 'voll'"
-   },
    "anwendungsbeispiel": {
     "seite": "GMB 2026 S. 59",
+    "irw": null,
     "objekt": {
      "gebaeudeart": "efh",
      "baujahr": 1995,
      "grundstuecksflaeche": 543,
      "wohnflaeche": 135,
      "bodenrichtwert_2023": 260,
-     "dachgeschoss": 4
+     "dachgeschoss_ausbau": "voll"
     },
-    "ergebnis_eur_qm_2024": 2611,
-    "ergebnis_eur_2024": 352485,
-    "ergebnis_eur_2026": 354952,
+    "regression_eur_qm": 2611,
+    "toleranz_regression_eur_qm": 0.5,
+    "ergebnis_eur_qm": 2629.27,
+    "toleranz_eur_qm": 0.5,
+    "toleranz_grund": "Der Ausschuss rundet auf ganze €/m² (rd. 2.611 €/m²) und rechnet den Gesamtbetrag 352.485 € × 1,007 = 354.952 €; 354.952 € / 135 m² = 2.629,27 €/m², der Kern 2.611,12 × 1,007 = 2.629,40 €/m².",
+    "wohnflaeche": 135,
+    "ergebnis_eur": 354952,
     "wortlaut": "Immobilienrichtwert2024[€] = (-44446,436779 + 23,790489 x 1995 - 7,816921 x 135 + 2,267695 x 260 + 0,618203 x 543-68,617031 x 4) €/m² x 135 m² = rd. 2.611 €/m² x 135 m² = rd. 352.485 € · Immobilienrichtwert für das Jahr 2026: = 352.485 € x 1,007 (= Faktor Stichtag 01.01.2026) = rd. 354.952 €"
    }
   },
@@ -4728,7 +4943,7 @@
    "gemeinden": "Stadt Rheine",
    "hinweis": "Dokument „Doppelhaushälften“; der GMB führt für Reihenhäuser dieselbe Funktion mit Konstante −172,006608. Datengrundlage Baujahr 1960–2018, Grundstück 200–500 m², Wohnfläche 70–160 m², BRW 2023 110–500 €/m²."
   },
-  "warum_kein_wert": "Die Zu- und Abschläge des Dokuments sind Prozentwerte einer ADDITIVEN linearen Regressionsfunktion (Grundstücksmarktbericht 2026 der Stadt Rheine, Nr. 5.1.2, S. 40): y [€/m²] = (a + Σ bᵢ × xᵢ) × Faktor Stichtag. Prozentabweichungen mehrerer Merkmale addieren sich; der Kern rechnet nur multiplikativ und kennt keine Regressionsfunktion. Die Lage geht über den Bodenrichtwert 2023 ein (nicht über den aktuellen). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW oder Grundstücksmarktbericht 2026 (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf).",
+  "warum_kein_wert": "Gelesen 27.10.2026: Örtliche Fachinformationen LGDIR_3_0527900_2026 und Grundstücksmarktbericht 2026 der Stadt Rheine (GMB_27900_2026.pdf, Nr. 5.1.2 S. 39/40, 6.1.2 S. 54, 8.1 S. 57–60). Der Ausschuss beschließt keine Umrechnungstabellen, sondern Regressionsfunktionen, aus denen er die Immobilienrichtwerte darstellt (Richtwertsitzung 29.01.2026); „Für die Ermittlung des Vergleichswertes ist zusätzlich der folgende Faktor anzubringen“ (Faktor Stichtag). Die Prozenttabellen der UDOK sind diese Funktion, linearisiert am Normgrundstück. Gemessen am IRW-Shape 2026: der veröffentlichte Richtwert jeder Zone ist die Funktion am Zonen-Normobjekt mit dem Zonenfeld BOWL als Bodenrichtwert 2023, gerundet auf 50/100 €/m² (Abweichung höchstens 48,5 €/m²). Der Kern hat dafür die Form irw_regression (v3015). Doppelhaushälften und Reihenhäuser (Funktion S. 40): kein Beispiel im Dokument — das einzige Anwendungsbeispiel (GMB S. 59) rechnet die Funktion für freistehende Ein-/Zweifamilienhäuser. Ohne eigenes amtliches Beispiel nicht freigeschaltet. Weg: Grundstücksmarktbericht 2026 der Stadt Rheine (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf).",
   "formel_vorgemerkt": {
    "form": "irw_regression",
    "verknuepfung": "additiv",
@@ -4863,7 +5078,7 @@
    "gemeinden": "Stadt Rheine",
    "hinweis": "Nur Wiederverkäufe; Datengrundlage Baujahr 1960–2018, Wohnfläche 40–120 m², BRW 2023 160–500 €/m²."
   },
-  "warum_kein_wert": "Die Zu- und Abschläge des Dokuments sind Prozentwerte einer ADDITIVEN linearen Regressionsfunktion (Grundstücksmarktbericht 2026 der Stadt Rheine, Nr. 6.1.2, S. 54): y [€/m²] = (a + Σ bᵢ × xᵢ) × Faktor Stichtag. Prozentabweichungen mehrerer Merkmale addieren sich; der Kern rechnet nur multiplikativ und kennt keine Regressionsfunktion. Die Lage geht über den Bodenrichtwert 2023 ein (nicht über den aktuellen). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW oder Grundstücksmarktbericht 2026 (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf).",
+  "warum_kein_wert": "Gelesen 27.10.2026: Örtliche Fachinformationen LGDIR_1_0527900_2026 und Grundstücksmarktbericht 2026 der Stadt Rheine (GMB_27900_2026.pdf, Nr. 5.1.2 S. 39/40, 6.1.2 S. 54, 8.1 S. 57–60). Der Ausschuss beschließt keine Umrechnungstabellen, sondern Regressionsfunktionen, aus denen er die Immobilienrichtwerte darstellt (Richtwertsitzung 29.01.2026); „Für die Ermittlung des Vergleichswertes ist zusätzlich der folgende Faktor anzubringen“ (Faktor Stichtag). Die Prozenttabellen der UDOK sind diese Funktion, linearisiert am Normgrundstück. Gemessen am IRW-Shape 2026: der veröffentlichte Richtwert jeder Zone ist die Funktion am Zonen-Normobjekt mit dem Zonenfeld BOWL als Bodenrichtwert 2023, gerundet auf 50/100 €/m² (Abweichung höchstens 48,5 €/m²). Der Kern hat dafür die Form irw_regression (v3015). Wohnungseigentum (Funktion S. 54): kein Beispiel im Dokument — das einzige Anwendungsbeispiel (GMB S. 59) rechnet die Funktion für freistehende Ein-/Zweifamilienhäuser. Ohne eigenes amtliches Beispiel nicht freigeschaltet. Weg: Grundstücksmarktbericht 2026 der Stadt Rheine (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf).",
   "formel_vorgemerkt": {
    "form": "irw_regression",
    "verknuepfung": "additiv",

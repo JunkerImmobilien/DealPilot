@@ -3702,7 +3702,7 @@
     "kennzahl": "umrechnungskoeffizient_flaeche",
     "zweig": "ifw",
     "vollstaendig": false,
-    "warum_kein_wert": "Für den Ausschuss liegt in BORIS-NRW für 2026 weder eine Fachinformation zu den Bodenrichtwerten noch ein Grundstücksmarktbericht vor (Abruf aller Nutzungsgruppen 0–7 und des Marktberichts am 16.10.2026: nicht vorhanden). Ein Umrechnungskoeffizient ist deshalb nicht belegt. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh; Webseite der Geschäftsstelle: www.gars.nrw/guetersloh (laut Grundstücksmarktbericht 2025); Grundstücksmarktbericht 2025 unter dl-de/zero-2-0; Fachinformation zu den Bodenrichtwerten: https://www.boris.nrw.de; Bodenrichtwerte und Grundstücksmarktbericht über BORIS-NRW (www.boris.nrw.de).",
+    "warum_kein_wert": "Am 16.10.2026 unter der falschen Kennziffer 0530800 abgefragt (HTTP 404). Die Dokumente 2026 des Ausschusses liegen in BORIS-NRW unter der Kennziffer 0533300 (Befund der Nachernte vom 27.10.2026, GMB_33300_2026.pdf); ausgewertet sind sie in uk-flaeche-nw-nachernte-2026-10-27.json. Dieser Satz belegt deshalb keinen Umrechnungskoeffizienten. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh; Webseite der Geschäftsstelle: www.gars.nrw/guetersloh (laut Grundstücksmarktbericht 2025); Grundstücksmarktbericht 2025 unter dl-de/zero-2-0; Fachinformation zu den Bodenrichtwerten: https://www.boris.nrw.de; Bodenrichtwerte und Grundstücksmarktbericht über BORIS-NRW (www.boris.nrw.de).",
     "sperre_grund": "kein_dokument",
     "formel": null,
     "geltungsbereich": null,
@@ -3711,7 +3711,7 @@
         "art": "amtliche Veröffentlichung",
         "dokument": "BORIS-NRW, Dateiverzeichnis Bodenrichtwerte 2026",
         "fundstelle": "Abruf LGDBR_0…7_0530800_2026.pdf und GMB_30800_2026.pdf am 16.10.2026: HTTP 404 (Dateiname, keine Seite)",
-        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30800_2026.pdf"
+        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf"
       }
     ],
     "stufe": "A",
@@ -3724,7 +3724,7 @@
     "lizenz_hinweis": "Kein Dokument 2026 vorhanden; Lizenz wie BORIS-NRW angenommen nur für die Sperre (es wird nichts verwendet).",
     "fundstelle": "Abruf LGDBR_0…7_0530800_2026.pdf und GMB_30800_2026.pdf am 16.10.2026: HTTP 404 (Dateiname, keine Seite)",
     "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh; Webseite der Geschäftsstelle: www.gars.nrw/guetersloh (laut Grundstücksmarktbericht 2025); Grundstücksmarktbericht 2025 unter dl-de/zero-2-0; Fachinformation zu den Bodenrichtwerten: https://www.boris.nrw.de; Bodenrichtwerte und Grundstücksmarktbericht über BORIS-NRW (www.boris.nrw.de).",
-    "boris_nummer": "0530800",
+    "boris_nummer": "0533300",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
     },
@@ -4989,7 +4989,7 @@
     "kennzahl": "umrechnungskoeffizient_flaeche",
     "zweig": "ifw",
     "vollstaendig": false,
-    "warum_kein_wert": "Für den Ausschuss liegt in BORIS-NRW für 2026 weder eine Fachinformation zu den Bodenrichtwerten noch ein Grundstücksmarktbericht vor (Abruf aller Nutzungsgruppen 0–7 und des Marktberichts am 16.10.2026: nicht vorhanden). Ein Umrechnungskoeffizient ist deshalb nicht belegt. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte im Kreis Unna; Bodenrichtwerte des Kreises Unna auch im Open-Data-Portal Metropole Ruhr (Datensatz „Bodenrichtwerte im Kreis Unna“); Fachinformation zu den Bodenrichtwerten: https://www.boris.nrw.de; Bodenrichtwerte und Grundstücksmarktbericht über BORIS-NRW (www.boris.nrw.de).",
+    "warum_kein_wert": "Am 16.10.2026 unter der falschen Kennziffer 0532800 abgefragt (HTTP 404). Die Dokumente 2026 des Ausschusses liegen in BORIS-NRW unter der Kennziffer 0533200 (Befund der Nachernte vom 27.10.2026, GMB_33200_2026.pdf); ausgewertet sind sie in uk-flaeche-nw-nachernte-2026-10-27.json. Dieser Satz belegt deshalb keinen Umrechnungskoeffizienten. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte im Kreis Unna; Bodenrichtwerte des Kreises Unna auch im Open-Data-Portal Metropole Ruhr (Datensatz „Bodenrichtwerte im Kreis Unna“); Fachinformation zu den Bodenrichtwerten: https://www.boris.nrw.de; Bodenrichtwerte und Grundstücksmarktbericht über BORIS-NRW (www.boris.nrw.de).",
     "sperre_grund": "kein_dokument",
     "formel": null,
     "geltungsbereich": null,
@@ -4998,7 +4998,7 @@
         "art": "amtliche Veröffentlichung",
         "dokument": "BORIS-NRW, Dateiverzeichnis Bodenrichtwerte 2026",
         "fundstelle": "Abruf LGDBR_0…7_0532800_2026.pdf und GMB_32800_2026.pdf am 16.10.2026: HTTP 404 (Dateiname, keine Seite)",
-        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32800_2026.pdf"
+        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33200_2026.pdf"
       }
     ],
     "stufe": "A",
@@ -5011,7 +5011,7 @@
     "lizenz_hinweis": "Kein Dokument 2026 vorhanden; Lizenz wie BORIS-NRW angenommen nur für die Sperre (es wird nichts verwendet).",
     "fundstelle": "Abruf LGDBR_0…7_0532800_2026.pdf und GMB_32800_2026.pdf am 16.10.2026: HTTP 404 (Dateiname, keine Seite)",
     "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte im Kreis Unna; Bodenrichtwerte des Kreises Unna auch im Open-Data-Portal Metropole Ruhr (Datensatz „Bodenrichtwerte im Kreis Unna“); Fachinformation zu den Bodenrichtwerten: https://www.boris.nrw.de; Bodenrichtwerte und Grundstücksmarktbericht über BORIS-NRW (www.boris.nrw.de).",
-    "boris_nummer": "0532800",
+    "boris_nummer": "0533200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
     },

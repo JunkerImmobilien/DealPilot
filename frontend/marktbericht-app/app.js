@@ -922,6 +922,8 @@ function _irwStaffel(rw) {
   return rw.map(function (z) {
     var o = { pos: z.pos, detail: z.detail || null };
     if (z.faktor != null) o.faktor = Number(z.faktor).toLocaleString('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).replace(',', '.');
+    /* v3015 · additive Verknuepfung: Zu-/Abschlag in Prozent des Richtwerts */
+    else if (z.zuschlag_prozent != null) o.anzeige = (z.zuschlag_prozent > 0 ? '+' : z.zuschlag_prozent < 0 ? '-' : '±') + Math.abs(Number(z.zuschlag_prozent)).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
     else if (z.einheit === '€/m²') o.anzeige = Number(z.wert).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²';
     else if (z.wert != null) o.wert = z.wert;
     if (/^= Vergleichswert/.test(z.pos || '')) o.summe = true;

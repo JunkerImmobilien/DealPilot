@@ -22,8 +22,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
-const LIB = path.join(HIER, '..', 'marktbericht', 'backend', 'src', 'lib');
-const ORDNER = path.join(LIB, 'register');
+/* v3015 · --lib <pfad> / --ordner <pfad>: einen Entwurf in einer Kopie pruefen (parallele Arbeit) — nie fuer die Abnahme */
+const _a = process.argv.slice(2);
+const LIB = _a.includes('--lib') ? path.resolve(_a[_a.indexOf('--lib') + 1]) : path.join(HIER, '..', 'marktbericht', 'backend', 'src', 'lib');
+const ORDNER = _a.includes('--ordner') ? path.resolve(_a[_a.indexOf('--ordner') + 1]) : path.join(LIB, 'register');
 const imp = (d) => import('file://' + path.join(LIB, d).replace(/\\/g, '/'));
 const V = await imp('vergleichswert_irw.js');
 const VW = await imp('verfahrenswahl.js');
@@ -38,7 +40,7 @@ const ENTWURF = argv.includes('--entwurf');
 
 let saetze = 0, werte = 0, sperren = 0, beispiele = 0, ohneBeispiel = 0, rot = 0;
 const fehler = (t) => { rot++; console.log('  FEHLER ' + t); };
-const ARTEN = new Set(['klassen', 'kategorien', 'kurve', 'matrix', 'stichtag']);
+const ARTEN = new Set(['klassen', 'kategorien', 'kurve', 'matrix', 'stichtag', 'matrix_linear', 'klassen_je_gemeindegruppe', 'matrix_klassen', 'funktion']);
 const dateien = fs.readdirSync(ORDNER).filter((x) => x.startsWith('uk-irw-') && x.endsWith('.json') && (!NUR_DATEI || x === NUR_DATEI)).sort();
 const alle = [];
 const schl = new Map();
@@ -67,6 +69,16 @@ for (const d of dateien) {
     }
     const f = s.formel || {};
     if (f.form !== 'irw_umrechnung') fehler(wo + ': formel.form ' + f.form);
+    /* v3015 · Verknuepfung, Zuschlaege in €/m², Rundung */
+    if (!['multiplikativ', 'additiv', undefined].includes(f.verknuepfung)) fehler(wo + ': verknuepfung ' + f.verknuepfung);
+    for (const z of f.zuschlaege_eur_qm || []) {
+      if (!V.EINGABEN[z.eingabe]) fehler(wo + ' · ' + z.id + ': eingabe ' + z.eingabe + ' nicht im Katalog');
+      if (typeof z.eur_je_einheit !== 'number') fehler(wo + ' · ' + z.id + ': eur_je_einheit keine Zahl');
+      if (!z.norm_feld && z.norm == null) fehler(wo + ' · ' + z.id + ': weder norm_feld noch norm');
+    }
+    if (f.rundung_eur_qm != null && !(f.rundung_eur_qm > 0)) fehler(wo + ': rundung_eur_qm');
+    if (f.rundung_produkt != null && !(Number.isInteger(f.rundung_produkt) && f.rundung_produkt >= 0 && f.rundung_produkt <= 4)) fehler(wo + ': rundung_produkt muss eine ganze Zahl 0–4 sein');
+    if (f.rundung_produkt != null && (f.verknuepfung || 'multiplikativ') !== 'multiplikativ') fehler(wo + ': rundung_produkt nur bei multiplikativer Verknüpfung');
     if (typeof f.stellplaetze_im_irw !== 'boolean') fehler(wo + ': formel.stellplaetze_im_irw muss true/false sein (Modell sagt, ob Stellplätze enthalten sind)');
     if (!s.geltungsbereich || !s.geltungsbereich.teilmarkt) fehler(wo + ': geltungsbereich.teilmarkt fehlt');
     if (V.TEILMAERKTE[s.geltungsbereich && s.geltungsbereich.teilmarkt] !== s.zweig) fehler(wo + ': zweig passt nicht zum Teilmarkt-Code');
@@ -101,8 +113,57 @@ for (const d of dateien) {
         if (!n || (m.werte || []).length !== n || m.werte.some((z) => z.length !== n)) fehler(mw + ': Matrix nicht ' + n + '×' + n);
         else for (let i = 0; i < n; i++) if (m.werte[i][i] !== 1) fehler(mw + ': Diagonale ' + m.kategorien[i] + ' = ' + m.werte[i][i]);
       }
+      /* v3015 · Matrix Richtwertobjekt × Bewertungsobjekt mit Interpolation */
+      if (m.art === 'matrix_linear') {
+        const zs = m.zeilen_norm || [], sp = m.spalten_objekt || [];
+        const mono = (a) => a.length >= 2 && (a.every((x, i) => i === 0 || x > a[i - 1]) || a.every((x, i) => i === 0 || x < a[i - 1]));
+        if (!mono(zs) || !mono(sp)) fehler(mw + ': zeilen_norm/spalten_objekt nicht streng monoton');
+        if ((m.werte || []).length !== zs.length || m.werte.some((z) => z.length !== sp.length)) fehler(mw + ': werte nicht ' + zs.length + '×' + sp.length);
+        else {
+          for (const z of m.werte) for (const u of z) if (!ukOk(u)) fehler(mw + ': uk ' + u);
+          zs.forEach((x, i) => { const j = sp.indexOf(x); if (j >= 0 && m.werte[i][j] !== 1) fehler(mw + ': Objekt = Norm ' + x + ' ergibt ' + m.werte[i][j] + ' statt 1'); });
+        }
+        if (m.interpolation !== false && !m.interpolation_text) console.log('  HINWEIS ' + mw + ': ohne interpolation_text — Vermerk „lineare Interpolation (DealPilot)"');
+      }
+      /* v3015 · Matrix mit Klassen (Moers): Zeilen/Spalten verschieden, werte[zeile][spalte] */
+      if (m.art === 'matrix_klassen') {
+        const zs = m.zeilen_norm || [], sp = m.spalten_objekt || [];
+        if (!zs.length || !sp.length) fehler(mw + ': zeilen_norm/spalten_objekt fehlen');
+        if ((m.werte || []).length !== zs.length || m.werte.some((z) => z.length !== sp.length)) fehler(mw + ': werte nicht ' + zs.length + '×' + sp.length);
+        else for (const z of m.werte) for (const u of z) if (!ukOk(u)) fehler(mw + ': uk ' + u);
+        if (!(m.werte || []).some((z) => z.includes(1))) fehler(mw + ': keine Zelle 1,000 (Objekt = Richtwert?)');
+      }
+      /* v3015 · Interpolationsfunktion (Dortmund): lesbar, Bereich, trifft die gedruckten Stuetzstellen */
+      if (m.art === 'funktion') {
+        if (!m.formel || !m.funktion_wortlaut) fehler(mw + ': formel und funktion_wortlaut noetig');
+        if (!m.bereich_objekt || m.bereich_objekt.von == null || m.bereich_objekt.bis == null) fehler(mw + ': bereich_objekt (von/bis) fehlt — sonst Extrapolation');
+        if (m.zweidimensional && (!m.bereich_norm || m.bereich_norm.von == null)) fehler(mw + ': bereich_norm fehlt');
+        try {
+          const nur = { ...m, stuetzstellen: null, tabelle: null };
+          if (m.stuetzstellen) m.stuetzstellen.x.forEach((x, i) => { const p = V.funktionProzent(nur, x); if (Math.abs(p - m.stuetzstellen.prozent[i]) > 0.1 + 1e-9) fehler(mw + ': Funktion bei ' + x + ' = ' + p + ' statt ' + m.stuetzstellen.prozent[i]); });
+          if (m.tabelle) { let d = 0; m.tabelle.zeilen_norm.forEach((n, i) => m.tabelle.spalten_objekt.forEach((x, j) => { const p = V.funktionProzent(nur, x, n), s = m.tabelle.werte_prozent[i][j]; if (s == null) return; if (Math.abs(p - s) > 0.1 + 1e-9) fehler(mw + ': Funktion ' + n + '→' + x + ' = ' + p + ' statt ' + s); else if (Math.abs(p - s) > 1e-9) d++; }));
+            if (d) console.log('  HINWEIS ' + mw + ': Funktion weicht an ' + d + ' Tabellenzelle(n) um 0,1 % ab (Rundungsgrenze) — dort gilt der Tabellenwert'); }
+        } catch (e) { fehler(mw + ': Funktion nicht lesbar — ' + e.message); }
+      }
+      if (m.art === 'klassen_je_gemeindegruppe') {
+        if (!Array.isArray(m.gruppen) || !m.gruppen.length) fehler(mw + ': gruppen fehlen');
+        const gesehen = new Set();
+        for (const g of m.gruppen || []) {
+          if (!(g.gemeinden || []).length) fehler(mw + ': Gruppe ohne gemeinden');
+          for (const n of g.gemeinden || []) { if (gesehen.has(n)) fehler(mw + ': Gemeinde ' + n + ' in zwei Gruppen'); gesehen.add(n); }
+          for (const kl of g.klassen || []) if (!ukOk(kl.uk)) fehler(mw + ': uk ' + kl.uk + ' in Gruppe');
+          if (!(g.klassen || []).some((kl) => kl.uk === 1)) fehler(mw + ': Gruppe ohne Normklasse 1,000');
+        }
+      }
+      for (const r of [].concat(m.bedingung || [])) {
+        if (typeof r !== 'object') { fehler(mw + ': bedingung als Text — muss [{wenn, setze|nur|nicht, wortlaut}] sein'); continue; }
+        if (r.setze == null && !r.nur && !r.nicht) fehler(mw + ': bedingung ohne setze/nur/nicht');
+        if (!r.wortlaut) fehler(mw + ': bedingung ohne wortlaut');
+        const kats = m.art === 'kategorien' ? Object.keys(m.werte || {}) : m.art === 'matrix' ? (m.kategorien || []) : null;
+        if (kats) for (const k of [].concat(r.setze ?? [], r.nur || [], r.nicht || [])) if (!kats.includes(k)) fehler(mw + ': bedingung nennt ' + k + ' — nicht in der Tabelle');
+      }
       /* Normbezug: Objekt = Norm ergibt 1 (nur wo die Norm im Satz steht) */
-      if (m.art !== 'stichtag' && m.art !== 'matrix' && m.norm != null) {
+      if (!['stichtag', 'matrix', 'matrix_linear', 'klassen_je_gemeindegruppe'].includes(m.art) && m.norm != null) {
         const o = {};
         const e0 = [].concat(m.eingabe);
         o[e0[e0.length - 1]] = m.norm;
@@ -215,6 +276,102 @@ for (const s of alle) {
   }
 }
 
+/* ── v3015 · KERNAUSBAU: je Ausschuss ein Prueffall ──────────────────────────
+   wert:  jeder genannte Teilmarkt ist ein Wert, sein amtliches Beispiel laeuft durch den VOLLEN
+          Weg (vergleichswertIrw, mit Rechenweg) und trifft; dazu eine Probe der Rechenform.
+   sperre: jeder Satz des Ausschusses ist Sperre mit Grund (kein Beispiel bzw. Widerspruch). */
+let kaFaelle = 0;
+if (!NUR_DATEI) {
+  const alleS = [];
+  for (const d of dateien) for (const s of JSON.parse(fs.readFileSync(path.join(ORDNER, d), 'utf8'))) alleS.push(s);
+  const KA = {
+    '30200': { name: 'Kreis Borken', wert: ['efh_zfh', 'etw'], form: 'additiv' },
+    '33300': { name: 'Kreis Gütersloh', wert: ['efh_zfh', 'etw', 'rh_dhh'], form: 'gemeindegruppe' },
+    '30900': { name: 'Kreis Heinsberg', wert: ['rh_dhh', 'etw'], form: 'matrix_linear' },
+    '26400': { name: 'Stadt Moers', wert: ['etw', 'efh_zfh', 'rh_dhh'], form: 'matrix' },
+    '30600': { name: 'Rhein-Erft-Kreis', wert: ['efh_zfh', 'rh_dhh', 'etw'], form: 'matrix_linear' },
+    '30700': { name: 'Kreis Euskirchen', wert: ['etw'], form: 'matrix_linear' },
+    '30400': { name: 'Kreis Düren', wert: ['etw'], form: 'matrix_linear' },
+    '33200': { name: 'Kreis Unna', wert: ['etw', 'rh_dhh'], form: 'matrix_linear' },
+    '10600': { name: 'Stadt Dortmund', wert: ['etw', 'efh_zfh', 'rh_dhh', 'mfh'], form: 'additiv' },
+    '33000': { name: 'Kreis Warendorf', sperre: true },
+    '27900': { name: 'Stadt Rheine', sperre: true },
+    '11600': { name: 'Stadt Leverkusen', sperre: true },
+    '22200': { name: 'Dorsten/Gladbeck/Marl', sperre: true },
+    '27600': { name: 'Stadt Recklinghausen', sperre: true },
+    '20700': { name: 'Stadt Bergisch Gladbach', sperre: true },
+    '11100': { name: 'Stadt Hagen', sperre: true },
+    '10500': { name: 'Stadt Bottrop', sperre: true },
+  };
+  for (const [gasl, k] of Object.entries(KA)) {
+    kaFaelle++;
+    const ss = alleS.filter((s) => s.gasl === gasl);
+    if (!ss.length) { fehler(`Kernausbau ${k.name}: keine Sätze`); continue; }
+    if (k.sperre) {
+      const w = ss.filter((s) => s.formel);
+      if (w.length) fehler(`Kernausbau ${k.name}: ${w.map((s) => s.zweig).join(',')} trägt formel, erwartet Sperre`);
+      else if (ss.some((s) => !s.warum_kein_wert)) fehler(`Kernausbau ${k.name}: Sperre ohne Grund`);
+      else console.log(`  ok Kernausbau ${k.name}: ${ss.length} Satz/Sätze gesperrt mit Grund`);
+      continue;
+    }
+    for (const z of k.wert) {
+      const s = ss.find((x) => x.zweig === z && x.formel);
+      if (!s) { fehler(`Kernausbau ${k.name} ${z}: kein Wert`); continue; }
+      const ab = s.anwendungsbeispiel;
+      if (!ab) { fehler(`Kernausbau ${k.name} ${z}: ohne amtliches Beispiel freigeschaltet`); continue; }
+      if (ab.merkmale_ersatz) { const p = V.pruefeBeispiel(s); if (!p || !p.ok) fehler(`Kernausbau ${k.name} ${z}: Beispiel (mit Ersatztabelle) verfehlt`); else console.log(`  ok Kernausbau ${k.name} ${z}: Beispiel ${ab.seite} mit Tabelle laut ${ab.ersatz_grund ? 'ersatz_grund' : 'Ersatz'} getroffen`); continue; }
+      const tm = Number(Object.keys(V.TEILMAERKTE).find((c) => V.TEILMAERKTE[c] === z));
+      const irw = { verfuegbar: true, wert_qm: Number(ab.irw), gasl, teilmarkt_code: tm, stichtag: '01.01.' + s.jahrgang, roh: ab.norm_zone || {} };
+      const r = V.vergleichswertIrw({ irw, objekt: { ...ab.objekt, wohnflaeche: ab.objekt.wohnflaeche ?? ab.wohnflaeche ?? 100 } });
+      if (!r.verfuegbar) { fehler(`Kernausbau ${k.name} ${z}: voller Weg rechnet nicht — ${r.hinweis}`); continue; }
+      const tol = ab.toleranz_eur_qm ?? 1;
+      if (ab.ergebnis_eur_qm != null && Math.abs(r.wert_qm_roh - Number(ab.ergebnis_eur_qm)) > tol) fehler(`Kernausbau ${k.name} ${z}: voller Weg ${r.wert_qm_roh} statt ${ab.ergebnis_eur_qm}`);
+      else if (!r.rechenweg.some((x) => /angepasster Richtwert/.test(x.pos))) fehler(`Kernausbau ${k.name} ${z}: Rechenweg ohne angepassten Richtwert`);
+      else console.log(`  ok Kernausbau ${k.name} ${z}: Beispiel ${ab.seite} über den vollen Weg ${Math.round(r.wert_qm_roh * 100) / 100} €/m² (Soll ${ab.ergebnis_eur_qm})`);
+    }
+  }
+  /* Formproben am echten Kern */
+  const borken = alleS.find((s) => s.gasl === '30200' && s.zweig === 'efh_zfh' && s.formel);
+  if (borken) {
+    kaFaelle++;
+    const u = V.umrechnen(borken, 2510, borken.anwendungsbeispiel.objekt, borken.anwendungsbeispiel.norm_zone);
+    const mult = u.faktoren.reduce((a, x) => a * x.uk, 1) * 2510;
+    if (!u.ok || u.verknuepfung !== 'additiv' || Math.abs(u.wert_qm - mult) < 3) fehler('Formprobe additiv: Borken rechnet nicht additiv (multiplikativ wäre ' + Math.round(mult * 10) / 10 + ')');
+    else console.log(`  ok Formprobe additiv (Borken): ${Math.round(u.wert_qm * 10) / 10} €/m², multipliziert wären es ${Math.round(mult * 10) / 10}`);
+  }
+  const unna = alleS.find((s) => s.gasl === '33200' && s.zweig === 'rh_dhh' && s.formel);
+  const ml = unna && unna.formel.merkmale.find((m) => m.art === 'matrix_linear');
+  if (ml) {
+    kaFaelle++;
+    const sp = ml.spalten_objekt, zs = ml.zeilen_norm;
+    const ausser = Math.max(sp[0], sp[sp.length - 1]) + 1;
+    const n0 = zs[0];
+    const r = V.merkmalFaktor(ml, { [[].concat(ml.eingabe)[0]]: ausser }, { [ml.norm_feld]: String(n0) }, unna.formel.normobjekt, { jahr: unna.jahrgang });
+    if (r.ok || r.grund !== 'ausserhalb') fehler('Formprobe matrix_linear (Unna ' + ml.id + '): ' + ausser + ' muss außerhalb sein (keine Extrapolation)');
+    else console.log(`  ok Formprobe matrix_linear (Unna ${ml.id}): ${ausser} außerhalb der Tabelle → kein Wert`);
+  }
+  const gt = alleS.find((s) => s.gasl === '33300' && s.zweig === 'efh_zfh' && s.formel);
+  const gm = gt && gt.formel.merkmale.find((m) => m.art === 'klassen_je_gemeindegruppe');
+  if (gm) {
+    kaFaelle++;
+    const r1 = V.merkmalFaktor(gm, { bodenrichtwert: 240 }, { BOWL: '190', GENA: 'Halle' }, gt.formel.normobjekt);
+    const r2 = V.merkmalFaktor(gm, { bodenrichtwert: 240 }, { BOWL: '190', GENA: 'Bielefeld' }, gt.formel.normobjekt);
+    if (!r1.ok || Math.abs(r1.uk - 1.05) > 0.0005 || r2.ok) fehler('Formprobe Gemeindegruppe (Gütersloh): Halle 1,05 und fremde Gemeinde kein Wert erwartet');
+    else console.log(`  ok Formprobe Gemeindegruppe (Gütersloh): Halle 240 gegen 190 → ${r1.uk.toFixed(3)}, Bielefeld → kein Wert (${r2.grund})`);
+  }
+  const bot = alleS.find((s) => s.gasl === '10500' && s.zweig === 'rh_dhh');
+  const bm = bot && (bot.formel || bot.formel_vorgemerkt || {}).merkmale && (bot.formel || bot.formel_vorgemerkt).merkmale.find((m) => Array.isArray(m.bedingung) && m.bedingung.length);
+  if (bm) {
+    kaFaelle++;
+    const ctx = { jahr: bot.jahrgang };
+    const neu = V.merkmalFaktor(bm, { baujahr: 2000, mtyp: 1 }, null, null, ctx);
+    const mitte = V.merkmalFaktor(bm, { baujahr: 1980, mtyp: 1 }, null, null, ctx);
+    const ohne = V.merkmalFaktor(bm, { mtyp: 1 }, null, null, ctx);
+    if (!neu.ok || Math.abs(neu.uk - 1) > 1e-9 || mitte.ok || mitte.grund !== 'ausserhalb' || ohne.grund !== 'merkmal_fehlt') fehler('Formprobe Bedingung (Bottrop, vorgemerkt): Bj 2000 → neuzeitlich, Bj 1980 baujahrtypisch → kein Wert, ohne Baujahr → merkmal_fehlt erwartet');
+    else console.log('  ok Formprobe Bedingung (Bottrop, vorgemerkt): Bj 2000 → neuzeitlich gesetzt, Bj 1980 „baujahrtypisch“ → kein Wert, ohne Baujahr → merkmal_fehlt');
+  }
+}
+
 /* ── optional: Deckung gegen das Shape ── */
 /* Minimaler DBF-Leser für die Attribute des IRW-Shapes (UTF-8, siehe .cpg). */
 function liesDbf(pfad) {
@@ -244,6 +401,19 @@ if (SHAPE) {
         let gut = true;
         for (const m of s.formel.merkmale) {
           if (m.art === 'stichtag' || !m.norm_feld) continue;
+          /* v3015 · Zeilen (Norm) und Spalten (Objekt) heissen verschieden: abbildbar, wenn irgendeine Spalte rechnet */
+          if (m.art === 'matrix_klassen' || (m.art === 'matrix_linear' && JSON.stringify(m.zeilen_norm) !== JSON.stringify(m.spalten_objekt))) {
+            const e1 = [].concat(m.eingabe); const k1 = e1[e1.length - 1];
+            let r1 = null;
+            for (const c of m.spalten_objekt) {
+              const zahl = String(c).match(/d+/);
+              const v = typeof c === 'number' ? c : (/^s*[<>]|-/.test(String(c)) && zahl ? Number(zahl[0]) + (/^s*>/.test(String(c)) ? 1 : 0) : c);
+              r1 = V.merkmalFaktor({ ...m, eingabe: k1, zuordnung: {} }, { [k1]: v }, z, s.formel.normobjekt);
+              if (r1.ok) break;
+            }
+            if (!r1 || !r1.ok) { gut = false; const g1 = r1 ? r1.grund : 'leer'; gruende[m.id + ':' + g1] = (gruende[m.id + ':' + g1] || 0) + 1; }
+            continue;
+          }
           /* Objekt = Norm der Zone: dann muss jedes Merkmal rechenbar sein */
           const nv = (z[m.norm_feld] || '').trim();
           const o = {}; const e0 = [].concat(m.eingabe); o[e0[e0.length - 1]] = nv || m.norm;
@@ -281,7 +451,7 @@ if (LIVE) {
 }
 
 console.log(`DECKUNG: ${dateien.length} Datei(en), ${saetze} Sätze (${werte} Werte, ${sperren} Sperren), `
-  + `${beispiele} Anwendungsbeispiel(e) getroffen, ${ohneBeispiel} ohne Beispiel · Verfahrenswahl ${vwFaelle} Fälle · Garage ${garFaelle} Kernläufe · gilt_nur ${gnFaelle} Kernläufe`);
+  + `${beispiele} Anwendungsbeispiel(e) getroffen, ${ohneBeispiel} ohne Beispiel · Verfahrenswahl ${vwFaelle} Fälle · Garage ${garFaelle} Kernläufe · gilt_nur ${gnFaelle} Kernläufe · Kernausbau ${kaFaelle} Prüffälle`);
 if (!saetze) { rot++; console.log('  -> NULL Sätze gelesen — kein grünes Ergebnis'); }
 console.log('ERGEBNIS: ' + (rot ? rot + ' Fehler' : 'sauber'));
 process.exit(rot ? 1 : 0);

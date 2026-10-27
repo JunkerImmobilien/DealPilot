@@ -4077,15 +4077,17 @@
       "gemeinden": "Erkelenz, Gangelt, Geilenkirchen, Heinsberg, Hückelhoven, Selfkant, Übach-Palenberg, Waldfeucht, Wassenberg, Wegberg",
       "hinweis": "Freistehende Ein- und Zweifamilienhäuser, 2.635 Kauffälle 2012–2025, Baujahre 1950–2023, Weiterverkäufe (S. 3)."
     },
-    "warum_kein_wert": "Der Kreis Heinsberg veröffentlicht seine Umrechnungskoeffizienten als Matrizen „Richtwertobjekt × Bewertungsobjekt\" mit Stützstellen (Baujahr in 10-Jahres-, Wohnfläche und Baulandfläche in 10- bzw. 50-m²-Schritten) und schreibt dazu: „Die Tabelle ist auszugsweise wiedergegeben\" und „Für eventuelle Umrechnungen wird empfohlen, den Immobilien-Preis-Kalkulator zu verwenden\". Die Zonen führen eigene Normobjekte, die oft ZWISCHEN den gedruckten Stützstellen liegen (z. B. Baujahr 1975/1985, Wohnfläche 135/145 m², Baulandfläche 525/545/590/745 m² — 96 Zonen); das amtliche Anwendungsbeispiel rechnet selbst mit einem nicht gedruckten Richtwertobjekt (Zwischenwert). Der Kern kennt keine Matrix mit Zahlen-Stützstellen und Interpolation in Zeile UND Spalte; eine Kurve aus einer einzelnen Zeile träfe die übrigen Zeilen nur auf ±0,01. Deshalb keine Umrechnung — alle Tabellen stehen unter formel_vorgemerkt. Weg: Immobilien-Preis-Kalkulator in BORIS-NRW (https://www.boris.nrw.de/boris-nrw/?lang=de (Immobilienrichtwert anklicken → rotes Rechnersymbol „Immobilien-Preis-Kalkulator\")) oder Gutachterausschuss im Kreis Heinsberg.",
+    "warum_kein_wert": "Kernfertig (v3015: Matrizen als matrix_linear, Koeffizienten und Produkt auf zwei Stellen wie im Beispiel), aber das amtliche Anwendungsbeispiel S. 8 wird nicht getroffen: am Zwischenwert Baujahr Richtwert 1985 → Objekt 2020 druckt der Ausschuss 1,34, die gedruckte Tabelle („auszugsweise wiedergegeben“) ergibt zwischen den Zeilen 1990 (1,28) und 1980 (1,41) aber 1,345, gerundet 1,35. Ergebnis am echten Kern 3.229 statt 3.206 €/m² (+0,7 %). Der Ausschuss rechnet im Immobilien-Preis-Kalkulator mit der vollständigen Tabelle (die Zonen führen BJ 1965/1975/1985 …). Die Teilmärkte RH und ETW treffen ihre Beispiele mit derselben Rechenform. Freigabe erst mit der vollständigen Tabelle des Ausschusses oder einer ausdrücklichen Entscheidung. Weg: Immobilien-Preis-Kalkulator in BORIS-NRW oder Gutachterausschuss im Kreis Heinsberg.",
     "formel_vorgemerkt": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "zwischen den Stützstellen (vom Ausschuss im Kalkulator angewandt, im Beispiel S. 8 sichtbar)",
+      "rundung_produkt": 2,
+      "rundung_herkunft": "Anwendungsbeispiel: Koeffizienten (auch interpolierte) auf zwei Stellen, „Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von …“ auf zwei Stellen, dann Richtwert × Faktor",
+      "interpolation": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
       "extrapolation": false,
       "irw_lageangepasst": true,
       "stellplaetze_im_irw": false,
-      "rechenform_vorschlag": "Vorschlag Rechenform „matrix_stuetz\": UK = M[Richtwertobjekt][Bewertungsobjekt], bilinear zwischen den gedruckten Stützstellen (Zeile = Normmerkmal der Zone, Spalte = Objekt), keine Extrapolation; Zellen unter `ungesichert` mit Hinweis „keine gesicherten Werte\" (Ausschuss).",
+      "stellplaetze_hinweis": "Der vorläufige Vergleichswert beinhaltet keine Nebengebäude, wie z. B. Garagen oder Carports; sie sind separat nach ihrem Zeitwert zu berücksichtigen (Beispielseite).",
       "normobjekt": "je Zone (Felder GART, EGART, BJ, WHNFL, KELLER, MTYP, GSTAND, MIETS, FLAE)",
       "merkmale": [
         {
@@ -4094,24 +4096,30 @@
           "eingabe": "gebaeudeart",
           "norm_feld": "GART",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
-            "Einfamilienhaus",
-            "Zweifamilienhaus"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "Einfamilienhaus",
             "Zweifamilienhaus"
           ],
           "werte": [
             [
               1,
-              0.92
+              1.09
             ],
             [
-              1.09,
+              0.92,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "efh": "Einfamilienhaus",
+            "zfh": "Zweifamilienhaus"
+          },
+          "norm_zuordnung": {
+            "13": "Einfamilienhaus",
+            "17": "Zweifamilienhaus"
+          }
         },
         {
           "id": "ergaenzende_gebaeudeart",
@@ -4119,17 +4127,28 @@
           "eingabe": "anbauweise",
           "norm_feld": "EGART",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
-            "freistehend"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "freistehend"
           ],
           "werte": [
             [
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "freistehend": "freistehend",
+            "doppelhaushaelfte": "Doppelhaus",
+            "reihenendhaus": "Reihenendhaus",
+            "reihenmittelhaus": "Reihenmittelhaus"
+          },
+          "norm_zuordnung": {
+            "1": "freistehend",
+            "2": "Doppelhaus",
+            "4": "Reihenmittelhaus",
+            "5": "Reihenendhaus"
+          }
         },
         {
           "id": "baujahr",
@@ -4137,7 +4156,8 @@
           "eingabe": "baujahr",
           "norm_feld": "BJ",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             2020,
             2015,
             2010,
@@ -4148,7 +4168,7 @@
             1960,
             1950
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             2020,
             2015,
             2010,
@@ -4260,6 +4280,8 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
           "ungesichert": {
             "zeilen": [
               2020,
@@ -4269,6 +4291,7 @@
               2020,
               1950
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
           }
         },
@@ -4278,7 +4301,8 @@
           "eingabe": "wohnflaeche",
           "norm_feld": "WHNFL",
           "seite": "S. 4–5",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             80,
             90,
             100,
@@ -4296,7 +4320,7 @@
             230,
             250
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             80,
             90,
             100,
@@ -4604,6 +4628,9 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
+          "runden": 0,
           "ungesichert": {
             "zeilen": [
               80,
@@ -4615,6 +4642,7 @@
               230,
               250
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
           }
         },
@@ -4626,18 +4654,9 @@
             "keller"
           ],
           "norm_feld": "KELLER",
-          "norm_codes": {
-            "0": "nicht vorhanden",
-            "1": "vorhanden",
-            "2": "teilw. vorhanden"
-          },
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "vorhanden",
-            "teilw. vorhanden",
-            "nicht vorhanden"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "vorhanden",
             "teilw. vorhanden",
             "nicht vorhanden"
@@ -4645,20 +4664,33 @@
           "werte": [
             [
               1,
-              0.95,
-              0.93
-            ],
-            [
               1.06,
-              1,
-              0.98
+              1.07
             ],
             [
-              1.07,
-              1.02,
+              0.95,
+              1,
+              1.02
+            ],
+            [
+              0.93,
+              0.98,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "voll": "vorhanden",
+            "teil": "teilw. vorhanden",
+            "kein": "nicht vorhanden",
+            "ja": "vorhanden",
+            "nein": "nicht vorhanden"
+          },
+          "norm_zuordnung": {
+            "0": "nicht vorhanden",
+            "1": "vorhanden",
+            "2": "teilw. vorhanden"
+          }
         },
         {
           "id": "modernisierungstyp",
@@ -4666,12 +4698,8 @@
           "eingabe": "mtyp",
           "norm_feld": "MTYP",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "baujahrtypisch",
-            "teilmodernisiert",
-            "neuzeitlich"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "baujahrtypisch",
             "teilmodernisiert",
             "neuzeitlich"
@@ -4679,33 +4707,43 @@
           "werte": [
             [
               1,
-              1.07,
-              1.14
-            ],
-            [
               0.93,
-              1,
-              1.06
+              0.88
             ],
             [
-              0.88,
-              0.94,
+              1.07,
+              1,
+              0.94
+            ],
+            [
+              1.14,
+              1.06,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "1": "baujahrtypisch",
+            "2": "teilmodernisiert",
+            "3": "neuzeitlich"
+          },
+          "norm_zuordnung": {
+            "1": "baujahrtypisch",
+            "2": "teilmodernisiert",
+            "3": "neuzeitlich"
+          }
         },
         {
           "id": "gebaeudestandard",
           "name": "Gebäudestandard",
-          "eingabe": "gstand",
+          "eingabe": [
+            "ausstattung",
+            "gstand"
+          ],
           "norm_feld": "GSTAND",
           "seite": "S. 6",
-          "zeilen_richtwertobjekt": [
-            "einfach",
-            "mittel",
-            "gehoben"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "einfach",
             "mittel",
             "gehoben"
@@ -4713,20 +4751,32 @@
           "werte": [
             [
               1,
-              1.13,
-              1.23
-            ],
-            [
               0.89,
-              1,
-              1.09
+              0.81
             ],
             [
-              0.81,
-              0.92,
+              1.13,
+              1,
+              0.92
+            ],
+            [
+              1.23,
+              1.09,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "norm_zuordnung": {
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "zuordnung_herkunft": "„Die Einstufung des Gebäudestandards richtet sich nach den Standardmerkmalen und Standardstufen der Sachwertrichtlinie“; Codes des IRW-Datenmodells (Feld 60): 3 = einfach [1,8–2,2], 5 = mittel [2,8–3,2], 7 = gehoben [3,8–4,2]; Zwischenstufen führt die Tabelle nicht → kein Wert"
         },
         {
           "id": "mietsituation",
@@ -4734,24 +4784,30 @@
           "eingabe": "vermietet",
           "norm_feld": "MIETS",
           "seite": "S. 6",
-          "zeilen_richtwertobjekt": [
-            "unvermietet",
-            "vermietet"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "unvermietet",
             "vermietet"
           ],
           "werte": [
             [
               1,
-              0.93
+              1.08
             ],
             [
-              1.08,
+              0.93,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "ja": "vermietet",
+            "nein": "unvermietet"
+          },
+          "norm_zuordnung": {
+            "1": "unvermietet",
+            "2": "vermietet"
+          }
         },
         {
           "id": "baulandflaeche",
@@ -4759,7 +4815,8 @@
           "eingabe": "grundstuecksflaeche",
           "norm_feld": "FLAE",
           "seite": "S. 6–7",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             250,
             300,
             350,
@@ -4776,7 +4833,7 @@
             1000,
             1200
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             250,
             300,
             350,
@@ -5066,6 +5123,9 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
+          "runden": 0,
           "ungesichert": {
             "zeilen": [
               250,
@@ -5078,12 +5138,12 @@
               1100,
               1200
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
-          },
-          "hinweis": "Die Zeile „1100\" fehlt im Druck (15 Zeilen, 16 Spalten)."
+          }
         }
       ],
-      "wohnlage": "Keine Koeffizienten: „Die Immobilienrichtwertzonen wurden so gebildet, dass sich keine Lageunterschiede innerhalb einer Immobilienrichtwertzone ergeben\" (S. 7).",
+      "wohnlage_hinweis": "Keine Koeffizienten: „Die Immobilienrichtwertzonen wurden so gebildet, dass sich keine Lageunterschiede innerhalb einer Immobilienrichtwertzone ergeben\" (S. 7).",
       "anwendungsbeispiel": {
         "seite": "S. 8",
         "irw": 2340,
@@ -5094,7 +5154,7 @@
           "WHNFL": "140",
           "KELLER": "1",
           "MTYP": "1",
-          "GSTAND": "mittel",
+          "GSTAND": "5",
           "MIETS": "1",
           "FLAE": "550"
         },
@@ -5105,10 +5165,11 @@
           "wohnflaeche": 120,
           "keller": false,
           "mtyp": 2,
-          "gstand": "gehoben",
           "vermietet": true,
-          "grundstuecksflaeche": 605
+          "grundstuecksflaeche": 605,
+          "ausstattung": "gehoben"
         },
+        "objekt_hinweis": "Alle Merkmale des Beispiels; Ausstattungswort als Eingabe ausstattung, Zonen-Codes wie im IRW-Shape (GSTAND 5 = mittel).",
         "faktoren": {
           "gebaeudeart": 0.92,
           "ergaenzende_gebaeudeart": 1,
@@ -5120,10 +5181,10 @@
           "mietsituation": 0.93,
           "baulandflaeche": 1.03
         },
-        "produkt_gedruckt": 1.37,
         "ergebnis_eur_qm": 3206,
         "wohnflaeche": 120,
         "ergebnis_eur": 385000,
+        "produkt_gedruckt": 1.37,
         "wortlaut": "Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von 1,37 · 2.340 €/m² x 1,37 = 3.206 €/m² · 120 m² x 3.206 €/m² = rd. 385.000 € (Baujahr 1985 → 2020 = 1,34 und Baulandfläche 550 → 605 = 1,03 sind Zwischenwerte, nicht gedruckt)"
       }
     },
@@ -5132,7 +5193,8 @@
       "Zitat S. 4/5/7: „Die Tabelle ist auszugsweise wiedergegeben.\" Gelbe Zellen: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"."
     ],
     "seite": "S. 1–8",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0530900_2026.pdf"
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0530900_2026.pdf",
+    "kernausbau": "v3015 Kernausbau: kernfertig, Beispiel S. 8 nicht getroffen (1,35 statt 1,34 am Zwischenwert Baujahr) — bleibt Sperre"
   },
   {
     "land_code": "NW",
@@ -5146,7 +5208,7 @@
     "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "modellansaetze": {
       "teilmarkt_code": 3,
       "brechv": 2,
@@ -5166,15 +5228,22 @@
       "gemeinden": "Erkelenz, Gangelt, Geilenkirchen, Heinsberg, Hückelhoven, Selfkant, Übach-Palenberg, Waldfeucht, Wassenberg, Wegberg",
       "hinweis": "Reihen- und Doppelhäuser, 2.188 Kauffälle, Baujahre 1950–2023, Weiterverkäufe (S. 3)."
     },
-    "warum_kein_wert": "Der Kreis Heinsberg veröffentlicht seine Umrechnungskoeffizienten als Matrizen „Richtwertobjekt × Bewertungsobjekt\" mit Stützstellen (Baujahr in 10-Jahres-, Wohnfläche und Baulandfläche in 10- bzw. 50-m²-Schritten) und schreibt dazu: „Die Tabelle ist auszugsweise wiedergegeben\" und „Für eventuelle Umrechnungen wird empfohlen, den Immobilien-Preis-Kalkulator zu verwenden\". Die Zonen führen eigene Normobjekte, die oft ZWISCHEN den gedruckten Stützstellen liegen (z. B. Baujahr 1975/1985, Wohnfläche 115/125 m², Baulandfläche 285/320/325/385 m² — 76 Zonen); das amtliche Anwendungsbeispiel rechnet selbst mit einem nicht gedruckten Richtwertobjekt (Zwischenwert). Der Kern kennt keine Matrix mit Zahlen-Stützstellen und Interpolation in Zeile UND Spalte; eine Kurve aus einer einzelnen Zeile träfe die übrigen Zeilen nur auf ±0,01. Deshalb keine Umrechnung — alle Tabellen stehen unter formel_vorgemerkt. Weg: Immobilien-Preis-Kalkulator in BORIS-NRW (https://www.boris.nrw.de/boris-nrw/?lang=de (Immobilienrichtwert anklicken → rotes Rechnersymbol „Immobilien-Preis-Kalkulator\")) oder Gutachterausschuss im Kreis Heinsberg.",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (Kreis Heinsberg), Stichtag 01.01.2026: S. 1 Hinweise (keine Nebengebäude), S. 3 Kennzahlen, Preisindex (01.01.2026 extrapoliert 181,9) und ergänzende Gebäudeart, S. 4 Baujahr und Wohnfläche, S. 5 Keller, Modernisierungstyp, Gebäudestandard, Mietsituation, S. 6 Baulandfläche, S. 7 Beispiel.",
+      "Zitat: „Die Tabelle ist auszugsweise wiedergegeben.\" Gelbe Zellen: „keine gesicherten Werte\". (Fundstelle: LGDIR_3_0530900_2026.pdf, S. 1–7)"
+    ],
+    "seite": "S. 1–7",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0530900_2026.pdf",
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "zwischen den Stützstellen (Kalkulator; im Beispiel S. 7 sichtbar)",
+      "rundung_produkt": 2,
+      "rundung_herkunft": "Anwendungsbeispiel: Koeffizienten (auch interpolierte) auf zwei Stellen, „Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von …“ auf zwei Stellen, dann Richtwert × Faktor",
+      "interpolation": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
       "extrapolation": false,
       "irw_lageangepasst": true,
       "stellplaetze_im_irw": false,
-      "rechenform_vorschlag": "Vorschlag Rechenform „matrix_stuetz\": UK = M[Richtwertobjekt][Bewertungsobjekt], bilinear zwischen den gedruckten Stützstellen (Zeile = Normmerkmal der Zone, Spalte = Objekt), keine Extrapolation; Zellen unter `ungesichert` mit Hinweis „keine gesicherten Werte\" (Ausschuss).",
+      "stellplaetze_hinweis": "Der vorläufige Vergleichswert beinhaltet keine Nebengebäude, wie z. B. Garagen oder Carports; sie sind separat nach ihrem Zeitwert zu berücksichtigen (Beispielseite).",
       "normobjekt": "je Zone (Felder GART, EGART, BJ, WHNFL, KELLER, MTYP, GSTAND, MIETS, FLAE)",
       "merkmale": [
         {
@@ -5183,12 +5252,8 @@
           "eingabe": "anbauweise",
           "norm_feld": "EGART",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
-            "Doppelhaus",
-            "Reihenendhaus",
-            "Reihenmittelhaus"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "Doppelhaus",
             "Reihenendhaus",
             "Reihenmittelhaus"
@@ -5196,20 +5261,33 @@
           "werte": [
             [
               1,
+              1.03,
+              1.06
+            ],
+            [
               0.97,
-              0.95
-            ],
-            [
-              1.03,
               1,
-              0.97
+              1.03
             ],
             [
-              1.06,
-              1.03,
+              0.95,
+              0.97,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "freistehend": "freistehend",
+            "doppelhaushaelfte": "Doppelhaus",
+            "reihenendhaus": "Reihenendhaus",
+            "reihenmittelhaus": "Reihenmittelhaus"
+          },
+          "norm_zuordnung": {
+            "1": "freistehend",
+            "2": "Doppelhaus",
+            "4": "Reihenmittelhaus",
+            "5": "Reihenendhaus"
+          }
         },
         {
           "id": "baujahr",
@@ -5217,7 +5295,8 @@
           "eingabe": "baujahr",
           "norm_feld": "BJ",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             2020,
             2015,
             2010,
@@ -5228,7 +5307,7 @@
             1960,
             1950
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             2020,
             2015,
             2010,
@@ -5340,6 +5419,8 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
           "ungesichert": {
             "zeilen": [
               2020,
@@ -5349,6 +5430,7 @@
               2020,
               1950
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
           }
         },
@@ -5358,7 +5440,8 @@
           "eingabe": "wohnflaeche",
           "norm_feld": "WHNFL",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             60,
             70,
             80,
@@ -5373,7 +5456,7 @@
             180,
             200
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             60,
             70,
             80,
@@ -5585,6 +5668,9 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
+          "runden": 0,
           "ungesichert": {
             "zeilen": [
               60,
@@ -5596,6 +5682,7 @@
               180,
               200
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
           }
         },
@@ -5607,18 +5694,9 @@
             "keller"
           ],
           "norm_feld": "KELLER",
-          "norm_codes": {
-            "0": "nicht vorhanden",
-            "1": "vorhanden",
-            "2": "teilw. vorhanden"
-          },
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "vorhanden",
-            "teilw. vorhanden",
-            "nicht vorhanden"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "vorhanden",
             "teilw. vorhanden",
             "nicht vorhanden"
@@ -5626,20 +5704,33 @@
           "werte": [
             [
               1,
+              1.03,
+              1.06
+            ],
+            [
               0.97,
-              0.94
-            ],
-            [
-              1.03,
               1,
-              0.97
+              1.03
             ],
             [
-              1.06,
-              1.03,
+              0.94,
+              0.97,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "voll": "vorhanden",
+            "teil": "teilw. vorhanden",
+            "kein": "nicht vorhanden",
+            "ja": "vorhanden",
+            "nein": "nicht vorhanden"
+          },
+          "norm_zuordnung": {
+            "0": "nicht vorhanden",
+            "1": "vorhanden",
+            "2": "teilw. vorhanden"
+          }
         },
         {
           "id": "modernisierungstyp",
@@ -5647,12 +5738,8 @@
           "eingabe": "mtyp",
           "norm_feld": "MTYP",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "baujahrtypisch",
-            "teilmodernisiert",
-            "neuzeitlich"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "baujahrtypisch",
             "teilmodernisiert",
             "neuzeitlich"
@@ -5660,33 +5747,43 @@
           "werte": [
             [
               1,
-              1.1,
-              1.2
-            ],
-            [
               0.91,
-              1,
-              1.09
+              0.83
             ],
             [
-              0.83,
-              0.92,
+              1.1,
+              1,
+              0.92
+            ],
+            [
+              1.2,
+              1.09,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "1": "baujahrtypisch",
+            "2": "teilmodernisiert",
+            "3": "neuzeitlich"
+          },
+          "norm_zuordnung": {
+            "1": "baujahrtypisch",
+            "2": "teilmodernisiert",
+            "3": "neuzeitlich"
+          }
         },
         {
           "id": "gebaeudestandard",
           "name": "Gebäudestandard",
-          "eingabe": "gstand",
+          "eingabe": [
+            "ausstattung",
+            "gstand"
+          ],
           "norm_feld": "GSTAND",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "einfach",
-            "mittel",
-            "gehoben"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "einfach",
             "mittel",
             "gehoben"
@@ -5694,20 +5791,32 @@
           "werte": [
             [
               1,
-              1.12,
-              1.17
-            ],
-            [
               0.9,
-              1,
-              1.05
+              0.85
             ],
             [
-              0.85,
-              0.95,
+              1.12,
+              1,
+              0.95
+            ],
+            [
+              1.17,
+              1.05,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "norm_zuordnung": {
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "zuordnung_herkunft": "„Die Einstufung des Gebäudestandards richtet sich nach den Standardmerkmalen und Standardstufen der Sachwertrichtlinie“; Codes des IRW-Datenmodells (Feld 60): 3 = einfach [1,8–2,2], 5 = mittel [2,8–3,2], 7 = gehoben [3,8–4,2]; Zwischenstufen führt die Tabelle nicht → kein Wert"
         },
         {
           "id": "mietsituation",
@@ -5715,24 +5824,30 @@
           "eingabe": "vermietet",
           "norm_feld": "MIETS",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "unvermietet",
-            "vermietet"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "unvermietet",
             "vermietet"
           ],
           "werte": [
             [
               1,
-              0.94
+              1.06
             ],
             [
-              1.06,
+              0.94,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "ja": "vermietet",
+            "nein": "unvermietet"
+          },
+          "norm_zuordnung": {
+            "1": "unvermietet",
+            "2": "vermietet"
+          }
         },
         {
           "id": "baulandflaeche",
@@ -5740,7 +5855,8 @@
           "eingabe": "grundstuecksflaeche",
           "norm_feld": "FLAE",
           "seite": "S. 6",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             100,
             150,
             200,
@@ -5755,7 +5871,7 @@
             650,
             750
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             100,
             150,
             200,
@@ -5967,6 +6083,9 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
+          "runden": 0,
           "ungesichert": {
             "zeilen": [
               100,
@@ -5980,60 +6099,56 @@
               650,
               750
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
           }
         }
       ],
-      "wohnlage": "Keine Koeffizienten (Zonen ohne Lageunterschiede, S. 6).",
-      "anwendungsbeispiel": {
-        "seite": "S. 7",
-        "irw": 2370,
-        "norm_zone": {
-          "GART": "13",
-          "EGART": "4",
-          "BJ": "2000",
-          "WHNFL": "130",
-          "KELLER": "2",
-          "MTYP": "1",
-          "GSTAND": "mittel",
-          "MIETS": "1",
-          "FLAE": "265"
-        },
-        "objekt": {
-          "gebaeudeart": "efh",
-          "anbauweise": "doppelhaushaelfte",
-          "baujahr": 1998,
-          "wohnflaeche": 110,
-          "keller": true,
-          "mtyp": 2,
-          "gstand": "einfach",
-          "vermietet": true,
-          "grundstuecksflaeche": 260
-        },
-        "faktoren": {
-          "gebaeudeart": 1,
-          "ergaenzende_gebaeudeart": 1.06,
-          "baujahr": 0.98,
-          "wohnflaeche": 1.08,
-          "keller": 1.03,
-          "modernisierungstyp": 1.1,
-          "gebaeudestandard": 0.9,
-          "mietsituation": 0.94,
-          "baulandflaeche": 1
-        },
-        "produkt_gedruckt": 1.08,
-        "ergebnis_eur_qm": 2560,
-        "wohnflaeche": 110,
-        "ergebnis_eur": 282000,
-        "wortlaut": "2.370 €/m² x 1,08 = 2.560 €/m² · 110 m² x 2.560 €/m² = rd. 282.000 € (Gebäudeart EFH/EFH 1,00 — eine Gebäudeart-Tabelle druckt der Teilmarkt nicht)"
-      }
+      "wohnlage_hinweis": "Keine Koeffizienten (Zonen ohne Lageunterschiede, S. 6)."
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (Kreis Heinsberg), Stichtag 01.01.2026: S. 1 Hinweise (keine Nebengebäude), S. 3 Kennzahlen, Preisindex (01.01.2026 extrapoliert 181,9) und ergänzende Gebäudeart, S. 4 Baujahr und Wohnfläche, S. 5 Keller, Modernisierungstyp, Gebäudestandard, Mietsituation, S. 6 Baulandfläche, S. 7 Beispiel.",
-      "Zitat: „Die Tabelle ist auszugsweise wiedergegeben.\" Gelbe Zellen: „keine gesicherten Werte\". (Fundstelle: LGDIR_3_0530900_2026.pdf, S. 1–7)"
-    ],
-    "seite": "S. 1–7",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0530900_2026.pdf"
+    "anwendungsbeispiel": {
+      "seite": "S. 7",
+      "irw": 2370,
+      "norm_zone": {
+        "GART": "13",
+        "EGART": "4",
+        "BJ": "2000",
+        "WHNFL": "130",
+        "KELLER": "2",
+        "MTYP": "1",
+        "GSTAND": "5",
+        "MIETS": "1",
+        "FLAE": "265"
+      },
+      "objekt": {
+        "gebaeudeart": "efh",
+        "anbauweise": "doppelhaushaelfte",
+        "baujahr": 1998,
+        "wohnflaeche": 110,
+        "keller": true,
+        "mtyp": 2,
+        "vermietet": true,
+        "grundstuecksflaeche": 260,
+        "ausstattung": "einfach"
+      },
+      "objekt_hinweis": "Alle Merkmale des Beispiels; Ausstattungswort als Eingabe ausstattung, Zonen-Codes wie im IRW-Shape (GSTAND 5 = mittel).",
+      "faktoren": {
+        "ergaenzende_gebaeudeart": 1.06,
+        "baujahr": 0.98,
+        "wohnflaeche": 1.08,
+        "keller": 1.03,
+        "modernisierungstyp": 1.1,
+        "gebaeudestandard": 0.9,
+        "mietsituation": 0.94,
+        "baulandflaeche": 1
+      },
+      "ergebnis_eur_qm": 2560,
+      "wohnflaeche": 110,
+      "ergebnis_eur": 282000,
+      "produkt_gedruckt": 1.08,
+      "wortlaut": "2.370 €/m² x 1,08 = 2.560 €/m² · 110 m² x 2.560 €/m² = rd. 282.000 € (Gebäudeart EFH/EFH 1,00 — eine Gebäudeart-Tabelle druckt der Teilmarkt nicht)"
+    },
+    "kernausbau": "v3015 Kernausbau: Matrizen Richtwertobjekt × Bewertungsobjekt (matrix_linear, lineare Interpolation in beide Richtungen), Anwendungsbeispiel S. 7 am echten Kern"
   },
   {
     "land_code": "NW",
@@ -6047,7 +6162,7 @@
     "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "modellansaetze": {
       "teilmarkt_code": 1,
       "brechv": 2,
@@ -6066,15 +6181,23 @@
       "gemeinden": "Erkelenz, Geilenkirchen, Heinsberg, Hückelhoven, Übach-Palenberg, Wassenberg, Wegberg",
       "hinweis": "Eigentumswohnungen, 1.227 Kauffälle, Baujahre 1950–2023, Weiterverkäufe (S. 3)."
     },
-    "warum_kein_wert": "Der Kreis Heinsberg veröffentlicht seine Umrechnungskoeffizienten als Matrizen „Richtwertobjekt × Bewertungsobjekt\" mit Stützstellen (Baujahr in 10-Jahres-, Wohnfläche und Baulandfläche in 10- bzw. 50-m²-Schritten) und schreibt dazu: „Die Tabelle ist auszugsweise wiedergegeben\" und „Für eventuelle Umrechnungen wird empfohlen, den Immobilien-Preis-Kalkulator zu verwenden\". Die Zonen führen eigene Normobjekte, die oft ZWISCHEN den gedruckten Stützstellen liegen (z. B. Baujahr 1975/1985/1995, Wohnfläche 65/75/85 m² — 23 Zonen); das amtliche Anwendungsbeispiel rechnet selbst mit einem nicht gedruckten Richtwertobjekt (Zwischenwert). Der Kern kennt keine Matrix mit Zahlen-Stützstellen und Interpolation in Zeile UND Spalte; eine Kurve aus einer einzelnen Zeile träfe die übrigen Zeilen nur auf ±0,01. Deshalb keine Umrechnung — alle Tabellen stehen unter formel_vorgemerkt. Weg: Immobilien-Preis-Kalkulator in BORIS-NRW (https://www.boris.nrw.de/boris-nrw/?lang=de (Immobilienrichtwert anklicken → rotes Rechnersymbol „Immobilien-Preis-Kalkulator\")) oder Gutachterausschuss im Kreis Heinsberg.",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (Kreis Heinsberg), Stichtag 01.01.2026: S. 1 Hinweise, S. 3 Kennzahlen, Preisindex (01.01.2026 extrapoliert 201,6) und Baujahr, S. 4 Wohnfläche, Balkon, Einheiten, S. 5 Geschosslage, Gebäudestandard, Mietsituation, S. 6 Beispiel.",
+      "S. 6: „Dieser vorläufige Vergleichswert beinhaltet keine Werte für Garagen, Stellplätze oder Sondernutzungsrechte.\"",
+      "Das Beispiel nennt als Zeitpunkt 01.01.2025 (Vorjahr) — Auffälligkeit, kein Rechenfehler."
+    ],
+    "seite": "S. 1–6",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0530900_2026.pdf",
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "zwischen den Stützstellen (Kalkulator; im Beispiel S. 6 sichtbar)",
+      "rundung_produkt": 2,
+      "rundung_herkunft": "Anwendungsbeispiel: Koeffizienten (auch interpolierte) auf zwei Stellen, „Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von …“ auf zwei Stellen, dann Richtwert × Faktor",
+      "interpolation": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
       "extrapolation": false,
       "irw_lageangepasst": true,
       "stellplaetze_im_irw": false,
-      "rechenform_vorschlag": "Vorschlag Rechenform „matrix_stuetz\": UK = M[Richtwertobjekt][Bewertungsobjekt], bilinear zwischen den gedruckten Stützstellen (Zeile = Normmerkmal der Zone, Spalte = Objekt), keine Extrapolation; Zellen unter `ungesichert` mit Hinweis „keine gesicherten Werte\" (Ausschuss).",
+      "stellplaetze_hinweis": "Der vorläufige Vergleichswert beinhaltet keine Nebengebäude, wie z. B. Garagen oder Carports; sie sind separat nach ihrem Zeitwert zu berücksichtigen (Beispielseite).",
       "normobjekt": "je Zone (Felder BJ, WHNFL, BK, WHNA, GESLA, GSTAND, MIETS)",
       "merkmale": [
         {
@@ -6083,7 +6206,8 @@
           "eingabe": "baujahr",
           "norm_feld": "BJ",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             2020,
             2015,
             2010,
@@ -6094,7 +6218,7 @@
             1960,
             1950
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             2020,
             2015,
             2010,
@@ -6206,6 +6330,8 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
           "ungesichert": {
             "zeilen": [
               2020,
@@ -6217,6 +6343,7 @@
               1960,
               1950
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
           }
         },
@@ -6226,7 +6353,8 @@
           "eingabe": "wohnflaeche",
           "norm_feld": "WHNFL",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             30,
             40,
             50,
@@ -6240,7 +6368,7 @@
             130,
             150
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             30,
             40,
             50,
@@ -6424,6 +6552,9 @@
               1
             ]
           ],
+          "interpolation_text": "lineare Interpolation (DealPilot) zwischen den gedruckten Stützstellen — der Ausschuss gibt die Tabelle „auszugsweise“ wieder und rechnet im Immobilien-Preis-Kalkulator mit Zwischenwerten (Anwendungsbeispiel), nennt aber keine eigene Regel",
+          "uk_runden": 2,
+          "runden": 0,
           "ungesichert": {
             "zeilen": [
               30,
@@ -6437,6 +6568,7 @@
               130,
               150
             ],
+            "text": "Ausschuss: „wegen geringer Anzahl von Kauffällen keine gesicherten Werte“",
             "regel": "Zelle ist gelb hinterlegt („wegen geringer Anzahl von Kauffällen keine gesicherten Werte\"), wenn ihre Zeile ODER ihre Spalte hier genannt ist (am Seitenbild abgelesen, Diagonale grau)"
           }
         },
@@ -6446,40 +6578,45 @@
           "eingabe": "balkon",
           "norm_feld": "BK",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
-            "vorhanden",
-            "nicht vorhanden"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "vorhanden",
             "nicht vorhanden"
           ],
           "werte": [
             [
               1,
-              0.98
+              1.03
             ],
             [
-              1.03,
+              0.98,
               1
             ]
           ],
-          "hinweis": "„Der Werteinfluss einer Dachterrasse o. ä. ist sachverständig zu schätzen.\""
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "ja": "vorhanden",
+            "nein": "nicht vorhanden"
+          },
+          "norm_zuordnung": {
+            "0": "nicht vorhanden",
+            "1": "vorhanden",
+            "2": "vorhanden",
+            "3": "vorhanden",
+            "4": "vorhanden"
+          }
         },
         {
           "id": "einheiten",
           "name": "Anzahl der Einheiten in der Wohnanlage",
-          "eingabe": "einheiten",
+          "eingabe": [
+            "einheiten_anlage",
+            "einheiten"
+          ],
           "norm_feld": "WHNA",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
-            "3-5",
-            "6-7",
-            "8-12",
-            "13-25",
-            "26-100"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "3-5",
             "6-7",
             "8-12",
@@ -6489,135 +6626,239 @@
           "werte": [
             [
               1,
-              0.95,
-              0.91,
-              0.91,
-              0.9
-            ],
-            [
               1.06,
-              1,
-              0.96,
-              0.96,
-              0.95
-            ],
-            [
               1.1,
-              1.04,
-              1,
-              1,
-              0.98
-            ],
-            [
               1.1,
-              1.04,
-              1,
-              1,
-              0.98
+              1.12
             ],
             [
-              1.12,
-              1.05,
-              1.02,
-              1.02,
+              0.95,
+              1,
+              1.04,
+              1.04,
+              1.05
+            ],
+            [
+              0.91,
+              0.96,
+              1,
+              1,
+              1.02
+            ],
+            [
+              0.91,
+              0.96,
+              1,
+              1,
+              1.02
+            ],
+            [
+              0.9,
+              0.95,
+              0.98,
+              0.98,
               1
             ]
           ],
-          "hinweis": "Klassen — als Matrix mit Klassen (von/bis) rechenbar; Zonenfeld WHNA führt Spannen wie 13-25, 8-12, 26-100, 6-7."
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "klassen": [
+            {
+              "name": "3-5",
+              "von": 3,
+              "bis": 5
+            },
+            {
+              "name": "6-7",
+              "von": 6,
+              "bis": 7
+            },
+            {
+              "name": "8-12",
+              "von": 8,
+              "bis": 12
+            },
+            {
+              "name": "13-25",
+              "von": 13,
+              "bis": 25
+            },
+            {
+              "name": "26-100",
+              "von": 26,
+              "bis": 100
+            }
+          ]
         },
         {
           "id": "geschosslage",
           "name": "Geschosslage",
           "eingabe": "geschoss",
           "norm_feld": "GESLA",
-          "norm_codes": {
+          "seite": "S. 5",
+          "art": "matrix",
+          "kategorien": [
+            "Souterrain",
+            "EG",
+            "1.+ 2. OG",
+            "ab 3. OG",
+            "DG",
+            "Maisonette"
+          ],
+          "werte": [
+            [
+              1,
+              0.7,
+              0.7,
+              0.74,
+              0.71,
+              0.66
+            ],
+            [
+              1.43,
+              1,
+              1,
+              1.06,
+              1.02,
+              0.95
+            ],
+            [
+              1.43,
+              1,
+              1,
+              1.06,
+              1.02,
+              0.95
+            ],
+            [
+              1.35,
+              0.94,
+              0.94,
+              1,
+              0.96,
+              0.89
+            ],
+            [
+              1.4,
+              0.98,
+              0.98,
+              1.04,
+              1,
+              0.93
+            ],
+            [
+              1.51,
+              1.05,
+              1.05,
+              1.12,
+              1.07,
+              1
+            ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
             "1": "1.+ 2. OG",
             "2": "1.+ 2. OG",
+            "3": "ab 3. OG",
+            "4": "ab 3. OG",
+            "5": "ab 3. OG",
+            "6": "ab 3. OG",
+            "7": "ab 3. OG",
+            "8": "ab 3. OG",
+            "9": "ab 3. OG",
+            "10": "ab 3. OG",
+            "11": "ab 3. OG",
+            "12": "ab 3. OG",
+            "13": "ab 3. OG",
+            "14": "ab 3. OG",
+            "15": "ab 3. OG",
+            "16": "ab 3. OG",
+            "17": "ab 3. OG",
+            "18": "ab 3. OG",
+            "19": "ab 3. OG",
+            "20": "ab 3. OG",
+            "21": "ab 3. OG",
+            "22": "ab 3. OG",
+            "23": "ab 3. OG",
+            "24": "ab 3. OG",
+            "25": "ab 3. OG",
+            "26": "ab 3. OG",
+            "27": "ab 3. OG",
+            "28": "ab 3. OG",
+            "29": "ab 3. OG",
+            "30": "ab 3. OG",
+            "31": "ab 3. OG",
+            "32": "ab 3. OG",
+            "33": "ab 3. OG",
+            "34": "ab 3. OG",
+            "35": "ab 3. OG",
+            "36": "ab 3. OG",
+            "37": "ab 3. OG",
+            "38": "ab 3. OG",
+            "39": "ab 3. OG",
+            "40": "ab 3. OG",
             "77": "DG",
             "88": "EG",
             "98": "Maisonette",
             "99": "Souterrain"
           },
-          "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "Souterrain",
-            "EG",
-            "1.+ 2. OG",
-            "ab 3. OG",
-            "DG",
-            "Maisonette"
-          ],
-          "spalten_bewertungsobjekt": [
-            "Souterrain",
-            "EG",
-            "1.+ 2. OG",
-            "ab 3. OG",
-            "DG",
-            "Maisonette"
-          ],
-          "werte": [
-            [
-              1,
-              1.43,
-              1.43,
-              1.35,
-              1.4,
-              1.51
-            ],
-            [
-              0.7,
-              1,
-              1,
-              0.94,
-              0.98,
-              1.05
-            ],
-            [
-              0.7,
-              1,
-              1,
-              0.94,
-              0.98,
-              1.05
-            ],
-            [
-              0.74,
-              1.06,
-              1.06,
-              1,
-              1.04,
-              1.12
-            ],
-            [
-              0.71,
-              1.02,
-              1.02,
-              0.96,
-              1,
-              1.07
-            ],
-            [
-              0.66,
-              0.95,
-              0.95,
-              0.89,
-              0.93,
-              1
-            ]
-          ]
+          "norm_zuordnung": {
+            "1": "1.+ 2. OG",
+            "2": "1.+ 2. OG",
+            "3": "ab 3. OG",
+            "4": "ab 3. OG",
+            "5": "ab 3. OG",
+            "6": "ab 3. OG",
+            "7": "ab 3. OG",
+            "8": "ab 3. OG",
+            "9": "ab 3. OG",
+            "10": "ab 3. OG",
+            "11": "ab 3. OG",
+            "12": "ab 3. OG",
+            "13": "ab 3. OG",
+            "14": "ab 3. OG",
+            "15": "ab 3. OG",
+            "16": "ab 3. OG",
+            "17": "ab 3. OG",
+            "18": "ab 3. OG",
+            "19": "ab 3. OG",
+            "20": "ab 3. OG",
+            "21": "ab 3. OG",
+            "22": "ab 3. OG",
+            "23": "ab 3. OG",
+            "24": "ab 3. OG",
+            "25": "ab 3. OG",
+            "26": "ab 3. OG",
+            "27": "ab 3. OG",
+            "28": "ab 3. OG",
+            "29": "ab 3. OG",
+            "30": "ab 3. OG",
+            "31": "ab 3. OG",
+            "32": "ab 3. OG",
+            "33": "ab 3. OG",
+            "34": "ab 3. OG",
+            "35": "ab 3. OG",
+            "36": "ab 3. OG",
+            "37": "ab 3. OG",
+            "38": "ab 3. OG",
+            "39": "ab 3. OG",
+            "40": "ab 3. OG",
+            "77": "DG",
+            "88": "EG",
+            "98": "Maisonette",
+            "99": "Souterrain"
+          }
         },
         {
           "id": "gebaeudestandard",
           "name": "Gebäudestandard",
-          "eingabe": "gstand",
+          "eingabe": [
+            "ausstattung",
+            "gstand"
+          ],
           "norm_feld": "GSTAND",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "einfach",
-            "mittel",
-            "gehoben"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "einfach",
             "mittel",
             "gehoben"
@@ -6625,20 +6866,32 @@
           "werte": [
             [
               1,
-              1.06,
-              1.41
-            ],
-            [
               0.94,
-              1,
-              1.33
+              0.71
             ],
             [
-              0.71,
-              0.75,
+              1.06,
+              1,
+              0.75
+            ],
+            [
+              1.41,
+              1.33,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "norm_zuordnung": {
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "zuordnung_herkunft": "„Die Einstufung des Gebäudestandards richtet sich nach den Standardmerkmalen und Standardstufen der Sachwertrichtlinie“; Codes des IRW-Datenmodells (Feld 60): 3 = einfach [1,8–2,2], 5 = mittel [2,8–3,2], 7 = gehoben [3,8–4,2]; Zwischenstufen führt die Tabelle nicht → kein Wert"
         },
         {
           "id": "mietsituation",
@@ -6646,73 +6899,74 @@
           "eingabe": "vermietet",
           "norm_feld": "MIETS",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
-            "unvermietet",
-            "vermietet"
-          ],
-          "spalten_bewertungsobjekt": [
+          "art": "matrix",
+          "kategorien": [
             "unvermietet",
             "vermietet"
           ],
           "werte": [
             [
               1,
-              0.92
+              1.09
             ],
             [
-              1.09,
+              0.92,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Objekt][Norm]; gedruckt Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
+          "zuordnung": {
+            "ja": "vermietet",
+            "nein": "unvermietet"
+          },
+          "norm_zuordnung": {
+            "1": "unvermietet",
+            "2": "vermietet"
+          }
         }
       ],
-      "modernisierungstyp": "Keine Koeffizienten: „konnten keine signifikanten Einflüsse durch den Modernisierungstyp festgestellt werden\" (S. 5).",
-      "wohnlage": "Keine Koeffizienten (Zonen ohne Lageunterschiede, S. 5).",
-      "anwendungsbeispiel": {
-        "seite": "S. 6",
-        "irw": 2320,
-        "stichtag_im_beispiel": "01.01.2025",
-        "norm_zone": {
-          "BJ": "1985",
-          "WHNFL": "75",
-          "BK": "0",
-          "WHNA": "13-25",
-          "GESLA": "88",
-          "GSTAND": "mittel",
-          "MIETS": "1"
-        },
-        "objekt": {
-          "baujahr": 1990,
-          "wohnflaeche": 80,
-          "balkon": true,
-          "einheiten": "26-100",
-          "geschoss": "ab 3. OG",
-          "gstand": "mittel",
-          "vermietet": true
-        },
-        "faktoren": {
-          "baujahr": 1.05,
-          "wohnflaeche": 0.99,
-          "balkon": 1.03,
-          "einheiten": 0.98,
-          "geschosslage": 0.94,
-          "gebaeudestandard": 1,
-          "mietsituation": 0.92
-        },
-        "produkt_gedruckt": 0.91,
-        "ergebnis_eur_qm": 2111,
-        "wohnflaeche": 80,
-        "ergebnis_eur": 169000,
-        "wortlaut": "2.320 €/m² x 0,91 = 2.111 €/m² · 80 m² x 2.111 €/m² = rd. 169.000 € (Zeitpunkt im Beispiel 01.01.2025 — vom Vorjahr übernommen)"
-      }
+      "wohnlage_hinweis": "Keine Koeffizienten (Zonen ohne Lageunterschiede, S. 5).",
+      "modernisierungstyp_hinweis": "Keine Koeffizienten: „konnten keine signifikanten Einflüsse durch den Modernisierungstyp festgestellt werden\" (S. 5)."
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (Kreis Heinsberg), Stichtag 01.01.2026: S. 1 Hinweise, S. 3 Kennzahlen, Preisindex (01.01.2026 extrapoliert 201,6) und Baujahr, S. 4 Wohnfläche, Balkon, Einheiten, S. 5 Geschosslage, Gebäudestandard, Mietsituation, S. 6 Beispiel.",
-      "S. 6: „Dieser vorläufige Vergleichswert beinhaltet keine Werte für Garagen, Stellplätze oder Sondernutzungsrechte.\"",
-      "Das Beispiel nennt als Zeitpunkt 01.01.2025 (Vorjahr) — Auffälligkeit, kein Rechenfehler."
-    ],
-    "seite": "S. 1–6",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0530900_2026.pdf"
+    "anwendungsbeispiel": {
+      "seite": "S. 6",
+      "irw": 2320,
+      "norm_zone": {
+        "BJ": "1985",
+        "WHNFL": "75",
+        "BK": "0",
+        "WHNA": "13-25",
+        "GESLA": "88",
+        "GSTAND": "5",
+        "MIETS": "1"
+      },
+      "objekt": {
+        "baujahr": 1990,
+        "wohnflaeche": 80,
+        "balkon": true,
+        "geschoss": 3,
+        "vermietet": true,
+        "ausstattung": "mittel",
+        "einheiten_anlage": "26-100"
+      },
+      "objekt_hinweis": "Alle Merkmale des Beispiels; Ausstattungswort als Eingabe ausstattung, Zonen-Codes wie im IRW-Shape (GSTAND 5 = mittel).",
+      "faktoren": {
+        "baujahr": 1.05,
+        "wohnflaeche": 0.99,
+        "balkon": 1.03,
+        "einheiten": 0.98,
+        "geschosslage": 0.94,
+        "gebaeudestandard": 1,
+        "mietsituation": 0.92
+      },
+      "ergebnis_eur_qm": 2111,
+      "wohnflaeche": 80,
+      "ergebnis_eur": 169000,
+      "produkt_gedruckt": 0.91,
+      "wortlaut": "2.320 €/m² x 0,91 = 2.111 €/m² · 80 m² x 2.111 €/m² = rd. 169.000 € (Zeitpunkt im Beispiel 01.01.2025 — vom Vorjahr übernommen)",
+      "stichtag_im_beispiel": "01.01.2025"
+    },
+    "kernausbau": "v3015 Kernausbau: Matrizen Richtwertobjekt × Bewertungsobjekt (matrix_linear, lineare Interpolation in beide Richtungen), Anwendungsbeispiel S. 6 am echten Kern"
   },
   {
     "land_code": "NW",
@@ -15973,7 +16227,7 @@
     "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "modellansaetze": {
       "teilmarkt_code": 1,
       "brechv": 2,
@@ -15992,15 +16246,20 @@
       "gemeinden": "Stadt Moers (25 Zonen)",
       "hinweis": "Bestehende Eigentumswohnungen, rd. 1.400 Kauffälle 2018–2025, Alter 6–71 Jahre, keine Neubauten und keine Erstverkäufe nach Umwandlung (S. 2)."
     },
-    "warum_kein_wert": "Die Umrechnungskoeffizienten stehen als Matrizen „Richtwert (Zeile) × Bewertungsobjekt (Spalte)\", deren Zeilen andere Klassen bzw. Einzelwerte tragen als die Spalten (z. B. Baujahr: Zeilen 2013/2002/1987/1970/1945/1900, Spalten 2023-2018 … 1930-1871; Bodenrichtwert: Zeilen 151-200 … 351-400, Spalten 101-150 … 401-450). Die Zonen führen verschiedene Normwerte. Der Kern rechnet nur quadratische Matrizen mit gleicher Einteilung oder Tabellen gegen ein einziges Normobjekt; eine rechteckige Matrix mit Klassengrenzen (offene Klassen wie „> 200 m²\", „> 1200 m²\") kann er nicht einordnen. Für Eigentumswohnungen sind Baujahr, Wohnfläche und Wohneinheiten Stützstellen-Matrizen mit ausdrücklicher Interpolation („Zwischen den Tabellenwerten kann interpoliert werden\", S. 2), deren Zonen-Normwerte zum Teil zwischen den Zeilen liegen. Außerdem ist die Baujahr-Zelle Zeile 1995/Spalte 1970 als „077\" gedruckt. Alle Tabellen stehen vollständig unter formel_vorgemerkt. Weg: Immobilien-Preis-Kalkulator in BORIS-NRW oder Gutachterausschuss der Stadt Moers.",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (Stadt Moers), Stichtag 01.01.2026: S. 1 Hinweise und Preise für Garagen/Tiefgaragen/Stellplätze, S. 2 Wohnlage und Baujahr, S. 3 Modernisierungsgrad, Ausstattung, Balkon, S. 4 Wohnfläche und Wohneinheiten, S. 5 Geschosslage, Mietsituation, Beispiel, S. 6 Berechnungsformular.",
+      "S. 1: „beinhalten keine Nebengebäude (Garage, Schuppen, etc.)\"; Kaufpreise für Garagen/Stellplätze werden pauschal angesetzt (Garage Weiterverkauf 5.000–15.000 €, Ø 10.000 €; Stellplatz Weiterverkauf 2.000–7.500 €, Ø 3.000 €; Neubau höher) — stellplaetze_im_irw = false.",
+      "Druckfehler: Baujahr Zeile 1995/Spalte 1970 „077\" (S. 2); „ü. 4.\" 0,9 mit einer Nachkommastelle (S. 5)."
+    ],
+    "seite": "S. 1–6",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0526400_2026.pdf",
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "zwischen den Tabellenwerten (S. 2)",
+      "interpolation": "lineare Interpolation nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden“, S. 2); kategoriale Merkmale exakt",
       "extrapolation": false,
       "irw_lageangepasst": false,
       "stellplaetze_im_irw": false,
-      "rechenform_vorschlag": "Vorschlag Rechenform „matrix_rechteckig\": zeilen = Normwert der Zone (Einzelwert oder Klasse mit von/bis), spalten = Klassen des Bewertungsobjekts (von/bis, offene Grenzen erlaubt), werte[zeile][spalte]; leere Zellen = kein Wert. Für Stützstellen zusätzlich bilineare Interpolation.",
       "normobjekt": "je Zone (WHNLA, BJ, WHNFL, AKL, MTYP, GESLA, BK, MIETS, ANZEGEB)",
       "merkmale": [
         {
@@ -16009,12 +16268,13 @@
           "eingabe": "wohnlage",
           "norm_feld": "WHNLA",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "gut",
             "mittel",
             "einfach"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "einfach",
             "mittel",
             "gut",
@@ -16039,7 +16299,20 @@
               1.1,
               1.33
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "1": "sehr gut",
+            "3": "gut",
+            "5": "mittel",
+            "7": "einfach"
+          },
+          "norm_zuordnung": {
+            "1": "sehr gut",
+            "3": "gut",
+            "5": "mittel",
+            "7": "einfach"
+          }
         },
         {
           "id": "baujahr",
@@ -16047,7 +16320,8 @@
           "eingabe": "baujahr",
           "norm_feld": "BJ",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             2005,
             2000,
             1995,
@@ -16059,7 +16333,7 @@
             1965,
             1960
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             2015,
             2010,
             2000,
@@ -16171,7 +16445,14 @@
               0.9
             ]
           ],
-          "zweifel": "Zeile 1995 / Spalte 1970 gedruckt „077\" (ohne Komma) — hier als leere Zelle (null) erfasst — Druckfehler, vermutlich 0,77; nicht korrigiert, Rückfrage beim Ausschuss."
+          "interpolation_text": "lineare Interpolation nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden“, S. 2)",
+          "zweifel": [
+            {
+              "zeile": 1995,
+              "spalte": 1970,
+              "grund": "Zeile 1995 / Spalte 1970 gedruckt „077\" (ohne Komma) — hier als leere Zelle (null) erfasst — Druckfehler, vermutlich 0,77; nicht korrigiert, Rückfrage beim Ausschuss."
+            }
+          ]
         },
         {
           "id": "modernisierungsgrad",
@@ -16179,11 +16460,12 @@
           "eingabe": "mtyp",
           "norm_feld": "MTYP",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "baujahrestypisch",
             "teilmodernisiert"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "baujahrtypisch",
             "teilmodernisiert",
             "neuzeitlich"
@@ -16199,20 +16481,34 @@
               1,
               1.07
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "1": "baujahrtypisch",
+            "2": "teilmodernisiert",
+            "3": "neuzeitlich"
+          },
+          "norm_zuordnung": {
+            "1": "baujahrestypisch",
+            "2": "teilmodernisiert"
+          }
         },
         {
           "id": "ausstattung",
           "name": "Ausstattung (Sachwertverfahren)",
-          "eingabe": "gstand",
+          "eingabe": [
+            "ausstattung",
+            "gstand"
+          ],
           "norm_feld": "AKL",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "gehoben",
             "mittel",
             "einfach"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "einfach",
             "einfach-mittel",
             "mittel",
@@ -16245,7 +16541,24 @@
               1.23,
               1.38
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "3": "einfach",
+            "4": "einfach-mittel",
+            "5": "mittel",
+            "6": "mittel-gehoben",
+            "7": "gehoben",
+            "8": "gehoben-stark gehoben"
+          },
+          "norm_zuordnung": {
+            "4": "gehoben",
+            "5": "mittel-gehoben",
+            "6": "mittel",
+            "7": "einfach-mittel",
+            "8": "einfach"
+          },
+          "zuordnung_herkunft": "„Sie wird nach den Kategorien des Sachwertverfahrens ermittelt“; Objekt: Codes des IRW-Datenmodells Feld 60 (3 einfach … 8 gehoben–stark gehoben), Norm: Zonenfeld AKL (Feld 27: 4 gehoben, 6 mittel, 8 einfach)."
         },
         {
           "id": "balkon",
@@ -16253,10 +16566,11 @@
           "eingabe": "balkon",
           "norm_feld": "BK",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "vorhanden"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "Balkon",
             "kein Balkon"
           ],
@@ -16265,7 +16579,16 @@
               1,
               0.94
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "ja": "Balkon",
+            "nein": "kein Balkon"
+          },
+          "norm_zuordnung": {
+            "0": "nicht vorhanden",
+            "1": "vorhanden"
+          }
         },
         {
           "id": "wohnflaeche",
@@ -16273,7 +16596,8 @@
           "eingabe": "wohnflaeche",
           "norm_feld": "WHNFL",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_linear",
+          "zeilen_norm": [
             60,
             65,
             70,
@@ -16283,7 +16607,7 @@
             90,
             95
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             40,
             60,
             70,
@@ -16374,7 +16698,8 @@
               0.97,
               0.92
             ]
-          ]
+          ],
+          "interpolation_text": "lineare Interpolation nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden“, S. 2)"
         },
         {
           "id": "einheiten",
@@ -16382,7 +16707,9 @@
           "eingabe": "einheiten",
           "norm_feld": "ANZEGEB",
           "seite": "S. 4",
-          "zeilen_richtwertobjekt": [
+          "hinweis": "„Maßgeblich ist die Anzahl der Wohneinheiten im Gebäude (in der Regel mit eigener Hausnummer).\"",
+          "art": "matrix_linear",
+          "zeilen_norm": [
             3,
             4,
             6,
@@ -16390,7 +16717,7 @@
             10,
             20
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             3,
             4,
             6,
@@ -16455,7 +16782,7 @@
               0.99
             ]
           ],
-          "hinweis": "„Maßgeblich ist die Anzahl der Wohneinheiten im Gebäude (in der Regel mit eigener Hausnummer).\""
+          "interpolation_text": "lineare Interpolation nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden“, S. 2)"
         },
         {
           "id": "geschosslage",
@@ -16463,10 +16790,12 @@
           "eingabe": "geschoss",
           "norm_feld": "GESLA",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
+          "hinweis": "Eine Zeile (Norm 1./2. OG) — als kategorien rechenbar; „SG\" im Dokument nicht erläutert (vermutlich Staffelgeschoss).",
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "1./2. OG"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "Sout.",
             "EG",
             "1./2.",
@@ -16486,7 +16815,57 @@
               1.05
             ]
           ],
-          "hinweis": "Eine Zeile (Norm 1./2. OG) — als kategorien rechenbar; „SG\" im Dokument nicht erläutert (vermutlich Staffelgeschoss)."
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "1": "1./2.",
+            "2": "1./2.",
+            "3": "3./4.",
+            "4": "3./4.",
+            "5": "ü. 4.",
+            "6": "ü. 4.",
+            "7": "ü. 4.",
+            "8": "ü. 4.",
+            "9": "ü. 4.",
+            "10": "ü. 4.",
+            "11": "ü. 4.",
+            "12": "ü. 4.",
+            "13": "ü. 4.",
+            "14": "ü. 4.",
+            "15": "ü. 4.",
+            "16": "ü. 4.",
+            "17": "ü. 4.",
+            "18": "ü. 4.",
+            "19": "ü. 4.",
+            "20": "ü. 4.",
+            "21": "ü. 4.",
+            "22": "ü. 4.",
+            "23": "ü. 4.",
+            "24": "ü. 4.",
+            "25": "ü. 4.",
+            "26": "ü. 4.",
+            "27": "ü. 4.",
+            "28": "ü. 4.",
+            "29": "ü. 4.",
+            "30": "ü. 4.",
+            "31": "ü. 4.",
+            "32": "ü. 4.",
+            "33": "ü. 4.",
+            "34": "ü. 4.",
+            "35": "ü. 4.",
+            "36": "ü. 4.",
+            "37": "ü. 4.",
+            "38": "ü. 4.",
+            "39": "ü. 4.",
+            "40": "ü. 4.",
+            "66": "SG",
+            "77": "DG",
+            "88": "EG",
+            "99": "Sout."
+          },
+          "norm_zuordnung": {
+            "1": "1./2. OG",
+            "2": "1./2. OG"
+          }
         },
         {
           "id": "mietsituation",
@@ -16494,10 +16873,11 @@
           "eingabe": "vermietet",
           "norm_feld": "MIETS",
           "seite": "S. 5",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "unvermietet"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "unvermietet",
             "vermietet"
           ],
@@ -16506,54 +16886,60 @@
               1,
               0.91
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "ja": "vermietet",
+            "nein": "unvermietet"
+          },
+          "norm_zuordnung": {
+            "1": "unvermietet",
+            "2": "vermietet"
+          }
         }
-      ],
-      "anwendungsbeispiel": {
-        "seite": "S. 5",
-        "irw": 1950,
-        "norm": {
-          "wohnlage": "mittel",
-          "baujahr": 1975,
-          "ausstattung": "mittel",
-          "wohnflaeche": 75,
-          "einheiten": 8,
-          "mtyp": "teilmodernisiert",
-          "geschoss": "1./2. OG",
-          "vermietet": false
-        },
-        "objekt": {
-          "wohnlage": "einfach",
-          "baujahr": 1980,
-          "ausstattung": "mittel",
-          "wohnflaeche": 90,
-          "einheiten": 20,
-          "mtyp": "teilmodernisiert",
-          "geschoss": "3. OG",
-          "vermietet": true
-        },
-        "faktoren": {
-          "wohnlage": 0.97,
-          "baujahr": 1.07,
-          "ausstattung": 1,
-          "wohnflaeche": 1.03,
-          "einheiten": 0.88,
-          "modernisierungsgrad": 1,
-          "geschosslage": 0.97,
-          "mietsituation": 0.91
-        },
-        "ergebnis_eur_qm": 1620,
-        "ergebnis_eur": 145800,
-        "wortlaut": "1.950 €/m² x 0,97 x 1,07 x 1,00 x 1,03 x 0,88 x 1 x 0,97 x 0,91 = 1.620 €/m² · vorläufiger Vergleichswert rd. 145.800 €"
-      }
+      ]
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (Stadt Moers), Stichtag 01.01.2026: S. 1 Hinweise und Preise für Garagen/Tiefgaragen/Stellplätze, S. 2 Wohnlage und Baujahr, S. 3 Modernisierungsgrad, Ausstattung, Balkon, S. 4 Wohnfläche und Wohneinheiten, S. 5 Geschosslage, Mietsituation, Beispiel, S. 6 Berechnungsformular.",
-      "S. 1: „beinhalten keine Nebengebäude (Garage, Schuppen, etc.)\"; Kaufpreise für Garagen/Stellplätze werden pauschal angesetzt (Garage Weiterverkauf 5.000–15.000 €, Ø 10.000 €; Stellplatz Weiterverkauf 2.000–7.500 €, Ø 3.000 €; Neubau höher) — stellplaetze_im_irw = false.",
-      "Druckfehler: Baujahr Zeile 1995/Spalte 1970 „077\" (S. 2); „ü. 4.\" 0,9 mit einer Nachkommastelle (S. 5)."
-    ],
-    "seite": "S. 1–6",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0526400_2026.pdf"
+    "anwendungsbeispiel": {
+      "seite": "S. 5",
+      "irw": 1950,
+      "norm_zone": {
+        "WHNLA": "5",
+        "BJ": "1975",
+        "AKL": "6",
+        "WHNFL": "75",
+        "ANZEGEB": "8",
+        "MTYP": "2",
+        "GESLA": "1",
+        "BK": "1",
+        "MIETS": "1"
+      },
+      "objekt": {
+        "wohnlage": "einfach",
+        "baujahr": 1980,
+        "ausstattung": "mittel",
+        "wohnflaeche": 90,
+        "einheiten": 20,
+        "mtyp": 2,
+        "geschoss": 3,
+        "vermietet": true,
+        "balkon": true
+      },
+      "objekt_hinweis": "Normobjekt und Objekt wie im Beispiel (Wörter in Zonen-Codes: Wohnlage mittel = 5, Ausstattung mittel = AKL 6, teilmodernisiert = 2, 1./2. OG = 1); Balkon nennt das Beispiel nicht → wie Norm (vorhanden).",
+      "faktoren": {
+        "wohnlage": 0.97,
+        "baujahr": 1.07,
+        "ausstattung": 1,
+        "wohnflaeche": 1.03,
+        "einheiten": 0.88,
+        "modernisierungsgrad": 1,
+        "geschosslage": 0.97,
+        "mietsituation": 0.91
+      },
+      "ergebnis_eur_qm": 1620,
+      "ergebnis_eur": 145800,
+      "wortlaut": "1.950 €/m² x 0,97 x 1,07 x 1,00 x 1,03 x 0,88 x 1 x 0,97 x 0,91 = 1.620 €/m² · vorläufiger Vergleichswert rd. 145.800 €"
+    },
+    "kernausbau": "v3015 Kernausbau: Matrizen Richtwert × Bewertungsobjekt (matrix_linear mit Interpolation nach S. 2, sonst matrix_klassen), Anwendungsbeispiel S. 5 am echten Kern"
   },
   {
     "land_code": "NW",
@@ -16567,7 +16953,7 @@
     "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "modellansaetze": {
       "teilmarkt_code": 2,
       "brechv": 2,
@@ -16587,15 +16973,19 @@
       "gemeinden": "Stadt Moers (19 Zonen)",
       "hinweis": "Weiterverkäufe, Kaufpreise 2018–2025 (S. 1). Stichtag 01.01.2026 (S. 1)."
     },
-    "warum_kein_wert": "Die Umrechnungskoeffizienten stehen als Matrizen „Richtwert (Zeile) × Bewertungsobjekt (Spalte)\", deren Zeilen andere Klassen bzw. Einzelwerte tragen als die Spalten (z. B. Baujahr: Zeilen 2013/2002/1987/1970/1945/1900, Spalten 2023-2018 … 1930-1871; Bodenrichtwert: Zeilen 151-200 … 351-400, Spalten 101-150 … 401-450). Die Zonen führen verschiedene Normwerte. Der Kern rechnet nur quadratische Matrizen mit gleicher Einteilung oder Tabellen gegen ein einziges Normobjekt; eine rechteckige Matrix mit Klassengrenzen (offene Klassen wie „> 200 m²\", „> 1200 m²\") kann er nicht einordnen. Alle Tabellen stehen vollständig unter formel_vorgemerkt. Weg: Immobilien-Preis-Kalkulator in BORIS-NRW oder Gutachterausschuss der Stadt Moers.",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt freistehende Ein- und Zweifamilienhäuser (Stadt Moers): S. 1 Hinweise und Preise für Garagen/Stellplätze, S. 2 Gebäudeart, Baujahr, Bodenrichtwert, Wohnfläche, S. 3 Grundstücksfläche, Modernisierungstyp, Ausstattung, Keller, S. 4 Beispiel, S. 5 Berechnungsformular.",
+      "S. 1: „beinhalten keine Nebengebäude (Garage, Schuppen, etc.)\"; Kaufpreise für Garagen/Stellplätze werden pauschal angesetzt (Garage Weiterverkauf 5.000–15.000 €, Ø 10.000 €; Stellplatz Weiterverkauf 2.000–7.500 €, Ø 3.000 €; Neubau höher) — stellplaetze_im_irw = false."
+    ],
+    "seite": "S. 1–5",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0526400_2026.pdf",
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "keine Angabe im Dokument",
+      "interpolation": "keine (Klassen Richtwert × Objekt)",
       "extrapolation": false,
       "irw_lageangepasst": false,
       "stellplaetze_im_irw": false,
-      "rechenform_vorschlag": "Vorschlag Rechenform „matrix_rechteckig\": zeilen = Normwert der Zone (Einzelwert oder Klasse mit von/bis), spalten = Klassen des Bewertungsobjekts (von/bis, offene Grenzen erlaubt), werte[zeile][spalte]; leere Zellen = kein Wert.",
       "normobjekt": "je Zone (GART/EGART, BJ, BOWL, WHNFL, FLAE, MTYP, AKL, KELLER)",
       "merkmale": [
         {
@@ -16604,10 +16994,11 @@
           "eingabe": "gebaeudeart",
           "norm_feld": "GART",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "Einfamilienhaus"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "Einfamilienhaus",
             "Zweifamilienhaus"
           ],
@@ -16616,7 +17007,16 @@
               1,
               0.9
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "efh": "Einfamilienhaus",
+            "zfh": "Zweifamilienhaus"
+          },
+          "norm_zuordnung": {
+            "13": "Einfamilienhaus",
+            "17": "Zweifamilienhaus"
+          }
         },
         {
           "id": "baujahr",
@@ -16624,7 +17024,8 @@
           "eingabe": "baujahr",
           "norm_feld": "BJ",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             2013,
             2002,
             1987,
@@ -16632,7 +17033,7 @@
             1945,
             1900
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "2023-2018",
             "2017-2011",
             "2010-1996",
@@ -16696,7 +17097,8 @@
               1.09,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)"
         },
         {
           "id": "bodenrichtwert",
@@ -16704,14 +17106,15 @@
           "eingabe": "bodenrichtwert",
           "norm_feld": "BOWL",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "151 - 200",
             "201 - 250",
             "251 - 300",
             "301 - 350",
             "351 - 400"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "101-150",
             "151-200",
             "201-250",
@@ -16766,7 +17169,9 @@
               1,
               1.03
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "runden": 0
         },
         {
           "id": "wohnflaeche",
@@ -16774,14 +17179,15 @@
           "eingabe": "wohnflaeche",
           "norm_feld": "WHNFL",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "80-100",
             "101-120",
             "121-140",
             "141-160",
             "161-180"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "< 80",
             "80-100",
             "101-120",
@@ -16842,7 +17248,9 @@
               0.92,
               0.9
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "runden": 0
         },
         {
           "id": "grundstuecksflaeche",
@@ -16850,7 +17258,9 @@
           "eingabe": "grundstuecksflaeche",
           "norm_feld": "FLAE",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "hinweis": "Zonenwert „601-801\" (Shape) ist keine Klasse des Ausschusses — Datenfehler.",
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "150-250",
             "251-350",
             "351-450",
@@ -16858,7 +17268,7 @@
             "601-800",
             "801-1000"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "150-250",
             "251-350",
             "351-450",
@@ -16930,7 +17340,8 @@
               1.06
             ]
           ],
-          "hinweis": "Zonenwert „601-801\" (Shape) ist keine Klasse des Ausschusses — Datenfehler."
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "runden": 0
         },
         {
           "id": "modernisierungstyp",
@@ -16938,10 +17349,11 @@
           "eingabe": "mtyp",
           "norm_feld": "MTYP",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "baujahrestypisch"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "baujahrtypisch",
             "teilmodernisiert",
             "neuzeitlich"
@@ -16952,18 +17364,32 @@
               1.06,
               1.11
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "1": "baujahrtypisch",
+            "2": "teilmodernisiert",
+            "3": "neuzeitlich"
+          },
+          "norm_zuordnung": {
+            "1": "baujahrestypisch",
+            "2": "teilmodernisiert"
+          }
         },
         {
           "id": "ausstattung",
           "name": "Ausstattung (Sachwertverfahren)",
-          "eingabe": "gstand",
-          "norm_feld": "GSTAND",
+          "eingabe": [
+            "ausstattung",
+            "gstand"
+          ],
+          "norm_feld": "AKL",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "mittel"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "einfach",
             "einfach-mittel",
             "mittel",
@@ -16978,18 +17404,39 @@
               1.11,
               1.2
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "3": "einfach",
+            "4": "einfach-mittel",
+            "5": "mittel",
+            "6": "mittel-gehoben",
+            "7": "gehoben",
+            "8": "gehoben-stark gehoben"
+          },
+          "norm_zuordnung": {
+            "4": "gehoben",
+            "5": "mittel-gehoben",
+            "6": "mittel",
+            "7": "einfach-mittel",
+            "8": "einfach"
+          },
+          "zuordnung_herkunft": "„Sie wird nach den Kategorien des Sachwertverfahrens ermittelt“; Objekt: Codes des IRW-Datenmodells Feld 60 (3 einfach … 8 gehoben–stark gehoben), Norm: Zonenfeld AKL (Feld 27: 4 gehoben, 6 mittel, 8 einfach)."
         },
         {
           "id": "keller",
           "name": "Keller",
-          "eingabe": "keller",
+          "eingabe": [
+            "keller_art",
+            "keller"
+          ],
           "norm_feld": "KELLER",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "vorhanden"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "vorhanden",
             "nicht vorhanden"
           ],
@@ -16998,53 +17445,62 @@
               1,
               0.91
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "voll": "vorhanden",
+            "teil": "vorhanden",
+            "kein": "nicht vorhanden",
+            "ja": "vorhanden",
+            "nein": "nicht vorhanden"
+          },
+          "norm_zuordnung": {
+            "0": "nicht vorhanden",
+            "1": "vorhanden"
+          },
+          "hinweis": "Teilunterkellerung führt die Tabelle nicht gesondert; „teil“ gilt als vorhanden."
         }
-      ],
-      "anwendungsbeispiel": {
-        "seite": "S. 4",
-        "irw": 3050,
-        "norm": {
-          "GART": "13",
-          "BJ": "1970",
-          "BOWL": "251 – 300",
-          "WHNFL": "121 – 140",
-          "FLAE": "451 – 600",
-          "MTYP": "1",
-          "AUSSTATTUNG": "mittel",
-          "KELLER": "1"
-        },
-        "objekt": {
-          "gebaeudeart": "zfh",
-          "baujahr": 1985,
-          "bodenrichtwert": 280,
-          "wohnflaeche": 115,
-          "grundstuecksflaeche": 823,
-          "mtyp": 2,
-          "gstand": "einfach-mittel",
-          "keller": false
-        },
-        "faktoren": {
-          "gebaeudeart": 0.9,
-          "baujahr": 1.09,
-          "bodenrichtwert": 1,
-          "wohnflaeche": 1.08,
-          "grundstuecksflaeche": 1.09,
-          "modernisierungstyp": 1.06,
-          "ausstattung": 0.92,
-          "keller": 0.91
-        },
-        "ergebnis_eur_qm": 3125,
-        "ergebnis_eur": 359400,
-        "wortlaut": "3.050 €/m² x 0,90 x 1,09 x 1,00 x 1,08 x 1,09 x 1,06 x 0,92 x 0,91 = 3.125 €/m² · vorläufiger Vergleichswert rd. 359.400 €"
-      }
+      ]
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt freistehende Ein- und Zweifamilienhäuser (Stadt Moers): S. 1 Hinweise und Preise für Garagen/Stellplätze, S. 2 Gebäudeart, Baujahr, Bodenrichtwert, Wohnfläche, S. 3 Grundstücksfläche, Modernisierungstyp, Ausstattung, Keller, S. 4 Beispiel, S. 5 Berechnungsformular.",
-      "S. 1: „beinhalten keine Nebengebäude (Garage, Schuppen, etc.)\"; Kaufpreise für Garagen/Stellplätze werden pauschal angesetzt (Garage Weiterverkauf 5.000–15.000 €, Ø 10.000 €; Stellplatz Weiterverkauf 2.000–7.500 €, Ø 3.000 €; Neubau höher) — stellplaetze_im_irw = false."
-    ],
-    "seite": "S. 1–5",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0526400_2026.pdf"
+    "anwendungsbeispiel": {
+      "seite": "S. 4",
+      "irw": 3050,
+      "norm_zone": {
+        "BJ": "1970",
+        "BOWL": "251 - 300",
+        "WHNFL": "121 - 140",
+        "FLAE": "451 - 600",
+        "MTYP": "1",
+        "AKL": "6",
+        "KELLER": "1",
+        "GART": "13"
+      },
+      "objekt": {
+        "gebaeudeart": "zfh",
+        "baujahr": 1985,
+        "bodenrichtwert": 280,
+        "wohnflaeche": 115,
+        "grundstuecksflaeche": 823,
+        "mtyp": 2,
+        "keller": false,
+        "ausstattung": "einfach-mittel"
+      },
+      "objekt_hinweis": "Normobjekt mit den Klassen des Beispiels, Objekt wie im Beispiel (Ausstattung als Wort).",
+      "faktoren": {
+        "gebaeudeart": 0.9,
+        "baujahr": 1.09,
+        "bodenrichtwert": 1,
+        "wohnflaeche": 1.08,
+        "grundstuecksflaeche": 1.09,
+        "modernisierungstyp": 1.06,
+        "ausstattung": 0.92,
+        "keller": 0.91
+      },
+      "ergebnis_eur_qm": 3125,
+      "ergebnis_eur": 359400,
+      "wortlaut": "3.050 €/m² x 0,90 x 1,09 x 1,00 x 1,08 x 1,09 x 1,06 x 0,92 x 0,91 = 3.125 €/m² · vorläufiger Vergleichswert rd. 359.400 €"
+    },
+    "kernausbau": "v3015 Kernausbau: Matrizen Richtwert × Bewertungsobjekt (matrix_klassen, rechteckig mit Klassen), Anwendungsbeispiel S. 4 am echten Kern"
   },
   {
     "land_code": "NW",
@@ -17058,7 +17514,7 @@
     "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "modellansaetze": {
       "teilmarkt_code": 3,
       "brechv": 2,
@@ -17078,15 +17534,19 @@
       "gemeinden": "Stadt Moers (27 Zonen)",
       "hinweis": "Weiterverkäufe, Kaufpreise 2018–2025 (S. 1). Text S. 1: „Die angegebenen Immobilienrichtwerte sind auf den Stichtag 01.01.2025 bezogen\" — im Dokument für 2026 nicht fortgeschrieben (Beispiel: 01.01.2026)."
     },
-    "warum_kein_wert": "Die Umrechnungskoeffizienten stehen als Matrizen „Richtwert (Zeile) × Bewertungsobjekt (Spalte)\", deren Zeilen andere Klassen bzw. Einzelwerte tragen als die Spalten (z. B. Baujahr: Zeilen 2013/2002/1987/1970/1945/1900, Spalten 2023-2018 … 1930-1871; Bodenrichtwert: Zeilen 151-200 … 351-400, Spalten 101-150 … 401-450). Die Zonen führen verschiedene Normwerte. Der Kern rechnet nur quadratische Matrizen mit gleicher Einteilung oder Tabellen gegen ein einziges Normobjekt; eine rechteckige Matrix mit Klassengrenzen (offene Klassen wie „> 200 m²\", „> 1200 m²\") kann er nicht einordnen. Alle Tabellen stehen vollständig unter formel_vorgemerkt. Weg: Immobilien-Preis-Kalkulator in BORIS-NRW oder Gutachterausschuss der Stadt Moers.",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (Stadt Moers): S. 1 Hinweise und Preise für Garagen/Stellplätze, S. 2 Gebäudeart, Baujahr, Bodenrichtwert, Wohnfläche, S. 3 Grundstücksfläche, Modernisierungstyp, Ausstattung, Keller, S. 4 Beispiel, S. 5 Berechnungsformular.",
+      "S. 1: „beinhalten keine Nebengebäude (Garage, Schuppen, etc.)\"; Kaufpreise für Garagen/Stellplätze werden pauschal angesetzt (Garage Weiterverkauf 5.000–15.000 €, Ø 10.000 €; Stellplatz Weiterverkauf 2.000–7.500 €, Ø 3.000 €; Neubau höher) — stellplaetze_im_irw = false."
+    ],
+    "seite": "S. 1–5",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0526400_2026.pdf",
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "keine Angabe im Dokument",
+      "interpolation": "keine (Klassen Richtwert × Objekt)",
       "extrapolation": false,
       "irw_lageangepasst": false,
       "stellplaetze_im_irw": false,
-      "rechenform_vorschlag": "Vorschlag Rechenform „matrix_rechteckig\": zeilen = Normwert der Zone (Einzelwert oder Klasse mit von/bis), spalten = Klassen des Bewertungsobjekts (von/bis, offene Grenzen erlaubt), werte[zeile][spalte]; leere Zellen = kein Wert.",
       "normobjekt": "je Zone (GART/EGART, BJ, BOWL, WHNFL, FLAE, MTYP, AKL, KELLER)",
       "merkmale": [
         {
@@ -17095,10 +17555,11 @@
           "eingabe": "anbauweise",
           "norm_feld": "EGART",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "Doppelhaushälfte"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "Doppelhaushälfte",
             "Reihenendhaus",
             "Reihenmittelhaus"
@@ -17109,7 +17570,18 @@
               0.96,
               0.93
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "doppelhaushaelfte": "Doppelhaushälfte",
+            "reihenendhaus": "Reihenendhaus",
+            "reihenmittelhaus": "Reihenmittelhaus"
+          },
+          "norm_zuordnung": {
+            "2": "Doppelhaushälfte",
+            "4": "Reihenmittelhaus",
+            "5": "Reihenendhaus"
+          }
         },
         {
           "id": "baujahr",
@@ -17117,7 +17589,8 @@
           "eingabe": "baujahr",
           "norm_feld": "BJ",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             2013,
             2002,
             1987,
@@ -17125,7 +17598,7 @@
             1945,
             1900
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "2023-2018",
             "2017-2011",
             "2010-1996",
@@ -17189,7 +17662,8 @@
               1.09,
               1
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)"
         },
         {
           "id": "bodenrichtwert",
@@ -17197,14 +17671,15 @@
           "eingabe": "bodenrichtwert",
           "norm_feld": "BOWL",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "151 - 200",
             "201 - 250",
             "251 - 300",
             "301 - 350",
             "351 - 400"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "101-150",
             "151-200",
             "201-250",
@@ -17259,7 +17734,9 @@
               1,
               1.03
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "runden": 0
         },
         {
           "id": "wohnflaeche",
@@ -17267,14 +17744,15 @@
           "eingabe": "wohnflaeche",
           "norm_feld": "WHNFL",
           "seite": "S. 2",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "80-100",
             "101-120",
             "121-140",
             "141-160",
             "161-180"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "< 80",
             "80-100",
             "101-120",
@@ -17335,7 +17813,9 @@
               0.92,
               0.9
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "runden": 0
         },
         {
           "id": "grundstuecksflaeche",
@@ -17343,7 +17823,9 @@
           "eingabe": "grundstuecksflaeche",
           "norm_feld": "FLAE",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "hinweis": "Zonenwert „601-801\" (Shape) ist keine Klasse des Ausschusses — Datenfehler.",
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "150-250",
             "251-350",
             "351-450",
@@ -17351,7 +17833,7 @@
             "601-800",
             "801-1000"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "150-250",
             "251-350",
             "351-450",
@@ -17423,7 +17905,8 @@
               1.06
             ]
           ],
-          "hinweis": "Zonenwert „601-801\" (Shape) ist keine Klasse des Ausschusses — Datenfehler."
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "runden": 0
         },
         {
           "id": "modernisierungstyp",
@@ -17431,10 +17914,11 @@
           "eingabe": "mtyp",
           "norm_feld": "MTYP",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "baujahrestypisch"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "baujahrtypisch",
             "teilmodernisiert",
             "neuzeitlich"
@@ -17445,18 +17929,32 @@
               1.06,
               1.11
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "1": "baujahrtypisch",
+            "2": "teilmodernisiert",
+            "3": "neuzeitlich"
+          },
+          "norm_zuordnung": {
+            "1": "baujahrestypisch",
+            "2": "teilmodernisiert"
+          }
         },
         {
           "id": "ausstattung",
           "name": "Ausstattung (Sachwertverfahren)",
-          "eingabe": "gstand",
-          "norm_feld": "GSTAND",
+          "eingabe": [
+            "ausstattung",
+            "gstand"
+          ],
+          "norm_feld": "AKL",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "mittel"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "einfach",
             "einfach-mittel",
             "mittel",
@@ -17471,18 +17969,39 @@
               1.11,
               1.2
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "3": "einfach",
+            "4": "einfach-mittel",
+            "5": "mittel",
+            "6": "mittel-gehoben",
+            "7": "gehoben",
+            "8": "gehoben-stark gehoben"
+          },
+          "norm_zuordnung": {
+            "4": "gehoben",
+            "5": "mittel-gehoben",
+            "6": "mittel",
+            "7": "einfach-mittel",
+            "8": "einfach"
+          },
+          "zuordnung_herkunft": "„Sie wird nach den Kategorien des Sachwertverfahrens ermittelt“; Objekt: Codes des IRW-Datenmodells Feld 60 (3 einfach … 8 gehoben–stark gehoben), Norm: Zonenfeld AKL (Feld 27: 4 gehoben, 6 mittel, 8 einfach)."
         },
         {
           "id": "keller",
           "name": "Keller",
-          "eingabe": "keller",
+          "eingabe": [
+            "keller_art",
+            "keller"
+          ],
           "norm_feld": "KELLER",
           "seite": "S. 3",
-          "zeilen_richtwertobjekt": [
+          "art": "matrix_klassen",
+          "zeilen_norm": [
             "vorhanden"
           ],
-          "spalten_bewertungsobjekt": [
+          "spalten_objekt": [
             "vorhanden",
             "nicht vorhanden"
           ],
@@ -17491,53 +18010,64 @@
               1,
               0.91
             ]
-          ]
+          ],
+          "werte_hinweis": "werte[Richtwert][Objekt] wie gedruckt (Zeile = Richtwert, Spalte = Bewertungsobjekt)",
+          "zuordnung": {
+            "voll": "vorhanden",
+            "teil": "vorhanden",
+            "kein": "nicht vorhanden",
+            "ja": "vorhanden",
+            "nein": "nicht vorhanden"
+          },
+          "norm_zuordnung": {
+            "0": "nicht vorhanden",
+            "1": "vorhanden"
+          },
+          "hinweis": "Teilunterkellerung führt die Tabelle nicht gesondert; „teil“ gilt als vorhanden."
         }
-      ],
-      "anwendungsbeispiel": {
-        "seite": "S. 4",
-        "irw": 3200,
-        "norm": {
-          "EGART": "2",
-          "BJ": "1987",
-          "BOWL": "251 - 300",
-          "WHNFL": "121 - 140",
-          "FLAE": "351 - 450",
-          "MTYP": "1",
-          "AUSSTATTUNG": "mittel",
-          "KELLER": "1"
-        },
-        "objekt": {
-          "anbauweise": "reihenmittelhaus",
-          "baujahr": 1970,
-          "bodenrichtwert": 310,
-          "wohnflaeche": 95,
-          "grundstuecksflaeche": 230,
-          "mtyp": 2,
-          "gstand": "einfach",
-          "keller": false
-        },
-        "faktoren": {
-          "ergaenzende_gebaeudeart": 0.93,
-          "baujahr": 0.92,
-          "bodenrichtwert": 1.03,
-          "wohnflaeche": 1.14,
-          "grundstuecksflaeche": 0.91,
-          "modernisierungstyp": 1.06,
-          "ausstattung": 0.85,
-          "keller": 0.91
-        },
-        "ergebnis_eur_qm": 2400,
-        "ergebnis_eur": 228000,
-        "wortlaut": "3.200 €/m² x 0,93 x 0,92 x 1,03 x 1,14 x 0,91 x 1,06 x 0,85 x 0,91 = 2.400 €/m · vorläufiger Vergleichswert rd. 228.000 €"
-      }
+      ]
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (Stadt Moers): S. 1 Hinweise und Preise für Garagen/Stellplätze, S. 2 Gebäudeart, Baujahr, Bodenrichtwert, Wohnfläche, S. 3 Grundstücksfläche, Modernisierungstyp, Ausstattung, Keller, S. 4 Beispiel, S. 5 Berechnungsformular.",
-      "S. 1: „beinhalten keine Nebengebäude (Garage, Schuppen, etc.)\"; Kaufpreise für Garagen/Stellplätze werden pauschal angesetzt (Garage Weiterverkauf 5.000–15.000 €, Ø 10.000 €; Stellplatz Weiterverkauf 2.000–7.500 €, Ø 3.000 €; Neubau höher) — stellplaetze_im_irw = false."
-    ],
-    "seite": "S. 1–5",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0526400_2026.pdf"
+    "anwendungsbeispiel": {
+      "seite": "S. 4",
+      "irw": 3200,
+      "norm_zone": {
+        "BJ": "1987",
+        "BOWL": "251 - 300",
+        "WHNFL": "121 - 140",
+        "FLAE": "351 - 450",
+        "MTYP": "1",
+        "AKL": "6",
+        "KELLER": "1",
+        "EGART": "2"
+      },
+      "objekt": {
+        "anbauweise": "reihenmittelhaus",
+        "baujahr": 1970,
+        "bodenrichtwert": 310,
+        "wohnflaeche": 95,
+        "grundstuecksflaeche": 230,
+        "mtyp": 2,
+        "keller": false,
+        "ausstattung": "einfach"
+      },
+      "objekt_hinweis": "Normobjekt mit den Klassen des Beispiels, Objekt wie im Beispiel (Ausstattung als Wort).",
+      "faktoren": {
+        "ergaenzende_gebaeudeart": 0.93,
+        "baujahr": 0.92,
+        "bodenrichtwert": 1.03,
+        "wohnflaeche": 1.14,
+        "grundstuecksflaeche": 0.91,
+        "modernisierungstyp": 1.06,
+        "ausstattung": 0.85,
+        "keller": 0.91
+      },
+      "ergebnis_eur_qm": 2400,
+      "ergebnis_eur": 228000,
+      "wortlaut": "3.200 €/m² x 0,93 x 0,92 x 1,03 x 1,14 x 0,91 x 1,06 x 0,85 x 0,91 = 2.400 €/m · vorläufiger Vergleichswert rd. 228.000 €",
+      "toleranz_eur_qm": 1.5,
+      "toleranz_grund": "Alle acht Koeffizienten wie gedruckt; 3.200 × Produkt = 2.398,67 €/m², das Dokument druckt gerundet 2.400 €/m²"
+    },
+    "kernausbau": "v3015 Kernausbau: Matrizen Richtwert × Bewertungsobjekt (matrix_klassen, rechteckig mit Klassen), Anwendungsbeispiel S. 4 am echten Kern"
   },
   {
     "land_code": "NW",
