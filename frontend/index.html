@@ -34,7 +34,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v2969b">
+<link rel="stylesheet" href="css/style.css?v=v3003a">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -1094,7 +1094,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
       <!-- v445-obj-reorder -->
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr <button type="button" class="dp-tip" data-tip-id="tab1.baujahr" tabindex="-1" aria-label="Hilfe zu Baujahr"></button></label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
       <div class="f"><label>Etage</label><input id="etage" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Anzahl Etagen</label><input id="etagen_ges" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
       <div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
@@ -1108,7 +1108,7 @@ label.dp-required.qc-required::after {
             <option value="stark_sanierungsbeduerftig">Stark sanierungsbedürftig</option>
           </select>
         </div>
-      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fünf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualität des Gebäudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
+      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fünf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualität des Gebäudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010) <button type="button" class="dp-tip" data-tip-id="tab1.wert_standardstufe" tabindex="-1" aria-label="Hilfe zu Standardstufe"></button></label><div class="iw"><select id="standardstufe">
         <option value="">— keine Angabe —</option>
         <option value="1">1 · sehr einfach (nur Häuser)</option>
         <option value="2">2 · einfach (nur Häuser)</option>
@@ -1125,7 +1125,7 @@ label.dp-required.qc-required::after {
           </select>
         </div>
       <div class="f"><label>Vermietungsstand <button type="button" class="dp-tip" data-tip-id="tab1.vermietungsstand" tabindex="-1" aria-label="Hilfe zu tab1.vermietungsstand"></button></label><select id="vermstand"><option selected>Vollvermietet</option><option>Teilweise leer</option><option>Leer</option></select></div>
-      <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Grundstücksfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wert_gsfl" tabindex="-1" aria-label="Hilfe zu Grundstücksfläche"></button></label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
       <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
       <input type="hidden" id="_dp_herkunft">
@@ -1287,7 +1287,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Keller / Abstellraum <button type="button" class="dp-tip" data-tip-id="tab1.eq_store_room" tabindex="-1" aria-label="Hilfe zu Keller / Abstellraum"></button></label><select id="eq_store_room"><option value="">– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innen & außen</option><option value="KEINER">Keiner</option></select></div>
       <div class="f"><label>Badezimmer</label><input id="bad_anz" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Balkon / Terrasse (m&sup2;)</label><div class="iw"><input id="balkon_flae" type="text" inputmode="decimal" placeholder="z.B. 10" class="tr"><span class="sfx">m&sup2;</span></div></div>
-      <div class="f"><label>Garagenpl&auml;tze</label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
+      <div class="f"><label>Garagenpl&auml;tze <button type="button" class="dp-tip" data-tip-id="tab1.wert_stellplaetze" tabindex="-1" aria-label="Hilfe zu Garagen und Stellplätze"></button></label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Au&szlig;enstellpl&auml;tze</label><input id="stellpl_aussen" type="text" inputmode="decimal" placeholder="z.B. 0"></div>
       <div class="f"><label>Modernisierungsjahr</label><input id="modernis" type="text" inputmode="decimal" placeholder="z.B. 2025"></div>
           <div class="f"><label>Baustatus</label><div class="iw"><select id="baustatus">
@@ -1322,7 +1322,7 @@ label.dp-required.qc-required::after {
             <div class="f"><label>Restlaufzeit (Jahre)</label><div class="iw"><input id="erb_restlz" type="text" inputmode="numeric" placeholder="55" class="tr" oninput="calc()"><span class="sfx">J</span></div></div>
             <div class="f"><label>Angemessener Erbbauzinssatz (%)</label><div class="iw"><input id="erb_zs_ang" type="text" inputmode="decimal" placeholder="3,5" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
             <div class="f"><label>Entschädigung bei Zeitablauf (%)</label><div class="iw"><input id="erb_entsch" type="text" inputmode="decimal" placeholder="66,7" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-            <div class="f s2"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:12px;color:var(--muted)"><input type="checkbox" id="erb_wert_ist_erb" onchange="calc()"><span>Verkehrswert / Bankbewertung ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)</span></label></div>
+            <div class="f s2"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:12px;color:var(--muted)"><input type="checkbox" id="erb_wert_ist_erb" onchange="calc()"><span>Marktwert/Verkehrswert ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)</span></label></div>
           </div>
           <div id="erb_ergebnis" class="brw-ki-result" style="display:none;margin-top:8px"></div>
         </div>
@@ -1336,7 +1336,7 @@ label.dp-required.qc-required::after {
                Investors - an ihr haengt die Zielrendite und damit der
                Verhandlungsspielraum. Kein DS2-Abzeichen: sie geht nicht in
                den Investor Deal Score, sondern in die Heuristik. -->
-          <div class="f"><label>Lageklasse <span class="oe-lk-tag" title="Bestimmt deine Zielrendite aus den Einstellungen. Daraus rechnet DealPilot, auf welchen Kaufpreis du verhandeln müsstest.">Ziel</span></label><select id="lageklasse" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll()"><option value="" selected>- keine Angabe -</option><option value="A">A-Lage</option><option value="B">B-Lage</option><option value="C">C-Lage</option></select></div>
+          <div class="f"><label>Lageklasse <span class="oe-lk-tag" title="Bestimmt deine Zielrendite aus den Einstellungen. Daraus rechnet DealPilot, auf welchen Kaufpreis du verhandeln müsstest.">Ziel</span> <button type="button" class="dp-tip" data-tip-id="tab1.wert_lage" tabindex="-1" aria-label="Hilfe zu Lage"></button></label><select id="lageklasse" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll()"><option value="" selected>- keine Angabe -</option><option value="A">A-Lage</option><option value="B">B-Lage</option><option value="C">C-Lage</option></select></div>
           <div class="f"><label>Makrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f"><label>Mikrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f">
@@ -1401,9 +1401,18 @@ label.dp-required.qc-required::after {
       </div>
     </div>
 <div class="card-title">Wertanker</div>
-        <div class="g3">
-          <div class="f"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
-      <div class="f"><label title="Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten. Darunter wählen, woher der Wert stammt: Gutachten und Bankbewertung tragen LTV und Wertpuffer, Schätzung und Angebotsniveau nicht.">Marktwert / Verkehrswert <span class="cf-hint">(Herkunft darunter wählen)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div><!-- v2996 · die Herkunft entscheidet, was der Wert ist (Beschriftung, Wert-Anker, LTV-Basis) --><select id="svw_herkunft" class="svw-herkunft" onchange="calc()" title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB; LTV und Wertpuffer rechnen nur mit einem Gutachten- oder Bankwert." style="margin-top:6px;width:100%"><option value="">Herkunft: automatisch</option><option value="gutachten">Verkehrswertgutachten (§ 194 BauGB)</option><option value="bank">Bankbewertung (Marktwert)</option><option value="marktbericht">DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)</option><option value="indikation">Marktpreisindikation (Angebotspreise)</option><option value="eigene">eigene Schätzung</option></select><div id="oe-vw" class="oe-vw" style="display:none"></div></div>
+        <!-- v3003 · Marcel 27.10.2026: „Marktwert/Verkehrswert, Herkunft und welcher Bericht in EINE Zeile, darunter Bankbewertung und Wert nach Sanierung."
+             Feld-IDs unverändert; eigenes Raster (wa-raster), weil .g3 unter 900 px einspaltig fällt. -->
+        <div class="wa-raster wa-z1">
+      <div class="f"><label title="Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten. Daneben wählen, woher der Wert stammt: Nur Gutachten und Bankbewertung tragen den LTV. Den Wertpuffer tragen auch Marktbericht und eigene Schätzung, die Marktpreisindikation aus Angeboten nicht.">Marktwert / Verkehrswert <span class="cf-hint">(Herkunft daneben wählen)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div><!-- v2996 · die Herkunft entscheidet, was der Wert ist (Beschriftung, Wert-Anker, LTV-Basis) --></div>
+      <div class="f wa-herkunft"><label title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB.">Herkunft</label><select id="svw_herkunft" class="svw-herkunft" onchange="calc()" title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB; der LTV rechnet nur mit einem Gutachten- oder Bankwert, der Wertpuffer mit jeder Angabe außer der Marktpreisindikation aus Angeboten." style="width:100%"><option value="">Herkunft: automatisch</option><option value="gutachten">Verkehrswertgutachten (§ 194 BauGB)</option><option value="bank">Bankbewertung (Marktwert)</option><option value="marktbericht">DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)</option><option value="indikation">Marktpreisindikation (Angebotspreise)</option><option value="eigene">eigene Schätzung</option></select></div>
+      <div class="f wa-bericht"><label title="Werte aus den Marktberichten dieses Objekts — auswählen und übernehmen">Bericht</label><div id="oe-vw" class="oe-vw" style="display:none"></div><span class="cf-hint wa-leer">noch kein Marktbericht</span></div>
+        </div>
+        <!-- v3003a · Marcel: „Brauchen wir das Feld Bankbewertung überhaupt noch, wenn es die Herkunft gibt?" Nein -
+             die Herkunft „Bankbewertung" trägt es. Das Feld bleibt im DOM (gespeichert, nie gelöscht), wertangabe.js überträgt es einmal nach svwert. -->
+        <input type="hidden" id="bankval_migriert" value="">
+        <div class="wa-raster2 wa-z2">
+  <div class="f wa-weg" aria-hidden="true"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
       <div class="f"><label title="Erwarteter Wert nach Abschluss der Sanierung/Modernisierung (stabilisierter Zustand). Banken rechnen Sanierungsfinanzierungen gegen diesen Wert (as-completed).">Wert nach Sanierung <span class="cf-hint">(optional · stabilisiert)</span></label><div class="iw"><span class="pfx">€</span><input id="wert_soll" type="text" inputmode="decimal" placeholder="z.B. 1.250.000" class="trl" oninput="calc()"></div></div>
         </div>
 </div>
@@ -1463,7 +1472,7 @@ label.dp-required.qc-required::after {
         <option value="dreispaenner">Dreispänner · 3 Wohnungen (× 0,97)</option>
         <option value="vierspaenner">Vierspänner · 4 Wohnungen (× 0,95)</option>
       </select></div></div>
-      <div class="f"><label title="Punktesystem der Anlage 2: durchgeführte Modernisierungen (Dach, Fenster, Heizung, Bäder, Leitungen ...) ergeben Punkte, aus denen sich die verlängerte Restnutzungsdauer ableitet. Es beschreibt den Zustand — die Standardstufe daneben die Ausstattungsqualität.">Modernisierungsgrad (Anlage 2)</label><div class="iw"><input type="hidden" id="mod_quelle"><!-- v2540: Quelle der Punkte beim MFH --><select id="mod_punkte">
+      <div class="f"><label title="Punktesystem der Anlage 2: durchgeführte Modernisierungen (Dach, Fenster, Heizung, Bäder, Leitungen ...) ergeben Punkte, aus denen sich die verlängerte Restnutzungsdauer ableitet. Es beschreibt den Zustand — die Standardstufe daneben die Ausstattungsqualität.">Modernisierungsgrad (Anlage 2) <button type="button" class="dp-tip" data-tip-id="tab1.wert_mod" tabindex="-1" aria-label="Hilfe zu Modernisierungspunkte"></button></label><div class="iw"><input type="hidden" id="mod_quelle"><!-- v2540: Quelle der Punkte beim MFH --><select id="mod_punkte">
         <option value="">— keine Angabe, wird geschätzt —</option>
         <option value="0">nicht modernisiert</option>
         <option value="4">kleine Modernisierungen im Rahmen der Instandhaltung</option>
@@ -1475,6 +1484,9 @@ label.dp-required.qc-required::after {
       <div class="f" id="uk_flaeche_feld"><label title="Umrechnungskoeffizient nach Paragraf 19 ImmoWertV: passt den Bodenrichtwert an die Größe des Grundstücks an. Er kommt vom örtlichen Gutachterausschuss (Grundstücksmarktbericht oder BORIS-Anhang). Leer lassen, wenn DealPilot ihn aus dem Register holt — eintragen nur, wenn keiner hinterlegt ist.">Umrechnungskoeffizient Grundstücksgröße</label><div class="iw"><input id="uk_flaeche" type="text" inputmode="decimal" placeholder="leer = Wert des Ausschusses" class="tr"></div></div>
       <!-- v2361 · WGFZ des Objekts (§ 16 Abs. 4 ImmoWertV) fuer die Umrechnung nach der Geschossflaechenzahl -->
       <div class="f" id="wgfz_objekt_feld"><label title="Wertrelevante Geschossflächenzahl nach Paragraf 16 Abs. 4 ImmoWertV: Fläche aller oberirdischen Geschosse (Außenmaße, ausgebautes oder ausbaufähiges Dachgeschoss zu 75 Prozent, ohne Keller) geteilt durch die Grundstücksfläche. Weicht sie von der WGFZ der Bodenrichtwertzone ab, rechnet DealPilot den Bodenrichtwert mit den Umrechnungskoeffizienten des Gutachterausschusses um — vor allem bei Mehrfamilienhäusern.">WGFZ des Objekts</label><div class="iw"><input id="wgfz_objekt" type="text" inputmode="decimal" placeholder="z. B. 1,2" class="tr"></div></div>
+      <!-- v3008 · Klassen des Gutachterausschusses fuer seinen Vergleichsfaktor (vgf-merkmale.js blendet sie ein, wenn der geltende Registersatz das Merkmal fuehrt) -->
+      <div class="f" id="vgf_wohnlage_feld" style="display:none"><label title="Wohnlage nach der Lagekarte des örtlichen Gutachterausschusses (z. B. Konstanz: Lageklasse der Bodenrichtwertkarte). Nicht die DealPilot-Lageeinschätzung. Leer lassen, wenn sie aus der Bodenrichtwertkarte kommt; eintragen, wenn der Ausschuss eine Ausnahme nennt (z. B. Seesicht).">Wohnlage (Gutachterausschuss)</label><div class="iw"><input type="hidden" id="vgf_wohnlage"><select id="vgf_wohnlage_wahl"></select></div><small id="vgf_wohnlage_hilfe" style="display:block;margin-top:4px;font-size:11px;line-height:1.35;color:var(--muted)"></small></div>
+      <div class="f" id="vgf_ausstattung_feld" style="display:none"><label title="Ausstattungsklasse nach dem Merkmalskatalog des örtlichen Gutachterausschusses. Sie ist nicht die Standardstufe nach Anlage 4 ImmoWertV; ohne Angabe bildet DealPilot keinen Vergleichsfaktor.">Ausstattungsklasse (Gutachterausschuss)</label><div class="iw"><input type="hidden" id="vgf_ausstattung"><select id="vgf_ausstattung_wahl"></select></div><small id="vgf_ausstattung_hilfe" style="display:block;margin-top:4px;font-size:11px;line-height:1.35;color:var(--muted)"></small></div>
       <div class="f"><label title="Nur die Stellplatz- und Garagenmiete. Die Nettokaltmiete der Wohnung steht im Tab Miete und wird von dort übernommen — sie fehlt hier nicht, sie steht nur nicht zweimal. Die Bewirtschaftungskosten-Quoten rechnen auf dem GESAMTEN Rohertrag, also einschliesslich dieser Stellplätze.">Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
       <div class="f"><label>Sonstige Einnahmen (€/Jahr)</label><div class="iw"><span class="pfx">€</span><input id="sonstige_jahr" type="text" inputmode="decimal" placeholder="Werbefläche, Antennenanlage …" class="trl"></div></div>
     </div>
@@ -1509,7 +1521,7 @@ label.dp-required.qc-required::after {
         <option value="2">Doppelhaus / Reihenendhaus</option>
         <option value="3">Reihenmittelhaus</option>
       </select></div></div>
-      <div class="f"><label>Geschosse und Unterkellerung</label><div class="iw"><select id="nhk_geschosse">
+      <div class="f"><label>Geschosse und Unterkellerung <button type="button" class="dp-tip" data-tip-id="tab1.wert_geschosse" tabindex="-1" aria-label="Hilfe zu Geschosse und Unterkellerung"></button></label><div class="iw"><select id="nhk_geschosse">
         <option value="">— keine Angabe —</option>
         <option value="0">Keller- und Erdgeschoss</option>
         <option value="1">Keller-, Erd- und Obergeschoss</option>
@@ -1563,6 +1575,9 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Bodenrichtwert manuell (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw_manuell" type="text" inputmode="decimal" placeholder="leer = amtlicher Abruf" class="trl"></div></div>
       <div class="f"><label>Bodenwert-Anpassung (%)</label><div class="iw"><input id="brw_anpassung_pct" type="text" inputmode="decimal" placeholder="z. B. -10 für Lärmbelastung" class="tr"><span class="sfx">%</span></div></div>
       <div class="f s2"><label>Begründung der Anpassung</label><div class="iw"><input id="brw_anpassung_grund" type="text" placeholder="Pflicht, sobald eine Anpassung eingetragen ist" class="tr"></div></div>
+      <!-- v3010 · Wertermittlungsstichtag (Marcel 27.10.2026): leer = Tag der Berichtserstellung. Am Stichtag haengen
+           Baupreisindex, Alter/Restnutzungsdauer, Mietabweichung, Zensus- und BWK-Fortschreibung und der Jahrgang des Registers. -->
+      <div class="f"><label title="Der Zeitpunkt, auf den sich die Wertermittlung bezieht (§ 2 Abs. 4 ImmoWertV). Leer = heute, also der Tag, an dem der Marktbericht erstellt wird. Ein Datum in der Zukunft wird nicht übernommen.">Wertermittlungsstichtag <span style="font-weight:400;opacity:.7">(leer = heute)</span></label><div class="iw" style="display:flex;gap:6px;align-items:center"><input id="wertermittlungsstichtag" type="date" class="tr" style="flex:1 1 auto;min-width:0"><button type="button" id="wst_kaufdat" class="btn btn-ghost" style="flex:0 0 auto;white-space:nowrap;font-size:12px;padding:4px 8px" title="Kaufdatum aus dem Reiter Objekt übernehmen" onclick="var k=document.getElementById('kaufdat'),w=document.getElementById('wertermittlungsstichtag');if(!k||!k.value){this.textContent='kein Kaufdatum';return;}w.value=k.value;w.dispatchEvent(new Event('input',{bubbles:true}));w.dispatchEvent(new Event('change',{bubbles:true}));">= Kaufdatum</button></div></div>
     </div>
   </div>
 
@@ -3630,14 +3645,14 @@ label.dp-required.qc-required::after {
 <script src="/vendor/cdn/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-text-sauber.js?v=v2992"></script><!-- v2970 · EINE Text-Bereinigung fuer jedes jsPDF-Dokument, direkt nach jsPDF -->
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
-<script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
+<script src="js/pdf-anlage-bmf.js?v=v3006"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v2999"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v2996"></script>
-<script src="js/bmf-modal.js?v=v2269"></script>
-<script src="js/bmf-modal-v292.js?v=v2269"></script>
+<script src="js/pdf-investment-bank.js?v=v3006c"></script>
+<script src="js/bmf-modal.js?v=v3006d"></script>
+<script src="js/bmf-modal-v292.js?v=v3006d"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2943"></script>
-<script src="js/pdf-kaufpreisaufteilung.js?v=v2180"></script><!-- v987-v292-restore -->
+<script src="js/pdf-kaufpreisaufteilung.js?v=v3006d"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="/vendor/cdn/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="/vendor/cdn/jszip/3.10.1/jszip.min.js"></script>
@@ -3645,13 +3660,13 @@ label.dp-required.qc-required::after {
 <script src="js/schwellen.js?v=v2240"></script><!-- v2240 · EINE Quelle fuer die Ampel-Schwellen (DSCR/LTV/Cashflow) aus den Einstellungen -->
 <script src="js/dp-qr.js?v=v2180"></script>
 <script src="js/hausgeld-engine.js?v=v2191a"></script>
-<script src="js/deal-kpis.js?v=v2261"></script>
-<script src="js/afa-engine.js?v=v2891"></script>
+<script src="js/deal-kpis.js?v=v3006e"></script>
+<script src="js/afa-engine.js?v=v3006"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
 <script src="js/erbbau-engine.js?v=v2180"></script>
-<script src="js/erbbau-ui.js?v=v1312"></script>
-  <script src="js/afa-ui.js?v=v1439"></script>
+<script src="js/erbbau-ui.js?v=v3003a"></script>
+  <script src="js/afa-ui.js?v=v3006"></script>
   <script src="js/zve-manager.js?v=v2180"></script>
   <script src="js/tax-periods.js?v=v2949"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
@@ -3664,13 +3679,13 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2996"></script>
+  <script src="js/calc.js?v=v3006e"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v2852"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v2992"></script>
+<script src="js/tax.js?v=v3006c"></script>
 <script src="js/steuer-verlauf.js?v=v2992"></script>
 <script src="js/config.js?v=v2955"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
@@ -3685,7 +3700,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-heuristik.js?v=v2546a"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v2557"></script>
+<script src="js/tooltip-content.js?v=v3006"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v2421"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
@@ -3693,7 +3708,7 @@ label.dp-required.qc-required::after {
   <script src="js/provider-keys.js?v=v2180"></script>
   <script src="js/ueberfuehrung-kern.js?v=v2984"></script>
   <script src="js/mandanten.js?v=v2984"></script>
-  <script src="js/ueberfuehrung-wizard.js?v=v2984"></script>
+  <script src="js/ueberfuehrung-wizard.js?v=v3003a"></script>
   <script src="js/apikeys.js?v=v2977"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
   <script src="js/unterlagen-modal.js?v=v2920"></script>
@@ -3703,7 +3718,7 @@ label.dp-required.qc-required::after {
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
 <script src="js/stripe-success.js?v=183"></script>
-<script src="js/demo-paywall.js?v=878"></script>
+<script src="js/demo-paywall.js?v=v3003c"></script>
 <script src="js/anlage-v-2025.js?v=v1258"></script>
 <script src="js/werbungskosten-pdf.js?v=v2891"></script>
 <script src="js/gesellschaft-abschluss.js?v=v2984"></script>
@@ -3718,12 +3733,12 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v2992"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2996"></script>
+<script src="js/storage.js?v=v3010"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
-<script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
-<script src="js/all-objects.js?v=v2966d"></script>
-<script src="js/track-record.js?v=W39"></script>
-<script src="js/pdf.js?v=v2997"></script>
+<script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
+<script src="js/all-objects.js?v=v3006c"></script>
+<script src="js/track-record.js?v=v3003a"></script>
+<script src="js/pdf.js?v=v3006c"></script>
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
@@ -3735,9 +3750,9 @@ label.dp-required.qc-required::after {
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
 <script src="js/dealscore2.js?v=v2548c"></script>
 <script src="js/dealscore2-ui.js?v=v2548c"></script>
-<script src="js/ds2-ai.js?v=v2518"></script>
-<script src="js/ki-lage.js?v=v2518"></script>
-<script src="js/ki-miete.js?v=v2500"></script>
+<script src="js/ds2-ai.js?v=v3003a"></script>
+<script src="js/ki-lage.js?v=v3007b"></script>
+<script src="js/ki-miete.js?v=v3002"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v2932"></script>
 <script src="js/dokument-import.js?v=v2218h"></script>
@@ -3746,16 +3761,19 @@ label.dp-required.qc-required::after {
 <script src="js/financing-pdf.js?v=v2932"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
-<script src="js/quick-check.js?v=v2546a"></script>
+<script src="js/quick-check.js?v=v3006c"></script>
 <script src="js/qc-bridge.js?v=qc-v2969"></script>
 <script src="js/bodenrichtwert.js?v=v2952"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
-<script src="js/objekt-reiter.js?v=v2996"></script>
+<script src="js/vgf-merkmale.js?v=v3008"></script>
+<script src="js/objekt-reiter.js?v=v3002"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2966b"></script>
-<script src="js/potenzial.js?v=v2988"></script>
+<script src="js/mfh-einheiten.js?v=v3001b"></script>
+<script src="js/mfh-felder.js?v=v3003"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
+<script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
+<script src="js/potenzial.js?v=v3001a"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3766,10 +3784,10 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2988"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v2969b"></script>
+<script src="js/help.js?v=v3001"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
-<script src="js/prozess-atlas.js?v=v2969b"></script>
+<script src="js/prozess-atlas.js?v=v3001"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2966f"></script>
 <script src="js/messe-drehbuch.js?v=v2968"></script>
 <script src="js/hinweise.js?v=v2204"></script>
@@ -3792,7 +3810,7 @@ label.dp-required.qc-required::after {
 <!-- v2060: breite Tabellen werden auf dem Handy zu Karten (zentral, alle Ansichten) -->
 <script src="js/tabellen-karten.js?v=v2466a"></script>
 <script src="js/portfolio-export.js?v=v2180"></script>
-<script src="js/deal-action.js?v=v2943"></script>
+<script src="js/deal-action.js?v=v3006c"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1871"></script>
 <script src="js/deal-action-readycheck.js?v=v2080"></script>
@@ -3811,7 +3829,8 @@ label.dp-required.qc-required::after {
 <script src="js/bestand-analyse.js?v=v2985"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
 <script src="js/jahresstaende.js?v=v2989"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/wert-zielbild.js?v=v2999"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
-<script src="js/dealpilot-mb.js?v=v2996"></script>
+<script src="js/dealpilot-mb.js?v=v3010"></script>
+<script src="js/mb-abgleich.js?v=v3002d"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2969"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
@@ -3819,25 +3838,25 @@ label.dp-required.qc-required::after {
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=v1426"></script>
 <script src="js/rnd-calc.js?v=v2995"></script>
-<script src="js/rnd-wizard.js?v=v2995"></script>
+<script src="js/rnd-wizard.js?v=v3006c"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v2891"></script>
 <script src="js/bwk-profil.js?v=v2211"></script>
-<script src="js/dashboard.js?v=v2999"></script>
+<script src="js/dashboard.js?v=v3006c"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
 <!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
 <script src="js/portfolio-pilot.js?v=v2955"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=v2354"></script>
+<script src="js/main.js?v=v3003c"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=v2932"></script>
   <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>
-  <script src="js/voice-import.js?v=v2956"></script>
+  <script src="js/voice-import.js?v=v3003a"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

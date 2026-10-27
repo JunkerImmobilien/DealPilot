@@ -3265,7 +3265,7 @@
             'Miete je m², Sachwert. Die Objektart entscheidet, welche Verfahren ' +
             'überhaupt rechnen: eine Eigentumswohnung ohne Miteigentumsanteil ' +
             'bekommt keinen eigenen Bodenwert.',
-    baujahr: 'Das Baujahr steuert die AfA (2 oder 2,5 Prozent), die Restnutzungsdauer ' +
+    baujahr: 'Das Baujahr steuert die AfA (2, 2,5 oder bei Fertigstellung ab 2023 3 Prozent), die Restnutzungsdauer ' +
              'im Sachwert und die Erwartung an Zustand und Energie. Der Kaufpreis ist ' +
              'die Basis der Kaufnebenkosten und der Nenner jeder Rendite.',
     nkm: 'Die Kaltmiete trägt die Mietrendite, den Cashflow und über den DSCR die ' +
@@ -3729,13 +3729,19 @@
     var w = {}, teile = [];
     var gr = _profilZahl('grenzsteuersatz');
     if (gr != null) { w.grenz = String(gr).replace('.', ','); teile.push(w.grenz + ' % Grenzsteuersatz'); }
-    /* AfA-Satz nach Baujahr: 2 % ab 1925, 2,5 % davor (§ 7 Abs. 4 EStG).
+    /* AfA-Satz nach Fertigstellung (= Baujahr), § 7 Abs. 4 Satz 1 Nr. 2 EStG:
+       Buchst. a nach 2022 3 %, Buchst. b 1925-2022 2 %, Buchst. c vor 1925 2,5 %.
        Das ist Gesetz, keine Einstellung — deshalb wird es nur dann
-       vorgeschlagen, wenn das Baujahr auch wirklich bekannt ist. */
+       vorgeschlagen, wenn das Baujahr auch wirklich bekannt ist.
+       v3006: bis v3005 fehlten die 3 % (ein Neubau 2024 bekam 2 %), und die
+       Werte standen mit Komma ('2,5'), das Auswahlfeld fuehrt '2.0'/'2.5'/'3.0'
+       - getroffen wurde nur ueber den Optionstext. Jetzt der Optionswert. */
     var bj = _rfNum(_rfFeld('baujahr'));
     if (bj != null && bj > 1500 && bj < 2200) {
-      w.afa_satz = (bj < 1925) ? '2,5' : '2';
-      teile.push(w.afa_satz + ' % AfA (Baujahr ' + bj + ')');
+      var _lin = (window.Afa && Afa.linearNachFertigstellung) ? Afa.linearNachFertigstellung(bj)
+        : (bj > 2022 ? { wert: '3.0' } : bj < 1925 ? { wert: '2.5' } : { wert: '2.0' });
+      w.afa_satz = _lin.wert;
+      teile.push(w.afa_satz.replace('.', ',') + ' % AfA (Baujahr ' + bj + ')');
     }
     if (!teile.length) return null;
     return { werte: w, text: teile.join(' · ') };
@@ -11861,9 +11867,15 @@
     if (_rf.mwVorschlag && (RF_JA.test(t) || _istZustimmung(t))) {
       var mv = _rf.mwVorschlag; _rf.mwVorschlag = null;
       _rfBlase('ich', escH(t));
-      _rfSetzen('bankval', mv.wert, 'Marktpreisindikation (als Näherung)');
-      _rfBlase('co', 'Übernommen: <b>' + escH(mv.text) + '</b> — in der Übersicht steht, ' +
-        'dass es der Marktwert ist, keine Bankbewertung.');
+      /* v3003a · nie mehr als Bankbewertung: die Marktpreisindikation geht als Marktwert mit Herkunft
+         „Marktpreisindikation“ an svwert - und nur, wenn dort noch nichts steht (wertangabe.js) */
+      var _svAlt = (_rf.data.fields || {}).svwert;
+      if (_svAlt === undefined || _svAlt === null || _svAlt === '') {
+        _rfSetzen('svwert', mv.wert, 'Marktpreisindikation (als Näherung)');
+        _rfSetzen('svw_herkunft', 'indikation', 'Marktpreisindikation');
+      }
+      _rfBlase('co', 'Übernommen: <b>' + escH(mv.text) + '</b> — als Marktwert mit der Herkunft ' +
+        '„Marktpreisindikation“, nicht als Bankbewertung.');
       _rfStandZeichnen();
       _rfWeiterGleich();
       return true;

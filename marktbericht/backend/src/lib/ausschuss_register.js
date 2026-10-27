@@ -76,6 +76,19 @@ function indizieren(saetze) {
   for (const liste of ix.values()) {
     liste.sort((a, b) => (b.berichtsjahr || 0) - (a.berichtsjahr || 0));
   }
+  /* v3008 · EIN WERT, DER EINE SPERRE AUSDRUECKLICH ABLOEST.
+     Konstanz ETW stand als Sperre (merkmal_fehlt) in vgf-bw-2026.json; seit die
+     Leseroutine Wohnlage und Ausstattung kennt, traegt vgf-bw-konstanz-2026.json
+     denselben Schluessel (ags, zweig, Jahrgang) als Wert. Bei gleichem Jahrgang
+     entschied bisher die Ladereihenfolge - die Sperre lag vorn. Jetzt nur, wenn der
+     Wertsatz es SAGT (ersetzt_sperre: true): Sperren desselben Zweigs, Jahrgangs
+     und derselben Lage fallen aus dem Index. Ohne das Feld bleibt alles wie es war. */
+  const _sperre = (s) => s.vollstaendig === false || !!s.warum_kein_wert;
+  const _gl = (s) => [String(s.zweig || '').toLowerCase(), s.berichtsjahr ?? '', String(((s.geltungsbereich || {}).lage) || '').toLowerCase()].join('|');
+  for (const [k, liste] of ix) {
+    const abl = new Set(liste.filter((s) => s.ersetzt_sperre === true && !_sperre(s)).map(_gl));
+    if (abl.size) ix.set(k, liste.filter((s) => !(_sperre(s) && abl.has(_gl(s)))));
+  }
   return ix;
 }
 
@@ -449,6 +462,64 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                > Vergleichswertverfahren, das sie nicht tragen. Die
                                > Verdrahtung muss `verwendung` lesen. */
                             'vgf-be.json',
+                            /* Ernte 27.10.2026 (Ost): Sachsen-Anhalt — Gebaeudefaktoren (§ 20) des
+                               GAA ST, veroeffentlicht 22.01./13.02.2025, alle 14 Kreise fuer EZFH und
+                               RH/DHH (Normobjekt-Kurve je Wohnflaeche x Umrechnungskoeffizienten), dazu
+                               ETW Halle aus dem GMB 2023 Abschn. 7.3. Gemeinden mit Grossstadtrandlage
+                               bzw. Altkreis Querfurt eigens (8-stellig). Viele Saetze verlangen
+                               Standardstufe / Unterkellerung / Garagen / Modernisierungspunkte als
+                               formel.bedingungen - ohne diese Eingaben rechnen sie nicht. */
+                            'vgf-st-2025.json',
+                            /* Ernte 27.10.2026 (Ost): ETW-Vergleichsfaktor-Sperren mit Weg fuer
+                               Dresden (nur UK-Modell 7.2.3, formel_vorgemerkt), Leipzig, Schwerin. */
+                            'ost-nachernte-2026-10.json',
+                            /* Ernte 27.10.2026 (HH/BB/NI): Vergleichs-/Gebaeudefaktoren (§ 20).
+                               vgf-hh-2026.json      Hamburg, IMB 2026 Kap. 7.2.1/7.6.1: EFH je Stellung
+                                                     (ezfh, dhh, rmh, reh) und ETW, Produktformel. Rechnet
+                                                     erst mit NormBRW20/NormBRW18 und Alter (bedingungen).
+                               vgf-bb-oga-2025.json  Oberer GAA Brandenburg, Vergleichsfaktoren 2025:
+                                                     Berliner Umland je Gemeinde (8-stellig, ohne die fuenf
+                                                     Barnimer - Barnim hat eigene, vgf-bb.json), Weiterer
+                                                     Metropolenraum als Landessatz 12. Stufe C.
+                               vgf-ni-2026.json      NI-Dashboards (VizQL-Bootstrap): Hannover, Braunschweig,
+                                                     Osnabrueck, Oldenburg/Ammerland, Hildesheim, Goettingen,
+                                                     Lueneburg; Sperren dort, wo Ortsteil/Stadtteil den Wert
+                                                     bestimmt. Die meisten verlangen das modifizierte Baujahr. */
+                            'vgf-hh-2026.json', 'vgf-bb-oga-2025.json', 'vgf-ni-2026.json',
+                            /* Ernte 27.10.2026 (Nord): die uebrigen NI-Vergleichsfaktor-Dashboards
+                               (Braunschweig-Wolfsburg, Northeim, Hameln-Pyrmont/Schaumburg, Sulingen-
+                               Verden, Oldenburg-Cloppenburg, Osnabrueck-Meppen, Lueneburg, Otterndorf,
+                               Aurich mit Inseln), Lage je Gemeinde fest; Sperren, wo Ortsteil, Gemarkung,
+                               Kurlage oder Kuestenort den Wert bestimmt.
+                               vgf-sh-2026.json: alle 15 SH-Ausschuesse, Werte nur Dithmarschen ETW
+                               (GMB 2025 S. 35), RD-Eck IRW genehmigungspflichtig vorgemerkt, sonst Sperren.
+                               vgf-hb-2026.json: Bremen und Bremerhaven, kostenpflichtige Vollberichte. */
+                            'vgf-ni-2026-teil2.json', 'vgf-sh-2026.json', 'vgf-hb-2026.json',
+                            /* Ernte 27.10.2026 (HE): Vergleichsfaktoren des Landes Hessen 2026
+                               (ZGGH, Stichtag 01.01.2026, Version 1.1 vom 31.08.2026), alle 17
+                               Ausschuesse: EFH/ZFH und RH/DHH = Tabelle Wohnflaeche x
+                               Bodenrichtwertbereich plus Korrekturwert (Grundstuecksgroesse x
+                               Baujahr, additiv, EUR/m2), ETW = Bodenrichtwertbereich x Baujahr
+                               (Wiederverkauf). Geteilte Kreise als ein Satz je Zweig, Marktbereich
+                               ueber die achtstellige ags (verzweigt); Main-Kinzig/Wetterau je
+                               Gemeinde (MB 2 ohne RH/ETW = Sperre). Frankfurt ETW braucht die Lage
+                               (rechnet nicht), Wiesbaden ETW = Klassenmittel (Stufe C). */
+                            'vgf-he-2026.json',
+                            /* Ernte 27.10.2026 (Sued/West): Vergleichsfaktoren BW, BY, RP, SL - nur Sperren mit Weg,
+                               kein Wert (kostenpflichtig, genehmigungs-/nichtkommerziell-Lizenz, oder Merkmal
+                               Wohnlage/Ausstattung fehlt im Rechenweg). BW je Gemeinde (941 AGS, 105 Ausschuesse,
+                               Konstanz-Tabelle unter formel_vorgemerkt), BY je Kreis (94), RP je Kreis/Stadt
+                               (Landesbericht 4.4, GeoShop 28 EUR), SL ohne Saarpfalz-EFH/ZFH/RMH (vgf-sl.json). */
+                            'vgf-bw-2026.json', 'vgf-by-2026.json', 'vgf-rp-2026.json', 'vgf-sl-2026.json',
+                            /* Ernte 27.10.2026 (Ost II): Vergleichsfaktoren SN, TH, MV als Sperren mit Weg
+                               (SN genehmigungs-/kostenpflichtig, SOE/Bautzen mit Modell im Dokument; TH nur
+                               Erfurt-ETW 2024, Lage je Stadtteil; MV genehmigungspflichtig bzw. ohne Normobjekt).
+                               vgf-bb-kreise-2026.json: WERTE Potsdam (EFH/ZFH, RH/DHH, ETW mit offenen
+                               Anpassungen), Brandenburg a. d. H. (EZFH, DHH/REH, RMH), Prignitz (EZFH, RH/DHH);
+                               Havelland als Sperre mit formel_vorgemerkt (BGF-Bezug / Vermietungszustand);
+                               ETW-Sperren in den Umland-Gemeinden (8-stellig, neben den OGA-Saetzen). */
+                            'vgf-sn-2026.json', 'vgf-th-2026.json', 'vgf-mv-2026.json', 'vgf-bb-kreise-2026.json',
+                            'vgf-bw-konstanz-2026.json',   /* v3008: Konstanz ETW-Tabelle Wohnlage x Baujahr x Ausstattung (merkmalsmatrix), loest die Sperre in vgf-bw-2026.json ab */
                             /* v2279: Umrechnungskoeffizienten Grundstuecksgroesse
                                (§ 19 ImmoWertV), Kennzahl umrechnungskoeffizient_flaeche.
                                Erster Satz: Stadt Bielefeld (BORIS-NRW 2026). Gelesen
@@ -844,9 +915,37 @@ export function finde(kennzahl, ags) {
   if (!_index.size) return [];
   for (const s of kaskadeSchluessel(ags)) {
     const t = _index.get(schluessel(kennzahl, s));
-    if (t && t.length) return t;
+    if (t && t.length) return _zumStichtag(t);   /* v3010 */
   }
   return [];
+}
+
+/* ═══ v3010 · DER JAHRGANG ZUM WERTERMITTLUNGSSTICHTAG ══════════════════
+   Marcel 27.10.2026: am Stichtag haengt auch die Wahl des Registerjahrgangs.
+   § 10 ImmoWertV: es gilt das Modell, das am Stichtag galt. Fuehrt das Register
+   fuer denselben Zweig (und dieselbe Lage) mehrere Jahrgaenge, fallen die heraus,
+   deren Stichtag NACH dem Wertermittlungsstichtag liegt - aber nur, wenn ein
+   aelterer desselben Zweigs bleibt (sonst bleibt alles, wie es war: ein juengerer
+   Satz ist besser als keiner, und der Bericht nennt den Jahrgang).
+   Gesetzt wird der Stichtag synchron um einen Abruf herum (mitRegisterStichtag);
+   ohne ihn aendert sich nichts. */
+let _stichtagKontext = null;
+export function mitRegisterStichtag(iso, fn) {
+  const alt = _stichtagKontext;
+  _stichtagKontext = (iso && /^\d{4}-\d{2}-\d{2}$/.test(String(iso))) ? String(iso) : null;
+  try { return fn(); } finally { _stichtagKontext = alt; }
+}
+function _satzTag(s) {
+  const t = String((s && s.stichtag) || '').slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+  const b = Number(s && s.berichtsjahr);
+  return Number.isFinite(b) && b > 1900 ? String(b) + '-01-01' : null;
+}
+function _zumStichtag(liste) {
+  if (!_stichtagKontext || liste.length < 2) return liste;
+  const grp = (s) => [String(s.zweig || '').toLowerCase(), String(((s.geltungsbereich || {}).lage) || '').toLowerCase()].join('|');
+  const hatAelteren = new Set(liste.filter((s) => { const d = _satzTag(s); return d && d <= _stichtagKontext; }).map(grp));
+  return liste.filter((s) => { const d = _satzTag(s); return !(d && d > _stichtagKontext && hatAelteren.has(grp(s))); });
 }
 
 /** Ein Satz einer Kennzahl fuer einen Zweig (Objektart), oder null. */

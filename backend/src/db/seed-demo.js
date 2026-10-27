@@ -71,8 +71,7 @@ const DEMO_OBJECTS = [
       grerw_proz: '6.5',
       makler_proz: '3.57',
       san: '0',
-      bankval: '200000',
-      svwert: '210000',
+      svwert: '200000', svw_herkunft: 'bank',   /* v3003b · eine Wertangabe (bis v3003a: bankval 200.000 + svwert 210.000) */
       // Grund & Boden
       brw: '160',
       mea: '7.06',
@@ -139,8 +138,7 @@ const DEMO_OBJECTS = [
       grerw_proz: '6.5',
       makler_proz: '3.57',
       san: '15000',
-      bankval: '620000',
-      svwert: '640000',
+      svwert: '620000', svw_herkunft: 'bank',   /* v3003b (bis v3003a: bankval 620.000 + svwert 640.000) */
       brw: '280',
       mea: '100',
       gsfl: '480',
@@ -201,8 +199,7 @@ const DEMO_OBJECTS = [
       grerw_proz: '6.5',
       makler_proz: '3.57',
       san: '8000',
-      bankval: '210000',
-      svwert: '220000',
+      svwert: '210000', svw_herkunft: 'bank',   /* v3003b (bis v3003a: bankval 210.000 + svwert 220.000) */
       brw: '250',
       mea: '8.5',
       gsfl: '720',

@@ -43,8 +43,39 @@
       paragraph: 'GEG § 86',
       severity: 'beginner'
     },
+    /* v3003 · Marcel 27.10.2026: „die Parameter der Verkehrswerte erklären" - wofür das Feld im Marktbericht gebraucht wird */
+    'tab1.wert_gsfl': {
+      title: 'Grundstücksfläche',
+      body: 'Im Marktbericht: Fläche × Bodenrichtwert ergibt den Bodenwert. Er geht in den Ertragswert (der Boden wird verzinst) und in den Sachwert ein. Weicht die Fläche stark vom typischen Grundstück der Bodenrichtwertzone ab, rechnet der Bericht den Richtwert um, wo der Gutachterausschuss dafür eine Tabelle führt.',
+      severity: 'beginner'
+    },
+    'tab1.wert_mod': {
+      title: 'Modernisierungspunkte',
+      body: 'Im Marktbericht: Durchgeführte Modernisierungen (Dach, Fenster, Leitungen, Heizung, Bäder …) verlängern die Restnutzungsdauer nach der Punktetabelle der Wertermittlungsverordnung (Anlage 2 ImmoWertV). Mehr Restnutzungsdauer heißt höherer Ertragswert und geringerer Altersabschlag im Sachwert.',
+      severity: 'beginner'
+    },
+    'tab1.wert_standardstufe': {
+      title: 'Standardstufe',
+      body: 'Im Marktbericht: Die Standardstufe (1 sehr einfach bis 5 stark gehoben) bestimmt die Baukosten je m² im Sachwert (Normalherstellungskosten 2010). Für den Ertragswert spielt sie keine Rolle — dort zählt die Miete.',
+      severity: 'beginner'
+    },
+    'tab1.wert_geschosse': {
+      title: 'Geschosse und Unterkellerung',
+      body: 'Im Marktbericht: Wählt den Gebäudetyp in der Baukostentabelle des Sachwerts — ein Keller oder ein ausgebautes Dachgeschoss ändern die Baukosten je m². Im Ertragswert wirkt es nicht.',
+      severity: 'beginner'
+    },
+    'tab1.wert_stellplaetze': {
+      title: 'Garagen und Stellplätze',
+      body: 'Im Marktbericht: Vermietete Stellplätze gehen mit ihrer Miete in den Ertragswert ein; Garagen zählen im Sachwert mit eigenen Baukosten. Stellplätze ohne Miete bringen im Ertragswert weder Ertrag noch Kosten.',
+      severity: 'beginner'
+    },
+    'tab1.wert_lage': {
+      title: 'Lage im Verkehrswert',
+      body: 'Im Marktbericht: Die Lage-Einschätzung fließt in den Deal Score. Den Verkehrswert bestimmt die Lage über den Bodenrichtwert, die marktübliche Miete und die Kaufpreise vergleichbarer Objekte in der Umgebung — nicht über dieses Feld.',
+      severity: 'beginner'
+    },
     'tab1.ds2_zustand': {
-      title: 'Zustand der Wohnung',
+      title: 'Zustand der Wohnung / des Gebäudes',
       body: 'Subjektive Einschätzung des Bauzustands. Beeinflusst den DealScore-Risiko-Anteil und unterstützt die Auto-AfA-Vorauswahl (Neubau ab Baujahr 2023 → degressive AfA möglich).',
       severity: 'beginner'
     },
@@ -72,13 +103,13 @@
 
     'tab1.wfl': {
       title: 'Wohnfläche',
-      body: 'Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig).',
+      body: 'Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig). Im Marktbericht: Grundlage der Miete je m² im Ertragswert, des Vergleichswerts (Preis je m² × Fläche) und — über die Bruttogrundfläche — der Baukosten im Sachwert.',
       paragraph: 'WoFlV',
       severity: 'beginner'
     },
     'tab1.baujahr': {
       title: 'Baujahr',
-      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: vor 1925 = 2,5%, ab 1925 = 2,0%, Neubau ab Bauantrag 2023 = 3,0% oder 5,0% degressiv möglich. Auch relevant für GEG-Sanierungspflichten.',
+      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: fertiggestellt vor 1925 = 2,5%, 1925 bis 2022 = 2,0%, fertiggestellt ab 2023 = 3,0% (§ 7 Abs. 4 Satz 1 Nr. 2 EStG). 5,0% degressiv (§ 7 Abs. 5a) nur bei Baubeginn oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029. Auch relevant für GEG-Sanierungspflichten. Im Marktbericht: Baujahr und Modernisierungspunkte ergeben die Restnutzungsdauer — sie bestimmt im Ertragswert den Vervielfältiger und im Sachwert die Alterswertminderung.',
       paragraph: '§ 7 Abs. 4 EStG',
       severity: 'beginner'
     },
@@ -123,7 +154,7 @@
     },
     'tab1.bodenrichtwert': {
       title: 'Bodenrichtwert',
-      body: 'Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands.',
+      body: 'Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands. Im Marktbericht: Bodenrichtwert × Grundstücksfläche ergibt den Bodenwert — er steckt im Ertragswert und im Sachwert.',
       example: 'Beispiel: München-Schwabing: 8.000 €/m². Münster-Geist: 420 €/m².',
       severity: 'beginner'
     },
@@ -152,7 +183,7 @@
     },
     'tab2.notar': {
       title: 'Notarkosten',
-      body: 'Notar- und Grundbuchgebühren nach GNotKG-Tabelle. Üblich: 1,5-2,0% des Kaufpreises. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung.',
+      body: 'Notar- und Grundbuchgebühren nach GNotKG-Tabelle. Üblich: 1,5-2,0% des Kaufpreises. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung. Die Bestellung der Grundschuld ist kein Teil der Anschaffungskosten, sondern Finanzierungskosten (sofort abziehbar): im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ eintragen, dann fällt sie aus der AfA-Basis.',
       paragraph: 'GNotKG',
       severity: 'beginner'
     },
@@ -171,7 +202,7 @@
     },
     'tab2.grundbuchamt': {
       title: 'Grundbuchamt',
-      body: 'Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung).',
+      body: 'Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung). Steuerlich gehört nur der Erwerb zu den Anschaffungskosten; die Kosten der Grundschuld (Notar und Grundbuch) sind Finanzierungskosten und sofort abziehbare Werbungskosten. Trag sie im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ ein — DealPilot nimmt sie dann aus der AfA-Basis heraus; die Gesamtinvestition bleibt gleich.',
       severity: 'beginner'
     },
     'tab2.grunderwerbsteuer': {
@@ -281,7 +312,7 @@
     },
     'tab4.afa_satz': {
       title: 'AfA-Satz',
-      body: 'Wie schnell wird das Gebäude abgeschrieben? Linear 2,0% (50 Jahre): Standard ab Baujahr 1925. Linear 2,5% (40 Jahre): vor 1925. Linear 3,0% (33 Jahre): Wohnzwecke mit Bauantrag ab 2023. Degressiv 5,0%: nur für Neubau-Wohnbau (Bauantrag 10/2023 – 09/2029).',
+      body: 'Wie schnell wird das Gebäude abgeschrieben? Maßgeblich ist die Fertigstellung (§ 7 Abs. 4 Satz 1 Nr. 2 EStG): Linear 3,0% (33⅓ Jahre): fertiggestellt ab 2023 (Buchst. a). Linear 2,0% (50 Jahre): fertiggestellt 1925 bis 2022 (Buchst. b). Linear 2,5% (40 Jahre): fertiggestellt vor 1925 (Buchst. c). Degressiv 5,0% (§ 7 Abs. 5a): nur Wohngebäude mit Baubeginn (Baubeginnsanzeige) oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029, beim Kauf bis Ende des Fertigstellungsjahres.',
       paragraph: '§ 7 EStG',
       severity: 'beginner'
     },
@@ -292,14 +323,14 @@
     },
     'tab4.degressive_afa': {
       title: 'Degressive AfA § 7 Abs. 5a EStG',
-      body: 'Nur für Wohngebäude mit Bauantrag oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029. Die AfA wird in den ersten Jahren deutlich höher (5% vom Restbuchwert) und sinkt jedes Jahr — bringt frühe Steuervorteile, hilft bei der Anlauf-Cashflow-Phase.',
+      body: 'Nur für Wohngebäude, deren Herstellung (Baubeginnsanzeige) zwischen 01.10.2023 und 30.09.2029 begonnen hat oder die aufgrund eines Kaufvertrags aus diesem Zeitraum angeschafft werden — beim Kauf nur bis zum Ende des Fertigstellungsjahres. Die AfA wird in den ersten Jahren deutlich höher (5% vom Restbuchwert) und sinkt jedes Jahr — bringt frühe Steuervorteile, hilft bei der Anlauf-Cashflow-Phase.',
       paragraph: '§ 7 Abs. 5a EStG',
       format: 'infobox',
       severity: 'critical'
     },
     'tab4.sonder_7b': {
       title: '§ 7b Sonder-AfA',
-      body: 'Nur für Mietwohnungs-Neubau (Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietungspflicht, Bauantrag/Kaufvertrag zwischen 01.01.2023 und 30.09.2029). Wenn alle 4 Bedingungen erfüllt: zusätzliche 5% AfA p.a. in den ersten 4 Jahren — 20% Bonus auf förderfähige Basis (max. 4.000 €/m²).',
+      body: 'Nur für Mietwohnungs-Neubau (Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietungspflicht, Bauantrag oder Bauanzeige zwischen 01.01.2023 und 30.09.2029; beim Kauf bis Ende des Fertigstellungsjahres). Wenn alle 4 Bedingungen erfüllt: zusätzliche 5% AfA p.a. in den ersten 4 Jahren — 20% Bonus auf förderfähige Basis (max. 4.000 €/m²).',
       paragraph: '§ 7b EStG',
       format: 'infobox',
       severity: 'critical'
@@ -516,7 +547,7 @@
     },
     'tab8.wertpuffer': {
       title: 'Wertpuffer',
-      body: 'Verkehrswert minus Kaufpreis. Wenn der Verkehrswert (Sachverständigen-Gutachten) höher als der Kaufpreis ist: positiver Wertpuffer = sofortiger Buchgewinn. Negativer Wertpuffer = du zahlst über Marktwert.',
+      body: 'Marktwert minus Kaufpreis. Positiv = du kaufst unter Wert, negativ = du zahlst über Marktwert. Gerechnet wird mit Gutachten, Bankbewertung, dem Wert aus dem DealPilot-Marktbericht und deiner eigenen Schätzung — nicht mit der Marktpreisindikation aus Angeboten. Der Beleihungsauslauf (LTV) nimmt dagegen nur Gutachten oder Bankbewertung.',
       severity: 'pro'
     },
     'tab8.tilgung_vom_mieter': {

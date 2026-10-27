@@ -50,9 +50,14 @@ export const KENNZAHLEN = {
   sachwertfaktor: 'swf',
   umrechnungskoeffizient_flaeche: 'uk_flaeche',
   umrechnungskoeffizient_wgfz: 'uk_wgfz',
+  /* v3000 · Vergleichsfaktoren (§ 20) und IRW-Umrechnungen gehoeren in die Matrix (Marcel 27.10.2026:
+     „damit ich dort auch immer einen vernuenftigen Ueberblick habe") - bis hier unter „sonstige" */
+  vergleichsfaktor: 'vgf',
+  umrechnung_irw: 'irw',
 };
 export const KZ_NAME = { lzs: 'Liegenschaftszinssatz', swf: 'Sachwertfaktor',
-  uk_flaeche: 'UK Grundstücksgröße', uk_wgfz: 'UK WGFZ', sonstige: 'sonstige Kennzahlen' };
+  uk_flaeche: 'UK Grundstücksgröße', uk_wgfz: 'UK WGFZ', vgf: 'Vergleichsfaktor (§ 20)', irw: 'IRW-Umrechnung',
+  sonstige: 'sonstige Kennzahlen' };
 const kzVon = (k) => KENNZAHLEN[k] || 'sonstige';
 
 const landVon = (s) => LC[String((s && s.ags) || '').replace(/\D/g, '').slice(0, 2)]

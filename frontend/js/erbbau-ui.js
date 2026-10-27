@@ -102,11 +102,10 @@
   function volleigentum() {
     /* Kaskade wie wert_basis in calc.js, aber mit Herkunftsangabe: der
        Nutzer muss sehen, WORAUF der Abschlag gerechnet wurde. */
-    var svw = val('svwert');
-    if (svw > 0) return { wert: svw, quelle: 'Verkehrswert (§ 194 BauGB)' };
-    var bv = val('bankval');
+    /* v3003a · eine Wertangabe: Marktwert/Verkehrswert mit Herkunft (wertangabe.js) */
+    var _wa = window.DpWertangabe ? window.DpWertangabe.aufloesen(window.DpWertangabe.ausFormular()) : { wert: val('svwert'), herkunft: null };
     var kp = val('kp');
-    if (bv > kp && bv > 0) return { wert: bv, quelle: 'Bankbewertung' };
+    if (_wa.wert > 0) return { wert: _wa.wert, quelle: _wa.herkunft === 'bank' ? 'Bankbewertung' : _wa.herkunft === 'gutachten' ? 'Verkehrswert (§ 194 BauGB)' : 'Marktwert (Reiter Objekt)' };
     if (kp > 0) return { wert: kp, quelle: 'Kaufpreis' };
     return null;
   }

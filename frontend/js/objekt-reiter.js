@@ -350,6 +350,9 @@
     box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '…', 'wird aus dem Register gelesen', '') + mpZeile;
     var r = await api('/marktbericht/wertparameter/zinssatz', { object: o });
     if (lauf !== _autoLauf) return;
+    /* v3002 · der Abgleich mit dem Marktbericht (mb-abgleich.js) liest denselben Abruf, keinen zweiten */
+    try { window._dpZinsAbruf = { key: (typeof window._currentObjKey === 'string' && window._currentObjKey) || null, r: r || null, zeit: Date.now() };
+          window.dispatchEvent(new CustomEvent('dp:zins-abruf', { detail: {} })); } catch (e) {}
     /* v2483 · die RND des Hauses fuer Mieterliste und Bankfassung (mfh-einheiten.js
        hausRnd): dieselbe Zahl wie diese Zeile, nicht ein zweiter Weg */
     try {

@@ -314,6 +314,11 @@
     const _inv = ['inv_kueche', 'inv_moebel', 'inv_geraete', 'inv_pv', 'inv_stellplatz', 'inv_sonst'].reduce(function (s, k) { return s + _zahl(dpObj[k]); }, 0) || _zahl(dpObj.moebl);
     const _nkPct = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'].reduce(function (s, k) { return s + _zahl(dpObj[k]); }, 0);
     if (kp > 0) prefill._dpGebaeudeanteil = (Math.max(0, kp - _inv) + kp * _nkPct / 100) * gaPct / 100;
+    /* v3006c · dieselbe Rechnung wie calc.js: Kern DealKpis (GrESt ohne Inventar, Nebenkosten anteilig) */
+    if (kp > 0 && window.DealKpis && DealKpis.nebenkosten && DealKpis.gebaeudeAhk) {
+      const _nkE = DealKpis.nebenkosten({ kp: kp, inventar: _inv, makler_p: _zahl(dpObj.makler_p), notar_p: _zahl(dpObj.notar_p), gba_p: _zahl(dpObj.gba_p), gest_p: _zahl(dpObj.gest_p), ji_p: _zahl(dpObj.ji_p) });
+      prefill._dpGebaeudeanteil = DealKpis.gebaeudeAhk({ kp: kp, nk: _nkE.summe, nkNurImmo: _nkE.grest, gebAntPct: gaPct, inventar: _inv }).gebAhk;
+    }
     const grenz = parseFloat(String(dpObj.grenz || 42).replace(',', '.')) || 42;
     prefill._dpGrenzsteuersatz = grenz / 100;
 
@@ -1343,7 +1348,7 @@
       /* v2993 · Stand 27.10.2026: IX R 14/23 und die Aufhebung des BMF-Schreibens vom 22.02.2023 am 01.12.2025 */
       + '<strong style="color:#2A2727">Rechtliche Basis:</strong> § 7 Abs. 4 Satz 2 EStG. Jede im Einzelfall geeignete sachverständige Methode ist zulässig (BFH IX R 25/19 vom 28.07.2021; IX R 14/23 vom 23.01.2024), auch die Restnutzungsdauer nach ImmoWertV - '
       + 'aber nicht als bloßer Verweis auf das Modell: das Gutachten muss die Gegebenheiten des Objekts zum Erwerbszeitpunkt begutachten, etwa durchgeführte oder unterlassene Modernisierungen je Gewerk. '
-      + 'Das BMF-Schreiben vom 22.02.2023 ist seit 01.12.2025 aufgehoben. Gesetzliche Nutzungsdauer hier: ' + Math.round(1 / _gesetzAfaSatz(state.baujahr)) + ' Jahre (' + String(_gesetzAfaSatz(state.baujahr) * 100).replace('.', ',') + ' %).'
+      + 'Das BMF-Schreiben vom 22.02.2023 ist seit 01.12.2025 aufgehoben. Gesetzliche Nutzungsdauer hier: ' + (_gesetzAfaSatz(state.baujahr) === 0.03 ? '33⅓' : String(Math.round(1 / _gesetzAfaSatz(state.baujahr)))) /* v3006b: 3 % sind 33 1/3 Jahre */ + ' Jahre (' + String(_gesetzAfaSatz(state.baujahr) * 100).replace('.', ',') + ' %).'
       + '</div>';
 
     body.innerHTML = html;

@@ -59,10 +59,20 @@
     var elig = window.Afa.checkDegressivEligibility({
       ds2_zustand: zustand,
       baujahr: baujahr,
-      afaSatz: afaSatz
+      afaSatz: afaSatz,
+      kaufdatum: ($('kaufdat') || {}).value || ''   /* v3006: § 7 Abs. 5a knuepft am Vertrag, nicht am Baujahr */
     });
 
     hint.style.display = elig.eligible ? 'flex' : 'none';
+    /* v3006 · Der Text nennt die Voraussetzungen des Gesetzes. Bis v3005 stand
+       dort „Bauantrag/Kaufvertrag ab 10/2023" - der Bauantrag ist § 7b. */
+    var txt = $('afa-neubau-hint-text');
+    if (txt && elig.eligible) {
+      txt.textContent = (elig.pruefen
+        ? 'Bei Neubau erlaubt § 7 Abs. 5a EStG 5 % degressiv vom Restbuchwert, wenn der Baubeginn (Baubeginnsanzeige) oder der Kaufvertrag zwischen dem 01.10.2023 und dem 30.09.2029 liegt - beim Kauf nur bis zum Ende des Fertigstellungsjahres.'
+        : 'Kaufvertrag zwischen dem 01.10.2023 und dem 30.09.2029 und im Fertigstellungsjahr: § 7 Abs. 5a EStG erlaubt 5 % degressiv vom Restbuchwert.')
+        + ' Vorteil: deutlich höhere Abschreibung in den ersten Jahren.';
+    }
   };
 
   /**

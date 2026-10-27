@@ -23,6 +23,7 @@
  * `CrossCheckService` übernommen (Schätzung ab Z. 118, Anlage 2 ab Z. 203
  * im Stand v1815).
  */
+import { stichtagJahr } from './stichtag.js';   /* v3010 */
 import { restnutzungsdauer as anlage2Rnd } from './anlage2.js';
 
 export const GND_JAHRE_STANDARD = 80;   /* Wohngebäude, Anlage 1 ImmoWertV */
@@ -39,7 +40,7 @@ export function schaetzung(ref = {}, gnd = GND_JAHRE_STANDARD) {
   const buildYear = _num(ref.build_year);
   if (!buildYear) return null;
   const G = Number(gnd) > 0 ? Number(gnd) : GND_JAHRE_STANDARD;
-  const nowYear = new Date().getFullYear();
+  const nowYear = stichtagJahr(ref);   /* v3010 · Alter zum Wertermittlungsstichtag */
   const alter = Math.max(0, nowYear - buildYear);
   let rnd = G - alter;
   const mod = String(ref.modernization || '').toLowerCase();
@@ -124,7 +125,7 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
     return erg('geschaetzt', 'kein_baujahr', fallback,
       SCHAETZUNG_TEXT + ' Es liegt kein verwertbares Baujahr vor.');
   }
-  const a2 = anlage2Rnd({ gnd: GND, alter: Math.max(0, (new Date().getFullYear()) - bj),
+  const a2 = anlage2Rnd({ gnd: GND, alter: Math.max(0, stichtagJahr(ref) - bj),   /* v3010 */
                           punkte: mp, kernsaniert: kern });
   /* v1966: den ECHTEN Grund weitergeben. Hier stand pauschal „lieferte
      kein Ergebnis" — seit anlage2.js hinter dem Scheitel absichtlich

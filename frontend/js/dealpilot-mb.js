@@ -161,11 +161,12 @@ if (!window._wlc) {
        mea und das Erbbaurecht, die der Mapper schon immer las und die die
        Karte nie schickte. */
     'nkm', 'brw', 'mea', 'erbpacht', 'erbbauzins', 'erb_restlz', 'nutzungsart', 'garagen', 'stellpl_aussen', 'balkon_flae', 'bad_anz',
-    'baustatus', 'bgf', 'standardstufe', 'grundriss', 'mod_punkte', 'sachwertfaktor', 'uk_flaeche' /* v2282 */, 'wgfz_objekt' /* v2361 */, 'nhk_haus', 'nhk_geschosse', 'nhk_dach',
+    'baustatus', 'bgf', 'standardstufe', 'grundriss', 'mod_punkte', 'sachwertfaktor', 'uk_flaeche' /* v2282 */, 'wgfz_objekt' /* v2361 */, 'vgf_wohnlage', 'vgf_ausstattung' /* v3008 */, 'nhk_haus', 'nhk_geschosse', 'nhk_dach',
     'hinterland_qm', 'hinterland_eur_qm', 'hinterland_rentierlich', 'garagen_bgf_qm', 'garagen_stufe', 'aussenanlagen_pct', 'aussenanlagen',
     'ausst_aussenwaende', 'ausst_dach', 'ausst_fenster', 'ausst_innenwaende', 'ausst_decken', 'ausst_fussboeden', 'ausst_sanitaer', 'ausst_heizung', 'ausst_technik',
     'bes_bauteile', 'btl_gauben', 'btl_balkone', 'btl_vordach', 'btl_terrassen', 'btl_sonstige',
     'lzs_pct', 'brw_anpassung_pct', 'brw_anpassung_grund', 'stellplatz_miete_monat',
+    'wertermittlungsstichtag' /* v3010 · leer = heute; der Mapper laesst nur JJJJ-MM-TT durch */,
     'mikrolage', 'makrolage', 'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung', 'ds2_mietausfall',
     /* v2241 · Die acht Bauteile der Anlage 2. Ohne sie zaehlte der Mapper
        `mod_angaben` immer 0 — und 0 Punkte aus acht Antworten „Keine/Nie"
@@ -601,6 +602,9 @@ if (!window._wlc) {
      gelten jetzt hier genauso. Wer eine aendert, aendert BEIDE. */
   function _stufeMakro(sc) { if (sc == null || !isFinite(sc)) return null; return sc >= 75 ? 'sehr_gut' : sc >= 60 ? 'gut' : sc >= 45 ? 'durchschnittlich' : sc >= 30 ? 'schwach' : 'sehr_schwach'; }
   function _stufeMikro(sc) { if (sc == null || !isFinite(sc)) return null; return sc >= 85 ? 'sehr_gut' : sc >= 75 ? 'gut' : sc >= 55 ? 'durchschnittlich' : sc >= 35 ? 'schwach' : 'sehr_schwach'; }
+  /* v3007 · die Wertsteigerungs-Schwelle stand zweimal lokal (autoLage, applyToFields);
+     jetzt EINE Stelle, auch fuer den Abgleich in ki-lage.js (lageStufen.wert). */
+  function _wertStufe(p) { return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines'; }
   function _bevStufe(pctProJahr) {
     if (pctProJahr == null || !isFinite(pctProJahr)) return null;
     if (pctProJahr >= 0.8) return 'stark_wachsend';
@@ -656,7 +660,7 @@ if (!window._wlc) {
   function autoLage() {
     if (!D) return 0;
     var lc = function (sc) { return sc >= 8 ? 'sehr_gut' : sc >= 6 ? 'gut' : sc >= 4 ? 'durchschnittlich' : sc >= 2 ? 'schwach' : 'sehr_schwach'; };
-    var wc = function (p) { return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines'; };
+    var wc = _wertStufe;
     var gesetzt = [];
     if (D.macroRaw != null && setSelLeer('makrolage', _stufeMakro(D.macroRaw))) gesetzt.push('Makrolage');
     if (D.microRaw != null && setSelLeer('mikrolage', _stufeMikro(D.microRaw))) gesetzt.push('Mikrolage');
@@ -683,7 +687,7 @@ if (!window._wlc) {
       if (sqm) { setInput('ds2_marktmiete', sqm.toFixed(2).replace('.', ',')); applied.push('Marktmiete €/m²'); }
     }
     var lc = function (sc) { return sc >= 8 ? 'sehr_gut' : sc >= 6 ? 'gut' : sc >= 4 ? 'durchschnittlich' : sc >= 2 ? 'schwach' : 'sehr_schwach'; };
-    var wc = function (p) { return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines'; };
+    var wc = _wertStufe;
     if (D.macroRaw != null) { setSel('makrolage', _stufeMakro(D.macroRaw)); applied.push('Makrolage'); }
     if (D.microRaw != null) { setSel('mikrolage', _stufeMikro(D.microRaw)); applied.push('Mikrolage'); }
     if (D.trendRaw != null) { var _w = wc(D.trendRaw); if (_w) { setSel('ds2_wertsteigerung', _w); applied.push('Wertsteigerung'); } }
@@ -936,7 +940,7 @@ if (!window._wlc) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
 
-  global.DealPilotMB = { lageStufen: { makro: _stufeMakro, mikro: _stufeMikro, bev: function (p) { return _bevStufe(p); }, nachfrage: function (t) { return _nachfrageStufe(t); } }, /* v2177 */ run: run, restore: restore, inputs: inputs, uebernehmen: uebernehmen, /* v1862: ein Sammler, eine Karte */ letzter: function () { return D || null; }, /* v1851: letzte Karte fuer die Lage-Gegenueberstellung */ /* v752-api */
+  global.DealPilotMB = { lageStufen: { makro: _stufeMakro, mikro: _stufeMikro, bev: function (p) { return _bevStufe(p); }, nachfrage: function (t) { return _nachfrageStufe(t); }, wert: function (p) { return _wertStufe(p); } }, /* v2177, wert v3007 */ run: run, restore: restore, inputs: inputs, uebernehmen: uebernehmen, /* v1862: ein Sammler, eine Karte */ letzter: function () { return D || null; }, /* v1851: letzte Karte fuer die Lage-Gegenueberstellung */ /* v752-api */
     getData: function () { return (D && D.mw) ? { D: D, mode: mode } : null; },
     setMode: function (m) { mode = (m === 'mid') ? 'med' : m; try { persistLight(); } catch (e) {} },
     apply: applyToFields,

@@ -571,6 +571,10 @@ export const DealPilotObjectMapper = {
       sachwertfaktor: dez(pick(d, ['sachwertfaktor'])),
       uk_flaeche: dez(pick(d, ['uk_flaeche'])),   /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
       wgfz_objekt: dez(pick(d, ['wgfz_objekt'])),   /* v2361 · WGFZ des Objekts (§ 16 Abs. 4 ImmoWertV) */
+      /* v3008 · Klassen des Gutachterausschusses fuer Vergleichsfaktoren (eigene Angabe, Wortlaut des Ausschusses) */
+      vgf_wohnlage: String(pick(d, ['vgf_wohnlage']) || '').trim() || null,
+      vermietungsstand: String(pick(d, ['vermstand', 'vermietungsstand']) || '').trim() || null,   /* v3008 */
+      vgf_ausstattung: String(pick(d, ['vgf_ausstattung']) || '').trim() || null,
       angebot_abschlag_pct: dez(pick(d, ['angebot_abschlag_pct'])),   /* v2367 · eigener Angebotsabschlag */
       nhk_typ: (function () {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);
@@ -616,6 +620,11 @@ export const DealPilotObjectMapper = {
       })(),
       /* Ertragswert (Stufe 3) */
       lzs_pct: dez(pick(d, ['lzs_pct'])),               /* v1851: „2.56" kam als 256 an */
+      /* v3010 · Wertermittlungsstichtag (Feld im Block „Ansaetze des Sachverstaendigen"); nur ein Datum JJJJ-MM-TT reist weiter,
+         leer = heute (lib/stichtag.js). Ohne diese Zeile fiele das Feld hier still weg. */
+      wertermittlungsstichtag: (function () { let v = String(pick(d, ['wertermittlungsstichtag']) || '').trim();
+        const de = v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (de) v = de[3] + '-' + de[2].padStart(2, '0') + '-' + de[1].padStart(2, '0');   /* v3010a: auch TT.MM.JJJJ */
+        v = v.slice(0, 10); return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null; })(),
       brw_anpassung_pct: dez(pick(d, ['brw_anpassung_pct'])),
       brw_anpassung_grund: pick(d, ['brw_anpassung_grund']),
       stellplatz_miete_monat: num(pick(d, ['stellplatz_miete_monat'])),

@@ -1552,7 +1552,8 @@ async function _exportPDFInner() {
     ['Makler (' + pP(v('makler_p'), 2) + ')',  pE(K.kp * v('makler_p') / 100)],
     ['Notar (' + pP(v('notar_p'), 2) + ')',    pE(K.kp * v('notar_p') / 100)],
     ['Grundbuchamt',              pE(K.kp * v('gba_p') / 100)],
-    ['Grunderwerbsteuer (' + pP(v('gest_p'), 2) + ')', pE(K.kp * v('gest_p') / 100)],
+    /* v3006c · auf den Kaufpreis ohne Inventar, wie das Formular (DealKpis.grestBasis) */
+    ['Grunderwerbsteuer (' + pP(v('gest_p'), 2) + ')', pE(((window.DealKpis && DealKpis.grestBasis) ? DealKpis.grestBasis(K.kp, Math.max(v('inv_kueche') || 0, v('moebl') || 0)) : K.kp) * v('gest_p') / 100)],
     /* v2273 · hier stand „Junker Immo.“ - ein Firmenname im PDF jedes Nutzers (die Bankfassung sagt seit v1463 „Vermittlung / Beratung“) */
     ['Vermittlung / Beratung (' + pP(v('ji_p'), 2) + ')', pE(K.kp * v('ji_p') / 100)],
     ['Sanierungskosten',          pE(v('san'))],

@@ -1,0 +1,2987 @@
+[
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Dithmarschen (übrige Gemeinden, Zeile „Dithmarschen“)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "etw",
+  "objektart": "etw",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025 Dithmarschen, ETW-Richtwerttabelle",
+  "quelle_parser": "VGF-SH-2026-handernte",
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen, Grundstücksmarktbericht 2025, S. 35",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "wohnflaeche",
+   "achse_bez": "Wohnfläche in m²",
+   "stufen": {
+    "30": 3800,
+    "50": 3500,
+    "70": 3300,
+    "90": 3100,
+    "110": 3000
+   },
+   "liefert": "wert_eur",
+   "rundung_stellen": 0,
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "normobjekt": "Eigentumswohnung in Dithmarschen, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 13 %).",
+   "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+   "pruefbeispiel": {
+    "art": "Normprobe",
+    "objekt": "Dithmarschen, 70 m²",
+    "erwartet_eur_qm": 3300,
+    "seite": 35
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Kreis Dithmarschen, Kap. 5.4 „Wohnungs- und Teileigentum“, S. 35: „Bewertungsmodell für die nachfolgende ETW – Richtwerttabelle“",
+   "gnd_jahre": 80,
+   "wohnungsgroessen": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche (Tabelle 30 bis 110 m²)",
+   "lage": "mittlere bis gute Lage",
+   "stichprobe": "1.154 Kaufverträge von 2020 - 2025",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche (Richtwert = Vergleichsfaktor, Bodenanteil vom Kaufpreis in % ausgewiesen, also einschließlich Boden)",
+   "veroeffentlicht": "16.03.2026",
+   "beispiel": {
+    "wortlaut": "„Ein Beispiel: Eigentumswohnung in Büsum, Baujahr 2020, WF = 70 m² — Richtwert = 50 m² x 4.800 €/m² = rd. 240.000 €“ (S. 35)",
+    "befund": "Das abgedruckte Beispiel ist in sich nicht stimmig: es nennt 70 m² Wohnfläche, rechnet aber mit 50 m² und 4.800 €/m². 4.800 €/m² steht in der Tabelle bei Heide, Bj 2020 - 2025, 50 m²; Büsum Bj 2020 - 2025 führt bei 50 m² 7.300 und bei 70 m² 6.000 €/m². Als Prüfmaßstab nicht verwendbar; geprüft wird an den Tabellenzellen (Normprobe)."
+   }
+  },
+  "geltungsbereich": {
+   "sachlich": "Eigentumswohnungen (Wiederverkauf und Neubau nicht getrennt ausgewiesen), mittlere bis gute Lage",
+   "raeumlich": "Kreis Dithmarschen (übrige Gemeinden, Zeile „Dithmarschen“)",
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh"
+   ],
+   "extrapolation": "gesperrt",
+   "ausserhalb_wortlaut": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; die Tabelle druckt 30 bis 110 m² — außerhalb rechnet DealPilot nicht (keine Extrapolation)."
+  },
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.4, S. 35 (Richtwerte für Eigentumswohnungen)",
+    "wortlaut": "Bewertungsmodell: GND 80 Jahre; Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; mittlere bis gute Lage; Stichprobe 1.154 Kaufverträge von 2020 - 2025. „Richtwerte in €/m² (Vergleichsfaktor) bei folgenden Wohnflächen“ 30/50/70/90/110 m².",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Richtwerttabelle (Vergleichsfaktor) mit Normobjekt; Stufe B, weil das abgedruckte Anwendungsbeispiel nicht stimmig ist und zwischen den Wohnflächen linear interpoliert wird (der Bericht sagt nichts zur Interpolation).",
+  "fallzahl": 1154,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "stichtag_hinweis": "Der Bericht nennt keinen Stichtag; eingetragen ist das Ende des Auswertezeitraums (Kaufverträge 2020 - 2025, Berichtsjahr 2025), veröffentlicht am 16.03.2026.",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "fundstelle": "GMB 2025 Kreis Dithmarschen, S. 35"
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "ags": "01051",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Dithmarschen",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "unvollstaendig_grund": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.3.1, S. 34",
+    "wortlaut": "„Die Kaufpreise wurden in Gebäudeanteile und Bodenwertanteile zerlegt. Von den Gebäudeanteilen wurden 8 % für den Außenanlagenanteil abgezogen … Hinweis: Es ist keine Altersentwertung und Marktanpassung notwendig!“ Bezugsgröße €/m² WF, Ausbaustandard mittel, rd. 3.929 Kaufverträge 2020–2025.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Gebäudezeitwert €/m² Wohnfläche ohne Boden, plus Bodenwert",
+   "wohnflaeche_qm": [
+    60,
+    100,
+    140,
+    180,
+    220,
+    260
+   ],
+   "dithmarschen_gesamt": [
+    1500,
+    1300,
+    1200,
+    1100,
+    1000,
+    1000
+   ],
+   "gebaeudezustand": {
+    "schlecht": [
+     500,
+     400,
+     400,
+     300,
+     300,
+     300
+    ],
+    "mittel": [
+     1400,
+     1100,
+     1000,
+     900,
+     900,
+     800
+    ],
+    "gut": [
+     2100,
+     1700,
+     1500,
+     1400,
+     1300,
+     1200
+    ]
+   },
+   "hinweis": "Zuordnung der übrigen Tabellenzeilen (Baujahrsklassen) aus der Textschicht nicht eindeutig — vor Verwendung am Seitenbild S. 34 nachlesen."
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Dithmarschen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Inhaltsverzeichnis und Kap. 5.3/5.4, S. 34–35",
+    "wortlaut": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051011",
+  "ebene": "gemeinde",
+  "gebiet_name": "Brunsbüttel (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "etw",
+  "objektart": "etw",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025 Dithmarschen, ETW-Richtwerttabelle",
+  "quelle_parser": "VGF-SH-2026-handernte",
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen, Grundstücksmarktbericht 2025, S. 35",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "wohnflaeche",
+   "achse_bez": "Wohnfläche in m²",
+   "stufen": {
+    "30": 3900,
+    "50": 3200,
+    "70": 2700,
+    "90": 2500,
+    "110": 2300
+   },
+   "liefert": "wert_eur",
+   "rundung_stellen": 0,
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "normobjekt": "Eigentumswohnung in Brunsbüttel, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 9 %).",
+   "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+   "pruefbeispiel": {
+    "art": "Normprobe",
+    "objekt": "Brunsbüttel, 70 m²",
+    "erwartet_eur_qm": 2700,
+    "seite": 35
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Kreis Dithmarschen, Kap. 5.4 „Wohnungs- und Teileigentum“, S. 35: „Bewertungsmodell für die nachfolgende ETW – Richtwerttabelle“",
+   "gnd_jahre": 80,
+   "wohnungsgroessen": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche (Tabelle 30 bis 110 m²)",
+   "lage": "mittlere bis gute Lage",
+   "stichprobe": "1.154 Kaufverträge von 2020 - 2025",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche (Richtwert = Vergleichsfaktor, Bodenanteil vom Kaufpreis in % ausgewiesen, also einschließlich Boden)",
+   "veroeffentlicht": "16.03.2026",
+   "beispiel": {
+    "wortlaut": "„Ein Beispiel: Eigentumswohnung in Büsum, Baujahr 2020, WF = 70 m² — Richtwert = 50 m² x 4.800 €/m² = rd. 240.000 €“ (S. 35)",
+    "befund": "Das abgedruckte Beispiel ist in sich nicht stimmig: es nennt 70 m² Wohnfläche, rechnet aber mit 50 m² und 4.800 €/m². 4.800 €/m² steht in der Tabelle bei Heide, Bj 2020 - 2025, 50 m²; Büsum Bj 2020 - 2025 führt bei 50 m² 7.300 und bei 70 m² 6.000 €/m². Als Prüfmaßstab nicht verwendbar; geprüft wird an den Tabellenzellen (Normprobe)."
+   }
+  },
+  "geltungsbereich": {
+   "sachlich": "Eigentumswohnungen (Wiederverkauf und Neubau nicht getrennt ausgewiesen), mittlere bis gute Lage",
+   "raeumlich": "Brunsbüttel (Kreis Dithmarschen)",
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh"
+   ],
+   "extrapolation": "gesperrt",
+   "ausserhalb_wortlaut": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; die Tabelle druckt 30 bis 110 m² — außerhalb rechnet DealPilot nicht (keine Extrapolation)."
+  },
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.4, S. 35 (Richtwerte für Eigentumswohnungen)",
+    "wortlaut": "Bewertungsmodell: GND 80 Jahre; Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; mittlere bis gute Lage; Stichprobe 1.154 Kaufverträge von 2020 - 2025. „Richtwerte in €/m² (Vergleichsfaktor) bei folgenden Wohnflächen“ 30/50/70/90/110 m².",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Richtwerttabelle (Vergleichsfaktor) mit Normobjekt; Stufe B, weil das abgedruckte Anwendungsbeispiel nicht stimmig ist und zwischen den Wohnflächen linear interpoliert wird (der Bericht sagt nichts zur Interpolation).",
+  "fallzahl": 1154,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "stichtag_hinweis": "Der Bericht nennt keinen Stichtag; eingetragen ist das Ende des Auswertezeitraums (Kaufverträge 2020 - 2025, Berichtsjahr 2025), veröffentlicht am 16.03.2026.",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "fundstelle": "GMB 2025 Kreis Dithmarschen, S. 35"
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "ags": "01051011",
+  "ebene": "gemeinde",
+  "gebiet_name": "Brunsbüttel (Kreis Dithmarschen)",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "unvollstaendig_grund": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.3.1, S. 34",
+    "wortlaut": "„Die Kaufpreise wurden in Gebäudeanteile und Bodenwertanteile zerlegt. Von den Gebäudeanteilen wurden 8 % für den Außenanlagenanteil abgezogen … Hinweis: Es ist keine Altersentwertung und Marktanpassung notwendig!“ Bezugsgröße €/m² WF, Ausbaustandard mittel, rd. 3.929 Kaufverträge 2020–2025.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Gebäudezeitwert €/m² Wohnfläche ohne Boden, plus Bodenwert",
+   "wohnflaeche_qm": [
+    60,
+    100,
+    140,
+    180,
+    220,
+    260
+   ],
+   "dithmarschen_gesamt": [
+    1500,
+    1300,
+    1200,
+    1100,
+    1000,
+    1000
+   ],
+   "gebaeudezustand": {
+    "schlecht": [
+     500,
+     400,
+     400,
+     300,
+     300,
+     300
+    ],
+    "mittel": [
+     1400,
+     1100,
+     1000,
+     900,
+     900,
+     800
+    ],
+    "gut": [
+     2100,
+     1700,
+     1500,
+     1400,
+     1300,
+     1200
+    ]
+   },
+   "hinweis": "Zuordnung der übrigen Tabellenzeilen (Baujahrsklassen) aus der Textschicht nicht eindeutig — vor Verwendung am Seitenbild S. 34 nachlesen."
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051011",
+  "ebene": "gemeinde",
+  "gebiet_name": "Brunsbüttel (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Inhaltsverzeichnis und Kap. 5.3/5.4, S. 34–35",
+    "wortlaut": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051132",
+  "ebene": "gemeinde",
+  "gebiet_name": "Westerdeichstrich (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "etw",
+  "objektart": "etw",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025 Dithmarschen, ETW-Richtwerttabelle",
+  "quelle_parser": "VGF-SH-2026-handernte",
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen, Grundstücksmarktbericht 2025, S. 35",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "wohnflaeche",
+   "achse_bez": "Wohnfläche in m²",
+   "stufen": {
+    "30": 3000,
+    "50": 2800,
+    "70": 2600,
+    "90": 2500,
+    "110": 2400
+   },
+   "liefert": "wert_eur",
+   "rundung_stellen": 0,
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "normobjekt": "Eigentumswohnung in Westerdeichstrich, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 13 %).",
+   "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+   "pruefbeispiel": {
+    "art": "Normprobe",
+    "objekt": "Westerdeichstrich, 70 m²",
+    "erwartet_eur_qm": 2600,
+    "seite": 35
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Kreis Dithmarschen, Kap. 5.4 „Wohnungs- und Teileigentum“, S. 35: „Bewertungsmodell für die nachfolgende ETW – Richtwerttabelle“",
+   "gnd_jahre": 80,
+   "wohnungsgroessen": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche (Tabelle 30 bis 110 m²)",
+   "lage": "mittlere bis gute Lage",
+   "stichprobe": "1.154 Kaufverträge von 2020 - 2025",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche (Richtwert = Vergleichsfaktor, Bodenanteil vom Kaufpreis in % ausgewiesen, also einschließlich Boden)",
+   "veroeffentlicht": "16.03.2026",
+   "beispiel": {
+    "wortlaut": "„Ein Beispiel: Eigentumswohnung in Büsum, Baujahr 2020, WF = 70 m² — Richtwert = 50 m² x 4.800 €/m² = rd. 240.000 €“ (S. 35)",
+    "befund": "Das abgedruckte Beispiel ist in sich nicht stimmig: es nennt 70 m² Wohnfläche, rechnet aber mit 50 m² und 4.800 €/m². 4.800 €/m² steht in der Tabelle bei Heide, Bj 2020 - 2025, 50 m²; Büsum Bj 2020 - 2025 führt bei 50 m² 7.300 und bei 70 m² 6.000 €/m². Als Prüfmaßstab nicht verwendbar; geprüft wird an den Tabellenzellen (Normprobe)."
+   }
+  },
+  "geltungsbereich": {
+   "sachlich": "Eigentumswohnungen (Wiederverkauf und Neubau nicht getrennt ausgewiesen), mittlere bis gute Lage",
+   "raeumlich": "Westerdeichstrich (Kreis Dithmarschen)",
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh"
+   ],
+   "extrapolation": "gesperrt",
+   "ausserhalb_wortlaut": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; die Tabelle druckt 30 bis 110 m² — außerhalb rechnet DealPilot nicht (keine Extrapolation)."
+  },
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.4, S. 35 (Richtwerte für Eigentumswohnungen)",
+    "wortlaut": "Bewertungsmodell: GND 80 Jahre; Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; mittlere bis gute Lage; Stichprobe 1.154 Kaufverträge von 2020 - 2025. „Richtwerte in €/m² (Vergleichsfaktor) bei folgenden Wohnflächen“ 30/50/70/90/110 m².",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Richtwerttabelle (Vergleichsfaktor) mit Normobjekt; Stufe B, weil das abgedruckte Anwendungsbeispiel nicht stimmig ist und zwischen den Wohnflächen linear interpoliert wird (der Bericht sagt nichts zur Interpolation).",
+  "fallzahl": 1154,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "stichtag_hinweis": "Der Bericht nennt keinen Stichtag; eingetragen ist das Ende des Auswertezeitraums (Kaufverträge 2020 - 2025, Berichtsjahr 2025), veröffentlicht am 16.03.2026.",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "fundstelle": "GMB 2025 Kreis Dithmarschen, S. 35"
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "ags": "01051132",
+  "ebene": "gemeinde",
+  "gebiet_name": "Westerdeichstrich (Kreis Dithmarschen)",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "unvollstaendig_grund": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.3.1, S. 34",
+    "wortlaut": "„Die Kaufpreise wurden in Gebäudeanteile und Bodenwertanteile zerlegt. Von den Gebäudeanteilen wurden 8 % für den Außenanlagenanteil abgezogen … Hinweis: Es ist keine Altersentwertung und Marktanpassung notwendig!“ Bezugsgröße €/m² WF, Ausbaustandard mittel, rd. 3.929 Kaufverträge 2020–2025.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Gebäudezeitwert €/m² Wohnfläche ohne Boden, plus Bodenwert",
+   "wohnflaeche_qm": [
+    60,
+    100,
+    140,
+    180,
+    220,
+    260
+   ],
+   "dithmarschen_gesamt": [
+    1500,
+    1300,
+    1200,
+    1100,
+    1000,
+    1000
+   ],
+   "gebaeudezustand": {
+    "schlecht": [
+     500,
+     400,
+     400,
+     300,
+     300,
+     300
+    ],
+    "mittel": [
+     1400,
+     1100,
+     1000,
+     900,
+     900,
+     800
+    ],
+    "gut": [
+     2100,
+     1700,
+     1500,
+     1400,
+     1300,
+     1200
+    ]
+   },
+   "hinweis": "Zuordnung der übrigen Tabellenzeilen (Baujahrsklassen) aus der Textschicht nicht eindeutig — vor Verwendung am Seitenbild S. 34 nachlesen."
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051132",
+  "ebene": "gemeinde",
+  "gebiet_name": "Westerdeichstrich (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Inhaltsverzeichnis und Kap. 5.3/5.4, S. 34–35",
+    "wortlaut": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051034",
+  "ebene": "gemeinde",
+  "gebiet_name": "Friedrichskoog (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "etw",
+  "objektart": "etw",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025 Dithmarschen, ETW-Richtwerttabelle",
+  "quelle_parser": "VGF-SH-2026-handernte",
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen, Grundstücksmarktbericht 2025, S. 35",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "wohnflaeche",
+   "achse_bez": "Wohnfläche in m²",
+   "stufen": {
+    "30": 2600,
+    "50": 2400,
+    "70": 2200,
+    "90": 2100,
+    "110": 2000
+   },
+   "liefert": "wert_eur",
+   "rundung_stellen": 0,
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "normobjekt": "Eigentumswohnung in Friedrichskoog, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 18 %).",
+   "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+   "pruefbeispiel": {
+    "art": "Normprobe",
+    "objekt": "Friedrichskoog, 70 m²",
+    "erwartet_eur_qm": 2200,
+    "seite": 35
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Kreis Dithmarschen, Kap. 5.4 „Wohnungs- und Teileigentum“, S. 35: „Bewertungsmodell für die nachfolgende ETW – Richtwerttabelle“",
+   "gnd_jahre": 80,
+   "wohnungsgroessen": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche (Tabelle 30 bis 110 m²)",
+   "lage": "mittlere bis gute Lage",
+   "stichprobe": "1.154 Kaufverträge von 2020 - 2025",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche (Richtwert = Vergleichsfaktor, Bodenanteil vom Kaufpreis in % ausgewiesen, also einschließlich Boden)",
+   "veroeffentlicht": "16.03.2026",
+   "beispiel": {
+    "wortlaut": "„Ein Beispiel: Eigentumswohnung in Büsum, Baujahr 2020, WF = 70 m² — Richtwert = 50 m² x 4.800 €/m² = rd. 240.000 €“ (S. 35)",
+    "befund": "Das abgedruckte Beispiel ist in sich nicht stimmig: es nennt 70 m² Wohnfläche, rechnet aber mit 50 m² und 4.800 €/m². 4.800 €/m² steht in der Tabelle bei Heide, Bj 2020 - 2025, 50 m²; Büsum Bj 2020 - 2025 führt bei 50 m² 7.300 und bei 70 m² 6.000 €/m². Als Prüfmaßstab nicht verwendbar; geprüft wird an den Tabellenzellen (Normprobe)."
+   }
+  },
+  "geltungsbereich": {
+   "sachlich": "Eigentumswohnungen (Wiederverkauf und Neubau nicht getrennt ausgewiesen), mittlere bis gute Lage",
+   "raeumlich": "Friedrichskoog (Kreis Dithmarschen)",
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh"
+   ],
+   "extrapolation": "gesperrt",
+   "ausserhalb_wortlaut": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; die Tabelle druckt 30 bis 110 m² — außerhalb rechnet DealPilot nicht (keine Extrapolation)."
+  },
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.4, S. 35 (Richtwerte für Eigentumswohnungen)",
+    "wortlaut": "Bewertungsmodell: GND 80 Jahre; Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; mittlere bis gute Lage; Stichprobe 1.154 Kaufverträge von 2020 - 2025. „Richtwerte in €/m² (Vergleichsfaktor) bei folgenden Wohnflächen“ 30/50/70/90/110 m².",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Richtwerttabelle (Vergleichsfaktor) mit Normobjekt; Stufe B, weil das abgedruckte Anwendungsbeispiel nicht stimmig ist und zwischen den Wohnflächen linear interpoliert wird (der Bericht sagt nichts zur Interpolation).",
+  "fallzahl": 1154,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "stichtag_hinweis": "Der Bericht nennt keinen Stichtag; eingetragen ist das Ende des Auswertezeitraums (Kaufverträge 2020 - 2025, Berichtsjahr 2025), veröffentlicht am 16.03.2026.",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "fundstelle": "GMB 2025 Kreis Dithmarschen, S. 35"
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "ags": "01051034",
+  "ebene": "gemeinde",
+  "gebiet_name": "Friedrichskoog (Kreis Dithmarschen)",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "unvollstaendig_grund": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.3.1, S. 34",
+    "wortlaut": "„Die Kaufpreise wurden in Gebäudeanteile und Bodenwertanteile zerlegt. Von den Gebäudeanteilen wurden 8 % für den Außenanlagenanteil abgezogen … Hinweis: Es ist keine Altersentwertung und Marktanpassung notwendig!“ Bezugsgröße €/m² WF, Ausbaustandard mittel, rd. 3.929 Kaufverträge 2020–2025.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Gebäudezeitwert €/m² Wohnfläche ohne Boden, plus Bodenwert",
+   "wohnflaeche_qm": [
+    60,
+    100,
+    140,
+    180,
+    220,
+    260
+   ],
+   "dithmarschen_gesamt": [
+    1500,
+    1300,
+    1200,
+    1100,
+    1000,
+    1000
+   ],
+   "gebaeudezustand": {
+    "schlecht": [
+     500,
+     400,
+     400,
+     300,
+     300,
+     300
+    ],
+    "mittel": [
+     1400,
+     1100,
+     1000,
+     900,
+     900,
+     800
+    ],
+    "gut": [
+     2100,
+     1700,
+     1500,
+     1400,
+     1300,
+     1200
+    ]
+   },
+   "hinweis": "Zuordnung der übrigen Tabellenzeilen (Baujahrsklassen) aus der Textschicht nicht eindeutig — vor Verwendung am Seitenbild S. 34 nachlesen."
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051034",
+  "ebene": "gemeinde",
+  "gebiet_name": "Friedrichskoog (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Inhaltsverzeichnis und Kap. 5.3/5.4, S. 34–35",
+    "wortlaut": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051044",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heide (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "etw",
+  "objektart": "etw",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025 Dithmarschen, ETW-Richtwerttabelle",
+  "quelle_parser": "VGF-SH-2026-handernte",
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen, Grundstücksmarktbericht 2025, S. 35",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "baujahrsklasse_dithmarschen",
+   "achse_k_bez": "Baujahrsklasse des Berichts",
+   "zuordnung_feld": "baujahr",
+   "kategorie_baender": [
+    {
+     "von": 1960,
+     "bis": 1979,
+     "kategorie": "Bj 1960 - 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1999,
+     "kategorie": "Bj 1980 - 1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "kategorie": "Bj 2000 - 2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2019,
+     "kategorie": "Bj 2010 - 2019"
+    },
+    {
+     "von": 2020,
+     "bis": 2025,
+     "kategorie": "Bj 2020 - 2025"
+    }
+   ],
+   "modell_je_kategorie": {
+    "Bj 1960 - 1979": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 1700,
+      "50": 1600,
+      "70": 1500,
+      "90": 1400,
+      "110": 1400
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Heide, Bj 1960 - 1979, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 16 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Heide, Bj 1960 - 1979, 70 m²",
+      "erwartet_eur_qm": 1500,
+      "seite": 35
+     }
+    },
+    "Bj 1980 - 1999": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 2900,
+      "50": 2600,
+      "70": 2500,
+      "90": 2400,
+      "110": 2300
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Heide, Bj 1980 - 1999, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 10 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Heide, Bj 1980 - 1999, 70 m²",
+      "erwartet_eur_qm": 2500,
+      "seite": 35
+     }
+    },
+    "Bj 2000 - 2009": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 4600,
+      "50": 3500,
+      "70": 2900,
+      "90": 2600,
+      "110": 2300
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Heide, Bj 2000 - 2009, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 8 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Heide, Bj 2000 - 2009, 70 m²",
+      "erwartet_eur_qm": 2900,
+      "seite": 35
+     }
+    },
+    "Bj 2010 - 2019": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 5100,
+      "50": 4200,
+      "70": 3600,
+      "90": 3300,
+      "110": 3000
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Heide, Bj 2010 - 2019, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 7 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Heide, Bj 2010 - 2019, 70 m²",
+      "erwartet_eur_qm": 3600,
+      "seite": 35
+     }
+    },
+    "Bj 2020 - 2025": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 5900,
+      "50": 4800,
+      "70": 4200,
+      "90": 3900,
+      "110": 3600
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Heide, Bj 2020 - 2025, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 4 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Heide, Bj 2020 - 2025, 70 m²",
+      "erwartet_eur_qm": 4200,
+      "seite": 35
+     }
+    }
+   },
+   "liefert": "wert_eur",
+   "rundung_stellen": 0,
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "normobjekt": "Eigentumswohnung in Heide, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil je Baujahrsklasse 16 %/10 %/8 %/7 %/4 %).",
+   "hinweis": "Tabelle je Baujahrsklasse (Bj 1960 - 1979, Bj 1980 - 1999, Bj 2000 - 2009, Bj 2010 - 2019, Bj 2020 - 2025); Baujahre vor 1960 führt der Bericht für Heide nicht — kein Wert.",
+   "pruefbeispiel": {
+    "art": "Normprobe",
+    "objekt": "Heide, Baujahr 1990, 70 m²",
+    "erwartet_eur_qm": 2500,
+    "seite": 35
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Kreis Dithmarschen, Kap. 5.4 „Wohnungs- und Teileigentum“, S. 35: „Bewertungsmodell für die nachfolgende ETW – Richtwerttabelle“",
+   "gnd_jahre": 80,
+   "wohnungsgroessen": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche (Tabelle 30 bis 110 m²)",
+   "lage": "mittlere bis gute Lage",
+   "stichprobe": "1.154 Kaufverträge von 2020 - 2025",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche (Richtwert = Vergleichsfaktor, Bodenanteil vom Kaufpreis in % ausgewiesen, also einschließlich Boden)",
+   "veroeffentlicht": "16.03.2026",
+   "beispiel": {
+    "wortlaut": "„Ein Beispiel: Eigentumswohnung in Büsum, Baujahr 2020, WF = 70 m² — Richtwert = 50 m² x 4.800 €/m² = rd. 240.000 €“ (S. 35)",
+    "befund": "Das abgedruckte Beispiel ist in sich nicht stimmig: es nennt 70 m² Wohnfläche, rechnet aber mit 50 m² und 4.800 €/m². 4.800 €/m² steht in der Tabelle bei Heide, Bj 2020 - 2025, 50 m²; Büsum Bj 2020 - 2025 führt bei 50 m² 7.300 und bei 70 m² 6.000 €/m². Als Prüfmaßstab nicht verwendbar; geprüft wird an den Tabellenzellen (Normprobe)."
+   }
+  },
+  "geltungsbereich": {
+   "sachlich": "Eigentumswohnungen (Wiederverkauf und Neubau nicht getrennt ausgewiesen), mittlere bis gute Lage",
+   "raeumlich": "Heide (Kreis Dithmarschen)",
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh"
+   ],
+   "extrapolation": "gesperrt",
+   "ausserhalb_wortlaut": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; die Tabelle druckt 30 bis 110 m² — außerhalb rechnet DealPilot nicht (keine Extrapolation)."
+  },
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.4, S. 35 (Richtwerte für Eigentumswohnungen)",
+    "wortlaut": "Bewertungsmodell: GND 80 Jahre; Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; mittlere bis gute Lage; Stichprobe 1.154 Kaufverträge von 2020 - 2025. „Richtwerte in €/m² (Vergleichsfaktor) bei folgenden Wohnflächen“ 30/50/70/90/110 m².",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Richtwerttabelle (Vergleichsfaktor) mit Normobjekt; Stufe B, weil das abgedruckte Anwendungsbeispiel nicht stimmig ist und zwischen den Wohnflächen linear interpoliert wird (der Bericht sagt nichts zur Interpolation).",
+  "fallzahl": 1154,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "stichtag_hinweis": "Der Bericht nennt keinen Stichtag; eingetragen ist das Ende des Auswertezeitraums (Kaufverträge 2020 - 2025, Berichtsjahr 2025), veröffentlicht am 16.03.2026.",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "fundstelle": "GMB 2025 Kreis Dithmarschen, S. 35"
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "ags": "01051044",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heide (Kreis Dithmarschen)",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "unvollstaendig_grund": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.3.1, S. 34",
+    "wortlaut": "„Die Kaufpreise wurden in Gebäudeanteile und Bodenwertanteile zerlegt. Von den Gebäudeanteilen wurden 8 % für den Außenanlagenanteil abgezogen … Hinweis: Es ist keine Altersentwertung und Marktanpassung notwendig!“ Bezugsgröße €/m² WF, Ausbaustandard mittel, rd. 3.929 Kaufverträge 2020–2025.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Gebäudezeitwert €/m² Wohnfläche ohne Boden, plus Bodenwert",
+   "wohnflaeche_qm": [
+    60,
+    100,
+    140,
+    180,
+    220,
+    260
+   ],
+   "dithmarschen_gesamt": [
+    1500,
+    1300,
+    1200,
+    1100,
+    1000,
+    1000
+   ],
+   "gebaeudezustand": {
+    "schlecht": [
+     500,
+     400,
+     400,
+     300,
+     300,
+     300
+    ],
+    "mittel": [
+     1400,
+     1100,
+     1000,
+     900,
+     900,
+     800
+    ],
+    "gut": [
+     2100,
+     1700,
+     1500,
+     1400,
+     1300,
+     1200
+    ]
+   },
+   "hinweis": "Zuordnung der übrigen Tabellenzeilen (Baujahrsklassen) aus der Textschicht nicht eindeutig — vor Verwendung am Seitenbild S. 34 nachlesen."
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051044",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heide (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Inhaltsverzeichnis und Kap. 5.3/5.4, S. 34–35",
+    "wortlaut": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051013",
+  "ebene": "gemeinde",
+  "gebiet_name": "Büsum (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "etw",
+  "objektart": "etw",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025 Dithmarschen, ETW-Richtwerttabelle",
+  "quelle_parser": "VGF-SH-2026-handernte",
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen, Grundstücksmarktbericht 2025, S. 35",
+  "formel": {
+   "form": "verzweigt",
+   "achse_k_feld": "baujahrsklasse_dithmarschen",
+   "achse_k_bez": "Baujahrsklasse des Berichts",
+   "zuordnung_feld": "baujahr",
+   "kategorie_baender": [
+    {
+     "von": 1960,
+     "bis": 1979,
+     "kategorie": "Bj 1960 - 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1999,
+     "kategorie": "Bj 1980 - 1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "kategorie": "Bj 2000 - 2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2019,
+     "kategorie": "Bj 2010 - 2019"
+    },
+    {
+     "von": 2020,
+     "bis": 2025,
+     "kategorie": "Bj 2020 - 2025"
+    }
+   ],
+   "modell_je_kategorie": {
+    "Bj 1960 - 1979": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 3200,
+      "50": 2800,
+      "70": 2600,
+      "90": 2500,
+      "110": 2300
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Büsum (Eigenland), Bj 1960 - 1979, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 24 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Büsum (Eigenland), Bj 1960 - 1979, 70 m²",
+      "erwartet_eur_qm": 2600,
+      "seite": 35
+     }
+    },
+    "Bj 1980 - 1999": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 4000,
+      "50": 3600,
+      "70": 3300,
+      "90": 3100,
+      "110": 3000
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Büsum (Eigenland), Bj 1980 - 1999, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 16 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Büsum (Eigenland), Bj 1980 - 1999, 70 m²",
+      "erwartet_eur_qm": 3300,
+      "seite": 35
+     }
+    },
+    "Bj 2000 - 2009": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 4400,
+      "50": 3700,
+      "70": 3300,
+      "90": 3100,
+      "110": 3000
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Büsum (Eigenland), Bj 2000 - 2009, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 13 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Büsum (Eigenland), Bj 2000 - 2009, 70 m²",
+      "erwartet_eur_qm": 3300,
+      "seite": 35
+     }
+    },
+    "Bj 2010 - 2019": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 5100,
+      "50": 4500,
+      "70": 4200,
+      "90": 4000,
+      "110": 3800
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Büsum (Eigenland), Bj 2010 - 2019, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 13 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Büsum (Eigenland), Bj 2010 - 2019, 70 m²",
+      "erwartet_eur_qm": 4200,
+      "seite": 35
+     }
+    },
+    "Bj 2020 - 2025": {
+     "form": "stufen_1d",
+     "achse_feld": "wohnflaeche",
+     "achse_bez": "Wohnfläche in m²",
+     "stufen": {
+      "30": 9800,
+      "50": 7300,
+      "70": 6000,
+      "90": 5200,
+      "110": 4600
+     },
+     "liefert": "wert_eur",
+     "rundung_stellen": 0,
+     "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+     "normobjekt": "Eigentumswohnung in Büsum (Eigenland), Bj 2020 - 2025, mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil 21 %).",
+     "hinweis": "Zwischen den Wohnflächen 30/50/70/90/110 m² linear interpoliert; außerhalb kein Wert.",
+     "pruefbeispiel": {
+      "art": "Normprobe",
+      "objekt": "Büsum (Eigenland), Bj 2020 - 2025, 70 m²",
+      "erwartet_eur_qm": 6000,
+      "seite": 35
+     }
+    }
+   },
+   "liefert": "wert_eur",
+   "rundung_stellen": 0,
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "normobjekt": "Eigentumswohnung in Büsum (Eigenland), mittlere bis gute Lage, Wohnfläche 30–110 m² (Modell 20–130 m²), Gesamtnutzungsdauer 80 Jahre; Richtwert = Vergleichsfaktor einschließlich Bodenanteil (Bodenanteil je Baujahrsklasse 24 %/16 %/13 %/13 %/21 %).",
+   "hinweis": "Tabelle je Baujahrsklasse (Bj 1960 - 1979, Bj 1980 - 1999, Bj 2000 - 2009, Bj 2010 - 2019, Bj 2020 - 2025); Baujahre vor 1960 führt der Bericht für Büsum (Eigenland) nicht — kein Wert.",
+   "pruefbeispiel": {
+    "art": "Normprobe",
+    "objekt": "Büsum (Eigenland), Baujahr 1990, 70 m²",
+    "erwartet_eur_qm": 3300,
+    "seite": 35
+   }
+  },
+  "korrekturen": [
+   {
+    "bez": "Erbbaurecht",
+    "feld": "erbbaurecht",
+    "art": "offen",
+    "wirkung": "multiplikativ",
+    "norm": "nein",
+    "hinweis": "Für Wohnungen im Erbbaurecht führt der Bericht eine EIGENE Tabelle: „Büsum (Erbbaurecht)“, Bodenwertvorteil: Bj 1960 - 1979 (9 %) 2.700 / 2.400 / 2.200 / 2.100 / 2.000; Bj 1980 - 1999 (8 %) 3.400 / 3.000 / 2.700 / 2.500 / 2.400 €/m² bei 30 / 50 / 70 / 90 / 110 m². Der Satz rechnet mit der Tabelle „Büsum (Eigenland)“; eine Erbbaurechtswohnung gehört an die Erbbaurechtstabelle (Bericht S. 35)."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "Grundstücksmarktbericht 2025 des Gutachterausschusses im Kreis Dithmarschen, Kap. 5.4 „Wohnungs- und Teileigentum“, S. 35: „Bewertungsmodell für die nachfolgende ETW – Richtwerttabelle“",
+   "gnd_jahre": 80,
+   "wohnungsgroessen": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche (Tabelle 30 bis 110 m²)",
+   "lage": "mittlere bis gute Lage",
+   "stichprobe": "1.154 Kaufverträge von 2020 - 2025",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche (Richtwert = Vergleichsfaktor, Bodenanteil vom Kaufpreis in % ausgewiesen, also einschließlich Boden)",
+   "veroeffentlicht": "16.03.2026",
+   "beispiel": {
+    "wortlaut": "„Ein Beispiel: Eigentumswohnung in Büsum, Baujahr 2020, WF = 70 m² — Richtwert = 50 m² x 4.800 €/m² = rd. 240.000 €“ (S. 35)",
+    "befund": "Das abgedruckte Beispiel ist in sich nicht stimmig: es nennt 70 m² Wohnfläche, rechnet aber mit 50 m² und 4.800 €/m². 4.800 €/m² steht in der Tabelle bei Heide, Bj 2020 - 2025, 50 m²; Büsum Bj 2020 - 2025 führt bei 50 m² 7.300 und bei 70 m² 6.000 €/m². Als Prüfmaßstab nicht verwendbar; geprüft wird an den Tabellenzellen (Normprobe)."
+   }
+  },
+  "geltungsbereich": {
+   "sachlich": "Eigentumswohnungen (Wiederverkauf und Neubau nicht getrennt ausgewiesen), mittlere bis gute Lage",
+   "raeumlich": "Büsum (Kreis Dithmarschen)",
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh"
+   ],
+   "extrapolation": "gesperrt",
+   "ausserhalb_wortlaut": "Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; die Tabelle druckt 30 bis 110 m² — außerhalb rechnet DealPilot nicht (keine Extrapolation)."
+  },
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.4, S. 35 (Richtwerte für Eigentumswohnungen)",
+    "wortlaut": "Bewertungsmodell: GND 80 Jahre; Wohnungsgrößen von 20 m² bis 130 m² Wohnfläche; mittlere bis gute Lage; Stichprobe 1.154 Kaufverträge von 2020 - 2025. „Richtwerte in €/m² (Vergleichsfaktor) bei folgenden Wohnflächen“ 30/50/70/90/110 m².",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Richtwerttabelle (Vergleichsfaktor) mit Normobjekt; Stufe B, weil das abgedruckte Anwendungsbeispiel nicht stimmig ist und zwischen den Wohnflächen linear interpoliert wird (der Bericht sagt nichts zur Interpolation).",
+  "fallzahl": 1154,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "stichtag_hinweis": "Der Bericht nennt keinen Stichtag; eingetragen ist das Ende des Auswertezeitraums (Kaufverträge 2020 - 2025, Berichtsjahr 2025), veröffentlicht am 16.03.2026.",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "fundstelle": "GMB 2025 Kreis Dithmarschen, S. 35"
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "ags": "01051013",
+  "ebene": "gemeinde",
+  "gebiet_name": "Büsum (Kreis Dithmarschen)",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "unvollstaendig_grund": "Die „Vergleichsfaktorentabellen [Einfamilienhäuser]“ (S. 34) geben einen GEBÄUDEZEITWERT je m² Wohnfläche OHNE Boden an („anschließend ist der Bodenanteil zum Gebäudewert zu addieren“, Beispiel 140 m² × 2.100 €/m² + 800 m² × 95 €/m²). Der Vergleichswert-Rechenweg von DealPilot multipliziert einen Wert einschließlich Boden mit der Wohnfläche; die Addition des Bodenwerts ist dort nicht gebaut — kein Wert, Tabelle vorgemerkt.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Kap. 5.3.1, S. 34",
+    "wortlaut": "„Die Kaufpreise wurden in Gebäudeanteile und Bodenwertanteile zerlegt. Von den Gebäudeanteilen wurden 8 % für den Außenanlagenanteil abgezogen … Hinweis: Es ist keine Altersentwertung und Marktanpassung notwendig!“ Bezugsgröße €/m² WF, Ausbaustandard mittel, rd. 3.929 Kaufverträge 2020–2025.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Gebäudezeitwert €/m² Wohnfläche ohne Boden, plus Bodenwert",
+   "wohnflaeche_qm": [
+    60,
+    100,
+    140,
+    180,
+    220,
+    260
+   ],
+   "dithmarschen_gesamt": [
+    1500,
+    1300,
+    1200,
+    1100,
+    1000,
+    1000
+   ],
+   "gebaeudezustand": {
+    "schlecht": [
+     500,
+     400,
+     400,
+     300,
+     300,
+     300
+    ],
+    "mittel": [
+     1400,
+     1100,
+     1000,
+     900,
+     900,
+     800
+    ],
+    "gut": [
+     2100,
+     1700,
+     1500,
+     1400,
+     1300,
+     1200
+    ]
+   },
+   "hinweis": "Zuordnung der übrigen Tabellenzeilen (Baujahrsklassen) aus der Textschicht nicht eindeutig — vor Verwendung am Seitenbild S. 34 nachlesen."
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01051013",
+  "ebene": "gemeinde",
+  "gebiet_name": "Büsum (Kreis Dithmarschen)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+  "zugang": "frei",
+  "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Keine Lizenz- oder Nutzungsangabe im Grundstücksmarktbericht 2025 (S. 3: „im Internet zum kostenlosen Download vorgehalten“; kein Vervielfältigungs- oder Genehmigungsvorbehalt im Bericht). Nicht erfunden, so vermerkt.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Dithmarschen, Inhaltsverzeichnis und Kap. 5.3/5.4, S. 34–35",
+    "wortlaut": "Der Grundstücksmarktbericht 2025 führt Vergleichsfaktoren nur für Einfamilienhäuser (Kap. 5.3.1, S. 34, als Gebäudezeitwert ohne Boden) und Eigentumswohnungen (Kap. 5.4, S. 35); für Reihenhäuser und Doppelhaushälften keine.",
+    "url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01058",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Rendsburg-Eckernförde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Rendsburg-Eckernförde",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Lizenz nicht einschlägig: der Grundstücksmarktbericht 2024 erlaubt „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen … nur mit Genehmigung des Herausgebers und mit Quellenangabe“. Die Immobilienrichtwerte für Ein-/Zweifamilienhäuser zum 01.01.2025 (fünf Lagebezirke, S. 14–17, mit Anwendungsbeispiel) sind vorgemerkt; ein Wert erst mit Genehmigung des Ausschusses.",
+  "unvollstaendig_grund": "Lizenz nicht einschlägig: der Grundstücksmarktbericht 2024 erlaubt „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen … nur mit Genehmigung des Herausgebers und mit Quellenangabe“. Die Immobilienrichtwerte für Ein-/Zweifamilienhäuser zum 01.01.2025 (fünf Lagebezirke, S. 14–17, mit Anwendungsbeispiel) sind vorgemerkt; ein Wert erst mit Genehmigung des Ausschusses.",
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Gutachterausschuss@kreis-rd.de",
+  "quelle_url": "https://www.kreis-rendsburg-eckernfoerde.de/fileadmin/download/Bauen_und_Mobilitaet/Gutachterausschuss/gutachterausschuss-2026/GMB_2024.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet. (GMB 2024, Impressum S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Kreis Rendsburg-Eckernförde, Kap. 5.1, S. 14–17; Impressum S. 2",
+    "wortlaut": "Lizenz nicht einschlägig: der Grundstücksmarktbericht 2024 erlaubt „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen … nur mit Genehmigung des Herausgebers und mit Quellenangabe“. Die Immobilienrichtwerte für Ein-/Zweifamilienhäuser zum 01.01.2025 (fünf Lagebezirke, S. 14–17, mit Anwendungsbeispiel) sind vorgemerkt; ein Wert erst mit Genehmigung des Ausschusses.",
+    "url": "https://www.kreis-rendsburg-eckernfoerde.de/fileadmin/download/Bauen_und_Mobilitaet/Gutachterausschuss/gutachterausschuss-2026/GMB_2024.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Immobilienrichtwerte EFH (Vergleichsfaktoren § 20 ImmoWertV) zum 01.01.2025, Euro je m² Wohnfläche einschließlich Boden, Weiterverkäufe, Normobjekt mit Keller und Garage, unvermietet, mittlere Lage im Bezirk",
+   "zonen": {
+    "Nord": {
+     "irw": 2600,
+     "richtwert_baujahr": 1975
+    },
+    "Eckernförde (Stadt)": {
+     "irw": 3300,
+     "richtwert_baujahr": 1975
+    },
+    "Rendsburg (Stadt)": {
+     "irw": 2200,
+     "richtwert_baujahr": 1965
+    },
+    "West": {
+     "irw": 1950,
+     "richtwert_baujahr": 1970
+    },
+    "Ost": {
+     "irw": 2700,
+     "richtwert_baujahr": 1980
+    }
+   },
+   "zuordnung": "GMB 2023, Kap. 17, S. 117: Nord = Altenholz, Büdelsdorf, Ämter Dänischenhagen, Dänischer Wohld, Hüttener Berge, Schlei-Ostsee, aus Amt Fockbek Rickert und Alt Duvenstedt; West = Ämter Hohner Harde, Jevenstedt, aus Amt Eiderkanal Haßmoor, Ostenfeld, Osterrönfeld, Rade b. R., Schacht-Audorf, Schülldorf, aus Amt Fockbek Fockbek und Nübbel, übrige Gemeinden der Ämter Mittelholstein und Nortorfer Land; Ost = Kronshagen, Wasbek, Ämter Achterwehr, Bordesholm, Eidertal, Bovenau, aus Mittelholstein Arpsdorf, Aukrug, Ehndorf, Padenstedt, aus Nortorfer Land Borgdorf-Seedorf, Dätgen, Groß Vollstedt, Krogaspe, Schülp/N., Timmaspe, Warder (Stadt Nortorf im Text „Ost“, in der Gemeindeliste nicht genannt — zu klären).",
+   "baujahr_umrechnung": {
+    "1965": [
+     1.19,
+     1.17,
+     1.15,
+     1.13,
+     1.11,
+     1.09,
+     1.08,
+     1.06,
+     1.04,
+     1.01,
+     0.99,
+     0.96,
+     0.94
+    ],
+    "1970": [
+     1.17,
+     1.15,
+     1.13,
+     1.11,
+     1.1,
+     1.08,
+     1.06,
+     1.04,
+     1.03,
+     1,
+     0.97,
+     0.95,
+     0.93
+    ],
+    "1975": [
+     1.16,
+     1.14,
+     1.12,
+     1.1,
+     1.08,
+     1.06,
+     1.05,
+     1.03,
+     1.01,
+     0.99,
+     0.96,
+     0.94,
+     0.91
+    ],
+    "1980": [
+     1.14,
+     1.12,
+     1.1,
+     1.08,
+     1.06,
+     1.05,
+     1.03,
+     1.02,
+     1,
+     0.97,
+     0.95,
+     0.92,
+     0.9
+    ],
+    "objekt_baujahr": [
+     2020,
+     2015,
+     2010,
+     2005,
+     2000,
+     1995,
+     1990,
+     1985,
+     1980,
+     1970,
+     1960,
+     1950,
+     1940
+    ]
+   },
+   "gebaeudeart": {
+    "RMH": 0.9,
+    "DHH/REH": 0.95,
+    "EFH": 1,
+    "BGL": 1.05,
+    "VILLA": "bis 1,75",
+    "ZFH": 0.95
+   },
+   "wohnflaechenklasse": {
+    "EFH/BGL": {
+     "klein": "< 90 m²",
+     "typisch": "90 - 130 m²",
+     "gross": "> 130 m²",
+     "sehr_gross": "> 180 m²"
+    },
+    "RMH/DHH/REH": {
+     "klein": "< 75 m²",
+     "typisch": "75 - 110 m²",
+     "gross": "> 110 m²",
+     "sehr_gross": "> 150 m²"
+    },
+    "faktoren": {
+     "klein": "bis 1,10",
+     "gross": 0.9,
+     "sehr_gross": "bis 0,75"
+    }
+   },
+   "grundstuecksflaechenklasse": {
+    "EFH, BGL, Villa": [
+     "< 425",
+     "425 - 1200",
+     "> 1200",
+     "> 1800"
+    ],
+    "DHH": [
+     "< 250",
+     "250 - 600",
+     "> 600",
+     "> 800"
+    ],
+    "REH": [
+     "< 250",
+     "250 - 500",
+     "> 500",
+     "> 800"
+    ],
+    "RMH": [
+     "< 175",
+     "175 - 325",
+     "> 325",
+     "> 600"
+    ],
+    "faktoren": {
+     "klein": "bis 0,95",
+     "gross": 1.1,
+     "sehr_gross": "boG"
+    }
+   },
+   "wohnlage": {
+    "sehr gut": "bis 1,70",
+    "gut": 1.15,
+    "einfach": "bis 0,90"
+   },
+   "ausstattung": "Normobjekt Klasse 2,5 (bis Bj 1995) bzw. 3,5 (ab 1996); sehr gut bis 1,25, einfach bis 0,90",
+   "anwendungsbeispiel": {
+    "seite": 17,
+    "irw_eur_qm": 2700,
+    "objekt": "DHH, Bj 1990, Ausstattung 3,0, Wohnfläche 150 m² (groß), Lage gut",
+    "koeffizienten": [
+     0.95,
+     1.03,
+     1.05,
+     0.9,
+     1.15
+    ],
+    "faktor": 1.06,
+    "angepasster_irw_eur_qm": 2862,
+    "vorlaeufiger_vergleichswert_eur": 429300
+   }
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01058",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Rendsburg-Eckernförde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Rendsburg-Eckernförde",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Lizenz nicht einschlägig: der Grundstücksmarktbericht 2024 erlaubt „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen … nur mit Genehmigung des Herausgebers und mit Quellenangabe“. Die Immobilienrichtwerte für Ein-/Zweifamilienhäuser zum 01.01.2025 (fünf Lagebezirke, S. 14–17, mit Anwendungsbeispiel) sind vorgemerkt; ein Wert erst mit Genehmigung des Ausschusses. Für Reihen- und Doppelhäuser gilt der EFH-Richtwert mit dem Gebäudeart-Koeffizienten (RMH 0,90, DHH/REH 0,95).",
+  "unvollstaendig_grund": "Lizenz nicht einschlägig: der Grundstücksmarktbericht 2024 erlaubt „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen … nur mit Genehmigung des Herausgebers und mit Quellenangabe“. Die Immobilienrichtwerte für Ein-/Zweifamilienhäuser zum 01.01.2025 (fünf Lagebezirke, S. 14–17, mit Anwendungsbeispiel) sind vorgemerkt; ein Wert erst mit Genehmigung des Ausschusses. Für Reihen- und Doppelhäuser gilt der EFH-Richtwert mit dem Gebäudeart-Koeffizienten (RMH 0,90, DHH/REH 0,95).",
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Gutachterausschuss@kreis-rd.de",
+  "quelle_url": "https://www.kreis-rendsburg-eckernfoerde.de/fileadmin/download/Bauen_und_Mobilitaet/Gutachterausschuss/gutachterausschuss-2026/GMB_2024.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet. (GMB 2024, Impressum S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Kreis Rendsburg-Eckernförde, Kap. 5.1, S. 14–17; Impressum S. 2",
+    "wortlaut": "Lizenz nicht einschlägig: der Grundstücksmarktbericht 2024 erlaubt „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen … nur mit Genehmigung des Herausgebers und mit Quellenangabe“. Die Immobilienrichtwerte für Ein-/Zweifamilienhäuser zum 01.01.2025 (fünf Lagebezirke, S. 14–17, mit Anwendungsbeispiel) sind vorgemerkt; ein Wert erst mit Genehmigung des Ausschusses. Für Reihen- und Doppelhäuser gilt der EFH-Richtwert mit dem Gebäudeart-Koeffizienten (RMH 0,90, DHH/REH 0,95).",
+    "url": "https://www.kreis-rendsburg-eckernfoerde.de/fileadmin/download/Bauen_und_Mobilitaet/Gutachterausschuss/gutachterausschuss-2026/GMB_2024.pdf"
+   }
+  ],
+  "formel_vorgemerkt": {
+   "art": "Immobilienrichtwerte EFH (Vergleichsfaktoren § 20 ImmoWertV) zum 01.01.2025, Euro je m² Wohnfläche einschließlich Boden, Weiterverkäufe, Normobjekt mit Keller und Garage, unvermietet, mittlere Lage im Bezirk",
+   "zonen": {
+    "Nord": {
+     "irw": 2600,
+     "richtwert_baujahr": 1975
+    },
+    "Eckernförde (Stadt)": {
+     "irw": 3300,
+     "richtwert_baujahr": 1975
+    },
+    "Rendsburg (Stadt)": {
+     "irw": 2200,
+     "richtwert_baujahr": 1965
+    },
+    "West": {
+     "irw": 1950,
+     "richtwert_baujahr": 1970
+    },
+    "Ost": {
+     "irw": 2700,
+     "richtwert_baujahr": 1980
+    }
+   },
+   "zuordnung": "GMB 2023, Kap. 17, S. 117: Nord = Altenholz, Büdelsdorf, Ämter Dänischenhagen, Dänischer Wohld, Hüttener Berge, Schlei-Ostsee, aus Amt Fockbek Rickert und Alt Duvenstedt; West = Ämter Hohner Harde, Jevenstedt, aus Amt Eiderkanal Haßmoor, Ostenfeld, Osterrönfeld, Rade b. R., Schacht-Audorf, Schülldorf, aus Amt Fockbek Fockbek und Nübbel, übrige Gemeinden der Ämter Mittelholstein und Nortorfer Land; Ost = Kronshagen, Wasbek, Ämter Achterwehr, Bordesholm, Eidertal, Bovenau, aus Mittelholstein Arpsdorf, Aukrug, Ehndorf, Padenstedt, aus Nortorfer Land Borgdorf-Seedorf, Dätgen, Groß Vollstedt, Krogaspe, Schülp/N., Timmaspe, Warder (Stadt Nortorf im Text „Ost“, in der Gemeindeliste nicht genannt — zu klären).",
+   "baujahr_umrechnung": {
+    "1965": [
+     1.19,
+     1.17,
+     1.15,
+     1.13,
+     1.11,
+     1.09,
+     1.08,
+     1.06,
+     1.04,
+     1.01,
+     0.99,
+     0.96,
+     0.94
+    ],
+    "1970": [
+     1.17,
+     1.15,
+     1.13,
+     1.11,
+     1.1,
+     1.08,
+     1.06,
+     1.04,
+     1.03,
+     1,
+     0.97,
+     0.95,
+     0.93
+    ],
+    "1975": [
+     1.16,
+     1.14,
+     1.12,
+     1.1,
+     1.08,
+     1.06,
+     1.05,
+     1.03,
+     1.01,
+     0.99,
+     0.96,
+     0.94,
+     0.91
+    ],
+    "1980": [
+     1.14,
+     1.12,
+     1.1,
+     1.08,
+     1.06,
+     1.05,
+     1.03,
+     1.02,
+     1,
+     0.97,
+     0.95,
+     0.92,
+     0.9
+    ],
+    "objekt_baujahr": [
+     2020,
+     2015,
+     2010,
+     2005,
+     2000,
+     1995,
+     1990,
+     1985,
+     1980,
+     1970,
+     1960,
+     1950,
+     1940
+    ]
+   },
+   "gebaeudeart": {
+    "RMH": 0.9,
+    "DHH/REH": 0.95,
+    "EFH": 1,
+    "BGL": 1.05,
+    "VILLA": "bis 1,75",
+    "ZFH": 0.95
+   },
+   "wohnflaechenklasse": {
+    "EFH/BGL": {
+     "klein": "< 90 m²",
+     "typisch": "90 - 130 m²",
+     "gross": "> 130 m²",
+     "sehr_gross": "> 180 m²"
+    },
+    "RMH/DHH/REH": {
+     "klein": "< 75 m²",
+     "typisch": "75 - 110 m²",
+     "gross": "> 110 m²",
+     "sehr_gross": "> 150 m²"
+    },
+    "faktoren": {
+     "klein": "bis 1,10",
+     "gross": 0.9,
+     "sehr_gross": "bis 0,75"
+    }
+   },
+   "grundstuecksflaechenklasse": {
+    "EFH, BGL, Villa": [
+     "< 425",
+     "425 - 1200",
+     "> 1200",
+     "> 1800"
+    ],
+    "DHH": [
+     "< 250",
+     "250 - 600",
+     "> 600",
+     "> 800"
+    ],
+    "REH": [
+     "< 250",
+     "250 - 500",
+     "> 500",
+     "> 800"
+    ],
+    "RMH": [
+     "< 175",
+     "175 - 325",
+     "> 325",
+     "> 600"
+    ],
+    "faktoren": {
+     "klein": "bis 0,95",
+     "gross": 1.1,
+     "sehr_gross": "boG"
+    }
+   },
+   "wohnlage": {
+    "sehr gut": "bis 1,70",
+    "gut": 1.15,
+    "einfach": "bis 0,90"
+   },
+   "ausstattung": "Normobjekt Klasse 2,5 (bis Bj 1995) bzw. 3,5 (ab 1996); sehr gut bis 1,25, einfach bis 0,90",
+   "anwendungsbeispiel": {
+    "seite": 17,
+    "irw_eur_qm": 2700,
+    "objekt": "DHH, Bj 1990, Ausstattung 3,0, Wohnfläche 150 m² (groß), Lage gut",
+    "koeffizienten": [
+     0.95,
+     1.03,
+     1.05,
+     0.9,
+     1.15
+    ],
+    "faktor": 1.06,
+    "angepasster_irw_eur_qm": 2862,
+    "vorlaeufiger_vergleichswert_eur": 429300
+   }
+  }
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01058",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Rendsburg-Eckernförde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Rendsburg-Eckernförde",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Für Eigentumswohnungen veröffentlicht der Ausschuss den „Mittelwert vom WF-Faktor (normiert)“ je Amt und Jahrgang (Kap. 6, S. 19–21), ohne Normobjekt (Lage, Baujahr, Größe) — ein Mittelwert ist kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "unvollstaendig_grund": "Für Eigentumswohnungen veröffentlicht der Ausschuss den „Mittelwert vom WF-Faktor (normiert)“ je Amt und Jahrgang (Kap. 6, S. 19–21), ohne Normobjekt (Lage, Baujahr, Größe) — ein Mittelwert ist kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "zugang": "frei",
+  "quelle_url": "https://www.kreis-rendsburg-eckernfoerde.de/fileadmin/download/Bauen_und_Mobilitaet/Gutachterausschuss/gutachterausschuss-2026/GMB_2024.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet. (GMB 2024, Impressum S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Kreis Rendsburg-Eckernförde, Kap. 6.1–6.3, S. 19–21",
+    "wortlaut": "Für Eigentumswohnungen veröffentlicht der Ausschuss den „Mittelwert vom WF-Faktor (normiert)“ je Amt und Jahrgang (Kap. 6, S. 19–21), ohne Normobjekt (Lage, Baujahr, Größe) — ein Mittelwert ist kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+    "url": "https://www.kreis-rendsburg-eckernfoerde.de/fileadmin/download/Bauen_und_Mobilitaet/Gutachterausschuss/gutachterausschuss-2026/GMB_2024.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01057",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Plön",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Plön",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Vergleichsfaktoren für freistehende Ein- und Zweifamilienhäuser stehen im Immobilienmarktbericht 2025, Kap. 7.1.3, S. 44 — veröffentlicht ist nur eine „deutlich gekürzte Version“ (9 Seiten) ohne dieses Kapitel. Der vollständige Bericht kostet 50 € je Exemplar (Gebührensatzung Tarifstelle 5.1) und steht unter Genehmigungsvorbehalt.",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Vergleichsfaktoren für freistehende Ein- und Zweifamilienhäuser stehen im Immobilienmarktbericht 2025, Kap. 7.1.3, S. 44 — veröffentlicht ist nur eine „deutlich gekürzte Version“ (9 Seiten) ohne dieses Kapitel. Der vollständige Bericht kostet 50 € je Exemplar (Gebührensatzung Tarifstelle 5.1) und steht unter Genehmigungsvorbehalt.",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:Gutachterausschuss.Kreis_Ploen@LVermGeo.landsh.de",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "Gebührensatzung Kreis Plön, Tarifstelle 5.1 „Grundstücksmarktbericht je Exemplar“ 50 €",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet. (Immobilienmarktbericht 2025, Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2025 Kreis Plön (gekürzte Fassung), Inhaltsverzeichnis S. 3–4; Gebührensatzung Kreis Plön Tarifstelle 5.1",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Vergleichsfaktoren für freistehende Ein- und Zweifamilienhäuser stehen im Immobilienmarktbericht 2025, Kap. 7.1.3, S. 44 — veröffentlicht ist nur eine „deutlich gekürzte Version“ (9 Seiten) ohne dieses Kapitel. Der vollständige Bericht kostet 50 € je Exemplar (Gebührensatzung Tarifstelle 5.1) und steht unter Genehmigungsvorbehalt.",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01057",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Plön",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Plön",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Vergleichsfaktoren für Doppelhaushälften und Reihenhäuser stehen im Immobilienmarktbericht 2025, Kap. 7.2.2, S. 48 — nur im vollständigen, kostenpflichtigen Bericht (50 € je Exemplar, Gebührensatzung Tarifstelle 5.1).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Vergleichsfaktoren für Doppelhaushälften und Reihenhäuser stehen im Immobilienmarktbericht 2025, Kap. 7.2.2, S. 48 — nur im vollständigen, kostenpflichtigen Bericht (50 € je Exemplar, Gebührensatzung Tarifstelle 5.1).",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:Gutachterausschuss.Kreis_Ploen@LVermGeo.landsh.de",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "Gebührensatzung Kreis Plön, Tarifstelle 5.1 „Grundstücksmarktbericht je Exemplar“ 50 €",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet. (Immobilienmarktbericht 2025, Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2025 Kreis Plön (gekürzte Fassung), Inhaltsverzeichnis S. 3–4; Gebührensatzung Kreis Plön Tarifstelle 5.1",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Vergleichsfaktoren für Doppelhaushälften und Reihenhäuser stehen im Immobilienmarktbericht 2025, Kap. 7.2.2, S. 48 — nur im vollständigen, kostenpflichtigen Bericht (50 € je Exemplar, Gebührensatzung Tarifstelle 5.1).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01057",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Plön",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Plön",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Vergleichsfaktoren für Wohnungseigentum (Erstverkäufe Kap. 8.1.2, S. 53; Weiterverkäufe nach Baualtersklassen für Kreis Plön, Laboe/Heikendorf/Mönkeberg/Stein, Schönberg, Schwentinental, Preetz und Plön, Kap. 8.2.2, S. 56–72) — nur im vollständigen, kostenpflichtigen Bericht (50 € je Exemplar).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Vergleichsfaktoren für Wohnungseigentum (Erstverkäufe Kap. 8.1.2, S. 53; Weiterverkäufe nach Baualtersklassen für Kreis Plön, Laboe/Heikendorf/Mönkeberg/Stein, Schönberg, Schwentinental, Preetz und Plön, Kap. 8.2.2, S. 56–72) — nur im vollständigen, kostenpflichtigen Bericht (50 € je Exemplar).",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:Gutachterausschuss.Kreis_Ploen@LVermGeo.landsh.de",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "Gebührensatzung Kreis Plön, Tarifstelle 5.1 „Grundstücksmarktbericht je Exemplar“ 50 €",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet. (Immobilienmarktbericht 2025, Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2025 Kreis Plön (gekürzte Fassung), Inhaltsverzeichnis S. 3–4; Gebührensatzung Kreis Plön Tarifstelle 5.1",
+    "wortlaut": "Eigentumswohnungen: Vergleichsfaktoren für Wohnungseigentum (Erstverkäufe Kap. 8.1.2, S. 53; Weiterverkäufe nach Baualtersklassen für Kreis Plön, Laboe/Heikendorf/Mönkeberg/Stein, Schönberg, Schwentinental, Preetz und Plön, Kap. 8.2.2, S. 56–72) — nur im vollständigen, kostenpflichtigen Bericht (50 € je Exemplar).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01061",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Steinburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Steinburg",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Vergleichsfaktoren für Ein- und Zweifamilienhäuser stehen im Grundstücksmarktbericht 2025, Kap. 5.2.1, S. 101 (Inhaltsverzeichnis frei abrufbar). Der Bericht wird nur „auf Anforderung gegen eine Gebühr gemäß der Gebührensatzung des Kreises Steinburg“ abgegeben (Tel. 04821/69372).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Vergleichsfaktoren für Ein- und Zweifamilienhäuser stehen im Grundstücksmarktbericht 2025, Kap. 5.2.1, S. 101 (Inhaltsverzeichnis frei abrufbar). Der Bericht wird nur „auf Anforderung gegen eine Gebühr gemäß der Gebührensatzung des Kreises Steinburg“ abgegeben (Tel. 04821/69372).",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:gutachterausschuss@steinburg.de",
+  "gebuehr_wortlaut": "„auf Anforderung gegen eine Gebühr gemäß der Gebührensatzung des Kreises Steinburg abgegeben“ (Webseite; Höhe dort nicht genannt)",
+  "quelle_url": "https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Steinburg, Inhaltsverzeichnis (Grundstuecksmarktbericht_2025_Inhaltsverzeichnis.pdf), S. 2",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Vergleichsfaktoren für Ein- und Zweifamilienhäuser stehen im Grundstücksmarktbericht 2025, Kap. 5.2.1, S. 101 (Inhaltsverzeichnis frei abrufbar). Der Bericht wird nur „auf Anforderung gegen eine Gebühr gemäß der Gebührensatzung des Kreises Steinburg“ abgegeben (Tel. 04821/69372).",
+    "url": "https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01061",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Steinburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Steinburg",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2025 führt laut Inhaltsverzeichnis Vergleichsfaktoren für Ein- und Zweifamilienhäuser (Kap. 5.2.1) und Wohneigentum (Kap. 5.3.1); ob Reihenhäuser/Doppelhaushälften darin enthalten sind, ist nur im kostenpflichtigen Bericht prüfbar.",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2025 führt laut Inhaltsverzeichnis Vergleichsfaktoren für Ein- und Zweifamilienhäuser (Kap. 5.2.1) und Wohneigentum (Kap. 5.3.1); ob Reihenhäuser/Doppelhaushälften darin enthalten sind, ist nur im kostenpflichtigen Bericht prüfbar.",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:gutachterausschuss@steinburg.de",
+  "gebuehr_wortlaut": "„auf Anforderung gegen eine Gebühr gemäß der Gebührensatzung des Kreises Steinburg abgegeben“ (Webseite; Höhe dort nicht genannt)",
+  "quelle_url": "https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Steinburg, Inhaltsverzeichnis (Grundstuecksmarktbericht_2025_Inhaltsverzeichnis.pdf), S. 2",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2025 führt laut Inhaltsverzeichnis Vergleichsfaktoren für Ein- und Zweifamilienhäuser (Kap. 5.2.1) und Wohneigentum (Kap. 5.3.1); ob Reihenhäuser/Doppelhaushälften darin enthalten sind, ist nur im kostenpflichtigen Bericht prüfbar.",
+    "url": "https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01061",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Steinburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Steinburg",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Vergleichsfaktoren Wohneigentum stehen im Grundstücksmarktbericht 2025, Kap. 5.3.1, S. 108 — nur im kostenpflichtigen Bericht (Gebühr nach Gebührensatzung des Kreises Steinburg).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Vergleichsfaktoren Wohneigentum stehen im Grundstücksmarktbericht 2025, Kap. 5.3.1, S. 108 — nur im kostenpflichtigen Bericht (Gebühr nach Gebührensatzung des Kreises Steinburg).",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:gutachterausschuss@steinburg.de",
+  "gebuehr_wortlaut": "„auf Anforderung gegen eine Gebühr gemäß der Gebührensatzung des Kreises Steinburg abgegeben“ (Webseite; Höhe dort nicht genannt)",
+  "quelle_url": "https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2025 Kreis Steinburg, Inhaltsverzeichnis (Grundstuecksmarktbericht_2025_Inhaltsverzeichnis.pdf), S. 2",
+    "wortlaut": "Eigentumswohnungen: Vergleichsfaktoren Wohneigentum stehen im Grundstücksmarktbericht 2025, Kap. 5.3.1, S. 108 — nur im kostenpflichtigen Bericht (Gebühr nach Gebührensatzung des Kreises Steinburg).",
+    "url": "https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01001",
+  "ebene": "kreis",
+  "gebiet_name": "Stadt Flensburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Flensburg",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:Gutachterausschuss-Flensburg@LVermGeo.landsh.de",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "„Der aktuelle Grundstücksmarktbericht 2025 kann per E-Mail als pdf-Datei zu einem Preis von 50,- € unter Angabe der Rechnungsadresse bei der Geschäftsstelle bestellt werden.“",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite des Gutachterausschusses Flensburg (schleswig-holstein.de/gaa), Abschnitt „Grundstücksmarktinformationen“, abgerufen 27.10.2026",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01001",
+  "ebene": "kreis",
+  "gebiet_name": "Stadt Flensburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Flensburg",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:Gutachterausschuss-Flensburg@LVermGeo.landsh.de",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "„Der aktuelle Grundstücksmarktbericht 2025 kann per E-Mail als pdf-Datei zu einem Preis von 50,- € unter Angabe der Rechnungsadresse bei der Geschäftsstelle bestellt werden.“",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite des Gutachterausschusses Flensburg (schleswig-holstein.de/gaa), Abschnitt „Grundstücksmarktinformationen“, abgerufen 27.10.2026",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01001",
+  "ebene": "kreis",
+  "gebiet_name": "Stadt Flensburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Flensburg",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+  "zugang": "kostenpflichtig",
+  "bestell_url": "mailto:Gutachterausschuss-Flensburg@LVermGeo.landsh.de",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "„Der aktuelle Grundstücksmarktbericht 2025 kann per E-Mail als pdf-Datei zu einem Preis von 50,- € unter Angabe der Rechnungsadresse bei der Geschäftsstelle bestellt werden.“",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite des Gutachterausschusses Flensburg (schleswig-holstein.de/gaa), Abschnitt „Grundstücksmarktinformationen“, abgerufen 27.10.2026",
+    "wortlaut": "Eigentumswohnungen: Der Grundstücksmarktbericht 2025 ist nur gegen 50 € (pdf per E-Mail) erhältlich; frei veröffentlicht ist nichts. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert.",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01059",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Schleswig-Flensburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Schleswig-Flensburg",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+  "zugang": "auf_anfrage_kostenfrei",
+  "bestell_url": "https://www.schleswig-flensburg.de/index.php?La=1&ffmod=frm&object=frm,3333.22.1&FID=3333.22.1",
+  "quelle_url": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite Kreis Schleswig-Flensburg „Immobilienmarktberichte zum Download“, abgerufen 27.10.2026",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+    "url": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01059",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Schleswig-Flensburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Schleswig-Flensburg",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+  "zugang": "auf_anfrage_kostenfrei",
+  "bestell_url": "https://www.schleswig-flensburg.de/index.php?La=1&ffmod=frm&object=frm,3333.22.1&FID=3333.22.1",
+  "quelle_url": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite Kreis Schleswig-Flensburg „Immobilienmarktberichte zum Download“, abgerufen 27.10.2026",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+    "url": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01059",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Schleswig-Flensburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Schleswig-Flensburg",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+  "zugang": "auf_anfrage_kostenfrei",
+  "bestell_url": "https://www.schleswig-flensburg.de/index.php?La=1&ffmod=frm&object=frm,3333.22.1&FID=3333.22.1",
+  "quelle_url": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite Kreis Schleswig-Flensburg „Immobilienmarktberichte zum Download“, abgerufen 27.10.2026",
+    "wortlaut": "Eigentumswohnungen: Der Immobilienmarktbericht 2023/2024 wird „gebührenfrei“ abgegeben, aber nur nach Eingabe einer E-Mail-Adresse im Formular des Kreises zugesandt. Ob er Vergleichsfaktoren führt, ist ohne den Bericht nicht prüfbar — kein Wert. Weg: Formular ausfüllen, Bericht per E-Mail.",
+    "url": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01002",
+  "ebene": "kreis",
+  "gebiet_name": "Landeshauptstadt Kiel",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Kiel",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+  "zugang": "frei",
+  "quelle_url": "https://www.gutachterausschuss-kiel.de/wp-content/uploads/2026/07/Immobilienmarktbericht_2026.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Der Immobilienmarktbericht ist urheberrechtlich geschützt. Der Immobilienmarktbericht ist urheberrechtlich geschützt. Eine nicht kommerzielle auszugsweise Vervielfältigung ist mit Quellenangabe bei einer Übersendung eines Belegexemplars gestattet. (IMB 2026, Impressum S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 Landeshauptstadt Kiel, Inhaltsverzeichnis S. 3–6 (Kap. 6.1.1–6.1.3 S. 34–38, Kap. 7.1.1–7.1.4 S. 58–60)",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+    "url": "https://www.gutachterausschuss-kiel.de/wp-content/uploads/2026/07/Immobilienmarktbericht_2026.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01002",
+  "ebene": "kreis",
+  "gebiet_name": "Landeshauptstadt Kiel",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Kiel",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+  "zugang": "frei",
+  "quelle_url": "https://www.gutachterausschuss-kiel.de/wp-content/uploads/2026/07/Immobilienmarktbericht_2026.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Der Immobilienmarktbericht ist urheberrechtlich geschützt. Der Immobilienmarktbericht ist urheberrechtlich geschützt. Eine nicht kommerzielle auszugsweise Vervielfältigung ist mit Quellenangabe bei einer Übersendung eines Belegexemplars gestattet. (IMB 2026, Impressum S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 Landeshauptstadt Kiel, Inhaltsverzeichnis S. 3–6 (Kap. 6.1.1–6.1.3 S. 34–38, Kap. 7.1.1–7.1.4 S. 58–60)",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+    "url": "https://www.gutachterausschuss-kiel.de/wp-content/uploads/2026/07/Immobilienmarktbericht_2026.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01002",
+  "ebene": "kreis",
+  "gebiet_name": "Landeshauptstadt Kiel",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Kiel",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+  "zugang": "frei",
+  "quelle_url": "https://www.gutachterausschuss-kiel.de/wp-content/uploads/2026/07/Immobilienmarktbericht_2026.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Der Immobilienmarktbericht ist urheberrechtlich geschützt. Der Immobilienmarktbericht ist urheberrechtlich geschützt. Eine nicht kommerzielle auszugsweise Vervielfältigung ist mit Quellenangabe bei einer Übersendung eines Belegexemplars gestattet. (IMB 2026, Impressum S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 Landeshauptstadt Kiel, Inhaltsverzeichnis S. 3–6 (Kap. 6.1.1–6.1.3 S. 34–38, Kap. 7.1.1–7.1.4 S. 58–60)",
+    "wortlaut": "Eigentumswohnungen: Der Immobilienmarktbericht 2026 führt für Ein-/Zweifamilienhäuser, Reihenhäuser und Eigentumswohnungen nur Kaufpreise (Mittel/Spannen nach Baualter und Stadtteil, Kap. 6.1 und 7.1) und Rohertragsvervielfältiger für MFH/WGH — keinen Vergleichsfaktor mit Normobjekt (§ 20 ImmoWertV). Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (gebührenpflichtig).",
+    "url": "https://www.gutachterausschuss-kiel.de/wp-content/uploads/2026/07/Immobilienmarktbericht_2026.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01003",
+  "ebene": "kreis",
+  "gebiet_name": "Hansestadt Lübeck",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaMUeb2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2025 (Hansestadt Lübeck), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaMUeb2025Luebeck.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01003",
+  "ebene": "kreis",
+  "gebiet_name": "Hansestadt Lübeck",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaMUeb2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2025 (Hansestadt Lübeck), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaMUeb2025Luebeck.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01003",
+  "ebene": "kreis",
+  "gebiet_name": "Hansestadt Lübeck",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaMUeb2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2025 (Hansestadt Lübeck), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaMUeb2025Luebeck.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01055",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Ostholstein",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaMUeb2024Ostholstein.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2024 (Kreis Ostholstein), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaMUeb2024Ostholstein.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01055",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Ostholstein",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaMUeb2024Ostholstein.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2024 (Kreis Ostholstein), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaMUeb2024Ostholstein.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01055",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Ostholstein",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaMUeb2024Ostholstein.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2024 (Kreis Ostholstein), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2024 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaMUeb2024Ostholstein.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01053",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Herzogtum Lauenburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaMUebHzgtLauenburg2025.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2025 (Kreis Herzogtum Lauenburg), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaMUebHzgtLauenburg2025.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01053",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Herzogtum Lauenburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaMUebHzgtLauenburg2025.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2025 (Kreis Herzogtum Lauenburg), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaMUebHzgtLauenburg2025.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01053",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Herzogtum Lauenburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaMUebHzgtLauenburg2025.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Marktübersicht 2025 (Kreis Herzogtum Lauenburg), Abschnitt „Vorbemerkungen“ und Inhaltsverzeichnis",
+    "wortlaut": "Eigentumswohnungen: Der Ausschuss veröffentlicht eine Marktübersicht 2025 mit Eckwerten; sie „liefert keine grundstücksbezogenen Informationen … ohne den Anspruch Daten für eine Wertermittlung eines Grundstückes liefern zu können“ (Vorbemerkungen) und führt keinen Vergleichsfaktor. Kein Wert. Weg: Antrag auf Auskunft aus der Kaufpreissammlung (Formular der Geschäftsstelle, gebührenpflichtig).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaMUebHzgtLauenburg2025.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01056",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Pinneberg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaAntragKpsPinneberg.pdf?__blob=publicationFile&v=4",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktinformationen 01.01.2025 - 31.12.2025 Kreis Pinneberg, Abschnitt 3, S. 3",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01056",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Pinneberg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaAntragKpsPinneberg.pdf?__blob=publicationFile&v=4",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktinformationen 01.01.2025 - 31.12.2025 Kreis Pinneberg, Abschnitt 3, S. 3",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01056",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Pinneberg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+  "zugang": "frei",
+  "bestell_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaAntragKpsPinneberg.pdf?__blob=publicationFile&v=4",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktinformationen 01.01.2025 - 31.12.2025 Kreis Pinneberg, Abschnitt 3, S. 3",
+    "wortlaut": "Eigentumswohnungen: Die Immobilienmarktinformationen 2025 beschreiben „ein durchschnittliches Wohnhaus im Kreisgebiet. Eine weitergehende Differenzierung … erfolgt üblicherweise im ausführlichen Immobilienmarktbericht, der hier nicht erstellt wird.“ Kein Vergleichsfaktor. Weg: „kostenpflichtiger Auszug aus der Kaufpreissammlung“ bei der Geschäftsstelle (Antragsformular).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01054",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Nordfriesland",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Nordfriesland",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+  "zugang": "frei",
+  "quelle_url": "https://www.nordfriesland.de/loadDocument.phtml?ObjSvrID=2271&ObjID=1937&ObjLa=1&Ext=PDF",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Bestellformular Statistische Daten zum Grundstücksmarkt, Kreis Nordfriesland, Stand 17.08.2026",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+    "url": "https://www.nordfriesland.de/loadDocument.phtml?ObjSvrID=2271&ObjID=1937&ObjLa=1&Ext=PDF"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01054",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Nordfriesland",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Nordfriesland",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+  "zugang": "frei",
+  "quelle_url": "https://www.nordfriesland.de/loadDocument.phtml?ObjSvrID=2271&ObjID=1937&ObjLa=1&Ext=PDF",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Bestellformular Statistische Daten zum Grundstücksmarkt, Kreis Nordfriesland, Stand 17.08.2026",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+    "url": "https://www.nordfriesland.de/loadDocument.phtml?ObjSvrID=2271&ObjID=1937&ObjLa=1&Ext=PDF"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01054",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Nordfriesland",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Nordfriesland",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+  "zugang": "frei",
+  "quelle_url": "https://www.nordfriesland.de/loadDocument.phtml?ObjSvrID=2271&ObjID=1937&ObjLa=1&Ext=PDF",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Bestellformular Statistische Daten zum Grundstücksmarkt, Kreis Nordfriesland, Stand 17.08.2026",
+    "wortlaut": "Eigentumswohnungen: Wörtlich (Bestellformular „Statistische Daten zum Grundstücksmarkt“, Stand 17.08.2026): „Mir ist bekannt, dass die Statistischen Daten zum Grundstücksmarkt keine Faktoren oder Umrechnungskoeffizienten (wie z.B. Sachwertfaktoren, Liegenschaftszinssätze, Vergleichsfaktoren, etc.) beinhalten, da entsprechende Daten für Nordfriesland bislang nicht vorliegen.“ Kein Wert. Weg: Auskunft aus der Kaufpreissammlung (gutachterausschuss@nordfriesland.de).",
+    "url": "https://www.nordfriesland.de/loadDocument.phtml?ObjSvrID=2271&ObjID=1937&ObjLa=1&Ext=PDF"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Segeberg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "zugang": "frei",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Dieser Bericht ist urheberrechtlich geschützt. Vervielfältigung und Verbreitung (auch auszugsweise) bedürfen der Genehmigung des Herausgebers. (GMB 2024, Impressum S. 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Kreis Segeberg, Inhaltsverzeichnis S. 2–3, Kap. 6.1–6.6 S. 40–78",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Segeberg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "zugang": "frei",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Dieser Bericht ist urheberrechtlich geschützt. Vervielfältigung und Verbreitung (auch auszugsweise) bedürfen der Genehmigung des Herausgebers. (GMB 2024, Impressum S. 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Kreis Segeberg, Inhaltsverzeichnis S. 2–3, Kap. 6.1–6.6 S. 40–78",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Segeberg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+  "zugang": "frei",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Dieser Bericht ist urheberrechtlich geschützt. Vervielfältigung und Verbreitung (auch auszugsweise) bedürfen der Genehmigung des Herausgebers. (GMB 2024, Impressum S. 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Kreis Segeberg, Inhaltsverzeichnis S. 2–3, Kap. 6.1–6.6 S. 40–78",
+    "wortlaut": "Eigentumswohnungen: Der Grundstücksmarktbericht 2024 führt für Ein-/Zweifamilienhäuser, Doppelhaushälften/Reihenhäuser und Geschosswohnungen Durchschnittskaufpreise je Region, Bodenrichtwertniveau und Stadt (Kap. 6.1–6.6) — kein Normobjekt, also kein Vergleichsfaktor nach § 20 ImmoWertV (ImmoWertA 20). Kein Wert.",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01062",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Stormarn",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+  "zugang": "frei",
+  "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Inhaltsverzeichnis Teil 1 und Teil 2",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01062",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Stormarn",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+  "zugang": "frei",
+  "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Inhaltsverzeichnis Teil 1 und Teil 2",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01062",
+  "ebene": "kreis",
+  "gebiet_name": "Kreis Stormarn",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+  "zugang": "frei",
+  "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Inhaltsverzeichnis Teil 1 und Teil 2",
+    "wortlaut": "Eigentumswohnungen: Der Grundstücksmarktbericht (Stand 01.01.2025, zwei Teile) führt keinen Vergleichsfaktor für Ein-/Zweifamilienhäuser, Reihenhäuser oder Eigentumswohnungen. Kein Wert. Weg: Auskunft aus der Kaufpreissammlung beim Ausschuss (ga@kreis-stormarn.de).",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01004",
+  "ebene": "kreis",
+  "gebiet_name": "Stadt Neumünster",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Neumünster",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+  "unvollstaendig_grund": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+  "zugang": "auf_anfrage",
+  "bestell_url": "mailto:Gutachterausschuss@Neumuenster.de",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster",
+  "stufe": "B",
+  "berichtsjahr": 2015,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite des Gutachterausschusses Neumünster (schleswig-holstein.de/gaa), Downloads: gaGMBNeumuenster2015.pdf, Gebührensatzung; abgerufen 27.10.2026",
+    "wortlaut": "Ein-/Zweifamilienhäuser: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01004",
+  "ebene": "kreis",
+  "gebiet_name": "Stadt Neumünster",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Neumünster",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+  "unvollstaendig_grund": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+  "zugang": "auf_anfrage",
+  "bestell_url": "mailto:Gutachterausschuss@Neumuenster.de",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster",
+  "stufe": "B",
+  "berichtsjahr": 2015,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite des Gutachterausschusses Neumünster (schleswig-holstein.de/gaa), Downloads: gaGMBNeumuenster2015.pdf, Gebührensatzung; abgerufen 27.10.2026",
+    "wortlaut": "Reihenhäuser/Doppelhaushälften: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster"
+   }
+  ]
+ },
+ {
+  "land_code": "SH",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "01004",
+  "ebene": "kreis",
+  "gebiet_name": "Stadt Neumünster",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Neumünster",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Eigentumswohnungen: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+  "unvollstaendig_grund": "Eigentumswohnungen: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+  "zugang": "auf_anfrage",
+  "bestell_url": "mailto:Gutachterausschuss@Neumuenster.de",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster",
+  "stufe": "B",
+  "berichtsjahr": 2015,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": null,
+  "belege": [
+   {
+    "fundstelle": "Webseite des Gutachterausschusses Neumünster (schleswig-holstein.de/gaa), Downloads: gaGMBNeumuenster2015.pdf, Gebührensatzung; abgerufen 27.10.2026",
+    "wortlaut": "Eigentumswohnungen: Der Ausschuss veröffentlicht keinen aktuellen Grundstücksmarktbericht (zuletzt 2015 auf der Landesseite); Vergleichsfaktoren sind nicht frei verfügbar. Kein Wert. Weg: Geschäftsstelle (Gartenstraße 10, 24534 Neumünster, 04321 942-2553).",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster"
+   }
+  ]
+ }
+]

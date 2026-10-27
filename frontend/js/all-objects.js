@@ -45,7 +45,9 @@
     var nkm = num('nkm') + num('ze');
     var d1 = num('d1'), d2 = num('d2');
     var d_total = d1 + d2;
-    var nebenkosten = (kp * (num('makler_p') + num('notar_p') + num('gba_p') + num('gest_p') + num('ji_p')) / 100);
+    var nebenkosten = (window.DealKpis && DealKpis.nebenkosten)   /* v3006c: GrESt ohne Inventar */
+      ? DealKpis.nebenkosten({ kp: kp, inventar: Math.max(num('inv_kueche'), num('moebl')), makler_p: num('makler_p'), notar_p: num('notar_p'), gba_p: num('gba_p'), gest_p: num('gest_p'), ji_p: num('ji_p') }).summe
+      : (kp * (num('makler_p') + num('notar_p') + num('gba_p') + num('gest_p') + num('ji_p')) / 100);
     var gi = kp + nebenkosten + num('san');   /* v2261: Inventar ist Teil des Kaufpreises */
     var bmy = kp > 0 ? (nkm * 12 / kp) * 100 : 0;
     var ek = gi - d_total;

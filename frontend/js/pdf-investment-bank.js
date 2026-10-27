@@ -934,7 +934,8 @@
     function nkZeile(feld, name) {
       var pz = num(feld);
       if (pz === null || !kp) return 0;
-      var betrag = kp * pz / 100;
+      /* v3006c · die Grunderwerbsteuer auf den Kaufpreis ohne Inventar (wie das Formular) */
+      var betrag = ((feld === 'gest_p' && window.DealKpis && DealKpis.grestBasis) ? DealKpis.grestBasis(kp, Math.max(moebl || 0, num('inv_kueche') || 0)) : kp) * pz / 100;
       if (!betrag) return 0;
       if (KURZ) return betrag;   /* Kurzfassung: nur die Summe */
       zeile(name + ' (' + pct(pz, 2) + ')', eur(betrag), { einzug: true, klein: true });

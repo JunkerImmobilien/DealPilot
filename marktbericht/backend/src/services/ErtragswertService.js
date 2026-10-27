@@ -457,15 +457,23 @@ export const ErtragswertService = {
        * Instandhaltungsruecklage und die Leerstandsannahme aus der Prognose.
        * Das sind seine Zahlen, nicht meine Tabellenwerte — und naeher an der
        * Wirklichkeit. Fehlt beides, greift Anlage 3. */
+      /* v3005 · W6 · EIGENE SAETZE SIND KEINE ANLAGE 3. Bis v3004 liefen
+         bwk_verwaltung_je_we, bwk_instandhaltung_je_qm und bwk_mietausfall_pct vor den
+         Anlage-3-Werten, das Etikett blieb aber „Anlage 3". Jetzt „eigene Angabe" je Posten,
+         und bei amtlichem Zins (A/B/C) der Hinweis auf § 10 Abs. 1 ImmoWertV.
+         Rücklage/Leerstand (unten) sind im Marktbericht-Pfad bewusst NICHT angeschlossen
+         (CrossCheckService, v3005): eine WEG-Ruecklage ist keine Instandhaltung nach
+         Anlage 3, und Leerstand wird nicht abgezogen (Marcel 21.10.2026, voll vermietet). */
+      const vHerkunft = num(ein.bwk_verwaltung_je_we) != null ? 'eigene Angabe' : 'Anlage 3';
       let iJeQm = num(ein.bwk_instandhaltung_je_qm);
-      let iHerkunft = 'Anlage 3';
+      let iHerkunft = iJeQm != null ? 'eigene Angabe' : 'Anlage 3';
       if (iJeQm == null && pos(ein.instandhaltung_ruecklage_jahr) && pos(ein.wohnflaeche_qm)) {
         iJeQm = round2(pos(ein.instandhaltung_ruecklage_jahr) / pos(ein.wohnflaeche_qm));
         iHerkunft = 'eigene Ruecklage';
       }
       if (iJeQm == null) iJeQm = _aw.inst_qm ?? BWK_TABELLE.instandhaltung_je_qm_wfl_eur;   /* v2186: zum Stichtag */
       let maPct = num(ein.bwk_mietausfall_pct);
-      let maHerkunft = 'Anlage 3';
+      let maHerkunft = maPct != null ? 'eigene Angabe' : 'Anlage 3';   /* v3005 · W6 */
       if (maPct == null && pos(ein.leerstand_pct)) {
         maPct = pos(ein.leerstand_pct); maHerkunft = 'eigene Leerstandsannahme';
       }
@@ -488,7 +496,7 @@ export const ErtragswertService = {
             ? BWK_TABELLE.mietausfall_gewerbe_pct : BWK_TABELLE.mietausfall_wohnen_pct;
         }
       }
-      out.bwk_herkunft = { instandhaltung: iHerkunft, mietausfall: maHerkunft };
+      out.bwk_herkunft = { verwaltung: vHerkunft, instandhaltung: iHerkunft, mietausfall: maHerkunft };   /* v3005 · W6: verwaltung dazu */
 
       /* v2195 · Verwaltung Gewerbe: 3 % des gewerblichen Rohertrags (Anlage 3;
          Oberer Gutachterausschuss Brandenburg 2022-2026). Fehlte bis hier ganz. */
@@ -553,26 +561,37 @@ export const ErtragswertService = {
              + (spKosten ? ` + ${spKosten} Stellpl. × ${vJeStp} €` : '')
              + (verwGewerbe ? ` + Gewerbe ${_gewVerwPct} % vom Rohertrag` : '')
              + ')',
+        detail: vHerkunft === 'Anlage 3' ? null : 'eigene Angabe, nicht Anlage 3',   /* v3005 · W6 */
         wert: verwaltung });
       bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €`
              + (spKosten ? ` + ${spKosten} Stellpl. × ${deZahl(iJeStp)} €` : '')   /* v2382, v2541 */
              + (instGewerbe > 0 ? ` + Gewerbe ${_instGewTeile.join(' + ')}` : '') + ')',   /* v2210 */
-        detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
+        detail: iHerkunft === 'Anlage 3' ? null : (iHerkunft === 'eigene Angabe' ? 'eigene Angabe, nicht Anlage 3' : 'aus deiner Rücklage'),   /* v3005 · W6 */
         wert: instand });
       bwkDetail.push({ pos: _maGetrennt ? `Mietausfallwagnis (Wohnen ${_maGetrennt.wohnen} %, Gewerbe ${_maGetrennt.gewerbe} % - zusammen ${deZahl(maPct)} %)`
           : (_spGewerbe ? `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag, Stellplätze wie Gewerbe)` : `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`),
-        detail: maHerkunft === 'Anlage 3' ? null : 'aus deiner Leerstandsannahme',
+        detail: maHerkunft === 'Anlage 3' ? null : (maHerkunft === 'eigene Angabe' ? 'eigene Angabe, nicht Anlage 3' : 'aus deiner Leerstandsannahme'),   /* v3005 · W6 */
         wert: mietausfall });
       if (betriebNul) bwkDetail.push({ pos: 'Nicht umlagefähige Betriebskosten', wert: betriebNul });
 
       bwk = verwaltung + instand + mietausfall + betriebNul;
+      /* v3005 · W6 · eigene Saetze nennen, statt alles „nach Anlage 3“ zu nennen; bei amtlichem Zins § 10 */
+      const _eigen = [vHerkunft, iHerkunft, maHerkunft].some((h) => h !== 'Anlage 3');
+      const _eigenListe = [vHerkunft !== 'Anlage 3' ? 'Verwaltung' : null, iHerkunft !== 'Anlage 3' ? 'Instandhaltung' : null,
+        maHerkunft !== 'Anlage 3' ? 'Mietausfallwagnis' : null].filter(Boolean);
+      if (_eigen && /^[ABC]$/.test(String(ein.lzs_stufe || '').toUpperCase())) {
+        out.warnungen.push('Der Liegenschaftszinssatz des Gutachterausschusses ist mit den Bewirtschaftungskosten seines Modells abgeleitet. '
+          + 'Mit eigenen Ansätzen (' + _eigenListe.join(', ') + ') ist der Ertragswert insoweit nicht modellkonform (§ 10 Abs. 1 ImmoWertV).');
+        out.bwk_modellkonform = false;
+      }
       /* v2186: statt der pauschalen Warnung „nicht indexiert" - was zum
          Stichtag gilt und was nicht aus dem Stichtagsjahr kommt. */
       if (!_nrw) {
         if (!_A.vollstaendig || !Object.keys(_aw).length) {
           out.warnungen.push('Für das Stichtagsjahr ' + _A.stichtag_jahr + ' liegen keine fortgeschriebenen Bewirtschaftungskosten (Anlage 3 ImmoWertV) vor — angesetzt sind die Basiswerte. Das Ergebnis ist insoweit vorläufig.');
         } else {
-          out.hinweise.push('Bewirtschaftungskosten nach Anlage 3 ImmoWertV, fortgeschrieben zum Stichtag ' + _A.stichtag_jahr
+          if (_eigen) out.hinweise.push('Bewirtschaftungskosten: ' + _eigenListe.join(', ') + ' aus eigener Angabe, nicht nach Anlage 3 ImmoWertV.');
+          if (!_eigen || _eigenListe.length < 3) out.hinweise.push((_eigen ? 'Übrige ' : '') + 'Bewirtschaftungskosten nach Anlage 3 ImmoWertV, fortgeschrieben zum Stichtag ' + _A.stichtag_jahr
             + (_A.abweichend.length ? ' (' + _A.abweichend.join(', ') + ')' : '') + '. Quelle: ' + _A.quellen.join('; ') + '.');
         }
       }
@@ -609,6 +628,32 @@ export const ErtragswertService = {
     out.lzs = { pct: lzs, quelle: lzsQuelle, stufe: lzsStufe, grund: lzsGrund,
                 streuung_pp: ein.lzs_streuung_pp ?? null,
                 massstab: ein.lzs_massstab ?? null };
+
+    /* v3009 · W3 · OBJEKTSPEZIFISCH ANGEPASSTER ZINS (§ 33, § 34 Abs. 1 ImmoWertV). `lzs` ist
+       bereits der angepasste Satz (WertParameterService, lib/lzs_anpassung.js) und geht unten in
+       Bodenwertverzinsung und Barwertfaktor. Die Zeile zeigt, woraus er wurde. */
+    const _anp = ein.lzs_anpassung || null;
+    if (_anp && _anp.angepasst && Math.abs(Number(_anp.zins_pct) - lzs) < 1e-9) {
+      out.lzs.anpassung = _anp;
+      out.lzs.etikett = 'A, angepasst';
+      out.staffel.push({
+        pos: _anp.art === 'funktion'
+          ? `Liegenschaftszinssatz nach der Funktion des Gutachterausschusses → objektspezifisch ${deZahl(lzs)} % (A, angepasst)`
+          : `Liegenschaftszinssatz des Gutachterausschusses ${deZahl(_anp.basis_pct)} % → objektspezifisch angepasst ${deZahl(lzs)} % (A, angepasst)`,
+        detail: _anp.text + ' § 33 ImmoWertV; der angepasste Satz gilt für Bodenwertverzinsung und Barwertfaktor (§ 34 Abs. 1).',
+        wert: null,
+      });
+      const _rndA = Number(_anp.eingabe && _anp.eingabe.restnutzungsdauer);
+      const _rndE = pos(ein.rnd_jahre);
+      if (_anp.art === 'koeffizienten' && (_anp.schritte || []).some((s) => /Restnutzungsdauer/i.test(s.merkmal))
+          && Number.isFinite(_rndA) && _rndE && Math.abs(_rndA - _rndE) > 0.05) {
+        out.warnungen.push('Die Anpassung des Liegenschaftszinssatzes rechnet mit ' + deZahl(_rndA) + ' Jahren Restnutzungsdauer, '
+          + 'der Ertragswert mit ' + deZahl(_rndE) + ' Jahren — bitte prüfen (eine Restnutzungsdauer für alle Verfahren).');
+      }
+    } else if (_anp && !_anp.angepasst && _anp.text) {
+      out.lzs.anpassung = _anp;
+      out.hinweise.push(_anp.text);
+    }
 
     /* ── 4 · Bodenwertverzinsung ────────────────────────────────────────── */
     /* v1072-WREN-1 · NUR DER RENTIERLICHE BODENWERT WIRD VERZINST.

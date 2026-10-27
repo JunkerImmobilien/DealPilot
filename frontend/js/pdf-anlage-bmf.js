@@ -321,15 +321,23 @@ window.generateBmfPdfAnlage = function(state){
   if(y > 230){ doc.addPage(); y = marginT; }
 
   _secHead('5 \u00b7 Lineare AfA (\u00a7 7 Abs. 4 EStG)');
-  var afaSatz = (inputs.baujahr && inputs.baujahr > 2022) ? 3.0 : 2.0;
-  var afaSatzText = (inputs.baujahr && inputs.baujahr > 2022)
-    ? 'Neubau ab 2023 (3,0 % nach \u00a7 7 Abs. 4 Nr. 2a EStG)'
-    : 'Bestand (2,0 % nach \u00a7 7 Abs. 4 Nr. 2a EStG)';
+  /* v3006 \u00b7 \u00a7 7 Abs. 4 Satz 1 Nr. 2 EStG, alle drei Buchstaben, am Fertigstellungsjahr.
+     Bis v3005: vor 1925 stand 2,0 % statt 2,5 %, und der Bestand hiess \u201eNr. 2a"
+     (richtig: Nr. 2 Buchst. b; Buchst. a ist der Neubau nach 2022). */
+  var _lin = (window.Afa && Afa.linearNachFertigstellung) ? Afa.linearNachFertigstellung(inputs.baujahr) : null;
+  if (!_lin) {
+    var _bjP = parseInt(inputs.baujahr, 10);
+    _lin = (_bjP > 2022) ? { satz: 3.0, buchst: 'a' } : (_bjP && _bjP < 1925) ? { satz: 2.5, buchst: 'c' } : { satz: 2.0, buchst: 'b' };
+  }
+  var afaSatz = _lin.satz;
+  var afaSatzText = (_lin.buchst === 'a' ? 'Fertigstellung nach 2022 (3,0 %'
+    : _lin.buchst === 'c' ? 'Fertigstellung vor 1925 (2,5 %' : 'Fertigstellung 1925 bis 2022 (2,0 %')
+    + ' nach \u00a7 7 Abs. 4 Satz 1 Nr. 2 Buchst. ' + _lin.buchst + ' EStG)';
   var afaJahr = afaBasis ? (afaBasis * afaSatz / 100) : null;
   _kvRow('AfA-Basis (Geb\u00e4ude)' + (hk > 0 ? ' \u2014 inkl. Herstellungskosten' : ''), fmtEur(afaBasis, 2), { bold: true });
   _kvRow('AfA-Satz', afaSatzText);
   _kvRow('J\u00e4hrliche AfA', fmtEur(afaJahr, 2), { bold: true, goldVal: true });
-  _kvRow('AfA-Zeitraum', (afaSatz === 3.0 ? '33,33 Jahre' : '50 Jahre'));
+  _kvRow('AfA-Zeitraum', (afaSatz === 3.0 ? '33,33 Jahre' : afaSatz === 2.5 ? '40 Jahre' : '50 Jahre'));
   y += 4;
 
   // V307-klausel-removed: Notarvertrag-Klausel-Sektion entfernt (auf Wunsch).

@@ -1044,9 +1044,10 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
    2025 eine Erstattung von 11.659 €. Gerechnet wird weiter mit der Eingabe; die
    Warnung sagt, dass das Finanzamt es anders sehen wird.
    Fenster: drei Jahre ab dem Kaufdatum, auf Kalenderjahre gerundet (Kaufjahr bis
-   Kaufjahr + 3; das letzte nur, wenn der Kauf nicht im Januar lag). Betraege sind
-   brutto erfasst, die Grenze gilt netto - verglichen wird brutto / 1,19 (vorsichtig:
-   Leistungen ohne USt liegen damit eher unter als ueber der Grenze). */
+   Kaufjahr + 3; das letzte nur, wenn der Kauf nicht im Januar lag). Die Grenze gilt
+   ohne USt. Bis v3005 stand hier „verglichen wird brutto / 1,19 (vorsichtig)" - das
+   war nicht vorsichtig, sondern das Gegenteil: geteilt wird die Summe kleiner, die
+   Warnung spaeter. Seit v3006 nach #san_ust, Begruendung im Rumpf. */
 function _dpAhkWarnung(reihe) {
   try {
     var kd = (document.getElementById('kaufdat') || {}).value || '';
@@ -1059,13 +1060,35 @@ function _dpAhkWarnung(reihe) {
     reihe.forEach(function (t) {
       if (t && t.year >= kj && t.year <= bis && t.erh > 0) { summe += t.erh; teile.push(t.year + ': ' + Math.round(t.erh).toLocaleString('de-DE') + ' €'); }
     });
-    var netto = summe / 1.19;
-    if (!(netto > grenze)) return '';
-    var ende = kd.slice(8, 10) + '.' + kd.slice(5, 7) + '.' + (kj + 3);
+    /* v3006 · Nur ein BRUTTObetrag wird netto gerechnet. Die Jahresfelder sind
+       Werbungskosten, also das, was gezahlt wurde - mit Umsatzsteuer, wo die
+       Rechnung sie ausweist, ohne, wo keine ausgewiesen ist (Kleinunternehmer,
+       § 19 UStG). Welche Lesart gilt, sagt der Nutzer am Feld „Angegebener
+       Betrag" (#san_ust, Reiter Investition) - dieselbe Angabe, die calc.js
+       und _computeAutoForYear fuer die 15-%-Pruefung schon lesen. Bis v3005
+       wurde hier IMMER durch 1,19 geteilt, auch bei „netto (ohne USt)": eine
+       Rechnung ohne USt-Ausweis lag dann rechnerisch 16 % unter ihrem Betrag,
+       und die Warnung kam zu spaet oder gar nicht.
+       Brutto bleibt der Vorgabefall (privater Vermieter, Handwerkerrechnung).
+       Liegt der volle Betrag ueber der Grenze, nur der geteilte nicht, nennt
+       der Hinweis das ausdruecklich: ohne USt-Ausweis zaehlt der volle Betrag. */
+    var _ustNetto = ((document.getElementById('san_ust') || {}).value || 'brutto') === 'netto';
+    var netto = _ustNetto ? summe : summe / 1.19;
     var eur = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
+    var ende = kd.slice(8, 10) + '.' + kd.slice(5, 7) + '.' + (kj + 3);
+    if (!(netto > grenze)) {
+      if (_ustNetto || !(summe > grenze)) return '';
+      return '<div class="tax-ahk-warn" style="margin:12px 0;padding:10px 12px;border-left:3px solid var(--gold);background:rgba(0,0,0,0.04);font-size:13px;line-height:1.5">'
+        + '<b>Anschaffungsnahe Herstellungskosten: Grenzbereich (§ 6 Abs. 1 Nr. 1a EStG)</b><br>'
+        + 'In den drei Jahren nach dem Kauf (bis ' + ende + ') stehen ' + eur(summe) + ' Erhaltungsaufwand (' + teile.join(' · ') + '). '
+        + 'Ohne die Umsatzsteuer sind das rund ' + eur(netto) + ' und damit unter der Grenze von ' + eur(grenze) + ' - aber nur, wenn die Rechnungen 19 % USt ausweisen. '
+        + 'Rechnungen ohne USt-Ausweis (z. B. Kleinunternehmer) zählen mit dem vollen Betrag. Weisen deine Rechnungen keine USt aus, stell im Reiter Investition „Angegebener Betrag“ auf netto.'
+        + '</div>';
+    }
     return '<div class="tax-ahk-warn" style="margin:12px 0;padding:10px 12px;border-left:3px solid var(--red,#B8625C);background:rgba(184,98,92,0.08);font-size:13px;line-height:1.5">'
       + '<b>Anschaffungsnahe Herstellungskosten prüfen (§ 6 Abs. 1 Nr. 1a EStG)</b><br>'
-      + 'In den drei Jahren nach dem Kauf (bis ' + ende + ') stehen ' + eur(summe) + ' Erhaltungsaufwand (' + teile.join(' · ') + '), netto rund ' + eur(netto) + '. '
+      + 'In den drei Jahren nach dem Kauf (bis ' + ende + ') stehen ' + eur(summe) + ' Erhaltungsaufwand (' + teile.join(' · ') + ')'
+      + (_ustNetto ? ' ohne Umsatzsteuer. ' : ', ohne Umsatzsteuer rund ' + eur(netto) + '. ')
       + 'Das liegt über 15 % der Gebäude-Anschaffungskosten (Grenze ' + eur(grenze) + ' netto). '
       + 'Dann sind die Aufwendungen keine sofort abziehbaren Werbungskosten, sondern Herstellungskosten, die mit der Gebäude-AfA abgeschrieben werden. '
       + 'Jährlich übliche Erhaltungsaufwendungen zählen nicht mit. Die Zeitleiste rechnet weiter mit deiner Eingabe - bitte mit deinem Steuerberater klären.'
@@ -1349,9 +1372,16 @@ function _computeAutoForYear(yearIdx, year) {
   var afa_parsed_for_san = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(afa_sel_val) : { methode: 'linear', satzPct: parseDe(afa_sel_val) || 2 };
   var afa_satz_pct = afa_parsed_for_san.satzPct;
   // Effektive Nutzungsdauer für anschaffungsnahe HK:
-  var afa_nutzungsdauer = (afa_parsed_for_san.methode === 'linear')
-    ? Math.round(100 / afa_satz_pct)
-    : 33;  // Degressiv → Wohnbau-Neubau-Nutzungsdauer
+  /* v3006b · KEIN RUNDEN DES KEHRWERTS. Anschaffungsnahe HK sind Herstellungskosten des
+     Gebaeudes und laufen mit dessen Satz (§ 7 Abs. 4 EStG). Bis v3006a stand hier
+     Math.round(100 / Satz): bei 3 % 33 Jahre, also 3,03 % im Jahr - 60.000 € gaben
+     1.818,18 statt 1.800 € und waren nach 33 Jahren zu Ende statt nach 33 1/3.
+     Jetzt: Jahresbetrag = Betrag x Satz, das letzte Jahr nimmt den Rest
+     (3 %: 33 volle Jahre, im 34. Jahr 1 %). 2 % und 2,5 % gehen glatt auf (50/40).
+     Degressiv: weiter die Naeherung mit 3 % linear (bis v3006a: 33 Jahre). */
+  var afa_satz_eff = (afa_parsed_for_san.methode === 'linear' && afa_satz_pct > 0) ? afa_satz_pct : 3.0;
+  var afa_nd_exakt = 100 / afa_satz_eff;                       /* 33,33 / 40 / 50 */
+  var afa_nutzungsdauer = Math.ceil(afa_nd_exakt - 1e-9);      /* Jahre mit Abschreibung */
   /* v2890 · DIE 15-%-GRENZE AUS DERSELBEN RECHNUNG WIE IM TAB INVESTITION.
      Hier stand `kp × 0,15`, verglichen mit dem Bruttobetrag. calc.js rechnet
      seit v1261 richtig (§ 6 Abs. 1 Nr. 1a EStG): 15 % der Gebaeude-
@@ -1380,23 +1410,32 @@ function _computeAutoForYear(yearIdx, year) {
        Wahlrecht und steht in der Auswahl daneben - bis v2890 verteilte die
        Automatik stillschweigend auf 5 Jahre. */
     sanLaufzeit = sanAnschaffungsnah ? afa_nutzungsdauer : 1;
-    sanAfaJaehrlich = san_inp / sanLaufzeit;
+    sanAfaJaehrlich = sanAnschaffungsnah ? (san_inp * afa_satz_eff / 100) : san_inp;   /* v3006b */
   } else if (sanYearsChoice === '50') {
     // Manuell: anschaffungsnah, also Gebäude-AfA-Nutzungsdauer
     sanAnschaffungsnah = true;
     sanLaufzeit = afa_nutzungsdauer;
-    sanAfaJaehrlich = san_inp / sanLaufzeit;
+    sanAfaJaehrlich = san_inp * afa_satz_eff / 100;   /* v3006b */
   } else {
     // Manuell: feste Jahresanzahl als Erhaltungsaufwand
     sanAnschaffungsnah = false;
     sanLaufzeit = parseInt(sanYearsChoice);
     sanAfaJaehrlich = san_inp / sanLaufzeit;
   }
-  var sanThisYear = (sanLaufzeit > 0 && yearIdx < sanLaufzeit) ? sanAfaJaehrlich : 0;
+  /* v3006b: das letzte Jahr nimmt nur den Rest (bei 3 %: 1 % im 34. Jahr) */
+  var sanThisYear = (sanLaufzeit > 0 && yearIdx < sanLaufzeit)
+    ? Math.max(0, Math.min(sanAfaJaehrlich, san_inp - sanAfaJaehrlich * yearIdx)) : 0;
 
   // MÖBLIERUNG
   var moeblLaufzeit = moeblYearsChoice;
-  var moeblPerYear = moeblActive ? (moebl_inp / moeblLaufzeit) : 0;
+  /* v3006b · Das Inventar traegt seinen Anteil an den Erwerbsnebenkosten (Verteilung im
+     Verhaeltnis der Kaufpreisanteile, DealKpis.gebaeudeAhk). Bis v3006a lag dieser Anteil
+     in Gebaeude und Boden, und die Inventar-AfA lief auf dem nackten Betrag. */
+  /* v3006c: je Euro Inventar ohne Grunderwerbsteuer (die faellt aufs Inventar nicht an) */
+  var _nkQ = (window.State && State._ahk && isFinite(State._ahk.nkInvQuote)) ? State._ahk.nkInvQuote
+    : ((window.State && State._ahk && isFinite(State._ahk.nkQuote)) ? State._ahk.nkQuote : 0);
+  var moeblBasis = moebl_inp * (1 + _nkQ);
+  var moeblPerYear = moeblActive ? (moeblBasis / moeblLaufzeit) : 0;
   var moeblThisYear = (moeblActive && yearIdx < moeblLaufzeit) ? moeblPerYear : 0;
 
   // Einnahmen: Nettokaltmiete + zusätzliche Einnahmen (z.B. Stellplatz, Garage)

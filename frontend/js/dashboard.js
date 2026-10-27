@@ -40,7 +40,7 @@
      gemischte Schreibweise "4,0"/"3.5" in denselben Feldern). Betroffen: Kapitaldienst, Tilgung, Zins,
      Restschuld, mittlerer Zins und die Objektwerte an die Portfolio-Analyse. */
   /* v475: Erwerbsnebenkosten in EURO — absolut falls vorhanden, sonst aus %-Feldern (wie calc.js Z.663) */
-  function _nkEuro(o){ if(num(o&&o.nk)>0) return num(o.nk); var kp=_kpEuro(o); return kp*(_pct(o&&o.notar_p)+_pct(o&&o.gest_p)+_pct(o&&o.makler_p)+_pct(o&&o.gba_p)+_pct(o&&o.ji_p))/100; }
+  function _nkEuro(o){ if(num(o&&o.nk)>0) return num(o.nk); var kp=_kpEuro(o); if(window.DealKpis&&DealKpis.nebenkosten){ /* v3006c: GrESt ohne Inventar */ return DealKpis.nebenkosten({kp:kp,inventar:Math.max(num(o&&o.inv_kueche)||0,num(o&&o.moebl)||0),makler_p:_pct(o&&o.makler_p),notar_p:_pct(o&&o.notar_p),gba_p:_pct(o&&o.gba_p),gest_p:_pct(o&&o.gest_p),ji_p:_pct(o&&o.ji_p)}).summe; } return kp*(_pct(o&&o.notar_p)+_pct(o&&o.gest_p)+_pct(o&&o.makler_p)+_pct(o&&o.gba_p)+_pct(o&&o.ji_p))/100; }
   /* v475: heutiges Datum DD.MM.YYYY */
   function _heute(){ var d=new Date(); return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear(); }
 

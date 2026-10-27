@@ -248,6 +248,70 @@ for (const f of F.ebene_a) {
   } catch (err) { pruefe('A', id, 'Lauf', false, 'Ausnahme: ' + err.message); }
 }
 
+/* ══ EBENE A · VERGLEICHSFAKTOR-MERKMALE UND W1 (v3008) ═════════════════
+   Konstanz ETW (vgf-bw-konstanz-2026.json): das Dokument druckt KEIN
+   Anwendungsbeispiel - Pruefmassstab sind die Tabellenpunkte selbst (Normprobe
+   an Eckwerten, Klassengrenzen und leeren Zellen; die Tabelle interpoliert nicht,
+   sie ist ein Beschluss je Zelle). Dazu W1: kein Vergleichswert mit fehlender
+   Anpassung (§ 26 Abs. 1, § 9 Abs. 1 S. 3 ImmoWertV), am echten OGA-BB-Satz. */
+try {
+  const GAA = await lade('lib/gutachterausschuss.js');
+  const vf = (x) => GAA.vergleichsfaktor({ ags: '08335043', objektart: 'etw', wohnflaeche: 80, baujahr: 1985, zimmer: 3, ...x });
+  const id = 'A-VGF-KN';
+  offen('A', id, 'Konstanz: kein amtliches Anwendungsbeispiel im Dokument - Normprobe an Tabellenpunkten (S. 49)');
+  let r = vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' });
+  wert('A', id + '1', 'gute · 1970-1989 · mittel (Tabelle 4.800)', r.wert ?? null, 4800);
+  wert('A', id + '1', 'Objektwert 80 m²', r.objektwert ?? null, 384000);
+  pruefe('A', id + '1', 'Rechenweg nennt eigene Angabe', /eigene Angabe nach Lagekarte des Gutachterausschusses/.test(r.rechenweg || ''), r.rechenweg);
+  wert('A', id + '2', 'Eckwert bevorzugte · 2001-2023 · stark gehoben', vf({ baujahr: 2023, vgf_wohnlage: 'bevorzugte', vgf_ausstattung: 'stark gehoben' }).wert ?? null, 13200);
+  wert('A', id + '2', 'Eckwert mäßige · vor 1935 · mittel', vf({ baujahr: 1900, vgf_wohnlage: 'mäßige', vgf_ausstattung: 'mittel' }).wert ?? null, 4300);
+  wert('A', id + '3', 'Klassengrenze Bj 1934 (vor 1935, gute mittel)', vf({ baujahr: 1934, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).wert ?? null, 5700);
+  wert('A', id + '3', 'Klassengrenze Bj 1935 (1935-1969, keine Interpolation)', vf({ baujahr: 1935, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).wert ?? null, 5000);
+  wert('A', id + '4', 'Lageklasse 2,0 -> gute', vf({ lageklasse_brw: 2.0, vgf_ausstattung: 'mittel' }).wert ?? null, 4800);
+  wert('A', id + '4', 'Lageklasse 1,9 -> bevorzugte', vf({ lageklasse_brw: 1.9, vgf_ausstattung: 'mittel' }).wert ?? null, 7000);
+  wert('A', id + '4', 'Lageklasse 3,9 -> mittlere', vf({ lageklasse_brw: 3.9, vgf_ausstattung: 'mittel' }).wert ?? null, 4300);
+  wert('A', id + '4', 'Lageklasse 4,0 -> mäßige', vf({ lageklasse_brw: 4.0, vgf_ausstattung: 'mittel' }).wert ?? null, 2600);
+  wert('A', id + '5', 'linksrheinisch (Altstadt, LK 1,0) -> gute', vf({ lageklasse_brw: 1.0, ortsteil_brw: 'Altstadt', vgf_ausstattung: 'mittel' }).wert ?? null, 4800);
+  wert('A', id + '5', 'eigene Angabe schlägt Ableitung (Seesicht)', vf({ lageklasse_brw: 1.0, ortsteil_brw: 'Altstadt', vgf_wohnlage: 'bevorzugte', vgf_ausstattung: 'mittel' }).wert ?? null, 7000);
+  r = vf({});
+  pruefe('A', id + '6', 'ohne Wohnlage/Ausstattung: merkmal_fehlt mit beiden Feldern', r.grund === 'merkmal_fehlt'
+    && (r.fehlende_merkmale || []).map((m) => m.feld).join(',') === 'vgf_wohnlage,vgf_ausstattung', r.grund + ' ' + (r.fehlende_merkmale || []).map((m) => m.feld));
+  pruefe('A', id + '6', 'Klassen kommen aus dem Satz', ((r.fehlende_merkmale || [])[0] || {}).klassen?.join('|') === 'bevorzugte|gute|mittlere|mäßige');
+  pruefe('A', id + '7', '2 Zimmer: ausserhalb des Geltungsbereichs', vf({ zimmer: 2, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).grund === 'ausserhalb_des_geltungsbereichs');
+  pruefe('A', id + '7', 'Bj 2024: nicht extrapoliert', vf({ baujahr: 2024, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).verfuegbar === false);
+  pruefe('A', id + '8', 'leere Zelle (mittlere · 1970-1989 · gehoben) ohne Nachbarwert', vf({ vgf_wohnlage: 'mittlere', vgf_ausstattung: 'gehoben' }).grund === 'zelle_leer');
+  pruefe('A', id + '8', 'Klasse einfach: kein Beschluss', vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'einfach' }).grund === 'zelle_leer');
+  pruefe('A', id + '8', 'falscher Klassenname wird nicht unscharf zugeordnet', vf({ vgf_wohnlage: 'gut', vgf_ausstattung: 'mittel' }).verfuegbar === false);
+  pruefe('A', id + '9', 'Vorrang: Wertsatz vor der Sperre in vgf-bw-2026.json', vf({}).grund !== 'gesperrt');
+  /* v3011 · W4 · ohne amtlichen Index: Stand des Ausschusses im Rechenweg, keine Fortschreibung */
+  pruefe('A', 'A-W4', 'Konstanz: Rechenweg nennt Stand 01/2026, nicht fortgeschrieben', /Stand des Ausschusses: 01\/2026, nicht auf den Stichtag fortgeschrieben \(kein amtlicher Index\)/.test(vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).rechenweg || ''));
+  pruefe('A', 'A-W4', 'Konstanz: Wert bleibt der Beschluss (keine Hochrechnung)', vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).wert === 4800);
+
+  /* W1 am Oberen Gutachterausschuss Brandenburg: Standardstufe fehlt -> kein Wert. */
+  const bb = JSON.parse(fs.readFileSync(path.join(SRC, 'lib/register/vgf-bb-oga-2025.json'), 'utf8'))
+    .filter((s) => s.formel && s.formel.form && s.vollstaendig !== false);
+  const efh = { objektart: 'efh', brw: 100, brw_eur_qm: 100, wohnflaeche: 140, flaeche: 600, baujahr: 1985, rnd: 40,
+    standardstufe: 3, unterkellerung_pct: 100, stellplaetze: 2 };
+  const voll = bb.filter((s) => (s.korrekturen || []).some((k) => k.feld === 'stellplaetze')).map((s) => ({ s, r: GAA.vergleichsfaktor({ ...efh, ags: s.ags, zweig: s.zweig }) })).find((x) => x.r.verfuegbar);
+  if (!voll) pruefe('A', 'A-W1', 'OGA BB: ein Satz rechnet am Normobjekt', false);
+  else {
+    const ohne = GAA.vergleichsfaktor({ ...efh, standardstufe: null, ags: voll.s.ags, zweig: voll.s.zweig });
+    pruefe('A', 'A-W1a', 'OGA BB ' + voll.s.ags + ': ohne Standardstufe kein Wert (merkmal_fehlt)', ohne.verfuegbar === false && ohne.grund === 'merkmal_fehlt', ohne.grund);
+    pruefe('A', 'A-W1a', 'Rechenweg-Zeile nennt die offene Anpassung', /Standardstufe/.test(ohne.rechenweg || '') && /kein Wert/.test(ohne.rechenweg || ''), ohne.rechenweg);
+    const aus = GAA.vergleichsfaktor({ ...efh, unterkellerung_pct: 120, ags: voll.s.ags, zweig: voll.s.zweig });
+    pruefe('A', 'A-W1b', 'Merkmal ausserhalb der Anpassungstabelle: nicht auf Norm gesetzt', aus.verfuegbar === false, aus.grund);
+    const st = GAA.vergleichsfaktor({ ...efh, stellplaetze: 0, ags: voll.s.ags, zweig: voll.s.zweig });
+    pruefe('A', 'A-W1b', '0 Stellplätze (Tabelle ab 1): kein stiller Randwert', st.verfuegbar === false, st.grund);
+    pruefe('A', 'A-W1c', 'Bezugsgröße ist eine Art (wohnflaeche), keine Zahl', voll.r.bezugsgroesse === 'wohnflaeche' && voll.r.bezugsflaeche_qm === 140, String(voll.r.bezugsgroesse));
+  }
+  /* v3008b · W1 auch beim Sachwertfaktor: Hamburg fuehrt 19 Korrekturen, DealPilot erfasst u. a.
+     Ecklage, Einbaukueche, Fussbodenheizung nicht -> kein Faktor, sondern Merkmal fehlt. */
+  const hh = GAA.sachwertfaktor({ ags: '02000000', objektart: 'efh', sachwert_eur: 600000, bodenwert_eur: 360000, rnd_jahre: 40,
+    grundstuecksflaeche_qm: 600, wohnflaeche_qm: 120, baujahr: 1985, mod_punkte: 4 });
+  pruefe('A', 'A-W1d', 'Sachwertfaktor Hamburg mit fehlenden Merkmalen: kein Wert (merkmal_fehlt)', hh.verfuegbar === false && hh.grund === 'merkmal_fehlt' && hh.faktor_ohne_anpassung != null, hh.grund);
+  pruefe('A', 'A-W1d', 'Bodenwertanteil aus Bodenwert/Sachwert gerechnet, nicht als fehlend gemeldet', !(hh.korrekturen_offen || []).some((z) => z.feld === 'bodenwertanteil'));
+} catch (err) { pruefe('A', 'A-VGF', 'Lauf', false, 'Ausnahme: ' + err.message); }
+
 /* ══ EBENE B ═════════════════════════════════════════════════════════ */
 const C = F.ebene_c || { faelle: {} };
 /* v2600 · Die eingefrorenen Argumente (Erfassung vor v2595) fuehren lzs_modellansaetze noch
@@ -1191,6 +1255,90 @@ fallB('B54', () => {
   pruefe('B', 'B54', 'eigene bOM-Angabe (Wegerecht) bleibt in jeder Stufe voll', !!zE && !zE.sanierungsstau && zE.wert_ungerundet === kE.wert_ungerundet && bE.ein.bog_quelle === null,
     zE ? 'quelle ' + bE.ein.bog_quelle + ', Δ ' + (zE.wert_ungerundet - kE.wert_ungerundet) : 'kein Lauf');
 });
+
+/* v3005 · B55 Regionalfaktor aus dem Sachwertmodell (Hamburg 1,75, § 36 Abs. 3) · B56 Baupreisindex
+   zum Wertermittlungsstichtag (§ 36 Abs. 2) · B57 GND Wohnhaus mit Mischnutzung 80 (Anlage 1) */
+(() => {
+  const ref = { property_type: 'efh', property_subtype: 'efh', living_area: 140, build_year: 1990, plot_area: 600,
+    ags: '02000000', standardstufe: 3, nhk_typ: '1.21', bgf: 225, gemeinde: 'Hamburg' };
+  const par = (x) => Object.assign({ ags: '02000000', brw_sqm: 800, standardstufe: 3, bgf_direkt: 225 }, x || {});
+  const lv = { available: true, value_sqm: 800 };
+  const s0 = (compute(ref, lv, null, null, par()) || {}).sachwert || {};
+  wert('B', 'B55', 'Hamburg: Regionalfaktor aus dem Modell', s0.regionalfaktor ?? null, 1.75, 0);
+  pruefe('B', 'B55', 'Hamburg: Quelle modell_gutachterausschuss, Staffelzeile × Regionalfaktor 1,75',
+    s0.regionalfaktor_quelle === 'modell_gutachterausschuss' && (s0.staffel || []).some((z) => /Regionalfaktor/.test(z.pos) && z.faktor === 1.75),
+    s0.regionalfaktor_quelle);
+  const s1 = (compute(ref, lv, null, null, par({ regionalfaktor: 1.2 })) || {}).sachwert || {};
+  pruefe('B', 'B55', 'eigene Angabe 1,2 gilt, mit Hinweis auf § 10', s1.regionalfaktor === 1.2 && /§ 10/.test(String(s1.regionalfaktor_hinweis)), s1.regionalfaktor_hinweis);
+  const s2 = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2025-06-15' })) || {}).sachwert || {};
+  /* v3010 · gewollt geaendert: am 15.06.2025 war der Mai-Wert noch nicht veroeffentlicht (Rhythmus: Juli) -> Februar 2025 */
+  wert('B', 'B56', 'Baupreisindex zum Stichtag 15.06.2025 (veröffentlicht: Februar 2025, 132,6 / 70,8)', s2.baupreisindex ? s2.baupreisindex.wert : null, 1.87, 0);
+  const s3 = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2099-01-01' })) || {}).sachwert || {};
+  pruefe('B', 'B56', 'Stichtag in der Zukunft verworfen, heutiger Index', !!s3.baupreisindex && s3.baupreisindex.stichtag_verworfen === '2099-01-01' && s3.baupreisindex.wert === s0.baupreisindex.wert,
+    JSON.stringify(s3.baupreisindex || null).slice(0, 80));
+  wert('B', 'B57', 'GND Wohnhaus mit Mischnutzung (Anlage 1)', IW.gnd('wohn_misch'), 80, 0);
+})();
+
+/* v3009 · B58 Objektspezifisch angepasster Liegenschaftszins (§ 33): Koeffizienten des Ausschusses
+   (GAG Aurich, Bueroflaechen 3,5 % bei RND 30, UK 20/30/40/50 = 1,2/1,0/0,8/0,6, GMB S. 44),
+   multiplikativ, nur innerhalb der Tabelle; der angepasste Zins geht in Barwertfaktor und
+   Bodenwertverzinsung (§ 34 Abs. 1). */
+{
+  const LA = await lade('lib/lzs_anpassung.js');
+  const satz = { gaa_name: 'GAG Aurich', formel: { form: 'konstante', wert: 3.5, rundung_stellen: 2 },
+    korrekturen: [{ bez: 'Umrechnungskoeffizient Restnutzungsdauer', feld: 'restnutzungsdauer', art: 'stufen_1d', einheit: 'faktor',
+      stufen: { 20: 1.2, 30: 1, 40: 0.8, 50: 0.6 } }] };
+  const a40 = LA.lzsAnpassung({ satz, wert_pct: 3.5, eingabe: { restnutzungsdauer: 40 } });
+  wert('B', 'B58', 'RND 40: 3,5 % × 0,8 (Stützstelle, multiplikativ, nicht addiert)', a40 && a40.zins_pct, 2.8, 0);
+  const a35 = LA.lzsAnpassung({ satz, wert_pct: 3.5, eingabe: { restnutzungsdauer: 35 } });
+  wert('B', 'B58', 'RND 35: zwischen den Stützstellen linear (× 0,9)', a35 && a35.zins_pct, 3.15, 0);
+  const a60 = LA.lzsAnpassung({ satz, wert_pct: 3.5, eingabe: { restnutzungsdauer: 60 } });
+  pruefe('B', 'B58', 'RND 60 außerhalb der Tabelle: nicht extrapoliert, Zins bleibt 3,5 %, Merkmal offen',
+    !!a60 && a60.zins_pct === 3.5 && !a60.angepasst && a60.offen.length === 1 && a60.offen[0].ausserhalb, a60 && a60.text);
+  const aOhne = LA.lzsAnpassung({ satz: { formel: { form: 'konstante', wert: 2.5 } }, wert_pct: 2.5, eingabe: {} });
+  pruefe('B', 'B58', 'ohne Funktion des Ausschusses: unangepasst, mit Grund', !!aOhne && !aOhne.angepasst && /keine Umrechnungskoeffizienten/.test(aOhne.text), aOhne && aOhne.art);
+  /* Kette in den Kern: derselbe Ertragswert mit 2,8 % - einmal als Anpassung, einmal ohne - ist gleich,
+     und die Anpassungszeile steht im Rechenweg */
+  const basisEin = { objektart: 'mfh', anzahl_we: 4, wohnflaeche_qm: 300, miete_markt_jahr: 27000,
+    lzs_pct: 2.8, lzs_stufe: 'A', baujahr: 1985, rnd_jahre: 40, stichtag_jahr: 2026, bwk_modus: 'manuell', bwk_gesamt_jahr: 6000 };
+  const kOhne = ertragswert(Object.assign({}, basisEin), { vollstaendig: true, wert: 100000 });
+  const kMit = ertragswert(Object.assign({}, basisEin, { lzs_anpassung: a40 }), { vollstaendig: true, wert: 100000 });
+  pruefe('B', 'B58', 'angepasster Zins 2,8 % in Barwertfaktor und Bodenwertverzinsung, Zeile „3,5 % → 2,8 % (A, angepasst)"',
+    !!kMit && kMit.wert === kOhne.wert && (kMit.staffel || []).some((z) => /3,5 % → objektspezifisch angepasst 2,8 % \(A, angepasst\)/.test(z.pos))
+      && (kMit.staffel || []).some((z) => /Bodenwertverzinsung .*× 2,8 %/.test(z.pos)),
+    kMit && (kMit.staffel || []).map((z) => z.pos).filter((p) => /Liegenschaftszins|Bodenwertverzinsung|Barwert/.test(p)).join(' | '));
+}
+
+/* v3010 · B59 Wertermittlungsstichtag (Marcel 27.10.2026): heute (Pruefer-Uhr 21.10.2026) gegen 01.06.2024
+   an einem Testobjekt - Baupreisindex nach VEROEFFENTLICHTEM Stand, Alter/RND im Stichtagsjahr, Jahrgang des
+   Registers zum Stichtag, kuenftiger Stichtag verworfen. */
+{
+  const BPI = await lade('lib/baupreisindex.js'), ST = await lade('lib/stichtag.js'), REG = await lade('lib/ausschuss_register.js');
+  const am = (t) => { const x = BPI.baupreisindexAm(new Date(t + 'T12:00:00Z')); return x ? x.wert : null; };
+  wert('B', 'B59', 'Baupreisindex 21.10.2026 (August 2026, veröffentlicht 09.10.)', am('2026-10-21'), 2.00, 0);
+  wert('B', 'B59', 'Baupreisindex 01.09.2026: August noch nicht veröffentlicht → Mai 2026', am('2026-09-01'), 1.98, 0);
+  wert('B', 'B59', 'Baupreisindex 01.06.2024 (Februar 2024: 128,5 / 70,8)', am('2024-06-01'), 1.81, 0);
+  pruefe('B', 'B59', 'Stichtag in der Zukunft verworfen, heute', ST.stichtagAus('2099-01-01').eigen === false && ST.stichtagAus('2099-01-01').verworfen === '2099-01-01', JSON.stringify(ST.stichtagAus('2099-01-01').verworfen));
+  const ref = { property_type: 'efh', property_subtype: 'efh', living_area: 140, build_year: 1990, plot_area: 600,
+    ags: '05711000', standardstufe: 3, nhk_typ: '1.21', bgf: 225, gemeinde: 'Bielefeld' };
+  const par = (x) => Object.assign({ ags: '05711000', brw_sqm: 300, standardstufe: 3, bgf_direkt: 225 }, x || {});
+  const lv = { available: true, value_sqm: 300 };
+  const h = (compute(ref, lv, null, null, par()) || {}).sachwert || {};
+  const v = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2024-06-01' })) || {}).sachwert || {};
+  wert('B', 'B59', 'Sachwert: Index im Rechenweg 01.06.2024', v.baupreisindex ? v.baupreisindex.wert : null, 1.81, 0);
+  wert('B', 'B59', 'Restnutzungsdauer +2 Jahre (Alter 34 statt 36, Stichtagsjahr − Baujahr)',
+    (v.restnutzungsdauer_jahre != null && h.restnutzungsdauer_jahre != null) ? v.restnutzungsdauer_jahre - h.restnutzungsdauer_jahre : null, 2, 0);
+  pruefe('B', 'B59', 'Sachwert 01.06.2024 weicht vom heutigen ab (Index und Alter)', h.value_eur != null && v.value_eur != null && h.value_eur !== v.value_eur,
+    'heute ' + h.value_eur + ' · 01.06.2024 ' + v.value_eur);
+  const jg = REG.mitRegisterStichtag('2024-06-01', () => REG.findeZweig('liegenschaftszinssatz', '05711000', 'we_v'));
+  const jgH = REG.findeZweig('liegenschaftszinssatz', '05711000', 'we_v');
+  pruefe('B', 'B59', 'Register-Jahrgang zum Stichtag: Bielefeld ETW 01.06.2024 → Satz 31.12.2023, heute jüngster',
+    !!jg && String(jg.stichtag).slice(0, 10) === '2023-12-31' && !!jgH && String(jgH.stichtag) > '2024', (jg && jg.stichtag) + ' / ' + (jgH && jgH.stichtag));
+  const m1 = CCS.mietabweichungBog([{ nr: 1, differenz_jahr: 1200, befristet_bis: '2026-06-01' }], 3, 40, new Date('2024-06-01T12:00:00Z'));
+  const m2 = CCS.mietabweichungBog([{ nr: 1, differenz_jahr: 1200, befristet_bis: '2026-06-01' }], 3, 40, new Date('2026-06-01T12:00:00Z'));
+  pruefe('B', 'B59', 'Mietabweichung: Restlaufzeit ab Stichtag (2 Jahre ab 01.06.2024, 0 ab 01.06.2026)',
+    !!m1 && !!m2 && m1.zeilen[0].jahre === 2 && m2.zeilen[0].jahre === 0, JSON.stringify(m1 && m1.zeilen && m1.zeilen[0] && m1.zeilen[0].jahre) + '/' + JSON.stringify(m2 && m2.zeilen && m2.zeilen[0] && m2.zeilen[0].jahre));
+}
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {

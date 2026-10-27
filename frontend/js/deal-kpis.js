@@ -46,6 +46,13 @@ window.DealKpis = (function() {
    *   ek          (€)        Eigenkapital
    *   afa         (€/Jahr)   AfA-Betrag (default 0)
    *   grenz       (Prozent)  Grenzsteuersatz in % (default 0)
+   *   svw         (€)        Wertangabe (Verkehrs-/Marktwert, default 0)
+   *   svw_herkunft (Text)    v3006: gutachten | bank | marktbericht | indikation | eigene.
+   *                          Nur gutachten/bank tragen den LTV (wie calc.js seit v2996).
+   *                          FEHLT das Feld, gilt svw wie bis v3005 (Telegram/Altaufrufer).
+   *   bankval     (€)        v3006: Bankbewertung, LTV-Basis, wenn svw nicht traegt
+   *   bspar_y     (€/Jahr)   v3006: Bausparrate bei Tilgungsaussetzung (default 0) -
+   *                          Schuldendienst im DSCR und Abfluss im Cashflow wie calc.js
    *
    * @returns {Object} KPIs (siehe Return-Objekt unten)
    */
@@ -122,15 +129,30 @@ window.DealKpis = (function() {
     //   Sonst                    → LTV/KP  (Fallback)
     var _ekInklNkLtv = !!i.ekInklNkLtv;
     var svw          = +i.svw || 0;
+    /* v3006 · Die Herkunft entscheidet, ob der Wert den LTV traegt (calc.js, v2996):
+       nur Gutachten und Bankbewertung. Bis v3005 nahm der Kern jeden Wert > 0 -
+       der Quick-Check rechnete den LTV damit auch auf eine eigene Schaetzung oder
+       auf Angebotsniveau, die Haupt-App nicht. Ohne Angabe bleibt es beim alten
+       Verhalten, damit Aufrufer ohne Herkunft nicht still umspringen. */
+    var _herk        = (i.svw_herkunft == null) ? null : String(i.svw_herkunft);
+    var _svwTraegt   = svw > 0 && (_herk === null || _herk === 'gutachten' || _herk === 'bank');
+    var bankval      = +i.bankval || 0;
     var ltv_basis;
     if (_ekInklNkLtv) ltv_basis = gi;
-    else if (svw > 0) ltv_basis = svw;
+    else if (_svwTraegt) ltv_basis = svw;
+    else if (bankval > 0) ltv_basis = bankval;
     else ltv_basis = kp;
     var ltv = ltv_basis > 0 ? (d_total / ltv_basis * 100) : 0;
 
     var zins_j = (d1_zm + d2_zm) * 12;
     var tilg_j = (d1_tm + d2_tm) * 12;
     var rate_j = zins_j + tilg_j;
+    /* v3006 · `bspar_y` war hier nie deklariert: `typeof bspar_y` ergab immer
+       'undefined', die Bausparrate ging mit 0 in den DSCR - lautlos, weil typeof
+       keinen ReferenceError wirft. Jetzt ein Eingabefeld wie in calc.js
+       (Tilgungsaussetzung + Bausparvertrag): Schuldendienst im DSCR und Abfluss im
+       Cashflow. Kein heutiger Aufrufer liefert es, die Zahlen bleiben gleich. */
+    var bspar_y = +i.bspar_y || 0;
 
     // ═════ Cashflow — V63.40: User-Wunsch "CF v.St. = IMMER nach Tilgung" ═════
     // CF v.St. = Banker-Cashflow (nach Tilgung, vor Steuer) — was aus eigener Tasche zuzuschießen
@@ -144,7 +166,7 @@ window.DealKpis = (function() {
     var zve_immo    = (nkm_j - bwk_nul_st - zins_j) - afa;
     var steuer      = zve_immo * grenz;               // negativ = Erstattung
     // Öffentliche CF-Werte (in der App immer nach Tilgung)
-    var cf_op    = cf_operativ - tilg_j;              // = Banker-CF v.St., NACH Tilgung
+    var cf_op    = cf_operativ - tilg_j - bspar_y;    // = Banker-CF v.St., NACH Tilgung (und BSV, v3006)
     var cf_ns    = cf_op - steuer;                    // = Banker-CF n.St., NACH Tilgung
     var cf_m     = cf_op / 12;                        // /Mon vor Steuer
     var cf_ns_m  = cf_ns / 12;                        // /Mon nach Steuer
@@ -167,12 +189,12 @@ window.DealKpis = (function() {
           ze_j:   0,           // ZE ist hier schon in nkm_j enthalten (Service-Layer ohne ZE-Trennung)
           zins_j: zins_j,
           tilg_j: tilg_j,
-          bsv_j:  (typeof bspar_y === 'number' ? bspar_y : 0),
+          bsv_j:  bspar_y,
           bwk_cf: bwk_cf
         })
       : (function () {
           // Fallback wenn Engine nicht geladen — alte Formel mit BSV erweitert
-          var _kd = zins_j + tilg_j + (typeof bspar_y === 'number' ? bspar_y : 0);
+          var _kd = zins_j + tilg_j + bspar_y;
           return {
             brutto: _kd > 0 ? nkm_j / _kd : 0,
             netto:  _kd > 0 ? (nkm_j - bwk_cf) / _kd : 0,
@@ -219,5 +241,81 @@ window.DealKpis = (function() {
     };
   }
 
-  return { compute: compute };
+  /* ═══ v3006b · GEBAEUDE-ANSCHAFFUNGSKOSTEN, EINE RECHNUNG ══════════════════
+     Bemessungsgrundlage der Gebaeude-AfA (§ 7 Abs. 4 EStG) sind die
+     Anschaffungskosten des Gebaeudes EINSCHLIESSLICH der anteiligen
+     Erwerbsnebenkosten (§ 255 Abs. 1 HGB). Bis v3006a stand die Formel dreimal:
+     calc.js (mit Nebenkosten), quick-check.js (OHNE Nebenkosten: kp x geb_ant x
+     Satz) und agentWerkzeuge.js (mit Nebenkosten, ohne Inventar). Jetzt hier,
+     und alle drei lesen sie.
+
+     Inventar (Kueche, Moebel), das im Kaufpreis steckt und ausgewiesen ist,
+     ist ein eigenes Wirtschaftsgut: es kommt VOR der Aufteilung Gebaeude/Boden
+     vom Kaufpreis ab, und die Nebenkosten verteilen sich im Verhaeltnis der
+     Kaufpreisanteile auf Grundstueck und Inventar. Bis v3006a lief der Anteil
+     der Nebenkosten, der auf das Inventar entfaellt, mit in Gebaeude und Boden.
+
+     Eingabe: kp (€), nk (€, alle Erwerbsnebenkosten), gebAntPct (0-100),
+       inventar (€, im Kaufpreis enthalten, default 0), nkAbzug (€, Nebenkosten,
+       die keine Anschaffungskosten sind - die Grundschuld, calc.js v3006),
+       nkNurImmo (€, v3006c: Nebenkosten, die NUR das Grundstueck betreffen -
+       die Grunderwerbsteuer; sie geht nie anteilig aufs Inventar).
+     Liest keine Einstellung und kein DOM. */
+  function gebaeudeAhk(i) {
+    i = i || {};
+    var kp = +i.kp || 0;
+    var geb = (i.gebAntPct == null || !isFinite(+i.gebAntPct)) ? 0 : (+i.gebAntPct / 100);
+    var inv = Math.max(0, +i.inventar || 0);
+    /* v3006d · ein Anteil ausserhalb 0-100 % ist keine Aufteilung (gemessen: Selbsttest der
+       BMF-Pipeline lieferte -24,93 %); dann zaehlt der Kaufpreis als Obergrenze des Inventars */
+    if (!(geb >= 0 && geb <= 1)) geb = Math.min(1, Math.max(0, geb || 0));
+    /* v3006e: kein Deckel beim Gebaeudeanteil mehr (Inventar ist kein Teil des Gebaeudes), nur beim Kaufpreis */
+    if (inv > kp) inv = kp;
+    var nk = Math.max(0, (+i.nk || 0) - Math.max(0, +i.nkAbzug || 0));
+    var nkNurImmo = Math.min(nk, Math.max(0, +i.nkNurImmo || 0));
+    var nkAnteilig = nk - nkNurImmo;
+    var kpOhneInv = kp - inv;
+    var anteilImmo = kp > 0 ? kpOhneInv / kp : 1;
+    var nkImmo = nkAnteilig * anteilImmo + nkNurImmo;
+    var nkInv = nk - nkImmo;
+    var gebKp = kpOhneInv * geb;
+    var nkGeb = nkImmo * geb;
+    return {
+      kpOhneInv: kpOhneInv, inventar: inv,
+      gebKp: gebKp, nkGeb: nkGeb, gebAhk: gebKp + nkGeb,
+      nkImmo: nkImmo, nkInv: nkInv, invAk: inv + nkInv,
+      nkQuote: kp > 0 ? nk / kp : 0,                /* Nebenkosten je Euro Kaufpreis */
+      nkInvQuote: inv > 0 ? nkInv / inv : 0         /* v3006c: Nebenkosten je Euro Inventar */
+    };
+  }
+
+  /* ═══ v3006c · ERWERBSNEBENKOSTEN, EINE RECHNUNG ═══════════════════════════
+     Grunderwerbsteuer faellt nur auf das GRUNDSTUECK an (§ 1, § 2 GrEStG):
+     bewegliches Inventar (Kueche, Moebel), das im Kaufvertrag gesondert und
+     angemessen ausgewiesen ist, gehoert nicht zur Gegenleistung (§ 8, § 9
+     GrEStG). Bemessung: (Kaufpreis - Inventar) x Satz. Makler, Notar,
+     Grundbuch und Sonstige bleiben auf dem Gesamtpreis - so stehen sie in den
+     Feldern (Prozent vom Kaufpreis), und so rechnet auch die Gebuehr.
+     Bis v3006b: kp x Satz, also 650 € zu viel bei 10.000 € Inventar und 6,5 %.
+     Eingabe: kp (€), inventar (€), makler_p, notar_p, gba_p, gest_p, ji_p (Prozent).
+     Liest keine Einstellung und kein DOM. */
+  function grestBasis(kp, inventar) {
+    kp = +kp || 0;
+    var inv = Math.min(kp, Math.max(0, +inventar || 0));
+    return kp - inv;
+  }
+  function nebenkosten(i) {
+    i = i || {};
+    var kp = +i.kp || 0;
+    var p = function (x) { var n = +x; return isFinite(n) && n > 0 ? n / 100 : 0; };
+    var basisGrest = grestBasis(kp, i.inventar);
+    var r = {
+      makler: kp * p(i.makler_p), notar: kp * p(i.notar_p), gba: kp * p(i.gba_p),
+      grest: basisGrest * p(i.gest_p), ji: kp * p(i.ji_p), grestBasis: basisGrest
+    };
+    r.summe = r.makler + r.notar + r.gba + r.grest + r.ji;
+    return r;
+  }
+
+  return { compute: compute, gebaeudeAhk: gebaeudeAhk, nebenkosten: nebenkosten, grestBasis: grestBasis };
 })();

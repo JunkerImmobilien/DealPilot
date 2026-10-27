@@ -72,14 +72,26 @@
     /* v2938 · Elektrik ist ein Teil des Elements „Leitungssysteme (Strom, Gas, Wasser, Abwasser)" der
        Anlage 2: 1 von 2 Punkten (Teilpunkte wie das Modell Sachsen-Anhalt, Gebäudefaktoren: Strom/Gas 1,
        Wasser/Abwasser 1). Bis v2937 zählte sie gar nicht. */
-    { id: 'elektrik',   t: 'Elektrik',            gewerk: 'leitungen',   einheit: true, max: 1, hinweis: 'Teil der Leitungssysteme (Anlage 2): 1 von 2 Punkten' },
+    { id: 'elektrik',   t: 'Elektrik',            gewerk: 'leitungen',   einheit: true, haus: true, max: 1, hinweis: 'Teil der Leitungssysteme (Anlage 2): 1 von 2 Punkten' },
     { id: 'renovierung', t: 'Renovierung',        gewerk: null,          einheit: true },
     { id: 'kueche',     t: 'Küche',               gewerk: null,          einheit: true },
     { id: 'dach',       t: 'Dach',                gewerk: 'dach',        einheit: false, haus: true },
     { id: 'fassade',    t: 'Fassade/Dämmung',     gewerk: 'aussenwand',  einheit: false, haus: true },
     { id: 'heizung',    t: 'Heizung',             gewerk: 'heizung',     einheit: false, haus: true },
     { id: 'leitungen',  t: 'Leitungen',           gewerk: 'leitungen',   einheit: false, haus: true },
-    { id: 'sonst',      t: 'Sonstiges',           gewerk: null,          einheit: true }
+    /* v3001 (Marcel 27.10.2026: „da hat man nur so ein paar Sachen, Dach und allen“): weitere Massnahmen
+       am ganzen Haus. Punkte NUR, wo Anlage 2 Tabelle 1 das Element nennt und die Massnahme es ganz
+       erfuellt - Eingangstuer und Treppenhaus sind nur TEILE eines Elements („Fenster und Aussentueren“,
+       „Innenausbau, z. B. Decken, Fussboeden, Treppen“) und tragen allein keine Punkte; alles andere
+       ist kein Element der Anlage 2. Kosten zaehlen trotzdem (Zielbild, Umlage, Bank-PDF). */
+    { id: 'eingang',    t: 'Hauseingang/Außentüren', gewerk: null,       einheit: false, haus: true, hinweis: 'Teil von „Fenster und Außentüren“ (Anlage 2) — allein keine Punkte' },
+    { id: 'treppenhaus', t: 'Treppenhaus',        gewerk: null,          einheit: false, haus: true, hinweis: 'Teil des Innenausbaus (Anlage 2: Decken, Fußböden, Treppen) — allein keine Punkte' },
+    { id: 'geschossdecke', t: 'Dämmung oberste Geschossdecke/Kellerdecke', gewerk: null, einheit: false, haus: true, hinweis: 'kein eigenes Element der Anlage 2 — keine Punkte' },
+    { id: 'balkone',    t: 'Balkone/Loggien',     gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
+    { id: 'aufzug',     t: 'Aufzug',              gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
+    { id: 'pv',         t: 'Photovoltaik',        gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
+    { id: 'aussenanlagen', t: 'Außenanlagen/Stellplätze', gewerk: null,  einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
+    { id: 'sonst',      t: 'Sonstiges',           gewerk: null,          einheit: true, haus: true }
   ];
 
   function el(id) { return document.getElementById(id); }
@@ -265,7 +277,11 @@
     return j + '-' + String(mo + 1).padStart(2, '0');
   }
   function umlage559(liste, istM, wfl) {
-    var k = (liste || []).filter(function (m) { return m.bewohnt; }).reduce(function (a, m) { return a + zahl(m.k); }, 0);
+    /* v3001 · § 559 Abs. 2 BGB: Kosten fuer Erhaltungsmassnahmen gehoeren NICHT zu den umlagefaehigen
+       Kosten. Bis v3000 lag die Umlage auf den vollen Kosten. `erh` = Erhaltungsanteil in % je Massnahme
+       (eigene Angabe, leer = 0); Renovierung ist Erhaltung und wird nie umgelegt. */
+    var k = (liste || []).filter(function (m) { return m.bewohnt && m.id !== 'renovierung'; }).reduce(function (a, m) {
+      var e = Math.min(100, Math.max(0, zahl(m.erh))); return a + zahl(m.k) * (1 - e / 100); }, 0);
     if (!(k > 0) || !(wfl > 0)) return { monat: 0, kosten: 0 };
     var roh = k * 0.08 / 12;
     var kappeQm = (istM > 0 && istM / wfl < 7) ? 2 : 3;
@@ -371,14 +387,14 @@
          der Ausgangspunkt (heute), die Massnahme ist das Ziel. */
       var hausL = (opts.haus_massnahmen || D.haus_massnahmen || []).filter(function (m) { var k = m && katalog(m.id); return k && k.haus; });
       var flAll = liste.reduce(function (a, e) { return a + ((e && (zahl(e.wfl) > 0 || zahl(e.ist) > 0)) ? zahl(e.wfl) : 0); }, 0);
-      out.haus = { massnahmen: hausL.map(function (m) { return { id: m.id, t: m.t, k: zahl(m.k), bewohnt: !!m.bewohnt }; }),
+      out.haus = { massnahmen: hausL.map(function (m) { return { id: m.id, t: m.t, k: zahl(m.k), bewohnt: !!m.bewohnt, erh: zahl(m.erh) }; }),
         kosten: hausL.reduce(function (a, m) { return a + zahl(m.k); }, 0) };
       out.wohnungen = liste.map(function (e, i) { return { e: e, i: i }; }).filter(function (o) { return o.e && (zahl(o.e.wfl) > 0 || zahl(o.e.ist) > 0); }).map(function (o) {
         var e = o.e, i = o.i;
         var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist);
         var anteil = flAll > 0 ? wfl / flAll : 0;
         var mlEigen = massnahmenVon(e);
-        var ml = mlEigen.concat(hausL.map(function (m) { return { id: m.id, t: m.t, k: zahl(m.k) * anteil, bewohnt: !!m.bewohnt, haus: true }; }));
+        var ml = mlEigen.concat(hausL.map(function (m) { return { id: m.id, t: m.t, k: zahl(m.k) * anteil, bewohnt: !!m.bewohnt, erh: zahl(m.erh), haus: true }; }));
         var s = sollFuer(hausL.length ? Object.assign({}, e, { massnahmen: ml }) : e, ctx);
         var zielQm = zahl(e.ziel_qm);
         var zielM = zielQm > 0 && wfl > 0 ? zielQm * wfl : 0;
@@ -753,7 +769,7 @@
         marktpreisindikation_etw: r.aufteilung.mpi_etw || null };   /* v2541 */
     }
     if (m.haus && m.haus.massnahmen.length) z.haus_massnahmen = { kosten: Math.round(m.haus.kosten),   /* v2966 */
-      text: m.haus.massnahmen.map(function (x) { return x.t + (x.k ? ' ' + Math.round(x.k) + ' €' : '') + (x.bewohnt ? ' (bewohnt, § 559)' : ''); }).join(', '),
+      text: m.haus.massnahmen.map(function (x) { return x.t + (x.k ? ' ' + Math.round(x.k) + ' €' : '') + (x.bewohnt ? ' (umgelegt nach § 559 BGB' + (zahl(x.erh) ? ', davon ' + zahl(x.erh) + ' % Erhaltung' : '') + ')' : ''); }).join(', '),
       hinweis: 'Kosten nach Wohnfläche auf die Wohnungen verteilt und in deren Kosten enthalten.' };
     /* v2988 · die Maßnahmen im Zielbild sind NICHT die Sanierungskosten - beide Zahlen getrennt */
     try {
@@ -768,7 +784,7 @@
       return { nr: w.nr, lage: w.lage, wfl: w.wfl, status: w.status, ist: Math.round(w.ist),
         soll: w.soll && w.soll.miete != null ? Math.round(w.soll.miete) : null, soll_ab: w.soll ? w.soll.ab_text || null : null,
         soll_herkunft: w.soll ? w.soll.herkunft : null, ziel: w.ziel != null ? Math.round(w.ziel) : null, ziel_wann: w.ziel_wann || null,
-        massnahmen: w.massnahmen.map(function (x) { return x.t + (zahl(x.k) ? ' ' + Math.round(zahl(x.k)) + ' €' : '') + (x.bewohnt ? ' (bewohnt, § 559)' : ''); }).join(', ') || null,
+        massnahmen: w.massnahmen.map(function (x) { return x.t + (zahl(x.k) ? ' ' + Math.round(zahl(x.k)) + ' €' : '') + (x.bewohnt ? ' (umgelegt nach § 559 BGB' + (zahl(x.erh) ? ', davon ' + zahl(x.erh) + ' % Erhaltung' : '') + ')' : ''); }).join(', ') || null,
         kosten: Math.round(w.kosten) || 0,
         /* v2541 · je Wohnung als ETW: Ertragswert und Marktpreisindikation nebeneinander */
         etw: (function () { var we = wohnungErgebnis(r, m, w.i); if (!we || (!we.als_etw && !we.mpi_etw)) return null;
@@ -1745,7 +1761,7 @@
   function chipsHtml(liste, mitPunkte, e, geb, fuerEinheit, fuerHaus) {
     return '<div class="dp-zb-chips">' + MASSNAHMEN.filter(function (k) { return fuerHaus ? k.haus : (fuerEinheit ? k.einheit : true); }).map(function (k) {
       var m = (liste || []).filter(function (x) { return x.id === k.id; })[0];
-      var p = k.gewerk ? Math.max(0, maxP(k.gewerk) - punkteJetzt(k.gewerk, e, geb)) : 0;
+      var p = k.gewerk ? Math.max(0, (k.max != null ? Math.min(maxP(k.gewerk), k.max) : maxP(k.gewerk)) - punkteJetzt(k.gewerk, e, geb)) : 0;   /* v3001a: Teilmassnahme (Elektrik 1 von 2) zeigt ihren Teil, wie punkteGewinn rechnet */
       return '<button type="button" class="dp-zb-chip' + (m ? ' on' : '') + '" data-zb-chip="' + k.id + '" aria-pressed="' + (m ? 'true' : 'false') + '"'
         + ' title="' + esc(k.gewerk ? (p ? '+' + p + ' Modernisierungspunkte (Anlage 2)' : 'Gewerk schon voll modernisiert — keine weiteren Punkte') : (k.hinweis || 'ohne Modernisierungspunkte')) + '">'
         + esc(k.t) + (mitPunkte && k.gewerk && p ? ' <em>+' + p + ' P.</em>' : '') + '</button>';
@@ -1755,7 +1771,12 @@
     return (liste || []).map(function (m, i) {
       return '<div class="dp-zb-mz" data-zb-i="' + i + '"><span class="dp-zb-mt">' + esc(m.t) + '</span>'
         + '<label><span>Kosten €</span><input data-zb-k="' + i + '" inputmode="decimal" value="' + esc(m.k ? String(Math.round(zahl(m.k))) : '') + '" placeholder="0"></label>'
-        + '<label class="dp-zb-bew" title="Modernisierung im bewohnten Zustand: Umlage 8 % der Kosten im Jahr (§ 559 BGB), gedeckelt 3 €/m² (2 €/m² unter 7 €/m²) in 6 Jahren — zählt zur Soll-Miete"><input type="checkbox" data-zb-b="' + i + '"' + (m.bewohnt ? ' checked' : '') + '> bewohnt (§ 559)</label>'
+        /* v3001 · Marcel 27.10.2026: „bewohnen und irgendein Paragraph, wo keiner weiss, was gemeint ist“ -
+           das Kaestchen sagt jetzt, was es tut: die Kosten als Modernisierungsumlage auf die laufende Miete. */
+        + (m.id === 'renovierung' ? '<span class="dp-zb-bew-nein">Renovierung ist Erhaltung — nicht auf die Miete umlegbar</span>'
+          : '<label class="dp-zb-bew"><input type="checkbox" data-zb-b="' + i + '"' + (m.bewohnt ? ' checked' : '') + '> Mieter bleibt drin — Kosten auf die Miete umlegen</label>'
+          + (m.bewohnt ? '<label><span>davon Erhaltung %</span><input data-zb-e="' + i + '" inputmode="decimal" value="' + esc(m.erh ? String(zahl(m.erh)) : '') + '" placeholder="0" style="width:70px"></label>'
+            + '<span class="dp-zb-bew-info">Modernisierungsumlage (§ 559 BGB): 8 % der Kosten pro Jahr auf die Miete, ohne den Anteil für Erhaltung (z. B. ohnehin fällige Reparatur), höchstens 3 €/m² — bei Miete unter 7 €/m² 2 €/m² — in 6 Jahren. Geht in die Soll-Miete ein.</span>' : ''))
         + (m.id === 'sonst' ? '<label><span>Bezeichnung</span><input data-zb-t="' + i + '" value="' + esc(m.t) + '"></label>' : '')
         + '</div>';
     }).join('');
@@ -1775,6 +1796,7 @@
       '.dp-zb-mz .dp-zb-mt{font-weight:600;min-width:110px}',
       '.dp-zb-mz label{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:#6B6356}',
       '.dp-zb-mz label.dp-zb-bew{flex-direction:row;align-items:center;gap:6px;color:#2A2727}',
+      '.dp-zb-bew-info,.dp-zb-bew-nein{flex-basis:100%;font-size:11.5px;line-height:1.4;color:#6B6356}',
       '.dp-zb-mz input:not([type=checkbox]){width:110px;border:1px solid #E6E0D3;border-radius:8px;padding:5px 8px;font:13px Inter,sans-serif}',
       '.dp-zb-sum{font-size:12.5px;color:#6B6356;margin-top:8px}',
       '.dp-zb-sum b.c-soll{color:#3d6fa8}.dp-zb-sum b.c-ziel{color:#2f7d55}'
@@ -1801,6 +1823,10 @@
       });
       host.querySelectorAll('[data-zb-b]').forEach(function (cb) {
         cb.onchange = function () { liste[+cb.getAttribute('data-zb-b')].bewohnt = !!cb.checked; if (opts.geaendert) opts.geaendert(true); };
+      });
+      host.querySelectorAll('[data-zb-b]').forEach(function (cb) { cb.addEventListener('change', zeichne); });   /* v3001: Erhaltungsfeld ein-/ausblenden */
+      host.querySelectorAll('[data-zb-e]').forEach(function (inp) {
+        inp.oninput = function () { liste[+inp.getAttribute('data-zb-e')].erh = zahl(inp.value); if (opts.geaendert) opts.geaendert(true); };
       });
       host.querySelectorAll('[data-zb-t]').forEach(function (inp) {
         inp.oninput = function () { liste[+inp.getAttribute('data-zb-t')].t = inp.value || 'Sonstiges'; if (opts.geaendert) opts.geaendert(true); };

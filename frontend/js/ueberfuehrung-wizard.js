@@ -102,8 +102,9 @@
   /* ── Vorbelegung: nur aus vorhandenen Angaben, nie erfunden ───────────── */
   function _vorbelegen() {
     var b = _ctx.privatBlob, w = _ctx.w;
-    var vw = _num(b.svwert), vwQ = 'Verkehrswert (Reiter Objekt)';
-    if (vw == null) { vw = _num(b.bankval); vwQ = 'Bankbewertung'; }
+    /* v3003a · eine Wertangabe (wertangabe.js) */
+    var _wa = window.DpWertangabe ? window.DpWertangabe.aufloesen(b) : { wert: _num(b.svwert) || _num(b.bankval), herkunft: null };
+    var vw = _wa.wert || null, vwQ = _wa.herkunft === 'bank' ? 'Bankbewertung' : 'Verkehrswert (Reiter Objekt)';
     if (vw == null) vwQ = '';
     w.vw = vw; w.vwQuelle = vwQ;
     w.art = 'kauf';

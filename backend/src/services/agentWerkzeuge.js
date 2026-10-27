@@ -247,6 +247,21 @@ const SOLL_IST = [
   ['_kpis_cf_vs', 'Cashflow vor Steuer', 'eur', 'groesser'], ['_kpis_cf_ns', 'Cashflow nach Steuer', 'eur', 'groesser'],
   ['_ds2_score', 'DealScore', 'zahl', 'groesser']
 ];
+
+/* v3003a · EINE Wertangabe: Marktwert/Verkehrswert (svwert) mit Herkunft (svw_herkunft). Dieselbe Regel
+   wie frontend/js/wertangabe.js aufloesen(): bankval ist keine eigene Quelle mehr, sondern gilt nur,
+   solange das Objekt noch nicht im Formular uebertragen ist (bankval_migriert). */
+function wertangabe(d) {
+  d = d || {};
+  const n = (v) => { const x = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.')); return Number.isFinite(x) && x > 0 ? x : null; };
+  const sv = n(d.svwert), bv = n(d.bankval), h = String(d.svw_herkunft || '');
+  if (String(d.bankval_migriert || '') === '1' || !bv) return { wert: sv, herkunft: sv ? (h || null) : null };
+  if (!sv) return { wert: bv, herkunft: 'bank' };
+  if (Math.abs(sv - bv) < 1) return { wert: sv, herkunft: h || 'bank' };
+  if (h === 'gutachten' || h === 'bank') return { wert: sv, herkunft: h, anders: bv };
+  return { wert: bv, herkunft: 'bank', anders: sv };
+}
+
 function _zahlSI(v) {
   if (v === null || v === undefined || v === '') return null;
   if (typeof v === 'number') return Number.isFinite(v) ? v : null;
@@ -347,7 +362,7 @@ function _potenzialKurz(d, frei) {
     if (soll || ziel || ml.length) {
       roh.push({ nr: w.nr || null, lage: w.lage || null, wfl: w.wfl || null, ist: w.ist || null, soll_monat: soll,
         soll_ab: w.soll_ab || null, ziel_qm: ziel, ziel_wann: w.ziel_wann || null,
-        massnahmen: ml.map((m) => (m.t || '') + (m.k ? ' ' + m.k + ' EUR' : '') + (m.bewohnt ? ' (bewohnt, § 559)' : '')).join(', ') || null });
+        massnahmen: ml.map((m) => (m.t || '') + (m.k ? ' ' + m.k + ' EUR' : '') + (m.bewohnt ? ' (Modernisierungsumlage nach § 559 BGB' + (Number(m.erh) ? ', davon ' + Number(m.erh) + ' % Erhaltung' : '') + ')' : '')).join(', ') || null });
     }
   });
   const obj = (d && (d.zb_soll_qm || d.zb_ziel_qm || d.zb_massnahmen))
@@ -1761,7 +1776,9 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
     const n = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.'));
     return Number.isFinite(n) && n > 0 ? n : null;
   };
-  const svw = zahl(d.svwert), bank = zahl(d.bankval);
+  /* v3003a · eine Wertangabe (wertangabe): die Bankbewertung ist die Herkunft „bank“ am Wert */
+  const _wa = wertangabe(d);
+  const svw = _wa.wert, bank = _wa.herkunft === 'bank' ? _wa.wert : null;
   const eigene = [];
   if (svw) eigene.push({ was: 'Verkehrswert', wert: eur(svw), herkunft: 'am Objekt eingetragen' });
   if (bank && bank !== svw) eigene.push({ was: 'Beleihungswert', wert: eur(bank), herkunft: 'am Objekt eingetragen' });
@@ -2080,14 +2097,20 @@ async function objekt_schnellblick(ctx, args) {
     return null;
   };
   const knkTeile = [];
-  let knkSumme = 0, knkVollstaendig = true;
+  let knkSumme = 0, knkVollstaendig = true, knkGrest = 0;
+  /* v3006c · Grunderwerbsteuer auf den Kaufpreis ohne ausgewiesenes Inventar (§ 2 GrEStG),
+     dieselbe Bemessung wie die App (DealKpis.grestBasis). Die anderen Posten auf den Gesamtpreis. */
+  const _invGr = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
+  const _grBasis = rechenkerne.grestBasis(kp, _invGr);
   [['gest_p', 'Grunderwerbsteuer'], ['notar_p', 'Notar'], ['gba_p', 'Grundbuch'],
    ['makler_p', 'Maklercourtage']].forEach(([fid, name]) => {
     const s = satzVon(fid);
     if (!s || s.wert == null) { knkVollstaendig = false; knkTeile.push(name + ': unbekannt'); return; }
-    const betrag = kp * s.wert / 100;
+    const betrag = (fid === 'gest_p' ? _grBasis : kp) * s.wert / 100;
+    if (fid === 'gest_p') knkGrest = betrag;
     knkSumme += betrag;
-    knkTeile.push(name + ' ' + pct(s.wert) + ' = ' + eur(betrag) + '  (' + s.quelle + ')');
+    knkTeile.push(name + ' ' + pct(s.wert) + ' = ' + eur(betrag) + '  (' + s.quelle
+      + (fid === 'gest_p' && _grBasis < kp ? ', auf ' + eur(_grBasis) + ' ohne Inventar' : '') + ')');
   });
 
   const kaufnebenkosten = {
@@ -2257,9 +2280,19 @@ async function objekt_schnellblick(ctx, args) {
     /* AfA und Grenzsteuersatz nur, wenn sie am Objekt stehen — sonst 0,
        dann ist der Cashflow vor Steuer gleich dem nach Steuer. */
     const gebAnt = dez(d.geb_ant), afaSatz = dez(d.afa_satz);
+    /* v3006b · Gebaeude-AHK aus dem Kern der App (DealKpis.gebaeudeAhk): Nebenkosten anteilig,
+       Inventar (moebl / inv_kueche) vor der Aufteilung abgezogen. Bis v3006a (kp + NK) x geb_ant. */
+    const _invB = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
     const afa = (gebAnt != null && gebAnt > 0)
-      ? (kp + knkSumme) * (gebAnt / 100) * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
-    const svw = z(d.svwert) || z(d.bankval) || 0;
+      ? rechenkerne.gebaeudeAhk({ kp: kp, nk: knkSumme, nkNurImmo: knkGrest, gebAntPct: gebAnt, inventar: _invB }).gebAhk
+        * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
+    /* v3006 · LTV-Basis wie die App (calc.js v2996, deal-kpis v3006): der Wert mit
+       seiner Herkunft, die Bankbewertung getrennt. Ohne gespeicherte Herkunft gilt
+       „eigene" - so liest calc.js ein Objekt ohne Auswahl (ohne Marktbericht-Vermerk). */
+    /* v3003a · Wert und Herkunft aus der einen Wertangabe (wertangabe), bankval geht dort auf */
+    const _wa = wertangabe(d);
+    const svw = _wa.wert || 0;
+    const svwHerkunft = svw > 0 ? (_wa.herkunft || 'eigene') : null;
 
     K = rechenkerne.kpis({
       kp: kp, nk: knkSumme, san: z(d.san) || 0, moebl: z(d.moebl) || 0,
@@ -2269,7 +2302,9 @@ async function objekt_schnellblick(ctx, args) {
       afa: afa, grenz: dez(d.grenz) || 0,
       ekInklNkLtv: d.ek_inkl_nk === true || d.ek_inkl_nk === 'true'
                 || d._ek_ist_nk === true || d._ek_ist_nk === 'true',
-      svw: svw
+      svw: svw,
+      svw_herkunft: svwHerkunft,
+      bankval: 0   /* v3003a · steckt in svw mit Herkunft bank */
     });
 
     finanzierung = {
@@ -2362,11 +2397,17 @@ async function objekt_schnellblick(ctx, args) {
   if (!zins || !tilg) scoreFehlt.push('Zinssatz und Tilgung');
   if (!bwkDa) scoreFehlt.push('Hausgeld bzw. Bewirtschaftungskosten');
 
-  const svw2 = z(d.svwert) || z(d.bankval) || 0;
+  /* v3006b · Dieselbe Herkunftsregel wie Kachel und Score (calc.js wp / wp_kpi): eine
+     Marktpreisindikation aus Angebotspreisen traegt keinen Wertpuffer. Bis v3006a rechnete der
+     Schnellblick sie als „Verkehrswert minus Kaufpreis“. Ohne Wertangabe bleibt die
+     5-%-Annahme des Quick-Checks. */
+  const _wa2 = wertangabe(d);
+  const svwIndikation = (_wa2.wert || 0) > 0 && _wa2.herkunft === 'indikation';
+  const svw2 = svwIndikation ? 0 : (_wa2.wert || 0);   /* v3003a */
   /* Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
      Ohne Verkehrswert nimmt der Quick-Check 5 % vom Kaufpreis an — das
      ist eine ANNAHME und steht als solche im Ergebnis. */
-  const wp = svw2 > 0 ? svw2 - kp : kp * 0.05;
+  const wp = svw2 > 0 ? svw2 - kp : (svwIndikation ? 0 : kp * 0.05);
 
   /* ── 1 · WELCHER SCORE GILT — genau einer ─────────────────────────────
    * Liegt ein in DealPilot gerechneter vor, gilt DIESER, und es wird kein
@@ -2517,8 +2558,11 @@ async function objekt_schnellblick(ctx, args) {
           + '. Sie werden nicht geschaetzt — frag danach.',
       wertpuffer: !K ? undefined : (svw2 > 0
         ? eur(wp) + '  (Verkehrswert ' + eur(svw2) + ' minus Kaufpreis)'
-        : eur(wp) + '  ANGENOMMEN: 5 % vom Kaufpreis, weil kein Verkehrswert '
-          + 'hinterlegt ist. Sag das dem Nutzer.'),
+        : svwIndikation
+          ? 'keiner: am Objekt steht nur eine Marktpreisindikation aus Angebotspreisen, '
+            + 'die traegt keinen Wertpuffer (wie in der App). Sag das dem Nutzer.'
+          : eur(wp) + '  ANGENOMMEN: 5 % vom Kaufpreis, weil kein Verkehrswert '
+            + 'hinterlegt ist. Sag das dem Nutzer.'),
       /* ── DIE HEURISTIK, VOLLUMFAENGLICH ──────────────────────────────
        *
        * v1936. Marcel am 07.10.2026: „beim Quickcheck geben wir doch immer
@@ -2632,8 +2676,11 @@ async function objekt_schnellblick(ctx, args) {
           : 'Bei den Kaufnebenkosten fehlt ein Posten; Darlehen und Kapitaldienst '
             + 'sind dadurch eher zu niedrig.',
         (svw2 > 0) ? null
-          : 'Es ist kein Verkehrswert hinterlegt; der Wertpuffer ist mit 5 % vom '
-            + 'Kaufpreis ANGENOMMEN, nicht gemessen.',
+          : svwIndikation
+            ? 'Am Objekt steht nur eine Marktpreisindikation aus Angebotspreisen; sie traegt '
+              + 'keinen Wertpuffer, er geht mit 0 in die Bewertung.'
+            : 'Es ist kein Verkehrswert hinterlegt; der Wertpuffer ist mit 5 % vom '
+              + 'Kaufpreis ANGENOMMEN, nicht gemessen.',
         bwkDa ? null
           : 'Am Objekt ist keine Bewirtschaftung hinterlegt. Der Cashflow ist '
             + 'dadurch ZU HOCH — die nicht umlagefaehigen Kosten fehlen darin.',

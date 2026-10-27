@@ -1718,6 +1718,77 @@ function fwBezugLinear(m, e) {
       + `${b >= 0 ? '+' : '−'} ${Math.abs(b)} = ${w}` };
 }
 
+/* ═══ v3008 · MERKMALSMATRIX — EINE TABELLE UEBER BELIEBIG VIELE MERKMALE ═══
+   Konstanz druckt seine Vergleichsfaktoren fuer Wohnungseigentum als
+   Beschluss je Wohnlage x Baujahresklasse x Ausstattungsklasse. Keine der
+   vorhandenen Formen traegt drei Achsen, und zwei davon sind KLASSEN des
+   Ausschusses (Wort, keine Zahl).
+
+   Generisch statt Sonderfall: `achsen` ist eine geordnete Liste, jede Achse
+   ist entweder `klasse` (Wortlaut des Ausschusses, ohne Gross-/Klein-
+   schreibung, NICHT unscharf) oder `band` (Zahl in von/bis, Grenzen
+   eingeschlossen, null = offen). `zellen` ist in Achsenreihenfolge
+   verschachtelt. KEINE Interpolation — die Tabelle ist ein Beschluss je
+   Zelle. Eine leere Zelle („-") ist kein Wert, auch nicht der Nachbar.
+   `geltung` haelt Bedingungen, die keine Achse sind (Zimmerzahl).
+
+   Fehlt ein Merkmal, heisst der Grund `merkmal_fehlt` und traegt das
+   Merkmal mit — die Leseroutine (gutachterausschuss.js) sammelt daraus die
+   Felder, in die der Nutzer es eintragen kann. */
+function merkmalsmatrix(m, e) {
+  const achsen = Array.isArray(m.achsen) ? m.achsen : [];
+  if (!achsen.length) return nichts('kein_modell', 'Die Merkmalsmatrix fuehrt keine Achsen.');
+  for (const g of (Array.isArray(m.geltung) ? m.geltung : [])) {
+    const v = zahl(e[g.feld]);
+    if (v === null) {
+      return { ...nichts('merkmal_fehlt', `Merkmal fehlt: ${g.bez || g.feld}.`), merkmal: g.merkmal || g.feld };
+    }
+    if ((g.mindestens != null && v < g.mindestens) || (g.hoechstens != null && v > g.hoechstens)) {
+      return { ...nichts('ausserhalb_des_geltungsbereichs',
+        `${g.bez || g.feld} = ${v}: außerhalb des Geltungsbereichs. Die Tabelle gilt nur ${g.text || 'im Anwendungsbereich'}.`),
+        merkmal: g.merkmal || g.feld };
+    }
+  }
+  let knoten = m.zellen || {};
+  const weg = [];
+  for (const a of achsen) {
+    const roh = e[a.feld];
+    let schl = null;
+    if (a.art === 'band') {
+      const x = zahl(roh);
+      if (x === null) return { ...nichts('merkmal_fehlt', `Merkmal fehlt: ${a.bez || a.feld}.`), merkmal: a.merkmal || a.feld };
+      const b = (a.baender || []).find((r) => (r.von == null || x >= r.von) && (r.bis == null || x <= r.bis));
+      if (!b) {
+        return { ...nichts('ausserhalb_der_tabelle',
+          `${a.bez || a.feld} ${x} liegt außerhalb der Klassen des Ausschusses (`
+          + (a.baender || []).map((r) => r.schluessel).join(', ') + '); extrapoliert wird nicht.'),
+          merkmal: a.merkmal || a.feld };
+      }
+      schl = String(b.schluessel);
+      weg.push({ merkmal: a.merkmal || a.feld, bez: a.bez || a.feld, eingabe: x, klasse: schl });
+    } else {
+      const t = String(roh ?? '').trim().toLowerCase();
+      if (!t) return { ...nichts('merkmal_fehlt', `Merkmal fehlt: ${a.bez || a.feld}.`), merkmal: a.merkmal || a.feld };
+      const k = (a.klassen || []).find((c) => String(c).toLowerCase() === t);
+      if (k === undefined) {
+        return { ...nichts('merkmal_unbekannt',
+          `${a.bez || a.feld} „${roh}" ist keine Klasse des Ausschusses (${(a.klassen || []).join(', ')}).`),
+          merkmal: a.merkmal || a.feld };
+      }
+      schl = String(k);
+      weg.push({ merkmal: a.merkmal || a.feld, bez: a.bez || a.feld, eingabe: String(roh), klasse: schl });
+    }
+    knoten = (knoten && typeof knoten === 'object') ? knoten[schl] : undefined;
+  }
+  if (!istZahl(knoten)) {
+    return { ...nichts('zelle_leer',
+      'Für diese Kombination (' + weg.map((w) => w.bez + ' ' + w.klasse).join(' · ')
+      + ') hat der Gutachterausschuss keinen Vergleichsfaktor beschlossen. '
+      + 'Ein Wert einer Nachbarzelle wird nicht übertragen.'), zelle: weg };
+  }
+  return { verfuegbar: true, wert: knoten, tabellenwert: knoten, korrekturen: [], zelle: weg };
+}
+
 /** formelwerk — der Einstieg. Waehlt die Bauart und gibt die Hausform zurueck. */
 function formelwerk(m, e) {
   const bauart = m.bauart
@@ -1755,6 +1826,7 @@ const AUSWERTER = {
   baender_kategorial: baenderKategorial, /* v1101-WBKAT */
   verzweigt: verzweigt,                 /* v1103-WVERZ */
   formelwerk,                           /* v1886-WFW */
+  merkmalsmatrix,                       /* v3008 · Achsen aus Merkmalen des Ausschusses */
   /* v1886-WFW · `regression_log` ist dieselbe BAUART wie Magdeburgs
      Formelwerk: Koeffizienten auf transformierte Groessen, aussen eine
      Funktion. Dresden fuehrt sie unter diesem Namen (1 Satz,

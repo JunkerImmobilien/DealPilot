@@ -249,7 +249,7 @@ function loadExample() {
   sv('baujahr',   1995);
   sv('kaufdat',   '2024-12-23');
   sv('svwert',    250000);
-  sv('bankval',   250000);
+  sv('svw_herkunft', 'bank');   /* v3003b · eine Wertangabe: Bankbewertung ist eine Herkunft, kein eigenes Feld */
   sv('nkm',       800);
   sv('ze',        50);
   sv('umlagef',   150);
@@ -286,7 +286,7 @@ function loadExamplePlaceholders() {
     baujahr:     '1995',
     kaufdat:     '',
     svwert:      '250000',
-    bankval:     '250000',
+    svw_herkunft: 'bank',
     nkm:         '800',
     ze:          '50',
     umlagef:     '150',

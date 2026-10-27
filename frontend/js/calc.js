@@ -856,8 +856,16 @@ function _setCostEur(id, val) {
 
 // User hat Prozent geändert — Euro folgt automatisch (über _calcImmediate)
 // V63.8: User hat Prozent geändert — Euro-Feld dynamisch nachziehen
-function syncCostPct(prefix) {
+/* v3006c · Bezugsgroesse je Posten: die Grunderwerbsteuer auf den Kaufpreis OHNE Inventar
+   (DealKpis.grestBasis, § 2 GrEStG), alles andere auf den Gesamtpreis. */
+function _costBasis(prefix) {
   var kp = v('kp');
+  if (prefix !== 'gest') return kp;
+  var inv = Math.max(0, v('inv_kueche') || 0, v('moebl') || 0);
+  return (window.DealKpis && DealKpis.grestBasis) ? DealKpis.grestBasis(kp, inv) : Math.max(0, kp - inv);
+}
+function syncCostPct(prefix) {
+  var kp = _costBasis(prefix);   /* v3006c */
   var eFld = el(prefix + '_e');
   var pFld = el(prefix + '_p');
   if (eFld && pFld && kp > 0) {
@@ -870,7 +878,7 @@ function syncCostPct(prefix) {
 
 // User hat Euro geändert — Prozent neu berechnen aus Kaufpreis
 function syncCostEur(prefix) {
-  var kp = v('kp');
+  var kp = _costBasis(prefix);   /* v3006c */
   var eFld = el(prefix + '_e');
   var pFld = el(prefix + '_p');
   if (!eFld || !pFld) return;
@@ -893,7 +901,12 @@ function calcNow() {
 function _calcImmediate(){
   updHeader();
   var kp=v('kp');
-  var m_e=kp*v('makler_p')/100,n_e=kp*v('notar_p')/100,g_e=kp*v('gba_p')/100,ge_e=kp*v('gest_p')/100,ji_e=kp*v('ji_p')/100;
+  /* v3006c · Grunderwerbsteuer ohne ausgewiesenes Inventar (§ 2 GrEStG), Kern DealKpis.nebenkosten */
+  var _nkK = (window.DealKpis && DealKpis.nebenkosten)
+    ? DealKpis.nebenkosten({ kp: kp, inventar: Math.max(0, v('inv_kueche') || 0, v('moebl') || 0),
+        makler_p: v('makler_p'), notar_p: v('notar_p'), gba_p: v('gba_p'), gest_p: v('gest_p'), ji_p: v('ji_p') })
+    : { makler: kp*v('makler_p')/100, notar: kp*v('notar_p')/100, gba: kp*v('gba_p')/100, grest: kp*v('gest_p')/100, ji: kp*v('ji_p')/100 };
+  var m_e=_nkK.makler,n_e=_nkK.notar,g_e=_nkK.gba,ge_e=_nkK.grest,ji_e=_nkK.ji;
   var nk=m_e+n_e+g_e+ge_e+ji_e;
   /* v2261 · Marcel am 15.10.2026: „Inventar ist nicht zusaetzlich." Es ist Teil des
      Kaufpreises (separates Wirtschaftsgut darin) - die Gesamtinvestition ist
@@ -975,7 +988,9 @@ function _calcImmediate(){
   var kuecheActive = kuecheVal > 0;
   // Sicherheit: Küche kann nicht > Gebäudeanteil sein
   var gebBruttoMax = kp * gebAnt;
-  if (kuecheVal > gebBruttoMax) kuecheVal = gebBruttoMax;
+  /* v3006e · der Deckel lag beim Gebaeudeanteil (kp x geb_ant) - Inventar ist aber ein eigenes
+     Wirtschaftsgut, kein Teil des Gebaeudes; die Obergrenze ist der Kaufpreis (wie DealKpis). */
+  if (kuecheVal > kp) kuecheVal = Math.max(0, kp);
 
   /* V292.6.1-afa-basis-fix-correct: AfA-Basis nach BMF Pipeline Phase 8
    * 
@@ -1003,8 +1018,39 @@ function _calcImmediate(){
   var gebOhneK = kpOhneK * gebAnt;
   var gebQuoteOhneK = gebAnt;
   var nkGesamt = nk; // Summe aller Nebenkosten aus Z.610 (m_e+n_e+g_e+ge_e+ji_e)
-  var nkGebAnteil = nkGesamt * gebQuoteOhneK;
-  var gebAHK = gebOhneK + nkGebAnteil;
+  /* ═══ v3006 · DIE GRUNDSCHULD IST KEINE ANSCHAFFUNGSKOSTE ═════════════════
+     Notar- und Grundbuchkosten der Grundschuldbestellung sind Kosten der
+     FINANZIERUNG, nicht des Erwerbs (§ 255 Abs. 1 HGB: Aufwendungen, um den
+     Vermoegensgegenstand zu erwerben) - sie sind Werbungskosten nach § 9
+     Abs. 1 Satz 3 Nr. 1 EStG und im Jahr der Zahlung sofort abziehbar.
+     Die Kaufnebenkosten-Felder (Notar %, Grundbuchamt %) enthalten sie aber,
+     wenn der Nutzer die Gesamtrechnung eintraegt (Tooltip Grundbuchamt:
+     „inkludiert ... Eintragung der Grundschuld"). Bis v3005 lief damit alles
+     in die AfA-Basis - und wer die Grundschuldkosten im Reiter Steuern unter
+     „Notar/Grundschuld (anteilig)" eintrug, zog sie DOPPELT ab: sofort als
+     Werbungskosten und noch einmal ueber 50 Jahre AfA.
+     Jetzt: was dort im KAUFJAHR steht, kommt aus den Anschaffungskosten
+     (AfA-Basis, 15-%-Grenze, Boden-/Gebaeudeanteil) heraus, hoechstens
+     Notar + Grundbuch. Die Gesamtinvestition bleibt, wie sie ist: das Geld
+     fliesst ja trotzdem. Ohne Eintrag (Vorgabe 0) rechnet alles wie bisher -
+     eine erfundene Aufteilung gibt es nicht (Frage an Marcel im Journal). */
+  var _gsKosten = 0;
+  try {
+    if (typeof _getYearOverride === 'function' && typeof _v269_getStartYear === 'function' && window._taxYearlyOverrides) {
+      var _gsOv = Number(_getYearOverride(_v269_getStartYear(), 'notar_grundschuld'));
+      if (isFinite(_gsOv) && _gsOv > 0) _gsKosten = Math.min(_gsOv, n_e + g_e);
+    }
+  } catch (_eGs) {}
+  State.gs_kosten_ak = _gsKosten;
+  nkGesamt = Math.max(0, nkGesamt - _gsKosten);
+  /* v3006b · Gebaeude-AHK aus dem Kern (DealKpis.gebaeudeAhk, auch Quick-Check und Bot):
+     die Nebenkosten verteilen sich jetzt anteilig auf Grundstueck UND Inventar. Bis v3006a
+     ging der Inventaranteil der Nebenkosten mit in Gebaeude und Boden (nkGesamt x geb_ant). */
+  var _ahkK = (window.DealKpis && DealKpis.gebaeudeAhk)
+    ? DealKpis.gebaeudeAhk({ kp: kp, nk: nkGesamt, nkNurImmo: ge_e, gebAntPct: gebAnt * 100, inventar: kuecheVal })   /* v3006c: GrESt nur aufs Grundstueck */
+    : { gebKp: gebOhneK, nkGeb: nkGesamt * gebQuoteOhneK, gebAhk: gebOhneK + nkGesamt * gebQuoteOhneK, nkInv: 0, nkQuote: kp > 0 ? nkGesamt / kp : 0 };
+  var nkGebAnteil = _ahkK.nkGeb;
+  var gebAHK = _ahkK.gebAhk;
   var sanLimit = gebAHK * 0.15;
 
   var sanIst = v('san');
@@ -1050,9 +1096,12 @@ function _calcImmediate(){
     var _p = (window.Afa && Afa.parseSelectValue)
       ? Afa.parseSelectValue(_sel)
       : { methode: 'linear', satzPct: parseDe(_sel) || 2 };
-    if (_p.methode !== 'linear') return 33;
-    var _s = _p.satzPct;
-    return (_s > 0) ? Math.round(100 / _s) : 50;
+    /* v3006b · ohne Runden: 3 % sind 33 1/3 Jahre, nicht 33 (tax.js rechnet seit v3006b mit dem Satz) */
+    var _s = (_p.methode !== 'linear') ? 3.0 : _p.satzPct;
+    if (!(_s > 0)) return '50';
+    var _nd = 100 / _s;
+    return (Math.abs(_nd - Math.round(_nd)) < 1e-9) ? String(Math.round(_nd))
+      : (Math.abs(_nd - 100 / 3) < 1e-9 ? '33⅓' : _nd.toFixed(1).replace('.', ','));
   })();
   var sanStatusEl = el('san_limit_status');
   if (sanStatusEl) {
@@ -1141,7 +1190,8 @@ function _calcImmediate(){
         if (kuecheRow) kuecheRow.style.display = 'none';
         if (gebNettoRow) gebNettoRow.style.display = 'none';
       }
-      st('ahk_nk_anteil', fE(nkGebAnteil, 0) + ' (= ' + (gebQuoteOhneK*100).toFixed(1).replace('.', ',') + ' % der NK)');
+      st('ahk_nk_anteil', fE(nkGebAnteil, 0) + ' (= ' + ((nkGesamt > 0 ? nkGebAnteil / nkGesamt : gebQuoteOhneK)*100).toFixed(1).replace('.', ',') + ' % der NK'
+        + (_gsKosten > 0 ? ' ohne ' + fE(_gsKosten, 0) + ' Grundschuld' : '') + ')');   /* v3006 */
       st('ahk_basis', fE(gebAHK, 0));
       st('ahk_15pct', fE(sanLimit, 0));
     } else {
@@ -1156,7 +1206,10 @@ function _calcImmediate(){
       sanLimit:      sanLimit,
       kuecheVal:     kuecheVal,
       kuecheActive:  kuecheActive,
-      gebQuoteOhneK: gebQuoteOhneK
+      gebQuoteOhneK: gebQuoteOhneK,
+      nkInv:         _ahkK.nkInv,     /* v3006b: Nebenkosten, die auf das Inventar entfallen */
+      nkQuote:       _ahkK.nkQuote,   /* v3006b: Nebenkosten (ohne Grundschuld) je Euro Kaufpreis */
+      nkInvQuote:    _ahkK.nkInvQuote /* v3006c: Nebenkosten je Euro Inventar (ohne GrESt) */
     };
   }
   /* ═══ v1313 · Der Erbbau-Abschlag greift VOR jedem Wertvergleich ═══════
@@ -1219,7 +1272,9 @@ function _calcImmediate(){
   //   1. Verkehrswert (svw, §194 BauGB) wenn > 0
   //   2. Bankbewertung (bankval) wenn > Kaufpreis
   //   3. Kaufpreis (kp) als Fallback
-  var _bankval = v('bankval') || 0;
+  /* v3003a · Die Bankbewertung ist keine eigene Quelle mehr: sie steht als Herkunft „bank“ an
+     svwert (wertangabe.js uebertraegt bankval beim Laden). bankval bleibt gespeichert, rechnet aber nicht mehr. */
+  var _bankval = 0;
   /* v1313: die Bankbewertung ist genauso ein Volleigentumswert - die Bank
      bewertet nach BelWertV und setzt beim Erbbaurecht ihren eigenen
      Abschlag, aber was hier eingetippt wird, ist der Wert VOR Abschlag. */
@@ -2249,7 +2304,11 @@ function _calcImmediate(){
   var ekv = ekvBase;
   // Erwerbsnebenkosten = gi - kp (alles außer Kaufpreis selbst) — für Anzeigezwecke
   var nk_total = Math.max(0, gi - kp);
-  var wp_kpi=svw>0?svw-kp:0;
+  /* v3006 · Derselbe Wertpuffer wie oben (wp, v2996): eine Marktpreisindikation aus
+     Angebotspreisen traegt keinen. Bis v3005 rechnete der Score (K.wp_kpi, DealScore
+     „Potenzial") und das Bank-PDF („Sofortiger Wertpuffer") ihn trotzdem mit, waehrend
+     die Kachel ihn ausblendete - zwei Antworten auf dieselbe Frage. */
+  var wp_kpi=(svw>0 && _svwHerk !== 'indikation')?svw-kp:0;
   var btj=parseInt(g('btj')||'20');
   /* v816-CUT: Privat-Objekt-Cut bei Ueberfuehrung. Gated ueber Feld 'ueberf_ende' (Datum).
      Kappt btj auf volle Jahre bis zum Stichtagsjahr; letztes Jahr wird anteilig (Monat/12) gerechnet.

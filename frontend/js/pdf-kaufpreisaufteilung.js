@@ -29,6 +29,40 @@
   }
   function num(id) { return zahl(txt(id)); }
   function wertVon(o) { return (o && typeof o === 'object' && 'value' in o) ? o.value : o; }
+
+  /* ═══ v3006d · DIE ZAHLEN DER AUFTEILUNG AUS DEM KERN ═════════════════════════
+     Bis v3006c rechnete das PDF eigen: Gebaeude = Kaufpreis MIT Inventar x Anteil,
+     Nebenkosten = alle x Anteil (auch der Teil, der auf das Inventar entfaellt), die
+     Grundschuld als Anschaffungskosten. Gemessen mit 10.000 EUR Inventar: AfA-Basis
+     268.448 EUR, Hauptformular 260.002,40 EUR. Jetzt DealKpis.gebaeudeAhk mit denselben
+     Eingaben wie calc.js: Inventar max(inv_kueche, moebl), Grunderwerbsteuer nur aufs
+     Grundstueck, Grundschuld (State.gs_kosten_ak) heraus. Die Variante mit Abschlag
+     verschiebt nur Boden -> Gebaeude innerhalb des Kaufpreises OHNE Inventar.
+     e: { kp, nk, grest, gebPct, abschlag } - fehlende Felder liest sie selbst. */
+  function kpaZahlen(e) {
+    e = e || {};
+    var kp = e.kp != null ? e.kp : (num('ak_kp') || num('kp') || 0);
+    var nk = e.nk != null ? e.nk : 0;
+    var grest = e.grest != null ? e.grest : (num('ak_grest') || 0);
+    var inv = Math.max(num('inv_kueche') || 0, num('moebl') || 0);
+    var gs = (window.State && State.gs_kosten_ak) || 0;
+    var gebPct = e.gebPct || 0, abschlag = e.abschlag != null ? e.abschlag : 20;
+    var K = window.DealKpis && DealKpis.gebaeudeAhk;
+    var rechne = function (pct) {
+      if (K) return DealKpis.gebaeudeAhk({ kp: kp, nk: nk, nkNurImmo: grest, nkAbzug: gs, gebAntPct: pct, inventar: inv });
+      var ko = Math.max(0, kp - inv); return { kpOhneInv: ko, gebKp: ko * pct / 100, nkGeb: nk * pct / 100, gebAhk: (ko + nk) * pct / 100, inventar: inv, nkInv: 0 };
+    };
+    var a = rechne(gebPct);
+    var kpImmo = a.kpOhneInv;
+    var bodenAlt = kpImmo - a.gebKp, gebAlt = a.gebKp;
+    var bodenNeu = bodenAlt * (1 - abschlag / 100), gebNeu = kpImmo - bodenNeu;
+    var gebPctNeu = kpImmo ? gebNeu / kpImmo * 100 : 0;
+    var n = rechne(gebPctNeu);
+    return { kp: kp, inventar: kp - kpImmo, kpImmo: kpImmo, grundschuld: gs,
+      bodenAlt: bodenAlt, gebAlt: gebAlt, bodenNeu: bodenNeu, gebNeu: gebNeu, gebPctNeu: gebPctNeu,
+      nkGebAlt: a.nkGeb, nkGebNeu: n.nkGeb, basisAlt: a.gebAhk, basisNeu: n.gebAhk };
+  }
+  window._dpKpaZahlen = kpaZahlen;
   function eur(v, dec) {
     if (v == null || !isFinite(v)) return '-';
     return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec == null ? 0 : dec, maximumFractionDigits: dec == null ? 0 : dec }).format(v) + ' €';
@@ -278,13 +312,16 @@
     if (abschlag == null) abschlag = 20;
     var grundBegr = txt('bmf-boden-grund');
 
-    var bodenAnteilKp = (kp || 0) * (100 - gebPct) / 100;
-    var gebAnteilKp = (kp || 0) * gebPct / 100;
-    var bodenNeu = bodenAnteilKp * (1 - abschlag / 100);
-    var gebNeu = (kp || 0) - bodenNeu;
-    var gebPctNeu = kp ? gebNeu / kp * 100 : 0;
-    var nkGebAlt = nkInBmf * gebPct / 100, nkGebNeu = nkInBmf * gebPctNeu / 100;
-    var basisAlt = gebAnteilKp + nkGebAlt, basisNeu = gebNeu + nkGebNeu;
+    /* v3006d · aus dem Kern, siehe kpaZahlen oben */
+    var KZ = kpaZahlen({ kp: kp || 0, nk: nkInBmf, gebPct: gebPct || 0, abschlag: abschlag });
+    var kpImmo = KZ.kpImmo, invKp = KZ.inventar;
+    var bodenAnteilKp = KZ.bodenAlt;
+    var gebAnteilKp = KZ.gebAlt;
+    var bodenNeu = KZ.bodenNeu;
+    var gebNeu = KZ.gebNeu;
+    var gebPctNeu = KZ.gebPctNeu;
+    var nkGebAlt = KZ.nkGebAlt, nkGebNeu = KZ.nkGebNeu;
+    var basisAlt = KZ.basisAlt, basisNeu = KZ.basisNeu;
 
     /* ── Seite 1 ─────────────────────────────────────────────────── */
     kopf('Kaufpreisaufteilung', (adr || 'Objekt') + ' · Stand ' + heute());
@@ -331,6 +368,9 @@
     });
     zeile('Anschaffungsnebenkosten' + (kp ? ' (' + pct(nkSumme / kp * 100, 2) + ' vom Kaufpreis)' : ''), eur(nkSumme, 2), { fett: true });
     zeile('Anschaffungskosten gesamt', eur(ak, 2), { summe: true });
+    /* v3006d · was nicht in die Aufteilung Gebaeude/Boden geht, steht offen da */
+    if (invKp > 0.005) zeile('davon Inventar (bewegliche Wirtschaftsgüter, gesondert abgeschrieben)', eur(invKp, 2), { einzug: true, klein: true });
+    if (KZ.grundschuld > 0.005) zeile('davon Grundschuldbestellung (Finanzierungskosten, sofort abziehbar)', eur(KZ.grundschuld, 2), { einzug: true, klein: true });
     y += 1;
     zeile('davon in der amtlichen Aufteilung angesetzt', eur(akBmf, 2), { fett: true });
     if (nkAussen > 0.005) zeile('nicht angesetzt (Fahrt, Gutachten, Anwalt, Reise, Sonstiges)', eur(nkAussen, 2), { einzug: true, klein: true });
@@ -362,7 +402,7 @@
     vergleich(
       [['Position', 52], ['Amtlich', 30], ['Mit Abschlag', 30], ['Unterschied', 28]],
       [
-        zv('Kaufpreis (ohne Inventar)', kp, kp),
+        zv('Kaufpreis (ohne Inventar)', kpImmo, kpImmo),   /* v3006d: hier stand der Kaufpreis MIT Inventar */
         zv('davon Grund und Boden', bodenAnteilKp, bodenNeu),
         zv('davon Gebäude', gebAnteilKp, gebNeu),
         zv('Gebäudeanteil', gebPct, gebPctNeu, function (v) { return pct(v, 2); }, true),
@@ -400,7 +440,8 @@
     abschnitt('Text für den Kaufvertrag');
     var klausel = (el('bmf-boden-klausel-text') && el('bmf-boden-klausel-text').value) || '';
     if (!klausel) {
-      klausel = 'Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von ' + eur(kp, 2) + ' für das Objekt ' + (adr || '[Objektadresse]') + ' wie folgt auf: auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das Gebäude entfallen ' + eur(gebNeu, 2) + '.';
+      klausel = 'Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von ' + eur(kp, 2) + ' für das Objekt ' + (adr || '[Objektadresse]') + ' wie folgt auf: auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das Gebäude entfallen ' + eur(gebNeu, 2)
+        + (invKp > 0.005 ? ', auf das mitverkaufte Inventar (bewegliche Wirtschaftsgüter) entfallen ' + eur(invKp, 2) : '') + '.';   /* v3006d */
     }
     /* v1490 · Marcel: "das muss kursiv geschrieben werden, genauso mit
        'hiermit erklaeren die Vertragsparteien rechtsverbindlich'". Also:

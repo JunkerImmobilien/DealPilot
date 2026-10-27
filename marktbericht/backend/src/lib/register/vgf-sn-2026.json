@@ -1,0 +1,1123 @@
+[
+ {
+  "land_code": "SN",
+  "ags": "14511",
+  "ebene": "kreis",
+  "gebiet_name": "Chemnitz, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht nicht frei abrufbar; Abgabe gegen Gebühr von 65,00 € (PDF oder Druck). Ob er Vergleichsfaktoren mit Normobjekt führt, ist ohne den Bericht nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz, https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte; Gebühr: 65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht nicht frei abrufbar; Abgabe gegen Gebühr von 65,00 € (PDF oder Druck). Ob er Vergleichsfaktoren mit Normobjekt führt, ist ohne den Bericht nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz, https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte; Gebühr: 65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (boris.sachsen.de, KontaktdatenGAA.pdf, S. 1): Geschäftsstelle Chemnitz, gutachterausschuss@stadt-chemnitz.de, 0371 488-6206",
+    "url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+  "gebuehr": "65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14511",
+  "ebene": "kreis",
+  "gebiet_name": "Chemnitz, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht nicht frei abrufbar; Abgabe gegen Gebühr von 65,00 € (PDF oder Druck). Ob er Vergleichsfaktoren mit Normobjekt führt, ist ohne den Bericht nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz, https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte; Gebühr: 65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht nicht frei abrufbar; Abgabe gegen Gebühr von 65,00 € (PDF oder Druck). Ob er Vergleichsfaktoren mit Normobjekt führt, ist ohne den Bericht nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz, https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte; Gebühr: 65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (boris.sachsen.de, KontaktdatenGAA.pdf, S. 1): Geschäftsstelle Chemnitz, gutachterausschuss@stadt-chemnitz.de, 0371 488-6206",
+    "url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+  "gebuehr": "65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14511",
+  "ebene": "kreis",
+  "gebiet_name": "Chemnitz, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht nicht frei abrufbar; Abgabe gegen Gebühr von 65,00 € (PDF oder Druck). Ob er Vergleichsfaktoren mit Normobjekt führt, ist ohne den Bericht nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz, https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte; Gebühr: 65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht nicht frei abrufbar; Abgabe gegen Gebühr von 65,00 € (PDF oder Druck). Ob er Vergleichsfaktoren mit Normobjekt führt, ist ohne den Bericht nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz, https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte; Gebühr: 65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (boris.sachsen.de, KontaktdatenGAA.pdf, S. 1): Geschäftsstelle Chemnitz, gutachterausschuss@stadt-chemnitz.de, 0371 488-6206",
+    "url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte",
+  "gebuehr": "65,00 € (PDF oder Druck), Stand Länderlinie 05.10.2026"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14521",
+  "ebene": "kreis",
+  "gebiet_name": "Erzgebirgskreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Erzgebirgskreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Erzgebirgskreis, https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss; Gebühr: Gebühr vorab bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Erzgebirgskreis, https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss; Gebühr: Gebühr vorab bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle Annaberg-Buchholz",
+    "url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+  "gebuehr": "Gebühr vorab bei der Geschäftsstelle zu erfragen"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14521",
+  "ebene": "kreis",
+  "gebiet_name": "Erzgebirgskreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Erzgebirgskreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Erzgebirgskreis, https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss; Gebühr: Gebühr vorab bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Erzgebirgskreis, https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss; Gebühr: Gebühr vorab bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle Annaberg-Buchholz",
+    "url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+  "gebuehr": "Gebühr vorab bei der Geschäftsstelle zu erfragen"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14521",
+  "ebene": "kreis",
+  "gebiet_name": "Erzgebirgskreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Erzgebirgskreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Erzgebirgskreis, https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss; Gebühr: Gebühr vorab bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Erzgebirgskreis, https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss; Gebühr: Gebühr vorab bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle Annaberg-Buchholz",
+    "url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss",
+  "gebuehr": "Gebühr vorab bei der Geschäftsstelle zu erfragen"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14522",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Mittelsachsen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (beschlossen 21.05.2026) NICHT online — nur Einsicht in der Geschäftsstelle oder schriftliche Anfrage gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen, https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html; Gebühr: nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (beschlossen 21.05.2026) NICHT online — nur Einsicht in der Geschäftsstelle oder schriftliche Anfrage gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen, https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html; Gebühr: nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), gutachterausschuss@landkreis-mittelsachsen.de, 03733 831-4184",
+    "url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+  "gebuehr": "nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14522",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Mittelsachsen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (beschlossen 21.05.2026) NICHT online — nur Einsicht in der Geschäftsstelle oder schriftliche Anfrage gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen, https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html; Gebühr: nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (beschlossen 21.05.2026) NICHT online — nur Einsicht in der Geschäftsstelle oder schriftliche Anfrage gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen, https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html; Gebühr: nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), gutachterausschuss@landkreis-mittelsachsen.de, 03733 831-4184",
+    "url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+  "gebuehr": "nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14522",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Mittelsachsen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (beschlossen 21.05.2026) NICHT online — nur Einsicht in der Geschäftsstelle oder schriftliche Anfrage gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen, https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html; Gebühr: nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (beschlossen 21.05.2026) NICHT online — nur Einsicht in der Geschäftsstelle oder schriftliche Anfrage gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen, https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html; Gebühr: nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), gutachterausschuss@landkreis-mittelsachsen.de, 03733 831-4184",
+    "url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-mittelsachsen.de/das-amt/ressorts/geschaeftsstelle-gutachterausschuss.html",
+  "gebuehr": "nach Gebührenordnung (schriftliche Anfrage); Einsicht in der Geschäftsstelle Döbeln; mündliche Auskunft kostenfrei"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14523",
+  "ebene": "kreis",
+  "gebiet_name": "Vogtlandkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2025 (177 Seiten, frei abrufbar) Kap. 6.5 „Vergleichsfaktoren für bebaute Grundstücke“ (S. 141–142) erklärt nur die Begriffe Gebäude- und Ertragsfaktor; abgeleitet sind Ertragsfaktoren für Renditeobjekte. Die €/m²-Tabellen der Kap. 4/5 sind Mittelwerte je Baujahrsklasse/Lage/Sanierungsgrad ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor). Zusätzlich genehmigungspflichtig (Impressum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Vogtlandkreis, https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2025 (177 Seiten, frei abrufbar) Kap. 6.5 „Vergleichsfaktoren für bebaute Grundstücke“ (S. 141–142) erklärt nur die Begriffe Gebäude- und Ertragsfaktor; abgeleitet sind Ertragsfaktoren für Renditeobjekte. Die €/m²-Tabellen der Kap. 4/5 sind Mittelwerte je Baujahrsklasse/Lage/Sanierungsgrad ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor). Zusätzlich genehmigungspflichtig (Impressum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Vogtlandkreis, https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Vogtlandkreis 2025, Kap. 6.5 (S. 141–142); Impressum S. 2",
+    "url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14523",
+  "ebene": "kreis",
+  "gebiet_name": "Vogtlandkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2025 (177 Seiten, frei abrufbar) Kap. 6.5 „Vergleichsfaktoren für bebaute Grundstücke“ (S. 141–142) erklärt nur die Begriffe Gebäude- und Ertragsfaktor; abgeleitet sind Ertragsfaktoren für Renditeobjekte. Die €/m²-Tabellen der Kap. 4/5 sind Mittelwerte je Baujahrsklasse/Lage/Sanierungsgrad ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor). Zusätzlich genehmigungspflichtig (Impressum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Vogtlandkreis, https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2025 (177 Seiten, frei abrufbar) Kap. 6.5 „Vergleichsfaktoren für bebaute Grundstücke“ (S. 141–142) erklärt nur die Begriffe Gebäude- und Ertragsfaktor; abgeleitet sind Ertragsfaktoren für Renditeobjekte. Die €/m²-Tabellen der Kap. 4/5 sind Mittelwerte je Baujahrsklasse/Lage/Sanierungsgrad ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor). Zusätzlich genehmigungspflichtig (Impressum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Vogtlandkreis, https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Vogtlandkreis 2025, Kap. 6.5 (S. 141–142); Impressum S. 2",
+    "url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14523",
+  "ebene": "kreis",
+  "gebiet_name": "Vogtlandkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2025 (177 Seiten, frei abrufbar) Kap. 6.5 „Vergleichsfaktoren für bebaute Grundstücke“ (S. 141–142) erklärt nur die Begriffe Gebäude- und Ertragsfaktor; abgeleitet sind Ertragsfaktoren für Renditeobjekte. Die €/m²-Tabellen der Kap. 4/5 sind Mittelwerte je Baujahrsklasse/Lage/Sanierungsgrad ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor). Zusätzlich genehmigungspflichtig (Impressum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Vogtlandkreis, https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2025 (177 Seiten, frei abrufbar) Kap. 6.5 „Vergleichsfaktoren für bebaute Grundstücke“ (S. 141–142) erklärt nur die Begriffe Gebäude- und Ertragsfaktor; abgeleitet sind Ertragsfaktoren für Renditeobjekte. Die €/m²-Tabellen der Kap. 4/5 sind Mittelwerte je Baujahrsklasse/Lage/Sanierungsgrad ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor). Zusätzlich genehmigungspflichtig (Impressum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Vogtlandkreis, https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Vogtlandkreis 2025, Kap. 6.5 (S. 141–142); Impressum S. 2",
+    "url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14524",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Zwickau",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die frei abrufbare „öffentliche Fassung in gekürzter Version“ des Grundstücksmarktberichts 2026 erklärt in Kap. 6.5 (S. 132) nur Gebäude- und Ertragsfaktoren; die abgedruckten „Gebäudefaktoren“ (Kap. 4, ab S. 56) sind Mittelwerte/Mediane je Baujahr, Restnutzungsdauer/Sanierungsgrad und Lageklasse ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor; die Lageklasse ist zudem aus dem Gemeindeschlüssel nicht bestimmbar). Die Vollversion kostet 140,00 €; außerdem genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Zwickau, https://www.landkreis-zwickau.de/detail?type=BHW&id=152; Gebühr: 140,00 € (Vollversion, Impressum S. 2). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Die frei abrufbare „öffentliche Fassung in gekürzter Version“ des Grundstücksmarktberichts 2026 erklärt in Kap. 6.5 (S. 132) nur Gebäude- und Ertragsfaktoren; die abgedruckten „Gebäudefaktoren“ (Kap. 4, ab S. 56) sind Mittelwerte/Mediane je Baujahr, Restnutzungsdauer/Sanierungsgrad und Lageklasse ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor; die Lageklasse ist zudem aus dem Gemeindeschlüssel nicht bestimmbar). Die Vollversion kostet 140,00 €; außerdem genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Zwickau, https://www.landkreis-zwickau.de/detail?type=BHW&id=152; Gebühr: 140,00 € (Vollversion, Impressum S. 2). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Landkreis Zwickau 2026, Kap. 6.5 (S. 132), Tabellen „Gebäudefaktor“ Kap. 4 (S. 56 ff.); Impressum S. 2 (Gebühr 140,00 €)",
+    "url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-zwickau.de/detail?type=BHW&id=152",
+  "gebuehr": "140,00 € (Vollversion, Impressum S. 2)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14524",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Zwickau",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die frei abrufbare „öffentliche Fassung in gekürzter Version“ des Grundstücksmarktberichts 2026 erklärt in Kap. 6.5 (S. 132) nur Gebäude- und Ertragsfaktoren; die abgedruckten „Gebäudefaktoren“ (Kap. 4, ab S. 56) sind Mittelwerte/Mediane je Baujahr, Restnutzungsdauer/Sanierungsgrad und Lageklasse ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor; die Lageklasse ist zudem aus dem Gemeindeschlüssel nicht bestimmbar). Die Vollversion kostet 140,00 €; außerdem genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Zwickau, https://www.landkreis-zwickau.de/detail?type=BHW&id=152; Gebühr: 140,00 € (Vollversion, Impressum S. 2). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Die frei abrufbare „öffentliche Fassung in gekürzter Version“ des Grundstücksmarktberichts 2026 erklärt in Kap. 6.5 (S. 132) nur Gebäude- und Ertragsfaktoren; die abgedruckten „Gebäudefaktoren“ (Kap. 4, ab S. 56) sind Mittelwerte/Mediane je Baujahr, Restnutzungsdauer/Sanierungsgrad und Lageklasse ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor; die Lageklasse ist zudem aus dem Gemeindeschlüssel nicht bestimmbar). Die Vollversion kostet 140,00 €; außerdem genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Zwickau, https://www.landkreis-zwickau.de/detail?type=BHW&id=152; Gebühr: 140,00 € (Vollversion, Impressum S. 2). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Landkreis Zwickau 2026, Kap. 6.5 (S. 132), Tabellen „Gebäudefaktor“ Kap. 4 (S. 56 ff.); Impressum S. 2 (Gebühr 140,00 €)",
+    "url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-zwickau.de/detail?type=BHW&id=152",
+  "gebuehr": "140,00 € (Vollversion, Impressum S. 2)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14524",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Zwickau",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die frei abrufbare „öffentliche Fassung in gekürzter Version“ des Grundstücksmarktberichts 2026 erklärt in Kap. 6.5 (S. 132) nur Gebäude- und Ertragsfaktoren; die abgedruckten „Gebäudefaktoren“ (Kap. 4, ab S. 56) sind Mittelwerte/Mediane je Baujahr, Restnutzungsdauer/Sanierungsgrad und Lageklasse ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor; die Lageklasse ist zudem aus dem Gemeindeschlüssel nicht bestimmbar). Die Vollversion kostet 140,00 €; außerdem genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Zwickau, https://www.landkreis-zwickau.de/detail?type=BHW&id=152; Gebühr: 140,00 € (Vollversion, Impressum S. 2). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Die frei abrufbare „öffentliche Fassung in gekürzter Version“ des Grundstücksmarktberichts 2026 erklärt in Kap. 6.5 (S. 132) nur Gebäude- und Ertragsfaktoren; die abgedruckten „Gebäudefaktoren“ (Kap. 4, ab S. 56) sind Mittelwerte/Mediane je Baujahr, Restnutzungsdauer/Sanierungsgrad und Lageklasse ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20: kein Vergleichsfaktor; die Lageklasse ist zudem aus dem Gemeindeschlüssel nicht bestimmbar). Die Vollversion kostet 140,00 €; außerdem genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Zwickau, https://www.landkreis-zwickau.de/detail?type=BHW&id=152; Gebühr: 140,00 € (Vollversion, Impressum S. 2). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Landkreis Zwickau 2026, Kap. 6.5 (S. 132), Tabellen „Gebäudefaktor“ Kap. 4 (S. 56 ff.); Impressum S. 2 (Gebühr 140,00 €)",
+    "url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-zwickau.de/detail?type=BHW&id=152",
+  "gebuehr": "140,00 € (Vollversion, Impressum S. 2)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14612",
+  "ebene": "kreis",
+  "gebiet_name": "Dresden, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (119 Seiten): Volltext „Vergleichsfaktor“ nur in der allgemeinen Aufgabenbeschreibung (S. 2). Für den individuellen Wohnungsbau führt Kap. 7.2.1 Umrechnungskoeffizienten für den BODENWERT, keinen Vergleichsfaktor für Häuser. (ETW-Sperre steht in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (119 Seiten): Volltext „Vergleichsfaktor“ nur in der allgemeinen Aufgabenbeschreibung (S. 2). Für den individuellen Wohnungsbau führt Kap. 7.2.1 Umrechnungskoeffizienten für den BODENWERT, keinen Vergleichsfaktor für Häuser. (ETW-Sperre steht in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke … (Impressum S. 2, im Textstrom abgeschnitten; vollständiger Wortlaut im Dokument)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Dresden 2026, Kap. 7.2.1 (S. 67 ff.), Aufgabenbeschreibung S. 2",
+    "url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14612",
+  "ebene": "kreis",
+  "gebiet_name": "Dresden, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (119 Seiten): Volltext „Vergleichsfaktor“ nur in der allgemeinen Aufgabenbeschreibung (S. 2). Für den individuellen Wohnungsbau führt Kap. 7.2.1 Umrechnungskoeffizienten für den BODENWERT, keinen Vergleichsfaktor für Häuser. (ETW-Sperre steht in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (119 Seiten): Volltext „Vergleichsfaktor“ nur in der allgemeinen Aufgabenbeschreibung (S. 2). Für den individuellen Wohnungsbau führt Kap. 7.2.1 Umrechnungskoeffizienten für den BODENWERT, keinen Vergleichsfaktor für Häuser. (ETW-Sperre steht in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Copyright Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke … (Impressum S. 2, im Textstrom abgeschnitten; vollständiger Wortlaut im Dokument)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Dresden 2026, Kap. 7.2.1 (S. 67 ff.), Aufgabenbeschreibung S. 2",
+    "url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713",
+  "ebene": "kreis",
+  "gebiet_name": "Leipzig, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Marktbericht 2026: Volltextsuche nach „Vergleichsfaktor“ über alle 100 Seiten ergibt nur die allgemeine Aufgabenbeschreibung (S. 10) — kein Vergleichsfaktor für Ein-/Zweifamilien-, Reihen- oder Doppelhäuser (Befund der Ost-Nachernte, ETW-Satz in ost-nachernte-2026-10.json). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, https://www.gutachterausschuss.leipzig.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Marktbericht 2026: Volltextsuche nach „Vergleichsfaktor“ über alle 100 Seiten ergibt nur die allgemeine Aufgabenbeschreibung (S. 10) — kein Vergleichsfaktor für Ein-/Zweifamilien-, Reihen- oder Doppelhäuser (Befund der Ost-Nachernte, ETW-Satz in ost-nachernte-2026-10.json). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, https://www.gutachterausschuss.leipzig.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.gutachterausschuss.leipzig.de",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "siehe ETW-Satz in ost-nachernte-2026-10.json (Marktbericht 2026 kostenpflichtig)",
+  "belege": [
+   {
+    "fundstelle": "Marktbericht 2026 der Stadt Leipzig, S. 10 (Befund ost-nachernte-2026-10.json, ETW-Satz)",
+    "url": "https://www.gutachterausschuss.leipzig.de",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713",
+  "ebene": "kreis",
+  "gebiet_name": "Leipzig, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Marktbericht 2026: Volltextsuche nach „Vergleichsfaktor“ über alle 100 Seiten ergibt nur die allgemeine Aufgabenbeschreibung (S. 10) — kein Vergleichsfaktor für Ein-/Zweifamilien-, Reihen- oder Doppelhäuser (Befund der Ost-Nachernte, ETW-Satz in ost-nachernte-2026-10.json). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, https://www.gutachterausschuss.leipzig.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Marktbericht 2026: Volltextsuche nach „Vergleichsfaktor“ über alle 100 Seiten ergibt nur die allgemeine Aufgabenbeschreibung (S. 10) — kein Vergleichsfaktor für Ein-/Zweifamilien-, Reihen- oder Doppelhäuser (Befund der Ost-Nachernte, ETW-Satz in ost-nachernte-2026-10.json). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, https://www.gutachterausschuss.leipzig.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.gutachterausschuss.leipzig.de",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "siehe ETW-Satz in ost-nachernte-2026-10.json (Marktbericht 2026 kostenpflichtig)",
+  "belege": [
+   {
+    "fundstelle": "Marktbericht 2026 der Stadt Leipzig, S. 10 (Befund ost-nachernte-2026-10.json, ETW-Satz)",
+    "url": "https://www.gutachterausschuss.leipzig.de",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14625",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Bautzen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2026: Vergleichsfaktoren (Immobilienrichtwert) nur für Ein- und Zweifamilienhäuser (Kap. 10.6, S. 84–85); für diese Objektart keiner. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Bautzen, https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2026: Vergleichsfaktoren (Immobilienrichtwert) nur für Ein- und Zweifamilienhäuser (Kap. 10.6, S. 84–85); für diese Objektart keiner. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Bautzen, https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Landkreis Bautzen Stand 01.01.2026, Kap. 10.6 (S. 84–85), Impressum S. 2",
+    "url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14625",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Bautzen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2026 (beschlossen 15.06.2026), Kap. 10.6 „Immobilienrichtwert für Ein- und Zweifamilienhäuser“ (S. 84–85): Regression IRW = ((k1×Grundstücksgröße)+(k2×BRW)+(k3×Wohnfläche)+(k4×Keller 1/2/3)+(k5×Ausstattungsstandard 1–5)+(k6×RND)+(k7×Vertragsjahr)+K)×1.000, 511 Kauffälle 2022–2025, R² 0,77, Normobjekt ohne Nebengebäude, mittlere Lage der BRW-Zone. Das Impressum erlaubt Verwertung für nichteigene oder wirtschaftliche Zwecke nur mit Erlaubnis — ein Kundenbericht ist das. Zusätzlich verlangt das Modell das Vertragsjahr und einen eigenen Ausstattungsstandard (1–5, nicht die Standardstufe nach Anlage 4), die DealPilot nicht führt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Bautzen, https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2026 (beschlossen 15.06.2026), Kap. 10.6 „Immobilienrichtwert für Ein- und Zweifamilienhäuser“ (S. 84–85): Regression IRW = ((k1×Grundstücksgröße)+(k2×BRW)+(k3×Wohnfläche)+(k4×Keller 1/2/3)+(k5×Ausstattungsstandard 1–5)+(k6×RND)+(k7×Vertragsjahr)+K)×1.000, 511 Kauffälle 2022–2025, R² 0,77, Normobjekt ohne Nebengebäude, mittlere Lage der BRW-Zone. Das Impressum erlaubt Verwertung für nichteigene oder wirtschaftliche Zwecke nur mit Erlaubnis — ein Kundenbericht ist das. Zusätzlich verlangt das Modell das Vertragsjahr und einen eigenen Ausstattungsstandard (1–5, nicht die Standardstufe nach Anlage 4), die DealPilot nicht führt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Bautzen, https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Landkreis Bautzen Stand 01.01.2026, Kap. 10.6 (S. 84–85), Impressum S. 2",
+    "url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14625",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Bautzen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2026: Vergleichsfaktoren (Immobilienrichtwert) nur für Ein- und Zweifamilienhäuser (Kap. 10.6, S. 84–85); für diese Objektart keiner. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Bautzen, https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2026: Vergleichsfaktoren (Immobilienrichtwert) nur für Ein- und Zweifamilienhäuser (Kap. 10.6, S. 84–85); für diese Objektart keiner. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Bautzen, https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Landkreis Bautzen Stand 01.01.2026, Kap. 10.6 (S. 84–85), Impressum S. 2",
+    "url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-bautzen.de/landratsamt/organisation/geschaeftsstelle-gutachterausschuss/142"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14626",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Görlitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Görlitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Grundstücksmarktbericht online (frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de). Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Görlitz, https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50; Gebühr: unbekannt — bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Grundstücksmarktbericht online (frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de). Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Görlitz, https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50; Gebühr: unbekannt — bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle 02806 Görlitz",
+    "url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+  "gebuehr": "unbekannt — bei der Geschäftsstelle zu erfragen"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14626",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Görlitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Görlitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Grundstücksmarktbericht online (frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de). Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Görlitz, https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50; Gebühr: unbekannt — bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Grundstücksmarktbericht online (frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de). Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Görlitz, https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50; Gebühr: unbekannt — bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle 02806 Görlitz",
+    "url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+  "gebuehr": "unbekannt — bei der Geschäftsstelle zu erfragen"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14626",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Görlitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Görlitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Grundstücksmarktbericht online (frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de). Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Görlitz, https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50; Gebühr: unbekannt — bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Grundstücksmarktbericht online (frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de). Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Görlitz, https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50; Gebühr: unbekannt — bei der Geschäftsstelle zu erfragen. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle 02806 Görlitz",
+    "url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50",
+  "gebuehr": "unbekannt — bei der Geschäftsstelle zu erfragen"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14627",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Meißen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Meißen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die frei abrufbare „Marktinformation 2026“ (40 Seiten, Stand 01.01.2026) nennt Vergleichsfaktoren nur in der Aufgabenbeschreibung (S. 13) und führt sonst Preisübersichten (Medianwerte, Tab. 18) ohne Normobjekt — kein Vergleichsfaktor nach § 20 ImmoWertV. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Meißen, https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Die frei abrufbare „Marktinformation 2026“ (40 Seiten, Stand 01.01.2026) nennt Vergleichsfaktoren nur in der Aufgabenbeschreibung (S. 13) und führt sonst Preisübersichten (Medianwerte, Tab. 18) ohne Normobjekt — kein Vergleichsfaktor nach § 20 ImmoWertV. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Meißen, https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Marktinformation 2026 Landkreis Meißen, S. 13 und Tab. 18; Impressum S. 2",
+    "url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14627",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Meißen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Meißen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die frei abrufbare „Marktinformation 2026“ (40 Seiten, Stand 01.01.2026) nennt Vergleichsfaktoren nur in der Aufgabenbeschreibung (S. 13) und führt sonst Preisübersichten (Medianwerte, Tab. 18) ohne Normobjekt — kein Vergleichsfaktor nach § 20 ImmoWertV. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Meißen, https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Die frei abrufbare „Marktinformation 2026“ (40 Seiten, Stand 01.01.2026) nennt Vergleichsfaktoren nur in der Aufgabenbeschreibung (S. 13) und führt sonst Preisübersichten (Medianwerte, Tab. 18) ohne Normobjekt — kein Vergleichsfaktor nach § 20 ImmoWertV. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Meißen, https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Marktinformation 2026 Landkreis Meißen, S. 13 und Tab. 18; Impressum S. 2",
+    "url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14627",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Meißen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Meißen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Die frei abrufbare „Marktinformation 2026“ (40 Seiten, Stand 01.01.2026) nennt Vergleichsfaktoren nur in der Aufgabenbeschreibung (S. 13) und führt sonst Preisübersichten (Medianwerte, Tab. 18) ohne Normobjekt — kein Vergleichsfaktor nach § 20 ImmoWertV. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Meißen, https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Die frei abrufbare „Marktinformation 2026“ (40 Seiten, Stand 01.01.2026) nennt Vergleichsfaktoren nur in der Aufgabenbeschreibung (S. 13) und führt sonst Preisübersichten (Medianwerte, Tab. 18) ohne Normobjekt — kein Vergleichsfaktor nach § 20 ImmoWertV. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Meißen, https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+  "belege": [
+   {
+    "fundstelle": "Marktinformation 2026 Landkreis Meißen, S. 13 und Tab. 18; Impressum S. 2",
+    "url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14628",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Sächsische Schweiz-Osterzgebirge",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: Kap. 6.8.2 „Wohnungseigentum — Vergleichspreisermittlung auf Grundlage von Immobilienrichtwerten“ (S. 152–157): Richtwert 1.290 €/m² Wohnfläche, Umrechnungskoeffizienten Geschosslage, Raumanzahl, Bodenwertniveau, Kaufzeitpunkt, Balkon/Terrasse, Stellplatz, Wohnfläche, Modernisierungstyp und Gebäudealter (Polynom), 3.022 Kauffälle 2015–2025. Genehmigungsvorbehalt im Impressum; Geschosslage, Raumanzahl, Balkon, Stellplatz und Modernisierungstyp führt DealPilot nicht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge, https://www.landratsamt-pirna.de/gs-gutachterausschuss.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: Kap. 6.8.2 „Wohnungseigentum — Vergleichspreisermittlung auf Grundlage von Immobilienrichtwerten“ (S. 152–157): Richtwert 1.290 €/m² Wohnfläche, Umrechnungskoeffizienten Geschosslage, Raumanzahl, Bodenwertniveau, Kaufzeitpunkt, Balkon/Terrasse, Stellplatz, Wohnfläche, Modernisierungstyp und Gebäudealter (Polynom), 3.022 Kauffälle 2015–2025. Genehmigungsvorbehalt im Impressum; Geschosslage, Raumanzahl, Balkon, Stellplatz und Modernisierungstyp führt DealPilot nicht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge, https://www.landratsamt-pirna.de/gs-gutachterausschuss.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Landkreis Sächsische Schweiz-Osterzgebirge, Kap. 6.8.1 (S. 144–151) und 6.8.2 (S. 152–157); Impressum S. 2",
+    "url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landratsamt-pirna.de/gs-gutachterausschuss.html"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14628",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Sächsische Schweiz-Osterzgebirge",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: Grundstücksmarktbericht 2026 (veröffentlicht 05.06.2026) Kap. 6.8.1 „Vergleichspreisermittlung auf Grundlage von Immobilienrichtwerten“ (S. 144–151): Richtwert 1.680 €/m² Wohnfläche, Umrechnungskoeffizienten Kaufzeitpunkt, Bodenwertniveau, Wohnflächenklasse, Grundstücksflächenklasse, Gebäudeart (freistehend 1,00 / DHH 0,91 / RMH 0,85 / REH 0,89), Modernisierungstyp, überdachter Stellplatz und Gebäudealter (Polynom), Anwendungsbeispiel S. 148 (2.295 €/m²). Impressum: „Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.“ Außerdem verlangt das Modell Kaufzeitpunkt, Modernisierungstyp und Stellplatz — Merkmale, die DealPilot nicht führt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge, https://www.landratsamt-pirna.de/gs-gutachterausschuss.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: Grundstücksmarktbericht 2026 (veröffentlicht 05.06.2026) Kap. 6.8.1 „Vergleichspreisermittlung auf Grundlage von Immobilienrichtwerten“ (S. 144–151): Richtwert 1.680 €/m² Wohnfläche, Umrechnungskoeffizienten Kaufzeitpunkt, Bodenwertniveau, Wohnflächenklasse, Grundstücksflächenklasse, Gebäudeart (freistehend 1,00 / DHH 0,91 / RMH 0,85 / REH 0,89), Modernisierungstyp, überdachter Stellplatz und Gebäudealter (Polynom), Anwendungsbeispiel S. 148 (2.295 €/m²). Impressum: „Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.“ Außerdem verlangt das Modell Kaufzeitpunkt, Modernisierungstyp und Stellplatz — Merkmale, die DealPilot nicht führt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge, https://www.landratsamt-pirna.de/gs-gutachterausschuss.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Landkreis Sächsische Schweiz-Osterzgebirge, Kap. 6.8.1 (S. 144–151) und 6.8.2 (S. 152–157); Impressum S. 2",
+    "url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landratsamt-pirna.de/gs-gutachterausschuss.html"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14628",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Sächsische Schweiz-Osterzgebirge",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: dasselbe Immobilienrichtwert-Modell wie für Einfamilienhäuser (Kap. 6.8.1, S. 144–151) mit Umrechnungskoeffizient Gebäudeart (DHH 0,91, Reihenmittelhaus 0,85, Reihenendhaus 0,89). Genehmigungsvorbehalt im Impressum; Kaufzeitpunkt, Modernisierungstyp und Stellplatz führt DealPilot nicht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge, https://www.landratsamt-pirna.de/gs-gutachterausschuss.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument: dasselbe Immobilienrichtwert-Modell wie für Einfamilienhäuser (Kap. 6.8.1, S. 144–151) mit Umrechnungskoeffizient Gebäudeart (DHH 0,91, Reihenmittelhaus 0,85, Reihenendhaus 0,89). Genehmigungsvorbehalt im Impressum; Kaufzeitpunkt, Modernisierungstyp und Stellplatz führt DealPilot nicht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge, https://www.landratsamt-pirna.de/gs-gutachterausschuss.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Landkreis Sächsische Schweiz-Osterzgebirge, Kap. 6.8.1 (S. 144–151) und 6.8.2 (S. 152–157); Impressum S. 2",
+    "url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landratsamt-pirna.de/gs-gutachterausschuss.html"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14729",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Leipzig",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe auf schriftlichen Antrag gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Leipzig, https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses; Gebühr: 70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe auf schriftlichen Antrag gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Leipzig, https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses; Gebühr: 70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle Borna",
+    "url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+  "gebuehr": "70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14729",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Leipzig",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe auf schriftlichen Antrag gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Leipzig, https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses; Gebühr: 70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe auf schriftlichen Antrag gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Leipzig, https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses; Gebühr: 70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle Borna",
+    "url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+  "gebuehr": "70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14729",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Leipzig",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe auf schriftlichen Antrag gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Leipzig, https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses; Gebühr: 70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe auf schriftlichen Antrag gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Leipzig, https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses; Gebühr: 70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), Geschäftsstelle Borna",
+    "url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreisleipzig.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-des-gutachterausschusses",
+  "gebuehr": "70 bis 167 € für den aktuellen Bericht, ältere Jahrgänge die Hälfte (Gutachterausschusssatzung)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14730",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Nordsachsen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen, https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss; Gebühr: 60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen, https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss; Gebühr: 60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), gutachterausschuss@lra-nordsachsen.de",
+    "url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+  "gebuehr": "60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14730",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Nordsachsen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen, https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss; Gebühr: 60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen, https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss; Gebühr: 60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), gutachterausschuss@lra-nordsachsen.de",
+    "url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+  "gebuehr": "60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen)"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14730",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Nordsachsen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Bericht online; Abgabe gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen, https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss; Gebühr: 60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Bericht online; Abgabe gegen Gebühr. Ob er Vergleichsfaktoren führt, ist nicht feststellbar. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen, https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss; Gebühr: 60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "kostenpflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "Kein Lizenzwortlaut messbar — es liegt kein frei abrufbarer Bericht vor (Ernte 27.10.2026; Stand der Länderlinie 05.10.2026). Sachsen ist bei allen gemessenen Berichten genehmigungspflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Kontaktliste der sächsischen Gutachterausschüsse (KontaktdatenGAA.pdf, S. 1), gutachterausschuss@lra-nordsachsen.de",
+    "url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.landkreis-nordsachsen.de/was-erledige-ich-wo/dezernat/geschaeftsstelle-gutachterausschuss",
+  "gebuehr": "60,00 € aktueller Bericht, 30,00 € ältere Jahrgänge (Amtsblatt Nordsachsen)"
+ }
+]

@@ -656,7 +656,7 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
   > neunzehn für lückenhaft. **Neue Sätze tragen `gnd_jahre`** — und sie
   > tragen sie am SACHWERTFAKTOR, nicht am Zinssatz: `modell_gnd_jahre`
   > wird nur im Sachwert-Zweig gelesen (`CrossCheckService.js:372`).
-- **Der Baupreisindex ist korrigiert, aber immer noch eine Konstante.**
+- **Der Baupreisindex ist korrigiert, aber immer noch eine Konstante.** *(Stand bis v2995 — seit v2996 nach Stichtag aus der Destatis-Tabelle, `lib/baupreisindex.js`, August 2026 = 2,00.)*
   Bis v1406 stand dort `2.02`; gemessen sagen **zwei** unabhängige amtliche
   Quellen zum 01.01.2026 etwas anderes — Hamburg **1,911**, Dortmund
   **1,906**. Seit **v1407** steht dort `1.91`, und der Sachwert fällt rund
@@ -683,7 +683,16 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
   dann „Baupreisindex zum Wertermittlungsstichtag (Modell des Ausschusses:
   Index zum Kaufzeitpunkt)". **Ohne Bezugszeitpunkt** („Baupreisindex des
   Statistischen Bundesamtes", Ludwigslust-Parchim, Böblingen, Lahr) bleibt
-  es eine Sperre.
+  es eine Sperre — **gilt für neu geerntete Sätze.**
+
+  > **Entscheidung 27.10.2026 (Marcel: „so umsetzen, dass es passt"):** Die
+  > rund 420 Bestandssätze, deren Modell den Index gar nicht nennt, bleiben
+  > Werte. Nennt ein Ausschuss keinen abweichenden Bezug, gilt der Regelfall
+  > des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — genau so
+  > rechnet DealPilot. Gesperrt wird nur, wo das Modell einen ANDEREN,
+  > unbekannten Bezug nahelegt. Der Index selbst kommt seit v2996 nach
+  > Stichtag aus der Destatis-Tabelle (`lib/baupreisindex.js`), nicht mehr
+  > als Konstante 1,91.
 - **Die NRW-Bewirtschaftungskosten sind stichtagsabhängig** — das AGVGA-Modell
   schreibt die Ausgangswerte von 2002 über den VPI fort. Das hinterlegte Paar
   gilt nur für den 01.01.2015.

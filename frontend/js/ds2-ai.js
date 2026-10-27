@@ -91,11 +91,12 @@
     function v(id) { var e = document.getElementById(id); return e ? e.value : ''; }
     function n(id) { return (typeof parseDe === 'function') ? parseDe(v(id)) : (parseFloat(v(id)) || 0); }
 
-    // V44: Beste verfügbare Bewertung — Bankbewertung > Sachverständigenwert > Kaufpreis
-    var bankval = n('bankval');
-    var svwert  = n('svwert');
+    // v3003a: EINE Wertangabe (wertangabe.js) statt Bank vor Verkehrswert - dieselbe Regel wie calc.js
+    var _wa = window.DpWertangabe ? window.DpWertangabe.aufloesen(window.DpWertangabe.ausFormular()) : { wert: n('svwert') || n('bankval'), herkunft: null };
+    var bankval = _wa.herkunft === 'bank' ? _wa.wert : null;
+    var svwert  = _wa.herkunft !== 'bank' ? _wa.wert : null;
     var kp      = n('kp');
-    var bewertung = bankval || svwert || kp;
+    var bewertung = (_wa.wert && _wa.herkunft !== 'indikation') ? _wa.wert : kp;
 
     var ctx = {
       adresse: [v('str') + ' ' + v('hnr'), v('plz') + ' ' + v('ort')]
@@ -658,7 +659,8 @@ async function ds2AiSuggestAllLage() {
   function v(id) { var e = document.getElementById(id); return e ? e.value : ''; }
   function n(id) { return (typeof parseDe === 'function') ? parseDe(v(id)) : (parseFloat(v(id)) || 0); }
 
-  var bankval = n('bankval'), svwert = n('svwert'), kp = n('kp');
+  var _wa2 = window.DpWertangabe ? window.DpWertangabe.aufloesen(window.DpWertangabe.ausFormular()) : { wert: n('svwert') || n('bankval'), herkunft: null };   /* v3003a */
+  var bankval = _wa2.herkunft === 'bank' ? _wa2.wert : null, svwert = _wa2.herkunft !== 'bank' ? _wa2.wert : null, kp = n('kp');
   var ctx = {
     adresse: [v('str') + ' ' + v('hnr'), v('plz') + ' ' + v('ort')]
       .map(function(s) { return s.trim(); }).filter(Boolean).join(', '),
@@ -673,7 +675,7 @@ async function ds2AiSuggestAllLage() {
     nettokaltmiete: n('nkm'),
     makrolage: v('makrolage'),
     mikrolage: v('mikrolage'),
-    bewertung: bankval || svwert || kp,
+    bewertung: (_wa2.wert && _wa2.herkunft !== 'indikation') ? _wa2.wert : kp,
     bankbewertung: bankval || null,
     sachverstaendigenwert: svwert || null
   };

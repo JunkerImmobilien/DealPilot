@@ -118,8 +118,22 @@
   window._hasAnyInvDetail = _hasAnyDetail;
 
   // Initial-Sync nach DOM ready + bei Storage-Load
+  /* v3006c · Hinweis am Inventarfeld: die Grunderwerbsteuer rechnet DealPilot seit v3006c auf
+     den Kaufpreis ohne Inventar (§ 2 GrEStG) - das traegt nur, wenn der Vertrag es ausweist.
+     Hier statt in index.html, weil der Hinweis zur Rechnung gehoert, nicht zum Layout. */
+  function _grestHinweis(){
+    var m = document.getElementById('moebl');
+    var f = m && m.closest ? m.closest('.f') : null;
+    if (!f || f.querySelector('[data-grest-hinweis]')) return;
+    var s = document.createElement('span');
+    s.className = 'hint'; s.setAttribute('data-grest-hinweis', '1');
+    s.style.cssText = 'font-size:11px;display:block;margin-top:2px';
+    s.textContent = 'Inventar ist grunderwerbsteuerfrei, wenn es im Kaufvertrag gesondert und angemessen ausgewiesen ist.';
+    f.appendChild(s);
+  }
   function _init(){
     _syncInventarToMoebl();
+    try { _grestHinweis(); } catch (e) {}
   }
   document.addEventListener('DOMContentLoaded', _init);
   if (document.readyState === 'complete' || document.readyState === 'interactive') {

@@ -20,9 +20,23 @@
 import { q } from '../lib/db.js';
 /* v1816 · der Weg zum Register. Kein Ringschluss: gutachterausschuss.js
    und ausschuss_register.js kennen diesen Dienst nicht (gegengeprueft). */
-import { finde as regFinde, lagenFuer as regLagen, findeZweig as regFindeZweig } from '../lib/ausschuss_register.js';
+import { finde as regFinde, lagenFuer as regLagen, findeZweig as regFindeZweig, mitRegisterStichtag } from '../lib/ausschuss_register.js';   /* v3010 */
 import { liegenschaftszinssatz as regZins } from '../lib/gutachterausschuss.js';
 import { zinssatzFuerObjekt } from '../lib/zweigwahl.js';
+import { lzsAnpassung } from '../lib/lzs_anpassung.js';   /* v3009 · W3 · § 33 ImmoWertV */
+
+/* v3009 · W3 · der objektspezifisch angepasste Zins (§ 33, § 34 Abs. 1): nur mit der Funktion bzw.
+   den Koeffizienten DESSELBEN Registersatzes, nur innerhalb seiner Tabellen (lib/lzs_anpassung.js). */
+function _lzsAnpassungFuer(reg, ags, brwSqm, objekt, stichtag = null) {
+  try {
+    const satz = mitRegisterStichtag(stichtag, () => regFindeZweig('liegenschaftszinssatz', String(ags), reg.zweig, reg.lage || null));   /* v3010: derselbe Jahrgang */
+    const o = objekt || {};
+    return lzsAnpassung({ satz, wert_pct: reg.wert_pct, roh: reg.roh || null, eingabe: {
+      restnutzungsdauer: o.restnutzungsdauer ?? null, bodenrichtwert: brwSqm ?? null,
+      miete_qm: o.miete_qm ?? null, gewerbeanteil_pct: o.gewerbeanteil_pct ?? null,
+      nutzflaechenanteil_pct: o.nutzflaechenanteil_pct ?? null, gemeinde: o.gemeinde || null } });
+  } catch (e) { return null; }
+}
 import { lzsNach256, MODELL } from '../lib/immowertv.js';
 import { stufeNachStreuung } from '../lib/nrw_modell.js';   /* v1048-WSTR-1 */
 /* v2401 · Stufe N - die DealPilot-Formel fuer den Liegenschaftszins */
@@ -329,12 +343,14 @@ export const WertParameterService = {
            amtlichen Zins. Den nehmen wir (Stufe A), mit Begruendung. Nur wenn es den
            nicht gibt, bleibt es beim Auffangwert. */
         try {
-          const regZ = zinssatzFuerObjekt(
+          const regZ = mitRegisterStichtag(stichtag, () => zinssatzFuerObjekt(   /* v3010 · Jahrgang zum Stichtag */
             { finde: regFinde, lagenFuer: regLagen, abruf: regZins },
-            String(ags), { ...(objekt || {}), objart: 'zfh', einheiten: _we });
+            String(ags), { ...(objekt || {}), objart: 'zfh', einheiten: _we }));
           if (regZ && regZ.verfuegbar) {
+            const _anpZ = _lzsAnpassungFuer(regZ, ags, brwSqm, objekt, stichtag);   /* v3009 · W3 */
             return {
-              wert: Number(regZ.wert_pct), min: null, max: null,
+              wert: (_anpZ && _anpZ.angepasst) ? Number(_anpZ.zins_pct) : Number(regZ.wert_pct), min: null, max: null,
+              anpassung: _anpZ || null,
               stufe: regZ.stufe || 'A', stufe_roh: regZ.stufe || 'A',
               quelle: regZ.quellenvermerk || regZ.ausschuss || 'Gutachterausschuss',
               quelle_url: regZ.quelle_url || null, parameter_id: null,
@@ -368,13 +384,15 @@ export const WertParameterService = {
     }
     if (typ === 'lzs' && ags) {
       try {
-        const reg = zinssatzFuerObjekt(
+        const reg = mitRegisterStichtag(stichtag, () => zinssatzFuerObjekt(   /* v3010 · Jahrgang zum Stichtag */
           { finde: regFinde, lagenFuer: regLagen, abruf: regZins },
           String(ags),
-          { objart: objektart, einheiten: anzahlWe, ...(objekt || {}) });
+          { objart: objektart, einheiten: anzahlWe, ...(objekt || {}) }));
         if (reg && reg.verfuegbar) {
+          const _anp = _lzsAnpassungFuer(reg, ags, brwSqm, objekt, stichtag);   /* v3009 · W3 */
           return {
-            wert: Number(reg.wert_pct), min: null, max: null,
+            wert: (_anp && _anp.angepasst) ? Number(_anp.zins_pct) : Number(reg.wert_pct), min: null, max: null,
+            anpassung: _anp || null,
             stufe: reg.stufe || 'A', stufe_roh: reg.stufe || 'A',
             quelle: reg.quellenvermerk || reg.ausschuss || 'Gutachterausschuss',
             quelle_url: reg.quelle_url || null,
@@ -1010,6 +1028,12 @@ export function zinsHerkunft(a) {
   const spanne = (st === 'N' && Number.isFinite(Number(a.pct_von)) && Number.isFinite(Number(a.pct_bis)))
     ? { pct_von: Number(a.pct_von), pct_bis: Number(a.pct_bis),
         spanne_deckung: Number.isFinite(Number(a.spanne_deckung)) ? Number(a.spanne_deckung) : null } : null;
+  /* v3009 · W3 · objektspezifisch angepasst (§ 33): „A, angepasst", nie „Stufe C" */
+  if (a.anpassung && a.anpassung.angepasst && !unterA) {
+    etikett = etikett + ' · A, angepasst (§ 33 ImmoWertV)';
+    klartext = (klartext ? klartext + ' ' : '') + 'Objektspezifisch angepasst mit '
+      + (a.anpassung.art === 'funktion' ? 'der Funktion' : 'den Umrechnungskoeffizienten') + ' desselben Gutachterausschusses.';
+  }
   return {
     ebene, etikett, klartext, unter_a: unterA, spanne,
     indikativ: unterA || ebene === 'eigene_angabe',
