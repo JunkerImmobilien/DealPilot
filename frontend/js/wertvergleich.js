@@ -61,6 +61,46 @@
   }
   var VERF = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' };
 
+  /* ══ v2979 · ANGABEN, DIE DEM BERICHT FEHLEN ═════════════════════════════
+     Marcel 27.10.2026: „auch drauf hinweisen, wenn Felder, die wichtig sind, nicht
+     ausgefüllt wurden". Gelesen wird das FORMULAR (dort trägt der Nutzer nach), nicht
+     der Bericht - der Hinweis gilt dem nächsten Bericht. Nur Felder, deren Fehlen
+     der Rechenkern nachweislich anders rechnen lässt:
+       Grundstücksfläche  -> kein Bodenwert (Haus)
+       Miteigentumsanteil -> kein Bodenwert (ETW, CLAUDE.md)
+       BGF                -> ETW kein Sachwert; Haus nur Näherung (CrossCheckService Pauschalansatz)
+       Zustand renovierungs-/sanierungsbedürftig ohne offenen Sanierungsbetrag
+                          -> kein Abzug nach § 8 Abs. 3 (Mapper bomAus; ab 12 Monaten
+                             nach Kauf gilt die Ankaufs-Sanierung als ausgeführt, v2952) */
+  function feld(id) { var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
+  function feldZahl(id) {
+    var s = feld(id).replace(/[^\d,.-]/g, ''); if (!s) return null;
+    var n = Number(s.indexOf(',') >= 0 ? s.replace(/\./g, '').replace(',', '.') : s);
+    return isFinite(n) ? n : null;
+  }
+  function fehlendeAngaben() {
+    var art = feld('objart').toUpperCase(), f = [];
+    if (!art) return '';
+    var etw = art === 'ETW', haus = /^(EFH|ZFH|MFH|DHH|RH)$/.test(art);
+    if (haus && !(feldZahl('gsfl') > 0)) f.push('<b>Grundstücksfläche</b> fehlt: ohne sie gibt es keinen Bodenwert, Sach- und Ertragswert bleiben unvollständig.');
+    if (etw && !(feldZahl('mea') > 0)) f.push('<b>Miteigentumsanteil</b> fehlt: ohne ihn gibt es keinen Bodenwert.');
+    if (etw && !(feldZahl('bgf') > 0)) f.push('<b>Brutto-Grundfläche der Wohnung</b> fehlt: ohne sie rechnet kein Sachwert.');
+    if (haus && !(feldZahl('bgf') > 0)) f.push('<b>Brutto-Grundfläche</b> fehlt: der Sachwert rechnet dann nur mit einer Näherung aus der Wohnfläche.');
+    var z = feld('ds2_zustand');
+    if (z === 'renovierungsbeduerftig' || z === 'stark_sanierungsbeduerftig') {
+      var zw = z === 'renovierungsbeduerftig' ? 'renovierungsbedürftig' : 'stark sanierungsbedürftig';
+      var san = feldZahl('san'), kd = Date.parse(feld('kaufdat')), bestand = isFinite(kd) && Date.now() - kd >= 365 * 864e5;
+      if (san > 0 && bestand) f.push('Zustand <b>„' + zw + '“</b>: der Kauf liegt über ein Jahr zurück, die Sanierungskosten aus dem Ankauf gelten deshalb als ausgeführt und werden nicht abgezogen. '
+        + 'Ist der Zustand noch aktuell, ist ein offener Instandsetzungsbedarf in Sach- und Ertragswert nicht berücksichtigt und beide liegen zu hoch. Ist saniert, stell den Zustand um.');
+      else if (!(san > 0)) f.push('Zustand <b>„' + zw + '“</b>, aber keine <b>Sanierungskosten</b> eingetragen (Reiter Investition): ein Instandsetzungsrückstand ist in Sach- und Ertragswert nicht abgezogen, beide liegen dann zu hoch.');
+    }
+    if (!f.length) return '';
+    return '<div class="dp-wv-fehlt"><b>Angaben, die dem Bericht fehlen</b>'
+      + '<ul>' + f.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>'
+      + '<span>Nach dem Nachtragen den Marktbericht neu erstellen, dann rechnen die Werte damit.</span></div>';
+  }
+
+
   function html(h) {
     var mw = zahl(h.market_value), lo = zahl(h.market_value_low), hi = zahl(h.market_value_high);
     if (mw == null) return '';
@@ -72,10 +112,11 @@
     var vw = zahl(h.irw_vergleichswert_eur);
     if (vw == null && h.vergleichsfaktor_amtlich) vw = zahl(h.vergleichswert_eur);
     var kp = kaufpreis(), fu = String(h.fuehrend || '');
+    var mfh = /mfh|mehrfam|wgh|wohn.*gesch|gewerbe/i.test(String(h.property_type || '')) || (fu === 'ertragswert' && h.sw_faktor_grund === 'objektart_nicht_abgeleitet');
     var ro = rohertrag(h);
 
-    function zeile(name, sub, a, m, b, fuehrend) {
-      var d = abw(m, mw);
+    function zeile(name, sub, a, m, b, fuehrend, ohneAbw) {
+      var d = ohneAbw ? null : abw(m, mw);
       return '<tr' + (fuehrend ? ' class="dp-wv-fuehrend"' : '') + '><td class="abw-wort">' + name
         + (fuehrend ? ' <span class="dp-wv-tag">führend</span>' : '')
         + (sub ? '<span class="dp-wv-sub">' + sub + '</span>' : '') + '</td>'
@@ -90,10 +131,17 @@
     if (mitAb) t += zeile('ohne Abschlag', 'Angebotsniveau, wie es im Markt ausgeschrieben ist', rohLo, roh, rohHi, false);
     if (ew != null) t += zeile(/vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert',
       (ewV != null ? 'Spanne aus dem Liegenschaftszins' : '') , ewV, ew, ewB, fu === 'ertragswert');
-    if (sw != null) t += zeile(swVorl ? 'Sachwert (vorläufig)' : 'Sachwert', swVorl ? 'ohne Sachwertfaktor, nicht an den Markt angepasst' : '', null, sw, null, fu === 'sachwert');
+    /* v2979 · Marcel 27.10.2026 (Parkstr. 9, MFH Bj 1905: Sachwert 519.125 € neben Ertragswert 425.000 € und
+       Kaufpreis 395.000 €), Variante B: ohne Sachwertfaktor ist der Sachwert eine Herstellungskostenrechnung,
+       keine Marktaussage. Er bleibt stehen, aber als Plausibilitaet, mit Begruendung und ohne Prozentabstand -
+       ein „+13 %“ neben dem Kaufpreis las sich wie ein Schnaeppchen. */
+    if (sw != null) t += zeile(swVorl ? 'Sachwert (nur Plausibilität)' : 'Sachwert',
+      swVorl ? 'Herstellungskosten ohne Marktanpassung, ' + (mfh ? 'für Mehrfamilienhäuser nicht aussagekräftig' : 'kein Marktwert') : '',
+      null, sw, null, fu === 'sachwert', swVorl);
     if (vw != null) t += zeile('Vergleichswert', h.irw_vergleichswert_eur != null ? 'aus dem Immobilienrichtwert' : 'mit amtlichem Vergleichsfaktor', null, vw, null, fu === 'vergleichswert');
     if (kp != null) t += zeile('Kaufpreis', 'deine Angabe', null, kp, null, false);
     t += '</tbody></table></div>';
+    t += fehlendeAngaben();
 
     /* ── Wie sich die Werte zusammensetzen ── */
     var e = [];
@@ -166,6 +214,8 @@
         ? (h.sw_faktor_grund === 'objektart_nicht_abgeleitet'
             ? '. Für diese Objektart leitet der Gutachterausschuss keinen Sachwertfaktor ab. Der Wert gibt deshalb nur die Herstellungskosten wieder und ist noch nicht an den Markt angepasst.'
             : '. Für dieses Objekt liegt kein passender Sachwertfaktor vor. Der Wert ist deshalb nicht an den Markt angepasst und nur vorläufig.')
+          + (mfh ? ' Mehrfamilienhäuser kauft der Markt nach ihrer Miete, nicht nach ihren Baukosten. Das Verfahren richtet sich nach den Gepflogenheiten im Markt (§ 6 Abs. 1 ImmoWertV), hier also nach dem Ertragswert. Der Sachwert dient nur der Plausibilität und kann deutlich über dem Marktpreis liegen, weil er zeigt, was das Gebäude abzüglich Alter zu bauen kostet, nicht was Käufer dafür zahlen.'
+                 : ' Er zeigt, was das Gebäude abzüglich Alter zu bauen kostet, nicht was Käufer dafür zahlen.')
         : (zahl(h.sw_faktor) != null ? ', angepasst an den Markt mit dem Sachwertfaktor ' + pct(h.sw_faktor, 2) + '.' : ', angepasst an den Markt mit dem Sachwertfaktor des Gutachterausschusses.');
       e.push(swt);
     }
@@ -197,7 +247,7 @@
           + ': er holt die Angebote auf das Niveau tatsächlich gezahlter Kaufpreise, die Miete bleibt davon unberührt.');
       }
     }
-    if (sw != null) {
+    if (sw != null && !swVorl) {
       var ds = abw(sw, mw);
       if (Math.abs(ds) > 10) w.push('Der Sachwert liegt ' + pct(Math.abs(ds)) + ' % ' + (ds < 0 ? 'unter' : 'über') + ' der Marktpreisindikation. '
         + (fu === 'ertragswert' ? 'Bei einem Renditeobjekt zahlt der Markt für die Miete, nicht für die Bausubstanz. Deshalb ist der Sachwert hier nur die Gegenprobe.'
@@ -228,6 +278,8 @@
       + 'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);color:var(--wl-c9a84c, #C9A84C);vertical-align:1px}'
       + '.dp-wv-fuehrend td{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent)}'
       + '.dp-wv-tafel td:nth-child(5){white-space:nowrap}'
+      + '.dp-wv-fehlt{margin:12px 0 4px;padding:11px 14px;border:1px solid color-mix(in srgb, #D8564C 45%, transparent);border-left-width:3px;border-radius:6px;font-size:12.5px;line-height:1.5}'
+      + '.dp-wv-fehlt ul{margin:6px 0 6px 18px;padding:0}.dp-wv-fehlt li{margin:3px 0}.dp-wv-fehlt span{display:block;font-size:11.5px;color:var(--muted,#8A8272)}'
       + '.dp-wv-h{margin:16px 0 4px;font:600 13px/1.3 "Space Grotesk",system-ui,sans-serif;color:var(--dp-ink-1,#E8E3D8)}';
     document.head.appendChild(s);
   }

@@ -163,7 +163,9 @@
     if (ew != null) z('ertragswert', D.ertragswert.vorlaeufig ? 'Ertragswert (vorläufig)' : 'Ertragswert',
       D.ertragswert.lzs_pct != null ? 'Liegenschaftszins ' + dez(D.ertragswert.lzs_pct, 2) + ' %' + (D.ertragswert.lzs_stufe ? ', Stufe ' + D.ertragswert.lzs_stufe : '') : null,
       D.ertragswert.von, ew, D.ertragswert.bis, fu === 'ertragswert');
-    if (sw != null) z('sachwert', swVorl ? 'Sachwert (vorläufig)' : 'Sachwert', swVorl ? 'ohne Sachwertfaktor, nicht an den Markt angepasst' : (D.sachwert.faktor != null ? 'mit Sachwertfaktor ' + dez(D.sachwert.faktor, 2) : null), null, sw, null, fu === 'sachwert');
+    /* v2979 · wie wertvergleich.js: ohne Sachwertfaktor nur Plausibilitaet, kein Prozentabstand zur Marktpreisindikation */
+    if (sw != null) { z('sachwert', swVorl ? 'Sachwert (nur Plausibilität)' : 'Sachwert', swVorl ? 'Herstellungskosten ohne Marktanpassung, kein Marktwert' : (D.sachwert.faktor != null ? 'mit Sachwertfaktor ' + dez(D.sachwert.faktor, 2) : null), null, sw, null, fu === 'sachwert');
+      if (swVorl) V[V.length - 1].abw_zur_mpi_pct = null; }
     if (vw != null) z('vergleichswert', 'Vergleichswert', vwArt === 'immobilienrichtwert' ? 'aus dem Immobilienrichtwert' : 'mit amtlichem Vergleichsfaktor', null, vw, null, fu === 'vergleichswert');
     if (kp != null) z('kaufpreis', 'Kaufpreis', 'deine Angabe', null, kp, null, false);
     /* Klartext: führendes Verfahren und Lage des Kaufpreises - nur am Bericht Ablesbares */
