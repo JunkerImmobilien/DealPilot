@@ -1111,7 +1111,11 @@ function _buildAIPayload() {
       try {
         var AK = window.DealPilotAnkauf;
         if (!AK || !AK.vorhanden() || !window.DpBestand) return null;
-        return window.DpBestand.payload();
+        var bp = window.DpBestand.payload();
+        /* v2989 · Zielerreichung je Hebel (jahresstaende.js). Der Prompt-Teil in
+           openaiService.js wird nachgezogen, sobald die Datei frei ist (Journal v2989). */
+        try { if (bp && window.DpJahresstaende) bp.zielerreichung = window.DpJahresstaende.payload(); } catch (e2) {}
+        return bp;
       } catch (e) { return null; }
     })(),
     wohnung: {
@@ -1803,6 +1807,7 @@ window._dpPaTab = function (id, btn) {
        eines Unterreiters wird beides aus dem heutigen Stand neu gebaut. */
     try { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); } catch (e2) {}
     if ((id === 'anschluss' || id === 'exit') && window.DpBestand) { try { window.DpBestand.mountAll(); } catch (e3) {} }   /* v2985 */
+    if (id === 'si' && window.DpJahresstaende) { try { window.DpJahresstaende.mount(); } catch (e4) {} }   /* v2989 */
     if (id === 'si' && typeof window._dpPaSollIstNeu === 'function') {
       var altH = wrap.querySelector('.abw-tafel-host');
       if (altH) {
@@ -2241,6 +2246,9 @@ function _renderAIServerAnalysis(a) {
     return '<div class="abw-tafel-host" style="margin:0">'
       + '<div class="abw-kopf"><h4>Ankauf gegen Bestand <span class="abw-sub">eingefrorener Stand gegen heute</span></h4>'
       + '<div class="abw-stand">Ankauf-Stand vom <b>' + t + '</b></div></div>'
+      /* v2989 · Rechenstand: mit welcher App-Version der Ankauf gerechnet wurde */
+      + (function () { try { var J = window.DpJahresstaende, st = AK.stand ? AK.stand() : null, sz = J && st ? J.rechenstandSatz(st) : '';
+          return sz ? '<div class="dp-pa-fuss" data-dp-rechenstand="1" style="margin:0 0 10px">' + sz + '</div>' : ''; } catch (e) { return ''; } })()
       + '<p style="margin:0 0 12px;font:400 12.5px/1.6 Inter,system-ui,sans-serif">'
       + '<b>Ankauf</b> ist der Stand beim Nutzen-/Lastenwechsel. '   /* v2430: dein Soll/dein Ist raus - Soll heisst jetzt die Soll-Miete (Mieter bleibt) */
       + '<b>Bestand</b> ist, wie das Objekt heute dasteht. '
@@ -2411,7 +2419,10 @@ function _renderAIServerAnalysis(a) {
      Bisherige mit Sprungleiste. Ohne wert-zielbild.js bleibt es beim Bisherigen. */
   var _siPanel = (_siHtml || _potHtml ? panel('si', (function () {
         var g = _potHtml + (_potHtml && _siHtml ? '<div style="margin-top:12px"></div>' : '') + _siHtml;
-        try { return window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(g, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : g; } catch (e) { return g; }
+        /* v2989 · Zielerreichung und Jahresstaende OBEN, in Einfach und Genau (jahresstaende.js) */
+        var zh = '';
+        try { zh = (_bestand && window.DpJahresstaende) ? '<div data-dp-ziel-host="1">' + window.DpJahresstaende.html() + '</div>' : ''; } catch (e) { zh = ''; }
+        try { return zh + (window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(g, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : g); } catch (e) { return zh + g; }
       })(), false) : '');   /* v2430 */
   var _rail, _inhalt;
   if (_bestand) {

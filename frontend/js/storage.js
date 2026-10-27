@@ -941,6 +941,10 @@ async function saveObj(opts) {
   if (typeof updHeader === 'function') updHeader();
 
   var data = collectData();
+  /* v2989 · Jahresstand im Bestand (jahresstaende.js): der Kennzahlen-Stand des
+     laufenden Jahres reist mit DIESEM Speichern - nie beim Laden. Die Pruefungen
+     (Ankauf-Stand, keine Soll-Ansicht, Kennzahlen dieses Objekts) stehen dort. */
+  try { if (window.DpJahresstaende && typeof DpJahresstaende.beimSpeichern === 'function') DpJahresstaende.beimSpeichern(data, opts); } catch (e) {}
   var aiText = window._aiText || null;
   /* v2193 · N62.17 - URSACHE gefunden: collectData() traegt `_ai` aus
      _currentObjData mit, also den Text vom LADEN des Objekts. Nach einer
