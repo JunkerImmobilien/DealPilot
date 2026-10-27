@@ -2569,7 +2569,10 @@ export const CrossCheckService = {
       _amtVgl = { wert_eur: Math.round(Number(_vwIrw.vergleichswert_eur)), faktor_qm: _vwIrw.wert_qm || null,
         rechnung: 'Immobilienrichtwert ' + Number(p.irw.wert_qm).toLocaleString('de-DE') + ' €/m² × Koeffizienten '
           + String(Math.round(_vwIrw.produkt * 10000) / 10000).replace('.', ',') + ' = '
-          + Number(_vwIrw.wert_qm).toLocaleString('de-DE') + ' €/m² × ' + String(ref.living_area).replace('.', ',') + ' m²',
+          + Number(_vwIrw.wert_qm).toLocaleString('de-DE') + ' €/m² × ' + String(ref.living_area).replace('.', ',') + ' m²'
+          /* v3011 · W4 · Stand des Richtwerts; ohne amtlichen Index nicht fortgeschrieben */
+          + ' · Stand des Ausschusses: ' + (p.irw && p.irw.stichtag ? String(p.irw.stichtag).replace(/^\d{2}\.(\d{2})\.(\d{4})$/, '$1/$2') : '?')
+          + ', nicht auf den Stichtag fortgeschrieben (kein amtlicher Index)',
         quelle: (_vwIrw.quelle && _vwIrw.quelle.umrechnung_url) || null,
         ausschuss: (_vwIrw.quelle && _vwIrw.quelle.ausschuss) || null,
         art: 'immobilienrichtwert', stufe: 'A' };

@@ -1656,6 +1656,37 @@ function _korrekturenPruefen(korr, e, offenListe) {
   return zeilen;
 }
 
+/* ══ v3011 · W4 · FORTSCHREIBUNG AUF DEN WERTERMITTLUNGSSTICHTAG ══════════
+   § 9 Abs. 1 S. 2 ImmoWertV, ImmoWertA 9.(1): Daten eines anderen Stichtags sind mit
+   geeigneten Indexreihen (§ 18) fortzuschreiben. Fortgeschrieben wird NUR mit dem
+   amtlichen Index desselben Ausschusses bzw. Landes fuer den Teilmarkt - im Register
+   liegt dafuer heute keine Reihe (Recherche 27.10.2026: Hamburg rechnet die
+   Aktualisierung schon im Faktor; NI-NIPIX endet mit dem Jahreswert 2025, also vor dem
+   VGF-Stichtag 01.01.2026; BB/BE/HE ohne Index; ST nur Halle EFH; NW je Ausschuss im
+   GMB, nicht geerntet). Deshalb steht hier der Vermerk, nicht eine Rechnung - und
+   nie eine Verlaengerung ueber den letzten Indexstand hinaus.
+   Fuehrt ein Satz kuenftig `fortschreibung_index` (Reihe mit Quelle), ist das die
+   Stelle, an der sie gerechnet wird. */
+function _standMonat(st) {
+  const s = String(st || '');
+  let m = /^(\d{4})-(\d{2})/.exec(s);
+  if (m) return m[2] + '/' + m[1];
+  m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(s);
+  if (m) return m[2] + '/' + m[3];
+  return null;
+}
+export function fortschreibungVermerk(satz) {
+  const stand = _standMonat(satz && satz.stichtag) || (satz && satz.berichtsjahr ? String(satz.berichtsjahr) : null);
+  const aktual = ((satz && satz.korrekturen) || []).some((k) => k && k.feld === 'aktualisierungsfaktor');
+  if (aktual) {
+    return { art: 'aktualisierung_im_faktor', stand,
+      vermerk: 'Stand des Ausschusses: ' + (stand || '?') + ', mit seinem Aktualisierungsfaktor auf diesen Stand gebracht; '
+        + 'darüber hinaus nicht fortgeschrieben (kein jüngerer amtlicher Index)' };
+  }
+  return { art: 'keine', stand,
+    vermerk: 'Stand des Ausschusses: ' + (stand || '?') + ', nicht auf den Stichtag fortgeschrieben (kein amtlicher Index)' };
+}
+
 function _vergleichsfaktorKern(arg = {}) {
   const { ags, zweig, objektart } = arg;
   const ebenen = _ebenenListen('vergleichsfaktor', ags);
@@ -1788,8 +1819,12 @@ function _vergleichsfaktorKern(arg = {}) {
       + norm.map((z) => z.bez).join(', ') + '.');
   }
 
+  /* v3011 · W4 · der Stand des Ausschusses steht im Rechenweg - Bericht und PDF lesen ihn dort. */
+  const _fw = fortschreibungVermerk(s);
+  rechenweg = (rechenweg ? rechenweg + ' · ' : '') + _fw.vermerk;
   return _mitSatz({
     verfuegbar: true,
+    fortschreibung: _fw,
     wert: rr.wert,
     einheit: rr.einheit || null,
     einheit_bez: f.liefert_einheit || null,

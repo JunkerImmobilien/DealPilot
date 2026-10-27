@@ -283,6 +283,9 @@ try {
   pruefe('A', id + '8', 'Klasse einfach: kein Beschluss', vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'einfach' }).grund === 'zelle_leer');
   pruefe('A', id + '8', 'falscher Klassenname wird nicht unscharf zugeordnet', vf({ vgf_wohnlage: 'gut', vgf_ausstattung: 'mittel' }).verfuegbar === false);
   pruefe('A', id + '9', 'Vorrang: Wertsatz vor der Sperre in vgf-bw-2026.json', vf({}).grund !== 'gesperrt');
+  /* v3011 · W4 · ohne amtlichen Index: Stand des Ausschusses im Rechenweg, keine Fortschreibung */
+  pruefe('A', 'A-W4', 'Konstanz: Rechenweg nennt Stand 01/2026, nicht fortgeschrieben', /Stand des Ausschusses: 01\/2026, nicht auf den Stichtag fortgeschrieben \(kein amtlicher Index\)/.test(vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).rechenweg || ''));
+  pruefe('A', 'A-W4', 'Konstanz: Wert bleibt der Beschluss (keine Hochrechnung)', vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).wert === 4800);
 
   /* W1 am Oberen Gutachterausschuss Brandenburg: Standardstufe fehlt -> kein Wert. */
   const bb = JSON.parse(fs.readFileSync(path.join(SRC, 'lib/register/vgf-bb-oga-2025.json'), 'utf8'))
