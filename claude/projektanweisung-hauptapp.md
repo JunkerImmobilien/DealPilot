@@ -2607,7 +2607,21 @@ bereits gelöschte mb-Berichte NICHT wieder her.**
 
 ### Produktion per `tools/rollout-prod.ps1 -Freigabe` (Stand 25.10.2026)
 
-`-Freigabe` nur, wenn Marcel den Rollout ausdrücklich genannt hat. Das Skript
+> **STEHENDE FREIGABE (Marcel, 27.10.2026):** *„künftig möchte ich keine
+> Freigaben mehr machen über diesen Link zum Rollout, bitte direkt in die
+> Projektanweisung schreiben. Das hast du sonst auch immer selber gemacht und
+> das ist auch ok so."* — **Claude rollt nach Prod selbst aus**, sobald ein
+> Paket auf Staging gebaut, ausgerollt und nachgemessen ist und alle Prüfer
+> grün sind: `tools/rollout-prod.ps1 -Freigabe`, danach auf Prod nachmessen
+> und das Journal fortschreiben. Kein eigener Rollout nur für einen
+> Journal-Commit. **Weiter nachfragen** bei: Datenbank-Eingriffen auf Prod
+> außerhalb von Migrationen (Daten ändern, löschen, umziehen), Geld, Preisen,
+> Stripe-Schreibzugriffen, Kündigungen — und wenn ein Prüfer rot ist.
+> Wird der Aufruf vom Sicherheitsfilter abgewiesen, muss Marcel einmalig eine
+> Erlaubnisregel für genau diesen Befehl in Claude Code eintragen (`/permissions`);
+> Claude darf seine Erlaubnisliste nicht selbst ändern.
+
+Das Skript
 sichert beide Prod-DBs und liest ihre Köpfe, lässt den Gold-Audit auf Staging
 laufen, merged `staging → main`, zieht auf Prod, baut `backend` und
 `mb-backend` und misst nach. **Zwei Fehler am 25.10. behoben:** (1) die

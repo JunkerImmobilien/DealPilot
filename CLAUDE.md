@@ -794,8 +794,17 @@ Der Kreislauf pro Aufgabe:
 Erst melden, wenn es **funktioniert** oder wenn du **nicht weiterkommst**.
 Zwischenstände nur, wenn ein Befund die Richtung ändert.
 
+**Prod-Rollout: stehende Freigabe seit 27.10.2026.** Marcel: *„künftig möchte
+ich keine Freigaben mehr machen … das hast du sonst auch immer selber gemacht
+und das ist auch ok so."* Ist ein Paket auf Staging nachgemessen und sind alle
+Prüfer grün, rollt Claude selbst mit `tools/rollout-prod.ps1 -Freigabe` aus,
+misst auf Prod nach und schreibt das Journal fort. Einzelheiten:
+`claude/projektanweisung-hauptapp.md`, Abschnitt „Produktion per
+`tools/rollout-prod.ps1`“.
+
 **Nachfragen nur bei:**
-- Produktion, Datenbank-Eingriffen, Geld, Preisen, Kündigungen
+- Datenbank-Eingriffen auf Prod außerhalb von Migrationen, Geld, Preisen,
+  Stripe-Schreibzugriffen, Kündigungen
 - Optik und Produktentscheidungen ohne klare Vorgabe → Demo bauen und zeigen
 - Etwas aus „Nicht anfassen" müsste angefasst werden
 - Nach drei erfolglosen Anläufen: STOPP, Diagnose, melden
