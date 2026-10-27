@@ -42881,3 +42881,9 @@ Marcel 22.10.2026: „ja rollout 62".
   7. Rückfragen bei den Ausschüssen Euskirchen und Heinsberg (efh).
   - Viele neue Sätze brauchen Angaben, die der Reiter Objekt nicht führt: Modernisierungstyp (`mtyp`), Wohnlage (Dortmund, Moers, Euskirchen), Alter und Ausstattung (Borken). Ohne sie meldet der Bericht „Angabe fehlt“. Ohne Zusatzangaben rechnen nur Gütersloh, Heinsberg etw und Kreis Düren etw.
   - **Nicht auf Produktion.**
+
+### Prod-Rollout 27.10.2026 spaet · v3014, v3015, Demo-Konto
+- **Was:** Nachernte bundesweit mit Wegen statt Luecken, Lizenzsperren Kiel (MFH-LZS) und Waiblingen/Korb (10 LZS) wegen „nur nicht kommerziell“ (v3014); IRW-Kernausbau NRW, 57 statt 48 von 72 Ausschuessen, 135 Werte (v3015); Demo-Konto 19/19 gespiegelt (c03bccf1).
+- **Commit:** Prod `1fb449d` (Merge staging → main „Prod-Rollout 27.10.2026“). Ausgerollt von Hand aus einer sauberen Worktree-Kopie, weil der Video-Agent `messe-drehbuch.js` offen hatte und `rollout-prod.ps1` deshalb verweigert — dieselben Schritte wie das Skript: Sicherung beider Prod-DBs (`haupt-20261027-2211-vor-v3015` 15 MB, `mb-…-vor-v3015` 29 MB, Kopf geprueft), Gold-Audit Staging RC=0, merge, push, pull, Neubau backend + mb-backend, HTTP 200.
+- **Register Prod:** `register-saat` 6.046 = 6.046. **Offen:** `register-db-abgleich` Regel 1 ROT, 11 „DB-Wert ueber Datei-Sperre“ = genau die Kiel/Waiblingen-Saetze. Abraeumen (`register-saat --aufraeumen`) loescht Zeilen auf Prod und wurde vom Werkzeug ohne ausdrueckliche Zustimmung Marcels verweigert — bis dahin rechnen diese 11 Saetze auf Prod noch als Wert. Staging ist aufgeraeumt (6.025 → 6.046 sauber).
+- **Rest:** Freigaben per Mail (Stormarn, Enzkreis, Philippsburg, Kiel, Waiblingen); „nicht abgeleitet“ als Zugangsklasse fuer Stufe N (Entscheidung Marcel); IRW-Zusatzangaben (Modernisierungstyp, Wohnlage) im Reiter Objekt; Edge-Einbettung bei Marcel blockiert (frisches Edge geht, Notausgang 5 s live) — Konsole morgen.
