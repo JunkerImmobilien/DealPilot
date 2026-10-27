@@ -28,7 +28,7 @@
   var TON = true;
   try { TON = localStorage.getItem('dp_vt_ton') !== '0'; } catch (e) {}
   function datei(v) { return ((TON && v && v.datei_ton) ? v.datei_ton : v.datei) + '?v=marcel-20261026b'; }   /* v2967 · neue Stimme: Videos neu laden statt aus dem Cache */
-  function bild(v, D) { return D.basis_bilder + v.poster + '?v=v2968'; }   /* v2968 · Vorschaubilder Modul 14/18 neu: neu laden statt aus dem Cache */
+  function bildUrl(v, D) { return D.basis_bilder + v.poster + '?v=v2968'; }   /* v2968 · Vorschaubilder Modul 14/18 neu: neu laden statt aus dem Cache */
   function tonText() { return TON ? 'Mit Sprecher ✓' : 'Ohne Sprecher'; }
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>';
@@ -111,7 +111,7 @@
       streifen.innerHTML = liste.map(function (v, i) {
         return '<button class="dpl-w" data-i="' + i + '" aria-label="' + esc(v.titel) + ' abspielen">' +
           '<span class="dpl-wp"></span>' +
-          '<img src="' + esc(bild(v, D)) + '" alt="" loading="lazy" width="212" height="119">' +
+          '<img src="' + esc(bildUrl(v, D)) + '" alt="" loading="lazy" width="212" height="119">' +
           '<span class="dpl-wd">' + mmss(v.dauer) + '</span>' +
           '<span class="dpl-wt"><span class="dpl-wn">' + esc(v.kategorie === 'ueberblick' ? 'ÜBERBLICK ' + String(v.nr).replace('Ü', '') : 'MODUL ' + v.nr) + '</span><b>' + esc(v.titel) + '</b></span>' +
         '</button>';
@@ -137,7 +137,7 @@
       var v = liste[idx];
       bild.classList.add('wechsel'); karte.classList.add('wechsel');
       setTimeout(function () {
-        vid.setAttribute('poster', bild(v, D));
+        vid.setAttribute('poster', bildUrl(v, D));
         vid.preload = scharf ? 'metadata' : 'none';
         vid.src = D.basis_medien + datei(v);
         karteFuellen(v);
@@ -260,7 +260,7 @@
         '<div class="vt-raster">' + vs.map(function (v) {
           var such = [v.titel, v.unterzeile, v.story, v.nutzen, (v.kapitel || []).join(' '), v.nr].join(' ').toLowerCase();
           return '<button class="vt-k" data-id="' + esc(v.id) + '" data-such="' + esc(such) + '">' +
-            '<span class="vt-kb"><img src="' + esc(bild(v, D)) + '" alt="" loading="lazy" width="480" height="256">' +
+            '<span class="vt-kb"><img src="' + esc(bildUrl(v, D)) + '" alt="" loading="lazy" width="480" height="256">' +
               '<span class="vt-nr">' + esc(v.nr) + '</span><span class="vt-d">' + mmss(v.dauer) + '</span><span class="vt-play">' + PLAY + '</span></span>' +
             '<span class="vt-kt"><b>' + esc(v.titel) + '</b><span class="vt-u">' + esc(v.unterzeile) + '</span><span class="vt-s">' + esc(v.story) + '</span></span>' +
           '</button>';
@@ -316,7 +316,7 @@
       var i = -1; V.forEach(function (v, j) { if (v.id === id) i = j; });
       if (i < 0) return;
       aktuell = i; var v = V[i];
-      kv.setAttribute('poster', bild(v, D));
+      kv.setAttribute('poster', bildUrl(v, D));
       kv.src = D.basis_medien + datei(v);
       kino.querySelector('#vtKinoText').innerHTML =
         '<div class="dpl-k-kick"><span>' + esc(nrLabel(v, D)) + '</span><span>' + mmss(v.dauer) + ' Min.</span></div>' +

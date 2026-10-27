@@ -7,7 +7,7 @@
 <meta name="description" content="Dein Cockpit für Immobilien-Investments: Cashflow, DSCR, Steuer, Deal Score und bankfertige Unterlagen — in Minuten statt Stunden. 19 Module, 24 Kennzahlen, Server in Deutschland.">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
-<link rel="stylesheet" href="dp2-hero.css?v=v1570">
+<link rel="stylesheet" href="dp2-hero.css?v=landing-videos-1">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
@@ -172,6 +172,17 @@
     <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
 </div></div></div>
 
+<!-- landing-videos-1 · Marcel 27.10.2026: "wo sind eigentlich auf der Landingpage meine videos geblieben? Das muss direkt auf der Hauptseite nach dem Hero-Bereich richtig cool in Szene gesetzt werden." Seit v2968 war der Abschnitt unsichtbar: dp2-live.js warf (bild is not a function, lokale Variable ueberdeckte die Funktion) und der catch blendete die Section aus. Jetzt direkt hinter Hero, Laufband und Vertrauensband. -->
+<!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
+     landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
+     direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
+     DealPilot Live". Deshalb steht er HINTER "Was DealPilot macht".
+     Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
+     nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
+<section class="sec sec-dark dpl" id="live"><div class="wrap">
+  <div id="dplRoot" data-start="ueberblick"></div>
+</div></section>
+
 <!-- ══ WILLKOMMEN ════════════════════════════════════════════════════ -->
 <div class="board-band">
   <span class="perf-edge"></span><span class="perf-edge rechts"></span>
@@ -208,16 +219,6 @@
        Was DealPilot macht kann raus." Platzhalter, demo-wechsel.css und .js entfernt
        (die Einzelseite demo-wechsel.html bleibt). -->
 
-</div></section>
-
-<!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
-     landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
-     direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
-     DealPilot Live". Deshalb steht er HINTER "Was DealPilot macht".
-     Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
-     nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
-<section class="sec sec-dark dpl" id="live"><div class="wrap">
-  <div id="dplRoot" data-start="ueberblick"></div>
 </div></section>
 
 <!-- ══ MODULE ════════════════════════════════════════════════════════ -->
@@ -617,12 +618,7 @@
     <!-- landing-videothek-1 · Logo von der Website der Kanzlei (sp-steuerberatung.de/img/logo.png) -->
     <div class="plogo"><img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div>
   </div></div>
-  <div class="kz rv">
-    <img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB" width="203" height="40" loading="lazy">
-    <p><b>Begleitet von Steuerberatungskanzleien.</b> DealPilot entsteht nicht im luftleeren Raum: Kanzleien wie
-      die <b>Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB</b> aus Hüllhorst sagen uns, wo es in der Praxis hakt.
-      Die Beratung bleibt in der Kanzlei — wir liefern die Aufbereitung.</p>
-  </div>
+  <!-- landing-videos-1 · Kanzlei-Zeile (Schmidt & Partner) unter dem Laufband entfernt, Marcel 27.10.2026; das Logo bleibt im Laufband -->
   <figure class="bildzeile rv">
     <img src="assets/bild/haus.jpg" alt="Mehrfamilienhaus in einer deutschen Wohnstraße" loading="lazy">
     <figcaption>Worum es geht: ein Bestandsobjekt, ehrlich gerechnet.</figcaption>
@@ -689,7 +685,7 @@
 <script src="dp2-video.js?v=v1570"></script>
 <script src="demo-steuer-daten.js?v=v1600"></script>
 <script src="dp2.js?v=v1570"></script>
-<script src="dp2-live.js?v=landing-videothek-4f"></script><!-- landing-videothek-1 -->
+<script src="dp2-live.js?v=landing-videos-1"></script><!-- landing-videothek-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
      oben auf der Abgleichsliste:
