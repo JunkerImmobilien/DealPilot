@@ -358,9 +358,38 @@
     var reg = m.regime || {};
     var kst = (reg.kst != null ? reg.kst : 15.825) / 100;
     var heb = (reg.gewst != null ? reg.gewst : 0);
-    var gewst = reg.erw_kuerzung ? 0 : (0.035 * (heb / 100));
+    /* v2984 · Hier stand `reg.erw_kuerzung ? 0 : …` (Wahrheitswert), die Maske
+       zeigte den Haken aber bei NIE gespeichertem Feld als gesetzt (`!== false`).
+       Gemessen: Anzeige „erw. Kuerzung", Rechnung mit GewSt. Jetzt fuer alle
+       Stellen derselbe Kern: aktiv nur, wenn beantragt UND alle Pruefpunkte
+       bestaetigt (§ 9 Nr. 1 S. 2–5 GewStG). Der Satz ist eine Naeherung fuer
+       Anzeigen; gerechnet wird mit steuerParameter() + Kern.steuerReihe(). */
+    var gewst = _erwAktiv(reg) ? 0 : (0.035 * (heb / 100));
     var r = kst + gewst;
     return (isFinite(r) && r > 0) ? r : null;
+  }
+  function _erwStatus(reg) {
+    var K = window.DealPilotUeberfuehrungKern;
+    if (K && K.erwKuerzungStatus) return K.erwKuerzungStatus(reg || {});
+    return { beantragt: !!(reg && reg.erw_kuerzung === true), aktiv: false, offen: ['kern'] };
+  }
+  function _erwAktiv(reg) { return _erwStatus(reg).aktiv; }
+  /* v2984 · Parameter fuer den Steuerkern der Gesellschaft — eine Quelle fuer
+     Projektion, Steuer-Reiter und Jahresabschluss. null = kein Koerperschaft-Halter. */
+  function steuerParameter(id) {
+    if (!_isPro()) return null;
+    if (id == null) { var sel = document.getElementById('halter'); id = sel ? sel.value : 'privat'; }
+    var m = get(id || 'privat');
+    if (!m || !isCorp(m.rechtsform)) return null;
+    var reg = m.regime || {};
+    var st = _erwStatus(reg);
+    return {
+      id: m.id, name: m.name, rechtsform: m.rechtsform,
+      kstSoliPct: (reg.kst != null && isFinite(Number(reg.kst))) ? Number(reg.kst) : 15.825,
+      hebesatz: (reg.gewst != null && isFinite(Number(reg.gewst))) ? Number(reg.gewst) : 0,
+      erwKuerzung: st.aktiv, erwStatus: st,
+      stammkapital: (m.bh && Number(m.bh.stammkapital)) || 0
+    };
   }
 
   /* ===== Objekt-Felder: Ueberfuehrung ein/aus + %-Anzeige ===== */
@@ -492,17 +521,92 @@
     var hasEnde = !!(endeEl && (endeEl.value || '').trim());
     var BX = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(184,98,80,.08);border:1px solid rgba(184,98,80,.35);border-radius:10px;padding:10px 13px;margin:2px 0 4px';
     var BTN = 'margin-left:auto;background:transparent;border:1px solid #B86250;color:#B86250;padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit';
+    var _ud = ueberfDaten();
+    var _hsEl = document.getElementById('halter_seit');
+    var _seit = _hsEl ? _fmtDe(_hsEl.value) : '';
     if (isGmbh) {
       host.style.display = '';
-      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u2713 Aus Privatbestand \u00fcbernommen' + (ende ? ' \u00b7 l\u00e4uft bis ' + ende : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrung()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>';
+      /* v2984 \u00b7 Hier stand \u201el\u00e4uft bis <ueberf_ende>". Das Gesellschaftsobjekt
+         bekam den Stichtag als ueberf_ende mit (v816h) \u2014 dort ist er der
+         BEGINN, nicht das Ende (calc.js wertet es seit v2212 nicht aus). Gemessen
+         27.10.2026 in Prod an \u201eAm Markt 9" und \u201eH\u00f6lderlinstr. 1". Angezeigt wird
+         jetzt der Beginn; das geerbte Feld bleibt in der DB unangetastet. */
+      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u2713 Aus Privatbestand \u00fcbernommen' + (_seit ? ' \u00b7 Gesellschaft h\u00e4lt seit ' + _seit : '') + (_ud && _ud.art && window.DealPilotUeberfuehrungKern ? ' \u00b7 ' + esc(DealPilotUeberfuehrungKern.ARTEN[_ud.art] ? DealPilotUeberfuehrungKern.ARTEN[_ud.art].kurz : _ud.art) : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrung()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>'
+        + _ueberfDetailHtml(_ud, true);
       return;
     }
     if (hasEnde) {
       host.style.display = '';
-      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u2708 \u00dcberf\u00fchrt in Gesellschaft' + (ende ? ' \u00b7 eingefroren am ' + ende : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrungFromPrivat()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>';
+      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u2708 \u00dcberf\u00fchrt in Gesellschaft' + (ende ? ' \u00b7 privat bis ' + ende + ' (ab diesem Tag Gesellschaft)' : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrungFromPrivat()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>'
+        + _ueberfDetailHtml(_ud, false);
+      return;
+    }
+    /* v2984 \u00b7 Privatobjekt OHNE Ende, aber verknuepft: gemessen 27.10.2026 in
+       Prod an \u201eH\u00f6lderlinstr. 1" (privat, kein ueberf_ende) neben einem
+       Gesellschaftsobjekt derselben Anschrift. Es rechnet dann voll weiter \u2014
+       Miete, AfA und Steuer doppelt neben der Gesellschaft. Kein stilles
+       Umschreiben: ein Hinweis mit dem Weg. */
+    var _lk = document.getElementById('_ueberf_link');
+    var _lkv = _lk ? (_lk.value || '').trim() : '';
+    if (_lkv) {
+      host.style.display = '';
+      host.innerHTML = '<div style="'+BX+'"><span style="font-size:12.5px;color:#8a4a3c;line-height:1.45"><b>Bitte pr\u00fcfen:</b> Dieses Privatobjekt ist mit einem Gesellschaftsobjekt verkn\u00fcpft, hat aber <b>kein Privat-Ende</b>. Es rechnet deshalb weiter voll privat \u2014 neben der Gesellschaft. Trage im Feld \u201ePrivat-Ende / \u00fcberf\u00fchrt am\u201c den Stichtag ein oder hebe die Verkn\u00fcpfung auf.</span></div>';
       return;
     }
     host.style.display = 'none'; host.innerHTML = '';
+    _verwaistPruefen(host);
+  }
+  /* v2984 \u00b7 Gibt es ein Gesellschaftsobjekt, dessen Rueck-Link auf DIESES
+     Privatobjekt zeigt, obwohl hier weder Ende noch Link steht? */
+  var _vwCache = { t: 0, items: null };
+  function _verwaistPruefen(host) {
+    try {
+      var key = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : window._currentObjKey;
+      if (!key || !window.Auth || typeof Auth.apiCall !== 'function') return;
+      var corps = (_state && _state.list || []).filter(function (m) { return isCorp(m.rechtsform); });
+      if (!corps.length) return;
+      var pr = (_vwCache.items && Date.now() - _vwCache.t < 60000) ? Promise.resolve(_vwCache.items)
+        : Auth.apiCall('/objects', { method: 'GET' }).then(function (r) { var it = (r && (r.items || r.objects)) || []; _vwCache = { t: Date.now(), items: it }; return it; });
+      pr.then(function (items) {
+        var cur = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : window._currentObjKey;
+        if (String(cur) !== String(key)) return;
+        var treffer = items.filter(function (o) { var d = o.data || o; return String(d.obj_herkunft || '') === 'ueberfuehrung' && String(d._ueberf_link || '') === String(key); });
+        if (!treffer.length) return;
+        var d0 = treffer[0].data || treffer[0];
+        host.style.display = '';
+        host.innerHTML = '<div style="display:flex;gap:10px;flex-wrap:wrap;background:rgba(184,98,80,.08);border:1px solid rgba(184,98,80,.35);border-radius:10px;padding:10px 13px;margin:2px 0 4px"><span style="font-size:12.5px;color:#8a4a3c;line-height:1.45"><b>Bitte pr\u00fcfen:</b> Das Gesellschaftsobjekt <b>' + esc(d0.kuerzel || d0.str || treffer[0].id || '') + '</b> wurde aus diesem Objekt \u00fcberf\u00fchrt' + (d0.halter_seit ? ' (Stichtag ' + esc(_fmtDe(d0.halter_seit)) + ')' : '') + ', hier fehlen aber Privat-Ende und Verkn\u00fcpfung. Dieses Objekt rechnet deshalb weiter voll privat. Trage im Feld \u201ePrivat-Ende / \u00fcberf\u00fchrt am\u201c den Stichtag ein.</span></div>';
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  /* v2984 \u00b7 Ergebnis der Ueberfuehrung (vom Assistenten im Feld ueberf_daten
+     abgelegt): am Privatobjekt der \u00a7 23-Teil, am Gesellschaftsobjekt die
+     Anschaffungskosten. Fehlen die Angaben (vor v2984 angelegt), steht dort
+     \u201ebitte erg\u00e4nzen" statt einer erfundenen Zahl. */
+  function ueberfDaten() {
+    var el = document.getElementById('ueberf_daten');
+    if (!el || !el.value) return null;
+    try { var o = JSON.parse(el.value); return (o && typeof o === 'object') ? o : null; } catch (e) { return null; }
+  }
+  function _eur(n) { return (n == null || !isFinite(n)) ? '\u2014' : Math.round(n).toLocaleString('de-DE') + ' \u20ac'; }
+  function _ueberfDetailHtml(u, gesellschaft) {
+    var BOX = 'margin:0 0 6px;padding:9px 12px;border:1px solid #EDE7DA;border-radius:9px;background:#FBF8F0;font-size:12px;line-height:1.55;color:#5f594f';
+    if (!u || !u.v) {
+      return '<div style="' + BOX + '"><b style="color:#B8625C">Bitte erg\u00e4nzen:</b> Diese \u00dcberf\u00fchrung wurde vor v2984 angelegt. Es fehlen Art der \u00dcbertragung, Grunderwerbsteuer der \u00dcberf\u00fchrung, Notar/Grundbuch, Boden-/Geb\u00e4udeanteil zum Stichtag'
+        + (gesellschaft ? ' \u2014 die Gesellschaft rechnet bis dahin mit dem alten Kaufpreis und seinen Nebenkosten (AfA auf den Verkehrswert skaliert).' : ' und der Ver\u00e4u\u00dferungsgewinn nach \u00a7 23 EStG.')
+        + ' Neu anlegen \u00fcber \u201e\u00dcberf\u00fchrung aufheben\u201c und den Assistenten.</div>';
+    }
+    if (gesellschaft) {
+      var a = u.ak || {};
+      return '<div style="' + BOX + '">Anschaffungskosten der Gesellschaft ' + _eur(a.ak) + ' = Ansatz ' + _eur(a.ansatz) + ' + GrESt ' + _eur(a.grest) + (a.grestVorlaeufig ? ' <b style="color:#B8625C">(vorl\u00e4ufig auf den Verkehrswert \u2014 Grundbesitzwert des Finanzamts fehlt)</b>' : '') + ' + Notar/Grundbuch ' + _eur(a.notar)
+        + (a.gebAntPct != null ? ' \u00b7 Geb\u00e4udeanteil ' + String(Math.round(a.gebAntPct * 10) / 10).replace('.', ',') + ' %' + (a.bodenQuelle === 'uebernommen' ? ' <b style="color:#B8625C">(vom Privatobjekt \u00fcbernommen \u2014 bitte zum Stichtag neu aufteilen)</b>' : '') : '')
+        + ' \u00b7 AfA ' + String(a.afaSatzPct || '').replace('.', ',') + ' % linear (\u00a7 7 Abs. 4 EStG)' + (a.vga > 0 ? ' \u00b7 <b style="color:#B8625C">Preis \u00fcber Verkehrswert: ' + _eur(a.vga) + ' verdeckte Gewinnaussch\u00fcttung</b>' : '') + '</div>';
+    }
+    var p = u.p23 || {};
+    if (p.steuerfrei) return '<div style="' + BOX + '">\u00a7 23 EStG: Zehnjahresfrist abgelaufen (' + esc(p.fristText || '') + ') \u2014 der Gewinn aus der \u00dcberf\u00fchrung ist <b style="color:#3FA56C">steuerfrei</b>.</div>';
+    if (p.fehlt) return '<div style="' + BOX + '"><b style="color:#B8625C">\u00a7 23 EStG nicht berechenbar:</b> es fehlt ' + esc(p.fehlt.join(', ')) + '.</div>';
+    return '<div style="' + BOX + '">\u00a7 23 EStG (' + esc(p.fristText || '') + '): Ver\u00e4u\u00dferungspreis ' + _eur(p.veraeusserungspreis) + ' (' + esc(p.preisQuelle || '') + ') \u2212 fortgef\u00fchrte AK ' + _eur(p.fortgefuehrteAK) + ' (AK ' + _eur(p.akPrivat) + ' \u2212 AfA ' + _eur(p.afaBisher) + ') = <b>Gewinn ' + _eur(p.gewinn) + '</b>'
+      + (p.unterFreigrenze ? ' \u00b7 unter der Freigrenze von 1.000 \u20ac \u2192 steuerfrei (sofern keine weiteren \u00a7 23-Gewinne im Jahr)' : (p.steuer != null ? ' \u00b7 indikative Steuer <b style="color:#B8625C">' + _eur(p.steuer) + '</b> (' + esc(p.steuerMethode || '') + ')' : ''))
+      + '</div>';
   }
   /* Aufheben vom GmbH-Objekt aus: GmbH loeschen + Privat (via _ueberf_link) auftauen. */
   async function undoUeberfuehrung() {
@@ -710,7 +814,7 @@
       var reg = m.regime || {};
       var sub = isCorp(m.rechtsform)
         ? ('K\u00f6rperschaftsteuer ' + (reg.kst != null ? reg.kst : 15.825).toString().replace('.', ',') + ' %'
-           + (reg.erw_kuerzung ? ' \u00b7 erw. K\u00fcrzung' : (reg.gewst ? ' \u00b7 GewSt ' + reg.gewst + ' %' : '')))
+           + (_erwAktiv(reg) ? ' \u00b7 erw. K\u00fcrzung' : (reg.erw_kuerzung === true ? ' \u00b7 erw. K\u00fcrzung beantragt, Pr\u00fcfpunkte offen' : '') + (reg.gewst ? ' \u00b7 GewSt-Hebesatz ' + reg.gewst + ' %' : ' \u00b7 Hebesatz fehlt')))
         : (m.rechtsform === 'gbr' ? 'Personengesellschaft \u00b7 transparent (ESt der Gesellschafter)'
                                   : 'Einkommensteuer \u00b7 \u00fcber zvE (Tab Steuer)');
       return '<div style="border:1px solid #ece7df;border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;background:#fff">'
@@ -924,8 +1028,18 @@
       +     fldH('Handelsregister', inp('mand-f-hr', ident.handelsregister, 'z.B. HRB 12345, AG Bad Oeynhausen'), 'Registernummer und Registergericht, wie im Handelsregisterauszug.')
       +   '</div>'
       +   '<div style="margin:6px 0 0">'
-      +     chk('mand-f-kuerz', reg.erw_kuerzung !== false, 'Erweiterte Gewerbesteuer-K\u00fcrzung (\u00a7 9 GewStG) \u2014 GewSt = 0')
-      +     '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">Reine Grundst\u00fccksverwaltung (nur Vermietung, kein gewerblicher Handel) kann die Gewerbesteuer auf 0 k\u00fcrzen. Aktiv lassen, wenn die Gesellschaft ausschlie\u00dflich vermietet.</div>'
+      /* v2984 \u00b7 Vorgabe AUS. Ein nie gespeicherter Wert gilt ueberall als nicht
+         beantragt (Kern erwKuerzungStatus). Wirksam erst mit allen vier
+         Pruefpunkten \u2014 die erweiterte Kuerzung ist eine Antragsverg\u00fcnstigung
+         mit strengen Voraussetzungen (\u00a7 9 Nr. 1 S. 2\u20135 GewStG). */
+      +     chk('mand-f-kuerz', reg.erw_kuerzung === true, 'Erweiterte Gewerbesteuer-K\u00fcrzung beantragen (\u00a7 9 Nr. 1 S. 2 GewStG)')
+      +     '<div id="mand-f-ek-box" style="margin:8px 0 0 24px">'
+      +       (function () { var K = window.DealPilotUeberfuehrungKern, pr = reg.erw_pruefung || {};
+                return (K && K.PRUEFPUNKTE || []).map(function (x) {
+                  return '<label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.45;cursor:pointer;margin:4px 0;color:#5f594f"><input type="checkbox" id="mand-f-ek-' + x.k + '"' + (pr[x.k] === true ? ' checked' : '') + ' style="margin-top:2px"> ' + esc(x.t) + '</label>';
+                }).join(''); })()
+      +     '</div>'
+      +     '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">Die K\u00fcrzung greift nur, wenn alle vier Punkte das <b>ganze Jahr</b> zutreffen \u2014 dann ist die Gewerbesteuer auf die Vermietung 0. Sonst rechnet DealPilot mit Gewerbesteuer: Gewinn minus Grundsteuer (\u00a7 9 Nr. 1 S. 1 GewStG, ab 2025), auf volle 100 \u20ac abgerundet, \u00d7 3,5 % \u00d7 Hebesatz. ' + (function () { var s = _erwStatus(reg); return s.beantragt && !s.aktiv ? '<b style="color:#B8625C">Beantragt, aber Pr\u00fcfpunkte offen \u2014 gerechnet wird mit Gewerbesteuer.</b>' : ''; })() + (!(Number(reg.gewst) > 0) ? ' <b style="color:#B8625C">Hebesatz fehlt (gesetzlich mind. 200 %, \u00a7 16 Abs. 4 GewStG) \u2014 bitte erg\u00e4nzen.</b>' : '') + '</div>'
       +   '</div>'
       +   '<hr class="dvd" style="margin:18px 0 6px">'
       +   '<h3 class="set-section-h">Buchhaltung <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 f\u00fcr den Jahresabschluss (GuV und Bilanz)</span></h3>'   /* v2208: war "(Stufe 3)" - den Abschluss gibt es seit v1227 */
@@ -1065,6 +1179,8 @@
     }
     if (isCorp(rf)) {
       m.regime = { kst: _toN(_val('mand-f-kst')), gewst: _toN(_val('mand-f-gewst')), erw_kuerzung: _chk('mand-f-kuerz') };
+      /* v2984: die Pruefpunkte der erweiterten Kuerzung */
+      try { var _K = window.DealPilotUeberfuehrungKern; if (_K && _K.PRUEFPUNKTE) { m.regime.erw_pruefung = {}; _K.PRUEFPUNKTE.forEach(function (x) { m.regime.erw_pruefung[x.k] = _chk('mand-f-ek-' + x.k); }); } } catch (_ek) {}
       m.bh = {
         kontenrahmen: _val('mand-f-kr') || 'SKR04',
         wj_start: _val('mand-f-wj') || '01-01',
@@ -1207,7 +1323,7 @@
     openUeberfuehrung: openUeberfuehrung, _uewPick: _uewPick,  /* v856-uew */
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
-    setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, sphaere: sphaere, anteil: anteil, istKoerperschaft: istKoerperschaft, wireObjectFields: wireObjectFields,
+    setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, steuerParameter: steuerParameter, ueberfDaten: ueberfDaten, sphaere: sphaere, anteil: anteil, istKoerperschaft: istKoerperschaft, wireObjectFields: wireObjectFields,
     renderSidebarChips: renderSidebarChips, _toggleMandMenu: _toggleMandMenu, onUeberfToggle: onUeberfToggle, undoUeberfuehrung: undoUeberfuehrung, undoUeberfuehrungFromPrivat: undoUeberfuehrungFromPrivat,  syncAfterLoad: syncAfterLoad,  /* v816d-export */
     renderSettingsTab: renderSettingsTab,
     uiSaveIfOpen: uiSaveIfOpen,   /* v826 (dedup) */

@@ -1853,7 +1853,7 @@
       abschnitt('Was in dieser Fassung fehlt');
       var gruende = [];
       if (rows.length < 2) gruende.push('Die Projektion endet nach ' + (rows.length || 0) + ' Jahr' + (rows.length === 1 ? '' : 'en') + '. Vermögensaufbau, Diagramme und Belastungsprobe brauchen mindestens zwei Jahresreihen.');
-      if (rows.length < 2 && txt('ueberf_ende')) gruende.push('Grund ist das gesetzte Privat-Ende zum ' + sauber(txt('ueberf_ende')) + ' - ab dann rechnet die Gesellschaft weiter.');
+      if (rows.length < 2 && txt('ueberf_ende') && txt('obj_herkunft') !== 'ueberfuehrung') gruende.push('Grund ist das gesetzte Privat-Ende zum ' + sauber(txt('ueberf_ende')) + ' - ab dann rechnet die Gesellschaft weiter.');
       if (rows.length >= 2 && !diagramme.length) gruende.push('Die Diagramme der Bankansicht ließen sich nicht erzeugen.');
       if (rows.length >= 2 && !SM) gruende.push('Die Belastungsprobe ließ sich nicht erzeugen.');
       gruende.forEach(function (t) {

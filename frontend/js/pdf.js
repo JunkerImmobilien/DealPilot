@@ -895,7 +895,9 @@ function _dpPdfSecKey(title){
   var m={'Gesamtbewertung':'gesamt','Stärken':'staerken','Risiken':'risiken','Risikoanalyse':'risikoanalyse','Szenario-Analyse':'szenarien','Investor-Fit':'investorfit','Empfehlung':'empfehlung','Investmentbewertung':'investbew','Verhandlungsempfehlung':'verhandlung','Kaufpreis-Offerte':'offerte','Bankargumente':'bank','DealPilot-Insight':'insight',
     /* v2552 · die Abschnitte, die die Pilot-Analyse seit v2150-v2544 zeigt */
     'Anschlussfinanzierung':'anschluss','Lage & Markt':'lage','Abgleich mit dem Marktbericht':'abgleich','Optischer Eindruck aus den Fotos':'fotos',
-    'Ankauf · Bestand · Zielbild':'zielbild','Ankauf gegen heute':'ankaufheute','Steuerliche Zusammenfassung':'steuer','Steuerverlauf':'steuerverlauf'};
+    'Ankauf · Bestand · Zielbild':'zielbild','Ankauf gegen heute':'ankaufheute','Steuerliche Zusammenfassung':'steuer','Steuerverlauf':'steuerverlauf',
+    /* v2985 · Bestand: die Bestandsstrategie haengt am Haken der Verhandlung, Exit hat einen eigenen */
+    'Bestandsstrategie':'verhandlung','Exit-Strategien':'exit'};
   return m[title]||null;
 }
 function _dpPdfSectionOn(title){var k=_dpPdfSecKey(title);if(!k)return true;var cb=document.getElementById('ai-pdf-sec-'+k);return !cb||cb.checked;}
@@ -1052,10 +1054,35 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   if (a.investmentbewertung) {
     block('Investmentbewertung', clean(a.investmentbewertung), [235, 241, 248], [60, 102, 148]);
   }
-  if (a.verhandlungsempfehlung) {
+  /* v2985 · BESTAND (Ankauf-Stand vorhanden, Ist-Ansicht - dieselbe Regel wie die Reiter):
+     Bestandsstrategie, Anschlussfinanzierung und Exit-Strategien statt Verhandlung/Offerte/Bank.
+     Die Rechnung kommt aus bestand-analyse.js (ohne KI), die Fragen aus der Analyse. */
+  var _best = false;
+  try { _best = !!(window.DpBestand && window.DpBestand.istBestand()); } catch (e) { _best = false; }
+  function _qaText(arr) {
+    if (!Array.isArray(arr)) return '';
+    return arr.filter(function (x) { return x && x.frage && x.antwort; })
+      .map(function (x) { return clean(x.frage) + '\n' + clean(x.antwort); }).join('\n\n');
+  }
+  if (a.verhandlungsempfehlung && (!_best || a.bestand_modus)) {
     block(a.bestand_modus ? 'Bestandsstrategie' : 'Verhandlungsempfehlung', clean(a.verhandlungsempfehlung), [250, 244, 230], C.GOLD);   /* v2982 */
   }
-  if (a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object') {
+  if (_best) {
+    var _neu = 'Analyse neu abrufen, dann beantwortet der Pilot diese Fragen.';
+    var _af = [];
+    try { _af.push(window.DpBestand.anschlussText()); } catch (e) {}
+    var _afQa = _qaText(a.anschlussfinanzierung);
+    _af.push(_afQa || (typeof a.anschlussfinanzierung === 'string' && a.anschlussfinanzierung ? clean(a.anschlussfinanzierung) + '\n\n' + _neu : _neu));
+    if (Array.isArray(a.bankargumente) && a.bankargumente.length)
+      _af.push('Argumente für die Bank:\n' + a.bankargumente.map(function (x) { return '\• ' + clean(x); }).join('\n'));
+    block('Anschlussfinanzierung', _af.filter(Boolean).join('\n\n'));
+    var _ex = [];
+    try { _ex.push(window.DpBestand.exitText()); } catch (e) {}
+    var _exQa = _qaText(a.exit_strategien);
+    _ex.push(_exQa ? _exQa + '\n\nEine Einordnung aus deinen Eingaben, keine Steuer- oder Rechtsberatung.' : _neu);
+    block('Exit-Strategien', _ex.filter(Boolean).join('\n\n'));
+  }
+  if (!_best && a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object') {
     var kpo = a.kaufpreis_offerte;
     var offText = '';
     if (kpo.empfohlen)   offText += 'Empfohlener Kaufpreis: ' + clean(kpo.empfohlen) + '\n\n';
@@ -1066,7 +1093,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     }
     if (offText) block('Kaufpreis-Offerte', offText.trim(), [240, 232, 255], [122, 90, 181]);
   }
-  if (Array.isArray(a.bankargumente) && a.bankargumente.length) {
+  if (!_best && Array.isArray(a.bankargumente) && a.bankargumente.length) {   /* v2985 · im Bestand unter Anschlussfinanzierung */
     bulletBlock('Bankargumente', a.bankargumente, [232, 244, 234], [42, 154, 90]);
   }
 
@@ -1075,7 +1102,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
      PDF nie druckte (Felder kamen in pdf.js nicht vor). Jetzt als Textbausteine,
      jeder mit eigenem Haken unter „Bausteine im PDF". */
   var _eur = function (x) { return (x < 0 ? '-' : '') + Math.round(Math.abs(x)).toLocaleString('de-DE') + ' €'; };
-  if (a.anschlussfinanzierung) block('Anschlussfinanzierung', clean(a.anschlussfinanzierung));
+  if (!_best && a.anschlussfinanzierung) block('Anschlussfinanzierung', Array.isArray(a.anschlussfinanzierung) ? _qaText(a.anschlussfinanzierung) : clean(a.anschlussfinanzierung));   /* v2985 */
   (function () {
     var t = [];
     if (a.makrolage_recherche) t.push('Makrolage: ' + clean(a.makrolage_recherche));

@@ -178,7 +178,7 @@ var FIELDS = [
   /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
   'ueberf_restschuld','ueberf_rest_zins',
   /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */
-  'ueberf_ende','_ueberf_link',
+  'ueberf_ende','_ueberf_link','ueberf_daten',   /* v2984 */
   /* ═══ v1311 · Die Herkunft überlebt das Speichern ═══════════════════
      Marcels Vorgabe vom 11.09.2026: „wäre es super, wenn all das was wir
      ausgearbeitet haben auch nach dem Speichern im Tab Pilot-Analyse zur
@@ -547,7 +547,7 @@ function loadData(d) {
     'halter_seit', 'obj_herkunft',
     'verkehrswert_ueberf', 'ueberf_preis', 'gesellschafterdarlehen',
     'ueberf_restschuld', 'ueberf_rest_zins',
-    'ueberf_ende', '_ueberf_link',
+    'ueberf_ende', '_ueberf_link', 'ueberf_daten',
     /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
     'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr',
     /* v2660: der Mietvertrag am Objekt - fehlte er im geladenen Objekt, erbte B Vertragsart,
