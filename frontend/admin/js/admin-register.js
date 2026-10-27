@@ -20,7 +20,7 @@
   var D = null;          // letzte Antwort
   var offen = null;      // offene Zelle 'NW|lzs'
 
-  var KZ4 = ['lzs', 'swf', 'uk_flaeche', 'uk_wgfz'];
+  var KZ4 = ['lzs', 'swf', 'uk_flaeche', 'uk_wgfz', 'vgf', 'irw'];   /* v3000 · Vergleichsfaktoren und IRW-Umrechnungen dazu */
   var GRUEN = '#3FA56C', ROT = '#B8625C';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var FUNDORT = {
