@@ -22,16 +22,20 @@
   if (!sec) return;
   var frame = sec.querySelector('#ein-frame'), laedt = sec.querySelector('.ein-laedt');
   var tabs = [].slice.call(sec.querySelectorAll('[data-ansicht]'));
-  var zustand = { origin: null, ansicht: 'anmelden', weiter: '' };
+  var zustand = { origin: null, ansicht: 'anmelden', weiter: '' }, notausT = null;
 
   function istEinstiegsLink(a) {
     if (a.hasAttribute('data-direkt')) return null;   /* „Lieber direkt in die App" */
     var u; try { u = new URL(a.href, location.href); } catch (e) { return null; }
     if (!APP_RE.test(u.origin)) return null;
+    /* landing-einstieg-2 · auf der Staging-Landingpage immer die Staging-App - die Auswertung von
+       #anmelden lief vor dem Umschreiben der Links und lud sonst die Produktiv-App */
+    var org = u.origin;
+    if (/^staging\./.test(location.hostname) && org === 'https://app.dealpilot.immo') org = 'https://app.staging.dealpilot.immo';
     if (u.pathname !== '/' && u.pathname !== '/index.html') return null;
     var reg = u.searchParams.get('register') === '1';
     var weiter = new URLSearchParams(u.search); weiter.delete('register');
-    return { origin: u.origin, ansicht: reg ? 'registrieren' : 'anmelden', weiter: weiter.toString() };
+    return { origin: org, ansicht: reg ? 'registrieren' : 'anmelden', weiter: weiter.toString() };
   }
   function tabsSetzen(ansicht) {
     tabs.forEach(function (t) { var an = t.getAttribute('data-ansicht') === ansicht; t.classList.toggle('an', an); t.setAttribute('aria-selected', an ? 'true' : 'false'); });
@@ -41,8 +45,20 @@
     sec.hidden = false;
     sec.classList.add('offen');
     tabsSetzen(ziel.ansicht);
-    var src = ziel.origin + '/?einbettung=1' + (ziel.ansicht === 'registrieren' ? '&register=1' : '') + (ziel.weiter ? '&' + ziel.weiter : '');
+    /* landing-einstieg-2 · eigener Parameter: ein Browser, der die App-Seite noch aus der Zeit VOR der
+       Einbettung (X-Frame-Options DENY) im Zwischenspeicher hat, behielt bei der Neuvalidierung (304) den alten
+       Kopf und blockierte den Rahmen - Marcels Screenshot 27.10.2026 22:22. Neue Adresse = frische Antwort. */
+    var src = ziel.origin + '/?einbettung=1&e=2' + (ziel.ansicht === 'registrieren' ? '&register=1' : '') + (ziel.weiter ? '&' + ziel.weiter : '');
     if (frame.getAttribute('data-src') !== src) {
+      /* landing-einstieg-2 · Marcel 27.10.2026: „bei Kostenlos starten sehe ich kein Anmeldefenster, das ist grau".
+         Kommt von der Karte binnen 8 s keine Hoehe, geht es ohne Einbettung direkt in die App - nie eine graue Flaeche. */
+      clearTimeout(notausT);
+      var _ziel = ziel, _gemeldet = false;
+      frame._hoeheDa = false;
+      notausT = setTimeout(function () {
+        if (frame._hoeheDa || _gemeldet) return; _gemeldet = true;
+        location.href = _ziel.origin + '/' + (_ziel.ansicht === 'registrieren' ? '?register=1' + (_ziel.weiter ? '&' + _ziel.weiter : '') : (_ziel.weiter ? '?' + _ziel.weiter : ''));
+      }, 8000);
       if (frame.getAttribute('data-geladen') === '1' && frame.getAttribute('data-origin') === ziel.origin) {
         frame.contentWindow.postMessage({ dpEinbettung: true, typ: 'ansicht', wert: ziel.ansicht }, ziel.origin);
       } else {
@@ -77,7 +93,7 @@
   window.addEventListener('message', function (e) {
     if (!e.data || !e.data.dpEinbettung || !APP_RE.test(e.origin) || e.origin !== frame.getAttribute('data-origin')) return;
     if (e.data.typ === 'bereit') { frame.setAttribute('data-geladen', '1'); }
-    if (e.data.typ === 'hoehe' && e.data.h > 120) { frame.style.height = Math.min(1400, e.data.h) + 'px'; if (laedt) laedt.hidden = true; }
+    if (e.data.typ === 'hoehe' && e.data.h > 120) { frame._hoeheDa = true; frame.style.height = Math.min(1400, e.data.h) + 'px'; if (laedt) laedt.hidden = true; }
     if (e.data.typ === 'angemeldet') { location.href = e.origin + '/' + (zustand.weiter ? '?' + zustand.weiter : ''); }
   });
 
