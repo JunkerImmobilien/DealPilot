@@ -83,7 +83,23 @@ const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
    Bis v2995 hier 1,91 (Nov. 2025); zum 27.10.2026 galt August 2026 = 2,00 - Sachwert rund 4,7 % zu niedrig.
    Rueckfall 1,91 nur, falls die Tabelle fuer den Stichtag nichts hat (vor Nov. 2024). */
 const BPI_RUECKFALL = 1.91;
-const BPI = () => { const x = baupreisindexAm(new Date()); return x ? x.wert : BPI_RUECKFALL; };
+/* v3005 · W7 · DER INDEX ZUM WERTERMITTLUNGSSTICHTAG DES BERICHTS (§ 36 Abs. 2 ImmoWertV),
+   nicht zum heutigen Tag. Bis v3004 stand hier baupreisindexAm(new Date()) - richtig, solange
+   der Stichtag der Berichtstag ist, falsch fuer einen zurueckliegenden Stichtag (z. B. Erwerb).
+   Ohne eigenen Stichtag bleibt es der heutige Tag. */
+const BPI = (stichtag) => { const x = baupreisindexAm(stichtag instanceof Date ? stichtag : new Date()); return x ? x.wert : BPI_RUECKFALL; };
+/** Wertermittlungsstichtag aus den Parametern (`wertermittlungsstichtag`, ISO JJJJ-MM-TT oder
+    TT.MM.JJJJ). Ungueltig oder in der Zukunft -> heute, mit `verworfen`. */
+export function wertermittlungsstichtagAus(p) {
+  const roh = p && p.wertermittlungsstichtag;
+  if (roh == null || roh === '') return { datum: new Date(), eigen: false, verworfen: null };
+  let s = String(roh).trim();
+  const de = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (de) s = de[3] + '-' + de[2].padStart(2, '0') + '-' + de[1].padStart(2, '0');
+  const t = /^\d{4}-\d{2}-\d{2}$/.test(s) ? Date.parse(s + 'T12:00:00Z') : NaN;
+  if (!Number.isFinite(t) || t > Date.now()) return { datum: new Date(), eigen: false, verworfen: String(roh) };
+  return { datum: new Date(t), eigen: true, iso: s, verworfen: null };
+}
 export function baupreisindexHeute() { return baupreisindexAm(new Date()) || { wert: BPI_RUECKFALL, stichtag: '2026-01-01', art: 'konstante' }; }
 export const BAUPREISINDEX_KONSTANTE = baupreisindexHeute(); /* v1851: Rueckwaertsname; Aufrufer nehmen baupreisindexHeute() */
                                   // Quellen: IMB Hamburg 2026 (1,911),
@@ -322,6 +338,7 @@ export const CrossCheckService = {
      * sie sofort abgestuerzt — der Sachwert fuer Haeuser war latent kaputt,
      * seit `params` eingefuehrt wurde. Deklaration gehoert an den Anfang. */
     const p = params || {};
+    const _wst = wertermittlungsstichtagAus(p);   /* v3005 · W7 */
     const out = {
       available: false,
       sachwert: { available: false },
@@ -331,7 +348,7 @@ export const CrossCheckService = {
         /* WSACH-2 · Die Fussnote nannte hart "Liegenschaftszins 3 %", auch wenn
          * tatsaechlich 4 % gerechnet wurden. Eine Annahme, die etwas anderes
          * behauptet als die Rechnung, ist schlimmer als keine. */
-        nhk_efh_bgf_eur: NHK_EFH_BGF, baupreisindex_2010_heute: BPI(),
+        nhk_efh_bgf_eur: NHK_EFH_BGF, baupreisindex_2010_heute: BPI(_wst.datum),
         bgf_faktor: BGF_FAKTOR, gnd_jahre: GND_JAHRE, sachwertfaktor: SACHWERTFAKTOR,
         liegenschaftszins_pct_effektiv: (params && params.lzs_pct != null)
           ? Number(params.lzs_pct) : LIEGENSCHAFTSZINS * 100,
@@ -602,7 +619,22 @@ export const CrossCheckService = {
        `p.bodenwert` gar keinen Bodenwert und wies das Gebaeude als Sachwert aus. */
     const _bwSw = (p && p.bodenwert) || (bodenwert != null ? { vollstaendig: true, wert: bodenwert } : null);
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
-      let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
+      /* v3005 · W2 · REGIONALFAKTOR (§ 36 Abs. 3 ImmoWertV): „ein vom oertlich zustaendigen
+         Gutachterausschuss festgelegter Modellparameter". Fuehrt der Registersatz des
+         Sachwertfaktors einen (modellansaetze.regionalfaktor als ZAHL), gilt er - der Faktor
+         passt nur auf eine Rechnung mit demselben Regionalfaktor (§ 10 Abs. 1). Die
+         Nutzereingabe gilt nur, wenn sie ausdruecklich gesetzt ist. Bis v3004 nahm der Kern
+         nur die Nutzereingabe, sonst 1,0 - Hamburg (1,75) rechnete den vorlaeufigen Sachwert
+         ohne seinen Modellfaktor und multiplizierte ihn dann mit dem Hamburger SWF.
+         Ein Regionalfaktor nur im Fliesstext wird NICHT geraten (Luecke bleibt Luecke).
+         Erst nach dem Nachschlagen ist das Modell bekannt; weicht sein Regionalfaktor ab,
+         laeuft der erste Lauf neu und der Faktor wird mit dem richtigen vorlaeufigen
+         Sachwert erneut nachgeschlagen (Hamburg: Sachwertverhaeltnis haengt davon ab). */
+      const _rfNutzer = Number(p && p.regionalfaktor) > 0 ? Number(p.regionalfaktor) : null;
+      const _rfAusModell = (ma) => { const v = Number(ma && ma.regionalfaktor);
+        return (ma && typeof ma.regionalfaktor === 'number' && Number.isFinite(v) && v > 0) ? v : null; };
+      let _rfSw = _rfNutzer, _rfQuelle = _rfNutzer != null ? 'eigene_angabe' : 'ohne', _rfHinweis = null;
+      const _ein1 = {   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
         nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
           || _nhkTypAuto(), keller_dg: (p && p.keller_dg) || ref.keller_dg,
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
@@ -611,7 +643,7 @@ export const CrossCheckService = {
         /* v2383 · Korrekturfaktoren NHK 2010 Anlage 4 fuer Mehrfamilienhaeuser (Wohnungsgroesse,
            Grundrissart) - der Kern konnte sie seit jeher, sie kamen nie an. */
         ..._mfhKorr,
-        baupreisindex: BPI(), regionalfaktor: (p && p.regionalfaktor) || null,
+        baupreisindex: BPI(_wst.datum), regionalfaktor: _rfNutzer,   /* v3005 · W2/W7 */
         /* v1056-WRND-1 · Bisher bekam der Sachwert die alte Schaetzung,
          * waehrend der Ertragswert seit v1052 nach Anlage 2 rechnet: 38
          * gegen 49,6 Jahre fuer dasselbe Gebaeude. Zwei Alterswerte fuer
@@ -642,7 +674,8 @@ export const CrossCheckService = {
         aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
         garagen_bgf_qm: (p && p.garagen_bgf_qm) || ref.garagen_bgf_qm || null,
         garagen_stufe: (p && p.garagen_stufe) || ref.garagen_stufe || null,
-      }, _bwSw, (p && p.sachwertfaktor_param) || null);
+      };
+      let _sw = nhkSachwert({ ..._ein1 }, _bwSw, (p && p.sachwertfaktor_param) || null);
 
       /* v1069-WSWF-2 · Der Sachwertfaktor haengt vom vorlaeufigen Sachwert
        * ab — er laesst sich nicht vorab aus einer Tabelle holen. Deshalb
@@ -664,7 +697,7 @@ export const CrossCheckService = {
             ? p.sachwertfaktor_param.wert : p.sachwertfaktor_param.sachwertfaktor));
       if (!(_swfEigen > 0)
           && _sw && _sw.vorlaeufiger_sachwert_eur != null) {
-        _swfTab = swfNachTabelle({
+        const _swfArgs = {   /* v3005 · W2: die Argumente einmal, fuer ein zweites Nachschlagen */
           ags: (p && p.ags) || ref.ags || null,
           sachwert_eur: _sw.vorlaeufiger_sachwert_eur,
           rnd_jahre: _sw.restnutzungsdauer_jahre,
@@ -714,10 +747,33 @@ export const CrossCheckService = {
           unterkellerung: (p && p.keller_dg) || ref.keller_dg || null,
           mod_punkte: (p && p.mod_punkte) != null ? p.mod_punkte
             : (ref.mod_punkte != null ? ref.mod_punkte : null),
-
-
-
-        });
+        };
+        _swfTab = swfNachTabelle({ ..._swfArgs });
+        /* v3005 · W2 · Regionalfaktor aus dem Modell des Ausschusses (siehe oben). */
+        if (_swfTab && _swfTab.verfuegbar) {
+          const _rfM = _rfAusModell(_swfTab.modellansaetze);
+          if (_rfM != null && _rfNutzer != null && Math.abs(_rfM - _rfNutzer) > 1e-9) {
+            _rfHinweis = 'Der eingetragene Regionalfaktor ' + String(_rfNutzer).replace('.', ',')
+              + ' weicht vom Modell des Gutachterausschusses ab (' + String(_rfM).replace('.', ',')
+              + '). Der Sachwertfaktor gilt nur im Modell, aus dem er abgeleitet wurde (§ 10 Abs. 1 ImmoWertV) \u2014 '
+              + 'mit der eigenen Angabe ist das Ergebnis insoweit nicht modellkonform.';
+          } else if (_rfM != null && _rfNutzer == null) {
+            _rfSw = _rfM; _rfQuelle = 'modell_gutachterausschuss';
+            if (_rfM !== 1) {
+              const _sw1rf = nhkSachwert({ ..._ein1, regionalfaktor: _rfM }, _bwSw, null);
+              const _tab2 = (_sw1rf && _sw1rf.vorlaeufiger_sachwert_eur != null)
+                ? swfNachTabelle({ ..._swfArgs, sachwert_eur: _sw1rf.vorlaeufiger_sachwert_eur, rnd_jahre: _sw1rf.restnutzungsdauer_jahre })
+                : null;
+              if (_tab2 && _tab2.verfuegbar && _rfAusModell(_tab2.modellansaetze) === _rfM) {
+                _sw = _sw1rf; _swfTab = _tab2;
+              } else {
+                _rfSw = _rfNutzer; _rfQuelle = 'ohne';
+                _swfTab = { verfuegbar: false, grund: 'regionalfaktor_modell_abweichend',
+                  hinweis: 'Mit dem Regionalfaktor des Modells (' + String(_rfM).replace('.', ',') + ') liefert der Ausschuss f\u00fcr dieses Objekt keinen Sachwertfaktor.' };
+              }
+            }
+          }
+        }
         if (_swfTab && _swfTab.verfuegbar) {
           /* v1338: Fuehrt das Modell des Ausschusses eine eigene
              Gesamtnutzungsdauer, gilt SIE - sonst passt der Faktor auf
@@ -734,12 +790,12 @@ export const CrossCheckService = {
             keller_dg: (p && p.keller_dg) || ref.keller_dg,
             standardstufe: (p && p.standardstufe) || ref.standardstufe,
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
-            objektart: ref.property_type, baupreisindex: BPI(),
+            objektart: ref.property_type, baupreisindex: BPI(_wst.datum),   /* v3005 · W7 */
             zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH · zweiter Lauf */
             /* v2720 · Bezug des Index im Modell des Ausschusses (nur fuer den Rechenweg). */
             baupreisindex_bezug: ((_swfTab.modellansaetze || {}).baupreisindex_bezug) || null,
             ..._mfhKorr,   /* v2383 · zweiter Lauf */
-            regionalfaktor: (p && p.regionalfaktor) || null,
+            regionalfaktor: _rfSw,   /* v3005 · W2 */
             gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
         /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
            setzt ihn, und Objektliterale werten in Quelltextreihenfolge
@@ -804,6 +860,19 @@ export const CrossCheckService = {
           /* v1338: Womit gerechnet wurde und warum. Ohne diese drei
              Felder sieht niemand, ob die Zahl im Modell des Ausschusses
              steht oder aus Anlage 1 stammt. */
+          /* v3005 · W2 · womit der Regionalfaktor gerechnet wurde und woher er stammt */
+          regionalfaktor: _rfSw != null ? _rfSw : 1,
+          regionalfaktor_quelle: _rfQuelle,
+          regionalfaktor_hinweis: _rfHinweis
+            || (_rfQuelle === 'modell_gutachterausschuss' && _rfSw !== 1
+              ? 'Regionalfaktor ' + String(_rfSw).replace('.', ',') + ' aus dem Sachwertmodell des Gutachterausschusses (§ 36 Abs. 3 ImmoWertV) — derselbe Modellparameter, mit dem er seine Sachwertfaktoren ableitet (§ 10 Abs. 1).'
+              : null),
+          /* v3005 · W7 · Baupreisindex zum Wertermittlungsstichtag */
+          baupreisindex: (function () { const x = baupreisindexAm(_wst.datum);
+            return x ? { wert: x.wert, monat: x.monat, text: x.text, wertermittlungsstichtag: _wst.eigen ? _wst.iso : null,
+                         stichtag_verworfen: _wst.verworfen }
+                     : { wert: BPI_RUECKFALL, monat: null, text: 'Rückfallwert ' + String(BPI_RUECKFALL).replace('.', ','),
+                         wertermittlungsstichtag: _wst.eigen ? _wst.iso : null, stichtag_verworfen: _wst.verworfen }; })(),
           gnd_jahre: _gndSw,
           gnd_quelle: _gndModell != null ? 'modell_gutachterausschuss' : 'anlage1_immowertv',
           gnd_hinweis: _gndModell != null
@@ -1019,7 +1088,7 @@ export const CrossCheckService = {
          Berichts (Anlage 2, wenn Punkte vorliegen) - nicht mit GND - Alter. */
       try { const _rE = _rndEinheitlich(GND_JAHRE); if (Number(_rE) > 0) rnd = _rE; } catch (e) {}
       const bgf = wfl * BGF_FAKTOR;
-      const hkNeubau = bgf * NHK_EFH_BGF * BPI();
+      const hkNeubau = bgf * NHK_EFH_BGF * BPI(_wst.datum);
       const alterswertfaktor = rnd != null ? rnd / GND_JAHRE : null;
       const gebaeudeSachwert = alterswertfaktor != null ? hkNeubau * alterswertfaktor : null;
       /* ══ v2595 · OHNE BODENWERT KEIN SACHWERT (§ 35 Abs. 2 ImmoWertV) ══════
@@ -1752,6 +1821,17 @@ export const CrossCheckService = {
         ein.bwk_gesamt_jahr = Math.round(rohertrag * BWK_QUOTE);
       } else {
         ein.bwk_modus = 'normiert';
+        /* v3005 · W6 · TOTER PFAD, OFFEN DOKUMENTIERT (gemessen 27.10.2026):
+           - `instandhaltung_ruecklage_jahr` und `leerstand_pct` liefert der Orchestrator
+             (ReportOrchestrator ~Z. 1496), hier werden sie BEWUSST NICHT an `ein` gegeben:
+             eine WEG-Ruecklage ist keine Instandhaltung nach Anlage 3, und Leerstand wird im
+             Ertragswert nicht abgezogen (Marcel 21.10.2026: Bewertung am voll vermieteten
+             Objekt; Mietausfallwagnis nach Anlage 3/Modell). Ausserdem kaeme `leerstand`
+             aus dem Objekt-Mapper als OBJEKT (leerstandAus), nicht als Prozentsatz.
+           - Die drei eigenen Saetze unten stehen nicht in der ref-Liste des Orchestrators
+             (~Z. 235-313) - ueber /api kommen sie heute nie an; erreichbar nur bei direktem
+             Aufruf von compute(). Kommt der Weg, beschriftet der Kern sie als
+             „eigene Angabe“ und warnt bei amtlichem Zins (§ 10 Abs. 1), v3005. */
         ein.bwk_verwaltung_je_we = _num(p.bwk_verwaltung_je_we);
         ein.bwk_instandhaltung_je_qm = _num(p.bwk_instandhaltung_je_qm);
         ein.bwk_mietausfall_pct = _num(p.bwk_mietausfall_pct);

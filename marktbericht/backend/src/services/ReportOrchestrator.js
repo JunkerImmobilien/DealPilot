@@ -273,6 +273,8 @@ export const ReportOrchestrator = {
         && Number.isFinite(Number(input.mod_angaben)) ? Number(input.mod_angaben) : null,
       bgf: input.bgf ? Number(input.bgf) : null,
       regionalfaktor: input.regionalfaktor ? Number(input.regionalfaktor) : null,
+      /* v3005 · W7 · Wertermittlungsstichtag des Berichts (JJJJ-MM-TT), sonst heute */
+      wertermittlungsstichtag: input.wertermittlungsstichtag ? String(input.wertermittlungsstichtag) : null,
       sachwertfaktor: input.sachwertfaktor ? Number(input.sachwertfaktor) : null,
       bes_bauteile: input.bes_bauteile ? Number(input.bes_bauteile) : null,
       /* v1338: bOM nach Paragraf 8 Abs. 3 ImmoWertV. Die ref-Liste ist
@@ -1501,6 +1503,7 @@ export const ReportOrchestrator = {
           nhk_typ: ref.nhk_typ || null, keller_dg: ref.keller_dg || null,
           standardstufe: ref.standardstufe || null, bgf_direkt: ref.bgf || null,
           regionalfaktor: ref.regionalfaktor || null,
+          wertermittlungsstichtag: ref.wertermittlungsstichtag || null,   /* v3005 · W7 */
           bes_bauteile: ref.bes_bauteile || null, aussenanlagen: ref.aussenanlagen || null,
           /* v1074-WAUS9-4 · Kette von A nach B. */
           ausstattung: ref.ausstattung || null,

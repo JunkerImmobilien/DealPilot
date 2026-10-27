@@ -1192,6 +1192,28 @@ fallB('B54', () => {
     zE ? 'quelle ' + bE.ein.bog_quelle + ', Δ ' + (zE.wert_ungerundet - kE.wert_ungerundet) : 'kein Lauf');
 });
 
+/* v3005 · B55 Regionalfaktor aus dem Sachwertmodell (Hamburg 1,75, § 36 Abs. 3) · B56 Baupreisindex
+   zum Wertermittlungsstichtag (§ 36 Abs. 2) · B57 GND Wohnhaus mit Mischnutzung 80 (Anlage 1) */
+(() => {
+  const ref = { property_type: 'efh', property_subtype: 'efh', living_area: 140, build_year: 1990, plot_area: 600,
+    ags: '02000000', standardstufe: 3, nhk_typ: '1.21', bgf: 225, gemeinde: 'Hamburg' };
+  const par = (x) => Object.assign({ ags: '02000000', brw_sqm: 800, standardstufe: 3, bgf_direkt: 225 }, x || {});
+  const lv = { available: true, value_sqm: 800 };
+  const s0 = (compute(ref, lv, null, null, par()) || {}).sachwert || {};
+  wert('B', 'B55', 'Hamburg: Regionalfaktor aus dem Modell', s0.regionalfaktor ?? null, 1.75, 0);
+  pruefe('B', 'B55', 'Hamburg: Quelle modell_gutachterausschuss, Staffelzeile × Regionalfaktor 1,75',
+    s0.regionalfaktor_quelle === 'modell_gutachterausschuss' && (s0.staffel || []).some((z) => /Regionalfaktor/.test(z.pos) && z.faktor === 1.75),
+    s0.regionalfaktor_quelle);
+  const s1 = (compute(ref, lv, null, null, par({ regionalfaktor: 1.2 })) || {}).sachwert || {};
+  pruefe('B', 'B55', 'eigene Angabe 1,2 gilt, mit Hinweis auf § 10', s1.regionalfaktor === 1.2 && /§ 10/.test(String(s1.regionalfaktor_hinweis)), s1.regionalfaktor_hinweis);
+  const s2 = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2025-06-15' })) || {}).sachwert || {};
+  wert('B', 'B56', 'Baupreisindex zum Stichtag 15.06.2025 (Mai 2025: 133,6 / 70,8)', s2.baupreisindex ? s2.baupreisindex.wert : null, 1.89, 0);
+  const s3 = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2099-01-01' })) || {}).sachwert || {};
+  pruefe('B', 'B56', 'Stichtag in der Zukunft verworfen, heutiger Index', !!s3.baupreisindex && s3.baupreisindex.stichtag_verworfen === '2099-01-01' && s3.baupreisindex.wert === s0.baupreisindex.wert,
+    JSON.stringify(s3.baupreisindex || null).slice(0, 80));
+  wert('B', 'B57', 'GND Wohnhaus mit Mischnutzung (Anlage 1)', IW.gnd('wohn_misch'), 80, 0);
+})();
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};

@@ -25,7 +25,7 @@ export const GND_TABELLE = {
   werte: {
     efh: 80, zfh: 80, dhh: 80, rh: 80,
     mfh: 80, etw: 80, wohnung: 80,
-    wohn_misch: 70,
+    wohn_misch: 80,   /* v3005 · W5: Anlage 1 „Wohnhäuser mit Mischnutzung 80“ - bis v3004 70; der Schluessel wird derzeit nirgends erzeugt (WGH laufen ueber default 80) */
     buero: 60, geschaeft: 60,
     hotel: 40, lager: 40, werkstatt: 40, parkhaus: 40,
     kaufhaus: 50,
@@ -37,9 +37,9 @@ export const GND_TABELLE = {
    false) - einzelne Zeilen sind es: Anlage 1 ImmoWertV 2021 nennt fuer Ein-/Zweifamilien-,
    Doppel- und Reihenhaeuser sowie Mehrfamilienhaeuser 80 Jahre, Buero/Geschaeftshaeuser 60,
    Kauf-/Warenhaeuser 50, Beherbergung, Lager, Werkstaetten, Hoch-/Tiefgaragen 40. Fuer
-   diese Arten erscheint die Warnung „nicht verifiziert" nicht mehr. `wohn_misch` (70)
-   bleibt offen. */
-const GND_ANLAGE1_BELEGT = { efh: 80, zfh: 80, dhh: 80, rh: 80, mfh: 80, etw: 80, wohnung: 80, haus: 80,
+   diese Arten erscheint die Warnung „nicht verifiziert" nicht mehr. `wohn_misch` ist seit
+   v3005 belegt: 80 (Anlage 1 „Wohnhäuser mit Mischnutzung“), vorher stand dort 70. */
+const GND_ANLAGE1_BELEGT = { efh: 80, zfh: 80, dhh: 80, rh: 80, mfh: 80, etw: 80, wohnung: 80, haus: 80, wohn_misch: 80,
   buero: 60, geschaeft: 60, kaufhaus: 50, hotel: 40, lager: 40, werkstatt: 40, parkhaus: 40 };
 export function gndNachAnlage1Belegt(objektart) {
   const k = String(objektart ?? '').toLowerCase().trim();
