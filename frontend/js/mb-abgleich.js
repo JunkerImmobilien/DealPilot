@@ -33,7 +33,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMbAbgleich) return;
-  var VERSION = 'v3002b';
+  var VERSION = 'v3002c';
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function fmt(n, d) {
@@ -448,7 +448,7 @@
      als Hintergrund im Modul (DpMbAbgleich.zeilen) — der Pilot und das PDF
      lesen dieselben Berichtswerte ohnehin über /objects/history. */
   function merkerKey(art) {
-    var u = ''; try { var U = window.Auth && Auth.getUser ? Auth.getUser() : null; u = (U && (U.id || U.email)) || ''; } catch (e) {}
+    var u = ''; try { var U = window.Auth && Auth.getSession ? Auth.getSession() : null; u = (U && (U.userId || U.email)) || ''; } catch (e) {}
     return 'dp_mba_offen_' + art + '_' + u;
   }
   function istOffen(art) { try { return localStorage.getItem(merkerKey(art)) === '1'; } catch (e) { return false; } }
