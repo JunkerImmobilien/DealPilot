@@ -617,6 +617,9 @@ router.get('/objects/history', async (req, res) => {
               market_value, market_value_low, market_value_high,
               median_sqm, gross_yield_pct, rent_multiplier, deal_score, micro_score, macro_score,
               price_cagr_pct, confidence, comparable_group, ai_mode,
+              /* v3002 . Stufe des Berichts (1/2 Indikation, 3 Wertermittlung) - der Abgleich in den
+                 Reitern Objekt und Miete sucht den letzten Bericht der Stufe 3. Keine Backticks hier. */
+              (data->'ref'->>'wert_stufe') AS wert_stufe,
               /* ══ v1963 · DIE IMMOWERTV-WERTE GEHEN MIT ══════════════════
                  Marcel am 08.10.2026: „wenn wir die Stufe 3 gerechnet haben,
                  sollte der Verkehrswert bzw. Ertragswert auch unten in dem

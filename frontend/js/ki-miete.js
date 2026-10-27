@@ -141,6 +141,9 @@ async function runKiMiete() {
     var istQm = wfl > 0 ? (nkm / wfl) : 0;
     var marktVal = sugMarkt && sugMarkt.value ? parseFloat(String(sugMarkt.value).replace(',', '.')) : null;
     var ausfallVal = sugAusfall && sugAusfall.value ? sugAusfall.value : null;
+    /* v3002 · der Abgleich mit dem Marktbericht (mb-abgleich.js) stellt die Recherche neben den Bericht */
+    try { window._lastKiMiete = { key: window._currentObjKey || null, markt_qm: (marktVal != null && isFinite(marktVal)) ? marktVal : null, ausfall: ausfallVal, belege: belege, zeit: Date.now() };
+          window.dispatchEvent(new CustomEvent('dp:ki-miete', { detail: {} })); } catch (e) {}
 
     var ausfallMap = {
       sehr_niedrig: { label: 'Sehr niedrig', col: '#3FA56C' },
@@ -314,7 +317,7 @@ function _kmVergleichHtml(b, kiWert, istQm, sug) {
   }
   if (b.band) {
     o += _kmZeile('Marktüblichkeitsband', _kmQm(b.band.unten_qm) + ' – ' + _kmQm(b.band.oben_qm),
-      'Wertermittlung im Marktbericht: amtliche Vergleichsmiete und Angebotsmiete × 0,7 bis × 1,3', 'Wertermittlung', g.indexOf('marktueblichkeitsband') >= 0);
+      'Wertermittlung im Marktbericht: ' + (b.band.regel || 'Anker der Marktüblichkeit ± 20 %')   /* v3002: stand „× 0,7 bis × 1,3“, seit v2600 Anker ± 20 % */, 'Wertermittlung', g.indexOf('marktueblichkeitsband') >= 0);
   }
   if (b.ertrag && b.ertrag.wert_qm != null) {
     o += _kmZeile('Im Ertragswert angesetzt', _kmQm(b.ertrag.wert_qm), b.ertrag.quelle || '', 'Wertermittlung', g.indexOf('ertragswert_miete') >= 0);
