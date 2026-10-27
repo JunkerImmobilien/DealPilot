@@ -66,28 +66,47 @@ router.use(authenticate);
 const MB_BASE = (process.env.MB_BACKEND_URL
   || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
 
-/* ── Die Tür für später ──────────────────────────────────────────────
-   Heute: jeder angemeldete Nutzer darf. Wer die Kerne künftig
-   kostenpflichtig machen will, prüft HIER das Plan-Merkmal oder den
-   Admin-Schalter — und nirgends sonst. */
-function _darfRechnen(req) {
-  if (!req.user || !req.user.id) return { ok: false, grund: 'nicht angemeldet' };
-  /* PLATZHALTER fuer die spaetere Freigabe, bewusst offen:
-       const frei = await featureService.hat(req.user.id, 'rechenkerne');
-       if (!frei) return { ok:false, grund:'rechenkerne_nicht_freigeschaltet' };
-     Der API-Key-Weg prueft den Pro-Plan bereits in middleware/auth.js. */
-  return { ok: true };
+/* ── v2977 · DIE TÜR HAT JETZT EIN SCHLOSS ───────────────────────────
+   Marcel 27.10.2026: die Schnittstelle wird ein eigener Zusatz („später
+   für Sachverständige oder Makler ein extra Paket“), nur für Pro und
+   Partner. Hier stand bis v2976 ein Platzhalter, der jeden angemeldeten
+   Nutzer durchließ. Jetzt fragt die Route EINE Stelle:
+   zusatzService.darfRechnen() — Plan, Testphase, Zusatz, Monatskontingent.
+   Gemessen vorher: auf Produktion gab es einen einzigen API-Schlüssel, nie
+   benutzt — die Sperre schneidet niemanden ab. */
+const zusatz = require('../services/zusatzService');
+
+async function _darfRechnen(req, kern) {
+  try {
+    return await zusatz.darfRechnen(req.user, kern);
+  } catch (e) {
+    /* Ein bezahlter Zusatz geht im Zweifel ZU, nicht auf. */
+    console.error('[rechenkerne] Freigabe nicht pruefbar:', e.message);
+    return { ok: false, status: 503, grund: 'freigabe_nicht_pruefbar' };
+  }
 }
 
-/* ── Die Zählung für später ──────────────────────────────────────────
-   Noch keine Abrechnung, aber schon eine Spur: wer, welcher Kern, wie
-   lange. Ohne sie müsste man die Nutzung später schätzen. */
-function rechenkerneLog(req, kern, msDauer, ok) {
+function _abgelehnt(res, darf) {
+  const s = darf.status || 403;
+  const k = Object.assign({ error: darf.grund }, darf);
+  delete k.ok; delete k.status; delete k.grund;
+  return res.status(s).json(k);
+}
+
+/* ── Die Zählung ─────────────────────────────────────────────────────
+   Jeder Aufruf landet in rechenkerne_aufrufe (Kontingent, spätere
+   Abrechnung) und weiter im Protokoll. */
+function rechenkerneLog(req, kern, msDauer, ok, status) {
   try {
     console.log('[rechenkerne] ' + kern
       + ' user=' + (req.user && req.user.id)
       + ' via=' + (req.apiKey ? 'api-key' : 'session')
       + ' ms=' + msDauer + ' ok=' + (ok ? 1 : 0));
+    zusatz.aufrufZaehlen({
+      userId: req.user && req.user.id, apiKeyId: req.apiKey && req.apiKey.id,
+      kern: kern, ok: ok, status: status || (ok ? 200 : null), ms: msDauer,
+      externalRef: req.body && req.body.external_ref
+    }).catch(function (e) { console.error('[rechenkerne] Zaehlung fehlgeschlagen:', e.message); });
   } catch (e) { /* eine Zaehlung darf nie den Aufruf kippen */ }
 }
 
@@ -110,8 +129,8 @@ function rechenkerneLog(req, kern, msDauer, ok) {
    ═══════════════════════════════════════════════════════════════════════ */
 router.post('/rnd', async function (req, res) {
   const t0 = Date.now();
-  const darf = _darfRechnen(req);
-  if (!darf.ok) return res.status(403).json({ error: darf.grund });
+  const darf = await _darfRechnen(req, 'rnd');
+  if (!darf.ok) return _abgelehnt(res, darf);
 
   try {
     const body = req.body || {};
@@ -167,7 +186,7 @@ router.post('/rnd', async function (req, res) {
     rechenkerneLog(req, 'rnd', Date.now() - t0, true);
     res.json(antwort);
   } catch (e) {
-    rechenkerneLog(req, 'rnd', Date.now() - t0, false);
+    rechenkerneLog(req, 'rnd', Date.now() - t0, false, 422);
     /* Der Kern wirft bei unbrauchbaren Eingaben - das ist gewollt und
        die Meldung gehört dem Aufrufer, nicht nur dem Protokoll. */
     res.status(422).json({ error: 'rechenfehler', message: String(e && e.message || e) });
@@ -193,8 +212,8 @@ router.post('/rnd', async function (req, res) {
    ═══════════════════════════════════════════════════════════════════════ */
 router.post('/verkehrswert', async function (req, res) {
   const t0 = Date.now();
-  const darf = _darfRechnen(req);
-  if (!darf.ok) return res.status(403).json({ error: darf.grund });
+  const darf = await _darfRechnen(req, 'verkehrswert');
+  if (!darf.ok) return _abgelehnt(res, darf);
 
   try {
     const body = req.body || {};
@@ -288,7 +307,7 @@ router.post('/verkehrswert', async function (req, res) {
       text = await r.text();
       try { antwort = JSON.parse(text); } catch (e) { antwort = null; }
       if (r.status >= 400) {
-        rechenkerneLog(req, 'verkehrswert', Date.now() - t0, false);
+        rechenkerneLog(req, 'verkehrswert', Date.now() - t0, false, r.status);
         return res.status(r.status).json(antwort || { error: 'mb_fehler', roh: String(text).slice(0, 400) });
       }
     } finally { clearTimeout(frist); }
@@ -300,7 +319,7 @@ router.post('/verkehrswert', async function (req, res) {
       ergebnis: antwort
     });
   } catch (e) {
-    rechenkerneLog(req, 'verkehrswert', Date.now() - t0, false);
+    rechenkerneLog(req, 'verkehrswert', Date.now() - t0, false, 502);
     res.status(502).json({ error: 'mb_unreachable', message: String(e && e.message || e) });
   }
 });
@@ -329,10 +348,30 @@ router.get('/', function (req, res) {
       }
     ],
     zugang: 'Kopfzeile x-api-key, oder angemeldete Sitzung. 120 Aufrufe je Minute.',
-    bepreisung: 'Heute im Plan enthalten. Der Namensraum /rechenkerne/* ist eigens '
-              + 'dafuer da, spaeter getrennt freigeschaltet und abgerechnet zu werden; '
-              + 'jeder Aufruf wird bereits mit Nutzer, Kern und Dauer protokolliert.'
+    freigabe: 'Zusatz „Schnittstelle Rechenkerne“ (v2977): Plan Pro oder Partner, ausserhalb '
+            + 'der Testphase, Zusatz freigeschaltet. Optional ein Monatskontingent je Kern; '
+            + 'gezaehlt werden nur erfolgreiche Aufrufe.',
+    stand: 'GET /api/v1/rechenkerne/kontingent',
+    doku: '/api-doku.html'
   });
+});
+
+/* ═══ 4 · v2977 · MEIN STAND ════════════════════════════════════════════
+   Freigabe, Kontingent und Aufrufe im laufenden Monat - damit der Kunde
+   (oder sein Programm) nicht erst am 429 merkt, dass es knapp wird. */
+router.get('/kontingent', async function (req, res) {
+  try {
+    const z = await zusatz.holen(req.user.id, zusatz.RECHENKERNE);
+    const zaehl = await zusatz.monatsZaehlung(req.user.id);
+    res.json({
+      freigeschaltet: !!(z && z.aktiv),
+      monat: zaehl,
+      kontingent: { rnd: z ? z.kontingent_rnd : null, verkehrswert: z ? z.kontingent_vw : null },
+      hinweis: 'kontingent null = ohne Grenze; gezaehlt wird n_ok (erfolgreiche Aufrufe)'
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'server_error', message: String(e && e.message || e) });
+  }
 });
 
 module.exports = router;

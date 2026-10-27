@@ -1874,6 +1874,31 @@ router.delete('/api-keys/:keyId', requireAdmin, requireRole('owner', 'support'),
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+/* v2977 · Zusatz „Schnittstelle Rechenkerne“ (RND + Verkehrswert) je Kunde:
+   freischalten, Monatskontingent, Aufrufe im laufenden Monat. Marcel 27.10.2026. */
+const _zusatzService = require('../services/zusatzService');
+router.get('/users/:id/zusaetze', requireAdmin, async (req, res) => {
+  try {
+    res.json({
+      rechenkerne: await _zusatzService.holen(req.params.id, _zusatzService.RECHENKERNE),
+      monat: await _zusatzService.monatsZaehlung(req.params.id)
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/users/:id/zusaetze/rechenkerne', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const b = req.body || {};
+    const z = await _zusatzService.setzen(req.params.id, _zusatzService.RECHENKERNE, {
+      aktiv: b.aktiv !== false, kontingent_rnd: b.kontingent_rnd, kontingent_vw: b.kontingent_vw, notiz: b.notiz
+    }, req.adminUser.email);
+    await audit(db, req.adminUser.id, req.adminUser.email,
+      z.aktiv ? 'user.zusatz_rechenkerne_an' : 'user.zusatz_rechenkerne_aus', 'user', req.params.id,
+      { kontingent_rnd: z.kontingent_rnd, kontingent_vw: z.kontingent_vw }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, rechenkerne: z });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
 /* ═══ v1189 · Pro-Test durch den Admin ══════════════════════════════════
    HIER STANDEN ZWEI ROUTEN AUF DEMSELBEN PFAD. Express nimmt bei doppelter
    Registrierung die ERSTE — also lief seit v811b die alte, und die neue,

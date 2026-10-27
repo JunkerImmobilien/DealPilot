@@ -92,7 +92,10 @@
     html += '</tbody></table>';
     html += '<div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">' +
       '<button type="button" class="btn btn-sm btn-outline" onclick="DealPilotApiKeys.create()">Neuen Key erzeugen</button>' +
-      '<span style="font-size:11.5px;color:var(--muted)">Header <code>X-API-Key</code> \u00b7 Basis-URL <code>/api/v1</code> \u00b7 voller CRUD</span></div>';
+      '<span style="font-size:11.5px;color:var(--muted)">Header <code>X-API-Key</code> \u00b7 Basis-URL <code>/api/v1</code> \u00b7 voller CRUD</span></div>' +
+      /* v2977 \u00b7 Rechenkerne (RND, Verkehrswert) als Zusatz - Doku fuer die Anbindung */
+      '<div style="margin-top:8px;font-size:11.5px;color:var(--muted)">Restnutzungsdauer und Verkehrswert per Schnittstelle (Zusatz): ' +
+      '<a href="/api-doku.html" target="_blank" rel="noopener">Dokumentation</a></div>';
     b.innerHTML = html;
   }
 

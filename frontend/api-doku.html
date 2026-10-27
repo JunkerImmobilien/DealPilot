@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot Schnittstelle</title>
+<link rel="icon" href="assets/dealpilot-favicon.png">
+<link rel="stylesheet" href="/fonts/dp-fonts.css">
+<!-- v2977 · Kundendoku der Schnittstelle Rechenkerne (RND + Verkehrswert).
+     Quelle der Wahrheit ist backend/src/routes/rechenkerne.js und zusatzService.js. -->
+<style>
+:root{
+  --obs:#050505; --creme:#FDFCFA; --karte:#FBF6E9; --linie:#E6DFCF;
+  --text:#2A2727; --leise:#6B6356; --gruen:#3FA56C; --rot:#B8625C;
+  --gold:var(--wl-c9a84c, #C9A84C); --gold-lo:var(--wl-b8932f, #b8932f);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--creme);color:var(--text);font:15px/1.6 Inter,system-ui,sans-serif}
+header{background:var(--obs);color:var(--creme);padding:28px 16px}
+header .in,main{max-width:880px;margin:0 auto}
+header h1{font:600 28px/1.2 'Space Grotesk',sans-serif;margin:0 0 6px}
+header p{margin:0;color:#cfc8b8}
+.marke{font:600 11px/1 'JetBrains Mono',monospace;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+main{padding:8px 16px 64px}
+h2{font:600 21px/1.3 'Space Grotesk',sans-serif;margin:36px 0 10px;padding-top:8px;border-top:1px solid var(--linie)}
+h3{font:600 16px/1.3 'Space Grotesk',sans-serif;margin:22px 0 6px}
+code,pre{font-family:'JetBrains Mono',monospace;font-size:13px}
+code{background:var(--karte);padding:1px 5px;border-radius:4px}
+pre{background:var(--obs);color:#eee6d2;padding:14px;border-radius:8px;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:8px 0;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--linie);vertical-align:top}
+th{font:600 12px/1.3 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--leise)}
+.tw{overflow-x:auto}
+.kasten{background:var(--karte);border-left:3px solid var(--gold);padding:10px 14px;border-radius:6px;margin:12px 0}
+.m{font:600 12px 'JetBrains Mono',monospace;padding:2px 6px;border-radius:4px;color:#fff;background:var(--gruen)}
+.m.get{background:var(--gold-lo)}
+nav.inhalt{display:flex;flex-wrap:wrap;gap:6px 14px;margin:18px 0 0}
+nav.inhalt a{color:var(--text);font-size:14px}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="marke">DealPilot · Schnittstelle</div>
+  <h1>Rechenkerne per API</h1>
+  <p>Restnutzungsdauer und Verkehrswert aus deiner eigenen Software berechnen, mit denselben Rechenkernen wie in der DealPilot-App.</p>
+</div></header>
+<main>
+<nav class="inhalt">
+  <a href="#zugang">Zugang</a><a href="#rnd">Restnutzungsdauer</a><a href="#vw">Verkehrswert</a>
+  <a href="#kontingent">Kontingent</a><a href="#fehler">Fehlercodes</a><a href="#grundsaetze">Grundsätze</a>
+</nav>
+
+<h2 id="zugang">Zugang</h2>
+<p>Die Schnittstelle ist ein <strong>Zusatz zu den Plänen Pro und Partner</strong>. Sie ist in der Testphase nicht enthalten und wird von DealPilot je Konto freigeschaltet.</p>
+<ol>
+  <li>In der App unter <em>Einstellungen → Account &amp; Sicherheit → DealPilot API</em> einen Schlüssel anlegen. Er wird nur einmal angezeigt.</li>
+  <li>Jeden Aufruf mit der Kopfzeile <code>x-api-key: dpk_live_…</code> schicken, Inhalt als JSON.</li>
+  <li>Basis-Adresse: <code>https://app.dealpilot.immo/api/v1/rechenkerne</code></li>
+</ol>
+<div class="kasten">Höchstens 120 Aufrufe je Minute und Schlüssel. Ist für dein Konto ein Monatskontingent vereinbart, zählen nur erfolgreiche Aufrufe.</div>
+
+<h2 id="rnd"><span class="m">POST</span> /rnd · Restnutzungsdauer</h2>
+<p>Restnutzungsdauer nach Anlage 2 ImmoWertV mit technischer Prüfung über die Gewerke. Das Ergebnis ist das Niedrigere aus Modell und Technik; die Modernisierung zählt über die Punkte, der Zustand der Gewerke kann nur kürzen. Ohne Baujahr gibt es keine Zahl.</p>
+<h3>Eingabe</h3>
+<div class="tw"><table>
+<tr><th>Feld</th><th>Pflicht</th><th>Bedeutung</th></tr>
+<tr><td><code>eingabe.baujahr</code></td><td>ja</td><td>Baujahr (bei Kernsanierung das Sanierungsjahr)</td></tr>
+<tr><td><code>eingabe.stichtag</code></td><td>nein</td><td>Wertermittlungsstichtag <code>JJJJ-MM-TT</code>, sonst heute</td></tr>
+<tr><td><code>eingabe.gnd</code></td><td>nein</td><td>Gesamtnutzungsdauer in Jahren, Vorgabe 70</td></tr>
+<tr><td><code>eingabe.modPoints</code></td><td>nein</td><td>Modernisierungspunkte nach Anlage 2 (0–20)</td></tr>
+<tr><td><code>eingabe.kernsaniert</code></td><td>nein</td><td><code>true</code> bei Kernsanierung (Deckel 90 % statt 70 %)</td></tr>
+<tr><td><code>eingabe.gewerkeBewertung</code></td><td>nein</td><td>Zustand je Gewerk: <code>dach</code>, <code>fenster</code>, <code>leitungen</code>, <code>heizung</code>, <code>aussenwand</code>, <code>baeder</code>, <code>decken</code>, <code>technik</code>, <code>grundriss</code>, jeweils <code>veraltet</code> · <code>standard</code> · <code>erneuert</code> · <code>gehoben</code></td></tr>
+<tr><td><code>afa</code></td><td>nein</td><td>Steuervergleich: <code>gebaeudeanteil</code> (€, Pflicht), <code>grenzsteuersatz</code> (0,42), <code>standardAfaSatz</code> (0,02), <code>gutachterkosten</code> (1500)</td></tr>
+<tr><td><code>external_ref</code></td><td>nein</td><td>deine eigene Kennung, wird mitgezählt</td></tr>
+</table></div>
+<p>Statt <code>eingabe</code> kann auch ein ganzer DealPilot-Datensatz als <code>objekt</code> geschickt werden (wie im Portfolio-Export).</p>
+<pre><code>curl -X POST https://app.dealpilot.immo/api/v1/rechenkerne/rnd \
+  -H "x-api-key: dpk_live_…" -H "Content-Type: application/json" \
+  -d '{ "eingabe": { "baujahr": 1998, "stichtag": "2024-07-31", "gnd": 70, "modPoints": 1,
+        "gewerkeBewertung": { "dach":"veraltet", "fenster":"veraltet", "leitungen":"veraltet",
+          "heizung":"erneuert", "aussenwand":"veraltet", "baeder":"veraltet",
+          "decken":"veraltet", "technik":"veraltet", "grundriss":"veraltet" } } }'</code></pre>
+<h3>Antwort (gekürzt)</h3>
+<pre><code>{ "kern": "restnutzungsdauer",
+  "ergebnis": {
+    "final_rnd": 28.6,
+    "verfahren": "technisch",
+    "final_source": "technische Alterswertminderung - Basis Anlage 2 mit 1 Punkten, …",
+    "methods": { "punktraster": { … }, "technisch": { … }, "linear": { … } },
+    "grenzen": [ … ] } }</code></pre>
+<p><code>verfahren</code> ist <code>punktraster</code> (Modell), <code>technisch</code> (die Gewerke kürzen) oder <code>keines</code> (keine Zahl, Grund in <code>grenzen</code>).</p>
+
+<h2 id="vw"><span class="m">POST</span> /verkehrswert · Wertermittlung</h2>
+<p>Bodenwert, Ertragswert und Sachwert nach ImmoWertV mit den amtlichen Kennzahlen der Gutachterausschüsse (Liegenschaftszins, Sachwertfaktor, Bodenrichtwert). Dauer etwa 10–30 Sekunden.</p>
+<h3>Eingabe: <code>objekt</code></h3>
+<div class="tw"><table>
+<tr><th>Feld</th><th>Pflicht</th><th>Bedeutung</th></tr>
+<tr><td><code>str</code>, <code>hnr</code>, <code>plz</code>, <code>ort</code></td><td>ja</td><td>Anschrift (oder <code>lat</code>/<code>lon</code> auf oberster Ebene)</td></tr>
+<tr><td><code>objart</code></td><td>ja</td><td><code>ETW</code> · <code>EFH</code> · <code>ZFH</code> · <code>MFH</code> · <code>DHH</code> · <code>RH</code> · <code>BUERO</code> · <code>GESCH</code> · <code>GEW</code></td></tr>
+<tr><td><code>wfl</code></td><td>ja</td><td>Wohnfläche in m²</td></tr>
+<tr><td><code>baujahr</code></td><td>ja</td><td>Baujahr</td></tr>
+<tr><td><code>nkm</code></td><td>für Ertragswert</td><td>Nettokaltmiete je Monat in €</td></tr>
+<tr><td><code>gsfl</code></td><td>für Bodenwert</td><td>Grundstücksfläche in m²</td></tr>
+<tr><td><code>mea</code></td><td>ETW</td><td>Miteigentumsanteil in Prozent, z. B. <code>7.06</code> (ohne ihn kein Bodenwert)</td></tr>
+<tr><td><code>bgf</code></td><td>Sachwert ETW</td><td>Brutto-Grundfläche in m²</td></tr>
+<tr><td><code>mod_punkte</code></td><td>nein</td><td>Modernisierungspunkte nach Anlage 2</td></tr>
+<tr><td><code>kp</code></td><td>nein</td><td>Kaufpreis in €, für den Vergleich</td></tr>
+<tr><td><code>brw</code>, <code>lzs_pct</code>, <code>sachwertfaktor</code></td><td>nein</td><td>eigene Werte, wo kein amtlicher vorliegt (im Ergebnis als „eigene Angabe“)</td></tr>
+</table></div>
+<p>Weitere Felder wie in der App (Ausstattung, Stellplätze, Erbbaurecht, Einheiten des Mehrfamilienhauses) werden ebenfalls gelesen. Optional auf oberster Ebene: <code>wert_stufe</code> (Vorgabe 3 = volle Wertermittlung), <code>external_ref</code>.</p>
+<pre><code>curl -X POST https://app.dealpilot.immo/api/v1/rechenkerne/verkehrswert \
+  -H "x-api-key: dpk_live_…" -H "Content-Type: application/json" \
+  -d '{ "objekt": { "str":"Musterstraße", "hnr":"1", "plz":"32609", "ort":"Hüllhorst",
+        "objart":"EFH", "wfl":140, "baujahr":1975, "gsfl":650, "nkm":800 },
+        "external_ref": "Auftrag-4711" }'</code></pre>
+<h3>Antwort (gekürzt)</h3>
+<pre><code>{ "kern": "verkehrswert",
+  "ergebnis": {
+    "report_id": …,
+    "data": {
+      "cross_check": {
+        "bodenwert":   { … },
+        "ertragswert": { "available": true, … },
+        "sachwert":    { "available": false, "grund": "…", "sachwertfaktor_quelle_link": { … } },
+        "quellen_nachweis": [ … ] } } } }</code></pre>
+
+<h2 id="kontingent"><span class="m get">GET</span> /kontingent · dein Stand</h2>
+<p>Freigabe, vereinbartes Monatskontingent und Aufrufe im laufenden Monat (<code>n</code> alle, <code>n_ok</code> erfolgreiche). <code>null</code> heißt ohne Grenze.</p>
+<pre><code>{ "freigeschaltet": true,
+  "monat": { "rnd": { "n": 12, "n_ok": 12 }, "verkehrswert": { "n": 3, "n_ok": 2 } },
+  "kontingent": { "rnd": null, "verkehrswert": 50 } }</code></pre>
+
+<h2 id="fehler">Fehlercodes</h2>
+<div class="tw"><table>
+<tr><th>Status</th><th><code>error</code></th><th>Bedeutung</th></tr>
+<tr><td>400</td><td><code>bad_request</code></td><td>Eingabe fehlt oder hat die falsche Form</td></tr>
+<tr><td>401</td><td>–</td><td>Schlüssel fehlt, ist falsch, abgelaufen oder widerrufen</td></tr>
+<tr><td>403</td><td><code>plan_ohne_schnittstelle</code></td><td>der Plan enthält keine Schnittstelle (nur Pro, Partner)</td></tr>
+<tr><td>403</td><td><code>testphase</code></td><td>in der Testphase nicht enthalten</td></tr>
+<tr><td>403</td><td><code>zusatz_nicht_freigeschaltet</code></td><td>der Zusatz ist für dein Konto nicht freigeschaltet</td></tr>
+<tr><td>422</td><td><code>rechenfehler</code></td><td>die Eingabe lässt sich nicht rechnen, Grund in <code>message</code></td></tr>
+<tr><td>429</td><td><code>kontingent_erschoepft</code></td><td>Monatskontingent aufgebraucht (oder mehr als 120 Aufrufe je Minute)</td></tr>
+<tr><td>502 / 503</td><td>–</td><td>Dienst vorübergehend nicht erreichbar, später erneut versuchen</td></tr>
+</table></div>
+
+<h2 id="grundsaetze">Grundsätze</h2>
+<ul>
+  <li><strong>Kein Verfahren rechnet halb.</strong> Fehlt eine Pflichtangabe, erscheint das Verfahren nicht, dafür steht im Ergebnis der Grund und was fehlt.</li>
+  <li><strong>Kein Treffer heißt kein Wert.</strong> Wo kein amtlicher Wert vorliegt, nennen wir den zuständigen Gutachterausschuss und den Weg zu seiner Quelle. Ausnahme ist der Liegenschaftszins: er hat immer einen Wert, unterhalb der örtlichen Ebene ausdrücklich gekennzeichnet.</li>
+  <li><strong>Jede Zahl trägt ihre Herkunft:</strong> Stufe, Modellvermerk, Ausschuss, Jahrgang.</li>
+  <li>Die Ergebnisse sind eine rechnerische Ermittlung. Sie ersetzen kein Gutachten mit Ortsbesichtigung und sachverständiger Würdigung.</li>
+</ul>
+</main>
+</body>
+</html>

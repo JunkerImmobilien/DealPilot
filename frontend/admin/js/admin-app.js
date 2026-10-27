@@ -829,6 +829,20 @@
               </button>
             </div>
 
+            <div class="action-section" id="zusatz-rk">
+              <h4>Zusatz: Schnittstelle Rechenkerne</h4>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">RND und Verkehrswert über die API (nur Pro/Partner, nicht in der Testphase). Kontingent je Kalendermonat, leer = ohne Grenze.</p>
+              <div id="zusatz-rk-stand" style="font-size:0.85em;margin:0 0 8px 0;">lädt …</div>
+              <div class="action-row">
+                <input type="number" id="zusatz-rk-rnd" placeholder="RND / Monat" min="0">
+                <input type="number" id="zusatz-rk-vw" placeholder="Verkehrswert / Monat" min="0">
+              </div>
+              <div class="action-row" style="margin-top:6px;">
+                <button class="btn btn-primary btn-sm" data-action="zusatz-rk-an">Freischalten / speichern</button>
+                <button class="btn btn-sm" data-action="zusatz-rk-aus">Abschalten</button>
+              </div>
+            </div>
+
             <div class="action-section">
               <h4>Passwort zurücksetzen</h4>
               <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Generiert ein neues Passwort. Wird nur einmal angezeigt!</p>
@@ -873,6 +887,9 @@
       $$('[data-action="reset-password"]')[0].addEventListener('click', () => handleResetPassword(id, u.email));
       $$('[data-action="toggle-active"]')[0].addEventListener('click', () => handleToggleActive(id, u.is_active, u.email));
       $$('[data-action="delete-dsgvo"]')[0].addEventListener('click', () => handleDeleteDsgvo(id, u.email));
+      $$('[data-action="zusatz-rk-an"]')[0].addEventListener('click', () => handleZusatzRk(id, true));
+      $$('[data-action="zusatz-rk-aus"]')[0].addEventListener('click', () => handleZusatzRk(id, false));
+      ladeZusatzRk(id);
 
     } catch (err) {
       $('#user-detail-content').innerHTML = `<div class="error-msg">${escapeHtml(err.message || 'Laden fehlgeschlagen')}</div>`;
@@ -900,6 +917,43 @@
       const r = await API.grantCredits(id, amount, reason);
       toast(`✓ ${r.granted} Credits gutgeschrieben. Bonus jetzt: ${r.balance?.bonus_credits || '?'}`, 'success');
       showUserDetail(id);
+    } catch (err) {
+      toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
+    }
+  }
+
+  /* v2977 · Zusatz Schnittstelle Rechenkerne */
+  async function ladeZusatzRk(id) {
+    const el = $('#zusatz-rk-stand');
+    try {
+      const r = await API.getZusaetze(id);
+      const z = r.rechenkerne, m = r.monat || {};
+      const kg = (v) => (v == null ? 'ohne Grenze' : v);
+      if (z) {
+        if (z.kontingent_rnd != null) $('#zusatz-rk-rnd').value = z.kontingent_rnd;
+        if (z.kontingent_vw != null) $('#zusatz-rk-vw').value = z.kontingent_vw;
+      }
+      el.innerHTML = (z && z.aktiv
+          ? '<span class="pill pill-active">Freigeschaltet</span>'
+          : '<span class="pill pill-plan">Nicht freigeschaltet</span>')
+        + '<br>Diesen Monat: RND ' + ((m.rnd && m.rnd.n_ok) || 0) + ' / ' + kg(z && z.kontingent_rnd)
+        + ' · Verkehrswert ' + ((m.verkehrswert && m.verkehrswert.n_ok) || 0) + ' / ' + kg(z && z.kontingent_vw)
+        + (z && z.updated_at ? '<br><span style="color:var(--text-muted)">geändert ' + fmtDate(z.updated_at)
+          + (z.geaendert_von ? ' von ' + escapeHtml(z.geaendert_von) : '') + '</span>' : '');
+    } catch (err) {
+      el.textContent = 'Stand nicht lesbar: ' + (err.message || 'unbekannt');
+    }
+  }
+
+  async function handleZusatzRk(id, aktiv) {
+    try {
+      await API.setZusatzRechenkerne(id, {
+        aktiv: aktiv,
+        kontingent_rnd: $('#zusatz-rk-rnd').value,
+        kontingent_vw: $('#zusatz-rk-vw').value
+      });
+      toast(aktiv ? '✓ Schnittstelle freigeschaltet' : '✓ Schnittstelle abgeschaltet', 'success');
+      ladeZusatzRk(id);
     } catch (err) {
       toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
     }

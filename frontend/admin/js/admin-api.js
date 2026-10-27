@@ -146,6 +146,10 @@ return {
     // V197: NEU
     toggleTestUser: (id, reason) =>
       call('POST', `/users/${id}/toggle-test`, { reason }),
+    // v2977: Zusatz Schnittstelle Rechenkerne
+    getZusaetze: (id) => call('GET', `/users/${id}/zusaetze`),
+    setZusatzRechenkerne: (id, werte) =>
+      call('POST', `/users/${id}/zusaetze/rechenkerne`, werte),
     deleteUser: (id, confirm_email, reason) =>
       call('DELETE', `/users/${id}`, { confirm_email, reason }),
 
