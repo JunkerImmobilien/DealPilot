@@ -5761,7 +5761,7 @@ async function exportPdf(out) {
         let t = b.text;
         if (b.level <= 2) { const m = t.match(/^([A-P])\)\s*(.*)$/); t = m ? (PDF_SECTION_TITLES[m[1]] || m[2]) : t.replace(/^[A-Z]\d?\)\s*/, ''); }
         else t = t.replace(/^[A-Z]\d?\)\s*/, '');
-        need(14); y += (b.level >= 3 ? 2.5 : 4.5);
+        need(14 + 2 * RLH); y += (b.level >= 3 ? 2.5 : 4.5);   /* v2990b: Ueberschrift nie allein am Seitenende - zwei Zeilen Text muessen mit */
         doc.setFont('helvetica', 'bold'); doc.setTextColor(...GOLD); doc.setFontSize(b.level >= 3 ? 10 : 11);
         doc.text(t, M, y);
         doc.setDrawColor(...GOLD); doc.setLineWidth(0.6); doc.line(M, y + 2.6, M + (b.level >= 3 ? 10 : 14), y + 2.6);
