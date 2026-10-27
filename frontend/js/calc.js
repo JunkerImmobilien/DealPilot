@@ -1273,7 +1273,15 @@ function _calcImmediate(){
   /* v813-3a: bei Ueberfuehrung haengt die AfA an der neuen Bemessungsgrundlage = Verkehrswert,
      nicht am alten Kaufpreis. Skalierung erhaelt Kuechen-/NK-Proportionalitaet. */
   try {
-    if (g('obj_herkunft') === 'ueberfuehrung') {
+    /* v2984 · Nur fuer Ueberfuehrungen VOR v2984. Seit v2984 traegt das
+       Gesellschaftsobjekt eigene Anschaffungskosten (kp = Ansatz, Nebenkosten
+       der Ueberfuehrung, Gebaeudeanteil zum Stichtag) — dann ist gebAHK schon
+       richtig und wird nicht noch einmal skaliert. Alte Objekte rechnen wie
+       bisher weiter (nicht still umgeschrieben), mandanten.js zeigt dort
+       „bitte ergänzen". */
+    var _udNeu = false;
+    try { var _udO = JSON.parse(g('ueberf_daten') || 'null'); _udNeu = !!(_udO && _udO.v >= 2984 && _udO.fuer === 'gesellschaft'); } catch (_e2) {}
+    if (g('obj_herkunft') === 'ueberfuehrung' && !_udNeu) {
       var _vwUe = v('verkehrswert_ueberf');
       if (_vwUe > 0) {
         if (kp > 0) afa_geb_basis = afa_geb_basis * (_vwUe / kp);
@@ -2047,25 +2055,45 @@ function _calcImmediate(){
 
   /* mand v804: Halter-Regime — Privat/GbR = ESt nach Progression, GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
   var _mandRate = (function(){ try{ if(window.DealPilotMandanten && DealPilotMandanten.effRate){ var _r=DealPilotMandanten.effRate(); return (_r!=null && isFinite(_r)) ? _r : null; } }catch(_e){} return null; })();
-  function _mtx(base, jahr){ return (_mandRate!=null) ? (Math.max(0, base) * _mandRate) : _estDelta(base, jahr); }
-  /* v813-3b: Stichtag-Schnitt im Ueberfuehrungsjahr. Faellt fuer JEDEN anderen Fall
-     (Neukauf, kein Stichtag, Privat-Halter) exakt auf _mtx zurueck -> kein Verhaltenswechsel. */
+  /* v2984 · Steuer der Gesellschaft aus EINEM Kern (ueberfuehrung-kern.js
+     steuerReihe/tracker) — KSt + Soli mit Verlustvortrag (§ 10d EStG),
+     GewSt mit Kuerzung § 9 Nr. 1 GewStG, Abrundung, eigenem Vortrag. Vorher
+     hier max(0, Ergebnis) × Satz OHNE Vortrag, im Steuer-Reiter MIT — zwei
+     Zahlen fuer dasselbe Jahr (Pruefbericht 27.10.2026, Befund 11).
+     Der Tracker beginnt neu, sobald eine Schleife wieder beim ersten Jahr
+     anfaengt. Grundsteuer (Feld `grundsteuer`, je Monat) = Kuerzung § 9 Nr. 1 S. 1
+     ab EZ 2025. Zins eines Gesellschafterdarlehens ist Betriebsausgabe. */
+  var _mandParams = (function(){ try { return (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter() : null; } catch(_e){ return null; } })();
+  var _gesK = window.DealPilotUeberfuehrungKern || null;
+  var _gesTracker = (_mandParams && _gesK) ? _gesK.tracker(_mandParams) : null;
+  var _gesGrundsteuerJ = v('grundsteuer') * 12;
+  var _gesGdZins = (function(){
+    try {
+      var _ud = JSON.parse(g('ueberf_daten') || 'null');
+      var _gd = _ud && _ud.gd;
+      if (_gd && _gd.betrag > 0 && _gd.zinsPct > 0) return _gd.betrag * _gd.zinsPct / 100;
+    } catch(_e){}
+    return 0;
+  })();
+  State._gesGdZins = _gesGdZins;
+  function _mtx(base, jahr){
+    if (_mandRate == null) return _estDelta(base, jahr);
+    if (_gesTracker) return _gesTracker.steuer(base - _gesGdZins, (typeof jahr === 'number' ? jahr : 0), _gesGrundsteuerJ).steuer;
+    return Math.max(0, base) * _mandRate;
+  }
+  /* v813-3b → v2984: Hier wurde im Stichtagsjahr das Ergebnis des
+     Gesellschaftsobjekts noch einmal geteilt und der „Privat-Anteil" mit ESt
+     inkl. Erstattung besteuert. Das Gesellschaftsobjekt ist durch kaufdat =
+     Stichtag aber schon anteilig (anteilig.js) — gemessen bei Stichtag
+     01.07.2026: Ergebnis −3.000 € -> −630 € ESt-Erstattung aus einem
+     GmbH-Verlust. Der private Teil gehoert ausschliesslich dem Privatobjekt.
+     Jetzt: das Gesellschaftsobjekt kennt nur Gesellschaftssteuer; Jahre vor
+     dem Stichtag haben dort kein Ergebnis. */
   function _mtxYear(base, calYear){
     try {
       if (g('obj_herkunft') === 'ueberfuehrung' && _mandRate != null) {
         var _hs = g('halter_seit');
-        if (_hs && /^\d{4}-\d{2}-\d{2}$/.test(_hs) && typeof calYear === 'number') {
-          var _hy = parseInt(_hs.slice(0,4), 10);
-          var _hm = parseInt(_hs.slice(5,7), 10);
-          if (calYear < _hy) return _estDelta(base, calYear);   /* noch privat: ESt nach Progression */
-          if (calYear > _hy) return _mtx(base, calYear);         /* GmbH: KSt */
-          /* Stichtagsjahr: anteilig Privat (vor Stichtag) + GmbH (ab Stichtag) */
-          var _gf = (_hm >= 1 && _hm <= 12) ? (13 - _hm) / 12 : 1;  /* GmbH-Anteil ab Stichtagsmonat */
-          var _pf = 1 - _gf;                                        /* Privat-Anteil davor */
-          var _taxPrivat = _estDelta(base * _pf, calYear);          /* ESt-Seite (Erstattung moeglich) */
-          var _taxGmbh   = Math.max(0, base * _gf) * _mandRate;     /* KSt-Seite (kein Negativwert) */
-          return _taxPrivat + _taxGmbh;
-        }
+        if (_hs && /^\d{4}-\d{2}-\d{2}$/.test(_hs) && typeof calYear === 'number' && calYear < parseInt(_hs.slice(0,4), 10)) return 0;
       }
     } catch (_e) {}
     return _mtx(base, calYear);
@@ -2215,14 +2243,34 @@ function _calcImmediate(){
       if (_startY == null) _startY = (new Date()).getFullYear();
       if (_ueY < _startY) return;                 /* Stichtag vor Start -> kein sinnvoller Cut */
       var _fullYears = _ueY - _startY;            /* volle Jahre vor dem Stichtagsjahr */
-      var _lastIdx = _fullYears + 1;              /* das (anteilige) Stichtagsjahr als Loop-Index */
+      /* v2984 · Hier stand factor = Monat/12. Die Gesellschaft rechnet ab dem
+         Stichtagsmonat (13 − Monat)/12 (anteilig.js) — zusammen 13/12, ein Monat
+         doppelt (Stichtag 01.01. -> privat 1/12 + Gesellschaft 12/12). Privat
+         endet jetzt mit (Monat − 1)/12; liegt der Stichtag im Kaufjahr, relativ
+         zu dessen aktiven Monaten. Bei 0 privaten Monaten endet die Reihe mit
+         dem Vorjahr (keine Nullzeile). */
+      var _privM = _ueM - 1, _fac, _lastIdx;
+      if (_fullYears === 0) {
+        var _wuIso = g('wirtschaftlicher_uebergang') || g('kaufdat') || '';
+        var _km = /^\d{4}-\d{2}/.test(_wuIso) && parseInt(_wuIso.slice(0,4),10) === _ueY ? parseInt(_wuIso.slice(5,7),10) : 1;
+        var _akt = 13 - _km, _pm = Math.max(0, _ueM - _km);
+        if (!(_pm > 0)) return;                   /* privat nie gehalten */
+        _lastIdx = 1; _fac = _pm / _akt;
+      } else if (_privM === 0) {
+        _lastIdx = _fullYears; _fac = 1;
+      } else {
+        _lastIdx = _fullYears + 1; _fac = _privM / 12;
+      }
       if (_lastIdx < 1) return;
       if (_lastIdx < btj) btj = _lastIdx;         /* nur kappen, nie verlaengern */
       _v816cut.active = true;
-      _v816cut.factor = _ueM / 12;                /* Anteil des letzten Jahres bis Stichtagsmonat */
+      _v816cut.factor = (btj === _lastIdx) ? _fac : 1;   /* Anteil des letzten (Stichtags-)Jahres */
       _v816cut.lastYear = btj;
+      _v816cut.stichtagJahr = _ueY;
     } catch(_e){}
   })();
+  /* v2984: tax.js liest denselben Schnitt (Steuer-Reiter im Stichtagsjahr) */
+  try { if (window.State) State._v816cut = { active: _v816cut.active, factor: _v816cut.factor, lastYear: _v816cut.lastYear, cal: _v816cut.active ? (_calYearBase + _v816cut.lastYear - 1) : null }; } catch (_e) {}
   var mstg=v('mietstg')/100,wstg=v('wertstg')/100,kstg=v('kostenstg')/100;
   // V109 BUG-FIX: State.wstg + Co. waren nie gesetzt — bank-charts.js (und andere Module die
   // window.State lesen) bekamen `undefined` und nutzten Fallback 0.015 (1,5%). Folge: bei
@@ -3451,9 +3499,24 @@ function _calcImmediate(){
       eq_y  = wert_y - _rs_comb2;
       ltv_y = wert_y > 0 ? _rs_comb2 / wert_y * 100 : 0;
     }
+    /* v2984 · Privatobjekt im Stichtagsjahr: nur die Monate vor dem Stichtag.
+       Der Schnitt wirkte bisher nur in der Vermoegens-/CF-Schleife (v816-ef) —
+       die Projektion und damit der Steuer-Reiter rechneten das Stichtagsjahr
+       voll, neben dem vollen Jahr der Gesellschaft (Pruefbericht, Fehler 2). */
+    var _afaPush = _afaJahr(y);
+    if (_v816cut.active && y === btj && _v816cut.factor < 1) {
+      var _cf = _v816cut.factor;
+      nkm_y2 *= _cf; wm_y2 *= _cf; bwk_y2 *= _cf; bwk_cf_y2 *= _cf; bwk_st_y2 *= _cf;
+      zy2 *= _cf; ty2 *= _cf; bspar_y2 = (bspar_y2 || 0) * _cf; _afaPush *= _cf;
+      cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
+      zve_op_y        = nkm_y2 - bwk_st_y2 - zy2;
+      cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
+      taxEffect_y     = _mtxYear(zve_op_y - _afaPush, _v268_baseYear + y - 1);
+      cfns_y          = cfop_y - taxEffect_y;
+    }
     var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);  // V354: kombinierte RS fuer Anzeige
     var eff_rs = Math.max(0, _rs_push - bspar_kum_proj);
-    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaJahr(y),zve_y:zve_op_y-_afaJahr(y)});  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
+    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush});  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
   }
   /* v1898 · WOHER DAS zvE JE JAHR KAM — die Herkunft ist ausweisbar, statt
      dass eine Zahl ohne Vermerk dasteht. 'steuerzeitraum' = aus Marcels

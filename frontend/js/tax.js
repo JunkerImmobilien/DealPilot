@@ -876,12 +876,13 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       '<div class="tax-grid">' +
         '<div class="tax-item" style="grid-column:1/-1;background:#1b1408;border-color:var(--gold-d)"><div class="tax-label" style="color:var(--gold-h)">Halter \u00b7 ' + (_mandName || 'Gesellschaft') + '</div><div class="tax-val" style="color:var(--gold-h)">K\u00f6rperschaftsteuer-Regime \u00b7 ' + _rateTxt + '</div></div>' +
         /* v814-B */ '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,0.15)"><div class="tax-label" style="font-size:12px;color:var(--muted)">Halter wechseln</div><div class="tax-val" style="font-size:12px"><a href="#" onclick="if(typeof showSettings===&quot;function&quot;)showSettings();return false" style="color:var(--gold-d);text-decoration:underline">In den Einstellungen &rarr;</a></div></div>' +
-        '<div class="tax-item"><div class="tax-label">Einnahmen V+V</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
-        '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt</div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
+        '<div class="tax-item"><div class="tax-label">Betriebseinnahmen (Miete)</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
+        '<div class="tax-item"><div class="tax-label">Betriebsausgaben gesamt</div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
         '<div class="tax-item tax-highlight" style="grid-column:1/-1"><div class="tax-label">Beitrag zum GmbH-Ergebnis (' + displayYear + ')</div><div class="tax-val" style="color:' + _ergCol + '">' + fE(_erg, 0, true) + '</div></div>' +
         '<div class="tax-item"><div class="tax-label">K\u00f6rperschaftsteuer-Satz</div><div class="tax-val">' + _rateTxt + '</div></div>' +
-        '<div class="tax-item tax-result"><div class="tax-label">K\u00f6rperschaftsteuer (dieses Objekt)</div><div class="tax-val" style="color:' + (_erg >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_erg >= 0 ? '\u2212' + fE(_kst, 0) : '0 \u20ac') + '</div></div>' +
+        '<div class="tax-item tax-result"><div class="tax-label">Ertragsteuer KSt + Soli + GewSt (dieses Objekt)</div><div class="tax-val" style="color:' + (_erg >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_erg >= 0 ? '\u2212' + fE(_kst, 0) : '0 \u20ac') + '</div></div>' +
         (_erg < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlust</div><div class="tax-val" style="color:var(--green)">keine Erstattung \u00b7 Verlustvortrag ins Folgejahr (Stand ' + fE(_kstJ.vortragNach, 0) + ')</div></div>' : '') +
+        _gesDetailHtml(_kstJ) +
         (_kstJ.genutzt > 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlustvortrag verrechnet (\u00a7 10d EStG)</div><div class="tax-val" style="color:var(--green)">' + fE(_kstJ.genutzt, 0) + ' aus den Vorjahren \u00b7 Rest ' + fE(_kstJ.vortragNach, 0) + '</div></div>' : '') +
         (function(){  /* v813-3c: echte Mandanten-Steuerakte (KSt ueber alle Objekte der Gesellschaft) */
           try {
@@ -956,13 +957,17 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
           try {
             if (!(_erg > 0)) return '';
             var _nachKSt = _erg - _kst;
+            /* v2984: UG — 25 % in die gesetzliche Ruecklage (§ 5a Abs. 3 GmbHG), nur der Rest ist ausschuettbar */
+            var _ugRl = ((_gesSteuerParams() || {}).rechtsform === 'ug') ? _nachKSt * 0.25 : 0;
+            _nachKSt -= _ugRl;
             var _kap = _nachKSt * 0.26375;          /* 25 % KapESt + 5,5 % Soli darauf */
             var _beim = _nachKSt - _kap;
             var _gesamt = _erg > 0 ? (1 - _beim / _erg) : 0;
             return '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,.22)">'
                  +   '<div class="tax-label" style="color:var(--gold-h)">Wenn ausgesch&uuml;ttet wird &middot; zweite Steuerebene</div>'
                  +   '<div class="tax-val" style="font-size:13px;color:var(--muted);line-height:1.5">'
-                 +     'Nach K&ouml;rperschaftsteuer ' + fE(_nachKSt, 0)
+                 +     (_ugRl > 0 ? 'UG-Pflichtr&uuml;cklage 25 % (&sect; 5a Abs. 3 GmbHG) ' + fE(_ugRl, 0) + ' &middot; ' : '')
+                 +     'Aussch&uuml;ttbar nach Steuern ' + fE(_nachKSt, 0)
                  +     ' &middot; abz&uuml;glich Kapitalertragsteuer 26,375 % ' + fE(_kap, 0)
                  +   '</div>'
                  + '</div>'
@@ -1454,7 +1459,7 @@ function _computeAutoForYear(yearIdx, year) {
   var verwaltung = 0;
   var sonst_bewirt = 0;
 
-  return {
+  var _autoOut = {
     year: year,
     yearIdx: yearIdx,
 
@@ -1519,6 +1524,19 @@ function _computeAutoForYear(yearIdx, year) {
     einnahmen_km: einnahmen_km,
     einnahmen_nk: einnahmen_nk
   };
+  /* v2984 · Privatobjekt im Stichtagsjahr der Ueberfuehrung: nur die Monate
+     vor dem Stichtag (calc.js _v816cut). Schuldzinsen und nicht umlagefaehige
+     Kosten kommen aus cfRows und sind dort schon gekuerzt; hier die Werte, die
+     tax.js selbst ableitet (Miete aus dem Feld × 12, AfA-Reihe, Moeblierung,
+     Sanierungsverteilung). Vorher rechnete der Steuer-Reiter das Jahr voll. */
+  try {
+    var _cut = window.State && State._v816cut;
+    if (_cut && _cut.active && _cut.factor < 1 && _cut.cal === year) {
+      ['einnahmen_km', 'einnahmen_nk', 'nk_umlf', 'afa', '_afaLinear', '_afaSonder7b', 'sonst_bewegl_wg', 'anschaffungsnah', 'erhaltungsaufwand']
+        .forEach(function (k) { if (typeof _autoOut[k] === 'number') _autoOut[k] *= _cut.factor; });
+    }
+  } catch (_ce) {}
+  return _autoOut;
 }
 
 function _getEffectiveValue(year, field, autoVal) {
@@ -1558,7 +1576,53 @@ function _getEffectiveValue(year, field, autoVal) {
    gilt hier fuer den Gewerbesteueranteil des Halter-Satzes - § 10a GewStG
    verrechnet nach demselben Muster (dort 60 %); bei Objekten dieser
    Groessenordnung wird die Millionengrenze nicht erreicht. */
-function _kstMitVortrag(reihe, rate) {
+/* v2984 · Die Steuer der Gesellschaft kommt aus EINEM Kern
+   (ueberfuehrung-kern.js steuerReihe): KSt + Soli mit § 10d, GewSt mit
+   Kuerzung § 9 Nr. 1 GewStG und eigenem Vortrag. Dieselbe Funktion rechnet
+   die Projektion (calc.js) und den Jahresabschluss. `kst` ist die GESAMTE
+   Ertragsteuer der Gesellschaft (KSt + Soli + GewSt) — wie bisher der Satz
+   aus effRate() beides enthielt; `kstSoli` und `gewst` getrennt.
+   Grundsteuer je Jahr (Feld `grundsteuer` × 12) und der Zins eines
+   Gesellschafterdarlehens kommen vom aktuellen Objekt (State._gesGdZins). */
+/* v2984 · Aufschluesselung der Ertragsteuer der Gesellschaft + Hinweise */
+function _gesDetailHtml(j) {
+  try {
+    var P = _gesSteuerParams(); if (!P || !j) return '';
+    var st = P.erwStatus || {};
+    var gew = st.aktiv
+      ? 'erweiterte K&uuml;rzung (&sect; 9 Nr. 1 S. 2 GewStG) &rarr; 0 &euro;'
+      : (fE(j.gewst || 0, 0) + ' (Gewerbeertrag ' + fE(j.gewerbeertrag || 0, 0) + ' nach K&uuml;rzung Grundsteuer ' + fE(j.gewKuerzung || 0, 0) + ', &times; 3,5 % &times; ' + String(P.hebesatz).replace('.', ',') + ' %)'
+         + (st.beantragt ? ' &middot; <b style="color:var(--red)">erweiterte K&uuml;rzung beantragt, Pr&uuml;fpunkte offen</b>' : '')
+         + (!(P.hebesatz > 0) ? ' &middot; <b style="color:var(--red)">Hebesatz fehlt &mdash; bitte im Mandanten erg&auml;nzen</b>' : ''));
+    var moebl = parseDe((document.getElementById('moebl') || {}).value) || 0;
+    var h = '<div class="tax-item" style="grid-column:1/-1;opacity:.92"><div class="tax-label">davon K&ouml;rperschaftsteuer + Soli ' + fE(j.kstSoli || 0, 0) + ' &middot; Gewerbesteuer</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.5">' + gew + '</div></div>';
+    if (st.aktiv && moebl > 0) h += '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Pr&uuml;fpunkt erweiterte K&uuml;rzung</div><div class="tax-val" style="font-size:12px;font-weight:400">Das Objekt ist m&ouml;bliert (' + fE(moebl, 0) + '). Mitvermietete Einrichtung kann die K&uuml;rzung gef&auml;hrden, wenn sie nicht untergeordnet ist.</div></div>';
+    if (j.gdZins > 0) {
+      var K = window.DealPilotUeberfuehrungKern, ud = null;
+      try { ud = JSON.parse((document.getElementById('ueberf_daten') || {}).value || 'null'); } catch (e) {}
+      var q = ud && ud.gd ? ud.gd.beteiligungPct : null;
+      var r = K ? K.gesellschafterdarlehen({ betrag: 1, zinsPct: 0, beteiligungPct: q }) : null;
+      h += '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Gesellschafterdarlehen</div><div class="tax-val" style="font-size:12px;font-weight:400">Zins ' + fE(j.gdZins, 0) + ' als Betriebsausgabe abgezogen. Bei dir Einkünfte aus Kapitalvermögen: ' + (r ? r.regel : '') + '.</div></div>';
+    }
+    return h;
+  } catch (e) { return ''; }
+}
+function _gesSteuerParams() {
+  try { return (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter() : null; } catch (e) { return null; }
+}
+function _kstMitVortrag(reihe, rate, opt) {
+  var K = window.DealPilotUeberfuehrungKern, P = _gesSteuerParams();
+  if (K && P) {
+    opt = opt || {};
+    var gs = (opt.grundsteuer != null) ? opt.grundsteuer : ((parseDe((document.getElementById('grundsteuer') || {}).value) || 0) * 12);
+    var gd = (opt.gdZins != null) ? opt.gdZins : ((window.State && State._gesGdZins) || 0);
+    return K.steuerReihe((reihe || []).map(function (r) { return { jahr: r.jahr, erg: (Number(r.erg) || 0) - gd, grundsteuer: gs }; }), P)
+      .map(function (x) { return { jahr: x.jahr, erg: x.erg, genutzt: x.genutzt, bemessung: x.bemessung, kst: x.steuer, kstSoli: x.kst, gewst: x.gewst,
+        gewKuerzung: x.gewKuerzung, gewerbeertrag: x.gewerbeertrag, vortragNach: x.vortragNach, vortragGewNach: x.vortragGewNach, gdZins: gd }; });
+  }
+  return _kstMitVortragAlt(reihe, rate);
+}
+function _kstMitVortragAlt(reihe, rate) {
   var vortrag = 0, aus = [];
   (reihe || []).forEach(function (r) {
     var erg = Number(r.erg) || 0, genutzt = 0, bem = 0;

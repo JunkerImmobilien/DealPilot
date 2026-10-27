@@ -102,6 +102,8 @@ function _gaMonate(startIso, jahr) {
   return n;
 }
 
+function _gaEur(n) { return (n == null || !isFinite(n)) ? '—' : Math.round(n).toLocaleString('de-DE') + ' €'; }
+
 function _gaRestschuldEines(D, z, t, n) {
   if (!(D > 0)) return 0;
   if (n == null || n <= 0) return D;
@@ -119,6 +121,20 @@ function _gaRestschuldEines(D, z, t, n) {
    und sagt dazu, worauf sie beruht. */
 function _gaRestschuld(d, jahr) {
   d = d || {};
+  /* v2984 · Bei einer Ueberfuehrung VOR v2984 steht in d1 noch das Anfangs-
+     darlehen des Privatobjekts (Pruefbericht, Befund 6) — die Gesellschaft
+     schuldet aber die uebernommene Restschuld ab dem Stichtag. Nur die
+     Rechnung wird umgestellt, der Datensatz bleibt, wie er ist. */
+  if (String(d.obj_herkunft || '') === 'ueberfuehrung' && _gaNum(d.ueberf_restschuld) > 0) {
+    var _ud0 = null; try { _ud0 = JSON.parse(d.ueberf_daten || 'null'); } catch (e) {}
+    if (!(_ud0 && _ud0.v >= 2984)) {
+      d = JSON.parse(JSON.stringify(d));
+      d.d1 = d.ueberf_restschuld;
+      if (_gaNum(d.ueberf_rest_zins) > 0) d.d1z = d.ueberf_rest_zins;
+      d.d2 = 0;
+      d.d1_vertrag = d.halter_seit || d.d1_vertrag;
+    }
+  }
   var start = _gaStartDatum(d);
   var n = _gaMonate(start, jahr);
   var teile = [], summe = 0, vorbehalt = [];
@@ -270,6 +286,10 @@ async function _gaDaten(halterId, jahr, _ohneVortrag) {
     /* Ueberfuehrte Objekte: die Gesellschaft setzt den Verkehrswert an. */
     var basis = (d.obj_herkunft === 'ueberfuehrung' && _gaNum(d.verkehrswert_ueberf) > 0)
       ? _gaNum(d.verkehrswert_ueberf) : kp;
+    /* v2984 · seit v2984 traegt das Gesellschaftsobjekt seine Anschaffungskosten
+       (Ansatz + GrESt + Notar/Grundbuch, § 255 Abs. 1 HGB) im Feld ueberf_daten */
+    var _udA = null; try { _udA = JSON.parse(d.ueberf_daten || 'null'); } catch (e) {}
+    if (_udA && _udA.v >= 2984 && _udA.ak && _gaNum(_udA.ak.ak) > 0) basis = _gaNum(_udA.ak.ak);
     /* Anschaffungsnahe Herstellkosten sind aktiviert — sie erhoehen die
        Anschaffungskosten des Gebaeudes, sonst faellt der Buchwert um eine
        Abschreibung, deren Grundlage in der Bilanz fehlt. */
@@ -287,6 +307,8 @@ async function _gaDaten(halterId, jahr, _ohneVortrag) {
       kumAfaGebaeude: kumGeb,
       kumAfaBwg: kumBwg,
       basisIstVerkehrswert: (basis !== kp),
+      grundsteuerJahr: _gaNum(d.grundsteuer) * 12,
+      gdZins: (_udA && _udA.gd && _gaNum(_udA.gd.betrag) > 0) ? _gaNum(_udA.gd.betrag) * _gaNum(_udA.gd.zinsPct) / 100 : 0,
       restschuld: _gaRestschuld(d, jahr)
     });
   });
@@ -363,8 +385,9 @@ async function _gaVortrag(halterId, jahr, objekte) {
     if (!d.objekte.length) continue;
     var r = _gaRechnen(halterId, y, d);
     var e = (r && r.guv && isFinite(r.guv.jahresueberschuss)) ? r.guv.jahresueberschuss : 0;
+    var ev = (r && r.guv && isFinite(r.guv.ergebnisVorSteuern)) ? r.guv.ergebnisVorSteuern : 0;
     summe += e;
-    details.push({ jahr: y, ergebnis: e });
+    details.push({ jahr: y, ergebnis: e, vorSteuern: ev, grundsteuer: (r && r._grundsteuer) || 0 });
   }
   return { summe: summe, jahre: details, gekappt: gekappt, start: start };
 }
@@ -407,6 +430,10 @@ function _gaRechnen(halterId, jahr, daten) {
   guv.personal += gfGehalt;
   guv.sonstige += (kosten.summe - gfGehalt);
 
+  /* v2984 · Zins eines Gesellschafterdarlehens ist Aufwand der Gesellschaft */
+  var gdZinsSumme = 0, grundsteuerSumme = 0;
+  daten.objekte.forEach(function (o) { gdZinsSumme += o.gdZins || 0; grundsteuerSumme += o.grundsteuerJahr || 0; });
+  guv.zinsen += gdZinsSumme;
   var ergebnisVorSteuern = guv.umsatz - guv.grundstueck - guv.personal
     - guv.afa - guv.sonstige - guv.zinsen;
 
@@ -421,8 +448,32 @@ function _gaRechnen(halterId, jahr, daten) {
     }
   } catch (e) {}
   if (satz == null || !isFinite(satz)) satz = 0.15825;
+  /* v2984 · Hier stand „Steuer = Satz × max(0, Ergebnis), ein Verlustvortrag
+     wird NICHT gerechnet" — der Steuer-Reiter rechnete mit Vortrag, die
+     Projektion ohne: drei Zahlen fuer dasselbe Jahr. Jetzt derselbe Kern
+     (steuerReihe) ueber die Vorjahre dieses Abschlusses. Die Vorjahreslaeufe
+     (_ohneVortrag) liefern nur ihr Ergebnis vor Steuern. */
   var steuern = ergebnisVorSteuern > 0 ? ergebnisVorSteuern * satz : 0;
+  var steuerDetail = null, vortragSteuerlich = null;
+  try {
+    var _K = window.DealPilotUeberfuehrungKern;
+    var _P = (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter(halterId) : null;
+    if (_K && _P) {
+      var _vj = (daten && daten.vortrag && daten.vortrag.jahre) || [];
+      var _reihe = _vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuer: x.grundsteuer || 0 }; });
+      _reihe.push({ jahr: jahr, erg: ergebnisVorSteuern, grundsteuer: grundsteuerSumme });
+      var _sr = _K.steuerReihe(_reihe, _P);
+      steuerDetail = _sr[_sr.length - 1];
+      steuern = steuerDetail.steuer;
+      /* Vortrag der Vorjahre mit DERSELBEN Steuer (sonst stuende dort die ohne Verlustvortrag) */
+      var _vs = 0; for (var _i = 0; _i < _sr.length - 1; _i++) _vs += _reihe[_i].erg - _sr[_i].steuer;
+      if (_vj.length) var _vortragKorr = _vs;
+      vortragSteuerlich = { kst: steuerDetail.vortragNach, gewst: steuerDetail.vortragGewNach, genutzt: steuerDetail.genutzt };
+    }
+  } catch (e) {}
   var jahresueberschuss = ergebnisVorSteuern - steuern;
+  /* UG: gesetzliche Ruecklage 25 % (§ 5a Abs. 3 GmbHG) */
+  var ugRuecklage = (mand && mand.rechtsform === 'ug' && jahresueberschuss > 0) ? jahresueberschuss * 0.25 : 0;
 
   /* ── Bilanz ── */
   var akGrund = 0, akGeb = 0, kumGeb = 0, akBwg = 0, kumBwg = 0, darlehen = 0;
@@ -450,7 +501,8 @@ function _gaRechnen(halterId, jahr, daten) {
      Gesellschaft kann aelter sein als ihre Daten hier. Fehlt die
      Fortschreibung (kein Vorjahr erfasst), bleibt es beim Eroeffnungswert,
      also beim bisherigen Verhalten. */
-  var vortragAusVorjahren = (daten && daten.vortrag && isFinite(daten.vortrag.summe)) ? daten.vortrag.summe : 0;
+  var vortragAusVorjahren = (typeof _vortragKorr === 'number' && isFinite(_vortragKorr)) ? _vortragKorr
+    : ((daten && daten.vortrag && isFinite(daten.vortrag.summe)) ? daten.vortrag.summe : 0);
   var gewinnvortrag = _gaNum(bh.eb_gewinnvortrag) + vortragAusVorjahren;
   var gesdar = _gaNum(bh.eb_gesdar);
   var passivaOhneAusgleich = stammkapital + gewinnvortrag + jahresueberschuss
@@ -463,7 +515,10 @@ function _gaRechnen(halterId, jahr, daten) {
 
   return {
     mandant: mand, regime: reg, bh: bh, kosten: kosten,
-    steuersatz: satz,
+    steuersatz: satz, steuerDetail: steuerDetail, vortragSteuerlich: vortragSteuerlich,
+    ugRuecklage: ugRuecklage, gdZins: gdZinsSumme,
+    erwStatus: (window.DealPilotUeberfuehrungKern ? DealPilotUeberfuehrungKern.erwKuerzungStatus(reg) : { aktiv: false }),
+    _grundsteuer: grundsteuerSumme,
     guv: {
       umsatz: guv.umsatz, grundstueck: guv.grundstueck, personal: guv.personal,
       afa: guv.afa, sonstige: guv.sonstige, zinsen: guv.zinsen,
@@ -621,7 +676,7 @@ function _gaDeckblatt(doc, jahr, name, rech, daten, W, H, M, CW) {
   var anschrift = [ident.strasse, ident.ort].filter(Boolean).join(', ');
   zeile('Anschrift', anschrift || 'nicht hinterlegt', !anschrift);
   zeile('Steuersatz', (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' %'
-    + (rech.regime.erw_kuerzung !== false ? '  ·  erweiterte Kürzung § 9 GewStG' : ''), false);
+    + (rech.erwStatus && rech.erwStatus.aktiv ? '  ·  erweiterte Kürzung § 9 GewStG' : (rech.regime.erw_kuerzung === true ? '  ·  erw. Kürzung beantragt, Prüfpunkte offen' : '')), false);
 
   cy += 4;
   doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
@@ -699,12 +754,14 @@ function _gaGuvSeite(doc, jahr, name, rech, W, H, M, CW) {
   strich(true);
   pos('', 'Ergebnis vor Steuern', g.ergebnisVorSteuern, { fett: true, rot: g.ergebnisVorSteuern < 0 });
   pos('14.', 'Steuern vom Einkommen und vom Ertrag', -g.steuern,
-    { hinweis: 'Satz ' + (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' % — '
-      + 'Körperschaftsteuer und Soli'
-      + (rech.regime.erw_kuerzung !== false
-          ? ', Gewerbesteuer wegen erweiterter Kürzung nach § 9 Nr. 1 Satz 2 GewStG mit 0 angesetzt'
-          : ', einschließlich Gewerbesteuer')
-      + '. Ein Verlustvortrag aus Vorjahren ist nicht berücksichtigt.' });
+    { hinweis: (rech.steuerDetail
+        ? 'Körperschaftsteuer + Soli ' + _gaEur(rech.steuerDetail.kst) + ', Gewerbesteuer ' + _gaEur(rech.steuerDetail.gewst)
+          + (rech.erwStatus && rech.erwStatus.aktiv ? ' (erweiterte Kürzung § 9 Nr. 1 S. 2 GewStG)' : ' (nach Kürzung Grundsteuer § 9 Nr. 1 S. 1 GewStG, abgerundet)')
+          + (rech.steuerDetail.genutzt > 0 ? '; Verlustvortrag verrechnet ' + _gaEur(rech.steuerDetail.genutzt) : '')
+          + (rech.steuerDetail.vortragNach > 0 ? '; verbleibender Verlustvortrag ' + _gaEur(rech.steuerDetail.vortragNach) : '')
+          + (rech.ugRuecklage > 0 ? '. UG: gesetzliche Rücklage 25 % = ' + _gaEur(rech.ugRuecklage) + ' (§ 5a Abs. 3 GmbHG)' : '') + '.'
+        : 'Satz ' + (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' % — Körperschaftsteuer und Soli'
+          + (rech.erwStatus && rech.erwStatus.aktiv ? ', Gewerbesteuer wegen erweiterter Kürzung mit 0 angesetzt' : ', einschließlich Gewerbesteuer') + '.') });
   strich(true);
   /* v1227c: bei negativem Ergebnis heisst die Zeile handelsrechtlich
      JahresFEHLBETRAG. "Jahresueberschuss: -21.078 EUR" ist kein Schoenheitsfehler,
