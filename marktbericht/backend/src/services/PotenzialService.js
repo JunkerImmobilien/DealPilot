@@ -28,6 +28,8 @@ import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einhe
 import { mieteNachBand, herkunftNachBand, differenzZumErtragswert } from './CrossCheckService.js';   /* v2488 · dieselbe Bandregel wie der Bestand; v2595 · dieselbe Differenz */
 import { ValuationService } from './ValuationService.js';         /* v2541 */
 import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 */
+import { marktmiete as amtlicheMiete, klasseAusPunkten, KLASSE_TEXT } from '../lib/mietmodell_nrw.js';   /* v2988 */
+import { MIETBAND } from './CrossCheckService.js';   /* v2988 */
 
 /* ══ v2541 · MARKTPREISINDIKATION JE STUFE UND JE WOHNUNG ═════════════════════
    Marcel 20.10.2026: „dann kann man den Ertragswert sehen, aber auch die
@@ -195,10 +197,25 @@ function bestandsBasis(basis, wl) {
   leer.forEach((z) => { z.basis = z.roh * fL; z.basis_qm = r2(z.basis / 12 / z.wfl); });
   return { zeilen, faktor: fV, faktor_leer: leer.length ? fL : null, rohertrag: rB };
 }
-/** Wertermittlungs-Miete einer Wohnung in der Stufe s. */
-function stufenMiete(z, w, s) {
+/** Wertermittlungs-Miete einer Wohnung in der Stufe s.
+ *  v2988 · `ov` (optional): Band und marktuebliche Miete NACH den Massnahmen der Stufe
+ *  (mieteNachModernisierung). Dann gilt die Bandregel gegen DIESES Band - auch fuer die
+ *  Ist-Miete einer Wohnung ohne eigene Stufenmiete (der Mieter zahlt sie weiter, nach der
+ *  Modernisierung ist sie womoeglich marktueblich) und fuer leere Wohnungen. */
+function stufenMiete(z, w, s, ov) {
   if (!z) return null;
   if (s === 'bestand') return z.basis;
+  if (ov && ov.band && ov.markt > 0 && z.wfl > 0) {
+    const m0 = zahl(w.miete_jahr && w.miete_jahr[s]);
+    const leer = z.herkunft === 'leer_marktueblich';
+    const mEff = (m0 != null && m0 > z.ist) ? m0 : (z.ist > 0 ? z.ist : null);
+    let roh;
+    if (mEff != null && mEff > 0) {
+      const r = mieteNachBand(r2(mEff / 12 / z.wfl), ov.band, ov.markt);
+      roh = r.fuehrt ? mEff : ov.markt * z.wfl * 12;
+    } else roh = ov.markt * z.wfl * 12;
+    return z.basis + Math.max(0, roh - (leer ? z.basis : z.roh));
+  }
   const m = zahl(w.miete_jahr && w.miete_jahr[s]);
   if (m == null || !(m > z.ist)) return z.basis;           /* keine Anhebung -> Basis */
   /* leer: max(Basis, Stufenmiete); vermietet: die Mehrmiete gegen die eigene gepruefte Miete */
@@ -216,6 +233,80 @@ function stufenMiete(z, w, s) {
     stufeRoh = r.fuehrt ? m : (Number(r.qm) > 0 ? r.qm * z.wfl * 12 : stufeRoh);
   }
   return z.basis + Math.max(0, stufeRoh - bezug);
+}
+
+/* == v2988 · MIETE NACH MODERNISIERUNG (Marcel 27.10.2026, Parkstr. 9) ==================
+   § 27 Abs. 1 / § 31 Abs. 2 ImmoWertV: Rohertrag = marktueblich erzielbare Ertraege fuer
+   das Objekt in SEINEM Zustand. Das Zielbild unterstellt die Massnahmen als umgesetzt
+   (ImmoWertA zu § 2 Abs. 5: Qualitaetsstichtag als „Beschreibung bestimmter Annahmen zum
+   Grundstueckszustand") - marktueblich ist dann die Miete der modernisierten Wohnung.
+   Woher sie kommt, in dieser Rangfolge:
+     1  eigene Angabe (Feld zb_markt_qm, „Marktübliche Miete nach Modernisierung", nur Zielbild)
+     2  die amtliche Quelle selbst, wo sie nach Modernisierung staffelt und Anker des
+        Bestands ist: Mietpreisuebersicht Minden-Luebbecke (Abschnitt 9) mit der Klasse aus
+        den Punkten NACH der Massnahme - dieselbe Tabelle, dieselben Faktoren (Lage, Groesse,
+        Geschoss), nur die Klasse wechselt
+     3  sonst nichts: die Quelle staffelt nicht (Ø Miete des Satzes, Angebotsmiete) - es
+        bleibt beim Band des Bestands, und der Bericht sagt es (keine erfundene Zahl).
+        Konservative Entscheidung, fuer Marcel markiert (entscheidung_offen).
+   Band wie im Bestand: Anker ± MIETBAND.pct. Eine Stufe faellt nie unter den Bestand. */
+const qm2 = (v) => Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²';
+const pkt = (v) => (v == null ? '–' : String(Math.round(Number(v) * 10) / 10).replace('.', ','));
+const bandT = (q) => qm2(q * (1 - MIETBAND.pct / 100)).replace(' €/m²', '') + '–' + qm2(q * (1 + MIETBAND.pct / 100));
+function bandUm(band0, anker, etikett) {
+  return Object.assign({}, band0 || {}, { anker_qm: anker, anker_etikett: etikett,
+    unten_qm: Math.round(anker * (1 - MIETBAND.pct / 100) * 100) / 100,
+    oben_qm: Math.round(anker * (1 + MIETBAND.pct / 100) * 100) / 100, band_pct: MIETBAND.pct });
+}
+function mieteNachModernisierung(wb, basis, s, plus, kosten, eigenQm) {
+  const band0 = basis.miete_band || null;
+  const anker0 = band0 && band0.anker_qm > 0 ? Number(band0.anker_qm) : zahl(basis.markt_qm);
+  const hatMassnahme = (Number(plus) > 0) || (Number(kosten) > 0);
+  const eigen = s === 'zielbild' && Number(eigenQm) > 0 ? Number(eigenQm) : null;
+  const EIGEN_T = ' Eigenen Ansatz eintragen: Reiter Objekt, Karte „Mieterhöhung und Zielbild“, Feld „Marktübliche Miete nach Modernisierung“.';
+  if (!(anker0 > 0)) return { ov: null, info: null };
+  if (eigen != null) {
+    const wirkt = eigen > anker0 + 0.005;
+    return { ov: wirkt ? { band: bandUm(band0, eigen, 'marktübliche Miete nach Modernisierung (eigene Angabe)'), markt: eigen } : null,
+      info: { weg: 'eigene_angabe', qm_vorher: anker0, qm_nachher: eigen, wirkt,
+        satz: 'Marktübliche Miete nach Modernisierung: eigene Angabe ' + qm2(eigen)
+          + (wirkt ? ' statt ' + qm2(anker0) + ' im Bestand (Band ± ' + MIETBAND.pct + ' %: ' + bandT(eigen) + ').'
+            : ' — nicht über der marktüblichen Miete des Bestands (' + qm2(anker0) + '), ohne Wirkung.') } };
+  }
+  if (!hatMassnahme) return { ov: null, info: null };
+  const E = wb && wb.amtliche_miete_eingabe;
+  const amtlich = !!(band0 && band0.anker_stufe === 'amtlich');
+  if (amtlich && E) {
+    const pV = zahl(basis.ein.mod_punkte);
+    const pN = Math.min(20, (pV != null ? pV : 0) + (Number(plus) > 0 ? Number(plus) : 0));
+    const kV = E.modernisierung_klasse != null ? Number(E.modernisierung_klasse) : klasseAusPunkten(pV);
+    const kN = klasseAusPunkten(pN);
+    let r = null;
+    try { r = (kN != null && (kV == null || kN > kV)) ? amtlicheMiete(Object.assign({}, E, { modernisierung_klasse: kN })) : null; } catch (e) { r = null; }
+    const qmN = r && r.verfuegbar && Number(r.miete_qm) > 0 ? Number(r.miete_qm) : null;
+    const wirkt = qmN != null && qmN > anker0 + 0.005;
+    const kT = (k, p) => (k ? 'Klasse ' + k + ' (' + (KLASSE_TEXT[k] || '') + ', ' + pkt(p) + ' Punkte)' : 'ohne Klasse');
+    let satz = 'Die Mietpreisübersicht des Gutachterausschusses staffelt nach Modernisierungsgrad. Die Maßnahmen heben ihn von '
+      + kT(kV, pV) + ' auf ' + kT(kN, pN);
+    if (wirkt) {
+      satz += ' (fiktives Baujahr ' + r.fiktives_baujahr + '): marktübliche Miete ' + qm2(qmN) + ' statt ' + qm2(anker0)
+        + ', Band ± ' + MIETBAND.pct + ' % ' + bandT(qmN) + '.';
+    } else if (kN != null && kV != null && kN > kV) {
+      satz += (r && r.verfuegbar ? ' (fiktives Baujahr ' + r.fiktives_baujahr + ')' : '')
+        + ' — die Tabelle ergibt keine höhere Miete' + (r && r.verfuegbar && r.fiktives_baujahr <= 1950 ? ' (bis Baujahr 1949 gilt der Wert von 1950)' : '')
+        + '. Mehrmiete über der marktüblichen Miete (' + qm2(anker0) + ' + ' + MIETBAND.pct + ' %) ist nicht angesetzt.' + EIGEN_T;
+    } else {
+      satz += ' — die Klasse ändert sich nicht, die marktübliche Miete bleibt ' + qm2(anker0)
+        + '. Mehrmiete darüber (+ ' + MIETBAND.pct + ' %) ist nicht angesetzt.' + EIGEN_T;
+    }
+    return { ov: wirkt ? { band: bandUm(band0, qmN, 'amtliche Miete nach Modernisierung (Klasse ' + kN + ')'), markt: qmN } : null,
+      info: { weg: 'amtlich_nach_modernisierung', klasse_vorher: kV, klasse_nachher: kN, punkte_vorher: pV, punkte_nachher: pN,
+        qm_vorher: anker0, qm_nachher: qmN, fiktives_baujahr: r && r.verfuegbar ? r.fiktives_baujahr : null, wirkt, satz,
+        quelle: r && r.quelle ? r.quelle : 'Mietpreisübersicht des Gutachterausschusses' } };
+  }
+  return { ov: null, info: { weg: 'nicht_gestaffelt', qm_vorher: anker0, qm_nachher: null, wirkt: false, entscheidung_offen: true,
+    satz: 'Mehrmiete über der marktüblichen Miete nicht angesetzt — die verwendete Quelle (' + ((band0 && band0.anker_etikett) || 'Vergleichsmiete') + ' '
+      + qm2(anker0) + ') staffelt nicht nach Modernisierung.' + EIGEN_T } };
 }
 
 function eineStufe(basis, ref, basisKern, miete, plus, kosten) {
@@ -550,6 +641,7 @@ export const PotenzialService = {
       bericht_ertragswert: bericht.value_eur ?? null,
     };
     out.haus = { bestand };
+    out.sanierung = cc.sanierung || null;   /* v2988 · Regel der Sanierungskosten (Mapper sanStatus) */
     const varianten = Array.isArray(auftrag.varianten) ? auftrag.varianten : [];
     const wl = (Array.isArray(auftrag.wohnungen) ? auftrag.wohnungen : []).filter((w) => w && Number(w.wfl) > 0);
     /* v2488 · ohne Wohnungsliste (ETW, Einzelobjekt): EINE Wohnung = das Objekt,
@@ -558,19 +650,27 @@ export const PotenzialService = {
       miete_jahr: Object.assign({ bestand: (!ref.vacancy && zahl(ref.monthly_net_rent) > 0) ? zahl(ref.monthly_net_rent) * 12 : 0 },
         ...varianten.filter((v) => v && STUFEN.indexOf(v.key) >= 0).map((v) => ({ [v.key]: zahl(v.miete_wohnen_jahr) }))) }];
     const bb = bestandsBasis(basis, wlB);
-    const anhebungN = (s) => (bb ? bb.zeilen.filter((z, i) => z && stufenMiete(z, wlB[i], s) > z.basis + 0.5).length : 0);
+    /* v2988 · Band und marktuebliche Miete nach den Massnahmen je Stufe */
+    const MNM = {};
+    for (const v of varianten) {
+      if (!v || STUFEN.indexOf(v.key) < 0) continue;
+      MNM[v.key] = mieteNachModernisierung(wb, basis, v.key, zahl(v.mod_punkte_plus) || 0, zahl(v.kosten) || 0, auftrag.zielbild_markt_qm);
+    }
+    const ovS = (s) => (MNM[s] ? MNM[s].ov : null);
+    const anhebungN = (s) => (bb ? bb.zeilen.filter((z, i) => z && stufenMiete(z, wlB[i], s, ovS(s)) > z.basis + 0.5).length : 0);
     bestand.anhebung_jahr = 0;
     for (const v of varianten) {
       if (!v || STUFEN.indexOf(v.key) < 0) continue;
       let m = zahl(v.miete_wohnen_jahr);
       if (m == null) continue;
-      if (bb) m = bb.zeilen.reduce((a, z, i) => a + (z ? stufenMiete(z, wlB[i], v.key) : 0), 0);
+      if (bb) m = bb.zeilen.reduce((a, z, i) => a + (z ? stufenMiete(z, wlB[i], v.key, ovS(v.key)) : 0), 0);
       else m = Math.max(m, Number(basis.ein.miete_markt_jahr) || 0);   /* ohne Basis: nie unter dem Bestand */
       const z = eineStufe(basis, ref, kB, m, zahl(v.mod_punkte_plus) || 0, zahl(v.kosten) || 0);
       if (z) {
         z.kosten = zahl(v.kosten) || 0;
         z.anhebung_jahr = Math.round(z.miete_wohnen_jahr - bestand.miete_wohnen_jahr);   /* v2488 */
         z.anhebung_wohnungen = anhebungN(v.key);
+        z.miete_nach_modernisierung = MNM[v.key] ? MNM[v.key].info : null;   /* v2988 */
         out.haus[v.key] = z;
       }
     }
@@ -644,7 +744,7 @@ export const PotenzialService = {
       const bbW = bb && wlB === wl ? bb : null;
       const mieteW = (w, i, s) => {
         const z = bbW ? bbW.zeilen[i] : null;
-        return z ? stufenMiete(z, w, s) : (zahl(w.miete_jahr && w.miete_jahr[s]) || 0);
+        return z ? stufenMiete(z, w, s, ovS(s)) : (zahl(w.miete_jahr && w.miete_jahr[s]) || 0);
       };
       const summeMiete = {};
       stufenAlle.forEach((s) => { summeMiete[s] = wl.reduce((a, w, i) => a + mieteW(w, i, s), 0); });
@@ -778,3 +878,5 @@ export default PotenzialService;
 
 /* v2854 · fuer den Pruefer (tools/wertermittlung-pruefen.mjs B54): dieselbe Stufenrechnung */
 export { eineStufe as _eineStufe };
+/* v2988 · fuer Knotenprobe und Pruefer: Miete nach Modernisierung, Stufenmiete, Bestandsbasis */
+export { mieteNachModernisierung as _mieteNachModernisierung, stufenMiete as _stufenMiete, bestandsBasis as _bestandsBasis };

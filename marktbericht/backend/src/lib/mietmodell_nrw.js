@@ -115,6 +115,25 @@ export function baujahrAnpassung(gebaeudealter, klasse) {
   return MOD_ERHOEHUNG[80][k];
 }
 
+/* v2988 · Modernisierungsgrad (Punkte nach Anlage 2 / AGVGA-NRW-Modell) -> Klasse
+ * der Mietpreisuebersicht. Bis v2987 stand diese Zuordnung inline im
+ * ReportOrchestrator; der Potenzial-Lauf braucht sie fuer die Miete NACH den
+ * Massnahmen (Zielbild) - eine Stelle, zwei Leser.
+ * Abschnitt 9 (GMB 2026, S. 78) „Einstufung der Modernisierung":
+ *   Instandhaltung ohne Modernisierung = Klasse 1, kleinere Modernisierungen = 2,
+ *   mittlerer Modernisierungsstand = 3, ueberwiegend modernisiert = 4,
+ *   umfassend modernisiert = 5; Grade nach dem AGVGA-Modell: <= 1 / 2-5 / 6-10 /
+ *   11-17 / >= 18 Punkte. ACHTUNG: das Anwendungsbeispiel derselben Seite nennt
+ *   „kleinere Modernisierungen" mit Klasse 3 - Widerspruch im Bericht selbst,
+ *   als Entscheidung offen (Dateien/zielbild-miete-pruefung-20261027.md). */
+export const KLASSE_TEXT = Object.freeze({ 1: 'Instandhaltung ohne Modernisierung', 2: 'kleinere Modernisierungen',
+  3: 'mittlerer Modernisierungsstand', 4: 'überwiegend modernisiert', 5: 'umfassend modernisiert' });
+export function klasseAusPunkten(p) {
+  if (p == null || p === '' || !Number.isFinite(Number(p))) return null;
+  const n = Number(p);
+  return n <= 1 ? 1 : n <= 5 ? 2 : n <= 10 ? 3 : n <= 17 ? 4 : 5;
+}
+
 /* Die Tabelle des Ausschusses reicht von 50 bis 140 m2. Darueber hinaus wird
  * NICHT fortgeschrieben: der Faktor faellt von 1,20 auf 0,82 und laesst sich
  * nicht guten Gewissens verlaengern. Eine 165-m2-Wohnung mit 0,82 zu rechnen

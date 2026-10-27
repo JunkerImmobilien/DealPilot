@@ -40,7 +40,7 @@ import { DealPilotObjectMapper } from './DealPilotObjectMapper.js';
 import { MarketInsightsService } from './MarketInsightsService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { IrwConnector, ebeneFuer, IRW_EBENEN } from '../connectors/IrwConnector.js';   /* v2660: ebeneFuer, IRW_EBENEN */
-import { marktmiete as amtlicheMiete } from '../lib/mietmodell_nrw.js';   /* v1059-WMIET-1 */
+import { marktmiete as amtlicheMiete, klasseAusPunkten } from '../lib/mietmodell_nrw.js';   /* v1059-WMIET-1; v2988 */
 import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';   /* v1060-WVF-1 */   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
@@ -286,6 +286,8 @@ export const ReportOrchestrator = {
          ob der Zustandsabschlag entfaellt (kein Doppelabzug). */
       bom_quelle: input.bom_quelle || (Number.isFinite(Number(input.bom_eur)) && input.bom_eur != null ? 'eigene_angabe' : null),
       bom_worst_eur: Number.isFinite(Number(input.bom_worst_eur)) ? Number(input.bom_worst_eur) : null,
+      /* v2988 · was mit den Sanierungskosten geschieht (Regel, Ausfuehrungsdatum, Hinweis) */
+      san_status: input.san_status && typeof input.san_status === 'object' ? input.san_status : null,
       rnd_verkuerzt: input.rnd_verkuerzt === true || input.rnd_verkuerzt === 'ja',
 
       /* v1071-WHIN-3 · Zusaetzliche Grundstuecksflaeche mit eigenem Ansatz. */
@@ -615,15 +617,14 @@ export const ReportOrchestrator = {
      * abgeleitet hat. Sie wird IMMER gerechnet, auch wenn sie nicht fuehrt —
      * der Vergleich mit der Portalmiete ist selbst eine Aussage. */
     let _amtMiete = null;
+    let _amtMieteEin = null;   /* v2988 */
     try {
       const _bp3 = (landValue && landValue.properties_raw) || {};
       const _gem = _bp3.Gemeinde || _bp3.GENA
         || (address && (address.city || address.town)) || null;
       if (_gem && ref.build_year && ref.living_area) {
-        const _kl = ref.mod_punkte != null
-          ? (Number(ref.mod_punkte) <= 1 ? 1 : Number(ref.mod_punkte) <= 5 ? 2
-             : Number(ref.mod_punkte) <= 10 ? 3 : Number(ref.mod_punkte) <= 17 ? 4 : 5)
-          : null;
+        /* v2988 · dieselbe Zuordnung, jetzt an einer Stelle (lib/mietmodell_nrw.js) */
+        const _kl = ref.mod_punkte != null ? klasseAusPunkten(ref.mod_punkte) : null;
         const _lage = _bp3.Lagebeurteilung != null
           ? (Number(_bp3.Lagebeurteilung) >= 4 ? 'sehr_gut'
              : Number(_bp3.Lagebeurteilung) === 3 ? 'gut'
@@ -642,7 +643,7 @@ export const ReportOrchestrator = {
           if (_eh.length) _wflAmt = _eh.reduce((a, x) => a + x, 0) / _eh.length;
           else if (Number(ref.units) > 1) _wflAmt = Number(ref.living_area) / Number(ref.units);
         }
-        _amtMiete = amtlicheMiete({
+        _amtMieteEin = {
           ags: ref.ags || null,   /* v1071-WZUS-5 */
           gemeinde: _gem, baujahr: ref.build_year, wohnflaeche_qm: _wflAmt,
           modernisierung_klasse: _kl,
@@ -650,7 +651,10 @@ export const ReportOrchestrator = {
             && Number(ref.mod_punkte || 0) >= 18,
           sanierungsjahr: ref.modernization_year || null,
           wohnlage: _lage, stichtag_jahr: (new Date()).getFullYear(),
-        });
+        };
+        /* v2988 · die Eingabe bleibt fuer den Potenzial-Lauf stehen: das Zielbild fragt
+           dieselbe Tabelle mit der Modernisierungsklasse NACH den Massnahmen */
+        _amtMiete = amtlicheMiete(_amtMieteEin);
         step('amtliche miete: ' + (_amtMiete.verfuegbar
           ? _amtMiete.miete_qm + ' EUR/m2 (fiktives Bj ' + _amtMiete.fiktives_baujahr + ')'
           : 'keine (' + _amtMiete.grund + ')'));
@@ -1604,12 +1608,24 @@ export const ReportOrchestrator = {
     }
 
     let crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
+    /* v2988 · Sanierungskosten: welche Regel gilt - im Bericht offen, nicht still */
+    try {
+      if (crossCheck && ref.san_status) {
+        crossCheck.sanierung = ref.san_status;
+        if (Array.isArray(crossCheck.notes)) {
+          const _sn = ref.san_status.hinweis || null;
+          if (_sn && crossCheck.notes.indexOf(_sn) < 0) crossCheck.notes.push(_sn);
+        }
+      }
+    } catch (e) { /* nur Auskunft */ }
     /* v2430 · Nur-Wert-Lauf endet hier: ref, Parameter und Quercheck samt der
        (nicht aufzaehlbaren) Ertragswert-Eingabe gehen an PotenzialService. */
     if (NUR_WERT) {
       step('nur-wert-basis: Ende nach dem Quercheck');
       return { nur_wert_basis: true, ref, wert_params: _wertParams, cross_check: crossCheck,
         ertragswert_eingabe: (crossCheck && crossCheck._ertragswertEingabe) || null,
+        /* v2988 · Miete nach Modernisierung im Zielbild: Eingabe und Ergebnis der Mietpreisuebersicht */
+        amtliche_miete: _amtMiete || null, amtliche_miete_eingabe: _amtMieteEin || null,
         land_value: landValue ? { available: !!landValue.available, value_sqm: landValue.value_sqm ?? null } : null,
         /* v2541 · Marktpreisindikation je Stufe/Wohnung (PotenzialService): die Indikation
            des Bestands samt Gegenprobe und die Marktdaten, aus denen sie entsteht -

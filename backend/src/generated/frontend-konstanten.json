@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-27T12:43:30.353Z",
+ "erzeugt_am": "2026-10-27T13:14:19.686Z",
  "quellen": {
   "voice-import": "3cbd37d2be829d1c",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "71b3aa3be2b0e4de",
-  "index-html": "7842f759062c7b46",
+  "storage": "b06bc6e9216dc0a1",
+  "index-html": "e335e461835b8098",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -582,6 +582,8 @@
    "zb_ziel_wann",
    "zb_massnahmen",
    "zb_fertig_jahr",
+   "zb_markt_qm",
+   "san_ausgefuehrt",
    "mv_art",
    "mv_beginn",
    "mv_letzte_erhoehung",
@@ -1604,6 +1606,16 @@
     "id": "zb_fertig_jahr",
     "kind": "text",
     "label": "Zielbild fertig (Jahr)"
+   },
+   {
+    "id": "zb_markt_qm",
+    "kind": "text",
+    "label": "Marktübliche Miete nach Modernisierung (€/m²)"
+   },
+   {
+    "id": "san_ausgefuehrt",
+    "kind": "text",
+    "label": "Sanierung ausgeführt am — optional"
    },
    {
     "id": "mv_art",
@@ -5115,6 +5127,7 @@
     "san",
     "san_ust",
     "kaufdat",
+    "san_ausgefuehrt",
     "etagen_ges",
     "mv_befristet_bis",
     "mv_kuendigungsverzicht_bis",
@@ -5154,6 +5167,6 @@
  },
  "inhalt": {
   "hilfe": "a4b64bcab551246f",
-  "bewertung": "78f03bef50ae93e7"
+  "bewertung": "eb13f847789ae4c0"
  }
 }

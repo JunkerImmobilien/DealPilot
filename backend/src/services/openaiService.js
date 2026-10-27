@@ -61,7 +61,7 @@ function _potenzialBlock(pz) {
   var st = pz.stufen || {};
   z.push('');
   /* v2541 · Jahr je Stufe und beide Marktpreisindikationen (Marcel 20.10.2026) */
-  z.push('Stufe | Jahr | Kaltmiete/Monat | Kaltmiete/Jahr | Massnahmenkosten | Modernisierungspunkte plus | Bruttomietrendite | DSCR | Restnutzungsdauer | Miete im Ertragswert/Jahr (Anhebung gegen Bestand) | Ertragswert | Marktpreisindikation (Angebote) | Rohertragsfaktor x Miete');
+  z.push('Stufe | Jahr | Kaltmiete/Monat | Kaltmiete/Jahr | Massnahmen im Zielbild (Kosten) | Modernisierungspunkte plus | Bruttomietrendite | DSCR | Restnutzungsdauer | Miete im Ertragswert/Jahr (Anhebung gegen Bestand) | Ertragswert | Marktpreisindikation (Angebote) | Rohertragsfaktor x Miete');
   ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
     var x = st[k]; if (!x) return;
     z.push(k + ' | ' + (x.jahr ? x.jahr : (k === 'zielbild' ? 'offen' : '-')) + ' | ' + e(x.kaltmiete_monat) + ' | ' + e(x.kaltmiete_jahr) + ' | ' + e(x.kosten) + ' | ' + (x.punkte_plus || 0)
@@ -72,6 +72,19 @@ function _potenzialBlock(pz) {
       + ' | ' + (x.marktpreisindikation_angebote != null ? e(x.marktpreisindikation_angebote) : '-')
       + ' | ' + (x.rohertragsfaktor_x_miete != null ? e(x.rohertragsfaktor_x_miete) : '-'));
   });
+  /* v2988 · Massnahmen im Zielbild sind NICHT die Sanierungskosten der Investition (Parkstr. 9:
+     137.000 EUR Investition, 136.000 EUR Zielbild-Massnahmen) - beide getrennt benennen. */
+  var mh = pz.massnahmen_herkunft;
+  if (mh && (mh.text || mh.sanierungskosten_investition)) {
+    z.push('Massnahmen im Zielbild: ' + (mh.text || 'keine eingetragen') + (mh.summe ? ' Summe ' + e(mh.summe) + '.' : '')
+      + (mh.sanierungskosten_investition ? ' Sanierungskosten der Investition (Reiter Investition, eigene Angabe): ' + e(mh.sanierungskosten_investition) + '.' : '')
+      + ' Nenne die Kosten der Spalte als "Massnahmen im Zielbild" - nie als Sanierungskosten; die Sanierungskosten gehoeren zur Investition (Kaufpreis plus Sanierung).'
+      + (mh.unterschied ? ' Liegen beide vor, sag, dass es zwei getrennte Angaben sind und dieselbe Arbeit sonst doppelt stuende.' : ''));
+  }
+  if (pz.miete_nach_modernisierung && pz.miete_nach_modernisierung.satz && !pz.ertragswert_gesperrt) {
+    z.push('Miete im Zielbild-Ertragswert (so wiedergeben): ' + pz.miete_nach_modernisierung.satz);
+  }
+  if (pz.sanierung_regel) z.push('Sanierungskosten im Marktbericht: ' + pz.sanierung_regel);
   /* v2541 · die Jahre: woher sie kommen, und was „offen" heisst */
   if (pz.jahre) z.push('Jahre: Bestand ab Kaufdatum' + (pz.jahre.ankauf ? ' ' + pz.jahre.ankauf : ' (nicht eingetragen)')
     + (pz.jahre.mieterhoehung ? ', Mieterhoehung ab ' + pz.jahre.mieterhoehung + ' (' + (pz.jahre.mieterhoehung_herkunft || '') + ')' : '')

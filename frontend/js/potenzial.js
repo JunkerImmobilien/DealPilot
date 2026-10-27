@@ -481,6 +481,10 @@
     });
     /* v2431 · die Objektkennung: an ihr haengt ein schon vorliegender Bericht Stufe 3 */
     var body = { object: obj, varianten: varianten, external_ref: (typeof window._currentObjKey === 'string' && window._currentObjKey) || null };
+    /* v2988 · eigene Angabe „Marktübliche Miete nach Modernisierung" (€/m²) - nur gesetzt im Auftrag,
+       damit der Pruefwert aller Objekte ohne dieses Feld gleich bleibt */
+    var _zmq = zahl(wert('zb_markt_qm'));
+    if (_zmq > 0) body.zielbild_markt_qm = Math.round(_zmq * 100) / 100;
     if (m.art === 'mfh') {
       body.wohnungen = m.wohnungen.map(function (w) {
         var sm = (w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist;
@@ -616,6 +620,105 @@
       cf_m: k._kpis_cf_vs != null ? Number(k._kpis_cf_vs) / 12 : null };
   }
 
+  /* ══ v2988 · WOHER DAS ZIELBILD KOMMT (Marcel 27.10.2026, Parkstr. 9) ══════════
+     Gemessen: Investition `san` 137.000 €, Zielbild-Maßnahmen 136.000 € (Summe der
+     Maßnahmen von fünf Wohnungen) - zwei Zahlen, die gleich aussehen und Verschiedenes
+     sagen. `san` gehört zur Investition (Ankauf; bis zur Ausführung offener
+     Instandhaltungsrückstau, § 8 Abs. 3 ImmoWertV), die Zielbild-Maßnahmen sind die
+     Kosten, die das Zielbild NOCH braucht (im Wertzuwachs abgezogen). Ist die Sanierung
+     dieselbe Arbeit, steht sie doppelt. herkunftAus() arbeitet auf den Rohdaten
+     (Cockpit: gespeichertes Objekt), herkunft() auf dem offenen Formular. */
+  function herkunftAus(einheiten, hausL, objListe, san) {
+    var sumL = function (l) { return (l || []).reduce(function (a, x) { return a + zahl(x && x.k); }, 0); };
+    var out = { art: null, n_wohnungen: 0, n_einheiten: 0, summe_wohnungen: 0, haus: 0, haus_n: 0, summe: 0, san: zahl(san) || 0, text: '', unterschied: null };
+    if (Array.isArray(einheiten) && einheiten.length) {
+      out.art = 'mfh';
+      einheiten.forEach(function (e) {
+        if (!e || !(zahl(e.wfl) > 0 || zahl(e.ist) > 0)) return;
+        out.n_einheiten++;
+        var l = massnahmenVon(e), k = sumL(l);
+        if (l.length && k >= 0) { out.n_wohnungen++; out.summe_wohnungen += k; }
+      });
+      var hl = (hausL || []).filter(function (m) { var kk = m && katalog(m.id); return kk && kk.haus; });
+      out.haus = sumL(hl); out.haus_n = hl.length;
+      out.summe = out.summe_wohnungen + out.haus;
+      var t = [];
+      if (out.n_wohnungen) t.push('den Maßnahmen von ' + out.n_wohnungen + (out.n_wohnungen === 1 ? ' Wohnung' : ' Wohnungen') + ' (Summe ' + eur(out.summe_wohnungen) + ')');
+      if (out.haus_n) t.push('den Hausmaßnahmen (' + eur(out.haus) + ')');
+      out.text = t.length ? 'Zielbild aus ' + t.join(' und ') + '.' : '';
+    } else {
+      out.art = 'einzel';
+      var l2 = Array.isArray(objListe) ? objListe : [];
+      out.summe = sumL(l2);
+      out.text = l2.length ? 'Zielbild aus den Maßnahmen am Objekt (' + l2.length + ', Summe ' + eur(out.summe) + ').' : '';
+    }
+    if (out.san > 0 && out.summe > 0) {
+      out.unterschied = 'Investition (Sanierungskosten) ' + eur(out.san) + ' · Zielbild-Maßnahmen ' + eur(out.summe)
+        + ' — zwei getrennte Angaben: die Sanierungskosten (Reiter Investition) gehören zum Ankauf und gelten bis zur Ausführung als offener Instandhaltungsrückstau;'
+        + ' die Zielbild-Maßnahmen sind die Kosten, die das Zielbild noch braucht, und werden vom Wertzuwachs abgezogen.'
+        + ' Ist es dieselbe Arbeit, steht sie doppelt — dann eine der beiden Angaben leeren.';
+    }
+    return out;
+  }
+  function herkunft() {
+    var D = window._dpMfh || {};
+    var mfh = artMitEinheiten() && Array.isArray(D.einheiten) && D.einheiten.length;
+    return herkunftAus(mfh ? D.einheiten : null, mfh ? D.haus_massnahmen : null, mfh ? null : objektMassnahmen(), wert('san'));
+  }
+  function herkunftAusDaten(d) {
+    d = d || {};
+    var M = d._mfh && Array.isArray(d._mfh.einheiten) && d._mfh.einheiten.length ? d._mfh : null;
+    var ol = []; try { ol = JSON.parse(d.zb_massnahmen || '[]'); } catch (e) { ol = []; }
+    return herkunftAus(M ? M.einheiten : null, M ? M.haus_massnahmen : null, M ? null : ol, d.san);
+  }
+  /** Ein Block für Reiter Objekt und Wert & Zielbild: Herkunft, Unterschied zu `san`,
+      marktübliche Miete nach Modernisierung, Regel der Sanierungskosten, Knopf „Zielbild leeren". */
+  function herkunftHtml(opts) {
+    opts = opts || {};
+    var H = herkunft(), r = ergebnis(), zl = r && r.haus && r.haus.zielbild ? r.haus.zielbild : null;
+    var mnm = zl && zl.miete_nach_modernisierung ? zl.miete_nach_modernisierung : null;
+    var z = [];
+    if (H.text) z.push('<b>' + esc(H.text) + '</b>');
+    if (H.unterschied) z.push(esc(H.unterschied));
+    if (mnm && mnm.satz) z.push((mnm.wirkt ? '' : '<b>Miete im Zielbild:</b> ') + esc(mnm.satz));
+    if (r && r.sanierung && r.sanierung.text) z.push('<b>Sanierungskosten:</b> ' + esc(r.sanierung.text));
+    if (!z.length) return '';
+    return '<div class="dp-zb-herkunft" style="font-size:12px;line-height:1.5;margin:8px 0;padding:8px 10px;border-left:3px solid var(--wl-c9a84c, #C9A84C);background:rgba(127,127,127,.06)">'
+      + z.map(function (x) { return '<div style="margin:2px 0">' + x + '</div>'; }).join('')
+      + (opts.ohneKnopf || !(H.summe > 0 || modell().aktiv) ? '' : '<button type="button" class="btn btn-sm" data-dp-zb-leeren="1" style="margin-top:6px">Zielbild leeren</button>')
+      + '</div>';
+  }
+  /** Leert Maßnahmen, Soll- und Zielmieten (Objekt und Einheiten) - nur nach Rückfrage.
+      Nichts in der Datenbank direkt: die Felder werden geleert und das Objekt wie bei
+      jeder Eingabe gespeichert (saveObj). */
+  function leeren() {
+    var H = herkunft();
+    var frage = 'Zielbild leeren?\n\nEntfernt werden: alle Maßnahmen (' + eur(H.summe) + (H.n_wohnungen ? ', ' + H.n_wohnungen + ' Wohnungen' : '') + (H.haus_n ? ', Hausmaßnahmen' : '')
+      + '), Soll- und Zielmieten, „Zielbild ab wann" und die marktübliche Miete nach Modernisierung.\n'
+      + 'Nicht berührt: Ist-Mieten, Flächen, Sanierungskosten im Reiter Investition.';
+    if (!window.confirm(frage)) return false;
+    var D = window._dpMfh;
+    if (D && Array.isArray(D.einheiten)) {
+      D.einheiten.forEach(function (e) { if (!e) return; e.massnahmen = []; e.massnahme = ''; e.kosten = ''; e.soll = ''; e.ziel_qm = ''; e.ziel_wann = ''; });
+      D.haus_massnahmen = [];
+    }
+    ['zb_massnahmen', 'zb_soll_qm', 'zb_soll_ab', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_markt_qm', 'zb_fertig_jahr'].forEach(function (id) {
+      var f = el(id); if (!f) return; f.value = '';
+      try { f.dispatchEvent(new Event('input', { bubbles: true })); f.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    });
+    _objListe = [];
+    try { objektKarte(); } catch (e) {}
+    try { if (typeof window.saveObj === 'function') window.saveObj({ silent: true }); } catch (e) {}
+    try { window.dispatchEvent(new CustomEvent('dp:potenzial', { detail: { geleert: true } })); } catch (e) {}
+    return true;
+  }
+  document.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-dp-zb-leeren]') : null;
+    if (!t) return;
+    ev.preventDefault();
+    leeren();
+  });
+
   /* Für Prompt, Portfolio-Pilot und PDF: das Wesentliche in einem Satz Zahlen. */
   function zusammenfassung(m, r) {
     var kz = kennzahlen(m), h = (r && r.haus) || {};
@@ -652,6 +755,15 @@
     if (m.haus && m.haus.massnahmen.length) z.haus_massnahmen = { kosten: Math.round(m.haus.kosten),   /* v2966 */
       text: m.haus.massnahmen.map(function (x) { return x.t + (x.k ? ' ' + Math.round(x.k) + ' €' : '') + (x.bewohnt ? ' (bewohnt, § 559)' : ''); }).join(', '),
       hinweis: 'Kosten nach Wohnfläche auf die Wohnungen verteilt und in deren Kosten enthalten.' };
+    /* v2988 · die Maßnahmen im Zielbild sind NICHT die Sanierungskosten - beide Zahlen getrennt */
+    try {
+      var _H = herkunft();
+      z.massnahmen_herkunft = { text: _H.text || null, summe: Math.round(_H.summe), n_wohnungen: _H.n_wohnungen, haus: Math.round(_H.haus),
+        sanierungskosten_investition: _H.san > 0 ? Math.round(_H.san) : null, unterschied: _H.unterschied };
+    } catch (e) { /* nur Auskunft */ }
+    var _zl = h.zielbild && h.zielbild.miete_nach_modernisierung;
+    if (_zl) z.miete_nach_modernisierung = { satz: _zl.satz, weg: _zl.weg, wirkt: !!_zl.wirkt, qm_vorher: _zl.qm_vorher, qm_nachher: _zl.qm_nachher };
+    if (r && r.sanierung && r.sanierung.text) z.sanierung_regel = r.sanierung.text + (r.sanierung.hinweis ? ' ' + r.sanierung.hinweis : '');
     z.wohnungen = m.wohnungen.slice(0, 30).map(function (w) {
       return { nr: w.nr, lage: w.lage, wfl: w.wfl, status: w.status, ist: Math.round(w.ist),
         soll: w.soll && w.soll.miete != null ? Math.round(w.soll.miete) : null, soll_ab: w.soll ? w.soll.ab_text || null : null,
@@ -1715,7 +1827,8 @@
           + '<div class="dp-zb-sum">Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
           + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' : '')
           + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '')
-          + (m.aktiv ? '' : ' · noch keine Soll-Miete oder kein Zielbild eingetragen') + '</div>';
+          + (m.aktiv ? '' : ' · noch keine Soll-Miete oder kein Zielbild eingetragen') + '</div>'
+          + herkunftHtml();   /* v2988 */
       }
       return;
     }
@@ -1743,9 +1856,10 @@
         + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' : '')
         + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat' + (m.stufen.zielbild.kosten ? ' · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '') + (m.stufen.zielbild.plus ? ' · +' + dez(m.stufen.zielbild.plus, 1).replace(',0', '') + ' Modernisierungspunkte' : '') : '')
         + '<br>' + esc(m.kappung.text) + ' Die Ertragswerte stehen in der Pilot-Analyse (Reiter „Ankauf · Bestand · Zielbild") und in beiden PDFs.';
+    if (m.aktiv) host.innerHTML += herkunftHtml();   /* v2988 */
   }
   function bindeObjektFelder() {
-    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag'].forEach(function (id) {
+    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'zb_markt_qm', 'san', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag'].forEach(function (id) {
       var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
       e.addEventListener('input', function () { objektSumme(); });
       e.addEventListener('change', function () { objektSumme(); });
@@ -1880,6 +1994,7 @@
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
     brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml, stufenWerte: stufenWerte, KURZ_AUSBLICK: KURZ_AUSBLICK,
     sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
+    herkunft: herkunft, herkunftAusDaten: herkunftAusDaten, herkunftHtml: herkunftHtml, leeren: leeren,   /* v2988 */
     _hash: hash, _auftrag: auftrag
   };
 })();

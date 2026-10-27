@@ -151,14 +151,8 @@ function bomAus(d) {
   }
   const san = num(pick(d, ['san', 'sanierungskosten']));
   if (!(san > 0)) return { bom_eur: null, bom_grund: null, bom_quelle: null };
-  /* v2952 · Liegt der Kauf mindestens zwölf Monate zurück, ist das Objekt im
-     Bestand und die Sanierung aus dem Ankauf gilt als ausgeführt: sie ist
-     Investition, kein offener Stau mehr. Gemessen an Parkstr. 9 (Cockpit):
-     137.000 € Ankauf-Sanierung drückten den Ertragswert heute auf 161.000 €. */
-  const kd = Date.parse(String(pick(d, ['kaufdat', 'kaufdatum']) || ''));
-  if (Number.isFinite(kd) && Date.now() - kd >= 365 * 864e5) {
-    return { bom_eur: null, bom_grund: null, bom_quelle: null };
-  }
+  const st = sanStatus(d, san);
+  if (st.gilt_ausgefuehrt) return { bom_eur: null, bom_grund: null, bom_quelle: null, san_status: st };
   const ust = String(pick(d, ['san_ust']) || '').toLowerCase();
   const art = ust === 'netto' ? 'netto' : (ust === 'brutto' ? 'brutto' : null);
   return {
@@ -167,7 +161,51 @@ function bomAus(d) {
       + (art ? ' (' + art + ')' : '')
       + ' — Kostenansatz, kein sachverständig ermittelter Wertabschlag',
     bom_quelle: 'sanierungskosten',
+    san_status: st,
   };
+}
+
+/* ══ v2988 · „SANIERUNG AUSGEFÜHRT AM" (Kann-Feld, Marcel 27.10.2026) ═══════
+   Leer   -> bisherige Regel (v2952): liegt der Kauf mindestens zwölf Monate
+             zurück, gilt die Ankauf-Sanierung als ausgeführt (kein bOM).
+             Gemessen an Parkstr. 9 (Cockpit): 137.000 € Ankauf-Sanierung
+             drückten den Ertragswert heute auf 161.000 €.
+   Datum  -> bis zu diesem Tag ist die Sanierung offener Instandhaltungsrückstau
+             (§ 8 Abs. 3 Satz 2 Nr. 2 ImmoWertV, bOM in Sach- und Ertragswert
+             wie bisher in den ersten zwölf Monaten), ab dem Tag ausgeführt.
+             Auch ein Datum in der Zukunft (geplant) hält den Stau offen.
+   Stichtag ist heute (Wertermittlungsstichtag des Berichts). Dazu ein Hinweis,
+   wenn der Zustand noch „renovierungs-/stark sanierungsbedürftig" heißt, die
+   Sanierung aber als ausgeführt gilt: dann widersprechen sich zwei Angaben. */
+function sanStatus(d, san) {
+  const deD = (t) => { try { return new Date(t).toLocaleDateString('de-DE'); } catch (e) { return ''; } };
+  const amRoh = String(pick(d, ['san_ausgefuehrt', 'sanierung_ausgefuehrt']) || '').trim();
+  const am = Date.parse(amRoh);
+  const kdRoh = String(pick(d, ['kaufdat', 'kaufdatum']) || '').trim();
+  const kd = Date.parse(kdRoh);
+  const jetzt = Date.now();
+  let gilt = false, regel, text;
+  if (amRoh && Number.isFinite(am)) {
+    gilt = jetzt >= am;
+    regel = 'ausgefuehrt_am';
+    text = gilt ? 'Sanierung laut Angabe am ' + deD(am) + ' ausgeführt: Investition, kein offener Instandhaltungsrückstau.'
+      : 'Sanierung laut Angabe erst am ' + deD(am) + ' ausgeführt: bis dahin offener Instandhaltungsrückstau, in Sach- und Ertragswert abgezogen (§ 8 Abs. 3 ImmoWertV).';
+  } else if (Number.isFinite(kd) && jetzt - kd >= 365 * 864e5) {
+    gilt = true; regel = 'kaufdatum_12m';
+    text = 'Kein Ausführungsdatum eingetragen: der Kauf (' + deD(kd) + ') liegt über zwölf Monate zurück, die Sanierung aus dem Ankauf gilt deshalb als ausgeführt und wird nicht abgezogen.';
+  } else {
+    regel = 'offen';
+    text = 'Sanierung noch nicht ausgeführt (Kauf vor weniger als zwölf Monaten oder ohne Kaufdatum): als Instandhaltungsrückstau abgezogen (§ 8 Abs. 3 ImmoWertV).';
+  }
+  const z = String(pick(d, ['ds2_zustand', 'zustand']) || '').toLowerCase();
+  const zw = /stark_?sanierungsbed/.test(z) ? 'stark sanierungsbedürftig' : (/renovierungsbed/.test(z) ? 'renovierungsbedürftig' : null);
+  const hinweis = gilt && zw
+    ? 'Zustand „' + zw + '“, die Sanierungskosten (' + Math.round(san).toLocaleString('de-DE') + ' €) gelten aber als ausgeführt'
+      + (regel === 'kaufdatum_12m' ? ' (Kauf über zwölf Monate zurück, kein Ausführungsdatum)' : '')
+      + ' und sind nicht abgezogen. Ist die Sanierung noch offen, „Sanierung ausgeführt am“ mit dem geplanten Datum eintragen; ist sie erledigt, den Zustand umstellen.'
+    : null;
+  return { regel, gilt_ausgefuehrt: gilt, ausgefuehrt_am: amRoh && Number.isFinite(am) ? amRoh.slice(0, 10) : null,
+           kaufdat: Number.isFinite(kd) ? kdRoh.slice(0, 10) : null, san_eur: Math.round(san), text, hinweis };
 }
 function buildAddress(d) {
   const str = pick(d, ['str', 'strasse', 'straße']);
@@ -410,6 +448,7 @@ export const DealPilotObjectMapper = {
       /* Nur wenn es einen Betrag gibt: der Orchestrator liest
          `Number.isFinite(Number(input.bom_eur))`, und Number(null) ist 0. */
       ...(_bom.bom_eur != null ? { bom_eur: _bom.bom_eur, bom_grund: _bom.bom_grund, bom_quelle: _bom.bom_quelle } : {}),
+      ...(_bom.san_status ? { san_status: _bom.san_status } : {}),   /* v2988 */
       living_area: wfl,
       rooms: num(pick(d, ['zimmer'])),
       build_year: num(pick(d, ['baujahr'])),
