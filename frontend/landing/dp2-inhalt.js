@@ -263,9 +263,15 @@
     var b = e.target.closest('button[data-art]'); if (b) artSetzen(b.dataset.art);
   });
   /* Direktlink #partner-plan oeffnet die Partner-Ansicht. */
-  if (location.hash === '#partner-plan') artSetzen('partner');
-  document.querySelectorAll('a[href="#partner-plan"]').forEach(function (a) {
-    a.addEventListener('click', function () { setTimeout(function () { artSetzen('partner'); }, 30); });
+  /* landing-loesungen-1 · #module (Zusatzmodule) liegt im selben Kasten. Er ist beim Laden
+     verborgen, also springt der Browser nicht hin - nach dem Umschalten selbst hinrollen. */
+  function _partnerZiel(h) {
+    artSetzen('partner');
+    setTimeout(function () { var z = document.querySelector(h); if (z) z.scrollIntoView({ block: 'start' }); }, 60);
+  }
+  if (location.hash === '#partner-plan' || location.hash === '#module') _partnerZiel(location.hash);
+  document.querySelectorAll('a[href="#partner-plan"], a[href="#module"]').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); _partnerZiel(a.getAttribute('href')); });
   });
 
   /* ══ 5 · Live-Marktzinsen ══════════════════════════════════════════

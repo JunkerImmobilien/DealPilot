@@ -257,3 +257,6 @@
    Kanzlei-Zeile weg ist, sass das Hausbild direkt unter dem Logo-Laufband. */
 #partner .pmarq + .bildzeile,#partner .pmarq ~ .bildzeile{margin-top:56px}
 @media(max-width:640px){#partner .pmarq ~ .bildzeile{margin-top:40px}}
+
+/* landing-loesungen-1 · Sprungziele unter der festen Navigation */
+#partner-plan,#module{scroll-margin-top:96px}
