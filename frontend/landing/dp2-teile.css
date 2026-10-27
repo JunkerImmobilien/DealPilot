@@ -693,4 +693,9 @@ footer .mark-gross .wort{font-size:21px}
   #pricing .ptoggle button,.seg button{min-height:44px}
   .nk-cta{padding:16px 0}
   .nk-e-cta{padding:16px 0}
+  /* leistungsumfang.html: Kontingent-Tabelle bei 360 px 365 px breit */
+  .kont-tab th,.kont-tab td{padding:10px 6px}
+  .kont-tab thead th{font-size:9px;letter-spacing:.04em}
+  .kont-tab td{font-size:13px}
+  .kont-tab td:first-child{hyphens:auto;-webkit-hyphens:auto}
 }

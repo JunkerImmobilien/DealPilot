@@ -7,7 +7,7 @@
 <meta name="description" content="Die DealPilot REST-API: Objekte programmatisch anlegen, lesen, ändern und löschen. JSON über HTTPS, Header X-API-Key, 120 Anfragen pro Minute. Enthalten im Pro- und im Partner-Plan.">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
-<link rel="stylesheet" href="dp2-teile.css?v=v2971b">
+<link rel="stylesheet" href="dp2-teile.css?v=v2971c">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    API-Dokumentation aus frontend/landing/index.html Z.1348-1446 (7 Kapitel).
@@ -65,6 +65,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 @media(max-width:820px){
 .api-layout{grid-template-columns:minmax(0,1fr);gap:20px}  /* v2971: 1fr wuchs bei 360 px auf 1033 px (min-content der Codebloecke) */
 .api-nav{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
+pre{overflow-x:auto;max-width:100%}  /* v2971: Codezeilen (white-space:pre) schoben die Seite bei 360 px auf 1033 px */
 .api-nav a{border-left:0;border-bottom:2px solid transparent}
 .api-nav a.on{border-left:0;border-bottom-color:var(--gd)}
 }
