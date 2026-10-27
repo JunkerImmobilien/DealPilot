@@ -42835,3 +42835,49 @@ Marcel 22.10.2026: „ja rollout 62".
 - **Stichprobe Prod** (lesend, `saveObj` stumm, danach 19/19 md5 unverändert): Parkstr. 9 KP 395.000, Vollvermietet, Ankauf-Stand 23.12.2024, Bericht 39 vom 27.10. aktiv.
 - **Storybook:** `node tools/messe-storybook.mjs` — 17 Objekte, 23 Seiten, 1,5 MB.
 - **Offen (Marcel):** (1) Herkunft der übrigen 16 `svwert` (Gutachten? Bank? Marktbericht?) — solange „automatisch“, kein LTV auf den Wert; Parkstr. 9 487.000 ist laut calc.js-Kommentar v2996 eine Marktpreisindikation aus Angeboten (dann Herkunft „indikation“, Wertpuffer entfällt) — nicht gesetzt, weil es die Messe-Geschichte verschiebt. (2) Löhner Str. 278: beide Einheiten „leer“ ohne Ist-Miete (Hauptwohnung, Wohnrecht), Vermietungsstand aber „Vollvermietet“ mit 1.400 € — Hinweis der App steht, nicht aufgelöst. (3) Hölderlinstr. ohne Vermietungsstand. (4) Erbbaurecht „nein“ ist im Datenmodell nicht ausdrückbar. (5) Hauptstr. 51 Stufe 1 ohne Marktwert. (6) Sachsenstr. 18: der neue Bericht hat Makro/Mikro/Bevölkerung in leere Felder übernommen (App-Verhalten `autoLage`).
+
+### v3015 · IRW-Kernausbau NRW – additiv, Matrix mit Interpolation, Bedingung, Gemeindegruppe (27.10.2026 nachts)
+- **Was:** Der Kern `lib/vergleichswert_irw.js` rechnet drei bisher abgelehnte Rechenformen der Örtlichen Fachinformationen, jede so, wie das Dokument sie beschreibt:
+  - **additiv** (`verknuepfung: 'additiv'`): IRW × (1 + Σ(UKᵢ(Objekt) − 1)) / (1 + Σ(UKᵢ(Zonennorm) − 1)). Bei Zonennorm = Tabellennorm ist das genau die Formel des Dokuments („ausgehend vom Normobjekt … addiert bzw. subtrahiert“). Liegt die Zonennorm daneben, wird die Formel auf beide angewandt und ins Verhältnis gesetzt. **Das sagt kein Dokument ausdrücklich, Entscheidung offen für Marcel.** Heute ohne Wirkung: bei allen freigeschalteten additiven Sätzen (Borken, Dortmund) liegt die Zonennorm auf der Tabellennorm.
+  - **matrix_linear**: Richtwertobjekt × Bewertungsobjekt, bilinear, nie extrapoliert. Vermerk aus dem Dokument, sonst „lineare Interpolation (DealPilot), Tabelle des Ausschusses ohne eigene Regel“.
+  - **funktion**: Interpolationsfunktion des Ausschusses, Formelleser ohne eval (Dortmund).
+  - **matrix_klassen**: rechteckige Klassenmatrix (Moers).
+  - **klassen_je_gemeindegruppe**: Tabelle je Gemeinde, aus BORIS `GENA` (Gütersloh).
+  - **bedingung** `[{wenn, setze|nur|nicht, wortlaut, kurz}]` zwischen Merkmalen (Hagen, Bottrop; beide noch vorgemerkt).
+  - Dazu `formel.rundung_produkt` (Gesamtfaktor, wo das Beispiel rundet), `rundung_eur_qm`, `zuschlaege_eur_qm`, `zweifel_zellen`, `anwendungsbeispiel.merkmale_ersatz` und die neuen Eingaben `alter`, `gemeinde`, `bodenrichtwert_2023`, `dachgeschoss_ausbau`, `ausstattung`, `stellplatz_anzahl`.
+- **Freigabe nur mit getroffenem amtlichen Anwendungsbeispiel am echten Kern.** `umrechnung_irw`: **114 → 135 Werte**, 60 → 81 Beispiele getroffen. **Rechenbar sind jetzt 57 statt 48 der 72 Ausschüsse.**
+- **Neu rechenbar, mit Beispiel:**
+  - Kreis Borken etw/efh: S. 4, 2.365,20 / 2.098,40 €/m²; multipliziert wären es 2.093,4.
+  - Kreis Gütersloh, alle drei Teilmärkte: S. 5 Halle / Rietberg / Verl.
+  - Kreis Heinsberg rh/etw: S. 7 / S. 6.
+  - Stadt Moers, alle drei: S. 4 / S. 5, Zelle „077“ als Zweifel geführt.
+  - Rhein-Erft-Kreis, alle drei: S. 6 / S. 7.
+  - Kreis Euskirchen etw: S. 6.
+  - Kreis Düren etw: S. 5.
+  - Kreis Unna etw/rh: S. 5 / S. 6. Das Beispiel rechnet mit „Zeitpunkt 01.01.2025“ und der Baujahrtabelle 2025, deshalb wird nur für die Prüfung diese Tabelle eingesetzt (`merkmale_ersatz`); gerechnet wird mit 2026.
+  - Stadt Dortmund etw/efh/rh/mfh: S. 10 / S. 7, additiv in Prozent mit den Funktionen, Ergebnis auf 10 €/m².
+- **Weiter gesperrt, Grund im Satz:**
+  - Kein Beispiel im Dokument (UDOK und GMB 2026 gelesen): Warendorf, Leverkusen, Dorsten/Gladbeck/Marl, Recklinghausen, Hagen, Bottrop.
+  - Rheine: Regressionsform; efh trifft, aber der Stellplatzbezug ist offen; rh/etw ohne Beispiel. Der Diff `irw_regression` liegt im Scratchpad und ist nicht übernommen.
+  - Bergisch Gladbach: alle Beispiele treffen, aber die Normstandardstufe bei GSTAND 6 ist nicht beziffert; etw hat Matrixbezug 2022 und Erbbaurecht.
+  - Beispiel widerspricht der Tabelle: Heinsberg efh (1,34 gegen 1,35), Euskirchen efh (0,97 gegen 0,96), Kreis Düren efh (Beispiel 2021, alte Tabellen), Unna efh (Grundstück 1,02 gegen 1,014).
+- **Nebenbei:** In `uk-flaeche-nw-2026.json` stehen Gütersloh 0530800 → **0533300** und Unna 0532800 → **0533200**, mit Sperrtext. In `uk-wgfz-nw2-2026.json` ist der Unna-Sperrtext korrigiert; der Bericht 2026 liegt unter 33200. Die 2025er-Links unter 30800/32800 bleiben, weil sie richtig sind (HTTP 200).
+- **Prüfer:** `irw-pruefen` prüft die neuen Formen, hat einen Prüffall je Ausschuss (17, Vollweg über `vergleichswertIrw`) und vier Formproben: additiv ≠ multiplikativ, keine Extrapolation, fremde Gemeinde ergibt keinen Wert, Bedingung. Neu sind die Schalter `--lib` und `--ordner` für Entwürfe. RC=0 bei `irw-pruefen`, `wertermittlung-pruefen`, `saat-pruefen` (je Datei und `--basislinie`; nach der Ergänzung von `normobjekt` bei Unna nichts über dem Deckel) und `buster-ebenen`.
+- **Marktbericht-App:** Der Rechenweg zeigt Zu- und Abschläge in % (`_irwStaffel`, im PDF mit ASCII-Minus). Buster `app.js?v=v3015`.
+- **Commit:** `523cb0f9` (staging). Die Nummer v3014 war schon von der parallelen Nachernte belegt (`52f00430`).
+- **Nachweis Staging:**
+  - mb-backend neu gebaut.
+  - Sicherung `/root/backups/mb-20261027-2203-v3015.sql.gz` (41 MB, Kopf „PostgreSQL database dump“, 41 COPY).
+  - `register-saat` trocken und echt: 6.025 → **6.046** Zeilen, SOLL = IST.
+  - `register-db-abgleich` sauber.
+  - **Bericht 392**, Kiskerstraße 10, Halle (Westf.), EFH 165 m², Bj 1992, 850 m², `wert_stufe` 3: Zone 1503, IRW 2.590 €/m² (die Zone des amtlichen Beispiels). Gruppe 1 der Gütersloher Bodenrichtwerttabelle; Baujahr 1,091, Grundstück 1,060, Keller 1,000, Wohnfläche 0,912, Standard 1,000 wie im Beispiel; BRW 310 gegen Norm 190 → 1,147 (Klasse 291–400). Ergebnis 3.133 €/m², **Vergleichswert 516.979 €**, Quellennachweis dl-de/zero-2-0.
+- **Rest / Entscheidungen Marcel:**
+  1. Additiv bei abweichender Zonennorm (Formel oben), betrifft Warendorf.
+  2. Unna: gilt das Beispiel mit der Vorjahrestabelle als getroffen? Keller-Zeile RH ist als Zweifel geführt.
+  3. Bergisch Gladbach: Normstandardstufe 3 bei GSTAND 6?
+  4. Rheine: Stellplätze im Regressionsmodell?
+  5. Rhein-Erft etw: ungesicherte Zellen weggelassen.
+  6. Kreis Düren etw: Beispiel von 2021 trifft die Tabellen 2026.
+  7. Rückfragen bei den Ausschüssen Euskirchen und Heinsberg (efh).
+  - Viele neue Sätze brauchen Angaben, die der Reiter Objekt nicht führt: Modernisierungstyp (`mtyp`), Wohnlage (Dortmund, Moers, Euskirchen), Alter und Ausstattung (Borken). Ohne sie meldet der Bericht „Angabe fehlt“. Ohne Zusatzangaben rechnen nur Gütersloh, Heinsberg etw und Kreis Düren etw.
+  - **Nicht auf Produktion.**
