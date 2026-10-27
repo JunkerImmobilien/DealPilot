@@ -164,6 +164,8 @@ const FELDBRUECKE = {
 
   baujahr: ['baujahr', 'build_year'],
   flaeche: ['grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl', 'flaeche'],
+  /* v3008b · Hamburg (swf-hh) nennt die Grundstuecksflaeche gsflaeche - reine Namensbruecke */
+  gsflaeche: ['grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl', 'flaeche'],
   baugrundstuecksflaeche: ['baugrundstuecksflaeche_qm',
     'grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl'],
   baulandflaeche: ['baulandflaeche_qm', 'grundstuecksflaeche_qm', 'gsfl'],
@@ -596,11 +598,50 @@ function ausRegisterRechnen(o, ags) {
      > sieht genauso aus wie eine, die fehlt.
 
      Fuer alle anderen Formen aendert das nichts: sie lesen das Feld nicht. */
+  /* v3008b · Groessen, die der Kern aus vorhandenen Zahlen RECHNEN kann, statt sie als
+     fehlendes Merkmal zu melden: Bodenwertanteil = Bodenwert / vorlaeufiger Sachwert;
+     Sachwertverhaeltnis = vorlaeufiger Sachwert / Normsachwert - nur, wenn der Satz den
+     Normsachwert als ZAHL fuehrt (modellansaetze.normsachwert_eur). Eine Angabe des
+     Aufrufers geht vor. */
+  const _einSwf = eingabeBruecke(o);
+  {
+    const _swE = Number(_einSwf.sachwert_eur), _bwE = Number(_einSwf.bodenwert_eur);
+    const _nsw = Number((satz.modellansaetze || {}).normsachwert_eur);
+    if (_einSwf.bodenwertanteil == null && _swE > 0 && _bwE >= 0 && _einSwf.bodenwert_eur != null) {
+      _einSwf.bodenwertanteil = Math.round(_bwE / _swE * 10000) / 10000;
+    }
+    if (_einSwf.sachwertverhaeltnis == null && _swE > 0 && _nsw > 0) {
+      _einSwf.sachwertverhaeltnis = Math.round(_swE / _nsw * 10000) / 10000;
+    }
+  }
   const r = auswerten({ ...(satz.formel || {}),
                         kennzahl: 'sachwertfaktor',
                         modellansaetze: satz.modellansaetze || null,
                         korrekturen: satz.korrekturen || [] },
-                      eingabeBruecke(o));
+                      _einSwf);
+  /* v3008b · W1 · KEIN SACHWERTFAKTOR MIT FEHLENDER ANPASSUNG (§ 10 Abs. 1, § 21 Abs. 3
+     ImmoWertV - der Faktor gilt nur in seinem Modell). Dieselbe Pruefung wie beim
+     Vergleichsfaktor: jede Korrektur des Satzes ist angewandt oder liegt in der Norm;
+     sonst kein Wert, sondern der Grund mit dem Merkmal (gemessen 27.10.2026: Hamburg
+     rechnete mit 2 von 19 Korrekturen). */
+  if (r && r.verfuegbar) {
+    const _kz = _korrekturenPruefen(satz.korrekturen, _einSwf, r.korrekturen_offen);
+    const _bl = _kz.filter((z) => z.status !== 'norm');
+    if (_bl.length) {
+      const _t = (z) => z.status === 'merkmal_fehlt' ? 'Merkmal fehlt: ' + z.bez + ' (eintragen: ' + _eintragenText(z.feld) + ')'
+        : z.status === 'ausserhalb' ? z.bez + ': Angabe ' + z.wert + ' liegt außerhalb der Tabelle des Ausschusses'
+          + (z.spanne ? ' (' + z.spanne[0] + ' bis ' + z.spanne[1] + ')' : '') + ' — nicht auf Rand oder Norm gesetzt'
+          : z.bez + ': Anpassung im Dokument genannt, ihre Werte liegen nicht rechenbar vor';
+      r.faktor_ohne_anpassung = r.wert;
+      r.verfuegbar = false;
+      r.wert = null;
+      r.grund = _bl.some((z) => z.status === 'merkmal_fehlt') ? 'merkmal_fehlt' : 'korrektur_nicht_anwendbar';
+      r.korrekturen_offen = _bl;
+      r.hinweis = 'Der Sachwertfaktor des Gutachterausschusses (' + (satz.gaa_name || '–') + ') ist an das Objekt '
+        + 'anzupassen. Offen: ' + _bl.map(_t).join('; ') + '. Ohne diese Anpassung wird kein Sachwertfaktor angesetzt '
+        + '(§ 21 Abs. 3, § 10 Abs. 1 ImmoWertV); der Sachwert bleibt vorläufig.';
+    }
+  }
 
   /* Auch der Misserfolg traegt seine Herkunft — sonst steht im Bericht
    * "kein Wert" ohne zu sagen, WER nichts abgeleitet hat. */
@@ -1534,7 +1575,7 @@ function _merkmaleVorbereiten(f, e) {
         if (b) {
           e[a.feld] = b.klasse;
           herkunft.push({ merkmal: a.merkmal || a.feld, klasse: b.klasse, art: 'abgeleitet',
-            text: `${a.bez || a.feld}: ${b.klasse} — ${ab.bez || ab.feld} ${String(lk).replace('.', ',')}`
+            text: `${a.bez || a.feld}: ${b.klasse} — ${ab.bez || ab.feld} ${lk.toFixed(1).replace('.', ',')}`
               + (ab.text ? ' (' + ab.text + ')' : '') });
           continue;
         }

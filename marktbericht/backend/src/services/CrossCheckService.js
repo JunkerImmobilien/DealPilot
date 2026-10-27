@@ -696,6 +696,8 @@ export const CrossCheckService = {
           ags: (p && p.ags) || ref.ags || null,
           sachwert_eur: _sw.vorlaeufiger_sachwert_eur,
           rnd_jahre: _sw.restnutzungsdauer_jahre,
+          /* v3008b · fuer den Bodenwertanteil (Korrektur Hamburg u. a.), aus derselben Rechnung */
+          bodenwert_eur: _sw.bodenwert_eur != null ? _sw.bodenwert_eur : null,
           /* v2396 · DIE HAUSART, NICHT „haus". mapPropertyType fasst EFH, ZFH,
              DHH und RH zu „haus" zusammen, und dafuer fuehrt ZWEIG_VORZUG
              keinen Eintrag: jedes App-Haus ausserhalb eines Ausschussmoduls

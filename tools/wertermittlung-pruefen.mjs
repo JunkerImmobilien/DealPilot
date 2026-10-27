@@ -301,6 +301,12 @@ try {
     pruefe('A', 'A-W1b', '0 Stellplätze (Tabelle ab 1): kein stiller Randwert', st.verfuegbar === false, st.grund);
     pruefe('A', 'A-W1c', 'Bezugsgröße ist eine Art (wohnflaeche), keine Zahl', voll.r.bezugsgroesse === 'wohnflaeche' && voll.r.bezugsflaeche_qm === 140, String(voll.r.bezugsgroesse));
   }
+  /* v3008b · W1 auch beim Sachwertfaktor: Hamburg fuehrt 19 Korrekturen, DealPilot erfasst u. a.
+     Ecklage, Einbaukueche, Fussbodenheizung nicht -> kein Faktor, sondern Merkmal fehlt. */
+  const hh = GAA.sachwertfaktor({ ags: '02000000', objektart: 'efh', sachwert_eur: 600000, bodenwert_eur: 360000, rnd_jahre: 40,
+    grundstuecksflaeche_qm: 600, wohnflaeche_qm: 120, baujahr: 1985, mod_punkte: 4 });
+  pruefe('A', 'A-W1d', 'Sachwertfaktor Hamburg mit fehlenden Merkmalen: kein Wert (merkmal_fehlt)', hh.verfuegbar === false && hh.grund === 'merkmal_fehlt' && hh.faktor_ohne_anpassung != null, hh.grund);
+  pruefe('A', 'A-W1d', 'Bodenwertanteil aus Bodenwert/Sachwert gerechnet, nicht als fehlend gemeldet', !(hh.korrekturen_offen || []).some((z) => z.feld === 'bodenwertanteil'));
 } catch (err) { pruefe('A', 'A-VGF', 'Lauf', false, 'Ausnahme: ' + err.message); }
 
 /* ══ EBENE B ═════════════════════════════════════════════════════════ */
