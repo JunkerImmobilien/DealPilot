@@ -1053,7 +1053,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     block('Investmentbewertung', clean(a.investmentbewertung), [235, 241, 248], [60, 102, 148]);
   }
   if (a.verhandlungsempfehlung) {
-    block('Verhandlungsempfehlung', clean(a.verhandlungsempfehlung), [250, 244, 230], C.GOLD);
+    block(a.bestand_modus ? 'Bestandsstrategie' : 'Verhandlungsempfehlung', clean(a.verhandlungsempfehlung), [250, 244, 230], C.GOLD);   /* v2982 */
   }
   if (a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object') {
     var kpo = a.kaufpreis_offerte;
@@ -1094,7 +1094,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
       var AK = window.DealPilotAnkauf, st = AK && AK.stand ? AK.stand() : (window._dpAnkauf || null);
       var roh = st && st.daten ? st.daten._ai : null, alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null;
       if (alt && typeof alt === 'object' && (alt.empfehlung || alt.gesamtbewertung)) {
-        var kp = function (x) { var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? clean(String(o.empfohlen)) : '–'; };
+        var kp = function (x) { if (x && x.bestand_modus) return 'entfällt (im Bestand)'; var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? clean(String(o.empfohlen)) : '–'; };   /* v2982 */
         t.push('Empfehlung beim Ankauf: ' + clean(alt.empfehlung || '–') + ' · heute: ' + clean(a.empfehlung || '–'));
         t.push('Empfohlener Kaufpreis beim Ankauf: ' + kp(alt) + ' · heute: ' + kp(a));
       }

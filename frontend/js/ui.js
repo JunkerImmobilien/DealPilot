@@ -1853,7 +1853,11 @@ function _renderAIServerAnalysis(a) {
   }
   function empfBadge(emp) {
     var e = String(emp || '').toLowerCase(), color = 'var(--wl-c9a84c, #C9A84C)', label = emp || '\u2014';
-    if (e.indexOf('kaufen') === 0) { color = '#2F8E5A'; label = 'KAUFEN'; }
+    /* v2982 · Bestandsmodus: Halten / Optimieren / Verkauf prüfen */
+    if (e.indexOf('halten') === 0) { color = '#2F8E5A'; label = 'HALTEN'; }
+    else if (e.indexOf('optimieren') === 0) { color = 'var(--wl-c9a84c, #C9A84C)'; label = 'OPTIMIEREN'; }
+    else if (e.indexOf('verkauf') === 0) { color = '#B8625C'; label = 'VERKAUF PRÜFEN'; }
+    else if (e.indexOf('kaufen') === 0) { color = '#2F8E5A'; label = 'KAUFEN'; }
     else if (e.indexOf('nicht') === 0) { color = '#B8625C'; label = 'NICHT KAUFEN'; }
     else if (e.indexOf('pr\u00fcfen') >= 0 || e.indexOf('pruefen') >= 0) { color = 'var(--wl-c9a84c, #C9A84C)'; label = 'PR\u00dcFEN'; }
     return '<span class="dp-pa-empf" style="background:' + color + '">' + label + '</span>';
@@ -2012,9 +2016,10 @@ function _renderAIServerAnalysis(a) {
   }
 
   // Panel 5 — Verhandlung & Offerte
-  var pV = sec('', I.deal, 'VERHANDLUNG & OFFERTE');
+  /* v2982 · im Bestand gibt es keine Verhandlung: dasselbe Feld traegt die Bestandsstrategie */
+  var pV = sec('', I.deal, a.bestand_modus ? 'BESTANDSSTRATEGIE' : 'VERHANDLUNG & OFFERTE');
   if (has(a.verhandlungsempfehlung))
-    pV += '<div class="dp-pa-card">' + sec('', I.deal, 'VERHANDLUNGSEMPFEHLUNG') + p(a.verhandlungsempfehlung) + '</div>';
+    pV += '<div class="dp-pa-card">' + sec('', I.deal, a.bestand_modus ? 'WAS DU JETZT TUN KANNST' : 'VERHANDLUNGSEMPFEHLUNG') + p(a.verhandlungsempfehlung) + '</div>';
   /* v2946 · DIE OFFERTE LIEGT NIE UEBER DEM KAUFPREIS - auch nicht in der Anzeige.
      Die Deckelung im Backend (openaiService.js _offerteDeckeln, v2264) greift nur beim
      Erzeugen. Gemessen 25.10.2026 an Westerfeldstr. 140 (Analyse vom 13.10.): Offerte
@@ -2204,7 +2209,7 @@ function _renderAIServerAnalysis(a) {
         + 'Was der Pilot damals gesagt hätte, lässt sich nicht nachträglich erzeugen — eine neue Analyse beschreibt immer den heutigen Stand.</p></div>';
     }
     function dat(x) { var d = x && x._fuer && x._fuer.stand ? new Date(x._fuer.stand) : null; return d && !isNaN(d) ? d.toLocaleDateString('de-DE') : 'ohne Datum'; }
-    function kp(x) { var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? _escClean(String(o.empfohlen)) : '–'; }
+    function kp(x) { if (x && x.bestand_modus) return 'entfällt (im Bestand)'; var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? _escClean(String(o.empfohlen)) : '–'; }   /* v2982 */
     function kurz(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
     var gleich = alt._fuer && a._fuer && alt._fuer.stand === a._fuer.stand;
     var zeile = function (wort, x, y) { return '<tr><td class="abw-wort">' + wort + '</td><td>' + x + '</td><td>' + y + '</td></tr>'; };
@@ -2216,6 +2221,10 @@ function _renderAIServerAnalysis(a) {
       + zeile('Empfohlener Kaufpreis', kp(alt), kp(a))
       + zeile('Begründung', _escClean(kurz(alt.empfehlung_begruendung, 260)), _escClean(kurz(a.empfehlung_begruendung, 260)))
       + '</tbody></table>'
+      /* v2982 · Marcel zu Hüllhorst: „erst prüfen und jetzt kaufen? warum? ist doch schon im Bestand." */
+      + (a.bestand_modus
+          ? '<p class="dp-pa-p" style="margin-top:8px">Beim Ankauf war die Frage „kaufen?", heute ist sie „halten?": das Objekt ist im Bestand. Die beiden Empfehlungen beantworten deshalb verschiedene Fragen.</p>'
+          : (gleich ? '' : '<p class="dp-pa-p" style="margin-top:8px"><b>Die heutige Analyse bewertet das Objekt noch als Kaufangebot.</b> Sie stammt aus der Zeit, bevor der Pilot Bestandsobjekte als Halteentscheidung bewertet. Ruf die Analyse neu ab, dann heißt die Empfehlung Halten, Optimieren oder Verkauf prüfen.</p>'))
       + '<details style="margin-top:10px"><summary style="cursor:pointer;font:600 12px Inter,sans-serif">Gesamtbewertung beim Ankauf lesen</summary>'
       + '<p class="dp-pa-p" style="margin-top:8px">' + _escClean(alt.gesamtbewertung || '') + '</p></details></div>';
   })();
@@ -2378,7 +2387,10 @@ function _renderMiniAI(a) {
   function _miniEmpfBadge(emp) {
     var e = String(emp || '').toLowerCase();
     var color = 'var(--wl-c9a84c, #C9A84C)', label = emp || '—';
-    if (e.indexOf('kaufen') === 0)     { color = '#3FA56C'; label = 'KAUFEN'; }
+    if (e.indexOf('halten') === 0)     { color = '#3FA56C'; label = 'HALTEN'; }   /* v2982 */
+    else if (e.indexOf('optimieren') === 0) { color = 'var(--wl-c9a84c, #C9A84C)'; label = 'OPTIMIEREN'; }
+    else if (e.indexOf('verkauf') === 0) { color = '#B8625C'; label = 'VERKAUF PRÜFEN'; }
+    else if (e.indexOf('kaufen') === 0)     { color = '#3FA56C'; label = 'KAUFEN'; }
     else if (e.indexOf('nicht') === 0) { color = '#B8625C'; label = 'NICHT KAUFEN'; }
     else if (e.indexOf('prüfen') >= 0 || e.indexOf('pruefen') >= 0) { color = 'var(--wl-c9a84c, #C9A84C)'; label = 'PRÜFEN'; }
     return '<span class="ai-mini-empf" style="background:' + color + '">' + label + '</span>';

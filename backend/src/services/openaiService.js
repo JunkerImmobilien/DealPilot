@@ -1612,6 +1612,19 @@ function buildPrompt(payload, opts) {
     '  und öffentliche Stellen (Gutachterausschuss, Statistisches Bundesamt/Landesamt,',
     '  Deutsche Bundesbank, Kommune) und ImmoMetrica.',
     '',
+    /* v2982 · BESTANDSMODUS. Marcel 27.10.2026 (Hüllhorst, Ankauf-Stand 9.10.): „erst prüfen und
+       jetzt kaufen? warum? ist doch schon im Bestand." Der Prompt verlangte auch für ein
+       gekauftes Objekt Kaufen/Prüfen/Nicht kaufen, Kaufpreis-Offerte und Verhandlung. Liegt ein
+       ANKAUF-STAND vor, ist das Objekt gekauft: es geht ums Halten, nicht ums Kaufen. */
+    (_ak ? '## BESTANDSMODUS — GILT VOR ALLEN VORGABEN ZU KAUFEN UND VERHANDLUNG\n'
+      + 'Das Objekt ist bereits GEKAUFT und im Bestand (siehe ANKAUF-STAND). Es gibt keine Kaufentscheidung mehr.\n'
+      + '- "empfehlung" und "fazit_kurz": "Halten" | "Optimieren" | "Verkauf prüfen" (nie Kaufen/Prüfen/Nicht kaufen).\n'
+      + '  Bindung an den Score: 70+ Halten, 50-69 Optimieren, unter 50 Verkauf prüfen; abweichen nur mit benanntem Grund.\n'
+      + '- "empfehlung_begruendung": warum halten/optimieren/verkaufen, mit Zahlen von heute und der Bewegung seit dem Ankauf.\n'
+      + '- "verhandlungsempfehlung": statt einer Kaufverhandlung die BESTANDSSTRATEGIE, 8-12 Saetze: Mietanpassung,\n'
+      + '  Anschlussfinanzierung, Instandhaltung/Modernisierung, Steuer, Exit - die wirksamsten Hebel zuerst.\n'
+      + '- "kaufpreis_offerte": null. "offerte_mail": null. Keinen Kaufpreis und keinen Zielpreis nennen.\n'
+      + '- Gesamtbewertung, Staerken, Risiken und Szenarien beschreiben das Objekt als Bestand, nicht als Angebot.\n' : ''),
     '## ANTWORTFORMAT — strikt JSON, keine Markdown-Codeblöcke',
     'Antworte AUSSCHLIESSLICH mit folgendem JSON-Objekt:',
     '{',
@@ -2027,6 +2040,31 @@ function _offerteDeckeln(a, payload) {
   return a;
 }
 
+/* v2982 · Sicherheitsnetz zum Bestandsmodus: liefert das Modell trotz Ankauf-Stand ein
+   Kaufurteil oder eine Offerte, wird umgestellt und vermerkt (nie still). */
+function _bestandModus(a, payload) {
+  try {
+    if (!a || !payload || !payload.ankauf) return a;
+    var map = function (v) {
+      var t = String(v || '').trim(), l = t.toLowerCase();
+      if (/^(halten|optimieren|verkauf)/.test(l)) return t;
+      if (l.indexOf('nicht') === 0) return 'Verkauf prüfen';
+      if (l.indexOf('kaufen') === 0) return 'Halten';
+      if (l.indexOf('prüfen') >= 0 || l.indexOf('pruefen') >= 0) return 'Optimieren';
+      return t;
+    };
+    var vorher = a.empfehlung;
+    a.empfehlung = map(a.empfehlung);
+    a.fazit_kurz = map(a.fazit_kurz);
+    if (vorher && vorher !== a.empfehlung) a.bestand_umgestellt = 'Vom Modell kam „' + vorher + '“; im Bestand gilt „' + a.empfehlung + '“.';
+    a.kaufpreis_offerte = null;
+    a.offerte_mail = null;
+    a.offerte_mail_entfallen = null;
+    a.bestand_modus = true;
+  } catch (e) {}
+  return a;
+}
+
 async function analyze(payload, opts) {
   const prompt = buildPrompt(payload, opts) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
   /* v2013 - MIT Fotos geht der ERSTE Anlauf ueber den Bildweg.
@@ -2102,7 +2140,7 @@ async function analyze(payload, opts) {
        strukturierten Quellenfelder - die LANGTEXTE
        (`makrolage_recherche`, `kaufpreisniveau`, …) tragen ihre Links im
        Fliesstext und kamen dort nie an. */
-    analysis: _offerteDeckeln(_analyseQuellenNeutral(_analyseUrlsSaeubern(parsed)), payload),
+    analysis: _bestandModus(_offerteDeckeln(_analyseQuellenNeutral(_analyseUrlsSaeubern(parsed)), payload), payload),
     raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
 }
