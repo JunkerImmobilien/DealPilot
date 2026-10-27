@@ -304,12 +304,21 @@
     } else {
       rohwert = (k.a * alter * alter / gnd) - (k.b * alter) + (k.c * gnd);
       rnd = Math.max(0, rohwert);
-      if (rnd > kappe) {
+      /* v2974 · DER DECKEL KUERZT NIE UNTER GND - ALTER (tools/rnd-strecke-pruefen.mjs, B3).
+         Gemessen GND 80, Baujahr 2010: 4 Punkte 64 J., 8 Punkte 56 J. — mehr Modernisierung
+         gab WENIGER Restnutzungsdauer, weil der 70-%-Deckel unter den unmodernisierten Wert
+         (GND - Alter) schnitt. Der Deckel begrenzt die Streckung durch Modernisierung; was
+         ein Gebaeude ohne Modernisierung hat, nimmt er nicht weg. Gleiche Regel in
+         marktbericht/backend/src/lib/anlage2.js. */
+      const kappeWirksam = Math.max(kappe, gnd - alter);
+      if (rnd > kappeWirksam) {
         grenze = 'gestreckt';
-        hinweis = 'Rohwert ' + round2(rohwert) + ' Jahre auf ' + round2(kappe)
-                + ' Jahre gekappt (' + Math.round(quote * 100) + ' % der Gesamtnutzungsdauer'
+        hinweis = 'Rohwert ' + round2(rohwert) + ' Jahre auf ' + round2(kappeWirksam)
+                + ' Jahre gekappt (' + (kappeWirksam > kappe
+                  ? 'Gesamtnutzungsdauer minus Alter — der Deckel von ' + Math.round(quote * 100) + ' % kürzt nicht darunter'
+                  : Math.round(quote * 100) + ' % der Gesamtnutzungsdauer')
                 + (kernsaniert ? ', Kernsanierung nachgewiesen' : '') + ').';
-        rnd = kappe;
+        rnd = kappeWirksam;
       }
     }
 
@@ -639,6 +648,13 @@
        erhalten und wird als Plausibilitaetspruefung ausgewiesen - sie
        verschwindet nicht, sie urteilt nur nicht mehr allein.         */
     let final, finalSource, verfahren;
+    /* v2974 · GEPRUEFT UND BEWUSST NICHT GEAENDERT: unter der Schwelle fuehrt die
+       technische Rechnung. tools/rnd-strecke-pruefen.mjs zeigt daran einen Sprung an der
+       Schwelle (GND 80, 4 P., alle Gewerke veraltet: Bj 1990 44,1 J. Modell, Bj 1995
+       29,4 J. Technik). Ein Umbau auf „Modell fuehrt auch unter der Schwelle" scheiterte
+       am unterschriebenen Gutachten Am Markt 18 (25DG02661): dort gilt unter der Schwelle
+       die technische RND 26 J., nicht GND - Alter 40 J. (rnd-gutachten-test.mjs). Ob ueber
+       der Schwelle die Technik ebenfalls fuehren soll, ist Marcels Fachfrage (Journal v2974). */
     if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
       final = punktraster.restnutzungsdauer;
       verfahren = 'punktraster';
@@ -760,6 +776,18 @@
             + 'Sachverständig würdigen, bevor der Wert übernommen wird.',
         quelle: 'Paragraf 185 Abs. 3 Satz 5 BewG - dort bindend, hier Plausibilitätsanker'
       });
+    }
+
+    /* v2974 · OHNE BAUJAHR KEINE ZAHL. `Number(null)` ist 0 - ein Objekt ohne Baujahr galt
+       als 2026 Jahre alt und bekam 21,3 J. (GND 80, 4 P.; gemessen am Bot-Weg
+       routes/rechenkerne.js -> mapDealPilotObject, baujahr null). Die Oberflaechen pruefen
+       das Baujahr vorher (deal-action, bmf-bodenabschlag, mfh-einheiten, Wizard) - der Bot nicht. */
+    if (!(Number.isFinite(baujahr) && baujahr > 1000)) {
+      final = 0;
+      verfahren = 'keines';
+      finalSource = 'kein Baujahr - keine Restnutzungsdauer';
+      grenzen.unshift({ greift: true, art: 'kein_baujahr',
+        text: 'Ohne Baujahr lässt sich keine Restnutzungsdauer ermitteln.', quelle: 'Eingabe' });
     }
 
     let reell = null;
