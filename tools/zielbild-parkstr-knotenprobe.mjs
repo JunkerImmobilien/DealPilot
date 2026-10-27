@@ -40,12 +40,12 @@ const de = (v) => Math.round(v).toLocaleString('de-DE');
 const WE = [{ nr: '1', wfl: 92, ist: 644, soll: 800 }, { nr: '2', wfl: 86, ist: 602, soll: 750 }, { nr: '3', wfl: 92, ist: 874, soll: 874 },
   { nr: '4', wfl: 86, ist: 620, soll: 750 }, { nr: '5', wfl: 71, ist: 455, soll: 620 }];
 const AMT_EIN = { ags: '05770004', gemeinde: 'Bad Oeynhausen', baujahr: 1905, wohnflaeche_qm: 85.4, modernisierung_klasse: klasseAusPunkten(8),
-  kernsaniert: false, sanierungsjahr: null, wohnlage: 'einfach', stichtag_jahr: 2026 };
+  kernsaniert: false, sanierungsjahr: null, wohnlage: 'gut', stichtag_jahr: 2026 };   /* v2991: Lagebeurteilung 1 = gute Wohnlage (amtlich, Örtliche Fachinformationen Minden-Lübbecke S. 1) */
 
 console.log('=== 1 · amtliche Miete (Mietpreisübersicht Minden-Lübbecke, Abschnitt 9) ===');
 const a0 = marktmiete(AMT_EIN);
-ok(a0.miete_qm === 4.64, 'Bestand: Klasse ' + AMT_EIN.modernisierung_klasse + ', fiktives Bj ' + a0.fiktives_baujahr + ', 5,90 × 0,8 (Lage „einfach“ aus Lagebeurteilung 1) × '
-  + (0.94 + (1 - 0.94) * (100 - 85.4) / 20).toFixed(3) + ' = ' + a0.miete_qm + ' €/m² (Prod: 4,64)');
+ok(Math.abs(a0.miete_qm - 5.80) < 0.015, 'Bestand: Klasse ' + AMT_EIN.modernisierung_klasse + ', fiktives Bj ' + a0.fiktives_baujahr + ', 5,90 × 1,0 (Lage „gut“ aus Lagebeurteilung 1, seit v2991) × '
+  + (0.94 + (1 - 0.94) * (100 - 85.4) / 20).toFixed(3) + ' = ' + a0.miete_qm + ' €/m² (bis v2990 auf Prod: 4,64 mit falscher Lage „einfach“)');
 const aGut = marktmiete(Object.assign({}, AMT_EIN, { wohnlage: 'gut' }));
 console.log('       Befund Lage: mit „gut“ (Stadtlage, Faktor 1,0) wären es ' + aGut.miete_qm + ' €/m² — siehe Prüfbericht, Entscheidung offen');
 [3, 4, 5].forEach((k) => { const r = marktmiete(Object.assign({}, AMT_EIN, { modernisierung_klasse: k })); console.log('       Klasse ' + k + ': fiktives Bj ' + r.fiktives_baujahr + ' → ' + r.miete_qm + ' €/m²'); });

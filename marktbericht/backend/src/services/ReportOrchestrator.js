@@ -625,11 +625,19 @@ export const ReportOrchestrator = {
       if (_gem && ref.build_year && ref.living_area) {
         /* v2988 · dieselbe Zuordnung, jetzt an einer Stelle (lib/mietmodell_nrw.js) */
         const _kl = ref.mod_punkte != null ? klasseAusPunkten(ref.mod_punkte) : null;
-        const _lage = _bp3.Lagebeurteilung != null
-          ? (Number(_bp3.Lagebeurteilung) >= 4 ? 'sehr_gut'
-             : Number(_bp3.Lagebeurteilung) === 3 ? 'gut'
-             : Number(_bp3.Lagebeurteilung) === 2 ? 'mittel' : 'einfach')
-          : 'mittel';
+        /* v2991 · DIE SKALA WAR VERKEHRT HERUM. Amtlich (Gutachterausschuss Kreis Minden-Lübbecke,
+           „Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte" 2025 und 2026,
+           S. 1; boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_0_0531700_2026.pdf):
+             „Lagebeurteilung — 1 – gute Wohnlage · 2 – mittlere Wohnlage · 3 – einfache Wohnlage ·
+              0 – keine Lagebeurteilung"
+           GMB 2026 S. 79: Tabellenwerte gelten fuer GUTE Wohnlage, Faktor aus diesem Merkmal ableitbar.
+           Hier stand 3 = gut, 2 = mittel, sonst einfach - Code 1 (die teuersten Zonen, Median BRW 130 €/m²)
+           bekam 0,8 statt 1,0, Code 3 (Median 42,50 €/m²) 1,0 statt 0,8. Ein leeres Feld kommt als ' '
+           an und wurde ueber Number(' ') = 0 ebenfalls „einfach". Gemeldet von Marcel an der Parkstr. 9.
+           0 und leer: keine Beurteilung -> der bisherige Rueckfall 'mittel'. „sehr gut" hat keinen Code. */
+        const _lurtRoh = _bp3.Lagebeurteilung == null ? '' : String(_bp3.Lagebeurteilung).trim();
+        const _lurt = _lurtRoh === '' ? null : Number(_lurtRoh);
+        const _lage = _lurt === 1 ? 'gut' : _lurt === 2 ? 'mittel' : _lurt === 3 ? 'einfach' : 'mittel';
         /* v2851 · MFH: die Mietpreisuebersicht staffelt nach WOHNUNGSgroesse.
            Hier stand die Wohnflaeche des ganzen Hauses - Parkstr. 9 (427 m², 5 WE)
            fiel „ueber die Tabelle" in die oberste Groessenklasse, die amtliche Miete
