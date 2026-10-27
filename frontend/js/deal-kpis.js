@@ -257,7 +257,9 @@ window.DealKpis = (function() {
 
      Eingabe: kp (€), nk (€, alle Erwerbsnebenkosten), gebAntPct (0-100),
        inventar (€, im Kaufpreis enthalten, default 0), nkAbzug (€, Nebenkosten,
-       die keine Anschaffungskosten sind - die Grundschuld, calc.js v3006).
+       die keine Anschaffungskosten sind - die Grundschuld, calc.js v3006),
+       nkNurImmo (€, v3006c: Nebenkosten, die NUR das Grundstueck betreffen -
+       die Grunderwerbsteuer; sie geht nie anteilig aufs Inventar).
      Liest keine Einstellung und kein DOM. */
   function gebaeudeAhk(i) {
     i = i || {};
@@ -266,9 +268,11 @@ window.DealKpis = (function() {
     var inv = Math.max(0, +i.inventar || 0);
     if (inv > kp * geb) inv = kp * geb;            /* wie calc.js: nie mehr als der Gebaeudeanteil */
     var nk = Math.max(0, (+i.nk || 0) - Math.max(0, +i.nkAbzug || 0));
+    var nkNurImmo = Math.min(nk, Math.max(0, +i.nkNurImmo || 0));
+    var nkAnteilig = nk - nkNurImmo;
     var kpOhneInv = kp - inv;
     var anteilImmo = kp > 0 ? kpOhneInv / kp : 1;
-    var nkImmo = nk * anteilImmo;
+    var nkImmo = nkAnteilig * anteilImmo + nkNurImmo;
     var nkInv = nk - nkImmo;
     var gebKp = kpOhneInv * geb;
     var nkGeb = nkImmo * geb;
@@ -276,9 +280,38 @@ window.DealKpis = (function() {
       kpOhneInv: kpOhneInv, inventar: inv,
       gebKp: gebKp, nkGeb: nkGeb, gebAhk: gebKp + nkGeb,
       nkImmo: nkImmo, nkInv: nkInv, invAk: inv + nkInv,
-      nkQuote: kp > 0 ? nk / kp : 0                 /* Nebenkosten je Euro Kaufpreis */
+      nkQuote: kp > 0 ? nk / kp : 0,                /* Nebenkosten je Euro Kaufpreis */
+      nkInvQuote: inv > 0 ? nkInv / inv : 0         /* v3006c: Nebenkosten je Euro Inventar */
     };
   }
 
-  return { compute: compute, gebaeudeAhk: gebaeudeAhk };
+  /* ═══ v3006c · ERWERBSNEBENKOSTEN, EINE RECHNUNG ═══════════════════════════
+     Grunderwerbsteuer faellt nur auf das GRUNDSTUECK an (§ 1, § 2 GrEStG):
+     bewegliches Inventar (Kueche, Moebel), das im Kaufvertrag gesondert und
+     angemessen ausgewiesen ist, gehoert nicht zur Gegenleistung (§ 8, § 9
+     GrEStG). Bemessung: (Kaufpreis - Inventar) x Satz. Makler, Notar,
+     Grundbuch und Sonstige bleiben auf dem Gesamtpreis - so stehen sie in den
+     Feldern (Prozent vom Kaufpreis), und so rechnet auch die Gebuehr.
+     Bis v3006b: kp x Satz, also 650 € zu viel bei 10.000 € Inventar und 6,5 %.
+     Eingabe: kp (€), inventar (€), makler_p, notar_p, gba_p, gest_p, ji_p (Prozent).
+     Liest keine Einstellung und kein DOM. */
+  function grestBasis(kp, inventar) {
+    kp = +kp || 0;
+    var inv = Math.min(kp, Math.max(0, +inventar || 0));
+    return kp - inv;
+  }
+  function nebenkosten(i) {
+    i = i || {};
+    var kp = +i.kp || 0;
+    var p = function (x) { var n = +x; return isFinite(n) && n > 0 ? n / 100 : 0; };
+    var basisGrest = grestBasis(kp, i.inventar);
+    var r = {
+      makler: kp * p(i.makler_p), notar: kp * p(i.notar_p), gba: kp * p(i.gba_p),
+      grest: basisGrest * p(i.gest_p), ji: kp * p(i.ji_p), grestBasis: basisGrest
+    };
+    r.summe = r.makler + r.notar + r.gba + r.grest + r.ji;
+    return r;
+  }
+
+  return { compute: compute, gebaeudeAhk: gebaeudeAhk, nebenkosten: nebenkosten, grestBasis: grestBasis };
 })();

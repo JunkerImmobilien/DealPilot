@@ -204,6 +204,11 @@ function gebaeudeAhk(eingabe) {
   return _oder_wirf().DealKpis.gebaeudeAhk(eingabe || {});
 }
 
+/** v3006c · DealKpis.grestBasis() der App - Kaufpreis ohne ausgewiesenes Inventar. */
+function grestBasis(kp, inventar) {
+  return _oder_wirf().DealKpis.grestBasis(kp, inventar);
+}
+
 /** Dscr.compute() der App. */
 function dscr(eingabe) {
   return _oder_wirf().Dscr.compute(eingabe || {});
@@ -301,6 +306,7 @@ function herkunft() {
 module.exports = {
   kpis, dscr, score, stufe, heuristik,
   gebaeudeAhk,                 /* v3006b */
+  grestBasis,                  /* v3006c */
   heuristikTeil,               /* v1936 — stufensatz / kennzahlenAmpel / kategorien */
   rnd, rndAusObjekt, rndAfaVergleich,   /* v2071 — Restnutzungsdauer */
   vorhanden, herkunft,

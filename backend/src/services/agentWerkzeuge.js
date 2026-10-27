@@ -2097,14 +2097,20 @@ async function objekt_schnellblick(ctx, args) {
     return null;
   };
   const knkTeile = [];
-  let knkSumme = 0, knkVollstaendig = true;
+  let knkSumme = 0, knkVollstaendig = true, knkGrest = 0;
+  /* v3006c · Grunderwerbsteuer auf den Kaufpreis ohne ausgewiesenes Inventar (§ 2 GrEStG),
+     dieselbe Bemessung wie die App (DealKpis.grestBasis). Die anderen Posten auf den Gesamtpreis. */
+  const _invGr = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
+  const _grBasis = rechenkerne.grestBasis(kp, _invGr);
   [['gest_p', 'Grunderwerbsteuer'], ['notar_p', 'Notar'], ['gba_p', 'Grundbuch'],
    ['makler_p', 'Maklercourtage']].forEach(([fid, name]) => {
     const s = satzVon(fid);
     if (!s || s.wert == null) { knkVollstaendig = false; knkTeile.push(name + ': unbekannt'); return; }
-    const betrag = kp * s.wert / 100;
+    const betrag = (fid === 'gest_p' ? _grBasis : kp) * s.wert / 100;
+    if (fid === 'gest_p') knkGrest = betrag;
     knkSumme += betrag;
-    knkTeile.push(name + ' ' + pct(s.wert) + ' = ' + eur(betrag) + '  (' + s.quelle + ')');
+    knkTeile.push(name + ' ' + pct(s.wert) + ' = ' + eur(betrag) + '  (' + s.quelle
+      + (fid === 'gest_p' && _grBasis < kp ? ', auf ' + eur(_grBasis) + ' ohne Inventar' : '') + ')');
   });
 
   const kaufnebenkosten = {
@@ -2278,7 +2284,7 @@ async function objekt_schnellblick(ctx, args) {
        Inventar (moebl / inv_kueche) vor der Aufteilung abgezogen. Bis v3006a (kp + NK) x geb_ant. */
     const _invB = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
     const afa = (gebAnt != null && gebAnt > 0)
-      ? rechenkerne.gebaeudeAhk({ kp: kp, nk: knkSumme, gebAntPct: gebAnt, inventar: _invB }).gebAhk
+      ? rechenkerne.gebaeudeAhk({ kp: kp, nk: knkSumme, nkNurImmo: knkGrest, gebAntPct: gebAnt, inventar: _invB }).gebAhk
         * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
     /* v3006 · LTV-Basis wie die App (calc.js v2996, deal-kpis v3006): der Wert mit
        seiner Herkunft, die Bankbewertung getrennt. Ohne gespeicherte Herkunft gilt

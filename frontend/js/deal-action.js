@@ -1985,6 +1985,13 @@ window.DealPilotDealAction = (function() {
     var _nkP = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'].reduce(function (s, id) {
       var e = document.getElementById(id); return s + ((e && _pd(e.value)) || 0); }, 0);
     if (_kp > 0) prefill._dpGebaeudeanteil = (Math.max(0, _kp - _inv) + _kp * _nkP / 100) * _ga / 100;
+    /* v3006c · dieselbe Rechnung wie calc.js: Kern DealKpis (GrESt ohne Inventar, Nebenkosten anteilig) */
+    if (_kp > 0 && window.DealKpis && DealKpis.nebenkosten && DealKpis.gebaeudeAhk) {
+      var _p5 = { kp: _kp, inventar: _inv };
+      ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'].forEach(function (id) { var e = document.getElementById(id); _p5[id] = (e && _pd(e.value)) || 0; });
+      var _nkE = DealKpis.nebenkosten(_p5);
+      prefill._dpGebaeudeanteil = DealKpis.gebaeudeAhk({ kp: _kp, nk: _nkE.summe, nkNurImmo: _nkE.grest, nkAbzug: (window.State && State.gs_kosten_ak) || 0, gebAntPct: _ga, inventar: _inv }).gebAhk;
+    }
     prefill._dpGrenzsteuersatz = _grz / 100;
 
     console.log('[RND-Wizard] Prefill ermittelt:', prefill);

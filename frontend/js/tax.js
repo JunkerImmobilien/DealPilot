@@ -1431,7 +1431,9 @@ function _computeAutoForYear(yearIdx, year) {
   /* v3006b · Das Inventar traegt seinen Anteil an den Erwerbsnebenkosten (Verteilung im
      Verhaeltnis der Kaufpreisanteile, DealKpis.gebaeudeAhk). Bis v3006a lag dieser Anteil
      in Gebaeude und Boden, und die Inventar-AfA lief auf dem nackten Betrag. */
-  var _nkQ = (window.State && State._ahk && isFinite(State._ahk.nkQuote)) ? State._ahk.nkQuote : 0;
+  /* v3006c: je Euro Inventar ohne Grunderwerbsteuer (die faellt aufs Inventar nicht an) */
+  var _nkQ = (window.State && State._ahk && isFinite(State._ahk.nkInvQuote)) ? State._ahk.nkInvQuote
+    : ((window.State && State._ahk && isFinite(State._ahk.nkQuote)) ? State._ahk.nkQuote : 0);
   var moeblBasis = moebl_inp * (1 + _nkQ);
   var moeblPerYear = moeblActive ? (moeblBasis / moeblLaufzeit) : 0;
   var moeblThisYear = (moeblActive && yearIdx < moeblLaufzeit) ? moeblPerYear : 0;

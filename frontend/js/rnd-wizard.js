@@ -314,6 +314,11 @@
     const _inv = ['inv_kueche', 'inv_moebel', 'inv_geraete', 'inv_pv', 'inv_stellplatz', 'inv_sonst'].reduce(function (s, k) { return s + _zahl(dpObj[k]); }, 0) || _zahl(dpObj.moebl);
     const _nkPct = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'].reduce(function (s, k) { return s + _zahl(dpObj[k]); }, 0);
     if (kp > 0) prefill._dpGebaeudeanteil = (Math.max(0, kp - _inv) + kp * _nkPct / 100) * gaPct / 100;
+    /* v3006c · dieselbe Rechnung wie calc.js: Kern DealKpis (GrESt ohne Inventar, Nebenkosten anteilig) */
+    if (kp > 0 && window.DealKpis && DealKpis.nebenkosten && DealKpis.gebaeudeAhk) {
+      const _nkE = DealKpis.nebenkosten({ kp: kp, inventar: _inv, makler_p: _zahl(dpObj.makler_p), notar_p: _zahl(dpObj.notar_p), gba_p: _zahl(dpObj.gba_p), gest_p: _zahl(dpObj.gest_p), ji_p: _zahl(dpObj.ji_p) });
+      prefill._dpGebaeudeanteil = DealKpis.gebaeudeAhk({ kp: kp, nk: _nkE.summe, nkNurImmo: _nkE.grest, gebAntPct: gaPct, inventar: _inv }).gebAhk;
+    }
     const grenz = parseFloat(String(dpObj.grenz || 42).replace(',', '.')) || 42;
     prefill._dpGrenzsteuersatz = grenz / 100;
 

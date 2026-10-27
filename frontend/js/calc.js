@@ -856,8 +856,16 @@ function _setCostEur(id, val) {
 
 // User hat Prozent geändert — Euro folgt automatisch (über _calcImmediate)
 // V63.8: User hat Prozent geändert — Euro-Feld dynamisch nachziehen
-function syncCostPct(prefix) {
+/* v3006c · Bezugsgroesse je Posten: die Grunderwerbsteuer auf den Kaufpreis OHNE Inventar
+   (DealKpis.grestBasis, § 2 GrEStG), alles andere auf den Gesamtpreis. */
+function _costBasis(prefix) {
   var kp = v('kp');
+  if (prefix !== 'gest') return kp;
+  var inv = Math.max(0, v('inv_kueche') || 0, v('moebl') || 0);
+  return (window.DealKpis && DealKpis.grestBasis) ? DealKpis.grestBasis(kp, inv) : Math.max(0, kp - inv);
+}
+function syncCostPct(prefix) {
+  var kp = _costBasis(prefix);   /* v3006c */
   var eFld = el(prefix + '_e');
   var pFld = el(prefix + '_p');
   if (eFld && pFld && kp > 0) {
@@ -870,7 +878,7 @@ function syncCostPct(prefix) {
 
 // User hat Euro geändert — Prozent neu berechnen aus Kaufpreis
 function syncCostEur(prefix) {
-  var kp = v('kp');
+  var kp = _costBasis(prefix);   /* v3006c */
   var eFld = el(prefix + '_e');
   var pFld = el(prefix + '_p');
   if (!eFld || !pFld) return;
@@ -893,7 +901,12 @@ function calcNow() {
 function _calcImmediate(){
   updHeader();
   var kp=v('kp');
-  var m_e=kp*v('makler_p')/100,n_e=kp*v('notar_p')/100,g_e=kp*v('gba_p')/100,ge_e=kp*v('gest_p')/100,ji_e=kp*v('ji_p')/100;
+  /* v3006c · Grunderwerbsteuer ohne ausgewiesenes Inventar (§ 2 GrEStG), Kern DealKpis.nebenkosten */
+  var _nkK = (window.DealKpis && DealKpis.nebenkosten)
+    ? DealKpis.nebenkosten({ kp: kp, inventar: Math.max(0, v('inv_kueche') || 0, v('moebl') || 0),
+        makler_p: v('makler_p'), notar_p: v('notar_p'), gba_p: v('gba_p'), gest_p: v('gest_p'), ji_p: v('ji_p') })
+    : { makler: kp*v('makler_p')/100, notar: kp*v('notar_p')/100, gba: kp*v('gba_p')/100, grest: kp*v('gest_p')/100, ji: kp*v('ji_p')/100 };
+  var m_e=_nkK.makler,n_e=_nkK.notar,g_e=_nkK.gba,ge_e=_nkK.grest,ji_e=_nkK.ji;
   var nk=m_e+n_e+g_e+ge_e+ji_e;
   /* v2261 · Marcel am 15.10.2026: „Inventar ist nicht zusaetzlich." Es ist Teil des
      Kaufpreises (separates Wirtschaftsgut darin) - die Gesamtinvestition ist
@@ -1032,7 +1045,7 @@ function _calcImmediate(){
      die Nebenkosten verteilen sich jetzt anteilig auf Grundstueck UND Inventar. Bis v3006a
      ging der Inventaranteil der Nebenkosten mit in Gebaeude und Boden (nkGesamt x geb_ant). */
   var _ahkK = (window.DealKpis && DealKpis.gebaeudeAhk)
-    ? DealKpis.gebaeudeAhk({ kp: kp, nk: nkGesamt, gebAntPct: gebAnt * 100, inventar: kuecheVal })
+    ? DealKpis.gebaeudeAhk({ kp: kp, nk: nkGesamt, nkNurImmo: ge_e, gebAntPct: gebAnt * 100, inventar: kuecheVal })   /* v3006c: GrESt nur aufs Grundstueck */
     : { gebKp: gebOhneK, nkGeb: nkGesamt * gebQuoteOhneK, gebAhk: gebOhneK + nkGesamt * gebQuoteOhneK, nkInv: 0, nkQuote: kp > 0 ? nkGesamt / kp : 0 };
   var nkGebAnteil = _ahkK.nkGeb;
   var gebAHK = _ahkK.gebAhk;
@@ -1193,7 +1206,8 @@ function _calcImmediate(){
       kuecheActive:  kuecheActive,
       gebQuoteOhneK: gebQuoteOhneK,
       nkInv:         _ahkK.nkInv,     /* v3006b: Nebenkosten, die auf das Inventar entfallen */
-      nkQuote:       _ahkK.nkQuote    /* v3006b: Nebenkosten (ohne Grundschuld) je Euro Kaufpreis */
+      nkQuote:       _ahkK.nkQuote,   /* v3006b: Nebenkosten (ohne Grundschuld) je Euro Kaufpreis */
+      nkInvQuote:    _ahkK.nkInvQuote /* v3006c: Nebenkosten je Euro Inventar (ohne GrESt) */
     };
   }
   /* ═══ v1313 · Der Erbbau-Abschlag greift VOR jedem Wertvergleich ═══════

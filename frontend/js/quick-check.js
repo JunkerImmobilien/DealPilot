@@ -195,6 +195,23 @@
     if (m) m.remove();
   }
 
+  /* v3006c · Erwerbsnebenkosten des Quick-Checks: Gesamtsatz qc_knk auf den Kaufpreis, die
+     Grunderwerbsteuer darin aber nur auf den Kaufpreis OHNE ausgewiesenes Inventar (§ 2 GrEStG,
+     DealKpis.grestBasis). Inventar kennt der Quick-Check nur aus dem Objekt (inv_kueche/moebl,
+     wie die AfA seit v3006b); der GrESt-Satz kommt aus qc_knk_teile, sonst aus gest_p. Ohne
+     Inventar rechnet alles wie bisher. */
+  function _qcKnk(kp, knkP) {
+    var pd = function (id) { var e = document.getElementById(id); return e ? (parseDe(e.value || '0') || 0) : 0; };
+    var inv = Math.max(0, pd('inv_kueche'), pd('moebl'));
+    var gestP = 0;
+    var tt = String((document.getElementById('qc_knk_teile') || {}).value || '').split(';');
+    if (tt.length === 5 && isFinite(+tt[0]) && tt[0] !== '') gestP = +tt[0]; else gestP = pd('gest_p');
+    if (!(gestP > 0) || gestP > knkP) gestP = 0;
+    var basis = (window.DealKpis && DealKpis.grestBasis) ? DealKpis.grestBasis(kp, inv) : Math.max(0, kp - inv);
+    var grest = basis * gestP / 100;
+    return { abs: kp * (knkP - gestP) / 100 + grest, grest: grest, inv: Math.min(kp, inv) };
+  }
+
   function qcCalc() {
     function v(id) { var e = document.getElementById(id); return e ? e.value : ''; }
     function n(id) { return (typeof parseDe === 'function') ? parseDe(v(id)) : (parseFloat((v(id)||'').replace(',', '.')) || 0); }
@@ -504,7 +521,8 @@
       nkmGrundMon = nkm;
       zeMon = 0;
     }
-    var knkAbs = kp * (knkP / 100);
+    var _knkQ = _qcKnk(kp, knkP);   /* v3006c */
+    var knkAbs = _knkQ.abs;
     var gi = kp + knkAbs;
     var darlehen = Math.max(0, gi - ek);
 
@@ -526,7 +544,7 @@
         var _invE1 = document.getElementById('inv_kueche'), _invE2 = document.getElementById('moebl');
         _invQc = Math.max(0, _invE1 ? (parseDe(_invE1.value || '0') || 0) : 0, _invE2 ? (parseDe(_invE2.value || '0') || 0) : 0);
         var _ahkQc = (window.DealKpis && DealKpis.gebaeudeAhk)
-          ? DealKpis.gebaeudeAhk({ kp: kp, nk: knkAbs, gebAntPct: gebAnt, inventar: _invQc }).gebAhk
+          ? DealKpis.gebaeudeAhk({ kp: kp, nk: knkAbs, nkNurImmo: _knkQ.grest, gebAntPct: gebAnt, inventar: _invQc }).gebAhk
           : (kp + knkAbs) * (gebAnt / 100);
         if (gebAnt > 0) afaQc = _ahkQc * (afaSatz / 100);
       }
@@ -1075,7 +1093,7 @@
       }
     }
 
-    var nk = kp * (knkP / 100);
+    var nk = _qcKnk(kp, knkP).abs;   /* v3006c */
     var ekKp = kp * (1 - ltvPct / 100);
     var ek = ekKp + nk;
     if (inp) {
