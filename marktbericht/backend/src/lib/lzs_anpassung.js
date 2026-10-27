@@ -96,7 +96,9 @@ function eineKorrektur(k, e) {
   }
   if (!Number.isFinite(v)) return { offen: true, merkmal: bez, grund: 'Tabellenwert nicht lesbar' };
   return { ok: true, merkmal: bez, wirkung, wert: Math.round(v * 10000) / 10000,
-    auspraegung: de(x, 2) + (EINHEIT_EINGABE[schl] || ''), interpoliert: interp };
+    auspraegung: de(x, 2) + (EINHEIT_EINGABE[schl] || ''), interpoliert: interp,
+    /* v3010 · Marcel 27.10.2026: lineare Interpolation bestaetigt; ob der Ausschuss sie selbst vorgibt */
+    regel_ausschuss: /linear/i.test(String(k.interpolation || '')) && !/nicht/i.test(String(k.interpolation || '')) };
 }
 
 /**
@@ -145,6 +147,7 @@ export function lzsAnpassung({ satz, wert_pct, eingabe = {}, roh = null } = {}) 
       z = r.wirkung === 'faktor' ? z * r.wert : z + r.wert;
       schritte.push({ merkmal: r.merkmal, auspraegung: r.auspraegung, wirkung: r.wirkung, wert: r.wert, interpoliert: r.interpoliert,
         vor_pct: Math.round(vor * 10000) / 10000, nach_pct: Math.round(z * 10000) / 10000, fundstelle: k.hinweis ? String(k.hinweis).split('.')[0] : null });
+      schritte[schritte.length - 1].regel_ausschuss = !!r.regel_ausschuss;
     } else offen.push({ merkmal: r.merkmal, grund: r.grund, ausserhalb: !!r.ausserhalb });
   }
   const st = f.rundung_stellen != null ? Number(f.rundung_stellen) : 2;
@@ -152,7 +155,8 @@ export function lzsAnpassung({ satz, wert_pct, eingabe = {}, roh = null } = {}) 
   const angepasst = schritte.length > 0 && Math.abs(zins - basis) > 1e-9;
   const teile = schritte.map((s) => s.merkmal.replace(/\s*\(.*\)\s*$/, '') + ' ' + s.auspraegung + ': '
     + (s.wirkung === 'faktor' ? '× ' + de(s.wert, 4) : (s.wert >= 0 ? '+ ' : '− ') + de(Math.abs(s.wert), 2) + ' Pp.')
-    + (s.interpoliert ? ' (zwischen den Stützstellen linear interpoliert)' : ''));
+    + (s.interpoliert ? (s.regel_ausschuss ? ' (zwischen den Stützstellen linear interpoliert, wie vom Ausschuss vorgegeben)'
+      : ' (lineare Interpolation (DealPilot), Tabelle des Ausschusses ohne eigene Regel)') : ''));   /* v3010 */
   const offenText = offen.length ? ' Nicht angepasst: ' + offen.map((o) => o.merkmal.replace(/\s*\(.*\)\s*$/, '') + ' (' + o.grund + ')').join('; ') + '.' : '';
   return {
     angepasst, art: 'koeffizienten', etikett: angepasst ? 'A, angepasst' : null,

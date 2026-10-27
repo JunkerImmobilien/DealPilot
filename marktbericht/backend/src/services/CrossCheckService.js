@@ -15,6 +15,8 @@ import { pruefeModell, mieteModellkonform, modellDurchschnitte } from '../lib/mo
 import { barwertAbweichung } from '../lib/immowertv.js';   /* v2600 · E2 */
 import { kappungFuer, erhoehungspfad558 } from '../lib/kappung.js';   /* v2993 */
 import { baupreisindexAm } from '../lib/baupreisindex.js';   /* v2996 */
+import { stichtagAus } from '../lib/stichtag.js';
+import { mitRegisterStichtag } from '../lib/ausschuss_register.js';   /* v3010 · Jahrgang zum Stichtag */   /* v3010 · Wertermittlungsstichtag an einer Stelle */
 /* ══ v1968 · HIER STAND EIN TOTER IMPORT ══════════════════════════════
 
      import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';
@@ -30,7 +32,7 @@ import { baupreisindexAm } from '../lib/baupreisindex.js';   /* v2996 */
    Die Zieldatei lib/anlage2.js bleibt: lib/rnd-einheitlich.js und
    lib/immowertv.js importieren sie und rufen sie auch. */
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js'; /* v1816 */
-import { fuehrendesVerfahren, angepassterZins, verfahrenMitIrw } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1, v2660: verfahrenMitIrw */
+import { fuehrendesVerfahren, verfahrenMitIrw } from '../lib/verfahrenswahl.js';   /* v3010: angepassterZins gestrichen */   /* v1061-WVER-1, v2660: verfahrenMitIrw */
 import { vergleichswertIrw, objektAusRef, EINGABE_ORT } from '../lib/vergleichswert_irw.js';   /* v2660 · E7 */
 /* v1069-WSWF-1 · Sachwertfaktoren nach § 21 Abs. 3 ImmoWertV. */
 /* v1073-WGAA-1 · Nicht mehr ein Modul, sondern der Aufloeser. Er
@@ -90,16 +92,7 @@ const BPI_RUECKFALL = 1.91;
 const BPI = (stichtag) => { const x = baupreisindexAm(stichtag instanceof Date ? stichtag : new Date()); return x ? x.wert : BPI_RUECKFALL; };
 /** Wertermittlungsstichtag aus den Parametern (`wertermittlungsstichtag`, ISO JJJJ-MM-TT oder
     TT.MM.JJJJ). Ungueltig oder in der Zukunft -> heute, mit `verworfen`. */
-export function wertermittlungsstichtagAus(p) {
-  const roh = p && p.wertermittlungsstichtag;
-  if (roh == null || roh === '') return { datum: new Date(), eigen: false, verworfen: null };
-  let s = String(roh).trim();
-  const de = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-  if (de) s = de[3] + '-' + de[2].padStart(2, '0') + '-' + de[1].padStart(2, '0');
-  const t = /^\d{4}-\d{2}-\d{2}$/.test(s) ? Date.parse(s + 'T12:00:00Z') : NaN;
-  if (!Number.isFinite(t) || t > Date.now()) return { datum: new Date(), eigen: false, verworfen: String(roh) };
-  return { datum: new Date(t), eigen: true, iso: s, verworfen: null };
-}
+export function wertermittlungsstichtagAus(p) { return stichtagAus(p && p.wertermittlungsstichtag); }   /* v3010: lib/stichtag.js */
 export function baupreisindexHeute() { return baupreisindexAm(new Date()) || { wert: BPI_RUECKFALL, stichtag: '2026-01-01', art: 'konstante' }; }
 export const BAUPREISINDEX_KONSTANTE = baupreisindexHeute(); /* v1851: Rueckwaertsname; Aufrufer nehmen baupreisindexHeute() */
                                   // Quellen: IMB Hamburg 2026 (1,911),
@@ -338,7 +331,8 @@ export const CrossCheckService = {
      * sie sofort abgestuerzt — der Sachwert fuer Haeuser war latent kaputt,
      * seit `params` eingefuehrt wurde. Deklaration gehoert an den Anfang. */
     const p = params || {};
-    const _wst = wertermittlungsstichtagAus(p);   /* v3005 · W7 */
+    /* v3005 · W7 / v3010: Stichtag aus den Parametern, sonst aus dem Objekt (ReportOrchestrator setzt beide) */
+    const _wst = wertermittlungsstichtagAus((p && p.wertermittlungsstichtag) ? p : ref);
     const out = {
       available: false,
       sachwert: { available: false },
@@ -450,7 +444,7 @@ export const CrossCheckService = {
     const plot = _num(ref.plot_area);
     const brw = landValue && landValue.available ? _num(landValue.value_sqm) : null;
     const bodenwert = plot && brw ? Math.round(plot * brw) : null;
-    const nowYear = new Date().getFullYear();
+    const nowYear = _wst.datum.getFullYear();   /* v3010 · Stichtagsjahr statt Kalenderjahr (Alter, BWK, VPI) */
 
     // ---- Restnutzungsdauer (vereinfacht modifiziert) ----
     // Basis: GND - Alter. Modernisierung verlängert (teilmodernisiert +10 J., kern-/umfassend +20 J.),
@@ -561,7 +555,8 @@ export const CrossCheckService = {
      * Modernisierungsgrade × 3 Modernisierungsarten), Modul gegen diese
      * Closure — 147 mal dieselbe Zahl, 0 Abweichungen. */
     const _rndEinheitlich = (gndArg) => {
-      const e = rndEinheitlich(ref, Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE);
+      const e = rndEinheitlich(_wst.eigen ? { ...ref, wertermittlungsstichtag: _wst.iso } : ref,   /* v3010 */
+        Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE);
       _rndHerkunft.gnd_jahre = e.gnd_jahre;
       /* Der Rückfall des Moduls rechnet dieselbe Schätzung; stimmt sie
          nicht mit der hier gebildeten überein, gilt die hier gebildete —
@@ -748,29 +743,30 @@ export const CrossCheckService = {
           mod_punkte: (p && p.mod_punkte) != null ? p.mod_punkte
             : (ref.mod_punkte != null ? ref.mod_punkte : null),
         };
-        _swfTab = swfNachTabelle({ ..._swfArgs });
-        /* v3005 · W2 · Regionalfaktor aus dem Modell des Ausschusses (siehe oben). */
-        if (_swfTab && _swfTab.verfuegbar) {
+        _swfTab = mitRegisterStichtag(_wst.eigen ? _wst.iso : null, () => swfNachTabelle({ ..._swfArgs }));   /* v3010 */
+        /* v3005 · W2 · Regionalfaktor aus dem Modell des Ausschusses (siehe oben).
+           v3010 · auch wenn der Sachwertfaktor selbst gesperrt ist: § 36 Abs. 3 ImmoWertV - der
+           Regionalfaktor passt die durchschnittlichen Herstellungskosten an den oertlichen Markt an,
+           er ist Teil des vorlaeufigen Sachwerts, nicht nur des Faktors. Nur als ZAHL im Satz. */
+        if (_swfTab && _swfTab.modellansaetze) {
           const _rfM = _rfAusModell(_swfTab.modellansaetze);
           if (_rfM != null && _rfNutzer != null && Math.abs(_rfM - _rfNutzer) > 1e-9) {
             _rfHinweis = 'Der eingetragene Regionalfaktor ' + String(_rfNutzer).replace('.', ',')
               + ' weicht vom Modell des Gutachterausschusses ab (' + String(_rfM).replace('.', ',')
-              + '). Der Sachwertfaktor gilt nur im Modell, aus dem er abgeleitet wurde (§ 10 Abs. 1 ImmoWertV) \u2014 '
+              + '). Der Sachwertfaktor gilt nur im Modell, aus dem er abgeleitet wurde (§ 10 Abs. 1 ImmoWertV) — '
               + 'mit der eigenen Angabe ist das Ergebnis insoweit nicht modellkonform.';
           } else if (_rfM != null && _rfNutzer == null) {
             _rfSw = _rfM; _rfQuelle = 'modell_gutachterausschuss';
             if (_rfM !== 1) {
               const _sw1rf = nhkSachwert({ ..._ein1, regionalfaktor: _rfM }, _bwSw, null);
-              const _tab2 = (_sw1rf && _sw1rf.vorlaeufiger_sachwert_eur != null)
-                ? swfNachTabelle({ ..._swfArgs, sachwert_eur: _sw1rf.vorlaeufiger_sachwert_eur, rnd_jahre: _sw1rf.restnutzungsdauer_jahre })
-                : null;
-              if (_tab2 && _tab2.verfuegbar && _rfAusModell(_tab2.modellansaetze) === _rfM) {
-                _sw = _sw1rf; _swfTab = _tab2;
-              } else {
-                _rfSw = _rfNutzer; _rfQuelle = 'ohne';
-                _swfTab = { verfuegbar: false, grund: 'regionalfaktor_modell_abweichend',
-                  hinweis: 'Mit dem Regionalfaktor des Modells (' + String(_rfM).replace('.', ',') + ') liefert der Ausschuss f\u00fcr dieses Objekt keinen Sachwertfaktor.' };
-              }
+              if (_sw1rf && _sw1rf.vorlaeufiger_sachwert_eur != null) {
+                const _tab2 = mitRegisterStichtag(_wst.eigen ? _wst.iso : null, () => swfNachTabelle({ ..._swfArgs,
+                  sachwert_eur: _sw1rf.vorlaeufiger_sachwert_eur, rnd_jahre: _sw1rf.restnutzungsdauer_jahre }));
+                _sw = _sw1rf;
+                _swfTab = (_tab2 && _rfAusModell(_tab2.modellansaetze) === _rfM) ? _tab2
+                  : { verfuegbar: false, grund: 'regionalfaktor_modell_abweichend',
+                      hinweis: 'Mit dem Regionalfaktor des Modells (' + String(_rfM).replace('.', ',') + ') liefert der Ausschuss für dieses Objekt keinen Sachwertfaktor.' };
+              } else { _rfSw = _rfNutzer; _rfQuelle = 'ohne'; }
             }
           }
         }
@@ -971,7 +967,7 @@ export const CrossCheckService = {
           sachwertfaktor_alter_jahre: (function () {
             const bj = Number(_swfTab && _swfTab.berichtsjahr);
             if (!Number.isFinite(bj) || bj < 1990) return null;
-            return new Date().getFullYear() - bj;
+            return _wst.datum.getFullYear() - bj;   /* v3010 · zum Stichtag */
           })(),
 
           sachwertfaktor_tabellenwert: (_swfTab && _swfTab.tabellenwert) || null,
@@ -1885,8 +1881,8 @@ export const CrossCheckService = {
         const _lzsK = kern.lzs ? kern.lzs.pct : lzsPct;
         const _rndK = kern.nutzungsdauer ? kern.nutzungsdauer.rnd : null;
         _bogDoppelt = !!(ein.bog_eur && /miet|leerst|herricht|overrent|underrent|mehrertrag|minderertrag/i.test(String(ein.bog_grund || '')));
-        if (_postenAlle.length) _mietBog = mietabweichungBog(_postenAlle, _lzsK, _rndK, new Date(),
-          { kappung: kappungFuer(ref.ags, ref.kappung_pct) });   /* v2993 · § 558 BGB */
+        if (_postenAlle.length) _mietBog = mietabweichungBog(_postenAlle, _lzsK, _rndK, _wst.datum,   /* v3010 · zum Stichtag */
+          { kappung: kappungFuer(ref.ags, ref.kappung_pct, _wst.datum) });   /* v2993 · § 558 BGB */
         /* v2800 · Wortlaut je Art: nur Gewerbe -> „Gewerbeeinheit", gemischt -> beide */
         if (_mietBog && _gew) {
           _mietBog.gewerbe = !_wohnPosten.length;
@@ -2356,7 +2352,7 @@ export const CrossCheckService = {
         let _mietBogG = null;
         const _gewPostenG = (_gew && _gHerk === 'marktueblich') ? gewerbeMietPosten(_gew) : _gewPostenAnker;   /* v2790: Band */
         if (kernG.vollstaendig && kernG.wert != null && _gewPostenG.length) {
-          _mietBogG = mietabweichungBog(_gewPostenG, kernG.lzs ? kernG.lzs.pct : _lzsG, kernG.nutzungsdauer ? kernG.nutzungsdauer.rnd : _rndG, new Date());
+          _mietBogG = mietabweichungBog(_gewPostenG, kernG.lzs ? kernG.lzs.pct : _lzsG, kernG.nutzungsdauer ? kernG.nutzungsdauer.rnd : _rndG, _wst.datum);   /* v3010 */
           const _dopG = !!(einG.bog_eur && /miet|overrent|underrent|mehrertrag|minderertrag/i.test(String(einG.bog_grund || '')));
           if (!_dopG && (_mietBogG.n_angesetzt || _mietBogG.n_offen)) {
             einG.bog_posten = _mietBogG.n_angesetzt && _mietBogG.angesetzt_eur ? [{ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung Gewerbe', wert: _mietBogG.angesetzt_eur,
@@ -2654,23 +2650,9 @@ export const CrossCheckService = {
           + (out.verfahrenswahl.weg ? ' ' + out.verfahrenswahl.weg : ''));
     }
 
-    /* v1061-WVER-3 · Objektspezifisch angepasster Zinssatz nach Paragraf 33.
-     * Ausgangswert bleibt der amtliche; die Anpassung folgt dem Katalog des
-     * Ausschusses und bleibt in seiner Streuung. Ergebnis ist Stufe C —
-     * marktabgeleitet, nie amtlich. */
-    if (p.lzs_pct > 0 && p.lzs_min != null && p.lzs_max != null) {
-      const _stabw = (Number(p.lzs_max) - Number(p.lzs_min)) / 2;
-      const _an = angepassterZins({
-        basis_pct: Number(p.lzs_pct), stabw_pct: _stabw,
-        gebaeudealter: ref.build_year ? (new Date()).getFullYear() - Number(ref.build_year) : null,
-        mikrolage_score: p.mikrolage_score != null ? Number(p.mikrolage_score) : null,
-        nutzung: ref.usage_type, wohneinheiten: ref.units,
-        wohnflaeche_qm: ref.living_area, normobjekt_qm: p.normobjekt_qm || null,
-      });
-      /* v3009 · W3 · Passt der Ausschuss selbst an (§ 33), entfaellt die DealPilot-Einordnung -
-         zwei angepasste Zinssaetze nebeneinander waeren einer zu viel. */
-      if (_an && _an.verfuegbar && !(p.lzs_anpassung && p.lzs_anpassung.angepasst)) out.zins_anpassung = _an;
-    }
+    /* v3010 · Hier stand der DealPilot-Merkmalskatalog zum Zins (angepassterZins, out.zins_anpassung):
+       gesetzte Gewichte, nie gerechnet. ImmoWertA kennt diesen Weg nicht, Marcel 27.10.2026 - gestrichen.
+       Die Anpassung nach § 33 rechnet lib/lzs_anpassung.js mit den Koeffizienten des Ausschusses. */
 
     /* v1977: auch der zurueckgehaltene Satz gehoert in den Bericht. Dass
        ein Ausschuss Vergleichsfaktoren fuehrt, sie aber nur fuer die

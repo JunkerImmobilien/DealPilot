@@ -892,9 +892,37 @@ export function finde(kennzahl, ags) {
   if (!_index.size) return [];
   for (const s of kaskadeSchluessel(ags)) {
     const t = _index.get(schluessel(kennzahl, s));
-    if (t && t.length) return t;
+    if (t && t.length) return _zumStichtag(t);   /* v3010 */
   }
   return [];
+}
+
+/* ═══ v3010 · DER JAHRGANG ZUM WERTERMITTLUNGSSTICHTAG ══════════════════
+   Marcel 27.10.2026: am Stichtag haengt auch die Wahl des Registerjahrgangs.
+   § 10 ImmoWertV: es gilt das Modell, das am Stichtag galt. Fuehrt das Register
+   fuer denselben Zweig (und dieselbe Lage) mehrere Jahrgaenge, fallen die heraus,
+   deren Stichtag NACH dem Wertermittlungsstichtag liegt - aber nur, wenn ein
+   aelterer desselben Zweigs bleibt (sonst bleibt alles, wie es war: ein juengerer
+   Satz ist besser als keiner, und der Bericht nennt den Jahrgang).
+   Gesetzt wird der Stichtag synchron um einen Abruf herum (mitRegisterStichtag);
+   ohne ihn aendert sich nichts. */
+let _stichtagKontext = null;
+export function mitRegisterStichtag(iso, fn) {
+  const alt = _stichtagKontext;
+  _stichtagKontext = (iso && /^\d{4}-\d{2}-\d{2}$/.test(String(iso))) ? String(iso) : null;
+  try { return fn(); } finally { _stichtagKontext = alt; }
+}
+function _satzTag(s) {
+  const t = String((s && s.stichtag) || '').slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+  const b = Number(s && s.berichtsjahr);
+  return Number.isFinite(b) && b > 1900 ? String(b) + '-01-01' : null;
+}
+function _zumStichtag(liste) {
+  if (!_stichtagKontext || liste.length < 2) return liste;
+  const grp = (s) => [String(s.zweig || '').toLowerCase(), String(((s.geltungsbereich || {}).lage) || '').toLowerCase()].join('|');
+  const hatAelteren = new Set(liste.filter((s) => { const d = _satzTag(s); return d && d <= _stichtagKontext; }).map(grp));
+  return liste.filter((s) => { const d = _satzTag(s); return !(d && d > _stichtagKontext && hatAelteren.has(grp(s))); });
 }
 
 /** Ein Satz einer Kennzahl fuer einen Zweig (Objektart), oder null. */

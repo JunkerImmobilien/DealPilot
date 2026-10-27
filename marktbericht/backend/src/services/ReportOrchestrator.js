@@ -52,6 +52,7 @@ import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v132
 import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 import { objektartNormal, gewerbeArt, zinsObjektart, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
 import { zensusMieteAmStichtag } from '../lib/zensus_miete.js';   /* v2993 */
+import { stichtagVon, stichtagJahr, stichtagIso } from '../lib/stichtag.js';   /* v3010 · Wertermittlungsstichtag */
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -670,7 +671,7 @@ export const ReportOrchestrator = {
           kernsaniert: /kernsaniert/i.test(String(ref.modernization || ''))
             && Number(ref.mod_punkte || 0) >= 18,
           sanierungsjahr: ref.modernization_year || null,
-          wohnlage: _lage, stichtag_jahr: (new Date()).getFullYear(),
+          wohnlage: _lage, stichtag_jahr: stichtagJahr(ref),   /* v3010 */
         };
         /* v2988 · die Eingabe bleibt fuer den Potenzial-Lauf stehen: das Zielbild fragt
            dieselbe Tabelle mit der Modernisierungsklasse NACH den Massnahmen */
@@ -916,8 +917,8 @@ export const ReportOrchestrator = {
           garagen_anzahl: Number.isFinite(Number(ref.garages)) && ref.garages !== null && ref.garages !== '' ? Number(ref.garages) : null,
           /* v2999 · modifiziertes Baujahr (Niedersachsen): Wertermittlungsjahr - (GND 80 - RND nach Anlage 2),
              dieselbe RND wie in allen Verfahren; Alter (Hamburg) = Wertermittlungsjahr - Baujahr */
-          baujahr_modifiziert: _rndVorab.rnd != null ? Math.round(new Date().getFullYear() - (80 - Number(_rndVorab.rnd))) : null,
-          alter_jahre: Number(ref.build_year) > 0 ? new Date().getFullYear() - Number(ref.build_year) : null,
+          baujahr_modifiziert: _rndVorab.rnd != null ? Math.round(stichtagJahr(ref) - (80 - Number(_rndVorab.rnd))) : null,   /* v3010 · Wertermittlungsjahr */
+          alter_jahre: Number(ref.build_year) > 0 ? stichtagJahr(ref) - Number(ref.build_year) : null,   /* v3010 */
           /* v3008 · Merkmale des Ausschusses (Merkmalsmatrix, Konstanz): Zimmerzahl, eigene Angaben
              zu Wohnlage und Ausstattungsklasse, dazu die Lageklasse der Bodenrichtwertzone, wie
              BORIS-BW sie im Feld BEM fuehrt („Lageklasse 2,8") - der Satz entscheidet, ob er sie liest. */
@@ -1041,6 +1042,7 @@ export const ReportOrchestrator = {
       const _lzs = await WertParameterService.liegenschaftszins({
         /* v2381 · die genaue Hausart (zfh, dhh, rh, efh) - mit „haus" griff kein Zweig */
         ags: _agsWert || null, objektart: ref.property_subtype || ref.property_type, anzahlWe: ref.units,
+        stichtag: stichtagVon(ref).iso,   /* v3010 · Jahrgang und Parametertabelle zum Wertermittlungsstichtag */
         brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
         nutzerwert: ref.lzs_pct || null,
         objekt: {
@@ -1459,6 +1461,7 @@ export const ReportOrchestrator = {
       try {
         _swf = await WertParameterService.sachwertfaktor({
           ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
+          stichtag: stichtagVon(ref).iso,   /* v3010 */
           nutzerwert: ref.sachwertfaktor || null,
         });
       } catch (e) { /* ohne Faktor bleibt es beim vorlaeufigen Sachwert */ }
@@ -1546,7 +1549,7 @@ export const ReportOrchestrator = {
           lzs_aus_register: !!_lzs.aus_register,
           lzs_berichtsjahr: _lzs.berichtsjahr || null,
           /* v2993 · Bestandsmiete Zensus 2022, fortgeschrieben - Anker vor der Angebotsmiete */
-          zensus_miete: (function () { try { return zensusMieteAmStichtag(zensus, new Date()); } catch (e) { return null; } })(),
+          zensus_miete: (function () { try { return zensusMieteAmStichtag(zensus, stichtagVon(ref).datum);   /* v3010 · VPI zum Stichtag */ } catch (e) { return null; } })(),
           bodenwert: _bw,
           flaeche: _flaeche,   /* v1049-WFLA-2 */
           /* v1055-WSPL-1 · Hinweis, wenn Stellplaetze da sind und kein
@@ -1690,7 +1693,7 @@ export const ReportOrchestrator = {
           ? valuation.market_value.estimated : null;
         const _rnd = (_wertParams && _wertParams.restnutzungsdauer != null)
           ? _wertParams.restnutzungsdauer
-          : (ref.build_year ? Math.max(20, 80 - (new Date().getFullYear() - ref.build_year)) : null);
+          : (ref.build_year ? Math.max(20, 80 - (stichtagJahr(ref) - ref.build_year)) : null);   /* v3010 */
         /* === v1342 - DEN MARKTABGELEITETEN KOEFFIZIENTEN HOLEN =========
            Liegt fuer diesen Ort und diese Objektart ein Erbbaurechts-
            koeffizient vor (v1339), geht er der Formel vor. Er stammt aus
@@ -2012,6 +2015,9 @@ export const ReportOrchestrator = {
         ? macroRaw.metrics.bevoelkerung_trend : null,
       days_on_market: (insights && insights.dynamics && insights.dynamics.days_on_market != null)
         ? insights.dynamics.days_on_market : null,
+      /* v3010 · Wertermittlungsstichtag fuer Kopf von Web und PDF (eigen = eingetragen, sonst Berichtstag) */
+      wertermittlungsstichtag: (function () { const st = stichtagVon(ref);
+        return { datum: stichtagIso(st), eigen: st.eigen, verworfen: st.verworfen }; })(),
       meta: {
         generated_at: new Date().toISOString(),
         /* v2513 · aus den ECHTEN Ergebnissen. Bisher stand hier fest

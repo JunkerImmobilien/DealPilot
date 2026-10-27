@@ -20,16 +20,16 @@
 import { q } from '../lib/db.js';
 /* v1816 · der Weg zum Register. Kein Ringschluss: gutachterausschuss.js
    und ausschuss_register.js kennen diesen Dienst nicht (gegengeprueft). */
-import { finde as regFinde, lagenFuer as regLagen, findeZweig as regFindeZweig } from '../lib/ausschuss_register.js';
+import { finde as regFinde, lagenFuer as regLagen, findeZweig as regFindeZweig, mitRegisterStichtag } from '../lib/ausschuss_register.js';   /* v3010 */
 import { liegenschaftszinssatz as regZins } from '../lib/gutachterausschuss.js';
 import { zinssatzFuerObjekt } from '../lib/zweigwahl.js';
 import { lzsAnpassung } from '../lib/lzs_anpassung.js';   /* v3009 · W3 · § 33 ImmoWertV */
 
 /* v3009 · W3 · der objektspezifisch angepasste Zins (§ 33, § 34 Abs. 1): nur mit der Funktion bzw.
    den Koeffizienten DESSELBEN Registersatzes, nur innerhalb seiner Tabellen (lib/lzs_anpassung.js). */
-function _lzsAnpassungFuer(reg, ags, brwSqm, objekt) {
+function _lzsAnpassungFuer(reg, ags, brwSqm, objekt, stichtag = null) {
   try {
-    const satz = regFindeZweig('liegenschaftszinssatz', String(ags), reg.zweig, reg.lage || null);
+    const satz = mitRegisterStichtag(stichtag, () => regFindeZweig('liegenschaftszinssatz', String(ags), reg.zweig, reg.lage || null));   /* v3010: derselbe Jahrgang */
     const o = objekt || {};
     return lzsAnpassung({ satz, wert_pct: reg.wert_pct, roh: reg.roh || null, eingabe: {
       restnutzungsdauer: o.restnutzungsdauer ?? null, bodenrichtwert: brwSqm ?? null,
@@ -343,11 +343,11 @@ export const WertParameterService = {
            amtlichen Zins. Den nehmen wir (Stufe A), mit Begruendung. Nur wenn es den
            nicht gibt, bleibt es beim Auffangwert. */
         try {
-          const regZ = zinssatzFuerObjekt(
+          const regZ = mitRegisterStichtag(stichtag, () => zinssatzFuerObjekt(   /* v3010 · Jahrgang zum Stichtag */
             { finde: regFinde, lagenFuer: regLagen, abruf: regZins },
-            String(ags), { ...(objekt || {}), objart: 'zfh', einheiten: _we });
+            String(ags), { ...(objekt || {}), objart: 'zfh', einheiten: _we }));
           if (regZ && regZ.verfuegbar) {
-            const _anpZ = _lzsAnpassungFuer(regZ, ags, brwSqm, objekt);   /* v3009 · W3 */
+            const _anpZ = _lzsAnpassungFuer(regZ, ags, brwSqm, objekt, stichtag);   /* v3009 · W3 */
             return {
               wert: (_anpZ && _anpZ.angepasst) ? Number(_anpZ.zins_pct) : Number(regZ.wert_pct), min: null, max: null,
               anpassung: _anpZ || null,
@@ -384,12 +384,12 @@ export const WertParameterService = {
     }
     if (typ === 'lzs' && ags) {
       try {
-        const reg = zinssatzFuerObjekt(
+        const reg = mitRegisterStichtag(stichtag, () => zinssatzFuerObjekt(   /* v3010 · Jahrgang zum Stichtag */
           { finde: regFinde, lagenFuer: regLagen, abruf: regZins },
           String(ags),
-          { objart: objektart, einheiten: anzahlWe, ...(objekt || {}) });
+          { objart: objektart, einheiten: anzahlWe, ...(objekt || {}) }));
         if (reg && reg.verfuegbar) {
-          const _anp = _lzsAnpassungFuer(reg, ags, brwSqm, objekt);   /* v3009 · W3 */
+          const _anp = _lzsAnpassungFuer(reg, ags, brwSqm, objekt, stichtag);   /* v3009 · W3 */
           return {
             wert: (_anp && _anp.angepasst) ? Number(_anp.zins_pct) : Number(reg.wert_pct), min: null, max: null,
             anpassung: _anp || null,

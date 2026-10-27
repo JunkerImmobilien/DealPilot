@@ -1385,12 +1385,32 @@ function _renderWertverfahren(d) {
   });
 }
 
+/* v3010 · Wertermittlungsstichtag (Marcel 27.10.2026): oben in Web und PDF. Ohne eigenen
+   Stichtag ist es der Tag der Berichtserstellung (meta.generated_at). */
+function _wstText(d) {
+  const w = (d && d.wertermittlungsstichtag) || null;
+  const iso = (w && w.datum) || (d && d.meta && d.meta.generated_at ? String(d.meta.generated_at).slice(0, 10) : null);
+  if (!iso || !/^\d{4}-\d{2}-\d{2}/.test(iso)) return null;
+  const t = iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.' + iso.slice(0, 4);
+  return { text: 'Wertermittlungsstichtag: ' + t, zusatz: w && w.eigen ? 'eigene Angabe'
+    : (w && w.verworfen ? 'Tag der Berichtserstellung (Angabe „' + w.verworfen + '“ liegt in der Zukunft oder ist kein Datum)' : 'Tag der Berichtserstellung') };
+}
 function render(out) {
   const d = out.data;
   try { fillFormFromOut(d); } catch (e) { /* Formular-Befuellung optional */ }
   $('placeholder').classList.add('hide');
   $('resultBody').classList.remove('hide');
   $('reportPanel').classList.remove('hide');
+  /* v3010 · Wertermittlungsstichtag oben im Ergebnis */
+  try {
+    const _w = _wstText(d), _rb = $('resultBody');
+    let _z = $('wstZeile');
+    if (_rb && _w) {
+      if (!_z) { _z = document.createElement('div'); _z.id = 'wstZeile'; _rb.insertBefore(_z, _rb.firstChild); }
+      _z.style.cssText = 'font-size:12.5px;margin:0 0 10px;opacity:.85';
+      _z.innerHTML = ''; const _b = document.createElement('b'); _b.textContent = _w.text; const _s = document.createElement('span'); _s.style.opacity = '.7'; _s.textContent = ' · ' + _w.zusatz; _z.appendChild(_b); _z.appendChild(_s);
+    } else if (_z) _z.remove();
+  } catch (e) { /* Anzeige darf den Bericht nie kippen */ }
 
   /* WKIV-1 · Die KI-Gegenrechnung stand seit v1021 im Bericht unter
    * ki_gegenrechnung, wurde aber nirgends dargestellt. Auch eingeschaltet
@@ -3704,6 +3724,9 @@ async function exportPdf(out) {
       if (i < segs.length - 1) { doc.setTextColor(...C.obj); doc.text('|', ox, 158.6); ox += 4.2; }
     });
   }
+  /* v3010 · Wertermittlungsstichtag unter der Objektzeile */
+  { const _w = _wstText(d); if (_w) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(...C.addr);
+      doc.text(_w.text + '  (' + _w.zusatz.replace(/[„“]/g, '"') + ')', LX, 167.2); } }
   // Marktwert prominent — Eyebrow Baseline 217, Wert 51pt Baseline 236.7 (Mockup)
   doc.setFontSize(9); doc.setTextColor(...C.eyebrow);
   doc.text('MARKTWERT-INDIKATION', LX, 217, { charSpace: 1.6 });
@@ -5196,66 +5219,9 @@ async function exportPdf(out) {
     doc.setFont('helvetica', 'normal'); doc.setTextColor(110, 110, 118);
     y += _kastenH + 4;
 
-    /* v1062-WZIN-3 · Die Anpassung nach Paragraf 33 lag vollstaendig im
-     * Ergebnis und wurde nirgends gezeigt. Sie ersetzt die Rechnung NICHT:
-     * gerechnet wird weiter mit dem amtlichen Zinssatz, der angepasste ist
-     * Stufe C und steht als Einordnung daneben. Jedes Merkmal einzeln, und
-     * die nicht bewertbaren ausdruecklich benannt. */
-    const _za = d.cross_check && d.cross_check.zins_anpassung;
-    if (_za && _za.verfuegbar && _za.merkmale && _za.merkmale.length) {
-      const _mName = { alter: 'Gebäudealter', wohnlage: 'Wohnlage', nutzung: 'Nutzung',
-        wohneinheiten: 'Wohneinheiten', groesse: 'Objektgröße' };
-      need(24 + _HR);
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
-      doc.setCharSpace(0.3);
-      /* v3009 · W3 · keine „Stufe C": DealPilot-Einordnung, nicht gerechnet. Die Anpassung nach
-         § 33 steht als Zeile im Rechenweg (Staffel), wenn der Ausschuss eine Funktion fuehrt. */
-      doc.text('EINORDNUNG DES ZINSSATZES · DEALPILOT-GEWICHTUNG, NICHT GERECHNET', M, y + 3);
-      doc.setCharSpace(0);
-      y += 7;
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
-      doc.text(String(_za.basis_pct).replace('.', ',') + ' % amtlich (gerechnet)'
-        + ((_za.anpassung_pct >= 0) ? '   +   ' : '   -   ')
-        + String(Math.abs(_za.anpassung_pct)).replace('.', ',') + ' Punkte   =   '
-        + String(_za.zins_pct).replace('.', ',') + ' %'
-        + (_za.gedeckelt ? '   (auf eine Standardabweichung gedeckelt)' : ''), M, y + 3);
-      y += 6;
-      doc.setFontSize(6.6);
-      _za.merkmale.forEach((_mk) => {
-        need(5 + _HR);
-        doc.setFont('helvetica', 'normal'); doc.setTextColor(...MUT);
-        doc.text((_mName[_mk.id] || _mk.id) + ' — ' + String(_mk.text || ''), M + 3, y + 2);
-        /* Statusfarben bleiben hart (rot rauf, gruen runter) — sie sind
-         * bewusst nicht im WL_TINTS-Satz. */
-        if (_mk.beitrag_pct >= 0) doc.setTextColor(184, 98, 92);
-        else doc.setTextColor(63, 165, 108);
-        doc.text(((_mk.beitrag_pct >= 0) ? '+' : '-')
-          + String(Math.abs(_mk.beitrag_pct)).replace('.', ',')
-          + '  (Gewicht ' + String(_mk.gewicht).replace('.', ',') + ')',
-          M + blockW, y + 2, { align: 'right' });
-        y += 3.7;
-      });
-      const _fehlt = ['alter', 'wohnlage', 'nutzung', 'wohneinheiten', 'groesse']
-        .filter((_id) => !_za.merkmale.some((_mk) => _mk.id === _id))
-        .map((_id) => _mName[_id] || _id);
-      if (_fehlt.length) {
-        doc.setFont('helvetica', 'italic'); doc.setFontSize(6.4); doc.setTextColor(...MUT);
-        const _fl = doc.splitTextToSize('Nicht bewertbar mangels Angabe: ' + _fehlt.join(', ')
-          + '. Diese Merkmale bleiben unberücksichtigt — ein Ersatzwert wäre eine Aussage '
-          + 'über etwas, das nicht erhoben wurde.', blockW - 3);
-        need(_fl.length * 3 + 4 + _HR);
-        doc.text(_fl, M + 3, y + 2); y += _fl.length * 3 + 2;
-        doc.setFont('helvetica', 'normal');
-      }
-      if (_za.hinweis) {
-        doc.setFontSize(6.2); doc.setTextColor(150, 143, 130);
-        const _zh = doc.splitTextToSize(String(_za.hinweis), blockW);
-        need(_zh.length * 2.9 + 4 + _HR);
-        doc.text(_zh, M, y + 2); y += _zh.length * 2.9 + 3;
-      }
-      y += 2;
-      doc.setFontSize(7.4); doc.setTextColor(...TXT);
-    }
+    /* v3010 · Hier stand der Block „Einordnung des Zinssatzes" (DealPilot-Merkmalskatalog,
+       cross_check.zins_anpassung). ImmoWertA kennt diesen Weg nicht, Marcel 27.10.2026 - gestrichen.
+       Die Anpassung nach § 33 steht als Zeile im Rechenweg (Staffel des Ertragswerts). */
 
     /* v1063-WOD-9 · Vierte und letzte Station: sichtbar machen. Ein Wert,
      * der nur klassiert veroeffentlicht ist, gehoert in den Bericht — als

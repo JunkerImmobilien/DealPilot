@@ -49,7 +49,8 @@ var WM_FIELDS = [
   'ausst_aussenwaende','ausst_dach','ausst_fenster','ausst_innenwaende',
   'ausst_decken','ausst_fussboeden','ausst_sanitaer','ausst_heizung','ausst_technik',
   'bes_bauteile','btl_gauben','btl_balkone','btl_vordach','btl_terrassen','btl_sonstige',
-  'lzs_pct','brw_manuell','brw_anpassung_pct','brw_anpassung_grund','brw_stichtag'
+  'lzs_pct','brw_manuell','brw_anpassung_pct','brw_anpassung_grund','brw_stichtag',
+  'wertermittlungsstichtag'   /* v3010 · leer = heute */
 ];
 
 var FIELDS = [

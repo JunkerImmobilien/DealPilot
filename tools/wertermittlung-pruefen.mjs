@@ -1262,7 +1262,8 @@ fallB('B54', () => {
   const s1 = (compute(ref, lv, null, null, par({ regionalfaktor: 1.2 })) || {}).sachwert || {};
   pruefe('B', 'B55', 'eigene Angabe 1,2 gilt, mit Hinweis auf § 10', s1.regionalfaktor === 1.2 && /§ 10/.test(String(s1.regionalfaktor_hinweis)), s1.regionalfaktor_hinweis);
   const s2 = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2025-06-15' })) || {}).sachwert || {};
-  wert('B', 'B56', 'Baupreisindex zum Stichtag 15.06.2025 (Mai 2025: 133,6 / 70,8)', s2.baupreisindex ? s2.baupreisindex.wert : null, 1.89, 0);
+  /* v3010 · gewollt geaendert: am 15.06.2025 war der Mai-Wert noch nicht veroeffentlicht (Rhythmus: Juli) -> Februar 2025 */
+  wert('B', 'B56', 'Baupreisindex zum Stichtag 15.06.2025 (veröffentlicht: Februar 2025, 132,6 / 70,8)', s2.baupreisindex ? s2.baupreisindex.wert : null, 1.87, 0);
   const s3 = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2099-01-01' })) || {}).sachwert || {};
   pruefe('B', 'B56', 'Stichtag in der Zukunft verworfen, heutiger Index', !!s3.baupreisindex && s3.baupreisindex.stichtag_verworfen === '2099-01-01' && s3.baupreisindex.wert === s0.baupreisindex.wert,
     JSON.stringify(s3.baupreisindex || null).slice(0, 80));
@@ -1297,6 +1298,37 @@ fallB('B54', () => {
     !!kMit && kMit.wert === kOhne.wert && (kMit.staffel || []).some((z) => /3,5 % → objektspezifisch angepasst 2,8 % \(A, angepasst\)/.test(z.pos))
       && (kMit.staffel || []).some((z) => /Bodenwertverzinsung .*× 2,8 %/.test(z.pos)),
     kMit && (kMit.staffel || []).map((z) => z.pos).filter((p) => /Liegenschaftszins|Bodenwertverzinsung|Barwert/.test(p)).join(' | '));
+}
+
+/* v3010 · B59 Wertermittlungsstichtag (Marcel 27.10.2026): heute (Pruefer-Uhr 21.10.2026) gegen 01.06.2024
+   an einem Testobjekt - Baupreisindex nach VEROEFFENTLICHTEM Stand, Alter/RND im Stichtagsjahr, Jahrgang des
+   Registers zum Stichtag, kuenftiger Stichtag verworfen. */
+{
+  const BPI = await lade('lib/baupreisindex.js'), ST = await lade('lib/stichtag.js'), REG = await lade('lib/ausschuss_register.js');
+  const am = (t) => { const x = BPI.baupreisindexAm(new Date(t + 'T12:00:00Z')); return x ? x.wert : null; };
+  wert('B', 'B59', 'Baupreisindex 21.10.2026 (August 2026, veröffentlicht 09.10.)', am('2026-10-21'), 2.00, 0);
+  wert('B', 'B59', 'Baupreisindex 01.09.2026: August noch nicht veröffentlicht → Mai 2026', am('2026-09-01'), 1.98, 0);
+  wert('B', 'B59', 'Baupreisindex 01.06.2024 (Februar 2024: 128,5 / 70,8)', am('2024-06-01'), 1.81, 0);
+  pruefe('B', 'B59', 'Stichtag in der Zukunft verworfen, heute', ST.stichtagAus('2099-01-01').eigen === false && ST.stichtagAus('2099-01-01').verworfen === '2099-01-01', JSON.stringify(ST.stichtagAus('2099-01-01').verworfen));
+  const ref = { property_type: 'efh', property_subtype: 'efh', living_area: 140, build_year: 1990, plot_area: 600,
+    ags: '05711000', standardstufe: 3, nhk_typ: '1.21', bgf: 225, gemeinde: 'Bielefeld' };
+  const par = (x) => Object.assign({ ags: '05711000', brw_sqm: 300, standardstufe: 3, bgf_direkt: 225 }, x || {});
+  const lv = { available: true, value_sqm: 300 };
+  const h = (compute(ref, lv, null, null, par()) || {}).sachwert || {};
+  const v = (compute(ref, lv, null, null, par({ wertermittlungsstichtag: '2024-06-01' })) || {}).sachwert || {};
+  wert('B', 'B59', 'Sachwert: Index im Rechenweg 01.06.2024', v.baupreisindex ? v.baupreisindex.wert : null, 1.81, 0);
+  wert('B', 'B59', 'Restnutzungsdauer +2 Jahre (Alter 34 statt 36, Stichtagsjahr − Baujahr)',
+    (v.restnutzungsdauer_jahre != null && h.restnutzungsdauer_jahre != null) ? v.restnutzungsdauer_jahre - h.restnutzungsdauer_jahre : null, 2, 0);
+  pruefe('B', 'B59', 'Sachwert 01.06.2024 weicht vom heutigen ab (Index und Alter)', h.value_eur != null && v.value_eur != null && h.value_eur !== v.value_eur,
+    'heute ' + h.value_eur + ' · 01.06.2024 ' + v.value_eur);
+  const jg = REG.mitRegisterStichtag('2024-06-01', () => REG.findeZweig('liegenschaftszinssatz', '05711000', 'we_v'));
+  const jgH = REG.findeZweig('liegenschaftszinssatz', '05711000', 'we_v');
+  pruefe('B', 'B59', 'Register-Jahrgang zum Stichtag: Bielefeld ETW 01.06.2024 → Satz 31.12.2023, heute jüngster',
+    !!jg && String(jg.stichtag).slice(0, 10) === '2023-12-31' && !!jgH && String(jgH.stichtag) > '2024', (jg && jg.stichtag) + ' / ' + (jgH && jgH.stichtag));
+  const m1 = CCS.mietabweichungBog([{ nr: 1, differenz_jahr: 1200, befristet_bis: '2026-06-01' }], 3, 40, new Date('2024-06-01T12:00:00Z'));
+  const m2 = CCS.mietabweichungBog([{ nr: 1, differenz_jahr: 1200, befristet_bis: '2026-06-01' }], 3, 40, new Date('2026-06-01T12:00:00Z'));
+  pruefe('B', 'B59', 'Mietabweichung: Restlaufzeit ab Stichtag (2 Jahre ab 01.06.2024, 0 ab 01.06.2026)',
+    !!m1 && !!m2 && m1.zeilen[0].jahre === 2 && m2.zeilen[0].jahre === 0, JSON.stringify(m1 && m1.zeilen && m1.zeilen[0] && m1.zeilen[0].jahre) + '/' + JSON.stringify(m2 && m2.zeilen && m2.zeilen[0] && m2.zeilen[0].jahre));
 }
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */

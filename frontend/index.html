@@ -1575,6 +1575,9 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Bodenrichtwert manuell (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw_manuell" type="text" inputmode="decimal" placeholder="leer = amtlicher Abruf" class="trl"></div></div>
       <div class="f"><label>Bodenwert-Anpassung (%)</label><div class="iw"><input id="brw_anpassung_pct" type="text" inputmode="decimal" placeholder="z. B. -10 für Lärmbelastung" class="tr"><span class="sfx">%</span></div></div>
       <div class="f s2"><label>Begründung der Anpassung</label><div class="iw"><input id="brw_anpassung_grund" type="text" placeholder="Pflicht, sobald eine Anpassung eingetragen ist" class="tr"></div></div>
+      <!-- v3010 · Wertermittlungsstichtag (Marcel 27.10.2026): leer = Tag der Berichtserstellung. Am Stichtag haengen
+           Baupreisindex, Alter/Restnutzungsdauer, Mietabweichung, Zensus- und BWK-Fortschreibung und der Jahrgang des Registers. -->
+      <div class="f"><label title="Der Zeitpunkt, auf den sich die Wertermittlung bezieht (§ 2 Abs. 4 ImmoWertV). Leer = heute, also der Tag, an dem der Marktbericht erstellt wird. Ein Datum in der Zukunft wird nicht übernommen.">Wertermittlungsstichtag <span style="font-weight:400;opacity:.7">(leer = heute)</span></label><div class="iw" style="display:flex;gap:6px;align-items:center"><input id="wertermittlungsstichtag" type="date" class="tr" style="flex:1 1 auto;min-width:0"><button type="button" id="wst_kaufdat" class="btn btn-ghost" style="flex:0 0 auto;white-space:nowrap;font-size:12px;padding:4px 8px" title="Kaufdatum aus dem Reiter Objekt übernehmen" onclick="var k=document.getElementById('kaufdat'),w=document.getElementById('wertermittlungsstichtag');if(!k||!k.value){this.textContent='kein Kaufdatum';return;}w.value=k.value;w.dispatchEvent(new Event('input',{bubbles:true}));w.dispatchEvent(new Event('change',{bubbles:true}));">= Kaufdatum</button></div></div>
     </div>
   </div>
 
@@ -3730,7 +3733,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v2992"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3008"></script>
+<script src="js/storage.js?v=v3010"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2966d"></script>
@@ -3826,7 +3829,7 @@ label.dp-required.qc-required::after {
 <script src="js/bestand-analyse.js?v=v2985"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
 <script src="js/jahresstaende.js?v=v2989"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/wert-zielbild.js?v=v2999"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
-<script src="js/dealpilot-mb.js?v=v3008"></script>
+<script src="js/dealpilot-mb.js?v=v3010"></script>
 <script src="js/mb-abgleich.js?v=v3002d"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2969"></script>

@@ -158,162 +158,18 @@ export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung =
 }
 
 /* ════════════════════════════════════════════════════════════════════════
- * 2 · DIE OBJEKTSPEZIFISCHE ZINSANPASSUNG
+ * 2 · ENTFERNT (v3010): DER DEALPILOT-MERKMALSKATALOG ZUM ZINS
  *
- * Paragraf 33 ImmoWertV kennt den "objektspezifisch angepassten
- * Liegenschaftszinssatz" — nicht den Tabellenwert roh. Der Marktbericht gibt
- * in Abschnitt 8 den Katalog vor, in welche Richtung welches Merkmal wirkt.
- *
- * DIE GEWICHTE SIND GESETZT, NICHT ABGELEITET. Der Ausschuss nennt die
- * Richtungen, nicht ihre Staerke. Deshalb:
- *   - die Summe wird auf EINE Standardabweichung gedeckelt, also auf den
- *     Spielraum, den der Ausschuss selbst veroeffentlicht
- *   - das Ergebnis ist Stufe C (marktabgeleitet), NIE Stufe A
- *   - jedes Merkmal wird einzeln ausgewiesen, damit ein Sachverstaendiger
- *     widersprechen kann
- *
- * Wer andere Gewichte fuer richtig haelt, sieht sie und kann sie ersetzen.
+ * Hier stand angepassterZins() mit MERKMALE: Gebaeudealter, Wohnlage, Nutzung,
+ * Wohneinheiten und Groesse, je mit einem von DealPilot GESETZTEN Gewicht, gedeckelt
+ * auf eine Standardabweichung, ausgewiesen als „Stufe C" (bis v3009) bzw. als
+ * „Einordnung, nicht gerechnet". Die ImmoWertA kennt diesen Weg nicht: § 33 passt
+ * nur mit der Funktion oder den Umrechnungskoeffizienten des Ausschusses selbst an
+ * (lib/lzs_anpassung.js, v3009); was die nicht traegt, gehoert in die boG
+ * (ImmoWertA zu § 33). Marcel 27.10.2026: streichen.
+ * Einziger Aufrufer war CrossCheckService (out.zins_anpassung), einziger Leser
+ * der PDF-Block in frontend/marktbericht-app/app.js - beide entfernt.
  * ════════════════════════════════════════════════════════════════════════ */
-
-const NEUTRAL_TEXT = { alter: 'das Gebäudealter ist mittel', wohnlage: 'die Wohnlage ist durchschnittlich',
-  nutzung: 'die Nutzung ist gemischt', wohneinheiten: 'die Zahl der Wohneinheiten ist mittel', groesse: 'die Größe entspricht dem Normobjekt' };   /* v2383 */
-export const MERKMALE = [
-  {
-    id: 'alter', gewicht: 0.30,
-    hoch: 'das Gebäude ist alt oder sehr alt',
-    runter: 'das Gebäude ist neu',
-  },
-  {
-    id: 'wohnlage', gewicht: 0.25,
-    hoch: 'die Wohnlage ist eher mäßig',
-    runter: 'die Wohnlage ist überdurchschnittlich',
-  },
-  {
-    id: 'nutzung', gewicht: 0.20,
-    hoch: 'die Kapitalanlage steht im Vordergrund',
-    runter: 'die Eigennutzung steht im Vordergrund',
-  },
-  {
-    id: 'wohneinheiten', gewicht: 0.15,
-    hoch: 'viele Wohneinheiten im Objekt',
-    runter: 'wenige Wohneinheiten im Objekt',
-  },
-  {
-    id: 'groesse', gewicht: 0.10,
-    hoch: 'das Objekt ist klein',
-    runter: 'das Objekt ist sehr groß',
-  },
-];
-
-const spanne = (x, stufen) => {
-  for (const [grenze, wert] of stufen) {
-    if (x <= grenze) return wert;
-  }
-  return stufen[stufen.length - 1][1];
-};
-
-/**
- * Objektspezifisch angepasster Liegenschaftszinssatz nach § 33 ImmoWertV.
- *
- * @param {object} o
- * @param {number} o.basis_pct        amtlicher Ausgangswert
- * @param {number} [o.stabw_pct]      veröffentlichte Standardabweichung
- * @param {number} [o.gebaeudealter]
- * @param {number} [o.mikrolage_score] 0 bis 100
- * @param {string} [o.nutzung]
- * @param {number} [o.wohneinheiten]
- * @param {number} [o.wohnflaeche_qm]
- * @param {number} [o.normobjekt_qm]   Wohnfläche der Ausschuss-Stichprobe
- */
-export function angepassterZins({
-  basis_pct, stabw_pct = null, gebaeudealter = null, mikrolage_score = null,
-  nutzung = null, wohneinheiten = null, wohnflaeche_qm = null, normobjekt_qm = null,
-}) {
-  const basis = Number(basis_pct);
-  if (!(basis > 0)) return null;
-
-  const stabw = Number(stabw_pct);
-  if (!(stabw > 0)) {
-    return { verfuegbar: false, grund: 'keine_streuung',
-      hinweis: 'Ohne veröffentlichte Standardabweichung fehlt der Rahmen, innerhalb dessen '
-        + 'angepasst werden darf. Es bleibt beim amtlichen Ausgangswert.' };
-  }
-
-  const teile = [];
-  const bewerte = (id, richtung, text) => {
-    if (richtung === null) return;
-    const m = MERKMALE.find((x) => x.id === id);
-    teile.push({ id, gewicht: m.gewicht, richtung,
-      beitrag_pct: Math.round(m.gewicht * richtung * stabw * 1000) / 1000,
-      /* v2383 · Richtung 0 ist NEUTRAL: hier stand bei Beitrag 0 „die Wohnlage ist
-         ueberdurchschnittlich" - eine Begruendung fuer einen Abschlag, der nicht stattfand. */
-      neutral: richtung === 0,
-      text: richtung > 0 ? m.hoch : (richtung < 0 ? m.runter : (NEUTRAL_TEXT[id] || 'durchschnittlich') + ' — kein Zu- oder Abschlag') });
-  };
-
-  /* Alter: der Bericht nennt "alt / sehr alt" und "sehr neu". */
-  /* v1062-WZIN-1 · Number(null) ist 0 und besteht Number.isFinite. Ohne
-   * Baujahr wurde das Gebaeude damit als "sehr neu" eingestuft und der
-   * Zinssatz um 0,33 Punkte gesenkt — eine Aussage ueber ein Merkmal, das
-   * niemand erhoben hat. Fehlt die Angabe, faellt das Merkmal aus. */
-  const alt = (gebaeudealter === null || gebaeudealter === undefined
-    || gebaeudealter === '') ? NaN : Number(gebaeudealter);
-  bewerte('alter', (Number.isFinite(alt) && alt >= 0)
-    ? spanne(alt, [[10, -1], [25, -0.5], [45, 0], [65, 0.5], [Infinity, 1]]) : null);
-
-  /* Wohnlage: unser Mikrolage-Score als Naeherung. */
-  /* v1062-WZIN-2 · Dieselbe Falle, teurer: ein fehlender Mikrolage-Score
-   * wurde als 0 gelesen und damit als schlechteste denkbare Wohnlage —
-   * der staerkste Einzelbeitrag des ganzen Katalogs (+0,275), begruendet
-   * im Klartext mit "die Wohnlage ist eher maessig". */
-  const lage = (mikrolage_score === null || mikrolage_score === undefined
-    || mikrolage_score === '') ? NaN : Number(mikrolage_score);
-  bewerte('wohnlage', (Number.isFinite(lage) && lage > 0)
-    ? spanne(lage, [[35, 1], [50, 0.5], [70, 0], [85, -0.5], [Infinity, -1]]) : null);
-
-  /* Nutzung. */
-  const nz = String(nutzung || '').toLowerCase();
-  bewerte('nutzung', /kapital|rendite|vermiet/.test(nz) ? 1
-    : /eigen|selbst/.test(nz) ? -1 : null);
-
-  /* Wohneinheiten: "je weniger" runter, "je mehr" rauf. */
-  const we = Number(wohneinheiten);
-  bewerte('wohneinheiten', Number.isFinite(we) && we > 0
-    ? spanne(we, [[2, -1], [6, -0.25], [20, 0.5], [Infinity, 1]]) : null);
-
-  /* Groesse gegen das Normobjekt der Ausschuss-Stichprobe. */
-  const wfl = Number(wohnflaeche_qm), norm = Number(normobjekt_qm);
-  bewerte('groesse', (wfl > 0 && norm > 0)
-    ? spanne(wfl / norm, [[0.7, 1], [0.9, 0.5], [1.3, 0], [1.8, -0.5], [Infinity, -1]]) : null);
-
-  const roh = teile.reduce((a, t) => a + t.beitrag_pct, 0);
-  /* Gedeckelt auf eine Standardabweichung — den Spielraum, den der Ausschuss
-   * selbst veroeffentlicht. Darueber hinaus waere es keine Anpassung mehr,
-   * sondern ein anderer Wert. */
-  const gedeckelt = Math.max(-stabw, Math.min(stabw, roh));
-  const zins = Math.round((basis + gedeckelt) * 100) / 100;
-
-  return {
-    verfuegbar: true,
-    basis_pct: basis,
-    anpassung_pct: Math.round(gedeckelt * 100) / 100,
-    zins_pct: zins,
-    gedeckelt: Math.abs(roh - gedeckelt) > 0.001,
-    spanne_von: Math.round((basis - stabw) * 100) / 100,
-    spanne_bis: Math.round((basis + stabw) * 100) / 100,
-    merkmale: teile,
-    /* v3009 · W3 · keine „Stufe C" mehr: das ist eine EINORDNUNG mit DealPilot-Gewichten, nicht die
-       Anpassung nach § 33 (die rechnet lib/lzs_anpassung.js mit den Koeffizienten des Ausschusses).
-       Sie geht in keine Rechnung ein. */
-    stufe: null, art: 'dealpilot_einordnung',
-    hinweis: 'Einordnung des Zinssatzes, nicht gerechnet: angepasst wird nach § 33 ImmoWertV nur mit der '
-      + 'Funktion oder den Umrechnungskoeffizienten des Gutachterausschusses selbst. '
-      + 'Ausgangswert ist der amtliche Zinssatz; die Einordnung folgt einem Merkmalskatalog und bleibt innerhalb der '
-      + 'veröffentlichten Streuung. Die Gewichtung der Merkmale ist eine Festlegung von DealPilot, nicht des '
-      + 'Ausschusses — sie macht das Ergebnis nachvollziehbar und für jedes Objekt gleich, '
-      + 'ersetzt aber keine sachverständige Würdigung des Einzelfalls.',
-  };
-}
 
 /* ════════════════════════════════════════════════════════════════════════
  * 3 · VERFAHRENSWAHL MIT DEM IMMOBILIENRICHTWERT (v2620, Marcel 21.10.2026: E7)
