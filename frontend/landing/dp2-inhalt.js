@@ -244,7 +244,7 @@
 
   var SUB = {
     einzel: 'Für private Investoren — ein Konto, deine Objekte.',
-    partner: 'Für Kanzleien, Maklerbüros und Finanzierer — Ihre Mandanten unter Ihrer Marke.',
+    partner: 'Für Kanzleien, Maklerbüros und Finanzierer — deine Mandanten unter deiner Marke.',
   };
   function artSetzen(art) {
     var p = art === 'partner';

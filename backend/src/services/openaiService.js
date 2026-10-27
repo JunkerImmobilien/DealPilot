@@ -2096,7 +2096,7 @@ async function analyze(payload, opts) {
        strukturierten Quellenfelder - die LANGTEXTE
        (`makrolage_recherche`, `kaufpreisniveau`, …) tragen ihre Links im
        Fliesstext und kamen dort nie an. */
-    analysis: _offerteDeckeln(_analyseUrlsSaeubern(parsed), payload),
+    analysis: _offerteDeckeln(_analyseQuellenNeutral(_analyseUrlsSaeubern(parsed)), payload),
     raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
 }
@@ -2120,6 +2120,53 @@ function _analyseUrlsSaeubern(a) {
  * V36: Kompakte Lage-Bewertung (Makro + Mikro) für eine Adresse.
  * Kurzer Output, eigener Endpoint, eigenes JSON-Schema.
  */
+/* ══ v2972 · KEIN QUELLENNAME IM TEXT DER PILOT-ANALYSE (Marcel 27.10.2026) ══
+   Das Investment-PDF 2026-1078 nannte unter „Lage & Markt" „von miet-check.de".
+   Die Regel steht seit v2264 im Prompt (Z. ~1609) - das Modell ueberliest sie.
+   Ein Hinweis verliert gegen das Werkzeug; also wird die ANTWORT bereinigt:
+   Portal- und Anbieternamen werden ersetzt, Domains, die nicht amtlich sind,
+   fallen aus dem Fliesstext (mit ihrer Praeposition), und die Quellenliste
+   verliert Eintraege solcher Seiten. Amtliche Stellen bleiben, ImmoMetrica auch. */
+const _QN_AMTLICH = /(\.bund\.de|destatis|statistik|bundesbank|gutachterausschu|boris|regionalstatistik|zensus|\.nrw\.de|it\.nrw|\.bayern\.de|\.hessen\.de|\.niedersachsen\.de|\.sachsen\.de|berlin\.de|hamburg\.de|bremen\.de|\.ihk\.de|stadt|gemeinde|kreis|rathaus|haus-?und-?grund|immometrica|arbeitsagentur|europa\.eu|bbsr)/i;
+const _QN_PORTAL_NAME = /\b(ImmobilienScout\s?24|Immobilien\s?Scout\s?24|ImmoScout\s?24|ImmoScout|Immowelt|Immonet|immoportal|Wohnungsb(?:oe|ö)rse|Homeday|meinestadt|Kleinanzeigen|Kalaydo|wohnpreis|immopreise|Immo-?Kompass)\b/gi;
+const _QN_ANBIETER_NAME = /\b(Sprengnetter|PriceHubble|GeoMap|on-geo|empirica|bulwiengesa)\b/gi;
+const _QN_DOMAIN = /(\s*\(?\s*(?:Quelle:\s*|von\s+|laut\s+|lt\.\s*|auf\s+|bei\s+|via\s+|nach\s+)?)(?:https?:\/\/)?(?:www\.)?([a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)*\.(?:de|com|net|org|eu|info|io))\b(?:\/[^\s),;]*)?(\s*\))?/gi;
+function _quelleNeutralText(t) {
+  return String(t)
+    .replace(_QN_DOMAIN, function (m, vor, dom) {
+      if (_QN_AMTLICH.test(dom)) return m;
+      if (/laut|lt\.|nach/i.test(vor || '')) return (/^\s*[LN]/.test(vor) ? ' Laut' : ' laut') + ' aktuellen Marktdaten';
+      return '';
+    })
+    .replace(_QN_PORTAL_NAME, 'Angebotsportalen')
+    .replace(_QN_ANBIETER_NAME, 'unabhängiger Bewertungspartner')
+    .replace(/\s+([.,;:])/g, '$1').replace(/,([.;:])/g, '$1').replace(/\(\s*\)/g, '').replace(/ {2,}/g, ' ');
+}
+function _quelleIstMarktseite(q) {
+  const t = typeof q === 'string' ? q : (q && (q.url || q.quelle || q.label || q.name)) || '';
+  if (!t || _QN_AMTLICH.test(t)) return false;
+  _QN_PORTAL_NAME.lastIndex = 0; _QN_ANBIETER_NAME.lastIndex = 0;
+  return _QN_PORTAL_NAME.test(t) || _QN_ANBIETER_NAME.test(t) || /\.(de|com|net|org|eu|info|io)\b/i.test(t);
+}
+function _analyseQuellenNeutral(a, schluessel) {
+  if (a == null) return a;
+  if (typeof a === 'string') {
+    /* ein Feld, das nur eine Quelle traegt, wird bei einer Marktseite neutral */
+    if ((schluessel === 'quelle' || schluessel === 'mietspiegel_herkunft') && _quelleIstMarktseite(a)) return schluessel === 'quelle' ? null : 'aktueller Marktdurchschnitt';
+    return _quelleNeutralText(a);
+  }
+  if (Array.isArray(a)) {
+    const l = schluessel === 'quellen' ? a.filter(function (q) { return !_quelleIstMarktseite(q); }) : a;
+    return l.map(function (x) { return _analyseQuellenNeutral(x, schluessel); });
+  }
+  if (typeof a === 'object') {
+    const out = {};
+    for (const k of Object.keys(a)) out[k] = _analyseQuellenNeutral(a[k], k);
+    return out;
+  }
+  return a;
+}
+
 async function analyzeLage(payload, opts) {
   const adresse = payload.adresse || [payload.str, payload.hnr, payload.plz, payload.ort].filter(Boolean).join(' ');
   if (!adresse) throw new Error('Keine Adresse übergeben');
@@ -4003,5 +4050,6 @@ module.exports = {
   extractBeleg,
   extractRndg,       /* v1677 */
   extractDokument,   /* v1678 */
+  _analyseQuellenNeutral,   /* v2972 · fuer den Pruefer */
   extractJson
 };

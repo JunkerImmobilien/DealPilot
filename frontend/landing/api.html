@@ -6,8 +6,8 @@
 <title>API · DealPilot</title>
 <meta name="description" content="Die DealPilot REST-API: Objekte programmatisch anlegen, lesen, ändern und löschen. JSON über HTTPS, Header X-API-Key, 120 Anfragen pro Minute. Enthalten im Pro- und im Partner-Plan.">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="dp2.css?v=v2966f">
-<link rel="stylesheet" href="dp2-teile.css?v=landing-tband-1">
+<link rel="stylesheet" href="dp2.css?v=v2971b">
+<link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    API-Dokumentation aus frontend/landing/index.html Z.1348-1446 (7 Kapitel).
@@ -63,8 +63,11 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .fldt td{padding:6px 10px;border-top:1px solid rgba(127,127,127,.16);font-size:13px;vertical-align:top}
 .fldt td:first-child{white-space:nowrap;width:1%}
 @media(max-width:820px){
-.api-layout{grid-template-columns:1fr;gap:20px}
+.api-layout{grid-template-columns:minmax(0,1fr);gap:20px}  /* v2971: 1fr wuchs bei 360 px auf 1033 px (min-content der Codebloecke) */
 .api-nav{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
+pre{overflow-x:auto;max-width:100%}  /* v2971: Codezeilen (white-space:pre) schoben die Seite bei 360 px auf 1033 px */
+table.fldt tr td:first-child{white-space:normal;overflow-wrap:anywhere;width:38%}  /* v2971: Feldnamen-Spalte (nowrap, auch im zweiten style-Block Z. 228) trug die Tabelle auf 552 px */
+.ep{flex-wrap:wrap}.ep .path{min-width:0;overflow-wrap:anywhere}.ep .desc{margin-left:0;flex-basis:100%}  /* v2971: Endpunkt-Zeilen (Pfad + Beschreibung nebeneinander) liefen bei 360 px bis 450 px */
 .api-nav a{border-left:0;border-bottom:2px solid transparent}
 .api-nav a.on{border-left:0;border-bottom-color:var(--gd)}
 }
@@ -122,7 +125,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
     <li><a href="dp2.html#pricing">Preise<i class="kar"></i></a>
       <ul class="sub">
         <li><a href="dp2.html#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
-        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
+        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Deine Mandanten unter deiner Marke</span></span></a></li>
         <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
       </ul></li>
     <li><a href="dp2.html#partner">Partner</a></li>
@@ -133,7 +136,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       </ul></li>
   </ul>
   <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
-  <a class="b-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1"><span class="b-cta-voll">Kostenlos starten</span><span class="b-cta-kurz">Starten</span></a>
 </div></nav>
 
 

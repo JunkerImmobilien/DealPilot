@@ -336,7 +336,7 @@
   /* ── Das Modell: Wohnungen und Stufen ───────────────────────────────── */
   function objektVgl() {
     var v = zahl(wert('zb_vgl_qm'));
-    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Objekt)' };
+    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)' };
     v = zahl(wert('ds2_marktmiete'));
     if (v > 0) return { qm: v, herkunft: 'Marktmiete (Tab Miete)' };
     v = zahl(wert('me_soll'));

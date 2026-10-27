@@ -464,7 +464,7 @@
       knoten: [
         { id: 'z1', s: 0, z: 0, t: 'Soll-Miete eintragen', k: 'Mieter bleibt · § 558 BGB',
           d: 'Die Soll-Miete ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Lässt du das Feld leer, rechnet DealPilot sie vor: bis zur Vergleichsmiete, frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze (15 % oder 20 % in drei Jahren). Deine eigene Angabe überschreibt immer.',
-          unter: [['Karte öffnen', 'Reiter Objekt, Karte „Mieterhöhung und Zielbild (optional)“.'], ['Vergleichsmiete (€/m²)', 'Die ortsübliche Vergleichsmiete. Leer: die Marktmiete aus dem Reiter Miete.'], ['Soll-Miete (Mieter bleibt, €/m²)', 'Leer lassen, dann steht darunter der Vorschlag mit Begründung — oder eine eigene Zahl eintragen.'], ['Soll erreichbar ab', 'Leer: 15 Monate nach der letzten Erhöhung aus dem Mietvertrag.']],
+          unter: [['Karte öffnen', 'Reiter Investition, Karte „Mieterhöhung und Zielbild (optional)“.'], ['Vergleichsmiete (€/m²)', 'Die ortsübliche Vergleichsmiete. Leer: die Marktmiete aus dem Reiter Miete.'], ['Soll-Miete (Mieter bleibt, €/m²)', 'Leer lassen, dann steht darunter der Vorschlag mit Begründung — oder eine eigene Zahl eintragen.'], ['Soll erreichbar ab', 'Leer: 15 Monate nach der letzten Erhöhung aus dem Mietvertrag.']],
           ein: ['Ist-Miete', 'Vergleichsmiete', 'letzte Mieterhöhung', 'Kappungsgrenze'], aus: ['Soll-Miete', 'Mieterhöhung je Monat'],
           ziel: { tab: 's0' }, beleg: 'frontend/index.html:Soll-Miete (Mieter bleibt, €/m²)' },
         { id: 'z2', s: 0, z: 1, t: 'Zielbild und Maßnahmen', k: 'nach Umbau oder Neuvermietung',
@@ -473,7 +473,7 @@
           ein: ['Zielmiete', 'Maßnahmen', 'Kosten'], aus: ['Zielbild', 'Modernisierungspunkte', 'Maßnahmenkosten'],
           ziel: { tab: 's0' }, beleg: 'frontend/js/potenzial.js:MASSNAHMEN' },
         { id: 'z3', s: 0, z: 2, t: 'Mehrfamilienhaus: je Wohnung', k: 'Einheiten erfassen › Details', opt: true,
-          d: 'Beim Mehrfamilienhaus stehen Soll-Miete und Zielbild je Wohnung. Die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.',
+          d: 'Beim Mehrfamilienhaus stehen Soll-Miete und Zielbild je Wohnung. Die Karte im Reiter Investition zeigt dann nur die Summe aus den Wohnungen.',
           unter: [['Einheiten erfassen', 'Knopf unter der Wohnfläche im Reiter Objekt.'], ['Details', 'In der Liste die Wohnung öffnen: Mietvertrag, Soll-Miete, Zielbild mit Maßnahmen, Ertragswert.'], ['Maßnahmen am ganzen Haus', 'Im Schritt Gebäude: Dach, Fassade, Fenster, Heizung, Leitungen mit Kosten. Kosten nach Wohnfläche verteilt, Punkte für jede Wohnung, je Gewerk nur einmal.'], ['Aufgeteilt?', 'Im Schritt Gebäude der Haken „In Wohnungseigentum aufgeteilt“ und die Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung).']],
           ein: ['Wohnungen', 'Ist-Miete je Wohnung'], aus: ['Summe aus den Wohnungen', 'Anteil Haus je Wohnung', 'Ertragswert je Wohnung'],
           ziel: { tab: 's0' }, beleg: 'frontend/js/mfh-einheiten.js:Zielbild · nach Umbau' },

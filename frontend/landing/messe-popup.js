@@ -340,6 +340,14 @@
       '  #' + ID + ' .mp-tband img{width:26px;height:26px}',
       '  #' + ID + ' .mp-fuss{flex-direction:column;align-items:stretch;padding:16px}',
       '  #' + ID + ' .mp-fuss .mp-btn,#' + ID + ' .mp-fuss .mp-btn-l{text-align:center}',
+      /* v2971 · gemessen bei 360 px: die zwei Knoepfe standen linksbuendig in
+         eigener Breite (150 / 174 px) untereinander, "Vielleicht spaeter" 43 px
+         hoch; das Schliessen-X 34x34 eckig. Jetzt volle Breite, der
+         Hauptknopf zuerst, beide 48 px; das X rund und 44 px. */
+      '  #' + ID + ' .mp-fuss > div:last-child{display:flex;flex-direction:column-reverse;gap:10px}',
+      '  #' + ID + ' .mp-fuss .mp-btn,#' + ID + ' .mp-fuss .mp-btn-l{width:100%;min-height:48px}',
+      '  #' + ID + ' .mp-zu{width:44px;height:44px;border-radius:50%;top:-10px;right:-6px;font-size:22px;',
+      '    display:flex;align-items:center;justify-content:center;padding:0}',
       '}',
       '@keyframes mpRuckQ{0%{transform:translateY(0)}40%{transform:translateY(-3px)}',
       '  70%{transform:translateY(2px)}100%{transform:translateY(0)}}',
@@ -415,7 +423,7 @@
       +     '<div><b>Aus der Gutachtenpraxis</b><span>DESAG-geprüfter Sachverständiger</span></div></div>'
       +   '<div><svg viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/>'
       +     '<path d="m9 12 2.2 2.2L15.5 10"/></svg>'
-      +     '<div><b>Ihre Daten bleiben Ihre</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>'
+      +     '<div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>'
       +   '<div class="weg-handy"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/>'
       +     '<path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>'
       +     '<div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>'

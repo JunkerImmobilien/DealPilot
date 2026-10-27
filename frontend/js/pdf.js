@@ -1080,7 +1080,8 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     var t = [];
     if (a.makrolage_recherche) t.push('Makrolage: ' + clean(a.makrolage_recherche));
     if (a.mikrolage_recherche) t.push('Mikrolage: ' + clean(a.mikrolage_recherche));
-    if (a.mietspiegel_eur_qm != null && a.mietspiegel_eur_qm !== '') t.push('Mietspiegel: ' + clean(a.mietspiegel_eur_qm) + ' €/m²' + (a.mietspiegel_herkunft ? ' (' + clean(a.mietspiegel_herkunft) + ')' : ''));
+    if (a.mietspiegel_eur_qm != null && a.mietspiegel_eur_qm !== '') t.push('Mietspiegel: ' + clean(a.mietspiegel_eur_qm).replace(/\s*(?:€|EUR|Euro)(?:\s*\/\s*(?:m²|m2|qm))?\s*$/i, '') + ' €/m²'   /* v2970 · die KI liefert den Wert oft MIT Einheit ("9,81 €") - sonst "9,81 € €/m²" */
+       + (a.mietspiegel_herkunft ? ' (' + clean(a.mietspiegel_herkunft) + ')' : ''));
     if (a.kaufpreisniveau) t.push('Kaufpreisniveau: ' + clean(a.kaufpreisniveau));
     if (t.length) block('Lage & Markt', t.join('\n\n'));
   })();

@@ -2669,7 +2669,19 @@ Stripe LIVE seit 15.07. · Caddyfile repo-gepflegt ·
 
 ## OFFENE PUNKTE
 
-**Demo-Konto info@ — Staging und Prod laufen seit 25.10.2026 auseinander.**
+**Demo-Konto info@ — seit 26.10.2026 wieder gespiegelt.** Die 19 Objekte, die
+es auf beiden Seiten gibt, sind am 26.10. per ID von Staging nach Prod
+übertragen (md5 19/19), dazu die 17 Marktberichte. 9 Testobjekte liegen nur
+auf Staging, 5 nur auf Prod. **Parkstr. 9 (DEMO-BO6) seit v2968b:** Ankauf-Stand
+zum 23.12.2024 mit KP 395.000 / Darlehen 324.000 (DSCR 1,79, Score 65; Mieten,
+Leerstand, Modernisierung = Stand beim Kauf), heute DSCR 2,43, Score 69; zwei
+Pilot-Analysen vom 26.10. (Ankauf „Kaufen“ 372.000, heute „Kaufen“ 395.000).
+Auf beiden Servern md5-gleich in `_ankauf` und `_ai`; übrige Felder des
+Prod-Objekts weichen in Rechenfeldern leicht ab (dort geöffnet).
+**Vor jedem Skript-`loadData` an einem Demo-Objekt `saveObj` stummschalten**
+(FALLEN.md, 26.10.).
+
+*Vorgeschichte:*
 Am 23.10. wurden die 17 Demo-Objekte per ID nach Prod gespiegelt. Am 25.10.
 nur auf **Staging** geändert (mit Marcels Freigabe): Kaufpreise Parkstr. 9
 395.000 (vorher 780.000), Bismarckstr. 27 850.000 (1,15 Mio), Hölderlinstr. 1
@@ -2678,8 +2690,24 @@ Darlehen im selben Verhältnis, EK = Gesamtinvestition − Darlehen; Parkstr. 9
 Modernisierung eingetragen; Musterstraße 12 Grundstück 1.200 m²; Westerfeld-
 Kopie `c5a78c89` („E2E“) und Am Markt 9 privat `cea958eb` auf „Verloren“
 (endgültig löschen macht Marcel). Behalten: Westerfeld `ae155d38`
-(Spot/Videos), Am Markt 9 VV-GmbH `ec2d0f32`. Soll Prod für die Messe
-denselben Stand zeigen, muss wieder gespiegelt werden (vorher sichern).
+(Spot/Videos), Am Markt 9 VV-GmbH `ec2d0f32`. Seit dem Spiegel vom 26.10. erledigt; bei neuen Änderungen
+wieder spiegeln (vorher sichern).
+
+**Stand 26.10.2026 abends (Sitzungsende, Prod = Staging `24578bd` + Journal):**
+- Videothek 30 von 30 mit Marcels Stimme, Modul 14 neu (v2968), Vorschaubilder
+  14/18 neu; Video-URLs `?v=marcel-20261026b`, Bilder `?v=v2968`,
+  `dp2-live.js` Buster `landing-videothek-4f` in `index.html` UND
+  `videothek.html` (die zweite Seite hat einen EIGENEN Buster — beim nächsten
+  Mal beide ziehen). Higgsfield-Rest rund 82 Credits.
+- Offen bei Marcel: echter Telegram-Dialog (Hilfe, Bewertung bis „Ja“, PDFs);
+  Social-Media-Paket `Dateien/Social-Media/2026-10-26-messe-immocation/`
+  (welches Instagram-Profil, Festival-Hashtag, Ticketcodes); Pilot-Analyse nennt
+  den DealScore (97), die Karte den Investor Deal Score (69) — auf einen Score
+  ausrichten?; Kopien Westerfeld `c5a78c89` und Am Markt 9 `cea958eb` endgültig
+  löschen (macht Marcel); Anzeige-Widerspruch MFH-Gebäudezustand gegen
+  Objektfelder (Parkstr. 9).
+- Aufräumen: Sicherungsreste mit `\r` im Namen in `/root/backups` auf Prod
+  (`…-1649`, 25.10.); Rohaufnahmen in `Dateien/Messe/Videos/alt-vor-*`.
 
 **Messe-Material (Messe Leipzig 31.10.–01.11.2026):** Storybook aus
 `tools/messe-storybook.mjs` → `Dateien/Messe/DealPilot Messe-Storybook.pdf`
@@ -42544,3 +42572,24 @@ Marcel 22.10.2026: „ja rollout 62".
   **(3) Eigener Fehler:** Skript-`loadData` des Kaufzustands (ohne `_ankauf`) löste das Auto-Festschreiben aus und SPEICHERTE das Objekt sofort im Kaufzustand. Sofort zurückgeschrieben, Feld für Feld gegen den Abzug vorher geprüft (nur `_at`, `_ankauf`, `_ai` verschieden). FALLEN.md-Eintrag.
   **(4) Modul 14** neu aufgenommen (Agent, v2968 `ba94a737`, Krücke R14_ANKAUF raus, Szene 9 liest beide Analysen), Satz 10 neu vertont (0,92 Credits), gemischt 158,0 s, Landing −16,8 LUFS. Alte Fassungen `Dateien/Messe/Videos/alt-vor-v2968/`, auf Staging `medien/videothek/alt-vor-v2968/`. Vorschaubilder 14 (Kapitel 3, Kaufpreis 395.000) und 18 (Lage) neu; `dp2-live.js` `bild()` hängt `?v=v2968` an, Videos `?v=marcel-20261026b`, Buster `landing-videothek-4f`. **`videothek.html` stand auf Buster 4d** — der Versionszusatz von v2967 kam dort nicht an; v2968d zieht nach. Staging im Browser gemessen (beide Bilder 960 px, md5 der Videos gleich).
   **Rest:** Prod-Rollout von v2968–v2968d plus Tausch der zwei Modul-14-Videos auf Prod steht aus (Freigabe). Score-Doppelung in der Pilot-Analyse (DealScore vs. Investor Deal Score) als Anzeige-Frage offen.
+  **Nachtrag Prod (Marcel: „ja prod freigabe“):** rollout-prod.ps1, Sicherungen haupt-/mb-20261026-1444 gelesen, AUDIT_RC=0, Prod 24578bd, 200. Modul-14-Videos getauscht (alte nach medien/videothek/alt-vor-v2968/), md5 lokal = Server, dealpilot.immo liefert 10.297.684 Byte, videothek.html mit Buster 4f.
+
+- **v2970 · PDF-Text WinAnsi-fest — keine gesperrten Zeilen, keine zerstörten Zahlen (27.10.2026, Staging)** (Marcel per Telegram, Investment-PDF 2026-1078: Zeilen „D i e  g e p l a n t e …" über den Rand, „2 , 9 8 / %", „- 2 4 4 / €", „9,81 € €/m²")
+  **Ursache (gemessen, jsPDF 2.5.1 in Node mit der echten Vendor-Datei):** ein einziges Zeichen außerhalb WinAnsi im String — U+202F (schmales geschütztes Leerzeichen, setzt die KI zwischen Zahl und Einheit; 61× im Objekt Teststraße 5) oder U+2212 — schaltet jsPDF für den GANZEN String auf UTF-16. Die Standardschrift Helvetica setzt jedes Byte einzeln: NUL vor jedem Zeichen = Sperrung, U+202F = 0x20 0x2F = „ /". `splitTextToSize` rechnet mit 87 Zeichen, gesetzt werden 174 Glyphen → Überlauf. Ganze Zeile gesperrt, wo `doc.text` die Zeile setzt; nur einzelne Wörter, wo der Blocksatz Wort für Wort setzt. **`Intl.NumberFormat('de-DE')` ist unschuldig** (U+00A0 und € sind WinAnsi). „€ €/m²": die KI liefert `mietspiegel_eur_qm` mit Einheit, pdf.js und ui.js hängten sie noch einmal an.
+  **Fix:** `frontend/js/pdf-text-sauber.js` (neu, `DpPdfText.sauber`) hängt sich über das jsPDF-Ereignis `initialized` an JEDES Dokument und bereinigt in `text`, `splitTextToSize`, `getTextWidth`, `getStringUnitWidth` — Breite und Satz sehen denselben String; U+202F/U+2007 → U+00A0 (bleibt geschützt), schmale Leerzeichen → Leerzeichen, U+2212/U+2011 → „-", Pfeile/≤/≥ ersetzt, Emojis und Nullbreiten raus, Akzente außerhalb Latin-1 auf den Grundbuchstaben; € bleibt (0x80). Geladen direkt nach jsPDF in `index.html`, `marktbericht-app/index.html`, `handbuch.html`. Falle beim Bau: das Merkfeld auf `jsPDF.API` wird auf jedes Dokument kopiert — eigener Name nötig, sonst hält jedes Dokument sich für schon behandelt. Voraussetzung: keine eingebettete Unicode-Schrift im Projekt (kein `addFont`, gemessen).
+  **Alle PDF-Erzeuger (alle jsPDF, alle über `window.jspdf.jsPDF` → alle abgedeckt):** pdf.js (Investment hell/Obsidian, Objekt-Report), pdf-investment-bank.js (Bank/Kurz), storage.js (Bankexport), pdf-kaufpreisaufteilung.js, werbungskosten-pdf.js, pdf-anlage-bmf.js, selbstauskunft.js, track-record.js, gesellschaft-abschluss.js, reseller-portal.js, messe-drehbuch.js, handbuch.html, marktbericht-app/app.js. Serverseitig wird kein PDF gebaut — der PDF-Dienst öffnet die echte App in Headless-Chromium.
+  **Commit:** `be81ef63` (Code), Journal + Frontend-Konstanten (Fingerabdruck index.html) im Folgecommit. buster-ebenen-pruefen RC=0, SAUBER.
+  **Nachweis Staging** (über `telegramPdfService.erzeugen` im Backend-Container, derselbe Weg wie der Bot; Objekt Teststraße 5, 61× U+202F in den Daten): Investment hell/Obsidian, Bank, Kurz, Bankexport, Marktbericht 351 — **0 UTF-16-Textbefehle** in 4271/3048/752/274/802 Tj, Fließtext rechte Kante höchstens 552,5 pt (Satzspiegel 552,8 pt), „Mietspiegel: 9,81 €/m²" einfach. Vorher lokal mit derselben Vendor-Datei: 3 UTF-16-Tj im Probetext.
+  **Rest:** (a) Prod-Rollout (Freigabe). (b) Lage & Markt nennt „von miet-check.de" im Bericht — Quellenname nach außen? (Marcel 14.10.: keine Datenquelle nach außen) — nicht angefasst. (c) Achsenbeschriftung „2040" im Cashflow-Diagramm Seite 12/13 endet bei 559 pt, 6 pt über dem Satzspiegel (auf der Seite, kein Überlauf). (d) Skalierung PDF-Dienst siehe Bericht: 1 Lauf zugleich, Schlange 4, ~7–12 s und ~520–590 MB Container-Spitze je Lauf.
+- **v2969 · Handy-Durchgang nach 17 Bildschirmfotos (27.10.2026, Staging)** (Marcel: Texte/Knöpfe schlecht positioniert, Platzhalter uneinheitlich, Gewerke ab Innenwände nicht eintragbar, Stufenzeilen nicht klickbar, Haken „weitere Objektdetails“, Stufe-3-Text widersprüchlich, X oval, Kaufnebenkosten im QuickCheck einklappen, „Alle Objekte“ überflüssig).
+  - **Was:** `76c1e532` — Gewerke-Tabelle unter 520 px als Karten (Art volle Breite, modernisiert 2/3, Stufe 1/3; Spalten ohne Feld und Gewicht fallen weg; Beschriftung aus den bisherigen `.oe-sr`, Gewerkname darin nur noch für Bildschirmleser). Stufenzeilen tragen `data-oe-zeile` und wählen die Eingabetiefe; `#oe-details-cb` folgt der Tiefe (1 aus, ab 2 an) und ist ausgeblendet, `abweichend()` hebt beim Sprung in eine Detailkarte die Tiefe auf 2. Stufe-3-Hinweis nennt die Pflichtfelder aus `pflichtFuer(3)`. Handy-Regel `.btn, button {padding:8px 14px; min-height:40/44px}` machte `.pricing-modal-close` 36×44 oval mit 6-px-SVG → runde Symbolknöpfe 44×44 (`button[class*=close]:has(> svg:only-child)`). `.app-wrap` und `header.hdr` trugen beide `env(safe-area-inset-top)` → unter 640 px nur noch der Kopf. Datums-/Monatsfelder `appearance:none`, 100 %, 44 px. Platzhalter überall gerade (vorher 7 kursiv / 6 gerade im Reiter Objekt). Fünf lange Platzhalter gekürzt. Pilot-Lage-Kopf als Raster, Cockpit-Objektauswahl volle Breite (war 22 px), Marktbericht-Kopf (Pille bricht um, QR weg, `.sub` line-height). QuickCheck (`qc-v2969`): Kaufnebenkosten als `<details>` mit Summe, `.row-2/3/4` unter 480 px einspaltig, Speicherhinweis über dem Knopf. „Alle Objekte“ unter Aktionen per CSS ausgeblendet wie die Strategie (v1935e).
+  - **Nachweis:** kopfloser Chrome 390 px (Gerätemodus, lokaler Server, Anmeldung ausgeblendet): Querscroll 0; `mod_innenausbau`/`ausst_decken`/`ausst_technik`/`mod_grundriss` jetzt innerhalb 41–349 px sichtbar (vorher x > 390); Klick auf Zeile 3 setzt `dp_zielstufe=3`; Preisfenster-X 44×44. Staging liefert `style.css?v=v2969` mit dem Block aus. `buster-ebenen-pruefen` SAUBER, `frontend-konstanten` neu.
+  - **Rest:** Messung im echten iOS-Safari steht aus (Safe-Area und Datumsfelder lassen sich im kopflosen Chrome nicht nachstellen) — Staging-Abnahmepunkt. „X in der Erstkonfiguration“: im Onboarding (`onboarding.js`) gibt es kein X; ohne Bildschirmfoto nicht gefunden, die allgemeine X-Regel greift für Symbolknöpfe mit `close` in der Klasse.
+- **v2971–v2971f · Landingpage auf dem Handy (27.10.2026, Staging)** (Marcel: „Handy-Ansicht bzw. kleine Bildschirme durchgehen … auch mit der Landingpage“; Haupt-App macht ein paralleler Agent)
+  - **Was:** `14a36946` Cockpit-Matrix unter 640 px mit klebender Funktionsspalte (118 px), kompakten Tarifspalten und Wischhinweis (vorher min-width 780 px in 306 px — sichtbar war NUR die Funktionsspalte); Hero-Knöpfe volle Breite untereinander; Modul-Knöpfe ohne inline `margin-left:10px` (Klasse `.btn-reihe`); Tippflächen ≥ 44 px (Burger, Blätterpfeile, Nachlegen, Guthaben aufladen, Fußlinks, „Anmelden“ über `::after`-Trefferfläche); Messe-Pop-up: X rund 44 px, Knöpfe volle Breite, Hauptknopf zuerst. `1bc40cb8` Tarifschalter heißen `.seg`, nicht `.ptoggle` → 44 px. `1cee6482` sechs Unterseiten führten im Kopf „Kostenlos starten“ ohne Kurzfassung (Knopf bis 399 px, Seite seitwärts verschiebbar); `sicherheit.html` Tabelle 519 px; Hero-Knopf einzeilig. `4d387cc0`/`d26be262`/`eb92c1eb`/`cc66d020` `api.html` (1033 → 595 → 450 → 360 px: Raster `1fr`, `pre` ohne overflow, `.fldt` nowrap in einem ZWEITEN style-Block im Body, `.ep`-Zeilen), `leistungsumfang.html` Kontingent-Tabelle 365 px. Buster `dp2.css` v2971b, `dp2-teile.css` v2971c, `messe-popup.js` v2971 in allen Landing-Seiten; buster-ebenen RC=0 SAUBER.
+  - **Nachweis:** kopfloser Chrome über CDP (mobile Emulation, 360/390 px, Staging): Seitenbreite = Viewport auf index, leistungsumfang, sicherheit, fragen, forschung, videothek, prozesskarte, api (vorher: 5 Unterseiten 366–1033 px). Startseite Tippflächen < 44 px: 37 → 3 (Logo 84×20, „Anmelden“ — Trefferfläche per `::after` 79×47, misst `getBoundingClientRect` nicht —, „Starten“ 78×44).
+  - **Rest:** (a) Unterseiten-Tippflächen: Videothek-Reiter 30 px, Fragen-/API-Reiter 40 px, Inhaltsverzeichnis Leistungsumfang 42 px, Fließtext-Links in sicherheit.html — nicht angefasst. (b) Geschichten-Karussell: Höhe = längste Geschichte, bei kurzen ~300 px Leerraum vor den Punkten; Höhenanpassung je Folie würde die Seite beim Autoplay springen lassen → Optikfrage an Marcel. (c) Texte in Sie-Form auf der Startseite („Was Sie einmal erfassen“, „Ihre Daten bleiben Ihre“) neben Du — Textfrage, nicht angefasst. (d) Echtes iOS-Safari steht aus (Staging-Abnahmepunkt).
+- **v2969a/b + v2972 (27.10.2026, Staging, Marcel: „1. musst du einmal selber durchgehen 2. ja raus 3 ja rollout danach. Und Zielbild in Tab Investition“).**
+  - **Was:** `209c1752` — (a) „X in der Erstkonfiguration“: im Assistenten (`onboarding.js`) gibt es bewusst kein X; gemeint war die Schublade „Datenaufnahme · Quellen wählen“ (`object-actions.js`, `.dp-pf-mclose`): weißer Kasten 45×44, 13-px-✕, weil `.sec button:not(…)` (neun `:not()`, 0,10,1) die eigene Regel schlug → Klasse zwölffach, rund 44 px, ✕ 18 px in `--wl-e8cc7a`. (b) Karte „Mieterhöhung und Zielbild“ (`#zb-karte`) vom Reiter Objekt ans Ende des Reiters Investition (`s1`); hängt nur an der ID (`potenzial.js`), Hilfe/Prozessatlas/Herkunftstext angepasst, `frontend-konstanten` neu. (c) v2972 Backend: `_analyseQuellenNeutral()` hinter `_analyseUrlsSaeubern()` in `analyze()` — Portal-/Anbieternamen ersetzt, nicht amtliche Domains samt Präposition aus dem Fließtext („laut X“ → „laut aktuellen Marktdaten“), `quellen` ohne Marktseiten, `quelle`/`mietspiegel_herkunft` neutral. Der Prompt verbot es seit v2264, das Modell überlas es.
+  - **Nachweis:** kopfloser Chrome 390 px: `.dp-pf-mclose` 44×44, bg transparent, rad 50 %; `.pricing-modal-close` 44×44, SVG 20 px; `#zb-karte` in `s1`, sichtbar, Querscroll 0. Im Staging-Container: „von miet-check.de“ fällt weg, „Laut immowelt.de“ → „Laut aktuellen Marktdaten“, destatis bleibt. `deploy-staging` grün, Backend neu gebaut, healthy.
+  - **Rest:** Schon gespeicherte Analysen tragen den alten Text, bis sie neu laufen (Teststraße 5).

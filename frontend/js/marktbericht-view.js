@@ -45,7 +45,7 @@
       '.mbv-stub .s .dp-wordmark img{max-width:92px !important;max-height:13px !important;vertical-align:-2px}',
       '.mbv-bandmain{flex:1;background:linear-gradient(100deg,var(--wl-c9a84c, #C9A84C),var(--wl-d8bd66, #d8bd66) 55%,var(--wl-c9a84c, #C9A84C));display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 24px;flex-wrap:wrap}',
       '.mbv-bandmain .ttl{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:30px;color:#1a1407;line-height:1.05}',
-      '.mbv-bandmain .ttl .sub{display:block;font-weight:500;font-size:13px;color:#3a2f12;opacity:.9;margin-top:5px;font-family:"Inter",sans-serif;max-width:560px}',
+      '.mbv-bandmain .ttl .sub{display:block;font-weight:500;font-size:13px;color:#3a2f12;opacity:.9;margin-top:5px;font-family:"Inter",sans-serif;max-width:560px;line-height:1.35}',
       '.mbv-band-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}',
       '.mbv-cost{display:inline-flex;align-items:center;gap:7px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;color:#1a1407;background:rgba(255,255,255,.55);border:1px solid rgba(26,20,7,.25);border-radius:999px;padding:6px 11px;white-space:nowrap}',
       '.mbv-bc{width:84px;height:36px;background:repeating-linear-gradient(90deg,#0a0a0a 0 2px,transparent 2px 4px);opacity:.65;border-radius:3px}',
@@ -56,6 +56,8 @@
       '.mbv-frame{width:100%;border:0;display:block;height:640px;background:#fff;border-radius:14px;overflow:hidden}',
       '@media (max-width:760px){.mbv-band{flex-direction:column}.mbv-stub{border-right:0;border-bottom:2px dashed rgba(255,255,255,.30);flex-direction:row;align-items:center;gap:10px;border-radius:16px 16px 0 0}.mbv-stub .k{font-size:22px}.mbv-bandmain{padding:14px 16px}.mbv-bandmain .ttl{font-size:24px}.mbv-bc{display:none}.mbv-stub::before,.mbv-stub::after,.mbv-rz::before,.mbv-rz::after{display:none}.mbv-rz{border-left:0;border-top:2px dashed rgba(26,20,7,.32);border-radius:0 0 16px 16px;justify-content:center;padding:12px 16px}}',
       /* v1882a: Tablet 820 gemessen - der Abriss (.mbv-rz, min-width 150) trug QR + PDF-Knopf nebeneinander, der Knopf ragte 41 px aus der Karte. Bis 1024 gestapelt. */
+      /* v2969 · Handy (Marcel 27.10.: Pille ragte rechts heraus, Ansicht unuebersichtlich): Pille bricht um, QR-Code faellt weg, PDF-Knopf ueber die volle Breite. */
+      '@media (max-width:600px){.mbv-cost{white-space:normal;border-radius:10px;line-height:1.35;display:block;max-width:100%}.mbv-band-actions{width:100%}.mbv-qr{display:none}.mbv-rz{padding:10px 16px}.mbv-pdf{width:100%;justify-content:center}.mbv-stub .bp{display:none}}',
       '@media (min-width:761px) and (max-width:1024px){.mbv-rz{flex-direction:column;gap:8px;padding:10px 12px;min-width:0;justify-content:center}.mbv-pdf{padding:7px 11px;font-size:12px}}'
     ].join('\n');
     document.head.appendChild(s);

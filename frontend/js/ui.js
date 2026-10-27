@@ -1963,7 +1963,7 @@ function _renderAIServerAnalysis(a) {
      Vorrang, und `mietspiegel_herkunft` sagt, welcher Fall vorliegt.
      Ohne diese Zeile wuesste der Leser es weiterhin nicht. */
   if (has(a.mietspiegel_eur_qm)) pL += '<div class="dp-pa-kv"><strong>Mietspiegel:</strong> '
-    + _escClean(a.mietspiegel_eur_qm) + ' \u20ac/m\u00b2'
+    + _escClean(String(a.mietspiegel_eur_qm).replace(/\s*(?:\u20ac|EUR|Euro)(?:\s*\/\s*(?:m\u00b2|m2|qm))?\s*$/i, '')) + ' \u20ac/m\u00b2'   /* v2970 \u00b7 die KI liefert den Wert oft MIT Einheit - sonst "9,81 \u20ac \u20ac/m\u00b2" */
     + (a.mietspiegel_herkunft ? ' <span class="dp-pa-herk">\u00b7 ' + _esc(a.mietspiegel_herkunft) + '</span>' : '')
     + '</div>';
   if (a.kaufpreisniveau)         pL += kv('Kaufpreisniveau', a.kaufpreisniveau);
