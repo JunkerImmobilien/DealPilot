@@ -750,7 +750,41 @@ window._dpPdfJahr1 = function (lang) {
   try { c = window.State && State.cfRows && State.cfRows[0] ? Number(State.cfRows[0].cal) : null; } catch (e) {}
   var j = new Date().getFullYear();
   if (!c || !isFinite(c) || c >= j) return lang ? 'Heute (' + j + ')' : 'Heute';
+  /* v2992 · „Jahr 1 (2024, voll)" bei Kauf am 23.12.2024: 2024 hatte EINEN Monat.
+     Gerechnet wird das erste volle Jahr ab Kauf - so steht es jetzt auch da. */
+  var m = window._dpPdfMonate1 ? window._dpPdfMonate1() : 12;
+  if (m < 12) return lang ? 'Jahr 1 (12 Monate ab Kauf)' : 'Jahr 1 (voll)';
   return lang ? 'Jahr 1 (' + c + ', voll)' : 'Jahr 1 (' + c + ')';
+};
+/* v2992 · Monate im ersten Kalenderjahr der Projektion (Kauf- bzw. Übergangsmonat
+   bis Dezember) - dieselbe Quelle wie calc.js (_v816cut): wirtschaftlicher Übergang,
+   sonst Kaufdatum. 12, wenn nichts bekannt ist oder das Jahr nicht passt. */
+window._dpPdfMonate1 = function () {
+  try {
+    var c = window.State && State.cfRows && State.cfRows[0] ? Number(State.cfRows[0].cal) : null;
+    var g = function (id) { var e = document.getElementById(id); return e && e.value ? String(e.value) : ''; };
+    var iso = g('wirtschaftlicher_uebergang') || g('kaufdat');
+    if (!c || !/^\d{4}-\d{2}/.test(iso) || parseInt(iso.slice(0, 4), 10) !== c) return 12;
+    var km = parseInt(iso.slice(5, 7), 10);
+    return (km >= 1 && km <= 12) ? 13 - km : 12;
+  } catch (e) { return 12; }
+};
+/* v2992 · EIN Deal Score für alle PDFs: der Investor-Score der Objektkarte
+   (DealScore2), sonst der Kennzahlen-Score. Bis v2991 druckten beide PDFs
+   DealScore.computeFromKpis - gemessen Parkstr. 9: 99 im PDF, 76 auf der Karte. */
+window._dpPdfScore = function (K) {
+  var stufe = function (s, l) { try { if (window.ScoreTier && ScoreTier.stufe) return ScoreTier.stufe(s).wort; } catch (e) {} return l || ''; };
+  try {
+    if (typeof window._dpDs2Available === 'function' ? window._dpDs2Available() : (typeof _dpDs2Available === 'function' && _dpDs2Available())) {
+      var r = window.DealScore2.compute(window._buildDeal2FromState());
+      if (r && r.score) { var s2 = Math.round(r.score); return { score: s2, label: stufe(s2, r.label), quelle: 'investor' }; }
+    }
+  } catch (e) {}
+  try {
+    var sc = window.DealScore && DealScore.computeFromKpis(K);
+    if (sc && sc.score) { var s1 = Math.round(sc.score); return { score: s1, label: stufe(s1, sc.label), quelle: 'kennzahlen' }; }
+  } catch (e) {}
+  return null;
 };
 window._dpPdfMiete = function () {
   var ME = window.MietEntwicklung, m = 'prog';
@@ -1136,7 +1170,10 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     if (!r || !r.length) return;
     var w = SV.auswerten(r), t = [];
     if (w.jahr != null) t.push(w.wende === 0 ? 'Das Objekt ist vom ersten Jahr an steuerlich positiv (Überschuss ab ' + w.jahr + ').'
-      : 'Steuerlich positiv ab ' + w.jahr + '. Bis dahin ' + _eur(w.erstattung) + ' Steuererstattung, danach ' + _eur(-w.steuer) + ' Steuer im Betrachtungszeitraum.');
+      : (w.vorherSteuer < 0
+        /* v2992 · Gewinnjahre vor der Wende: deren Steuer gehoert in den Satz */
+        ? 'Steuerlich dauerhaft positiv ab ' + w.jahr + '. Bis dahin ' + _eur(w.erstattung) + ' Erstattungen und ' + _eur(-w.vorherSteuer) + ' Steuer (zusammen ' + (w.netto >= 0 ? _eur(w.netto) + ' Erstattung' : _eur(-w.netto) + ' Steuer') + '), danach ' + _eur(-w.steuer) + ' Steuer im Betrachtungszeitraum.'
+        : 'Steuerlich positiv ab ' + w.jahr + '. Bis dahin ' + _eur(w.erstattung) + ' Steuererstattung, danach ' + _eur(-w.steuer) + ' Steuer im Betrachtungszeitraum.'));
     else t.push('Im Betrachtungszeitraum bleibt das Objekt steuerlich im Verlust.');
     /* v2900 · Steuer und Cashflow nach Steuern je Jahr stehen in der Cashflow-Projektion
        (Spalten ± Steuer, CF n.St.) - hier nur noch das steuerliche Ergebnis, das dort fehlt,
@@ -1424,7 +1461,13 @@ async function _exportPDFInner() {
   sBox(doc, M,             cy, sw3, window._dpPdfJahr1(true), pE(K.cf_ns, true), 'CF p.a. nach Steuern', C.GREEN_BG, C.GREEN);
   /* v2463 · daneben stand „Heute" nach Steuern und hier der Wert VOR Steuern (K.cf_ezb) */
   sBox(doc, M + sw3 + 4,  cy, sw3, 'Ende Zinsbindung',                         pE(K.cf_ns_ezb != null ? K.cf_ns_ezb : K.cf_ezb, true),'CF p.a. nach Steuern (Prognose)',      [250,245,232], C.GOLD);
-  sBox(doc, M+(sw3+4)*2,  cy, sw3, 'Exit / Verkauf',                            pE(K.exit_vkp - Math.max(0, State.rs), true), 'M\u00f6gl. Gewinn', C.CH, C.GOLD);
+  /* v2992 \u00b7 Verkauf am ENDE des Betrachtungszeitraums minus die Restschuld DESSELBEN
+     Jahres. Bis v2991 stand hier State.rs (Restschuld Ende Zinsbindung) gegen den
+     Verkaufspreis nach 20 Jahren und hiess \u201eM\u00f6gl. Gewinn" - Parkstr. 9: 629.300 \u20ac
+     hier, 660.737 \u20ac im Bank-PDF. Es ist ein Erl\u00f6s vor Kosten und Steuer, kein Gewinn. */
+  var _exRow = State.cfRows && State.cfRows.length ? State.cfRows[State.cfRows.length - 1] : null;
+  var _exRs = _exRow && isFinite(Number(_exRow.rs)) ? Number(_exRow.rs) : Math.max(0, State.rs || 0);
+  sBox(doc, M+(sw3+4)*2,  cy, sw3, 'Exit nach ' + (State.cfRows ? State.cfRows.length : '') + ' Jahren', pE(K.exit_vkp - Math.max(0, _exRs), true), 'Erl\u00f6s nach Abl\u00f6sung (Exit-Rendite ' + pP((function () { var e = document.getElementById('exit_bmy'); var n = e && e.value !== '' ? _pfZahl(e.value) : NaN; return isNaN(n) || n <= 0 ? 5 : n; })(), 1) + ')', C.CH, C.GOLD);
   cy += 22;
 
   // CF Rechnung + Kennzahlen nebeneinander
@@ -1492,7 +1535,7 @@ async function _exportPDFInner() {
     /* v2830 · aus der Bankfassung: interner Zinsfuss und Deal Score (Rechenkern
        DealScore.computeFromKpis, wie dort) */
     ['Interner Zinsfu\u00df (IRR)', (K.irr != null && isFinite(K.irr)) ? pP(K.irr, 2) : 'nicht bestimmbar'],
-    ['Deal Score', (function () { try { var sc = window.DealScore && DealScore.computeFromKpis(K); return sc && sc.score ? Math.round(sc.score) + ' / 100' + (sc.label ? ' \u00b7 ' + sc.label : '') : '-'; } catch (e) { return '-'; } })()]
+    ['Deal Score', (function () { var sc = window._dpPdfScore(K); return sc ? sc.score + ' / 100' + (sc.label ? ' \u00b7 ' + sc.label : '') : '-'; })()]
   ], [4, 5, 12]);
   setPdfProgress(35);
 
@@ -1728,9 +1771,9 @@ async function _exportPDFInner() {
         ['Mieteinnahmen kalt / Jahr', pE(data.wm)],   /* v2264: wm = NKM + Zusatzeinnahmen, keine Warmmiete */
         ['- Bewirtschaftung', '- ' + pE(data.bwk)],
         ['- Zinsen',            '- ' + pE(data.zins)],
-        ['= CF operativ vor BSV',     pE(data.cf_op + data.bspar, true)],
         ['- Bausparrate (BSV)', '- ' + pE(data.bspar)],
         ['- Tilgung',          '- ' + pE(data.tilg)],
+        ['= CF vor Steuern',          pE(data.cf_op, true)],   /* v2992: cf_op ist NACH Tilgung/BSV - stand vorher davor */
         ['- Steuern',          (data.steuer < 0 ? '+ ' : '- ') + pE(Math.abs(data.steuer))],
         ['= CF nach Steuern',         pE(data.cf_ns, true)],
         ['= CF / Monat',              pE(data.cf_ns / 12, true)]
@@ -1740,8 +1783,8 @@ async function _exportPDFInner() {
         ['Mieteinnahmen kalt / Jahr', pE(data.wm)],   /* v2264: wm = NKM + Zusatzeinnahmen, keine Warmmiete */
         ['- Bewirtschaftung', '- ' + pE(data.bwk)],
         ['- Zinsen',            '- ' + pE(data.zins)],
-        ['= CF operativ',             pE(data.cf_op, true)],
         ['- Tilgung',          '- ' + pE(data.tilg)],
+        ['= CF vor Steuern',          pE(data.cf_op, true)],   /* v2992: Parkstr. 9 zeigte 39.420 - 7.680 - 12.960 „= 15.540" (das ist nach Tilgung) */
         ['- Steuern',          (data.steuer < 0 ? '+ ' : '- ') + pE(Math.abs(data.steuer))],
         ['= CF nach Steuern',         pE(data.cf_ns, true)],
         ['= CF / Monat',              pE(data.cf_ns / 12, true)]
@@ -1759,8 +1802,8 @@ async function _exportPDFInner() {
     doc.text(title, x + cfColW / 2, y + 7, { align: 'center' });
     // Rows
     var ry = y + 14;
-    var hlIdx = hasBspar ? [3, 7, 8] : [3, 6, 7];
-    var sepIdx = hasBspar ? [3, 6] : [3, 5];
+    var hlIdx = hasBspar ? [5, 7, 8] : [4, 6, 7];   /* v2992: Summenzeile „CF vor Steuern" steht jetzt nach der Tilgung */
+    var sepIdx = hasBspar ? [5, 6] : [4, 5];
     rows.forEach(function(r, i) {
       var isHL = hlIdx.indexOf(i) !== -1;
       doc.setFont('helvetica', isHL ? 'bold' : 'normal');
@@ -2108,10 +2151,15 @@ async function _exportPDFInner() {
       return s + ' \u20ac';
     }
     function eFmtNeg(n) {
+      if (n == null || Math.round(Math.abs(n)) === 0) return '0 \u20ac';   /* v2992: \u201e-0 \u20ac" im Rumpfjahr */
       return '-' + pE(n) + ' \u20ac';
     }
+    /* v2992 \u00b7 Rumpfjahr: Parkstr. 9 (Kauf 23.12.2024) zeigte \u201e2024 \u00b7 NKM/Mon 274 \u20ac" -
+       die Miete EINES Monats durch zw\u00f6lf. Monatswerte teilen jetzt durch die Monate,
+       die das Objekt in dem Jahr gehalten wurde, und die Jahreszahl sagt, wie viele. */
+    var _mon1 = window._dpPdfMonate1 ? window._dpPdfMonate1() : 12;
 
-    var _projBody = State.cfRows.map(function(r) {
+    var _projBody = State.cfRows.map(function(r, _ri) {
       // V65.3: Defensive Werte gegen null/undefined — bei Tilgungsaussetzung +
       // Bausparvertrag + D2 können einzelne Felder NaN/undefined sein.
       // Vorher: r.ltv_y.toFixed(0) crashte wenn ltv_y undefined.
@@ -2127,11 +2175,13 @@ async function _exportPDFInner() {
       var _ty  = (r.ty   == null || isNaN(r.ty))  ? 0 : r.ty;
       var _bspar = (r.bspar_y == null || isNaN(r.bspar_y)) ? 0 : r.bspar_y;
       var cf_vst_j = _cfop;
-      var cf_vst_m = cf_vst_j / 12;
-      var cf_ns_m  = _cfns / 12;
+      var _teiler  = (_ri === 0 && _mon1 < 12) ? _mon1 : 12;
+      if (_teiler !== 12 && r.nkm_y != null && isFinite(r.nkm_y)) _nkm = r.nkm_y / _teiler;
+      var cf_vst_m = cf_vst_j / _teiler;
+      var cf_ns_m  = _cfns / _teiler;
       var tilgOrBspar = _hasBsparProj ? _bspar : _ty;
       return [
-        String(r.cal != null ? r.cal : '-'),
+        String(r.cal != null ? r.cal : '-') + (_ri === 0 && _mon1 < 12 ? '\n' + _mon1 + ' Mon.' : ''),
         eFmt(_nkm),
         eFmtNeg(_zy),
         eFmtNeg(tilgOrBspar),

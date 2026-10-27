@@ -1026,6 +1026,12 @@
     /* Score aus dem Rechenkern - nicht aus der Oberflaeche gelesen. */
     var SC = null;
     try { if (window.DealScore && typeof window.DealScore.computeFromKpis === 'function') SC = window.DealScore.computeFromKpis(K); } catch (e) {}
+    /* v2992 · die ZAHL der Kachel ist der Score der Objektkarte (Investor-Score), wie im
+       Investment-PDF - Parkstr. 9 zeigte hier 99, auf der Karte 76. Die Deutung darunter
+       bleibt die des Kennzahlen-Scores und steht nur, wenn er auch die Zahl liefert. */
+    var SCK = null; try { SCK = window._dpPdfScore ? window._dpPdfScore(K) : null; } catch (e) {}
+    if (SCK && SC && SCK.quelle !== 'kennzahlen') SC = { score: SCK.score, label: SCK.label };
+    else if (SCK && !SC) SC = { score: SCK.score, label: SCK.label };
     /* v2900b · Kurzfassung: acht Kacheln (zwei Reihen) - mit zwoelf rutschte das Raster auf S. 2 */
     raster([
       ['Bruttomietrendite', pct(K.bmy, 2), 'auf Kaufpreis'],
@@ -1036,7 +1042,8 @@
       ['LTV', pct(K.ltv, 1), S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : ''],
       ['EK-Rendite', pct(K.ekr, 2), 'p. a., vor Steuern'],
       ['Interner Zinsfuß (IRR)', da(K.irr) === null ? 'nicht bestimmbar' : pct(K.irr, 2), ''],
-      ['Kaltmiete', rows[0] ? eur(rows[0].nkm_y) : '-', 'im ersten Jahr'],
+      /* v2992 · bis hier rows[0].nkm_y - im Rumpfjahr (Kauf 23.12.2024) die Miete EINES Monats „im ersten Jahr" */
+      ['Kaltmiete', da(K.wm_j) !== null ? eur(K.wm_j) : (rows[1] ? eur(rows[1].nkm_y) : '-'), 'pro Jahr, inkl. Zusatzeinnahmen'],
       ['Equity Multiple', da(K.em) === null ? '-' : fmt(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
       ['Deal Score', (SC && SC.score) ? fmt(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']

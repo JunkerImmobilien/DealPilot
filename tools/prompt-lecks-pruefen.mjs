@@ -586,7 +586,7 @@ const ERWARTET = [
   ['Zensus: Bestandsmiete-Hinweis', 'v2162', 'BESTANDSMIETE aller laufenden Vertraege'],
   ['Aufgabe 15 + Zielfeld',        'v2157', '"lage_gegenueberstellung": ['],
   ['Steuer: Werbungskosten Jahr 1', 'v2166', 'Werbungskosten gesamt 24.689 EUR = Schuldzinsen 13.579 + AfA 8.642'],
-  ['Steuer: Jahr der Wende',        'v2166', 'Erstes Jahr mit positivem Ergebnis aus Vermietung: 2034'],
+  ['Steuer: Jahr der Wende',        'v2166', 'DAUERHAFT positiv (davor koennen Gewinn- und Verlustjahre wechseln, siehe Jahresverlauf): 2034'],
   ['Steuer: Steuerlast danach',     'v2166', 'Steuerlast danach bis Jahr 15: 9.988 EUR'],
   ['Steuer: Jahresverlauf',         'v2166', '2027 | 21357 | 13579 | 8642 | 2468 | -3332 | -1389 | 777'],
   ['Aufgabe 16 Steuer',             'v2160', '16. Steuerliche Zusammenfassung'],
