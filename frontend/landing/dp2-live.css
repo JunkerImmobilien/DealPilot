@@ -252,3 +252,8 @@
 .pmod-f{margin:18px 0 0;font-size:12.6px;color:var(--ddk);line-height:1.6}
 .pmod-f a{color:var(--gdh)}
 @media(max-width:900px){.pmod-g{grid-template-columns:1fr}.pmod{padding:24px 16px 18px}.pmod-h h3{font-size:22px}}
+
+/* landing-module-1a · Marcel 27.10.2026: „mehr Platz zwischen Bild und den Partnern" - seit die
+   Kanzlei-Zeile weg ist, sass das Hausbild direkt unter dem Logo-Laufband. */
+#partner .pmarq + .bildzeile,#partner .pmarq ~ .bildzeile{margin-top:56px}
+@media(max-width:640px){#partner .pmarq ~ .bildzeile{margin-top:40px}}
