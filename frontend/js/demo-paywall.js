@@ -24,7 +24,7 @@ var DemoMode = (function() {
     grerw_proz: '6.5',
     makler_proz: '3.57',
     san: '0',
-    bankval: '250000',
+    svw_herkunft: 'bank',   /* v3003b */
     svwert: '250000',
     // Miete
     nkm: '800',
