@@ -165,11 +165,12 @@
   animation:pmarq 60s linear infinite}
 .pmarq:hover .pmarq-track{animation-play-state:paused}
 @keyframes pmarq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.plogo{flex:none;height:46px;display:flex;align-items:center;opacity:.68;
-  transition:opacity .3s var(--e-weich),filter .3s var(--e-weich);
-  filter:grayscale(1)}
-.plogo:hover{opacity:1;filter:grayscale(0)}
-.plogo img{max-height:46px;width:auto;object-fit:contain}
+/* landing-videos-1 · Marcel 27.10.2026: "die Partner duerfen groesser aussehen und muessen auch nicht grau sein" - vorher 46 px, grau, 68 % Deckkraft */
+.plogo{flex:none;height:76px;display:flex;align-items:center;opacity:1;filter:none;
+  transition:transform .3s var(--e-weich)}
+.plogo:hover{transform:scale(1.06)}
+.plogo img{max-height:76px;max-width:240px;width:auto;object-fit:contain}
+@media(max-width:640px){.pmarq-track{gap:40px}.plogo{height:58px}.plogo img{max-height:58px;max-width:180px}}
 
 @media(prefers-reduced-motion:reduce){
   .hero-bg,.hero-grid-bg,.hero-orb,.ec,.pmarq-track{animation:none}

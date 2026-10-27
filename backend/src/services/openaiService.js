@@ -1779,7 +1779,13 @@ async function callOpenAI(prompt, opts) {
   // unterstützt diesen Parameter nicht (gibt 400: Unknown parameter 'seed').
   // 'seed' war nur in der alten /v1/chat/completions-API gültig.
   if (opts.aiOptions) {
-    if (opts.aiOptions.temperature != null) {
+    /* v2978 · Die Denkmodelle (gpt-5-Familie, o1/o3/o4) lehnen `temperature` mit 400 ab:
+       „Unsupported parameter: 'temperature' is not supported with this model."
+       Marcel 27.10.2026 im Co-Piloten auf Prod - dort fehlt COPILOT_MODEL, also greift der
+       Standard gpt-5.6-luna (auf Staging steht gpt-4o-mini, deshalb fiel es dort nie auf).
+       Fuer diese Modelle wird die Temperatur weggelassen statt die Frage scheitern zu lassen. */
+    const _ohneTemperatur = /^(gpt-5|o[1-9])/i.test(String(model || ''));
+    if (opts.aiOptions.temperature != null && !_ohneTemperatur) {
       body.temperature = Number(opts.aiOptions.temperature);
     }
     // 'seed' bewusst nicht setzen — siehe oben

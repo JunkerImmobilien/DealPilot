@@ -7,12 +7,12 @@
 <meta name="description" content="Dein Cockpit für Immobilien-Investments: Cashflow, DSCR, Steuer, Deal Score und bankfertige Unterlagen — in Minuten statt Stunden. 19 Module, 24 Kennzahlen, Server in Deutschland.">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
-<link rel="stylesheet" href="dp2-hero.css?v=v1570">
+<link rel="stylesheet" href="dp2-hero.css?v=landing-videos-1">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
-<link rel="stylesheet" href="dp2-live.css?v=landing-videothek-1c">
+<link rel="stylesheet" href="dp2-live.css?v=landing-loesungen-1">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -75,7 +75,13 @@
         <li><a href="#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Deine Mandanten unter deiner Marke</span></span></a></li>
         <li><a href="#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
       </ul></li>
-    <li><a href="#partner">Partner</a></li>
+    <li><a href="loesungen.html">Für Partner<i class="kar"></i></a>
+      <ul class="sub"><!-- landing-loesungen-1 -->
+        <li><a href="loesungen.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Individuelle Lösungen</b><span>Prozesse, Automatisierung, Homepage &amp; iFrame</span></span></a></li>
+        <li><a href="#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>DealPilot unter deiner Marke</span></span></a></li>
+        <li><a href="#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne und Makler-Hub, auf Anfrage</span></span></a></li>
+        <li><a href="#partner"><svg class="ico si"><use href="#i-pokal"/></svg><span><b>Unsere Partner</b><span>Wer mit uns zusammenarbeitet</span></span></a></li>
+      </ul></li>
     <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
       <ul class="sub">
         <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
@@ -172,6 +178,17 @@
     <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
 </div></div></div>
 
+<!-- landing-videos-1 · Marcel 27.10.2026: "wo sind eigentlich auf der Landingpage meine videos geblieben? Das muss direkt auf der Hauptseite nach dem Hero-Bereich richtig cool in Szene gesetzt werden." Seit v2968 war der Abschnitt unsichtbar: dp2-live.js warf (bild is not a function, lokale Variable ueberdeckte die Funktion) und der catch blendete die Section aus. Jetzt direkt hinter Hero, Laufband und Vertrauensband. -->
+<!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
+     landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
+     direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
+     DealPilot Live". Deshalb steht er HINTER "Was DealPilot macht".
+     Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
+     nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
+<section class="sec sec-dark dpl" id="live"><div class="wrap">
+  <div id="dplRoot" data-start="ueberblick"></div>
+</div></section>
+
 <!-- ══ WILLKOMMEN ════════════════════════════════════════════════════ -->
 <div class="board-band">
   <span class="perf-edge"></span><span class="perf-edge rechts"></span>
@@ -208,16 +225,6 @@
        Was DealPilot macht kann raus." Platzhalter, demo-wechsel.css und .js entfernt
        (die Einzelseite demo-wechsel.html bleibt). -->
 
-</div></section>
-
-<!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
-     landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
-     direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
-     DealPilot Live". Deshalb steht er HINTER "Was DealPilot macht".
-     Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
-     nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
-<section class="sec sec-dark dpl" id="live"><div class="wrap">
-  <div id="dplRoot" data-start="ueberblick"></div>
 </div></section>
 
 <!-- ══ MODULE ════════════════════════════════════════════════════════ -->
@@ -383,10 +390,10 @@
     <div class="pcard rv" id="partner-plan">
       <span class="pbadge">★ WHITELABEL</span>
       <div class="pcard-l">
-        <div class="tag">Makler · Steuerberater · Finanzierer · Hausverwalter</div>
+        <div class="tag">Makler · Sachverständige · Steuerberater · Finanzierer</div>
         <h3>Partner</h3>
-        <p class="lead">Deine Mandanten rechnen unter deiner Marke. Du prüfst, gibst frei und
-          behältst den Überblick — ohne E-Mail-Ping-Pong.</p>
+        <p class="lead">Deine Kunden und Mandanten rechnen unter deiner Marke. Du prüfst, gibst frei und
+          behältst jeden Vorgang im Blick, ohne Mail-Pingpong und ohne eigene IT.</p>
         <div class="pr" data-m="99 €" data-j="1.089 €">99 €<small> / Monat</small></div>
         <div class="prn" data-m="oder 1.089 €/Jahr — 1 Monat geschenkt"
              data-j="entspricht rund 91 €/Monat — 1 Monat geschenkt">oder 1.089 €/Jahr — 1 Monat geschenkt</div>
@@ -404,7 +411,7 @@
           <li>Freigabe-Workflow mit lückenlosem Protokoll</li>
           <li>Voller Pro-Funktionsumfang für deinen Zugang</li>
           <li>Weitere Mandanten-Plätze — ab 12 € je Mandant</li>
-          <li>Schnittstellen &amp; Anpassungen auf Wunsch — nach Aufwand</li>
+          <li>Individuelle Prozesse, Homepage-Einbindung und Schnittstellen — <a href="loesungen.html" style="color:inherit;text-decoration:underline">auf Anfrage</a></li>
         </ul>
       </div>
     </div>
@@ -436,20 +443,60 @@
         <p>Gibt ein Mandant ein Objekt frei, landet es bei dir als Aufgabe. Du siehst alle
           Kennzahlen, gibst es mit Anmerkung zurück oder bestätigst verbindlich.</p>
         <span class="ptag">AUFGABE · RÜCKGABE · NACHWEIS</span></div>
-      <div><h4>Schnittstellen &amp; Sonderlösungen</h4>
-        <p>Deine Kanzlei arbeitet nicht von der Stange. Wir binden vorhandene Systeme an —
-          Buchhaltungs-Export, Datenraum, eigene Vorlagen — und bauen fehlende Bausteine
-          nach Aufwand dazu.</p>
-        <span class="ptag">INDIVIDUELL · NACH AUFWAND</span></div>
+      <div><h4>Individuelle Lösungen</h4>
+        <p>Du arbeitest nicht von der Stange. Wir bilden deine Prozesse ab, automatisieren sie,
+          binden Rechner per iFrame in deine Homepage ein und verbinden deine Software.
+          <a href="loesungen.html" style="color:var(--gdh)">Mehr dazu →</a></p>
+        <span class="ptag">PROZESS · IFRAME · SCHNITTSTELLE</span></div>
       <div><h4>Eine Rechnung, keine Umwege</h4>
         <p>Du rechnest mit uns ab — einmal im Monat oder im Jahr, für Basis und Plätze zusammen.
           Was du deinen Mandanten berechnest, ist allein deine Sache.</p>
-        <span class="ptag">SAMMELRECHNUNG · IHRE MARGE</span></div>
-      <div><h4>Warum 99 € und nicht 49 €</h4>
-        <p>Das Partner-Paket kostete bis September 2026 nur 99 Cent weniger als Pro — bei vollem
-          Pro-Umfang plus eigener Marke plus Mandanten-Konsole. Der Aufschlag steht für
-          Whitelabel, Reseller-Portal und drei Mandanten-Plätze.</p>
-        <span class="ptag">SEIT 09/2026</span></div>
+        <span class="ptag">SAMMELRECHNUNG · DEINE MARGE</span></div>
+      <div><h4>Für deinen Beruf gemacht</h4>
+        <p>Makler bewerten für Eigentümer, Sachverständige für Auftraggeber, Steuerberater für
+          Mandanten, Finanzierer für Kreditnehmer. Jeder bekommt dieselbe Rechentiefe unter
+          deinem Namen.</p>
+        <span class="ptag">MAKLER · SV · STB · FINANZIERUNG</span></div>
+    </div>
+    <!-- landing-module-1 · Marcel 27.10.2026: „für Partner, dass wir RND-Kern und Rechenkern
+         Verkehrswerte und Ertragswerte als Module verkaufen sowie gesondert den Makler-Hub …
+         schon bewerben, mit dem Zusatz auf Anfrage". Technik: Zusatz rechenkerne_api (v2977),
+         Makler-Hub ist ein eigenes Produkt (E:\Makler Hub). Keine Kunden- oder Anbieternamen. -->
+    <div class="pmod rv" id="module">
+      <div class="pmod-h">
+        <div class="tag">Zusatzmodule für Partner · auf Anfrage</div>
+        <h3>Unsere Rechenkerne in <span class="ac">deiner Software.</span></h3>
+        <p>Für Sachverständige, Makler und Plattformen: dieselben Kerne, mit denen DealPilot rechnet,
+          als Schnittstelle in deinem eigenen System. Dazu der Makler-Hub als eigenes Produkt.</p>
+      </div>
+      <div class="pmod-g">
+        <div class="pmod-k">
+          <div class="pmod-n">MODUL 01 · SCHNITTSTELLE</div>
+          <h4>Restnutzungsdauer-Kern</h4>
+          <p>Restnutzungsdauer nach Anlage 2 ImmoWertV mit technischer Prüfung über neun Gewerke,
+            dazu der steuerliche AfA-Vergleich. Geprüft gegen unterschriebene Gutachten.</p>
+          <ul><li>Modell und Technik, das Niedrigere gilt</li><li>jede Zahl mit Verfahren und Begründung</li><li>Kontingent je Monat</li></ul>
+          <a class="pmod-cta" href="mailto:info@dealpilot.immo?subject=Modul-Anfrage%20%E2%80%93%20Restnutzungsdauer-Kern">Auf Anfrage →</a>
+        </div>
+        <div class="pmod-k">
+          <div class="pmod-n">MODUL 02 · SCHNITTSTELLE</div>
+          <h4>Wertermittlungs-Kern</h4>
+          <p>Bodenwert, Ertragswert und Sachwert nach ImmoWertV mit den amtlichen Kennzahlen der
+            Gutachterausschüsse: Liegenschaftszins, Sachwertfaktor, Bodenrichtwert.</p>
+          <ul><li>Herkunft je Wert: Ausschuss, Jahrgang, Stufe</li><li>kein Treffer heißt kein erfundener Wert</li><li>Kontingent je Monat</li></ul>
+          <a class="pmod-cta" href="mailto:info@dealpilot.immo?subject=Modul-Anfrage%20%E2%80%93%20Wertermittlungs-Kern">Auf Anfrage →</a>
+        </div>
+        <div class="pmod-k pmod-hub">
+          <div class="pmod-n">EIGENES PRODUKT · FÜR MAKLER</div>
+          <h4>Makler-Hub</h4>
+          <p>Der ganze Maklerprozess in einem System: vom ersten Kontakt des Eigentümers bis zum
+            Kaufvertragsentwurf beim Notar.</p>
+          <ul><li>geführter Ablauf je Objekt, Aufgaben und Fristen</li><li>Unterlagen bei den Ämtern anfragen, Akte automatisch ablegen</li><li>digitale Unterschrift, Exposé per KI aus Diktat und Unterlagen</li><li>Portale für Eigentümer und Tippgeber, Briefing aufs Handy</li><li>mehrere Benutzer, deine Marke</li></ul>
+          <a class="pmod-cta" href="mailto:info@dealpilot.immo?subject=Anfrage%20%E2%80%93%20Makler-Hub">Auf Anfrage →</a>
+        </div>
+      </div>
+      <p class="pmod-f">Die Module schalten wir persönlich frei, mit Einrichtung und Einweisung. Preis nach Umfang.
+        <a href="https://app.dealpilot.immo/api-doku.html" target="_blank" rel="noopener">Technische Dokumentation der Schnittstelle</a></p>
     </div>
   </div>
 </div></section>
@@ -617,12 +664,7 @@
     <!-- landing-videothek-1 · Logo von der Website der Kanzlei (sp-steuerberatung.de/img/logo.png) -->
     <div class="plogo"><img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div>
   </div></div>
-  <div class="kz rv">
-    <img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB" width="203" height="40" loading="lazy">
-    <p><b>Begleitet von Steuerberatungskanzleien.</b> DealPilot entsteht nicht im luftleeren Raum: Kanzleien wie
-      die <b>Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB</b> aus Hüllhorst sagen uns, wo es in der Praxis hakt.
-      Die Beratung bleibt in der Kanzlei — wir liefern die Aufbereitung.</p>
-  </div>
+  <!-- landing-videos-1 · Kanzlei-Zeile (Schmidt & Partner) unter dem Laufband entfernt, Marcel 27.10.2026; das Logo bleibt im Laufband -->
   <figure class="bildzeile rv">
     <img src="assets/bild/haus.jpg" alt="Mehrfamilienhaus in einer deutschen Wohnstraße" loading="lazy">
     <figcaption>Worum es geht: ein Bestandsobjekt, ehrlich gerechnet.</figcaption>
@@ -684,12 +726,12 @@
 </div></footer>
 
 <script src="dp2-daten.js?v=v1570"></script>
-<script src="dp2-inhalt.js?v=v2973"></script>
+<script src="dp2-inhalt.js?v=landing-loesungen-1"></script>
 <!-- dp2-ablauf.js abgeloest durch demo-wechsel.js (v1588) -->
 <script src="dp2-video.js?v=v1570"></script>
 <script src="demo-steuer-daten.js?v=v1600"></script>
 <script src="dp2.js?v=v1570"></script>
-<script src="dp2-live.js?v=landing-videothek-4f"></script><!-- landing-videothek-1 -->
+<script src="dp2-live.js?v=landing-module-1"></script><!-- landing-videothek-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
      oben auf der Abgleichsliste:
