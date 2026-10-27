@@ -50,6 +50,7 @@ import { ableiten as ausstAbleiten, zusammenfuehren as ausstMerge }
 import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
 import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 import { objektartNormal, gewerbeArt, zinsObjektart, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
+import { zensusMieteAmStichtag } from '../lib/zensus_miete.js';   /* v2993 */
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -1448,6 +1449,8 @@ export const ReportOrchestrator = {
           lzs_zweig: _lzs.zweig || null,
           lzs_aus_register: !!_lzs.aus_register,
           lzs_berichtsjahr: _lzs.berichtsjahr || null,
+          /* v2993 · Bestandsmiete Zensus 2022, fortgeschrieben - Anker vor der Angebotsmiete */
+          zensus_miete: (function () { try { return zensusMieteAmStichtag(zensus, new Date()); } catch (e) { return null; } })(),
           bodenwert: _bw,
           flaeche: _flaeche,   /* v1049-WFLA-2 */
           /* v1055-WSPL-1 · Hinweis, wenn Stellplaetze da sind und kein

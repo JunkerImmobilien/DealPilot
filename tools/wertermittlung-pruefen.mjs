@@ -327,6 +327,21 @@ const satzBielefeld = (() => {
     return s ? s.modellansaetze : null;
   } catch (e) { return null; }
 })();
+/* v2993 · B60 Zensus-Bestandsmiete als dritter Anker (lib/zensus_miete.js), vor der Angebotsmiete.
+   Fortschreibung mit dem Nettokaltmietenindex (Destatis 2020=100): Mai 2022 102,7 -> Sep. 2026 111,9. */
+const ZM = await lade('lib/zensus_miete.js');
+const await_kappung = await lade('lib/kappung.js');   /* v2993 */
+fallB('B60', () => {
+  const z = { available: true, gemeinde: { name: 'Prüfgemeinde', miete_baujahr: { klasse: '1949-1978', wert: 5.0 }, miete_flaeche: { klasse: '60-80', wert: 6.0 } }, kreis: null };
+  const r = ZM.zensusMieteAmStichtag(z, new Date('2026-09-15'));
+  wert('B', 'B60a', 'Zensus Mittel der Klassen 5,0/6,0, fortgeschrieben ×111,9/102,7', r ? r.qm : null, Math.round(5.5 * 111.9 / 102.7 * 100) / 100, 0.001);
+  pruefe('B', 'B60b', 'Gemeinde vor Kreis, Herkunft im Text', !!r && r.ebene === 'gemeinde' && /Zensus 2022/.test(r.text) && /Index der Nettokaltmieten/.test(r.text));
+  pruefe('B', 'B60c', 'ohne Zensuswert kein Ergebnis', ZM.zensusMieteAmStichtag({ available: true, gemeinde: null, kreis: { name: 'K' } }, new Date()) === null);
+  const W0 = ccFall('westerfeld_body', (a) => { a[4].amtliche_miete = null; a[4].zensus_miete = r; }, { ohneSatz: true });
+  const bd = W0 && W0.ertragswert && W0.ertragswert.miete_band;
+  pruefe('B', 'B60d', 'ohne amtliche Miete und ohne Satz: Anker = Zensus (nicht Angebot)', !!bd && bd.anker_stufe === 'zensus' && bd.anker_qm === r.qm,
+    bd ? bd.anker_stufe + ' ' + bd.anker_qm : 'kein Band');
+});
 fallB('B12', () => {
   if (!satzBielefeld) return pruefe('B', 'B12', 'Registersatz Bielefeld MFH 2025', false, 'nicht gefunden');
   const W0 = ccFall('westerfeld_body', null, { ohneSatz: true });
@@ -669,11 +684,28 @@ fallB('B20', () => {
 fallB('B21', () => {
   const r = westerfeldMit((w) => { w.ist_monat = 500; }), e = anteil(r);
   const b = e && e.miete_bog;
-  pruefe('B', 'B21', 'ohne Laufzeit: Szenarien 3/5/10 Jahre, nichts angesetzt', !!b && b.n_angesetzt === 0 && b.n_offen === 1
-    && b.szenarien.map((s) => s.jahre).join() === '3,5,10' && b.szenarien[0].barwert_eur < 0 && b.szenarien[2].barwert_eur < b.szenarien[0].barwert_eur);
-  pruefe('B', 'B21', 'Ertragswert ohne boG, als vorläufig benannt, Satz nennt die Spanne in €', !!e && e.vorlaeufig_vor_bog
-    && r.ertragswert_kern.wert_ungerundet === e.vorlaeufiger_ertragswert_eur + eigenerBog(r)
-    && (r.notes || []).some((n) => /Je nach Dauer macht sie −[\d.]+ € \(3 Jahre\) bis −[\d.]+ € \(10 Jahre\) aus — Szenarien, keine gesetzliche Annahme/.test(n)));
+  /* v2993 · Wohnung unter dem Band ohne Vertragsdatum: Dauer aus dem Erhoehungspfad nach § 558 BGB
+     (lib/kappung.js), nicht mehr die Szenarien 3/5/10 (ImmoWertA zu § 31 c). Bis v2992 stand hier
+     „ohne Laufzeit: Szenarien 3/5/10 Jahre, nichts angesetzt". */
+  const z = b && b.zeilen && b.zeilen[0];
+  pruefe('B', 'B21', 'ohne Laufzeit (Wohnung, unter dem Band): § 558-Pfad angesetzt, keine Szenarien', !!z && b.n_angesetzt === 1 && b.n_offen === 0
+    && !b.szenarien && z.jahre_quelle === 'bgb558' && z.barwert_eur < 0 && z.pfad558 && z.pfad558.schritte[0].ab_monat === 3
+    && z.pfad558.schritte[0].miete_monat === Math.round(Math.min(500 * (1 + z.pfad558.kappung_pct / 100), (z.differenz_jahr * -1 + 6000) / 12) * 100) / 100,
+    z ? z.jahre + ' J., ' + z.barwert_eur + ' €, ' + JSON.stringify(z.pfad558 && z.pfad558.schritte.slice(0, 2)) : 'keine Zeile');
+  pruefe('B', 'B21', 'Ertragswert = vorläufig + Barwert des Pfads (+ eigener boG)', !!e && !!z
+    && r.ertragswert_kern.wert_ungerundet === e.vorlaeufiger_ertragswert_eur + z.barwert_eur + eigenerBog(r));
+  /* Handrechnung: 1.000 €/Monat Ist, 1.100 marktueblich, 3 %, Kappung 20 %: Monate 0-2 je −100 €,
+     abgezinst (1,03)^-(1/12 … 3/12) = −298,53 -> −299 €; ab Monat 3 erreicht (0,3 Jahre). */
+  const KP = await_kappung;
+  const hp = KP.erhoehungspfad558(12000, 13200, 3, 20, 40);
+  wert('B', 'B21', 'Handbeispiel § 558: Barwert 3 Monate × −100 € bei 3 %', hp ? hp.barwert_eur : null, -299, 0);
+  wert('B', 'B21', 'Handbeispiel § 558: Dauer 0,25 J. (gerundet 0,3)', hp ? hp.jahre : null, 0.3, 0);
+  const hp2 = KP.erhoehungspfad558(12000, 18000, 3, 15, 40);
+  pruefe('B', 'B21', 'Kappung 15 %: drei Schritte (1.150, 1.322,50, 1.500 gedeckelt) in Monat 3, 39, 75',
+    !!hp2 && hp2.schritte.map((x) => x.ab_monat + ':' + x.miete_monat).join() === '3:1150,39:1322.5,75:1500', hp2 ? JSON.stringify(hp2.schritte) : '');
+  const kb = KP.kappungFuer('05711000', null), kh = KP.kappungFuer('02000000', null), ke = KP.kappungFuer('05711000', 15);
+  pruefe('B', 'B21', 'Kappungsgrenze: Hamburg 15 % (Verordnung), eigene Angabe geht vor', kh.pct === 15 && kh.herkunft === 'verordnung' && ke.pct === 15 && ke.herkunft === 'eigen' && (kb.pct === 20 || kb.pct === 15),
+    kh.pct + ' ' + kb.pct + ' ' + ke.herkunft);
 });
 fallB('B22', () => {
   /* WE 1 mit 1.100 €/Monat (11,28 €/m²) ueber dem Band: Mehrertrag */

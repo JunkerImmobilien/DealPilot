@@ -13,6 +13,7 @@ import { ErtragswertService } from './ErtragswertService.js';
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { pruefeModell, mieteModellkonform, modellDurchschnitte } from '../lib/modellpruefung.js';   /* v2595, v2600 */
 import { barwertAbweichung } from '../lib/immowertv.js';   /* v2600 · E2 */
+import { kappungFuer, erhoehungspfad558 } from '../lib/kappung.js';   /* v2993 */
 /* ══ v1968 · HIER STAND EIN TOTER IMPORT ══════════════════════════════
 
      import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';
@@ -150,7 +151,11 @@ export function herkunftNachBand(r) {
    Szenarien 3/5/10 Jahre, ausdruecklich keine gesetzliche Annahme, und der Ertragswert bleibt
    insoweit vorlaeufig. Die Dauer ist auf die Restnutzungsdauer begrenzt.
    posten: [{ nr, art, differenz_jahr, befristet_bis, kuendigungsverzicht_bis, abw_jahre }] */
-export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag) {
+/* v2993 · Underrent einer WOHNUNG ohne Vertragsdatum: Dauer und Barwert aus dem Erhoehungspfad
+   nach § 558 BGB (lib/kappung.js) - ImmoWertA zu § 31 c: „Moeglichkeiten der Anpassung …
+   (Mieterhoehungsmoeglichkeiten) sind zu beruecksichtigen". opts.kappung = kappungFuer(...).
+   Gewerbe und Overrent unveraendert. */
+export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag, opts = {}) {
   const st = stichtag instanceof Date ? stichtag : new Date();
   const jahreBis = (d) => {
     if (!d) return null;
@@ -171,10 +176,19 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag) {
     let jahre = null, quelle = null;
     if (belegt.length) { jahre = Math.max(...belegt); quelle = jB != null && jahre === jB ? 'befristung' : 'kuendigungsverzicht'; }
     else if (art === 'underrent' && Number(z.abw_jahre) > 0) { jahre = Number(z.abw_jahre); quelle = 'eingabe'; }
+    let pfad = null;
+    if (jahre == null && art === 'underrent' && z.nutzung !== 'gewerbe' && opts.kappung && Number(z.ist_jahr) > 0) {
+      pfad = erhoehungspfad558(Number(z.ist_jahr), Number(z.ist_jahr) - d, lzsPct, opts.kappung.pct, R);
+      if (pfad) { jahre = pfad.jahre; quelle = 'bgb558'; }
+    }
     const zeile = { nr: z.nr || null, art, differenz_jahr: d, jahre: jahre != null ? deckel(jahre) : null, jahre_quelle: quelle,
                     gedeckelt_auf_rnd: jahre != null && R != null && jahre > R };
     if (z.nutzung) zeile.nutzung = z.nutzung;   /* v2800 · Wohnung oder Gewerbeeinheit (WGH) */
-    if (jahre != null && jahre > 0) {
+    if (pfad) {
+      zeile.barwert_eur = pfad.barwert_eur; zeile.angesetzt = true;
+      zeile.pfad558 = { schritte: pfad.schritte, kappung_pct: pfad.kappung_pct, kappung_text: opts.kappung.text,
+                        kappung_pruefen: !!opts.kappung.pruefen, annahmen: pfad.annahmen };
+    } else if (jahre != null && jahre > 0) {
       zeile.barwert_eur = barwertAbweichung(d, lzsPct, zeile.jahre);
       zeile.angesetzt = true;
     } else if (jahre === 0) {
@@ -1064,9 +1078,9 @@ export const CrossCheckService = {
             + 'sie werden nach der Marktanpassung angesetzt, und dieser Sachwert ist unangepasst.');
         }
         /* v955-etw: SACHWERTFAKTOR = 1.0 heisst "keine Marktanpassung", nicht
-         * "Marktanpassung ergibt 1,0". Real liegt er je nach Lage bei 0,8-1,3.
+         * "Marktanpassung ergibt 1,0". Eine Spanne (bis v2992 „0,8-1,3") ist nicht belegt und wird nicht genannt.
          * Wer das nicht weiss, liest den Sachwert als Verkehrswert. */
-        out.notes.push('Sachwertfaktor 1,0 angesetzt: Ohne Daten des örtlichen Gutachterausschusses erfolgt KEINE Marktanpassung. Reale Sachwertfaktoren liegen je nach Lage zwischen 0,8 und 1,3 – der ausgewiesene Sachwert ist deshalb unangepasst und weicht systematisch vom Verkehrswert ab.');
+        out.notes.push('Sachwertfaktor 1,0 angesetzt: Ohne Daten des örtlichen Gutachterausschusses erfolgt KEINE Marktanpassung. Die allgemeinen Wertverhältnisse kommen im Sachwertverfahren erst über den Sachwertfaktor hinein (ImmoWertA zu § 7, § 21 Abs. 3 ImmoWertV) – der ausgewiesene Sachwert ist deshalb unangepasst, nur eine Plausibilitätsrechnung und kein Marktwert.');   /* v2993: die Spanne „0,8 bis 1,3" war unbelegt */
         if (!istHaus && !istWohnung) out.notes.push('Objektart nicht eindeutig – Sachwert mit EFH-Ansatz gerechnet. Bei Nicht-Wohnnutzung ist er nicht belastbar.');
       }
 
@@ -1114,9 +1128,17 @@ export const CrossCheckService = {
             Modell des verwendeten Zinses sie verlangt (AGVGA-NRW-Vermerk oder derselbe
             Ausschuss) und sie fuer das Objekt gilt (fuehrend) - Rueckkehr zu v1059
          2  Ø Miete des VERWENDETEN Liegenschaftszins-Satzes (modellansaetze)
-         3  nur wenn beides fehlt: die Angebotsmiete (aktueller Marktdurchschnitt).
-            Einen belegten Abschlag Angebot -> Vertrag gibt es nicht (empirica 273/2024:
-            -7 % bis +29 % je Stadt); er wird deshalb nicht erfunden.
+         3  v2993: die Bestandsmiete des Zensus 2022 (Gemeinde vor Kreis, Klasse nach
+            Baujahr und Wohnungsgroesse), mit dem Nettokaltmietenindex auf den Stichtag
+            fortgeschrieben (lib/zensus_miete.js). Die Ausschuesse leiten ihre Zinsen aus
+            TATSAECHLICHEN Mieten ab, § 256 BewG gehoert zu den Bestandsmieten der
+            Anlage 39 BewG - die Angebotsmiete passt zu keinem der Modelle (§ 10,
+            ImmoWertA zu § 31 b und zu § 33). Am Markt 9: 8,40 Angebot gegen 5,59 Zensus.
+         4  nur wenn alles fehlt: die Angebotsmiete (aktueller Marktdurchschnitt),
+            gekennzeichnet. Ein Abschlag wird nicht erfunden: Inserate liegen laut
+            empirica 273/2024 im Mittel 17 % (11 bis 29 %) ueber den Neuvertragsmieten,
+            gemessen nur in den zehn teuersten Staedten. (Bis v2992 stand hier
+            „-7 % bis +29 %" - die -7 % waren die Differenz der Mietsteigerung in Koeln.)
        _refQm ist ab hier der Anker: Mitte des Bandes, Ansatz ausserhalb des Bandes und
        Miete der leeren Wohnungen (Marcel 21.10.: voll vermietet). */
     const _amtM = (p.amtliche_miete && p.amtliche_miete.verfuegbar && _num(p.amtliche_miete.miete_qm)) ? p.amtliche_miete : null;
@@ -1139,10 +1161,14 @@ export const CrossCheckService = {
         ? { qm: _r2a(_satzMiete.qm), stufe: 'satz_mittel', etikett: 'Ø Miete des Liegenschaftszinssatzes', feld: _satzMiete.feld,
             quelle: 'Ø Miete der Kauffälle, aus denen ' + (p.lzs_ausschuss || 'der Gutachterausschuss') + ' den Liegenschaftszins'
               + (p.lzs_berichtsjahr ? ' ' + p.lzs_berichtsjahr : '') + ' abgeleitet hat' }
-        : (rentSqm > 0
-          ? { qm: _r2a(rentSqm), stufe: 'angebot', etikett: 'Angebotsmiete (aktueller Marktdurchschnitt)',
-              quelle: 'aktueller Marktdurchschnitt der Angebotsmieten' }
-          : null);
+        : (p.zensus_miete && _num(p.zensus_miete.qm) > 0)
+          ? { qm: _r2a(_num(p.zensus_miete.qm)), stufe: 'zensus', etikett: 'Bestandsmiete Zensus 2022, fortgeschrieben',
+              quelle: p.zensus_miete.text || p.zensus_miete.quelle, zensus: p.zensus_miete,
+              angebot_qm: rentSqm > 0 ? _r2a(rentSqm) : null }
+          : (rentSqm > 0
+            ? { qm: _r2a(rentSqm), stufe: 'angebot', etikett: 'Angebotsmiete (aktueller Marktdurchschnitt)',
+                quelle: 'aktueller Marktdurchschnitt der Angebotsmieten' }
+            : null);
     if (_anker && _amtVerlangt && !_amtFuehrt && _amtM.ausserhalb_hinweis) _anker.amtlich_nicht_fuehrend = _amtM.ausserhalb_hinweis;
     const _refQm = _anker ? _anker.qm : null;
     /* ══ v2367 · DIE IST-MIETE, WENN SIE MARKTUEBLICH IST (§ 31 Abs. 2 ImmoWertV) ══
@@ -1298,6 +1324,7 @@ export const CrossCheckService = {
         ? [{ nr: null, differenz_jahr: _ls
               ? Math.round(_ls.ist_monat_vermietet * 12 - _refQm * _ls.wfl_vermietet * 12)
               : Math.round(_num(ref.monthly_net_rent) * 12 - _refQm * _wflIst * 12),
+             ist_jahr: _ls ? Math.round(_ls.ist_monat_vermietet * 12) : Math.round(_num(ref.monthly_net_rent) * 12),   /* v2993 · fuer den § 558-Pfad */
              befristet_bis: ref.mv_befristet_bis || null, kuendigungsverzicht_bis: ref.mv_kuendigungsverzicht_bis || null,
              abw_jahre: Number(ref.mv_abw_jahre) > 0 ? Number(ref.mv_abw_jahre) : null }]
         : []);
@@ -1754,7 +1781,8 @@ export const CrossCheckService = {
         const _lzsK = kern.lzs ? kern.lzs.pct : lzsPct;
         const _rndK = kern.nutzungsdauer ? kern.nutzungsdauer.rnd : null;
         _bogDoppelt = !!(ein.bog_eur && /miet|leerst|herricht|overrent|underrent|mehrertrag|minderertrag/i.test(String(ein.bog_grund || '')));
-        if (_postenAlle.length) _mietBog = mietabweichungBog(_postenAlle, _lzsK, _rndK, new Date());
+        if (_postenAlle.length) _mietBog = mietabweichungBog(_postenAlle, _lzsK, _rndK, new Date(),
+          { kappung: kappungFuer(ref.ags, ref.kappung_pct) });   /* v2993 · § 558 BGB */
         /* v2800 · Wortlaut je Art: nur Gewerbe -> „Gewerbeeinheit", gemischt -> beide */
         if (_mietBog && _gew) {
           _mietBog.gewerbe = !_wohnPosten.length;
@@ -1771,8 +1799,12 @@ export const CrossCheckService = {
         if (!_bogDoppelt && _mietBog && _mietBog.n_angesetzt && _mietBog.angesetzt_eur) {
           _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung' + (_mietBog.gemischt ? ' Wohnungen und Gewerbe' : (_mietBog.gewerbe ? ' Gewerbe' : (_gew ? ' Wohnungen' : ''))), wert: _mietBog.angesetzt_eur,
             detail: 'Reinertragsdifferenz je Jahr (Bewirtschaftungskosten gleich): ' + _mietBog.zeilen.filter((x) => x.angesetzt && x.barwert_eur).map((x) => (x.nr ? x.nr + ': ' : '')
-              + (x.differenz_jahr > 0 ? '+' : '−') + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr × Barwertfaktor '
-              + String(x.jahre).replace('.', ',') + ' J. (' + (x.jahre_quelle === 'eingabe' ? 'eigene Angabe' : x.jahre_quelle === 'befristung' ? 'Befristung' : 'Kündigungsverzicht') + ')').join('; ') });
+              + (x.jahre_quelle === 'bgb558'
+                /* v2993 · Pfad nach § 558 BGB: die Differenz schrumpft mit jeder Anhebung - kein einzelner Barwertfaktor */
+                ? '−' + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr anfangs, abnehmend mit jeder Anhebung nach § 558 BGB (Kappung ' + x.pfad558.kappung_pct + ' %), '
+                  + String(x.jahre).replace('.', ',') + ' J. bis zur marktüblichen Miete = ' + Math.round(x.barwert_eur).toLocaleString('de-DE') + ' €'
+                : (x.differenz_jahr > 0 ? '+' : '−') + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr × Barwertfaktor '
+                  + String(x.jahre).replace('.', ',') + ' J. (' + (x.jahre_quelle === 'eingabe' ? 'eigene Angabe' : x.jahre_quelle === 'befristung' ? 'Befristung' : 'Kündigungsverzicht') + ')')).join('; ') });
         }
         if (!_bogDoppelt && _leerBog && _leerBog.summe_eur > 0) {
           _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Leerstand (Mietausfall, Herrichtung)', wert: -_leerBog.summe_eur,
@@ -1967,6 +1999,14 @@ export const CrossCheckService = {
             out.notes.push('Mietabweichung als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV): Barwert der Reinertragsdifferenz zwischen Ist-Miete und '
               + 'marktüblichem Ansatz (Bewirtschaftungskosten in beiden gleich, wie Ertragswertrichtlinie Anlage 3 Beispiel 1) über die Restlaufzeit, mit dem Liegenschaftszins ' + String(_mietBog.lzs_pct).replace('.', ',') + ' % (Ertragswertrichtlinie Nr. 11.1): '
               + _eu(_mietBog.angesetzt_eur) + '.');
+          }
+          /* v2993 · der Pfad nach § 558 BGB sagt seine Annahmen und die Kappungsgrenze */
+          const _p558 = _mietBog.zeilen.filter((x) => x.jahre_quelle === 'bgb558' && x.pfad558);
+          if (_p558.length) {
+            const _p0 = _p558[0].pfad558;
+            out.notes.push('Mindermiete bis zur Anpassung (ImmoWertA zu § 31 c, § 558 BGB): ' + _p0.annahmen + '. ' + (_p0.kappung_text || '') + '.'
+              + ' Je Wohnung: ' + _p558.map((x) => (x.nr ? x.nr + ' ' : '') + String(x.jahre).replace('.', ',') + ' J., ' + _eu(x.barwert_eur)).join('; ')
+              + '. Ist die letzte Erhöhung jünger als 15 Monate oder gilt eine Befristung, verlängert sich die Dauer - mit einem Vertragsdatum wird sie genau.');
           }
           if (_mietBog.n_offen && _mietBog.szenarien) {
             const s0 = _mietBog.szenarien[0], s2 = _mietBog.szenarien[_mietBog.szenarien.length - 1];

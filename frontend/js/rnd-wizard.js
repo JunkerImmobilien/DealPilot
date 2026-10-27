@@ -17,6 +17,15 @@
 (function (global) {
   'use strict';
 
+  /* v2993 · gesetzlicher AfA-Satz nach Fertigstellungsjahr (§ 7 Abs. 4 Satz 1 Nr. 2 EStG) */
+  function _gesetzAfaSatz(bj) {
+    const j = parseInt(bj, 10);
+    if (!(j > 0)) return 0.02;
+    if (j >= 2023) return 0.03;
+    if (j < 1925) return 0.025;
+    return 0.02;
+  }
+
   let currentStep = 1;
   const TOTAL_STEPS = 9;
   let state = null;
@@ -183,7 +192,9 @@
       eigentuemer_plz: '',
       eigentuemer_ort: '',
       stichtag: today,
-      besichtigungsdatum: today,
+      /* v2993 · leer statt „heute": ein vorbelegtes Datum behauptet eine Besichtigung,
+         die es vielleicht nie gab (Recherche RND-Gutachten 27.10.2026). */
+      besichtigungsdatum: '',
       aktenzeichen: 'JI-' + Date.now().toString().slice(-7),
 
       // Step 3: Bauliche Anlagen
@@ -1334,7 +1345,10 @@
 
     // ─── Rechtliche Basis ──────────────────────────────────────────
     html += '<div style="padding:14px 18px;background:#FAF6E8;border-radius:8px;font-size:12px;color:#7A7370;line-height:1.5;border-left:3px solid #C9A84C">'
-      + '<strong style="color:#2A2727">Rechtliche Basis:</strong> §7 Abs. 4 Satz 2 EStG, BFH IX R 25/19 (28.07.2021). Eine kürzere RND als die Standard-50-J. ist anerkennungsfähig durch Sachverständigen-Gutachten.'
+      /* v2993 · Stand 27.10.2026: IX R 14/23 und die Aufhebung des BMF-Schreibens vom 22.02.2023 am 01.12.2025 */
+      + '<strong style="color:#2A2727">Rechtliche Basis:</strong> § 7 Abs. 4 Satz 2 EStG. Jede im Einzelfall geeignete sachverständige Methode ist zulässig (BFH IX R 25/19 vom 28.07.2021; IX R 14/23 vom 23.01.2024), auch die Restnutzungsdauer nach ImmoWertV - '
+      + 'aber nicht als bloßer Verweis auf das Modell: das Gutachten muss die Gegebenheiten des Objekts zum Erwerbszeitpunkt begutachten, etwa durchgeführte oder unterlassene Modernisierungen je Gewerk. '
+      + 'Das BMF-Schreiben vom 22.02.2023 ist seit 01.12.2025 aufgehoben. Gesetzliche Nutzungsdauer hier: ' + Math.round(1 / _gesetzAfaSatz(state.baujahr)) + ' Jahre (' + String(_gesetzAfaSatz(state.baujahr) * 100).replace('.', ',') + ' %).'
       + '</div>';
 
     body.innerHTML = html;
@@ -1426,7 +1440,10 @@
     // V195: Werte aus DealPilot-Prefill (gesetzt durch _getRndPrefill in deal-action)
     const gebAnteil = state._dpGebaeudeanteil || 200000;
     const grenz = state._dpGrenzsteuersatz || 0.42;
-    const standardSatz = state._dpStandardAfaSatz || 0.02;
+    /* v2993 · der gesetzliche Satz nach § 7 Abs. 4 Satz 1 EStG hängt am Baujahr: 3 % bei
+       Fertigstellung nach dem 31.12.2022, 2,5 % vor 1925, sonst 2 %. Bis v2992 immer 2 % -
+       der Mehr-AfA-Vergleich war vor 1925 geschönt (2 statt 2,5 %). */
+    const standardSatz = state._dpStandardAfaSatz || _gesetzAfaSatz(state.baujahr);
     return RND.calcAfaVergleich({
       gebaeudeanteil: gebAnteil,
       rnd: result.final_rnd,

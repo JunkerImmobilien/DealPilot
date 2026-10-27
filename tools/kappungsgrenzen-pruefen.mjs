@@ -137,6 +137,16 @@ console.log('Land  K15   MPB  ohneAGS  Kappung bis');
 for (const z of zeilen) console.log(z);
 console.log(`Summe Gemeinden mit AGS: ${alleAgs.size}`);
 for (const w of warn) console.log(`HINWEIS ${w}`);
+/* v2993 · der Spiegel im Marktbericht-Backend (lib/kappung.js, § 558-Pfad der Mindermiete) -
+   das mb-Image enthaelt frontend/ nicht. Abweichung = ROT: sonst rechnet der Bericht mit
+   einer alten Liste, und nichts widerspricht. */
+{
+  const SP = path.join(path.dirname(DATEI), '..', '..', '..', 'marktbericht', 'backend', 'src', 'lib', 'data', 'kappungsgrenzen.json');
+  if (!fs.existsSync(SP)) fehler.push('Spiegel fehlt: marktbericht/backend/src/lib/data/kappungsgrenzen.json');
+  else if (fs.readFileSync(SP, 'utf8').replace(/\r\n/g, '\n') !== fs.readFileSync(DATEI, 'utf8').replace(/\r\n/g, '\n'))
+    fehler.push('Spiegel weicht ab: cp frontend/js/data/kappungsgrenzen.json marktbericht/backend/src/lib/data/');
+  else console.log('Spiegel marktbericht/backend/src/lib/data/kappungsgrenzen.json gleich');
+}
 if (fehler.length) {
   console.log(`ROT  ${fehler.length} Befund(e):`);
   for (const m of fehler.slice(0, 40)) console.log(`  - ${m}`);
