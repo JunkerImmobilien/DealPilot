@@ -41383,3 +41383,17 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
   html body #oe-karte-gewerke #oe-gewerke .oe-sr-g { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   html body #oe-karte-gewerke > .ct, html body #oe-karte-gewerke > .oe-gew-hint { position: static !important; }
 }
+
+/* v2969a · Marcel 27.10.: „In der Erstkonfiguration wird das X fuer Schliessen nicht
+   richtig angezeigt." Gemessen: das ✕ der Datenaufnahme-Schublade (object-actions.js,
+   .dp-pf-mclose) stand als WEISSER Kasten 45 × 44 mit 13-px-Zeichen auf der dunklen
+   Kopfleiste — die Knopf-Regel im Reiter (bg #fff, padding 10px 16px) schlug die
+   eigene Regel Z. 33680. Jetzt rund, dunkel, Zeichen gross genug. */
+/* Klasse zwoelffach: `.sec button:not(...)` traegt neun :not() (0,10,1) und gewann (gemessen). */
+html body .dp-pf-msheet-head .dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose {
+  width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important;
+  padding: 0 !important; border-radius: 50% !important; background: transparent !important;
+  border: 1px solid rgba(255,255,255,.22) !important; color: var(--wl-e8cc7a, #E8CC7A) !important;
+  font-size: 18px !important; line-height: 1 !important; box-shadow: none !important;
+  display: inline-flex !important; align-items: center; justify-content: center; margin-top: 0;
+}

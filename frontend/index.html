@@ -34,7 +34,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v2969">
+<link rel="stylesheet" href="css/style.css?v=v2969b">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/avsec-karte-neu.js?v=v2780a"></script><!-- v2780 · nur noch Vergleich ?mwkarte=alt -->
@@ -1428,36 +1428,6 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
-  <!-- ═══ v2430 · MIETERHÖHUNG UND ZIELBILD (optional) ═════════════════════
-       Marcel 19.10.2026: je Wohnung bis zu drei Mieten — Ist, Soll-Miete
-       (Mieter bleibt, normale Mieterhöhung) und Zielbild (nach Umbau oder
-       Neuvermietung). Freiwillig: „kann, nicht muss". Für ETW/EFH/ZFH hier am
-       Objekt; beim MFH je Wohnung im Fenster „Einheiten erfassen" — dann
-       zeigt diese Karte nur die Summe (potenzial.js objektKarte()).
-       Felder in storage.js FIELDS und resetFields. Eingetragen wird im
-       laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. -->
-  <div class="card" data-collapsible="zb-obj" data-collapse-title="Mieterhöhung und Zielbild (optional)" id="zb-karte">
-    <div class="ct-row">
-      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-trend"/></svg></span>Mieterhöhung und Zielbild <span class="oe-ct-hint">optional · kann, nicht muss</span></div>
-    </div>
-    <div id="zb-mfh-summe" style="display:none"></div>
-    <!-- v2541: Jahr der Fertigstellung des Zielbilds (Pilot-Analyse, PDF, Karte im Tab Bewertung) - fuer Einzelobjekt und MFH -->
-    <div class="g3" id="zb-jahr-zeile" style="margin:0 0 10px"><div class="f"><label title="In welchem Jahr ist das Zielbild erreicht (Umbau fertig, neu vermietet)? Leer: in Pilot-Analyse und PDF steht das Jahr als offen.">Zielbild fertig (Jahr)</label><div class="iw"><input id="zb_fertig_jahr" type="text" inputmode="numeric" maxlength="4" placeholder="z. B. 2028"></div></div></div>
-    <div id="zb-einzel">
-      <p class="sec-desc" style="margin:0 0 12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
-      <div class="g3">
-        <div class="f"><label title="Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.">Vergleichsmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="aus Tab Miete" class="trl"></div></div>
-        <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
-        <div class="f"><label title="Leer: 15 Monate nach der letzten Erhöhung (Tab Miete, Mietvertrag).">Soll erreichbar ab</label><div class="iw"><input id="zb_soll_ab" type="month"></div></div>
-        <div class="f"><label title="Was nach Umbau oder Neuvermietung erzielbar ist.">Zielmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_ziel_qm" type="text" inputmode="decimal" placeholder="z. B. 9,20" class="trl"></div></div>
-        <div class="f s2"><label>Zielbild ab wann</label><div class="iw"><input id="zb_ziel_wann" type="text" placeholder="z. B. nach Sanierung 2027"></div></div>
-      </div>
-      <div class="card-title">Maßnahmen <span class="oe-ct-hint">mit Kosten und Modernisierungspunkten (Anlage 2 ImmoWertV)</span></div>
-      <div id="zb-massnahmen-host"></div>
-      <input type="hidden" id="zb_massnahmen">
-      <div class="dp-zb-sum" id="zb-summe"></div>
-    </div>
-  </div>
   <!-- ═══ v1136-WMTAB-1 · Wertermittlung am Objekt ═══════════════════════
        Seit v1121/v1134/v1135 stehen die Wertermittlungsangaben dauerhaft am
        Objekt und laufen in beide Richtungen — ansehen oder aendern konnte man
@@ -1847,6 +1817,38 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
+  <!-- ═══ v2969b · Marcel 27.10.2026: „Zielbild in Tab Investition" — die Karte stand
+       bis hierher im Reiter Objekt. Sie haengt nur an ihrer ID (potenzial.js), nicht am Reiter. -->
+  <!-- ═══ v2430 · MIETERHÖHUNG UND ZIELBILD (optional) ═════════════════════
+       Marcel 19.10.2026: je Wohnung bis zu drei Mieten — Ist, Soll-Miete
+       (Mieter bleibt, normale Mieterhöhung) und Zielbild (nach Umbau oder
+       Neuvermietung). Freiwillig: „kann, nicht muss". Für ETW/EFH/ZFH hier am
+       Objekt; beim MFH je Wohnung im Fenster „Einheiten erfassen" — dann
+       zeigt diese Karte nur die Summe (potenzial.js objektKarte()).
+       Felder in storage.js FIELDS und resetFields. Eingetragen wird im
+       laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. -->
+  <div class="card" data-collapsible="zb-obj" data-collapse-title="Mieterhöhung und Zielbild (optional)" id="zb-karte">
+    <div class="ct-row">
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-trend"/></svg></span>Mieterhöhung und Zielbild <span class="oe-ct-hint">optional · kann, nicht muss</span></div>
+    </div>
+    <div id="zb-mfh-summe" style="display:none"></div>
+    <!-- v2541: Jahr der Fertigstellung des Zielbilds (Pilot-Analyse, PDF, Karte im Tab Bewertung) - fuer Einzelobjekt und MFH -->
+    <div class="g3" id="zb-jahr-zeile" style="margin:0 0 10px"><div class="f"><label title="In welchem Jahr ist das Zielbild erreicht (Umbau fertig, neu vermietet)? Leer: in Pilot-Analyse und PDF steht das Jahr als offen.">Zielbild fertig (Jahr)</label><div class="iw"><input id="zb_fertig_jahr" type="text" inputmode="numeric" maxlength="4" placeholder="z. B. 2028"></div></div></div>
+    <div id="zb-einzel">
+      <p class="sec-desc" style="margin:0 0 12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
+      <div class="g3">
+        <div class="f"><label title="Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.">Vergleichsmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="aus Tab Miete" class="trl"></div></div>
+        <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
+        <div class="f"><label title="Leer: 15 Monate nach der letzten Erhöhung (Tab Miete, Mietvertrag).">Soll erreichbar ab</label><div class="iw"><input id="zb_soll_ab" type="month"></div></div>
+        <div class="f"><label title="Was nach Umbau oder Neuvermietung erzielbar ist.">Zielmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_ziel_qm" type="text" inputmode="decimal" placeholder="z. B. 9,20" class="trl"></div></div>
+        <div class="f s2"><label>Zielbild ab wann</label><div class="iw"><input id="zb_ziel_wann" type="text" placeholder="z. B. nach Sanierung 2027"></div></div>
+      </div>
+      <div class="card-title">Maßnahmen <span class="oe-ct-hint">mit Kosten und Modernisierungspunkten (Anlage 2 ImmoWertV)</span></div>
+      <div id="zb-massnahmen-host"></div>
+      <input type="hidden" id="zb_massnahmen">
+      <div class="dp-zb-sum" id="zb-summe"></div>
+    </div>
+  </div>
   <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Miete</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s1');return false;">Weiter: Miete<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
@@ -3743,7 +3745,7 @@ label.dp-required.qc-required::after {
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v2966b"></script>
-<script src="js/potenzial.js?v=v2966a"></script>
+<script src="js/potenzial.js?v=v2969b"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3754,10 +3756,10 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2833"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v2966"></script>
+<script src="js/help.js?v=v2969b"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
-<script src="js/prozess-atlas.js?v=v2966f"></script>
+<script src="js/prozess-atlas.js?v=v2969b"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2966f"></script>
 <script src="js/messe-drehbuch.js?v=v2968"></script>
 <script src="js/hinweise.js?v=v2204"></script>
