@@ -317,7 +317,16 @@
       });
       return '<span class="oe-chips">' + leer.concat(voll).join('') + '</span>';
     })();
-    var mpQ = (mp && mp.total > 0 ? st('a', 'Anlage 2 greift') : st('x', 'Anlage 2 greift nicht'))
+    /* v2983 · Marcel 27.10.2026 (Lindenhof 14, MFH Bj 1972, alle acht Felder „Keine/Nie" oder
+       „> 20 Jahre"): hier stand bei 0 Punkten immer „Anlage 2 greift nicht". Seit v2541/v2975
+       rechnet Anlage 2 auch mit 0 Punkten - sie greift, nur ohne Modernisierungszuschlag. Rot
+       ist nur noch, wenn die Felder FEHLEN: 0 aus acht Antworten ist ein Befund, keine Luecke. */
+    var _mpGef = MOD_FELDER.filter(function (f) { return !!_v(f[0]); }).length;
+    var mpQ = (mp && mp.total > 0 ? st('a', 'Anlage 2 greift')
+        : (_mpGef ? st('a', 'Anlage 2 mit 0 Punkten') : st('x', 'Angaben fehlen')))
+      + (mp && mp.total === 0 && _mpGef
+          ? 'Keines der Gewerke ist in den letzten 20 Jahren modernisiert: Anlage 2 ImmoWertV rechnet die Restnutzungsdauer ohne Modernisierungszuschlag. '
+          : '')
       + 'Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle (Anlage 2 ImmoWertV) und tragen die Restnutzungsdauer. Klick springt zum Feld:'
       + '<br>' + mpChips;
     if (mp && mp.mfh) mpQ = st('a', 'Anlage 2 greift') + 'Aus den ' + mp.mfh.einheiten + ' Einheiten des MFH-Konfigurators, flächengewichtet ('
