@@ -229,3 +229,26 @@
   .fe2-siegel::before,.dpl-live i{animation:none}
   .dpl-bild video,.dpl-karte .dpl-inhalt{transition:none}
 }
+
+/* ══ landing-module-1 · Zusatzmodule für Partner (#module, im Partner-Kasten) ══
+   Marcel 27.10.2026: RND-Kern, Wertermittlungs-Kern und Makler-Hub bewerben, „auf Anfrage". */
+.pmod{margin-top:28px;border:1px solid var(--line);padding:30px 26px 22px}
+.pmod-h{max-width:720px;margin-bottom:22px}
+.pmod-h .tag{font:700 10px/1 var(--mono);letter-spacing:.14em;color:var(--gdh);text-transform:uppercase;margin-bottom:12px}
+.pmod-h h3{font:600 26px/1.2 var(--disp);color:#fff;margin:0 0 10px}
+.pmod-h p{margin:0;color:var(--mdk);font-size:14.5px;line-height:1.6}
+.pmod-g{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pmod-k{display:flex;flex-direction:column;border:1px solid var(--line);padding:22px 20px;background:rgba(255,255,255,.025)}
+.pmod-hub{border-color:var(--gdh)}
+.pmod-n{font:700 9px/1 var(--mono);letter-spacing:.12em;color:var(--gdh);margin-bottom:12px}
+.pmod-k h4{font-size:17px;color:#fff;margin:0 0 9px}
+.pmod-k p{margin:0 0 12px;font-size:13.4px;color:var(--mdk);line-height:1.6}
+.pmod-k ul{margin:0 0 18px;padding:0;list-style:none;flex:1}
+.pmod-k li{font-size:13px;color:var(--txtd);line-height:1.5;padding:5px 0 5px 18px;position:relative}
+.pmod-k li::before{content:"◆";position:absolute;left:0;top:6px;font-size:9px;color:var(--gdh)}
+.pmod-cta{display:block;text-align:center;border:1px solid var(--gdh);color:var(--gdh);padding:12px;min-height:44px;
+  font:700 11px/1.6 var(--mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none}
+.pmod-cta:hover{background:var(--runway);color:#14100a;border-color:transparent}
+.pmod-f{margin:18px 0 0;font-size:12.6px;color:var(--ddk);line-height:1.6}
+.pmod-f a{color:var(--gdh)}
+@media(max-width:900px){.pmod-g{grid-template-columns:1fr}.pmod{padding:24px 16px 18px}.pmod-h h3{font-size:22px}}

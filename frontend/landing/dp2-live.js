@@ -67,9 +67,9 @@
 
     root.innerHTML =
       '<div class="dpl-kopf">' +
-        '<div class="head"><div class="eye">DealPilot live · Bordkino</div>' +
-          '<h2>Nicht erklärt. <span class="ac">Vorgeflogen.</span></h2>' +
-          '<p>Echte Bildschirmaufnahmen aus der laufenden App, kein Werbespot. Wähle deine Flughöhe: der ganze Weg im Überblick, die Basismodule oder die Spezialthemen.</p></div>' +
+        /* landing-module-1 · Marcel 27.10.2026: „Nicht erklärt. Vorgeflogen.“ war ihm zu albern, Investoren brauchen eine deutliche Sprache */ '<div class="head"><div class="eye">DealPilot in Aktion · echte Aufnahmen</div>' +
+          '<h2>Vom Exposé zur <span class="ac">belastbaren Entscheidung.</span></h2>' +
+          '<p>So rechnet DealPilot ein Objekt durch: Cashflow, Finanzierung, Steuer, Wert und Risiko, nachvollziehbar Schritt für Schritt. Starte mit dem Überblick oder geh direkt in das Modul, das dich interessiert.</p></div>' +
         '<div class="dpl-tabs" role="tablist" aria-label="Videoreihe wählen">' +
           K.map(function (k) {
             var n = V.filter(function (v) { return v.kategorie === k.id; }).length;
