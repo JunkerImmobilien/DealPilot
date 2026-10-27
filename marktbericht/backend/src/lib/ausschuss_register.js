@@ -449,6 +449,40 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                > Vergleichswertverfahren, das sie nicht tragen. Die
                                > Verdrahtung muss `verwendung` lesen. */
                             'vgf-be.json',
+                            /* Ernte 27.10.2026 (Ost): Sachsen-Anhalt — Gebaeudefaktoren (§ 20) des
+                               GAA ST, veroeffentlicht 22.01./13.02.2025, alle 14 Kreise fuer EZFH und
+                               RH/DHH (Normobjekt-Kurve je Wohnflaeche x Umrechnungskoeffizienten), dazu
+                               ETW Halle aus dem GMB 2023 Abschn. 7.3. Gemeinden mit Grossstadtrandlage
+                               bzw. Altkreis Querfurt eigens (8-stellig). Viele Saetze verlangen
+                               Standardstufe / Unterkellerung / Garagen / Modernisierungspunkte als
+                               formel.bedingungen - ohne diese Eingaben rechnen sie nicht. */
+                            'vgf-st-2025.json',
+                            /* Ernte 27.10.2026 (Ost): ETW-Vergleichsfaktor-Sperren mit Weg fuer
+                               Dresden (nur UK-Modell 7.2.3, formel_vorgemerkt), Leipzig, Schwerin. */
+                            'ost-nachernte-2026-10.json',
+                            /* Ernte 27.10.2026 (HH/BB/NI): Vergleichs-/Gebaeudefaktoren (§ 20).
+                               vgf-hh-2026.json      Hamburg, IMB 2026 Kap. 7.2.1/7.6.1: EFH je Stellung
+                                                     (ezfh, dhh, rmh, reh) und ETW, Produktformel. Rechnet
+                                                     erst mit NormBRW20/NormBRW18 und Alter (bedingungen).
+                               vgf-bb-oga-2025.json  Oberer GAA Brandenburg, Vergleichsfaktoren 2025:
+                                                     Berliner Umland je Gemeinde (8-stellig, ohne die fuenf
+                                                     Barnimer - Barnim hat eigene, vgf-bb.json), Weiterer
+                                                     Metropolenraum als Landessatz 12. Stufe C.
+                               vgf-ni-2026.json      NI-Dashboards (VizQL-Bootstrap): Hannover, Braunschweig,
+                                                     Osnabrueck, Oldenburg/Ammerland, Hildesheim, Goettingen,
+                                                     Lueneburg; Sperren dort, wo Ortsteil/Stadtteil den Wert
+                                                     bestimmt. Die meisten verlangen das modifizierte Baujahr. */
+                            'vgf-hh-2026.json', 'vgf-bb-oga-2025.json', 'vgf-ni-2026.json',
+                            /* Ernte 27.10.2026 (HE): Vergleichsfaktoren des Landes Hessen 2026
+                               (ZGGH, Stichtag 01.01.2026, Version 1.1 vom 31.08.2026), alle 17
+                               Ausschuesse: EFH/ZFH und RH/DHH = Tabelle Wohnflaeche x
+                               Bodenrichtwertbereich plus Korrekturwert (Grundstuecksgroesse x
+                               Baujahr, additiv, EUR/m2), ETW = Bodenrichtwertbereich x Baujahr
+                               (Wiederverkauf). Geteilte Kreise als ein Satz je Zweig, Marktbereich
+                               ueber die achtstellige ags (verzweigt); Main-Kinzig/Wetterau je
+                               Gemeinde (MB 2 ohne RH/ETW = Sperre). Frankfurt ETW braucht die Lage
+                               (rechnet nicht), Wiesbaden ETW = Klassenmittel (Stufe C). */
+                            'vgf-he-2026.json',
                             /* v2279: Umrechnungskoeffizienten Grundstuecksgroesse
                                (§ 19 ImmoWertV), Kennzahl umrechnungskoeffizient_flaeche.
                                Erster Satz: Stadt Bielefeld (BORIS-NRW 2026). Gelesen

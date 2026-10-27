@@ -878,6 +878,25 @@ export const ReportOrchestrator = {
           rnd_jahre: _rndVorab.rnd != null ? _rndVorab.rnd : null,
           flaeche: Number(ref.plot_area) > 0 ? Number(ref.plot_area) : null,
           baujahr: Number(ref.build_year) > 0 ? Number(ref.build_year) : null,
+          /* v2999 · Gebaeudefaktoren Sachsen-Anhalt (vgf-st-2025) rechnen mit Standardstufe, Unterkellerung,
+             Modernisierungspunkten und Garagen - ohne sie halten 115 von 121 Saetzen an (bedingung_nicht_pruefbar).
+             Unterkellerung aus der NHK-Angabe (Geschosse 0/1 = mit Keller, 2/3 = ohne; keller_dg kg_/ohne_kg_);
+             eine Teilunterkellerung fuehrt DealPilot nicht - dann keine Zahl, kein Raten. */
+          standardstufe: Number(ref.standardstufe) > 0 ? Number(ref.standardstufe) : null,
+          unterkellerung_pct: (function () {
+            const k = String(ref.keller_dg || '');
+            if (/^kg_/.test(k)) return 100;
+            if (/^ohne_kg/.test(k)) return 0;
+            const m = /^\d+\.(\d)/.exec(String(ref.nhk_typ || ''));
+            if (m) return (m[1] === '0' || m[1] === '1') ? 100 : ((m[1] === '2' || m[1] === '3') ? 0 : null);
+            return null;
+          })(),
+          mod_punkte: Number.isFinite(Number(ref.mod_punkte)) && ref.mod_punkte !== null && ref.mod_punkte !== '' ? Number(ref.mod_punkte) : null,
+          garagen_anzahl: Number.isFinite(Number(ref.garages)) && ref.garages !== null && ref.garages !== '' ? Number(ref.garages) : null,
+          /* v2999 · modifiziertes Baujahr (Niedersachsen): Wertermittlungsjahr - (GND 80 - RND nach Anlage 2),
+             dieselbe RND wie in allen Verfahren; Alter (Hamburg) = Wertermittlungsjahr - Baujahr */
+          baujahr_modifiziert: _rndVorab.rnd != null ? Math.round(new Date().getFullYear() - (80 - Number(_rndVorab.rnd))) : null,
+          alter_jahre: Number(ref.build_year) > 0 ? new Date().getFullYear() - Number(ref.build_year) : null,
         });
         if (_r && _r.verfuegbar && _r.wert != null) {
           if (String(_r.verwendung || '') === 'intern') {
@@ -934,6 +953,9 @@ export const ReportOrchestrator = {
           }
         } else if (_r && _r.grund) {
           step('vergleichsfaktor-register: keiner (' + _r.grund + ')');
+          /* v2999 · der Grund und der Weg zum Ausschuss reisen mit (Sperre, fehlende Angabe) */
+          if (_r.grund !== 'kein_satz' && _r.hinweis) _regVf = { verfuegbar: false, grund: _r.grund, hinweis: _r.hinweis,
+            zugang: _r.zugang || null, quelle_url: _r.quelle_url || _r.bestell_url || null, ausschuss: _r.ausschuss || null };
         }
       }
     } catch (e) {

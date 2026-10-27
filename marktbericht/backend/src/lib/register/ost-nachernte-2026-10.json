@@ -1,0 +1,129 @@
+[
+ {
+  "ebene": "kreis",
+  "kennzahl": "vergleichsfaktor",
+  "vollstaendig": false,
+  "stufe": "A",
+  "quelle_parser": "register-ernte 27.10.2026 (pdftotext-Volltextsuche + Sichtlesung)",
+  "land_code": "SN",
+  "ags": "14612",
+  "gebiet_name": "Dresden, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+  "zweig": "etw",
+  "berichtsjahr": 2026,
+  "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf#page=71",
+  "zugang": "kostenpflichtig",
+  "modellversion": "Grundstücksmarktbericht Dresden 2026, Kap. 7.2.3",
+  "lizenz": "Wörtlich (Impressum S. 2): „Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig.\"",
+  "warum_kein_wert": "Kein Vergleichsfaktor für Wohnungseigentum mit Normobjekt. Der Grundstücksmarktbericht 2026 führt in Kap. 7.2.3 „Geschossbau als Wohnungseigentum\" (S. 71–75) nur UMRECHNUNGSKOEFFIZIENTEN für Weiterverkäufe (Baujahr ab 1990; Baujahr bis 1989 saniert): eine Regression ln(Preis) über Wohnfläche, Bodenrichtwert, Baujahr bzw. Sanierungsjahr und Wohnlage (1 = dörflich … 5 = sehr gut), mit der ein GEGEBENER Vergleichspreis auf das Wertermittlungsobjekt umgerechnet wird („angepasster Preis = Vergleichspreis × Preis(Wertermittlungsobjekt)/Preis(Vergleichsobjekt)\", S. 74). Den Vergleichspreis selbst gibt die Geschäftsstelle nur als Auskunft aus der Kaufpreissammlung ab: „Auf Antrag und bei Nachweis des berechtigten Interesses … sind gebührenpflichtig.\" (Kap. 8.1, S. 104). Zusätzlich verlangt das Modell die Dresdner Wohnlage, die DealPilot nicht führt. Weg: Antrag auf Auskunft aus der Kaufpreissammlung über www.dresden.de/gutachterausschuss (Antragsformulare laut Kap. 8.5, S. 104), dann Umrechnung mit dem Modell unter formel_vorgemerkt.",
+  "formel_vorgemerkt": {
+   "art": "Umrechnungskoeffizienten-Modell, kein Vergleichsfaktor",
+   "ab_1990": {
+    "formel": "ln(Preis) = 0,0020 × Wohnfläche + 0,0002 × Bodenrichtwert + 0,0220 × Baujahr + 0,1069 × Wohnlage − 36,6502",
+    "r2": 0.63,
+    "kauffaelle": 747,
+    "stichtag": "2025-07-09",
+    "seite": "S. 73–74",
+    "anwendungsbeispiel": {
+     "vergleichspreis_eur_qm": 2500,
+     "vergleichsobjekt": {
+      "wf": 80,
+      "brw": 400,
+      "baujahr": 1993,
+      "wohnlage": 4
+     },
+     "objekt": {
+      "wf": 95,
+      "brw": 520,
+      "baujahr": 2012,
+      "wohnlage": 4
+     },
+     "ergebnis_eur_qm": 4008,
+     "seite": "S. 75"
+    }
+   },
+   "bis_1989_saniert": {
+    "formel": "ln(Preis) = 0,0036 × Wohnfläche + 0,1031 × ln(Bodenrichtwert) + 0,0113 × Sanierungsjahr + 0,1016 × Wohnlage − 15,9950 (Anwendungsbeispiel S. 75 rechnet mit + 15,9950)",
+    "r2": 0.58,
+    "kauffaelle": 767,
+    "stichtag": "2025-07-14",
+    "seite": "S. 73–74",
+    "anwendungsbeispiel": {
+     "vergleichspreis_eur_qm": 2600,
+     "vergleichsobjekt": {
+      "wf": 90,
+      "brw": 840,
+      "sanierungsjahr": 2000,
+      "wohnlage": 3
+     },
+     "objekt": {
+      "wf": 70,
+      "brw": 820,
+      "sanierungsjahr": 1998,
+      "wohnlage": 4
+     },
+     "ergebnis_eur_qm": 2612,
+     "seite": "S. 75"
+    },
+    "widerspruch": "S. 73 druckt die Konstante als „− 15,9950\", das Anwendungsbeispiel S. 75 rechnet mit „+ 15,9950\". Im Verhältnis zweier Preise kürzt sich die Konstante heraus — das Ergebnis 2.612 €/m² hängt nicht davon ab."
+   }
+  },
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Dresden 2026, Kap. 7.2.3, S. 71–75; Kap. 8.1/8.5, S. 104",
+    "wortlaut": "Weiterverkäufe – Baujahr ab 1990 (880 Kauffälle, nach Ausreißerbereinigung 747) und Baujahr bis 1989, saniert (908 / 767); Umrechnung eines Vergleichspreises."
+   }
+  ],
+  "unvollstaendig_grund": "Kein Vergleichsfaktor für Wohnungseigentum mit Normobjekt."
+ },
+ {
+  "ebene": "kreis",
+  "kennzahl": "vergleichsfaktor",
+  "vollstaendig": false,
+  "stufe": "A",
+  "quelle_parser": "register-ernte 27.10.2026 (pdftotext-Volltextsuche + Sichtlesung)",
+  "land_code": "SN",
+  "ags": "14713",
+  "gebiet_name": "Leipzig, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "zweig": "etw",
+  "berichtsjahr": 2026,
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "zugang": "kostenpflichtig",
+  "modellversion": "Marktbericht Leipzig 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "warum_kein_wert": "Kein Vergleichsfaktor nach § 20 ImmoWertV im Marktbericht 2026. Volltextsuche nach „Vergleichsfaktor\" über alle 100 Seiten: einziger Treffer in der allgemeinen Aufgabenbeschreibung (S. 10: aus der Kaufpreissammlung werden „Indexreihen, Umrechnungskoeffizienten, Vergleichsfaktoren, Liegenschaftszinssätze, Marktanpassungsfaktoren\" abgeleitet). Kap. 5 (Sondereigentum, S. 53–75) behandelt laut Inhaltsverzeichnis Wohnungseigentum nach Teilmärkten (Erstverkauf Neubau und sanierter Altbau; Wiederverkauf Baujahre nach 1990, sanierter Altbau, Komplexer Wohnungsbau); eine Ableitung nach § 20 mit Normobjekt ist dort nicht ausgewiesen (Kaufpreisstatistiken ohne Normobjekt wären höchstens ein durchschnittspreis, ImmoWertA 20). Nicht Seite für Seite gelesen — bei der nächsten Ernte prüfen, ob Kap. 5.5.3/5.5.5 Umrechnungskoeffizienten mit Bezugsobjekt führen. „Die Leistungen des Gutachterausschusses bzw. seiner Geschäftsstelle sind gebührenpflichtig.\" (S. 10). Weg: Auskunft aus der Kaufpreissammlung bei der Geschäftsstelle (Amt für Geoinformation und Bodenordnung der Stadt Leipzig), gebührenpflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Marktbericht Leipzig 2026, S. 10 (Kaufpreissammlung, Gebührenpflicht); Inhaltsverzeichnis Kap. 5.4–5.5, S. 53–75",
+    "wortlaut": "siehe warum_kein_wert"
+   }
+  ],
+  "unvollstaendig_grund": "Kein Vergleichsfaktor nach § 20 ImmoWertV im Marktbericht 2026."
+ },
+ {
+  "ebene": "kreis",
+  "kennzahl": "vergleichsfaktor",
+  "vollstaendig": false,
+  "stufe": "A",
+  "quelle_parser": "register-ernte 27.10.2026 (pdftotext-Volltextsuche + Sichtlesung)",
+  "land_code": "MV",
+  "ags": "13004",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "zweig": "etw",
+  "berichtsjahr": 2025,
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf#page=79",
+  "zugang": "kostenpflichtig",
+  "modellversion": "Grundstücksmarktbericht Schwerin 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "warum_kein_wert": "Kein Vergleichsfaktor nach § 20 ImmoWertV im Grundstücksmarktbericht 2025 (Volltextsuche nach „Vergleichsfaktor\": kein Treffer; 96 Seiten). Vergleichspreise gibt es nur über den „Antrag auf Auskunft aus der Kaufpreissammlung (Vergleichspreise)\" nach § 13 Abs. 2 der Gutachterausschusslandesverordnung (Formular im Bericht S. 79). Weg: Antrag an die Geschäftsstelle des Gutachterausschusses Schwerin (Tel. 03871 722-6103), gebührenpflichtig.",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 79 (Antragsformular Auskunft aus der Kaufpreissammlung)",
+    "wortlaut": "Antrag auf Auskunft aus der Kaufpreissammlung (Vergleichspreise)."
+   }
+  ],
+  "unvollstaendig_grund": "Kein Vergleichsfaktor nach § 20 ImmoWertV im Grundstücksmarktbericht 2025 (Volltextsuche nach „Vergleichsfaktor\": kein Treffer; 96 Seiten)."
+ }
+]

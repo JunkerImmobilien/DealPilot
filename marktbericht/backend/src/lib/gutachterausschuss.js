@@ -1443,9 +1443,14 @@ function _vergleichsfaktorKern(arg = {}) {
    * Das ist etwas anderes als "kein Ausschuss hinterlegt", und der Bericht
    * soll den Unterschied sagen können. */
   if (!f.form) {
-    return { verfuegbar: false, grund: 'gefuehrt_aber_nicht_abgeleitet',
-      hinweis: 'Der Ausschuss führt diese Objektart, hat für sie aber '
-        + 'keinen Vergleichsfaktor abgeleitet.',
+    /* v2999 · eine Sperre MIT Grund (warum_kein_wert, zugang) ist keine fehlende Ableitung -
+       bis hier hiess jede Sperre „hat keinen Vergleichsfaktor abgeleitet", auch wo der Ausschuss
+       einen fuehrt, der nur am Ortsteil haengt oder Geld kostet (Ernte NI/Ost 27.10.2026). */
+    const _warum = s.warum_kein_wert || (s.sperre && s.sperre.grund) || null;
+    return { verfuegbar: false, grund: _warum ? 'gesperrt' : 'gefuehrt_aber_nicht_abgeleitet',
+      hinweis: _warum ? String(_warum) : ('Der Ausschuss führt diese Objektart, hat für sie aber '
+        + 'keinen Vergleichsfaktor abgeleitet.'),
+      zugang: s.zugang || null, bestell_url: s.bestell_url || null, quelle_url: s.quelle_url || null,
       ausschuss: s.gaa_name || null, zweig: s.zweig,
       stichtag: s.stichtag || null, berichtsjahr: s.berichtsjahr ?? null };
   }
