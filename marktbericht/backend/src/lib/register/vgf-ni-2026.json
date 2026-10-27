@@ -19334,15 +19334,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.7488511942965871": 1.5,
-     "0.891988011711322": 2,
-     "1.08507953880832": 3,
-     "1.15426940418037": 3.5,
-     "1.21193143816304": 4,
-     "1.2609231043538": 4.5
+     "2": 0.892,
+     "3": 1.0851,
+     "4": 1.2119,
+     "1.5": 0.7489,
+     "2.5": 1,
+     "3.5": 1.1543,
+     "4.5": 1.2609
     },
-    "hinweis": "Stützpunkte 0.7488511942965871 bis 1.2609231043538 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1.5 bis 4.5 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -19584,15 +19584,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -20077,15 +20077,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.7488511942965871": 1.5,
-     "0.891988011711322": 2,
-     "1.08507953880832": 3,
-     "1.15426940418037": 3.5,
-     "1.21193143816304": 4,
-     "1.2609231043538": 4.5
+     "2": 0.892,
+     "3": 1.0851,
+     "4": 1.2119,
+     "1.5": 0.7489,
+     "2.5": 1,
+     "3.5": 1.1543,
+     "4.5": 1.2609
     },
-    "hinweis": "Stützpunkte 0.7488511942965871 bis 1.2609231043538 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1.5 bis 4.5 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -20343,15 +20343,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -20673,15 +20673,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.7488511942965871": 1.5,
-     "0.891988011711322": 2,
-     "1.08507953880832": 3,
-     "1.15426940418037": 3.5,
-     "1.21193143816304": 4,
-     "1.2609231043538": 4.5
+     "2": 0.892,
+     "3": 1.0851,
+     "4": 1.2119,
+     "1.5": 0.7489,
+     "2.5": 1,
+     "3.5": 1.1543,
+     "4.5": 1.2609
     },
-    "hinweis": "Stützpunkte 0.7488511942965871 bis 1.2609231043538 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1.5 bis 4.5 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -20939,15 +20939,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -21448,15 +21448,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.7488511942965871": 1.5,
-     "0.891988011711322": 2,
-     "1.08507953880832": 3,
-     "1.15426940418037": 3.5,
-     "1.21193143816304": 4,
-     "1.2609231043538": 4.5
+     "2": 0.892,
+     "3": 1.0851,
+     "4": 1.2119,
+     "1.5": 0.7489,
+     "2.5": 1,
+     "3.5": 1.1543,
+     "4.5": 1.2609
     },
-    "hinweis": "Stützpunkte 0.7488511942965871 bis 1.2609231043538 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1.5 bis 4.5 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -21698,15 +21698,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -22207,15 +22207,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.7488511942965871": 1.5,
-     "0.891988011711322": 2,
-     "1.08507953880832": 3,
-     "1.15426940418037": 3.5,
-     "1.21193143816304": 4,
-     "1.2609231043538": 4.5
+     "2": 0.892,
+     "3": 1.0851,
+     "4": 1.2119,
+     "1.5": 0.7489,
+     "2.5": 1,
+     "3.5": 1.1543,
+     "4.5": 1.2609
     },
-    "hinweis": "Stützpunkte 0.7488511942965871 bis 1.2609231043538 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1.5 bis 4.5 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -22457,15 +22457,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -22966,15 +22966,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.7488511942965871": 1.5,
-     "0.891988011711322": 2,
-     "1.08507953880832": 3,
-     "1.15426940418037": 3.5,
-     "1.21193143816304": 4,
-     "1.2609231043538": 4.5
+     "2": 0.892,
+     "3": 1.0851,
+     "4": 1.2119,
+     "1.5": 0.7489,
+     "2.5": 1,
+     "3.5": 1.1543,
+     "4.5": 1.2609
     },
-    "hinweis": "Stützpunkte 0.7488511942965871 bis 1.2609231043538 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1.5 bis 4.5 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -23216,15 +23216,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -23725,15 +23725,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.7488511942965871": 1.5,
-     "0.891988011711322": 2,
-     "1.08507953880832": 3,
-     "1.15426940418037": 3.5,
-     "1.21193143816304": 4,
-     "1.2609231043538": 4.5
+     "2": 0.892,
+     "3": 1.0851,
+     "4": 1.2119,
+     "1.5": 0.7489,
+     "2.5": 1,
+     "3.5": 1.1543,
+     "4.5": 1.2609
     },
-    "hinweis": "Stützpunkte 0.7488511942965871 bis 1.2609231043538 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1.5 bis 4.5 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -23975,15 +23975,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -24521,15 +24521,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -25051,15 +25051,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -25581,15 +25581,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -26111,15 +26111,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
@@ -26641,15 +26641,15 @@
     "wirkung": "multiplikativ",
     "rundung_stellen": 4,
     "stufen": {
-     "1": 2.5,
-     "0.86381399539736": 1,
-     "0.91068440977748": 1.5,
-     "0.955701397531031": 2,
-     "1.04419769690282": 3,
-     "1.08868867497562": 3.5,
-     "1.13375380786025": 4
+     "1": 0.8638,
+     "2": 0.9557,
+     "3": 1.0442,
+     "4": 1.1338,
+     "1.5": 0.9107,
+     "2.5": 1,
+     "3.5": 1.0887
     },
-    "hinweis": "Stützpunkte 0.86381399539736 bis 1.13375380786025 aus den Dashboard-Daten (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
+    "hinweis": "Stützpunkte Standardstufe 1 bis 4 aus den Dashboard-Daten (Spalte „SUM(Stützpunkt (STST))“, nachgeerntet 27.10.2026) (ungerundet; das Dashboard zeigt zwei Nachkommastellen). Bei der Normstelle 1,00."
    },
    {
     "bez": "Erbbaurecht",
