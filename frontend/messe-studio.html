@@ -55,6 +55,21 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
 #fort{position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--gl),var(--gh));transition:width .8s cubic-bezier(.3,0,.2,1);box-shadow:0 0 12px var(--g)}
 /* Vorhang über allem (Intro/Outro) */
 #vorhang{position:absolute;inset:0;z-index:30;pointer-events:none}
+/* v3015 · Webinar: rechts neben der App eine Tafel mit drei Punkten (was du eingibst, warum, was daraus folgt) */
+body.mit-tafel #rahmen{right:500px}
+#tafel{display:none;position:absolute;right:24px;top:22px;bottom:172px;width:452px;border-radius:16px;padding:26px 26px 22px;overflow:hidden;
+  background:linear-gradient(170deg,rgba(18,15,9,.97),rgba(8,7,5,.97) 70%);box-shadow:0 0 0 1px color-mix(in srgb,var(--g) 45%,transparent),0 30px 80px rgba(0,0,0,.55)}
+body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
+#tafel .tk{font:700 12px "JetBrains Mono",monospace;letter-spacing:.26em;text-transform:uppercase;color:var(--g)}
+#tafel .tp{position:relative;padding:16px 18px 16px 62px;border-radius:12px;background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--g) 22%,transparent);opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s}
+#tafel.an .tp{opacity:1;transform:none}
+#tafel.an .tp:nth-child(3){transition-delay:.35s}#tafel.an .tp:nth-child(4){transition-delay:.7s}
+#tafel .tp i{position:absolute;left:16px;top:16px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font:700 17px/1 "Space Grotesk",sans-serif;font-style:normal;color:#1a1407;background:linear-gradient(110deg,var(--gh),var(--g) 55%,var(--gl))}
+#tafel .tp b{display:block;font:700 11px "JetBrains Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--gh);margin-bottom:6px}
+#tafel .tp span{display:block;font:500 20px/1.38 Inter,sans-serif;color:var(--creme)}
+#tafel .leer{margin:auto 0;font:400 17px/1.5 Inter,sans-serif;color:#8c8578;text-align:center}
+#tafel .fuss{margin-top:auto;font:700 22px/1 "Space Grotesk",sans-serif;letter-spacing:-.03em;color:var(--creme)}
+#tafel .fuss b{background:linear-gradient(110deg,var(--gh),var(--g) 55%,var(--gl));-webkit-background-clip:text;background-clip:text;color:transparent}
 #start{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--obs);text-align:center}
 #start button{font:700 18px "Space Grotesk",sans-serif;padding:16px 30px;border-radius:12px;border:0;cursor:pointer;color:#1a1407;background:linear-gradient(110deg,var(--gh),var(--g) 55%,var(--gl))}
 #start p{color:#8c8578;font-size:14px;margin-top:14px}
@@ -64,6 +79,7 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
 <div id="buehne">
   <div id="hinweis">Vorführung · Beispieldaten · aufgezeichnete Pilot-Analyse</div>
   <div id="rahmen"><iframe id="app" title="DealPilot" allow="clipboard-write"></iframe></div>
+  <div id="tafel"></div>
   <div id="band">
     <div id="nr">1</div>
     <div id="txt"><div id="kick"></div><div id="titel"></div><div id="zeile"></div></div>
@@ -162,6 +178,11 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     'ue2': { art: 'Überblick', nr: '2', hinweis: 'Vorführung · Kopie eines Demo-Objekts · aufgezeichnete Marktbewertung', messe: 'reihe-ueberblick2', titel: 'Vom neuen Objekt zum DealScore und Investment-PDF', unter: 'Der ganze Weg am Stück — in fünf Minuten.',
             spruch: 'Vom ersten Eintrag', spruch2: 'bis zur Bankmappe.', weiter: 'Basismodule 02–10 · jeder Bereich im Detail' }
   };
+  /* v3015 · Webinar (Marcel 27.10.2026: „ein großes Webinar, detailliert erklärt“): eigene Reihe,
+     neun Kapitel, Tafel rechts; ?modul=mfh oder ?messe=komplett-mfh */
+  REIHE.mfh = { reihe: 'DealPilot Webinar', art: 'Komplettbeispiel', nr: 'MFH', tafel: true, hinweis: 'Vorführung · Haus aus dem Demo-Konto, neu getippt · aufgezeichneter Marktbericht · PDF lokal erzeugt', messe: 'komplett-mfh',
+            titel: 'Komplettbeispiel Mehrfamilienhaus', unter: 'Ein Haus, neun Kapitel — von der ersten Eingabe bis zum Bank-PDF.',
+            spruch: 'Erst rechnen,', spruch2: 'dann kaufen.', weiter: '' };
   REIHE.ue1 = REIHE['01'];   /* v2370 · Alias */
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];
@@ -176,7 +197,9 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
   /* v2235b · die App bekommt einen Viewport von BREITE CSS-px und wird auf den
      Rahmen gestreckt. Gemessen bei 0,8 (2.606 px App-Breite): Kacheln und
      Kegel im Video kaum lesbar. 1.700 bleibt Desktop-Fassung, Schrift x1,23. */
-  var BREITE = parseInt(P.get('breite'), 10) || 1700, SKALA = 1;
+  /* v3015 · mit Tafel ist der Rahmen 476 px schmaler - 1.440 px App-Breite halten die Schrift lesbar (Skala ~0,97) */
+  if (M && M.tafel) document.body.classList.add('mit-tafel');
+  var BREITE = parseInt(P.get('breite'), 10) || (M && M.tafel ? 1440 : 1700), SKALA = 1;
   var app = document.getElementById('app'), rahmen = document.getElementById('rahmen'), vorhang = document.getElementById('vorhang');
   var band = document.getElementById('band'), nr = document.getElementById('nr'), txt = document.getElementById('txt');
 
@@ -199,7 +222,7 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
   /* v2253 · Reihen-Stücke bekommen ihre Texte aus REIHE; andere Stücke
      behalten die Texte aus TEXTE */
   if (M) {
-    var RT = { reihe: 'So funktioniert DealPilot', modul: MODUL };
+    var RT = { reihe: M.reihe || 'So funktioniert DealPilot', modul: MODUL };
     T = { intro: T.intro, outro: T.outro };
     if (INTRO === 'reihe') T.intro = { reihe: RT.reihe, modul: M.nr || MODUL, art: M.art, titel: M.titel, unter: M.unter };
     if (OUTRO === 'reihe') T.outro = { reihe: RT.reihe, modul: M.nr || MODUL, art: M.art, spruch: M.spruch, spruch2: M.spruch2, weiter: M.weiter || '', url: String(QR).replace(/^https?:\/\//, '') };
@@ -253,10 +276,40 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     var m = e.data;
     if (m.type === 'bereit') _bereit = true;
     else if (m.type === 'kapitel') kapitel(m);
+    else if (m.type === 'tafel') tafel(m.tafel);
+    else if (m.type === 'zwischentitel') zwischentitel(m);
+    else if (m.type === 'zwischentitel-weg') zwischentitelWeg();
     else if (m.type === 'ende') ende();
   });
+  /* v3015 · Tafel: drei Punkte je Schritt (Texte aus dem Drehbuch, Zahlen dort live gelesen) */
+  var tafelEl = document.getElementById('tafel');
+  function tafelEsc(s) { var d = document.createElement('div'); d.textContent = String(s == null ? '' : s); return d.innerHTML; }
+  function tafel(t) {
+    var sig = t ? [t.was, t.warum, t.folge].join('|') : '';
+    if (tafelEl.getAttribute('data-sig') === sig) return;
+    tafelEl.setAttribute('data-sig', sig);
+    tafelEl.classList.remove('an');
+    tafelEl.innerHTML = '<div class="tk">Dieser Schritt</div>' + (t
+      ? [['1', 'Was du eingibst', t.was], ['2', 'Warum', t.warum], ['3', 'Was daraus folgt', t.folge]].map(function (x) { return '<div class="tp"><i>' + x[0] + '</i><b>' + x[1] + '</b><span>' + tafelEsc(x[2]) + '</span></div>'; }).join('')
+      : '<div class="leer">Gleich geht es weiter.</div>') + '<div class="fuss">Deal<b>Pilot</b></div>';
+    void tafelEl.offsetWidth; tafelEl.classList.add('an');
+  }
+  /* v3015 · Zwischentitel je Kapitel: das Reihen-Intro des Baukastens mit „Kapitel n“ */
+  var _zw = null;
+  function zwischentitel(m) {
+    zwischentitelWeg(true);
+    _zw = DealPilotMesseFX.spiele(vorhang, 'intro', 'reihe', { reihe: (M && M.reihe) || 'DealPilot', art: 'Kapitel', modul: String(m.nr), titel: m.titel || '', unter: m.unter || '' });
+  }
+  function zwischentitelWeg(sofort) {
+    var z = _zw; _zw = null; if (!z) return;
+    if (sofort) { z.weg(); return; }
+    z.ebene.style.transition = 'opacity .8s'; z.ebene.style.opacity = '0';
+    setTimeout(function () { z.weg(); }, 850);
+  }
+  if (M && M.tafel) tafel(null);
   async function ende() {
     band.classList.remove('an');
+    zwischentitelWeg(true);
     await warte(500);
     DealPilotMesseFX.spiele(vorhang, 'outro', OUTRO, T.outro || {});
     window.DPM_STUDIO_FERTIG = Date.now();

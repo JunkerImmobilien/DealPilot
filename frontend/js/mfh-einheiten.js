@@ -1116,11 +1116,15 @@
 
   function oeffnen(schritt) {
     stilEinhaengen();
-    ausObjektVorbelegen();
     schliessen();
     var d = daten();
     _arbeit = JSON.parse(JSON.stringify(d.einheiten || []));
     _geb = JSON.parse(JSON.stringify(d.gebaeude || {}));
+    /* v3015 · ERST nach _geb vorbelegen. Gemessen am Webinar-Lauf 27.10.2026: das Vorbelegen lief vor
+       dieser Zeile und wurde von ihr überschrieben - Schritt 1 sagte „8 Angaben stammen aus dem Tab
+       Objekt und sind unten schon gesetzt“, zeigte aber 0 von 20 Punkten, und „Übernehmen“ schrieb
+       Modernisierungspunkte 0 statt 8 ins Objekt (Restnutzungsdauer 12 statt 32 Jahre). */
+    ausObjektVorbelegen();
     _weg = !!d.aufgeteilt;
     _auftK = (d.aufteilungskosten != null && String(d.aufteilungskosten).trim() !== '') ? d.aufteilungskosten : null;   /* v2430 */
     _hausM = JSON.parse(JSON.stringify(Array.isArray(d.haus_massnahmen) ? d.haus_massnahmen : []));   /* v2966 */
