@@ -52,16 +52,21 @@
     if (frame.getAttribute('data-src') !== src) {
       /* landing-einstieg-2 · Marcel 27.10.2026: „bei Kostenlos starten sehe ich kein Anmeldefenster, das ist grau".
          Kommt von der Karte binnen 8 s keine Hoehe, geht es ohne Einbettung direkt in die App - nie eine graue Flaeche. */
-      clearTimeout(notausT);
-      var _ziel = ziel, _gemeldet = false;
-      frame._hoeheDa = false;
-      notausT = setTimeout(function () {
-        if (frame._hoeheDa || _gemeldet) return; _gemeldet = true;
-        location.href = _ziel.origin + '/' + (_ziel.ansicht === 'registrieren' ? '?register=1' + (_ziel.weiter ? '&' + _ziel.weiter : '') : (_ziel.weiter ? '?' + _ziel.weiter : ''));
-      }, 8000);
       if (frame.getAttribute('data-geladen') === '1' && frame.getAttribute('data-origin') === ziel.origin) {
         frame.contentWindow.postMessage({ dpEinbettung: true, typ: 'ansicht', wert: ziel.ansicht }, ziel.origin);
       } else {
+        /* nur beim echten Neuladen scharf - ein Wechsel der Ansicht im geladenen Rahmen meldet kein "bereit" */
+        clearTimeout(notausT);
+        var _ziel = ziel, _gemeldet = false;
+        frame._hoeheDa = false; frame._bereit = false; frame._verlaengert = false;
+        notausT = setTimeout(function notaus() {
+          /* landing-einstieg-3: hat die App sich gemeldet ("bereit"), bekommt die Karte bis 12 s;
+             ohne jedes Lebenszeichen nach 5 s ist der Rahmen blockiert - sofort in die App */
+          if (frame._hoeheDa || _gemeldet) return;
+          if (frame._bereit && !frame._verlaengert) { frame._verlaengert = true; notausT = setTimeout(notaus, 7000); return; }
+          _gemeldet = true;
+          location.href = _ziel.origin + '/' + (_ziel.ansicht === 'registrieren' ? '?register=1' + (_ziel.weiter ? '&' + _ziel.weiter : '') : (_ziel.weiter ? '?' + _ziel.weiter : ''));
+        }, 5000);
         if (laedt) laedt.hidden = false;
         frame.setAttribute('data-origin', ziel.origin);
         frame.src = src;
@@ -92,7 +97,7 @@
 
   window.addEventListener('message', function (e) {
     if (!e.data || !e.data.dpEinbettung || !APP_RE.test(e.origin) || e.origin !== frame.getAttribute('data-origin')) return;
-    if (e.data.typ === 'bereit') { frame.setAttribute('data-geladen', '1'); }
+    if (e.data.typ === 'bereit') { frame.setAttribute('data-geladen', '1'); frame._bereit = true; }
     if (e.data.typ === 'hoehe' && e.data.h > 120) { frame._hoeheDa = true; frame.style.height = Math.min(1400, e.data.h) + 'px'; if (laedt) laedt.hidden = true; }
     if (e.data.typ === 'angemeldet') { location.href = e.origin + '/' + (zustand.weiter ? '?' + zustand.weiter : ''); }
   });
