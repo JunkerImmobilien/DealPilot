@@ -723,7 +723,56 @@
     });
     badgeInDenKopf();
     zahlNachziehen();
+    nutzerNachziehen();
   }
+
+  /* ══ v2980 · DER NUTZERBLOCK KOMMT NACH DER SCHIENE ══════════════════════
+     Marcel 27.10.2026: „wenn ich mich das erste Mal anmelde und ein Objekt im
+     Bestand öffne … sind die Account-Informationen unten wie Plan und Abmelden
+     und angemeldeter User weg" — „unten kein Abmelden möglich links im Menü".
+
+     GEMESSEN auf Prod (Layout v1b, 1920x889): die Schiene führte marke,
+     portfolio, schalter, suche, objekte, aktionen (424 px), score (268 px) -
+     aber KEIN dpl-teil-nutzer. `#sb-user` hing in der versteckten
+     #sidebar (Höhe 0). Ursache: auth.js updateUserDisplay() legt #sb-user
+     beim Anmelden NACHTRÄGLICH an; baueSchienen() lief vorher, `hole('#sb-user')`
+     gab null und der Teil wurde still übersprungen. Nachgezogen hat ihn niemand.
+
+     > Ein einmaliger Aufruf trifft nur, was schon existiert. (Derselbe Satz
+     > steht bei nutzerBeobachten() - dort für die Plan-Pille.)
+
+     Jetzt: wer `nutzer` nimmt, holt den Block nach, sobald er in #sidebar
+     auftaucht - beim Bau, per Beobachter auf #sidebar und bei dp:plan-ready. */
+  var nutzerSidebarWache = null;
+  function nutzerNachziehen() {
+    /* Auf dem Handy nimmt die Schiene nichts (v1880) - dort bleibt der Block in der Seitenleiste. */
+    if (window.matchMedia('(max-width: 900px)').matches) return;
+    var u = el('#sb-user');
+    if (u && !u.closest('.dpl-schiene')) {
+      var ziel = document.querySelector('.dpl-schiene[data-dpl-nimmt~="nutzer"]');
+      if (ziel) {
+        var k = hole('#sb-user');
+        if (k) {
+          var h = document.createElement('div');
+          h.className = 'dpl-teil dpl-teil-nutzer';
+          h.appendChild(k);
+          ziel.appendChild(h);
+        }
+      }
+    }
+    if (!nutzerSidebarWache && window.MutationObserver) {
+      var sb = el('#sidebar');
+      if (sb) {
+        nutzerSidebarWache = new MutationObserver(function () {
+          var n = el('#sb-user');
+          if (n && !n.closest('.dpl-schiene') && document.querySelector('.dpl-schiene[data-dpl-nimmt~="nutzer"]')) nutzerNachziehen();
+        });
+        nutzerSidebarWache.observe(sb, { childList: true });
+      }
+    }
+  }
+  window.addEventListener('dp:plan-ready', function () { try { nutzerNachziehen(); } catch (e) {} });
+
 
   /* ── „0 / 6 · 0 %" gehört in den Kopf ─────────────────────────────
      Marcel am 28.09.2026: „unter Deal-Aktion im Menübereich, dort haben
@@ -839,6 +888,7 @@
        zwangslaeufig dunkel geworden. */
     schiene.setAttribute('data-ton', S.ton || 'dunkel');
     schiene.setAttribute('data-objekte', L.objekteAls);
+    schiene.setAttribute('data-dpl-nimmt', (S.nimmt || []).join(' '));   /* v2980 · für nutzerNachziehen() */
 
     /* ── WESSEN MARKE HIER STEHT ──────────────────────────────────
        Bei einem Whitelabel-Mandanten SEINE, sonst unsere. Gefragt

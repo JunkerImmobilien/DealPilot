@@ -2607,7 +2607,21 @@ bereits gelöschte mb-Berichte NICHT wieder her.**
 
 ### Produktion per `tools/rollout-prod.ps1 -Freigabe` (Stand 25.10.2026)
 
-`-Freigabe` nur, wenn Marcel den Rollout ausdrücklich genannt hat. Das Skript
+> **STEHENDE FREIGABE (Marcel, 27.10.2026):** *„künftig möchte ich keine
+> Freigaben mehr machen über diesen Link zum Rollout, bitte direkt in die
+> Projektanweisung schreiben. Das hast du sonst auch immer selber gemacht und
+> das ist auch ok so."* — **Claude rollt nach Prod selbst aus**, sobald ein
+> Paket auf Staging gebaut, ausgerollt und nachgemessen ist und alle Prüfer
+> grün sind: `tools/rollout-prod.ps1 -Freigabe`, danach auf Prod nachmessen
+> und das Journal fortschreiben. Kein eigener Rollout nur für einen
+> Journal-Commit. **Weiter nachfragen** bei: Datenbank-Eingriffen auf Prod
+> außerhalb von Migrationen (Daten ändern, löschen, umziehen), Geld, Preisen,
+> Stripe-Schreibzugriffen, Kündigungen — und wenn ein Prüfer rot ist.
+> Wird der Aufruf vom Sicherheitsfilter abgewiesen, muss Marcel einmalig eine
+> Erlaubnisregel für genau diesen Befehl in Claude Code eintragen (`/permissions`);
+> Claude darf seine Erlaubnisliste nicht selbst ändern.
+
+Das Skript
 sichert beide Prod-DBs und liest ihre Köpfe, lässt den Gold-Audit auf Staging
 laufen, merged `staging → main`, zieht auf Prod, baut `backend` und
 `mb-backend` und misst nach. **Zwei Fehler am 25.10. behoben:** (1) die
@@ -42646,3 +42660,8 @@ Marcel 22.10.2026: „ja rollout 62".
   - **Nachweis:** Knotenlauf mit Parkstr.-Zahlen: neue Zeile und Begründung da, „+13 %“ und Prozentsatz weg, Kasten mit Hinweis „über ein Jahr zurück“; ohne `san` Hinweis „keine Sanierungskosten“; Zustand normal → kein Kasten. buster-ebenen sauber.
   - **Rest:** Nicht im Browser am echten Objekt angesehen (Anmeldung nötig). Ein Feld für einen offenen Instandsetzungsbetrag im Bestand gibt es in der App nicht — nur Zustand oder `san` innerhalb der ersten 12 Monate.
 - **Prod-Rollout `adc3b99` (27.10.2026, v2979, von Marcel gestartet).** Sicherungen `haupt-20261027-1220`, `mb-20261027-1220`, Köpfe gelesen; Gold-Audit auf der Basislinie. App liefert `wertvergleich.js?v=v2979` und `wert-zielbild.js?v=v2979`, die Datei enthält „nur Plausibilität“ und „Angaben, die dem Bericht fehlen“.
+- **v2980 · Nutzerblock (Plan, Abmelden) fehlte in der Schiene nach der ersten Anmeldung (27.10.2026)** (Marcel: „wenn ich mich das erste Mal anmelde und ein Objekt im Bestand öffne … sind die Account-Informationen unten wie Plan und Abmelden und angemeldeter User weg“, Bild `Dateien/Fehler/Screenshot 2026-10-27 122632.png`).
+  - **Befund (Prod, Marcels Browser, Layout v1b, 1920×889):** Schiene mit marke, portfolio, schalter, suche, objekte, aktionen 424 px, score 268 px — **kein `dpl-teil-nutzer`**; `#sb-user` hing in der versteckten `#sidebar` (Höhe 0). `auth.js updateUserDisplay()` legt `#sb-user` beim Anmelden nachträglich an; `baueSchienen()` lief vorher, `hole('#sb-user')` gab null, der Teil wurde still übersprungen.
+  - **Was:** `layout-varianten.js` `nutzerNachziehen()`: holt `#sb-user` in die Schiene mit `data-dpl-nimmt~="nutzer"` (neues Attribut je Schiene), beim Bau, per Beobachter auf `#sidebar` und bei `dp:plan-ready`; auf dem Handy nicht (Schiene nimmt dort nichts, v1880). Buster v2980.
+  - **Nachweis:** In Marcels Tab dieselbe Verschiebung von Hand: Nutzerblock 778–889 px, Aktionen schrumpfen (flex 1 1 auto, scrollen). Beim Einfügen entstanden 45 doppelte Zeilenenden (`\r\r\n`, Write-Datei mit CRLF nochmals umgesetzt) — vor dem Commit bereinigt, `node --check` sauber, Diff 50 Zeilen.
+  - **Rest:** Erstanmeldung selbst nicht nachgestellt (eigenes Passwort tabu); Marcel prüft beim nächsten Anmelden.
