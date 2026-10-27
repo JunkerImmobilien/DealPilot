@@ -109,6 +109,202 @@ function _lageCss() {
   document.head.appendChild(st);
 }
 
+/* ══ v3007 · ABGLEICH MIT DER WEBRECHERCHE — TABELLE, QUELLEN, AUSWAHL ════
+   Marcel am 27.10.2026: nach „Entwicklung per Webrecherche ergaenzen" stand
+   je Merkmal nur ein „≠" oder ein Haekchen. Gemessen vorher: die Spalte
+   „jetzt" zeigte den FELDWERT, nicht die Messung - ≠ hiess also „Feld weicht
+   von der Messung ab", und die Recherche schrieb Entwicklung/Wertsteigerung
+   ungefragt ins Feld (auch ueber einen eigenen Wert). Die Quelle stand nur
+   bei zwei Zeilen, und nur eine je Merkmal.
+
+   Jetzt: je Merkmal Ermittelt (Marktbericht oder unsere Messung) neben der
+   Recherche, eine Ampel (gleich / weicht ab / fehlt) und die freie Wahl, was
+   ins Feld kommt: Ermittelt, Recherche oder ein eigener Wert. Geschrieben
+   wird erst mit „Auswahl uebernehmen" - in dieselben Felder wie bisher, und
+   die Herkunft geht wie seit v2515 nach #_lage_herkunft (gemessen/ki/eigen).
+   Darunter die Fundstellen der Recherche, nummeriert und klickbar.
+   Ein Portal-Link bleibt ein Link, heisst aber nach aussen nur
+   „Aktueller Marktdurchschnitt" (CLAUDE.md, Anbieter-Neutralitaet). */
+var _dpLageWahl = {};      /* key|feld -> {art, eigen} */
+var _dpLageOffen = {};     /* key -> true/false (aufgeklappt) */
+var _dpLageCtx = {};       /* key -> {zeilen, neu} fuer Auswahl und Neuzeichnen */
+var _LV_PORTAL = /(immobilienscout|immoscout|scout24|immowelt|immonet|immoportal|wohnungsb(oe|ö)rse|homeday|meinestadt|miete-aktuell|mietspiegel\.(com|net|org)|wohnpreis|kleinanzeigen|ebay\.|ohne-makler|immopreise|wohnungsmarkt24|sprengnetter|pricehubble)/i;
+function _lvAttr(s) { return _escKi(s).replace(/"/g, '&quot;'); }
+function _lvNeutral(t) {
+  return typeof window._dpOhnePortal === 'function' ? window._dpOhnePortal(t) : String(t == null ? '' : t);
+}
+function _lvHost(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } }
+/* Fundstellen einer KI-Dimension: neu "sources", alt "source" */
+function _lvQuellenVon(d) {
+  if (!d) return [];
+  var roh = Array.isArray(d.sources) && d.sources.length ? d.sources : (d.source ? [d.source] : []);
+  return roh.map(function (q) {
+    if (!q || typeof q !== 'object') return null;
+    var url = /^https?:\/\//i.test(String(q.url || '')) ? String(q.url) : '';
+    if (url && typeof window._urlSauber === 'function') url = window._urlSauber(url);
+    var portal = !!q.portal || _LV_PORTAL.test(url) || _LV_PORTAL.test(String(q.label || ''));
+    var text = portal ? 'Aktueller Marktdurchschnitt (Angebotsdaten)' : _lvNeutral(String(q.label || '').trim());
+    if (!text) text = _lvHost(url) || 'Quelle';
+    return (url || text) ? { url: url, text: text, host: portal ? '' : _lvHost(url) } : null;
+  }).filter(Boolean);
+}
+/* ctx: {key, erm: {feld: {stufe, detail, tip}}, ki: Antwort von /ai/lage, kopf, fuss, neu()} */
+function _lageAbgleichHtml(ctx) {
+  _lageCss(); _lvCss();
+  var key = ctx.key || '';
+  var ki = ctx.ki || {};
+  var quellen = [];                                   /* global nummeriert, entdoppelt */
+  function nr(q) {
+    var s = (q.url || q.text).toLowerCase();
+    for (var i = 0; i < quellen.length; i++) if ((quellen[i].url || quellen[i].text).toLowerCase() === s) return i + 1;
+    quellen.push(q); return quellen.length;
+  }
+  var zeilen = [], n = { gleich: 0, ab: 0, fehlt: 0 };
+  _LAGE_FELDER.forEach(function (x) {
+    var el = document.getElementById(x.id);
+    if (!el) return;
+    var g = (ctx.erm || {})[x.id] || null;
+    var k = ki[x.ki] && ki[x.ki].value && el.querySelector('option[value="' + ki[x.ki].value + '"]') ? ki[x.ki] : null;
+    if (!g && !k) return;
+    var amp = (g && g.stufe && k) ? (g.stufe === k.value ? 'gleich' : 'ab') : 'fehlt';
+    n[amp]++;
+    var refs = k ? _lvQuellenVon(k).map(function (q) { return { n: nr(q), q: q }; }) : [];
+    var jetzt = el.value || '';
+    var w = _dpLageWahl[key + '|' + x.id];
+    if (!w) {
+      var art = (g && g.stufe && jetzt === g.stufe) ? 'erm' : (k && jetzt === k.value) ? 'ki'
+        : jetzt ? 'eigen' : (g && g.stufe ? 'erm' : 'ki');
+      w = _dpLageWahl[key + '|' + x.id] = { art: art, eigen: jetzt };
+    }
+    zeilen.push({ x: x, g: g, k: k, amp: amp, refs: refs, jetzt: jetzt, w: w, el: el });
+  });
+  _dpLageCtx[key] = { zeilen: zeilen, neu: ctx.neu };
+  if (!zeilen.length) return '';
+  var AMP = { gleich: ['gleich', 'Ermittelt und Recherche kommen zum selben Ergebnis'],
+              ab: ['weicht ab', 'Ermittelt und Recherche kommen zu verschiedenen Stufen — wählen Sie, was gilt'],
+              fehlt: ['fehlt', 'Für dieses Merkmal liegt nur eine Seite vor'] };
+  var rows = zeilen.map(function (z) {
+    var id = z.x.id, nm = 'lvw-' + id;
+    var erm = z.g && z.g.stufe
+      ? '<b>' + _escKi(_lageOptText(id, z.g.stufe)) + '</b>' + (z.g.detail ? '<span class="lv-w">' + _escKi(z.g.detail) + '</span>' : '')
+      : '<span class="lv-leer">' + (z.g && z.g.detail ? _escKi(z.g.detail) : 'nicht ermittelt') + '</span>';
+    var rec = z.k
+      ? '<b>' + _escKi(_lageOptText(id, z.k.value)) + '</b>'
+        + (z.refs.length ? ' ' + z.refs.map(function (r) {
+            return r.q.url ? '<a class="lv-ref" href="' + _lvAttr(r.q.url) + '" target="_blank" rel="noopener noreferrer" title="' + _lvAttr(r.q.text) + '">[' + r.n + ']</a>'
+              : '<span class="lv-ref" title="' + _lvAttr(r.q.text) + '">[' + r.n + ']</span>';
+          }).join('') : '')
+        + (z.k.text ? '<span class="lv-kt" title="' + _lvAttr(_lvNeutral(z.k.text)) + '">' + _escKi(_lvNeutral(z.k.text)) + '</span>' : '')
+      : '<span class="lv-leer">nicht recherchiert</span>';
+    function opt(art, label, an) {
+      return '<label class="lv-o' + (an ? '' : ' lv-o-aus') + '"><input type="radio" name="' + nm + '" value="' + art + '"'
+        + (z.w.art === art ? ' checked' : '') + (an ? '' : ' disabled')
+        + ' onchange="_dpLageWahlSetzen(\'' + _lvAttr(ctx.key || '') + '\',\'' + id + '\',this.value)"> ' + label + '</label>';
+    }
+    var eigenOpts = Array.prototype.map.call(z.el.options, function (o) {
+      return '<option value="' + _lvAttr(o.value) + '"' + (o.value === (z.w.eigen || '') ? ' selected' : '') + '>'
+        + _escKi(o.value ? o.textContent.replace(/\s*\(.*\)\s*$/, '') : '— leer —') + '</option>';
+    }).join('');
+    var wahl = '<div class="lv-wahl">' + opt('erm', 'Ermittelt', !!(z.g && z.g.stufe)) + opt('ki', 'Recherche', !!z.k) + opt('eigen', 'Eigener', true) + '</div>'
+      + (z.w.art === 'eigen' ? '<select class="lv-eigen" aria-label="Eigener Wert ' + _lvAttr(z.x.t) + '" onchange="_dpLageEigenSetzen(\'' + _lvAttr(ctx.key || '') + '\',\'' + id + '\',this.value)">' + eigenOpts + '</select>' : '');
+    return '<tr class="lv-z lv-' + z.amp + '"' + (z.g && z.g.tip ? ' title="' + _lvAttr(z.g.tip) + '"' : '') + '>'
+      + '<td data-l="Merkmal"><span class="lv-amp" title="' + _lvAttr(AMP[z.amp][1]) + '"><i></i>' + AMP[z.amp][0] + '</span><b class="lv-mm">' + _escKi(z.x.t) + '</b>'
+      + '<span class="lv-w">im Feld: ' + _escKi(z.jetzt ? _lageOptText(id, z.jetzt) : '–') + '</span></td>'
+      + '<td data-l="Ermittelt (DealPilot)">' + erm + '</td>'
+      + '<td data-l="Webrecherche">' + rec + '</td>'
+      + '<td data-l="Übernehmen">' + wahl + '</td></tr>';
+  }).join('');
+  var qHtml = quellen.length
+    ? '<div class="lv-qk">Quellen der Webrecherche</div><ol class="lv-q">' + quellen.map(function (q) {
+        return '<li>' + (q.url ? '<a href="' + _lvAttr(q.url) + '" target="_blank" rel="noopener noreferrer" title="' + _lvAttr(q.url) + '">' + _escKi(q.text) + '</a>'
+          + (q.host && q.host !== q.text ? ' <span class="lv-host">' + _escKi(q.host) + '</span>' : '') : _escKi(q.text) + ' <span class="lv-host">ohne Link</span>') + '</li>';
+      }).join('') + '</ol>'
+    : '<div class="lv-qk">Quellen der Webrecherche</div><div class="lv-fuss">Die Recherche hat keine Fundstellen genannt.</div>';
+  var zus = [n.gleich ? n.gleich + ' gleich' : '', n.ab ? n.ab + (n.ab > 1 ? ' weichen ab' : ' weicht ab') : '', n.fehlt ? n.fehlt + ' nur einseitig' : ''].filter(Boolean).join(' · ');
+  var offen = !!_dpLageOffen[key];
+  return '<details class="lv-abgl"' + (offen ? ' open' : '') + ' ontoggle="_dpLageOffen[\'' + _lvAttr(key) + '\']=this.open">'
+    + '<summary><span class="lv-sk">' + _escKi(ctx.kopf || 'Abgleich mit der Webrecherche') + '</span><span class="lv-sz">' + _escKi(zus) + '</span></summary>'
+    + '<table class="lv-tab lv-tab4"><thead><tr><th>Merkmal</th><th>Ermittelt (DealPilot)</th><th>Webrecherche</th><th>Übernehmen</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    + '<div class="lv-akt"><button class="btn btn-gold btn-sm" type="button" onclick="_dpLageAuswahlUebernehmen(\'' + _lvAttr(key) + '\')">⤓ Auswahl übernehmen</button>'
+    + '<span class="lv-fuss">' + _escKi(ctx.fuss || 'Ermittelt: Marktbericht bzw. Regionaldatenbank, Zensus 2022, Umfeld-Analyse — Quelle und Schwelle beim Darüberfahren.') + '</span></div>'
+    + qHtml + '</details>';
+}
+function _dpLageWahlSetzen(key, id, art) {
+  var w = _dpLageWahl[key + '|' + id] || (_dpLageWahl[key + '|' + id] = { art: art, eigen: '' });
+  w.art = art;
+  if (art === 'eigen' && !w.eigen) { var el = document.getElementById(id); w.eigen = el ? el.value : ''; }
+  var c = _dpLageCtx[key]; if (c && typeof c.neu === 'function') c.neu();
+}
+function _dpLageEigenSetzen(key, id, v) {
+  var w = _dpLageWahl[key + '|' + id] || (_dpLageWahl[key + '|' + id] = { art: 'eigen', eigen: '' });
+  w.eigen = v;
+}
+function _dpLageAuswahlUebernehmen(key) {
+  var c = _dpLageCtx[key]; if (!c) return;
+  var HK = { erm: 'gemessen', ki: 'ki', eigen: 'eigen' }, geaendert = 0;
+  c.zeilen.forEach(function (z) {
+    var w = _dpLageWahl[key + '|' + z.x.id]; if (!w) return;
+    var v = w.art === 'erm' ? (z.g && z.g.stufe) : w.art === 'ki' ? (z.k && z.k.value) : w.eigen;
+    var el = document.getElementById(z.x.id); if (!el || v == null) return;
+    if (v !== '' && !el.querySelector('option[value="' + v + '"]')) return;
+    if (el.value !== v) { el.value = v; el.dispatchEvent(new Event('change')); geaendert++; }
+    if (window.DpLageHerkunft) window.DpLageHerkunft.setze(z.x.id, HK[w.art]);   /* v2515: leerer Wert loescht die Herkunft */
+    w.eigen = w.art === 'eigen' ? v : w.eigen;
+  });
+  if (typeof dpUpdateAll === 'function') dpUpdateAll();
+  if (typeof toast === 'function') toast(geaendert ? '✓ ' + geaendert + (geaendert > 1 ? ' Lage-Felder' : ' Lage-Feld') + ' übernommen' : '✓ Auswahl entspricht schon den Feldern');
+  if (typeof c.neu === 'function') c.neu();
+}
+window._dpLageWahlSetzen = _dpLageWahlSetzen;
+window._dpLageEigenSetzen = _dpLageEigenSetzen;
+window._dpLageAuswahlUebernehmen = _dpLageAuswahlUebernehmen;
+window._dpLageOffen = _dpLageOffen;
+/* Ermittelt aus der eigenen Messung (/lage/gemessen) */
+function _lvErmAusMessung(m) {
+  var f = (m && m.felder) || {}, out = {};
+  Object.keys(f).forEach(function (id) {
+    var g = f[id]; if (!g || !g.stufe) return;
+    out[id] = { stufe: g.stufe, detail: (g.wert != null ? String(g.wert).replace('.', ',') + ' ' + (g.einheit || '') + ' · ' : '') + 'Regionaldaten',
+      tip: (g.quelle || '') + (g.stand ? ' · Stand ' + (typeof g.stand === 'object' ? JSON.stringify(g.stand).replace(/[{}"]/g, '') : g.stand) : '')
+        + (g.schwelle ? '\nSchwelle (Modellannahme): ' + g.schwelle : '') };
+  });
+  return out;
+}
+function _lvCss() {
+  if (document.getElementById('ki-lage-v3007-css')) return;
+  var G = 'var(--wl-c9a84c, #C9A84C)';
+  var st = document.createElement('style'); st.id = 'ki-lage-v3007-css';
+  st.textContent = ''
+    + '.lv-abgl{margin:10px 0 0;border:1px solid color-mix(in srgb, ' + G + ' 35%, transparent);border-radius:12px;padding:0 12px}'
+    + '.lv-abgl>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:10px 0}'
+    + '.lv-abgl>summary::-webkit-details-marker{display:none}'
+    + '.lv-abgl>summary::before{content:"▸";color:var(--wl-b8932f, #b8932f);font-size:11px}.lv-abgl[open]>summary::before{content:"▾"}'
+    + '.lv-sk{font:600 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f)}'
+    + '.lv-sz{font-size:12px;color:#8b8678}'
+    + '.lv-tab4 td{font-size:12.5px}.lv-tab4 tr{cursor:default}.lv-tab4 td:nth-child(4){min-width:200px}'
+    + '.lv-mm{display:block}.lv-amp{display:inline-flex;align-items:center;gap:4px;font:500 10px/1.2 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;color:#8b8678}'
+    + '.lv-amp i{width:8px;height:8px;border-radius:50%;background:#8b8678;display:inline-block}'
+    + '.lv-gleich .lv-amp{color:#3FA56C}.lv-gleich .lv-amp i{background:#3FA56C}'
+    + '.lv-ab .lv-amp{color:#D8564C}.lv-ab .lv-amp i{background:#D8564C}'
+    + '.lv-kt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:11.5px;line-height:1.35;color:#8b8678;margin-top:2px}'
+    + '.lv-ref{font:500 10.5px/1 "JetBrains Mono",monospace;color:var(--wl-b8932f, #b8932f);text-decoration:none;margin-left:2px}a.lv-ref:hover{text-decoration:underline}'
+    + '.lv-wahl{display:flex;flex-wrap:wrap;gap:2px 10px}.lv-o{display:inline-flex;align-items:center;gap:3px;font-size:12px;cursor:pointer;white-space:nowrap}'
+    + '.lv-o input{margin:0;accent-color:' + G + '}.lv-o-aus{opacity:.4;cursor:not-allowed}'
+    + '.lv-eigen{margin-top:4px;font-size:12px;padding:3px 6px;max-width:100%;border-radius:6px;border:1px solid rgba(140,134,120,.45);background:transparent;color:inherit}'
+    + '.lv-eigen option{color:#1a1a1a;background:#fff}'
+    + '.lv-akt{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:10px 0 4px}.lv-akt .lv-fuss{margin:0}'
+    + '.lv-qk{margin-top:10px;font:600 10.5px/1.4 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#8b8678}'
+    + '.lv-q{margin:4px 0 12px;padding-left:22px;font-size:12px;line-height:1.5}.lv-q a{color:var(--wl-b8932f, #b8932f);word-break:break-word}'
+    + '.lv-host{font:400 10.5px/1.3 "JetBrains Mono",monospace;color:#8b8678;margin-left:4px}'
+    + '@media (max-width:640px){'
+    + '.lv-tab4 thead{display:none}.lv-tab4,.lv-tab4 tbody,.lv-tab4 tr,.lv-tab4 td{display:block;width:auto}'
+    + '.lv-tab4 tr{border:1px solid rgba(140,134,120,.25);border-radius:10px;padding:6px 10px;margin:0 0 8px}'
+    + '.lv-tab4 td{border:0;padding:4px 0}.lv-tab4 td:nth-child(4){min-width:0}'
+    + '.lv-tab4 td:not(:first-child)::before{content:attr(data-l);display:block;font:500 10px/1.3 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.05em;color:#8b8678}'
+    + '}';
+  document.head.appendChild(st);
+}
+
 function runKiLage(opts) {
   /* v2177: {ergaenzen:true} = ein Marktbericht hat die Lage schon gemessen;
      die KI ergaenzt nur, was er nicht misst. */
@@ -245,19 +441,24 @@ function runKiLage(opts) {
     }
     _kiFertig = true;
     if (_erg) {
-      /* v2177: nur die Felder, die der Bericht NICHT gemessen hat */
-      var D = window.DealPilotMB && DealPilotMB.letzter ? DealPilotMB.letzter() : null;
-      var erg = { entwicklung: data.entwicklung || null, wertsteigerung: (D && D.trendRaw != null) ? null : (data.wertsteigerung || null) };
+      /* v3007 · die ganze Antwort bleibt fuer den Abgleich (sie kostet dasselbe,
+         ob wir zwei oder sechs Merkmale zeigen), und NICHTS wird ungefragt ins
+         Feld geschrieben - bis v3006 ueberschrieb die Recherche Entwicklung und
+         Wertsteigerung, auch einen eigenen Wert. Gewaehlt wird in der Tabelle. */
+      var _k = window._currentObjKey || '';
       window._kiLageErgaenzung = window._kiLageErgaenzung || {};
-      window._kiLageErgaenzung[window._currentObjKey || ''] = erg;
-      [['ds2_entwicklung', erg.entwicklung], ['ds2_wertsteigerung', erg.wertsteigerung]].forEach(function (p) {
-        var el = document.getElementById(p[0]);
-        if (el && p[1] && p[1].value && el.querySelector('option[value="' + p[1].value + '"]')) { el.value = p[1].value; el.dispatchEvent(new Event('change')); }
-      });
-      if (typeof dpUpdateAll === 'function') dpUpdateAll();
+      window._kiLageErgaenzung[_k] = { ki: data, adresse: adresse };
+      _dpLageOffen[_k] = true;
+      try {
+        if (window.currentDeal && typeof window.currentDeal === 'object') {
+          window.currentDeal.ai_lage_cache = { html: '', ts: Date.now(), address: adresse, str: str, hnr: hnr, plz: plz, ort: ort,
+            daten: { ki: data, messung: null, modus: 'ergaenzen' } };
+          if (typeof scheduleSave === 'function') scheduleSave();
+        }
+      } catch (e) {}
       window._kiLageErgaenzt = null;
       if (typeof window._kiLageBerichtZeichnen === 'function') window._kiLageBerichtZeichnen();
-      if (typeof toast === 'function') toast('✓ Per Web-Recherche ergänzt — die gemessenen Felder bleiben unverändert');
+      if (typeof toast === 'function') toast('✓ Webrecherche fertig — im Abgleich wählen, welcher Wert gilt');
       return;
     }
     /* v2175: die Messung abwarten (sie ist fast immer schon da), dann beides zeigen */
@@ -272,7 +473,7 @@ function runKiLage(opts) {
   });
 }
 
-function _renderKiLage(data) {
+function _renderKiLage(data, opts) {
   var body = document.getElementById('ki-lage-body');
   if (!body) return;
 
@@ -347,24 +548,23 @@ function _renderKiLage(data) {
     '</div>';
   }
 
-  body.innerHTML =
-    (typeof window.KiLage !== 'undefined' && typeof window.KiLage.getAccuracyBanner === 'function'
-      ? window.KiLage.getAccuracyBanner() : '') +
-    (window._lastLageMessung ? _lageVergleichHtml(window._lastLageMessung, data) : '') +   /* v2175 */
-    '<div class="ki-lage-grid">' +
-      renderBox('Makrolage', 'makro', data.makro) +
-      renderBox('Mikrolage', 'mikro', data.mikro) +
-    '</div>' +
-    aspectsHtml +
-    // V63.9: Kaufpreis-Bewertung (deal_verdict) wird hier NICHT mehr angezeigt — User-Wunsch
-    '<div class="ki-lage-actions">' +
-      '<button class="btn btn-gold ki-lage-apply-btn" type="button" onclick="applyKiLageToFields()">' +
-        '⤓ In Felder übernehmen' +
-      '</button>' +
-      '<span class="ki-lage-apply-hint">Befüllt die Lage-Felder: gemessene Werte zuerst, sonst die KI-Bewertung.</span>' +
-    '</div>';
+  /* v3007 · statt Vergleich + Karten EIN Abgleich: Ermittelt · Webrecherche ·
+     Uebernehmen, die KI-Texte und Quellen stehen in der Zeile. Die Karten
+     (renderBox/renderAspect) wiederholten dieselben Texte ein zweites Mal. */
+  void renderBox; void renderAspect; void aspectsHtml; void renderDealVerdict;
+  var _key = window._currentObjKey || '';
+  _dpLageOffen[_key] = !opts || !opts.zu;   /* frisch recherchiert: offen; aus dem Speicher: zu */
+  var _messung = opts && ('messung' in opts) ? opts.messung : window._lastLageMessung;
+  var _banner = opts && opts.banner != null ? opts.banner
+    : (typeof window.KiLage !== 'undefined' && typeof window.KiLage.getAccuracyBanner === 'function' ? window.KiLage.getAccuracyBanner() : '');
+  var _neu = function () {
+    var b = document.getElementById('ki-lage-body'); if (!b) return;
+    b.innerHTML = _banner + _lageAbgleichHtml({ key: _key, erm: _lvErmAusMessung(_messung), ki: data, neu: _neu });
+  };
+  _neu();
 
   // V63.6: Daten zwischenspeichern für späteres "In Felder übernehmen"
+  if (opts && opts.zu) return;   /* v3007: aus dem Speicher - kein frischer Abruf, nichts neu cachen */
   window._lastKiLageData = data;
   // V187-h2: Cache in currentDeal speichern
   try { if (window.KiLage && typeof window.KiLage.cacheResult === 'function') window.KiLage.cacheResult(); } catch(e){}
@@ -526,7 +726,7 @@ window.runKiLage = runKiLage;
     
     // Beim Object-Load: Cache hydrieren wenn vorhanden
     hydrate: function(cache) {
-      if (!cache || !cache.html) {
+      if (!cache || (!cache.html && !(cache.daten && cache.daten.ki))) {
         this.clearResult();
         return;
       }
@@ -553,7 +753,14 @@ window.runKiLage = runKiLage;
           '↻ Neu analysieren</button>' +
         '</div>';
       
-      body.innerHTML = cacheBanner + cache.html;
+      /* v3007 · liegen die Daten mit im Speicher, wird der Abgleich neu gebaut
+         (Auswahl und Quellen bleiben bedienbar), zugeklappt. Alte Speicher
+         ohne Daten zeigen weiter ihr HTML. */
+      if (cache.daten && cache.daten.ki && typeof _renderKiLage === 'function') {
+        _renderKiLage(cache.daten.ki, { zu: true, messung: cache.daten.messung || null, banner: cacheBanner });
+      } else {
+        body.innerHTML = cacheBanner + cache.html;
+      }
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Lage neu analysieren';
@@ -580,7 +787,9 @@ window.runKiLage = runKiLage;
           html: html,
           ts: Date.now(),
           address: req.adresse,
-          str: req.str, hnr: req.hnr, plz: req.plz, ort: req.ort
+          str: req.str, hnr: req.hnr, plz: req.plz, ort: req.ort,
+          /* v3007 · die Daten selbst, damit der Abgleich nach dem Laden bedienbar bleibt */
+          daten: window._lastKiLageData ? { ki: window._lastKiLageData, messung: window._lastLageMessung || null } : null
         };
         // Trigger save (debounced via storage.js)
         if (typeof scheduleSave === 'function') scheduleSave();
@@ -649,6 +858,20 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
     return D;
   }
   function fz(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toString().replace('.', ','); }
+  function S() { return (window.DealPilotMB && DealPilotMB.lageStufen) || {}; }
+  /* v3007 · die Webrecherche zu DIESEM Objekt: frisch aus der Sitzung, sonst
+     aus dem Objekt (ai_lage_cache.daten), aber nur fuer dieselbe Adresse. */
+  function recherche() {
+    var k = window._currentObjKey || '';
+    var E = (window._kiLageErgaenzung || {})[k];
+    if (E && E.ki) return E.ki;
+    var c = window.currentDeal && window.currentDeal.ai_lage_cache;
+    if (!c || !c.daten || !c.daten.ki) return null;
+    var v = function (id) { return ((document.getElementById(id) || {}).value || '').trim().toLowerCase(); };
+    if (c.plz && String(c.plz).trim().toLowerCase() !== v('plz')) return null;
+    if (c.str && String(c.str).trim().toLowerCase() !== v('str')) return null;
+    return c.daten.ki;
+  }
   function zeilen(D) {
     var S = (window.DealPilotMB && DealPilotMB.lageStufen) || {};
     var z = [];
@@ -656,7 +879,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
     if (D.microRaw != null) z.push(['mikrolage', 'Mikrolage', S.mikro && S.mikro(D.microRaw), 'Score ' + Math.round(D.microRaw)]);
     if (D.bevRaw != null) z.push(['ds2_bevoelkerung', 'Bevölkerung', S.bev && S.bev(D.bevRaw), fz(D.bevRaw, 2) + ' %/Jahr']);
     if (D.tageRaw != null) z.push(['ds2_nachfrage', 'Nachfrage', S.nachfrage && S.nachfrage(D.tageRaw), Math.round(D.tageRaw) + ' Tage Vermarktungsdauer']);
-    if (D.trendRaw != null) z.push(['ds2_wertsteigerung', 'Wertsteigerung', null, fz(D.trendRaw, 1) + ' %/Jahr Preisentwicklung']);
+    if (D.trendRaw != null) z.push(['ds2_wertsteigerung', 'Wertsteigerung', S.wert ? S.wert(D.trendRaw) : null, fz(D.trendRaw, 1) + ' %/Jahr Preisentwicklung']);   /* v3007: Stufe wie autoLage */
     return z;
   }
   function zeichnen() {
@@ -700,6 +923,30 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       });
     }
     if (window._kiLageErgaenzt === (window._currentObjKey || '')) return;   /* KI-Ergaenzung steht gerade da */
+    /* v3007 · liegt eine Webrecherche vor (frisch oder im Objekt gespeichert),
+       steht der Abgleich mit Auswahl statt der ≠/✓-Liste. */
+    var KI = recherche();
+    if (KI) {
+      var erm = _lvErmAusMessung(messungen[window._currentObjKey || '']);
+      zeilen(D).forEach(function (r) {
+        erm[r[0]] = { stufe: r[2] || null, detail: r[3] + ' · Marktbericht', tip: 'Gemessen im Marktbericht' + (D.bericht_datum ? ' vom ' + D.bericht_datum : '') };
+      });
+      var kk = window._currentObjKey || '';
+      var neu = function () {
+        var b = document.getElementById('ki-lage-body'); if (!b) return;
+        var h = '<div class="ki-lage-vergleich lv-mark"><div class="lv-kopf">✓ Lage aus dem Marktbericht' + (D.bericht_datum ? ' vom ' + _escKi(D.bericht_datum) : '') + ' übernommen</div>'
+          + '<div class="lv-fuss" style="margin-top:0">Eine erneute Analyse ist nicht nötig. Die Webrecherche steht daneben — Sie wählen je Merkmal, was gilt.</div>'
+          + _lageAbgleichHtml({ key: kk, erm: erm, ki: KI, neu: neu,
+              fuss: 'Ermittelt: Marktbericht, sonst Regionaldatenbank, Zensus 2022 — Quelle beim Darüberfahren.' })
+          + '<div class="ki-lage-actions" style="margin-top:10px"><button class="btn btn-sm" type="button" onclick="runKiLage({ergaenzen:true})">Webrecherche erneuern</button></div></div>';
+        if (b._dpLvHtml === h && b.querySelector('.lv-mark')) return;
+        b.innerHTML = h; b._dpLvHtml = h;
+      };
+      _lageCss();
+      body.setAttribute('data-aus-bericht', '1');
+      neu();
+      return;
+    }
     var rows = zeilen(D).map(function (r) {
       var feld = document.getElementById(r[0]);
       var jetzt = feld && feld.value ? _lageOptText(r[0], feld.value) : '–';
@@ -718,12 +965,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
         + _escKi(String(g.wert).replace('.', ',') + ' ' + g.einheit) + ' · Regionaldaten (nicht im Bericht)</span></td><td class="lv-u">'
         + (anders ? '<span class="lv-ab" title="Im Feld steht ein anderer Wert als die Messung (' + _escKi(_lageOptText(p[0], g.stufe)) + ')">≠</span>' : '<span class="lv-ok">✓</span>') + '</td></tr>';
     });
-    var E = (window._kiLageErgaenzung || {})[window._currentObjKey || ''] || {};
-    [['ds2_entwicklung', 'Entwicklung', E.entwicklung], ['ds2_wertsteigerung', 'Wertsteigerung', E.wertsteigerung]].forEach(function (p) {
-      if (!p[2] || !p[2].value) return;
-      var q = p[2].source && p[2].source.url ? ' <a class="ki-lage-src-link" href="' + _escKi(p[2].source.url) + '" target="_blank" rel="noopener noreferrer">Quelle</a>' : '';
-      rows += '<tr><td>' + p[1] + '</td><td><b>' + _escKi(_lageOptText(p[0], p[2].value)) + '</b><span class="lv-w">Web-Recherche: ' + _escKi(p[2].text || '') + '</span>' + q + '</td><td class="lv-u">KI</td></tr>';
-    });
+    /* v3007: die KI-Zeilen (Entwicklung/Wertsteigerung) stehen jetzt im Abgleich oben */
     var offen = ['ds2_entwicklung'].concat(D.trendRaw == null ? ['ds2_wertsteigerung'] : []);
     var html = '<div class="ki-lage-vergleich"><div class="lv-kopf">✓ Lage aus dem Marktbericht' + (D.bericht_datum ? ' vom ' + _escKi(D.bericht_datum) : '') + ' übernommen</div>'
       + '<table class="lv-tab"><tbody>' + rows + '</tbody></table>'

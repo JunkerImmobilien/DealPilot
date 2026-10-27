@@ -2334,6 +2334,50 @@ function _analyseQuellenNeutral(a, schluessel) {
   return a;
 }
 
+/* ══ v3007 · FUNDSTELLEN JE LAGE-DIMENSION ═════════════════════════════
+   Das Modell liefert "sources" (neu) oder "source" (alt). Hier wird beides zu
+   einer Liste {label, url?, portal?}: nur http(s)-Adressen, Zaehlparameter
+   ab, Dubletten raus, hoechstens vier. Ein Portal bleibt als Link stehen,
+   aber sein Name geht nicht nach aussen (Marcel 14.10.2026): das Etikett
+   wird neutral, portal:true sagt dem Frontend, wie es ihn beschriftet. */
+const _LAGE_PORTALE = /(ohne-makler|immobilien\.net|immoportal|immowelt|immobilienscout|immoscout|scout24|immonet|wohnungsb(oe|ö)rse|homeday|mietspiegel\.(com|net|org)|meinestadt|kalaydo|kleinanzeigen|ebay\.|miete-aktuell|wohnpreis|mietpreise\.|immopreise|immo-?kompass|wohnungsmarkt24|sprengnetter|pricehubble|geomap|on-?geo)/i;
+function _lageNeutral(t) {
+  return String(t || '')
+    .replace(/\b(ImmobilienScout\s?24|Immobilien\s?Scout\s?24|ImmoScout\s?24|ImmoScout|Scout\s?24|Immowelt|Immonet|immoportal|Wohnungsb(oe|ö)rse|Homeday|meinestadt(\.de)?|miete-aktuell(\.de)?|mietspiegel\.(com|net|org)|wohnpreis(\.de)?|Kleinanzeigen)(\.de)?(?![\wäöü])/gi, 'aktueller Marktdurchschnitt')
+    .replace(/\b(Sprengnetter|PriceHubble|GeoMap|on-geo)\b/gi, 'unabhängiger Bewertungspartner');
+}
+function lageQuellenNormieren(d) {
+  const roh = d && Array.isArray(d.sources) ? d.sources.slice() : [];
+  if (d && d.source) roh.push(d.source);
+  const out = [];
+  roh.forEach(function (q) {
+    if (!q) return;
+    if (typeof q === 'string') q = { label: q };
+    if (typeof q !== 'object') return;
+    let label = String(q.label || q.name || q.title || '').trim().slice(0, 140);
+    let url = String(q.url || '').trim();
+    if (url && !/^https?:\/\/[^\s/]+\.[^\s]+$/i.test(url)) url = '';
+    if (url) {
+      try {
+        const u = new URL(url);
+        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'gclid', 'fbclid']
+          .forEach(function (p) { u.searchParams.delete(p); });
+        url = u.toString().replace(/\?$/, '');
+      } catch (e) { url = ''; }
+    }
+    if (!label && !url) return;
+    const portal = _LAGE_PORTALE.test(url) || _LAGE_PORTALE.test(label);
+    label = portal ? 'Aktueller Marktdurchschnitt (Angebotsdaten)' : _lageNeutral(label);
+    const schl = (url || label).toLowerCase();
+    if (out.some(function (x) { return (x.url || x.label).toLowerCase() === schl; })) return;
+    const e = { label: label };
+    if (url) e.url = url;
+    if (portal) e.portal = true;
+    out.push(e);
+  });
+  return out.slice(0, 4);
+}
+
 async function analyzeLage(payload, opts) {
   const adresse = payload.adresse || [payload.str, payload.hnr, payload.plz, payload.ort].filter(Boolean).join(' ');
   if (!adresse) throw new Error('Keine Adresse übergeben');
@@ -2427,16 +2471,22 @@ async function analyzeLage(payload, opts) {
     '',
     'Wenn ein Kaufpreis angegeben wurde: bewerte ZUSÄTZLICH ob der Kaufpreis im Marktumfeld realistisch / zu teuer / Schnäppchen ist.',
     '',
-    'QUELLEN: Pro Dimension EINE primäre Quelle nennen (label + url) — z.B. "Statistisches Bundesamt", "ImmoScout24 Marktbericht 2026", "Mietspiegel <Stadt>". KEINE erfundenen URLs.',
+    /* v3007 · Marcel 27.10.2026: der Abgleich im Reiter Objekt zeigt je Merkmal
+       die Fundstellen als Links. Bis hierher EINE Quelle je Dimension, und das
+       Beispiel nannte ein Portal beim Namen - das Modell kopiert das Beispiel. */
+    'QUELLEN: Pro Dimension in "sources" die Fundstellen, auf die du dich stuetzt (eine bis drei), je { "label": "...", "url": "https://..." }.',
+    '  - z.B. Stadt/Gemeinde, Statistisches Landesamt, Regionalstatistik, IHK, Lokalpresse, Mietspiegel der Stadt.',
+    '  - url NUR, wenn du die Seite in der Recherche wirklich gefunden hast. KEINE erfundenen oder zusammengebauten URLs - dann url weglassen.',
+    '  - Im "label" und im "text" KEINEN Namen eines Immobilienportals oder Datenanbieters; Angebotsdaten heissen "aktueller Marktdurchschnitt".',
     '',
     'Antwort STRIKT als JSON, keine Markdown-Codeblöcke:',
     '{',
-    '  "makro": { "value": "gut", "text": "2-3 Sätze Begründung", "source": {"label":"Stat. Bundesamt","url":"https://..."} },',
-    '  "mikro": { "value": "gut", "text": "2-3 Sätze", "source": {...} },',
-    '  "bevoelkerung":   { "value": "stabil",      "text": "1-2 Sätze", "source": {...} },',
-    '  "nachfrage":      { "value": "stark",       "text": "1-2 Sätze", "source": {...} },',
-    '  "wertsteigerung": { "value": "hoch",        "text": "1-2 Sätze", "source": {...} },',
-    '  "entwicklung":    { "value": "eine_starke", "text": "1-2 Sätze", "source": {...} }',
+    '  "makro": { "value": "gut", "text": "2-3 Sätze Begründung", "sources": [ {"label":"Statistisches Landesamt, Bevölkerungsstand 2025","url":"https://..."}, {"label":"IHK, Konjunkturbericht 2026","url":"https://..."} ] },',
+    '  "mikro": { "value": "gut", "text": "2-3 Sätze", "sources": [ {...} ] },',
+    '  "bevoelkerung":   { "value": "stabil",      "text": "1-2 Sätze", "sources": [ {...} ] },',
+    '  "nachfrage":      { "value": "stark",       "text": "1-2 Sätze", "sources": [ {...} ] },',
+    '  "wertsteigerung": { "value": "hoch",        "text": "1-2 Sätze", "sources": [ {...} ] },',
+    '  "entwicklung":    { "value": "eine_starke", "text": "1-2 Sätze", "sources": [ {"label":"Stadt <Ort>, Bebauungsplan <Name>","url":"https://..."} ] }',
     '}'
   ].join('\n');
 
@@ -2460,12 +2510,14 @@ async function analyzeLage(payload, opts) {
     if (!d) return null;
     const map = enumScoreMaps[dim];
     const score = map && d.value && map[d.value] != null ? map[d.value] : null;
+    const sources = lageQuellenNormieren(d);
     return {
       value: d.value || null,
       score: score,
       label: _humanLabel(d.value),
-      text: d.text || '',
-      source: d.source || null
+      text: _lageNeutral(d.text || ''),
+      source: sources[0] || null,     /* alte Leser (Karten, Cache) */
+      sources: sources                /* v3007 · alle Fundstellen der Dimension */
     };
   }
   function _humanLabel(v) {
@@ -4206,6 +4258,7 @@ module.exports = {
   bildZuText,   /* v1796 — macht nur Text; die Felder macht extractFromText */
   analyze,
   analyzeLage,
+  lageQuellenNormieren,   /* v3007 · fuer den Pruefer */
   suggestDs2Fields,
   buildDs2Prompt,     /* v2500 · fuer tools/prompt-lecks-pruefen.mjs */
   suggestQcFields,
