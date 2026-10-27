@@ -1379,6 +1379,9 @@
         + 'RND: eine für das Gebäude (unten).', L, y + 1);
       y += 10;
 
+      /* v2988 · Block zusammenhalten: gemessen (Parkstr., Bankfassung) wanderte nur der Schlusssatz auf Seite 8,
+         die Seite blieb leer. ~9 Zeilen + Satz = 70 mm. */
+      platz(70, 'Einheiten und Zustand', 'Fortsetzung');
       abschnitt('Ist gegen Soll');
       var istJ = (K.nkm_j || 0), sollJ = MFH.s.soll * 12;
       zeile('Kaltmiete p. a. - Ist', eur(istJ));
@@ -1693,7 +1696,11 @@
             'Gerechnete Schuldendeckung je Zins- und Mietszenario: siehe Belastungsprobe.'].filter(Boolean));
         }
         liste('Bankargumente', ai.bankargumente);
-        if (!KURZ) block('Anschlussfinanzierung', ai.anschlussfinanzierung);
+        /* v2988 · seit v2985 sind anschlussfinanzierung/exit_strategien im Bestand Listen aus {frage, antwort} -
+           gemessen stand im Bank-PDF der Parkstr. „[object Object],[object Object],…“ (Seite 15). */
+        var _qa = function (v) { if (!Array.isArray(v)) return v; return v.map(function (e) { return e && typeof e === 'object' ? (e.frage ? e.frage + '\n' : '') + (e.antwort || '') : String(e || ''); }).filter(Boolean).join('\n\n'); };
+        if (!KURZ) block('Anschlussfinanzierung', _qa(ai.anschlussfinanzierung));
+        if (!KURZ && ai.exit_strategien) block('Exit-Strategien', _qa(ai.exit_strategien));
         if (!KURZ) (function () {
           var t = [];
           if (ai.makrolage_recherche) t.push('Makrolage: ' + ai.makrolage_recherche);
