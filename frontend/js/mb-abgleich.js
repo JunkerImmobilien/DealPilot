@@ -33,7 +33,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMbAbgleich) return;
-  var VERSION = 'v3002c';
+  var VERSION = 'v3002d';
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function fmt(n, d) {
@@ -571,7 +571,8 @@
   function spaeter() { clearTimeout(_zt); _zt = setTimeout(zeichnen, 250); }
   function anstossen() {
     var a = host('objekt'), b = host('miete');
-    if (sichtbar(a) || sichtbar(b)) laden(false); else zeichnen();
+    /* v3002d · der Behälter selbst ist ohne Inhalt ausgeblendet - sichtbar sein muss der Reiter */
+    if (sichtbar(a && a.parentNode) || sichtbar(b && b.parentNode)) laden(false); else zeichnen();
   }
 
   /* ── Klicks ────────────────────────────────────────────────────────── */
@@ -616,8 +617,8 @@
   window.addEventListener('dp:ki-miete', spaeter);
   /* Erst laden, wenn einer der beiden Blöcke sichtbar wird (Reiterwechsel) */
   try {
-    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && (!S.fertig || S.key !== key())) laden(false); }); });
-    var beob = function () { ['objekt', 'miete'].forEach(function (a) { var h = host(a); if (h && !h._mbaIo) { h._mbaIo = true; io.observe(h); } }); };
+    var io = new IntersectionObserver(function (es) {   /* v3002d · weiter Rand: laden, sobald der Reiter offen ist, nicht erst beim Scrollen */ es.forEach(function (e) { if (e.isIntersecting && (!S.fertig || S.key !== key())) laden(false); }); }, { rootMargin: '0px 0px 4000px 0px' });
+    var beob = function () { ['objekt', 'miete'].forEach(function (a) { var h = host(a); if (h && h.parentNode && !h._mbaIo) { h._mbaIo = true; io.observe(h.parentNode); } }); };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { beob(); zeichnen(); }); else { beob(); zeichnen(); }
   } catch (e) {}
 
