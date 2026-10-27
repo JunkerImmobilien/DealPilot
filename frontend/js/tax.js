@@ -1044,9 +1044,10 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
    2025 eine Erstattung von 11.659 €. Gerechnet wird weiter mit der Eingabe; die
    Warnung sagt, dass das Finanzamt es anders sehen wird.
    Fenster: drei Jahre ab dem Kaufdatum, auf Kalenderjahre gerundet (Kaufjahr bis
-   Kaufjahr + 3; das letzte nur, wenn der Kauf nicht im Januar lag). Betraege sind
-   brutto erfasst, die Grenze gilt netto - verglichen wird brutto / 1,19 (vorsichtig:
-   Leistungen ohne USt liegen damit eher unter als ueber der Grenze). */
+   Kaufjahr + 3; das letzte nur, wenn der Kauf nicht im Januar lag). Die Grenze gilt
+   ohne USt. Bis v3005 stand hier „verglichen wird brutto / 1,19 (vorsichtig)" - das
+   war nicht vorsichtig, sondern das Gegenteil: geteilt wird die Summe kleiner, die
+   Warnung spaeter. Seit v3006 nach #san_ust, Begruendung im Rumpf. */
 function _dpAhkWarnung(reihe) {
   try {
     var kd = (document.getElementById('kaufdat') || {}).value || '';
@@ -1059,13 +1060,35 @@ function _dpAhkWarnung(reihe) {
     reihe.forEach(function (t) {
       if (t && t.year >= kj && t.year <= bis && t.erh > 0) { summe += t.erh; teile.push(t.year + ': ' + Math.round(t.erh).toLocaleString('de-DE') + ' €'); }
     });
-    var netto = summe / 1.19;
-    if (!(netto > grenze)) return '';
-    var ende = kd.slice(8, 10) + '.' + kd.slice(5, 7) + '.' + (kj + 3);
+    /* v3006 · Nur ein BRUTTObetrag wird netto gerechnet. Die Jahresfelder sind
+       Werbungskosten, also das, was gezahlt wurde - mit Umsatzsteuer, wo die
+       Rechnung sie ausweist, ohne, wo keine ausgewiesen ist (Kleinunternehmer,
+       § 19 UStG). Welche Lesart gilt, sagt der Nutzer am Feld „Angegebener
+       Betrag" (#san_ust, Reiter Investition) - dieselbe Angabe, die calc.js
+       und _computeAutoForYear fuer die 15-%-Pruefung schon lesen. Bis v3005
+       wurde hier IMMER durch 1,19 geteilt, auch bei „netto (ohne USt)": eine
+       Rechnung ohne USt-Ausweis lag dann rechnerisch 16 % unter ihrem Betrag,
+       und die Warnung kam zu spaet oder gar nicht.
+       Brutto bleibt der Vorgabefall (privater Vermieter, Handwerkerrechnung).
+       Liegt der volle Betrag ueber der Grenze, nur der geteilte nicht, nennt
+       der Hinweis das ausdruecklich: ohne USt-Ausweis zaehlt der volle Betrag. */
+    var _ustNetto = ((document.getElementById('san_ust') || {}).value || 'brutto') === 'netto';
+    var netto = _ustNetto ? summe : summe / 1.19;
     var eur = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
+    var ende = kd.slice(8, 10) + '.' + kd.slice(5, 7) + '.' + (kj + 3);
+    if (!(netto > grenze)) {
+      if (_ustNetto || !(summe > grenze)) return '';
+      return '<div class="tax-ahk-warn" style="margin:12px 0;padding:10px 12px;border-left:3px solid var(--gold);background:rgba(0,0,0,0.04);font-size:13px;line-height:1.5">'
+        + '<b>Anschaffungsnahe Herstellungskosten: Grenzbereich (§ 6 Abs. 1 Nr. 1a EStG)</b><br>'
+        + 'In den drei Jahren nach dem Kauf (bis ' + ende + ') stehen ' + eur(summe) + ' Erhaltungsaufwand (' + teile.join(' · ') + '). '
+        + 'Ohne die Umsatzsteuer sind das rund ' + eur(netto) + ' und damit unter der Grenze von ' + eur(grenze) + ' - aber nur, wenn die Rechnungen 19 % USt ausweisen. '
+        + 'Rechnungen ohne USt-Ausweis (z. B. Kleinunternehmer) zählen mit dem vollen Betrag. Weisen deine Rechnungen keine USt aus, stell im Reiter Investition „Angegebener Betrag“ auf netto.'
+        + '</div>';
+    }
     return '<div class="tax-ahk-warn" style="margin:12px 0;padding:10px 12px;border-left:3px solid var(--red,#B8625C);background:rgba(184,98,92,0.08);font-size:13px;line-height:1.5">'
       + '<b>Anschaffungsnahe Herstellungskosten prüfen (§ 6 Abs. 1 Nr. 1a EStG)</b><br>'
-      + 'In den drei Jahren nach dem Kauf (bis ' + ende + ') stehen ' + eur(summe) + ' Erhaltungsaufwand (' + teile.join(' · ') + '), netto rund ' + eur(netto) + '. '
+      + 'In den drei Jahren nach dem Kauf (bis ' + ende + ') stehen ' + eur(summe) + ' Erhaltungsaufwand (' + teile.join(' · ') + ')'
+      + (_ustNetto ? ' ohne Umsatzsteuer. ' : ', ohne Umsatzsteuer rund ' + eur(netto) + '. ')
       + 'Das liegt über 15 % der Gebäude-Anschaffungskosten (Grenze ' + eur(grenze) + ' netto). '
       + 'Dann sind die Aufwendungen keine sofort abziehbaren Werbungskosten, sondern Herstellungskosten, die mit der Gebäude-AfA abgeschrieben werden. '
       + 'Jährlich übliche Erhaltungsaufwendungen zählen nicht mit. Die Zeitleiste rechnet weiter mit deiner Eingabe - bitte mit deinem Steuerberater klären.'

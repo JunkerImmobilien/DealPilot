@@ -530,7 +530,22 @@
     // V63.36: SVW aus Hauptfeld übernehmen (für 3-stufige LTV-Logik)
     var _qc_svw = 0;
     var svwEl = document.getElementById('svwert');
-    if (svwEl) _qc_svw = parseFloat((svwEl.value || '0').replace(',','.')) || 0;
+    /* v3006 · parseDe statt parseFloat: „237.000" war hier 237 (Punkt als Komma). */
+    if (svwEl) _qc_svw = parseDe(svwEl.value || '0') || 0;
+    /* v3006 · Die Herkunft wie calc.js (v2996): Auswahl am Feld, sonst der Vermerk
+       der Marktbericht-Uebernahme, sonst „eigene". Nur Gutachten und Bank tragen den
+       LTV - bis v3005 nahm der Quick-Check jede Wertangabe. */
+    var _qc_herk = null;
+    if (_qc_svw > 0) {
+      var _hEl = document.getElementById('svw_herkunft');
+      if (_hEl && _hEl.value) _qc_herk = _hEl.value;
+      else {
+        try { var _hMb = window._dpSvHerkunftMb ? window._dpSvHerkunftMb() : null; if (_hMb) _qc_herk = _hMb.amtlich ? 'marktbericht' : 'indikation'; } catch (_eH) {}
+        if (!_qc_herk) _qc_herk = 'eigene';
+      }
+    }
+    var _bvEl = document.getElementById('bankval');
+    var _qc_bank = _bvEl ? (parseDe(_bvEl.value || '0') || 0) : 0;
     var kpis = (window.DealKpis && DealKpis.compute) ? DealKpis.compute({
       kp:      kp,
       nk:      knkAbs,
@@ -551,7 +566,9 @@
       afa:     afaQc,
       grenz:   grenzQc,
       ekInklNkLtv: _qc_ekInklNkLtv,
-      svw:     _qc_svw
+      svw:     _qc_svw,
+      svw_herkunft: _qc_herk,   /* v3006 */
+      bankval: _qc_bank         /* v3006 */
     }) : null;
 
     // KPIs aus DealKpis übernehmen (gleicher Pfad wie Tab Kennzahlen)

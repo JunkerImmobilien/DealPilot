@@ -1404,8 +1404,8 @@ label.dp-required.qc-required::after {
         <!-- v3003 · Marcel 27.10.2026: „Marktwert/Verkehrswert, Herkunft und welcher Bericht in EINE Zeile, darunter Bankbewertung und Wert nach Sanierung."
              Feld-IDs unverändert; eigenes Raster (wa-raster), weil .g3 unter 900 px einspaltig fällt. -->
         <div class="wa-raster wa-z1">
-      <div class="f"><label title="Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten. Daneben wählen, woher der Wert stammt: Gutachten und Bankbewertung tragen LTV und Wertpuffer, Schätzung und Angebotsniveau nicht.">Marktwert / Verkehrswert <span class="cf-hint">(Herkunft daneben wählen)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div><!-- v2996 · die Herkunft entscheidet, was der Wert ist (Beschriftung, Wert-Anker, LTV-Basis) --></div>
-      <div class="f wa-herkunft"><label title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB.">Herkunft</label><select id="svw_herkunft" class="svw-herkunft" onchange="calc()" title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB; LTV und Wertpuffer rechnen nur mit einem Gutachten- oder Bankwert." style="width:100%"><option value="">Herkunft: automatisch</option><option value="gutachten">Verkehrswertgutachten (§ 194 BauGB)</option><option value="bank">Bankbewertung (Marktwert)</option><option value="marktbericht">DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)</option><option value="indikation">Marktpreisindikation (Angebotspreise)</option><option value="eigene">eigene Schätzung</option></select></div>
+      <div class="f"><label title="Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten. Daneben wählen, woher der Wert stammt: Nur Gutachten und Bankbewertung tragen den LTV. Den Wertpuffer tragen auch Marktbericht und eigene Schätzung, die Marktpreisindikation aus Angeboten nicht.">Marktwert / Verkehrswert <span class="cf-hint">(Herkunft daneben wählen)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div><!-- v2996 · die Herkunft entscheidet, was der Wert ist (Beschriftung, Wert-Anker, LTV-Basis) --></div>
+      <div class="f wa-herkunft"><label title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB.">Herkunft</label><select id="svw_herkunft" class="svw-herkunft" onchange="calc()" title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB; der LTV rechnet nur mit einem Gutachten- oder Bankwert, der Wertpuffer mit jeder Angabe außer der Marktpreisindikation aus Angeboten." style="width:100%"><option value="">Herkunft: automatisch</option><option value="gutachten">Verkehrswertgutachten (§ 194 BauGB)</option><option value="bank">Bankbewertung (Marktwert)</option><option value="marktbericht">DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)</option><option value="indikation">Marktpreisindikation (Angebotspreise)</option><option value="eigene">eigene Schätzung</option></select></div>
       <div class="f wa-bericht"><label title="Werte aus den Marktberichten dieses Objekts — auswählen und übernehmen">Bericht</label><div id="oe-vw" class="oe-vw" style="display:none"></div><span class="cf-hint wa-leer">noch kein Marktbericht</span></div>
         </div>
         <div class="wa-raster2 wa-z2">
@@ -3636,7 +3636,7 @@ label.dp-required.qc-required::after {
 <script src="/vendor/cdn/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-text-sauber.js?v=v2992"></script><!-- v2970 · EINE Text-Bereinigung fuer jedes jsPDF-Dokument, direkt nach jsPDF -->
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
-<script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
+<script src="js/pdf-anlage-bmf.js?v=v3006"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v2999"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
 <script src="js/pdf-investment-bank.js?v=v2996"></script>
@@ -3651,13 +3651,13 @@ label.dp-required.qc-required::after {
 <script src="js/schwellen.js?v=v2240"></script><!-- v2240 · EINE Quelle fuer die Ampel-Schwellen (DSCR/LTV/Cashflow) aus den Einstellungen -->
 <script src="js/dp-qr.js?v=v2180"></script>
 <script src="js/hausgeld-engine.js?v=v2191a"></script>
-<script src="js/deal-kpis.js?v=v2261"></script>
-<script src="js/afa-engine.js?v=v2891"></script>
+<script src="js/deal-kpis.js?v=v3006"></script>
+<script src="js/afa-engine.js?v=v3006"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
 <script src="js/erbbau-engine.js?v=v2180"></script>
 <script src="js/erbbau-ui.js?v=v1312"></script>
-  <script src="js/afa-ui.js?v=v1439"></script>
+  <script src="js/afa-ui.js?v=v3006"></script>
   <script src="js/zve-manager.js?v=v2180"></script>
   <script src="js/tax-periods.js?v=v2949"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
@@ -3670,13 +3670,13 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2996"></script>
+  <script src="js/calc.js?v=v3006"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v2852"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v2992"></script>
+<script src="js/tax.js?v=v3006"></script>
 <script src="js/steuer-verlauf.js?v=v2992"></script>
 <script src="js/config.js?v=v2955"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
@@ -3691,7 +3691,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-heuristik.js?v=v2546a"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v3003"></script>
+<script src="js/tooltip-content.js?v=v3006"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v2421"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
@@ -3752,7 +3752,7 @@ label.dp-required.qc-required::after {
 <script src="js/financing-pdf.js?v=v2932"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
-<script src="js/quick-check.js?v=v2546a"></script>
+<script src="js/quick-check.js?v=v3006"></script>
 <script src="js/qc-bridge.js?v=qc-v2969"></script>
 <script src="js/bodenrichtwert.js?v=v2952"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
@@ -3845,7 +3845,7 @@ label.dp-required.qc-required::after {
   <script src="js/object-actions.js?v=v2932"></script>
   <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>
-  <script src="js/voice-import.js?v=v2956"></script>
+  <script src="js/voice-import.js?v=v3006"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

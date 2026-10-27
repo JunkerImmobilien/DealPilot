@@ -1003,6 +1003,31 @@ function _calcImmediate(){
   var gebOhneK = kpOhneK * gebAnt;
   var gebQuoteOhneK = gebAnt;
   var nkGesamt = nk; // Summe aller Nebenkosten aus Z.610 (m_e+n_e+g_e+ge_e+ji_e)
+  /* ═══ v3006 · DIE GRUNDSCHULD IST KEINE ANSCHAFFUNGSKOSTE ═════════════════
+     Notar- und Grundbuchkosten der Grundschuldbestellung sind Kosten der
+     FINANZIERUNG, nicht des Erwerbs (§ 255 Abs. 1 HGB: Aufwendungen, um den
+     Vermoegensgegenstand zu erwerben) - sie sind Werbungskosten nach § 9
+     Abs. 1 Satz 3 Nr. 1 EStG und im Jahr der Zahlung sofort abziehbar.
+     Die Kaufnebenkosten-Felder (Notar %, Grundbuchamt %) enthalten sie aber,
+     wenn der Nutzer die Gesamtrechnung eintraegt (Tooltip Grundbuchamt:
+     „inkludiert ... Eintragung der Grundschuld"). Bis v3005 lief damit alles
+     in die AfA-Basis - und wer die Grundschuldkosten im Reiter Steuern unter
+     „Notar/Grundschuld (anteilig)" eintrug, zog sie DOPPELT ab: sofort als
+     Werbungskosten und noch einmal ueber 50 Jahre AfA.
+     Jetzt: was dort im KAUFJAHR steht, kommt aus den Anschaffungskosten
+     (AfA-Basis, 15-%-Grenze, Boden-/Gebaeudeanteil) heraus, hoechstens
+     Notar + Grundbuch. Die Gesamtinvestition bleibt, wie sie ist: das Geld
+     fliesst ja trotzdem. Ohne Eintrag (Vorgabe 0) rechnet alles wie bisher -
+     eine erfundene Aufteilung gibt es nicht (Frage an Marcel im Journal). */
+  var _gsKosten = 0;
+  try {
+    if (typeof _getYearOverride === 'function' && typeof _v269_getStartYear === 'function' && window._taxYearlyOverrides) {
+      var _gsOv = Number(_getYearOverride(_v269_getStartYear(), 'notar_grundschuld'));
+      if (isFinite(_gsOv) && _gsOv > 0) _gsKosten = Math.min(_gsOv, n_e + g_e);
+    }
+  } catch (_eGs) {}
+  State.gs_kosten_ak = _gsKosten;
+  nkGesamt = Math.max(0, nkGesamt - _gsKosten);
   var nkGebAnteil = nkGesamt * gebQuoteOhneK;
   var gebAHK = gebOhneK + nkGebAnteil;
   var sanLimit = gebAHK * 0.15;
@@ -1141,7 +1166,8 @@ function _calcImmediate(){
         if (kuecheRow) kuecheRow.style.display = 'none';
         if (gebNettoRow) gebNettoRow.style.display = 'none';
       }
-      st('ahk_nk_anteil', fE(nkGebAnteil, 0) + ' (= ' + (gebQuoteOhneK*100).toFixed(1).replace('.', ',') + ' % der NK)');
+      st('ahk_nk_anteil', fE(nkGebAnteil, 0) + ' (= ' + (gebQuoteOhneK*100).toFixed(1).replace('.', ',') + ' % der NK'
+        + (_gsKosten > 0 ? ' ohne ' + fE(_gsKosten, 0) + ' Grundschuld' : '') + ')');   /* v3006 */
       st('ahk_basis', fE(gebAHK, 0));
       st('ahk_15pct', fE(sanLimit, 0));
     } else {
@@ -2249,7 +2275,11 @@ function _calcImmediate(){
   var ekv = ekvBase;
   // Erwerbsnebenkosten = gi - kp (alles außer Kaufpreis selbst) — für Anzeigezwecke
   var nk_total = Math.max(0, gi - kp);
-  var wp_kpi=svw>0?svw-kp:0;
+  /* v3006 · Derselbe Wertpuffer wie oben (wp, v2996): eine Marktpreisindikation aus
+     Angebotspreisen traegt keinen. Bis v3005 rechnete der Score (K.wp_kpi, DealScore
+     „Potenzial") und das Bank-PDF („Sofortiger Wertpuffer") ihn trotzdem mit, waehrend
+     die Kachel ihn ausblendete - zwei Antworten auf dieselbe Frage. */
+  var wp_kpi=(svw>0 && _svwHerk !== 'indikation')?svw-kp:0;
   var btj=parseInt(g('btj')||'20');
   /* v816-CUT: Privat-Objekt-Cut bei Ueberfuehrung. Gated ueber Feld 'ueberf_ende' (Datum).
      Kappt btj auf volle Jahre bis zum Stichtagsjahr; letztes Jahr wird anteilig (Monat/12) gerechnet.

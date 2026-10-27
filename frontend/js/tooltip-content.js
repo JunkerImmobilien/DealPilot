@@ -109,7 +109,7 @@
     },
     'tab1.baujahr': {
       title: 'Baujahr',
-      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: vor 1925 = 2,5%, ab 1925 = 2,0%, Neubau ab Bauantrag 2023 = 3,0% oder 5,0% degressiv möglich. Auch relevant für GEG-Sanierungspflichten. Im Marktbericht: Baujahr und Modernisierungspunkte ergeben die Restnutzungsdauer — sie bestimmt im Ertragswert den Vervielfältiger und im Sachwert die Alterswertminderung.',
+      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: fertiggestellt vor 1925 = 2,5%, 1925 bis 2022 = 2,0%, fertiggestellt ab 2023 = 3,0% (§ 7 Abs. 4 Satz 1 Nr. 2 EStG). 5,0% degressiv (§ 7 Abs. 5a) nur bei Baubeginn oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029. Auch relevant für GEG-Sanierungspflichten. Im Marktbericht: Baujahr und Modernisierungspunkte ergeben die Restnutzungsdauer — sie bestimmt im Ertragswert den Vervielfältiger und im Sachwert die Alterswertminderung.',
       paragraph: '§ 7 Abs. 4 EStG',
       severity: 'beginner'
     },
@@ -183,7 +183,7 @@
     },
     'tab2.notar': {
       title: 'Notarkosten',
-      body: 'Notar- und Grundbuchgebühren nach GNotKG-Tabelle. Üblich: 1,5-2,0% des Kaufpreises. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung.',
+      body: 'Notar- und Grundbuchgebühren nach GNotKG-Tabelle. Üblich: 1,5-2,0% des Kaufpreises. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung. Die Bestellung der Grundschuld ist kein Teil der Anschaffungskosten, sondern Finanzierungskosten (sofort abziehbar): im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ eintragen, dann fällt sie aus der AfA-Basis.',
       paragraph: 'GNotKG',
       severity: 'beginner'
     },
@@ -202,7 +202,7 @@
     },
     'tab2.grundbuchamt': {
       title: 'Grundbuchamt',
-      body: 'Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung).',
+      body: 'Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung). Steuerlich gehört nur der Erwerb zu den Anschaffungskosten; die Kosten der Grundschuld (Notar und Grundbuch) sind Finanzierungskosten und sofort abziehbare Werbungskosten. Trag sie im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ ein — DealPilot nimmt sie dann aus der AfA-Basis heraus; die Gesamtinvestition bleibt gleich.',
       severity: 'beginner'
     },
     'tab2.grunderwerbsteuer': {
@@ -312,7 +312,7 @@
     },
     'tab4.afa_satz': {
       title: 'AfA-Satz',
-      body: 'Wie schnell wird das Gebäude abgeschrieben? Linear 2,0% (50 Jahre): Standard ab Baujahr 1925. Linear 2,5% (40 Jahre): vor 1925. Linear 3,0% (33 Jahre): Wohnzwecke mit Bauantrag ab 2023. Degressiv 5,0%: nur für Neubau-Wohnbau (Bauantrag 10/2023 – 09/2029).',
+      body: 'Wie schnell wird das Gebäude abgeschrieben? Maßgeblich ist die Fertigstellung (§ 7 Abs. 4 Satz 1 Nr. 2 EStG): Linear 3,0% (33⅓ Jahre): fertiggestellt ab 2023 (Buchst. a). Linear 2,0% (50 Jahre): fertiggestellt 1925 bis 2022 (Buchst. b). Linear 2,5% (40 Jahre): fertiggestellt vor 1925 (Buchst. c). Degressiv 5,0% (§ 7 Abs. 5a): nur Wohngebäude mit Baubeginn (Baubeginnsanzeige) oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029, beim Kauf bis Ende des Fertigstellungsjahres.',
       paragraph: '§ 7 EStG',
       severity: 'beginner'
     },
@@ -323,14 +323,14 @@
     },
     'tab4.degressive_afa': {
       title: 'Degressive AfA § 7 Abs. 5a EStG',
-      body: 'Nur für Wohngebäude mit Bauantrag oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029. Die AfA wird in den ersten Jahren deutlich höher (5% vom Restbuchwert) und sinkt jedes Jahr — bringt frühe Steuervorteile, hilft bei der Anlauf-Cashflow-Phase.',
+      body: 'Nur für Wohngebäude, deren Herstellung (Baubeginnsanzeige) zwischen 01.10.2023 und 30.09.2029 begonnen hat oder die aufgrund eines Kaufvertrags aus diesem Zeitraum angeschafft werden — beim Kauf nur bis zum Ende des Fertigstellungsjahres. Die AfA wird in den ersten Jahren deutlich höher (5% vom Restbuchwert) und sinkt jedes Jahr — bringt frühe Steuervorteile, hilft bei der Anlauf-Cashflow-Phase.',
       paragraph: '§ 7 Abs. 5a EStG',
       format: 'infobox',
       severity: 'critical'
     },
     'tab4.sonder_7b': {
       title: '§ 7b Sonder-AfA',
-      body: 'Nur für Mietwohnungs-Neubau (Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietungspflicht, Bauantrag/Kaufvertrag zwischen 01.01.2023 und 30.09.2029). Wenn alle 4 Bedingungen erfüllt: zusätzliche 5% AfA p.a. in den ersten 4 Jahren — 20% Bonus auf förderfähige Basis (max. 4.000 €/m²).',
+      body: 'Nur für Mietwohnungs-Neubau (Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietungspflicht, Bauantrag oder Bauanzeige zwischen 01.01.2023 und 30.09.2029; beim Kauf bis Ende des Fertigstellungsjahres). Wenn alle 4 Bedingungen erfüllt: zusätzliche 5% AfA p.a. in den ersten 4 Jahren — 20% Bonus auf förderfähige Basis (max. 4.000 €/m²).',
       paragraph: '§ 7b EStG',
       format: 'infobox',
       severity: 'critical'
@@ -547,7 +547,7 @@
     },
     'tab8.wertpuffer': {
       title: 'Wertpuffer',
-      body: 'Verkehrswert minus Kaufpreis. Wenn der Verkehrswert (Sachverständigen-Gutachten) höher als der Kaufpreis ist: positiver Wertpuffer = sofortiger Buchgewinn. Negativer Wertpuffer = du zahlst über Marktwert.',
+      body: 'Marktwert minus Kaufpreis. Positiv = du kaufst unter Wert, negativ = du zahlst über Marktwert. Gerechnet wird mit Gutachten, Bankbewertung, dem Wert aus dem DealPilot-Marktbericht und deiner eigenen Schätzung — nicht mit der Marktpreisindikation aus Angeboten. Der Beleihungsauslauf (LTV) nimmt dagegen nur Gutachten oder Bankbewertung.',
       severity: 'pro'
     },
     'tab8.tilgung_vom_mieter': {

@@ -46,6 +46,13 @@ window.DealKpis = (function() {
    *   ek          (€)        Eigenkapital
    *   afa         (€/Jahr)   AfA-Betrag (default 0)
    *   grenz       (Prozent)  Grenzsteuersatz in % (default 0)
+   *   svw         (€)        Wertangabe (Verkehrs-/Marktwert, default 0)
+   *   svw_herkunft (Text)    v3006: gutachten | bank | marktbericht | indikation | eigene.
+   *                          Nur gutachten/bank tragen den LTV (wie calc.js seit v2996).
+   *                          FEHLT das Feld, gilt svw wie bis v3005 (Telegram/Altaufrufer).
+   *   bankval     (€)        v3006: Bankbewertung, LTV-Basis, wenn svw nicht traegt
+   *   bspar_y     (€/Jahr)   v3006: Bausparrate bei Tilgungsaussetzung (default 0) -
+   *                          Schuldendienst im DSCR und Abfluss im Cashflow wie calc.js
    *
    * @returns {Object} KPIs (siehe Return-Objekt unten)
    */
@@ -122,15 +129,30 @@ window.DealKpis = (function() {
     //   Sonst                    → LTV/KP  (Fallback)
     var _ekInklNkLtv = !!i.ekInklNkLtv;
     var svw          = +i.svw || 0;
+    /* v3006 · Die Herkunft entscheidet, ob der Wert den LTV traegt (calc.js, v2996):
+       nur Gutachten und Bankbewertung. Bis v3005 nahm der Kern jeden Wert > 0 -
+       der Quick-Check rechnete den LTV damit auch auf eine eigene Schaetzung oder
+       auf Angebotsniveau, die Haupt-App nicht. Ohne Angabe bleibt es beim alten
+       Verhalten, damit Aufrufer ohne Herkunft nicht still umspringen. */
+    var _herk        = (i.svw_herkunft == null) ? null : String(i.svw_herkunft);
+    var _svwTraegt   = svw > 0 && (_herk === null || _herk === 'gutachten' || _herk === 'bank');
+    var bankval      = +i.bankval || 0;
     var ltv_basis;
     if (_ekInklNkLtv) ltv_basis = gi;
-    else if (svw > 0) ltv_basis = svw;
+    else if (_svwTraegt) ltv_basis = svw;
+    else if (bankval > 0) ltv_basis = bankval;
     else ltv_basis = kp;
     var ltv = ltv_basis > 0 ? (d_total / ltv_basis * 100) : 0;
 
     var zins_j = (d1_zm + d2_zm) * 12;
     var tilg_j = (d1_tm + d2_tm) * 12;
     var rate_j = zins_j + tilg_j;
+    /* v3006 · `bspar_y` war hier nie deklariert: `typeof bspar_y` ergab immer
+       'undefined', die Bausparrate ging mit 0 in den DSCR - lautlos, weil typeof
+       keinen ReferenceError wirft. Jetzt ein Eingabefeld wie in calc.js
+       (Tilgungsaussetzung + Bausparvertrag): Schuldendienst im DSCR und Abfluss im
+       Cashflow. Kein heutiger Aufrufer liefert es, die Zahlen bleiben gleich. */
+    var bspar_y = +i.bspar_y || 0;
 
     // ═════ Cashflow — V63.40: User-Wunsch "CF v.St. = IMMER nach Tilgung" ═════
     // CF v.St. = Banker-Cashflow (nach Tilgung, vor Steuer) — was aus eigener Tasche zuzuschießen
@@ -144,7 +166,7 @@ window.DealKpis = (function() {
     var zve_immo    = (nkm_j - bwk_nul_st - zins_j) - afa;
     var steuer      = zve_immo * grenz;               // negativ = Erstattung
     // Öffentliche CF-Werte (in der App immer nach Tilgung)
-    var cf_op    = cf_operativ - tilg_j;              // = Banker-CF v.St., NACH Tilgung
+    var cf_op    = cf_operativ - tilg_j - bspar_y;    // = Banker-CF v.St., NACH Tilgung (und BSV, v3006)
     var cf_ns    = cf_op - steuer;                    // = Banker-CF n.St., NACH Tilgung
     var cf_m     = cf_op / 12;                        // /Mon vor Steuer
     var cf_ns_m  = cf_ns / 12;                        // /Mon nach Steuer
@@ -167,12 +189,12 @@ window.DealKpis = (function() {
           ze_j:   0,           // ZE ist hier schon in nkm_j enthalten (Service-Layer ohne ZE-Trennung)
           zins_j: zins_j,
           tilg_j: tilg_j,
-          bsv_j:  (typeof bspar_y === 'number' ? bspar_y : 0),
+          bsv_j:  bspar_y,
           bwk_cf: bwk_cf
         })
       : (function () {
           // Fallback wenn Engine nicht geladen — alte Formel mit BSV erweitert
-          var _kd = zins_j + tilg_j + (typeof bspar_y === 'number' ? bspar_y : 0);
+          var _kd = zins_j + tilg_j + bspar_y;
           return {
             brutto: _kd > 0 ? nkm_j / _kd : 0,
             netto:  _kd > 0 ? (nkm_j - bwk_cf) / _kd : 0,

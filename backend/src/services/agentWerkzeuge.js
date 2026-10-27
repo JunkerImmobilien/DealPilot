@@ -2259,7 +2259,11 @@ async function objekt_schnellblick(ctx, args) {
     const gebAnt = dez(d.geb_ant), afaSatz = dez(d.afa_satz);
     const afa = (gebAnt != null && gebAnt > 0)
       ? (kp + knkSumme) * (gebAnt / 100) * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
-    const svw = z(d.svwert) || z(d.bankval) || 0;
+    /* v3006 · LTV-Basis wie die App (calc.js v2996, deal-kpis v3006): der Wert mit
+       seiner Herkunft, die Bankbewertung getrennt. Ohne gespeicherte Herkunft gilt
+       „eigene" - so liest calc.js ein Objekt ohne Auswahl (ohne Marktbericht-Vermerk). */
+    const svw = z(d.svwert) || 0;
+    const svwHerkunft = svw > 0 ? (d.svw_herkunft ? String(d.svw_herkunft) : 'eigene') : null;
 
     K = rechenkerne.kpis({
       kp: kp, nk: knkSumme, san: z(d.san) || 0, moebl: z(d.moebl) || 0,
@@ -2269,7 +2273,9 @@ async function objekt_schnellblick(ctx, args) {
       afa: afa, grenz: dez(d.grenz) || 0,
       ekInklNkLtv: d.ek_inkl_nk === true || d.ek_inkl_nk === 'true'
                 || d._ek_ist_nk === true || d._ek_ist_nk === 'true',
-      svw: svw
+      svw: svw,
+      svw_herkunft: svwHerkunft,
+      bankval: z(d.bankval) || 0
     });
 
     finanzierung = {
