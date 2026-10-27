@@ -4169,7 +4169,7 @@ async function exportPdf(out) {
          (der rechnet mit der IST-Miete). Jetzt benannt: was durch was. */
       fuss: (ref.purchase_price != null && rMonth)
         ? 'Kaufpreisfaktor zur Marktmiete: ' + (ref.purchase_price / (rMonth * 12)).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-          + ' (Kaufpreis ' + euro(ref.purchase_price) + ' ÷ Jahresmarktmiete ' + euro(Math.round(rMonth * 12)) + ')'
+          + ' (Kaufpreis ' + euro(ref.purchase_price) + ' ÷ Jahresmarktmiete ' + euro(Math.round(rmed && area ? rmed * area * 12 : rMonth * 12)) + ')'
           + (yld.rent_multiplier != null ? ' · zur Ist-Miete: ' + String(yld.rent_multiplier).replace('.', ',') : '')
         : null,
       fussCol: [120, 113, 100],
@@ -4243,7 +4243,7 @@ async function exportPdf(out) {
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(180, 180, 188);
     const info = [];
     if (lv.nutzung) info.push('Nutzung ' + _mbNutzung(lv.nutzung));   /* v2990: „1130“ -> „WA · allgemeines Wohngebiet“ */
-    if (lv.stichtag) info.push('Stichtag ' + String(lv.stichtag).replace(/^(d{4})-(d{2})-(d{2})$/, '$3.$2.$1') + (lv.stichtag_veraltet ? ' (älter als ein Jahr)' : ''));   /* v2592 */
+    if (lv.stichtag) info.push('Stichtag ' + String(lv.stichtag).replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$3.$2.$1') + (lv.stichtag_veraltet ? ' (älter als ein Jahr)' : ''));   /* v2592 */
     if (lv.used_year) info.push('Jahrgang ' + lv.used_year);
     if (_lvEigenPdf) info.unshift('eigene Angabe, nicht über BORIS abgerufen');   /* v2390 */
     doc.text(info.join('  ·  '), M + 60, y + 9);
@@ -5036,7 +5036,7 @@ async function exportPdf(out) {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4);
       const _kz = doc.splitTextToSize(_mbFlaecheKern(cc.flaeche, ref), _bxW);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
-      const _satzL = String(cc.flaeche.hinweis).split(/(?<=[.!?“])s+(?=[A-ZÄÖÜ„])/)
+      const _satzL = String(cc.flaeche.hinweis).split(/(?<=[.!?“])\s+(?=[A-ZÄÖÜ„])/)
         .filter((x) => !/^Das Grundstück ist mit|nicht an die Grundstücksgröße angepasst|NICHT an die Grundstücksgröße angepasst|^Der Bodenwert setzt die gesamte Fläche/.test(x));
       let _det = [], _gekuerzt = false;
       for (const _sz of _satzL) {
