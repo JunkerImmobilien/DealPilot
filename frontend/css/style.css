@@ -41417,3 +41417,5 @@ html body .dp-pf-msheet-head .dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclos
   .wa-raster > .f:first-child{grid-column:1 / -1}
   .wa-raster2{gap:8px}
 }
+/* v3003a · Bankbewertung geht in Marktwert/Verkehrswert + Herkunft auf; das Feld bleibt im DOM, wird nicht gezeigt */
+.wa-raster2 > .f.wa-weg{display:none !important}

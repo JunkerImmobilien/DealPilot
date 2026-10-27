@@ -11867,9 +11867,15 @@
     if (_rf.mwVorschlag && (RF_JA.test(t) || _istZustimmung(t))) {
       var mv = _rf.mwVorschlag; _rf.mwVorschlag = null;
       _rfBlase('ich', escH(t));
-      _rfSetzen('bankval', mv.wert, 'Marktpreisindikation (als Näherung)');
-      _rfBlase('co', 'Übernommen: <b>' + escH(mv.text) + '</b> — in der Übersicht steht, ' +
-        'dass es der Marktwert ist, keine Bankbewertung.');
+      /* v3003a · nie mehr als Bankbewertung: die Marktpreisindikation geht als Marktwert mit Herkunft
+         „Marktpreisindikation“ an svwert - und nur, wenn dort noch nichts steht (wertangabe.js) */
+      var _svAlt = (_rf.data.fields || {}).svwert;
+      if (_svAlt === undefined || _svAlt === null || _svAlt === '') {
+        _rfSetzen('svwert', mv.wert, 'Marktpreisindikation (als Näherung)');
+        _rfSetzen('svw_herkunft', 'indikation', 'Marktpreisindikation');
+      }
+      _rfBlase('co', 'Übernommen: <b>' + escH(mv.text) + '</b> — als Marktwert mit der Herkunft ' +
+        '„Marktpreisindikation“, nicht als Bankbewertung.');
       _rfStandZeichnen();
       _rfWeiterGleich();
       return true;

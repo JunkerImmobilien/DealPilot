@@ -53,7 +53,7 @@ var WM_FIELDS = [
 
 var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','wert_soll','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
-  'thesis','risiken','notizen','bankval','svwert','svw_herkunft' /* v2996 */,'makrolage','mikrolage',
+  'thesis','risiken','notizen','bankval','svwert','svw_herkunft' /* v2996 */,'bankval_migriert' /* v3003a */,'makrolage','mikrolage',
   /* v1958 - Die Lageklasse A/B/C. Ohne diesen Eintrag faellt sie beim
      Speichern LAUTLOS weg - genau der Fall, den diese Datei weiter oben
      schon mehrfach protokolliert. Sie steht neben makrolage/mikrolage,
@@ -521,6 +521,9 @@ function loadData(d) {
     /* v2515: Herkunft der Lage-Felder (KI/Messung/eigen) - sonst erbt
        Objekt B die Kennzeichnung von A, und ein eigener Wert hiesse KI. */
     '_lage_herkunft',
+    /* v3003a: die Wertangabe. svw_herkunft gibt es erst seit v2996 - aeltere Objekte
+       tragen den Schluessel nicht und erbten die Herkunft des vorigen Objekts. */
+    'svwert', 'bankval', 'svw_herkunft', 'bankval_migriert',
     /* v1958: ohne diesen Eintrag traegt Objekt B die Lageklasse von
        Objekt A weiter - und an ihr haengt eine Rechnung. */
     'lageklasse',
@@ -3307,7 +3310,7 @@ async function showBankexportView() {
       if (obj) {
         var d = obj.data;
         t.kp += parseFloat(d.kp) || 0;
-        t.marktw += parseFloat(d.bankval) || parseFloat(d.svwert) || (parseFloat(d.kp) || 0);
+        t.marktw += (window.DpWertangabe ? window.DpWertangabe.marktwert(d, d.kp) : (parseFloat(d.svwert) || parseFloat(d.bankval) || parseFloat(d.kp) || 0));   /* v3003a · eine Wertangabe (wertangabe.js), dieselbe Regel wie calc.js */
       }
     }
     t.darl += r.darl_summe || 0;
@@ -3594,7 +3597,7 @@ function exportGlobalBankCSV() {
   data.objects.forEach(function(o) {
     var d = o.data;
     var kp = parseFloat(d.kp) || 0;
-    var marktw = parseFloat(d.bankval) || parseFloat(d.svwert) || kp;
+    var marktw = (window.DpWertangabe ? window.DpWertangabe.marktwert(d, d.kp) : (parseFloat(d.svwert) || parseFloat(d.bankval) || parseFloat(d.kp) || kp));   /* v3003a */
     var darl = parseFloat(d.d1) || 0;
     var ltv = marktw > 0 ? (darl / marktw * 100) : 0;
     rows.push([
@@ -3672,7 +3675,7 @@ async function exportGlobalBankPDF() {
   var rows = data.objects.map(function(o) {
     var d = o.data;
     var kp = parseFloat(d.kp) || 0;
-    var marktw = parseFloat(d.bankval) || parseFloat(d.svwert) || kp;
+    var marktw = (window.DpWertangabe ? window.DpWertangabe.marktwert(d, d.kp) : (parseFloat(d.svwert) || parseFloat(d.bankval) || parseFloat(d.kp) || kp));   /* v3003a */
     var darl = parseFloat(d.d1) || 0;
     var ltv = marktw > 0 ? (darl / marktw * 100) : 0;
     return [

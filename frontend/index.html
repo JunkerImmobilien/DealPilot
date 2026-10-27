@@ -34,7 +34,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v3003">
+<link rel="stylesheet" href="css/style.css?v=v3003a">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -1322,7 +1322,7 @@ label.dp-required.qc-required::after {
             <div class="f"><label>Restlaufzeit (Jahre)</label><div class="iw"><input id="erb_restlz" type="text" inputmode="numeric" placeholder="55" class="tr" oninput="calc()"><span class="sfx">J</span></div></div>
             <div class="f"><label>Angemessener Erbbauzinssatz (%)</label><div class="iw"><input id="erb_zs_ang" type="text" inputmode="decimal" placeholder="3,5" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
             <div class="f"><label>Entschädigung bei Zeitablauf (%)</label><div class="iw"><input id="erb_entsch" type="text" inputmode="decimal" placeholder="66,7" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-            <div class="f s2"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:12px;color:var(--muted)"><input type="checkbox" id="erb_wert_ist_erb" onchange="calc()"><span>Verkehrswert / Bankbewertung ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)</span></label></div>
+            <div class="f s2"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:12px;color:var(--muted)"><input type="checkbox" id="erb_wert_ist_erb" onchange="calc()"><span>Marktwert/Verkehrswert ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)</span></label></div>
           </div>
           <div id="erb_ergebnis" class="brw-ki-result" style="display:none;margin-top:8px"></div>
         </div>
@@ -1408,8 +1408,11 @@ label.dp-required.qc-required::after {
       <div class="f wa-herkunft"><label title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB.">Herkunft</label><select id="svw_herkunft" class="svw-herkunft" onchange="calc()" title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB; der LTV rechnet nur mit einem Gutachten- oder Bankwert, der Wertpuffer mit jeder Angabe außer der Marktpreisindikation aus Angeboten." style="width:100%"><option value="">Herkunft: automatisch</option><option value="gutachten">Verkehrswertgutachten (§ 194 BauGB)</option><option value="bank">Bankbewertung (Marktwert)</option><option value="marktbericht">DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)</option><option value="indikation">Marktpreisindikation (Angebotspreise)</option><option value="eigene">eigene Schätzung</option></select></div>
       <div class="f wa-bericht"><label title="Werte aus den Marktberichten dieses Objekts — auswählen und übernehmen">Bericht</label><div id="oe-vw" class="oe-vw" style="display:none"></div><span class="cf-hint wa-leer">noch kein Marktbericht</span></div>
         </div>
+        <!-- v3003a · Marcel: „Brauchen wir das Feld Bankbewertung überhaupt noch, wenn es die Herkunft gibt?" Nein -
+             die Herkunft „Bankbewertung" trägt es. Das Feld bleibt im DOM (gespeichert, nie gelöscht), wertangabe.js überträgt es einmal nach svwert. -->
+        <input type="hidden" id="bankval_migriert" value="">
         <div class="wa-raster2 wa-z2">
-  <div class="f"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
+  <div class="f wa-weg" aria-hidden="true"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
       <div class="f"><label title="Erwarteter Wert nach Abschluss der Sanierung/Modernisierung (stabilisierter Zustand). Banken rechnen Sanierungsfinanzierungen gegen diesen Wert (as-completed).">Wert nach Sanierung <span class="cf-hint">(optional · stabilisiert)</span></label><div class="iw"><span class="pfx">€</span><input id="wert_soll" type="text" inputmode="decimal" placeholder="z.B. 1.250.000" class="trl" oninput="calc()"></div></div>
         </div>
 </div>
@@ -3656,7 +3659,7 @@ label.dp-required.qc-required::after {
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
 <script src="js/erbbau-engine.js?v=v2180"></script>
-<script src="js/erbbau-ui.js?v=v1312"></script>
+<script src="js/erbbau-ui.js?v=v3003a"></script>
   <script src="js/afa-ui.js?v=v3006"></script>
   <script src="js/zve-manager.js?v=v2180"></script>
   <script src="js/tax-periods.js?v=v2949"></script>
@@ -3670,7 +3673,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v3006"></script>
+  <script src="js/calc.js?v=v3003a"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3699,7 +3702,7 @@ label.dp-required.qc-required::after {
   <script src="js/provider-keys.js?v=v2180"></script>
   <script src="js/ueberfuehrung-kern.js?v=v2984"></script>
   <script src="js/mandanten.js?v=v2984"></script>
-  <script src="js/ueberfuehrung-wizard.js?v=v2984"></script>
+  <script src="js/ueberfuehrung-wizard.js?v=v3003a"></script>
   <script src="js/apikeys.js?v=v2977"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
   <script src="js/unterlagen-modal.js?v=v2920"></script>
@@ -3724,11 +3727,11 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v2992"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2996"></script>
+<script src="js/storage.js?v=v3003a"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2966d"></script>
-<script src="js/track-record.js?v=W39"></script>
+<script src="js/track-record.js?v=v3003a"></script>
 <script src="js/pdf.js?v=v2997"></script>
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
@@ -3741,7 +3744,7 @@ label.dp-required.qc-required::after {
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
 <script src="js/dealscore2.js?v=v2548c"></script>
 <script src="js/dealscore2-ui.js?v=v2548c"></script>
-<script src="js/ds2-ai.js?v=v2518"></script>
+<script src="js/ds2-ai.js?v=v3003a"></script>
 <script src="js/ki-lage.js?v=v3007"></script>
 <script src="js/ki-miete.js?v=v3002"></script>
 <script src="js/star-rating.js?v=v1851"></script>
@@ -3762,6 +3765,7 @@ label.dp-required.qc-required::after {
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v3001b"></script>
 <script src="js/mfh-felder.js?v=v3003"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
+<script src="js/wertangabe.js?v=v3003a"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/potenzial.js?v=v3001a"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
@@ -3845,7 +3849,7 @@ label.dp-required.qc-required::after {
   <script src="js/object-actions.js?v=v2932"></script>
   <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>
-  <script src="js/voice-import.js?v=v3006"></script>
+  <script src="js/voice-import.js?v=v3003a"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

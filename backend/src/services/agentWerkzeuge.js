@@ -247,6 +247,21 @@ const SOLL_IST = [
   ['_kpis_cf_vs', 'Cashflow vor Steuer', 'eur', 'groesser'], ['_kpis_cf_ns', 'Cashflow nach Steuer', 'eur', 'groesser'],
   ['_ds2_score', 'DealScore', 'zahl', 'groesser']
 ];
+
+/* v3003a · EINE Wertangabe: Marktwert/Verkehrswert (svwert) mit Herkunft (svw_herkunft). Dieselbe Regel
+   wie frontend/js/wertangabe.js aufloesen(): bankval ist keine eigene Quelle mehr, sondern gilt nur,
+   solange das Objekt noch nicht im Formular uebertragen ist (bankval_migriert). */
+function wertangabe(d) {
+  d = d || {};
+  const n = (v) => { const x = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.')); return Number.isFinite(x) && x > 0 ? x : null; };
+  const sv = n(d.svwert), bv = n(d.bankval), h = String(d.svw_herkunft || '');
+  if (String(d.bankval_migriert || '') === '1' || !bv) return { wert: sv, herkunft: sv ? (h || null) : null };
+  if (!sv) return { wert: bv, herkunft: 'bank' };
+  if (Math.abs(sv - bv) < 1) return { wert: sv, herkunft: h || 'bank' };
+  if (h === 'gutachten' || h === 'bank') return { wert: sv, herkunft: h, anders: bv };
+  return { wert: bv, herkunft: 'bank', anders: sv };
+}
+
 function _zahlSI(v) {
   if (v === null || v === undefined || v === '') return null;
   if (typeof v === 'number') return Number.isFinite(v) ? v : null;
@@ -1761,7 +1776,9 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
     const n = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.'));
     return Number.isFinite(n) && n > 0 ? n : null;
   };
-  const svw = zahl(d.svwert), bank = zahl(d.bankval);
+  /* v3003a · eine Wertangabe (wertangabe): die Bankbewertung ist die Herkunft „bank“ am Wert */
+  const _wa = wertangabe(d);
+  const svw = _wa.wert, bank = _wa.herkunft === 'bank' ? _wa.wert : null;
   const eigene = [];
   if (svw) eigene.push({ was: 'Verkehrswert', wert: eur(svw), herkunft: 'am Objekt eingetragen' });
   if (bank && bank !== svw) eigene.push({ was: 'Beleihungswert', wert: eur(bank), herkunft: 'am Objekt eingetragen' });
@@ -2262,8 +2279,10 @@ async function objekt_schnellblick(ctx, args) {
     /* v3006 · LTV-Basis wie die App (calc.js v2996, deal-kpis v3006): der Wert mit
        seiner Herkunft, die Bankbewertung getrennt. Ohne gespeicherte Herkunft gilt
        „eigene" - so liest calc.js ein Objekt ohne Auswahl (ohne Marktbericht-Vermerk). */
-    const svw = z(d.svwert) || 0;
-    const svwHerkunft = svw > 0 ? (d.svw_herkunft ? String(d.svw_herkunft) : 'eigene') : null;
+    /* v3003a · Wert und Herkunft aus der einen Wertangabe (wertangabe), bankval geht dort auf */
+    const _wa = wertangabe(d);
+    const svw = _wa.wert || 0;
+    const svwHerkunft = svw > 0 ? (_wa.herkunft || 'eigene') : null;
 
     K = rechenkerne.kpis({
       kp: kp, nk: knkSumme, san: z(d.san) || 0, moebl: z(d.moebl) || 0,
@@ -2275,7 +2294,7 @@ async function objekt_schnellblick(ctx, args) {
                 || d._ek_ist_nk === true || d._ek_ist_nk === 'true',
       svw: svw,
       svw_herkunft: svwHerkunft,
-      bankval: z(d.bankval) || 0
+      bankval: 0   /* v3003a · steckt in svw mit Herkunft bank */
     });
 
     finanzierung = {
@@ -2368,7 +2387,7 @@ async function objekt_schnellblick(ctx, args) {
   if (!zins || !tilg) scoreFehlt.push('Zinssatz und Tilgung');
   if (!bwkDa) scoreFehlt.push('Hausgeld bzw. Bewirtschaftungskosten');
 
-  const svw2 = z(d.svwert) || z(d.bankval) || 0;
+  const svw2 = wertangabe(d).wert || 0;   /* v3003a */
   /* Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
      Ohne Verkehrswert nimmt der Quick-Check 5 % vom Kaufpreis an — das
      ist eine ANNAHME und steht als solche im Ergebnis. */

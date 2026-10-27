@@ -135,7 +135,7 @@ function renderCoverPage(doc, objects, W, H, C) {
     var d = o.data || {};
     var k = o.kpis || {};
     totals.kp += parseFloat(d.kp) || 0;
-    totals.marktw += parseFloat(d.bankval) || parseFloat(d.svwert) || (parseFloat(d.kp) || 0);
+    totals.marktw += (window.DpWertangabe ? window.DpWertangabe.marktwert(d, d.kp) : (parseFloat(d.svwert) || parseFloat(d.bankval) || parseFloat(d.kp) || 0));   /* v3003a */
     totals.darl += (parseFloat(d.d1) || 0) + (parseFloat(d.d2) || 0);
     totals.cf_jahr += k.cf_ns_yearly || 0;
   });
@@ -305,7 +305,7 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
     ['Baujahr', d.baujahr || '–'],
     ['Kaufdatum', d.kaufdat ? new Date(d.kaufdat).toLocaleDateString('de-DE') : '–'],
     ['Kaufpreis', _euro(d.kp)],
-    ['Marktwert (Bank)', d.bankval ? _euro(d.bankval) : (d.svwert ? _euro(d.svwert) : '–')], /*v898-p5*/
+    ['Marktwert', (function () { var r = window.DpWertangabe ? window.DpWertangabe.aufloesen(d) : { wert: parseFloat(d.svwert) || parseFloat(d.bankval) }; return r.wert ? _euro(r.wert) : '–'; })()], /*v898-p5 · v3003a eine Wertangabe*/
     ['Eigenkapital', _euro(d.ek)],
     ['Finanzierung', _euro(d.d1) + (parseFloat(d.d2) > 0 ? ' + ' + _euro(d.d2) : '')]
   ];
@@ -340,7 +340,7 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
   var cfNsM = cfNs / 12;
   var dscr = k.dscr || 0;
   var darl = (parseFloat(d.d1) || 0) + (parseFloat(d.d2) || 0);
-  var marktw = parseFloat(d.bankval) || parseFloat(d.svwert) || parseFloat(d.kp) || 0;
+  var marktw = (window.DpWertangabe ? window.DpWertangabe.marktwert(d, d.kp) : (parseFloat(d.svwert) || parseFloat(d.bankval) || parseFloat(d.kp) || 0));   /* v3003a */
   var ltv = (k.ltv != null && !isNaN(k.ltv)) ? parseFloat(k.ltv) : (marktw > 0 ? (darl / marktw * 100) : 0); /*v898-p5*/
 
   var kpiCards = [

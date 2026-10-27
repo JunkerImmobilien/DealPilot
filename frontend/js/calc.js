@@ -1245,7 +1245,9 @@ function _calcImmediate(){
   //   1. Verkehrswert (svw, §194 BauGB) wenn > 0
   //   2. Bankbewertung (bankval) wenn > Kaufpreis
   //   3. Kaufpreis (kp) als Fallback
-  var _bankval = v('bankval') || 0;
+  /* v3003a · Die Bankbewertung ist keine eigene Quelle mehr: sie steht als Herkunft „bank“ an
+     svwert (wertangabe.js uebertraegt bankval beim Laden). bankval bleibt gespeichert, rechnet aber nicht mehr. */
+  var _bankval = 0;
   /* v1313: die Bankbewertung ist genauso ein Volleigentumswert - die Bank
      bewertet nach BelWertV und setzt beim Erbbaurecht ihren eigenen
      Abschlag, aber was hier eingetippt wird, ist der Wert VOR Abschlag. */
