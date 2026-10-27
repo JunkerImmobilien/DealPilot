@@ -978,8 +978,8 @@
     zeile('Finanzierungsstruktur', _strukt, { klein: true });   /* v2940 · auch in der Kurzfassung */
     var _svw = num('svwert');
     if (_svw) {   /* v2940 · auch in der Kurzfassung */
-      zeile('Verkehrswert (Angabe, § 194 BauGB)', eur(_svw));
-      zeile('Sofortiger Wertpuffer gegenüber dem Kaufpreis', (da(K.wp_kpi) !== null && K.wp_kpi > 0 ? '+ ' : '') + eur(K.wp_kpi), { fett: true });
+      zeile((window.State && State.svw_label) || 'Wertangabe (Reiter Objekt)', eur(_svw));   /* v2996: Herkunft statt immer § 194 */
+      if (da(K.wp_kpi) !== null && K.wp_kpi !== 0) zeile('Sofortiger Wertpuffer gegenüber dem Kaufpreis', (da(K.wp_kpi) !== null && K.wp_kpi > 0 ? '+ ' : '') + eur(K.wp_kpi), { fett: true });
     }
     y += 1;
 

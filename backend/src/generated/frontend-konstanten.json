@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-27T17:44:14.469Z",
+ "erzeugt_am": "2026-10-27T17:56:17.300Z",
  "quellen": {
   "voice-import": "3cbd37d2be829d1c",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "e828e0815e640144",
-  "index-html": "62527da4c787ed28",
+  "storage": "4f8b4aaba0ba169c",
+  "index-html": "8e03c7f831bb0412",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -444,6 +444,7 @@
    "notizen",
    "bankval",
    "svwert",
+   "svw_herkunft",
    "makrolage",
    "mikrolage",
    "lageklasse",
@@ -839,7 +840,34 @@
    {
     "id": "svwert",
     "kind": "text",
-    "label": "Verkehrswert (§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)"
+    "label": "Marktwert / Verkehrswert (Herkunft darunter wählen)"
+   },
+   {
+    "id": "svw_herkunft",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "gutachten",
+      "text": "Verkehrswertgutachten (§ 194 BauGB)"
+     },
+     {
+      "wert": "bank",
+      "text": "Bankbewertung (Marktwert)"
+     },
+     {
+      "wert": "marktbericht",
+      "text": "DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)"
+     },
+     {
+      "wert": "indikation",
+      "text": "Marktpreisindikation (Angebotspreise)"
+     },
+     {
+      "wert": "eigene",
+      "text": "eigene Schätzung"
+     }
+    ],
+    "label": "Marktwert / Verkehrswert (Herkunft darunter wählen)"
    },
    {
     "id": "makrolage",

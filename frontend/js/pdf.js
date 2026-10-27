@@ -1863,11 +1863,7 @@ async function _exportPDFInner() {
 
   // V63.66: Wert-Anker für Wertsteigerung (svw > bankval > kp) explizit ausweisen
   if (State.wert_basis && State.wert_basis !== v('kp')) {
-    var _wbLabel = (v('svwert') > 0)
-      ? 'Verkehrswert (§ 194 BauGB)'
-      : (v('bankval') > v('kp'))
-        ? 'Bankbewertung'
-        : 'Kaufpreis';
+    var _wbLabel = State.wert_basis_text || 'Kaufpreis';   /* v2996: Herkunft statt immer „Verkehrswert (§ 194 BauGB)" */
     _annahmenRows.push(['Wert-Anker für Wertsteigerung', _wbLabel + ' · ' + pE(State.wert_basis)]);
   }
 
@@ -3912,9 +3908,7 @@ async function _exportPDFInner() {
   }
   // V63.66: Wert-Anker für Wertsteigerung explizit, wenn nicht Kaufpreis
   if (State.wert_basis && State.wert_basis !== v('kp')) {
-    var _wbLabel2 = (v('svwert') > 0)
-      ? 'Verkehrswert'
-      : 'Bankbewertung';
+    var _wbLabel2 = State.wert_basis_text || 'Bankbewertung';   /* v2996 */
     _baseAnnahmen.push(['Wert-Anker', pE(State.wert_basis), _wbLabel2, 'Startwert für Wertsteigerung statt Kaufpreis']);
   }
   if (doc.autoTable) {

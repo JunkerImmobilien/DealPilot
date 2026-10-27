@@ -447,8 +447,21 @@ if (!window._wlc) {
     }
     return null;
   }
+  /* v2996 · fuer calc.js: woher der Wert im Feld stammt (Vermerk der Uebernahme) */
+  try { global._dpSvHerkunftMb = _svHerkunft; } catch (e) {}
   function _svLabel() {
     var sv = $('svwert'); if (!sv) return;
+    /* v2996 · eine ausdruecklich gewaehlte Herkunft geht vor - Gutachten/Bank sind dann der Wert */
+    var _sel = $('svw_herkunft');
+    if (_sel && _sel.value && (_sel.value === 'gutachten' || _sel.value === 'bank')) {
+      var _f0 = sv.closest ? sv.closest('.f') : null, _l0 = _f0 ? _f0.querySelector('label') : null;
+      if (_l0 && _l0._svMark) {
+        for (var _i0 = 0; _i0 < _l0.childNodes.length; _i0++) { var _n0 = _l0.childNodes[_i0]; if (_n0.nodeType === 3 && _n0.nodeValue && _n0.nodeValue.trim()) { if (_l0._svOrigTxt != null) _n0.nodeValue = _l0._svOrigTxt; break; } }
+        var _h0 = _l0.querySelector('.cf-hint'); if (_h0 && _h0._svOrig != null) { _h0.textContent = _h0._svOrig; _h0.style.color = ''; }
+        _l0.style.color = ''; _l0._svMark = false; _l0._svSchl = null;
+      }
+      return;
+    }
     var fld = sv.closest ? sv.closest('.f') : null;
     var lbl = fld ? fld.querySelector('label') : null; if (!lbl) return;
     var hint = lbl.querySelector('.cf-hint');
@@ -661,7 +674,9 @@ if (!window._wlc) {
 
   function applyToFields() {
     if (!D) return; var applied = [];
-    if (D.mw) { setInput('svwert', fmt0(D.mw[mode])); applied.push('Verkehrswert'); }
+    if (D.mw) { setInput('svwert', fmt0(D.mw[mode])); applied.push('Marktpreisindikation');
+      /* v2996 · die Kartenzahl ist eine Marktpreisindikation aus Angeboten, kein Verkehrswert */
+      try { var _hs = $('svw_herkunft'); if (_hs) { _hs.value = 'indikation'; _hs.dispatchEvent(new Event('change', { bubbles: true })); } } catch (e) {} }
     if (D.mm) {
       var area = D.area || numDe(vIn('wfl')) || 0;
       var sqm = area ? (D.mm[mode] / area) : null;

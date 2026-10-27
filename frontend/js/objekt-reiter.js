@@ -1172,6 +1172,8 @@
       }
     } catch (x) {}
     el.value = String(_wert);
+    /* v2996 · Herkunft mitsetzen: Ertrags-/Sach-/amtlicher Vergleichswert = Marktbericht, sonst Indikation */
+    try { var _hs = $('svw_herkunft'); if (_hs) _hs.value = _amtlich ? 'marktbericht' : 'indikation'; } catch (x) {}
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     if (typeof calc === 'function') { try { calc(); } catch (e) {} }

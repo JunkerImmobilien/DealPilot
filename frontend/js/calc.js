@@ -1188,7 +1188,31 @@ function _calcImmediate(){
   (function () { var _z = el('erb-abzug-zeile'); if (_z) _z.style.display = (_erbAbzug > 0) ? 'flex' : 'none'; })();
   var svw=v('svwert');
   if (_erbAbzug > 0 && svw > 0) svw = Math.max(0, svw - _erbAbzug);
-  var wp=svw>0?svw-kp:0;
+  /* ══ v2996 · DIE HERKUNFT DES WERTS ENTSCHEIDET, WAS ER IST ══════════════
+     Gegenpruefung 27.10.2026: das Feld hiess „Verkehrswert (§ 194 BauGB)" und
+     wurde so gedruckt, als Wert-Anker VOR dem Marktbericht und als LTV-Basis
+     genommen - auch wenn darin eine Marktpreisindikation aus Angeboten ohne
+     Abschlag stand (Parkstr. 9: 487.000 €). Ein Verkehrswert entsteht nur
+     durch eine Wertermittlung (Gutachten); Banken rechnen den LTV auf ihren
+     Marktwert, nicht auf eine Schaetzung.
+       gutachten    Verkehrswert (§ 194 BauGB, Gutachten)  Anker 1, LTV-Basis
+       bank         Marktwert laut Bankbewertung           Anker 1, LTV-Basis
+       marktbericht Wert aus dem DealPilot-Marktbericht    nach dem Bericht-Anker
+       indikation   Marktpreisindikation (Angebote)        kein Wertpuffer, keine LTV-Basis
+       eigene       Marktwert (eigene Schaetzung)          keine LTV-Basis
+     Ohne Auswahl: der Vermerk der Uebernahme (dealpilot-mb.js), sonst „eigene". */
+  var _svwHerk = (function () {
+    if (!(svw > 0)) return null;
+    var s = el('svw_herkunft'); if (s && s.value) return s.value;
+    try { var h = window._dpSvHerkunftMb ? window._dpSvHerkunftMb() : null; if (h) return h.amtlich ? 'marktbericht' : 'indikation'; } catch (e) {}
+    return 'eigene';
+  })();
+  var _SVW_LABEL = { gutachten: 'Verkehrswert (§ 194 BauGB, Gutachten)', bank: 'Marktwert laut Bankbewertung',
+    marktbericht: 'Wert aus dem DealPilot-Marktbericht (indikativ)', indikation: 'Marktpreisindikation aus Angebotspreisen', eigene: 'Marktwert (eigene Schätzung)' };
+  State.svw_herkunft = _svwHerk;
+  State.svw_label = _svwHerk ? _SVW_LABEL[_svwHerk] || _SVW_LABEL.eigene : null;
+  var _svwBelastbar = _svwHerk === 'gutachten' || _svwHerk === 'bank';
+  var wp=(svw>0 && _svwHerk !== 'indikation')?svw-kp:0;
   var wpBox=el('wert-puffer');if(wpBox)wpBox.style.display=wp>0?'flex':'none';
   st('wert-puffer-val',wp>0?fE(wp,0,true):'');
   // V63.65: Startwert für Wertsteigerung — Reihenfolge:
@@ -1219,10 +1243,13 @@ function _calcImmediate(){
     }
   } catch (_e) { _mbAnker = null; }
   var wert_basis, _wbQuelle;
-  if (svw > 0) {
+  /* v2996 · Gutachten/Bank > fuehrendes Verfahren des Berichts > uebrige Angabe > Bank > Kaufpreis */
+  if (svw > 0 && _svwBelastbar) {
     wert_basis = svw; _wbQuelle = 'verkehrswert';
   } else if (_mbAnker && _mbAnker.wert > 0) {
     wert_basis = _mbAnker.wert; _wbQuelle = 'marktbericht';
+  } else if (svw > 0 && _svwHerk !== 'indikation') {
+    wert_basis = svw; _wbQuelle = 'verkehrswert';
   } else if (_bankval > kp) {
     wert_basis = _bankval; _wbQuelle = 'bankbewertung';
   } else {
@@ -1230,7 +1257,7 @@ function _calcImmediate(){
   }
   State.wert_basis = wert_basis;
   State.wert_basis_quelle = _wbQuelle;
-  State.wert_basis_text = _wbQuelle === 'verkehrswert' ? 'Verkehrswert (Reiter Objekt)'
+  State.wert_basis_text = _wbQuelle === 'verkehrswert' ? (State.svw_label || 'Wertangabe') + ' (Reiter Objekt)'
     : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
   var gs_a=v('gsfl')*(v('mea')/100);
@@ -1630,11 +1657,12 @@ function _calcImmediate(){
   if (_ekInklNkLtv) {
     ltv_basis = gi;
     ltv_basis_label = 'Gesamtinvestition (KP + KNK)';
-  } else if (svw > 0) {
+  } else if (svw > 0 && _svwBelastbar) {
+    /* v2996 · nur ein Gutachten- oder Bankwert traegt den LTV; Schaetzung und Angebotsniveau nicht */
     ltv_basis = svw;
-    ltv_basis_label = 'Verkehrswert (§194 BauGB)';
-  } else if (_bankval > kp) {
-    // V63.65: Wenn Bankbewertung höher als Kaufpreis und kein Verkehrswert eingegeben
+    ltv_basis_label = State.svw_label;
+  } else if (_bankval > 0) {
+    /* v2996 · die Bankbewertung gilt auch, wenn sie UNTER dem Kaufpreis liegt (bis v2995 nur darueber) */
     ltv_basis = _bankval;
     ltv_basis_label = 'Bankbewertung';
   } else {
@@ -1791,8 +1819,10 @@ function _calcImmediate(){
   var ltvHint;
   if (_ekInklNkLtv) {
     ltvHint = 'Konservative GI-Sicht: Beleihungsbasis = KP + Erwerbsnebenkosten ('+fE(gi)+'). EK '+fE(ekVal)+' | Darlehen '+fE(darlVal)+' | GI '+fE(gi);
+  } else if (svw > 0 && _svwBelastbar) {
+    ltvHint = 'LTV auf den '+State.svw_label+' ('+fE(svw)+'). Banken beleihen selbst auf den Beleihungswert nach BelWertV. EK '+fE(ekVal)+' | Darlehen '+fE(darlVal);
   } else if (svw > 0) {
-    ltvHint = 'Bankenpraxis: Beleihungsbasis = Verkehrswert §194 BauGB ('+fE(svw)+'). EK '+fE(ekVal)+' | Darlehen '+fE(darlVal)+' | Verkehrswert '+fE(svw);
+    ltvHint = 'LTV auf den Kaufpreis: die Wertangabe im Reiter Objekt ist eine '+(State.svw_label||'eigene Angabe')+' - der LTV rechnet nur mit einem Gutachten- oder Bankwert. EK '+fE(ekVal)+' | Darlehen '+fE(darlVal)+' | KP '+fE(kpVal);
   } else {
     ltvHint = 'Standard ohne Verkehrswert: Beleihungsbasis = Kaufpreis. EK '+fE(ekVal)+' | Darlehen '+fE(darlVal)+' | KP '+fE(kpVal);
   }

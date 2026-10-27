@@ -14,6 +14,7 @@ import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { pruefeModell, mieteModellkonform, modellDurchschnitte } from '../lib/modellpruefung.js';   /* v2595, v2600 */
 import { barwertAbweichung } from '../lib/immowertv.js';   /* v2600 · E2 */
 import { kappungFuer, erhoehungspfad558 } from '../lib/kappung.js';   /* v2993 */
+import { baupreisindexAm } from '../lib/baupreisindex.js';   /* v2996 */
 /* ══ v1968 · HIER STAND EIN TOTER IMPORT ══════════════════════════════
 
      import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';
@@ -78,8 +79,13 @@ const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
    ist dasselbe Muster wie bei der Gesamtnutzungsdauer vor v1338: der Wert
    steht da, aber nicht in einem Feld, das jemand abholen kann.
    Siehe Backlog B1 (2). */
-const BAUPREISINDEX = 1.91;       // Neubau Wohngebaeude, 2010 -> 01.01.2026
-export const BAUPREISINDEX_KONSTANTE = { wert: BAUPREISINDEX, stichtag: '2026-01-01', art: 'konstante' }; /* v1851: fuer die Automatik-Leiste, EINE Quelle */
+/* v2996 · KEINE KONSTANTE MEHR: der Index zum Stichtag aus der Destatis-Tabelle (lib/baupreisindex.js).
+   Bis v2995 hier 1,91 (Nov. 2025); zum 27.10.2026 galt August 2026 = 2,00 - Sachwert rund 4,7 % zu niedrig.
+   Rueckfall 1,91 nur, falls die Tabelle fuer den Stichtag nichts hat (vor Nov. 2024). */
+const BPI_RUECKFALL = 1.91;
+const BPI = () => { const x = baupreisindexAm(new Date()); return x ? x.wert : BPI_RUECKFALL; };
+export function baupreisindexHeute() { return baupreisindexAm(new Date()) || { wert: BPI_RUECKFALL, stichtag: '2026-01-01', art: 'konstante' }; }
+export const BAUPREISINDEX_KONSTANTE = baupreisindexHeute(); /* v1851: Rueckwaertsname; Aufrufer nehmen baupreisindexHeute() */
                                   // Quellen: IMB Hamburg 2026 (1,911),
                                   // GMB Dortmund 2026 (1,906)
 const BGF_FAKTOR = 1.35;          // BGF ≈ Wohnfläche × 1,35 (EFH-Faustwert)
@@ -100,7 +106,10 @@ const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? 
    ortsueblichen Vergleichsmiete) - KEINE gesetzliche Grenze; ImmoWertA 31 nennt keine Zahl.
    Marcel 21.10.2026 (E11): bei ±20 % bleiben. Bis v2595: min(amtlich, Angebot) x 0,7 bis
    max(...) x 1,15 (v2541; bis v2540 x 1,3). */
-export const MIETBAND = Object.freeze({ pct: 20, art: 'DealPilot-Analyseparameter (hessischer Leitfaden II), keine gesetzliche Grenze' });
+/* v2996 · die Fundstelle „hessischer Leitfaden II" war nicht verifiziert und stand im Kundentext.
+   Die ImmoWertA nennt keine Zahl (31.2 a „Bandbreite marktueblich erzielbarer Ertraege"); der Obere
+   Gutachterausschuss Niedersachsen arbeitet mit rund 10 %. Die 20 % sind eine DealPilot-Setzung. */
+export const MIETBAND = Object.freeze({ pct: 20, art: 'DealPilot-Setzung (die ImmoWertA nennt keine Zahl), keine gesetzliche Grenze' });
 const BAND_OBEN = 1 + MIETBAND.pct / 100;
 /* v2600 · E2 · Szenarien der Restlaufzeit, wenn keine Laufzeit bekannt ist - ausdruecklich
    keine gesetzliche Annahme (Prompt: „Nicht erfinden … gekennzeichnete Szenarien 3/5/10 Jahre"). */
@@ -322,7 +331,7 @@ export const CrossCheckService = {
         /* WSACH-2 · Die Fussnote nannte hart "Liegenschaftszins 3 %", auch wenn
          * tatsaechlich 4 % gerechnet wurden. Eine Annahme, die etwas anderes
          * behauptet als die Rechnung, ist schlimmer als keine. */
-        nhk_efh_bgf_eur: NHK_EFH_BGF, baupreisindex_2010_heute: BAUPREISINDEX,
+        nhk_efh_bgf_eur: NHK_EFH_BGF, baupreisindex_2010_heute: BPI(),
         bgf_faktor: BGF_FAKTOR, gnd_jahre: GND_JAHRE, sachwertfaktor: SACHWERTFAKTOR,
         liegenschaftszins_pct_effektiv: (params && params.lzs_pct != null)
           ? Number(params.lzs_pct) : LIEGENSCHAFTSZINS * 100,
@@ -602,7 +611,7 @@ export const CrossCheckService = {
         /* v2383 · Korrekturfaktoren NHK 2010 Anlage 4 fuer Mehrfamilienhaeuser (Wohnungsgroesse,
            Grundrissart) - der Kern konnte sie seit jeher, sie kamen nie an. */
         ..._mfhKorr,
-        baupreisindex: BAUPREISINDEX, regionalfaktor: (p && p.regionalfaktor) || null,
+        baupreisindex: BPI(), regionalfaktor: (p && p.regionalfaktor) || null,
         /* v1056-WRND-1 · Bisher bekam der Sachwert die alte Schaetzung,
          * waehrend der Ertragswert seit v1052 nach Anlage 2 rechnet: 38
          * gegen 49,6 Jahre fuer dasselbe Gebaeude. Zwei Alterswerte fuer
@@ -725,7 +734,7 @@ export const CrossCheckService = {
             keller_dg: (p && p.keller_dg) || ref.keller_dg,
             standardstufe: (p && p.standardstufe) || ref.standardstufe,
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
-            objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
+            objektart: ref.property_type, baupreisindex: BPI(),
             zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH · zweiter Lauf */
             /* v2720 · Bezug des Index im Modell des Ausschusses (nur fuer den Rechenweg). */
             baupreisindex_bezug: ((_swfTab.modellansaetze || {}).baupreisindex_bezug) || null,
@@ -1010,7 +1019,7 @@ export const CrossCheckService = {
          Berichts (Anlage 2, wenn Punkte vorliegen) - nicht mit GND - Alter. */
       try { const _rE = _rndEinheitlich(GND_JAHRE); if (Number(_rE) > 0) rnd = _rE; } catch (e) {}
       const bgf = wfl * BGF_FAKTOR;
-      const hkNeubau = bgf * NHK_EFH_BGF * BAUPREISINDEX;
+      const hkNeubau = bgf * NHK_EFH_BGF * BPI();
       const alterswertfaktor = rnd != null ? rnd / GND_JAHRE : null;
       const gebaeudeSachwert = alterswertfaktor != null ? hkNeubau * alterswertfaktor : null;
       /* ══ v2595 · OHNE BODENWERT KEIN SACHWERT (§ 35 Abs. 2 ImmoWertV) ══════
@@ -1165,7 +1174,9 @@ export const CrossCheckService = {
            nicht verlangt - sie ist oertlicher und juenger als der Zensus (ImmoWertA zu § 5 Abs. 3:
            Grundlage ist „insbesondere die ortsuebliche Vergleichsmiete"). Gemessen 27.10.2026:
            Hermannstr. 9 Huellhorst und Loehner Str. 278 fielen sonst auf den Zensus. */
-        : (_amtM && _amtM.fuehrend !== false)
+        /* v2996 · Rechnet der Zins mit § 256 BewG (Stufe D), gehoert die Bestandsmiete dazu (Anlage 39
+           BewG, Modellkonformitaet § 10) - dann Zensus vor der Mietpreisuebersicht. */
+        : (_amtM && _amtM.fuehrend !== false && !(p.lzs_stufe === 'D' && p.zensus_miete && _num(p.zensus_miete.qm) > 0))
           ? { qm: _r2a(_num(_amtM.miete_qm)), stufe: 'amtlich', etikett: 'amtliche Miete des Gutachterausschusses'
                 + (_amtM.ausserhalb_tabelle && _amtM.groessenklasse_kurz ? ' (' + _amtM.groessenklasse_kurz + ')' : ''),
               groessenklasse_hinweis: _amtM.ausserhalb_tabelle ? (_amtM.ausserhalb_hinweis || null) : null,
@@ -2332,7 +2343,7 @@ export const CrossCheckService = {
               : _gHerk === 'anker_lzs' ? ('Keine marktübliche Miete je Einheit eingetragen; Anker ist die Ø Miete der Stichprobe des Liegenschaftszinssatzes ('
                 + String(_ankerG.anker_qm).replace('.', ',') + ' €/m²). Die Ist-Miete (' + String(_ankerG.ist_qm).replace('.', ',') + ' €/m²) liegt '
                 + (_ankerG.herkunft === 'ist_im_band' ? 'im Band ±' + MIETBAND.pct + ' % und ist angesetzt.' : 'außerhalb des Bandes ±' + MIETBAND.pct + ' %; angesetzt ist die Ø Miete, die Abweichung ist ein besonderes objektspezifisches Merkmal.')
-                + ' Das Band ist ein DealPilot-Analyseparameter (hessischer Leitfaden II), keine gesetzliche Grenze.')
+                + ' Das Band ist eine DealPilot-Setzung; die ImmoWertA nennt keine Zahl (31.2 a), keine gesetzliche Grenze.')
               : 'Rohertrag = Ist-Miete, nicht auf Marktüblichkeit geprüft (§ 31 Abs. 2 ImmoWertV) — der Ertragswert ist indikativ.'));
           kernG.warnungen.forEach((w) => { if (out.notes.indexOf(w) < 0) out.notes.push(w); });
           kernG.hinweise.forEach((h) => { if (out.notes.indexOf(h) < 0) out.notes.push(h); });

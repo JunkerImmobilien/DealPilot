@@ -286,7 +286,22 @@ export function lzsNach256(objektart, brwSqm = null, anzahlWe = null) {
     + 'mit ihm deshalb eher zu niedrig aus.';
 
   const brw = Number(brwSqm);
-  if (istEfh && Number.isFinite(brw) && brw > 500) {
+  /* v2996 · Abs. 2 gilt fuer jedes Ein-/Zweifamilienhaus, auch „haus" mit 1-2 Wohnungen
+     (bis hier nur istEfh - die Luecke von v2993c war halb geschlossen). Abs. 3 fuer
+     Wohnungseigentum fehlte ganz: -0,1 Punkte je volle 100 €/m² ueber 2.000, ab 3.000
+     einheitlich 2,0 % (Wortlaut gesetze-im-internet.de, 27.10.2026). */
+  const efhArt = istEfh || (k === 'haus' && Number(anzahlWe) >= 1 && Number(anzahlWe) <= 2);
+  if (istEtw && Number.isFinite(brw) && brw > 2000) {
+    if (brw >= 3000) {
+      pct = 2.0;
+      hinweis += ' Bodenrichtwert ab 3.000 EUR/m²: einheitlich 2,0 % (§ 256 Abs. 3 BewG).';
+    } else {
+      const stufenW = Math.floor((brw - 2000) / 100);
+      pct = Math.max(2.0, round2(pct - stufenW * 0.1));
+      hinweis += ` Verringerung nach § 256 Abs. 3 BewG: ${stufenW} × 0,1 Punkte wegen Bodenrichtwert ${brw} EUR/m².`;
+    }
+  }
+  if (efhArt && Number.isFinite(brw) && brw > 500) {
     if (brw >= 1500) {
       pct = 1.5;
       hinweis += ' Bodenrichtwert ab 1.500 EUR/m²: einheitlich 1,5 %.';
