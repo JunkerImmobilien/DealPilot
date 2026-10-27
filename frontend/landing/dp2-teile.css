@@ -699,3 +699,13 @@ footer .mark-gross .wort{font-size:21px}
   .kont-tab td{font-size:13px}
   .kont-tab td:first-child{hyphens:auto;-webkit-hyphens:auto}
 }
+
+/* v2973 · Tippflaechen der Unterseiten (Nachmessung v2971 bei 390 px: Videothek-Reiter
+   30 px, Reiter in Fragen und API 40 px, Inhaltsverzeichnis Leistungsumfang 42 px,
+   „Zurueck" in der API 16 px). Nur auf dem Handy, mindestens 44 px. */
+@media (max-width: 640px) {
+  .dpl-tab { min-height: 44px; display: inline-flex; align-items: center; }
+  .fq-nav a, .api-nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  .lu-toc-item { min-height: 44px; }
+  .api-back { min-height: 44px; align-items: center; }
+}

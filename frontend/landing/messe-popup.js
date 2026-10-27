@@ -423,7 +423,7 @@
       +     '<div><b>Aus der Gutachtenpraxis</b><span>DESAG-geprüfter Sachverständiger</span></div></div>'
       +   '<div><svg viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/>'
       +     '<path d="m9 12 2.2 2.2L15.5 10"/></svg>'
-      +     '<div><b>Ihre Daten bleiben Ihre</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>'
+      +     '<div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>'
       +   '<div class="weg-handy"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/>'
       +     '<path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>'
       +     '<div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>'
