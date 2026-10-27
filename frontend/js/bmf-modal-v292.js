@@ -118,6 +118,7 @@
       gba_e:      _parseDe(_v('gba_e')),
       makler_e:   _parseDe(_v('makler_e')),
       ji_sonst_e: _parseDe(_v('ji_e')),
+      gs_kosten_ak: (window.State && State.gs_kosten_ak) || 0,   /* v3006d: Grundschuld aus der Pipeline-AfA-Basis (calc.js v3006) */
       kaufdat:    _v('kaufdat')
     };
 

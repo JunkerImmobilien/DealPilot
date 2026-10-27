@@ -21,6 +21,7 @@
  */
 
 const bmfService = require('./bmfService');
+const rechenkerne = require('./rechenkerne');   /* v3006d: Gebaeude-AHK aus dem Kern der App */
 
 /* ═══ v1846 · JACOBY NEBEN BMF — ein Rechenkern, eine Zinsquelle ═══════════
  *
@@ -367,13 +368,28 @@ function _phase5_varianten(phase2, phase4) {
 // ─────────────────────────────────────────────────────────────────
 // PHASE 7: NK-Verteilung pro Variante (Geb/Boden, NICHT Inventar)
 // ─────────────────────────────────────────────────────────────────
-function _phase7_nkVerteilung(phase3, phase5) {
-  const nkGesamt = phase3.nk_gesamt;
+/* v3006d · Gebaeude-AHK aus dem Kern der App (DealKpis.gebaeudeAhk, wie calc.js, BMF-Fenster
+   und Kaufpreisaufteilung). Bis v3006c verteilte diese Phase ALLE Nebenkosten auf Gebaeude und
+   Boden - auch den Teil, der auf das Inventar entfaellt - und rundete auf ganze Euro; die
+   Grundschuld (Finanzierungskosten) lief als Anschaffungskosten mit. Jetzt: Grunderwerbsteuer
+   nur aufs Grundstueck, die uebrigen Nebenkosten im Verhaeltnis der Kaufpreisanteile auch aufs
+   Inventar, Grundschuld (investition.gs_kosten_ak) heraus, ungerundet. */
+function _ahkKern(inputs, phase2, phase3, gebPct) {
+  const inv = inputs.investition || {};
+  return rechenkerne.gebaeudeAhk({
+    kp: Number(inv.kp_brutto) || 0, nk: phase3.nk_gesamt, nkNurImmo: phase3.nk_aufschluesselung.grest,
+    nkAbzug: Number(inv.gs_kosten_ak) || 0, gebAntPct: gebPct, inventar: phase2.inventar_gesamt
+  });
+}
+function _phase7_nkVerteilung(phase3, phase5, phase2, inputs) {
   const result = {};
   for (const [name, v] of Object.entries(phase5)) {
+    const k = _ahkKern(inputs, phase2, phase3, v.gebaeude_pct);
     result[name] = {
-      geb_nk:   Math.round(nkGesamt * v.gebaeude_pct / 100),
-      boden_nk: Math.round(nkGesamt * v.boden_pct / 100)
+      geb_nk:   k.nkGeb,
+      boden_nk: k.nkImmo - k.nkGeb,
+      inv_nk:   k.nkInv,
+      _kern:    k
     };
   }
   return result;
@@ -387,10 +403,11 @@ function _phase8_finaleAk(phase2, phase5, phase7) {
   for (const name of Object.keys(phase5)) {
     const v = phase5[name];
     const nk = phase7[name];
+    const k = nk._kern;   /* v3006d */
     result[name] = {
-      gebaeude_ak: v.gebaeude_eur_vertrag + nk.geb_nk,
-      boden_ak:    v.boden_eur_vertrag + nk.boden_nk,
-      inventar_ak: phase2.inventar_gesamt
+      gebaeude_ak: k.gebAhk,
+      boden_ak:    (k.kpOhneInv - k.gebKp) + nk.boden_nk,
+      inventar_ak: k.invAk
     };
   }
   return result;
@@ -422,8 +439,11 @@ function _phase10_afa(inputs, phase2, phase8) {
   const afa_satz_pct = _afaSatzFromBaujahr(baujahr);
 
   const inventar_jahre = Number(inputs.renovierung?.moebl_verteilung_jahre) || 10;
+  /* v3006d · Inventar-AfA auf das Inventar MIT seinem Anteil an den Nebenkosten (wie tax.js v3006b) */
+  const _ersteVariante = Object.keys(phase8)[0];
+  const _invAk = _ersteVariante ? phase8[_ersteVariante].inventar_ak : phase2.inventar_gesamt;
   const inventar_afa_jahr = inventar_jahre > 0
-    ? Math.round(phase2.inventar_gesamt / inventar_jahre)
+    ? Math.round(_invAk / inventar_jahre)
     : 0;
 
   const result = {};
@@ -548,7 +568,7 @@ async function runPipeline(rawInputs) {
   const phase5 = _phase5_varianten(phase2, phase4);
 
   // Phase 7: NK-Verteilung
-  const phase7 = _phase7_nkVerteilung(phase3, phase5);
+  const phase7 = _phase7_nkVerteilung(phase3, phase5, phase2, inputs);   /* v3006d */
 
   // Phase 8: Finale AK
   const phase8 = _phase8_finaleAk(phase2, phase5, phase7);

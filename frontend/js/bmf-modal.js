@@ -1067,6 +1067,40 @@ function _bmfNkImmo(akTotal, bruttoKp){
   return Math.max(0, akTotal - bruttoKp - san);
 }
 
+/* ═══ v3006d · EINE RECHNUNG FUER DIE GEBAEUDE-AHK, AUCH IM BMF-FENSTER ════════
+   Bis v3006c rechnete das Fenster eigen: Gebaeude = (Kaufpreis - Inventar der
+   Fensterfelder) x Anteil, dazu ALLE Nebenkosten x Anteil (nkImmo). Gemessen mit
+   10.000 EUR Inventar, nur in #moebl: das Fenster sah kein Inventar (die Felder
+   inv_moebl/inv_pv/... sind leer) und kam auf 268.448 EUR, das Hauptformular auf
+   260.002,40 EUR. Jetzt der Kern (DealKpis.gebaeudeAhk) mit denselben Eingaben wie
+   calc.js: Inventar wie dort (max(inv_kueche, moebl)), Grunderwerbsteuer nur aufs
+   Grundstueck, Nebenkosten anteilig aufs Inventar, Grundschuld (State.gs_kosten_ak)
+   heraus. Nebenkosten = alles im Reiter 1 ausser Kaufpreis und Sanierung (wie
+   _bmfNkImmo) - Fahrt, Gutachten, Anwalt gehen anteilig mit. */
+function _bmfInventar(){
+  var g = function(id){ var e = document.getElementById(id); return e ? (parseDe(e.value) || 0) : 0; };
+  return Math.max(0, g('inv_kueche'), g('moebl'));
+}
+function _bmfAkTotalRaw(){
+  var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN;
+  return isFinite(r) ? r : parseDe(((e || {}).textContent || '').replace('€','').trim());
+}
+function _bmfAhk(gebPct){
+  var kp = parseDe(($('ak_kp') || {}).value) || 0;
+  /* Verpflegung und Uebernachtung sind Reisekosten, keine Anschaffungsnebenkosten (v1495,
+     wie die Kaufpreisaufteilung) */
+  var _rk = (parseDe(($('ak_verpfl') || {}).value) || 0) + (parseDe(($('ak_hotel') || {}).value) || 0);
+  var nk = Math.max(0, _bmfNkImmo(_bmfAkTotalRaw(), kp) - _rk);
+  var grest = parseDe(($('ak_grest') || {}).value) || 0;
+  var gs = (window.State && State.gs_kosten_ak) || 0;
+  if (window.DealKpis && DealKpis.gebaeudeAhk) {
+    return DealKpis.gebaeudeAhk({ kp: kp, nk: nk, nkNurImmo: grest, nkAbzug: gs, gebAntPct: gebPct, inventar: _bmfInventar() });
+  }
+  var inv = _bmfInventar(), ko = Math.max(0, kp - inv);
+  return { kpOhneInv: ko, gebKp: ko * gebPct / 100, nkGeb: nk * gebPct / 100, gebAhk: ko * gebPct / 100 + nk * gebPct / 100, nkImmo: nk, nkInv: 0, invAk: inv };
+}
+window._dpBmfAhk = _bmfAhk;
+
 /* v2260 · Die 15-%-Grenze (§ 6 Abs. 1 Nr. 1a EStG) an EINER Stelle.
    Schwelle = 15 % der Anschaffungskosten des GEBAEUDES der gewaehlten Variante
    = Gebaeudeanteil x (Kaufpreis ohne Inventar + Nebenkosten), ohne Sanierung.
@@ -1083,11 +1117,14 @@ function _bmfNkImmo(akTotal, bruttoKp){
    verglichen wurden 87.000 brutto statt 73.109 netto. */
 function _bmfG15(){
   var basis = null, quelle = '';
+  /* v3006d · Basis immer aus dem Kern (DealKpis.gebaeudeAhk), wie das Hauptformular auf den
+     Cent. Von der Pipeline kommt nur der Gebaeudeanteil der gewaehlten Variante; ihre
+     gebaeude_ak (bis v3006c hier die Basis) kannte die Grundschuld nicht. */
   try {
     var st = window._v292State, r = st && st.response, sel = st && st.selectedVariant;
-    if (r && r.ok && r.phase8_finale_ak && sel && r.phase8_finale_ak[sel]
-        && isFinite(Number(r.phase8_finale_ak[sel].gebaeude_ak))) {
-      basis = Number(r.phase8_finale_ak[sel].gebaeude_ak);
+    if (r && r.ok && r.phase5_varianten && sel && r.phase5_varianten[sel]
+        && isFinite(Number(r.phase5_varianten[sel].gebaeude_pct))) {
+      basis = _bmfAhk(Number(r.phase5_varianten[sel].gebaeude_pct)).gebAhk;
       quelle = 'pipeline:' + sel;
     }
   } catch (e) {}
@@ -1098,8 +1135,7 @@ function _bmfG15(){
       var e = $('ak_total');
       var akTotal = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN;
       if (!isFinite(akTotal)) akTotal = parseDe(((e || {}).textContent || '').replace('€','').trim());
-      var bruttoKp = parseDe(($('ak_kp') || {}).value);
-      basis = chosen.gebEur + _bmfNkImmo(akTotal, bruttoKp) * chosen.gebPct / 100;
+      basis = _bmfAhk(chosen.gebPct).gebAhk;   /* v3006d: Kern */
       quelle = 'fenster:' + chosen.key;
     }
   }
@@ -1187,8 +1223,12 @@ function _dpInjectTreeHk(){  /* v992-tree2 */
      dem eigenen Feld (§ 255 Abs. 2) bleiben. */
   try {
     var _kp0 = parseDe(($('ak_kp') || {}).value) || 0;
-    var _inv0 = (typeof window.dpInventarSumme === 'function') ? window.dpInventarSumme() : 0;
-    var _nk0 = (typeof _bmfNkImmo === 'function') ? _bmfNkImmo() : 0;
+    /* v3006d · hier stand _bmfNkImmo() OHNE Argumente - NaN, also 0: die Endzeile zeigte
+       die Basis ohne Nebenkosten. Jetzt der Kern: Kaufpreis ohne Inventar + Nebenkosten
+       aufs Grundstueck (ohne den Inventaranteil, ohne Grundschuld). */
+    var _k0 = _bmfAhk(50);
+    var _inv0 = _kp0 - _k0.kpOhneInv;
+    var _nk0 = _k0.nkImmo;
     var _san0 = parseDe(($('ak_ahk') || {}).value) || 0;
     var _g = (typeof window._bmfG15 === 'function') ? window._bmfG15() : null;
     var _anschaffungsnah = !!(_g && _g.max > 0 && _g.geplantNetto > _g.max);
@@ -1325,10 +1365,10 @@ function _varianten(){
 
   // Immobilien-KP = Brutto-KP − Inventar
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var inv = (parseDe($('inv_kueche').value) || 0) +
-            (parseDe($('inv_moebl').value)  || 0) +
-            (parseDe($('inv_pv').value)     || 0) +
-            (parseDe($('inv_sonst').value)  || 0);
+  /* v3006d · Inventar wie calc.js (max(inv_kueche, moebl)); hier standen vier Fensterfelder,
+     darunter inv_moebl, das es nicht gibt (das Feld heisst inv_moebel) - Inventar nur in
+     #moebl kam als 0 an. */
+  var inv = _bmfInventar();
   var immoKp = Math.max(0, bruttoKp - inv);
 
   // BMF-Aufteilung
@@ -1409,10 +1449,8 @@ function renderVarGrid(){
   // (immobilienbezogene NK = AK-Total − Brutto-Kaufpreis, also nur die NK ohne KP)
   var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
-
   // BMF-Variante als Referenz für Delta
-  var bmfAfa = (varianten[0].gebEur + nkImmo * varianten[0].gebPct/100) * afaSatz/100;
+  var bmfAfa = _bmfAhk(varianten[0].gebPct).gebAhk * afaSatz/100;   /* v3006d: Kern */
 
   // V292.6.6-pane4-afa-split: Inventar-AfA berechnen (bewegliche WG, linear 10 J)
   var _invSumP4 = 0;
@@ -1425,7 +1463,7 @@ function renderVarGrid(){
 
   var html = '';
   varianten.forEach(function(va){
-    var gebAk = va.gebEur + (nkImmo * va.gebPct/100) + _bmfHk();  /* v988 */
+    var gebAk = _bmfAhk(va.gebPct).gebAhk + _bmfHk();  /* v988, v3006d: Kern */
     var afaJahr = gebAk * afaSatz/100;
     var delta = afaJahr - bmfAfa;
     var isActive = (va.key === _varChoice);
@@ -1475,12 +1513,11 @@ function renderVarImpact(){
   var afaSatz = parseDe($('afa_satz').value) || 2.0;
   var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
   var grenz = 0.4045;
 
   var _hk988 = _bmfHk();
-  var gebAkChosen = chosen.gebEur + (nkImmo * chosen.gebPct/100) + _hk988;
-  var gebAkBmf = bmf.gebEur + (nkImmo * bmf.gebPct/100) + _hk988;
+  var gebAkChosen = _bmfAhk(chosen.gebPct).gebAhk + _hk988;   /* v3006d: Kern */
+  var gebAkBmf = _bmfAhk(bmf.gebPct).gebAhk + _hk988;
   var afaChosen = gebAkChosen * afaSatz/100;
   var afaBmf = gebAkBmf * afaSatz/100;
   var deltaAfa = afaChosen - afaBmf;
@@ -1588,8 +1625,7 @@ function updateTabInvestSync(){
       if(chosen){
         var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
         var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-        var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
-        var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
+        var gebAk = _bmfAhk(chosen.gebPct).gebAhk;   /* v3006d: Kern */
         var max15 = gebAk * 0.15;
         statusEl.style.display = '';
         if(sanInvest > max15){
@@ -1633,11 +1669,7 @@ function renderRiskGrid(){
   if(aufSub) aufSub.textContent = chosen.riskLabel;
 
   // 2) Inventarwerte
-  var inv = (parseDe($('inv_kueche').value) || 0) +
-            (parseDe($('inv_moebl').value) || 0) +
-            (parseDe($('inv_pv').value) || 0) +
-            (parseDe($('inv_sonst').value) || 0);
-  if (!(inv > 0)) inv = parseDe(($('moebl') || {}).value) || 0;   /* v2265: Inventar nur in #moebl */
+  var inv = _bmfInventar();   /* v3006d: Inventar wie calc.js */
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
   var invQuote = bruttoKp > 0 ? (inv / bruttoKp) * 100 : 0;
   if($('risk_inv')){
@@ -1658,8 +1690,7 @@ function renderRiskGrid(){
   // 3) 15-%-Grenze
   if($('risk_15')){
     var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
-    var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
-    var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
+    var gebAk = _bmfAhk(chosen.gebPct).gebAhk;   /* v3006d: Kern */
     var _g15r = _bmfG15();  /* v2260 · eine Quelle, Sanierung netto */
     if (_g15r.basis != null) gebAk = _g15r.basis;
     var max15 = gebAk * 0.15;
@@ -1691,11 +1722,7 @@ function renderEmpfehlung(){
   var chosen = varianten.find(function(v){ return v.key === _varChoice; }) || varianten[0];
   if(!chosen) return;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var inv = (parseDe($('inv_kueche').value) || 0) +
-            (parseDe($('inv_moebl').value) || 0) +
-            (parseDe($('inv_pv').value) || 0) +
-            (parseDe($('inv_sonst').value) || 0);
-  if (!(inv > 0)) inv = parseDe(($('moebl') || {}).value) || 0;   /* v2265: Inventar nur in #moebl */
+  var inv = _bmfInventar();   /* v3006d: Inventar wie calc.js */
   var invQuote = bruttoKp > 0 ? (inv / bruttoKp) * 100 : 0;
 
   var mainHtml = '', listItems = [];
@@ -1734,8 +1761,7 @@ function renderEmpfehlung(){
 
   // 15-%-Grenze
   var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
-  var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
-  var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
+  var gebAk = _bmfAhk(chosen.gebPct).gebAhk;   /* v3006d: Kern */
   var _g15e = _bmfG15();  /* v2260 · eine Quelle, Sanierung netto */
   if (_g15e.basis != null) gebAk = _g15e.basis;
   var max15 = gebAk * 0.15;
@@ -1762,11 +1788,7 @@ function renderKlausel(){
   if(klauselVarEl) klauselVarEl.textContent = chosen.label;
 
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var inv = (parseDe($('inv_kueche').value) || 0) +
-            (parseDe($('inv_moebl').value) || 0) +
-            (parseDe($('inv_pv').value) || 0) +
-            (parseDe($('inv_sonst').value) || 0);
-  if (!(inv > 0)) inv = parseDe(($('moebl') || {}).value) || 0;   /* v2265: Inventar nur in #moebl */
+  var inv = _bmfInventar();   /* v3006d: Inventar wie calc.js */
   var immoKp = Math.max(0, bruttoKp - inv);
 
   // Begründungs-Zusatz je nach Variante
