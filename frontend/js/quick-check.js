@@ -544,8 +544,9 @@
         if (!_qc_herk) _qc_herk = 'eigene';
       }
     }
-    var _bvEl = document.getElementById('bankval');
-    var _qc_bank = _bvEl ? (parseDe(_bvEl.value || '0') || 0) : 0;
+    /* v3006a · Keine Bankbewertung mehr daneben: seit v3003a steht sie als Herkunft
+       „bank" an svwert (wertangabe.js), calc.js liest bankval nicht mehr. */
+    var _qc_bank = 0;
     var kpis = (window.DealKpis && DealKpis.compute) ? DealKpis.compute({
       kp:      kp,
       nk:      knkAbs,

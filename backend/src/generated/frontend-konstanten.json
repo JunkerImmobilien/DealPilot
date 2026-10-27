@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-27T19:33:44.381Z",
+ "erzeugt_am": "2026-10-27T19:37:15.492Z",
  "quellen": {
-  "voice-import": "6cf8b4e280eb37cd",
+  "voice-import": "9618e5358052c4e6",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "4f8b4aaba0ba169c",
-  "index-html": "29670dc1e4cd412e",
+  "storage": "1345346ccb058945",
+  "index-html": "076eb8a70a7025b3",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -445,6 +445,7 @@
    "bankval",
    "svwert",
    "svw_herkunft",
+   "bankval_migriert",
    "makrolage",
    "mikrolage",
    "lageklasse",
