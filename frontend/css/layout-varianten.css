@@ -9546,3 +9546,15 @@ html[data-dp-layout] body .dpl-schiene .sb-card.is-active .sbc-actions{
   background:#221F1A !important;
   box-shadow:0 0 0 1px rgba(255,255,255,.06), -10px 0 12px 2px #221F1A !important;
 }
+
+/* ═══ v2980a · DIE LOST-LASCHE FIEL AUS DER KARTE ═══════════════════════════
+   Marcel 27.10.2026 (Bild Dateien/Fehler/Screenshot 2026-10-27 123145.png): in der
+   Schiene stand „×LOST“ lose über der Liste, über „2026-1002 Am Markt 9“.
+   Gemessen: .sbc-lost-ribbon position:static. Die WON-Lasche ist hier seit jeher
+   ausgeblendet (Abschnitt „Die WON-Lasche fällt weg“), weil Nummer und Kante den
+   Status tragen - für LOST fehlte das Gegenstück. Verloren zeigt die rote Nummer
+   (.deal-lost .sbc-seq), genau wie gewonnen ohne Lasche auskommt. */
+html[data-dp-layout] .dpl-schiene .sb-card .sbc-lost-ribbon,
+html[data-dp-layout] aside#sidebar .sb-card .sbc-lost-ribbon{
+  display:none !important;
+}
