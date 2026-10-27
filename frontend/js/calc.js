@@ -988,7 +988,9 @@ function _calcImmediate(){
   var kuecheActive = kuecheVal > 0;
   // Sicherheit: Küche kann nicht > Gebäudeanteil sein
   var gebBruttoMax = kp * gebAnt;
-  if (kuecheVal > gebBruttoMax) kuecheVal = gebBruttoMax;
+  /* v3006e · der Deckel lag beim Gebaeudeanteil (kp x geb_ant) - Inventar ist aber ein eigenes
+     Wirtschaftsgut, kein Teil des Gebaeudes; die Obergrenze ist der Kaufpreis (wie DealKpis). */
+  if (kuecheVal > kp) kuecheVal = Math.max(0, kp);
 
   /* V292.6.1-afa-basis-fix-correct: AfA-Basis nach BMF Pipeline Phase 8
    * 

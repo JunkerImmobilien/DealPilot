@@ -269,7 +269,7 @@ window.DealKpis = (function() {
     /* v3006d · ein Anteil ausserhalb 0-100 % ist keine Aufteilung (gemessen: Selbsttest der
        BMF-Pipeline lieferte -24,93 %); dann zaehlt der Kaufpreis als Obergrenze des Inventars */
     if (!(geb >= 0 && geb <= 1)) geb = Math.min(1, Math.max(0, geb || 0));
-    if (geb > 0 && inv > kp * geb) inv = kp * geb;  /* wie calc.js: nie mehr als der Gebaeudeanteil */
+    /* v3006e: kein Deckel beim Gebaeudeanteil mehr (Inventar ist kein Teil des Gebaeudes), nur beim Kaufpreis */
     if (inv > kp) inv = kp;
     var nk = Math.max(0, (+i.nk || 0) - Math.max(0, +i.nkAbzug || 0));
     var nkNurImmo = Math.min(nk, Math.max(0, +i.nkNurImmo || 0));
