@@ -622,7 +622,9 @@ export const DealPilotObjectMapper = {
       lzs_pct: dez(pick(d, ['lzs_pct'])),               /* v1851: „2.56" kam als 256 an */
       /* v3010 · Wertermittlungsstichtag (Feld im Block „Ansaetze des Sachverstaendigen"); nur ein Datum JJJJ-MM-TT reist weiter,
          leer = heute (lib/stichtag.js). Ohne diese Zeile fiele das Feld hier still weg. */
-      wertermittlungsstichtag: (function () { const v = String(pick(d, ['wertermittlungsstichtag']) || '').trim().slice(0, 10); return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null; })(),
+      wertermittlungsstichtag: (function () { let v = String(pick(d, ['wertermittlungsstichtag']) || '').trim();
+        const de = v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (de) v = de[3] + '-' + de[2].padStart(2, '0') + '-' + de[1].padStart(2, '0');   /* v3010a: auch TT.MM.JJJJ */
+        v = v.slice(0, 10); return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null; })(),
       brw_anpassung_pct: dez(pick(d, ['brw_anpassung_pct'])),
       brw_anpassung_grund: pick(d, ['brw_anpassung_grund']),
       stellplatz_miete_monat: num(pick(d, ['stellplatz_miete_monat'])),
