@@ -6473,7 +6473,7 @@
   /* ── Bank-PDF (wie Modul 19) ─────────────────────────────────────────── */
   async function kmBankPdf() {
     var bank = await r19Bank();
-    if (bank) { try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.roh = tx; _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); DPM_KM.pdf = { bytes: bank.size, seiten: _r19.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {} }
+    if (bank) { try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.roh = tx; _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); DPM_KM.pdf = { bytes: bank.size, seiten: _r19.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8), ziel: (function () { var T = _r19.tok || [], i = -1; T.forEach(function (x, j) { if (i < 0 && /^(WERTPOTENZIAL|ZIELBILD)/.test(x)) i = j; }); return i < 0 ? null : T.slice(i, i + 40).join(' | ').slice(0, 900); })() }; } catch (e) {} }
     return bank;
   }
 
@@ -6505,8 +6505,8 @@
           { was: 'Nichts — ein leeres Objekt über „Neues Objekt“.', warum: 'Jedes Feld einmal sehen und verstehen, wofür es gebraucht wird.', folge: 'Alle Zahlen im Video rechnet die App aus genau diesen Eingaben.' });
         await zeige(function () { return q('nav.tabs'); }, 6);
         var tabs = [].map.call(document.querySelectorAll('nav.tabs .tab[data-target-sec]'), function (t) { return t.offsetWidth ? r6Text(t) : null; }).filter(Boolean);
-        await kmSag(s, 'Die Reiter', (tabs.length ? tabs.length + ' Reiter: ' + tabs.join(' · ') : 'Die Reiter oben') + '. Wir gehen sie der Reihe nach durch.',
-          'Oben siehst du die Reiter: ' + (tabs.length ? tabs.join(', ') : 'Objekt, Investition, Miete und so weiter') + '. Sie sind die Kapitel eines Objekts, und genau in dieser Reihenfolge gehen wir sie heute durch.', null,
+        await kmSag(s, 'Die Reiter', (tabs.length ? tabs.length + ' Reiter: ' + tabs.join(' · ') : 'Die Reiter oben') + '. Die wichtigsten gehen wir heute durch.',
+          'Oben siehst du die Reiter: ' + (tabs.length ? tabs.join(', ') : 'Objekt, Investition, Miete und so weiter') + '. Sie sind die Kapitel eines Objekts. Wir gehen die wichtigsten durch — in der Reihenfolge, in der man ein Haus durchdenkt: erst das Objekt und seine Wohnungen, dann Miete, Finanzierung und Steuer, dann Wert, Plan und Ergebnis.', null,
           { was: 'Noch nichts — wir schauen uns die Reiter an.', warum: 'Jeder Reiter ist ein Kapitel des Objekts.', folge: 'Was du in einem Reiter einträgst, rechnet in allen anderen mit.' });
         var stz = function () { return q('#oe-stufen') || q('#oab-dp-stufen'); };
         if (stz()) {
@@ -7095,7 +7095,7 @@
         DPM_KM.ergebnisText = et.slice(0, 1500);
         var zr = /Zielbild[^.]*?Restnutzungsdauer[^\d]*(\d+) Jahre/.exec(et) || /nach (?:dem )?Zielbild[^\d]*(\d+) Jahre/.exec(et);
         await kmSag(s, 'Heute und im Zielbild', 'Restnutzungsdauer heute <b>' + (_km.rnd || '–') + ' Jahre</b>' + (zr ? ', im Zielbild <b>' + zr[1] + ' Jahre</b>' : '') + ' — gerechnet wird mit dem Bestand.',
-          'Das Ergebnis zeigt beides: das Haus heute und nach dem Zielbild. Score und Wertermittlung rechnen weiter mit dem Bestand, denn das Zielbild ist ein Plan. Seinen Wert sieht man in Pilot-Analyse und PDF neben Ist und Soll.', null,
+          'Das Ergebnis zeigt beides: das Haus heute und nach dem Zielbild. Score und Wertermittlung rechnen weiter mit dem Bestand, denn das Zielbild ist ein Plan. In Pilot-Analyse und Bank-PDF steht es neben Ist und Soll.', null,
           { was: 'Nichts — Bestand und Zielbild nebeneinander.', warum: 'Ein Plan ist kein Ist.', folge: 'Bewertet wird der Bestand; das Zielbild zeigt das Potenzial.' });
         var san = r26Mfh('#mfh-san'); if (san && san.checked) san.click();
         await zeige(function () { return r26Mfh('#mfh-weiter'); }, 8);
@@ -7166,8 +7166,8 @@
         var wp = r19Stelle(/^WERTPOTENZIAL|^ZIELBILD/, null);
         if (wp && wp.seite && /WERTPOTENZIAL|ZIELBILD/.test((_r19.tok || []).join(' '))) {
           await r19Seite(bank, wp.seite, wp.oben);
-          await kmSag(s, 'Zielbild im PDF', 'Ist, Soll und Zielbild nebeneinander — der Plan aus Kapitel 8.',
-            'Auch das Zielbild aus Kapitel acht steht im PDF: Ist, Soll und Zielbild nebeneinander.', null,
+          await kmSag(s, 'Zielbild im PDF', 'Der Plan aus Kapitel 8 — auch im PDF für die Bank.',
+            'Auch das Zielbild aus Kapitel acht steht im PDF.', null,
             { was: 'Nichts.', warum: 'Die Bank sieht nicht nur das Heute, sondern den Plan.', folge: 'Das Potenzial des Hauses ist belegt, nicht behauptet.' });
         }
         r19Zu(); kegelHoch(false);
