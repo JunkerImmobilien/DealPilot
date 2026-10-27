@@ -1654,6 +1654,15 @@ export const ReportOrchestrator = {
         vollstaendig: !!_b.vollstaendig,
         schritte: Array.isArray(_b.schritte) ? _b.schritte : [],
         hinweise: Array.isArray(_b.hinweise) ? _b.hinweise : [],
+        /* v2987 · die angewandte Umrechnung Grundstücksgröße als Zahl (vorher nur im Text der
+           Schritte, z. B. „250 €/m² × 1 / 1,008"). Der Reiter Objekt zeigt sie (Verlauf uk_*). */
+        flaechenaufteilung: (_b.flaechenaufteilung && _b.flaechenaufteilung.koeffizient_angewandt) ? {
+          koeffizient_bauland: _b.flaechenaufteilung.koeffizient_bauland,
+          koeffizient_bezugsgroesse: _b.flaechenaufteilung.koeffizient_bezugsgroesse,
+          bezugsgroesse_qm: _b.flaechenaufteilung.bezugsgroesse_qm != null ? _b.flaechenaufteilung.bezugsgroesse_qm : null,
+          bodenwert_eur_qm: _b.flaechenaufteilung.bodenwert_eur_qm,
+          quelle_art: _b.flaechenaufteilung.quelle_art || _b.flaechenaufteilung.quelle || null,
+        } : null,
       };
     }
 

@@ -711,6 +711,13 @@ router.get('/objects/history', async (req, res) => {
               (data->'cross_check'->'sachwert'->>'restnutzungsdauer_jahre')::numeric AS sw_rnd_jahre,
               (data->'cross_check'->'sachwert'->>'marktangepasst')::boolean AS sw_marktangepasst,
               data->'cross_check'->'sachwert'->>'sachwertfaktor_grund' AS sw_faktor_grund,
+              /* v2987 · angewandte Umrechnung Grundstücksgröße (ErtragswertService out.flaechenaufteilung) -
+                 der Reiter Objekt zeigt den Wert, den die DealPilot-Formel bzw. der Ausschuss im Bericht ergab */
+              data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'koeffizient_bauland'      AS uk_k_bauland,
+              data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'koeffizient_bezugsgroesse' AS uk_k_bezug,
+              data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'bezugsgroesse_qm'          AS uk_bezug_qm,
+              data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'bodenwert_eur_qm'          AS uk_bw_qm,
+              data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'quelle_art'                AS uk_quelle_art,
               CASE WHEN (data->'cross_check'->'vergleichswert_irw'->>'verfuegbar') = 'true'
                    THEN (data->'cross_check'->'vergleichswert_irw'->>'vergleichswert_eur')::numeric END AS irw_vergleichswert_eur,
               /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:

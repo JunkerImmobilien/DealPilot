@@ -422,7 +422,21 @@
         if (ukEigen) html += zeile('Umrechnung Grundstücksgröße', esc(ukEigen), st('b', 'eigener Ansatz') + (uq.verfuegbar ? 'statt des Werts des Ausschusses' : 'eigene Angabe') + _ukQ, knopf('ändern', 'uk_flaeche'));
         else if (uq.verfuegbar && uq.anwendbar) html += zeile('Umrechnung Grundstücksgröße', uq.form_text || 'Tabelle vorhanden', st('a', uq.ebene === 'land' ? 'Landeswert' : 'Ausschuss') + '<span title="' + esc(uq.ausschuss || '') + '">' + esc(String(uq.ausschuss || '').split(',')[0]) + '</span>' + (uq.jahrgang ? ' · ' + esc(uq.jahrgang) : '') + _ukQ + ' — im Bericht aus Fläche und Bezugsgröße des Richtwertgrundstücks', '');
         /* v2358 · Greift im Bericht die DealPilot-Formel, sagt der Reiter es auch. */
-        else if (uq.naeherung) html += zeile('Umrechnung Grundstücksgröße', 'DealPilot-Formel', st('b', 'Näherung') + esc(uq.naeherung_text || '') + (uq.hinweis ? ' ' + esc(uq.hinweis) : '') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
+        /* v2987 · Marcel 27.10.2026: „DealPilot-Formel - aber wie ist der Wert? Können wir den dort hinschreiben?"
+           Der Koeffizient haengt an der Bezugsgroesse der Bodenrichtwertzone, die erst der Marktbericht kennt.
+           Liegt ein Bericht vor, steht hier, was er angewandt hat (Verlauf: uk_k_bauland / uk_k_bezug). */
+        else if (uq.naeherung) {
+          var _ukB = null; try { _ukB = window.DpWertZielbild && DpWertZielbild.bericht ? DpWertZielbild.bericht() : null; } catch (e) {}
+          var _ukK = _ukB && _ukB.uk_k_bauland != null && Number(_ukB.uk_k_bezug) > 0 ? Number(_ukB.uk_k_bauland) / Number(_ukB.uk_k_bezug) : null;
+          var _ukWert = _ukK != null && isFinite(_ukK) ? '× ' + _ukK.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : 'DealPilot-Formel';
+          var _ukText = _ukK != null && isFinite(_ukK)
+            ? 'Im Marktbericht vom ' + (function () { try { return new Date(_ukB.created_at).toLocaleDateString('de-DE'); } catch (e) { return ''; } })()
+              + ' angewandt' + (_ukB.uk_bezug_qm ? ' (Bezugsgröße der Richtwertzone ' + Number(_ukB.uk_bezug_qm).toLocaleString('de-DE') + ' m²' : ' (')
+              + (_ukB.uk_bw_qm ? ', angepasster Bodenwert ' + Number(_ukB.uk_bw_qm).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/m²' : '') + ')'
+              + (_ukB.uk_quelle_art ? ' · ' + esc(_ukB.uk_quelle_art) : '') + '. '
+            : 'Der Wert entsteht im Marktbericht: er braucht die Bezugsgröße der Bodenrichtwertzone. ';
+          html += zeile('Umrechnung Grundstücksgröße', _ukWert, st('b', 'Näherung') + _ukText + esc(uq.naeherung_text || '') + (uq.hinweis ? ' ' + esc(uq.hinweis) : '') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
+        }
         else html += zeile('Umrechnung Grundstücksgröße', '—', st('x', 'kein Wert') + esc(uq.hinweis || 'Für diesen Ort ist kein Umrechnungskoeffizient hinterlegt — der Bodenwert wird nicht an die Grundstücksgröße angepasst.') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
       }
       /* v2361 · Umrechnung nach der WGFZ (§ 16 Abs. 4 ImmoWertV): nur wo der Ausschuss
