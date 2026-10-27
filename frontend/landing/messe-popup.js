@@ -340,6 +340,14 @@
       '  #' + ID + ' .mp-tband img{width:26px;height:26px}',
       '  #' + ID + ' .mp-fuss{flex-direction:column;align-items:stretch;padding:16px}',
       '  #' + ID + ' .mp-fuss .mp-btn,#' + ID + ' .mp-fuss .mp-btn-l{text-align:center}',
+      /* v2971 · gemessen bei 360 px: die zwei Knoepfe standen linksbuendig in
+         eigener Breite (150 / 174 px) untereinander, "Vielleicht spaeter" 43 px
+         hoch; das Schliessen-X 34x34 eckig. Jetzt volle Breite, der
+         Hauptknopf zuerst, beide 48 px; das X rund und 44 px. */
+      '  #' + ID + ' .mp-fuss > div:last-child{display:flex;flex-direction:column-reverse;gap:10px}',
+      '  #' + ID + ' .mp-fuss .mp-btn,#' + ID + ' .mp-fuss .mp-btn-l{width:100%;min-height:48px}',
+      '  #' + ID + ' .mp-zu{width:44px;height:44px;border-radius:50%;top:-10px;right:-6px;font-size:22px;',
+      '    display:flex;align-items:center;justify-content:center;padding:0}',
       '}',
       '@keyframes mpRuckQ{0%{transform:translateY(0)}40%{transform:translateY(-3px)}',
       '  70%{transform:translateY(2px)}100%{transform:translateY(0)}}',
