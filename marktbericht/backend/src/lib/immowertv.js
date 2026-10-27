@@ -254,7 +254,11 @@ export function lzsNach256(objektart, brwSqm = null, anzahlWe = null) {
   const istEtw = ['etw', 'wohnung'].includes(k);
 
   let pct;
-  if (istEfh) pct = BEWG_256.basis.efh;
+  /* v2993c · „haus" mit ein oder zwei Wohnungen ist ein Ein-/Zweifamilienhaus (§ 249 Abs. 2, 3 BewG)
+     und faellt unter § 256 Abs. 1 Nr. 1 (2,5 %), nicht unter die Mietwohngrundstuecke (Nr. 3).
+     Gemessen 27.10.2026: Loehner Str. 278 (ZFH, 2 WE) rechnete mit 4,0 %. */
+  if (k === 'haus' && Number(anzahlWe) >= 1 && Number(anzahlWe) <= 2) pct = BEWG_256.basis.efh;
+  else if (istEfh) pct = BEWG_256.basis.efh;
   else if (istEtw) pct = BEWG_256.basis.etw;
   else if (k === 'mfh' || k === 'haus') {
     pct = (Number(anzahlWe) > 6) ? BEWG_256.basis.mfh_ueber6 : BEWG_256.basis.mfh_bis6;
