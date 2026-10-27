@@ -1,0 +1,828 @@
+[
+ {
+  "land_code": "SL",
+  "ags": "10041100",
+  "ebene": "gemeinde",
+  "gebiet_name": "Saarbrücken, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser (EFH/ZFH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Saarbrücken, Landeshauptstadt gibt es keinen amtlichen Vergleichsfaktor für freistehende Ein- und Zweifamilienhäuser (EFH/ZFH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarbrücken, Landeshauptstadt",
+   "objektarten": [
+    "efh",
+    "zfh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10041100",
+  "ebene": "gemeinde",
+  "gebiet_name": "Saarbrücken, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (RH/DHH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Saarbrücken, Landeshauptstadt gibt es keinen amtlichen Vergleichsfaktor für Reihenhäuser und Doppelhaushälften (RH/DHH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarbrücken, Landeshauptstadt",
+   "objektarten": [
+    "rh",
+    "dhh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10041100",
+  "ebene": "gemeinde",
+  "gebiet_name": "Saarbrücken, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Saarbrücken, Landeshauptstadt gibt es keinen amtlichen Vergleichsfaktor für Eigentumswohnungen (ETW). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarbrücken, Landeshauptstadt",
+   "objektarten": [
+    "etw"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10041",
+  "ebene": "kreis",
+  "gebiet_name": "Regionalverband Saarbrücken",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser (EFH/ZFH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Regionalverband Saarbrücken gibt es keinen amtlichen Vergleichsfaktor für freistehende Ein- und Zweifamilienhäuser (EFH/ZFH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Regionalverband Saarbrücken",
+   "objektarten": [
+    "efh",
+    "zfh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10041",
+  "ebene": "kreis",
+  "gebiet_name": "Regionalverband Saarbrücken",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (RH/DHH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Regionalverband Saarbrücken gibt es keinen amtlichen Vergleichsfaktor für Reihenhäuser und Doppelhaushälften (RH/DHH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Regionalverband Saarbrücken",
+   "objektarten": [
+    "rh",
+    "dhh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10041",
+  "ebene": "kreis",
+  "gebiet_name": "Regionalverband Saarbrücken",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Regionalverband Saarbrücken gibt es keinen amtlichen Vergleichsfaktor für Eigentumswohnungen (ETW). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Regionalverband Saarbrücken",
+   "objektarten": [
+    "etw"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10042",
+  "ebene": "kreis",
+  "gebiet_name": "Merzig-Wadern, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser (EFH/ZFH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Merzig-Wadern, Landkreis gibt es keinen amtlichen Vergleichsfaktor für freistehende Ein- und Zweifamilienhäuser (EFH/ZFH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Merzig-Wadern, Landkreis",
+   "objektarten": [
+    "efh",
+    "zfh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10042",
+  "ebene": "kreis",
+  "gebiet_name": "Merzig-Wadern, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (RH/DHH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Merzig-Wadern, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Reihenhäuser und Doppelhaushälften (RH/DHH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Merzig-Wadern, Landkreis",
+   "objektarten": [
+    "rh",
+    "dhh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10042",
+  "ebene": "kreis",
+  "gebiet_name": "Merzig-Wadern, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Merzig-Wadern, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Eigentumswohnungen (ETW). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Merzig-Wadern, Landkreis",
+   "objektarten": [
+    "etw"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10043",
+  "ebene": "kreis",
+  "gebiet_name": "Neunkirchen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser (EFH/ZFH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Neunkirchen, Landkreis gibt es keinen amtlichen Vergleichsfaktor für freistehende Ein- und Zweifamilienhäuser (EFH/ZFH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Neunkirchen, Landkreis",
+   "objektarten": [
+    "efh",
+    "zfh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10043",
+  "ebene": "kreis",
+  "gebiet_name": "Neunkirchen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (RH/DHH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Neunkirchen, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Reihenhäuser und Doppelhaushälften (RH/DHH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Neunkirchen, Landkreis",
+   "objektarten": [
+    "rh",
+    "dhh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10043",
+  "ebene": "kreis",
+  "gebiet_name": "Neunkirchen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Neunkirchen, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Eigentumswohnungen (ETW). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Neunkirchen, Landkreis",
+   "objektarten": [
+    "etw"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10044",
+  "ebene": "kreis",
+  "gebiet_name": "Saarlouis, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser (EFH/ZFH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Saarlouis, Landkreis gibt es keinen amtlichen Vergleichsfaktor für freistehende Ein- und Zweifamilienhäuser (EFH/ZFH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarlouis, Landkreis",
+   "objektarten": [
+    "efh",
+    "zfh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10044",
+  "ebene": "kreis",
+  "gebiet_name": "Saarlouis, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (RH/DHH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Saarlouis, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Reihenhäuser und Doppelhaushälften (RH/DHH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarlouis, Landkreis",
+   "objektarten": [
+    "rh",
+    "dhh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10044",
+  "ebene": "kreis",
+  "gebiet_name": "Saarlouis, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für Saarlouis, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Eigentumswohnungen (ETW). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarlouis, Landkreis",
+   "objektarten": [
+    "etw"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10046",
+  "ebene": "kreis",
+  "gebiet_name": "St. Wendel, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser (EFH/ZFH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für St. Wendel, Landkreis gibt es keinen amtlichen Vergleichsfaktor für freistehende Ein- und Zweifamilienhäuser (EFH/ZFH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "St. Wendel, Landkreis",
+   "objektarten": [
+    "efh",
+    "zfh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10046",
+  "ebene": "kreis",
+  "gebiet_name": "St. Wendel, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (RH/DHH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für St. Wendel, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Reihenhäuser und Doppelhaushälften (RH/DHH). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "St. Wendel, Landkreis",
+   "objektarten": [
+    "rh",
+    "dhh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10046",
+  "ebene": "kreis",
+  "gebiet_name": "St. Wendel, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Für St. Wendel, Landkreis gibt es keinen amtlichen Vergleichsfaktor für Eigentumswohnungen (ETW). Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt in Kap. 7.2 (S. 56) für das ganze Land: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.“ Der Saarpfalz-Kreis gibt seine Gebäudefaktoren nur auf Antrag ab (vgf-sl.json); übertragen werden dürfen sie nicht (§ 10 ImmoWertV). OFFEN: die Seite der Zentralen Geschäftsstelle (ZGGA) nennt „Vergleichsfaktoren“ als Inhalt des kostenpflichtigen Grundstücksmarktberichts des Saarlandes 2024 (75 Euro); das PDF ist maschinell nicht abrufbar (HTTP 403, gemessen 01.10.2026) — ob es Faktoren für diesen Kreis führt, ist ungeprüft. Weg: Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel; Grundstücksmarktbericht des Saarlandes bei der ZGGA (LVGL), zgga@lvgl.saarland.de, 75 Euro: https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (Berichtszeitraum 2025), Kap. 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)“, S. 56",
+    "wortlaut": "Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.",
+    "url": "https://www.saarbruecken.de/media/download-672dd7209e93a"
+   },
+   {
+    "fundstelle": "ZGGA-Seite, Inhaltsangabe des Grundstücksmarktberichts des Saarlandes 2024 (verfuegbarkeit-sl.json, quellen[0])",
+    "wortlaut": "Sachwertfaktoren … Liegenschaftszinssätze … sowie Vergleichsfaktoren — einheitlich für alle Landkreise, den Regionalverband Saarbrücken und die Landeshauptstadt.",
+    "url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "St. Wendel, Landkreis",
+   "objektarten": [
+    "etw"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (Immobilienmarktbericht 2026 Saarbrücken)"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10045",
+  "ebene": "kreis",
+  "gebiet_name": "Saarpfalz-Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "nicht_abgeleitet",
+  "warum_kein_wert": "Der Saarpfalz-Kreis leitet Gebäudefaktoren nur für „Ein- und Zweifamilienhäuser, Reihenhäuser/Doppelhaushälften“ ab (Haustypen EFH, ZFH, RH); Eigentumswohnungen nennt die Leistungsbeschreibung nicht. Weg: Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, info@saarpfalz-kreis.de; Auskunft aus der Kaufpreissammlung (gebührenpflichtig, 30,74 Euro je angefangene halbe Stunde).",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Leistungsbeschreibung „Vergleichswertfaktoren“ des Saarpfalz-Kreises (abgerufen 27.10.2026)",
+    "wortlaut": "Ein- und Zweifamilienhäuser, Reihenhäuser/Doppelhaushälften",
+    "url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarpfalz-Kreis",
+   "objektarten": [
+    "etw"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig"
+ },
+ {
+  "land_code": "SL",
+  "ags": "10045",
+  "ebene": "kreis",
+  "gebiet_name": "Saarpfalz-Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (RH/DHH)",
+  "vollstaendig": false,
+  "stufe": "E",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "sperre_grund": "auf_anfrage",
+  "warum_kein_wert": "Der Saarpfalz-Kreis führt Doppelhaushälften und Reihenendhäuser im Haustyp „ZFH – Zweifamilienhaus, Doppelhaushälfte und Reihenendhaus“ und Reihenmittelhäuser im Haustyp „RH“ (Sätze zfh/rmh in vgf-sl.json). Die Gebäudefaktoren selbst werden nur auf Antrag berechnet und nicht veröffentlicht. Weg: Antrag „Vergleichswertfaktoren“ beim Gutachterausschuss für den Saarpfalz-Kreis, info@saarpfalz-kreis.de; Gebühr nach Zeitaufwand, 30,74 Euro je angefangene halbe Stunde.",
+  "formel": null,
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Leistungsbeschreibung „Vergleichswertfaktoren“ des Saarpfalz-Kreises (abgerufen 27.10.2026)",
+    "wortlaut": "ZFH: „Zweifamilienhaus, Doppelhaushälfte und Reihenendhaus“ · RH: „Reihenmittelhaus“ · je angefangene halbe Stunde eine Gebühr von 30,74 €",
+    "url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/"
+   }
+  ],
+  "geltungsbereich": {
+   "raeumlich": "Saarpfalz-Kreis",
+   "objektarten": [
+    "rh",
+    "dhh"
+   ]
+  },
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren (§ 20 ImmoWertV), Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Prüfstand 27.10.2026",
+  "modellansaetze": {},
+  "quelle_url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/",
+  "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "zugang": "auf_anfrage",
+  "bestell_url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/",
+  "gebuehr": "30,74 Euro je angefangene halbe Stunde (Gutachtergebührenverordnung, Nr. 9.2)"
+ }
+]

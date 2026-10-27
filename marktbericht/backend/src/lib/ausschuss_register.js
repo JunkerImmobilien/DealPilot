@@ -486,6 +486,15 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                                      Lueneburg; Sperren dort, wo Ortsteil/Stadtteil den Wert
                                                      bestimmt. Die meisten verlangen das modifizierte Baujahr. */
                             'vgf-hh-2026.json', 'vgf-bb-oga-2025.json', 'vgf-ni-2026.json',
+                            /* Ernte 27.10.2026 (Nord): die uebrigen NI-Vergleichsfaktor-Dashboards
+                               (Braunschweig-Wolfsburg, Northeim, Hameln-Pyrmont/Schaumburg, Sulingen-
+                               Verden, Oldenburg-Cloppenburg, Osnabrueck-Meppen, Lueneburg, Otterndorf,
+                               Aurich mit Inseln), Lage je Gemeinde fest; Sperren, wo Ortsteil, Gemarkung,
+                               Kurlage oder Kuestenort den Wert bestimmt.
+                               vgf-sh-2026.json: alle 15 SH-Ausschuesse, Werte nur Dithmarschen ETW
+                               (GMB 2025 S. 35), RD-Eck IRW genehmigungspflichtig vorgemerkt, sonst Sperren.
+                               vgf-hb-2026.json: Bremen und Bremerhaven, kostenpflichtige Vollberichte. */
+                            'vgf-ni-2026-teil2.json', 'vgf-sh-2026.json', 'vgf-hb-2026.json',
                             /* Ernte 27.10.2026 (HE): Vergleichsfaktoren des Landes Hessen 2026
                                (ZGGH, Stichtag 01.01.2026, Version 1.1 vom 31.08.2026), alle 17
                                Ausschuesse: EFH/ZFH und RH/DHH = Tabelle Wohnflaeche x
@@ -496,6 +505,20 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Gemeinde (MB 2 ohne RH/ETW = Sperre). Frankfurt ETW braucht die Lage
                                (rechnet nicht), Wiesbaden ETW = Klassenmittel (Stufe C). */
                             'vgf-he-2026.json',
+                            /* Ernte 27.10.2026 (Sued/West): Vergleichsfaktoren BW, BY, RP, SL - nur Sperren mit Weg,
+                               kein Wert (kostenpflichtig, genehmigungs-/nichtkommerziell-Lizenz, oder Merkmal
+                               Wohnlage/Ausstattung fehlt im Rechenweg). BW je Gemeinde (941 AGS, 105 Ausschuesse,
+                               Konstanz-Tabelle unter formel_vorgemerkt), BY je Kreis (94), RP je Kreis/Stadt
+                               (Landesbericht 4.4, GeoShop 28 EUR), SL ohne Saarpfalz-EFH/ZFH/RMH (vgf-sl.json). */
+                            'vgf-bw-2026.json', 'vgf-by-2026.json', 'vgf-rp-2026.json', 'vgf-sl-2026.json',
+                            /* Ernte 27.10.2026 (Ost II): Vergleichsfaktoren SN, TH, MV als Sperren mit Weg
+                               (SN genehmigungs-/kostenpflichtig, SOE/Bautzen mit Modell im Dokument; TH nur
+                               Erfurt-ETW 2024, Lage je Stadtteil; MV genehmigungspflichtig bzw. ohne Normobjekt).
+                               vgf-bb-kreise-2026.json: WERTE Potsdam (EFH/ZFH, RH/DHH, ETW mit offenen
+                               Anpassungen), Brandenburg a. d. H. (EZFH, DHH/REH, RMH), Prignitz (EZFH, RH/DHH);
+                               Havelland als Sperre mit formel_vorgemerkt (BGF-Bezug / Vermietungszustand);
+                               ETW-Sperren in den Umland-Gemeinden (8-stellig, neben den OGA-Saetzen). */
+                            'vgf-sn-2026.json', 'vgf-th-2026.json', 'vgf-mv-2026.json', 'vgf-bb-kreise-2026.json',
                             'vgf-bw-konstanz-2026.json',   /* v3008: Konstanz ETW-Tabelle Wohnlage x Baujahr x Ausstattung (merkmalsmatrix), loest die Sperre in vgf-bw-2026.json ab */
                             /* v2279: Umrechnungskoeffizienten Grundstuecksgroesse
                                (§ 19 ImmoWertV), Kennzahl umrechnungskoeffizient_flaeche.

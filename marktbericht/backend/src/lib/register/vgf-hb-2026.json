@@ -1,0 +1,185 @@
+[
+ {
+  "land_code": "HB",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "04011",
+  "ebene": "kreis",
+  "gebiet_name": "Bremen, Stadtgemeinde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen)",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "Gebührenübersicht S. 135: „Grundstücksmarktbericht (ab 2024 nur als pdf-Version) 50,- €“; Bestellung Tel. 0421 361-78694",
+  "bestell_url": "mailto:geodatenservice@geo.bremen.de",
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der vollständige Grundstücksmarktbericht Bremen 2026 kostet 50 € (pdf). Frei ist nur ein Auszug (15 Seiten). Laut Inhaltsverzeichnis führt der Bericht Preisniveaus je Stadtteil/Lage (Reihenhäuser 4.2, Doppelhaushälften 4.3, Ein-/Zweifamilienhäuser 4.4, Eigentumswohnungen 6.2–6.3) und Ertragsfaktoren (§ 20, Kap. 8.1) — ob diese ein Normobjekt nach § 20 ImmoWertV tragen, ist am Auszug nicht prüfbar (er zeigt Mittelwerte und Mediane). Kein Wert. Weg: Bericht bestellen (Tel. 0421 361-78694).",
+  "unvollstaendig_grund": "kostenpflichtiger Vollbericht, am freien Auszug nicht prüfbar",
+  "quelle_url": "https://www.gutachterausschuss.bremen.de/marktbericht-1469",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Dieser Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung und Verbreitung sind nur mit Genehmigung des Gutachterausschusses für Grundstückswerte in Bremen zulässig. (Auszug 2026, S. 135)",
+  "belege": [
+   {
+    "fundstelle": "Auszug Grundstücksmarktbericht Bremen 2026, Inhaltsverzeichnis und Gebührenübersicht S. 135",
+    "wortlaut": "Produkte: … Grundstücksmarktbericht (ab 2024 nur als pdf-Version) 50,- €; Auskunft aus der Kaufpreissammlung 240,- €.",
+    "url": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Auszug_Grundst%C3%BCcksmarktbericht%20Bremen%202026_gesichert.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "HB",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "04012",
+  "ebene": "kreis",
+  "gebiet_name": "Bremerhaven, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven)",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr_wortlaut": "„Gebühr: gemäß VermWertKostV in der aktuellen Fassung“ (Impressum S. 1); Betrag nicht genannt",
+  "bestell_url": "mailto:Gutachterausschuss@magistrat.bremerhaven.de",
+  "warum_kein_wert": "Ein-/Zweifamilienhäuser: Der Grundstücksmarktbericht 2026 führt „Vergleichsfaktoren (Gebäudefaktoren)“ mit Modellbeschreibung (Kap. 5.3.1, S. 20) und Kap. 5.3.2 „Freistehende Ein- und Zweifamilienhäuser“, S. 22. Frei veröffentlicht ist nur der allgemeine Teil (18 Seiten, „Der allgemeine Teil des Grundstücksmarktberichtes steht kostenfrei … zur Verfügung“); der vollständige Bericht ist gebührenpflichtig nach VermWertKostV. Kein Wert. Weg: Geschäftsstelle, Fährstraße 20, 27568 Bremerhaven, Tel. 0471 590-3334 oder -3354.",
+  "unvollstaendig_grund": "kostenpflichtiger Vollbericht",
+  "quelle_url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "© Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung, Nachdruck und Verbreitung auch auszugsweise nur mit Genehmigung des Herausgebers und unter Angabe der Quelle gestattet. (Impressum S. 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Bremerhaven (allgemeiner Teil), Inhaltsverzeichnis S. 3 und Vorwort S. 5",
+    "wortlaut": "5.3 Vergleichsfaktoren (Gebäudefaktoren) … 20; 5.3.2 Freistehende Ein- und Zweifamilienhäuser … 22; 5.3.3 Reihenhäuser und Doppelhaushälften … 25; 5.3.4 Wohnungseigentum … 28",
+    "url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "HB",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "04011",
+  "ebene": "kreis",
+  "gebiet_name": "Bremen, Stadtgemeinde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen)",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "Gebührenübersicht S. 135: „Grundstücksmarktbericht (ab 2024 nur als pdf-Version) 50,- €“; Bestellung Tel. 0421 361-78694",
+  "bestell_url": "mailto:geodatenservice@geo.bremen.de",
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der vollständige Grundstücksmarktbericht Bremen 2026 kostet 50 € (pdf). Frei ist nur ein Auszug (15 Seiten). Laut Inhaltsverzeichnis führt der Bericht Preisniveaus je Stadtteil/Lage (Reihenhäuser 4.2, Doppelhaushälften 4.3, Ein-/Zweifamilienhäuser 4.4, Eigentumswohnungen 6.2–6.3) und Ertragsfaktoren (§ 20, Kap. 8.1) — ob diese ein Normobjekt nach § 20 ImmoWertV tragen, ist am Auszug nicht prüfbar (er zeigt Mittelwerte und Mediane). Kein Wert. Weg: Bericht bestellen (Tel. 0421 361-78694).",
+  "unvollstaendig_grund": "kostenpflichtiger Vollbericht, am freien Auszug nicht prüfbar",
+  "quelle_url": "https://www.gutachterausschuss.bremen.de/marktbericht-1469",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Dieser Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung und Verbreitung sind nur mit Genehmigung des Gutachterausschusses für Grundstückswerte in Bremen zulässig. (Auszug 2026, S. 135)",
+  "belege": [
+   {
+    "fundstelle": "Auszug Grundstücksmarktbericht Bremen 2026, Inhaltsverzeichnis und Gebührenübersicht S. 135",
+    "wortlaut": "Produkte: … Grundstücksmarktbericht (ab 2024 nur als pdf-Version) 50,- €; Auskunft aus der Kaufpreissammlung 240,- €.",
+    "url": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Auszug_Grundst%C3%BCcksmarktbericht%20Bremen%202026_gesichert.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "HB",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "04012",
+  "ebene": "kreis",
+  "gebiet_name": "Bremerhaven, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven)",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr_wortlaut": "„Gebühr: gemäß VermWertKostV in der aktuellen Fassung“ (Impressum S. 1); Betrag nicht genannt",
+  "bestell_url": "mailto:Gutachterausschuss@magistrat.bremerhaven.de",
+  "warum_kein_wert": "Reihenhäuser/Doppelhaushälften: Der Grundstücksmarktbericht 2026 führt „Vergleichsfaktoren (Gebäudefaktoren)“ mit Modellbeschreibung (Kap. 5.3.1, S. 20) und Kap. 5.3.3 „Reihenhäuser und Doppelhaushälften“, S. 25. Frei veröffentlicht ist nur der allgemeine Teil (18 Seiten, „Der allgemeine Teil des Grundstücksmarktberichtes steht kostenfrei … zur Verfügung“); der vollständige Bericht ist gebührenpflichtig nach VermWertKostV. Kein Wert. Weg: Geschäftsstelle, Fährstraße 20, 27568 Bremerhaven, Tel. 0471 590-3334 oder -3354.",
+  "unvollstaendig_grund": "kostenpflichtiger Vollbericht",
+  "quelle_url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "© Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung, Nachdruck und Verbreitung auch auszugsweise nur mit Genehmigung des Herausgebers und unter Angabe der Quelle gestattet. (Impressum S. 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Bremerhaven (allgemeiner Teil), Inhaltsverzeichnis S. 3 und Vorwort S. 5",
+    "wortlaut": "5.3 Vergleichsfaktoren (Gebäudefaktoren) … 20; 5.3.2 Freistehende Ein- und Zweifamilienhäuser … 22; 5.3.3 Reihenhäuser und Doppelhaushälften … 25; 5.3.4 Wohnungseigentum … 28",
+    "url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "HB",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "04011",
+  "ebene": "kreis",
+  "gebiet_name": "Bremen, Stadtgemeinde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen)",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr_eur": 50,
+  "gebuehr_wortlaut": "Gebührenübersicht S. 135: „Grundstücksmarktbericht (ab 2024 nur als pdf-Version) 50,- €“; Bestellung Tel. 0421 361-78694",
+  "bestell_url": "mailto:geodatenservice@geo.bremen.de",
+  "warum_kein_wert": "Eigentumswohnungen: Der vollständige Grundstücksmarktbericht Bremen 2026 kostet 50 € (pdf). Frei ist nur ein Auszug (15 Seiten). Laut Inhaltsverzeichnis führt der Bericht Preisniveaus je Stadtteil/Lage (Reihenhäuser 4.2, Doppelhaushälften 4.3, Ein-/Zweifamilienhäuser 4.4, Eigentumswohnungen 6.2–6.3) und Ertragsfaktoren (§ 20, Kap. 8.1) — ob diese ein Normobjekt nach § 20 ImmoWertV tragen, ist am Auszug nicht prüfbar (er zeigt Mittelwerte und Mediane). Kein Wert. Weg: Bericht bestellen (Tel. 0421 361-78694).",
+  "unvollstaendig_grund": "kostenpflichtiger Vollbericht, am freien Auszug nicht prüfbar",
+  "quelle_url": "https://www.gutachterausschuss.bremen.de/marktbericht-1469",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "Dieser Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung und Verbreitung sind nur mit Genehmigung des Gutachterausschusses für Grundstückswerte in Bremen zulässig. (Auszug 2026, S. 135)",
+  "belege": [
+   {
+    "fundstelle": "Auszug Grundstücksmarktbericht Bremen 2026, Inhaltsverzeichnis und Gebührenübersicht S. 135",
+    "wortlaut": "Produkte: … Grundstücksmarktbericht (ab 2024 nur als pdf-Version) 50,- €; Auskunft aus der Kaufpreissammlung 240,- €.",
+    "url": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Auszug_Grundst%C3%BCcksmarktbericht%20Bremen%202026_gesichert.pdf"
+   }
+  ]
+ },
+ {
+  "land_code": "HB",
+  "kennzahl": "vergleichsfaktor",
+  "verwendung": "produkt",
+  "ags": "04012",
+  "ebene": "kreis",
+  "gebiet_name": "Bremerhaven, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven)",
+  "zweig": "etw",
+  "objektart": "etw",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr_wortlaut": "„Gebühr: gemäß VermWertKostV in der aktuellen Fassung“ (Impressum S. 1); Betrag nicht genannt",
+  "bestell_url": "mailto:Gutachterausschuss@magistrat.bremerhaven.de",
+  "warum_kein_wert": "Eigentumswohnungen: Der Grundstücksmarktbericht 2026 führt „Vergleichsfaktoren (Gebäudefaktoren)“ mit Modellbeschreibung (Kap. 5.3.1, S. 20) und Kap. 5.3.4 „Wohnungseigentum“, S. 28. Frei veröffentlicht ist nur der allgemeine Teil (18 Seiten, „Der allgemeine Teil des Grundstücksmarktberichtes steht kostenfrei … zur Verfügung“); der vollständige Bericht ist gebührenpflichtig nach VermWertKostV. Kein Wert. Weg: Geschäftsstelle, Fährstraße 20, 27568 Bremerhaven, Tel. 0471 590-3334 oder -3354.",
+  "unvollstaendig_grund": "kostenpflichtiger Vollbericht",
+  "quelle_url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "fallzahl": null,
+  "lizenz": "© Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung, Nachdruck und Verbreitung auch auszugsweise nur mit Genehmigung des Herausgebers und unter Angabe der Quelle gestattet. (Impressum S. 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Bremerhaven (allgemeiner Teil), Inhaltsverzeichnis S. 3 und Vorwort S. 5",
+    "wortlaut": "5.3 Vergleichsfaktoren (Gebäudefaktoren) … 20; 5.3.2 Freistehende Ein- und Zweifamilienhäuser … 22; 5.3.3 Reihenhäuser und Doppelhaushälften … 25; 5.3.4 Wohnungseigentum … 28",
+    "url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf"
+   }
+  ]
+ }
+]

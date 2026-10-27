@@ -1,0 +1,684 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13003",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. „Wohnungseigentum“ (S. 43 ff.): Kaufpreisübersichten, kein Vergleichsfaktor mit Normobjekt; Tabelle 39/40 (S. 57–58) führen kein Wohnungseigentum. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock, https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. „Wohnungseigentum“ (S. 43 ff.): Kaufpreisübersichten, kein Vergleichsfaktor mit Normobjekt; Tabelle 39/40 (S. 57–58) führen kein Wohnungseigentum. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock, https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-rostock/de/mod/1,50,860/ajax/1/GetProduct/con=63767,860&method=store/grundstuecksmarktbericht-2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigungen, auch auszugsweise, und Verbreitung sind nur mit Genehmigung des Herausgebers gestattet. …“ (S. 4)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Rostock, Tab. 39 (S. 57), Tab. 40 (S. 58), Wohnungseigentum ab S. 43, Lizenz S. 4",
+    "url": "https://www.geocms.com/geoshop-rostock/de/mod/1,50,860/ajax/1/GetProduct/con=63767,860&method=store/grundstuecksmarktbericht-2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13003",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. 4.3, Tabelle 39 (S. 57) und 40 (S. 58): „Vergleichsfaktoren aus den Jahren 2023 bis 2025“ für Einfamilienhäuser als Mittelwert und Spanne je Bereich (Stadt / küstennaher Bereich), Baujahr/Sanierung und Lage (Stadtteilgruppen) — Mittelwerte ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20, 25.3). Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock, https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. 4.3, Tabelle 39 (S. 57) und 40 (S. 58): „Vergleichsfaktoren aus den Jahren 2023 bis 2025“ für Einfamilienhäuser als Mittelwert und Spanne je Bereich (Stadt / küstennaher Bereich), Baujahr/Sanierung und Lage (Stadtteilgruppen) — Mittelwerte ohne Normobjekt und ohne Umrechnungskoeffizienten (ImmoWertA 20, 25.3). Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock, https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-rostock/de/mod/1,50,860/ajax/1/GetProduct/con=63767,860&method=store/grundstuecksmarktbericht-2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigungen, auch auszugsweise, und Verbreitung sind nur mit Genehmigung des Herausgebers gestattet. …“ (S. 4)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Rostock, Tab. 39 (S. 57), Tab. 40 (S. 58), Wohnungseigentum ab S. 43, Lizenz S. 4",
+    "url": "https://www.geocms.com/geoshop-rostock/de/mod/1,50,860/ajax/1/GetProduct/con=63767,860&method=store/grundstuecksmarktbericht-2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13003",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. 4.3, Tabelle 39/40 (S. 57–58) führen Einfamilien-, Mehrfamilien- und Wohn-/Geschäftshäuser — Reihen- und Doppelhäuser nicht gesondert. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock, https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. 4.3, Tabelle 39/40 (S. 57–58) führen Einfamilien-, Mehrfamilien- und Wohn-/Geschäftshäuser — Reihen- und Doppelhäuser nicht gesondert. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock, https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-rostock/de/mod/1,50,860/ajax/1/GetProduct/con=63767,860&method=store/grundstuecksmarktbericht-2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigungen, auch auszugsweise, und Verbreitung sind nur mit Genehmigung des Herausgebers gestattet. …“ (S. 4)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Rostock, Tab. 39 (S. 57), Tab. 40 (S. 58), Wohnungseigentum ab S. 43, Lizenz S. 4",
+    "url": "https://www.geocms.com/geoshop-rostock/de/mod/1,50,860/ajax/1/GetProduct/con=63767,860&method=store/grundstuecksmarktbericht-2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "kreis",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht Schwerin 2025 (96 Seiten): Volltextsuche nach „Vergleichsfaktor“, „Normobjekt“, „Umrechnungskoeffizient“ ohne Treffer; Kap. 3.2.1 (EFH, DHH/REH, RMH) und 3.2.5 führen Kaufpreis- und Wohnflächenpreisübersichten. Vergleichspreise nur über den gebührenpflichtigen „Antrag auf Auskunft aus der Kaufpreissammlung“ (S. 79). (ETW-Satz in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht Schwerin 2025 (96 Seiten): Volltextsuche nach „Vergleichsfaktor“, „Normobjekt“, „Umrechnungskoeffizient“ ohne Treffer; Kap. 3.2.1 (EFH, DHH/REH, RMH) und 3.2.5 führen Kaufpreis- und Wohnflächenpreisübersichten. Vergleichspreise nur über den gebührenpflichtigen „Antrag auf Auskunft aus der Kaufpreissammlung“ (S. 79). (ETW-Satz in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars ohne Genehmigung gestattet (Befund ost-nachernte-2026-10.json)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, Kap. 3.2.1 (S. 30–42), Antragsformular S. 79",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "kreis",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht Schwerin 2025 (96 Seiten): Volltextsuche nach „Vergleichsfaktor“, „Normobjekt“, „Umrechnungskoeffizient“ ohne Treffer; Kap. 3.2.1 (EFH, DHH/REH, RMH) und 3.2.5 führen Kaufpreis- und Wohnflächenpreisübersichten. Vergleichspreise nur über den gebührenpflichtigen „Antrag auf Auskunft aus der Kaufpreissammlung“ (S. 79). (ETW-Satz in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht Schwerin 2025 (96 Seiten): Volltextsuche nach „Vergleichsfaktor“, „Normobjekt“, „Umrechnungskoeffizient“ ohne Treffer; Kap. 3.2.1 (EFH, DHH/REH, RMH) und 3.2.5 führen Kaufpreis- und Wohnflächenpreisübersichten. Vergleichspreise nur über den gebührenpflichtigen „Antrag auf Auskunft aus der Kaufpreissammlung“ (S. 79). (ETW-Satz in ost-nachernte-2026-10.json.) WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars ohne Genehmigung gestattet (Befund ost-nachernte-2026-10.json)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, Kap. 3.2.1 (S. 30–42), Antragsformular S. 79",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2024 (Berichtsjahr 2023) genehmigungspflichtig; ob und in welchem Modell er Vergleichsfaktoren führt, ist in dieser Ernte NICHT nachgelesen worden (nur Lizenz und Liegenschaftszinssätze am 2024er Bericht gemessen). Geschäftsstelle: Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, 0395 570 87 3200. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2024 (Berichtsjahr 2023) genehmigungspflichtig; ob und in welchem Modell er Vergleichsfaktoren führt, ist in dieser Ernte NICHT nachgelesen worden (nur Lizenz und Liegenschaftszinssätze am 2024er Bericht gemessen). Geschäftsstelle: Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, 0395 570 87 3200. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ (GMB 2024, S. 2; Befund nachernte-2026-10b-mv.json)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte, Lizenz S. 2 (Befund nachernte-2026-10b-mv.json)",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2024 (Berichtsjahr 2023) genehmigungspflichtig; ob und in welchem Modell er Vergleichsfaktoren führt, ist in dieser Ernte NICHT nachgelesen worden (nur Lizenz und Liegenschaftszinssätze am 2024er Bericht gemessen). Geschäftsstelle: Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, 0395 570 87 3200. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2024 (Berichtsjahr 2023) genehmigungspflichtig; ob und in welchem Modell er Vergleichsfaktoren führt, ist in dieser Ernte NICHT nachgelesen worden (nur Lizenz und Liegenschaftszinssätze am 2024er Bericht gemessen). Geschäftsstelle: Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, 0395 570 87 3200. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ (GMB 2024, S. 2; Befund nachernte-2026-10b-mv.json)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte, Lizenz S. 2 (Befund nachernte-2026-10b-mv.json)",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2024 (Berichtsjahr 2023) genehmigungspflichtig; ob und in welchem Modell er Vergleichsfaktoren führt, ist in dieser Ernte NICHT nachgelesen worden (nur Lizenz und Liegenschaftszinssätze am 2024er Bericht gemessen). Geschäftsstelle: Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, 0395 570 87 3200. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2024 (Berichtsjahr 2023) genehmigungspflichtig; ob und in welchem Modell er Vergleichsfaktoren führt, ist in dieser Ernte NICHT nachgelesen worden (nur Lizenz und Liegenschaftszinssätze am 2024er Bericht gemessen). Geschäftsstelle: Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, 0395 570 87 3200. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ (GMB 2024, S. 2; Befund nachernte-2026-10b-mv.json)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte, Lizenz S. 2 (Befund nachernte-2026-10b-mv.json)",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. 3.7.1/3.7.2 Erst-/Weiterverkäufe Wohnungseigentum (Tab. 19–22, S. 54–58): Wohnflächenpreise und Indexreihen, kein Normobjekt. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Rostock, https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. 3.7.1/3.7.2 Erst-/Weiterverkäufe Wohnungseigentum (Tab. 19–22, S. 54–58): Wohnflächenpreise und Indexreihen, kein Normobjekt. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Rostock, https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-rostock/de/mod/2,50,830/ajax/1/GetProduct/con=205648,830&method=store/GMB_2026_LRO.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.“ (S. 3)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Landkreis Rostock, Tab. 7–8 (S. 38–40), Tab. 13–14 (S. 46), Tab. 19–22 (S. 54–58), Lizenz S. 3",
+    "url": "https://www.geocms.com/geoshop-lk-rostock/de/mod/2,50,830/ajax/1/GetProduct/con=205648,830&method=store/GMB_2026_LRO.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. 3.6.1.1 „Wohnflächenpreise für Ein- und Zweifamilienhäuser“ (Tab. 7/8, S. 38–40): Mittelwerte je Region/Baujahr, kein Normobjekt; Gebäudefaktoren gibt es nur für Mehrfamilienhäuser (Kap. 3.6.2.1, Tab. 13/14, S. 46). Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Rostock, https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. 3.6.1.1 „Wohnflächenpreise für Ein- und Zweifamilienhäuser“ (Tab. 7/8, S. 38–40): Mittelwerte je Region/Baujahr, kein Normobjekt; Gebäudefaktoren gibt es nur für Mehrfamilienhäuser (Kap. 3.6.2.1, Tab. 13/14, S. 46). Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Rostock, https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-rostock/de/mod/2,50,830/ajax/1/GetProduct/con=205648,830&method=store/GMB_2026_LRO.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.“ (S. 3)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Landkreis Rostock, Tab. 7–8 (S. 38–40), Tab. 13–14 (S. 46), Tab. 19–22 (S. 54–58), Lizenz S. 3",
+    "url": "https://www.geocms.com/geoshop-lk-rostock/de/mod/2,50,830/ajax/1/GetProduct/con=205648,830&method=store/GMB_2026_LRO.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026: Reihen-/Doppelhäuser nur als Kaufpreis-/Wohnflächenpreisübersicht, kein Vergleichsfaktor mit Normobjekt; Gebäudefaktoren nur für Mehrfamilienhäuser (Tab. 13/14, S. 46). Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Rostock, https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026: Reihen-/Doppelhäuser nur als Kaufpreis-/Wohnflächenpreisübersicht, kein Vergleichsfaktor mit Normobjekt; Gebäudefaktoren nur für Mehrfamilienhäuser (Tab. 13/14, S. 46). Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Rostock, https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-rostock/de/mod/2,50,830/ajax/1/GetProduct/con=205648,830&method=store/GMB_2026_LRO.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.“ (S. 3)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Landkreis Rostock, Tab. 7–8 (S. 38–40), Tab. 13–14 (S. 46), Tab. 19–22 (S. 54–58), Lizenz S. 3",
+    "url": "https://www.geocms.com/geoshop-lk-rostock/de/mod/2,50,830/ajax/1/GetProduct/con=205648,830&method=store/GMB_2026_LRO.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Jüngster gelisteter Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle 2017/2018) — außerhalb der zulässigen Jahrgänge 2023–2025 und genehmigungspflichtig. Ob er Vergleichsfaktoren führt, ist nicht nachgelesen. Bezug über den Geoshop des Landkreises. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen, https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Jüngster gelisteter Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle 2017/2018) — außerhalb der zulässigen Jahrgänge 2023–2025 und genehmigungspflichtig. Ob er Vergleichsfaktoren führt, ist nicht nachgelesen. Bezug über den Geoshop des Landkreises. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen, https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ (S. 2; Befund nachernte-2026-10b-mv.json)",
+  "belege": [
+   {
+    "fundstelle": "Geoshop-Liste des Landkreises (Befund nachernte-2026-10b-mv.json, gelesen 14.09.2026), GMB 2019 S. 2",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Jüngster gelisteter Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle 2017/2018) — außerhalb der zulässigen Jahrgänge 2023–2025 und genehmigungspflichtig. Ob er Vergleichsfaktoren führt, ist nicht nachgelesen. Bezug über den Geoshop des Landkreises. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen, https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Jüngster gelisteter Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle 2017/2018) — außerhalb der zulässigen Jahrgänge 2023–2025 und genehmigungspflichtig. Ob er Vergleichsfaktoren führt, ist nicht nachgelesen. Bezug über den Geoshop des Landkreises. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen, https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ (S. 2; Befund nachernte-2026-10b-mv.json)",
+  "belege": [
+   {
+    "fundstelle": "Geoshop-Liste des Landkreises (Befund nachernte-2026-10b-mv.json, gelesen 14.09.2026), GMB 2019 S. 2",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Jüngster gelisteter Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle 2017/2018) — außerhalb der zulässigen Jahrgänge 2023–2025 und genehmigungspflichtig. Ob er Vergleichsfaktoren führt, ist nicht nachgelesen. Bezug über den Geoshop des Landkreises. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen, https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Jüngster gelisteter Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle 2017/2018) — außerhalb der zulässigen Jahrgänge 2023–2025 und genehmigungspflichtig. Ob er Vergleichsfaktoren führt, ist nicht nachgelesen. Bezug über den Geoshop des Landkreises. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen, https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ (S. 2; Befund nachernte-2026-10b-mv.json)",
+  "belege": [
+   {
+    "fundstelle": "Geoshop-Liste des Landkreises (Befund nachernte-2026-10b-mv.json, gelesen 14.09.2026), GMB 2019 S. 2",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13074",
+  "ebene": "kreis",
+  "gebiet_name": "Nordwestmecklenburg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. 3.2.7.11 „Ertrags- und Gebäudefaktoren HWI und Landkreis NWM“ (S. 60): Gebäudefaktoren A (ohne Bodenwert) und B (mit Bodenwert) als Mittelwerte je Objektart für Wismar und den Landkreis — ohne Normobjekt; Eigentumswohnungen Kap. 3.2.6 (S. 39–47) als Wohnflächenpreise und Indexreihen. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg, https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. 3.2.7.11 „Ertrags- und Gebäudefaktoren HWI und Landkreis NWM“ (S. 60): Gebäudefaktoren A (ohne Bodenwert) und B (mit Bodenwert) als Mittelwerte je Objektart für Wismar und den Landkreis — ohne Normobjekt; Eigentumswohnungen Kap. 3.2.6 (S. 39–47) als Wohnflächenpreise und Indexreihen. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg, https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt (§ 2 Urhebergesetz – UrhG). Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden (§ 12 i. V. mit § 87 a UrhG). Vervielfältigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers.“",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Nordwestmecklenburg, Kap. 3.2.7.11 (S. 60), Kap. 3.2.6 (S. 39–47)",
+    "url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13074",
+  "ebene": "kreis",
+  "gebiet_name": "Nordwestmecklenburg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. 3.2.7.11 „Ertrags- und Gebäudefaktoren HWI und Landkreis NWM“ (S. 60): Gebäudefaktoren A (ohne Bodenwert) und B (mit Bodenwert) als Mittelwerte je Objektart für Wismar und den Landkreis — ohne Normobjekt; Eigentumswohnungen Kap. 3.2.6 (S. 39–47) als Wohnflächenpreise und Indexreihen. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg, https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. 3.2.7.11 „Ertrags- und Gebäudefaktoren HWI und Landkreis NWM“ (S. 60): Gebäudefaktoren A (ohne Bodenwert) und B (mit Bodenwert) als Mittelwerte je Objektart für Wismar und den Landkreis — ohne Normobjekt; Eigentumswohnungen Kap. 3.2.6 (S. 39–47) als Wohnflächenpreise und Indexreihen. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg, https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt (§ 2 Urhebergesetz – UrhG). Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden (§ 12 i. V. mit § 87 a UrhG). Vervielfältigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers.“",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Nordwestmecklenburg, Kap. 3.2.7.11 (S. 60), Kap. 3.2.6 (S. 39–47)",
+    "url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13074",
+  "ebene": "kreis",
+  "gebiet_name": "Nordwestmecklenburg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 Kap. 3.2.7.11 „Ertrags- und Gebäudefaktoren HWI und Landkreis NWM“ (S. 60): Gebäudefaktoren A (ohne Bodenwert) und B (mit Bodenwert) als Mittelwerte je Objektart für Wismar und den Landkreis — ohne Normobjekt; Eigentumswohnungen Kap. 3.2.6 (S. 39–47) als Wohnflächenpreise und Indexreihen. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg, https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 Kap. 3.2.7.11 „Ertrags- und Gebäudefaktoren HWI und Landkreis NWM“ (S. 60): Gebäudefaktoren A (ohne Bodenwert) und B (mit Bodenwert) als Mittelwerte je Objektart für Wismar und den Landkreis — ohne Normobjekt; Eigentumswohnungen Kap. 3.2.6 (S. 39–47) als Wohnflächenpreise und Indexreihen. Zusätzlich genehmigungspflichtig. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg, https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt (§ 2 Urhebergesetz – UrhG). Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden (§ 12 i. V. mit § 87 a UrhG). Vervielfältigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers.“",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Nordwestmecklenburg, Kap. 3.2.7.11 (S. 60), Kap. 3.2.6 (S. 39–47)",
+    "url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13075",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Greifswald, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — Grundstücksmarktbericht 2024 Kap. 4.3.4 „Vergleichsfaktoren Wohneigentum“ (Tab. 36–47, S. 47–56) für Greifswald, Usedom, Kleinstädte und ländlichen Bereich, je Erst-/Weiterverkauf/Umwandlung. Genehmigungsvorbehalt im Impressum; die Gebietszuordnung (Usedom/Kleinstadt/ländlich) folgt nicht allein dem Gemeindeschlüssel. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald, https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG — Grundstücksmarktbericht 2024 Kap. 4.3.4 „Vergleichsfaktoren Wohneigentum“ (Tab. 36–47, S. 47–56) für Greifswald, Usedom, Kleinstädte und ländlichen Bereich, je Erst-/Weiterverkauf/Umwandlung. Genehmigungsvorbehalt im Impressum; die Gebietszuordnung (Usedom/Kleinstadt/ländlich) folgt nicht allein dem Gemeindeschlüssel. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald, https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/datei/download/id/128967,840/grundstuecksmarktbericht_2024.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Grundstücksmarktbericht ist urheberrechtlich geschützt (§2 Urheberrechtsgesetz – UrhG). Nachdruck, Vervielfältigung, auch auszugsweise und Verbreitung, ist nur mit Genehmigung des Herausgebers gestattet.“ (Druckseite 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Vorpommern-Greifswald, Tab. 16 (S. 34), Kap. 4.2.3 (S. 35), Kap. 4.3.4 Tab. 36–47 (S. 47–56), Impressum Druckseite 1",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/datei/download/id/128967,840/grundstuecksmarktbericht_2024.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13075",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Greifswald, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — Grundstücksmarktbericht 2024 (Zweijahresrhythmus, aktueller Jahrgang) Tabelle 16 „Gebäudefaktoren EFH u. ZFH freistehend“ (Kap. 4.2.2, S. 34): €/m² Wohnfläche einschließlich Bodenwert, nach Region/Baujahr — als Mittelwerte ohne Normobjekt-Umrechnung. Genehmigungsvorbehalt im Impressum. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald, https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG — Grundstücksmarktbericht 2024 (Zweijahresrhythmus, aktueller Jahrgang) Tabelle 16 „Gebäudefaktoren EFH u. ZFH freistehend“ (Kap. 4.2.2, S. 34): €/m² Wohnfläche einschließlich Bodenwert, nach Region/Baujahr — als Mittelwerte ohne Normobjekt-Umrechnung. Genehmigungsvorbehalt im Impressum. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald, https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/datei/download/id/128967,840/grundstuecksmarktbericht_2024.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Grundstücksmarktbericht ist urheberrechtlich geschützt (§2 Urheberrechtsgesetz – UrhG). Nachdruck, Vervielfältigung, auch auszugsweise und Verbreitung, ist nur mit Genehmigung des Herausgebers gestattet.“ (Druckseite 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Vorpommern-Greifswald, Tab. 16 (S. 34), Kap. 4.2.3 (S. 35), Kap. 4.3.4 Tab. 36–47 (S. 47–56), Impressum Druckseite 1",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/datei/download/id/128967,840/grundstuecksmarktbericht_2024.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13075",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Greifswald, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — Grundstücksmarktbericht 2024 Kap. 4.2.3 „Doppelhaushälften und Reihenhäuser“ (S. 35): Gebäudefaktoren je m² Wohnfläche einschließlich Bodenwert als Mittelwerte. Genehmigungsvorbehalt im Impressum. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald, https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG — Grundstücksmarktbericht 2024 Kap. 4.2.3 „Doppelhaushälften und Reihenhäuser“ (S. 35): Gebäudefaktoren je m² Wohnfläche einschließlich Bodenwert als Mittelwerte. Genehmigungsvorbehalt im Impressum. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald, https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "genehmigungspflichtig",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/datei/download/id/128967,840/grundstuecksmarktbericht_2024.pdf",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Grundstücksmarktbericht ist urheberrechtlich geschützt (§2 Urheberrechtsgesetz – UrhG). Nachdruck, Vervielfältigung, auch auszugsweise und Verbreitung, ist nur mit Genehmigung des Herausgebers gestattet.“ (Druckseite 1)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Vorpommern-Greifswald, Tab. 16 (S. 34), Kap. 4.2.3 (S. 35), Kap. 4.3.4 Tab. 36–47 (S. 47–56), Impressum Druckseite 1",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/datei/download/id/128967,840/grundstuecksmarktbericht_2024.pdf",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13076",
+  "ebene": "kreis",
+  "gebiet_name": "Ludwigslust-Parchim, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (88 Seiten, kostenfrei): Kap. 4.2.1–4.2.3 (S. 27–37) Kaufpreis- und Wohnflächenpreisübersichten nach Baujahr und Teilmarkt, Kap. 5.3 nur Ertragsfaktoren (Tab. 33), Kap. 5.4 Vergleichswerte für Objekte mit begrenztem Gebäudewert (Bezug Grundfläche, nur bis 65.000 €). Volltext: „Normobjekt“ 0 Treffer, „Umrechnungskoeffizient“ 0 Treffer — kein Vergleichsfaktor mit Normobjekt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (88 Seiten, kostenfrei): Kap. 4.2.1–4.2.3 (S. 27–37) Kaufpreis- und Wohnflächenpreisübersichten nach Baujahr und Teilmarkt, Kap. 5.3 nur Ertragsfaktoren (Tab. 33), Kap. 5.4 Vergleichswerte für Objekte mit begrenztem Gebäudewert (Bezug Grundfläche, nur bis 65.000 €). Volltext: „Normobjekt“ 0 Treffer, „Umrechnungskoeffizient“ 0 Treffer — kein Vergleichsfaktor mit Normobjekt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.“ (S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Ludwigslust-Parchim, Kap. 4.2.1–4.2.3 (S. 27–37), Kap. 5.3 Tab. 33 (S. 67), Kap. 5.4 (S. 68)",
+    "url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13076",
+  "ebene": "kreis",
+  "gebiet_name": "Ludwigslust-Parchim, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (88 Seiten, kostenfrei): Kap. 4.2.1–4.2.3 (S. 27–37) Kaufpreis- und Wohnflächenpreisübersichten nach Baujahr und Teilmarkt, Kap. 5.3 nur Ertragsfaktoren (Tab. 33), Kap. 5.4 Vergleichswerte für Objekte mit begrenztem Gebäudewert (Bezug Grundfläche, nur bis 65.000 €). Volltext: „Normobjekt“ 0 Treffer, „Umrechnungskoeffizient“ 0 Treffer — kein Vergleichsfaktor mit Normobjekt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (88 Seiten, kostenfrei): Kap. 4.2.1–4.2.3 (S. 27–37) Kaufpreis- und Wohnflächenpreisübersichten nach Baujahr und Teilmarkt, Kap. 5.3 nur Ertragsfaktoren (Tab. 33), Kap. 5.4 Vergleichswerte für Objekte mit begrenztem Gebäudewert (Bezug Grundfläche, nur bis 65.000 €). Volltext: „Normobjekt“ 0 Treffer, „Umrechnungskoeffizient“ 0 Treffer — kein Vergleichsfaktor mit Normobjekt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.“ (S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Ludwigslust-Parchim, Kap. 4.2.1–4.2.3 (S. 27–37), Kap. 5.3 Tab. 33 (S. 67), Kap. 5.4 (S. 68)",
+    "url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/"
+ },
+ {
+  "land_code": "MV",
+  "ags": "13076",
+  "ebene": "kreis",
+  "gebiet_name": "Ludwigslust-Parchim, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "warum_kein_wert": "Grundstücksmarktbericht 2026 (88 Seiten, kostenfrei): Kap. 4.2.1–4.2.3 (S. 27–37) Kaufpreis- und Wohnflächenpreisübersichten nach Baujahr und Teilmarkt, Kap. 5.3 nur Ertragsfaktoren (Tab. 33), Kap. 5.4 Vergleichswerte für Objekte mit begrenztem Gebäudewert (Bezug Grundfläche, nur bis 65.000 €). Volltext: „Normobjekt“ 0 Treffer, „Umrechnungskoeffizient“ 0 Treffer — kein Vergleichsfaktor mit Normobjekt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Grundstücksmarktbericht 2026 (88 Seiten, kostenfrei): Kap. 4.2.1–4.2.3 (S. 27–37) Kaufpreis- und Wohnflächenpreisübersichten nach Baujahr und Teilmarkt, Kap. 5.3 nur Ertragsfaktoren (Tab. 33), Kap. 5.4 Vergleichswerte für Objekte mit begrenztem Gebäudewert (Bezug Grundfläche, nur bis 65.000 €). Volltext: „Normobjekt“ 0 Treffer, „Umrechnungskoeffizient“ 0 Treffer — kein Vergleichsfaktor mit Normobjekt. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "quelle_url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+  "quelle_parser": "register-ernte 27.10.2026 (Ost-VGF): pdftotext -layout/-raw, Tabellen gegen Seitenbild (pdftoppm 90-110 dpi) gelesen",
+  "modellversion": "Ernte VGF Ost 27.10.2026",
+  "lizenz": "„Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.“ (S. 2)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2026 Ludwigslust-Parchim, Kap. 4.2.1–4.2.3 (S. 27–37), Kap. 5.3 Tab. 33 (S. 67), Kap. 5.4 (S. 68)",
+    "url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+    "abruf": "27.10.2026"
+   }
+  ],
+  "verwendung": "produkt",
+  "bestell_url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/"
+ }
+]
