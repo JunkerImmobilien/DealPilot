@@ -166,7 +166,7 @@
     /* v2979 · wie wertvergleich.js: ohne Sachwertfaktor nur Plausibilitaet, kein Prozentabstand zur Marktpreisindikation */
     if (sw != null) { z('sachwert', swVorl ? 'Sachwert (nur Plausibilität)' : 'Sachwert', swVorl ? 'Herstellungskosten ohne Marktanpassung, kein Marktwert' : (D.sachwert.faktor != null ? 'mit Sachwertfaktor ' + dez(D.sachwert.faktor, 2) : null), null, sw, null, fu === 'sachwert');
       if (swVorl) V[V.length - 1].abw_zur_mpi_pct = null; }
-    if (vw != null) z('vergleichswert', 'Vergleichswert', vwArt === 'immobilienrichtwert' ? 'aus dem Immobilienrichtwert' : 'mit amtlichem Vergleichsfaktor', null, vw, null, fu === 'vergleichswert');
+    if (vw != null) z('vergleichswert', 'Vergleichswert', vwArt === 'immobilienrichtwert' ? 'aus dem Immobilienrichtwert' : 'amtlicher Vergleichsfaktor aus Kaufpreisen', null, vw, null, fu === 'vergleichswert');
     if (kp != null) z('kaufpreis', 'Kaufpreis', 'deine Angabe', null, kp, null, false);
     /* Klartext: führendes Verfahren und Lage des Kaufpreises - nur am Bericht Ablesbares */
     var VERF = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' };

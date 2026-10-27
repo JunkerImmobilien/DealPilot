@@ -773,7 +773,15 @@ router.get('/objects/history', async (req, res) => {
                  amtlicher_vergleichsfaktor.verfuegbar = false). Die Bedingung
                  steht VOR dem Literal, nicht darin (Backtick-Falle). */
               (data->'cross_check'->'comparison'->>'vergleichswert_eur')::numeric AS vergleichswert_eur,
-              coalesce((data->'cross_check'->'amtlicher_vergleichsfaktor'->>'verfuegbar')::boolean, false) AS vergleichsfaktor_amtlich,
+              /* v2999 · amtlich ist auch der Vergleichsfaktor aus dem REGISTER (Berlin, Barnim, Ernte HE/HH/BB/NI/Ost):
+                 bis hier zaehlte nur die NRW-Tabelle (amtlicher_vergleichsfaktor), ein Registerfaktor kam in App und
+                 PDF nie als Vergleichswert an. comparison.basis = kaufpreise sagt es fuer alle Wege. */
+              (coalesce((data->'cross_check'->'amtlicher_vergleichsfaktor'->>'verfuegbar')::boolean, false)
+                OR coalesce(data->'cross_check'->'comparison'->>'basis', '') = 'kaufpreise') AS vergleichsfaktor_amtlich,
+              (data->'cross_check'->'comparison'->>'bezeichnung')    AS vergleich_bezeichnung,
+              (data->'cross_check'->'comparison'->>'basis_hinweis')  AS vergleich_hinweis,
+              (data->'cross_check'->'comparison'->'amtlicher_vergleich'->>'ausschuss') AS vergleich_ausschuss,
+              (data->'cross_check'->'comparison'->>'angebotswert_eur')::numeric AS angebotswert_eur,
               (data->'cross_check'->'verfahrenswahl'->>'verfahren')  AS fuehrend,
               (data->'cross_check'->'verfahrenswahl'->>'grund')      AS fuehrend_grund,
               (data->'cross_check'->'verfahrenswahl'->>'quelle')     AS fuehrend_quelle,

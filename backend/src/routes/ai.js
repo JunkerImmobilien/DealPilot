@@ -76,6 +76,9 @@ async function _mbHistoryFor(userId, ref) {
           deal_score: x.deal_score != null ? Number(x.deal_score) : null,
           sachwert: x.sachwert_eur != null ? Number(x.sachwert_eur) : null,
           ertragswert: x.ertragswert_eur != null ? Number(x.ertragswert_eur) : null,
+          /* v2999 · amtlicher Vergleichswert, nur wenn er aus Kaufpreisen stammt */
+          vergleichswert: x.irw_vergleichswert_eur != null ? Number(x.irw_vergleichswert_eur)
+            : (x.vergleichsfaktor_amtlich && x.vergleichswert_eur != null ? Number(x.vergleichswert_eur) : null),
           fuehrend: x.fuehrend || null,
         };
       }),
