@@ -3391,14 +3391,8 @@ async function _exportPDFInner() {
       // V63.98: KEINE Page-Break-Schwelle, dritte Tabelle direkt unten dran
       var wstgPct = parseDe(g('wertstg')) || 1.5;
       var faktor = Math.pow(1 + wstgPct/100, btjY);
-      var _ankerLabel;
-      if (v('svwert') > 0) {
-        _ankerLabel = 'Wert-Anker: Verkehrswert';
-      } else if (v('bankval') > K.kp) {
-        _ankerLabel = 'Wert-Anker: Bankbewertung';
-      } else {
-        _ankerLabel = 'Wert-Anker: Kaufpreis';
-      }
+      /* v2997 · die Herkunft aus calc.js (State.wert_basis_text) - bis v2996 hiess jede Wertangabe „Verkehrswert" */
+      var _ankerLabel = 'Wert-Anker: ' + (State.wert_basis_text || 'Kaufpreis');
       cy = secH(doc, cy, 'Wie die Wertsteigerung berechnet wird (' + btjY + ' Jahre)', M, CW);
       kvT(doc, M, cy, CW, [
         [_ankerLabel,                           pE(_wertAnker)],

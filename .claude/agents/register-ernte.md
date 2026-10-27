@@ -1,6 +1,6 @@
 ---
 name: register-ernte
-description: Erntet amtliche Liegenschaftszinssätze, Sachwertfaktoren und Umrechnungskoeffizienten für die Grundstücksgröße der Gutachterausschüsse ins Register (JSON-Satzdateien unter marktbericht/backend/src/lib/register/), mit vollständiger Herkunft je Satz. Einsetzen für ein Land, einen Ausschuss oder die Lücken BY, SL, HB. Schreibt nur Dateien — nie in eine Datenbank.
+description: Erntet amtliche Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren (ETW/EFH) und Umrechnungskoeffizienten für die Grundstücksgröße der Gutachterausschüsse ins Register (JSON-Satzdateien unter marktbericht/backend/src/lib/register/), mit vollständiger Herkunft je Satz. Einsetzen für ein Land, einen Ausschuss oder die Lücken BY, SL, HB. Schreibt nur Dateien — nie in eine Datenbank.
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, WebSearch
 ---
 
@@ -71,6 +71,27 @@ Jeder **Wert** zusätzlich:
   Übernimmt ein Ausschuss eine fremde Tabelle (z. B. VW-RL 2014) ausdrücklich in
   SEIN Dokument, ist sie seine — dann Wert mit `herkunft`; ohne diesen Beschluss
   bleibt die Regel oben: VW-RL nicht zulässig.
+
+## Vergleichsfaktoren (§ 20 ImmoWertV) — fester Teil jeder Ernte (Marcel 27.10.2026)
+- „Kannst du das auch fest mit aufnehmen, also in unsere Agenten, die Ernte machen?"
+  Je Ausschuss werden zusätzlich **Vergleichsfaktoren / Gebäudefaktoren /
+  Immobilienrichtwerte für Eigentumswohnungen und Ein-/Zweifamilienhäuser** gesucht
+  (Kennzahl `vergleichsfaktor`). Sie tragen im Bericht den **Vergleichswert auf
+  Gutachterbasis** neben der Marktpreisindikation aus Angeboten.
+- Muster: `vgf-be.json` (Bezug Brutto-Grundfläche, Achsen `bgf_qm`, `brw_eur_qm`) und
+  `vgf-bb.json` (Bezug Wohnfläche, Achsen `brw`, `wohnflaeche`, Korrekturen `rnd`,
+  `flaeche`). Die Leseroutine (`regVergleichsfaktor`, ReportOrchestrator) nimmt die
+  Achsen- und Korrekturnamen, die dort vorkommen: `brw · brw_eur_qm · bodenwert ·
+  wohnflaeche · wohnflaeche_qm · bgf_qm`, Korrekturen `rnd · flaeche · baujahr`.
+  Andere Namen nur, wenn der Rechenweg im Code nachgezogen wird — sonst Sperre mit
+  dem Wortlaut. Pflicht: `bezugsgroesse` (Wohnfläche oder BGF), Normobjekt
+  (`geltungsbereich`), Stichtag, Umrechnungskoeffizienten des Ausschusses, wo er sie
+  führt, und das Anwendungsbeispiel.
+- Nur für die **steuerliche Bewertung** erhobene Faktoren tragen `verwendung: 'intern'`
+  (sie erscheinen dann nur als Auskunft). Kreis-Mediane ohne Normobjekt sind KEIN
+  Vergleichsfaktor (ImmoWertA 20, 25.3) — höchstens `durchschnittspreis`.
+- Ältere Jahrgänge (2023–2025) sind erlaubt, wenn kein neuerer frei vorliegt: mit
+  `berichtsjahr`/`stichtag` des Dokuments; der Bericht weist den Jahrgang aus.
 
 ## Gebührenpflichtig heißt: Absprung mitliefern (Marcel 19.10.2026)
 - „Wenn die irgendwie gebührenpflichtig sind, dass wir die dann auch abrufen
