@@ -18092,7 +18092,10 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "mfh",
     "objektart_bez": "Mehrfamilienhausgrundstücke inkl. Wohn- und Geschäftshäuser mit gewerblichem Rohertragsanteil ≤ 20 %",
-    "formel": {
+    "vollstaendig": false,
+    "zugang": "nichtkommerziell",
+    "zugang_beleg": "Sperre seit 27.10.2026: Lizenz erlaubt nur nicht kommerzielle Vervielfaeltigung (S. 2) - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Ausschuss anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+    "formel_vorgemerkt": {
       "form": "formelwerk",
       "liefert": "prozent",
       "rundung_stellen": 1,

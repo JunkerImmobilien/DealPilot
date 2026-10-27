@@ -42815,3 +42815,69 @@ Marcel 22.10.2026: „ja rollout 62".
 - **Commit:** `6d9348c0` (Staging), Prod `2666a47` per `rollout-prod.ps1 -Freigabe` (vorher `dffaba0`; mitgenommen: fremder Commit `4dcb265c` v3013 NI-Lüneburg-Nachernte + vorgemerkte Indexreihen — nur Registerdateien, `register-saat` auf Prod dafür NICHT gelaufen).
 - **Nachweis:** kopfloser Chrome, Staging und Prod: `methodik.html` 200 (104.752 Byte), PDF 200 `application/pdf`; 390 und 1366 px scrollWidth = Breite, kein Element über den Rand, 14 Kapitel, 14 Sprungmarken; Menüeintrag nach echtem Überfahren sichtbar und per elementFromPoint getroffen (1366: x 886, 390: im Burger-Menü); Startseite: Eintrag und `#workflow`-Verweis da; Prod 0 Konsolenfehler. Prüfstrecke lokal RC=0 (wertermittlung A 118/B 231/C 99, irw, uk-flaeche, uk-wgfz, beleihungswert, rnd-kerne, rnd-gutachten).
 - **Rest:** Belegliste `scratchpad/methodik-fassung3-final-belege.md`. Ungeprüft im Text: 17 % Angebots- über Vertragsmieten (aus Fassung 2), Veröffentlichungsdaten Baupreisindex vor 08/2026 (so benannt), BaFin-Satz, GrESt-Sätze. Bei 390 px ist die 6-spaltige Ländertabelle eng, aber ohne Querscroll. Register-Saat für v3013 auf Prod offen (fremder Strang). sicherheit.html und fragen.html tragen noch das ältere Menü ohne Ausklappmenü (nicht angefasst).
+
+### Demo-Konto auf den Stand v3000–v3013, Staging und Prod (27.10.2026 abends)
+- **Auftrag** (Marcel: „Ja, weiter mit dem Demo-Konto und bitte danach die Objekte auf Prod anpassen.“). Demo-Konto info@, die 19 Objekte, die es auf beiden Seiten gibt.
+- **Sicherungen** (alle mit Kopf „PostgreSQL database dump“ und „dump complete“ angesehen): Staging `/root/backups/haupt-20261027-2118-vor-demo-v3013.sql.gz` (50 MB, 76 COPY), `mb-20261027-2118-vor-demo-v3013.sql.gz` (40 MB); Prod `haupt-20261027-2135-vor-demo-v3013.sql.gz` (15 MB, 76 COPY), `mb-20261027-2135-vor-demo-v3013.sql.gz` (29 MB, 41 COPY); dazu je Zeilenabzug der 19 Objekte: Prod `demo-objekte-prod-vor-v3013-20261027.json` (9,4 MB), Staging `demo-objekte-staging-vor-merge-20261027.json` (9,2 MB).
+- **Weg:** Staging im Browser (eigener Tab, Demo-Sitzung), je Objekt `loadSaved` → die Migrationen der App laufen (wertangabe.js, mfh-felder.js, mfh-einheiten.js) → `saveObj`. Vorher ein Trockenlauf mit stummem `saveObj` über alle 18 (Feld-Diff gegen die DB, nichts geschrieben). `_ankauf` aller 19 Objekte vorher/nachher gleich (Parkstr. 9: Stichtag 23.12.2024, KP 395.000).
+- **Geändert (Eingaben):**
+  - Wertangabe: nur **Musterstraße 12** führte `bankval` (220.000) neben `svwert` (240.000, Herkunft unbekannt). Entscheidung Gutachten > Bank > Marktbericht/eigene: **220.000 €, Herkunft Bankbewertung**; `bankval` bleibt gespeichert, `bankval_migriert = 1`. Alle anderen tragen nur `svwert` — Herkunft bleibt „automatisch“ (= eigene Schätzung), weil sie aus den Daten nicht eindeutig folgt.
+  - Zustand des Gebäudes aus den Einheiten (v3003, flächengewichtet, von der App gesetzt): Wilhelm-Busch-Str. normal → renovierungsbedürftig, Lindenhof 14 stark sanierungsbedürftig → renovierungsbedürftig, Westerfeldstr. 140 gut → normal, Gohliser Str. 42 gut → normal, Löhner Str. 278 gut → normal; Parkstr. 9, Bismarckstr., Ravensberger Weg, Hauptstr. 51 unverändert.
+  - Vermietungsstand aus den Einheiten (v3001b): Wilhelm-Busch-Str. leer → Vollvermietet (6/6 vermietet), **Parkstr. 9 Teilweise leer → Vollvermietet** (5/5 vermietet, Ist 3.195 € = Summe der Einheiten).
+  - Hausmaßnahmen: keines der Objekte führt `haus_massnahmen` — nichts gesetzt (keine erfunden). Westerfeld Einheit 3 (Bad, „Mieter bleibt drin“): `erh` leer gelassen, Erhaltungsanteil ist nicht belegt.
+  - v3008-Merkmale: Stellplätze (Garagen + außen) standen schon überall, wo es Angaben gibt. Erbbaurecht „nein“ lässt sich nicht setzen — das Häkchen kennt nur „ja“, ein leeres reist nicht mit (Orchestrator: `erbbaurecht: ref.leasehold ? 'ja' : null`). Keller nur aus der NHK-Angabe (`nhk_haus/nhk_geschosse/nhk_dach` vollständig) — bei keinem Objekt vollständig, nicht geraten.
+- **Prod hatte heute eigene Stände** (Fund beim Abgleich, Prod `updated_at` 11:22–19:22 UTC): neue Pilot-Analysen im Bestandsmodus (v2985) an 10 Objekten (`ai_analysis` und `data._ai`), Parkstr. 9 `ds2_entwicklung` begrenzt → eine_starke, `me_modus`, neues Foto/`_thumb`, Lindenhof `mod_quelle`, Am Markt 9 privat (verloren) `bgf` 159 und zwei Berichte. **Ein blinder Spiegel hätte das überschrieben.** Deshalb erst diese Prod-Stände nach Staging übernommen (SQL, nur diese Felder; Am Markt 9 privat ganz von Prod), die 11 Objekte in der App neu geladen und gespeichert, dann gespiegelt.
+- **Marktberichte** (Staging, Kontingent des Demo-Kontos, `DealPilotMB.run` mit derselben Stufe): 16 neu, Stichtag 27.10.2026. Stufe 3: Hermannstraße 9 (370), Parkstr. 9 (371), Ravensberger (372), Hölderlinstr. (373), Gohliser (374), Westerfeld (375), Bismarckstr. (376), Musterstraße (377), Bäckerstr. (378), Am Markt 9 VV (379); Stufe 1: Sachsenstr. 18 (380), Alexanderstr. (381), Löhner Str. (382), Hauptstr. 51 (383), Am Markt 18 (384), Lindenhof (385). Am Markt 9 privat (verloren) bewusst ohne neuen Bericht.
+  - Große Sprünge: Parkstr. 9 Ertragswert 425.000 → **499.000** (Mietansatz 4,64 → 5,90 €/m², LZS 2,9 → 3,1 % Minden-Lübbecke MFH 2026), MPI 459.000 → 453.000; Hermannstraße 9 EW 209.000 → 156.000 (Miete Angebot 7,83 → amtlich 5,46 €/m², Rangfolge v2993); Am Markt 9 VV EW 252.000 → 163.000 (Angebot 8,40 → Ist marktüblich 5,93); Hölderlinstr. EW 88.500 → 112.000 (amtliche Miete 5,95 → 7,44). Vergleichsfaktor überall „kein Ausschuss hinterlegt“ bzw. gesperrt (Leipzig).
+  - **Bericht 383 Hauptstr. 51 (GESCH) kam ohne Marktwert** (`valuation.market_value` leer, nichts abgebucht) — nicht nach Prod übertragen; auf Staging ist er der jüngste Snapshot dieses Objekts.
+- **Kennzahlen vorher → nachher (Staging = Prod):** LTV steigt überall, wo `svwert` ohne Herkunft steht, weil seit v2996/v3006 nur Gutachten/Bank den LTV tragen (Basis jetzt Kaufpreis): Hölderlinstr. 70,5 → 94,5 %, Bäckerstr. 84,6 → 100 %, Gohliser 78,3 → 84,5 %, Musterstraße 83,3 → 90,9 % (Bank 220.000). Investor-Score: Hölderlinstr. 90 → 81, Musterstraße 62 → 56, Bäckerstr. 61 → 56, Sachsenstr. 18 65 → 71, sonst ±2. CF n. St. durch die EStG-Korrekturen v3006: Wilhelm-Busch 14.326 → 11.463, Westerfeld 8.119 → 5.926, Lindenhof −13.544 → −10.641, Hermannstrasse 9 (2026-1088) 397 → 2.327 €/J. Parkstr. 9: DSCR 2,43, LTV 82,0, Investor 93, DS2 69 → 70, Karte auf Prod „76 GUT“, CF +9.506.
+- **Spiegel nach Prod:** 19 Objekte per ID (`jsonb_populate_record`, alle Spalten außer id/user_id/created_at, nur wenn `md5(data)` noch dem Stand der Sicherung entsprach: 19/19), Nachprüfung **19/19 `md5(data)` und `md5(ai_analysis)` gleich**. 15 Berichte (Staging 370–382, 384, 385 → Prod 38–52, `property_id` NULL, `user_id` Prod), Abgleich `md5(payload)+md5(snapshot.data)` beider Seiten gleich. Das eine nur-Prod-Objekt nicht angefasst.
+- **Stichprobe Prod** (lesend, `saveObj` stumm, danach 19/19 md5 unverändert): Parkstr. 9 KP 395.000, Vollvermietet, Ankauf-Stand 23.12.2024, Bericht 39 vom 27.10. aktiv.
+- **Storybook:** `node tools/messe-storybook.mjs` — 17 Objekte, 23 Seiten, 1,5 MB.
+- **Offen (Marcel):** (1) Herkunft der übrigen 16 `svwert` (Gutachten? Bank? Marktbericht?) — solange „automatisch“, kein LTV auf den Wert; Parkstr. 9 487.000 ist laut calc.js-Kommentar v2996 eine Marktpreisindikation aus Angeboten (dann Herkunft „indikation“, Wertpuffer entfällt) — nicht gesetzt, weil es die Messe-Geschichte verschiebt. (2) Löhner Str. 278: beide Einheiten „leer“ ohne Ist-Miete (Hauptwohnung, Wohnrecht), Vermietungsstand aber „Vollvermietet“ mit 1.400 € — Hinweis der App steht, nicht aufgelöst. (3) Hölderlinstr. ohne Vermietungsstand. (4) Erbbaurecht „nein“ ist im Datenmodell nicht ausdrückbar. (5) Hauptstr. 51 Stufe 1 ohne Marktwert. (6) Sachsenstr. 18: der neue Bericht hat Makro/Mikro/Bevölkerung in leere Felder übernommen (App-Verhalten `autoLage`).
+
+### v3015 · IRW-Kernausbau NRW – additiv, Matrix mit Interpolation, Bedingung, Gemeindegruppe (27.10.2026 nachts)
+- **Was:** Der Kern `lib/vergleichswert_irw.js` rechnet drei bisher abgelehnte Rechenformen der Örtlichen Fachinformationen, jede so, wie das Dokument sie beschreibt:
+  - **additiv** (`verknuepfung: 'additiv'`): IRW × (1 + Σ(UKᵢ(Objekt) − 1)) / (1 + Σ(UKᵢ(Zonennorm) − 1)). Bei Zonennorm = Tabellennorm ist das genau die Formel des Dokuments („ausgehend vom Normobjekt … addiert bzw. subtrahiert“). Liegt die Zonennorm daneben, wird die Formel auf beide angewandt und ins Verhältnis gesetzt. **Das sagt kein Dokument ausdrücklich, Entscheidung offen für Marcel.** Heute ohne Wirkung: bei allen freigeschalteten additiven Sätzen (Borken, Dortmund) liegt die Zonennorm auf der Tabellennorm.
+  - **matrix_linear**: Richtwertobjekt × Bewertungsobjekt, bilinear, nie extrapoliert. Vermerk aus dem Dokument, sonst „lineare Interpolation (DealPilot), Tabelle des Ausschusses ohne eigene Regel“.
+  - **funktion**: Interpolationsfunktion des Ausschusses, Formelleser ohne eval (Dortmund).
+  - **matrix_klassen**: rechteckige Klassenmatrix (Moers).
+  - **klassen_je_gemeindegruppe**: Tabelle je Gemeinde, aus BORIS `GENA` (Gütersloh).
+  - **bedingung** `[{wenn, setze|nur|nicht, wortlaut, kurz}]` zwischen Merkmalen (Hagen, Bottrop; beide noch vorgemerkt).
+  - Dazu `formel.rundung_produkt` (Gesamtfaktor, wo das Beispiel rundet), `rundung_eur_qm`, `zuschlaege_eur_qm`, `zweifel_zellen`, `anwendungsbeispiel.merkmale_ersatz` und die neuen Eingaben `alter`, `gemeinde`, `bodenrichtwert_2023`, `dachgeschoss_ausbau`, `ausstattung`, `stellplatz_anzahl`.
+- **Freigabe nur mit getroffenem amtlichen Anwendungsbeispiel am echten Kern.** `umrechnung_irw`: **114 → 135 Werte**, 60 → 81 Beispiele getroffen. **Rechenbar sind jetzt 57 statt 48 der 72 Ausschüsse.**
+- **Neu rechenbar, mit Beispiel:**
+  - Kreis Borken etw/efh: S. 4, 2.365,20 / 2.098,40 €/m²; multipliziert wären es 2.093,4.
+  - Kreis Gütersloh, alle drei Teilmärkte: S. 5 Halle / Rietberg / Verl.
+  - Kreis Heinsberg rh/etw: S. 7 / S. 6.
+  - Stadt Moers, alle drei: S. 4 / S. 5, Zelle „077“ als Zweifel geführt.
+  - Rhein-Erft-Kreis, alle drei: S. 6 / S. 7.
+  - Kreis Euskirchen etw: S. 6.
+  - Kreis Düren etw: S. 5.
+  - Kreis Unna etw/rh: S. 5 / S. 6. Das Beispiel rechnet mit „Zeitpunkt 01.01.2025“ und der Baujahrtabelle 2025, deshalb wird nur für die Prüfung diese Tabelle eingesetzt (`merkmale_ersatz`); gerechnet wird mit 2026.
+  - Stadt Dortmund etw/efh/rh/mfh: S. 10 / S. 7, additiv in Prozent mit den Funktionen, Ergebnis auf 10 €/m².
+- **Weiter gesperrt, Grund im Satz:**
+  - Kein Beispiel im Dokument (UDOK und GMB 2026 gelesen): Warendorf, Leverkusen, Dorsten/Gladbeck/Marl, Recklinghausen, Hagen, Bottrop.
+  - Rheine: Regressionsform; efh trifft, aber der Stellplatzbezug ist offen; rh/etw ohne Beispiel. Der Diff `irw_regression` liegt im Scratchpad und ist nicht übernommen.
+  - Bergisch Gladbach: alle Beispiele treffen, aber die Normstandardstufe bei GSTAND 6 ist nicht beziffert; etw hat Matrixbezug 2022 und Erbbaurecht.
+  - Beispiel widerspricht der Tabelle: Heinsberg efh (1,34 gegen 1,35), Euskirchen efh (0,97 gegen 0,96), Kreis Düren efh (Beispiel 2021, alte Tabellen), Unna efh (Grundstück 1,02 gegen 1,014).
+- **Nebenbei:** In `uk-flaeche-nw-2026.json` stehen Gütersloh 0530800 → **0533300** und Unna 0532800 → **0533200**, mit Sperrtext. In `uk-wgfz-nw2-2026.json` ist der Unna-Sperrtext korrigiert; der Bericht 2026 liegt unter 33200. Die 2025er-Links unter 30800/32800 bleiben, weil sie richtig sind (HTTP 200).
+- **Prüfer:** `irw-pruefen` prüft die neuen Formen, hat einen Prüffall je Ausschuss (17, Vollweg über `vergleichswertIrw`) und vier Formproben: additiv ≠ multiplikativ, keine Extrapolation, fremde Gemeinde ergibt keinen Wert, Bedingung. Neu sind die Schalter `--lib` und `--ordner` für Entwürfe. RC=0 bei `irw-pruefen`, `wertermittlung-pruefen`, `saat-pruefen` (je Datei und `--basislinie`; nach der Ergänzung von `normobjekt` bei Unna nichts über dem Deckel) und `buster-ebenen`.
+- **Marktbericht-App:** Der Rechenweg zeigt Zu- und Abschläge in % (`_irwStaffel`, im PDF mit ASCII-Minus). Buster `app.js?v=v3015`.
+- **Commit:** `523cb0f9` (staging). Die Nummer v3014 war schon von der parallelen Nachernte belegt (`52f00430`).
+- **Nachweis Staging:**
+  - mb-backend neu gebaut.
+  - Sicherung `/root/backups/mb-20261027-2203-v3015.sql.gz` (41 MB, Kopf „PostgreSQL database dump“, 41 COPY).
+  - `register-saat` trocken und echt: 6.025 → **6.046** Zeilen, SOLL = IST.
+  - `register-db-abgleich` sauber.
+  - **Bericht 392**, Kiskerstraße 10, Halle (Westf.), EFH 165 m², Bj 1992, 850 m², `wert_stufe` 3: Zone 1503, IRW 2.590 €/m² (die Zone des amtlichen Beispiels). Gruppe 1 der Gütersloher Bodenrichtwerttabelle; Baujahr 1,091, Grundstück 1,060, Keller 1,000, Wohnfläche 0,912, Standard 1,000 wie im Beispiel; BRW 310 gegen Norm 190 → 1,147 (Klasse 291–400). Ergebnis 3.133 €/m², **Vergleichswert 516.979 €**, Quellennachweis dl-de/zero-2-0.
+- **Rest / Entscheidungen Marcel:**
+  1. Additiv bei abweichender Zonennorm (Formel oben), betrifft Warendorf.
+  2. Unna: gilt das Beispiel mit der Vorjahrestabelle als getroffen? Keller-Zeile RH ist als Zweifel geführt.
+  3. Bergisch Gladbach: Normstandardstufe 3 bei GSTAND 6?
+  4. Rheine: Stellplätze im Regressionsmodell?
+  5. Rhein-Erft etw: ungesicherte Zellen weggelassen.
+  6. Kreis Düren etw: Beispiel von 2021 trifft die Tabellen 2026.
+  7. Rückfragen bei den Ausschüssen Euskirchen und Heinsberg (efh).
+  - Viele neue Sätze brauchen Angaben, die der Reiter Objekt nicht führt: Modernisierungstyp (`mtyp`), Wohnlage (Dortmund, Moers, Euskirchen), Alter und Ausstattung (Borken). Ohne sie meldet der Bericht „Angabe fehlt“. Ohne Zusatzangaben rechnen nur Gütersloh, Heinsberg etw und Kreis Düren etw.
+  - **Nicht auf Produktion.**

@@ -8847,7 +8847,10 @@
   "zweig": "etw",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (Wohnfläche 30 bis 130 m²)",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 1.5,
@@ -8922,7 +8925,10 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein-, Zwei- und Dreifamilienhäuser",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 2,
@@ -8996,7 +9002,10 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser (Rohertrag Gewerbe < 50 %)",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 2.25,
@@ -9067,7 +9076,10 @@
   "zweig": "wgh",
   "objektart": "wgh",
   "objektart_bez": "Gemischt genutzte Grundstücke (Rohertrag Gewerbe > 50 %)",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 2.5,
@@ -9138,7 +9150,10 @@
   "zweig": "gewerbe",
   "objektart": "gewerbe",
   "objektart_bez": "Gewerbe-, Industrie- und Dienstleistungsgrundstücke",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 4.5,
@@ -9327,7 +9342,10 @@
   "zweig": "etw",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (Wohnfläche 30 bis 130 m²)",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 1.5,
@@ -9402,7 +9420,10 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein-, Zwei- und Dreifamilienhäuser",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 2,
@@ -9476,7 +9497,10 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser (Rohertrag Gewerbe < 50 %)",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 2.25,
@@ -9547,7 +9571,10 @@
   "zweig": "wgh",
   "objektart": "wgh",
   "objektart_bez": "Gemischt genutzte Grundstücke (Rohertrag Gewerbe > 50 %)",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 2.5,
@@ -9618,7 +9645,10 @@
   "zweig": "gewerbe",
   "objektart": "gewerbe",
   "objektart_bez": "Gewerbe-, Industrie- und Dienstleistungsgrundstücke",
-  "formel": {
+  "vollstaendig": false,
+  "zugang": "nichtkommerziell",
+  "zugang_beleg": "Sperre seit 27.10.2026: Quelle waiblingen.de, Impressum der Stadt: Downloads und Kopien nur fuer den privaten, nicht kommerziellen Gebrauch - kommerzielle Nutzung im Kundenbericht nicht gedeckt; Freigabe beim Gutachterausschuss Waiblingen anfragen. Bis dahin Stufe N mit Weg zum Bericht.",
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": 4.5,

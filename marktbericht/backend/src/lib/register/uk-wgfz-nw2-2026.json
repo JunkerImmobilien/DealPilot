@@ -7138,7 +7138,7 @@
   "jahrgang": 2025,
   "berichtsjahr": 2025,
   "vollstaendig": false,
-  "warum_kein_wert": "Keine WGFZ-Umrechnung im Dokument: im Grundstücksmarktbericht 2025 (der Bericht 2026 lag am 18.10.2026 nicht bei BORIS-NRW, GMB_32800_2026.pdf: 404) kein Treffer zu WGFZ, GFZ oder Geschossflächenzahl.",
+  "warum_kein_wert": "Keine WGFZ-Umrechnung im Grundstücksmarktbericht 2025 (kein Treffer zu WGFZ, GFZ oder Geschossflächenzahl). Der Bericht 2026 wurde am 18.10.2026 unter der falschen Kennziffer 32800 gesucht (404); er liegt unter der Kennziffer 33200 (GMB_33200_2026.pdf, Befund der Nachernte vom 27.10.2026) und ist auf eine WGFZ-Umrechnung noch nicht ausgewertet.",
   "geltungsbereich": {
    "objektarten": [],
    "objektarten_ausgeschlossen": [],

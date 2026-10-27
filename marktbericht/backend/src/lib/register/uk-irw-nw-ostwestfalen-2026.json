@@ -10,7 +10,7 @@
     "lizenz": "dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "ags": "05754",
     "gasl": "33300",
     "gebiet_name": "Kreis Gütersloh und Stadt Gütersloh",
@@ -28,8 +28,19 @@
       "gemeinden": "Borgholzhausen, Gütersloh, Halle (Westf.), Harsewinkel, Herzebrock-Clarholz, Langenberg, Rheda-Wiedenbrück, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Verl, Versmold, Werther (Westf.)",
       "hinweis": "Ein Immobilienrichtwert je Gemeinde (13 Zonen); drei Gemeindegruppen mit eigenem Normobjekt-Bodenrichtwert und eigener Bodenrichtwerttabelle."
     },
-    "warum_kein_wert": "Der Ausschuss rechnet den Bodenrichtwert mit DREI verschiedenen Tabellen, je nach Gemeindegruppe (Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther: Norm 171–210 €/m²; Borgholzhausen, Langenberg, Versmold: Norm 131–170 €/m²; Gütersloh, Rheda-Wiedenbrück, Verl: Norm 291–400 €/m²; S. 1–2 und 4). Eine Tabelle, die von einem anderen Merkmal (der Gemeinde der Zone) abhängt, kennt der Rechenkern nicht (Formen klassen/kategorien/kurve/matrix rechnen mit EINER Tabelle je Merkmal). Eine Zusammenlegung zu einer Tabelle wäre eine Glättung (die Quotienten der drei Tabellen stimmen nur bis auf rund 0,001 überein). Ohne das Bodenrichtwert-Merkmal würde nur halb umgerechnet. Alle übrigen Tabellen und das Anwendungsbeispiel liegen unter formel_vorgemerkt bereit; es fehlt nur die Rechenform „klassen_je_gemeindegruppe\".",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser - freistehend (6 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte der 13 Gemeinden, S. 3 Tabellen Baujahr, Grundstücksgröße, Keller, Wohnfläche, Gebäudestandard, S. 4 drei Bodenrichtwerttabellen je Gemeindegruppe und Nebengebäude, S. 5 Anwendungsbeispiel Halle (Westf.), S. 6 Hinweis zur Standardstufe.",
+      "S. 4: „Nebengebäude wie Garagen und Carports sind im Immobilienrichtwert nicht berücksichtigt. Es sind folgende Zuschläge anzubringen\" — Bestand: Garagenstellplatz 8.000 EUR, Carport 5.000 EUR; Neubau: 17.000 EUR / 8.000 EUR.",
+      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 1 (Halle) nachgerechnet: 2.590 × 1,091 × 1,060 × 0,912 × 1,050 = 2.868,0 €/m² — getroffen (Prüfskript scratchpad/irw/ostwestfalen/pruef-vorgemerkt.mjs).",
+      "Zonen (Shape IRW_2026): je Gemeinde eine Zone, BOWL 190 (Gruppe 1), 150 (Gruppe 2), 345 (Gruppe 3), BJ 1986, WHNFL 141-160, FLAE 501-800, KELLER 1, GSTAND 5."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 2,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
+    },
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
       "interpolation": "keine (Klassen)",
@@ -288,7 +299,6 @@
           "art": "klassen_je_gemeindegruppe",
           "norm_feld": "BOWL",
           "runden": 0,
-          "gruppe_aus": "GENA der Zone (Gemeinde); gleichwertig: Normklasse des Zonenfelds BOWL, die je Gruppe eindeutig ist",
           "gruppen": [
             {
               "gemeinden": [
@@ -298,7 +308,9 @@
                 "Rietberg",
                 "Schloß Holte-Stukenbrock",
                 "Steinhagen",
-                "Werther (Westf.)"
+                "Werther (Westf.)",
+                "Halle",
+                "Werther"
               ],
               "norm": "171-210",
               "klassen": [
@@ -344,7 +356,8 @@
                   "bis": 750,
                   "uk": 1.259
                 }
-              ]
+              ],
+              "name": "Gruppe 1: Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther"
             },
             {
               "gemeinden": [
@@ -396,7 +409,8 @@
                   "bis": 750,
                   "uk": 1.312
                 }
-              ]
+              ],
+              "name": "Gruppe 2: Borgholzhausen, Langenberg, Versmold"
             },
             {
               "gemeinden": [
@@ -448,60 +462,55 @@
                   "bis": 750,
                   "uk": 1.097
                 }
-              ]
+              ],
+              "name": "Gruppe 3: Gütersloh, Rheda-Wiedenbrück, Verl"
             }
           ],
-          "rechenvorschlag": "Tabelle der Gemeindegruppe der Zone wählen; dort ist die Norm 1,000, also UK = Tabellenwert(Objekt). Ein einziger Tabellensatz für alle Gruppen wäre nur bis auf die dritte Nachkommastelle gleich (Quotienten weichen bis 0,0013 ab) — deshalb nicht zusammengelegt."
+          "gruppe_feld": "GENA",
+          "gruppe_hinweis": "Die Tabelle der Gemeindegruppe der Zone gilt (BORIS-Feld GENA, sonst Angabe gemeinde). BORIS führt „Halle“ und „Werther“ ohne Zusatz „(Westf.)“ — beide Schreibweisen stehen in der Gruppe. Die drei Tabellen werden nicht zusammengelegt (Quotienten weichen bis 0,0013 ab)."
         }
-      ],
-      "anwendungsbeispiel": {
-        "seite": "S. 5",
-        "irw": 2590,
-        "gemeinde": "Halle (Westf.)",
-        "norm_zone": {
-          "BOWL": "190",
-          "BJ": "1986",
-          "FLAE": "501-800",
-          "WHNFL": "141-160",
-          "KELLER": "1",
-          "GSTAND": "5"
-        },
-        "objekt": {
-          "baujahr": 1992,
-          "grundstuecksflaeche": 850,
-          "keller": true,
-          "wohnflaeche": 165,
-          "standardstufe": "mittel",
-          "bodenrichtwert": 240
-        },
-        "faktoren": {
-          "baujahr": 1.091,
-          "grundstuecksflaeche": 1.06,
-          "keller": 1,
-          "wohnflaeche": 0.912,
-          "gebaeudestandard": 1,
-          "bodenrichtwert": 1.05
-        },
-        "ergebnis_eur_qm": 2868,
-        "toleranz_eur_qm": 1,
-        "wohnflaeche": 165,
-        "nebengebaeude_eur": 16000,
-        "ergebnis_eur": 489220,
-        "wortlaut": "2.590 EUR/m² x 1,091 x 1,060 x 1,000 x 0,912 x 1,000 x 1,050 = rd. 2.868 EUR/m² · 2.868 EUR/m² x 165 m² + 16.000 EUR = rd. 489.220 EUR (Nebengebäude: Doppelgarage, pauschaler Zuschlag 16.000 EUR)"
-      }
+      ]
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser - freistehend (6 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte der 13 Gemeinden, S. 3 Tabellen Baujahr, Grundstücksgröße, Keller, Wohnfläche, Gebäudestandard, S. 4 drei Bodenrichtwerttabellen je Gemeindegruppe und Nebengebäude, S. 5 Anwendungsbeispiel Halle (Westf.), S. 6 Hinweis zur Standardstufe.",
-      "S. 4: „Nebengebäude wie Garagen und Carports sind im Immobilienrichtwert nicht berücksichtigt. Es sind folgende Zuschläge anzubringen\" — Bestand: Garagenstellplatz 8.000 EUR, Carport 5.000 EUR; Neubau: 17.000 EUR / 8.000 EUR.",
-      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 1 (Halle) nachgerechnet: 2.590 × 1,091 × 1,060 × 0,912 × 1,050 = 2.868,0 €/m² — getroffen (Prüfskript scratchpad/irw/ostwestfalen/pruef-vorgemerkt.mjs).",
-      "Zonen (Shape IRW_2026): je Gemeinde eine Zone, BOWL 190 (Gruppe 1), 150 (Gruppe 2), 345 (Gruppe 3), BJ 1986, WHNFL 141-160, FLAE 501-800, KELLER 1, GSTAND 5."
-    ],
-    "modellansaetze": {
-      "teilmarkt_code": 2,
-      "rundung_uk": 3,
-      "brechv": 2,
-      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
-    }
+    "anwendungsbeispiel": {
+      "seite": "S. 5",
+      "irw": 2590,
+      "gemeinde": "Halle (Westf.)",
+      "norm_zone": {
+        "GENA": "Halle",
+        "BOWL": "190",
+        "BJ": "1986",
+        "FLAE": "501-800",
+        "WHNFL": "141-160",
+        "KELLER": "1",
+        "GSTAND": "5"
+      },
+      "objekt": {
+        "baujahr": 1992,
+        "grundstuecksflaeche": 850,
+        "keller": true,
+        "wohnflaeche": 165,
+        "standardstufe": "mittel",
+        "bodenrichtwert": 240
+      },
+      "faktoren": {
+        "baujahr": 1.091,
+        "grundstuecksflaeche": 1.06,
+        "keller": 1,
+        "wohnflaeche": 0.912,
+        "gebaeudestandard": 1,
+        "bodenrichtwert": 1.05
+      },
+      "ergebnis_eur_qm": 2868,
+      "toleranz_eur_qm": 1,
+      "wohnflaeche": 165,
+      "nebengebaeude_eur": 16000,
+      "ergebnis_eur": 489220,
+      "wortlaut": "2.590 EUR/m² x 1,091 x 1,060 x 1,000 x 0,912 x 1,000 x 1,050 = rd. 2.868 EUR/m² · 2.868 EUR/m² x 165 m² + 16.000 EUR = rd. 489.220 EUR (Nebengebäude: Doppelgarage, pauschaler Zuschlag 16.000 EUR)",
+      "objekt_hinweis": "Alle Merkmale des Beispiels sind im Dokument genannt; die Gemeinde (Gemeindegruppe) kommt aus dem Zonenfeld GENA. Der Nebengebäude-Zuschlag (16000 €) ist kein Teil der Umrechnung (besonderes objektspezifisches Merkmal).",
+      "toleranz_grund": "Ergebnis im Dokument „rd.“ auf volle €/m² gerundet",
+      "quelle": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0533300_2026.pdf"
+    },
+    "kernausbau": "v3015 Kernausbau: Bodenrichtwert-Tabelle je Gemeindegruppe (Form klassen_je_gemeindegruppe); Anwendungsbeispiel S. 5 am echten Kern getroffen (Halle (Westf.))"
   },
   {
     "land_code": "NW",
@@ -514,7 +523,7 @@
     "lizenz": "dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "ags": "05754",
     "gasl": "33300",
     "gebiet_name": "Kreis Gütersloh und Stadt Gütersloh",
@@ -531,8 +540,19 @@
       "gemeinden": "Borgholzhausen, Gütersloh, Halle (Westf.), Harsewinkel, Herzebrock-Clarholz, Langenberg, Rheda-Wiedenbrück, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Verl, Versmold, Werther (Westf.)",
       "hinweis": "Ein Immobilienrichtwert je Gemeinde (13 Zonen); drei Gemeindegruppen mit eigenem Normobjekt-Bodenrichtwert und eigener Bodenrichtwerttabelle."
     },
-    "warum_kein_wert": "Der Ausschuss rechnet den Bodenrichtwert mit DREI verschiedenen Tabellen, je nach Gemeindegruppe (Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther: Norm 151–210 €/m²; Borgholzhausen, Langenberg, Versmold: Norm bis 150 €/m²; Gütersloh, Rheda-Wiedenbrück, Verl: Norm 291–500 €/m²; S. 1–2 und 4). Eine Tabelle, die von einem anderen Merkmal (der Gemeinde der Zone) abhängt, kennt der Rechenkern nicht (Formen klassen/kategorien/kurve/matrix rechnen mit EINER Tabelle je Merkmal). Eine Zusammenlegung zu einer Tabelle wäre eine Glättung (die Quotienten der drei Tabellen stimmen nur bis auf rund 0,001 überein). Ohne das Bodenrichtwert-Merkmal würde nur halb umgerechnet. Alle übrigen Tabellen und das Anwendungsbeispiel liegen unter formel_vorgemerkt bereit; es fehlt nur die Rechenform „klassen_je_gemeindegruppe\".",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (5 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte der 13 Gemeinden, S. 3 Tabellen Baujahr, Wohnfläche, Gebäudestandard, Anzahl der Einheiten, Mietsituation, S. 4 Objektgruppe, drei Bodenrichtwerttabellen je Gemeindegruppe, Nebengebäude/Stellplätze, S. 5 Anwendungsbeispiel Rietberg.",
+      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 1 (Rietberg) nachgerechnet: 2.370 × 1,057 = 2.505,1 €/m² — getroffen.",
+      "Die Wohnflächentabelle beginnt bei 26 m² und endet bei 150 m², die Einheiten-Tabelle bei 100 — außerhalb kein Koeffizient.",
+      "Gebäudestandard: Das ETW-Dokument trägt „Gebäudestandard*\", druckt den Hinweis zur Standardstufe aber nicht ab; die Zuordnung ist aus dem Dokument für Ein- und Zweifamilienhäuser (S. 6) übernommen — vor Freigabe beim Ausschuss bestätigen."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
+    },
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
       "interpolation": "keine (Klassen)",
@@ -794,7 +814,6 @@
           "art": "klassen_je_gemeindegruppe",
           "norm_feld": "BOWL",
           "runden": 0,
-          "gruppe_aus": "GENA der Zone (Gemeinde); gleichwertig: Normklasse des Zonenfelds BOWL, die je Gruppe eindeutig ist",
           "gruppen": [
             {
               "gemeinden": [
@@ -804,7 +823,9 @@
                 "Rietberg",
                 "Schloß Holte-Stukenbrock",
                 "Steinhagen",
-                "Werther (Westf.)"
+                "Werther (Westf.)",
+                "Halle",
+                "Werther"
               ],
               "norm": "151-210",
               "klassen": [
@@ -844,7 +865,8 @@
                   "bis": 1700,
                   "uk": 1.214
                 }
-              ]
+              ],
+              "name": "Gruppe 1: Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther"
             },
             {
               "gemeinden": [
@@ -890,7 +912,8 @@
                   "bis": 1700,
                   "uk": 1.25
                 }
-              ]
+              ],
+              "name": "Gruppe 2: Borgholzhausen, Langenberg, Versmold"
             },
             {
               "gemeinden": [
@@ -936,63 +959,58 @@
                   "bis": 1700,
                   "uk": 1.07
                 }
-              ]
+              ],
+              "name": "Gruppe 3: Gütersloh, Rheda-Wiedenbrück, Verl"
             }
           ],
-          "rechenvorschlag": "Tabelle der Gemeindegruppe der Zone wählen; dort ist die Norm 1,000, also UK = Tabellenwert(Objekt). Ein einziger Tabellensatz für alle Gruppen wäre nur bis auf die dritte Nachkommastelle gleich (Quotienten weichen bis 0,0013 ab) — deshalb nicht zusammengelegt."
+          "gruppe_feld": "GENA",
+          "gruppe_hinweis": "Die Tabelle der Gemeindegruppe der Zone gilt (BORIS-Feld GENA, sonst Angabe gemeinde). BORIS führt „Halle“ und „Werther“ ohne Zusatz „(Westf.)“ — beide Schreibweisen stehen in der Gruppe. Die drei Tabellen werden nicht zusammengelegt (Quotienten weichen bis 0,0013 ab)."
         }
-      ],
-      "anwendungsbeispiel": {
-        "seite": "S. 5",
-        "irw": 2370,
-        "gemeinde": "Rietberg",
-        "norm_zone": {
-          "BOWL": "180",
-          "BJ": "1993",
-          "WHNFL": "71-100",
-          "WHNA": "1-6",
-          "MIETS": "1",
-          "GSTAND": "5",
-          "OBJGR": "3"
-        },
-        "objekt": {
-          "baujahr": 1992,
-          "wohnflaeche": 77,
-          "standardstufe": "mittel",
-          "einheiten": 4,
-          "vermietet": false,
-          "erstverkauf": false,
-          "bodenrichtwert": 280
-        },
-        "faktoren": {
-          "baujahr": 1,
-          "wohnflaeche": 1,
-          "gebaeudestandard": 1,
-          "einheiten": 1,
-          "mietsituation": 1,
-          "objektgruppe": 1,
-          "bodenrichtwert": 1.057
-        },
-        "ergebnis_eur_qm": 2505,
-        "toleranz_eur_qm": 1,
-        "wohnflaeche": 77,
-        "nebengebaeude_eur": 5000,
-        "ergebnis_eur": 198000,
-        "wortlaut": "2.370 EUR/m² x 1,000 x 1,000 x 1,000 x 1,000 x 1,000 x 1,000 x 1,057 = rd. 2.505 EUR/m² · 2.505 EUR/m² x 77 m² + 5.000 EUR = rd. 198.000 EUR (Nebengebäude: Carport)"
-      }
+      ]
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (5 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte der 13 Gemeinden, S. 3 Tabellen Baujahr, Wohnfläche, Gebäudestandard, Anzahl der Einheiten, Mietsituation, S. 4 Objektgruppe, drei Bodenrichtwerttabellen je Gemeindegruppe, Nebengebäude/Stellplätze, S. 5 Anwendungsbeispiel Rietberg.",
-      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 1 (Rietberg) nachgerechnet: 2.370 × 1,057 = 2.505,1 €/m² — getroffen.",
-      "Die Wohnflächentabelle beginnt bei 26 m² und endet bei 150 m², die Einheiten-Tabelle bei 100 — außerhalb kein Koeffizient.",
-      "Gebäudestandard: Das ETW-Dokument trägt „Gebäudestandard*\", druckt den Hinweis zur Standardstufe aber nicht ab; die Zuordnung ist aus dem Dokument für Ein- und Zweifamilienhäuser (S. 6) übernommen — vor Freigabe beim Ausschuss bestätigen."
-    ],
-    "modellansaetze": {
-      "teilmarkt_code": 1,
-      "rundung_uk": 3,
-      "brechv": 2,
-      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
-    }
+    "anwendungsbeispiel": {
+      "seite": "S. 5",
+      "irw": 2370,
+      "gemeinde": "Rietberg",
+      "norm_zone": {
+        "GENA": "Rietberg",
+        "BOWL": "180",
+        "BJ": "1993",
+        "WHNFL": "71-100",
+        "WHNA": "1-6",
+        "MIETS": "1",
+        "GSTAND": "5",
+        "OBJGR": "3"
+      },
+      "objekt": {
+        "baujahr": 1992,
+        "wohnflaeche": 77,
+        "standardstufe": "mittel",
+        "einheiten": 4,
+        "vermietet": false,
+        "erstverkauf": false,
+        "bodenrichtwert": 280
+      },
+      "faktoren": {
+        "baujahr": 1,
+        "wohnflaeche": 1,
+        "gebaeudestandard": 1,
+        "einheiten": 1,
+        "mietsituation": 1,
+        "objektgruppe": 1,
+        "bodenrichtwert": 1.057
+      },
+      "ergebnis_eur_qm": 2505,
+      "toleranz_eur_qm": 1,
+      "wohnflaeche": 77,
+      "nebengebaeude_eur": 5000,
+      "ergebnis_eur": 198000,
+      "wortlaut": "2.370 EUR/m² x 1,000 x 1,000 x 1,000 x 1,000 x 1,000 x 1,000 x 1,057 = rd. 2.505 EUR/m² · 2.505 EUR/m² x 77 m² + 5.000 EUR = rd. 198.000 EUR (Nebengebäude: Carport)",
+      "objekt_hinweis": "Alle Merkmale des Beispiels sind im Dokument genannt; die Gemeinde (Gemeindegruppe) kommt aus dem Zonenfeld GENA. Der Nebengebäude-Zuschlag (5000 €) ist kein Teil der Umrechnung (besonderes objektspezifisches Merkmal).",
+      "toleranz_grund": "Ergebnis im Dokument „rd.“ auf volle €/m² gerundet",
+      "quelle": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0533300_2026.pdf"
+    },
+    "kernausbau": "v3015 Kernausbau: Bodenrichtwert-Tabelle je Gemeindegruppe (Form klassen_je_gemeindegruppe); Anwendungsbeispiel S. 5 am echten Kern getroffen (Rietberg)"
   },
   {
     "land_code": "NW",
@@ -1005,7 +1023,7 @@
     "lizenz": "dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "ags": "05754",
     "gasl": "33300",
     "gebiet_name": "Kreis Gütersloh und Stadt Gütersloh",
@@ -1023,8 +1041,18 @@
       "gemeinden": "Borgholzhausen, Gütersloh, Halle (Westf.), Harsewinkel, Herzebrock-Clarholz, Langenberg, Rheda-Wiedenbrück, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Verl, Versmold, Werther (Westf.)",
       "hinweis": "Ein Immobilienrichtwert je Gemeinde (13 Zonen); drei Gemeindegruppen mit eigenem Normobjekt-Bodenrichtwert und eigener Bodenrichtwerttabelle."
     },
-    "warum_kein_wert": "Der Ausschuss rechnet den Bodenrichtwert mit DREI verschiedenen Tabellen, je nach Gemeindegruppe (Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther: Norm 171–210 €/m²; Borgholzhausen, Langenberg, Versmold: Norm 131–170 €/m²; Gütersloh, Rheda-Wiedenbrück, Verl: Norm 291–400 €/m²; S. 1–2 und 4). Eine Tabelle, die von einem anderen Merkmal (der Gemeinde der Zone) abhängt, kennt der Rechenkern nicht (Formen klassen/kategorien/kurve/matrix rechnen mit EINER Tabelle je Merkmal). Eine Zusammenlegung zu einer Tabelle wäre eine Glättung (die Quotienten der drei Tabellen stimmen nur bis auf rund 0,001 überein). Ohne das Bodenrichtwert-Merkmal würde nur halb umgerechnet. Alle übrigen Tabellen und das Anwendungsbeispiel liegen unter formel_vorgemerkt bereit; es fehlt nur die Rechenform „klassen_je_gemeindegruppe\".",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (5 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte, S. 3 Tabellen Ergänzende Gebäudeart, Baujahr, Grundstücksgröße, Keller, Wohnfläche, Gebäudestandard, S. 4 drei Bodenrichtwerttabellen und Nebengebäude, S. 5 Anwendungsbeispiel Verl.",
+      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 3 (Verl) nachgerechnet: 2.770 × 1,091 × 0,942 × 1,145 = 3.259,6 €/m² → rd. 3.260 — getroffen.",
+      "Grundstücksgrößen-Tabelle endet bei 500 m², Wohnfläche bei 190 m² — darüber kein Koeffizient. Hinweis zur Standardstufe nicht im RH-Dokument abgedruckt; übernommen aus dem EFH-Dokument S. 6."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 3,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
+    },
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
       "interpolation": "keine (Klassen)",
@@ -1289,7 +1317,6 @@
           "art": "klassen_je_gemeindegruppe",
           "norm_feld": "BOWL",
           "runden": 0,
-          "gruppe_aus": "GENA der Zone (Gemeinde); gleichwertig: Normklasse des Zonenfelds BOWL, die je Gruppe eindeutig ist",
           "gruppen": [
             {
               "gemeinden": [
@@ -1299,7 +1326,9 @@
                 "Rietberg",
                 "Schloß Holte-Stukenbrock",
                 "Steinhagen",
-                "Werther (Westf.)"
+                "Werther (Westf.)",
+                "Halle",
+                "Werther"
               ],
               "norm": "171-210",
               "klassen": [
@@ -1345,7 +1374,8 @@
                   "bis": 750,
                   "uk": 1.259
                 }
-              ]
+              ],
+              "name": "Gruppe 1: Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther"
             },
             {
               "gemeinden": [
@@ -1397,7 +1427,8 @@
                   "bis": 750,
                   "uk": 1.312
                 }
-              ]
+              ],
+              "name": "Gruppe 2: Borgholzhausen, Langenberg, Versmold"
             },
             {
               "gemeinden": [
@@ -1449,62 +1480,58 @@
                   "bis": 750,
                   "uk": 1.097
                 }
-              ]
+              ],
+              "name": "Gruppe 3: Gütersloh, Rheda-Wiedenbrück, Verl"
             }
           ],
-          "rechenvorschlag": "Tabelle der Gemeindegruppe der Zone wählen; dort ist die Norm 1,000, also UK = Tabellenwert(Objekt). Ein einziger Tabellensatz für alle Gruppen wäre nur bis auf die dritte Nachkommastelle gleich (Quotienten weichen bis 0,0013 ab) — deshalb nicht zusammengelegt."
+          "gruppe_feld": "GENA",
+          "gruppe_hinweis": "Die Tabelle der Gemeindegruppe der Zone gilt (BORIS-Feld GENA, sonst Angabe gemeinde). BORIS führt „Halle“ und „Werther“ ohne Zusatz „(Westf.)“ — beide Schreibweisen stehen in der Gruppe. Die drei Tabellen werden nicht zusammengelegt (Quotienten weichen bis 0,0013 ab)."
         }
-      ],
-      "anwendungsbeispiel": {
-        "seite": "S. 5",
-        "irw": 2770,
-        "gemeinde": "Verl",
-        "norm_zone": {
-          "EGART": "2",
-          "BOWL": "345",
-          "BJ": "1986",
-          "FLAE": "351-500",
-          "WHNFL": "126-140",
-          "KELLER": "1",
-          "GSTAND": "5"
-        },
-        "objekt": {
-          "anbauweise": "doppelhaushaelfte",
-          "baujahr": 1992,
-          "grundstuecksflaeche": 350,
-          "keller": true,
-          "wohnflaeche": 100,
-          "standardstufe": "mittel",
-          "bodenrichtwert": 370
-        },
-        "faktoren": {
-          "gebaeudeart": 1,
-          "baujahr": 1.091,
-          "grundstuecksflaeche": 0.942,
-          "keller": 1,
-          "wohnflaeche": 1.145,
-          "gebaeudestandard": 1,
-          "bodenrichtwert": 1
-        },
-        "ergebnis_eur_qm": 3260,
-        "toleranz_eur_qm": 5,
-        "wohnflaeche": 100,
-        "nebengebaeude_eur": 8000,
-        "ergebnis_eur": 334000,
-        "wortlaut": "2.770 EUR/m² x 1,000 x 1,091 x 0,942 x 1,000 x 1,145 x 1,000 x 1,000 = rd. 3.260 EUR/m² · 3.260 EUR/m² x 100 m² + 8.000 EUR = rd. 334.000 EUR (Nebengebäude: Einzelgarage)"
-      }
+      ]
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (5 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte, S. 3 Tabellen Ergänzende Gebäudeart, Baujahr, Grundstücksgröße, Keller, Wohnfläche, Gebäudestandard, S. 4 drei Bodenrichtwerttabellen und Nebengebäude, S. 5 Anwendungsbeispiel Verl.",
-      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 3 (Verl) nachgerechnet: 2.770 × 1,091 × 0,942 × 1,145 = 3.259,6 €/m² → rd. 3.260 — getroffen.",
-      "Grundstücksgrößen-Tabelle endet bei 500 m², Wohnfläche bei 190 m² — darüber kein Koeffizient. Hinweis zur Standardstufe nicht im RH-Dokument abgedruckt; übernommen aus dem EFH-Dokument S. 6."
-    ],
-    "modellansaetze": {
-      "teilmarkt_code": 3,
-      "rundung_uk": 3,
-      "brechv": 2,
-      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
-    }
+    "anwendungsbeispiel": {
+      "seite": "S. 5",
+      "irw": 2770,
+      "gemeinde": "Verl",
+      "norm_zone": {
+        "GENA": "Verl",
+        "EGART": "2",
+        "BOWL": "345",
+        "BJ": "1986",
+        "FLAE": "351-500",
+        "WHNFL": "126-140",
+        "KELLER": "1",
+        "GSTAND": "5"
+      },
+      "objekt": {
+        "anbauweise": "doppelhaushaelfte",
+        "baujahr": 1992,
+        "grundstuecksflaeche": 350,
+        "keller": true,
+        "wohnflaeche": 100,
+        "standardstufe": "mittel",
+        "bodenrichtwert": 370
+      },
+      "faktoren": {
+        "gebaeudeart": 1,
+        "baujahr": 1.091,
+        "grundstuecksflaeche": 0.942,
+        "keller": 1,
+        "wohnflaeche": 1.145,
+        "gebaeudestandard": 1,
+        "bodenrichtwert": 1
+      },
+      "ergebnis_eur_qm": 3260,
+      "toleranz_eur_qm": 1,
+      "wohnflaeche": 100,
+      "nebengebaeude_eur": 8000,
+      "ergebnis_eur": 334000,
+      "wortlaut": "2.770 EUR/m² x 1,000 x 1,091 x 0,942 x 1,000 x 1,145 x 1,000 x 1,000 = rd. 3.260 EUR/m² · 3.260 EUR/m² x 100 m² + 8.000 EUR = rd. 334.000 EUR (Nebengebäude: Einzelgarage)",
+      "objekt_hinweis": "Alle Merkmale des Beispiels sind im Dokument genannt; die Gemeinde (Gemeindegruppe) kommt aus dem Zonenfeld GENA. Der Nebengebäude-Zuschlag (8000 €) ist kein Teil der Umrechnung (besonderes objektspezifisches Merkmal).",
+      "toleranz_grund": "Ergebnis im Dokument „rd.“ auf volle €/m² gerundet",
+      "quelle": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0533300_2026.pdf"
+    },
+    "kernausbau": "v3015 Kernausbau: Bodenrichtwert-Tabelle je Gemeindegruppe (Form klassen_je_gemeindegruppe); Anwendungsbeispiel S. 5 am echten Kern getroffen (Verl)"
   },
   {
     "land_code": "NW",

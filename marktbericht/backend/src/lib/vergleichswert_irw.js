@@ -126,6 +126,13 @@ export const EINGABEN = {
   jahresrohertrag_qm: 'Jahresrohertrag in €/m² Wohn-/Nutzfläche und JAHR, Zahl',
   wohn_nutzflaeche: 'Summe aus Wohn- und Nutzfläche in m², Zahl',
   einheiten_anlage: 'Anzahl der Wohnungen in der gesamten Wohnanlage, Zahl',
+  /* v3015 · Kernausbau (additiv, matrix_linear, Bedingung, Gemeindegruppe) */
+  alter: 'Gebäudealter in Jahren am Stichtag nach dem Modell des Ausschusses (tatsächlich bzw. bei Modernisierung fiktiv), Zahl — ohne Angabe aus dem fiktiven Baujahr, nie still aus dem Baujahr',
+  gemeinde: 'Gemeinde des Objekts (Name wie in BORIS-NRW, Feld GENA) — sonst aus der Richtwertzone',
+  bodenrichtwert_2023: 'Bodenrichtwert am Objekt zum 01.01.2023 in €/m² (Lagewert-Stichtag des Ausschusses), Zahl',
+  dachgeschoss_ausbau: "Ausbau des Dachgeschosses: 'flachdach' | 'nicht' | 'teilweise' | 'voll'",
+  ausstattung: "Ausstattungsklasse nach dem Wort des Ausschusses (z. B. 'einfach' | 'mittel' | 'gehoben')",
+  stellplatz_anzahl: 'Anzahl der Garagen und Stellplätze im Kaufpreis, Zahl',
   /* Kein Objektmerkmal: Zeitpunkt. Stichtag des Richtwerts = Wertermittlungsstichtag. */
   stichtag: '(intern) Registrierungsjahr/Kaufzeitpunkt — gleich dem Richtwertstichtag',
 };
@@ -186,8 +193,12 @@ export function satzFuer({ gasl, teilmarkt, jahrgang = null, saetze = null }) {
 /* `eingabe` darf eine Liste sein: der erste Wert, der in der Tabelle
    vorkommt, gilt (z. B. ['anbauweise','gebaeudeart'] — eine Doppelhaus-
    haelfte vor dem Einfamilienhaus). */
-function eingabeWert(k, m, objekt) {
+function eingabeWert(k, m, objekt, ctx = {}) {
   let v = objekt ? objekt[k] : undefined;
+  /* v3015 · Alter: nur ausdruecklich oder aus dem FIKTIVEN Baujahr. Aus dem Baujahr allein
+     waere es bei einem modernisierten Haus falsch (Borken: „bei Modernisierungen fiktives Alter"). */
+  if (k === 'alter' && leer(v) && objekt && num(objekt.baujahr_fiktiv) != null && ctx.jahr) v = Number(ctx.jahr) - num(objekt.baujahr_fiktiv);
+  if (k === 'gemeinde' && leer(v) && ctx.roh && !leer(ctx.roh.GENA)) v = String(ctx.roh.GENA).trim();
   if (k === 'gstand' && leer(v) && objekt && !leer(objekt.standardstufe)) v = gstandAusStandardstufe(objekt.standardstufe);
   if (k === 'mgrad' && leer(v) && objekt && !leer(objekt.modernisierungspunkte) && m.punkte_zuordnung) {
     const p = Number(objekt.modernisierungspunkte);
@@ -198,11 +209,11 @@ function eingabeWert(k, m, objekt) {
   if (m.runden != null && typeof v === 'number') v = Math.round(v * 10 ** m.runden) / 10 ** m.runden;
   return leer(v) ? null : v;
 }
-function objektWert(m, objekt) {
+function objektWert(m, objekt, ctx = {}) {
   const liste = Array.isArray(m.eingabe) ? m.eingabe : [m.eingabe];
   let erst = null;
   for (const k of liste) {
-    const v = eingabeWert(k, m, objekt);
+    const v = eingabeWert(k, m, objekt, ctx);
     if (v == null) continue;
     if (erst == null) erst = v;
     if (liste.length === 1) return v;
@@ -266,6 +277,155 @@ function kurveBei(m, x) {
   return null;
 }
 
+/* ══ v3015 · MATRIX „RICHTWERTOBJEKT × BEWERTUNGSOBJEKT" MIT INTERPOLATION ══
+   zeilen_norm   Stuetzstellen des Richtwertobjekts (Zone), Zahlen, auf- oder absteigend
+   spalten_objekt Stuetzstellen des Bewertungsobjekts
+   werte[i][j]   Koeffizient fuer Norm zeilen_norm[i] und Objekt spalten_objekt[j], WIE GEDRUCKT
+   Zwischen den Stuetzstellen linear in beide Richtungen (bilinear), wenn das Dokument
+   interpoliert oder keine eigene Regel nennt; `interpolation: false` laesst nur Treffer zu.
+   Ausserhalb der Stuetzstellen kein Wert (nie Extrapolation). */
+function klammer(achse, x) {
+  for (let i = 0; i < achse.length; i++) {
+    if (Math.abs(achse[i] - x) < 1e-9) return { i, j: i, t: 0 };
+    if (i + 1 < achse.length && ((achse[i] < x && x < achse[i + 1]) || (achse[i] > x && x > achse[i + 1]))) {
+      return { i, j: i + 1, t: (x - achse[i]) / (achse[i + 1] - achse[i]) };
+    }
+  }
+  return null;
+}
+export function matrixLinearBei(m, xNorm, xObjekt) {
+  const z = klammer(m.zeilen_norm || [], xNorm), s = klammer(m.spalten_objekt || [], xObjekt);
+  if (!z) return { aus: 'norm' };
+  if (!s) return { aus: 'objekt' };
+  if (m.interpolation === false && (z.t !== 0 || s.t !== 0)) return { aus: 'zwischen' };
+  const w = (a, b) => { const r = (m.werte[a] || [])[b]; return r == null ? null : Number(r); };
+  const ecken = [w(z.i, s.i), w(z.i, s.j), w(z.j, s.i), w(z.j, s.j)];
+  if (ecken.some((e) => e == null)) {
+    /* v3015 · gedruckter Fehler (zweifel: [{zeile, spalte, grund}]) ist kein Loch, sondern eine Rueckfrage */
+    const zl = [m.zeilen_norm[z.i], m.zeilen_norm[z.j]], sl = [m.spalten_objekt[s.i], m.spalten_objekt[s.j]];
+    const zw = (m.zweifel || []).find((q) => q && zl.includes(q.zeile) && sl.includes(q.spalte));
+    return zw ? { aus: 'zweifel', zweifel: zw } : { aus: 'luecke' };
+  }
+  const oben = ecken[0] + (ecken[1] - ecken[0]) * s.t;
+  const unten = ecken[2] + (ecken[3] - ecken[2]) * s.t;
+  let uk = oben + (unten - oben) * z.t;
+  if (m.uk_runden != null) uk = Math.round(uk * 10 ** m.uk_runden) / 10 ** m.uk_runden;
+  /* v3015 · vom Ausschuss als „nicht gesichert" markierte Zeilen/Spalten: rechnet (der Ausschuss
+     rechnet sie selbst), aber mit Hinweis */
+  const ug = m.ungesichert || null;
+  const zeilenBenutzt = z.t === 0 ? [m.zeilen_norm[z.i]] : [m.zeilen_norm[z.i], m.zeilen_norm[z.j]];
+  const spaltenBenutzt = s.t === 0 ? [m.spalten_objekt[s.i]] : [m.spalten_objekt[s.i], m.spalten_objekt[s.j]];
+  const ungesichert = !!(ug && (zeilenBenutzt.some((x) => (ug.zeilen || []).includes(x)) || spaltenBenutzt.some((x) => (ug.spalten || []).includes(x))));
+  return { uk, interpoliert: z.t !== 0 || s.t !== 0, ungesichert };
+}
+
+/* ══ v3015 · MATRIX MIT KLASSEN „RICHTWERT (ZEILE) × BEWERTUNGSOBJEKT (SPALTE)" (Moers) ══
+   zeilen_norm / spalten_objekt: Eintraege als Name ("mittel", "151 - 200", "< 80", "> 200",
+   "2023-2018") oder Zahl (2013). Zuordnung: erst der Name (nach zuordnung/norm_zuordnung),
+   dann eine Zahl in der Klasse (von–bis, offene Grenzen; Zahl = Einzelwert). Mehrere Klassen
+   mit einer Zahl → Grenze (kein Wert). Keine Interpolation. Leere Zelle → kein Wert. */
+function klasseAusName(e) {
+  if (typeof e === 'number') return { von: e, bis: e };
+  const s = String(e).replace(/\s+/g, '').replace(',', '.');
+  let r;
+  if ((r = s.match(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/))) { const a = Number(r[1]), b = Number(r[2]); return { von: Math.min(a, b), bis: Math.max(a, b) }; }
+  if ((r = s.match(/^<(\d+(?:\.\d+)?)$/))) return { bis: Number(r[1]), bis_offen: true };
+  if ((r = s.match(/^>(\d+(?:\.\d+)?)$/))) return { von: Number(r[1]), von_offen: true };
+  if ((r = s.match(/^(\d+(?:\.\d+)?)$/))) return { von: Number(r[1]), bis: Number(r[1]) };
+  return null;
+}
+const normName = (x) => String(x).replace(/\s+/g, '').toLowerCase();
+function indexInListe(liste, v) {
+  const n = normName(v);
+  const i = liste.findIndex((e) => normName(e) === n);
+  if (i >= 0) return { i };
+  const x = num(v);
+  if (x == null) return { i: -1 };
+  const treffer = [];
+  liste.forEach((e, k) => {
+    const c = klasseAusName(e);
+    if (!c) return;
+    const ok1 = c.von == null || (c.von_offen ? x > c.von : x >= c.von);
+    const ok2 = c.bis == null || (c.bis_offen ? x < c.bis : x <= c.bis);
+    if (ok1 && ok2) treffer.push(k);
+  });
+  if (treffer.length > 1) return { i: -1, grenze: treffer.map((k) => liste[k]) };
+  return { i: treffer.length ? treffer[0] : -1 };
+}
+
+/* ══ v3015 · INTERPOLATIONSFUNKTION DES AUSSCHUSSES (Dortmund) ═══════════════════
+   m.formel: der gedruckte Ausdruck in Zeichen, die dieser kleine Leser kennt — Zahlen (Punkt),
+   x (Objekt), n (Richtwertobjekt/Zone), + − * / ^, Klammern, sqrt ln exp log10. Kein eval.
+   Ergebnis: Zu-/Abschlag in Prozent. Nur im Bereich der Tabelle (bereich_objekt/bereich_norm),
+   nie darueber hinaus; klemme_objekt.unter: Tabellenklasse „bis …" (Wert an dieser Grenze). */
+const FN = { sqrt: Math.sqrt, ln: Math.log, exp: Math.exp, log10: Math.log10 };
+export function formelWert(text, vars) {
+  const t = String(text).match(/\d+(?:\.\d+)?|[a-z0-9_]+|[-+*/^()]/gi) || [];
+  if (t.join('') !== String(text).replace(/\s+/g, '')) throw new Error('Formel enthält unbekannte Zeichen');
+  let p = 0;
+  const sieh = () => t[p], nimm = () => t[p++];
+  const ausdruck = () => { let v = term(); while (sieh() === '+' || sieh() === '-') { const o = nimm(); const w = term(); v = o === '+' ? v + w : v - w; } return v; };
+  const term = () => { let v = faktor(); while (sieh() === '*' || sieh() === '/') { const o = nimm(); const w = faktor(); v = o === '*' ? v * w : v / w; } return v; };
+  const faktor = () => { if (sieh() === '-') { nimm(); return -faktor(); } if (sieh() === '+') { nimm(); return faktor(); } const b = basis(); if (sieh() === '^') { nimm(); return b ** faktor(); } return b; };
+  const basis = () => {
+    const k = nimm();
+    if (k === '(') { const v = ausdruck(); if (nimm() !== ')') throw new Error('Klammer'); return v; }
+    if (/^\d/.test(k)) return Number(k);
+    if (Object.prototype.hasOwnProperty.call(FN, k)) { if (nimm() !== '(') throw new Error('Funktion ohne Klammer'); const v = ausdruck(); if (nimm() !== ')') throw new Error('Klammer'); return FN[k](v); }
+    if (Object.prototype.hasOwnProperty.call(vars, k)) return Number(vars[k]);
+    throw new Error('unbekannt: ' + k);
+  };
+  const v = ausdruck();
+  if (p !== t.length) throw new Error('Formel nicht zu Ende gelesen');
+  return v;
+}
+function imBereich(b, x) { return !b || ((b.von == null || x >= b.von - 1e-9) && (b.bis == null || x <= b.bis + 1e-9)); }
+export function funktionProzent(m, x, n = null) {
+  /* An einer gedruckten Stuetzstelle gilt der gedruckte Tabellenwert („Zwischenwerte" nach der Funktion):
+     die Funktion trifft die Tabelle sonst nur bis auf die Rundung ihrer Koeffizienten (±0,1 %). */
+  const gleich = (a, b) => Math.abs(Number(a) - Number(b)) < 1e-9;
+  if (n == null && m.stuetzstellen && Array.isArray(m.stuetzstellen.x)) {
+    const i = m.stuetzstellen.x.findIndex((s) => gleich(s, x));
+    if (i >= 0 && m.stuetzstellen.prozent[i] != null) return Number(m.stuetzstellen.prozent[i]);
+  }
+  if (n != null && m.tabelle && Array.isArray(m.tabelle.zeilen_norm)) {
+    const i = m.tabelle.zeilen_norm.findIndex((s) => gleich(s, n)), j = (m.tabelle.spalten_objekt || []).findIndex((s) => gleich(s, x));
+    if (i >= 0 && j >= 0 && (m.tabelle.werte_prozent[i] || [])[j] != null) return Number(m.tabelle.werte_prozent[i][j]);
+  }
+  let p = formelWert(m.formel, n == null ? { x } : { x, n });
+  if (!Number.isFinite(p)) return null;
+  if (m.prozent_runden != null) p = Math.round((p + Math.sign(p) * 1e-9) * 10 ** m.prozent_runden) / 10 ** m.prozent_runden;
+  return p;
+}
+
+/* ══ v3015 · BEDINGUNG ZWISCHEN MERKMALEN (Hagen, Bottrop) ════════════════════
+   m.bedingung = [{ wenn: { baujahr_von, baujahr_bis, alter_von, alter_bis }, setze | nur | nicht, wortlaut }]
+     setze  der Ausschuss gibt die Kategorie vor („fuer juengere Gebaeude wird eine mittlere
+            Modernisierung unterstellt") — die Angabe des Objekts wird ersetzt
+     nur    nur diese Kategorien sind zulaessig; eine andere → kein Wert (ausserhalb)
+     nicht  diese Kategorien sind ausgeschlossen
+   Alter = Stichtagsjahr des Satzes − Baujahr (tatsaechliches Alter, wie im Dokument).
+   Fehlt das Baujahr, das die Bedingung braucht → kein Wert (merkmal_fehlt). */
+function bedingungPruefen(m, objekt, ctx) {
+  const regeln = Array.isArray(m.bedingung) ? m.bedingung : [];
+  const greifen = [];
+  for (const r of regeln) {
+    const w = r.wenn || {};
+    const brauchtBj = ['baujahr_von', 'baujahr_bis', 'alter_von', 'alter_bis'].some((k) => w[k] != null);
+    if (!brauchtBj) { greifen.push(r); continue; }
+    const bj = num(objekt && objekt.baujahr);
+    if (bj == null) return { fehlt: true };
+    const alter = ctx.jahr ? Number(ctx.jahr) - bj : null;
+    if (w.baujahr_von != null && bj < w.baujahr_von) continue;
+    if (w.baujahr_bis != null && bj > w.baujahr_bis) continue;
+    if ((w.alter_von != null || w.alter_bis != null) && alter == null) return { fehlt: true };
+    if (w.alter_von != null && alter < w.alter_von) continue;
+    if (w.alter_bis != null && alter > w.alter_bis) continue;
+    greifen.push(r);
+  }
+  return { greifen };
+}
+
 /* Normwert des Merkmals: aus der Zone (Feld des IRW), sonst aus dem Satz. */
 function normWert(m, roh, satzNorm) {
   if (m.norm_feld && roh && !leer(roh[m.norm_feld])) {
@@ -280,8 +440,23 @@ function normWert(m, roh, satzNorm) {
  * Ein Merkmal: Faktor Objekt gegen Norm.
  * @returns {{ok:true, uk, objekt, norm, text}} | {{ok:false, grund, text}}
  */
-export function merkmalFaktor(m, objekt, roh, satzNorm) {
+export function merkmalFaktor(m, objekt, roh, satzNorm, ctx = {}) {
   const name = m.name || m.id;
+  ctx = { ...ctx, roh: roh || ctx.roh || null };
+  /* v3015 · Tabelle je Gemeindegruppe (Guetersloh): die Gruppe kommt aus der Gemeinde der
+     Zone (BORIS-Feld GENA) oder der Angabe zum Objekt; ohne Gruppe kein Wert. */
+  if (Array.isArray(m.gruppen)) {
+    const feld = m.gruppe_feld || 'GENA';
+    const gem = (roh && !leer(roh[feld])) ? String(roh[feld]).trim() : (objekt && !leer(objekt.gemeinde) ? String(objekt.gemeinde).trim() : null);
+    if (!gem) return { ok: false, grund: 'norm_unbekannt', text: `${name}: die Tabelle hängt von der Gemeinde ab — Gemeinde der Zone unbekannt` };
+    const g = m.gruppen.find((x) => (x.gemeinden || []).some((n) => n.toLowerCase() === gem.toLowerCase()));
+    if (!g) return { ok: false, grund: 'ausserhalb', text: `${name}: die Gemeinde „${gem}" gehört zu keiner Gemeindegruppe des Ausschusses` };
+    const { gruppen, gruppe_feld, gruppe_art, ...rest } = m;
+    const { gemeinden, name: gName, ...tab } = g;
+    const r = merkmalFaktor({ ...rest, ...tab, art: gruppe_art || 'klassen' }, objekt, roh, satzNorm, ctx);
+    if (r.text) r.text = r.text.replace(name + ':', `${name} (Tabelle ${gName || gemeinden.join(', ')}):`);
+    return r;
+  }
   if (m.art === 'stichtag') {
     return { ok: true, uk: 1, objekt: 'Stichtag des Richtwerts', norm: m.norm != null ? String(m.norm) : 'Richtwertstichtag',
       text: `${name}: Wertermittlungsstichtag gleich Richtwertstichtag — keine Zeitanpassung` };
@@ -299,7 +474,25 @@ export function merkmalFaktor(m, objekt, roh, satzNorm) {
   }
   const nw = normWert(m, roh, satzNorm);
   if (!nw) return { ok: false, grund: 'norm_unbekannt', text: `${name}: das Normobjekt der Zone führt dieses Merkmal nicht` };
-  const ov0 = objektWert(m, objekt);
+  let ov0 = objektWert(m, objekt, ctx);
+  /* v3015 · Bedingung zwischen Merkmalen */
+  let bedText = '';
+  if (Array.isArray(m.bedingung) && m.bedingung.length) {
+    const b = bedingungPruefen(m, objekt, ctx);
+    if (b.fehlt) return { ok: false, grund: 'merkmal_fehlt', text: `${name}: die Vorgabe des Ausschusses hängt vom Baujahr ab — Angabe zum Objekt fehlt (${EINGABEN.baujahr})` };
+    for (const r of b.greifen) {
+      if (r.setze != null) { ov0 = r.setze; bedText = ` (Vorgabe des Ausschusses: ${r.kurz || r.wortlaut || r.setze})`; }
+    }
+    if (ov0 != null && ov0 !== '__grenze__') {
+      const key = String(aufSchluessel(m, ov0)).toLowerCase();
+      for (const r of b.greifen) {
+        const nur = (r.nur || []).map((x) => String(x).toLowerCase()), nicht = (r.nicht || []).map((x) => String(x).toLowerCase());
+        if ((nur.length && !nur.includes(key)) || nicht.includes(key)) {
+          return { ok: false, grund: 'ausserhalb', text: `${name}: „${aufSchluessel(m, ov0)}" ist für dieses Objekt nach dem Modell des Ausschusses nicht zulässig (${r.kurz || r.wortlaut || 'Bedingung'})` };
+        }
+      }
+    }
+  }
   if (ov0 == null) {
     const k0 = Array.isArray(m.eingabe) ? m.eingabe[m.eingabe.length - 1] : m.eingabe;
     return { ok: false, grund: 'merkmal_fehlt', text: `${name}: Angabe zum Objekt fehlt (${EINGABEN[k0] || k0})` };
@@ -308,6 +501,68 @@ export function merkmalFaktor(m, objekt, roh, satzNorm) {
     return { ok: false, grund: 'grenze', text: `${name}: die Modernisierungspunkte liegen zwischen zwei Stufen des Ausschusses — sachverständig zuzuordnen` };
   }
   const ov = aufSchluessel(m, ov0);
+
+  if (m.art === 'matrix_linear') {
+    const xo = num(ov), xn = num(nw.wert);
+    if (xo == null) return { ok: false, grund: 'merkmal_fehlt', text: `${name}: „${ov0}" ist keine Zahl` };
+    if (xn == null) return { ok: false, grund: 'norm_unbekannt', text: `${name}: Normmerkmal „${nw.roh}" ist keine Zahl (Spanne?) — nicht eindeutig` };
+    const r = matrixLinearBei(m, xn, xo);
+    const zs = m.zeilen_norm, sp = m.spalten_objekt;
+    const rand = (a) => `${Math.min(a[0], a[a.length - 1])}–${Math.max(a[0], a[a.length - 1])}`;
+    if (r.aus === 'norm') return { ok: false, grund: 'norm_unbekannt', text: `${name}: das Normobjekt der Zone (${xn}) liegt außerhalb der Tabelle des Ausschusses (${rand(zs)})` };
+    if (r.aus === 'objekt') return { ok: false, grund: 'ausserhalb', text: `${name}: ${xo} liegt außerhalb der Tabelle des Ausschusses (${rand(sp)}); eine Fortschreibung darüber hinaus ist nicht zulässig` };
+    if (r.aus === 'zwischen') return { ok: false, grund: 'ausserhalb', text: `${name}: ${xo} gegen Norm ${xn} liegt zwischen den Tabellenwerten, und der Ausschuss sieht keine Interpolation vor` };
+    if (r.aus === 'zweifel') return { ok: false, grund: 'zweifel', text: `${name}: der amtliche Tabellenwert (Richtwert ${r.zweifel.zeile}, Objekt ${r.zweifel.spalte}) ist offensichtlich fehlerhaft gedruckt — Rückfrage beim Ausschuss` };
+    if (r.aus) return { ok: false, grund: 'ausserhalb', text: `${name}: für ${xo} gegen Norm ${xn} veröffentlicht der Ausschuss keinen Koeffizienten` };
+    const iv = r.interpoliert ? `; ${m.interpolation_text || 'lineare Interpolation (DealPilot), Tabelle des Ausschusses ohne eigene Regel'}` : '';
+    const ug = r.ungesichert ? `; ${m.ungesichert.text || 'vom Ausschuss als nicht gesichert gekennzeichnet (geringe Anzahl von Kauffällen)'}` : '';
+    return { ok: true, uk: r.uk, objekt: String(xo), norm: String(xn), ungesichert: r.ungesichert || undefined,
+      text: `${name}: Objekt ${xo} gegen Norm ${xn} → ${de(r.uk)}${iv}${ug}` };
+  }
+
+  /* v3015 · Matrix mit Klassen (Zeilen = Richtwert, Spalten = Objekt), siehe indexInListe */
+  if (m.art === 'matrix_klassen') {
+    const zi = indexInListe(m.zeilen_norm || [], nw.wert), si = indexInListe(m.spalten_objekt || [], ov);
+    if (si.grenze) return { ok: false, grund: 'grenze', text: `${name}: ${ov0} liegt auf der Grenze zweier Klassen (${si.grenze.join(' / ')}) — sachverständig zuzuordnen` };
+    if (zi.i < 0) return { ok: false, grund: 'norm_unbekannt', text: `${name}: Normmerkmal „${nw.roh}" ist keiner Zeile der Tabelle zuzuordnen` };
+    if (si.i < 0) return { ok: false, grund: 'ausserhalb', text: `${name}: „${ov0}" ist in der Tabelle des Ausschusses nicht geführt` };
+    const zk = m.zeilen_norm[zi.i], sk = m.spalten_objekt[si.i];
+    const zw = (m.zweifel || []).find((q) => q && q.zeile === zk && q.spalte === sk);
+    if (zw) return { ok: false, grund: 'zweifel', text: `${name}: der amtliche Tabellenwert (Richtwert ${zk}, Objekt ${sk}) ist offensichtlich fehlerhaft gedruckt — Rückfrage beim Ausschuss` };
+    const uk = (m.werte[zi.i] || [])[si.i];
+    if (uk == null) return { ok: false, grund: 'ausserhalb', text: `${name}: kein Koeffizient für Objekt ${sk} gegen Richtwert ${zk}` };
+    return { ok: true, uk: Number(uk), objekt: String(sk), norm: String(zk),
+      text: `${name}: ${sk} gegen Richtwert ${zk} → ${de(uk)}${bedText}` };
+  }
+
+  /* v3015 · Interpolationsfunktion des Ausschusses (Prozent), ein- oder zweidimensional */
+  if (m.art === 'funktion') {
+    const xo = num(ov), xn = num(nw.wert);
+    if (xo == null) return { ok: false, grund: 'merkmal_fehlt', text: `${name}: „${ov0}" ist keine Zahl` };
+    if (xn == null) return { ok: false, grund: 'norm_unbekannt', text: `${name}: Normmerkmal „${nw.roh}" ist keine Zahl — nicht eindeutig` };
+    const bo = m.bereich_objekt || null, bn = m.bereich_norm || bo;
+    const rand = (b) => `${b.von ?? '…'}–${b.bis ?? '…'}`;
+    if (!imBereich(bo, xo)) return { ok: false, grund: 'ausserhalb', text: `${name}: ${xo} liegt außerhalb der Tabelle des Ausschusses (${rand(bo)}); eine Fortschreibung darüber hinaus ist nicht zulässig` };
+    if (!imBereich(bn, xn)) return { ok: false, grund: 'norm_unbekannt', text: `${name}: das Normobjekt der Zone (${xn}) liegt außerhalb der Tabelle des Ausschusses (${rand(bn)})` };
+    const kl = m.klemme_objekt || {};
+    const xr = kl.unter != null && xo < kl.unter ? kl.unter : (kl.ueber != null && xo > kl.ueber ? kl.ueber : xo);
+    const klText = xr !== xo ? ` (Tabellenklasse ${kl.unter != null && xo < kl.unter ? 'bis ' + kl.unter : 'ab ' + kl.ueber})` : '';
+    const ft = m.funktion_text || 'Interpolationsfunktion des Ausschusses';
+    try {
+      if (m.zweidimensional) {
+        const p = funktionProzent(m, xr, xn);
+        if (p == null) return { ok: false, grund: 'ausserhalb', text: `${name}: die Funktion des Ausschusses ist hier nicht definiert` };
+        return { ok: true, uk: 1 + p / 100, objekt: String(xo), norm: String(xn), prozent: p,
+          text: `${name}: Objekt ${xo}${klText} gegen Richtwert ${xn} → ${de(p, 1)} % (${ft})` };
+      }
+      const po = funktionProzent(m, xr), pn = funktionProzent(m, xn);
+      if (po == null || pn == null) return { ok: false, grund: 'ausserhalb', text: `${name}: die Funktion des Ausschusses ist hier nicht definiert` };
+      return { ok: true, uk: (1 + po / 100) / (1 + pn / 100), uk_objekt: 1 + po / 100, uk_norm: 1 + pn / 100, objekt: String(xo), norm: String(xn),
+        text: `${name}: ${xo}${klText} → ${de(po, 1)} %` + (pn ? ` (Norm ${xn}: ${de(pn, 1)} %)` : ` (Norm ${xn})`) + ` (${ft})` };
+    } catch (e) {
+      return { ok: false, grund: 'form', text: `${name}: Funktion nicht lesbar (${e.message})` };
+    }
+  }
 
   if (m.art === 'matrix') {
     const ks = m.kategorien.map((k) => String(k).toLowerCase());
@@ -329,10 +584,14 @@ export function merkmalFaktor(m, objekt, roh, satzNorm) {
     const i = ko.kat == null ? -1 : ks.indexOf(String(ko.kat).toLowerCase()), j = kn.kat == null ? -1 : ks.indexOf(String(kn.kat).toLowerCase());
     if (i < 0) return { ok: false, grund: 'ausserhalb', text: `${name}: „${ov0}" ist in der Tabelle des Ausschusses nicht geführt` };
     if (j < 0) return { ok: false, grund: 'norm_unbekannt', text: `${name}: Normmerkmal „${nw.roh}" ist der Tabelle nicht zuzuordnen` };
+    /* v3015 · Zellen, die der Ausschuss offensichtlich fehlerhaft gedruckt hat (Kreis Unna, Keller RH:
+       Zeile „vorhanden" vertauscht) → kein Wert mit Rueckfrage, nie still korrigiert. */
+    const zwz = (m.zweifel_zellen || []).find((z) => String(z.objekt).toLowerCase() === ks[i] && String(z.norm).toLowerCase() === ks[j]);
+    if (zwz) return { ok: false, grund: 'zweifel', text: `${name}: der amtliche Koeffizient für ${m.kategorien[i]} gegen Norm ${m.kategorien[j]} ist offensichtlich fehlerhaft gedruckt (${zwz.grund || 'Rückfrage beim Ausschuss'})` };
     const uk = (m.werte[i] || [])[j];
     if (uk == null) return { ok: false, grund: 'ausserhalb', text: `${name}: kein Koeffizient für ${m.kategorien[i]} gegen ${m.kategorien[j]}` };
     return { ok: true, uk: Number(uk), objekt: m.kategorien[i], norm: m.kategorien[j],
-      text: `${name}: ${m.kategorien[i]} gegen Norm ${m.kategorien[j]} → ${de(uk)}` };
+      text: `${name}: ${m.kategorien[i]} gegen Norm ${m.kategorien[j]} → ${de(uk)}${bedText}` };
   }
 
   let ukO, ukN, oTxt, nTxt;
@@ -366,28 +625,72 @@ export function merkmalFaktor(m, objekt, roh, satzNorm) {
   }
   const uk = ukO / ukN;
   return { ok: true, uk, uk_objekt: ukO, uk_norm: ukN, objekt: oTxt, norm: nTxt,
-    text: ukN === 1 ? `${name}: ${oTxt} (Norm ${nTxt}) → ${de(ukO)}`
-      : `${name}: ${oTxt} gegen Norm ${nTxt} → ${de(ukO)} / ${de(ukN)} = ${de(uk, 4)}` };
+    text: (ukN === 1 ? `${name}: ${oTxt} (Norm ${nTxt}) → ${de(ukO)}`
+      : `${name}: ${oTxt} gegen Norm ${nTxt} → ${de(ukO)} / ${de(ukN)} = ${de(uk, 4)}`) + bedText };
 }
 
 /** Nur die Umrechnung (ohne Flaeche), fuer Pruefer und Rechner. */
 export function umrechnen(satz, irwWert, objekt, roh = null) {
   const f = satz.formel || {};
   const faktoren = [], fehler = [];
+  const ctx = { jahr: Number(satz.jahrgang) || null, roh };
   for (const m of f.merkmale || []) {
-    const r = merkmalFaktor(m, objekt, roh, f.normobjekt);
+    const r = merkmalFaktor(m, objekt, roh, f.normobjekt, ctx);
     /* v2660 · `eingabe` und `name` reisen mit: der Bericht nennt, WELCHE Angabe fehlt und wo sie einzutragen ist */
     if (!r.ok) { fehler.push({ id: m.id, name: m.name || m.id, eingabe: m.eingabe, grund: r.grund, text: r.text }); continue; }
     faktoren.push({ id: m.id, name: m.name || m.id, art: m.art, objekt: r.objekt, norm: r.norm, uk: r.uk, uk_objekt: r.uk_objekt, uk_norm: r.uk_norm, text: r.text });
   }
-  if (fehler.length) return { ok: false, fehler };
-  /* Additives Berechnungsverfahren (BRECHV 1) gibt es im Datenmodell; im
-     Register heute nur multiplikativ. Additiv wird nicht still multipliziert. */
-  if ((f.verknuepfung || 'multiplikativ') !== 'multiplikativ') {
-    return { ok: false, fehler: [{ id: '*', grund: 'form', text: 'additive Verknüpfung ist nicht umgesetzt' }] };
+  /* v3015 · Zuschlaege in €/m² nach der Multiplikation (Bergisch Gladbach: „Summe =
+     vorlaeufiger Vergleichswert"): Betrag × (Objekt − Richtwertobjekt), nur innerhalb von/bis. */
+  const zuschlaege = [];
+  for (const z of f.zuschlaege_eur_qm || []) {
+    const name = z.name || z.id;
+    const xo = num(eingabeWert(z.eingabe, z, objekt, ctx));
+    const nw = normWert(z, roh, f.normobjekt);
+    const xn = nw ? num(nw.wert) : null;
+    if (xo == null) { fehler.push({ id: z.id, name, eingabe: z.eingabe, grund: 'merkmal_fehlt', text: `${name}: Angabe zum Objekt fehlt (${EINGABEN[z.eingabe] || z.eingabe})` }); continue; }
+    if (xn == null) { fehler.push({ id: z.id, name, eingabe: z.eingabe, grund: 'norm_unbekannt', text: `${name}: das Normobjekt der Zone führt dieses Merkmal nicht als Zahl` }); continue; }
+    if ((z.von != null && xo < z.von) || (z.bis != null && xo > z.bis)) { fehler.push({ id: z.id, name, eingabe: z.eingabe, grund: 'ausserhalb', text: `${name}: ${xo} liegt außerhalb des Geltungsbereichs des Ausschusses (${z.von ?? '…'}–${z.bis ?? '…'})` }); continue; }
+    const eurQm = Number(z.eur_je_einheit) * (xo - xn);
+    zuschlaege.push({ id: z.id, name, objekt: xo, norm: xn, eur_qm: eurQm,
+      text: `${name}: ${de(Number(z.eur_je_einheit), 2)} €/m² × (${xo} − ${xn}) = ${de(eurQm, 2)} €/m²` });
   }
-  const prod = faktoren.reduce((a, x) => a * x.uk, 1);
-  return { ok: true, faktoren, produkt: prod, wert_qm: irwWert * prod };
+  if (fehler.length) return { ok: false, fehler };
+  /* v3015 · Verknuepfung nach dem Dokument des Ausschusses.
+     multiplikativ  IRW × Π UKᵢ
+     additiv        IRW × (1 + Σ (UKᵢ − 1)) — „Ausgehend vom Normobjekt … addiert bzw. subtrahiert"
+                    (Borken, Warendorf, Dortmund u. a.). Liegt das Normobjekt der Zone nicht auf dem
+                    Normobjekt der Tabelle (UK(Norm) ≠ 1), wird dieselbe Formel auf Objekt und
+                    Zonennorm angewandt und ins Verhaeltnis gesetzt:
+                    IRW × (1 + Σ (UKᵢ(Objekt) − 1)) / (1 + Σ (UKᵢ(Norm) − 1)).
+                    Bei UK(Norm) = 1 ist das genau die Formel des Dokuments.
+                    Matrizen (Richtwert × Objekt) sind schon auf die Zone bezogen: Beitrag UK − 1. */
+  const verk = f.verknuepfung || 'multiplikativ';
+  let prod, summeObjekt = null, summeNorm = null;
+  let prodRoh = null;
+  if (verk === 'multiplikativ') {
+    prod = faktoren.reduce((a, x) => a * x.uk, 1);
+    /* v3015 · Rundung des Gesamtfaktors, wo das Dokument sie vorgibt (Rhein-Erft, Euskirchen, Kreis Dueren:
+       „Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von 1,17“, dann IRW × 1,17). */
+    if (f.rundung_produkt != null) { prodRoh = prod; prod = Math.round(prod * 10 ** f.rundung_produkt) / 10 ** f.rundung_produkt; }
+  }
+  else if (verk === 'additiv') {
+    summeObjekt = 0; summeNorm = 0;
+    for (const x of faktoren) {
+      if (x.uk_objekt != null && x.uk_norm != null) { summeObjekt += x.uk_objekt - 1; summeNorm += x.uk_norm - 1; x.zuschlag = x.uk_objekt - 1; x.zuschlag_norm = x.uk_norm - 1; }
+      else { summeObjekt += x.uk - 1; x.zuschlag = x.uk - 1; x.zuschlag_norm = 0; }
+    }
+    prod = (1 + summeObjekt) / (1 + summeNorm);
+  } else {
+    return { ok: false, fehler: [{ id: '*', grund: 'form', text: `Verknüpfung „${verk}" ist nicht umgesetzt` }] };
+  }
+  let wert = irwWert * prod;
+  const summeEur = zuschlaege.reduce((a, z) => a + z.eur_qm, 0);
+  wert += summeEur;
+  let gerundet = null;
+  if (f.rundung_eur_qm) { gerundet = Math.round(wert / f.rundung_eur_qm) * f.rundung_eur_qm; }
+  return { ok: true, faktoren, produkt: prod, produkt_ungerundet: prodRoh, verknuepfung: verk, summe_objekt: summeObjekt, summe_norm: summeNorm,
+    zuschlaege, summe_zuschlaege_eur_qm: summeEur, wert_qm_ungerundet: wert, wert_qm: gerundet != null ? gerundet : wert };
 }
 
 const GRUND_TEXT = {
@@ -455,8 +758,21 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
   const wertQm = u.wert_qm;
   const vorl = wertQm * wfl;
   const rechenweg = [{ pos: 'Immobilienrichtwert der Zone', detail: `${irw.zonennummer ? 'Zone ' + irw.zonennummer + ', ' : ''}Stichtag ${irw.stichtag || '?'}`, wert: Number(irw.wert_qm), einheit: '€/m²' }];
-  for (const x of u.faktoren) rechenweg.push({ pos: `× ${x.name}`, detail: x.text, faktor: r3(x.uk) });
-  rechenweg.push({ pos: '= angepasster Richtwert', detail: `Produkt der Koeffizienten ${de(u.produkt, 4)}`, wert: Math.round(wertQm * 100) / 100, einheit: '€/m²' });
+  if (u.verknuepfung === 'additiv') {
+    /* v3015 · additiv: jede Zeile ist ein Zu-/Abschlag in Prozent des Richtwerts */
+    for (const x of u.faktoren) {
+      const p = (x.zuschlag - (x.zuschlag_norm || 0)) * 100;
+      rechenweg.push({ pos: `${p < 0 ? '−' : '+'} ${x.name}`, detail: x.text + (x.zuschlag_norm ? ` (Zonennorm ${de(x.zuschlag_norm * 100, 1)} %)` : ''), zuschlag_prozent: Math.round(p * 10) / 10 });
+    }
+    const nTxt = u.summe_norm ? ` / (1 ${u.summe_norm < 0 ? '−' : '+'} ${de(Math.abs(u.summe_norm), 3)} Zonennorm)` : '';
+    rechenweg.push({ pos: '= angepasster Richtwert', detail: `additive Verknüpfung nach dem Ausschuss: Richtwert × (1 ${u.summe_objekt < 0 ? '−' : '+'} ${de(Math.abs(u.summe_objekt), 3)})${nTxt} = × ${de(u.produkt, 4)}`, wert: Math.round((Number(irw.wert_qm) * u.produkt) * 100) / 100, einheit: '€/m²' });
+  } else {
+    for (const x of u.faktoren) rechenweg.push({ pos: `× ${x.name}`, detail: x.text, faktor: r3(x.uk) });
+    rechenweg.push({ pos: u.zuschlaege.length ? '= Richtwert nach Koeffizienten' : '= angepasster Richtwert', detail: u.produkt_ungerundet != null ? `Produkt der Koeffizienten ${de(u.produkt_ungerundet, 4)}, gerundet auf ${de(u.produkt, f.rundung_produkt)} wie im Anwendungsbeispiel des Ausschusses` : `Produkt der Koeffizienten ${de(u.produkt, 4)}`, wert: Math.round((Number(irw.wert_qm) * u.produkt) * 100) / 100, einheit: '€/m²' });
+  }
+  for (const z of u.zuschlaege) rechenweg.push({ pos: `${z.eur_qm < 0 ? '−' : '+'} ${z.name}`, detail: z.text, wert: Math.round(z.eur_qm * 100) / 100, einheit: '€/m²' });
+  if (u.zuschlaege.length) rechenweg.push({ pos: '= angepasster Richtwert', detail: 'Summe nach dem Modell des Ausschusses', wert: Math.round(u.wert_qm_ungerundet * 100) / 100, einheit: '€/m²' });
+  if (f.rundung_eur_qm && u.wert_qm !== u.wert_qm_ungerundet) rechenweg.push({ pos: '= gerundet', detail: `auf ${f.rundung_eur_qm} €/m² wie im Anwendungsbeispiel des Ausschusses`, wert: u.wert_qm, einheit: '€/m²' });
   rechenweg.push({ pos: '× Wohnfläche', detail: `${de(wfl, 2)} m²`, wert: Math.round(vorl), einheit: '€' });
 
   const bogListe = (Array.isArray(bog) ? bog : []).filter((b) => b && Number.isFinite(Number(b.eur)) && Number(b.eur) !== 0);
@@ -529,6 +845,7 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
     vergleichswert_eur: Math.round(vw),
     faktoren: u.faktoren.map((x) => ({ ...x, uk: r3(x.uk) })),
     produkt: u.produkt,
+    verknuepfung: u.verknuepfung,   /* v3015: multiplikativ | additiv */
     rechenweg,
     stellplaetze_im_irw: f.stellplaetze_im_irw ?? null,
     garage_normobjekt: garage,   /* v2670: abzug | kein_betrag | angabe_fehlt | wie_norm | null */
@@ -678,7 +995,16 @@ export function objektAusRef(ref = {}, { bodenrichtwert = null } = {}) {
 export function pruefeBeispiel(satz) {
   const b = satz.anwendungsbeispiel;
   if (!b) return null;
-  const u = umrechnen(satz, Number(b.irw), b.objekt || {}, b.norm_zone || null);
+  /* v3015 · b.merkmale_ersatz: rechnet das amtliche Beispiel nachweislich mit einer anderen (der
+     Vorjahres-)Tabelle eines Merkmals — Kreis Unna druckt im Dokument 2026 das Beispiel „Zeitpunkt
+     01.01.2025" mit der Baujahrtabelle 2025 —, wird NUR fuer die Pruefung diese Tabelle eingesetzt
+     (mit Quelle und ersatz_grund im Satz). Alle uebrigen Merkmale und die Rechenregel bleiben die des Satzes. */
+  let s2 = satz;
+  if (Array.isArray(b.merkmale_ersatz) && b.merkmale_ersatz.length) {
+    const ers = new Map(b.merkmale_ersatz.map((m) => [m.id, m]));
+    s2 = { ...satz, formel: { ...satz.formel, merkmale: satz.formel.merkmale.map((m) => (ers.has(m.id) ? { ...m, ...ers.get(m.id) } : m)) } };
+  }
+  const u = umrechnen(s2, Number(b.irw), b.objekt || {}, b.norm_zone || null);
   if (!u.ok) return { ok: false, fehler: u.fehler };
   const abw = [];
   for (const [id, soll] of Object.entries(b.faktoren || {})) {
@@ -693,4 +1019,4 @@ export function pruefeBeispiel(satz) {
   return { ok: !abw.length, abw, wert_qm: u.wert_qm, faktoren: u.faktoren.length };
 }
 
-export default { KENNZAHL, TEILMAERKTE, EINGABEN, EINGABE_ORT, objektAusRef, ladeSaetze, satzFuer, merkmalFaktor, umrechnen, vergleichswertIrw, pruefeBeispiel, gstandAusStandardstufe };
+export default { KENNZAHL, TEILMAERKTE, EINGABEN, EINGABE_ORT, objektAusRef, ladeSaetze, satzFuer, merkmalFaktor, matrixLinearBei, umrechnen, vergleichswertIrw, pruefeBeispiel, gstandAusStandardstufe };

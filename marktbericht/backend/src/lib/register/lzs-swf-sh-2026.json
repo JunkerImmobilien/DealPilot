@@ -1,0 +1,268 @@
+[
+ {
+  "land_code": "SH",
+  "ags": "01062",
+  "ebene": "kreis",
+  "gebiet_name": "Stormarn, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser (Mietobjekte)",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht kostenfrei abrufbar (Deckblatt: Gebühr 60,00 €); Wiedergabe nur mit Erlaubnis",
+  "bestell_url": "mailto:ga@kreis-stormarn.de",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Deckblatt S. 1 (Gebühr, Kontakt) und Fußzeile jeder Seite (Schutzvermerk), am 27.10.2026 per curl/pdftotext gelesen",
+  "formel": null,
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert": 3.33,
+   "einheit": "Prozent",
+   "spanne": [
+    2.85,
+    4
+   ],
+   "fallzahl": 7,
+   "seite": 42,
+   "hinweis": "vorgemerkt, nicht gerechnet (Sperre): Mittelwert LZS Kreis 3,33 %"
+  },
+  "korrekturen": [],
+  "modellansaetze": null,
+  "modellansaetze_vorgemerkt": {
+   "gnd_jahre": 80,
+   "rnd_mittel_jahre": 68,
+   "bodenwert": "Bodenrichtwerte für Mehrfamilienhausbauplätze",
+   "ableitung": "rekursiv nach der Formel von Simon & Reinhold (S. 42)",
+   "mieten": "tatsächliche Mieten (S. 42)",
+   "bewirtschaftungskosten": "nach den Vorgaben der ImmoWertV unter Berücksichtigung der üblichen Betriebskosten und Instandhaltungsaufwendungen (S. 42 f.)",
+   "ausweisung": "Zinsspanne und Durchschnittswert für den gesamten Kreis Stormarn (S. 42)"
+  },
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fundstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.4.1 Liegenschaftszinssätze für Mehrfamilienhäuser (Mietobjekte), S. 42",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   },
+   {
+    "art": "lizenz",
+    "fundstelle": "Fußzeile jeder Seite: „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“; Deckblatt S. 1: „GEBÜHR: 60,00 €“",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 7,
+  "streuung": "2,85 – 4,0 %",
+  "stichtag": null,
+  "stichtag_hinweis": "Grundstücksmarktbericht Stand 01.01.2025, Kauffälle 2023 und 2024 (Teil 2 veröffentlicht Mai 2026)",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Stormarn Stand 01.01.2025 (Teil 2)",
+  "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf",
+  "quelle_parser": "v3014-hand (Marktbericht2024_Teil2.pdf per curl/pdftotext -layout gelesen, 27.10.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; jede Seite trägt den Vermerk „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“ — eine Erlaubnis zur Wiedergabe steht nicht darin",
+  "lizenz_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.4.1 Liegenschaftszinssätze für Mehrfamilienhäuser (Mietobjekte), S. 42",
+  "seite": 42,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht des Kreises Stormarn (Stand 01.01.2025, Zweiter Teil, Mai 2026, frei: https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf) führt in Kap. 6.4.1 (S. 42) einen Liegenschaftszinssatz für Mehrfamilienhäuser: Mittelwert für den gesamten Kreis 3,33 %, Spanne 2,85 bis 4,0 %, 7 ausgewertete Fälle; Modell GND 80 Jahre, mittlere Restnutzungserwartung 68 Jahre, tatsächliche Mieten, Bodenwert aus den Bodenrichtwerten für Mehrfamilienhausbauplätze. GESPERRT WIRD WEGEN DER LIZENZ, nicht wegen der Verfügbarkeit: der Bericht ist frei abrufbar, aber jede Seite trägt „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“, und eine Erlaubnis zur Wiedergabe steht im Dokument nicht (das Deckblatt nennt außerdem eine Gebühr von 60,00 € nach der Gebührensatzung vom 12.12.2025). Kostenfreier Zugang ist keine Lizenz. Der Wert ist unter formel_vorgemerkt hinterlegt; mit der Erlaubnis des Ausschusses (ga@kreis-stormarn.de) ist die Übernahme ein Arbeitsgang. WEG: Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": null,
+  "vollstaendig": false
+ },
+ {
+  "land_code": "SH",
+  "ags": "01062",
+  "ebene": "kreis",
+  "gebiet_name": "Stormarn, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ggg",
+  "objektart_bez": "Wohn- und Geschäftshäuser",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht kostenfrei abrufbar (Deckblatt: Gebühr 60,00 €); Wiedergabe nur mit Erlaubnis",
+  "bestell_url": "mailto:ga@kreis-stormarn.de",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Deckblatt S. 1 (Gebühr, Kontakt) und Fußzeile jeder Seite (Schutzvermerk), am 27.10.2026 per curl/pdftotext gelesen",
+  "formel": null,
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert": 3.16,
+   "einheit": "Prozent",
+   "spanne": [
+    2.64,
+    3.6
+   ],
+   "fallzahl": 4,
+   "seite": 43,
+   "hinweis": "vorgemerkt, nicht gerechnet (Sperre): Mittelwert LZS Kreis 3,16 %; der Ausschuss schränkt die Aussagekraft selbst ein (nur 4 Fälle, besonders ertragsreiche Objekte)"
+  },
+  "korrekturen": [],
+  "modellansaetze": null,
+  "modellansaetze_vorgemerkt": {
+   "gnd_jahre": 80,
+   "rnd_mittel_jahre": 31,
+   "bodenwert": "Bodenrichtwerte für Wohn- und Geschäftshausbauplätze",
+   "ableitung": "rekursiv nach der Formel von Simon & Reinhold (S. 42)",
+   "mieten": "tatsächliche Mieten (S. 42)",
+   "bewirtschaftungskosten": "nach den Vorgaben der ImmoWertV unter Berücksichtigung der üblichen Betriebskosten und Instandhaltungsaufwendungen (S. 42 f.)",
+   "ausweisung": "Zinsspanne und Durchschnittswert für den gesamten Kreis Stormarn (S. 42)"
+  },
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fundstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.4.2 Liegenschaftszinssätze für Wohn- und Geschäftshäuser, S. 43",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   },
+   {
+    "art": "lizenz",
+    "fundstelle": "Fußzeile jeder Seite: „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“; Deckblatt S. 1: „GEBÜHR: 60,00 €“",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 4,
+  "streuung": "2,64 – 3,60 %",
+  "stichtag": null,
+  "stichtag_hinweis": "Grundstücksmarktbericht Stand 01.01.2025, Kauffälle 2023 und 2024 (Teil 2 veröffentlicht Mai 2026)",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Stormarn Stand 01.01.2025 (Teil 2)",
+  "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf",
+  "quelle_parser": "v3014-hand (Marktbericht2024_Teil2.pdf per curl/pdftotext -layout gelesen, 27.10.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; jede Seite trägt den Vermerk „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“ — eine Erlaubnis zur Wiedergabe steht nicht darin",
+  "lizenz_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.4.2 Liegenschaftszinssätze für Wohn- und Geschäftshäuser, S. 43",
+  "seite": 43,
+  "auflagen": null,
+  "warum_kein_wert": "Kap. 6.4.2 (S. 43) führt für Wohn- und Geschäftshäuser 3,16 % (Spanne 2,64 bis 3,60 %, 4 Fälle; GND 80 Jahre, mittlere Restnutzungserwartung 31 Jahre). Der Ausschuss schreibt selbst, dass die statistische Aussagekraft wegen der vier Fälle eingeschränkt ist und es sich um besonders ertragsreiche Objekte handelt — auch mit Erlaubnis gehört der Satz deshalb auf Stufe B, nicht A. GESPERRT WIRD WEGEN DER LIZENZ, nicht wegen der Verfügbarkeit: der Bericht ist frei abrufbar, aber jede Seite trägt „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“, und eine Erlaubnis zur Wiedergabe steht im Dokument nicht (das Deckblatt nennt außerdem eine Gebühr von 60,00 € nach der Gebührensatzung vom 12.12.2025). Kostenfreier Zugang ist keine Lizenz. Der Wert ist unter formel_vorgemerkt hinterlegt; mit der Erlaubnis des Ausschusses (ga@kreis-stormarn.de) ist die Übernahme ein Arbeitsgang. WEG: Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": null,
+  "vollstaendig": false
+ },
+ {
+  "land_code": "SH",
+  "ags": "01062",
+  "ebene": "kreis",
+  "gebiet_name": "Stormarn, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "gewerbe",
+  "objektart_bez": "Gewerbeobjekte (Büro, Werkstatt, Lager; ohne Sondernutzungen)",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht kostenfrei abrufbar (Deckblatt: Gebühr 60,00 €); Wiedergabe nur mit Erlaubnis",
+  "bestell_url": "mailto:ga@kreis-stormarn.de",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Deckblatt S. 1 (Gebühr, Kontakt) und Fußzeile jeder Seite (Schutzvermerk), am 27.10.2026 per curl/pdftotext gelesen",
+  "formel": null,
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert": 5.6,
+   "einheit": "Prozent",
+   "spanne": [
+    5,
+    6
+   ],
+   "fallzahl": 18,
+   "seite": 43,
+   "hinweis": "vorgemerkt, nicht gerechnet (Sperre): Mittelwert LZS Kreis 5,6 %"
+  },
+  "korrekturen": [],
+  "modellansaetze": null,
+  "modellansaetze_vorgemerkt": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "GND je Gebäudeart (Büro, Werkstatt, Lagerhalle o. Ä.) marktüblich angesetzt, keine Zahl im Dokument",
+   "rnd_mittel_jahre": 26,
+   "objekte": "vorrangig in ausgewiesenen Gewerbegebieten; Büro- und Lagerflächen dominieren; Verbrauchermärkte nicht untersucht",
+   "ableitung": "rekursiv nach der Formel von Simon & Reinhold (S. 42)",
+   "mieten": "tatsächliche Mieten (S. 42)",
+   "bewirtschaftungskosten": "nach den Vorgaben der ImmoWertV unter Berücksichtigung der üblichen Betriebskosten und Instandhaltungsaufwendungen (S. 42 f.)",
+   "ausweisung": "Zinsspanne und Durchschnittswert für den gesamten Kreis Stormarn (S. 42)"
+  },
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fundstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.4.3 Liegenschaftszinssätze für Gewerbeobjekte, S. 43",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   },
+   {
+    "art": "lizenz",
+    "fundstelle": "Fußzeile jeder Seite: „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“; Deckblatt S. 1: „GEBÜHR: 60,00 €“",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 18,
+  "streuung": "5,00 – 6,00 %",
+  "stichtag": null,
+  "stichtag_hinweis": "Grundstücksmarktbericht Stand 01.01.2025, Kauffälle 2023 und 2024 (Teil 2 veröffentlicht Mai 2026)",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Stormarn Stand 01.01.2025 (Teil 2)",
+  "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf",
+  "quelle_parser": "v3014-hand (Marktbericht2024_Teil2.pdf per curl/pdftotext -layout gelesen, 27.10.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; jede Seite trägt den Vermerk „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“ — eine Erlaubnis zur Wiedergabe steht nicht darin",
+  "lizenz_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.4.3 Liegenschaftszinssätze für Gewerbeobjekte, S. 43",
+  "seite": 43,
+  "auflagen": null,
+  "warum_kein_wert": "Kap. 6.4.3 (S. 43) führt für Gewerbeobjekte 5,6 % (Spanne 5,00 bis 6,00 %, 18 Fälle, mittlere Restnutzungserwartung 26 Jahre; vorrangig Objekte in Gewerbegebieten, Büro- und Lagerflächen; Sondernutzungen wie Verbrauchermärkte nicht untersucht). Die Gesamtnutzungsdauer ist je Gebäudeart angesetzt und im Dokument nicht beziffert — auch mit Erlaubnis müsste sie für eine modellkonforme Anwendung beim Ausschuss erfragt werden. GESPERRT WIRD WEGEN DER LIZENZ, nicht wegen der Verfügbarkeit: der Bericht ist frei abrufbar, aber jede Seite trägt „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“, und eine Erlaubnis zur Wiedergabe steht im Dokument nicht (das Deckblatt nennt außerdem eine Gebühr von 60,00 € nach der Gebührensatzung vom 12.12.2025). Kostenfreier Zugang ist keine Lizenz. Der Wert ist unter formel_vorgemerkt hinterlegt; mit der Erlaubnis des Ausschusses (ga@kreis-stormarn.de) ist die Übernahme ein Arbeitsgang. WEG: Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": null,
+  "vollstaendig": false
+ },
+ {
+  "land_code": "SH",
+  "ags": "01062",
+  "ebene": "kreis",
+  "gebiet_name": "Stormarn, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser",
+  "zugang": "nicht veröffentlicht",
+  "gebuehr": null,
+  "bestell_url": "mailto:ga@kreis-stormarn.de",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Deckblatt S. 1 (Gebühr, Kontakt) und Fußzeile jeder Seite (Schutzvermerk), am 27.10.2026 per curl/pdftotext gelesen",
+  "formel": null,
+  "formel_vorgemerkt": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "modellansaetze_vorgemerkt": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fundstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.1 Vorbemerkungen (S. 31) und Kap. 6.4 (S. 42–43)",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   },
+   {
+    "art": "lizenz",
+    "fundstelle": "Fußzeile jeder Seite: „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“; Deckblatt S. 1: „GEBÜHR: 60,00 €“",
+    "url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Grundstücksmarktbericht Stand 01.01.2025, Kauffälle 2023 und 2024 (Teil 2 veröffentlicht Mai 2026)",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Stormarn Stand 01.01.2025 (Teil 2)",
+  "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf",
+  "quelle_parser": "v3014-hand (Marktbericht2024_Teil2.pdf per curl/pdftotext -layout gelesen, 27.10.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; jede Seite trägt den Vermerk „Vervielfältigung, Umarbeitung und Veröffentlichung gesetzlich geschützt“ — eine Erlaubnis zur Wiedergabe steht nicht darin",
+  "lizenz_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Stormarn (Stand 01.01.2025), Zweiter Teil, Kap. 6.1 Vorbemerkungen (S. 31) und Kap. 6.4 (S. 42–43)",
+  "seite": 31,
+  "auflagen": null,
+  "warum_kein_wert": "Die Vorbemerkung (Kap. 6.1, S. 31) sagt, der Ausschuss habe „Liegenschaftszinsen für Ein- und Zweifamilienhäuser, Mehrfamilienhäuser und Gewerbeobjekte“ abgeleitet — abgedruckt sind in Kap. 6.4 (S. 42–43) aber nur Mehrfamilienhäuser, Wohn- und Geschäftshäuser und Gewerbeobjekte. Für Ein- und Zweifamilienhäuser steht im Bericht keine Zahl; ob es sie gibt, kann nur der Ausschuss sagen. WEG: Gutachterausschuss für Grundstückswerte im Kreis Stormarn, Geschäftsstelle, Mommsenstraße 14, 23843 Bad Oldesloe, Tel. 04531 160-1485, ga@kreis-stormarn.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": null,
+  "vollstaendig": false
+ }
+]

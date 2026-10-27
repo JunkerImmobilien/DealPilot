@@ -11,7 +11,7 @@
     "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, Textlayer pdftotext -layout zum Abgleich, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "ags": "05978",
     "gasl": "33200",
     "gebiet_name": "Kreis Unna",
@@ -25,11 +25,302 @@
       "gemeinden": "Kreis Unna: Bergkamen, Bönen, Fröndenberg/Ruhr, Holzwickede, Kamen, Lünen, Schwerte, Selm, Unna, Werne",
       "hinweis": "Richtwerte gelten für mittlere Wohnlage der jeweiligen Zone (alle Zonen WHNLA 5); nur Weiterverkäufe."
     },
-    "warum_kein_wert": "Der Ausschuss veröffentlicht die numerischen Merkmale (BJ, WHNFL, ANZEGEB) als Matrix Richtwertobjekt × Bewertungsobjekt auf Stützstellen und schreibt vor: „Zwischen den Tabellenwerten kann interpoliert werden.“ Sein Anwendungsbeispiel interpoliert in BEIDEN Richtungen (Zonen-Norm und Objekt). Die Normobjekte der Zonen liegen meist zwischen den Stützstellen (auf einer Stützstelle: BJ 18/178, WHNFL 19/178, ANZEGEB 44/178). Der Kern kennt die Matrix nur für Kategorien ohne Interpolation; eine Kurve aus einer Zeile gäbe die gedruckten Zellen nur auf ±0,01 wieder. Fehlende Rechenform: matrix_linear (bilineare Interpolation in einer numerischen Matrix, keine Extrapolation). Alles Übrige steht vollständig unter formel_vorgemerkt.",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (5 Seiten): S. 1 Hinweise (nur Weiterverkäufe, „beinhalten keine Nebengebäude (Garage, Schuppen etc.)“, „nur innerhalb des Modells des Gutachterausschusses mit seinen entsprechenden Umrechnungstabellen zu verwenden“), Datengrundlage (2.132 Kauffälle 2018–2024, mittlere Wohnlage), S. 2 Preisindex und Baujahrmatrix, S. 3 Wohnfläche, Wohneinheiten, Ausstattung, S. 4 Mietsituation, Modernisierungstyp, Geschosslage, Balkon/Terrasse, S. 5 Berechnungsbeispiel, Garagen-Zeitwert.",
+      "Druckabweichung: Beispiel S. 5 Baujahr 1980 → 1990 = 1,09, Matrix S. 2 = 1,08 (siehe formel_vorgemerkt.anwendungsbeispiel.zweifel).",
+      "Kein Wert, weil die Rechenform für numerische Matrizen mit Interpolation im Kern fehlt. Tabellen vollständig übernommen; die großen Matrizen über den Textlayer gelesen und an den Seitenbildern abgeglichen (Diagonale 1,00 und Verhältnis-Konsistenz geprüft), das Anwendungsbeispiel bilinear nachgerechnet.",
+      "v3015: Die Druckabweichungen beim Baujahr im Beispiel sind keine: das Beispiel (Zeitpunkt 01.01.2025) rechnet mit der Baujahrtabelle 2025 (https://www.boris.nrw.de/borisfachdaten/lgd/irw/2025/LGDIR_1_0533200_2025.pdf); mit ihr trifft es exakt."
+    ],
+    "seite": "S. 1–5",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0533200_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "brechv": 2,
+      "rundung_uk": 2,
+      "normbezug": "Matrix Richtwertobjekt × Bewertungsobjekt",
+      "kaufpreise": "2018–2024, indiziert auf 01.01.2026"
+    },
+    "anwendungsbeispiel": {
+      "seite": "S. 5",
+      "irw": 1790,
+      "norm_zone": {
+        "BJ": "1980",
+        "WHNFL": "100",
+        "ANZEGEB": "4",
+        "AKL": "mittel",
+        "GESLA": "88",
+        "MIETS": "1",
+        "MTYP": "1",
+        "BK": "1"
+      },
+      "objekt": {
+        "baujahr": 1990,
+        "wohnflaeche": 100,
+        "einheiten": 7,
+        "standardstufe": "einfach",
+        "geschoss": 77,
+        "vermietet": true,
+        "mtyp": 2,
+        "balkon": false
+      },
+      "faktoren": {
+        "baujahr": 1.09,
+        "wohnflaeche": 1,
+        "wohneinheiten": 0.98,
+        "ausstattung": 0.89,
+        "geschosslage": 0.92,
+        "mietsituation": 0.9,
+        "modernisierungstyp": 1.08,
+        "balkon": 0.96,
+        "preisindex": 1
+      },
+      "faktor_gedruckt": 0.82,
+      "ergebnis_eur_qm": 1468,
+      "toleranz_eur_qm": 0.5,
+      "wohnflaeche": 100,
+      "ergebnis_eur": 147000,
+      "wortlaut": "Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von: 0,82 · angepasster Immobilienrichtwert 1.790 €/m² x 0,82 = 1.468 €/m² · vorläufiger Vergleichswert 100 m² x 1.468 €/m² = rd. 147.000 €",
+      "merkmale_ersatz": [
+        {
+          "id": "baujahr",
+          "zeilen_norm": [
+            2015,
+            2010,
+            2000,
+            1990,
+            1980,
+            1970,
+            1960,
+            1950,
+            1940,
+            1930,
+            1920,
+            1910,
+            1900
+          ],
+          "spalten_objekt": [
+            2020,
+            2010,
+            2000,
+            1990,
+            1980,
+            1970,
+            1960,
+            1950,
+            1940,
+            1930,
+            1920,
+            1910,
+            1900
+          ],
+          "werte": [
+            [
+              1.05,
+              0.95,
+              0.86,
+              0.78,
+              0.72,
+              0.67,
+              0.65,
+              0.64,
+              0.63,
+              0.64,
+              0.66,
+              0.69,
+              0.74
+            ],
+            [
+              1.11,
+              1,
+              0.9,
+              0.82,
+              0.75,
+              0.71,
+              0.68,
+              0.67,
+              0.66,
+              0.67,
+              0.69,
+              0.72,
+              0.77
+            ],
+            [
+              1.22,
+              1.11,
+              1,
+              0.9,
+              0.83,
+              0.78,
+              0.75,
+              0.74,
+              0.74,
+              0.74,
+              0.76,
+              0.8,
+              0.86
+            ],
+            [
+              1.35,
+              1.22,
+              1.11,
+              1,
+              0.92,
+              0.87,
+              0.83,
+              0.82,
+              0.81,
+              0.82,
+              0.85,
+              0.89,
+              0.95
+            ],
+            [
+              1.47,
+              1.33,
+              1.2,
+              1.09,
+              1,
+              0.94,
+              0.91,
+              0.89,
+              0.88,
+              0.89,
+              0.92,
+              0.96,
+              1.03
+            ],
+            [
+              1.56,
+              1.41,
+              1.27,
+              1.15,
+              1.06,
+              1,
+              0.96,
+              0.94,
+              0.94,
+              0.95,
+              0.97,
+              1.02,
+              1.09
+            ],
+            [
+              1.62,
+              1.47,
+              1.33,
+              1.2,
+              1.1,
+              1.04,
+              1,
+              0.98,
+              0.97,
+              0.99,
+              1.01,
+              1.06,
+              1.14
+            ],
+            [
+              1.65,
+              1.5,
+              1.35,
+              1.22,
+              1.13,
+              1.06,
+              1.02,
+              1,
+              1,
+              1.01,
+              1.04,
+              1.08,
+              1.16
+            ],
+            [
+              1.66,
+              1.5,
+              1.36,
+              1.23,
+              1.13,
+              1.07,
+              1.03,
+              1,
+              1,
+              1.01,
+              1.04,
+              1.09,
+              1.17
+            ],
+            [
+              1.64,
+              1.49,
+              1.34,
+              1.22,
+              1.12,
+              1.06,
+              1.01,
+              0.99,
+              0.99,
+              1,
+              1.03,
+              1.08,
+              1.15
+            ],
+            [
+              1.6,
+              1.45,
+              1.31,
+              1.18,
+              1.09,
+              1.03,
+              0.99,
+              0.97,
+              0.96,
+              0.97,
+              1,
+              1.05,
+              1.12
+            ],
+            [
+              1.53,
+              1.38,
+              1.25,
+              1.13,
+              1.04,
+              0.98,
+              0.94,
+              0.92,
+              0.92,
+              0.93,
+              0.95,
+              1,
+              1.07
+            ],
+            [
+              1.43,
+              1.29,
+              1.17,
+              1.06,
+              0.97,
+              0.92,
+              0.88,
+              0.86,
+              0.86,
+              0.87,
+              0.89,
+              0.93,
+              1
+            ]
+          ],
+          "quelle": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2025/LGDIR_1_0533200_2025.pdf S. 2 (Baujahrtabelle „Bewertungsobjekt mit Stichtag im Jahr 2025“)"
+        }
+      ],
+      "ersatz_grund": "Das Beispiel rechnet mit „Zeitpunkt 01.01.2025“ und steht wortgleich schon im Dokument 2025. Die Baujahrtabelle hängt nach dem Dokument vom Jahr der Wertermittlung ab; das Beispiel setzt die Werte der Tabelle 2025 (1980 → 1990: 1,09; Tabelle 2026: 1,08). Für die Prüfung wird deshalb nur die Baujahrtabelle 2025 eingesetzt; alle übrigen Tabellen sind in beiden Jahrgängen gleich (Textvergleich 2025/2026).",
+      "toleranz_uk": 0.005,
+      "toleranz_grund": "Koeffizienten im Beispiel auf zwei Stellen gedruckt (interpolierte Werte, z. B. Grundstück 0,909 → 0,91); das Ergebnis je m² trifft exakt (Richtwert × gerundeter Gesamtfaktor, auf volle €/m² gerundet gedruckt)."
+    },
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "bilinear in den numerischen Matrizen (vom Ausschuss vorgesehen), Kategorien exakt",
+      "interpolation": "bilinear in den numerischen Matrizen (Vorgabe des Ausschusses S. 2), Kategorien exakt; Gesamtfaktor auf zwei Stellen gerundet (Rechenweg des Beispiels)",
       "extrapolation": false,
       "irw_lageangepasst": true,
       "stellplaetze_im_irw": false,
@@ -37,11 +328,6 @@
       "garage_zeitwert_eur_von": 2000,
       "garage_zeitwert_eur_bis": 6000,
       "garage_seite": "S. 5",
-      "vorschlag_form": "matrix_linear: Zeilen = Richtwertobjekt (numerisch), Spalten = Bewertungsobjekt (numerisch), Wert = bilineare Interpolation der gedruckten Zellen; außerhalb der Stützstellen kein Wert. Die kategorialen Merkmale stehen schon in der vorhandenen Form 'matrix' (transponiert: werte[Objekt][Norm]).",
-      "vorschlag_eingaben": {
-        "keller_art": "„tlw. vorhanden“ braucht keller_art (voll/teil/kein); keller ja/nein reicht für vorhanden/nicht vorhanden",
-        "ausstattung": "Eingabe standardstufe, Klassen siehe eingabe_klassen (der Kern bräuchte dafür klassen statt kategorien für das Objekt)"
-      },
       "zonen": {
         "anzahl": 178,
         "felder": {
@@ -54,6 +340,33 @@
           "BK": "1",
           "MIETS": "1|2",
           "WHNLA": "5"
+        }
+      },
+      "normobjekt": {
+        "herkunft": "Das Richtwertobjekt ist je Zone in BORIS-NRW beschrieben; ein kreisweites Normobjekt nennt das Dokument nicht. Normwerte kommen aus den Zonenfeldern.",
+        "felder": [
+          "BJ (Baujahr (Ursprungsbaujahr))",
+          "WHNFL (Wohnfläche (WoFlV))",
+          "ANZEGEB (Anzahl der Wohneinheiten im Gebäude)",
+          "AKL (Ausstattung)",
+          "MIETS (Mietsituation)",
+          "MTYP (Modernisierungstyp)",
+          "GESLA (Geschosslage)",
+          "BK (Balkon/Terrasse)"
+        ],
+        "zonen": {
+          "anzahl": 178,
+          "felder": {
+            "BJ": "45 Ausprägungen",
+            "WHNFL": "11 Ausprägungen",
+            "ANZEGEB": "23 Ausprägungen",
+            "AKL": "6|4|8",
+            "MTYP": "1|2",
+            "GESLA": "1|2|3|88|77",
+            "BK": "1",
+            "MIETS": "1|2",
+            "WHNLA": "5"
+          }
         }
       },
       "merkmale": [
@@ -93,7 +406,10 @@
             1910,
             1900
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte[Zeile Richtwertobjekt][Spalte Bewertungsobjekt] wie gedruckt",
+          "seite": "S. 2",
+          "hinweis": "Tabelle für Wertermittlungsjahr 2026; Zeile 2015 und Spalte 2020 ohne Gegenstück (gedruckt so)",
+          "werte": [
             [
               1.05,
               0.95,
@@ -290,9 +606,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 2",
-          "hinweis": "Tabelle für Wertermittlungsjahr 2026; Zeile 2015 und Spalte 2020 ohne Gegenstück (gedruckt so)"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "wohnflaeche",
@@ -316,7 +630,9 @@
             100,
             150
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte[Zeile Richtwertobjekt][Spalte Bewertungsobjekt] wie gedruckt",
+          "seite": "S. 3",
+          "werte": [
             [
               1,
               1.08,
@@ -366,8 +682,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 3"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "wohneinheiten",
@@ -391,7 +706,9 @@
             24,
             35
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte[Zeile Richtwertobjekt][Spalte Bewertungsobjekt] wie gedruckt",
+          "seite": "S. 3",
+          "werte": [
             [
               1,
               0.97,
@@ -441,8 +758,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 3"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "ausstattung",
@@ -474,7 +790,13 @@
           ],
           "werte_hinweis": "werte[Objekt][Norm]; gedruckt ist Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
           "seite": "S. 3",
-          "eingabe_klassen": [
+          "norm_zuordnung": {
+            "4": "gehoben",
+            "6": "mittel",
+            "8": "einfach"
+          },
+          "zuordnung_herkunft": "AKL des IRW-Datenmodells (Feld 27): 8 einfach, 6 mittel, 4 gehoben — nach dem NAMEN zugeordnet. Die Spannen weichen ab (AKL 6 = Standardkennzahl 2,8–3,2, der Ausschuss: mittel 2,4–3,0); Rückfrage, ob die Zonenkennung so gemeint ist.",
+          "klassen": [
             {
               "name": "einfach",
               "von": 1,
@@ -491,13 +813,8 @@
               "bis": 5
             }
           ],
-          "eingabe_klassen_herkunft": "Ausschuss: „einfach: Gebäudestandard 1,0 bis 2,3 · mittel: 2,4 bis 3,0 · gehoben: ab 3,1“ (Kategorien des Sachwertverfahrens); Eingabe standardstufe",
-          "norm_zuordnung": {
-            "4": "gehoben",
-            "6": "mittel",
-            "8": "einfach"
-          },
-          "zuordnung_herkunft": "AKL des IRW-Datenmodells (Feld 27): 8 einfach, 6 mittel, 4 gehoben — nach dem NAMEN zugeordnet. Die Spannen weichen ab (AKL 6 = Standardkennzahl 2,8–3,2, der Ausschuss: mittel 2,4–3,0); Rückfrage, ob die Zonenkennung so gemeint ist."
+          "klassen_herkunft": "Ausschuss: „einfach: Gebäudestandard 1,0 bis 2,3 · mittel: 2,4 bis 3,0 · gehoben: ab 3,1“ (Kategorien des Sachwertverfahrens); Eingabe standardstufe",
+          "runden": 1
         },
         {
           "id": "mietsituation",
@@ -725,69 +1042,10 @@
           "hinweis": "Basis 100 = 01.01.2019; für Wertermittlungsstichtag = Richtwertstichtag Faktor 1,00"
         }
       ],
-      "anwendungsbeispiel": {
-        "seite": "S. 5",
-        "irw": 1790,
-        "norm_zone": {
-          "BJ": "1980",
-          "WHNFL": "100",
-          "ANZEGEB": "4",
-          "AKL": "mittel",
-          "GESLA": "88",
-          "MIETS": "1",
-          "MTYP": "1",
-          "BK": "1"
-        },
-        "objekt": {
-          "baujahr": 1990,
-          "wohnflaeche": 100,
-          "einheiten": 7,
-          "standardstufe": "einfach",
-          "geschoss": 77,
-          "vermietet": true,
-          "mtyp": 2,
-          "balkon": false
-        },
-        "faktoren": {
-          "baujahr": 1.09,
-          "wohnflaeche": 1,
-          "wohneinheiten": 0.98,
-          "ausstattung": 0.89,
-          "geschosslage": 0.92,
-          "mietsituation": 0.9,
-          "modernisierungstyp": 1.08,
-          "balkon": 0.96,
-          "preisindex": 1
-        },
-        "faktor_gedruckt": 0.82,
-        "ergebnis_eur_qm": 1468,
-        "toleranz_eur_qm": 6,
-        "wohnflaeche": 100,
-        "ergebnis_eur": 147000,
-        "zweifel": [
-          {
-            "bei": "baujahr 1980 → 1990",
-            "grund": "Das Beispiel setzt 1,09, die Baujahrmatrix S. 2 (Zeile 1980, Spalte 1990) druckt 1,08. Mit 1,08 ergäbe das Produkt 0,81 statt 0,82. Vermutlich rechnet das Beispiel mit der ungerundeten Modellfunktion statt mit der gedruckten Tabelle; nicht korrigiert — Rückfrage beim Ausschuss.",
-            "seite": "S. 2 / S. 5"
-          }
-        ],
-        "wortlaut": "Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von: 0,82 · angepasster Immobilienrichtwert 1.790 €/m² x 0,82 = 1.468 €/m² · vorläufiger Vergleichswert 100 m² x 1.468 €/m² = rd. 147.000 €"
-      }
+      "rundung_produkt": 2,
+      "produkt_runden_beleg": "Berechnungsbeispiel S. 5: „Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von: 0,82“ — der Gesamtfaktor wird auf zwei Stellen gerundet und dann mit dem Richtwert multipliziert"
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (5 Seiten): S. 1 Hinweise (nur Weiterverkäufe, „beinhalten keine Nebengebäude (Garage, Schuppen etc.)“, „nur innerhalb des Modells des Gutachterausschusses mit seinen entsprechenden Umrechnungstabellen zu verwenden“), Datengrundlage (2.132 Kauffälle 2018–2024, mittlere Wohnlage), S. 2 Preisindex und Baujahrmatrix, S. 3 Wohnfläche, Wohneinheiten, Ausstattung, S. 4 Mietsituation, Modernisierungstyp, Geschosslage, Balkon/Terrasse, S. 5 Berechnungsbeispiel, Garagen-Zeitwert.",
-      "Druckabweichung: Beispiel S. 5 Baujahr 1980 → 1990 = 1,09, Matrix S. 2 = 1,08 (siehe formel_vorgemerkt.anwendungsbeispiel.zweifel).",
-      "Kein Wert, weil die Rechenform für numerische Matrizen mit Interpolation im Kern fehlt. Tabellen vollständig übernommen; die großen Matrizen über den Textlayer gelesen und an den Seitenbildern abgeglichen (Diagonale 1,00 und Verhältnis-Konsistenz geprüft), das Anwendungsbeispiel bilinear nachgerechnet."
-    ],
-    "seite": "S. 1–5",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0533200_2026.pdf",
-    "modellansaetze": {
-      "teilmarkt_code": 1,
-      "brechv": 2,
-      "rundung_uk": 2,
-      "normbezug": "Matrix Richtwertobjekt × Bewertungsobjekt",
-      "kaufpreise": "2018–2024, indiziert auf 01.01.2026"
-    }
+    "kernausbau": "v3015 Kernausbau: Matrizen Richtwertobjekt × Bewertungsobjekt bilinear interpoliert (matrix_linear, Vorgabe S. 2), Gesamtfaktor auf zwei Stellen gerundet wie im Rechenweg S. 5; Anwendungsbeispiel S. 5 am echten Kern getroffen (mit der Baujahrtabelle 2025, auf die es sich bezieht)"
   },
   {
     "land_code": "NW",
@@ -816,7 +1074,7 @@
       "gemeinden": "Kreis Unna: Bergkamen, Bönen, Fröndenberg/Ruhr, Holzwickede, Kamen, Lünen, Schwerte, Selm, Unna, Werne",
       "hinweis": "Richtwerte gelten für mittlere Wohnlage der jeweiligen Zone (alle Zonen WHNLA 5); nur Weiterverkäufe."
     },
-    "warum_kein_wert": "Der Ausschuss veröffentlicht die numerischen Merkmale (BJ, WHNFL, FLAE) als Matrix Richtwertobjekt × Bewertungsobjekt auf Stützstellen und schreibt vor: „Zwischen den Tabellenwerten kann interpoliert werden.“ Sein Anwendungsbeispiel interpoliert in BEIDEN Richtungen (Zonen-Norm und Objekt). Die Normobjekte der Zonen liegen meist zwischen den Stützstellen (auf einer Stützstelle: BJ 25/246, WHNFL 132/246, FLAE 25/246). Der Kern kennt die Matrix nur für Kategorien ohne Interpolation; eine Kurve aus einer Zeile gäbe die gedruckten Zellen nur auf ±0,01 wieder. Fehlende Rechenform: matrix_linear (bilineare Interpolation in einer numerischen Matrix, keine Extrapolation). Alles Übrige steht vollständig unter formel_vorgemerkt.",
+    "warum_kein_wert": "Das Berechnungsbeispiel (S. 5, Zeitpunkt 01.01.2025, wortgleich im Dokument 2025) ist mit den Tabellen des Ausschusses nicht nachzurechnen: es setzt für die Grundstücksfläche 465 → 500 m² den Koeffizienten 1,02 an; die Tabelle (Zeile 450: 1,02, Zeile 500: 1,00) ergibt mit der vom Ausschuss vorgesehenen Interpolation 1,014, gerundet 1,01. Mit 1,01 ergäbe der gerundete Gesamtfaktor 1,01 statt 1,02 und 2.636 statt 2.662 €/m². Die Teilmärkte ETW und RH desselben Ausschusses treffen ihr Beispiel mit derselben Rechenregel (bilinear, Gesamtfaktor auf zwei Stellen) exakt — hier nicht. Ohne getroffenes Beispiel keine Freigabe (v3015). Weg: Rückfrage beim Ausschuss (Interpolation Grundstücksfläche) oder Immobilien-Preis-Kalkulator in BORIS.NRW.",
     "formel_vorgemerkt": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
@@ -885,7 +1143,10 @@
             1910,
             1900
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
+          "seite": "S. 2",
+          "hinweis": "Tabelle für Wertermittlungsjahr 2026; Zeile 2015 und Spalte 2020 ohne Gegenstück (gedruckt so)",
+          "werte": [
             [
               1.04,
               0.96,
@@ -1082,9 +1343,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 2",
-          "hinweis": "Tabelle für Wertermittlungsjahr 2026; Zeile 2015 und Spalte 2020 ohne Gegenstück (gedruckt so)"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "wohnflaeche",
@@ -1126,7 +1385,9 @@
             230,
             260
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
+          "seite": "S. 3",
+          "werte": [
             [
               1,
               0.95,
@@ -1383,8 +1644,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 3"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "grundstuecksflaeche",
@@ -1426,7 +1686,10 @@
             1100,
             1200
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
+          "seite": "S. 3",
+          "hinweis": "nur Baulandanteil; Freizeit-/Gartenflächen sachverständig",
+          "werte": [
             [
               1,
               1.04,
@@ -1683,9 +1946,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 3",
-          "hinweis": "nur Baulandanteil; Freizeit-/Gartenflächen sachverständig"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "gebaeudeart",
@@ -1965,7 +2226,8 @@
         ],
         "rechnung_hinweis": "Der Ausschuss rundet das Produkt (1,0179) auf 1,02 und rechnet 2.610 × 1,02 = 2.662 €/m²; mit dem ungerundeten Produkt ergeben sich 2.657 €/m².",
         "wortlaut": "Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von: 1,02 · angepasster Immobilienrichtwert 2.610 €/m² x 1,02 = 2.662 €/m² · vorläufiger Vergleichswert 180 m² x 2.662 €/m² = rd. 479.000 €"
-      }
+      },
+      "rundung_produkt": 2
     },
     "belege": [
       "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt freistehende Ein- und Zweifamilienhäuser (5 Seiten): S. 1 Hinweise (nur Weiterverkäufe, „beinhalten keine Nebengebäude (Garage, Schuppen etc.)“, „nur innerhalb des Modells des Gutachterausschusses mit seinen entsprechenden Umrechnungstabellen zu verwenden“), S. 2 Datengrundlage (1.558 Kauffälle 2018–2024, mittlere Wohnlage), Preisindex, Baujahrmatrix, S. 3 Wohnfläche und Grundstücksfläche, S. 4 Gebäudeart, Ausstattung, Mietsituation, Modernisierungstyp, S. 5 Keller, Berechnungsbeispiel, Garagen-Zeitwert.",
@@ -1993,7 +2255,7 @@
     "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
     "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
     "quelle_parser": "manuell (Seitenbild des PDF, Textlayer pdftotext -layout zum Abgleich, 21.10.2026, v2680)",
-    "vollstaendig": false,
+    "vollstaendig": true,
     "ags": "05978",
     "gasl": "33200",
     "gebiet_name": "Kreis Unna",
@@ -2008,11 +2270,305 @@
       "gemeinden": "Kreis Unna: Bergkamen, Bönen, Fröndenberg/Ruhr, Holzwickede, Kamen, Lünen, Schwerte, Selm, Unna, Werne",
       "hinweis": "Richtwerte gelten für mittlere Wohnlage der jeweiligen Zone (alle Zonen WHNLA 5); nur Weiterverkäufe."
     },
-    "warum_kein_wert": "Der Ausschuss veröffentlicht die numerischen Merkmale (BJ, WHNFL, FLAE) als Matrix Richtwertobjekt × Bewertungsobjekt auf Stützstellen und schreibt vor: „Zwischen den Tabellenwerten kann interpoliert werden.“ Sein Anwendungsbeispiel interpoliert in BEIDEN Richtungen (Zonen-Norm und Objekt). Die Normobjekte der Zonen liegen meist zwischen den Stützstellen (auf einer Stützstelle: BJ 16/230, WHNFL 115/230, FLAE 23/230). Der Kern kennt die Matrix nur für Kategorien ohne Interpolation; eine Kurve aus einer Zeile gäbe die gedruckten Zellen nur auf ±0,01 wieder. Fehlende Rechenform: matrix_linear (bilineare Interpolation in einer numerischen Matrix, keine Extrapolation). Alles Übrige steht vollständig unter formel_vorgemerkt.",
-    "formel_vorgemerkt": {
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (6 Seiten): S. 1 Hinweise (nur Weiterverkäufe, „beinhalten keine Nebengebäude (Garage, Schuppen etc.)“), S. 2 Datengrundlage (2.340 Kauffälle 2018–2024), Preisindex, Baujahrmatrix, S. 3 Wohnfläche und Grundstücksfläche, S. 4 Gebäudeart, Ergänzende Gebäudeart, Ausstattung, Mietsituation, S. 5 Modernisierungstyp, Keller, S. 6 Berechnungsbeispiel, Garagen-Zeitwert.",
+      "Druckabweichungen: Beispiel S. 6 Baujahr 1990 → 1970 = 0,86, Matrix S. 2 = 0,87; Kellertabelle S. 5 Zeile „vorhanden“ vermutlich vertauscht (0,94 / 0,97).",
+      "Kein Wert, weil die Rechenform für numerische Matrizen mit Interpolation im Kern fehlt. Tabellen vollständig übernommen; die großen Matrizen über den Textlayer gelesen und an den Seitenbildern abgeglichen (Diagonale 1,00 und Verhältnis-Konsistenz geprüft), das Anwendungsbeispiel bilinear nachgerechnet.",
+      "v3015: Die Druckabweichungen beim Baujahr im Beispiel sind keine: das Beispiel (Zeitpunkt 01.01.2025) rechnet mit der Baujahrtabelle 2025 (https://www.boris.nrw.de/borisfachdaten/lgd/irw/2025/LGDIR_3_0533200_2025.pdf); mit ihr trifft es exakt."
+    ],
+    "seite": "S. 1–6",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0533200_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 3,
+      "brechv": 2,
+      "rundung_uk": 2,
+      "normbezug": "Matrix Richtwertobjekt × Bewertungsobjekt",
+      "kaufpreise": "2018–2024, indiziert auf 01.01.2026"
+    },
+    "anwendungsbeispiel": {
+      "seite": "S. 6",
+      "irw": 1850,
+      "norm_zone": {
+        "BJ": "1990",
+        "WHNFL": "130",
+        "FLAE": "520",
+        "GART": "13",
+        "EGART": "2",
+        "AKL": "einfach",
+        "MIETS": "1",
+        "MTYP": "2",
+        "KELLER": "1"
+      },
+      "objekt": {
+        "baujahr": 1970,
+        "wohnflaeche": 145,
+        "grundstuecksflaeche": 275,
+        "gebaeudeart": "zfh",
+        "anbauweise": "doppelhaushaelfte",
+        "standardstufe": "mittel",
+        "vermietet": false,
+        "mtyp": 1,
+        "keller_art": "voll"
+      },
+      "faktoren": {
+        "baujahr": 0.86,
+        "wohnflaeche": 0.94,
+        "grundstuecksflaeche": 0.91,
+        "gebaeudeart": 0.98,
+        "ergaenzende_gebaeudeart": 1,
+        "ausstattung": 1.11,
+        "mietsituation": 1,
+        "modernisierungstyp": 0.9,
+        "keller": 1,
+        "preisindex": 1
+      },
+      "faktor_gedruckt": 0.72,
+      "ergebnis_eur_qm": 1332,
+      "toleranz_eur_qm": 0.5,
+      "wohnflaeche": 145,
+      "ergebnis_eur": 193000,
+      "wortlaut": "Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von: 0,72 · angepasster Immobilienrichtwert 1.850 €/m² x 0,72 = 1.332 €/m² · vorläufiger Vergleichswert 145 m² x 1.332 €/m² = rd. 193.000 €",
+      "merkmale_ersatz": [
+        {
+          "id": "baujahr",
+          "zeilen_norm": [
+            2015,
+            2010,
+            2000,
+            1990,
+            1980,
+            1970,
+            1960,
+            1950,
+            1940,
+            1930,
+            1920,
+            1910,
+            1900
+          ],
+          "spalten_objekt": [
+            2020,
+            2010,
+            2000,
+            1990,
+            1980,
+            1970,
+            1960,
+            1950,
+            1940,
+            1930,
+            1920,
+            1910,
+            1900
+          ],
+          "werte": [
+            [
+              1.05,
+              0.95,
+              0.86,
+              0.78,
+              0.72,
+              0.68,
+              0.64,
+              0.61,
+              0.59,
+              0.57,
+              0.56,
+              0.55,
+              0.54
+            ],
+            [
+              1.11,
+              1,
+              0.9,
+              0.82,
+              0.76,
+              0.71,
+              0.67,
+              0.64,
+              0.62,
+              0.6,
+              0.59,
+              0.58,
+              0.57
+            ],
+            [
+              1.22,
+              1.11,
+              1,
+              0.91,
+              0.84,
+              0.79,
+              0.74,
+              0.71,
+              0.68,
+              0.66,
+              0.65,
+              0.64,
+              0.63
+            ],
+            [
+              1.35,
+              1.22,
+              1.1,
+              1,
+              0.92,
+              0.86,
+              0.82,
+              0.78,
+              0.75,
+              0.73,
+              0.71,
+              0.7,
+              0.69
+            ],
+            [
+              1.46,
+              1.32,
+              1.19,
+              1.08,
+              1,
+              0.94,
+              0.89,
+              0.85,
+              0.81,
+              0.79,
+              0.77,
+              0.76,
+              0.75
+            ],
+            [
+              1.56,
+              1.41,
+              1.27,
+              1.16,
+              1.07,
+              1,
+              0.95,
+              0.9,
+              0.87,
+              0.84,
+              0.82,
+              0.81,
+              0.8
+            ],
+            [
+              1.65,
+              1.49,
+              1.35,
+              1.22,
+              1.13,
+              1.06,
+              1,
+              0.96,
+              0.92,
+              0.89,
+              0.87,
+              0.86,
+              0.85
+            ],
+            [
+              1.72,
+              1.56,
+              1.41,
+              1.28,
+              1.18,
+              1.11,
+              1.05,
+              1,
+              0.96,
+              0.93,
+              0.91,
+              0.9,
+              0.89
+            ],
+            [
+              1.79,
+              1.62,
+              1.46,
+              1.33,
+              1.23,
+              1.15,
+              1.09,
+              1.04,
+              1,
+              0.97,
+              0.95,
+              0.93,
+              0.92
+            ],
+            [
+              1.84,
+              1.67,
+              1.51,
+              1.37,
+              1.27,
+              1.18,
+              1.12,
+              1.07,
+              1.03,
+              1,
+              0.98,
+              0.96,
+              0.95
+            ],
+            [
+              1.89,
+              1.71,
+              1.54,
+              1.4,
+              1.3,
+              1.21,
+              1.15,
+              1.1,
+              1.06,
+              1.02,
+              1,
+              0.98,
+              0.97
+            ],
+            [
+              1.92,
+              1.74,
+              1.57,
+              1.43,
+              1.32,
+              1.23,
+              1.17,
+              1.11,
+              1.07,
+              1.04,
+              1.02,
+              1,
+              0.99
+            ],
+            [
+              1.94,
+              1.76,
+              1.59,
+              1.44,
+              1.33,
+              1.25,
+              1.18,
+              1.13,
+              1.09,
+              1.05,
+              1.03,
+              1.01,
+              1
+            ]
+          ],
+          "quelle": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2025/LGDIR_3_0533200_2025.pdf S. 2 (Baujahrtabelle „Bewertungsobjekt mit Stichtag im Jahr 2025“)"
+        }
+      ],
+      "ersatz_grund": "Das Beispiel rechnet mit „Zeitpunkt 01.01.2025“ und steht wortgleich schon im Dokument 2025. Die Baujahrtabelle hängt nach dem Dokument vom Jahr der Wertermittlung ab; das Beispiel setzt die Werte der Tabelle 2025 (1990 → 1970: 0,86; Tabelle 2026: 0,87). Für die Prüfung wird deshalb nur die Baujahrtabelle 2025 eingesetzt; alle übrigen Tabellen sind in beiden Jahrgängen gleich (Textvergleich 2025/2026).",
+      "toleranz_uk": 0.005,
+      "toleranz_grund": "Koeffizienten im Beispiel auf zwei Stellen gedruckt (interpolierte Werte, z. B. Grundstück 0,909 → 0,91); das Ergebnis je m² trifft exakt (Richtwert × gerundeter Gesamtfaktor, auf volle €/m² gerundet gedruckt)."
+    },
+    "formel": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
-      "interpolation": "bilinear in den numerischen Matrizen (vom Ausschuss vorgesehen), Kategorien exakt",
+      "interpolation": "bilinear in den numerischen Matrizen (Vorgabe des Ausschusses S. 2), Kategorien exakt; Gesamtfaktor auf zwei Stellen gerundet (Rechenweg des Beispiels)",
       "extrapolation": false,
       "irw_lageangepasst": true,
       "stellplaetze_im_irw": false,
@@ -2020,11 +2576,6 @@
       "garage_zeitwert_eur_von": 2000,
       "garage_zeitwert_eur_bis": 6000,
       "garage_seite": "S. 6",
-      "vorschlag_form": "matrix_linear: Zeilen = Richtwertobjekt (numerisch), Spalten = Bewertungsobjekt (numerisch), Wert = bilineare Interpolation der gedruckten Zellen; außerhalb der Stützstellen kein Wert. Die kategorialen Merkmale stehen schon in der vorhandenen Form 'matrix' (transponiert: werte[Objekt][Norm]).",
-      "vorschlag_eingaben": {
-        "keller_art": "„tlw. vorhanden“ braucht keller_art (voll/teil/kein); keller ja/nein reicht für vorhanden/nicht vorhanden",
-        "ausstattung": "Eingabe standardstufe, Klassen siehe eingabe_klassen (der Kern bräuchte dafür klassen statt kategorien für das Objekt)"
-      },
       "zonen": {
         "anzahl": 230,
         "felder": {
@@ -2038,6 +2589,35 @@
           "FLAE": "46 Ausprägungen",
           "MIETS": "1",
           "WHNLA": "5"
+        }
+      },
+      "normobjekt": {
+        "herkunft": "Das Richtwertobjekt ist je Zone in BORIS-NRW beschrieben; ein kreisweites Normobjekt nennt das Dokument nicht. Normwerte kommen aus den Zonenfeldern.",
+        "felder": [
+          "BJ (Baujahr (Ursprungsbaujahr))",
+          "WHNFL (Wohnfläche (WoFlV))",
+          "FLAE (Grundstücksfläche (Baulandanteil))",
+          "GART (Gebäudeart)",
+          "EGART (Ergänzende Gebäudeart)",
+          "AKL (Ausstattung)",
+          "MIETS (Mietsituation)",
+          "MTYP (Modernisierungstyp)",
+          "KELLER (Keller)"
+        ],
+        "zonen": {
+          "anzahl": 230,
+          "felder": {
+            "GART": "13",
+            "EGART": "4|2|5",
+            "BJ": "56 Ausprägungen",
+            "WHNFL": "15 Ausprägungen",
+            "AKL": "6|4|8",
+            "MTYP": "1|2",
+            "KELLER": "1",
+            "FLAE": "46 Ausprägungen",
+            "MIETS": "1",
+            "WHNLA": "5"
+          }
         }
       },
       "merkmale": [
@@ -2077,7 +2657,10 @@
             1910,
             1900
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte[Zeile Richtwertobjekt][Spalte Bewertungsobjekt] wie gedruckt",
+          "seite": "S. 2",
+          "hinweis": "Tabelle für Wertermittlungsjahr 2026; Zeile 2015 und Spalte 2020 ohne Gegenstück (gedruckt so)",
+          "werte": [
             [
               1.05,
               0.95,
@@ -2274,9 +2857,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 2",
-          "hinweis": "Tabelle für Wertermittlungsjahr 2026; Zeile 2015 und Spalte 2020 ohne Gegenstück (gedruckt so)"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "wohnflaeche",
@@ -2318,7 +2899,9 @@
             190,
             200
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte[Zeile Richtwertobjekt][Spalte Bewertungsobjekt] wie gedruckt",
+          "seite": "S. 3",
+          "werte": [
             [
               1,
               0.97,
@@ -2575,8 +3158,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 3"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "grundstuecksflaeche",
@@ -2614,7 +3196,9 @@
             750,
             800
           ],
-          "werte_wie_gedruckt": [
+          "werte_hinweis": "werte[Zeile Richtwertobjekt][Spalte Bewertungsobjekt] wie gedruckt",
+          "seite": "S. 3",
+          "werte": [
             [
               1,
               1.03,
@@ -2811,8 +3395,7 @@
               1
             ]
           ],
-          "werte_hinweis": "werte_wie_gedruckt[Zeile Richtwertobjekt][Spalte Bewertungsobjekt]; Zwischenwerte bilinear („Zwischen den Tabellenwerten kann interpoliert werden.“), keine Extrapolation",
-          "seite": "S. 3"
+          "interpolation_text": "lineare Interpolation in beide Richtungen nach Vorgabe des Ausschusses („Zwischen den Tabellenwerten kann interpoliert werden.“, S. 2)"
         },
         {
           "id": "gebaeudeart",
@@ -2916,7 +3499,13 @@
           ],
           "werte_hinweis": "werte[Objekt][Norm]; gedruckt ist Zeile = Richtwertobjekt, Spalte = Bewertungsobjekt (transponiert übernommen)",
           "seite": "S. 4",
-          "eingabe_klassen": [
+          "norm_zuordnung": {
+            "4": "gehoben",
+            "6": "mittel",
+            "8": "einfach"
+          },
+          "zuordnung_herkunft": "AKL des IRW-Datenmodells (Feld 27): 8 einfach, 6 mittel, 4 gehoben — nach dem NAMEN zugeordnet. Die Spannen weichen ab (AKL 6 = Standardkennzahl 2,8–3,2, der Ausschuss: mittel 2,4–3,0); Rückfrage, ob die Zonenkennung so gemeint ist. Für diesen Teilmarkt endet „gehoben“ bei 3,3; AKL 4 (gehoben, 3,8–4,2) liegt außerhalb.",
+          "klassen": [
             {
               "name": "einfach",
               "von": 1,
@@ -2933,13 +3522,8 @@
               "bis": 3.3
             }
           ],
-          "eingabe_klassen_herkunft": "Ausschuss: „einfach: Gebäudestandard 1,0 bis 2,3 · mittel: 2,4 bis 3,0 · gehoben: 3,1 bis 3,3“ (Kategorien des Sachwertverfahrens); Eingabe standardstufe",
-          "norm_zuordnung": {
-            "4": "gehoben",
-            "6": "mittel",
-            "8": "einfach"
-          },
-          "zuordnung_herkunft": "AKL des IRW-Datenmodells (Feld 27): 8 einfach, 6 mittel, 4 gehoben — nach dem NAMEN zugeordnet. Die Spannen weichen ab (AKL 6 = Standardkennzahl 2,8–3,2, der Ausschuss: mittel 2,4–3,0); Rückfrage, ob die Zonenkennung so gemeint ist. Für diesen Teilmarkt endet „gehoben“ bei 3,3; AKL 4 (gehoben, 3,8–4,2) liegt außerhalb."
+          "klassen_herkunft": "Ausschuss: „einfach: Gebäudestandard 1,0 bis 2,3 · mittel: 2,4 bis 3,0 · gehoben: 3,1 bis 3,3“ (Kategorien des Sachwertverfahrens); Eingabe standardstufe",
+          "runden": 1
         },
         {
           "id": "mietsituation",
@@ -3020,7 +3604,10 @@
         {
           "id": "keller",
           "name": "Keller",
-          "eingabe": "keller_art",
+          "eingabe": [
+            "keller_art",
+            "keller"
+          ],
           "art": "matrix",
           "norm_feld": "KELLER",
           "kategorien": [
@@ -3059,10 +3646,17 @@
             "1": "vorhanden"
           },
           "eingabe_hinweis": "keller_art (voll/teil/kein); keller ja/nein deckt „tlw. vorhanden\" nicht",
-          "zweifel": [
+          "zweifel_zellen": [
             {
-              "bei": "Richtwertobjekt vorhanden",
-              "grund": "Zeile „vorhanden“ druckt tlw. 0,94 / nicht 0,97 — die übrigen Zeilen (1,03 / 0,97 und 1,07 / 1,04) passen nur zu 0,97 / 0,94. Vermutlich vertauscht; nicht korrigiert, Rückfrage beim Ausschuss.",
+              "objekt": "tlw. vorhanden",
+              "norm": "vorhanden",
+              "grund": "Zeile „vorhanden“ druckt tlw. 0,94 / nicht 0,97; die übrigen Zeilen (1,03 / 0,97 und 1,07 / 1,04) passen nur zu 0,97 / 0,94 — vermutlich vertauscht, Rückfrage beim Ausschuss",
+              "seite": "S. 5"
+            },
+            {
+              "objekt": "nicht vorhanden",
+              "norm": "vorhanden",
+              "grund": "Zeile „vorhanden“ druckt tlw. 0,94 / nicht 0,97; die übrigen Zeilen (1,03 / 0,97 und 1,07 / 1,04) passen nur zu 0,97 / 0,94 — vermutlich vertauscht, Rückfrage beim Ausschuss",
               "seite": "S. 5"
             }
           ]
@@ -3087,72 +3681,10 @@
           "hinweis": "Basis 100 = 01.01.2019; für Wertermittlungsstichtag = Richtwertstichtag Faktor 1,00"
         }
       ],
-      "anwendungsbeispiel": {
-        "seite": "S. 6",
-        "irw": 1850,
-        "norm_zone": {
-          "BJ": "1990",
-          "WHNFL": "130",
-          "FLAE": "520",
-          "GART": "13",
-          "EGART": "2",
-          "AKL": "einfach",
-          "MIETS": "1",
-          "MTYP": "2",
-          "KELLER": "1"
-        },
-        "objekt": {
-          "baujahr": 1970,
-          "wohnflaeche": 145,
-          "grundstuecksflaeche": 275,
-          "gebaeudeart": "zfh",
-          "anbauweise": "doppelhaushaelfte",
-          "standardstufe": "mittel",
-          "vermietet": false,
-          "mtyp": 1,
-          "keller_art": "voll"
-        },
-        "faktoren": {
-          "baujahr": 0.86,
-          "wohnflaeche": 0.94,
-          "grundstuecksflaeche": 0.91,
-          "gebaeudeart": 0.98,
-          "ergaenzende_gebaeudeart": 1,
-          "ausstattung": 1.11,
-          "mietsituation": 1,
-          "modernisierungstyp": 0.9,
-          "keller": 1,
-          "preisindex": 1
-        },
-        "faktor_gedruckt": 0.72,
-        "ergebnis_eur_qm": 1332,
-        "toleranz_eur_qm": 6,
-        "wohnflaeche": 145,
-        "ergebnis_eur": 193000,
-        "zweifel": [
-          {
-            "bei": "baujahr 1990 → 1970",
-            "grund": "Das Beispiel setzt 0,86, die Baujahrmatrix S. 2 (Zeile 1990, Spalte 1970) druckt 0,87. Mit 0,87 ergäbe das Produkt 0,73 statt 0,72. Vermutlich rechnet das Beispiel mit der ungerundeten Modellfunktion statt mit der gedruckten Tabelle; nicht korrigiert — Rückfrage beim Ausschuss.",
-            "seite": "S. 2 / S. 6"
-          }
-        ],
-        "wortlaut": "Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von: 0,72 · angepasster Immobilienrichtwert 1.850 €/m² x 0,72 = 1.332 €/m² · vorläufiger Vergleichswert 145 m² x 1.332 €/m² = rd. 193.000 €"
-      }
+      "rundung_produkt": 2,
+      "produkt_runden_beleg": "Berechnungsbeispiel S. 6: „Die Multiplikation der Umrechnungskoeffizienten ergibt einen Faktor von: 0,72“ — der Gesamtfaktor wird auf zwei Stellen gerundet und dann mit dem Richtwert multipliziert"
     },
-    "belege": [
-      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (6 Seiten): S. 1 Hinweise (nur Weiterverkäufe, „beinhalten keine Nebengebäude (Garage, Schuppen etc.)“), S. 2 Datengrundlage (2.340 Kauffälle 2018–2024), Preisindex, Baujahrmatrix, S. 3 Wohnfläche und Grundstücksfläche, S. 4 Gebäudeart, Ergänzende Gebäudeart, Ausstattung, Mietsituation, S. 5 Modernisierungstyp, Keller, S. 6 Berechnungsbeispiel, Garagen-Zeitwert.",
-      "Druckabweichungen: Beispiel S. 6 Baujahr 1990 → 1970 = 0,86, Matrix S. 2 = 0,87; Kellertabelle S. 5 Zeile „vorhanden“ vermutlich vertauscht (0,94 / 0,97).",
-      "Kein Wert, weil die Rechenform für numerische Matrizen mit Interpolation im Kern fehlt. Tabellen vollständig übernommen; die großen Matrizen über den Textlayer gelesen und an den Seitenbildern abgeglichen (Diagonale 1,00 und Verhältnis-Konsistenz geprüft), das Anwendungsbeispiel bilinear nachgerechnet."
-    ],
-    "seite": "S. 1–6",
-    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0533200_2026.pdf",
-    "modellansaetze": {
-      "teilmarkt_code": 3,
-      "brechv": 2,
-      "rundung_uk": 2,
-      "normbezug": "Matrix Richtwertobjekt × Bewertungsobjekt",
-      "kaufpreise": "2018–2024, indiziert auf 01.01.2026"
-    }
+    "kernausbau": "v3015 Kernausbau: Matrizen Richtwertobjekt × Bewertungsobjekt bilinear interpoliert (matrix_linear, Vorgabe S. 2), Gesamtfaktor auf zwei Stellen gerundet wie im Rechenweg S. 6; Anwendungsbeispiel S. 6 am echten Kern getroffen (mit der Baujahrtabelle 2025, auf die es sich bezieht)"
   },
   {
     "land_code": "NW",
@@ -14966,7 +15498,7 @@
       "gemeinden": "Stadt Hagen (38 Zonen)",
       "hinweis": "Gilt nicht für Wohnungserbbaurechte, Ersterwerbe (Neubau bis 5 Jahre), erstmalige Umwandlungen und Wohnungseigentum in Ein- und Zweifamilienhäusern (GMB S. 55)."
     },
-    "warum_kein_wert": "Die Örtliche Fachinformation (UDOK, 3 Seiten) druckt keine Koeffizienten („Hier sind bei allen Einflussgrößen die statistisch ermittelten Umrechnungskoeffizienten hinterlegt“ — im Immobilien-Preis-Kalkulator); die Tabellen stehen im Grundstücksmarktbericht 2026 der Stadt Hagen und sind unter formel_vorgemerkt vollständig erfasst. Gesperrt, weil: Modernisierung nur „ab Alter über 30 Jahre“; für jüngere Gebäude „wird eine mittlere Modernisierung unterstellt“ — der Koeffizient hängt also vom Gebäudealter ab (bedingte Kategorie). Der Kern kennt keine Bedingung zwischen Merkmalen; ohne sie würde ein junges Haus mit wenigen Modernisierungspunkten als „nicht modernisiert“ (0,89/0,94/0,91) gerechnet statt mit der unterstellten mittleren Modernisierung. Wohnlage-Zwischenstufen („einfache-mittlere“, „mittlere-gute“) und „Terrasse / Gartennutzung“ brauchen zudem Eingaben, die der Kern nicht führt. Fehlende Rechenform: Merkmal mit Bedingung (wenn Alter ≤ 30 Jahre, dann Kategorie „mittlere Modernisierung“).",
+    "warum_kein_wert": "Kein Anwendungsbeispiel im Dokument: die Örtliche Fachinformation (UDOK, 3 Seiten, alle drei Teilmärkte) druckt weder Koeffizienten noch eine Beispielrechnung, und der Grundstücksmarktbericht 2026 der Stadt Hagen (Kap. 5.1.2 S. 39–41 EFH, 5.2 DHH/RH, 6.1.2 S. 55–57 ETW; geprüft 27.10.2026) enthält die Tabellen, aber kein Anwendungsbeispiel zum zIRW (die „Anwendungsbeispiele“ des GMB betreffen nur Erbbaurechte, Kap. 7). Ohne amtliches Beispiel keine Freigabe (v3015). Die Bedingung „Modernisierung erst ab Alter über 30 Jahre, jünger mittlere Modernisierung unterstellt“ ist jetzt kernfertig strukturiert (bedingung); ihre Jahresgrenze ist zwischen UDOK („vor/nach 1994“) und GMB („größer 30 Jahre“, ETW „vor/nach 1996“) uneinheitlich. Daneben brauchen „mehrere Garagen/Stellplätze“ (stellplatz_anzahl), Wohnlage-Zwischenstufen und die Ausstattungsklasse (keine Zuordnung zur Standardstufe) Angaben, die nur mit der Klasse des Ausschusses rechenbar sind. Weg: Immobilien-Preis-Kalkulator (IPK) in BORIS.NRW.",
     "formel_vorgemerkt": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
@@ -15335,7 +15867,16 @@
           "art": "kategorien",
           "norm_feld": "MGRAD",
           "norm": "kleine Modernisierungen",
-          "bedingung": "nur Alter > 30 Jahre; jünger: „mittlere Modernisierung unterstellt“ (GMB S. 57)",
+          "bedingung": [
+            {
+              "wenn": {
+                "baujahr_von": 1995
+              },
+              "setze": "mittlere Modernisierung",
+              "wortlaut": "UDOK S. 3: „Grad der Modernisierung nur bei Gebäuden mit Baujahr vor 1994 (Alter ab 30 Jahre). Für Gebäude nach 1994 wird eine mittlere Modernisierung unterstellt“",
+              "offen": "Baujahr 1994 selbst ist weder „vor 1994“ noch „nach 1994“; der GMB 2026 (Fußnote S. 41) sagt „bei einem Gebäudealter von größer 30 Jahren“ und für ETW (S. 57) „Baujahr vor 1996 … nach 1996“. Die Grenze ist zwischen den Dokumenten uneinheitlich — vor einer Freigabe beim Ausschuss klären."
+            }
+          ],
           "zuordnung": {
             "1": "nicht modernisiert",
             "2": "kleine Modernisierungen",
@@ -15349,7 +15890,8 @@
             "mittlere Modernisierung": 1.08,
             "überwiegend modernisiert": 1.1,
             "umfassend modernisiert": 1.23
-          }
+          },
+          "bedingung_text": "nur Alter > 30 Jahre; jünger: „mittlere Modernisierung unterstellt“ (GMB S. 57)"
         },
         {
           "id": "ausstattung",
@@ -15436,7 +15978,7 @@
       "gemeinden": "Stadt Hagen (30 Zonen)",
       "hinweis": "Gilt nicht für Erbbaurechte, Ersterwerbe (Neubau bis 3 Jahre), Fachwerkhäuser/außergewöhnliche Bauweise, Außenbereich (UDOK S. 2)."
     },
-    "warum_kein_wert": "Die Örtliche Fachinformation (UDOK, 3 Seiten) druckt keine Koeffizienten („Hier sind bei allen Einflussgrößen die statistisch ermittelten Umrechnungskoeffizienten hinterlegt“ — im Immobilien-Preis-Kalkulator); die Tabellen stehen im Grundstücksmarktbericht 2026 der Stadt Hagen und sind unter formel_vorgemerkt vollständig erfasst. Gesperrt, weil: Modernisierung nur „ab Alter über 30 Jahre“; für jüngere Gebäude „wird eine mittlere Modernisierung unterstellt“ — der Koeffizient hängt also vom Gebäudealter ab (bedingte Kategorie). Der Kern kennt keine Bedingung zwischen Merkmalen; ohne sie würde ein junges Haus mit wenigen Modernisierungspunkten als „nicht modernisiert“ (0,89/0,94/0,91) gerechnet statt mit der unterstellten mittleren Modernisierung. „mehrere Garagen / Stellplätze“ braucht zudem eine Anzahl. Fehlende Rechenform: Merkmal mit Bedingung (wenn Alter ≤ 30 Jahre, dann Kategorie „mittlere Modernisierung“).",
+    "warum_kein_wert": "Kein Anwendungsbeispiel im Dokument: die Örtliche Fachinformation (UDOK, 3 Seiten, alle drei Teilmärkte) druckt weder Koeffizienten noch eine Beispielrechnung, und der Grundstücksmarktbericht 2026 der Stadt Hagen (Kap. 5.1.2 S. 39–41 EFH, 5.2 DHH/RH, 6.1.2 S. 55–57 ETW; geprüft 27.10.2026) enthält die Tabellen, aber kein Anwendungsbeispiel zum zIRW (die „Anwendungsbeispiele“ des GMB betreffen nur Erbbaurechte, Kap. 7). Ohne amtliches Beispiel keine Freigabe (v3015). Die Bedingung „Modernisierung erst ab Alter über 30 Jahre, jünger mittlere Modernisierung unterstellt“ ist jetzt kernfertig strukturiert (bedingung); ihre Jahresgrenze ist zwischen UDOK („vor/nach 1994“) und GMB („größer 30 Jahre“, ETW „vor/nach 1996“) uneinheitlich. Daneben brauchen „mehrere Garagen/Stellplätze“ (stellplatz_anzahl), Wohnlage-Zwischenstufen und die Ausstattungsklasse (keine Zuordnung zur Standardstufe) Angaben, die nur mit der Klasse des Ausschusses rechenbar sind. Weg: Immobilien-Preis-Kalkulator (IPK) in BORIS.NRW.",
     "formel_vorgemerkt": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
@@ -15629,7 +16171,16 @@
           "art": "kategorien",
           "norm_feld": "MGRAD",
           "norm": "kleine Modernisierung",
-          "bedingung": "nur Alter > 30 Jahre; jünger: „mittlere Modernisierung unterstellt“ (UDOK S. 3)",
+          "bedingung": [
+            {
+              "wenn": {
+                "baujahr_von": 1995
+              },
+              "setze": "mittlere Modernisierung",
+              "wortlaut": "UDOK S. 3: „Grad der Modernisierung nur bei Gebäuden mit Baujahr vor 1994 (Alter ab 30 Jahre). Für Gebäude nach 1994 wird eine mittlere Modernisierung unterstellt“",
+              "offen": "Baujahr 1994 selbst ist weder „vor 1994“ noch „nach 1994“; der GMB 2026 (Fußnote S. 41) sagt „bei einem Gebäudealter von größer 30 Jahren“ und für ETW (S. 57) „Baujahr vor 1996 … nach 1996“. Die Grenze ist zwischen den Dokumenten uneinheitlich — vor einer Freigabe beim Ausschuss klären."
+            }
+          ],
           "zuordnung": {
             "1": "nicht modernisiert",
             "2": "kleine Modernisierung",
@@ -15641,7 +16192,8 @@
             "kleine Modernisierung": 1,
             "mittlere Modernisierung": 1.02,
             "überwiegend modernisiert": 1.2
-          }
+          },
+          "bedingung_text": "nur Alter > 30 Jahre; jünger: „mittlere Modernisierung unterstellt“ (UDOK S. 3)"
         },
         {
           "id": "ausstattung",
@@ -15729,7 +16281,7 @@
       "gemeinden": "Stadt Hagen (46 Zonen)",
       "hinweis": "Gilt nicht für Erbbaurechte, Ersterwerbe (Neubau bis 3 Jahre), Fachwerkhäuser/außergewöhnliche Bauweise, Außenbereich (UDOK S. 2)."
     },
-    "warum_kein_wert": "Die Örtliche Fachinformation (UDOK, 3 Seiten) druckt keine Koeffizienten („Hier sind bei allen Einflussgrößen die statistisch ermittelten Umrechnungskoeffizienten hinterlegt“ — im Immobilien-Preis-Kalkulator); die Tabellen stehen im Grundstücksmarktbericht 2026 der Stadt Hagen und sind unter formel_vorgemerkt vollständig erfasst. Gesperrt, weil: Modernisierung nur „ab Alter über 30 Jahre“; für jüngere Gebäude „wird eine mittlere Modernisierung unterstellt“ — der Koeffizient hängt also vom Gebäudealter ab (bedingte Kategorie). Der Kern kennt keine Bedingung zwischen Merkmalen; ohne sie würde ein junges Haus mit wenigen Modernisierungspunkten als „nicht modernisiert“ (0,89/0,94/0,91) gerechnet statt mit der unterstellten mittleren Modernisierung. „Garage im Gebäude“ / „Garagen und Stellplatz“ sind mit den vorhandenen Eingaben nicht eindeutig. Fehlende Rechenform: Merkmal mit Bedingung (wenn Alter ≤ 30 Jahre, dann Kategorie „mittlere Modernisierung“).",
+    "warum_kein_wert": "Kein Anwendungsbeispiel im Dokument: die Örtliche Fachinformation (UDOK, 3 Seiten, alle drei Teilmärkte) druckt weder Koeffizienten noch eine Beispielrechnung, und der Grundstücksmarktbericht 2026 der Stadt Hagen (Kap. 5.1.2 S. 39–41 EFH, 5.2 DHH/RH, 6.1.2 S. 55–57 ETW; geprüft 27.10.2026) enthält die Tabellen, aber kein Anwendungsbeispiel zum zIRW (die „Anwendungsbeispiele“ des GMB betreffen nur Erbbaurechte, Kap. 7). Ohne amtliches Beispiel keine Freigabe (v3015). Die Bedingung „Modernisierung erst ab Alter über 30 Jahre, jünger mittlere Modernisierung unterstellt“ ist jetzt kernfertig strukturiert (bedingung); ihre Jahresgrenze ist zwischen UDOK („vor/nach 1994“) und GMB („größer 30 Jahre“, ETW „vor/nach 1996“) uneinheitlich. Daneben brauchen „mehrere Garagen/Stellplätze“ (stellplatz_anzahl), Wohnlage-Zwischenstufen und die Ausstattungsklasse (keine Zuordnung zur Standardstufe) Angaben, die nur mit der Klasse des Ausschusses rechenbar sind. Weg: Immobilien-Preis-Kalkulator (IPK) in BORIS.NRW.",
     "formel_vorgemerkt": {
       "form": "irw_umrechnung",
       "verknuepfung": "multiplikativ",
@@ -15900,7 +16452,16 @@
           "art": "kategorien",
           "norm_feld": "MGRAD",
           "norm": "normal instandgehalten",
-          "bedingung": "nur Alter > 30 Jahre; jünger: „mittlere Modernisierung unterstellt“ (UDOK S. 3)",
+          "bedingung": [
+            {
+              "wenn": {
+                "baujahr_von": 1995
+              },
+              "setze": "mittlere Modernisierung",
+              "wortlaut": "UDOK S. 3: „Grad der Modernisierung nur bei Gebäuden mit Baujahr vor 1994 (Alter ab 30 Jahre). Für Gebäude nach 1994 wird eine mittlere Modernisierung unterstellt“",
+              "offen": "Baujahr 1994 selbst ist weder „vor 1994“ noch „nach 1994“; der GMB 2026 (Fußnote S. 41) sagt „bei einem Gebäudealter von größer 30 Jahren“ und für ETW (S. 57) „Baujahr vor 1996 … nach 1996“. Die Grenze ist zwischen den Dokumenten uneinheitlich — vor einer Freigabe beim Ausschuss klären."
+            }
+          ],
           "zuordnung": {
             "1": "nicht modernisiert",
             "2": "normal instandgehalten",
@@ -15912,7 +16473,8 @@
             "normal instandgehalten": 1,
             "mittlere Modernisierung": 1.03,
             "überwiegend modernisiert": 1.17
-          }
+          },
+          "bedingung_text": "nur Alter > 30 Jahre; jünger: „mittlere Modernisierung unterstellt“ (UDOK S. 3)"
         },
         {
           "id": "ausstattung",
@@ -17741,10 +18303,10 @@
       ],
       "gemeinden": "Dorsten, Gladbeck, Marl (31 Zonen)"
     },
-    "warum_kein_wert": "Das Shape (IRW_2026) führt für alle Zonen dieses Ausschusses BRECHV 1 = additives Berechnungsverfahren. Das Dokument druckt die Koeffizienten als Punktdiagramm um 1 (Normobjekt = 1), sagt aber weder „multiplikativ“ noch „additiv“ und enthält kein Rechenbeispiel. Additiv (Summe der Abweichungen von 1) und multiplikativ ergeben bei mehreren Abweichungen verschiedene Werte; die Bibliothek rechnet nur multiplikativ und wird eine additive Verknüpfung nicht still multiplizieren. Zudem: „Für den IPK wurden die Baujahresklassen interpoliert“ — wie, sagt das Dokument nicht. Rückfrage beim Ausschuss; Tabellen vollständig unter formel_vorgemerkt.",
+    "warum_kein_wert": "Die Verknüpfung ist jetzt belegt: additiv (Grundstücksmarktbericht 2026, S. 65: „Die Anwendung erfolgt additiv und ausschließlich über den o. g. Immobilien-Preis-Kalkulator“; Shape BRECHV 1). Gesperrt bleibt der Satz, weil (1) kein amtliches Anwendungsbeispiel vorliegt (Örtliche Fachinformationen 2026 und 2025, Grundstücksmarktbericht 2026 gelesen — kein Berechnungsbeispiel) und (2) der Kalkulator „innerhalb der Baujahresklassen interpoliert“ (UDOK S. 1, GMB S. 65), ohne die Stützstellen dieser Interpolation zu veröffentlichen — mit den gedruckten Klassen würde anders gerechnet als vom Ausschuss vorgeschrieben („ausschließlich über den Kalkulator“). Kein Beispiel im Dokument (v3015). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
     "formel_vorgemerkt": {
       "form": "irw_umrechnung",
-      "verknuepfung": "unklar (Shape: BRECHV 1 additiv; Dokument ohne Angabe)",
+      "verknuepfung": "additiv",
       "interpolation": "Klassen (IPK interpoliert die Baujahresklassen — Verfahren nicht beschrieben)",
       "extrapolation": false,
       "irw_lageangepasst": true,
@@ -17984,7 +18546,8 @@
       "vorschlag_eingaben": {
         "barrierefrei": "alten- und behindertengerecht, ja/nein",
         "gartennutzung": "Gartennutzung zur Wohnung, ja/nein"
-      }
+      },
+      "verknuepfung_beleg": "Grundstücksmarktbericht 2026 der Städte Dorsten, Gladbeck und Marl, S. 65: „Die Anwendung erfolgt additiv und ausschließlich über den o. g. Immobilien-Preis-Kalkulator.“ (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf)"
     },
     "belege": [
       "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Wohnungseigentum (2 Seiten): S. 1 Hinweise (Kaufpreise 2021–2025, 1.884 Kauffälle, räumlich autoregressive Regression (SAR), ohne Erstverkäufe, „ohne Wertanteil für Garagen und Stellplätze“) und Normobjekt, S. 2 Umrechnungskoeffizienten als Punktdiagramm.",
@@ -18028,10 +18591,10 @@
       "gemeinden": "Dorsten, Gladbeck, Marl (39 Zonen)",
       "hinweis": "Der Teilmarkt 2 dieses Ausschusses umfasst alle Anbauweisen (Normobjekt Doppelhaushälfte, Koeffizienten für Reihenmittel-, Reihenend- und freistehende Häuser)."
     },
-    "warum_kein_wert": "Das Shape (IRW_2026) führt für alle Zonen dieses Ausschusses BRECHV 1 = additives Berechnungsverfahren. Das Dokument druckt die Koeffizienten als Punktdiagramm um 1 (Normobjekt = 1), sagt aber weder „multiplikativ“ noch „additiv“ und enthält kein Rechenbeispiel. Additiv (Summe der Abweichungen von 1) und multiplikativ ergeben bei mehreren Abweichungen verschiedene Werte; die Bibliothek rechnet nur multiplikativ und wird eine additive Verknüpfung nicht still multiplizieren. Zudem: „Für den IPK wurden die Baujahresklassen interpoliert“ — wie, sagt das Dokument nicht. Rückfrage beim Ausschuss; Tabellen vollständig unter formel_vorgemerkt.",
+    "warum_kein_wert": "Die Verknüpfung ist jetzt belegt: additiv (Grundstücksmarktbericht 2026, S. 50: „Die Anwendung erfolgt additiv und ausschließlich über den o. g. Immobilien-Preis-Kalkulator“; Shape BRECHV 1). Gesperrt bleibt der Satz, weil (1) kein amtliches Anwendungsbeispiel vorliegt (Örtliche Fachinformationen 2026 und 2025, Grundstücksmarktbericht 2026 gelesen — kein Berechnungsbeispiel) und (2) der Kalkulator „innerhalb der Baujahresklassen interpoliert“ (UDOK S. 1, GMB S. 49), ohne die Stützstellen dieser Interpolation zu veröffentlichen — mit den gedruckten Klassen würde anders gerechnet als vom Ausschuss vorgeschrieben („ausschließlich über den Kalkulator“). Kein Beispiel im Dokument (v3015). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
     "formel_vorgemerkt": {
       "form": "irw_umrechnung",
-      "verknuepfung": "unklar (Shape: BRECHV 1 additiv; Dokument ohne Angabe)",
+      "verknuepfung": "additiv",
       "interpolation": "Klassen (IPK interpoliert die Baujahresklassen — Verfahren nicht beschrieben)",
       "extrapolation": false,
       "irw_lageangepasst": true,
@@ -18322,7 +18885,8 @@
             "2025": 1
           }
         }
-      ]
+      ],
+      "verknuepfung_beleg": "Grundstücksmarktbericht 2026 der Städte Dorsten, Gladbeck und Marl, S. 50: „Die Anwendung erfolgt additiv und ausschließlich über den o. g. Immobilien-Preis-Kalkulator.“ (https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf)"
     },
     "belege": [
       "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser (2 Seiten): S. 1 Hinweise (Kaufpreise 2021–2025, 1.948 Kauffälle, SAR-Regression, ohne Erstverkäufe, „ohne Wertanteil für Garagen und Stellplätze“) und Normobjekt, S. 2 Umrechnungskoeffizienten als Punktdiagramm.",
@@ -18354,7 +18918,7 @@
     "gasl": "27600",
     "gebiet_name": "Stadt Recklinghausen",
     "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
-    "warum_kein_wert": "„Die Umrechnungskoeffizienten sind additiv zu verwenden.“ (S. 2) — der Kern rechnet nur multiplikativ und multipliziert eine additive Verknüpfung nicht still. Das Dokument enthält kein Rechenbeispiel, das die Additionsregel (Summe der Abweichungen von 1,000?) festlegt; „Die im Folgenden dargestellten Umrechnungskoeffizienten stellen lediglich gerundete Werte dar. Es wird daher die Verwendung des Immobilien-Preis-Kalkulators empfohlen.“ Fehlende Rechenform: verknuepfung additiv (IRW × (1 + Σ (UK_i − 1))). Tabellen vollständig unter formel_vorgemerkt.",
+    "warum_kein_wert": "„Die Umrechnungskoeffizienten sind additiv zu verwenden.“ (S. 2) — die additive Form rechnet der Kern seit v3015. Es fehlt das amtliche Anwendungsbeispiel: weder die Örtlichen Fachinformationen 2026 (LGDIR_1/2_0527600_2026) noch die Fassung 2025 noch der Grundstücksmarktbericht 2026 (Nr. 5.4, S. 43–45) enthalten ein Berechnungsbeispiel; das Dokument nennt die Tabellen ausdrücklich „lediglich gerundete Werte“ und empfiehlt den Immobilien-Preis-Kalkulator. Kein Beispiel im Dokument — bleibt vorgemerkt (v3015). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
     "zweig": "etw",
     "geltungsbereich": {
       "teilmarkt": 1,
@@ -19183,7 +19747,7 @@
     "gasl": "27600",
     "gebiet_name": "Stadt Recklinghausen",
     "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
-    "warum_kein_wert": "„Die Umrechnungskoeffizienten sind additiv zu verwenden.“ (S. 2) — der Kern rechnet nur multiplikativ und multipliziert eine additive Verknüpfung nicht still. Das Dokument enthält kein Rechenbeispiel, das die Additionsregel (Summe der Abweichungen von 1,000?) festlegt; „Die im Folgenden dargestellten Umrechnungskoeffizienten stellen lediglich gerundete Werte dar. Es wird daher die Verwendung des Immobilien-Preis-Kalkulators empfohlen.“ Fehlende Rechenform: verknuepfung additiv (IRW × (1 + Σ (UK_i − 1))). Tabellen vollständig unter formel_vorgemerkt.",
+    "warum_kein_wert": "„Die Umrechnungskoeffizienten sind additiv zu verwenden.“ (S. 2) — die additive Form rechnet der Kern seit v3015. Es fehlt das amtliche Anwendungsbeispiel: weder die Örtlichen Fachinformationen 2026 (LGDIR_1/2_0527600_2026) noch die Fassung 2025 noch der Grundstücksmarktbericht 2026 (Nr. 5.4, S. 43–45) enthalten ein Berechnungsbeispiel; das Dokument nennt die Tabellen ausdrücklich „lediglich gerundete Werte“ und empfiehlt den Immobilien-Preis-Kalkulator. Kein Beispiel im Dokument — bleibt vorgemerkt (v3015). Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
     "zweig": "efh_zfh",
     "geltungsbereich": {
       "teilmarkt": 2,
@@ -23008,7 +23572,7 @@
     "gasl": "10500",
     "gebiet_name": "Stadt Bottrop",
     "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
-    "warum_kein_wert": "Der Modernisierungstyp ist an das Baujahr gebunden („baujahrtypisch“ nur bis 1970, ab 1995 „grundsätzlich neuzeitlich“ — Tabelle „Baujahre × Modernisierungstyp“). Der Kern kennt keine Bedingung zwischen Merkmalen (Vorgabe v2680: bedingte Kategorien → Sperre). Daneben: die Klassen haben Lücken (z. B. Baujahr 1939, Bodenrichtwert 176–179 €/m²), „Interpolation möglich“ ist ohne Stützstellen angegeben, und Zone wie Normobjekt sind stadtweit EIN Objekt. Tabellen vollständig unter formel_vorgemerkt.",
+    "warum_kein_wert": "Kein Anwendungsbeispiel im Dokument: weder die Örtlichen Fachinformationen (UDOK Teilmarkt 1 und 3) noch der Grundstücksmarktbericht 2026 der Stadt Bottrop (Kap. 4 S. 50–54 Immobilienrichtwerte EFH, Kap. 5 S. 71–73 ETW, Modell Kap. 8.4 S. 91–93; geprüft 27.10.2026) rechnen ein Beispiel mit den Umrechnungskoeffizienten vor. Ohne amtliches Beispiel keine Freigabe (v3015). Die Bindung des Modernisierungstyps an das Baujahr ist jetzt kernfertig strukturiert (bedingung, GMB S. 93); offen bleibt das Grenzjahr 1970 (Text „vor 1970“, Tabelle „bis 1970“ und „1970 - 1994“). Daneben haben die Klassen Lücken (z. B. Baujahr 1939, Bodenrichtwert 176–179 €/m² — dort kein Wert, nicht geschlossen), und „Interpolation möglich“ steht ohne Stützstellen. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
     "zweig": "etw",
     "geltungsbereich": {
       "teilmarkt": 1,
@@ -23310,7 +23874,38 @@
             "2": "teilmodernisiert",
             "3": "neuzeitlich"
           },
-          "bedingung": {
+          "bedingung": [
+            {
+              "wenn": {
+                "baujahr_von": 1995
+              },
+              "setze": "neuzeitlich",
+              "wortlaut": "GMB 2026 S. 93: „dass sich der Modernisierungstyp ‚baujahrtypisch‘ nur auf Altbauten vor dem Baujahr 1970 bezieht. Für neuere Gebäude ab dem Baujahr 1995 wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ‚neuzeitlich‘ zu wählen.“ Tabelle: bis 1970 alle drei · 1970–1994 baujahrtypisch „nicht auszuwählen“ · ab 1995 nur neuzeitlich"
+            },
+            {
+              "wenn": {
+                "baujahr_von": 1971,
+                "baujahr_bis": 1994
+              },
+              "nicht": [
+                "baujahrtypisch"
+              ],
+              "wortlaut": "GMB 2026 S. 93: „dass sich der Modernisierungstyp ‚baujahrtypisch‘ nur auf Altbauten vor dem Baujahr 1970 bezieht. Für neuere Gebäude ab dem Baujahr 1995 wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ‚neuzeitlich‘ zu wählen.“ Tabelle: bis 1970 alle drei · 1970–1994 baujahrtypisch „nicht auszuwählen“ · ab 1995 nur neuzeitlich"
+            },
+            {
+              "wenn": {
+                "baujahr_von": 1970,
+                "baujahr_bis": 1970
+              },
+              "nur": [
+                "teilmodernisiert",
+                "neuzeitlich"
+              ],
+              "wortlaut": "GMB 2026 S. 93: „dass sich der Modernisierungstyp ‚baujahrtypisch‘ nur auf Altbauten vor dem Baujahr 1970 bezieht. Für neuere Gebäude ab dem Baujahr 1995 wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ‚neuzeitlich‘ zu wählen.“ Tabelle: bis 1970 alle drei · 1970–1994 baujahrtypisch „nicht auszuwählen“ · ab 1995 nur neuzeitlich",
+              "offen": "Baujahr 1970: der Text sagt „vor dem Baujahr 1970“ (also nicht baujahrtypisch), die Tabelle führt 1970 in beiden Zeilen („bis 1970“ und „1970 - 1994“). Hier nach dem Text (strenger) — vor einer Freigabe klären."
+            }
+          ],
+          "bedingung_text": {
             "regel": "„baujahrtypisch“ nur für Baujahre bis 1970; 1970–1994 nur „teilmodernisiert“ oder „neuzeitlich“; ab 1995 „wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ,neuzeitlich‘ zu wählen“",
             "vorschlag_form": "bedingung: [{ baujahr_ab: 1995, setze: 'neuzeitlich' }, { baujahr_ab: 1970, nicht: ['baujahrtypisch'] }]"
           }
@@ -23346,7 +23941,7 @@
     "gasl": "10500",
     "gebiet_name": "Stadt Bottrop",
     "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
-    "warum_kein_wert": "Der Modernisierungstyp ist an das Baujahr gebunden („baujahrtypisch“ nur bis 1970, ab 1995 „grundsätzlich neuzeitlich“ — Tabelle „Baujahre × Modernisierungstyp“). Der Kern kennt keine Bedingung zwischen Merkmalen (Vorgabe v2680: bedingte Kategorien → Sperre). Daneben: die Klassen haben Lücken (z. B. Baujahr 1939, Bodenrichtwert 176–179 €/m²), „Interpolation möglich“ ist ohne Stützstellen angegeben, und Zone wie Normobjekt sind stadtweit EIN Objekt. Tabellen vollständig unter formel_vorgemerkt.",
+    "warum_kein_wert": "Kein Anwendungsbeispiel im Dokument: weder die Örtlichen Fachinformationen (UDOK Teilmarkt 1 und 3) noch der Grundstücksmarktbericht 2026 der Stadt Bottrop (Kap. 4 S. 50–54 Immobilienrichtwerte EFH, Kap. 5 S. 71–73 ETW, Modell Kap. 8.4 S. 91–93; geprüft 27.10.2026) rechnen ein Beispiel mit den Umrechnungskoeffizienten vor. Ohne amtliches Beispiel keine Freigabe (v3015). Die Bindung des Modernisierungstyps an das Baujahr ist jetzt kernfertig strukturiert (bedingung, GMB S. 93); offen bleibt das Grenzjahr 1970 (Text „vor 1970“, Tabelle „bis 1970“ und „1970 - 1994“). Daneben haben die Klassen Lücken (z. B. Baujahr 1939, Bodenrichtwert 176–179 €/m² — dort kein Wert, nicht geschlossen), und „Interpolation möglich“ steht ohne Stützstellen. Weg: Immobilien-Preis-Kalkulator in BORIS.NRW.",
     "zweig": "rh_dhh",
     "geltungsbereich": {
       "teilmarkt": 3,
@@ -23586,7 +24181,38 @@
             "2": "teilmodernisiert (nicht neuzeitlich, tlw. modernisiert)",
             "3": "neuzeitliche (neuzeitliche Ausstattung)"
           },
-          "bedingung": {
+          "bedingung": [
+            {
+              "wenn": {
+                "baujahr_von": 1995
+              },
+              "setze": "neuzeitliche (neuzeitliche Ausstattung)",
+              "wortlaut": "GMB 2026 S. 93: „dass sich der Modernisierungstyp ‚baujahrtypisch‘ nur auf Altbauten vor dem Baujahr 1970 bezieht. Für neuere Gebäude ab dem Baujahr 1995 wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ‚neuzeitlich‘ zu wählen.“ Tabelle: bis 1970 alle drei · 1970–1994 baujahrtypisch „nicht auszuwählen“ · ab 1995 nur neuzeitlich"
+            },
+            {
+              "wenn": {
+                "baujahr_von": 1971,
+                "baujahr_bis": 1994
+              },
+              "nicht": [
+                "baujahrtypisch (nicht neuzeitlich, nicht modernisiert)"
+              ],
+              "wortlaut": "GMB 2026 S. 93: „dass sich der Modernisierungstyp ‚baujahrtypisch‘ nur auf Altbauten vor dem Baujahr 1970 bezieht. Für neuere Gebäude ab dem Baujahr 1995 wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ‚neuzeitlich‘ zu wählen.“ Tabelle: bis 1970 alle drei · 1970–1994 baujahrtypisch „nicht auszuwählen“ · ab 1995 nur neuzeitlich"
+            },
+            {
+              "wenn": {
+                "baujahr_von": 1970,
+                "baujahr_bis": 1970
+              },
+              "nur": [
+                "teilmodernisiert (nicht neuzeitlich, tlw. modernisiert)",
+                "neuzeitliche (neuzeitliche Ausstattung)"
+              ],
+              "wortlaut": "GMB 2026 S. 93: „dass sich der Modernisierungstyp ‚baujahrtypisch‘ nur auf Altbauten vor dem Baujahr 1970 bezieht. Für neuere Gebäude ab dem Baujahr 1995 wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ‚neuzeitlich‘ zu wählen.“ Tabelle: bis 1970 alle drei · 1970–1994 baujahrtypisch „nicht auszuwählen“ · ab 1995 nur neuzeitlich",
+              "offen": "Baujahr 1970: der Text sagt „vor dem Baujahr 1970“ (also nicht baujahrtypisch), die Tabelle führt 1970 in beiden Zeilen („bis 1970“ und „1970 - 1994“). Hier nach dem Text (strenger) — vor einer Freigabe klären."
+            }
+          ],
+          "bedingung_text": {
             "regel": "„baujahrtypisch“ nur für Baujahre bis 1970; 1970–1994 nur „teilmodernisiert“ oder „neuzeitlich“; ab 1995 „wird eine neuzeitliche Ausstattung unterstellt, hier ist grundsätzlich der Modernisierungstyp ,neuzeitlich‘ zu wählen“",
             "vorschlag_form": "bedingung: [{ baujahr_ab: 1995, setze: 'neuzeitlich' }, { baujahr_ab: 1970, nicht: ['baujahrtypisch'] }]"
           }

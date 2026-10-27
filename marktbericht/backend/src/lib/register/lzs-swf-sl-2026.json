@@ -1,0 +1,113 @@
+[
+ {
+  "land_code": "SL",
+  "ags": "10041",
+  "ebene": "kreis",
+  "gebiet_name": "Regionalverband Saarbrücken",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "zugang": "kostenpflichtig",
+  "zugang_beleg": "Webseite des Ausschusses: „Die komplette Version inklusive der wertrelevanten Daten erhalten Sie gegen eine Gebühr von 50 Euro\"",
+  "bestell_url": "mailto:gutachterausschuss@rvsbr.de",
+  "gebuehr": "Vollversion GMB 2024: 50 € (Webseite und Impressum S. 2); Daten 01.06.2025: auf Anfrage, nicht beziffert",
+  "objektart_bez": null,
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "Im Modell 2022 „gewichtet entsprechend der Standardstufe\", keine Zahl (Stichprobe 61–75 Jahre freistehend). Die Rückfallzahl 80 des Rechenkerns läge außerhalb — beim Anlegen eines Wertes nicht 80 eintragen."
+  },
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "Webseite des Ausschusses",
+    "dokument": "Regionalverband Saarbrücken, Seite „Gutachterausschuss\", Abschnitt „Grundstücksmarktbericht und Links\" (am 27.10.2026 gelesen)",
+    "fundstelle": "Webseite, Abschnitt „Grundstücksmarktbericht und Links\" (Stand 27.10.2026)",
+    "url": "https://www.regionalverband-saarbruecken.de/bauen-und-planen/gutachterausschuss",
+    "wortlaut": "Den Grundstücksmarktbericht 2024 für den Regionalverband Saarbrücken gibt es in der Kurz-Version kostenlos als PDF. Die komplette Version inklusive der wertrelevanten Daten erhalten Sie gegen eine Gebühr von 50 Euro bei der Geschäftsstelle des Gutachterausschusses … Zum Stichtag 01.06.2025 wurden die \"Erforderlichen Daten zur Wertermittlung\" neu abgeleitet und können ebenfalls bei der Geschäftsstelle angefordert werden."
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarktbericht 2024 für den Regionalverband Saarbrücken, Kurzversion (83 Blatt)",
+    "fundstelle": "PDF-Seite 2 (Impressum) und PDF-Seite 6 (Inhaltsverzeichnis Kap. 12.2 S. 77, 12.3 S. 82); Kapitel 12 fehlt in der Kurzversion (Druckseiten 72–115 nicht enthalten)",
+    "url": "https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2024_Kurzversion.pdf",
+    "wortlaut": "Gebühr: 50 Euro. Dieser Bericht ist urheberrechtlich geschützt. Die Vervielfältigung (auch auszugsweise) bedarf der Genehmigung des Herausgebers. — 12.2 Ableitungsmodell Sachwertfaktoren für Ein- und Zweifamilienhäuser … 12.3 Ableitungsmodell Liegenschaftszinssätze für Ein- und Zweifamilienhäuser"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-06-01",
+  "stichtag_hinweis": "Stichtag der neu abgeleiteten „Erforderlichen Daten zur Wertermittlung\" laut Webseite des Ausschusses",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.regionalverband-saarbruecken.de/bauen-und-planen/gutachterausschuss",
+  "quelle_parser": "ernte-2026-10-27-hand (pdftotext -layout, Tabellenzeilen am Seitenbild bestaetigt)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Kein Wert übernommen. Impressum der Kurzversion 2024: „urheberrechtlich geschützt. Die Vervielfältigung (auch auszugsweise) bedarf der Genehmigung des Herausgebers.\" Auch mit gekaufter Vollversion bliebe die Wiedergabe im Bericht genehmigungspflichtig.",
+  "fundstelle": "Webseite Gutachterausschuss Regionalverband Saarbrücken; GMB 2024 Kurzversion, Inhaltsverzeichnis (PDF-S. 6) und Impressum (PDF-S. 2)",
+  "seite": 6,
+  "auflagen": [],
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Gutachterausschuss für den Regionalverband Saarbrücken leitet Sachwertfaktoren für Ein- und Zweifamilienhäuser ab (GMB 2024, Kap. 12.2; neu zum Stichtag 01.06.2025), gibt sie aber nur gegen Gebühr und mit Genehmigungsvorbehalt heraus. Weg: Vollversion des Grundstücksmarktberichts 2024 (mit Kapitel 12) gegen 50 € bzw. die zum 01.06.2025 neu abgeleiteten „Erforderlichen Daten zur Wertermittlung\" bei der Geschäftsstelle (gutachterausschuss@rvsbr.de, Tel. 0681 506-6030, Schlossplatz 1-15, 66119 Saarbrücken); für die Übernahme in einen Bericht zusätzlich die Genehmigung des Herausgebers.",
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: dieser Satz ist der jüngere Jahrgang neben der Sperre 2022 (lzs-/swf-ni-sh-rp-sl-2026.json, die unverändert bleibt). Frei liegt nur die Kurzversion 2024 — ihr fehlt Kapitel 12 (am PDF gemessen: die Druckseitenzählung springt von 71 auf 116, die Druckseiten 77–84 mit Kap. 12.2/12.3 sind nicht enthalten). Die Vollversion 2024 kostet 50 €, die zum 01.06.2025 neu abgeleiteten Daten sind bei der Geschäftsstelle anzufordern; Vervielfältigung nur mit Genehmigung. Für Reihenhäuser, Eigentumswohnungen und Mehrfamilienhäuser führt das Inhaltsverzeichnis 2024 keine Sachwertfaktoren — dort gelten die Sperren 2022 weiter. Vollversion des Grundstücksmarktberichts 2024 (mit Kapitel 12) gegen 50 € bzw. die zum 01.06.2025 neu abgeleiteten „Erforderlichen Daten zur Wertermittlung\" bei der Geschäftsstelle (gutachterausschuss@rvsbr.de, Tel. 0681 506-6030, Schlossplatz 1-15, 66119 Saarbrücken); für die Übernahme in einen Bericht zusätzlich die Genehmigung des Herausgebers. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+ },
+ {
+  "land_code": "SL",
+  "ags": "10041",
+  "ebene": "kreis",
+  "gebiet_name": "Regionalverband Saarbrücken",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "zugang": "kostenpflichtig",
+  "zugang_beleg": "Webseite des Ausschusses: „Die komplette Version inklusive der wertrelevanten Daten erhalten Sie gegen eine Gebühr von 50 Euro\"",
+  "bestell_url": "mailto:gutachterausschuss@rvsbr.de",
+  "gebuehr": "Vollversion GMB 2024: 50 € (Webseite und Impressum S. 2); Daten 01.06.2025: auf Anfrage, nicht beziffert",
+  "objektart_bez": null,
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "Webseite des Ausschusses",
+    "dokument": "Regionalverband Saarbrücken, Seite „Gutachterausschuss\", Abschnitt „Grundstücksmarktbericht und Links\" (am 27.10.2026 gelesen)",
+    "fundstelle": "Webseite, Abschnitt „Grundstücksmarktbericht und Links\" (Stand 27.10.2026)",
+    "url": "https://www.regionalverband-saarbruecken.de/bauen-und-planen/gutachterausschuss",
+    "wortlaut": "Den Grundstücksmarktbericht 2024 für den Regionalverband Saarbrücken gibt es in der Kurz-Version kostenlos als PDF. Die komplette Version inklusive der wertrelevanten Daten erhalten Sie gegen eine Gebühr von 50 Euro bei der Geschäftsstelle des Gutachterausschusses … Zum Stichtag 01.06.2025 wurden die \"Erforderlichen Daten zur Wertermittlung\" neu abgeleitet und können ebenfalls bei der Geschäftsstelle angefordert werden."
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarktbericht 2024 für den Regionalverband Saarbrücken, Kurzversion (83 Blatt)",
+    "fundstelle": "PDF-Seite 2 (Impressum) und PDF-Seite 6 (Inhaltsverzeichnis Kap. 12.2 S. 77, 12.3 S. 82); Kapitel 12 fehlt in der Kurzversion (Druckseiten 72–115 nicht enthalten)",
+    "url": "https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2024_Kurzversion.pdf",
+    "wortlaut": "Gebühr: 50 Euro. Dieser Bericht ist urheberrechtlich geschützt. Die Vervielfältigung (auch auszugsweise) bedarf der Genehmigung des Herausgebers. — 12.2 Ableitungsmodell Sachwertfaktoren für Ein- und Zweifamilienhäuser … 12.3 Ableitungsmodell Liegenschaftszinssätze für Ein- und Zweifamilienhäuser"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-06-01",
+  "stichtag_hinweis": "Stichtag der neu abgeleiteten „Erforderlichen Daten zur Wertermittlung\" laut Webseite des Ausschusses",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.regionalverband-saarbruecken.de/bauen-und-planen/gutachterausschuss",
+  "quelle_parser": "ernte-2026-10-27-hand (pdftotext -layout, Tabellenzeilen am Seitenbild bestaetigt)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Kein Wert übernommen. Impressum der Kurzversion 2024: „urheberrechtlich geschützt. Die Vervielfältigung (auch auszugsweise) bedarf der Genehmigung des Herausgebers.\" Auch mit gekaufter Vollversion bliebe die Wiedergabe im Bericht genehmigungspflichtig.",
+  "fundstelle": "Webseite Gutachterausschuss Regionalverband Saarbrücken; GMB 2024 Kurzversion, Inhaltsverzeichnis (PDF-S. 6) und Impressum (PDF-S. 2)",
+  "seite": 6,
+  "auflagen": [],
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Gutachterausschuss für den Regionalverband Saarbrücken leitet Liegenschaftszinssätze für Ein- und Zweifamilienhäuser ab (GMB 2024, Kap. 12.3; neu zum Stichtag 01.06.2025), gibt sie aber nur gegen Gebühr und mit Genehmigungsvorbehalt heraus. Weg: Vollversion des Grundstücksmarktberichts 2024 (mit Kapitel 12) gegen 50 € bzw. die zum 01.06.2025 neu abgeleiteten „Erforderlichen Daten zur Wertermittlung\" bei der Geschäftsstelle (gutachterausschuss@rvsbr.de, Tel. 0681 506-6030, Schlossplatz 1-15, 66119 Saarbrücken); für die Übernahme in einen Bericht zusätzlich die Genehmigung des Herausgebers.",
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: dieser Satz ist der jüngere Jahrgang neben der Sperre 2022 (lzs-/swf-ni-sh-rp-sl-2026.json, die unverändert bleibt). Frei liegt nur die Kurzversion 2024 — ihr fehlt Kapitel 12 (am PDF gemessen: die Druckseitenzählung springt von 71 auf 116, die Druckseiten 77–84 mit Kap. 12.2/12.3 sind nicht enthalten). Die Vollversion 2024 kostet 50 €, die zum 01.06.2025 neu abgeleiteten Daten sind bei der Geschäftsstelle anzufordern; Vervielfältigung nur mit Genehmigung. Für Reihenhäuser, Eigentumswohnungen und Mehrfamilienhäuser führt das Inhaltsverzeichnis 2024 keine Liegenschaftszinssätze — dort gelten die Sperren 2022 weiter. Vollversion des Grundstücksmarktberichts 2024 (mit Kapitel 12) gegen 50 € bzw. die zum 01.06.2025 neu abgeleiteten „Erforderlichen Daten zur Wertermittlung\" bei der Geschäftsstelle (gutachterausschuss@rvsbr.de, Tel. 0681 506-6030, Schlossplatz 1-15, 66119 Saarbrücken); für die Übernahme in einen Bericht zusätzlich die Genehmigung des Herausgebers. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+ }
+]
