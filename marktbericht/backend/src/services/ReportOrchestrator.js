@@ -1320,6 +1320,34 @@ export const ReportOrchestrator = {
         }
       }
 
+      /* v2990 · KERNAUSSAGE ZUR GRUNDSTUECKSGROESSE, aus den Zahlen. Der Hinweis darueber ist
+         ueber mehrere Versionen zusammengewachsen (Bericht Am Markt 9: 19 Zeilen, „nicht angepasst"
+         zweimal) - Bericht und PDF zeigen jetzt zuerst diesen einen Satz, der Rest ist Erlaeuterung.
+         Bei Wohnungseigentum ist die Grundstuecksflaeche die der ganzen Anlage; der Anteil der Wohnung
+         (MEA) steht dabei. Und: nicht angepasst ist eine OFFENE Pruefung, kein Sicherheitsabschlag -
+         der KI-Text schrieb daraus „Bodenwert konservativ angesetzt" (falsch: die Richtung ist offen,
+         eine groessere Flaeche druecke den Wert je m², eine hoehere Ausnutzung hebe ihn). */
+      if (_flaeche && _flaeche.erheblich) {
+        const _dq = (x) => Number(x).toLocaleString('de-DE', { maximumFractionDigits: 1 });
+        const _etwFl = /^(wohnung|etw)$/i.test(String(ref.property_type || ''));
+        const _meaFl = Number(ref.mea_pct);
+        let _k = 'Grundstück ' + _dq(_flaeche.objekt_qm) + ' m² gegen ' + _dq(_flaeche.richtwertgrundstueck_qm)
+          + ' m² Bezugsgröße der Bodenrichtwertzone (+' + _flaeche.ueberschreitung_pct + ' %).';
+        if (_etwFl && _meaFl > 0 && _meaFl < 100) {
+          _flaeche.etw_anteil_qm = Math.round(_flaeche.objekt_qm * _meaFl / 100 * 10) / 10;
+          _k += ' Bei Wohnungseigentum ist das die Fläche der ganzen Anlage; auf diese Wohnung entfallen '
+            + _dq(_flaeche.etw_anteil_qm) + ' m² (MEA ' + _dq(_meaFl) + ' %).';
+        }
+        if (_flaeche.bodenwert_nicht_angepasst) {
+          _k += ' Der Bodenwert ist nicht an die Größe angepasst – eine offene Prüfung, kein Sicherheitsabschlag;'
+            + ' Ertrags- und Sachwert sind insoweit vorläufig.';
+        } else if (_uk && _uk.verfuegbar && (_uk.koeffizient_angewandt || _uk.naeherung || _uk.gruen_qm > 0)) {
+          _k += _uk.naeherung ? ' Der Bodenwert ist über die DealPilot-Formel an die Größe angepasst (Näherung, nicht amtlich).'
+            : ' Der Bodenwert ist an die Größe angepasst.';
+        }
+        _flaeche.kern = _k;
+      }
+
       /* WNHK-1 · Sachwertfaktor aus derselben Kaskade wie der Zinssatz.
        * Er steht in denselben Grundstuecksmarktberichten — die Ernte
        * liefert beides oder keines. */

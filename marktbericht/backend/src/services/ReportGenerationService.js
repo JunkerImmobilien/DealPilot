@@ -582,10 +582,24 @@ function vergleichswertFakten(cc) {
     + (ft.length ? ': für die Umrechnung fehlt ' + ft.join(', ') + '.' : '. ' + String(v.hinweis || '').slice(0, 220))
     + ' Nenne keinen Vergleichswert; die Zahl aus Angebotspreisen heißt Marktpreisindikation.'];
 }
+/* v2990 · Bodenwert ohne Groessenanpassung ist eine OFFENE Pruefung, kein vorsichtiger Ansatz.
+   Bericht Am Markt 9 (Kabelsketal, 27.10.2026): „die umfangreiche Grundstuecksflaeche wurde hierbei
+   nicht angepasst, sodass der Bodenwert konservativ angesetzt wurde" - die Richtung einer Anpassung
+   ist offen (groessere Flaeche: je m² weniger; hoehere Ausnutzung: mehr). Geprueft wird der Satz in
+   lib/ki_text_pruefung.js (art 'bodenwert_wertung'). */
+export function bodenwertFakten(cc) {
+  const fl = cc && cc.flaeche;
+  if (!fl || !fl.erheblich || !fl.bodenwert_nicht_angepasst) return [];
+  return ['Der Bodenwert ist NICHT an die Grundstücksgröße angepasst (' + fl.objekt_qm + ' m² gegen '
+    + fl.richtwertgrundstueck_qm + ' m² Bezugsgröße der Zone'
+    + (fl.etw_anteil_qm ? '; Wohnungseigentum, Anteil dieser Wohnung ' + String(fl.etw_anteil_qm).replace('.', ',') + ' m²' : '')
+    + '). Das ist eine offene Prüfung, kein vorsichtiger Ansatz: ob eine Anpassung den Bodenwert senken oder heben würde, ist offen. '
+    + 'Nenne den Bodenwert deshalb NIE „konservativ", „vorsichtig", „zurückhaltend" oder „auf der sicheren Seite", sondern „nicht an die Grundstücksgröße angepasst, insoweit vorläufig".'];
+}
 export function wertermittlungFakten(cc) {
   const e = cc && cc.ertragswert && cc.ertragswert.available ? cc.ertragswert : null;
-  if (!e) return vergleichswertFakten(cc);
-  const f = vergleichswertFakten(cc);
+  if (!e) return vergleichswertFakten(cc).concat(bodenwertFakten(cc));
+  const f = vergleichswertFakten(cc).concat(bodenwertFakten(cc));
   const ms = e.miete_stufe, mh = e.miete_herkunft || {};
   if (ms && ms.qm) {
     const nAus = (mh.n_oben || 0) + (mh.n_unten || 0);

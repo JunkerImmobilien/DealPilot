@@ -257,6 +257,17 @@ export const MarketAnalysisService = {
         offer_date: o.offer_date, lat: o.lat, lon: o.lon, city: o.city, postcode: o.postcode,
         distance_m: round(haversineMeters(ref.lat, ref.lon, o.lat, o.lon), 0),
       }));
+      /* v2990 · dieselbe Anzeige mehrfach (gleicher Ort, Flaeche, Preis, Baujahr) ist EIN Angebot -
+         im Bericht Am Markt 9 standen zwei von zehn Zeilen doppelt. Es bleibt der naechste Eintrag.
+         Der Median kommt aus der Kennzahl-Abfrage des Anbieters und ist davon nicht beruehrt. */
+      const _bes = new Map();
+      comparables.forEach((c) => {
+        const k = [c.postcode || '', c.city || '', c.living_area, c.price, c.build_year].join('|');
+        const a = _bes.get(k);
+        if (!a || (c.distance_m != null && (a.distance_m == null || c.distance_m < a.distance_m))) _bes.set(k, c);
+      });
+      const _beh = new Set(_bes.values());
+      comparables = comparables.filter((c) => _beh.has(c));
     }
 
     const out = {

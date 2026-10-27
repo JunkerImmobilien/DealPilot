@@ -495,7 +495,7 @@ const ADAPTERS = [
      * HTML zurueck, der Leser fand kein Feature und meldete „kein Wert am
      * Punkt". Eine Portaladresse ist kein Dienst; sie wird ignoriert. */
     code: 'borisd_wms', name: 'BORIS-D WMS (bundesweit)',
-    license: 'dl-de/by-2-0 (laenderspezifisch)',
+    license: 'dl-de/by-2-0 (länderspezifisch)',
     quellenvermerk: '© Daten der Gutachterausschüsse für Grundstückswerte '
       + CURRENT_BRW_YEAR + ', dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0) '
       + 'https://www.bodenrichtwerte-boris.de',
@@ -516,7 +516,7 @@ const ADAPTERS = [
     // (v2592 gemessen: auch MV, und hier zusaetzlich BW/SL mit Stichtag 2024/2025).
     // Steht ZULETZT + catchAll -> spezifische verifizierte Landesadapter und der
     // offizielle WMS davor gewinnen immer zuerst (v2592: zweiter Rueckfall).
-    code: 'borisd', name: 'BORIS-D (bundesweit)', license: 'dl-de/by-2-0 (laenderspezifisch)',
+    code: 'borisd', name: 'BORIS-D (bundesweit)', license: 'dl-de/by-2-0 (länderspezifisch)',
     /* v1456 · gemessen am 20.09.2026 (Josef-Mueller-Str. 92, Wolfenbuettel):
        dieser Eintrag lieferte quellenvermerk=null, obwohl die Lizenz eine
        Namensnennung verlangt — der WMS-Zwilling darunter fuehrt sie. Ein Wert

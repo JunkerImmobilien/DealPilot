@@ -1092,6 +1092,12 @@ function _renderWertverfahren(d) {
               { pos: '= Bodenwert', wert: cc.bodenwert.wert, summe: true },
             ])
           : null))
+    /* v2990 · Grundstuecksgroesse: Kernaussage sichtbar, der ganze Hinweis aufklappbar.
+       Stand bisher NUR im PDF, dort als langer Absatz in Braunrot. */
+    + ((cc.flaeche && cc.flaeche.erheblich && cc.flaeche.hinweis)
+        ? '<div class="wv-quelle"><b>Grundstücksgröße:</b> ' + esc(_mbFlaecheKern(cc.flaeche, d.ref)) + '</div>'
+          + aufklapper('flh', 'Ganzer Hinweis zur Grundstücksgröße', esc(cc.flaeche.hinweis))
+        : '')
     + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
     + '<div class="wv-g' + (vi ? ' wv-g4' : '') + '">'
     /* ══ v2660 · E7 · VERGLEICHSWERT AUS DEM IMMOBILIENRICHTWERT ═══════════
@@ -1909,11 +1915,25 @@ function _stufeWert(s) {
   const t = Number.isFinite(n) ? new Intl.NumberFormat('de-DE', { maximumFractionDigits: 2 }).format(n) : String(s.wert);
   return (s.einheit === '% p. a.' && n > 0 ? '+' : '') + t + (s.einheit ? ' ' + s.einheit : '');
 }
+/* v2990 · Kernaussage zur Grundstuecksgroesse - aus den Zahlen, nicht aus dem Fliesstext.
+   Bei Wohnungseigentum ist die Flaeche die der ganzen Anlage; der Anteil der Wohnung steht dabei. */
+function _mbFlaecheKern(fl, ref) {
+  if (fl && fl.kern) return fl.kern;
+  const de = (x) => Number(x).toLocaleString('de-DE', { maximumFractionDigits: 1 });
+  let t = 'Grundstück ' + de(fl.objekt_qm) + ' m² gegen ' + de(fl.richtwertgrundstueck_qm)
+    + ' m² Bezugsgröße der Bodenrichtwertzone (+' + fl.ueberschreitung_pct + ' %).';
+  t += fl.bodenwert_nicht_angepasst
+    ? ' Der Bodenwert ist nicht an die Größe angepasst; Ertrags- und Sachwert sind insoweit vorläufig.'
+    : '';
+  return t;
+}
+/* v2273/v2990 · ds2_entwicklung fuehrt Schluessel - Klartext fuer Web UND PDF */
+const _ENTW_WORT_PDF = { mehrere: 'mehrere klare Möglichkeiten', eine_starke: 'eine starke Möglichkeit', begrenzt: 'begrenzt', kaum: 'kaum', keine: 'keine' };
 /* v2515 · Beschriftung der Herkunft eines Lage-Felds aus DealPilot */
 function _herkunftWort(art) {
   return art === 'ki' ? 'KI-Einschätzung, keine Messung'
     : art === 'gemessen' ? 'aus der Lagemessung übernommen'
-    : 'Ihre Angabe';
+    : 'deine Angabe';   /* v2990: Du im Nutztext */
 }
 function _makroZeilen(d) {
   const mk = d && d.makro_kennzahlen;
@@ -2005,7 +2025,7 @@ function renderAssessment(d) {
      Orchestrator liefert sie als `nutzer_einschaetzung`; `assessment`
      bleibt, was gemessen wurde (GeoMap, Zensus, Makro). */
   const n = d.nutzer_einschaetzung;
-  const ENTW_WORT = { mehrere: 'mehrere klare Möglichkeiten', eine_starke: 'eine starke Möglichkeit', begrenzt: 'begrenzt', kaum: 'kaum', keine: 'keine' };
+  const ENTW_WORT = _ENTW_WORT_PDF;   /* v2990: eine Liste fuer Web und PDF */
   const _nh = (n && n.herkunft) || {};   /* v2515 · Herkunft je Feld */
   const nrows = n ? [
     ['Mikrolage', n.mikrolage, 'mikrolage'], ['Makrolage', n.makrolage, 'makrolage'], ['Bevölkerung', n.bevoelkerung, 'bevoelkerung'],
@@ -3267,7 +3287,11 @@ async function exportPdf(out) {
     doc.setFillColor(255, 255, 255); doc.setDrawColor(232, 230, 224); doc.setLineWidth(0.25);
     doc.roundedRect(x, ty, w, h, 1.8, 1.8, 'FD');
     doc.setFillColor(...(accent || GOLD)); doc.roundedRect(x, ty + 3, 1.8, h - 6, 0.9, 0.9, 'F');
-    doc.setFontSize(7); doc.setTextColor(...MUT); doc.text(label.toUpperCase(), x + 5.5, ty + 6, { charSpace: 0.5 });
+    /* v2990 · laengere Titel („Kaufpreis unter Indikation") passen sich der Kachel an, statt hinauszulaufen */
+    let _lfs = 7, _lcs = 0.5; const _lt = label.toUpperCase();
+    doc.setFontSize(_lfs);
+    while (_lfs > 5.6 && doc.getTextWidth(_lt) + _lt.length * _lcs > w - 8) { if (_lcs > 0.15) _lcs -= 0.15; else _lfs -= 0.3; doc.setFontSize(_lfs); }
+    doc.setTextColor(...MUT); doc.text(_lt, x + 5.5, ty + 6, { charSpace: _lcs });
     doc.setFontSize(14.5); doc.setTextColor(...INK); doc.setFont('helvetica', 'bold');
     doc.text(String(value == null ? '–' : value), x + 5.5, ty + 14.2); doc.setFont('helvetica', 'normal');
   }
@@ -3665,7 +3689,7 @@ async function exportPdf(out) {
   doc.setFontSize(9.5);
   {
     const segs = [
-      ['home', ref.property_type],
+      ['home', _mbArtLabel(ref.property_type)],   /* v2990: Klartext statt „wohnung“ */
       ['area', ref.living_area ? ref.living_area + ' m²' : null],
       ['bed', ref.rooms ? ref.rooms + ' Zi.' : null],
       ['cal', ref.build_year ? 'Bj. ' + ref.build_year : null],
@@ -3841,8 +3865,10 @@ async function exportPdf(out) {
      * Beide sind raus — der Marktwert steht in 03 im Band, die Marktmiete
      * ebenfalls. 01 zeigt nur noch, was NICHT anderswo steht. */
     ['Bruttorendite', yld.gross_yield_pct != null ? String(yld.gross_yield_pct).replace('.', ',') + ' %' : null, [67, 183, 124]],
-    ['Kaufpreisfaktor', yld.rent_multiplier != null ? String(yld.rent_multiplier).replace('.', ',') : null, [150, 142, 120]],
-    ['Abw. z. Marktwert', mv.discount_to_market_pct != null ? String(mv.discount_to_market_pct).replace('.', ',') + ' %' : null, GOLD],
+    ['Kaufpreisfaktor Ist-Miete', yld.rent_multiplier != null ? String(yld.rent_multiplier).replace('.', ',') : null, [150, 142, 120]],   /* v2990: Kaufpreis ÷ Ist-Jahresmiete */
+    /* v2990 · hier stand „Abw. z. Marktwert 32,2 %" - ohne Richtung. Positiv heisst: Kaufpreis UNTER der Indikation. */
+    [mv.discount_to_market_pct != null && mv.discount_to_market_pct < 0 ? 'Kaufpreis über Indikation' : 'Kaufpreis unter Indikation',
+      mv.discount_to_market_pct != null ? String(Math.abs(mv.discount_to_market_pct)).replace('.', ',') + ' %' : null, GOLD],
     ['Kaufpreis €/m²', inp.price_per_sqm ? Math.round(inp.price_per_sqm).toLocaleString('de-DE') + ' €' : null, [138, 138, 147]],
   ].filter((t) => t[1] != null); // leere Kacheln (z.B. Kauf-Szenario ohne Preis) NICHT zeigen
   const tileRows = Math.ceil(tiles.length / 3);
@@ -3884,12 +3910,13 @@ async function exportPdf(out) {
     doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...cc);
     const head = pct != null ? `${lbl} · ${pct} %` : `Konfidenz: ${lbl}`;
     doc.text(head, M + 6, y);
+    const _headW = doc.getTextWidth(head);   /* v2990: gemessen in der Schrift, in der gesetzt wurde (fett 10 pt) - vorher erst nach dem Wechsel auf 8,5 pt normal: „85 %(56“ */
     const ns = d.sale && d.sale.sample_size;
     const meta = [ns ? ns.toLocaleString('de-DE') + ' Vergleiche' : null,
       mv.input_filled != null ? `${mv.input_filled}/${mv.input_total} Objektangaben` : null].filter(Boolean).join(' · ');
     if (meta) {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...MUT);
-      doc.text('(' + meta + ')', M + 6 + doc.getTextWidth(head) + 4, y);
+      doc.text('(' + meta + ')', M + 6 + _headW + 3, y);
     }
     y += 6;
     if (pct != null) {
@@ -3915,8 +3942,8 @@ async function exportPdf(out) {
   const _optText = (id, v) => { try { const o = [].find.call(document.querySelectorAll('#' + id + ' option'), (x) => x.value === String(v)); return o ? o.textContent.trim() : v; } catch (e) { return v; } };
   const _ART = { mfh: 'Mehrfamilienhaus', efh: 'Einfamilienhaus', zfh: 'Zweifamilienhaus', wohnung: 'Eigentumswohnung', etw: 'Eigentumswohnung', dhh: 'Doppelhaushälfte', rh: 'Reihenhaus' };
   const col = (W - 2 * M) / 3; const rows = [
-    ['Objekttyp', _ART[String(ref.property_type || '').toLowerCase()] || ref.property_type], ['Wohnfläche', ref.living_area ? ref.living_area + ' m²' : null], ['Zimmer', ref.rooms],
-    ['Baujahr', ref.build_year], ['Etage', ref.floor], ['Energieklasse', ref.energy_class],
+    ['Objekttyp', _ART[String(ref.property_type || '').toLowerCase()] || _mbArtLabel(ref.property_type)], ['Wohnfläche', ref.living_area ? ref.living_area + ' m²' : null], ['Zimmer', ref.rooms],
+    ['Baujahr', ref.build_year], ['Etage', _mbEtage(ref.floor)], ['Energieklasse', ref.energy_class],   /* v2990: „0“ -> EG */
     ['Zustand', ref.condition ? _optText('cond', ref.condition) : '–'], ['Ausstattung', ref.quality ? _optText('quality', ref.quality) : '–'], ['Modernisierung', ref.modernization ? _optText('modern', ref.modernization) : '–'],
   ];
   if (ref.modernization_year) rows.push(['Modernisierungsjahr', ref.modernization_year]);
@@ -4138,7 +4165,13 @@ async function exportPdf(out) {
       midSub: fmtSqm(rmed, true) + ' €/m²  ·  Median',
       hiLab: 'OBERE MIETE', hiTxt: euro(rHi), hiSub: fmtSqm(d.rent.q75_per_sqm, true) + ' €/m²',
       marker: null, markerTxt: '',
-      fuss: (ref.purchase_price != null && rMonth) ? 'Brutto-Faktor: ' + (ref.purchase_price / (rMonth * 12)).toFixed(1) : null,
+      /* v2990 · hier stand „Brutto-Faktor: 11.1" - Punkt statt Komma und ohne Erklaerung neben dem Kaufpreisfaktor 15,7
+         (der rechnet mit der IST-Miete). Jetzt benannt: was durch was. */
+      fuss: (ref.purchase_price != null && rMonth)
+        ? 'Kaufpreisfaktor zur Marktmiete: ' + (ref.purchase_price / (rMonth * 12)).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+          + ' (Kaufpreis ' + euro(ref.purchase_price) + ' ÷ Jahresmarktmiete ' + euro(Math.round(rMonth * 12)) + ')'
+          + (yld.rent_multiplier != null ? ' · zur Ist-Miete: ' + String(yld.rent_multiplier).replace('.', ',') : '')
+        : null,
       fussCol: [120, 113, 100],
     });
   }
@@ -4167,7 +4200,7 @@ async function exportPdf(out) {
   }
   if (d.rent && d.rent.q25_per_sqm != null && d.rent.q75_per_sqm != null && rmed != null) {
     rangeBarPro(M + halfW + 6, y + 8, halfW, d.rent.q25_per_sqm, rmed, d.rent.q75_per_sqm,
-      (v) => v.toLocaleString('de-DE') + ' €', null, null);
+      (v) => v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €', null, null);   /* v2990: 7,50 statt 7,5 */
   }
   y += 22;
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(...MUT);
@@ -4179,7 +4212,7 @@ async function exportPdf(out) {
     if (sale.min_per_sqm != null && sale.max_per_sqm != null)
       gp.push('Kauf gesamt ' + Math.round(sale.min_per_sqm).toLocaleString('de-DE') + '–' + Math.round(sale.max_per_sqm).toLocaleString('de-DE') + ' €/m²');
     if (d.rent && d.rent.min_per_sqm != null && d.rent.max_per_sqm != null)
-      gp.push('Miete gesamt ' + d.rent.min_per_sqm.toLocaleString('de-DE') + '–' + d.rent.max_per_sqm.toLocaleString('de-DE') + ' €/m²');
+      gp.push('Miete gesamt ' + d.rent.min_per_sqm.toLocaleString('de-DE', { minimumFractionDigits: 2 }) + '–' + d.rent.max_per_sqm.toLocaleString('de-DE', { minimumFractionDigits: 2 }) + ' €/m²');
     doc.text('Gesamtspanne aller Vergleiche: ' + gp.join('  ·  '), M, y + 3.5);
     y += 9;
   }
@@ -4188,7 +4221,7 @@ async function exportPdf(out) {
   need(16);
   const kpis = [
     yld.gross_yield_pct != null ? ['Bruttorendite', String(yld.gross_yield_pct).replace('.', ',') + ' %'] : null,
-    yld.rent_multiplier != null ? ['Kaufpreisfaktor', String(yld.rent_multiplier).replace('.', ',')] : null,
+    yld.rent_multiplier != null ? ['Kaufpreisfaktor (Ist-Miete)', String(yld.rent_multiplier).replace('.', ',')] : null,
     ds.score != null ? ['Deal-Score', ds.score + ' (' + _scoreTier(ds.score) + ')'] : null,   /* v1203 */
   ].filter(Boolean);
   if (kpis.length) { kpis.forEach((k, i) => kv(k[0], k[1], M + i * col, col, k[2])); y += 16; } /* v952-kvaccent */
@@ -4209,8 +4242,8 @@ async function exportPdf(out) {
     const lcomp = (d.valuation && d.valuation.land_component) || null;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(180, 180, 188);
     const info = [];
-    if (lv.nutzung) info.push('Nutzung ' + lv.nutzung);
-    if (lv.stichtag) info.push('Stichtag ' + lv.stichtag + (lv.stichtag_veraltet ? ' (älter als ein Jahr)' : ''));   /* v2592 */
+    if (lv.nutzung) info.push('Nutzung ' + _mbNutzung(lv.nutzung));   /* v2990: „1130“ -> „WA · allgemeines Wohngebiet“ */
+    if (lv.stichtag) info.push('Stichtag ' + String(lv.stichtag).replace(/^(d{4})-(d{2})-(d{2})$/, '$3.$2.$1') + (lv.stichtag_veraltet ? ' (älter als ein Jahr)' : ''));   /* v2592 */
     if (lv.used_year) info.push('Jahrgang ' + lv.used_year);
     if (_lvEigenPdf) info.unshift('eigene Angabe, nicht über BORIS abgerufen');   /* v2390 */
     doc.text(info.join('  ·  '), M + 60, y + 9);
@@ -4235,11 +4268,15 @@ async function exportPdf(out) {
      * Jetzt wird der Wert aus der Rechnung gezeigt, sonst gar keiner. */
     const _bwEcht = d.cross_check && d.cross_check.ertragswert
       && d.cross_check.ertragswert.bodenwert_eur;
-    if (_bwEcht) doc.text('Bodenwertanteil dieses Objekts: ' + euro(_bwEcht), M + 90, y + 12);
+    /* v2990 · stand bei M+90 / y+12 - mitten in der Infozeile, eingerueckt gegen alle anderen Zeilen.
+       Jetzt in der Zeile, in der die anderen Faelle den Bodenwert nennen, mit dem Anteil bei Wohnungseigentum. */
+    const _meaPdf = Number(ref.mea_pct);
+    if (_bwEcht) doc.text((ref.plot_area ? 'Grundstück ' + Math.round(ref.plot_area).toLocaleString('de-DE') + ' m² · ' : '')
+      + (_meaPdf > 0 && _meaPdf < 100 ? 'Bodenwertanteil (MEA ' + String(_meaPdf).replace('.', ',') + ' %): ' : 'Bodenwert: ') + euro(_bwEcht), M + 60, y + 16);
       if (false) doc.text('Rechnerischer Bodenwertanteil (' + area + ' m²): ' + euro(bodenAnteil), M + 60, y + 16);
     }
     doc.setFontSize(7); doc.setTextColor(150, 150, 160);
-    if (lv.license) doc.text(lv.license, M + 60, y + 22);
+    if (lv.license) doc.text(String(lv.license).replace(/laenderspezifisch/g, 'länderspezifisch'), M + 60, y + 22);   /* v2990 */
     y += 30;
     if (lcomp && lcomp.value_eur > 0) {
       need(8);
@@ -4267,8 +4304,14 @@ async function exportPdf(out) {
   if (cc && cc.available && cc.comparison) {
     sectionTitle('Wertverfahren im Vergleich', 70);
     need(56);
-    const cardW = (blockW - 12) / 3, cardH = 40;
-    const card3 = (x, title, value, lines, lead) => {
+    const cardW = (blockW - 12) / 3; let cardH = 40;
+    /* v2990 · Die Karten werden erst gesammelt, dann gemessen, dann gezeichnet: die Sachwert-Karte
+       endete im Bericht Am Markt 9 mitten im Wort („… keinen Fak"), weil sieben Zeilen in 40 mm
+       nicht passten und die Schrift bei 4,6 pt aufhoerte zu schrumpfen. Jetzt waechst die Hoehe
+       (fuer alle drei gleich), die Schrift bleibt lesbar. */
+    const _k3 = [];
+    const card3 = (...a) => { _k3.push(a); };
+    const _card3Draw = (x, title, value, lines, lead) => {
       doc.setFillColor(...(lead ? INK : [245, 243, 238])); doc.roundedRect(x, y, cardW, cardH, 2.5, 2.5, 'F');
       doc.setFillColor(...GOLD); doc.roundedRect(x, y, 2, cardH, 1, 1, 'F');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6);
@@ -4295,14 +4338,14 @@ async function exportPdf(out) {
        * lange Begruendung schrumpft.
        */
       const _avail = cardH - 24; // von ly = y+22 bis zum Kartenfuss
-      let _fs = 7, _lh = 4.4, _cl = [];
+      let _fs = 7, _lh = 4.2, _cl = [];
       for (;;) {
         doc.setFontSize(_fs);
         _cl = [];
         lines.filter(Boolean).forEach((l) => {
           doc.splitTextToSize(String(l), cardW - 12).forEach((w) => _cl.push(w));
         });
-        if (_cl.length * _lh <= _avail || _fs <= 4.6) break;
+        if (_cl.length * _lh <= _avail || _fs <= 6) break;
         _fs -= 0.4; _lh = _fs * 0.63;
       }
       _cl.forEach((l) => { doc.text(l, x + 6, ly); ly += _lh; });
@@ -4403,11 +4446,15 @@ async function exportPdf(out) {
         technisch: 'Immobilienrichtwert derzeit nicht abrufbar',
       }[cc.irw.grund] || null) : null,
     ], _fuehrt('vergleichswert'));   /* v1062-WFUE-2 */
-    card3(M + cardW + 6, 'SACHWERT · INDIKATIV', sw.available ? sw.value_eur : null, sw.available ? [
+    /* v2990 · wie die Haupt-App seit v2979 (wertvergleich.js): ohne Sachwertfaktor nur Plausibilitaet,
+       keine Marktaussage - Titel und Unterzeile sagen es, die Zeilen bleiben kurz. */
+    const _swPl = !!(sw.available && (sw.vorlaeufig === true || sw.marktangepasst === false));
+    card3(M + cardW + 6, _swPl ? 'SACHWERT · NUR PLAUSIBILITÄT' : 'SACHWERT · INDIKATIV', sw.available ? sw.value_eur : null, sw.available ? [
+      _swPl ? 'Herstellungskosten ohne Marktanpassung, kein Marktwert' : null,
       /* v1056-WKRT-1 · Die drei Felder gab es im Ergebnis nicht; die Karte
        * zeigte "ohne Bodenwert · Gebäude – · RND undefined J." neben einer
        * korrekten Staffel. Jetzt liefert der Rechenkern sie. */
-      sw.hinweis_kurz || null,
+      _swPl ? null : (sw.hinweis_kurz || null),
       /* v2390 · beim Pauschalansatz steht da, was zum Sachwert nach NHK 2010 fehlt */
       sw.pauschal ? ('vereinfachter Sachwert, vorläufig'
         + (sw.fehlt && sw.fehlt.length ? ' · es fehlt: ' + sw.fehlt.join(', ') : '')) : null,
@@ -4432,7 +4479,7 @@ async function exportPdf(out) {
        * Eigentumswohnung leitet der Gutachterausschuss naemlich gar keinen
        * ab. Der Bildschirm zeigt den Grund seit v1143, das PDF nicht. */
       /* v1867 · der Standardwert steht als Zahl im PDF, nicht nur „ohne Faktor" */
-      (sw.available && !sw.marktangepasst && sw.sachwertfaktor_standard)
+      (sw.available && !sw.marktangepasst && sw.sachwertfaktor_standard && !_swPl)
         ? ('Sachwertfaktor ' + String(sw.sachwertfaktor_standard).replace('.', ',') + ' · Standard, ohne Marktanpassung (§ 7 Abs. 2 ImmoWertV)')
         : null,
       (sw.available && !sw.marktangepasst && sw.sachwertfaktor_grund)
@@ -4460,6 +4507,14 @@ async function exportPdf(out) {
        Code-Grund (gewerbe_ohne_nutzungsart) stand roh da. Jetzt der eigene Grund, kurz mit Ort. */
     ] : [ewGrundText(cc.ertragswert, true) || 'nicht berechenbar'],
       _fuehrt('ertragswert'));   /* v1062-WFUE-4 */
+    {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+      let _maxZ = 0;
+      _k3.forEach((a) => { let n = 0; (a[3] || []).filter(Boolean).forEach((l) => { n += doc.splitTextToSize(String(l), cardW - 12).length; }); _maxZ = Math.max(_maxZ, n); });
+      cardH = Math.max(40, Math.min(72, 24 + _maxZ * 4.2 + 1.5));
+      need(cardH + 2);
+      _k3.forEach((a) => _card3Draw(...a));
+    }
     y += cardH + 5;
 
     /* v1062-WFUE-5 · Drei Karten nebeneinander ohne Rangfolge lesen sich wie
@@ -4972,12 +5027,37 @@ async function exportPdf(out) {
     /* v1050-WFLA-1 · Der Flaechenbefund aus v1049. Eine stille Annahme
      * ueber den Bodenwert ist dieselbe Sorte Fehler wie die stille
      * Standardstufe 3 — sie gehoert in den Bericht, nicht ins Log. */
+    /* v2990 · Marcel am Bericht Am Markt 9: ein langer braunroter Absatz (19 Zeilen, der Satz „nicht
+       angepasst" zweimal). Jetzt ein Hinweiskasten wie „Welche Miete der Ertragswert rechnet": Kernaussage
+       zuerst, darunter in kleiner Schrift nur so viele ganze Saetze, wie in sechs Zeilen passen - der ganze
+       Hinweis steht aufklappbar in der Web-Ansicht. Nie mitten im Satz abschneiden (v962). */
     if (cc.flaeche && cc.flaeche.erheblich && cc.flaeche.hinweis) {
-      const _fl = doc.splitTextToSize(cc.flaeche.hinweis, blockW);
-      need(_fl.length * 3.4 + 6);
-      doc.setFontSize(7); doc.setTextColor(150, 110, 100);
-      doc.text(_fl, M, y); y += _fl.length * 3.4 + 4;
-      doc.setFontSize(7.5); doc.setTextColor(...MUT);
+      const _bxW = blockW - 10;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4);
+      const _kz = doc.splitTextToSize(_mbFlaecheKern(cc.flaeche, ref), _bxW);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
+      const _satzL = String(cc.flaeche.hinweis).split(/(?<=[.!?“])s+(?=[A-ZÄÖÜ„])/)
+        .filter((x) => !/^Das Grundstück ist mit|nicht an die Grundstücksgröße angepasst|NICHT an die Grundstücksgröße angepasst|^Der Bodenwert setzt die gesamte Fläche/.test(x));
+      let _det = [], _gekuerzt = false;
+      for (const _sz of _satzL) {
+        const _try = doc.splitTextToSize(_det.concat([_sz]).join(' '), _bxW);
+        if (_try.length > 6) { _gekuerzt = true; break; }
+        _det.push(_sz);
+      }
+      if (_gekuerzt) _det.push('Den ganzen Hinweis zeigt die Web-Ansicht des Berichts.');
+      const _dz = _det.length ? doc.splitTextToSize(_det.join(' '), _bxW) : [];
+      const _bxH = 9 + _kz.length * 3.4 + (_dz.length ? 1.5 + _dz.length * 2.9 : 0) + 2;
+      need(_bxH + 4);
+      doc.setFillColor(247, 243, 233); doc.roundedRect(M, y, blockW, _bxH, 2, 2, 'F');
+      doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, _bxH, 0.8, 0.8, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
+      doc.text('GRUNDSTÜCKSGRÖSSE', M + 5, y + 5, { charSpace: 0.3 });
+      doc.setFontSize(7.4); doc.setTextColor(...TXT);
+      doc.text(_kz, M + 5, y + 10);
+      let _by = y + 10 + _kz.length * 3.4 + 1.2;
+      if (_dz.length) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(...MUT); doc.text(_dz, M + 5, _by); }
+      y += _bxH + 4;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
     }
 
     /* Staffel */
@@ -5387,7 +5467,8 @@ async function exportPdf(out) {
       ['Mikrolage', N.mikrolage, 'mikrolage'], ['Makrolage', N.makrolage, 'makrolage'], ['Bevölkerungsentwicklung', N.bevoelkerung, 'bevoelkerung'],
       ['Nachfrage', N.nachfrage, 'nachfrage'], ['Entwicklungsmöglichkeiten', N.entwicklung, 'entwicklung'], ['Wertsteigerungspotenzial', N.wertsteigerung, 'wertsteigerung'],
       ['Mietausfallrisiko', N.mietausfallrisiko, 'mietausfallrisiko'],
-    ].filter((r) => r[1] != null && r[1] !== '').map((r) => [r[0] + ' (' + _herkunftWort(_NH[r[2]]) + ')', String(r[1]).replace(/_/g, ' ')]);   /* v2515 */
+    ].filter((r) => r[1] != null && r[1] !== '').map((r) => [r[0] + ' (' + _herkunftWort(_NH[r[2]]) + ')',
+      (r[2] === 'entwicklung' && _ENTW_WORT_PDF[r[1]]) || String(r[1]).replace(/_/g, ' ')]);   /* v2515; v2990: „eine starke" -> „eine starke Möglichkeit" wie die Web-Ansicht */
     if (nr.length) {
       need(14); doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...MUT);
       doc.text('Angaben aus DealPilot (Reiter Objekt) — Herkunft je Feld', M, y); y += 4;
@@ -5573,17 +5654,21 @@ async function exportPdf(out) {
      *
      * Der Typ steht weiter in der Tabelle, weil er bei gemischten Bestaenden
      * traegt; der Ort kommt daneben. */
-    const _cN = comps.length;
+    /* v2990 · dieselbe Anzeige zweimal (Schkeuditz 83,2 m² 187.000 €, Kabelsketal 113 m² 184.900 € im
+       Bericht Am Markt 9) - entdoppelt, und der Satz darunter sagt es. */
+    const _compsRoh = comps.length;
+    const _compsE = _mbCompsEindeutig(comps);
+    const _cN = _compsE.length;
     const _cGes = (d.sale && d.sale.sample_size) || _cN;
     sectionTitle('Vergleichsobjekte (' + _cN + (_cGes > _cN ? ' von ' + _cGes : '') + ')');
     doc.autoTable({
       startY: y, margin: { left: M, right: M },
       head: [['Typ', 'Ort', 'Fläche', 'Baujahr', 'Preis', '€/m²', 'Entf.']],
-      body: comps.map((c) => [c.property_type || '–',
+      body: _compsE.map((c) => [_mbArtLabel(c.property_type) || '–',
         [c.postcode, c.city].filter(Boolean).join(' ') || '–',
-        c.living_area ? c.living_area + ' m²' : '–',
+        c.living_area ? Number(c.living_area).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' m²' : '–',
         c.build_year || '–', euro(c.price), c.price_per_sqm ? Math.round(c.price_per_sqm).toLocaleString('de-DE') : '–',
-        c.distance_m != null ? c.distance_m + ' m' : '–']),
+        c.distance_m != null ? Number(c.distance_m).toLocaleString('de-DE') + ' m' : '–']),
       headStyles: { fillColor: INK, textColor: 255, fontSize: 8 },
       styles: { fontSize: 8, cellPadding: 1.8, textColor: TXT },
       alternateRowStyles: { fillColor: [245, 244, 240] },
@@ -5598,7 +5683,8 @@ async function exportPdf(out) {
         _hin.push(_cN + ' von ' + _cGes + ' Vergleichen gezeigt; Median, Quartile und '
           + 'Gesamtspanne oben stammen aus allen ' + _cGes + '.');
       }
-      const _koord = new Set(comps.map((c) => (c.lat != null && c.lon != null)
+      if (_compsRoh > _cN) _hin.push((_compsRoh - _cN) + (_compsRoh - _cN === 1 ? ' Angebot war doppelt eingestellt und steht' : ' Angebote waren doppelt eingestellt und stehen') + ' hier nur einmal.');
+      const _koord = new Set(_compsE.map((c) => (c.lat != null && c.lon != null)
         ? c.lat + ',' + c.lon : null).filter(Boolean));
       if (_koord.size > 0 && _koord.size < _cN) {
         _hin.push('Die Standorte sind je Ort zusammengefasst (' + _koord.size
@@ -5644,17 +5730,30 @@ async function exportPdf(out) {
     }
     const _drawRich = (text, x, maxW, color) => {
       const lay = _mbLayoutRuns(doc, _mbParseRuns(text), maxW, RSZ);
-      for (const line of lay.lines) {
+      const _nL = lay.lines.length;
+      lay.lines.forEach((line, li) => {
         // v957-fontleak: need() kann umbrechen. Die Breiten in lay stammen aus
         // RSZ — also muss auch gezeichnet werden bei RSZ, egal was dazwischen war.
-        need(RLH); doc.setFontSize(RSZ); let cx = x; const yy = y;
-        for (const tok of line) {
-          doc.setFont('helvetica', tok.bold ? 'bold' : 'normal');
+        /* v2990 · keine Schusterjunge, kein Hurenkind: Seite 9 des Berichts Am Markt 9 trug nur
+           die letzte Zeile eines Absatzes. Die ersten zwei und die letzten zwei Zeilen eines
+           Absatzes bleiben zusammen. */
+        const _rest = _nL - li;
+        need(li === 0 ? Math.min(_nL, 2) * RLH : (_rest === 2 ? 2 * RLH : RLH));
+        doc.setFontSize(RSZ); let cx = x; const yy = y;
+        /* v2990 · Woerter derselben Schrift als EIN String setzen: den Abstand macht dann der
+           Viewer mit denselben Glyphenbreiten, mit denen er setzt (vorher Wort fuer Wort mit
+           gemessener Breite: „Vergleichsangebotesowie"). */
+        let gi = 0;
+        while (gi < line.length) {
+          let gj = gi; while (gj + 1 < line.length && !!line[gj + 1].bold === !!line[gi].bold) gj++;
+          const grp = line.slice(gi, gj + 1).map((t) => t.t).join(' ');
+          doc.setFont('helvetica', line[gi].bold ? 'bold' : 'normal');
           doc.setTextColor(color[0], color[1], color[2]);
-          doc.text(tok.t, cx, yy); cx += tok.w + lay.spaceW;
+          doc.text(grp, cx, yy); cx += doc.getTextWidth(grp) + lay.spaceW;
+          gi = gj + 1;
         }
         y = yy + RLH;
-      }
+      });
     };
     doc.setFontSize(RSZ);
     for (const b of mdToPdfLines(out.report_md)) {
@@ -5814,6 +5913,58 @@ function mdToPdfLines(md) {
     B.push({ type: 'p', text: p.join(' ') });
   }
   return B;
+}
+/* v2990 · Klartext statt Rohschluessel im PDF (Bericht Am Markt 9, Kabelsketal, 27.10.2026):
+   „wohnung" klein auf Deckblatt und in den Vergleichsobjekten, „Etage 0", „Nutzung 1130". */
+const _MB_ART = { wohnung: 'Eigentumswohnung', etw: 'Eigentumswohnung', mfh: 'Mehrfamilienhaus', efh: 'Einfamilienhaus',
+  zfh: 'Zweifamilienhaus', dhh: 'Doppelhaushälfte', rh: 'Reihenhaus', reh: 'Reihenendhaus', rmh: 'Reihenmittelhaus',
+  haus: 'Haus', grundstueck: 'Grundstück', gewerbe: 'Gewerbe', wgh: 'Wohn- und Geschäftshaus' };
+function _mbArtLabel(t) {
+  if (t == null || t === '') return null;
+  const s = String(t).trim();
+  return _MB_ART[s.toLowerCase()] || (s.charAt(0).toUpperCase() + s.slice(1));
+}
+/* Etage: 0 = EG, negativ = UG, sonst „n. OG". */
+function _mbEtage(f) {
+  if (f == null || f === '') return null;
+  const n = Number(f);
+  if (!Number.isFinite(n)) return String(f);
+  return n === 0 ? 'EG' : (n < 0 ? (n === -1 ? 'UG' : (-n) + '. UG') : n + '. OG');
+}
+/* Art der Nutzung des Bodenrichtwertgrundstuecks. Die BORIS-D-Dienste liefern sie als
+   Zahl; die Zahl ist die Gliederungsnummer der Anlage 5 ImmoWertV (Nutzungsartenkatalog):
+   1000 + Nr. x 100 + Unternr. x 10 - 1130 = Nr. 1.3 WA (gemessen: die Zonen „WA-Grosskugel"
+   und „Rinteln-WA Waldkaterallee" tragen beide 1130). Nur die Bauflaechen 1-5 sind
+   abgebildet; ein unbekannter Schluessel bleibt als Schluessel stehen, mit Namen. */
+const _MB_NUTZUNG = { 1100: ['W', 'Wohnbaufläche'], 1110: ['WS', 'Kleinsiedlungsgebiet'], 1120: ['WR', 'reines Wohngebiet'],
+  1130: ['WA', 'allgemeines Wohngebiet'], 1140: ['WB', 'besonderes Wohngebiet'], 1200: ['M', 'gemischte Baufläche'],
+  1210: ['MD', 'Dorfgebiet'], 1220: ['MDW', 'Dörfliches Wohngebiet'], 1230: ['MI', 'Mischgebiet'], 1240: ['MK', 'Kerngebiet'],
+  1250: ['MU', 'Urbanes Gebiet'], 1300: ['G', 'gewerbliche Baufläche'], 1310: ['GE', 'Gewerbegebiet'],
+  1320: ['GI', 'Industriegebiet'], 1400: ['S', 'Sonderbaufläche'], 1410: ['SE', 'Sondergebiet für Erholung'],
+  1420: ['SO', 'sonstige Sondergebiete'], 1500: ['GB', 'Baufläche für Gemeinbedarf'] };
+const _MB_NUTZUNG_K = {};
+Object.keys(_MB_NUTZUNG).forEach((k) => { _MB_NUTZUNG_K[_MB_NUTZUNG[k][0]] = _MB_NUTZUNG[k][1]; });
+function _mbNutzung(v) {
+  if (v == null || v === '') return null;
+  const s = String(v).trim();
+  if (/^\d{4}$/.test(s)) {
+    const e = _MB_NUTZUNG[Number(s)];
+    return e ? e[0] + ' · ' + e[1] : 'Nutzungsart-Schlüssel ' + s;
+  }
+  const k = _MB_NUTZUNG_K[s.toUpperCase()];
+  return k ? s.toUpperCase() + ' · ' + k : s;
+}
+/* Dieselbe Anzeige zweimal (gleiche Flaeche, gleicher Preis, gleiches Baujahr, gleicher Ort)
+   ist dasselbe Angebot, mehrfach eingestellt - es bleibt der naechstgelegene Eintrag. */
+function _mbCompsEindeutig(comps) {
+  const m = new Map();
+  (comps || []).forEach((c) => {
+    const k = [c.postcode || '', c.city || '', c.living_area, c.price, c.build_year].join('|');
+    const alt = m.get(k);
+    if (!alt || (c.distance_m != null && (alt.distance_m == null || c.distance_m < alt.distance_m))) m.set(k, c);
+  });
+  const behalten = new Set(m.values());
+  return (comps || []).filter((c) => behalten.has(c));
 }
 // v895d-mbfmt: inline **fett** -> Runs [{t,bold}]
 function _mbParseRuns(text) {
