@@ -36,7 +36,8 @@
 .lz-flow{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:24px 22px;position:relative}
 .lz-flow-k{display:flex;justify-content:space-between;font:700 9.5px/1 var(--mono);letter-spacing:.14em;color:var(--gdh);
   text-transform:uppercase;margin-bottom:18px}
-.lz-flow-k i{font-style:normal;color:var(--grn)}
+.lz-flow-k{gap:12px}
+.lz-flow-k i{font-style:normal;color:var(--grn);white-space:nowrap}
 .lz-step{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;padding:11px 0;
   border-top:1px solid rgba(255,255,255,.06);opacity:.35;transition:opacity .5s}
 .lz-step:first-of-type{border-top:0}
@@ -187,7 +188,7 @@
   .lz-bild{max-width:260px}
 }
 @media(max-width:640px){
-  .lz-hero{padding:96px 0 64px}
+  .lz-hero{padding:56px 0 64px}
   .lz-sec{padding:72px 0}
   .lz-leist,.lz-ref,.lz-baut,.lz-kompetenz{grid-template-columns:1fr}
   .lz-l{border-right:0 !important}
