@@ -302,11 +302,14 @@ export function angepassterZins({
     spanne_von: Math.round((basis - stabw) * 100) / 100,
     spanne_bis: Math.round((basis + stabw) * 100) / 100,
     merkmale: teile,
-    stufe: 'C',
-    hinweis: 'Objektspezifisch angepasster Liegenschaftszinssatz nach § 33 ImmoWertV. '
-      + 'Ausgangswert ist der amtliche Zinssatz; die Anpassung folgt dem Katalog der Zu- und '
-      + 'Abschläge des Gutachterausschusses und bleibt innerhalb der von ihm veröffentlichten '
-      + 'Streuung. Die Gewichtung der Merkmale ist eine Festlegung von DealPilot, nicht des '
+    /* v3009 · W3 · keine „Stufe C" mehr: das ist eine EINORDNUNG mit DealPilot-Gewichten, nicht die
+       Anpassung nach § 33 (die rechnet lib/lzs_anpassung.js mit den Koeffizienten des Ausschusses).
+       Sie geht in keine Rechnung ein. */
+    stufe: null, art: 'dealpilot_einordnung',
+    hinweis: 'Einordnung des Zinssatzes, nicht gerechnet: angepasst wird nach § 33 ImmoWertV nur mit der '
+      + 'Funktion oder den Umrechnungskoeffizienten des Gutachterausschusses selbst. '
+      + 'Ausgangswert ist der amtliche Zinssatz; die Einordnung folgt einem Merkmalskatalog und bleibt innerhalb der '
+      + 'veröffentlichten Streuung. Die Gewichtung der Merkmale ist eine Festlegung von DealPilot, nicht des '
       + 'Ausschusses — sie macht das Ergebnis nachvollziehbar und für jedes Objekt gleich, '
       + 'ersetzt aber keine sachverständige Würdigung des Einzelfalls.',
   };

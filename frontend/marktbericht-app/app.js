@@ -5208,12 +5208,13 @@ async function exportPdf(out) {
       need(24 + _HR);
       doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
       doc.setCharSpace(0.3);
-      doc.text('OBJEKTSPEZIFISCH ANGEPASSTER ZINSSATZ (§ 33 IMMOWERTV) · STUFE '
-        + (_za.stufe || 'C'), M, y + 3);
+      /* v3009 · W3 · keine „Stufe C": DealPilot-Einordnung, nicht gerechnet. Die Anpassung nach
+         § 33 steht als Zeile im Rechenweg (Staffel), wenn der Ausschuss eine Funktion fuehrt. */
+      doc.text('EINORDNUNG DES ZINSSATZES · DEALPILOT-GEWICHTUNG, NICHT GERECHNET', M, y + 3);
       doc.setCharSpace(0);
       y += 7;
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
-      doc.text(String(_za.basis_pct).replace('.', ',') + ' % amtlich'
+      doc.text(String(_za.basis_pct).replace('.', ',') + ' % amtlich (gerechnet)'
         + ((_za.anpassung_pct >= 0) ? '   +   ' : '   -   ')
         + String(Math.abs(_za.anpassung_pct)).replace('.', ',') + ' Punkte   =   '
         + String(_za.zins_pct).replace('.', ',') + ' %'

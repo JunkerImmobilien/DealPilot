@@ -1214,6 +1214,36 @@ fallB('B54', () => {
   wert('B', 'B57', 'GND Wohnhaus mit Mischnutzung (Anlage 1)', IW.gnd('wohn_misch'), 80, 0);
 })();
 
+/* v3009 · B58 Objektspezifisch angepasster Liegenschaftszins (§ 33): Koeffizienten des Ausschusses
+   (GAG Aurich, Bueroflaechen 3,5 % bei RND 30, UK 20/30/40/50 = 1,2/1,0/0,8/0,6, GMB S. 44),
+   multiplikativ, nur innerhalb der Tabelle; der angepasste Zins geht in Barwertfaktor und
+   Bodenwertverzinsung (§ 34 Abs. 1). */
+{
+  const LA = await lade('lib/lzs_anpassung.js');
+  const satz = { gaa_name: 'GAG Aurich', formel: { form: 'konstante', wert: 3.5, rundung_stellen: 2 },
+    korrekturen: [{ bez: 'Umrechnungskoeffizient Restnutzungsdauer', feld: 'restnutzungsdauer', art: 'stufen_1d', einheit: 'faktor',
+      stufen: { 20: 1.2, 30: 1, 40: 0.8, 50: 0.6 } }] };
+  const a40 = LA.lzsAnpassung({ satz, wert_pct: 3.5, eingabe: { restnutzungsdauer: 40 } });
+  wert('B', 'B58', 'RND 40: 3,5 % × 0,8 (Stützstelle, multiplikativ, nicht addiert)', a40 && a40.zins_pct, 2.8, 0);
+  const a35 = LA.lzsAnpassung({ satz, wert_pct: 3.5, eingabe: { restnutzungsdauer: 35 } });
+  wert('B', 'B58', 'RND 35: zwischen den Stützstellen linear (× 0,9)', a35 && a35.zins_pct, 3.15, 0);
+  const a60 = LA.lzsAnpassung({ satz, wert_pct: 3.5, eingabe: { restnutzungsdauer: 60 } });
+  pruefe('B', 'B58', 'RND 60 außerhalb der Tabelle: nicht extrapoliert, Zins bleibt 3,5 %, Merkmal offen',
+    !!a60 && a60.zins_pct === 3.5 && !a60.angepasst && a60.offen.length === 1 && a60.offen[0].ausserhalb, a60 && a60.text);
+  const aOhne = LA.lzsAnpassung({ satz: { formel: { form: 'konstante', wert: 2.5 } }, wert_pct: 2.5, eingabe: {} });
+  pruefe('B', 'B58', 'ohne Funktion des Ausschusses: unangepasst, mit Grund', !!aOhne && !aOhne.angepasst && /keine Umrechnungskoeffizienten/.test(aOhne.text), aOhne && aOhne.art);
+  /* Kette in den Kern: derselbe Ertragswert mit 2,8 % - einmal als Anpassung, einmal ohne - ist gleich,
+     und die Anpassungszeile steht im Rechenweg */
+  const basisEin = { objektart: 'mfh', anzahl_we: 4, wohnflaeche_qm: 300, miete_markt_jahr: 27000,
+    lzs_pct: 2.8, lzs_stufe: 'A', baujahr: 1985, rnd_jahre: 40, stichtag_jahr: 2026, bwk_modus: 'manuell', bwk_gesamt_jahr: 6000 };
+  const kOhne = ertragswert(Object.assign({}, basisEin), { vollstaendig: true, wert: 100000 });
+  const kMit = ertragswert(Object.assign({}, basisEin, { lzs_anpassung: a40 }), { vollstaendig: true, wert: 100000 });
+  pruefe('B', 'B58', 'angepasster Zins 2,8 % in Barwertfaktor und Bodenwertverzinsung, Zeile „3,5 % → 2,8 % (A, angepasst)"',
+    !!kMit && kMit.wert === kOhne.wert && (kMit.staffel || []).some((z) => /3,5 % → objektspezifisch angepasst 2,8 % \(A, angepasst\)/.test(z.pos))
+      && (kMit.staffel || []).some((z) => /Bodenwertverzinsung .*× 2,8 %/.test(z.pos)),
+    kMit && (kMit.staffel || []).map((z) => z.pos).filter((p) => /Liegenschaftszins|Bodenwertverzinsung|Barwert/.test(p)).join(' | '));
+}
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};

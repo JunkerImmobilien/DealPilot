@@ -145,6 +145,9 @@ function _lvQuellenVon(d) {
     var portal = !!q.portal || _LV_PORTAL.test(url) || _LV_PORTAL.test(String(q.label || ''));
     var text = portal ? 'Aktueller Marktdurchschnitt (Angebotsdaten)' : _lvNeutral(String(q.label || '').trim());
     if (!text) text = _lvHost(url) || 'Quelle';
+    /* v3007b · ein Portal-Link nennt das Portal in der Adresse (CLAUDE.md: keine Datenquelle nach aussen,
+       wie v2947) - nur der neutrale Text, kein Link */
+    if (portal) url = '';
     return (url || text) ? { url: url, text: text, host: portal ? '' : _lvHost(url) } : null;
   }).filter(Boolean);
 }

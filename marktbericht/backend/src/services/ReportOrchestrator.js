@@ -987,6 +987,7 @@ export const ReportOrchestrator = {
           haustyp: ref.haustyp || null,
           baujahr: ref.build_year || null,
           restnutzungsdauer: _rndVorab.rnd,
+          gemeinde: ref.gemeinde || null,   /* v3009 · W3 · Zu-/Abschlag nach Gemeinde (§ 33) */
           einheiten: ref.units || null,
           lage: ref.lage || null,
           stadtteil: ref.stadtteil || ref.ortsteil || null,
@@ -1455,6 +1456,7 @@ export const ReportOrchestrator = {
           /* v2401 · Stufe N: Formel, Datenbasis und Rechenweg; bei D, warum es keine Formel wurde */
           lzs_formel: _lzs.stufe === 'N' ? (_lzs.formel || null) : null,
           lzs_formel_nicht: _lzs.dealpilot_formel_nicht || null,
+          lzs_anpassung: _lzs.anpassung || null,   /* v3009 · W3 · objektspezifisch angepasster Zins (§ 33) */
           /* ── v1816 · DIE RUECKFRAGE REIST BIS IN DEN BERICHT ──────────
            *
            * Liegt fuer diesen Ort ein amtlicher Zinssatz vor, fehlt aber

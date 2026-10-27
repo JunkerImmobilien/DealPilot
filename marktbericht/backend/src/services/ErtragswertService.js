@@ -629,6 +629,32 @@ export const ErtragswertService = {
                 streuung_pp: ein.lzs_streuung_pp ?? null,
                 massstab: ein.lzs_massstab ?? null };
 
+    /* v3009 · W3 · OBJEKTSPEZIFISCH ANGEPASSTER ZINS (§ 33, § 34 Abs. 1 ImmoWertV). `lzs` ist
+       bereits der angepasste Satz (WertParameterService, lib/lzs_anpassung.js) und geht unten in
+       Bodenwertverzinsung und Barwertfaktor. Die Zeile zeigt, woraus er wurde. */
+    const _anp = ein.lzs_anpassung || null;
+    if (_anp && _anp.angepasst && Math.abs(Number(_anp.zins_pct) - lzs) < 1e-9) {
+      out.lzs.anpassung = _anp;
+      out.lzs.etikett = 'A, angepasst';
+      out.staffel.push({
+        pos: _anp.art === 'funktion'
+          ? `Liegenschaftszinssatz nach der Funktion des Gutachterausschusses → objektspezifisch ${deZahl(lzs)} % (A, angepasst)`
+          : `Liegenschaftszinssatz des Gutachterausschusses ${deZahl(_anp.basis_pct)} % → objektspezifisch angepasst ${deZahl(lzs)} % (A, angepasst)`,
+        detail: _anp.text + ' § 33 ImmoWertV; der angepasste Satz gilt für Bodenwertverzinsung und Barwertfaktor (§ 34 Abs. 1).',
+        wert: null,
+      });
+      const _rndA = Number(_anp.eingabe && _anp.eingabe.restnutzungsdauer);
+      const _rndE = pos(ein.rnd_jahre);
+      if (_anp.art === 'koeffizienten' && (_anp.schritte || []).some((s) => /Restnutzungsdauer/i.test(s.merkmal))
+          && Number.isFinite(_rndA) && _rndE && Math.abs(_rndA - _rndE) > 0.05) {
+        out.warnungen.push('Die Anpassung des Liegenschaftszinssatzes rechnet mit ' + deZahl(_rndA) + ' Jahren Restnutzungsdauer, '
+          + 'der Ertragswert mit ' + deZahl(_rndE) + ' Jahren — bitte prüfen (eine Restnutzungsdauer für alle Verfahren).');
+      }
+    } else if (_anp && !_anp.angepasst && _anp.text) {
+      out.lzs.anpassung = _anp;
+      out.hinweise.push(_anp.text);
+    }
+
     /* ── 4 · Bodenwertverzinsung ────────────────────────────────────────── */
     /* v1072-WREN-1 · NUR DER RENTIERLICHE BODENWERT WIRD VERZINST.
      *

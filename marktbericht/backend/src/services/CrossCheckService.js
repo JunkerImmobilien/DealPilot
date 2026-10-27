@@ -1725,6 +1725,10 @@ export const CrossCheckService = {
           && (_num(ref.mod_punkte) || 0) >= 18,
         sanierungsjahr: _num(ref.modernization_year) || _num(ref.reconstruction_year) || null,
         lzs_pct: lzsPct, lzs_quelle: p.lzs_quelle || 'pauschal', lzs_stufe: p.lzs_stufe || null,
+        /* v3009 · W3 · objektspezifisch angepasster Zins (§ 33): lzs_pct IST schon der angepasste;
+           die Anpassung reist mit, damit der Rechenweg beide Zeilen zeigt. Nur bei Registerzins (A/B/C). */
+        lzs_anpassung: (p.lzs_anpassung && p.lzs_aus_register && /^[ABC]$/.test(String(p.lzs_stufe || ''))
+          && Math.abs(Number(p.lzs_anpassung.zins_pct) - lzsPct) < 1e-9) ? p.lzs_anpassung : null,
         /* v2390 · Ebene in Klartext fuer die Belastbarkeit (C ist nicht „marktabgeleitet") */
         lzs_herkunft: p.lzs_zins_herkunft
           ? { ebene: p.lzs_zins_herkunft.ebene, etikett: p.lzs_zins_herkunft.etikett } : null,
@@ -2067,6 +2071,7 @@ export const CrossCheckService = {
             : null,
           /* v2390 · Ebene des Zinses in Klartext, Weg zum oertlichen Satz */
           liegenschaftszins_herkunft: p.lzs_zins_herkunft || null,
+          liegenschaftszins_anpassung: (kern.lzs && kern.lzs.anpassung) || null,   /* v3009 · W3 · § 33 */
           /* v2401 · Stufe N: die Formel mit Datenbasis und Rechenweg; bei D der Grund ohne Formel */
           liegenschaftszins_formel: p.lzs_formel || null,
           liegenschaftszins_formel_hinweis: p.lzs_stufe === 'N' ? (p.lzs_hinweis || null) : null,
@@ -2652,7 +2657,9 @@ export const CrossCheckService = {
         nutzung: ref.usage_type, wohneinheiten: ref.units,
         wohnflaeche_qm: ref.living_area, normobjekt_qm: p.normobjekt_qm || null,
       });
-      if (_an && _an.verfuegbar) out.zins_anpassung = _an;
+      /* v3009 · W3 · Passt der Ausschuss selbst an (§ 33), entfaellt die DealPilot-Einordnung -
+         zwei angepasste Zinssaetze nebeneinander waeren einer zu viel. */
+      if (_an && _an.verfuegbar && !(p.lzs_anpassung && p.lzs_anpassung.angepasst)) out.zins_anpassung = _an;
     }
 
     /* v1977: auch der zurueckgehaltene Satz gehoert in den Bericht. Dass
