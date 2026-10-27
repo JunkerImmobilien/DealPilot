@@ -573,6 +573,12 @@ body::before {
 @media (max-width: 700px) {
   .row-3, .row-4 { grid-template-columns: 1fr 1fr; }
 }
+/* qc-v2969 · Handy: zwei Felder nebeneinander standen versetzt, sobald eine
+   Beschriftung zweizeilig wurde („Hausgeld / Monat (€)" neben „Nicht-umlagefaehig
+   (% vom HG)"). Unter 480 px steht jedes Feld auf eigener Zeile. */
+@media (max-width: 480px) {
+  .row-2, .row-3, .row-4 { grid-template-columns: 1fr; }
+}
 
 .field { position: relative; display: flex; flex-direction: column; gap: 4px; }
 .field label {
@@ -691,6 +697,14 @@ body::before {
 .qc-knk-zeile.aus label, .qc-knk-zeile.aus .p, .qc-knk-zeile.aus .e { color:var(--ch3); text-decoration:line-through; }
 .qc-knk-zeile.summe { border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent); margin-top:3px; padding-top:4px; font-weight:700; }
 .qc-knk-zeile .klein { font-size:11px; color:var(--ch3); }
+/* qc-v2969 · eingeklappt: eine Zeile mit Summe, Klick klappt die Positionen auf */
+.qc-knk-auf > summary { list-style:none; cursor:pointer; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; margin:0; min-height:28px; }
+.qc-knk-auf > summary::-webkit-details-marker { display:none; }
+.qc-knk-auf > summary b { color:var(--ch); letter-spacing:0; }
+.qc-knk-mehr { margin-left:auto; font-size:11px; letter-spacing:0; text-transform:none; font-weight:600; color:var(--gold-3); text-decoration:underline; }
+.qc-knk-auf[open] > summary { margin-bottom:6px; }
+.qc-knk-hinweis { font-size:11px; color:var(--ch3); margin-bottom:4px; }
+.qc-knk-zeile .klein { display:block; }
 
 /* Foto-Drop */
 .photo-drop {
@@ -1997,6 +2011,13 @@ body::before {
   text-align: left;
 }
 .save-zone-info strong { color: var(--gold-3); font-style: normal; }
+/* qc-v2969 · Handy (Marcel 27.10.2026: „Text neben Button, obwohl der Text darueber besser waere"):
+   unter 600 px steht der Hinweis UEBER dem Knopf, der Knopf geht ueber die volle Breite. */
+@media (max-width: 600px) {
+  .save-zone { flex-direction: column; align-items: stretch; gap: 10px; padding: 16px; }
+  .save-zone-info { text-align: center; font-style: normal; }
+  .save-zone .save-btn { width: 100%; justify-content: center; min-height: 48px; }
+}
 .save-btn {
   display: inline-flex;
   align-items: center;
@@ -4316,7 +4337,13 @@ const QcApp = (function() {
     if (!box) return;
     const knk = window._qcKnkPct(), T = window._qcKnkTeile || {}, roh = T.roh || {}, aus = T.aus || {};
     const eur = x => fmt0(x) + ' €';
-    let h = '<div class="qc-knk-kopf">Kaufnebenkosten · Haken raus = Position entfällt</div>';
+    /* qc-v2969 · Marcel 27.10.2026: „Im QuickCheck sollten die Kaufnebenkosten
+       eingeklappt sein." Zu: eine Zeile mit Summe. Auf: die fuenf Positionen.
+       Der Zustand ueberlebt das Neuzeichnen (die Box wird bei jeder Eingabe neu gebaut). */
+    const offen = !!(box.querySelector('details') && box.querySelector('details').open);
+    let h = '<details class="qc-knk-auf"' + (offen ? ' open' : '') + '><summary class="qc-knk-kopf">Kaufnebenkosten <b>' + _pctDe(knk) + ' %</b>'
+      + (kp ? ' · ' + eur(kp * knk / 100) : '') + ' <span class="qc-knk-mehr">Positionen ' + (offen ? 'zuklappen' : 'anpassen') + '</span></summary>'
+      + '<div class="qc-knk-hinweis">Haken raus = Position entfällt</div>';
     KNK_POS.forEach(([k, name]) => {
       const satz = roh[k] || 0, an = !aus[k];
       let zusatz = '';
@@ -4329,8 +4356,10 @@ const QcApp = (function() {
     });
     h += '<div class="qc-knk-zeile summe"><span></span><span>Summe</span><span class="p">' + _pctDe(knk) + ' %</span><span class="e">' + (kp ? eur(kp * knk / 100) : '—') + '</span></div>';
     h += '<span class="qc-herkunft">Sätze aus deinen Einstellungen (Investmentprofil › Kaufnebenkosten), wie sie auch ein neues Objekt bekommt. '
-      + 'Grunderwerbsteuer nach dem Landessatz 2026. Was du hier abwählst, geht so auch ins Objekt.</span>';
+      + 'Grunderwerbsteuer nach dem Landessatz 2026. Was du hier abwählst, geht so auch ins Objekt.</span></details>';
     box.innerHTML = h;
+    const d = box.querySelector('details');
+    if (d) d.addEventListener('toggle', function () { const m = d.querySelector('.qc-knk-mehr'); if (m) m.textContent = 'Positionen ' + (d.open ? 'zuklappen' : 'anpassen'); });
   }
   function _knkUmschalten(ev) {
     const cb = ev.target && ev.target.closest && ev.target.closest('input[data-knk]');

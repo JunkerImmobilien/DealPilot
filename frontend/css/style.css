@@ -41286,3 +41286,100 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
   body aside.sidebar .sb-card .sbc-address { padding-right: 0 !important; white-space: normal !important; display: -webkit-box !important;
     -webkit-box-orient: vertical !important; -webkit-line-clamp: 2 !important; overflow: hidden !important; line-height: 1.25 !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v2969 · HANDY-DURCHGANG 27.10.2026 (Marcel, 17 Bildschirmfotos in Dateien/Fehler)
+   Gemessen in einem kopflosen Chrome bei 390 px (Gerätemodus, scratchpad mk/).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* (1) „Alle Objekte" unter Aktionen — Marcel: „Brauchen wir das? Wir haben die
+       ja unter Portfolio." Ausgeblendet wie die Strategie (v1935e), nicht entfernt:
+       die Ansicht bleibt ueber sbActionsAction('view-all') erreichbar. */
+.sb-act-item.sb-act-item[data-act="view-all"] { display: none !important; }
+
+/* (2) Der Haken „weitere Objektdetails angeben" folgt seit v2969 der
+       Eingabetiefe (objekt-reiter.js) — als Schalter ist er weg. */
+.oe-kopf .oe-kopf-cb { display: none !important; }
+/* Die drei Stufen-Zeilen waehlen die Tiefe per Klick — das muss man sehen. */
+.oe-abruf-zeilen .oe-row[data-oe-zeile] { cursor: pointer; }
+.oe-abruf-zeilen .oe-row[data-oe-zeile]:not(.on):hover { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent); }
+
+/* (3) Platzhalter: kursiv und gerade gemischt (gemessen 7 kursiv, 6 gerade im
+       Reiter Objekt). Einheitlich gerade, dieselbe Farbe. */
+.body input::placeholder, .body textarea::placeholder,
+.dp-example-placeholder::placeholder, .dp-example-placeholder:focus::placeholder { font-style: normal !important; }
+
+@media (max-width: 640px) {
+  /* (4) Doppelte Sicherheitszone oben: .app-wrap UND header.hdr trugen beide
+         env(safe-area-inset-top) (V99, Z. 27430) — auf dem iPhone ~47 px leere
+         Flaeche im Kopf. Der Kopf allein haelt Abstand zur Notch. */
+  .app-wrap { padding-top: 0 !important; }
+
+  /* (5) Datumsfelder: iOS zeichnet type=date/month als graue Pille bzw.
+         breiter als die Karte (Kaufdatum, Wirtsch. Uebergang, Soll erreichbar ab). */
+  .body input[type="date"], .body input[type="month"], .body input[type="datetime-local"] {
+    -webkit-appearance: none; appearance: none; display: block; box-sizing: border-box;
+    width: 100% !important; min-width: 0 !important; max-width: 100% !important;
+    height: 44px !important; min-height: 44px; text-align: left; background-color: #fff;
+  }
+  .body input[type="date"]::-webkit-date-and-time-value,
+  .body input[type="month"]::-webkit-date-and-time-value { text-align: left; }
+
+  /* (6) Kopf im Reiter Objekt: Stand in eine Zeile, Erklaersaetze weg — die
+         Zeilen darunter sagen dasselbe. */
+  .oe-kopf .oe-ziel-status { flex-basis: 100%; flex-wrap: wrap; }
+  .oe-kopf .oe-ziel-status .oe-q { display: none; }
+  .oe-abruf-box > .card-title .oe-ct-hint { display: none; }
+  .oe-auto .oe-row > .oe-q { display: none !important; }
+
+  /* (7) Pilot-Lage-Bewertung: Titel und Aufklapper oben, der Knopf darunter
+         ueber die volle Breite (vorher Knopf rechts, Pfeil allein links darunter). */
+  #ki-lage-box .ki-lage-header { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+  #ki-lage-box .ki-lage-header > .ki-lage-title { grid-column: 1; grid-row: 1; flex-wrap: wrap; min-width: 0; }
+  #ki-lage-box .ki-lage-header > button:not(#ki-lage-btn) { grid-column: 2; grid-row: 1; }
+  #ki-lage-box .ki-lage-header > #ki-lage-btn { grid-column: 1 / -1; grid-row: 2; width: 100%; justify-content: center; margin: 0; }
+
+  /* (8) Portfolio-Cockpit-Kopf: die Auswahl „Objekt" war 22 px breit
+         (gemessen), die Pille „Quick-Boarding-Stil" lief hinein. */
+  #dp-stage .sl-head .tag { display: none !important; }
+  #dp-stage .sl-head .cp-objsel { flex: 1 0 100% !important; display: flex !important; align-items: center; gap: 8px; }
+  #dp-stage .sl-head .cp-objsel select { flex: 1 1 auto; min-width: 0 !important; width: auto !important; }
+}
+
+@media (max-width: 768px) {
+  /* (9) Schliessen-X: die Handy-Regel `.btn, button { padding: 8px 14px;
+         min-height: 40/44px }` machte aus dem 36-px-Kreis ein Oval 36 × 44
+         und drueckte das Symbol auf 6 px (gemessen am Preisfenster). Runde
+         Symbol-Knoepfe bekommen ihre Flaeche ohne Innenabstand zurueck. */
+  html body .pricing-modal-close,
+  html body button[class*="close"]:has(> svg:only-child) {
+    width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important;
+    padding: 0 !important; border-radius: 50% !important; flex: 0 0 44px;
+  }
+  html body .pricing-modal-close > svg,
+  html body button[class*="close"]:has(> svg:only-child) > svg { width: 20px !important; height: 20px !important; flex: 0 0 20px; }
+}
+
+@media (max-width: 520px) {
+  /* (10) Gewerke & Ausstattung als Karten. Marcel: „ab Innenwaende kann ich
+          nichts eintragen" — die Felder lagen in einer 620 px breiten Tabelle
+          rechts ausserhalb (Wischen, auf iOS ohne sichtbaren Balken). Jetzt je
+          Gewerk ein Block: Name, darunter Art · modernisiert · Standardstufe
+          beschriftet. Spalten ohne Feld („—") und das Gewicht fallen weg. */
+  html body #oe-karte-gewerke { overflow-x: visible !important; }
+  html body #oe-karte-gewerke #oe-gewerke { display: block !important; min-width: 0 !important; width: 100% !important; max-width: 100% !important; }
+  html body #oe-karte-gewerke #oe-gewerke thead { display: none !important; }
+  html body #oe-karte-gewerke #oe-gewerke tbody { display: block !important; }
+  html body #oe-karte-gewerke #oe-gewerke tr { display: grid !important; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6px 10px; padding: 10px 0; border-bottom: 1px solid var(--border, #E0DBD3); }
+  html body #oe-karte-gewerke #oe-gewerke td { display: block !important; padding: 0 !important; border: 0 !important; min-width: 0; }
+  html body #oe-karte-gewerke #oe-gewerke td.oe-g { grid-column: 1 / -1; white-space: normal; }
+  /* Art ueber die volle Breite, darunter modernisiert (breit) und Stufe (schmal, Werte 1-5) */
+  html body #oe-karte-gewerke #oe-gewerke td:nth-child(2) { grid-column: 1 / -1; }
+  html body #oe-karte-gewerke #oe-gewerke td.oe-wg,
+  html body #oe-karte-gewerke #oe-gewerke td:has(> .oe-leer) { display: none !important; }
+  html body #oe-karte-gewerke #oe-gewerke select { min-width: 0 !important; width: 100% !important; }
+  html body #oe-karte-gewerke #oe-gewerke .oe-sr { position: static !important; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal;
+    display: block; margin: 0 0 3px; font: 500 10.5px/1.3 "JetBrains Mono", monospace; letter-spacing: .04em; color: var(--muted, #7A7370); }
+  html body #oe-karte-gewerke #oe-gewerke .oe-sr-g { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  html body #oe-karte-gewerke > .ct, html body #oe-karte-gewerke > .oe-gew-hint { position: static !important; }
+}

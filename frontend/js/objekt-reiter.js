@@ -552,7 +552,8 @@
     /* v1854: liegt das Feld in einer zugeschalteten Detailkarte, die gerade
        aus ist, setzt der Sprung den Haken — der Nutzer will genau dorthin. */
     var dk = el.closest('.oe-karte[data-oe-detail]'), cb = $('oe-details-cb');
-    if (dk && dk.classList.contains('oe-aus') && cb) { cb.checked = true; try { localStorage.setItem('dp_details', '1'); } catch (e) {} detailsAnwenden(); }
+    /* v2969: der Haken folgt der Eingabetiefe - der Sprung hebt die Tiefe auf 2. */
+    if (dk && dk.classList.contains('oe-aus') && cb) { if (zielstufe() < 2) { try { localStorage.setItem(ZIEL_KEY, '2'); } catch (e) {} } zielAnwenden(); }
     /* Reiterwechsel, wenn das Feld woanders liegt (Kaufpreis, Miete) */
     var sec = el.closest('.sec');
     if (sec && !sec.classList.contains('active')) { var tab = document.querySelector('[data-target-sec="' + sec.id + '"]'); if (tab) tab.click(); }
@@ -710,7 +711,12 @@
        und Ausgiebig setzen ihn von selbst, Einfach lässt ihn, wie er war. */
     var cb = $('oe-details-cb');
     if (cb) {
-      if (z >= 2 && !cb.checked) { cb.checked = true; try { localStorage.setItem('dp_details', '1'); } catch (e) {} }
+      /* v2969 · Marcel 27.10.: „Warum gibt es eine Checkbox mit weitere
+         Objektdetails?" Der Haken war eine zweite Schaltstelle neben der
+         Eingabetiefe. Jetzt entscheidet allein die Tiefe: Stufe 1 ohne,
+         ab Stufe 2 mit Gewerken und Bauteilen. Der Haken bleibt als
+         unsichtbarer Traeger im DOM; abweichend() hebt beim Sprung die Tiefe. */
+      cb.checked = z >= 2;
       detailsAnwenden();
     }
     /* Pflichtfelder markieren: nur die der Zielstufe, nur solange leer.
@@ -799,7 +805,7 @@
       var aus = r === 0;
       var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
       /* v1868 · kompakt: Name, frei, Pille — der Satz dazu steckt im Tooltip */
-      return '<div class="oe-row' + (s === z ? ' on' : '') + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
+      return '<div class="oe-row' + (s === z ? ' on' : '') + '" data-oe-zeile="' + s + '" role="button" tabindex="0" aria-pressed="' + (s === z) + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
         + '<span class="oe-k">' + k.name + '</span>'
         + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + ' ' + (fehlt ? st('x', fehlt + ' fehlt') : st('a', 'bereit')) + '</span>'
         + '<span class="oe-q oe-q-kompakt">' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '</span>'
@@ -1186,7 +1192,12 @@
       var amt = e.target.closest('[data-oe-amt]');
       if (amt && window.DealPilotUnterlagen && typeof DealPilotUnterlagen.oeffnen === 'function') { DealPilotUnterlagen.oeffnen(amt.getAttribute('data-oe-amt')); return; }
       var s = e.target.closest('[data-oe-stufe]');
-      if (s && !s.disabled) stufeAbrufen(parseInt(s.getAttribute('data-oe-stufe'), 10));
+      if (s && !s.disabled) { stufeAbrufen(parseInt(s.getAttribute('data-oe-stufe'), 10)); return; }
+      /* v2969 · Marcel 27.10.: „man kann nur Stufe 1-3 oben anklicken, aber nicht
+         die Schaltfläche Einfach · Stufe 1". Die ganze Zeile waehlt jetzt die
+         Eingabetiefe - dieselbe Wahl wie die Kreise oben. */
+      var zr = e.target.closest('[data-oe-zeile]');
+      if (zr) zielSetzen(parseInt(zr.getAttribute('data-oe-zeile'), 10));
     });
     /* Pflichtfelder: Markierung und Fehlzahl folgen der Eingabe */
     Object.keys(FELDNAMEN).forEach(function (id) {
