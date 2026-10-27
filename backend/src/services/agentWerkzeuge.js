@@ -347,7 +347,7 @@ function _potenzialKurz(d, frei) {
     if (soll || ziel || ml.length) {
       roh.push({ nr: w.nr || null, lage: w.lage || null, wfl: w.wfl || null, ist: w.ist || null, soll_monat: soll,
         soll_ab: w.soll_ab || null, ziel_qm: ziel, ziel_wann: w.ziel_wann || null,
-        massnahmen: ml.map((m) => (m.t || '') + (m.k ? ' ' + m.k + ' EUR' : '') + (m.bewohnt ? ' (bewohnt, § 559)' : '')).join(', ') || null });
+        massnahmen: ml.map((m) => (m.t || '') + (m.k ? ' ' + m.k + ' EUR' : '') + (m.bewohnt ? ' (Modernisierungsumlage nach § 559 BGB' + (Number(m.erh) ? ', davon ' + Number(m.erh) + ' % Erhaltung' : '') + ')' : '')).join(', ') || null });
     }
   });
   const obj = (d && (d.zb_soll_qm || d.zb_ziel_qm || d.zb_massnahmen))
