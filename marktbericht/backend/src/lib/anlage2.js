@@ -205,9 +205,15 @@ export function restnutzungsdauer({ gnd, alter, punkte = 0, kernsaniert = false 
   if (kernsaniert && rnd > 0.90 * G) {
     rnd = 0.90 * G;
     hinweis = 'Auf 90 % der Gesamtnutzungsdauer begrenzt (Kernsanierung).';
-  } else if (!kernsaniert && ausFormel && rnd > 0.70 * G) {
-    rnd = 0.70 * G;
-    hinweis = 'Auf 70 % der Gesamtnutzungsdauer begrenzt, wie im Modell vorgesehen.';
+  } else if (!kernsaniert && ausFormel && rnd > Math.max(0.70 * G, G - A)) {
+    /* v2974 · der Deckel kuerzt nie unter GND - Alter (tools/rnd-strecke-pruefen.mjs, B3):
+       GND 80, Bj 2010 gab mit 8 Punkten 56 J., mit 4 Punkten 64 J. Gleiche Regel in
+       frontend/js/rnd-calc.js calcPunktraster. */
+    const kappe = Math.max(0.70 * G, G - A);
+    hinweis = kappe > 0.70 * G
+      ? 'Auf Gesamtnutzungsdauer minus Alter begrenzt — der Deckel von 70 % kürzt nicht unter den Wert ohne Modernisierung.'
+      : 'Auf 70 % der Gesamtnutzungsdauer begrenzt, wie im Modell vorgesehen.';
+    rnd = kappe;
   }
   if (rnd < 0) { rnd = 0; hinweis = 'Rechnerisch aufgebraucht — sachverständige Würdigung nötig.'; }
 
