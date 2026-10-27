@@ -1761,7 +1761,7 @@
   function chipsHtml(liste, mitPunkte, e, geb, fuerEinheit, fuerHaus) {
     return '<div class="dp-zb-chips">' + MASSNAHMEN.filter(function (k) { return fuerHaus ? k.haus : (fuerEinheit ? k.einheit : true); }).map(function (k) {
       var m = (liste || []).filter(function (x) { return x.id === k.id; })[0];
-      var p = k.gewerk ? Math.max(0, maxP(k.gewerk) - punkteJetzt(k.gewerk, e, geb)) : 0;
+      var p = k.gewerk ? Math.max(0, (k.max != null ? Math.min(maxP(k.gewerk), k.max) : maxP(k.gewerk)) - punkteJetzt(k.gewerk, e, geb)) : 0;   /* v3001a: Teilmassnahme (Elektrik 1 von 2) zeigt ihren Teil, wie punkteGewinn rechnet */
       return '<button type="button" class="dp-zb-chip' + (m ? ' on' : '') + '" data-zb-chip="' + k.id + '" aria-pressed="' + (m ? 'true' : 'false') + '"'
         + ' title="' + esc(k.gewerk ? (p ? '+' + p + ' Modernisierungspunkte (Anlage 2)' : 'Gewerk schon voll modernisiert — keine weiteren Punkte') : (k.hinweis || 'ohne Modernisierungspunkte')) + '">'
         + esc(k.t) + (mitPunkte && k.gewerk && p ? ' <em>+' + p + ' P.</em>' : '') + '</button>';
