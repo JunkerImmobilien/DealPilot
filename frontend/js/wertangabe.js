@@ -17,8 +17,9 @@
      · svwert leer                            → bankval, Herkunft Bankbewertung
      · beide gleich                           → svwert, Herkunft wie gewählt, sonst Bank
      · verschieden, Herkunft Gutachten/Bank   → svwert bleibt, der andere Betrag als Hinweis
-     · verschieden, sonst                     → bankval mit Herkunft Bankbewertung,
-                                                der Wert aus svwert als Hinweis
+     · verschieden, sonst                     → svwert bleibt (v3003b), die Bankbewertung
+                                                als Hinweis mit Knopf „übernehmen“ - der
+                                                Nutzer entscheidet; nie ein Betrag still weg
    `bankval` bleibt gespeichert und wird NIE gelöscht. Beim Laden überträgt
    `uebernehmen()` die Regel EINMAL ins Formular (svwert, svw_herkunft) und
    setzt `bankval_migriert` — sonst überschriebe ein alter Bankwert jede
@@ -43,7 +44,9 @@
     if (!sv) return { wert: bv, herkunft: 'bank', anders: null, aus: 'bankval' };
     if (Math.abs(sv - bv) < 1) return { wert: sv, herkunft: h || 'bank', anders: null, aus: 'svwert' };
     if (h === 'gutachten' || h === 'bank') return { wert: sv, herkunft: h, anders: bv, aus: 'svwert' };
-    return { wert: bv, herkunft: 'bank', anders: sv, aus: 'bankval' };
+    /* v3003b · bis v3003a gewann hier die Bank und der Verkehrswert stand nur bis zum Speichern
+       als Hinweis da - danach war er weg. Jetzt bleibt svwert, die Bank wartet auf den Nutzer. */
+    return { wert: sv, herkunft: h || null, anders: bv, aus: 'svwert', bankWahl: true };
   }
   /** Marktwert für Summen (Portfolio, Track Record, KI): dieselbe Grenze wie calc.js wert_basis —
       eine Marktpreisindikation aus Angebotspreisen ist kein Wert-Anker, dann der Kaufpreis. */
@@ -63,7 +66,18 @@
     var h = el('wa-hinweis');
     if (r && r.anders) {
       if (!h) { h = document.createElement('div'); h.id = 'wa-hinweis'; h.className = 'cf-hint'; h.style.marginTop = '4px'; f.appendChild(h); }
-      h.textContent = 'Hier stand zusätzlich ' + fmt(r.anders) + ' (frühere ' + (r.aus === 'bankval' ? 'Wertangabe' : 'Bankbewertung') + ') — bitte prüfen, welcher Betrag gilt.';
+      h.textContent = 'Zusätzlich erfasst: Bankbewertung ' + fmt(r.anders) + ' — bitte prüfen, welcher Betrag gilt. ';
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-outline'; b.style.cssText = 'margin-left:6px;padding:2px 8px;font-size:11.5px';
+      b.textContent = 'Bankbewertung übernehmen';
+      b.onclick = function () {
+        var sv = el('svwert'), hs = el('svw_herkunft');
+        if (sv) sv.value = String(Math.round(r.anders));
+        if (hs) hs.value = 'bank';
+        try { if (typeof global.calc === 'function') global.calc(); } catch (e) {}
+        h.textContent = 'Bankbewertung übernommen. Der bisherige Wert stand bei ' + fmt(r.vorher) + '.';
+      };
+      r.vorher = num(el('svwert') && el('svwert').value);
+      h.appendChild(b);
     } else if (h) h.remove();
   }
   /** Einmal je Objekt: die Regel ins Formular übertragen. Schreibt nichts in die Datenbank. */
