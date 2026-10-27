@@ -33,7 +33,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMbAbgleich) return;
-  var VERSION = 'v3002a';
+  var VERSION = 'v3002b';
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function fmt(n, d) {
@@ -218,7 +218,7 @@
     (function () {
       var eig = fv('ds2_entwicklung'), kl = kiLageFrisch(), abr = kl && kl.entwicklung && kl.entwicklung.value;
       var ber = (B.assessment || {}).entwicklung || null;
-      z.push({ k: 'Entwicklung', eig: eig ? { w: wortVon('ds2_entwicklung', eig), h: lageHerkunft('ds2_entwicklung') } : null,
+      z.push({ k: 'Entwicklung', ref: true, eig: eig ? { w: wortVon('ds2_entwicklung', eig), h: lageHerkunft('ds2_entwicklung') } : null,
         abr: abr ? { w: wortVon('ds2_entwicklung', abr), h: 'Pilot-Einschätzung (KI)' } : null,
         ber: ber ? { w: ber, h: 'Marktentwicklung' } : null,
         a: ber ? { cls: 'info', txt: 'anderer Maßstab' } : { cls: 'fehlt', txt: 'fehlt im Bericht' },
@@ -243,7 +243,7 @@
       var bw = cc.bodenwert || {};
       if (zahl(bw.wert) != null) {
         var sch = (bw.schritte || []).map(function (x) { return x.detail || x.pos; }).filter(Boolean).join(' · ');
-        z.push({ k: 'Bodenwert (angesetzt)', eig: null, abr: null, ber: { w: eur(zahl(bw.wert)), h: sch }, a: { cls: 'info', txt: 'nur im Bericht' },
+        z.push({ k: 'Bodenwert (angesetzt)', ref: true, eig: null, abr: null, ber: { w: eur(zahl(bw.wert)), h: sch }, a: { cls: 'info', txt: 'nur im Bericht' },
           woher: 'Bodenrichtwert × Fläche, angepasst an die Grundstücksgröße (§ 40 ImmoWertV), soweit der Ausschuss einen Koeffizienten führt' + ((bw.hinweise || []).length ? ' · ' + bw.hinweise.join(' ') : ''), erkl: '' });
       }
     })();
@@ -354,7 +354,7 @@
       var ber = am && am.verfuegbar ? zahl(am.miete_qm) : null;
       var abr = bel && bel.amtlich && !bel.amtlich.fehlt ? zahl(bel.amtlich.wert_qm) : null;
       var st = am && am.staffel ? am.staffel.map(function (x) { return x.pos + (x.wert != null ? ' ' + String(x.wert).replace('.', ',') : '') + (x.faktor != null ? ' ' + String(x.faktor).replace('.', ',') : ''); }).join(' · ') : '';
-      z.push({ k: 'Amtliche Vergleichsmiete', eig: null,
+      z.push({ k: 'Amtliche Vergleichsmiete', ref: true, eig: null,
         abr: abr != null ? { w: qm(abr), h: 'Beleg der Pilot-Recherche' } : null,
         ber: ber != null ? { w: qm(ber), h: (am.ausschuss || '').replace(/^Der /, '') } : { leer: am ? 'liegt nicht vor' : '—' },
         a: abr != null ? ampelZahl(abr, ber, 1) : (ber != null ? { cls: 'info', txt: 'nur im Bericht' } : { cls: 'fehlt', txt: 'fehlt' }),
@@ -364,7 +364,7 @@
     (function () {
       var ber = band ? zahl(band.satz_qm) : null;
       var lz = (cc.assumptions || {});
-      z.push({ k: 'Ø Miete des Liegenschaftszinssatzes', eig: null, abr: null,
+      z.push({ k: 'Ø Miete des Liegenschaftszinssatzes', ref: true, eig: null, abr: null,
         ber: ber != null ? { w: qm(ber), h: lz.liegenschaftszins_berichtsjahr ? 'Jahrgang ' + lz.liegenschaftszins_berichtsjahr : '' } : { leer: 'Satz führt keine Miete' },
         a: ber != null ? { cls: 'info', txt: 'nur im Bericht' } : { cls: 'fehlt', txt: 'fehlt' },
         woher: 'amtlich: Ø Miete der Kauffälle, aus denen der Ausschuss den Liegenschaftszins abgeleitet hat (Modellansatz des Satzes)', erkl: '' });
@@ -395,7 +395,7 @@
       var a = abr != null ? ampelZahl(abr, ber, 2) : (istF != null ? ampelZahl(istF, ber, 5) : { cls: ber != null ? 'info' : 'fehlt', txt: ber != null ? 'nur im Bericht' : 'fehlt' });
       var erkl = (ber != null && istF != null && ber > istF * 1.05) ? 'Die Angebotsmiete liegt ' + fmt((ber / istF - 1) * 100, 0) + ' % über deiner Ist-Miete. Inserate sind Angebote, keine Abschlüsse, und zeigen Neuvermietung — Bestandsmieten liegen typisch darunter. Ein Abschlag für Mieten ist nicht gemessen; der Bericht nimmt die Angebotsmiete nur, wenn alles andere fehlt.' : '';
       if (abr != null) a.txt = a.txt.replace('weicht ab', 'Beleg weicht ab');
-      z.push({ k: 'Angebotsmiete', eig: null,
+      z.push({ k: 'Angebotsmiete', ref: true, eig: null,
         abr: abr != null ? { w: qm(abr), h: 'Beleg der Pilot-Recherche' } : null,
         ber: ber != null && !demo ? { w: qm(ber), h: h.join(' · ') } : null, a: a,
         woher: 'aktueller Marktdurchschnitt der Angebotsmieten im Umkreis (Median)' + (zahl(B.rent_trend_pct) != null ? ' · Entwicklung ' + fmt(B.rent_trend_pct, 1) + ' %/Jahr' : ''),
@@ -414,7 +414,7 @@
       var mh = ew.miete_herkunft || {}, ber = zahl(mh.angesetzt_qm != null ? mh.angesetzt_qm : ew.miete_qm);
       if (ber == null) return;
       var a = ampelZahl(istF, ber, 5);
-      z.push({ k: 'Im Ertragswert angesetzt', eig: istF != null ? { w: qm(istF), h: 'deine Ist-Miete' } : null, abr: null,
+      z.push({ k: 'Im Ertragswert angesetzt', ref: true, eig: istF != null ? { w: qm(istF), h: 'deine Ist-Miete' } : null, abr: null,
         ber: { w: qm(ber), h: mh.n_oben ? mh.n_oben + ' Whg. über dem Band' : (mh.n_unten ? mh.n_unten + ' Whg. unter dem Band' : '') }, a: a,
         woher: 'Bericht: ' + (ew.miete_quelle || 'Miete des Ertragswerts'),
         erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Der Ertragswert kapitalisiert die marktüblich erzielbare Miete, nicht die Ist-Miete um jeden Preis: liegt sie außerhalb des Bandes, gilt die Bandkante bzw. der Anker (§ 31 Abs. 2, § 10 ImmoWertV).' : '' });
@@ -435,106 +435,125 @@
     return z;
   }
 
-  /* ── Abrufparameter ────────────────────────────────────────────────── */
-  function parameter(art) {
-    var B = S.bericht || {}, ref = B.ref || {};
+  /* ── Zeichnen (v3002b) ─────────────────────────────────────────────
+     Marcel 27.10.2026 zur ersten Fassung: „riesig, sehr viel Text,
+     unübersichtlich, keine Ahnung, warum das da drin ist" — und als
+     Leitfrage: „Liest das jemand? Braucht der Kunde es nicht, zeigen wir
+     es nicht. Braucht er es, dann so, dass er es versteht."
+
+     Deshalb zeigt der Block nur noch HINWEISE: eine echte Abweichung mit
+     Folge, je ein Satz in Kundensprache. Passt alles, steht eine Zeile
+     „passt zum Marktbericht". Ohne Bericht eine Zeile mit Knopf.
+     Die vollständige Gegenüberstellung (zeilenObjekt/zeilenMiete) bleibt
+     als Hintergrund im Modul (DpMbAbgleich.zeilen) — der Pilot und das PDF
+     lesen dieselben Berichtswerte ohnehin über /objects/history. */
+  function merkerKey(art) {
+    var u = ''; try { var U = window.Auth && Auth.getUser ? Auth.getUser() : null; u = (U && (U.id || U.email)) || ''; } catch (e) {}
+    return 'dp_mba_offen_' + art + '_' + u;
+  }
+  function istOffen(art) { try { return localStorage.getItem(merkerKey(art)) === '1'; } catch (e) { return false; } }
+  function setzeOffen(art, an) { try { localStorage.setItem(merkerKey(art), an ? '1' : '0'); } catch (e) {} }
+  function pct(a, b) { return Math.round(Math.abs(a / b - 1) * 100); }
+
+  /* Geänderte Eingaben seit dem Bericht: der Bericht rechnet mit dem alten Stand */
+  function paramHinweise(liste) {
+    var ref = (S.bericht || {}).ref || {}, H = [];
     var mp = null; try { mp = window.DealPilotObjektReiter && DealPilotObjektReiter.modPunkte ? DealPilotObjektReiter.modPunkte() : null; } catch (e) {}
-    var P = [
-      ['Adresse', [fv('str'), fv('hnr')].join(' ').trim() + ', ' + [fv('plz'), fv('ort')].join(' ').trim(), ref.address || B.address && B.address.formatted || null, 'text'],
-      ['Objektart', fv('objart'), ref.property_type || null, 'art'],
-      ['Baujahr', zahl(fv('baujahr')), zahl(ref.build_year), 'zahl0'],
-      ['Wohnfläche (m²)', zahl(fv('wfl')), zahl(ref.living_area), 'zahl'],
-      ['Einheiten', zahl(fv('einheiten')), zahl(ref.units), 'zahl0'],
-      ['Grundstück (m²)', zahl(fv('gsfl')), zahl(ref.plot_area), 'zahl0'],
-      ['Nettokaltmiete / Monat (€)', zahl(fv('nkm')), zahl(ref.monthly_net_rent), 'zahl0'],
-      ['Kaufpreis (€)', zahl(fv('kp')), zahl(ref.purchase_price), 'zahl0'],
-      ['Modernisierungspunkte', mp ? mp.total : null, zahl(ref.mod_punkte), 'zahl0'],
-      ['Ausstattung', fv('ausst'), ref.quality || null, 'text'],
-      ['Zustand', fv('ds2_zustand'), ref.condition || null, 'text'],
-      ['Standardstufe', zahl(fv('standardstufe')), zahl(ref.standardstufe), 'zahl'],
-      ['Bodenrichtwert manuell (€/m²)', zahl(fv('brw_manuell')), zahl(ref.land_value_manual), 'zahl'],
-      ['Liegenschaftszins eigen (%)', zahl(fv('lzs_pct')), zahl(ref.lzs_pct), 'zahl'],
-      ['Sachwertfaktor eigen', zahl(fv('sachwertfaktor')), zahl(ref.sachwertfaktor), 'zahl']
-    ];
-    var anders = 0;
-    var rows = P.map(function (p) {
-      var a = p[1], b = p[2], t = p[3];
-      var aT = (a == null || a === '') ? '—' : (t === 'zahl0' ? fmt(a, 0) : t === 'zahl' ? fmt(a, 2).replace(/,00$/, '') : String(a));
-      var bT = (b == null || b === '') ? '—' : (t === 'zahl0' ? fmt(b, 0) : t === 'zahl' ? fmt(b, 2).replace(/,00$/, '') : String(b));
-      var diff = false;
-      if (S.bericht) {
-        if (t === 'zahl' || t === 'zahl0') diff = (a != null || b != null) && !(a != null && b != null && Math.abs(a - b) < 0.01);
-        else if (t === 'art') diff = !!(a && b && norm(a).slice(0, 3) !== norm(b).slice(0, 3) && !(/etw|wohn/.test(norm(a)) && /wohn|etw/.test(norm(b))));
-        else if (p[0] === 'Adresse') diff = !!(a && b && norm(b).indexOf(norm(fv('plz'))) < 0);
-        else diff = !!(a && b && norm(a) !== norm(b));
-        if (a == null || a === '') diff = diff && b != null && b !== '' && t !== 'text';
-      }
-      if (diff) anders++;
-      return '<tr' + (diff ? ' class="mba-p-diff"' : '') + '><td>' + esc(p[0]) + '</td><td>' + esc(aT) + '</td><td>' + esc(bT) + (diff ? ' <span class="mba-pill mba-ab">geändert</span>' : '') + '</td></tr>';
-    }).join('');
-    var plz = fv('plz'), ort = fv('ort');
-    var abrufe = [
-      ['Lage gemessen', 'PLZ ' + (plz || '—') + ', Ort ' + (ort || '—') + ', Objektart ' + (fv('objart') || '—') + ' — ohne Adresse, also ohne Umfeld-Messung (frei). Die Mikrolage misst „Komplette Lage analysieren“ mit der Adresse.', S.lage ? 'ok' : 'leer'],
-      ['Zensus 2022', 'PLZ, Ort, Baujahr ' + (fv('baujahr') || '—') + ', Wohnfläche je Wohnung — Gemeinde vor Kreis (frei)', S.zensus ? 'ok' : 'leer'],
-      ['Liegenschaftszins (Automatik)', 'PLZ, Ort, Objektart, Baujahr, Einheiten, Nutzungsart, Wohnfläche, Modernisierungspunkte — Register der Gutachterausschüsse (frei)', zinsAbruf() ? 'ok' : 'leer'],
-      ['Bodenrichtwert', 'Adresse → Koordinate → Bodenrichtwertzone des Landes (Open Data, frei), Knopf am Feld', fv('brw') ? 'ok' : 'leer'],
-      ['Pilot-Mietpreis-Analyse', 'Adresse, Wohnfläche, Nettokaltmiete — KI mit Websuche plus Belege aus Bericht und Zensus (Kontingent)', kiMiete() ? 'ok' : 'leer'],
-      ['Marktbericht', S.zeile ? 'Bericht vom ' + datum(S.zeile.created_at) + ', Stufe ' + (S.stufe || '?') + ' — ' + S.anzahl + ' Bericht(e) im Verlauf' : 'kein Bericht', S.bericht ? 'ok' : 'leer']
-    ].map(function (x) { return '<li><b>' + esc(x[0]) + '</b> <span class="mba-pill mba-' + (x[2] === 'ok' ? 'ok">abgerufen' : 'fehlt">nicht abgerufen') + '</span><br><span class="mba-h">' + esc(x[1]) + '</span></li>'; }).join('');
-    void art;
-    return '<details class="mba-param"><summary>Abrufparameter — womit der Reiter fragt und der Bericht gerechnet hat'
-      + (anders ? ' <span class="mba-pill mba-ab">' + anders + ' seit dem Bericht geändert</span>' : '') + '</summary>'
-      + '<div class="mba-scroll"><table class="mba-ptab"><thead><tr><th>Parameter</th><th>im Reiter jetzt</th><th>im Bericht verwendet</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
-      + '<ul class="mba-abrufe">' + abrufe + '</ul></details>';
+    var P = {
+      wfl: ['Deine Wohnfläche', zahl(fv('wfl')), zahl(ref.living_area), ' m²', 0],
+      baujahr: ['Dein Baujahr', zahl(fv('baujahr')), zahl(ref.build_year), '', 0],
+      gsfl: ['Deine Grundstücksfläche', zahl(fv('gsfl')), zahl(ref.plot_area), ' m²', 0],
+      einheiten: ['Die Zahl der Einheiten', zahl(fv('einheiten')), zahl(ref.units), '', 0],
+      mod: ['Deine Modernisierungspunkte', mp ? mp.total : null, zahl(ref.mod_punkte), ' Punkten', 0],
+      nkm: ['Deine Nettokaltmiete', zahl(fv('nkm')), zahl(ref.monthly_net_rent), ' € im Monat', 0]
+    };
+    liste.forEach(function (k) {
+      var p = P[k]; if (!p || p[1] == null || p[2] == null) return;
+      if (Math.abs(p[1] - p[2]) < 0.5) return;
+      H.push({ satz: p[0] + ' hat sich seit dem Bericht geändert — der Bericht rechnet noch mit ' + (k === 'baujahr' ? p[2] : fmt(p[2], 0)) + p[3] + '. Ein neuer Bericht bringt die Werte auf den aktuellen Stand.', stufe3: true });
+    });
+    return H;
+  }
+  function stufenAbstand(id, a, b) { var sk = SKALEN[id] || [], i = sk.indexOf(norm(a)), j = sk.indexOf(norm(b)); return (i < 0 || j < 0) ? 0 : i - j; }
+
+  function hinweiseObjekt() {
+    var B = S.bericht || {}, cc = B.cross_check || {}, ass = cc.assumptions || {}, H = paramHinweise(['wfl', 'baujahr', 'gsfl', 'einheiten', 'mod']);
+    var st = B.assessment_stufen || {};
+    /* Lage: nur eine deutliche Abweichung (ab zwei Stufen) der EIGENEN Angabe — sie wirkt auf den Deal Score */
+    [['makrolage', 'makrolage', 'Makrolage'], ['mikrolage', 'mikrolage', 'Mikrolage'], ['ds2_bevoelkerung', 'bevoelkerung', 'Bevölkerungsentwicklung'],
+     ['ds2_nachfrage', 'nachfrage', 'Nachfrage'], ['ds2_wertsteigerung', 'wertsteigerung', 'Wertsteigerung']].forEach(function (x) {
+      var eig = fv(x[0]), b = st[x[1]];
+      if (!eig || !b || !b.stufe || lageHerkunft(x[0]) !== 'eigene Angabe') return;
+      var d = stufenAbstand(x[0], eig, b.stufe); if (Math.abs(d) < 2) return;
+      H.push({ satz: 'Deine Einschätzung der ' + x[2] + ' („' + wortVon(x[0], eig) + '") liegt deutlich ' + (d > 0 ? 'unter' : 'über') + ' der Messung im Bericht („' + (b.wort || wortVon(x[0], b.stufe)) + '") — das ' + (d > 0 ? 'senkt' : 'hebt') + ' deinen Deal Score; bitte prüfen.',
+        ueb: { id: x[0], wert: norm(b.stufe), text: 'Messung übernehmen' } });
+    });
+    /* Bodenrichtwert */
+    var lv = B.land_value || {}, bBrw = lv.available ? zahl(lv.value_sqm) : null, eBrw = zahl(fv('brw_manuell')) != null ? zahl(fv('brw_manuell')) : zahl(fv('brw'));
+    if (bBrw && eBrw && pct(eBrw, bBrw) >= 5) H.push({ satz: 'Dein Bodenrichtwert (' + qm(eBrw) + ') weicht vom amtlichen Wert im Bericht ab (' + qm(bBrw) + (lv.stichtag ? ', Stand ' + datum(lv.stichtag) : '') + ') — bitte Stand und Lage prüfen.' });
+    /* Liegenschaftszins: neuer Jahrgang oder eigener Ansatz */
+    var r = zinsAbruf(), bZ = zahl(ass.liegenschaftszins_pct_effektiv), eZ = zahl(fv('lzs_pct'));
+    if (eZ != null && bZ != null && Math.abs(eZ - bZ) >= 0.25) H.push({ satz: 'Dein eigener Liegenschaftszins (' + fmt(eZ, 2) + ' %) weicht vom Satz des Gutachterausschusses ab (' + fmt(bZ, 2) + ' %) — er verändert den Ertragswert spürbar.' });
+    else if (eZ == null && r && r.verfuegbar && bZ != null && r.berichtsjahr && ass.liegenschaftszins_berichtsjahr && String(r.berichtsjahr) !== String(ass.liegenschaftszins_berichtsjahr) && Math.abs(zahl(r.wert_pct) - bZ) >= 0.05)
+      H.push({ satz: 'Der Gutachterausschuss hat einen neuen Liegenschaftszins veröffentlicht (' + fmt(zahl(r.wert_pct), 2) + ' % statt ' + fmt(bZ, 2) + ' %) — ein neuer Bericht rechnet damit.', stufe3: true });
+    /* Verkehrswert */
+    var vf = cc.verfahrenswahl || {}, fu = String(vf.verfahren || ''), W = { ertragswert: zahl((cc.ertragswert || {}).value_eur), sachwert: zahl((cc.sachwert || {}).value_eur), vergleichswert: zahl((cc.comparison || {}).vergleichswert_eur) };
+    var bW = W[fu], eW = zahl(fv('svwert'));
+    var name = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[fu];
+    if (bW && eW && pct(eW, bW) >= 10) H.push({ satz: 'Dein Markt-/Verkehrswert liegt ' + pct(eW, bW) + ' % ' + (eW > bW ? 'über' : 'unter') + ' dem ' + name + ' des Berichts (' + eur(bW) + ') — Finanzierung und Wertpuffer rechnen mit deinem Wert.' });
+    return H;
   }
 
-  /* ── Zeichnen ──────────────────────────────────────────────────────── */
-  function zelle(x, titel) {
-    if (!x) return '<div class="mba-c" data-t="' + titel + '"><span class="mba-leer">—</span></div>';
-    if (x.leer) return '<div class="mba-c" data-t="' + titel + '"><span class="mba-leer">' + esc(x.leer) + '</span></div>';
-    return '<div class="mba-c" data-t="' + titel + '"><b>' + esc(x.w) + '</b>' + (x.h ? '<span class="mba-h">' + esc(x.h) + '</span>' : '') + '</div>';
+  function hinweiseMiete() {
+    var B = S.bericht || {}, cc = B.cross_check || {}, ew = cc.ertragswert || {}, H = paramHinweise(['nkm', 'wfl']);
+    var band = ew.miete_band || cc.miete_band || null, ms = ew.miete_stufe || null;
+    var wfl = zahl(fv('wfl')), nkm = zahl(fv('nkm')), ist = (wfl && nkm) ? nkm / wfl : null;
+    var anker = ms ? zahl(ms.qm) : (band ? zahl(band.anker_qm) : null);
+    var quelle = (ms && ms.code === 'amtlich') ? 'des Gutachterausschusses' : (ms && ms.code === 'zensus') ? 'laut Zensus' : 'im Bericht';
+    if (ist != null && anker) {
+      var oben = band ? zahl(band.oben_qm) : null, unten = band ? zahl(band.unten_qm) : null;
+      if (unten != null && ist < unten) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt ' + pct(ist, anker) + ' % unter der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ') — Mieterhöhung prüfen.' });
+      else if (oben != null && ist > oben) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt über dem, was der Bericht als marktüblich ansieht (bis ' + qm(oben) + ') — bei einem Mieterwechsel ist diese Miete womöglich nicht wieder zu erzielen.' });
+    }
+    var mm = zahl(fv('ds2_marktmiete'));
+    if (mm && anker && pct(mm, anker) >= 15) H.push({ satz: 'Deine Marktmiete (' + qm(mm) + ') liegt ' + pct(mm, anker) + ' % ' + (mm > anker ? 'über' : 'unter') + ' der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ')' + (mm > anker ? ' — Angebotsmieten liegen meist über dem, was im Bestand gezahlt wird, und dein Deal Score rechnet damit ein höheres Mietpotenzial.' : '.') });
+    var st = (B.assessment_stufen || {}).mietausfallrisiko, ea = fv('ds2_mietausfall');
+    if (st && st.stufe && ea && lageHerkunft('ds2_mietausfall') === 'eigene Angabe') {
+      var d = stufenAbstand('ds2_mietausfall', ea, st.stufe);
+      if (Math.abs(d) >= 2) H.push({ satz: 'Dein Mietausfallrisiko („' + wortVon('ds2_mietausfall', ea) + '") weicht deutlich vom gemessenen Leerstand ab („' + (st.wort || st.stufe) + '", ' + String(st.wert).replace('.', ',') + ' % laut Zensus 2022) — bitte prüfen.',
+        ueb: { id: 'ds2_mietausfall', wert: norm(st.stufe), text: 'Messung übernehmen' } });
+    }
+    return H;
   }
-  function zeileHtml(r, i) {
-    if (r.gruppe) return '<div class="mba-gruppe">' + esc(r.gruppe) + '</div>';
-    return '<div class="mba-z">'
-      + '<div class="mba-c mba-k">' + esc(r.k) + '</div>'
-      + zelle(r.eig, 'Deine Angabe') + zelle(r.abr, 'Abruf im Reiter') + zelle(r.ber, 'Marktbericht')
-      + '<div class="mba-c mba-amp" data-t="Abgleich"><span class="mba-pill mba-' + r.a.cls + '">' + esc(r.a.txt) + '</span>'
-      + (r.uebernehmen ? '<button type="button" class="btn btn-outline btn-sm mba-btn" data-mba-ueb="' + esc(r.uebernehmen.id) + '" data-mba-wert="' + esc(r.uebernehmen.wert) + '" title="Wert des Berichts ins Feld übernehmen">übernehmen</button>' : '') + '</div>'
-      + '<div class="mba-woher"><span class="mba-wl">Woher</span> ' + esc(r.woher || '') + (r.erkl ? '<div class="mba-erkl">' + esc(r.erkl) + '</div>' : '') + '</div>'
-      + '</div>';
-  }
-  function kopf(art) {
-    var t = art === 'objekt' ? 'Abgleich mit dem Marktbericht · Lage und Wertparameter' : 'Abgleich mit dem Marktbericht · Miete';
-    return '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bar"/></svg></span>' + t + '</div>';
-  }
+
   function knopfStufe3(txt) {
-    return '<button type="button" class="btn btn-gold btn-sm mba-stufe3">' + esc(txt || 'Marktbericht Stufe 3 erstellen') + '</button>';
+    return '<button type="button" class="btn btn-gold btn-sm mba-stufe3">' + esc(txt || 'Marktbericht erstellen') + '</button>';
   }
   function inhalt(art) {
-    if (!key()) return kopf(art) + '<p class="hint">Objekt speichern oder laden — dann stellt DealPilot die Abrufe dem Marktbericht gegenüber.</p>';
-    if (!S.fertig) return kopf(art) + '<p class="hint">Marktbericht und Abrufe werden gelesen …</p>';
-    var info = '';
-    if (!S.bericht) {
-      info = '<div class="mba-hinweis"><b>Noch kein Marktbericht zu diesem Objekt.</b> Die Spalte „Marktbericht“ bleibt leer, bis einer vorliegt. Stufe 3 (Wertermittlung nach ImmoWertV) bringt amtliche Miete, Ø Miete des Zinssatzes, Band der Marktüblichkeit, Bodenwert und Ertrags-/Sachwert. Der Abruf verbraucht ein Kontingent — erst mit dem Klick. '
-        + knopfStufe3() + '</div>';
-    } else {
-      var d = datum(S.zeile && S.zeile.created_at);
-      info = '<div class="mba-quelle">Bezug: <b>Marktbericht ' + (S.stufe === 3 ? 'Stufe 3 (Wertermittlung)' : 'Stufe ' + (S.stufe || '?') + ' (Indikation)') + ' vom ' + esc(d) + '</b>'
-        + (S.anzahl > 1 ? ' · ' + S.anzahl + ' Berichte im Verlauf, verglichen wird ' + (S.nurIndikation ? 'der neueste' : 'der neueste der Stufe 3') : '')
-        + ' · Ampel: <span class="mba-pill mba-ok">gleich</span> bis ± 5 % (Zins ± 0,05 Pp.), <span class="mba-pill mba-ab">weicht ab</span> bis ± 15 % bzw. eine Stufe, <span class="mba-pill mba-stark">weicht ab</span> darüber. Bezug ist der Bericht; verglichen wird deine Angabe, ohne sie der Abruf im Reiter.</div>'
-        + (S.nurIndikation ? '<div class="mba-hinweis">Zu diesem Objekt gibt es nur eine Marktpreisindikation (Stufe 1/2) — amtliche Miete, Band und Wertparameter fehlen darin. ' + knopfStufe3() + '</div>' : '');
+    if (!key()) return '';
+    if (!S.fertig) return '<div class="mba-zeile mba-leise">Abgleich mit dem Marktbericht wird gelesen …</div>';
+    if (!S.bericht || S.nurIndikation) {
+      return '<div class="mba-zeile"><span>' + (S.bericht ? 'Bisher nur eine Marktpreisindikation — für den Abgleich mit amtlichen Werten fehlt ein Marktbericht Stufe 3.' : 'Noch kein Marktbericht zu diesem Objekt — mit ihm prüft DealPilot deine Angaben gegen amtliche Werte.')
+        + '</span>' + knopfStufe3(S.bericht ? 'Marktbericht Stufe 3 erstellen' : 'Marktbericht erstellen') + '</div>';
     }
-    var Z = art === 'objekt' ? zeilenObjekt() : zeilenMiete();
-    return kopf(art) + info
-      + '<div class="mba-tab"><div class="mba-z mba-z-kopf"><div class="mba-c">Kennzahl</div><div class="mba-c">Deine Angabe</div><div class="mba-c">Abruf im Reiter</div><div class="mba-c">Marktbericht</div><div class="mba-c">Abgleich</div></div>'
-      + Z.map(zeileHtml).join('') + '</div>' + parameter(art);
+    var d = datum(S.zeile && S.zeile.created_at);
+    var H = art === 'objekt' ? hinweiseObjekt() : hinweiseMiete();
+    if (!H.length) return '<div class="mba-zeile mba-passt"><span class="mba-ok">✓</span> Passt zum Marktbericht vom ' + esc(d) + '.</div>';
+    var offen = istOffen(art);
+    var o = '<button type="button" class="mba-kopf" data-mba-auf="' + art + '" aria-expanded="' + offen + '">'
+      + '<span class="mba-dot"></span><span class="mba-titel">' + H.length + (H.length === 1 ? ' Hinweis' : ' Hinweise') + ' aus dem Marktbericht vom ' + esc(d) + '</span>'
+      + '<span class="mba-chev" aria-hidden="true">' + (offen ? '▾' : '▸') + '</span></button>';
+    if (!offen) return o;
+    var neu = H.some(function (h) { return h.stufe3; });
+    return o + '<ul class="mba-liste">' + H.map(function (h) {
+      return '<li>' + esc(h.satz) + (h.ueb ? ' <button type="button" class="btn btn-outline btn-sm mba-btn" data-mba-ueb="' + esc(h.ueb.id) + '" data-mba-wert="' + esc(h.ueb.wert) + '">' + esc(h.ueb.text) + '</button>' : '') + '</li>';
+    }).join('') + '</ul>' + (neu ? '<div class="mba-fuss">' + knopfStufe3('Neuen Marktbericht erstellen') + '</div>' : '');
   }
   function host(art) {
     var id = art === 'objekt' ? 'mba-objekt' : 'mba-miete';
     var h = $(id); if (h) return h;
     var nach = $(art === 'objekt' ? 'ki-lage-box' : 'ki-miete-box'); if (!nach || !nach.parentNode) return null;
-    h = document.createElement('div'); h.id = id; h.className = 'card mba-card'; h.setAttribute('data-mba', art);
+    h = document.createElement('div'); h.id = id; h.className = 'mba-card'; h.setAttribute('data-mba', art);
     nach.parentNode.insertBefore(h, nach.nextSibling);
     return h;
   }
@@ -544,7 +563,9 @@
     stil();
     ['objekt', 'miete'].forEach(function (art) {
       var h = host(art); if (!h) return;
-      try { h.innerHTML = inhalt(art); } catch (e) { h.innerHTML = kopf(art) + '<p class="hint">Abgleich nicht darstellbar: ' + esc(e.message) + '</p>'; try { console.warn('[mb-abgleich]', e); } catch (x) {} }
+      var html = '';
+      try { html = inhalt(art); } catch (e) { html = ''; try { console.warn('[mb-abgleich]', e); } catch (x) {} }
+      h.innerHTML = html; h.style.display = html ? '' : 'none';
     });
   }
   function spaeter() { clearTimeout(_zt); _zt = setTimeout(zeichnen, 250); }
@@ -566,6 +587,8 @@
       }
       return;
     }
+    var auf = t.closest('[data-mba-auf]');
+    if (auf) { ev.preventDefault(); var art = auf.getAttribute('data-mba-auf'); setzeOffen(art, !istOffen(art)); zeichnen(); return; }
     var u = t.closest('[data-mba-ueb]');
     if (u) {
       ev.preventDefault();
@@ -604,45 +627,25 @@
     if ($('mba-stil')) return;
     var s = document.createElement('style'); s.id = 'mba-stil';
     s.textContent = [
-      '.mba-card{margin-top:14px}',
-      '.mba-quelle,.mba-hinweis{font:400 12px/1.5 Inter,system-ui,sans-serif;margin:0 0 10px}',
-      '.mba-hinweis{padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-radius:8px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent)}',
-      '.mba-hinweis .btn{margin-top:8px;display:inline-flex}',
-      '.mba-tab{display:block;font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
-      '.mba-z{display:grid;grid-template-columns:minmax(120px,1.05fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr) minmax(118px,auto);gap:4px 12px;padding:8px 0;border-bottom:1px solid color-mix(in srgb, currentColor 12%, transparent);align-items:start}',
-      '.mba-z-kopf{font:600 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.65;padding:4px 0}',
-      '.mba-k{font-weight:600}',
-      '.mba-c b{display:block;font-weight:600;white-space:nowrap}',
-      '.mba-h{display:block;font-size:11px;opacity:.68;overflow-wrap:anywhere}',
-      '.mba-leer{opacity:.5;font-style:italic}',
-      '.mba-woher{grid-column:1/-1;font-size:11.5px;opacity:.82;overflow-wrap:anywhere}',
-      '.mba-wl{font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-right:4px}',
-      '.mba-erkl{margin-top:3px;padding-left:8px;border-left:2px solid var(--wl-c9a84c, #C9A84C);opacity:1}',
-      '.mba-gruppe{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);padding:12px 0 2px}',
-      '.mba-pill{display:inline-block;padding:2px 8px;border-radius:999px;font:600 10px/1.4 "JetBrains Mono",monospace;letter-spacing:.03em;border:1px solid currentColor;white-space:nowrap}',
-      '.mba-pill.mba-ok{color:#3FA56C}.mba-pill.mba-stark{color:#B8625C}.mba-pill.mba-ab{color:var(--wl-b8932f, #b8932f)}',
-      '.mba-pill.mba-fehlt,.mba-pill.mba-info{opacity:.6}',
-      '.mba-amp .mba-btn{margin-top:6px}',
-      '.mba-amp{display:flex;flex-direction:column;align-items:flex-start}',
-      '.mba-param{margin-top:12px;font:400 12px/1.45 Inter,system-ui,sans-serif}',
-      '.mba-param summary{cursor:pointer;font-weight:600}',
-      '.mba-scroll{overflow-x:auto;margin-top:8px}',
-      '.mba-ptab{width:100%;border-collapse:collapse;font-size:12px}',
-      '.mba-ptab th{text-align:left;font:600 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;opacity:.65;padding:4px 6px;border-bottom:1px solid color-mix(in srgb, currentColor 18%, transparent)}',
-      '.mba-ptab td{padding:5px 6px;border-bottom:1px solid color-mix(in srgb, currentColor 10%, transparent);vertical-align:top}',
-      '.mba-p-diff td{font-weight:600}',
-      '.mba-abrufe{margin:10px 0 0;padding-left:18px}.mba-abrufe li{margin:0 0 6px}',
-      '@media (max-width:760px){',
-      '.mba-z{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 10px}',
-      '.mba-z-kopf{display:none}',
-      '.mba-k{grid-column:1/-1}',
-      '.mba-amp{grid-column:1/-1}',
-      '.mba-c[data-t]::before{content:attr(data-t);display:block;font:600 9px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;opacity:.55}',
-      '.mba-c b{white-space:normal}',
-      '}'
+      '.mba-card{margin-top:10px;font:400 12.5px/1.5 Inter,system-ui,sans-serif}',
+      '.mba-zeile{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 12px;border:1px solid color-mix(in srgb, currentColor 14%, transparent);border-radius:8px}',
+      '.mba-zeile>span{flex:1 1 220px;min-width:0}',
+      '.mba-leise{opacity:.6}',
+      '.mba-passt .mba-ok{color:#3FA56C;font-weight:700;flex:0 0 auto}',
+      '.mba-kopf{display:flex;width:100%;align-items:center;gap:8px;padding:8px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:8px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);color:inherit;font:600 12.5px/1.4 Inter,system-ui,sans-serif;text-align:left;cursor:pointer}',
+      '.mba-kopf .mba-titel{flex:1 1 auto;min-width:0}',
+      '.mba-dot{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:var(--wl-c9a84c, #C9A84C)}',
+      '.mba-chev{flex:0 0 auto;opacity:.7}',
+      '.mba-liste{margin:6px 0 0;padding:0 0 0 18px}',
+      '.mba-liste li{margin:0 0 8px}',
+      '.mba-liste .mba-btn{margin-left:6px;vertical-align:middle}',
+      '.mba-fuss{margin-top:4px}'
     ].join('');
     document.head.appendChild(s);
   }
 
-  window.DpMbAbgleich = { VERSION: VERSION, laden: laden, zeichnen: zeichnen, zustand: function () { return S; } };
+  window.DpMbAbgleich = { VERSION: VERSION, laden: laden, zeichnen: zeichnen, zustand: function () { return S; },
+    /* Hintergrund: die volle Gegenüberstellung je Kennzahl, nicht angezeigt (v3002b) */
+    zeilen: function () { return { objekt: zeilenObjekt(), miete: zeilenMiete() }; },
+    hinweise: function () { return { objekt: hinweiseObjekt(), miete: hinweiseMiete() }; } };
 })();
