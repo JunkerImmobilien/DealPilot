@@ -2441,7 +2441,17 @@ export const CrossCheckService = {
 
     // ================= VERGLEICH =================
     const vgl = valuation && valuation.market_value ? valuation.market_value.estimated : null;
-    if (out.sachwert.available || out.ertragswert.available) {
+    /* v3008a · EIN AMTLICHER VERGLEICHSWERT BRAUCHT KEIN ZWEITES VERFAHREN.
+       Der ganze Vergleichs- und Verfahrensblock hing an Ertrags- ODER Sachwert. Eine
+       Eigentumswohnung ohne Miteigentumsanteil und BGF hat beides nicht - und verlor damit
+       auch den amtlichen Vergleichsfaktor, obwohl der fuer sie das fuehrende Verfahren ist
+       (gemessen 27.10.2026, Konstanz ETW, Bericht 363: Faktor 4.800 EUR/m2 im Protokoll,
+       im Bericht nichts). Jetzt oeffnet ihn auch ein verfuegbarer amtlicher Vergleichsfaktor
+       bzw. Immobilienrichtwert. */
+    const _vglAmtlichDa = !!((p.register_vergleichsfaktor && p.register_vergleichsfaktor.verfuegbar)
+      || (p.amtlicher_vergleichsfaktor && p.amtlicher_vergleichsfaktor.verfuegbar)
+      || (p.irw && p.irw.verfuegbar));
+    if (out.sachwert.available || out.ertragswert.available || _vglAmtlichDa) {
       /* v1049-WFLA-3 · Der Flaechenbefund gehoert in den Bericht, nicht nur
      * ins Log. Eine stille Annahme ueber den Bodenwert ist dieselbe Sorte
      * Fehler wie die stille Standardstufe 3. */
@@ -2871,6 +2881,13 @@ export const CrossCheckService = {
       for (const z of (_rvQ.quellen_zusatz || [])) _merke(z.vermerk, z.kennzahl || 'Vergleichsfaktor (Merkmal)', z.url || null, z.lizenz || null, null);
     }
     out.quellen_nachweis = Array.from(_nachweis.values());
+    /* v3008a · Ein ZURUECKGEHALTENER Register-Vergleichsfaktor (Merkmal fehlt, Anpassung offen)
+       stand nur im Block oben - ohne Ertrags-/Sachwert erfuhr der Leser nicht, was fehlt. */
+    if (p.register_vergleichsfaktor && !out.register_vergleichsfaktor) {
+      out.register_vergleichsfaktor = p.register_vergleichsfaktor;
+      const _rv0 = p.register_vergleichsfaktor;
+      if (_rv0.hinweis && out.notes.indexOf(_rv0.hinweis) < 0) out.notes.push(_rv0.hinweis);
+    }
 
     /* v2382 · `assumptions` nennt, womit GERECHNET wurde. Bis hier standen die Vorgaben des
        vereinfachten EFH-Wegs (835 €/m², BGF-Faktor 1,35, Faktor 1,0, BWK 23 %, Zins 3 %) auch
