@@ -1161,6 +1161,15 @@ export const CrossCheckService = {
         ? { qm: _r2a(_satzMiete.qm), stufe: 'satz_mittel', etikett: 'Ø Miete des Liegenschaftszinssatzes', feld: _satzMiete.feld,
             quelle: 'Ø Miete der Kauffälle, aus denen ' + (p.lzs_ausschuss || 'der Gutachterausschuss') + ' den Liegenschaftszins'
               + (p.lzs_berichtsjahr ? ' ' + p.lzs_berichtsjahr : '') + ' abgeleitet hat' }
+        /* v2993b · die amtliche Mietpreisuebersicht des Ausschusses auch dann, wenn das Zinsmodell sie
+           nicht verlangt - sie ist oertlicher und juenger als der Zensus (ImmoWertA zu § 5 Abs. 3:
+           Grundlage ist „insbesondere die ortsuebliche Vergleichsmiete"). Gemessen 27.10.2026:
+           Hermannstr. 9 Huellhorst und Loehner Str. 278 fielen sonst auf den Zensus. */
+        : (_amtM && _amtM.fuehrend !== false)
+          ? { qm: _r2a(_num(_amtM.miete_qm)), stufe: 'amtlich', etikett: 'amtliche Miete des Gutachterausschusses'
+                + (_amtM.ausserhalb_tabelle && _amtM.groessenklasse_kurz ? ' (' + _amtM.groessenklasse_kurz + ')' : ''),
+              groessenklasse_hinweis: _amtM.ausserhalb_tabelle ? (_amtM.ausserhalb_hinweis || null) : null,
+              quelle: _amtM.quelle || 'Mietpreisübersicht des Gutachterausschusses', nicht_vom_modell_verlangt: true }
         : (p.zensus_miete && _num(p.zensus_miete.qm) > 0)
           ? { qm: _r2a(_num(p.zensus_miete.qm)), stufe: 'zensus', etikett: 'Bestandsmiete Zensus 2022, fortgeschrieben',
               quelle: p.zensus_miete.text || p.zensus_miete.quelle, zensus: p.zensus_miete,
