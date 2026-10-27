@@ -33,7 +33,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMbAbgleich) return;
-  var VERSION = 'v3002';
+  var VERSION = 'v3002a';
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function fmt(n, d) {
@@ -257,6 +257,8 @@
       var erkl = '';
       if (a.cls === 'ab' || a.cls === 'stark') {
         erkl = eig != null ? 'Dein eigener Ansatz ersetzt im nächsten Bericht den amtlichen Satz.'
+          : (r && r.berichtsjahr && ass.liegenschaftszins_berichtsjahr && String(r.berichtsjahr) !== String(ass.liegenschaftszins_berichtsjahr))
+            ? 'Im Register liegt inzwischen ein neuer Jahrgang (' + r.berichtsjahr + ' statt ' + ass.liegenschaftszins_berichtsjahr + ' im Bericht). Ein neuer Bericht rechnet mit dem neuen Satz.'
           : 'Automatik und Bericht unterscheiden sich — meist, weil sich Objektangaben (Objektart → Zweig, Baujahr, Modernisierungspunkte → Restnutzungsdauer) seit dem Bericht geändert haben oder ein neuer Jahrgang im Register liegt.';
       }
       z.push({ k: 'Liegenschaftszins', eig: eig != null ? { w: fmt(eig, 2) + ' %', h: 'eigener Ansatz' } : null,
@@ -344,7 +346,9 @@
         abr: abr != null ? { w: qm(abr), h: 'Pilot-Recherche (KI mit Websuche)' } : { leer: 'Recherche nicht gelaufen' },
         ber: ber != null ? { w: qm(ber), h: 'Anker: ' + et } : null, a: a,
         woher: 'Bericht: Anker der Marktüblichkeit in dieser Rangfolge — amtliche Miete des Gutachterausschusses, Ø Miete des Liegenschaftszinssatzes, Bestandsmiete Zensus 2022 (fortgeschrieben), zuletzt der aktuelle Marktdurchschnitt' + (ms && ms.quelle ? ' · hier: ' + ms.quelle : ''),
-        erkl: erkl, uebernehmen: (ber != null && eig !== ber) ? { id: 'ds2_marktmiete', wert: fmt(ber, 2), wort: qm(ber) } : null });
+        /* v3002 · kein Übernehmen-Knopf: das Feld Marktmiete trägt im Deal Score die erzielbare Neuvermietungsmiete (Upside),
+           der Anker des Berichts die modellkonforme Bestandsmiete - welche dort hingehört, entscheidet Marcel */
+        erkl: erkl });
     })();
     (function () {
       var ber = am && am.verfuegbar ? zahl(am.miete_qm) : null;
@@ -496,7 +500,7 @@
       + '<div class="mba-c mba-k">' + esc(r.k) + '</div>'
       + zelle(r.eig, 'Deine Angabe') + zelle(r.abr, 'Abruf im Reiter') + zelle(r.ber, 'Marktbericht')
       + '<div class="mba-c mba-amp" data-t="Abgleich"><span class="mba-pill mba-' + r.a.cls + '">' + esc(r.a.txt) + '</span>'
-      + (r.uebernehmen ? '<button type="button" class="mba-btn" data-mba-ueb="' + esc(r.uebernehmen.id) + '" data-mba-wert="' + esc(r.uebernehmen.wert) + '" title="Wert des Berichts ins Feld übernehmen">übernehmen</button>' : '') + '</div>'
+      + (r.uebernehmen ? '<button type="button" class="btn btn-outline btn-sm mba-btn" data-mba-ueb="' + esc(r.uebernehmen.id) + '" data-mba-wert="' + esc(r.uebernehmen.wert) + '" title="Wert des Berichts ins Feld übernehmen">übernehmen</button>' : '') + '</div>'
       + '<div class="mba-woher"><span class="mba-wl">Woher</span> ' + esc(r.woher || '') + (r.erkl ? '<div class="mba-erkl">' + esc(r.erkl) + '</div>' : '') + '</div>'
       + '</div>';
   }
@@ -618,8 +622,8 @@
       '.mba-pill{display:inline-block;padding:2px 8px;border-radius:999px;font:600 10px/1.4 "JetBrains Mono",monospace;letter-spacing:.03em;border:1px solid currentColor;white-space:nowrap}',
       '.mba-pill.mba-ok{color:#3FA56C}.mba-pill.mba-stark{color:#B8625C}.mba-pill.mba-ab{color:var(--wl-b8932f, #b8932f)}',
       '.mba-pill.mba-fehlt,.mba-pill.mba-info{opacity:.6}',
-      '.mba-btn{display:block;margin-top:5px;background:none;border:1px solid color-mix(in srgb, currentColor 30%, transparent);border-radius:6px;padding:2px 8px;font:500 11px/1.4 Inter,system-ui,sans-serif;color:inherit;cursor:pointer}',
-      '.mba-btn:hover{border-color:var(--wl-c9a84c, #C9A84C)}',
+      '.mba-amp .mba-btn{margin-top:6px}',
+      '.mba-amp{display:flex;flex-direction:column;align-items:flex-start}',
       '.mba-param{margin-top:12px;font:400 12px/1.45 Inter,system-ui,sans-serif}',
       '.mba-param summary{cursor:pointer;font-weight:600}',
       '.mba-scroll{overflow-x:auto;margin-top:8px}',
