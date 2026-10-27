@@ -73,7 +73,7 @@
     if (mitAb) v.push({ art: 'roh', name: 'ohne Abschlag', sub: 'Angebotsniveau, wie ausgeschrieben', unten: zahl(h.market_value_roh_low), mitte: roh, oben: zahl(h.market_value_roh_high) });
     if (ew != null) v.push({ art: 'ew', name: /vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert',
       sub: zahl(h.ertragswert_von_eur) != null ? 'Spanne aus dem Liegenschaftszins' : '', unten: zahl(h.ertragswert_von_eur), mitte: ew, oben: zahl(h.ertragswert_bis_eur), fuehrend: fu === 'ertragswert' });
-    if (sw != null) v.push({ art: 'sw', name: swVorl ? 'Sachwert (vorläufig)' : 'Sachwert', sub: swVorl ? 'ohne Sachwertfaktor, nicht marktangepasst' : '', mitte: sw, fuehrend: fu === 'sachwert' });
+    if (sw != null) v.push({ art: 'sw', name: swVorl ? 'Sachwert (nur Plausibilität)' : 'Sachwert', sub: swVorl ? 'Herstellungskosten ohne Marktanpassung, kein Marktwert' : '', mitte: sw, ohneAbw: swVorl, /* v2979 */ fuehrend: fu === 'sachwert' });
     if (vw != null) v.push({ art: 'vw', name: 'Vergleichswert', sub: h.irw_vergleichswert_eur != null ? 'aus dem Immobilienrichtwert' : 'mit amtlichem Vergleichsfaktor', mitte: vw, fuehrend: fu === 'vergleichswert' });
     return v;
   }
@@ -243,8 +243,8 @@
         doc.setFont('helvetica', fett ? 'bold' : 'normal'); doc.setFontSize(8.4); setT(f.tinte);
         doc.text(sauber(v.name) + (v.fuehrend ? '  (führend)' : ''), x + 2.5, y + 4.2);
         if (v.sub) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); setT(f.grau); doc.text(sauber(v.sub), x + 2.5, y + 7.3); }
-        var dM = (mpi && v.art !== 'mpi' && v.art !== 'roh') ? (v.mitte - mpi.mitte) / mpi.mitte * 100 : null;
-        var dK = (d.kaufpreis && v.art !== 'kp') ? (v.mitte - d.kaufpreis) / d.kaufpreis * 100 : null;
+        var dM = (mpi && v.art !== 'mpi' && v.art !== 'roh' && !v.ohneAbw) ? (v.mitte - mpi.mitte) / mpi.mitte * 100 : null;
+        var dK = (d.kaufpreis && v.art !== 'kp' && !v.ohneAbw) ? (v.mitte - d.kaufpreis) / d.kaufpreis * 100 : null;
         var werte = ['', v.unten != null ? eur(v.unten) : '', eur(v.mitte), v.oben != null ? eur(v.oben) : '', dM != null ? pz(dM) : '', dK != null ? pz(dK) : ''];
         werte.forEach(function (w, i) {
           var bw = sp[i][1] * fak;
