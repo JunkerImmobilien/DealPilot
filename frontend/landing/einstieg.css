@@ -1,0 +1,24 @@
+/* landing-einstieg-1 · Anmelden und Konto erstellen unter dem Hero (einstieg.js) */
+.einstieg{padding:56px 0 64px;scroll-margin-top:72px}
+.einstieg[hidden]{display:none}
+.einstieg .ein-kopf{position:relative;text-align:center;max-width:640px;margin:0 auto 22px}
+.einstieg .ein-kopf h2{margin:6px 0 16px}
+.einstieg .eye{justify-content:center}
+.einstieg .ein-tabs{display:inline-flex;gap:4px;padding:4px;border:1px solid rgba(232,204,122,.35);border-radius:999px;background:rgba(255,255,255,.04)}
+.einstieg .ein-tabs button{appearance:none;border:0;background:transparent;color:inherit;font:600 14px/1 Inter,system-ui,sans-serif;padding:10px 18px;border-radius:999px;cursor:pointer;opacity:.75}
+.einstieg .ein-tabs button.an{background:var(--gdh,#E8CC7A);color:#050505;opacity:1}
+.einstieg .ein-tabs button:focus-visible{outline:2px solid var(--gdh,#E8CC7A);outline-offset:2px}
+.einstieg .ein-zu{position:absolute;top:-6px;right:0;appearance:none;border:0;background:transparent;color:inherit;font-size:26px;line-height:1;cursor:pointer;opacity:.6;width:40px;height:40px}
+.einstieg .ein-zu:hover{opacity:1}
+.einstieg .ein-rahmen{position:relative;max-width:480px;margin:0 auto}
+.einstieg #ein-frame{display:block;width:100%;height:620px;border:0;background:transparent;color-scheme:normal;transition:height .25s ease}
+.einstieg .ein-laedt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 13px Inter,system-ui,sans-serif;opacity:.7}
+.einstieg .ein-laedt[hidden]{display:none}
+.einstieg .ein-fuss{text-align:center;font-size:13px;opacity:.75;margin:14px 0 0}
+.einstieg .ein-fuss a{color:var(--gdh,#E8CC7A)}
+@media (max-width:640px){
+  .einstieg{padding:36px 0 44px}
+  .einstieg .ein-rahmen{max-width:100%}
+  .einstieg .ein-tabs button{padding:10px 14px;font-size:13.5px}
+  .einstieg .ein-zu{top:-14px;right:-4px}
+}
