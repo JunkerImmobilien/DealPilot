@@ -200,6 +200,17 @@ console.log('    ETW, Baujahr 1998, Stichtag 31.07.2024, GND 70, nie modernisier
         n2(r.methods.technisch.alterswertminderung_pct) + ' %');
   /* Die reelle RND des Gutachtens (26) ist eine sachverständige Korrektur
      „aufgrund der Substanz vor Ort" - kein Rechenweg, deshalb nicht geprüft. */
+  pruef('Endwert = 22,00 Jahre (technisch kürzt das Modell 44)',
+        n2(r.final_rnd) === 22, r.final_rnd);
+  /* v2976 · Laut Gutachten ist die Heizung vor 10-15 Jahren erneuert. Wer dafür 1 Punkt
+     gibt, darf keinen Sprung bekommen: v2975 gab 44 statt 22. Kein Gutachtenwert -
+     das Gutachten vergibt den Punkt nicht -, deshalb nur die Grenze geprüft. */
+  const r1 = K.calcAll({
+    baujahr: 1998, stichtag: '2024-07-31', gnd: 70, modPoints: 1,
+    gewerkeBewertung: gew('veraltet', { heizung: 'erneuert' })
+  });
+  pruef('1 Punkt (Heizung erneuert) hebt höchstens um 7 J. (v2975: 44)',
+        r1.final_rnd >= r.final_rnd && r1.final_rnd <= r.final_rnd + 7, n2(r1.final_rnd));
 }
 
 /* =====================================================================

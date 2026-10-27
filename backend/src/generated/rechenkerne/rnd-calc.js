@@ -593,11 +593,14 @@
        die RND nach Anlage 2 mit 0 Punkten (Alter hoechstens GND). Unter der Schwelle ist
        das GND - Alter, die Gutachten Am Markt 18/9 bleiben unberuehrt. Gerechnet wird ueber
        ein Ersatzalter (GND - Basis), denn calcTechnisch kennt nur „GND - Alter". */
-    const punktraster0 = modPoints === 0 ? punktraster
-      : calcPunktraster(alter, gnd, 0, kernsaniert);
-    const basisModell0 = Math.max(0, punktraster0.restnutzungsdauer);
-    const technisch = calcTechnisch(Math.max(0, gnd - basisModell0), gnd, gewerke, weights, gewerkeRLD);
-    technisch.basis_herkunft = 'RND nach Anlage 2 ImmoWertV mit 0 Modernisierungspunkten (' + round2(basisModell0) + ' Jahre)';
+    /* v2976 · BASIS IST DAS MODELL MIT DEN TATSAECHLICHEN PUNKTEN (Variante 4, Marcel
+       27.10.2026 „ja bau variante 4"). v2975 rechnete die Technik immer vom Modell mit
+       0 Punkten aus und schaltete ab 1 Punkt auf das Modell um: WE03 Am Markt 9 (Heizung
+       erneuert = 1 P.) sprang von 22 auf 44 J., im Raster ein Punkt um bis zu 40 J. Jetzt
+       zaehlt die Modernisierung ueber die Punkte, der Zustand der Gewerke kann nur kuerzen. */
+    const basisModell = Math.max(0, punktraster.restnutzungsdauer);
+    const technisch = calcTechnisch(Math.max(0, gnd - basisModell), gnd, gewerke, weights, gewerkeRLD);
+    technisch.basis_herkunft = 'RND nach Anlage 2 ImmoWertV mit ' + modPoints + ' Modernisierungspunkten (' + round2(basisModell) + ' Jahre)';
 
     const schadensInfo = processSchaeden(schaeden);
 
@@ -667,7 +670,10 @@
        am unterschriebenen Gutachten Am Markt 18 (25DG02661): dort gilt unter der Schwelle
        die technische RND 26 J., nicht GND - Alter 40 J. (rnd-gutachten-test.mjs). Ob ueber
        der Schwelle die Technik ebenfalls fuehren soll, ist Marcels Fachfrage (Journal v2974). */
-    /* v2975 · VERFAHRENSWAHL (Marcel 27.10.2026, Recherche im Journal v2975):
+    /* v2975 · VERFAHRENSWAHL - ERSETZT DURCH v2976 (darunter). Die Grenze bei 1 Punkt war
+       falsch: sie schaltete von der Technik auf das Modell um (WE03: 22 -> 44 J.), und der
+       Pruefer sah es nicht (er pruefte nur „mehr Punkte nie weniger"). Stand bis v2975: */
+    /* (alt) VERFAHRENSWAHL (Marcel 27.10.2026, Recherche im Journal v2975):
          ab 1 Punkt   Anlage 2 fuehrt durchgehend - unter der Schwelle GND - Alter,
                       darueber die Formel, ueber der GND Alter = GND (ImmoWertA II.5).
                       So rechnen die Gutachten Alexanderstr. (33) und Westerfeldstr. (16).
@@ -679,10 +685,11 @@
                       1 Punkt weniger als 0 (gemessen 507 Rasterfaelle).
        Ergebnis rnd-strecke-pruefen: nie keine Zahl, aelter nie mehr, mehr Punkte nie
        weniger, groesster Sprung 1,1 J. (vorher mit Gewerken 28 J.). */
-    const modellFuehrt = modPoints >= 1
-      && (punktraster.anwendbar || punktraster.grenze === 'unter_schwelle')
-      && punktraster.restnutzungsdauer > 0;
-    const technikKuerzt = modPoints === 0 && punktraster.restnutzungsdauer > 0
+    /* v2976 · fuer ALLE Punktzahlen das Niedrigere aus Technik und Modell. Die Technik
+       rechnet vom Modell mit den tatsaechlichen Punkten aus (oben), kann also nur kuerzen.
+       Ein Punkt mehr hebt hoechstens um die Steigung der Verordnungstabelle (Raster: +3,1 J.). */
+    const modellFuehrt = punktraster.restnutzungsdauer > 0;
+    const technikKuerzt = modellFuehrt
       && recommendedNachSchaden != null && recommendedNachSchaden < punktraster.restnutzungsdauer - 0.005;
     if (technikKuerzt) {
       final = recommendedNachSchaden;
@@ -690,8 +697,8 @@
       finalSource = (applySchadensAbschlag && schadensInfo.gesamtAbschlag_pct > 0
         ? 'technische Alterswertminderung + Schadensabschlag (-' + schadensInfo.gesamtAbschlag_pct + '%)'
         : 'technische Alterswertminderung')
-        + ' - Basis Anlage 2 mit 0 Punkten, niedriger als das Modellergebnis';
-    } else if (modellFuehrt || (modPoints === 0 && punktraster.restnutzungsdauer > 0)) {
+        + ' - Basis Anlage 2 mit ' + modPoints + ' Punkten, niedriger als das Modellergebnis';
+    } else if (modellFuehrt) {
       final = punktraster.restnutzungsdauer;
       verfahren = 'punktraster';
       finalSource = punktraster.grenze === 'unter_schwelle'

@@ -48,7 +48,7 @@ try { HP = fs.existsSync(P_HP) ? ladeGlobal(P_HP, 'DealPilotRND') : null; } catc
 
 const JAHR = new Date().getFullYear();          /* die Wertermittlung rechnet mit dem laufenden Jahr */
 const STICHTAG = JAHR + '-10-15';
-const GEWERKE = ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand', 'baeder', 'innenausbau', 'technik'];
+const GEWERKE = ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand', 'baeder', 'decken', 'technik', 'grundriss'];   /* v2975a: die neun Kennungen aus rnd-calc.js GEWERKE - vorher 'innenausbau' statt decken/grundriss */
 const profil = (grad) => grad ? Object.fromEntries(GEWERKE.map((g) => [g, grad])) : {};
 const app = (bj, p, gnd, grad, kern) => APP.calcAll({ baujahr: bj, stichtag: STICHTAG, gnd, modPoints: p,
   gewerkeBewertung: profil(grad), kernsaniert: !!kern });
@@ -95,8 +95,8 @@ console.log('\nTEIL B · Raster Baujahr 1850–' + JAHR + ' × Punkte 0–20 × 
    Anlage 2, bei 0 Punkten das Niedrigere aus Technik [Basis Anlage 2 mit 0 Punkten] und
    Modell). Vorher sprang die RND mit Gewerken an der Schwelle um bis zu 28 J. */
 const TOL = 0.15;
-const N = { b1: 0, b2: 0, b3: 0, b4: 0, b5: 0, b6: 0, h: 0, faelle: 0 };
-const BEISP = { b1: [], b2: [], b3: [], b4: [], b5: [], b6: [], h: [] };
+const N = { b1: 0, b2: 0, b3: 0, b4: 0, b5: 0, b6: 0, b7: 0, h: 0, faelle: 0 };
+const BEISP = { b1: [], b2: [], b3: [], b4: [], b5: [], b6: [], b7: [], h: [] };
 const merk = (k, t) => { N[k]++; if (BEISP[k].length < 4) BEISP[k].push(t); };
 let maxSprung = 0, maxSprungWo = '';
 for (const gnd of [60, 70, 80]) for (const grad of [null, 'erneuert', 'veraltet']) {
@@ -125,10 +125,17 @@ for (const gnd of [60, 70, 80]) for (const grad of [null, 'erneuert', 'veraltet'
   for (let bj = 1850; bj <= JAHR; bj++) for (let p = 1; p <= 20; p++) {
     if (tab[(p - 1) + '|' + bj] > tab[p + '|' + bj] + TOL)
       merk('b3', 'GND ' + gnd + ', ' + (grad || 'ohne Gewerke') + ', Bj ' + bj + ': ' + (p - 1) + ' P. ' + r1(tab[(p - 1) + '|' + bj]) + ' > ' + p + ' P. ' + r1(tab[p + '|' + bj]));
+    /* v2975a · B7: EIN Punkt darf die RND nicht verdoppeln. Gefunden am Gutachten WE03
+       (25DG06644): erneuerte Heizung = 1 Punkt -> v2975 sprang von 22 auf 44 J., weil ab
+       1 Punkt das Modell fuehrte. B3 sah das nicht - es prueft nur „nie weniger".
+       Schranke 4 J.: die Tabelle der Anlage 2 selbst steigt je Punkt um hoechstens 3,1 J. */
+    const dp = tab[p + '|' + bj] - tab[(p - 1) + '|' + bj];
+    if (dp > 4) merk('b7', 'GND ' + gnd + ', ' + (grad || 'ohne Gewerke') + ', Bj ' + bj + ': ' + (p - 1) + '→' + p + ' P. ' + r1(tab[(p - 1) + '|' + bj]) + ' → ' + r1(tab[p + '|' + bj]));
   }
 }
 const T = { b1: 'B1 immer eine Zahl > 0', b2: 'B2 älter nie mehr RND (Tol. 0,15 J.)', b3: 'B3 mehr Punkte nie weniger (Tol. 0,15 J.)',
-  b4: 'B4 kein Sprung > 2 J. je Baujahr', b5: 'B5 Deckel 70 % GND oder GND − Alter', b6: 'B6 App = Wertermittlung (ohne Gewerke)' };
+  b4: 'B4 kein Sprung > 2 J. je Baujahr', b5: 'B5 Deckel 70 % GND oder GND − Alter', b6: 'B6 App = Wertermittlung (ohne Gewerke)',
+  b7: 'B7 ein Punkt mehr hebt höchstens um 4 J.' };
 for (const k of Object.keys(T)) {
   zeile(N[k] === 0, T[k] + ' — ' + N[k] + ' Verstöße');
   BEISP[k].forEach((t) => console.log('           z. B. ' + t));
