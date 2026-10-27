@@ -1223,6 +1223,11 @@
       if (s.flaeche > 0) setzen('wfl', s.flaeche);
       setzen('einheiten', s.wohnen);
       if (s.ist > 0) setzen('nkm', s.ist);
+      /* v3001b · Marcel 27.10.2026: „wenn man Einheiten anlegt, muss sich der Vermietungsstand
+         automatisch anpassen“. Abgeleitet aus dem Status der Einheiten, nie geraten. */
+      var vs = vermstandAus(s);
+      var vsel = el('vermstand');
+      if (vs && vsel && vsel.value !== vs) { vsel.value = vs; try { vsel.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} meldung += ' · Vermietungsstand: ' + vs; }
       /* v1738 · die Zimmer wandern mit — bisher standen sie in jeder
          Einheitenzeile und mussten in den Objektdetails NOCH EINMAL von
          Hand gepflegt werden. Zwei Orte für dieselbe Zahl heisst: einer
@@ -1369,6 +1374,43 @@
   var _n = 0;
   function haken() { if (!anhaengen() && ++_n < 12) setTimeout(haken, 400); }
 
+  /* ══ v3001b · VERMIETUNGSSTAND: AUS DEN EINHEITEN, GEGEN DIE ANDEREN FELDER GEPRUEFT ══
+     Marcel 27.10.2026: „das muss auch abgeprueft werden mit anderen Feldern, ob das da auch so ist“.
+     Geprueft wird nur, was sich widersprechen KANN: Auswahl gegen Status der Einheiten, Status einer
+     Einheit gegen ihre Ist-Miete, Ist-Miete im Reiter Miete gegen die Summe der Einheiten; ohne
+     Einheiten die Auswahl gegen die Ist-Miete. Hinweis, keine Sperre - geaendert wird nur beim
+     Uebernehmen der Einheiten. */
+  function vermstandAus(s) {
+    if (!s || !s.anzahl) return null;
+    return s.leer === 0 ? 'Vollvermietet' : (s.leer >= s.anzahl ? 'Leer' : 'Teilweise leer');
+  }
+  function vermstandPruefen() {
+    var sel = el('vermstand'); if (!sel) return [];
+    var f = sel.closest ? sel.closest('.f') : null;
+    var box = el('dp-verm-hinweis');
+    if (!box && f) { box = document.createElement('div'); box.id = 'dp-verm-hinweis'; box.style.cssText = 'font-size:11.5px;line-height:1.4;color:#B8625C;margin-top:4px'; f.appendChild(box); }
+    var h = [], v = sel.value, nkm = zahl(el('nkm') && el('nkm').value);
+    var list = (artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten)) ? window._dpMfh.einheiten.filter(function (e) { return zahl(e.wfl) > 0 || zahl(e.ist) > 0 || String(e.lage || '').trim(); }) : [];
+    if (list.length) {
+      var s = summe(list), soll = vermstandAus(s);
+      if (soll && v !== soll) h.push('Laut Einheiten ' + soll.toLowerCase() + ' (' + s.leer + ' von ' + s.anzahl + ' leer) — die Auswahl sagt „' + v + '“.');
+      list.forEach(function (e, i) {
+        var n = String(e.nr || (i + 1)) + (e.lage ? ' (' + e.lage + ')' : '');
+        if (e.status === 'leer' && zahl(e.ist) > 0) h.push('Einheit ' + n + ' steht auf leer, trägt aber eine Ist-Miete von ' + eur(zahl(e.ist)) + ' — sie zählt nicht mit.');
+        else if (e.status !== 'leer' && !(zahl(e.ist) > 0)) h.push('Einheit ' + n + ' steht auf vermietet, aber ohne Ist-Miete.');
+      });
+      if (s.ist > 0 && nkm > 0 && Math.abs(nkm - s.ist) > 1) h.push('Ist-Miete im Reiter Miete ' + eur(nkm) + ' weicht von der Summe der vermieteten Einheiten ' + eur(s.ist) + ' ab.');
+    } else {
+      if (v === 'Vollvermietet' && !(nkm > 0)) h.push('Vollvermietet, aber im Reiter Miete steht keine Ist-Miete.');
+      if (v === 'Leer' && nkm > 0) h.push('Leer, aber im Reiter Miete steht eine Ist-Miete von ' + eur(nkm) + '.');
+    }
+    if (box) { box.innerHTML = h.map(function (t) { return '⚠ ' + esc(t); }).join('<br>'); box.style.display = h.length ? '' : 'none'; }
+    return h;
+  }
+  document.addEventListener('change', function (e) { if (e.target && (e.target.id === 'vermstand' || e.target.id === 'objart')) vermstandPruefen(); });
+  document.addEventListener('input', function (e) { if (e.target && e.target.id === 'nkm') vermstandPruefen(); });
+  window.addEventListener('dp:object-ready', function () { setTimeout(vermstandPruefen, 900); });
+
   function start() {
     haken();
     var a = el('objart'); if (a && !a._mfhBound) { a._mfhBound = true; a.addEventListener('change', knopf); }
@@ -1387,6 +1429,7 @@
   }
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
+    vermstandPruefen: vermstandPruefen /* v3001b */,
     oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
