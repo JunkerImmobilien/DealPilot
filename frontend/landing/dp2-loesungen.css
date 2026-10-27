@@ -196,3 +196,7 @@
   .lz-tabs button{flex:1 1 calc(50% - 6px);padding:14px 8px}
 }
 @media(prefers-reduced-motion:reduce){.lz-step{transition:none;opacity:1}}
+
+/* landing-loesungen-1c · nur noch zwei Wege */
+.lz-wege.zwei{grid-template-columns:repeat(2,1fr);max-width:860px;margin:0 auto}
+@media(max-width:980px){.lz-wege.zwei{grid-template-columns:1fr}}
