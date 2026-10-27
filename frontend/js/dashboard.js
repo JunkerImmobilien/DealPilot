@@ -808,6 +808,8 @@
       var e = { name: basis.name, key: o._key, kp: basis.kp, top: z.top, stand: z.stand, mB: B.miete_jahr, mM: M.miete_jahr, mZ: T.miete_jahr,
         kosten: T.kosten || 0, ewB: B.ertragswert, ewZ: T.ertragswert, zuw: zw, gesperrt: z.ertragswert_gesperrt,
         mpiB: B.marktpreisindikation, rndB: B.rnd, rndZ: T.rnd, grund: g ? g.text : null, code: g ? g.code : null };
+      /* v2988 · woher das Zielbild kommt, und ob es von der Investition (san) abweicht */
+      try { e.herk = (window.DpPotenzial && DpPotenzial.herkunftAusDaten) ? DpPotenzial.herkunftAusDaten(o) : null; } catch (x) { e.herk = null; }
       if (zw != null && B.ertragswert != null && T.ertragswert != null) {
         A.ewN++; A.ewB += B.ertragswert; A.ewZ += T.ertragswert; A.ewKosten += T.kosten || 0; A.zuw += zw; A.kpEw += basis.kp;
       } else A.ohneEw.push(e);
@@ -978,6 +980,9 @@
         +   (e.zuw==null ? (e.unveraendert ? 'unverändert' : (e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet')) : VZ(e.zuw)) + '</span>'
         +   (e.ewB != null && e.ewZ != null ? '<small>EW '+EK(e.ewB)+' → '+EK(e.ewZ)+'</small>' : '')
         +   (e.kosten ? '<small>Maßnahmen '+EK(e.kosten)+'</small>' : '<small>ohne Maßnahmen</small>')
+        /* v2988 · Herkunft des Zielbilds; weicht die Investition ab, beide Zahlen nebeneinander */
+        +   (e.herk && e.herk.text ? '<small title="'+esc(e.herk.unterschied || e.herk.text)+'">'+esc(e.herk.text.replace(/^Zielbild aus /, 'aus ').replace(/\.$/, ''))
+              + (e.herk.san > 0 && e.kosten && Math.abs(e.herk.san - e.kosten) >= 1 ? ' · Investition '+EK(e.herk.san)+' · Zielbild-Maßnahmen '+EK(e.kosten) : '') + '</small>' : '')
         +   '<button type="button" class="zb-neu-btn" title="Öffnet das Objekt, rechnet die Ertragswerte je Stufe neu (kostenlos, kein Kontingent) und speichert" onclick="DealPilotDashboard.zumZielbild(\''+esc(e.key)+'\',true)">neu rechnen \u21bb</button></div>'
         + '</div>';
     }).join('');

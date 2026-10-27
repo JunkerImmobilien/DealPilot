@@ -108,7 +108,10 @@ const BASIS = {
   ds2_entwicklung: 'begrenzt', ds2_mietausfall: 'niedrig',
   ds2_marktmiete: '8.50', ds2_marktfaktor: '1.0',
   /* v2660 · E2 · Einzelobjekt: Restlaufzeit der Mietabweichung */
-  mv_befristet_bis: '2028-06', mv_kuendigungsverzicht_bis: '', mv_abw_jahre: '3'
+  mv_befristet_bis: '2028-06', mv_kuendigungsverzicht_bis: '', mv_abw_jahre: '3',
+  /* v2988 · Sanierungskosten, Kaufdatum (ab 12 Monaten gilt die Sanierung als ausgefuehrt)
+     und das Kann-Feld „Sanierung ausgefuehrt am" (hier geplant, also Stau offen) */
+  san: '50000', kaufdat: '2025-01-15', san_ausgefuehrt: '2099-01-01'
 };
 
 /* Je Formularfeld ein ANDERER Wert — plausibel, aber verschieden. */
@@ -137,6 +140,7 @@ const ANDERS = {
   ausst_decken: '5', ausst_technik: '5', ausst_aussenwaende: '5',
   bad_anz: '3', balkon_flae: '25', garagen: '3', stellpl_aussen: '4',
   modernis: '2023', baustatus: 'neubau_erstbezug', ausst: 'Einfach',
+  san: '80000', kaufdat: '2026-09-01', san_ausgefuehrt: '2025-02-01',   /* v2988 */
   objart: 'MFH', nutzungsart: 'eigennutzung',
   mikrolage: 'schwach', makrolage: 'sehr_gut', ds2_bevoelkerung: 'stark_fallend',
   ds2_nachfrage: 'sehr_schwach', ds2_wertsteigerung: 'hoch',

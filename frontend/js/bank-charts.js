@@ -975,7 +975,7 @@ if (!window._wlc) {
                 '<span class="bc-footer-sub">Über ' + n + ' Jahre aus eigener Tasche zugeschossen (negativer monatl. CF). Bereits vom Vermögenszuwachs abgezogen.</span>'
               : '<span class="bc-footer-label">Anteil eigene Tasche</span>' +
                 '<span class="bc-footer-value">0 €</span>' +
-                '<span class="bc-footer-sub">Kein zusätzliches Eigenkapital nötig — alles aus dem Cashflow.</span>') +
+                '<span class="bc-footer-sub">Kein weiteres Eigenkapital nötig.</span>') +
           '</div>' +
         '</div>' +
       '</div>';

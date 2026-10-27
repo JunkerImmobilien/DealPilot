@@ -150,6 +150,7 @@ var FIELDS = [
   'mietspiegel','me_modus','me_soll','me_anz','me_int','me_pct',
   /* v2430 · Mieterhoehung und Zielbild am Objekt (ETW/EFH/ZFH; beim MFH je Wohnung in _mfh) */
   'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen','zb_fertig_jahr',   /* v2541 */
+  'zb_markt_qm', 'san_ausgefuehrt',   /* v2988 · marktuebliche Miete nach Modernisierung; Sanierung ausgefuehrt am */
   /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
      Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
      nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
@@ -550,6 +551,7 @@ function loadData(d) {
     'ueberf_ende', '_ueberf_link', 'ueberf_daten',
     /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
     'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr',
+    'zb_markt_qm', 'san_ausgefuehrt',   /* v2988: sonst erbt Objekt B das Ausfuehrungsdatum von A */
     /* v2660: der Mietvertrag am Objekt - fehlte er im geladenen Objekt, erbte B Vertragsart,
        Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
     'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',
@@ -939,6 +941,10 @@ async function saveObj(opts) {
   if (typeof updHeader === 'function') updHeader();
 
   var data = collectData();
+  /* v2989 · Jahresstand im Bestand (jahresstaende.js): der Kennzahlen-Stand des
+     laufenden Jahres reist mit DIESEM Speichern - nie beim Laden. Die Pruefungen
+     (Ankauf-Stand, keine Soll-Ansicht, Kennzahlen dieses Objekts) stehen dort. */
+  try { if (window.DpJahresstaende && typeof DpJahresstaende.beimSpeichern === 'function') DpJahresstaende.beimSpeichern(data, opts); } catch (e) {}
   var aiText = window._aiText || null;
   /* v2193 · N62.17 - URSACHE gefunden: collectData() traegt `_ai` aus
      _currentObjData mit, also den Text vom LADEN des Objekts. Nach einer

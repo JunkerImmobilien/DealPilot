@@ -179,6 +179,7 @@
       if (!Object.prototype.hasOwnProperty.call(d, k)) continue;
       if (k === '_ankauf') continue;   /* keine Matrjoschka */
       if (k === '_thumb') continue;    /* jederzeit neu erzeugbar */
+      if (k === '_jahresstaende') continue;   /* v2989 · gehoeren zum Bestand, nicht zum Ankauf */
       kopie[k] = d[k];
     }
     /* v2216f · TIEFE Kopie. Gemessen 14.10.2026 an 2026-1056: `_mfh` (die
@@ -192,6 +193,25 @@
        window._aiText. Festgeschrieben wird die, die gerade gilt. */
     if (typeof window._aiText === 'string' && window._aiText) kopie._ai = window._aiText;
     return kopie;
+  }
+
+  /* v2989 · RECHENSTAND UND PLAN. Mit welcher App-Version die eingefrorenen
+     Kennzahlen gerechnet wurden (`version`, `kerne`: Buster der Rechenkerne)
+     und die Projektion von DAMALS (`plan`: je Jahr Miete, Cashflow, Restschuld
+     aus State.cfRows). Ohne den Rechenstand steckt eine spaetere
+     Kernkorrektur unsichtbar in der Abweichung; ohne den Plan liesse sich
+     „Plan gegen Ist" nur mit dem HEUTIGEN Kern nachrechnen - verboten (Kopf).
+     Fehlt jahresstaende.js oder passen die Kennzahlen nicht zum Objekt, bleibt
+     das Feld leer (null), nie geschaetzt. */
+  function _anhang(st) {
+    try {
+      var J = window.DpJahresstaende;
+      var an = J && typeof J.festschreibAnhang === 'function' ? J.festschreibAnhang() : null;
+      st.version = an && an.version ? an.version : null;
+      st.kerne = an && an.kerne ? an.kerne : null;
+      st.plan = an && an.plan ? an.plan : null;
+    } catch (e) { st.version = null; st.kerne = null; st.plan = null; }
+    return st;
   }
 
   function festschreiben(stichtag) {
@@ -208,6 +228,7 @@
       daten: daten,
       korrekturen: []
     };
+    _anhang(neu);
     window._dpAnkauf = neu;
     /* v2173: der Ist|Soll-Umschalter im Objekt erscheint sofort */
     try { if (window.DealPilotAnkaufAnsicht) setTimeout(DealPilotAnkaufAnsicht.bannerZeichnen, 0); } catch (e) {}
@@ -239,10 +260,12 @@
          mitzuschleppen waere genau die Matrjoschka von oben. */
       var neueDaten = _datensatzJetzt();
       a.korrekturen = a.korrekturen || [];
-      a.korrekturen.push({ am: new Date().toISOString(), was: 'daten', von: a.kurz, auf: _kurzfassung(neueDaten) });
+      a.korrekturen.push({ am: new Date().toISOString(), was: 'daten', von: a.kurz, auf: _kurzfassung(neueDaten),
+        version_von: a.version || null });   /* v2989 */
       a.daten = neueDaten;
       a.kurz = _kurzfassung(neueDaten);
       a.am = new Date().toISOString();
+      _anhang(a);   /* v2989 · der neue Stand ist mit dem heutigen Kern gerechnet */
       return a;
     }
     throw new Error('Unbekannte Korrektur: ' + was);
@@ -525,6 +548,8 @@
     jetzt: jetzt,
     spaeter: spaeter,
     neuNehmen: neuNehmen,
+    /* v2989 · fuer jahresstaende.js - dieselbe Kurzfassung, EINE Quelle */
+    kurzfassung: _kurzfassung,
     KENNZAHLEN: KENNZAHLEN
   };
 })();

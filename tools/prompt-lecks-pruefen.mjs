@@ -266,6 +266,17 @@ const auftrag = {
     _selbst_gesetzt: ['min_dscr', 'max_ltv', 'strategie']
   },
 
+  /* ── v2988 · Zielbild: Massnahmen im Zielbild getrennt von den Sanierungskosten der Investition ── */
+  potenzial: {
+    art: 'mfh', kennzeichnung: 'PRUEF-KENNZEICHNUNG', kappung: { pct: 20, text: 'PRUEF-KAPPUNG' },
+    stufen: { bestand: { kaltmiete_monat: 3195, kaltmiete_jahr: 38340, kosten: 0, punkte_plus: 0, ertragswert: 425000, rnd: 32 },
+              zielbild: { kaltmiete_monat: 3794, kaltmiete_jahr: 45528, kosten: 136543, punkte_plus: 1.1, ertragswert: 436000, rnd: 34.4 } },
+    ertragswert_gerechnet: true,
+    massnahmen_herkunft: { text: 'PRUEF-ZIELBILD-AUS-5-WOHNUNGEN', summe: 136543, n_wohnungen: 5, haus: 0,
+      sanierungskosten_investition: 137321, unterschied: 'PRUEF-UNTERSCHIED' },
+    miete_nach_modernisierung: { satz: 'PRUEF-MIETE-NACH-MODERNISIERUNG', weg: 'amtlich_nach_modernisierung', wirkt: false },
+    sanierung_regel: 'PRUEF-SANIERUNG-REGEL'
+  },
   verhandlung: { inseriert_seit: '2026-01-13', tage_online: 263 },
   investor_score: { total: 71, rendite: 67, finanzierung: 73, risiko: 61, lage: 79 },
   dealscore: { total: 68 },
@@ -412,6 +423,14 @@ const ERWARTET = [
   ['bestand.fehlt', 'bestand-analyse.js payload()', 'PRUEF-FEHLT-EXIT'],
   ['bestand: Antwortfeld exit_strategien', 'v2985', '"exit_strategien"'],
   ['bestand: Q&A-Form anschlussfinanzierung', 'v2985', '"anschlussfinanzierung": [{ "frage"'],
+
+  /* ── v2988 · Zielbild-Massnahmen und Sanierungskosten getrennt ─────── */
+  ['potenzial.massnahmen_herkunft.text', 'potenzial.js zusammenfassung()', 'PRUEF-ZIELBILD-AUS-5-WOHNUNGEN'],
+  ['potenzial.massnahmen_herkunft.summe', 'potenzial.js zusammenfassung()', 'Summe ' + z(136543)],
+  ['potenzial.massnahmen_herkunft.sanierungskosten_investition', 'potenzial.js zusammenfassung()', 'eigene Angabe): ' + z(137321)],
+  ['potenzial: Spaltenname Massnahmen im Zielbild', 'v2988', 'Massnahmen im Zielbild (Kosten)'],
+  ['potenzial.miete_nach_modernisierung.satz', 'potenzial.js zusammenfassung()', 'PRUEF-MIETE-NACH-MODERNISIERUNG'],
+  ['potenzial.sanierung_regel', 'potenzial.js zusammenfassung()', 'PRUEF-SANIERUNG-REGEL'],
 
   /* ── die, die vorher schon ankamen: Gegenprobe gegen einen Rueckbau ─ */
   ['steuer.zve', 'ui.js:895', z(87654)],

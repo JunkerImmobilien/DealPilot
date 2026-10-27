@@ -95,5 +95,22 @@ if (ab) {
   ok(e.length === 0, 'veröffentlichter Text 331 ohne Befund');
 } else ok(false, 'abnahme_331 fehlt in der Fixture');
 
+console.log('7) v2990 · Bodenwert nicht angepasst ist nicht „konservativ" (Bericht Am Markt 9, Kabelsketal)');
+{
+  const pl = JSON.parse(JSON.stringify(fx.payload));
+  pl.cross_check = pl.cross_check || {};
+  pl.cross_check.flaeche = { erheblich: true, bodenwert_nicht_angepasst: true, objekt_qm: 2350, richtwertgrundstueck_qm: 800, ueberschreitung_pct: 194 };
+  const Fb = K.textFakten(pl);
+  ok(Fb.bodenwert_nicht_angepasst === true, 'Fakt bodenwert_nicht_angepasst gesetzt');
+  ok(/NICHT an die Grundstücksgröße angepasst/.test(K.faktenAnweisung(Fb)), 'Anweisung nennt es');
+  const echt = 'Der Bodenrichtwert ist mit 130 €/m² ausgewiesen, die umfangreiche Grundstücksfläche wurde hierbei nicht angepasst, sodass der Bodenwert konservativ angesetzt wurde.';
+  ok(K.pruefeText(echt, Fb).some((x) => x.art === 'bodenwert_wertung'), 'echter Satz aus Bericht Am Markt 9 -> Befund');
+  ok(!K.pruefeText(echt, F).some((x) => x.art === 'bodenwert_wertung'), 'ohne den Fakt kein Befund (angepasster Bodenwert darf so heissen)');
+  ok(!K.pruefeText('Der Bodenwert ist nicht an die Grundstücksgröße angepasst und insoweit vorläufig.', Fb).length, 'richtige Formulierung -> kein Befund');
+  ok(!K.pruefeText('Die Mietansätze sind konservativ gewählt.', Fb).some((x) => x.art === 'bodenwert_wertung'), '„konservativ" ohne Bodenwert -> kein Befund');
+  const R2 = await import(pathToFileURL(RGS).href);
+  ok(R2.bodenwertFakten(pl.cross_check).length === 1 && R2.bodenwertFakten({ flaeche: { erheblich: true } }).length === 0, 'bodenwertFakten nur bei nicht angepasstem Bodenwert');
+}
+
 console.log((fehler ? 'ROT' : 'GRUEN') + ': ' + (n - fehler) + '/' + n);
 process.exit(fehler ? 1 : 0);

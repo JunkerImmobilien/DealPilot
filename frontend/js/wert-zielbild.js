@@ -336,7 +336,10 @@
     var kost = top.kosten || 0;
     K.push({ schluessel: 'kosten', titel: 'Maßnahmen', wert: kost, wert_text: eur(kost),
       vergleich_text: M && T && M.kosten ? 'davon ' + eur(M.kosten) + ' für die Mieterhöhung' : (kost ? 'bis ' + (T ? 'zum Zielbild' : 'zur Mieterhöhung') : 'keine eingetragen'),
-      text: kost ? 'Kosten der Maßnahmen, ohne Finanzierung.' : 'Ohne Maßnahmen steigt nur die Miete.' });
+      text: kost ? 'Kosten der Maßnahmen im Zielbild, ohne Finanzierung' + (function () {   /* v2988 · Herkunft, nicht die Sanierungskosten der Investition */
+          try { var H = global.DpPotenzial && global.DpPotenzial.herkunft ? global.DpPotenzial.herkunft() : null;
+            return H && H.text ? ' — ' + H.text.replace(/^Zielbild aus /, 'aus ').replace(/\.$/, '') + (H.san > 0 ? '; Sanierungskosten der Investition ' + eur(H.san) + ' sind eine eigene Angabe' : '') : ''; } catch (e) { return ''; }
+        })() + '.' : 'Ohne Maßnahmen steigt nur die Miete.' });
     var zw = Z.wertzuwachs_nach_kosten[topK];
     if (!Z.ertragswert_gesperrt && zw != null) K.push({ schluessel: 'wert', titel: 'Wertzuwachs nach Kosten', wert: zw, wert_text: eurVz(zw), ton: alt ? null : (zw >= 0 ? 'pos' : 'neg'), veraltet: !!alt,
       vergleich_text: 'Ertragswert ' + (T ? 'Zielbild' : 'nach Erhöhung') + ' − heute − Maßnahmen',
@@ -776,7 +779,9 @@
     }
     _karte = c;
     platz(c);
-    c.querySelector('[data-dp-wz-oben]').innerHTML = segmentOben(D);
+    /* v2988 · woher das Zielbild kommt (Maßnahmen je Wohnung/Haus, Unterschied zur Investition, Miete nach Modernisierung) */
+    var _hk = ''; try { _hk = D.zielbild && global.DpPotenzial && global.DpPotenzial.herkunftHtml ? global.DpPotenzial.herkunftHtml() : ''; } catch (e) { _hk = ''; }
+    c.querySelector('[data-dp-wz-oben]').innerHTML = segmentOben(D) + _hk;
     vzZielbild(D);
     c.querySelector('.dp-wz-kz').hidden = !D.zielbild;
     var det2 = c.querySelector('details.dp-wz-det');

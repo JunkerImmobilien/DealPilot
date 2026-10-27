@@ -103,17 +103,39 @@
         return text.apply(this, args);
       };
     }
+    /* v2990 · BREITE OHNE UNTERSCHNEIDUNG. jsPDF misst mit den Kerning-Paaren der
+       Standardschrift („Te" -120, „Ve" -80 …), setzt den Text aber OHNE sie. Jedes
+       Wort mit einem solchen Paar war gemessen schmaler als gesetzt; wer Woerter
+       einzeln setzt (Marktbericht-Fliesstext, _mbLayoutRuns), verlor so den Wortabstand:
+       „Vergleichsangebotesowie", „Trendfortschreibungzu" (Bericht Am Markt 9,
+       Kabelsketal, 27.10.2026). Gemessen jsPDF 2.5.1, 9,5 pt: „Tagen" 9,02 mm
+       gemessen gegen 9,42 mm gesetzt, der Wortabstand ist 0,93 mm. Gemessen wird
+       deshalb wie gesetzt wird: ohne Kerning. */
+    var _ohneKern = function (d, o) {
+      var r = {}; for (var k in (o || {})) if (Object.prototype.hasOwnProperty.call(o, k)) r[k] = o[k];
+      if (!r.kerning) r.kerning = {};
+      if (!r.widths && !r.fontName && !r.fontStyle) {
+        try { var U = d.internal.getFont().metadata.Unicode; if (U && U.widths) r.widths = U.widths; } catch (e) {}
+        if (!r.widths) delete r.kerning;   /* ohne Breitentabelle nimmt splitTextToSize sonst gar keine */
+      }
+      return r;
+    };
     if (typeof split === 'function') {
-      doc.splitTextToSize = function (s) {
+      doc.splitTextToSize = function (s, w, o) {
         var args = Array.prototype.slice.call(arguments); args[0] = _tief(s);
+        args[2] = _ohneKern(this, o);
         return split.apply(this, args);
       };
     }
     if (typeof breite === 'function') {
-      doc.getTextWidth = function (s) { return breite.call(this, sauber(s)); };
+      doc.getTextWidth = function (s) { return breite.call(this, sauber(s)); };   /* ruft this.getStringUnitWidth, also ohne Kerning */
     }
     if (typeof einheit === 'function') {
-      doc.getStringUnitWidth = function (s, o) { return einheit.call(this, sauber(s), o); };
+      doc.getStringUnitWidth = function (s, o) {
+        var r = {}; for (var k in (o || {})) if (Object.prototype.hasOwnProperty.call(o, k)) r[k] = o[k];
+        if (!r.kerning) r.kerning = {};
+        return einheit.call(this, sauber(s), r);
+      };
     }
   }
 

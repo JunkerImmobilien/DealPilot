@@ -68,7 +68,9 @@ export function textFakten(p) {
     anzahl_im_band: ew ? ganz(mh.n_band) : null,
     anzahl_ohne_restlaufzeit: ew ? ganz(bog.n_offen) : null,
   };
-  return { werte, verhaeltnis, zaehl, ertragswert_im_umfang: !!ew, sachwert_im_umfang: !!sw };
+  /* v2990 · Bodenwert ohne Groessenanpassung: keine Wertung „konservativ" (s. pruefeText 5) */
+  const bodenwert_nicht_angepasst = !!(im && cc.flaeche && cc.flaeche.erheblich && cc.flaeche.bodenwert_nicht_angepasst);
+  return { werte, verhaeltnis, zaehl, ertragswert_im_umfang: !!ew, sachwert_im_umfang: !!sw, bodenwert_nicht_angepasst };
 }
 
 /* Benannte Pruefzahlen fuer den Prompt: kaufpreis_ueber_mpi_pct = 58.6 usw. */
@@ -105,6 +107,8 @@ export function faktenAnweisung(F) {
     s.push('Zählung: ' + t.join(', ') + '. Leer stehende Wohnungen und Wohnungen mit Miete über dem Band sind VERSCHIEDENE Gruppen.');
     s.push('Der Ertragswert ist in diesem Bericht ENTHALTEN' + (F.sachwert_im_umfang ? ', der Sachwert ebenfalls' : '') + ' - schreibe nie, er sei nicht enthalten.');
   }
+  if (F.bodenwert_nicht_angepasst) s.push('Der Bodenwert ist NICHT an die Grundstücksgröße angepasst - das ist eine offene Prüfung, '
+    + 'kein vorsichtiger Ansatz. Nenne ihn nie „konservativ", „vorsichtig" oder „zurückhaltend".');
   if (!s.length) return '';
   return '\n\nPRÜFZAHLEN (fertig gerechnet, verbindlich): ' + s.join(' ')
     + ' Als Feldnamen: ' + JSON.stringify(pruefzahlen(F)) + '. '
@@ -194,6 +198,14 @@ export function pruefeText(md, F) {
         const w = zahlAn(t, n);
         if (w !== z.anzahl_ueber_band) befunde.push({ art: 'zaehlung_band', satz: t.trim(), zeile: s.zeile, ist: n[0], soll: String(z.anzahl_ueber_band) + ' über dem Band' });
       }
+    }
+    /* 5) v2990 · Bodenwert „konservativ", obwohl er nur NICHT angepasst ist (Bericht Am Markt 9).
+          Nicht angepasst heisst: Richtung offen. Gezaehlt wird nur ein Satz, der den Bodenwert oder
+          die Grundstuecksflaeche nennt UND ihn als vorsichtig wertet. */
+    if (F.bodenwert_nicht_angepasst && /Bodenwert|Grundstücksfläche|Grundstücksgröße/i.test(t)
+      && /(konservativ|vorsichtig|zurückhaltend|auf der sicheren Seite|bewusst niedrig)/i.test(t)) {
+      befunde.push({ art: 'bodenwert_wertung', satz: t.trim(), zeile: s.zeile, ist: 'Bodenwert als vorsichtig/konservativ gewertet',
+        soll: 'nicht an die Grundstücksgröße angepasst, insoweit vorläufig (Richtung offen)' });
     }
     /* 4) Verfahren im Umfang als „nicht enthalten" bezeichnet */
     if (F.ertragswert_im_umfang && /Ertrags/i.test(t) && /(nicht enthalten|nicht Teil|liegen? nicht vor|wurden? nicht ermittelt|nicht ausgewiesen)/i.test(t)) {
