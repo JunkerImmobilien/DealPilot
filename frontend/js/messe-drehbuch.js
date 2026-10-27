@@ -1514,6 +1514,8 @@
   }
   function rhAntwort(u, m, opt) {
     var D = window.DPM_REIHE_DATEN; if (!D || !_rh) return null;
+    /* v3015 · Webinar komplett-mfh: eigener Mitschnitt (Bericht 371), vor allen anderen */
+    var kma = kmAntwort(u, m, opt); if (kma) return kma;
     var body = null; try { body = opt && typeof opt.body === 'string' ? JSON.parse(opt.body) : null; } catch (e) {}
     if (/\/ai\/transcribe-chunk/.test(u)) { _rh.spr = Math.min(_rh.sprMax || D.sprache.text.length, (_rh.spr || 0) + 1); return rhJ({ text: D.sprache.text.slice(0, _rh.spr).join(' ') }); }
     if (/\/ai\/voice-quickmatch/.test(u)) { var ids = []; for (var i = 0; i < (_rh.spr || 0); i++) ids = ids.concat(D.sprache.ids[i] || []); return rhJ({ ids: ids }); }
@@ -6260,6 +6262,894 @@
         await b2oZeile(s, 'Steuerverlauf mit Wendepunkt', 'Wann das Haus steuerlich positiv wird — und wann es Zeit fürs nächste Investment ist.', 1000);
       }
     ]
+  };
+
+  /* ═══ WEBINAR · KOMPLETTBEISPIEL MEHRFAMILIENHAUS (v3015) ════════════════
+     Marcel 27.10.2026: „Das Video und die Eingaben laufen viel zu schnell, das
+     kann keiner in der Schnelle verarbeiten. Das darf gerne ein großes Webinar
+     sein, detailliert erklärt.“ Neun Kapitel mit Zwischentitel (Einführung ·
+     Objekt anlegen · Einheiten erfassen · Miete · Finanzierung · Steuer ·
+     Marktbericht und Wertermittlung · Zielbild · Ergebnis und Bank-PDF).
+     Jede Eingabe in Tipptempo (KM_TIPP), vor jedem Feld 2,5 s Pause, nach jedem
+     Ergebnis 5 s Standzeit; zu jedem Schritt eine Tafel mit drei Punkten (was du
+     eingibst, warum, was daraus folgt) - im Studio rechts neben der App.
+     Zu jeder Zeile ein längerer Sprechtext in DPM_ZEILEN[].sprich (für die
+     Vertonung, als Datei abgelegt); die Zeile steht so lange, wie er dauert.
+
+     DAS HAUS: Parkstr. 9, 32545 Bad Oeynhausen, aus dem Demo-Konto - mit seinen
+     ECHTEN Eingaben (Zeile vom 27.10.2026, md5 data d166b005…). Das echte Objekt
+     wird NIE geladen und nie gespeichert: „Neues Objekt“ (rhStart), alles getippt,
+     beim Aufräumen gelöscht (auch bei Esc). Zielbild-Pläne (Kapitel 8) sind
+     Beispiele des Drehbuchs, nicht die des Demo-Objekts.
+
+     KEIN ABRUF JE DURCHGANG. Der Marktbericht Stufe 3 ist der echte Bericht 371
+     dieses Hauses (Staging, 27.10.2026, Stichtag 27.10.2026), in
+     js/messe-komplett-daten.js als ROHER Payload (mb.market_reports 371) - im
+     Lauf über den Stream gespielt. Seine Eingaben (ref) sind genau die, die das
+     Drehbuch tippt (geprüft im Prüflauf: kmRefPruefen). Den vollen Bericht zeigt
+     das Marktbericht-Fenster per GET (/reports/one?id=371, kein Kontingent);
+     der Verlauf des neuen Objekts zeigt auf ihn. Geokodierung, Webrecherche,
+     Pilot-Analyse, Ertragswert je Stufe: nicht im Video (gesperrt, RH_SPERRE).
+     Entwicklung: window.DPM_HALT = N hält VOR Szene N, window.DPM_WEITER = 1. */
+  var KM = {
+    kuerzel: 'Parkstr. 9 · Webinar', str: 'Parkstr.', hnr: '9', plz: '32545', ort: 'Bad Oeynhausen',
+    baujahr: '1905', etagen: '3', gsfl: '720', bgf: '576', kaufdat: '2024-12-23', brw: '250', brwStichtag: '2026-01-01',
+    stellpl: '4', kp: '395000', makler: '3,57', moebl: '7000', d1: '324000', d1z: '4,0', d1t: '1,0', bindj: '10', gebAnt: '54,31',
+    /* Modernisierung in den letzten Jahren - je Gewerk die volle Punktzahl nach Anlage 2 (zusammen 8, wie im Bericht) */
+    mod: [['mod_heizung', '< 5 Jahre', 'Heizung'], ['mod_baeder', '< 5 Jahre', 'Bäder'], ['mod_leitungen', '< 5 Jahre', 'Leitungen'], ['mod_innenausbau', '< 5 Jahre', 'Innenausbau']],
+    ausst: [['ausst_dach', '2'], ['ausst_fenster', '2'], ['ausst_heizung', '2']],
+    lage: [['lageklasse', 'C', 'Lageklasse'], ['makrolage', 'durchschnittlich', 'Makrolage'], ['mikrolage', 'sehr_schwach', 'Mikrolage'],
+           ['ds2_bevoelkerung', 'stabil', 'Bevölkerung'], ['ds2_nachfrage', 'mittel', 'Nachfrage'], ['ds2_wertsteigerung', 'mittel', 'Wertsteigerung'], ['ds2_entwicklung', 'eine_starke', 'Entwicklung']],
+    /* nr, lage, wfl, zimmer, ist, status, Gesamtzustand (5 neuwertig … 1 stark sanierungsbedürftig) */
+    we: [['1', 'EG links', '92', '3', '644', 'vermietet', '2'], ['2', 'EG rechts', '86', '3', '602', 'vermietet', '2'],
+         ['3', '1. OG links', '92', '3', '874', 'vermietet', '1'], ['4', '1. OG rechts', '86', '3', '620', 'vermietet', '2'],
+         ['5', 'DG', '71', '2', '455', 'vermietet', '1']],
+    /* Wohnung 1: Staffelmiete wie im Demo-Objekt */
+    staffel: { mv_art: 'staffel', mv_beginn: '2022-04-01', mv_letzte_erhoehung: '2025-04-01', mv_erhoehung_art: 'prozent', mv_erhoehung_wert: '3', mv_rhythmus_jahre: '2', mv_stufen_offen: '4', mv_naechste_anpassung: '2027-04-01' },
+    grundsteuer: '336', hgNul: '7680', wegR: '798',
+    /* Kapitel 8 · Zielbild (Beispiel des Drehbuchs) */
+    zbJahr: '2029',
+    haus: [['fassade', '60000', true, '30']],
+    plan: {
+      1: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2023-03-01', vgl_qm: '7,60' },
+      2: { mass: [['bad', '18000'], ['boeden', '9000']], ziel_qm: '10,00', ziel_wann: 'bei Mieterwechsel' },
+      4: { mass: [['bad', '15000'], ['renovierung', '6000']], ziel_qm: '9,50', ziel_wann: 'bei Mieterwechsel' }
+    }
+  };
+  var KM_TIPP = 150;   /* ms je Zeichen - Tipptempo */
+  var KM_BERICHT = 371;   /* der echte Stufe-3-Bericht der Parkstr. 9 (Staging) */
+  var KM_BUSTER = 'v3015';
+  var _km = {};
+  window.DPM_KM = window.DPM_KM || { gespielt: [], tafeln: [] };
+  function kmParam(k) { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } }
+  async function kmHalt(i) {
+    var h = Number(kmParam('halt') || window.DPM_HALT || 0);
+    if (!h || i + 1 < h) return;
+    window.DPM_HALT_STEHT = i + 1;
+    await new Promise(function (ok, x) {
+      var l = lauf, t = setInterval(function () {
+        if (l !== lauf) { clearInterval(t); x('stopp'); return; }
+        if (window.DPM_WEITER) { window.DPM_WEITER = 0; window.DPM_HALT_STEHT = 0; clearInterval(t); ok(); }
+      }, 300);
+    });
+  }
+  function kmOpt(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? r6Text(e.options[e.selectedIndex]) : ''; }
+  function kmMonat(iso) { var m = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']; return iso ? m[+iso.slice(5, 7) - 1] + ' ' + iso.slice(0, 4) : ''; }
+  function kmEur(id) { var n = zahl(id); return n == null ? '–' : eur(n); }
+
+  /* ── Tempo, Tafel, Kapitel ──────────────────────────────────────────── */
+  /* window.DPM_KM_SCHNELL (nur Entwicklung, z. B. 0.2) kürzt Pausen und Tippen - im Video nie gesetzt */
+  function kmT() { return Math.max(15, Math.round(KM_TIPP * kmF())); }
+  function kmF() { var f = Number(window.DPM_KM_SCHNELL); return f > 0 && f < 1 ? f : 1; }
+  async function kmPause(ms) { await warte(Math.round(ms * kmF() / TEMPO)); }   /* echte Millisekunden */
+  function kmTafelText(t) { return t ? [t.was, t.warum, t.folge].join(' ') : ''; }
+  /* Standzeit: Lesezeit des Bandes, der Tafel (4 s + 1 s je 15 Zeichen) oder Sprechdauer (13 Zeichen/s + 1,5 s) - das Längste */
+  function kmDauer(titel, text, sprich, tafel) {
+    var l = lies(titel, text), tf = tafel ? Math.round((4000 + 1000 * kmTafelText(tafel).length / 15) / TEMPO) : 0;
+    var sp = sprich ? Math.round((1500 + 1000 * String(sprich).length / 13) / TEMPO) : 0;
+    return Math.round(Math.max(l, tf, sp) * kmF());
+  }
+  function kmMerke(sprich, tafel) { try { var z = window.DPM_ZEILEN; if (z && z.length) { z[z.length - 1].sprich = sprich || null; if (tafel) z[z.length - 1].tafel = tafel; } } catch (e) {} }
+  /* die Tafel: im Studio rechts neben der App, sonst oben rechts im Bild */
+  function kmTafel(t) {
+    _km.tafel = t || null;
+    if (t) DPM_KM.tafeln.push(t.was);
+    if (STUDIO) { anStudio({ type: 'tafel', tafel: t || null }); return; }
+    var e = el('dpm-tafel');
+    if (!t) { e.style.display = 'none'; return; }
+    e.style.cssText = 'position:fixed;z-index:10073;right:16px;top:70px;width:360px;padding:14px 16px;border-radius:12px;background:rgba(10,9,7,.94);border:1px solid ' + G + ';color:#FDFCFA;font:400 14px/1.45 Inter,sans-serif;pointer-events:none';
+    e.innerHTML = [['Was du eingibst', t.was], ['Warum', t.warum], ['Was daraus folgt', t.folge]].map(function (x) { return '<div style="margin:0 0 8px"><div style="font:600 10px JetBrains Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:' + G + '">' + x[0] + '</div>' + x[1] + '</div>'; }).join('');
+  }
+  async function kmSag(s, titel, text, sprich, nach, tafel) {
+    if (tafel !== undefined) kmTafel(tafel);
+    s.zeile(titel, text); kmMerke(sprich, tafel);
+    await warte(kmDauer(titel, text, sprich, tafel));
+    await kmPause(nach == null ? 5000 : nach);
+  }
+  /* eine Eingabe: Ziel zeigen, Band und Tafel, 2,5 s Pause, tippen, Standzeit (mindestens Sprech-/Lesedauer), 5 s Ruhe */
+  async function kmEingabe(s, ziel, titel, text, tafel, sprich, aktion, nach) {
+    if (Array.isArray(ziel)) await zeigeGruppe(ziel[0], ziel[1], 8); else if (ziel) await zeige(ziel, 10);
+    kmTafel(tafel);
+    s.zeile(titel, text); kmMerke(sprich, tafel);
+    var t0 = Date.now(), soll = kmDauer(titel, text, sprich, tafel) * TEMPO;
+    await kmPause(2500);
+    if (aktion) await aktion();
+    var rest = soll - (Date.now() - t0); if (rest > 300) await warte(rest >= 600 * TEMPO ? rest / TEMPO : rest);
+    await kmPause(nach == null ? 5000 : nach);
+  }
+  async function kmTipp(id, v) {
+    await kmPause(2200);   /* vor jedem Feld */
+    var e = document.getElementById(id); if (e) { try { e.focus(); } catch (x) {} }
+    await tippeH(id, String(v), kmT());
+    if (e) e.dispatchEvent(new Event('blur', { bubbles: true }));
+    await kmPause(900);
+  }
+  /* Maßnahmen einer Wohnung in Tipptempo: Baustein wählen, Pause, Kosten tippen */
+  async function kmMassnahmen(liste) {
+    for (var j = 0; j < liste.length; j++) {
+      await kmPause(1500);
+      var c = r26We('[data-zb-chip="' + liste[j][0] + '"]'); if (c && !c.classList.contains('on')) c.click();
+      await kmPause(1500);
+      var n = document.querySelectorAll('#mfh-we-ov [data-zb-k]').length;
+      await r26Tippe(r26We('[data-zb-k="' + (n - 1) + '"]'), liste[j][1], kmT());
+    }
+  }
+  async function kmWahl(id, v) { await kmPause(2200); r6Setz(id, v); await kmPause(1500); }
+  /* Zwischentitel: im Studio das Reihen-Intro des Baukastens mit „Kapitel n“, sonst die Titelkarte */
+  async function kmKapitel(s, nr, titel, unter, sprich) {
+    zeige(null); kegelHoch(false); kmTafel(null);
+    if (STUDIO) anStudio({ type: 'zwischentitel', nr: nr, titel: titel, unter: unter });
+    else karte('<div class="k">Kapitel ' + nr + ' von 9</div><h1>' + titel + '</h1><p>' + unter + '</p>');
+    s.zeile('Kapitel ' + nr + ' · ' + titel, unter); kmMerke(sprich);
+    await warte(Math.max(kmDauer('Kapitel ' + nr + ' · ' + titel, unter, sprich), Math.round(8500 * kmF() / TEMPO)));
+    if (STUDIO) anStudio({ type: 'zwischentitel-weg' }); else karte(null);
+    await kmPause(1200);
+  }
+
+  /* ── Mitschnitt: Bericht 371 über den Stream, Verlauf zeigt auf ihn ────── */
+  function kmLaden() {
+    return new Promise(function (ok) {
+      if (window.DPM_KOMPLETT_DATEN) { ok(true); return; }
+      var s = document.createElement('script'); s.src = 'js/messe-komplett-daten.js?v=' + KM_BUSTER;
+      s.onload = function () { ok(!!window.DPM_KOMPLETT_DATEN); }; s.onerror = function () { ok(false); };
+      document.head.appendChild(s);
+    });
+  }
+  function kmStrom(steps, data) {
+    var enc = new TextEncoder(), i = 0;
+    var rs = new ReadableStream({ pull: function (c) {
+      return new Promise(function (ok) {
+        setTimeout(function () {
+          if (i < steps.length) c.enqueue(enc.encode(JSON.stringify({ type: 'step', msg: steps[i++] }) + '\n'));
+          else { c.enqueue(enc.encode(JSON.stringify({ type: 'done', result: { report_id: null, object_key: null, cost: 0, data: JSON.parse(JSON.stringify(data)) } }) + '\n')); c.close(); }
+          ok();
+        }, i < steps.length ? Math.round(900 * TEMPO) : 300);
+      });
+    } });
+    return new Response(rs, { status: 200, headers: { 'Content-Type': 'application/x-ndjson' } });
+  }
+  /* wird aus rhAntwort gefragt (nur in diesem Drehbuch) - null = nicht zuständig */
+  function kmAntwort(u, m, opt) {
+    var D = window.DPM_KOMPLETT_DATEN; if (!D || !_rh || _aktiv !== DREHBUECHER['komplett-mfh']) return null;
+    var body = null; try { body = opt && typeof opt.body === 'string' ? JSON.parse(opt.body) : null; } catch (e) {}
+    if (m === 'POST' && /\/marktbericht\/reports\/generate-stream/.test(u)) {
+      var st = body && body.wert_stufe ? Number(body.wert_stufe) : 1;
+      if (st !== 3) { DPM_REIHE.gesperrt.push('POST generate-stream Stufe ' + st); return new Response(JSON.stringify({ error: 'Vorführung: Abruf gesperrt' }), { status: 503, headers: { 'Content-Type': 'application/json' } }); }   /* nur Stufe 3 liegt vor - nie der Mitschnitt eines anderen Hauses */
+      _km.ref = (body && body.object) || body;
+      _rh.berichte.push({ stufe: 3, at: new Date().toISOString(), p: JSON.parse(JSON.stringify(D.mb3.data)) });
+      DPM_KM.gespielt.push('mb3');
+      return kmStrom(D.mb3.steps || [], D.mb3.data);
+    }
+    if (m === 'GET' && /\/marktbericht\/objects\/history\?/.test(u) && _rh.berichte.length) {
+      var ref = decodeURIComponent((u.match(/[?&](?:ref|key)=([^&]+)/) || [])[1] || '').replace(/^dp:/, '');
+      if (ref && DPM_REIHE.angelegt.indexOf(ref) >= 0) {
+        var h = rhVerlauf().map(function (r) { r.report_id = KM_BERICHT; r.wert_stufe = 3; return r; });
+        DPM_KM.gespielt.push('verlauf');
+        return rhJ({ history: h });
+      }
+    }
+    return null;
+  }
+  /* Prüfung im Lauf: kommen die getippten Eingaben im Auftrag so an, wie der Bericht sie trägt? */
+  /* die Felder des echten Objekts (Zeile vom 27.10.2026), aus denen Bericht 371 entstand */
+  var KM_SOLL = { plz: '32545', ort: 'Bad Oeynhausen', str: 'Parkstr.', hnr: '9', objart: 'MFH', baujahr: '1905', wfl: '427', gsfl: '720', kp: '395000',
+    einheiten: '5', nkm: '3195', mod_punkte: '8', standardstufe: '2', ds2_energie: 'G', ds2_zustand: 'renovierungsbeduerftig', stellpl_aussen: '4',
+    etagen_ges: '3', bgf: '576', brw: '250', vermstand: 'Vollvermietet', nutzungsart: 'kapitalanlage', kaufdat: '2024-12-23', garagen: '0',
+    ausst_dach: '2', ausst_fenster: '2', ausst_heizung: '2' };
+  function kmNorm(v) { var s = String(v == null ? '' : v).trim(), n = s.replace(/\./g, '').replace(',', '.'); return /^-?\d+(\.\d+)?$/.test(n) ? String(parseFloat(n)) : s; }
+  function kmRefPruefen() {
+    var o = _km.ref || {}, ab = [];
+    Object.keys(KM_SOLL).forEach(function (k) {
+      if (!(k in o)) { ab.push(k + ': fehlt im Auftrag'); return; }
+      if (kmNorm(o[k]) !== kmNorm(KM_SOLL[k])) ab.push(k + ': Bericht ' + KM_SOLL[k] + ' / Lauf ' + o[k]);
+    });
+    DPM_KM.refAbweichung = ab; DPM_KM.refAuftrag = o;
+    return ab;
+  }
+
+  /* ── Bank-PDF (wie Modul 19) ─────────────────────────────────────────── */
+  async function kmBankPdf() {
+    var bank = await r19Bank();
+    if (bank) { try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.roh = tx; _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); DPM_KM.pdf = { bytes: bank.size, seiten: _r19.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {} }
+    return bank;
+  }
+
+  DREHBUECHER['komplett-mfh'] = {
+    titel: 'Komplettbeispiel Mehrfamilienhaus', unterzeile: 'Das große Webinar — ein Haus, alle Schritte, ausführlich erklärt', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () {
+      var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove();
+      try { r19Zu(); } catch (e) {} try { r16MbZu(); } catch (e) {}
+      kmTafel(null); var t = q('#dpm-tafel'); if (t) t.remove();
+      try { document.documentElement.classList.remove('dpm-km'); } catch (e) {}
+      karte(null);
+      rhAufraeumen();
+    },
+    szenen: [
+      /* ════ KAPITEL 1 · EINFÜHRUNG ════ */
+      async function (s) {
+        _km = {}; DPM_KM.gespielt = []; DPM_KM.tafeln = []; DPM_KM.refAbweichung = null;
+        /* fremde Hinweise aus dem Konto (Pille „Marktbericht fertig · …“ eines anderen Objekts) nicht im Bild */
+        try { document.documentElement.classList.add('dpm-km'); if (!q('#dpm-km-css')) { var kc = document.createElement('style'); kc.id = 'dpm-km-css'; kc.textContent = 'html.dpm-km #dp-mba-pille{display:none!important}'; document.head.appendChild(kc); } } catch (e) {}
+        await kmLaden();
+        await rhStart(0);
+        await kmKapitel(s, 1, 'Einführung', 'Ein Mehrfamilienhaus, von der ersten Eingabe bis zum Bank-PDF.',
+          'Willkommen zum großen Komplettbeispiel. Wir nehmen uns heute Zeit und gehen mit einem einzigen Mehrfamilienhaus den ganzen Weg durch DealPilot: wir legen es an, erfassen jede Wohnung, die Miete, die Finanzierung und die Steuer, holen den Marktbericht mit der Wertermittlung, planen ein Zielbild und landen am Ende beim Ergebnis und beim PDF für die Bank.');
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
+        await kmSag(s, 'Ein neues Objekt', 'Wir starten leer: <b>„Neues Objekt“</b> — und tippen jedes Feld selbst.',
+          'Wir beginnen mit einem leeren Objekt. DealPilot könnte ein Exposé auslesen oder eine Sprachaufnahme verstehen. Heute tippen wir jedes Feld selbst, damit du siehst, was wofür gebraucht wird.', null,
+          { was: 'Nichts — ein leeres Objekt über „Neues Objekt“.', warum: 'Jedes Feld einmal sehen und verstehen, wofür es gebraucht wird.', folge: 'Alle Zahlen im Video rechnet die App aus genau diesen Eingaben.' });
+        await zeige(function () { return q('nav.tabs'); }, 6);
+        var tabs = [].map.call(document.querySelectorAll('nav.tabs .tab[data-target-sec]'), function (t) { return t.offsetWidth ? r6Text(t) : null; }).filter(Boolean);
+        await kmSag(s, 'Die Reiter', (tabs.length ? tabs.length + ' Reiter: ' + tabs.join(' · ') : 'Die Reiter oben') + '. Wir gehen sie der Reihe nach durch.',
+          'Oben siehst du die Reiter: ' + (tabs.length ? tabs.join(', ') : 'Objekt, Investition, Miete und so weiter') + '. Sie sind die Kapitel eines Objekts, und genau in dieser Reihenfolge gehen wir sie heute durch.', null,
+          { was: 'Noch nichts — wir schauen uns die Reiter an.', warum: 'Jeder Reiter ist ein Kapitel des Objekts.', folge: 'Was du in einem Reiter einträgst, rechnet in allen anderen mit.' });
+        var stz = function () { return q('#oe-stufen') || q('#oab-dp-stufen'); };
+        if (stz()) {
+          await zeige(stz, 8);
+          await kmSag(s, 'Drei Eingabestufen', 'Oben steht, was für die Marktbewertung noch fehlt — <b>Stufe 1, 2 und 3</b>.',
+            'Ganz oben zeigt DealPilot die Eingabestufen. Für eine schnelle Marktpreisindikation reicht wenig, für die amtliche Wertermittlung in Stufe drei braucht es mehr Angaben. Die Liste darunter sagt dir jederzeit, was noch fehlt. Unser Ziel heute ist Stufe drei.', null,
+            { was: 'Noch nichts — die Liste zeigt, was fehlt.', warum: 'Die Wertermittlung braucht vollständige Angaben.', folge: 'Ist Stufe 3 erreicht, kann der Marktbericht amtlich rechnen.' });
+        }
+        await kmSag(s, 'Das Beispiel', 'Ein Haus aus dem Demo-Konto: <b>' + KM.str + ' ' + KM.hnr + ', ' + KM.ort + '</b> — fünf Wohnungen, Baujahr ' + KM.baujahr + '.',
+          'Unser Beispiel ist ein echtes Haus aus dem Demo-Konto: die ' + KM.str.replace('Parkstr.', 'Parkstraße') + ' ' + KM.hnr + ' in ' + KM.ort + '. Ein Altbau von ' + KM.baujahr + ' mit fünf Wohnungen. Wir tippen seine echten Angaben ab — und das Original im Konto bleibt dabei unberührt.', null,
+          { was: 'Die Angaben eines echten Hauses aus dem Demo-Konto.', warum: 'Echte Daten zeigen echte Ergebnisse — keine geschönten.', folge: 'Am Ende stehen Score, Marktwert, Zielbild und Bank-PDF für dieses Haus.' });
+      },
+
+      /* ════ KAPITEL 2 · OBJEKT ANLEGEN ════ */
+      async function (s) {
+        await kmKapitel(s, 2, 'Objekt anlegen', 'Adresse, Objektart, Baujahr, Grundstück, Modernisierung, Lage.',
+          'Kapitel zwei: das Objekt anlegen. Hier entstehen die Grundlagen, auf denen später jede Rechnung steht — Adresse, Objektart, Baujahr, Grundstück, der Stand der Modernisierung und die Lage.');
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await kmEingabe(s, [feldVon('plz'), feldVon('hnr')], 'Die Adresse', 'PLZ, Ort, Straße und Hausnummer: <b>' + KM.plz + ' ' + KM.ort + ', ' + KM.str + ' ' + KM.hnr + '</b>.',
+          { was: 'Postleitzahl, Ort, Straße, Hausnummer.', warum: 'An der Adresse hängen Lage, Bodenrichtwert und der zuständige Gutachterausschuss.', folge: 'Der Marktbericht findet später genau diese Stelle auf der Karte.' },
+          'Zuerst die Adresse. Das ist mehr als eine Anschrift: an ihr hängen die Lage, der Bodenrichtwert und der zuständige Gutachterausschuss, dessen Daten später in die Wertermittlung gehen.',
+          async function () { await kmTipp('plz', KM.plz); await kmTipp('ort', KM.ort); await kmTipp('str', KM.str); await kmTipp('hnr', KM.hnr); });
+        await kmEingabe(s, feldVon('objart'), 'Objektart', '<b>Mehrfamilienhaus</b> — davon hängt ab, welche Felder und welche Rechenwege gelten.',
+          { was: 'Objektart: Mehrfamilienhaus.', warum: 'Die Art bestimmt Felder, Bewirtschaftungskosten und den Liegenschaftszins.', folge: 'Darunter erscheint die Erfassung der einzelnen Einheiten.' },
+          'Die Objektart: Mehrfamilienhaus. Das ist keine Formsache. Davon hängt ab, welche Felder erscheinen, welche Bewirtschaftungskosten angesetzt werden und welcher Liegenschaftszins in der Wertermittlung gilt.',
+          async function () { await kmWahl('objart', 'MFH'); });
+        await kmEingabe(s, feldVon('nutzungsart'), 'Nutzungsart', '<b>' + (function () { var e = document.getElementById('nutzungsart'); var o = e && [].filter.call(e.options, function (x) { return x.value === 'kapitalanlage'; })[0]; return o ? r6Text(o) : 'Vermietet'; })() + '</b> — wir sind Vermieter.',
+          { was: 'Nutzungsart: vermietet als Kapitalanlage.', warum: 'Vermieter rechnen anders als Selbstnutzer.', folge: 'Steuer als Einkünfte aus Vermietung, Cashflow aus Sicht des Vermieters.' },
+          'Die Nutzungsart: vermietet, als Kapitalanlage. Dadurch rechnet DealPilot die Steuer als Einkünfte aus Vermietung und Verpachtung und den Cashflow aus Sicht des Vermieters. Der Marktbericht braucht die Angabe ebenfalls.',
+          async function () { await kmWahl('nutzungsart', 'kapitalanlage'); });
+        var kasten = function () { var k = q('#mff-kasten'); return k && k.offsetWidth ? k : null; };
+        await warteAuf(kasten, 3000);
+        if (kasten()) {
+          await zeige(kasten, 8);
+          await kmSag(s, 'Mit Einheiten erfassen', 'Der Erklärkasten: Fläche, Miete, Vermietungsstand und Zustand kommen bei einem Haus <b>aus den Einheiten</b>.',
+            'Sofort erscheint ein Erklärkasten. Bei einem Haus mit Einheiten erfassen wir jede Wohnung einzeln. Daraus füllen sich Wohnfläche, Anzahl der Wohnungen, Zimmer, Nettokaltmiete, Vermietungsstand und der Zustand des Gebäudes von selbst. Das machen wir im nächsten Kapitel.', null,
+            { was: 'Noch nichts — der Kasten erklärt die Einheiten.', warum: 'Ein Haus ist die Summe seiner Wohnungen.', folge: 'Fläche, Miete und Zustand kommen später aus den Einheiten.' });
+        }
+        await kmEingabe(s, [feldVon('baujahr'), feldVon('etagen_ges')], 'Baujahr und Etagen', 'Baujahr <b>' + KM.baujahr + '</b>, ' + KM.etagen + ' Etagen.',
+          { was: 'Baujahr ' + KM.baujahr + ', Anzahl Etagen ' + KM.etagen + '.', warum: 'Aus Baujahr und Modernisierung ergibt sich die Restnutzungsdauer.', folge: 'Sie steckt im Ertragswert, im Sachwert und in der Abschreibung.' },
+          'Baujahr ' + KM.baujahr + ', drei Etagen. Das Baujahr ist eine der wichtigsten Zahlen überhaupt: aus ihm und den Modernisierungen ergibt sich die Restnutzungsdauer, und die steckt im Ertragswert, im Sachwert und in der Abschreibung.',
+          async function () { await kmTipp('baujahr', KM.baujahr); await kmTipp('etagen_ges', KM.etagen); });
+        await kmEingabe(s, [feldVon('standardstufe'), feldVon('ds2_energie')], 'Ausstattung und Energie', 'Standardstufe <b>2</b> (einfach), Energieklasse <b>G</b>.',
+          { was: 'Standardstufe 2 nach NHK 2010, Energieklasse G.', warum: 'Die Standardstufe bestimmt die Herstellungskosten im Sachwert.', folge: 'Die Energieklasse geht ins Risiko des Deal Score ein.' },
+          'Die Standardstufe nach den Normalherstellungskosten: zwei, also einfach. Sie bestimmt im Sachwertverfahren, was das Gebäude neu kosten würde. Dazu die Energieklasse G — die geht in die Risikobewertung des Deal Score ein.',
+          async function () { await kmWahl('standardstufe', '2'); await kmWahl('ds2_energie', 'G'); });
+        await kmEingabe(s, [feldVon('gsfl'), feldVon('kuerzel')], 'Grundstück und Kürzel', 'Grundstück <b>' + KM.gsfl + ' m²</b>, dazu ein Kürzel für die Liste.',
+          { was: 'Grundstücksfläche ' + KM.gsfl + ' m² und ein Kürzel.', warum: 'Fläche mal Bodenrichtwert ergibt den Bodenwert.', folge: 'Boden wird nicht abgeschrieben — er fehlt in der AfA.' },
+          'Die Grundstücksfläche: ' + KM.gsfl + ' Quadratmeter. Mit dem Bodenrichtwert ergibt sich daraus der Bodenwert — wichtig, weil Boden sich nicht abnutzt und deshalb steuerlich nicht abgeschrieben wird. Dazu ein Kürzel, unter dem wir das Haus in der Liste wiederfinden.',
+          async function () { await kmTipp('gsfl', KM.gsfl); await kmTipp('kuerzel', KM.kuerzel); });
+        await kmEingabe(s, feldVon('kaufdat'), 'Kaufdatum', 'Gekauft am <b>' + datum(KM.kaufdat) + '</b>.',
+          { was: 'Das Datum des Kaufvertrags.', warum: 'Ab hier laufen Abschreibung, Fristen und der Steuerverlauf.', folge: 'Auch die Drei-Jahres-Frist der 15-%-Grenze zählt ab diesem Tag.' },
+          'Das Kaufdatum, hier der dreiundzwanzigste Dezember zweitausendvierundzwanzig. Ab diesem Tag laufen Abschreibung und Steuerverlauf, und auch die Drei-Jahres-Frist für anschaffungsnahe Herstellungskosten.',
+          async function () { await kmTipp('kaufdat', KM.kaufdat); });
+        await kmEingabe(s, [feldVon('brw'), feldVon('brw_stichtag')], 'Bodenrichtwert', '<b>' + KM.brw + ' €/m²</b>, Stichtag ' + datum(KM.brwStichtag) + ' — vom amtlichen Portal.',
+          { was: 'Bodenrichtwert ' + KM.brw + ' €/m² mit Stichtag.', warum: 'Er ist der amtliche Wert für den Boden in dieser Zone.', folge: 'Bodenwert, Gebäudeanteil und Ertragswert hängen daran.' },
+          'Der Bodenrichtwert. DealPilot kann ihn selbst beim amtlichen Bodenrichtwert-Portal abfragen; hier tragen wir den Wert direkt ein: ' + KM.brw + ' Euro je Quadratmeter, Stichtag erster Januar zweitausendsechsundzwanzig. Daraus entsteht der Bodenwert, und der entscheidet mit über den Gebäudeanteil für die Abschreibung.',
+          async function () { await kmTipp('brw', KM.brw); await kmTipp('brw_stichtag', KM.brwStichtag); });
+        /* Modernisierung: vier Gewerke, je volle Punkte nach Anlage 2 */
+        var gw = function () { return b2oHuelle(feldVon(KM.mod[0][0])(), feldVon(KM.mod[KM.mod.length - 1][0])()); };
+        await kmEingabe(s, [feldVon(KM.mod[0][0]), feldVon(KM.mod[KM.mod.length - 1][0])], 'Modernisierung', KM.mod.map(function (x) { return x[2]; }).join(', ') + ': in den letzten <b>fünf Jahren</b> erneuert.',
+          { was: 'Je Gewerk: wann zuletzt modernisiert.', warum: 'Anlage 2 ImmoWertV gibt dafür Modernisierungspunkte.', folge: 'Mehr Punkte, längere Restnutzungsdauer — höherer Wert.' },
+          'Jetzt der Stand der Modernisierung, Gewerk für Gewerk. Bei unserem Haus sind Heizung, Bäder, Leitungen und Innenausbau in den letzten fünf Jahren erneuert worden. Die Anlage 2 der Immobilienwertermittlungsverordnung vergibt dafür Punkte — und die verlängern die Restnutzungsdauer.',
+          async function () { for (var i = 0; i < KM.mod.length; i++) await kmWahl(KM.mod[i][0], KM.mod[i][1]); KM.ausst.forEach(function (x) { r6Setz(x[0], x[1]); }); });
+        var mp = function () { var e = document.getElementById('mod_punkte'); return e && (e.closest('.f') || e); };
+        if (mp()) {
+          await zeige(mp, 8);
+          await kmSag(s, 'Modernisierungspunkte', 'DealPilot zählt: <b>' + (wert('mod_punkte') || '–') + ' Punkte</b> nach Anlage 2.',
+            'DealPilot zählt die Punkte selbst zusammen: ' + (wert('mod_punkte') || 'keine') + ' Punkte. Mit diesem Wert rechnen die Restnutzungsdauer und später die Wertermittlung.', null,
+            { was: 'Nichts — die Punkte rechnet DealPilot.', warum: 'Eine Zahl statt vier Einzelangaben für die Wertermittlung.', folge: 'Die Restnutzungsdauer verlängert sich mit jedem Punkt.' });
+        }
+        await kmEingabe(s, [feldVon('stellpl_aussen'), feldVon('bgf')], 'Stellplätze und Bruttogrundfläche', KM.stellpl + ' Außenstellplätze, Bruttogrundfläche <b>' + KM.bgf + ' m²</b>.',
+          { was: 'Außenstellplätze und Bruttogrundfläche.', warum: 'Das Sachwertverfahren rechnet mit der Bruttogrundfläche.', folge: 'Stellplätze fließen als eigener Wert ein.' },
+          'Vier Außenstellplätze und die Bruttogrundfläche, ' + KM.bgf + ' Quadratmeter. Die braucht das Sachwertverfahren: dort werden die Herstellungskosten je Quadratmeter Bruttogrundfläche gerechnet.',
+          async function () { await kmTipp('stellpl_aussen', KM.stellpl); await kmTipp('bgf', KM.bgf); });
+        await kmEingabe(s, [feldVon('lageklasse'), feldVon('ds2_entwicklung')], 'Die Lage — deine Einschätzung', 'Lageklasse <b>C</b>, Makrolage durchschnittlich, Mikrolage — zunächst vorsichtig — <b>sehr schwach</b>.',
+          { was: 'Lageklasse, Makro- und Mikrolage, Markt am Ort.', warum: 'Eine schwächere Lage verlangt eine höhere Rendite.', folge: 'Der Marktbericht misst die Lage später nach — und vergleicht.' },
+          'Die Lage, zunächst als eigene Einschätzung. Lageklasse C, die Stadt insgesamt durchschnittlich, die Straße schätzen wir vorsichtig als sehr schwach ein. Dazu Bevölkerung stabil, Nachfrage und Wertsteigerung mittel. Warum das zählt: eine schwächere Lage braucht eine höhere Rendite. Der Marktbericht misst die Lage später nach — wir werden sehen, ob wir zu vorsichtig waren.',
+          async function () { for (var i = 0; i < KM.lage.length; i++) await kmWahl(KM.lage[i][0], KM.lage[i][1]); });
+        var wa = function () { var e = document.getElementById('svwert'); return e && (e.closest('.wa-raster') || e.closest('.f')); };
+        if (wa()) {
+          await zeige(wa, 8);
+          var hk = [].map.call((q('#svw_herkunft') || { options: [] }).options, function (o) { return o.value ? r6Text(o).replace(/\s*\(.*\)$/, '') : null; }).filter(Boolean);
+          await kmSag(s, 'Wertangabe in einer Zeile', 'Marktwert/Verkehrswert · <b>Herkunft</b> · Bericht. Herkunft: ' + hk.join(', ') + '.',
+            'Eine Zeile für den Wert des Hauses: Marktwert oder Verkehrswert, daneben die Herkunft und der Bericht. Als Herkunft wählst du ' + hk.join(', ') + '. Eine Bankbewertung ist also kein eigenes Feld mehr, sondern eine Herkunft. Wir lassen die Zeile vorerst leer — der Marktbericht liefert gleich einen Wert.', null,
+            { was: 'Vorerst nichts — die Zeile bleibt leer.', warum: 'Nur ein Gutachten oder eine Bankbewertung trägt den Beleihungsauslauf.', folge: 'Ohne Wert rechnet der LTV mit dem Kaufpreis.' });
+        }
+        var ws = function () { var e = document.getElementById('wertermittlungsstichtag'); return e && (e.closest('.f') || e.parentElement); };
+        if (ws()) {
+          await zeige(ws, 8);
+          await kmSag(s, 'Wertermittlungsstichtag', 'Leer heißt <b>heute</b>. Der Knopf „= Kaufdatum“ setzt den Tag des Kaufs.',
+            'Neu ist das Feld Wertermittlungsstichtag. Leer bedeutet: bewertet wird zum heutigen Tag. Mit dem Knopf daneben übernimmst du das Kaufdatum — dann rechnet die Wertermittlung mit dem Baupreisindex, dem Alter und den Mieten zu diesem Tag. Wir lassen es leer.', null,
+            { was: 'Nichts — leer bedeutet heute.', warum: 'Jeder Wert gilt für einen Tag: Index, Alter und Mieten.', folge: 'Der Stichtag steht oben im Marktbericht.' });
+        }
+      },
+
+      /* ════ KAPITEL 3 · EINHEITEN ERFASSEN ════ */
+      async function (s) {
+        await kmKapitel(s, 3, 'Einheiten erfassen', 'Fünf Wohnungen, jede für sich: Fläche, Zimmer, Miete, Zustand.',
+          'Kapitel drei: die Einheiten. Ein Mehrfamilienhaus ist die Summe seiner Wohnungen. Wir erfassen jede einzeln — und das Haus rechnet sich daraus von selbst zusammen.');
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var kn = function () { var b = q('#mff-oeffnen') || q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; };
+        await zeige(kn, 10);
+        await kmSag(s, 'Einheiten erfassen', 'Der Knopf im Erklärkasten öffnet die Erfassung — <b>vier Schritte</b>.',
+          'Ein Klick auf „Einheiten erfassen“ öffnet die Erfassung. Sie hat vier Schritte: das Gebäude, die Einheiten, den Zustand je Einheit und das Ergebnis.', 2500,
+          { was: 'Ein Klick auf „Einheiten erfassen“.', warum: 'Wohnungen einzeln erfassen statt Summen schätzen.', folge: 'Vier Schritte: Gebäude, Einheiten, Zustand, Ergebnis.' });
+        var b = kn(); if (b) b.click();
+        await warteAuf(function () { return r26Mfh('#mfh-body'); }, 4000);
+        kegelHoch(true); await kmPause(1000);
+        await zeige(function () { return r26Mfh('#mfh-body table'); }, 6);
+        var gp = r6Text(r26Mfh('#mfh-geb-p'));
+        await kmSag(s, 'Schritt 1 · Das Gebäude', 'Die Gewerke nach <b>Anlage 2</b> — übernommen aus dem Reiter Objekt' + (gp ? ': <b>' + gp + ' von 20 Punkten</b>' : '') + '.',
+          'Schritt eins: das Gebäude. Hier stehen die Gewerke der Anlage 2 — Dach, Außenwände, Leitungen und Heizung gehören dem ganzen Haus, Fenster, Bäder und Innenausbau sind die Vorgabe für die Wohnungen. Die Angaben aus dem Reiter Objekt sind schon übernommen. Wir ändern nichts.', null,
+          { was: 'Nichts — die Modernisierung steht schon.', warum: 'Dach, Fassade, Heizung und Leitungen gehören dem ganzen Haus.', folge: 'Jede Wohnung erbt diese Angaben, bis sie widerspricht.' });
+        var wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return r26Zelle(0, 'nr'); }, 3000);
+        await kmPause(900);
+        await zeige(function () { return r26Mfh('.mfh-tab'); }, 6);
+        await kmSag(s, 'Schritt 2 · Die Wohnungen', 'Je Zeile eine Wohnung: Nummer, Lage, Fläche, Zimmer, <b>Ist-Miete</b> kalt, Status.',
+          'Schritt zwei: die Wohnungen. Jede Zeile ist eine Wohnung — Nummer, Lage im Haus, Wohnfläche, Zimmer, die heutige Kaltmiete und der Status, also vermietet oder leer. Mehr braucht es beim Anlegen nicht; alles Weitere steht in den Details.', 2500,
+          { was: 'Je Wohnung: Nummer, Lage, Fläche, Zimmer, Kaltmiete, Status.', warum: 'Die Miete jeder Wohnung ist die Grundlage der Rendite.', folge: 'Summen für Fläche und Miete bildet DealPilot selbst.' });
+        for (var i = 0; i < KM.we.length; i++) {
+          if (i > 0) { var nb = r26Mfh('#mfh-neu'); if (nb) nb.click(); await warteAuf(function () { return r26Zelle(i, 'nr'); }, 2000); }
+          var r = KM.we[i], T = kmT();
+          s.zeile('Wohnung ' + r[0] + ' · ' + r[1], r[2] + ' m², ' + r[3] + ' Zimmer, Ist-Miete <b>' + r[4] + ' €</b> kalt, ' + r[5] + '.');
+          kmMerke(i === 0 ? 'Wohnung eins, Erdgeschoss links: ' + r[2] + ' Quadratmeter, ' + r[3] + ' Zimmer, ' + r[4] + ' Euro Kaltmiete, vermietet.' : 'Wohnung ' + r[0] + ', ' + r[1].replace('EG', 'Erdgeschoss').replace('OG', 'Obergeschoss').replace('DG', 'Dachgeschoss') + ': ' + r[2] + ' Quadratmeter, ' + r[4] + ' Euro.');
+          await kmPause(2200);
+          var nr = r26Zelle(i, 'nr'); if (nr && nr.value !== r[0]) await r26Tippe(nr, r[0], T);
+          await kmPause(700); await r26Tippe(r26Zelle(i, 'lage'), r[1], T);
+          await kmPause(700); await r26Tippe(r26Zelle(i, 'wfl'), r[2], T);
+          await kmPause(700); await r26Tippe(r26Zelle(i, 'zimmer'), r[3], T);
+          await kmPause(700); await r26Tippe(r26Zelle(i, 'ist'), r[4], T);
+          await kmPause(700); await r26Tippe(r26Zelle(i, 'status'), r[5]);
+          await kmPause(2500);
+        }
+        await zeige(function () { return b2oHuelle(r26Mfh('.mfh-tab'), r26Mfh('#mfh-summe')); }, 6);
+        var su = r26Summe(), sm = /(\d+) Einheiten.*?·\s*([\d.,]+ m²).*?Ist ([\d.]+ €)\/Monat/.exec(su);
+        await kmSag(s, 'Das Haus in Zahlen', sm ? '<b>' + sm[1] + ' Einheiten, ' + sm[2] + '</b>, Ist-Miete <b>' + sm[3] + '</b> im Monat.' : su,
+          sm ? 'Die Summenzeile rechnet mit: ' + sm[1] + ' Wohnungen, ' + sm[2].replace('m²', 'Quadratmeter') + ' und ' + sm[3].replace('€', 'Euro') + ' Kaltmiete im Monat.' : 'Die Summenzeile rechnet mit.', null,
+          { was: 'Nichts — die Summe rechnet sich selbst.', warum: 'Kein Abtippen von Summen, keine Rechenfehler.', folge: 'Diese Summen gehen gleich ins Objekt.' });
+        /* Gesamtzustand je Wohnung (Details · Stammdaten) */
+        await zeige(function () { return r26Mfh('[data-det="0"]'); }, 8);
+        await kmSag(s, 'Der Zustand je Wohnung', 'In den <b>Details</b> jeder Wohnung steht ihr Gesamtzustand — von neuwertig bis stark sanierungsbedürftig.',
+          'Eine Angabe holen wir noch nach: den Zustand jeder Wohnung. Er steht in den Details. Aus allen fünf rechnet DealPilot nach Fläche gewichtet den Zustand des Gebäudes.', 2500,
+          { was: 'Je Wohnung: Gesamtzustand in den Details.', warum: 'Wohnungen sind unterschiedlich gut in Schuss.', folge: 'Daraus ergibt sich der Zustand des Gebäudes, nach Fläche gewichtet.' });
+        for (var j = 0; j < KM.we.length; j++) {
+          await r26WohnungAuf(j);
+          var zs = function () { var x = r26We('[data-wk="zustand"]'); return x && (x.closest('.mfh-we-f') || x); };
+          await zeige(zs, 8);
+          var w = KM.we[j];
+          s.zeile('Wohnung ' + w[0] + ' · Zustand', 'Gesamtzustand: <b>' + ({ 5: 'neuwertig', 4: 'gut', 3: 'normal', 2: 'renovierungsbedürftig', 1: 'stark sanierungsbedürftig' })[w[6]] + '</b>.');
+          kmMerke(j === 0 ? 'Wohnung eins: renovierungsbedürftig.' : 'Wohnung ' + w[0] + ': ' + ({ 2: 'renovierungsbedürftig', 1: 'stark sanierungsbedürftig' })[w[6]] + '.');
+          await kmPause(2200);
+          await r26Tippe(r26We('[data-wk="zustand"]'), w[6]);
+          await kmPause(j === 0 ? 3500 : 2500);
+          await r26WohnungZu();
+        }
+        /* Schritt 3 und 4 ansehen, dann übernehmen */
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await kmPause(900);
+        await zeige(function () { return r26Mfh('#mfh-body table') || r26Mfh('#mfh-body'); }, 6);
+        await kmSag(s, 'Schritt 3 · Zustand je Einheit', 'Vorgabe ist <b>„wie Gebäude“</b> — nur Wohnungen, die abweichen, bekommen eigene Angaben.',
+          'Schritt drei zeigt Fenster, Bäder, Innenausbau und Grundriss je Wohnung. Die Vorgabe ist „wie Gebäude“ — nur eine Wohnung, die abweicht, bekommt eigene Angaben. Bei uns stimmt alles.', null,
+          { was: 'Nichts — die Vorgabe „wie Gebäude“ passt.', warum: 'Nur Abweichungen kosten Zeit, nicht der Normalfall.', folge: 'Jede Wohnung bekommt ihre Modernisierungspunkte.' });
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return r26Mfh('#mfh-uep') || r26Mfh('#mfh-body'); }, 3000);
+        await kmPause(900);
+        await zeige(function () { return r26Mfh('#mfh-body'); }, 6);
+        var et = r6Text(r26Mfh('#mfh-body')), rg = /Restnutzungsdauer(?: des Gebäudes)? (\d+) Jahre/.exec(et), pg = /angesetzt (\d+) Punkte|Gebäude gesamt:\s*([\d,]+) Punkte/.exec(et);
+        _km.rnd = rg ? rg[1] : null;
+        await kmSag(s, 'Schritt 4 · Ergebnis', (pg ? '<b>' + (pg[1] || pg[2]) + ' Punkte</b> nach Anlage 2' : 'Punkte nach Anlage 2') + (rg ? ', Restnutzungsdauer <b>' + rg[1] + ' Jahre</b>' : '') + '.',
+          'Schritt vier, das Ergebnis: ' + (pg ? (pg[1] || pg[2]) + ' Modernisierungspunkte' : 'die Modernisierungspunkte') + (rg ? ' und daraus eine Restnutzungsdauer von ' + rg[1] + ' Jahren' : '') + '. Mit diesem Stand rechnen Score und Wertermittlung.', null,
+          { was: 'Nichts — das Ergebnis rechnet DealPilot.', warum: 'Punkte und Restnutzungsdauer für das ganze Haus auf einen Blick.', folge: 'Die Restnutzungsdauer trägt Ertragswert und Sachwert.' });
+        var san = r26Mfh('#mfh-san'); if (san && san.checked) san.click();
+        await zeige(function () { return r26Mfh('#mfh-weiter'); }, 8);
+        await kmSag(s, 'Übernehmen', 'Ein Klick: Fläche, Einheiten, Miete, Zustand und Vermietungsstand gehen ins Objekt.', 'Ein Klick auf Übernehmen …', 1200,
+          { was: 'Ein Klick auf „Übernehmen“.', warum: 'Die Summen gehören ins Objekt.', folge: 'Diese Felder sind danach schreibgeschützt — sie kommen aus den Einheiten.' });
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return !q('#mfh-modal'); }, 5000);
+        kegelHoch(false);
+        await kmPause(1800);
+        m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('wfl'), feldVon('vermstand'), 8);
+        var ro = ['wfl', 'einheiten', 'vermstand', 'ds2_zustand'].filter(function (id) { var e = document.getElementById(id); return e && e.classList.contains('mff-gesperrt'); }).length;
+        _km.ro = ro;
+        await kmSag(s, 'Aus den Einheiten', '<b>' + wert('einheiten') + ' Einheiten</b>, ' + wert('wfl') + ' m², Vermietungsstand <b>' + kmOpt('vermstand') + '</b>, Zustand <b>' + kmOpt('ds2_zustand') + '</b> — schreibgeschützt.',
+          'Und alles steht im Objekt: ' + wert('einheiten') + ' Einheiten, ' + wert('wfl') + ' Quadratmeter, Vermietungsstand ' + kmOpt('vermstand') + ', Zustand des Gebäudes ' + kmOpt('ds2_zustand') + '. Diese Felder sind jetzt schreibgeschützt: sie kommen aus den Einheiten. Wer etwas ändern will, ändert die Wohnung — so können Haus und Wohnungen nie auseinanderlaufen.', null,
+          { was: 'Nichts — die Felder sind übernommen.', warum: 'Eine Quelle für Fläche, Miete und Zustand.', folge: 'Der Vermietungsstand wird gegen die übrigen Felder geprüft.' });
+      },
+
+      /* ════ KAPITEL 4 · MIETE ════ */
+      async function (s) {
+        await kmKapitel(s, 4, 'Miete', 'Kaltmiete aus den Wohnungen, ein Mietvertrag im Detail, Bewirtschaftung.',
+          'Kapitel vier: die Miete. Sie entscheidet, ob ein Haus sich trägt. Wir sehen, wo die Kaltmiete herkommt, tragen einen Mietvertrag mit Staffelmiete ein und schauen auf die Kosten der Bewirtschaftung.');
+        reiter('s2'); await kmPause(1300);
+        await zeige(feldVon('nkm'), 10);
+        await kmSag(s, 'Nettokaltmiete', '<b>' + kmEur('nkm') + '</b> im Monat — die Summe der fünf Wohnungen.',
+          'Im Reiter Miete steht die Nettokaltmiete: ' + de(zahl('nkm') || 0) + ' Euro im Monat. Wir haben sie nicht getippt — sie ist die Summe der fünf Wohnungen.', null,
+          { was: 'Nichts — die Miete kommt aus den Einheiten.', warum: 'Die Summe der Wohnungen ist die Miete des Hauses.', folge: 'Sie trägt Rendite, Cashflow und Ertragswert.' });
+        /* Mietvertrag Wohnung 1: Staffelmiete */
+        reiter('s0'); await kmPause(900);
+        var kn = function () { var b = q('#mff-oeffnen') || q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; };
+        await zeige(kn, 10);
+        await kmSag(s, 'Der Mietvertrag gehört zur Wohnung', 'Mietverträge stehen <b>je Wohnung</b> in den Details — wir öffnen Wohnung 1.',
+          'Mietverträge gehören zur einzelnen Wohnung. Wir öffnen die Einheiten noch einmal, diesmal die Details von Wohnung eins.', 2500,
+          { was: 'Ein Klick auf „Einheiten bearbeiten“.', warum: 'Jede Wohnung hat ihren eigenen Vertrag.', folge: 'Vertragsart und Fristen gelten genau für diese Wohnung.' });
+        var b = kn(); if (b) b.click();
+        await warteAuf(function () { return r26Mfh('#mfh-body'); }, 4000);
+        kegelHoch(true);
+        var t2 = r26Mfh('[data-s="1"]'); if (t2) t2.click();
+        await warteAuf(function () { return r26Mfh('[data-det="0"]'); }, 3000);
+        await r26WohnungAuf(0);
+        var P = KM.staffel;
+        await kmEingabe(s, r26BlockTitel(/^Mietvertrag/), 'Wohnung 1 · Staffelmiete', 'Seit ' + kmMonat(P.mv_beginn) + ', <b>+' + P.mv_erhoehung_wert + ' % alle ' + P.mv_rhythmus_jahre + ' Jahre</b>, noch ' + P.mv_stufen_offen + ' Stufen.',
+          { was: 'Vertragsart Staffelmiete, Beginn, letzte Stufe, Höhe und Rhythmus.', warum: 'Eine Staffel legt die Erhöhungen im Vertrag fest.', folge: 'Daneben ist keine Erhöhung nach § 558 BGB möglich.' },
+          'Wohnung eins hat eine Staffelmiete: seit April zweitausendzweiundzwanzig, die letzte Stufe im April zweitausendfünfundzwanzig, plus drei Prozent alle zwei Jahre, noch vier Stufen offen. Wichtig: bei einer Staffelmiete ist eine Erhöhung auf die Vergleichsmiete nach Paragraf 558 BGB ausgeschlossen. Die Miete steigt genau so, wie der Vertrag es sagt.',
+          async function () {
+            for (var k in P) { await kmPause(1500); await r26Feld(k, P[k], kmT()); }
+          });
+        await zeige(r26BlockTitel(/^Mietvertrag/), 6);
+        var na = r26We('[data-wk="mv_naechste_anpassung"]');
+        await kmSag(s, 'Die nächste Stufe', na && na.value ? 'Nächste Anpassung: <b>' + datum(na.value) + '</b>.' : 'Die Staffel steht im Vertrag der Wohnung.',
+          na && na.value ? 'Die nächste Stufe ist am ' + datum(na.value) + ' fällig. Genau so rechnet die Mietentwicklung dieser Wohnung weiter.' : 'Die Staffel steht jetzt im Vertrag der Wohnung, und die Mietentwicklung rechnet mit ihr.', null,
+          { was: 'Nichts — die nächste Stufe steht im Vertrag.', warum: 'Fristen sind Geld: sie bestimmen, wann die Miete steigt.', folge: 'Die Mietentwicklung des Hauses rechnet mit der Staffel.' });
+        await r26WohnungZu();
+        var wbx;
+        /* über „Übernehmen“ schließen (Schritt 4), damit der Vertrag ins Objekt geht */
+        var s4 = r26Mfh('[data-s="3"]'); if (s4) s4.click(); await kmPause(600);
+        wbx = r26Mfh('#mfh-weiter'); if (wbx) wbx.click();
+        await warteAuf(function () { return !q('#mfh-modal'); }, 5000);
+        kegelHoch(false);
+        /* Mietentwicklung aus Wohnungen */
+        reiter('s2'); await kmPause(1300);
+        var me = function () { var x = q('#me-mode-einheiten'); return x && x.offsetWidth ? x : null; };
+        if (me()) {
+          await zeige(function () { var x = me(); return x && x.parentElement; }, 10);
+          var modi = [].map.call(document.querySelectorAll('.me-mode-toggle .me-mode-btn'), function (x) { return x.offsetWidth ? r6Text(x) : null; }).filter(Boolean);
+          await kmEingabe(s, function () { var x = me(); return x && x.parentElement; }, 'Mietentwicklung', (modi.length ? modi.map(function (x) { return '„' + x + '“'; }).join(', ') : '') + ' — für das Haus: <b>„' + r6Text(me()) + '“</b>.',
+            { was: 'Wie die Miete fortgeschrieben wird.', warum: 'Jede Wohnung hat ihren eigenen Vertrag und Termin.', folge: 'Die Tabelle rechnet Jahr für Jahr je Wohnung.' },
+            'Darunter die Mietentwicklung. Es gibt mehrere Wege, die Miete in die Zukunft zu schreiben. Für ein Haus mit erfassten Wohnungen nehmen wir „' + r6Text(me()) + '“: dann rechnet jede Wohnung mit ihrem eigenen Vertrag, die Staffel von Wohnung eins eingeschlossen.',
+            async function () { var k = me(); if (k && !k.classList.contains('active')) k.click(); await kmPause(900); });
+        }
+        var stg = pz(wert('mietstg')) || '–';
+        await kmEingabe(s, [feldVon('ds2_mietausfall'), feldVon('mietstg')], 'Mietausfall und Steigerung', 'Mietausfall-Risiko <b>mittel</b>, Mietsteigerung <b>' + stg + ' %</b> im Jahr.',
+          { was: 'Mietausfall-Risiko; die Steigerung kommt aus deinem Profil.', warum: 'Leerstand und Ausfall kosten Geld.', folge: 'Beides geht in Cashflow und Investor Deal Score ein.' },
+          'Zwei Annahmen noch: das Mietausfall-Risiko setzen wir auf mittel. Die jährliche Mietsteigerung von ' + stg + ' Prozent kommt aus deinem Investmentprofil — du setzt sie einmal in den Einstellungen, und jedes neue Objekt startet damit.',
+          async function () { await kmWahl('ds2_mietausfall', 'mittel'); });
+        /* Bewirtschaftung - die Werte des Demo-Objekts, getippt */
+        reiter('s4'); await kmPause(1300);
+        await kmEingabe(s, [feldVon('grundsteuer'), feldVon('weg_r')], 'Bewirtschaftung', 'Grundsteuer <b>' + eur(+KM.grundsteuer) + '</b>, nicht umlagefähige Kosten <b>' + eur(+KM.hgNul) + '</b>, Rücklage <b>' + eur(+KM.wegR) + '</b> — je Jahr.',
+          { was: 'Grundsteuer, nicht umlagefähige Kosten und Rücklage je Jahr.', warum: 'Nur was nicht umlagefähig ist, bleibt beim Eigentümer.', folge: 'Diese Kosten mindern Cashflow und Rendite.' },
+          'Im Reiter Bewirtschaftung die laufenden Kosten, je Jahr. Die Grundsteuer, dreihundertsechsunddreißig Euro, zahlt der Mieter über die Nebenkosten — sie ist umlagefähig. Was beim Eigentümer bleibt — Verwaltung und Instandhaltung, hier siebentausendsechshundertachtzig Euro, und die Rücklage von siebenhundertachtundneunzig Euro — ist nicht umlagefähig. Nur das schmälert den Cashflow.',
+          async function () { await kmTipp('grundsteuer', KM.grundsteuer); await kmTipp('hg_nul', KM.hgNul); await kmTipp('weg_r', KM.wegR); try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} });
+      },
+
+      /* ════ KAPITEL 5 · FINANZIERUNG ════ */
+      async function (s) {
+        await kmKapitel(s, 5, 'Finanzierung', 'Kaufpreis, Nebenkosten, Inventar — und das Darlehen.',
+          'Kapitel fünf: die Finanzierung. Erst was das Haus insgesamt kostet — Kaufpreis, Nebenkosten, Inventar —, dann wie wir es bezahlen.');
+        reiter('s1'); await kmPause(1300);
+        await kmEingabe(s, feldVon('kp'), 'Kaufpreis', '<b>' + eur(+KM.kp) + '</b>.',
+          { was: 'Der Kaufpreis laut Vertrag.', warum: 'Er ist die Basis für Nebenkosten, Rendite und Finanzierung.', folge: 'Die Nebenkosten rechnen sich in Prozent davon.' },
+          'Im Reiter Investition: der Kaufpreis, dreihundertfünfundneunzigtausend Euro. Er ist die Basis für alles Weitere — für die Nebenkosten, die Rendite und die Finanzierung.',
+          async function () { await kmTipp('kp', KM.kp); try { DealPilotInvestmentProfile.nachziehen('kp'); } catch (e) {} });
+        await kmEingabe(s, [feldVon('makler_p'), feldVon('ji_p')], 'Nebenkosten', 'Makler <b>' + KM.makler + ' %</b>; Notar, Grundbuch und Grunderwerbsteuer kommen aus dem Profil und dem Bundesland.',
+          { was: 'Maklerprovision in Prozent.', warum: 'Nebenkosten zahlst du meist aus Eigenkapital.', folge: 'Grunderwerbsteuer setzt DealPilot je Bundesland — hier 6,5 %.' },
+          'Die Nebenkosten. Die Maklerprovision tragen wir ein: drei Komma fünf sieben Prozent. Notar und Grundbuch kommen aus deinem Profil, die Grunderwerbsteuer setzt DealPilot nach dem Bundesland — Nordrhein-Westfalen, sechs Komma fünf Prozent.',
+          async function () { await kmTipp('makler_p', KM.makler); });
+        var gestVor = zahl('gest_e') != null ? de(zahl('gest_e')) : '';
+        await zeige(feldVon('gest_e'), 10);
+        await kmSag(s, 'Grunderwerbsteuer', '<b>' + (gestVor || '–') + ' €</b> — 6,5 % auf den Kaufpreis.',
+          'Die Grunderwerbsteuer beträgt jetzt ' + (gestVor || 'einen Betrag') + ' Euro. Merken wir uns die Zahl.', null,
+          { was: 'Nichts — DealPilot rechnet die Steuer.', warum: 'Sie ist der größte Posten der Nebenkosten.', folge: 'Gleich sehen wir, warum Inventar sie senkt.' });
+        var inv = function () { var e = document.getElementById('moebl'); return e && (e.closest('.f') || e); };
+        var it = q('#inv_detail_toggle'); if (it && !it.checked && !(document.getElementById('moebl') || {}).offsetWidth) { it.click(); await kmPause(600); }
+        await kmEingabe(s, inv, 'Inventar', 'Mitverkauftes Inventar — Einbauküchen, Möbel: <b>' + eur(+KM.moebl) + '</b>.',
+          { was: 'Wert des mitverkauften Inventars.', warum: 'Auf Inventar fällt keine Grunderwerbsteuer an.', folge: 'Inventar wird schneller abgeschrieben als das Gebäude.' },
+          'Jetzt das Inventar: mitverkaufte Einbauküchen und Möbel für siebentausend Euro. Das ist mehr als eine Randnotiz. Auf Inventar fällt keine Grunderwerbsteuer an, und steuerlich wird es über wenige Jahre abgeschrieben statt über Jahrzehnte.',
+          async function () { await kmTipp('moebl', KM.moebl); });
+        var gestNach = zahl('gest_e') != null ? de(zahl('gest_e')) : '';
+        await zeige(feldVon('gest_e'), 10);
+        await kmSag(s, 'Keine Grunderwerbsteuer auf Inventar', 'Grunderwerbsteuer jetzt <b>' + (gestNach || '–') + ' €</b>' + (gestVor && gestNach && gestVor !== gestNach ? ' statt ' + gestVor + ' €' : '') + '.',
+          'Und tatsächlich: die Grunderwerbsteuer sinkt auf ' + (gestNach || 'einen kleineren Betrag') + ' Euro' + (gestVor && gestNach && gestVor !== gestNach ? ', vorher waren es ' + gestVor + ' Euro' : '') + '. Sie wird nur auf den Kaufpreis ohne das Inventar erhoben.', null,
+          { was: 'Nichts — DealPilot rechnet neu.', warum: 'Grunderwerbsteuer gilt nur für Grundstück und Gebäude.', folge: 'Weniger Nebenkosten, weniger Eigenkapital.' });
+        /* Darlehen */
+        reiter('s3'); await kmPause(1300);
+        await kmEingabe(s, [feldVon('d1'), feldVon('d1_bindj')], 'Das Darlehen', '<b>' + eur(+KM.d1) + '</b> zu ' + KM.d1z + ' %, Tilgung ' + KM.d1t + ' %, Zinsbindung ' + KM.bindj + ' Jahre.',
+          { was: 'Darlehensbetrag, Zins, Tilgung, Zinsbindung.', warum: 'Zins und Tilgung bestimmen die monatliche Rate.', folge: 'Daraus folgen Cashflow, DSCR und Beleihungsauslauf.' },
+          'Im Reiter Finanzierung das Darlehen: dreihundertvierundzwanzigtausend Euro, vier Prozent Zins, ein Prozent Tilgung, zehn Jahre Zinsbindung. Zins und Tilgung ergeben die Rate, und die Rate entscheidet über den Cashflow.',
+          async function () { await kmTipp('d1', KM.d1); await kmTipp('d1z', KM.d1z); await kmTipp('d1t', KM.d1t); await kmTipp('d1_bindj', KM.bindj); try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} });
+        await kmPause(800);
+        var K = (window.State && State.kpis) || {};
+        await zeige(feldVon('ek'), 10);
+        await kmSag(s, 'Eigenkapital', 'Eigenkapital <b>' + kmEur('ek') + '</b>' + (K.ltv != null ? ', Beleihungsauslauf <b>' + de(K.ltv, 1) + ' %</b>' : '') + '.',
+          'Das Eigenkapital ergibt sich: ' + de(zahl('ek') || 0) + ' Euro' + (K.ltv != null ? '. Der Beleihungsauslauf liegt bei ' + de(K.ltv, 1).replace(',', ' Komma ') + ' Prozent — gerechnet auf den Kaufpreis, weil wir noch keinen Wert aus Gutachten oder Bank haben' : '') + '.', null,
+          { was: 'Nichts — das Eigenkapital ergibt sich.', warum: 'Gesamtkosten minus Darlehen musst du selbst aufbringen.', folge: 'Der Beleihungsauslauf ist die Kennzahl der Bank.' });
+      },
+
+      /* ════ KAPITEL 6 · STEUER ════ */
+      async function (s) {
+        await kmKapitel(s, 6, 'Steuer', 'Abschreibung, Gebäudeanteil — und was am Jahresende übrig bleibt.',
+          'Kapitel sechs: die Steuer. Wir sehen, wie viel vom Kaufpreis abgeschrieben wird, wie hoch die Abschreibung ist und was nach Steuern übrig bleibt. Wichtig vorab: DealPilot rechnet mit deinen Eingaben, eine Steuerberatung ersetzt das nicht.');
+        reiter('s3-tax'); await kmPause(1300);
+        await zeigeGruppe(feldVon('zve'), feldVon('grenz'), 8);
+        var gz = pz(wert('grenz'));
+        await kmSag(s, 'Dein Steuersatz', 'zvE und Grenzsteuersatz <b>' + (gz || '–') + ' %</b> kommen aus deinem <b>Profil</b> — sie gehören zu dir, nicht zum Haus.',
+          'Oben stehen dein zu versteuerndes Einkommen und dein Grenzsteuersatz, hier ' + (gz ? gz.replace(',', ' Komma ') : 'aus dem Profil') + ' Prozent. Die tippen wir hier nicht: sie gehören zu dir als Steuerpflichtigem, nicht zum Haus, und kommen aus deinem Investmentprofil.', null,
+          { was: 'Nichts — beides steht in deinem Profil.', warum: 'Der Steuersatz gehört zur Person, nicht zur Immobilie.', folge: 'Jeder Euro Verlust spart Steuer zu diesem Satz.' });
+        await kmEingabe(s, feldVon('geb_ant'), 'Gebäudeanteil', '<b>' + KM.gebAnt + ' %</b> des Kaufpreises entfallen auf das Gebäude.',
+          { was: 'Anteil des Gebäudes am Kaufpreis.', warum: 'Nur das Gebäude nutzt sich ab — der Boden nicht.', folge: 'Nur dieser Anteil wird abgeschrieben.' },
+          'Der Gebäudeanteil: vierundfünfzig Komma drei eins Prozent. Nur dieser Teil des Kaufpreises wird abgeschrieben, denn der Boden nutzt sich nicht ab. Den Anteil kann DealPilot auch mit der Arbeitshilfe des Bundesfinanzministeriums aufteilen — dazu gibt es ein eigenes Video.',
+          async function () { await kmTipp('geb_ant', KM.gebAnt); try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} });
+        var afaVor = kmOpt('afa_satz');
+        await kmEingabe(s, feldVon('afa_satz'), 'Der AfA-Satz', 'Vorgabe: ' + afaVor + '. Unser Haus ist von ' + KM.baujahr + ' — wir wählen <b>2,5 % · Baujahr vor 1925</b>.',
+          { was: 'Den AfA-Satz: 2,5 % linear.', warum: 'Fertigstellung vor 1925: 2,5 %, danach 2 % (§ 7 Abs. 4 EStG).', folge: 'Das Gebäude wird in 40 statt 50 Jahren abgeschrieben.' },
+          'Der AfA-Satz. Vorgegeben sind zwei Prozent, der Regelfall. Der Satz richtet sich aber nach dem Jahr der Fertigstellung: für Gebäude, die vor neunzehnhundertfünfundzwanzig fertig wurden, gelten zweieinhalb Prozent. Unser Haus ist von ' + KM.baujahr + ', also wählen wir zweieinhalb Prozent.',
+          async function () { await kmWahl('afa_satz', '2.5'); try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} });
+        await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa_kalk') && (q('#afa_kalk').closest('.f') || q('#afa_kalk')); }, 8);
+        await kmSag(s, 'Die Abschreibung', 'AfA-Satz <b>' + kmOpt('afa_satz').replace(/\s*—.*$/, '') + '</b> auf den Gebäudeanteil: <b>' + (r6Id('afa_kalk') || '–') + '</b> im Jahr.',
+          'Das ergibt eine Abschreibung von ' + (r6Id('afa_kalk') || 'einem festen Betrag') + ' im Jahr — Jahr für Jahr, ohne dass Geld fließt. Genau das macht vermietete Immobilien steuerlich interessant.', null,
+          { was: 'Nichts — DealPilot rechnet die AfA.', warum: 'Gebäudeanteil am Kaufpreis mal AfA-Satz.', folge: 'Die AfA mindert das steuerliche Ergebnis Jahr für Jahr.' });
+        var ein = r6TaxWert(/^Einnahmen V\+V/), wk = r6TaxWert(/^Werbungskosten gesamt/), erg = r6TaxWert(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/);
+        await zeige(function () { return r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/) || r6TaxItem(/^Einnahmen V\+V/); }, 8);
+        await kmSag(s, 'Was im Jahr übrig bleibt', 'Einnahmen <b>' + (ein || '–') + '</b>, Werbungskosten ' + (wk || '–') + ' — Ergebnis aus Vermietung <b>' + (erg || '–') + '</b>.',
+          'Unten die Rechnung für das Jahr: Mieteinnahmen ' + (ein || 'aus den Wohnungen') + ', Werbungskosten ' + (wk || '') + ' — das sind Zinsen, Bewirtschaftung und Abschreibung. Das Ergebnis aus Vermietung: ' + (erg || 'siehe Bild') + '. Mit deinem Grenzsteuersatz verrechnet ergibt sich daraus der Cashflow nach Steuern.', null,
+          { was: 'Nichts — das Ergebnis rechnet DealPilot.', warum: 'Zinsen, Kosten und AfA mindern die Einnahmen.', folge: 'Das Ergebnis bestimmt den Cashflow nach Steuern.' });
+      },
+
+      /* ════ KAPITEL 7 · MARKTBERICHT UND WERTERMITTLUNG ════ */
+      async function (s) {
+        await kmKapitel(s, 7, 'Marktbericht und Wertermittlung', 'Marktwert, Lage, Ertrags- und Sachwert — mit Rechenweg und Quelle.',
+          'Kapitel sieben: der Marktbericht mit der Wertermittlung. Jetzt zeigt sich, ob unsere Eingaben vollständig sind — und was das Haus aus Sicht des Marktes und nach den amtlichen Verfahren wert ist.');
+        reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await kmPause(900);
+        var zeileS3 = stufeZeile(3);
+        await zeige(function () { return zeileS3() || q('#oe-stufen'); }, 8);
+        var fehlt3 = fehlt(3);
+        await kmSag(s, 'Stufe 3 ist erreicht', fehlt3 && fehlt3.length ? 'Es fehlen noch: ' + feldNamen(fehlt3) + '.' : 'Alle Angaben für die <b>amtliche Wertermittlung</b> sind da.',
+          fehlt3 && fehlt3.length ? 'Für Stufe drei fehlen noch: ' + feldNamen(fehlt3) + '.' : 'Die Liste ist leer: alle Angaben für die amtliche Wertermittlung sind da. Wir rufen den Marktbericht in Stufe drei ab.', null,
+          { was: 'Ein Klick auf „Abrufen“ in Stufe 3.', warum: 'Stufe 3 rechnet nach den Verfahren der ImmoWertV.', folge: 'Marktwert, Ertragswert und Sachwert mit Rechenweg.' });
+        kegelHoch(true);
+        await rhStufeAbrufen(3, function () { s.zeile('Der Bericht entsteht', 'Standort, Vergleichsdaten, Bodenrichtwert, Liegenschaftszins — Schritt für Schritt.'); kmMerke('Der Bericht entsteht: DealPilot ermittelt den Standort, lädt Vergleichsdaten und Strukturdaten, den Bodenrichtwert und den Liegenschaftszins des zuständigen Gutachterausschusses.'); });
+        kegelHoch(false);
+        kmRefPruefen();
+        await kmPause(1500);
+        var k = mbKarteH() || {};
+        await zeige(function () { return q('#avsec') || q('#dp-mb-host'); }, 8);
+        var mw = kartenText(/MARKTEINSCHÄTZUNG\s+\S+\s+([\d.]+ €)/i), un = kartenText(/UNTEN\s+([\d.]+ €)/i), ob = kartenText(/OBEN\s+([\d.]+ €)/i), abs = kartenText(/inkl\.\s*([\d,]+ %) Abschlag/);
+        _km.mw = mw;
+        await kmSag(s, 'Das Ergebnis im Objekt', 'Marktpreisindikation <b>' + (mw || '–') + '</b>' + (un && ob ? ', Spanne ' + un + ' bis ' + ob : '') + (abs ? ' — nach ' + abs + ' Abschlag auf Angebotspreise' : '') + '.',
+          'Das Ergebnis steht direkt im Objekt: eine Marktpreisindikation von ' + (mw ? mw.replace('€', 'Euro') : 'einem Betrag') + (un && ob ? ', in einer Spanne von ' + un.replace('€', 'Euro') + ' bis ' + ob.replace('€', 'Euro') : '') + '. ' + (abs ? 'Angebotspreise liegen über den echten Kaufpreisen; deshalb zieht DealPilot ' + abs.replace('%', 'Prozent') + ' ab, örtlich gemessen an den Kauffällen des Gutachterausschusses. ' : '') + 'Den vollen Bericht öffnen wir jetzt.', null,
+          { was: 'Nichts — der Bericht ist da.', warum: 'Angebotspreise sind keine Kaufpreise — der Abschlag ist örtlich gemessen.', folge: 'Der volle Bericht zeigt jeden Rechenweg.' });
+        /* der volle Bericht (gespeicherter Bericht 371, nur gelesen) */
+        await r16MbOeffnen(KM_BERICHT);
+        var kopf = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#resultBody *'), function (x) { return x.children.length < 3 && /Wertermittlungsstichtag/.test(x.textContent) && x.offsetWidth; })[0]; };
+        if (kopf()) {
+          await r16Hin(kopf(), true);
+          await zeige(kopf, 8);
+          var kt = r6Text(kopf());
+          await kmSag(s, 'Der Stichtag oben', '<b>' + kt.replace(/^.*?(Wertermittlungsstichtag[^·|]*).*$/, '$1').trim() + '</b>.',
+            'Ganz oben im Bericht steht der Wertermittlungsstichtag: ' + kt.replace(/^.*?Wertermittlungsstichtag:?\s*/, '').replace(/\(.*$/, '').trim() + '. Für diesen Tag gelten alle Werte darunter.', null,
+            { was: 'Nichts — der Bericht nennt seinen Stichtag.', warum: 'Ein Wert gilt immer für einen bestimmten Tag.', folge: 'Leer gelassen bedeutet: der Tag der Berichtserstellung.' });
+        }
+        var sb = function () { return r16Mb('#resultBody .scorebox'); };
+        if (sb()) {
+          await r16Hin(sb(), true);
+          await zeigeGruppe(sb, function () { return r16Mb('#resultBody .kpis') || sb(); }, 8);
+          var sc = r6Text(sb()), num = /(\d+)\s*\/\s*100/.exec(sc);
+          await kmSag(s, 'Oben das Ergebnis', 'Deal-Score <b>' + (num ? num[1] : '–') + '</b>, Marktwert, Bruttorendite ' + (r6Text(r16Mb('#kYield')) || '–') + ', Abstand zum Marktwert.',
+            'Darunter die Übersicht: der Deal-Score des Berichts, ' + (num ? num[1] : '') + ' von hundert, der Marktwert, die Bruttorendite und der Abstand des Kaufpreises zum Marktwert.', null,
+            { was: 'Nichts — alles aus den Eingaben gerechnet.', warum: 'Erst der Überblick, dann die Herleitung.', folge: 'Jede Zahl hat darunter ihren Rechenweg.' });
+        }
+        var ag = function () { return r16Mb('#assessGrid'); };
+        if (ag()) {
+          await r16Hin(ag(), true);
+          await zeige(ag, 8);
+          var lg = function (re) { var v = r18Assess(re); return v ? v.split(' · ')[0] : '–'; };
+          _km.mikro = lg(/^Mikrolage(\s*·|$)/);
+          await kmSag(s, 'Die Lage — gemessen', 'Mikrolage <b>' + _km.mikro + '</b>, Makrolage ' + lg(/^Makrolage(\s*·|$)/) + ', Nachfrage ' + lg(/^Nachfrage(\s*·|$)/) + '.',
+            'Die Lage, diesmal gemessen statt geschätzt: Mikrolage ' + _km.mikro + ', Makrolage ' + lg(/^Makrolage(\s*·|$)/) + ', Nachfrage ' + lg(/^Nachfrage(\s*·|$)/) + '. Erinnern wir uns: wir hatten die Mikrolage als sehr schwach eingeschätzt. Darauf kommen wir gleich zurück.', null,
+            { was: 'Nichts — die Lage wird gemessen.', warum: 'Infrastruktur und Umfeld lassen sich zählen.', folge: 'Weicht deine Einschätzung ab, sagt es dir das Objekt.' });
+        }
+        var wv = function () { return r16Mb('#wv-box'); };
+        if (wv()) {
+          await r16Hin(wv(), true);
+          await zeigeGruppe(function () { return r16Mb('#wv-box .wv-boden') || wv(); }, function () { var d = r16Doc(); var kk = d && d.querySelectorAll('#wv-box .wv-k'); return kk && kk.length ? kk[kk.length - 1] : wv(); }, 8);
+          var t = r6Inner(wv()), bw = /Bodenwert\s*\n?\s*([\d.]+ €)/i.exec(t), lz = /Liegenschaftszinssatz:?\s*([\d,]+ %)/.exec(t);
+          function kartenW(re) { var d = r16Doc(); var kk = d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return re.test(r6Text(x.querySelector('.wv-t'))); })[0]; return kk ? r6Text(kk.querySelector('.wv-v')) : '–'; }
+          _km.ew = kartenW(/^Ertragswert/i); _km.sw = kartenW(/^Sachwert/i); _km.vw = kartenW(/^Vergleichswert/i);
+          await kmSag(s, 'Wertermittlung · Stufe 3', 'Bodenwert <b>' + (bw ? bw[1] : '–') + '</b>, Ertragswert <b>' + _km.ew + '</b>, Sachwert ' + _km.sw + '.',
+            'Das Herzstück: die Wertermittlung nach der Immobilienwertermittlungsverordnung. Bodenwert ' + (bw ? bw[1] : '') + ', Ertragswert ' + _km.ew + ', Sachwert ' + _km.sw + '. Weil wir ein Renditeobjekt bewerten, führt das Ertragswertverfahren.', null,
+            { was: 'Nichts — drei Verfahren, eine Herleitung.', warum: 'Bei Renditeobjekten führt der Ertragswert (§ 6 ImmoWertV).', folge: 'Jeder Wert trägt Quelle, Stufe und Rechenweg.' });
+          var ewK = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Ertragswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+          var rw = ewK() && [].filter.call(ewK().querySelectorAll('.wv-mehr'), function (x) { return /Rechenweg/.test(x.textContent) && /▸/.test(x.textContent); })[0];
+          if (rw) {
+            rw.click(); await kmPause(900);
+            var zz = function () { var kk = ewK(); return kk && [].filter.call(kk.querySelectorAll('tr,li,div'), function (r) { return /Liegenschaftszins/.test(r.textContent) && r.textContent.length < 260 && r.offsetWidth; }).pop(); };
+            var zl = zz() ? r6Text(zz()) : '';
+            _km.lzsZeile = zl;
+            if (zz()) {
+              await r16Hin(zz(), false);
+              await zeige(zz, 8);
+              var ang = /angepasst/.test(zl);
+              await kmSag(s, 'Der Liegenschaftszins', (lz ? 'Zins <b>' + lz[1] + '</b> ' : '') + (ang ? '— objektspezifisch angepasst, <b>„A, angepasst“</b>.' : '— vom Gutachterausschuss, <b>Stufe A</b>.'),
+              'Im Rechenweg des Ertragswerts steht der Liegenschaftszins' + (lz ? ', ' + lz[1].replace(',', ' Komma ').replace('%', 'Prozent') : '') + '. Er stammt vom zuständigen Gutachterausschuss, mit Jahrgang und Quelle. Führt der Ausschuss eine Formel oder Koeffizienten, passt DealPilot den Zins nach Paragraf 33 an das Objekt an — im Bericht steht dann „A, angepasst“. ' + (ang ? 'Genau das ist hier der Fall.' : 'Für dieses Haus führt der Ausschuss einen festen Satz; er gilt unverändert.'), null,
+              { was: 'Nichts — der Zins kommt vom Gutachterausschuss.', warum: 'Der Zins ist der stärkste Hebel im Ertragswert.', folge: 'Mit Formel des Ausschusses: angepasst nach § 33, „A, angepasst“.' });
+            }
+          }
+          var vk = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Vergleichswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+          if (vk()) {
+            await r16Hin(vk(), false);
+            await zeige(vk, 8);
+            var vt = r6Text(vk()).replace(/^Vergleichswert\s*/i, '').slice(0, 140);
+            await kmSag(s, 'Vergleichswert', '<b>' + _km.vw + '</b> — ' + (/–|kein|nicht/i.test(_km.vw + vt) ? 'ohne vollständig anpassbare Vergleichsfaktoren gibt es <b>keinen Wert</b>.' : vt),
+              'Und der Vergleichswert. DealPilot rechnet ihn nur mit amtlichen Vergleichsfaktoren, die sich vollständig an das Objekt anpassen lassen. Fehlt eine Anpassung — oder führt der Ausschuss für diese Objektart gar keine Faktoren —, gibt es keinen Wert, statt einen halben. Das ist hier der Fall.', null,
+              { was: 'Nichts — DealPilot prüft die Faktoren.', warum: 'Ein halb angepasster Faktor wäre eine erfundene Zahl.', folge: 'Ohne volle Anpassung: kein Vergleichswert.' });
+          }
+        }
+        r16MbZu(); await kmPause(1200);
+        /* Abgleich im Reiter Objekt */
+        reiter('s0'); await kmPause(900);
+        try { if (window.DpMbAbgleich) await DpMbAbgleich.laden(true); } catch (e) {}
+        await kmPause(1200);
+        var ab = function () { var h = q('#mba-objekt'); return h && h.offsetWidth ? h : null; };
+        await warteAuf(ab, 6000);
+        if (ab()) {
+          var auf = q('#mba-objekt [data-mba-auf]'); if (auf && !q('#mba-objekt [data-mba-ueb]')) { auf.click(); await kmPause(700); }
+          await zeige(ab, 8);
+          var hz = [].map.call(document.querySelectorAll('#mba-objekt li, #mba-objekt .mba-satz'), function (x) { return r6Text(x); }).filter(Boolean);
+          _km.hinweise = hz;
+          await kmSag(s, 'Abgleich mit dem Marktbericht', r6Text(q('#mba-objekt [data-mba-auf]') || ab()).slice(0, 90) + (hz.length ? ' — z. B. ' + hz[0].slice(0, 110) + (hz[0].length > 110 ? ' …' : '') : '') + '.',
+            'Zurück im Objekt wartet ein kompakter Abgleich mit dem Marktbericht. Er zeigt nur, was eine Folge hat: geänderte Eingaben seit dem Bericht, eine eigene Lage-Einschätzung, die deutlich von der Messung abweicht, einen anderen Bodenrichtwert oder einen Verkehrswert, der weit weg liegt. ' + (hz.length ? 'Hier meldet er: ' + hz[0] : ''), null,
+            { was: 'Nichts — der Abgleich meldet sich selbst.', warum: 'Er zeigt nur Abweichungen, die eine Folge haben.', folge: 'Ein Klick übernimmt die Messung ins Objekt.' });
+          var ueb = function () { return q('#mba-objekt [data-mba-ueb="mikrolage"]') || q('#mba-objekt [data-mba-ueb]'); };
+          if (ueb()) {
+            await zeige(ueb, 10);
+            var vor = kmOpt('mikrolage');
+            await kmSag(s, 'Messung übernehmen', 'Ein Klick — die Mikrolage aus dem Bericht ersetzt unsere Schätzung „' + vor + '“.', 'Wir waren zu vorsichtig. Ein Klick auf „Messung übernehmen“ …', 1200,
+              { was: 'Ein Klick auf „Messung übernehmen“.', warum: 'Die Messung ist belastbarer als unsere Schätzung.', folge: 'Deal Score und Investor Deal Score rechnen neu.' });
+            var u = ueb(); if (u) u.click();
+            await kmPause(1500);
+            await zeige(feldVon('mikrolage'), 10);
+            await kmSag(s, 'Übernommen', 'Mikrolage jetzt <b>' + kmOpt('mikrolage') + '</b> — Herkunft: gemessen.',
+              '… und die Mikrolage steht jetzt auf ' + kmOpt('mikrolage') + ', mit der Herkunft „gemessen“. Score und Investor Deal Score rechnen ab sofort damit.', null,
+              { was: 'Nichts — der Wert ist übernommen.', warum: 'Jede Lage-Angabe trägt ihre Herkunft.', folge: 'Die Bewertung des Objekts steigt mit der besseren Lage.' });
+          }
+        }
+        /* Wertangabe: Marktwert aus dem Bericht */
+        var wa = function () { var e = document.getElementById('svwert'); return e && (e.closest('.wa-raster') || e.closest('.f')); };
+        if (wa()) {
+          await zeige(wa, 8);
+          var vwb = kmOpt('oe-vw-wahl');
+          await kmSag(s, 'Die Wertangabe', 'Bericht: <b>' + (vwb || '–') + '</b>. Marktwert/Verkehrswert bleibt leer — Herkunft „automatisch“.',
+            'Und die Wertangabe: in der Zeile steht jetzt der Bericht' + (vwb ? ', ' + vwb.replace(/ · /g, ', ').replace('€', 'Euro') : '') + '. Das Feld Marktwert oder Verkehrswert lassen wir trotzdem leer. Für den Beleihungsauslauf zählt nur ein Wert aus einem Gutachten oder einer Bankbewertung — ein Marktbericht ist eine Indikation, kein Gutachten.', null,
+            { was: 'Die Herkunft des Werts.', warum: 'Gutachten, Bank, Marktbericht oder Schätzung wiegen verschieden.', folge: 'Nur Gutachten und Bank tragen den Beleihungsauslauf.' });
+        }
+      },
+
+      /* ════ KAPITEL 8 · ZIELBILD ════ */
+      async function (s) {
+        await kmKapitel(s, 8, 'Zielbild', 'Mieterhöhung, Maßnahmen am Haus und je Wohnung — der Plan.',
+          'Kapitel acht: das Zielbild. Bisher haben wir beschrieben, was ist. Jetzt planen wir: welche Mieterhöhung der Vertrag erlaubt, was wir am ganzen Haus machen und was in einzelnen Wohnungen nach einem Mieterwechsel.');
+        reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var kn = function () { var b = q('#mff-oeffnen') || q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; };
+        await zeige(kn, 10); await kmPause(1500);
+        var b = kn(); if (b) b.click();
+        await warteAuf(function () { return r26Mfh('#mfh-body'); }, 4000);
+        kegelHoch(true); await kmPause(900);
+        var zj = function () { var x = r26Mfh('#mfh-zbjahr'); return x && x.offsetWidth ? x : null; };
+        if (zj()) {
+          await kmEingabe(s, function () { var x = zj(); return x && x.parentElement; }, 'Zielbild fertig ' + KM.zbJahr, 'Bis wann ist der Plan umgesetzt? <b>' + KM.zbJahr + '</b>.',
+            { was: 'Das Jahr, in dem der Plan umgesetzt ist.', warum: 'Ein Plan braucht einen Zeitpunkt.', folge: 'Ab diesem Jahr rechnet die Mietentwicklung mit dem Ziel.' },
+            'Im ersten Schritt das Jahr, in dem das Zielbild fertig sein soll: ' + KM.zbJahr + '. Dieses Jahr steht später über den Spalten in Pilot-Analyse und PDF.',
+            async function () { await kmPause(800); await r26Tippe(zj(), KM.zbJahr, kmT()); });
+        }
+        var hm = function () { var x = r26Mfh('#mfh-haus-mass'); return x && x.closest('.mfh-haus-mass'); };
+        var hx = hm(); if (hx) { var sc = scroller(hx); if (sc) sc.scrollTop += rect(hx).top - 140; }
+        await kmPause(700);
+        var chips = [].map.call(document.querySelectorAll('#mfh-haus-mass [data-zb-chip]'), function (c) { return r6Text(c).replace(/\s*\+\d+\s*P\.?\s*$/, ''); }).filter(Boolean);
+        await zeige(hm, 8);
+        await kmSag(s, 'Maßnahmen am ganzen Haus', chips.length + ' Bausteine: ' + chips.join(', ') + '.',
+          'Darunter die Maßnahmen am ganzen Haus. ' + chips.length + ' Bausteine stehen zur Auswahl: ' + chips.join(', ') + '. Was die Anlage 2 als Element kennt, bringt Modernisierungspunkte; die übrigen zählen nur mit ihren Kosten. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt.', null,
+          { was: 'Eine oder mehrere Maßnahmen am Haus, mit Kosten.', warum: 'Dach, Fassade oder Heizung betreffen alle Wohnungen.', folge: 'Kosten nach Fläche verteilt, Punkte für jede Wohnung.' });
+        for (var j = 0; j < KM.haus.length; j++) {
+          var H = KM.haus[j];
+          await kmEingabe(s, hm, 'Fassade dämmen', 'Fassade/Dämmung für <b>' + de(+H[1]) + ' €</b>. Die Mieter bleiben im Haus — <b>' + H[3] + ' %</b> davon sind Erhaltung.',
+            { was: 'Fassade/Dämmung, Kosten, „Mieter bleibt drin“ und Erhaltungsanteil.', warum: 'Modernisierung darf auf die Miete umgelegt werden (§ 559 BGB).', folge: '8 % der Kosten ohne Erhaltungsanteil pro Jahr auf die Miete.' },
+            'Wir planen eine Maßnahme: die Fassade dämmen, sechzigtausend Euro laut Angebot. Die Mieter bleiben während der Arbeiten im Haus — deshalb setzen wir das Häkchen „Mieter bleibt drin — Kosten auf die Miete umlegen“. Das ist die Modernisierungsumlage nach Paragraf 559 BGB. Aber nicht alles ist Modernisierung: dreißig Prozent sind ohnehin fällige Instandsetzung, also Erhaltung. Die tragen wir ein — sie dürfen nicht umgelegt werden.',
+            async function () {
+              var c = r26Mfh('#mfh-haus-mass [data-zb-chip="' + H[0] + '"]'); if (c && !c.classList.contains('on')) c.click();
+              await kmPause(1500);
+              var ks = r26Mfh('#mfh-haus-mass') ? r26Mfh('#mfh-haus-mass').querySelectorAll('[data-zb-k]') : [], idx = ks.length - 1;
+              await r26Tippe(ks[idx], H[1], kmT());
+              if (H[2]) {
+                await kmPause(1800);
+                var cb = r26Mfh('#mfh-haus-mass [data-zb-b="' + idx + '"]'); if (cb && !cb.checked) cb.click();
+                await kmPause(1800);
+                var e = r26Mfh('#mfh-haus-mass [data-zb-e="' + idx + '"]'); if (e) await r26Tippe(e, H[3], kmT());
+              }
+            }, 3000);
+        }
+        var info = function () { return r26Mfh('#mfh-haus-mass .dp-zb-bew-info'); };
+        if (info()) {
+          await zeige(info, 8);
+          await kmSag(s, 'Die Modernisierungsumlage', r6Text(info()).replace(/^Modernisierungsumlage \(§ 559 BGB\):\s*/, '').slice(0, 160) + (r6Text(info()).length > 200 ? ' …' : ''),
+            'Die Regel steht direkt darunter: acht Prozent der Kosten pro Jahr dürfen auf die Miete — ohne den Erhaltungsanteil, und gedeckelt: höchstens drei Euro je Quadratmeter in sechs Jahren, bei einer Miete unter sieben Euro höchstens zwei Euro. Das geht in die Soll-Miete jeder Wohnung ein.', null,
+            { was: 'Nichts — DealPilot rechnet die Umlage.', warum: 'Die Kappung schützt die Mieter.', folge: 'Die Umlage erscheint in der Soll-Miete jeder Wohnung.' });
+        }
+        await zeige(hm, 8);
+        await kmSag(s, 'Am Haus', r6Text(r26Mfh('#mfh-haus-sum')).replace(/ — in den Kosten.*$/, '').replace(/^Am Haus:\s*/, '') + ' — nach Fläche auf die Wohnungen verteilt.',
+          'Zusammen: ' + r6Text(r26Mfh('#mfh-haus-sum')).replace(/ — in den Kosten.*$/, '').replace(/^Am Haus:\s*/, '') + '. Die Kosten stecken anteilig in jeder Wohnung.', 3000,
+          { was: 'Nichts — die Summe am Haus.', warum: 'Eine Maßnahme, fünf Wohnungen.', folge: 'Jede Wohnung trägt ihren Anteil nach Fläche.' });
+        /* Wohnungen */
+        var wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return r26Zelle(0, 'nr'); }, 3000);
+        await kmPause(900);
+        /* Wohnung 2: Mieterhöhung nach § 558 */
+        var P = KM.plan[1];
+        await r26WohnungAuf(1);
+        await kmEingabe(s, r26BlockTitel(/^Mietvertrag/), 'Wohnung 2 · Mietvertrag', 'Unbefristet, zuletzt erhöht im <b>' + kmMonat(P.mv_letzte_erhoehung) + '</b>.',
+          { was: 'Vertragsart und Datum der letzten Erhöhung.', warum: 'Erhöhung frühestens 15 Monate nach der letzten (§ 558 BGB).', folge: 'Daraus ergibt sich, ab wann die Soll-Miete gilt.' },
+          'Wohnung zwei hat einen normalen, unbefristeten Vertrag. Zuletzt erhöht wurde im ' + kmMonat(P.mv_letzte_erhoehung) + '. Das Datum ist wichtig: nach Paragraf 558 BGB darf die Miete frühestens fünfzehn Monate nach der letzten Erhöhung wieder steigen.',
+          async function () { await kmPause(800); await r26Feld('mv_art', P.mv_art, kmT()); await kmPause(1500); await r26Feld('mv_letzte_erhoehung', P.mv_letzte_erhoehung, kmT()); });
+        await kmEingabe(s, r26Block('soll'), 'Wohnung 2 · Vergleichsmiete', 'Aus dem Mietspiegel: <b>' + P.vgl_qm + ' €/m²</b>.',
+          { was: 'Die ortsübliche Vergleichsmiete je m².', warum: 'Bis dahin darf die Miete im laufenden Vertrag steigen.', folge: 'DealPilot rechnet Soll-Miete und Kappungsgrenze.' },
+          'Für die Mieterhöhung tragen wir nur die ortsübliche Vergleichsmiete aus dem Mietspiegel ein: ' + P.vgl_qm.replace(',', ' Komma ') + ' Euro je Quadratmeter. Alles Weitere rechnet DealPilot.',
+          async function () { await kmPause(800); await r26Feld('vgl_qm', P.vgl_qm, kmT()); await warteAuf(function () { return r26Kv('#mfh-we-soll .mfh-we-kv')['Soll-Miete']; }, 6000); });
+        var kv = r26Kv('#mfh-we-soll .mfh-we-kv'), kt = (function () { var h = document.querySelectorAll('#mfh-we-soll .mfh-we-hint'); return h.length ? r6Text(h[h.length - 1]) : ''; })();
+        var kg = /Kappungsgrenze (\d+) %/.exec(kt);
+        await zeige(function () { return r26We('#mfh-we-soll'); }, 6);
+        var hk2 = String(kv['Herkunft'] || '').replace(/^gerechnet \(§ 558\) · /, '');
+        DPM_KM.soll2 = { kv: kv, hinweis: kt };
+        await kmSag(s, 'Die Soll-Miete', '<b>' + (kv['Soll-Miete'] || '–') + '</b>, erreichbar ab <b>' + (kv['erreichbar ab'] || '–') + '</b>' + (hk2 ? ' — ' + hk2 : '') + '.',
+          'Das Ergebnis: eine Soll-Miete von ' + String(kv['Soll-Miete'] || '').replace('€/Monat', 'Euro im Monat').replace('€/m²', 'Euro je Quadratmeter') + ', erreichbar ab ' + (kv['erreichbar ab'] || '') + '. Sie liegt über der Vergleichsmiete, weil die Umlage der Fassadendämmung dazukommt: die Erhöhung nach Paragraf 558 bis zur Vergleichsmiete' + (kg ? ', begrenzt durch die Kappungsgrenze von ' + kg[1] + ' Prozent in drei Jahren,' : '') + ' und die Modernisierungsumlage nach Paragraf 559 stehen nebeneinander. Die Soll-Miete ist das, was der laufende Vertrag hergibt — ohne Mieterwechsel.', null,
+          { was: 'Nichts — DealPilot rechnet die Soll-Miete.', warum: 'Vergleichsmiete und Kappungsgrenze (§ 558) plus Umlage (§ 559).', folge: 'Ab dem Termin rechnet die Mietentwicklung mit ihr.' });
+        await r26WohnungZu();
+        /* Wohnungen 3 und 5: Zielbild nach Mieterwechsel */
+        var ziele = [2, 4];
+        for (var z = 0; z < ziele.length; z++) {
+          var i = ziele[z], Q = KM.plan[i], W = KM.we[i];
+          await r26WohnungAuf(i);
+          await kmEingabe(s, r26Block('ziel'), 'Wohnung ' + W[0] + ' · Zielbild', (z === 0 ? 'Bad für 18.000 €, Böden für 9.000 €' : 'Bad für 15.000 €, Renovierung 6.000 €') + ' — danach <b>' + Q.ziel_qm + ' €/m²</b> ' + Q.ziel_wann + '.',
+            { was: 'Maßnahmen als Bausteine, Kosten, Zielmiete und Zeitpunkt.', warum: 'Nach einem Mieterwechsel ist Neuvermietung zur Marktmiete möglich.', folge: 'Kosten, Punkte und Zielmiete je Wohnung.' },
+            z === 0 ? 'Wohnung drei ist stark sanierungsbedürftig. Für den nächsten Mieterwechsel planen wir ein neues Bad für achtzehntausend Euro und neue Böden für neuntausend. Danach vermieten wir neu, zu zehn Euro je Quadratmeter.' : 'Ebenso Wohnung fünf im Dachgeschoss: neues Bad für fünfzehntausend Euro und eine Renovierung für sechstausend, danach neun Euro fünfzig je Quadratmeter.',
+            async function () { await kmPause(800); await kmMassnahmen(Q.mass); await kmPause(1200); await r26Feld('ziel_qm', Q.ziel_qm, kmT()); await kmPause(1200); await r26Feld('ziel_wann', Q.ziel_wann, 60); });
+          var kz = r26Kv('#mfh-we-ziel .mfh-we-kv'), kg1 = /^(-?[\d.]+ €)/.exec(String(kz['Kosten gesamt'] || '')), kgH = /Anteil Haus ([\d.]+ €)/.exec(String(kz['Kosten gesamt'] || ''));
+          var kgs = kg1 ? kg1[1] : (kz['Kosten gesamt'] || '–');
+          await zeige(function () { return r26We('#mfh-we-ziel'); }, 6);
+          await kmSag(s, 'Wohnung ' + W[0] + ' · Kosten und Punkte', 'Kosten <b>' + kgs + '</b>' + (kgH ? ', davon ' + kgH[1] + ' Anteil an der Fassade' : '') + '; ' + String(kz['Modernisierungspunkte'] || '–').replace(/\s*\(Anlage 2\)/, '') + ' Punkte, Zielmiete <b>' + (kz['Zielmiete'] || '–') + '</b>.',
+            'DealPilot zeigt die Kosten dieser Wohnung, ' + kgs.replace('€', 'Euro') + (kgH ? ' — darin ' + kgH[1].replace('€', 'Euro') + ' als ihr Anteil an der Fassade' : '') + ' —, die zusätzlichen Modernisierungspunkte nach Anlage 2 und die Zielmiete von ' + String(kz['Zielmiete'] || '').replace('€/Monat', 'Euro im Monat') + '.', null,
+            { was: 'Nichts — Kosten und Punkte rechnet DealPilot.', warum: 'Jede Maßnahme hat Kosten und bringt Punkte.', folge: 'Das Zielbild steht neben Ist und Soll — als Plan, nicht als Ist.' });
+          await r26WohnungZu();
+        }
+        /* Ergebnis und übernehmen */
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click(); await kmPause(800);
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return r26Mfh('#mfh-uep'); }, 3000);
+        await kmPause(900);
+        await zeige(function () { return r26Mfh('#mfh-body'); }, 6);
+        var et = r6Text(r26Mfh('#mfh-body'));
+        DPM_KM.ergebnisText = et.slice(0, 1500);
+        var zr = /Zielbild[^.]*?Restnutzungsdauer[^\d]*(\d+) Jahre/.exec(et) || /nach (?:dem )?Zielbild[^\d]*(\d+) Jahre/.exec(et);
+        await kmSag(s, 'Heute und im Zielbild', 'Restnutzungsdauer heute <b>' + (_km.rnd || '–') + ' Jahre</b>' + (zr ? ', im Zielbild <b>' + zr[1] + ' Jahre</b>' : '') + ' — gerechnet wird mit dem Bestand.',
+          'Das Ergebnis zeigt beides: das Haus heute und nach dem Zielbild. Score und Wertermittlung rechnen weiter mit dem Bestand, denn das Zielbild ist ein Plan. Seinen Wert sieht man in Pilot-Analyse und PDF neben Ist und Soll.', null,
+          { was: 'Nichts — Bestand und Zielbild nebeneinander.', warum: 'Ein Plan ist kein Ist.', folge: 'Bewertet wird der Bestand; das Zielbild zeigt das Potenzial.' });
+        var san = r26Mfh('#mfh-san'); if (san && san.checked) san.click();
+        await zeige(function () { return r26Mfh('#mfh-weiter'); }, 8);
+        await kmPause(2500);
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return !q('#mfh-modal'); }, 5000);
+        kegelHoch(false);
+        await kmPause(1500);
+        reiter('s1'); await kmPause(1300);
+        var zbf = function () { var e = document.getElementById('zb_soll_qm'); return e && e.offsetWidth ? (e.closest('.card') || e.closest('.f')) : null; };
+        if (zbf()) {
+          await zeigeGruppe(feldVon('zb_fertig_jahr'), feldVon('zb_ziel_wann'), 8);
+          await kmSag(s, 'Im Reiter Investition', 'Zielbild <b>' + (wert('zb_fertig_jahr') || KM.zbJahr) + '</b>: Soll-Miete ' + (wert('zb_soll_qm') || '–') + ' €/m², Zielmiete <b>' + (wert('zb_ziel_qm') || '–') + ' €/m²</b>.',
+            'Im Reiter Investition steht das Zielbild zusammengefasst: das Jahr ' + (wert('zb_fertig_jahr') || KM.zbJahr) + ', die Soll-Miete und die Zielmiete im Schnitt des Hauses.', null,
+            { was: 'Nichts — die Zusammenfassung aus den Wohnungen.', warum: 'Ein Blick auf den ganzen Plan.', folge: 'Pilot-Analyse und Bank-PDF zeigen Ist, Soll und Zielbild.' });
+        }
+      },
+
+      /* ════ KAPITEL 9 · ERGEBNIS UND BANK-PDF ════ */
+      async function (s) {
+        await kmKapitel(s, 9, 'Ergebnis und Bank-PDF', 'Deal Score, Investor Deal Score, Kennzahlen — und das PDF für die Bank.',
+          'Kapitel neun: das Ergebnis. Wir sehen, wie DealPilot das Haus bewertet, und erzeugen das PDF für das Gespräch mit der Bank.');
+        reiter('s6'); await kmPause(1500);
+        await warteAuf(function () { return r12Karte(1)() && r12Kopf(1).score; }, 8000);
+        await kmPause(800);
+        var ring = function (i) { return function () { var k = r12Karte(i)(); return k && (k.querySelector('.dpsh-colring') || k.querySelector('.dpsh-mainrow') || k.querySelector('.dpsh-headrow')); }; };
+        var a = r12Kopf(0), bb = r12Kopf(1);
+        DPM_KM.scores = { deal: a, investor: bb };
+        await zeige(ring(0), 10);
+        await kmSag(s, 'Der Deal Score', 'Deal Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b> — aus Cashflow, Rendite und weiteren Kennzahlen.',
+          'Im Reiter Bewertung: der Deal Score, ' + (a.score || '') + ' von hundert, Stufe ' + r12Wort(a.wort) + '. Er fasst die Kennzahlen des Objekts zusammen — Cashflow, Rendite, Finanzierung — gewichtet nach deinen Einstellungen.', null,
+          { was: 'Nichts — der Score rechnet sich aus allen Eingaben.', warum: 'Eine Zahl für den schnellen Vergleich von Objekten.', folge: 'Die Gewichte stellst du in den Einstellungen ein.' });
+        await zeige(ring(1), 10);
+        await kmSag(s, 'Der Investor Deal Score', 'Investor Deal Score <b>' + (bb.score || '–') + ' · ' + r12Wort(bb.wort) + '</b> — dazu Lage, Risiko und Potenzial.',
+          'Daneben der Investor Deal Score, ' + (bb.score || '') + ' von hundert, ' + r12Wort(bb.wort) + '. Er schaut zusätzlich auf Lage, Risiko und Upside — hier fließen die gemessene Mikrolage und die Angaben zum Markt am Ort ein.', null,
+          { was: 'Nichts — die Lage aus dem Marktbericht ist schon drin.', warum: 'Rendite allein sagt nichts über das Risiko.', folge: 'Zwei Blickwinkel auf dasselbe Haus.' });
+        var K = (window.State && State.kpis) || {};
+        var kb = function () { return q('#s6 .dpsh-statstrip') || q('#s6 .kpi-grid') || r12Karte(0)(); };
+        await zeige(kb, 8);
+        DPM_KM.kpis = { bmy: K.bmy, dscr: K.dscr, cf_op: K.cf_op, cf_ns: K.cf_ns, ltv: K.ltv };
+        await kmSag(s, 'Die Kennzahlen', 'Bruttomietrendite <b>' + (K.bmy != null ? de(K.bmy, 2) + ' %' : '–') + '</b>, DSCR <b>' + (K.dscr != null ? de(K.dscr, 2) : '–') + '</b>, Cashflow vor Steuern <b>' + (K.cf_op != null ? eur(K.cf_op) : '–') + '</b> im Jahr' + (K.cf_ns != null ? ', nach Steuern ' + eur(K.cf_ns) : '') + '.',
+          'Die wichtigsten Kennzahlen: Bruttomietrendite ' + (K.bmy != null ? de(K.bmy, 2) : '') + ' Prozent. Schuldendienstdeckung ' + (K.dscr != null ? de(K.dscr, 2) : '') + '' + (K.dscr != null ? ' — der Reinertrag deckt Zins und Tilgung ' + de(K.dscr, 1).replace(',', ' Komma ') + '-fach' : '') + '. Und der Cashflow vor Steuern: ' + (K.cf_op != null ? de(Math.round(K.cf_op)) + ' Euro' : '') + ' im Jahr' + (K.cf_ns != null ? ', nach Steuern ' + de(Math.round(K.cf_ns)) + ' Euro' : '') + '.', null,
+          { was: 'Nichts — alles aus den Eingaben gerechnet.', warum: 'Die Bank schaut auf DSCR und Beleihungsauslauf.', folge: 'Genau diese Zahlen stehen im Bank-PDF.' });
+        /* Bank-PDF */
+        try { _r19.wahl = localStorage.getItem('dp_pdf_wahl'); localStorage.removeItem('dp_pdf_wahl'); } catch (e) {}
+        await zeige(function () { return qs('.sb-act-item[onclick*="bank"]') || qs('[onclick*="exportPDFBank"]') || q('nav.tabs'); }, 8);
+        await kmSag(s, 'Das Bank-PDF', 'Ein Klick erzeugt die <b>Bankfassung</b>: Objekt, Finanzierung, Kennzahlen, Belastungsprobe.',
+          'Zum Schluss das PDF für die Bank. Ein Klick erzeugt die Bankfassung — mit deinem Logo, wenn du eins hinterlegt hast.', 2000,
+          { was: 'Ein Klick auf das Bank-PDF.', warum: 'Die Bank will Zahlen sauber und vollständig.', folge: 'Ein PDF mit Objekt, Finanzierung, Kennzahlen und Annahmen.' });
+        var bank = await kmBankPdf();
+        _r19.bank = bank;
+        if (!bank) { await kmSag(s, 'Das Bank-PDF', 'Das PDF entsteht im Browser — nichts wird verschickt.', null, 2000); return; }
+        zeige(null); kegelHoch(true); kmTafel(null);
+        await r19Seite(bank, 1);
+        var Kk = r19K();
+        await kmSag(s, 'Seite 1 · Objekt und Investition', 'Kaufpreis <b>' + eur(Kk.kp) + '</b>, Gesamtinvestition ' + eur(Kk.gi) + ', Darlehen <b>' + eur(Kk.d1) + '</b>.',
+          'Seite eins: das Objekt mit allen Eckdaten, die Investition mit jeder Nebenkostenzeile — Gesamtinvestition ' + (eur(Kk.gi) || '') + ' — und die Finanzierung.', null,
+          { was: 'Nichts — das PDF entsteht aus dem Objekt.', warum: 'Die Bank prüft zuerst Objekt und Investition.', folge: 'Jede Zahl ist dieselbe wie in der App.' });
+        await r19Seite(bank, 2, 190);
+        await kmSag(s, 'Seite 2 · Kennzahlen', 'Rendite, Cashflow, DSCR, Beleihungsauslauf — mit Ampeln.',
+          'Seite zwei: die Kennzahlen mit Ampeln — Rendite, Cashflow, Schuldendienstdeckung und Beleihungsauslauf.', null,
+          { was: 'Nichts.', warum: 'Die Bank entscheidet über DSCR und Beleihungsauslauf.', folge: 'Ampeln zeigen, wo das Haus stark oder schwach ist.' });
+        var st = r19Stelle(/^BELASTUNGSPROBE/, 7);
+        await r19Seite(bank, st.seite, st.oben);
+        await kmSag(s, 'Die Belastungsprobe', 'Was passiert, wenn Zins oder Leerstand steigen?',
+          'Und die Belastungsprobe: was passiert mit dem Cashflow, wenn der Zins bei der Anschlussfinanzierung steigt oder Wohnungen leer stehen. Genau diese Frage stellt jede Bank.', null,
+          { was: 'Nichts.', warum: 'Jede Bank fragt nach dem Risiko.', folge: 'Die Antwort steht schon im PDF.' });
+        var wp = r19Stelle(/^WERTPOTENZIAL|^ZIELBILD/, null);
+        if (wp && wp.seite && /WERTPOTENZIAL|ZIELBILD/.test((_r19.tok || []).join(' '))) {
+          await r19Seite(bank, wp.seite, wp.oben);
+          await kmSag(s, 'Zielbild im PDF', 'Ist, Soll und Zielbild nebeneinander — der Plan aus Kapitel 8.',
+            'Auch das Zielbild aus Kapitel acht steht im PDF: Ist, Soll und Zielbild nebeneinander.', null,
+            { was: 'Nichts.', warum: 'Die Bank sieht nicht nur das Heute, sondern den Plan.', folge: 'Das Potenzial des Hauses ist belegt, nicht behauptet.' });
+        }
+        r19Zu(); kegelHoch(false);
+        reiter('s0'); var mm = q('.main-col'); if (mm) mm.scrollTop = 0;
+        await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
+        await kmSag(s, 'Geschafft', 'Ein Haus, neun Kapitel: angelegt, erfasst, finanziert, bewertet, geplant — <b>bereit für die Bank</b>.',
+          'Geschafft. Ein Mehrfamilienhaus, neun Kapitel: angelegt, Wohnung für Wohnung erfasst, finanziert, steuerlich eingeordnet, amtlich bewertet, mit Zielbild geplant und bereit für das Gespräch mit der Bank. Jede Zahl, die du gesehen hast, hat DealPilot aus unseren Eingaben gerechnet. Danke fürs Zuschauen.', 3000,
+          { was: 'Deine eigenen Objekte — genauso.', warum: 'Erst rechnen, dann kaufen.', folge: 'dealpilot.immo' });
+      }
+    ].map(function (f, i) { return async function (s) { await kmHalt(i); return f(s); }; })
   };
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
