@@ -248,6 +248,61 @@ for (const f of F.ebene_a) {
   } catch (err) { pruefe('A', id, 'Lauf', false, 'Ausnahme: ' + err.message); }
 }
 
+/* ══ EBENE A · VERGLEICHSFAKTOR-MERKMALE UND W1 (v3008) ═════════════════
+   Konstanz ETW (vgf-bw-konstanz-2026.json): das Dokument druckt KEIN
+   Anwendungsbeispiel - Pruefmassstab sind die Tabellenpunkte selbst (Normprobe
+   an Eckwerten, Klassengrenzen und leeren Zellen; die Tabelle interpoliert nicht,
+   sie ist ein Beschluss je Zelle). Dazu W1: kein Vergleichswert mit fehlender
+   Anpassung (§ 26 Abs. 1, § 9 Abs. 1 S. 3 ImmoWertV), am echten OGA-BB-Satz. */
+try {
+  const GAA = await lade('lib/gutachterausschuss.js');
+  const vf = (x) => GAA.vergleichsfaktor({ ags: '08335043', objektart: 'etw', wohnflaeche: 80, baujahr: 1985, zimmer: 3, ...x });
+  const id = 'A-VGF-KN';
+  offen('A', id, 'Konstanz: kein amtliches Anwendungsbeispiel im Dokument - Normprobe an Tabellenpunkten (S. 49)');
+  let r = vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' });
+  wert('A', id + '1', 'gute · 1970-1989 · mittel (Tabelle 4.800)', r.wert ?? null, 4800);
+  wert('A', id + '1', 'Objektwert 80 m²', r.objektwert ?? null, 384000);
+  pruefe('A', id + '1', 'Rechenweg nennt eigene Angabe', /eigene Angabe nach Lagekarte des Gutachterausschusses/.test(r.rechenweg || ''), r.rechenweg);
+  wert('A', id + '2', 'Eckwert bevorzugte · 2001-2023 · stark gehoben', vf({ baujahr: 2023, vgf_wohnlage: 'bevorzugte', vgf_ausstattung: 'stark gehoben' }).wert ?? null, 13200);
+  wert('A', id + '2', 'Eckwert mäßige · vor 1935 · mittel', vf({ baujahr: 1900, vgf_wohnlage: 'mäßige', vgf_ausstattung: 'mittel' }).wert ?? null, 4300);
+  wert('A', id + '3', 'Klassengrenze Bj 1934 (vor 1935, gute mittel)', vf({ baujahr: 1934, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).wert ?? null, 5700);
+  wert('A', id + '3', 'Klassengrenze Bj 1935 (1935-1969, keine Interpolation)', vf({ baujahr: 1935, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).wert ?? null, 5000);
+  wert('A', id + '4', 'Lageklasse 2,0 -> gute', vf({ lageklasse_brw: 2.0, vgf_ausstattung: 'mittel' }).wert ?? null, 4800);
+  wert('A', id + '4', 'Lageklasse 1,9 -> bevorzugte', vf({ lageklasse_brw: 1.9, vgf_ausstattung: 'mittel' }).wert ?? null, 7000);
+  wert('A', id + '4', 'Lageklasse 3,9 -> mittlere', vf({ lageklasse_brw: 3.9, vgf_ausstattung: 'mittel' }).wert ?? null, 4300);
+  wert('A', id + '4', 'Lageklasse 4,0 -> mäßige', vf({ lageklasse_brw: 4.0, vgf_ausstattung: 'mittel' }).wert ?? null, 2600);
+  wert('A', id + '5', 'linksrheinisch (Altstadt, LK 1,0) -> gute', vf({ lageklasse_brw: 1.0, ortsteil_brw: 'Altstadt', vgf_ausstattung: 'mittel' }).wert ?? null, 4800);
+  wert('A', id + '5', 'eigene Angabe schlägt Ableitung (Seesicht)', vf({ lageklasse_brw: 1.0, ortsteil_brw: 'Altstadt', vgf_wohnlage: 'bevorzugte', vgf_ausstattung: 'mittel' }).wert ?? null, 7000);
+  r = vf({});
+  pruefe('A', id + '6', 'ohne Wohnlage/Ausstattung: merkmal_fehlt mit beiden Feldern', r.grund === 'merkmal_fehlt'
+    && (r.fehlende_merkmale || []).map((m) => m.feld).join(',') === 'vgf_wohnlage,vgf_ausstattung', r.grund + ' ' + (r.fehlende_merkmale || []).map((m) => m.feld));
+  pruefe('A', id + '6', 'Klassen kommen aus dem Satz', ((r.fehlende_merkmale || [])[0] || {}).klassen?.join('|') === 'bevorzugte|gute|mittlere|mäßige');
+  pruefe('A', id + '7', '2 Zimmer: ausserhalb des Geltungsbereichs', vf({ zimmer: 2, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).grund === 'ausserhalb_des_geltungsbereichs');
+  pruefe('A', id + '7', 'Bj 2024: nicht extrapoliert', vf({ baujahr: 2024, vgf_wohnlage: 'gute', vgf_ausstattung: 'mittel' }).verfuegbar === false);
+  pruefe('A', id + '8', 'leere Zelle (mittlere · 1970-1989 · gehoben) ohne Nachbarwert', vf({ vgf_wohnlage: 'mittlere', vgf_ausstattung: 'gehoben' }).grund === 'zelle_leer');
+  pruefe('A', id + '8', 'Klasse einfach: kein Beschluss', vf({ vgf_wohnlage: 'gute', vgf_ausstattung: 'einfach' }).grund === 'zelle_leer');
+  pruefe('A', id + '8', 'falscher Klassenname wird nicht unscharf zugeordnet', vf({ vgf_wohnlage: 'gut', vgf_ausstattung: 'mittel' }).verfuegbar === false);
+  pruefe('A', id + '9', 'Vorrang: Wertsatz vor der Sperre in vgf-bw-2026.json', vf({}).grund !== 'gesperrt');
+
+  /* W1 am Oberen Gutachterausschuss Brandenburg: Standardstufe fehlt -> kein Wert. */
+  const bb = JSON.parse(fs.readFileSync(path.join(SRC, 'lib/register/vgf-bb-oga-2025.json'), 'utf8'))
+    .filter((s) => s.formel && s.formel.form && s.vollstaendig !== false);
+  const efh = { objektart: 'efh', brw: 100, brw_eur_qm: 100, wohnflaeche: 140, flaeche: 600, baujahr: 1985, rnd: 40,
+    standardstufe: 3, unterkellerung_pct: 100, stellplaetze: 2 };
+  const voll = bb.filter((s) => (s.korrekturen || []).some((k) => k.feld === 'stellplaetze')).map((s) => ({ s, r: GAA.vergleichsfaktor({ ...efh, ags: s.ags, zweig: s.zweig }) })).find((x) => x.r.verfuegbar);
+  if (!voll) pruefe('A', 'A-W1', 'OGA BB: ein Satz rechnet am Normobjekt', false);
+  else {
+    const ohne = GAA.vergleichsfaktor({ ...efh, standardstufe: null, ags: voll.s.ags, zweig: voll.s.zweig });
+    pruefe('A', 'A-W1a', 'OGA BB ' + voll.s.ags + ': ohne Standardstufe kein Wert (merkmal_fehlt)', ohne.verfuegbar === false && ohne.grund === 'merkmal_fehlt', ohne.grund);
+    pruefe('A', 'A-W1a', 'Rechenweg-Zeile nennt die offene Anpassung', /Standardstufe/.test(ohne.rechenweg || '') && /kein Wert/.test(ohne.rechenweg || ''), ohne.rechenweg);
+    const aus = GAA.vergleichsfaktor({ ...efh, unterkellerung_pct: 120, ags: voll.s.ags, zweig: voll.s.zweig });
+    pruefe('A', 'A-W1b', 'Merkmal ausserhalb der Anpassungstabelle: nicht auf Norm gesetzt', aus.verfuegbar === false, aus.grund);
+    const st = GAA.vergleichsfaktor({ ...efh, stellplaetze: 0, ags: voll.s.ags, zweig: voll.s.zweig });
+    pruefe('A', 'A-W1b', '0 Stellplätze (Tabelle ab 1): kein stiller Randwert', st.verfuegbar === false, st.grund);
+    pruefe('A', 'A-W1c', 'Bezugsgröße ist eine Art (wohnflaeche), keine Zahl', voll.r.bezugsgroesse === 'wohnflaeche' && voll.r.bezugsflaeche_qm === 140, String(voll.r.bezugsgroesse));
+  }
+} catch (err) { pruefe('A', 'A-VGF', 'Lauf', false, 'Ausnahme: ' + err.message); }
+
 /* ══ EBENE B ═════════════════════════════════════════════════════════ */
 const C = F.ebene_c || { faelle: {} };
 /* v2600 · Die eingefrorenen Argumente (Erfassung vor v2595) fuehren lzs_modellansaetze noch

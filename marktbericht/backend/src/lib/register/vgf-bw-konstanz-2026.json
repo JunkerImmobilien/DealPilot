@@ -1,0 +1,422 @@
+[
+ {
+  "land_code": "BW",
+  "ags": "08335043",
+  "ebene": "gemeinde",
+  "gebiet_name": "Konstanz",
+  "gaa_name": "Gutachterausschuss für den Bereich der Stadt Konstanz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (ETW), 3- bis ≥ 4-Zimmer-Wohnungen im Weiterverkauf",
+  "vollstaendig": true,
+  "ersetzt_sperre": true,
+  "ersetzt_sperre_grund": "Löst die Sperre (merkmal_fehlt) für 08335043/etw in vgf-bw-2026.json ab: die Leseroutine kennt seit v3008 die Merkmale Wohnlage, Ausstattungsklasse und Zimmerzahl (Modellform merkmalsmatrix).",
+  "stufe": "B",
+  "stufe_grund": "Amtlicher Beschluss des Ausschusses je Zelle (Wohnlage × Baujahresklasse × Ausstattungsklasse), Tabellenwert ohne Interpolation. Nicht A: das Dokument druckt kein Anwendungsbeispiel; die Zellen beruhen teils auf 1 bis 2 Kauffällen (kursiv), was je Zelle im Bericht steht.",
+  "formel": {
+   "form": "merkmalsmatrix",
+   "liefert": "wert_eur",
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche (bereinigter Kaufpreis, Weiterverkauf)",
+   "normobjekt": "3- bis ≥ 4-Zimmer-Wohnung im Weiterverkauf, Stadt Konstanz, Stichtag 01.01.2026; Achsen Wohnlage (Lageklasse der Bodenrichtwertkarte), Baujahresklasse, Ausstattungsklasse (Merkmalskatalog des Ausschusses)",
+   "beschluss_text": "Beschluss des Gutachterausschusses Konstanz zum 01.01.2026, Immobilienmarktbericht 2026 S. 49",
+   "seite": 49,
+   "interpolation": "keine — Beschluss je Zelle; „-\" ist kein Wert, auch nicht der Nachbar",
+   "geltung": [
+    {
+     "merkmal": "zimmer",
+     "feld": "zimmer",
+     "bez": "Zimmerzahl",
+     "mindestens": 3,
+     "text": "für 3- bis ≥ 4-Zimmer-Wohnungen",
+     "fundstelle": "Immobilienmarktbericht 2026, S. 49, Tabellenüberschrift"
+    }
+   ],
+   "achsen": [
+    {
+     "merkmal": "wohnlage",
+     "feld": "vgf_wohnlage",
+     "bez": "Wohnlage",
+     "art": "klasse",
+     "klassen": [
+      "bevorzugte",
+      "gute",
+      "mittlere",
+      "mäßige"
+     ],
+     "eigene_angabe_text": "eigene Angabe nach Lagekarte des Gutachterausschusses",
+     "hilfe": "mäßige Wohnlage: Lageklassen 9,9 bis 4,0 · mittlere: 3,9 bis 3,0 · gute: 2,9 bis 2,0 · bevorzugte: 1,9 bis 1,0. Die Lageklasse steht unter den beschreibenden Merkmalen der Bodenrichtwertkarte (BORIS-BW). Linksrheinisch ist Wohnnutzung grundsätzlich gute Wohnlage, ausgenommen Wohnungen mit Seesicht.",
+     "url": "https://www.konstanz.de/site/Konstanz-Microsites/get/params_E-1123642426_Dattachment/777534/Merkmale%20zu%20den%20Vergleichsfaktoren%20f%C3%BCr%20Wohnungseigentum%202026.pdf",
+     "ableitung": {
+      "feld": "lageklasse_brw",
+      "bez": "Lageklasse der Bodenrichtwertzone",
+      "text": "BORIS-BW, beschreibendes Merkmal der Zone; Zuordnung nach dem Merkmalsblatt des Ausschusses S. 1",
+      "wortlaut": "Das Zuständigkeitsgebiet des Gutachterausschusses Konstanz verfügt über vier Lagequalitäten. Diese sind unter den beschreibenden Merkmalen in der Bodenrichtwertkarte über Konstanz (www.gutachterausschuesse-bw.de) abrufbar. mäßige Wohnlage: Wohnlagen mit den Lageklassen 9,9 bis 4,0 · mittlere Wohnlage: 3,9 bis 3,0 · gute Wohnlage: 2,9 bis 2,0 · bevorzugte Wohnlage: 1,9 bis 1,0",
+      "fundstelle": "Merkmale zu den Vergleichsfaktoren für Wohnungseigentum zum 01.01.2026, S. 1, Abschnitt Wohnlage",
+      "quelle_daten": "BORIS-BW (www.gutachterausschuesse-bw.de), Feld BEM „Lageklasse x,y\" der Bodenrichtwertzone; Einzelabruf im Objektbezug",
+      "baender": [
+       {
+        "von": 1,
+        "bis": 1.9,
+        "klasse": "bevorzugte"
+       },
+       {
+        "von": 2,
+        "bis": 2.9,
+        "klasse": "gute"
+       },
+       {
+        "von": 3,
+        "bis": 3.9,
+        "klasse": "mittlere"
+       },
+       {
+        "von": 4,
+        "bis": 9.9,
+        "klasse": "mäßige"
+       }
+      ],
+      "ortsteil_regel": {
+       "feld": "ortsteil_brw",
+       "ortsteile": [
+        "Altstadt",
+        "Paradies"
+       ],
+       "klasse": "gute",
+       "text": "Regel des Ausschusses für das linksrheinische Stadtgebiet: Wohnnutzung grundsätzlich gute Wohnlage, ausgenommen Wohnungen mit Seesicht — bei Seesicht die Wohnlage selbst eintragen",
+       "wortlaut": "Im linksrheinischen Stadtgebiet sind die bevorzugten Lageklassen entsprechend der Bodenrichtwertkarte überwiegend durch den Einzelhandel bedingt. Die bevorzugten Lageklassen treffen großräumig betrachtet nicht auf die Wohnnutzung im linksrheinischen Stadtgebiet zu. Im linksrheinischen Stadtgebiet ist die Wohnnutzung, ausgenommen sind Wohnungen mit Seesicht (Seesicht), grundsätzlich einer guten Wohnlage zuzuordnen.",
+       "fundstelle": "Merkmale zu den Vergleichsfaktoren für Wohnungseigentum zum 01.01.2026, S. 1",
+       "zuordnung_ortsteile": "DealPilot: die BORIS-BW-Ortsteile (Feld ORTST) Altstadt und Paradies liegen südlich des Seerheins, also linksrheinisch; alle übrigen Konstanzer Ortsteile (Petershausen, Königsbau, Allmannsdorf, Staad, Egg, Litzelstetten, Dingelsdorf, Wallhausen, Dettingen, Oberdorf, Fürstenberg, Wollmatingen, Industriegebiet) rechtsrheinisch. Die Ortsteilnamen sind am 27.10.2026 aus BORIS-BW ausgelesen."
+      }
+     }
+    },
+    {
+     "merkmal": "baujahr",
+     "feld": "baujahr",
+     "bez": "Baujahr",
+     "art": "band",
+     "baender": [
+      {
+       "von": null,
+       "bis": 1934,
+       "schluessel": "vor 1935"
+      },
+      {
+       "von": 1935,
+       "bis": 1969,
+       "schluessel": "1935-1969"
+      },
+      {
+       "von": 1970,
+       "bis": 1989,
+       "schluessel": "1970-1989"
+      },
+      {
+       "von": 1990,
+       "bis": 2000,
+       "schluessel": "1990-2000"
+      },
+      {
+       "von": 2001,
+       "bis": 2023,
+       "schluessel": "2001-2023"
+      }
+     ]
+    },
+    {
+     "merkmal": "ausstattung",
+     "feld": "vgf_ausstattung",
+     "bez": "Ausstattungsklasse",
+     "art": "klasse",
+     "klassen": [
+      "stark gehoben",
+      "gehoben",
+      "mittel",
+      "einfach"
+     ],
+     "eigene_angabe_text": "eigene Angabe nach dem Merkmalskatalog des Gutachterausschusses",
+     "hilfe": "stark gehoben: Baujahre ab ca. 2005 bzw. hochwertig kernsaniert · gehoben: Baujahre ca. 1995–2004 bzw. entsprechend saniert · mittel: Baujahre vor ca. 1995 bzw. entsprechend saniert · einfach: ältere, nicht sanierte Wohnungen. Der Ausschuss: „Für die Einkategorisierung … ist das Baujahr zwar ausschlaggebend, aber nur die Summe aus mehreren Kriterien führt zu einer richtigen Einstufung.\"",
+     "url": "https://www.konstanz.de/site/Konstanz-Microsites/get/params_E-1123642426_Dattachment/777534/Merkmale%20zu%20den%20Vergleichsfaktoren%20f%C3%BCr%20Wohnungseigentum%202026.pdf",
+     "keine_ableitung": "Der Ausschuss beschreibt die Klassen mit einem Merkmalskatalog (Baujahr, Bäder, Dämmung, Fenster, Heizung, Gemeinschaftsräume …) und sagt ausdrücklich, dass das Baujahr allein nicht genügt; eine Zuordnung zur Standardstufe nach Anlage 4 ImmoWertV nennt er nicht. Deshalb keine Ableitung, nur eigene Angabe (Merkmalsblatt S. 1–2)."
+    }
+   ],
+   "zellen": {
+    "bevorzugte": {
+     "2001-2023": {
+      "stark gehoben": 13200,
+      "gehoben": null
+     },
+     "1990-2000": {
+      "gehoben": 13800,
+      "mittel": null
+     },
+     "1970-1989": {
+      "gehoben": 9800,
+      "mittel": 7000
+     },
+     "1935-1969": {
+      "mittel": 12000
+     },
+     "vor 1935": {
+      "gehoben": 11800,
+      "mittel": null
+     }
+    },
+    "gute": {
+     "2001-2023": {
+      "stark gehoben": 7200,
+      "gehoben": 6700
+     },
+     "1990-2000": {
+      "gehoben": 6600,
+      "mittel": 5300
+     },
+     "1970-1989": {
+      "gehoben": 5900,
+      "mittel": 4800
+     },
+     "1935-1969": {
+      "gehoben": 6500,
+      "mittel": 5000
+     },
+     "vor 1935": {
+      "gehoben": 6800,
+      "mittel": 5700
+     }
+    },
+    "mittlere": {
+     "2001-2023": {
+      "stark gehoben": 6500,
+      "gehoben": 5900
+     },
+     "1990-2000": {
+      "gehoben": 5100,
+      "mittel": 4100
+     },
+     "1970-1989": {
+      "gehoben": null,
+      "mittel": 4300
+     },
+     "1935-1969": {
+      "gehoben": 6100,
+      "mittel": 4100
+     },
+     "vor 1935": {
+      "gehoben": 6800,
+      "mittel": 4600
+     }
+    },
+    "mäßige": {
+     "2001-2023": {
+      "gehoben": null
+     },
+     "1990-2000": {
+      "gehoben": 3900
+     },
+     "1970-1989": {
+      "mittel": 2600
+     },
+     "1935-1969": {
+      "mittel": 4300
+     },
+     "vor 1935": {
+      "mittel": 4300
+     }
+    }
+   },
+   "zellen_info": {
+    "bevorzugte|2001-2023|stark gehoben": {
+     "kauffaelle": 1,
+     "daten": "Vertragsjahr 2024 (*1)",
+     "text": "Der Beschluss für diese Zelle beruht auf einem Kauffall (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahr 2024 (*1)."
+    },
+    "bevorzugte|1990-2000|gehoben": {
+     "kauffaelle": 2,
+     "daten": "Vertragsjahr 2024 (*1)",
+     "text": "Der Beschluss für diese Zelle beruht auf 2 Kauffällen (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahr 2024 (*1)."
+    },
+    "bevorzugte|1970-1989|gehoben": {
+     "kauffaelle": 4,
+     "daten": "Vertragsjahre 2024 und 2025 (*2)",
+     "text": "Der Beschluss beruht auf 4 Kauffällen, Daten aus dem Vertragsjahre 2024 und 2025 (*2)."
+    },
+    "bevorzugte|1970-1989|mittel": {
+     "kauffaelle": 1,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss für diese Zelle beruht auf einem Kauffall (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahr 2025."
+    },
+    "bevorzugte|1935-1969|mittel": {
+     "kauffaelle": 1,
+     "daten": "Vertragsjahr 2024 (*1)",
+     "text": "Der Beschluss für diese Zelle beruht auf einem Kauffall (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahr 2024 (*1)."
+    },
+    "bevorzugte|vor 1935|gehoben": {
+     "kauffaelle": 4,
+     "daten": "Vertragsjahre 2024 und 2025 (*2)",
+     "text": "Der Beschluss beruht auf 4 Kauffällen, Daten aus dem Vertragsjahre 2024 und 2025 (*2)."
+    },
+    "gute|2001-2023|stark gehoben": {
+     "kauffaelle": 6,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 6 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|2001-2023|gehoben": {
+     "kauffaelle": 9,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 9 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|1990-2000|gehoben": {
+     "kauffaelle": 12,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 12 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|1990-2000|mittel": {
+     "kauffaelle": 7,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 7 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|1970-1989|gehoben": {
+     "kauffaelle": 5,
+     "daten": "Vertragsjahr 2024 (*1)",
+     "text": "Der Beschluss beruht auf 5 Kauffällen, Daten aus dem Vertragsjahr 2024 (*1)."
+    },
+    "gute|1970-1989|mittel": {
+     "kauffaelle": 44,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 44 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|1935-1969|gehoben": {
+     "kauffaelle": 3,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 3 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|1935-1969|mittel": {
+     "kauffaelle": 27,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 27 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|vor 1935|gehoben": {
+     "kauffaelle": 9,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 9 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "gute|vor 1935|mittel": {
+     "kauffaelle": 28,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 28 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "mittlere|2001-2023|stark gehoben": {
+     "kauffaelle": 4,
+     "daten": "Vertragsjahre 2024 und 2025 (*2)",
+     "text": "Der Beschluss beruht auf 4 Kauffällen, Daten aus dem Vertragsjahre 2024 und 2025 (*2)."
+    },
+    "mittlere|2001-2023|gehoben": {
+     "kauffaelle": 9,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 9 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "mittlere|1990-2000|gehoben": {
+     "kauffaelle": 6,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 6 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "mittlere|1990-2000|mittel": {
+     "kauffaelle": 8,
+     "daten": "Vertragsjahre 2024 und 2025 (*2)",
+     "text": "Der Beschluss beruht auf 8 Kauffällen, Daten aus dem Vertragsjahre 2024 und 2025 (*2)."
+    },
+    "mittlere|1970-1989|mittel": {
+     "kauffaelle": 31,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 31 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "mittlere|1935-1969|gehoben": {
+     "kauffaelle": 7,
+     "daten": "Vertragsjahre 2024 und 2025 (*2)",
+     "text": "Der Beschluss beruht auf 7 Kauffällen, Daten aus dem Vertragsjahre 2024 und 2025 (*2)."
+    },
+    "mittlere|1935-1969|mittel": {
+     "kauffaelle": 16,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 16 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "mittlere|vor 1935|gehoben": {
+     "kauffaelle": 9,
+     "daten": "Vertragsjahre 2024 und 2025 (*2)",
+     "text": "Der Beschluss beruht auf 9 Kauffällen, Daten aus dem Vertragsjahre 2024 und 2025 (*2)."
+    },
+    "mittlere|vor 1935|mittel": {
+     "kauffaelle": 11,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss beruht auf 11 Kauffällen, Daten aus dem Vertragsjahr 2025."
+    },
+    "mäßige|1990-2000|gehoben": {
+     "kauffaelle": 2,
+     "daten": "Vertragsjahre 2024 und 2025 (*2)",
+     "text": "Der Beschluss für diese Zelle beruht auf 2 Kauffällen (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahre 2024 und 2025 (*2)."
+    },
+    "mäßige|1970-1989|mittel": {
+     "kauffaelle": 2,
+     "daten": "Vertragsjahr 2024 (*1)",
+     "text": "Der Beschluss für diese Zelle beruht auf 2 Kauffällen (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahr 2024 (*1)."
+    },
+    "mäßige|1935-1969|mittel": {
+     "kauffaelle": 1,
+     "daten": "Vertragsjahr 2025",
+     "text": "Der Beschluss für diese Zelle beruht auf einem Kauffall (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahr 2025."
+    },
+    "mäßige|vor 1935|mittel": {
+     "kauffaelle": 1,
+     "daten": "Vertragsjahr 2024 (*1)",
+     "text": "Der Beschluss für diese Zelle beruht auf einem Kauffall (im Bericht kursiv gesetzt), Daten aus dem Vertragsjahr 2024 (*1)."
+    }
+   }
+  },
+  "korrekturen": [],
+  "belege": [
+   {
+    "fundstelle": "Immobilienmarktbericht 2026, S. 49, Tabelle „Vergleichsfaktoren für 3- bis ≥ 4-Zimmer-Wohnungen im Weiterverkauf zum 01.01.2026\", Spalte „Beschluss Vergleichsfaktor Stichtag 01.01.2026\" (Seitenbild 140 dpi gelesen)",
+    "wortlaut": "Daten aus dem Vertragsjahr 2025, *1 Daten aus dem Vertragsjahr 2024, *2 Daten aus den Vertragsjahren 2024 und 2025",
+    "url": "https://www.konstanz.de/site/Konstanz-Microsites/get/params_E-1247721654_Dattachment/777533/Vergleichsfaktoren%20WET%20f%C3%BCr%203-%20bis%20%E2%89%A5%204-Zimmer-Wohnungen%202026.pdf"
+   },
+   {
+    "fundstelle": "Merkmale zu den Vergleichsfaktoren für Wohnungseigentum zum 01.01.2026, S. 1 (Wohnlage)",
+    "wortlaut": "mäßige Wohnlage: Wohnlagen mit den Lageklassen 9,9 bis 4,0 · mittlere 3,9 bis 3,0 · gute 2,9 bis 2,0 · bevorzugte 1,9 bis 1,0",
+    "url": "https://www.konstanz.de/site/Konstanz-Microsites/get/params_E-1123642426_Dattachment/777534/Merkmale%20zu%20den%20Vergleichsfaktoren%20f%C3%BCr%20Wohnungseigentum%202026.pdf"
+   },
+   {
+    "fundstelle": "Merkmale zu den Vergleichsfaktoren für Wohnungseigentum zum 01.01.2026, S. 1–2 (Ausstattung und Baujahr)",
+    "wortlaut": "Hinweis: Für die Einkategorisierung der Wohnung in die entsprechende Ausstattungsstufe ist das Baujahr zwar ausschlaggebend, aber nur die Summe aus mehreren Kriterien führt zu einer richtigen Einstufung.",
+    "url": "https://www.konstanz.de/site/Konstanz-Microsites/get/params_E-1123642426_Dattachment/777534/Merkmale%20zu%20den%20Vergleichsfaktoren%20f%C3%BCr%20Wohnungseigentum%202026.pdf"
+   },
+   {
+    "fundstelle": "Immobilienmarktbericht 2026, S. 49, Hinweis unter der Tabelle",
+    "wortlaut": "Hinweis: Die Vergleichsfaktoren für Wohnungseigentum werden insbesondere für die Wertermittlung der Finanzverwaltung (z.B. Bedarfsbewertung) angewendet.",
+    "url": "https://www.konstanz.de/site/Konstanz-Microsites/get/params_E-1247721654_Dattachment/777533/Vergleichsfaktoren%20WET%20f%C3%BCr%203-%20bis%20%E2%89%A5%204-Zimmer-Wohnungen%202026.pdf"
+   }
+  ],
+  "auflagen": "Der Ausschuss nennt als Hauptanwendung die Wertermittlung der Finanzverwaltung („insbesondere … Bedarfsbewertung\", S. 49) — anders als Berlin nicht „ausschließlich\"; deshalb keine Sperre für den Verkehrswert. Wohnungen mit Seesicht im linksrheinischen Stadtgebiet: Wohnlage selbst eintragen.",
+  "geltungsbereich": {
+   "raeumlich": "Stadt Konstanz",
+   "objektarten": [
+    "etw"
+   ],
+   "zimmer": "3 bis ≥ 4",
+   "extrapolation": "gesperrt"
+  },
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "modellversion": "Vergleichsfaktoren Wohnungseigentum (§ 20 ImmoWertV), Gutachterausschuss Konstanz, Immobilienmarktbericht 2026 S. 49 und Merkmalsblatt zum 01.01.2026",
+  "modellansaetze": {
+   "bezugsmaßstab": "Euro je m² Wohnfläche, bereinigter Kaufpreis, Weiterverkauf",
+   "zimmer": "3 bis ≥ 4",
+   "wohnlage": "Lageklasse der Bodenrichtwertkarte (vier Lagequalitäten)",
+   "ausstattung": "vier Klassen nach Merkmalskatalog (stark gehoben, gehoben, mittel, einfach); einfach ohne Beschluss",
+   "anwendungsbeispiel": "keins im Dokument — Prüfmaßstab sind die Tabellenpunkte selbst (Normprobe in tools/wertermittlung-pruefen.mjs, Abschnitt Konstanz)"
+  },
+  "quelle_url": "https://www.konstanz.de/site/Konstanz-Microsites/get/params_E-1247721654_Dattachment/777533/Vergleichsfaktoren%20WET%20f%C3%BCr%203-%20bis%20%E2%89%A5%204-Zimmer-Wohnungen%202026.pdf",
+  "quelle_parser": "v3008 gen-vgf-konstanz (Seitenbild S. 49 bei 140 dpi Zelle für Zelle; Merkmalsblatt pdftotext; BORIS-BW-Abfrage Ortsteile/Lageklassen 27.10.2026)",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument (1 Seite, Auszug S. 49 des Immobilienmarktberichts 2026, frei abrufbar auf konstanz.de)",
+  "quellenvermerk": "Gutachterausschuss für den Bereich der Stadt Konstanz, Immobilienmarktbericht 2026; Lageklasse: Gutachterausschüsse in Baden-Württemberg, BORIS-BW (www.gutachterausschuesse-bw.de)",
+  "boris_url": "https://www.gutachterausschuesse-bw.de/borisbw/?lang=de"
+ }
+]

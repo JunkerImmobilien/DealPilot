@@ -76,6 +76,19 @@ function indizieren(saetze) {
   for (const liste of ix.values()) {
     liste.sort((a, b) => (b.berichtsjahr || 0) - (a.berichtsjahr || 0));
   }
+  /* v3008 · EIN WERT, DER EINE SPERRE AUSDRUECKLICH ABLOEST.
+     Konstanz ETW stand als Sperre (merkmal_fehlt) in vgf-bw-2026.json; seit die
+     Leseroutine Wohnlage und Ausstattung kennt, traegt vgf-bw-konstanz-2026.json
+     denselben Schluessel (ags, zweig, Jahrgang) als Wert. Bei gleichem Jahrgang
+     entschied bisher die Ladereihenfolge - die Sperre lag vorn. Jetzt nur, wenn der
+     Wertsatz es SAGT (ersetzt_sperre: true): Sperren desselben Zweigs, Jahrgangs
+     und derselben Lage fallen aus dem Index. Ohne das Feld bleibt alles wie es war. */
+  const _sperre = (s) => s.vollstaendig === false || !!s.warum_kein_wert;
+  const _gl = (s) => [String(s.zweig || '').toLowerCase(), s.berichtsjahr ?? '', String(((s.geltungsbereich || {}).lage) || '').toLowerCase()].join('|');
+  for (const [k, liste] of ix) {
+    const abl = new Set(liste.filter((s) => s.ersetzt_sperre === true && !_sperre(s)).map(_gl));
+    if (abl.size) ix.set(k, liste.filter((s) => !(_sperre(s) && abl.has(_gl(s)))));
+  }
   return ix;
 }
 
@@ -483,6 +496,7 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Gemeinde (MB 2 ohne RH/ETW = Sperre). Frankfurt ETW braucht die Lage
                                (rechnet nicht), Wiesbaden ETW = Klassenmittel (Stufe C). */
                             'vgf-he-2026.json',
+                            'vgf-bw-konstanz-2026.json',   /* v3008: Konstanz ETW-Tabelle Wohnlage x Baujahr x Ausstattung (merkmalsmatrix), loest die Sperre in vgf-bw-2026.json ab */
                             /* v2279: Umrechnungskoeffizienten Grundstuecksgroesse
                                (§ 19 ImmoWertV), Kennzahl umrechnungskoeffizient_flaeche.
                                Erster Satz: Stadt Bielefeld (BORIS-NRW 2026). Gelesen

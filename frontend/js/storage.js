@@ -42,6 +42,7 @@ if (!window._pdfGold) {
 var WM_FIELDS = [
   'baustatus','bgf','standardstufe','grundriss','mod_punkte','mod_quelle',   /* v2540: mod_quelle */
   'sachwertfaktor','uk_flaeche','wgfz_objekt','stellplatz_miete_monat','sonstige_jahr',   /* v2282: uk_flaeche, v2361: wgfz_objekt */
+  'vgf_wohnlage','vgf_ausstattung',   /* v3008: Klassen des Gutachterausschusses (Vergleichsfaktor) */
   'nhk_haus','nhk_geschosse','nhk_dach',
   'hinterland_qm','hinterland_eur_qm','hinterland_rentierlich',
   'garagen_bgf_qm','garagen_stufe','aussenanlagen_pct','aussenanlagen',

@@ -1406,9 +1406,14 @@ export function vergleichsfaktor(arg = {}) {
   if (!_erg || typeof _erg !== 'object') return _erg;
   if (_erg.verwendung !== undefined) return _erg;
   try {
-    const _s = finde('vergleichsfaktor', String((arg && arg.ags) || ''));
-    const _l = Array.isArray(_s) ? _s : (_s ? [_s] : []);
-    const _t = _l.find((x) => x && x.zweig === _erg.zweig) || _l[0] || null;
+    /* v3008 · der Satz kommt vom Kern selbst - seit die Ebenen je Zweig
+       abgestuft werden, liegt er nicht mehr zwingend auf der ersten Ebene. */
+    let _t = _erg._satz || null;
+    if (!_t) {
+      const _s = finde('vergleichsfaktor', String((arg && arg.ags) || ''));
+      const _l = Array.isArray(_s) ? _s : (_s ? [_s] : []);
+      _t = _l.find((x) => x && x.zweig === _erg.zweig) || _l[0] || null;
+    }
     if (_t) {
       _erg.verwendung = _t.verwendung || null;
       if (_t.auflagen) _erg.auflagen = _t.auflagen;
@@ -1417,17 +1422,220 @@ export function vergleichsfaktor(arg = {}) {
   return _erg;
 }
 
+/* ══ v3008 · WO DER NUTZER EIN FEHLENDES MERKMAL EINTRAEGT ═════════════
+   Die Klassen und ihr Wortlaut kommen aus dem SATZ (Dokument des
+   Ausschusses); hier steht nur, wo das Feld in DealPilot liegt. Ein
+   Merkmal ohne Eintrag hier wird von DealPilot nicht erfasst - das sagt
+   der Hinweis dann auch so, statt einen Ort zu erfinden. */
+const VGF_EINTRAGEN = {
+  vgf_wohnlage: 'Reiter Objekt, Block Wertermittlung: „Wohnlage (Gutachterausschuss)“',
+  vgf_ausstattung: 'Reiter Objekt, Block Wertermittlung: „Ausstattungsklasse (Gutachterausschuss)“',
+  zimmer: 'Reiter Objekt, Stammdaten: „Zimmer“',
+  baujahr: 'Reiter Objekt, Stammdaten: „Baujahr“',
+  wohnflaeche: 'Reiter Objekt, Stammdaten: „Wohnfläche“',
+  wohnflaeche_qm: 'Reiter Objekt, Stammdaten: „Wohnfläche“',
+  flaeche: 'Reiter Objekt: „Grundstücksfläche“',
+  bgf_qm: 'Reiter Objekt, Block Wertermittlung: „BGF“',
+  standardstufe: 'Reiter Objekt, Block Wertermittlung: „Standardstufe“',
+  unterkellerung_pct: 'Reiter Objekt, Block Wertermittlung: Gebäudeart nach NHK (mit/ohne Keller)',
+  mod_punkte: 'Reiter Objekt, Block Wertermittlung: „Modernisierungsgrad (Anlage 2)“',
+  garagen_anzahl: 'Reiter Objekt: „Garagen“',
+  stellplaetze: 'Reiter Objekt: „Garagen“ und „Stellplätze außen“',
+  rnd: 'Reiter Objekt: Baujahr und Modernisierungsgrad (Restnutzungsdauer nach Anlage 2)',
+  brw: 'Bodenrichtwert (BORIS-Abruf oder Reiter Objekt „Bodenrichtwert“)',
+};
+function _eintragenText(feld) {
+  return VGF_EINTRAGEN[feld] || 'von DealPilot derzeit nicht erfasst';
+}
+
+/** Die Ebenen des Registers je Schluessel, feinste zuerst (je Ebene eine Liste). */
+function _ebenenListen(kennzahl, ags) {
+  const out = [];
+  const gesehen = new Set();
+  for (const k of kaskadeSchluessel(ags)) {
+    const L = finde(kennzahl, k);
+    if (!L.length || gesehen.has(L)) continue;
+    gesehen.add(L);
+    out.push({ key: k, liste: L });
+  }
+  return out;
+}
+
+/** Kommt der Zweig (oder ein Zweig fuer die Objektart) auf dieser Ebene vor -
+ *  als Wert ODER als Sperre? Nur wenn nicht, darf die naechste Ebene gelten. */
+function _zweigKommtVor(L, zweig, objektart) {
+  if (zweig) return L.some((s) => String(s.zweig || '').toLowerCase() === String(zweig).toLowerCase());
+  const t = String(objektart || '').trim();
+  if (!t) return false;
+  if (nachArt(L, t.toLowerCase()).length) return true;
+  for (const [muster, vorzug] of ZWEIG_VORZUG) {
+    if (!muster.test(t)) continue;
+    return vorzug.some((z) => nachArt(L, z).length > 0);
+  }
+  return false;
+}
+
+/* ══ v3008 · MERKMALE DES AUSSCHUSSES (Wohnlage, Ausstattung, Zimmer) ═══
+   Fuer die Modellform `merkmalsmatrix`. Je Achse in dieser Reihenfolge:
+     1  eigene Angabe des Nutzers (Feld der Achse, z. B. vgf_wohnlage) -
+        geprueft gegen die Klassen des Ausschusses, nie unscharf;
+     2  die Ableitung, die der SATZ beschreibt (`ableitung`) - nur, wo
+        das Dokument des Ausschusses die Zuordnung selbst angibt (Konstanz:
+        Lageklasse der Bodenrichtwertzone -> Wohnlage, Merkmalsblatt S. 1);
+     3  sonst fehlt das Merkmal, und es gibt keinen Wert.
+   Nie wird die DealPilot-eigene Lageeinschaetzung umgedeutet. */
+function _merkmaleVorbereiten(f, e) {
+  const herkunft = [];
+  const fehlen = [];
+  for (const g of (Array.isArray(f.geltung) ? f.geltung : [])) {
+    const v = zahlOderNull0(e[g.feld]);
+    if (v === null) { fehlen.push(g); continue; }
+    if ((g.mindestens != null && v < g.mindestens) || (g.hoechstens != null && v > g.hoechstens)) {
+      return { ausserhalb: `${g.bez || g.feld} ${String(v).replace('.', ',')}: außerhalb des Geltungsbereichs — `
+        + `die Tabelle des Gutachterausschusses gilt nur ${g.text || 'im Anwendungsbereich'}.`, merkmal: g.merkmal || g.feld };
+    }
+  }
+  for (const a of (Array.isArray(f.achsen) ? f.achsen : [])) {
+    if (a.art === 'band') {
+      const x = zahlOderNull0(e[a.feld]);
+      if (x === null) { fehlen.push(a); continue; }
+      const b = (a.baender || []).find((r) => (r.von == null || x >= r.von) && (r.bis == null || x <= r.bis));
+      if (!b) {
+        return { ausserhalb: `${a.bez || a.feld} ${x}: außerhalb des Geltungsbereichs — der Ausschuss führt nur `
+          + (a.baender || []).map((r) => r.schluessel).join(', ') + '; extrapoliert wird nicht.', merkmal: a.merkmal || a.feld };
+      }
+      continue;
+    }
+    const roh = String(e[a.feld] ?? '').trim();
+    if (roh) {
+      const k = (a.klassen || []).find((c) => String(c).toLowerCase() === roh.toLowerCase());
+      if (k === undefined) {
+        return { ausserhalb: `${a.bez || a.feld} „${roh}“ ist keine Klasse des Gutachterausschusses (`
+          + (a.klassen || []).join(', ') + ').', merkmal: a.merkmal || a.feld, grund: 'merkmal_unbekannt' };
+      }
+      e[a.feld] = k;
+      herkunft.push({ merkmal: a.merkmal || a.feld, klasse: k, art: 'eigene_angabe',
+        text: `${a.bez || a.feld}: ${k} — ${a.eigene_angabe_text || 'eigene Angabe'}` });
+      continue;
+    }
+    const ab = a.ableitung || null;
+    if (ab) {
+      const r = ab.ortsteil_regel || null;
+      const ot = r ? String(e[r.feld] ?? '').trim().toLowerCase() : '';
+      if (r && ot && (r.ortsteile || []).some((o) => String(o).toLowerCase() === ot)) {
+        e[a.feld] = r.klasse;
+        herkunft.push({ merkmal: a.merkmal || a.feld, klasse: r.klasse, art: 'abgeleitet',
+          text: `${a.bez || a.feld}: ${r.klasse} — ${r.text || 'Regel des Ausschusses'} (Ortsteil ${e[r.feld]})` });
+        continue;
+      }
+      const lk = zahlOderNull0(e[ab.feld]);
+      if (lk !== null) {
+        const b = (ab.baender || []).find((x) => (x.von == null || lk >= x.von) && (x.bis == null || lk <= x.bis));
+        if (b) {
+          e[a.feld] = b.klasse;
+          herkunft.push({ merkmal: a.merkmal || a.feld, klasse: b.klasse, art: 'abgeleitet',
+            text: `${a.bez || a.feld}: ${b.klasse} — ${ab.bez || ab.feld} ${String(lk).replace('.', ',')}`
+              + (ab.text ? ' (' + ab.text + ')' : '') });
+          continue;
+        }
+      }
+    }
+    fehlen.push(a);
+  }
+  return { herkunft, fehlen };
+}
+function zahlOderNull0(v) {
+  if (v === null || v === undefined || v === '') return null;
+  const n = Number(String(v).replace(',', '.'));
+  return Number.isFinite(n) ? n : null;
+}
+
+/* ══ v3008 · W1 · KEIN VERGLEICHSWERT MIT FEHLENDER ANPASSUNG ═══════════
+   § 26 Abs. 1 i. V. m. § 9 Abs. 1 S. 3 ImmoWertV, ImmoWertA 26.1: weicht
+   das Objekt in einem Merkmal vom Normobjekt ab, ist der Vergleichsfaktor
+   anzupassen. Bis hier sammelte `auswerten()` nicht anwendbare Korrekturen
+   als `korrekturen_offen` - und der Wert kam trotzdem heraus (gemessen am
+   Brandenburger OGA: 40 von 40 Werten ohne Standardstufe/Unterkellerung).
+
+   Je Korrektur des Satzes:
+     norm          gerechnet, oder das Modell sieht fuer diesen Fall keine
+                   Anpassung vor (Merkmal liegt in der Norm)  -> Wert bleibt
+     merkmal_fehlt das Objekt-Merkmal ist nicht erfasst        -> kein Wert
+     ausserhalb    Merkmal erfasst, aber ausserhalb der Tabelle der Anpassung
+                   (auch knapp daneben - nie stillschweigend Rand oder Norm)
+                                                                -> kein Wert
+     nicht_rechenbar  die Anpassung steht im Dokument, ihre Werte nicht
+                   (art "offen"), und keine Normangabe deckt das Objekt
+                                                                -> kein Wert */
+function _korrekturenPruefen(korr, e, offenListe) {
+  const offen = new Set((offenListe || []).map(String));
+  const leer = (v) => v === undefined || v === null || v === '';
+  const zeilen = [];
+  for (const k of (Array.isArray(korr) ? korr : [])) {
+    const name = k.bez || k.feld;
+    if (k.fest) { zeilen.push({ bez: name, feld: k.feld, status: 'norm' }); continue; }
+    const v = e[k.feld];
+    if (k.art === 'offen') {
+      if (k.norm !== undefined && !leer(v) && String(v).toLowerCase() === String(k.norm).toLowerCase()) {
+        zeilen.push({ bez: name, feld: k.feld, status: 'norm' });
+      } else {
+        zeilen.push({ bez: name, feld: k.feld, status: leer(v) && VGF_EINTRAGEN[k.feld] ? 'merkmal_fehlt' : 'nicht_rechenbar' });
+      }
+      continue;
+    }
+    if (leer(v) || (k.art === 'stufen_kategorial' && leer(e[k.kategorie_feld]))) {
+      zeilen.push({ bez: name, feld: leer(v) ? k.feld : k.kategorie_feld, status: 'merkmal_fehlt' });
+      continue;
+    }
+    if (offen.has(String(name))) { zeilen.push({ bez: name, feld: k.feld, status: 'ausserhalb', wert: v }); continue; }
+    /* Stufentabellen: ausserhalb der Stuetzstellen rechnete auswerten() mit
+       dem Randwert. Fuer den Vergleichsfaktor ist das eine Verlaengerung
+       der Tabelle - Regel 3: nicht stillschweigend. */
+    if (!k.art || k.art === 'stufen' || k.art === 'stufen_kategorial') {
+      let reihe = k.stufen || {};
+      if (k.art === 'stufen_kategorial') {
+        let kat = String(e[k.kategorie_feld] ?? '');
+        if (Array.isArray(k.kategorie_baender) && k.kategorie_baender.length) {
+          const zv = Number(e[k.kategorie_feld]);
+          const tr = k.kategorie_baender.find((b) => (b.von == null || zv >= b.von) && (b.bis == null || zv <= b.bis));
+          kat = tr ? String(tr.kategorie) : '';
+        }
+        reihe = (k.stufen || {})[kat] || {};
+      }
+      const st = Object.keys(reihe).map(Number).filter(Number.isFinite);
+      const x = Number(v);
+      if (st.length && Number.isFinite(x) && (x < Math.min(...st) || x > Math.max(...st))) {
+        zeilen.push({ bez: name, feld: k.feld, status: 'ausserhalb', wert: v,
+          spanne: [Math.min(...st), Math.max(...st)] });
+        continue;
+      }
+    }
+    zeilen.push({ bez: name, feld: k.feld, status: 'norm' });
+  }
+  return zeilen;
+}
+
 function _vergleichsfaktorKern(arg = {}) {
   const { ags, zweig, objektart } = arg;
-  const reg = finde('vergleichsfaktor', ags);
-  if (!reg.length) {
+  const ebenen = _ebenenListen('vergleichsfaktor', ags);
+  if (!ebenen.length) {
     return { verfuegbar: false, grund: 'kein_ausschuss_hinterlegt',
       hinweis: 'Für diesen Ort ist kein Vergleichsfaktor hinterlegt. '
         + 'Übertragen werden darf er nicht (§ 10 ImmoWertV).' };
   }
-  const s = findeZweig('vergleichsfaktor', ags, zweig)
+  /* v3008 · EBENEN JE ZWEIG. finde() stuft je Kennzahl ab: ein Kreissatz
+     fuer Wohnungseigentum verdeckte den Landessatz des Oberen
+     Gutachterausschusses fuer Ein-/Zweifamilienhaeuser („zweig_nicht_
+     abgeleitet", Ost-Ernte 27.10.2026). Jetzt gilt die feinste Ebene, auf
+     der der Zweig VORKOMMT - als Wert oder als Sperre. Eine Sperre der
+     unteren Ebene behaelt damit Vorrang; weitergegangen wird nur, wo der
+     Zweig dort gar nicht gefuehrt ist. */
+  const ebene = ebenen.find((x) => _zweigKommtVor(x.liste, zweig, objektart)) || ebenen[0];
+  const reg = ebene.liste;
+  const s = (zweig && findeZweig('vergleichsfaktor', ebene.key, zweig))
     || zweigWaehlen(reg, reg, objektart, arg.baujahr)
     || null;
+  const _mitSatz = (o) => { if (s) Object.defineProperty(o, '_satz', { value: s, enumerable: false }); return o; };
   if (!s) {
     return { verfuegbar: false, grund: 'zweig_nicht_abgeleitet',
       hinweis: 'Der Gutachterausschuss hat für diese Objektart keinen '
@@ -1447,31 +1655,99 @@ function _vergleichsfaktorKern(arg = {}) {
        bis hier hiess jede Sperre „hat keinen Vergleichsfaktor abgeleitet", auch wo der Ausschuss
        einen fuehrt, der nur am Ortsteil haengt oder Geld kostet (Ernte NI/Ost 27.10.2026). */
     const _warum = s.warum_kein_wert || (s.sperre && s.sperre.grund) || null;
-    return { verfuegbar: false, grund: _warum ? 'gesperrt' : 'gefuehrt_aber_nicht_abgeleitet',
+    return _mitSatz({ verfuegbar: false, grund: _warum ? 'gesperrt' : 'gefuehrt_aber_nicht_abgeleitet',
       hinweis: _warum ? String(_warum) : ('Der Ausschuss führt diese Objektart, hat für sie aber '
         + 'keinen Vergleichsfaktor abgeleitet.'),
       zugang: s.zugang || null, bestell_url: s.bestell_url || null, quelle_url: s.quelle_url || null,
       ausschuss: s.gaa_name || null, zweig: s.zweig,
-      stichtag: s.stichtag || null, berichtsjahr: s.berichtsjahr ?? null };
+      stichtag: s.stichtag || null, berichtsjahr: s.berichtsjahr ?? null });
+  }
+
+  const eingabe = eingabeBruecke({ ...arg });
+  const gemein = { ausschuss: s.gaa_name || null, zweig: s.zweig, modellform: f.form,
+    stichtag: s.stichtag || null, berichtsjahr: s.berichtsjahr ?? null, quelle_url: s.quelle_url || null };
+
+  /* v3008 · Merkmale des Ausschusses vorab - ALLE fehlenden auf einmal nennen. */
+  let merkmalHerkunft = [];
+  if (f.form === 'merkmalsmatrix') {
+    const mv = _merkmaleVorbereiten(f, eingabe);
+    if (mv.ausserhalb) {
+      return _mitSatz({ verfuegbar: false, grund: mv.grund || 'ausserhalb_des_geltungsbereichs',
+        hinweis: mv.ausserhalb + ' Ein Vergleichsfaktor wird dafür nicht gebildet (§ 10 ImmoWertV).',
+        merkmal: mv.merkmal, ...gemein });
+    }
+    if (mv.fehlen.length) {
+      const fm = mv.fehlen.map((a) => ({ merkmal: a.merkmal || a.feld, feld: a.feld, bez: a.bez || a.feld,
+        klassen: a.klassen || null, hilfe: a.hilfe || null, url: a.url || null, eintragen: _eintragenText(a.feld) }));
+      return _mitSatz({ verfuegbar: false, grund: 'merkmal_fehlt', fehlende_merkmale: fm,
+        hinweis: 'Merkmal fehlt: ' + fm.map((x) => x.bez).join(', ') + '. Der Vergleichsfaktor ('
+          + (s.gaa_name || 'Gutachterausschuss') + ') hängt davon ab; ohne die Angabe wird kein Wert gebildet. '
+          + fm.map((x) => x.bez + (x.klassen ? ' (' + x.klassen.join(' · ') + ')' : '') + ' eintragen: ' + x.eintragen
+            + (x.url ? ' — Grundlage: ' + x.url : '')).join('; ') + '.',
+        ...gemein });
+    }
+    merkmalHerkunft = mv.herkunft;
   }
 
   const rr = auswerten({ ...f, kennzahl: 'vergleichsfaktor',
-                         korrekturen: s.korrekturen || [] },
-                       eingabeBruecke({ ...arg }));
+                         korrekturen: s.korrekturen || [] }, eingabe);
   if (!rr.verfuegbar) {
-    return { verfuegbar: false, grund: rr.grund, hinweis: rr.hinweis,
-      spanne: rr.spanne || null,
-      ausschuss: s.gaa_name || null, zweig: s.zweig, modellform: f.form,
-      stichtag: s.stichtag || null, berichtsjahr: s.berichtsjahr ?? null };
+    return _mitSatz({ verfuegbar: false, grund: rr.grund, hinweis: rr.hinweis,
+      spanne: rr.spanne || null, ...gemein });
   }
 
-  /* Die Bezugsgröße wird NICHT geraten. Ohne sie gibt es den Wert je
-   * Einheit und keinen Objektwert. */
-  const bez = zahlOderNull(arg.wfl ?? arg.wohnflaeche ?? arg.bgf);
+  /* v3008 · W1 - jede Korrektur des Satzes muss angewandt oder in der Norm sein. */
+  const kz = _korrekturenPruefen(s.korrekturen, eingabe, rr.korrekturen_offen);
+  const blockiert = kz.filter((z) => z.status !== 'norm');
+  if (blockiert.length) {
+    const txt = (z) => z.status === 'merkmal_fehlt'
+      ? `Merkmal fehlt: ${z.bez} (eintragen: ${_eintragenText(z.feld)})`
+      : z.status === 'ausserhalb'
+        ? `${z.bez}: Angabe ${z.wert} liegt außerhalb der Tabelle des Ausschusses`
+          + (z.spanne ? ` (${z.spanne[0]} bis ${z.spanne[1]})` : '') + ' — nicht auf Rand oder Norm gesetzt'
+        : `${z.bez}: Anpassung im Dokument genannt, ihre Werte liegen nicht rechenbar vor`;
+    return _mitSatz({ verfuegbar: false,
+      grund: blockiert.some((z) => z.status === 'merkmal_fehlt') ? 'merkmal_fehlt' : 'korrektur_nicht_anwendbar',
+      hinweis: 'Für dieses Gebiet führt der Gutachterausschuss (' + (s.gaa_name || '–') + ') einen Vergleichsfaktor ('
+        + 'Tabellenwert ' + rr.tabellenwert + ' €/m²), der an das Objekt anzupassen ist (§ 26 Abs. 1, § 9 Abs. 1 '
+        + 'ImmoWertV). Offen: ' + blockiert.map(txt).join('; ') + '. Ohne diese Anpassung wird kein Vergleichswert gebildet.',
+      korrekturen_offen: blockiert,
+      rechenweg: 'Tabellenwert ' + rr.tabellenwert + ' €/m² · offen: ' + blockiert.map((z) => z.bez + ' (' + (z.status === 'merkmal_fehlt' ? 'Merkmal fehlt' : z.status === 'ausserhalb' ? 'außerhalb der Tabelle' : 'nicht rechenbar') + ')').join(' · ') + ' → kein Wert',
+      faktor_tabelle: rr.tabellenwert, ...gemein });
+  }
+
+  /* v3008 · Ost-Befund 1 · DIE BEZUGSGROESSE IST EINE ART, KEINE ZAHL.
+     Hier stand `bezugsgroesse: zahlOderNull(arg.wfl ?? arg.wohnflaeche ?? arg.bgf)`
+     - die ZAHL der Wohnflaeche. Der Orchestrator sucht darin „bgf" und
+     fand es nie: ein BGF-Faktor waere mit der Wohnflaeche multipliziert
+     worden (rund 45 % zu wenig). Die Art steht im Satz (liefert_einheit). */
+  const _einheitText = String(f.liefert_einheit || f.einheit || s.einheit || '');
+  const bezugsart = /bgf|brutto/i.test(_einheitText) ? 'bgf' : 'wohnflaeche';
+  const bez = bezugsart === 'bgf'
+    ? zahlOderNull(arg.bgf_qm ?? arg.bgf)
+    : zahlOderNull(arg.wfl ?? arg.wohnflaeche ?? arg.wohnflaeche_qm);
   const objektwert = (rr.liefert === 'wert_eur' && bez)
     ? Math.round(rr.wert * bez) : null;
 
-  return {
+  /* v3008 · Rechenweg der Merkmalsmatrix: woher jede Klasse kommt. */
+  let rechenweg = rr.rechenweg || null;
+  const hinweise = [];
+  if (f.form === 'merkmalsmatrix') {
+    const zelle = rr.zelle || [];
+    const pfad = zelle.map((z) => z.klasse).join('|');
+    const info = (f.zellen_info || {})[pfad] || null;
+    const herk = (m) => (merkmalHerkunft.find((h) => h.merkmal === m) || {}).text;
+    rechenweg = zelle.map((z) => herk(z.merkmal) || `${z.bez}: ${z.eingabe}${String(z.eingabe) !== z.klasse ? ' → ' + z.klasse : ''}`).join(' · ')
+      + ` → Vergleichsfaktor ${rr.wert} €/m² ${bezugsart === 'bgf' ? 'BGF' : 'Wohnfläche'}`
+      + (f.beschluss_text ? ` (${f.beschluss_text})` : '');
+    if (info && info.text) hinweise.push(info.text);
+  } else if (kz.length) {
+    const norm = kz.filter((z) => z.status === 'norm' && !(rr.korrekturen || []).some((k) => k.merkmal === z.bez));
+    if (norm.length) hinweise.push('Ohne Anpassung, weil das Merkmal in der Norm des Ausschusses liegt: '
+      + norm.map((z) => z.bez).join(', ') + '.');
+  }
+
+  return _mitSatz({
     verfuegbar: true,
     wert: rr.wert,
     einheit: rr.einheit || null,
@@ -1479,14 +1755,18 @@ function _vergleichsfaktorKern(arg = {}) {
     objektwert,
     objektwert_hinweis: objektwert === null
       ? 'Der Objektwert entsteht erst durch Multiplikation mit der '
-        + 'Bezugsgröße (Wohnfläche). Sie ist nicht erfasst; geraten wird '
+        + 'Bezugsgröße (' + (bezugsart === 'bgf' ? 'Brutto-Grundfläche' : 'Wohnfläche') + '). Sie ist nicht erfasst; geraten wird '
         + 'sie nicht.'
       : null,
-    bezugsgroesse: bez,
+    bezugsgroesse: bezugsart,
+    bezugsflaeche_qm: bez,
     modellform: f.form,
-    rechenweg: rr.rechenweg || null,
+    rechenweg,
+    merkmale: merkmalHerkunft,
+    hinweise,
     korrekturen: rr.korrekturen || [],
-    korrekturen_offen: rr.korrekturen_offen || [],
+    korrekturen_offen: [],
+    korrekturen_geprueft: kz,
     stufe: s.stufe,
     stufe_grund: s.stufe_grund || null,
     ausschuss: s.gaa_name,
@@ -1499,7 +1779,7 @@ function _vergleichsfaktorKern(arg = {}) {
     quellenvermerk: s.quellenvermerk || null,
     lizenz: s.lizenz || null,
     fundstelle: b.fundstelle || s.fundstelle || null,
-  };
+  });
 }
 
 /** v1094 · Bodenpreisindexreihe. INDIKATIV — eine Indexreihe ist kein

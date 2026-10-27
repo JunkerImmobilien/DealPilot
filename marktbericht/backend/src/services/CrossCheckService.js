@@ -2861,6 +2861,15 @@ export const CrossCheckService = {
              (_vwQ.quelle && _vwQ.quelle.umrechnung_url) || null, (_vwQ.quelle && _vwQ.quelle.lizenz) || null,
              (_vwQ.quelle && _vwQ.quelle.jahrgang) || null);
     }
+    /* v3008 · Der amtliche Vergleichsfaktor aus dem Register war im Nachweis nicht vertreten, obwohl
+       er den Vergleichswert traegt; dazu die Daten, aus denen seine Merkmale stammen (Hamburg:
+       normierter Bodenrichtwert des LGV, dl-de/by-2-0). Nur wenn er den Vergleichswert wirklich bildet. */
+    const _rvQ = p.register_vergleichsfaktor;
+    if (_rvQ && _rvQ.verfuegbar && out.comparison && out.comparison.basis_art === 'vergleichsfaktor_register') {
+      _merke(_rvQ.quellenvermerk || _rvQ.ausschuss, 'Vergleichsfaktor', _rvQ.quelle_url || null, _rvQ.lizenz || null,
+             _rvQ.stichtag ? String(_rvQ.stichtag).slice(0, 4) : null);
+      for (const z of (_rvQ.quellen_zusatz || [])) _merke(z.vermerk, z.kennzahl || 'Vergleichsfaktor (Merkmal)', z.url || null, z.lizenz || null, null);
+    }
     out.quellen_nachweis = Array.from(_nachweis.values());
 
     /* v2382 · `assumptions` nennt, womit GERECHNET wurde. Bis hier standen die Vorgaben des

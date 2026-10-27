@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-27T19:37:15.492Z",
+ "erzeugt_am": "2026-10-27T19:41:30.645Z",
  "quellen": {
   "voice-import": "9618e5358052c4e6",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "1345346ccb058945",
-  "index-html": "076eb8a70a7025b3",
+  "storage": "77fa6114ec24c54e",
+  "index-html": "86b6c776791c00f7",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -676,6 +676,8 @@
    "wgfz_objekt",
    "stellplatz_miete_monat",
    "sonstige_jahr",
+   "vgf_wohnlage",
+   "vgf_ausstattung",
    "nhk_haus",
    "nhk_geschosse",
    "nhk_dach",
@@ -5109,6 +5111,8 @@
     "sachwertfaktor",
     "uk_flaeche",
     "wgfz_objekt",
+    "vgf_wohnlage",
+    "vgf_ausstattung",
     "nhk_haus",
     "nhk_geschosse",
     "nhk_dach",
@@ -5196,6 +5200,6 @@
  },
  "inhalt": {
   "hilfe": "626759a7ed955b4a",
-  "bewertung": "eb13f847789ae4c0"
+  "bewertung": "72a78b852e40b048"
  }
 }

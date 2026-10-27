@@ -41,6 +41,7 @@ import { MarketInsightsService } from './MarketInsightsService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { IrwConnector, ebeneFuer, IRW_EBENEN } from '../connectors/IrwConnector.js';   /* v2660: ebeneFuer, IRW_EBENEN */
 import { marktmiete as amtlicheMiete, klasseAusPunkten } from '../lib/mietmodell_nrw.js';   /* v1059-WMIET-1; v2988 */
+import { hhNormBrw } from '../lib/hh_normbrw.js';   /* v3008 · normierte BRW Hamburg (Lagefaktor VGF) */
 import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';   /* v1060-WVF-1 */   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
@@ -216,6 +217,14 @@ export const ReportOrchestrator = {
       lzs_pct: input.lzs_pct ? Number(input.lzs_pct) : null,
       /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
       uk_flaeche: Number(input.uk_flaeche) > 0 ? Number(input.uk_flaeche) : null,
+      /* v3008 · eigene Angaben zu Klassen des Gutachterausschusses (Vergleichsfaktor-Merkmalsmatrix):
+         Wohnlage nach der Lagekarte, Ausstattungsklasse nach dem Merkmalskatalog. Wortlaut wie im Dokument;
+         geprueft wird gegen die Klassen des Satzes in der Leseroutine, nicht hier. */
+      vgf_wohnlage: String(input.vgf_wohnlage || '').trim() || null,
+      /* v3008 · Vermietungsstand im Wortlaut des Formulars (Vollvermietet / Teilweise leer / Leer) -
+         fuer die Korrektur "Vermietung" der Vergleichsfaktoren; vacancy allein unterscheidet nicht. */
+      vermietungsstand: input.vermietungsstand ? String(input.vermietungsstand).trim() : null,
+      vgf_ausstattung: String(input.vgf_ausstattung || '').trim() || null,
       /* v2367 · eigener Abschlag auf Angebotspreise aus dem Investmentprofil */
       angebot_abschlag_pct: (input.angebot_abschlag_pct != null && input.angebot_abschlag_pct !== ''
         && isFinite(Number(String(input.angebot_abschlag_pct).replace(',', '.'))))
@@ -870,6 +879,16 @@ export const ReportOrchestrator = {
            > sie als `korrekturen_offen`, das die Leseroutine schon
            > zurueckgibt. */
         const _bgfVf = Number(ref.bgf) > 0 ? Number(ref.bgf) : null;
+        /* v3008 · Hamburg: der Lagefaktor der Vergleichsfaktoren liest den NORMIERTEN Bodenrichtwert der
+           Zone (EFH 2020, MFH 2018) aus dem WFS des LGV. Ohne Zonenwert rechnet der Satz nicht. */
+        let _hhNorm = null;
+        if (/^02/.test(String(_agsWert)) && Number.isFinite(Number(lat)) && Number.isFinite(Number(lon))) {
+          try {
+            _hhNorm = await hhNormBrw(lat, lon);
+            if (_hhNorm) { ref._normbrw20 = _hhNorm.normbrw20; ref._normbrw18 = _hhNorm.normbrw18; }
+            step('hh-normbrw: EFH 2020 ' + (_hhNorm && _hhNorm.normbrw20) + ' / MFH 2018 ' + (_hhNorm && _hhNorm.normbrw18));
+          } catch (e) { step('hh-normbrw: fehler ' + e.message); }
+        }
         const _r = regVergleichsfaktor({
           ags: String(_agsWert), objektart: ref.property_type,
           brw: _brwVf, brw_eur_qm: _brwVf, bodenwert: _brwVf,
@@ -899,6 +918,48 @@ export const ReportOrchestrator = {
              dieselbe RND wie in allen Verfahren; Alter (Hamburg) = Wertermittlungsjahr - Baujahr */
           baujahr_modifiziert: _rndVorab.rnd != null ? Math.round(new Date().getFullYear() - (80 - Number(_rndVorab.rnd))) : null,
           alter_jahre: Number(ref.build_year) > 0 ? new Date().getFullYear() - Number(ref.build_year) : null,
+          /* v3008 · Merkmale des Ausschusses (Merkmalsmatrix, Konstanz): Zimmerzahl, eigene Angaben
+             zu Wohnlage und Ausstattungsklasse, dazu die Lageklasse der Bodenrichtwertzone, wie
+             BORIS-BW sie im Feld BEM fuehrt („Lageklasse 2,8") - der Satz entscheidet, ob er sie liest. */
+          zimmer: Number(ref.rooms) > 0 ? Number(ref.rooms) : null,
+          vgf_wohnlage: ref.vgf_wohnlage || null,
+          vgf_ausstattung: ref.vgf_ausstattung || null,
+          lageklasse_brw: (function () {
+            const _bp = (landValue && landValue.properties_raw) || {};
+            const m = /Lageklasse\s*(\d+(?:[.,]\d+)?)/i.exec(String(_bp.BEM || _bp.bem || ''));
+            return m ? Number(m[1].replace(',', '.')) : null;
+          })(),
+          ortsteil_brw: (function () {
+            const _bp = (landValue && landValue.properties_raw) || {};
+            return String(_bp.ORTST || _bp.ortst || '').trim() || null;
+          })(),
+          /* v3008 · W1 · Merkmale, die DealPilot fuehrt und die Korrekturen der Ausschuesse lesen.
+             Nur wo die Zuordnung eindeutig ist: Stellplaetze = Garagen + Stellplaetze aussen
+             (OGA BB: „Garagen, Carports und Stellplaetze"), Keller aus der NHK-Angabe (kg_ = mit,
+             ohne_kg = ohne, sonst keine Zuordnung), Erbbaurecht aus dem Haekchen,
+             Miteigentumsanteil in Zehntausendsteln, Verhaeltnis BGF/Wohnflaeche aus beiden Flaechen. */
+          stellplaetze: (ref.garages == null && ref.outdoor_parking == null) ? null
+            : (Number(ref.garages) || 0) + (Number(ref.outdoor_parking) || 0),
+          keller: (function () {
+            const k = String(ref.keller_dg || '');
+            if (/^kg_/.test(k)) return 'mit';
+            if (/^ohne_kg/.test(k)) return 'ohne';
+            return null;
+          })(),
+          /* Erbbaurecht NUR, wenn das Haekchen gesetzt ist - ein leeres Haekchen reist nicht mit
+             (dealpilot-mb.js) und ist damit keine Aussage "kein Erbbaurecht". Dann bleibt es offen. */
+          erbbaurecht: ref.leasehold ? 'ja' : null,
+          /* Wohnungen im Gebaeude: Feld "Wohneinheiten im Gebaeude" (einheiten). Bei der ETW ist es
+             ausgeblendet (objektart-felder.js) - dort kein Wert, das Merkmal bleibt offen. */
+          wohnungen_im_gebaeude: (/etw|wohnung/i.test(String(ref.property_type || '')) || !(Number(ref.units) > 0)) ? null : Number(ref.units),
+          /* Vermietung aus dem Vermietungsstand: Vollvermietet = ja, Leer = nein; Teilweise leer ist keine
+             der beiden Klassen der Ausschuesse - offen. */
+          vermietet: /^vollvermietet$/i.test(String(ref.vermietungsstand || '').trim()) ? 'ja'
+            : (/^leer$/i.test(String(ref.vermietungsstand || '').trim()) ? 'nein' : null),
+          miteigentumsanteil_zehntausendstel: Number(ref.mea_pct) > 0 && Number(ref.mea_pct) <= 100 ? Math.round(Number(ref.mea_pct) * 100) : null,
+          bgf_wfl_verhaeltnis: (_bgfVf && Number(ref.living_area) > 0) ? Math.round(_bgfVf / Number(ref.living_area) * 100) / 100 : null,
+          normbrw20: ref._normbrw20 != null ? ref._normbrw20 : null,
+          normbrw18: ref._normbrw18 != null ? ref._normbrw18 : null,
         });
         if (_r && _r.verfuegbar && _r.wert != null) {
           if (String(_r.verwendung || '') === 'intern') {
@@ -946,7 +1007,13 @@ export const ReportOrchestrator = {
               rechenweg: _r.rechenweg || null, ausschuss: _r.ausschuss || null,
               quelle_url: _r.quelle_url || null, stufe: _r.stufe || null,
               quellenvermerk: _r.quellenvermerk || null,
-              hinweis: 'Amtlicher Vergleichsfaktor nach § 20 ImmoWertV, abgeleitet aus '
+              /* v3008 · Herkunft der Merkmale (Wohnlage, Ausstattung) und gepruefte Korrekturen */
+              merkmale: _r.merkmale || [], korrekturen_geprueft: _r.korrekturen_geprueft || [],
+              quellen_zusatz: (_hhNorm && /normbrw/.test(JSON.stringify(_r.korrekturen || []))) ? [_hhNorm.quelle] : [],
+              lizenz: _r.lizenz || null,
+              stichtag: _r.stichtag || null, bezugsgroesse: _r.bezugsgroesse || null,
+              hinweis: ((_r.hinweise && _r.hinweise.length) ? _r.hinweise.join(' ') + ' ' : '')
+                + 'Amtlicher Vergleichsfaktor nach § 20 ImmoWertV, abgeleitet aus '
                 + 'der Kaufpreissammlung des Gutachterausschusses. Anders als '
                 + 'Angebotspreise beruht er auf beurkundeten Kaufpreisen (§ 25 Abs. 1 '
                 + 'ImmoWertV).' };
@@ -957,7 +1024,10 @@ export const ReportOrchestrator = {
           step('vergleichsfaktor-register: keiner (' + _r.grund + ')');
           /* v2999 · der Grund und der Weg zum Ausschuss reisen mit (Sperre, fehlende Angabe) */
           if (_r.grund !== 'kein_satz' && _r.hinweis) _regVf = { verfuegbar: false, grund: _r.grund, hinweis: _r.hinweis,
-            zugang: _r.zugang || null, quelle_url: _r.quelle_url || _r.bestell_url || null, ausschuss: _r.ausschuss || null };
+            zugang: _r.zugang || null, quelle_url: _r.quelle_url || _r.bestell_url || null, ausschuss: _r.ausschuss || null,
+            /* v3008 · W1/Konstanz: was fehlt und wo man es eintraegt, mit Rechenweg-Zeile bis in den Bericht */
+            fehlende_merkmale: _r.fehlende_merkmale || null, korrekturen_offen: (_r.korrekturen_offen && _r.korrekturen_offen.length) ? _r.korrekturen_offen : null,
+            rechenweg: _r.rechenweg || null, faktor_tabelle: _r.faktor_tabelle ?? null, stichtag: _r.stichtag || null };
         }
       }
     } catch (e) {
