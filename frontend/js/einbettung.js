@@ -50,7 +50,9 @@
     'html.dp-einbettung body>*:not(.auth-overlay-v39){display:none!important}',
     'html.dp-einbettung .auth-overlay-v39{position:static!important;inset:auto!important;background:transparent!important;padding:4px 0 8px!important;justify-content:center!important;align-items:flex-start!important;min-height:0!important;overflow:visible!important;z-index:auto!important}',
     'html.dp-einbettung .auth-bg-v39,html.dp-einbettung #dp-register-close{display:none!important}',
-    'html.dp-einbettung .auth-card-v39{margin:0 auto!important;max-width:440px!important;width:100%!important}'
+    'html.dp-einbettung .auth-card-v39{margin:0 auto!important;max-width:440px!important;width:100%!important}',
+    /* die App legt bei ?register=1 die Registrierung UEBER die Anmeldekarte - eingebettet gilt nur die oberste */
+    'html.dp-einbettung body:has(#dp-register-modal) #auth-modal{display:none!important}'
   ].join('');
   var st = document.createElement('style'); st.id = 'dp-einbettung-stil'; st.textContent = css;
   (document.head || document.documentElement).appendChild(st);
@@ -58,7 +60,7 @@
   /* Höhe: sichtbare Karte messen, nur bei Änderung melden */
   var letzteH = 0;
   function hoehe() {
-    var o = [].filter.call(document.querySelectorAll('.auth-overlay-v39'), function (x) { return x.offsetParent !== null || x.getClientRects().length; });
+    var o = [].filter.call(document.querySelectorAll('.auth-overlay-v39'), function (x) { return getComputedStyle(x).display !== 'none' && x.getClientRects().length; });
     var el = o.length ? o[o.length - 1] : null;
     var h = el ? Math.ceil(el.getBoundingClientRect().height) + 8 : 0;
     if (h && Math.abs(h - letzteH) > 2) { letzteH = h; senden({ typ: 'hoehe', h: h }); }
