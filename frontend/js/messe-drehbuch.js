@@ -6345,8 +6345,11 @@
   function kmTafelText(t) { return t ? [t.was, t.warum, t.folge].join(' ') : ''; }
   /* Standzeit: Lesezeit des Bandes, der Tafel (4 s + 1 s je 15 Zeichen) oder Sprechdauer (13 Zeichen/s + 1,5 s) - das Längste */
   function kmDauer(titel, text, sprich, tafel) {
-    var l = lies(titel, text), tf = tafel ? Math.round((4000 + 1000 * kmTafelText(tafel).length / 15) / TEMPO) : 0;
-    var sp = sprich ? Math.round((1500 + 1000 * String(sprich).length / 13) / TEMPO) : 0;
+    /* v3015b · gemessen am Prüflauf (104 Zeilen): mit der Sprechdauer als Untergrenze wären es ~45 min geworden.
+       Das stumme Video steht nach der Lesezeit: Band (4 s + 1 s je 15 Zeichen) oder Tafel (3 s + 1 s je 20 Zeichen,
+       sie steht neben dem Band und wird mitgelesen). ?sprechtempo (später, mit Sprecher) nimmt die Sprechdauer dazu. */
+    var l = lies(titel, text), tf = tafel ? Math.round((3000 + 1000 * kmTafelText(tafel).length / 20) / TEMPO) : 0;
+    var sp = sprich && kmParam('sprechtempo') != null ? Math.round((1500 + 1000 * String(sprich).length / 13) / TEMPO) : 0;
     return Math.round(Math.max(l, tf, sp) * kmF());
   }
   function kmMerke(sprich, tafel) { try { var z = window.DPM_ZEILEN; if (z && z.length) { z[z.length - 1].sprich = sprich || null; if (tafel) z[z.length - 1].tafel = tafel; } } catch (e) {} }
@@ -6364,7 +6367,7 @@
     if (tafel !== undefined) kmTafel(tafel);
     s.zeile(titel, text); kmMerke(sprich, tafel);
     await warte(kmDauer(titel, text, sprich, tafel));
-    await kmPause(nach == null ? 5000 : nach);
+    await kmPause(nach == null ? 4500 : nach);
   }
   /* eine Eingabe: Ziel zeigen, Band und Tafel, 2,5 s Pause, tippen, Standzeit (mindestens Sprech-/Lesedauer), 5 s Ruhe */
   async function kmEingabe(s, ziel, titel, text, tafel, sprich, aktion, nach) {
@@ -6375,7 +6378,7 @@
     await kmPause(2500);
     if (aktion) await aktion();
     var rest = soll - (Date.now() - t0); if (rest > 300) await warte(rest >= 600 * TEMPO ? rest / TEMPO : rest);
-    await kmPause(nach == null ? 5000 : nach);
+    await kmPause(nach == null ? 4500 : nach);
   }
   async function kmTipp(id, v) {
     await kmPause(2200);   /* vor jedem Feld */
@@ -6893,8 +6896,8 @@
           await r16Hin(sb(), true);
           await zeigeGruppe(sb, function () { return r16Mb('#resultBody .kpis') || sb(); }, 8);
           var sc = r6Text(sb()), num = /(\d+)\s*\/\s*100/.exec(sc);
-          await kmSag(s, 'Oben das Ergebnis', 'Deal-Score <b>' + (num ? num[1] : '–') + '</b>, Marktwert, Bruttorendite ' + (r6Text(r16Mb('#kYield')) || '–') + ', Abstand zum Marktwert.',
-            'Darunter die Übersicht: der Deal-Score des Berichts, ' + (num ? num[1] : '') + ' von hundert, der Marktwert, die Bruttorendite und der Abstand des Kaufpreises zum Marktwert.', null,
+          await kmSag(s, 'Oben das Ergebnis', 'Marktwert, Bruttorendite <b>' + (r6Text(r16Mb('#kYield')) || '–') + '</b>, Abstand des Kaufpreises zum Marktwert — und eine Kurzwertung des Berichts.',
+            'Darunter die Übersicht: Marktwert, Bruttorendite ' + (r6Text(r16Mb('#kYield')) || '').replace(',', ' Komma ').replace('%', 'Prozent') + ' und der Abstand des Kaufpreises zum Marktwert. Der Bericht trägt dazu eine eigene Kurzwertung aus seinen Marktdaten. Den Deal Score und den Investor Deal Score, die alle deine Eingaben einbeziehen — auch Finanzierung und Steuer —, sehen wir am Ende im Reiter Bewertung.', null,
             { was: 'Nichts — alles aus den Eingaben gerechnet.', warum: 'Erst der Überblick, dann die Herleitung.', folge: 'Jede Zahl hat darunter ihren Rechenweg.' });
         }
         var ag = function () { return r16Mb('#assessGrid'); };
@@ -6958,8 +6961,8 @@
           var auf = q('#mba-objekt [data-mba-auf]'); if (auf && !q('#mba-objekt [data-mba-ueb]')) { auf.click(); await kmPause(700); }
           await zeige(ab, 8);
           var hz = [].map.call(document.querySelectorAll('#mba-objekt li, #mba-objekt .mba-satz'), function (x) { return r6Text(x); }).filter(Boolean);
-          _km.hinweise = hz;
-          await kmSag(s, 'Abgleich mit dem Marktbericht', r6Text(q('#mba-objekt [data-mba-auf]') || ab()).slice(0, 90) + (hz.length ? ' — z. B. ' + hz[0].slice(0, 110) + (hz[0].length > 110 ? ' …' : '') : '') + '.',
+          _km.hinweise = hz; DPM_KM.hinweise = hz;
+          await kmSag(s, 'Abgleich mit dem Marktbericht', r6Text(q('#mba-objekt [data-mba-auf]') || ab()).replace(/[▾▸]/g, '').trim().slice(0, 90) + (hz.length ? ' — z. B. ' + hz[0].slice(0, 110) + (hz[0].length > 110 ? ' …' : '') : '') + '.',
             'Zurück im Objekt wartet ein kompakter Abgleich mit dem Marktbericht. Er zeigt nur, was eine Folge hat: geänderte Eingaben seit dem Bericht, eine eigene Lage-Einschätzung, die deutlich von der Messung abweicht, einen anderen Bodenrichtwert oder einen Verkehrswert, der weit weg liegt. ' + (hz.length ? 'Hier meldet er: ' + hz[0] : ''), null,
             { was: 'Nichts — der Abgleich meldet sich selbst.', warum: 'Er zeigt nur Abweichungen, die eine Folge haben.', folge: 'Ein Klick übernimmt die Messung ins Objekt.' });
           var ueb = function () { return q('#mba-objekt [data-mba-ueb="mikrolage"]') || q('#mba-objekt [data-mba-ueb]'); };
