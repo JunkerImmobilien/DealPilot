@@ -779,13 +779,26 @@
     var A = { n: arr.length, mit: [], ohne: [], nZiel: 0, nMh: 0,
       mieteB: 0, mieteM: 0, mieteZ: 0, kosten: 0, kostenM: 0, kpMit: 0, mieteObjMit: 0,
       ewN: 0, ewB: 0, ewZ: 0, ewKosten: 0, zuw: 0, kpEw: 0, mpiN: 0, mpiB: 0, kpMpi: 0,
-      ohneEw: [], hinweise: [], staende: [] };
+      ohneEw: [], hinweise: [], staende: [], unv: [] };
     if (!W || typeof W.zielbildFuer !== 'function') return null;
     arr.forEach(function(o){
       var z = null; try { z = W.zielbildFuer(o); } catch (e) { z = null; }
       var g = null; try { g = W.zielbildGrund ? W.zielbildGrund(o) : null; } catch (e) { g = null; }
       var basis = { name: _objName(o), key: o._key, kp: _kpEuro(o) };
-      if (!z) { basis.grund = g ? g.text : 'Keine Angaben.'; basis.code = g ? g.code : null; A.ohne.push(basis); return; }
+      /* v2987 · Marcel 27.10.2026: „Objekte ohne Zielbild - kann das Zielbild dann die normale Entwicklung
+         aus dem Objekt sein, also unverändert? Das muss einfach zu verstehen sein." Hat das Objekt eine Miete,
+         zaehlt es jetzt mit: Bestand = Mieterhoehung = Zielbild, keine Massnahmen, kein Wertzuwachs. Ohne
+         Miete bleibt es bei „nicht enthalten" mit Grund. */
+      if (!z) {
+        var _mJ = _mieteJOf(o);
+        if (_mJ > 0) {
+          A.mieteB += _mJ; A.mieteM += _mJ; A.mieteZ += _mJ; A.kpMit += basis.kp; A.mieteObjMit += _mJ;
+          var eU = { name: basis.name, key: o._key, kp: basis.kp, top: 'bestand', mB: _mJ, mM: _mJ, mZ: _mJ, kosten: 0,
+            ewB: null, ewZ: null, zuw: null, unveraendert: true, grund: 'Kein Zielbild eingetragen: gerechnet wie heute, Miete unverändert, keine Maßnahmen.' };
+          A.unv.push(eU); A.mit.push(eU); return;
+        }
+        basis.grund = g ? g.text : 'Keine Angaben.'; basis.code = g ? g.code : null; A.ohne.push(basis); return;
+      }
       var S = z.stufen, B = S.bestand, M = S.mieterhoehung || B, T = S[z.top];
       if (S.zielbild) A.nZiel++; else A.nMh++;
       A.mieteB += B.miete_jahr || 0; A.mieteM += M.miete_jahr || 0; A.mieteZ += T.miete_jahr || 0;
@@ -871,8 +884,9 @@
     var bmyB = A.kpMit > 0 ? A.mieteB / A.kpMit * 100 : null, bmyZ = (A.kpMit + A.kosten) > 0 ? A.mieteZ / (A.kpMit + A.kosten) * 100 : null;
     /* Auswertung: fest formulierte Sätze, nur aus den Summen oben */
     var t = [];
-    t.push('Für ' + nMit + ' von ' + A.n + ' Objekten liegen Angaben zu Mieterhöhung oder Zielbild vor (' + A.nZiel + ' mit Zielbild'
+    t.push('Für ' + (nMit - A.unv.length) + ' von ' + A.n + ' Objekten liegen Angaben zu Mieterhöhung oder Zielbild vor (' + A.nZiel + ' mit Zielbild'
       + (A.nMh ? ', ' + A.nMh + ' nur mit Mieterhöhung' : '') + ').'
+      + (A.unv.length ? ' ' + A.unv.length + ' weitere zählen unverändert mit ihrer heutigen Miete mit (kein Zielbild eingetragen).' : '')
       + (A.ohne.length ? ' Nicht enthalten: ' + A.ohne.map(function(x){ return x.name; }).join(', ') + ' – die Gründe stehen oben.' : ''));
     t.push('Über diese Objekte steigt die Kaltmiete von ' + E(A.mieteB) + ' auf ' + E(A.mieteZ) + ' im Jahr (' + VZ(mehrZ) + ', ' + P(A.mieteB?mehrZ/A.mieteB*100:null) + ')'
       + (mehrZ > 0 ? '; davon ' + E(mehrM) + ' ohne Mieterwechsel, ' + E(A.mieteZ - A.mieteM) + ' nach Umbau oder Neuvermietung.' : '.'));
@@ -905,12 +919,17 @@
     var nMit = A.mit.length;
     var kopfZahl = '<b>' + A.nZiel + ' von ' + A.n + '</b> mit Zielbild'
       + (A.nMh ? ' · ' + A.nMh + ' nur mit Mieterhöhung' : '')
+      + (A.unv.length ? ' · ' + A.unv.length + ' unverändert' : '')
       + (A.ohne.length ? ' · ' + A.ohne.length + ' ohne Angaben' : '');
     function knopf(key, txt){ return key ? '<button type="button" class="zb-btn" onclick="DealPilotDashboard.zumZielbild(\''+esc(key)+'\')">'+(txt||'Im Objekt öffnen')+' ›</button>' : ''; }
     var gruende = A.ohne.concat(A.ohneEw.filter(function(e){ return A.ohne.indexOf(e) < 0; })).concat(A.hinweise);
-    var gruendeHtml = gruende.length ? '<div class="zb-gr"><div class="zb-gr-t">Nicht oder nur teilweise enthalten · mit Grund</div>'
-      + gruende.map(function(x){ return '<div class="zb-gr-row"><span class="zb-gr-n">'+esc(x.name)+'</span><span class="zb-gr-g">'+esc(x.grund||'')+'</span>'+knopf(x.key)+'</div>'; }).join('')
+    gruende = gruende.filter(function(x){ return !x.unveraendert; });
+    var unvHtml = A.unv.length ? '<div class="zb-gr"><div class="zb-gr-t">Ohne Zielbild · gerechnet wie heute (unverändert)</div>'
+      + A.unv.map(function(x){ return '<div class="zb-gr-row"><span class="zb-gr-n">'+esc(x.name)+'</span><span class="zb-gr-g">Miete '+_fE(x.mB)+' im Jahr bleibt, keine Maßnahmen. Zielbild anlegen, dann rechnet das Objekt mit seinem Potenzial.</span>'+knopf(x.key, 'Zielbild anlegen')+'</div>'; }).join('')
       + '</div>' : '';
+    var gruendeHtml = unvHtml + (gruende.length ? '<div class="zb-gr"><div class="zb-gr-t">Nicht oder nur teilweise enthalten · mit Grund</div>'
+      + gruende.map(function(x){ return '<div class="zb-gr-row"><span class="zb-gr-n">'+esc(x.name)+'</span><span class="zb-gr-g">'+esc(x.grund||'')+'</span>'+knopf(x.key)+'</div>'; }).join('')
+      + '</div>' : '');
     var neuHtml = '<div class="zb-neu"><b>Neu rechnen:</b> Der Vergleich liest die Berechnungen, die am Objekt gespeichert sind'
       + (A.staende.length ? ' (Stand ' + (A.staende[0] === A.staende[A.staende.length-1] ? dat(A.staende[0]) : dat(A.staende[0]) + ' bis ' + dat(A.staende[A.staende.length-1])) + ')' : '')
       + '. <b>„neu rechnen ↻“</b> an jedem Objekt öffnet es, rechnet die Ertragswerte je Stufe <b>kostenlos</b> neu (kein Kontingent) und speichert; danach das Cockpit wieder öffnen. Dasselbe geschieht im Objekt unter <i>Bewertung › Wert &amp; Zielbild</i>. Kostenpflichtig (ein Kontingent) ist nur ein neuer Marktbericht.</div>';
@@ -951,12 +970,12 @@
       var pz = e.mB ? ((e.mZ - e.mB) / e.mB * 100) : null;
       var w = pz != null ? Math.max(pz, 0) / maxP * 100 : 0;
       return '<div class="zb-o">'
-        + '<div class="zb-o-n" title="'+esc(e.name)+'">'+esc(e.name)+'<small>'+(e.top==='zielbild'?'Zielbild':'nur Mieterhöhung')+(e.stand?' · gerechnet am '+dat(e.stand):'')+'</small></div>'
+        + '<div class="zb-o-n" title="'+esc(e.name)+'">'+esc(e.name)+'<small>'+(e.unveraendert?'unverändert, kein Zielbild':(e.top==='zielbild'?'Zielbild':'nur Mieterhöhung'))+(e.stand?' · gerechnet am '+dat(e.stand):'')+'</small></div>'
         + '<div class="zb-o-g"><span class="zb-o-bar"><span style="width:'+w.toFixed(2)+'%"></span></span>'
         +   '<span class="zb-o-m">'+EK(e.mB)+' → '+EK(e.mZ)+' <b>'+P(pz)+'</b></span>'
         +   (e.ewB != null && e.ewZ === e.ewB && e.mZ > e.mB ? '<small class="zb-o-hin">Mehrmiete liegt über der marktüblichen Miete – im Ertragswert nicht angesetzt</small>' : '') + '</div>'
         + '<div class="zb-o-w"><span class="zb-o-wl">Wertzuwachs n. K.</span><span class="'+(e.zuw==null?'':(e.zuw>=0?'zb-pos':'zb-neg'))+'">'
-        +   (e.zuw==null ? (e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet') : VZ(e.zuw)) + '</span>'
+        +   (e.zuw==null ? (e.unveraendert ? 'unverändert' : (e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet')) : VZ(e.zuw)) + '</span>'
         +   (e.ewB != null && e.ewZ != null ? '<small>EW '+EK(e.ewB)+' → '+EK(e.ewZ)+'</small>' : '')
         +   (e.kosten ? '<small>Maßnahmen '+EK(e.kosten)+'</small>' : '<small>ohne Maßnahmen</small>')
         +   '<button type="button" class="zb-neu-btn" title="Öffnet das Objekt, rechnet die Ertragswerte je Stufe neu (kostenlos, kein Kontingent) und speichert" onclick="DealPilotDashboard.zumZielbild(\''+esc(e.key)+'\',true)">neu rechnen \u21bb</button></div>'

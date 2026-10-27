@@ -3503,12 +3503,13 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       var mpi = eur(B.mpi_angebote)
         + (B.mpi_angebote != null ? '<span class="dp-wv-sub">' + (ab > 0 ? 'nach ' + _dpVNum(ab, 1) + ' % Abschlag' : (ab === 0 ? 'ohne Abschlag' : 'Abschlag nicht gespeichert'))
           + (B.mpi_angebote_roh != null && ab > 0 ? ' · ohne: ' + eur(B.mpi_angebote_roh) : '') + '</span>' : '');
-      return '<tr><td>' + _dpVDate(a.abgerufen_am) + '</td><td>' + qm(M.kauf_haus, 0) + '</td><td>' + qm(M.kauf_etw, 0) + '</td><td>' + qm(M.miete, 2)
-        + '</td><td>' + mpi + '</td><td>' + eur(B.ertragswert) + '</td></tr>';
+      /* v2987 · Zahlen rechtsbuendig unter den rechtsbuendigen Koepfen (abw-zahl wie dp-wv-tafel) */
+      return '<tr><td class="abw-wort">' + _dpVDate(a.abgerufen_am) + '</td><td class="abw-zahl">' + qm(M.kauf_haus, 0) + '</td><td class="abw-zahl">' + qm(M.kauf_etw, 0) + '</td><td class="abw-zahl">' + qm(M.miete, 2)
+        + '</td><td class="abw-zahl">' + mpi + '</td><td class="abw-zahl">' + eur(B.ertragswert) + '</td></tr>';
     }).join('');
     return '<div class="dp-pa-card" style="margin-top:14px"><h4 class="dpv-h">Abgelegte Marktpreis-Abrufe (' + abrufe.length + ')</h4>'
       + '<p class="dp-pa-p" style="color:#8b8678;margin:2px 0 8px">Jeder Abruf „Marktpreise“ wird mit Datum gespeichert. Kauf- und Mietpreise sind Angebotspreise; die Marktpreisindikation steht nach Abschlag.</p>'
-      + '<div style="overflow-x:auto"><table class="abw-tafel" style="min-width:560px"><thead><tr><th>Abruf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation Bestand<br><span style="font-weight:400;text-transform:none">nach Abschlag</span></th><th>Ertragswert Bestand</th></tr></thead><tbody>'
+      + '<div style="overflow-x:auto"><table class="abw-tafel dp-wv-tafel" style="min-width:540px"><thead><tr><th>Abruf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation Bestand<br><span style="font-weight:400;text-transform:none">nach Abschlag</span></th><th>Ertragswert Bestand</th></tr></thead><tbody>'
       + zeilen + '</tbody></table></div></div>';
   }
 
@@ -3556,10 +3557,13 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       '.dpv-err{color:#B8625C;font-family:"JetBrains Mono",monospace;font-size:12px}',
       '.dpv-lade{color:#8b8678;font-style:italic}.dpv-zh{font-family:"Space Grotesk",sans-serif;font-size:13.5px;font-weight:600;margin:14px 0 4px}.dpv-light .dpv-zh{color:#2A2727}.dpv-dark .dpv-zh{color:#F2ECDC}',
       '.dpv-tbl{width:100%;border-collapse:collapse;font-size:12.5px}',
-      '.dpv-tbl th,.dpv-tbl td{text-align:right;padding:9px 11px;border-bottom:1px solid rgba(140,134,120,.28)}',
+      /* v2987 · Marcel 27.10.2026: „Skalierung und Formatierung der Tabellen Absolutwerte und Abgelegte Marktpreis-Abrufe
+         passt nicht, gleich das bitte genau ab." Gemessen: Zellen 9x11 px statt 5x8 wie die Wertuebersicht (abw-tafel),
+         Kopf mit Goldlinie. Jetzt dieselben Masse, Zahlen tabellarisch. */
+      '.dpv-tbl th,.dpv-tbl td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line,#E7E4DC);font-variant-numeric:tabular-nums;white-space:nowrap}',
       '.dpv-tbl th:first-child,.dpv-tbl td:first-child{text-align:left}',
       '.dpv-light .dpv-tbl td:first-child{color:#2A2727}.dpv-dark .dpv-tbl td:first-child{color:#F2ECDC}',
-      '.dpv-tbl thead th{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:#8b8678;font-weight:500;border-bottom:1px solid #b8932f}',
+      '.dpv-tbl thead th{font:600 10px/1.4 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.4px;text-transform:uppercase;color:var(--ink3,#938B7F);border-bottom:1px solid var(--line,#E7E4DC);white-space:normal}',
       '.dpv-mdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}',
       '.dpv-val,.dpv-delta{font-family:"JetBrains Mono",monospace}.dpv-light .dpv-val{color:#3a3630}.dpv-dark .dpv-val{color:#D8D2C7}.dpv-delta{font-weight:700}',
       '.dpv-up{color:#2e7d52}.dpv-dark .dpv-up{color:#3FA56C}.dpv-down{color:#B8625C}.dpv-flat{color:#8b8678}',
