@@ -690,7 +690,7 @@ footer .mark-gross .wort{font-size:21px}
     padding:8px 10px;font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
     color:var(--mut);text-align:center;border-bottom:1px solid var(--cream-line)}
   .stx-a{width:44px;height:44px}
-  #pricing .ptoggle button{min-height:44px}
+  #pricing .ptoggle button,.seg button{min-height:44px}
   .nk-cta{padding:16px 0}
   .nk-e-cta{padding:16px 0}
 }

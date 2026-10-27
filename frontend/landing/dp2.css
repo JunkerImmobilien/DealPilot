@@ -364,5 +364,5 @@ img{max-width:100%;display:block}
   .burger{padding:11px}
   .b-log{position:relative}
   .b-log::after{content:'';position:absolute;left:-6px;right:-6px;top:-10px;bottom:-10px}
-  .footer a{padding:10px 0}
+  .footer a{padding:11px 0}
 }
