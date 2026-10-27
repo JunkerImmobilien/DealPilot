@@ -43,8 +43,39 @@
       paragraph: 'GEG § 86',
       severity: 'beginner'
     },
+    /* v3003 · Marcel 27.10.2026: „die Parameter der Verkehrswerte erklären" - wofür das Feld im Marktbericht gebraucht wird */
+    'tab1.wert_gsfl': {
+      title: 'Grundstücksfläche',
+      body: 'Im Marktbericht: Fläche × Bodenrichtwert ergibt den Bodenwert. Er geht in den Ertragswert (der Boden wird verzinst) und in den Sachwert ein. Weicht die Fläche stark vom typischen Grundstück der Bodenrichtwertzone ab, rechnet der Bericht den Richtwert um, wo der Gutachterausschuss dafür eine Tabelle führt.',
+      severity: 'beginner'
+    },
+    'tab1.wert_mod': {
+      title: 'Modernisierungspunkte',
+      body: 'Im Marktbericht: Durchgeführte Modernisierungen (Dach, Fenster, Leitungen, Heizung, Bäder …) verlängern die Restnutzungsdauer nach der Punktetabelle der Wertermittlungsverordnung (Anlage 2 ImmoWertV). Mehr Restnutzungsdauer heißt höherer Ertragswert und geringerer Altersabschlag im Sachwert.',
+      severity: 'beginner'
+    },
+    'tab1.wert_standardstufe': {
+      title: 'Standardstufe',
+      body: 'Im Marktbericht: Die Standardstufe (1 sehr einfach bis 5 stark gehoben) bestimmt die Baukosten je m² im Sachwert (Normalherstellungskosten 2010). Für den Ertragswert spielt sie keine Rolle — dort zählt die Miete.',
+      severity: 'beginner'
+    },
+    'tab1.wert_geschosse': {
+      title: 'Geschosse und Unterkellerung',
+      body: 'Im Marktbericht: Wählt den Gebäudetyp in der Baukostentabelle des Sachwerts — ein Keller oder ein ausgebautes Dachgeschoss ändern die Baukosten je m². Im Ertragswert wirkt es nicht.',
+      severity: 'beginner'
+    },
+    'tab1.wert_stellplaetze': {
+      title: 'Garagen und Stellplätze',
+      body: 'Im Marktbericht: Vermietete Stellplätze gehen mit ihrer Miete in den Ertragswert ein; Garagen zählen im Sachwert mit eigenen Baukosten. Stellplätze ohne Miete bringen im Ertragswert weder Ertrag noch Kosten.',
+      severity: 'beginner'
+    },
+    'tab1.wert_lage': {
+      title: 'Lage im Verkehrswert',
+      body: 'Im Marktbericht: Die Lage-Einschätzung fließt in den Deal Score. Den Verkehrswert bestimmt die Lage über den Bodenrichtwert, die marktübliche Miete und die Kaufpreise vergleichbarer Objekte in der Umgebung — nicht über dieses Feld.',
+      severity: 'beginner'
+    },
     'tab1.ds2_zustand': {
-      title: 'Zustand der Wohnung',
+      title: 'Zustand der Wohnung / des Gebäudes',
       body: 'Subjektive Einschätzung des Bauzustands. Beeinflusst den DealScore-Risiko-Anteil und unterstützt die Auto-AfA-Vorauswahl (Neubau ab Baujahr 2023 → degressive AfA möglich).',
       severity: 'beginner'
     },
@@ -72,13 +103,13 @@
 
     'tab1.wfl': {
       title: 'Wohnfläche',
-      body: 'Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig).',
+      body: 'Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig). Im Marktbericht: Grundlage der Miete je m² im Ertragswert, des Vergleichswerts (Preis je m² × Fläche) und — über die Bruttogrundfläche — der Baukosten im Sachwert.',
       paragraph: 'WoFlV',
       severity: 'beginner'
     },
     'tab1.baujahr': {
       title: 'Baujahr',
-      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: vor 1925 = 2,5%, ab 1925 = 2,0%, Neubau ab Bauantrag 2023 = 3,0% oder 5,0% degressiv möglich. Auch relevant für GEG-Sanierungspflichten.',
+      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: vor 1925 = 2,5%, ab 1925 = 2,0%, Neubau ab Bauantrag 2023 = 3,0% oder 5,0% degressiv möglich. Auch relevant für GEG-Sanierungspflichten. Im Marktbericht: Baujahr und Modernisierungspunkte ergeben die Restnutzungsdauer — sie bestimmt im Ertragswert den Vervielfältiger und im Sachwert die Alterswertminderung.',
       paragraph: '§ 7 Abs. 4 EStG',
       severity: 'beginner'
     },
@@ -123,7 +154,7 @@
     },
     'tab1.bodenrichtwert': {
       title: 'Bodenrichtwert',
-      body: 'Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands.',
+      body: 'Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands. Im Marktbericht: Bodenrichtwert × Grundstücksfläche ergibt den Bodenwert — er steckt im Ertragswert und im Sachwert.',
       example: 'Beispiel: München-Schwabing: 8.000 €/m². Münster-Geist: 420 €/m².',
       severity: 'beginner'
     },

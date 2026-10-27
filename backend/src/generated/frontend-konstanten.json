@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-27T19:21:40.873Z",
+ "erzeugt_am": "2026-10-27T19:28:11.019Z",
  "quellen": {
   "voice-import": "3cbd37d2be829d1c",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "4f8b4aaba0ba169c",
-  "index-html": "aaecb7d4393ebde3",
+  "index-html": "7085f58e302d8ab0",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -840,7 +840,7 @@
    {
     "id": "svwert",
     "kind": "text",
-    "label": "Marktwert / Verkehrswert (Herkunft darunter wählen)"
+    "label": "Marktwert / Verkehrswert (Herkunft daneben wählen)"
    },
    {
     "id": "svw_herkunft",
@@ -867,7 +867,7 @@
       "text": "eigene Schätzung"
      }
     ],
-    "label": "Marktwert / Verkehrswert (Herkunft darunter wählen)"
+    "label": "Herkunft"
    },
    {
     "id": "makrolage",

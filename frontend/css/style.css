@@ -41397,3 +41397,23 @@ html body .dp-pf-msheet-head .dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclos
   font-size: 18px !important; line-height: 1 !important; box-shadow: none !important;
   display: inline-flex !important; align-items: center; justify-content: center; margin-top: 0;
 }
+
+/* ══ v3003 · WERTANKER IN ZWEI ZEILEN ══════════════════════════════════
+   Marcel 27.10.2026: „Marktwert/Verkehrswert, darunter Herkunft und darunter,
+   welcher Bericht. Das bitte in EINE Zeile. Darunter dann Bankbewertung und
+   Wert nach Sanierung. Muss auf Handy und Tablet passend dargestellt werden."
+   Eigenes Raster statt .g3: .g3 faellt unter 900 px (Z. 172) und unter 640 px
+   (.card .g3, !important) auf eine Spalte - auf dem Tablet waeren es wieder
+   drei Zeilen. Handy (<= 640 px, derselbe Bruch wie .card .g3): Wert ueber
+   die volle Breite, darunter Herkunft und Bericht nebeneinander. */
+.wa-raster{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.25fr);gap:12px;align-items:start}
+.wa-raster2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+.wa-raster > *, .wa-raster2 > *{min-width:0}
+.wa-bericht .oe-vw{margin-top:0}
+.wa-bericht .wa-leer{display:none}
+.wa-bericht:has(#oe-vw[style*="none"]) .wa-leer{display:block;margin-top:9px}
+@media (max-width:640px){
+  .wa-raster{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .wa-raster > .f:first-child{grid-column:1 / -1}
+  .wa-raster2{gap:8px}
+}
