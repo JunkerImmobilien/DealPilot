@@ -1599,7 +1599,7 @@ async function _runAIServer(btn) {
        mitzuschicken waere teuer und unnoetig. `_fotosFuerKi()` gibt
        hoechstens vier zurueck, lange Kante 768 px, JPEG 72 %. */
     try { payload.fotos = await _fotosFuerKi(); } catch (e) { payload.fotos = []; }
-    var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload });
+    var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload, timeout: 300000 });   /* v2986 · Websuche + zweiter Anlauf brauchen mehr als 120 s */
     var html;
     if (data && data.analysis) {
       /* v2017a - STEMPELN VOR DEM RENDERN.
@@ -2604,7 +2604,7 @@ async function _runMiniAIGuarded() {
       }
     }
 
-    var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload });
+    var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload, timeout: 300000 });   /* v2986 · Websuche + zweiter Anlauf brauchen mehr als 120 s */
     if (data && data.analysis) {
       /* v2015 - stempeln, BEVOR gespeichert wird. Danach ist nicht
          mehr feststellbar, fuer welches Objekt sie gerechnet wurde. */
