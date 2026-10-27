@@ -207,7 +207,7 @@ function _lageAbgleichHtml(ctx) {
     }).join('');
     var wahl = '<div class="lv-wahl">' + opt('erm', 'Ermittelt', !!(z.g && z.g.stufe)) + opt('ki', 'Recherche', !!z.k) + opt('eigen', 'Eigener', true) + '</div>'
       + (z.w.art === 'eigen' ? '<select class="lv-eigen" aria-label="Eigener Wert ' + _lvAttr(z.x.t) + '" onchange="_dpLageEigenSetzen(\'' + _lvAttr(ctx.key || '') + '\',\'' + id + '\',this.value)">' + eigenOpts + '</select>' : '');
-    return '<tr class="lv-z lv-' + z.amp + '"' + (z.g && z.g.tip ? ' title="' + _lvAttr(z.g.tip) + '"' : '') + '>'
+    return '<tr class="lv-z lva-' + z.amp + '"' + (z.g && z.g.tip ? ' title="' + _lvAttr(z.g.tip) + '"' : '') + '>'
       + '<td data-l="Merkmal"><span class="lv-amp" title="' + _lvAttr(AMP[z.amp][1]) + '"><i></i>' + AMP[z.amp][0] + '</span><b class="lv-mm">' + _escKi(z.x.t) + '</b>'
       + '<span class="lv-w">im Feld: ' + _escKi(z.jetzt ? _lageOptText(id, z.jetzt) : '–') + '</span></td>'
       + '<td data-l="Ermittelt (DealPilot)">' + erm + '</td>'
@@ -216,11 +216,11 @@ function _lageAbgleichHtml(ctx) {
   }).join('');
   var qHtml = quellen.length
     ? '<div class="lv-qk">Quellen der Webrecherche</div><ol class="lv-q">' + quellen.map(function (q) {
-        return '<li>' + (q.url ? '<a href="' + _lvAttr(q.url) + '" target="_blank" rel="noopener noreferrer" title="' + _lvAttr(q.url) + '">' + _escKi(q.text) + '</a>'
+        return '<li>' + (q.url ? '<a href="' + _lvAttr(q.url) + '" target="_blank" rel="noopener noreferrer" title="' + _lvAttr(q.host ? q.url : q.text) + '">' + _escKi(q.text) + '</a>'
           + (q.host && q.host !== q.text ? ' <span class="lv-host">' + _escKi(q.host) + '</span>' : '') : _escKi(q.text) + ' <span class="lv-host">ohne Link</span>') + '</li>';
       }).join('') + '</ol>'
     : '<div class="lv-qk">Quellen der Webrecherche</div><div class="lv-fuss">Die Recherche hat keine Fundstellen genannt.</div>';
-  var zus = [n.gleich ? n.gleich + ' gleich' : '', n.ab ? n.ab + (n.ab > 1 ? ' weichen ab' : ' weicht ab') : '', n.fehlt ? n.fehlt + ' nur einseitig' : ''].filter(Boolean).join(' · ');
+  var zus = [n.gleich ? n.gleich + ' gleich' : '', n.ab ? n.ab + (n.ab > 1 ? ' weichen ab' : ' weicht ab') : '', n.fehlt ? n.fehlt + (n.fehlt > 1 ? ' fehlen' : ' fehlt') + ' auf einer Seite' : ''].filter(Boolean).join(' · ');
   var offen = !!_dpLageOffen[key];
   return '<details class="lv-abgl"' + (offen ? ' open' : '') + ' ontoggle="_dpLageOffen[\'' + _lvAttr(key) + '\']=this.open">'
     + '<summary><span class="lv-sk">' + _escKi(ctx.kopf || 'Abgleich mit der Webrecherche') + '</span><span class="lv-sz">' + _escKi(zus) + '</span></summary>'
@@ -284,8 +284,8 @@ function _lvCss() {
     + '.lv-tab4 td{font-size:12.5px}.lv-tab4 tr{cursor:default}.lv-tab4 td:nth-child(4){min-width:200px}'
     + '.lv-mm{display:block}.lv-amp{display:inline-flex;align-items:center;gap:4px;font:500 10px/1.2 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;color:#8b8678}'
     + '.lv-amp i{width:8px;height:8px;border-radius:50%;background:#8b8678;display:inline-block}'
-    + '.lv-gleich .lv-amp{color:#3FA56C}.lv-gleich .lv-amp i{background:#3FA56C}'
-    + '.lv-ab .lv-amp{color:#D8564C}.lv-ab .lv-amp i{background:#D8564C}'
+    + '.lva-gleich .lv-amp{color:#3FA56C}.lva-gleich .lv-amp i{background:#3FA56C}'
+    + '.lva-ab .lv-amp{color:#D8564C}.lva-ab .lv-amp i{background:#D8564C}'
     + '.lv-kt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:11.5px;line-height:1.35;color:#8b8678;margin-top:2px}'
     + '.lv-ref{font:500 10.5px/1 "JetBrains Mono",monospace;color:var(--wl-b8932f, #b8932f);text-decoration:none;margin-left:2px}a.lv-ref:hover{text-decoration:underline}'
     + '.lv-wahl{display:flex;flex-wrap:wrap;gap:2px 10px}.lv-o{display:inline-flex;align-items:center;gap:3px;font-size:12px;cursor:pointer;white-space:nowrap}'
