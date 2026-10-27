@@ -177,6 +177,40 @@ function _ankaufBlock(ak) {
   return z.join('\n');
 }
 
+/* v2985 · Marcel 27.10.2026: „im Bestand … Exit-Strategien und Anschlussfinanzierungs-
+   szenarien mit Fragen beantworten." Die Zahlen rechnet das Frontend
+   (bestand-analyse.js aus calc.js-State, Dscr.compute, Marktbericht) - der Pilot
+   soll sie EINORDNEN, nicht nachrechnen. Was fehlt, steht als „fehlt" da. */
+function _bestandBlock(b) {
+  if (!b || typeof b !== 'object') return '';
+  var eur = function (v) { return v == null || !isFinite(Number(v)) ? '–' : Math.round(Number(v)).toLocaleString('de-DE') + ' €'; };
+  var zahl = function (v, n) { return v == null || !isFinite(Number(v)) ? '–' : Number(v).toLocaleString('de-DE', { minimumFractionDigits: n, maximumFractionDigits: n }); };
+  var z = ['', '## BESTAND: ANSCHLUSSFINANZIERUNG UND EXIT (fertig gerechnet - nicht nachrechnen)'];
+  (Array.isArray(b.darlehen) ? b.darlehen : []).forEach(function (d) {
+    if (!d) return;
+    z.push(String(d.name || 'Darlehen') + ': Zinsbindung endet ' + (d.zinsbindung_ende || '–')
+      + (d.monate_bis_ende != null ? ' (in ' + d.monate_bis_ende + ' Monaten)' : '')
+      + ', Restschuld dann ' + eur(d.restschuld_ende) + ', Rate heute ' + eur(d.rate_heute_m) + '/Monat.');
+    (Array.isArray(d.anschluss) ? d.anschluss : []).forEach(function (s) {
+      z.push('  Anschlusszins ' + zahl(s.zins_pct, 2) + ' %' + (s.label ? ' (' + s.label + ')' : '') + ': Rate ' + eur(s.rate_m)
+        + '/Monat (' + (Number(s.mehr_m) > 0 ? '+' : '') + eur(s.mehr_m) + '), Cashflow vor Steuer danach ' + eur(s.cf_m)
+        + '/Monat, DSCR ' + zahl(s.dscr, 2) + ' (gleiche Tilgung, heutige Miete und Kosten)');
+    });
+    if (d.hinweis) z.push('  Hinweis: ' + d.hinweis);
+    if (Array.isArray(d.fehlt) && d.fehlt.length) z.push('  fehlt: ' + d.fehlt.join(', '));
+  });
+  if (b.cf_heute_m != null || b.dscr_heute != null) z.push('Heute: Cashflow vor Steuer ' + eur(b.cf_heute_m) + '/Monat, DSCR ' + zahl(b.dscr_heute, 2) + '.');
+  z.push('Kaufdatum: ' + (b.kaufdatum || '–') + '. Ende der Zehnjahresfrist § 23 EStG: ' + (b.steuerfrei_ab || '–')
+    + (b.monate_bis_steuerfrei != null ? (b.monate_bis_steuerfrei > 0 ? ' (noch ' + b.monate_bis_steuerfrei + ' Monate)' : ' (abgelaufen)') : '') + '.');
+  z.push('Marktpreisindikation (letzter Marktbericht' + (b.marktwert_stand ? ' vom ' + b.marktwert_stand : '') + '): ' + eur(b.marktwert)
+    + '. Kaufpreis ' + eur(b.kaufpreis) + ', Gesamtinvestition ' + eur(b.gesamtinvestition) + ', Wertzuwachs ' + eur(b.wertzuwachs) + '.');
+  z.push('Restschuld' + (b.restschuld_jahr ? ' Ende ' + b.restschuld_jahr : '') + ': ' + eur(b.restschuld_heute)
+    + '. Netto-Erloes vor Steuer (Marktpreis - Restschuld): ' + eur(b.netto_erloes_vor_steuer)
+    + '. Rechnerischer Beleihungsspielraum bei 80 % des Marktpreises: ' + eur(b.beleihungsreserve_80) + '.');
+  if (Array.isArray(b.fehlt) && b.fehlt.length) z.push('fehlt: ' + b.fehlt.join(', ') + ' - sage das, statt zu schaetzen.');
+  return z.join('\n');
+}
+
 function buildPrompt(payload, opts) {
   const o = payload.objekt || {};
   const k = payload.kennzahlen || {};
@@ -737,6 +771,7 @@ function buildPrompt(payload, opts) {
        unten; hier steht nur der Aufruf, damit die Verkettung lesbar
        bleibt. */
     _ak ? _ankaufBlock(_ak) : '',
+    _ak ? _bestandBlock(payload.bestand) : '',   /* v2985 */
     _pz ? _potenzialBlock(_pz) : '',   /* v2430 */
     _wo ? _zeilen('## WOHNUNGSDETAILS (fuer den Mietspiegel-Vergleich)', [
       ['Zimmer', _wo.zimmer], ['Baeder', _wo.baeder],
@@ -1624,7 +1659,17 @@ function buildPrompt(payload, opts) {
       + '- "verhandlungsempfehlung": statt einer Kaufverhandlung die BESTANDSSTRATEGIE, 8-12 Saetze: Mietanpassung,\n'
       + '  Anschlussfinanzierung, Instandhaltung/Modernisierung, Steuer, Exit - die wirksamsten Hebel zuerst.\n'
       + '- "kaufpreis_offerte": null. "offerte_mail": null. Keinen Kaufpreis und keinen Zielpreis nennen.\n'
-      + '- Gesamtbewertung, Staerken, Risiken und Szenarien beschreiben das Objekt als Bestand, nicht als Angebot.\n' : ''),
+      + '- Gesamtbewertung, Staerken, Risiken und Szenarien beschreiben das Objekt als Bestand, nicht als Angebot.\n'
+      /* v2985 · zwei Reiter im Bestand: Anschlussfinanzierung und Exit-Strategien, als Fragen und Antworten */
+      + '- "anschlussfinanzierung" und "exit_strategien": je 4-6 Eintraege {"frage", "antwort"}. Jede Antwort 3-5 Saetze\n'
+      + '  MIT Zahlen aus dem Block „BESTAND: ANSCHLUSSFINANZIERUNG UND EXIT" (Restschuld, Raten je Anschlusszins, Cashflow, DSCR,\n'
+      + '  Fristende, Marktpreis, Netto-Erloes) - nicht nachrechnen. Steht dort „fehlt", sage das statt zu schaetzen.\n'
+      + '  Fragen zur Anschlussfinanzierung, z.B.: „Was kostet mich das Ende der Zinsbindung?", „Lohnt ein Forward-Darlehen\n'
+      + '  oder eine Sondertilgung?", „Wie viel Eigenkapital braucht die Anschlussfinanzierung, damit der DSCR traegt?".\n'
+      + '  Fragen zum Exit, z.B.: „Wann kann ich steuerfrei verkaufen?" (Zehnjahresfrist § 23 EStG ab Kaufdatum),\n'
+      + '  „Verkaufen, halten oder beleihen fuer den naechsten Kauf?"; bei einem Mehrfamilienhaus „Lohnt eine Aufteilung in\n'
+      + '  Eigentumswohnungen?"; „Lohnt eine Ueberfuehrung in eine Gesellschaft?" - nur als Hinweis auf die Fragen, die zu\n'
+      + '  klaeren sind (Grunderwerbsteuer, Frist, laufende Besteuerung), KEINE Steuer- oder Rechtsberatung; verweise auf den Steuerberater.\n' : ''),
     '## ANTWORTFORMAT — strikt JSON, keine Markdown-Codeblöcke',
     'Antworte AUSSCHLIESSLICH mit folgendem JSON-Objekt:',
     '{',
@@ -1707,7 +1752,10 @@ function buildPrompt(payload, opts) {
     '  "steuer_zusammenfassung": "14-20 Saetze in der Gliederung von Aufgabe 16: Werbungskosten nach Art, Ergebnis und Steuerwirkung Jahr 1, Jahr der Wende und warum, Steuerlast danach in EUR, Folge fuer den Cashflow nach Steuer, Sanierung, Hinweis auf Steuerberater",',
     _pz ? '  "potenzial_text": "4-7 Saetze nach Aufgabe 17 (Mieterhoehung, Zielbild, Ertragswert je Stufe, Wertzuwachs nach Kosten, Aufteilung); null ohne Block",' : '',   /* v2430 */
     _ak ? '  "soll_ist_steuer": "2-4 Saetze: steuerliche Lage beim Ankauf gegen heute, mit beiden Zahlen; null, wenn keine Steuerzahl zu beiden Zeitpunkten vorliegt",' : '',
-    '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
+    /* v2985 · im Bestand Fragen und Antworten (eigener Reiter), im Ankauf wie bisher ein Absatz */
+    _ak ? '  "anschlussfinanzierung": [{ "frage": "Was kostet mich das Ende der Zinsbindung?", "antwort": "3-5 Saetze mit Restschuld, Rate je Anschlusszins, Cashflow und DSCR danach" }, "... 4-6 Eintraege"],'
+        : '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
+    _ak ? '  "exit_strategien": [{ "frage": "Wann kann ich steuerfrei verkaufen?", "antwort": "3-5 Saetze mit Fristende, Marktpreis, Restschuld und Netto-Erloes vor Steuer; keine Steuerberatung" }, "... 4-6 Eintraege"],' : '',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
     /* v2013b - GEMESSEN am echten Lauf: die Fotos gingen durch (22 von
        22 Schluesseln kamen zurueck), aber das Modell schrieb KEIN Wort
@@ -2060,6 +2108,16 @@ function _bestandModus(a, payload) {
     a.kaufpreis_offerte = null;
     a.offerte_mail = null;
     a.offerte_mail_entfallen = null;
+    /* v2985 · Fragen und Antworten nur in der verlangten Form; ein Absatz (altes Format)
+       bleibt als Text stehen, alles andere faellt weg - der Reiter rechnet dann ohne KI */
+    var qa = function (v) {
+      if (!Array.isArray(v)) return (typeof v === 'string' && v.trim()) ? v : null;
+      var l = v.filter(function (x) { return x && typeof x === 'object' && typeof x.frage === 'string' && x.frage.trim() && typeof x.antwort === 'string' && x.antwort.trim(); })
+        .map(function (x) { return { frage: x.frage.trim(), antwort: x.antwort.trim() }; });
+      return l.length ? l : null;
+    };
+    a.anschlussfinanzierung = qa(a.anschlussfinanzierung);
+    a.exit_strategien = Array.isArray(a.exit_strategien) ? qa(a.exit_strategien) : null;
     a.bestand_modus = true;
   } catch (e) {}
   return a;

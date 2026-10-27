@@ -237,6 +237,18 @@ const auftrag = {
     abweichung: null                          /* GENAU der Fall: kein Vergleich */
   },
 
+  /* ── v2985 · BESTAND: Anschlussfinanzierung und Exit (bestand-analyse.js payload()) ── */
+  bestand: {
+    darlehen: [{ name: 'PRUEF-DARLEHEN-1', zinsbindung_ende: '2031-04-01', monate_bis_ende: 53, restschuld_ende: 187654,
+      rate_heute_m: 1234.56, fehlt: ['PRUEF-FEHLT-DARLEHEN'], hinweis: 'PRUEF-HINWEIS-AUSSETZUNG',
+      anschluss: [{ zins_pct: 4.37, rate_m: 1111.11, mehr_m: -123.45, cf_m: 321.98, dscr: 1.43, label: 'PRUEF-MARKTZINS' }] }],
+    cf_heute_m: 198.53, dscr_heute: 1.29,
+    kaufdatum: '2019-06-14', steuerfrei_ab: '2029-06-14', monate_bis_steuerfrei: 31,
+    marktwert: 456789, marktwert_stand: '2026-10-20', kaufpreis: 398765, gesamtinvestition: 431234,
+    restschuld_heute: 276543, restschuld_jahr: 2026, netto_erloes_vor_steuer: 180246, wertzuwachs: 25555,
+    beleihungsreserve_80: 88888, fehlt: ['PRUEF-FEHLT-EXIT']
+  },
+
   /* ── v2140 · DAS INVESTMENTPROFIL ────────────────────────────────
      Sieben von 23 Schluesseln (ui.js:1197-1205). Die uebrigen sind
      Formular-Vorbelegungen und stehen schon als Objektwert im Auftrag -
@@ -369,6 +381,37 @@ const ERWARTET = [
   /* ── Ankauf (v2139) ───────────────────────────────────────────────── */
   ['ankauf.kennzahlen_damals', 'ui.js:967', 'PRUEF-KENNZAHLEN-DAMALS'],
   ['ankauf.festgeschrieben_am', 'ui.js:969', '2024-09-29'],
+
+  /* ── v2985 · Bestand: Anschlussfinanzierung und Exit ─────────────── */
+  ['bestand.darlehen.name', 'bestand-analyse.js payload()', 'PRUEF-DARLEHEN-1'],
+  ['bestand.darlehen.zinsbindung_ende', 'bestand-analyse.js payload()', '2031-04-01'],
+  ['bestand.darlehen.monate_bis_ende', 'bestand-analyse.js payload()', 'in 53 Monaten'],
+  ['bestand.darlehen.restschuld_ende', 'bestand-analyse.js payload()', z(187654)],
+  ['bestand.darlehen.rate_heute_m', 'bestand-analyse.js payload()', z(1234.56) + ' €/Monat'],
+  ['bestand.darlehen.fehlt', 'bestand-analyse.js payload()', 'PRUEF-FEHLT-DARLEHEN'],
+  ['bestand.darlehen.hinweis', 'bestand-analyse.js payload()', 'PRUEF-HINWEIS-AUSSETZUNG'],
+  ['bestand.anschluss.zins_pct', 'bestand-analyse.js payload()', '4,37 %'],
+  ['bestand.anschluss.label', 'bestand-analyse.js payload()', 'PRUEF-MARKTZINS'],
+  ['bestand.anschluss.rate_m', 'bestand-analyse.js payload()', 'Rate ' + z(1111.11)],
+  ['bestand.anschluss.mehr_m', 'bestand-analyse.js payload()', '-123 €'],
+  ['bestand.anschluss.cf_m', 'bestand-analyse.js payload()', z(321.98) + ' €/Monat, DSCR'],
+  ['bestand.anschluss.dscr', 'bestand-analyse.js payload()', 'DSCR 1,43'],
+  ['bestand.cf_heute_m', 'bestand-analyse.js payload()', z(198.53) + ' €/Monat, DSCR 1,29'],
+  ['bestand.kaufdatum', 'bestand-analyse.js payload()', '2019-06-14'],
+  ['bestand.steuerfrei_ab', 'bestand-analyse.js payload()', '2029-06-14'],
+  ['bestand.monate_bis_steuerfrei', 'bestand-analyse.js payload()', 'noch 31 Monate'],
+  ['bestand.marktwert', 'bestand-analyse.js payload()', z(456789)],
+  ['bestand.marktwert_stand', 'bestand-analyse.js payload()', 'vom 2026-10-20'],
+  ['bestand.kaufpreis', 'bestand-analyse.js payload()', z(398765)],
+  ['bestand.gesamtinvestition', 'bestand-analyse.js payload()', z(431234)],
+  ['bestand.wertzuwachs', 'bestand-analyse.js payload()', z(25555)],
+  ['bestand.restschuld_heute', 'bestand-analyse.js payload()', z(276543)],
+  ['bestand.restschuld_jahr', 'bestand-analyse.js payload()', 'Ende 2026'],
+  ['bestand.netto_erloes_vor_steuer', 'bestand-analyse.js payload()', z(180246)],
+  ['bestand.beleihungsreserve_80', 'bestand-analyse.js payload()', z(88888)],
+  ['bestand.fehlt', 'bestand-analyse.js payload()', 'PRUEF-FEHLT-EXIT'],
+  ['bestand: Antwortfeld exit_strategien', 'v2985', '"exit_strategien"'],
+  ['bestand: Q&A-Form anschlussfinanzierung', 'v2985', '"anschlussfinanzierung": [{ "frage"'],
 
   /* ── die, die vorher schon ankamen: Gegenprobe gegen einen Rueckbau ─ */
   ['steuer.zve', 'ui.js:895', z(87654)],

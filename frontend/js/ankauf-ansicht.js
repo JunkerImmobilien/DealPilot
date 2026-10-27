@@ -351,7 +351,9 @@
     wachen(false);
     entsperren();
     document.body.classList.remove('dp-ankauf-ansicht', 'dp-ankauf-frei');
-    function loesen() { _aktiv = false; bannerZeichnen(); }
+    /* v2985 · die Pilot-Analyse wurde beim Laden noch in der Soll-Ansicht gezeichnet
+       (alte Reiter) - nach dem Loesen in der Bestands-Ansicht neu zeichnen */
+    function loesen() { _aktiv = false; bannerZeichnen(); try { if (typeof window._dpPaNeuZeichnen === 'function') window._dpPaNeuZeichnen(); } catch (e) {} }
     if (_key && typeof loadSaved === 'function') {
       try {
         var p = loadSaved(_key);
@@ -374,7 +376,10 @@
     document.body.classList.remove('dp-ankauf-ansicht', 'dp-ankauf-frei');
   }
   window.addEventListener('dp:object-ready', function () {
-    if (_aktiv && window._currentObjKey !== _key) abbrechen();
+    if (_aktiv && window._currentObjKey !== _key) {
+      abbrechen();
+      try { if (typeof window._dpPaNeuZeichnen === 'function') window._dpPaNeuZeichnen(); } catch (e) {}   /* v2985 */
+    }
     setTimeout(bannerZeichnen, 200);
   });
 
