@@ -72,7 +72,11 @@ const g = globalThis;
 for (const f of ['../../frontend/js/rnd-gnd-table.js', '../../frontend/js/rnd-calc.js',
                  'rnd-spanne.js'])
   new Function('window', fs.readFileSync(H(f), 'utf8'))(g);
-const K = g.DealPilotRND, S = g.JunkerRND_Spanne, Z = g.JunkerRND_Zustand;
+const K0 = g.DealPilotRND, S = g.JunkerRND_Spanne, Z = g.JunkerRND_Zustand;
+/* v2995 · Die App gewichtet seit v2995 nach den NHK-2010-Anteilen. Die Gutachten rechnen mit
+   ihrer Hausvorlage (Kap. 5.3.2) - geprueft wird, dass UNSER Rechenweg mit IHREN Eingaben
+   IHRE Zahl liefert. Deshalb bekommt jeder Fall die Vorlage ausdruecklich mit. */
+const K = Object.assign({}, K0, { calcAll: (x) => K0.calcAll(Object.assign({ gewerkeWeights: K0.GEWERKE_VORLAGE }, x)) });
 
 let fehler = 0;
 function pruef(name, bed, ist) {

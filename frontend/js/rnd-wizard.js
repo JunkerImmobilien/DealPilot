@@ -237,7 +237,8 @@
         baeder: 'veraltet',
         decken: 'veraltet',
         technik: 'standard',
-        grundriss: 'veraltet'
+        innenwaende: 'veraltet',   /* v2995 · NHK-Gruppen */
+        fussboeden: 'veraltet'
       },
 
       // Step 7: Schäden
@@ -1098,17 +1099,9 @@
   }
 
   function renderStep6(body) {
-    const gewerke = [
-      ['dach',        'Dachkonstruktion inkl. Wärmedämmung', 15],
-      ['fenster',     'Fenster / Außentüren',                15],
-      ['leitungen',   'Leitungssysteme',                     5],
-      ['heizung',     'Heizungsanlage',                      15],
-      ['aussenwand',  'Außenwände inkl. Wärmedämmung',       10],
-      ['baeder',      'Ausbau Bäder',                        5],
-      ['decken',      'Deckenkonstruktion inkl. Wärmedämmung', 5],
-      ['technik',     'Technische Ausstattung',              15],
-      ['grundriss',   'Wesentliche Veränderung Grundriss',   15]
-    ];
+    /* v2995 · die Gewerke und Gewichte kommen aus dem Kern (NHK 2010, Anlage 4 ImmoWertV) -
+       bis v2994 eine eigene Liste mit der Gewichtung der Gutachter-Vorlage */
+    const gewerke = ((global.DealPilotRND && global.DealPilotRND.GEWERKE) || []).map(function (g) { return [g.id, g.label, g.weight]; });
 
     let html = '<div class="rnd-wiz-info-box">'
       + '<strong>Wie ist der aktuelle Zustand jedes Gewerks?</strong><br>'
@@ -1117,6 +1110,8 @@
       + '„veraltet" = ursprünglich, nicht mehr zeitgemäß (Abzug) · „zeitgemäß" = nie erneuert, '
       + 'entspricht aber heutigen Anforderungen (neutral) · „erneuert" = aktueller Standard, in den '
       + 'letzten rund 20 Jahren erneuert (Aufschlag) · „gehoben" = erneuert und über dem heutigen Standard.'
+      /* v2995 · woher die Gewichte kommen */
+      + '<br><span style="font-size:12px;color:#7A7370">Gewichtet nach den Wägungsanteilen der Normalherstellungskosten 2010 (Anlage 4 ImmoWertV, Tabelle 1); für Eigentumswohnungen und Mehrfamilienhäuser sinngemäß, weil Anlage 4 dort keine eigenen Anteile führt.</span>'
       + '</div>';
 
     html += '<table class="rnd-wiz-gewerke-tab">'
