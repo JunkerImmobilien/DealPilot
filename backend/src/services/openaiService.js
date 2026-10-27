@@ -1259,11 +1259,23 @@ function buildPrompt(payload, opts) {
          > Einordnung ist in diesem Fall schlimmer als keiner. */
       var _sw = a.sachwert_eur != null ? Number(a.sachwert_eur) : null;
       var _ew = a.ertragswert_eur != null ? Number(a.ertragswert_eur) : null;
-      if (_sw != null || _ew != null || a.fuehrend) {
+      /* v2999 · der Vergleichswert auf Gutachterbasis (Vergleichsfaktor / Immobilienrichtwert des Ausschusses,
+         § 20, § 24 ImmoWertV) - bis hier kannte der Prompt nur die Angebotsindikation */
+      var _vw = (a.irw_vergleichswert_eur != null) ? Number(a.irw_vergleichswert_eur)
+        : (a.vergleichsfaktor_amtlich && a.vergleichswert_eur != null ? Number(a.vergleichswert_eur) : null);
+      if (_sw != null || _ew != null || _vw != null || a.fuehrend) {
         L.push('');
         L.push('## WERTERMITTLUNG IM BERICHT (Stufe 3, ImmoWertV-Logik)');
         if (_sw != null) L.push('- Sachwert: ' + fmtEur(_sw));
         if (_ew != null) L.push('- Ertragswert: ' + fmtEur(_ew));
+        if (_vw != null) {
+          L.push('- Vergleichswert (amtlich, aus Kaufpreisen des Gutachterausschusses' + (a.vergleich_ausschuss ? ', ' + a.vergleich_ausschuss : '') + '): ' + fmtEur(_vw));
+          L.push('  Das ist der Vergleichswert nach § 24 ImmoWertV. Die Marktpreisindikation aus Angebotspreisen');
+          L.push('  ist KEIN Vergleichswert - nenne beide getrennt und sage, welcher auf Kaufpreisen beruht.');
+        } else {
+          L.push('- Vergleichswert auf Gutachterbasis: fuer dieses Gebiet liegt kein amtlicher Vergleichsfaktor vor.');
+          L.push('  Der Marktwert des Berichts ist eine Marktpreisindikation aus ANGEBOTSPREISEN, kein Vergleichswert.');
+        }
         if (_sw != null && _ew != null && _sw > 0) {
           var _spr = ((_ew - _sw) / _sw) * 100;
           L.push('- Abstand Ertrags- zu Sachwert: ' + (_spr >= 0 ? '+' : '')
@@ -1282,7 +1294,8 @@ function buildPrompt(payload, opts) {
             + (a.fuehrend_grund ? ' — ' + a.fuehrend_grund : ''));
           if (a.fuehrend_quelle) L.push('  Rechtsgrundlage: ' + a.fuehrend_quelle);
           var _tragend = a.fuehrend === 'sachwert' ? _sw
-                       : a.fuehrend === 'ertragswert' ? _ew : null;
+                       : a.fuehrend === 'ertragswert' ? _ew
+                       : a.fuehrend === 'vergleichswert' ? _vw : null;   /* v2999 */
           if (_tragend != null) {
             L.push('- Der TRAGENDE Wert ist damit ' + fmtEur(_tragend)
               + ' (' + _vn + ').');

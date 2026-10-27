@@ -141,7 +141,7 @@
     if (sw != null) t += zeile(swVorl ? 'Sachwert (nur Plausibilität)' : 'Sachwert',
       swVorl ? 'Herstellungskosten ohne Marktanpassung, ' + (mfh ? 'für Mehrfamilienhäuser nicht aussagekräftig' : 'kein Marktwert') : '',
       null, sw, null, fu === 'sachwert', swVorl);
-    if (vw != null) t += zeile('Vergleichswert', h.irw_vergleichswert_eur != null ? 'aus dem Immobilienrichtwert' : 'mit amtlichem Vergleichsfaktor', null, vw, null, fu === 'vergleichswert');
+    if (vw != null) t += zeile('Vergleichswert', h.irw_vergleichswert_eur != null ? 'aus dem Immobilienrichtwert' : 'amtlicher Vergleichsfaktor aus Kaufpreisen' + (h.vergleich_ausschuss ? ' · ' + String(h.vergleich_ausschuss).replace(/^Der Gutachterausschuss für Grundstückswerte /, 'GAA ') : ''), null, vw, null, fu === 'vergleichswert');
     if (kp != null) t += zeile('Kaufpreis', 'deine Angabe', null, kp, null, false);
     t += '</tbody></table></div>';
     t += fehlendeAngaben();

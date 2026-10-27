@@ -1048,11 +1048,13 @@
       var h = _mbHist[o._key] || null, e = zb[o._key] || null;
       var ew = e && e.ewB != null ? e.ewB : (h && num(h.ertragswert_eur) > 0 ? num(h.ertragswert_eur) : null);
       var mpi = e && e.mpiB != null ? e.mpiB : (h && num(h.market_value) > 0 ? num(h.market_value) : null);
+      /* v2999 · Vergleichswert auf Gutachterbasis (Vergleichsfaktor/Immobilienrichtwert des Ausschusses) neben der Angebotsindikation */
+      var vw = h ? (num(h.irw_vergleichswert_eur) > 0 ? num(h.irw_vergleichswert_eur) : (h.vergleichsfaktor_amtlich && num(h.vergleichswert_eur) > 0 ? num(h.vergleichswert_eur) : null)) : null;
       var grund = null;
       if (ew == null) grund = !(o._key in _mbHist) ? 'wird geladen …'
         : (!h ? 'Noch kein Marktbericht – im Objekt unter Bewertung abrufen.'
           : 'Der Marktbericht weist keinen Ertragswert aus – Stufe 1, oder es fehlt eine Pflichtangabe (z. B. Grundstücksfläche); der Grund steht im Bericht.');
-      return { key: o._key, name: _objName(o), kp: _kpEuro(o), ew: ew, mpi: mpi,
+      return { key: o._key, name: _objName(o), kp: _kpEuro(o), ew: ew, mpi: mpi, vw: vw,
         ewQuelle: ew == null ? null : (e && e.ewB != null ? 'Zielbild-Lauf' : 'Marktbericht'),
         stand: h && h.created_at ? _fDat(h.created_at) : '', grund: grund };
     });
@@ -1065,12 +1067,13 @@
           + ' <button type="button" class="zb-btn" onclick="DealPilotDashboard.zumZielbild(\'' + esc(x.key) + '\')">Im Objekt öffnen ›</button></small>' : '') + '</td>'
         + '<td>' + _fE(x.kp) + '</td>'
         + '<td>' + (x.mpi != null ? _fE(x.mpi) + '<small class="' + ton(x.mpi, x.kp) + '">' + P(x.mpi, x.kp) + '</small>' : '–') + '</td>'
+        + '<td>' + (x.vw != null ? _fE(x.vw) + '<small class="' + ton(x.vw, x.kp) + '">' + P(x.vw, x.kp) + '</small>' : '<small>kein amtl. Faktor</small>') + '</td>'
         + '<td>' + (x.ew != null ? _fE(x.ew) + '<small class="' + ton(x.ew, x.kp) + '">' + P(x.ew, x.kp) + '</small>' : '<b class="gb-neg">fehlt</b>') + '</td>'
         + '<td>' + esc(x.stand || '') + '</td></tr>';
     }).join('');
-    return '<details class="gb-tab"' + (B.some(function(x){ return x.ew == null; }) ? ' open' : '') + '><summary>Bewertung je Objekt – Kaufpreis, Marktpreisindikation, Ertragswert</summary>'
-      + '<div class="gb-tab-scroll"><table><thead><tr><th>Objekt</th><th>Kaufpreis</th><th>Marktpreisindikation</th><th>Ertragswert</th><th>Bericht vom</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
-      + '<p class="cp-erkl">Prozent = Abstand zum Kaufpreis. Ertragswert aus dem Zielbild-Lauf des Objekts, sonst aus dem letzten Marktbericht. Werte so, wie der Bericht sie ausweist – nichts nachträglich verändert.</p></details>';
+    return '<details class="gb-tab"' + (B.some(function(x){ return x.ew == null; }) ? ' open' : '') + '><summary>Bewertung je Objekt – Kaufpreis, Marktpreisindikation, Vergleichswert, Ertragswert</summary>'
+      + '<div class="gb-tab-scroll"><table><thead><tr><th>Objekt</th><th>Kaufpreis</th><th>Marktpreisindikation</th><th>Vergleichswert (amtlich)</th><th>Ertragswert</th><th>Bericht vom</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+      + '<p class="cp-erkl">Prozent = Abstand zum Kaufpreis. Marktpreisindikation = Angebotspreise nach Abschlag; Vergleichswert = Vergleichsfaktor bzw. Immobilienrichtwert des Gutachterausschusses aus Kaufpreisen (§ 20, § 24 ImmoWertV), nur wo er vorliegt. Ertragswert aus dem Zielbild-Lauf des Objekts, sonst aus dem letzten Marktbericht. Werte so, wie der Bericht sie ausweist – nichts nachträglich verändert.</p></details>';
   }
   function renderGesamtbew(){
     var host = $('dp-gesamtbew'); if (!host || !_detailsLoaded) return;

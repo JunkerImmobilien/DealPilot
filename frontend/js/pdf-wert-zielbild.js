@@ -74,7 +74,7 @@
     if (ew != null) v.push({ art: 'ew', name: /vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert',
       sub: zahl(h.ertragswert_von_eur) != null ? 'Spanne aus dem Liegenschaftszins' : '', unten: zahl(h.ertragswert_von_eur), mitte: ew, oben: zahl(h.ertragswert_bis_eur), fuehrend: fu === 'ertragswert' });
     if (sw != null) v.push({ art: 'sw', name: swVorl ? 'Sachwert (nur Plausibilität)' : 'Sachwert', sub: swVorl ? 'Herstellungskosten ohne Marktanpassung, kein Marktwert' : '', mitte: sw, ohneAbw: swVorl, /* v2979 */ fuehrend: fu === 'sachwert' });
-    if (vw != null) v.push({ art: 'vw', name: 'Vergleichswert', sub: h.irw_vergleichswert_eur != null ? 'aus dem Immobilienrichtwert' : 'mit amtlichem Vergleichsfaktor', mitte: vw, fuehrend: fu === 'vergleichswert' });
+    if (vw != null) v.push({ art: 'vw', name: 'Vergleichswert', sub: h.irw_vergleichswert_eur != null ? 'aus dem Immobilienrichtwert' : 'amtlicher Vergleichsfaktor aus Kaufpreisen' + (h.vergleich_ausschuss ? ' · ' + String(h.vergleich_ausschuss).replace(/^Der Gutachterausschuss für Grundstückswerte /, 'GAA ') : ''), mitte: vw, fuehrend: fu === 'vergleichswert' });
     return v;
   }
 
