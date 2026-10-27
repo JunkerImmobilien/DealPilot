@@ -1,0 +1,207 @@
+[
+  {
+    "land_code": "NW",
+    "ags": "05314",
+    "ebene": "kreis",
+    "gebiet_name": "Bundesstadt Bonn",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × Faktor(Fläche des Bewertungsgrundstücks) / Faktor(Fläche des Richtwertgrundstücks)",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 500,
+          "flaeche_qm": [150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500],
+          "koeffizient": [1.12, 1.1, 1.08, 1.07, 1.05, 1.03, 1, 0.97, 0.94, 0.92, 0.9, 0.88, 0.87, 0.86, 0.85, 0.84, 0.84],
+          "bezug_wortlaut": "Tabelle „Größe [m²] / Faktor“, Faktor 1,00 bei 500 m²; das Beispiel rechnet mit dem Quotienten Faktor(Objekt) / Faktor(Richtwertgrundstück)"
+        }
+      },
+      "zwischenwerte": null,
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte; zwischen den Tabellenwerten wird deshalb nicht gerechnet (nur die abgedruckten Flächen liefern einen Koeffizienten).",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": null,
+        "hinweis": "Die Tabelle endet bei 1.500 m²; für größere Flächen nennt der Ausschuss keinen Faktor."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": null,
+        "hinweis": "Die Tabelle beginnt bei 150 m²; für kleinere Flächen nennt der Ausschuss keinen Faktor."
+      },
+      "hinweis_dokument": "Die ermittelten Faktoren sind überwiegend zur Umrechnung kleiner Flächendifferenzen geeignet.",
+      "grundlage": "rd. 411 Kauffälle aus den Jahren 2015 bis 2022, unbebaute Ein- und Zweifamilienhausgrundstücke, die nicht in weitere Bauplätze aufteilbar sind",
+      "pruefbeispiel": {
+        "wortlaut": "Bodenrichtwert: 750 EUR/m² bei 600 m²; Größe des Wertermittlungsgrundstückes: 400 m²; Umrechnungsfaktor bei 600 m²: 0,97; Umrechnungsfaktor bei 400 m²: 1,03; BW (EUR/m²) = 750 EUR/m² · 1,03 / 0,97 = 796 EUR/m² = rd. 800 EUR/m²",
+        "flaeche_qm": 400,
+        "normgroesse_qm": 600,
+        "brw_eur_qm": 750,
+        "koeffizient": 1.0619,
+        "koeffizient_hinweis": "1,03 / 0,97 = 1,0619 (Quotient, vom Dokument nicht ausgeschrieben)",
+        "koeffizient_objekt": 1.03,
+        "koeffizient_norm": 0.97,
+        "bodenwert_eur_qm": 796,
+        "rundung_eur_qm": 1,
+        "rundung_hinweis": "Das Dokument nennt 796 EUR/m² und rundet danach auf rd. 800 EUR/m²; geprüft wird die ungerundete Zahl 796.",
+        "seite": "S. 56 (PDF-Seite 58)"
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "unbebaute Ein- und Zweifamilienhausgrundstücke, nicht in weitere Bauplätze aufteilbar (Bodenrichtwertzonen „E“ = Wohngebiet mit Ein- und Zweifamilienhausbebauung in offener oder geschlossener Bauweise)",
+      "objektarten": ["efh", "zfh", "dhh", "rh"],
+      "objektarten_ausgeschlossen": ["mfh", "etw", "gewerbe"],
+      "regelfall_wortlaut": [
+        "Eine Auswertung von rd. 411 Kauffällen aus den Jahren 2015 bis 2022, in welcher der Einfluss der Grundstücksgröße auf den Kaufpreis von unbebauten Ein- und Zweifamilienhausgrundstücken, die nicht in weitere Bauplätze aufteilbar sind, untersucht wurde, zeigt das in der nachfolgenden Grafik dargestellte Ergebnis.",
+        "E 300 — Wohngebiet mit Ein- und Zweifamilienhausbebauung in offener oder geschlossener Bauweise und einem Richtwertgrundstück von (beispielhaft) 300 m² (Örtliche Fachinformation, S. 1)."
+      ],
+      "dhh_rh_hinweis": "DHH/RH sind eingeschlossen, weil die Zonendefinition „E“ ausdrücklich die geschlossene Bauweise umfasst; die Tabelle unterscheidet nicht nach Haustyp.",
+      "ausserhalb_wortlaut": "Die ermittelten Faktoren sind überwiegend zur Umrechnung kleiner Flächendifferenzen geeignet. Teilbare Grundstücke (weitere Bauplätze) sind nicht Gegenstand der Auswertung.",
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Bundesstadt Bonn, Berliner Platz 2, 53103 Bonn, Tel. (0228) 77-2200, gutachterausschuss@bonn.de; Grundstücksmarktbericht 2026 über BORIS-NRW (www.boris.nrw.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Grundstücksmarktbericht 2026 für die Bundesstadt Bonn",
+        "fundstelle": "Kap. 10.5 „Einfluss der Grundstücksgröße bei Ein- und Zweifamilienhausgrundstücken“, S. 56 (PDF-Seite 58): Tabelle 150–1.500 m², Beispielrechnung",
+        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf"
+      },
+      {
+        "art": "Lizenz",
+        "dokument": "Grundstücksmarktbericht 2026 für die Bundesstadt Bonn, Impressum",
+        "fundstelle": "PDF-Seite 2 (Impressum, Zeile „Lizenz“)",
+        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf",
+        "wortlaut": "Für den Grundstücksmarktbericht gilt die Lizenz \"Datenlizenz Deutschland – Zero – Version 2.0“ (dl-de/zero-2-0). Jede Nutzung ist ohne Einschränkungen oder Bedingungen zulässig."
+      },
+      {
+        "art": "amtliche Veröffentlichung (Zonendefinition)",
+        "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
+        "fundstelle": "S. 1 (Definition „E 300“)",
+        "url": "https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_1_0510400_2026.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Amtlich veröffentlichte Umrechnungskoeffizienten des örtlich zuständigen Ausschusses, Grundstücksmarktbericht 2026 (Stichtag 01.01.2026), unter dl-de/zero-2-0.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "auswertezeitraum": "2015–2022",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf",
+    "lizenz": "dl-de/zero-2-0",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn, Grundstücksmarktbericht 2026, Kap. 10.5, über BORIS-NRW (www.boris.nrw.de), dl-de/zero-2-0",
+    "lizenz_hinweis": "Die Sperre in uk-flaeche-nw-2026.json (16.10.2026) stützte sich auf die Örtliche Fachinformation mit dem Vermerk „Dokumentenklasse B (nur für den Dienstgebrauch)“. Dieselbe Tabelle mit derselben Beispielrechnung veröffentlicht der Ausschuss im Grundstücksmarktbericht 2026 (Kap. 10.5) ausdrücklich unter dl-de/zero-2-0 („Jede Nutzung ist ohne Einschränkungen oder Bedingungen zulässig“). Quelle dieses Satzes ist deshalb der Marktbericht, nicht die Fachinformation.",
+    "fundstelle": "GMB 2026 Kap. 10.5, S. 56 (PDF-Seite 58); Lizenz PDF-Seite 2",
+    "boris_nummer": "0510400",
+    "stufe_hinweis_vorrang": "Löst für EFH/ZFH/DHH/RH die Sperre „nutzung_ungeklaert“ in uk-flaeche-nw-2026.json ab (satzFuer nimmt den Satz, dessen Geltungsbereich die Objektart nennt).",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur im genannten Geltungsbereich.",
+    "belege_meta": {
+      "dokument": "Grundstücksmarktbericht 2026 für die Bundesstadt Bonn",
+      "abgerufen_am": "2026-10-27"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn, Grundstücksmarktbericht 2026",
+    "quelle_parser": "uk-nachernte-27.10.2026 (Grundstücksmarktbericht BORIS-NRW, pdftotext -layout, 27.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "NW",
+    "ags": "05754",
+    "ebene": "kreis",
+    "gebiet_name": "Kreis Gütersloh (mit Stadt Gütersloh)",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "sperre_grund": "nicht_abbildbar",
+    "warum_kein_wert": "Der Ausschuss führt keinen Umrechnungskoeffizienten für die Grundstücksgröße, sondern eine Obergrenze mit Gartenlandanteil: „Der volle Bodenrichtwert sollte für freistehende Ein- und Zweifamilienhäuser bis max. 900 m² und für Reihenhäuser und Doppelhaushälften bis max. 450 m² angesetzt werden.“ Darüber hinaus gilt in der Stadt Gütersloh rd. 30 %, im übrigen Kreisgebiet rd. 35 % des Bodenrichtwertes (GMB 2026, Kap. 4.4.4.2, S. 53). Die Bodenrichtwerte gelten „in der Regel für Flächen von 200 bis 900 m²“ ohne eine feste Größe des Richtwertgrundstücks — der Rechenkern setzt den Restfaktor an der Größe des Richtwertgrundstücks an, nicht an einer Obergrenze je Haustyp. Deshalb keine automatische Umrechnung und keine DealPilot-Formel (die Formel würde Grundstücke bis 900 m² kürzen, die der Ausschuss voll ansetzt). Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh; Grundstücksmarktbericht 2026: https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf; Örtliche Fachinformation: https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_1_0533300_2026.pdf.",
+    "korrektur_hinweis": "Die Sperre in uk-flaeche-nw-2026.json nennt „kein Dokument 2026“ — sie hat unter der Kennziffer 0530800 gesucht. Der Ausschuss führt in BORIS-NRW die Kennziffer 0533300 (wie in uk-irw-nw-ostwestfalen-2026.json); dort liegen Fachinformationen (Nutzungsgruppen 1–6) und Grundstücksmarktbericht 2026.",
+    "formel": null,
+    "formel_vorgemerkt": {
+      "form": "obergrenze_mit_gartenland",
+      "obergrenze_qm": { "efh_zfh": 900, "rh_dhh": 450 },
+      "rest_faktor": { "stadt_guetersloh_05754008": 0.30, "kreis_ohne_stadt": 0.35 },
+      "wortlaut": "Stadt Gütersloh: Der volle Bodenrichtwert sollte für freistehende Ein- und Zweifamilienhäuser bis max. 900 m² und für Reihenhäuser und Doppelhaushälften bis max. 450 m² angesetzt werden. Für Gartenland gilt der Bodenrichtwert nicht. Hierfür ergaben Untersuchungen von Kauffällen aus den Jahren 2020-2022 ein Mittel von rd. 30 % des Bodenrichtwertes. — Kreis Gütersloh (ohne Stadt Gütersloh): … sind mit rd. 35 % des Bodenrichtwertes zu bewerten.",
+      "seite": 53
+    },
+    "geltungsbereich": {
+      "objektarten": ["efh", "zfh", "dhh", "rh"],
+      "objektarten_ausgeschlossen": ["mfh", "etw", "gewerbe"],
+      "raeumlich": "Kreis Gütersloh mit Stadt Gütersloh"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Grundstücksmarktbericht 2026 für den Kreis Gütersloh und die Stadt Gütersloh",
+        "fundstelle": "Kap. 4.4.4.2 „Umrechnungskoeffizienten für übergroße Grundstücke (Gartenland)“, S. 53; Lizenz PDF-Seite 4",
+        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
+        "fundstelle": "LGDBR_1_0533300_2026.pdf, Abschnitte „W - Wohnbaufläche“ und „Gartenland bei übergroßen Grundstücken im Innenbereich“",
+        "url": "https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_1_0533300_2026.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Grundstücksmarktbericht 2026, PDF-Seite 4: „Für den Grundstücksmarktbericht gilt die Lizenz „Datenlizenz Deutschland - Zero - Version 2.0“ (dl-de/zero-2-0).“",
+    "fundstelle": "GMB 2026 Kap. 4.4.4.2, S. 53",
+    "weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh; Grundstücksmarktbericht 2026: https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf",
+    "boris_nummer": "0533300",
+    "belege_meta": { "abgerufen_am": "2026-10-27" },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh, Grundstücksmarktbericht 2026",
+    "quelle_parser": "uk-nachernte-27.10.2026 (Grundstücksmarktbericht BORIS-NRW, pdftotext -layout, 27.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "NW",
+    "ags": "05978",
+    "ebene": "kreis",
+    "gebiet_name": "Kreis Unna (mit Stadt Unna und Stadt Lünen)",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "sperre_grund": "keine_uk",
+    "warum_kein_wert": "Der Ausschuss hat keine Umrechnungskoeffizienten ermittelt. Örtliche Fachinformation 2026, S. 2: „Umrechnungskoeffizienten liegen nicht vor.“ Grundstücksmarktbericht 2026, Kap. 4.7.4, S. 29: „Diese Eigenschaften (Einflussnahme) können z.B. Grundstücksgröße /-tiefe oder bauliche Ausnutzbarkeit sein. Der Gutachterausschuss hat hierzu keine Untersuchungen durchgeführt. Bei Bedarf greift der Gutachterausschuss auf Untersuchungen benachbarter Gutachterausschüsse zurück.“ Werte von Nachbarausschüssen übernimmt DealPilot nicht. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Unna; Örtliche Fachinformation: https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_0_0533200_2026.pdf; Grundstücksmarktbericht 2026: https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33200_2026.pdf.",
+    "korrektur_hinweis": "Die Sperre in uk-flaeche-nw-2026.json nennt „kein Dokument 2026“ — sie hat unter der Kennziffer 0532800 gesucht. Der Ausschuss führt in BORIS-NRW die Kennziffer 0533200 (wie in uk-irw-nw-ruhr-nord-2026.json); dort liegen Fachinformation und Grundstücksmarktbericht 2026.",
+    "formel": null,
+    "geltungsbereich": {
+      "objektarten": ["efh", "zfh", "dhh", "rh"],
+      "objektarten_ausgeschlossen": [],
+      "raeumlich": "Kreis Unna mit Stadt Unna und Stadt Lünen"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
+        "fundstelle": "S. 2, Abschnitt „Umrechnungskoeffizienten zur Berücksichtigung von abweichenden Grundstücksmerkmalen“",
+        "url": "https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_0_0533200_2026.pdf"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Grundstücksmarktbericht 2026 für den Kreis Unna",
+        "fundstelle": "Kap. 4.7.4 „Umrechnungskoeffizienten“, S. 29; Lizenz PDF-Seite 3",
+        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33200_2026.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_0_0533200_2026.pdf",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Grundstücksmarktbericht 2026, PDF-Seite 3: „Für den Grundstücksmarktbericht gilt die „Datenlizenz Deutschland – Zero – Version 2.0“ (dl-de/zero-2-0).“ Die Fachinformation nennt selbst keine Lizenz; es wird nichts aus ihr verwendet.",
+    "fundstelle": "Fachinformation S. 2; GMB 2026 Kap. 4.7.4, S. 29",
+    "weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Unna; https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_0_0533200_2026.pdf",
+    "boris_nummer": "0533200",
+    "belege_meta": { "abgerufen_am": "2026-10-27" },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Unna, Bodenrichtwerte 2026",
+    "quelle_parser": "uk-nachernte-27.10.2026 (Fachinformation und Grundstücksmarktbericht BORIS-NRW, pdftotext -layout, 27.10.2026)",
+    "modellansaetze": {}
+  }
+]

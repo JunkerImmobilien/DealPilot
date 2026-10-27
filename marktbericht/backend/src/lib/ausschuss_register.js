@@ -545,6 +545,9 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                LK Fulda, Wiesbaden, Trier, Kiel (Tabellen), Suedhessen amtlich „kein Einfluss“, Buedingen/Korbach/Giessen
                                mit der von ihnen beschlossenen Landestabelle (Stufe C); Sperren mit Weg, WWT und RV Saarbruecken als Stuetzstelle. */
                             'uk-flaeche-west-2026.json',
+                            /* Nachernte 27.10.2026 (UK Flaeche NRW): Wert Bonn (GMB 2026 Kap. 10.5, dl-de/zero-2-0 - loest die
+                               Dienstgebrauch-Sperre ab); Guetersloh und Unna als Sperren mit richtiger BORIS-Kennziffer (0533300/0533200). */
+                            'uk-flaeche-nw-nachernte-2026-10-27.json',
                             /* v2361: Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4 ImmoWertV), Kennzahl
                                umrechnungskoeffizient_wgfz, gelesen von lib/umrechnung_wgfz.js.
                                Erster Satz: Stadt Bielefeld (MFH-Grundstuecke, GMB 2026 S. 30-31). */
@@ -635,6 +638,24 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Diepholz EFH/ZFH, LK Nienburg und Heidekreis RH; Sperren mit Weg fuer Verden RH
                                (Bremer Umland ohne Ortsliste) und Nienburg-Land EFH. */
                             'swf-ni-sv-2026.json',
+                            /* Ernte 27.10.2026 (BY/SL/HB, nur Sperren mit Weg - kein frei nutzbarer Wert gefunden):
+                               BY Freyung-Grafenau (09272) und Neustadt a.d.Aisch-Bad Windsheim (09575), die bis dahin
+                               GAR KEINEN Satz fuehrten (SWF EZFH kostenpflichtig 20 € / 50 €, LZS nicht abgeleitet);
+                               SL Regionalverband Saarbruecken Jahrgang 2025 (Daten zum 01.06.2025, Vollversion 50 €,
+                               genehmigungspflichtig) neben den Sperren 2022. */
+                            'lzs-swf-by-2026.json', 'lzs-swf-sl-2026.json',
+                            /* Ernte 27.10.2026 (RP/SN/MV/SH/TH): Kreis Stormarn, Grundstuecksmarktbericht
+                               Stand 01.01.2025, Teil 2 (Mai 2026) - Zinssaetze MFH 3,33 / WGH 3,16 / Gewerbe 5,6 %
+                               als SPERREN (Schutzvermerk ohne Wiedergabeerlaubnis), Werte unter formel_vorgemerkt. */
+                            'lzs-swf-sh-2026.json',
+                            /* Ernte 27.10.2026 (BW Teil 2, nur Sperren mit Weg - kein kommerziell nutzbarer Wert gefunden):
+                               13 Ausschuesse, deren Gemeinden bis dahin GAR KEINEN LZS/SWF-Satz fuehrten (Enzkreis,
+                               Philippsburg, Rastatt, Buehl, Gaggenau, Hechingen, Achern, Nagold, Tuttlingen, westl. LK
+                               Ravensburg, Markgraeflerland, suedl. LK Karlsruhe, Waldshut-West) plus Ausschuss-Sperren auf
+                               die uebrigen Mitgliedsgemeinden (suedwestl./noerdl. RNK, Bopfingen, Strohgaeu, Loerrach-
+                               Wiesental). LZS nur mit Zugangsgrund, damit Stufe N weiterrechnet. Enzkreis-SWF 2025 und
+                               Philippsburg-ETW 2,2 % unter formel_vorgemerkt (Lizenz nur nicht kommerziell). */
+                            'lzs-swf-bw-2026-teil2.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
