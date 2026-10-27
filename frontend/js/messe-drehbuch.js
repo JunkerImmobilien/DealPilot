@@ -6575,10 +6575,14 @@
             'DealPilot zählt die Punkte selbst zusammen: ' + (wert('mod_punkte') || 'keine') + ' Punkte. Mit diesem Wert rechnen die Restnutzungsdauer und später die Wertermittlung.', null,
             { was: 'Nichts — die Punkte rechnet DealPilot.', warum: 'Eine Zahl statt vier Einzelangaben für die Wertermittlung.', folge: 'Die Restnutzungsdauer verlängert sich mit jedem Punkt.' });
         }
-        await kmEingabe(s, [feldVon('stellpl_aussen'), feldVon('bgf')], 'Stellplätze und Bruttogrundfläche', KM.stellpl + ' Außenstellplätze, Bruttogrundfläche <b>' + KM.bgf + ' m²</b>.',
-          { was: 'Außenstellplätze und Bruttogrundfläche.', warum: 'Das Sachwertverfahren rechnet mit der Bruttogrundfläche.', folge: 'Stellplätze fließen als eigener Wert ein.' },
-          'Vier Außenstellplätze und die Bruttogrundfläche, ' + KM.bgf + ' Quadratmeter. Die braucht das Sachwertverfahren: dort werden die Herstellungskosten je Quadratmeter Bruttogrundfläche gerechnet.',
-          async function () { await kmTipp('stellpl_aussen', KM.stellpl); await kmTipp('bgf', KM.bgf); });
+        await kmEingabe(s, [feldVon('garagen'), feldVon('stellpl_aussen')], 'Stellplätze', 'Keine Garage, <b>' + KM.stellpl + ' Außenstellplätze</b>.',
+          { was: 'Garagen und Außenstellplätze.', warum: 'Stellplätze haben einen eigenen Wert und eigene Miete.', folge: 'Sie fließen in Marktwert und Ertragswert ein.' },
+          'Keine Garage, aber vier Außenstellplätze. Stellplätze haben einen eigenen Wert und oft eine eigene Miete — sie fließen in Marktwert und Ertragswert ein.',
+          async function () { await kmTipp('garagen', '0'); await kmTipp('stellpl_aussen', KM.stellpl); });
+        await kmEingabe(s, feldVon('bgf'), 'Bruttogrundfläche', 'Bruttogrundfläche <b>' + KM.bgf + ' m²</b> — für das Sachwertverfahren.',
+          { was: 'Die Bruttogrundfläche in m².', warum: 'Das Sachwertverfahren rechnet Herstellungskosten je m² BGF.', folge: 'Ohne BGF schätzt DealPilot sie — mit ihr rechnet der Sachwert genauer.' },
+          'Die Bruttogrundfläche, ' + KM.bgf + ' Quadratmeter. Die braucht das Sachwertverfahren: dort werden die Herstellungskosten je Quadratmeter Bruttogrundfläche gerechnet.',
+          async function () { await kmTipp('bgf', KM.bgf); });
         await kmEingabe(s, [feldVon('lageklasse'), feldVon('ds2_entwicklung')], 'Die Lage — deine Einschätzung', 'Lageklasse <b>C</b>, Makrolage durchschnittlich, Mikrolage — zunächst vorsichtig — <b>sehr schwach</b>.',
           { was: 'Lageklasse, Makro- und Mikrolage, Markt am Ort.', warum: 'Eine schwächere Lage verlangt eine höhere Rendite.', folge: 'Der Marktbericht misst die Lage später nach — und vergleicht.' },
           'Die Lage, zunächst als eigene Einschätzung. Lageklasse C, die Stadt insgesamt durchschnittlich, die Straße schätzen wir vorsichtig als sehr schwach ein. Dazu Bevölkerung stabil, Nachfrage und Wertsteigerung mittel. Warum das zählt: eine schwächere Lage braucht eine höhere Rendite. Der Marktbericht misst die Lage später nach — wir werden sehen, ob wir zu vorsichtig waren.',
@@ -6747,7 +6751,7 @@
             async function () { var k = me(); if (k && !k.classList.contains('active')) k.click(); await kmPause(900); });
         }
         var stg = pz(wert('mietstg')) || '–';
-        await kmEingabe(s, [feldVon('ds2_mietausfall'), feldVon('mietstg')], 'Mietausfall und Steigerung', 'Mietausfall-Risiko <b>mittel</b>, Mietsteigerung <b>' + stg + ' %</b> im Jahr.',
+        await kmEingabe(s, feldVon('ds2_mietausfall'), 'Mietausfall und Steigerung', 'Mietausfall-Risiko <b>mittel</b>, Mietsteigerung <b>' + stg + ' %</b> im Jahr.',
           { was: 'Mietausfall-Risiko; die Steigerung kommt aus deinem Profil.', warum: 'Leerstand und Ausfall kosten Geld.', folge: 'Beides geht in Cashflow und Investor Deal Score ein.' },
           'Zwei Annahmen noch: das Mietausfall-Risiko setzen wir auf mittel. Die jährliche Mietsteigerung von ' + stg + ' Prozent kommt aus deinem Investmentprofil — du setzt sie einmal in den Einstellungen, und jedes neue Objekt startet damit.',
           async function () { await kmWahl('ds2_mietausfall', 'mittel'); });
@@ -6795,6 +6799,20 @@
           'Im Reiter Finanzierung das Darlehen: dreihundertvierundzwanzigtausend Euro, vier Prozent Zins, ein Prozent Tilgung, zehn Jahre Zinsbindung. Zins und Tilgung ergeben die Rate, und die Rate entscheidet über den Cashflow.',
           async function () { await kmTipp('d1', KM.d1); await kmTipp('d1z', KM.d1z); await kmTipp('d1t', KM.d1t); await kmTipp('d1_bindj', KM.bindj); try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} });
         await kmPause(800);
+        /* Kapitaldeckung: Eigenkapital aus dem Profil + Darlehen decken die Gesamtinvestition nicht */
+        var kd = function () { var b = q('#kd-box'); return b && b.offsetWidth ? b : null; };
+        var kdz = r6Text(q('#kd-zeile')), fehltB = /Es fehlen ([\d.]+ €)/.exec(kdz);
+        DPM_KM.kapital = kdz.slice(0, 200);
+        if (kd() && fehltB && q('#kd-btn-ek') && q('#kd-btn-ek').offsetWidth) {
+          await zeige(kd, 8);
+          await kmSag(s, 'Es fehlen ' + fehltB[1], 'Eigenkapital aus dem Profil und Darlehen decken die <b>Gesamtinvestition</b> nicht — DealPilot sagt es sofort.',
+            'Und hier meldet sich DealPilot: es fehlen ' + fehltB[1].replace('€', 'Euro') + '. Das Eigenkapital stand noch auf dem Wert aus deinem Profil, und zusammen mit dem Darlehen deckt es die Gesamtinvestition — Kaufpreis plus Nebenkosten — nicht. Eine Lücke in der Finanzierung fällt so nicht erst bei der Bank auf.', null,
+            { was: 'Noch nichts — DealPilot prüft die Deckung.', warum: 'Eigenkapital plus Darlehen muss die Gesamtinvestition decken.', folge: 'Ein Knopf setzt Eigenkapital oder Darlehen passend.' });
+          await kmEingabe(s, function () { var b = q('#kd-btn-ek'); return b && b.offsetWidth ? b : kd(); }, 'Eigenkapital passend setzen', 'Ein Klick: das Eigenkapital deckt den Rest — das Darlehen bleibt bei <b>' + eur(+KM.d1) + '</b>.',
+            { was: 'Ein Klick auf „Eigenkapital passend setzen“.', warum: 'Das Darlehen steht fest, den Rest bringst du ein.', folge: 'Eigenkapital-Rendite und Cashflow rechnen mit dem echten Einsatz.' },
+            'Wir klicken auf „Eigenkapital passend setzen“. Das Darlehen bleibt, wie es mit der Bank verhandelt ist, und das Eigenkapital deckt genau den Rest.',
+            async function () { var b = q('#kd-btn-ek'); if (b) b.click(); await kmPause(1200); try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} });
+        }
         var K = (window.State && State.kpis) || {};
         await zeige(feldVon('ek'), 10);
         await kmSag(s, 'Eigenkapital', 'Eigenkapital <b>' + kmEur('ek') + '</b>' + (K.ltv != null ? ', Beleihungsauslauf <b>' + de(K.ltv, 1) + ' %</b>' : '') + '.',
@@ -6850,7 +6868,10 @@
         kmRefPruefen();
         await kmPause(1500);
         var k = mbKarteH() || {};
-        await zeige(function () { return q('#avsec') || q('#dp-mb-host'); }, 8);
+        await zeige(function () {
+          var a = q('#avsec'); if (a && a.offsetWidth) return a;
+          return [].filter.call(document.querySelectorAll('#s0 div'), function (x) { return x.offsetWidth && /MARKTEINSCHÄTZUNG/i.test(x.innerText || '') && (x.innerText || '').length < 900; })[0] || null;
+        }, 8);
         var mw = kartenText(/MARKTEINSCHÄTZUNG\s+\S+\s+([\d.]+ €)/i), un = kartenText(/UNTEN\s+([\d.]+ €)/i), ob = kartenText(/OBEN\s+([\d.]+ €)/i), abs = kartenText(/inkl\.\s*([\d,]+ %) Abschlag/);
         _km.mw = mw;
         await kmSag(s, 'Das Ergebnis im Objekt', 'Marktpreisindikation <b>' + (mw || '–') + '</b>' + (un && ob ? ', Spanne ' + un + ' bis ' + ob : '') + (abs ? ' — nach ' + abs + ' Abschlag auf Angebotspreise' : '') + '.',
@@ -6879,7 +6900,8 @@
         var ag = function () { return r16Mb('#assessGrid'); };
         if (ag()) {
           await r16Hin(ag(), true);
-          await zeige(ag, 8);
+          /* gemessen (Studio-Prüflauf): das ganze Raster ist höher als das Bild - nur Mikrolage bis Nachfrage */
+          if (r18AssessEl(/^Mikrolage/)() && r18AssessEl(/^Nachfrage/)()) await zeigeGruppe(r18AssessEl(/^Mikrolage/), r18AssessEl(/^Nachfrage/), 8); else await zeige(ag, 8);
           var lg = function (re) { var v = r18Assess(re); return v ? v.split(' · ')[0] : '–'; };
           _km.mikro = lg(/^Mikrolage(\s*·|$)/);
           await kmSag(s, 'Die Lage — gemessen', 'Mikrolage <b>' + _km.mikro + '</b>, Makrolage ' + lg(/^Makrolage(\s*·|$)/) + ', Nachfrage ' + lg(/^Nachfrage(\s*·|$)/) + '.',
@@ -6896,30 +6918,33 @@
           await kmSag(s, 'Wertermittlung · Stufe 3', 'Bodenwert <b>' + (bw ? bw[1] : '–') + '</b>, Ertragswert <b>' + _km.ew + '</b>, Sachwert ' + _km.sw + '.',
             'Das Herzstück: die Wertermittlung nach der Immobilienwertermittlungsverordnung. Bodenwert ' + (bw ? bw[1] : '') + ', Ertragswert ' + _km.ew + ', Sachwert ' + _km.sw + '. Weil wir ein Renditeobjekt bewerten, führt das Ertragswertverfahren.', null,
             { was: 'Nichts — drei Verfahren, eine Herleitung.', warum: 'Bei Renditeobjekten führt der Ertragswert (§ 6 ImmoWertV).', folge: 'Jeder Wert trägt Quelle, Stufe und Rechenweg.' });
-          var ewK = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Ertragswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
-          var rw = ewK() && [].filter.call(ewK().querySelectorAll('.wv-mehr'), function (x) { return /Rechenweg/.test(x.textContent) && /▸/.test(x.textContent); })[0];
-          if (rw) {
-            rw.click(); await kmPause(900);
-            var zz = function () { var kk = ewK(); return kk && [].filter.call(kk.querySelectorAll('tr,li,div'), function (r) { return /Liegenschaftszins/.test(r.textContent) && r.textContent.length < 260 && r.offsetWidth; }).pop(); };
-            var zl = zz() ? r6Text(zz()) : '';
-            _km.lzsZeile = zl;
-            if (zz()) {
-              await r16Hin(zz(), false);
-              await zeige(zz, 8);
-              var ang = /angepasst/.test(zl);
-              await kmSag(s, 'Der Liegenschaftszins', (lz ? 'Zins <b>' + lz[1] + '</b> ' : '') + (ang ? '— objektspezifisch angepasst, <b>„A, angepasst“</b>.' : '— vom Gutachterausschuss, <b>Stufe A</b>.'),
-              'Im Rechenweg des Ertragswerts steht der Liegenschaftszins' + (lz ? ', ' + lz[1].replace(',', ' Komma ').replace('%', 'Prozent') : '') + '. Er stammt vom zuständigen Gutachterausschuss, mit Jahrgang und Quelle. Führt der Ausschuss eine Formel oder Koeffizienten, passt DealPilot den Zins nach Paragraf 33 an das Objekt an — im Bericht steht dann „A, angepasst“. ' + (ang ? 'Genau das ist hier der Fall.' : 'Für dieses Haus führt der Ausschuss einen festen Satz; er gilt unverändert.'), null,
+          /* der Liegenschaftszins: im Bericht „Liegenschaftszinssatz: x % · amtlich“ samt Quelle (gemessen am Bericht 371).
+             „A, angepasst“ (§ 33) steht dort nur, wo der Ausschuss eine Formel oder Koeffizienten führt. */
+          var lzE = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box *'), function (x) { return x.offsetWidth && /^Liegenschaftszinssatz:/.test(r6Text(x)) && r6Text(x).length < 120; }).pop(); };
+          var lzQ = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box *'), function (x) { return x.offsetWidth && /^Liegenschaftszinssätze für dieses Gebiet/.test(r6Text(x)) && r6Text(x).length < 320; }).pop(); };
+          if (lzE()) {
+            await r16Hin(lzE(), false);
+            if (lzQ()) await zeigeGruppe(lzE, lzQ, 8); else await zeige(lzE, 8);
+            var lzt = r6Text(lzE()), ang = /angepasst/.test(lzt);
+            var CCk = (window.DPM_KOMPLETT_DATEN && DPM_KOMPLETT_DATEN.mb3.data.cross_check) || {}, EWk = CCk.ertragswert || {};
+            var lzA = String(EWk.liegenschaftszins_quelle || '').split(',')[0];
+            if (EWk.liegenschaftszins_anpassung && EWk.liegenschaftszins_anpassung.angepasst) ang = true;
+            _km.lzsZeile = lzt;
+            await kmSag(s, 'Der Liegenschaftszins', '<b>' + lzt.replace(/^Liegenschaftszinssatz:\s*/, '') + '</b>' + (lzA ? ' — ' + lzA : '') + (ang ? ', objektspezifisch angepasst („A, angepasst“).' : '.'),
+              'Der stärkste Hebel im Ertragswert ist der Liegenschaftszins: hier ' + lzt.replace(/^Liegenschaftszinssatz:\s*/, '').replace(/\s*·.*$/, '').replace(',', ' Komma ').replace('%', 'Prozent') + ', amtlich, vom zuständigen Gutachterausschuss, mit Jahrgang und Link zur Quelle. Führt ein Ausschuss eine Formel oder Koeffizienten, passt DealPilot den Zins nach Paragraf 33 an das Objekt an; im Bericht steht dann „A, angepasst“. ' + (ang ? 'Genau das ist hier der Fall.' : 'Für dieses Haus führt der Ausschuss einen festen Satz — er gilt unverändert.'), null,
               { was: 'Nichts — der Zins kommt vom Gutachterausschuss.', warum: 'Der Zins ist der stärkste Hebel im Ertragswert.', folge: 'Mit Formel des Ausschusses: angepasst nach § 33, „A, angepasst“.' });
-            }
           }
-          var vk = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Vergleichswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
-          if (vk()) {
-            await r16Hin(vk(), false);
-            await zeige(vk, 8);
-            var vt = r6Text(vk()).replace(/^Vergleichswert\s*/i, '').slice(0, 140);
-            await kmSag(s, 'Vergleichswert', '<b>' + _km.vw + '</b> — ' + (/–|kein|nicht/i.test(_km.vw + vt) ? 'ohne vollständig anpassbare Vergleichsfaktoren gibt es <b>keinen Wert</b>.' : vt),
-              'Und der Vergleichswert. DealPilot rechnet ihn nur mit amtlichen Vergleichsfaktoren, die sich vollständig an das Objekt anpassen lassen. Fehlt eine Anpassung — oder führt der Ausschuss für diese Objektart gar keine Faktoren —, gibt es keinen Wert, statt einen halben. Das ist hier der Fall.', null,
-              { was: 'Nichts — DealPilot prüft die Faktoren.', warum: 'Ein halb angepasster Faktor wäre eine erfundene Zahl.', folge: 'Ohne volle Anpassung: kein Vergleichswert.' });
+          /* Vergleichswert: nur mit vollständig anpassbaren amtlichen Vergleichsfaktoren - hier keine Karte */
+          var vkK = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Vergleichswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+          var avf = ((window.DPM_KOMPLETT_DATEN && DPM_KOMPLETT_DATEN.mb3.data.cross_check) || {}).amtlicher_vergleichsfaktor || {};
+          var nKarten = (function () { var d = r16Doc(); return d ? d.querySelectorAll('#wv-box .wv-k').length : 0; })();
+          if (!vkK()) {
+            await r16Hin(wv(), true);
+            await zeigeGruppe(function () { var d = r16Doc(); var kk = d && d.querySelectorAll('#wv-box .wv-k'); return kk && kk[0]; }, function () { var d = r16Doc(); var kk = d && d.querySelectorAll('#wv-box .wv-k'); return kk && kk[kk.length - 1]; }, 8);
+            DPM_KM.vergleich = { karten: nKarten, grund: avf.grund || null, verfuegbar: avf.verfuegbar };
+            await kmSag(s, 'Kein Vergleichswert', nKarten + ' Karten, <b>kein Vergleichswert</b> — ' + (avf.grund === 'objektart_ohne_tabelle' ? 'für Mehrfamilienhäuser führt der Ausschuss keine Vergleichsfaktoren.' : 'ohne vollständig anpassbare Vergleichsfaktoren keine Zahl.'),
+              'Und was fehlt? Ein Vergleichswert. DealPilot rechnet ihn nur mit amtlichen Vergleichsfaktoren, die sich vollständig an das Objekt anpassen lassen. ' + (avf.grund === 'objektart_ohne_tabelle' ? 'Für Mehrfamilienhäuser führt der Gutachterausschuss hier keine Vergleichsfaktoren.' : 'Fehlt eine Anpassung, rechnet DealPilot nicht halb.') + ' Dann gibt es keinen Wert — statt einer Zahl, die nur so aussieht wie eine.', null,
+              { was: 'Nichts — DealPilot prüft die Vergleichsfaktoren.', warum: 'Ein halb angepasster Faktor wäre eine erfundene Zahl.', folge: 'Ohne volle Anpassung: kein Vergleichswert.' });
           }
         }
         r16MbZu(); await kmPause(1200);
