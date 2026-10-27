@@ -1016,16 +1016,26 @@ function _buildAIPayload() {
             summe_eur: z((r1.zy || 0) + (r1.afa_y || 0) + (r1.bwk_st_y || 0)),
             mieteinnahmen_eur: z(r1.nkm_y)
           };
+          /* v2992 · Warnung anschaffungsnahe HK (tax.js) - als Klartext an den Pilot */
+          try {
+            var _ahk = window._dpAhkWarnung && State.taxTimeline ? window._dpAhkWarnung(State.taxTimeline) : '';
+            if (_ahk) s.ahk_warnung = _ahk.replace(/<br>/g, ' ').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+          } catch (e) {}
           s.verlauf = R.slice(0, 15).map(function (r) {
             return { jahr: r.cal || r.y, miete_eur: z(r.nkm_y), zinsen_eur: z(r.zy), afa_eur: z(r.afa_y),
                      bwk_steuerlich_eur: z(r.bwk_st_y), ergebnis_vuv_eur: z(r.zve_y),
                      steuer_eur: z(r.tax_y), cashflow_nach_steuer_eur: z(r.cfns_y) };
           });
-          var wende = null, erstattBis = 0, lastAb = 0;
+          /* v2992 · Wende = ab hier DAUERHAFT positiv (wie steuer-verlauf.js auswerten).
+             Bis v2991 das erste Jahr mit Gewinn - Parkstr. 9 (Kauf 12/2024): 2024 mit
+             einem Monat Miete und Gewinn, dann 2025 und 2028 Verlust durch Erhaltungsaufwand.
+             Der Pilot schrieb daraus „im Jahr 2026 kippt die Steuerwirkung". */
+          var wIdx = -1;
+          for (var k = R.length - 1; k >= 0; k--) { if (typeof R[k].zve_y === 'number' && R[k].zve_y > 0) wIdx = k; else break; }
+          var wende = wIdx >= 0 ? (R[wIdx].cal || R[wIdx].y) : null, erstattBis = 0, lastAb = 0;
           for (var i = 0; i < R.length; i++) {
-            var e = R[i].zve_y, t = R[i].tax_y;
-            if (wende === null && typeof e === 'number' && e > 0) wende = R[i].cal || R[i].y;
-            if (wende === null && typeof t === 'number') erstattBis += t;
+            var t = R[i].tax_y;
+            if ((wIdx < 0 || i < wIdx) && typeof t === 'number') erstattBis += t;
             else if (typeof t === 'number' && i < 15) lastAb += t;
           }
           s.wende = {

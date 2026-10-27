@@ -527,6 +527,14 @@
       var _ohneSwf = function (e) { return !/sachwert|swf/i.test(String(e.kennzahl) + String(e.name)); };
       hinterlegt = hinterlegt.filter(_ohneSwf); fehlt = fehlt.filter(_ohneSwf);
     }
+    /* v2994 · EIGENE ANGABEN ZAEHLEN. Marcel 27.10.2026 (Hermannstr. 9, Huellhorst): Sachwertfaktor
+       1,15 und Zins 2,56 % selbst eingetragen, trotzdem rot „fehlt eine amtliche Kennzahl" und beim Zins
+       „der Bericht nimmt den gesetzlichen Auffangwert (Stufe E)" - Stufe E ist die eigene Angabe. Mit
+       eigener Angabe rechnet der Bericht damit; die Zeile sagt das, ohne Rot und ohne Anfrage-Pflicht. */
+    var _zahlEigen = function (id) { var t = String(_v(id) || '').trim().replace(',', '.'); var n = parseFloat(t); return t && isFinite(n) && n > 0 ? n : null; };
+    var eigenSwf = _zahlEigen('sachwertfaktor'), eigenLzs = _zahlEigen('lzs_pct');
+    var zinsEigen = !!(_leiste && _leiste.zinsStufe === 'E') || eigenLzs != null;
+    var _de = function (n, d) { return String(Math.round(n * Math.pow(10, d)) / Math.pow(10, d)).replace('.', ','); };
     var swfOhneArt = swfRelevant && _leiste && !_leiste.swf;
     /* v1858c · steht der Sachwertfaktor schon in „fehlt" (Register führt
        keinen), kommt keine zweite Zeile dazu — Parkstr. 9 hatte zwei. */
@@ -536,28 +544,42 @@
       var link = e.quelle_url ? '<a href="' + esc(e.quelle_url) + '" target="_blank" rel="noopener">' + (/\.pdf(\?|$)/i.test(e.quelle_url) ? 'Bericht (PDF)' : 'Quelle öffnen') + '</a>' : '<span class="oe-leer">kein Link hinterlegt</span>';
       var text = esc(kurz(e.ausschuss || q.ausschuss)) + (e.jahrgang || e.berichtsjahr ? ' · ' + esc(e.jahrgang || e.berichtsjahr) : '') + (e.gebiet ? ' · ' + esc(e.gebiet) : '');
       /* Faktor hinterlegt, aber nicht für diese Objektart (Lippe: nur EZFH) — EINE Zeile, nicht zwei */
-      if (istSwf && swfOhneArt) { text += ' · <span title="' + esc(_leiste.swfHinweis || '') + '">nicht für diese Objektart</span>'; swfOhneArt = false; }
+      if (istSwf && swfOhneArt) { text += ' · <span title="' + esc(_leiste.swfHinweis || '') + '">nicht für diese Objektart</span>'
+        + (eigenSwf != null ? ' · deine eigene Angabe ' + _de(eigenSwf, 2) + ' gilt' : ''); swfOhneArt = false; }
       /* v1865 · dasselbe für den Zins: Register führt ihn, aber nicht für diese
          Objektart (Minden-Lübbecke: ETW, EFH, ZFH — kein MFH) — der Bericht
          rechnet dann mit dem Auffangwert. Die Zeile sagt das, statt „hinterlegt". */
       var istZins = /liegenschaft|lzs/i.test(String(e.kennzahl) + e.name);
-      if (istZins && _leiste && !_leiste.zins && _leiste.zinsStufe) {
+      if (istZins && zinsEigen) {
+        text += ' · deine eigene Angabe' + (eigenLzs != null ? ' ' + _de(eigenLzs, 2) + ' %' : '') + ' gilt (Stufe E)';
+      } else if (istZins && _leiste && !_leiste.zins && _leiste.zinsStufe) {
         text += ' · <span title="' + esc(_leiste.zinsGrund || '') + '">nicht für die Objektart ' + esc(_v('objart').toUpperCase() || '?')
               + ' — der Bericht nimmt ' + (_leiste.zinsStufe === 'N' ? 'die DealPilot-Formel (Stufe N)' : 'den gesetzlichen Auffangwert (Stufe ' + esc(_leiste.zinsStufe) + ')') + '</span>';
       }
-      zeilen.push('<div class="oe-qz' + ((istSwf && /nicht für diese Objektart/.test(text)) || (istZins && /Auffangwert|DealPilot-Formel/.test(text)) ? ' fehlt' : '') + '"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span title="' + esc(e.ausschuss || q.ausschuss || '') + '">' + text + '</span>' + link + '</div>');
+      zeilen.push('<div class="oe-qz' + ((istSwf && /nicht für diese Objektart/.test(text) && eigenSwf == null) || (istZins && /Auffangwert|DealPilot-Formel/.test(text) && !zinsEigen) ? ' fehlt' : '') + '"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span title="' + esc(e.ausschuss || q.ausschuss || '') + '">' + text + '</span>' + link + '</div>');
     });
     fehlt.forEach(function (e) {
+      var _eSwf = /sachwert|swf/i.test(String(e.kennzahl) + String(e.name)), _eZins = /liegenschaft|lzs/i.test(String(e.kennzahl) + String(e.name));
+      if ((_eSwf && eigenSwf != null) || (_eZins && zinsEigen)) {
+        zeilen.push('<div class="oe-qz"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — deine eigene Angabe'
+          + (_eSwf ? ' ' + _de(eigenSwf, 2) : (eigenLzs != null ? ' ' + _de(eigenLzs, 2) + ' %' : '')) + ' gilt (Stufe E)</span></div>');
+        return;
+      }
       zeilen.push('<div class="oe-qz fehlt"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — ' + esc(kurz(q && q.ausschuss) || 'Gutachterausschuss') + ' anfragen oder dem Grundstücksmarktbericht entnehmen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
     });
-    if (swfOhneArt) {
+    if (swfOhneArt && eigenSwf != null) {
+      zeilen.push('<div class="oe-qz"><b>Sachwertfaktor</b><span title="' + esc(_leiste.swfHinweis || '') + '">für diese Objektart nicht abgeleitet — deine eigene Angabe ' + _de(eigenSwf, 2) + ' gilt (Stufe E)</span></div>');
+    } else if (swfOhneArt) {
       zeilen.push('<div class="oe-qz fehlt"><b>Sachwertfaktor</b><span title="' + esc(_leiste.swfHinweis || '') + '">für diese Objektart nicht abgeleitet — ' + esc(kurz(_leiste.ausschuss || (q && q.ausschuss)) || 'Gutachterausschuss') + ' anfragen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
     }
     if (zeilen.some(function (z) { return /fehlt/.test(z); })) zeilen.push('<div class="oe-qz"><b></b><span class="oe-q">Unterlagen und Grundstücksmarktbericht anfragen:</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">beim Amt anfragen</button></div>');
-    var brauchtAnfrage = fehlt.length > 0 || (_leiste && (!_leiste.zins || (swfRelevant && !_leiste.swf)));
+    var _fehltOhneEigen = fehlt.filter(function (e) { var k = String(e.kennzahl) + String(e.name); return !((/sachwert|swf/i.test(k) && eigenSwf != null) || (/liegenschaft|lzs/i.test(k) && zinsEigen)); });
+    var brauchtAnfrage = _fehltOhneEigen.length > 0 || (_leiste && ((!_leiste.zins && !zinsEigen) || (swfRelevant && !_leiste.swf && eigenSwf == null)));
+    var mitEigen = zinsEigen || (swfRelevant && eigenSwf != null && !(_leiste && _leiste.swf));
     if (hint) hint.innerHTML = brauchtAnfrage
       ? st('x', 'nötig') + 'Für dieses Objekt fehlt eine amtliche Kennzahl — Quelle unten, Anfrage mit einem Klick.'
-      : (q && q.ausschuss ? st('a', 'vollständig') + 'Alle Kennzahlen liegen im Register (' + esc(q.ausschuss) + ').' : '');
+      : (mitEigen ? st('a', 'vollständig') + 'Alle Kennzahlen liegen vor — teils aus dem Register' + (q && q.ausschuss ? ' (' + esc(q.ausschuss) + ')' : '') + ', teils als deine eigene Angabe (Stufe E).'
+      : (q && q.ausschuss ? st('a', 'vollständig') + 'Alle Kennzahlen liegen im Register (' + esc(q.ausschuss) + ').' : ''));
     box.innerHTML = zeilen.join('');
     box.style.display = zeilen.length ? '' : 'none';
   }
@@ -1150,6 +1172,8 @@
       }
     } catch (x) {}
     el.value = String(_wert);
+    /* v2996 · Herkunft mitsetzen: Ertrags-/Sach-/amtlicher Vergleichswert = Marktbericht, sonst Indikation */
+    try { var _hs = $('svw_herkunft'); if (_hs) _hs.value = _amtlich ? 'marktbericht' : 'indikation'; } catch (x) {}
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     if (typeof calc === 'function') { try { calc(); } catch (e) {} }

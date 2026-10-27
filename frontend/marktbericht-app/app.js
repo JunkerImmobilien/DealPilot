@@ -1160,6 +1160,9 @@ function _renderWertverfahren(d) {
                 /* v2600 · E1 · Massstab ist der Anker (amtlich / Ø Miete des Satzes / Angebotsmiete) ± 20 % */
                 + (e.miete_band.anker_qm != null
                   ? esc(e.miete_band.anker_etikett || 'Vergleichsmiete') + ' ' + String(e.miete_band.anker_qm).replace('.', ',') + ' ± ' + (e.miete_band.band_pct || 20) + ' %'
+                    /* v2993 · Zensus-Anker: das Angebotsniveau steht daneben, ausdruecklich nicht angesetzt */
+                    + (e.miete_band.anker_stufe === 'zensus' && e.miete_band.angebot_qm != null
+                      ? '; Angebotsniveau ' + String(e.miete_band.angebot_qm).replace('.', ',') + ' €/m², nicht angesetzt (Angebote sind keine Vertragsmieten)' : '')
                   : [e.miete_band.amtlich_qm != null ? 'amtlich ' + String(e.miete_band.amtlich_qm).replace('.', ',') : null,
                      e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ')) + ')' : '')
              /* v2600 · E2/E3/E4/E10 · besondere Merkmale, vorlaeufig, Spanne, Liquidationshinweis */

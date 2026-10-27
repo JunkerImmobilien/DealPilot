@@ -389,7 +389,11 @@ function buildPrompt(payload, opts) {
     'verwirrt den Nutzer, der beide Angaben nebeneinander sieht.',
     '',
     'WICHTIGE INSTRUKTIONEN:',
-    '- Verwende die Begriffe „SOLIDE", „ERHÖHT", „KRITISCH" / „KNAPP" exakt wie oben.',
+    '- Verwende die Stufen solide, erhöht, kritisch / knapp wie oben - im Fließtext klein, ohne',
+    '  Anführungszeichen, ohne Versalien und ohne „nach der DealPilot-Skala" (v2992).',
+    '- Schreibe durchgehend Deutsch - keine englischen Fachwörter wie „Benchmark", „Upside",',
+    '  „Comparison", „Exit-Cap". Der DealPilot-Marktbericht ist KEIN Gutachten und KEIN',
+    '  Wertgutachten - nenne ihn „Marktbericht", seine Werte „Marktpreisindikation" bzw. „Ertragswert".',
     '- Formuliere positiv-konkret: Ein LTV von 84 % ist SOLIDE und gehört in den',
     '  Stärken-Block, NICHT in die Risiken. Bezeichne diesen Bereich NIE als „hoch",',
     '  „relativ hoch" oder „erhöht" — das ist faktisch falsch und kontrastiert mit',
@@ -704,6 +708,8 @@ function buildPrompt(payload, opts) {
                 ? 'automatisch gewaehlte Jahre' : (_st.sanierung.verteilung_jahre || '?') + ' Jahre'))
             : 'nein - als Erhaltungsaufwand NICHT angesetzt') : null],
       ['Sonder-AfA § 7b', _st.sonder_afa_7b ? 'aktiv' : null],
+      /* v2992 · die App rechnet den Erhaltungsaufwand wie eingegeben - die Warnung muss in den Text */
+      ['WARNUNG anschaffungsnahe Herstellungskosten (in Aufgabe 8 und der steuerlichen Zusammenfassung nennen)', _st.ahk_warnung ? String(_st.ahk_warnung).slice(0, 700) : null],
       ['Erbbaurecht', (_st.erbbaurecht && _st.erbbaurecht.ja)
         ? ('ja' + (_st.erbbaurecht.erbbauzins_eur_jahr != null
             ? ', Erbbauzins ' + _z(_st.erbbaurecht.erbbauzins_eur_jahr) + ' EUR/Jahr' : '')) : null]
@@ -723,7 +729,7 @@ function buildPrompt(payload, opts) {
       if (w) {
         o.push('## STEUER: WANN WIRD DAS OBJEKT STEUERLICH POSITIV');
         o.push(w.erstes_jahr_steuerlich_positiv
-          ? ('- Erstes Jahr mit positivem Ergebnis aus Vermietung: ' + w.erstes_jahr_steuerlich_positiv
+          ? ('- Ab diesem Jahr ist das Ergebnis aus Vermietung DAUERHAFT positiv (davor koennen Gewinn- und Verlustjahre wechseln, siehe Jahresverlauf): ' + w.erstes_jahr_steuerlich_positiv
              + '. Steuerwirkung bis dahin: ' + _z(w.steuerwirkung_bis_dahin_eur) + ' EUR (negativ = Erstattung).'
              + ' Steuerlast danach bis Jahr 15: ' + _z(w.steuerlast_danach_bis_jahr15_eur) + ' EUR.')
           : ('- In den gerechneten ' + w.gerechnet_ueber_jahre + ' Jahren bleibt das Ergebnis negativ.'
@@ -1049,7 +1055,17 @@ function buildPrompt(payload, opts) {
        Steuererstattung. Jetzt steht beides da und ist benannt. */
     '- Monatlich (VOR Steuer): ' + fmtEur(k.cf_m),
     (k.cf_ns != null && isFinite(k.cf_ns)) ? ('- Jaehrlich NACH Steuer: ' + fmtEur(k.cf_ns)) : '',
-    (k.steuer != null && isFinite(k.steuer)) ? ('- Steuerwirkung p.a.: ' + fmtEur(-k.steuer) + ' (negativ = Erstattung)') : '',
+    /* v2992 · bis hier „Steuerwirkung p.a.: fmtEur(-k.steuer) (negativ = Erstattung)". k.steuer
+       ist die BELASTUNG (positiv = Steuer) - das Minus machte aus 5.522 EUR Steuer eine
+       „Entlastung von -5.522". Und k.steuer ist das Rumpfjahr; die Kennzahl des ersten
+       vollen Jahres ist Cashflow vor minus nach Steuer. */
+    (function () {
+      var st = (k.cf_m != null && k.cf_ns != null && isFinite(k.cf_m) && isFinite(k.cf_ns)) ? k.cf_m * 12 - k.cf_ns
+        : ((k.steuer != null && isFinite(k.steuer)) ? Number(k.steuer) : null);
+      if (st == null) return '';
+      return '- Steuer im ersten vollen Jahr: ' + (st >= 0 ? 'Belastung ' + fmtEur(st) + ' (der Investor ZAHLT)' : 'Erstattung ' + fmtEur(-st) + ' (der Investor BEKOMMT zurueck)')
+        + (k.cf_ns != null && isFinite(k.cf_ns) ? '\n- Monatlich NACH Steuer (erstes volles Jahr): ' + fmtEur(k.cf_ns / 12) + ' - nimm DIESE Zahl, wenn du vom Cashflow nach Steuer heute sprichst' : '');
+    })(),
     (k.afa != null && isFinite(k.afa)) ? ('- AfA p.a.: ' + fmtEur(k.afa)) : '',
     '- Score: ' + cfScore + ' / 100',
     '',
@@ -1382,8 +1398,19 @@ function buildPrompt(payload, opts) {
       }
 
       /* ---- Mietabweichung: die eigentliche Aussage ------------------------ */
-      var marktM = null;
-      try { marktM = (a.data && a.data.rent && a.data.rent.median_sqm) || null; } catch (e) {}
+      /* v2992 · rent.median_sqm ist der Median der MIETANGEBOTE am Ort, keine Marktmiete
+         und kein Mietspiegel. Parkstr. 9: der Pilot schrieb „Marktmiete laut Bericht 9,38 €/m²,
+         Ist 18 % darunter" - die marktuebliche Miete des Ertragswerts lag bei 4,64 €/m², die
+         Ist-Miete UEBER dem Band. Verglichen wird jetzt mit der marktueblichen Miete des
+         Ertragswerts (Band der Marktueblichkeit); das Angebot steht daneben, benannt. */
+      var angebotM = null, ewM = null, band = null;
+      try { angebotM = (a.data && a.data.rent && a.data.rent.median_sqm) || null; } catch (e) {}
+      try {
+        var _ccE = a.data && a.data.cross_check && a.data.cross_check.ertragswert;
+        if (_ccE && Number(_ccE.miete_vergleich_qm) > 0) ewM = Number(_ccE.miete_vergleich_qm);
+        if (_ccE && _ccE.miete_band && Number(_ccE.miete_band.unten_qm) > 0) band = _ccE.miete_band;
+      } catch (e) {}
+      var marktM = ewM != null ? ewM : angebotM;
       if (marktM == null && mb.marktmiete_qm != null) marktM = Number(mb.marktmiete_qm);
       var wfl = Number(o.wfl || (a.living_area != null ? a.living_area : 0)) || null;
       /* nkm_j ist die JAHRES-Nettokaltmeite (calc.js State.kpis) -> /12 fuer den
@@ -1394,7 +1421,16 @@ function buildPrompt(payload, opts) {
         var abw = ((istQm - marktM) / marktM) * 100;
         L.push('');
         L.push('## MIETNIVEAU — GERECHNET, NICHT GESCHAETZT');
-        L.push('- Marktmiete laut Bericht: ' + fmtNum(marktM, 2).replace('.', ',') + ' €/m²');
+        if (ewM != null) {
+          L.push('- Marktuebliche Miete (Ertragswert des Berichts): ' + fmtNum(ewM, 2).replace('.', ',') + ' €/m²'
+            + (band ? ' · Band der Marktueblichkeit ' + fmtNum(band.unten_qm, 2).replace('.', ',') + ' bis ' + fmtNum(band.oben_qm, 2).replace('.', ',') + ' €/m²' : ''));
+          if (angebotM != null) L.push('- Angebotsmiete (Median der Mietangebote am Ort, NUR zur Einordnung): ' + fmtNum(angebotM, 2).replace('.', ',') + ' €/m²');
+          L.push('- SPRACHE: Nenne die Angebotsmiete NIE „Marktmiete", „Mietspiegel" oder „Vergleichsmiete" -');
+          L.push('  sie ist ein Angebotsniveau, kein Beleg fuer erzielbare Mieten. Ein Mietspiegel liegt nur vor,');
+          L.push('  wenn er unten ausdruecklich genannt ist.');
+        } else {
+          L.push('- Angebotsmiete (Median der Mietangebote am Ort - KEINE marktuebliche Miete, KEIN Mietspiegel): ' + fmtNum(marktM, 2).replace('.', ',') + ' €/m²');
+        }
         L.push('- Ist-Kaltmiete: ' + fmtEur(istKalt) + '/Monat auf ' + Math.round(wfl) + ' m² = ' + fmtNum(istQm, 2).replace('.', ',') + ' €/m²');
         L.push('- Abweichung: ' + (abw >= 0 ? '+' : '') + abw.toFixed(1).replace('.', ',') + ' %');
         if (abw < -8) {

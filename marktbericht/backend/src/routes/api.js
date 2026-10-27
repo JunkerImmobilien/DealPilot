@@ -1592,7 +1592,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
         }
       } catch (e) { /* nur Auskunft */ }
     } catch (e) { ukQuelle = null; }
-    const { BAUPREISINDEX_KONSTANTE } = await import('../services/CrossCheckService.js');
+    const { baupreisindexHeute } = await import('../services/CrossCheckService.js');   /* v2996 */
 
     res.json({
       verfuegbar: true,
@@ -1627,7 +1627,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
             seite: s.seite || null, jahrgang: s.jahrgang || s.berichtsjahr || null };
         } catch (e) { return null; }
       })(),
-      baupreisindex: BAUPREISINDEX_KONSTANTE,
+      baupreisindex: baupreisindexHeute(),
       objektart: m.property_type, ags: String(agsFein)
     });
   } catch (e) { res.status(500).json({ verfuegbar: false, grund: e.message }); }

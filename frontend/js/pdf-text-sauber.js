@@ -62,6 +62,15 @@
   /** Text WinAnsi-fest machen. Nicht-Strings gehen unveraendert zurueck. */
   function sauber(s) {
     if (typeof s !== 'string' || !s) return s;
+    /* v2992 · Normzitate brechen nicht um: „§ 194 / BauGB" stand im Investment-PDF
+       am Zeilen- und sogar am Seitenende. Geschuetztes Leerzeichen (WinAnsi 0xA0)
+       zwischen §, Nummer, „Abs." und Gesetz - splitTextToSize trennt dort nicht
+       (gemessen jsPDF 2.5.1). */
+    if (s.indexOf('§') >= 0) {
+      s = s.replace(/(§§?) (?=\d)/g, '$1 ')
+        .replace(/(§ [\d.]+[a-z]?) (Abs\.|Satz|Nr\.)( )?(\d*)/g, function (m, a, b, c, d) { return a + ' ' + b + (c ? ' ' : '') + d; })
+        .replace(/(\d[a-z]?) (BauGB|BGB|EStG|ImmoWertV|ImmoWertA|BewG|GrEStG|WEG|HGB|UStG|BelWertV|GEG|WoFlV|BetrKV|KStG|UmwStG|AO)\b/g, '$1 $2');
+    }
     /* schneller Weg: alles schon WinAnsi */
     if (!/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/.test(s)) return s;
     var aus = '';

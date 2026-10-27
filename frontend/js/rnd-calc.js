@@ -95,18 +95,30 @@
     { id: 'grundriss',    label: 'Verbesserung Grundrissgestaltung',           max: 2 }
   ];
 
-  // 9 Gewerke mit Standard-Gewichtung lt. Original-Gutachten
+  /* v2995 · GEWICHTE NACH DEN WÄGUNGSANTEILEN DER NHK 2010 (Anlage 4 ImmoWertV, Tabelle 1).
+     Bis v2994 stand hier die Gewichtung einer Gutachter-Hausvorlage (15/15/5/15/10/5/5/15/15,
+     Kap. 5.3.2 der Gutachten 25DG02661/25DG06644) - ohne veröffentlichte Quelle, mit
+     „Grundriss" (kein alterndes Bauteil, wirkt schon über die Modernisierungspunkte) und
+     „Leitungen" neben „Technik" (überschneidend). Recherche 27.10.2026: amtlich belegt sind nur
+     die NHK-Anteile; ein Musterrestnutzungsdauergutachten gewichtet ausdrücklich „an der
+     Gewichtung der Herstellungskosten der NHK2010". Für ETW/MFH führt Anlage 4 keine eigenen
+     Anteile - dort ist es eine Analogie, und das Gutachten sagt es. Dieselben neun Gruppen
+     bewertet der Reiter Objekt (ausst_*). Die Vorlage bleibt als GEWERKE_VORLAGE, damit der
+     Prüfer die Gutachten mit IHRER Gewichtung nachrechnen kann. */
   const GEWERKE = [
-    { id: 'dach',         label: 'Dachkonstruktion inkl. Wärmedämmung',  weight: 15 },
-    { id: 'fenster',      label: 'Fenster / Außentüren',                 weight: 15 },
-    { id: 'leitungen',    label: 'Leitungssysteme',                      weight:  5 },
-    { id: 'heizung',      label: 'Heizungsanlage',                       weight: 15 },
-    { id: 'aussenwand',   label: 'Außenwände inkl. Wärmedämmung',        weight: 10 },
-    { id: 'baeder',       label: 'Ausbau Bäder',                         weight:  5 },
-    { id: 'decken',       label: 'Deckenkonstruktion inkl. Wärmedämmung',weight:  5 },
-    { id: 'technik',      label: 'Technische Ausstattung',               weight: 15 },
-    { id: 'grundriss',    label: 'Wesentliche Veränderung Grundriss',    weight: 15 }
+    { id: 'aussenwand',   label: 'Außenwände',                                  weight: 23 },
+    { id: 'dach',         label: 'Dach',                                        weight: 15 },
+    { id: 'fenster',      label: 'Fenster und Außentüren',                      weight: 11 },
+    { id: 'innenwaende',  label: 'Innenwände und -türen',                       weight: 11 },
+    { id: 'decken',       label: 'Decken und Treppen',                          weight: 11 },
+    { id: 'fussboeden',   label: 'Fußböden',                                    weight:  5 },
+    { id: 'baeder',       label: 'Sanitär',                                     weight:  9 },
+    { id: 'heizung',      label: 'Heizung',                                     weight:  9 },
+    { id: 'technik',      label: 'Sonstige technische Ausstattung (Elektro)',   weight:  6 }
   ];
+  const GEWERKE_VORLAGE = { dach: 15, fenster: 15, leitungen: 5, heizung: 15, aussenwand: 10,
+                            baeder: 5, decken: 5, technik: 15, grundriss: 15 };
+  const GEWICHT_QUELLE = 'Wägungsanteile der Normalherstellungskosten 2010 (Anlage 4 ImmoWertV, Tabelle 1)';
 
   /* v2943 · VIER STUFEN, nicht drei. Die Gutachten (25DG02661, 25DG06644,
      Kap. 5.3.2) meinen mit „aktueller Standard" ein ERNEUERTES Gewerk
@@ -440,9 +452,12 @@
   function calcTechnisch(alter, gnd, gewerkeBewertung, gewerkeWeights, gewerkeRestlebensdauer) {
     const weights = gewerkeWeights || {};
     let pctVeraltet = 0, pctStandard = 0, pctErneuert = 0, pctGehoben = 0, pctUnbewertet = 0, totalWeight = 0;
+    /* v2995 · ein vollständiger eigener Gewichtssatz (z. B. GEWERKE_VORLAGE) bringt seine
+       Gewerke selbst mit; sonst die NHK-Gruppen. */
+    const LISTE = Object.keys(weights).length ? Object.keys(weights).map(function (id) { return { id: id, weight: Number(weights[id]) }; }) : GEWERKE;
 
-    // Gewerke mit ihren prozentualen Anteilen aufaddieren (wie im Original-Gutachten Kap. 5.3.2)
-    GEWERKE.forEach(function (g) {
+    // Gewerke mit ihren prozentualen Anteilen aufaddieren
+    LISTE.forEach(function (g) {
       const w = (weights[g.id] != null) ? Number(weights[g.id]) : g.weight;
       totalWeight += w;
       const grad = (gewerkeBewertung && gewerkeBewertung[g.id]) || null;
@@ -484,7 +499,7 @@
     let btePlausibilitaet = null;
     if (gewerkeRestlebensdauer && Object.keys(gewerkeRestlebensdauer).length > 0) {
       let rldGewichtet = 0, w_sum = 0;
-      GEWERKE.forEach(function (g) {
+      LISTE.forEach(function (g) {
         if (gewerkeRestlebensdauer[g.id] != null) {
           const rld = Number(gewerkeRestlebensdauer[g.id]);
           const w = (weights[g.id] != null) ? Number(weights[g.id]) : g.weight;
@@ -1310,6 +1325,9 @@
       baeder:     gradBaeder || mehrheit,
       decken:     gradDecken || gradInnen || mehrheit,
       technik:    gradTechnik || gradKueche || mehrheit,
+      /* v2995 · NHK-Gruppen Innenwände und Fußböden */
+      innenwaende: gradInnen || mehrheit,
+      fussboeden:  gradBoden || mehrheit,
       grundriss:  fallbackGrad
     };
 
@@ -1510,6 +1528,8 @@
     VERSION: '3.1.0',   /* v3.1.0-GRENZ */
     MOD_ELEMENTS: MOD_ELEMENTS,
     GEWERKE: GEWERKE,
+    GEWERKE_VORLAGE: GEWERKE_VORLAGE,   /* v2995 */
+    GEWICHT_QUELLE: GEWICHT_QUELLE,
     GRADE: GRADE,
     PUNKTRASTER_KOEFF: PUNKTRASTER_KOEFF,
     SCHADEN_KATALOG: SCHADEN_KATALOG,

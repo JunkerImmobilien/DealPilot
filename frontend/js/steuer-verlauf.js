@@ -63,12 +63,21 @@
   function auswerten(R) {
     var w = -1;
     for (var i = R.length - 1; i >= 0; i--) { if (R[i].erg > 0) w = i; else break; }
-    var erst = 0, steuer = 0, verluste = 0;
+    var erst = 0, steuer = 0, verluste = 0, vorher = 0, plusVorher = 0;
     R.forEach(function (r, i) {
-      if (w < 0 || i < w) { if (r.erg <= 0) verluste++; erst += Math.max(0, r.steuer); }
+      if (w < 0 || i < w) {
+        if (r.erg <= 0) verluste++; else plusVorher++;
+        erst += Math.max(0, r.steuer);
+        vorher += Math.min(0, r.steuer);   /* v2992: Steuer in Gewinnjahren VOR der Wende */
+      }
       if (w >= 0 && i >= w) steuer += Math.min(0, r.steuer);
     });
-    return { wende: w, jahr: w >= 0 ? R[w].jahr : null, erstattung: erst, steuer: steuer, verluste: verluste };
+    /* v2992 · Parkstr. 9: 2024, 2026 und 2027 mit Gewinn, 2025 und 2028 mit Verlust
+       (Erhaltungsaufwand). „Positiv ab 2029, bis dahin 16.096 € Erstattung" verschwieg
+       die 10.961 € Steuer der Gewinnjahre dazwischen. `dauerhaft` sagt, dass es vor
+       der Wende schon Gewinnjahre gab; `vorherSteuer` ist deren Steuer (negativ). */
+    return { wende: w, jahr: w >= 0 ? R[w].jahr : null, erstattung: erst, steuer: steuer, verluste: verluste,
+             vorherSteuer: vorher, dauerhaft: plusVorher > 0, netto: erst + vorher };
   }
 
   function stilEinhaengen() {
@@ -110,13 +119,18 @@
     stilEinhaengen();
     var A = auswerten(R), E = ereignisse(R), w = A.wende, n = R.length;
     var zahlen = [
-      ['Steuerlich positiv ab', A.jahr ? String(A.jahr) : 'nicht im Zeitraum', w === 0 ? 'vom ersten Jahr an' : (w > 0 ? 'nach ' + A.verluste + ' Verlustjahr' + (A.verluste === 1 ? '' : 'en') : R[0].jahr + '–' + R[n - 1].jahr), C.marke],
-      ['Erstattungen bis dahin', w > 0 ? sgn(A.erstattung) : '0 €', w > 0 ? R[0].jahr + '–' + R[w - 1].jahr : 'keine Verlustjahre', C.verlust],
+      [A.dauerhaft ? 'Dauerhaft positiv ab' : 'Steuerlich positiv ab', A.jahr ? String(A.jahr) : 'nicht im Zeitraum', w === 0 ? 'vom ersten Jahr an' : (w > 0 ? 'nach ' + A.verluste + ' Verlustjahr' + (A.verluste === 1 ? '' : 'en') : R[0].jahr + '–' + R[n - 1].jahr), C.marke],
+      (A.vorherSteuer < 0 && w > 0)
+        ? ['Steuerwirkung bis dahin', sgn(A.netto), 'Erstattung ' + sgn(A.erstattung) + ' · Steuer ' + eur(A.vorherSteuer), C.verlust]
+        : ['Erstattungen bis dahin', w > 0 ? sgn(A.erstattung) : '0 €', w > 0 ? R[0].jahr + '–' + R[w - 1].jahr : 'keine Verlustjahre', C.verlust],
       ['Steuern ab dem Wendepunkt', w >= 0 ? eur(A.steuer) : '0 €', w >= 0 ? R[w].jahr + '–' + R[n - 1].jahr : '—', C.gewinn],
       ['Ergebnis V+V im letzten Jahr', sgn(R[n - 1].erg), String(R[n - 1].jahr), '#E6DCC2']
     ];
     var satz = w > 0
-      ? 'Bis ' + R[w - 1].jahr + ' senkt das Objekt deine Steuer (Erstattungen ' + sgn(A.erstattung) + '). <b>Ab ' + A.jahr + ' wird das Ergebnis positiv</b> – ab hier zahlst du auf dieses Objekt Steuern. Das ist der Zeitpunkt, an dem ein weiteres Investment mit Anfangsverlusten (Zinsen, AfA, Sanierung) die Steuerlast wieder ausgleichen kann.'
+      ? 'Bis ' + R[w - 1].jahr + (A.vorherSteuer < 0
+          ? ' wechseln Verlust- und Gewinnjahre (Erstattungen ' + sgn(A.erstattung) + ', Steuer ' + eur(A.vorherSteuer) + ', zusammen ' + sgn(A.netto) + '). <b>Ab ' + A.jahr + ' bleibt das Ergebnis positiv</b>'
+          : ' senkt das Objekt deine Steuer (Erstattungen ' + sgn(A.erstattung) + '). <b>Ab ' + A.jahr + ' wird das Ergebnis positiv</b>')
+        + ' – ab hier zahlst du auf dieses Objekt Steuern. Das ist der Zeitpunkt, an dem ein weiteres Investment mit Anfangsverlusten (Zinsen, AfA, Sanierung) die Steuerlast wieder ausgleichen kann.'
       : (w === 0 ? 'Dieses Objekt ist <b>vom ersten Jahr an steuerlich positiv</b> – es bringt keine Erstattung, die Steuer steigt mit der Miete (' + R[0].jahr + ': ' + eur(Math.max(0, -R[0].steuer)) + ', ' + R[n - 1].jahr + ': ' + eur(Math.max(0, -R[n - 1].steuer)) + ' im Jahr). Ein Objekt mit Anfangsverlusten daneben würde die Last senken.'
         : 'Das Objekt bleibt im Betrachtungszeitraum steuerlich negativ – es senkt deine Steuer in jedem Jahr (zusammen ' + sgn(R.reduce(function (a, r) { return a + Math.max(0, r.steuer); }, 0)) + ').');
     /* Diagramm */

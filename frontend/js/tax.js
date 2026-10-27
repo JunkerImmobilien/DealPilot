@@ -1037,6 +1037,43 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
 // ═══════════════════════════════════════════════════
 // STEUERVERLAUF über mehrere Jahre
 // ═══════════════════════════════════════════════════
+/* v2992 · ANSCHAFFUNGSNAHE HERSTELLUNGSKOSTEN UEBER ALLE JAHRE (§ 6 Abs. 1 Nr. 1a EStG).
+   Die 15-%-Pruefung sah bis hier nur das Feld Sanierung (san). Parkstr. 9 (Kauf
+   23.12.2024) traegt im Steuer-Reiter Erhaltungsaufwand je Jahr: 2025 46.200 €,
+   2026 und 2027 je 1.200 € - zusammen weit ueber der Grenze, sofort abgezogen,
+   2025 eine Erstattung von 11.659 €. Gerechnet wird weiter mit der Eingabe; die
+   Warnung sagt, dass das Finanzamt es anders sehen wird.
+   Fenster: drei Jahre ab dem Kaufdatum, auf Kalenderjahre gerundet (Kaufjahr bis
+   Kaufjahr + 3; das letzte nur, wenn der Kauf nicht im Januar lag). Betraege sind
+   brutto erfasst, die Grenze gilt netto - verglichen wird brutto / 1,19 (vorsichtig:
+   Leistungen ohne USt liegen damit eher unter als ueber der Grenze). */
+function _dpAhkWarnung(reihe) {
+  try {
+    var kd = (document.getElementById('kaufdat') || {}).value || '';
+    if (!/^\d{4}-\d{2}-\d{2}/.test(kd) || !Array.isArray(reihe) || !reihe.length) return '';
+    var kj = parseInt(kd.slice(0, 4), 10), km = parseInt(kd.slice(5, 7), 10);
+    var bis = kj + (km > 1 ? 3 : 2);
+    var grenze = (window.State && State._ahk && isFinite(State._ahk.sanLimit) && State._ahk.sanLimit > 0) ? State._ahk.sanLimit : null;
+    if (!grenze) return '';
+    var summe = 0, teile = [];
+    reihe.forEach(function (t) {
+      if (t && t.year >= kj && t.year <= bis && t.erh > 0) { summe += t.erh; teile.push(t.year + ': ' + Math.round(t.erh).toLocaleString('de-DE') + ' €'); }
+    });
+    var netto = summe / 1.19;
+    if (!(netto > grenze)) return '';
+    var ende = kd.slice(8, 10) + '.' + kd.slice(5, 7) + '.' + (kj + 3);
+    var eur = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
+    return '<div class="tax-ahk-warn" style="margin:12px 0;padding:10px 12px;border-left:3px solid var(--red,#B8625C);background:rgba(184,98,92,0.08);font-size:13px;line-height:1.5">'
+      + '<b>Anschaffungsnahe Herstellungskosten prüfen (§ 6 Abs. 1 Nr. 1a EStG)</b><br>'
+      + 'In den drei Jahren nach dem Kauf (bis ' + ende + ') stehen ' + eur(summe) + ' Erhaltungsaufwand (' + teile.join(' · ') + '), netto rund ' + eur(netto) + '. '
+      + 'Das liegt über 15 % der Gebäude-Anschaffungskosten (Grenze ' + eur(grenze) + ' netto). '
+      + 'Dann sind die Aufwendungen keine sofort abziehbaren Werbungskosten, sondern Herstellungskosten, die mit der Gebäude-AfA abgeschrieben werden. '
+      + 'Jährlich übliche Erhaltungsaufwendungen zählen nicht mit. Die Zeitleiste rechnet weiter mit deiner Eingabe - bitte mit deinem Steuerberater klären.'
+      + '</div>';
+  } catch (e) { return ''; }
+}
+window._dpAhkWarnung = _dpAhkWarnung;
+
 function renderTaxTimeline() {
   if (!State.cfRows || !State.cfRows.length) return;
   if (typeof Tax === 'undefined') return;
@@ -1065,7 +1102,8 @@ function renderTaxTimeline() {
       werbungskosten: totals.werbungskosten,
       immoResult: totals.ergebnis,
       taxDelta: totals.taxDelta,
-      refund: totals.refund
+      refund: totals.refund,
+      erh: totals.values ? (Number(totals.values.erhaltungsaufwand) || 0) : 0   /* v2992 */
     };
   });
   var timeline = timelineVoll.slice(0, 15);   /* die Karten */
@@ -1174,6 +1212,8 @@ function renderTaxTimeline() {
     '</div>';
   });
   html += '</div>';
+
+  html += _dpAhkWarnung(timelineVoll);
 
   // Total
   var totalRefund = timeline.reduce(function(s, t) { return s + t.refund; }, 0);

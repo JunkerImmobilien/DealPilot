@@ -53,7 +53,7 @@ var WM_FIELDS = [
 
 var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','wert_soll','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
-  'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
+  'thesis','risiken','notizen','bankval','svwert','svw_herkunft' /* v2996 */,'makrolage','mikrolage',
   /* v1958 - Die Lageklasse A/B/C. Ohne diesen Eintrag faellt sie beim
      Speichern LAUTLOS weg - genau der Fall, den diese Datei weiter oben
      schon mehrfach protokolliert. Sie steht neben makrolage/mikrolage,

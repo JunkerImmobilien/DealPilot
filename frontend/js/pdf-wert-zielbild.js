@@ -171,6 +171,9 @@
       return {
         verfahren: verf.filter(function (v) { return zahl(v.mitte) != null; }),
         stufen: stufen, kaufpreis: kp, stand: sauber(stand),
+        /* v2992 · Abschlag und Wert ohne Abschlag des gespeicherten Berichts - fuer den Hinweis unter den Stufen */
+        berichtAb: h ? zahl(h.angebot_abschlag_pct) : null, berichtOhne: h ? zahl(h.market_value_roh) : null,
+        berichtDatum: h && h.created_at ? new Date(h.created_at).toLocaleDateString('de-DE') : null,
         texte: h ? texteAusBericht(h) : [], kern: X.kern || [], stau: X.stau || [], ausblick: sauber(X.ausblick || ''),
         /* v2833 · der Hinweis zu Mieterhoehung/Zielbild ist Marcels Wortlaut aus
            potenzial.js (KENNZEICHNUNG, v2870) - nie ein eigener Text */
@@ -371,6 +374,19 @@
         doc.setDrawColor(f.linie[0], f.linie[1], f.linie[2]); doc.setLineWidth(0.15); doc.line(x, y + rh3, x + B, y + rh3); doc.setLineWidth(0.2);
         y += rh3;
       });
+      /* v2992 · Parkstr. 9: Tabelle oben „nach 5,0 % Abschlag, ohne 482.000" (Bericht vom
+         25.10.), Stufen „nach 6,2 % · ohne 487.000" - die Stufen rechnen mit den Angeboten
+         vom Tag der PDF. Zwei Zahlen auf einer Seite brauchen ihren Grund daneben. */
+      var _sb = d.stufen[0] || {};
+      if (mitMpi && d.berichtAb != null && ((zahl(_sb.mpiAb) != null && Math.abs(zahl(_sb.mpiAb) - d.berichtAb) >= 0.05)
+          || (zahl(_sb.mpiOhne) != null && d.berichtOhne != null && Math.abs(zahl(_sb.mpiOhne) - d.berichtOhne) >= 500))) {
+        doc.setFont('helvetica', 'italic'); doc.setFontSize(6.8); setT(f.grau);
+        var _hz = doc.splitTextToSize(sauber('Die Stufen sind mit den Angebotspreisen vom ' + new Date().toLocaleDateString('de-DE')
+          + ' neu gerechnet; die Werte je Verfahren oben stammen aus dem Marktbericht' + (d.berichtDatum ? ' vom ' + d.berichtDatum : '')
+          + '. Abschlag und Angebotsniveau können deshalb leicht abweichen.'), B);
+        platz(_hz.length * 3 + 2);
+        doc.text(_hz, x, y + 3.2); y += _hz.length * 3 + 1;
+      }
       y += 5;
     }
     if (d.stufen.length && T('stufenText')) {
