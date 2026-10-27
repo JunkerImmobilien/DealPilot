@@ -192,10 +192,17 @@ if (hoch.restnutzungsdauer > 80 * 0.90 + 0.01) {
   fehler++; console.log('  FEHLT  Deckel 0,90 x GND greift nicht: ' + hoch.restnutzungsdauer);
 } else console.log('  ok     Deckel 0,90 x GND = ' + hoch.restnutzungsdauer + ' (max 72)');
 
-/* d) Liegt ein Modellergebnis vor, traegt es - nicht die Technik */
+/* d) v2976: das Niedrigere aus Technik und Modell. Die Technik rechnet vom Modell mit
+      den tatsaechlichen Punkten aus und kann nur kuerzen. Ohne Gewerke traegt das Modell,
+      mit veralteten Gewerken kuerzt die Technik - nie ueber das Modell hinaus.
+      (Bis v2975 stand hier „Modell traegt den Endwert" fuer jeden Fall mit Punkten.) */
+const rOhne = RND.calcAll({ baujahr: 1962, stichtag: '2026-10-10', gnd: 80, modPoints: 11,
+  gewerkeBewertung: {}, schaeden: [] });
+pruef('ohne Gewerke traegt das Modell', rOhne.verfahren, 'punktraster');
 const rMod = RND.calcAll({ baujahr: 1962, stichtag: '2026-10-10', gnd: 80, modPoints: 11,
   gewerkeBewertung: alleGrade('veraltet'), schaeden: [] });
-pruef('Modell traegt den Endwert', rMod.verfahren, 'punktraster');
+pruef('veraltete Gewerke kuerzen', rMod.verfahren, 'technisch');
+pruef('Technik nie ueber dem Modell', rMod.final_rnd <= rMod.methods.punktraster.restnutzungsdauer + 0.005, true);
 if (rMod.methods.technisch == null) { fehler++; console.log('  FEHLT  technisch muss erhalten bleiben'); }
 else console.log('  ok     technisch bleibt ausgewiesen = ' + rMod.methods.technisch.restnutzungsdauer);
 const abwGrenze = (rMod.grenzen || []).find(g => g.art === 'technik_weicht_ab');
