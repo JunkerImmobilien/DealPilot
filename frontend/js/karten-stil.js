@@ -64,6 +64,9 @@
   'use strict';
 
   var LS = 'dp_karten_stil';
+  /* v2981 · beim LADEN gelesen: der Beobachter unten kann setze() schon vor start() rufen und
+     den Merker schreiben - danach saehe „nie gewaehlt“ falsch aus. */
+  var NIE_GEWAEHLT = (function () { try { return localStorage.getItem(LS) === null; } catch (e) { return false; } })();
   /* v1706c: Trichter und Bordkarte sind raus.
 
      Marcel am 29.09.2026: "automatisch passt, die Zeile passt, der
@@ -633,6 +636,12 @@
     var ausUrl = p.get('karte');
     var gemerkt = '';
     try { gemerkt = localStorage.getItem(LS) || ''; } catch (e) {}
+    /* v2981 · Marcel 27.10.2026: „bitte standardmäßig Darstellung Aktenmappe mit Bordkarte und
+       Bütten.“ Aktenmappe (layout-varianten.js) und Bordkarte (dp_objkarte_stil) waren schon
+       Vorgabe; die Datenaufnahme-Karte stand ohne Wahl auf „Automatisch“. Bütten bekommt nur,
+       wer NIE gewählt hat (Schlüssel fehlt ganz) - wer „Automatisch“ wählt, speichert '' und
+       behält es. */
+    var nieGewaehlt = NIE_GEWAEHLT;
 
     /* ── v1702b: DIE MIGRATION VON v1654 IST ZURUECKGENOMMEN ──────────
        Hier stand: wer `trichter` oder `bordkarte` gemerkt hatte, bekam
@@ -689,7 +698,7 @@
     if (ausUrl === 'bordkarte') ausUrl = 'aus';
     if (ausUrl === 'trichter') ausUrl = 'aus';   /* v1985 */
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
-    else setze(gemerkt);
+    else setze(gemerkt || (nieGewaehlt ? 'buetten' : ''));
     /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die
        Bordkarte ueber die CSS-Regel
        `html[data-dp-layout]:not([data-dp-kartenstil])` - also NUR in
