@@ -57,6 +57,7 @@ const bewertungsText = require('./bewertungsText'); /* v1927: die KI-Einordnung 
 const avmHistorie = require('./avmHistoryService');  /* v1937: Marktpreisindikation */
 const ertragswertFreigabe = require('./ertragswertFreigabe');   /* v2431 */
 const config = require('../config');
+const objektWissen = require('./objektWissen');      /* v3025: Unterlagen, Potenzial im Jahr, To-dos */
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
 
@@ -419,6 +420,108 @@ async function potenzial_lesen(ctx, args) {
   return { anzahl: liste.length, objekte: liste.slice(0, 40),
     hinweis: 'Sortiert nach Wertzuwachs nach Kosten (Ertragswert Zielbild bzw. Mieterhoehung minus Bestand minus Massnahmenkosten). '
       + 'Ohne gerechneten Ertragswert (ertragswert_gerechnet: false) nur die Mieten nennen; bei ertragswert_gesperrt: der Ertragswert je Stufe gehoert zu DealPilot Stufe 3, sachlich so sagen. Immer als Ausblick kennzeichnen, kein Verkehrswert zum heutigen Stichtag.' };
+}
+
+/* ══ v3025 · DAS OBJEKTWISSEN AUS DEN UNTERLAGEN, DAS POTENZIAL IM JAHR, DIE TO-DOS ══
+   Marcel 28.10.2026: „kann der Telegram-Bot darauf zugreifen?" GEMESSEN: die
+   Unterlagen-Auswertung (`_dok_auswertung`) erreichte kein Werkzeug - objekt_lesen
+   wirft alles mit `_` weg. Die Fassung steht in objektWissen.js, EINMAL fuer Bot,
+   Co-Pilot und Cockpit-Pilot. Stufe lesen, kostet nichts, rechnet nichts neu. */
+async function _anfragenJeObjekt(userId) {
+  const m = {};
+  try {
+    const r = await query(`SELECT objekt_id, art, status, erstellt_am, gesendet_am FROM unterlagen_anfragen
+                            WHERE user_id = $1 AND status IN ('entwurf','gesendet') ORDER BY erstellt_am`, [userId]);
+    let A = {}; try { A = require('./unterlagenService').ARTEN_MAP || {}; } catch (e) { A = {}; }
+    r.rows.forEach((z) => { const k = String(z.objekt_id || ''); (m[k] = m[k] || []).push(Object.assign({}, z, { art_name: A[z.art] ? A[z.art].name : z.art })); });
+  } catch (e) { /* Tabelle fehlt: keine Anfragen */ }
+  return m;
+}
+async function objekt_unterlagen(ctx, args) {
+  const id = await _findeObjekt(ctx, args);
+  if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+  const o = await dialog.objektKontext(ctx.userId, id);
+  if (!o) return { gefunden: false };
+  ctx.merkeObjekt(id);
+  const u = objektWissen.unterlagen(o.daten);
+  if (!u) {
+    return { gefunden: true, id: o.objekt_id, adresse: _adrVon(o), vorhanden: false,
+      so_sagen: 'Zu diesem Objekt sind noch keine Unterlagen ausgewertet. Das geht in DealPilot über „Daten aus Dokumenten“ '
+        + '(Exposé, WEG-Protokolle, Wirtschaftsplan, Grundbuch, Baulastenauskunft) - danach stehen Risiken, WEG und '
+        + 'Maßnahmen in der Pilot-Analyse unter „Unterlagen & WEG“, und ich kann sie dir hier nennen.' };
+  }
+  return Object.assign({ gefunden: true, id: o.objekt_id, adresse: _adrVon(o), vorhanden: true }, u, {
+    hinweis: 'Aus den Unterlagen des Objekts ausgewertet (Stand siehe "stand"); Namen sind geschwärzt. Nenne bei Risiken '
+      + 'die Quelle. Für "was kostet mich ..." nimm anteil_eur (fertig gerechnet nach anteil_regel), nicht selbst teilen. '
+      + 'Steht unter baulasten ein Satz statt einer Liste, liegt keine Auskunft vor - sag das, erfinde keine.' });
+}
+async function _objekteAlle(userId) {
+  const r = await query('SELECT id, name, data FROM objects WHERE user_id = $1 ORDER BY seq_no NULLS LAST, created_at', [userId]);
+  return r.rows.map((z) => { let d = z.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } } return { id: z.id, name: z.name, d: d || {} }; });
+}
+async function portfolio_potenzial(ctx, args) {
+  const heute = new Date();
+  const jahr = Number(args && args.jahr) || heute.getFullYear();
+  let liste = await _objekteAlle(ctx.userId);
+  if (args && args.id) liste = liste.filter((x) => String(x.id) === String(args.id));
+  if (args && args.adresse) { const f = _flach(String(args.adresse)); liste = liste.filter((x) => _flach(objektWissen.adresse(x.d) + ' ' + (x.name || '')).includes(f)); }
+  const objekte = [];
+  let sM = 0, sJ = 0, sW = 0, sZ = 0;
+  liste.forEach((x) => {
+    const p = objektWissen.potenzial(x.d, jahr, heute);
+    if (!p || (!p.positionen.length && !p.nicht_erfasst)) return;
+    sM += p.in_diesem_jahr.mieterhoehungen_mehr_monat; sJ += p.in_diesem_jahr.mieterhoehungen_mehr_jahr_voll;
+    sW += p.in_diesem_jahr.mieterhoehungen_wirksam_im_jahr; sZ += p.in_diesem_jahr.zielbild_mehr_monat;
+    objekte.push({ id: x.id, adresse: objektWissen.adresse(x.d), stand: p.stand, kappung: p.kappung,
+      in_diesem_jahr: p.in_diesem_jahr, positionen: p.positionen.slice(0, 20), nicht_erfasst: p.nicht_erfasst });
+  });
+  objekte.sort((a, b) => b.in_diesem_jahr.mieterhoehungen_mehr_monat - a.in_diesem_jahr.mieterhoehungen_mehr_monat);
+  if (!objekte.length) return { jahr, anzahl: 0, so_sagen: 'Für keines deiner Objekte ist eine Mieterhöhung oder ein Zielbild gerechnet. Das entsteht im Reiter Investition unter „Mieterhöhung & Zielbild“ (beim MFH je Wohnung im Fenster „Einheiten erfassen“).' };
+  const ohne = liste.length - objekte.length;
+  return {
+    jahr, anzahl: objekte.length, objekte_ohne_planung: ohne,
+    summe: { mehrmiete_monat_eur: sM, mehrmiete_jahr_voll_eur: sJ, wirksam_im_jahr_eur: sW, zielbild_zusaetzlich_monat_eur: sZ },
+    objekte: objekte.slice(0, 40),
+    hinweis: 'Gelesen aus "Mieterhöhung & Zielbild" je Objekt (gerechnet in DealPilot: § 558 Vergleichsmiete mit Kappungsgrenze und '
+      + '15-Monats-Frist, § 559 Modernisierungsumlage, Indexmiete/Staffel als eigene Angabe). mehr_monat = Mehrmiete je Monat, WIRKSAM ab "ab_text" (§ 558b/§ 559b/§ 557b: erst nach Zugang des Erhöhungsschreibens), verlangen_ab = ab wann das Schreiben gestellt werden kann; mieterhoehungen_mehr_monat zählt alles, was im Jahr verlangt werden kann; '
+      + 'mehr_jahr_voll = volle Jahreswirkung (x12); wirksam_im_jahr_eur = was davon im Jahr ' + jahr + ' ankommt. Zielbild-Positionen sind '
+      + 'Planung nach Maßnahmen, nicht Teil der Mieterhöhungssumme - getrennt nennen. Nenne den Stand; Mieterhöhungen sind ein Recht, keine '
+      + 'Garantie (Zustimmung des Mieters nach § 558b BGB).' + (ohne ? ' ' + ohne + ' Objekte haben keine Planung - sag das.' : '')
+  };
+}
+async function portfolio_todos(ctx, args) {
+  const heute = new Date();
+  let liste = await _objekteAlle(ctx.userId);
+  if (args && args.id) liste = liste.filter((x) => String(x.id) === String(args.id));
+  if (args && args.adresse) { const f = _flach(String(args.adresse)); liste = liste.filter((x) => _flach(objektWissen.adresse(x.d) + ' ' + (x.name || '')).includes(f)); }
+  const anfr = await _anfragenJeObjekt(ctx.userId);
+  const objekte = [];
+  let n = 0;
+  liste.forEach((x) => {
+    const t = objektWissen.todos(x.d, { heute, anfragen: anfr[String(x.id)] || [] });
+    if (!t.length) return;
+    n += t.length;
+    objekte.push({ id: x.id, adresse: objektWissen.adresse(x.d) || x.name, anzahl: t.length, todos: t.slice(0, 25) });
+  });
+  if (!objekte.length) return { anzahl: 0, so_sagen: 'Aus den gespeicherten Daten ergibt sich gerade kein offener Punkt.' };
+  const nachArt = {};
+  objekte.forEach((o) => o.todos.forEach((t) => { nachArt[t.art] = (nachArt[t.art] || 0) + 1; }));
+  return { anzahl: n, nach_art: nachArt, objekte: objekte.slice(0, 40),
+    hinweis: 'Nur was in DealPilot gespeichert ist, je mit Quelle: offene Fragen und WEG-Maßnahmen aus der Unterlagen-Auswertung, '
+      + 'Mieterhöhungen dieses Jahres, Zinsbindungsende in den nächsten 24 Monaten, 3-Jahres-Frist der anschaffungsnahen Kosten, '
+      + 'Anfragen beim Amt, fehlende Pflichtangaben der PDFs. Eine eigene Aufgabenliste führt DealPilot nicht. Nach Dringlichkeit '
+      + '(faellig) ordnen, je Objekt zusammenfassen.' };
+}
+
+async function marktmiete(ctx, args) {
+  const a = args || {};
+  const objekte = await _objekteAlle(ctx.userId);
+  const r = await objektWissen.marktmiete({ userId: ctx.userId, ort: a.ort, plz: a.plz, objektart: a.objektart,
+    wohnflaeche: a.wohnflaeche, baujahr: a.baujahr, objekte });
+  if (r.gefunden) r.hinweis = 'Nenne JEDE Quelle einzeln mit Wert, Stand und Herkunft (amtlich / Bestand / Angebot / eigene Objekte); '
+    + 'verrechne sie nicht zu einem Mittelwert. Keine Anbieternamen - Angebote heißen "aktueller Marktdurchschnitt aus Angeboten". '
+    + 'Gutachterausschüsse darfst du nennen. Was fehlt, steht unter "fehlt" mit dem Weg dorthin - sag es.';
+  return r;
 }
 
 async function pilot_analyse_lesen(ctx, args) {
@@ -4112,8 +4215,59 @@ const WERKZEUGE = [
 
   { name: 'objekt_lesen', stufe: 'lesen', fn: objekt_lesen,
     beschreibung: 'Alle Daten EINES Objekts: Kerndaten, Scores, Kennzahlen, Felder. '
-      + 'Ohne Angabe wird das zuletzt besprochene Objekt genommen.',
+      + 'Ohne Angabe wird das zuletzt besprochene Objekt genommen. Fuer Risiken, WEG, '
+      + 'Baulasten und Grundbuch aus den Unterlagen nimm objekt_unterlagen.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  /* v3025 */
+  { name: 'objekt_unterlagen', stufe: 'lesen', fn: objekt_unterlagen,
+    beschreibung: 'Die AUSGEWERTETEN UNTERLAGEN eines Objekts (Exposé, WEG-Protokolle, '
+      + 'Wirtschaftsplan, Teilungserklärung, Grundbuch, Baulastenauskunft, Energieausweis): '
+      + 'Risiken nach Schwere mit Quelle und Betrag, Investitionsthese, WEG-Verlauf, '
+      + 'Erhaltungsrücklage, Hausgeld, Maßnahmen am Gemeinschaftseigentum mit Gesamtkosten '
+      + 'UND deinem Anteil (anteil_eur), Sonderumlagen, Baulasten, Lasten in Abt. II, '
+      + 'offene Fragen an Verwalter/Verkäufer, Dokumentliste mit Datum, Stand. Nutze es bei '
+      + '"welche Risiken hat ...?", "gibt es Baulasten?", "was steht im Grundbuch?", '
+      + '"was kostet mich die Dachsanierung anteilig?", "wie hoch ist die Rücklage?", '
+      + '"was wurde in der Eigentümerversammlung beschlossen?", "welche Unterlagen liegen vor?". '
+      + 'Kostet nichts.',
+    parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  { name: 'portfolio_potenzial', stufe: 'lesen', fn: portfolio_potenzial,
+    beschreibung: 'MIETPOTENZIAL IN EINEM JAHR über ALLE Objekte (oder eines per adresse): '
+      + 'je Objekt und Wohnung die mögliche Mehrmiete mit Grund (§ 558 Vergleichsmiete/'
+      + 'Kappungsgrenze, § 559 Modernisierungsumlage, Indexmiete § 557b, Staffel), ab wann, '
+      + 'Betrag je Monat und je Jahr, was davon im Jahr wirksam wird, dazu das Zielbild '
+      + 'nach Maßnahmen getrennt - und die Summe. Nutze es bei "wie viel Potenzial steckt '
+      + 'dieses Jahr in meinen Immobilien?", "wo kann ich die Miete erhöhen?", "welche '
+      + 'Mieterhöhungen sind 2027 möglich?". Kostet nichts; rechnet nichts neu.',
+    parameter: { type: 'object', properties: {
+      jahr: { type: 'integer', description: 'Kalenderjahr, ohne Angabe das laufende' },
+      id: OBJEKT_ARGS.id, adresse: OBJEKT_ARGS.adresse }, additionalProperties: false } },
+
+  { name: 'portfolio_todos', stufe: 'lesen', fn: portfolio_todos,
+    beschreibung: 'OFFENE PUNKTE / TO-DOS je Objekt aus den gespeicherten Daten, je mit '
+      + 'Quelle und Fälligkeit: Fragen an Verwalter/Verkäufer aus den Unterlagen, WEG-'
+      + 'Maßnahmen und Sonderumlagen, mögliche Mieterhöhungen dieses Jahr, Zinsbindungsende '
+      + 'in 24 Monaten (Anschlussfinanzierung), Frist der anschaffungsnahen Kosten (15 %), '
+      + 'Anfragen beim Amt (Entwurf/ausstehend), fehlende Pflichtangaben für PDFs. Nutze es '
+      + 'bei "welche To-dos gibt es?", "was steht an?", "was muss ich erledigen?", "was ist '
+      + 'offen bei der Lindenallee?" (dann mit adresse). Kostet nichts.',
+    parameter: { type: 'object', properties: { id: OBJEKT_ARGS.id, adresse: OBJEKT_ARGS.adresse }, additionalProperties: false } },
+
+  { name: 'marktmiete', stufe: 'lesen', fn: marktmiete,
+    beschreibung: 'MARKTMIETE an einem Ort (auch ohne eigenes Objekt dort): alle Mietquellen '
+      + 'von DealPilot nebeneinander, je mit Stand und Herkunft - amtlich (Gutachterausschuss), '
+      + 'Bestand (Zensus 2022), aktueller Marktdurchschnitt aus Angeboten (aus vorhandenen '
+      + 'Marktberichten), Ist-Mieten der eigenen Objekte am Ort - und was fehlt. Nutze es bei '
+      + '"wie ist aktuell die Miete für ETWs in Herford mit 80 m²?", "was kostet ein Haus zur '
+      + 'Miete in 32052?", "welche Miete ist in Bielefeld marktüblich?". Kostet nichts.',
+    parameter: { type: 'object', properties: {
+      ort: { type: 'string', description: 'Ort WOERTLICH aus der Frage' },
+      plz: { type: 'string', description: '5-stellige PLZ, nur wenn genannt' },
+      objektart: { type: 'string', description: 'ETW, EFH, ZFH, MFH, DHH, RH - nur wenn genannt' },
+      wohnflaeche: { type: 'number', description: 'Wohnfläche in m², nur wenn genannt' },
+      baujahr: { type: 'integer', description: 'nur wenn genannt' } }, additionalProperties: false } },
 
   /* v2012 · Die Cockpit-Analyse - das Gegenstueck zu pilot_analyse_lesen. */
   { name: 'portfolio_analyse_lesen', stufe: 'lesen', fn: portfolio_analyse_lesen,

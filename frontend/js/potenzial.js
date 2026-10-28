@@ -884,6 +884,11 @@
         soll_herkunft: w.soll ? w.soll.herkunft : null, ziel: w.ziel != null ? Math.round(w.ziel) : null, ziel_wann: w.ziel_wann || null,
         massnahmen: w.massnahmen.map(function (x) { return x.t + (zahl(x.k) ? ' ' + Math.round(zahl(x.k)) + ' €' : '') + (x.bewohnt ? ' (umgelegt nach § 559 BGB' + (zahl(x.erh) ? ', davon ' + zahl(x.erh) + ' % Erhaltung' : '') + ')' : ''); }).join(', ') || null,
         kosten: Math.round(w.kosten) || 0,
+        /* v3025 · die nächste Indexanpassung (v3026, js/indexmiete.js) mit dem Objekt speichern - sonst
+           erreicht sie weder Telegram-Bot noch Portfolio-Pilot (objektWissen.js liest `index`) */
+        index: w.index && w.index.ok && w.index.naechste ? { miete: w.index.naechste.miete_neu, ab: w.index.naechste.wirksam,
+          erklaerung_ab: w.index.naechste.erklaerung, plus_monat: w.index.naechste.plus_monat, annahme: !!w.index.naechste.annahme,
+          herkunft: 'Indexmiete § 557b BGB, gerechnet in DealPilot (VPI' + (w.index.naechste.annahme ? ', Annahme ' + w.index.annahme_pct + ' % p. a.' : '') + ')' } : null,
         /* v2541 · je Wohnung als ETW: Ertragswert und Marktpreisindikation nebeneinander */
         etw: (function () { var we = wohnungErgebnis(r, m, w.i); if (!we || (!we.als_etw && !we.mpi_etw)) return null;
           return { ertragswert: we.als_etw || null, marktpreisindikation: we.mpi_etw ? { bestand: we.mpi_etw.bestand, zielbild: we.mpi_etw.zielbild } : null }; })() };

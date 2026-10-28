@@ -142,6 +142,12 @@
         ? DealPilotMB.letzter() : null;
       if (_mb) c.marktbericht = _mb;
     } catch (e) {}
+    /* v3025 · Marcel 28.10.2026: dasselbe Objektwissen wie der Telegram-Bot - die ganze
+       Unterlagen-Auswertung (Risiken mit Quelle, WEG, Massnahmen mit Anteil, Baulasten,
+       Abt. II, offene Fragen), Mietpotenzial dieses Jahres, To-dos, Marktmiete. Der Server
+       liest es zur objekt_id aus der Datenbank (routes/ai.js _copilotObjektwissen), mit
+       denselben Funktionen wie die Bot-Werkzeuge. Hier geht nur die Kennung mit. */
+    try { if (window._currentObjKey) c.objekt_id = String(window._currentObjKey); } catch (e) {}
     return c;
   }
 
