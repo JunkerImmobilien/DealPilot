@@ -118,7 +118,8 @@
     var liste = modal.querySelector('.settings-tabs');
     function tab(k) { return modal.querySelector('.st-tab[data-tab="' + k + '"]'); }
     function pane(k) { return modal.querySelector('.st-pane[data-pane="' + k + '"]'); }
-    function verstecke(el) { if (el) el.style.display = 'none'; }
+    /* style.css setzt display:flex !important auf .st-tab — ohne important wirkt nichts (gemessen) */
+    function verstecke(el) { if (el) el.style.setProperty('display', 'none', 'important'); }
     function benenne(k, titel, desc) {
       var b = tab(k); if (!b) return;
       var t = b.querySelector('.help-sidebar-item-title'), d = b.querySelector('.help-sidebar-item-desc');
