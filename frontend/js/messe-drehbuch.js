@@ -7770,16 +7770,17 @@
       'Oben stehen jetzt ' + nR + ' Reiter: die Übernahme, für jedes Dokument ein eigener Reiter mit allem, was darin gelesen wurde, und die gemeinsame Auswertung aller Unterlagen.', LU_NACH,
       { was: 'Nichts.', warum: 'Jede Unterlage einzeln nachprüfbar.', folge: 'Erst prüfen, dann übernehmen.' });
     var ueb = luReiter(/^Übernahme/)(); if (ueb) ueb.click(); await warte(600);
-    /* eine Zeile mit Einheit und Jahr (z. B. „… € / Jahr (Protokoll 2025)“), sonst Grundstück */
-    var ej = kuZeileWert(/(€|m²)[^()]*\((?:[^)]*\s)?(?:19|20)\d\d\)/);
-    var zf = ej() ? ej : (luZeile(/Grundstücksfläche/)() ? luZeile(/Grundstücksfläche/) : null);
-    if (zf) {
+    /* gemessen (Mitschnitt): die erste Übernahme trägt keine Zeile mit Jahr - Einheit und Quelle zeigt die
+       Grundstücksfläche, das Jahr kommt beim Hausgeld aus dem Wirtschaftsplan (Szene 9d) */
+    var zf = luZeile(/^Grundstücksfläche/), wf = luZeile(/^Wohnfläche/), fl = luZeile(/^Flur$/), fs = luZeile(/^Flurstück/);
+    if (zf()) {
       await luZeige(zf, 8);
-      var zn = luKurz(r6Text(zf().cells[1]), 50), zw = luKurz(kuWertText(zf()), 70), zq = luQuelle(zf());
-      DPM_KU.messung.zeile = zn + ': ' + zw;
-      await kmSag(s, 'Jede Zeile mit Einheit', zn + ' <b>' + zw + '</b>' + (zq ? ' — Quelle: ' + zq : '') + '.',
-        'In der Übernahme trägt jede Zeile ihre Einheit, und wo es darauf ankommt, auch das Jahr. Zum Beispiel ' + zn + ': ' + zw.replace(/\s*\/\s*Jahr/, ' im Jahr') + (zq ? ', gelesen aus dem Dokument ' + zq : '') + '.', LU_NACH,
-        { was: 'Nichts — gelesen, nicht getippt.', warum: 'Eine Zahl ohne Einheit und Jahr ist nicht prüfbar.', folge: 'Was du nicht willst, hakst du ab.' });
+      var zw = luKurz(kuWertText(zf()), 40), zq = luQuelle(zf()), ww = wf() ? kuWertText(wf()) : '', wq = wf() ? luQuelle(wf()) : '';
+      var flt = fl() && fs() ? ', Flur ' + kuWertText(fl()) + ', Flurstück ' + kuWertText(fs()) : '';
+      DPM_KU.messung.zeile = { grundstueck: zw, quelle: zq, flur: flt, wohnflaeche: ww, wq: wq };
+      await kmSag(s, 'Jeder Wert mit Einheit und Quelle', 'Grundstück <b>' + zw + '</b>' + flt + (zq ? ' — Quelle: ' + zq : '') + (ww ? '. Wohnfläche <b>' + ww + '</b>' + (wq ? ' — ' + wq : '') : '') + '.',
+        'In der Übernahme steht jeder Wert mit seiner Einheit und seiner Quelle. Die Grundstücksfläche, ' + zw + flt + (zq ? ' — aus dem ' + zq : '') + (ww ? '. Die Wohnfläche, ' + ww + (wq ? ', aus dem ' + wq : '') : '') + '. Was du nicht willst, hakst du einfach ab.', LU_NACH,
+        { was: 'Nichts — gelesen, nicht getippt.', warum: 'Eine Zahl ohne Einheit und Quelle ist nicht prüfbar.', folge: 'Was du nicht willst, hakst du ab.' });
     }
     var aw = luReiter(/^Auswertung/);
     if (aw()) {
@@ -7889,6 +7890,17 @@
   /* ── Szene 9d · nachreichen, Hausgeld, Steuer, „Zuletzt nachgereicht“, Bausteine im PDF ── */
   async function kuS4(s) {
     if (_ku.aus) return;
+    /* gemessen (Mitschnitt): ohne Wert im Objekt zeigt das Nachreichen kein „bisher im Objekt“. Bekannt ist bis
+       hierher nur die Verwaltervergütung (Protokoll 2025, TOP 7: 29 € netto je Wohnung und Monat, 8 WE, 19 % USt
+       = 3.313 € im Jahr) - sie wird wie von Hand als nicht umlagefähiges Hausgeld eingetragen. Die Auswertung im
+       Mitschnitt hängt nicht an diesem Feld (Änderungen, Baulasten, Hausgeld-Text gemessen). */
+    reiter('s4'); await kmPause(1300);
+    await kmEingabe(s, feldVon('hg_nul'), 'Bisher bekannt', 'Aus dem Protokoll 2025 nur die <b>Verwaltervergütung</b>: ' + eur(3313) + ' im Jahr — als nicht umlagefähiges Hausgeld.',
+      { was: 'Nicht umlagefähiges Hausgeld: ' + eur(3313) + ' im Jahr.', warum: 'Mehr gaben die Unterlagen bis hier nicht her.', folge: 'Der Wirtschaftsplan wird gleich etwas anderes sagen.' },
+      'Bevor wir weitere Unterlagen nachreichen: bekannt ist bisher nur die Verwaltervergütung aus dem Protokoll zweitausendfünfundzwanzig — neunundzwanzig Euro netto je Wohnung und Monat, für acht Wohnungen rund dreitausenddreihundertdreizehn Euro im Jahr. Die tragen wir als nicht umlagefähiges Hausgeld ein.',
+      async function () { await kmTipp('hg_nul', '3313'); try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} });
+    DPM_KU.messung.hgNulVorher = wert('hg_nul');
+    reiter('s5'); await warte(900);
     var nb = function () { var p = r11Panel(); return p && p.querySelector('.dpu-nach-btn'); };
     if (!nb()) { await r11PaTab(/^Unterlagen/); }
     if (!nb()) { DPM_KU.messung.nachreichen = 'kein Knopf'; return; }
