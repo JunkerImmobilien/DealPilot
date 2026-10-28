@@ -42974,3 +42974,24 @@ Export liegt unter `/tmp/sp-*.json` auf Prod, SQL `scratchpad/spiegel-1123.sql` 
 tax_snapshot, user_id umgeschrieben); wartet auf Marcels ausdrückliches OK. Lindenallee-Video wird wegen der
 korrigierten Kostenkarte neu aufgenommen (Agent läuft). Offen aus dem Import: KI-These „komplett vermietet“ bei
 leerer WE 5, Rücklagen-Zuführung 7.800 statt 9.600, OCR blockiert den Browser bis 45 s.
+
+### v3016z/v3016z1 · Lindenallee-Video neu aufgenommen, Kostenkarte 118.300 € (28.10.2026 abends)
+
+**Was.** Drehbuch `lindenallee-unterlagen` straffer: Pause nach jeder Sprechzeile 0,9 s (`LU_NACH`, vorher 1,5–2,5 s),
+`?sprechvor=<ms>` (Vorlauf je Sprechzeile, Vorgabe 1500 unverändert für andere Drehbücher), PDFs während der
+Kapitelkarte vorab geholt, Fenster-Zeile entfällt (Kapiteltext sagt es), `?lukurz` ohne „Bereit zur Übernahme“,
+These/größtes Risiko gesprochen 180 statt 260/240 Zeichen, kürzere Klickpausen. Sprechtext der Karte „Was absehbar
+Geld kostet“ über `luListe()` ohne doppelte Jahreszahl; die Zahl kommt weiter live (118.300 € seit v3016y). Studio
+reicht `sprechvor`/`lukurz` durch (v3016z1).
+
+**Commits.** 9d84c6b4 (Drehbuch, Buster v3016z), f5760c82 (Studio).
+
+**Nachweis.** Prüflauf mitgeschrieben: 9 KI-Abrufe (extract-expose 1, extract-dokument 7, dokumente-auswerten 1),
+alle Schreibabrufe auf das NEUE Objekt (danach DELETE), 8 gesperrt, keiner an 2026-1123; Kegel in 1728/1816 Proben
+sichtbar. Aufnahme: Drehbuch 531 s (vorher ~625 s), Konto danach 32 Objekte, 2026-1123 md5 2870ee25… vor und nach
+(updated_at 15:30:04 UTC unverändert; Sicherung `/root/backups/obj-2026-1123-vor-video-20261028b.json`).
+Standbild `Dateien/Messe/Videos/Lindenallee-14/lindenallee-unterlagen_2026-10-28b_kostenkarte.png` zeigt 118.300 €.
+
+**Rest.** ffmpeg lief rund 10 s nach dem Start an → Intro aus der Aufnahme vom Nachmittag vorangestellt (7,1 s,
+gleicher Studio-Vorspann). Vertonung: 29 Clips wiederverwendet, 7 neu nötig (Zeilen 11, 12, 20, 21, 22, 26, 31,
+1.455 Zeichen); Fassung unter 8 min nur mit Inhaltsverlust (Wartetafeln während der KI-Lesung ~95 s).
