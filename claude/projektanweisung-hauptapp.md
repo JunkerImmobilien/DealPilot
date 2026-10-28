@@ -43516,3 +43516,32 @@ und behoben: eine Staffel mit altem Text „sofort“.
   gekennzeichnete Umrechnung.
 - § 559b Abs. 2 S. 2 (+6 Monate ohne Ankündigung nach § 555c bzw. bei mehr als 10 % Überschreitung) ist nicht erfasst.
 - Prod-Rollout.
+
+### Nachträge 28.10.2026 abends: Pakete ohne eigenen Eintrag, Entscheidungen Marcel, Stand vor dem nächsten Prod-Rollout
+
+**Pakete ohne eigenen Journal-Eintrag (alle auf staging committet):**
+- `01c21d6c` **v3019** – Baupreisindex ohne Bezug = Regelfall § 36 Abs. 2 auch für NEU geerntete Sätze (`baupreisindex_bezug: 'stichtag_regelfall'` + Wortlaut + Seite, saat-pruefen, Rechenweg-Text in nhk2010.js); 101 neue SWF-Werte (Bruchsal 24, Böblingen 27, Lahr 26, Schwarzwald-Baar-Südwest 22, Ludwigslust-Parchim 2); CrossCheckService reicht `baujahr` an den Sachwertfaktor (gestaffelte Faktoren meldeten `achse_fehlt` – betraf auch 16 Altwerte). Register 6.186 Werte, Staging + Prod eingespielt (Prod `fa0ff4e`).
+- `0fca2c11` **v3020** – Anfragen an Ämter: `ausschuss_kontakte.json` (269 Einträge, 248 belegte E-Mails), `lib/sperren_anfragen.js`, `tools/sperren-anfrageliste.mjs` (→ `Dateien/Register/Sperren-Anfrageliste.csv/.md`), Admin „Register & Ernte › Anfragen an Ämter" mit Status in `mb.amt_anfragen` (Migration 022). Admin-Abnahme mit Login steht aus (Marcel).
+- `57dc21b1` **v3021a** – GENESIS-Online an der echten Antwort: ZIP entpacken, Monat aus `*_variable_attribute_code`, Prozentzeilen raus, Filter (VPI `DG`; Baupreis `BPNBK`+`BAULEISTBW`+`STEMW1`). Gemessen: VPI 09/2026 = 126,6; Baupreis 08/2026 = 141,7 (= Code). Token: `GENESIS_TOKEN` in `.env` beider Server + Compose-Durchreichung (von Marcel per Skript gesetzt, `.pre-genesis`-Sicherungen auf den Servern). Der alte `DESTATIS_TOKEN` (Nutzer RE014466) ist NUR die Regionaldatenbank.
+- `750e86fc`…`39cecc30` **v3022–v3022d** – Einstellungen schlank (`einstellungen-schlank.js`): seit v3022c STANDARD, volle Fassung nur `?einstellungen=voll`. Mein Profil (Haltung: Strategie, Risikoneigung, geltende Score-Gewichtung + Zurücksetzen), Co-Pilot nur Länge/Ton + „Für Profis", Marktphase entfällt (nicht mehr im Prompt), Verkäuferbereitschaft je Objekt („Verkäufer unter Zeitdruck?"). Behoben: Einrichtung speicherte Risikoneigung mit unbekanntem Text → Einstellungen schrieben still „konservativ" zurück.
+- `cda7cd48` **v3023a** – `avm-section.js` (Marcel gab die Datei dafür frei): Abweichung „−21,6 %" statt „-21.6%".
+- `af11b2d9` **messe-schleife-7** – Werbebilder (8 × 1920×1080 WebP, Favoriten 01 Boarding-Pass/03 Akte) zwischendurch (Menü E: `werbung`, `werbung_nach`, `werbung_sek`) und als Kanal W in Dauerschleife.
+- `81cac229`, `b65668d8` **landing-videothek-6 / messe-schleife-8(a)** – Kapitelmarken auf der Zeitleiste (Landing-Videothek und Schleifen-Videothek; ←/→, Leertaste, N, F; Wächter wartet nach Sprung bis 30 s); `videothek-liste.js` führt 285 Kapitel mit Zeit.
+- `53f11579` **landing-videothek-5** – Suche, Kapitelmarken, kein Autoplay am Ende.
+- `45a5d622` **landing-methodik-4** – Rangfolge des Angebotsabschlags (eigene Angabe → örtlich aus Kauffällen → aus LZS-Stichprobe → Marktdurchschnitt) öffentlich, ohne Quellennamen; Methodik länderneutral (Immobilienrichtwerte).
+- Stundennachweise: Generator ohne 10-h-Grenze, beide Projekte (DealPilot + `E:/Portfolio Strategie`), Quellen Commits + Marcels Nachrichten, Trennung erst ab 5 h Pause, Handnachträge bleiben, Testpauschale 10 h/Monat als Nachtrag (`8c9a4eda`).
+- Werbebilder Ertragswert ImmoWertV: `Dateien/Social-Media/Ertragswert-ImmoWertV-2026-10-28/` (6 Ideen, Favoriten 01 + 03 in `_ausgewaehlt/`), KI-Motive (Higgsfield gpt_image_2_5, 3 Credits).
+- Lindenallee-Video neu vertont: `Dateien/Messe/Videos/Lindenallee-14/lindenallee-unterlagen_2026-10-28b_vertont.mp4` (9:14).
+
+**Entscheidungen Marcel (28.10. abends):**
+- Baupreisindex ohne Bezug → Regelfall auch bei neuen Sätzen („ja, wenn das sinnvoll ist"); Öhringen bleibt Sperre; die 958 wartenden BW-LZS-Sperren NICHT aktivieren; alle Sperren mit Kontakt pflegen.
+- Videos dürfen von den Daten abweichen – **das Storybook-PDF muss passen** (geprüft: 19/19 Geschichten stimmen mit den Zahlen).
+- Demo-Konto bleibt bei Score-Vorlage **Lage-Fokus** (alle 17 gespeicherten Scores stimmen damit, Standard würde 8 Stufen kippen); Einstellungen am Konto (v3024), Staging = Prod.
+- Einstellungen schlank als Standard; Absender/Logo im PDF ab Investor (laut Preis-Seite), Banner/Anfrage-Karten bleiben Pro.
+- PDF: Urteil nur einmal, Bausteine je Objekt gemerkt, Export nur bei gültigen Daten, kein Zielbild ohne Zielbild.
+- Mieterhöhung: „verlangbar ab" und „wirksam ab" getrennt (v3028).
+- Parkstr. 9: Gebäudeanteil 54,31 % ist BMF-Arbeitshilfe nach Ertragswert, aber mit BRW 2026 (250); mit BRW 01.01.2024 (230) wären es 57,13 % – bleibt bewusst unverändert („hatte mich nur interessiert"). Meine erste Vermutung „Restwertmethode" war falsch.
+
+**Stand vor dem nächsten Prod-Rollout (Prod `fa0ff4e`):** committet, auf Staging teils noch nicht gezogen (Messe-Aufnahme komplett-mfh lief): v3021a, v3022c/d, v3023/a, v3024 (Staging live), v3025 (Backend live, Frontend nicht), v3026 (Migration 024 ausstehend), v3027, v3028 (neuer mb-Endpunkt `/zensus/fortgeschrieben`). Schritte: Aufnahme fertig → mb-DB sichern → pull → backend + mb-backend neu bauen → `POST /jahreswerte/abruf` (nkm, VPI ab 2008) → gold-audit → Browser-Abnahme (Zahlenformat, Indexmiete an Indexwohnung, Vertragsübersicht Miete, Co-Pilot Lindenallee, PDFs Umbruch) → Prüfer → `rollout-prod.ps1 -Freigabe`. **Bis dahin auf Prod kein Demo-Objekt öffnen/speichern** (Prod hat vorgaben-sync noch nicht; ein Browser mit alter Gewichtung würde Scores umschreiben).
+
+**Offen:** Destatis/GENESIS-Leser für weitere Reihen; § 559b Abs. 2 Satz 2 (6-Monats-Verschiebung) nicht abgebildet; Steuer-Overrides je Jahr für Bot/Co-Pilot unsichtbar; Prüfungen für Marktbericht-/RND-/Exposé-/Track-Record-PDF; ETW-Kaufpreisaufteilung druckt MEA nicht; Reiter Bewertung nennt Zielbild auch ohne Zielbild; Hinweis „Bauantrag" bei der degressiven AfA, § 7b-Bauantragszeitraum ungeprüft; Ludwigslust-Parchim verlangt Belegexemplar; Bild 05 der Werbung trägt Registerzahlen fest (nach Ernte neu rendern).
