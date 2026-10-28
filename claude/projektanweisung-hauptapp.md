@@ -43217,3 +43217,57 @@ Abschnitte, keine Striche. Zielbild: Lindenallee (ohne) Investment 20 S. „Ziel
 MEA nicht. Die App-Ansicht (Tab Bewertung) nennt das Zielbild weiter auch ohne Zielbild – nur das PDF
 ist bereinigt. `frontend-konstanten.json` nicht neu committet (help.js trägt fremde, ungesicherte
 Änderungen eines parallelen Agenten). Nicht auf Prod.
+
+### v3021 · Jahreswerte: Register, Prüfer, automatischer Abruf, Angebotsabschlag selbst ermittelt · 28.10.2026 — Staging `eb3b5357`
+
+**Was.** Marcel 28.10.2026: *„den Wert [Angebotsabschlag 5,8 %] bitte dann jedes Jahr automatisch
+neu ermitteln, und das müssen wir auch bei den Steuerdaten machen."*
+(1) **Register** `marktbericht/backend/src/lib/data/jahreswerte.json`, 25 Werte (gemessen per grep und
+Sweep, nicht aus dem Gedächtnis): je Wert Orte mit Suchmuster für jede Spiegelstelle, `erwartet`,
+Stand, Quelle (intern), Turnus, `faellig_am` (Kappung: nächster Ablauf aus der Liste gelesen),
+Verfahren `automatisch` / `agent` / `durchsicht`. Liegt im mb-Backend, weil der Admin es über das
+mb-Image liest (das hat kein `tools/`). (2) **Prüfer** `tools/jahreswerte-pruefen.mjs` (RC=1 bei
+überfällig außer `automatisch`, bei ungleichen Spiegeln und bei verbotener zweiter Quelle; gelb
+≤ 60 Tage; Tarif-Stetigkeit an den Zonengrenzen je Jahrgang), in `deploy-staging.ps1` nach den
+Kappungsgrenzen. (3) **Automatik** `JahreswerteService` (täglich prüfen, alle 7 Tage holen):
+VPI (61111, Monate, 2020 = 100) und Baupreisindex Wohngebäude (61261) von den öffentlichen
+Destatis-Tabellenseiten; GENESIS-API vorbereitet (`GENESIS_TOKEN`), ohne Konto Code 15 —
+der vorhandene `DESTATIS_TOKEN` gilt nur für die Regionaldatenbank, die beide Tabellen nicht führt
+(Code 104). Plausibilität vor Übernahme (`pruefe()`: Band, Sprung je Abstand, belegter Wert ±0,5 %),
+nur `aktiv` wirkt; Code-Tabellen bleiben Rückfall UND Vorrang (`uebernimmAbruf`,
+`uebernimmVpiOktober` fügen nur fehlende Perioden an). Migration 023 (`mb.jahreswerte_abruf`,
+`_lauf`, `angebot_abschlag_messung`, `angebot_abschlag_jahr`). (4) **Angebotsabschlag:** jede
+Ortsmessung (Stufe 2 Rohertragsfaktor-Satz, Stufe 3 LZS-Satz, keine Demodaten) hängt als
+`angebot_abschlag.messung` am Ergebnis, der ReportOrchestrator schreibt sie (ohne Personenbezug);
+ab 15.01. je Segment ETW/Haus/MFH Median des Vorjahres (je Ort × Satz jüngste Messung, Tukey
+1,5 × IQR, mind. 20) → Stufe 4 „DealPilot-Marktdurchschnitt aus n Ortsmessungen (Jahr)" — bewusst
+nicht „örtlichen": sechs Stellen lesen `/rtlich/` als Stufe 2. EINE Quelle `lib/angebot_abschlag.js`;
+`config.js angebotAbschlagMarkt` ist `null` und wird aus `GET /marktbericht/jahreswerte/angebotsabschlag`
+gefüllt (Quellenname und Link sind damit aus dem ausgelieferten Frontend raus). (5) **Steuer:**
+Tarif § 32a 2025 und Soli-Freigrenze 2025 (19.950) aus BGBl. 2024 I Nr. 449, Art. 1 Nr. 2 / Art. 3,
+wörtlich aus dem Regelungstext-PDF; 2026 gegen dasselbe Dokument gegengelesen (gleich). Admin
+„Register & Ernte › Jahreswerte" (lesend + „jetzt holen"), Agent `.claude/agents/jahreswerte.md`.
+help.js: Baupreisindex-Text sagte noch „feste Zahl 1,91".
+
+**Nachweis.** Lokal: jahreswerte-pruefen RC=0 (gelb: Tarif/Soli 15.12., VPI 15.12., Kappung HE
+25.11., BelWertV 05.12., MFI-Rückfall alt), Gegenprobe mit falschem `erwartet` → ungleich erkannt;
+wertermittlung-pruefen RC=0, saat/kappung/beleihungswert/frontend-konstanten/buster RC=0. Parser
+gegen den Code: BPI 23 Quartale ohne Abweichung, VPI Okt. 2025 = 123,0. Staging: mb-DB gesichert
+(`/root/backups/mb-20261028-1751-v3021.sql.gz`, 41 MB, 35 Tabellen), Migration 023 OK, Abruf: VPI
+69 gelesen / 68 neu aktiv / 0 Warnungen, BPI 23 „gleich" (Seite meldet „eingefroren"); 4
+Oktoberwerte 2021–2024 neu in `VPI_OKTOBER` (NRW-BWK für zurückliegende Stichtage jetzt
+fortgeschrieben, Stichtag 2026 unverändert). Im Container: Bielefeld MFH 16,4 % mit Messung
+(Rohertragsfaktor), Herford ETW 19,7 % (LZS), München EFH 5,8 % ohne Messung; mit gesetztem
+Jahreswert 7,4 % „DealPilot-Marktdurchschnitt aus 31 Ortsmessungen (2026)"; Insert in
+`mb.angebot_abschlag_messung` geprüft (Testzeile entfernt). Browser: `DealPilotConfig.
+angebotAbschlagMarkt` = 5,8 aus dem Backend, `Tax.tarifInfo(2025)` exakt; Admin-Abschnitt mit
+eingespeister Antwort gezeichnet (Login fehlte – echte Antwort über `admin_auth_required` nicht
+gesehen = Abnahmepunkt).
+
+**Rest.** Tarif 2027 nur Regierungsentwurf (Grundfreibetrag 12.564) – offen bis Verkündung. Ab
+Anfang 2027 ist bpr110 abgeschaltet: ohne `GENESIS_TOKEN` (kostenloses Konto bei
+genesis.destatis.de, Marcel) kein automatischer Baupreisindex mehr; der GENESIS-Leser ist an keiner
+echten Antwort gemessen. KSt-Senkung ab 2028 nur als Hinweis (Fundstelle offen). NKM-Index noch
+nicht in der Automatik. Gold-Audit auf Staging rot durch fremde `einstellungen-schlank.js` (0 → 2).
+deploy-staging.ps1 brach an fremden ungesicherten Dateien ab – Ausrollen per push + Pull + Rebuild
+von Hand mit denselben Prüfern vorab. Nicht auf Prod.
