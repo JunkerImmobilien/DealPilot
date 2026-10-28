@@ -43323,3 +43323,38 @@ nicht angefasst: `avm-section.js` (Nicht anfassen) zeigt „-21.6%" in der Markt
 die Anlage-V-Jahresfelder (`type=number`) formatiert der Browser selbst; Quick-Check-iframe ist ein
 eigenes Dokument (nicht Teil des Auftrags). Drehbücher, die in Felder tippen, zeigen ab jetzt
 während des Tippens die deutsche Form („1.090" bei „1090").
+
+### v3024 · Demo-Konto: Vorgaben am Konto, Staging = Prod (28.10.2026)
+
+**Was.** Marcel: „beide Konten Prod wie Staging gleich … es muss zum Storytelling passen“.
+Gemessen: alle 17 gespeicherten Demo-Scores sind bitgleich mit der Vorlage **Lage-Fokus**
+(DS 20/22/14/14/30), keiner mit Standard. Mit Standard würden acht Stufen kippen, außerdem M12 (78 Gut → 85 Sehr gut),
+Ü2 und Komplettbeispiel-MFH. **Entscheidung: Lage-Fokus bleibt.** Die Anzeige „Ausgewogen · angepasst“ ist
+korrekt (Set Ausgewogen plus Feinjustierung). Ursache des Risikos: Vorlage, Gewichte, Set und Investmentprofil
+lagen nur im localStorage. Derselbe Chrome hatte auf Prod „custom“ mit Standardgewichten, also hätte die
+Westerfeldstr. dort 85 gezeigt und beim Speichern in die DB geschrieben.
+Neu `js/vorgaben-sync.js` + `user_settings` Schlüssel `browser_vorgaben` (ERLAUBT): Beim Laden gewinnt der Server,
+dann lädt die Seite einmal neu (einmal je Sitzung und Konto). Leerer Server bekommt den Browserstand nur vom Besitzer
+(`dp_vorgaben_nutzer`), ein fremder Stand wird beiseitegelegt (`dp_vorgaben_ablage_<id>`/`_ohne`).
+Änderungen gehen über einen Abgriff an `Storage.prototype.setItem/removeItem` gebündelt hoch.
+Demo-Wert auf beiden Servern per SQL hinterlegt (md5 gleich).
+Daten: Staging Bismarckstr. 27 (Speicherung 15:28 hatte alten `_ai`/`_mb_state` zurückgeschrieben) aus Prod
+zurückgeholt; Prod Hauptstr. 51 und Lindenallee 14 auf Staging-Stand; Prod Hölderlinstr. `d8dba139` (Doppel)
+und 9 Staging-Testreste → Verloren (nicht gelöscht). Pilot-Analysen neu auf Staging, nach Prod gespiegelt:
+Gohliser 42, Hölderlin 1, Am Markt 9 VV, Hermannstraße 9. Ihre Texte nannten Scores, die nicht zum
+gespeicherten passten. Storybook neu.
+
+**Commit.** `8e9367b3` (v3024). Staging: git pull plus Backend-Rebuild. `deploy-staging.ps1` brach wegen
+fremder ungetrackter Dateien ab, deshalb die Fernschritte von Hand ausgeführt.
+
+**Nachweis.** Kern-Nachrechnung 17/17 = Lage-Fokus. Sync am Knotenmodell in 5 Fällen geprüft (gleich, Server
+anders, leer/Besitzer, leer/fremd mit Ablage, Änderung danach). Live Staging: kein Neuladen bei gleichem Stand.
+Browser künstlich auf `balanced` gesetzt: Seite lädt einmal neu, steht danach auf `lage`, der Server bleibt
+`lage`. md5(data)+md5(ai_analysis) Staging = Prod für 19/19 gemeinsame aktive Objekte. Sicherungen
+`/root/backups/haupt-20261028-1804-vor-demo.sql.gz` auf beiden Servern (51 MB / 15 MB).
+Liste für Videos: `Dateien/Messe/Demo-Konto-Stand-2026-10-28.md`.
+
+**Rest.** Prod-Rollout v3024 (Frontend plus Backend-Rebuild) steht aus. Bis dahin rechnet ein Prod-Browser mit
+seinem eigenen localStorage, also Demo-Objekte auf Prod vorher nicht speichern. Neu aufzunehmen: M21
+Portfolio (heute 71 Gut / 10 Objekte statt 69 / 11), Schleife `portfolio`/`score`; M12/M19 um 1 daneben
+(77 statt 78), M11 zeigt „Kaufen“, das Objekt trägt heute die Bestandsanalyse „Halten“.
