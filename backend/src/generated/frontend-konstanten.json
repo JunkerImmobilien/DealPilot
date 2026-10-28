@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T08:19:02.294Z",
+ "erzeugt_am": "2026-10-28T09:45:44.884Z",
  "quellen": {
-  "voice-import": "48e5ac3d4c908aa7",
+  "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "625b05e65d5c8be6",
-  "index-html": "4d0b17da7cd21f3a",
+  "storage": "5e8a72368e550d83",
+  "index-html": "92cb438a6e1bb88f",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -629,6 +629,7 @@
    "_avm_state",
    "_mb_state",
    "_lage_herkunft",
+   "_dok_auswertung",
    "einheiten",
    "san_tax_active",
    "san_tax_years",

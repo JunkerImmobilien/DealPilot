@@ -126,8 +126,18 @@
     brw_eur_m2: ['brw', 'Bodenrichtwert', 'eurm2'], bodenrichtwert_eur_m2: ['brw', 'Bodenrichtwert', 'eurm2'], bodenrichtwert: ['brw', 'Bodenrichtwert', 'eurm2'],
     grunderwerbsteuer_pct: ['gest_p', 'Grunderwerbsteuer', 'pct'],
     kaufdatum: ['kaufdat', 'Kaufdatum', 'datum'],
-    gemarkung: ['gemarkung', 'Gemarkung', 'text'], flur: ['flur', 'Flur', 'text'], flurstueck: ['flurstueck', 'Flurstück', 'text']
+    gemarkung: ['gemarkung', 'Gemarkung', 'text'], flur: ['flur', 'Flur', 'text'], flurstueck: ['flurstueck', 'Flurstück', 'text'],
+    /* v3016 · Unterlagen: Grundbuch/Teilung (MEA), Energieausweis, Mietvertrag (ETW) */
+    mea_pct: ['mea', 'Miteigentumsanteil', 'pct'],
+    energieeffizienzklasse: ['ds2_energie', 'Energieklasse', 'auswahl'],
+    baujahr_gebaeude: ['baujahr', 'Baujahr', 'jahr'],
+    kaltmiete_eur: ['nkm', 'Nettokaltmiete (Monat)', 'eur'],
+    wohnflaeche_m2: ['wfl', 'Wohnfläche', 'm2'],
+    zimmer: ['zimmer', 'Zimmer', 'zahl']
   };
+  /* v3016 · nur aus diesen Arten - eine Kaltmiete aus der Mieterliste eines MFH ist
+     die Summe vieler Wohnungen und geht über die Einheiten, nicht in ein Feld */
+  var NUR_AUS = { kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1 }, zimmer: { mietvertrag: 1 } };
   /* Klartext statt Schluessel fuer die uebrigen Angaben */
   var NAMEN = {
     notar: 'Notar', ur_nr: 'Urkundennummer', nebenkosten_eur: 'Nebenkosten', verkaeufer_anzahl: 'Verkäufer (Anzahl)', kaeufer_anzahl: 'Käufer (Anzahl)',
@@ -139,10 +149,16 @@
   };
   function _flach(ext) {
     var o = {};
+    /* v3016 · Flurstücke stehen als Liste - das erste füllt Gemarkung, Flur, Flurstück */
+    var fs0 = ext && Array.isArray(ext.flurstuecke) && ext.flurstuecke[0];
+    if (fs0) ['gemarkung', 'flur', 'flurstueck'].forEach(function (k) { if (fs0[k] != null && fs0[k] !== '' && (ext[k] == null || ext[k] === '')) o[k] = fs0[k]; });
+    if (fs0 && fs0.flaeche_m2 && ext.flurstuecke.length === 1 && !(ext.grundstuecksflaeche_m2 > 0)) o.grundstuecksflaeche_m2 = fs0.flaeche_m2;
+    if (ext && ext.miteigentumsanteil && window.DpUnterlagen) { var mp = window.DpUnterlagen.meaProzent(ext.miteigentumsanteil); if (mp != null) o.mea_pct = mp; }
+    if (ext && ext.energieeffizienzklasse) o.energieeffizienzklasse = String(ext.energieeffizienzklasse).toUpperCase().replace(/\s/g, '');
     Object.keys(ext || {}).forEach(function (k) {
       var v = ext[k];
       if (v && typeof v === 'object' && !Array.isArray(v)) Object.keys(v).forEach(function (k2) { if (o[k2] === undefined) o[k2] = v[k2]; });
-      else o[k] = v;
+      else if (!((v === null || v === undefined || v === '') && o[k] != null && o[k] !== '')) o[k] = v;   /* v3016: leer überschreibt nie die Flurstücksliste */
     });
     return o;
   }
@@ -154,19 +170,21 @@
   function _schreibwert(v, art) {
     if (art === 'datum') return _datumIso(v);
     if (art === 'text') return String(v).trim();
+    if (art === 'auswahl') return String(v).trim().toUpperCase().replace(/\s/g, '');   /* Energieklasse: „b" → „B" wie im Auswahlfeld */
     var n = _zahl(v); if (n === null) return null;
     if (art === 'jahr') return String(Math.round(n));
     return (n % 1 === 0) ? String(n) : String(n).replace('.', ',');
   }
   function _gleich(ist, neu, art) {
-    if (art === 'text' || art === 'datum') return String(ist).trim().toLowerCase() === String(neu).trim().toLowerCase();
+    if (art === 'text' || art === 'datum' || art === 'auswahl') return String(ist).trim().toLowerCase() === String(neu).trim().toLowerCase();
     var a = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(ist), b = (typeof parseDe === 'function') ? parseDe(neu) : parseFloat(neu);
     return Math.abs(a - b) < 0.005;
   }
-  function _abgleich(ext) {
+  function _abgleich(ext, typ) {
     var f = _flach(ext), zeilen = [], gesehen = {};
     Object.keys(ZIEL).forEach(function (k) {
       if (f[k] === undefined || f[k] === null || f[k] === '') return;
+      if (NUR_AUS[k] && !(typ && NUR_AUS[k][typ])) return;   /* v3016 */
       var z = ZIEL[k]; if (gesehen[z[0]]) return;
       var el = document.getElementById(z[0]); if (!el) return;
       var neu = _schreibwert(f[k], z[2]); if (neu === null || neu === '') return;
@@ -373,7 +391,9 @@
   async function lesenText(text, dateiname, typ) {
     return await Auth.apiCall('/ai/extract-dokument', {
       method: 'POST',
-      body: { text: String(text || '').slice(0, 15000), dateiname: dateiname || '', typ: typ || undefined }
+      /* v3016 · 45.000 statt 15.000 Zeichen: ein WEG-Protokoll mit 10 Seiten hat ~28.000, die
+         Beschlüsse zur Sanierung standen hinter Zeichen 15.000 */
+      body: { text: String(text || '').slice(0, 45000), dateiname: dateiname || '', typ: typ || undefined }
     });
   }
   function vergleich(ext) {

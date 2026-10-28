@@ -9784,6 +9784,15 @@
     $('vi-rf-ok').addEventListener('click', _rfSenden);
     /* v1381 · Anhalten und Weiter. */
     $('vi-rf-halt').addEventListener('click', function () { _fsPauseUm(); });
+    /* v3016e · Klick auf den Mikrofonkasten schaltet das Zuhören ein, solange es aus ist */
+    var _mk = $('vi-rf-mikro');
+    if (_mk) _mk.addEventListener('click', function (ev) {
+      if (_fs.an || _fsPtt()) return;
+      if (ev && ev.target && ev.target.closest && ev.target.closest('#vi-rf-halt')) return;
+      var s1 = $('vi-rf-fs'); if (!s1) return;
+      s1.disabled = false; s1.checked = true;
+      try { s1.dispatchEvent(new Event('change')); } catch (e) {}
+    });
     _fsPauseKnopf();
     _fsPttEinrichten();   /* v2204 · N63.9 */
     /* v2049 - `#vi-rf-nix` gibt es nicht mehr; ein nacktes $() darauf
@@ -12545,7 +12554,14 @@
        hat. Der Quellenname wird dafuer mitgemerkt. */
     _rf.vorlaufQuelle = vorQuelle;
 
-    _fs.an = true;
+    /* v3016e · Marcel 28.10.2026: „bei der geführten Eingabe soll nicht direkt aufgenommen
+       werden. erst per klick". Bis hier holte das Öffnen sofort das Mikrofon und hörte zu.
+       Jetzt bleibt es bei der GEFÜHRTEN Eingabe aus, bis der Mikrofonkasten geklickt wird
+       (dieselbe Kette wie der Schalter #vi-rf-fs). Am Handy gilt weiter „halten zum
+       Sprechen" - das IST ein Klick; das Mikrofon kommt dort erst beim ersten Drücken.
+       Der Weg nach einer freien Aufnahme (alle = false) bleibt, wie er war. */
+    var _mikroGleich = !alle;
+    _fs.an = _mikroGleich || _fsPtt();
     /* Das Kontingent wird MIT dem Mikrofon geladen, nicht danach: das
        Angebot für die Marktpreisindikation braucht die Zahl, und ein
        Angebot, das zu spät kommt, kommt gar nicht. */
@@ -12555,8 +12571,13 @@
         kg = Promise.resolve(window.AiCredits.refresh()).catch(function () { return null; });
       }
     } catch (e) {}
-    Promise.all([_fsStart(), kg]).then(function (r) {
+    Promise.all([_mikroGleich ? _fsStart() : Promise.resolve(true), kg]).then(function (r) {
       if (!_rf) return;
+      if (!_mikroGleich && !_fsPtt()) {
+        var s0 = $('vi-rf-fs'); if (s0) s0.checked = false;
+        var hb0 = $('vi-rf-halt'); if (hb0) hb0.style.display = 'none';
+        _fsMikroKasten(false, 'Mikrofon ist aus — klick hier, um zu sprechen.', 'Oder tippe deine Antwort unten ein.');
+      }
       if (!r[0]) {
         var s = $('vi-rf-fs'); if (s) { s.checked = false; s.disabled = true; }
         _fs.an = false;

@@ -1214,6 +1214,37 @@
   function schliessen() { var m = el('mfh-modal'); if (m) m.remove(); }
   function setzen(id, wert) { var e = el(id); if (!e) return; e.value = String(Math.round(wert * 100) / 100).replace('.', ','); try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {} }
 
+  /* v3016 · Marcel 28.10.2026: Mieterliste/Exposé eines MFH „auslesen … und auch die
+     'Einheiten erfassen' felder füllen … samt Mietvertrag und Höhe". Die gelesenen Zeilen
+     gehen in das Fenster (Schritt Einheiten), NICHT still ins Objekt: übernommen wird erst
+     mit „Übernehmen“. Vorhandene Einheiten werden über Nr. oder Lage ergänzt, nie geleert.
+     liste: [{nr, lage, art, wfl, zimmer, ist, status, mv_art, mv_beginn, mv_kaution,
+              nk_vorauszahlung, mv_letzte_erhoehung, mv_befristet_bis, stellplatz_miete}] */
+  function vorbelegen(liste) {
+    oeffnen(1);
+    var leer = _arbeit.length === 1 && !zahl(_arbeit[0].wfl) && !zahl(_arbeit[0].ist) && !String(_arbeit[0].lage || '').trim();
+    if (leer) _arbeit = [];
+    var n = 0;
+    (liste || []).forEach(function (w) {
+      if (!w) return;
+      var nr = String(w.nr || '').trim(), lage = String(w.lage || '').trim();
+      var e = _arbeit.filter(function (x) { return (nr && String(x.nr || '') === nr) || (lage && String(x.lage || '').toLowerCase() === lage.toLowerCase()); })[0];
+      var neu = !e;
+      if (!e) { e = { nr: nr || String(_arbeit.length + 1), art: standardArt(), status: 'vermietet' }; _arbeit.push(e); }
+      Object.keys(w).forEach(function (k) {
+        var v = w[k];
+        if (v == null || v === '' || k === 'nr') return;
+        /* v3016h · eine NEUE Zeile übernimmt alles Gelesene - gemessen: das Ladenlokal blieb „Wohnen“,
+           weil die Vorgabe-Art schon gesetzt war. Bei einer bestehenden Zeile bleibt die eigene Angabe. */
+        if (!neu && String(e[k] == null ? '' : e[k]).trim() !== '' && k !== 'status') return;
+        e[k] = String(v);
+      });
+      n++;
+    });
+    zeichnen();
+    return n;
+  }
+
   function uebernehmen() {
     if (window.DpPotenzial) _arbeit.forEach(function (e) { if (Array.isArray(e.massnahmen) || e.massnahme || e.kosten) window.DpPotenzial.massnahmenSpiegeln(e); });   /* v2430 */
     var list = _arbeit.filter(function (e) { return zahl(e.wfl) > 0 || zahl(e.ist) > 0 || String(e.lage || '').trim(); });
@@ -1433,7 +1464,7 @@
   }
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
-    vermstandPruefen: vermstandPruefen /* v3001b */,
+    vermstandPruefen: vermstandPruefen /* v3001b */, vorbelegen: vorbelegen /* v3016 */,
     oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
