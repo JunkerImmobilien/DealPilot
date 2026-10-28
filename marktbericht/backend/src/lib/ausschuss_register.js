@@ -668,6 +668,16 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                NICHT aktiv: register-vorgemerkt/lzs-ernte-20261028b-he-oberursel-wartet.json. */
                             'lzs-ernte-20261028b-he.json', 'swf-ernte-20261028b-he.json', 'uk-wgfz-ernte-20261028b-nw.json',
                             'vgf-ernte-20261028c-be.json', 'lzs-ernte-20261028c-mv.json', 'uk-flaeche-ernte-20261028c-mv.json',
+                            /* Ernte 28.10.2026 (e, SN/TH/MV/RP): nur Trier 2026 - eigener, kostenpflichtiger Bericht
+                               (100 EUR PDF, Online-Bestellsystem) statt Landesbericht als Weg; LZS/SWF/VGF Sperren. */
+                            'lzs-ernte-20261028e-rp.json', 'swf-ernte-20261028e-rp.json', 'vgf-ernte-20261028e-rp.json',
+                            /* Ernte 28.10.2026 (d, BW Teil 3, nur Sperren mit Weg - kein kommerziell nutzbarer Wert):
+                               LZS mit Zugangsgrund (Renningen 45 EUR, Heidenheim 40 EUR, Muensingen 35 EUR, Riedlingen,
+                               Filderstadt auf Anfrage, Oehringen nur privat), SWF-Sperren fuer 20 Ausschuesse. Bruchsal
+                               2025 SWF-Gleichungen und Oehringen-Mittelwerte unter formel_vorgemerkt (Baupreisindex ohne
+                               Bezug bzw. Lizenz). NICHT aktiv: register-vorgemerkt/lzs-ernte-20261028d-bw-wartet.json
+                               (958 LZS-Sperren „nicht abgeleitet/nicht veroeffentlicht“, damit Stufe N weiterrechnet). */
+                            'lzs-swf-ernte-20261028d-bw.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

@@ -93,6 +93,21 @@ Jeder **Wert** zusätzlich:
 - Ältere Jahrgänge (2023–2025) sind erlaubt, wenn kein neuerer frei vorliegt: mit
   `berichtsjahr`/`stichtag` des Dokuments; der Bericht weist den Jahrgang aus.
 
+## Immobilienrichtwerte in ALLEN Ländern (Marcel 28.10.2026)
+- „das bitte für alle Bundesländer fassen … und bitte auch an die Agenten weitergeben,
+  dass wir die Werte auch in anderen Bundesländern einholen." Immobilienrichtwerte
+  (Richtwertzone × Teilmarkt, Normobjekt, Umrechnungskoeffizienten) gibt es nicht nur
+  in NRW (BORIS-NRW, `uk-irw-nw-*.json`, Kennzahl `umrechnung_irw`). **Bei jeder Ernte
+  je Land gezielt danach suchen** – u. a. Niedersachsen (Immobilienrichtwerte in
+  BORIS-NI/LGLN), Hessen, Bremen, Brandenburg, Sachsen, Rheinland-Pfalz und große
+  Städte mit eigenem Immobilienpreisportal – und frei nutzbare Tabellen ernten.
+- Muster und Prüfer wie NRW: Umrechnungstabellen des Ausschusses je Teilmarkt und
+  Jahrgang, Anwendungsbeispiel als Prüfmaßstab (`tools/irw-pruefen.mjs`). Liefert ein
+  Land die Richtwerte nur über einen Dienst (WMS/WFS/API) ohne Tabelle im Dokument,
+  den Dienst, die Felder und die Lizenz im Bericht melden statt einen Satz zu bauen –
+  der Rechenweg (`ReportOrchestrator`, IRW-Kern) liest heute nur das NRW-Format.
+- Kostenpflichtig oder genehmigungspflichtig → Sperre mit `zugang` und Weg wie üblich.
+
 ## Gebührenpflichtig heißt: Absprung mitliefern (Marcel 19.10.2026)
 - „Wenn die irgendwie gebührenpflichtig sind, dass wir die dann auch abrufen
   können und die Leute dann direkt den Absprung finden." Gilt für Berichte,
