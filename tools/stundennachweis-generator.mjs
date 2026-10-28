@@ -77,6 +77,13 @@ for (const mo of Object.keys(months).sort()) {
     rows.push(`| ${d} | ${de(h)} | ${de(hF)} | ${de(hP)} | ${x.n} | ${apTop} | ${tat.replace(/\|/g, '/')} |`);
     csv.push([mo, d, de(h), de(hF), de(hP), x.n, apTop, '"' + tat.replace(/"/g, "'").replace(/;/g, ',') + '"'].join(';'));
   }
+  /* 28.10.2026 · Handnachträge überleben das Neuschreiben (vorher wurde die Tabelle jedes Mal geleert) */
+  let nachtrag = ['| Datum | Stunden | AP | Tätigkeit |', '|---|---:|---|---|', '| | | | |'];
+  if (fs.existsSync(file)) {
+    const alt = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+    const m = alt.match(/## Nachträge von Hand\n\n([\s\S]*?)\n\n_Geprüft und freigegeben/);
+    if (m && m[1].trim()) nachtrag = m[1].trim().split('\n');
+  }
   const apLines = Object.entries(apSum).sort((a, b) => Number(a[0]) - Number(b[0])).map(([k, v]) => `| AP ${k} | ${AP[k] || ''} | ${de(Math.round(v * 2) / 2)} |`);
   fs.writeFileSync(file, [
     `# Stundennachweis ${mo} · Vorhaben 827-757-583/2026-1/1`, '',
@@ -91,7 +98,7 @@ for (const mo of Object.keys(months).sort()) {
     '| Datum | Std. gesamt | FuE | Produkt | Commits | Schwerpunkt | Tätigkeit (aus den Commit-Botschaften) |',
     '|---|---:|---:|---:|---:|---|---|', ...rows, '',
     '## FuE-Stunden je Arbeitspaket (Vorschlag)', '', '| AP | Inhalt | Stunden |', '|---|---|---:|', ...apLines, '',
-    '## Nachträge von Hand', '', '| Datum | Stunden | AP | Tätigkeit |', '|---|---:|---|---|', '| | | | |', '',
+    '## Nachträge von Hand', '', ...nachtrag, '',
     '_Geprüft und freigegeben: ______________________ (Datum, Unterschrift)_', '',
   ].join('\n'));
   console.log(mo, 'Tage', months[mo].length, 'gesamt', de(sumG), 'FuE', de(sumF));
