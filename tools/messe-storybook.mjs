@@ -25,6 +25,11 @@ const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Pro
 
 /* ── Die Geschichten (von Hand) ─────────────────────────────────────── */
 const STORYS = [
+  /* v3016o · Marcel 28.10.2026: „im Storytelling die Lindenallee als Beispiel hinzufügen" */
+  { seq: '2026-1123', titel: 'Was im Kleingedruckten steht', thema: 'Unterlagen einlesen · WEG-Protokolle · Risiken · Investitionsthese',
+    geschichte: 'Acht Wohnungen in Herford, Baujahr 1996, nach WEG aufgeteilt, alle im Paket zu verkaufen. Das Exposé klingt gut – „gepflegt“, „Mietpotenzial“. Erst die Unterlagen zeigen, was es verschweigt: die Eigentümerversammlung hat 2025 die Flachdachsanierung für 92.000 € beschlossen, davon 42.000 € als Sonderumlage, und die Fassade wartet. DealPilot liest alle sieben PDFs in einem Zug und legt das auf den Tisch, bevor du ein Angebot abgibst.',
+    zeigen: ['Datenaufnahme › Exposé / Dokumente: alle 7 PDFs auf einmal hineinziehen', 'Import-Fenster: ein Reiter je Dokument, „Übernahme“ mit Flur, Flurstück, Energieklasse', 'Reiter „Auswertung“: Risiken mit Quelle (Protokoll 2025, TOP 3), Investitionsthese', 'Übernehmen: Risiken und These stehen in den Feldern, „Einheiten erfassen“ öffnet sich mit 8 Wohnungen samt Miete', 'Pilot-Analyse › Reiter „Unterlagen & WEG“'],
+    satz: 'Das Exposé verkauft – die Protokolle erzählen. DealPilot liest beides und sagt dir, was es kostet.' },
   { seq: '2026-1041', titel: 'Der Investment Case für die Bank', thema: 'Bank-PDF · Pilot-Analyse · DealScore',
     geschichte: 'Ein solides Mehrfamilienhaus in Bielefeld, sechs Einheiten, Baujahr 1967. An diesem Objekt siehst du den ganzen Weg: vom Objekt über die Pilot-Analyse bis zum PDF, das du der Bank auf den Tisch legst.',
     zeigen: ['Reiter Kennzahlen: Score-Ring und die fünf Kategorien', 'Reiter Pilot-Analyse: Urteil, Stärken, Risiken, Verhandlungsempfehlung', 'Deal-Aktion › PDF › Bankfassung oder Kurzfassung wählen', 'im PDF: Finanzierung, Belastungsprobe, Annahmen'],
@@ -193,13 +198,15 @@ const rundgang = '<section class="seite dicht"><div class="kick">Am Stand · fü
   + '<table class="ueb akte"><tr><th>Akt</th><th>Die Frage des Besuchers</th><th>Objekt</th><th>Was du zeigst</th></tr>'
   + [['1 · Finden', '„Ist das Angebot überhaupt was?“', NAME('2026-999'), 'Quick-Check: Adresse und Preis rein, in Sekunden Score und Marktpreisindikation mit Spanne. Dann „übernehmen“ – das Objekt ist angelegt.'],
      ['2 · Prüfen', '„Würde die Bank das finanzieren?“', NAME('2026-1041'), 'Pilot-Analyse mit Urteil, Stärken, Risiken – dann das Bank-PDF. Als Gegenstück ' + NAME('2026-1051') + ': hier sagt DealPilot „Nein“.'],
+     ['2b · Unterlagen', '„Was steht im Kleingedruckten?“', NAME('2026-1123'), 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung und WEG-Protokolle auf einmal einlesen: Felder gefüllt, Einheiten erfasst, die beschlossene Dachsanierung als Risiko mit Quelle – und eine Investitionsthese.'],
      ['3 · Bewerten', '„Was ist das Haus wirklich wert?“', NAME('2026-1054'), 'Stufe 3: Ertrags-, Sach- und Vergleichswert nebeneinander, jeder mit Gutachterausschuss, Jahr und Seite. Warum die Verfahren auseinanderliegen.'],
      ['4 · Halten', '„Hat sich die Sanierung gelohnt – und die nächste?“', NAME('2026-1056'), 'Modernisierung nach Anlage 2 verlängert die Restnutzungsdauer. Zielbild: Wertzuwachs nach Kosten – hier ehrlich negativ.'],
      ['5 · Überblick', '„Was ist mein ganzer Bestand wert?“', 'Portfolio-Cockpit', 'Gesamtbewertung in drei Spalten, Bewertung je Objekt, Zeitraum 10/20/30 Jahre, Portfolio-Pilot mit Zahlenprüfung. Zum Schluss: Bankexport im Telegram-Bot.']]
     .map((r) => '<tr><td><b>' + r[0] + '</b></td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td></tr>').join('') + '</table>'
   + '<div class="zwei" style="margin-top:5mm"><div class="box"><div class="box-k">Übergänge, die tragen</div><ol>'
   + '<li>Von 1 nach 2: „Der Score sagt dir, ob es sich lohnt, genauer hinzusehen. Jetzt sehen wir genauer hin.“</li>'
-  + '<li>Von 2 nach 3: „Die Bank fragt als Nächstes: Was ist das Haus wert?“</li>'
+  + '<li>Von 2 nach 2b: „Und bevor du unterschreibst: Was steht in den Unterlagen, die keiner liest?“</li>'
+  + '<li>Von 2b nach 3: „Die Bank fragt als Nächstes: Was ist das Haus wert?“</li>'
   + '<li>Von 3 nach 4: „Gekauft ist es. Jetzt beginnt die eigentliche Arbeit.“</li>'
   + '<li>Von 4 nach 5: „Und jetzt alle Objekte auf einmal.“</li></ol></div>'
   + '<div class="box"><div class="box-k">Wenn Fragen kommen</div><ol>'
@@ -259,6 +266,26 @@ const zahlen = '<section class="seite"><div class="kick">DealPilot in Zahlen · 
   + '<p class="gesetze"><b>Gesetze an Bord:</b> ' + (A.gesetze || []).map((g) => esc(g.gesetz) + ' ' + g.paragrafen + (g.gesetz === 'DSGVO' ? ' Art.' : (g.paragrafen === 1 ? ' §' : ' §§'))).join(' · ') + '</p>'
   + '<div class="fuss">Alle Zahlen gemessen: Code im Repository, amtliche Daten in der Marktbericht-Datenbank.</div></section>';
 
+/* v3016o · Marcel 28.10.2026: „5–6 ausschlaggebende Sätze, was DealPilot ist, sowie die USP" */
+const wasIst = '<section class="seite"><div class="kick">Am Stand</div><h1>Was DealPilot ist – in sechs Sätzen</h1>'
+  + '<ol class="sechs">'
+  + '<li><b>DealPilot ist die Prüfzentrale für Immobilien-Investoren</b> – vom ersten Exposé bis zum ganzen Bestand in einem Werkzeug.</li>'
+  + '<li>Jedes Objekt wird durchgerechnet wie bei der Bank: Rendite, Cashflow vor und nach Steuern, DSCR, Finanzierung und Belastungsprobe über bis zu 30 Jahre.</li>'
+  + '<li>Den Wert ermittelt DealPilot nach der Logik der ImmoWertV mit den Daten der Gutachterausschüsse – Ertrags-, Sach- und Vergleichswert, jede Zahl mit Herkunft.</li>'
+  + '<li>Unterlagen wie Exposé, Mietaufstellung, Grundbuch und WEG-Protokolle liest DealPilot in Minuten und macht daraus Felder, Risiken und eine Investitionsthese.</li>'
+  + '<li>Der Pilot erklärt, prüft und schreibt mit – gerechnet wird mit festen Formeln, jede Zahl der KI wird gegengeprüft.</li>'
+  + '<li>Am Ende steht ein klares Urteil und ein Investment Case, den du der Bank auf den Tisch legst.</li>'
+  + '</ol>'
+  + '<h2 class="usp-h">Was DealPilot anders macht</h2><div class="usp">'
+  + [['Amtlich statt geschätzt', de(R && R.werte_gesamt) + ' amtliche Registerwerte von ' + de(R && R.ausschuesse) + ' Gutachterausschüssen. Wo kein Wert vorliegt, nennt DealPilot den Weg dorthin – statt eine Zahl zu erfinden.'],
+     ['Wertermittlung wie ein Gutachter', 'Drei Verfahren nach ImmoWertV, Restnutzungsdauer nach Anlage 2, Bodenwert aus den Bodenrichtwerten – mit Rechenweg und Fundstelle.'],
+     ['Unterlagen statt Abtippen', 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis – auch Scans. Risiken mit Quelle, Einheiten samt Miete.'],
+     ['Steuer nach EStG', 'AfA, Kaufpreisaufteilung nach BMF-Arbeitshilfe, zu versteuerndes Einkommen je Jahr, privat oder in der GmbH.'],
+     ['Bestand und Zielbild', 'Soll/Ist ab Ankauf, Mieterhöhung bis zur Kappungsgrenze, Sanierung mit Wertzuwachs nach Kosten – ehrlich, auch wenn er negativ ist.'],
+     ['Bankfertig', 'Investment Case als PDF mit Belastungsprobe, DSCR-Matrix und indikativem Beleihungswert-Check.']]
+    .map((u) => '<div><b>' + esc(u[0]) + '</b><span>' + esc(u[1]) + '</span></div>').join('') + '</div>'
+  + '<div class="fuss">DealPilot · Messe-Storybook</div></section>';
+
 const stand = '<section class="seite"><div class="kick">Am Stand</div><h1>Der Pitch in 30 Sekunden</h1>'
   + '<div class="box gold gross"><p>„Du kaufst eine Immobilie für zwanzig, dreißig Jahre – und entscheidest oft nach Bauchgefühl und Excel. DealPilot prüft jedes Objekt wie ein Pilot vor dem Start: Rendite, Finanzierung, Steuer und Wert mit den amtlichen Daten der Gutachterausschüsse. Am Ende steht ein klares Urteil – und ein PDF, das du der Bank geben kannst.“</p></div>'
   + '<div class="zwei"><div class="box"><div class="box-k">Drei Fragen für den Einstieg</div><ol><li>Kaufst du gerade, oder hast du schon Objekte im Bestand?</li><li>Wie prüfst du heute, ob ein Deal gut ist?</li><li>Was will deine Bank von dir sehen?</li></ol></div>'
@@ -272,6 +299,10 @@ const deckblatt = '<section class="seite deck"><img class="deck-logo" src="' + l
 
 const css = `@import url('${fonts}');
 @page{size:A4;margin:0}
+.sechs{margin:6mm 0 4mm;padding-left:7mm;font-size:12pt;line-height:1.55}.sechs li{margin:0 0 3.2mm}
+.usp-h{font-size:14pt;margin:6mm 0 3mm}
+.usp{display:grid;grid-template-columns:1fr 1fr;gap:4mm}.usp div{border:1px solid #e6dcc0;border-radius:3mm;padding:3.5mm 4mm;background:#fdfbf5}
+.usp b{display:block;font-size:11pt;margin-bottom:1.2mm}.usp span{font-size:9.6pt;line-height:1.45;color:#4a4540}
 *{box-sizing:border-box}
 body{margin:0;font:10.5pt/1.5 Inter,system-ui,sans-serif;color:#1f1b14;background:#fff}
 .seite{width:210mm;height:297mm;padding:18mm 17mm 16mm;position:relative;page-break-after:always;overflow:hidden;background:#FDFCFA}
@@ -343,7 +374,7 @@ h2{font:700 17pt/1.2 'Space Grotesk',sans-serif;margin:1mm 0 3mm}
 .fuss{position:absolute;left:17mm;right:17mm;bottom:9mm;font:600 6.8pt 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#a89f8e;border-top:1px solid #e7e1d4;padding-top:2.5mm}`;
 
 const html = '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>DealPilot Messe-Storybook</title><style>' + css + '</style></head><body>'
-  + deckblatt + stand + rundgang + ubersicht + cockpit + zielbildSeite + STORYS.map(seite).join('') + zahlen + '</body></html>';
+  + deckblatt + wasIst + stand + rundgang + ubersicht + cockpit + zielbildSeite + STORYS.map(seite).join('') + zahlen + '</body></html>';
 fs.mkdirSync(ZIEL, { recursive: true });
 const htmlDatei = path.join(ZIEL, 'DealPilot Messe-Storybook.html');
 const pdfDatei = path.join(ZIEL, 'DealPilot Messe-Storybook.pdf');
