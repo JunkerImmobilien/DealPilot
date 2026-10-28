@@ -267,6 +267,38 @@
     zio.observe(e);
   });
 
+  /* ── landing-zahlen-1 · Modulzahl und Registerstand ───────────────── */
+  /* Marcel 28.10.2026: „neben registrierte Nutzer auch unsere Daten aus dem Register … so dass sie sich
+     automatisch anpassen, wenn neue Werte dazukommen; das gilt auch für die anderen Werte".
+     Modulzahl aus window.DP_MODULE (dp2-daten.js), Register aus register-stand.js (nach jeder Ernte
+     von tools/messe-schleife-daten.mjs erzeugt), tagesaktuell nachgeladen. */
+  function setzeZahl(e, neu) {
+    e.dataset.ziel = neu;
+    if (!e.hasAttribute('data-zaehl')) { e.textContent = neu.toLocaleString('de-DE'); return; }
+    /* ein Zähler, der noch läuft oder noch nicht gestartet ist, wird erst danach nachgezogen */
+    (function warte(n) {
+      if (!e.dataset.fertig && n < 40) { setTimeout(function () { warte(n + 1); }, 300); return; }
+      if (zahlAus(e) === neu) return;
+      if (sichtbar() && !ruhig) { delete e.dataset.fertig; hoch(e, neu, 900); }
+      else e.textContent = neu.toLocaleString('de-DE');
+    })(0);
+  }
+  var ZW = ['Null','Ein','Zwei','Drei','Vier','Fünf','Sechs','Sieben','Acht','Neun','Zehn','Elf','Zwölf','Dreizehn','Vierzehn','Fünfzehn','Sechzehn','Siebzehn','Achtzehn','Neunzehn','Zwanzig','Einundzwanzig','Zweiundzwanzig','Dreiundzwanzig','Vierundzwanzig','Fünfundzwanzig'];
+  if (window.DP_MODULE && window.DP_MODULE.length) {
+    var nMod = window.DP_MODULE.length;
+    document.querySelectorAll('[data-modulzahl]').forEach(function (e) { setzeZahl(e, nMod); });
+    document.querySelectorAll('[data-modulwort]').forEach(function (e) { e.textContent = ZW[nMod] || String(nMod); });
+  }
+  if (document.querySelector('[data-reg]')) {
+    var rs = document.createElement('script');
+    rs.src = 'register-stand.js?d=' + new Date().toISOString().slice(0, 10);
+    rs.onload = function () {
+      var R = window.DPS_REGISTER; if (!R || !R.kopf) return;
+      document.querySelectorAll('[data-reg]').forEach(function (e) { var v = R.kopf[e.getAttribute('data-reg')]; if (typeof v === 'number') setzeZahl(e, v); });
+    };
+    document.head.appendChild(rs);
+  }
+
   /* ── Nutzerzahl vom eigenen Host ─────────────────────────────────── */
   /* Die Zahl steht fertig im HTML. Kommt sie frisch herein und hat sich
      geaendert, laeuft sie noch einmal hoch - dann sieht man, dass sie lebt. */

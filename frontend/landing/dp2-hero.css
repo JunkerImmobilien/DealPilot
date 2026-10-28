@@ -76,11 +76,14 @@
 @keyframes einbl{to{opacity:1}}
 .hero-btn{display:flex;gap:13px;flex-wrap:wrap;margin-bottom:34px;
   opacity:0;animation:einbl .8s ease .66s forwards}
-.hbeleg{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding-top:20px;
+/* landing-zahlen-1: sechs Zahlen in einer Flucht (vorher vier) */
+.hbeleg{display:grid;grid-template-columns:repeat(6,auto);justify-content:space-between;gap:18px;padding-top:20px;
   border-top:1px solid rgba(236,230,214,.13);opacity:0;animation:einbl .8s ease .82s forwards}
 .hbeleg div b{display:block;font:700 26px/1 var(--disp);color:var(--gdh);
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .hbeleg div b span{font:inherit;color:inherit}
+/* landing-zahlen-1: am Handy drei Spalten, zwei Reihen - sechs in einer Flucht sprengen 390 px */
+@media(max-width:760px){.hbeleg{grid-template-columns:repeat(3,minmax(0,1fr));justify-content:stretch;gap:16px 12px}.hbeleg div b{font-size:24px}}
 .hbeleg div > span{font:700 7.6px/1.35 var(--mono);letter-spacing:.09em;
   color:var(--ddk);display:block;margin-top:6px}
 
