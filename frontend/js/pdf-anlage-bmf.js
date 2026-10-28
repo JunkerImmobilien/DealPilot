@@ -62,7 +62,7 @@ window.generateBmfPdfAnlage = function(state){
   /* v975-branding: eigenes Branding nur bei custom_logo (Investor+) UND gesetzt — sonst neutral DealPilot */
   var brand = (function(){
     var b = (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.get === 'function')
-      ? (DealPilotConfig.branding.get() || {}) : {};
+      ? ((DealPilotConfig.branding.fuerPdf ? DealPilotConfig.branding.fuerPdf() : DealPilotConfig.branding.get()) || {}) : {};   /* v3018c · Absender ab Investor */
     var canBrand = false;
     try { canBrand = !!(window.DealPilotConfig && DealPilotConfig.pricing
       && typeof DealPilotConfig.pricing.hasFeature === 'function'

@@ -128,7 +128,7 @@
   function marke() {
     try {
       if (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.get === 'function') {
-        return DealPilotConfig.branding.get() || {};
+        return (DealPilotConfig.branding.fuerPdf ? DealPilotConfig.branding.fuerPdf() : DealPilotConfig.branding.get()) || {};   /* v3018c · Absender ab Investor */
       }
     } catch (e) {}
     return {};

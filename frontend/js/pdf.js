@@ -135,7 +135,7 @@ async function loadAssets() {
 }
 // Branding-Helpers - delegieren an zentrale Config (config.js)
 function _getBranding() {
-  if (window.DealPilotConfig && DealPilotConfig.branding) return DealPilotConfig.branding.get();
+  if (window.DealPilotConfig && DealPilotConfig.branding) return (DealPilotConfig.branding.fuerPdf ? DealPilotConfig.branding.fuerPdf() : DealPilotConfig.branding.get());   /* v3018c · Absender ab Investor */
   // Fallback minimal
   return { product_name: 'DealPilot', company: 'DealPilot', name: '', role: '',
            address: '', plz: '', city: '', phone: '', email: '', website: '', logo_b64: '' };
@@ -1016,6 +1016,11 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     var i = 0, erst = true;
     while (i < lines.length) {
       var platz = Math.max(1, Math.floor((UNTEN - cy - KOPF - FUSS) / LINE_H));
+      /* v3018c · Hurenkind: gemessen an 2026-1123 trug S. 21 nur „(FORTSETZUNG)" und
+         zwei Zeilen („… bleibt das Objekt unattraktiv."). Läuft ein Block über, gehen
+         mindestens drei Zeilen mit auf die neue Seite - und drei bleiben hier. */
+      var _rest = lines.length - i - platz;
+      if (_rest > 0 && _rest < 3 && platz - (3 - _rest) >= 3) platz -= (3 - _rest);
       var teil = lines.slice(i, i + platz);
       var h = KOPF + teil.length * LINE_H + FUSS;
       doc.setFillColor(255, 255, 255); doc.roundedRect(M, cy, CW, h, 1.8, 1.8, 'F');
@@ -3683,7 +3688,11 @@ async function _exportPDFInner() {
     var _MFH = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.berichtDaten === 'function') ? window.DpMfhEinheiten.berichtDaten() : null;
     if (_MFH && _MFH.zeilen && _MFH.zeilen.length && doc.autoTable) {
       var _n = function (x) { var z = Number(String(x == null ? '' : x).replace(',', '.')); return isFinite(z) && z > 0 ? z : null; };
-      cy = newPage('Einheiten & Zustand');
+      /* v3018c · gemessen: 2026-1123 S. 13 (20 % gefuellt) und ETW 2026-001 S. 11 (13 %) trugen nur
+         den Rest von Wert & Zielbild, danach begann Einheiten & Zustand auf neuer Seite. Passt die
+         Mieterliste GANZ auf die angebrochene Seite (Zeile reichlich 8,5 mm), laeuft sie dort weiter. */
+      var _einhH = 11 + (_MFH.zeilen.length + 1) * 8.5 + 6;
+      if (cy + 8 + _einhH <= 272) { if (cy > 40) cy += 8; } else cy = newPage('Einheiten & Zustand');
       cy = secH(doc, cy, 'Mieterliste \u00b7 ' + _MFH.zeilen.length + ' Einheiten', M, CW);
       doc.autoTable({
         startY: cy, theme: 'striped',
@@ -3935,9 +3944,7 @@ async function _exportPDFInner() {
   /* ══════════════════════════════════════════════════
      SEITE 6: ANNAHMEN & DISCLAIMER
   ══════════════════════════════════════════════════ */
-  cy = newPage('Annahmen & Hinweise');
-
-  cy = secH(doc, cy, 'Verwendete Prognose-Annahmen', M, CW);
+  /* v3018c · die Seite wird erst nach dem Aufbau der Zeilen gewaehlt (unten, vor der Tabelle) */
   // V63.52: Annahmen-Tabelle erweitern bei Tilgungsaussetzung
   var _baseAnnahmen = [
     ['Mietentwicklung',                window._dpPdfMiete().text, 'Annahme', window._dpPdfMiete().modus === 'prog' ? 'Erfahrungswert' : (window._dpPdfMiete().modus === 'detail' ? 'Erhöhungsplan im Objekt' : 'aus den Einheiten')],
@@ -3981,6 +3988,13 @@ async function _exportPDFInner() {
     var _wbLabel2 = State.wert_basis_text || 'Bankbewertung';   /* v2996 */
     _baseAnnahmen.push(['Wert-Anker', pE(State.wert_basis), _wbLabel2, 'Startwert für Wertsteigerung statt Kaufpreis']);
   }
+  /* v3018c · gemessen: 2026-1123 S. 21 trug 9 %, ETW 2026-001 S. 19 23 % - die letzte Seite der
+     Pilot-Analyse, danach Annahmen & Hinweise immer auf neuer Seite. Passen Tabelle, Hinweis-Kasten
+     und Erstellt-Zeile GANZ auf die angebrochene Seite (Zeile reichlich 11 mm, falls die Bemerkung
+     umbricht), laufen sie dort weiter; sonst wie bisher neue Seite. Die Tabelle bricht so nie um. */
+  var _annH = 11 + (_baseAnnahmen.length + 1) * 11 + 10 + 30 + 10;
+  if (cy + 8 + _annH <= 280) { if (cy > 40) cy += 8; } else cy = newPage('Annahmen & Hinweise');
+  cy = secH(doc, cy, 'Verwendete Prognose-Annahmen', M, CW);
   if (doc.autoTable) {
     doc.autoTable({
       head: [['Parameter', 'Wert', 'Typ', 'Quelle / Bemerkung']],

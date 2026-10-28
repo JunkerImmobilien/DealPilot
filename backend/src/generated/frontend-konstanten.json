@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T17:08:17.707Z",
+ "erzeugt_am": "2026-10-28T17:26:46.628Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "5c9ff0d729858353",
-  "index-html": "00006c2ef5d83890",
+  "storage": "ede97e023ec599eb",
+  "index-html": "551f1a7b7af30e38",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -4010,7 +4010,7 @@
      },
      {
       "h": "Co-Pilot (KI) und Kontakt & Logo",
-      "text": "Unter Co-Pilot (KI) legst du fest, wie die Pilot-Analysen schreiben (KI-Lage, Quick-Check, Investor Deal Score AI):\n• Detailgrad: kurz, mittel oder ausführlich\n• Tonalität: sachlich, beratend oder kritisch (Risiken zuerst)\n• Fokus-Schwerpunkte und Eigene Anweisungen\n• Eigenes Wissen für alle Piloten: geht an Pilot-Analyse, Portfolio-Pilot und Telegram-Bot. Trag dort keine Zahlen ein, die sich ändern — die holt die KI aus der echten Quelle.\n• Standard-Analyseparameter wie Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und aktuelle Marktphase. Pro Objekt im KI-Tab überschreibbar.\n\nUnter Kontakt & Logo stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen im PDF-Footer und auf Track-Records. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (empfohlen: PNG, 300×100 px)."
+      "text": "Unter Co-Pilot (KI) legst du fest, wie die Pilot-Analysen schreiben (KI-Lage, Quick-Check, Investor Deal Score AI):\n• Detailgrad: kurz, mittel oder ausführlich\n• Tonalität: sachlich, beratend oder kritisch (Risiken zuerst)\n• Fokus-Schwerpunkte und Eigene Anweisungen\n• Eigenes Wissen für alle Piloten: geht an Pilot-Analyse, Portfolio-Pilot und Telegram-Bot. Trag dort keine Zahlen ein, die sich ändern — die holt die KI aus der echten Quelle.\n• Standard-Analyseparameter wie Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und aktuelle Marktphase. Pro Objekt im KI-Tab überschreibbar.\n\nUnter Kontakt & Logo stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen ab dem Investor-Plan im Kopf bzw. Footer deiner PDFs und auf Track-Records; in Free und Starter tragen die PDFs keinen Absender. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (ab Investor, empfohlen: PNG, 300×100 px). Im Deal-Aktion-Banner und auf den Anfrage-Karten erscheinen deine Daten ab Pro."
      },
      {
       "h": "Deal Score: Gewichtung und Bewertungsprofile",
@@ -5235,7 +5235,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "3dc754326aec3ab5",
+  "hilfe": "f1f9f683ce68c535",
   "bewertung": "bca98c7b04c452b7"
  }
 }

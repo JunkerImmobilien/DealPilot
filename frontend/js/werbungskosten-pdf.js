@@ -170,6 +170,21 @@ function _populateFaPdfYearSelect() {
  * (Ich hatte zuerst vermutet, die Saetze truegen nur die Hand-Korrekturen, weil
  * _getEffectiveValue so aussieht. Gemessen ist das falsch — sie werden beim
  * Rechnen geschrieben. Aus dem Code geschlossen, an den Daten widerlegt.) */
+/* v3018c · Marcel 28.10.2026: „bitte auch schauen in den PDFs, ob die Seitenumbrüche sinnvoll
+   gewählt werden.“ Gemessen an der Steuermappe 2026 (Lindenallee, 43 S.): sechs Seiten tragen
+   nur den Kasten Steuerwirkung - ohne Kopf, ohne Objekt, ohne Jahr. Der Kasten bleibt zusammen
+   (das war richtig), aber jede Folgeseite sagt jetzt, wozu sie gehört. */
+var _wkFolge = null;
+function _wkNeueSeite(doc, M, CW) {
+  doc.addPage();
+  if (!_wkFolge) return 20;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(122, 115, 112);
+  var t = _wkFolge; while (t.length > 20 && doc.getTextWidth(t.toUpperCase()) > CW) t = t.slice(0, -1);
+  doc.text(t.toUpperCase(), M, 14);
+  doc.setDrawColor.apply(doc, window._pdfGold()); doc.setLineWidth(0.4); doc.line(M, 16.5, M + CW, 16.5); doc.setLineWidth(0.2);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(42, 39, 39);
+  return 24;
+}
 function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   // ── HEADER ─────────────────────────────────────
   doc.setFillColor(42, 39, 39);
@@ -212,6 +227,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
              ((g("str") || "") + " " + (g("hnr") || "") + ", " + (g("plz") || "") + " " + (g("ort") || ""));
   var qm = q ? (q.qm || "") : g("wfl");
   var bezeichnung = (q ? q.art : g("objart")) || "ETW";
+  _wkFolge = 'Aufstellung Werbungskosten ' + year + ' · ' + String(addr || name || '').replace(/^[\s,]+|[\s,]+$/g, '') + ' · Fortsetzung';   /* v3018c */
 
   doc.setFillColor(248, 246, 240);
   doc.roundedRect(M, cy, CW, 22, 2, 2, 'F');
@@ -339,7 +355,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   ]);
 
   // Page break check
-  if (cy > 230) { doc.addPage(); cy = 20; }
+  if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); }
 
   // Section 6: Anschaffungsnah / Erhaltungsaufwand
   cy = _renderWkSection(doc, cy, M, CW, '6. Anschaffungsnahe Herstellkosten / Erhaltungsaufwand', [
@@ -348,7 +364,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   ]);
 
   // ── SUMMARY ────────────────────────────────────
-  if (cy > 245) { doc.addPage(); cy = 20; }
+  if (cy > 245) { cy = _wkNeueSeite(doc, M, CW); }
 
   doc.setFillColor(42, 39, 39);
   doc.roundedRect(M, cy, CW, 26, 2, 2, 'F');
@@ -420,7 +436,7 @@ function _renderSteuerwirkung(doc, cy, M, CW, totals) {
   var zve = totals && totals.zve;
   if (!imp || !zve || !isFinite(zve) || zve <= 0) return cy;
 
-  if (cy > 235) { doc.addPage(); cy = 20; }
+  if (cy > 235) { cy = _wkNeueSeite(doc, M, CW); }
 
   function eur(n) { return Math.round(n).toLocaleString('de-DE') + ' €'; }
   function pct(n) { return (Math.round(n * 100) / 100).toString().replace('.', ',') + ' %'; }
@@ -446,7 +462,7 @@ function _renderSteuerwirkung(doc, cy, M, CW, totals) {
     ['Grenzsteuersatz', pct(imp.grenzsteuersatzBefore * 100), 'danach ' + pct(imp.grenzsteuersatzAfter * 100)]
   ];
   zeilen.forEach(function (z, i) {
-    if (cy + 7 > 280) { doc.addPage(); cy = 20; }
+    if (cy + 7 > 280) { cy = _wkNeueSeite(doc, M, CW); }
     doc.setFillColor(i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 250 : 246, i % 2 === 0 ? 244 : 238);
     doc.rect(M, cy, CW, 7, 'F');
     doc.setTextColor(60, 55, 55);
@@ -468,7 +484,7 @@ function _renderSteuerwirkung(doc, cy, M, CW, totals) {
   /* Die Zahl, auf die es Marcel ankommt. */
   var proJahr = imp.refund;                    /* > 0 = Erstattung */
   var proMonat = proJahr / 12;
-  if (cy + 18 > 280) { doc.addPage(); cy = 20; }
+  if (cy + 18 > 280) { cy = _wkNeueSeite(doc, M, CW); }
   doc.setFillColor(42, 39, 39);
   doc.roundedRect(M, cy + 2, CW, 16, 2, 2, 'F');
   doc.setFillColor.apply(doc, window._pdfGold());
@@ -498,7 +514,7 @@ function _renderWkSection(doc, cy, M, CW, title, items) {
   if (!items.length) return cy;          /* leerer Abschnitt: gar nicht erst zeichnen */
 
   // Page break check
-  if (cy > 250) { doc.addPage(); cy = 20; }
+  if (cy > 250) { cy = _wkNeueSeite(doc, M, CW); }
 
   // Section header bar
   doc.setFillColor(42, 39, 39);
@@ -517,7 +533,7 @@ function _renderWkSection(doc, cy, M, CW, title, items) {
     sectionTotal += val;
 
     var rowH = note ? 11 : 7;
-    if (cy + rowH > 280) { doc.addPage(); cy = 20; }
+    if (cy + rowH > 280) { cy = _wkNeueSeite(doc, M, CW); }
 
     doc.setFillColor(i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 250 : 246, i % 2 === 0 ? 244 : 238);
     doc.rect(M, cy, CW, rowH, 'F');
