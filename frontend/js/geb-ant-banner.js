@@ -143,9 +143,32 @@
     if (banner) banner.style.display = 'none';
   }
 
+  /* v3029-import · Die 80 % stehen fest im Feld (index.html value="80") und gingen still in die AfA -
+     als Wert, der wie eine Angabe aussieht. Der Wert bleibt (Entscheidung offen), aber er heißt jetzt
+     Vorgabe, solange keine Kaufpreisaufteilung gerechnet ist. Beim EFH mit großem Grundstück liegt
+     der Gebäudeanteil oft bei 50-60 %; die AfA fällt mit 80 % dann zu hoch aus. */
+  function _vorgabeHinweis() {
+    var gebEl = _el('geb_ant'); if (!gebEl) return;
+    var fld = gebEl.closest ? gebEl.closest('.f') : null; if (!fld) return;
+    var h = fld.querySelector('#geb-ant-vorgabe');
+    var pct = _parseDe(gebEl.value);
+    var zeigen = pct === DEFAULT_PCT && !window._lastBmfResults;
+    if (!zeigen) { if (h) h.style.display = 'none'; return; }
+    if (!h) {
+      h = document.createElement('div'); h.id = 'geb-ant-vorgabe';
+      h.style.cssText = 'font-size:11.5px;margin-top:4px;color:var(--gold-3,#9a7f33);line-height:1.35';
+      h.innerHTML = 'Vorgabe 80 % - nicht aus diesem Objekt ermittelt. Genauer über die '
+        + '<a href="#" onclick="if(typeof openBMFModal===\'function\'){openBMFModal();}return false;">Kaufpreisaufteilung (BMF-Arbeitshilfe)</a> oder ein Gutachten.';
+      var nach = fld.querySelector('.hint');
+      if (nach && nach.parentNode === fld) fld.insertBefore(h, nach.nextSibling); else fld.appendChild(h);
+    }
+    h.style.display = '';
+  }
+
   function _onChange() {
     var gebEl = _el('geb_ant');
     if (!gebEl) return;
+    try { _vorgabeHinweis(); } catch (e) {}   /* v3029-import */
     var pct = _parseDe(gebEl.value);
     if (isNaN(pct) || pct === DEFAULT_PCT) {
       _hideBanner();
@@ -175,6 +198,7 @@
       gebEl.addEventListener('input', _onChange);
       gebEl.addEventListener('change', _onChange);
       console.log('[geb-ant-banner V187] Initialisiert');
+      try { _vorgabeHinweis(); } catch (e) {}   /* v3029-import */
     }
     // Auch reagieren wenn Sanierungskosten sich ändern (Re-Render bei eingeblendetem Banner)
     var sanEls = ['san_limit_actual', 'ahk_15pct'];
@@ -182,6 +206,7 @@
       var el = _el(id);
       if (el) {
         new MutationObserver(function() {
+          try { _vorgabeHinweis(); } catch (e) {}   /* v3029-import: auch nach Laden/calc() */
           var banner = _el('geb-ant-banner');
           if (banner && banner.style.display === 'block') {
             var pct = _parseDe(gebEl ? gebEl.value : '80');

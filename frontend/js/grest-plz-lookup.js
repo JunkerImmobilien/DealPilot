@@ -85,112 +85,102 @@
      *
      * Die Reihenfolge zaehlt: der engere Bereich 04900-04938 steht VOR
      * dem weiteren 04000-04999, weil der erste Treffer gilt. */
+    /* v3029-import · Die Bereiche ab hier sind an echten Postleitzahlen nachgemessen
+       (140 Stichproben, tools: Agentenlauf 28.10.2026). Bis v3028 lagen 23 davon im
+       falschen Land, u. a. Osnabrueck/Vechta/Nordhorn als NW (6,5 statt 5,0), Aschaffenburg
+       und Miltenberg als HE (6,0 statt 3,5), Ulm/Wertheim/Tauberbischofsheim als BY
+       (3,5 statt 5,0), Goettingen als HE, Bremerhaven als NI. Schmale Ausnahmen stehen
+       VOR dem weiten Bereich (erster Treffer gilt). Grenzorte mit geteilter PLZ bleiben
+       eine Naeherung - deshalb zeigt das Feld „Aus PLZ ermittelt: <Land>". */
+    [1940, 1999, 'BB'],     // Ruhland, Senftenberg, Lauchhammer, Schipkau
     [1000, 2999, 'SN'],     // Dresden, Bautzen, Goerlitz
     [3000, 3999, 'BB'],     // Cottbus und die Lausitz
-    [4900, 4938, 'BB'],     // Herzberg/Elster, Bad Liebenwerda — VOR 04000-04999
+    [4600, 4639, 'TH'],     // Altenburger Land
+    [4895, 4938, 'BB'],     // Falkenberg, Herzberg/Elster, Elsterwerda — VOR 04000-04999
     [4000, 4999, 'SN'],     // Leipzig
+    [6556, 6578, 'TH'],     // Kyffhaeuserkreis (Artern, Bad Frankenhausen)
     [6000, 6999, 'ST'],     // Halle, Merseburg, Dessau
+    [7919, 7919, 'SN'], [7952, 7952, 'SN'], [7985, 7985, 'SN'],   // Pausa, Elsterberg
     [7000, 7999, 'TH'],     // Jena, Gera, Rudolstadt
     [8000, 9999, 'SN'],     // Zwickau, Plauen, Chemnitz
-    // 10000–14999 Berlin (10xxx-14xxx) + teils Brandenburg (14xxx)
-    [10000, 13999, 'BE'],
-    [14000, 14199, 'BE'],
+    [12529, 12529, 'BB'],   // Schoenefeld
+    [10000, 14199, 'BE'],
     [14200, 16999, 'BB'],
-    // 17000–17999 Mecklenburg-Vorpommern (vorwiegend) + teils Brandenburg
-    [17000, 17499, 'MV'],
-    [17500, 17999, 'MV'],
-    // 18000-19999 MV (teils SH bei 19xxx Grenze, aber 19xxx ist MV/Schwerin)
-    [18000, 19999, 'MV'],
-    // 20000-25999 Schleswig-Holstein und Hamburg
+    [17261, 17291, 'BB'], [17326, 17326, 'BB'], [17337, 17337, 'BB'],   // Templin, Lychen, Prenzlau, Bruessow, Uckerland
+    [17000, 18999, 'MV'],
+    [19273, 19273, 'NI'],   // Amt Neuhaus
+    [19307, 19369, 'BB'],   // Lenzen, Wittenberge, Perleberg, Karstaedt
+    [19000, 19999, 'MV'],
     [20000, 21149, 'HH'],   // Hamburg
-    [21150, 21449, 'NI'],   // Niedersachsen Pendelbereich (Lüneburg etc.)
-    [21450, 21929, 'SH'],   // S-H
-    [21930, 22113, 'SH'],
-    [22114, 22529, 'HH'],   // Hamburg
-    [22530, 22999, 'SH'],
-    [23000, 23999, 'SH'],
-    [24000, 25999, 'SH'],
-    // 26000-29999 Niedersachsen + Bremen
+    [21150, 21449, 'NI'],   // Seevetal, Winsen, Lueneburg, Buchholz
+    [21450, 21529, 'SH'],   // Reinbek, Lauenburg, Schwarzenbek, Geesthacht, Glinde
+    [21530, 21999, 'NI'],   // Buxtehude, Stade, Otterndorf
+    [22000, 22799, 'HH'],   // Hamburg
+    [22800, 22999, 'SH'],   // Norderstedt, Wedel, Ahrensburg
+    [23920, 23999, 'MV'],   // Schoenberg, Grevesmuehlen, Wismar
+    [23000, 25999, 'SH'],
     [26000, 26999, 'NI'],
-    [27000, 27499, 'HB'],   // Bremen-Stadt (28xxx primär, aber Bremerhaven 275xx)
-    [27500, 27999, 'NI'],
-    [28000, 28999, 'HB'],   // Bremen-Stadt
-    [29000, 29999, 'NI'],
-    // 30000-31999 Niedersachsen (Hannover Region)
-    [30000, 31999, 'NI'],
-    // 32000-33999 Niedersachsen + NRW (Ostwestfalen)
-    [32000, 32849, 'NW'],   // NRW (Bielefeld-Region) — z.B. Hüllhorst 32609 ist NW
-    [32850, 32849, 'NW'],
-    [33000, 33999, 'NW'],
-    // 34000-37999 Hessen + Niedersachsen + Sachsen-Anhalt
-    [34000, 34329, 'HE'],
-    [34330, 34399, 'NI'],
-    [34400, 34629, 'HE'],
-    [34630, 36399, 'HE'],
-    [36400, 36469, 'TH'],
-    [36470, 37199, 'HE'],
-    [37200, 37999, 'NI'],
-    // 38000-38999 Niedersachsen + Sachsen-Anhalt
-    [38000, 38489, 'NI'],
-    [38490, 38559, 'ST'],
-    [38560, 38879, 'NI'],
-    [38880, 38899, 'ST'],
-    [38900, 39999, 'ST'],
-    // 40000-48999 NRW
+    [27498, 27498, 'SH'],   // Helgoland
+    [27499, 27499, 'HH'],   // Neuwerk
+    [27500, 27580, 'HB'],   // Bremerhaven
+    [27000, 27999, 'NI'],   // Verden, Rotenburg, Cuxhaven, Delmenhorst
+    [28000, 28779, 'HB'],   // Bremen
+    [28780, 28999, 'NI'],   // Stuhr, Achim, Weyhe, Syke, Lilienthal
+    [29410, 29416, 'ST'],   // Salzwedel
+    [29000, 31999, 'NI'],
+    [32000, 33999, 'NW'],   // Ostwestfalen-Lippe, Bielefeld, Paderborn
+    [34346, 34355, 'NI'],   // Hann. Muenden, Staufenberg
+    [34400, 34439, 'NW'],   // Warburg, Marsberg, Borgentreich
+    [34000, 36399, 'HE'],
+    [36400, 36469, 'TH'],   // Vacha, Bad Salzungen
+    [36470, 36999, 'HE'],
+    [37200, 37299, 'HE'],   // Witzenhausen, Hess. Lichtenau, Eschwege
+    [37300, 37359, 'TH'],   // Eichsfeld
+    [37670, 37671, 'NW'], [37688, 37688, 'NW'], [37696, 37696, 'NW'],   // Hoexter, Beverungen, Marienmuenster
+    [37000, 37999, 'NI'],   // Goettingen, Northeim, Osterode, Holzminden
+    [38486, 38489, 'ST'],   // Kloetze, Beetzendorf
+    [38820, 38999, 'ST'],   // Halberstadt, Wernigerode
+    [38000, 38819, 'NI'],   // Braunschweig, Wolfsburg, Helmstedt, Gifhorn, Goslar
+    [39000, 39999, 'ST'],
+    [48455, 48465, 'NI'],   // Bad Bentheim, Schuettorf
+    [48479, 48484, 'NI'],   // Spelle
+    [48486, 48492, 'NI'],   // Emsbueren
+    [48499, 48531, 'NI'],   // Salzbergen, Nordhorn
     [40000, 48999, 'NW'],
-    // 49000-49999 NRW + Niedersachsen
-    [49000, 49509, 'NW'],
-    [49510, 49849, 'NI'],
-    [49850, 49999, 'NI'],
-    // 50000-53999 NRW (Köln/Bonn) + Rheinland-Pfalz
+    [49000, 49459, 'NI'],   // Osnabrueck, Melle, Diepholz, Vechta
+    [49460, 49549, 'NW'],   // Ibbenbueren, Mettingen, Lotte, Lengerich, Tecklenburg
+    [49550, 49999, 'NI'],   // Bramsche, Quakenbrueck, Meppen
+    [51598, 51598, 'RP'],   // Friesenhagen
+    [53400, 53599, 'RP'],   // Remagen, Bad Neuenahr-Ahrweiler, Sinzig, Linz
+    [53619, 53619, 'RP'],   // Rheinbreitbach
     [50000, 53999, 'NW'],
-    // 54000-56999 Rheinland-Pfalz + Saarland
-    [54000, 54439, 'RP'],
-    [54440, 54559, 'RP'],
-    [54560, 54669, 'RP'],
-    [54670, 54699, 'RP'],
-    [55000, 55299, 'RP'],
-    [55300, 55999, 'RP'],
-    [56000, 56999, 'RP'],
-    // 57000-57999 NRW + RP
-    [57000, 57489, 'NW'],
-    [57500, 57647, 'RP'],
-    [57648, 57939, 'RP'],
-    // 58000-59999 NRW
+    [54000, 56999, 'RP'],
+    [57000, 57489, 'NW'],   // Siegen, Olpe
+    [57490, 57999, 'RP'],   // Betzdorf, Altenkirchen, Hachenburg
     [58000, 59999, 'NW'],
-    // 60000-65999 Hessen
+    [63739, 63939, 'BY'],   // Aschaffenburg, Alzenau, Miltenberg, Amorbach
+    [65558, 65558, 'RP'], [65582, 65582, 'RP'], [65623, 65626, 'RP'], [65629, 65629, 'RP'],   // Rhein-Lahn
     [60000, 65999, 'HE'],
-    // 66000-66999 Saarland + RP
-    [66000, 66459, 'SL'],
-    [66460, 66509, 'RP'],
-    [66510, 66839, 'SL'],
-    [66840, 66999, 'SL'],
-    // 67000-67999 RP
+    [66480, 66509, 'RP'],   // Zweibruecken, Contwig
+    [66840, 66999, 'RP'],   // Landstuhl, Kusel, Pirmasens
+    [66000, 66839, 'SL'],
     [67000, 67999, 'RP'],
-    // 68000-69999 BW + Hessen + RP (Mannheim/Heidelberg-Region)
-    [68000, 68309, 'BW'],
-    [68310, 68649, 'HE'],
-    [68650, 69240, 'BW'],
-    [69241, 69434, 'BW'],
-    [69435, 69517, 'HE'],
-    [69518, 69999, 'BW'],
-    // 70000-89999 Baden-Württemberg + Bayern
-    [70000, 79999, 'BW'],
+    [68519, 68519, 'HE'],   // Viernheim
+    [68600, 68649, 'HE'],   // Lampertheim, Buerstadt, Biblis
+    [69434, 69434, 'HE'],   // Hirschhorn
+    [69483, 69492, 'HE'],   // Wald-Michelbach, Birkenau
+    [69509, 69513, 'HE'],   // Moerlenbach
+    [69517, 69518, 'HE'],   // Gorxheimertal, Abtsteinach
+    [68000, 79999, 'BW'],
+    [88100, 88179, 'BY'],   // Lindau, Lindenberg, Scheidegg
     [80000, 87999, 'BY'],
-    [88000, 88099, 'BW'],
-    [88100, 88499, 'BW'],
-    [88500, 88799, 'BW'],
-    [88800, 88899, 'BW'],
-    [89000, 89089, 'BY'],
-    [89090, 89099, 'BW'],
-    [89100, 89299, 'BY'],
-    [89300, 89619, 'BW'],
-    [89620, 89999, 'BY'],
-    // 90000-96999 Bayern
-    [90000, 96999, 'BY'],
-    // 97000-97999 BY + Hessen
-    [97000, 97999, 'BY'],
-    // 98000-99999 Thüringen + Sachsen
+    [88000, 88999, 'BW'],
+    [89000, 89199, 'BW'],   // Ulm, Alb-Donau
+    [89200, 89499, 'BY'],   // Neu-Ulm, Guenzburg, Dillingen
+    [89500, 89999, 'BW'],   // Heidenheim, Ehingen
+    [96515, 96529, 'TH'],   // Sonneberg
+    [97877, 97877, 'BW'], [97896, 97896, 'BW'], [97900, 97900, 'BW'], [97910, 97999, 'BW'],   // Wertheim, Main-Tauber
+    [90000, 97999, 'BY'],
     [98000, 99999, 'TH'],
   ];
 

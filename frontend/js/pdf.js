@@ -701,6 +701,9 @@ function pE(n, sgn) {
   else if (n < 0) sign = '-';
   return sign + Math.round(a).toLocaleString('de-DE');
 }
+/* v3029-pdf · Betrag MIT Einheit fuer die Stellen, die das € selbst anhaengen -
+   pE(null) + ' €' ergab „- €". Fehlt der Wert, steht nur „-". */
+function pEu(n, sgn) { var s = pE(n, sgn); return s === '-' ? '-' : s + ' €'; }
 /* ══ v1732 · EIN LEERES PROZENTFELD HAT DAS GANZE PDF ABGEBROCHEN ══
    Gemessen am Objekt 2026-1006 (Löhner Str. 278):
 
@@ -1572,7 +1575,11 @@ async function _exportPDFInner() {
   var cf_nz_now = noi_now - K.zins_j;
   var cf_vst_now = cf_nz_now - K.tilg_j;
   // V63.51: Bauspar bei Tilgungsaussetzung
-  var _bsparY_p2 = (State.bsparRate_m || 0) * 12;
+  /* v3029-pdf · Sparrate aus dem Kern (K.bspar_j). Tilgung und Sparrate stehen beide da, wenn
+     beide laufen (D1 Tilgungsaussetzung + D2 Annuitaet): bisher fehlte im BSV-Zweig die Tilgung, und
+     „CF vor Steuern“ lag um die D2-Tilgung zu hoch. Die Summe ist jetzt K.cf_op (calc.js: nach
+     Tilgung UND Sparrate), nicht mehr hier gebildet. */
+  var _bsparY_p2 = (K.bspar_j != null && isFinite(K.bspar_j)) ? Number(K.bspar_j) : (State.bsparRate_m || 0) * 12;
   var _hasBspar_p2 = _bsparY_p2 > 0;
   var _cfRows = [
     ['Warmmiete / Jahr (NKM + NK-Vorauszahlungen)', pE(warmmiete_now)],
@@ -1585,21 +1592,18 @@ async function _exportPDFInner() {
     ['- Zinsen / Jahr',                   '- ' + pE(K.zins_j)],
     ['= CF nach Zinsen (vor Tilgung)',           pE(cf_nz_now, true)]
   ];
-  if (_hasBspar_p2) {
-    // Bei Aussetzung: K.tilg_j ist 0, stattdessen erscheint Bausparrate
-    _cfRows.push(['- Bausparrate (BSV) / Jahr',       '- ' + pE(_bsparY_p2)]);
-    _cfRows.push(['= CF vor Steuern (nach BSV)',           pE(cf_nz_now - _bsparY_p2, true)]);
-  } else {
-    _cfRows.push(['- Tilgung / Jahr',                  '- ' + pE(K.tilg_j)]);
-    _cfRows.push(['= CF vor Steuern (nach Tilgung)',          pE(cf_vst_now, true)]);
-  }
+  var _mitTilg_p2 = !_hasBspar_p2 || Math.abs(K.tilg_j || 0) > 0.5;
+  if (_mitTilg_p2) _cfRows.push(['- Tilgung / Jahr', '- ' + pE(K.tilg_j)]);
+  if (_hasBspar_p2) _cfRows.push(['- Bausparrate (BSV) / Jahr', '- ' + pE(_bsparY_p2)]);
+  var _iCfv = _cfRows.length;
+  _cfRows.push([!_hasBspar_p2 ? '= CF vor Steuern (nach Tilgung)' : (_mitTilg_p2 ? '= CF vor Steuern (nach Tilg. + BSV)' : '= CF vor Steuern (nach BSV)'), pE(K.cf_op, true)]);
   /* v2463 · Steuer als Differenz der Volljahres-Cashflows (wie die App, calc.js V352) -
      K.steuer ist das anteilige erste Jahr: „+ 771" zwischen zwei gleichen Cashflows. */
   var _stP2 = (K.cf_ns || 0) - (K.cf_op || 0);
   _cfRows.push(['\u00b1 Steuern / Jahr',                    (_stP2 > 0.5 ? '+ ' : (_stP2 < -0.5 ? '- ' : '')) + pE(Math.abs(_stP2))]);
   _cfRows.push(['= CF nach Steuern / Jahr (operativ)',      pE(K.cf_ns, true)]);
   _cfRows.push(['= CF nach Steuern / Monat',                pE(K.cf_ns_m || (K.cf_ns/12), true)]);
-  kvT(doc, M, cy, hw, _cfRows, [2, 4, 6, 8, 10, 12, 13]);   /* v2484: zwei Zeilen mehr (Nettokaltmiete, Zusatzeinnahmen) */
+  kvT(doc, M, cy, hw, _cfRows, [2, 4, 6, 8, _iCfv, _iCfv + 2, _iCfv + 3]);   /* v3029-pdf: Summenzeilen ab der variablen CF-Zeile */   /* v2484: zwei Zeilen mehr (Nettokaltmiete, Zusatzeinnahmen) */
 
   cy = secH(doc, cyA, 'Alle Kennzahlen', M + hw + 5, hw);
   kvT(doc, M + hw + 5, cy, hw, [
@@ -1612,8 +1616,10 @@ async function _exportPDFInner() {
     ['LTV',                  pP(K.ltv, 1)],
     ['Wertpuffer / Equity',  pE(K.wp_kpi, true)],
     ['AfA / Jahr',           pE(K.afa)],
-    ['Zu versteuernder CF',  pE(K.zve_immo, true)],
-    ['Zinsrisiko / Mon.',    pE(K.zaer_m) + ' \u20ac'],
+    /* v3029-pdf \u00b7 K.zve_immo ist das steuerliche Ergebnis nach AfA, kein Cashflow (Wortlaut der
+       Bankfassung). Zinsrisiko ohne angehaengtes \u201e\u20ac" wie jede andere Zeile dieser Tabelle. */
+    ['Zu versteuerndes Ergebnis', pE(K.zve_immo, true)],
+    ['Zinsrisiko / Mon.',    pE(K.zaer_m)],
     /* v2830 · aus der Bankfassung: interner Zinsfuss und Deal Score (Rechenkern
        DealScore.computeFromKpis, wie dort) */
     ['Interner Zinsfu\u00df (IRR)', (K.irr != null && isFinite(K.irr)) ? pP(K.irr, 2) : 'nicht bestimmbar'],
@@ -1686,7 +1692,10 @@ async function _exportPDFInner() {
   finRows.push(['Zinsbindung bis', (document.getElementById('r-bindend') || {}).textContent || '-']);
   finRows.push(['Restschuld EZB', pE(State.rs, false)]);
   finRows.push(['Anschluss Zinssatz', pP(v('anschl_z'), 2)]);
-  finRows.push(['Anschluss Rate/Mon.', pE(State.rs * (v('anschl_z') + v('anschl_t')) / 100 / 12)]);
+  /* v3029-pdf · hier stand State.rs x (anschl_z + anschl_t): State.rs ist die Restschuld D1 PLUS D2
+     (calc.js rs_total) und ignorierte „durchfinanziert" und den Bausparvertrag. Jetzt die Rate aus
+     dem Kern (K.rate_an_m, Hauptdarlehen, wie die Bankfassung „Rate nach Anschluss / Monat"). */
+  finRows.push([d2 > 0 ? 'Anschluss Rate D1/Mon.' : 'Anschluss Rate/Mon.', pE(K.rate_an_m)]);
   finRows.push(['Zinsrisiko / Monat', pE(K.zaer_m)]);
   kvT(doc, M + hw3 + 5, y3A + 11, hw3, finRows);
 
@@ -1910,15 +1919,20 @@ async function _exportPDFInner() {
   // Wichtig: K.cf_op enthält die Bauspar-Rate bereits (abgezogen in calc.js).
   // Für die "vor BSV"-Anzeige addieren wir sie wieder, damit der User sieht
   // wie sich der CF zusammensetzt.
-  var _bsparY = (State.bsparRate_m || 0) * 12;
+  /* v3029-pdf · Sparrate JE PHASE aus dem Kern (K.bspar_j / _ezb / _an, wie calc.js cf_op* sie
+     abzieht). Bisher trug jede Karte dieselbe Rate - im Anschluss nach der Zuteilung ist sie 0
+     (calc.js bspar_y_an), die Karte zog sie trotzdem ab und ging nicht auf. _bsparY bleibt fuer die
+     Kartenhoehe: groesste Rate der drei Phasen. */
+  var _bsparPh = [K.bspar_j || 0, K.bspar_ezb || 0, K.bspar_an || 0];
+  var _bsparY = Math.max(_bsparPh[0], _bsparPh[1], _bsparPh[2]);
   /* v2463 · Steuer je Phase = Cashflow vor minus nach Steuern (Volljahre, wie die App) -
      gemessen: Ende Zinsbindung 11.216 - 2.467 ergab nicht die gezeigten 8.943. */
   var heuteData = { wm: K.nkm_j, bwk: K.bwk_cf, zins: K.zins_j, tilg: K.tilg_j,
-                    cf_op: K.cf_op, steuer: (K.cf_op || 0) - (K.cf_ns || 0), cf_ns: K.cf_ns, bspar: _bsparY };
+                    cf_op: K.cf_op, steuer: (K.cf_op || 0) - (K.cf_ns || 0), cf_ns: K.cf_ns, bspar: _bsparPh[0] };
   var ezbData   = { wm: K.nkm_ezb, bwk: K.bwk_cf_ezb, zins: K.zins_ezb, tilg: K.tilg_ezb,
-                    cf_op: K.cf_op_ezb, steuer: (K.cf_op_ezb || 0) - (K.cf_ns_ezb || 0), cf_ns: K.cf_ns_ezb, bspar: _bsparY };
+                    cf_op: K.cf_op_ezb, steuer: (K.cf_op_ezb || 0) - (K.cf_ns_ezb || 0), cf_ns: K.cf_ns_ezb, bspar: _bsparPh[1] };
   var anData    = { wm: K.nkm_an, bwk: K.bwk_cf_an, zins: K.zins_an, tilg: K.tilg_an,
-                    cf_op: K.cf_op_an, steuer: (K.cf_op_an || 0) - (K.cf_ns_an || 0), cf_ns: K.cf_ns_an, bspar: _bsparY };
+                    cf_op: K.cf_op_an, steuer: (K.cf_op_an || 0) - (K.cf_ns_an || 0), cf_ns: K.cf_ns_an, bspar: _bsparPh[2] };
 
   drawCFCard(M,                cy, window._dpPdfJahr1(true).toUpperCase(),     C.GREEN,         heuteData);
   drawCFCard(M + cfColW + 4,   cy, 'ENDE ZINSBINDUNG',                              C.GOLD,     ezbData);
@@ -2008,11 +2022,30 @@ async function _exportPDFInner() {
     var _tilgNow = _isAussetzungPhPdf ? _bsparPhPdf : pt.now.tilg;
     var _tilgEzb = _isAussetzungPhPdf ? _bsparPhPdf : pt.ezb.tilg;
     var _tilgAn  = _isAussetzungPhPdf ? 0 : pt.an.tilg;
+    /* v3029-pdf · Tilgung UND Bausparrate je Phase aus dem Kern (pt.*.tilg, K.bspar_j/_ezb/_an), so
+       wie calc.js cf_op* sie abzieht. Bisher ersetzte die Sparrate die Tilgung: die Tilgung eines
+       Darlehens II und die Anschluss-Tilgung (calc.js setzt bei Aussetzung mind. 1 %) fehlten, und im
+       Anschluss stand die Sparrate auch nach der Zuteilung (bspar_y_an = 0) - die Spalte ging nicht auf. */
+    var _bsvPh = [K.bspar_j || 0, K.bspar_ezb || 0, K.bspar_an || 0];
+    var _hatBsvPh = _bsvPh.some(function (x) { return x > 0.5; });
+    /* v3029-pdf · DSCR je Phase ueber den Kern Dscr.compute (CLAUDE.md: DSCR nie duplizieren) und
+       deutsch formatiert - hier stand pt.*.dscr.toFixed(2), also „1.14" mit Punkt. Heute = K.dscr. */
+    function _dscrPh(p, bsv, heute) {
+      if (heute && K.dscr != null && isFinite(K.dscr)) return pN(K.dscr, 2);
+      try {
+        if (window.Dscr && typeof Dscr.compute === 'function')
+          return pN(Dscr.compute({ nkm_j: p.wm, ze_j: 0, zins_j: p.zins, tilg_j: p.tilg, bsv_j: bsv, bwk_cf: p.bwk }).brutto, 2);
+      } catch (e) {}
+      return pN(p.dscr, 2);
+    }
     var rows = [
       ['Mieteinnahmen / Jahr (NKM+ZE)', pE(pt.now.wm), pE(pt.ezb.wm), pE(pt.an.wm)],
       ['Bewirt. nicht-umlagef. / Jahr', '-' + pE(pt.now.bwk), '-' + pE(pt.ezb.bwk), '-' + pE(pt.an.bwk)],
       ['Zinsen / Jahr', '-' + pE(pt.now.zins), '-' + pE(pt.ezb.zins), '-' + pE(pt.an.zins)],
-      [_tilgLabel, '-' + pE(_tilgNow), '-' + pE(_tilgEzb), '-' + pE(_tilgAn)],
+      ['Tilgung / Jahr', '-' + pE(pt.now.tilg), '-' + pE(pt.ezb.tilg), '-' + pE(pt.an.tilg)]
+    ];
+    if (_hatBsvPh) rows.push(['Bausparrate / Jahr', '-' + pE(_bsvPh[0]), '-' + pE(_bsvPh[1]), '-' + pE(_bsvPh[2])]);
+    rows = rows.concat([
       ['CF vor Steuern / Jahr', pE(pt.now.cfvst, true), pE(pt.ezb.cfvst, true), pE(pt.an.cfvst, true)],
       // V63.83 Bug-Fix: pE(..., true) liefert bereits Vorzeichen (+/-).
       // Vorher: hardcoded "-" davor → bei Erstattung (negativ) wurde "--663" angezeigt.
@@ -2023,12 +2056,12 @@ async function _exportPDFInner() {
       ['CF nach Steuern / Monat', pE(pt.now.cfns / 12, true), pE(pt.ezb.cfns / 12, true), pE(pt.an.cfns / 12, true)],
       ['Bruttomietrendite', pP(pt.now.bmy, 2), pP(pt.ezb.bmy, 2), pP(pt.an.bmy, 2)],
       ['Nettomietrendite', pP(pt.now.nmy, 2), pP(pt.ezb.nmy, 2), pP(pt.an.nmy, 2)],
-      ['DSCR', pt.now.dscr.toFixed(2), pt.ezb.dscr.toFixed(2), pt.an.dscr.toFixed(2)],
+      ['DSCR', _dscrPh(pt.now, _bsvPh[0], true), _dscrPh(pt.ezb, _bsvPh[1]), _dscrPh(pt.an, _bsvPh[2])],
       ['LTV', pP(pt.now.ltv, 1), pP(pt.ezb.ltv, 1), pP(pt.an.ltv, 1)],
       ['Restschuld', pE(pt.now.rs), pE(pt.ezb.rs), pE(pt.an.rs)],
       ['Immobilienwert', pE(pt.now.wert), pE(pt.ezb.wert), pE(pt.an.wert)],
       ['Eigenkapital im Objekt', pE(pt.now.eq), pE(pt.ezb.eq), pE(pt.an.eq)]
-    ];
+    ]);
     doc.autoTable({
       startY: cy,
       head: [['Kennzahl', window._dpPdfJahr1(false), 'Ende Zinsbindung', 'Anschluss']],
@@ -2212,7 +2245,7 @@ async function _exportPDFInner() {
       'Jahr',
       'NKM\n/Mon',
       'Zinsen',
-      _hasBsparProj ? 'BSV-Rate' : 'Tilgung',
+      _hasBsparProj ? 'Tilg.\n+ BSV' : 'Tilgung',   /* v3029-pdf: Summe beider, siehe tilgOrBspar */
       'CF v.St./J',
       'CF v.St./M',
       '\u00b1 Steuer',
@@ -2228,7 +2261,7 @@ async function _exportPDFInner() {
     function eFmt(n, signed) {
       if (n == null) return '-';
       var s = pE(n, signed);
-      return s + ' \u20ac';
+      return s === '-' ? '-' : s + ' \u20ac';   /* v3029-pdf \u00b7 NaN ergab \u201e- \u20ac" */
     }
     function eFmtNeg(n) {
       if (n == null || Math.round(Math.abs(n)) === 0) return '0 \u20ac';   /* v2992: \u201e-0 \u20ac" im Rumpfjahr */
@@ -2259,7 +2292,9 @@ async function _exportPDFInner() {
       if (_teiler !== 12 && r.nkm_y != null && isFinite(r.nkm_y)) _nkm = r.nkm_y / _teiler;
       var cf_vst_m = cf_vst_j / _teiler;
       var cf_ns_m  = _cfns / _teiler;
-      var tilgOrBspar = _hasBsparProj ? _bspar : _ty;
+      /* v3029-pdf · nach der Zuteilung ist bspar_y 0 und die Tilgung des Bauspardarlehens steht in ty
+         (calc.js) - die Spalte zeigte dann 0, obwohl CF v.St. die Tilgung enthielt. Jetzt beide zusammen. */
+      var tilgOrBspar = _hasBsparProj ? (_ty + _bspar) : _ty;
       return [
         String(r.cal != null ? r.cal : '-') + (_ri === 0 && _mon1 < 12 ? '\n' + _mon1 + ' Mon.' : ''),
         eFmt(_nkm),
@@ -2417,7 +2452,7 @@ async function _exportPDFInner() {
     // Umlaute (CP1252) bleiben.
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
     doc.text('Alle Werte in EUR' +
-             (_hasBsparProj ? '  \u00b7  BSV-Rate statt Tilgung (Tilgungsaussetzung)' : ''), _tblM, cy);
+             (_hasBsparProj ? '  \u00b7  Tilg. + BSV: Tilgung und Bausparrate zusammen (Tilgungsaussetzung)' : ''), _tblM, cy);
     cy += 3.5;
     /* v2463 · lief 9 mm über den rechten Rand, und „ohne Tilgung" stimmte nicht:
        gemessen CF n.St./J 2027 = 7.965 - 388 = 7.577, also nach Tilgung. */
@@ -3724,17 +3759,23 @@ async function _exportPDFInner() {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
       doc.text('Anlage 2 ImmoWertV: Modernisierungspunkte je Einheit; * = Zustand vollst\u00e4ndig vom Geb\u00e4ude \u00fcbernommen.', M, cy);
       cy += 6;
-      var _sollJ = (_MFH.s && _MFH.s.soll ? _MFH.s.soll * 12 : null);
+      /* v3029-pdf \u00b7 Soll wie die App (mfh-einheiten.js istSoll, v2410): Einheiten-Soll PLUS
+         Zusatzeinnahmen (Ist = K.nkm_j enthaelt sie) und Rendite auf DERSELBEN Basis Kaufpreis
+         ueber DealKpis.compute - hier stand Soll ohne Stellplaetze auf die Gesamtinvestition. */
+      var _zeJ = (K.ze_j != null && isFinite(K.ze_j)) ? Number(K.ze_j) : 0;
+      var _sollJ = (_MFH.s && _MFH.s.soll ? _MFH.s.soll * 12 + _zeJ : null);
+      var _bmySoll = null;
+      try { if (_sollJ != null && K.kp > 0 && window.DealKpis && typeof DealKpis.compute === 'function') _bmySoll = DealKpis.compute({ kp: K.kp, nkm: _MFH.s.soll, ze: _zeJ / 12 }).bmy; } catch (e) {}
       var _ist = [
-        ['Kaltmiete p. a. - Ist', pE(K.nkm_j) + ' \u20ac'],
-        ['Kaltmiete p. a. - Soll (nach Ma\u00dfnahmen)', _sollJ != null ? pE(_sollJ) + ' \u20ac' : '-'],
+        ['Kaltmiete p. a. - Ist', pEu(K.nkm_j)],
+        ['Kaltmiete p. a. - Soll (nach Ma\u00dfnahmen)', _sollJ != null ? pEu(_sollJ) : '-'],
         ['Bruttomietrendite Ist (auf Kaufpreis)', pP(K.bmy, 2)],
-        ['Bruttomietrendite Soll (auf Gesamtinvestition)', (_sollJ != null && K.gi > 0) ? pP(_sollJ / K.gi * 100, 2) : '-'],
+        ['Bruttomietrendite Soll (auf Kaufpreis)', _bmySoll != null ? pP(_bmySoll, 2) : '-'],
         ['Rechtliche Einheit', _MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Geb\u00e4ude'],
         ['Modernisierungsgrad (fl\u00e4chengewichtet)', pN(_MFH.punkteGew, 1) + ' von 20 Punkten, angesetzt ' + _MFH.hausPunkte]
       ];
       if (_MFH.s && _MFH.s.leer) _ist.push(['Leerstand', _MFH.s.leer + ' Einheiten / ' + pE(_MFH.s.leerFl) + ' m\u00b2']);
-      if (_MFH.s && _MFH.s.kosten) _ist.push(['Geplante Ma\u00dfnahmen', pE(_MFH.s.kosten) + ' \u20ac']);
+      if (_MFH.s && _MFH.s.kosten) _ist.push(['Geplante Ma\u00dfnahmen', pEu(_MFH.s.kosten)]);
       if (_MFH.rndGew > 0) _ist.push(['Restnutzungsdauer des Geb\u00e4udes (Anlage 2, indikativ)', Math.round(_MFH.rndGew) + ' Jahre' + (_MFH.rndInfo && _MFH.rndInfo.gnd ? ' (GND ' + _MFH.rndInfo.gnd + ')' : '')]);
       if (cy + 11 + _ist.length * 5.8 > 278) cy = newPage('Einheiten & Zustand \u00b7 Fortsetzung');
       cy = secH(doc, cy, 'Ist gegen Soll', M, CW);

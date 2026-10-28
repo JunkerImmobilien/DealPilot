@@ -107,16 +107,24 @@
   function einheitenAus(typ, ext) {
     var liste = (ext && Array.isArray(ext.einheiten)) ? ext.einheiten : [];
     var aus = [];
+    /* v3029-import · Stellplätze, Garagen, Keller sind keine Einheiten - ihre Miete fiel bis v3028
+       aber ganz heraus (2 × 40 € fehlten in der Objektmiete). Sie wird jetzt mitgezählt
+       (aus.stellplatzMiete) und geht in die Zusatzeinnahmen (object-actions.js). */
+    aus.stellplatzMiete = 0; aus.stellplatzAnzahl = 0;
     liste.forEach(function (w, i) {
       if (!w) return;
       var art = String(w.nutzung || w.art || '').toLowerCase();
-      if (/stellplatz|garage|keller/.test(art)) return;
+      if (/stellplatz|garage|keller/.test(art)) {
+        if (typ === 'mietaufstellung' && zahl(w.kaltmiete_eur) > 0 && String(w.status || '').toLowerCase() !== 'leer') { aus.stellplatzMiete += zahl(w.kaltmiete_eur); aus.stellplatzAnzahl++; }
+        return;
+      }
       var e = { nr: String(w.nr || (i + 1)).replace(/^(we|wohnung|nr\.?)\s*/i, ''), lage: w.lage || '' };
       if (/gewerbe/.test(art)) e.art = 'gewerbe';
       if (zahl(w.wfl_m2)) e.wfl = String(w.wfl_m2).replace('.', ',');
       if (zahl(w.zimmer)) e.zimmer = String(w.zimmer).replace('.', ',');
       if (typ === 'mietaufstellung') {
-        if (zahl(w.kaltmiete_eur) > 0) { e.ist = String(Math.round(w.kaltmiete_eur)); e.status = 'vermietet'; }
+        /* v3029-import · auf den Cent, nicht auf den Euro (6 × 512,50 € waren 3.078 statt 3.075 €) */
+        if (zahl(w.kaltmiete_eur) > 0) { e.ist = String(Math.round(zahl(w.kaltmiete_eur) * 100) / 100).replace('.', ','); e.status = 'vermietet'; }
         if (String(w.status || '').toLowerCase() === 'leer') { e.status = 'leer'; }
         if (VERTRAG[w.vertragsart]) e.mv_art = VERTRAG[w.vertragsart];
         if (datumIso(w.mietbeginn)) e.mv_beginn = datumIso(w.mietbeginn);
@@ -164,12 +172,17 @@
     if (window.ObjectActions && typeof window.ObjectActions.openImport === 'function') window.ObjectActions.openImport(null, { ergaenzen: true });
   }
   async function auswerten(dokumente, opts) {
-    var objekt = { objektart: v('objart'), adresse: [v('str'), v('hnr'), v('plz'), v('ort')].join(' ').trim(), kaufpreis: v('kp'), wohnflaeche: v('wfl'),
-      baujahr: v('baujahr'), nettokaltmiete_monat: v('nkm'), miteigentumsanteil_pct: v('mea'), einheiten: v('einheiten'), hausgeld_ul_jahr: v('hg_ul'), hausgeld_nul_jahr: v('hg_nul') };
+    /* v3029-import · opts.kontext: Objektart/MEA aus dem gerade gelesenen Paket (object-actions.js
+       _kontext) - bei einem neuen Objekt ist das Formular noch leer, und die Sonderumlage einer
+       Wohnung wurde für das ganze Gebäude gerechnet. */
+    var ktx = (opts && opts.kontext) || {};
+    var artK = ktx.objart || v('objart'), meaK = (ktx.mea > 0) ? String(ktx.mea).replace('.', ',') : v('mea');
+    var objekt = { objektart: artK, adresse: [v('str'), v('hnr'), v('plz'), v('ort')].join(' ').trim(), kaufpreis: v('kp'), wohnflaeche: v('wfl'),
+      baujahr: v('baujahr'), nettokaltmiete_monat: v('nkm'), miteigentumsanteil_pct: meaK, einheiten: v('einheiten'), hausgeld_ul_jahr: v('hg_ul'), hausgeld_nul_jahr: v('hg_nul') };
     /* v3016f · gemessen am Demo-Set Lindenallee (MFH, alle 6 Einheiten im Paket): die Auswertung
        rechnete die Sonderumlage mit dem MEA EINES Grundbuchblatts (204/1.000 → 9.466 statt 46.400 €).
        Ohne eigenen MEA im Objekt wird das ganze Gebäude gekauft. */
-    objekt.kauf_umfang = (v('mea') && v('objart') === 'ETW') ? 'eine Einheit, Anteil laut Miteigentumsanteil' : (v('mea') ? 'Anteil laut Miteigentumsanteil' : 'ganzes Gebaeude, alle Einheiten (Anteil 100 %)');
+    objekt.kauf_umfang = (meaK && artK === 'ETW') ? 'eine Einheit, Anteil laut Miteigentumsanteil' : (artK === 'ETW' ? 'eine Einheit, Miteigentumsanteil noch unbekannt - Betraege der Gemeinschaft NICHT als Anteil der Einheit ausgeben' : (meaK ? 'Anteil laut Miteigentumsanteil' : 'ganzes Gebaeude, alle Einheiten (Anteil 100 %)'));
     var body = { dokumente: dokumente, objekt: objekt };
     var alt = opts && opts.ergaenzen ? laden() : null;   /* v3017 · zusammenführen statt ersetzen */
     if (alt && alt.auswertung) { body.vorher = alt.auswertung; body.vorherDokumente = (alt.dokumente || []).map(function (x) { return x.label + (x.datum ? ' ' + x.datum : ''); }); }

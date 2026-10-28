@@ -117,6 +117,9 @@
     var ga = zahl(roh('geb_ant'));
     if (ga == null || !(ga > 0 && ga <= 100)) S.push(sperre('Gebäudeanteil am Kaufpreis', 'geb_ant',
       ga == null ? 'Ohne ihn rechnet die AfA mit einer Vorgabe statt mit deiner Angabe.' : 'Eingetragen sind ' + String(ga).replace('.', ',') + ' % - gültig ist ein Anteil über 0 und bis 100 %.', 'Reiter Steuer'));
+    /* v3029-import · 80 % ist die Vorgabe des Felds (index.html value="80") - nie leer, deshalb griff die
+       Sperre oben nie. Kein Halt (Entscheidung offen), aber ein Hinweis im Haus-Stil. */
+    if (ga === 80 && !window._lastBmfResults) W.push('Gebäudeanteil 80 % ist die Vorgabe, nicht aus diesem Objekt ermittelt - die AfA kann damit zu hoch oder zu niedrig sein. Genauer über die Kaufpreisaufteilung.');
     var as = zahl(roh('afa_satz'));
     if (!(as > 0)) S.push(sperre('AfA-Satz', 'afa_satz', 'Ohne Satz gibt es keine Abschreibung - oder eine aus der Vorgabe.', 'Reiter Steuer'));
     if (!St.cfRows || !St.cfRows.length) S.push(sperre('Steuerjahre (Betrachtungszeitraum)', 'btj', 'Die Aufstellung ist je Steuerjahr - ohne Jahre gibt es keine Seite.', 'Reiter Finanzierung'));

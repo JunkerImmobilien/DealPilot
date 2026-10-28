@@ -77,11 +77,43 @@ window.DealPilotInvestmentProfile = (function() {
   }
 
   // v668: effektiver Standard-Zins = eigener Wert, sonst indikativer Pfandbrief-Satz der Zinsbindung
-  function getZins() {
+  /* v3029-rechnen · DER VORGABEZINS FOLGT DER VORGABE-FINANZIERUNG.
+     Bis v3028 kam der Zins immer aus der Stufe „standard" (Beleihung 80 %).
+     Die Vorgabe-Finanzierung derselben Einstellungen ist aber 10 % Eigenkapital
+     vom Kaufpreis bei mitfinanzierten Nebenkosten - Darlehen = Kaufpreis +
+     Nebenkosten - EK, also rund 104 % vom Kaufpreis (NW: 1,7 + 0,5 + 3,57 +
+     1,5 + 6,5 = 13,77 % Nebenkosten). Die Marktformel schlaegt dort 0,64
+     Prozentpunkte auf statt 0 - bei 300.000 € rund 1.900 € Zins im Jahr, die
+     die Rechnung verschwieg.
+     Jetzt: `ltv` als Parameter (wer ihn kennt, gibt ihn mit); sonst der LTV, den
+     die eigenen Vorgaben ergeben. Die gewaehlte Stufe bleibt die UNTERGRENZE
+     (wer „schwach" waehlt, bekommt nie weniger). Ein eigener Zins geht vor. */
+  function vorgabeLtv() {
+    var z = function (k) { var n = parseFloat(String(get(k) == null ? '' : get(k)).replace(',', '.')); return isFinite(n) ? n : 0; };
+    var ekq = z('ek_quote_default');
+    if (!(ekq > 0)) return null;
+    var grest = 0;
+    try {
+      var bl = get('bundesland'), R = window.DealPilotGrest && window.DealPilotGrest.rates;
+      grest = (bl && R && isFinite(R[bl])) ? Number(R[bl]) : 6.5;
+    } catch (e) { grest = 6.5; }
+    var nk = z('notar_pct') + z('grundbuch_pct') + z('maklerkosten') + z('sonstige_nk_pct') + grest;
+    return Math.max(0, 100 + nk - ekq);
+  }
+  function getZins(ltv) {
     var ov = get('zins_override');
     if (ov != null && String(ov).trim() !== '') { var nn = parseFloat(String(ov).replace(',', '.')); if (isFinite(nn) && nn > 0) return nn; }
     var binding = get('zinsbindung_default') || 10;
-    try { if (typeof window.dpGetIndicativeZins === 'function') { var r = window.dpGetIndicativeZins(binding, get('zins_margin') || 'standard'); if (typeof r === 'number' && isFinite(r)) return r; } } catch (e) {}
+    try {
+      if (typeof window.dpGetIndicativeZins === 'function') {
+        var stufe = window.dpGetIndicativeZins(binding, get('zins_margin') || 'standard');
+        var l = (ltv != null && isFinite(Number(ltv)) && Number(ltv) > 0) ? Number(ltv) : vorgabeLtv();
+        var nachLtv = (l != null) ? window.dpGetIndicativeZins(binding, null, l) : null;
+        var r = (typeof nachLtv === 'number' && isFinite(nachLtv))
+          ? ((typeof stufe === 'number' && isFinite(stufe)) ? Math.max(stufe, nachLtv) : nachLtv) : stufe;
+        if (typeof r === 'number' && isFinite(r)) return r;
+      }
+    } catch (e) {}
     return null;
   }
 
@@ -285,7 +317,7 @@ window.DealPilotInvestmentProfile = (function() {
            _dpProfilWert, bis v1431 _dpProfil). Jetzt wirken alle drei. */
         field('ip_bwk_ul_pct_default', 'Bewirtschaftung umlagefähig', p.bwk_ul_pct_default, '% der NKM', 'Hausgeld umlagefähig, Grundsteuer — typisch 15–20 %'),
         field('ip_bwk_anteil_default', 'Bewirtschaftung nicht umlagefähig', p.bwk_anteil_default, '% der NKM', 'Verwaltung, Rücklagen — typisch 15–22 %'),
-        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet — gilt in beiden Rechenwegen; A-Lage eher 1 %, C-Lage eher 3 % (ImmoWertV: 2 % Wohnen).'),
+        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet (sobald eine Miete eingetragen ist) und gilt bei Euro-Werten (Detailliert) — bei Prozent der Nettokaltmiete steckt er nicht in der Quote; A-Lage eher 1 %, C-Lage eher 3 % (ImmoWertV: 2 % Wohnen).'),
         (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — Fallback — nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)</div></div>'; })(),
         field('ip_hausgeld_pct', 'Eigener Hausgeld-Anteil (optional)', (p.hausgeld_pct != null && ['0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0',''].indexOf(String(p.hausgeld_pct)) < 0) ? p.hausgeld_pct : '', '% vom KP/Jahr', 'übersteuert die Schnellauswahl'),
       '</div>',

@@ -30,11 +30,15 @@
     makrolage:      ['makrolage'],
     bevoelkerung:   ['ds2_bevoelkerung'],
     nachfrage:      ['ds2_nachfrage'],
-    mietwachstum:   ['mietwachstum', 'ds2_mietwachstum', 'mietwachstumPct'],
+    /* v3029-import · mietwachstum und instandhaltung zeigten auf ids, die es in index.html nicht
+       gibt - fieldState meldete „existiert nicht", und beide Score-Felder wurden still NICHT
+       gezählt (kein Chip, kein Absprung). Der Score liest mietstg (dealscore2-ui.js:138) bzw.
+       weg_r + eigen_r, ersatzweise hg_nul (dealscore2-ui.js:94-100). */
+    mietwachstum:   ['mietstg'],
     wertsteigerung: ['ds2_wertsteigerung'],
     entwicklungs:   ['ds2_entwicklung', 'ds2_entwicklungsmoeglichkeiten'],
     leerstand:      ['leerstand'],
-    instandhaltung: ['instandhaltung', 'ihr', 'instandh'],
+    instandhaltung: ['eigen_r', 'weg_r', 'hg_nul'],
     mietausfall:    ['ds2_mietausfall', 'mietausfall'],
     /* ── v2079 · DREI SCORE-FELDER FEHLTEN IM ZAEHLER ──────────────────
        Gemessen am 10.10.2026: `index.html` fuehrt NEUN `ds2_`-Felder, die
@@ -94,6 +98,12 @@
         var v = parseFloat(hid[i].value);
         if (!isNaN(v) && v > 0) return { exists: true, filled: true };
       }
+      return { exists: true, filled: false };
+    }
+    /* v3029-import · Instandhaltung ist gefüllt, sobald EINE ihrer drei Quellen etwas trägt */
+    if (key === 'instandhaltung') {
+      var ids = FIELD_TARGETS.instandhaltung;
+      for (var k = 0; k < ids.length; k++) { var ek = document.getElementById(ids[k]); if (ek && String(ek.value || '').trim() !== '') return { exists: true, filled: true }; }
       return { exists: true, filled: false };
     }
     var val = (el.value != null) ? String(el.value).trim() : '';

@@ -3256,7 +3256,9 @@ async function extractExpose(text, opts) {
     '  - sanierungsjahr: 4-stellige Jahreszahl falls eine Sanierung erwähnt wird',
     '  - objektart: einer von: "Wohnung", "Eigentumswohnung", "Einfamilienhaus", "Mehrfamilienhaus", "Reihenhaus", "Doppelhaushälfte", "Gewerbe"',
     '  - zimmer: Zahl (z.B. 3 oder 3.5)',
-    '  - nettokaltmiete: Zahl in Euro/Monat (falls vermietet oder Mieteinnahmen erwähnt)',
+    '  - nettokaltmiete: Zahl in Euro/MONAT (falls vermietet oder Mieteinnahmen erwähnt). Nennt das Exposé nur eine JAHRES-Miete (z. B. "Mieteinnahmen p.a.", "Jahresnettokaltmiete", "IST-Miete/Jahr"), teile sie durch 12',
+    '  - wohneinheiten: Anzahl der Wohneinheiten im Gebäude (Zahl; beim Mehrfamilienhaus die Zahl der Wohnungen, bei einer Eigentumswohnung die Wohnungen der Anlage, falls genannt)',
+    '  - kaeuferprovision_pct: Maklerprovision des KÄUFERS in Prozent inkl. MwSt (z. B. 3.57); 0, wenn "provisionsfrei" oder "keine Käuferprovision"; weglassen, wenn nichts dazu steht',
     '  - nebenkosten: Zahl in Euro/Monat (Nebenkosten, BK)',
     '  - hausgeld: Zahl in Euro/Monat (nur bei ETW)',
     '  - instandhaltung: Zahl in Euro/Monat (Instandhaltungsrücklage, falls separat ausgewiesen)',
@@ -3302,14 +3304,36 @@ async function extractExpose(text, opts) {
   ['adresse', 'plz', 'ort', 'objektart', 'energieklasse', 'heizungsart', 'zustand', 'stellplatz'].forEach(k => {
     if (ext[k] != null && ext[k] !== '') cleaned[k] = String(ext[k]).trim();
   });
+  /* v3029-import · deutsche Schreibweise als Text richtig lesen: bis v3028 wurde "285.000" zu 285
+     und "3.500,50" zu 3,5 (der Prompt verlangt Zahlen, aber nicht jede Antwort haelt sich daran). */
+  const _zahlDe = (v) => {
+    if (typeof v === 'number') return v;
+    let s = String(v).replace(/[^\d.,-]/g, '');
+    if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+    return parseFloat(s);
+  };
+  /* v3029-import · marktmiete_*, wohneinheiten, kaeuferprovision_pct standen im Prompt bzw. fehlten,
+     wurden hier aber nie uebernommen - die Marktmiete kam so nie an. */
   ['kaufpreis', 'wohnflaeche', 'grundstuecksflaeche', 'baujahr', 'sanierungsjahr',
    'zimmer', 'nettokaltmiete', 'nebenkosten', 'hausgeld', 'heizkosten', 'energieverbrauch',
-   'instandhaltung', 'verwaltung', 'eigenkapital', 'kaufnebenkosten'].forEach(k => {
+   'instandhaltung', 'verwaltung', 'eigenkapital', 'kaufnebenkosten',
+   'marktmiete_qm', 'marktmiete_monat', 'wohneinheiten', 'kaeuferprovision_pct'].forEach(k => {
     const v = ext[k];
     if (v == null || v === '') return;
-    const n = typeof v === 'number' ? v : parseFloat(String(v).replace(/[^\d.,-]/g, '').replace(',', '.'));
+    const n = _zahlDe(v);
     if (!isNaN(n)) cleaned[k] = n;
   });
+  if (cleaned.wohneinheiten != null && !(cleaned.wohneinheiten >= 1 && cleaned.wohneinheiten <= 500)) delete cleaned.wohneinheiten;
+  if (cleaned.kaeuferprovision_pct != null && !(cleaned.kaeuferprovision_pct >= 0 && cleaned.kaeuferprovision_pct < 10)) delete cleaned.kaeuferprovision_pct;
+  /* v3029-import · Faktor Kaufpreis : Jahresmiete unter 3 gibt es nicht - dann hat die KI eine
+     Jahresmiete als Monatsmiete geliefert. Durch 12, mit Hinweis fuer die Uebernahme. */
+  if (cleaned.nettokaltmiete > 0 && cleaned.kaufpreis > 0 && cleaned.kaufpreis / (cleaned.nettokaltmiete * 12) < 3) {
+    const roh = cleaned.nettokaltmiete;
+    cleaned.nettokaltmiete = Math.round(roh / 12 * 100) / 100;
+    cleaned.nettokaltmiete_hinweis = 'Im Exposé stehen ' + Math.round(roh).toLocaleString('de-DE') + ' € - als Monatsmiete wäre der Faktor '
+      + (Math.round(cleaned.kaufpreis / (roh * 12) * 10) / 10).toString().replace('.', ',') + '; übernommen als Jahresmiete ÷ 12';
+  }
   ['balkon', 'keller', 'aufzug'].forEach(k => {
     if (ext[k] != null) cleaned[k] = Boolean(ext[k]);
   });

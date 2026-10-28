@@ -1009,16 +1009,27 @@
       }
     }
     if (picked.energieklasse) set('ds2_energie', picked.energieklasse.toUpperCase());
-    if (picked.hausgeld) set('hg_ul', picked.hausgeld);
-    // V42: Neue Felder
-    if (picked.instandhaltung) set('inst', picked.instandhaltung);
+    /* v3029-import · Hausgeld im Exposé = €/Monat und Gesamtsumme; hg_ul ist „umlagefähig / Jahr".
+       Bis v3028 stand das Monatsgeld unverändert dort (320 €/Monat → 320 €/Jahr). Jetzt ×12 und nach
+       derselben Vorgabe aufgeteilt wie im Übernahme-Fenster (object-actions.js dpHausgeldAusExpose). */
+    var _hg = (picked.hausgeld && window.dpHausgeldAusExpose) ? window.dpHausgeldAusExpose(picked.hausgeld) : null;
+    if (_hg) { set('hg_ul', String(_hg.ul)); set('hg_nul', String(_hg.nul)); }
     if (picked.eigenkapital) set('ek', picked.eigenkapital);
-    if (picked.verwaltung) set('verwaltung', picked.verwaltung);
-    if (picked.kaufnebenkosten) {
-      // Wenn als Prozent kommt (z.B. "10.5") → in nk-Feld
-      var nkInp = document.getElementById('nk_pct');
-      if (nkInp) nkInp.value = picked.kaufnebenkosten;
+    /* v3029-import · inst, verwaltung, nk_pct gibt es als Felder nicht (still verworfen) -
+       entfernt. Neu: Grundstücksfläche, Wohneinheiten, Käuferprovision. */
+    if (picked.grundstuecksflaeche) set('gsfl', picked.grundstuecksflaeche);
+    if (picked.wohneinheiten) set('einheiten', picked.wohneinheiten);
+    if (picked.kaeuferprovision_pct != null && picked.kaeuferprovision_pct !== '' && isFinite(Number(picked.kaeuferprovision_pct))) {
+      var _mpE = document.getElementById('makler_p');
+      if (_mpE) { _mpE.value = String(picked.kaeuferprovision_pct).replace('.', ','); try { _mpE.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
     }
+    /* v3029-import · Folgen wie bei einer Eingabe von Hand: GrESt nach PLZ, Eigenkapital-/Mietausfall-Vorgabe, AfA nach Baujahr */
+    try {
+      if (window.dpImportFolgen) {
+        var _f = ['plz', 'kp', 'nkm', 'baujahr'].filter(function (k) { return k === 'kp' ? picked.kaufpreis : k === 'nkm' ? picked.nettokaltmiete : picked[k === 'plz' ? 'plz' : 'baujahr']; });
+        window.dpImportFolgen(_f);
+      }
+    } catch (e) {}
 
     if (typeof calc === 'function') calc();
     if (typeof updHeader === 'function') updHeader();
