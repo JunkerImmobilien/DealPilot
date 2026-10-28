@@ -1,0 +1,963 @@
+[
+  {
+    "land_code": "MV",
+    "ags": "13004",
+    "ebene": "gemeinde",
+    "gebiet_name": "Schwerin, Landeshauptstadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB Schwerin 2026",
+    "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+    "quelle_parser": "v3017-hand (pdftotext -layout, Tabellen S. 63–65 am Seitenbild gelesen, 28.10.2026, Ernte SWF)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+    "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+    "lizenz_hinweis": "Impressum, S. 2 des Grundstücksmarktberichts 2026: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: […] Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — derselbe Wortlaut wie im Jahrgang 2025 (schwerin.json); das Belegexemplar ist eine offene Auflage.",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser, freistehend",
+    "formel": {
+      "form": "verzweigt",
+      "liefert": "faktor",
+      "rundung_stellen": 2,
+      "achse_k_feld": "baujahrsklasse",
+      "achse_k_bez": "Baujahrsklasse (bis_1990 oder ab_1991)",
+      "modell_je_kategorie": {
+        "bis_1990": {
+          "form": "stufen_kategorial",
+          "liefert": "faktor",
+          "achse_k_feld": "gebaeudetyp_nhk2010",
+          "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre bis 1990“)",
+          "rundung_stellen": 2,
+          "stufen": {
+            "1": 1.16,
+            "1.01": 1.16
+          },
+          "kategorie_ohne_wert": [
+            "1.03",
+            "1.12",
+            "1.13",
+            "1.21",
+            "1.22",
+            "1.23",
+            "1.33"
+          ],
+          "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert: „-“ = kein Kauffall bzw. kein Wert, „*“ = zu wenige Kauffälle (Fallzahl steht da). Beide werden NICHT durch einen Nachbarwert ersetzt.",
+          "fallzahl": {
+            "1": 12,
+            "1.01": 10,
+            "1.03": null,
+            "1.12": 1,
+            "1.13": null,
+            "1.21": 1,
+            "1.22": null,
+            "1.23": null,
+            "1.33": null
+          },
+          "spanne": {
+            "1": [
+              0.84,
+              1.4
+            ],
+            "1.01": [
+              0.84,
+              1.4
+            ]
+          }
+        },
+        "ab_1991": {
+          "form": "stufen_kategorial",
+          "liefert": "faktor",
+          "achse_k_feld": "gebaeudetyp_nhk2010",
+          "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre ab 1991“)",
+          "rundung_stellen": 2,
+          "stufen": {
+            "1": 0.97,
+            "1.21": 0.99,
+            "1.22": 0.89,
+            "1.23": 1.02,
+            "1.33": 0.94
+          },
+          "kategorie_ohne_wert": [
+            "1.01",
+            "1.03",
+            "1.12",
+            "1.13"
+          ],
+          "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert: „-“ = kein Kauffall bzw. kein Wert, „*“ = zu wenige Kauffälle (Fallzahl steht da). Beide werden NICHT durch einen Nachbarwert ersetzt.",
+          "fallzahl": {
+            "1": 50,
+            "1.01": 1,
+            "1.03": 1,
+            "1.12": null,
+            "1.13": 2,
+            "1.21": 27,
+            "1.22": 11,
+            "1.23": 5,
+            "1.33": 3
+          },
+          "spanne": {
+            "1": [
+              0.83,
+              1.14
+            ],
+            "1.21": [
+              0.85,
+              1.13
+            ],
+            "1.22": [
+              0.82,
+              1.11
+            ],
+            "1.23": [
+              0.95,
+              1.16
+            ],
+            "1.33": [
+              0.77,
+              1.03
+            ]
+          }
+        }
+      },
+      "interpolation": "keine — beide Achsen sind kategorial. Zwischen Baujahrsklassen wird nicht gemittelt.",
+      "beschreibung_je_gebaeudetyp": {
+        "1": "Einfamilienhaus gesamt (Summenzeile des Berichts)",
+        "1.01": "Einfamilienhaus, freistehend; Keller-, Erd-, vollausgebautes Dachgeschoss",
+        "1.03": "Einfamilienhaus, freistehend; Keller-, Erdgeschoss, Flachdach",
+        "1.12": "Einfamilienhaus, freistehend; Keller-, Erd-, Ober-, nicht ausgebautes Dachgeschoss",
+        "1.13": "Einfamilienhaus, freistehend; Keller-, Erd-, Obergeschoss, Flachdach",
+        "1.21": "Einfamilienhaus, freistehend; Erd-, vollausgebautes Dachgeschoss, nicht unterkellert",
+        "1.22": "Einfamilienhaus, freistehend; Erd-, nicht ausgebautes Dachgeschoss, nicht unterkellert",
+        "1.23": "Einfamilienhaus, freistehend; Erdgeschoss, Flachdach, nicht unterkellert",
+        "1.33": "Einfamilienhaus, freistehend; Erd-, Obergeschoss, Flachdach, nicht unterkellert"
+      }
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62 des Berichts, PDF-Seite 64).",
+      "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
+      "bezugsgroesse": "Brutto-Grundfläche (BGF), Angaben aus dem Geoinformationssystem",
+      "baupreisindex": null,
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "S. 62: „Die NHK 2010 werden mit Hilfe der Baupreisindexreihen auf den Wertermittlungsstichtag umgerechnet.“ — Modelltabelle ebenda: „× Baupreisindex des Statistischen Bundesamtes/100“.",
+      "baupreisindex_seite": "62",
+      "baupreisindex_hinweis": "Der Bericht beziffert den Index nicht, nennt aber den BEZUG: Umrechnung auf den Wertermittlungsstichtag — bei der Ableitung aus Kauffällen ist das der Vertragszeitpunkt jedes Kauffalls, bei der Anwendung der Wertermittlungsstichtag des Objekts (§ 36 Abs. 2 ImmoWertV, Regelfall; Entscheidung Marcel 22./27.10.2026). Der Jahrgang 2025 (schwerin.json) enthielt diesen Satz nach seinem Beleg nicht; neu im Jahrgang 2026. RÜCKFRAGE an Marcel in der Ernte-Meldung vermerkt: „auf den Wertermittlungsstichtag“ statt „zum Kaufzeitpunkt“ wörtlich.",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Wörtlich S. 62: „Alterswertminderungsfaktor nach § 38 ImmoWertV 2021 (linear); Gesamtnutzungsdauer nach Anlage 1 ImmoWertV; Restnutzungsdauer nach § 4 Abs. 3 ImmoWertV.“",
+      "gnd_hinweis": "Anlage 1 ImmoWertV führt für Ein- und Zweifamilienhäuser, Doppel- und Reihenhäuser 80 Jahre — der sachliche Geltungsbereich dieser Sätze. Für andere Gebäudearten gilt der Satz nicht.",
+      "alterswertminderung": "linear, § 38 ImmoWertV 2021",
+      "aussenanlagen": "pauschale Schätzung in Höhe von 2 bis 4 % des Gebäudewertes (ggf. Berücksichtigung Carports), § 37 ImmoWertV 2021",
+      "nebengebaeude": "pauschale Schätzung des Wertes der Nebengebäude (z.B. Garagen) und sonstiger baulicher Anlagen",
+      "bodenwert": "Fläche × angepasstem Bodenrichtwert",
+      "besondere_merkmale": "nicht berücksichtigt — es wurden nur schadensfreie Objekte ausgewertet",
+      "datenbasis": "tatsächlich gezahlte Kaufpreise der Jahre 2024 bis 2025",
+      "stichprobe": {
+        "anzahl": 125,
+        "bodenrichtwert_eur_qm": {
+          "mittel": 165,
+          "spanne": [
+            135,
+            195
+          ]
+        },
+        "preis_eur_qm_wohnflaeche": {
+          "mittel": 2830,
+          "spanne": [
+            2210,
+            3420
+          ]
+        },
+        "gesamtkaufpreis_eur": {
+          "mittel": 349000,
+          "spanne": [
+            260000,
+            450000
+          ]
+        },
+        "baujahr": {
+          "mittel": 1999,
+          "spanne": [
+            1978,
+            2012
+          ]
+        },
+        "bgf_qm": {
+          "mittel": 210,
+          "spanne": [
+            160,
+            270
+          ]
+        },
+        "fundstelle": "S. 62 (PDF-Seite 64), Tabelle „Dem Gutachterausschuss stand eine Stichprobe mit folgenden Kennwerten zur Verfügung“"
+      }
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+      "sachlich": "Ein- und Zweifamilienhäuser, freistehend (Gebäudetypen 1.01 bis 1.33 der NHK 2010)",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw"
+      ],
+      "extrapolation": "gesperrt",
+      "hinweis": "Wörtlich S. 63: „Bei den Sachwertfaktoren zu den Gebäudetypen nach NHK 2010 handelt es sich um mittlere Werte der Kauffälle des jeweiligen Gebäudetyps.“ Trifft die Tabelle für den Gebäudetyp keine Aussage, verweist der Bericht (S. 65) auf die Regressionstabelle (eigener Satz, zweig ezfh_rhdhh_regression) — nicht auf einen benachbarten Gebäudetyp."
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 63 (PDF-Seite 65), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp“ — Zeilen 1.01 bis 1 (Summe)",
+        "wortlaut": "Spalten „Baujahre bis 1990“ und „Baujahre ab 1991“, je Fallzahl und NHK-2010-Faktor mit 2/3-Spanne. Zeile 1.13 ab 1991: Fallzahl 2, Wert „-“ (so abgedruckt).",
+        "pruefprotokoll": "ZÄHLPROBE am 28.10.2026 (Seitenbild): Einzeltypen addieren sich auf die Summenzeilen — EFH bis 1990: 10+1+1 = 12; EFH ab 1991: 1+1+2+27+11+5+3 = 50; Doppel-/Reihenendhaus bis 1990: 7+5+2 = 14, ab 1991: 3+21+1+6+2+3 = 36; Reihenmittelhaus ab 1991: 2+1+2+2+2 = 9, bis 1990: 1. Gesamtzeile 27 / 95 = 12+14+1 / 50+36+9. Alle Summen stimmen. OFFEN: 27+95 = 122, die Stichprobe S. 62 nennt 125 — Differenz 3 im Bericht nicht erklärt, nicht verteilt."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 62,
+    "stichtag": "2026-01-01",
+    "auflagen": "Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte zum 01.01.2026, beschlossen 27.03.2026), Datenbasis Kaufpreise 2024 bis 2025.",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.5, S. 62–63 (PDF-Seiten 64–65)"
+  },
+  {
+    "land_code": "MV",
+    "ags": "13004",
+    "ebene": "gemeinde",
+    "gebiet_name": "Schwerin, Landeshauptstadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB Schwerin 2026",
+    "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+    "quelle_parser": "v3017-hand (pdftotext -layout, Tabellen S. 63–65 am Seitenbild gelesen, 28.10.2026, Ernte SWF)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+    "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+    "lizenz_hinweis": "Impressum, S. 2 des Grundstücksmarktberichts 2026: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: […] Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — derselbe Wortlaut wie im Jahrgang 2025 (schwerin.json); das Belegexemplar ist eine offene Auflage.",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "objektart": "rhdhh",
+    "objektart_bez": "Doppelhaushälften und Reihenendhäuser",
+    "formel": {
+      "form": "verzweigt",
+      "liefert": "faktor",
+      "rundung_stellen": 2,
+      "achse_k_feld": "baujahrsklasse",
+      "achse_k_bez": "Baujahrsklasse (bis_1990 oder ab_1991)",
+      "modell_je_kategorie": {
+        "bis_1990": {
+          "form": "stufen_kategorial",
+          "liefert": "faktor",
+          "achse_k_feld": "gebaeudetyp_nhk2010",
+          "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre bis 1990“)",
+          "rundung_stellen": 2,
+          "stufen": {
+            "2": 1.09,
+            "2.01": 1.19,
+            "2.13": 1.12
+          },
+          "kategorie_ohne_wert": [
+            "2.21",
+            "2.22",
+            "2.31",
+            "2.32",
+            "2.33"
+          ],
+          "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert: „-“ = kein Kauffall bzw. kein Wert, „*“ = zu wenige Kauffälle (Fallzahl steht da). Beide werden NICHT durch einen Nachbarwert ersetzt.",
+          "fallzahl": {
+            "2": 14,
+            "2.01": 7,
+            "2.13": 5,
+            "2.21": 2,
+            "2.22": null,
+            "2.31": null,
+            "2.32": null,
+            "2.33": null
+          },
+          "spanne": {
+            "2": [
+              0.88,
+              1.38
+            ],
+            "2.01": [
+              1.05,
+              1.38
+            ],
+            "2.13": [
+              0.88,
+              1.67
+            ]
+          }
+        },
+        "ab_1991": {
+          "form": "stufen_kategorial",
+          "liefert": "faktor",
+          "achse_k_feld": "gebaeudetyp_nhk2010",
+          "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre ab 1991“)",
+          "rundung_stellen": 2,
+          "stufen": {
+            "2": 1.06,
+            "2.01": 0.89,
+            "2.21": 1.06,
+            "2.31": 1.04,
+            "2.33": 1.2
+          },
+          "kategorie_ohne_wert": [
+            "2.13",
+            "2.22",
+            "2.32"
+          ],
+          "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert: „-“ = kein Kauffall bzw. kein Wert, „*“ = zu wenige Kauffälle (Fallzahl steht da). Beide werden NICHT durch einen Nachbarwert ersetzt.",
+          "fallzahl": {
+            "2": 36,
+            "2.01": 3,
+            "2.13": null,
+            "2.21": 21,
+            "2.22": 1,
+            "2.31": 6,
+            "2.32": 2,
+            "2.33": 3
+          },
+          "spanne": {
+            "2": [
+              0.9,
+              1.18
+            ],
+            "2.01": [
+              0.68,
+              1.11
+            ],
+            "2.21": [
+              0.9,
+              1.17
+            ],
+            "2.31": [
+              0.96,
+              1.13
+            ],
+            "2.33": [
+              1.11,
+              1.27
+            ]
+          }
+        }
+      },
+      "interpolation": "keine — beide Achsen sind kategorial. Zwischen Baujahrsklassen wird nicht gemittelt.",
+      "beschreibung_je_gebaeudetyp": {
+        "2": "Doppel- und Reihenendhaus gesamt (Summenzeile des Berichts)",
+        "2.01": "Doppel- und Reihenendhaus; Keller-, Erd-, voll ausgebautes Dachgeschoss",
+        "2.13": "Doppel- und Reihenendhaus; Keller-, Erd-, Obergeschoss, Flachdach",
+        "2.21": "Doppel- und Reihenendhaus; Erd-, voll ausgebautes Dachgeschoss, nicht unterkellert",
+        "2.22": "Doppel- und Reihenendhaus; Erd-, nicht ausgebautes Dachgeschoss, nicht unterkellert",
+        "2.31": "Doppel- und Reihenendhaus; Erd-, Ober-, voll ausgebautes Dachgeschoss, nicht unterkellert",
+        "2.32": "Doppel- und Reihenendhaus; Erd-, Ober-, nicht ausgebautes Dachgeschoss, nicht unterkellert",
+        "2.33": "Doppel- und Reihenendhaus; Erd-, Obergeschoss, Flachdach, nicht unterkellert"
+      }
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62 des Berichts, PDF-Seite 64).",
+      "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
+      "bezugsgroesse": "Brutto-Grundfläche (BGF), Angaben aus dem Geoinformationssystem",
+      "baupreisindex": null,
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "S. 62: „Die NHK 2010 werden mit Hilfe der Baupreisindexreihen auf den Wertermittlungsstichtag umgerechnet.“ — Modelltabelle ebenda: „× Baupreisindex des Statistischen Bundesamtes/100“.",
+      "baupreisindex_seite": "62",
+      "baupreisindex_hinweis": "Der Bericht beziffert den Index nicht, nennt aber den BEZUG: Umrechnung auf den Wertermittlungsstichtag — bei der Ableitung aus Kauffällen ist das der Vertragszeitpunkt jedes Kauffalls, bei der Anwendung der Wertermittlungsstichtag des Objekts (§ 36 Abs. 2 ImmoWertV, Regelfall; Entscheidung Marcel 22./27.10.2026). Der Jahrgang 2025 (schwerin.json) enthielt diesen Satz nach seinem Beleg nicht; neu im Jahrgang 2026. RÜCKFRAGE an Marcel in der Ernte-Meldung vermerkt: „auf den Wertermittlungsstichtag“ statt „zum Kaufzeitpunkt“ wörtlich.",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Wörtlich S. 62: „Alterswertminderungsfaktor nach § 38 ImmoWertV 2021 (linear); Gesamtnutzungsdauer nach Anlage 1 ImmoWertV; Restnutzungsdauer nach § 4 Abs. 3 ImmoWertV.“",
+      "gnd_hinweis": "Anlage 1 ImmoWertV führt für Ein- und Zweifamilienhäuser, Doppel- und Reihenhäuser 80 Jahre — der sachliche Geltungsbereich dieser Sätze. Für andere Gebäudearten gilt der Satz nicht.",
+      "alterswertminderung": "linear, § 38 ImmoWertV 2021",
+      "aussenanlagen": "pauschale Schätzung in Höhe von 2 bis 4 % des Gebäudewertes (ggf. Berücksichtigung Carports), § 37 ImmoWertV 2021",
+      "nebengebaeude": "pauschale Schätzung des Wertes der Nebengebäude (z.B. Garagen) und sonstiger baulicher Anlagen",
+      "bodenwert": "Fläche × angepasstem Bodenrichtwert",
+      "besondere_merkmale": "nicht berücksichtigt — es wurden nur schadensfreie Objekte ausgewertet",
+      "datenbasis": "tatsächlich gezahlte Kaufpreise der Jahre 2024 bis 2025",
+      "stichprobe": {
+        "anzahl": 125,
+        "bodenrichtwert_eur_qm": {
+          "mittel": 165,
+          "spanne": [
+            135,
+            195
+          ]
+        },
+        "preis_eur_qm_wohnflaeche": {
+          "mittel": 2830,
+          "spanne": [
+            2210,
+            3420
+          ]
+        },
+        "gesamtkaufpreis_eur": {
+          "mittel": 349000,
+          "spanne": [
+            260000,
+            450000
+          ]
+        },
+        "baujahr": {
+          "mittel": 1999,
+          "spanne": [
+            1978,
+            2012
+          ]
+        },
+        "bgf_qm": {
+          "mittel": 210,
+          "spanne": [
+            160,
+            270
+          ]
+        },
+        "fundstelle": "S. 62 (PDF-Seite 64), Tabelle „Dem Gutachterausschuss stand eine Stichprobe mit folgenden Kennwerten zur Verfügung“"
+      }
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+      "sachlich": "Doppel- und Reihenendhäuser (Gebäudetypen 2.01 bis 2.33 der NHK 2010)",
+      "objektarten": [
+        "dhh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw"
+      ],
+      "extrapolation": "gesperrt",
+      "hinweis": "Wörtlich S. 63: „Bei den Sachwertfaktoren zu den Gebäudetypen nach NHK 2010 handelt es sich um mittlere Werte der Kauffälle des jeweiligen Gebäudetyps.“ Trifft die Tabelle für den Gebäudetyp keine Aussage, verweist der Bericht (S. 65) auf die Regressionstabelle (eigener Satz, zweig ezfh_rhdhh_regression) — nicht auf einen benachbarten Gebäudetyp."
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 63 (PDF-Seite 65), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp“ — Zeilen 2.01 bis 2 (Summe)",
+        "wortlaut": "Die Spaltenüberschrift lautet im Bericht „Sachwertfaktor für Einfamilienhäuser“, obwohl die Zeilen 2.xx Doppel- und Reihenendhäuser führen — so abgedruckt.",
+        "pruefprotokoll": "ZÄHLPROBE am 28.10.2026 (Seitenbild): Einzeltypen addieren sich auf die Summenzeilen — EFH bis 1990: 10+1+1 = 12; EFH ab 1991: 1+1+2+27+11+5+3 = 50; Doppel-/Reihenendhaus bis 1990: 7+5+2 = 14, ab 1991: 3+21+1+6+2+3 = 36; Reihenmittelhaus ab 1991: 2+1+2+2+2 = 9, bis 1990: 1. Gesamtzeile 27 / 95 = 12+14+1 / 50+36+9. Alle Summen stimmen. OFFEN: 27+95 = 122, die Stichprobe S. 62 nennt 125 — Differenz 3 im Bericht nicht erklärt, nicht verteilt."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 50,
+    "stichtag": "2026-01-01",
+    "auflagen": "Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte zum 01.01.2026, beschlossen 27.03.2026), Datenbasis Kaufpreise 2024 bis 2025.",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.5, S. 63 (PDF-Seite 65)"
+  },
+  {
+    "land_code": "MV",
+    "ags": "13004",
+    "ebene": "gemeinde",
+    "gebiet_name": "Schwerin, Landeshauptstadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB Schwerin 2026",
+    "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+    "quelle_parser": "v3017-hand (pdftotext -layout, Tabellen S. 63–65 am Seitenbild gelesen, 28.10.2026, Ernte SWF)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+    "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+    "lizenz_hinweis": "Impressum, S. 2 des Grundstücksmarktberichts 2026: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: […] Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — derselbe Wortlaut wie im Jahrgang 2025 (schwerin.json); das Belegexemplar ist eine offene Auflage.",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rmh",
+    "objektart": "rmh",
+    "objektart_bez": "Reihenmittelhäuser",
+    "formel": {
+      "form": "verzweigt",
+      "liefert": "faktor",
+      "rundung_stellen": 2,
+      "achse_k_feld": "baujahrsklasse",
+      "achse_k_bez": "Baujahrsklasse (bis_1990 oder ab_1991)",
+      "modell_je_kategorie": {
+        "bis_1990": {
+          "form": "stufen_kategorial",
+          "liefert": "faktor",
+          "achse_k_feld": "gebaeudetyp_nhk2010",
+          "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre bis 1990“)",
+          "rundung_stellen": 2,
+          "stufen": {},
+          "kategorie_ohne_wert": [
+            "3",
+            "3.12",
+            "3.21",
+            "3.23",
+            "3.31",
+            "3.32",
+            "3.33"
+          ],
+          "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert: „-“ = kein Kauffall bzw. kein Wert, „*“ = zu wenige Kauffälle (Fallzahl steht da). Beide werden NICHT durch einen Nachbarwert ersetzt.",
+          "fallzahl": {
+            "3": 1,
+            "3.12": 1,
+            "3.21": null,
+            "3.23": null,
+            "3.31": null,
+            "3.32": null,
+            "3.33": null
+          },
+          "spanne": {}
+        },
+        "ab_1991": {
+          "form": "stufen_kategorial",
+          "liefert": "faktor",
+          "achse_k_feld": "gebaeudetyp_nhk2010",
+          "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre ab 1991“)",
+          "rundung_stellen": 2,
+          "stufen": {
+            "3": 1.3
+          },
+          "kategorie_ohne_wert": [
+            "3.12",
+            "3.21",
+            "3.23",
+            "3.31",
+            "3.32",
+            "3.33"
+          ],
+          "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert: „-“ = kein Kauffall bzw. kein Wert, „*“ = zu wenige Kauffälle (Fallzahl steht da). Beide werden NICHT durch einen Nachbarwert ersetzt.",
+          "fallzahl": {
+            "3": 9,
+            "3.12": null,
+            "3.21": 2,
+            "3.23": 1,
+            "3.31": 2,
+            "3.32": 2,
+            "3.33": 2
+          },
+          "spanne": {
+            "3": [
+              1.12,
+              1.43
+            ]
+          }
+        }
+      },
+      "interpolation": "keine — beide Achsen sind kategorial. Zwischen Baujahrsklassen wird nicht gemittelt.",
+      "beschreibung_je_gebaeudetyp": {
+        "3": "Reihenmittelhaus gesamt (Summenzeile des Berichts)",
+        "3.12": "Reihenmittelhaus; Keller-, Erd-, Ober-, nicht ausgebautes Dachgeschoss",
+        "3.21": "Reihenmittelhaus; Erd-, voll ausgebautes Dachgeschoss, nicht unterkellert",
+        "3.23": "Reihenmittelhaus; Erdgeschoss, Flachdach, nicht unterkellert",
+        "3.31": "Reihenmittelhaus; Erd-, Ober-, voll ausgebautes Dachgeschoss, nicht unterkellert",
+        "3.32": "Reihenmittelhaus; Erd-, Ober-, nicht ausgebautes Dachgeschoss, nicht unterkellert",
+        "3.33": "Reihenmittelhaus; Erd-, Obergeschoss, Flachdach, nicht unterkellert"
+      }
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62 des Berichts, PDF-Seite 64).",
+      "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
+      "bezugsgroesse": "Brutto-Grundfläche (BGF), Angaben aus dem Geoinformationssystem",
+      "baupreisindex": null,
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "S. 62: „Die NHK 2010 werden mit Hilfe der Baupreisindexreihen auf den Wertermittlungsstichtag umgerechnet.“ — Modelltabelle ebenda: „× Baupreisindex des Statistischen Bundesamtes/100“.",
+      "baupreisindex_seite": "62",
+      "baupreisindex_hinweis": "Der Bericht beziffert den Index nicht, nennt aber den BEZUG: Umrechnung auf den Wertermittlungsstichtag — bei der Ableitung aus Kauffällen ist das der Vertragszeitpunkt jedes Kauffalls, bei der Anwendung der Wertermittlungsstichtag des Objekts (§ 36 Abs. 2 ImmoWertV, Regelfall; Entscheidung Marcel 22./27.10.2026). Der Jahrgang 2025 (schwerin.json) enthielt diesen Satz nach seinem Beleg nicht; neu im Jahrgang 2026. RÜCKFRAGE an Marcel in der Ernte-Meldung vermerkt: „auf den Wertermittlungsstichtag“ statt „zum Kaufzeitpunkt“ wörtlich.",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Wörtlich S. 62: „Alterswertminderungsfaktor nach § 38 ImmoWertV 2021 (linear); Gesamtnutzungsdauer nach Anlage 1 ImmoWertV; Restnutzungsdauer nach § 4 Abs. 3 ImmoWertV.“",
+      "gnd_hinweis": "Anlage 1 ImmoWertV führt für Ein- und Zweifamilienhäuser, Doppel- und Reihenhäuser 80 Jahre — der sachliche Geltungsbereich dieser Sätze. Für andere Gebäudearten gilt der Satz nicht.",
+      "alterswertminderung": "linear, § 38 ImmoWertV 2021",
+      "aussenanlagen": "pauschale Schätzung in Höhe von 2 bis 4 % des Gebäudewertes (ggf. Berücksichtigung Carports), § 37 ImmoWertV 2021",
+      "nebengebaeude": "pauschale Schätzung des Wertes der Nebengebäude (z.B. Garagen) und sonstiger baulicher Anlagen",
+      "bodenwert": "Fläche × angepasstem Bodenrichtwert",
+      "besondere_merkmale": "nicht berücksichtigt — es wurden nur schadensfreie Objekte ausgewertet",
+      "datenbasis": "tatsächlich gezahlte Kaufpreise der Jahre 2024 bis 2025",
+      "stichprobe": {
+        "anzahl": 125,
+        "bodenrichtwert_eur_qm": {
+          "mittel": 165,
+          "spanne": [
+            135,
+            195
+          ]
+        },
+        "preis_eur_qm_wohnflaeche": {
+          "mittel": 2830,
+          "spanne": [
+            2210,
+            3420
+          ]
+        },
+        "gesamtkaufpreis_eur": {
+          "mittel": 349000,
+          "spanne": [
+            260000,
+            450000
+          ]
+        },
+        "baujahr": {
+          "mittel": 1999,
+          "spanne": [
+            1978,
+            2012
+          ]
+        },
+        "bgf_qm": {
+          "mittel": 210,
+          "spanne": [
+            160,
+            270
+          ]
+        },
+        "fundstelle": "S. 62 (PDF-Seite 64), Tabelle „Dem Gutachterausschuss stand eine Stichprobe mit folgenden Kennwerten zur Verfügung“"
+      }
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+      "sachlich": "Reihenmittelhäuser (Gebäudetypen 3.xx der NHK 2010); belegt ist nur die Summenzeile „Reihenmittelhaus gesamt“, Baujahre ab 1991 (9 Kauffälle)",
+      "objektarten": [
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw"
+      ],
+      "extrapolation": "gesperrt",
+      "hinweis": "Wörtlich S. 63: „Bei den Sachwertfaktoren zu den Gebäudetypen nach NHK 2010 handelt es sich um mittlere Werte der Kauffälle des jeweiligen Gebäudetyps.“ Trifft die Tabelle für den Gebäudetyp keine Aussage, verweist der Bericht (S. 65) auf die Regressionstabelle (eigener Satz, zweig ezfh_rhdhh_regression) — nicht auf einen benachbarten Gebäudetyp. Für Baujahre bis 1990 weist der Bericht keinen Wert aus (1 Kauffall, „*“)."
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp“ — Zeilen 3.12 bis 3 (Summe)",
+        "wortlaut": "Reihenmittelhaus gesamt: bis 1990 Fallzahl 1, „*“; ab 1991 Fallzahl 9, 1,30 (1,12 – 1,43).",
+        "pruefprotokoll": "ZÄHLPROBE am 28.10.2026 (Seitenbild): Einzeltypen addieren sich auf die Summenzeilen — EFH bis 1990: 10+1+1 = 12; EFH ab 1991: 1+1+2+27+11+5+3 = 50; Doppel-/Reihenendhaus bis 1990: 7+5+2 = 14, ab 1991: 3+21+1+6+2+3 = 36; Reihenmittelhaus ab 1991: 2+1+2+2+2 = 9, bis 1990: 1. Gesamtzeile 27 / 95 = 12+14+1 / 50+36+9. Alle Summen stimmen. OFFEN: 27+95 = 122, die Stichprobe S. 62 nennt 125 — Differenz 3 im Bericht nicht erklärt, nicht verteilt."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 9,
+    "stichtag": "2026-01-01",
+    "auflagen": "Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte zum 01.01.2026, beschlossen 27.03.2026), Datenbasis Kaufpreise 2024 bis 2025.",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.5, S. 64 (PDF-Seite 66)"
+  },
+  {
+    "land_code": "MV",
+    "ags": "13004",
+    "ebene": "gemeinde",
+    "gebiet_name": "Schwerin, Landeshauptstadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB Schwerin 2026",
+    "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+    "quelle_parser": "v3017-hand (pdftotext -layout, Tabellen S. 63–65 am Seitenbild gelesen, 28.10.2026, Ernte SWF)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+    "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+    "lizenz_hinweis": "Impressum, S. 2 des Grundstücksmarktberichts 2026: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: […] Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — derselbe Wortlaut wie im Jahrgang 2025 (schwerin.json); das Belegexemplar ist eine offene Auflage.",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh_rhdhh_regression",
+    "objektart": "ezfh_rhdhh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser, Doppel- und Reihenhäuser (Rückfalltabelle)",
+    "formel": {
+      "form": "matrix_interp",
+      "liefert": "faktor",
+      "rundung_stellen": 2,
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert des Grundstücks in Euro",
+      "achse_x": [
+        175000,
+        200000,
+        225000,
+        250000,
+        275000,
+        300000,
+        325000,
+        350000,
+        375000,
+        400000,
+        450000,
+        500000,
+        600000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in Euro/m²",
+      "achse_y": [
+        90,
+        100,
+        125,
+        150,
+        175,
+        200,
+        225,
+        250,
+        275,
+        300
+      ],
+      "zellen_schluessel": "Bodenrichtwert -> Werte in Reihenfolge achse_x",
+      "zellen": {
+        "90": [
+          1.13,
+          1.11,
+          1.1,
+          1.08,
+          1.06,
+          1.05,
+          1.03,
+          1.02,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "100": [
+          1.13,
+          1.12,
+          1.1,
+          1.09,
+          1.07,
+          1.05,
+          1.04,
+          1.02,
+          1.01,
+          null,
+          null,
+          null,
+          null
+        ],
+        "125": [
+          1.14,
+          1.13,
+          1.11,
+          1.1,
+          1.08,
+          1.07,
+          1.05,
+          1.04,
+          1.02,
+          1.01,
+          null,
+          null,
+          null
+        ],
+        "150": [
+          1.16,
+          1.14,
+          1.13,
+          1.11,
+          1.1,
+          1.08,
+          1.07,
+          1.05,
+          1.04,
+          1.02,
+          0.99,
+          null,
+          null
+        ],
+        "175": [
+          1.17,
+          1.15,
+          1.14,
+          1.12,
+          1.11,
+          1.09,
+          1.08,
+          1.06,
+          1.05,
+          1.03,
+          1,
+          null,
+          null
+        ],
+        "200": [
+          1.18,
+          1.17,
+          1.15,
+          1.14,
+          1.12,
+          1.11,
+          1.09,
+          1.08,
+          1.06,
+          1.05,
+          1.02,
+          0.99,
+          null
+        ],
+        "225": [
+          null,
+          1.18,
+          1.17,
+          1.15,
+          1.14,
+          1.12,
+          1.11,
+          1.09,
+          1.08,
+          1.06,
+          1.03,
+          1,
+          0.94
+        ],
+        "250": [
+          null,
+          null,
+          null,
+          1.16,
+          1.15,
+          1.13,
+          1.12,
+          1.1,
+          1.09,
+          1.07,
+          1.04,
+          1.01,
+          0.95
+        ],
+        "275": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1.13,
+          1.12,
+          1.1,
+          1.09,
+          1.06,
+          1.03,
+          0.97
+        ],
+        "300": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1.13,
+          1.11,
+          1.1,
+          1.07,
+          1.04,
+          0.98
+        ]
+      },
+      "interpolation": "Kreuzinterpolation zwischen benachbarten Stützstellen. Eine LEERE Zelle wird nicht durch einen Nachbarwert ersetzt.",
+      "bestimmtheitsmass": 0.12
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62 des Berichts, PDF-Seite 64).",
+      "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
+      "bezugsgroesse": "Brutto-Grundfläche (BGF), Angaben aus dem Geoinformationssystem",
+      "baupreisindex": null,
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "S. 62: „Die NHK 2010 werden mit Hilfe der Baupreisindexreihen auf den Wertermittlungsstichtag umgerechnet.“ — Modelltabelle ebenda: „× Baupreisindex des Statistischen Bundesamtes/100“.",
+      "baupreisindex_seite": "62",
+      "baupreisindex_hinweis": "Der Bericht beziffert den Index nicht, nennt aber den BEZUG: Umrechnung auf den Wertermittlungsstichtag — bei der Ableitung aus Kauffällen ist das der Vertragszeitpunkt jedes Kauffalls, bei der Anwendung der Wertermittlungsstichtag des Objekts (§ 36 Abs. 2 ImmoWertV, Regelfall; Entscheidung Marcel 22./27.10.2026). Der Jahrgang 2025 (schwerin.json) enthielt diesen Satz nach seinem Beleg nicht; neu im Jahrgang 2026. RÜCKFRAGE an Marcel in der Ernte-Meldung vermerkt: „auf den Wertermittlungsstichtag“ statt „zum Kaufzeitpunkt“ wörtlich.",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Wörtlich S. 62: „Alterswertminderungsfaktor nach § 38 ImmoWertV 2021 (linear); Gesamtnutzungsdauer nach Anlage 1 ImmoWertV; Restnutzungsdauer nach § 4 Abs. 3 ImmoWertV.“",
+      "gnd_hinweis": "Anlage 1 ImmoWertV führt für Ein- und Zweifamilienhäuser, Doppel- und Reihenhäuser 80 Jahre — der sachliche Geltungsbereich dieser Sätze. Für andere Gebäudearten gilt der Satz nicht.",
+      "alterswertminderung": "linear, § 38 ImmoWertV 2021",
+      "aussenanlagen": "pauschale Schätzung in Höhe von 2 bis 4 % des Gebäudewertes (ggf. Berücksichtigung Carports), § 37 ImmoWertV 2021",
+      "nebengebaeude": "pauschale Schätzung des Wertes der Nebengebäude (z.B. Garagen) und sonstiger baulicher Anlagen",
+      "bodenwert": "Fläche × angepasstem Bodenrichtwert",
+      "besondere_merkmale": "nicht berücksichtigt — es wurden nur schadensfreie Objekte ausgewertet",
+      "datenbasis": "tatsächlich gezahlte Kaufpreise der Jahre 2024 bis 2025",
+      "stichprobe": {
+        "anzahl": 125,
+        "bodenrichtwert_eur_qm": {
+          "mittel": 165,
+          "spanne": [
+            135,
+            195
+          ]
+        },
+        "preis_eur_qm_wohnflaeche": {
+          "mittel": 2830,
+          "spanne": [
+            2210,
+            3420
+          ]
+        },
+        "gesamtkaufpreis_eur": {
+          "mittel": 349000,
+          "spanne": [
+            260000,
+            450000
+          ]
+        },
+        "baujahr": {
+          "mittel": 1999,
+          "spanne": [
+            1978,
+            2012
+          ]
+        },
+        "bgf_qm": {
+          "mittel": 210,
+          "spanne": [
+            160,
+            270
+          ]
+        },
+        "fundstelle": "S. 62 (PDF-Seite 64), Tabelle „Dem Gutachterausschuss stand eine Stichprobe mit folgenden Kennwerten zur Verfügung“"
+      }
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+      "sachlich": "Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser — Rückfalltabelle, wenn die Gebäudetyp-Tabelle für den Typ keine Aussage trifft",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw"
+      ],
+      "extrapolation": "gesperrt",
+      "hinweis": "Wörtliche Auflage (S. 65): „Die in der nachstehenden Tabelle angegebenen Anpassungsfaktoren können als Anhaltswerte dienen, wenn die vorstehende Tabelle für den Gebäudetyp keine Aussage trifft. Sie sind nach sachverständigem Ermessen zu werten und anzuwenden. Es sind nur die durch Kaufpreise abgedeckten Sachwertfaktorenbereiche belegt. Eine Extrapolation von Werten für die nicht beschriebenen Bereiche ist nicht sachgerecht.“ — NACHRANGIG gegenüber den Gebäudetyp-Sätzen; Bestimmtheitsmaß nur 0,12."
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 65 (PDF-Seite 67), Tabelle „Sachwertfaktoren“ mit Bestimmtheitsmaß R² = 0,12",
+        "wortlaut": "Zeilen: vorläufiger Sachwert 175.000 bis 600.000 €. Spalten: Bodenrichtwert 90 bis 300 €/m². 96 der 130 Zellen belegt; Lücken in den Ecken wie abgedruckt.",
+        "pruefprotokoll": "GITTERPROBE am 28.10.2026 (Seitenbild): 96 belegte Zellen; Monotonie über den vorläufigen Sachwert fallend und über den Bodenrichtwert steigend, 0 Verstöße (Erzeuger bricht sonst ab). Regressionsgleichung und Anwendungsbeispiel druckt der Bericht nicht ab."
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Bestimmtheitsmaß 0,12, und der Bericht stellt die Tabelle selbst als nachrangige Anhaltswerte dar.",
+    "stichtag": "2026-01-01",
+    "auflagen": "Nachrangig gegenüber den Gebäudetyp-Sätzen. — Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte zum 01.01.2026, beschlossen 27.03.2026), Datenbasis Kaufpreise 2024 bis 2025.",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 65 (PDF-Seite 67)"
+  },
+  {
+    "vollstaendig": false,
+    "land_code": "MV",
+    "ags": "13004",
+    "ebene": "gemeinde",
+    "gebiet_name": "Schwerin, Landeshauptstadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "mfh",
+    "objektart": "mfh",
+    "objektart_bez": "Mehrfamilienhäuser",
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "berichtsjahr": 2026,
+    "stichtag": null,
+    "warum_kein_wert": "KEIN WERT IM DOKUMENT: der Grundstücksmarktbericht Schwerin 2026 leitet Sachwertfaktoren wörtlich nur „für Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser“ ab (Abschnitt 5.5, S. 62); Mehrfamilienhäuser stehen dort nur mit Preisen je m² Wohnfläche. WEG ZUR QUELLE: Gemeinsame Geschäftsstelle der Gutachterausschüsse, Landeshauptstadt Schwerin, gutachterausschuss@schwerin.de, Tel. (0385) 545-1411; Bericht kostenfrei: https://www.schwerin.de/mein-schwerin/leben/planen-bauen/grundstuecksmarkt/grundstuecksmarktbericht/. KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+    "unvollstaendig_grund": "Für Mehrfamilienhäuser nicht abgeleitet.",
+    "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Gemeinsame Geschäftsstelle der Gutachterausschüsse, Landeshauptstadt Schwerin, gutachterausschuss@schwerin.de, Tel. (0385) 545-1411; Bericht kostenfrei: https://www.schwerin.de/mein-schwerin/leben/planen-bauen/grundstuecksmarkt/grundstuecksmarktbericht/",
+    "lizenz": "kein Wert - Lizenz nicht einschlägig",
+    "lizenz_hinweis": "Impressum, S. 2 des Grundstücksmarktberichts 2026: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: […] Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — derselbe Wortlaut wie im Jahrgang 2025 (schwerin.json); das Belegexemplar ist eine offene Auflage.",
+    "geltungsbereich": {
+      "objektarten": [
+        "mfh"
+      ],
+      "objektarten_ausgeschlossen": [],
+      "raeumlich": "Schwerin, Landeshauptstadt"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.5, S. 62 (nur EZFH, DHH, RH)",
+        "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf"
+      }
+    ],
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.5, S. 62",
+    "modellversion": "GMB Schwerin 2026",
+    "modellansaetze": {},
+    "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+    "quelle_parser": "v3017-hand (pdftotext -layout, Tabellen S. 63–65 am Seitenbild gelesen, 28.10.2026, Ernte SWF)"
+  }
+]

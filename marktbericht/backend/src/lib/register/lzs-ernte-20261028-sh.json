@@ -1,0 +1,202 @@
+[
+ {
+  "land_code": "SH",
+  "ags": "01056",
+  "ebene": "kreis",
+  "gebiet_name": "Pinneberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein-/Zweifamilienhäuser (Tabelle: „EFH, DHH, REH, RMH“)",
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell S. 7–8 (Bewertungsansatz, Bewirtschaftungskosten).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "„Gesamtnutzungsdauer: 80 Jahre (Wohngebäude / gemischt genutzte Wohngebäude), 60 Jahre (Gewerbe- und gemischt gewerblich geprägte Objekte)“ (S. 7)",
+   "restnutzungsdauer": "„Restnutzungsdauer = Gesamtnutzungsdauer abzüglich Alter, ggf. modifizierte Restnutzungsdauer (mindestens 15 Jahre angesetzt)“ (S. 7)",
+   "rohertrag": "„Nettokaltmieten nach Käuferangaben, auf Marktüblichkeit plausibilisiert“ (S. 7)",
+   "bewirtschaftungskosten": "Tabelle S. 8: Verwaltung EFH/DHH/REH/RMH 360 €/WE, MFH 344 €/WE, ETW 429 €/WE; Instandhaltung 14,00 €/m²; Mietausfallwagnis 2 %; Garagen 46 € / 106 €",
+   "bodenwert": "„erschließungsbeitragsfrei, an den Bewertungsstichtag angepasst“; nur rentierlich zugehörige Flächen (S. 7)",
+   "baupreisindex": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Pinneberg"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Immobilienmarktinformation Auswertezeitraum 2025, S. 8 (Tabelle) und S. 1 (Vervielfältigungsvermerk)",
+    "wortlaut": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre amtlich belegt: Wert vorhanden, Wiedergabe genehmigungspflichtig.",
+  "fallzahl": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag (Auswertezeitraum 01.01.–31.12.2025).",
+  "berichtsjahr": 2025,
+  "modellversion": "Immobilienmarktinformation 2025 Kreis Pinneberg",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v3017-hand (pdftotext + Sichtpruefung S. 8 gerendert, 28.10.2026, Agent register-ernte)",
+  "quellenvermerk": "Immobilienmarktinformation Auswertezeitraum 2025, Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "lizenz": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)",
+  "fundstelle": "S. 8",
+  "seite": 8,
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „EFH, DHH, REH, RMH*“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „EFH, DHH, REH, RMH*“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SH",
+  "ags": "01056",
+  "ebene": "kreis",
+  "gebiet_name": "Pinneberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppelhaushälften, Reihenend- und Reihenmittelhäuser (Tabelle: „EFH, DHH, REH, RMH“)",
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell S. 7–8 (Bewertungsansatz, Bewirtschaftungskosten).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "„Gesamtnutzungsdauer: 80 Jahre (Wohngebäude / gemischt genutzte Wohngebäude), 60 Jahre (Gewerbe- und gemischt gewerblich geprägte Objekte)“ (S. 7)",
+   "restnutzungsdauer": "„Restnutzungsdauer = Gesamtnutzungsdauer abzüglich Alter, ggf. modifizierte Restnutzungsdauer (mindestens 15 Jahre angesetzt)“ (S. 7)",
+   "rohertrag": "„Nettokaltmieten nach Käuferangaben, auf Marktüblichkeit plausibilisiert“ (S. 7)",
+   "bewirtschaftungskosten": "Tabelle S. 8: Verwaltung EFH/DHH/REH/RMH 360 €/WE, MFH 344 €/WE, ETW 429 €/WE; Instandhaltung 14,00 €/m²; Mietausfallwagnis 2 %; Garagen 46 € / 106 €",
+   "bodenwert": "„erschließungsbeitragsfrei, an den Bewertungsstichtag angepasst“; nur rentierlich zugehörige Flächen (S. 7)",
+   "baupreisindex": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Pinneberg"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Immobilienmarktinformation Auswertezeitraum 2025, S. 8 (Tabelle) und S. 1 (Vervielfältigungsvermerk)",
+    "wortlaut": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre amtlich belegt: Wert vorhanden, Wiedergabe genehmigungspflichtig.",
+  "fallzahl": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag (Auswertezeitraum 01.01.–31.12.2025).",
+  "berichtsjahr": 2025,
+  "modellversion": "Immobilienmarktinformation 2025 Kreis Pinneberg",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v3017-hand (pdftotext + Sichtpruefung S. 8 gerendert, 28.10.2026, Agent register-ernte)",
+  "quellenvermerk": "Immobilienmarktinformation Auswertezeitraum 2025, Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "lizenz": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)",
+  "fundstelle": "S. 8",
+  "seite": 8,
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „EFH, DHH, REH, RMH*“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „EFH, DHH, REH, RMH*“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SH",
+  "ags": "01056",
+  "ebene": "kreis",
+  "gebiet_name": "Pinneberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell S. 7–8 (Bewertungsansatz, Bewirtschaftungskosten).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "„Gesamtnutzungsdauer: 80 Jahre (Wohngebäude / gemischt genutzte Wohngebäude), 60 Jahre (Gewerbe- und gemischt gewerblich geprägte Objekte)“ (S. 7)",
+   "restnutzungsdauer": "„Restnutzungsdauer = Gesamtnutzungsdauer abzüglich Alter, ggf. modifizierte Restnutzungsdauer (mindestens 15 Jahre angesetzt)“ (S. 7)",
+   "rohertrag": "„Nettokaltmieten nach Käuferangaben, auf Marktüblichkeit plausibilisiert“ (S. 7)",
+   "bewirtschaftungskosten": "Tabelle S. 8: Verwaltung EFH/DHH/REH/RMH 360 €/WE, MFH 344 €/WE, ETW 429 €/WE; Instandhaltung 14,00 €/m²; Mietausfallwagnis 2 %; Garagen 46 € / 106 €",
+   "bodenwert": "„erschließungsbeitragsfrei, an den Bewertungsstichtag angepasst“; nur rentierlich zugehörige Flächen (S. 7)",
+   "baupreisindex": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Pinneberg"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Immobilienmarktinformation Auswertezeitraum 2025, S. 8 (Tabelle) und S. 1 (Vervielfältigungsvermerk)",
+    "wortlaut": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre amtlich belegt: Wert vorhanden, Wiedergabe genehmigungspflichtig.",
+  "fallzahl": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag (Auswertezeitraum 01.01.–31.12.2025).",
+  "berichtsjahr": 2025,
+  "modellversion": "Immobilienmarktinformation 2025 Kreis Pinneberg",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v3017-hand (pdftotext + Sichtpruefung S. 8 gerendert, 28.10.2026, Agent register-ernte)",
+  "quellenvermerk": "Immobilienmarktinformation Auswertezeitraum 2025, Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "lizenz": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)",
+  "fundstelle": "S. 8",
+  "seite": 8,
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „MFH**“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „MFH**“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "verwendung": "produkt"
+ },
+ {
+  "land_code": "SH",
+  "ags": "01056",
+  "ebene": "kreis",
+  "gebiet_name": "Pinneberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw",
+  "objektart": "etw",
+  "objektart_bez": "Wohnungseigentum",
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell S. 7–8 (Bewertungsansatz, Bewirtschaftungskosten).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "„Gesamtnutzungsdauer: 80 Jahre (Wohngebäude / gemischt genutzte Wohngebäude), 60 Jahre (Gewerbe- und gemischt gewerblich geprägte Objekte)“ (S. 7)",
+   "restnutzungsdauer": "„Restnutzungsdauer = Gesamtnutzungsdauer abzüglich Alter, ggf. modifizierte Restnutzungsdauer (mindestens 15 Jahre angesetzt)“ (S. 7)",
+   "rohertrag": "„Nettokaltmieten nach Käuferangaben, auf Marktüblichkeit plausibilisiert“ (S. 7)",
+   "bewirtschaftungskosten": "Tabelle S. 8: Verwaltung EFH/DHH/REH/RMH 360 €/WE, MFH 344 €/WE, ETW 429 €/WE; Instandhaltung 14,00 €/m²; Mietausfallwagnis 2 %; Garagen 46 € / 106 €",
+   "bodenwert": "„erschließungsbeitragsfrei, an den Bewertungsstichtag angepasst“; nur rentierlich zugehörige Flächen (S. 7)",
+   "baupreisindex": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Pinneberg"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Immobilienmarktinformation Auswertezeitraum 2025, S. 8 (Tabelle) und S. 1 (Vervielfältigungsvermerk)",
+    "wortlaut": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre amtlich belegt: Wert vorhanden, Wiedergabe genehmigungspflichtig.",
+  "fallzahl": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag (Auswertezeitraum 01.01.–31.12.2025).",
+  "berichtsjahr": 2025,
+  "modellversion": "Immobilienmarktinformation 2025 Kreis Pinneberg",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v3017-hand (pdftotext + Sichtpruefung S. 8 gerendert, 28.10.2026, Agent register-ernte)",
+  "quellenvermerk": "Immobilienmarktinformation Auswertezeitraum 2025, Gutachterausschuss für Grundstückswerte im Kreis Pinneberg",
+  "lizenz": "„Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1)",
+  "fundstelle": "S. 8",
+  "seite": 8,
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „Wohnungseigentum ETW***“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "unvollstaendig_grund": "GENEHMIGUNGSPFLICHTIG. Die Immobilienmarktinformation 2025 des Gutachterausschusses im Kreis Pinneberg (veröffentlicht 15.05.2026, online seit 05.06.2026, kostenfrei) führt den Liegenschaftszinssatz für diesen Teilmarkt als Zahl mit Streuung und Fallzahl (Tabelle S. 8, Zeile „Wohnungseigentum ETW***“, Auswertezeitraum 2025). Die Wiedergabe ist aber vorbehalten: „Nachdruck, Vervielfältigung und Wiedergabe von Auswertungsergebnissen sind nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.“ (Deckblatt, S. 1) Ohne diese Genehmigung kommt der Satz in keinen Kundenbericht; kein Nachbarkreis, kein Landesmittel. KORREKTUR einer älteren Sperre: lzs-st-th-sh-ni-2025.json (01056, Zweig „alle“) sagt, die Immobilienmarktinformation stelle die Zinssätze „NUR GRAFISCH“ dar. Das stimmt nicht — Seite 8 trägt eine Wertetabelle (Mittel, Streuung, Anzahl Kauffälle, Auswertezeitraum 2025); gemessen am 28.10.2026 an der gerenderten Seite. Die Hürde ist die Lizenz, nicht die Darstellung. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Pinneberg, Langelohe 65 b, 25337 Elmshorn, Telefon 04121 57998-104, Gutachterausschuss-Pinneberg@LVermGeo.landsh.de — schriftliche Genehmigung zur Wiedergabe der Liegenschaftszinssätze (Tabelle S. 8) erbitten; Dokument kostenfrei: https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+  "verwendung": "produkt"
+ }
+]

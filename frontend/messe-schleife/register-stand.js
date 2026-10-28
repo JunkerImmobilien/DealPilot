@@ -1,33 +1,33 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-23T08:42:21.614Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T14:09:44.783Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
- "stand": "2026-10-23",
- "erzeugt": "2026-10-23T08:42:21.614Z",
- "register_commit": "96031fff",
+ "stand": "2026-10-28",
+ "erzeugt": "2026-10-28T14:09:44.783Z",
+ "register_commit": "0fe9c1d0",
  "register_lokal_geaendert": false,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 105,
- "saetze": 10850,
+ "dateien": 132,
+ "saetze": 17489,
  "kopf": {
-  "werte_gesamt": 4654,
-  "lzs": 2487,
-  "swf": 738,
-  "uk_flaeche": 159,
+  "werte_gesamt": 6067,
+  "lzs": 2493,
+  "swf": 742,
+  "uk_flaeche": 161,
   "uk_wgfz": 115,
-  "uk": 274,
-  "irw_tabellen": 114,
-  "irw_ausschuesse": 48,
-  "ausschuesse": 200,
+  "uk": 276,
+  "irw_tabellen": 135,
+  "irw_ausschuesse": 57,
+  "ausschuesse": 201,
   "laender_erfasst": 16,
   "laender_mit_wert": 15,
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 4654,
-  "mit_ausschuss": 4654,
-  "mit_jahrgang": 4654,
-  "mit_quelle": 4654,
-  "mit_seite": 4653
+  "werte": 6067,
+  "mit_ausschuss": 6067,
+  "mit_jahrgang": 6067,
+  "mit_quelle": 6067,
+  "mit_seite": 6066
  },
  "jahrgaenge": [
   2018,
@@ -36,10 +36,10 @@ window.DPS_REGISTER = {
  "laender": {
   "SH": {
    "name": "Schleswig-Holstein",
-   "werte": 34,
+   "werte": 39,
    "lzs": {
-    "w": 18,
-    "anteil": 0.53
+    "w": 17,
+    "anteil": 0.4
    },
    "swf": {
     "w": 6,
@@ -53,12 +53,12 @@ window.DPS_REGISTER = {
     "w": 5,
     "anteil": 0.31
    },
-   "anteil4": 0.27,
+   "anteil4": 0.25,
    "erfasst": true
   },
   "HH": {
    "name": "Hamburg",
-   "werte": 8,
+   "werte": 13,
    "lzs": {
     "w": 5,
     "anteil": 0.83
@@ -80,7 +80,7 @@ window.DPS_REGISTER = {
   },
   "NI": {
    "name": "Niedersachsen",
-   "werte": 544,
+   "werte": 1447,
    "lzs": {
     "w": 302,
     "anteil": 0.78
@@ -124,9 +124,9 @@ window.DPS_REGISTER = {
   },
   "NW": {
    "name": "Nordrhein-Westfalen",
-   "werte": 2849,
+   "werte": 2872,
    "lzs": {
-    "w": 1475,
+    "w": 1476,
     "anteil": 1
    },
    "swf": {
@@ -134,7 +134,7 @@ window.DPS_REGISTER = {
     "anteil": 0.93
    },
    "uk_flaeche": {
-    "w": 20,
+    "w": 21,
     "anteil": 0.27
    },
    "uk_wgfz": {
@@ -146,7 +146,7 @@ window.DPS_REGISTER = {
   },
   "HE": {
    "name": "Hessen",
-   "werte": 333,
+   "werte": 569,
    "lzs": {
     "w": 140,
     "anteil": 0.88
@@ -190,14 +190,14 @@ window.DPS_REGISTER = {
   },
   "BW": {
    "name": "Baden-Württemberg",
-   "werte": 331,
+   "werte": 338,
    "lzs": {
-    "w": 236,
-    "anteil": 0.14
+    "w": 242,
+    "anteil": 0.1
    },
    "swf": {
     "w": 49,
-    "anteil": 0.06
+    "anteil": 0.04
    },
    "uk_flaeche": {
     "w": 1,
@@ -207,7 +207,7 @@ window.DPS_REGISTER = {
     "w": 45,
     "anteil": 0.05
    },
-   "anteil4": 0.08,
+   "anteil4": 0.06,
    "erfasst": true
   },
   "BY": {
@@ -278,7 +278,7 @@ window.DPS_REGISTER = {
   },
   "BB": {
    "name": "Brandenburg",
-   "werte": 177,
+   "werte": 285,
    "lzs": {
     "w": 100,
     "anteil": 0.88
@@ -300,24 +300,24 @@ window.DPS_REGISTER = {
   },
   "MV": {
    "name": "Mecklenburg-Vorpommern",
-   "werte": 34,
+   "werte": 39,
    "lzs": {
     "w": 16,
     "anteil": 0.32
    },
    "swf": {
-    "w": 11,
-    "anteil": 0.38
+    "w": 15,
+    "anteil": 0.44
    },
    "uk_flaeche": {
-    "w": 0,
-    "anteil": 0
+    "w": 1,
+    "anteil": 0.13
    },
    "uk_wgfz": {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.28,
+   "anteil4": 0.31,
    "erfasst": true
   },
   "SN": {
@@ -344,7 +344,7 @@ window.DPS_REGISTER = {
   },
   "ST": {
    "name": "Sachsen-Anhalt",
-   "werte": 81,
+   "werte": 202,
    "lzs": {
     "w": 50,
     "anteil": 0.68

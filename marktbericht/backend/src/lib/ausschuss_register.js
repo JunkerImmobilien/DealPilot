@@ -656,6 +656,13 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Wiesental). LZS nur mit Zugangsgrund, damit Stufe N weiterrechnet. Enzkreis-SWF 2025 und
                                Philippsburg-ETW 2,2 % unter formel_vorgemerkt (Lizenz nur nicht kommerziell). */
                             'lzs-swf-bw-2026-teil2.json',
+                            /* v3016n · Ernte 28.10.2026 (drei Agenten): Schwerin SWF 2026 (4 Werte, MFH-Sperre),
+                               Oestlicher Bodenseekreis LZS ETW/MFH (16 Werte, ersetzen die 40-EUR-Sperre; Bericht
+                               frei auf kressbronn.de), WGH/Gewerbe-Sperren; Pinneberg LZS genehmigungspflichtig
+                               (Tabelle S. 8, nicht nur grafisch); Schwerin UK Flaeche = 1 bis 1.000 m², NWM gesperrt.
+                               NICHT aktiv: register-vorgemerkt/lzs-ernte-20261028-bw-bnh-wartet.json (Breisgau-Nord, „nicht abgeleitet“). */
+                            'swf-ernte-20261028-mv.json', 'lzs-ernte-20261028-bw.json', 'lzs-ernte-20261028-sh.json',
+                            'uk-flaeche-ernte-20261028-mv.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

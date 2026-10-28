@@ -1,7 +1,7 @@
 {
- "stand": "2026-10-23",
- "saetze": 10836,
- "dateien": 104,
+ "stand": "2026-10-28",
+ "saetze": 17489,
+ "dateien": 132,
  "befunde": {
   "berlin.json": {},
   "bodenpreise-nrw.json": {},
@@ -34,6 +34,8 @@
   "lzs-by-bw-2026.json": {
    "stichtag fehlt": 3
   },
+  "lzs-ernte-20261028-bw.json": {},
+  "lzs-ernte-20261028-sh.json": {},
   "lzs-he-2026.json": {},
   "lzs-ni-aurich-inseln-2026.json": {},
   "lzs-ni-mfh-landesmodell-2026.json": {},
@@ -48,14 +50,18 @@
    "stichtag fehlt": 12
   },
   "lzs-st-th-sh-ni-2025.json": {
-   "stichtag fehlt": 42,
+   "stichtag fehlt": 41,
    "beleg[#] ohne Seite, Kapitel oder Datei": 18
   },
   "lzs-swf-2026-nachernte.json": {},
   "lzs-swf-bw-2026-nachernte.json": {},
+  "lzs-swf-bw-2026-teil2.json": {},
   "lzs-swf-bw-2026-wege.json": {},
   "lzs-swf-by-2026-sperren.json": {},
+  "lzs-swf-by-2026.json": {},
   "lzs-swf-mv-rostock-2026-sperren.json": {},
+  "lzs-swf-sh-2026.json": {},
+  "lzs-swf-sl-2026.json": {},
   "lzs-swf-uk-ulm-2026.json": {},
   "lzs-th-st-sn-mv-2026.json": {},
   "marktdaten-nrw.json": {},
@@ -74,6 +80,7 @@
   "nachernte-2026-10b-st.json": {},
   "nachernte-2026-10b-th.json": {},
   "nord2.json": {},
+  "ost-nachernte-2026-10.json": {},
   "ost.json": {
    "stichtag fehlt": 1,
    "beleg[#] ohne Seite, Kapitel oder Datei": 7,
@@ -102,6 +109,7 @@
   "swf-by-bw-2026.json": {
    "modellansaetze.baupreisindex fehlt als Zahl": 36
   },
+  "swf-ernte-20261028-mv.json": {},
   "swf-he.json": {
    "modellansaetze.baupreisindex fehlt als Zahl": 15,
    "modellansaetze.gnd_jahre fehlt als Zahl": 2
@@ -120,6 +128,7 @@
    "modellansaetze.baupreisindex fehlt als Zahl": 4
   },
   "swf-ni-sperren-2026.json": {},
+  "swf-ni-sv-2026.json": {},
   "swf-ni.json": {},
   "swf-nrw.json": {
    "stichtag fehlt": 19,
@@ -167,10 +176,12 @@
   },
   "uk-flaeche-bw-2026.json": {},
   "uk-flaeche-by-2026.json": {},
+  "uk-flaeche-ernte-20261028-mv.json": {},
   "uk-flaeche-funde-ernte-lzs.json": {},
   "uk-flaeche-laender-2026.json": {},
   "uk-flaeche-ni-2026.json": {},
   "uk-flaeche-nw-2026.json": {},
+  "uk-flaeche-nw-nachernte-2026-10-27.json": {},
   "uk-flaeche-ost-2026.json": {},
   "uk-flaeche-west-2026.json": {},
   "uk-irw-nw-bergisch-mettmann-2026.json": {},
@@ -190,8 +201,25 @@
   "uk-wgfz-nw-2026.json": {},
   "uk-wgfz-nw2-2026.json": {},
   "uk-wgfz-ost-west-2026.json": {},
+  "vgf-bb-kreise-2026.json": {},
+  "vgf-bb-oga-2025.json": {},
   "vgf-bb.json": {},
   "vgf-be.json": {},
-  "vgf-sl.json": {}
+  "vgf-bw-2026.json": {},
+  "vgf-bw-konstanz-2026.json": {},
+  "vgf-by-2026.json": {},
+  "vgf-hb-2026.json": {},
+  "vgf-he-2026.json": {},
+  "vgf-hh-2026.json": {},
+  "vgf-mv-2026.json": {},
+  "vgf-ni-2026-teil2.json": {},
+  "vgf-ni-2026.json": {},
+  "vgf-rp-2026.json": {},
+  "vgf-sh-2026.json": {},
+  "vgf-sl-2026.json": {},
+  "vgf-sl.json": {},
+  "vgf-sn-2026.json": {},
+  "vgf-st-2025.json": {},
+  "vgf-th-2026.json": {}
  }
 }

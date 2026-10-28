@@ -313,8 +313,24 @@ window.DealPilotOnboarding = (function () {
   }
 
   /* ══ SCHRITT 1 · AUSSEHEN ═════════════════════════════════════════ */
+  /* v3016l · Marcel 28.10.2026: „bei der Erstanmeldung, wenn man übers Handy reingeht, eine
+     Benachrichtigung, dass es empfehlenswert ist, DealPilot am Desktop oder Tablet zu verwenden
+     aufgrund der Vollumfänglichkeit". Nur auf kleinen Schirmen (dieselbe Grenze wie die
+     Handyansicht, 768 px) - am Desktop wäre der Hinweis Lärm. */
+  function _handy() {
+    try { return window.matchMedia('(max-width: 768px)').matches; } catch (e) { return false; }
+  }
+  function _handyHinweis() {
+    if (!_handy()) return '';
+    return '<div class="dpo-handy" style="margin:0 0 14px;padding:11px 13px;border-radius:10px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);'
+      + 'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);font-size:13px;line-height:1.5">'
+      + '<b>Tipp: am Desktop oder Tablet arbeitet es sich am besten.</b> '
+      + 'DealPilot läuft auch auf dem Handy – Quick-Check, Objekte und Co-Pilot sind unterwegs da. '
+      + 'Den vollen Umfang mit Wertermittlung, Einheiten erfassen, Unterlagen einlesen, PDF-Berichten '
+      + 'und Portfolio-Cockpit nutzt du am großen Bildschirm am bequemsten.</div>';
+  }
   function s1() {
-    return ''
+    return _handyHinweis()
       + '<p class="dpo-vor">Womit möchtest du arbeiten? Du kannst das jederzeit '
       + 'unter <b>Darstellung</b> ändern — auch mitten im Betrieb.'
       /* v2096: Der Hinweis steht NUR, wo er stimmt. Unter 900 px fuellt der
@@ -739,10 +755,23 @@ window.DealPilotOnboarding = (function () {
       +     '<span class="dpo-k-unter">Unsichtbar, bis du F1 oder ? drückst.</span>'
       +   '</button>'
       + '</div>'
-      + '<label class="dpo-haken" for="dpo_tour" style="margin-top:16px">'
-      +   '<input type="checkbox" id="dpo_tour" checked>'
-      +   '<span>Danach den <b>Rundgang</b> starten: zwei Minuten durch die wichtigsten Stellen</span>'
-      + '</label>'
+      /* v3016l · Marcel 28.10.2026: „fragen, ob man eine Tour möchte, dann startet die nicht
+         automatisch". Bis hier war der Haken vorgesetzt - wer nichts tat, bekam die Tour.
+         Jetzt eine Frage mit zwei Antworten, vorgewählt ist „Nein“. Der Haken bleibt als
+         Speicher (versteckt), damit _abschliessen() unverändert liest. */
+      + '<p class="dpo-vor" style="margin-top:18px"><b>Möchtest du einen kurzen Rundgang?</b> '
+      + 'Zwei Minuten durch die wichtigsten Stellen der App.</p>'
+      + '<div class="dpo-kacheln" data-gruppe="tour">'
+      +   '<button type="button" class="dpo-kachel" data-tourwahl="ja">'
+      +     '<span class="dpo-k-name">Ja, Rundgang starten</span>'
+      +     '<span class="dpo-k-unter">Startet direkt nach der Einrichtung.</span>'
+      +   '</button>'
+      +   '<button type="button" class="dpo-kachel an" data-tourwahl="nein">'
+      +     '<span class="dpo-k-name">Nein, danke</span>'
+      +     '<span class="dpo-k-unter">Du kannst ihn jederzeit über das Hilfe-Symbol oben starten.</span>'
+      +   '</button>'
+      + '</div>'
+      + '<input type="checkbox" id="dpo_tour" hidden>'
       + '<p class="dpo-vor dpo-vor-klein">Beides lässt sich später ändern: den Pilot unter '
       + '<b>Einstellungen › Allgemein</b>, den Rundgang über das Hilfe-Symbol oben.</p>';
   }
@@ -912,8 +941,14 @@ window.DealPilotOnboarding = (function () {
 
     _ov.addEventListener('click', function (ev) {
       if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); return; }
-      var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ],[data-pilotwahl]') : null;
+      var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ],[data-pilotwahl],[data-tourwahl]') : null;
       if (k) {
+        if (k.hasAttribute('data-tourwahl')) {   /* v3016l */
+          var tc = el('dpo_tour'); if (tc) tc.checked = k.getAttribute('data-tourwahl') === 'ja';
+          Array.prototype.forEach.call(k.parentNode.querySelectorAll('.dpo-kachel'), function (x) { x.classList.remove('an'); });
+          k.classList.add('an');
+          return;
+        }
         if (k.hasAttribute('data-pilotwahl')) {
           _wahl.pilot = k.getAttribute('data-pilotwahl');
           try { if (window.DealPilotPilot && DealPilotPilot.setOrt) DealPilotPilot.setOrt(_wahl.pilot); } catch (e) {}
@@ -921,7 +956,7 @@ window.DealPilotOnboarding = (function () {
           _wahl.aussehen = k.getAttribute('data-aussehen');
           _aussehenAnwenden(_wahl.aussehen);
         } else { _wahl.typ = k.getAttribute('data-typ'); }
-        Array.prototype.forEach.call(_ov.querySelectorAll('.dpo-kachel'), function (x) { x.classList.remove('an'); });
+        Array.prototype.forEach.call((k.parentNode || _ov).querySelectorAll('.dpo-kachel'), function (x) { x.classList.remove('an'); });
         k.classList.add('an');
         return;
       }

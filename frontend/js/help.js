@@ -28,6 +28,19 @@
           h: 'Was ist DealPilot?',
           body: 'DealPilot ist eine professionelle Investmentanalyse-App für Immobilien. Du gibst Kaufpreis, Miete, Finanzierung und Annahmen ein — DealPilot rechnet vollständige Cashflows über einen frei wählbaren Zeitraum (5 bis 50 Jahre, vorbelegt 15), vergleicht 3 Phasen (Heute / Ende Zinsbindung / Anschluss), bewertet das Investment per DealScore (0–100) und erstellt Bank-taugliche PDF-Reports.'
         },
+        /* v3016l · Hilfe zu den Änderungen vom 28.10.2026 (Marcel: „immer den Hilfebereich mit anpassen") */
+        {
+          h: 'DealPilot auf dem Handy',
+          body: 'DealPilot läuft auch auf dem Handy: Quick-Check, deine Objekte, Kennzahlen und der Co-Pilot sind unterwegs da. Den <strong>vollen Umfang</strong> – Wertermittlung, Einheiten erfassen, Unterlagen einlesen, PDF-Berichte und das Portfolio-Cockpit – nutzt du am bequemsten am <strong>Desktop oder Tablet</strong>. Deshalb weist die Einrichtung auf dem Handy einmal darauf hin.'
+        },
+        {
+          h: 'Der Rundgang (Tour)',
+          body: 'Am Ende der Einrichtung fragt DealPilot, ob du einen kurzen Rundgang möchtest – vorgewählt ist „Nein, danke“, er startet also nie von selbst. Du kannst ihn jederzeit über das <strong>Hilfe-Symbol</strong> oben oder hier im Hilfe-Fenster mit <strong>„Tour starten“</strong> aufrufen.'
+        },
+        {
+          h: 'Geführte Eingabe',
+          body: 'In der Datenaufnahme fragt dich die <strong>Geführte Eingabe</strong> Frage für Frage nach den Angaben, die für die Rechnung fehlen. Du kannst tippen oder sprechen. <strong>Das Mikrofon ist zu Beginn aus</strong> – erst ein Klick auf den Mikrofonkasten („Mikrofon ist aus — klick hier, um zu sprechen“) schaltet das Zuhören ein. Auf dem Handy hältst du den Mikrofonknopf gedrückt, solange du sprichst.'
+        },
         {
           h: 'Schnellstart in 4 Schritten',
           body: '1. <strong>Quick-Check</strong> — ein Inserat in einer Minute einordnen. Lohnt es sich, „Als Objekt speichern“.\n\n2. <strong>Datenaufnahme</strong> — die Reiter Objekt, Investition, Miete, Finanzierung, Bewirtschaftung und Steuer. Vom Groben zum Feinen; was fehlt, nennt DealPilot statt es zu schätzen.\n\n3. <strong>Bewerten</strong> — Pilot-Analyse, Reiter Bewertung, Marktbericht bis zur Wertermittlung nach ImmoWertV.\n\n4. <strong>Deal-Aktion</strong> — bereit für die Bank, Status Offen · Gewonnen · Verloren. Gewonnen friert den Ankauf-Stand zum Nutzen-/Lastenwechsel ein.\n\n<strong>Tipp:</strong> Drück überall <strong>F1</strong> oder <strong>?</strong> — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Alle Abläufe als Netzplan stehen im Thema „Abläufe & Pilot“.'
@@ -132,7 +145,7 @@
         },
         {
           h: 'Marktpreis, Exposé und Sprache abrufen',
-          body: 'In der Leiste <strong>QUICKBOARDING PASS</strong> wählst du Quellen per Klick und startest mit <strong>Abrufen</strong>:\n• <strong>DealPilot</strong> — Marktbewertung mit Marktwert, Marktmiete und Lage. Braucht PLZ oder Ort und verbraucht 1 Bewertung aus deinem Kontingent.\n• <strong>Exposé / Marktbericht</strong> — ein PDF auslesen, die Werte landen in den Feldern.\n• <strong>Sprache</strong> — das Objekt frei einsprechen, im Plan enthalten.\n• <strong>ImmoMetrica</strong> — sobald der Zugang in den Einstellungen gespeichert ist.\n\nErst laufen Sprache, Exposé und ImmoMetrica, dann die Marktbewertung. Fehlt eine Angabe, hält der Abruf an, markiert das Feld und wartet auf <strong>Weiter</strong>.\n\n<strong>Achtung:</strong> Nach der Marktbewertung trägt DealPilot die Marktmiete in <strong>Grundmiete (€)</strong> ein. Willst du mit der Ist-Miete rechnen, trag sie danach wieder ein. Der Marktwert fließt in die Teilnote Potenzial und in den Zielkaufpreis.\n\n<strong>Neuer Vorgang</strong> (nach dem Abruf statt „Abrufen“) setzt alles zurück.'
+          body: 'In der Leiste <strong>QUICKBOARDING PASS</strong> wählst du Quellen per Klick und startest mit <strong>Abrufen</strong>:\n• <strong>DealPilot</strong> — Marktbewertung mit Marktwert, Marktmiete und Lage. Braucht PLZ oder Ort und verbraucht 1 Bewertung aus deinem Kontingent.\n• <strong>Exposé / Dokumente</strong> — Exposé, Marktbericht und Unterlagen (Mieterliste, Mietvertrag, Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, auch Scans) auslesen; die Werte kommen zum Abgleich in die Felder, Risiken und Investitionsthese werden vorgeschlagen.\n• <strong>Sprache</strong> — das Objekt frei einsprechen, im Plan enthalten.\n• <strong>ImmoMetrica</strong> — sobald der Zugang in den Einstellungen gespeichert ist.\n\nErst laufen Sprache, Exposé und ImmoMetrica, dann die Marktbewertung. Fehlt eine Angabe, hält der Abruf an, markiert das Feld und wartet auf <strong>Weiter</strong>.\n\n<strong>Achtung:</strong> Nach der Marktbewertung trägt DealPilot die Marktmiete in <strong>Grundmiete (€)</strong> ein. Willst du mit der Ist-Miete rechnen, trag sie danach wieder ein. Der Marktwert fließt in die Teilnote Potenzial und in den Zielkaufpreis.\n\n<strong>Neuer Vorgang</strong> (nach dem Abruf statt „Abrufen“) setzt alles zurück.'
         },
         {
           h: 'Als Objekt speichern',
@@ -273,6 +286,10 @@
         {
           h: 'Wie oft kann ich die KI nutzen?',
           body: 'Die Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent. Auf das Kontingent zählen die Marktberichte — wie viele noch frei sind, steht im Reiter Objekt direkt an jeder Stufe („N frei“). Fragen an den Piloten (F1 oder ?) haben ein eigenes Tageslimit je Plan.'
+        },
+        {
+          h: 'Reiter „Unterlagen & WEG“',
+          body: 'Hast du in der Datenaufnahme unter <strong>Exposé / Dokumente</strong> Unterlagen eingelesen – Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, Mieterliste oder Mietvertrag –, erscheint in der Pilot-Analyse der Reiter <strong>Unterlagen &amp; WEG</strong>. Er zeigt:\n• die <strong>Investitionsthese</strong> aus den Unterlagen,\n• alle <strong>Risiken</strong> mit Einstufung (hoch, mittel, niedrig), Kosten, Jahr und Quelle (Dokument, TOP, Seite),\n• die <strong>WEG-Auswertung</strong>: Kernpunkte über alle Protokolle, Rücklage, Hausgeld, beschlossene und vertagte Sanierungen mit dem Anteil deines Objekts, Sonderumlagen und ein Fazit,\n• die Lasten aus dem <strong>Grundbuch</strong> in Klartext und was du beim Verwalter oder Verkäufer noch anfragen solltest.\n\nDie Pilot-Analyse bezieht diese Risiken in ihre Bewertung ein. Liest du neue Unterlagen ein, wird die Auswertung ersetzt.'
         },
         {
           h: 'Wird die Analyse gespeichert?',
@@ -528,6 +545,10 @@
         {
           h: 'Exposé oder Marktbericht einlesen',
           body: '<strong>Im Quick-Check:</strong> Kachel <strong>Exposé / Marktbericht</strong> anwählen und <strong>Abrufen</strong> drücken. Es öffnet sich „PDF-Exposé importieren“ — für ImmoScout, Kleinanzeigen und Maklerexposés, PDF bis 100 MB.\n\n<strong>Im Objekt:</strong> dieselbe Kachel in der Pre-Flight-Leiste öffnet „Exposé & Marktbericht importieren“. Dort hängst du mehrere PDFs gleichzeitig an. Der Typ jeder Datei wird erkannt und lässt sich umstellen; alle Werte werden zusammengeführt, bei Widerspruch gewinnt der Marktbericht.\n\nSo geht\'s:\n1. PDF wählen oder hineinziehen.\n2. Die KI liest Kaufpreis, Fläche, Baujahr, Miete, Hausgeld und weitere Werte. Bei Scan-PDFs springt die Texterkennung ein.\n3. Unter „Daten erkannt“ abhaken, was du nicht willst.\n4. <strong>Ausgewählte übernehmen</strong>. Gefundene Bilder werden mit übernommen.'
+        },
+        {
+          h: 'Exposé / Dokumente: Unterlagen eines Objekts einlesen',
+          body: 'In der Datenaufnahme-Karte die Kachel <strong>Exposé / Dokumente</strong> wählen und <strong>Abrufen</strong> drücken. Du kannst <strong>alle PDFs auf einmal</strong> hineinziehen: Exposé, Marktbericht, Mieterliste/Mietaufstellung, Mietvertrag, Grundbuchauszug, Teilungserklärung, Protokolle und Einladungen der Eigentümerversammlung, Energieausweis, Flurkarte. Die Art erkennt DealPilot selbst; <strong>gescannte PDFs</strong> werden Seite für Seite gelesen.\n\nIm Fenster gibt es danach Reiter:\n• <strong>Übernahme</strong> – alle Werte mit „im Dokument / im Objekt“, z. B. Flur, Flurstück, Gemarkung, Grundstücksfläche, Energieklasse, Miteigentumsanteil (nur bei einer Wohnung). Abweichungen sind nicht vorgehakt.\n• ein Reiter <strong>je Dokument</strong> mit allem, was gelesen wurde.\n• <strong>Auswertung</strong> – Risiken, Investitionsthese und WEG-Auswertung aus allen Unterlagen zusammen.\n\nBeim Übernehmen werden <strong>Bekannte Risiken</strong> und <strong>Investitionsthese</strong> unter deinen eigenen Text angehängt, nie ersetzt. Bei einem Mehrfamilienhaus öffnet eine Mieterliste das Fenster <strong>Einheiten erfassen</strong> vorbelegt – mit Fläche, Zimmern, Miete, Leerstand, Vertragsart, Mietbeginn und Kaution; übernommen wird erst dort auf deinen Klick.\n\n<strong>Datenschutz:</strong> Namen, Geburtsdaten, Anschriften, Telefonnummern, E-Mails und Kontodaten von Personen werden vor der Auswertung geschwärzt. Persönliche Unterlagen eines Mieters (z. B. Bescheide, Gehalts- oder Mietzahlungsnachweise) werden erkannt und nicht ausgelesen.'
         },
         {
           h: 'Gutachten und Auszüge lesen (Dokument einlesen)',

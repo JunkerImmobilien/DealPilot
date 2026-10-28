@@ -1,4 +1,4 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-23T06:56:46.459Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T14:09:44.783Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_VIDEOTHEK = {
  "stand": "2026-10-21",
@@ -154,7 +154,7 @@ window.DPS_VIDEOTHEK = {
    "titel": "Vom Ankauf in den Bestand",
    "unterzeile": "Gewonnen, eingefroren, verglichen — Plan gegen heute.",
    "datei": "dealpilot-modul-14-ankauf-in-den-bestand.mp4",
-   "dauer": 160
+   "dauer": 158
   },
   {
    "id": "modul-15-steuer-im-bestand",
@@ -190,7 +190,7 @@ window.DPS_VIDEOTHEK = {
    "titel": "Der Marktbericht",
    "unterzeile": "Lage, Vergleichsdaten, Zensus, Wertermittlung, Quellen — und das PDF.",
    "datei": "dealpilot-modul-18-der-marktbericht.mp4",
-   "dauer": 222
+   "dauer": 237
   },
   {
    "id": "modul-19-das-bank-pdf",

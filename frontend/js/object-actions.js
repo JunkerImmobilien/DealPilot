@@ -378,7 +378,8 @@
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">'
           + '<span class="k-heute">Daten einlesen</span>'
           + '<span class="k-neu">Daten \u00fcbernehmen aus</span></span><div class="dp-pf-row">' +
-          pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
+          /* v3016j · Marcel 28.10.2026: „Exposé/Marktbericht umbenennen in Exposé/Dokumente … auch der Tooltip" */
+          pfTileTool('import', _doc, 'Expos\u00e9 / Dokumente', 'Exposé, Marktbericht und Unterlagen einlesen – Mieterliste, Mietvertrag, Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, auch Scans. Die Werte kommen zum Abgleich, Risiken und Investitionsthese werden vorgeschlagen, die WEG-Auswertung steht danach in der Pilot-Analyse.') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen — im Plan enthalten') : '') +
           /* v2217 · ImmoMetrica vor die geführte Eingabe: erst die Quellen, die der
              Riegel sperrt, dann die freien - der Freigeben-Knopf liegt mittig
@@ -1987,12 +1988,17 @@
   }
   function _einheitenListe() {
     var U = window.DpUnterlagen; if (!U) return [];
-    var best = [], vonMiete = false;
+    /* v3016m · gewinnt die Liste mit den meisten MIETANGABEN, dann die längste. Gemessen 28.10.:
+       ein Exposé, das nur „Mietaufstellung anbei“ sagt, lieferte 8 Einheiten ohne Miete und
+       verdrängte die echte Mietaufstellung (gleich lang, also nicht „mehr“). */
+    var best = [], bestPunkte = -1;
     _unterlagenListe().forEach(function (t) {
       if (t.typ !== 'mietaufstellung' && t.typ !== 'teilungserklaerung') return;
       var l = U.einheitenAus(t.typ, t.extracted);
-      if (t.typ === 'mietaufstellung' && l.length) { if (!vonMiete || l.length > best.length) { best = l; vonMiete = true; } }
-      else if (!vonMiete && l.length > best.length) best = l;
+      if (!l.length) return;
+      var miete = l.filter(function (e) { return Number(e.ist) > 0 || e.status === 'leer'; }).length;
+      var punkte = miete * 1000 + l.length;
+      if (punkte > bestPunkte) { best = l; bestPunkte = punkte; }
     });
     return best;
   }
@@ -2331,10 +2337,12 @@
   function istDokument(text, name) {
     var t = String(text || '');
     if (/dealpilot/i.test(t)) return false;
-    if (DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; })) return true;
-    /* Ein Exposé nennt „Energieausweis“ oft in den Eckdaten - Kaufpreis plus Provision/Exposé heisst: Exposé */
+    /* Ein Exposé nennt „Energieausweis“ oft in den Eckdaten - Kaufpreis plus Provision/Exposé heisst: Exposé.
+       v3016k · VOR den Leitbegriffen: gemessen 28.10. las der Import das Exposé Lindenallee als
+       Energieausweis, weil es „Protokolle der Eigentümerversammlungen“ als Unterlage nennt. */
     var expo = ['kaufpreis', 'provision', 'courtage', 'exposé', 'expose'].filter(function (w) { return t.toLowerCase().indexOf(w) >= 0; }).length;
     if (expo >= 2 && !DOK_NAME.test(String(name || ''))) return false;
+    if (DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; })) return true;
     var kopf = t.slice(0, 800);
     return DOK_KOPF.some(function (w) { return kopf.indexOf(w) >= 0; }) || DOK_NAME.test(String(name || ''));
   }
