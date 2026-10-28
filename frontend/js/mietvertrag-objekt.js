@@ -157,7 +157,7 @@
     + '#mv-einheiten-uebersicht th{font:600 10px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#6B645A;text-align:left;padding:5px 6px;border-bottom:1px solid #E6DCC2;white-space:nowrap}'
     + '#mv-einheiten-uebersicht td{padding:6px;border-bottom:1px solid #F0E9D6;white-space:nowrap;vertical-align:top}'
     + '#mv-einheiten-uebersicht td.mveu-r{text-align:right}'
-    + '#mv-einheiten-uebersicht .mveu-fehlt{color:#B8625C;font-weight:600;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;font:inherit}'
+    + '#mv-einheiten-uebersicht .mveu-fehlt{color:#B8625C!important;font:inherit;font-weight:600;background:none!important;border:0!important;padding:0!important;margin:0!important;min-height:0!important;box-shadow:none!important;cursor:pointer;text-decoration:underline}'   /* v3028a: gegen .sec button:not(...) !important (style.css) */
     + '#mv-einheiten-uebersicht .mveu-knopf{margin-top:10px}';
   function uebersicht() {
     var karte = el('mv-objekt-karte'); if (!karte) return;
