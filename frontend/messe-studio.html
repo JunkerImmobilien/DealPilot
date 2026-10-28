@@ -179,9 +179,10 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
             spruch: 'Vom ersten Eintrag', spruch2: 'bis zur Bankmappe.', weiter: 'Basismodule 02–10 · jeder Bereich im Detail' }
   };
   /* v3015 · Webinar (Marcel 27.10.2026: „ein großes Webinar, detailliert erklärt“): eigene Reihe,
-     neun Kapitel, Tafel rechts; ?modul=mfh oder ?messe=komplett-mfh */
-  REIHE.mfh = { reihe: 'DealPilot Webinar', art: 'Komplettbeispiel', nr: 'MFH', tafel: true, hinweis: 'Vorführung · Haus aus dem Demo-Konto, neu getippt · aufgezeichneter Marktbericht · PDF lokal erzeugt', messe: 'komplett-mfh',
-            titel: 'Komplettbeispiel Mehrfamilienhaus', unter: 'Ein Haus, neun Kapitel — von der ersten Eingabe bis zum Bank-PDF.',
+     neun Kapitel, Tafel rechts; ?modul=mfh oder ?messe=komplett-mfh
+     v3021k · zehn Kapitel: Kapitel 9 liest Unterlagen eines zweiten Hauses (Mitschnitt, ?kumit = einmal echt) */
+  REIHE.mfh = { reihe: 'DealPilot Webinar', art: 'Komplettbeispiel', nr: 'MFH', tafel: true, hinweis: 'Vorführung · Haus aus dem Demo-Konto, neu getippt · aufgezeichneter Marktbericht · aufgezeichnete Auslese der Unterlagen · PDF lokal erzeugt', messe: 'komplett-mfh',
+            titel: 'Komplettbeispiel Mehrfamilienhaus', unter: 'Ein Haus, zehn Kapitel — von der ersten Eingabe über die Unterlagen bis zum Bank-PDF.',
             spruch: 'Erst rechnen,', spruch2: 'dann kaufen.', weiter: '' };
   /* v3016s · Webinar Lindenallee 14 (Marcel 28.10.2026): Unterlagen einlesen, auswerten, WEG in der Pilot-Analyse */
   REIHE.lindenallee = { reihe: 'DealPilot Webinar', art: 'Unterlagen', nr: 'WEG', tafel: true, hinweis: 'Vorführung · neues Objekt, nichts gespeichert · Unterlagen live ausgelesen · Demo-Objekt nur gelesen', messe: 'lindenallee-unterlagen',
@@ -265,7 +266,7 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
     /* v2255d · mit Zeitstempel: index.html kommt ohne Cache-Control (gemessen,
        nur ETag/Last-Modified) - dieselbe Adresse durfte der Browser aus dem
        Speicher holen, samt alter Buster */
-    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1' + ['sprechtempo', 'sprechvor', 'lukurz', 'tempo', 'halt'].map(function (k) { return P.has(k) ? '&' + k + '=' + encodeURIComponent(P.get(k)) : ''; }).join('') + '&_=' + Date.now();   /* v3016s · Tempo-Schalter an die App durchreichen */
+    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1' + ['sprechtempo', 'sprechvor', 'lukurz', 'tempo', 'halt', 'kumit'].map(function (k) { return P.has(k) ? '&' + k + '=' + encodeURIComponent(P.get(k)) : ''; }).join('') + '&_=' + Date.now();   /* v3016s · Tempo-Schalter an die App durchreichen */
     await warte(fx ? fx.dauer : 4000);
     /* warten, bis das Drehbuch in der App bereitsteht (Anmeldung, Plan) */
     var t0 = Date.now();

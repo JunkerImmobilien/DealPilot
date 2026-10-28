@@ -1584,6 +1584,8 @@
       if (lauf && _rh) {
         if (m !== 'GET') DPM_REIHE.abrufe.push(m + ' ' + pfad);
         /* v3016s · Lindenallee 14: NUR das Einlesen der Unterlagen geht echt hinaus (luLive) */
+        /* v3021k · komplett-mfh Kapitel 9: Unterlagen gespielt (oder im Mitschnitt-Lauf echt) */
+        if (_rh.ku && m === 'POST' && KU_KI.test(pfad)) return kuAbruf(echt, this, arguments, pfad, opt);
         if (_rh.luLive && m === 'POST' && LU_LIVE.test(pfad)) { try { DPM_LU.live.push(pfad); } catch (e) {} return echt.apply(this, arguments); }
         var a = rhAntwort(kurz, m, opt);
         if (a) { DPM_REIHE.gespielt.push(m + ' ' + pfad); return Promise.resolve(a); }
@@ -6405,7 +6407,7 @@
   async function kmKapitel(s, nr, titel, unter, sprich) {
     zeige(null); kegelHoch(false); kmTafel(null);
     if (STUDIO) anStudio({ type: 'zwischentitel', nr: nr, titel: titel, unter: unter });
-    else karte('<div class="k">Kapitel ' + nr + ' von 9</div><h1>' + titel + '</h1><p>' + unter + '</p>');
+    else karte('<div class="k">Kapitel ' + nr + ' von 10</div><h1>' + titel + '</h1><p>' + unter + '</p>');
     s.zeile('Kapitel ' + nr + ' · ' + titel, unter); kmMerke(sprich);
     await warte(Math.max(kmDauer('Kapitel ' + nr + ' · ' + titel, unter, sprich), Math.round(8500 * kmF() / TEMPO)));
     if (STUDIO) anStudio({ type: 'zwischentitel-weg' }); else karte(null);
@@ -6488,6 +6490,7 @@
       try { r19Zu(); } catch (e) {} try { r16MbZu(); } catch (e) {}
       kmTafel(null); var t = q('#dpm-tafel'); if (t) t.remove();
       try { document.documentElement.classList.remove('dpm-km'); } catch (e) {}
+      try { kuAufraeumen(); } catch (e) {}   /* v3021k */
       karte(null);
       rhAufraeumen();
     },
@@ -6504,7 +6507,7 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
         await kmSag(s, 'Ein neues Objekt', 'Wir starten leer: <b>„Neues Objekt“</b> — und tippen jedes Feld selbst.',
-          'Wir beginnen mit einem leeren Objekt. DealPilot könnte ein Exposé auslesen oder eine Sprachaufnahme verstehen. Heute tippen wir jedes Feld selbst, damit du siehst, was wofür gebraucht wird.', null,
+          'Wir beginnen mit einem leeren Objekt. DealPilot kann ein Exposé und weitere Unterlagen auslesen — das zeigen wir in Kapitel neun an einem zweiten Haus. Hier tippen wir jedes Feld selbst, damit du siehst, was wofür gebraucht wird.', null,
           { was: 'Nichts — ein leeres Objekt über „Neues Objekt“.', warum: 'Jedes Feld einmal sehen und verstehen, wofür es gebraucht wird.', folge: 'Alle Zahlen im Video rechnet die App aus genau diesen Eingaben.' });
         await zeige(function () { return q('nav.tabs'); }, 6);
         var tabs = [].map.call(document.querySelectorAll('nav.tabs .tab[data-target-sec]'), function (t) { return t.offsetWidth ? r6Text(t) : null; }).filter(Boolean);
@@ -7117,10 +7120,13 @@
         }
       },
 
-      /* ════ KAPITEL 9 · ERGEBNIS UND BANK-PDF ════ */
+      /* ════ KAPITEL 9 · UNTERLAGEN (v3021k) - zweites Objekt, danach zurück ════ */
+      kuS1, kuS2, kuS3, kuS4, kuS5,
+
+      /* ════ KAPITEL 10 · ERGEBNIS UND BANK-PDF ════ */
       async function (s) {
-        await kmKapitel(s, 9, 'Ergebnis und Bank-PDF', 'Deal Score, Investor Deal Score, Kennzahlen — und das PDF für die Bank.',
-          'Kapitel neun: das Ergebnis. Wir sehen, wie DealPilot das Haus bewertet, und erzeugen das PDF für das Gespräch mit der Bank.');
+        await kmKapitel(s, 10, 'Ergebnis und Bank-PDF', 'Deal Score, Investor Deal Score, Kennzahlen — und das PDF für die Bank.',
+          'Kapitel zehn: das Ergebnis. Wir sehen, wie DealPilot das Haus bewertet, und erzeugen das PDF für das Gespräch mit der Bank.');
         reiter('s6'); await kmPause(1500);
         await warteAuf(function () { return r12Karte(1)() && r12Kopf(1).score; }, 8000);
         await kmPause(800);
@@ -7176,8 +7182,8 @@
         r19Zu(); kegelHoch(false);
         reiter('s0'); var mm = q('.main-col'); if (mm) mm.scrollTop = 0;
         await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
-        await kmSag(s, 'Geschafft', 'Ein Haus, neun Kapitel: angelegt, erfasst, finanziert, bewertet, geplant — <b>bereit für die Bank</b>.',
-          'Geschafft. Ein Mehrfamilienhaus, neun Kapitel: angelegt, Wohnung für Wohnung erfasst, finanziert, steuerlich eingeordnet, amtlich bewertet, mit Zielbild geplant und bereit für das Gespräch mit der Bank. Jede Zahl, die du gesehen hast, hat DealPilot aus unseren Eingaben gerechnet. Danke fürs Zuschauen.', 3000,
+        await kmSag(s, 'Geschafft', 'Ein Haus, zehn Kapitel: angelegt, erfasst, finanziert, bewertet, geplant — <b>bereit für die Bank</b>.',
+          'Geschafft. Ein Mehrfamilienhaus, zehn Kapitel: angelegt, Wohnung für Wohnung erfasst, finanziert, steuerlich eingeordnet, amtlich bewertet, mit Zielbild geplant, dazu Unterlagen gelesen — und bereit für das Gespräch mit der Bank. Jede Zahl, die du gesehen hast, hat DealPilot aus unseren Eingaben gerechnet. Danke fürs Zuschauen.', 3000,
           { was: 'Deine eigenen Objekte — genauso.', warum: 'Erst rechnen, dann kaufen.', folge: 'dealpilot.immo' });
       }
     ].map(function (f, i) { return async function (s) { await kmHalt(i); return f(s); }; })
@@ -7582,6 +7588,453 @@
           'Das Exposé verkauft — die Protokolle erzählen. Sieben Unterlagen, gelesen, ausgewertet und übernommen: Risiken mit Betrag und Quelle, eine Investitionsthese und die Lage der Eigentümergemeinschaft. Bevor du kaufst, nicht danach.', LU_NACH,
           { was: 'Deine eigenen Unterlagen — genauso.', warum: 'Erst lesen, dann kaufen.', folge: 'dealpilot.immo' });
       }
+    ].map(function (f, i) { return async function (s) { await kmHalt(i); return f(s); }; })
+  };
+
+  /* ═══ WEBINAR komplett-mfh · KAPITEL 9 · UNTERLAGEN (v3021k) ════════════════════════
+     Marcel 28.10.2026: „sollten wir das Video, den Rundgang durch die App, mit den neuen
+     Sachen ergänzen? Dem Import der ganzen Dokumente, Übernahme und all dem anderen.“
+     Zwischen Zielbild (8) und Ergebnis (10) ein ZWEITES neues Objekt (Lindenallee 14):
+     01-07 einlesen, Reiter je Dokument, Übernahme, Pilot-Analyse › Unterlagen & WEG
+     (Einfach/Genau, Kosten, „Dein Anteil“, Baulasten), 08 Wirtschaftsplan + 09 Baulasten
+     nachreichen (Hausgeld mit Aufschlüsselung, Steuer-Vorschläge, Abweichungen nicht
+     vorgehakt, „Zuletzt nachgereicht“), Bausteine im PDF. Danach wird das Webinar-Objekt
+     (DPM_REIHE.angelegt[0]) wieder geladen. Beide Objekte löscht rhAufraeumen.
+     KI: EINMAL echt im Mitschnitt-Lauf (?kumit), sonst gespielt aus
+     js/messe-komplett-unterlagen.js (kuAbruf, ein Schlüssel je Abruf). Fehlt ein Eintrag,
+     wird gesperrt (503) und in DPM_KU.fehlt notiert - nie still echt gefragt. */
+  var KU_BUSTER = 'v3021k';
+  var KU_A = LU_DATEIEN, KU_B = ['08-wirtschaftsplan-2026.pdf', '09-baulastenauskunft.pdf'];
+  var KU_KI = /\/api\/v1\/ai\/(extract-expose|extract-market-data|seiten-lesen|extract-dokument|dokumente-auswerten|analyze)$/;
+  /* gespielte Antwortzeit je Abruf (echte ms, mit DPM_KM_SCHNELL gekürzt) */
+  var KU_VERZ = { 'extract-expose': 3500, 'extract-market-data': 3500, 'seiten-lesen': 3000, 'extract-dokument': 2600, 'dokumente-auswerten': 7000, analyze: 9000 };
+  window.DPM_KU = window.DPM_KU || { mitschnitt: [], live: [], gespielt: [], fehlt: [], unscharf: [] };
+  var _ku = {};
+  function kuMit() { return kmParam('kumit') != null || !!window.DPM_KU_MIT; }
+  function kuLaden() {
+    return new Promise(function (ok) {
+      if (window.DPM_KU_DATEN) { ok(true); return; }
+      var s = document.createElement('script'); s.src = 'js/messe-komplett-unterlagen.js?v=' + KU_BUSTER;
+      s.onload = function () { ok(!!window.DPM_KU_DATEN); }; s.onerror = function () { ok(false); };
+      document.head.appendChild(s);
+    });
+  }
+  function kuHash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) + ':' + s.length; }
+  function kuSchluessel(pfad, opt) {
+    var art = pfad.split('/').pop(), roh = String((opt && opt.body) || ''), b = {};
+    try { b = JSON.parse(roh) || {}; } catch (e) {}
+    if (art === 'extract-dokument') return art + '|' + (b.dateiname || '') + '|' + (b.typ || '');
+    if (art === 'dokumente-auswerten') return art + '|' + (b.vorher ? 'nachgereicht' : 'erst');
+    if (art === 'analyze') return art;
+    return art + '|' + kuHash(roh);
+  }
+  /* aus rhSpion: im Mitschnitt-Lauf echt und mitgeschrieben, sonst gespielt */
+  function kuAbruf(echt, ctx, args, pfad, opt) {
+    var k = kuSchluessel(pfad, opt), art = pfad.split('/').pop();
+    if (kuMit()) {
+      DPM_KU.live.push(k);
+      var p = echt.apply(ctx, args);
+      p.then(function (r) { var st = r.status; return r.clone().text().then(function (t) { DPM_KU.mitschnitt.push({ k: k, status: st, text: t }); }); }).catch(function () {});
+      return p;
+    }
+    var D = (window.DPM_KU_DATEN && window.DPM_KU_DATEN.antworten) || [];
+    _ku.benutzt = _ku.benutzt || {};
+    var alle = D.map(function (e, i) { return { e: e, i: i }; });
+    var kand = alle.filter(function (x) { return x.e.k === k; });
+    var wahl = kand.filter(function (x) { return !_ku.benutzt[x.i]; })[0] || kand[kand.length - 1];
+    if (!wahl) {
+      wahl = alle.filter(function (x) { return x.e.k.split('|')[0] === art && !_ku.benutzt[x.i]; })[0];
+      if (wahl) DPM_KU.unscharf.push(k + ' -> ' + wahl.e.k);
+    }
+    if (!wahl) {
+      DPM_KU.fehlt.push(k); DPM_REIHE.gesperrt.push('POST ' + pfad + ' (kein Mitschnitt)');
+      return Promise.resolve(new Response(JSON.stringify({ error: 'Vorführung: kein Mitschnitt' }), { status: 503, headers: { 'Content-Type': 'application/json' } }));
+    }
+    _ku.benutzt[wahl.i] = true; DPM_KU.gespielt.push(k); DPM_REIHE.gespielt.push('POST ' + pfad);
+    var e = wahl.e;
+    return new Promise(function (ok) {
+      setTimeout(function () { ok(new Response(e.text, { status: e.status || 200, headers: { 'Content-Type': 'application/json' } })); }, Math.round((KU_VERZ[art] || 2000) * kmF()));
+    });
+  }
+  function kuEinlegen(namen, bl) {
+    var inp = q('#oabi-input'); if (!inp) return false;
+    var dt = new DataTransfer();
+    namen.forEach(function (n, i) { dt.items.add(new File([bl[i]], n, { type: 'application/pdf' })); });
+    inp.files = dt.files;
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  }
+  function kuFertig(n) {
+    return luDateiZeilen().length >= n && luGelesen().length >= n && !!luReiter(/^Auswertung/)()
+      && !/werden gemeinsam ausgewertet/.test(r6Text(q('#oabi-ov [data-panel="ausw"]')));
+  }
+  /* jede Karte steht ihre volle Zeit (Sprechzeile), danach wird nur noch gewartet */
+  async function kuWarten(s, n, karten) {
+    var t0 = Date.now(), MAX = 6 * 60 * 1000;
+    for (var i = 0; ; i++) {
+      var neu = i < karten.length;
+      if (!neu && (kuFertig(n) || Date.now() - t0 > MAX)) break;
+      var w = karten[Math.min(i, karten.length - 1)], g = luGelesen().length;
+      var stand = g < n ? ' <span style="opacity:.75">· ' + g + ' von ' + n + ' gelesen</span>' : (kuFertig(n) ? '' : ' <span style="opacity:.75">· Auswertung läuft</span>');
+      await zeige(function () { return q('#oabi-files') || q('#oabi-ov .oabi-modal'); }, 8);
+      kmTafel(w[3]); s.zeile(w[0], w[1] + stand); kmMerke(neu ? w[2] : null, w[3]);
+      var bis = Date.now() + kmDauer(w[0], w[1], neu ? w[2] : null, w[3]) * TEMPO + LU_NACH;
+      while (Date.now() < bis && (neu || !kuFertig(n))) await warte(400);
+    }
+    _ku.lesedauer = (_ku.lesedauer || []).concat(Math.round((Date.now() - t0) / 1000));
+  }
+  /* Zeile der Übernahme, deren WERT passt (Einheit und Jahr) */
+  function kuZeileWert(re) {
+    return function () {
+      var p = luPanel() || q('#oabi-ov'); if (!p) return null;
+      return [].filter.call(p.querySelectorAll('.oabi-tbl tr'), function (tr) { return tr.offsetWidth && tr.cells && tr.cells.length > 2 && re.test(r6Text(tr.cells[2])); })[0] || null;
+    };
+  }
+  function kuWertText(tr) { var b = tr && tr.cells && tr.cells[2] && tr.cells[2].querySelector('b'); return r6Text(b || (tr && tr.cells && tr.cells[2])); }
+  function kuUnterlagen() { try { var d = window.DpUnterlagen && DpUnterlagen.laden(); return (d && d.auswertung) || null; } catch (e) { return null; } }
+  function kuAufraeumen() {
+    try { if (_ku.ansicht !== undefined) { if (_ku.ansicht === null) localStorage.removeItem('dp_unterlagen_ansicht'); else localStorage.setItem('dp_unterlagen_ansicht', _ku.ansicht); } } catch (e) {}
+    _ku.ansicht = undefined;
+    if (_rh) _rh.ku = false;
+  }
+
+  /* ── Szene 9a · Kapitel, zweites Objekt, sieben PDFs einlesen ── */
+  async function kuS1(s) {
+    _ku = { benutzt: {} }; DPM_KU.gespielt = []; DPM_KU.fehlt = []; DPM_KU.unscharf = []; DPM_KU.live = []; DPM_KU.zurueck = null; DPM_KU.messung = {};
+    if (kuMit()) DPM_KU.mitschnitt = [];
+    try { _ku.ansicht = localStorage.getItem('dp_unterlagen_ansicht'); } catch (e) { _ku.ansicht = undefined; }
+    _ku.w = DPM_REIHE.angelegt[0] || window._currentObjKey;
+    _ku.wKuerzel = wert('kuerzel') || KM.kuerzel;
+    var daten = kuMit() ? true : await kuLaden();
+    var vorab = Promise.all(KU_A.concat(KU_B).map(function (n) { return fetch(LU_PFAD + n + '?v=' + KU_BUSTER).then(function (r) { return r.blob(); }); }));
+    /* das zweite Objekt entsteht, während die Kapitelkarte steht */
+    var anlegen = (async function () {
+      reiter('s0');
+      try { if (window.dpTabSwitchSave) await window.dpTabSwitchSave(); } catch (e) {}
+      var n0 = DPM_REIHE.angelegt.length;
+      var kn = sbKnopf('new')();
+      if (kn) kn.click(); else if (typeof window.sbActionsAction === 'function') sbActionsAction('new');
+      await warteAuf(function () { return DPM_REIHE.angelegt.length > n0 && /Neues Objekt/.test((q('#hdr-obj') || {}).textContent || ''); }, 9000);
+      _ku.l = DPM_REIHE.angelegt.length > n0 ? DPM_REIHE.angelegt[DPM_REIHE.angelegt.length - 1] : null;
+      await warte(500);
+      rhNur([]);
+      var m = q('.main-col'); if (m) m.scrollTop = 0;
+    })();
+    await kmKapitel(s, 9, 'Unterlagen einlesen', 'Ein zweites Haus mit Exposé, Grundbuch und Protokollen — DealPilot liest sie.',
+      'Kapitel neun: Unterlagen. Bisher haben wir jedes Feld selbst getippt. Oft liegen aber schon Unterlagen vor — ein Exposé, die Mieterliste, ein Grundbuchauszug, die Protokolle der Eigentümerversammlung. Dafür nehmen wir kurz ein zweites Haus: die Lindenallee vierzehn in Herford, acht Wohnungen, aufgeteilt nach Wohnungseigentum. Danach geht es mit der Parkstraße weiter.');
+    await anlegen;
+    _ku.bl = await vorab;
+    DPM_KU.messung.l = _ku.l; DPM_KU.messung.w = _ku.w;
+    if (!daten || !_ku.l || _ku.l === _ku.w) {
+      _ku.aus = true;
+      await kmSag(s, 'Unterlagen einlesen', 'Für dieses Kapitel fehlt der Mitschnitt — es entfällt.', null, 1000);
+      return;
+    }
+    _rh.ku = true;
+    var kachel = rhKachel('import');
+    if (kachel()) {
+      await zeige(kachel, 10);
+      await kmSag(s, 'Exposé / Dokumente', 'Ein leeres Objekt, die Kachel <b>„' + rhNameKachel('import') + '“</b> — hier kommen alle PDFs hinein, auch viele auf einmal.',
+        'Wieder ein leeres Objekt. In der Datenaufnahme gibt es die Kachel Exposé und Dokumente. Hier kommen alle PDFs eines Objekts hinein — auch viele auf einmal.', LU_NACH,
+        { was: 'Die Kachel „Exposé / Dokumente“.', warum: 'Ein Weg für alle Unterlagen eines Objekts.', folge: 'Es öffnet sich das Fenster zum Einlesen.' });
+    }
+    await new Promise(function (ok) { ObjectActions.openImport(function () {}); setTimeout(ok, 50); });
+    await warteAuf(function () { return q('#oabi-ov .oabi-modal'); }, 5000);
+    await zeige(function () { return q('#oabi-drop'); }, 10);
+    kmTafel({ was: 'Sieben PDFs auf einmal.', warum: 'Niemand will sieben Mal hochladen.', folge: 'Jede Datei bekommt eine eigene Zeile.' });
+    await kmPause(1500);
+    kuEinlegen(KU_A, _ku.bl.slice(0, KU_A.length));
+    await warteAuf(function () { return luDateiZeilen().length >= KU_A.length; }, 8000);
+    await zeige(function () { return q('#oabi-files'); }, 8);
+    await kmSag(s, 'Sieben Dateien', 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, Energieausweis und <b>zwei Protokolle</b> — alle auf einmal.',
+      'Sieben Dateien auf einmal: das Exposé, die Mietaufstellung, ein Grundbuchauszug, die Teilungserklärung, der Energieausweis mit Flurkarte und zwei Protokolle der Eigentümerversammlung.', LU_NACH,
+      { was: 'Sieben PDFs.', warum: 'Erst alle Unterlagen zusammen ergeben das Bild.', folge: 'Jetzt wird gelesen.' });
+    await kuWarten(s, KU_A.length, [LU_WARTEN[1], LU_WARTEN[2], LU_WARTEN[3]]);
+    var arten = luDateiZeilen().map(luArt).filter(Boolean);
+    DPM_KU.messung.arten = arten;
+    var zaehl = {}; arten.forEach(function (a) { zaehl[a] = (zaehl[a] || 0) + 1; });
+    var liste = Object.keys(zaehl).map(function (a) { return a + (zaehl[a] > 1 ? ' ×' + zaehl[a] : ''); });
+    await zeige(function () { return q('#oabi-files'); }, 8);
+    await kmSag(s, 'Erkannt', liste.length ? 'Erkannt: <b>' + liste.join(' · ') + '</b>.' : 'Alle Dateien sind gelesen.',
+      'Alle sieben sind gelesen, und jede hat ihre Art: ' + (liste.length ? liste.join(', ').replace(/ ×2/g, ', gleich zweimal') : 'Exposé, Mieterliste, Grundbuch, Teilungserklärung, Energieausweis und Protokolle') + '. Ist eine Art falsch erkannt, stellst du sie an der Zeile um.', LU_NACH,
+      { was: 'Nichts.', warum: 'Die Art entscheidet, was gelesen wird.', folge: 'Darüber stehen jetzt die Reiter je Dokument.' });
+  }
+
+  /* ── Szene 9b · Reiter je Dokument, Übernahme, Einheiten ── */
+  async function kuS2(s) {
+    if (_ku.aus) return;
+    await zeige(function () { return q('#oabi-reiter'); }, 8);
+    var nR = document.querySelectorAll('#oabi-reiter .dpu-tab').length;
+    DPM_KU.messung.reiter = nR;
+    await kmSag(s, 'Ein Reiter je Dokument', '<b>' + nR + ' Reiter</b>: die Übernahme, je Dokument ein eigener — und die gemeinsame Auswertung.',
+      'Oben stehen jetzt ' + nR + ' Reiter: die Übernahme, für jedes Dokument ein eigener Reiter mit allem, was darin gelesen wurde, und die gemeinsame Auswertung aller Unterlagen.', LU_NACH,
+      { was: 'Nichts.', warum: 'Jede Unterlage einzeln nachprüfbar.', folge: 'Erst prüfen, dann übernehmen.' });
+    var ueb = luReiter(/^Übernahme/)(); if (ueb) ueb.click(); await warte(600);
+    /* eine Zeile mit Einheit und Jahr (z. B. „… € / Jahr (Protokoll 2025)“), sonst Grundstück */
+    var ej = kuZeileWert(/(€|m²)[^()]*\((?:[^)]*\s)?(?:19|20)\d\d\)/);
+    var zf = ej() ? ej : (luZeile(/Grundstücksfläche/)() ? luZeile(/Grundstücksfläche/) : null);
+    if (zf) {
+      await luZeige(zf, 8);
+      var zn = luKurz(r6Text(zf().cells[1]), 50), zw = luKurz(kuWertText(zf()), 70), zq = luQuelle(zf());
+      DPM_KU.messung.zeile = zn + ': ' + zw;
+      await kmSag(s, 'Jede Zeile mit Einheit', zn + ' <b>' + zw + '</b>' + (zq ? ' — Quelle: ' + zq : '') + '.',
+        'In der Übernahme trägt jede Zeile ihre Einheit, und wo es darauf ankommt, auch das Jahr. Zum Beispiel ' + zn + ': ' + zw.replace(/\s*\/\s*Jahr/, ' im Jahr') + (zq ? ', gelesen aus dem Dokument ' + zq : '') + '.', LU_NACH,
+        { was: 'Nichts — gelesen, nicht getippt.', warum: 'Eine Zahl ohne Einheit und Jahr ist nicht prüfbar.', folge: 'Was du nicht willst, hakst du ab.' });
+    }
+    var aw = luReiter(/^Auswertung/);
+    if (aw()) {
+      await zeige(aw, 8); await kmPause(700);
+      aw().click(); await warte(700);
+      var nRis = document.querySelectorAll('#oabi-ov [data-panel="ausw"] .dpu-risiko').length;
+      DPM_KU.messung.risikenImport = nRis;
+      await luZeige(function () { return q('#oabi-ov [data-panel="ausw"] .dpu-these') || q('#oabi-ov [data-panel="ausw"]'); }, 8);
+      await kmSag(s, 'Die Auswertung', 'Alle Unterlagen gemeinsam: eine <b>Investitionsthese</b>' + (nRis ? ' und <b>' + nRis + ' Risiken</b> mit Betrag und Quelle' : '') + '.',
+        'Die gemeinsame Auswertung schreibt eine Investitionsthese aus dem, was in den Unterlagen steht' + (nRis ? ', und findet ' + nRis + ' Risiken — jedes mit Betrag, wo es einen gibt, und mit der Quelle' : '') + '. Beides geht mit der Übernahme in die Felder des Objekts.', LU_NACH,
+        { was: 'Nichts.', warum: 'Erst im Zusammenhang wird sichtbar, was das Exposé nicht sagt.', folge: 'Risiken und These landen im Objekt.' });
+    }
+    var ueb2 = luReiter(/^Übernahme/)(); if (ueb2) ueb2.click(); await warte(600);
+    await zeige(function () { return q('#oabi-apply'); }, 10);
+    s.zeile('Ausgewählte übernehmen', 'Ein Klick — und alles Ausgewählte steht im Objekt.'); kmMerke('Ein Klick auf Ausgewählte übernehmen …');
+    kmTafel({ was: 'Ein Klick auf „Ausgewählte übernehmen“.', warum: 'Du entscheidest, was ins Objekt geht.', folge: 'Felder, Einheiten, Risiken und These stehen im Objekt.' });
+    await kmPause(2200);
+    var ap = q('#oabi-apply'); if (ap) ap.click();
+    await warte(1500);
+    var mfh = await warteAuf(function () { return q('#mfh-modal'); }, 8000);
+    if (mfh) {
+      await zeige(function () { return q('#mfh-modal .mfh-box') || q('#mfh-modal > div') || q('#mfh-modal'); }, 8);
+      var zeilen = q('#mfh-modal') ? q('#mfh-modal').querySelectorAll('tbody tr').length : 0;
+      DPM_KU.messung.einheiten = zeilen;
+      await kmSag(s, 'Die Einheiten', (zeilen ? '<b>' + zeilen + ' Wohnungen</b>' : 'Die Wohnungen') + ' aus der Mieterliste — Fläche, Miete, Status. Ein paar Klicks bis zur Übernahme.',
+        (zeilen ? zeilen + ' Wohnungen' : 'Die Wohnungen') + ' aus der Mieterliste, jede mit Fläche, Kaltmiete und Status — die Erfassung aus Kapitel drei, nur schon ausgefüllt.', LU_NACH,
+        { was: 'Nichts — prüfen.', warum: 'Die Mieterliste ist die Basis der Miete.', folge: 'Durchklicken und übernehmen.' });
+      for (var k = 0; k < 6 && q('#mfh-modal'); k++) {
+        var wb = q('#mfh-weiter'); if (!wb || !wb.offsetWidth) break;
+        await zeige(function () { return q('#mfh-weiter'); }, 10); await kmPause(900);
+        var ende = /Übernehmen/i.test(r6Text(wb));
+        wb.click(); await warte(1400);
+        if (ende) break;
+      }
+      await warteAuf(function () { return !q('#mfh-modal'); }, 6000);
+    }
+    reiter('s0'); await warte(600);
+  }
+
+  /* ── Szene 9c · Pilot-Analyse › Unterlagen & WEG ── */
+  async function kuS3(s) {
+    if (_ku.aus) return;
+    reiter('s5'); await warte(900);
+    var ab = function () { return qs('#ai-btn'); };
+    await zeige(ab, 10);
+    s.zeile('Pilot-Analyse', 'Ein Klick — die Analyse liest jetzt auch die <b>Unterlagen</b>.'); kmMerke('Jetzt die Pilot-Analyse. Sie bekommt die Auswertung der Unterlagen mit — Risiken, Beschlüsse, Rücklage — und bezieht sie in ihr Urteil ein.');
+    kmTafel({ was: 'Ein Klick auf „Pilot-Analyse“.', warum: 'Die Analyse soll kennen, was in den Unterlagen steht.', folge: 'Ein eigener Reiter „Unterlagen & WEG“.' });
+    var t0 = Date.now(), soll = kmDauer('Pilot-Analyse', 'Ein Klick — die Analyse liest jetzt auch die Unterlagen.', 'Jetzt die Pilot-Analyse. Sie bekommt die Auswertung der Unterlagen mit — Risiken, Beschlüsse, Rücklage — und bezieht sie in ihr Urteil ein.') * TEMPO;
+    await kmPause(1800);
+    if (ab()) ab().click();
+    await warteAuf(function () { return [].some.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return b.offsetWidth; }); }, kuMit() ? 300000 : 60000);
+    var rest = soll - (Date.now() - t0); if (rest > 300) await warte(rest >= 600 * TEMPO ? rest / TEMPO : rest);
+    await kmPause(LU_NACH);
+    var ok = await r11PaTab(/^Unterlagen/);
+    DPM_KU.messung.paReiter = ok;
+    if (!ok) { await kmSag(s, 'Pilot-Analyse', 'Der Reiter „Unterlagen & WEG“ fehlt.', null, 1000); return; }
+    var einf = function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter button[data-art="einfach"]'); };
+    if (einf()) { einf().click(); await warte(500); }
+    var amp = function () { var p = r11Panel(); return p && p.querySelector('[data-dpu-ansicht="einfach"] .dpu-ampel'); };
+    var geld = function () { var p = r11Panel(); return p && [].filter.call(p.querySelectorAll('[data-dpu-ansicht="einfach"] .dpu-karte'), function (x) { return /absehbar Geld/.test(r6Text(x)); })[0] || null; };
+    if (amp()) {
+      await zeige(function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter'); }, 8);
+      var z3 = [].map.call(amp().querySelectorAll('b'), r6Text);
+      DPM_KU.messung.ampel = z3;
+      await kmSag(s, 'Unterlagen & WEG', 'Ein eigener Reiter, <b>Einfach</b> und <b>Genau</b>. Die Ampel: ' + (z3[0] || '0') + ' hoch, ' + (z3[1] || '0') + ' mittel, ' + (z3[2] || '0') + ' niedrig.',
+        'In der Pilot-Analyse steht jetzt ein eigener Reiter: Unterlagen und W-E-G. Er hat zwei Ansichten, Einfach und Genau. Einfach zeigt oben die Ampel: ' + (z3[0] || 'keine') + ' Risiken hoch, ' + (z3[1] || 'keine') + ' mittel, ' + (z3[2] || 'keine') + ' niedrig.', LU_NACH,
+        { was: 'Die Ansicht „Einfach“.', warum: 'Erst der Überblick, dann die Einzelheiten.', folge: 'Ampel, Kosten, Gemeinschaft und These als Karten.' });
+    }
+    if (geld()) {
+      await zeige(geld, 8);
+      var gz = r6Text(geld().querySelector('.dpu-gross')), gw = r6Text(geld().querySelector('p'));
+      /* „nicht doppelt“ nur sagen, wenn die Auswertung eine Sonderumlage mit Betrag führt, die in der Karte NICHT steht */
+      var A = kuUnterlagen() || {}, su = (A.risiken || []).filter(function (x) { return /sonderumlage/i.test(x.titel || '') && Number(x.kosten_eur) > 0; })[0];
+      var suRaus = !!(su && gw.indexOf(su.titel) < 0);
+      DPM_KU.messung.kosten = { summe: gz, posten: gw, sonderumlageRaus: suRaus ? su.titel + ' ' + su.kosten_eur : null };
+      await kmSag(s, 'Was absehbar Geld kostet', (gz ? '<b>' + gz + '</b> — ' : '') + luKurz(gw, 110) + (suRaus ? '. Die <b>Sonderumlage</b> zählt nicht doppelt.' : ''),
+        'Daneben die Karte: was absehbar Geld kostet' + (gz ? ' — ' + gz : '') + '. ' + (gw ? 'Darin: ' + luListe(luKurz(gw, 160)) + '.' : '') + (suRaus ? ' Die Sonderumlage zählt dabei nicht doppelt — sie ist der Weg, auf dem die Gemeinschaft das Dach bezahlt, keine zweite Ausgabe.' : ''), LU_NACH,
+        { was: 'Nichts.', warum: 'Absehbare Kosten gehören in den Kaufpreis.', folge: 'Grundlage für die Verhandlung.' });
+    }
+    var gen = function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter button[data-art="genau"]'); };
+    if (gen()) {
+      await zeige(gen, 10); await kmPause(800);
+      gen().click(); await warte(800);
+      var tb = function () { var p = r11Panel(); var t = p && [].filter.call(p.querySelectorAll('[data-dpu-ansicht="genau"] .dpu-tbl'), function (x) { return /Dein Anteil/.test(r6Text(x)); })[0]; return t || null; };
+      if (tb()) {
+        await luZeige(tb, 8);
+        var nm = tb().querySelectorAll('tr').length - 1;
+        var wie = (function () { var p = tb().parentNode && tb().parentNode.querySelector('.dpu-weg-p'); return r6Text(p).replace(/^Dein Anteil:\s*/, '').replace(/\.$/, ''); })();
+        var r1 = tb().rows[1], r1t = r1 ? [].map.call(r1.cells, r6Text) : [];
+        DPM_KU.messung.massnahmen = { n: nm, wie: wie, erste: r1t };
+        await kmSag(s, 'Maßnahmen und dein Anteil', '<b>' + nm + ' Maßnahmen</b> mit Status, Jahr, Kosten gesamt und <b>Dein Anteil</b>' + (wie ? ' — ' + wie : '') + '.',
+          'Umgeschaltet auf Genau: die Maßnahmen am Gemeinschaftseigentum, ' + nm + ' Stück, jede mit Status, Jahr und Kosten — und mit einer Spalte Dein Anteil. Bei einer einzelnen Wohnung rechnet DealPilot die Gesamtkosten mal Miteigentumsanteil, beim ganzen Haus wie hier sind es hundert Prozent.' + (r1t.length > 4 ? ' Zum Beispiel ' + r1t[0] + ', ' + r1t[1] + (r1t[2] ? ' ' + r1t[2] : '') + ': ' + r1t[4] + '.' : ''), LU_NACH,
+          { was: 'Die Ansicht „Genau“.', warum: 'Wer eine Wohnung kauft, zahlt nur seinen Anteil.', folge: 'Der Anteil steht fest gerechnet, nicht geschätzt.' });
+      }
+      var blH = function () { var p = r11Panel(); return p && [].filter.call(p.querySelectorAll('[data-dpu-ansicht="genau"] .dpu-h'), function (x) { return /^Baulasten/.test(r6Text(x)); })[0] || null; };
+      if (blH()) {
+        var blT = r6Text(blH().nextElementSibling);
+        DPM_KU.messung.baulastenVorher = blT;
+        await luZeige(function () { return blH().nextElementSibling || blH(); }, 8);
+        await kmSag(s, 'Baulasten', '<b>Nicht im Grundbuch</b> — ' + luKurz(blT.replace(/^Baulasten stehen nicht im Grundbuch, sondern /, 'sondern '), 120),
+          'Und ein Block, den man leicht vergisst: die Baulasten. Sie stehen nicht im Grundbuch, sondern im Baulastenverzeichnis der Bauaufsicht. ' + (/liegt nicht vor/.test(blT) ? 'Eine Auskunft liegt hier noch nicht vor — wir reichen sie gleich nach.' : luKurz(blT, 160)), LU_NACH,
+          { was: 'Nichts.', warum: 'Eine Baulast kann ein Grundstück stärker binden als jede Grundschuld.', folge: 'Die Auskunft gehört zu den Unterlagen.' });
+      }
+    }
+  }
+
+  /* ── Szene 9d · nachreichen, Hausgeld, Steuer, „Zuletzt nachgereicht“, Bausteine im PDF ── */
+  async function kuS4(s) {
+    if (_ku.aus) return;
+    var nb = function () { var p = r11Panel(); return p && p.querySelector('.dpu-nach-btn'); };
+    if (!nb()) { await r11PaTab(/^Unterlagen/); }
+    if (!nb()) { DPM_KU.messung.nachreichen = 'kein Knopf'; return; }
+    var m0 = q('.main-col'); if (m0) m0.scrollTop = 0;
+    await luZeige(function () { var p = r11Panel(); return p && (p.querySelector('.dpu-nach') || nb()); }, 8);
+    await kmSag(s, 'Unterlagen nachreichen', '<b>+ Unterlagen nachreichen</b>: Wirtschaftsplan und Baulastenauskunft kommen später — die Auswertung wird ergänzt, nicht ersetzt.',
+      'Unterlagen kommen selten auf einmal. Der Wirtschaftsplan und die Baulastenauskunft fehlen noch. Mit Unterlagen nachreichen legen wir sie dazu. Gelesen werden nur die neuen Dateien; die bisherige Auswertung bleibt die Grundlage und wird ergänzt, nicht ersetzt.', LU_NACH,
+      { was: 'Zwei PDFs: Wirtschaftsplan und Baulastenauskunft.', warum: 'Unterlagen kommen nach und nach.', folge: 'Vor der Übernahme siehst du jede Änderung.' });
+    nb().click();
+    await warteAuf(function () { return q('#oabi-ov .oabi-modal'); }, 5000);
+    await zeige(function () { return q('#oabi-drop'); }, 10);
+    await kmPause(1200);
+    kuEinlegen(KU_B, _ku.bl.slice(KU_A.length));
+    await warteAuf(function () { return luDateiZeilen().length >= KU_B.length; }, 8000);
+    await kuWarten(s, KU_B.length, [
+      ['Nur die neuen', 'Gelesen werden nur der <b>Wirtschaftsplan</b> und die <b>Baulastenauskunft</b> — dann wird zusammengeführt.',
+        'DealPilot liest jetzt nur die zwei neuen Dateien und führt sie mit der bisherigen Auswertung zusammen. Was sich dadurch ändert — an Risiken, These, Hausgeld und Steuer — steht gleich vor der Übernahme.',
+        { was: 'Nichts — DealPilot liest.', warum: 'Schon Gelesenes muss nicht noch einmal gelesen werden.', folge: 'Die Änderungen stehen vor der Übernahme.' }]
+    ]);
+    var ueb = luReiter(/^Übernahme/)(); if (ueb) ueb.click(); await warte(600);
+    var hg = luZeile(/^Hausgeld nicht umlage/);
+    if (hg()) {
+      await luZeige(hg, 8);
+      var hw = kuWertText(hg()), hl = r6Text(hg().querySelector('.oabi-herl')), hb = r6Text(hg().querySelector('.oabi-bisher'));
+      DPM_KU.messung.hausgeld = { wert: hw, herleitung: hl, bisher: hb, vorgehakt: !!(hg().querySelector('input[type=checkbox]') || {}).checked };
+      var hu = luZeile(/^Hausgeld umlage/)(), huw = hu ? kuWertText(hu) : '';
+      await kmSag(s, 'Hausgeld aus dem Wirtschaftsplan', 'Nicht umlagefähig, inkl. Rücklage: <b>' + luKurz(hw, 60) + '</b>' + (hl ? ' — ' + luKurz(hl, 90) : '') + '.',
+        'Aus dem Wirtschaftsplan kommt das Hausgeld, getrennt in umlagefähig' + (huw ? ', ' + huw.replace(/\s*\(.*$/, '').replace(/\s*\/\s*Jahr/, ' im Jahr') : '') + ', und nicht umlagefähig einschließlich Rücklage: ' + hw.replace(/\s*\(.*$/, '').replace(/\s*\/\s*Jahr/, ' im Jahr') + '. Die Zeile zeigt, wie sich der Betrag zusammensetzt' + (hl ? ': ' + luKurz(hl, 140) : '') + '.', LU_NACH,
+        { was: 'Nichts — gelesen.', warum: 'Was nicht umlagefähig ist, trägst du selbst.', folge: 'Es geht in die Bewirtschaftung des Objekts.' });
+    }
+    var abw = function () { return q('#oabi-ov .oabi-abw-kopf'); };
+    var abwZ = function () { var p = luPanel() || q('#oabi-ov'); return p && [].filter.call(p.querySelectorAll('tr.oabi-abw'), function (tr) { return tr.offsetWidth && tr.querySelector('.oabi-bisher'); })[0] || null; };
+    if (abw() && abwZ()) {
+      await luZeige(abwZ, 8);
+      var an = r6Text(abw().querySelector('b')), az = luKurz(r6Text(abwZ().cells[1]), 50), ab = r6Text(abwZ().querySelector('.oabi-bisher'));
+      DPM_KU.messung.abweichung = { kopf: an, zeile: az, bisher: ab, vorgehakt: !!(abwZ().querySelector('input[type=checkbox]') || {}).checked };
+      await kmSag(s, 'Im Dokument — bisher im Objekt', '<b>' + an + '</b> Solche Zeilen sind <b>nicht vorgehakt</b>: ' + az + ', ' + luKurz(ab, 70) + '.',
+        'Wo das Dokument etwas anderes sagt als das Objekt, steht beides untereinander: der Wert im Dokument und darunter, was bisher im Objekt steht. ' + an.replace(/\.$/, '') + '. Solche Zeilen sind nicht vorgehakt — du entscheidest, wer recht hat. Hier zum Beispiel ' + az + ', ' + luKurz(ab, 90) + '.', LU_NACH,
+        { was: 'Haken setzen — oder nicht.', warum: 'Ein Dokument überschreibt nie still, was du eingetragen hast.', folge: 'Nur Angehaktes geht ins Objekt.' });
+    }
+    var st = function () { var p = luPanel() || q('#oabi-ov'); return p && [].filter.call(p.querySelectorAll('.oabi-tbl tr'), function (tr) { return tr.offsetWidth && tr.cells && tr.cells.length > 1 && /^Steuer \d{4}/.test(r6Text(tr.cells[1])); }) || []; };
+    if (st().length) {
+      await luZeige(function () { return st()[0]; }, 8);
+      var sl = st().map(function (tr) { return r6Text(tr.cells[1]).replace(/^Steuer (\d{4}) · /, '').replace(/\s*\(.*$/, ''); });
+      var sj = (/^Steuer (\d{4})/.exec(r6Text(st()[0].cells[1])) || [])[1] || '';
+      var sw = st().map(function (tr) { return kuWertText(tr); });
+      DPM_KU.messung.steuer = { jahr: sj, posten: sl, werte: sw };
+      await kmSag(s, 'Steuer-Vorschläge', 'Für die Steuer ' + sj + ': <b>' + sl.map(function (x, i) { return luKurz(x, 40) + ' ' + (sw[i] || '').replace(/\s*im Jahr \d{4}/, ''); }).join(' · ') + '</b>.',
+        'Und der Wirtschaftsplan liefert Vorschläge für den Steuer-Reiter ' + sj + ': ' + luListe(sl.map(function (x, i) { return x.replace(/\s*\(ohne Rücklage und Verwaltung\)/, '') + ' ' + (sw[i] || '').replace(/\s*im Jahr \d{4}/, ''); }).join(' · ')) + '. Weicht ein Vorschlag von deiner Angabe ab, ist auch er nicht vorgehakt.', LU_NACH,
+        { was: 'Nichts — prüfen.', warum: 'Hausverwaltung, nicht umlagefähige Kosten und Erhaltung sind Werbungskosten.', folge: 'Sie landen im Steuer-Reiter des Jahres.' });
+    }
+    await zeige(function () { return q('#oabi-apply'); }, 10);
+    s.zeile('Übernehmen', 'Ausgewählte übernehmen — die Auswertung wird ergänzt.'); kmMerke(null);
+    await kmPause(2000);
+    var ap = q('#oabi-apply'); if (ap) ap.click();
+    await warte(1500);
+    var mfh = await warteAuf(function () { return q('#mfh-modal'); }, 2500);
+    if (mfh) {
+      for (var k = 0; k < 6 && q('#mfh-modal'); k++) { var wb = q('#mfh-weiter'); if (!wb || !wb.offsetWidth) break; var ende = /Übernehmen/i.test(r6Text(wb)); wb.click(); await warte(1000); if (ende) break; }
+      await warteAuf(function () { return !q('#mfh-modal'); }, 6000);
+    }
+    /* der Reiter liest #_dok_auswertung beim Zeichnen - gemessen wird, ob die Änderungen ankommen */
+    reiter('s5'); await warte(900);
+    await r11PaTab(/^Unterlagen/);
+    var aend = function () { var p = r11Panel(); return p && p.querySelector('.dpu-aend'); };
+    DPM_KU.messung.aenderungen = aend() ? [].map.call(aend().querySelectorAll('li'), r6Text) : null;
+    DPM_KU.messung.aenderungenGespeichert = ((kuUnterlagen() || {}).aenderungen || []).length;
+    if (aend()) {
+      await luZeige(aend, 8);
+      var li = [].map.call(aend().querySelectorAll('li'), r6Text);
+      await kmSag(s, 'Zuletzt nachgereicht', '<b>Das hat sich geändert:</b> ' + luKurz(li.slice(0, 2).join(' · '), 150),
+        'Im Reiter steht danach, was sich durch die nachgereichten Unterlagen geändert hat. ' + li.length + (li.length === 1 ? ' Punkt' : ' Punkte') + ', zum Beispiel: ' + luKurz(li[0] || '', 170), LU_NACH,
+        { was: 'Nichts.', warum: 'Nachvollziehbar bleibt nur, was sich sichtbar ändert.', folge: 'Risiken, These, Hausgeld und Steuer sind ergänzt.' });
+    }
+    var gen = function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter button[data-art="genau"]'); };
+    if (gen() && !gen().classList.contains('on')) { gen().click(); await warte(600); }
+    var blH = function () { var p = r11Panel(); return p && [].filter.call(p.querySelectorAll('[data-dpu-ansicht="genau"] .dpu-h'), function (x) { return /^Baulasten/.test(r6Text(x)); })[0] || null; };
+    if (blH()) {
+      var blT = r6Text(blH().nextElementSibling);
+      DPM_KU.messung.baulastenNachher = blT;
+      if (!/liegt nicht vor/.test(blT)) {
+        await luZeige(function () { return blH().nextElementSibling || blH(); }, 8);
+        await kmSag(s, 'Baulasten', '<b>' + luKurz(blT, 160) + '</b>',
+          'Und der Block Baulasten ist jetzt gefüllt, aus der Auskunft der Bauaufsicht: ' + luKurz(blT, 200), LU_NACH,
+          { was: 'Nichts.', warum: 'Eine Baulast bindet auch den Käufer.', folge: 'Steht vor dem Kauf auf dem Tisch, nicht danach.' });
+      }
+    }
+    /* Bausteine im PDF: nach Ankauf und Bestand sortiert, das Urteil einmal, je Objekt gemerkt */
+    var det = qs('details.ai-pdf-details');
+    if (det) {
+      var mm = q('.main-col'); if (mm) mm.scrollTop = 0;
+      det.open = true; await warte(600);
+      var box = function () { return qs('#ai-pdf-sections'); };
+      await luZeige(box, 8);
+      var gr = [].map.call(box().querySelectorAll('.ai-pdf-gruppe'), function (g) { return r6Text(g.querySelector('.ai-pdf-gruppe-h')); });
+      DPM_KU.messung.bausteine = gr;
+      await kmSag(s, 'Bausteine im PDF', 'Sortiert nach <b>' + gr.map(function (x) { return x.replace(/\s*·.*$/, ''); }).join(' · ') + '</b> — das Urteil steht nur einmal im PDF.',
+        'Unter der Analyse wählst du die Bausteine fürs PDF. Sie sind sortiert: was im Ankauf und im Bestand gilt, was nur im Ankauf zählt und was erst im Bestand. Dazu steht, welche Gruppe bei diesem Objekt greift. Das Urteil steht nur einmal im PDF, in der Gesamtbewertung — und was schon gerechnet im PDF steht, kommt nicht noch einmal als Text.', LU_NACH,
+        { was: 'Haken setzen oder abwählen.', warum: 'Jedes PDF hat einen anderen Leser.', folge: 'Die Auswahl merkt sich DealPilot je Objekt.' });
+      var cb = function () { return document.getElementById('ai-pdf-sec-fotos'); };
+      if (cb() && cb().offsetWidth) {
+        await zeige(function () { return cb().closest('label') || cb(); }, 8);
+        await kmPause(1200);
+        cb().click(); await warte(500);
+        DPM_KU.messung.fotosAus = !cb().checked;
+        await kmSag(s, 'Je Objekt gemerkt', 'Ohne Fotos kein <b>optischer Eindruck</b> — Haken ab. Die Auswahl merkt sich DealPilot für <b>dieses Objekt</b>.',
+          'Dieses Haus hat keine Fotos, also nehmen wir den optischen Eindruck heraus. Die Auswahl gilt für dieses Objekt und ist beim nächsten Öffnen wieder da — ein anderes Objekt behält seine eigene.', LU_NACH,
+          { was: 'Ein Haken weniger.', warum: 'Jedes Objekt braucht sein eigenes PDF.', folge: 'Gespeichert mit dem Objekt.' });
+      }
+      det.open = false;
+    }
+  }
+
+  /* ── Szene 9e · zurück zum Webinar-Objekt ── */
+  async function kuS5(s) {
+    var ov = q('#oabi-ov'); if (ov) ov.remove(); var mo = q('#mfh-modal'); if (mo) mo.remove();
+    if (_rh) _rh.ku = false;
+    reiter('s0');
+    try { if (window.dpTabSwitchSave) await window.dpTabSwitchSave(); } catch (e) {}
+    if (_ku.w && window._currentObjKey !== _ku.w && typeof window.loadSaved === 'function') await window.loadSaved(_ku.w);
+    await warteAuf(function () { return window._currentObjKey === _ku.w && /\S/.test(wert('str')); }, 9000);
+    DPM_KU.zurueck = { soll: _ku.w, ist: window._currentObjKey, str: wert('str'), kuerzel: wert('kuerzel') };
+    await warte(900);
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+    await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
+    await kmSag(s, 'Zurück zur Parkstraße', 'Das gilt für jedes Objekt, auch für unser Haus. Weiter mit <b>' + (wert('str') ? wert('str') + ' ' + wert('hnr') : 'der Parkstraße') + '</b>.',
+      'So liest DealPilot Unterlagen — bei jedem Objekt, auch bei unserem Haus. Wir gehen zurück zur Parkstraße neun und schauen uns das Ergebnis an.', LU_NACH,
+      { was: 'Nichts — wir wechseln das Objekt.', warum: 'Das Webinar-Haus ist fertig erfasst.', folge: 'Jetzt kommt das Ergebnis.' });
+  }
+
+  /* Entwicklung und Mitschnitt: nur das Kapitel 9, mit eigenem leerem Webinar-Objekt
+     (?messe=komplett-unterlagen[&kumit]) - nicht für die Schleife */
+  DREHBUECHER['komplett-unterlagen'] = {
+    titel: 'Komplettbeispiel · Kapitel 9 Unterlagen', unterzeile: 'Nur zur Entwicklung und für den Mitschnitt', objekt: null,
+    abspann: [{ ms: 3000, html: ABSPANN_LOGO }],
+    aufraeumen: function () { DREHBUECHER['komplett-mfh'].aufraeumen(); },
+    szenen: [
+      async function (s) {
+        if (kmParam('schleife') != null) { stopp(); throw 'stopp'; }
+        _km = {}; DPM_KM.gespielt = []; DPM_KM.tafeln = [];
+        try { document.documentElement.classList.add('dpm-km'); if (!q('#dpm-km-css')) { var kc = document.createElement('style'); kc.id = 'dpm-km-css'; kc.textContent = 'html.dpm-km #dp-mba-pille{display:none!important}'; document.head.appendChild(kc); } } catch (e) {}
+        await kmLaden();
+        await rhStart(0);
+        return kuS1(s);
+      },
+      kuS2, kuS3, kuS4, kuS5
     ].map(function (f, i) { return async function (s) { await kmHalt(i); return f(s); }; })
   };
 
