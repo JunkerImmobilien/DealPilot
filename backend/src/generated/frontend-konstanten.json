@@ -1,11 +1,11 @@
 {
- "erzeugt_am": "2026-10-28T19:41:21.993Z",
+ "erzeugt_am": "2026-10-28T22:33:33.222Z",
  "quellen": {
-  "voice-import": "19e697e6e3a59cff",
+  "voice-import": "147850ca801bbad4",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "ede97e023ec599eb",
-  "index-html": "bb3d6f105ff2fd16",
-  "grest": "773e3e758b5f951c"
+  "index-html": "7ac913d91207b2fa",
+  "grest": "2ca5ed25cafdbaa7"
  },
  "daten": {
   "objektarten": {
@@ -3039,6 +3039,11 @@
    },
    "plz_bereiche": [
     [
+     1940,
+     1999,
+     "BB"
+    ],
+    [
      1000,
      2999,
      "SN"
@@ -3049,7 +3054,12 @@
      "BB"
     ],
     [
-     4900,
+     4600,
+     4639,
+     "TH"
+    ],
+    [
+     4895,
      4938,
      "BB"
     ],
@@ -3059,9 +3069,29 @@
      "SN"
     ],
     [
+     6556,
+     6578,
+     "TH"
+    ],
+    [
      6000,
      6999,
      "ST"
+    ],
+    [
+     7919,
+     7919,
+     "SN"
+    ],
+    [
+     7952,
+     7952,
+     "SN"
+    ],
+    [
+     7985,
+     7985,
+     "SN"
     ],
     [
      7000,
@@ -3074,12 +3104,12 @@
      "SN"
     ],
     [
-     10000,
-     13999,
-     "BE"
+     12529,
+     12529,
+     "BB"
     ],
     [
-     14000,
+     10000,
      14199,
      "BE"
     ],
@@ -3089,17 +3119,37 @@
      "BB"
     ],
     [
+     17261,
+     17291,
+     "BB"
+    ],
+    [
+     17326,
+     17326,
+     "BB"
+    ],
+    [
+     17337,
+     17337,
+     "BB"
+    ],
+    [
      17000,
-     17499,
+     18999,
      "MV"
     ],
     [
-     17500,
-     17999,
-     "MV"
+     19273,
+     19273,
+     "NI"
     ],
     [
-     18000,
+     19307,
+     19369,
+     "BB"
+    ],
+    [
+     19000,
      19999,
      "MV"
     ],
@@ -3115,31 +3165,31 @@
     ],
     [
      21450,
-     21929,
+     21529,
      "SH"
     ],
     [
-     21930,
-     22113,
-     "SH"
+     21530,
+     21999,
+     "NI"
     ],
     [
-     22114,
-     22529,
+     22000,
+     22799,
      "HH"
     ],
     [
-     22530,
+     22800,
      22999,
      "SH"
     ],
     [
-     23000,
+     23920,
      23999,
-     "SH"
+     "MV"
     ],
     [
-     24000,
+     23000,
      25999,
      "SH"
     ],
@@ -3149,62 +3199,62 @@
      "NI"
     ],
     [
-     27000,
+     27498,
+     27498,
+     "SH"
+    ],
+    [
      27499,
-     "HB"
+     27499,
+     "HH"
     ],
     [
      27500,
+     27580,
+     "HB"
+    ],
+    [
+     27000,
      27999,
      "NI"
     ],
     [
      28000,
-     28999,
+     28779,
      "HB"
     ],
     [
-     29000,
-     29999,
+     28780,
+     28999,
      "NI"
     ],
     [
-     30000,
+     29410,
+     29416,
+     "ST"
+    ],
+    [
+     29000,
      31999,
      "NI"
     ],
     [
      32000,
-     32849,
-     "NW"
-    ],
-    [
-     32850,
-     32849,
-     "NW"
-    ],
-    [
-     33000,
      33999,
      "NW"
     ],
     [
-     34000,
-     34329,
-     "HE"
-    ],
-    [
-     34330,
-     34399,
+     34346,
+     34355,
      "NI"
     ],
     [
      34400,
-     34629,
-     "HE"
+     34439,
+     "NW"
     ],
     [
-     34630,
+     34000,
      36399,
      "HE"
     ],
@@ -3215,38 +3265,78 @@
     ],
     [
      36470,
-     37199,
+     36999,
      "HE"
     ],
     [
      37200,
+     37299,
+     "HE"
+    ],
+    [
+     37300,
+     37359,
+     "TH"
+    ],
+    [
+     37670,
+     37671,
+     "NW"
+    ],
+    [
+     37688,
+     37688,
+     "NW"
+    ],
+    [
+     37696,
+     37696,
+     "NW"
+    ],
+    [
+     37000,
      37999,
      "NI"
     ],
     [
-     38000,
+     38486,
      38489,
-     "NI"
-    ],
-    [
-     38490,
-     38559,
      "ST"
     ],
     [
-     38560,
-     38879,
-     "NI"
-    ],
-    [
-     38880,
-     38899,
+     38820,
+     38999,
      "ST"
     ],
     [
-     38900,
+     38000,
+     38819,
+     "NI"
+    ],
+    [
+     39000,
      39999,
      "ST"
+    ],
+    [
+     48455,
+     48465,
+     "NI"
+    ],
+    [
+     48479,
+     48484,
+     "NI"
+    ],
+    [
+     48486,
+     48492,
+     "NI"
+    ],
+    [
+     48499,
+     48531,
+     "NI"
     ],
     [
      40000,
@@ -3255,18 +3345,33 @@
     ],
     [
      49000,
-     49509,
+     49459,
+     "NI"
+    ],
+    [
+     49460,
+     49549,
      "NW"
     ],
     [
-     49510,
-     49849,
+     49550,
+     49999,
      "NI"
     ],
     [
-     49850,
-     49999,
-     "NI"
+     51598,
+     51598,
+     "RP"
+    ],
+    [
+     53400,
+     53599,
+     "RP"
+    ],
+    [
+     53619,
+     53619,
+     "RP"
     ],
     [
      50000,
@@ -3275,36 +3380,6 @@
     ],
     [
      54000,
-     54439,
-     "RP"
-    ],
-    [
-     54440,
-     54559,
-     "RP"
-    ],
-    [
-     54560,
-     54669,
-     "RP"
-    ],
-    [
-     54670,
-     54699,
-     "RP"
-    ],
-    [
-     55000,
-     55299,
-     "RP"
-    ],
-    [
-     55300,
-     55999,
-     "RP"
-    ],
-    [
-     56000,
      56999,
      "RP"
     ],
@@ -3314,13 +3389,8 @@
      "NW"
     ],
     [
-     57500,
-     57647,
-     "RP"
-    ],
-    [
-     57648,
-     57939,
+     57490,
+     57999,
      "RP"
     ],
     [
@@ -3329,28 +3399,48 @@
      "NW"
     ],
     [
+     63739,
+     63939,
+     "BY"
+    ],
+    [
+     65558,
+     65558,
+     "RP"
+    ],
+    [
+     65582,
+     65582,
+     "RP"
+    ],
+    [
+     65623,
+     65626,
+     "RP"
+    ],
+    [
+     65629,
+     65629,
+     "RP"
+    ],
+    [
      60000,
      65999,
      "HE"
     ],
     [
-     66000,
-     66459,
-     "SL"
-    ],
-    [
-     66460,
+     66480,
      66509,
      "RP"
     ],
     [
-     66510,
-     66839,
-     "SL"
-    ],
-    [
      66840,
      66999,
+     "RP"
+    ],
+    [
+     66000,
+     66839,
      "SL"
     ],
     [
@@ -3359,39 +3449,44 @@
      "RP"
     ],
     [
-     68000,
-     68309,
-     "BW"
+     68519,
+     68519,
+     "HE"
     ],
     [
-     68310,
+     68600,
      68649,
      "HE"
     ],
     [
-     68650,
-     69240,
-     "BW"
-    ],
-    [
-     69241,
      69434,
-     "BW"
-    ],
-    [
-     69435,
-     69517,
+     69434,
      "HE"
     ],
     [
+     69483,
+     69492,
+     "HE"
+    ],
+    [
+     69509,
+     69513,
+     "HE"
+    ],
+    [
+     69517,
      69518,
-     69999,
+     "HE"
+    ],
+    [
+     68000,
+     79999,
      "BW"
     ],
     [
-     70000,
-     79999,
-     "BW"
+     88100,
+     88179,
+     "BY"
     ],
     [
      80000,
@@ -3400,56 +3495,51 @@
     ],
     [
      88000,
-     88099,
-     "BW"
-    ],
-    [
-     88100,
-     88499,
-     "BW"
-    ],
-    [
-     88500,
-     88799,
-     "BW"
-    ],
-    [
-     88800,
-     88899,
+     88999,
      "BW"
     ],
     [
      89000,
-     89089,
-     "BY"
-    ],
-    [
-     89090,
-     89099,
+     89199,
      "BW"
     ],
     [
-     89100,
-     89299,
+     89200,
+     89499,
      "BY"
     ],
     [
-     89300,
-     89619,
-     "BW"
-    ],
-    [
-     89620,
+     89500,
      89999,
-     "BY"
+     "BW"
+    ],
+    [
+     96515,
+     96529,
+     "TH"
+    ],
+    [
+     97877,
+     97877,
+     "BW"
+    ],
+    [
+     97896,
+     97896,
+     "BW"
+    ],
+    [
+     97900,
+     97900,
+     "BW"
+    ],
+    [
+     97910,
+     97999,
+     "BW"
     ],
     [
      90000,
-     96999,
-     "BY"
-    ],
-    [
-     97000,
      97999,
      "BY"
     ],
@@ -3524,7 +3614,7 @@
      },
      {
       "h": "Investition — Kaufpreis und Kaufnebenkosten",
-      "text": "Trag den Kaufpreis ein und darunter die Kaufnebenkosten. Jede Position gibt es doppelt — in Prozent und in Euro; änderst du eins, rechnet DealPilot das andere nach:\n• Makler\n• Notar\n• Grundbuchamt (bei neuen Objekten mit 0,5 % vorbelegt)\n• Grunderwerbsteuer (neu vorbelegt mit 6,5 % — prüf den Satz deines Bundeslands)\n• Sonstige — Bausachverständiger, Anfahrt, Gutachten\n\nDaraus entstehen Summe Nebenkosten und die Gesamtinvestition = Kaufpreis + Nebenkosten + Sanierungskosten + Inventarkosten. Der Markt-Faktor (Kaufpreis ÷ Jahres-Nettokaltmiete) rechnet sich selbst.\n\nUnter Sanierung schätzt du Gewerke ab und übernimmst die Summe in die Sanierungskosten. DealPilot prüft dabei die 15 %-Grenze (§ 6 Abs. 1 Nr. 1a EStG) — gemessen netto, deshalb wählst du, ob dein Betrag brutto oder netto ist. Inventarkosten (Küche, Möbel, Geräte …) zählen nicht zur Grenze und werden separat abgeschrieben."
+      "text": "Trag den Kaufpreis ein und darunter die Kaufnebenkosten. Jede Position gibt es doppelt — in Prozent und in Euro; änderst du eins, rechnet DealPilot das andere nach:\n• Makler\n• Notar\n• Grundbuchamt (bei neuen Objekten mit 0,5 % vorbelegt)\n• Grunderwerbsteuer (neu vorbelegt mit 6,5 % — prüf den Satz deines Bundeslands)\n• Sonstige — Bausachverständiger, Anfahrt, Gutachten\n\nDaraus entstehen Summe Nebenkosten und die Gesamtinvestition = Kaufpreis + Nebenkosten + Sanierungskosten. Inventar (Küche, Möbel) steckt im Kaufpreis und kommt nicht noch einmal dazu. Der Markt-Faktor (Kaufpreis ÷ Jahres-Nettokaltmiete) rechnet sich selbst.\n\nUnter Sanierung schätzt du Gewerke ab und übernimmst die Summe in die Sanierungskosten. DealPilot prüft dabei die 15 %-Grenze (§ 6 Abs. 1 Nr. 1a EStG) — gemessen netto, deshalb wählst du, ob dein Betrag brutto oder netto ist. Inventarkosten (Küche, Möbel, Geräte …) zählen nicht zur Grenze und werden separat abgeschrieben."
      },
      {
       "h": "Miete — Einnahmen und Mietentwicklung",
@@ -3630,7 +3720,7 @@
      },
      {
       "h": "EK-Rendite — was dein Eigenkapital wirklich erwirtschaftet",
-      "text": "Die Eigenkapital-Rendite (EK-Rendite p.a.) zeigt die jährliche Rendite, die dein eingesetztes Eigenkapital über den Betrachtungszeitraum (typisch 10 Jahre) erwirtschaftet. Sie ist die ehrlichste Antwort auf die Frage: „Was bringt mir das Investment, gemessen am Geld, das ich tatsächlich aus eigener Tasche eingebracht habe?\"\n\nDie EK-Rendite berücksichtigt:\n• Alle laufenden Cashflows nach Steuern\n• Die Tilgung (Vermögensaufbau durch den Mieter)\n• Die Wertsteigerung der Immobilie\n• Den Steuervorteil aus V+V-Verlusten\n\nGerade bei Immobilien-Investments mit Hebel kann die EK-Rendite deutlich höher liegen als die reine Mietrendite — weil ein Teil der Wertsteigerung und Tilgung auf Eigenkapital wirkt, das nur einen Bruchteil des Gesamtwerts darstellt.\n\nSpezialfall Vollfinanzierung: Wie der Equity Multiple wird auch die EK-Rendite bei null oder sehr geringem Eigenkapital sehr hoch oder mathematisch unendlich. In diesen Fällen sind absolute Cashflows und Vermögenszuwachs aussagekräftiger.\n\nTypische Werte über 10 Jahre (deutsche Wohnimmobilien):\n• Unter 4 % — schwach\n• 4–8 % — solide\n• 8–15 % — attraktiv\n• Über 15 % — starker Hebel-Effekt, meist niedriger EK-Einsatz"
+      "text": "Die EK-Rendite p.a. (vor Steuern) im Reiter Kennzahlen ist eine Kennzahl des ersten Jahres: der Cashflow vor Steuern — Miete minus nicht umlagefähige Kosten, Zinsen und Tilgung — geteilt durch dein eingesetztes Eigenkapital. Vor Steuern, damit sie zwischen Anlegern mit verschiedenem Steuersatz vergleichbar ist.\n\nNicht darin enthalten sind:\n• der Steuervorteil aus V+V-Verlusten\n• die Tilgung als Vermögensaufbau (sie ist abgezogen)\n• die Wertsteigerung der Immobilie\n\nDeshalb kann die EK-Rendite negativ sein, obwohl das Objekt Vermögen aufbaut. Den Blick über die ganze Haltedauer — mit Tilgung und Wertsteigerung — zeigen Equity Multiple und Vermögenszuwachs; die Phasentabelle führt zusätzlich die EK-Rendite nach Steuern (Cashflow nach Steuern ÷ Eigenkapital im Objekt).\n\nSpezialfall Vollfinanzierung: Wie der Equity Multiple wird auch die EK-Rendite bei null oder sehr geringem Eigenkapital sehr hoch oder mathematisch unendlich. In diesen Fällen sind absolute Cashflows und Vermögenszuwachs aussagekräftiger."
      },
      {
       "h": "Zinsrisiko — was die Anschlussfinanzierung kostet",
@@ -5243,7 +5333,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "dfeea5b7b1ec82b7",
+  "hilfe": "5cceeec90bff4f75",
   "bewertung": "bca98c7b04c452b7"
  }
 }

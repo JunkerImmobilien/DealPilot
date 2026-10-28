@@ -21,7 +21,10 @@
          Fassung B, gewaehlt am 08.08.2026. margin-left bleibt — das ist
          Layout, nicht Optik. */
       ".oabi-boarding .bdg-brand .x{width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));color:var(--wl-e8cc7a, #E8CC7A);box-shadow:0 2px 8px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:0;margin-left:8px;cursor:pointer;position:relative;flex:0 0 auto;transition:background .16s,border-color .16s,color .16s,transform .16s}",
-      ".oabi-boarding .bdg-brand .x svg{width:15px;height:15px;pointer-events:none}",
+      ".oabi-boarding .bdg-brand .x svg{width:15px;height:15px;pointer-events:none;flex:0 0 auto}",
+      /* v3029b · Messkabine 28.10.2026: das Kreuz war 2 x 15 px breit - .btn,button in style.css setzt padding 8px 14px !important,
+         bei 32 px Breite blieben dem SVG 2 px. Innenabstand hier ausdruecklich null, Tippflaeche bleibt ::after (44 px). */
+      ".oabi-boarding .bdg-brand .x{padding:0 !important;min-height:0 !important;display:inline-flex;align-items:center;justify-content:center}",
       ".oabi-boarding .bdg-brand .x::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px);background:transparent}",
       ".oabi-boarding .bdg-brand .x:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}",
       ".oabi-boarding .bdg-brand .x:active{transform:scale(.94)}",

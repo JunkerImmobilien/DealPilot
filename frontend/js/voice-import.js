@@ -152,7 +152,9 @@
     hg_nul: 'Hausgeld-Anteil, der NICHT umlegbar ist, in Euro pro Jahr',
     grundsteuer: 'Grundsteuer in Euro pro Jahr', ul_sonst: 'Sonstige umlagefähige Kosten in Euro pro Jahr',
     weg_r: 'WEG-Ruecklage in Euro pro Jahr', eigen_r: 'Eigene Rücklage in Euro pro Jahr',
-    mietausfall: 'Mietausfallwagnis in Prozent', nul_sonst: 'Sonstige nicht umlagefähige Kosten in Euro pro Jahr',
+    /* v3029-import · Das Feld #mietausfall ist „Kalkulat. Mietausfall / Jahr" in EURO. Hier stand
+       „in Prozent" - diktierte „2 Prozent" landeten als 2 €/Jahr (Soll bei 800 € Miete: 192 €). */
+    mietausfall: 'Kalkulatorischer Mietausfall in Euro pro Jahr (NICHT Prozent). Nennt der Nutzer einen Prozentsatz, rechne ihn mit der Nettokaltmiete × 12 in Euro um; ohne bekannte Miete leer lassen', nul_sonst: 'Sonstige nicht umlagefähige Kosten in Euro pro Jahr',
     bwk_ul_pct: 'Bewirtschaftungskosten umlagefähig in Prozent', bwk_nul_pct: 'Bewirtschaftungskosten nicht umlagefähig in Prozent',
     bwk_kp_pct: 'Bewirtschaftungskosten in Prozent vom Kaufpreis',
     mietspiegel: 'Mietspiegel in Euro pro m2', me_soll: 'Soll-Miete in Euro pro m2',
@@ -6203,7 +6205,9 @@
     var san   = _rfNum(_rfFeld('san')) || 0;
     var moebl = _rfNum(_rfFeld('moebl')) || 0;
     var ze    = _rfNum(_rfFeld('ze')) || 0;
-    var gi    = kp + nkEur + san + moebl;
+    /* v3029-rechnen: Inventar steckt im Kaufpreis (v2261, DealKpis gi = kp + nk + san) - bis v3028
+       kam moebl hier noch einmal dazu, und das Darlehen d1 = gi - ek war um den Moebelbetrag zu hoch. */
+    var gi    = kp + nkEur + san;
 
     /* Eigenkapital: gesagt, sonst aus der EK-Quote der Einstellungen. */
     var ek = _rfNum(_rfFeld('ek')), ekQuelle = 'gesagt';

@@ -433,7 +433,8 @@
     var S = window.State || {}, K = S.kpis || {}, rows = S.cfRows || [];
     var sperren = [], warnen = [];
 
-    if (!(zahl(K.gi) > 0)) sperren.push({ was: 'Kaufpreis', wo: 'Reiter Investition' });
+    /* v3029-pdf · die Sperre heisst „Kaufpreis" und prueft jetzt auch den Kaufpreis (bisher K.gi) */
+    if (!(zahl(K.kp) > 0)) sperren.push({ was: 'Kaufpreis', wo: 'Reiter Investition' });
     if (!(zahl(K.nkm_j) > 0)) sperren.push({ was: 'Mieteinnahme', wo: 'Reiter Objekt' });
 
     var darlehen = feldZahl('d1_betrag') + feldZahl('d2_betrag');
@@ -1049,7 +1050,10 @@
       ['EK-Rendite', pct(K.ekr, 2), 'p. a., vor Steuern'],
       ['Interner Zinsfuß (IRR)', da(K.irr) === null ? 'nicht bestimmbar' : pct(K.irr, 2), ''],
       /* v2992 · bis hier rows[0].nkm_y - im Rumpfjahr (Kauf 23.12.2024) die Miete EINES Monats „im ersten Jahr" */
-      ['Kaltmiete', da(K.wm_j) !== null ? eur(K.wm_j) : (rows[1] ? eur(rows[1].nkm_y) : '-'), 'pro Jahr, inkl. Zusatzeinnahmen'],
+      /* v3029-pdf · K.wm_j ist NKM + Zusatzeinnahmen + NK-Vorauszahlungen (calc.js wm_j), also eine
+         Warmmiete - Westerfeldstr. 140 zeigte hier 41.147 € „Kaltmiete", die Kette darunter 39.420 €.
+         Jetzt K.nkm_j, dieselbe Zahl wie „Kaltmiete inkl. Zusatzeinnahmen / Jahr". */
+      ['Kaltmiete', da(K.nkm_j) !== null ? eur(K.nkm_j) : (rows[1] ? eur(rows[1].nkm_y) : '-'), 'pro Jahr, inkl. Zusatzeinnahmen'],
       ['Equity Multiple', da(K.em) === null ? '-' : fmt(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
       ['Deal Score', (SC && SC.score) ? fmt(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']
@@ -1231,12 +1235,19 @@
           ph('Kaltmiete / Jahr', eur(K.nkm_j), eur(K.nkm_ezb), eur(K.nkm_an)),
           ph('Bewirtschaftung (nicht umlagef.)', eur(K.bwk_cf), eur(K.bwk_cf_ezb), eur(K.bwk_cf_an)),
           ph('Zinsen', eur(K.zins_j), eur(K.zins_ezb), eur(K.zins_an)),
-          ph('Tilgung', eur(K.tilg_j), eur(K.tilg_ezb), eur(K.tilg_an)),
+          ph('Tilgung', eur(K.tilg_j), eur(K.tilg_ezb), eur(K.tilg_an))
+        ].concat(
+          /* v3029-pdf · calc.js zieht in cf_op / cf_op_ezb / cf_op_an auch die Bausparrate ab
+             (bspar_y, bspar_y_ezb, bspar_y_an) - die Zeile fehlte, die Spalte ging bei
+             Tilgungsaussetzung nicht auf. Nur, wenn in einer Phase eine Rate laeuft. */
+          ((K.bspar_j || 0) > 0.5 || (K.bspar_ezb || 0) > 0.5 || (K.bspar_an || 0) > 0.5)
+            ? [ph('Bausparrate', eur(K.bspar_j || 0), eur(K.bspar_ezb || 0), eur(K.bspar_an || 0))] : []
+        ).concat([
           { werte: ['Cashflow vor Steuern', eur(K.cf_op), eur(K.cf_op_ezb), eur(K.cf_op_an)], fett: true },
           ph('Steuern (Belastung -, Erstattung +)', stD(K.cf_op, K.cf_ns), stD(K.cf_op_ezb, K.cf_ns_ezb), stD(K.cf_op_an, K.cf_ns_an)),
           { werte: ['Cashflow nach Steuern', eur(K.cf_ns), eur(K.cf_ns_ezb), eur(K.cf_ns_an)], fett: true },
           { werte: ['Cashflow nach Steuern / Monat', eur((K.cf_ns || 0) / 12, 2), eur((K.cf_ns_ezb || 0) / 12, 2), eur((K.cf_ns_an || 0) / 12, 2)], fett: true }
-        ],
+        ]),
         { titel: 'Drei Phasen', hinweis: 'Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.' });
 
       /* Kennzahlen je Phase - die Zellen hat calc bereits gefuellt
@@ -1295,10 +1306,13 @@
     /* v2830 · ALLE Jahre (das Investment-PDF zeigt den ganzen Betrachtungs-
        zeitraum, hier standen nur zehn) und dazu Steuer und Cashflow nach
        Steuern je Jahr - dieselben Felder wie die Projektion in pdf.js. */
+    /* v3029-pdf · mit Bausparvertrag zeigt die vierte Spalte Tilgung + Sparrate: nach der Zuteilung ist
+       bspar_y 0 und die Tilgung des Bauspardarlehens steht in ty (calc.js) - die Spalte zeigte 0, die
+       Zeile ging nicht auf; ebenso fehlte die Tilgung eines Darlehens II. */
     var _bsvJ = rows.some(function (r) { return (r.bspar_y || 0) > 0; });
     platz(52, 'Cashflow-Entwicklung', (adr || 'Objekt') + ' · ' + (rows.length || 0) + ' Jahre');
     abschnitt('Cashflow je Jahr');
-    var sp = [['Jahr', 13], ['Kaltmiete', 20], ['Bewirtsch.', 19], ['Zins', 19], [_bsvJ ? 'Bausparr.' : 'Tilgung', 19], ['CF v. St.', 19], ['Steuer', 17], ['CF n. St.', 19], ['Restschuld', 22], ['LTV', 13]];
+    var sp = [['Jahr', 13], ['Kaltmiete', 20], ['Bewirtsch.', 19], ['Zins', 19], [_bsvJ ? 'Tilg.+BSV' : 'Tilgung', 19], ['CF v. St.', 19], ['Steuer', 17], ['CF n. St.', 19], ['Restschuld', 22], ['LTV', 13]];
     var fak = CW / sp.reduce(function (a, s) { return a + s[1]; }, 0);
     function tabZeile(werte, fett, kopfzeile) {
       var x = L;
@@ -1322,11 +1336,11 @@
         if (y > H - 30) { doc.addPage(); kopf('Cashflow-Entwicklung', 'Fortsetzung'); tabZeile(sp.map(function (s) { return s[0]; }), false, true); }
         /* Steuer: tax_y > 0 ist eine Belastung - gezeigt mit Vorzeichen der Kasse (wie pdf.js) */
         var st = da(r.tax_y) === null ? null : -r.tax_y;
-        tabZeile([r.cal || r.y, fmt(r.nkm_y), fmt(r.bwk_cf_y != null ? r.bwk_cf_y : r.bwk_y), fmt(r.zy), fmt(_bsvJ ? r.bspar_y : r.ty), fmt(r.cfop_y),
+        tabZeile([r.cal || r.y, fmt(r.nkm_y), fmt(r.bwk_cf_y != null ? r.bwk_cf_y : r.bwk_y), fmt(r.zy), fmt(_bsvJ ? (r.ty || 0) + (r.bspar_y || 0) : r.ty), fmt(r.cfop_y),
           st === null ? '-' : (st > 0.5 ? '+' : '') + fmt(st), fmt(r.cfns_y), fmt(r.rs), pct(r.ltv_y, 0)]);
       });
       y += 1;
-      absatz('Beträge in Euro je Jahr. CF v. St. = Kaltmiete - Bewirtschaftung - Zins - ' + (_bsvJ ? 'Bausparrate' : 'Tilgung') + '. Steuer: + Erstattung, - Belastung. CF n. St. = CF v. St. + Steuer.', { groesse: 7, farbe: 130, zeile: 3.5, links: true });
+      absatz('Beträge in Euro je Jahr. CF v. St. = Kaltmiete - Bewirtschaftung - Zins - ' + (_bsvJ ? 'Tilgung - Bausparrate (nach der Zuteilung: Tilgung des Bauspardarlehens)' : 'Tilgung') + '. Steuer: + Erstattung, - Belastung. CF n. St. = CF v. St. + Steuer.', { groesse: 7, farbe: 130, zeile: 3.5, links: true });
       y += 5;
     }
 
@@ -1397,11 +1411,18 @@
          die Seite blieb leer. ~9 Zeilen + Satz = 70 mm. */
       platz(70, 'Einheiten und Zustand', 'Fortsetzung');
       abschnitt('Ist gegen Soll');
-      var istJ = (K.nkm_j || 0), sollJ = MFH.s.soll * 12;
+      /* v3029-pdf · Soll wie die App (mfh-einheiten.js istSoll, v2410): Einheiten-Soll PLUS
+         Zusatzeinnahmen (Ist = K.nkm_j enthaelt sie auch) und die Rendite auf DERSELBEN Basis
+         Kaufpreis ueber DealKpis.compute. Hier stand Soll ohne Stellplaetze auf die Gesamt-
+         investition - die Soll-Rendite lag allein durch den Nenner zu niedrig. */
+      var _zeJ = (da(K.ze_j) !== null ? K.ze_j : 0);
+      var istJ = (K.nkm_j || 0), sollJ = MFH.s.soll * 12 + _zeJ;
+      var _bmySoll = null;
+      try { if (window.DealKpis && typeof window.DealKpis.compute === 'function' && K.kp > 0) _bmySoll = window.DealKpis.compute({ kp: K.kp, nkm: MFH.s.soll, ze: _zeJ / 12 }).bmy; } catch (e) {}
       zeile('Kaltmiete p. a. - Ist', eur(istJ));
       zeile('Kaltmiete p. a. - Soll (nach Maßnahmen)', eur(sollJ));
       zeile('Bruttomietrendite Ist (auf Kaufpreis)', pct(K.bmy, 2));
-      zeile('Bruttomietrendite Soll (auf Gesamtinvestition)', da(K.gi) && K.gi > 0 ? pct(sollJ / K.gi * 100, 2) : '-');
+      zeile('Bruttomietrendite Soll (auf Kaufpreis)', da(_bmySoll) !== null ? pct(_bmySoll, 2) : '-');
       zeile('Rechtliche Einheit', MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Gebäude');
       if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + fmt(MFH.s.leerFl, 0) + ' m²');
       if (MFH.s.kosten) zeile('Geplante Maßnahmen', eur(MFH.s.kosten));

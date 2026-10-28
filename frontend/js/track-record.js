@@ -301,7 +301,7 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
 
   var facts = [
     ['Objektart', d.objart || '–'],
-    ['Wohnfläche', (d.wfl || '–') + ' m²'],
+    ['Wohnfläche', d.wfl ? d.wfl + ' m²' : '–'],   /* v3029-pdf · ohne Angabe stand „– m²" */
     ['Baujahr', d.baujahr || '–'],
     ['Kaufdatum', d.kaufdat ? new Date(d.kaufdat).toLocaleDateString('de-DE') : '–'],
     ['Kaufpreis', _euro(d.kp)],
@@ -335,7 +335,9 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
 
   cy += 11;
 
-  var bmy = (k.bmy || 0).toFixed(2).replace('.', ',') + ' %';
+  /* v3029-pdf · gespeicherte KPIs fallen beim Fehlen auf 0 (storage.js extractKpisFromData) - eine
+     Rendite oder ein DSCR von 0 ist keine Aussage. Nicht positiv = „–" statt „0,00". */
+  var bmy = (Number(k.bmy) > 0) ? Number(k.bmy).toFixed(2).replace('.', ',') + ' %' : '–';
   var cfNs = k.cf_ns_yearly || 0;
   var cfNsM = cfNs / 12;
   var dscr = k.dscr || 0;
@@ -347,7 +349,7 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
     { label: 'Bruttomietrendite', val: bmy, color: C.GREEN },
     { label: 'Cashflow n.St. p.a.', val: (cfNs >= 0 ? '+' : '') + _euro(cfNs), color: cfNs >= 0 ? C.GREEN : C.RED },
     { label: 'Cashflow / Mon. (n.St.)', val: (cfNsM >= 0 ? '+' : '') + _euro(cfNsM), color: cfNsM >= 0 ? C.GREEN : C.RED }, /*v898-p5*/
-    { label: 'DSCR', val: dscr.toFixed(2).replace('.', ','), color: C.CH },
+    { label: 'DSCR', val: (Number(dscr) > 0) ? Number(dscr).toFixed(2).replace('.', ',') : '–', color: C.CH },
     { label: 'LTV', val: ltv.toFixed(1).replace('.', ',') + ' %', color: C.CH }
   ];
 
@@ -373,6 +375,14 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
   cy += 30;
 
   // ── ENTWICKLUNG / TIMELINE ─────────────────────
+  /* v3029-pdf · Die Tabelle rechnete hier selbst: Restschuld = Darlehen x (1 - Jahr x 2,5 %)
+     („grobe Schätzung"), Wert ab dem Kaufpreis statt dem Marktwert oben, und
+     parseFloat(mietstg) || 1.5 machte aus eingetragenen 0 % Mietsteigerung 1,5 % (Wert: 2 %).
+     Jetzt nur noch die Projektion des Rechenkerns (State.cfRows) - und die gibt es nur für das
+     Objekt, das gerade offen ist (Schlüssel UND Kaufpreis müssen passen). Für alle anderen
+     entfällt der Abschnitt: lieber keine Prognose als eine geschätzte. */
+  var _trRows = _trackRecordProjektion(obj, d);
+  if (_trRows) {
   doc.setFillColor.apply(doc, C.CH);
   doc.rect(M, cy, CW, 7, 'F');
   doc.setTextColor.apply(doc, C.GOLD);
@@ -382,33 +392,10 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
 
   cy += 11;
 
-  // Generate 5-row projection table
-  var bindj = parseInt(d.d1_bindj || 10);
-  var mstg = (parseFloat(d.mietstg) || 1.5) / 100;
-  var wstg = (parseFloat(d.wertstg) || 2) / 100;
-  var nkmM = parseFloat(d.nkm) || 0;
-  var kp = parseFloat(d.kp) || 0;
-
-  var rows = [];
-  var jahre = [1, 3, 5, bindj, bindj + 5];
-  jahre.forEach(function(j) {
-    var miete = nkmM * Math.pow(1 + mstg, j - 1);
-    var wert = kp * Math.pow(1 + wstg, j);
-    var rs = darl * Math.max(0, 1 - j * 0.025); // grobe Schätzung
-    var equity = wert - rs;
-    rows.push([
-      'Jahr ' + j,
-      Math.round(miete).toLocaleString('de-DE') + ' €',
-      Math.round(wert).toLocaleString('de-DE') + ' €',
-      Math.round(rs).toLocaleString('de-DE') + ' €',
-      Math.round(equity).toLocaleString('de-DE') + ' €'
-    ]);
-  });
-
   doc.autoTable({
     startY: cy,
-    head: [['Jahr', 'Miete/Monat', 'Immobilienwert', 'Restschuld', 'Eigenkapital']],
-    body: rows,
+    head: [['Jahr', 'Kaltmiete/Monat', 'Immobilienwert', 'Restschuld', 'Eigenkapital']],
+    body: _trRows,
     theme: 'striped',
     headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 8.5, fontStyle: 'bold' },
     bodyStyles: { fontSize: 8.5, cellPadding: 1.8 },
@@ -418,6 +405,7 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
   });
 
   cy = doc.lastAutoTable.finalY + 8;
+  }
 
   // ── INVESTMENTTHESE (wenn vorhanden) ───────────
   if (d.thesis) {
@@ -450,6 +438,41 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
     W / 2, H - 8, { align: 'center' });
   doc.text('Erstellt am ' + new Date().toLocaleDateString('de-DE') + ' · Track Record',
     W / 2, H - 4, { align: 'center' });
+}
+
+/* v3029-pdf · Prognose-Zeilen des Track Records aus der Projektion des Rechenkerns (State.cfRows).
+   Nur für das gerade geöffnete Objekt: der Objektschlüssel muss passen UND der Kaufpreis, damit nie
+   die Projektion eines anderen Objekts unter fremder Anschrift steht. Sonst null - der Abschnitt
+   entfällt. Jahre 1, 3, 5, Ende Zinsbindung und fünf Jahre danach, soweit die Projektion reicht. */
+function _trackRecordProjektion(obj, d) {
+  try {
+    var S = window.State;
+    var rows = S && S.cfRows;
+    if (!rows || !rows.length) return null;
+    var key = window._currentObjKey;
+    if (!key || !obj || String(obj.id) !== String(key)) return null;
+    var kpObj = parseFloat(d && d.kp), kpSt = S.kpis && Number(S.kpis.kp);
+    if (!(kpObj > 0) || !(kpSt > 0) || Math.abs(kpObj - kpSt) > 0.5) return null;
+    var bindj = parseInt((d && d.d1_bindj) || 0, 10);
+    var jahre = [1, 3, 5];
+    if (bindj > 0) { jahre.push(bindj); jahre.push(bindj + 5); }
+    var gesehen = {}, out = [];
+    var mon1 = (typeof window._dpPdfMonate1 === 'function') ? window._dpPdfMonate1() : 12;
+    var eu = function (n) { return (n == null || !isFinite(Number(n))) ? '–' : Math.round(Number(n)).toLocaleString('de-DE') + ' €'; };
+    jahre.sort(function (a, b) { return a - b; }).forEach(function (j) {
+      if (gesehen[j] || j < 1 || j > rows.length) return;
+      gesehen[j] = 1;
+      var r = rows[j - 1];
+      /* Rumpfjahr: Monatsmiete durch die gehaltenen Monate, wie das Investment-PDF */
+      var teiler = (j === 1 && mon1 < 12) ? mon1 : 12;
+      out.push([
+        String(r.cal != null ? r.cal : ('Jahr ' + j)) + (teiler < 12 ? ' (' + teiler + ' Mon.)' : ''),
+        eu(r.nkm_y != null ? Number(r.nkm_y) / teiler : null),
+        eu(r.wert_y), eu(r.rs), eu(r.eq_y)
+      ]);
+    });
+    return out.length ? out : null;
+  } catch (e) { return null; }
 }
 
 function _photoPlaceholder(doc, x, y, w, h, C) {

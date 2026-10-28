@@ -1108,7 +1108,9 @@ function _calcImmediate(){
     if (sanIst === 0) {
       sanStatusEl.innerHTML = '<span class="badge badge-muted">Keine Sanierung</span>';
     } else if (sanIstNetto <= sanLimit) {
-      sanStatusEl.innerHTML = '<span class="badge badge-green">✓ Unter Grenze ('+sanPct.toFixed(1).replace('.', ',')+' %) – voll abzugsfähig</span>';
+      /* v3029-rechnen: unter der Grenze ist Erhaltungsaufwand sofort abziehbar - Herstellungskosten
+         im Sinne des § 255 Abs. 2 HGB (Erweiterung, Standardhebung) aber nie. „voll abzugsfaehig" war zu stark. */
+      sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA.">✓ Unter Grenze ('+sanPct.toFixed(1).replace('.', ',')+' %) – Erhaltungsaufwand sofort abziehbar</span>';
     } else {
       sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+sanPct.toFixed(1).replace('.', ',')+' %) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
     }
@@ -1165,8 +1167,11 @@ function _calcImmediate(){
       + fE(_betrag, 0)
       + ' an bezahlten Handwerkerrechnungen'
       + (_grenzeNetto ? ' ohne Umsatzsteuer' : '')
-      + ' in den ersten drei Jahren nach dem Kauf. Was darüber geht, darfst du '
-      + 'nicht mehr sofort absetzen, sondern erst über ' + _sanNd + ' Jahre.';
+      /* v3029-rechnen: wird die Grenze ueberschritten, sind ALLE Aufwendungen der drei
+         Jahre anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) - nicht nur
+         der Teil darueber. So rechnet tax.js auch. */
+      + ' in den ersten drei Jahren nach dem Kauf. Gehst du darüber, darfst du den '
+      + '<b>ganzen</b> Betrag nicht mehr sofort absetzen, sondern nur über ' + _sanNd + ' Jahre.';
   }
 
   // V63.99: Aufschlüsselung der AHK-Berechnung in der Info-Box
@@ -1711,7 +1716,7 @@ function _calcImmediate(){
   var ltv_basis, ltv_basis_label;
   if (_ekInklNkLtv) {
     ltv_basis = gi;
-    ltv_basis_label = 'Gesamtinvestition (KP + KNK)';
+    ltv_basis_label = 'Gesamtinvestition (KP + KNK + Sanierung)';   /* v3029-rechnen: gi = kp + nk + san (Z. 915) */
   } else if (svw > 0 && _svwBelastbar) {
     /* v2996 · nur ein Gutachten- oder Bankwert traegt den LTV; Schaetzung und Angebotsniveau nicht */
     ltv_basis = svw;
@@ -1757,13 +1762,27 @@ function _calcImmediate(){
   } catch (e) {}
   var bindj=v('d1_bindj')||10;State.bindj=bindj;
   var rs=d1, rs2=d2;
+  /* v3029-rechnen · EIN DARLEHENSJAHR WIRD MONAT FUER MONAT VERRECHNET.
+     Bis v3028 lief ein volles Jahr als EIN Schritt: Zins = Restschuld am
+     Jahresanfang x Zinssatz. Banken verrechnen monatlich - die Tilgung eines
+     Monats senkt schon den Zins des naechsten. Gemessen 300.000 € / 3,8 % /
+     2 %: Restschuld nach 10 Jahren 228.628 € (jaehrlich) statt 227.146 €
+     (monatlich, wie der Tilgungsplan der Bank), 1.482 € Zinsen zu viel.
+     Jetzt rechnen Bindung, Anschluss und Darlehen 2 ueber diese Funktion.
+     zinsJ = Jahreszins (Dezimal), rateM = Monatsrate (Zins + Tilgung). */
+  function _jahrMonatlich(r, zinsJ, rateM, monate) {
+    var n = (monate == null) ? 12 : monate, zy = 0, ty = 0;
+    for (var _k = 0; _k < n; _k++) {
+      var _zm = r * zinsJ / 12, _tm = Math.min(r, Math.max(0, rateM - _zm));
+      zy += _zm; ty += _tm; r = Math.max(0, r - _tm);
+    }
+    return { zy: zy, ty: ty, rs: r };
+  }
   for(var y=0;y<bindj;y++){
-    var z=rs*d1z, t=d1_rate_m*12-z;
-    rs=Math.max(0,rs-t);
+    rs=_jahrMonatlich(rs, d1z, d1_rate_m).rs;   /* v3029-rechnen */
     // Tilgung d2 nur wenn Annuität (nicht bei Tilgungsaussetzung)
     if(d2_enabled && d2_type !== 'tilgungsaussetzung'){
-      var z2=rs2*d2z, t2=d2_rate_m*12-z2;
-      rs2=Math.max(0,rs2-t2);
+      rs2=_jahrMonatlich(rs2, d2z, d2_rate_m).rs;   /* v3029-rechnen */
     }
   }
   /* ═══ v2852 · EINE RECHNUNG FUER DIE RESTSCHULD AM ENDE DER ZINSBINDUNG ═══
@@ -1797,16 +1816,9 @@ function _calcImmediate(){
   function _d1Bindung(rsIn, y) {
     var vor = _zbVor(y), mon = _zbIn(y);
     var kB = Math.max(0, Math.min(mon, _zbMon - vor));
-    var zy = 0, ty = 0, r = rsIn;
-    if (kB === 12) {
-      zy = r * d1z; ty = Math.min(r, d1_rate_m * 12 - zy); r = Math.max(0, r - ty);
-    } else {
-      for (var _k = 0; _k < kB; _k++) {
-        var _zm = r * d1z / 12, _tm = Math.min(r, d1_rate_m - _zm);
-        zy += _zm; ty += _tm; r = Math.max(0, r - _tm);
-      }
-    }
-    return { zy: zy, ty: ty, rs: r, kB: kB, mon: mon, vor: vor };
+    /* v3029-rechnen: auch volle Jahre Monat fuer Monat (bis v3028 ein Jahresschritt) */
+    var _jm = _jahrMonatlich(rsIn, d1z, d1_rate_m, kB);
+    return { zy: _jm.zy, ty: _jm.ty, rs: _jm.rs, kB: kB, mon: mon, vor: vor };
   }
   if (_zbStd) {
     var _zbR = d1;
@@ -3386,15 +3398,9 @@ function _calcImmediate(){
         var _zbKA = _zbB.mon - _zbB.kB;
         if (_zbKA > 0 && rs3 > 0) {
           var _zbRateA = (typeof State.rs1 === 'number' ? State.rs1 : State.rs) * anschl_rate_eff;   /* je Jahr, wie bisher */
-          if (_zbKA === 12) {
-            var _zbZa = rs3 * az_eff, _zbTa = Math.min(rs3, Math.max(0, _zbRateA - _zbZa));
-            zy2 += _zbZa; ty2 += _zbTa; rs3 = Math.max(0, rs3 - _zbTa);
-          } else {
-            for (var _zbK = 0; _zbK < _zbKA; _zbK++) {
-              var _zbZm = rs3 * az_eff / 12, _zbTm = Math.min(rs3, Math.max(0, _zbRateA / 12 - _zbZm));
-              zy2 += _zbZm; ty2 += _zbTm; rs3 = Math.max(0, rs3 - _zbTm);
-            }
-          }
+          /* v3029-rechnen: auch das volle Anschlussjahr Monat fuer Monat */
+          var _zbJa = _jahrMonatlich(rs3, az_eff, _zbRateA / 12, _zbKA);
+          zy2 += _zbJa.zy; ty2 += _zbJa.ty; rs3 = _zbJa.rs;
         }
         if (_zbB.vor + _zbB.mon <= _zbMon) State._zbEzbIdx = y - 1;            /* letztes Jahr ganz in der Bindung */
         if (_zbB.vor >= _zbMon && State._zbAnIdx == null) State._zbAnIdx = y - 1;  /* erstes Jahr ganz im Anschluss */
@@ -3403,10 +3409,9 @@ function _calcImmediate(){
         ty2 = d1_rate_m * 12 - zy2;
       } else if (rs3 > 0) {
         // Anschluss-Phase: Annuität bleibt konstant
-        zy2 = rs3 * az_eff;
         var rate_anschl = (typeof State.rs1 === 'number' ? State.rs1 : State.rs) * anschl_rate_eff;  // V354c-anschluss-rs1: D1-only RS (kein D2-Doppelzaehlen)
-        ty2 = Math.max(0, rate_anschl - zy2);
-        if (ty2 > rs3) { ty2 = rs3; }
+        var _anJm = _jahrMonatlich(rs3, az_eff, rate_anschl / 12);   /* v3029-rechnen: monatlich */
+        zy2 = _anJm.zy; ty2 = _anJm.ty;
       } else {
         zy2 = 0; ty2 = 0;
       }
@@ -3528,18 +3533,18 @@ function _calcImmediate(){
         zy2_d2 = rs3_d2 * d2z;
         ty2_d2 = 0;
       } else if (y <= d2_bindj) {
-        // Zinsbindungsphase: Annuitaet
-        zy2_d2 = rs3_d2 * d2z;
-        ty2_d2 = Math.min(rs3_d2, d2_rate_m * 12 - zy2_d2);
+        // Zinsbindungsphase: Annuitaet - v3029-rechnen: Monat fuer Monat
+        var _d2Jm = _jahrMonatlich(rs3_d2, d2z, d2_rate_m);
+        zy2_d2 = _d2Jm.zy; ty2_d2 = _d2Jm.ty;
       } else if (d2_anschl_enable) {
         // Eigene Anschlussfinanzierung (Checkbox)
-        zy2_d2 = rs3_d2 * d2_az;
         var _rate_d2_an = rs3_d2 * (d2_az + d2_at);
-        ty2_d2 = Math.min(rs3_d2, Math.max(0, _rate_d2_an - zy2_d2));
+        var _d2JmA = _jahrMonatlich(rs3_d2, d2_az, _rate_d2_an / 12);   /* v3029-rechnen */
+        zy2_d2 = _d2JmA.zy; ty2_d2 = _d2JmA.ty;
       } else {
         // Variante (c): laeuft mit eigener Annuitaet weiter (durchfinanziert)
-        zy2_d2 = rs3_d2 * d2z;
-        ty2_d2 = Math.min(rs3_d2, d2_rate_m * 12 - zy2_d2);
+        var _d2JmC = _jahrMonatlich(rs3_d2, d2z, d2_rate_m);   /* v3029-rechnen */
+        zy2_d2 = _d2JmC.zy; ty2_d2 = _d2JmC.ty;
       }
       // Y1-Anteiligkeit fuer D2 (eigenes Auszahlungsdatum d2_auszahl, sonst WU-Fallback)
       if (y === 1 && typeof window.DealPilotAnteilig === 'object') {
@@ -4681,13 +4686,18 @@ function renderPhaseTable() {
 
   // V63.35: Excel-Logik — wm/bwk in den Phase-Werten zeigen NKM/NUL für Anzeige-Konsistenz
   // Heute
+  /* v3029-rechnen: DSCR nur mit Kapitaldienst */
+  function _phDscr(nkm, kd) { return (kd > 0) ? nkm / kd : null; }
   var nowVals = {
     wm: K.nkm_j, bwk: K.bwk_cf, zins: K.zins_j, tilg: K.tilg_j,
     cfvst: K.cf_op, ster: K.steuer, cfns: K.cf_ns,
-    bmy: K.bmy, nmy: K.nmy,
+    /* v3029-rechnen · ohne Nenner keine Kennzahl: Kaufpreis 0 gab „0,00 %" und in den
+       Folgespalten „NaN %" (nkm / 0), ohne Kapitaldienst zeigte der DSCR die Jahresmiete
+       (Math.max(1, 0)), ohne Wert den LTV 0 %. Jetzt null -> „—". */
+    bmy: (kp > 0) ? K.bmy : null, nmy: (K.gi > 0) ? K.nmy : null,
     // V63.57: dscr inkl. BSV-Sparrate (wirtschaftlicher Tilgungsersatz)
-    dscr: K.nkm_j / Math.max(1, (K.zins_j + K.tilg_j + (K.bspar_j || 0))),
-    ltv: K.ltv,
+    dscr: _phDscr(K.nkm_j, K.zins_j + K.tilg_j + (K.bspar_j || 0)),
+    ltv: (State.ltv_basis > 0) ? K.ltv : null,
     // V63.67: Heute-Wert ist wert_basis (Verkehrswert / Bankbewertung / Kaufpreis)
     rs: K.d1, wert: wert_basis_ph, eq: wert_basis_ph - K.d1
   };
@@ -4701,16 +4711,16 @@ function renderPhaseTable() {
   var ezbVals = {
     wm: K.nkm_ezb, bwk: K.bwk_cf_ezb, zins: K.zins_ezb, tilg: K.tilg_ezb,
     cfvst: K.cf_op_ezb, ster: K.ster_ezb, cfns: K.cf_ns_ezb,
-    bmy: K.nkm_ezb / kp * 100,
+    bmy: (kp > 0) ? K.nkm_ezb / kp * 100 : null,   /* v3029-rechnen */
     // V63.35: NMR/DSCR auf Excel-Logik (NKM − NUL, UL durchlaufend)
-    nmy: (K.nkm_ezb - K.bwk_cf_ezb) / K.gi * 100,
-    dscr: K.nkm_ezb / Math.max(1, (K.zins_ezb + K.tilg_ezb + _bspY_ezb)),
+    nmy: (K.gi > 0) ? (K.nkm_ezb - K.bwk_cf_ezb) / K.gi * 100 : null,
+    dscr: _phDscr(K.nkm_ezb, K.zins_ezb + K.tilg_ezb + _bspY_ezb),
     rs: State.rs,
     // V63.67: EZB-Wert basiert auf wert_basis, nach `bindj` Jahren Wertsteigerung
     wert: wert_basis_ph * Math.pow(1 + wstg_ph, bindj),
     ltv: 0, eq: 0
   };
-  ezbVals.ltv = ezbVals.wert > 0 ? (ezbVals.rs / ezbVals.wert * 100) : 0;
+  ezbVals.ltv = ezbVals.wert > 0 ? (ezbVals.rs / ezbVals.wert * 100) : null;   /* v3029-rechnen */
   ezbVals.eq = ezbVals.wert - ezbVals.rs;
 
   // Anschluss (Jahr nach Zinsbindung)
@@ -4745,29 +4755,31 @@ function renderPhaseTable() {
   var anVals = {
     wm: K.nkm_an, bwk: K.bwk_cf_an, zins: K.zins_an, tilg: K.tilg_an,
     cfvst: K.cf_op_an, ster: K.ster_an, cfns: K.cf_ns_an,
-    bmy: K.nkm_an / kp * 100,
-    nmy: (K.nkm_an - K.bwk_cf_an) / K.gi * 100,
+    bmy: (kp > 0) ? K.nkm_an / kp * 100 : null,   /* v3029-rechnen */
+    nmy: (K.gi > 0) ? (K.nkm_an - K.bwk_cf_an) / K.gi * 100 : null,
     // V63.57: BSV-Sparrate nur wenn sie in dieser Phase noch läuft (after_ezb/never)
-    dscr: K.nkm_an / Math.max(1, (K.zins_an + K.tilg_an + _bspY_an)),
+    dscr: _phDscr(K.nkm_an, K.zins_an + K.tilg_an + _bspY_an),   /* v3029-rechnen */
     rs: rs_anschluss,  // V63.55: angepasst je nach BSV-Status
     // V63.67: Anschluss-Wert basiert auf wert_basis, nach `bindj+1` Jahren
     wert: wert_basis_ph * Math.pow(1 + wstg_ph, bindj + 1),
     ltv: 0, eq: 0
   };
-  anVals.ltv = anVals.wert > 0 ? (anVals.rs / anVals.wert * 100) : 0;
+  anVals.ltv = anVals.wert > 0 ? (anVals.rs / anVals.wert * 100) : null;   /* v3029-rechnen */
   anVals.eq = anVals.wert - anVals.rs;
 
+  /* v3029-rechnen: fehlender Wert (null, NaN, ±∞) -> „—" statt „NaN %" */
+  function _phOk(val) { return val != null && typeof val === 'number' && isFinite(val); }
   function setF(id, val, asMon) {
     var elt = el(id); if (!elt) return;
-    elt.textContent = fE(val, 0, true);
+    elt.textContent = _phOk(val) ? fE(val, 0, true) : '—';
   }
   function setP(id, val) {
     var elt = el(id); if (!elt) return;
-    elt.textContent = (val).toFixed(2).replace('.', ',') + ' %';
+    elt.textContent = _phOk(val) ? (val).toFixed(2).replace('.', ',') + ' %' : '—';
   }
   function setN(id, val) {
     var elt = el(id); if (!elt) return;
-    elt.textContent = (val).toFixed(2).replace('.', ',');
+    elt.textContent = _phOk(val) ? (val).toFixed(2).replace('.', ',') : '—';
   }
 
   // V63.35: Excel-Logik — Anzeige zeigt NKM und nur NUL-Bewirt (UL durchlaufend).
@@ -4784,7 +4796,7 @@ function renderPhaseTable() {
   // V63.62: Helper für Prozentwerte mit ∞/—-Behandlung wenn Bezugsgröße ≤ 0
   function setP_safe(id, val, denom) {
     var elt = el(id); if (!elt) return;
-    if (denom == null || denom <= 0) {
+    if (denom == null || denom <= 0 || !_phOk(val)) {   /* v3029-rechnen */
       elt.textContent = '—';
     } else {
       elt.textContent = (val).toFixed(2).replace('.', ',') + ' %';
@@ -4803,7 +4815,7 @@ function renderPhaseTable() {
   setF('ph-cfnsm-now', nowVals.cfns / 12);
   setP('ph-bmr-now', nowVals.bmy);
   // V63.58: NMR ersetzt durch phasenabhängige CF-Rendite und EK-Rendite
-  setP('ph-cfy-now', nowVals.wert > 0 ? (nowVals.cfns / nowVals.wert * 100) : 0);
+  setP('ph-cfy-now', nowVals.wert > 0 ? (nowVals.cfns / nowVals.wert * 100) : null);   /* v3029-rechnen */
   setP_safe('ph-ekr-now', nowVals.eq > 0 ? (nowVals.cfns / nowVals.eq * 100) : 0, nowVals.eq);
   setN('ph-dscr-now', nowVals.dscr);
   setP('ph-ltv-now', nowVals.ltv);
@@ -4822,7 +4834,7 @@ function renderPhaseTable() {
   setF('ph-cfns-ezb', ezbVals.cfns);
   setF('ph-cfnsm-ezb', ezbVals.cfns / 12);
   setP('ph-bmr-ezb', ezbVals.bmy);
-  setP('ph-cfy-ezb', ezbVals.wert > 0 ? (ezbVals.cfns / ezbVals.wert * 100) : 0);
+  setP('ph-cfy-ezb', ezbVals.wert > 0 ? (ezbVals.cfns / ezbVals.wert * 100) : null);   /* v3029-rechnen */
   setP_safe('ph-ekr-ezb', ezbVals.eq > 0 ? (ezbVals.cfns / ezbVals.eq * 100) : 0, ezbVals.eq);
   setN('ph-dscr-ezb', ezbVals.dscr);
   setP('ph-ltv-ezb', ezbVals.ltv);
@@ -4841,7 +4853,7 @@ function renderPhaseTable() {
   setF('ph-cfns-an', anVals.cfns);
   setF('ph-cfnsm-an', anVals.cfns / 12);
   setP('ph-bmr-an', anVals.bmy);
-  setP('ph-cfy-an', anVals.wert > 0 ? (anVals.cfns / anVals.wert * 100) : 0);
+  setP('ph-cfy-an', anVals.wert > 0 ? (anVals.cfns / anVals.wert * 100) : null);   /* v3029-rechnen */
   setP_safe('ph-ekr-an', anVals.eq > 0 ? (anVals.cfns / anVals.eq * 100) : 0, anVals.eq);
   setN('ph-dscr-an', anVals.dscr);
   setP('ph-ltv-an', anVals.ltv);
@@ -4883,7 +4895,7 @@ function renderPhaseTable() {
   // ZAER-Card: Zinssatz / Rate / CF / DSCR / ΔRate für 3 Phasen
   function _setF(id, val) { var e = el(id); if (e) e.textContent = fE(val, 0, true); }
   function _setP(id, val) { var e = el(id); if (e) e.textContent = (val).toFixed(2).replace('.', ',') + ' %'; }
-  function _setN(id, val) { var e = el(id); if (e) e.textContent = (val).toFixed(2).replace('.', ','); }
+  function _setN(id, val) { var e = el(id); if (e) e.textContent = (val != null && isFinite(val)) ? (val).toFixed(2).replace('.', ',') : '—'; }   /* v3029-rechnen: DSCR ohne Kapitaldienst */
 
   // Zinssätze: heute = aktueller Mischzins, EZB = noch aktueller, Anschluss = anschl_z
   // V63.59 BUGFIX: parseFloat() schneidet bei deutschem Komma ab — "3,8" wurde zu 3,

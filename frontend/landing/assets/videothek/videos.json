@@ -1,6 +1,6 @@
 {
   "_hinweis": "landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
-  "stand": "2026-10-21",
+  "stand": "2026-10-28",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
   "kategorien": [
@@ -53,6 +53,56 @@
       "datei": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.mp4", "datei_ton": "dealpilot-ueberblick-2-objekt-bis-investment-pdf-sprecher.mp4",
       "poster": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.webp",
       "youtube": { "titel": "DealPilot Überblick 2 · Vom neuen Objekt zum DealScore und Investment-PDF", "tags": ["DealPilot", "Mehrfamilienhaus", "DealScore", "Investment-PDF", "Immobilienanalyse"], "youtube_id": null }
+    },
+    {
+     "id": "ueberblick-3-komplettbeispiel-mehrfamilienhaus",
+     "kategorie": "ueberblick",
+     "nr": "Ü3",
+     "dauer": 2628,
+     "titel": "Komplettbeispiel Mehrfamilienhaus",
+     "unterzeile": "Ein Haus, zehn Kapitel: vom leeren Objekt bis zum PDF für die Bank.",
+     "story": "Ein echtes Mehrfamilienhaus mit fünf Wohnungen, jedes Feld von Hand eingegeben, damit du siehst, was wofür gebraucht wird: Objekt und Bodenrichtwert, die Wohnungen mit Zustand und Mietvertrag, Miete, Finanzierung, Steuer, der Marktbericht mit Ertrags- und Sachwert, das Zielbild mit Mieterhöhung je Wohnung. Dazu ein zweites Haus, dessen Unterlagen DealPilot einliest und auswertet, mit Nachreichen von Wirtschaftsplan und Baulastenauskunft. Am Ende stehen Deal Score, Kennzahlen und das Bank-PDF.",
+     "nutzen": "Du siehst den ganzen Weg an einem Haus und weißt danach, welche Angabe welche Zahl bewegt.",
+     "kapitel": [
+        { "t": 0, "titel": "Einstieg", "stichworte": "Komplettbeispiel Mehrfamilienhaus" },
+        { "t": 35, "titel": "Kapitel 1 · Reiter und Eingabestufen", "stichworte": "leeres Objekt Reiter Eingabestufen Marktpreisindikation" },
+        { "t": 125, "titel": "Kapitel 2 · Das Objekt anlegen", "stichworte": "Adresse Nutzungsart Baujahr Grundstück" },
+        { "t": 306, "titel": "Bodenrichtwert und Modernisierung", "stichworte": "Bodenrichtwert Modernisierungspunkte Bruttogrundfläche" },
+        { "t": 488, "titel": "Kapitel 3 · Die Einheiten", "stichworte": "Gebäude Gewerke Wohnungen" },
+        { "t": 558, "titel": "Wohnung für Wohnung", "stichworte": "Fläche Zustand renovierungsbedürftig Übernehmen" },
+        { "t": 751, "titel": "Kapitel 4 · Die Miete", "stichworte": "Kaltmiete Mietvertrag Staffelmiete Mietausfall" },
+        { "t": 919, "titel": "Kapitel 5 · Die Finanzierung", "stichworte": "Kaufpreis Nebenkosten Makler Inventar" },
+        { "t": 1022, "titel": "Das Darlehen", "stichworte": "Darlehen Zins Tilgung Eigenkapital" },
+        { "t": 1102, "titel": "Kapitel 6 · Die Steuer", "stichworte": "Gebäudeanteil Abschreibung AfA" },
+        { "t": 1226, "titel": "Kapitel 7 · Marktbericht und Wertermittlung", "stichworte": "Marktbericht Stichtag Lage" },
+        { "t": 1410, "titel": "Der Liegenschaftszins", "stichworte": "Liegenschaftszins Ertragswert Sachwert" },
+        { "t": 1469, "titel": "Abgleich im Objekt", "stichworte": "Marktbericht Abgleich Mikrolage" },
+        { "t": 1559, "titel": "Kapitel 8 · Das Zielbild", "stichworte": "Zielbild Maßnahmen Modernisierung" },
+        { "t": 1699, "titel": "Mieterhöhung je Wohnung", "stichworte": "Mieterhöhung Soll-Miete Kappungsgrenze Kosten" },
+        { "t": 1878, "titel": "Kapitel 9 · Unterlagen einlesen", "stichworte": "Exposé Mieterliste Grundbuch Teilungserklärung Protokoll" },
+        { "t": 2016, "titel": "Die Übernahme", "stichworte": "Übernahme Quelle Wohnungen" },
+        { "t": 2089, "titel": "Pilot-Analyse mit Unterlagen", "stichworte": "Risiken Kosten Eigentümergemeinschaft" },
+        { "t": 2221, "titel": "Unterlagen nachreichen", "stichworte": "Wirtschaftsplan Hausgeld Baulasten" },
+        { "t": 2443, "titel": "Kapitel 10 · Das Ergebnis", "stichworte": "Deal Score Kennzahlen" },
+        { "t": 2515, "titel": "Das PDF für die Bank", "stichworte": "Bank-PDF Rendite Cashflow DSCR" },
+        { "t": 2590, "titel": "Abschluss", "stichworte": "" }
+     ],
+     "spruch": "Ein Haus, zehn Kapitel, jede Zahl gerechnet.",
+     "datei": "dealpilot-ueberblick-3-komplettbeispiel-mehrfamilienhaus.mp4",
+     "datei_ton": "dealpilot-ueberblick-3-komplettbeispiel-mehrfamilienhaus-sprecher.mp4",
+     "poster": "dealpilot-ueberblick-3-komplettbeispiel-mehrfamilienhaus.webp",
+     "youtube": {
+      "titel": "DealPilot Komplettbeispiel · Mehrfamilienhaus von A bis Z",
+      "tags": [
+       "DealPilot",
+       "Immobilien",
+       "Mehrfamilienhaus",
+       "Kapitalanlage",
+       "Wertermittlung",
+       "Finanzierung"
+      ],
+      "youtube_id": null
+     }
     },
     {
       "id": "modul-02-quick-boarding-zum-objekt", "kategorie": "basis", "nr": "02", "dauer": 243,
@@ -720,6 +770,46 @@
        "Steuer",
        "Vermietung und Verpachtung",
        "Werbungskosten"
+      ],
+      "youtube_id": null
+     }
+    },
+    {
+     "id": "modul-28-unterlagen-einlesen",
+     "kategorie": "spezial",
+     "nr": "28",
+     "dauer": 553,
+     "titel": "Unterlagen einlesen",
+     "unterzeile": "Sieben PDFs auf einmal: gelesen, ausgewertet, übernommen.",
+     "story": "Ein Mehrfamilienhaus mit acht Wohnungen, ohne ein getipptes Feld. Exposé, Mietaufstellung, Grundbuchauszug, Teilungserklärung, Energieausweis und zwei Protokolle der Eigentümerversammlung gehen auf einmal hinein. DealPilot erkennt jede Unterlage, schwärzt Personendaten, liest nur, was wirklich darin steht, und wertet alles gemeinsam aus: Investitionsthese, Risiken mit Betrag und Quelle, die Wohnungen aus der Mieterliste. Die Pilot-Analyse zeigt danach, was absehbar Geld kostet.",
+     "nutzen": "Du siehst, was in den Unterlagen steht und im Exposé fehlt, bevor du ein Angebot machst.",
+     "kapitel": [
+        { "t": 0, "titel": "Einstieg", "stichworte": "Mehrfamilienhaus acht Wohnungen" },
+        { "t": 28, "titel": "Kein Feld getippt", "stichworte": "leeres Objekt Exposé Dokumente" },
+        { "t": 70, "titel": "Kapitel 2 · Lesen", "stichworte": "sieben PDFs Art erkennen" },
+        { "t": 140, "titel": "Personendaten geschwärzt", "stichworte": "Schwärzen Quelle" },
+        { "t": 196, "titel": "Gemeinsame Auswertung", "stichworte": "Auswertung Zusammenhang" },
+        { "t": 223, "titel": "Kapitel 3 · Auswerten und übernehmen", "stichworte": "Übernahme Reiter Quelle" },
+        { "t": 299, "titel": "These und Risiken", "stichworte": "Investitionsthese Risiken Dachsanierung" },
+        { "t": 364, "titel": "Übernehmen", "stichworte": "Wohnungen Mieterliste Bekannte Risiken" },
+        { "t": 421, "titel": "Kapitel 4 · Pilot-Analyse", "stichworte": "Unterlagen WEG Ampel" },
+        { "t": 463, "titel": "Was absehbar Geld kostet", "stichworte": "Kosten Sonderumlage Rücklage" },
+        { "t": 500, "titel": "Die genaue Ansicht", "stichworte": "Genau Risiken Stärken" },
+        { "t": 534, "titel": "Abschluss", "stichworte": "" }
+     ],
+     "spruch": "Das Exposé verkauft — die Protokolle erzählen.",
+     "datei": "dealpilot-modul-28-unterlagen-einlesen.mp4",
+     "datei_ton": "dealpilot-modul-28-unterlagen-einlesen-sprecher.mp4",
+     "poster": "dealpilot-modul-28-unterlagen-einlesen.webp",
+     "youtube": {
+      "titel": "DealPilot Modul 28 · Unterlagen einlesen",
+      "tags": [
+       "DealPilot",
+       "Immobilien",
+       "Exposé",
+       "Teilungserklärung",
+       "Eigentümerversammlung",
+       "Due Diligence"
       ],
       "youtube_id": null
      }

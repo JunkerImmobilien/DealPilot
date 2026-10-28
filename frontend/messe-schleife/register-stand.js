@@ -1,10 +1,10 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-28T16:56:46.085Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T21:52:48.826Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
  "stand": "2026-10-28",
- "erzeugt": "2026-10-28T16:56:46.085Z",
- "register_commit": "7c77b641",
- "register_lokal_geaendert": true,
+ "erzeugt": "2026-10-28T21:52:48.826Z",
+ "register_commit": "01c21d6c",
+ "register_lokal_geaendert": false,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
  "dateien": 142,
  "saetze": 18296,

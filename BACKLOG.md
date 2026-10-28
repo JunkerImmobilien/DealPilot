@@ -36,6 +36,46 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N83 · Nach der Vollprüfung v3029 — Marcels Entscheidungen vom 28.10.2026 (abends), nächste Sitzung
+
+Marcel: *„machen wir heute nicht … notier das einfach nur, machen wir nächstes Mal."*
+
+0. **Prod-Rollout v3029 + landing-videothek-7 steht aus.** Vorher müssen die zwei neuen
+   Videos auf Prod. Das scp hat die Freigabeprüfung bei Claude abgelehnt, deshalb führt Marcel
+   `scratchpad/videos-prod-hochladen.sh` selbst per `!` aus (Sitzung c8646e43). Stimmen die
+   md5-Summen, läuft `tools/rollout-prod.ps1 -Freigabe`. Ohne Upload zeigt die Prod-Landing zwei
+   Videos, die nicht abspielen.
+1. **„Bodenrichtwert schätzen" raus.** Marcel: *„totalen Quatsch … brauchen wir nicht."* Zu entfernen:
+   - der Knopf `#brw-ai-btn` (`index.html` ~1167)
+   - der automatische Rückfall `askAi()` nach leerem BORIS-Abruf (`bodenrichtwert.js` ~959)
+   - der Hinweis in `help.js:332` und im Hilfetext an `tab1.bodenrichtwert` (`index.html:1169`)
+
+   Bleibt ein leeres Feld, steht daneben der Weg zum Landesportal (Doktrin „kein Treffer heißt kein
+   Wert"). Prüfen, ob `brw_ki_result` aus `storage.js` (277/637) dann mitfallen kann; gespeicherte
+   Altwerte nicht löschen, nur nicht mehr anzeigen. Marcel sah den Knopf nur auf dem Handy, auf dem
+   Desktop nicht: messen, ob er dort verdeckt oder ausgeblendet ist.
+2. **Leerstand einrechnen.** Marcel: *„zwei Prozent nehmen wir einfach mal an … dann wird's abgezogen."*
+   - Heute füllt `#leerstand` (`main.js:168`, Vorgabe `leerstand_pct` 2 %) nur Score und PDF.
+     `calc.js`, `tax.js`, `deal-kpis.js` und `mietentwicklung.js` lesen das Feld nicht, und das PDF
+     schreibt „Leerstand 2,0 % · Vollvermietung angenommen" (`pdf.js:3969`).
+   - Umsetzen: in der Jahresschleife von der Miete abziehen, dabei klären, wie es zum kalkulatorischen
+     Mietausfall steht (nicht doppelt rechnen).
+   - DealKpis ist ein gespiegelter Kern, danach `rechenkerne-spiegeln`. Prüffälle bewusst neu messen.
+3. **DSCR-Ampel brutto oder netto: recherchieren, wie Banken es in der Praxis machen.** Heute stuft
+   `dscr-engine.js` brutto ein (Miete ÷ Kapitaldienst), ebenso die Risiko-Teilnote (`dealscore.js:155`).
+   Beispiel: brutto 1,20 „Standard", netto 0,96. Mit Quelle belegen, dann Ampel und Score umstellen oder
+   als brutto beschriften.
+4. **Abschlag-Wortlaut im Wert-&-Zielbild-PDF** (`pdf-wert-zielbild.js:76-77`, `:373`, „nach X %
+   Abschlag auf Angebotspreise"): recherchieren, wie es fachlich richtig und schlüssig heißt, und dabei
+   Marcels Regel vom 28.10. beachten, dass niemand die Rechenwege herauslesen soll.
+5. Offen aus v3029, auf Staging nachmessen:
+   - Hausgeld-Aufteilung 22 % aus dem Exposé
+   - Folgen-Kette nach dem Import (Grunderwerbsteuer, Eigenkapital, Mietausfall, AfA) im Browser
+   - Track-Record-Prognose beim offenen Objekt
+   - Seitenbild der Phasentabellen mit Bausparvertrag
+   - KfW mit tilgungsfreien Anlaufjahren ist nicht abgebildet
+   - `bestand-reiter-pruefen` (4 rot) und `feld-waechter` (185 Felder) waren schon vor v3029 rot
+
 ### N82 · Flugplan / Zielbild-Umbau — GEPARKT (28.10.2026)
 
 **GEPARKT:** Marcel am 28.10.2026: „können wir das erstmal los lassen und bauen wir später um?“ — erst nach der Messe (31.10.–01.11.) wieder aufnehmen.

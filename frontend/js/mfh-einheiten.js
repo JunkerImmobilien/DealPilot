@@ -1266,9 +1266,15 @@
     window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), aufgeteilt: wegFeld ? wegFeld.checked : _weg, sollAbJahr: sollAb > 0 ? sollAb : null, aufteilungskosten: _auftK, haus_massnahmen: _hausM.filter(function (m) { return m && m.id; }), stand: new Date().toISOString().slice(0, 10) };   /* v2430: aufteilungskosten · v2966: haus_massnahmen */
     var s = summe(list), meldung = list.length + ' Einheiten übernommen';
     if (list.length) {
-      if (s.flaeche > 0) setzen('wfl', s.flaeche);
+      /* v3029-import · Die Summe ersetzt die Wohnfläche nur, wenn JEDE Einheit eine Fläche hat. Bis
+         v3028 überschrieb eine Teilsumme (5 von 6 Einheiten mit m²) eine richtige Gesamtfläche. */
+      var ohneFl = list.filter(function (e) { return !(zahl(e.wfl) > 0); }).length;
+      if (s.flaeche > 0 && !ohneFl) setzen('wfl', s.flaeche);
+      else if (s.flaeche > 0) meldung += ' · Wohnfläche NICHT übernommen: ' + ohneFl + ' von ' + list.length + ' Einheiten ohne m²';
       setzen('einheiten', s.wohnen);
       if (s.ist > 0) setzen('nkm', s.ist);
+      /* v3029-import · wie nach einer Eingabe von Hand: Mietausfall-Vorgabe in ein leeres Feld */
+      try { if (s.ist > 0 && window.dpImportFolgen) window.dpImportFolgen(['nkm']); } catch (x) {}
       /* v3001b · Marcel 27.10.2026: „wenn man Einheiten anlegt, muss sich der Vermietungsstand
          automatisch anpassen“. Abgeleitet aus dem Status der Einheiten, nie geraten. */
       var vs = vermstandAus(s);

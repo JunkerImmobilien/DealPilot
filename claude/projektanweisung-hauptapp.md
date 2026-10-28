@@ -43593,3 +43593,78 @@ Während der Aufnahme änderten andere Agenten vier Testobjekte (Hölderlinstr. 
 Str. 42) und um 19:15 UTC entstand ein leeres Objekt `3834d152-…` (2026-1126, „Unbenannt“) – nicht aus den
 mitgeschriebenen Läufen, Herkunft offen, nicht gelöscht. `reihe-ueberblick2` ist ebenfalls ein App-Rundgang
 („Vom neuen Objekt zum DealScore“, 5 min) – unverändert.
+
+### Prod-Rollout 28.10.2026 abends · v3018c–v3028b · Prod `1ab5490` (vorher `fa0ff4e`)
+
+**Was.** Alles seit `fa0ff4e` auf Produktion: PDF-Umbrüche und Absender ab Investor (v3018c/c1), nur gültige PDFs
+(v3018d), Jahreswerte mit GENESIS-Leser (v3021/v3021a, Migrationen 023/024), Einstellungen schlank (v3022–d),
+Zahlenfelder deutsch (v3023/a), Vorgaben am Konto (v3024), Objektwissen für Bot/Co-Pilot (v3025),
+Nettokaltmieten-Index und Indexmiete § 557b (v3026), Vertragsübersicht im Reiter Miete (v3027),
+verlangbar ab/wirksam ab (v3028), Webinar-Drehbuch Kapitel 9 (v3021k–k6a), Landing/Messe-Pakete.
+Neu dabei: **v3028a/b** (`efa54a5a`, `82a54ce1`) – „fehlt: Vertragsart“ in der Vertragsübersicht erschien als
+weißer Knopf mit Rahmen. Gemessen an Parkstr. 9: `.sec button:not(…)` in `style.css` setzt Hintergrund, Rahmen,
+Abstand und `text-decoration` mit `!important`; die Modulregel ohne `!important` verlor. Jetzt `!important` am
+ID-Anker `#mv-einheiten-uebersicht` (gewinnt bei beiderseits `!important` über die Spezifität).
+
+**Nachweis.** Staging vorher gesichert (`mb-20261028-1931` 41 MB, `haupt-20261028-1931` 51 MB), Backends gebaut,
+Migration 024 OK; `POST /jahreswerte/abruf` auf Staging: VPI 226, BPI 27, NKM 81 Monate über GENESIS.
+`/zensus/fortgeschrieben?plz=32049` → Herford 5,78 → 6,30 €/m² (Gemeinde-Ebene, NKM 09/2026 111,9 zu 05/2022 102,7).
+gold-audit RC=0 (416 auf der Basislinie). Alle 20 Prüfer RC=0, Buster SAUBER. Browser (Staging, Marcels Konto):
+alle neuen Module mit richtigem Buster geladen; `DpIndexmiete.rechne` mit echter Reihe: Beginn 03/2022, Erklärung
+10/2026, wirksam 12/2026, +17,11 %; Vertragsübersicht Parkstr. 9 „5 Einheiten · 1 Staffel · 4 ohne Angabe“,
+Verweis nach v3028b rot und unterstrichen, Konsole ohne Fehler. Prod: Sicherungen `mb-20261028-2042` 30 MB,
+`haupt-20261028-2042` 15 MB; Migrationen 023/024 OK; HTTP 200. Jahreswerte-Takt auf Prod (5 min nach Start) lud selbst: VPI 226 bis 09/2026, BPI 27 bis 08/2026, NKM 81 bis 09/2026 – wie Staging. Angebotsabschlag 2025 meldet „zu wenig (0/20)“ je Art: auf Prod noch keine Stichprobe, erste Jahresrechnung ab 15.01.
+
+**Video.** Vertonung `komplett-mfh_2026-10-28b_vertont.mp4` fertig: 43:48, 145 MB, 131 Sätze (33 neu mit
+Marcels Stimmklon), 18 Standbilder zusammen 36,4 s; Ton geprüft an drei Stellen (−18 bis −23 dB).
+
+**Rest.** Nicht im Browser abgenommen: PDF-Umbruch (Datei-Download), Co-Pilot Lindenallee (Demo-Konto),
+Admin „Anfragen an Ämter“ und „Jahreswerte“ (Marcel, angemeldet). Übrige offene Punkte wie im Nachtrag oben.
+
+### v3029 · Vollprüfung 28.10.2026 abends: Rechnung, PDFs, Import, Messkabine · Staging `531b3237`
+
+**Was.** Marcels Auftrag „vollumfänglich die gesamte App durchprüfen“, aufgeteilt auf drei Prüfstränge (Rechnung,
+PDFs, Import/Übernahme) und die Messkabine. Die Befunde sind behoben; Einzelheiten stehen in der Commit-Botschaft:
+- Restschuld: volle Jahre werden monatlich gerechnet (300.000 / 3,8 / 2 → 227.146 € nach 10 J.)
+- Vorgabezins nach dem LTV der Vorgabe-Finanzierung
+- 15-%-Ampel im Beleg-Import netto und gegen `sanLimit`
+- Bank-PDF zeigt die Kaltmiete als NKM (vorher Warmmiete)
+- MFH Ist/Soll im PDF rechnet wie die App
+- Tilgung und Bausparrate stehen in allen Cashflow-Ketten getrennt
+- Track Record ohne eigene Schätzung
+- Exposé-Hausgeld wird ×12 auf das Jahr gerechnet
+- PLZ→Land: 23 von 140 Stichproben falsch → 0
+- Wirtschaftsplan und Mietvertrag am neuen Objekt korrekt zugeordnet
+- provisionsfrei = 0 %
+- AfA-Satz folgt dem Baujahr
+- Mieterliste mit Stellplätzen
+- Phasentabelle zeigt „–“ statt „NaN %“
+- Schließ-Kreuz der geführten Eingabe wieder sichtbar (2 × 15 px durch `padding … !important`)
+
+Daneben:
+- **v3029a** (`2efc26e1`): Marktbericht-Stufen auf dem Handy, Abruf und Kontingent untereinander im Kasten
+- **landing-videothek-7** (`bb7c501a`): Ü3 Komplettbeispiel MFH und Modul 28 Unterlagen einlesen in Videothek und Messe-Schleife; 32 Videos, 319 Kapitelmarken. Die MP4s liegen auf Staging, md5 gleich.
+
+**Nachweis.**
+- Prüfer: 19 Werkzeuge RC=0, buster-ebenen SAUBER.
+- `bestand-reiter-pruefen` und `feld-waechter` waren am HEAD **vor** dem Paket schon rot, mit identischen Zahlen (4 rot, 185 Felder ohne Speicherweg). Beides ist Altlast und bleibt offen.
+- Messkabine vor dem Paket: 15 Kombinationen Standardansicht (MFH/ETW/ZFH × 360/390/768/1180/1280) und 15 Aktenmappe, je 9 Reiter. Kein Überlauf, keine JS-Fehler.
+  - Funde: NaN % in der Phasentabelle (behoben) und das Kreuz (behoben).
+  - Die Bedienbarkeits-Meldungen der Aktenmappe (1180/1280) sind **kein Mangel**: Die Einträge liegen in der Scroll-Liste `.dpl-teil-aktionen` und sind unten nur angeschnitten.
+- Geführte Eingabe: auf 390 px alle 19 Fragen durchgegangen, kein Überlauf, keine Platzhalter; auf 1180 px Aktenmappe ebenfalls sauber.
+  - **Eigener Fehlalarm zurückgenommen:** „Startet in der Übersicht“ kam aus meinem Prüfskript (zu schnelle Klickfolge), nicht aus der App.
+- Messe-Schleife Rundgang: alle 15 Ausschnitte an Standbildern geprüft. Sie passen auch nach der Neuaufnahme von 18/19; der Zielbild-Ausschnitt zeigt noch „sofort“ (alte Aufnahme, Videos dürfen abweichen).
+
+**Rest.**
+- Prod-Upload der zwei neuen Videos (scp von der Freigabeprüfung abgelehnt): Marcel führt `scratchpad/videos-prod-hochladen.sh` aus, danach Prod-Rollout.
+- Marcel entscheidet:
+  - „Bodenrichtwert schätzen“ (KI-Schätzung samt automatischem Rückfall in `bodenrichtwert.js:959`) entfernen?
+  - Leerstand rechnet nicht mit (Feld nur im Score/PDF): abziehen oder entfernen?
+  - DSCR-Ampel brutto oder netto?
+  - Abschlag-Wortlaut im Wert-&-Zielbild-PDF.
+- Unsicher, auf Staging nachzumessen:
+  - Hausgeld-Aufteilung 22 % aus dem Exposé
+  - Folgen-Kette nach dem Import im Browser
+  - Track-Record-Prognose beim offenen Objekt
+  - Seitenbild der Phasentabellen mit Bausparvertrag
+- KfW mit tilgungsfreien Anlaufjahren ist nicht abgebildet.

@@ -584,40 +584,61 @@
 
   /* Zentrale Auswertung — genutzt von Anzeige (_sums) UND CSV-Export (csv).
      15-%-Ampel: §6 Abs. 1 Nr. 1a EStG (anschaffungsnahe HK). Basis =
-     Gebäudeanteil (window._lastBmf.geb_pct) der Netto-AK (#ak_total dataset.raw).
+     Gebaeude-Anschaffungskosten aus State._ahk.sanLimit (v3029-rechnen, netto verglichen).
      Orientierungswert — die taggenaue 3-Jahres-Frist folgt als eigener Ausbau. */
   function _aggregate() {
-    var byField = {}, sanierung = 0, total = 0, count = 0;
+    var byField = {}, sanierung = 0, sanNetto = 0, total = 0, count = 0;
     _rows.forEach(function (r) {
       if (!r.keep) return;
       count++; total += r.brutto;
-      if (SANIERUNG[r.kategorie]) sanierung += r.brutto;   // fuer die 15%-Ampel
+      if (SANIERUNG[r.kategorie]) {
+        sanierung += r.brutto;   // Anzeige und Uebernahme: brutto (Werbungskosten des Privatvermieters)
+        /* v3029-rechnen: die 15-%-Grenze misst OHNE Umsatzsteuer (§ 6 Abs. 1 Nr. 1a EStG).
+           Netto vom Beleg, wenn er eine USt ausweist; sonst brutto / 1,19 wie calc.js. */
+        sanNetto += (r.ust > 0 && r.netto > 0) ? r.netto : (r.brutto / 1.19);
+      }
       var f = _feldKarte()[r.kategorie];                       // Sanierung -> bmf_hk (Herstellungskosten Gebaeude)
       if (f) byField[f] = (byField[f] || 0) + r.brutto;
     });
     var uebernahme = 0;
     Object.keys(byField).forEach(function (f) { uebernahme += byField[f]; });
 
-    var el = document.getElementById('ak_total');
-    var akRaw = el && el.dataset && el.dataset.raw ? parseFloat(el.dataset.raw) : NaN;
-    var gebPct = (window._lastBmf && window._lastBmf.geb_pct != null) ? window._lastBmf.geb_pct : null;
-    var ampel = { cls: 'n', html: '', text: '' };
-    if (!isFinite(akRaw) || akRaw <= 0 || gebPct == null) {
-      ampel.html = 'Für die 15-%-Prüfung zuerst die Kaufpreisaufteilung im BMF-Rechner berechnen.';
-      ampel.text = '15-Prozent-Pruefung: Aufteilung noch nicht berechnet';
+    /* v3029-rechnen · DIE GRENZE AUS DERSELBEN RECHNUNG WIE STEUER UND INVESTITION.
+       Bis v3028: Grenze = ak_total x Gebaeudeanteil x 15 %, verglichen mit dem
+       BRUTTO-Betrag der Belege. ak_total enthaelt aber ak_ahk - die geplante
+       Sanierung selbst (bmf-modal.js v2260) - und weder Inventar noch Grundschuld
+       waren herausgerechnet. Gemessen: Kaufpreis 300.000, NK 30.000, Gebaeude 60 %,
+       Sanierung 35.000 brutto: richtig Grenze 29.700, netto 29.412 -> gruen; die
+       Ampel zeigte Grenze 32.850 gegen 35.000 brutto -> rot.
+       Jetzt: State._ahk.sanLimit (calc.js, dieselbe Zahl, mit der tax.js die
+       Sanierung einordnet), Ersatz ueber window._dpBmfAhk (Gebaeude-AHK der
+       BMF-Variante); verglichen wird netto. */
+    var grenze = null, gebAk = null;
+    if (window.State && State._ahk && isFinite(State._ahk.sanLimit) && State._ahk.sanLimit > 0) {
+      grenze = State._ahk.sanLimit; gebAk = isFinite(State._ahk.gebAhk) ? State._ahk.gebAhk : grenze / 0.15;
     } else {
-      var gebAk = akRaw * gebPct / 100, grenze = gebAk * 0.15;
+      var gebPct = (window._lastBmf && window._lastBmf.geb_pct != null) ? window._lastBmf.geb_pct : null;
+      if (gebPct != null && typeof window._dpBmfAhk === 'function') {
+        try { var _ahk = window._dpBmfAhk(gebPct); if (_ahk && _ahk.gebAhk > 0) { gebAk = _ahk.gebAhk; grenze = gebAk * 0.15; } } catch (e) {}
+      }
+    }
+    var ampel = { cls: 'n', html: '', text: '' };
+    var _nt = ' netto (' + _fmtEur(sanierung) + ' € brutto)';
+    if (grenze == null) {
+      ampel.html = 'Für die 15-%-Prüfung zuerst Kaufpreis und Gebäudeanteil eintragen oder die Kaufpreisaufteilung im BMF-Rechner berechnen.';
+      ampel.text = '15-Prozent-Pruefung: Gebaeude-Anschaffungskosten noch nicht berechnet';
+    } else {
       if (sanierung <= 0) {
-        ampel.html = 'Keine Instandsetzungs-/Modernisierungsbelege — 15-%-Grenze nicht berührt. Grenze: ' + _fmtEur(grenze) + ' € (15 % der Gebäude-AK ' + _fmtEur(gebAk) + ' €).';
-        ampel.text = 'keine Sanierung; Grenze ' + _fmtEur(grenze) + ' EUR';
-      } else if (sanierung <= grenze) {
+        ampel.html = 'Keine Instandsetzungs-/Modernisierungsbelege — 15-%-Grenze nicht berührt. Grenze: ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten ' + _fmtEur(gebAk) + ' €).';
+        ampel.text = 'keine Sanierung; Grenze ' + _fmtEur(grenze) + ' EUR netto';
+      } else if (sanNetto <= grenze) {
         ampel.cls = 'g';
-        ampel.html = '<strong>Grün:</strong> Instandsetzung ' + _fmtEur(sanierung) + ' € liegt unter der Grenze von ' + _fmtEur(grenze) + ' € (15 % der Gebäude-AK). Fällt i.d.R. als Erhaltungsaufwand sofort abziehbar an.';
-        ampel.text = 'GRUEN: Erhaltungsaufwand (' + _fmtEur(sanierung) + ' <= Grenze ' + _fmtEur(grenze) + ' EUR)';
+        ampel.html = '<strong>Grün:</strong> Instandsetzung ' + _fmtEur(sanNetto) + ' €' + _nt + ' liegt unter der Grenze von ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten). Fällt i.d.R. als Erhaltungsaufwand sofort abziehbar an — Erweiterungen und Standardhebungen ausgenommen.';
+        ampel.text = 'GRUEN: Erhaltungsaufwand (' + _fmtEur(sanNetto) + ' netto <= Grenze ' + _fmtEur(grenze) + ' EUR)';
       } else {
         ampel.cls = 'r';
-        ampel.html = '<strong>Rot:</strong> Instandsetzung ' + _fmtEur(sanierung) + ' € überschreitet die Grenze von ' + _fmtEur(grenze) + ' € (15 % der Gebäude-AK) — dann anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) → über die AfA statt Sofortabzug. Bitte steuerlich prüfen.';
-        ampel.text = 'ROT: anschaffungsnahe HK (' + _fmtEur(sanierung) + ' > Grenze ' + _fmtEur(grenze) + ' EUR)';
+        ampel.html = '<strong>Rot:</strong> Instandsetzung ' + _fmtEur(sanNetto) + ' €' + _nt + ' überschreitet die Grenze von ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten) — dann sind ALLE diese Aufwendungen anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) → über die AfA statt Sofortabzug. Bitte steuerlich prüfen.';
+        ampel.text = 'ROT: anschaffungsnahe HK (' + _fmtEur(sanNetto) + ' netto > Grenze ' + _fmtEur(grenze) + ' EUR)';
       }
     }
     return { byField: byField, sanierung: sanierung, uebernahme: uebernahme, total: total, count: count, ampel: ampel };

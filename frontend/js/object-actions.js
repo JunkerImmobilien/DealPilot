@@ -64,6 +64,17 @@
   function fmt0(n) { try { return new Intl.NumberFormat('de-DE').format(Math.round(n)); } catch (e) { return String(n); } }
   function escH(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function numDe(v) { if (v == null || v === '') return null; var n = parseFloat(String(v).replace(/[^\d.,-]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return isNaN(n) ? null : n; }
+  /* v3029-import · Hausgeld aus einem Exposé (Monat, Gesamtsumme) → die beiden Jahresfelder.
+     Die Aufteilung ist eine VORGABE (22 % nicht umlagefähig - dieselbe wie qc_hg_split im
+     Quick-Check) und steht so im Text; genauer wird es mit Wirtschaftsplan/Abrechnung.
+     Auch pdf-import.js liest das hier, damit es keine zweite Regel gibt. */
+  var HG_NUL_VORGABE_PCT = 22;
+  window.dpHausgeldAusExpose = function (monat) {
+    var m = numDe(monat); if (!(m > 0)) return null;
+    var jahr = Math.round(m * 12), nul = Math.round(jahr * HG_NUL_VORGABE_PCT / 100), ul = jahr - nul;
+    return { jahr: jahr, ul: ul, nul: nul, vorgabePct: HG_NUL_VORGABE_PCT,
+      text: 'Exposé: Hausgeld ' + fmt0(m) + ' €/Monat = ' + fmt0(jahr) + ' €/Jahr, aufgeteilt nach Vorgabe ' + (100 - HG_NUL_VORGABE_PCT) + ' : ' + HG_NUL_VORGABE_PCT + ' (umlagefähig : nicht umlagefähig) - genauer mit Wirtschaftsplan oder Hausgeldabrechnung' };
+  };
 
   var ICO = {
     upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
@@ -1887,12 +1898,38 @@
     addRow('zimmer', 'Zimmer', d.zimmer, d.zimmer, S, 'input');
     if (d.objektart) addRow('objart', 'Objektart', d.objektart, d.objektart, S, 'select', false);
     addRow('kp', 'Kaufpreis', d.kaufpreis ? fmt0(d.kaufpreis) + ' €' : null, d.kaufpreis, S, 'input');
-    addRow('nkm', 'Nettokaltmiete', d.nettokaltmiete ? fmt0(d.nettokaltmiete) + ' €' : null, d.nettokaltmiete, S, 'input');
-    addRow('hg_ul', 'Hausgeld', d.hausgeld, d.hausgeld, S, 'input');
-    addRow('inst', 'Instandhaltung', d.instandhaltung, d.instandhaltung, S, 'input');
+    /* v3029-import · Die Jahresmiete-Prüfung (Faktor < 3 → ÷ 12) macht das Backend
+       (openaiService.extractExpose) - hier steht nur ihr Hinweis an der Zeile. */
+    var _nkmE = numDe(d.nettokaltmiete);
+    addRow('nkm', 'Nettokaltmiete / Monat', _nkmE ? _nkmE.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €' : null, _nkmE, S, 'input');
+    if (d.nettokaltmiete_hinweis && _merged.nkm && _merged.nkm.source === S) _merged.nkm.herleitung = String(d.nettokaltmiete_hinweis);
+    /* v3029-import · Das Exposé nennt das Hausgeld je MONAT und als GESAMTSUMME. hg_ul ist
+       „Hausgeld (umlagefähig) / Jahr" - bis v3028 stand das Monatsgeld dort (320 €/Monat →
+       320 €/Jahr) und der nicht umlagefähige Teil fehlte ganz. Jetzt ×12 und aufgeteilt nach
+       derselben Vorgabe wie der Quick-Check (22 % nicht umlagefähig), als Vorgabe benannt. */
+    var _hg = window.dpHausgeldAusExpose ? window.dpHausgeldAusExpose(d.hausgeld) : null;
+    if (_hg) {
+      addRow('hg_ul', 'Hausgeld umlagefähig / Jahr', String(_hg.ul), String(_hg.ul), S, 'input');
+      addRow('hg_nul', 'Hausgeld nicht umlagefähig / Jahr', String(_hg.nul), String(_hg.nul), S, 'input');
+      ['hg_ul', 'hg_nul'].forEach(function (k) { if (_merged[k] && _merged[k].source === S) { _merged[k].herleitung = _hg.text; _merged[k].hgVorgabe = true; } });
+    }
     addRow('ek', 'Eigenkapital', d.eigenkapital, d.eigenkapital, S, 'input');
-    addRow('verwaltung', 'Verwaltung', d.verwaltung, d.verwaltung, S, 'input');
-    addRow('nk_pct', 'Kaufnebenkosten %', d.kaufnebenkosten, d.kaufnebenkosten, S, 'input');
+    /* v3029-import · inst, verwaltung, nk_pct gab es als Felder nie - die Zeilen standen
+       vorgehakt da und wurden still verworfen (aber als „übernommen" gezählt). Instandhaltung
+       und Verwaltung stecken im Hausgeld; die Kaufnebenkosten setzt die App je Posten. Neu:
+       Grundstücksfläche, Wohneinheiten, Käuferprovision, Marktmiete. */
+    addRow('gsfl', 'Grundstücksfläche', d.grundstuecksflaeche, d.grundstuecksflaeche, S, 'input');
+    addRow('einheiten', 'Wohneinheiten im Gebäude', d.wohneinheiten, d.wohneinheiten, S, 'input');
+    if (d.kaeuferprovision_pct != null && d.kaeuferprovision_pct !== '') {
+      var _mp = numDe(d.kaeuferprovision_pct);
+      if (_mp != null && _mp >= 0 && _mp < 10) {
+        addRow('makler_p', 'Maklerprovision Käufer (%)', _mp === 0 ? '0 % (provisionsfrei)' : String(_mp).replace('.', ',') + ' %', _mp, S, 'input');
+        if (_merged.makler_p && _merged.makler_p.source === S) _merged.makler_p.herleitung = _mp === 0 ? 'Das Exposé nennt das Objekt provisionsfrei - ersetzt die Vorgabe aus deinen Einstellungen' : 'Käuferprovision laut Exposé';
+      }
+    }
+    var _mmq = numDe(d.marktmiete_qm), _mmm = numDe(d.marktmiete_monat), _wflE = numDe(d.wohnflaeche);
+    var _mm = (_mmq != null) ? _mmq : ((_mmm != null && _wflE) ? _mmm / _wflE : null);
+    if (_mm != null && _mm > 0) addRow('ds2_marktmiete', 'Marktmiete (€/m²)', _mm.toFixed(2).replace('.', ',') + ' €/m²', _mm.toFixed(2).replace('.', ','), S, 'input');
     if (d.energieklasse) addRow('ds2_energie', 'Energieklasse', String(d.energieklasse).toUpperCase(), String(d.energieklasse).toUpperCase(), S, 'select', false);
     if (d.sanierungsjahr) addRow('modernis', 'Modernisierungsjahr', d.sanierungsjahr, d.sanierungsjahr, S, 'input');
     if (d.stellplatz) { var _sp = String(d.stellplatz).toLowerCase(); if (_sp.indexOf('kein') < 0) { if (/tiefgarage|garage|duplex/.test(_sp)) addRow('garagen', 'Garagenpl\u00e4tze', '1', '1', S, 'input'); else if (/stellplatz|au\u00dfen|aussen|parkplatz|carport|freiplatz/.test(_sp)) addRow('stellpl_aussen', 'Au\u00dfenstellpl\u00e4tze', '1', '1', S, 'input'); } }
@@ -1943,27 +1980,61 @@
     _files.filter(function (f) { return f.type === 'expose' && f.cache.expose && _giltFuerWahl(f); }).forEach(function (f) { mergeExpose(f.cache.expose); });
     _files.filter(function (f) { return f.type === 'market' && f.cache.market && _giltFuerWahl(f); }).forEach(function (f) { mergeMarket(f.cache.market); });
     /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
-    _vergleich = [];
-    _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; }).forEach(function (f) { mergeDokument(f.cache.dokument); });
+    _vergleich = []; _importHinweise = [];
+    /* v3029-import · Wirtschaftsplan/Abrechnung ZULETZT: sie brauchen Objektart und MEA, und
+       die kommen oft aus demselben Paket (Exposé, Grundbuch). Bis v3028 las _hausgeldBasis das
+       Formular - bei einem neuen Objekt war die Objektart leer, und der Gesamtplan der ganzen
+       Gemeinschaft (z. B. 38.000 € umlagefähig) ging vorgehakt in EINE Wohnung. */
+    var _dokFiles = _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; });
+    _dokFiles.forEach(function (f) { mergeDokument(f.cache.dokument, false); });
+    _dokFiles.forEach(function (f) { mergeDokument(f.cache.dokument, true); });
     /* v3016g · gemessen am Demo-Set Lindenallee (MFH, alle Einheiten): das Wohnungsgrundbuch EINER
        Einheit setzte „Miteigentumsanteil 20,4 %“ - das Haus hätte dann als Anteil gerechnet.
        Beim Haus (MFH/WGH/ZFH/EFH) gilt kein MEA aus einem einzelnen Blatt. */
     var _art = String((_merged.objart && (_merged.objart.raw || _merged.objart.value)) || (($('objart') || {}).value) || '');
     if (_merged.mea && /mfh|mehrfam|wgh|wohn.*gesch|zfh|zweifam|efh|einfam/i.test(_art)) delete _merged.mea;
+    /* v3029-import · Ein Mietvertrag ist EINE Wohnung. Beim Haus mit mehreren Einheiten setzte er
+       bis v3028 Objektmiete, Wohnfläche und Zimmer (MFH mit 8 WE → nkm 520 €, wfl 65 m²,
+       vorgehakt). Dort gehört er in „Einheiten erfassen". */
+    if (/mfh|mehrfam|wgh|wohn.*gesch|zfh|zweifam/i.test(_art)) {
+      var _wegMv = ['nkm', 'wfl', 'zimmer', 'ze'].filter(function (k) { return _merged[k] && _merged[k].typ === 'mietvertrag'; });
+      _wegMv.forEach(function (k) { delete _merged[k]; });
+      if (_wegMv.length) _importHinweise.push('Der Mietvertrag gilt für EINE Einheit - Miete und Fläche des Hauses wurden daraus nicht gesetzt. Trag die Einheit unter „Einheiten erfassen" ein.');
+    }
     _unterlagenZeilen();   /* v3016 */
   }
-  var _vergleich = [];
-  function mergeDokument(a) {
+  var _vergleich = [], _importHinweise = [];
+  /* v3029-import · Objektart und MEA für die Auslese: erst was gerade eingelesen wird, dann das Formular */
+  function _artCode(s) {
+    var t = String(s == null ? '' : s).trim(); if (!t) return '';
+    if (/^[A-Z]{2,6}$/.test(t)) return t;
+    var l = t.toLowerCase();
+    if (/mehrfam|\bmfh\b/.test(l)) return 'MFH'; if (/zweifam|\bzfh\b/.test(l)) return 'ZFH';
+    if (/wohn.*gesch|\bwgh\b/.test(l)) return 'WGH'; if (/einfam|\befh\b/.test(l)) return 'EFH';
+    if (/doppel/.test(l)) return 'DHH'; if (/reihen/.test(l)) return 'RH';
+    if (/eigentumswohnung|wohnung|\betw\b/.test(l)) return 'ETW';
+    return t;
+  }
+  function _kontext() {
+    var art = _artCode((_merged.objart && (_merged.objart.raw || _merged.objart.value)) || (($('objart') || {}).value) || '');
+    var meaRoh = (_merged.mea && _merged.mea.raw != null && _merged.mea.raw !== '') ? _merged.mea.raw : (($('mea') || {}).value || '');
+    var mea = numDe(meaRoh);
+    return { objart: art, mea: (mea > 0 && mea <= 100) ? mea : null };
+  }
+  function mergeDokument(a, nurHausgeld) {
     var D = window.DokumentImport; if (!D) return;
     /* v3016 · ein PDF kann mehrere Dokumente tragen (a.weitere, z. B. Flurkarte + Energieausweis) */
     [a].concat(a.weitere || []).forEach(function (t) {
-      (D.abgleich(t.extracted || {}, t.typ) || []).forEach(function (z) {
-        _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort };
+      if ((t.typ === 'hausgeld') !== !!nurHausgeld) return;   /* v3029-import: zwei Durchgänge */
+      var ktx = _kontext();
+      (D.abgleich(t.extracted || {}, t.typ, ktx) || []).forEach(function (z) {
+        if (z.hinweis) { _importHinweise.push(z.hinweis); return; }
+        _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
       });
       /* v3017 · Wirtschaftsplan/Abrechnung → Steuer-Reiter. Weicht der Vorschlag vom heutigen Wert ab,
          ist die Zeile nicht vorgehakt und zeigt den bisherigen Wert („erstmal drauf hinweisen") */
       if (typeof D.steuerVorschlaege === 'function' && typeof window.dpSteuerWert === 'function') {
-        D.steuerVorschlaege(t.extracted || {}, t.typ).forEach(function (s) {
+        D.steuerVorschlaege(t.extracted || {}, t.typ, ktx).forEach(function (s) {
           var w = window.dpSteuerWert(s.jahr, s.feld); if (w === null) return;
           _merged['steuer:' + s.jahr + ':' + s.feld] = { label: 'Steuer ' + s.jahr + ' · ' + s.wort, value: fmt0(s.betrag) + ' € im Jahr ' + s.jahr, raw: String(s.betrag),
             ist: (w.eigen || w.wert) ? String(Math.round(w.wert)) : '', istEigen: !!w.eigen, source: t.label || 'Dokument', kind: 'steuer', jahr: s.jahr, feld: s.feld, herleitung: s.hinweis };
@@ -1991,7 +2062,9 @@
     var U = window.DpUnterlagen, liste = _unterlagenListe();
     if (!U || !liste.length) return;
     _auswertungLaeuft = true; _auswertungFehler = ''; renderMergedTable();
-    try { _auswertung = await U.auswerten(liste, { ergaenzen: _ergaenzen }); }   /* v3017 */
+    /* v3029-import · Kaufumfang aus dem, was gerade eingelesen wird (Objektart, MEA) - nicht nur aus dem
+       Formular, das bei einem neuen Objekt noch leer ist (sonst „ganzes Gebäude" für eine Wohnung) */
+    try { _auswertung = await U.auswerten(liste, { ergaenzen: _ergaenzen, kontext: _kontext() }); }   /* v3017 */
     catch (e) { _auswertung = null; _auswertungFehler = e.message || 'Auswertung fehlgeschlagen'; }
     _auswertungLaeuft = false;
     recompute(); renderMergedTable();
@@ -2006,9 +2079,9 @@
       if (t.typ !== 'mietaufstellung' && t.typ !== 'teilungserklaerung') return;
       var l = U.einheitenAus(t.typ, t.extracted);
       if (!l.length) return;
-      var miete = l.filter(function (e) { return Number(e.ist) > 0 || e.status === 'leer'; }).length;
+      var miete = l.filter(function (e) { return numDe(e.ist) > 0 || e.status === 'leer'; }).length;   /* v3029-import: ist mit Komma */
       var punkte = miete * 1000 + l.length;
-      if (punkte > bestPunkte) { best = l; bestPunkte = punkte; }
+      if (punkte > bestPunkte) { best = l; bestPunkte = punkte; best._summeListe = numDe((t.extracted || {}).summe_kaltmiete_monat_eur); }
     });
     return best;
   }
@@ -2023,10 +2096,32 @@
     if (a && a.investitionsthese) _merged.thesis = { label: 'Investitionsthese', value: a.investitionsthese, raw: a.investitionsthese, source: 'Unterlagen', kind: 'anhaengen' };
     if (a) _merged._dok_auswertung = { label: 'Auswertung der Unterlagen', value: 'in der Pilot-Analyse, Reiter „Unterlagen & WEG“', raw: 1, source: 'Unterlagen', kind: 'merken' };
     var we = _einheitenListe();
+    /* v3029-import · „Einheiten erfassen" nur beim Haus mit mehreren Einheiten. Bei einer Eigentums-
+       wohnung (oder EFH/DHH/RH) listet die Teilungserklärung das ganze Haus; das Fenster setzte
+       beim Übernehmen die Fläche ALLER Einheiten als Wohnfläche der einen Wohnung. */
+    var _artU = _kontext().objart;
+    if (we.length && /^(ETW|EFH|DHH|RH)$/.test(_artU)) {
+      _importHinweise.push('Die Unterlagen listen ' + we.length + ' Einheiten des Hauses. Bei ' + (_artU === 'ETW' ? 'einer Eigentumswohnung' : 'diesem Objekt') + ' werden sie nicht als Einheiten übernommen - die Fläche der Wohnung steht in der Teilungserklärung bzw. im Aufteilungsplan.');
+      we = [];
+    }
     if (we.length && window.DpMfhEinheiten && typeof window.DpMfhEinheiten.vorbelegen === 'function') {
-      var miete = we.reduce(function (s, e) { return s + (Number(e.ist) || 0); }, 0);
-      _merged.mfh_einheiten_liste = { label: 'Einheiten erfassen', value: we.length + ' Einheiten' + (miete ? ' · ' + fmt0(miete) + ' €/Monat Ist-Miete' : ''), raw: we, source: 'Unterlagen', kind: 'einheiten',
-        herleitung: 'öffnet nach dem Übernehmen das Fenster „Einheiten erfassen“ — dort prüfen und übernehmen' };
+      var miete = we.reduce(function (s, e) { return s + (numDe(e.ist) || 0); }, 0);
+      var stp = numDe(we.stellplatzMiete) || 0;
+      /* v3029-import · Abgleich mit der Summe, die die Liste selbst nennt (Wohnen/Gewerbe + Stellplätze) */
+      var herl = 'öffnet nach dem Übernehmen das Fenster „Einheiten erfassen“ — dort prüfen und übernehmen';
+      var sl = we._summeListe;
+      if (sl > 0) {
+        var diff = Math.round((miete + stp - sl) * 100) / 100;
+        herl += Math.abs(diff) < 1 ? ' · Summe stimmt mit der Liste überein (' + fmt0(sl) + ' €/Monat)'
+          : ' · ACHTUNG: Einheiten + Stellplätze ergeben ' + (miete + stp).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat, die Liste nennt ' + sl.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' € - bitte im Fenster prüfen';
+      }
+      _merged.mfh_einheiten_liste = { label: 'Einheiten erfassen', value: we.length + ' Einheiten' + (miete ? ' · ' + miete.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat Ist-Miete' : ''), raw: we, source: 'Unterlagen', kind: 'einheiten', herleitung: herl };
+      /* v3029-import · Stellplätze und Garagen der Mieterliste: bis v3028 fielen sie still heraus
+         (z. B. 2 × 40 € fehlten in der Objektmiete). Sie gehören in die Zusatzeinnahmen. */
+      if (stp > 0) {
+        _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (Stellplätze)', value: stp.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €', raw: String(Math.round(stp * 100) / 100), source: 'Mieterliste', kind: 'input',
+          herleitung: (we.stellplatzAnzahl || 0) + ' Stellplätze/Garagen aus der Mieterliste' };
+      }
     }
   }
   function _norm(x){ return String(x==null?'':x).trim().toLowerCase().replace(/\s+/g,' '); }
@@ -2102,8 +2197,19 @@
   function _abweichungen(keys) {
     var out = {};
     keys.forEach(function (id) {
-      var it = _merged[id]; if (!it || it.kind === 'star' || it.kind === 'bool' || it.kind === 'anhaengen' || it.kind === 'merken' || it.kind === 'einheiten') return;   /* v3016 */
+      var it = _merged[id]; if (!it || it.kind === 'bool' || it.kind === 'anhaengen' || it.kind === 'merken' || it.kind === 'einheiten') return;   /* v3016 */
       var ist = _istText(id); if (ist === '') return;
+      /* v3029-import · Sterne: bis v3028 ganz ausgenommen - eine eigene Bewertung (z. B. Bad
+         „Modernisiert") wurde vom Marktbericht vorgehakt überschrieben. 0 heißt unbewertet. */
+      if (it.kind === 'star') { var _s = parseInt(ist, 10) || 0; if (_s > 0 && _s !== (parseInt(it.raw, 10) || 0)) out[id] = _stufeWort(id, _s); return; }
+      /* v3029-import · Die Maklerprovision steht bei jedem neuen Objekt auf der Vorgabe aus den
+         Einstellungen. Das ist keine eigene Angabe - ein „provisionsfrei" im Exposé ersetzt sie
+         vorgehakt, statt als Abweichung liegen zu bleiben. */
+      if (id === 'makler_p') {
+        try { var _IPm = window.DealPilotInvestmentProfile, _dm = _IPm && _IPm.get ? parseFloat(String(_IPm.get('maklerkosten')).replace(',', '.')) : NaN;
+          var _im = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(String(ist).replace(',', '.'));
+          if (isFinite(_dm) && Math.abs(_im - _dm) < 0.005) return; } catch (e) {}
+      }
       var el = document.getElementById(id);
       var neu = it.raw != null ? it.raw : it.value;
       /* Schreibweisen sind keine Abweichung: „Hermannstr" = „Hermannstraße",
@@ -2167,9 +2273,14 @@
           return '<label class="oabi-addr-opt"><input type="radio" name="oabi-addr" value="' + escH(o.key) + '"' + (o.key === _addrChoice ? ' checked' : '') + '> ' + escH(o.label) + ' <span class="src">(' + escH(o.source) + ')</span></label>';
         }).join('') + '<div class="oabi-addr-hinweis" style="font-size:12px;margin-top:4px;opacity:.8">Übernommen werden nur Werte aus dem Dokument der gewählten Adresse.</div></div>';
     }
-    var keys = Object.keys(_merged);
+    /* v3029-import · eine Zeile ohne Zielfeld wird nicht angeboten (sie konnte nie ankommen) */
+    var _SONDER = { steuer: 1, anhaengen: 1, merken: 1, einheiten: 1 };
+    var keys = Object.keys(_merged).filter(function (id) {
+      var it = _merged[id]; if (!it || _SONDER[it.kind] || id === 'me_modus' || id === 'mfh_wohnungen' || (_qcMode && OBJ2QC[id])) return true;
+      return !!document.getElementById(id);
+    });
     var hasPhotos = !!(_importPhotos && _importPhotos.length);
-    if (!keys.length && !hasPhotos) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>'; if (ab) ab.disabled = true; return; }
+    if (!keys.length && !hasPhotos) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>' + (_importHinweise.length ? '<div class="oabi-hinw" style="font-size:12.5px;margin-top:6px">' + _importHinweise.map(escH).join('<br>') + '</div>' : ''); if (ab) ab.disabled = true; return; }
     var photoRow = '';
     if (hasPhotos) {
       /* v2223 · eine Zeile je PDF. Bei einem Adresskonflikt ist nur die Zeile
@@ -2200,7 +2311,10 @@
       + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
           + '<b>Ergebnis eines fremden Gutachtens — wird nicht übernommen.</b> DealPilot rechnet selbst; die Zahl dient dem Abgleich.'
           + _vergleich.map(function (v) { return '<div style="margin-top:4px">' + escH(v.wort) + ': <b>' + escH(v.wert) + '</b>' + (v.eigen ? ' · DealPilot: ' + escH(v.eigen) : '') + ' <span class="src">(' + escH(v.quelle) + ')</span></div>'; }).join('')
-          + '</div>' : '');
+          + '</div>' : '')
+      /* v3029-import · was bewusst NICHT übernommen wurde, und warum */
+      + (_importHinweise.length ? '<div class="oabi-hinw" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px solid rgba(217,164,65,.6);background:rgba(217,164,65,.08);font-size:12.5px">'
+          + _importHinweise.filter(function (h, i, a) { return a.indexOf(h) === i; }).map(function (h) { return '<div style="margin-top:2px">' + escH(h) + '</div>'; }).join('') + '</div>' : '');
     _reiterEinbauen(host);   /* v3016 */
     if (ab) ab.disabled = false;
     // Range-Toggle-Handler
@@ -2546,6 +2660,7 @@
       return null;
     }
     var _ziel = document.getElementById(id);
+    if (!_ziel) return null;   /* v3029-import · ohne Feld nichts geschrieben - also auch nicht zählen */
     setInput(id, (_ziel && _ziel.type === 'number') ? it.raw : _deZahl(it.raw));   /* v2256 */
     return 'text';
   }
@@ -2597,7 +2712,7 @@
   function applyMerged() {
     var ov = $('oabi-ov'); if (!ov) return;
     if (_qcMode) { return applyMergedQc(ov); }  /* v418 */
-    var n = 0, _applied = [], _san = '';
+    var n = 0, _applied = [], _san = '', _folgen = '';
     try {
     ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
       var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it) return;
@@ -2616,6 +2731,7 @@
     } catch (e) {}
     try { if (typeof window._v236MarkQcLoaded === 'function' && _applied.length) window._v236MarkQcLoaded(_applied); } catch (e) {}
     _san = _sanNachziehen(_applied);
+    _folgen = window.dpImportFolgen ? window.dpImportFolgen(_applied) : '';   /* v3029-import */
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
     } finally {
@@ -2623,8 +2739,54 @@
       try { ov.remove(); } catch (e) {}
       _fireOabiDone();
     }
-    toast('✓ ' + n + ' Werte aus Import übernommen' + (_san ? ' · ' + _san : ''));
+    toast('✓ ' + n + ' Werte aus Import übernommen' + (_san ? ' · ' + _san : '') + (_folgen ? ' · ' + _folgen : ''));
   }
+
+  /* ══ v3029-import · WAS EINE EINGABE VON HAND AUSLOEST, MUSS AUCH DER IMPORT AUSLOESEN ══
+     Der Import schreibt per Skript und feuert nur „input". Drei Vorgaben hingen aber an
+     echten Eingaben: Grunderwerbsteuer nach PLZ (grest-plz-lookup.js hört auf change/blur),
+     Eigenkapital- und Mietausfall-Vorgabe (investment-profile.js nachziehen, nur bei
+     isTrusted). Ein per Exposé angelegtes Objekt hatte so 0 € Eigenkapital, 0 € Mietausfall
+     und die Grunderwerbsteuer des Profil-Bundeslands. Dazu der lineare AfA-Satz nach
+     Baujahr (§ 7 Abs. 4 Satz 1 Nr. 2 EStG), den bisher nur die geführte Eingabe setzte.
+     Alles nur in LEERE bzw. unveränderte Vorgabe-Felder; die Rückgabe nennt, was geschah.
+     Auch pdf-import.js und mfh-einheiten.js rufen das. */
+  window.dpImportFolgen = function (applied) {
+    var teile = [], hat = function (id) { return (applied || []).indexOf(id) >= 0; };
+    try {
+      if (hat('plz')) { var pz = $('plz'); if (pz) pz.dispatchEvent(new Event('change', { bubbles: true })); }
+    } catch (e) {}
+    try {
+      var IP = window.DealPilotInvestmentProfile;
+      if (IP && typeof IP.nachziehen === 'function') {
+        var g = [];
+        if (hat('kp')) g = g.concat(IP.nachziehen('kp') || []);
+        if (hat('nkm')) g = g.concat(IP.nachziehen('nkm') || []);
+        if (g.indexOf('ek') >= 0) teile.push('Eigenkapital nach Vorgabe');
+        if (g.indexOf('mietausfall') >= 0) teile.push('Mietausfall nach Vorgabe');
+      }
+    } catch (e) {}
+    try { if (hat('baujahr')) { var a = window.dpAfaNachBaujahr && window.dpAfaNachBaujahr(); if (a) teile.push(a); } } catch (e) {}
+    return teile.join(' · ');
+  };
+  /* Linearer AfA-Satz nach Fertigstellung (= Baujahr). Nur wenn der Satz nicht von Hand gewählt
+     wurde und einer der drei linearen Regelsätze (oder leer) ist - degressiv/eigen bleibt. */
+  window.dpAfaNachBaujahr = function () {
+    var sel = $('afa_satz'), bj = parseInt(String(($('baujahr') || {}).value || '').replace(/\D/g, ''), 10);
+    if (!sel || !bj || !window.Afa || typeof window.Afa.linearNachFertigstellung !== 'function') return '';
+    if (sel.dataset.userEdited === '1') return '';
+    if (['', '2.0', '2.5', '3.0'].indexOf(String(sel.value)) < 0) return '';
+    var lin = window.Afa.linearNachFertigstellung(bj); if (!lin || lin.wert === sel.value) return '';
+    sel.value = lin.wert;
+    try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    return 'AfA ' + lin.wert.replace('.', ',') + ' % (Baujahr ' + bj + ')';
+  };
+  /* Von Hand gewählter AfA-Satz bleibt stehen; ein von Hand geändertes Baujahr zieht ihn nach */
+  document.addEventListener('change', function (ev) {
+    var t = ev.target; if (!ev.isTrusted || !t) return;
+    if (t.id === 'afa_satz') t.dataset.userEdited = '1';
+    if (t.id === 'baujahr') { try { var r = window.dpAfaNachBaujahr(); if (r) toast(r + ' gesetzt'); } catch (e) {} }
+  }, true);
 
   /* ── v1231 · Der diktierte Sanierungsbedarf muss ankommen ───────────────
      Die acht Gewerke (fesh_*) sind seit v1231 diktierbar, aber ihre Werte
@@ -2697,10 +2859,16 @@
       if (_hgUOn || _hgNOn) {
         var _u = _hgUOn ? (numDe(_hgU.raw) || 0) : 0;
         var _n = _hgNOn ? (numDe(_hgN.raw) || 0) : 0;
-        var _ges = _u + _n;
+        /* v3029-import · hg_ul/hg_nul sind in _merged IMMER €/Jahr (wie ihr Formularfeld und
+           wie die Sprach-KI sie liefert: voice-import.js HINTS „pro Jahr"), qc_hg ist €/Monat.
+           Bis v3028 ging der Jahreswert ungeteilt ins Monatsfeld - diktierte 250 €/Monat
+           standen dort als 3.000. Eine Vorgabe-Aufteilung (Exposé) überschreibt nicht den
+           Split-Regler des Quick-Checks. */
+        var _ges = (_u + _n) / 12;
         if (_ges > 0) {
           qcData['qc_hg'] = String(Math.round(_ges));
-          if (_n > 0) qcData['qc_hg_split'] = String(Math.round(_n / _ges * 100));
+          var _hgVorg = (_hgU && _hgU.hgVorgabe) || (_hgN && _hgN.hgVorgabe);
+          if (_n > 0 && !_hgVorg) qcData['qc_hg_split'] = String(Math.round(_n / (_u + _n) * 100));
           delete _qcPendingMerged['hg_nul'];
           pendingList = pendingList.filter(function (x) { return x.key !== 'hg_nul'; });
         }

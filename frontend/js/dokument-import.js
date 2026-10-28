@@ -132,12 +132,20 @@
     energieeffizienzklasse: ['ds2_energie', 'Energieklasse', 'auswahl'],
     baujahr_gebaeude: ['baujahr', 'Baujahr', 'jahr'],
     kaltmiete_eur: ['nkm', 'Nettokaltmiete (Monat)', 'eur'],
-    wohnflaeche_m2: ['wfl', 'Wohnfläche', 'm2'],
-    zimmer: ['zimmer', 'Zimmer', 'zahl']
+    zimmer: ['zimmer', 'Zimmer', 'zahl'],
+    /* v3029-import · gelesen, aber nirgends hin: Wohnungen im Gebäude (Energieausweis,
+       Teilungserklärung) und die Stellplatzmiete des Mietvertrags. wohnflaeche_m2 stand hier
+       doppelt (der zweite Eintrag überschrieb den ersten - gleicher Inhalt, entfernt). */
+    anzahl_wohnungen: ['einheiten', 'Wohneinheiten im Gebäude', 'zahl'],
+    einheiten_anzahl: ['einheiten', 'Wohneinheiten im Gebäude', 'zahl'],
+    stellplatz_miete_eur: ['ze', 'Zusätzliche Einnahmen / Monat (Stellplatz)', 'eur']
   };
   /* v3016 · nur aus diesen Arten - eine Kaltmiete aus der Mieterliste eines MFH ist
      die Summe vieler Wohnungen und geht über die Einheiten, nicht in ein Feld */
-  var NUR_AUS = { kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1 }, zimmer: { mietvertrag: 1 } };
+  /* v3029-import · die Wohnfläche des Verkehrswertgutachtens (objekt.wohnflaeche_m2) fiel bis v3028 mit
+     unter diese Sperre und kam nie an. Beim Haus mit mehreren Einheiten entfernt object-actions.js
+     Miete/Fläche/Zimmer/Stellplatz eines Mietvertrags wieder (eine Einheit ist nicht das Haus). */
+  var NUR_AUS = { kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1, vwg_vorgutachten: 1 }, zimmer: { mietvertrag: 1 }, stellplatz_miete_eur: { mietvertrag: 1 } };
   /* Klartext statt Schluessel fuer die uebrigen Angaben */
   var NAMEN = {
     notar: 'Notar', ur_nr: 'Urkundennummer', nebenkosten_eur: 'Nebenkosten', verkaeufer_anzahl: 'Verkäufer (Anzahl)', kaeufer_anzahl: 'Käufer (Anzahl)',
@@ -185,17 +193,36 @@
      der Kaufumfang: eine Wohnung (ETW mit MEA) nimmt den Einzelplan oder den Gesamtplan × MEA, das ganze
      Haus den Gesamtplan. hg_nul trägt die Rücklage MIT (tab6.hg_nicht_umlagefaehig), weg_r ist nur Info. */
   function _feldWert(id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; }
-  function _hausgeldBasis(ext) {
+  /* v3029-import · Objektart und MEA kommen vom Aufrufer (ktx: was im selben Paket gerade gelesen
+     wird - Exposé, Grundbuch), sonst aus dem Formular. Bis v3028 nur aus dem Formular: bei einem
+     neuen Objekt war die Objektart leer, „nicht ETW" griff, und der Gesamtplan der ganzen
+     Gemeinschaft ging vorgehakt in eine einzelne Wohnung. Unbekannte Objektart rät nicht mehr.
+     Fehlt der MEA, gilt der des Wirtschaftsplans selbst (ext.mea, z. B. „85/1000"). */
+  function _ktxArt(ktx) { var a = (ktx && ktx.objart != null && ktx.objart !== '') ? ktx.objart : _feldWert('objart'); return String(a || '').toUpperCase(); }
+  function _hausgeldBasis(ext, ktx) {
     if (!ext) return null;
-    var etw = _feldWert('objart') === 'ETW', mea = (typeof parseDe === 'function' ? parseDe(_feldWert('mea')) : parseFloat(_feldWert('mea'))) || 0;
+    var art = _ktxArt(ktx), etw = art === 'ETW';
+    var mea = (ktx && ktx.mea > 0) ? ktx.mea : ((typeof parseDe === 'function' ? parseDe(_feldWert('mea')) : parseFloat(_feldWert('mea'))) || 0);
+    var meaWie = '';
+    if (!(mea > 0) && ext.mea && window.DpUnterlagen && window.DpUnterlagen.meaProzent) { var mp = window.DpUnterlagen.meaProzent(ext.mea); if (mp > 0) { mea = mp; meaWie = ' (laut Plan ' + ext.mea + ')'; } }
     var g = ext.gesamt || null, e = ext.einzel || null;
-    if (etw && e && (_zahl(e.umlagefaehig_jahr_eur) != null || _zahl(e.nicht_umlagefaehig_jahr_eur) != null)) return { w: e, faktor: 1, wie: 'Einzelplan der Wohnung' + (ext.einheit ? ' (' + ext.einheit + ')' : '') };
-    if (etw && g && mea > 0) return { w: g, faktor: mea / 100, wie: 'Gesamtplan × Miteigentumsanteil ' + String(mea).replace('.', ',') + ' %' };
+    var hatE = e && (_zahl(e.umlagefaehig_jahr_eur) != null || _zahl(e.nicht_umlagefaehig_jahr_eur) != null);
+    if (!art) return hatE ? { w: e, faktor: 1, wie: 'Einzelplan der Wohnung' + (ext.einheit ? ' (' + ext.einheit + ')' : '') + ' - Objektart noch offen, bitte prüfen' } : null;
+    if (etw && hatE) return { w: e, faktor: 1, wie: 'Einzelplan der Wohnung' + (ext.einheit ? ' (' + ext.einheit + ')' : '') };
+    if (etw && g && mea > 0) return { w: g, faktor: mea / 100, wie: 'Gesamtplan × Miteigentumsanteil ' + String(mea).replace('.', ',') + ' %' + meaWie };
     if (!etw && g) return { w: g, faktor: 1, wie: 'Gesamtplan der Gemeinschaft (ganzes Haus)' };
     return null;
   }
-  function _abgleichHausgeld(ext) {
-    var b = _hausgeldBasis(ext); if (!b) return [];
+  /* v3029-import · warum aus einem gelesenen Plan nichts übernommen wird - statt still nichts */
+  function _hausgeldHinweis(ext, ktx) {
+    if (!ext || !(ext.gesamt || ext.einzel)) return null;
+    var art = _ktxArt(ktx);
+    if (!art) return 'Wirtschaftsplan/Abrechnung: Hausgeld nicht übernommen - die Objektart fehlt noch. Ohne sie ist offen, ob der Gesamtplan für das ganze Haus oder eine Wohnung gilt.';
+    if (art === 'ETW') return 'Wirtschaftsplan/Abrechnung: Hausgeld nicht übernommen - es gibt nur den Gesamtplan und keinen Miteigentumsanteil. Trag den MEA im Reiter Objekt ein und lies den Plan erneut ein.';
+    return null;
+  }
+  function _abgleichHausgeld(ext, ktx) {
+    var b = _hausgeldBasis(ext, ktx); if (!b) { var h = _hausgeldHinweis(ext, ktx); return h ? [{ hinweis: h }] : []; }
     var w = b.w, f = b.faktor, rd = function (x) { var n = _zahl(x); return n == null ? null : Math.round(n * f); };
     var ul = rd(w.umlagefaehig_jahr_eur), nul = rd(w.nicht_umlagefaehig_jahr_eur), rl = rd(w.ruecklage_zufuehrung_jahr_eur);
     var werte = [['hg_ul', 'Hausgeld umlagefähig', ul], ['hg_nul', 'Hausgeld nicht umlagefähig (inkl. Rücklage)', nul == null && rl == null ? null : (nul || 0) + (rl || 0)], ['weg_r', 'WEG-Rücklage (Zuführung)', rl]];
@@ -216,9 +243,9 @@
   /* Vorschläge für den Steuer-Reiter: Verwaltung, übrige nicht umlagefähige Kosten (OHNE Rücklage -
      die Zuführung ist erst absetzbar, wenn die Gemeinschaft sie ausgibt), Erhaltungsaufwand aus
      Rücklagen-Entnahmen und Sonderumlagen im Jahr ihrer Verwendung. */
-  function steuerVorschlaege(ext, typ) {
+  function steuerVorschlaege(ext, typ, ktx) {
     if (typ !== 'hausgeld' || !ext) return [];
-    var b = _hausgeldBasis(ext); if (!b) return [];
+    var b = _hausgeldBasis(ext, ktx); if (!b) return [];
     var jahr = _zahl(ext.jahr) || new Date().getFullYear(), f = b.faktor, aus = [];
     var verw = _zahl(b.w.verwaltung_jahr_eur), nul = _zahl(b.w.nicht_umlagefaehig_jahr_eur);
     if (verw != null && verw > 0) aus.push({ jahr: jahr, feld: 'hausverwaltung', wort: 'Hausverwaltung', betrag: Math.round(verw * f), hinweis: b.wie });
@@ -227,14 +254,14 @@
     (ext.ruecklage_entnahmen || []).forEach(function (x) { var n = _zahl(x.betrag_eur); if (n > 0) { erh += n * (ext.umfang === 'einzel' ? 1 : f); teile.push((x.zweck || 'Entnahme') + ' (Rücklage)'); } });
     (ext.sonderumlagen || []).forEach(function (x) {
       if (_zahl(x.jahr) && _zahl(x.jahr) !== jahr) return;
-      var n = _zahl(x.betrag_einheit_eur) != null && _feldWert('objart') === 'ETW' ? _zahl(x.betrag_einheit_eur) : (_zahl(x.betrag_gesamt_eur) || 0) * f;
+      var n = _zahl(x.betrag_einheit_eur) != null && _ktxArt(ktx) === 'ETW' ? _zahl(x.betrag_einheit_eur) : (_zahl(x.betrag_gesamt_eur) || 0) * f;
       if (n > 0) { erh += n; teile.push((x.zweck || 'Sonderumlage') + ' (Sonderumlage)'); }
     });
     if (erh > 0) aus.push({ jahr: jahr, feld: 'erhaltungsaufwand', wort: 'Erhaltungsaufwand', betrag: Math.round(erh), hinweis: teile.join(', ') + ' · absetzbar im Jahr, in dem die Gemeinschaft das Geld für Erhaltung ausgibt; in den ersten drei Jahren nach Kauf zählt es zur 15-%-Grenze - mit dem Steuerberater abstimmen' });
     return aus;
   }
-  function _abgleich(ext, typ) {
-    if (typ === 'hausgeld') return _abgleichHausgeld(ext);   /* v3017 */
+  function _abgleich(ext, typ, ktx) {
+    if (typ === 'hausgeld') return _abgleichHausgeld(ext, ktx);   /* v3017 · v3029-import: ktx */
     var f = _flach(ext), zeilen = [], gesehen = {};
     Object.keys(ZIEL).forEach(function (k) {
       if (f[k] === undefined || f[k] === null || f[k] === '') return;
@@ -388,7 +415,7 @@
             + '</div>';
     }
 
-    var abg = _abgleich(ext);
+    var abg = _abgleich(ext).filter(function (z) { return !z.hinweis; });   /* v3029-import */
     if (abg.length) {
       var nAbw = abg.filter(function (z) { return z.status === 'abweichung'; }).length;
       var objekt = window._currentObjKey ? 'diesem Objekt' : 'dem offenen Formular';
