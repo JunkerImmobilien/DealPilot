@@ -43271,3 +43271,55 @@ echten Antwort gemessen. KSt-Senkung ab 2028 nur als Hinweis (Fundstelle offen).
 nicht in der Automatik. Gold-Audit auf Staging rot durch fremde `einstellungen-schlank.js` (0 → 2).
 deploy-staging.ps1 brach an fremden ungesicherten Dateien ab – Ausrollen per push + Pull + Rebuild
 von Hand mit denselben Prüfern vorab. Nicht auf Prod.
+
+### v3023 · Zahlenfelder in den Reitern deutsch angezeigt · 28.10.2026 — Commit auf `staging`, NICHT ausgerollt (Video-Aufnahme auf Staging)
+
+**Was.** Marcel: „in den Tabs werden Währungen und Einheiten und die Zahlen nicht passend mit Punkt
+und/oder Komma angegeben … aufgefallen im Tab Bewirtschaftung". Gemessen in einer abgeschotteten
+Kopie (lokaler Server mit Stub-API, Headless-Chrome, Objektdaten per `SELECT` von Staging, nichts
+gespeichert) an Lindenallee 2026-1123 (MFH), Hölderlinstr. 2026-1008 (ETW), Am Markt 2026-1040 (ETW):
+in denselben Reitern standen vier Schreibweisen nebeneinander — Bewirtschaftung „3313" / „9600"
+(Import) neben der Summe „3.313 €", Investition „1090000", „3.57" %, „6,5" %, Makler/Notar/GrESt €
+als „38913", Miete-Annahmen „1.5" / „1" %, Steuer „68.000" € neben „41.35" %, Finanzierung
+„250093" € neben „4,0" %. Dazu „58.60 m²" (Grundstücksanteil), DSCR-Pille „1.78",
+Platzhalter „9.50" / „7.06", Warmmiete „43.920,00 €" direkt über „43.920 €".
+
+**Ursache.** Es gab keine Formatierschicht für Eingabefelder. `loadData()` schreibt `e.value = d[id]`
+roh, `calc()` schreibt berechnete Felder als nackte Zahl, Import/Quick-Check/Sprache/BMF ebenso;
+nur was der Nutzer selbst tippte, stand deutsch. Gerechnet hat alles richtig, weil `v()` über
+`parseDe()` liest. **Den Wert selbst zu formatieren wäre der teure Fehler gewesen:** rund 35 Stellen
+lesen Felder mit `parseFloat(x.value)` / `replace(',', '.')` (afa-ui `wfl`, marktbericht-view
+`price=kp`, investment-profile `kp` …), und `collectData()` speichert `e.value`, das Portfolio,
+Track Record und `objectService` wieder mit `parseFloat` lesen — „1.090.000" wäre dort 1,09 €.
+
+**Lösung.** `js/zahlenfelder.js` (neu, nach `calc.js` geladen) trennt Anzeige und Wert: jedes
+Zahlenfeld der Reiter (`.sec input[inputmode=decimal|numeric]`, ohne Baujahr, Modernisierungsjahr,
+Zielbild-Jahr, PLZ, Hausnummer, Flur) bekommt einen eigenen `value`-Zugriff. **`.value` liefert
+weiter exakt den Text, der ohne die Schicht im Feld stünde** (`_dpRoh`); sichtbar ist die deutsche
+Form — € ganz oder mit zwei Stellen, % mit Komma (unter 10 mit einer Stelle), m² bis zwei Stellen.
+Beim Fokus steht der Rohtext zum Bearbeiten im Feld, beim Verlassen wieder deutsch (Fokus/Blur am
+`window` in der Capture-Phase, damit es vor jedem blur-Leser läuft). Jeder Schreibweg geht über den
+Setzer und kommt formatiert an, ohne dass Import `_wertSchreiben`, Quick-Check, Sprache oder BMF
+angefasst werden; dynamisch gebaute Felder holt ein MutationObserver (nur bei neuen Elementen mit
+`input`). Einheit wird am Feld ABGELESEN (pfx/sfx/`.unit`/Beschriftung). Ergänzt: Präfix „€/m²"
+statt „€" an Bodenrichtwert, BRW manuell, Hinterland, Marktmiete, Soll-Mietspiegel, Zielbild-
+Mieten; Suffix „%" an Zins übernommenes Darlehen, „J." an Abweichung erwartet. `calc.js`:
+Grundstücksanteil und DSCR-Pille mit Komma, Warmmiete Cent nur, wenn es welche gibt. Platzhalter
+„9,50" / „7,06". Ein halb getippter Wert („3,") und Text („ca. 5") bleiben, wie sie sind.
+
+**Nachweis.** Vorher/Nachher in derselben Kopie, Schicht per `Network.setBlockedURLs` an/aus:
+`.value` aller Felder + `collectData()` an drei Objekten **1.570 Werte, 0 Abweichungen** (nur
+`_at`); `State.kpis`, 12 Cashflow-Jahre, alle Zahlen des Datensatzes und 176 Anzeigetexte
+**1.349 Werte, 0 Abweichungen** (Lindenallee Cashflow −741,08 €/M, BMY 4,03 %, DSCR 0,89;
+Hölderlinstr. +86,22 €/M, 6,34 %, 1,37). Tippen gemessen: „1234,5" € → sichtbar „1.234,50", `v()`
+1234,5; „3.400" € → 3400; **„3.5" % → „3,5", `v()` 3,5** (punkt-ist-kein-tausender); Skript setzt
+12500 → „12.500", `.value` „12500"; Baujahr unberührt. buster-ebenen RC=0, frontend-konstanten,
+prompt-lecks RC=0, objekt-mapper RC=0. Screenshots Bewirtschaftung vorher/nachher in der Sitzung.
+
+**Rest.** Nicht auf Staging gezogen (Marcel rollt aus) — Abnahmepunkt: auf Staging einmal tippen
+(Fokus zeigt Rohtext, Blur deutsch) und einen Import in Bewirtschaftung laufen lassen. Bewusst
+nicht angefasst: `avm-section.js` (Nicht anfassen) zeigt „-21.6%" in der Marktwert-Karte;
+`brw_stichtag` steht als ISO-Text „2026-01-01"; Monatsraten/AfA mit Cent (4.125,00 €) sind Absicht;
+die Anlage-V-Jahresfelder (`type=number`) formatiert der Browser selbst; Quick-Check-iframe ist ein
+eigenes Dokument (nicht Teil des Auftrags). Drehbücher, die in Felder tippen, zeigen ab jetzt
+während des Tippens die deutsche Form („1.090" bei „1090").
