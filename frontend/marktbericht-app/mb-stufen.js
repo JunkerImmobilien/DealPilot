@@ -398,6 +398,14 @@
       /* v2198b · Responsive-Check 320-390 px: der Kostenhinweis „1 × MPI · noch 16 frei“ lief ohne Umbruch bis 353 px
          (Zeile endet bei 201, Schirm bei 263) und wurde abgeschnitten. Schmal: eigene Zeile darunter. */
       '@media (max-width:480px){.mbst-zeile{flex-wrap:wrap;row-gap:2px}.mbst-kero{margin-left:0;white-space:normal}}',
+      /* v3029a · Marcel 28.10.2026: „in der Handy-Ansicht die Abrufe der Berichte und das Kontingent vernünftig
+         untereinander zentrieren und formatieren“. Schmal steht unter dem Namen ein Kasten: oben der Abruf
+         (1 × MPI), darunter das Kontingent (noch 18 frei), beide mittig. Die Regel oben bleibt als Rückfall. */
+      '@media (max-width:480px){.mbst-zeile{display:flex;flex-direction:column;align-items:flex-start;gap:5px}' +
+        '.mbst-kero{margin-left:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;' +
+        'white-space:nowrap;line-height:1.3;min-width:96px;padding:4px 10px;border-radius:6px;' +
+        'border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 35%,transparent);background:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 6%,transparent)}' +
+        '.mbst-kero .mbst-frei,.mbst-kero .mbst-leer{margin-left:0;font-size:10px}}',
       '.mbst-was{font-size:10.5px;line-height:1.45;opacity:.6;margin-top:2px}',
       '.mbst-fehlt{font-size:10.5px;line-height:1.45;margin-top:2px;color:var(--wl-b8625c,#B8625C)}',
       /* v1139-VORRAT: kein Rot — das ist kein Mangel, sondern ein Klick. */
