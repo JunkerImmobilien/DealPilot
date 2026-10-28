@@ -8032,6 +8032,9 @@
         try { document.documentElement.classList.add('dpm-km'); if (!q('#dpm-km-css')) { var kc = document.createElement('style'); kc.id = 'dpm-km-css'; kc.textContent = 'html.dpm-km #dp-mba-pille{display:none!important}'; document.head.appendChild(kc); } } catch (e) {}
         await kmLaden();
         await rhStart(0);
+        /* ein leeres Objekt würde „Neues Objekt“ wiederverwenden (newobj-fixes v1268b) - also ein Feld setzen */
+        [['str', KM.str], ['hnr', KM.hnr], ['ort', KM.ort]].forEach(function (x) { var e = document.getElementById(x[0]); if (e) { e.value = x[1]; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } });
+        await warte(800);
         return kuS1(s);
       },
       kuS2, kuS3, kuS4, kuS5
