@@ -328,6 +328,14 @@
     var jahr = new Date().getFullYear();
     /* Grundschulden/Hypotheken sind Belastungen des Verkäufers, die mit dem Kaufpreis abgelöst werden - keine Kosten */
     var kosten = r.filter(function (x) { return zahl(x.kosten_eur) > 0 && String(x.schwere) !== 'niedrig' && (!x.jahr || (x.jahr >= jahr - 1 && x.jahr <= jahr + 2)) && !/grundschuld|hypothek|abt\.?\s*iii/i.test((x.titel || '') + ' ' + (x.quelle || '')); });
+    /* v3016y · eine Sonderumlage ist der Weg, eine Maßnahme zu bezahlen, keine eigene Ausgabe: steht im
+       selben Jahr eine Maßnahme mit mindestens dieser Summe, ist sie darin enthalten (Lindenallee 14:
+       Dach 92.000 € inkl. Sonderumlage 42.000 € ergab 160.300 € statt 118.300 €) */
+    var SU = /sonderumlage/i;
+    kosten = kosten.filter(function (x) {
+      if (!SU.test(x.titel || '')) return true;
+      return !kosten.some(function (y) { return y !== x && !SU.test(y.titel || '') && zahl(y.kosten_eur) >= zahl(x.kosten_eur) && (!x.jahr || !y.jahr || String(x.jahr) === String(y.jahr)); });
+    });
     var summe = kosten.reduce(function (s, x) { return s + zahl(x.kosten_eur); }, 0);
     var h = '<div class="dpu-ampel"><div class="hoch"><b>' + n.hoch + '</b><span>hoch</span></div><div class="mittel"><b>' + n.mittel + '</b><span>mittel</span></div><div class="niedrig"><b>' + n.niedrig + '</b><span>niedrig</span></div></div>';
     h += '<div class="dpu-karten">';
