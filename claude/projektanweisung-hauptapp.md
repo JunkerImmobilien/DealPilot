@@ -42916,3 +42916,34 @@ Marcel 22.10.2026: „ja rollout 62".
 - **Video-Prüfung (Agent):** 12 Videos neu (M18, M26, M21, M27 mit Drehbuch-Anpassung; M19, M15, M14, M10b, M06, Ü2, M24, Ü1/M03), Clips der Schleife und Spot v13 neu schneiden — wartet auf Marcels „ja“. Storybook neu erzeugt, Zahlen unverändert, Geschichten passen.
 - **Rest:** Demo-Objekt 2026-1122 nach Prod spiegeln; Videos neu; Wertpuffer-Tafel Ü1 (Produktfrage).
 - **Prod-Rollout 28.10.2026 mittags:** v3016-v3016i + Gold-Basislinie, Prod `2af9efe` (vorher `1d96d2b`); Prod 200, Backend healthy, `/ai/seiten-lesen` im Image, App laedt `unterlagen.js?v=v3016i`, `voice-import.js?v=v3016e`. v3016i: harte rgba-Gold-Pille in unterlagen.js auf Token (Gold-Audit hielt den ersten Rollout an).
+
+### v3016s/v3016x/v3016x1 · Webinar „Lindenallee 14 – Unterlagen einlesen“, Webinar komplett-mfh vertont, 2026-1123 auf 24/24 KPIs (28.10.2026)
+
+**Was.** (1) Neues Drehbuch `lindenallee-unterlagen` (Studio `?modul=lindenallee`, vier Kapitel, Tafel): sieben PDFs aus
+`frontend/messe-dateien/lindenallee-14` in einem NEUEN Objekt echt eingelesen (LU_LIVE: extract-expose, extract-dokument,
+seiten-lesen, dokumente-auswerten – 9 Abrufe je Lauf, deshalb nicht in die Schleife, `?schleife` bricht ab), Reiter
+Übernahme/Protokoll 2025/Auswertung, „Ausgewählte übernehmen“ → Einheiten (8 WE) → #risiken, #thesis; danach 2026-1123
+nur gelesen (luGesperrt), Pilot-Analyse › Unterlagen & WEG Einfach, dann Genau, Stärken & Risiken. Studio reicht
+`sprechtempo`/`tempo`/`halt` an die App durch; `?sprechtempo=15` = 15 Zeichen/s (Vorgabe 13).
+(2) 2026-1123 von 10/24 auf 24/24 KPIs: Zustand normal + Gewerke-Stufen (Exposé-Ausstattung, Protokoll 2025 TOP 3),
+Mietausfall niedrig, Entwicklung mehrere (Exposé), weg_r 9.600 (Protokoll TOP 2), hg_nul 3.313 (Verwaltervertrag TOP 7,
+29 € netto × 8 × 12 × 1,19), Finanzierung wie DEMO-BI1 (4,0 % / 1,0 % / 10 J, EK rund 20 % der GI: 990.000 / 250.093),
+Marktbericht Stufe 2 (Lage, Nachfrage, Wertsteigerung automatisch; Marktmiete 8,25 €/m² übernommen → Faktor 21,3).
+Investor Deal Score 60 (SOLIDE), Pilot-Analyse neu: „Nicht kaufen“, DealPilot-Score 25. Sicherung vorher:
+`/root/backups/obj-2026-1123-vor-ds-20261028-1531.json`.
+(3) Webinar komplett-mfh vertont (Marcels Stimmklon, 104 Zeilen): statt Neuaufnahme Standbild-Verlängerung, wo der
+Sprecher länger braucht als die Zeile steht (33 Stellen, +2:38) – Bild unverändert, Text vollständig.
+
+**Commits.** 5791ae37 (Drehbuch, Studio), 397ef3b8 (Frontend-Konstanten), cc1da383 (Nachbesserung nach Prüflauf).
+Hinweis: das Label v3016s war schon von 89992ae3 belegt (Einheiten erfassen) – meine Nachfolger heißen v3016x/v3016x1.
+
+**Nachweis.** Prüflauf + Aufnahme: neues Objekt angelegt und gelöscht (DPM_REIHE.geloescht), Konto bleibt bei 32
+Objekten; 2026-1123 nach der Aufnahme unverändert (updated_at 14:39:12 UTC, md5 3d32f31b…); gesperrt im Lauf u. a.
+PUT objects/2b57…, POST tax-snapshots, PUT tax-records/…/timeline, POST bmf/pipeline, POST marktbericht/potenzial.
+Videos unter `Dateien/Messe/Videos/Lindenallee-14/` (10:50 stumm, 10:58 vertont, −16,7 LUFS) und
+`Komplettbeispiel-MFH/komplett-mfh_2026-10-28_vertont.mp4` (31:32).
+
+**Rest / gefunden.** „Was absehbar Geld kostet“ (Unterlagen & WEG, Einfach) zählt die Sonderumlage doppelt:
+160.300 € = Flachdach 92.000 + Sonderumlage 42.000 (Teil der 92.000) + Fassade 24.500 + Studie 1.800. KI-These im
+Import schreibt je Lauf anderes, im Prüflauf „sämtliche Wohnungen vermietet“ (WE 5 steht leer); Auswertung nennt
+Rücklagen-Zuführung 7.800 statt 9.600 (2025 beschlossen). Im Protokoll-Reiter erscheint ein Jahr als „2.026“ (Intl).
