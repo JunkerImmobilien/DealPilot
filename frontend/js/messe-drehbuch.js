@@ -7856,7 +7856,7 @@
       var A = kuUnterlagen() || {}, su = (A.risiken || []).filter(function (x) { return /sonderumlage/i.test(x.titel || '') && Number(x.kosten_eur) > 0; })[0];
       var suRaus = !!(su && gw.indexOf(su.titel) < 0);
       DPM_KU.messung.kosten = { summe: gz, posten: gw, sonderumlageRaus: suRaus ? su.titel + ' ' + su.kosten_eur : null };
-      await kmSag(s, 'Was absehbar Geld kostet', (gz ? '<b>' + gz + '</b> — ' : '') + luKurz(gw, 110) + (suRaus ? '. Die <b>Sonderumlage</b> zählt nicht doppelt.' : ''),
+      await kmSag(s, 'Was absehbar Geld kostet', (gz ? '<b>' + gz + '</b> — ' : '') + luKurz(gw, 110).replace(/\s*…$/, ' …') + (suRaus ? ' Die <b>Sonderumlage</b> zählt nicht doppelt.' : ''),
         'Daneben die Karte: was absehbar Geld kostet' + (gz ? ' — ' + gz : '') + '. ' + (gw ? 'Darin: ' + luListe(luKurz(gw, 160)) + '.' : '') + (suRaus ? ' Die Sonderumlage zählt dabei nicht doppelt — sie ist der Weg, auf dem die Gemeinschaft das Dach bezahlt, keine zweite Ausgabe.' : ''), LU_NACH,
         { was: 'Nichts.', warum: 'Absehbare Kosten gehören in den Kaufpreis.', folge: 'Grundlage für die Verhandlung.' });
     }
@@ -7877,7 +7877,7 @@
       }
       var blH = function () { var p = r11Panel(); return p && [].filter.call(p.querySelectorAll('[data-dpu-ansicht="genau"] .dpu-h'), function (x) { return /^Baulasten/.test(r6Text(x)); })[0] || null; };
       if (blH()) {
-        var blT = r6Text(blH().nextElementSibling);
+        var blN = blH().nextElementSibling, blT = blN && blN.querySelectorAll('li').length ? [].map.call(blN.querySelectorAll('li'), r6Text).join(' · ') : r6Text(blN);
         DPM_KU.messung.baulastenVorher = blT;
         await luZeige(function () { return blH().nextElementSibling || blH(); }, 8);
         await kmSag(s, 'Baulasten', '<b>Nicht im Grundbuch</b> — ' + luKurz(blT.replace(/^Baulasten stehen nicht im Grundbuch, sondern /, 'sondern '), 120),
@@ -7927,7 +7927,7 @@
       var hw = kuWertText(hg()), hl = r6Text(hg().querySelector('.oabi-herl')), hb = r6Text(hg().querySelector('.oabi-bisher'));
       DPM_KU.messung.hausgeld = { wert: hw, herleitung: hl, bisher: hb, vorgehakt: !!(hg().querySelector('input[type=checkbox]') || {}).checked };
       var hu = luZeile(/^Hausgeld umlage/)(), huw = hu ? kuWertText(hu) : '';
-      await kmSag(s, 'Hausgeld aus dem Wirtschaftsplan', 'Nicht umlagefähig, inkl. Rücklage: <b>' + luKurz(hw, 60) + '</b>' + (hl ? ' — ' + luKurz(hl, 90) : '') + '.',
+      await kmSag(s, 'Hausgeld aus dem Wirtschaftsplan', 'Nicht umlagefähig, inkl. Rücklage: <b>' + luKurz(hw, 60) + '</b>' + (hl ? ' — ' + luKurz(hl.replace(/^.*darin:\s*/, ''), 110) : '') + '.',
         'Aus dem Wirtschaftsplan kommt das Hausgeld, getrennt in umlagefähig' + (huw ? ', ' + huw.replace(/\s*\(.*$/, '').replace(/\s*\/\s*Jahr/, ' im Jahr') : '') + ', und nicht umlagefähig einschließlich Rücklage: ' + hw.replace(/\s*\(.*$/, '').replace(/\s*\/\s*Jahr/, ' im Jahr') + '. Die Zeile zeigt, wie sich der Betrag zusammensetzt' + (hl ? ': ' + luKurz(hl, 140) : '') + '.', LU_NACH,
         { was: 'Nichts — gelesen.', warum: 'Was nicht umlagefähig ist, trägst du selbst.', folge: 'Es geht in die Bewirtschaftung des Objekts.' });
     }
@@ -7979,7 +7979,7 @@
     if (gen() && !gen().classList.contains('on')) { gen().click(); await warte(600); }
     var blH = function () { var p = r11Panel(); return p && [].filter.call(p.querySelectorAll('[data-dpu-ansicht="genau"] .dpu-h'), function (x) { return /^Baulasten/.test(r6Text(x)); })[0] || null; };
     if (blH()) {
-      var blT = r6Text(blH().nextElementSibling);
+      var blN = blH().nextElementSibling, blT = blN && blN.querySelectorAll('li').length ? [].map.call(blN.querySelectorAll('li'), r6Text).join(' · ') : r6Text(blN);
       DPM_KU.messung.baulastenNachher = blT;
       if (!/liegt nicht vor/.test(blT)) {
         await luZeige(function () { return blH().nextElementSibling || blH(); }, 8);
@@ -7997,7 +7997,7 @@
       await luZeige(box, 8);
       var gr = [].map.call(box().querySelectorAll('.ai-pdf-gruppe'), function (g) { return r6Text(g.querySelector('.ai-pdf-gruppe-h')); });
       DPM_KU.messung.bausteine = gr;
-      await kmSag(s, 'Bausteine im PDF', 'Sortiert nach <b>' + gr.map(function (x) { return x.replace(/\s*·.*$/, ''); }).join(' · ') + '</b> — das Urteil steht nur einmal im PDF.',
+      await kmSag(s, 'Bausteine im PDF', 'Drei Gruppen: <b>' + gr.map(function (x) { return x.replace(/\s*·.*$/, ''); }).join(' · ') + '</b> — mit dem Hinweis, welche bei diesem Objekt greift. Das <b>Urteil</b> steht nur einmal im PDF.',
         'Unter der Analyse wählst du die Bausteine fürs PDF. Sie sind sortiert: was im Ankauf und im Bestand gilt, was nur im Ankauf zählt und was erst im Bestand. Dazu steht, welche Gruppe bei diesem Objekt greift. Das Urteil steht nur einmal im PDF, in der Gesamtbewertung — und was schon gerechnet im PDF steht, kommt nicht noch einmal als Text.', LU_NACH,
         { was: 'Haken setzen oder abwählen.', warum: 'Jedes PDF hat einen anderen Leser.', folge: 'Die Auswahl merkt sich DealPilot je Objekt.' });
       var cb = function () { return document.getElementById('ai-pdf-sec-fotos'); };
