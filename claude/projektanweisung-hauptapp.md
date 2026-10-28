@@ -43613,7 +43613,7 @@ gold-audit RC=0 (416 auf der Basislinie). Alle 20 Prüfer RC=0, Buster SAUBER. B
 alle neuen Module mit richtigem Buster geladen; `DpIndexmiete.rechne` mit echter Reihe: Beginn 03/2022, Erklärung
 10/2026, wirksam 12/2026, +17,11 %; Vertragsübersicht Parkstr. 9 „5 Einheiten · 1 Staffel · 4 ohne Angabe“,
 Verweis nach v3028b rot und unterstrichen, Konsole ohne Fehler. Prod: Sicherungen `mb-20261028-2042` 30 MB,
-`haupt-20261028-2042` 15 MB; Migrationen 023/024 OK; HTTP 200.
+`haupt-20261028-2042` 15 MB; Migrationen 023/024 OK; HTTP 200. Jahreswerte-Takt auf Prod (5 min nach Start) lud selbst: VPI 226 bis 09/2026, BPI 27 bis 08/2026, NKM 81 bis 09/2026 – wie Staging. Angebotsabschlag 2025 meldet „zu wenig (0/20)“ je Art: auf Prod noch keine Stichprobe, erste Jahresrechnung ab 15.01.
 
 **Video.** Vertonung `komplett-mfh_2026-10-28b_vertont.mp4` fertig: 43:48, 145 MB, 131 Sätze (33 neu mit
 Marcels Stimmklon), 18 Standbilder zusammen 36,4 s; Ton geprüft an drei Stellen (−18 bis −23 dB).
