@@ -1,20 +1,21 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-28T14:09:44.783Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T15:46:06.045Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
  "stand": "2026-10-28",
- "erzeugt": "2026-10-28T14:09:44.783Z",
- "register_commit": "0fe9c1d0",
+ "erzeugt": "2026-10-28T15:46:06.045Z",
+ "register_commit": "7e79ec97",
  "register_lokal_geaendert": false,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 132,
- "saetze": 17489,
+ "dateien": 138,
+ "saetze": 17513,
  "kopf": {
-  "werte_gesamt": 6067,
-  "lzs": 2493,
-  "swf": 742,
-  "uk_flaeche": 161,
+  "werte_gesamt": 6085,
+  "lzs": 2505,
+  "swf": 744,
+  "uk_flaeche": 162,
   "uk_wgfz": 115,
-  "uk": 276,
+  "vgf": 1389,
+  "uk": 277,
   "irw_tabellen": 135,
   "irw_ausschuesse": 57,
   "ausschuesse": 201,
@@ -23,11 +24,11 @@ window.DPS_REGISTER = {
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 6067,
-  "mit_ausschuss": 6067,
-  "mit_jahrgang": 6067,
-  "mit_quelle": 6067,
-  "mit_seite": 6066
+  "werte": 6085,
+  "mit_ausschuss": 6085,
+  "mit_jahrgang": 6085,
+  "mit_quelle": 6085,
+  "mit_seite": 6084
  },
  "jahrgaenge": [
   2018,
@@ -139,20 +140,20 @@ window.DPS_REGISTER = {
    },
    "uk_wgfz": {
     "w": 32,
-    "anteil": 0.35
+    "anteil": 0.34
    },
    "anteil4": 0.93,
    "erfasst": true
   },
   "HE": {
    "name": "Hessen",
-   "werte": 569,
+   "werte": 579,
    "lzs": {
-    "w": 140,
-    "anteil": 0.88
+    "w": 148,
+    "anteil": 0.87
    },
    "swf": {
-    "w": 167,
+    "w": 169,
     "anteil": 0.73
    },
    "uk_flaeche": {
@@ -256,7 +257,7 @@ window.DPS_REGISTER = {
   },
   "BE": {
    "name": "Berlin",
-   "werte": 27,
+   "werte": 30,
    "lzs": {
     "w": 12,
     "anteil": 0.6
@@ -300,24 +301,24 @@ window.DPS_REGISTER = {
   },
   "MV": {
    "name": "Mecklenburg-Vorpommern",
-   "werte": 39,
+   "werte": 44,
    "lzs": {
-    "w": 16,
-    "anteil": 0.32
+    "w": 20,
+    "anteil": 0.37
    },
    "swf": {
     "w": 15,
     "anteil": 0.44
    },
    "uk_flaeche": {
-    "w": 1,
-    "anteil": 0.13
+    "w": 2,
+    "anteil": 0.22
    },
    "uk_wgfz": {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.31,
+   "anteil4": 0.34,
    "erfasst": true
   },
   "SN": {
