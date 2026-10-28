@@ -293,12 +293,35 @@
    * e: { ist, wfl, status, soll, soll_ab, vgl_qm, mv_letzte_erhoehung, massnahmen }
    * ctx: { kapp: {pct,text}, vgl_qm }
    */
+  /* v3016t · Marcel 28.10.2026: „gleicht er das auch mit dem Mietvertrag ab? Bei Indexmietverträgen oder
+     Staffelmiete können wir das nicht umlegen." Gemessen: sollFuer kannte mv_art nicht - § 558 und § 559
+     liefen auch bei Staffel- und Indexmiete. Die Regeln:
+       Staffelmiete  § 557a Abs. 2 BGB: Erhöhungen nach §§ 558 bis 559b während der Staffel ausgeschlossen.
+       Indexmiete    § 557b Abs. 2 BGB: § 558 ausgeschlossen; § 559 nur für bauliche Maßnahmen, die der
+                     Vermieter nicht zu vertreten hat (z. B. gesetzliche Pflicht) - das erfasst das Formular
+                     nicht, also keine Umlage, mit Hinweis.
+       Gewerbe       §§ 558/559 gelten nur für Wohnraum.
+     Eine EIGENE Soll-Angabe (z. B. die nächste Staffel) bleibt immer möglich. */
+  function vertragGrenzen(e) {
+    var art = String((e && e.mv_art) || '').toLowerCase();
+    if (art === 'staffel') return { art: art, s558: false, s559: false, text: 'Staffelmiete: Erhöhungen nach §§ 558 bis 559b BGB sind während der Staffel ausgeschlossen (§ 557a Abs. 2 BGB) – die Miete steigt nur nach den vereinbarten Staffeln. Die nächste Staffel trägst du als Soll-Miete ein.' };
+    if (art === 'index') return { art: art, s558: false, s559: false, text: 'Indexmiete: keine Erhöhung bis zur Vergleichsmiete (§ 557b Abs. 2 BGB); eine Modernisierungsumlage nur für Maßnahmen, die der Vermieter nicht zu vertreten hat (z. B. gesetzliche Pflicht) – deshalb hier nicht eingerechnet. Die Indexanpassung trägst du als Soll-Miete ein.' };
+    if (art === 'gewerbe' || (e && e.art === 'gewerbe')) return { art: 'gewerbe', s558: false, s559: false, text: 'Gewerbemiete: §§ 558 und 559 BGB gelten nur für Wohnraum – Erhöhungen richten sich nach dem Vertrag. Eine vereinbarte Anpassung trägst du als Soll-Miete ein.' };
+    return { art: art, s558: true, s559: true, text: '' };
+  }
   function sollFuer(e, ctx) {
     ctx = ctx || {};
     var ist = zahl(e.ist), wfl = zahl(e.wfl);
     var r = { miete: null, herkunft: null, grenze: null, ab: null, ab_text: '', hinweise: [] };
     if (e.status === 'leer' || !(ist > 0)) { r.grund = 'leer'; return r; }
-    var u = umlage559(massnahmenVon(e), ist, wfl);
+    var vg = vertragGrenzen(e);
+    var u = vg.s559 ? umlage559(massnahmenVon(e), ist, wfl) : { monat: 0, kosten: 0 };
+    if (!vg.s559 && massnahmenVon(e).some(function (m) { return m.bewohnt; })) r.hinweise.push('Umlage nicht eingerechnet – ' + vg.text);
+    if (!vg.s558) {
+      var eig = zahl(e.soll);
+      if (eig > 0) { r.miete = eig; r.herkunft = 'eigene Angabe'; r.vertrag = vg.art; return r; }
+      r.grund = vg.text; r.vertrag = vg.art; return r;
+    }
     /* Termin: eigene Angabe vor der Frist aus dem Mietvertrag. */
     var letzte = String(e.mv_letzte_erhoehung || '');
     var frist = letzte ? plusMonate(letzte, 15) : null;
@@ -1767,13 +1790,15 @@
         + esc(k.t) + (mitPunkte && k.gewerk && p ? ' <em>+' + p + ' P.</em>' : '') + '</button>';
     }).join('') + '</div>';
   }
-  function massnahmenZeilen(liste) {
+  function massnahmenZeilen(liste, e) {
+    var vg = e ? vertragGrenzen(e) : { s559: true };   /* v3016t */
     return (liste || []).map(function (m, i) {
       return '<div class="dp-zb-mz" data-zb-i="' + i + '"><span class="dp-zb-mt">' + esc(m.t) + '</span>'
         + '<label><span>Kosten €</span><input data-zb-k="' + i + '" inputmode="decimal" value="' + esc(m.k ? String(Math.round(zahl(m.k))) : '') + '" placeholder="0"></label>'
         /* v3001 · Marcel 27.10.2026: „bewohnen und irgendein Paragraph, wo keiner weiss, was gemeint ist“ -
            das Kaestchen sagt jetzt, was es tut: die Kosten als Modernisierungsumlage auf die laufende Miete. */
         + (m.id === 'renovierung' ? '<span class="dp-zb-bew-nein">Renovierung ist Erhaltung — nicht auf die Miete umlegbar</span>'
+          : !vg.s559 ? '<span class="dp-zb-bew-nein"><b>Nicht auf die Miete umlegbar.</b> ' + esc(vg.text) + ' Die Maßnahme zählt zum Zielbild (nach Auszug, Neuvermietung).</span>'
           : '<label class="dp-zb-bew"><input type="checkbox" data-zb-b="' + i + '"' + (m.bewohnt ? ' checked' : '') + '> Mieter bleibt drin — Kosten auf die Miete umlegen</label>'
           + (m.bewohnt ? '<label><span>davon Erhaltung %</span><input data-zb-e="' + i + '" inputmode="decimal" value="' + esc(m.erh ? String(zahl(m.erh)) : '') + '" placeholder="0" style="width:70px"></label>'
             + '<span class="dp-zb-bew-info">Modernisierungsumlage (§ 559 BGB): 8 % der Kosten pro Jahr auf die Miete, ohne den Anteil für Erhaltung (z. B. ohnehin fällige Reparatur), höchstens 3 €/m² — bei Miete unter 7 €/m² 2 €/m² — in 6 Jahren. Geht in die Soll-Miete ein.</span>'
@@ -1815,7 +1840,7 @@
     chipStil();
     function zeichne() {
       host.innerHTML = chipsHtml(liste, true, opts.e || null, opts.geb || null, !!opts.fuerEinheit, !!opts.fuerHaus)
-        + '<div class="dp-zb-mliste">' + massnahmenZeilen(liste) + '</div>';
+        + '<div class="dp-zb-mliste">' + massnahmenZeilen(liste, opts.e || null) + '</div>';
       host.querySelectorAll('[data-zb-chip]').forEach(function (b) {
         b.onclick = function () {
           var id = b.getAttribute('data-zb-chip'), k = katalog(id);
