@@ -188,6 +188,19 @@
       '.dpu-these{border-left:3px solid ' + GOLD + ';padding:6px 10px;background:#FBF6E9;border-radius:6px;font-size:13px;line-height:1.5}',
       '.dpu-hinweis{font-size:12px;color:#7A7370;margin:6px 0}',
       '.dpu-gesperrt{padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.3);font-size:12.5px;background:#fff}',
+      /* v3016x · WEG-Blöcke */
+      '.dpu-weg{margin:14px 0 6px;border:1px solid rgba(42,39,39,.12);border-radius:12px;overflow:hidden;background:#fff}',
+      '.dpu-weg-kopf{background:#2A2727;color:#fff;font:600 12px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:9px 14px}',
+      '.dpu-weg-blk{padding:12px 14px;border-top:1px solid rgba(42,39,39,.08)}.dpu-weg-blk:first-of-type{border-top:0}',
+      '.dpu-weg-t{font:600 11.5px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#7A7370;margin:0 0 8px}',
+      '.dpu-zeit{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid ' + GOLD + '}',
+      '.dpu-zeit li{position:relative;margin:0 0 7px;font-size:12.8px;line-height:1.45}.dpu-zeit li::before{content:"";position:absolute;left:-19px;top:6px;width:8px;height:8px;border-radius:50%;background:' + GOLD + '}',
+      '.dpu-zeit li b{display:inline-block;min-width:64px;margin-right:6px;color:#2A2727}',
+      '.dpu-weg-geld{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}',
+      '.dpu-weg-geld div{background:#FBF6E9;border-radius:10px;padding:10px 12px}.dpu-weg-geld span{font:600 11px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#7A7370}.dpu-weg-geld p{margin:4px 0 0;font-size:12.8px;line-height:1.45}',
+      '.dpu-tbl .r{text-align:right;white-space:nowrap}',
+      '.dpu-st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;background:rgba(42,39,39,.07)}.dpu-st-beschlossen{background:rgba(184,98,92,.13);color:#B8625C}.dpu-st-geplant{background:color-mix(in srgb, ' + GOLD + ' 18%, transparent);color:#8a6d1f}.dpu-st-erledigt{background:rgba(63,165,108,.14);color:#2f7d52}',
+      '.dpu-weg-p{margin:0;font-size:13px;line-height:1.5}.dpu-weg-fazit{background:#FBFAF7}',
       /* v3016r · Einfach/Genau */
       '.dpu-umschalter{display:inline-flex;border:1px solid rgba(42,39,39,.18);border-radius:999px;overflow:hidden;margin:0 0 12px}',
       '.dpu-umschalter button{border:0;background:#fff;padding:5px 14px;font-size:12.5px;cursor:pointer;color:#2A2727}',
@@ -267,17 +280,24 @@
     if (r.length) h += '<div class="dpu-h">Risiken (' + r.length + ')</div>' + r.map(risikoHtml).join('');
     var w = a.weg;
     if (w) {
-      h += '<div class="dpu-h">WEG · Eigentümergemeinschaft</div>';
-      if ((w.kernpunkte || []).length) h += '<ul class="dpu-ul">' + w.kernpunkte.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>';
-      var dl = [];
-      if (w.ruecklage) dl.push('<dt>Erhaltungsrücklage</dt><dd>' + esc(w.ruecklage) + '</dd>');
-      if (w.hausgeld) dl.push('<dt>Hausgeld</dt><dd>' + esc(w.hausgeld) + '</dd>');
-      if (w.verwaltung) dl.push('<dt>Verwaltung</dt><dd>' + esc(w.verwaltung) + '</dd>');
-      if ((w.sonderumlagen || []).length) dl.push('<dt>Sonderumlagen</dt><dd>' + w.sonderumlagen.map(esc).join('<br>') + '</dd>');
-      if (dl.length) h += '<dl class="dpu-dl">' + dl.join('') + '</dl>';
-      if ((w.sanierungen || []).length) h += '<table class="dpu-tbl"><tr><th>Maßnahmen</th><th>Status</th><th>Jahr</th><th>Kosten gesamt</th><th>Anteil Objekt</th></tr>'
-        + w.sanierungen.map(function (s) { return '<tr><td>' + esc(s.massnahme) + '</td><td>' + esc(s.status || '') + '</td><td>' + esc(s.jahr || '') + '</td><td>' + esc(eur(s.kosten_eur)) + '</td><td>' + esc(eur(s.anteil_objekt_eur)) + '</td></tr>'; }).join('') + '</table>';
-      if (w.fazit) h += '<p style="font-size:13px;line-height:1.5;margin:6px 0">' + esc(w.fazit) + '</p>';
+      /* v3016x · Marcel 28.10.2026: „den Tab ab WEG Eigentümergemeinschaft besser angeben, Übergang zu
+         Erhaltungsrücklage nicht schön … klar trennen die Bereiche". Bis hier liefen Kernpunkte, Rücklage,
+         Hausgeld und Verwaltung als lose Liste ineinander. Jetzt fünf Blöcke mit eigener Überschrift. */
+      h += '<div class="dpu-weg">';
+      h += '<div class="dpu-weg-kopf">WEG · Eigentümergemeinschaft</div>';
+      if ((w.kernpunkte || []).length) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">1 · Verlauf aus den Protokollen</div><ol class="dpu-zeit">'
+        + w.kernpunkte.map(function (y) { var m = String(y).match(/^\s*((?:19|20)\d\d(?:\s*[\/–-]\s*(?:19|20)?\d\d)?)\s*[:–-]\s*([\s\S]*)$/); return '<li>' + (m ? '<b>' + esc(m[1]) + '</b>' + esc(m[2]) : '<b>–</b>' + esc(y)) + '</li>'; }).join('') + '</ol></div>';
+      var geld = [];
+      if (w.ruecklage) geld.push(['Erhaltungsrücklage', w.ruecklage]);
+      if (w.hausgeld) geld.push(['Hausgeld', w.hausgeld]);
+      if ((w.sonderumlagen || []).length) geld.push(['Sonderumlagen', w.sonderumlagen.join(' · ')]);
+      if (geld.length) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">2 · Geld der Gemeinschaft</div><div class="dpu-weg-geld">'
+        + geld.map(function (x) { return '<div><span>' + esc(x[0]) + '</span><p>' + esc(x[1]) + '</p></div>'; }).join('') + '</div></div>';
+      if ((w.sanierungen || []).length) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">3 · Maßnahmen am Gemeinschaftseigentum</div><table class="dpu-tbl"><tr><th>Maßnahmen</th><th>Status</th><th>Jahr</th><th class="r">Kosten gesamt</th><th class="r">Anteil Objekt</th></tr>'
+        + w.sanierungen.map(function (s) { var st = String(s.status || ''); return '<tr><td>' + esc(s.massnahme) + '</td><td><span class="dpu-st dpu-st-' + esc(st) + '">' + esc(st || '–') + '</span></td><td>' + esc(s.jahr || '') + '</td><td class="r">' + esc(eur(s.kosten_eur)) + '</td><td class="r">' + esc(eur(s.anteil_objekt_eur)) + '</td></tr>'; }).join('') + '</table></div>';
+      if (w.verwaltung) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">4 · Verwaltung</div><p class="dpu-weg-p">' + esc(w.verwaltung) + '</p></div>';
+      if (w.fazit) h += '<div class="dpu-weg-blk dpu-weg-fazit"><div class="dpu-weg-t">5 · Fazit</div><p class="dpu-weg-p">' + esc(w.fazit) + '</p></div>';
+      h += '</div>';
     }
     var g = a.grundbuch;
     if (g && ((g.lasten || []).length || g.grundschulden)) {
