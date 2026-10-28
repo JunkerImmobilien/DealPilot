@@ -1,0 +1,201 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "kreis",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": true,
+  "formel": {
+   "form": "flaeche_eins",
+   "bezug": "Bodenwert = Grundstücksfläche × Bodenrichtwert × 1",
+   "wirkung": "multiplikativ",
+   "spanne_qm": [
+    null,
+    1000
+   ],
+   "wortlaut": "Im Rahmen einer Regressionsanalyse zum Einfluss der Grundstücksfläche und -tiefe sowie der Grundflächenzahl auf den Kaufpreis bei erschließungsbeitragsfreien Wohngrundstücken des individuellen Wohnungsbaus (bis zu einer Flächengröße von 1.000 m²) konnten keine Abhängigkeiten nachgewiesen werden. Diese Grundstücksmerkmale sind derzeit in der Landeshauptstadt Schwerin nicht wertrelevant. Daher werden keine Umrechnungskoeffizienten zur Anpassung von Grundstücksfläche und -tiefe sowie der Grundflächenzahl ausgewiesen."
+  },
+  "geltungsbereich": {
+   "nutzung": "erschließungsbeitragsfreie Wohngrundstücke des individuellen Wohnungsbaus bis 1.000 m² in der Landeshauptstadt Schwerin",
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw",
+    "gewerbe"
+   ],
+   "objektarten_hinweis": "Die Analyse betrifft ausdrücklich Wohngrundstücke des individuellen Wohnungsbaus; Mehrfamilienhaus-, Wohnungseigentums- und Gewerbegrundstücke sind nicht untersucht und bleiben außen vor.",
+   "spanne_qm": [
+    null,
+    1000
+   ],
+   "spanne_wortlaut": "(bis zu einer Flächengröße von 1.000 m²)",
+   "ausserhalb_wortlaut": "Abweichungen des einzelnen Grundstücks in den wertbeeinflussenden Eigenschaften wie Art und Maß der baulichen Nutzung, Grundstücksgröße, Bodenbeschaffenheit, Erschließungszustand und Grundstücksgestaltung, aber auch die Lage innerhalb der Bodenrichtwertzone bewirken Abweichungen seines Verkehrswertes vom Bodenrichtwert. Dazu sind gebietsbezogen auf Anfrage Auskünfte in der Geschäftsstelle zu erhalten. (Kap. 4.3, Druck-S. 54)",
+   "ausserhalb_weg": "Über 1.000 m² und für andere Objektarten: Auskunft der Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Landeshauptstadt Schwerin (gebietsbezogen auf Anfrage); Bericht: https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+   "uebergroesse_hinweis": "Für Grundstücke über 1.000 m² trifft der Ausschuss keine Aussage; dort gibt es keinen Koeffizienten (auch nicht 1)."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Der Grundstücksmarkt 2025 in der Landeshauptstadt Schwerin (Grundstücksmarktbericht 2025)",
+    "fundstelle": "Kap. 5.1 „Einfluss der Grundstücksfläche, der Grundflächenzahl und der Grundstückstiefe auf den Bodenwert“, Druck-S. 55 (PDF-S. 58)",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+    "wortlaut": "Im Rahmen einer Regressionsanalyse zum Einfluss der Grundstücksfläche und -tiefe sowie der Grundflächenzahl auf den Kaufpreis bei erschließungsbeitragsfreien Wohngrundstücken des individuellen Wohnungsbaus (bis zu einer Flächengröße von 1.000 m²) konnten keine Abhängigkeiten nachgewiesen werden. Diese Grundstücksmerkmale sind derzeit in der Landeshauptstadt Schwerin nicht wertrelevant. Daher werden keine Umrechnungskoeffizienten zur Anpassung von Grundstücksfläche und -tiefe sowie der Grundflächenzahl ausgewiesen."
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Der Grundstücksmarkt 2025 in der Landeshauptstadt Schwerin (Grundstücksmarktbericht 2025)",
+    "fundstelle": "Impressum (PDF-S. 2)",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+    "wortlaut": "Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet."
+   }
+  ],
+  "belege_meta": {
+   "abgerufen_am": "2026-10-28",
+   "seitenzaehlung": "Druckseite und PDF-Seite getrennt angegeben",
+   "dokument": "Grundstücksmarktbericht Schwerin 2025",
+   "seiten": 96
+  },
+  "stufe": "A",
+  "stufe_grund": "Amtliche Feststellung des örtlich zuständigen Ausschusses: die Grundstücksfläche ist bei Wohngrundstücken des individuellen Wohnungsbaus bis 1.000 m² nicht wertrelevant. Das ist ein Wert (Koeffizient 1) im Geltungsbereich, keine Sperre — wie Amberg (BY) und Sachsen-Anhalt landesweit. Vorrang vor dem Landeswert MV (ImmoWertA Nr. 9 (3)).",
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Jahrgang und Stichtag wie die übrigen Sätze aus demselben Bericht (schwerin.json: Grundstücksmarktbericht 2025, Bodenrichtwerte 01.01.2025); der Abschnitt selbst nennt keinen Stichtag.",
+  "berichtsjahr": 2025,
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "lizenz": "Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.",
+  "lizenz_hinweis": "Gleiche Lizenz wie die Zins- und Faktorsätze aus diesem Bericht (schwerin.json). Auflage: eindeutige Quellenangabe (quellenvermerk) und Belegexemplar an den Herausgeber — das Belegexemplar ist eine organisatorische Auflage, die für den ganzen Bericht gilt (siehe offene Frage im Erntebericht 28.10.2026).",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "fundstelle": "Kap. 5.1, Druck-S. 55 (PDF-S. 58)",
+  "verwendung": "Bodenwert: keine Anpassung an die Grundstücksgröße (Koeffizient 1) im Geltungsbereich bis 1.000 m².",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "quelle_parser": "ernte-20261028-uk (pdftotext -layout je Seite, PDF-S. 58 einzeln gelesen, 28.10.2026)",
+  "modellansaetze": {}
+ },
+ {
+  "land_code": "MV",
+  "ags": "13074",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Nordwestmecklenburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht eigene Flächenanpassungsfaktoren für Wohnbauland (Grundstücksmarktbericht 2026, Kap. 3.2.7.10 „Bodenrichtwert Umrechnungskoeffizienten (Fläche)“, Druck-S. 58–59, Kauffälle 2023 bis 2025) als vier logarithmische Funktionen je Bodenpreisindexgebiet: „ländliche Zentralorte“ (700 m² = 1), „Landkreis allgemein“ (1.000 m² = 1), „Ostseeregion“ ohne Wismar (1.000 m² = 1) und „Hansestadt Wismar“ (700 m² = 1); „Für ‚Landkreis allgemein‘ und ‚Hansestadt Wismar‘ ist eine Flächenabhängigkeit kaum nachweisbar.“ Zwei Gründe gegen einen Wert: (1) Lizenz: „Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden … Vervielfältigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers.“ — eine Genehmigung liegt nicht vor; (2) welche Funktion gilt, hängt am Bodenpreisindexgebiet, nicht am Gemeindeschlüssel (nur Wismar ist eindeutig); eine Zuordnung der Gemeinden zu den Gebieten steht nicht im Abschnitt, und Geltungsspannen in m² nennt er nicht. Vorrang vor dem (ebenfalls gesperrten) Landeswert MV. Weg: Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg einholen; Bericht über den Geoshop des Landkreises: https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html.",
+  "sperre_grund": "lizenz",
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html",
+  "formel": null,
+  "geltungsbereich": null,
+  "formel_vorgemerkt": {
+   "nutzung_intern": "stuetzstelle",
+   "nutzung_hinweis": "Nur als Stützstelle für die ausdrücklich als Näherung gekennzeichnete DealPilot-Formel – nie als amtliche Zahl ausgeben. Übernahme als Wert erst nach Genehmigung des Herausgebers und mit Zuordnung der Gemeinden zu den Bodenpreisindexgebieten.",
+   "lizenz_wortlaut": "Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt (§ 2 Urhebergesetz - UrhG). Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden (§ 12 i. V. mit § 87 a UrhG). Vervielfältigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers.",
+   "form": "flaeche_funktion",
+   "typ": "log",
+   "zuordnung": "je Bodenpreisindexgebiet (nicht je Gemeinde)",
+   "gebiete": [
+    {
+     "gebiet": "ländliche Zentralorte",
+     "normgroesse_qm": 700,
+     "a": 1.205,
+     "b": -0.031,
+     "formel_wortlaut": "y = -0,031ln(x) + 1,205",
+     "kauffaelle": 15,
+     "untersuchungszeitraum": "2023 bis 2025",
+     "bodenrichtwertniveau": "19 €/m² bis 165 €/m², Mittel 95,00 €/m²",
+     "planungsrecht": "B-Plangebiete und unbeplanter Innenbereich",
+     "seite": "Druck-S. 58 (PDF-S. 59)"
+    },
+    {
+     "gebiet": "Landkreis allgemein",
+     "normgroesse_qm": 1000,
+     "a": 0.9087,
+     "b": 0.0132,
+     "formel_wortlaut": "y = 0,0132ln(x) + 0,9087",
+     "kauffaelle": 173,
+     "untersuchungszeitraum": "2023 bis 2025",
+     "bodenrichtwertniveau": "16 €/m² bis 300 €/m², Mittel 104,00 €/m²",
+     "planungsrecht": "überwiegend aus B-Plangebieten",
+     "seite": "Druck-S. 58 (PDF-S. 59)"
+    },
+    {
+     "gebiet": "Ostseeregion (ohne Wismar)",
+     "normgroesse_qm": 1000,
+     "a": 1.382,
+     "b": -0.055,
+     "formel_wortlaut": "y = -0,055ln(x) + 1,382",
+     "kauffaelle": 52,
+     "untersuchungszeitraum": "2023 bis 2025",
+     "bodenrichtwertniveau": "42 €/m² bis 360 €/m², Mittel 170 €/m²",
+     "planungsrecht": "überwiegend aus B-Plangebieten",
+     "seite": "Druck-S. 59 (PDF-S. 60)"
+    },
+    {
+     "gebiet": "Hansestadt Wismar",
+     "normgroesse_qm": 700,
+     "a": 1.1497,
+     "b": -0.023,
+     "formel_wortlaut": "y = -0,023ln(x) + 1,1497",
+     "kauffaelle": 14,
+     "untersuchungszeitraum": "2023 bis 2025",
+     "bodenrichtwertniveau": "130 €/m² bis 230 €/m², Mittel 200,00 €/m²",
+     "planungsrecht": "überwiegend aus B-Plangebieten (ohne Sanierungsgebiet)",
+     "seite": "Druck-S. 59 (PDF-S. 60)"
+    }
+   ],
+   "hinweis_wortlaut": "Für „Landkreis allgemein“ und „Hansestadt Wismar“ ist eine Flächenabhängigkeit kaum nachweisbar.",
+   "pruefbeispiel": null,
+   "pruefbeispiel_hinweis": "Der Abschnitt druckt kein Rechenbeispiel."
+  },
+  "nutzung_intern": "stuetzstelle",
+  "weg": "Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg einholen; Bericht über den Geoshop des Landkreises: https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Untersuchungszeitraum 2023 bis 2025; einen Stichtag nennt der Abschnitt nicht.",
+  "berichtsjahr": 2026,
+  "quelle_url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+  "lizenz": "urheberrechtlich geschützt — darf Dritten nicht verwertbar gemacht werden; Vervielfältigung und Verbreitung nur mit Genehmigung des Herausgebers",
+  "lizenz_wortlaut": "Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt (§ 2 Urhebergesetz - UrhG). Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden (§ 12 i. V. mit § 87 a UrhG). Vervielfältigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers.",
+  "quellenvermerk": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarkt im Landkreis Nordwestmecklenburg 2026 (Grundstücksmarktbericht 2026)",
+    "fundstelle": "Kap. 3.2.7.10, Druck-S. 58 (PDF-S. 59)",
+    "url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+    "wortlaut": "Flächenanpassungsfaktoren für das Bodenpreisindexgebiet „ländliche Zentralorte“ … 700 m² = 1 … y = -0,031ln(x) + 1,205"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarkt im Landkreis Nordwestmecklenburg 2026 (Grundstücksmarktbericht 2026)",
+    "fundstelle": "Kap. 3.2.7.10, Druck-S. 59 (PDF-S. 60)",
+    "url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+    "wortlaut": "Für „Landkreis allgemein“ und „Hansestadt Wismar“ ist eine Flächenabhängigkeit kaum nachweisbar."
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarkt im Landkreis Nordwestmecklenburg 2026 (Grundstücksmarktbericht 2026)",
+    "fundstelle": "Impressum (PDF-S. 2)",
+    "url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+    "wortlaut": "Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt (§ 2 Urhebergesetz - UrhG). Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden (§ 12 i. V. mit § 87 a UrhG). Vervielfältigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers."
+   }
+  ],
+  "belege_meta": {
+   "dokument": "Grundstücksmarktbericht 2026, Landkreis Nordwestmecklenburg",
+   "abgerufen_am": "2026-10-27",
+   "gelesen_am": "2026-10-28"
+  },
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261028-uk (pdftotext -layout je Seite, PDF-S. 59–60 einzeln gelesen, 28.10.2026)",
+  "modellansaetze": {},
+  "fundstelle": "Kap. 3.2.7.10, Druck-S. 58–59 (PDF-S. 59–60); Impressum PDF-S. 2"
+ }
+]
