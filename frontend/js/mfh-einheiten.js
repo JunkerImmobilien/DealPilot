@@ -1472,7 +1472,9 @@
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
     vermstandPruefen: vermstandPruefen /* v3001b */, vorbelegen: vorbelegen /* v3016 */,
-    oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+    oeffnen: oeffnen, knopf: knopf,
+    /* v3027 · eine Einheit gezielt öffnen (Absprung aus der Vertragsübersicht im Reiter Miete) */
+    einheitOeffnen: function (i) { oeffnen(1); setTimeout(function () { wohnungOeffnen(i); }, 0); }, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
        eine zweite Liste dort waere der Anfang der Abweichung. */
