@@ -278,6 +278,7 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `beleihungswert-pruefen.mjs` | indikativer Beleihungswert-Check nach BelWertV (`lib/beleihungswert.js`), Mindestzins aus `config.js` jährlich nach dem 30.11. prüfen |
 | `ki-text-zahlen-pruefen.mjs` | KI-Fließtext des Marktberichts: Prozente/Zählungen gegen die vorab gerechneten Prüfzahlen (`lib/ki_text_pruefung.js`, v2670) |
 | `messe-schleife-daten.mjs` | erzeugt Register- und Videothek-Zahlen der Messe-Schleife **und die Registerkarten auf „Wie wir rechnen“** (`frontend/landing/register-stand.js`, seit landing-methodik-3); nach jeder Ernte laufen lassen und beide `register-stand.js` mitcommitten |
+| `sperren-anfrageliste.mjs` | jede Sperre des Registers je Gutachterausschuss mit Grund (`zugang`), Kennzahlen, Preis, Link und belegter E-Mail der Geschäftsstelle (`lib/ausschuss_kontakte.json`) → `Dateien/Register/Sperren-Anfrageliste.csv/.md`, `--land=XX`; dieselbe Rechnung (`lib/sperren_anfragen.js`) speist Admin › „Register & Ernte“ › „Anfragen an Ämter“ (Status in `mb.amt_anfragen`); nach jeder Ernte laufen lassen |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom

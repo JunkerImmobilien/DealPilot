@@ -2052,6 +2052,21 @@ router.get('/register/deckung/zelle', requireAdmin, async (req, res) => {
   } catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
 });
 
+/* v3020 · Anfragen an Ämter — Sperren je Gutachterausschuss mit E-Mail der
+ * Geschäftsstelle und Status (mb.amt_anfragen). Versendet wird nichts. Wer
+ * geändert hat, setzt der Proxy aus dem Admin-Token, nicht der Browser. */
+router.get('/register/anfragen', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('GET', '/register/anfragen'); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+router.post('/register/anfragen/status', requireAdmin, async (req, res) => {
+  const b = req.body || {};
+  const body = { schluessel: b.schluessel, status: b.status, angefragt_am: b.angefragt_am,
+    antwort_am: b.antwort_am, notiz: b.notiz, von: (req.adminUser && req.adminUser.email) || null };
+  try { const o = await _mbCall('POST', '/register/anfragen/status', body); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+
 router.post('/marktzinsen/uebernehmen', requireAdmin, async (req, res) => {
   try { const o = await _mbCall('POST', '/harvest/uebernehmen', req.body || {}); res.status(o.status).json(o.data); }
   catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }

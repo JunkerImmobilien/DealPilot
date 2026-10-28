@@ -120,6 +120,23 @@ Jeder **Wert** zusätzlich:
 - Die App zeigt das unter dem Feld als „Gebührenpflichtig … dort abrufen →"
   (v2370, `bodenrichtwert.js`); ohne Link endet der Nutzer dort im Leeren.
 
+## Sperren vermerken (Marcel 28.10.2026)
+- „Bitte alle Sperren immer vermerken und pflege eine Liste dazu mit E-Mail,
+  damit ich das irgendwann mal abfragen kann und dann Anfrage bei den Ämtern."
+- Jede neue Sperre trägt `zugang` (`kostenpflichtig` · `genehmigungspflichtig` ·
+  `nichtkommerziell` · `auf_anfrage` · `nicht veröffentlicht` · `nicht abgeleitet` …)
+  — **nie nur Freitext**; Preis in `gebuehr`, Bestellseite in `bestell_url`.
+- Hat `marktbericht/backend/src/lib/ausschuss_kontakte.json` für den Ausschuss
+  noch keine E-Mail: die E-Mail der **Geschäftsstelle** mit Beleg nachtragen
+  (`email`, `webseite`, `quelle_url` = Seite, auf der sie steht, `gelesen_am`;
+  optional `telefon`, `anschrift`). Nur wörtlich gelesene Funktionspostfächer,
+  keine geratenen info@-Adressen, keine Mitarbeiternamen. Ohne E-Mail:
+  `email: null` und `kontaktformular_url`. Abweichende Schreibweisen desselben
+  Ausschusses unter `alias`, Schlüssel ist der Name wie im Register.
+- Nach jeder Ernte `node tools/sperren-anfrageliste.mjs` laufen lassen
+  (→ `Dateien/Register/Sperren-Anfrageliste.csv/.md`; dieselbe Liste zeigt der
+  Admin unter „Register & Ernte" › „Anfragen an Ämter").
+
 ## Ablauf
 1. Lage messen, nicht annehmen: `node tools/saat-pruefen.mjs` zeigt je Datei,
    was fehlt; die Länderlage steht im Register (Dateien + `SAATDATEIEN` in

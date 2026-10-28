@@ -23,6 +23,7 @@ import { sperreRest, merkeLauf, laufStand } from '../lib/harvestScheduler.js';
 /* v2591 · Deckung des Registers fuer die Admin-Ansicht „Register & Ernte" */
 import { registerDeckung, zellenListe, KZ_NAME as DECKUNG_KZ } from '../lib/register_deckung.js';
 import { q as qMb } from '../lib/db.js';
+import { sperrenAnfrageliste, ANFRAGE_STATUS, STATUS_NAME, GRUND_NAME as ANFRAGE_GRUND_NAME } from '../lib/sperren_anfragen.js';   /* v3020 */
 import { DestatisConnector } from '../connectors/stubConnectors.js';
 import { AgsResolver } from '../connectors/AgsResolver.js';
 /* v1846 · fuer POST /wertparameter/zinssatz — der amtliche Zins und die
@@ -101,6 +102,65 @@ router.get('/register/deckung/zelle', (req, res) => {
   }
   try { res.json({ land, kz, ausschuesse: zellenListe(land, kz) }); }
   catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* ── v3020 · ANFRAGEN AN ÄMTER, fuer die Admin-Ansicht ─────────────────
+ *
+ * Abgesichert wie /register/deckung: nur im Docker-Netz, von aussen
+ * ausschliesslich ueber den Admin-Proxy des Haupt-Backends
+ * (/admin/register/anfragen, requireAdmin). Die Liste rechnet
+ * lib/sperren_anfragen.js — dieselbe Funktion wie
+ * tools/sperren-anfrageliste.mjs. Register und Kontaktdatei liegen im
+ * Image, deshalb einmal je Prozess. Der Status kommt aus mb.amt_anfragen
+ * (Migration 022). Versendet wird nichts. */
+let _anfrageCache = null;
+router.get('/register/anfragen', async (req, res) => {
+  try {
+    if (!_anfrageCache) _anfrageCache = sperrenAnfrageliste();
+    let status = [];
+    let statusFehler = null;
+    try { status = await qMb('SELECT schluessel, land, ausschuss, status, angefragt_am::text AS angefragt_am, antwort_am::text AS antwort_am, notiz, geaendert_am, geaendert_von FROM mb.amt_anfragen'); }
+    catch (e) { statusFehler = e.message; }
+    const jeSchluessel = new Map(status.map((s) => [s.schluessel, s]));
+    const ausschuesse = _anfrageCache.ausschuesse.map((a) => {
+      const s = jeSchluessel.get(a.schluessel);
+      return { ...a, status: s ? { status: s.status, angefragt_am: s.angefragt_am, antwort_am: s.antwort_am,
+        notiz: s.notiz, geaendert_am: s.geaendert_am, geaendert_von: s.geaendert_von } : null };
+    });
+    const bekannt = new Set(ausschuesse.map((a) => a.schluessel));
+    res.json({ ..._anfrageCache, ausschuesse, status_fehler: statusFehler,
+      verwaist: status.filter((s) => !bekannt.has(s.schluessel)),
+      status_werte: ANFRAGE_STATUS, status_name: STATUS_NAME, grund_name: ANFRAGE_GRUND_NAME });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/register/anfragen/status', async (req, res) => {
+  const b = req.body || {};
+  const schluessel = String(b.schluessel || '').slice(0, 300);
+  const status = String(b.status || '');
+  const datum = (d) => (d == null || d === '' ? null : (/^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? String(d) : undefined));
+  const angefragt = datum(b.angefragt_am);
+  const antwort = datum(b.antwort_am);
+  if (!/^[A-Z?]{2}:/.test(schluessel) || !ANFRAGE_STATUS.includes(status)
+      || angefragt === undefined || antwort === undefined) {
+    return res.status(400).json({ error: 'schluessel, status (' + ANFRAGE_STATUS.join(', ')
+      + ') und Daten als JJJJ-MM-TT erforderlich' });
+  }
+  try {
+    if (!_anfrageCache) _anfrageCache = sperrenAnfrageliste();
+    const a = _anfrageCache.ausschuesse.find((x) => x.schluessel === schluessel);
+    if (!a) return res.status(404).json({ error: 'Ausschuss nicht in der Anfrageliste' });
+    const rows = await qMb(
+      `INSERT INTO mb.amt_anfragen (schluessel, land, ausschuss, status, angefragt_am, antwort_am, notiz, geaendert_am, geaendert_von)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, now(), $8)
+       ON CONFLICT (schluessel) DO UPDATE SET status = EXCLUDED.status, angefragt_am = EXCLUDED.angefragt_am,
+         antwort_am = EXCLUDED.antwort_am, notiz = EXCLUDED.notiz, geaendert_am = now(),
+         geaendert_von = EXCLUDED.geaendert_von, ausschuss = EXCLUDED.ausschuss
+       RETURNING schluessel, status, angefragt_am::text AS angefragt_am, antwort_am::text AS antwort_am, notiz, geaendert_am, geaendert_von`,
+      [schluessel, a.land, a.ausschuss, status, angefragt, antwort,
+       b.notiz == null ? null : String(b.notiz).slice(0, 4000), b.von == null ? null : String(b.von).slice(0, 200)]);
+    res.json({ ok: true, status: rows[0] });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 /**
