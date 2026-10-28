@@ -702,7 +702,9 @@ function _mpZusatz(d) {
   if (mv.angebot_abschlag && mv.angebot_abschlag.pct > 0) {
     t += '<br>inkl. ' + String(mv.angebot_abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise'
       + (/rtlich/.test(mv.angebot_abschlag.herkunft || '') ? ' (aus den Kauffällen des Gutachterausschusses)'
-        : (/eigene/.test(mv.angebot_abschlag.herkunft || '') ? ' (dein Wert)' : ' (Marktdurchschnitt)'));
+        : (/eigene/.test(mv.angebot_abschlag.herkunft || '') ? ' (dein Wert)'
+          /* v3021 · jaehrlicher DealPilot-Marktdurchschnitt aus Ortsmessungen: Herkunft mit n und Jahr */
+          : (/^DealPilot-Marktdurchschnitt/.test(mv.angebot_abschlag.herkunft || '') ? ' (' + mv.angebot_abschlag.herkunft + ')' : ' (Marktdurchschnitt)')));
   }
   if (g && (g.wert_rohertragsfaktor_eur || g.wert_kaufpreis_mittel_eur)) {
     var teile = [];

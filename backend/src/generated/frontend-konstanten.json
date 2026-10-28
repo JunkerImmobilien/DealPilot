@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T17:44:31.956Z",
+ "erzeugt_am": "2026-10-28T17:49:21.115Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "ede97e023ec599eb",
-  "index-html": "996905aa4cc51bc1",
+  "index-html": "c57904116103522b",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -3552,7 +3552,7 @@
      },
      {
       "h": "Deal-Aktion — Status, PDFs und Bank",
-      "text": "Der letzte Reiter bringt den Deal zum Abschluss.\n\nDeal-Status — markier den Deal als Offen (in Prüfung), Gewonnen (Objekt im Bestand) oder Verloren.\n\nDokumente & Exporte:\n• Investment-PDF — der bankfertige Business-Case mit Kaufpreis, Finanzierung, Cashflow, DSCR/LTV und Stress-Test. Beim Klick wählst du die Fassung: Bankfassung, hell oder Obsidian.\n• Track Record — gewonnene Deals filtern, als Einzel- oder Sammel-PDF.\n\nMarktberichte listet deine erzeugten Berichte als PDF.\n\nBordkarte & Unterlagen bereitet das Bankgespräch vor, mit einer Liste persönlicher und objektbezogener Unterlagen. Fehlende Amtsunterlagen holst du über Unterlagen beim Amt anfordern.\n\nIn Gesellschaft überführen friert das Privatobjekt ein und legt ein neues GmbH-Objekt an. Unter Dein Netzwerk findest du geprüfte Partner — die Objektdaten werden mitgegeben."
+      "text": "Der letzte Reiter bringt den Deal zum Abschluss.\n\nDeal-Status — markier den Deal als Offen (in Prüfung), Gewonnen (Objekt im Bestand) oder Verloren.\n\nDokumente & Exporte:\n• Investment-PDF — der bankfertige Business-Case mit Kaufpreis, Finanzierung, Cashflow, DSCR/LTV und Stress-Test. Beim Klick wählst du die Fassung: Bankfassung, hell oder Obsidian.\n• Track Record — gewonnene Deals filtern, als Einzel- oder Sammel-PDF.\n\nMarktberichte listet deine erzeugten Berichte als PDF.\n\nBordkarte & Unterlagen bereitet das Bankgespräch vor, mit einer Liste persönlicher und objektbezogener Unterlagen. Fehlende Amtsunterlagen holst du über Unterlagen beim Amt anfordern.\n\nIn Gesellschaft überführen friert das Privatobjekt ein und legt ein neues GmbH-Objekt an. Unter Dein Netzwerk findest du geprüfte Partner — die Objektdaten werden mitgegeben.\n\nNur gültige PDFs: Fehlt einem Dokument eine Pflichtangabe oder ist ein Ergebnis ungültig (zum Beispiel keine Miete im Investment-PDF, kein Gebäudeanteil im Werbungskosten-PDF, keine Berechnung oder ein Gebäudeanteil außerhalb von 0 bis 100 % bei der Kaufpreisaufteilung), entsteht kein PDF. Stattdessen nennt ein Hinweis, was fehlt und in welchem Reiter — mit Hinspringen direkt zum Feld. Was das Dokument nur dünner macht, bleibt ein Hinweis, und das PDF entsteht. Ohne angelegtes Zielbild (Zielmiete oder Maßnahmen) steht im PDF kein Zielbild — die Mieterhöhung nach § 558 BGB bleibt."
      }
     ]
    },
@@ -3770,7 +3770,7 @@
      },
      {
       "h": "So rechnet DealPilot den Sachwert",
-      "text": "Sachwertverfahren mit den Normalherstellungskosten 2010 (NHK 2010):\n\n1. NHK-Kennwert (€/m² BGF, nach Gebäudeart und Standardstufe) × Bruttogrundfläche\n2. × Baupreisindex — derzeit eine feste Zahl: 1,91 (2010 → 01.01.2026), noch nicht je Ausschuss\n3. − Alterswertminderung aus Restnutzungs- und Gesamtnutzungsdauer\n4. + Garage, Außenanlagen, besondere Bauteile = Gebäudesachwert\n5. + Bodenwert = vorläufiger Sachwert\n6. × Sachwertfaktor des zuständigen Gutachterausschusses = marktangepasster Sachwert\n\nDer Faktor wird am vorläufigen Sachwert aus der Tabelle des Ausschusses abgelesen. Führt der Ausschuss in seinem Modell eine eigene Gesamtnutzungsdauer, rechnet der Bericht damit, sonst nach Anlage 1 — ein Faktor gilt nur für sein Modell (§ 21 Abs. 3).\n\nVoraussetzungen: Objektart, Standardstufe und Bruttogrundfläche, bei Häusern dazu Hausform, Geschosse und Dach. Fehlt etwas, steht statt der Zahl der Grund. Für Gewerbe und Garagen weist der Bericht keinen Sachwert aus."
+      "text": "Sachwertverfahren mit den Normalherstellungskosten 2010 (NHK 2010):\n\n1. NHK-Kennwert (€/m² BGF, nach Gebäudeart und Standardstufe) × Bruttogrundfläche\n2. × Baupreisindex zum Wertermittlungsstichtag (amtliche Reihe des Statistischen Bundesamtes, 2010 = 100 — für August 2026 rund 2,00; neue Quartale werden automatisch nachgezogen)\n3. − Alterswertminderung aus Restnutzungs- und Gesamtnutzungsdauer\n4. + Garage, Außenanlagen, besondere Bauteile = Gebäudesachwert\n5. + Bodenwert = vorläufiger Sachwert\n6. × Sachwertfaktor des zuständigen Gutachterausschusses = marktangepasster Sachwert\n\nDer Faktor wird am vorläufigen Sachwert aus der Tabelle des Ausschusses abgelesen. Führt der Ausschuss in seinem Modell eine eigene Gesamtnutzungsdauer, rechnet der Bericht damit, sonst nach Anlage 1 — ein Faktor gilt nur für sein Modell (§ 21 Abs. 3).\n\nVoraussetzungen: Objektart, Standardstufe und Bruttogrundfläche, bei Häusern dazu Hausform, Geschosse und Dach. Fehlt etwas, steht statt der Zahl der Grund. Für Gewerbe und Garagen weist der Bericht keinen Sachwert aus."
      },
      {
       "h": "Herkunft, Quellennachweis und fehlende Werte",
@@ -5239,7 +5239,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "29d24ef69787c956",
+  "hilfe": "9180c900be00d1b6",
   "bewertung": "bca98c7b04c452b7"
  }
 }

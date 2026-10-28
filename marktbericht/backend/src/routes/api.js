@@ -11,6 +11,9 @@ import { DealPilotImportService } from '../services/DealPilotImportService.js';
 import { openaiSelfCheck, generateVerlaufText } from '../services/ReportGenerationService.js';
 import { messeLage } from '../services/LageMessungService.js';   /* v2175 */
 import { bwkAnsaetze } from '../lib/immowertv.js';   /* v2186 */
+import * as Jahreswerte from '../services/JahreswerteService.js';   /* v3021 */
+import { oeffentlich as abschlagOeffentlich, RECHERCHE as ABSCHLAG_RECHERCHE, aktive as abschlagAktive } from '../lib/angebot_abschlag.js';   /* v3021 */
+import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js';   /* v3021 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { runLimited, limiterStats } from '../lib/limiter.js';
@@ -974,6 +977,34 @@ router.get('/lage/gemessen', async (req, res) => {
 // je Objektart, mit Quelle. Eine Quelle fuer Ertragswert UND Haupt-App (bwk-profil.js).
 router.get('/bwk/ansaetze', (req, res) => {
   try { res.json(bwkAnsaetze(req.query.jahr)); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// v3021 · JAHRESWERTE. Marcel 28.10.2026: „jedes Jahr automatisch neu ermitteln, und das
+// muessen wir auch bei den Steuerdaten machen."
+// GET /jahreswerte/angebotsabschlag — der Marktdurchschnitt fuer die Haupt-App (config.js
+// angebotAbschlagMarkt wird daraus gefuellt). Ohne Quellennamen.
+router.get('/jahreswerte/angebotsabschlag', (req, res) => {
+  try { res.json(abschlagOeffentlich()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// GET /jahreswerte/stand — nur ueber den Admin-Proxy: Register (Faelligkeit je Wert) plus
+// Stand der automatischen Reihen und des Angebotsabschlags aus der DB.
+router.get('/jahreswerte/stand', async (req, res) => {
+  try {
+    const reg = jahreswerteRegister();
+    const auto = await Jahreswerte.stand();
+    res.json({ register: { stand: reg.stand, version: reg.version }, werte: jahreswerteStatus(reg, new Date()),
+      automatisch: auto, abschlag_recherche: ABSCHLAG_RECHERCHE, abschlag_aktiv: abschlagAktive() });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// POST /jahreswerte/abruf — Reihen sofort holen (sonst taeglicher Takt, alle 7 Tage).
+// POST /jahreswerte/abschlag-rechnen {jahr} — Jahresrechnung des Angebotsabschlags von Hand.
+router.post('/jahreswerte/abruf', async (req, res) => {
+  try { res.json(await Jahreswerte.laufReihen()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/jahreswerte/abschlag-rechnen', async (req, res) => {
+  const j = Number((req.body || {}).jahr);
+  if (!(j >= 2026 && j <= new Date().getFullYear())) return res.status(400).json({ error: 'jahr (ab 2026) erforderlich' });
+  try { res.json(await Jahreswerte.rechneAbschlagJahr(j)); } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // GET /zensus/check — ist die Zensus-CSV da, wie viele Kreise, welche Spalten erkannt + Beispiel.

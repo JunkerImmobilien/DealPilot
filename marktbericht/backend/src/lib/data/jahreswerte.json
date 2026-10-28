@@ -1,0 +1,380 @@
+{
+  "version": "v3021",
+  "stand": "2026-10-28",
+  "zweck": "Jedes zeit- oder jahresabhaengige Datum im Code: Ort mit allen Spiegelstellen, Stand, Quelle (intern), Turnus, Faelligkeit, Verfahren. Pruefer: tools/jahreswerte-pruefen.mjs (RC=1 bei ueberfaellig oder Spiegel ungleich). Admin: Register & Ernte > Jahreswerte. Pflege: Agent .claude/agents/jahreswerte.md. Wer einen Wert nachzieht, setzt hier stand, erwartet und faellig_am neu.",
+  "verfahren_namen": {
+    "automatisch": "laeuft im Takt (mb-Backend) - der Wert im Code ist nur Rueckfall",
+    "agent": "Agent jahreswerte recherchiert mit amtlicher Fundstelle, Vorschlag mit Beleg, Freigabe durch Marcel",
+    "durchsicht": "aendert sich nur bei Gesetzes-/Landesaenderung; einmal im Jahr durchsehen"
+  },
+  "werte": [
+    {
+      "id": "est_tarif_32a",
+      "name": "Einkommensteuertarif § 32a EStG",
+      "gruppe": "steuer",
+      "stand": "VZ 2025 und 2026 (BGBl. 2024 I Nr. 449); 2027 nur Regierungsentwurf",
+      "wert_text": "2026: Grundfreibetrag 12.348, Zonen bis 17.799 / 69.878 / 277.825",
+      "erwartet": "12348,17799,69878,277825",
+      "quelle": "BGBl. 2024 I Nr. 449 (Steuerfortentwicklungsgesetz), Art. 1 Nr. 2 (VZ 2025) und Art. 2 Nr. 2 (VZ 2026); gesetze-im-internet.de/estg/__32a.html",
+      "turnus": "jaehrlich zum 01.01. (wenn ein Gesetz den Tarif aendert)",
+      "faellig_am": "2026-12-15",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "frontend/js/tax.js", "bezeichner": "TARIFE[2026]", "block": "    2026: {", "muster": "grundfreibetrag: (\\d+),[\\s\\S]*?z2bis: (\\d+)[\\s\\S]*?z3bis: (\\d+)[\\s\\S]*?z4bis: (\\d+)" },
+        { "datei": "frontend/js/dashboard.js", "bezeichner": "_tarifEcken() Rueckfall", "muster": "return \\[(\\d+), (\\d+), (\\d+), (\\d+)\\];" },
+        { "datei": "frontend/index.html", "bezeichner": "Texte \"Tarif 2026\" (Z. ~2159, 2179, 2350, 2354)" },
+        { "datei": "frontend/js/help.js", "bezeichner": "Text \"Tarif 2026\"" },
+        { "datei": "frontend/js/tooltip-content.js", "bezeichner": "Grenzsteuer-Beispiele (Z. ~303)" }
+      ],
+      "hinweis": "Tarif 2027: Regierungsentwurf Einkommensteuerreformgesetz 2027 (Grundfreibetrag 12.564) - erst nach Verkuendung im BGBl. eintragen. Neuer Jahrgang = neuer Eintrag in TARIFE, Rueckfall in dashboard.js auf den neuesten Jahrgang ziehen, 'erwartet' hier anpassen."
+    },
+    {
+      "id": "soli_freigrenze",
+      "name": "Solidaritaetszuschlag, Freigrenze § 3 Abs. 3 SolZG",
+      "gruppe": "steuer",
+      "stand": "2025: 19.950 / 2026: 20.350 EUR Einkommensteuer (Zusammenveranlagung doppelt)",
+      "erwartet": "20350",
+      "quelle": "BGBl. 2024 I Nr. 449, Art. 3 (2025) und Art. 4 (2026)",
+      "turnus": "jaehrlich mit dem Tarif",
+      "faellig_am": "2026-12-15",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "frontend/js/tax.js", "bezeichner": "TARIFE[2026].soliFreigrenze", "block": "    2026: {", "muster": "soliFreigrenze: (\\d+)" },
+        { "datei": "frontend/js/tax.js", "bezeichner": "Rueckfall in soli()", "muster": "soliFreigrenze \\|\\| (\\d+)", "nimm": "alle" }
+      ]
+    },
+    {
+      "id": "kirchensteuer",
+      "name": "Kirchensteuersatz (8 % BY/BW, sonst 9 %)",
+      "gruppe": "steuer",
+      "stand": "8 / 9 %",
+      "quelle": "Kirchensteuergesetze der Laender",
+      "turnus": "bei Landesaenderung",
+      "faellig_am": "2027-01-15",
+      "verfahren": "durchsicht",
+      "orte": [ { "datei": "frontend/js/tax.js", "bezeichner": "_kistSatz()" }, { "datei": "frontend/js/onboarding.js", "bezeichner": "Auswahltext (Z. ~585)" } ]
+    },
+    {
+      "id": "grunderwerbsteuer",
+      "name": "Grunderwerbsteuersaetze der Laender",
+      "gruppe": "steuer",
+      "stand": "05/2026 (HB 5,5 seit 07/2025, TH 5,0 seit 01/2024)",
+      "erwartet": "6.5",
+      "quelle": "Grunderwerbsteuergesetze der Laender (§ 11 GrEStG i. V. m. Landesgesetz)",
+      "turnus": "bei Landesaenderung (meist zum 01.01. oder 01.07.)",
+      "faellig_am": "2027-01-15",
+      "verfahren": "durchsicht",
+      "orte": [
+        { "datei": "frontend/js/grest-plz-lookup.js", "bezeichner": "GREST_RATES (Pruefwert NW)", "muster": "'NW': ([\\d.]+)," },
+        { "datei": "backend/src/generated/frontend-konstanten.json", "bezeichner": "daten.grest.saetze (erzeugt, Pruefsumme: tools/frontend-konstanten.mjs --pruefen)" },
+        { "datei": "frontend/js/help.js", "bezeichner": "Text \"NRW 6,5 %\" (Z. ~807)" }
+      ]
+    },
+    {
+      "id": "afa_degressiv_7_5a",
+      "name": "Degressive AfA § 7 Abs. 5a EStG (5 %)",
+      "gruppe": "steuer",
+      "stand": "Baubeginn/Kaufvertrag 01.10.2023 bis 30.09.2029",
+      "erwartet": "2023-10-01,2029-09-30",
+      "quelle": "§ 7 Abs. 5a EStG (Wachstumschancengesetz)",
+      "turnus": "Frist endet 30.09.2029 - vorher pruefen, ob verlaengert",
+      "faellig_am": "2029-07-01",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "frontend/js/afa-engine.js", "bezeichner": "DEG_AB / DEG_BIS", "muster": "DEG_AB = '([\\d-]+)', DEG_BIS = '([\\d-]+)'" },
+        { "datei": "frontend/js/afa-ui.js", "bezeichner": "Hinweistext (Z. ~72)" },
+        { "datei": "frontend/index.html", "bezeichner": "Texte Z. ~2219/2241 (sprechen noch von Bauantrag)" }
+      ]
+    },
+    {
+      "id": "afa_sonder_7b",
+      "name": "Sonder-AfA § 7b EStG (Baukostenobergrenze, Bemessungsgrenze)",
+      "gruppe": "steuer",
+      "stand": "5 % x 4 Jahre; Bemessung 4.000 EUR/m2; Baukosten hoechstens 5.200 EUR/m2; Bauantrag 01.01.2023-30.09.2029",
+      "erwartet": "5200",
+      "quelle": "§ 7b EStG",
+      "turnus": "bei Gesetzesaenderung; Antragsfenster endet 30.09.2029",
+      "faellig_am": "2029-07-01",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "frontend/js/afa-engine.js", "bezeichner": "SONDER_7B_BAUKOSTEN_GRENZE", "muster": "SONDER_7B_BAUKOSTEN_GRENZE = (\\d+);" },
+        { "datei": "frontend/js/afa-engine.js", "bezeichner": "sonder7bBasis 4000 x Wfl (NICHT ANFASSEN, V227.1)" },
+        { "datei": "frontend/index.html", "bezeichner": "Texte Z. ~2302-2333" }
+      ]
+    },
+    {
+      "id": "afa_linear_7_4",
+      "name": "Lineare Gebaeude-AfA § 7 Abs. 4 EStG",
+      "gruppe": "steuer",
+      "stand": "Fertigstellung nach 2022: 3 %; 1925-2022: 2 %; vor 1925: 2,5 %",
+      "quelle": "§ 7 Abs. 4 EStG",
+      "turnus": "bei Gesetzesaenderung",
+      "faellig_am": "2027-01-15",
+      "verfahren": "durchsicht",
+      "orte": [ { "datei": "frontend/js/afa-engine.js", "bezeichner": "linearNachFertigstellung()" }, { "datei": "frontend/js/bmf-modal.js" }, { "datei": "backend/src/services/bmfPipelineService.js" } ]
+    },
+    {
+      "id": "kst_soli",
+      "name": "Koerperschaftsteuer inkl. Soli (Rueckfall Mandanten/GmbH)",
+      "gruppe": "steuer",
+      "stand": "15,825 % (15 % + 5,5 % Soli)",
+      "erwartet": "15.825",
+      "quelle": "§ 23 Abs. 1 KStG",
+      "turnus": "bei Gesetzesaenderung",
+      "faellig_am": "2027-10-01",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "frontend/js/mandanten.js", "bezeichner": "Rueckfall reg.kst", "muster": ": (15\\.825)\\)", "nimm": "alle" },
+        { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "0.15825" },
+        { "datei": "frontend/js/gesellschaft-abschluss.js", "bezeichner": "0.15825" }
+      ],
+      "hinweis": "Zu pruefen: stufenweise Senkung des KSt-Satzes ab VZ 2028 (Gesetz fuer ein steuerliches Investitionssofortprogramm 2025) - mit Fundstelle im BGBl. belegen, dann jahrgangsabhaengig machen."
+    },
+    {
+      "id": "grenzsteuer_vorgabe",
+      "name": "Grenzsteuersatz-Vorgabe (Profil-Default)",
+      "gruppe": "steuer",
+      "stand": "40,45 %",
+      "erwartet": "40.45",
+      "quelle": "Annahme (42 % x 1,055 Soli ohne Kirchensteuer, gerundet) - Produktvorgabe",
+      "turnus": "bei Tarifwechsel durchsehen",
+      "faellig_am": "2027-01-15",
+      "verfahren": "durchsicht",
+      "orte": [
+        { "datei": "frontend/js/config.js", "bezeichner": "investmentProfileDefaults.grenzsteuersatz", "muster": "grenzsteuersatz:\\s+([\\d.]+),", "nimm": "erster" },
+        { "datei": "frontend/js/bmf-modal.js", "bezeichner": "var grenz", "muster": "var grenz = ([\\d.]+);", "nimm": "alle", "faktor": 100 },
+        { "datei": "backend/src/services/bmfPipelineService.js", "bezeichner": "GRENZSTEUER_DEFAULT", "muster": "GRENZSTEUER_DEFAULT = ([\\d.]+);", "faktor": 100 }
+      ]
+    },
+    {
+      "id": "anlage_v",
+      "name": "Anlage V (Formular-Zuordnung je Veranlagungsjahr)",
+      "gruppe": "steuer",
+      "stand": "VZ 2025 (2025AnlV103NET)",
+      "quelle": "BMF / ELSTER-Formulare",
+      "turnus": "jaehrlich, wenn das Formular des Vorjahres erscheint",
+      "faellig_am": "2027-03-01",
+      "verfahren": "agent",
+      "orte": [ { "datei": "frontend/js/anlage-v-2025.js", "bezeichner": "window.AnlageV2025" }, { "datei": "frontend/index.html", "bezeichner": "<script src=js/anlage-v-2025.js>" } ]
+    },
+    {
+      "id": "fristen_23_15pct",
+      "name": "Spekulationsfrist § 23 EStG (10 J.), 15-%-Grenze § 6 Abs. 1 Nr. 1a EStG",
+      "gruppe": "steuer",
+      "stand": "10 Jahre / 15 %",
+      "quelle": "§ 23 Abs. 1 Nr. 1, § 6 Abs. 1 Nr. 1a EStG",
+      "turnus": "bei Gesetzesaenderung",
+      "faellig_am": null,
+      "verfahren": "durchsicht",
+      "orte": [ { "datei": "frontend/js/portfolio-strategie.js" }, { "datei": "frontend/js/calc.js", "bezeichner": "15 % (Z. ~964, 1113)" } ]
+    },
+    {
+      "id": "angebotsabschlag",
+      "name": "Abschlag auf Angebotspreise - Marktdurchschnitt (Stufe 4)",
+      "gruppe": "wertermittlung",
+      "stand": "Recherche 5,8 % (Dezember 2025); ab 15.01. je Segment DealPilot-Marktdurchschnitt aus Ortsmessungen, wenn mind. 20",
+      "erwartet": "5.8",
+      "quelle": "intern: lib/angebot_abschlag.js RECHERCHE; Messungen mb.angebot_abschlag_messung, Jahreswert mb.angebot_abschlag_jahr",
+      "turnus": "jaehrlich ab 15.01. (Takt JahreswerteService)",
+      "faellig_am": "2027-01-15",
+      "verfahren": "automatisch",
+      "orte": [
+        { "datei": "marktbericht/backend/src/lib/angebot_abschlag.js", "bezeichner": "RECHERCHE.pct (einzige Stelle)", "block": "export const RECHERCHE", "muster": "pct: ([\\d.]+)," }
+      ],
+      "verboten": [
+        { "datei": "frontend/js/config.js", "muster": "angebotAbschlagMarkt:\\s*\\{[^}]*pct:\\s*\\d", "grund": "zweite Zahl - config.js wird aus GET /jahreswerte/angebotsabschlag gefuellt" },
+        { "datei": "frontend/js/marktwert-abschlag.js", "muster": "pct:\\s*5[.,]8", "grund": "Rueckfallzahl im Frontend" },
+        { "datei": "marktbericht/backend/src/services/ValuationService.js", "muster": "ANGEBOT_ABSCHLAG_MARKT_PCT\\s*=", "grund": "alte Konstante" }
+      ],
+      "hinweis": "Ist nach dem 15.01. kein Segment aktiv (zu wenig Messungen), die Recherche erneuern (Agent jahreswerte) und RECHERCHE + 'erwartet' ziehen."
+    },
+    {
+      "id": "baupreisindex",
+      "name": "Baupreisindex Neubau Wohngebaeude (Sachwert, § 36 Abs. 2 ImmoWertV)",
+      "gruppe": "wertermittlung",
+      "stand": "Code: bis August 2026 (141,7 / 2021=100 -> 2,00), Stand 09.10.2026",
+      "erwartet": "2026-10-09",
+      "quelle": "Destatis 61261-0002 / Tabelle bpr110",
+      "turnus": "quartalsweise (Feb/Mai/Aug/Nov, Veroeffentlichung rund 2 Monate spaeter)",
+      "faellig_am": "2027-01-15",
+      "verfahren": "automatisch",
+      "orte": [
+        { "datei": "marktbericht/backend/src/lib/baupreisindex.js", "bezeichner": "BPI_TABELLE.stand", "muster": "stand: '([\\d-]+)'," },
+        { "datei": "marktbericht/backend/src/services/CrossCheckService.js", "bezeichner": "BPI_RUECKFALL 1,91 (nur ohne Tabelle)" }
+      ],
+      "hinweis": "Automatik: JahreswerteService holt woechentlich. ACHTUNG: die Seite bpr110 wird seit KW 43/2026 nicht mehr aktualisiert und Anfang 2027 abgeschaltet - ab dann nur noch ueber GENESIS-Online (GENESIS_TOKEN, kostenloses Konto). Ohne Token: Quartal von Hand in BPI_TABELLE nachtragen."
+    },
+    {
+      "id": "vpi_oktober",
+      "name": "Verbraucherpreisindex Oktober (Fortschreibung BWK, AGVGA.NRW / Anlage 3)",
+      "gruppe": "wertermittlung",
+      "stand": "Code: Oktober 2025 = 123,0 (2020=100) / 139,6 (NRW-Basis)",
+      "erwartet": "2025",
+      "quelle": "Destatis 61111-0002 / Tabelle Verbraucherpreise-12Kategorien",
+      "turnus": "jaehrlich (Oktoberwert erscheint Mitte November)",
+      "faellig_am": "2026-12-15",
+      "verfahren": "automatisch",
+      "orte": [
+        { "datei": "marktbericht/backend/src/lib/nrw_modell.js", "bezeichner": "VPI_OKTOBER (neuestes Jahr)", "block": "export const VPI_OKTOBER = {", "muster": "\\n  (\\d{4}): [\\d.]+,", "nimm": "max" },
+        { "datei": "marktbericht/backend/src/lib/nrw_modell.js", "bezeichner": "VPI_OKTOBER_IMMOWERTV (neuestes Jahr)", "block": "export const VPI_OKTOBER_IMMOWERTV = {", "muster": "(\\d{4}): [\\d.]+,", "nimm": "max" }
+      ]
+    },
+    {
+      "id": "bwk_anlage3",
+      "name": "Bewirtschaftungskosten Anlage 3 ImmoWertV je Jahr",
+      "gruppe": "wertermittlung",
+      "stand": "2026: Verwaltung 367 / ETW 439 / Garage 48, Instandhaltung 14,40 / Garage 108",
+      "erwartet": "2026,367",
+      "quelle": "Oberer Gutachterausschuss Brandenburg, Bewko-Tabelle (amtlich); Gegenprobe: Ausgangswerte x VPI Okt. Vorjahr / 77,1",
+      "turnus": "jaehrlich zum 01.01.",
+      "faellig_am": "2027-01-31",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "marktbericht/backend/src/lib/immowertv.js", "bezeichner": "BWK_JAHRE (neuestes Jahr)", "block": "export const BWK_JAHRE = {", "muster": "(\\d{4}): \\{ verw_we: (\\d+),", "nimm": "max" },
+        { "datei": "marktbericht/backend/src/lib/sachwertfaktoren_herford.js", "bezeichner": "bwk_JJJJ", "muster": "bwk_(\\d{4}): \\{\\s*verwaltung_wohnung_eur: (\\d+)," }
+      ],
+      "hinweis": "Admin zeigt ab Mitte November den rechnerischen Vorschlag aus dem VPI Oktober (weicht in 2 von 5 Jahren um 1 EUR vom amtlichen Wert ab - deshalb nur Vorschlag, eingetragen wird der amtliche)."
+    },
+    {
+      "id": "nkm_index",
+      "name": "Index der Nettokaltmieten (Zensus-Miete fortschreiben)",
+      "gruppe": "wertermittlung",
+      "stand": "Monate bis September 2026, Stand 13.10.2026",
+      "erwartet": "2026-10-13",
+      "quelle": "Destatis, Verbraucherpreisindex Sondergliederungen, Spalte Nettokaltmiete",
+      "turnus": "quartalsweise nachtragen (monatlich veroeffentlicht)",
+      "faellig_am": "2027-01-20",
+      "verfahren": "agent",
+      "orte": [ { "datei": "marktbericht/backend/src/lib/zensus_miete.js", "bezeichner": "NKM_INDEX.stand", "block": "export const NKM_INDEX", "muster": "stand: '([\\d-]+)'," } ],
+      "hinweis": "Kandidat fuer den Automatik-Takt (selbe Seite wie VPI-Sondergliederungen) - noch nicht angebunden."
+    },
+    {
+      "id": "kappungsgrenzen",
+      "name": "Kappungsgrenzen- und Mietpreisbremse-Verordnungen der Laender",
+      "gruppe": "miete",
+      "stand": "Liste Stand 19.10.2026",
+      "erwartet": "2026-10-19",
+      "quelle": "Landesverordnungen (§ 558 Abs. 3 BGB, § 556d BGB)",
+      "turnus": "je Verordnung (naechster Ablauf wird aus der Liste gelesen)",
+      "faellig_aus": { "datei": "marktbericht/backend/src/lib/data/kappungsgrenzen.json", "muster": "\"gueltig_bis\":\\s*\"(\\d{4}-\\d{2}-\\d{2})\"" },
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "marktbericht/backend/src/lib/data/kappungsgrenzen.json", "bezeichner": "stand", "muster": "\"stand\":\\s*\"([\\d-]+)\"" },
+        { "datei": "frontend/js/data/kappungsgrenzen.json", "bezeichner": "stand (Spiegel)", "muster": "\"stand\":\\s*\"([\\d-]+)\"" }
+      ],
+      "hinweis": "Pruefer im Deploy: tools/kappungsgrenzen-pruefen.mjs (120-Tage-Vorlauf je Verordnung)."
+    },
+    {
+      "id": "belwertv_mindestzins",
+      "name": "BelWertV-Mindestkapitalisierungszins (Beleihungswert-Check)",
+      "gruppe": "finanzierung",
+      "stand": "Wohnen 5,5 % / Gewerbe 6,5 % seit 01.01.2024 (recherchiert 21.10.2026)",
+      "erwartet": "5.5,6.5",
+      "quelle": "BaFin, Bekanntgabe nach § 12 Abs. 4 BelWertV",
+      "turnus": "jaehrlich nach dem 30.11. (Anpassungsregel)",
+      "faellig_am": "2026-12-05",
+      "verfahren": "agent",
+      "orte": [ { "datei": "frontend/js/config.js", "bezeichner": "beleihungswert.mindestzins", "muster": "wohnen_pct: ([\\d.]+), gewerbe_pct: ([\\d.]+)," } ],
+      "hinweis": "Pruefer: tools/beleihungswert-pruefen.mjs. rendite_30j daneben mitziehen."
+    },
+    {
+      "id": "brw_jahrgang",
+      "name": "Bodenrichtwert-Jahrgang (BORIS-Abrufe)",
+      "gruppe": "wertermittlung",
+      "stand": "2026 (Stichtag 01.01.2026)",
+      "erwartet": "2026",
+      "quelle": "BORIS der Laender",
+      "turnus": "jaehrlich - neuer Jahrgang erscheint je Land zwischen Maerz und Juli",
+      "faellig_am": "2027-03-01",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "marktbericht/backend/src/connectors/boris/registry.js", "bezeichner": "CURRENT_BRW_YEAR", "muster": "const CURRENT_BRW_YEAR = (\\d{4});" },
+        { "datei": "marktbericht/backend/src/connectors/boris/ni-zone.js", "bezeichner": "jahr = 2026 (Vorgabe)", "muster": "jahr = (\\d{4}), fristMs", "nimm": "alle" },
+        { "datei": "marktbericht/backend/src/services/ReportOrchestrator.js", "bezeichner": "niZonenHolen jahr", "muster": "niZonenHolen\\(\\{ lat, lon, land, jahr: (\\d{4})" }
+      ],
+      "hinweis": "Nicht vor dem Erscheinen umstellen: je Land pruefen, ob der neue Layer da ist (registry.js nennt Berlin wms/brw2026 und weitere URLs mit Jahr)."
+    },
+    {
+      "id": "register_marktberichte",
+      "name": "Register der Gutachterausschuesse (LZS, SWF, UK, VGF) - Jahrgaenge",
+      "gruppe": "wertermittlung",
+      "stand": "Ernte 10/2026, Jahrgaenge 2023-2026",
+      "quelle": "Grundstuecksmarktberichte der Ausschuesse",
+      "turnus": "jaehrlich (Erscheinen der Marktberichte, meist Maerz-Juni)",
+      "faellig_am": "2027-06-30",
+      "verfahren": "automatisch",
+      "orte": [ { "datei": "marktbericht/backend/src/lib/register/", "bezeichner": "Satzdateien (Harvest-Takt + Agenten register-ernte / nachernte-pdf)" } ]
+    },
+    {
+      "id": "regionale_tabellen_nrw",
+      "name": "Regionale Tabellen NRW (Mietmodell, SWF, Vergleichsfaktoren, Umrechnung Minden-Luebbecke/Herford)",
+      "gruppe": "wertermittlung",
+      "stand": "Marktbericht 2025 (Minden-Luebbecke), 2026 (Herford)",
+      "quelle": "Grundstuecksmarktberichte",
+      "turnus": "jaehrlich",
+      "faellig_am": "2027-04-30",
+      "verfahren": "agent",
+      "orte": [ { "datei": "marktbericht/backend/src/lib/mietmodell_nrw.js", "bezeichner": "MIETMODELL_STAND" }, { "datei": "marktbericht/backend/src/lib/sachwertfaktoren_nrw.js" }, { "datei": "marktbericht/backend/src/lib/vergleichsfaktoren_nrw.js" }, { "datei": "marktbericht/backend/src/lib/umrechnung_nrw.js" }, { "datei": "marktbericht/backend/src/lib/sachwertfaktoren_herford.js" }, { "datei": "marktbericht/backend/src/lib/hh_normbrw.js", "bezeichner": "HH-Normrichtwerte 2020/2018" } ]
+    },
+    {
+      "id": "immowertv_anlagen",
+      "name": "ImmoWertV-Anlagen (GND Anlage 1, Modernisierung Anlage 2, NHK 2010), § 256 BewG",
+      "gruppe": "wertermittlung",
+      "stand": "ImmoWertV 2021; BewG § 256 (EFH 2,5 / ETW 3,0 / MFH 4,0-4,5)",
+      "quelle": "ImmoWertV, BewG",
+      "turnus": "bei Gesetzesaenderung",
+      "faellig_am": null,
+      "verfahren": "durchsicht",
+      "orte": [ { "datei": "marktbericht/backend/src/lib/immowertv.js", "bezeichner": "GND_TABELLE, BEWG_256" }, { "datei": "frontend/js/rnd-gnd-table.js", "bezeichner": "gespiegelt nach backend/src/generated/rechenkerne" }, { "datei": "marktbericht/backend/src/lib/nhk2010.js" } ]
+    },
+    {
+      "id": "bauzins_kalibrierung",
+      "name": "Bauzins-Formel: Kalibrierung k und Rueckfall-Renditen",
+      "gruppe": "finanzierung",
+      "stand": "k = 0,27, Rueckfall Bund-Renditen 14.10.2026",
+      "erwartet": "0.27",
+      "quelle": "Bundesbank-Zinsstruktur (live, taeglich), Kalibrierung mit tools/bauzins-pruefen.mjs",
+      "turnus": "Renditen taeglich automatisch; Kalibrierung vierteljaehrlich pruefen",
+      "faellig_am": "2027-01-15",
+      "verfahren": "automatisch",
+      "orte": [
+        { "datei": "backend/src/services/bauzinsService.js", "bezeichner": "K_KALIBRIERUNG.wert", "block": "const K_KALIBRIERUNG = {", "muster": "wert: ([\\d.]+)," },
+        { "datei": "frontend/js/config.js", "bezeichner": "marketRates.bauzins.k", "block": "      bauzins: {", "muster": "k: ([\\d.]+)," },
+        { "datei": "frontend/js/indicative-zins.js", "bezeichner": "STATIC_FORMEL.k", "block": "var STATIC_FORMEL = {", "muster": "k: ([\\d.]+)," }
+      ]
+    },
+    {
+      "id": "bauzins_rueckfall_datum",
+      "name": "Bauzins-Rueckfall: Stand der statischen Renditen",
+      "gruppe": "finanzierung",
+      "stand": "14.10.2026",
+      "erwartet": "2026-10-14",
+      "quelle": "Bundesbank",
+      "turnus": "Rueckfall - nur wenn API und DB ausfallen; quartalsweise auffrischen",
+      "faellig_am": "2027-01-15",
+      "verfahren": "automatisch",
+      "orte": [
+        { "datei": "backend/src/services/bauzinsService.js", "bezeichner": "STATISCHER_STAND.datum", "block": "const STATISCHER_STAND = {", "muster": "datum: '([\\d-]+)'," },
+        { "datei": "frontend/js/config.js", "bezeichner": "marketRates.bauzins.asOf", "block": "      bauzins: {", "muster": "asOf: '([\\d-]+)'" }
+      ]
+    },
+    {
+      "id": "mfi_ezb_rueckfall",
+      "name": "MFI-Effektivzinsen, EZB-Leitzins, EURIBOR, Pfandbrief - Rueckfallwerte",
+      "gruppe": "finanzierung",
+      "stand": "MFI 2026-02, EZB/EURIBOR 2026-05, Pfandbrief 2026-10",
+      "erwartet": "2026-02",
+      "quelle": "Bundesbank BBIM1 / EZB MIR (live), EZB-Pressemitteilungen",
+      "turnus": "live per API; Rueckfall monatlich laut Kommentar",
+      "faellig_am": "2026-04-01",
+      "verfahren": "automatisch",
+      "orte": [
+        { "datei": "backend/src/services/marketRatesService.js", "bezeichner": "STATIC_FALLBACK_AS_OF", "muster": "STATIC_FALLBACK_AS_OF = '([\\d-]+)';" },
+        { "datei": "frontend/js/config.js", "bezeichner": "marketRates.asOf", "block": "    marketRates: {", "muster": "\\n      asOf: '([\\d-]+)'," },
+        { "datei": "frontend/js/config.js", "bezeichner": "marketContext (EZB/EURIBOR)" },
+        { "datei": "backend/src/services/marketRatesService.js", "bezeichner": "STATIC_MARKET_CONTEXT, STATIC_PFANDBRIEF" }
+      ],
+      "hinweis": "Die Werte kommen im Betrieb live; ueberfaellig heisst hier nur: der Rueckfall ist alt (Warnung, kein Abbruch)."
+    }
+  ]
+}
