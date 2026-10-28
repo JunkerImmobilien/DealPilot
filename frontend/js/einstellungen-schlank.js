@@ -88,7 +88,7 @@
     var text;
     if (preset === 'custom' || eigen) text = '<b>Eigene Gewichtung aktiv.</b> Dein Deal Score rechnet mit selbst gesetzten Gewichten.';
     else if (standard) text = 'Dein Deal Score rechnet mit der <b>Standardgewichtung</b> (Ausgewogen).';
-    else text = 'Dein Deal Score rechnet mit dem Bewertungsprofil <b>' + esc(name) + '</b> aus deiner Einrichtung.';
+    else text = 'Dein Deal Score rechnet mit dem Bewertungsprofil <b>' + esc(name) + '</b> statt der Standardgewichtung.';
     return '<div class="dp-es-score" style="margin:10px 0 4px;padding:10px 12px;border:1px solid rgba(201,168,76,.35);border-radius:10px;font-size:13px;line-height:1.5">' +
       text +
       (standard ? '' : ' <button type="button" class="btn btn-sm btn-ghost dp-es-score-std" style="margin-left:6px">Auf Standard zurücksetzen</button>') +
@@ -101,11 +101,18 @@
     b.addEventListener('click', function () {
       if (!confirm('Deal Score auf die Standardgewichtung (Ausgewogen) zurücksetzen? Die Scores deiner Objekte können sich dadurch ändern.')) return;
       try { if (window.DealScore2 && DealScore2.setActivePreset) DealScore2.setActivePreset('balanced'); } catch (e) {}
-      var box = root.querySelector('.dp-es-score');
-      if (box) { var t = document.createElement('div'); t.innerHTML = scoreZeileHtml(); box.parentNode.replaceChild(t.firstChild, box); }
+      scoreZeileNeu(root);
       try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
       if (typeof window.toast === 'function') window.toast('✓ Deal Score rechnet wieder mit der Standardgewichtung');
     });
+  }
+
+  function scoreZeileNeu(root) {
+    var box = root && root.querySelector('.dp-es-score');
+    if (!box) return;
+    var t = document.createElement('div'); t.innerHTML = scoreZeileHtml();
+    box.parentNode.replaceChild(t.firstChild, box);
+    scoreZeileVerdrahten(root);
   }
 
   /* ── Umbau des fertig gebauten Einstellungsfensters ── */
@@ -202,6 +209,9 @@
         strat.addEventListener('change', function () { profilSchreiben('ai_strat', strat.value); });
         risk.addEventListener('change', function () { profilSchreiben('ai_risk', risk.value); });
         scoreZeileVerdrahten(box);
+        /* Ein Klick auf ein Anlegerprofil (standardwerte-karten.js) setzt
+           die Score-Vorlage sofort — die Zeile zieht nach. */
+        host.addEventListener('click', function () { setTimeout(function () { scoreZeileNeu(box); }, 150); });
       }
       if (paramGrid) verstecke(paramGrid);
       /* Verkäufer/Markt: im Entwurf nicht mehr gezeigt — und damit das
@@ -242,7 +252,18 @@
       window._swSet = n2;
     }
   }
+  /* Der Hinweis unter dem Anlegerprofil verweist auf den Reiter Deal Score,
+     den es im Entwurf nicht gibt. Er wird bei jedem Reiterwechsel neu gebaut. */
+  function hinweisAnpassen() {
+    var h = document.querySelector('#settings-modal .swk-hinweis');
+    if (h && /Reiter Deal Score/.test(h.textContent)) {
+      h.textContent = h.textContent.replace(/\s*Feiner justieren: Reiter Deal Score\./, ' Welche Gewichtung gerade gilt, steht oben unter „Deine Haltung“.');
+    }
+    var box = document.querySelector('#settings-modal .dp-es-haltung');
+    if (box) scoreZeileNeu(box);
+  }
   function band(k) {
+    if (k === 'standardwerte') setTimeout(hinweisAnpassen, 60);
     var e = BAND[k]; if (!e) return;
     var t = document.getElementById('set-band-title'), s = document.getElementById('set-band-sub');
     if (t) t.textContent = e[0]; if (s) s.textContent = e[1];
