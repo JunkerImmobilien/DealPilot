@@ -141,6 +141,10 @@
   async function auswerten(dokumente) {
     var objekt = { objektart: v('objart'), adresse: [v('str'), v('hnr'), v('plz'), v('ort')].join(' ').trim(), kaufpreis: v('kp'), wohnflaeche: v('wfl'),
       baujahr: v('baujahr'), nettokaltmiete_monat: v('nkm'), miteigentumsanteil_pct: v('mea'), einheiten: v('einheiten'), hausgeld_ul_jahr: v('hg_ul'), hausgeld_nul_jahr: v('hg_nul') };
+    /* v3016f · gemessen am Demo-Set Lindenallee (MFH, alle 6 Einheiten im Paket): die Auswertung
+       rechnete die Sonderumlage mit dem MEA EINES Grundbuchblatts (204/1.000 → 9.466 statt 46.400 €).
+       Ohne eigenen MEA im Objekt wird das ganze Gebäude gekauft. */
+    objekt.kauf_umfang = (v('mea') && v('objart') === 'ETW') ? 'eine Einheit, Anteil laut Miteigentumsanteil' : (v('mea') ? 'Anteil laut Miteigentumsanteil' : 'ganzes Gebaeude, alle Einheiten (Anteil 100 %)');
     var r = await window.Auth.apiCall('/ai/dokumente-auswerten', { method: 'POST', body: { dokumente: dokumente, objekt: objekt } });
     if (!r || !r.success) throw new Error((r && r.error) || 'Auswertung fehlgeschlagen.');
     return r.auswertung || {};

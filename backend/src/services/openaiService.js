@@ -4309,6 +4309,7 @@ async function dokumenteAuswerten(dokumente, objekt, opts) {
     'KEINE Namen von Personen (Eigentuemer, Mieter, Verwalter-Mitarbeiter) - schreibe "eine Wohnung", "ein Eigentuemer". Firmen (Verwaltung, Bank) duerfen genannt werden.',
     'Standardklauseln, die in fast jeder Teilungserklaerung stehen (Wiederaufbaupflicht, Verwalterzustimmung nach § 12 WEG, getrennte Ruecklagen in Mehrhausanlagen), hoechstens "niedrig" und nur in einem sachlichen Satz. Keine Dramatisierung, keine Worte wie "existenzbedrohend".',
     'Grundschulden des Verkaeufers in Abt. III sind beim Kauf ueblich und werden mit dem Kaufpreis abgeloest: hoechstens "niedrig" als Pruefpunkt (Loeschungsbewilligung), ausser es gibt Zwangsversteigerungs- oder Insolvenzvermerke.',
+    'Den Anteil des Objekts bestimmt NUR "kauf_umfang" in den Eckdaten: "ganzes Gebaeude" heisst 100 % der Gemeinschaftskosten, auch wenn ein einzelnes Grundbuchblatt einen kleineren Miteigentumsanteil zeigt.',
     'Hoch ist nur, was mit Zahl oder Beschluss belegt ist und den Kaeufer absehbar Geld kostet oder die Nutzung einschraenkt.',
     '',
     'Antworte NUR mit JSON:',
