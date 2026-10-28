@@ -43089,3 +43089,507 @@ genau die zwei aus, fremder Schlüssel erhalten. DB: 2026-1123, 1056, Teststr. 6
 Messlauf gesperrt) – Abnahmepunkt auf Staging: Haken abwählen, speichern, neu laden. Der KI-Prompt
 verlangt in `investmentbewertung`/`dealpilot_insight` weiter ein Urteil; das PDF filtert, der Prompt
 ist unverändert. Nicht auf Prod.
+
+### Prod-Rollout 28.10.2026 spät · v3017d, v3018–v3018b, v3019, v3020, landing-satz-2 — Prod `fa0ff4e`
+
+**Was.** v3017d Einheiten im Import; v3018/a/b PDF-Bausteine nach Ankauf/Bestand, Dopplungen raus, Urteil
+nur einmal, Haken je Objekt (`_pdf_bausteine_aus`, „alle an" als [] wenn das Feld schon existierte); v3019
+Baupreisindex ohne Bezug = Regelfall § 36 Abs. 2 auch für neue Sätze, 101 neue SWF-Werte, Baujahr an
+den Sachwertfaktor (gestaffelte Faktoren rechneten nie); v3020 Anfragen an Ämter (Admin, `mb.amt_anfragen`,
+Migration 022, `ausschuss_kontakte.json` 269 Einträge / 248 mit E-Mail, `tools/sperren-anfrageliste.mjs`);
+landing-satz-2; Stundennachweis-Generator ohne 10-h-Grenze, beide Projekte, Testpauschale 10 h/Monat.
+
+**Nachweis.** Prüfer grün (saat, wertermittlung, score-ketten, buster, rechenkerne, sperren-anfrageliste).
+Staging: Haken Teststr. 6 abgewählt → DB `["staerken","risikoanalyse"]` → nach Neuladen da → alle an →
+DB `[]`. Prod: Migration 022 eingespielt, Register 6.186 = 6.186 sauber, Landing zeigt 6.186 / 201.
+
+**Rest.** Admin „Anfragen an Ämter" angemeldet abnehmen (Marcel), Testzeile Oder-Spree in Staging
+`mb.amt_anfragen`. Ludwigslust-Parchim verlangt ein Belegexemplar. Läuft: v3018c Seitenumbrüche +
+Nutzerdaten ab Investor im PDF, Werbebilder (Agent), danach Rundgang-Video neu.
+
+
+### v3018c/c1 · Seitenumbrüche in den PDFs, Absender im PDF ab Investor · 28.10.2026 — Staging `35f6a41e`, `8413b353`
+
+**Was.** Marcel: „ob die Seitenumbrüche sinnvoll gewählt werden" und „ob die Daten des Users –
+Anschrift und E-Mail – auf dem PDF ausgegeben werden ab Investor-Plan".
+**Umbrüche** (Prüfer im scratchpad `umbruch-pruefen.mjs`, poppler `pdftotext -bbox-layout`: Füllgrad
+je Seite, Überschrift am Seitenende, Rest-Seite mit „(FORTSETZUNG)"): Investment-PDF – Pilot-Bausteine
+mit Hurenkind-Schutz (≥ 3 Zeilen auf der Folgeseite, ≥ 3 davor); Mieterliste (Einheiten & Zustand),
+Pilot-Analyse (wenn > halbe Seite frei) und Annahmen & Hinweise laufen auf der angebrochenen Seite
+weiter, wenn sie ganz passen (Schätzhöhe je Zeile 8,5 bzw. 11 mm – keine Tabelle bricht dadurch um).
+Steuermappe/Werbungskosten: Folgeseiten (Kasten Steuerwirkung blieb zusammen, stand aber ohne Bezug
+allein) tragen jetzt eine Kopfzeile „Aufstellung Werbungskosten Jahr · Objekt · Fortsetzung"
+(`_wkNeueSeite`). **Absender:** `getBranding()` verglich hart auf `'pro'` – gemessen gab das Konto
+info@ (Plan partner, Firma/Anschrift/E-Mail/Telefon im Profil) PDFs OHNE Absender aus. Neu
+`branding.fuerPdf()` = `get(true)`: ab `custom_logo` (Investor, Pro, Partner); `get()` außerhalb der
+PDFs ab Pro-Familie (`PRO_FAMILIE`, Partner nicht mehr ausgesperrt). pdf.js `_getBranding`, Bank
+`marke()`, BMF-Anlage, Kaufpreisaufteilung lesen `fuerPdf` (Werbungskosten/Track-Record über pdf.js).
+mandant-branding.js umhüllt `get` weiter (Argumente durchgereicht) – Whitelabel bleibt vorn.
+Einstellungs-Hinweis (Kontakt-Reiter) und Hilfe nennen die Grenzen.
+
+**Nachweis.** Staging, Schreibzugriffe/alert abgefangen. Seiten vorher → nachher: Lindenallee
+Investment 22 → 20 (Befunde 3 → 0), Bank 17 = 17, Kurz 6 = 6; ETW 2026-001 Investment 20 → 19
+(2 → 0); Parkstr. Investment 22 = 22 (1 Befund bleibt: S. 21 15 % Pilot-Ende, Annahmen ~200 mm passen
+nicht mehr); Steuermappe 6 Steuerwirkungs-Seiten jetzt mit Kopf; Werbungskosten-Übersicht, BMF-Anlage,
+Bank ETW/Parkstr. ohne Befund. Plan-Simulation per `dp_plan_override` (nur Browser, danach entfernt):
+free/starter PDF leer, investor PDF „Junker Solution | Hermannstr. 9 | info@…", App leer; pro/partner
+PDF und App gefüllt. Bilder: `Downloads/v3018c-bilder/` (vorher-/nachher-*.png), PDFs
+`Downloads/v3018c-vorher-*`, `v3018c-nachher-*`, `v3018c1-nachher-*`.
+
+**Rest.** Nicht geprüft: Marktbericht-PDF (eigenes Dokument), RND-Gutachten, Exposé/Pass, Track-Record,
+Kaufpreisaufteilung (verlangt vorher die Berechnung im Fenster). Investor sieht seinen Absender jetzt
+im PDF, im Deal-Aktion-Banner/Anfrage-Karten erst ab Pro – Produktentscheidung bestätigen. Nicht auf Prod.
+
+## Rollout-Journal 28.10.2026 — v3022/v3022a/v3022b: Entwurf „Einstellungen schlank" (Schalter, Vorgabe aus)
+
+**Was.** Marcel: „brauchen wir unter Einstellungen die ganzen Parameter und Co-Pilot (KI)? … Kunden nicht
+verwirren". Entwurf hinter Schalter `?einstellungen=schlank` (nur dieser Browser-Tab, sessionStorage),
+`&merken` dauerhaft (`dp_einst_schlank=1`), `?einstellungen=voll` aus. Neues Modul
+`frontend/js/einstellungen-schlank.js` baut das fertige Fenster um (wrappt `showSettings`/`_swSet`),
+löscht nichts: Standardwerte → **Mein Profil** direkt nach Account, dazu „Deine Haltung" (Strategie +
+Risikoneigung, aus Co-Pilot herübergehoben, sofort gespeichert) und eine Deal-Score-Zeile (welche
+Gewichtung gilt, „Auf Standard zurücksetzen"); Co-Pilot nur Länge + Ton, Rest unter „Für Profis";
+Reiter Deal Score aus (eigene Gewichtung wirkt weiter); Datenraum nur genutzt/ab Investor, Mandanten
+nur >1 Halter/ab Pro. `ui.js`: im Entwurf keine Marktlage im Prompt, Verkäuferdruck nur je Objekt
+(neues Feld `ai_verk` im Reiter Pilot-Analyse — der Name steht seit Langem in `storage.js` FIELDS,
+speichert also je Objekt ohne Eingriff in storage.js).
+
+**Nebenbei behoben (wirkt auch ohne Schalter):** `settings.js` opts() — das Einrichtungsfenster schreibt
+`ai_risk = "Konservativ (sicherheitsorientiert)"` / `"Chancenorientiert (höheres Risiko)"`, beide fehlten in
+der Auswahl; jedes Speichern der Einstellungen schrieb still „Konservativ (Sicherheit ist wichtigst)"
+zurück (ein Chancenorientierter wurde konservativ). Falsche Aussage „pro Objekt im KI-Tab
+überschreibbar" in settings.js und help.js korrigiert — gemessen gibt es kein solches Feld, ui.js liest nur das Profil.
+
+**Commit.** 750e86fc (v3022), ac29b526 (v3022a: `.st-tab` trägt `display:flex !important` aus style.css —
+`style.display='none'` wirkte nicht, gemessen per getComputedStyle), 23bd8e92 (v3022b: Score-Zeile zieht
+nach Klick aufs Anlegerprofil nach, Hinweis „Feiner justieren: Reiter Deal Score" zeigt im Entwurf auf
+„Deine Haltung").
+
+**Nachweis (Staging, Demo-Konto, eigener Tab, nichts gespeichert).** Mit Schalter: sichtbare Reiter
+Account · Mein Profil · Kontakt & Logo · Co-Pilot · Darstellung · Datenraum · Mandanten · Plan ·
+Partner-Portal · Rechtliches · Hilfe (Deal Score weg; Datenraum/Mandanten bleiben, Plan partner);
+Co-Pilot-Pane 1.646 → 186 px; `#set_ai_verk`/`#set_ai_markt` ohne id; `#ai_verk` am Objekt da, leer.
+Ohne Schalter: Deal Score `flex`, Pane 1.646 px, kein `#ai_verk`. Demo-Profil unverändert (nur zvE-Schlüssel),
+Preset weiter `lage`. buster-ebenen RC=0. Screenshots vorher/nachher Desktop + 390 px im Scratchpad des Agents.
+
+**Rest.** Entwurf, nicht Standard — Marcels Abnahme offen. Gemessen am Demo-Konto: Deal-Score-Vorlage
+`lage` (Lage-Fokus) aktiv, also rechnen die Messe-Scores NICHT mit der Standardgewichtung. Einrichtung
+(onboarding.js) deckt ab: Tilgung, EK, LTV, DSCR, Mietausfall, Angebotsabschlag, Grenzsteuersatz/zvE/
+Splitting/Kirche, Bundesland, Zielrendite je Lageklasse, Investortyp (→ ai_risk + Score-Vorlage); fehlt:
+Strategie (ai_strat), Mindest-Cashflow, Notar/Grundbuch/Makler/Sonstige, GrESt automatisch,
+Bewirtschaftung je Objektart. Pilot-Analyse mit `ai_verk` je Objekt nicht live ausgelöst (Kontingent) —
+Staging-Abnahmepunkt. Nicht auf Prod.
+
+
+### v3018d · nur gültige PDFs, eine Kaufpreisaufteilung, kein Zielbild ohne Zielbild · 28.10.2026 — Staging `ae261277`
+
+**Was.** Marcel: „PDF-Export nur dann erlauben, wenn das Dokument auch valide ist – vor allem bei
+Kaufpreisaufteilung, Anschaffungskosten und Steuer-PDF", „die Anlage zur Kaufpreisaufteilung sah
+gerade recht leer aus" und „wenn wir kein Zielbild angegeben haben, das auch nicht im PDF steht".
+**Gültigkeit:** neues `js/pdf-pruefung.js` (`DpPdfPruefung.tor(art, titel)`), eine Prüfung je Art,
+aufgerufen IN der Exportfunktion (jeder Knopf läuft durch): `investment` (pruefeInvestmentDaten –
+jetzt auch Investment-PDF, nicht nur Bank/Kurz), `kaufpreisaufteilung` (Pflichtliste des Fensters
+`_bmfFehlend`, Rechnung vorhanden, Gebäudeanteil 0–100 %, Bodenwert/Verkehrswert > 0, Gebäude +
+Boden = Anschaffungskosten ±0,05 %, ETW ohne MEA), `steuer` (Werbungskosten-PDF: Kaufpreis,
+Gebäudeanteil, AfA-Satz, Steuerjahre). Hinweis im Haus-Stil, Reiter aus dem DOM, „Hinspringen"
+(Reiter öffnen, Feld markieren) bzw. „Fenster öffnen"; Warnungen bleiben Toast. Das blockierende
+`alert()` der Kaufpreisaufteilung ist ersetzt. **Eine Ausgabe:** `exportBmfPdf` leitet auf
+`exportPDFKaufpreisaufteilung` weiter (alter Rumpf als `_exportBmfPdfAlt`, ungerufen); bmf-wahl,
+Deal-Aktion-Smartklappe und ReadyCheck rufen den genauen Export. **Zielbild:** „angegeben" =
+`DpPotenzial.modell().hat_ziel` (Zielmiete oder Maßnahme an Wohnung/Haus). Ohne: `DpPotenzial.
+ohneZielbild()` für alle Texte (auch Marktbericht-Dienst), Kernaussagen „Maßnahmen: 0 €"/
+„Wertzuwachs nach Kosten" und Zeile Maßnahmenkosten weg, Tabelle ohne Ziel/Maßnahmen, Seite „Wert &
+Potenzial", Pilot-Baustein „Ankauf · Bestand · Zielbild" entfällt. Mieterhöhung § 558 bleibt
+(aus dem Ist gerechnet, eigener Teil).
+
+**Nachweis.** Staging, Felder nur im Speicher, Schreibzugriffe abgefangen (nur `/bmf/aufteilung`
+durchgelassen). Vorher (2026-1123): Investment-PDF mit leerer Miete 14 S., Rendite 0,00 %, DSCR 0,00;
+Werbungskosten-PDF mit leerem Gebäudeanteil/AfA-Satz erzeugt (AfA aus Vorgabe); Kaufpreisaufteilung
+mit geleerter Grundstücksfläche aus alter Rechnung erzeugt; ohne Rechnung `alert()`; alte Anlage
+„Lage —", Datei „BMF_Anlage_Finanzamt_____", Fuß überlappt. Nachher: alle vier Fälle Hinweis statt
+PDF, Hinspringen landet in Reiter Objekt auf `gsfl`; vollständig: Kaufpreisaufteilung Text identisch
+(pdftotext-diff leer, 4 S.), Werbungskosten 1 S., Investment 14 S.; ETW 2026-001 genau: alle fünf
+Abschnitte, keine Striche. Zielbild: Lindenallee (ohne) Investment 20 S. „Zielbild" 8 → 0, Bank 17 S.
+10 → 0; Parkstr. (mit) 22 S. 20 → 20. Bilder `Downloads/v3018d-bilder/`, PDFs `Downloads/v3018d-*`.
+
+**Rest.** Nicht geprüft/gebaut: Marktbericht-PDF, RND-Gutachten, Exposé, Track-Record, Steuermappe
+(Portfolio aus der DB, prüft schon „keine Sätze"). Die genaue Kaufpreisaufteilung druckt bei ETW den
+MEA nicht. Die App-Ansicht (Tab Bewertung) nennt das Zielbild weiter auch ohne Zielbild – nur das PDF
+ist bereinigt. `frontend-konstanten.json` nicht neu committet (help.js trägt fremde, ungesicherte
+Änderungen eines parallelen Agenten). Nicht auf Prod.
+
+### v3021 · Jahreswerte: Register, Prüfer, automatischer Abruf, Angebotsabschlag selbst ermittelt · 28.10.2026 — Staging `eb3b5357`
+
+**Was.** Marcel 28.10.2026: *„den Wert [Angebotsabschlag 5,8 %] bitte dann jedes Jahr automatisch
+neu ermitteln, und das müssen wir auch bei den Steuerdaten machen."*
+(1) **Register** `marktbericht/backend/src/lib/data/jahreswerte.json`, 25 Werte (gemessen per grep und
+Sweep, nicht aus dem Gedächtnis): je Wert Orte mit Suchmuster für jede Spiegelstelle, `erwartet`,
+Stand, Quelle (intern), Turnus, `faellig_am` (Kappung: nächster Ablauf aus der Liste gelesen),
+Verfahren `automatisch` / `agent` / `durchsicht`. Liegt im mb-Backend, weil der Admin es über das
+mb-Image liest (das hat kein `tools/`). (2) **Prüfer** `tools/jahreswerte-pruefen.mjs` (RC=1 bei
+überfällig außer `automatisch`, bei ungleichen Spiegeln und bei verbotener zweiter Quelle; gelb
+≤ 60 Tage; Tarif-Stetigkeit an den Zonengrenzen je Jahrgang), in `deploy-staging.ps1` nach den
+Kappungsgrenzen. (3) **Automatik** `JahreswerteService` (täglich prüfen, alle 7 Tage holen):
+VPI (61111, Monate, 2020 = 100) und Baupreisindex Wohngebäude (61261) von den öffentlichen
+Destatis-Tabellenseiten; GENESIS-API vorbereitet (`GENESIS_TOKEN`), ohne Konto Code 15 —
+der vorhandene `DESTATIS_TOKEN` gilt nur für die Regionaldatenbank, die beide Tabellen nicht führt
+(Code 104). Plausibilität vor Übernahme (`pruefe()`: Band, Sprung je Abstand, belegter Wert ±0,5 %),
+nur `aktiv` wirkt; Code-Tabellen bleiben Rückfall UND Vorrang (`uebernimmAbruf`,
+`uebernimmVpiOktober` fügen nur fehlende Perioden an). Migration 023 (`mb.jahreswerte_abruf`,
+`_lauf`, `angebot_abschlag_messung`, `angebot_abschlag_jahr`). (4) **Angebotsabschlag:** jede
+Ortsmessung (Stufe 2 Rohertragsfaktor-Satz, Stufe 3 LZS-Satz, keine Demodaten) hängt als
+`angebot_abschlag.messung` am Ergebnis, der ReportOrchestrator schreibt sie (ohne Personenbezug);
+ab 15.01. je Segment ETW/Haus/MFH Median des Vorjahres (je Ort × Satz jüngste Messung, Tukey
+1,5 × IQR, mind. 20) → Stufe 4 „DealPilot-Marktdurchschnitt aus n Ortsmessungen (Jahr)" — bewusst
+nicht „örtlichen": sechs Stellen lesen `/rtlich/` als Stufe 2. EINE Quelle `lib/angebot_abschlag.js`;
+`config.js angebotAbschlagMarkt` ist `null` und wird aus `GET /marktbericht/jahreswerte/angebotsabschlag`
+gefüllt (Quellenname und Link sind damit aus dem ausgelieferten Frontend raus). (5) **Steuer:**
+Tarif § 32a 2025 und Soli-Freigrenze 2025 (19.950) aus BGBl. 2024 I Nr. 449, Art. 1 Nr. 2 / Art. 3,
+wörtlich aus dem Regelungstext-PDF; 2026 gegen dasselbe Dokument gegengelesen (gleich). Admin
+„Register & Ernte › Jahreswerte" (lesend + „jetzt holen"), Agent `.claude/agents/jahreswerte.md`.
+help.js: Baupreisindex-Text sagte noch „feste Zahl 1,91".
+
+**Nachweis.** Lokal: jahreswerte-pruefen RC=0 (gelb: Tarif/Soli 15.12., VPI 15.12., Kappung HE
+25.11., BelWertV 05.12., MFI-Rückfall alt), Gegenprobe mit falschem `erwartet` → ungleich erkannt;
+wertermittlung-pruefen RC=0, saat/kappung/beleihungswert/frontend-konstanten/buster RC=0. Parser
+gegen den Code: BPI 23 Quartale ohne Abweichung, VPI Okt. 2025 = 123,0. Staging: mb-DB gesichert
+(`/root/backups/mb-20261028-1751-v3021.sql.gz`, 41 MB, 35 Tabellen), Migration 023 OK, Abruf: VPI
+69 gelesen / 68 neu aktiv / 0 Warnungen, BPI 23 „gleich" (Seite meldet „eingefroren"); 4
+Oktoberwerte 2021–2024 neu in `VPI_OKTOBER` (NRW-BWK für zurückliegende Stichtage jetzt
+fortgeschrieben, Stichtag 2026 unverändert). Im Container: Bielefeld MFH 16,4 % mit Messung
+(Rohertragsfaktor), Herford ETW 19,7 % (LZS), München EFH 5,8 % ohne Messung; mit gesetztem
+Jahreswert 7,4 % „DealPilot-Marktdurchschnitt aus 31 Ortsmessungen (2026)"; Insert in
+`mb.angebot_abschlag_messung` geprüft (Testzeile entfernt). Browser: `DealPilotConfig.
+angebotAbschlagMarkt` = 5,8 aus dem Backend, `Tax.tarifInfo(2025)` exakt; Admin-Abschnitt mit
+eingespeister Antwort gezeichnet (Login fehlte – echte Antwort über `admin_auth_required` nicht
+gesehen = Abnahmepunkt).
+
+**Rest.** Tarif 2027 nur Regierungsentwurf (Grundfreibetrag 12.564) – offen bis Verkündung. Ab
+Anfang 2027 ist bpr110 abgeschaltet: ohne `GENESIS_TOKEN` (kostenloses Konto bei
+genesis.destatis.de, Marcel) kein automatischer Baupreisindex mehr; der GENESIS-Leser ist an keiner
+echten Antwort gemessen. KSt-Senkung ab 2028 nur als Hinweis (Fundstelle offen). NKM-Index noch
+nicht in der Automatik. Gold-Audit auf Staging rot durch fremde `einstellungen-schlank.js` (0 → 2).
+deploy-staging.ps1 brach an fremden ungesicherten Dateien ab – Ausrollen per push + Pull + Rebuild
+von Hand mit denselben Prüfern vorab. Nicht auf Prod.
+
+### v3023 · Zahlenfelder in den Reitern deutsch angezeigt · 28.10.2026 — Commit auf `staging`, NICHT ausgerollt (Video-Aufnahme auf Staging)
+
+**Was.** Marcel: „in den Tabs werden Währungen und Einheiten und die Zahlen nicht passend mit Punkt
+und/oder Komma angegeben … aufgefallen im Tab Bewirtschaftung". Gemessen in einer abgeschotteten
+Kopie (lokaler Server mit Stub-API, Headless-Chrome, Objektdaten per `SELECT` von Staging, nichts
+gespeichert) an Lindenallee 2026-1123 (MFH), Hölderlinstr. 2026-1008 (ETW), Am Markt 2026-1040 (ETW):
+in denselben Reitern standen vier Schreibweisen nebeneinander — Bewirtschaftung „3313" / „9600"
+(Import) neben der Summe „3.313 €", Investition „1090000", „3.57" %, „6,5" %, Makler/Notar/GrESt €
+als „38913", Miete-Annahmen „1.5" / „1" %, Steuer „68.000" € neben „41.35" %, Finanzierung
+„250093" € neben „4,0" %. Dazu „58.60 m²" (Grundstücksanteil), DSCR-Pille „1.78",
+Platzhalter „9.50" / „7.06", Warmmiete „43.920,00 €" direkt über „43.920 €".
+
+**Ursache.** Es gab keine Formatierschicht für Eingabefelder. `loadData()` schreibt `e.value = d[id]`
+roh, `calc()` schreibt berechnete Felder als nackte Zahl, Import/Quick-Check/Sprache/BMF ebenso;
+nur was der Nutzer selbst tippte, stand deutsch. Gerechnet hat alles richtig, weil `v()` über
+`parseDe()` liest. **Den Wert selbst zu formatieren wäre der teure Fehler gewesen:** rund 35 Stellen
+lesen Felder mit `parseFloat(x.value)` / `replace(',', '.')` (afa-ui `wfl`, marktbericht-view
+`price=kp`, investment-profile `kp` …), und `collectData()` speichert `e.value`, das Portfolio,
+Track Record und `objectService` wieder mit `parseFloat` lesen — „1.090.000" wäre dort 1,09 €.
+
+**Lösung.** `js/zahlenfelder.js` (neu, nach `calc.js` geladen) trennt Anzeige und Wert: jedes
+Zahlenfeld der Reiter (`.sec input[inputmode=decimal|numeric]`, ohne Baujahr, Modernisierungsjahr,
+Zielbild-Jahr, PLZ, Hausnummer, Flur) bekommt einen eigenen `value`-Zugriff. **`.value` liefert
+weiter exakt den Text, der ohne die Schicht im Feld stünde** (`_dpRoh`); sichtbar ist die deutsche
+Form — € ganz oder mit zwei Stellen, % mit Komma (unter 10 mit einer Stelle), m² bis zwei Stellen.
+Beim Fokus steht der Rohtext zum Bearbeiten im Feld, beim Verlassen wieder deutsch (Fokus/Blur am
+`window` in der Capture-Phase, damit es vor jedem blur-Leser läuft). Jeder Schreibweg geht über den
+Setzer und kommt formatiert an, ohne dass Import `_wertSchreiben`, Quick-Check, Sprache oder BMF
+angefasst werden; dynamisch gebaute Felder holt ein MutationObserver (nur bei neuen Elementen mit
+`input`). Einheit wird am Feld ABGELESEN (pfx/sfx/`.unit`/Beschriftung). Ergänzt: Präfix „€/m²"
+statt „€" an Bodenrichtwert, BRW manuell, Hinterland, Marktmiete, Soll-Mietspiegel, Zielbild-
+Mieten; Suffix „%" an Zins übernommenes Darlehen, „J." an Abweichung erwartet. `calc.js`:
+Grundstücksanteil und DSCR-Pille mit Komma, Warmmiete Cent nur, wenn es welche gibt. Platzhalter
+„9,50" / „7,06". Ein halb getippter Wert („3,") und Text („ca. 5") bleiben, wie sie sind.
+
+**Nachweis.** Vorher/Nachher in derselben Kopie, Schicht per `Network.setBlockedURLs` an/aus:
+`.value` aller Felder + `collectData()` an drei Objekten **1.570 Werte, 0 Abweichungen** (nur
+`_at`); `State.kpis`, 12 Cashflow-Jahre, alle Zahlen des Datensatzes und 176 Anzeigetexte
+**1.349 Werte, 0 Abweichungen** (Lindenallee Cashflow −741,08 €/M, BMY 4,03 %, DSCR 0,89;
+Hölderlinstr. +86,22 €/M, 6,34 %, 1,37). Tippen gemessen: „1234,5" € → sichtbar „1.234,50", `v()`
+1234,5; „3.400" € → 3400; **„3.5" % → „3,5", `v()` 3,5** (punkt-ist-kein-tausender); Skript setzt
+12500 → „12.500", `.value` „12500"; Baujahr unberührt. buster-ebenen RC=0, frontend-konstanten,
+prompt-lecks RC=0, objekt-mapper RC=0. Screenshots Bewirtschaftung vorher/nachher in der Sitzung.
+
+**Rest.** Nicht auf Staging gezogen (Marcel rollt aus) — Abnahmepunkt: auf Staging einmal tippen
+(Fokus zeigt Rohtext, Blur deutsch) und einen Import in Bewirtschaftung laufen lassen. Bewusst
+nicht angefasst: `avm-section.js` (Nicht anfassen) zeigt „-21.6%" in der Marktwert-Karte;
+`brw_stichtag` steht als ISO-Text „2026-01-01"; Monatsraten/AfA mit Cent (4.125,00 €) sind Absicht;
+die Anlage-V-Jahresfelder (`type=number`) formatiert der Browser selbst; Quick-Check-iframe ist ein
+eigenes Dokument (nicht Teil des Auftrags). Drehbücher, die in Felder tippen, zeigen ab jetzt
+während des Tippens die deutsche Form („1.090" bei „1090").
+
+### v3024 · Demo-Konto: Vorgaben am Konto, Staging = Prod (28.10.2026)
+
+**Was.** Marcel: „beide Konten Prod wie Staging gleich … es muss zum Storytelling passen“.
+Gemessen: alle 17 gespeicherten Demo-Scores sind bitgleich mit der Vorlage **Lage-Fokus**
+(DS 20/22/14/14/30), keiner mit Standard. Mit Standard würden acht Stufen kippen, außerdem M12 (78 Gut → 85 Sehr gut),
+Ü2 und Komplettbeispiel-MFH. **Entscheidung: Lage-Fokus bleibt.** Die Anzeige „Ausgewogen · angepasst“ ist
+korrekt (Set Ausgewogen plus Feinjustierung). Ursache des Risikos: Vorlage, Gewichte, Set und Investmentprofil
+lagen nur im localStorage. Derselbe Chrome hatte auf Prod „custom“ mit Standardgewichten, also hätte die
+Westerfeldstr. dort 85 gezeigt und beim Speichern in die DB geschrieben.
+Neu `js/vorgaben-sync.js` + `user_settings` Schlüssel `browser_vorgaben` (ERLAUBT): Beim Laden gewinnt der Server,
+dann lädt die Seite einmal neu (einmal je Sitzung und Konto). Leerer Server bekommt den Browserstand nur vom Besitzer
+(`dp_vorgaben_nutzer`), ein fremder Stand wird beiseitegelegt (`dp_vorgaben_ablage_<id>`/`_ohne`).
+Änderungen gehen über einen Abgriff an `Storage.prototype.setItem/removeItem` gebündelt hoch.
+Demo-Wert auf beiden Servern per SQL hinterlegt (md5 gleich).
+Daten: Staging Bismarckstr. 27 (Speicherung 15:28 hatte alten `_ai`/`_mb_state` zurückgeschrieben) aus Prod
+zurückgeholt; Prod Hauptstr. 51 und Lindenallee 14 auf Staging-Stand; Prod Hölderlinstr. `d8dba139` (Doppel)
+und 9 Staging-Testreste → Verloren (nicht gelöscht). Pilot-Analysen neu auf Staging, nach Prod gespiegelt:
+Gohliser 42, Hölderlin 1, Am Markt 9 VV, Hermannstraße 9. Ihre Texte nannten Scores, die nicht zum
+gespeicherten passten. Storybook neu.
+
+**Commit.** `8e9367b3` (v3024). Staging: git pull plus Backend-Rebuild. `deploy-staging.ps1` brach wegen
+fremder ungetrackter Dateien ab, deshalb die Fernschritte von Hand ausgeführt.
+
+**Nachweis.** Kern-Nachrechnung 17/17 = Lage-Fokus. Sync am Knotenmodell in 5 Fällen geprüft (gleich, Server
+anders, leer/Besitzer, leer/fremd mit Ablage, Änderung danach). Live Staging: kein Neuladen bei gleichem Stand.
+Browser künstlich auf `balanced` gesetzt: Seite lädt einmal neu, steht danach auf `lage`, der Server bleibt
+`lage`. md5(data)+md5(ai_analysis) Staging = Prod für 19/19 gemeinsame aktive Objekte. Sicherungen
+`/root/backups/haupt-20261028-1804-vor-demo.sql.gz` auf beiden Servern (51 MB / 15 MB).
+Liste für Videos: `Dateien/Messe/Demo-Konto-Stand-2026-10-28.md`.
+
+**Rest.** Prod-Rollout v3024 (Frontend plus Backend-Rebuild) steht aus. Bis dahin rechnet ein Prod-Browser mit
+seinem eigenen localStorage, also Demo-Objekte auf Prod vorher nicht speichern. Neu aufzunehmen: M21
+Portfolio (heute 71 Gut / 10 Objekte statt 69 / 11), Schleife `portfolio`/`score`; M12/M19 um 1 daneben
+(77 statt 78), M11 zeigt „Kaufen“, das Objekt trägt heute die Bestandsanalyse „Halten“.
+
+### v3026 · Nettokaltmieten-Index automatisch, Indexreihen für viele Nutzer, Indexmiete § 557b BGB · 28.10.2026 — Commit `66e6d89b`
+
+**Was.** Marcel: „so, dass wir halt viele Nutzer und Abrufe abdecken können … kann der VPI auch bei
+Indexmieten die mögliche Mieterhöhung für jedes Jahr berechnen?“ (v3025 gehört dem Bot-Strang, v3024 dem
+Demo-Konto – deshalb v3026.)
+- **Dritte Reihe `nkm`** im Jahreswerte-Takt. An der echten GENESIS-Antwort gemessen: Tabelle
+  **61111-0006** (VPI Deutschland, Monate, COICOP-Sonderpositionen), Merkmal **CC13B1**, Ausprägung
+  **CC13-73 „Nettokaltmiete“**, Filter `DG` + `CC13-73`, serverseitig eingegrenzt
+  (`classifyingvariable1/classifyingkey1`). 81 Monate 2020-01 bis 2026-09; Mai 2022 = 102,7,
+  Sep 2026 = 111,9 – alle zehn Code-Monate gleich. Weg 2: Seite „Sondergliederungen“, Spalte per
+  Kopfzelle gesucht (69 Monate, Stand 13.10.2026). Länderreihe gäbe es als 61111-0021 – bewusst nicht
+  benutzt (Methodik: Bundesindex). `uebernimmNkm()` schreibt neue Monate in `NKM_INDEX`, Code bleibt
+  Rückfall und Vorrang. Register `nkm_index` → automatisch. Migration **024** (Check `reihe` um `nkm`).
+- **VPI ab 2008** (225 Monate statt 81), Band 70–250 – die Indexmiete braucht die Monate seit Vertragsbeginn.
+- **Skalierung:** kein Nutzerabruf geht an GENESIS. Takt → `mb.jahreswerte_abruf` → `lib/indexreihen.js`
+  (Speicher-Cache, Rückfall Code-Tabellen) → `GET /marktbericht/indexreihen` (ETag/304, 2,4 KB) → Haupt-
+  Backend hält die Antwort 10 min (bei Ausfall bis 7 Tage) → Browser `js/indexreihen.js` einmal am Tag,
+  localStorage. Lasttest im mb-Container (Sandbox-Kopie, Erzeuger im selben Prozess, also Untergrenze):
+  200 parallel 767 Anfr./s p95 224 ms · 1000 parallel 718/s p95 1,3 s · mit ETag (304) 2.500–2.900/s.
+- **Indexmiete** `js/indexmiete.js` (Kern, Werte als Parameter): Basis VPI im Monat der letzten
+  Erhöhung bzw. des Mietbeginns; Erklärung frühestens Basis + 10 Monate, wirksam übernächster Monat
+  (Abs. 3) → ≥ 12 Monate (Abs. 2); je Jahr +12; Indexmonat = jüngster veröffentlichter Monat; Zukunft
+  nur als gekennzeichnete Annahme (Profil `indexmiete_vpi_pct`, Vorgabe 2,0 %). Gesetzestext § 557b im
+  Kopf zitiert. Anzeige: Tabelle je Wohnung im Einheiten-Fenster und in der Mietpotenzial-Karte (Reiter
+  Objekt), Summe je Haus; Pilot-Payload `indexmiete` + Prompt-Block („zitieren, nicht rechnen“,
+  Annahme benennen), Zeile in der Karte „Ankauf · Bestand · Zielbild“, PDF-Zeile im Segment Wert &
+  Zielbild – alles nur mit Indexvertrag. Nebenbei: der ETW-Pfad in `potenzial.js modell()` gab `mv_art`
+  nicht weiter – `vertragGrenzen` sah dort nie Staffel/Index; jetzt schon.
+
+**Nachweis.** `tools/indexmiete-pruefen.mjs` 39/39 (A: 800 € · 126,6/118,6 = 853,96 €, wirksam 12/2026;
+B: Sperre bis 03/2027, Annahme 127,2 → 1.021,69 €; C: Mietbeginn 07/2023 → 702,73 €; D: vier fehlende
+Angaben), `prompt-lecks-pruefen` sauber (+7 Punkte), `jahreswerte-pruefen` grün, `buster-ebenen` sauber.
+GENESIS-Abruf mit dem neuen Code im Staging-Container: nkm 81 Monate, vpi 225 Monate (2008-01 = 85,8).
+
+**Rest.** **Staging-Pull ausstehend** – im Chrome lief eine Messe-Aufnahme (`messe-studio.html?messe=
+komplett-mfh`); kein Pull, kein Rebuild. Danach: `git pull`, mb-backend **und** backend neu bauen,
+vorher `pg_dump` der mb-DB (ansehen!), Migration 024 prüfen, `POST /jahreswerte/abruf`, dann im Browser
+ein Objekt mit Indexmiet-Wohnung (nur im Speicher) und eine Pilot-Analyse nachmessen; `gold-audit.py`
+für die neue Datei `indexmiete.js` (Kartenfarben #E6DCC2/#F0E9D6) laufen lassen.
+
+### v3027 · Reiter Miete: Vertragsübersicht statt Objekt-Mietvertrag, wenn Einheiten erfasst sind (Entwurf) · 28.10.2026 — Commit `985f2764`
+
+**Was.** Marcel: „Macht es Sinn, im Tab Miete ‚Mietvertrag für dieses Objekt‘ anzugeben, wenn wir die
+Einheiten erfasst haben?“ Ab zwei Einheiten in `_dpMfh.einheiten` blendet `mietvertrag-objekt.js` die
+Objektfelder aus (sie bleiben gespeichert) und zeigt: Verteilung, Tabelle je Einheit (Vertrag, Mietbeginn,
+letzte Anpassung, Kaltmiete, nächste Erhöhung – § 558 über `sollFuer`, Index über `js/indexmiete.js`,
+Staffel über `mv_naechste_anpassung`), fehlende Angaben rot mit Sprung in genau diese Einheit
+(`DpMfhEinheiten.einheitOeffnen(i)`), Knopf „Einheiten bearbeiten“. Ohne Liste wie bisher, beim MFH mit
+Knopf „Einheiten erfassen“. Leser der Objektfelder gemessen: `calc.js` keiner, `potenzial.js` nur ohne
+Liste, Pilot über die Einheiten, `dealpilot-mb.js` schickte `mv_befristet_bis`/`mv_kuendigungsverzicht_bis`/
+`mv_abw_jahre` mit – jetzt nicht mehr, wenn die Einheiten gelten. Kennzahlen (calc.js) ändern sich damit
+nicht; ein Marktbericht eines MFH mit Liste rechnet die Mietabweichung nur noch je Einheit.
+
+**Nachweis.** `node --check`, `buster-ebenen` sauber, `termin()` im vm an sechs Einheiten (Index mit
+Datum → „ab 12/2026 +53,96 €“, Index ohne Datum → fehlt, Staffel ohne Stufe → fehlt, § 558, leer, ohne
+Vertragsart → fehlt), Zahlen „1.050“ / „850,50“ richtig gelesen.
+
+**Rest.** **Staging-Pull ausstehend** (Messe-Aufnahme lief). Danach im Browser: Lindenallee (Einheiten)
+und eine ETW, 390 px, Screenshots vorher/nachher, Absprung in die Einheit, Kennzahlen gegenlesen.
+
+### v3025 · Objektwissen für Telegram-Bot, Co-Pilot und Cockpit-Pilot: Unterlagen, Mietpotenzial im Jahr, To-dos, Marktmiete · 28.10.2026 — Commit `07d480d6`
+
+**Was.** Marcel: „wird alles, was wir heute ergänzt haben, auch immer im Objektwissen gespeichert, und kann der
+Telegram-Bot darauf zugreifen?“, erweitert um „Potenzial dieses Jahr“, „To-dos“ und „Miete für ETWs in Herford
+mit 80 m²“. **Gemessen vorher** (Lindenallee 14, `2b57a20f`, mit `tools/agent-pruefung/pruef-objektwissen.js`,
+Werkzeuge echt aufgerufen, ohne KI): die Unterlagen-Auswertung `data._dok_auswertung` erreichte **kein**
+Bot-Werkzeug. `objekt_lesen` wirft alles mit `_` weg und sah nur `risiken`/`thesis`. Der Co-Pilot bekam drei
+gekürzte Zeilen (`dok_*`). Der Co-Pilot und der Cockpit-Pilot haben keine Werkzeuge.
+Neu ist `backend/src/services/objektWissen.js`, eine Fassung für alle drei:
+- `unterlagen()`: Risiken nach Schwere mit Quelle, Betrag und Anteil; WEG; Maßnahmen mit Gesamt und Anteil
+  (ETW × MEA, sonst 100 %, wie `unterlagen.js anteil()`); Sonderumlagen, Baulasten, Abt. II, offene Fragen,
+  Dokumente, Stand. Alles läuft durch `schwaerze()`, ohne Dateinamen und ohne Verwalterzeile.
+- `potenzial(jahr)`: liest `_potenzial.zusammenfassung` und rechnet keine Miete neu. „sofort“ wirkt erst nach
+  § 558b Abs. 1 / § 559b Abs. 2 (dritter Monat) bzw. § 557b Abs. 3 (übernächster Monat); `verlangen_ab` getrennt.
+- `todos()`: offene Fragen, WEG-Maßnahmen, Mieterhöhungen, Zinsbindungsende ≤ 24 Monate (Auszahlung +
+  `bindj`), 15-%-Frist (Kaufdatum + 3 J.), `unterlagen_anfragen` (Entwurf/gesendet), PDF-Pflichtfelder
+  wie `pdf-pruefung.js`.
+- `marktmiete()`: Register-Modellmiete des Ausschusses (`/register/probe`, Zweig nach Objektart), Zensus 2022
+  je Klasse, Angebots-Median aus vorhandenen Marktberichten (`mietBelegeService`), eigene Ist-Mieten am Ort;
+  Ort→PLZ über eigene Objekte bzw. OpenPLZ. Kein Kontingent, keine Anbieternamen, kein Mittelwert.
+
+Bot-Werkzeuge `objekt_unterlagen`, `portfolio_potenzial`, `portfolio_todos`, `marktmiete` (Stufe lesen), Regel 7n
+in `agentLauf.js`. `/ai/copilot` ruft über `_copilotObjektwissen` **dieselben Werkzeugfunktionen** und legt
+`context.objektwissen` an: am Objekt über `context.objekt_id` (`copilot.js`), im Portfolio gekürzt (29.776
+statt 64.556 Zeichen); die Marktmiete nur bei erkannter Mietfrage. `potenzial.js` speichert die nächste
+Indexanpassung aus v3026 als `zusammenfassung.wohnungen[].index`. `help.js` ist nachgezogen.
+
+**Nachweis.** `pruef-objektwissen.js` im laufenden Staging-Container: **34/34**. Vorher erreichte
+`objekt_unterlagen` nichts, jetzt alle 9 Merkmale des Datensatzes. Potenzial Demo-Konto 2026: 13 Objekte,
+4.477 €/Monat verlangbar, davon wirksam 2026: 468 €. To-dos: 124 im Konto. Marktmiete Herford ETW 80 m²:
+amtlich 7,00 €/m² (GAA Kreis/Stadt Herford, 2025, 272 Fälle), Zensus 2022 5,78 (Größenklasse 5,59), Angebote
+8,14 (6,38–9,10, n = 28, Bericht 27.10.), eigene 7,50–9,00. Weitere Prüfer: `pruef-pilot-analyse.js` 17/17,
+`prompt-lecks-pruefen.mjs` sauber, `buster-ebenen` sauber.
+
+**Staging.** Es lief eine Messe-Aufnahme (`messe-studio.html?messe=komplett-mfh`). Deshalb **nur das Backend**:
+Das Image wurde aus `git archive origin/staging backend` gebaut (`dealpilot-staging-backend`) und mit
+`up -d --no-build backend` gestartet. Die Arbeitskopie auf dem Server blieb unberührt (0 lokale Änderungen),
+damit `deploy-staging.ps1` später sauber zieht.
+
+**Rest.**
+- **Staging-Pull ausstehend** für `copilot.js` (`objekt_id`), `help.js`, `potenzial.js` und die Buster
+  `v3025b`. Bis dahin bekommt der Objekt-Co-Pilot das neue Wissen nicht; Bot und Cockpit-Pilot haben es schon.
+- Die Fortschreibung der Zensus-Miete mit dem NKM-Index rechnet nur der mb-Dienst (`zensus_miete.js`). Dafür
+  fehlt ein Endpunkt, deshalb weist das Werkzeug Zensus mit Stand 2022 aus.
+- Die Indexmiete steht erst im Objekt, wenn „Mieterhöhung & Zielbild“ nach dem Pull einmal neu gerechnet wurde.
+- An der Lindenallee liegt auf Staging keine Baulastenauskunft vor. Das Werkzeug sagt das und nennt den Weg;
+  den Baulasten-Zweig im Browser mit einer nachgereichten Auskunft abnehmen.
+- Prod-Rollout.
+
+### v3028 · Mieterhöhung: „verlangbar ab“ und „wirksam ab“ getrennt, Zensus-Fortschreibung für die Piloten · 28.10.2026 — Commit `22a5589b`
+
+**Was.** Marcel (28.10.2026, „ja, mach das so“): „sofort“ hieß in der App nur, dass das Erhöhungsverlangen jetzt
+gestellt werden darf. Seit v3028 stehen überall zwei Daten: **verlangbar ab** (frühester Zugang) und **wirksam ab**
+(Beginn der Zahlungspflicht). Wortlaut auf gesetze-im-internet.de gelesen und im Code zitiert: § 558 Abs. 1 S. 2
+(Verlangen frühestens ein Jahr nach der letzten Erhöhung), § 558b Abs. 1 (dritter Kalendermonat nach Zugang),
+§ 559b Abs. 2 (dritter Monat nach Zugang), § 557b Abs. 3 (übernächster Monat).
+- **Ein Rechenweg:** `potenzial.js` `mhTermine()` / `wirksamNachZugang()`, `TERMIN_REGEL`. `sollFuer().ab` ist jetzt
+  der **Wirksamkeitsmonat** (vorher max(heute, letzte+15)). Daran hängen Jahr der Stufe, Mietentwicklung und das
+  Drei-Jahres-Fenster der Kappungsgrenze. Reine § 559-Umlage: ohne Jahressperre, § 559b. Eigene Angabe heißt jetzt
+  „Wirksam ab (eigene Angabe)“. Liegt sie vor dem frühesten Termin, gilt sie trotzdem, aber mit Hinweis.
+- **Gespeichert** je Wohnung in `_potenzial.zusammenfassung`: `soll_verlangbar_ab`, `soll_verlangbar_sofort`,
+  `soll_wirksam_ab`, `soll_termin`. `objektWissen.js` liest diese Felder. Für einen alten Speicherstand (nur Text
+  „sofort“/„Okt 2026“) rechnet `_altTermin()` um und kennzeichnet das. Der Prüfer zeigt, dass beide Wege für
+  dieselben Fälle dasselbe Ergebnis liefern. Staffel bekommt kein „sofort“ mehr, sondern „nächste Staffel wirksam
+  ab …“ (§ 557a).
+- **Stellen:** Karte „DealPilot rechnet vor“, Einheiten-Fenster (zwei Zeilen statt „erreichbar ab“),
+  Vertragsübersicht Reiter Miete (v3027, Spalte „Nächste Erhöhung“, mit Tooltip-Langform), Bank-Satz und
+  PDF-Zeile (`pdf.js`, `pdf-investment-bank.js`: Spalte bricht um), Jahresfuß, Mietentwicklung-Text, Feld
+  `zb_soll_ab`, To-dos, `portfolio_potenzial`, Cockpit-Pilot-Kurzfassung (`ai.js`), Hilfe (neuer Abschnitt).
+- **Piloten:** `MH_TERMIN_REGEL` (openaiService) steht im Analyse-Auftrag (`_potenzialBlock`) und im
+  Co-Pilot/Cockpit-Pilot (`copilotChat`): beide Daten nennen, „sofort“ nur für das Verlangen benutzen, das
+  laufende Jahr erst ab „wirksam ab“ zählen.
+- **Zensus fortgeschrieben:** mb `GET /zensus/fortgeschrieben?plz&ort&baujahr&wfl` nutzt `zensusMieteAmStichtag`
+  auf den jüngsten NKM-Monat, die Klassen werden einzeln fortgeschrieben. `marktmiete` übernimmt das Etikett
+  „Zensus 2022, fortgeschrieben auf MM/JJJJ mit dem Nettokaltmieten-Index“. Ohne Endpunkt bleibt der Wert von
+  2022 stehen, mit Hinweis.
+
+**Beispiel.** Vorher: Whg 1, letzte Erhöhung 03/2025 → „Soll erreichbar ab: sofort“. Nachher:
+„verlangbar ab sofort · wirksam ab 01/2027 (Zugang heute angenommen, § 558b Abs. 1 BGB)“. Im Jahr 2026 kommen
+0 € an, 2027 dann 12 Monate. Zensus Herford, Bj 1975, 80 m² (im mb-Container gemessen): 5,48 €/m² × 111,9/102,7
+(09/2026) = **5,97 €/m²**. Klassen: Baujahr 5,37 → 5,85, Größe 5,59 → 6,09.
+
+**Nachweis.** `tools/mieterhoehung-termine-pruefen.mjs` 50/50 (Zugang 15.10./31.10. → 01.01., 01.11. → 01.02.,
+§ 559b, § 557b, Jahresgrenze, sollFuer mit fester Uhr, objektWissen gespeichert/alt/Staffel, To-do, Quelltext).
+`prompt-lecks-pruefen` SAUBER (+5 Punkte). `indexmiete-pruefen` 39/39. `buster-ebenen` SAUBER (sieben Buster auf
+v3028). `pruef-objektwissen.js` **37/37** im Staging-Backend-Container gegen die echte DB, mit einer Arbeitskopie
+unter `/app/_pw3028` (danach entfernt; das laufende Image blieb unberührt). Dazu drei neue Termin-Punkte. Gefunden
+und behoben: eine Staffel mit altem Text „sofort“.
+
+**Rest.**
+- **Staging-Pull ausstehend:** Im Chrome lief eine Messe-Aufnahme (`messe-studio.html?messe=komplett-mfh`).
+  Danach `git pull`, Backend und mb-backend neu bauen (Endpunkt `/zensus/fortgeschrieben`).
+- Im Browser abnehmen: Einheiten-Fenster, Karte, Reiter Miete, beide PDFs (Umbruch der Spalte Mieterhöhung).
+- Alte Objekte bekommen die Felder, sobald „Mieterhöhung & Zielbild“ einmal gerechnet wird. Bis dahin gilt die
+  gekennzeichnete Umrechnung.
+- § 559b Abs. 2 S. 2 (+6 Monate ohne Ankündigung nach § 555c bzw. bei mehr als 10 % Überschreitung) ist nicht erfasst.
+- Prod-Rollout.
+
+### Nachträge 28.10.2026 abends: Pakete ohne eigenen Eintrag, Entscheidungen Marcel, Stand vor dem nächsten Prod-Rollout
+
+**Pakete ohne eigenen Journal-Eintrag (alle auf staging committet):**
+- `01c21d6c` **v3019** – Baupreisindex ohne Bezug = Regelfall § 36 Abs. 2 auch für NEU geerntete Sätze (`baupreisindex_bezug: 'stichtag_regelfall'` + Wortlaut + Seite, saat-pruefen, Rechenweg-Text in nhk2010.js); 101 neue SWF-Werte (Bruchsal 24, Böblingen 27, Lahr 26, Schwarzwald-Baar-Südwest 22, Ludwigslust-Parchim 2); CrossCheckService reicht `baujahr` an den Sachwertfaktor (gestaffelte Faktoren meldeten `achse_fehlt` – betraf auch 16 Altwerte). Register 6.186 Werte, Staging + Prod eingespielt (Prod `fa0ff4e`).
+- `0fca2c11` **v3020** – Anfragen an Ämter: `ausschuss_kontakte.json` (269 Einträge, 248 belegte E-Mails), `lib/sperren_anfragen.js`, `tools/sperren-anfrageliste.mjs` (→ `Dateien/Register/Sperren-Anfrageliste.csv/.md`), Admin „Register & Ernte › Anfragen an Ämter" mit Status in `mb.amt_anfragen` (Migration 022). Admin-Abnahme mit Login steht aus (Marcel).
+- `57dc21b1` **v3021a** – GENESIS-Online an der echten Antwort: ZIP entpacken, Monat aus `*_variable_attribute_code`, Prozentzeilen raus, Filter (VPI `DG`; Baupreis `BPNBK`+`BAULEISTBW`+`STEMW1`). Gemessen: VPI 09/2026 = 126,6; Baupreis 08/2026 = 141,7 (= Code). Token: `GENESIS_TOKEN` in `.env` beider Server + Compose-Durchreichung (von Marcel per Skript gesetzt, `.pre-genesis`-Sicherungen auf den Servern). Der alte `DESTATIS_TOKEN` (Nutzer RE014466) ist NUR die Regionaldatenbank.
+- `750e86fc`…`39cecc30` **v3022–v3022d** – Einstellungen schlank (`einstellungen-schlank.js`): seit v3022c STANDARD, volle Fassung nur `?einstellungen=voll`. Mein Profil (Haltung: Strategie, Risikoneigung, geltende Score-Gewichtung + Zurücksetzen), Co-Pilot nur Länge/Ton + „Für Profis", Marktphase entfällt (nicht mehr im Prompt), Verkäuferbereitschaft je Objekt („Verkäufer unter Zeitdruck?"). Behoben: Einrichtung speicherte Risikoneigung mit unbekanntem Text → Einstellungen schrieben still „konservativ" zurück.
+- `cda7cd48` **v3023a** – `avm-section.js` (Marcel gab die Datei dafür frei): Abweichung „−21,6 %" statt „-21.6%".
+- `af11b2d9` **messe-schleife-7** – Werbebilder (8 × 1920×1080 WebP, Favoriten 01 Boarding-Pass/03 Akte) zwischendurch (Menü E: `werbung`, `werbung_nach`, `werbung_sek`) und als Kanal W in Dauerschleife.
+- `81cac229`, `b65668d8` **landing-videothek-6 / messe-schleife-8(a)** – Kapitelmarken auf der Zeitleiste (Landing-Videothek und Schleifen-Videothek; ←/→, Leertaste, N, F; Wächter wartet nach Sprung bis 30 s); `videothek-liste.js` führt 285 Kapitel mit Zeit.
+- `53f11579` **landing-videothek-5** – Suche, Kapitelmarken, kein Autoplay am Ende.
+- `45a5d622` **landing-methodik-4** – Rangfolge des Angebotsabschlags (eigene Angabe → örtlich aus Kauffällen → aus LZS-Stichprobe → Marktdurchschnitt) öffentlich, ohne Quellennamen; Methodik länderneutral (Immobilienrichtwerte).
+- Stundennachweise: Generator ohne 10-h-Grenze, beide Projekte (DealPilot + `E:/Portfolio Strategie`), Quellen Commits + Marcels Nachrichten, Trennung erst ab 5 h Pause, Handnachträge bleiben, Testpauschale 10 h/Monat als Nachtrag (`8c9a4eda`).
+- Werbebilder Ertragswert ImmoWertV: `Dateien/Social-Media/Ertragswert-ImmoWertV-2026-10-28/` (6 Ideen, Favoriten 01 + 03 in `_ausgewaehlt/`), KI-Motive (Higgsfield gpt_image_2_5, 3 Credits).
+- Lindenallee-Video neu vertont: `Dateien/Messe/Videos/Lindenallee-14/lindenallee-unterlagen_2026-10-28b_vertont.mp4` (9:14).
+
+**Entscheidungen Marcel (28.10. abends):**
+- Baupreisindex ohne Bezug → Regelfall auch bei neuen Sätzen („ja, wenn das sinnvoll ist"); Öhringen bleibt Sperre; die 958 wartenden BW-LZS-Sperren NICHT aktivieren; alle Sperren mit Kontakt pflegen.
+- Videos dürfen von den Daten abweichen – **das Storybook-PDF muss passen** (geprüft: 19/19 Geschichten stimmen mit den Zahlen).
+- Demo-Konto bleibt bei Score-Vorlage **Lage-Fokus** (alle 17 gespeicherten Scores stimmen damit, Standard würde 8 Stufen kippen); Einstellungen am Konto (v3024), Staging = Prod.
+- Einstellungen schlank als Standard; Absender/Logo im PDF ab Investor (laut Preis-Seite), Banner/Anfrage-Karten bleiben Pro.
+- PDF: Urteil nur einmal, Bausteine je Objekt gemerkt, Export nur bei gültigen Daten, kein Zielbild ohne Zielbild.
+- Mieterhöhung: „verlangbar ab" und „wirksam ab" getrennt (v3028).
+- Parkstr. 9: Gebäudeanteil 54,31 % ist BMF-Arbeitshilfe nach Ertragswert, aber mit BRW 2026 (250); mit BRW 01.01.2024 (230) wären es 57,13 % – bleibt bewusst unverändert („hatte mich nur interessiert"). Meine erste Vermutung „Restwertmethode" war falsch.
+
+**Stand vor dem nächsten Prod-Rollout (Prod `fa0ff4e`):** committet, auf Staging teils noch nicht gezogen (Messe-Aufnahme komplett-mfh lief): v3021a, v3022c/d, v3023/a, v3024 (Staging live), v3025 (Backend live, Frontend nicht), v3026 (Migration 024 ausstehend), v3027, v3028 (neuer mb-Endpunkt `/zensus/fortgeschrieben`). Schritte: Aufnahme fertig → mb-DB sichern → pull → backend + mb-backend neu bauen → `POST /jahreswerte/abruf` (nkm, VPI ab 2008) → gold-audit → Browser-Abnahme (Zahlenformat, Indexmiete an Indexwohnung, Vertragsübersicht Miete, Co-Pilot Lindenallee, PDFs Umbruch) → Prüfer → `rollout-prod.ps1 -Freigabe`. **Bis dahin auf Prod kein Demo-Objekt öffnen/speichern** (Prod hat vorgaben-sync noch nicht; ein Browser mit alter Gewichtung würde Scores umschreiben).
+
+**Offen:** Destatis/GENESIS-Leser für weitere Reihen; § 559b Abs. 2 Satz 2 (6-Monats-Verschiebung) nicht abgebildet; Steuer-Overrides je Jahr für Bot/Co-Pilot unsichtbar; Prüfungen für Marktbericht-/RND-/Exposé-/Track-Record-PDF; ETW-Kaufpreisaufteilung druckt MEA nicht; Reiter Bewertung nennt Zielbild auch ohne Zielbild; Hinweis „Bauantrag" bei der degressiven AfA, § 7b-Bauantragszeitraum ungeprüft; Ludwigslust-Parchim verlangt Belegexemplar; Bild 05 der Werbung trägt Registerzahlen fest (nach Ernte neu rendern).
+
+### v3021k–v3021k6a · Webinar komplett-mfh: Kapitel 9 „Unterlagen einlesen“, Nachreichen zeichnet neu · 28.10.2026 — Staging `b8bd87fe`
+
+**Was.** Marcel: „sollten wir das Video, den Rundgang durch die App, mit den neuen Sachen ergänzen? Dem Import
+der ganzen Dokumente, Übernahme und all dem anderen.“ Das Webinar `komplett-mfh` hat jetzt **zehn Kapitel**:
+zwischen Zielbild (8) und Ergebnis (10) liegt Kapitel 9 in einem ZWEITEN neuen Objekt (Lindenallee 14):
+01–07 auf einmal einlesen (Arten erkannt, Schwärzung, „nur was dasteht“), 9 Reiter (Übernahme, je Dokument,
+Auswertung), Grundstück/Flur/Wohnfläche mit Einheit und Quelle, These + Risiken, Einheiten (8 WE);
+Pilot-Analyse › Unterlagen & WEG: Ampel, Kostenkarte (Sonderumlage nicht doppelt), Genau mit Maßnahmen und
+„Dein Anteil“, Baulasten „liegt nicht vor“; Verwaltervergütung 3.313 € als bisheriges Hausgeld eingetippt,
+dann 08 Wirtschaftsplan + 09 Baulastenauskunft nachgereicht: Hausgeld nicht umlagefähig 15.653 €/Jahr
+(Wirtschaftsplan 2026) mit Aufschlüsselung, „bisher im Objekt (Bewirtschaftung): 3.313 € / Jahr“ nicht
+vorgehakt, Steuer-Vorschläge 2026 (Hausverwaltung, nicht umlagefähige NK, Erhaltungsaufwand), „Zuletzt
+nachgereicht – das hat sich geändert“ (3 Punkte), Baulasten gefüllt; Bausteine im PDF (drei Gruppen, Urteil
+einmal, Haken „Optischer Eindruck“ ab, je Objekt gemerkt). Danach wird das Webinar-Objekt wieder geladen.
+KI: einmal echt (`?kumit`, 13 Abrufe), sonst gespielt aus `js/messe-komplett-unterlagen.js` (`kuAbruf`).
+Entwicklungs-Drehbuch `komplett-unterlagen` (nur Kapitel 9). Studio: zehn Kapitel, reicht `kumit` durch.
+**Produktfehler behoben:** nach „Unterlagen nachreichen“ zeigte der Reiter Unterlagen & WEG die ALTE
+Auswertung (3 Änderungen gespeichert, keine im Bild, Baulasten weiter „liegt nicht vor“) – `unterlagen.js`
+`merken()` zeichnet die Analyse neu (`_dpPaNeuZeichnen`) und lässt den Reiter offen.
+
+**Commits.** 5323b4cd (Kapitel 9, Studio), 27377a20, fb2de84e, 601891b9 (Entwicklungs-Drehbuch), 08a1a6c9
+(`unterlagen.js` neu zeichnen + Mitschnitt `js/messe-komplett-unterlagen.js`), e1257bba, b7e49f3f (Texte, Hausgeld
+vorher), 42c595b4 (Kapitel 9 als EINE Szene – das Band zählte Szenen, Kapitel 10 stand als „14“), b8bd87fe.
+**Eigener Fehler:** 42c595b4 nahm fremde, ungesicherte Änderungen eines parallelen Agenten aus `index.html` mit
+(calc.js/zahlenfelder.js v3023, me_soll, MEA-Zeile) – b8bd87fe nimmt sie im Repo zurück, die Arbeitskopie des
+anderen Agenten ist unverändert. Vor jedem Commit `git diff <pfad>` lesen, nicht nur `--stat` der eigenen Zeilen.
+
+**Nachweis.** Mitschnitt-Lauf (einziger KI-Lauf, `?kumit`): 13 Abrufe (extract-expose 1, extract-dokument 10,
+dokumente-auswerten 2, analyze 1). Prüflauf (Studio, `DPM_KM_SCHNELL` 0,35, 1.072 s) und Aufnahme
+(`?sprechtempo=16&sprechvor=500`, Drehbuch 2.571 s): je 132 Zeilen (131 mit Sprechtext), Kegel im Bild in jeder
+Zeile außer den zwei PDF-Seiten (gewollt), 13 KI-Antworten gespielt, 0 echt, 0 fehlend, 0 unscharf; gesperrt nur
+PUT portfolio-spiegel und POST bmf/pipeline; Schreibabrufe nur an die zwei angelegten Objekte, beide danach
+gelöscht; `fetch` wieder echt; Auftrag = Bericht 371 (`refAbweichung` leer). Kapitel 10 nach dem Objektwechsel:
+Deal Score 75, Investor 76, DSCR 2,37, CF vor Steuern 14.460 € (wie 28.10.); CF nach Steuern 9.272 statt 9.355 € –
+Tarif 2025 aus v3021 (eb3b5357), nicht der Wechsel. 2026-1123 unverändert (md5). Sicherung vorher:
+`/root/backups/demo-objekte-vor-km10-20261028-1727.json` (+ `demo-tax-…`).
+Video: `Dateien/Messe/Videos/Komplettbeispiel-MFH/komplett-mfh_2026-10-28b.mp4` (43:11, 96 MB, 1920×1022; Intro aus
+einer kurzen Zweitaufnahme `_intro.mp4` vorangestellt, weil das Drehbuch 8,6 s vor ffmpeg anlief; Roh `_roh.mp4`).
+Vertonung vorbereitet in `…/vertonung-2026-10-28b/`: 98 alte Clips wiederverwendet, 33 neu (`neue-clips.txt`),
+`fertig.sh` mischt (Probe mit Platzhaltertönen: 6 Standbilder, 7,4 s).
+
+**Rest.** Neue Clips erzeugen und `fertig.sh` laufen lassen. „Zielbild im PDF“ kommt im Bank-PDF nicht mehr vor
+(Regex `^WERTPOTENZIAL|^ZIELBILD` trifft seit v3018d nichts – Seite heißt jetzt anders oder fehlt; nicht geprüft).
+Während der Aufnahme änderten andere Agenten vier Testobjekte (Hölderlinstr. 1, Am Markt 9, Hermannstr. 9, Gohliser
+Str. 42) und um 19:15 UTC entstand ein leeres Objekt `3834d152-…` (2026-1126, „Unbenannt“) – nicht aus den
+mitgeschriebenen Läufen, Herkunft offen, nicht gelöscht. `reihe-ueberblick2` ist ebenfalls ein App-Rundgang
+(„Vom neuen Objekt zum DealScore“, 5 min) – unverändert.

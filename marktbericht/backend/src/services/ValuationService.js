@@ -4,10 +4,11 @@ import { round } from '../lib/stats.js';
 import { istGewerbe, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
 import { finde as regFinde } from '../lib/ausschuss_register.js';   /* v2367 */
 
-/* v2367 · recherchierter Marktdurchschnitt des Abschlags auf Angebotspreise - DERSELBE
-   Wert wie frontend/js/config.js angebotAbschlagMarkt.pct (Stand Dezember 2025). Bei
-   jeder Nachrecherche BEIDE Stellen ziehen. */
-const ANGEBOT_ABSCHLAG_MARKT_PCT = 5.8;
+/* v2367 · recherchierter Marktdurchschnitt des Abschlags auf Angebotspreise.
+   v3021 · steht nicht mehr hier und nicht mehr in frontend/js/config.js, sondern NUR in
+   lib/angebot_abschlag.js (RECHERCHE) - mit dem jaehrlichen DealPilot-Marktdurchschnitt
+   je Segment davor. Die Haupt-App holt ihn ueber GET /jahreswerte/angebotsabschlag. */
+import { marktdurchschnitt as abschlagMarkt, segmentVon as abschlagSegment } from '../lib/angebot_abschlag.js';   /* v3021 */
 import { lagenFuer as regLagen } from '../lib/ausschuss_register.js';   /* v2578 */
 import { liegenschaftszinssatz as regZins } from '../lib/gutachterausschuss.js';   /* v2578 */
 import { zinssatzFuerObjekt, typVon, dekodiere } from '../lib/zweigwahl.js';   /* v2578 */
@@ -628,9 +629,38 @@ export const ValuationService = {
             _abPct = _lzsPruef.pct; _abHerk = _lzsPruef.herkunft;
             _abMeta = { quelle: 'liegenschaftszinssatz', ausschuss: _lzsPruef.ausschuss,
               berichtsjahr: _lzsPruef.berichtsjahr, kurz: _lzsPruef.kurz };
-          } else { _abPct = ANGEBOT_ABSCHLAG_MARKT_PCT; _abHerk = 'Marktdurchschnitt'; }
+          } else { const _md = abschlagMarkt(abschlagSegment(ref)); _abPct = _md.pct; _abHerk = _md.herkunft;   /* v3021 */
+            if (_md.art === 'dealpilot') _abMeta = { quelle: 'dealpilot_marktdurchschnitt', segment: _md.segment, n: _md.n, jahr: _md.jahr }; }
         }
-      } catch (e) { _abPct = ANGEBOT_ABSCHLAG_MARKT_PCT; _abHerk = 'Marktdurchschnitt'; }
+      } catch (e) { const _md = abschlagMarkt(null); _abPct = _md.pct; _abHerk = _md.herkunft; }
+      /* v3021 · ORTSMESSUNG fuer den jaehrlichen DealPilot-Marktdurchschnitt: Stufe 2/3 haben
+         den Abschlag am Ort gemessen. Das Ergebnis traegt die Messung (ohne Personenbezug);
+         der ReportOrchestrator schreibt sie nach mb.angebot_abschlag_messung. Gemessen wird
+         auch, wenn eine eigene Angabe gilt - die Messung haengt nicht am Nutzer.
+         Stufe 2 (Rohertragsfaktor-Satz) laeuft nur ohne eigene Angabe; Stufe 3 (LZS) prueft
+         ihre Kriterien K1-K8 hier bei eigener Angabe nicht nach - gemessen wird dann nur Stufe 2. */
+      let _messung = null;
+      try {
+        const _seg = abschlagSegment(ref);
+        const _medA = Number(sale && sale.median_per_sqm);
+        const _demo = !!(sale && (sale.enthaelt_demodaten === true || sale.datenherkunft === 'demo'));
+        if (_seg && ref.ags && _medA > 0 && !_demo) {
+          const _kpRf = _rfSatz ? Number((_rfSatz.modellansaetze || {}).kaufpreis_eur_qm_mittel) : NaN;
+          if (_kpRf > 0) {
+            _messung = { quelle: 'rohertragsfaktor', kaufpreis_eur_qm: _kpRf,
+              satz_id: [_rfSatz.gaa_name || _rfSatz.ausschuss || '', 'rohertragsfaktor', String(ref.property_type || ''), _rfSatz.berichtsjahr || ''].join('|'),
+              satz_berichtsjahr: _rfSatz.berichtsjahr || null };
+          } else if (_lzsPruef && _lzsPruef.verwendet && Number(_lzsPruef.kaufpreis_eur_qm) > 0) {
+            _messung = { quelle: 'liegenschaftszinssatz', kaufpreis_eur_qm: Number(_lzsPruef.kaufpreis_eur_qm),
+              satz_id: [_lzsPruef.ausschuss || '', _lzsPruef.zweig || '', _lzsPruef.berichtsjahr || ''].join('|'),
+              satz_berichtsjahr: _lzsPruef.berichtsjahr || null };
+          }
+          if (_messung) Object.assign(_messung, { segment: _seg, ags: String(ref.ags),
+            objektart: String(ref.property_subtype || ref.property_type || '') || null,
+            angebotsmedian_eur_qm: Math.round(_medA), angebote_n: Number(sale.sample_size) || null,
+            abschlag_pct: round(Math.max(0, Math.min(25, (1 - _messung.kaufpreis_eur_qm / _medA) * 100)), 1) });
+        }
+      } catch (e) { _messung = null; }
       if (_abPct > 0) {
         const _f = 1 - _abPct / 100;
         out.market_value.angebot_abschlag = { pct: _abPct, herkunft: _abHerk,
@@ -638,6 +668,7 @@ export const ValuationService = {
         /* v2578 · Quelle kurz (Ausschuss + Jahrgang) und die interne Pruefung K1-K8 */
         if (_abMeta) Object.assign(out.market_value.angebot_abschlag, _abMeta);
         if (_lzsPruef) out.market_value.angebot_abschlag.pruefung_lzs = _lzsPruef;
+        if (_messung) out.market_value.angebot_abschlag.messung = _messung;   /* v3021 */
         /* v2383 · Der Abschlag trifft nur den Teil, der aus ANGEBOTSPREISEN kommt. Mehrflaechen-
            Bodenwert (Bodenrichtwert), Stellplatzwert und bOM-Betrag sind keine Angebotspreise -
            bis v2382 wurden sie mit abgeschlagen (W: 15,9 % auch auf 43.615 € Bodenwert). */
@@ -658,6 +689,7 @@ export const ValuationService = {
           roh: { estimated: out.market_value.estimated, low: out.market_value.low, high: out.market_value.high } };
         if (_abMeta) Object.assign(out.market_value.angebot_abschlag, _abMeta);   /* v2578 */
         if (_lzsPruef) out.market_value.angebot_abschlag.pruefung_lzs = _lzsPruef;
+        if (_messung) out.market_value.angebot_abschlag.messung = _messung;   /* v3021 */
       }
       /* v2367 · AMTLICHE GEGENPROBE - wo der Ausschuss fuer dieses Segment einen
          Rohertragsfaktor und den Ø Kaufpreis seiner Kauffaelle veroeffentlicht.

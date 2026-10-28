@@ -195,6 +195,9 @@ if (!window._wlc) {
       if (el && el.type === 'checkbox') { if (el.checked) o[id] = true; return; }
       var v = vIn(id); if (v == null || String(v).trim() === '') return;
       if (OA && OA.passt && OA.passt(art, id) === false) return;   /* v1437: nur was zur Art passt */
+      /* v3027 · Mit erfassten Einheiten (mind. 2) gelten deren Verträge - die ausgeblendeten
+         Objekt-Mietvertragsfelder bleiben gespeichert, rechnen aber nicht mit. */
+      if (/^mv_/.test(id) && window.DealPilotMietvertragObjekt && window.DealPilotMietvertragObjekt.einheitenGelten()) return;
       o[id] = v;
     });
     /* v2210 · Die Einheiten des MFH-Konfigurators reisten nie mit - der

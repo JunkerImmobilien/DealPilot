@@ -136,6 +136,19 @@
     var f = el('_dok_auswertung'); if (!f) return;
     f.value = o ? JSON.stringify(o) : '';
     try { f.dispatchEvent(new Event('input', { bubbles: true })); f.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    neuZeichnen();   /* v3021k */
+  }
+  /* v3021k · GEMESSEN 28.10.2026 (Webinar-Mitschnitt, Lindenallee 14): nach „Unterlagen nachreichen“
+     standen 3 Änderungen in #_dok_auswertung, im Reiter aber keine - und Baulasten weiter „liegt nicht
+     vor“. Der Reiter ist Teil der gezeichneten Pilot-Analyse und las die Auswertung nur beim Zeichnen.
+     Jetzt wird die Analyse neu gezeichnet; war „Unterlagen & WEG“ offen, bleibt er offen. */
+  function neuZeichnen() {
+    try {
+      if (typeof window._dpPaNeuZeichnen !== 'function') return;
+      var offen = [].some.call(document.querySelectorAll('.dp-pa-tab.active'), function (b) { return b.offsetWidth && /Unterlagen/.test(b.textContent || ''); });
+      window._dpPaNeuZeichnen();
+      if (offen) [].forEach.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { if (/Unterlagen/.test(b.textContent || '')) b.click(); });
+    } catch (e) {}
   }
   function v(id) { var e = el(id); return e ? String(e.value || '').trim() : ''; }
   /* v3017 · Marcel 28.10.2026: „werden bei den Maßnahmen auch die Kosten für eine einzelne ETW über den

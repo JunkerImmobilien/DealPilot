@@ -275,7 +275,20 @@ const auftrag = {
     massnahmen_herkunft: { text: 'PRUEF-ZIELBILD-AUS-5-WOHNUNGEN', summe: 136543, n_wohnungen: 5, haus: 0,
       sanierungskosten_investition: 137321, unterschied: 'PRUEF-UNTERSCHIED' },
     miete_nach_modernisierung: { satz: 'PRUEF-MIETE-NACH-MODERNISIERUNG', weg: 'amtlich_nach_modernisierung', wirkt: false },
-    sanierung_regel: 'PRUEF-SANIERUNG-REGEL'
+    sanierung_regel: 'PRUEF-SANIERUNG-REGEL',
+    /* v3028 · Termine je Wohnung: verlangbar ab · wirksam ab (potenzial.js mhTermine) */
+    wohnungen: [{ nr: '1', lage: 'EG', wfl: 60, ist: 500, soll: 560, soll_ab: 'PRUEF-VERLANGBAR-SOFORT-WIRKSAM-01/2027' },
+                { nr: '2', lage: 'OG', wfl: 70, ist: 600, soll: 650, soll_ab: 'PRUEF-VERLANGBAR-03/2027-WIRKSAM-06/2027' }]
+  },
+  /* ── v3026 · Indexmiete (potenzial.js indexmieteDaten) ── */
+  indexmiete: {
+    zeile: 'PRUEF-INDEXMIETE-ZEILE', vpi_stand: { bis: '2026-09' }, annahme: 'PRUEF-INDEX-ANNAHME',
+    wohnungen: [
+      { nr: '3', lage: 'PRUEF-LAGE-IDX', ok: true, miete_heute: 800, basis: { monat: '2024-03', wert: 118.6, herkunft: 'letzte Erhöhung' },
+        schritte: [{ jahr: 2026, wirksam_ab: '2026-12', erklaerung_bis: '2026-10', indexmonat: '2026-09', index: 126.6, annahme: false, miete_neu: 853.96, plus_monat: 53.96, plus_jahr: 647.52 },
+                   { jahr: 2027, wirksam_ab: '2027-12', erklaerung_bis: '2027-10', indexmonat: '2027-09', index: 129.1, annahme: true, miete_neu: 870.82, plus_monat: 16.86, plus_jahr: 202.32 }] },
+      { nr: '4', ok: false, fehlt: ['PRUEF-FEHLT-DATUM'] }
+    ]
   },
   verhandlung: { inseriert_seit: '2026-01-13', tage_online: 263 },
   investor_score: { total: 71, rendite: 67, finanzierung: 73, risiko: 61, lage: 79 },
@@ -431,6 +444,20 @@ const ERWARTET = [
   ['potenzial: Spaltenname Massnahmen im Zielbild', 'v2988', 'Massnahmen im Zielbild (Kosten)'],
   ['potenzial.miete_nach_modernisierung.satz', 'potenzial.js zusammenfassung()', 'PRUEF-MIETE-NACH-MODERNISIERUNG'],
   ['potenzial.sanierung_regel', 'potenzial.js zusammenfassung()', 'PRUEF-SANIERUNG-REGEL'],
+  /* ── v3028 · Mieterhöhung: verlangbar ab und wirksam ab getrennt ─ */
+  ['potenzial.wohnungen[0].soll_ab', 'potenzial.js zusammenfassung()', 'PRUEF-VERLANGBAR-SOFORT-WIRKSAM-01/2027'],
+  ['potenzial.wohnungen[1].soll_ab', 'potenzial.js zusammenfassung()', 'PRUEF-VERLANGBAR-03/2027-WIRKSAM-06/2027'],
+  ['potenzial: Spalte verlangbar/wirksam', 'v3028', 'Soll/Monat (verlangbar ab · wirksam ab)'],
+  ['potenzial: Regel sofort nur fuers Verlangen', 'v3028', 'Das Wort "sofort" nur fuer das Verlangen'],
+  ['potenzial: Regel Jahr ab wirksam', 'v3028', 'zaehlt nur ab "wirksam ab"'],
+  /* ── v3026 · Indexmiete ─ */
+  ['indexmiete.zeile', 'potenzial.js indexmieteDaten()', 'PRUEF-INDEXMIETE-ZEILE'],
+  ['indexmiete.annahme', 'potenzial.js indexmieteDaten()', 'PRUEF-INDEX-ANNAHME'],
+  ['indexmiete.wohnungen[0].lage', 'potenzial.js indexmieteDaten()', 'PRUEF-LAGE-IDX'],
+  ['indexmiete.schritte[0].miete_neu', 'potenzial.js indexmieteDaten()', '853,96 EUR'],
+  ['indexmiete.schritte[1] Annahme gekennzeichnet', 'v3026', '(09/2027, ANNAHME)'],
+  ['indexmiete.wohnungen[1].fehlt', 'potenzial.js indexmieteDaten()', 'PRUEF-FEHLT-DATUM'],
+  ['indexmiete: Anweisung zitieren statt rechnen', 'v3026', 'Rechne diese Zahlen NICHT selbst nach'],
 
   /* ── die, die vorher schon ankamen: Gegenprobe gegen einen Rueckbau ─ */
   ['steuer.zve', 'ui.js:895', z(87654)],

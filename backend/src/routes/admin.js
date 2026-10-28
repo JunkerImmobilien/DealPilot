@@ -2055,6 +2055,18 @@ router.get('/register/deckung/zelle', requireAdmin, async (req, res) => {
 /* v3020 · Anfragen an Ämter — Sperren je Gutachterausschuss mit E-Mail der
  * Geschäftsstelle und Status (mb.amt_anfragen). Versendet wird nichts. Wer
  * geändert hat, setzt der Proxy aus dem Admin-Token, nicht der Browser. */
+/* v3021 · Jahreswerte (Admin, Register & Ernte): Faelligkeiten aus dem Register, Stand der
+   automatischen Reihen (VPI, Baupreisindex) und des Angebotsabschlags. Nur lesend - plus
+   „jetzt holen" fuer die Reihen. */
+router.get('/jahreswerte', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('GET', '/jahreswerte/stand'); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: e.message }); }
+});
+router.post('/jahreswerte/abruf', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('POST', '/jahreswerte/abruf', {}); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: e.message }); }
+});
+
 router.get('/register/anfragen', requireAdmin, async (req, res) => {
   try { const o = await _mbCall('GET', '/register/anfragen'); res.status(o.status).json(o.data); }
   catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }

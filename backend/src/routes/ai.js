@@ -1935,6 +1935,89 @@ function _spracheBuchen(r) {
   _spDaily.set(r.key, r.nach);
   if (r.neu > 0) _cpDaily.set(r.key, (_cpDaily.get(r.key) || 0) + r.neu);
 }
+/* ══ v3025 · DAS OBJEKTWISSEN FUER CO-PILOT UND COCKPIT-PILOT ═══════════════
+   Marcel 28.10.2026: dasselbe Wissen wie der Telegram-Bot - Unterlagen-Auswertung,
+   Mietpotenzial im Jahr, To-dos, Marktmiete. Der Chat hat keine Werkzeuge; also
+   ruft der SERVER dieselben Werkzeugfunktionen (agentWerkzeuge.js) und legt das
+   Ergebnis in den Kontext. Was der Browser schickt, bestimmt nur WELCHES Objekt
+   (objekt_id) - gelesen wird aus der Datenbank des angemeldeten Nutzers.
+   Die Marktmiete laeuft nur, wenn die Frage danach klingt (Erkenner unten), weil
+   sie bis zu fuenf Abrufe im mb-Dienst braucht - alle ohne Kontingent. */
+const _MIETFRAGE = /(markt|aktuell\w*|ortsüblich\w*|ortsueblich\w*|üblich\w*|ueblich\w*|durchschnittlich\w*|vergleichs)\s*-?\s*miete|mietpreis|mietniveau|miete\s+(?:für|fuer|in|bei)\b|was\s+(?:kostet|zahlt)\s+man\s+(?:an\s+)?miete|€\s*\/\s*m²\s+miete/i;
+function _mietArgs(msg, obj) {
+  const t = String(msg || '');
+  const a = {};
+  const plz = t.match(/\b(\d{5})\b/); if (plz) a.plz = plz[1];
+  for (const ort of t.matchAll(/(?:^|\s)(?:in|im|für|fuer|bei)\s+([A-ZÄÖÜ][\wäöüß.-]*[\wäöüß](?:[ -](?:an der |am |im |in der |bei )?[A-ZÄÖÜ][\wäöüß.-]*[\wäöüß])?)/g)) {
+    if (/^(ETWs?|EFHs?|MFHs?|ZFHs?|DHH|Eigentumswohnung\w*|Wohnung\w*|Haus|Häuser|Euro|Mehrfamilien\w*|Einfamilien\w*|Zweifamilien\w*|Reihen\w*|Doppel\w*)\b/i.test(ort[1])) continue;
+    a.ort = ort[1]; break;
+  }
+  const m2 = t.match(/(\d{2,4}(?:[.,]\d+)?)\s*(?:m²|qm|m2|quadratmeter)/i); if (m2) a.wohnflaeche = Number(m2[1].replace(',', '.'));
+  const art = t.match(/\b(ETWs?|Eigentumswohnung\w*|Wohnung\w*|EFH|Einfamilienh\w*|ZFH|Zweifamilienh\w*|MFH|Mehrfamilienh\w*|DHH|Doppelh\w*|Reihenh\w*)\b/i); if (art) a.objektart = art[1];
+  const bj = t.match(/\b(?:baujahr|bj\.?)\s*((?:19|20)\d\d)\b/i); if (bj) a.baujahr = Number(bj[1]);
+  if (obj && !a.plz && !a.ort) { a.plz = obj.plz || undefined; a.ort = obj.ort || undefined; if (!a.objektart) a.objektart = obj.objart; if (!a.wohnflaeche && obj.wfl) a.wohnflaeche = obj.wfl; if (!a.baujahr && obj.baujahr) a.baujahr = obj.baujahr; }
+  return (a.plz || a.ort) ? a : null;
+}
+async function _copilotObjektwissen(uid, payload) {
+  const { query } = require('../db/pool');
+  const ctx0 = payload.context && typeof payload.context === 'object' ? payload.context : null;
+  if (!ctx0 || !uid) return;
+  const W = require('../services/agentWerkzeuge');
+  const fn = (n) => (W.finde(n) || {}).fn;
+  const wctx = { userId: uid, letzteListe: null, letztesObjekt: null, protokoll: [], merkeObjekt() {}, merkeListe() {} };
+  const wissen = {};
+  const istPortfolio = payload.kontextArt === 'portfolio' || ctx0.art === 'portfolio';
+  const oid = !istPortfolio && /^[0-9a-f-]{36}$/i.test(String(ctx0.objekt_id || '')) ? String(ctx0.objekt_id) : null;
+  let objDaten = null;
+  try {
+    if (oid) {
+      const u = await fn('objekt_unterlagen')(wctx, { id: oid });
+      if (u && u.gefunden) {
+        wissen.unterlagen = u.vorhanden ? Object.assign({}, u, { gefunden: undefined, id: undefined }) : { vorhanden: false, so_sagen: u.so_sagen };
+        const r = await query('SELECT data FROM objects WHERE id = $1 AND user_id = $2', [oid, uid]);
+        objDaten = r.rows[0] ? r.rows[0].data : null;
+        const p = await fn('portfolio_potenzial')(wctx, { id: oid });
+        if (p && p.anzahl) wissen.mietpotenzial_dieses_jahr = { jahr: p.jahr, objekt: p.objekte[0], hinweis: p.hinweis };
+        const t = await fn('portfolio_todos')(wctx, { id: oid });
+        if (t && t.anzahl) wissen.todos = { liste: t.objekte[0].todos, hinweis: t.hinweis };
+      }
+    } else if (istPortfolio) {
+      const r = await query('SELECT id, data FROM objects WHERE user_id = $1 ORDER BY seq_no NULLS LAST, created_at', [uid]);
+      const ow = require('../services/objektWissen');
+      const je = [];
+      r.rows.forEach((z) => { const u = ow.unterlagen(z.data, { kurz: true }); if (u) je.push(Object.assign({ id: z.id, adresse: ow.adresse(z.data) }, u)); });
+      if (je.length) wissen.unterlagen_je_objekt = je.slice(0, 25);
+      /* Gekuerzt fuer den Prompt (gemessen: ungekuerzt 64.556 Zeichen bei 33 Objekten) - je
+         Position nur Grund, Wohnung, Betrag, Zeitpunkt; Einzelheiten liefern die Bot-Werkzeuge. */
+      const p = await fn('portfolio_potenzial')(wctx, {});
+      if (p && p.objekte) p.objekte = p.objekte.map((o) => ({ adresse: o.adresse, stand: o.stand, in_diesem_jahr: o.in_diesem_jahr,
+        positionen: o.positionen.slice(0, 4).map((x) => ({ art: x.art, einheit: x.einheit, mehr_monat: x.mehr_monat, verlangbar_ab: x.verlangbar_sofort ? 'sofort' : (x.verlangen_ab || null), wirksam_ab: x.wirksam_ab || null, termin: x.ab_text })),   /* v3028 */
+        weitere_positionen: o.positionen.length > 4 ? o.positionen.length - 4 : undefined }));
+      wissen.mietpotenzial_dieses_jahr = p;
+      /* Mieterhoehungen stehen schon im Potenzial - je Objekt eine Sammelzeile statt einer je Wohnung */
+      const t = await fn('portfolio_todos')(wctx, {});
+      if (t && t.objekte) t.objekte = t.objekte.map((o) => {
+        const miete = o.todos.filter((x) => x.art === 'Miete');
+        const rest = o.todos.filter((x) => x.art !== 'Miete').map((x) => ({ art: x.art, was: String(x.was).slice(0, 170), faellig: x.faellig || undefined }));
+        if (miete.length) rest.unshift({ art: 'Miete', was: miete.length + ' Mieterhöhung(en) möglich - Einzelheiten unter mietpotenzial_dieses_jahr' });
+        return { adresse: o.adresse, anzahl: o.anzahl, todos: rest.slice(0, 6), weitere: rest.length > 6 ? rest.length - 6 : undefined };
+      });
+      wissen.todos = t;
+    }
+    if (_MIETFRAGE.test(String(payload.message || ''))) {
+      const d = objDaten || {};
+      const args = _mietArgs(payload.message, oid ? { plz: d.plz, ort: d.ort, objart: d.objart, wfl: d.wfl, baujahr: d.baujahr } : null);
+      if (args) wissen.marktmiete = await fn('marktmiete')(wctx, args);
+    }
+  } catch (e) { wissen.fehler = 'Objektwissen nicht vollständig lesbar: ' + e.message; }
+  if (Object.keys(wissen).length) {
+    wissen.hinweis = 'Objektwissen aus DealPilot (serverseitig gelesen, Stand je Teil): Unterlagen-Auswertung, Mietpotenzial '
+      + 'dieses Jahres, offene Punkte (To-dos), ggf. Marktmiete mit allen Quellen. Beträge unverändert übernehmen, Quelle und Stand '
+      + 'nennen; bei der Marktmiete jede Quelle einzeln, kein Mittelwert, keine Anbieternamen.';
+    payload.context.objektwissen = wissen;
+  }
+}
+
 router.post('/copilot', authenticate, async (req, res, next) => {
   try {
     const uid = req.user && req.user.id;
@@ -1956,6 +2039,7 @@ router.post('/copilot', authenticate, async (req, res, next) => {
       return res.status(400).json({ error: 'message fehlt.' });
     }
 
+    await _copilotObjektwissen(uid, payload);   /* v3025 */
     const result = await openaiService.copilotChat(payload, { userApiKey });
     _cpDaily.set(key, used + 1);
     if (_cpDaily.size > 5000) {
@@ -2067,3 +2151,6 @@ module.exports.copilotKontingent = {
     return { ok: true, limit: limit, benutzt: used + 1 };
   }
 };
+
+/* v3025 · fuer tools/agent-pruefung/pruef-objektwissen.js: derselbe Weg wie die Route */
+module.exports.copilotObjektwissen = _copilotObjektwissen;

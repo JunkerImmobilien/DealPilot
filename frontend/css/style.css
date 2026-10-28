@@ -33535,6 +33535,24 @@ body.hdr-banner-only .hdr-v61-row2 {
 @media (max-width:560px){.ai-pdf-gruppe{grid-template-columns:1fr}}
 /* v3018-pdf-gruppen END */
 
+/* v3018d-pdf-pruefung BEGIN · Hinweis statt PDF (js/pdf-pruefung.js) */
+.dp-pdfp-ov{position:fixed;inset:0;z-index:99999;background:rgba(5,5,5,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.dp-pdfp-box{background:var(--white,#fff);color:var(--ch,#2A2727);border-radius:var(--r2,12px);border-top:3px solid var(--gold);box-shadow:var(--shadow-md,0 4px 24px rgba(42,39,39,.12));max-width:520px;width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:20px 22px}
+.dp-pdfp-k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-3,var(--gold))}
+.dp-pdfp-t{font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:600;margin:4px 0 6px}
+.dp-pdfp-e{font-size:13px;line-height:1.5;color:var(--muted,#7A7370);margin-bottom:10px}
+.dp-pdfp-l{list-style:none;margin:0 0 12px;padding:0}
+.dp-pdfp-l li{padding:9px 0;border-top:1px solid var(--border,#E0DBD3)}
+.dp-pdfp-z{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;font-size:13.5px}
+.dp-pdfp-wo{color:var(--muted,#7A7370)}
+.dp-pdfp-hin{margin-left:auto;background:transparent;border:1px solid var(--border-g,var(--gold));color:var(--ch,#2A2727);border-radius:var(--r,8px);padding:4px 10px;font-size:12px;cursor:pointer}
+.dp-pdfp-hin:hover{background:var(--gold-bg,#FAF5E8)}
+.dp-pdfp-warum{font-size:12px;line-height:1.5;color:var(--muted,#7A7370);margin-top:3px}
+.dp-pdfp-w{font-size:12px;line-height:1.5;color:var(--muted,#7A7370);background:var(--surface,#F8F6F1);border-radius:var(--r,8px);padding:8px 10px;margin-bottom:12px}
+.dp-pdfp-f{display:flex;justify-content:flex-end}
+.dp-pdfp-zu{background:var(--gold);color:var(--ch,#2A2727);border:0;border-radius:var(--r,8px);padding:8px 16px;font-weight:600;cursor:pointer}
+/* v3018d-pdf-pruefung END */
+
 /* ===== v607-sidebar-rail BEGIN: eingeklappt = 66px Icon-Rail (statt display:none) ===== */
 /* Grid auf schmale Rail statt 0; Main bleibt in Spalte 2 (kein Overlap) */
 body.dp-sidebar-collapsed .app-wrap { grid-template-columns: 66px 1fr !important; }

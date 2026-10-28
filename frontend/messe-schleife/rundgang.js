@@ -20,6 +20,8 @@
    Keine Abrufe von JSON (file:// kann das nicht) — die Liste steht hier.
    Prüfhilfen: window.DPS (Zustand), window.DPS_LOG (Wechsel mit Zeit),
    window.DPS_SCHWARZ (längste Strecke ohne Bild in ms), &rate=4 (schneller).
+   messe-schleife-7: nach jeder n-ten Station ein Werbebild (werbung.js,
+   Menü „Werbung“), Favoriten 01/03 doppelt so oft.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -278,7 +280,7 @@
   }
 
   async function lauf() {
-    var i = 0;
+    var i = 0, stationen = 0;
     while (!abbruch) {
       var s = SCHRITTE[i];
       if (s.typ === 'tafel') {
@@ -296,6 +298,25 @@
         } else log('tafel-aus', s.id);
       } else {
         await spieleStueck(i, s);
+        /* messe-schleife-7 · Werbebild nach jeder n-ten Station (werbung.js, Menü: werbung, werbung_nach, werbung_sek) */
+        var nachS = SCHRITTE[i + 1];
+        if (!(nachS && nachS.typ === 'stueck' && nachS.a === s.a)) {
+          stationen++;
+          var WB = window.DPSTafeln && window.DPSTafeln.werbung;
+          if (WB && WB.da() && stationen % WB.nach() === 0) {
+            var wh = WB.html();
+            if (wh) {
+              status(i, { typ: 'tafel', id: 'werbung' }, { bild: window.DPS_WERBUNG && window.DPS_WERBUNG.bild });
+              log('tafel', 'werbung ' + (window.DPS_WERBUNG && window.DPS_WERBUNG.bild));
+              zeigeTafel({ art: 'werbung' }, wh);
+              if (!vorbereitet) { var jw = naechstesStueck(i); if (jw >= 0) vorbereiten(jw); }
+              var tw = performance.now(), endeW = tw + WB.sekunden() * 1000 / RATE;
+              while (performance.now() < endeW && !naechsterSprung) await warte(100);
+              naechsterSprung = false;
+              log('tafel-ende', 'werbung ' + Math.round(performance.now() - tw));
+            }
+          }
+        }
       }
       i++;
       if (i >= SCHRITTE.length) {

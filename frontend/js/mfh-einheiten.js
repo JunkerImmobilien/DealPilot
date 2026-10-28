@@ -539,6 +539,7 @@
               'die Höhe ergibt sich erst aus dem Verbraucherpreisindex. Was du hier einträgst, ' +
               'rechnet DealPilot als <b>Annahme</b> fort und kennzeichnet sie auch in der Mietentwicklung.' +
             '</div>' +
+            '<div id="mfh-we-index-tab"></div>' +   /* v3026 · mögliche Anpassung je Jahr aus dem VPI */
             '<div class="mfh-we-raster">' +
               s('mv_erhoehung_art', 'Erhöhung angeben als', [['', '–'], ['prozent', 'Prozent'], ['betrag', 'Euro je Monat']]) +
               f('mv_erhoehung_wert', 'Nächste Erhöhung (Höhe)', 'z. B. 3 oder 45', 'decimal') +
@@ -557,7 +558,7 @@
           '<div class="mfh-we-raster">' +
             f('vgl_qm', 'Vergleichsmiete €/m² (Mietspiegel)', '', 'decimal') +
             f('soll', 'Soll-Miete (€/Monat, eigene Angabe)', '', 'decimal') +
-            d('soll_ab', 'Erreichbar ab (eigene Angabe)', 'month') +
+            d('soll_ab', 'Wirksam ab (eigene Angabe)', 'month') +
           '</div><div class="mfh-we-ergebnis" id="mfh-we-soll"></div>') +
         /* v2430 · ZIELBILD — nach Umbau oder Neuvermietung. Massnahmen als
            Chips mit Kosten und Modernisierungspunkten (Anlage 2). */
@@ -603,7 +604,11 @@
         if (!w || e.status === 'leer' || !(ist > 0)) hS.innerHTML = '<p class="mfh-we-hint">Leer stehend oder ohne Ist-Miete: keine Soll-Miete, die Wohnung geht direkt ins Zielbild.</p>';
         else hS.innerHTML = (so && so.miete != null
             ? '<div class="mfh-we-kv"><div><span>Soll-Miete</span><b class="c-soll">' + eur(so.miete) + '/Monat' + (wfl ? ' · ' + (so.miete / wfl).toFixed(2).replace('.', ',') + ' €/m²' : '') + '</b></div>'
-              + '<div><span>erreichbar ab</span><b>' + esc(so.ab_text || '—') + '</b></div>'
+              /* v3028 · getrennt: wann das Verlangen zugehen darf, wann die Miete geschuldet ist (DpPotenzial.mhTermine) */
+              + (so.termine
+                ? '<div><span>verlangbar ab</span><b>' + esc(so.termine.verlangbar_sofort ? 'sofort' : P.mmjj(so.termine.verlangbar_ab)) + '</b></div>'
+                  + '<div><span>wirksam ab</span><b>' + esc(P.mmjj(so.termine.wirksam_ab)) + '</b> <small>(' + esc(so.termine.grund) + ')</small></div>'
+                : '<div><span>wirksam ab</span><b>—</b></div>')
               + '<div><span>Herkunft</span><b>' + esc(so.herkunft || '') + (so.grenze ? ' · ' + esc(so.grenze) : '') + '</b></div></div>'
               + (so.kapp_angerechnet ? '<p class="mfh-we-hint">Kappungsgrenze auf ' + eur(so.kapp_basis) + '/Monat gerechnet — die Miete vor der letzten Erhöhung; die Erhöhung um ' + eur(so.kapp_angerechnet) + ' liegt in den drei Jahren und ist angerechnet (§ 558 Abs. 3 BGB).</p>' : '')
               + (so.umlage559 ? '<p class="mfh-we-hint">Darin Modernisierungsumlage § 559 BGB: ' + eur(so.umlage559.monat) + '/Monat (8 % von ' + eur(so.umlage559.kosten) + (so.umlage559.gedeckelt ? ', gedeckelt auf ' + so.umlage559.kappe_qm + ' €/m²' : '') + ').</p>' : '')
@@ -682,8 +687,12 @@
       box.style.display = (a === 'staffel' || a === 'index') ? '' : 'none';
       var warn = el('mfh-we-index-warn');
       if (warn) warn.style.display = (a === 'index') ? '' : 'none';
+      /* v3026 · Indexmiete: Tabelle Jahr | Index | mögliche Miete | Erhöhung | wirksam ab (potenzial.js → js/indexmiete.js) */
+      var it = el('mfh-we-index-tab');
+      if (it) { try { it.innerHTML = (a === 'index' && window.DpPotenzial && DpPotenzial.indexmieteHtml) ? DpPotenzial.indexmieteHtml({ hat_index: true, art: 'einzel', wohnungen: [{ index: DpPotenzial.indexmieteFuer(e) }] }) : ''; } catch (x) { it.innerHTML = ''; } }
     }
     if (vArt) vArt.addEventListener("change", erhoehungZeigen);
+    ov.addEventListener('change', function (ev) { var k = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-wk'); if (k === 'mv_beginn' || k === 'mv_letzte_erhoehung' || k === 'ist' || k === 'status') erhoehungZeigen(); });   /* v3026 */
     erhoehungZeigen();
     /* v2600 · E3 · Leerstandsblock nur bei Status „leer" */
     var sSt = ov.querySelector('[data-wk="status"]');
@@ -1467,7 +1476,9 @@
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
     vermstandPruefen: vermstandPruefen /* v3001b */, vorbelegen: vorbelegen /* v3016 */,
-    oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+    oeffnen: oeffnen, knopf: knopf,
+    /* v3027 · eine Einheit gezielt öffnen (Absprung aus der Vertragsübersicht im Reiter Miete) */
+    einheitOeffnen: function (i) { oeffnen(1); setTimeout(function () { wohnungOeffnen(i); }, 0); }, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
        eine zweite Liste dort waere der Anfang der Abweichung. */

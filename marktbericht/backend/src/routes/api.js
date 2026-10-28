@@ -11,6 +11,11 @@ import { DealPilotImportService } from '../services/DealPilotImportService.js';
 import { openaiSelfCheck, generateVerlaufText } from '../services/ReportGenerationService.js';
 import { messeLage } from '../services/LageMessungService.js';   /* v2175 */
 import { bwkAnsaetze } from '../lib/immowertv.js';   /* v2186 */
+import * as Jahreswerte from '../services/JahreswerteService.js';   /* v3021 */
+import { oeffentlich as abschlagOeffentlich, RECHERCHE as ABSCHLAG_RECHERCHE, aktive as abschlagAktive } from '../lib/angebot_abschlag.js';   /* v3021 */
+import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js';   /* v3021 */
+import { indexreihen } from '../lib/indexreihen.js';                             /* v3026 */
+import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { runLimited, limiterStats } from '../lib/limiter.js';
@@ -956,6 +961,41 @@ router.get('/zensus/objekt', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// GET /zensus/fortgeschrieben?plz=32049&ort=Herford&baujahr=1975&wfl=80
+// v3028 · Zensus-Bestandsmiete (15.05.2022) eines Orts und seiner Klassen (Baujahr,
+// Wohnungsgroesse), mit dem Index der Nettokaltmieten (Destatis, 2020 = 100) auf den
+// JUENGSTEN bekannten Monat fortgeschrieben - dieselbe Rechnung wie im Ertragswert
+// (lib/zensus_miete.js zensusMieteAmStichtag, nkmIndexAm). Fuer die Piloten
+// (backend objektWissen.js, Werkzeug marktmiete). Nie erfunden: ohne Zensuswert kein Ergebnis.
+router.get('/zensus/fortgeschrieben', async (req, res) => {
+  try {
+    const plz = String(req.query.plz || '').trim();
+    if (!/^\d{5}$/.test(plz)) return res.status(400).json({ error: 'plz_fehlt' });
+    const zahl = (v) => { const n = Number(String(v == null ? '' : v).replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : null; };
+    const [k, g] = await Promise.all([
+      AgsResolver.fromPostcode(plz).catch(() => null),
+      AgsResolver.gemeindeEindeutig(plz, req.query.ort).catch(() => null)
+    ]);
+    if (!k) return res.json({ available: false, reason: 'plz_unbekannt' });
+    const z = await ZensusConnector.lookupDb({ kreisAgs: k.kreis_ags, gemeindeAgs: g && g.gemeinde_ags,
+      baujahr: zahl(req.query.baujahr), wohnflaeche: zahl(req.query.wfl) });
+    const jetzt = new Date();
+    const r = zensusMieteAmStichtag(z, jetzt);
+    if (!r) return res.json({ available: false, reason: 'kein_zensuswert' });
+    const idx = r.index || nkmIndexAm(jetzt);
+    const monat = idx && /^\d{4}-\d{2}$/.test(String(idx.bezug)) ? idx.bezug : null;
+    const mmjj = monat ? monat.slice(5, 7) + '/' + monat.slice(0, 4) : (idx ? String(idx.bezug) : null);
+    res.json({ available: true, qm: r.qm, roh_qm: r.roh_qm, faktor: r.faktor, ebene: r.ebene, gebiet: r.gebiet,
+      klassen: r.klassen.map((x) => ({ art: x.art, klasse: x.klasse || null, roh_qm: x.qm, qm: Math.round(x.qm * r.faktor * 100) / 100 })),
+      index: idx ? { wert: idx.wert, monat: monat || idx.bezug, basis_monat: NKM_INDEX.basis_monat, basis_wert: NKM_INDEX.basis_wert,
+        quelle: NKM_INDEX.quelle, quelle_url: NKM_INDEX.quelle_url } : null,
+      stand_zensus: '2022-05-15', fortgeschrieben_auf: monat,
+      etikett: 'Zensus 2022, fortgeschrieben auf ' + (mmjj || '?') + ' mit dem Nettokaltmieten-Index',
+      text: r.text, quelle: r.quelle,
+      gemeinde_eindeutig: g ? g.eindeutig : null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /lage/gemessen?adresse=&plz=&ort=&objektart= — v2175 · die messbaren Lage-Felder
 // (Makro, Mikro, Bevoelkerung, Nachfrage = Vermarktungsdauer, Mietausfall = Zensus-Leerstand; v2518)
 // mit Wert, Stufe, Schwelle und Quelle.
@@ -974,6 +1014,46 @@ router.get('/lage/gemessen', async (req, res) => {
 // je Objektart, mit Quelle. Eine Quelle fuer Ertragswert UND Haupt-App (bwk-profil.js).
 router.get('/bwk/ansaetze', (req, res) => {
   try { res.json(bwkAnsaetze(req.query.jahr)); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// v3021 · JAHRESWERTE. Marcel 28.10.2026: „jedes Jahr automatisch neu ermitteln, und das
+// muessen wir auch bei den Steuerdaten machen."
+// GET /jahreswerte/angebotsabschlag — der Marktdurchschnitt fuer die Haupt-App (config.js
+// angebotAbschlagMarkt wird daraus gefuellt). Ohne Quellennamen.
+router.get('/jahreswerte/angebotsabschlag', (req, res) => {
+  try { res.json(abschlagOeffentlich()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// GET /indexreihen — v3026 · VPI (2020=100), Index der Nettokaltmieten (2020=100) und
+// Baupreisindex (2021=100) als Monatsreihen fuer Haupt-App und Rechenkerne (als Parameter).
+// Kommt aus dem Speicher (lib/indexreihen.js), nie aus GENESIS; ETag + 304, eine Stunde cachebar.
+router.get('/indexreihen', (req, res) => {
+  try {
+    const ir = indexreihen();
+    res.set('ETag', ir.etag);
+    res.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    if (req.headers['if-none-match'] === ir.etag) return res.status(304).end();
+    res.json(ir);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// GET /jahreswerte/stand — nur ueber den Admin-Proxy: Register (Faelligkeit je Wert) plus
+// Stand der automatischen Reihen und des Angebotsabschlags aus der DB.
+router.get('/jahreswerte/stand', async (req, res) => {
+  try {
+    const reg = jahreswerteRegister();
+    const auto = await Jahreswerte.stand();
+    res.json({ register: { stand: reg.stand, version: reg.version }, werte: jahreswerteStatus(reg, new Date()),
+      automatisch: auto, abschlag_recherche: ABSCHLAG_RECHERCHE, abschlag_aktiv: abschlagAktive() });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// POST /jahreswerte/abruf — Reihen sofort holen (sonst taeglicher Takt, alle 7 Tage).
+// POST /jahreswerte/abschlag-rechnen {jahr} — Jahresrechnung des Angebotsabschlags von Hand.
+router.post('/jahreswerte/abruf', async (req, res) => {
+  try { res.json(await Jahreswerte.laufReihen()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/jahreswerte/abschlag-rechnen', async (req, res) => {
+  const j = Number((req.body || {}).jahr);
+  if (!(j >= 2026 && j <= new Date().getFullYear())) return res.status(400).json({ error: 'jahr (ab 2026) erforderlich' });
+  try { res.json(await Jahreswerte.rechneAbschlagJahr(j)); } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // GET /zensus/check — ist die Zensus-CSV da, wie viele Kreise, welche Spalten erkannt + Beispiel.

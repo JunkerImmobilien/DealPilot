@@ -526,3 +526,65 @@ body.laeuft.maus{cursor:default}
 /* v2941a · lange Zahlen im Instrument kleiner, Beschriftung darf trennen */
 .az-iz b.lang{font-size:33px;letter-spacing:-.03em}
 .az-iz span{hyphens:manual;overflow-wrap:normal;font-size:12px;letter-spacing:.03em}
+/* messe-schleife-7 · Werbebilder (werbung.js): Tafel zwischendurch und Kanal „Werbung" */
+.wb-t{background:var(--obs)}
+.wb-t img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.rg-tafel.an .wb-t>img{animation:wbEin 1.1s cubic-bezier(.2,.8,.2,1) both,wbZoom 18s linear both}
+@keyframes wbEin{from{opacity:0}to{opacity:1}}
+@keyframes wbZoom{from{transform:scale(1.02)}to{transform:scale(1)}}
+.wb-kanal{background:var(--obs);overflow:hidden}
+.wb-lage{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease}
+.wb-lage.an{opacity:1}
+.wb-lage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.wb-lage.an img{animation:wbZoom 18s linear both}
+.wb-leiste{position:absolute;left:0;right:0;bottom:0;height:4px;z-index:5;background:rgba(255,255,255,.06)}
+.wb-leiste i{display:block;height:100%;width:0;background:var(--runway)}
+.wb-punkte{position:absolute;right:28px;top:22px;z-index:5;display:flex;gap:8px;opacity:.55}
+.wb-punkte i{width:8px;height:8px;border-radius:50%;background:rgba(253,252,250,.25)}
+.wb-punkte i.jetzt{background:var(--g)}
+/* messe-schleife-7 · drei Kanäle nebeneinander (Rundgang, Videothek, Werbung) */
+.wahl-kanaele{grid-template-columns:repeat(3,1fr);gap:18px}
+.wahl-kanaele .wahl-rundgang{gap:18px;padding:14px 20px 14px 14px}
+.wahl-kanaele .wahl-rundgang img{width:170px;height:96px}
+.wahl-kanaele .wahl-rundgang b.taste{width:48px;height:48px;font-size:26px;border-radius:12px}
+.wahl-kanaele .wahl-rundgang h2{font-size:30px}
+.wahl-kanaele .wahl-rundgang p{font-size:16px}
+
+/* ══ messe-schleife-8 · Kapitelleiste im Kanal Videothek (videothek-kanal.js) ══
+   Masse in Bühnen-Pixeln (1920 x 1080, skaliert): Knöpfe 72 px, Zeitleiste 76 px
+   Tippfläche. Sitzt im unteren Bildteil ÜBER der Umschalt-Leiste (bottom 18 px + 54 px). */
+.vk{position:absolute;left:148px;width:1624px;bottom:104px;z-index:6;box-sizing:border-box;padding:18px 26px 12px;border-radius:16px;
+  background:rgba(8,7,5,.9);box-shadow:0 0 0 1px color-mix(in srgb,var(--g) 40%,transparent),0 24px 60px rgba(0,0,0,.6);backdrop-filter:blur(6px);
+  opacity:0;transform:translateY(24px);pointer-events:none;transition:opacity .3s,transform .3s;user-select:none;-webkit-user-select:none}
+.vk.an{opacity:1;transform:none;pointer-events:auto}
+.vk-zeile{display:flex;align-items:center;gap:14px}
+.vk-k{flex:0 0 auto;width:72px;height:72px;border-radius:14px;border:1px solid color-mix(in srgb,var(--g) 55%,transparent);background:rgba(255,255,255,.04);
+  color:var(--gh);display:grid;place-items:center;cursor:pointer;padding:0;touch-action:manipulation}
+.vk-k svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.vk-k:hover{background:color-mix(in srgb,var(--g) 18%,transparent)}
+.vk-k:active{transform:scale(.96)}
+.vk-pp{background:var(--runway);border-color:transparent;padding:0}
+.vk-pp i{display:block;width:22px;height:28px;border-left:8px solid #1a1407;border-right:8px solid #1a1407;box-sizing:border-box}
+.vk.pause .vk-pp i{width:0;height:0;border-style:solid;border-width:16px 0 16px 26px;border-color:transparent transparent transparent #1a1407;margin-left:6px}
+.vk-text{flex:1 1 auto;min-width:0;margin-left:10px}
+.vk-kick{font:700 17px/1 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gh)}
+.vk.pause .vk-kick::after{content:" · angehalten";color:var(--creme)}
+.vk-titel{margin-top:8px;font:700 32px/1.1 "Space Grotesk",sans-serif;color:var(--creme);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vk-rechts{flex:0 1 auto;max-width:560px;min-width:0;text-align:right}
+.vk-zeit{font:600 24px/1 "JetBrains Mono",monospace;color:var(--creme);font-variant-numeric:tabular-nums}
+.vk-naechst{margin-top:10px;font:500 18px/1.2 Inter,sans-serif;color:var(--matt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vk-naechst b{color:var(--text);font-weight:600}
+.vk-bahn{position:relative;height:76px;margin-top:6px;cursor:pointer;touch-action:none}
+.vk-spur{position:absolute;left:14px;right:14px;top:0;bottom:0}
+.vk-spur::before{content:"";position:absolute;left:0;right:0;top:50%;height:10px;margin-top:-5px;border-radius:5px;background:rgba(255,255,255,.14)}
+.vk-fill{position:absolute;left:0;top:50%;height:10px;margin-top:-5px;border-radius:5px;width:0;background:var(--runway)}
+.vk-marken{position:absolute;inset:0;pointer-events:none}
+.vk-marken i{position:absolute;top:50%;width:6px;height:34px;margin:-17px 0 0 -3px;border-radius:3px;background:var(--gh);box-shadow:0 0 0 3px rgba(8,7,5,.95)}
+.vk-marken i.vorbei{background:var(--creme)}
+.vk-kopf{position:absolute;top:50%;left:0;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:var(--creme);box-shadow:0 0 0 6px color-mix(in srgb,var(--g) 45%,transparent);z-index:2}
+.vk-tip{position:absolute;bottom:calc(100% + 12px);left:0;z-index:3;max-width:900px;padding:10px 16px;border-radius:10px;background:#0c0b08;box-shadow:0 0 0 2px var(--g),0 14px 40px rgba(0,0,0,.6);
+  font:600 24px/1.2 Inter,sans-serif;color:var(--creme);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.vk-tip[hidden]{display:none}
+.vk-tip b{font:700 20px/1 "JetBrains Mono",monospace;color:var(--gh);margin-right:12px}
+.vk-hilfe{margin-top:2px;font:500 15px/1.2 "JetBrains Mono",monospace;color:var(--matt);text-align:center;letter-spacing:.04em}
+.vk.ohne-kapitel .vk-marken{display:none}

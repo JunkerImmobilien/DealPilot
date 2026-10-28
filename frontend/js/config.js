@@ -73,18 +73,32 @@ window.DealPilotConfig = (function() {
     plz: '', city: '', phone: '', email: '', website: ''
   };
 
-  function getBranding() {
-    var s = (typeof Settings !== 'undefined') ? Settings.get() : {};
-    
-    // V192: Plan-Gating — nur Pro-Plan-User dürfen eigenes Branding nutzen
-    var isPro = false;
+  /* v3018c · Marcel 28.10.2026: „ob die Daten des Users - Anschrift und E-Mail - auf dem
+     PDF ausgegeben werden ab Investor-Plan". GEMESSEN auf Staging (Konto info@, Plan
+     partner, Firma/Anschrift/E-Mail/Telefon in den Einstellungen hinterlegt): getBranding()
+     lieferte ALLES LEER - hier stand `planKey === 'pro'`, die sechste harte Pro-Abfrage
+     neben den fuenf aus v1081-planfamilie. Zwei Fehler:
+       1. Partner (erweiterter Pro) bekam nirgends seinen Absender -> jetzt isProOrAbove.
+       2. Investor (Plan-Merkmal custom_logo = true, Einstellungen geben das Logo frei)
+          bekam im PDF weder Absender noch Logo -> fuerPdf() gilt ab custom_logo.
+     Deal-Aktion-Banner, Anfrage-Karten und Routing (storage.js, deal-action.js …) lesen
+     weiter get(): eigenes Branding AUSSERHALB des PDFs bleibt Pro (und Partner). */
+  function _brandingErlaubt(nurPdf) {
     try {
-      var planKey = getCurrentPlanKey();
-      isPro = (planKey === 'pro');
-    } catch(e) { /* Falls Pricing-Modul noch nicht geladen → Default Junker */ }
-    
+      if (nurPdf) {
+        var P = window.DealPilotConfig && window.DealPilotConfig.pricing;
+        if (P && typeof P.hasFeature === 'function') return !!P.hasFeature('custom_logo');
+        return (PLAN_RANG[getCurrentPlanKey()] || 0) >= PLAN_RANG.investor;
+      }
+      return PRO_FAMILIE.indexOf(getCurrentPlanKey()) >= 0;
+    } catch (e) { return false; }
+  }
+  function getBranding(nurPdf) {
+    var s = (typeof Settings !== 'undefined') ? Settings.get() : {};
+    var isPro = _brandingErlaubt(nurPdf === true);
+
     if (!isPro) {
-      // Free, Starter, Investor → IMMER Junker-Defaults zurückgeben (ignoriert User-Settings)
+      // ohne Freigabe (s. _brandingErlaubt) → leerer Absender, Einstellungen werden ignoriert
       return {
         product_name: BRANDING_DEFAULTS.product_name,
         tagline: BRANDING_DEFAULTS.tagline,
@@ -807,7 +821,9 @@ window.DealPilotConfig = (function() {
 
   // ── PUBLIC API ────────────────────────────────────
   return {
-    branding: { get: getBranding, formatFooter: formatFooter, defaults: BRANDING_DEFAULTS },
+    branding: { get: getBranding, formatFooter: formatFooter, defaults: BRANDING_DEFAULTS,
+      /* v3018c · Absender und Logo fuer PDFs: ab custom_logo (Investor). Ueber get(), damit Zusaetze am get (theme) mitkommen. */
+      fuerPdf: function () { return window.DealPilotConfig.branding.get(true); } },
     pricing:  {
       plans: PRICING,
       list: listPlans,
@@ -993,19 +1009,15 @@ window.DealPilotConfig = (function() {
     // User-Override über Settings → Anzeige (localStorage 'dp_startup_view').
     startupView: 'objekt',
 
-    /* v2237 · Abschlag auf Angebotspreise - recherchierter Marktdurchschnitt.
-       Marcel 14.10.2026: „wir recherchieren immer den aktuellen Durchschnitt".
-       Gilt, solange im Profil kein eigener Satz steht (angebot_abschlag_pct
-       leer). Beim Nachrecherchieren NUR diesen Block ändern (Wert, Stand,
-       Quelle, Link) - alle Bewertungen ziehen nach. */
-    angebotAbschlagMarkt: {
-      pct: 5.8,
-      stand: 'Dezember 2025',
-      quelle: 'ImmoScout24-Marktanalyse, Eigentumswohnungen bundesweit',   /* Partner nie namentlich nach außen */
-      url: 'https://www.immobilienscout24.de/unternehmen/news-medien/news/default-title/verhandlungsspielraum-beim-wohnungskauf-schrumpft-weiter/',
-      recherchiert: '2026-10-14',
-      spanne: 'Leipzig 0 %, Düsseldorf 1,4 %, Hamburg 7,8 %, Köln 9,2 % (Dezember 2025); Mitte 2025 bundesweit 6,8 %'
-    },
+    /* v2237 · Abschlag auf Angebotspreise - Marktdurchschnitt.
+       v3021 · Marcel 28.10.2026: „jedes Jahr automatisch neu ermitteln". Die
+       Zahl steht NICHT mehr hier (bis v3020: 5,8 % hier UND im Marktbericht-
+       Backend). Einzige Quelle: marktbericht/backend/src/lib/angebot_abschlag.js
+       (Recherche + jaehrlicher DealPilot-Marktdurchschnitt je Segment).
+       marktwert-abschlag.js fuellt dieses Feld beim Start aus
+       GET /marktbericht/jahreswerte/angebotsabschlag ({ pct, stand, segmente }).
+       Quelle und Link der Recherche bleiben im Backend (nie nach aussen). */
+    angebotAbschlagMarkt: null,
 
     /* v2630 · Marktparameter des indikativen Beleihungswert-Checks (Bank-Export).
        Der Kern (marktbericht/backend/src/lib/beleihungswert.js) liest sie nicht

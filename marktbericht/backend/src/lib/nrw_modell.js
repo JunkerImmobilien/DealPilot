@@ -343,3 +343,25 @@ export function stufeNachStreuung({ wert, wert_min, wert_max, qualitaet, objekta
       + `herabgestuft und mit seiner Spanne ausgewiesen.`,
   };
 }
+
+/* v3021 · AUTOMATISCH GEHOLTE OKTOBERWERTE (lib/destatis_reihen.js, JahreswerteService).
+   Eingang ist der VPI auf Basis 2020 = 100 (Destatis heute) - dieselbe Reihe wie
+   VPI_OKTOBER_IMMOWERTV (Oktober 2001 = 77,1). Fuer das NRW-Modell wird umgerechnet wie
+   beim Wert 2025 oben: x (87,5 / 77,1), auf eine Nachkommastelle. Belegte Jahre oben
+   bleiben unangetastet; nur fehlende Jahre kommen dazu, nur plausibel gepruefte. */
+export const VPI_ABGERUFEN = {};
+export function uebernimmVpiOktober(zeilen) {
+  let neu = 0;
+  for (const z of zeilen || []) {
+    const m = String(z.periode || '').match(/^(\d{4})-10$/);
+    const w = Number(z.wert);
+    if (!m || !(w > 0)) continue;
+    const j = Number(m[1]);
+    if (VPI_OKTOBER_IMMOWERTV[j] != null && !VPI_ABGERUFEN[j]) continue;
+    VPI_OKTOBER_IMMOWERTV[j] = w;
+    VPI_OKTOBER[j] = Math.round(w * (VPI_OKTOBER[2001] / VPI_OKTOBER_IMMOWERTV[2001]) * 10) / 10;
+    VPI_ABGERUFEN[j] = { wert_2020: w, abgerufen_am: String(z.abgerufen_am || '').slice(0, 10) };
+    neu++;
+  }
+  return neu;
+}

@@ -1316,7 +1316,7 @@ function _calcImmediate(){
     : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
   var gs_a=v('gsfl')*(v('mea')/100);
-  st('gs_ant',gs_a.toFixed(2)+' m²');st('bodenwert',fE(gs_a*v('brw')));
+  st('gs_ant',gs_a.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²');  /* v3023: stand „58.60 m²" */st('bodenwert',fE(gs_a*v('brw')));
   var nkm=v('nkm'),ze=v('ze'),uf=v('umlagef');
   var wm_m=nkm+ze+uf,wm_j=wm_m*12,nkm_j=(nkm+ze)*12;
   /* ══ v2484 · EINE WARMMIETE ══════════════════════════════════════════
@@ -1330,7 +1330,7 @@ function _calcImmediate(){
      fuer App und beide PDFs; wm_j bleibt als interne Summe (Steuerverlauf
      tax.js, Projektion) unveraendert - dort zaehlen die Zusatzeinnahmen mit. */
   var warm_m=nkm+uf,warm_j=warm_m*12;
-  st('wm_m',fE(warm_m,2));st('wm_j',fE(warm_j,2));st('nkm_j_out',fE(nkm_j));
+  /* v3023: Cent nur, wenn es welche gibt - daneben stand „43.920 €" und „43.920,00 €" */ var _ct=function(x){return Math.abs(x-Math.round(x))<0.005?0:2;}; st('wm_m',fE(warm_m,_ct(warm_m)));st('wm_j',fE(warm_j,_ct(warm_j)));st('nkm_j_out',fE(nkm_j));
   // V227: AfA mit linear ODER degressiv ODER degressiv-mit-Wechsel, optional + § 7b
   var afaSelVal = (el('afa_satz') || {}).value || '2.0';
   var afaParsed = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(afaSelVal) : { methode: 'linear', satzPct: parseDe(afaSelVal) || 2 };
@@ -2258,7 +2258,7 @@ function _calcImmediate(){
   var dscrLabel = Dscr.label(dscr, _sw);
   var dscrCls   = Dscr.kpiCls(dscr, _sw);
   var dscrEl=document.getElementById('bank-dscr-t');
-  if(dscrEl)dscrEl.innerHTML='DSCR: <span class="dscr-badge '+dscrCls+'">'+dscr.toFixed(2)+'</span> '+dscrLabel;
+  if(dscrEl)dscrEl.innerHTML='DSCR: <span class="dscr-badge '+dscrCls+'">'+dscr.toFixed(2).replace('.',',')+'</span> '+dscrLabel;
   var bankItem2=dscrEl&&dscrEl.closest('.bank-item');
   if(bankItem2)bankItem2.className='bank-item '+Dscr.bankItemCls(dscr, _sw);
   // Detail-Text: bei BSV explizit anzeigen

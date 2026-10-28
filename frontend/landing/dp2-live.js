@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   dp2-live.js · landing-videothek-5 · DealPilot live und die Videothek
+   dp2-live.js · landing-videothek-6 · DealPilot live und die Videothek
    ───────────────────────────────────────────────────────────────────────
    Eine Quelle: assets/videothek/videos.json. Daraus baut dieses Skript
      · auf der Landing (#dplRoot) den Abschnitt "DealPilot live": ein
@@ -21,7 +21,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-5';
+  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-6';
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */
@@ -409,7 +409,16 @@
     /* Kinofenster */
     var kino = document.createElement('div');
     kino.className = 'vt-kino'; kino.setAttribute('role', 'dialog'); kino.setAttribute('aria-modal', 'true');
+    /* landing-videothek-6 · Marcel 28.10.2026: die Kapitel auch als Marken auf der Zeitleiste.
+       Die native Leiste des Browsers laesst sich nicht beschriften (ihre Geometrie ist je Browser
+       anders, im Vollbild ohnehin fremd) - deshalb eine EIGENE Kapitelleiste direkt unter dem Bild,
+       die nativen Bedienelemente (Ton, Vollbild, Tempo) bleiben. Striche je Kapitel, beim
+       Ueberfahren Titel und Zeit, Klick springt: nahe an einer Marke (12 px) auf das Kapitel, sonst
+       an die Stelle. Tastatur auf der Leiste: Pfeil links/rechts = Kapitel zurueck/vor. */
     kino.innerHTML = '<div class="vt-kino-in"><div class="vt-kino-v"><video id="vtVideo" controls playsinline preload="metadata"></video>' +
+      '<div class="vt-zl" id="vtZl" role="slider" tabindex="0" aria-label="Zeitleiste mit Kapitelmarken – Pfeiltasten springen zum vorigen oder nächsten Kapitel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
+      '<div class="vt-zl-bahn"><i class="vt-zl-fill"></i><i class="vt-zl-kopf"></i><div class="vt-zl-marken"></div></div>' +
+      '<div class="vt-zl-tip" hidden><b></b><span></span></div></div>' +
       '<div class="vt-ende" id="vtEnde" hidden></div></div>' +
       '<div class="vt-kino-t"><button class="vt-zu" id="vtZu" aria-label="Schließen">×</button><div id="vtKinoText"></div>' +
       '<div class="vt-kino-n"><button id="vtZur">‹ Vorheriges</button><button id="vtVor">Nächstes ›</button>' +
@@ -445,6 +454,80 @@
     kv.addEventListener('timeupdate', kapMarkieren);
     kv.addEventListener('seeked', kapMarkieren);
 
+    /* ── landing-videothek-6 · Kapitelleiste unter dem Bild ── */
+    var zl = kino.querySelector('#vtZl'), zlBahn = zl.querySelector('.vt-zl-bahn'),
+      zlFill = zl.querySelector('.vt-zl-fill'), zlKopf = zl.querySelector('.vt-zl-kopf'),
+      zlMarken = zl.querySelector('.vt-zl-marken'), zlTip = zl.querySelector('.vt-zl-tip');
+    function dauerAkt() { return (isFinite(kv.duration) && kv.duration > 0) ? kv.duration : ((V[aktuell] || {}).dauer || 0); }
+    function kapZeiten() { return kapAkt.filter(function (c) { return c.t != null; }); }
+    function zlMarkenBauen() {
+      var d = dauerAkt();
+      zlMarken.innerHTML = d ? kapZeiten().filter(function (c) { return c.t > 0.5 && c.t < d; }).map(function (c) {
+        return '<i style="left:' + (c.t / d * 100).toFixed(3) + '%" data-t="' + c.t + '"></i>';
+      }).join('') : '';
+      zlStand();
+    }
+    function zlStand() {
+      var d = dauerAkt(), t = kv.currentTime || 0, p = d ? Math.min(100, t / d * 100) : 0;
+      zlFill.style.width = p + '%'; zlKopf.style.left = p + '%';
+      zl.setAttribute('aria-valuenow', Math.round(p));
+      var an = kapAn(t); zl.setAttribute('aria-valuetext', mmss(t) + (an ? ' · ' + an.titel : ''));
+      zlMarken.querySelectorAll('i').forEach(function (m) { m.classList.toggle('vorbei', +m.getAttribute('data-t') <= t + 0.25); });
+    }
+    function kapAn(t) { var a = null; kapZeiten().forEach(function (c) { if (c.t <= t + 0.25) a = c; }); return a; }
+    /* Position -> Zeit; nahe an einer Marke rastet sie ein (Finger sind breiter als Striche) */
+    function zlZeit(x) {
+      var r = zlBahn.getBoundingClientRect(), d = dauerAkt(); if (!d || !r.width) return null;
+      var t = Math.max(0, Math.min(1, (x - r.left) / r.width)) * d, best = null, bd = 12;
+      kapZeiten().forEach(function (c) { var dx = Math.abs(c.t / d * r.width - (x - r.left)); if (dx <= bd) { bd = dx; best = c; } });
+      return { t: best ? best.t : t, kap: best || kapAn(t), rastet: !!best, x: x - r.left, w: r.width };
+    }
+    function zlTipZeig(z) {
+      if (!z) { zlTip.hidden = true; return; }
+      zlTip.querySelector('b').textContent = mmss(z.t);
+      zlTip.querySelector('span').textContent = z.kap ? z.kap.titel : '';
+      zlTip.hidden = false;
+      var w = zlTip.offsetWidth, bw = zl.getBoundingClientRect().width, off = zlBahn.offsetLeft;
+      var d = dauerAkt(), x = off + (z.rastet && d ? z.t / d * z.w : z.x);
+      zlTip.style.left = Math.max(4, Math.min(bw - w - 4, x - w / 2)) + 'px';
+      zl.classList.toggle('rastet', z.rastet);
+    }
+    zl.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse' || zieht) zlTipZeig(zlZeit(e.clientX)); });
+    /* nur die Maus: ein Finger "verlaesst" die Leiste beim Abheben - der Tipp soll 1,4 s stehen bleiben */
+    zl.addEventListener('pointerleave', function (e) { if (!zieht && e.pointerType === 'mouse') zlTipZeig(null); });
+    var zieht = false;
+    zl.addEventListener('pointerdown', function (e) {
+      if (!dauerAkt()) return;
+      zieht = true; try { zl.setPointerCapture(e.pointerId); } catch (x) {}
+      zlTipZeig(zlZeit(e.clientX));
+    });
+    function zlLos(e) {
+      if (!zieht) return; zieht = false;
+      var z = zlZeit(e.clientX); if (!z) return;
+      springe(z.t, !kv.paused || kv.ended || kv.currentTime < 0.1);
+      if (e.pointerType !== 'mouse') setTimeout(function () { if (!zieht) zlTipZeig(null); }, 1400);
+    }
+    zl.addEventListener('pointerup', zlLos);
+    zl.addEventListener('pointercancel', function () { zieht = false; zlTipZeig(null); });
+    function kapSchritt(r) {
+      var k = kapZeiten(), t = kv.currentTime || 0, ziel = null;
+      if (!k.length) return;
+      if (r > 0) { k.forEach(function (c) { if (ziel == null && c.t > t + 0.5) ziel = c.t; }); if (ziel == null) return; }
+      /* zurueck: innerhalb der ersten 3 s eines Kapitels auf das vorige, sonst an den Anfang des laufenden */
+      else { k.forEach(function (c) { if (c.t < t - 3) ziel = c.t; }); if (ziel == null) ziel = 0; }
+      springe(ziel, !kv.paused);
+    }
+    zl.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); kapSchritt(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); kapSchritt(-1); }
+      else if (e.key === 'Home') { e.preventDefault(); springe(0, !kv.paused); }
+      else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); if (kv.paused) { var p = kv.play(); if (p && p.catch) p.catch(function () {}); } else kv.pause(); }
+    });
+    kv.addEventListener('timeupdate', zlStand);
+    kv.addEventListener('seeked', zlStand);
+    kv.addEventListener('loadedmetadata', zlMarkenBauen);
+    window.DPL_ZEITLEISTE = { marken: function () { return zlMarken.children.length; }, schritt: kapSchritt };   /* Pruefhilfe */
+
     function oeffne(id, ohneHash, t) {
       var i = -1; V.forEach(function (v, j) { if (v.id === id) i = j; });
       if (i < 0) return;
@@ -455,6 +538,7 @@
         kv.setAttribute('poster', bildUrl(v, D));
         kv.src = D.basis_medien + datei(v);
         kapAkt = kapListe(v);
+        zlMarkenBauen();
         var mitZeit = kapAkt.some(function (c) { return c.t != null; });
         kino.querySelector('#vtKinoText').innerHTML =
           '<div class="dpl-k-kick"><span>' + esc(nrLabel(v, D)) + '</span><span>' + mmss(v.dauer) + ' Min.</span></div>' +

@@ -2,8 +2,10 @@
    messe-schleife.js · messe-schleife-1 — Dauerschleife für den Messestand
    Aufruf: ohne Parameter (oder ?idee=rundgang) der Rundgang (rundgang.js, seit messe-schleife-4)
            ?idee=videothek der Kanal Videothek (videothek-kanal.js, seit messe-schleife-5)
+           ?idee=werbung der Kanal Werbung (werbung.js, seit messe-schleife-7): alle
+           Werbebilder in Dauerschleife
            ?idee=auswahl die Auswahl · ?idee=1 … 6 · ?idee=alle (jede eine Runde)
-           In jeder Idee: Leiste bei Mausbewegung, Tasten R, 1–6, A, Esc.
+           In jeder Idee: Leiste bei Mausbewegung, Tasten R, V, W, 1–6, A, Esc.
            Läuft auch direkt von der Platte (file://): keine Abrufe, alles relativ.
            &tempo=1.4 streckt alle Wartezeiten (Vorgabe 1)
 
@@ -15,7 +17,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-5';
+  var VER = 'messe-schleife-7';
   var Q = new URLSearchParams(location.search);
   var TEMPO = Math.max(0.3, Math.min(4, parseFloat(Q.get('tempo')) || 1));
   var GRUEN = '#3FA56C', ROT = '#B8625C', GOLD = 'var(--wl-c9a84c,#C9A84C)';
@@ -512,11 +514,14 @@
     var w = el('div', 'wahl ebene');
     w.innerHTML = '<div class="wahl-kopf"><div><div class="kick">Messe-Schleife · Auswahl</div><h1>Deal<span class="gold">Pilot</span> am Stand</h1></div>'
       + '<a class="wahl-alle" data-idee="alle"><b>A</b>Alle im Wechsel<small>jede Idee eine Runde, endlos</small></a></div>'
-      + '<p class="unter">Dauerschleifen für den großen Bildschirm — stumm, ohne Bedienung. Klick startet im Vollbild; Tasten <b>R</b>, <b>V</b>, <b>1–6</b>, <b>A</b>, <b>G</b> Gewinnspiel an/aus, <b>Esc</b> zurück.</p>'
+      + '<p class="unter">Dauerschleifen für den großen Bildschirm — stumm, ohne Bedienung. Klick startet im Vollbild; Tasten <b>R</b>, <b>V</b>, <b>W</b>, <b>1–6</b>, <b>A</b>, <b>G</b> Gewinnspiel an/aus, <b>Esc</b> zurück.</p>'
       + '<div class="wahl-kanaele"><a class="wahl-rundgang" data-idee="rundgang" href="?idee=rundgang"><img alt="" src="messe-schleife/vorschau/rundgang.jpg?v=' + VER + '"><b class="taste">R</b><div><h2>Rundgang durch die App</h2>'
       + '<p>' + (window.DealPilotRundgang ? window.DealPilotRundgang.abschnitte.length : 12) + ' Stationen aus der Videothek — Quick-Check, ImmoMetrica, Mehrfamilienhaus, Marktbericht, Pilot-Analyse, Finanzierung, Steuer, Portfolio. Startansicht.</p></div></a>'
       + '<a class="wahl-rundgang" data-idee="videothek" href="?idee=videothek"><img alt="" src="messe-schleife/vorschau/videothek.webp?v=' + VER + '"><b class="taste">V</b><div><h2>Videothek-Kanal</h2>'
-      + '<p>Alle ' + (window.DPS_VIDEOTHEK ? window.DPS_VIDEOTHEK.videos.length : 30) + ' Videos der Videothek nacheinander, stumm, in voller Länge — von Quick Boarding bis Steuerverlauf.</p></div></a></div>'
+      + '<p>Alle ' + (window.DPS_VIDEOTHEK ? window.DPS_VIDEOTHEK.videos.length : 30) + ' Videos der Videothek nacheinander, stumm, in voller Länge — von Quick Boarding bis Steuerverlauf.</p></div></a>'
+      /* messe-schleife-7 · Kanal Werbung */
+      + '<a class="wahl-rundgang" data-idee="werbung" href="?idee=werbung"><img alt="" src="messe-schleife/werbung/01-boarding-pass-motiv.webp?v=' + VER + '"><b class="taste">W</b><div><h2>Werbung</h2>'
+      + '<p>Die ' + (window.DealPilotWerbung ? window.DealPilotWerbung.bilder.length : 8) + ' Werbebilder „Ertragswert nach ImmoWertV“ hintereinander in Dauerschleife.</p></div></a></div>'
       + '<div class="wahl-weitere">Weitere Schleifen</div>';
     var r = el('div', 'wahl-raster');
     IDEEN.forEach(function (d) {
@@ -528,7 +533,7 @@
       r.appendChild(a);
     });
     w.appendChild(r);
-    w.appendChild(el('div', 'wahl-hinweis', '<b>Am Stand ohne Netz:</b> Ordner „Messe-Schleife“ auf den Rechner kopieren, <b>messe-schleife.html</b> doppelklicken — der Rundgang startet sofort; <b>F</b> oder F11 für Vollbild, <b>Esc</b> hierher.'));
+    w.appendChild(el('div', 'wahl-hinweis', '<b>Am Stand ohne Netz:</b> Ordner „Messe-Schleife“ auf den Rechner kopieren, <b>messe-schleife.html</b> doppelklicken — der Rundgang startet sofort; <b>F</b> oder F11 für Vollbild, <b>Esc</b> hierher. In der Videothek: Bild antippen oder Maus bewegen zeigt die Kapitelleiste, <b>← →</b> Kapitel, <b>Leertaste</b> Pause.'));
     buehne.appendChild(w);
     w.querySelector('.wahl-alle').href = '?idee=alle';
     document.body.classList.remove('laeuft');
@@ -559,6 +564,7 @@
       else if (e.key === 'a' || e.key === 'A') spiele('alle');
       else if (e.key === 'r' || e.key === 'R') spiele('rundgang');
       else if (e.key === 'v' || e.key === 'V') spiele('videothek');
+      else if (e.key === 'w' || e.key === 'W') spiele('werbung');
     });
   }
 
@@ -566,7 +572,8 @@
   function umschalter(aktiv) {
     var l = el('nav', 'umschalter');
     var html = '<a data-q="?idee=rundgang"' + (aktiv === 'R' ? ' class="an"' : '') + '><b>R</b>Rundgang</a>'
-      + '<a data-q="?idee=videothek"' + (aktiv === 'V' ? ' class="an"' : '') + '><b>V</b>Videothek</a>';
+      + '<a data-q="?idee=videothek"' + (aktiv === 'V' ? ' class="an"' : '') + '><b>V</b>Videothek</a>'
+      + '<a data-q="?idee=werbung"' + (aktiv === 'W' ? ' class="an"' : '') + '><b>W</b>Werbung</a>';
     IDEEN.forEach(function (d) { html += '<a data-q="?idee=' + d.n + '"' + (aktiv === d.n ? ' class="an"' : '') + '><b>' + d.n + '</b>' + d.name + '</a>'; });
     html += '<a data-q="?idee=alle"' + (ALLE ? ' class="an"' : '') + '><b>A</b>Alle im Wechsel</a><a data-q="auswahl"><b>Esc</b>Zur Auswahl</a>';
     l.innerHTML = html; document.body.appendChild(l);
@@ -581,6 +588,7 @@
       if (/^[1-6]$/.test(e.key)) geh('?idee=' + e.key);
       else if (e.key === 'r' || e.key === 'R') geh('?idee=rundgang');
       else if (e.key === 'v' || e.key === 'V') geh('?idee=videothek');
+      else if (e.key === 'w' || e.key === 'W') geh('?idee=werbung');
       else if (e.key === 'a' || e.key === 'A') geh('?idee=alle');
       else if (e.key === 'Escape') zurAuswahl();
     });
@@ -601,6 +609,14 @@
       document.body.classList.add('laeuft');
       if (!Q.has('vorschau')) umschalter('V');
       window.DealPilotVideothek.start(buehne);
+      return;
+    }
+    /* messe-schleife-7 · Kanal Werbung (werbung.js) */
+    if (idee === 'werbung' && window.DealPilotWerbung) {
+      document.title = 'DealPilot · Werbung';
+      document.body.classList.add('laeuft');
+      if (!Q.has('vorschau')) umschalter('W');
+      window.DealPilotWerbung.start(buehne);
       return;
     }
     if ((!idee || idee === 'rundgang') && window.DealPilotRundgang) {

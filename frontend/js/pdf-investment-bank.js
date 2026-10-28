@@ -128,7 +128,7 @@
   function marke() {
     try {
       if (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.get === 'function') {
-        return DealPilotConfig.branding.get() || {};
+        return (DealPilotConfig.branding.fuerPdf ? DealPilotConfig.branding.fuerPdf() : DealPilotConfig.branding.get()) || {};   /* v3018c · Absender ab Investor */
       }
     } catch (e) {}
     return {};
@@ -519,10 +519,14 @@
     try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {}
 
     /* v1505: erst pruefen, dann drucken. */
-    var befund = window.pruefeInvestmentDaten();
-    if (!befund.ok) { zeigeLuecken(befund); return; }
-    if (befund.warnen.length && typeof window.toast === 'function') {
-      window.toast('Hinweis: ' + befund.warnen[0]);
+    /* v3018d · dasselbe Tor wie das Investment-PDF (pdf-pruefung.js, mit Sprung zum Feld) */
+    if (window.DpPdfPruefung) { if (!window.DpPdfPruefung.tor('investment', KURZ ? 'Kurzfassung' : 'Bankfassung')) return; }
+    else {
+      var befund = window.pruefeInvestmentDaten();
+      if (!befund.ok) { zeigeLuecken(befund); return; }
+      if (befund.warnen.length && typeof window.toast === 'function') {
+        window.toast('Hinweis: ' + befund.warnen[0]);
+      }
     }
 
     var S = window.State || {}, K = S.kpis || {}, rows = S.cfRows || [];
@@ -724,7 +728,7 @@
         var inhalt = werte.map(function (w, i) {
           var bw = spalten[i][1] * fak, links = i === 0 || spalten[i][2] === 'l' || spalten[i][2] === 'u';
           var platzB = bw - (links && i > 0 ? 3 : 0) - 1.5;
-          if (spalten[i][2] === 'u' && !kopfzeile) {
+          if ((spalten[i][2] === 'u' || spalten[i][2] === 'w') && !kopfzeile) {   /* v3028: 'w' bricht um, bleibt rechtsbündig */
             var l = doc.splitTextToSize(String(w), platzB);
             if (l.length > 3) { l = l.slice(0, 3); l[2] = passt(l[2] + ' ...', platzB); }
             zeilen = Math.max(zeilen, l.length); return l;
@@ -1434,11 +1438,14 @@
        Verfahren und den Erklaerungen; anschluss=true heisst im Fluss weiter. */
     var pdZeichnen = !PD ? null : function (anschluss) {
       if (anschluss) { platz(60); }
-      else { _titel = 'Wertpotenzial'; _unter = (adr || 'Objekt') + ' · Mieterhöhung und Zielbild'; doc.addPage(); kopf(_titel, _unter); }   /* v2530: Fortsetzung trägt denselben Kopf */
+      else { _titel = 'Wertpotenzial'; _unter = (adr || 'Objekt') + ' · Mieterhöhung' + (PD.hat_ziel === false ? '' : ' und Zielbild'); doc.addPage(); kopf(_titel, _unter); }   /* v2530: Fortsetzung trägt denselben Kopf */
       abschnitt('Wertpotenzial');
       einleitung(sauberE(PD.satz_bank));
       if (PD.art === 'mfh' && PD.wohnungen.length) {
-        tabelle([['WE', 26, 'l'], ['m²', 10], ['Ist €/M', 16], ['Mieterhöhung', 28], ['Ziel €/M', 17], ['Maßnahmen', 57, 'u']],
+        /* v3018d · ohne Zielbild keine Spalten Ziel und Maßnahmen (nur Striche) */
+        if (PD.hat_ziel === false) tabelle([['WE', 60, 'l'], ['m²', 14], ['Ist €/M', 28], ['Mieterhöhung', 52, 'w']],
+          PD.wohnungen.map(function (w) { return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll)]; }), { titel: 'Wertpotenzial' });
+        else tabelle([['WE', 26, 'l'], ['m²', 10], ['Ist €/M', 16], ['Mieterhöhung', 28, 'w'], ['Ziel €/M', 17], ['Maßnahmen', 57, 'u']],
           PD.wohnungen.map(function (w) {
             return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen)];
           }), { titel: 'Wertpotenzial' });
@@ -1448,7 +1455,7 @@
          Zeilen mit Summenstrich, Veränderungen als Balken um null; keine gekürzte Achse mehr. */
       if (PD.bruecke && PZ.ueberleitungZeilen) {
         var UZ = PZ.ueberleitungZeilen(PD.bruecke), uRh = 7.6;
-        platz(14 + UZ.length * uRh + 10, 'Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
+        platz(14 + UZ.length * uRh + 10, 'Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung' + (PD.hat_ziel === false ? '' : ' und Zielbild'));
         abschnitt('Wertüberleitung · Ertragswert je Stufe');
         var uF = { bestand: [42, 39, 39], kosten: [201, 138, 132],
           soll: [Math.round(G[0] + (255 - G[0]) * 0.45), Math.round(G[1] + (255 - G[1]) * 0.45), Math.round(G[2] + (255 - G[2]) * 0.45)],
@@ -1515,9 +1522,11 @@
     var WZ = null;
     try { if (window.DpPdfWertZielbild) WZ = await window.DpPdfWertZielbild.daten({ potenzial: PD }); } catch (e) { WZ = null; }
     if (WZ) {
-      _titel = 'Wert & Zielbild'; _unter = (adr || 'Objekt') + ' · Werte je Verfahren';
+      /* v3018d · ohne angelegtes Zielbild heisst die Seite nicht „Wert & Zielbild" */
+      var _wzZ = !WZ.ohneZiel;
+      _titel = _wzZ ? 'Wert & Zielbild' : (PD ? 'Wert & Potenzial' : 'Wert je Verfahren'); _unter = (adr || 'Objekt') + ' · Werte je Verfahren';
       doc.addPage(); kopf(_titel, _unter);
-      einleitung('Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterhöhung und Zielbild entwickelt.');
+      einleitung('Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - ' + (_wzZ ? 'und wohin sich der Ertragswert mit Mieterhöhung und Zielbild entwickelt.' : (PD ? 'und wohin sich der Ertragswert mit der Mieterhöhung entwickelt.' : 'auf Basis der Miete im Bestand.')));
       /* v2900 · EIN Abschnitt (wie pdf.js): Werte je Verfahren, Wertlandschaft, dann das
          Wertpotenzial, dann Ausblick, Kernaussagen, Erklaerung. Die Tafel Ist/Soll/Zielbild
          entfaellt dort - die Kennzahlen je Stufe fuehren dieselben Werte; die Indikation

@@ -234,6 +234,25 @@ if (Test-Path "tools\kappungsgrenzen-pruefen.mjs") {
     Write-Host "   [ok] Kappungsgrenzen-Liste"
 }
 
+# v3021 - Jahreswerte-Register (Steuertarif, Soli, AfA-Fristen, VPI, Baupreisindex,
+# BWK, Angebotsabschlag ...). Marcel 28.10.2026: "jedes Jahr automatisch neu
+# ermitteln, und das muessen wir auch bei den Steuerdaten machen". Rot = ein
+# Wert ist ueberfaellig oder eine Spiegelstelle traegt einen anderen Wert;
+# "bald faellig" (60 Tage) ist gelb und bricht nicht ab.
+if (Test-Path "tools\jahreswerte-pruefen.mjs") {
+    $jw = node tools/jahreswerte-pruefen.mjs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $jw | Select-Object -Last 20
+        Write-Host ""
+        Write-Host "ABBRUCH: Jahreswert ueberfaellig oder Spiegelstellen ungleich." -ForegroundColor Red
+        Write-Host "         node tools/jahreswerte-pruefen.mjs --alle   (Agent: .claude/agents/jahreswerte.md)" -ForegroundColor Yellow
+        Write-Host ""
+        exit 1
+    }
+    $jw | Select-String "^\[gelb\]" | ForEach-Object { Write-Host ("   [!] Jahreswert " + $_.Line.Substring(8).Trim()) -ForegroundColor Yellow }
+    Write-Host "   [ok] Jahreswerte-Register"
+}
+
 # --- 4) Was geht raus? ------------------------------------------------
 git fetch origin $ZWEIG --quiet
 PruefeExit "git fetch"

@@ -151,8 +151,12 @@ fs.writeFileSync(join(WURZEL, 'frontend/landing/register-stand.js'), kopfText + 
 /* ── 4 · Videothek-Liste aus videos.json ──────────────────────────────── */
 const V = JSON.parse(fs.readFileSync(join(WURZEL, 'frontend/landing/assets/videothek/videos.json'), 'utf8'));
 const kat = Object.fromEntries((V.kategorien || []).map((k) => [k.id, k.name]));
+/* messe-schleife-8 · Marcel 28.10.2026: „das in der Messe-Schleife-Seite auch machen können bei den Videos" —
+   die Kapitel mit Zeit (videos.json `kapitel: [{t, titel}]`) gehen mit, damit der Kanal Videothek sie
+   als Marken zeigt und anspringt. Nur Kapitel MIT Zeit; Stichworte bleiben in der Landing (Suche). */
 const liste = V.videos.map((v) => ({ id: v.id, nr: v.nr, kategorie: kat[v.kategorie] || v.kategorie, titel: v.titel,
-  unterzeile: v.unterzeile, datei: v.datei, dauer: v.dauer }));
+  unterzeile: v.unterzeile, datei: v.datei, dauer: v.dauer,
+  kapitel: (v.kapitel || []).filter((c) => c && typeof c.t === 'number' && isFinite(c.t)).map((c) => ({ t: c.t, titel: c.titel })) }));
 fs.writeFileSync(join(ZIEL, 'videothek-liste.js'), kopfText
   + 'window.DPS_VIDEOTHEK = ' + JSON.stringify({ stand: V.stand, videos: liste }, null, 1) + ';\n');
 
@@ -163,4 +167,5 @@ console.log('Register ' + stand + ' (' + R.register_commit + (R.register_lokal_g
   + ' · Länder mit Wert ' + k.laender_mit_wert + ' (mit Sätzen ' + k.laender_erfasst + '/' + k.laender_gesamt + ')');
 console.log('Herkunft: Ausschuss ' + R.herkunft.mit_ausschuss + ', Jahrgang ' + R.herkunft.mit_jahrgang + ', Quelle ' + R.herkunft.mit_quelle
   + ', Seite ' + R.herkunft.mit_seite + ' von ' + werte + ' · Jahrgänge ' + jmin + '–' + jmax);
-console.log('Videothek ' + V.stand + ': ' + liste.length + ' Videos, ' + liste.reduce((s, v) => s + v.dauer, 0) + ' s');
+console.log('Videothek ' + V.stand + ': ' + liste.length + ' Videos, ' + liste.reduce((s, v) => s + v.dauer, 0) + ' s, '
+  + liste.reduce((s, v) => s + v.kapitel.length, 0) + ' Kapitel mit Zeit');

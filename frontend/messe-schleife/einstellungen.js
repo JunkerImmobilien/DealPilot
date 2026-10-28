@@ -10,6 +10,11 @@
    Vorrang: Menü > gewinnspiel.js. Taste G schaltet das Gewinnspiel weiter
    sofort um und schreibt es jetzt auch hierher.
 
+   messe-schleife-8 (28.10.2026): Schalter „Kapitelleiste im Video“ (kapitel, Kanal Videothek).
+
+   messe-schleife-7 (28.10.2026): Gruppe „Werbung" — werbung (an/aus),
+   werbung_nach, werbung_sek; Startkanal auch „werbung" (werbung.js).
+
    Läuft auch von der Platte (file://), ohne Netz.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -25,8 +30,12 @@
     app_nach: 5,                         /* Videothek: nach jedem n-ten Video */
     app_sek: 16,
     aufruf: true,                        /* Aufruf-Tafel „Jetzt kostenlos testen" */
-    start: 'rundgang',                   /* Startkanal ohne ?idee=: rundgang | videothek | auswahl */
-    leiste: true                         /* Leiste unten bei Mausbewegung */
+    werbung: true,                       /* messe-schleife-7 · Werbebilder zwischendurch (werbung.js) */
+    werbung_nach: 3,                     /* nach jeder n-ten Station (Rundgang) bzw. jedem n-ten Video (Videothek) */
+    werbung_sek: 10,                     /* Sekunden je Bild, auch im Kanal Werbung */
+    start: 'rundgang',                   /* Startkanal ohne ?idee=: rundgang | videothek | werbung | auswahl */
+    leiste: true,                        /* Leiste unten bei Mausbewegung */
+    kapitel: true                        /* messe-schleife-8 · Kapitelleiste im Video (Kanal Videothek) */
   };
   var E = Object.assign({}, VORGABE);
   try { var roh = JSON.parse(localStorage.getItem(SCHLUESSEL) || 'null'); if (roh && typeof roh === 'object') Object.keys(VORGABE).forEach(function (k) { if (roh[k] !== undefined) E[k] = roh[k]; }); } catch (e) { /* ohne Speicher: Vorgaben */ }
@@ -42,11 +51,16 @@
     ['app_sek', 'DealPilot in Zahlen: Sekunden', 'zahl', 8, 40],
     ['register', 'Register-Tafel (amtliche Werte)', 'schalter'],
     ['aufruf', 'Aufruf „Jetzt kostenlos testen“', 'schalter'],
+    ['Werbung', null],
+    ['werbung', 'Werbebilder zwischendurch', 'schalter'],
+    ['werbung_nach', 'Werbung nach jeder … Station bzw. jedem … Video', 'zahl', 1, 30],
+    ['werbung_sek', 'Werbung: Sekunden je Bild (auch Kanal W)', 'zahl', 4, 60],
     ['Videothek', null],
     ['app_nach', 'DealPilot in Zahlen nach jedem … Video', 'zahl', 1, 30],
     ['register_nach', 'Register-Tafel nach jedem … Video', 'zahl', 1, 30],
+    ['kapitel', 'Kapitelleiste im Video (Tippen springt)', 'schalter'],
     ['Start', null],
-    ['start', 'Kanal beim Öffnen', 'wahl', [['rundgang', 'Rundgang'], ['videothek', 'Videothek'], ['auswahl', 'Auswahl']]],
+    ['start', 'Kanal beim Öffnen', 'wahl', [['rundgang', 'Rundgang'], ['videothek', 'Videothek'], ['werbung', 'Werbung (Dauerschleife)'], ['auswahl', 'Auswahl']]],
     ['leiste', 'Leiste bei Mausbewegung', 'schalter']
   ];
 
@@ -68,7 +82,7 @@
       h += '</label>';
     });
     h += '</div><div class="dps-menue-fuss"><button type="button" data-a="reset">Zurücksetzen</button><button type="button" data-a="neu">Neu starten</button><button type="button" data-a="zu" class="dps-ja">Fertig</button></div>'
-      + '<div class="dps-menue-hilfe">Tasten: E Menü · G Gewinnspiel · N nächstes · F Vollbild · R Rundgang · V Videothek</div></div>';
+      + '<div class="dps-menue-hilfe">Tasten: E Menü · G Gewinnspiel · N nächstes · F Vollbild · R Rundgang · V Videothek · W Werbung<br>Videothek: ← → Kapitel · Leertaste Pause/Weiter · Maus bewegen oder Bild antippen zeigt die Kapitelleiste</div></div>';
     w.innerHTML = h;
     w.addEventListener('change', function (ev) {
       var t = ev.target, k = t.getAttribute('data-k'); if (!k) return;

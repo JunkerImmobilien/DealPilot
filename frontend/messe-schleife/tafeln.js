@@ -13,6 +13,8 @@
        Fehlt die Bilddatei, entfällt die Tafel still.
 
    Beide Tafeln nutzen den Rahmen .rg-t der Rundgang-Tafeln (Einblenden).
+   Die Werbe-Tafel (messe-schleife-7) hängt werbung.js als
+   DPSTafeln.werbung an — deshalb wird werbung.js NACH tafeln.js geladen.
    Gold nur über var(--g) = var(--wl-c9a84c, #C9A84C) aus schleife.css.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {

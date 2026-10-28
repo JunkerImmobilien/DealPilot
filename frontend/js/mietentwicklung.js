@@ -467,7 +467,7 @@ window.MietEntwicklung = (function() {
               + ' wird <b>keine</b> Steigerung angenommen' + (st.soll && (st.soll_ab || st.soll_termin) ? ', bis ihre Soll-Miete greift' : '') + '.'
             : '')
         + (st.soll && st.soll_ab ? (st.soll_roh >= 1900 ? ' Ab ' + st.soll_roh : ' Ab Jahr ' + st.soll_ab) + ' gilt je Wohnung die <b>Soll-Miete</b> (' + st.soll + ' Wohnungen).' : '')
-        + (st.soll && !st.soll_ab && st.soll_termin ? ' Je Wohnung gilt ab ihrem Termin die <b>Soll-Miete</b> (' + st.soll_termin + ' Wohnungen: 15 Monate nach der letzten Erhöhung oder eigene Angabe).' : '')   /* v2481 */
+        + (st.soll && !st.soll_ab && st.soll_termin ? ' Je Wohnung gilt ab ihrem Termin die <b>Soll-Miete</b> (' + st.soll_termin + ' Wohnungen: ab dem Wirksamwerden – Verlangen frühestens ein Jahr nach der letzten Erhöhung, wirksam ab dem dritten Kalendermonat nach Zugang, § 558b Abs. 1 BGB – oder eigene Angabe).' : '')   /* v2481 */
         + (st.soll && !st.soll_ab && !st.soll_termin ? ' Soll-Mieten sind erfasst, aber ohne Jahr \u2014 sie gehen noch nicht ein (Konfigurator, Schritt 4).' : '')
         + '</div>';
       if (st.index > 0) {

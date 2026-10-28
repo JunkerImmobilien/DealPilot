@@ -354,6 +354,8 @@ window.DealPilotInvestmentProfile = (function() {
       '<div class="ip-grid">',
         field('ip_angebot_abschlag_pct', 'Abschlag auf Angebotspreise', p.angebot_abschlag_pct, '%',
           (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'leer = Ø Markt ' + String(m.pct).replace('.', ',') + ' %' : 'leer = Marktdurchschnitt'; })()),
+        /* v3026 · Indexmiete (§ 557b BGB): Zukunft ist KEIN amtlicher Wert - die Annahme gehört dem Nutzer */
+        field('ip_indexmiete_vpi_pct', 'Indexmiete: Preisanstieg ab heute (Annahme)', p.indexmiete_vpi_pct, '% p. a.', 'leer = 2,0 % (Annahme, kein amtlicher Wert)'),
       '</div>',
 
       // V63.96: KI-Analyse-Parameter wandern in den Settings-Tab "KI" (Marcels Wunsch).
@@ -431,6 +433,7 @@ window.DealPilotInvestmentProfile = (function() {
       grest_auto:             (function(){ var c = document.getElementById('ip_grest_auto'); return c ? !!c.checked : null; })(),
       maklerkosten:           v('ip_maklerkosten'),
       angebot_abschlag_pct:   v('ip_angebot_abschlag_pct'),   /* v2237 · leer -> Marktdurchschnitt */
+      indexmiete_vpi_pct:     v('ip_indexmiete_vpi_pct'),     /* v3026 · leer -> 2,0 % Annahme */
       bundesland:             s('ip_bundesland'),
       // V63.90: KI-Analyse-Standards
       ai_strat:               s('ip_ai_strat'),

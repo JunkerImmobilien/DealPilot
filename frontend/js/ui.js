@@ -1106,6 +1106,12 @@ function _buildAIPayload() {
       try { return (window.DpPotenzial && DpPotenzial.pilotPayload) ? DpPotenzial.pilotPayload() : null; }
       catch (e) { return null; }
     })(),
+    /* v3026 · Indexmiete (§ 557b BGB) je Wohnung und Summe - gerechnet von js/indexmiete.js aus dem
+       amtlichen VPI; null ohne Indexvertrag (dann fragt der Prompt nichts dazu). */
+    indexmiete: (function () {
+      try { return (window.DpPotenzial && DpPotenzial.indexmieteDaten) ? DpPotenzial.indexmieteDaten() : null; }
+      catch (e) { return null; }
+    })(),
     ankauf: (function () {
       var AK = window.DealPilotAnkauf;
       if (!AK || !AK.vorhanden()) return null;
@@ -1384,8 +1390,22 @@ function _buildAIPayload() {
           var _gesetzt = [];
           var _ZU_ROH = { strategie: 'ai_strat', risikoneigung: 'ai_risk',
             verkaeufer_druck: 'ai_verk', marktlage: 'ai_markt' };
+          /* v3022 · Entwurf „Einstellungen schlank" (einstellungen-schlank.js):
+             Marktphase und Verkäuferbereitschaft stehen dort nicht mehr in
+             den Einstellungen — also dürfen sie das Urteil auch nicht
+             verschieben. Die Marktlage fällt weg; den Verkäuferdruck gibt es
+             nur noch je Objekt (Reiter Pilot-Analyse), und nur, wenn er
+             angegeben ist. Ohne Schalter bleibt alles wie bisher. */
+          var _schlank = !!(window.DpEinstSchlank && DpEinstSchlank.aktiv && DpEinstSchlank.aktiv());
+          var _verkObj = '';
+          if (_schlank) {
+            delete _prof.marktlage;
+            _verkObj = DpEinstSchlank.verkaeuferObjekt ? DpEinstSchlank.verkaeuferObjekt() : '';
+            if (_verkObj) _prof.verkaeufer_druck = _verkObj; else delete _prof.verkaeufer_druck;
+          }
           Object.keys(_prof).forEach(function (k) {
             if (_prof[k] == null || _prof[k] === '') { delete _prof[k]; return; }
+            if (_schlank && k === 'verkaeufer_druck') { _gesetzt.push(k); return; }
             var rk = _ZU_ROH[k] || k;
             if (_roh[rk] != null && _roh[rk] !== '') _gesetzt.push(k);
           });
@@ -2294,6 +2314,10 @@ function _renderAIServerAnalysis(a) {
   var _potHtml = (function () {
     var PZ = window.DpPotenzial; var t = '';
     try { t = PZ && PZ.tafelHtml ? PZ.tafelHtml() : ''; } catch (e) { t = ''; }
+    /* v3026 · Indexmiete: eine Zeile in derselben Karte (kein eigener Reiter); ohne Indexvertrag nichts */
+    var _im = null; try { _im = PZ && PZ.indexmieteDaten ? PZ.indexmieteDaten() : null; } catch (e) { _im = null; }
+    if (_im && _im.zeile) t += '<div class="dp-idx-zeile" style="margin-top:10px;padding:8px 12px;border:1px solid #E6DCC2;border-radius:10px;background:#FBF6E9;font:12.5px/1.45 Inter,sans-serif;color:#2A2727">'
+      + String(_im.zeile).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
     if (!t) return '';
     return '<div class="dp-pa-card">' + sec('', I.bank, 'ANKAUF \u00b7 BESTAND \u00b7 ZIELBILD') + '<div data-dp-pot-wirt="1">' + t + '</div>'
       + (has(a.potenzial_text) ? '<div style="margin-top:12px">' + sec('', I.bank, 'PILOT: WAS IM HAUS STECKT') + (function () {

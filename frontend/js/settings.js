@@ -531,7 +531,7 @@ function showSettings(initialTab) {
         // ohne Argument → undefined. Das warf TypeError beim Zugriff auf .ai_strat und
         // verhinderte das gesamte Settings-Modal-Render. Jetzt direkt einzelne Keys abfragen.
         '<h3 class="set-section-h" style="margin-top:24px">Standard-Analyseparameter</h3>' +
-        '<p class="hint" style="margin-top:-6px;margin-bottom:14px">Diese Werte fließen in jeden Pilot-Analyse-Prompt ein. Sie sind pro Objekt im KI-Tab überschreibbar.</p>' +
+        '<p class="hint" style="margin-top:-6px;margin-bottom:14px">Diese Werte fließen in jeden Pilot-Analyse-Prompt ein und gelten für alle Objekte.</p>' +   /* v3022: „pro Objekt im KI-Tab überschreibbar" stimmte nicht — es gibt kein solches Feld am Objekt, ui.js liest nur das Profil */
         (function() {
           var ipApi = (window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get) ? DealPilotInvestmentProfile : null;
           var aiStrat = (ipApi ? ipApi.get('ai_strat') : null) || 'Buy & Hold (Langfristig halten)';
@@ -539,6 +539,13 @@ function showSettings(initialTab) {
           var aiRisk  = (ipApi ? ipApi.get('ai_risk')  : null) || 'Moderat (ausgewogen)';
           var aiMarkt = (ipApi ? ipApi.get('ai_markt') : null) || 'Ausgeglichen (stabil)';
           function opts(arr, sel) {
+            /* v3022: Ein gespeicherter Text, der nicht in der Liste steht, wird als
+               eigene Option gezeigt. Gemessen: das Einrichtungsfenster schreibt
+               ai_risk = "Konservativ (sicherheitsorientiert)" bzw. "Chancenorientiert
+               (höheres Risiko)" (onboarding.js GRENZEN) — beide fehlten hier, der
+               Browser zeigte die ERSTE Option, und jedes Speichern der Einstellungen
+               schrieb still "Konservativ (Sicherheit ist wichtigst)" zurück. */
+            if (sel && arr.indexOf(sel) < 0) arr = arr.concat([sel]);
             return arr.map(function(o){
               return '<option' + (o === sel ? ' selected' : '') + '>' + o + '</option>';
             }).join('');
@@ -1693,14 +1700,19 @@ function _v192ShowProHintIfNeeded() {
     if (rs2) rs2.style.display = 'none';
     
     // Hint einfügen ganz oben in der Pane
+    /* v3018c · ab custom_logo (Investor) stehen Absender und Logo im PDF (config.js branding.fuerPdf) */
+    var _pdfAbs = false;
+    try { _pdfAbs = !!(window.DealPilotConfig && DealPilotConfig.pricing && DealPilotConfig.pricing.hasFeature('custom_logo')); } catch (e) {}
     var hint = document.createElement('div');
     hint.className = 'v192-pro-hint';
     hint.style.cssText = 'background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05));border:1px solid rgba(201,168,76,0.40);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px';
     hint.innerHTML = 
       '<div style="display:flex;align-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-star"/></svg></div>' + /* v838-sparkle-svg */
       '<div style="flex:1">' +
-      '<div style="font-weight:600;color:#9a7f33;margin-bottom:2px;font-size:15px">Eigenes Branding nur im Pro-Plan</div>' +
-      '<div style="font-size:12px;color:rgba(42,39,39,0.7);line-height:1.4">Im Pro-Plan kannst du deine eigenen Firmen- und Kontaktdaten hinterlegen — sie erscheinen dann im <strong>Deal-Aktion-Banner</strong>, den <strong>Anfrage-Karten</strong> und in <strong>PDF-Exports</strong>. Aktuell wird Junker Immobilien angezeigt.</div>' +
+      '<div style="font-weight:600;color:#9a7f33;margin-bottom:2px;font-size:15px">' + (_pdfAbs ? 'Eigenes Branding außerhalb der PDFs ab Pro' : 'Eigenes Branding ab Investor (PDF) bzw. Pro') + '</div>' +
+      '<div style="font-size:12px;color:rgba(42,39,39,0.7);line-height:1.4">' + (_pdfAbs
+        ? 'Deine Firmen- und Kontaktdaten und dein Logo stehen in deinen <strong>PDF-Exports</strong>. Im <strong>Deal-Aktion-Banner</strong> und auf den <strong>Anfrage-Karten</strong> erscheinen sie ab dem Pro-Plan.'
+        : 'Ab dem Investor-Plan stehen deine Firmen- und Kontaktdaten und dein Logo in deinen <strong>PDF-Exports</strong>, ab Pro auch im <strong>Deal-Aktion-Banner</strong> und auf den <strong>Anfrage-Karten</strong>. Bis dahin tragen deine PDFs keinen Absender.') + '</div>' +
       '</div>' +
       '<button type="button" onclick="closeSettings(); if(typeof openPricingModal===\'function\') openPricingModal();" style="background:#C9A84C;color:#2A2727;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-size:12px;white-space:nowrap">Pro ansehen</button>';
     pane.insertBefore(hint, pane.firstChild);

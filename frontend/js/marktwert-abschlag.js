@@ -27,23 +27,42 @@
   function cfg() { var w = eltern(); return global.DealPilotConfig || (w && w.DealPilotConfig) || null; }
   function profil() { var w = eltern(); return global.DealPilotInvestmentProfile || (w && w.DealPilotInvestmentProfile) || null; }
 
-  /** recherchierter Marktdurchschnitt { pct, stand, quelle, url } */
-  function markt() { var c = cfg(); return (c && c.angebotAbschlagMarkt) || { pct: 5.8, stand: 'Dezember 2025', quelle: 'ImmoScout24-Marktanalyse' }; }
+  /* v3021 · Der Marktdurchschnitt kommt aus EINER Quelle - dem Marktbericht-Backend
+     (lib/angebot_abschlag.js: Recherche, ab dem 15.01. der DealPilot-Marktdurchschnitt
+     aus Ortsmessungen). Bis v3020 stand hier und in config.js eine eigene 5,8. Ohne
+     Antwort gibt es KEINE Zahl: dann zieht die Karte nur ab, was der Bericht selbst
+     abgezogen hat (angebot_abschlag kommt im Ergebnis mit). */
+  var _laedt = false;
+  function laden() {
+    if (_laedt) return;
+    var A = global.Auth;
+    if (!A || typeof A.apiCall !== 'function') return;   /* QC-iframe: liest den Wert der Eltern-App */
+    _laedt = true;
+    A.apiCall('/marktbericht/jahreswerte/angebotsabschlag', { method: 'GET' }).then(function (r) {
+      if (r && isFinite(Number(r.pct))) {
+        var c = global.DealPilotConfig;
+        if (c) c.angebotAbschlagMarkt = { pct: Number(r.pct), stand: r.stand || null, segmente: r.segmente || null };
+      } else { _laedt = false; }
+    }).catch(function () { _laedt = false; });
+  }
+  /** Marktdurchschnitt { pct, stand, segmente } oder null (noch nicht geladen) */
+  function markt() { var c = cfg(); var m = c && c.angebotAbschlagMarkt; if (!m) laden(); return m || null; }
 
-  /** gültiger Satz in Prozent - eigener Wert, sonst Marktdurchschnitt */
+  /** gültiger Satz in Prozent - eigener Wert, sonst Marktdurchschnitt, sonst null */
   function satz() {
     var P = profil(), v = null;
     try { v = P && P.get ? P.get('angebot_abschlag_pct') : null; } catch (e) {}
     var n = (v == null || v === '') ? NaN : Number(String(v).replace(',', '.'));
-    return (isFinite(n) && n >= 0 && n < 50) ? n : markt().pct;
+    if (isFinite(n) && n >= 0 && n < 50) return n;
+    var m = markt();
+    return m && isFinite(Number(m.pct)) ? Number(m.pct) : null;
   }
   /** woher der Satz kommt - für Hinweise und den Urteilstext.
       v2237d · Marcel: „bitte auch keine Quelle wie ImmobilienScout angeben" -
       nach außen steht nur, OB es der Marktdurchschnitt oder dein Wert ist;
       Quelle, Stand und Link bleiben intern in config.js. */
   function quelle() {
-    var m = markt(), s = satz();
-    return Math.abs(s - m.pct) < 1e-9 ? 'aktueller Marktdurchschnitt' : 'dein Wert aus den Einstellungen';
+    return eigen() == null ? 'aktueller Marktdurchschnitt' : 'dein Wert aus den Einstellungen';   /* v3021: nicht mehr am Zahlenvergleich */
   }
 
   /* v2490 · der EIGENE Satz aus den Einstellungen, sonst null - EINE Stelle fuer
@@ -69,7 +88,9 @@
 
   function anwenden(card) {
     if (!card || !card.mw || card.abschlag) return card;
-    var s = satz(), f = 1 - s / 100;
+    var s = satz();
+    if (s == null) return card;   /* v3021 · kein Satz bekannt - nichts erfinden */
+    var f = 1 - s / 100;
     var roh = { low: card.mw.low, med: card.mw.med, high: card.mw.high };
     ['low', 'med', 'high'].forEach(function (k) { if (card.mw[k] != null && isFinite(card.mw[k])) card.mw[k] = Math.round(card.mw[k] * f / 1000) * 1000; });   /* auf volle 1.000 € - eine Schätzung ist nicht eurogenau */
     if (card.area && card.mw.med) card.mw.sqm = Math.round(card.mw.med / card.area).toLocaleString('de-DE') + ' €/m²';
@@ -116,5 +137,7 @@
       .observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  global.DealPilotAbschlag = { satz: satz, markt: markt, quelle: quelle, anwenden: anwenden, eigen: eigen, herkunftText: herkunftText };
+  global.DealPilotAbschlag = { satz: satz, markt: markt, quelle: quelle, anwenden: anwenden, eigen: eigen, herkunftText: herkunftText, laden: laden };
+  /* v3021 · frueh laden (Profil-Hinweis „leer = Ø Markt x %") und nach der Anmeldung erneut */
+  try { laden(); global.addEventListener('dp:plan-ready', function () { laden(); }); } catch (e) {}
 })(window);

@@ -279,11 +279,13 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `ki-text-zahlen-pruefen.mjs` | KI-Fließtext des Marktberichts: Prozente/Zählungen gegen die vorab gerechneten Prüfzahlen (`lib/ki_text_pruefung.js`, v2670) |
 | `messe-schleife-daten.mjs` | erzeugt Register- und Videothek-Zahlen der Messe-Schleife **und die Registerkarten auf „Wie wir rechnen“** (`frontend/landing/register-stand.js`, seit landing-methodik-3); nach jeder Ernte laufen lassen und beide `register-stand.js` mitcommitten |
 | `sperren-anfrageliste.mjs` | jede Sperre des Registers je Gutachterausschuss mit Grund (`zugang`), Kennzahlen, Preis, Link und belegter E-Mail der Geschäftsstelle (`lib/ausschuss_kontakte.json`) → `Dateien/Register/Sperren-Anfrageliste.csv/.md`, `--land=XX`; dieselbe Rechnung (`lib/sperren_anfragen.js`) speist Admin › „Register & Ernte“ › „Anfragen an Ämter“ (Status in `mb.amt_anfragen`); nach jeder Ernte laufen lassen |
+| `jahreswerte-pruefen.mjs` | Jahreswerte-Register `marktbericht/backend/src/lib/data/jahreswerte.json` (ESt-Tarif, Soli, AfA-Fristen, GrESt, VPI, Baupreisindex, BWK, Angebotsabschlag, BelWertV, BRW-Jahrgang …): RC=1 bei überfällig (außer `automatisch`) oder ungleichen Spiegelstellen, gelb bei ≤ 60 Tagen; Tarif-Stetigkeit an den Zonengrenzen; läuft in `deploy-staging.ps1` mit. Wer einen Jahreswert ändert, zieht `erwartet`/`faellig_am` im Register nach (v3021) |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
 Harvest-Takt gefundenen PDFs auswerten), `datenwaechter` (Deckung und Stand
-von Makro, Zensus, Register), `aemter-recherche` (Ämter mit belegter Quelle).
+von Makro, Zensus, Register), `aemter-recherche` (Ämter mit belegter Quelle),
+`jahreswerte` (fällige Steuer- und Jahreswerte mit amtlicher Fundstelle, v3021).
 Keiner schreibt in eine Datenbank oder fasst Produktion an.
 
 ## Namensräume nie mischen

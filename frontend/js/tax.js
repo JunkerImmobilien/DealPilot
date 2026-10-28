@@ -137,6 +137,23 @@ var Tax = (function() {
      Jahrgaenge braucht nur, wer eine alte Veranlagung nachrechnet.
      ══════════════════════════════════════════════════════════════════════ */
   var TARIFE = {
+    /* v3021 · Tarif 2025 nachgetragen - jetzt aus der Primaerquelle belegt
+       (oben stand: Zonen 4 und 5 fuer 2025 nicht belegbar). Wortlaut
+       BGBl. 2024 I Nr. 449 vom 30.12.2024 (Steuerfortentwicklungsgesetz),
+       Artikel 1 Nr. 2 (§ 32a Abs. 1 „ab dem Veranlagungszeitraum 2025"),
+       Seite 2; Soli-Freigrenze Artikel 3 Nr. 1 a) bb) (§ 3 Abs. 3 Satz 1
+       Nr. 2 SolZG: 19.950 EUR, Zusammenveranlagung 39.900 EUR). Gelesen am
+       28.10.2026 aus recht.bund.de/bgbl/1/2024/449/regelungstext.pdf.
+       Probe an den Zonengrenzen: stetig wie 2026 (tools/jahreswerte-pruefen.mjs). */
+    2025: {
+      quelle: '§ 32a Abs. 1 EStG, Fassung ab VZ 2025 — BGBl. 2024 I Nr. 449, Art. 1 Nr. 2, gelesen 28.10.2026',
+      grundfreibetrag: 12096,
+      z2bis: 17443, z2a: 932.30, z2b: 1400,
+      z3basis: 17443, z3bis: 68480, z3a: 176.64, z3b: 2397, z3c: 1015.13,
+      z4bis: 277825, z4satz: 0.42, z4c: 10911.92,
+      z5satz: 0.45, z5c: 19246.67,
+      soliFreigrenze: 19950
+    },
     2026: {
       quelle: '\u00a7 32a Abs. 1 EStG, Fassung ab VZ 2026 \u2014 gesetze-im-internet.de, abgerufen 13.09.2026',
       grundfreibetrag: 12348,

@@ -70,3 +70,27 @@ export function baupreisindexAm(stichtag) {
     text: 'Baupreisindex ' + String(wert).replace('.', ',') + ' (2010 = 100; ' + mo + '/' + j + ': ' + String(roh).replace('.', ',') + ' auf Basis 2021, Statistisches Bundesamt)',
     quelle: BPI_TABELLE.quelle, quelle_url: BPI_TABELLE.quelle_url };
 }
+
+/* v3021 · AUTOMATISCH GEHOLTE QUARTALE (lib/destatis_reihen.js, JahreswerteService).
+   Die Tabelle oben bleibt der Rueckfall und hat Vorrang: ein hier belegter Wert wird
+   nie ueberschrieben - nur NEUE Quartale kommen dazu, und nur solche, die die
+   Plausibilitaetspruefung bestanden haben (status 'aktiv' in mb.jahreswerte_abruf).
+   Veroeffentlicht gilt ab dem „Stand" der gelesenen Seite, sonst ab dem Abruftag -
+   frueher war der Wert fuer DealPilot nachweislich nicht sichtbar. */
+BPI_TABELLE.abgerufen = {};
+export function uebernimmAbruf(zeilen) {
+  let neu = 0;
+  for (const z of zeilen || []) {
+    const k = String(z.periode || '');
+    const w = Number(z.wert);
+    if (!/^\d{4}-(02|05|08|11)$/.test(k) || !(w > 0)) continue;
+    if (BPI_TABELLE.monate[k] != null && !BPI_TABELLE.abgerufen[k]) continue;   /* belegt im Code - bleibt */
+    const ab = String(z.abgerufen_am instanceof Date ? z.abgerufen_am.toISOString() : (z.abgerufen_am || '')).slice(0, 10);
+    const st = z.quelle_stand ? String(z.quelle_stand instanceof Date ? z.quelle_stand.toISOString() : z.quelle_stand).slice(0, 10) : null;
+    BPI_TABELLE.monate[k] = w;
+    BPI_TABELLE.veroeffentlicht[k] = (st && st >= k + '-01') ? st : ab;
+    BPI_TABELLE.abgerufen[k] = { abgerufen_am: ab, quelle_stand: st, weg: z.weg || null };
+    neu++;
+  }
+  return neu;
+}

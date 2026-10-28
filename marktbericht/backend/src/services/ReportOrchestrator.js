@@ -52,6 +52,7 @@ import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v132
 import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 import { objektartNormal, gewerbeArt, zinsObjektart, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
 import { zensusMieteAmStichtag } from '../lib/zensus_miete.js';   /* v2993 */
+import { protokolliereMessung as protokolliereAbschlag } from './JahreswerteService.js';   /* v3021 */
 import { stichtagVon, stichtagJahr, stichtagIso } from '../lib/stichtag.js';   /* v3010 · Wertermittlungsstichtag */
 
 export const ReportOrchestrator = {
@@ -564,6 +565,9 @@ export const ReportOrchestrator = {
 
     // 6) Bewertung (inkl. Grundstuecks-Mehrflaechenkorrektur ueber BORIS-BRW)
     const valuation = ValuationService.compute(ref, sale, rent, landValue);
+    /* v3021 · oertliche Messung des Angebotsabschlags protokollieren (ohne Personenbezug),
+       Grundlage des jaehrlichen DealPilot-Marktdurchschnitts. Nie im Weg des Berichts. */
+    try { protokolliereAbschlag(valuation && valuation.market_value && valuation.market_value.angebot_abschlag).catch(() => {}); } catch (e) { /* egal */ }
 
     /* WPARAM-1 · Wertermittlungsparameter nach der Abdeckungs-Kaskade
      * (A amtlich kreisscharf ... D gesetzlicher Auffangwert, E Nutzereingabe).
