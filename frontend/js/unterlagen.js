@@ -240,7 +240,8 @@
   function name(k) { return NAMEN[k] || String(k).replace(/_/g, ' '); }
   function wert(k, x) {
     if (x === true) return 'ja'; if (x === false) return 'nein';
-    if (typeof x === 'number') return /_eur$/.test(k) ? eur(x) : x.toLocaleString('de-DE');
+    /* v3016y · Jahreszahlen und Nummern nie durch toLocaleString („2.026“) */
+    if (typeof x === 'number') return /_eur$/.test(k) ? eur(x) : /jahr|(^|_)(nr|plz)(_|$)/.test(k) ? String(x) : x.toLocaleString('de-DE');
     return String(x);
   }
   function risikoHtml(x) {
