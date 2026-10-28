@@ -21,7 +21,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-6';
+  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-7';   /* landing-videothek-7: Ue3 Komplettbeispiel, Modul 28 Unterlagen */
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */

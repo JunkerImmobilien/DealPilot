@@ -1,7 +1,7 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-28T17:47:06.725Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T21:52:48.826Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_VIDEOTHEK = {
- "stand": "2026-10-21",
+ "stand": "2026-10-28",
  "videos": [
   {
    "id": "ueberblick-1-quick-boarding",
@@ -98,6 +98,105 @@ window.DPS_VIDEOTHEK = {
     {
      "t": 225,
      "titel": "Investment-PDF"
+    }
+   ]
+  },
+  {
+   "id": "ueberblick-3-komplettbeispiel-mehrfamilienhaus",
+   "nr": "Ü3",
+   "kategorie": "Überblick",
+   "titel": "Komplettbeispiel Mehrfamilienhaus",
+   "unterzeile": "Ein Haus, zehn Kapitel: vom leeren Objekt bis zum PDF für die Bank.",
+   "datei": "dealpilot-ueberblick-3-komplettbeispiel-mehrfamilienhaus.mp4",
+   "dauer": 2628,
+   "kapitel": [
+    {
+     "t": 0,
+     "titel": "Einstieg"
+    },
+    {
+     "t": 35,
+     "titel": "Kapitel 1 · Reiter und Eingabestufen"
+    },
+    {
+     "t": 125,
+     "titel": "Kapitel 2 · Das Objekt anlegen"
+    },
+    {
+     "t": 306,
+     "titel": "Bodenrichtwert und Modernisierung"
+    },
+    {
+     "t": 488,
+     "titel": "Kapitel 3 · Die Einheiten"
+    },
+    {
+     "t": 558,
+     "titel": "Wohnung für Wohnung"
+    },
+    {
+     "t": 751,
+     "titel": "Kapitel 4 · Die Miete"
+    },
+    {
+     "t": 919,
+     "titel": "Kapitel 5 · Die Finanzierung"
+    },
+    {
+     "t": 1022,
+     "titel": "Das Darlehen"
+    },
+    {
+     "t": 1102,
+     "titel": "Kapitel 6 · Die Steuer"
+    },
+    {
+     "t": 1226,
+     "titel": "Kapitel 7 · Marktbericht und Wertermittlung"
+    },
+    {
+     "t": 1410,
+     "titel": "Der Liegenschaftszins"
+    },
+    {
+     "t": 1469,
+     "titel": "Abgleich im Objekt"
+    },
+    {
+     "t": 1559,
+     "titel": "Kapitel 8 · Das Zielbild"
+    },
+    {
+     "t": 1699,
+     "titel": "Mieterhöhung je Wohnung"
+    },
+    {
+     "t": 1878,
+     "titel": "Kapitel 9 · Unterlagen einlesen"
+    },
+    {
+     "t": 2016,
+     "titel": "Die Übernahme"
+    },
+    {
+     "t": 2089,
+     "titel": "Pilot-Analyse mit Unterlagen"
+    },
+    {
+     "t": 2221,
+     "titel": "Unterlagen nachreichen"
+    },
+    {
+     "t": 2443,
+     "titel": "Kapitel 10 · Das Ergebnis"
+    },
+    {
+     "t": 2515,
+     "titel": "Das PDF für die Bank"
+    },
+    {
+     "t": 2590,
+     "titel": "Abschluss"
     }
    ]
   },
@@ -1470,6 +1569,65 @@ window.DPS_VIDEOTHEK = {
     {
      "t": 477,
      "titel": "Keine Steuerberatung"
+    }
+   ]
+  },
+  {
+   "id": "modul-28-unterlagen-einlesen",
+   "nr": "28",
+   "kategorie": "Erweitert",
+   "titel": "Unterlagen einlesen",
+   "unterzeile": "Sieben PDFs auf einmal: gelesen, ausgewertet, übernommen.",
+   "datei": "dealpilot-modul-28-unterlagen-einlesen.mp4",
+   "dauer": 553,
+   "kapitel": [
+    {
+     "t": 0,
+     "titel": "Einstieg"
+    },
+    {
+     "t": 28,
+     "titel": "Kein Feld getippt"
+    },
+    {
+     "t": 70,
+     "titel": "Kapitel 2 · Lesen"
+    },
+    {
+     "t": 140,
+     "titel": "Personendaten geschwärzt"
+    },
+    {
+     "t": 196,
+     "titel": "Gemeinsame Auswertung"
+    },
+    {
+     "t": 223,
+     "titel": "Kapitel 3 · Auswerten und übernehmen"
+    },
+    {
+     "t": 299,
+     "titel": "These und Risiken"
+    },
+    {
+     "t": 364,
+     "titel": "Übernehmen"
+    },
+    {
+     "t": 421,
+     "titel": "Kapitel 4 · Pilot-Analyse"
+    },
+    {
+     "t": 463,
+     "titel": "Was absehbar Geld kostet"
+    },
+    {
+     "t": 500,
+     "titel": "Die genaue Ansicht"
+    },
+    {
+     "t": 534,
+     "titel": "Abschluss"
     }
    ]
   }
