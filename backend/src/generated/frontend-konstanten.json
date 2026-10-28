@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T09:45:44.884Z",
+ "erzeugt_am": "2026-10-28T10:32:28.191Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "5e8a72368e550d83",
-  "index-html": "92cb438a6e1bb88f",
+  "index-html": "e3577fd5bc08f8a8",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -3571,7 +3571,7 @@
      },
      {
       "h": "Marktpreis, Exposé und Sprache abrufen",
-      "text": "In der Leiste QUICKBOARDING PASS wählst du Quellen per Klick und startest mit Abrufen:\n• DealPilot — Marktbewertung mit Marktwert, Marktmiete und Lage. Braucht PLZ oder Ort und verbraucht 1 Bewertung aus deinem Kontingent.\n• Exposé / Marktbericht — ein PDF auslesen, die Werte landen in den Feldern.\n• Sprache — das Objekt frei einsprechen, im Plan enthalten.\n• ImmoMetrica — sobald der Zugang in den Einstellungen gespeichert ist.\n\nErst laufen Sprache, Exposé und ImmoMetrica, dann die Marktbewertung. Fehlt eine Angabe, hält der Abruf an, markiert das Feld und wartet auf Weiter.\n\nAchtung: Nach der Marktbewertung trägt DealPilot die Marktmiete in Grundmiete (€) ein. Willst du mit der Ist-Miete rechnen, trag sie danach wieder ein. Der Marktwert fließt in die Teilnote Potenzial und in den Zielkaufpreis.\n\nNeuer Vorgang (nach dem Abruf statt „Abrufen“) setzt alles zurück."
+      "text": "In der Leiste QUICKBOARDING PASS wählst du Quellen per Klick und startest mit Abrufen:\n• DealPilot — Marktbewertung mit Marktwert, Marktmiete und Lage. Braucht PLZ oder Ort und verbraucht 1 Bewertung aus deinem Kontingent.\n• Exposé / Dokumente — Exposé, Marktbericht und Unterlagen (Mieterliste, Mietvertrag, Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, auch Scans) auslesen; die Werte kommen zum Abgleich in die Felder, Risiken und Investitionsthese werden vorgeschlagen.\n• Sprache — das Objekt frei einsprechen, im Plan enthalten.\n• ImmoMetrica — sobald der Zugang in den Einstellungen gespeichert ist.\n\nErst laufen Sprache, Exposé und ImmoMetrica, dann die Marktbewertung. Fehlt eine Angabe, hält der Abruf an, markiert das Feld und wartet auf Weiter.\n\nAchtung: Nach der Marktbewertung trägt DealPilot die Marktmiete in Grundmiete (€) ein. Willst du mit der Ist-Miete rechnen, trag sie danach wieder ein. Der Marktwert fließt in die Teilnote Potenzial und in den Zielkaufpreis.\n\nNeuer Vorgang (nach dem Abruf statt „Abrufen“) setzt alles zurück."
      },
      {
       "h": "Als Objekt speichern",
@@ -5207,7 +5207,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "626759a7ed955b4a",
+  "hilfe": "01e158b92709991f",
   "bewertung": "bca98c7b04c452b7"
  }
 }

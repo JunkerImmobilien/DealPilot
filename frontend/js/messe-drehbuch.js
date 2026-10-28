@@ -1159,12 +1159,8 @@
         await warte(5500);
         _kiFrei = null;
       },
-      async function (s) {   /* 14 · Wertpuffer ab Tag 1 - steht seit v2237 im Urteil selbst */
-        await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && /Wertpuffer/.test(n.textContent) ? (n.parentElement || n) : qcEl('oab-results'); }, 8);
-        var real = _mbAkt.mw.med, kp = Number((qcEl('qc_kp') || {}).value) || 0;   /* v2237: Marktwert nach Abschlag, Kaufpreis live */
-        s.zeile('Und trotzdem spannend', 'Nicht deine Lage-Rendite — aber gekauft für <b>' + eur(kp) + '</b>, realistisch wert rund <b>' + eur(real) + '</b>: <b>+' + eur(real - kp) + '</b> Wertpuffer ab dem ersten Tag.');
-        await warte(7500);
-      },
+      /* v3016j · Szene 14 „Wertpuffer ab dem ersten Tag“ gestrichen (Marcel 28.10.2026): sie rechnete aus der
+         Marktpreisindikation, und die gilt in der App seit v2996 nicht als Wertpuffer. */
       async function (s) {   /* 15 · Als Objekt speichern - gezeigt, nicht geklickt */
         await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
         s.zeile('Als Objekt speichern', 'Passt er zu dir? <b>Ein Klick</b> — als Objekt gespeichert, mit allen Werten, Quellen und der Pilot-Analyse.');

@@ -378,7 +378,8 @@
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">'
           + '<span class="k-heute">Daten einlesen</span>'
           + '<span class="k-neu">Daten \u00fcbernehmen aus</span></span><div class="dp-pf-row">' +
-          pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
+          /* v3016j · Marcel 28.10.2026: „Exposé/Marktbericht umbenennen in Exposé/Dokumente … auch der Tooltip" */
+          pfTileTool('import', _doc, 'Expos\u00e9 / Dokumente', 'Exposé, Marktbericht und Unterlagen einlesen – Mieterliste, Mietvertrag, Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, auch Scans. Die Werte kommen zum Abgleich, Risiken und Investitionsthese werden vorgeschlagen, die WEG-Auswertung steht danach in der Pilot-Analyse.') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen — im Plan enthalten') : '') +
           /* v2217 · ImmoMetrica vor die geführte Eingabe: erst die Quellen, die der
              Riegel sperrt, dann die freien - der Freigeben-Knopf liegt mittig
