@@ -137,8 +137,6 @@ for (const mo of Object.keys(monate).sort()) {
     if (d >= SEIT) rows.push(`| ${d} | ${de(h)} | ${hp.map(de).join(' | ')} | ${hF == null ? '–' : de(hF)} | ${x.n} | ${msg} | ${apTop} | ${tat.replace(/\|/g, '/')} |`);
     csv.push([mo, d, de(h), ...hp.map(de), hF == null ? '' : de(hF), x.n, msg, apTop, '"' + tat.replace(/"/g, "'").replace(/;/g, ',') + '"'].join(';'));
   }
-  if (mo < SEIT.slice(0, 7)) continue;
-  if (fs.existsSync(file) && /Geprüft und freigegeben: *[^_\s]/.test(fs.readFileSync(file, 'utf8'))) { console.log('unterschrieben, bleibt:', mo); continue; }
   /* Handnachträge überleben das Neuschreiben */
   let nachtrag = ['| Datum | Stunden | Projekt | AP | Tätigkeit |', '|---|---:|---|---|---|', '| | | | | |'];
   if (fs.existsSync(file)) {
@@ -146,6 +144,12 @@ for (const mo of Object.keys(monate).sort()) {
     const m = alt.match(/## Nachträge von Hand\n\n([\s\S]*?)\n\n_Geprüft und freigegeben/);
     if (m && m[1].trim() && /\d/.test(m[1].split('\n').slice(2).join(''))) nachtrag = m[1].trim().split('\n');
   }
+  /* 28.10.2026 · Handnachträge zählen in Summe und CSV mit (Marcel: Testpauschale 10 h je Monat) */
+  let nachH = 0;
+  nachtrag.slice(2).forEach((z) => { const c = z.split('|').map((x) => x.trim()); const n = parseFloat(String(c[2] || '').replace(',', '.'));
+    if (isFinite(n) && n > 0) { nachH += n; csv.push([mo, c[1], de(n), c[3] === 'Portfolio-Strategie' ? '' : de(n), c[3] === 'Portfolio-Strategie' ? de(n) : '', '', '', '', c[4] || '', '"Nachtrag von Hand: ' + (c[5] || '').replace(/"/g, "'").replace(/;/g, ',') + '"'].join(';')); } });
+  if (mo < SEIT.slice(0, 7)) continue;
+  if (fs.existsSync(file) && /Geprüft und freigegeben: *[^_\s]/.test(fs.readFileSync(file, 'utf8'))) { console.log('unterschrieben, bleibt:', mo); continue; }
   const apLines = Object.entries(apSum).sort((a, b) => Number(a[0]) - Number(b[0])).map(([k, v]) => `| AP ${k} | ${AP[k] || ''} | ${de(Math.round(v * 4) / 4)} |`);
   fs.writeFileSync(file, [
     `# Stundennachweis ${mo} · Vorhaben 827-757-583/2026-1/1`, '',
@@ -158,13 +162,13 @@ for (const mo of Object.keys(monate).sort()) {
     '> ein Arbeitspaket treffen – die endgültige Aufteilung macht der Berater. Zeiten ohne Commit und ohne',
     '> Nachricht (Lesen, Telefonate, Termine, Arbeit vor Mitte September in der Claude-App) fehlen und gehören in',
     '> „Nachträge von Hand". **Das ist ein Vorschlag, kein Beleg** — Marcel prüft jede Zeile.', '',
-    `**Summe ${mo}:** ${de(sumG)} h gesamt · ${namen.map((n) => n + ' ' + de(sumP[n] || 0) + ' h').join(' · ')} · FuE-Vorschlag ${de(sumF)} h · ${monate[mo].length} Arbeitstage`, '',
+    `**Summe ${mo}:** ${de(sumG)} h gesamt · ${namen.map((n) => n + ' ' + de(sumP[n] || 0) + ' h').join(' · ')} · FuE-Vorschlag ${de(sumF)} h · ${monate[mo].length} Arbeitstage` + (nachH ? ` · Nachträge von Hand ${de(nachH)} h · **insgesamt ${de(sumG + nachH)} h**` : ''), '',
     `| Datum | Std. gesamt | ${namen.join(' | ')} | FuE (Vorschlag) | Commits | Nachrichten | Schwerpunkt | Tätigkeit (aus den Commit-Botschaften) |`,
     `|---|---:|${namen.map(() => '---:').join('|')}|---:|---:|---:|---|---|`, ...rows, '',
     '## FuE-Stunden je Arbeitspaket (Vorschlag)', '', '| AP | Inhalt | Stunden |', '|---|---|---:|', ...apLines, '',
     '## Nachträge von Hand', '', ...nachtrag, '',
     '_Geprüft und freigegeben: ______________________ (Datum, Unterschrift)_', '',
   ].join('\n'));
-  console.log(mo, 'Tage', monate[mo].length, 'gesamt', de(sumG), namen.map((n) => n + ' ' + de(sumP[n] || 0)).join(' '), 'FuE', de(sumF));
+  console.log(mo, 'Tage', monate[mo].length, 'gesamt', de(sumG), 'Nachtraege', de(nachH), namen.map((n) => n + ' ' + de(sumP[n] || 0)).join(' '), 'FuE', de(sumF));
 }
 fs.writeFileSync(path.join(OUT, 'uebersicht.csv'), '\uFEFF' + csv.join('\n'));
