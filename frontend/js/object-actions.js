@@ -1988,12 +1988,17 @@
   }
   function _einheitenListe() {
     var U = window.DpUnterlagen; if (!U) return [];
-    var best = [], vonMiete = false;
+    /* v3016m · gewinnt die Liste mit den meisten MIETANGABEN, dann die längste. Gemessen 28.10.:
+       ein Exposé, das nur „Mietaufstellung anbei“ sagt, lieferte 8 Einheiten ohne Miete und
+       verdrängte die echte Mietaufstellung (gleich lang, also nicht „mehr“). */
+    var best = [], bestPunkte = -1;
     _unterlagenListe().forEach(function (t) {
       if (t.typ !== 'mietaufstellung' && t.typ !== 'teilungserklaerung') return;
       var l = U.einheitenAus(t.typ, t.extracted);
-      if (t.typ === 'mietaufstellung' && l.length) { if (!vonMiete || l.length > best.length) { best = l; vonMiete = true; } }
-      else if (!vonMiete && l.length > best.length) best = l;
+      if (!l.length) return;
+      var miete = l.filter(function (e) { return Number(e.ist) > 0 || e.status === 'leer'; }).length;
+      var punkte = miete * 1000 + l.length;
+      if (punkte > bestPunkte) { best = l; bestPunkte = punkte; }
     });
     return best;
   }
