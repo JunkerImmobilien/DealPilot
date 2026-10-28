@@ -64,7 +64,10 @@ const { query } = require('../db/pool');
    „Privat" zurück. Halter gehoeren ans Konto. */
 /* v2900 - `pdf_vorgabe`: Vorauswahl der PDF-Fassung, „ohne Rückfrage" und ob die
    Pilot-Analyse mitkommt (js/pdf-wahl.js). Marcel 23.10.2026: geräteübergreifend. */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
+/* v3024 - `browser_vorgaben`: Bewertungsprofil, Deal-Score-Gewichte, Anlegerprofil-Set und
+   Investmentprofil (js/vorgaben-sync.js). Gemessen 28.10.2026: dasselbe Demo-Konto rechnete auf
+   Staging mit Lage-Fokus, im Prod-Browser mit Standard - Westerfeldstr. 140 77 GUT gegen 85 SEHR GUT. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe', 'browser_vorgaben'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {
