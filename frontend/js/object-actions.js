@@ -1958,8 +1958,17 @@
     /* v3016 · ein PDF kann mehrere Dokumente tragen (a.weitere, z. B. Flurkarte + Energieausweis) */
     [a].concat(a.weitere || []).forEach(function (t) {
       (D.abgleich(t.extracted || {}, t.typ) || []).forEach(function (z) {
-        _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input' };
+        _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort };
       });
+      /* v3017 · Wirtschaftsplan/Abrechnung → Steuer-Reiter. Weicht der Vorschlag vom heutigen Wert ab,
+         ist die Zeile nicht vorgehakt und zeigt den bisherigen Wert („erstmal drauf hinweisen") */
+      if (typeof D.steuerVorschlaege === 'function' && typeof window.dpSteuerWert === 'function') {
+        D.steuerVorschlaege(t.extracted || {}, t.typ).forEach(function (s) {
+          var w = window.dpSteuerWert(s.jahr, s.feld); if (w === null) return;
+          _merged['steuer:' + s.jahr + ':' + s.feld] = { label: 'Steuer ' + s.jahr + ' · ' + s.wort, value: fmt0(s.betrag) + ' € im Jahr ' + s.jahr, raw: String(s.betrag),
+            ist: (w.eigen || w.wert) ? String(Math.round(w.wert)) : '', istEigen: !!w.eigen, source: t.label || 'Dokument', kind: 'steuer', jahr: s.jahr, feld: s.feld, herleitung: s.hinweis };
+        });
+      }
       (D.vergleich(t.extracted || {}) || []).forEach(function (v) { _vergleich.push({ wort: v.wort, wert: v.wert, eigen: v.eigen, quelle: t.label || 'Dokument' }); });
     });
   }
@@ -1977,11 +1986,12 @@
     return aus;
   }
   var _auswertung = null, _auswertungLaeuft = false, _auswertungFehler = '';
+  var _ergaenzen = false;   /* v3017 · Nachreichen aus der Pilot-Analyse: zusammenführen statt ersetzen */
   async function _unterlagenAuswerten() {
     var U = window.DpUnterlagen, liste = _unterlagenListe();
     if (!U || !liste.length) return;
     _auswertungLaeuft = true; _auswertungFehler = ''; renderMergedTable();
-    try { _auswertung = await U.auswerten(liste); }
+    try { _auswertung = await U.auswerten(liste, { ergaenzen: _ergaenzen }); }   /* v3017 */
     catch (e) { _auswertung = null; _auswertungFehler = e.message || 'Auswertung fehlgeschlagen'; }
     _auswertungLaeuft = false;
     recompute(); renderMergedTable();
@@ -2067,10 +2077,27 @@
   }
   /* v2217 · was steht im Objekt, und weicht es vom gelesenen Wert ab? */
   function _istText(id) {
+    if (_merged[id] && _merged[id].kind === 'steuer') return _merged[id].ist || '';   /* v3017 */
     var el = document.getElementById(id); if (!el) return '';
     if (el.tagName === 'SELECT') { var o = el.selectedOptions && el.selectedOptions[0]; return el.value && o ? String(o.textContent || '').trim() : ''; }
     if (el.type === 'checkbox') return '';
     return String(el.value || '').trim();
+  }
+  /* v3017a · der bisherige Wert in derselben Schreibweise wie der neue: „3313" → „3.313 €" */
+  function _bisherKopf(it) {
+    if (it.kind === 'steuer') return 'bisher im Steuer-Reiter ' + it.jahr + (it.istEigen ? ' (deine Angabe)' : ' (Vorschlag der App)') + ': ';
+    return 'bisher im Objekt' + (it.ort ? ' (' + it.ort + ')' : '') + ': ';
+  }
+  function _bisherText(it, ist) {
+    var s = String(ist == null ? '' : ist).trim();
+    if (!/^-?\d+([.,]\d+)?$/.test(s)) return s;
+    if (it.einheit) return fmt0(parseFloat(s.replace(',', '.'))) + ' ' + it.einheit;
+    if (it.kind === 'steuer') return fmt0(parseFloat(s.replace(',', '.'))) + ' € im Jahr ' + it.jahr;
+    var n = parseFloat(s.replace(',', '.')), neu = String(it.value || '');
+    if (/€\s*$/.test(neu) && !/€\/m²/.test(neu)) return fmt0(n) + ' €';
+    if (/m²\s*$/.test(neu)) return n.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' m²';
+    if (/%\s*$/.test(neu)) return n.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' %';
+    return s;
   }
   function _abweichungen(keys) {
     var out = {};
@@ -2165,7 +2192,7 @@
     host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
-      if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">im Objekt: ' + escH(abw[id]) + '</div>';
+      if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(_bisherKopf(it)) + escH(_bisherText(it, abw[id])) + '</div>';
       if (it.herleitung) valCell += '<div class="oabi-herl" style="font-size:11.5px;color:#7A7370;margin-top:2px;line-height:1.35">' + escH(it.herleitung) + '</div>';
       if (it.kind === 'anhaengen' && String(it.value).length > 160) valCell = valCell.replace('<b>' + escH(it.value) + '</b>', '<div style="white-space:pre-wrap;font-size:12px;max-height:120px;overflow:auto">' + escH(it.value) + '</div>');
       return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + (abw[id] !== undefined ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
@@ -2277,12 +2304,15 @@
   function openCombinedImport(onDone, opts) {
     _oabiDone = (typeof onDone === 'function') ? onDone : null;
     _qcMode = !!(opts && opts.target === 'qc');  /* v418 */
+    _ergaenzen = !!(opts && opts.ergaenzen) && !!(window.DpUnterlagen && window.DpUnterlagen.laden());   /* v3017 */
+    _auswertung = null;
     _qcPendingMerged = {};
     _merged = {}; _files = []; _importPhotos = [];
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
-        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>PDFs einlesen — Exposé, Marktbericht, Dokumente</h3></div>' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_ergaenzen ? 'Unterlagen nachreichen' : 'PDFs einlesen — Exposé, Marktbericht, Dokumente') + '</h3></div>' +
+        (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage – gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
         '<div class="oabi-sub">Mehrere PDFs gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
           '<div class="oabi-drop" id="oabi-drop">📁 PDFs auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
@@ -2332,8 +2362,9 @@
      „Energieausweis: Bedarf") - sie zählen deshalb nur im Kopf (erste 800 Zeichen) oder
      im Dateinamen. Ein Exposé, das als Dokument gelesen wird, verliert seine Felder. */
   var DOK_KOPF = ['Energieausweis', 'Teilungserklärung', 'Teilungserklaerung', 'Gemeinschaftsordnung', 'Aufteilungsplan', 'Mietvertrag',
-    'Wohnraummietvertrag', 'Mieterliste', 'Mietaufstellung', 'Mieterübersicht', 'Mietenliste', 'Einladung zur', 'Protokoll', 'Grundbuch', 'Flurkarte', 'Liegenschaftskarte'];
-  var DOK_NAME = /grundbuch|\bgb\b|teilung|weg|etv|protokoll|energie|flur|kataster|mietvertrag|mieterliste|mietaufstellung|baulast/i;
+    'Wohnraummietvertrag', 'Mieterliste', 'Mietaufstellung', 'Mieterübersicht', 'Mietenliste', 'Einladung zur', 'Protokoll', 'Grundbuch', 'Flurkarte', 'Liegenschaftskarte',
+    /* v3017 */ 'Wirtschaftsplan', 'Hausgeldabrechnung', 'Jahresabrechnung', 'Einzelabrechnung', 'Baulastenverzeichnis', 'Baulastenauskunft'];
+  var DOK_NAME = /grundbuch|\bgb\b|teilung|weg|etv|protokoll|energie|flur|kataster|mietvertrag|mieterliste|mietaufstellung|baulast|wirtschaftsplan|hausgeld|abrechnung/i;   /* v3017: wirtschaftsplan|hausgeld|abrechnung */
   function istDokument(text, name) {
     var t = String(text || '');
     if (/dealpilot/i.test(t)) return false;
@@ -2465,9 +2496,16 @@
       try { ta.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
       return 'text';
     }
+    if (it.kind === 'steuer') {   /* v3017 */
+      return (typeof window.dpSteuerSetzen === 'function' && window.dpSteuerSetzen(it.jahr, it.feld, it.raw)) ? 'text' : null;
+    }
     if (it.kind === 'merken') {
       if (!_auswertung || !window.DpUnterlagen) return null;
-      window.DpUnterlagen.merken({ stand: new Date().toISOString(), dokumente: _unterlagenListe().map(function (x) { return { typ: x.typ, label: x.label, datei: x.dateiname, datum: x.datum }; }), auswertung: _auswertung });
+      var neueDoks = _unterlagenListe().map(function (x) { return { typ: x.typ, label: x.label, datei: x.dateiname, datum: x.datum }; });
+      /* v3017 · Nachreichen: die Liste der Unterlagen wächst, die Auswertung ist schon zusammengeführt */
+      var alt = _ergaenzen ? (window.DpUnterlagen.laden() || {}) : {};
+      var doks = (alt.dokumente || []).filter(function (x) { return !neueDoks.some(function (n) { return n.datei && n.datei === x.datei; }); }).concat(neueDoks);
+      window.DpUnterlagen.merken({ stand: new Date().toISOString(), dokumente: doks, auswertung: _auswertung });
       return 'text';
     }
     if (it.kind === 'einheiten') {

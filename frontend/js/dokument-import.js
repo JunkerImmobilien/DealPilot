@@ -180,7 +180,61 @@
     var a = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(ist), b = (typeof parseDe === 'function') ? parseDe(neu) : parseFloat(neu);
     return Math.abs(a - b) < 0.005;
   }
+  /* v3017 · Marcel 28.10.2026: „den Wirtschaftsplan oder die Abrechnung hochladen, damit Hausgeld bzw.
+     Umlage und nicht umlagefähige Kosten automatisch gesetzt werden". Welche Zahlen gelten, entscheidet
+     der Kaufumfang: eine Wohnung (ETW mit MEA) nimmt den Einzelplan oder den Gesamtplan × MEA, das ganze
+     Haus den Gesamtplan. hg_nul trägt die Rücklage MIT (tab6.hg_nicht_umlagefaehig), weg_r ist nur Info. */
+  function _feldWert(id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; }
+  function _hausgeldBasis(ext) {
+    if (!ext) return null;
+    var etw = _feldWert('objart') === 'ETW', mea = (typeof parseDe === 'function' ? parseDe(_feldWert('mea')) : parseFloat(_feldWert('mea'))) || 0;
+    var g = ext.gesamt || null, e = ext.einzel || null;
+    if (etw && e && (_zahl(e.umlagefaehig_jahr_eur) != null || _zahl(e.nicht_umlagefaehig_jahr_eur) != null)) return { w: e, faktor: 1, wie: 'Einzelplan der Wohnung' + (ext.einheit ? ' (' + ext.einheit + ')' : '') };
+    if (etw && g && mea > 0) return { w: g, faktor: mea / 100, wie: 'Gesamtplan × Miteigentumsanteil ' + String(mea).replace('.', ',') + ' %' };
+    if (!etw && g) return { w: g, faktor: 1, wie: 'Gesamtplan der Gemeinschaft (ganzes Haus)' };
+    return null;
+  }
+  function _abgleichHausgeld(ext) {
+    var b = _hausgeldBasis(ext); if (!b) return [];
+    var w = b.w, f = b.faktor, rd = function (x) { var n = _zahl(x); return n == null ? null : Math.round(n * f); };
+    var ul = rd(w.umlagefaehig_jahr_eur), nul = rd(w.nicht_umlagefaehig_jahr_eur), rl = rd(w.ruecklage_zufuehrung_jahr_eur);
+    var werte = [['hg_ul', 'Hausgeld umlagefähig', ul], ['hg_nul', 'Hausgeld nicht umlagefähig (inkl. Rücklage)', nul == null && rl == null ? null : (nul || 0) + (rl || 0)], ['weg_r', 'WEG-Rücklage (Zuführung)', rl]];
+    var zeilen = [], verw = rd(w.verwaltung_jahr_eur);
+    /* Aufschlüsselung, damit ein großer Abstand zum bisherigen Wert lesbar ist (gemessen Lindenallee:
+       im Objekt stand nur die Verwaltervergütung) */
+    var teileNul = [];
+    if (verw) teileNul.push('Verwaltung ' + _fmt(verw) + ' €');
+    if (nul != null) teileNul.push((verw ? 'übrige nicht umlagefähige Kosten ' + _fmt(Math.max(0, nul - verw)) : 'nicht umlagefähige Kosten ' + _fmt(nul)) + ' €');
+    if (rl) teileNul.push('Zuführung Rücklage ' + _fmt(rl) + ' €');
+    werte.forEach(function (z) {
+      if (z[2] == null || !document.getElementById(z[0])) return;
+      var ist = _feldWert(z[0]), neu = String(z[2]);
+      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: _fmt(z[2]) + ' € / Jahr' + (ext.jahr ? ' (' + (ext.art || 'Wirtschaftsplan') + ' ' + ext.jahr + ')' : ''), ist: ist, einheit: '€ / Jahr', ort: 'Bewirtschaftung', status: ist === '' ? 'neu' : (_gleich(ist, neu, 'eur') ? 'gleich' : 'abweichung'), herleitung: (ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '') + ' · ' + b.wie + (z[0] === 'hg_nul' && teileNul.length > 1 ? ' · darin: ' + teileNul.join(' + ') : '') });
+    });
+    return zeilen;
+  }
+  /* Vorschläge für den Steuer-Reiter: Verwaltung, übrige nicht umlagefähige Kosten (OHNE Rücklage -
+     die Zuführung ist erst absetzbar, wenn die Gemeinschaft sie ausgibt), Erhaltungsaufwand aus
+     Rücklagen-Entnahmen und Sonderumlagen im Jahr ihrer Verwendung. */
+  function steuerVorschlaege(ext, typ) {
+    if (typ !== 'hausgeld' || !ext) return [];
+    var b = _hausgeldBasis(ext); if (!b) return [];
+    var jahr = _zahl(ext.jahr) || new Date().getFullYear(), f = b.faktor, aus = [];
+    var verw = _zahl(b.w.verwaltung_jahr_eur), nul = _zahl(b.w.nicht_umlagefaehig_jahr_eur);
+    if (verw != null && verw > 0) aus.push({ jahr: jahr, feld: 'hausverwaltung', wort: 'Hausverwaltung', betrag: Math.round(verw * f), hinweis: b.wie });
+    if (nul != null && nul > 0) aus.push({ jahr: jahr, feld: 'nk_n_umlf', wort: 'Nicht-umlagefähige Nebenkosten (ohne Rücklage und Verwaltung)', betrag: Math.max(0, Math.round((nul - (verw || 0)) * f)), hinweis: b.wie + ' · die Rücklagen-Zuführung ist erst absetzbar, wenn die Gemeinschaft sie ausgibt' });
+    var erh = 0, teile = [];
+    (ext.ruecklage_entnahmen || []).forEach(function (x) { var n = _zahl(x.betrag_eur); if (n > 0) { erh += n * (ext.umfang === 'einzel' ? 1 : f); teile.push((x.zweck || 'Entnahme') + ' (Rücklage)'); } });
+    (ext.sonderumlagen || []).forEach(function (x) {
+      if (_zahl(x.jahr) && _zahl(x.jahr) !== jahr) return;
+      var n = _zahl(x.betrag_einheit_eur) != null && _feldWert('objart') === 'ETW' ? _zahl(x.betrag_einheit_eur) : (_zahl(x.betrag_gesamt_eur) || 0) * f;
+      if (n > 0) { erh += n; teile.push((x.zweck || 'Sonderumlage') + ' (Sonderumlage)'); }
+    });
+    if (erh > 0) aus.push({ jahr: jahr, feld: 'erhaltungsaufwand', wort: 'Erhaltungsaufwand', betrag: Math.round(erh), hinweis: teile.join(', ') + ' · absetzbar im Jahr, in dem die Gemeinschaft das Geld für Erhaltung ausgibt; in den ersten drei Jahren nach Kauf zählt es zur 15-%-Grenze - mit dem Steuerberater abstimmen' });
+    return aus;
+  }
   function _abgleich(ext, typ) {
+    if (typ === 'hausgeld') return _abgleichHausgeld(ext);   /* v3017 */
     var f = _flach(ext), zeilen = [], gesehen = {};
     Object.keys(ZIEL).forEach(function (k) {
       if (f[k] === undefined || f[k] === null || f[k] === '') return;
@@ -417,6 +471,7 @@
     letztes: function () { return _letzter; },
     lesenText: lesenText,
     abgleich: _abgleich,
+    steuerVorschlaege: steuerVorschlaege,   /* v3017 */
     vergleich: vergleich
   };
 
