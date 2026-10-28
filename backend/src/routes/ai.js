@@ -947,11 +947,11 @@ router.post('/seiten-lesen', authenticate, seitenLimiter, async (req, res, next)
 
 router.post('/dokumente-auswerten', authenticate, extractLimiter, async (req, res, next) => {
   try {
-    const { dokumente, objekt, userApiKey: rawUserKey } = req.body || {};
+    const { dokumente, objekt, vorher, vorherDokumente, userApiKey: rawUserKey } = req.body || {};   /* v3017 · vorher: Nachreichen */
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
     if (!config.openai.apiKey && !userApiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfügbar.', needs_user_key: true });
     if (!Array.isArray(dokumente) || !dokumente.length) return res.status(400).json({ error: 'Keine Dokumente übergeben.' });
-    const r = await openaiService.dokumenteAuswerten(dokumente, objekt || {}, { userApiKey });
+    const r = await openaiService.dokumenteAuswerten(dokumente, objekt || {}, { userApiKey, vorher: vorher || null, vorherDokumente: Array.isArray(vorherDokumente) ? vorherDokumente : [] });
     try { if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') await aiCreditsService.logExtract(req.user.id, 'dokumente-auswerten'); } catch (e) { /* nicht kritisch */ }
     res.json(r);
   } catch (err) {

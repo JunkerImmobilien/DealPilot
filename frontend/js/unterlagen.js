@@ -138,14 +138,29 @@
     try { f.dispatchEvent(new Event('input', { bubbles: true })); f.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
   }
   function v(id) { var e = el(id); return e ? String(e.value || '').trim() : ''; }
-  async function auswerten(dokumente) {
+  /* v3017 · Marcel 28.10.2026: „werden bei den Maßnahmen auch die Kosten für eine einzelne ETW über den
+     Miteigentumsanteil runtergebrochen?" - jetzt fest gerechnet, nicht der KI überlassen: ETW mit MEA im
+     Objekt → Gesamtkosten × MEA; ganzes Haus → 100 %. */
+  function anteil(gesamt) {
+    var g = zahl(gesamt); if (g == null) return null;
+    var mea = parseFloat(String(v('mea')).replace(/\./g, '').replace(',', '.'));
+    if (v('objart') === 'ETW') return mea > 0 ? { eur: g * mea / 100, wie: 'MEA ' + String(mea).replace('.', ',') + ' %' } : null;
+    return { eur: g, wie: 'ganzes Haus' };
+  }
+  function nachreichen() {   /* v3017 · Unterlagen in der Pilot-Analyse nachreichen */
+    if (window.ObjectActions && typeof window.ObjectActions.openImport === 'function') window.ObjectActions.openImport(null, { ergaenzen: true });
+  }
+  async function auswerten(dokumente, opts) {
     var objekt = { objektart: v('objart'), adresse: [v('str'), v('hnr'), v('plz'), v('ort')].join(' ').trim(), kaufpreis: v('kp'), wohnflaeche: v('wfl'),
       baujahr: v('baujahr'), nettokaltmiete_monat: v('nkm'), miteigentumsanteil_pct: v('mea'), einheiten: v('einheiten'), hausgeld_ul_jahr: v('hg_ul'), hausgeld_nul_jahr: v('hg_nul') };
     /* v3016f · gemessen am Demo-Set Lindenallee (MFH, alle 6 Einheiten im Paket): die Auswertung
        rechnete die Sonderumlage mit dem MEA EINES Grundbuchblatts (204/1.000 → 9.466 statt 46.400 €).
        Ohne eigenen MEA im Objekt wird das ganze Gebäude gekauft. */
     objekt.kauf_umfang = (v('mea') && v('objart') === 'ETW') ? 'eine Einheit, Anteil laut Miteigentumsanteil' : (v('mea') ? 'Anteil laut Miteigentumsanteil' : 'ganzes Gebaeude, alle Einheiten (Anteil 100 %)');
-    var r = await window.Auth.apiCall('/ai/dokumente-auswerten', { method: 'POST', body: { dokumente: dokumente, objekt: objekt } });
+    var body = { dokumente: dokumente, objekt: objekt };
+    var alt = opts && opts.ergaenzen ? laden() : null;   /* v3017 · zusammenführen statt ersetzen */
+    if (alt && alt.auswertung) { body.vorher = alt.auswertung; body.vorherDokumente = (alt.dokumente || []).map(function (x) { return x.label + (x.datum ? ' ' + x.datum : ''); }); }
+    var r = await window.Auth.apiCall('/ai/dokumente-auswerten', { method: 'POST', body: body });
     if (!r || !r.success) throw new Error((r && r.error) || 'Auswertung fehlgeschlagen.');
     return r.auswertung || {};
   }
@@ -170,6 +185,12 @@
       '.dpu-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px}',
       '.dpu-tab{border:1px solid rgba(42,39,39,.18);background:#fff;border-radius:999px;padding:4px 11px;font-size:12px;cursor:pointer;color:#2A2727;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '.dpu-tab.on{background:#2A2727;color:#fff;border-color:#2A2727}',
+      '.dpu-nach{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:8px 0 10px;font-size:12px;color:#7A7370}',
+      '.dpu-nach-btn{border:1px solid var(--gold,#C9A84C);background:#fff;color:#2A2727;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;min-height:40px}',
+      '.dpu-nach-btn:hover{background:#FBF6E9}',
+      '.dpu-nach span{flex:1 1 260px;line-height:1.4}',
+      '.dpu-aend{margin:0 0 10px;padding:9px 12px;border-radius:8px;background:#FBF6E9;border-left:3px solid var(--gold,#C9A84C);font-size:12.5px}',
+      '.dpu-aend ul{margin:4px 0 0;padding-left:18px}',
       '.dpu-tab .dpu-n{display:inline-block;margin-left:5px;padding:0 5px;border-radius:8px;background:rgba(184,98,92,.15);color:#B8625C;font-size:10.5px}',
       '.dpu-tab.on .dpu-n{background:rgba(255,255,255,.2);color:#fff}',
       '.dpu-dl{display:grid;grid-template-columns:minmax(120px,38%) 1fr;gap:3px 12px;font-size:12.5px;margin:6px 0}',
@@ -294,8 +315,9 @@
       if ((w.sonderumlagen || []).length) geld.push(['Sonderumlagen', w.sonderumlagen.join(' · ')]);
       if (geld.length) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">2 · Geld der Gemeinschaft</div><div class="dpu-weg-geld">'
         + geld.map(function (x) { return '<div><span>' + esc(x[0]) + '</span><p>' + esc(x[1]) + '</p></div>'; }).join('') + '</div></div>';
-      if ((w.sanierungen || []).length) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">3 · Maßnahmen am Gemeinschaftseigentum</div><table class="dpu-tbl"><tr><th>Maßnahmen</th><th>Status</th><th>Jahr</th><th class="r">Kosten gesamt</th><th class="r">Anteil Objekt</th></tr>'
-        + w.sanierungen.map(function (s) { var st = String(s.status || ''); return '<tr><td>' + esc(s.massnahme) + '</td><td><span class="dpu-st dpu-st-' + esc(st) + '">' + esc(st || '–') + '</span></td><td>' + esc(s.jahr || '') + '</td><td class="r">' + esc(eur(s.kosten_eur)) + '</td><td class="r">' + esc(eur(s.anteil_objekt_eur)) + '</td></tr>'; }).join('') + '</table></div>';
+      if ((w.sanierungen || []).length) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">3 · Maßnahmen am Gemeinschaftseigentum</div><table class="dpu-tbl"><tr><th>Maßnahmen</th><th>Status</th><th>Jahr</th><th class="r">Kosten gesamt</th><th class="r">Dein Anteil</th></tr>'
+        + w.sanierungen.map(function (s) { var st = String(s.status || ''); return '<tr><td>' + esc(s.massnahme) + '</td><td><span class="dpu-st dpu-st-' + esc(st) + '">' + esc(st || '–') + '</span></td><td>' + esc(s.jahr || '') + '</td><td class="r">' + esc(eur(s.kosten_eur)) + '</td><td class="r">' + esc((function () { var a = anteil(s.kosten_eur); return a ? eur(a.eur) : eur(s.anteil_objekt_eur); })()) + '</td></tr>'; }).join('') + '</table>'
+          + (anteil(1) ? '<p class="dpu-weg-p" style="font-size:11.5px;margin-top:4px">Dein Anteil: ' + esc(anteil(1).wie === 'ganzes Haus' ? 'ganzes Haus, 100 % der Kosten der Gemeinschaft' : 'Gesamtkosten × Miteigentumsanteil (' + anteil(1).wie + ')') + '.</p>' : '') + '</div>';
       if (w.verwaltung) h += '<div class="dpu-weg-blk"><div class="dpu-weg-t">4 · Verwaltung</div><p class="dpu-weg-p">' + esc(w.verwaltung) + '</p></div>';
       if (w.fazit) h += '<div class="dpu-weg-blk dpu-weg-fazit"><div class="dpu-weg-t">5 · Fazit</div><p class="dpu-weg-p">' + esc(w.fazit) + '</p></div>';
       h += '</div>';
@@ -304,6 +326,14 @@
     if (g && ((g.lasten || []).length || g.grundschulden)) {
       h += '<div class="dpu-h">Grundbuch</div>' + ((g.lasten || []).length ? '<ul class="dpu-ul">' + g.lasten.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>' : '')
         + (g.grundschulden ? '<p style="font-size:12.5px;margin:4px 0">' + esc(g.grundschulden) + '</p>' : '');
+    }
+    /* v3017 · Baulasten (eigene Auskunft, nicht im Grundbuch) */
+    var bl = a.baulasten;
+    if (bl && (bl.keine || (bl.eintraege || []).length)) {
+      h += '<div class="dpu-h">Baulasten</div>' + (bl.keine && !(bl.eintraege || []).length ? '<p style="font-size:12.5px;margin:4px 0">Laut Auskunft aus dem Baulastenverzeichnis sind keine Baulasten eingetragen.</p>'
+        : '<ul class="dpu-ul">' + bl.eintraege.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>');
+    } else if (g && (g.lasten || []).length) {
+      h += '<div class="dpu-h">Baulasten</div><p style="font-size:12.5px;margin:4px 0">Baulasten stehen nicht im Grundbuch, sondern im Baulastenverzeichnis der Bauaufsicht. Eine Auskunft liegt nicht vor – du kannst sie nachreichen.</p>';
     }
     if ((a.offene_fragen || []).length) h += '<div class="dpu-h">Beim Verwalter oder Verkäufer anfragen</div><ul class="dpu-ul">' + a.offene_fragen.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>';
     return h;
@@ -337,7 +367,9 @@
       if (!SU.test(x.titel || '')) return true;
       return !kosten.some(function (y) { return y !== x && !SU.test(y.titel || '') && zahl(y.kosten_eur) >= zahl(x.kosten_eur) && (!x.jahr || !y.jahr || String(x.jahr) === String(y.jahr)); });
     });
-    var summe = kosten.reduce(function (s, x) { return s + zahl(x.kosten_eur); }, 0);
+    /* v3017 · Gemeinschaftskosten fest auf den Anteil gerechnet, wo die Auswertung sie gesamt führt */
+    kosten.forEach(function (x) { var a = zahl(x.kosten_gesamt_eur) > 0 ? anteil(x.kosten_gesamt_eur) : null; x._betrag = a ? a.eur : zahl(x.kosten_eur); });
+    var summe = kosten.reduce(function (s, x) { return s + (x._betrag || 0); }, 0);
     var h = '<div class="dpu-ampel"><div class="hoch"><b>' + n.hoch + '</b><span>hoch</span></div><div class="mittel"><b>' + n.mittel + '</b><span>mittel</span></div><div class="niedrig"><b>' + n.niedrig + '</b><span>niedrig</span></div></div>';
     h += '<div class="dpu-karten">';
     h += '<div class="dpu-karte' + (summe ? '' : ' niedrig') + '"><h4>Was absehbar Geld kostet</h4>'
@@ -384,7 +416,11 @@
       + '<button type="button" data-art="genau" class="' + (art === 'genau' ? 'on' : '') + '" onclick="DpUnterlagen.ansicht(this,\'genau\')">Genau</button></div>'
       + '<div class="dpu-hinweis">Ausgewertet am ' + esc(datum) + ' aus ' + (d.dokumente || []).length + ' Unterlagen: '
       + (d.dokumente || []).map(function (x) { return esc(x.label) + (x.datum ? ' ' + esc(x.datum) : ''); }).join(' · ') + '. '
-      + 'Neue Unterlagen über Datenaufnahme › Exposé / Dokumente einlesen — die Auswertung wird dann ersetzt.</div>'
+      + '</div>'
+      /* v3017 · Marcel 28.10.2026: Unterlagen nachreichen - fließen in Risiken, These, Hausgeld und Steuer */
+      + '<div class="dpu-nach"><button type="button" class="dpu-nach-btn" onclick="DpUnterlagen.nachreichen()">+ Unterlagen nachreichen</button>'
+      + '<span>z. B. Wirtschaftsplan, Hausgeldabrechnung, Baulastenauskunft, neues Protokoll – die Auswertung wird ergänzt, nicht ersetzt. Vor der Übernahme siehst du jede Änderung an Risiken, These, Hausgeld und Steuer.</span></div>'
+      + ((d.auswertung.aenderungen || []).length ? '<div class="dpu-aend"><b>Zuletzt nachgereicht – das hat sich geändert:</b><ul>' + d.auswertung.aenderungen.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul></div>' : '')
       + '<div data-dpu-ansicht="einfach"' + (art === 'einfach' ? '' : ' style="display:none"') + '>' + einfachHtml(d.auswertung) + '</div>'
       + '<div data-dpu-ansicht="genau"' + (art === 'genau' ? '' : ' style="display:none"') + '>' + auswertungHtml(d.auswertung) + '</div>'
       + '<div class="dpu-hinweis" style="margin-top:10px">Gelesen und zusammengefasst aus den Unterlagen — keine Rechtsberatung. Prüfe Beschlüsse und Lasten im Original.</div>'
@@ -395,6 +431,7 @@
     seitenLesen: seitenLesen, istPersoenlich: istPersoenlich, meaProzent: meaProzent, einheitenAus: einheitenAus,
     auswerten: auswerten, laden: laden, merken: merken, promptTeile: promptTeile,
     dokHtml: dokHtml, auswertungHtml: auswertungHtml, pilotReiterHtml: pilotReiterHtml, hatAuswertung: hatAuswertung, stil: stil,
-    einfachHtml: einfachHtml, ansicht: ansicht   /* v3016r */
+    einfachHtml: einfachHtml, ansicht: ansicht,   /* v3016r */
+    anteil: anteil, nachreichen: nachreichen   /* v3017 */
   };
 })();

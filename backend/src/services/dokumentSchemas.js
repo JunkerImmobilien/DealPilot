@@ -116,6 +116,20 @@ const DOKUMENT_TYPEN = {
     leit: ['Mieterliste', 'Mietaufstellung', 'Mieterübersicht', 'Mietenliste', 'Mieteinnahmen je Einheit'],
     keywords: ['Einheit', 'Wohnung', 'Kaltmiete', 'leerstehend', 'Leerstand', 'Mietbeginn', 'Summe']
   },
+  /* v3017 · Marcel 28.10.2026: „den Wirtschaftsplan oder die Abrechnung hochladen, damit Hausgeld
+     bzw. Umlage und nicht umlagefähige Kosten automatisch gesetzt werden können" */
+  hausgeld: {
+    label: 'Wirtschaftsplan / Hausgeldabrechnung',
+    leit: ['Wirtschaftsplan', 'Einzelwirtschaftsplan', 'Gesamtwirtschaftsplan', 'Hausgeldabrechnung', 'Jahresabrechnung', 'Einzelabrechnung', 'Gesamtabrechnung', 'Hausgeldvorauszahlung'],
+    keywords: ['Umlageschlüssel', 'umlagefähig', 'nicht umlagefähig', 'Erhaltungsrücklage', 'Instandhaltungsrücklage', 'Verwaltervergütung', 'Abrechnungszeitraum', 'Vorauszahlung', 'Hausgeld']
+  },
+  /* v3017 · Marcel 28.10.2026: „werden Baulasten … auch ausgelesen?" - Baulasten stehen nicht
+     im Grundbuch, sondern im Baulastenverzeichnis der unteren Bauaufsicht */
+  baulasten: {
+    label: 'Baulastenauskunft',
+    leit: ['Baulastenverzeichnis', 'Baulastenauskunft', 'Baulastenblatt', 'Auskunft aus dem Baulastenverzeichnis'],
+    keywords: ['Baulast', 'Bauaufsicht', 'Abstandsfläche', 'Stellplatz', 'Zufahrt', 'Vereinigungsbaulast', 'übernimmt die Verpflichtung']
+  },
   mieter_unterlagen: {
     label: 'Persönliche Unterlagen eines Mieters',
     leit: ['Mietzahlungsbestätigung', 'Mietschuldenfreiheit', 'Selbstauskunft', 'Rentenbescheid', 'Gehaltsabrechnung', 'Lohnabrechnung', 'SCHUFA', 'Bonitätsauskunft', 'Entschädigungsrente'],
@@ -513,6 +527,41 @@ const SCHEMATA = {
     zahlen: { summe_kaltmiete_monat_eur: [0, 1e7], summe_wfl_m2: [1, 1e6] }
   },
 
+  /* v3017 */
+  hausgeld: {
+    einleitung: 'Aus dem folgenden Wirtschaftsplan oder der Hausgeld-/Jahresabrechnung einer Wohnungseigentuemergemeinschaft extrahiere die Daten als JSON. KEINE Namen von Eigentuemern.',
+    schema: [
+      '{',
+      '  "art": "Wirtschaftsplan"|"Jahresabrechnung",',
+      '  "jahr": number (Wirtschafts- bzw. Abrechnungsjahr),',
+      '  "umfang": "einzel"|"gesamt"|"beides" (Einzelplan/Einzelabrechnung EINER Wohnung, Gesamtplan der ganzen Gemeinschaft oder beides),',
+      '  "einheit": string|null (Bezeichnung der Wohnung, z. B. "WE 5" - KEIN Name),',
+      '  "mea": string|null (Miteigentumsanteil der Wohnung, z. B. "85/1000"),',
+      '  "gesamt": null | {"kosten_jahr_eur": number, "umlagefaehig_jahr_eur": number, "nicht_umlagefaehig_jahr_eur": number (OHNE Ruecklagenzufuehrung), "ruecklage_zufuehrung_jahr_eur": number, "verwaltung_jahr_eur": number},',
+      '  "einzel": null | {"hausgeld_monat_eur": number, "kosten_jahr_eur": number, "umlagefaehig_jahr_eur": number, "nicht_umlagefaehig_jahr_eur": number (OHNE Ruecklagenzufuehrung), "ruecklage_zufuehrung_jahr_eur": number, "verwaltung_jahr_eur": number},',
+      '  "ruecklage_stand_eur": number|null (Stand der Erhaltungsruecklage der Gemeinschaft),',
+      '  "ruecklage_entnahmen": [{"zweck": string, "betrag_eur": number}] (Entnahmen aus der Ruecklage im Jahr, z. B. fuer Reparaturen),',
+      '  "sonderumlagen": [{"zweck": string, "betrag_gesamt_eur": number, "betrag_einheit_eur": number|null, "jahr": number, "faellig": string|null}],',
+      '  "abrechnungsergebnis_eur": number|null (nur Jahresabrechnung: Nachzahlung positiv, Guthaben negativ),',
+      '  "positionen": [{"bezeichnung": string, "betrag_gesamt_eur": number|null, "betrag_einheit_eur": number|null, "umlagefaehig": true|false|null}]',
+      '}',
+      'Umlagefaehig heisst: auf Mieter umlegbar nach Betriebskostenverordnung (Heizung, Warmwasser, Wasser/Abwasser, Muell, Strassenreinigung, Gebaeudeversicherung, Hausmeister, Reinigung, Allgemeinstrom, Aufzug, Gartenpflege, Schornsteinfeger). Nicht umlagefaehig: Verwaltung, Instandhaltung/Reparaturen, Bankgebuehren, Rechts- und Beratungskosten. Die Ruecklagenzufuehrung immer getrennt fuehren. Steht im Dokument selbst eine Spalte umlagefaehig/nicht umlagefaehig, gilt sie.'
+    ],
+    zahlen: { jahr: [1990, 2100] }
+  },
+  /* v3017 */
+  baulasten: {
+    einleitung: 'Aus der folgenden Auskunft aus dem Baulastenverzeichnis extrahiere die Daten als JSON. KEINE Namen von Personen.',
+    schema: [
+      '{',
+      '  "auskunft_datum": string DD.MM.JJJJ,',
+      '  "behoerde": string (untere Bauaufsicht / Stadt / Kreis),',
+      '  "keine_baulasten": boolean (true, wenn die Auskunft ausdruecklich sagt, dass keine Baulasten eingetragen sind),',
+      '  "baulasten": [{"blatt": string, "lfd_nr": string, "art": string (z. B. Abstandsflaechenbaulast, Stellplatzbaulast, Zufahrts-/Wegebaulast, Vereinigungsbaulast, Leitungsbaulast, Anbaubaulast), "rolle": "belastet"|"beguenstigt"|null (ist DIESES Grundstueck belastet oder beguenstigt), "inhalt": string (1-2 Saetze Klartext: was darf/muss auf welcher Flaeche), "eingetragen_am": string|null}]',
+      '}'
+    ]
+  },
+
   marktbericht: {
     einleitung: 'Aus dem folgenden Grundstuecksmarktbericht extrahiere die fuer eine Immobilienbewertung relevanten Daten als JSON.',
     schema: [
@@ -539,7 +588,7 @@ const SCHEMATA = {
 /* v3016 · Ein PDF kann mehrere Dokumente tragen (gemessen: „Flur u Energie.pdf" =
    Flurkarte + Energieausweis). Weitere Arten nur mit ZWEI Leitbegriffen im ganzen
    Text, nie die gesperrte Art und nie der Marktbericht (der zitiert alles). */
-const WEITERE_ERLAUBT = { energieausweis: 1, kataster: 1, grundbuch: 1, boris: 1, mietaufstellung: 1 };
+const WEITERE_ERLAUBT = { energieausweis: 1, kataster: 1, grundbuch: 1, boris: 1, mietaufstellung: 1, baulasten: 1 };
 function weitereTypen(text, dateiname, haupt) {
   const t = String(text || '').toLowerCase().slice(0, 60000);
   const aus = [];

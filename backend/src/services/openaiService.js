@@ -4319,11 +4319,14 @@ async function dokumenteAuswerten(dokumente, objekt, opts) {
     '',
     'Antworte NUR mit JSON:',
     '{',
-    '  "risiken": [{"titel": string, "beschreibung": string (2-3 Saetze: Sachverhalt, Folge fuer den Kaeufer, was zu tun ist), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null (Anteil des Objekts, sonst gesamt mit Hinweis), "jahr": number|null, "quelle": string}],',
+    '  "risiken": [{"titel": string, "beschreibung": string (2-3 Saetze: Sachverhalt, Folge fuer den Kaeufer, was zu tun ist), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null (Anteil des Objekts, sonst gesamt mit Hinweis), "kosten_gesamt_eur": number|null (Betrag der ganzen Gemeinschaft wie im Dokument, nur bei Gemeinschaftskosten), "jahr": number|null, "quelle": string}],',
     '  "risiken_text": string (fuer das Feld "Bekannte Risiken": je Risiko eine Zeile "– Titel: ein Satz (Quelle)", hoch zuerst),',
     '  "investitionsthese": string (3-5 Saetze: was spricht fuer das Objekt, gestuetzt auf Unterlagen und Eckdaten, mit Zahlen; ehrlich, wenn die Unterlagen dagegen sprechen),',
-    '  "weg": null | {"kernpunkte": [string] (die 5-10 wichtigsten Punkte aus allen WEG-Unterlagen, chronologisch, je mit Jahr), "ruecklage": string (Stand und Entwicklung, Anteil des Objekts), "hausgeld": string, "sanierungen": [{"massnahme": string, "status": "beschlossen"|"geplant"|"vertagt"|"erledigt", "jahr": number|null, "kosten_eur": number|null, "anteil_objekt_eur": number|null}], "sonderumlagen": [string], "verwaltung": string (Verwalter, Wechsel, Stimmung in der Gemeinschaft), "fazit": string (2-3 Saetze)},',
+    '  "weg": null | {"kernpunkte": [string] (die 5-10 wichtigsten Punkte aus allen WEG-Unterlagen, chronologisch, je mit Jahr), "ruecklage": string (Stand und Entwicklung, Anteil des Objekts), "hausgeld": string, "sanierungen": [{"massnahme": string, "status": "beschlossen"|"geplant"|"vertagt"|"erledigt", "jahr": number|null, "kosten_eur": number|null (Gesamtkosten der Gemeinschaft wie im Dokument), "anteil_objekt_eur": number|null}], "sonderumlagen": [string], "verwaltung": string (Verwalter, Wechsel, Stimmung in der Gemeinschaft), "fazit": string (2-3 Saetze)},',
     '  "grundbuch": null | {"lasten": [string] (Abt. II in Klartext mit Bedeutung), "grundschulden": string},',
+    /* v3017 · Baulastenauskunft: eigene Art, nicht im Grundbuch */
+    '  "baulasten": null | {"keine": boolean (Auskunft sagt ausdruecklich: keine Baulasten), "eintraege": [string] (je Baulast Klartext: Art, ob dieses Grundstueck belastet oder beguenstigt ist, was das fuer Nutzung, Bebauung oder Verkauf bedeutet)},',
+    '  "aenderungen": [string] (nur wenn unten eine bisherige Auswertung steht: was durch die neuen Unterlagen neu hinzukommt oder sich aendert, je ein Satz),',
     '  "offene_fragen": [string] (was ein Kaeufer beim Verwalter/Verkaeufer noch anfordern oder fragen sollte, konkret)',
     '}',
     '',
@@ -4333,7 +4336,18 @@ async function dokumenteAuswerten(dokumente, objekt, opts) {
     'Unterlagen:',
     JSON.stringify(doks).slice(0, 60000)
   ].join('\n');
-  const r = await callOpenAI(prompt, { userApiKey: o.userApiKey, maxTokens: 5000 });
+  /* v3017 · Marcel 28.10.2026: Unterlagen in der Pilot-Analyse nachreichen. Die bisherige
+     Auswertung geht als Grundlage mit (nicht die alten Dokumente) - zusammengefuehrt, nicht ersetzt. */
+  const vorher = o.vorher && typeof o.vorher === 'object' ? o.vorher : null;
+  const promptGesamt = vorher ? prompt + '\n\n' + [
+    'BISHERIGE AUSWERTUNG (aus frueher eingelesenen Unterlagen, Dokumente: ' + JSON.stringify(o.vorherDokumente || []).slice(0, 2000) + '):',
+    JSON.stringify(vorher).slice(0, 30000),
+    '',
+    'ZUSAMMENFUEHREN: Gib die GESAMTE Auswertung zurueck - alte und neue Unterlagen zusammen. Was weiter gilt, bleibt mit seiner Quelle stehen;',
+    'gleiche Sachverhalte zusammenfassen; ist ein neueres Dokument da, gilt es (z. B. neuere Ruecklage, neuer Beschluss) und der Verlauf wird genannt.',
+    'In "aenderungen" stehen nur die Punkte, die durch die NEUEN Unterlagen hinzukommen oder sich aendern.'
+  ].join('\n') : prompt;
+  const r = await callOpenAI(promptGesamt, { userApiKey: o.userApiKey, maxTokens: 6000 });
   const parsed = extractJson(r.text);
   if (!parsed) return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.' };
   return { success: true, model: r.model, auswertung: parsed };

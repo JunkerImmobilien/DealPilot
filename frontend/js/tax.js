@@ -2240,6 +2240,30 @@ function _ytfCellComputed(val) {
   return '<td class="num ytf-computed">' + Math.round(val).toLocaleString('de-DE') + ' €</td>';
 }
 
+/* v3017 · Marcel 28.10.2026: Unterlagen (Wirtschaftsplan, Abrechnung, Sonderumlage) schlagen Werte
+   für den Steuer-Reiter vor - „erstmal drauf hinweisen, dass dort eine Änderung zum jetzigen ist und ob
+   man das übernehmen möchte". Lesen liefert den Wert, der heute gilt (eigene Angabe vor Vorschlag). */
+window.dpSteuerWert = function (year, field) {
+  var ov = _getYearOverride(year, field);
+  if (ov !== undefined) return { wert: Number(ov) || 0, eigen: true };
+  try {
+    var idx = year - _v269_getStartYear();
+    if (State && State.cfRows && idx >= 0 && idx < State.cfRows.length) {
+      var a = _computeAutoForYear(idx, year);
+      if (a && a[field] !== undefined) return { wert: Number(a[field]) || 0, eigen: false };
+    }
+  } catch (e) { /* ohne Zeitleiste kein Vorschlag */ }
+  return null;
+};
+window.dpSteuerSetzen = function (year, field, val) {
+  if (window.dpSteuerWert(year, field) === null) return false;   /* Jahr liegt nicht in der Zeitleiste */
+  _setYearOverride(year, field, Math.round(Number(val) || 0));
+  try { renderYearlyTaxForm(); } catch (e) {}
+  try { if (typeof renderTaxTimeline === 'function') renderTaxTimeline(); } catch (e) {}
+  if (typeof calc === 'function') setTimeout(calc, 50);
+  return true;
+};
+
 function updateTaxOverride(input) {
   var year = parseInt(input.dataset.year);
   var field = input.dataset.field;
