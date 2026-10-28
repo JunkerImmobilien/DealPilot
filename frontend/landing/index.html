@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
 <link rel="stylesheet" href="dp2-hero.css?v=landing-videos-1">
-<link rel="stylesheet" href="einstieg.css?v=landing-einstieg-1">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
@@ -156,26 +155,9 @@
     </div>
   </div></div>
 </section>
-<!-- ══ EINCHECKEN · landing-einstieg-1 ════════════════════════════════
-     Marcel 27.10.2026: Anmelden und Konto erstellen direkt unter dem Hero,
-     ohne Zwischenseite. Öffnet sich bei „Anmelden" / „Kostenlos starten";
-     die Karte ist die der App (einstieg.js, iframe, js/einbettung.js). ═══ -->
-<section class="sec sec-dark einstieg" id="einstieg" hidden aria-label="Anmelden oder Konto erstellen"><div class="wrap">
-  <div class="ein-kopf">
-    <div class="eye">Einchecken</div>
-    <h2>Anmelden oder Konto erstellen</h2>
-    <div class="ein-tabs" role="tablist">
-      <button type="button" role="tab" data-ansicht="anmelden">Anmelden</button>
-      <button type="button" role="tab" data-ansicht="registrieren">Konto erstellen</button>
-    </div>
-    <button type="button" class="ein-zu" aria-label="Schließen">&times;</button>
-  </div>
-  <div class="ein-rahmen">
-    <iframe id="ein-frame" title="DealPilot Anmeldung" allow="clipboard-write" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-    <div class="ein-laedt">Lädt …</div>
-  </div>
-  <p class="ein-fuss">Sicher. Verschlüsselt. DSGVO-konform. · <a href="https://app.dealpilot.immo/" data-direkt>Lieber direkt in die App</a></p>
-</div></section>
+<!-- landing-einstieg-aus · Marcel 28.10.2026: „lass es uns wieder so darstellen wie vorher, mit dem Absprung auf die Seite.“
+     Die Einstiegskarte (landing-einstieg-1..3, einstieg.js/.css) ist hier ausgebaut; Anmelden und Kostenlos starten
+     führen wieder direkt in die App. Die Dateien bleiben liegen, js/einbettung.js wirkt nur mit ?einbettung=1. -->
 
 <div class="laufband"><div class="laufband-t">
   <span>◆ 19 MODULE — VOM EXPOSÉ BIS ZUR BANKUNTERLAGE</span>
@@ -765,7 +747,6 @@
                          vollen Preise, auch wenn ein Rabatt laeuft -
                          und niemand haette es der Seite angesehen.
      Reihenfolge wie in index.html: erst der Flyer, dann der Rabatt. -->
-<script src="einstieg.js?v=landing-einstieg-3"></script>
 <script src="flyer-code.js?v=v1593"></script>
 <script src="promo-erstflug.js?v=v1590"></script>
 <script src="erstflug-popup.js?v=v1595d"></script>

@@ -42947,3 +42947,30 @@ Videos unter `Dateien/Messe/Videos/Lindenallee-14/` (10:50 stumm, 10:58 vertont,
 160.300 € = Flachdach 92.000 + Sonderumlage 42.000 (Teil der 92.000) + Fassade 24.500 + Studie 1.800. KI-These im
 Import schreibt je Lauf anderes, im Prüflauf „sämtliche Wohnungen vermietet“ (WE 5 steht leer); Auswertung nennt
 Rücklagen-Zuführung 7.800 statt 9.600 (2025 beschlossen). Im Protokoll-Reiter erscheint ein Jahr als „2.026“ (Intl).
+
+### v3016i–v3016y1, Ernten, Landing · Prod-Rollout 28.10.2026 nachmittags — Prod `449933a`
+
+**Was.** Seit Prod `6794d34` (v3016–v3016u) dazu: v3016v (Storybook: „Was DealPilot ist“ in vier Fassungen, „Was
+DealPilot anders macht“), v3016w (Ernte 7e79ec97: Offenbach LZS/SWF, Berlin VGF 2026, Schwerin LZS/UK, Unna-WGFZ-Sperre,
+AGS Oberursel 06434011 → 06434008), v3016x (Unterlagen & WEG „Genau“ in fünf Blöcken), Landing `780fe4aa` (Hero-Satz,
+„Was DealPilot macht“, 19 Module in vier Phasen `dp2-module.js/.css`, „Wie wir rechnen“ als öffentliche Kurzfassung mit
+Stufentabelle E/A/B/C/N/D und Datenschutz/Schwärzung, ohne interne Rechenwege), `1b92fd7e` (Methodik-Tabellen am Handy
+als Karten, `data-l` je Zelle), **v3016y** (Kostenkarte zählt eine Sonderumlage nicht doppelt, wenn eine Maßnahme
+desselben Jahres mit mindestens dieser Summe sie enthält) und **v3016y1** (Jahreszahlen/Nummern in den Dokument-Reitern
+ohne Tausenderpunkt).
+
+**Commit.** Prod per `tools/rollout-prod.ps1 -Freigabe` auf `449933a`, beide Backends neu gebaut, HTTP 200. Sicherungen
+`/root/backups/mb-20261028-1629.sql.gz` (30 MB, Kopf angesehen) und `haupt-20261028-1629.sql.gz` (15 MB).
+
+**Nachweis.** Vorab grün: saat-pruefen --basislinie, wertermittlung-pruefen, score-ketten (216 Punkte),
+buster-ebenen, rechenkerne-spiegeln --pruefen. Kostenkarte mit der echten `unterlagen.js` am gespeicherten
+`_dok_auswertung` von 2026-1123: 118.300 € (92.000 + 24.500 + 1.800) statt 160.300 €. Register Prod: Trockenlauf zeigte
+genau die 3 verwaisten Oberursel-Zeilen (id 2916–2918, AGS 06434011, SWF 2025), mit Marcels „ja alles fertig machen“
+per `--aufraeumen` entfernt; SOLL = IST 6.085, `register-db-abgleich` sauber. Methodik bei 390 px: kein Querüberlauf,
+beide Tabellen als Karten (Screenshots `scratchpad/meth/k-390.png`, `k2-390.png`).
+
+**Rest.** Lindenallee 2026-1123 ins Prod-Demo-Konto (528be31f…) zu spiegeln wurde vom Freigabe-Filter abgelehnt –
+Export liegt unter `/tmp/sp-*.json` auf Prod, SQL `scratchpad/spiegel-1123.sql` (objects + 15 tax_records + 1
+tax_snapshot, user_id umgeschrieben); wartet auf Marcels ausdrückliches OK. Lindenallee-Video wird wegen der
+korrigierten Kostenkarte neu aufgenommen (Agent läuft). Offen aus dem Import: KI-These „komplett vermietet“ bei
+leerer WE 5, Rücklagen-Zuführung 7.800 statt 9.600, OCR blockiert den Browser bis 45 s.

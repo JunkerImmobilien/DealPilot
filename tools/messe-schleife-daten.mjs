@@ -124,6 +124,8 @@ const R = {
     swf: D.summe.swf ? D.summe.swf.werte : 0,
     uk_flaeche: D.summe.uk_flaeche ? D.summe.uk_flaeche.werte : 0,
     uk_wgfz: D.summe.uk_wgfz ? D.summe.uk_wgfz.werte : 0,
+    /* landing-methodik-3: Vergleichsfaktoren für die Karten auf „Wie wir rechnen" */
+    vgf: D.summe.vgf ? D.summe.vgf.werte : 0,
     uk: (D.summe.uk_flaeche ? D.summe.uk_flaeche.werte : 0) + (D.summe.uk_wgfz ? D.summe.uk_wgfz.werte : 0),
     irw_tabellen: irw,
     irw_ausschuesse: irwAus.size,
@@ -141,6 +143,10 @@ const R = {
 const kopfText = '/* messe-schleife-daten.mjs · erzeugt ' + R.erzeugt + ' — NICHT von Hand ändern.\n'
   + '   Neu erzeugen: node tools/messe-schleife-daten.mjs */\n';
 fs.writeFileSync(join(ZIEL, 'register-stand.js'), kopfText + 'window.DPS_REGISTER = ' + JSON.stringify(R, null, 1) + ';\n');
+/* landing-methodik-3 · Marcel 28.10.2026: „nur Zahlen groß nennen, in Karten, und immer anpassen, wenn wir
+   neue Werte ernten". Die Landing liegt unter eigener Wurzel (/srv/landing) und erreicht messe-schleife/
+   nicht – deshalb dieselbe Datei als Kopie dort. methodik.html zieht sie beim Aufruf nach. */
+fs.writeFileSync(join(WURZEL, 'frontend/landing/register-stand.js'), kopfText + 'window.DPS_REGISTER = ' + JSON.stringify(R, null, 1) + ';\n');
 
 /* ── 4 · Videothek-Liste aus videos.json ──────────────────────────────── */
 const V = JSON.parse(fs.readFileSync(join(WURZEL, 'frontend/landing/assets/videothek/videos.json'), 'utf8'));

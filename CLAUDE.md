@@ -277,7 +277,7 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `irw-pruefen.mjs` | Umrechnungstabellen der Immobilienrichtwerte NRW (`uk-irw-nw-*.json`) gegen ihre amtlichen Anwendungsbeispiele, Verfahrenswahl mit IRW (v2620/v2680) |
 | `beleihungswert-pruefen.mjs` | indikativer Beleihungswert-Check nach BelWertV (`lib/beleihungswert.js`), Mindestzins aus `config.js` jährlich nach dem 30.11. prüfen |
 | `ki-text-zahlen-pruefen.mjs` | KI-Fließtext des Marktberichts: Prozente/Zählungen gegen die vorab gerechneten Prüfzahlen (`lib/ki_text_pruefung.js`, v2670) |
-| `messe-schleife-daten.mjs` | erzeugt Register- und Videothek-Zahlen der Messe-Schleife; nach jeder Ernte laufen lassen |
+| `messe-schleife-daten.mjs` | erzeugt Register- und Videothek-Zahlen der Messe-Schleife **und die Registerkarten auf „Wie wir rechnen“** (`frontend/landing/register-stand.js`, seit landing-methodik-3); nach jeder Ernte laufen lassen und beide `register-stand.js` mitcommitten |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
