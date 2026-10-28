@@ -32,6 +32,13 @@ Jeder **Wert** zusätzlich:
 - beim **Sachwertfaktor**: `modellansaetze.gnd_jahre` als ZAHL und
   `modellansaetze.baupreisindex` als ZAHL (sonst rechnet der Kern mit 80
   Jahren und der Konstanten 1,91 — und nichts widerspricht)
+  — ODER, wenn das Modell den Index nicht beziffert (Marcel 28.10.2026, v3019):
+  `baupreisindex_bezug: 'kaufzeitpunkt'` (Modell nennt den Kaufzeitpunkt) bzw.
+  `'stichtag_regelfall'` (Modell nennt KEINEN Bezug → Regelfall § 36 Abs. 2
+  ImmoWertV), jeweils mit `baupreisindex_wortlaut` und `baupreisindex_seite`.
+  Dann ist der Satz ein WERT, keine Sperre. Gesperrt wird nur, wo das Modell
+  einen anderen, nicht bestimmbaren Bezug nahelegt. Ist ein Faktor nach
+  Baujahrsgruppen gestaffelt, rechnet er seit v3019 mit dem Baujahr des Objekts.
 - `lizenz` wörtlich aus dem Dokument; unter `dl-de/by-2-0` zusätzlich
   `quellenvermerk`. Steht im Dokument keine Lizenz: so vermerken, nie erfinden.
 

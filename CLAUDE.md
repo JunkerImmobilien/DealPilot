@@ -682,9 +682,14 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
   also genau der heutige Weg. Im Satz: `baupreisindex_bezug: 'kaufzeitpunkt'`
   plus `baupreisindex_wortlaut` und `baupreisindex_seite`; der Rechenweg sagt
   dann „Baupreisindex zum Wertermittlungsstichtag (Modell des Ausschusses:
-  Index zum Kaufzeitpunkt)". **Ohne Bezugszeitpunkt** („Baupreisindex des
-  Statistischen Bundesamtes", Ludwigslust-Parchim, Böblingen, Lahr) bleibt
-  es eine Sperre — **gilt für neu geerntete Sätze.**
+  Index zum Kaufzeitpunkt)". ~~Ohne Bezugszeitpunkt bleibt es eine Sperre —
+  gilt für neu geerntete Sätze.~~ **Aufgehoben am 28.10.2026 (v3019, Marcel:
+  „ja, wenn das sinnvoll ist")**: auch NEU geerntete Sätze ohne Bezugszeitpunkt
+  sind Werte mit `baupreisindex_bezug: 'stichtag_regelfall'` plus Wortlaut und
+  Seite; der Rechenweg sagt „Baupreisindex zum Wertermittlungsstichtag
+  (Regelfall § 36 Abs. 2 ImmoWertV; Modell des Ausschusses nennt keinen
+  abweichenden Bezug)". So wurden Bruchsal, Böblingen, Lahr,
+  Schwarzwald-Baar-Südwest und Ludwigslust-Parchim zu Werten.
 
   > **Entscheidung 27.10.2026 (Marcel: „so umsetzen, dass es passt"):** Die
   > rund 420 Bestandssätze, deren Modell den Index gar nicht nennt, bleiben
