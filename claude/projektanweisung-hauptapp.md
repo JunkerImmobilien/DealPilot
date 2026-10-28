@@ -43418,3 +43418,52 @@ Vertragsart → fehlt), Zahlen „1.050“ / „850,50“ richtig gelesen.
 
 **Rest.** **Staging-Pull ausstehend** (Messe-Aufnahme lief). Danach im Browser: Lindenallee (Einheiten)
 und eine ETW, 390 px, Screenshots vorher/nachher, Absprung in die Einheit, Kennzahlen gegenlesen.
+
+### v3025 · Objektwissen für Telegram-Bot, Co-Pilot und Cockpit-Pilot: Unterlagen, Mietpotenzial im Jahr, To-dos, Marktmiete · 28.10.2026 — Commit `07d480d6`
+
+**Was.** Marcel: „wird alles, was wir heute ergänzt haben, auch immer im Objektwissen gespeichert, und kann der
+Telegram-Bot darauf zugreifen?“, erweitert um „Potenzial dieses Jahr“, „To-dos“ und „Miete für ETWs in Herford
+mit 80 m²“. **Gemessen vorher** (Lindenallee 14, `2b57a20f`, mit `tools/agent-pruefung/pruef-objektwissen.js`,
+Werkzeuge echt aufgerufen, ohne KI): die Unterlagen-Auswertung `data._dok_auswertung` erreichte **kein**
+Bot-Werkzeug. `objekt_lesen` wirft alles mit `_` weg und sah nur `risiken`/`thesis`. Der Co-Pilot bekam drei
+gekürzte Zeilen (`dok_*`). Der Co-Pilot und der Cockpit-Pilot haben keine Werkzeuge.
+Neu ist `backend/src/services/objektWissen.js`, eine Fassung für alle drei:
+- `unterlagen()`: Risiken nach Schwere mit Quelle, Betrag und Anteil; WEG; Maßnahmen mit Gesamt und Anteil
+  (ETW × MEA, sonst 100 %, wie `unterlagen.js anteil()`); Sonderumlagen, Baulasten, Abt. II, offene Fragen,
+  Dokumente, Stand. Alles läuft durch `schwaerze()`, ohne Dateinamen und ohne Verwalterzeile.
+- `potenzial(jahr)`: liest `_potenzial.zusammenfassung` und rechnet keine Miete neu. „sofort“ wirkt erst nach
+  § 558b Abs. 1 / § 559b Abs. 2 (dritter Monat) bzw. § 557b Abs. 3 (übernächster Monat); `verlangen_ab` getrennt.
+- `todos()`: offene Fragen, WEG-Maßnahmen, Mieterhöhungen, Zinsbindungsende ≤ 24 Monate (Auszahlung +
+  `bindj`), 15-%-Frist (Kaufdatum + 3 J.), `unterlagen_anfragen` (Entwurf/gesendet), PDF-Pflichtfelder
+  wie `pdf-pruefung.js`.
+- `marktmiete()`: Register-Modellmiete des Ausschusses (`/register/probe`, Zweig nach Objektart), Zensus 2022
+  je Klasse, Angebots-Median aus vorhandenen Marktberichten (`mietBelegeService`), eigene Ist-Mieten am Ort;
+  Ort→PLZ über eigene Objekte bzw. OpenPLZ. Kein Kontingent, keine Anbieternamen, kein Mittelwert.
+
+Bot-Werkzeuge `objekt_unterlagen`, `portfolio_potenzial`, `portfolio_todos`, `marktmiete` (Stufe lesen), Regel 7n
+in `agentLauf.js`. `/ai/copilot` ruft über `_copilotObjektwissen` **dieselben Werkzeugfunktionen** und legt
+`context.objektwissen` an: am Objekt über `context.objekt_id` (`copilot.js`), im Portfolio gekürzt (29.776
+statt 64.556 Zeichen); die Marktmiete nur bei erkannter Mietfrage. `potenzial.js` speichert die nächste
+Indexanpassung aus v3026 als `zusammenfassung.wohnungen[].index`. `help.js` ist nachgezogen.
+
+**Nachweis.** `pruef-objektwissen.js` im laufenden Staging-Container: **34/34**. Vorher erreichte
+`objekt_unterlagen` nichts, jetzt alle 9 Merkmale des Datensatzes. Potenzial Demo-Konto 2026: 13 Objekte,
+4.477 €/Monat verlangbar, davon wirksam 2026: 468 €. To-dos: 124 im Konto. Marktmiete Herford ETW 80 m²:
+amtlich 7,00 €/m² (GAA Kreis/Stadt Herford, 2025, 272 Fälle), Zensus 2022 5,78 (Größenklasse 5,59), Angebote
+8,14 (6,38–9,10, n = 28, Bericht 27.10.), eigene 7,50–9,00. Weitere Prüfer: `pruef-pilot-analyse.js` 17/17,
+`prompt-lecks-pruefen.mjs` sauber, `buster-ebenen` sauber.
+
+**Staging.** Es lief eine Messe-Aufnahme (`messe-studio.html?messe=komplett-mfh`). Deshalb **nur das Backend**:
+Das Image wurde aus `git archive origin/staging backend` gebaut (`dealpilot-staging-backend`) und mit
+`up -d --no-build backend` gestartet. Die Arbeitskopie auf dem Server blieb unberührt (0 lokale Änderungen),
+damit `deploy-staging.ps1` später sauber zieht.
+
+**Rest.**
+- **Staging-Pull ausstehend** für `copilot.js` (`objekt_id`), `help.js`, `potenzial.js` und die Buster
+  `v3025b`. Bis dahin bekommt der Objekt-Co-Pilot das neue Wissen nicht; Bot und Cockpit-Pilot haben es schon.
+- Die Fortschreibung der Zensus-Miete mit dem NKM-Index rechnet nur der mb-Dienst (`zensus_miete.js`). Dafür
+  fehlt ein Endpunkt, deshalb weist das Werkzeug Zensus mit Stand 2022 aus.
+- Die Indexmiete steht erst im Objekt, wenn „Mieterhöhung & Zielbild“ nach dem Pull einmal neu gerechnet wurde.
+- An der Lindenallee liegt auf Staging keine Baulastenauskunft vor. Das Werkzeug sagt das und nennt den Weg;
+  den Baulasten-Zweig im Browser mit einer nachgereichten Auskunft abnehmen.
+- Prod-Rollout.
