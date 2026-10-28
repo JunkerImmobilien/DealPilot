@@ -43467,3 +43467,52 @@ damit `deploy-staging.ps1` später sauber zieht.
 - An der Lindenallee liegt auf Staging keine Baulastenauskunft vor. Das Werkzeug sagt das und nennt den Weg;
   den Baulasten-Zweig im Browser mit einer nachgereichten Auskunft abnehmen.
 - Prod-Rollout.
+
+### v3028 · Mieterhöhung: „verlangbar ab“ und „wirksam ab“ getrennt, Zensus-Fortschreibung für die Piloten · 28.10.2026 — Commit `22a5589b`
+
+**Was.** Marcel (28.10.2026, „ja, mach das so“): „sofort“ hieß in der App nur, dass das Erhöhungsverlangen jetzt
+gestellt werden darf. Seit v3028 stehen überall zwei Daten: **verlangbar ab** (frühester Zugang) und **wirksam ab**
+(Beginn der Zahlungspflicht). Wortlaut auf gesetze-im-internet.de gelesen und im Code zitiert: § 558 Abs. 1 S. 2
+(Verlangen frühestens ein Jahr nach der letzten Erhöhung), § 558b Abs. 1 (dritter Kalendermonat nach Zugang),
+§ 559b Abs. 2 (dritter Monat nach Zugang), § 557b Abs. 3 (übernächster Monat).
+- **Ein Rechenweg:** `potenzial.js` `mhTermine()` / `wirksamNachZugang()`, `TERMIN_REGEL`. `sollFuer().ab` ist jetzt
+  der **Wirksamkeitsmonat** (vorher max(heute, letzte+15)). Daran hängen Jahr der Stufe, Mietentwicklung und das
+  Drei-Jahres-Fenster der Kappungsgrenze. Reine § 559-Umlage: ohne Jahressperre, § 559b. Eigene Angabe heißt jetzt
+  „Wirksam ab (eigene Angabe)“. Liegt sie vor dem frühesten Termin, gilt sie trotzdem, aber mit Hinweis.
+- **Gespeichert** je Wohnung in `_potenzial.zusammenfassung`: `soll_verlangbar_ab`, `soll_verlangbar_sofort`,
+  `soll_wirksam_ab`, `soll_termin`. `objektWissen.js` liest diese Felder. Für einen alten Speicherstand (nur Text
+  „sofort“/„Okt 2026“) rechnet `_altTermin()` um und kennzeichnet das. Der Prüfer zeigt, dass beide Wege für
+  dieselben Fälle dasselbe Ergebnis liefern. Staffel bekommt kein „sofort“ mehr, sondern „nächste Staffel wirksam
+  ab …“ (§ 557a).
+- **Stellen:** Karte „DealPilot rechnet vor“, Einheiten-Fenster (zwei Zeilen statt „erreichbar ab“),
+  Vertragsübersicht Reiter Miete (v3027, Spalte „Nächste Erhöhung“, mit Tooltip-Langform), Bank-Satz und
+  PDF-Zeile (`pdf.js`, `pdf-investment-bank.js`: Spalte bricht um), Jahresfuß, Mietentwicklung-Text, Feld
+  `zb_soll_ab`, To-dos, `portfolio_potenzial`, Cockpit-Pilot-Kurzfassung (`ai.js`), Hilfe (neuer Abschnitt).
+- **Piloten:** `MH_TERMIN_REGEL` (openaiService) steht im Analyse-Auftrag (`_potenzialBlock`) und im
+  Co-Pilot/Cockpit-Pilot (`copilotChat`): beide Daten nennen, „sofort“ nur für das Verlangen benutzen, das
+  laufende Jahr erst ab „wirksam ab“ zählen.
+- **Zensus fortgeschrieben:** mb `GET /zensus/fortgeschrieben?plz&ort&baujahr&wfl` nutzt `zensusMieteAmStichtag`
+  auf den jüngsten NKM-Monat, die Klassen werden einzeln fortgeschrieben. `marktmiete` übernimmt das Etikett
+  „Zensus 2022, fortgeschrieben auf MM/JJJJ mit dem Nettokaltmieten-Index“. Ohne Endpunkt bleibt der Wert von
+  2022 stehen, mit Hinweis.
+
+**Beispiel.** Vorher: Whg 1, letzte Erhöhung 03/2025 → „Soll erreichbar ab: sofort“. Nachher:
+„verlangbar ab sofort · wirksam ab 01/2027 (Zugang heute angenommen, § 558b Abs. 1 BGB)“. Im Jahr 2026 kommen
+0 € an, 2027 dann 12 Monate. Zensus Herford, Bj 1975, 80 m² (im mb-Container gemessen): 5,48 €/m² × 111,9/102,7
+(09/2026) = **5,97 €/m²**. Klassen: Baujahr 5,37 → 5,85, Größe 5,59 → 6,09.
+
+**Nachweis.** `tools/mieterhoehung-termine-pruefen.mjs` 50/50 (Zugang 15.10./31.10. → 01.01., 01.11. → 01.02.,
+§ 559b, § 557b, Jahresgrenze, sollFuer mit fester Uhr, objektWissen gespeichert/alt/Staffel, To-do, Quelltext).
+`prompt-lecks-pruefen` SAUBER (+5 Punkte). `indexmiete-pruefen` 39/39. `buster-ebenen` SAUBER (sieben Buster auf
+v3028). `pruef-objektwissen.js` **37/37** im Staging-Backend-Container gegen die echte DB, mit einer Arbeitskopie
+unter `/app/_pw3028` (danach entfernt; das laufende Image blieb unberührt). Dazu drei neue Termin-Punkte. Gefunden
+und behoben: eine Staffel mit altem Text „sofort“.
+
+**Rest.**
+- **Staging-Pull ausstehend:** Im Chrome lief eine Messe-Aufnahme (`messe-studio.html?messe=komplett-mfh`).
+  Danach `git pull`, Backend und mb-backend neu bauen (Endpunkt `/zensus/fortgeschrieben`).
+- Im Browser abnehmen: Einheiten-Fenster, Karte, Reiter Miete, beide PDFs (Umbruch der Spalte Mieterhöhung).
+- Alte Objekte bekommen die Felder, sobald „Mieterhöhung & Zielbild“ einmal gerechnet wird. Bis dahin gilt die
+  gekennzeichnete Umrechnung.
+- § 559b Abs. 2 S. 2 (+6 Monate ohne Ankündigung nach § 555c bzw. bei mehr als 10 % Überschreitung) ist nicht erfasst.
+- Prod-Rollout.
