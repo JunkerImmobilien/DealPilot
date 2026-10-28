@@ -7121,7 +7121,8 @@
       },
 
       /* ════ KAPITEL 9 · UNTERLAGEN (v3021k) - zweites Objekt, danach zurück ════ */
-      kuS1, kuS2, kuS3, kuS4, kuS5,
+      /* EINE Szene: das Kapitelband zählt Szenen - fünf hätten Kapitel 10 als „14“ gezeigt (gemessen im Prüflauf) */
+      async function (s) { await kuS1(s); await kuS2(s); await kuS3(s); await kuS4(s); await kuS5(s); },
 
       /* ════ KAPITEL 10 · ERGEBNIS UND BANK-PDF ════ */
       async function (s) {
