@@ -258,12 +258,26 @@
     betrag_eur: 'Betrag', glaubiger: 'Gläubiger', flaeche_m2: 'Fläche (m²)', beschreibung: 'Beschreibung', jahr: 'Jahr', gewerk: 'Gewerk', kosten_geschaetzt_eur: 'Kosten (geschätzt)',
     nr: 'Nr.', lage: 'Lage', mea: 'MEA', wfl_m2: 'm²', status: 'Status', nk_vorauszahlung_eur: 'NK', ab: 'ab'
   };
-  function name(k) { return NAMEN[k] || String(k).replace(/_/g, ' '); }
+  /* v3017a · Marcel 28.10.2026: „prüf … ob das richtig angezeigt wird, ob das auch richtig formatiert ist" -
+     gemessen: Wirtschaftsplan und Baulasten zeigten Rohschlüssel („kosten jahr eur", „behoerde", „beguenstigt") */
+  var NAMEN2 = {
+    umfang: 'Umfang', einheit: 'Wohnung', kosten_jahr_eur: 'Kosten / Jahr', umlagefaehig_jahr_eur: 'umlagefähig / Jahr',
+    nicht_umlagefaehig_jahr_eur: 'nicht umlagefähig / Jahr (ohne Rücklage)', ruecklage_zufuehrung_jahr_eur: 'Zuführung Rücklage / Jahr',
+    verwaltung_jahr_eur: 'Verwaltung / Jahr', hausgeld_monat_eur: 'Hausgeld / Monat', ruecklage_stand_eur: 'Rücklage (Stand)',
+    ruecklage_entnahmen: 'Entnahmen aus der Rücklage', sonderumlagen: 'Sonderumlagen', abrechnungsergebnis_eur: 'Abrechnungsergebnis',
+    positionen: 'Positionen', bezeichnung: 'Position', betrag_gesamt_eur: 'Betrag Gemeinschaft', betrag_einheit_eur: 'Betrag Wohnung',
+    umlagefaehig: 'umlagefähig', zweck: 'Zweck', faellig: 'fällig', betrag_eur: 'Betrag',
+    auskunft_datum: 'Auskunft vom', behoerde: 'Behörde', keine_baulasten: 'keine Baulasten eingetragen', baulasten: 'Baulasten',
+    blatt: 'Blatt', rolle: 'dieses Grundstück', inhalt: 'Inhalt', art: 'Art', jahr: 'Jahr'
+  };
+  var BLOCK = { gesamt: 'Gesamtplan der Gemeinschaft', einzel: 'Einzelplan der Wohnung' };
+  var WORT = { beguenstigt: 'begünstigt', belastet: 'belastet', einzel: 'Einzelplan einer Wohnung', gesamt: 'Gesamtplan der Gemeinschaft', beides: 'Gesamt- und Einzelplan' };
+  function name(k) { return NAMEN2[k] || NAMEN[k] || String(k).replace(/_/g, ' '); }
   function wert(k, x) {
     if (x === true) return 'ja'; if (x === false) return 'nein';
     /* v3016y · Jahreszahlen und Nummern nie durch toLocaleString („2.026“) */
     if (typeof x === 'number') return /_eur$/.test(k) ? eur(x) : /jahr|(^|_)(nr|plz)(_|$)/.test(k) ? String(x) : x.toLocaleString('de-DE');
-    return String(x);
+    return WORT[x] || String(x);   /* v3017a */
   }
   function risikoHtml(x) {
     var s = String(x.schwere || 'mittel').toLowerCase();
@@ -284,6 +298,12 @@
         var cols = []; x.forEach(function (y) { Object.keys(y || {}).forEach(function (c) { if (cols.indexOf(c) < 0 && cols.length < 8) cols.push(c); }); });
         bloecke.push('<div class="dpu-h">' + esc(name(k)) + ' (' + x.length + ')</div><table class="dpu-tbl"><tr>' + cols.map(function (c) { return '<th>' + esc(name(c)) + '</th>'; }).join('') + '</tr>'
           + x.map(function (y) { return '<tr>' + cols.map(function (c) { var z = (y || {})[c]; return '<td>' + (z == null ? '' : esc(wert(c, z))) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>');
+        return;
+      }
+      /* v3017a · benannte Unterobjekte (Gesamt-/Einzelplan) als eigener Block statt flach dazwischen */
+      if (typeof x === 'object' && BLOCK[k]) {
+        var z = Object.keys(x).filter(function (k2) { return x[k2] != null && x[k2] !== '' && typeof x[k2] !== 'object'; });
+        if (z.length) bloecke.push('<div class="dpu-h">' + esc(BLOCK[k]) + '</div><dl class="dpu-dl">' + z.map(function (k2) { return '<dt>' + esc(name(k2)) + '</dt><dd>' + esc(wert(k2, x[k2])) + '</dd>'; }).join('') + '</dl>');
         return;
       }
       if (typeof x === 'object') { Object.keys(x).forEach(function (k2) { if (x[k2] != null && x[k2] !== '' && typeof x[k2] !== 'object') dl.push('<dt>' + esc(name(k2)) + '</dt><dd>' + esc(wert(k2, x[k2])) + '</dd>'); }); return; }
