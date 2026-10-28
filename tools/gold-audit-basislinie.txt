@@ -6,12 +6,12 @@
 # schreibt die Basislinie danach neu — dann ist der Deckel dichter.
 # Format: <pfad><TAB><anzahl>
 #
-# ASSETS	260
+# ASSETS	270
 # ^ Zahl der eingelesenen Dateien. Deckungspruefung: liest ein
 #   spaeterer Lauf deutlich weniger, hat er weniger GESUCHT, nicht
 #   weniger gefunden. Dann ist "sauber" eine Luege.
 #
-# Gesamt zum Zeitpunkt des Einfrierens: 429 Fundstellen in 54 Datei(en)
+# Gesamt zum Zeitpunkt des Einfrierens: 416 Fundstellen in 53 Datei(en)
 js/apikeys.js	1
 js/auth-401-handler.js	2
 js/auth.js	7
@@ -53,9 +53,8 @@ js/star-rating.js	1
 js/tax-periods.js	20
 js/tax.js	8
 js/textfarben-karten.js	2
-js/ueberfuehrung-wizard.js	12
 js/ui-varianten.js	10
-js/ui.js	9
+js/ui.js	8
 js/voice-import.js	1
 js/wirtschaftlicher-uebergang.js	2
 js/zve-manager.js	9
