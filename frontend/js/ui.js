@@ -1384,8 +1384,22 @@ function _buildAIPayload() {
           var _gesetzt = [];
           var _ZU_ROH = { strategie: 'ai_strat', risikoneigung: 'ai_risk',
             verkaeufer_druck: 'ai_verk', marktlage: 'ai_markt' };
+          /* v3022 · Entwurf „Einstellungen schlank" (einstellungen-schlank.js):
+             Marktphase und Verkäuferbereitschaft stehen dort nicht mehr in
+             den Einstellungen — also dürfen sie das Urteil auch nicht
+             verschieben. Die Marktlage fällt weg; den Verkäuferdruck gibt es
+             nur noch je Objekt (Reiter Pilot-Analyse), und nur, wenn er
+             angegeben ist. Ohne Schalter bleibt alles wie bisher. */
+          var _schlank = !!(window.DpEinstSchlank && DpEinstSchlank.aktiv && DpEinstSchlank.aktiv());
+          var _verkObj = '';
+          if (_schlank) {
+            delete _prof.marktlage;
+            _verkObj = DpEinstSchlank.verkaeuferObjekt ? DpEinstSchlank.verkaeuferObjekt() : '';
+            if (_verkObj) _prof.verkaeufer_druck = _verkObj; else delete _prof.verkaeufer_druck;
+          }
           Object.keys(_prof).forEach(function (k) {
             if (_prof[k] == null || _prof[k] === '') { delete _prof[k]; return; }
+            if (_schlank && k === 'verkaeufer_druck') { _gesetzt.push(k); return; }
             var rk = _ZU_ROH[k] || k;
             if (_roh[rk] != null && _roh[rk] !== '') _gesetzt.push(k);
           });

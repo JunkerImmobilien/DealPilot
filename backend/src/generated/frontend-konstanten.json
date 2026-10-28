@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T17:32:10.973Z",
+ "erzeugt_am": "2026-10-28T17:41:18.206Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "ede97e023ec599eb",
-  "index-html": "ac238f476f6c9c76",
+  "index-html": "0ec52d4efa739840",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -4009,8 +4009,12 @@
       "text": "Links findest du die Reiter:\n• Account & Sicherheit — Login, Passwort, Zwei-Faktor, Account löschen, Telegram-Bot\n• Kontakt & Logo — Kontaktdaten und eigenes Logo für PDFs\n• Co-Pilot (KI) — Tonalität, Fokus, Instruktionen\n• Deal Score — Gewichtung, Schwellenwerte\n• Standardwerte — Vorgaben, die in jede Kalkulation einfließen\n• Darstellung — was angezeigt wird und wie es aussieht; ändert keine Zahl\n• Datenraum — geteilte Objekte und Portfolio-Pässe\n• Mandanten — Halter, Steuerregime, Steuerzeiträume\n• Plan — Abo, Kontingent, Abrechnung\n• Rechtliches und Hilfe\n\nUnten steht „Auto-Save aktiv · Änderungen werden direkt übernommen“. Mit Speichern sicherst du ausdrücklich, Abbrechen oder Esc schließt das Fenster."
      },
      {
+      "h": "Entwurf: Einstellungen schlank",
+      "text": "Ein Entwurf zum Vergleichen, Vorgabe aus. Einschalten mit ?einstellungen=schlank hinter der Adresse (gilt für diesen Browser-Tab), dauerhaft mit ?einstellungen=schlank&merken, aus mit ?einstellungen=voll.\n\nWas sich ändert — gelöscht wird nichts, gespeicherte Werte bleiben:\n• Mein Profil (bisher Standardwerte) steht direkt nach Account und enthält zusätzlich Strategie und Risikoneigung sowie eine Zeile, mit welcher Gewichtung dein Deal Score rechnet — mit „Auf Standard zurücksetzen“, wenn es nicht die Standardgewichtung ist.\n• Co-Pilot (KI) zeigt nur Länge und Ton; Fokus, eigene Anweisungen, Vorlagen und eigenes Wissen liegen unter „Für Profis“.\n• Marktphase gibt es nicht mehr als Einstellung, und sie geht nicht in die Pilot-Analyse. Die Verkäuferbereitschaft trägst du freiwillig je Objekt im Reiter Pilot-Analyse ein („Verkäufer unter Zeitdruck?“).\n• Der Reiter Deal Score ist ausgeblendet; eine eigene Gewichtung wirkt weiter.\n• Datenraum erscheint, wenn du ihn nutzt oder ab Investor, Mandanten ab Pro oder sobald du eine Gesellschaft angelegt hast."
+     },
+     {
       "h": "Co-Pilot (KI) und Kontakt & Logo",
-      "text": "Unter Co-Pilot (KI) legst du fest, wie die Pilot-Analysen schreiben (KI-Lage, Quick-Check, Investor Deal Score AI):\n• Detailgrad: kurz, mittel oder ausführlich\n• Tonalität: sachlich, beratend oder kritisch (Risiken zuerst)\n• Fokus-Schwerpunkte und Eigene Anweisungen\n• Eigenes Wissen für alle Piloten: geht an Pilot-Analyse, Portfolio-Pilot und Telegram-Bot. Trag dort keine Zahlen ein, die sich ändern — die holt die KI aus der echten Quelle.\n• Standard-Analyseparameter wie Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und aktuelle Marktphase. Pro Objekt im KI-Tab überschreibbar.\n\nUnter Kontakt & Logo stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen ab dem Investor-Plan im Kopf bzw. Footer deiner PDFs und auf Track-Records; in Free und Starter tragen die PDFs keinen Absender. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (ab Investor, empfohlen: PNG, 300×100 px). Im Deal-Aktion-Banner und auf den Anfrage-Karten erscheinen deine Daten ab Pro."
+      "text": "Unter Co-Pilot (KI) legst du fest, wie die Pilot-Analysen schreiben (KI-Lage, Quick-Check, Investor Deal Score AI):\n• Detailgrad: kurz, mittel oder ausführlich\n• Tonalität: sachlich, beratend oder kritisch (Risiken zuerst)\n• Fokus-Schwerpunkte und Eigene Anweisungen\n• Eigenes Wissen für alle Piloten: geht an Pilot-Analyse, Portfolio-Pilot und Telegram-Bot. Trag dort keine Zahlen ein, die sich ändern — die holt die KI aus der echten Quelle.\n• Standard-Analyseparameter wie Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und aktuelle Marktphase. Sie gelten für alle Objekte.\n\nUnter Kontakt & Logo stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen ab dem Investor-Plan im Kopf bzw. Footer deiner PDFs und auf Track-Records; in Free und Starter tragen die PDFs keinen Absender. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (ab Investor, empfohlen: PNG, 300×100 px). Im Deal-Aktion-Banner und auf den Anfrage-Karten erscheinen deine Daten ab Pro."
      },
      {
       "h": "Deal Score: Gewichtung und Bewertungsprofile",
@@ -5235,7 +5239,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "f1f9f683ce68c535",
+  "hilfe": "29d24ef69787c956",
   "bewertung": "bca98c7b04c452b7"
  }
 }

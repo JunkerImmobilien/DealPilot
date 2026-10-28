@@ -531,7 +531,7 @@ function showSettings(initialTab) {
         // ohne Argument → undefined. Das warf TypeError beim Zugriff auf .ai_strat und
         // verhinderte das gesamte Settings-Modal-Render. Jetzt direkt einzelne Keys abfragen.
         '<h3 class="set-section-h" style="margin-top:24px">Standard-Analyseparameter</h3>' +
-        '<p class="hint" style="margin-top:-6px;margin-bottom:14px">Diese Werte fließen in jeden Pilot-Analyse-Prompt ein. Sie sind pro Objekt im KI-Tab überschreibbar.</p>' +
+        '<p class="hint" style="margin-top:-6px;margin-bottom:14px">Diese Werte fließen in jeden Pilot-Analyse-Prompt ein und gelten für alle Objekte.</p>' +   /* v3022: „pro Objekt im KI-Tab überschreibbar" stimmte nicht — es gibt kein solches Feld am Objekt, ui.js liest nur das Profil */
         (function() {
           var ipApi = (window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get) ? DealPilotInvestmentProfile : null;
           var aiStrat = (ipApi ? ipApi.get('ai_strat') : null) || 'Buy & Hold (Langfristig halten)';
@@ -539,6 +539,13 @@ function showSettings(initialTab) {
           var aiRisk  = (ipApi ? ipApi.get('ai_risk')  : null) || 'Moderat (ausgewogen)';
           var aiMarkt = (ipApi ? ipApi.get('ai_markt') : null) || 'Ausgeglichen (stabil)';
           function opts(arr, sel) {
+            /* v3022: Ein gespeicherter Text, der nicht in der Liste steht, wird als
+               eigene Option gezeigt. Gemessen: das Einrichtungsfenster schreibt
+               ai_risk = "Konservativ (sicherheitsorientiert)" bzw. "Chancenorientiert
+               (höheres Risiko)" (onboarding.js GRENZEN) — beide fehlten hier, der
+               Browser zeigte die ERSTE Option, und jedes Speichern der Einstellungen
+               schrieb still "Konservativ (Sicherheit ist wichtigst)" zurück. */
+            if (sel && arr.indexOf(sel) < 0) arr = arr.concat([sel]);
             return arr.map(function(o){
               return '<option' + (o === sel ? ' selected' : '') + '>' + o + '</option>';
             }).join('');
