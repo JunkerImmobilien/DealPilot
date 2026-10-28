@@ -2332,10 +2332,12 @@
   function istDokument(text, name) {
     var t = String(text || '');
     if (/dealpilot/i.test(t)) return false;
-    if (DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; })) return true;
-    /* Ein Exposé nennt „Energieausweis“ oft in den Eckdaten - Kaufpreis plus Provision/Exposé heisst: Exposé */
+    /* Ein Exposé nennt „Energieausweis“ oft in den Eckdaten - Kaufpreis plus Provision/Exposé heisst: Exposé.
+       v3016k · VOR den Leitbegriffen: gemessen 28.10. las der Import das Exposé Lindenallee als
+       Energieausweis, weil es „Protokolle der Eigentümerversammlungen“ als Unterlage nennt. */
     var expo = ['kaufpreis', 'provision', 'courtage', 'exposé', 'expose'].filter(function (w) { return t.toLowerCase().indexOf(w) >= 0; }).length;
     if (expo >= 2 && !DOK_NAME.test(String(name || ''))) return false;
+    if (DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; })) return true;
     var kopf = t.slice(0, 800);
     return DOK_KOPF.some(function (w) { return kopf.indexOf(w) >= 0; }) || DOK_NAME.test(String(name || ''));
   }

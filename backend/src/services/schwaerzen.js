@@ -47,6 +47,13 @@ const REGELN = [
   { name: 'geburtsname',
     re: new RegExp('\\b(geb\\.|geborene|geborener)\\s+' + W, 'g'),
     ersatz: (m, p1) => p1 + ' [Name]' },
+  // v3016k · Rolle + Name OHNE Anrede, wie in Exposés: „Ansprechpartner: Thomas Becker",
+  // „Ihr Makler Max Mustermann". Marcel 28.10.2026: personenbezogene Daten aus dem Exposé
+  // sollen nicht an die KI. Nur nach einer Rollenbezeichnung - ein Strassen- oder Firmenname
+  // ohne Rolle davor bleibt stehen.
+  { name: 'rolle_name',
+    re: new RegExp('\\b((?:Ihr(?:e)?\\s+)?(?:Ansprechpartner(?:in)?|Kontaktperson|Kontakt|Makler(?:in)?|Berater(?:in)?|Verkäufer(?:in)?|Eigentümer(?:in)?|Vermieter(?:in)?|Mieter(?:in)?|Verwalter(?:in)?|Sachbearbeiter(?:in)?)\\s*:?\\s+)(?!\\[)' + W + '\\s+' + W + '(?:\\s+' + W + ')?(?=[\\s,.;)]|$)', 'g'),
+    ersatz: (m, p1) => p1 + '[Name]' },
   // Anrede + Name (bis drei Wörter, Titel erlaubt)
   { name: 'anrede',
     re: new RegExp('\\b(Herrn?|Frau|Eheleute|Notarin|Notar)\\s+((?:Dr\\.|Prof\\.|Dipl\\.-[A-Za-z]+\\.?)\\s*)*' + W + '(?:\\s+(?:und\\s+)?' + W + '){0,3}', 'g'),
