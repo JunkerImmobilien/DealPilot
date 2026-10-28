@@ -43358,3 +43358,43 @@ Liste für Videos: `Dateien/Messe/Demo-Konto-Stand-2026-10-28.md`.
 seinem eigenen localStorage, also Demo-Objekte auf Prod vorher nicht speichern. Neu aufzunehmen: M21
 Portfolio (heute 71 Gut / 10 Objekte statt 69 / 11), Schleife `portfolio`/`score`; M12/M19 um 1 daneben
 (77 statt 78), M11 zeigt „Kaufen“, das Objekt trägt heute die Bestandsanalyse „Halten“.
+
+### v3026 · Nettokaltmieten-Index automatisch, Indexreihen für viele Nutzer, Indexmiete § 557b BGB · 28.10.2026 — Commit `66e6d89b`
+
+**Was.** Marcel: „so, dass wir halt viele Nutzer und Abrufe abdecken können … kann der VPI auch bei
+Indexmieten die mögliche Mieterhöhung für jedes Jahr berechnen?“ (v3025 gehört dem Bot-Strang, v3024 dem
+Demo-Konto – deshalb v3026.)
+- **Dritte Reihe `nkm`** im Jahreswerte-Takt. An der echten GENESIS-Antwort gemessen: Tabelle
+  **61111-0006** (VPI Deutschland, Monate, COICOP-Sonderpositionen), Merkmal **CC13B1**, Ausprägung
+  **CC13-73 „Nettokaltmiete“**, Filter `DG` + `CC13-73`, serverseitig eingegrenzt
+  (`classifyingvariable1/classifyingkey1`). 81 Monate 2020-01 bis 2026-09; Mai 2022 = 102,7,
+  Sep 2026 = 111,9 – alle zehn Code-Monate gleich. Weg 2: Seite „Sondergliederungen“, Spalte per
+  Kopfzelle gesucht (69 Monate, Stand 13.10.2026). Länderreihe gäbe es als 61111-0021 – bewusst nicht
+  benutzt (Methodik: Bundesindex). `uebernimmNkm()` schreibt neue Monate in `NKM_INDEX`, Code bleibt
+  Rückfall und Vorrang. Register `nkm_index` → automatisch. Migration **024** (Check `reihe` um `nkm`).
+- **VPI ab 2008** (225 Monate statt 81), Band 70–250 – die Indexmiete braucht die Monate seit Vertragsbeginn.
+- **Skalierung:** kein Nutzerabruf geht an GENESIS. Takt → `mb.jahreswerte_abruf` → `lib/indexreihen.js`
+  (Speicher-Cache, Rückfall Code-Tabellen) → `GET /marktbericht/indexreihen` (ETag/304, 2,4 KB) → Haupt-
+  Backend hält die Antwort 10 min (bei Ausfall bis 7 Tage) → Browser `js/indexreihen.js` einmal am Tag,
+  localStorage. Lasttest im mb-Container (Sandbox-Kopie, Erzeuger im selben Prozess, also Untergrenze):
+  200 parallel 767 Anfr./s p95 224 ms · 1000 parallel 718/s p95 1,3 s · mit ETag (304) 2.500–2.900/s.
+- **Indexmiete** `js/indexmiete.js` (Kern, Werte als Parameter): Basis VPI im Monat der letzten
+  Erhöhung bzw. des Mietbeginns; Erklärung frühestens Basis + 10 Monate, wirksam übernächster Monat
+  (Abs. 3) → ≥ 12 Monate (Abs. 2); je Jahr +12; Indexmonat = jüngster veröffentlichter Monat; Zukunft
+  nur als gekennzeichnete Annahme (Profil `indexmiete_vpi_pct`, Vorgabe 2,0 %). Gesetzestext § 557b im
+  Kopf zitiert. Anzeige: Tabelle je Wohnung im Einheiten-Fenster und in der Mietpotenzial-Karte (Reiter
+  Objekt), Summe je Haus; Pilot-Payload `indexmiete` + Prompt-Block („zitieren, nicht rechnen“,
+  Annahme benennen), Zeile in der Karte „Ankauf · Bestand · Zielbild“, PDF-Zeile im Segment Wert &
+  Zielbild – alles nur mit Indexvertrag. Nebenbei: der ETW-Pfad in `potenzial.js modell()` gab `mv_art`
+  nicht weiter – `vertragGrenzen` sah dort nie Staffel/Index; jetzt schon.
+
+**Nachweis.** `tools/indexmiete-pruefen.mjs` 39/39 (A: 800 € · 126,6/118,6 = 853,96 €, wirksam 12/2026;
+B: Sperre bis 03/2027, Annahme 127,2 → 1.021,69 €; C: Mietbeginn 07/2023 → 702,73 €; D: vier fehlende
+Angaben), `prompt-lecks-pruefen` sauber (+7 Punkte), `jahreswerte-pruefen` grün, `buster-ebenen` sauber.
+GENESIS-Abruf mit dem neuen Code im Staging-Container: nkm 81 Monate, vpi 225 Monate (2008-01 = 85,8).
+
+**Rest.** **Staging-Pull ausstehend** – im Chrome lief eine Messe-Aufnahme (`messe-studio.html?messe=
+komplett-mfh`); kein Pull, kein Rebuild. Danach: `git pull`, mb-backend **und** backend neu bauen,
+vorher `pg_dump` der mb-DB (ansehen!), Migration 024 prüfen, `POST /jahreswerte/abruf`, dann im Browser
+ein Objekt mit Indexmiet-Wohnung (nur im Speicher) und eine Pilot-Analyse nachmessen; `gold-audit.py`
+für die neue Datei `indexmiete.js` (Kartenfarben #E6DCC2/#F0E9D6) laufen lassen.
