@@ -533,7 +533,7 @@
       r.appendChild(a);
     });
     w.appendChild(r);
-    w.appendChild(el('div', 'wahl-hinweis', '<b>Am Stand ohne Netz:</b> Ordner „Messe-Schleife“ auf den Rechner kopieren, <b>messe-schleife.html</b> doppelklicken — der Rundgang startet sofort; <b>F</b> oder F11 für Vollbild, <b>Esc</b> hierher.'));
+    w.appendChild(el('div', 'wahl-hinweis', '<b>Am Stand ohne Netz:</b> Ordner „Messe-Schleife“ auf den Rechner kopieren, <b>messe-schleife.html</b> doppelklicken — der Rundgang startet sofort; <b>F</b> oder F11 für Vollbild, <b>Esc</b> hierher. In der Videothek: Bild antippen oder Maus bewegen zeigt die Kapitelleiste, <b>← →</b> Kapitel, <b>Leertaste</b> Pause.'));
     buehne.appendChild(w);
     w.querySelector('.wahl-alle').href = '?idee=alle';
     document.body.classList.remove('laeuft');

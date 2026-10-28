@@ -263,6 +263,23 @@
 .vt-ende-vor b span{color:var(--gdh)}
 .vt-ende-nochmal{background:none;border:0;color:var(--mdk);font:600 12px/1 var(--mono);letter-spacing:.08em;min-height:44px;padding:0 14px;cursor:pointer}
 .vt-ende-nochmal:hover{color:#fff}
+/* landing-videothek-6 · Kapitelleiste unter dem Bild: 44 px Tippflaeche, Striche je Kapitel,
+   Tooltip mit Zeit und Titel. Die Endkarte laesst sie und die native Leiste frei. */
+.vt-ende{bottom:98px}
+.vt-zl{position:relative;height:44px;padding:0 14px;background:#0a0907;border-top:1px solid var(--line);cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+.vt-zl:focus-visible{outline:2px solid var(--gdh);outline-offset:-2px}
+.vt-zl-bahn{position:relative;height:100%}
+.vt-zl-bahn::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:rgba(255,255,255,.14)}
+.vt-zl-fill{position:absolute;left:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;width:0;background:var(--runway)}
+.vt-zl-kopf{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;left:0;background:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--gd) 45%,transparent);transition:transform .15s}
+.vt-zl:hover .vt-zl-kopf{transform:scale(1.2)}
+.vt-zl-marken{position:absolute;inset:0;pointer-events:none}
+.vt-zl-marken i{position:absolute;top:50%;width:3px;height:16px;margin:-8px 0 0 -1.5px;border-radius:2px;background:var(--gdh);box-shadow:0 0 0 1.5px #0a0907}
+.vt-zl-marken i.vorbei{background:#fff}
+.vt-zl-tip{position:absolute;bottom:calc(100% + 8px);left:0;z-index:3;max-width:min(320px,calc(100% - 8px));padding:7px 10px;background:var(--ob);border:1px solid var(--gd);color:#fff;
+  font:600 13px/1.3 var(--sans,Inter,sans-serif);pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-zl-tip[hidden]{display:none}
+.vt-zl-tip b{font:700 11px/1 var(--mono);color:var(--gdh);margin-right:8px;letter-spacing:.06em}
 @media(min-width:701px){
   .vt-kino-in{align-items:start}
   .vt-kino-t{max-height:calc(100vh - 48px);overflow:auto}

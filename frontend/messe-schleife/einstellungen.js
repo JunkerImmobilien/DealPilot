@@ -10,6 +10,8 @@
    Vorrang: Menü > gewinnspiel.js. Taste G schaltet das Gewinnspiel weiter
    sofort um und schreibt es jetzt auch hierher.
 
+   messe-schleife-8 (28.10.2026): Schalter „Kapitelleiste im Video“ (kapitel, Kanal Videothek).
+
    messe-schleife-7 (28.10.2026): Gruppe „Werbung" — werbung (an/aus),
    werbung_nach, werbung_sek; Startkanal auch „werbung" (werbung.js).
 
@@ -32,7 +34,8 @@
     werbung_nach: 3,                     /* nach jeder n-ten Station (Rundgang) bzw. jedem n-ten Video (Videothek) */
     werbung_sek: 10,                     /* Sekunden je Bild, auch im Kanal Werbung */
     start: 'rundgang',                   /* Startkanal ohne ?idee=: rundgang | videothek | werbung | auswahl */
-    leiste: true                         /* Leiste unten bei Mausbewegung */
+    leiste: true,                        /* Leiste unten bei Mausbewegung */
+    kapitel: true                        /* messe-schleife-8 · Kapitelleiste im Video (Kanal Videothek) */
   };
   var E = Object.assign({}, VORGABE);
   try { var roh = JSON.parse(localStorage.getItem(SCHLUESSEL) || 'null'); if (roh && typeof roh === 'object') Object.keys(VORGABE).forEach(function (k) { if (roh[k] !== undefined) E[k] = roh[k]; }); } catch (e) { /* ohne Speicher: Vorgaben */ }
@@ -55,6 +58,7 @@
     ['Videothek', null],
     ['app_nach', 'DealPilot in Zahlen nach jedem … Video', 'zahl', 1, 30],
     ['register_nach', 'Register-Tafel nach jedem … Video', 'zahl', 1, 30],
+    ['kapitel', 'Kapitelleiste im Video (Tippen springt)', 'schalter'],
     ['Start', null],
     ['start', 'Kanal beim Öffnen', 'wahl', [['rundgang', 'Rundgang'], ['videothek', 'Videothek'], ['werbung', 'Werbung (Dauerschleife)'], ['auswahl', 'Auswahl']]],
     ['leiste', 'Leiste bei Mausbewegung', 'schalter']
@@ -78,7 +82,7 @@
       h += '</label>';
     });
     h += '</div><div class="dps-menue-fuss"><button type="button" data-a="reset">Zurücksetzen</button><button type="button" data-a="neu">Neu starten</button><button type="button" data-a="zu" class="dps-ja">Fertig</button></div>'
-      + '<div class="dps-menue-hilfe">Tasten: E Menü · G Gewinnspiel · N nächstes · F Vollbild · R Rundgang · V Videothek · W Werbung</div></div>';
+      + '<div class="dps-menue-hilfe">Tasten: E Menü · G Gewinnspiel · N nächstes · F Vollbild · R Rundgang · V Videothek · W Werbung<br>Videothek: ← → Kapitel · Leertaste Pause/Weiter · Maus bewegen oder Bild antippen zeigt die Kapitelleiste</div></div>';
     w.innerHTML = h;
     w.addEventListener('change', function (ev) {
       var t = ev.target, k = t.getAttribute('data-k'); if (!k) return;
