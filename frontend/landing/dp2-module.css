@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   dp2-module.css · landing-module-2 · Die 19 Module in vier Phasen
+   Marcel 28.10.2026: „die 19 Karten besser in Szene setzen, vlt auch
+   animiert, schönere Icons". Reiter je Phase, Karten mit Linien-Icon,
+   gestaffelter Einlauf. Auf dem Handy: Reiter wischbar, Karten einspaltig.
+   ═══════════════════════════════════════════════════════════════════════ */
+.mods{margin:34px 0 8px}
+.mods-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0 0 26px}
+.mods-tab{position:relative;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:rgba(255,255,255,.78);
+  font:600 13px/1 Inter,system-ui,sans-serif;letter-spacing:.02em;padding:11px 18px 11px 16px;border-radius:999px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:9px;transition:background .25s,color .25s,border-color .25s}
+.mods-tab .n{font:600 10.5px/1 'JetBrains Mono',monospace;color:var(--gd);letter-spacing:.06em}
+.mods-tab .z{font:500 11px/1 'JetBrains Mono',monospace;color:rgba(255,255,255,.45)}
+.mods-tab:hover{border-color:var(--gd);color:#fff}
+.mods-tab.on{background:var(--gd);border-color:var(--gd);color:#141210}
+.mods-tab.on .n,.mods-tab.on .z{color:#141210}
+.mods-tab .lauf{position:absolute;left:14px;right:14px;bottom:4px;height:2px;border-radius:2px;background:rgba(20,18,16,.25);overflow:hidden;display:none}
+.mods-tab.on .lauf{display:block}
+.mods-tab .lauf i{display:block;height:100%;width:0;background:#141210}
+.mods-tab.on.laeuft .lauf i{animation:modsLauf var(--mods-takt,7s) linear forwards}
+@keyframes modsLauf{to{width:100%}}
+.mods-kopf{text-align:center;color:rgba(255,255,255,.72);font-size:15px;margin:-8px auto 22px;max-width:640px;min-height:1.5em}
+.mods-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1180px;margin:0 auto}
+.mod{position:relative;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;padding:22px 20px 20px;color:#fff;overflow:hidden;
+  opacity:0;transform:translateY(18px) scale(.98);transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.2,1),border-color .25s,box-shadow .25s}
+.mod.da{opacity:1;transform:none}
+.mod:hover{border-color:var(--gd);box-shadow:0 18px 40px -22px rgba(0,0,0,.7),0 0 0 1px var(--gd) inset}
+.mod::after{content:'';position:absolute;right:-40px;top:-40px;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,var(--gd) 0%,transparent 70%);opacity:.12;transition:opacity .3s}
+.mod:hover::after{opacity:.28}
+.mod-kopf{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px}
+.mod-ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--gd)}
+.mod-ico svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.mod:hover .mod-ico svg{animation:modsWipp .6s ease}
+@keyframes modsWipp{30%{transform:rotate(-8deg) scale(1.08)}60%{transform:rotate(5deg)}}
+.mod-nr{font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;color:rgba(255,255,255,.4)}
+.mod h3{margin:0 0 6px;font:600 17px/1.25 'Space Grotesk',Inter,sans-serif;color:#fff}
+.mod .sb{margin:0 0 12px;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.72)}
+.mod ul{margin:0;padding:0;list-style:none;border-top:1px dashed rgba(255,255,255,.14);padding-top:10px}
+.mod li{position:relative;padding-left:14px;font-size:12.8px;line-height:1.45;color:rgba(255,255,255,.82);margin:0 0 5px}
+.mod li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;border:1.4px solid var(--gd)}
+@media (max-width:700px){
+  .mods-tabs{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;padding:0 2px 6px;margin:0 -16px 20px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+  .mods-tabs::-webkit-scrollbar{display:none}
+  .mods-tab{flex:0 0 auto}
+  .mods-grid{grid-template-columns:1fr;gap:12px}
+  .mod{padding:18px 16px}
+  .mods-kopf{font-size:14px;padding:0 4px}
+}
+@media (prefers-reduced-motion:reduce){
+  .mod{transition:none;opacity:1;transform:none}
+  .mod:hover .mod-ico svg{animation:none}
+  .mods-tab.on.laeuft .lauf i{animation:none}
+}

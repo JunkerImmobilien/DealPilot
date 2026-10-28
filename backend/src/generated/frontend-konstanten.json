@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T14:39:17.850Z",
+ "erzeugt_am": "2026-10-28T15:28:47.457Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "d1c400f3059479c9",
-  "index-html": "4373cbe2e85e3857",
+  "index-html": "a1e62f6ece14c472",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -3723,7 +3723,7 @@
      },
      {
       "h": "Reiter „Unterlagen & WEG“",
-      "text": "Hast du in der Datenaufnahme unter Exposé / Dokumente Unterlagen eingelesen – Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, Mieterliste oder Mietvertrag –, erscheint in der Pilot-Analyse der Reiter Unterlagen & WEG. Oben schaltest du zwischen Einfach (Ampel mit der Zahl der Risiken, was absehbar Geld kostet, die drei wichtigsten Risiken, Eigentümergemeinschaft und These als Karten) und Genau (alles im Einzelnen) um. Er zeigt:\n• die Investitionsthese aus den Unterlagen,\n• alle Risiken mit Einstufung (hoch, mittel, niedrig), Kosten, Jahr und Quelle (Dokument, TOP, Seite),\n• die WEG-Auswertung: Kernpunkte über alle Protokolle, Rücklage, Hausgeld, beschlossene und vertagte Sanierungen mit dem Anteil deines Objekts, Sonderumlagen und ein Fazit,\n• die Lasten aus dem Grundbuch in Klartext und was du beim Verwalter oder Verkäufer noch anfragen solltest.\n\nDie Pilot-Analyse bezieht diese Risiken in ihre Bewertung ein. Liest du neue Unterlagen ein, wird die Auswertung ersetzt."
+      "text": "Hast du in der Datenaufnahme unter Exposé / Dokumente Unterlagen eingelesen – Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, Mieterliste oder Mietvertrag –, erscheint in der Pilot-Analyse der Reiter Unterlagen & WEG. Oben schaltest du zwischen Einfach (Ampel mit der Zahl der Risiken, was absehbar Geld kostet – eine Sonderumlage, die eine Maßnahme bezahlt, zählt dabei nicht doppelt –, die drei wichtigsten Risiken, Eigentümergemeinschaft und These als Karten) und Genau (alles im Einzelnen) um. Er zeigt:\n• die Investitionsthese aus den Unterlagen,\n• alle Risiken mit Einstufung (hoch, mittel, niedrig), Kosten, Jahr und Quelle (Dokument, TOP, Seite),\n• die WEG-Auswertung: Kernpunkte über alle Protokolle, Rücklage, Hausgeld, beschlossene und vertagte Sanierungen mit dem Anteil deines Objekts, Sonderumlagen und ein Fazit,\n• die Lasten aus dem Grundbuch in Klartext und was du beim Verwalter oder Verkäufer noch anfragen solltest.\n\nDie Pilot-Analyse bezieht diese Risiken in ihre Bewertung ein. Liest du neue Unterlagen ein, wird die Auswertung ersetzt."
      },
      {
       "h": "Maßnahmen: „Mieter bleibt drin — Kosten auf die Miete umlegen“",
@@ -5235,7 +5235,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "f8c9b32c018693e5",
+  "hilfe": "481330c0085f4204",
   "bewertung": "bca98c7b04c452b7"
  }
 }

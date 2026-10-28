@@ -1,0 +1,49 @@
+[
+  {
+    "kennzahl": "umrechnungskoeffizient_wgfz",
+    "land_code": "NW",
+    "ags": "05978",
+    "ebene": "kreis",
+    "gebiet_name": "Kreis Unna (mit Stadt Unna und Stadt Lünen)",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+    "ausschuss": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+    "zweig": "alle",
+    "jahrgang": 2026,
+    "berichtsjahr": 2026,
+    "stichtag": "2026-01-01",
+    "vollstaendig": false,
+    "warum_kein_wert": "Der Ausschuss hat keine Umrechnungskoeffizienten für die bauliche Ausnutzbarkeit (WGFZ) ermittelt. Grundstücksmarktbericht 2026 (Berichtszeitraum 01.01.2025 – 31.12.2025, Stichtag der wertrelevanten Daten 01.01.2026, beschlossen 27.02.2026, veröffentlicht 12.03.2026), Kap. 4.7.4 „Umrechnungskoeffizienten“, S. 29: „Umrechnungskoeffizienten dienen dazu, Wertunterschiede, die sich aufgrund der Eigenschaften der Grundstücke ergeben, zu erfassen. Diese Eigenschaften (Einflussnahme) können z.B. Grundstücksgröße /-tiefe oder bauliche Ausnutzbarkeit sein. Der Gutachterausschuss hat hierzu keine Untersuchungen durchgeführt. Bei Bedarf greift der Gutachterausschuss auf Untersuchungen benachbarter Gutachterausschüsse zurück.“ Untersuchungen benachbarter Ausschüsse werden nicht übernommen (Nachbarausschüsse sind keine zulässige Quelle).",
+    "unvollstaendig_grund": "Keine WGFZ-Umrechnung im Grundstücksmarktbericht 2026 (Kap. 4.7.4, S. 29: „Der Gutachterausschuss hat hierzu keine Untersuchungen durchgeführt.“).",
+    "geltungsbereich": {
+      "objektarten": [],
+      "objektarten_ausgeschlossen": [],
+      "ausserhalb_wortlaut": "„Der Gutachterausschuss hat hierzu keine Untersuchungen durchgeführt. Bei Bedarf greift der Gutachterausschuss auf Untersuchungen benachbarter Gutachterausschüsse zurück.“ (S. 29)",
+      "ausserhalb_weg": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna, Zechenstraße 51, 59425 Unna, Tel. 02303 27-1068, gutachterausschuss@kreis-unna.de; Grundstücksmarktbericht 2026 gebührenfrei über BORIS-NRW: https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33200_2026.pdf"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Grundstücksmarktbericht 2026 für den Kreis Unna",
+        "fundstelle": "Kap. 4.7.4 Umrechnungskoeffizienten, S. 29",
+        "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33200_2026.pdf",
+        "wortlaut": "Grundstücksmarktbericht 2026 (Berichtszeitraum 01.01.2025 – 31.12.2025, Stichtag der wertrelevanten Daten 01.01.2026, beschlossen 27.02.2026, veröffentlicht 12.03.2026), Kap. 4.7.4 „Umrechnungskoeffizienten“, S. 29: „Umrechnungskoeffizienten dienen dazu, Wertunterschiede, die sich aufgrund der Eigenschaften der Grundstücke ergeben, zu erfassen. Diese Eigenschaften (Einflussnahme) können z.B. Grundstücksgröße /-tiefe oder bauliche Ausnutzbarkeit sein. Der Gutachterausschuss hat hierzu keine Untersuchungen durchgeführt. Bei Bedarf greift der Gutachterausschuss auf Untersuchungen benachbarter Gutachterausschüsse zurück.“"
+      }
+    ],
+    "fundstelle": "Kap. 4.7.4, S. 29",
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33200_2026.pdf",
+    "seite": "S. 29",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Bericht S. 2 (Lizenz): „Für den Grundstücksmarktbericht gilt die ‚Datenlizenz Deutschland - Zero - Version 2.0‘ (dl-de/zero-2-0).“",
+    "quellenvermerk": null,
+    "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Unna, Jahrgang 2026",
+    "quelle_parser": "ernte-20261028b-hand (pdftotext -layout, S. 29, 28.10.2026)",
+    "modellansaetze": {},
+    "belege_meta": {
+      "abgerufen_am": "2026-10-28",
+      "dokument": "Grundstücksmarktbericht 2026 für den Kreis Unna"
+    },
+    "hinweis": "Nachfolger der Sperre Jahrgang 2025 in uk-wgfz-nw2-2026.json, die den Bericht 2026 noch als „nicht ausgewertet“ führte."
+  }
+]
