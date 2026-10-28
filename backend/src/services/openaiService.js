@@ -4099,8 +4099,11 @@ async function extractDokument(text, typ, opts) {
   /* v3016 · Listen-Arten (WEG, Teilung, Mieterliste) brauchen mehr Platz: 1.400 Token
      schnitten eine Mieterliste mit 12 Einheiten mitten im JSON ab. */
   const _lang = { weg_protokoll: 1, teilungserklaerung: 1, mietaufstellung: 1, grundbuch: 1, energieausweis: 1, mietvertrag: 1 };
-  const r = await callOpenAI(prompt, Object.assign({ maxTokens: _lang[typ] ? 3500 : 1400 }, opts || {}));
-  const parsed = extractJson(r.text);
+  let r = await callOpenAI(prompt, Object.assign({ maxTokens: _lang[typ] ? 3500 : 1400 }, opts || {}));
+  let parsed = extractJson(r.text);
+  /* v3016g · gemessen 28.10.: die Mieterliste kam EINMAL als nicht lesbares JSON, beim zweiten
+     Lauf sauber. Ein zweiter Versuch, bevor der Import auf den Exposé-Weg zurückfällt. */
+  if (!parsed) { r = await callOpenAI(prompt, Object.assign({ maxTokens: 4000 }, opts || {})); parsed = extractJson(r.text); }
   if (!parsed) {
     return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
   }

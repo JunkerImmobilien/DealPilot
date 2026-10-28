@@ -1944,6 +1944,11 @@
     /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
     _vergleich = [];
     _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; }).forEach(function (f) { mergeDokument(f.cache.dokument); });
+    /* v3016g · gemessen am Demo-Set Lindenallee (MFH, alle Einheiten): das Wohnungsgrundbuch EINER
+       Einheit setzte „Miteigentumsanteil 20,4 %“ - das Haus hätte dann als Anteil gerechnet.
+       Beim Haus (MFH/WGH/ZFH/EFH) gilt kein MEA aus einem einzelnen Blatt. */
+    var _art = String((_merged.objart && (_merged.objart.raw || _merged.objart.value)) || (($('objart') || {}).value) || '');
+    if (_merged.mea && /mfh|mehrfam|wgh|wohn.*gesch|zfh|zweifam|efh|einfam/i.test(_art)) delete _merged.mea;
     _unterlagenZeilen();   /* v3016 */
   }
   var _vergleich = [];
