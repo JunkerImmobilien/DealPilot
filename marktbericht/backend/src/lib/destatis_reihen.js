@@ -1,3 +1,4 @@
+import zlib from 'zlib';   /* v3021a · GENESIS liefert ZIP */
 /* ═══════════════════════════════════════════════════════════════════════
    lib/destatis_reihen.js · v3021 — amtliche Preisreihen automatisch holen
 
@@ -37,6 +38,7 @@ export const REIHEN = Object.freeze({
     name: 'Verbraucherpreisindex Deutschland (2020 = 100)',
     basis: '2020=100',
     genesis: '61111-0002',
+    genesis_filter: ['DG'],                 /* v3021a · Deutschland insgesamt */
     seite: 'https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Verbraucherpreisindex/Tabellen/Verbraucherpreise-12Kategorien.html',
     band: [80, 250],
     sprung_max_pct: 3,      /* je Monat Abstand zum naechsten belegten Wert */
@@ -46,6 +48,9 @@ export const REIHEN = Object.freeze({
     name: 'Baupreisindex Neubau Wohngebäude, konventionell, einschl. USt (2021 = 100)',
     basis: '2021=100',
     genesis: '61261-0002',
+    /* v3021a · gemessen: Wohngebäude (BPNBK), Bauleistungen am Bauwerk (BAULEISTBW), einschl. USt (STEMW1);
+       August 2026 = 141,7 wie in lib/baupreisindex.js */
+    genesis_filter: ['BPNBK', 'BAULEISTBW', 'STEMW1'],
     seite: 'https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Preise/bpr110.html',
     band: [80, 300],
     sprung_max_pct: 5,      /* je Quartal Abstand */
@@ -147,7 +152,9 @@ export async function holeGenesis(reihe, { fetchImpl = globalThis.fetch, env = p
       language: 'de', startyear: String(jahr - 6), endyear: String(jahr) }).toString();
     const r = await fetchImpl(base + '/data/tablefile', { method: 'POST', body,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', username: tok, password: env.GENESIS_PASSWORD || '' } });
-    const txt = await r.text();
+    /* v3021a · GENESIS liefert die Tabelle als ZIP, auch mit compress=false (gemessen) */
+    const buf = Buffer.from(await r.arrayBuffer());
+    const txt = (buf[0] === 0x50 && buf[1] === 0x4b ? entpackeZip(buf) : buf).toString('utf8').replace(/^\uFEFF/, '');
     if (!r.ok || /^\s*\{/.test(txt)) return { ok: false, grund: 'GENESIS: ' + txt.slice(0, 200), weg: 'genesis' };
     const werte = parseGenesisFfcsv(reihe, txt);
     if (!Object.keys(werte).length) return { ok: false, grund: 'GENESIS-Antwort nicht lesbar', weg: 'genesis' };
@@ -155,20 +162,37 @@ export async function holeGenesis(reihe, { fetchImpl = globalThis.fetch, env = p
   } catch (e) { return { ok: false, grund: e.message, weg: 'genesis' }; }
 }
 
-/** ffcsv: Kopfzeile mit Spaltennamen; Zeit_Code / 2_Auspraegung_Code / Wert. */
+/* v3021a · eine Datei aus einem ZIP (Central Directory lesen, Deflate oder gespeichert) */
+export function entpackeZip(buf) {
+  const i = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x01, 0x02]));
+  if (i < 0) return buf;
+  const methode = buf.readUInt16LE(i + 10), csize = buf.readUInt32LE(i + 20), off = buf.readUInt32LE(i + 42);
+  const n = buf.readUInt16LE(off + 26), m = buf.readUInt16LE(off + 28);
+  const daten = buf.subarray(off + 30 + n + m, off + 30 + n + m + csize);
+  return methode === 8 ? zlib.inflateRawSync(daten) : daten;
+}
+
+/** ffcsv (gemessen 28.10.2026): time; …_variable_attribute_code (MONATnn/QUARTn); value; value_unit.
+ *  Prozent-Zeilen (Veränderungsraten) werden übersprungen; genesis_filter = Merkmalscodes, die
+ *  alle in der Zeile vorkommen müssen. */
 export function parseGenesisFfcsv(reihe, txt) {
-  const zeilen = String(txt || '').split(/\r?\n/).filter(Boolean);
+  const zeilen = String(txt || '').replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean);
   if (zeilen.length < 2) return {};
   const kopf = zeilen[0].split(';').map((s) => s.replace(/"/g, '').trim());
   const iZeit = kopf.findIndex((k) => /^time$|^zeit$/i.test(k));
   const iWert = kopf.findIndex((k) => /^value$|wert$/i.test(k) && !/flag|qualit/i.test(k));
-  const iMon = kopf.findIndex((k) => /2_variable_attribute_code|2_auspraegung_code/i.test(k));
+  const iEinh = kopf.findIndex((k) => /^value_unit$/i.test(k));
+  const iCodes = kopf.map((k, i) => (/_variable_attribute_code$|_auspraegung_code$/i.test(k) ? i : -1)).filter((i) => i >= 0);
+  const filter = (REIHEN[reihe] && REIHEN[reihe].genesis_filter) || [];
   if (iZeit < 0 || iWert < 0) return {};
   const out = {};
   for (const l of zeilen.slice(1)) {
     const c = l.split(';').map((s) => s.replace(/"/g, '').trim());
+    if (iEinh >= 0 && /%/.test(c[iEinh] || '')) continue;
+    const codes = iCodes.map((i) => c[i] || '');
+    if (filter.some((f) => codes.indexOf(f) < 0)) continue;
     const j = c[iZeit];
-    const code = iMon >= 0 ? c[iMon] : '';
+    const code = codes.find((x) => /^(MONAT\d{2}|QUART\d)$/.test(x)) || '';
     let mm = null;
     let m = code.match(/MONAT(\d{2})/); if (m) mm = m[1];
     m = code.match(/QUART(\d)/); if (m) mm = ['02', '05', '08', '11'][Number(m[1]) - 1];
