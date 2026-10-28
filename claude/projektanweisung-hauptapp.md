@@ -42915,3 +42915,4 @@ Marcel 22.10.2026: „ja rollout 62".
 - **Webinar komplett-mfh aufgenommen:** `Dateien/Messe/Videos/Komplettbeispiel-MFH/komplett-mfh_2026-10-28.mp4`, 28:54, 1920×1022. Auffällig: Kap. 6 AfA-Satz — Lichtkegel auf großer leerer Fläche (~20 s). Nicht vertont.
 - **Video-Prüfung (Agent):** 12 Videos neu (M18, M26, M21, M27 mit Drehbuch-Anpassung; M19, M15, M14, M10b, M06, Ü2, M24, Ü1/M03), Clips der Schleife und Spot v13 neu schneiden — wartet auf Marcels „ja“. Storybook neu erzeugt, Zahlen unverändert, Geschichten passen.
 - **Rest:** Demo-Objekt 2026-1122 nach Prod spiegeln; Videos neu; Wertpuffer-Tafel Ü1 (Produktfrage).
+- **Prod-Rollout 28.10.2026 mittags:** v3016-v3016i + Gold-Basislinie, Prod `2af9efe` (vorher `1d96d2b`); Prod 200, Backend healthy, `/ai/seiten-lesen` im Image, App laedt `unterlagen.js?v=v3016i`, `voice-import.js?v=v3016e`. v3016i: harte rgba-Gold-Pille in unterlagen.js auf Token (Gold-Audit hielt den ersten Rollout an).
