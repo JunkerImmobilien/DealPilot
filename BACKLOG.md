@@ -36,6 +36,15 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N82 · Flugplan / Zielbild-Umbau — GEPARKT (28.10.2026)
+
+**GEPARKT:** Marcel am 28.10.2026: „können wir das erstmal los lassen und bauen wir später um?“ — erst nach der Messe (31.10.–01.11.) wieder aufnehmen.
+
+Sieben Demo-Fassungen liegen vor: `design/mockups/flugplan-demo.html`, veröffentlicht unter https://claude.ai/artifact/QckHnnmYVyRRL6hCZ4Ckib
+(Karten-Baukasten · Zielbild-Assistent · Flugroute · Wertsäulen · Bank-Exposé · Portfolio-Cockpit · Soll/Ist). Marcels Wahl der Fassung
+(oder Kombination, z. B. Assistent + Baukasten + Exposé) steht aus. Bekannte Lücke der Demo: Bad, Böden und Grundriss in den Wohnungen bringen
+dort 0 Punkte statt bis zu +2 nach Anlage 2 (die App rechnet es richtig). Das heutige Zielbild in der App bleibt bis dahin unverändert.
+
 ### N81 · Telegram-Bot: Hilfe, Bewertung Stufe 1–3, PDFs — Rest: Abnahme und Prod (26.10.2026)
 
 Gebaut und auf Staging gemessen in v2960–v2961 (`4b87c710`, `7bc8b184`, s. Fertig). Offen:
