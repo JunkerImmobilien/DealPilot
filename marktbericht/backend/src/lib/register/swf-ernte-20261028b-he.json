@@ -1,0 +1,346 @@
+[
+  {
+    "land_code": "HE",
+    "ags": "06413000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Offenbach am Main, Stadt",
+    "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+    "berichtsjahr": 2025,
+    "berichtsjahr_dokument": 2024,
+    "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2025), wie bei den Offenbacher Sätzen aus dem Immobilienmarktbericht 2024 (dort Berichtsjahr laut Impressum 2023, im Register 2024). Das Impressum dieses Vorabzugs nennt „Berichtsjahr: 2024“ (Kauffälle 01.01.–31.12.2024).",
+    "stichtag": "2024-01-01",
+    "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2024“) bei einem Untersuchungszeitraum 01.01.2024 – 31.12.2024.",
+    "auswertezeitraum": "01.01.2024 – 31.12.2024",
+    "veroeffentlicht": "2025-10",
+    "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/IMB%20regional%202025",
+    "quelle_datei": "`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf",
+    "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / IMB regional 2025, Datei „`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf“. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 1. Ein Bericht 2026 (Berichtsjahr 2025) lag am 28.10.2026 weder im Downloadcenter (Ordner `IMB regional 2026 ohne Offenbach) noch auf offenbach.de vor.",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Der Vorabzug nennt keine Lizenz namentlich. Der Vervielfältigungshinweis (Impressum, S. 1) trägt den Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Vorabzugs der sonstigen für die Wertermittlung erforderlichen Daten und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Vorabzugs oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+    "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten 2025",
+    "verwendung": "produkt",
+    "korrekturen": [],
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "potenz",
+      "achse_feld": "sachwert",
+      "achse_bez": "vorläufiger Sachwert in Euro",
+      "a": 357.84,
+      "b": -0.444,
+      "gueltig_von": 350000,
+      "gueltig_bis": 1000000,
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "hinweis": "31 Kauffälle, Bestimmtheitsmaß 0,563, Standardabweichung 0,20. Abgedruckte Regressionsformel „357,84 x (vorl. Sachwert)^-0,444“; am 28.10.2026 an allen 14 Tabellenzeilen (350.000 bis 1.000.000 Euro) nachgerechnet, zeichengleich (z. B. 350.000 → 1,24; 1.000.000 → 0,78). Gültig nur im abgedruckten Bereich.",
+      "normobjekt": "Merkmale der Datengrundlage: Ø vorläufiger Sachwert 612.135 Euro, Ø Grundstücksgröße 524 m² (196 – 769), Ø BRW angepasst 732 €/m² (575 – 882), Ø RND 33 Jahre (24 – 57), Ø BGF 332 m², Ø Wohnfläche 162 m² (62 – 270), Ø Außenanlagen 10.904 Euro (5 % des Herstellungswertes), Ø Nebengebäude 968 Euro, Ø Bodenwertanteil am bereinigten Kaufpreis 0,65, Ø Gebäudefaktor 3.844 €/m² Wfl.",
+      "tabelle": [
+        [
+          350000,
+          1.24
+        ],
+        [
+          400000,
+          1.17
+        ],
+        [
+          450000,
+          1.11
+        ],
+        [
+          500000,
+          1.06
+        ],
+        [
+          550000,
+          1.01
+        ],
+        [
+          600000,
+          0.97
+        ],
+        [
+          650000,
+          0.94
+        ],
+        [
+          700000,
+          0.91
+        ],
+        [
+          750000,
+          0.88
+        ],
+        [
+          800000,
+          0.86
+        ],
+        [
+          850000,
+          0.83
+        ],
+        [
+          900000,
+          0.81
+        ],
+        [
+          950000,
+          0.79
+        ],
+        [
+          1000000,
+          0.78
+        ]
+      ]
+    },
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell des Vorabzugs 2025 (S. 35): Stichtag 01.01.2024; Stichprobe 100 %, um Ausreißer bereinigt; Untersuchungszeitraum 01.01.2024 – 31.12.2024; NHK 2010; Bezugsmaßstab Bruttogrundfläche (BGF); Gesamtnutzungsdauer der Gebäude 70 Jahre; Restnutzungsdauer Gesamtnutzungsdauer – Gebäudealter, ggf. nach sachverständigem Ermessen; Alterswertminderung linear; Baupreisindex aktuell zum Verkaufszeitpunkt (quartalsweise); Baunebenkosten in NHK 2010 bereits enthalten; Nebengebäude pauschaler Zeitwert; bauliche Außenanlagen und sonstige Anlagen pauschal 5 % des Herstellungswertes der gesamten baulichen Anlagen; besondere objektspezifische Grundstücksmerkmale: Auswertung fiktiv schadensfreie Objekte; Grundstücksfläche marktübliche, objektbezogene Grundstücksgröße; Bodenwert lage- und objektangepasster Bodenrichtwert; Regionalfaktor entfällt.",
+      "nhk": "NHK 2010, Baunebenkosten enthalten",
+      "gnd_jahre": 70,
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Baupreisindex: aktuell zum Verkaufszeitpunkt (quartalsweise)",
+      "baupreisindex_seite": "Vorabzug 2025 Offenbach am Main, Kap. 1.5 Sachwertfaktoren, Modelltabelle S. 35",
+      "alterswertminderung": "linear",
+      "rnd": "Gesamtnutzungsdauer minus Gebäudealter, ggf. nach sachverständigem Ermessen",
+      "bezugsmassstab": "Brutto-Grundfläche",
+      "baupreisindex": "Statistisches Bundesamt, quartalsweise zum Verkaufszeitpunkt",
+      "aussenanlagen": "pauschal 5 Prozent des Herstellungswertes; Nebengebäude pauschaler Zeitwert",
+      "bodenwert": "lage- und objektangepasster Bodenrichtwert",
+      "grundstuecksflaeche": "marktübliche, objektbezogene Grundstücksgröße",
+      "regionalfaktor": "entfällt",
+      "bog": "Auswertung fiktiv schadensfreier Objekte"
+    },
+    "geltungsbereich": {
+      "objektart_bez": "Freistehende Ein- und Zweifamilienhäuser",
+      "region": "Stadt Offenbach am Main",
+      "sachwert_von": 350000,
+      "sachwert_bis": 1000000
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten, Stadt Offenbach am Main 2025 (Berichtsjahr 2024, Ausgabe Oktober 2025)",
+        "fundstelle": "Kap. 1.5 Sachwertfaktoren, Modell S. 35; Abbildung 41 (tabellarisch) S. 36, Abbildung 42 (graphisch) S. 37"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtlich abgedruckte Regressionsformel und Wertetabelle, gegeneinander nachgerechnet. Stufe B wegen der kleinen Stichprobe (31 Kauffälle).",
+    "fallzahl": 31,
+    "streuung": 0.2,
+    "modellversion": "Vorabzug-Offenbach-2025 (Sachwertmodell S. 35: NHK 2010, BGF, GND 70, lineare AWM, BPI zum Verkaufszeitpunkt, Außenanlagen 5 %, ohne Regionalfaktor)",
+    "quelle_parser": "ernte-20261028b-hand (PDF-Seiten als Bild gelesen am 28.10.2026)",
+    "auflagen": "Quellenangabe. ABWEICHENDER MODELLANSATZ: Gesamtnutzungsdauer 70 Jahre, nicht 80. Dazu NHK 2010, Bezugsmaßstab Bruttogrundfläche, lineare Alterswertminderung, Baupreisindex quartalsweise zum Verkaufszeitpunkt, Baunebenkosten in den NHK enthalten, bauliche Außenanlagen pauschal 5 Prozent des Herstellungswertes, Nebengebäude pauschaler Zeitwert, kein Regionalfaktor, Auswertung fiktiv schadensfreier Objekte. Gültig nur im abgedruckten Sachwertbereich.",
+    "fundstelle": "Kap. 1.5 Sachwertfaktoren, Modell S. 35; Abbildung 41 (tabellarisch) S. 36, Abbildung 42 (graphisch) S. 37"
+  },
+  {
+    "land_code": "HE",
+    "ags": "06413000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Offenbach am Main, Stadt",
+    "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+    "berichtsjahr": 2025,
+    "berichtsjahr_dokument": 2024,
+    "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2025), wie bei den Offenbacher Sätzen aus dem Immobilienmarktbericht 2024 (dort Berichtsjahr laut Impressum 2023, im Register 2024). Das Impressum dieses Vorabzugs nennt „Berichtsjahr: 2024“ (Kauffälle 01.01.–31.12.2024).",
+    "stichtag": "2024-01-01",
+    "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2024“) bei einem Untersuchungszeitraum 01.01.2024 – 31.12.2024.",
+    "auswertezeitraum": "01.01.2024 – 31.12.2024",
+    "veroeffentlicht": "2025-10",
+    "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/IMB%20regional%202025",
+    "quelle_datei": "`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf",
+    "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / IMB regional 2025, Datei „`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf“. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 1. Ein Bericht 2026 (Berichtsjahr 2025) lag am 28.10.2026 weder im Downloadcenter (Ordner `IMB regional 2026 ohne Offenbach) noch auf offenbach.de vor.",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Der Vorabzug nennt keine Lizenz namentlich. Der Vervielfältigungshinweis (Impressum, S. 1) trägt den Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Vorabzugs der sonstigen für die Wertermittlung erforderlichen Daten und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Vorabzugs oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+    "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten 2025",
+    "verwendung": "produkt",
+    "korrekturen": [],
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "potenz",
+      "achse_feld": "sachwert",
+      "achse_bez": "vorläufiger Sachwert in Euro",
+      "a": 107.25,
+      "b": -0.356,
+      "gueltig_von": 210000,
+      "gueltig_bis": 580000,
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "hinweis": "37 Kauffälle, Bestimmtheitsmaß 0,3897, Standardabweichung 0,18. Abgedruckte Regressionsformel „107,25 x (vorl. Sachwert)^-0,356“; am 28.10.2026 an allen 9 Tabellenzeilen (210.000 bis 580.000 Euro) nachgerechnet, zeichengleich (z. B. 210.000 → 1,37; 500.000 → 1,00). Gültig nur im abgedruckten Bereich.",
+      "normobjekt": "Merkmale der Datengrundlage: Ø vorläufiger Sachwert 362.402 Euro, Ø Grundstücksgröße 320 m² (182 – 653), Ø BRW angepasst 706 €/m² (469 – 849), Ø RND 32 Jahre (25 – 48), Ø BGF 240 m², Ø Wohnfläche 121 m² (65 – 170), Ø Außenanlagen 6.854 Euro (5 %), Ø Nebengebäude 459 Euro, Ø Bodenwertanteil am bereinigten Kaufpreis 0,54, Ø Gebäudefaktor 3.460 €/m² Wfl.",
+      "tabelle": [
+        [
+          210000,
+          1.37
+        ],
+        [
+          250000,
+          1.28
+        ],
+        [
+          300000,
+          1.2
+        ],
+        [
+          350000,
+          1.14
+        ],
+        [
+          400000,
+          1.09
+        ],
+        [
+          450000,
+          1.04
+        ],
+        [
+          500000,
+          1
+        ],
+        [
+          550000,
+          0.97
+        ],
+        [
+          580000,
+          0.95
+        ]
+      ]
+    },
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell des Vorabzugs 2025 (S. 35): Stichtag 01.01.2024; Stichprobe 100 %, um Ausreißer bereinigt; Untersuchungszeitraum 01.01.2024 – 31.12.2024; NHK 2010; Bezugsmaßstab Bruttogrundfläche (BGF); Gesamtnutzungsdauer der Gebäude 70 Jahre; Restnutzungsdauer Gesamtnutzungsdauer – Gebäudealter, ggf. nach sachverständigem Ermessen; Alterswertminderung linear; Baupreisindex aktuell zum Verkaufszeitpunkt (quartalsweise); Baunebenkosten in NHK 2010 bereits enthalten; Nebengebäude pauschaler Zeitwert; bauliche Außenanlagen und sonstige Anlagen pauschal 5 % des Herstellungswertes der gesamten baulichen Anlagen; besondere objektspezifische Grundstücksmerkmale: Auswertung fiktiv schadensfreie Objekte; Grundstücksfläche marktübliche, objektbezogene Grundstücksgröße; Bodenwert lage- und objektangepasster Bodenrichtwert; Regionalfaktor entfällt.",
+      "nhk": "NHK 2010, Baunebenkosten enthalten",
+      "gnd_jahre": 70,
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Baupreisindex: aktuell zum Verkaufszeitpunkt (quartalsweise)",
+      "baupreisindex_seite": "Vorabzug 2025 Offenbach am Main, Kap. 1.5 Sachwertfaktoren, Modelltabelle S. 35",
+      "alterswertminderung": "linear",
+      "rnd": "Gesamtnutzungsdauer minus Gebäudealter, ggf. nach sachverständigem Ermessen",
+      "bezugsmassstab": "Brutto-Grundfläche",
+      "baupreisindex": "Statistisches Bundesamt, quartalsweise zum Verkaufszeitpunkt",
+      "aussenanlagen": "pauschal 5 Prozent des Herstellungswertes; Nebengebäude pauschaler Zeitwert",
+      "bodenwert": "lage- und objektangepasster Bodenrichtwert",
+      "grundstuecksflaeche": "marktübliche, objektbezogene Grundstücksgröße",
+      "regionalfaktor": "entfällt",
+      "bog": "Auswertung fiktiv schadensfreier Objekte"
+    },
+    "geltungsbereich": {
+      "objektart_bez": "Reihenhäuser oder Doppelhaushälften",
+      "region": "Stadt Offenbach am Main",
+      "sachwert_von": 210000,
+      "sachwert_bis": 580000
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten, Stadt Offenbach am Main 2025 (Berichtsjahr 2024, Ausgabe Oktober 2025)",
+        "fundstelle": "Kap. 1.5 Sachwertfaktoren, Modell S. 35; Abbildung 43 (tabellarisch) S. 38, Abbildung 44 (graphisch) S. 39"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtlich abgedruckte Regressionsformel und Wertetabelle, gegeneinander nachgerechnet. Stufe B wegen der kleinen Stichprobe (37 Kauffälle) und des niedrigen Bestimmtheitsmaßes (0,39).",
+    "fallzahl": 37,
+    "streuung": 0.18,
+    "modellversion": "Vorabzug-Offenbach-2025 (Sachwertmodell S. 35: NHK 2010, BGF, GND 70, lineare AWM, BPI zum Verkaufszeitpunkt, Außenanlagen 5 %, ohne Regionalfaktor)",
+    "quelle_parser": "ernte-20261028b-hand (PDF-Seiten als Bild gelesen am 28.10.2026)",
+    "auflagen": "Quellenangabe. ABWEICHENDER MODELLANSATZ: Gesamtnutzungsdauer 70 Jahre, nicht 80. Dazu NHK 2010, Bezugsmaßstab Bruttogrundfläche, lineare Alterswertminderung, Baupreisindex quartalsweise zum Verkaufszeitpunkt, Baunebenkosten in den NHK enthalten, bauliche Außenanlagen pauschal 5 Prozent des Herstellungswertes, Nebengebäude pauschaler Zeitwert, kein Regionalfaktor, Auswertung fiktiv schadensfreier Objekte. Gültig nur im abgedruckten Sachwertbereich.",
+    "fundstelle": "Kap. 1.5 Sachwertfaktoren, Modell S. 35; Abbildung 43 (tabellarisch) S. 38, Abbildung 44 (graphisch) S. 39"
+  },
+  {
+    "land_code": "HE",
+    "ags": "06413000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Offenbach am Main, Stadt",
+    "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+    "berichtsjahr": 2025,
+    "berichtsjahr_dokument": 2024,
+    "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2025), wie bei den Offenbacher Sätzen aus dem Immobilienmarktbericht 2024 (dort Berichtsjahr laut Impressum 2023, im Register 2024). Das Impressum dieses Vorabzugs nennt „Berichtsjahr: 2024“ (Kauffälle 01.01.–31.12.2024).",
+    "stichtag": "2024-01-01",
+    "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2024“) bei einem Untersuchungszeitraum 01.01.2024 – 31.12.2024.",
+    "auswertezeitraum": "01.01.2024 – 31.12.2024",
+    "veroeffentlicht": "2025-10",
+    "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/IMB%20regional%202025",
+    "quelle_datei": "`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf",
+    "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / IMB regional 2025, Datei „`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf“. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 1. Ein Bericht 2026 (Berichtsjahr 2025) lag am 28.10.2026 weder im Downloadcenter (Ordner `IMB regional 2026 ohne Offenbach) noch auf offenbach.de vor.",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Der Vorabzug nennt keine Lizenz namentlich. Der Vervielfältigungshinweis (Impressum, S. 1) trägt den Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Vorabzugs der sonstigen für die Wertermittlung erforderlichen Daten und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Vorabzugs oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+    "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten 2025",
+    "verwendung": "produkt",
+    "korrekturen": [],
+    "kennzahl": "sachwertfaktor",
+    "zweig": "mfh",
+    "modellansaetze": {
+      "gnd_jahre": 70,
+      "bezug": "Vorabzug 2025 Offenbach, Kap. 1.5"
+    },
+    "geltungsbereich": {
+      "objektart_bez": "Mehrfamilienhäuser",
+      "region": "Stadt Offenbach am Main",
+      "ausserhalb_weg": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten, Stadt Offenbach am Main 2025 (Berichtsjahr 2024, Ausgabe Oktober 2025)",
+        "fundstelle": "Kap. 1.5 Sachwertfaktoren, S. 35–39 (nur EFH/ZFH und RH/DHH)"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: der Ausschuss leitet für diese Objektart keinen Sachwertfaktor ab.",
+    "fallzahl": 0,
+    "streuung": null,
+    "modellversion": "Vorabzug-Offenbach-2025",
+    "quelle_parser": "ernte-20261028b-hand (PDF-Seiten als Bild gelesen am 28.10.2026)",
+    "vollstaendig": false,
+    "unvollstaendig_grund": "Der Vorabzug 2025 der Stadt Offenbach führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser sowie Reihenhäuser bzw. Doppelhaushälften (Kap. 1.5, S. 35: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“). Für Mehrfamilienhäuser gibt es keinen.",
+    "warum_kein_wert": "Der Vorabzug 2025 der Stadt Offenbach führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser sowie Reihenhäuser bzw. Doppelhaushälften (Kap. 1.5, S. 35: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“). Für Mehrfamilienhäuser gibt es keinen."
+  },
+  {
+    "land_code": "HE",
+    "ags": "06413000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Offenbach am Main, Stadt",
+    "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+    "berichtsjahr": 2025,
+    "berichtsjahr_dokument": 2024,
+    "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2025), wie bei den Offenbacher Sätzen aus dem Immobilienmarktbericht 2024 (dort Berichtsjahr laut Impressum 2023, im Register 2024). Das Impressum dieses Vorabzugs nennt „Berichtsjahr: 2024“ (Kauffälle 01.01.–31.12.2024).",
+    "stichtag": "2024-01-01",
+    "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2024“) bei einem Untersuchungszeitraum 01.01.2024 – 31.12.2024.",
+    "auswertezeitraum": "01.01.2024 – 31.12.2024",
+    "veroeffentlicht": "2025-10",
+    "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/IMB%20regional%202025",
+    "quelle_datei": "`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf",
+    "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / IMB regional 2025, Datei „`2025 IMB Stadt Offenbach Wertrelevante Daten.pdf“. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 1. Ein Bericht 2026 (Berichtsjahr 2025) lag am 28.10.2026 weder im Downloadcenter (Ordner `IMB regional 2026 ohne Offenbach) noch auf offenbach.de vor.",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Der Vorabzug nennt keine Lizenz namentlich. Der Vervielfältigungshinweis (Impressum, S. 1) trägt den Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Vorabzugs der sonstigen für die Wertermittlung erforderlichen Daten und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Vorabzugs oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+    "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten 2025",
+    "verwendung": "produkt",
+    "korrekturen": [],
+    "kennzahl": "sachwertfaktor",
+    "zweig": "etw",
+    "modellansaetze": {
+      "gnd_jahre": 70,
+      "bezug": "Vorabzug 2025 Offenbach, Kap. 1.5"
+    },
+    "geltungsbereich": {
+      "objektart_bez": "Eigentumswohnungen",
+      "region": "Stadt Offenbach am Main",
+      "ausserhalb_weg": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "dokument": "Vorabzug der sonstigen für die Wertermittlung erforderlichen Daten, Stadt Offenbach am Main 2025 (Berichtsjahr 2024, Ausgabe Oktober 2025)",
+        "fundstelle": "Kap. 1.5 Sachwertfaktoren, S. 35–39 (nur EFH/ZFH und RH/DHH)"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: der Ausschuss leitet für diese Objektart keinen Sachwertfaktor ab.",
+    "fallzahl": 0,
+    "streuung": null,
+    "modellversion": "Vorabzug-Offenbach-2025",
+    "quelle_parser": "ernte-20261028b-hand (PDF-Seiten als Bild gelesen am 28.10.2026)",
+    "vollstaendig": false,
+    "unvollstaendig_grund": "Der Vorabzug 2025 der Stadt Offenbach führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser sowie Reihenhäuser bzw. Doppelhaushälften (Kap. 1.5, S. 35: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“). Für Eigentumswohnungen gibt es keinen.",
+    "warum_kein_wert": "Der Vorabzug 2025 der Stadt Offenbach führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser sowie Reihenhäuser bzw. Doppelhaushälften (Kap. 1.5, S. 35: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“). Für Eigentumswohnungen gibt es keinen."
+  }
+]

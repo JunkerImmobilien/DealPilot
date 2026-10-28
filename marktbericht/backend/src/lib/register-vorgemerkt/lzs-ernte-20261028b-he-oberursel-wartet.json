@@ -1,0 +1,212 @@
+[
+ {
+  "land_code": "HE",
+  "ags": "06434008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Oberursel (Taunus), Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "berichtsjahr": 2025,
+  "berichtsjahr_dokument": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.oberursel.de/de/leben-wohnen/wohnen-bauen/immobilienmarkt-werte/immobilienmarktbericht-oberursel-2025.pdf?cid=172b",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Impressum S. 2 trägt den Wortlaut der dl-de/zero-2-0 („Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt …“), ohne die Lizenz namentlich zu nennen.",
+  "modellansaetze": {
+   "bezug": "IMB 2025 Oberursel, Kap. 9.2 (keine eigene Ableitung)"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Ein- und Zweifamilienhäuser",
+   "region": "Stadt Oberursel (Taunus)",
+   "ausserhalb_wortlaut": "„Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (S. 47; Quelle laut Fußnote 4: Immobilienmarktbericht für den Bereich Frankfurt am Main 2025, ISSN 2193-8008)",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus), Rathausplatz 1, 61440 Oberursel, Tel. 06171 502-445, gutachterausschuss@oberursel.de; Immobilienmarktbericht kostenfrei auf oberursel.de und gds.hessen.de (Immobilienwerte / Regionale Immobilienmarktberichte)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2025 für den Bereich der Stadt Oberursel (Taunus), Berichtsjahr 2024",
+    "fundstelle": "Kap. 9.2 Liegenschaftszinssätze, S. 47; Kap. 2.2, S. 5"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: der Ausschuss leitet keine Liegenschaftszinssätze ab.",
+  "fallzahl": 0,
+  "streuung": null,
+  "modellversion": "IMB-Oberursel-2025",
+  "quelle_parser": "ernte-20261028b-hand (pdftotext, S. 5 und 47, am 28.10.2026 gelesen)",
+  "verwendung": "produkt",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06434008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Oberursel (Taunus), Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "berichtsjahr": 2025,
+  "berichtsjahr_dokument": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.oberursel.de/de/leben-wohnen/wohnen-bauen/immobilienmarkt-werte/immobilienmarktbericht-oberursel-2025.pdf?cid=172b",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Impressum S. 2 trägt den Wortlaut der dl-de/zero-2-0 („Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt …“), ohne die Lizenz namentlich zu nennen.",
+  "modellansaetze": {
+   "bezug": "IMB 2025 Oberursel, Kap. 9.2 (keine eigene Ableitung)"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+   "region": "Stadt Oberursel (Taunus)",
+   "ausserhalb_wortlaut": "„Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (S. 47; Quelle laut Fußnote 4: Immobilienmarktbericht für den Bereich Frankfurt am Main 2025, ISSN 2193-8008)",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus), Rathausplatz 1, 61440 Oberursel, Tel. 06171 502-445, gutachterausschuss@oberursel.de; Immobilienmarktbericht kostenfrei auf oberursel.de und gds.hessen.de (Immobilienwerte / Regionale Immobilienmarktberichte)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2025 für den Bereich der Stadt Oberursel (Taunus), Berichtsjahr 2024",
+    "fundstelle": "Kap. 9.2 Liegenschaftszinssätze, S. 47; Kap. 2.2, S. 5"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: der Ausschuss leitet keine Liegenschaftszinssätze ab.",
+  "fallzahl": 0,
+  "streuung": null,
+  "modellversion": "IMB-Oberursel-2025",
+  "quelle_parser": "ernte-20261028b-hand (pdftotext, S. 5 und 47, am 28.10.2026 gelesen)",
+  "verwendung": "produkt",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06434008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Oberursel (Taunus), Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "berichtsjahr": 2025,
+  "berichtsjahr_dokument": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.oberursel.de/de/leben-wohnen/wohnen-bauen/immobilienmarkt-werte/immobilienmarktbericht-oberursel-2025.pdf?cid=172b",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Impressum S. 2 trägt den Wortlaut der dl-de/zero-2-0 („Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt …“), ohne die Lizenz namentlich zu nennen.",
+  "modellansaetze": {
+   "bezug": "IMB 2025 Oberursel, Kap. 9.2 (keine eigene Ableitung)"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Mehrfamilienhäuser",
+   "region": "Stadt Oberursel (Taunus)",
+   "ausserhalb_wortlaut": "„Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (S. 47; Quelle laut Fußnote 4: Immobilienmarktbericht für den Bereich Frankfurt am Main 2025, ISSN 2193-8008)",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus), Rathausplatz 1, 61440 Oberursel, Tel. 06171 502-445, gutachterausschuss@oberursel.de; Immobilienmarktbericht kostenfrei auf oberursel.de und gds.hessen.de (Immobilienwerte / Regionale Immobilienmarktberichte)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2025 für den Bereich der Stadt Oberursel (Taunus), Berichtsjahr 2024",
+    "fundstelle": "Kap. 9.2 Liegenschaftszinssätze, S. 47; Kap. 2.2, S. 5"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: der Ausschuss leitet keine Liegenschaftszinssätze ab.",
+  "fallzahl": 0,
+  "streuung": null,
+  "modellversion": "IMB-Oberursel-2025",
+  "quelle_parser": "ernte-20261028b-hand (pdftotext, S. 5 und 47, am 28.10.2026 gelesen)",
+  "verwendung": "produkt",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06434008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Oberursel (Taunus), Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw",
+  "objektart": "etw",
+  "berichtsjahr": 2025,
+  "berichtsjahr_dokument": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.oberursel.de/de/leben-wohnen/wohnen-bauen/immobilienmarkt-werte/immobilienmarktbericht-oberursel-2025.pdf?cid=172b",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Impressum S. 2 trägt den Wortlaut der dl-de/zero-2-0 („Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt …“), ohne die Lizenz namentlich zu nennen.",
+  "modellansaetze": {
+   "bezug": "IMB 2025 Oberursel, Kap. 9.2 (keine eigene Ableitung)"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Eigentumswohnungen",
+   "region": "Stadt Oberursel (Taunus)",
+   "ausserhalb_wortlaut": "„Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (S. 47; Quelle laut Fußnote 4: Immobilienmarktbericht für den Bereich Frankfurt am Main 2025, ISSN 2193-8008)",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus), Rathausplatz 1, 61440 Oberursel, Tel. 06171 502-445, gutachterausschuss@oberursel.de; Immobilienmarktbericht kostenfrei auf oberursel.de und gds.hessen.de (Immobilienwerte / Regionale Immobilienmarktberichte)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2025 für den Bereich der Stadt Oberursel (Taunus), Berichtsjahr 2024",
+    "fundstelle": "Kap. 9.2 Liegenschaftszinssätze, S. 47; Kap. 2.2, S. 5"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: der Ausschuss leitet keine Liegenschaftszinssätze ab.",
+  "fallzahl": 0,
+  "streuung": null,
+  "modellversion": "IMB-Oberursel-2025",
+  "quelle_parser": "ernte-20261028b-hand (pdftotext, S. 5 und 47, am 28.10.2026 gelesen)",
+  "verwendung": "produkt",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06434008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Oberursel (Taunus), Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "gewerbe",
+  "objektart": "gewerbe",
+  "berichtsjahr": 2025,
+  "berichtsjahr_dokument": 2024,
+  "stichtag": null,
+  "quelle_url": "https://www.oberursel.de/de/leben-wohnen/wohnen-bauen/immobilienmarkt-werte/immobilienmarktbericht-oberursel-2025.pdf?cid=172b",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Impressum S. 2 trägt den Wortlaut der dl-de/zero-2-0 („Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt …“), ohne die Lizenz namentlich zu nennen.",
+  "modellansaetze": {
+   "bezug": "IMB 2025 Oberursel, Kap. 9.2 (keine eigene Ableitung)"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Wohn- und Geschäftshäuser, Gewerbe",
+   "region": "Stadt Oberursel (Taunus)",
+   "ausserhalb_wortlaut": "„Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (S. 47; Quelle laut Fußnote 4: Immobilienmarktbericht für den Bereich Frankfurt am Main 2025, ISSN 2193-8008)",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Oberursel (Taunus), Rathausplatz 1, 61440 Oberursel, Tel. 06171 502-445, gutachterausschuss@oberursel.de; Immobilienmarktbericht kostenfrei auf oberursel.de und gds.hessen.de (Immobilienwerte / Regionale Immobilienmarktberichte)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2025 für den Bereich der Stadt Oberursel (Taunus), Berichtsjahr 2024",
+    "fundstelle": "Kap. 9.2 Liegenschaftszinssätze, S. 47; Kap. 2.2, S. 5"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: der Ausschuss leitet keine Liegenschaftszinssätze ab.",
+  "fallzahl": 0,
+  "streuung": null,
+  "modellversion": "IMB-Oberursel-2025",
+  "quelle_parser": "ernte-20261028b-hand (pdftotext, S. 5 und 47, am 28.10.2026 gelesen)",
+  "verwendung": "produkt",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2025 der Stadt Oberursel (Taunus) leitet keine eigenen Liegenschaftszinssätze ab (Kap. 9.2, S. 47): „Für den Bereich der Stadt Oberursel liegen nicht genügend Daten in der Kaufpreissammlung vor, die eine qualifizierte Ableitung von Liegenschaftszinssätzen erlauben. Daher werden die Liegenschaftszinssätze für den Bereich der Stadt Frankfurt am Main, soweit sie auf das Stadtgebiet Oberursel übertragbar sind, in Oberursel empfohlen.“ (ebenso Kap. 2, S. 5). Die Frankfurter Sätze werden nicht als Oberurseler Ortswert übernommen — die Übertragbarkeit ist eine sachverständige Einzelfallfrage, die der Ausschuss ausdrücklich offenlässt („soweit … übertragbar“). Ein Bericht 2026 lag am 28.10.2026 weder auf oberursel.de noch im Downloadcenter gds.hessen.de vor."
+ }
+]

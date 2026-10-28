@@ -663,6 +663,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                NICHT aktiv: register-vorgemerkt/lzs-ernte-20261028-bw-bnh-wartet.json (Breisgau-Nord, „nicht abgeleitet“). */
                             'swf-ernte-20261028-mv.json', 'lzs-ernte-20261028-bw.json', 'lzs-ernte-20261028-sh.json',
                             'uk-flaeche-ernte-20261028-mv.json',
+                            /* v3016w · Jahrgaenge 2026 (zwei Agenten): Offenbach LZS 8 Werte (erstmals) + SWF 2025, Unna WGFZ-Sperre 2026,
+                               Berlin VGF 2026 (ezfh, ezfh_sehr_gut, villa; verwendung intern), Schwerin LZS + UK 2026.
+                               NICHT aktiv: register-vorgemerkt/lzs-ernte-20261028b-he-oberursel-wartet.json. */
+                            'lzs-ernte-20261028b-he.json', 'swf-ernte-20261028b-he.json', 'uk-wgfz-ernte-20261028b-nw.json',
+                            'vgf-ernte-20261028c-be.json', 'lzs-ernte-20261028c-mv.json', 'uk-flaeche-ernte-20261028c-mv.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

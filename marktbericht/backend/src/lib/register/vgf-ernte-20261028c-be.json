@@ -1,0 +1,729 @@
+[
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser (auch mit Einliegerwohnung) in einfacher, mittlerer und guter stadträumlicher Wohnlage",
+  "formel": {
+   "form": "matrix_interp",
+   "liefert": "wert_eur",
+   "einheit": "EUR/m² Brutto-Grundfläche",
+   "achse_x_feld": "bgf_qm",
+   "achse_x_bez": "Brutto-Grundfläche in m² (DIN 277-1:2005-02, Anlage 4 ImmoWertV)",
+   "achse_x": [
+    140,
+    200,
+    250,
+    300,
+    350,
+    400,
+    430
+   ],
+   "achse_y_feld": "brw_eur_qm",
+   "achse_y_bez": "Bodenrichtwert zum 01.01.2025 in EUR/m²",
+   "achse_y": [
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000
+   ],
+   "zellen_schluessel": "Bodenrichtwert -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "400": [
+     2386,
+     2064,
+     1796,
+     1528,
+     1260,
+     992,
+     831
+    ],
+    "500": [
+     2577,
+     2255,
+     1987,
+     1719,
+     1451,
+     1183,
+     1022
+    ],
+    "600": [
+     2768,
+     2446,
+     2178,
+     1910,
+     1642,
+     1374,
+     1213
+    ],
+    "700": [
+     2959,
+     2637,
+     2369,
+     2101,
+     1832,
+     1564,
+     1404
+    ],
+    "800": [
+     3149,
+     2828,
+     2559,
+     2291,
+     2023,
+     1755,
+     1594
+    ],
+    "900": [
+     3340,
+     3018,
+     2750,
+     2482,
+     2214,
+     1946,
+     1785
+    ],
+    "1000": [
+     3531,
+     3209,
+     2941,
+     2673,
+     2405,
+     2137,
+     1976
+    ]
+   },
+   "rundung_stellen": 0,
+   "interpolation": "Kreuzinterpolation, linear in beiden Achsen — Tabelle 1 (S. 6): „Innerhalb der Tabellenwerte kann linear interpoliert werden.“ Außerhalb (BRW unter 400 oder über 1.000 EUR/m², BGF unter 140 oder über 430 m²) nichts.",
+   "normobjekt": "Ein- oder Zweifamilienhaus (auch mit Einliegerwohnung) in EINFACHER oder MITTLERER stadträumlicher Wohnlage, Grundstücksfläche 600 m² (Tabellenkopf S. 6: „Für eine mittlere Grundstücksfläche von 600 m²“), Baujahresgruppe bis 1948 oder 1971–1990, Massivhaus oder Fertighaus-Massiv, normaler Bauzustand, kein Denkmalschutz (alle ±0, S. 7). Gebäudestellung (Einzelhaus, Doppelhaushälfte, Reihenhaus, Reihenendhaus) trägt 2026 KEINE Korrektur: sie steht nur in der Statistik (Tabelle 9, S. 13); S. 7 schließt mit „Weitere signifikante Einflussgrößen liegen nicht vor.“ Der Faktor enthält Grund und Boden UND Gebäude.",
+   "probe_innere_stimmigkeit": "Je Zeile fallen die Werte gleichmäßig mit der BGF (z. B. Zeile 800: −321 bis 200 m², dann −268 je 50 m², −161 je 30 m²), je Spalte steigen sie gleichmäßig um rund 191 je 100 EUR/m² BRW. Gegenprobe gegen Erfassungsfehler, nicht die amtliche Formel.",
+   "beispiel_aus_dem_blatt": {
+    "quelle": "„Wie sind die Vergleichsfaktoren anzuwenden?“, S. 18",
+    "objekt": {
+     "bgf_qm": 250,
+     "brw_eur_qm": 800,
+     "baujahr": 1970,
+     "flaeche": 500,
+     "bauzustand": "normal",
+     "gebaeudekonstruktion": "Fertighaus-Holz",
+     "wohnlage": "mittel",
+     "denkmalschutz": "nein"
+    },
+    "rechenweg": [
+     {
+      "schritt": "Ausgangswert (Wertespalte 3, Wertezeile 5)",
+      "eur_qm_bgf": 2559
+     },
+     {
+      "schritt": "Baujahr 1970",
+      "eur_qm_bgf": -106
+     },
+     {
+      "schritt": "500 m² Grundstücksfläche",
+      "eur_qm_bgf": -110
+     },
+     {
+      "schritt": "Normaler Bauzustand",
+      "eur_qm_bgf": 0
+     },
+     {
+      "schritt": "Gebäudekonstruktion Fertighaus-Holz",
+      "eur_qm_bgf": -105
+     },
+     {
+      "schritt": "Mittlere stadträumliche Wohnlage",
+      "eur_qm_bgf": 0
+     },
+     {
+      "schritt": "Kein Denkmalschutz",
+      "eur_qm_bgf": 0
+     },
+     {
+      "schritt": "Ergebnis",
+      "eur_qm_bgf": 2238
+     }
+    ],
+    "objektwert_eur": 559500,
+    "nachgerechnet": "2.559 − 106 − 110 + 0 − 105 + 0 + 0 = 2.238 EUR/m² BGF; 2.238 × 250 m² = 559.500 EUR — beide Zeilen zeichengleich mit S. 18. ACHTUNG: im Textauszug (pdftotext) stehen die Beträge des Beispiels gegenüber ihren Zeilen verschoben; die Zuordnung oben ist am Seitenbild und an der Korrekturliste S. 7 geprüft (1949–1970 −106, 500 m² −110, Fertighaus-Holz −105)."
+   },
+   "liefert_einheit": "EUR/m² Brutto-Grundfläche",
+   "bezugsgroesse": "bgf_qm"
+  },
+  "korrekturen": [
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahr",
+    "art": "band",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "baender": [
+     {
+      "von": 0,
+      "bis": 1919,
+      "zuschlag": 0,
+      "bez": "bis 1919"
+     },
+     {
+      "von": 1920,
+      "bis": 1948,
+      "zuschlag": 0,
+      "bez": "1920-1948"
+     },
+     {
+      "von": 1949,
+      "bis": 1970,
+      "zuschlag": -106,
+      "bez": "1949-1970"
+     },
+     {
+      "von": 1971,
+      "bis": 1990,
+      "zuschlag": 0,
+      "bez": "1971-1990"
+     },
+     {
+      "von": 1991,
+      "bis": 2009,
+      "zuschlag": 662,
+      "bez": "1991-2009"
+     },
+     {
+      "von": 2010,
+      "bis": 2020,
+      "zuschlag": 944,
+      "bez": "2010-2020"
+     },
+     {
+      "von": 2021,
+      "bis": 2100,
+      "zuschlag": 868,
+      "bez": "ab 2021"
+     }
+    ],
+    "hinweis": "S. 7, Bänder ohne Interpolation. Ursprüngliches Baujahr, keine Modernisierungskorrektur (B, S. 3). Gegenüber 2025 andere Gruppen (2010-2020 statt 2010-2019, ab 2021 statt ab 2020) und andere Beträge."
+   },
+   {
+    "bez": "Stadträumliche Wohnlage",
+    "feld": "wohnlage",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "einfach": 0,
+     "mittel": 0,
+     "gut": 174
+    },
+    "hinweis": "S. 7: einfach ±0, mittel ±0, gut +174. Amtliche Berliner Wohnlage (B2, S. 4, Glossar artikel.158011.php), nicht die DealPilot-Lageklasse. „sehr gut“ gehört NICHT in diesen Zweig (→ ezfh_sehr_gut bzw. villa)."
+   },
+   {
+    "bez": "Gebäudekonstruktion",
+    "feld": "gebaeudekonstruktion",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "massivhaus": 0,
+     "fertighaus-massiv": 0,
+     "fertighaus-holz": -105
+    },
+    "hinweis": "S. 7: Massivhaus ±0, Fertighaus-Massiv ±0, Fertighaus-Holz −105."
+   },
+   {
+    "bez": "Bauzustand",
+    "feld": "bauzustand",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "gut": 370,
+     "normal": 0,
+     "schlecht": -474
+    },
+    "hinweis": "S. 7: gut +370, normal ±0, schlecht −474. Drei Zustandsnoten des Berliner Ausschusses (B3, S. 4; Glossar artikel.156899.php). Amtliche Klassen — eine Übersetzung aus der DealPilot-Zustandseinschätzung wäre eine erfundene Einordnung."
+   },
+   {
+    "bez": "Denkmalschutz",
+    "feld": "denkmalschutz",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "ja": 304,
+     "nein": 0
+    },
+    "hinweis": "S. 7: liegt vor +304, liegt nicht vor ±0 (Denkmalliste Berlin zum Verkaufszeitpunkt, B5, S. 4). Neu gegenüber 2025 — dort waren Denkmale von der Recherche ausgeschlossen."
+   },
+   {
+    "bez": "Grundstücksfläche",
+    "feld": "flaeche",
+    "art": "stufen",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "stufen": {
+     "200": -400,
+     "300": -330,
+     "400": -220,
+     "500": -110,
+     "600": 0,
+     "700": 110,
+     "800": 220,
+     "900": 330,
+     "1000": 440
+    },
+    "rundung_stellen": 0,
+    "hinweis": "S. 7, Stützstellen je 100 m² von 200 bis 1.000 m², Norm 600 m² (Tabellenkopf S. 6). Die Stützstellen liegen von 300 bis 1.000 m² auf einer Geraden (+110 je 100 m²), nur 200 m² weicht ab (−400 statt −440) — so abgedruckt. Das Blatt sagt NICHT ausdrücklich, ob zwischen den Stützstellen interpoliert wird; die Grundstücksfläche ist in der Regression eine stetige Variable (A4, S. 3), DealPilot interpoliert deshalb linear (art stufen). Außerhalb 200–1.000 m² kein Wert (Leseroutine sperrt „außerhalb der Tabelle“, kein Randwert)."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "§ 193 Abs. 5 BauGB, Vergleichsfaktoren nach § 12 Abs. 1 Nr. 3 ImmoWertV (A1, S. 1)",
+   "stichtag": "31.12.2025",
+   "bodenrichtwert_stichtag": "01.01.2025",
+   "bodenrichtwert_modellvorgabe": "B1, S. 3 wörtlich: „Für die Anwendung der Vergleichsfaktoren in den Tabellen 1 bis 3 ist im Rahmen der Modellkonformität der Bodenrichtwert zum 01.01.2025 anzusetzen.“ und „Eine WGFZ-Anpassung wurde nicht vorgenommen.“",
+   "besonderheit": "A1, S. 1: „Die Vergleichsfaktoren enthalten sowohl den Wert für den Grund und Boden als auch für die Gebäude.“ Ein Bodenwert wird NICHT zusätzlich angesetzt.",
+   "bgf_regeln": "B4/B6, S. 4: BGF in Anlehnung an DIN 277-1:2005-02 (Anlage 4 ImmoWertV), in der Regel aus den Bauakten; bei Giebelhöhe ≤ 1,50 m zählt das Dachgeschoss nicht; Garagen zählen nicht, außer von Geschossen überbaute.",
+   "baujahr": "B, S. 3: nur ursprüngliche Baujahre, keine Korrektur wegen Modernisierung, keine Innenbesichtigung, keine Prüfung der Teilbarkeit.",
+   "kaufpreisbereinigung": "B6, S. 4: Kaufpreis um Zeitwert der baulichen Nebenanlagen, besonderen Außenanlagen, besonderen Betriebseinrichtungen und den Kaufpreisanteil für Nebenflächen bereinigt, soweit bekannt.",
+   "nicht_beruecksichtigt": "A4, S. 2: Erwerbsumfang < 100 %, vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung, Grundstücke mit Wasserlage; Wertminderung wegen Baumängeln; Wohn-/Miet-/Nutzungsrechte, Ratenzahlung, Kaufpreis < Bodenwert, Verkäufer bewohnt > 1 Jahr nach Vertrag, private Bindungen.",
+   "wohnlage_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php",
+   "bauzustand_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "veroeffentlicht": "Das Deckblatt (S. 1) lautet „Veröffentlicht im Amtsblatt für Berlin Nr. ## vom ##.##.2026 Seite #### ff.“ — die Fundstelle im Amtsblatt ist im Blatt vom 19.10.2026 noch ein Platzhalter. Das Blatt selbst steht auf der Seite des Ausschusses (Stand 19.10.2026) frei zum Download. Bei der nächsten Nachernte die Amtsblatt-Nummer nachtragen.",
+   "stand_des_blattes": "19.10.2026",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Vergleichsfaktor nach § 20 ImmoWertV — kein Sachwertmodell, das Blatt nennt keine Gesamtnutzungsdauer und keinen Baupreisindex.",
+   "normobjekt": "siehe formel.normobjekt — Grundstücksfläche 600 m², einfache/mittlere Wohnlage, normaler Zustand",
+   "berechnungsmodell": "Vergleichsfaktor in EUR/m² BGF aus Tabelle 1 (BRW × BGF) plus sechs additive Korrekturen (S. 7)",
+   "ermittlung": "A4, S. 3: Regressionsanalyse mit den Variablen Bodenrichtwert, Brutto-Grundfläche, Grundstücksfläche, Zeit (in Tagen) und den Dummyvariablen Baujahresgruppe, Bauzustand, Wohnlagen, Stadtlagen, Gebäudeart, Denkmalschutz und Gebäudekonstruktion.",
+   "auswertungszeitraum": "01.01.2023 bis 31.12.2025",
+   "extremwerte": "A4, S. 2: Kaufpreis > 3.000.000 EUR oder < 160.000 EUR, Grundstücksfläche ≤ 120 m², BGF > 900 m², tatsächliche GFZ > 1,7.",
+   "kauffaelle_gesamt": 3554,
+   "kauffaelle_ausgewertet": 3126,
+   "kauffaelle_hinweis": "Text A4 (S. 2): „3.554 Kauffälle für Ein- und Zweifamilienhausgrundstücke in einfachen, mittleren, guten und sehr guten stadträumlichen Wohnlagen“. Statistik: Tabelle 4 (S. 10) 3.126 + Tabelle 10 (S. 14) 32 = 3.158. Die Differenz von 396 steht so im Blatt (2025 genauso: 219). Dieser Satz führt die Tabellenzahl 3.126."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berlin, aber NICHT in 17 namentlich ausgeschlossenen Ortsteilen (A3, S. 1); in allen übrigen anwendbar.",
+   "ortsteile_ausgeschlossen": [
+    "Mitte",
+    "Moabit",
+    "Hansaviertel",
+    "Tiergarten-Süd",
+    "Wedding",
+    "Friedrichshain",
+    "Kreuzberg",
+    "Charlottenburg",
+    "Schmargendorf",
+    "Grunewald",
+    "Charlottenburg-Nord",
+    "Halensee",
+    "Schöneberg",
+    "Friedenau",
+    "Alt-Treptow",
+    "Fennpfuhl",
+    "Rummelsburg"
+   ],
+   "ortsteile_hinweis": "Gegenüber 2025 (22 Ortsteile) nicht mehr ausgeschlossen: Gesundbrunnen, Neukölln, Plänterwald, Oberschöneweide, Malchow (Lichtenberg).",
+   "sachlich": "Einfamilienhäuser, Einfamilienhäuser mit Einliegerwohnung, Zweifamilienhäuser (A5, S. 3; Erst- und Weiterverkäufe) in einfacher, mittlerer oder guter stadträumlicher Wohnlage. Gebäudestellung Einzelhaus/DHH/Reihenhaus/Reihenendhaus in der Stichprobe (Tabelle 9, S. 13), ohne eigene Korrektur.",
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "A5, S. 3: „Kauffälle in der Rechtsform des Wohnungseigentums und Kauffälle von Wohnungseigentum bei bestehenden Erbbaurechten, Nießbrauch u.ä. wurden ausgeschlossen. Für diese Objekte kann das Modell keine Aussage treffen.“",
+   "ausserhalb_weg": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": [
+     400,
+     1000
+    ],
+    "bgf_qm": [
+     140,
+     430
+    ],
+    "flaeche": [
+     200,
+     1000
+    ]
+   },
+   "spannen_hinweis": "Tabellengrenzen. Stichprobe (Tabelle 4, S. 10): Kaufpreis Mittel 583.351 EUR (5–95 %: 320.000–1.000.000), EUR/m² BGF 2.355 (1.283–3.878), Grundstück 557 m² (198–1.000), BGF 256 m² (143–427), tatsächliche GFZ 0,28 (0,10–0,58), BRW 600 EUR/m² (380–1.000).",
+   "vorbehalt": "VERWENDUNGSZWECK (A1, S. 1) wörtlich: „Die nachfolgenden Vergleichsfaktoren dienen u.a. der steuerlichen Bedarfsbewertung nach dem 6. Abschnitt des 2. Teils des Bewertungsgesetzes sowie der Aufteilung eines Kaufpreises auf Grund und Boden und Gebäude.“ und „Die Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung des Verkehrswertes im Sinne des § 194 BauGB.“ ZEITLICHE ANWENDBARKEIT (A2, S. 1): „richtet sich nach den steuerlichen Vorschriften“ — keine Zeitanpassung, kein Index. Wie beim Jahrgang 2025 (vgf-be.json) deshalb verwendung: intern.",
+   "hinweis": "Die stadträumliche Wohnlage entscheidet, welche Tabelle gilt: einfach/mittel/gut → dieser Zweig; sehr gut → ezfh_sehr_gut; Villa/Landhaus → villa. Fehlt die amtliche Wohnlage, ist der Zweig nicht modellkonform wählbar."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Vergleichsfaktoren 2026 (05-05-010-2600.pdf), C1.1 Tabelle 1, S. 6 (49 Werte, BRW 400–1.000 × BGF 140–430 m²)",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   },
+   {
+    "art": "korrekturen",
+    "fundstelle": "Korrekturwerte (Additionskonstanten EUR/m² BGF), S. 7",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   },
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "„Wie sind die Vergleichsfaktoren anzuwenden?“, S. 18: 2.559 − 106 − 110 − 105 = 2.238 EUR/m² BGF; × 250 m² = 559.500 EUR",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   },
+   {
+    "art": "statistik",
+    "fundstelle": "Tabellen 4–9, S. 10–13 (3.126 Kauffälle)",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   }
+  ],
+  "stufe_grund": "Amtliche Tabelle mit abgedruckten Korrekturwerten des Gutachterausschusses Berlin, frei auf berlin.de (Stand 19.10.2026). Anwendungsbeispiel S. 18 zeichengleich nachgerechnet. Amtsblatt-Fundstelle im Blatt noch Platzhalter.",
+  "auflagen": "Quellenangabe und ©-Vermerk der Senatsverwaltung. Laut Blatt für steuerliche Bewertung und Kaufpreisaufteilung, kein Ersatz eines Verkehrswertgutachtens. Modellkonform nur mit BRW 01.01.2025 ohne WGFZ-Anpassung und der amtlichen Berliner Wohnlage. Löst den Jahrgang 2025 (vgf-be.json, Stichtag 31.12.2024) als jüngsten Satz ab.",
+  "stufe": "A",
+  "fallzahl": 3126,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren 2026 (EZFH/Villen), Stand 19.10.2026, Stichtag 31.12.2025, BRW 01.01.2025",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf",
+  "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+  "quelle_parser": "ernte-20261028c-be (pdftotext -layout + Seitenbild je Tabelle, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren 2026 für bebaute Ein- und Zweifamilienhaus- und Villen- und Landhausgrundstücke zum Stichtag 31.12.2025, Stand 19.10.2026. © 2026, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+  "lizenz": "keine Datenlizenz angegeben — im Blatt steht nur „© 2026, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E - Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin“ (S. 5). Kein dl-de/by-2-0, kein zero-2-0; am 28.10.2026 im Volltext gesucht (Lizenz, dl-de, Nutzung, Vervielfältigung, Urheber: ohne Treffer außer dem ©-Vermerk).",
+  "verwendung": "intern",
+  "zugang": "kostenfrei",
+  "fundstelle": "Vergleichsfaktoren 2026 (05-05-010-2600.pdf), Stand 19.10.2026: A1 (S. 1), A3 (S. 1–2), A4 (S. 2–3), B (S. 3–4), Tabelle 1 (S. 6), Korrekturwerte (S. 7), Tabellen 4–9 (S. 10–13), Anwendungsbeispiel (S. 18)"
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh_sehr_gut",
+  "objektart_bez": "Ein- und Zweifamilienhäuser in sehr guter stadträumlicher Wohnlage (Schmargendorf, Grunewald, Westend, Dahlem)",
+  "formel": {
+   "form": "matrix_interp",
+   "liefert": "wert_eur",
+   "einheit": "EUR/m² Brutto-Grundfläche",
+   "achse_x_feld": "bgf_qm",
+   "achse_x_bez": "Brutto-Grundfläche in m²",
+   "achse_x": [
+    190,
+    300,
+    400,
+    500,
+    600
+   ],
+   "achse_y_feld": "brw_eur_qm",
+   "achse_y_bez": "Bodenrichtwert zum 01.01.2025 in EUR/m²",
+   "achse_y": [
+    1500,
+    1700,
+    1900,
+    2100,
+    2300,
+    2500,
+    2700,
+    2800
+   ],
+   "zellen_schluessel": "Bodenrichtwert -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "1500": [
+     4967,
+     4549,
+     4170,
+     3790,
+     3411
+    ],
+    "1700": [
+     5142,
+     4725,
+     4345,
+     3966,
+     3586
+    ],
+    "1900": [
+     5317,
+     4900,
+     4520,
+     4141,
+     3761
+    ],
+    "2100": [
+     5493,
+     5075,
+     4696,
+     4316,
+     3937
+    ],
+    "2300": [
+     5668,
+     5251,
+     4871,
+     4492,
+     4112
+    ],
+    "2500": [
+     5844,
+     5426,
+     5047,
+     4667,
+     4288
+    ],
+    "2700": [
+     6019,
+     5602,
+     5222,
+     4843,
+     4463
+    ],
+    "2800": [
+     6107,
+     5689,
+     5310,
+     4930,
+     4551
+    ]
+   },
+   "rundung_stellen": 0,
+   "interpolation": "Kreuzinterpolation, linear — Tabelle 2 (S. 8): „Innerhalb der Tabellenwerte kann linear interpoliert werden.“ Außerhalb BRW 1.500–2.800 und BGF 190–600 m² nichts.",
+   "normobjekt": "Ein- oder Zweifamilienhaus in SEHR GUTER stadträumlicher Wohnlage in Schmargendorf, Grunewald, Westend oder Dahlem. S. 8: „Weitere signifikante Einflussgrößen liegen nicht vor.“ — KEINE Korrekturen (die der Tabelle 1 dürfen nicht übertragen werden). Neu gegenüber 2025: zweite Achse BGF (2025 nur BRW). Faktor enthält Grund und Boden UND Gebäude.",
+   "liefert_einheit": "EUR/m² Brutto-Grundfläche",
+   "bezugsgroesse": "bgf_qm"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "§ 193 Abs. 5 BauGB, Vergleichsfaktoren nach § 12 Abs. 1 Nr. 3 ImmoWertV (A1, S. 1)",
+   "stichtag": "31.12.2025",
+   "bodenrichtwert_stichtag": "01.01.2025",
+   "bodenrichtwert_modellvorgabe": "B1, S. 3 wörtlich: „Für die Anwendung der Vergleichsfaktoren in den Tabellen 1 bis 3 ist im Rahmen der Modellkonformität der Bodenrichtwert zum 01.01.2025 anzusetzen.“ und „Eine WGFZ-Anpassung wurde nicht vorgenommen.“",
+   "besonderheit": "A1, S. 1: „Die Vergleichsfaktoren enthalten sowohl den Wert für den Grund und Boden als auch für die Gebäude.“ Ein Bodenwert wird NICHT zusätzlich angesetzt.",
+   "bgf_regeln": "B4/B6, S. 4: BGF in Anlehnung an DIN 277-1:2005-02 (Anlage 4 ImmoWertV), in der Regel aus den Bauakten; bei Giebelhöhe ≤ 1,50 m zählt das Dachgeschoss nicht; Garagen zählen nicht, außer von Geschossen überbaute.",
+   "baujahr": "B, S. 3: nur ursprüngliche Baujahre, keine Korrektur wegen Modernisierung, keine Innenbesichtigung, keine Prüfung der Teilbarkeit.",
+   "kaufpreisbereinigung": "B6, S. 4: Kaufpreis um Zeitwert der baulichen Nebenanlagen, besonderen Außenanlagen, besonderen Betriebseinrichtungen und den Kaufpreisanteil für Nebenflächen bereinigt, soweit bekannt.",
+   "nicht_beruecksichtigt": "A4, S. 2: Erwerbsumfang < 100 %, vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung, Grundstücke mit Wasserlage; Wertminderung wegen Baumängeln; Wohn-/Miet-/Nutzungsrechte, Ratenzahlung, Kaufpreis < Bodenwert, Verkäufer bewohnt > 1 Jahr nach Vertrag, private Bindungen.",
+   "wohnlage_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php",
+   "bauzustand_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "veroeffentlicht": "Das Deckblatt (S. 1) lautet „Veröffentlicht im Amtsblatt für Berlin Nr. ## vom ##.##.2026 Seite #### ff.“ — die Fundstelle im Amtsblatt ist im Blatt vom 19.10.2026 noch ein Platzhalter. Das Blatt selbst steht auf der Seite des Ausschusses (Stand 19.10.2026) frei zum Download. Bei der nächsten Nachernte die Amtsblatt-Nummer nachtragen.",
+   "stand_des_blattes": "19.10.2026",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Vergleichsfaktor nach § 20 ImmoWertV — kein Sachwertmodell, das Blatt nennt keine Gesamtnutzungsdauer und keinen Baupreisindex.",
+   "normobjekt": "EZFH sehr gute Wohnlage, keine Korrekturen (S. 8)",
+   "berechnungsmodell": "Vergleichsfaktor in EUR/m² BGF aus Tabelle 2 (BRW × BGF), keine Korrekturen",
+   "ermittlung": "A4, S. 3: Regressionsanalyse mit den Variablen Bodenrichtwert, Grundstücksfläche, Zeit (in Tagen), tatsächliche GFZ und den Dummyvariablen Baujahresgruppe, Gebäudeart, Denkmalschutz und Bauzustand.",
+   "ermittlung_hinweis": "Auffällig und so abgedruckt: die Regression nennt die BGF nicht als Variable, die Tabelle 2 ist aber über die BGF aufgespannt. Übernommen wird die Tabelle, wie sie steht.",
+   "auswertungszeitraum": "01.01.2023 bis 31.12.2025",
+   "extremwerte": "A4, S. 2: Kaufpreis > 3.100.000 EUR oder < 600.000 EUR, Grundstücksfläche > 1.300 m² oder ≤ 120 m², BGF > 770 m².",
+   "kauffaelle_ausgewertet": 32
+  },
+  "geltungsbereich": {
+   "raeumlich": "nur die Ortsteile Schmargendorf, Grunewald, Westend und Dahlem (A3, S. 2)",
+   "ortsteile": [
+    "Schmargendorf",
+    "Grunewald",
+    "Westend",
+    "Dahlem"
+   ],
+   "sachlich": "Ein- und Zweifamilienhausgrundstücke in SEHR GUTER stadträumlicher Wohnlage, Erst- und Weiterverkäufe",
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "A3, S. 2: „Dagegen können diese Vergleichsfaktoren in allen nicht genannten Ortsteilen keine Aussage treffen.“",
+   "ausserhalb_weg": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": [
+     1500,
+     2800
+    ],
+    "bgf_qm": [
+     190,
+     600
+    ]
+   },
+   "spannen_hinweis": "Tabellengrenzen. Stichprobe (Tabelle 10, S. 14): 32 Kauffälle, Kaufpreis Mittel 1.878.188 EUR (5–95 %: 855.750–2.870.000), EUR/m² BGF 4.761 (2.784–7.762), Grundstück 751 m² (387–1.247), BGF 408 m² (188–607), GFZ 0,30 (0,15–0,72), BRW 2.200 (1.500–2.800). Gebäudestellung (Tabelle 15, S. 15): 20 freistehend, 9 Doppelhaus, 1 Reihenhaus, 2 Reihenendhaus.",
+   "vorbehalt": "VERWENDUNGSZWECK (A1, S. 1) wörtlich: „Die nachfolgenden Vergleichsfaktoren dienen u.a. der steuerlichen Bedarfsbewertung nach dem 6. Abschnitt des 2. Teils des Bewertungsgesetzes sowie der Aufteilung eines Kaufpreises auf Grund und Boden und Gebäude.“ und „Die Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung des Verkehrswertes im Sinne des § 194 BauGB.“ ZEITLICHE ANWENDBARKEIT (A2, S. 1): „richtet sich nach den steuerlichen Vorschriften“ — keine Zeitanpassung, kein Index. Wie beim Jahrgang 2025 (vgf-be.json) deshalb verwendung: intern. NUR 32 KAUFFÄLLE."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Vergleichsfaktoren 2026 (05-05-010-2600.pdf), C1.2 Tabelle 2, S. 8 (40 Werte)",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   },
+   {
+    "art": "statistik",
+    "fundstelle": "Tabellen 10–15, S. 14–15 (32 Kauffälle)",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   }
+  ],
+  "stufe_grund": "Amtliche Tabelle des Gutachterausschusses Berlin, frei auf berlin.de (Stand 19.10.2026). Kein Anwendungsbeispiel für Tabelle 2 abgedruckt; Zellen am Seitenbild abgelesen und zeilenweise auf gleichmäßigen Verlauf geprüft.",
+  "auflagen": "Wie Zweig ezfh. Löst den Jahrgang 2025 (vgf-be.json, nur BRW-Achse) ab.",
+  "stufe": "A",
+  "fallzahl": 32,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren 2026 (EZFH/Villen), Stand 19.10.2026, Stichtag 31.12.2025, BRW 01.01.2025",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf",
+  "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+  "quelle_parser": "ernte-20261028c-be (pdftotext -layout + Seitenbild je Tabelle, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren 2026 für bebaute Ein- und Zweifamilienhaus- und Villen- und Landhausgrundstücke zum Stichtag 31.12.2025, Stand 19.10.2026. © 2026, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+  "lizenz": "keine Datenlizenz angegeben — im Blatt steht nur „© 2026, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E - Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin“ (S. 5). Kein dl-de/by-2-0, kein zero-2-0; am 28.10.2026 im Volltext gesucht (Lizenz, dl-de, Nutzung, Vervielfältigung, Urheber: ohne Treffer außer dem ©-Vermerk).",
+  "verwendung": "intern",
+  "zugang": "kostenfrei",
+  "fundstelle": "Vergleichsfaktoren 2026 (05-05-010-2600.pdf): A3 (S. 2), A4 (S. 2–3), Tabelle 2 (S. 8), Tabellen 10–15 (S. 14–15)"
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "villa",
+  "objektart_bez": "Freistehende Villen und Landhäuser in guter und sehr guter stadträumlicher Wohnlage",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "wert_eur",
+   "einheit": "EUR/m² Brutto-Grundfläche",
+   "achse_feld": "brw_eur_qm",
+   "achse_bez": "Bodenrichtwert zum 01.01.2025 in EUR/m²",
+   "stufen": {
+    "740": 3153,
+    "800": 3287,
+    "1000": 3733,
+    "1500": 4849,
+    "2000": 5964,
+    "2500": 7080,
+    "2800": 7749
+   },
+   "rundung_stellen": 0,
+   "interpolation": "linear zwischen den Stützstellen — Tabelle 3 (S. 9): „Innerhalb der Tabellenwerte kann linear interpoliert werden.“ Außerhalb 740–2.800 EUR/m² nichts.",
+   "normobjekt": "Freistehende Villa oder Landhaus (A5, S. 3: „aufwendig errichtete Gebäude auf entsprechendem Grundstück, die sich von ihrer Größe, ihrer Bauweise, ihrer Ausstattung sowie ihrer Außengestaltung (und ihrem Preis) vom Üblichen nach oben abheben“) in guter oder sehr guter stadträumlicher Wohnlage in den zwölf genannten Ortsteilen, NORMALER Bauzustand (±0). ACHTUNG Umkehr gegenüber 2025: dort war „gut“ die Norm und „normal“ −2.182; 2026 ist „normal“ ±0 und „gut“ +1.941 (S. 9). Faktor enthält Grund und Boden UND Gebäude.",
+   "probe_innere_stimmigkeit": "Die sieben Stützstellen liegen auf einer Geraden: ≈ 3.153 + 2,231 × (BRW − 740), größte Abweichung 1 EUR. Gegenprobe gegen Erfassungsfehler, nicht die amtliche Formel.",
+   "liefert_einheit": "EUR/m² Brutto-Grundfläche",
+   "bezugsgroesse": "bgf_qm"
+  },
+  "korrekturen": [
+   {
+    "bez": "Bauzustand",
+    "feld": "bauzustand",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "gut": 1941,
+     "normal": 0
+    },
+    "hinweis": "S. 9: gut +1.941, normal ±0. Für „schlecht“ führt das Blatt KEINEN Wert (Tabelle 19, S. 17: gut 17, normal 20, kein schlechter Fall) — bei schlechtem Zustand gibt dieser Satz nichts aus. Drei Zustandsnoten des Berliner Ausschusses (B3, S. 4; Glossar artikel.156899.php). Amtliche Klassen — eine Übersetzung aus der DealPilot-Zustandseinschätzung wäre eine erfundene Einordnung."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "§ 193 Abs. 5 BauGB, Vergleichsfaktoren nach § 12 Abs. 1 Nr. 3 ImmoWertV (A1, S. 1)",
+   "stichtag": "31.12.2025",
+   "bodenrichtwert_stichtag": "01.01.2025",
+   "bodenrichtwert_modellvorgabe": "B1, S. 3 wörtlich: „Für die Anwendung der Vergleichsfaktoren in den Tabellen 1 bis 3 ist im Rahmen der Modellkonformität der Bodenrichtwert zum 01.01.2025 anzusetzen.“ und „Eine WGFZ-Anpassung wurde nicht vorgenommen.“",
+   "besonderheit": "A1, S. 1: „Die Vergleichsfaktoren enthalten sowohl den Wert für den Grund und Boden als auch für die Gebäude.“ Ein Bodenwert wird NICHT zusätzlich angesetzt.",
+   "bgf_regeln": "B4/B6, S. 4: BGF in Anlehnung an DIN 277-1:2005-02 (Anlage 4 ImmoWertV), in der Regel aus den Bauakten; bei Giebelhöhe ≤ 1,50 m zählt das Dachgeschoss nicht; Garagen zählen nicht, außer von Geschossen überbaute.",
+   "baujahr": "B, S. 3: nur ursprüngliche Baujahre, keine Korrektur wegen Modernisierung, keine Innenbesichtigung, keine Prüfung der Teilbarkeit.",
+   "kaufpreisbereinigung": "B6, S. 4: Kaufpreis um Zeitwert der baulichen Nebenanlagen, besonderen Außenanlagen, besonderen Betriebseinrichtungen und den Kaufpreisanteil für Nebenflächen bereinigt, soweit bekannt.",
+   "nicht_beruecksichtigt": "A4, S. 2: Erwerbsumfang < 100 %, vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung, Grundstücke mit Wasserlage; Wertminderung wegen Baumängeln; Wohn-/Miet-/Nutzungsrechte, Ratenzahlung, Kaufpreis < Bodenwert, Verkäufer bewohnt > 1 Jahr nach Vertrag, private Bindungen.",
+   "wohnlage_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php",
+   "bauzustand_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "veroeffentlicht": "Das Deckblatt (S. 1) lautet „Veröffentlicht im Amtsblatt für Berlin Nr. ## vom ##.##.2026 Seite #### ff.“ — die Fundstelle im Amtsblatt ist im Blatt vom 19.10.2026 noch ein Platzhalter. Das Blatt selbst steht auf der Seite des Ausschusses (Stand 19.10.2026) frei zum Download. Bei der nächsten Nachernte die Amtsblatt-Nummer nachtragen.",
+   "stand_des_blattes": "19.10.2026",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Vergleichsfaktor nach § 20 ImmoWertV — kein Sachwertmodell, das Blatt nennt keine Gesamtnutzungsdauer und keinen Baupreisindex.",
+   "normobjekt": "Villa/Landhaus, normaler Bauzustand (S. 9)",
+   "berechnungsmodell": "Vergleichsfaktor in EUR/m² BGF aus Tabelle 3 (BRW) plus Bauzustand",
+   "ermittlung": "A4, S. 3: Regressionsanalyse mit den Variablen Bodenrichtwert, Brutto-Grundfläche, Zeit (in Tagen), tatsächliche GFZ und den Dummyvariablen Baujahresgruppe, Denkmalschutz und Bauzustand.",
+   "auswertungszeitraum": "01.01.2021 bis 31.12.2025",
+   "extremwerte": "A4, S. 3: „Es wurden keine Extremwerte eliminiert.“",
+   "kauffaelle_gesamt": 55,
+   "kauffaelle_ausgewertet": 37,
+   "kauffaelle_hinweis": "Text A4 (S. 2) nennt 55 Kauffälle für Villen und Landhäuser, die Statistik (Tabellen 16–20, S. 16–17) 37 — so im Blatt."
+  },
+  "geltungsbereich": {
+   "raeumlich": "nur die Ortsteile Wilmersdorf, Schmargendorf, Grunewald, Westend, Lichterfelde, Zehlendorf, Dahlem, Nikolassee, Wannsee, Schlachtensee, Frohnau und Hermsdorf (A3, S. 2)",
+   "ortsteile": [
+    "Wilmersdorf",
+    "Schmargendorf",
+    "Grunewald",
+    "Westend",
+    "Lichterfelde",
+    "Zehlendorf",
+    "Dahlem",
+    "Nikolassee",
+    "Wannsee",
+    "Schlachtensee",
+    "Frohnau",
+    "Hermsdorf"
+   ],
+   "ortsteile_hinweis": "Gegenüber 2025 neu: Wilmersdorf, Grunewald; entfallen: Gatow.",
+   "sachlich": "bebaute Villen- und Landhausgrundstücke in guter und sehr guter stadträumlicher Wohnlage, Erst- und Weiterverkäufe; Baujahre der Stichprobe bis 1948 (Tabelle 20, S. 17)",
+   "objektarten": [
+    "efh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "A3, S. 2: „Dagegen können diese Vergleichsfaktoren in allen nicht genannten Ortsteilen keine Aussage treffen.“",
+   "ausserhalb_weg": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": [
+     740,
+     2800
+    ]
+   },
+   "spannen_hinweis": "Tabellengrenzen. Stichprobe (Tabelle 16, S. 16): 37 Kauffälle, Kaufpreis Mittel 3.624.040 EUR (5–95 %: 1.339.625–9.736.575), EUR/m² BGF 6.097 (1.930–11.358), Grundstück 1.224 m² (831–1.879), BGF 625 m² (417–1.250), GFZ 0,33 (0,17–0,56), BRW 1.700 (740–2.800). Baujahre nur bis 1919 (20) und 1920–1948 (17).",
+   "vorbehalt": "VERWENDUNGSZWECK (A1, S. 1) wörtlich: „Die nachfolgenden Vergleichsfaktoren dienen u.a. der steuerlichen Bedarfsbewertung nach dem 6. Abschnitt des 2. Teils des Bewertungsgesetzes sowie der Aufteilung eines Kaufpreises auf Grund und Boden und Gebäude.“ und „Die Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung des Verkehrswertes im Sinne des § 194 BauGB.“ ZEITLICHE ANWENDBARKEIT (A2, S. 1): „richtet sich nach den steuerlichen Vorschriften“ — keine Zeitanpassung, kein Index. Wie beim Jahrgang 2025 (vgf-be.json) deshalb verwendung: intern. NUR 37 KAUFFÄLLE."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Vergleichsfaktoren 2026 (05-05-010-2600.pdf), C1.3 Tabelle 3 und Bauzustand, S. 9",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   },
+   {
+    "art": "statistik",
+    "fundstelle": "Tabellen 16–20, S. 16–17 (37 Kauffälle)",
+    "url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf"
+   }
+  ],
+  "stufe_grund": "Amtliche Tabelle des Gutachterausschusses Berlin, frei auf berlin.de (Stand 19.10.2026). Kein Anwendungsbeispiel für Tabelle 3; Stützstellen am Seitenbild abgelesen und auf einer Geraden gegengeprüft (größte Abweichung 1 EUR).",
+  "auflagen": "Wie Zweig ezfh. Löst den Jahrgang 2025 (vgf-be.json) ab — Norm-Bauzustand hat gewechselt (2025 gut, 2026 normal).",
+  "stufe": "A",
+  "fallzahl": 37,
+  "streuung": null,
+  "stichtag": "2025-12-31",
+  "berichtsjahr": 2026,
+  "modellversion": "Vergleichsfaktoren 2026 (EZFH/Villen), Stand 19.10.2026, Stichtag 31.12.2025, BRW 01.01.2025",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2600.pdf",
+  "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+  "quelle_parser": "ernte-20261028c-be (pdftotext -layout + Seitenbild je Tabelle, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren 2026 für bebaute Ein- und Zweifamilienhaus- und Villen- und Landhausgrundstücke zum Stichtag 31.12.2025, Stand 19.10.2026. © 2026, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+  "lizenz": "keine Datenlizenz angegeben — im Blatt steht nur „© 2026, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E - Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin“ (S. 5). Kein dl-de/by-2-0, kein zero-2-0; am 28.10.2026 im Volltext gesucht (Lizenz, dl-de, Nutzung, Vervielfältigung, Urheber: ohne Treffer außer dem ©-Vermerk).",
+  "verwendung": "intern",
+  "zugang": "kostenfrei",
+  "fundstelle": "Vergleichsfaktoren 2026 (05-05-010-2600.pdf): A3 (S. 2), A4/A5 (S. 2–3), Tabelle 3 (S. 9), Tabellen 16–20 (S. 16–17)"
+ }
+]

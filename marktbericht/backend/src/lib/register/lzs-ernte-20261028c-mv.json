@@ -1,0 +1,594 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Schwerin 2026 (Kap. 5.4 unverändert aus GMB 2025)",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+  "quelle_parser": "ernte-20261028c-mv (pdftotext -layout je Seite + Seitenbild PDF-S. 58 und 63, Kapitelvergleich 2025/2026 per diff, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum GMB 2026, PDF-S. 2, wörtlich: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — Belegexemplar ist offene Auflage (wie Jahrgang 2025).",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "bau_unterhaltungszustand",
+   "achse_k_bez": "Bau- und Unterhaltungszustand (gut / befriedigend); „Gesamt\" ist der Rückfall",
+   "rundung_stellen": 1,
+   "interpolation": "keine — kategoriale Nachschlagetabelle",
+   "kategorien": [
+    "gut",
+    "befriedigend",
+    "Gesamt"
+   ],
+   "stufen": {
+    "gut": 3,
+    "befriedigend": 2.7,
+    "Gesamt": 2.9
+   },
+   "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Die Spalte „Gesamt\" ist der Rückfall, wenn die Kategorie nicht bestimmbar ist — sie steht so im Bericht und ist kein Mittelwert von mir.",
+   "stufen_spannen_pct": {
+    "gut": [
+     1.9,
+     3.7
+    ],
+    "befriedigend": [
+     1.6,
+     3.7
+    ],
+    "Gesamt": [
+     1.8,
+     3.7
+    ]
+   },
+   "stufen_fallzahl": {
+    "gut": 32,
+    "befriedigend": 22,
+    "Gesamt": 54
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Ertragswertmodell GMB 2026, Abschnitt 5.4 (Druck-S. 60, PDF-S. 62) — wortgleich mit GMB 2025.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.4 (Druck-S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": {
+     "gut": 170,
+     "befriedigend": 160,
+     "Gesamt": 165
+    },
+    "preis_eur_qm_wohn_nutzflaeche": {
+     "gut": 1510,
+     "befriedigend": 1270,
+     "Gesamt": 1410
+    },
+    "restnutzungsdauer_jahre": {
+     "gut": 39,
+     "befriedigend": 30,
+     "Gesamt": 35
+    },
+    "wohnflaeche_qm": {
+     "gut": 530,
+     "befriedigend": 470,
+     "Gesamt": 530
+    },
+    "reinertragsfaktor": {
+     "gut": [
+      23,
+      21,
+      26
+     ],
+     "befriedigend": [
+      21,
+      19,
+      25
+     ],
+     "Gesamt": [
+      22,
+      20,
+      26
+     ]
+    },
+    "rohertragsfaktor": {
+     "gut": [
+      17,
+      15,
+      19
+     ],
+     "befriedigend": [
+      15,
+      14,
+      17
+     ],
+     "Gesamt": [
+      16,
+      15,
+      19
+     ]
+    },
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]. Rein- und Rohertragsfaktor sind KEINE Kennzahl des Registers und stehen nur als Modellbegleitung hier."
+   },
+   "unveraendert_seit": "GMB 2025"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne.",
+   "sachlich": "Mehrfamilienhäuser"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63), Tabelle „Mehrfamilienhäuser\"",
+    "wortlaut": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.4 (Tabellen S. 61): Mehrfamilienhäuser — Liegenschaftszinssatz je Kategorie mit 2/3-Spanne und Anzahl der Kauffälle. Spaltentreu gelesen (pdftotext -table), nicht aus dem Textstrom.",
+    "pruefprotokoll": "Am 28.10.2026 am Seitenbild PDF-S. 63 (Druck-S. 61) abgelesen und Zelle für Zelle gegen den Jahrgang 2025 (schwerin.json) gehalten: alle Mittelwerte, 2/3-Spannen und Anzahlen identisch. Kein Anwendungsbeispiel im Bericht. Frühere Gegenproben des Jahrgangs 2025 (Fallzahlsummen, Vervielfältiger) gelten damit unverändert.",
+    "quotenprobe": "Rohertragsfaktor / Reinertragsfaktor = 1 − Bewirtschaftungskostenquote. Ausgerechnet ergibt das 26,1 / 28,6 / 27,3 % (MFH), 22,2 / 28,0 / 27,3 % (WGH), 25,0 / 25,0 / 30,8 / 33,3 % (ETW) und 20,6 % (individueller Wohnungsbau) — durchgehend plausible Größenordnungen, die die Zuordnung der drei Faktorzeilen zueinander stützen.",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf"
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 54,
+  "stichtag": "2026-01-01",
+  "auflagen": "GMB 2026 übernimmt Kap. 5.4 UNVERÄNDERT aus dem GMB 2025: gleiche Stichproben (MFH, ETW, individueller Wohnungsbau 2023–2024; WGH 2022–2024, S. 60), gleiche Mittelwerte, Spannen und Fallzahlen (Seitenbild PDF-S. 63 gegen schwerin.json; Kapiteltext per diff: nur Umbruch und Kopfzeile verschieden). Der Satz ist damit KEINE neue Ableitung, sondern der aktuelle Veröffentlichungsstand des Ausschusses mit neuer Quelle. — Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe).",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63), Tabelle „Mehrfamilienhäuser\"",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag; eingetragen ist wie bei den Sachwertfaktoren 2026 (swf-ernte-20261028-mv.json) der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte 01.01.2026). Die Kaufpreise stammen aus 2023–2024 (WGH 2022–2024).",
+  "vorgaenger": {
+   "datei": "schwerin.json",
+   "berichtsjahr": 2025,
+   "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf"
+  }
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Schwerin 2026 (Kap. 5.4 unverändert aus GMB 2025)",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+  "quelle_parser": "ernte-20261028c-mv (pdftotext -layout je Seite + Seitenbild PDF-S. 58 und 63, Kapitelvergleich 2025/2026 per diff, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum GMB 2026, PDF-S. 2, wörtlich: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — Belegexemplar ist offene Auflage (wie Jahrgang 2025).",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ggg",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "bodenrichtwertniveau",
+   "achse_k_bez": "Lage nach Bodenrichtwertniveau (> 300 €/m² bzw. < 300 €/m²); „Gesamt\" ist der Rückfall",
+   "rundung_stellen": 1,
+   "interpolation": "keine — kategoriale Nachschlagetabelle",
+   "kategorien": [
+    "ueber_300",
+    "unter_300",
+    "Gesamt"
+   ],
+   "stufen": {
+    "ueber_300": 4.5,
+    "unter_300": 2.4,
+    "Gesamt": 3.3
+   },
+   "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Die Spalte „Gesamt\" ist der Rückfall, wenn die Kategorie nicht bestimmbar ist — sie steht so im Bericht und ist kein Mittelwert von mir.",
+   "stufen_spannen_pct": {
+    "ueber_300": [
+     4,
+     5.1
+    ],
+    "unter_300": [
+     0.7,
+     3.6
+    ],
+    "Gesamt": [
+     1.8,
+     4.7
+    ]
+   },
+   "stufen_fallzahl": {
+    "ueber_300": 8,
+    "unter_300": 13,
+    "Gesamt": 21
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Ertragswertmodell GMB 2026, Abschnitt 5.4 (Druck-S. 60, PDF-S. 62) — wortgleich mit GMB 2025.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.4 (Druck-S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": {
+     "ueber_300": 610,
+     "unter_300": 180,
+     "Gesamt": 340
+    },
+    "preis_eur_qm_wohn_nutzflaeche": {
+     "ueber_300": 1660,
+     "unter_300": 1600,
+     "Gesamt": 1620
+    },
+    "restnutzungsdauer_jahre": {
+     "ueber_300": 33,
+     "unter_300": 35,
+     "Gesamt": 34
+    },
+    "wohn_nutzflaeche_qm": {
+     "ueber_300": 740,
+     "unter_300": 450,
+     "Gesamt": 560
+    },
+    "gewerblicher_flaechenanteil_pct": {
+     "ueber_300": 48,
+     "unter_300": 29,
+     "Gesamt": 36
+    },
+    "reinertragsfaktor": {
+     "ueber_300": [
+      18,
+      16,
+      22
+     ],
+     "unter_300": [
+      25,
+      19,
+      30
+     ],
+     "Gesamt": [
+      22,
+      17,
+      29
+     ]
+    },
+    "rohertragsfaktor": {
+     "ueber_300": [
+      14,
+      13,
+      16
+     ],
+     "unter_300": [
+      18,
+      14,
+      21
+     ],
+     "Gesamt": [
+      16,
+      13,
+      20
+     ]
+    },
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]."
+   },
+   "unveraendert_seit": "GMB 2025"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne.",
+   "sachlich": "Wohn- und Geschäftshäuser (Bau- und Unterhaltungszustand sehr gut und gut)"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63), Tabelle „Wohn- und Geschäftshäuser\"",
+    "wortlaut": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.4 (Tabellen S. 61): Wohn- und Geschäftshäuser (Bau- und Unterhaltungszustand sehr gut und gut) — Liegenschaftszinssatz je Kategorie mit 2/3-Spanne und Anzahl der Kauffälle. Spaltentreu gelesen (pdftotext -table), nicht aus dem Textstrom.",
+    "pruefprotokoll": "Am 28.10.2026 am Seitenbild PDF-S. 63 (Druck-S. 61) abgelesen und Zelle für Zelle gegen den Jahrgang 2025 (schwerin.json) gehalten: alle Mittelwerte, 2/3-Spannen und Anzahlen identisch. Kein Anwendungsbeispiel im Bericht. Frühere Gegenproben des Jahrgangs 2025 (Fallzahlsummen, Vervielfältiger) gelten damit unverändert.",
+    "quotenprobe": "Rohertragsfaktor / Reinertragsfaktor = 1 − Bewirtschaftungskostenquote. Ausgerechnet ergibt das 26,1 / 28,6 / 27,3 % (MFH), 22,2 / 28,0 / 27,3 % (WGH), 25,0 / 25,0 / 30,8 / 33,3 % (ETW) und 20,6 % (individueller Wohnungsbau) — durchgehend plausible Größenordnungen, die die Zuordnung der drei Faktorzeilen zueinander stützen.",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf"
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 21,
+  "stichtag": "2026-01-01",
+  "auflagen": "GMB 2026 übernimmt Kap. 5.4 UNVERÄNDERT aus dem GMB 2025: gleiche Stichproben (MFH, ETW, individueller Wohnungsbau 2023–2024; WGH 2022–2024, S. 60), gleiche Mittelwerte, Spannen und Fallzahlen (Seitenbild PDF-S. 63 gegen schwerin.json; Kapiteltext per diff: nur Umbruch und Kopfzeile verschieden). Der Satz ist damit KEINE neue Ableitung, sondern der aktuelle Veröffentlichungsstand des Ausschusses mit neuer Quelle. — Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe).",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63), Tabelle „Wohn- und Geschäftshäuser\"",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag; eingetragen ist wie bei den Sachwertfaktoren 2026 (swf-ernte-20261028-mv.json) der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte 01.01.2026). Die Kaufpreise stammen aus 2023–2024 (WGH 2022–2024).",
+  "vorgaenger": {
+   "datei": "schwerin.json",
+   "berichtsjahr": 2025,
+   "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf"
+  }
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Schwerin 2026 (Kap. 5.4 unverändert aus GMB 2025)",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+  "quelle_parser": "ernte-20261028c-mv (pdftotext -layout je Seite + Seitenbild PDF-S. 58 und 63, Kapitelvergleich 2025/2026 per diff, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum GMB 2026, PDF-S. 2, wörtlich: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — Belegexemplar ist offene Auflage (wie Jahrgang 2025).",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "etw_klasse",
+   "achse_k_bez": "Teilmarkt der Eigentumswohnung (Altbau > 45 m² bis 1949 saniert / Neubau > 45 m² ab 1991 / Wohnung < 45 m² / komplexer Wohnungsbau). Eine Spalte „Gesamt\" druckt der Bericht hier NICHT — ohne Zuordnung gibt es keinen Wert.",
+   "rundung_stellen": 1,
+   "interpolation": "keine — kategoriale Nachschlagetabelle",
+   "kategorien": [
+    "altbau_ueber45",
+    "neubau_ueber45",
+    "wohnung_unter45",
+    "komplexer_wohnungsbau"
+   ],
+   "stufen": {
+    "altbau_ueber45": 0.8,
+    "neubau_ueber45": 1.9,
+    "wohnung_unter45": 2.9,
+    "komplexer_wohnungsbau": 1
+   },
+   "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Die Spalte „Gesamt\" ist der Rückfall, wenn die Kategorie nicht bestimmbar ist — sie steht so im Bericht und ist kein Mittelwert von mir.",
+   "stufen_spannen_pct": {
+    "altbau_ueber45": [
+     -0.4,
+     2.1
+    ],
+    "neubau_ueber45": [
+     1.1,
+     2.8
+    ],
+    "wohnung_unter45": [
+     1.4,
+     4.5
+    ],
+    "komplexer_wohnungsbau": [
+     -0.6,
+     2.6
+    ]
+   },
+   "stufen_fallzahl": {
+    "altbau_ueber45": 93,
+    "neubau_ueber45": 154,
+    "wohnung_unter45": 30,
+    "komplexer_wohnungsbau": 30
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Ertragswertmodell GMB 2026, Abschnitt 5.4 (Druck-S. 60, PDF-S. 62) — wortgleich mit GMB 2025.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.4 (Druck-S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": {
+     "altbau_ueber45": 225,
+     "neubau_ueber45": 171,
+     "wohnung_unter45": 142,
+     "komplexer_wohnungsbau": 89
+    },
+    "preis_eur_qm_wohnflaeche": {
+     "altbau_ueber45": 2070,
+     "neubau_ueber45": 2438,
+     "wohnung_unter45": 1493,
+     "komplexer_wohnungsbau": 1420
+    },
+    "restnutzungsdauer_jahre": {
+     "altbau_ueber45": 34,
+     "neubau_ueber45": 57,
+     "wohnung_unter45": 46,
+     "komplexer_wohnungsbau": 32
+    },
+    "wohnflaeche_qm": {
+     "altbau_ueber45": 81,
+     "neubau_ueber45": 74,
+     "wohnung_unter45": 39,
+     "komplexer_wohnungsbau": 61
+    },
+    "reinertragsfaktor": {
+     "altbau_ueber45": [
+      32,
+      25,
+      38
+     ],
+     "neubau_ueber45": [
+      36,
+      29,
+      43
+     ],
+     "wohnung_unter45": [
+      26,
+      19,
+      34
+     ],
+     "komplexer_wohnungsbau": [
+      30,
+      25,
+      39
+     ]
+    },
+    "rohertragsfaktor": {
+     "altbau_ueber45": [
+      24,
+      19,
+      29
+     ],
+     "neubau_ueber45": [
+      27,
+      22,
+      32
+     ],
+     "wohnung_unter45": [
+      18,
+      13,
+      22
+     ],
+     "komplexer_wohnungsbau": [
+      20,
+      17,
+      27
+     ]
+    },
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]."
+   },
+   "unveraendert_seit": "GMB 2025"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne.",
+   "sachlich": "Eigentumswohnungen im Weiterverkauf"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63), Tabelle „Eigentumswohnung im Weiterverkauf\"",
+    "wortlaut": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.4 (Tabellen S. 61): Eigentumswohnungen im Weiterverkauf — Liegenschaftszinssatz je Kategorie mit 2/3-Spanne und Anzahl der Kauffälle. Spaltentreu gelesen (pdftotext -table), nicht aus dem Textstrom.",
+    "pruefprotokoll": "Am 28.10.2026 am Seitenbild PDF-S. 63 (Druck-S. 61) abgelesen und Zelle für Zelle gegen den Jahrgang 2025 (schwerin.json) gehalten: alle Mittelwerte, 2/3-Spannen und Anzahlen identisch. Kein Anwendungsbeispiel im Bericht. Frühere Gegenproben des Jahrgangs 2025 (Fallzahlsummen, Vervielfältiger) gelten damit unverändert.",
+    "quotenprobe": "Rohertragsfaktor / Reinertragsfaktor = 1 − Bewirtschaftungskostenquote. Ausgerechnet ergibt das 26,1 / 28,6 / 27,3 % (MFH), 22,2 / 28,0 / 27,3 % (WGH), 25,0 / 25,0 / 30,8 / 33,3 % (ETW) und 20,6 % (individueller Wohnungsbau) — durchgehend plausible Größenordnungen, die die Zuordnung der drei Faktorzeilen zueinander stützen.",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf"
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": null,
+  "stichtag": "2026-01-01",
+  "auflagen": "GMB 2026 übernimmt Kap. 5.4 UNVERÄNDERT aus dem GMB 2025: gleiche Stichproben (MFH, ETW, individueller Wohnungsbau 2023–2024; WGH 2022–2024, S. 60), gleiche Mittelwerte, Spannen und Fallzahlen (Seitenbild PDF-S. 63 gegen schwerin.json; Kapiteltext per diff: nur Umbruch und Kopfzeile verschieden). Der Satz ist damit KEINE neue Ableitung, sondern der aktuelle Veröffentlichungsstand des Ausschusses mit neuer Quelle. — Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe).",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63), Tabelle „Eigentumswohnung im Weiterverkauf\"",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag; eingetragen ist wie bei den Sachwertfaktoren 2026 (swf-ernte-20261028-mv.json) der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte 01.01.2026). Die Kaufpreise stammen aus 2023–2024 (WGH 2022–2024).",
+  "vorgaenger": {
+   "datei": "schwerin.json",
+   "berichtsjahr": 2025,
+   "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf"
+  }
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Schwerin 2026 (Kap. 5.4 unverändert aus GMB 2025)",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+  "quelle_parser": "ernte-20261028c-mv (pdftotext -layout je Seite + Seitenbild PDF-S. 58 und 63, Kapitelvergleich 2025/2026 per diff, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum GMB 2026, PDF-S. 2, wörtlich: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.“ — Belegexemplar ist offene Auflage (wie Jahrgang 2025).",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.4,
+   "rundung_stellen": 1,
+   "bezeichnung": "Individueller Wohnungsbau, Weiterverkauf, Baujahr nach 1990",
+   "hinweis": "Ergebnis in PROZENT (2,4 bedeutet 2,4 %). Keine Achse, keine Interpolation — der Bericht druckt für diesen Teilmarkt eine einzige Spalte."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Ertragswertmodell GMB 2026, Abschnitt 5.4 (Druck-S. 60, PDF-S. 62) — wortgleich mit GMB 2025.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2026, Abschnitt 5.4 (Druck-S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": 160,
+    "preis_eur_qm_wohnflaeche": 2810,
+    "restnutzungsdauer_jahre": 61,
+    "wohnflaeche_qm": 123,
+    "reinertragsfaktor": [
+     34,
+     28,
+     40
+    ],
+    "rohertragsfaktor": [
+     27,
+     22,
+     32
+    ],
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]."
+   },
+   "unveraendert_seit": "GMB 2025"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne. — Der Wert gilt ausdrücklich nur für Baujahre NACH 1990. Für älteren individuellen Wohnungsbau weist der Bericht keinen Liegenschaftszinssatz aus; übertragen werden darf er nicht.",
+   "sachlich": "Individueller Wohnungsbau (Einfamilien-, Doppel- und Reihenhäuser), Weiterverkauf, Baujahr nach 1990"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63), Tabelle „Individueller Wohnungsbau, Weiterverkauf, Baujahr nach 1990\"",
+    "wortlaut": "Liegenschaftszins 2,4 % (2/3-Spanne 1,8–3,1), 46 Kauffälle, Reinertragsfaktor 34 (28–40), Rohertragsfaktor 27 (22–32), Bodenrichtwert 160 €/m², Preis 2.810 €/m² Wohnfläche, Restnutzungsdauer 61 Jahre, Wohnfläche 123 m².",
+    "kauffaelle": 46,
+    "pruefprotokoll": "Am 28.10.2026 am Seitenbild PDF-S. 63 (Druck-S. 61) abgelesen und Zelle für Zelle gegen den Jahrgang 2025 (schwerin.json) gehalten: alle Mittelwerte, 2/3-Spannen und Anzahlen identisch. Kein Anwendungsbeispiel im Bericht. Frühere Gegenproben des Jahrgangs 2025 (Fallzahlsummen, Vervielfältiger) gelten damit unverändert.",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf"
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 46,
+  "stichtag": "2026-01-01",
+  "streuung": {
+   "min_pct": 1.8,
+   "max_pct": 3.1
+  },
+  "auflagen": "GMB 2026 übernimmt Kap. 5.4 UNVERÄNDERT aus dem GMB 2025: gleiche Stichproben (MFH, ETW, individueller Wohnungsbau 2023–2024; WGH 2022–2024, S. 60), gleiche Mittelwerte, Spannen und Fallzahlen (Seitenbild PDF-S. 63 gegen schwerin.json; Kapiteltext per diff: nur Umbruch und Kopfzeile verschieden). Der Satz ist damit KEINE neue Ableitung, sondern der aktuelle Veröffentlichungsstand des Ausschusses mit neuer Quelle. — Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe).",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2026, S. 61 (PDF-Seite 63)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag; eingetragen ist wie bei den Sachwertfaktoren 2026 (swf-ernte-20261028-mv.json) der Stand des Berichts (Grundstücksmarkt 2026, Bodenrichtwerte 01.01.2026). Die Kaufpreise stammen aus 2023–2024 (WGH 2022–2024).",
+  "vorgaenger": {
+   "datei": "schwerin.json",
+   "berichtsjahr": 2025,
+   "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf"
+  }
+ }
+]

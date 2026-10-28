@@ -1,0 +1,87 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "kreis",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": true,
+  "formel": {
+   "form": "flaeche_eins",
+   "bezug": "Bodenwert = Grundstücksfläche × Bodenrichtwert × 1",
+   "wirkung": "multiplikativ",
+   "spanne_qm": [
+    null,
+    1000
+   ],
+   "wortlaut": "Im Rahmen einer Regressionsanalyse zum Einfluss der Grundstücksfläche und –tiefe sowie der Grundflächenzahl auf den Kaufpreis bei erschließungsbeitragsfreien Wohngrundstücken des individuellen Wohnungsbaus (bis zu einer Flächengröße von 1.000 m²) konnten keine Abhängigkeiten nachgewiesen werden. Diese Grundstücksmerkmale sind derzeit in der Landeshauptstadt Schwerin nicht wertrelevant. Daher werden keine Umrechnungskoeffizienten zur Anpassung von Grundstücksfläche und -tiefe sowie der Grundflächenzahl ausgewiesen."
+  },
+  "geltungsbereich": {
+   "nutzung": "erschließungsbeitragsfreie Wohngrundstücke des individuellen Wohnungsbaus bis 1.000 m² in der Landeshauptstadt Schwerin",
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw",
+    "gewerbe"
+   ],
+   "objektarten_hinweis": "Die Analyse betrifft ausdrücklich Wohngrundstücke des individuellen Wohnungsbaus; Mehrfamilienhaus-, Wohnungseigentums- und Gewerbegrundstücke sind nicht untersucht und bleiben außen vor.",
+   "spanne_qm": [
+    null,
+    1000
+   ],
+   "spanne_wortlaut": "(bis zu einer Flächengröße von 1.000 m²)",
+   "ausserhalb_wortlaut": "Abweichungen des einzelnen Grundstücks in den wertbeeinflussenden Eigenschaften wie Art und Maß der baulichen Nutzung, Grundstücksgröße, Bodenbeschaffenheit, Erschließungszustand und Grundstücksgestaltung, aber auch die Lage innerhalb der Bodenrichtwertzone bewirken Abweichungen seines Verkehrswertes vom Bodenrichtwert. Dazu sind gebietsbezogen auf Anfrage Auskünfte in der Geschäftsstelle zu erhalten. (Kap. 4.3, Druck-S. 54)",
+   "ausserhalb_weg": "Über 1.000 m² und für andere Objektarten: Auskunft der Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Landeshauptstadt Schwerin (gebietsbezogen auf Anfrage); Bericht: https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+   "uebergroesse_hinweis": "Für Grundstücke über 1.000 m² trifft der Ausschuss keine Aussage; dort gibt es keinen Koeffizienten (auch nicht 1)."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Der Grundstücksmarkt 2026 in der Landeshauptstadt Schwerin (Grundstücksmarktbericht 2026)",
+    "fundstelle": "Kap. 5.1 „Einfluss der Grundstücksfläche, der Grundflächenzahl und der Grundstückstiefe auf den Bodenwert“, Druck-S. 55 (PDF-S. 58)",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+    "wortlaut": "Im Rahmen einer Regressionsanalyse zum Einfluss der Grundstücksfläche und –tiefe sowie der Grundflächenzahl auf den Kaufpreis bei erschließungsbeitragsfreien Wohngrundstücken des individuellen Wohnungsbaus (bis zu einer Flächengröße von 1.000 m²) konnten keine Abhängigkeiten nachgewiesen werden. Diese Grundstücksmerkmale sind derzeit in der Landeshauptstadt Schwerin nicht wertrelevant. Daher werden keine Umrechnungskoeffizienten zur Anpassung von Grundstücksfläche und -tiefe sowie der Grundflächenzahl ausgewiesen."
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Der Grundstücksmarkt 2026 in der Landeshauptstadt Schwerin (Grundstücksmarktbericht 2026)",
+    "fundstelle": "Impressum (PDF-S. 2)",
+    "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+    "wortlaut": "Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet."
+   }
+  ],
+  "belege_meta": {
+   "abgerufen_am": "2026-10-28",
+   "seitenzaehlung": "Druckseite und PDF-Seite getrennt angegeben",
+   "dokument": "Grundstücksmarktbericht Schwerin 2026",
+   "seiten": 96
+  },
+  "stufe": "A",
+  "stufe_grund": "Amtliche Feststellung des örtlich zuständigen Ausschusses: die Grundstücksfläche ist bei Wohngrundstücken des individuellen Wohnungsbaus bis 1.000 m² nicht wertrelevant. Das ist ein Wert (Koeffizient 1) im Geltungsbereich, keine Sperre — wie Amberg (BY) und Sachsen-Anhalt landesweit. Vorrang vor dem Landeswert MV (ImmoWertA Nr. 9 (3)).",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "Jahrgang und Stichtag wie die Sachwertfaktoren aus demselben Bericht (swf-ernte-20261028-mv.json: GMB 2026, Bodenrichtwerte 01.01.2026); der Abschnitt selbst nennt keinen Stichtag.",
+  "berichtsjahr": 2026,
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+  "lizenz": "Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.",
+  "lizenz_hinweis": "Gleiche Lizenz wie die Zins- und Faktorsätze aus diesem Bericht (schwerin.json). Auflage: eindeutige Quellenangabe (quellenvermerk) und Belegexemplar an den Herausgeber — das Belegexemplar ist eine organisatorische Auflage, die für den ganzen Bericht gilt (siehe offene Frage im Erntebericht 28.10.2026).",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+  "fundstelle": "Kap. 5.1, Druck-S. 55 (PDF-S. 58)",
+  "verwendung": "Bodenwert: keine Anpassung an die Grundstücksgröße (Koeffizient 1) im Geltungsbereich bis 1.000 m².",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2026",
+  "quelle_parser": "ernte-20261028c-mv (pdftotext -layout je Seite + Seitenbild PDF-S. 58 und 63, Kapitelvergleich 2025/2026 per diff, 28.10.2026)",
+  "modellansaetze": {},
+  "auflagen": "Kap. 5.1 im GMB 2026 wortgleich mit GMB 2025 (bis auf den Gedankenstrich in „Grundstücksfläche und –tiefe“). Belegexemplar an den Herausgeber steht noch aus.",
+  "vorgaenger": {
+   "datei": "uk-flaeche-ernte-20261028-mv.json",
+   "berichtsjahr": 2025,
+   "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf"
+  }
+ }
+]
