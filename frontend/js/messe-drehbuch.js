@@ -8034,6 +8034,8 @@
         await rhStart(0);
         /* ein leeres Objekt würde „Neues Objekt“ wiederverwenden (newobj-fixes v1268b) - also ein Feld setzen */
         [['str', KM.str], ['hnr', KM.hnr], ['ort', KM.ort]].forEach(function (x) { var e = document.getElementById(x[0]); if (e) { e.value = x[1]; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } });
+        /* gemessen (ku2): ohne Speichern blieb die Karte in der DB leer und „Neues Objekt“ nahm sie wieder */
+        try { if (typeof window.saveObj === 'function') await window.saveObj({ silent: true }); } catch (e) {}
         await warte(800);
         return kuS1(s);
       },
