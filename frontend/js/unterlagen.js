@@ -275,7 +275,7 @@
       if (w.verwaltung) dl.push('<dt>Verwaltung</dt><dd>' + esc(w.verwaltung) + '</dd>');
       if ((w.sonderumlagen || []).length) dl.push('<dt>Sonderumlagen</dt><dd>' + w.sonderumlagen.map(esc).join('<br>') + '</dd>');
       if (dl.length) h += '<dl class="dpu-dl">' + dl.join('') + '</dl>';
-      if ((w.sanierungen || []).length) h += '<table class="dpu-tbl"><tr><th>Maßnahme</th><th>Status</th><th>Jahr</th><th>Kosten gesamt</th><th>Anteil Objekt</th></tr>'
+      if ((w.sanierungen || []).length) h += '<table class="dpu-tbl"><tr><th>Maßnahmen</th><th>Status</th><th>Jahr</th><th>Kosten gesamt</th><th>Anteil Objekt</th></tr>'
         + w.sanierungen.map(function (s) { return '<tr><td>' + esc(s.massnahme) + '</td><td>' + esc(s.status || '') + '</td><td>' + esc(s.jahr || '') + '</td><td>' + esc(eur(s.kosten_eur)) + '</td><td>' + esc(eur(s.anteil_objekt_eur)) + '</td></tr>'; }).join('') + '</table>';
       if (w.fazit) h += '<p style="font-size:13px;line-height:1.5;margin:6px 0">' + esc(w.fazit) + '</p>';
     }

@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T14:37:02.370Z",
+ "erzeugt_am": "2026-10-28T14:39:17.850Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "d1c400f3059479c9",
-  "index-html": "ee40bfa307037952",
+  "index-html": "4373cbe2e85e3857",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -3726,7 +3726,7 @@
       "text": "Hast du in der Datenaufnahme unter Exposé / Dokumente Unterlagen eingelesen – Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, Mieterliste oder Mietvertrag –, erscheint in der Pilot-Analyse der Reiter Unterlagen & WEG. Oben schaltest du zwischen Einfach (Ampel mit der Zahl der Risiken, was absehbar Geld kostet, die drei wichtigsten Risiken, Eigentümergemeinschaft und These als Karten) und Genau (alles im Einzelnen) um. Er zeigt:\n• die Investitionsthese aus den Unterlagen,\n• alle Risiken mit Einstufung (hoch, mittel, niedrig), Kosten, Jahr und Quelle (Dokument, TOP, Seite),\n• die WEG-Auswertung: Kernpunkte über alle Protokolle, Rücklage, Hausgeld, beschlossene und vertagte Sanierungen mit dem Anteil deines Objekts, Sonderumlagen und ein Fazit,\n• die Lasten aus dem Grundbuch in Klartext und was du beim Verwalter oder Verkäufer noch anfragen solltest.\n\nDie Pilot-Analyse bezieht diese Risiken in ihre Bewertung ein. Liest du neue Unterlagen ein, wird die Auswertung ersetzt."
      },
      {
-      "h": "Maßnahme: „Mieter bleibt drin — Kosten auf die Miete umlegen“",
+      "h": "Maßnahmen: „Mieter bleibt drin — Kosten auf die Miete umlegen“",
       "text": "Jede Maßnahme im Zielbild einer Wohnung (Bad, Böden, Fassade …) steht als Karte mit ihren Kosten. Das Kästchen entscheidet, wann sie Geld bringt:\n• Ohne Haken gehört sie zum Zielbild: Die Wohnung wird nach einem Auszug saniert und zur Zielmiete neu vermietet; die laufende Miete ändert sich bis dahin nicht.\n• Mit Haken bleibt der Mieter wohnen, und die Kosten kommen als Modernisierungsumlage (§ 559 BGB) auf seine Miete: 8 % pro Jahr, ohne den Anteil für ohnehin fällige Erhaltung (Feld „davon Erhaltung %“), höchstens 3 €/m² – bei einer Miete unter 7 €/m² höchstens 2 €/m² – in sechs Jahren. Das fließt in die Soll-Miete ein. Renovierung ist Erhaltung und wird nie umgelegt.\n\nDer Mietvertrag zählt mit: Bei Staffelmiete sind Erhöhungen nach §§ 558 bis 559b BGB während der Staffel ausgeschlossen (§ 557a Abs. 2), bei Indexmiete gibt es keine Erhöhung bis zur Vergleichsmiete und eine Umlage nur für Maßnahmen, die der Vermieter nicht zu vertreten hat (§ 557b Abs. 2), bei Gewerbe gelten §§ 558/559 nicht. Für solche Wohnungen ist das Kästchen gesperrt und die Soll-Miete steigt nicht von selbst – die nächste Staffel oder Indexanpassung trägst du als Soll-Miete ein.\n\nJede Wohnung für sich: Die Maßnahmen legst du je Wohnung an (Einheiten erfassen › Details). Maßnahmen am ganzen Haus (Fassade, Dach …) werden nach Wohnfläche auf die Wohnungen verteilt, und für jede Wohnung gilt ihr eigener Vertrag.\n\n„Gemeinsam — vom Haus geerbt“: Was du im ersten Schritt für Dach, Außenwand, Leitungen und Heizung einträgst, zählt automatisch für jede Wohnung; die Wohnungsgewerke (Bad, Böden, Grundriss, Innenausbau) gelten als Vorgabe, solange eine Wohnung nichts Eigenes trägt. Beim Übernehmen gehen diese Angaben auch in die Modernisierung des Objekts."
      },
      {
@@ -5235,7 +5235,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "61b121c2f3325599",
+  "hilfe": "f8c9b32c018693e5",
   "bewertung": "bca98c7b04c452b7"
  }
 }
