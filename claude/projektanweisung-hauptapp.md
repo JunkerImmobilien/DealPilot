@@ -43620,3 +43620,51 @@ Marcels Stimmklon), 18 Standbilder zusammen 36,4 s; Ton geprüft an drei Stellen
 
 **Rest.** Nicht im Browser abgenommen: PDF-Umbruch (Datei-Download), Co-Pilot Lindenallee (Demo-Konto),
 Admin „Anfragen an Ämter“ und „Jahreswerte“ (Marcel, angemeldet). Übrige offene Punkte wie im Nachtrag oben.
+
+### v3029 · Vollprüfung 28.10.2026 abends: Rechnung, PDFs, Import, Messkabine · Staging `531b3237`
+
+**Was.** Marcels Auftrag „vollumfänglich die gesamte App durchprüfen“, aufgeteilt auf drei Prüfstränge (Rechnung,
+PDFs, Import/Übernahme) und die Messkabine. Die Befunde sind behoben; Einzelheiten stehen in der Commit-Botschaft:
+- Restschuld: volle Jahre werden monatlich gerechnet (300.000 / 3,8 / 2 → 227.146 € nach 10 J.)
+- Vorgabezins nach dem LTV der Vorgabe-Finanzierung
+- 15-%-Ampel im Beleg-Import netto und gegen `sanLimit`
+- Bank-PDF zeigt die Kaltmiete als NKM (vorher Warmmiete)
+- MFH Ist/Soll im PDF rechnet wie die App
+- Tilgung und Bausparrate stehen in allen Cashflow-Ketten getrennt
+- Track Record ohne eigene Schätzung
+- Exposé-Hausgeld wird ×12 auf das Jahr gerechnet
+- PLZ→Land: 23 von 140 Stichproben falsch → 0
+- Wirtschaftsplan und Mietvertrag am neuen Objekt korrekt zugeordnet
+- provisionsfrei = 0 %
+- AfA-Satz folgt dem Baujahr
+- Mieterliste mit Stellplätzen
+- Phasentabelle zeigt „–“ statt „NaN %“
+- Schließ-Kreuz der geführten Eingabe wieder sichtbar (2 × 15 px durch `padding … !important`)
+
+Daneben:
+- **v3029a** (`2efc26e1`): Marktbericht-Stufen auf dem Handy, Abruf und Kontingent untereinander im Kasten
+- **landing-videothek-7** (`bb7c501a`): Ü3 Komplettbeispiel MFH und Modul 28 Unterlagen einlesen in Videothek und Messe-Schleife; 32 Videos, 319 Kapitelmarken. Die MP4s liegen auf Staging, md5 gleich.
+
+**Nachweis.**
+- Prüfer: 19 Werkzeuge RC=0, buster-ebenen SAUBER.
+- `bestand-reiter-pruefen` und `feld-waechter` waren am HEAD **vor** dem Paket schon rot, mit identischen Zahlen (4 rot, 185 Felder ohne Speicherweg). Beides ist Altlast und bleibt offen.
+- Messkabine vor dem Paket: 15 Kombinationen Standardansicht (MFH/ETW/ZFH × 360/390/768/1180/1280) und 15 Aktenmappe, je 9 Reiter. Kein Überlauf, keine JS-Fehler.
+  - Funde: NaN % in der Phasentabelle (behoben) und das Kreuz (behoben).
+  - Die Bedienbarkeits-Meldungen der Aktenmappe (1180/1280) sind **kein Mangel**: Die Einträge liegen in der Scroll-Liste `.dpl-teil-aktionen` und sind unten nur angeschnitten.
+- Geführte Eingabe: auf 390 px alle 19 Fragen durchgegangen, kein Überlauf, keine Platzhalter; auf 1180 px Aktenmappe ebenfalls sauber.
+  - **Eigener Fehlalarm zurückgenommen:** „Startet in der Übersicht“ kam aus meinem Prüfskript (zu schnelle Klickfolge), nicht aus der App.
+- Messe-Schleife Rundgang: alle 15 Ausschnitte an Standbildern geprüft. Sie passen auch nach der Neuaufnahme von 18/19; der Zielbild-Ausschnitt zeigt noch „sofort“ (alte Aufnahme, Videos dürfen abweichen).
+
+**Rest.**
+- Prod-Upload der zwei neuen Videos (scp von der Freigabeprüfung abgelehnt): Marcel führt `scratchpad/videos-prod-hochladen.sh` aus, danach Prod-Rollout.
+- Marcel entscheidet:
+  - „Bodenrichtwert schätzen“ (KI-Schätzung samt automatischem Rückfall in `bodenrichtwert.js:959`) entfernen?
+  - Leerstand rechnet nicht mit (Feld nur im Score/PDF): abziehen oder entfernen?
+  - DSCR-Ampel brutto oder netto?
+  - Abschlag-Wortlaut im Wert-&-Zielbild-PDF.
+- Unsicher, auf Staging nachzumessen:
+  - Hausgeld-Aufteilung 22 % aus dem Exposé
+  - Folgen-Kette nach dem Import im Browser
+  - Track-Record-Prognose beim offenen Objekt
+  - Seitenbild der Phasentabellen mit Bausparvertrag
+- KfW mit tilgungsfreien Anlaufjahren ist nicht abgebildet.
