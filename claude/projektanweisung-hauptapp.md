@@ -43024,3 +43024,38 @@ Lindenallee 2026-1123 ins Prod-Demo-Konto gespiegelt (Marcels OK), md5 gleich St
 Rückfalls, offen. Offene Entscheidungen Marcel: Baupreisindex ohne Bezug bei NEU geernteten Sätzen
 (Bruchsal, Lahr, Böblingen, Donaueschingen, Ludwigslust-Parchim), Öhringen-Lizenz, wartende
 BW-LZS-Sperren aktivieren. Pilot-Analyse-PDF-Bausteine nach Ankauf/Bestand sortieren, Dopplungen prüfen.
+
+
+### v3018 · Bausteine im PDF nach Ankauf/Bestand, Dopplungen raus · 28.10.2026 — Staging `e3300ae3`
+
+**Was.** Marcel: „Bausteine im PDF … nach Ankauf und Bestand sortieren, und nicht Sachen doppelt im
+PDF haben, die wir eh standardmäßig schon ausgeben." Auswahl (index.html `#ai-pdf-sections`) in drei
+Gruppen: **Ankauf und Bestand** (Gesamtbewertung, Stärken, Risiken, Risikoanalyse, Investor-Fit,
+Empfehlung, Investmentbewertung, Lage & Markt, Optischer Eindruck, Steuerliche Zusammenfassung,
+Steuerverlauf, DealPilot-Insight) · **Ankauf** (Verhandlungsempfehlung, Kaufpreis-Offerte,
+Bankargumente) · **Bestand** (Bestandsstrategie, Anschlussfinanzierung mit Bankargumenten,
+Exit-Strategien, Ankauf gegen heute). Neue Haken `bestandsstrategie` (hing an `verhandlung`) und
+`exit` (hatte keinen, war immer an). Die Gruppe, die beim Objekt nicht greift
+(`DpBestand.istBestand()`), steht blasser mit Hinweis (`_dpPdfGruppenStand`, beim Aufklappen/Überfahren).
+**Dopplungen** (gemessen am Investment-PDF 2026-1123, 24 S., davon 9 Pilot): Szenario-Analyse ↔
+Stress-Test, Abgleich mit dem Marktbericht ↔ Wert & Zielbild, Ankauf · Bestand · Zielbild ↔
+Wertpotenzial, Anschlussfinanzierung im Ankauf ↔ Cashflow 3 Phasen/Zinsänderungsrisiko. Die KI nannte
+dort eigene, abweichende Zahlen (Objektwert „ca. 941.000 €" in 10 Jahren gegen 1.264.989 € auf S. 5).
+Regel: druckt das PDF den Standardteil (`_dpPdfStdMark('stress'|'wert'|'potenzial'|'phasen')`),
+entfällt der Baustein (`_dpPdfGedeckt`); fehlt der Standardteil, kommt der Text wie bisher. Bankfassung:
+Anschlussfinanzierung im Ankauf entfällt neben „Cashflow je Phase", im Bestand stehen die Bankargumente
+darunter (wie im Investment-PDF). Hilfe (Pilot-Analyse) angepasst. Haken sind nicht gespeichert
+(nicht in `FIELDS`), die IDs blieben – kein Altstand kann brechen.
+
+**Nachweis.** Staging-Browser, Schreibzugriffe abgefangen (saveObj, alle Nicht-GET), jsPDF-`text`
+mitgeschnitten. 2026-1123 (Ankauf): Investment 24 → 22 Seiten, Pilot 9 → 7, Szenario/Abgleich/Zielbild/
+Anschluss-Text 0, „941.000" 0; Bank 17 = 17, KI-Anschlussfinanzierung weg. 2026-1056 Parkstr. 9
+(Bestand): Bestandsstrategie, Anschlussfinanzierung + „Argumente für die Bank", Exit-Strategien da,
+Haken `exit`/`bestandsstrategie` aus → beide weg (23 → 22 S.). buster-ebenen RC=0, frontend-konstanten
+ok. Dateien: `Downloads/v3018-{vorher,nachher}-{Investment,Bank}-Lindenallee14.{pdf,txt}`,
+`v3018-vorher-Auswahl.png`, `v3018-nachher-Auswahl-{Desktop-Bestand,schmal}.jpg`.
+
+**Rest.** Nicht auf Prod (Auftrag: Prod nicht anfassen). Handy: Chrome-Fenster geht nur bis 555 px,
+dort einspaltig ohne Querscrollen; 390 px nicht echt gemessen. KI-interne Doppelung offen für Marcel:
+Gesamtbewertung, Investmentbewertung, Empfehlung und DealPilot-Insight sagen viermal das Gesamturteil
+(Investment-PDF S. 15–21). Haken werden nicht gespeichert (jede Sitzung alle an).
