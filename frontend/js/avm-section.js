@@ -365,7 +365,7 @@ if (!window._wlc) {
         '<span class="avs-cf" style="color:#fff;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.32)">' + accUnified(u)[0] + '</span></div>';
     }
     var mwCls = 'mw' + (u.isDP ? ' dpval' : '');
-    var sub = (sqm ? fmt(sqm) + ' \u20ac/m\u00b2' : '') + (d != null ? ' \u00b7 <span style="color:' + (d >= 0 ? '#2f8f57' : '#c0564f') + '">' + (d >= 0 ? '+' : '') + d.toFixed(1) + '%</span>' : '');
+    var sub = (sqm ? fmt(sqm) + ' \u20ac/m\u00b2' : '') + (d != null ? ' \u00b7 <span style="color:' + (d >= 0 ? '#2f8f57' : '#c0564f') + '">' + (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1).replace('.', ',') + ' %</span>' : '');
     var miete = (mm != null) ? ('Miete <b>' + fmt(mm) + ' \u20ac</b>' + (mmSqm ? ' \u00b7 ' + dec(mmSqm) + ' \u20ac/m\u00b2 kalt' : '')) : '';
     var foot = '<div class="mfoot">';
     /* v782-report-btn-removed: 'Marktbericht erzeugen' entfernt (DealPilot-Karte) */
@@ -392,7 +392,7 @@ if (!window._wlc) {
     var cMW = consMW(ps, b), cMM = consMM(ps, b);
     var body =
       row('Marktwert', function (u) { return (u ? fmt(mwAt(u, b)) : fmt(cMW)) + ' \u20ac'; }) +
-      row('vs. Kaufpreis', function (u) { var mw = u ? mwAt(u, b) : cMW; var d = diffPct(mw); return d == null ? '\u2013' : '<span class="' + (d >= 0 ? 'pos' : 'neg') + '">' + (d >= 0 ? '+' : '') + d.toFixed(1) + '%</span>'; }) +
+      row('vs. Kaufpreis', function (u) { var mw = u ? mwAt(u, b) : cMW; var d = diffPct(mw); return d == null ? '\u2013' : '<span class="' + (d >= 0 ? 'pos' : 'neg') + '">' + (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1).replace('.', ',') + ' %</span>'; }) +
       row('Einordnung', function (u) { var mw = u ? mwAt(u, b) : cMW; var pc = priceClass(mw); return '<span style="color:' + pc[1] + '">' + pc[0] + '</span>'; }) +
       row('Genauigkeit', function (u) { return u ? accUnified(u)[0] : '\u2014'; }) +
       row('Miete kalt', function (u) { var v = u ? mmAt(u, b) : cMM; return v == null ? '\u2013' : (fmt(v) + ' \u20ac'); });
