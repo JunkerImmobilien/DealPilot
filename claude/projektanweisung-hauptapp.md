@@ -43059,3 +43059,33 @@ ok. Dateien: `Downloads/v3018-{vorher,nachher}-{Investment,Bank}-Lindenallee14.{
 dort einspaltig ohne Querscrollen; 390 px nicht echt gemessen. KI-interne Doppelung offen für Marcel:
 Gesamtbewertung, Investmentbewertung, Empfehlung und DealPilot-Insight sagen viermal das Gesamturteil
 (Investment-PDF S. 15–21). Haken werden nicht gespeichert (jede Sitzung alle an).
+
+### v3018a · Gesamturteil nur einmal im PDF, Bausteine je Objekt gespeichert · 28.10.2026 — Staging `25b6dbd8`
+
+**Was.** Marcel zu den offenen Fragen aus v3018: „ja, wegfallen – soll nur einmal drin sein" und
+„ja, sollen gemerkt werden". **Urteil:** steht im Investment-PDF als erste Zeile der Gesamtbewertung
+(„Urteil: NICHT KAUFEN"), in der Bankfassung als Zeile „Urteil" am Kopf der Pilot-Analyse – beide am
+Haken „Gesamtbewertung mit Urteil". „Empfehlung" heißt „Begründung des Urteils" (gleicher Haken
+`empfehlung`) und verliert den Satz, der nur das Urteil ausspricht; dasselbe für DealPilot-Insight
+(`_dpOhneUrteil` in pdf.js: Urteil wörtlich UND Empfehlung/Urteil/Fazit/lautet, oder fast nur das
+Urteil; Bedingungen wie „… ließe sich 'Prüfen' vertreten" bleiben). Investmentbewertung kommt nicht
+mehr ins PDF (holistische Wiederholung; Lage/Risiko/Perspektive stehen in eigenen Bausteinen), Haken
+entfällt, in der App bleibt sie. **Speichern:** `d._pdf_bausteine_aus` in storage.js (nur abgewählte
+Schlüssel, nur wenn einer aus ist) – Altobjekt ohne Feld = alle an, bekommt beim Laden kein Feld;
+Schlüssel ohne Haken (z. B. `investbew` aus einem künftigen Stand) werden mitgeführt. Neues Objekt
+und Formular leeren: alle an. Mitcommittet: Buster dokument-import/unterlagen v3017d (aus `862e1c75`),
+frontend-konstanten.json.
+
+**Nachweis.** Staging, Schreibzugriffe abgefangen. 2026-1123: „Nicht kaufen" steht im Investment-PDF
+genau einmal (S. 15, Gesamtbewertung; vorher S. 17 Empfehlung + Satz in der Begründung), im Bank-PDF
+einmal (S. 13 „Urteil"). Seiten Investment 22 = 22 (v3018), Bank 17 = 17; Investmentbewertung weg.
+`_dpOhneUrteil` 7/7 Fälle (scratchpad urteil-test.mjs). Laden 2026-1123: ein saveObj wie in v3018,
+`collectData()._pdf_bausteine_aus` fehlt, alle 18 Haken an. Rundlauf im Speicher: exit/investorfit
+aus + fremder Schlüssel → collectData liefert alle drei; Objektwechsel → alle an; loadData mit Feld →
+genau die zwei aus, fremder Schlüssel erhalten. DB: 2026-1123, 1056, Teststr. 6 unverändert
+(updated_at vor dem Test, kein Feld). Buster RC=0, Konstanten neu.
+
+**Rest.** Ein echter Speicher-/Neuladen-Durchgang gegen die DB ist nicht gelaufen (Schreibzugriff im
+Messlauf gesperrt) – Abnahmepunkt auf Staging: Haken abwählen, speichern, neu laden. Der KI-Prompt
+verlangt in `investmentbewertung`/`dealpilot_insight` weiter ein Urteil; das PDF filtert, der Prompt
+ist unverändert. Nicht auf Prod.
