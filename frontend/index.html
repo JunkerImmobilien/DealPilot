@@ -34,7 +34,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v3003a">
+<link rel="stylesheet" href="css/style.css?v=v3018">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -3173,27 +3173,44 @@ label.dp-required.qc-required::after {
       <details class="ai-pdf-details">
         <summary class="ai-pdf-sections-h">Bausteine im PDF</summary>
         <div class="ai-pdf-sections" id="ai-pdf-sections">
-        <label><input type="checkbox" id="ai-pdf-sec-gesamt" checked> Gesamtbewertung</label>
-        <label><input type="checkbox" id="ai-pdf-sec-staerken" checked> St&auml;rken</label>
-        <label><input type="checkbox" id="ai-pdf-sec-risiken" checked> Risiken</label>
-        <label><input type="checkbox" id="ai-pdf-sec-risikoanalyse" checked> Risikoanalyse</label>
-        <label><input type="checkbox" id="ai-pdf-sec-szenarien" checked> Szenario-Analyse</label>
-        <label><input type="checkbox" id="ai-pdf-sec-investorfit" checked> Investor-Fit</label>
-        <label><input type="checkbox" id="ai-pdf-sec-empfehlung" checked> Empfehlung</label>
-        <label><input type="checkbox" id="ai-pdf-sec-investbew" checked> Investmentbewertung</label>
-        <label><input type="checkbox" id="ai-pdf-sec-verhandlung" checked> Verhandlungsempfehlung</label>
-        <label><input type="checkbox" id="ai-pdf-sec-offerte" checked> Kaufpreis-Offerte</label>
-        <label><input type="checkbox" id="ai-pdf-sec-bank" checked> Bankargumente</label>
-        <label><input type="checkbox" id="ai-pdf-sec-insight" checked> DealPilot-Insight</label>
-        <!-- v2552: die Abschnitte der Pilot-Analyse, die das PDF bisher nicht druckte -->
-        <label><input type="checkbox" id="ai-pdf-sec-anschluss" checked> Anschlussfinanzierung</label>
-        <label><input type="checkbox" id="ai-pdf-sec-lage" checked> Lage &amp; Markt</label>
-        <label><input type="checkbox" id="ai-pdf-sec-abgleich" checked> Abgleich mit dem Marktbericht</label>
-        <label><input type="checkbox" id="ai-pdf-sec-fotos" checked> Optischer Eindruck</label>
-        <label><input type="checkbox" id="ai-pdf-sec-zielbild" checked> Ankauf &middot; Bestand &middot; Zielbild</label>
-        <label><input type="checkbox" id="ai-pdf-sec-ankaufheute" checked> Ankauf gegen heute</label>
-        <label><input type="checkbox" id="ai-pdf-sec-steuer" checked> Steuerliche Zusammenfassung</label>
-        <label><input type="checkbox" id="ai-pdf-sec-steuerverlauf" checked> Steuerverlauf</label>
+        <!-- v3018 · Marcel 28.10.2026: nach Ankauf und Bestand sortiert, Dopplungen raus.
+             Die IDs bleiben (pdf.js _dpPdfSecKey) - kein gespeicherter Stand haengt daran,
+             die Haken leben nur in der Sitzung. Gruppe „ist-aus": greift bei diesem Objekt
+             nicht (pdf.js entscheidet per DpBestand.istBestand()), bleibt aber bedienbar. -->
+        <div class="ai-pdf-gruppe" data-gruppe="beide">
+          <div class="ai-pdf-gruppe-h">Ankauf und Bestand</div>
+          <label><input type="checkbox" id="ai-pdf-sec-gesamt" checked> Gesamtbewertung</label>
+          <label><input type="checkbox" id="ai-pdf-sec-staerken" checked> St&auml;rken</label>
+          <label><input type="checkbox" id="ai-pdf-sec-risiken" checked> Risiken</label>
+          <label><input type="checkbox" id="ai-pdf-sec-risikoanalyse" checked> Risikoanalyse</label>
+          <label><input type="checkbox" id="ai-pdf-sec-investorfit" checked> Investor-Fit</label>
+          <label><input type="checkbox" id="ai-pdf-sec-empfehlung" checked> Empfehlung</label>
+          <label><input type="checkbox" id="ai-pdf-sec-investbew" checked> Investmentbewertung</label>
+          <label><input type="checkbox" id="ai-pdf-sec-lage" checked> Lage &amp; Markt</label>
+          <label><input type="checkbox" id="ai-pdf-sec-fotos" checked> Optischer Eindruck</label>
+          <label><input type="checkbox" id="ai-pdf-sec-steuer" checked> Steuerliche Zusammenfassung</label>
+          <label><input type="checkbox" id="ai-pdf-sec-steuerverlauf" checked> Steuerverlauf</label>
+          <label><input type="checkbox" id="ai-pdf-sec-insight" checked> DealPilot-Insight</label>
+        </div>
+        <div class="ai-pdf-gruppe" data-gruppe="ankauf">
+          <div class="ai-pdf-gruppe-h">Ankauf <span class="ai-pdf-gruppe-st"></span></div>
+          <label><input type="checkbox" id="ai-pdf-sec-verhandlung" checked> Verhandlungsempfehlung</label>
+          <label><input type="checkbox" id="ai-pdf-sec-offerte" checked> Kaufpreis-Offerte</label>
+          <label><input type="checkbox" id="ai-pdf-sec-bank" checked> Bankargumente</label>
+        </div>
+        <div class="ai-pdf-gruppe" data-gruppe="bestand">
+          <div class="ai-pdf-gruppe-h">Bestand <span class="ai-pdf-gruppe-st"></span></div>
+          <label><input type="checkbox" id="ai-pdf-sec-bestandsstrategie" checked> Bestandsstrategie</label>
+          <label><input type="checkbox" id="ai-pdf-sec-anschluss" checked> Anschlussfinanzierung (mit Bankargumenten)</label>
+          <label><input type="checkbox" id="ai-pdf-sec-exit" checked> Exit-Strategien</label>
+          <label><input type="checkbox" id="ai-pdf-sec-ankaufheute" checked> Ankauf gegen heute</label>
+        </div>
+        <div class="ai-pdf-doppelt">
+          <b>Nicht doppelt im PDF.</b> Diese Teile der Analyse stehen schon gerechnet im PDF und kommen deshalb nicht noch einmal als Text:
+          Szenario-Analyse (&rarr; Stress-Test), Abgleich mit dem Marktbericht (&rarr; Wert &amp; Zielbild),
+          Ankauf &middot; Bestand &middot; Zielbild (&rarr; Wertpotenzial), Anschlussfinanzierung im Ankauf (&rarr; Cashflow in drei Phasen).
+          Fehlt die Seite im PDF, kommt der Text wie bisher.
+        </div>
       </div>
       </details>
     </div>
@@ -3649,7 +3666,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-anlage-bmf.js?v=v3006"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v2999"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v3006c"></script>
+<script src="js/pdf-investment-bank.js?v=v3018"></script>
 <script src="js/bmf-modal.js?v=v3006d"></script>
 <script src="js/bmf-modal-v292.js?v=v3006d"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2943"></script>
@@ -3739,7 +3756,7 @@ label.dp-required.qc-required::after {
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v3006c"></script>
 <script src="js/track-record.js?v=v3003a"></script>
-<script src="js/pdf.js?v=v3006c"></script>
+<script src="js/pdf.js?v=v3018"></script>
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
@@ -3786,7 +3803,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2988"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3017"></script>
+<script src="js/help.js?v=v3018"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3001"></script>

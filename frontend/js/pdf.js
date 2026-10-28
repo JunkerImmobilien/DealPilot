@@ -930,11 +930,42 @@ function _dpPdfSecKey(title){
     /* v2552 · die Abschnitte, die die Pilot-Analyse seit v2150-v2544 zeigt */
     'Anschlussfinanzierung':'anschluss','Lage & Markt':'lage','Abgleich mit dem Marktbericht':'abgleich','Optischer Eindruck aus den Fotos':'fotos',
     'Ankauf · Bestand · Zielbild':'zielbild','Ankauf gegen heute':'ankaufheute','Steuerliche Zusammenfassung':'steuer','Steuerverlauf':'steuerverlauf',
-    /* v2985 · Bestand: die Bestandsstrategie haengt am Haken der Verhandlung, Exit hat einen eigenen */
-    'Bestandsstrategie':'verhandlung','Exit-Strategien':'exit'};
+    /* v2985 · Bestand: Exit hat einen eigenen Haken.
+       v3018 · die Bestandsstrategie auch (hing bis dahin am Haken der Verhandlung,
+       der jetzt in der Gruppe „Ankauf" steht). */
+    'Bestandsstrategie':'bestandsstrategie','Exit-Strategien':'exit'};
   return m[title]||null;
 }
 function _dpPdfSectionOn(title){var k=_dpPdfSecKey(title);if(!k)return true;var cb=document.getElementById('ai-pdf-sec-'+k);return !cb||cb.checked;}
+
+/* v3018 · Marcel 28.10.2026: „wir müssen auch schauen, dass wir nicht Sachen
+   doppelt im PDF haben, die wir eh standardmäßig schon ausgeben."
+   Gemessen am Investment-PDF Lindenallee 14 (24 Seiten, davon 9 Pilot-Analyse):
+   vier Textbausteine erzählen in Worten nach, was eine gerechnete Seite davor
+   schon zeigt - und nennen dabei EIGENE Zahlen, die der Rechnung widersprechen
+   (Anschlussfinanzierung: Objektwert „ca. 941.000 €" in zehn Jahren, die Seite
+   Cashflow in drei Phasen 1.264.989 €; Szenario-Analyse: geschätzte Unterdeckung
+   neben dem gerechneten Stress-Test). Für eine Bank sind zwei Zahlen zum selben
+   Sachverhalt schlechter als eine. Deshalb gilt: hat dieses PDF den Standardteil
+   gedruckt, entfällt der Baustein; fehlt der Standardteil (z. B. kein Marktbericht,
+   keine Stress-Daten), kommt der Baustein wie bisher - es geht nichts verloren.
+   Die Standardteile tragen sich beim Drucken selbst ein (_dpPdfStdMark). */
+var _dpPdfStd = {};
+function _dpPdfStdReset(){ _dpPdfStd = {}; try { window._dpPdfStd = _dpPdfStd; } catch (e) {} }
+function _dpPdfStdMark(k){ _dpPdfStd[k] = true; }
+var _DP_PDF_GEDECKT = {
+  'Szenario-Analyse':              ['stress'],     /* Stress-Test · DSCR-Resilienz / Belastungsprobe */
+  'Abgleich mit dem Marktbericht': ['wert'],       /* Wert & Zielbild: Werte je Verfahren, Kaufpreis gegen Markt */
+  'Ankauf · Bestand · Zielbild':   ['potenzial'],  /* Wertpotenzial: Mieterhöhung, Zielbild, Kernaussagen */
+  'Anschlussfinanzierung (Ankauf)':['phasen']      /* Cashflow in drei Phasen + Zinsänderungsrisiko */
+};
+function _dpPdfGedeckt(title, std){
+  var g = _DP_PDF_GEDECKT[title]; std = std || _dpPdfStd;
+  if (!g || !std) return false;
+  for (var i = 0; i < g.length; i++) if (std[g[i]]) return true;
+  return false;
+}
+try { window._dpPdfGedeckt = _dpPdfGedeckt; } catch (e) {}
 function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   function clean(s) {
     if (s == null) return '';
@@ -1010,6 +1041,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
 
   function block(title, text, bgColor, accentColor, isDarkBg) {
     if (typeof _dpPdfSectionOn === 'function' && !_dpPdfSectionOn(title)) return; /* v603-gate */
+    if (_dpPdfGedeckt(title)) return;   /* v3018 · steht schon im Standardteil */
     bgColor = [255, 255, 255]; accentColor = C.GOLD; isDarkBg = false; /* v596-pdf-clean */
     if (!text) return;
     // V63.71: Schriftgröße VOR splitTextToSize setzen - sonst nimmt jsPDF die alte Größe
@@ -1136,7 +1168,8 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
      PDF nie druckte (Felder kamen in pdf.js nicht vor). Jetzt als Textbausteine,
      jeder mit eigenem Haken unter „Bausteine im PDF". */
   var _eur = function (x) { return (x < 0 ? '-' : '') + Math.round(Math.abs(x)).toLocaleString('de-DE') + ' €'; };
-  if (!_best && a.anschlussfinanzierung) block('Anschlussfinanzierung', Array.isArray(a.anschlussfinanzierung) ? _qaText(a.anschlussfinanzierung) : clean(a.anschlussfinanzierung));   /* v2985 */
+  /* v3018 · im Ankauf zeigt die Seite Cashflow in drei Phasen Restschuld, Anschlusszins, Rate und DSCR danach */
+  if (!_best && a.anschlussfinanzierung && !_dpPdfGedeckt('Anschlussfinanzierung (Ankauf)')) block('Anschlussfinanzierung', Array.isArray(a.anschlussfinanzierung) ? _qaText(a.anschlussfinanzierung) : clean(a.anschlussfinanzierung));   /* v2985 */
   (function () {
     var t = [];
     if (a.makrolage_recherche) t.push('Makrolage: ' + clean(a.makrolage_recherche));
@@ -1215,6 +1248,7 @@ async function exportPDF() {
 }
 
 async function _exportPDFInner() {
+  _dpPdfStdReset();   /* v3018 · welche Standardteile dieses PDF druckt */
 
   // Track usage (and enforce plan limit) before generating PDF
   if (typeof Sub !== 'undefined' && Sub.isApiMode()) {
@@ -1754,6 +1788,7 @@ async function _exportPDFInner() {
      SEITE 3b: CASHFLOW-RECHNUNGEN (Heute, EZB, Anschluss)
   ══════════════════════════════════════════════════ */
   cy = newPage('Cashflow-Rechnungen \u00b7 3 Phasen');
+  _dpPdfStdMark('phasen');   /* v3018 · Anschluss: Restschuld, Zins, Rate, DSCR */
 
   // Intro-Hinweis
   doc.setFillColor.apply(doc, C.SURF2); doc.roundedRect(M, cy, CW, 9, 1.5, 1.5, 'F');
@@ -2606,6 +2641,7 @@ async function _exportPDFInner() {
       return;
     }
 
+    _dpPdfStdMark('stress');   /* v3018 · die Szenarien stehen gerechnet hier */
     var matrix = data.matrix;
     var zinsSzen = data.zinsSzen; // [5.0, 3.0, 1.0, 0.0, -2.0]
     var mietSzen = data.mietSzen; // [-20, -10, 0, 10, 20]
@@ -3454,6 +3490,7 @@ async function _exportPDFInner() {
          zwei Seiten (Wertpotenzial und Wert & Zielbild). anschluss=true: im Fluss
          weiter statt neuer Seite. */
       var _pdZeichnen = function (anschluss) {
+      _dpPdfStdMark('potenzial');   /* v3018 */
       if (anschluss) { if (cy > 200) cy = newPage('Wert & Zielbild · Fortsetzung'); else cy += 4; }
       else cy = newPage('Wertpotenzial');
       cy = secH(doc, cy, 'Wertpotenzial · Mieterhöhung und Zielbild', M, CW);
@@ -3571,6 +3608,7 @@ async function _exportPDFInner() {
     var _pdOk = typeof _pdZeichnen === 'function';
     if (_WZ) {
       cy = newPage('Wert & Zielbild');
+      _dpPdfStdMark('wert');   /* v3018 · Werte je Verfahren gegen den Kaufpreis */
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
       cy = window.DpPdfBlocksatz.absatz(doc, 'Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterh\u00f6hung und Zielbild entwickelt.', { x: M, y: cy + 3, breite: CW, zeile: 4.4 }) + 2;
       /* v2900 · EIN Abschnitt: Werte je Verfahren und Wertlandschaft, dann das
@@ -3993,3 +4031,37 @@ async function exportPDFBlob() {
   }
 }
 window.exportPDFBlob = exportPDFBlob;
+
+/* v3018 · Bausteine im PDF: welche Gruppe greift bei DIESEM Objekt?
+   pdf.js entscheidet per DpBestand.istBestand() (Ankauf-Stand vorhanden UND
+   Ist-Ansicht) - dieselbe Frage stellt die Auswahl, damit der Haken, den man
+   setzt, auch etwas tut. Die andere Gruppe bleibt bedienbar, nur blasser:
+   wechselt das Objekt in den Bestand, gilt die Wahl dort weiter.
+   Neu bewertet beim Aufklappen und beim Darueberfahren (die Ansicht
+   Ankauf/Bestand laesst sich umschalten, waehrend der Reiter offen ist). */
+function _dpPdfGruppenStand() {
+  var box = document.getElementById('ai-pdf-sections');
+  if (!box) return;
+  var best = false;
+  try { best = !!(window.DpBestand && window.DpBestand.istBestand()); } catch (e) { best = false; }
+  var setze = function (gruppe, aktiv, aus) {
+    var g = box.querySelector('.ai-pdf-gruppe[data-gruppe="' + gruppe + '"]');
+    if (!g) return;
+    g.classList.toggle('ist-aus', !aktiv);
+    var st = g.querySelector('.ai-pdf-gruppe-st');
+    if (st) st.textContent = aktiv ? '· gilt für dieses Objekt' : aus;
+  };
+  setze('ankauf', !best, '· greift bei diesem Objekt nicht (Bestand)');
+  setze('bestand', best, '· greift erst im Bestand');
+}
+try {
+  document.addEventListener('toggle', function (ev) {
+    var t = ev.target;
+    if (t && t.classList && t.classList.contains('ai-pdf-details') && t.open) _dpPdfGruppenStand();
+  }, true);
+  document.addEventListener('pointerover', function (ev) {
+    var t = ev.target;
+    if (t && t.closest && t.closest('.ai-pdf-details[open]')) _dpPdfGruppenStand();
+  }, { passive: true });
+  window._dpPdfGruppenStand = _dpPdfGruppenStand;
+} catch (e) {}

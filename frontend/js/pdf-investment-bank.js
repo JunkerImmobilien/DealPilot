@@ -514,6 +514,7 @@
   window.exportPDFBank = async function (opt) {
     opt = opt || {};
     var KURZ = !!opt.kurz;
+    var _std = {};   /* v3018 · welche Standardteile diese Fassung druckt */
     if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen - bitte kurz warten und erneut versuchen.'); return; }
     try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {}
 
@@ -1210,6 +1211,7 @@
     var bindj = num('d1_bindj');
     var hatPhasen = da(K.cf_ns_ezb) !== null || da(K.cf_ns_an) !== null;
     if (hatPhasen) {
+      _std.phasen = true;   /* v3018 · Anschlussfinanzierung steht hier gerechnet (pdf.js _dpPdfGedeckt) */
       /* v2832 · die erste Spalte ist das erste VOLLE Jahr (beim Bestand das Kaufjahr) */
       var _j1 = typeof window._dpPdfJahr1 === 'function' ? window._dpPdfJahr1(false) : 'Heute';
       platz(62, 'Drei Phasen', _j1 + ' · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
@@ -1703,11 +1705,20 @@
             /* v2900 · die Zahlen stehen in der Belastungsprobe, nicht hier ein zweites Mal */
             'Gerechnete Schuldendeckung je Zins- und Mietszenario: siehe Belastungsprobe.'].filter(Boolean));
         }
-        liste('Bankargumente', ai.bankargumente);
+        /* v3018 · im Bestand stehen die Bankargumente unter der Anschlussfinanzierung -
+           wie im Investment-PDF (pdf.js v2985); die Kurzfassung druckt die Anschluss-
+           finanzierung nicht, dort bleiben sie als eigene Liste. */
+        var _bestB = false;
+        try { _bestB = !!(window.DpBestand && window.DpBestand.istBestand()); } catch (e) { _bestB = false; }
+        if (!_bestB || KURZ) liste('Bankargumente', ai.bankargumente);
         /* v2988 · seit v2985 sind anschlussfinanzierung/exit_strategien im Bestand Listen aus {frage, antwort} -
            gemessen stand im Bank-PDF der Parkstr. „[object Object],[object Object],…“ (Seite 15). */
         var _qa = function (v) { if (!Array.isArray(v)) return v; return v.map(function (e) { return e && typeof e === 'object' ? (e.frage ? e.frage + '\n' : '') + (e.antwort || '') : String(e || ''); }).filter(Boolean).join('\n\n'); };
-        if (!KURZ) block('Anschlussfinanzierung', _qa(ai.anschlussfinanzierung));
+        /* v3018 · im Ankauf steht die Anschlussfinanzierung gerechnet unter „Cashflow je Phase" und
+           „Zinsänderungsrisiko" - der KI-Text nannte dazu eigene, abweichende Zahlen. Im Bestand bleibt er. */
+        var _gedecktB = !_bestB && typeof window._dpPdfGedeckt === 'function' && window._dpPdfGedeckt('Anschlussfinanzierung (Ankauf)', _std);
+        if (!KURZ && !_gedecktB) block('Anschlussfinanzierung', [_qa(ai.anschlussfinanzierung),
+          _bestB && ai.bankargumente && ai.bankargumente.length ? 'Argumente für die Bank:\n' + ai.bankargumente.map(function (x) { return '- ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
         if (!KURZ && ai.exit_strategien) block('Exit-Strategien', _qa(ai.exit_strategien));
         if (!KURZ) (function () {
           var t = [];
