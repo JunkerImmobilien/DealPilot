@@ -43668,3 +43668,19 @@ Daneben:
   - Track-Record-Prognose beim offenen Objekt
   - Seitenbild der Phasentabellen mit Bausparvertrag
 - KfW mit tilgungsfreien Anlaufjahren ist nicht abgebildet.
+
+### Prod-Rollout 29.10.2026 · v3029, v3029a, landing-videothek-7 · Prod `dc0cdf7`
+
+**Was.** Vollprüfung v3029, Handy-Kasten für Abruf und Kontingent (v3029a) und Videothek mit Ü3/Modul 28 auf Produktion.
+Die vier MP4s gingen vorher per `scratchpad/videos-prod-hochladen.sh` auf Prod. Ein erster scp-Versuch von Claude
+wurde von der Freigabeprüfung abgelehnt; nach Marcels ausdrücklicher Bitte lief das Skript. md5 aller vier Dateien
+ist gleich zum Original.
+**Nachweis.**
+- `rollout-prod.ps1`: Sicherungen gelesen, gold-audit auf der Basislinie, Serverstand = lokal, HTTP 200.
+- Gemessen auf Prod:
+  - `calc.js`, `pdf.js`, `object-actions.js`, `modal-boarding-skin.js` mit `?v=v3029`
+  - `mb-stufen.js` mit `?v=v3029a`
+  - `videos.json` mit 32 Videos, darunter Ü3 und Modul 28
+  - beide neuen MP4s antworten mit 206 (Range)
+  - Backend healthy, 0 Fehler im Log
+**Rest.** BACKLOG N83: Bodenrichtwert-Schätzen raus, Leerstand einrechnen, DSCR brutto/netto und Abschlag-Wortlaut recherchieren.

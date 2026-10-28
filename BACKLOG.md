@@ -40,11 +40,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 Marcel: *„machen wir heute nicht … notier das einfach nur, machen wir nächstes Mal."*
 
-0. **Prod-Rollout v3029 + landing-videothek-7 steht aus.** Vorher müssen die zwei neuen
-   Videos auf Prod. Das scp hat die Freigabeprüfung bei Claude abgelehnt, deshalb führt Marcel
-   `scratchpad/videos-prod-hochladen.sh` selbst per `!` aus (Sitzung c8646e43). Stimmen die
-   md5-Summen, läuft `tools/rollout-prod.ps1 -Freigabe`. Ohne Upload zeigt die Prod-Landing zwei
-   Videos, die nicht abspielen.
+0. ~~Prod-Rollout v3029 + landing-videothek-7~~ **erledigt 29.10.2026, Prod `dc0cdf7`** (Videos per Skript hochgeladen, md5 gleich).
 1. **„Bodenrichtwert schätzen" raus.** Marcel: *„totalen Quatsch … brauchen wir nicht."* Zu entfernen:
    - der Knopf `#brw-ai-btn` (`index.html` ~1167)
    - der automatische Rückfall `askAi()` nach leerem BORIS-Abruf (`bodenrichtwert.js` ~959)
