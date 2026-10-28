@@ -361,14 +361,6 @@
       + '<tr><td colspan="2" style="padding:12px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Vorgabe für die Wohnungen</td></tr>'
       + WE_IDS.map(function (id) { return zeile(id, true); }).join('')
       + '</tbody></table>'
-      + '<div style="margin-top:12px;padding:9px 11px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
-        + '<label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="mfh-weg"' + (_weg ? ' checked' : '') + '>'
-        + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)<div style="font-size:11.5px;color:#8A8272">'
-        + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt; das Wertpotenzial (Pilot-Analyse, PDF) zeigt zusätzlich jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung.</div></span></label>'
-        /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
-        + '<div style="margin:8px 0 0 21px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Kosten der Aufteilung '
-        + '<input class="mfh-in mfh-md" id="mfh-auftk" inputmode="decimal" style="width:120px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
-        + '<span style="font-size:11.5px;color:#8A8272">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>'
       /* v2541 · Jahr, in dem das Zielbild erreicht ist - dasselbe Feld wie im Reiter Objekt (zb_fertig_jahr) */
       + '<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Zielbild fertig (Jahr) '
         + '<input class="mfh-in mfh-md" id="mfh-zbjahr" inputmode="numeric" maxlength="4" style="width:80px" value="' + esc((el('zb_fertig_jahr') && el('zb_fertig_jahr').value) || '') + '" placeholder="z. B. 2028">'
@@ -634,7 +626,7 @@
       var h = el('mfh-we-ew'); if (!h || !P) return;
       ov.querySelectorAll('[data-ewart]').forEach(function (b) {
         b.setAttribute('aria-pressed', b.getAttribute('data-ewart') === _ewArt ? 'true' : 'false');
-        if (b.getAttribute('data-ewart') === 'etw') { b.disabled = !_weg; b.title = _weg ? '' : 'Nur mit dem Haken „aufgeteilt“ in Schritt 1'; }
+        if (b.getAttribute('data-ewart') === 'etw') { b.disabled = !_weg; b.title = _weg ? '' : 'Nur mit dem Haken „In Wohnungseigentum aufgeteilt“ unter den Einheiten (Schritt 2)'; }
       });
       if (!m.aktiv) { h.innerHTML = '<p class="mfh-we-hint">Erst eine Soll-Miete oder ein Zielbild eintragen — dann rechnet DealPilot den Ertragswert je Stufe.</p>'; return; }
       var r = P.ergebnis(opts()), we = r ? P.wohnungErgebnis(r, m, i) : null;
@@ -768,7 +760,17 @@
       + '</colgroup><thead><tr style="text-align:left;color:#8A8272">'
       + '<th>Nr.</th><th>Lage</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete<br><small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th></th></tr></thead>'
       + '<tbody id="mfh-zeilen">' + _arbeit.map(zeileHtml).join('') + '</tbody></table>'
-      + '<div style="margin-top:8px"><button type="button" id="mfh-neu" class="btn btn-outline btn-sm">+ Einheit</button></div>';
+      + '<div style="margin-top:8px"><button type="button" id="mfh-neu" class="btn btn-outline btn-sm">+ Einheit</button></div>'
+      /* v3016s · Marcel 28.10.2026: „unter den Wohneinheiten Checkbox für ‚In Wohneigentum aufgeteilt' und
+         dann erst den Text anzeigen, wenn man es auswählt". Stand bis hier in Schritt 1, Text immer offen. */
+      + '<div style="margin-top:12px;padding:9px 11px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
+        + '<label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="mfh-weg"' + (_weg ? ' checked' : '') + '>'
+        + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)<div id="mfh-weg-text" style="font-size:11.5px;color:#8A8272' + (_weg ? '' : ';display:none') + '">'
+        + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt; das Wertpotenzial (Pilot-Analyse, PDF) zeigt zusätzlich jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung.</div></span></label>'
+        /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
+        + '<div id="mfh-weg-kosten" style="margin:8px 0 0 21px;display:' + (_weg ? 'flex' : 'none') + ';gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Kosten der Aufteilung '
+        + '<input class="mfh-in mfh-md" id="mfh-auftk" inputmode="decimal" style="width:120px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
+        + '<span style="font-size:11.5px;color:#8A8272">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>';
   }
 
   /* Schritt 3 — Zustand je Einheit (Vererbung) */
@@ -1173,7 +1175,7 @@
     m.addEventListener('click', function (ev) {
       var t = ev.target;
       if (t === m) schliessen();
-      if (t.id === 'mfh-weg') { _weg = t.checked; }
+      if (t.id === 'mfh-weg') { _weg = t.checked; var _wt = el('mfh-weg-text'), _wk = el('mfh-weg-kosten'); if (_wt) _wt.style.display = _weg ? '' : 'none'; if (_wk) _wk.style.display = _weg ? 'flex' : 'none'; }
       if (t.dataset && t.dataset.s != null) { _schritt = +t.dataset.s; zeichnen(); }
       if (t.dataset && t.dataset.dup != null) { var i = +t.dataset.dup, c = JSON.parse(JSON.stringify(_arbeit[i])); c.nr = String(_arbeit.length + 1); c.lage = ''; c.bilder = null; c.mv_mieter = ''; /* v2021 */ _arbeit.splice(i + 1, 0, c); zeichnen(); }
       /* v2021 - der Weg ins Wohnungsfenster, im selben delegierten

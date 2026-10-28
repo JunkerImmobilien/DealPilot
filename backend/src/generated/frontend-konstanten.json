@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T14:22:37.682Z",
+ "erzeugt_am": "2026-10-28T14:33:20.788Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "d1c400f3059479c9",
-  "index-html": "26950d1d19ac8083",
+  "index-html": "8b41cdf9be1984f5",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -3726,6 +3726,10 @@
       "text": "Hast du in der Datenaufnahme unter Exposé / Dokumente Unterlagen eingelesen – Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis, Mieterliste oder Mietvertrag –, erscheint in der Pilot-Analyse der Reiter Unterlagen & WEG. Oben schaltest du zwischen Einfach (Ampel mit der Zahl der Risiken, was absehbar Geld kostet, die drei wichtigsten Risiken, Eigentümergemeinschaft und These als Karten) und Genau (alles im Einzelnen) um. Er zeigt:\n• die Investitionsthese aus den Unterlagen,\n• alle Risiken mit Einstufung (hoch, mittel, niedrig), Kosten, Jahr und Quelle (Dokument, TOP, Seite),\n• die WEG-Auswertung: Kernpunkte über alle Protokolle, Rücklage, Hausgeld, beschlossene und vertagte Sanierungen mit dem Anteil deines Objekts, Sonderumlagen und ein Fazit,\n• die Lasten aus dem Grundbuch in Klartext und was du beim Verwalter oder Verkäufer noch anfragen solltest.\n\nDie Pilot-Analyse bezieht diese Risiken in ihre Bewertung ein. Liest du neue Unterlagen ein, wird die Auswertung ersetzt."
      },
      {
+      "h": "Maßnahme: „Mieter bleibt drin — Kosten auf die Miete umlegen“",
+      "text": "Jede Maßnahme im Zielbild einer Wohnung (Bad, Böden, Fassade …) steht als Karte mit ihren Kosten. Das Kästchen entscheidet, wann sie Geld bringt:\n• Ohne Haken gehört sie zum Zielbild: Die Wohnung wird nach einem Auszug saniert und zur Zielmiete neu vermietet; die laufende Miete ändert sich bis dahin nicht.\n• Mit Haken bleibt der Mieter wohnen, und die Kosten kommen als Modernisierungsumlage (§ 559 BGB) auf seine Miete: 8 % pro Jahr, ohne den Anteil für ohnehin fällige Erhaltung (Feld „davon Erhaltung %“), höchstens 3 €/m² – bei einer Miete unter 7 €/m² höchstens 2 €/m² – in sechs Jahren. Das fließt in die Soll-Miete ein. Renovierung ist Erhaltung und wird nie umgelegt.\n\n„Gemeinsam — vom Haus geerbt“: Was du im ersten Schritt für Dach, Außenwand, Leitungen und Heizung einträgst, zählt automatisch für jede Wohnung; die Wohnungsgewerke (Bad, Böden, Grundriss, Innenausbau) gelten als Vorgabe, solange eine Wohnung nichts Eigenes trägt. Beim Übernehmen gehen diese Angaben auch in die Modernisierung des Objekts."
+     },
+     {
       "h": "Reiter „Ankauf · Bestand · Zielbild“",
       "text": "Im Ankauf steht dieser Reiter immer in der Pilot-Analyse. Hier schätzt du ein, was im Objekt steckt: heute mit der Ist-Miete, nach Mieterhöhung bis zur zulässigen Vergleichsmiete und im Zielbild nach Umbau oder Neuvermietung – mit Ertragswert, Restnutzungsdauer und Wertzuwachs nach Kosten. Solange Soll-Miete und Zielbild fehlen, sagt der Reiter, wo du sie einträgst (Reiter Miete bzw. bei Häusern mit Einheiten: Einheiten erfassen › Details); danach die Pilot-Analyse neu abrufen."
      },
@@ -3847,7 +3851,7 @@
      },
      {
       "h": "Beim Mehrfamilienhaus: je Wohnung",
-      "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Investition zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche Einheiten erfassen öffnen.\n2. Im Schritt Gebäude den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken In Wohnungseigentum aufgeteilt setzen und die Kosten der Aufteilung prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch Zielbild fertig (Jahr).\n3. Ebenfalls im Schritt Gebäude, unter Maßnahmen am ganzen Haus · Zielbild: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die Kosten € eintragen (bei Modernisierung mit Mietern: Mieter bleibt drin — Kosten auf die Miete umlegen). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung Details: Mietvertrag, Soll-Miete, Zielbild · nach Umbau mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit Übernehmen schließen."
+      "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Investition zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche Einheiten erfassen öffnen.\n2. Im Schritt Gebäude den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt (oder soll es aufgeteilt werden), setzt du im Schritt Einheiten unter der Liste den Haken In Wohnungseigentum aufgeteilt – erst dann erscheinen die Erklärung und das Feld Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch Zielbild fertig (Jahr).\n3. Ebenfalls im Schritt Gebäude, unter Maßnahmen am ganzen Haus · Zielbild: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die Kosten € eintragen (bei Modernisierung mit Mietern: Mieter bleibt drin — Kosten auf die Miete umlegen). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung Details: Mietvertrag, Soll-Miete, Zielbild · nach Umbau mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit Übernehmen schließen."
      },
      {
       "h": "Ertragswerte rechnen — kostenlos",
@@ -5231,7 +5235,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "cb917a67f8b50e61",
+  "hilfe": "f21bde6b4e4cf007",
   "bewertung": "bca98c7b04c452b7"
  }
 }

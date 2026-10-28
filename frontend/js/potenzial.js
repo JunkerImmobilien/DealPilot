@@ -1776,7 +1776,10 @@
         + (m.id === 'renovierung' ? '<span class="dp-zb-bew-nein">Renovierung ist Erhaltung — nicht auf die Miete umlegbar</span>'
           : '<label class="dp-zb-bew"><input type="checkbox" data-zb-b="' + i + '"' + (m.bewohnt ? ' checked' : '') + '> Mieter bleibt drin — Kosten auf die Miete umlegen</label>'
           + (m.bewohnt ? '<label><span>davon Erhaltung %</span><input data-zb-e="' + i + '" inputmode="decimal" value="' + esc(m.erh ? String(zahl(m.erh)) : '') + '" placeholder="0" style="width:70px"></label>'
-            + '<span class="dp-zb-bew-info">Modernisierungsumlage (§ 559 BGB): 8 % der Kosten pro Jahr auf die Miete, ohne den Anteil für Erhaltung (z. B. ohnehin fällige Reparatur), höchstens 3 €/m² — bei Miete unter 7 €/m² 2 €/m² — in 6 Jahren. Geht in die Soll-Miete ein.</span>' : ''))
+            + '<span class="dp-zb-bew-info">Modernisierungsumlage (§ 559 BGB): 8 % der Kosten pro Jahr auf die Miete, ohne den Anteil für Erhaltung (z. B. ohnehin fällige Reparatur), höchstens 3 €/m² — bei Miete unter 7 €/m² 2 €/m² — in 6 Jahren. Geht in die Soll-Miete ein.</span>'
+            /* v3016s · Marcel 28.10.2026: „was soll das heißen? Mieter bleibt drin — Kosten auf die Miete
+               umlegen, was passiert, wenn ich das auswähle?" Jetzt steht auch OHNE Haken, was gilt. */
+            : '<span class="dp-zb-bew-info"><b>Ohne Haken</b> gehört die Maßnahme zum <b>Zielbild</b>: Die Wohnung wird nach einem Auszug saniert und zur Zielmiete neu vermietet – die laufende Miete ändert sich bis dahin nicht. <b>Mit Haken</b> bleibt der Mieter wohnen, und 8 % der Kosten pro Jahr kommen als Modernisierungsumlage (§ 559 BGB) auf seine Miete.</span>'))
         + (m.id === 'sonst' ? '<label><span>Bezeichnung</span><input data-zb-t="' + i + '" value="' + esc(m.t) + '"></label>' : '')
         + '</div>';
     }).join('');
@@ -1792,7 +1795,10 @@
          der gewaehlte Chip war vom freien nicht zu unterscheiden. Darum mit Anker und !important. */
       '#zb-karte .dp-zb-chip.on,#mfh-we-ov .dp-zb-chip.on,.dp-zb-chip.on{border-color:#2f7d55 !important;color:#2f7d55 !important;background:color-mix(in srgb,#2f7d55 9%,#fff) !important;font-weight:600 !important}',
       '.dp-zb-chip:focus-visible{outline:2px solid var(--wl-c9a84c, #C9A84C);outline-offset:2px}',
-      '.dp-zb-mz{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;padding:6px 0;border-bottom:1px dashed #E6DCC2;font-size:12.5px}',
+      /* v3016s · Marcel: „Zielbild auch besser darstellen, einfacher mit Karten" - jede Maßnahme eine Karte */
+      '.dp-zb-mz{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;padding:10px 12px;margin:8px 0;border:1px solid #E6DCC2;border-radius:12px;background:#fff;box-shadow:0 1px 3px rgba(42,39,39,.05);font-size:12.5px}',
+      '.dp-zb-mz .dp-zb-mt{flex-basis:100%;font-size:13.5px}',
+      '.dp-zb-mz:has(.dp-zb-bew input:checked){border-left:4px solid #3FA56C}',
       '.dp-zb-mz .dp-zb-mt{font-weight:600;min-width:110px}',
       '.dp-zb-mz label{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:#6B6356}',
       '.dp-zb-mz label.dp-zb-bew{flex-direction:row;align-items:center;gap:6px;color:#2A2727}',
