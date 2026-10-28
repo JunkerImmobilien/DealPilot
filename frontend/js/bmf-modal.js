@@ -740,7 +740,17 @@ function renderBmfResult(results, demoLabel){
   if(pdfBtn) pdfBtn.disabled = false;
 }
 
+/* v3018d · Marcel 28.10.2026: „die Anlage zur Kaufpreisaufteilung sah gerade recht leer aus“.
+   Gemessen: dieser ALTE Weg (pdf-anlage-bmf.js) las ak_str/ak_plz/ak_ort, die es nicht gibt -
+   „Lage —“, Dateiname „BMF_Anlage_Finanzamt_____“. Seit v1860 nimmt das Fenster den genauen
+   Export; drei Wege (bmf-wahl, Deal-Aktion, ReadyCheck) riefen noch diesen. Jetzt gibt es EINE
+   Ausgabe: exportBmfPdf leitet weiter (fuer fremde Aufrufer), das Alte bleibt unter
+   _exportBmfPdfAlt stehen, wird aber nirgends mehr gerufen. */
 function exportBmfPdf(){
+  if (typeof window.exportPDFKaufpreisaufteilung === 'function') return window.exportPDFKaufpreisaufteilung();
+  if (typeof toast === 'function') toast('Kaufpreisaufteilung-PDF nicht geladen.');
+}
+function _exportBmfPdfAlt(){
   if(!window._lastBmfResults){
     toast('Bitte erst Berechnen lassen');
     return;

@@ -41,6 +41,27 @@
   /* v2431 · Marcel 19.10.2026 (Geld): Ertragswert nur mit Stufe 3 - geprueft im
      Haupt-Backend (services/ertragswertFreigabe.js). Ohne Freigabe kommt
      `ertragswert_gesperrt` zurueck; Mieten, Zielbild, Kosten und Rendite bleiben. */
+  /* v3018d · Ein Text ohne Zielbild. Fuer Objekte OHNE angelegtes Zielbild (modell().hat_ziel):
+     erst die festen Wendungen auf die Mieterhoehung kuerzen, dann jeden Satz streichen, der das
+     Zielbild noch nennt. EINE Stelle fuer beide PDFs (pdf.js, pdf-investment-bank.js) und das
+     Segment Wert & Zielbild (pdf-wert-zielbild.js) - auch fuer Texte aus dem Marktbericht-Dienst
+     (PotenzialService), die das Zielbild nennen, obwohl keines angelegt ist. */
+  function ohneZielbild(s) {
+    var t = String(s == null ? '' : s);
+    if (!/Zielbild/.test(t)) return t;
+    [[/Mieterhöhung und Zielbild rechnen/g, 'Die Mieterhöhung rechnet'], [/erzielt bzw\. die Maßnahmen umgesetzt sind/g, 'erzielt wird'],
+     [/,\s*Zielbild mit Zustand[^.;]*/g, ''],
+     [/nach Mieterhöhung und im Zielbild/g, 'nach Mieterhöhung'], [/Mieterhöhung und Zielbild/g, 'Mieterhöhung'],
+     [/Mieterhöhung oder Zielbild/g, 'Mieterhöhung'], [/\(Ist, Soll, Zielbild\)/g, '(Ist, Soll)'],
+     [/Ist · Soll · Zielbild/g, 'Ist · Soll'], [/Ist \/ Soll \/ Zielbild/g, 'Ist / Soll'],
+     [/ bzw\. die Maßnahmen umgesetzt sind/g, ''], [/,\s*Zielbild (?:offen|\d{4})[^.;]*(?=\.)/g, '']].forEach(function (p) { t = t.replace(p[0], p[1]); });
+    return t.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"])/).map(function (satz) {
+      if (!/Zielbild/.test(satz)) return satz;
+      /* Aufzaehlung mit Semikolon: nur das Glied mit dem Zielbild faellt */
+      if (/;/.test(satz)) { var g = satz.split(/;\s*/).filter(function (x) { return !/Zielbild/.test(x); }); return g.length ? g.join('; ').replace(/[,;\s]*$/, '') + (/[.!?]$/.test(g[g.length - 1]) ? '' : '.') : ''; }
+      return '';
+    }).filter(Boolean).join(' ').replace(/\s{2,}/g, ' ').trim();
+  }
   var GESPERRT_KURZ = 'Ertragswert je Stufe mit DealPilot Stufe 3';
   var GESPERRT_LANG = 'Der Ertragswert gehört zur Wertermittlung nach ImmoWertV (Stufe 3). Er erscheint hier, sobald für dieses Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält.';
   function gesperrt(r) { return !!(r && r.ertragswert_gesperrt); }
@@ -1472,6 +1493,19 @@
        Tab Bewertung und beide PDFs (gezeichnet wird je Ausgabe, gerechnet hier). */
     d.bruecke = zu ? null : brueckeDaten(m, r);
     d.kaufpreis = zahl(wert('kp')) || ((window.State && window.State.kpis && window.State.kpis.kp) || null);
+    /* v3018d · Marcel 28.10.2026: „wenn wir kein Zielbild angegeben haben, das auch nicht im PDF
+       steht." Zielbild angegeben heisst hier dasselbe wie in modell(): eine Zielmiete (ziel_qm)
+       oder eine Massnahme an einer Wohnung bzw. am Haus (hat_ziel). Ohne das bleibt die
+       Mieterhoehung nach § 558 BGB - sie ist aus dem Ist gerechnet und ein eigener Teil -, aber
+       kein Wort Zielbild, keine Massnahmenkosten-Zeile mit Strichen und kein „Zielbild offen". */
+    d.hat_ziel = !!m.hat_ziel;
+    if (!d.hat_ziel) {
+      d.satz_invest = (S.mieterhoehung ? 'Zwei Stufen der Mietentwicklung (Bestand und Mieterhöhung)' : 'Die Miete im Bestand')
+        + (zu ? ' mit Kosten und Rendite.' : ' mit Ertragswert' + (S.mieterhoehung ? ' je Stufe' : '') + (r && r.aufteilung ? ' und der Wirkung einer Aufteilung in Eigentumswohnungen.' : '.'));
+      d.kennzeichnung = ohneZielbild(d.kennzeichnung);
+      d.fuss = ohneZielbild(d.fuss);
+      d.kennzahlen = (d.kennzahlen || []).filter(function (z) { return z[0] !== 'Maßnahmenkosten'; });
+    }
     d.zins_etw = (r && r.verfuegbar && r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand) ? r.aufteilung.zins.bestand : null;
     return d;
   }
@@ -2043,6 +2077,7 @@
 
   window.DpPotenzial = {
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
+    ohneZielbild: ohneZielbild,   /* v3018d */
     KENNZEICHNUNG: KENNZEICHNUNG, GESPERRT_KURZ: GESPERRT_KURZ, GESPERRT_LANG: GESPERRT_LANG, gesperrt: gesperrt, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,
     kappung: kappung, kappungLaden: kappungLaden, agsHolen: agsHolen,
     massnahmenVon: massnahmenVon, massnahmenSpiegeln: massnahmenSpiegeln, massnahmenBinden: massnahmenBinden,

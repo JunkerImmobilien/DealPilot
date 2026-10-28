@@ -67,6 +67,7 @@
         return gerechnet() ? null : 'Erst berechnen — die Anlage druckt das Ergebnis.';
       },
       tun: function () {
+        if (hat('exportPDFKaufpreisaufteilung')) return window.exportPDFKaufpreisaufteilung();   /* v3018d · der genaue Export */
         if (hat('exportBmfPdf')) return window.exportBmfPdf();
         toast('BMF-Anlage nicht verfügbar.');
       }

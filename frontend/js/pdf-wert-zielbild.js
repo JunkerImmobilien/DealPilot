@@ -162,6 +162,9 @@
     }, function () { return letzterBericht(); });
     return Promise.all([extern, bericht]).then(function (r) {
       var X = r[0] || {}, h = r[1];
+      return ohneZiel(o, baue(X, h));   /* v3018d */
+    });
+    function baue(X, h) {
       var verf = (X.verfahren && X.verfahren.length) ? X.verfahren : (h ? ausBericht(h) : []);
       var stufen = (X.stufen && X.stufen.length) ? X.stufen : stufenAusPotenzial(o.potenzial);
       stufen = stufen.filter(function (s) { return zahl(s.wert) != null; });
@@ -180,7 +183,34 @@
         hinweis: sauber(X.hinweis || ('Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB.'
           + (stufen.length && global.DpPotenzial && global.DpPotenzial.KENNZEICHNUNG ? ' ' + global.DpPotenzial.KENNZEICHNUNG : '')))
       };
-    });
+    }
+  }
+
+  /* v3018d · Marcel 28.10.2026: „wenn wir kein Zielbild angegeben haben, das auch nicht im PDF
+     steht." Gemessen an Lindenallee 2026-1123 (Mieterhoehung ja, Zielbild nein): Kernaussagen
+     „Maßnahmen: 0 € (keine eingetragen)" und „Wertzuwachs nach Kosten: 0 €", die Legende
+     „(Ist, Soll, Zielbild)", der Ausblick „Mieterhöhung und Zielbild unterstellen …" und
+     „Zielbild offen". Zielbild angegeben = DpPotenzial (hat_ziel); der Text geht durch
+     DpPotenzial.ohneZielbild - dieselbe Stelle wie pdf.js und die Bankfassung. */
+  function hatZiel(o) {
+    var PD = o && o.potenzial;
+    if (PD && typeof PD.hat_ziel === 'boolean') return PD.hat_ziel;
+    try { var P = global.DpPotenzial; if (P && typeof P.modell === 'function') return !!P.modell().hat_ziel; } catch (e) {}
+    return true;   /* unbekannt: nichts wegnehmen */
+  }
+  function ohneZiel(o, d) {
+    if (!d || hatZiel(o)) return d;
+    var P = global.DpPotenzial, oz = P && typeof P.ohneZielbild === 'function' ? P.ohneZielbild : function (s) { return s; };
+    d.ohneZiel = true;
+    d.stufen = (d.stufen || []).filter(function (s) { return !/Zielbild/.test(String(s.titel || '')); });
+    d.texte = (d.texte || []).map(function (a) { return { h: a.h, p: a.p.map(oz).filter(Boolean) }; })
+      .filter(function (a) { return a.p.length && !/Zielbild/.test(a.h); });
+    d.kern = (d.kern || []).filter(function (k) { return !/^(Maßnahmen|Wertzuwachs nach Kosten)|Zielbild/.test(String(k.titel || '')); })
+      .map(function (k) { return k.text ? Object.assign({}, k, { text: oz(k.text) }) : k; });
+    d.stau = (d.stau || []).filter(function (s) { return !/Zielbild/.test(String(s.titel || '')); });
+    d.ausblick = oz(d.ausblick || '');
+    d.hinweis = oz(d.hinweis || '');
+    return d;
   }
 
   /* glatte Achse */
@@ -323,7 +353,7 @@
       }
       y = y0 + G.length * rh2 + 7;
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8); setT(f.grau);
-      doc.text('Punkt: Mitte bzw. Wert · Band: untere bis obere Zahl · gestrichelt: Kaufpreis' + (d.stufen.length ? ' · dunkle Punkte: Ertragswert je Stufe (Ist, Soll, Zielbild)' : ''), x, y);
+      doc.text('Punkt: Mitte bzw. Wert · Band: untere bis obere Zahl · gestrichelt: Kaufpreis' + (d.stufen.length ? (d.ohneZiel ? ' · dunkle Punkte: Ertragswert je Stufe (Ist, Soll)' : ' · dunkle Punkte: Ertragswert je Stufe (Ist, Soll, Zielbild)') : ''), x, y);
       y += 6;
     }
 
@@ -337,7 +367,7 @@
       }
     }
     if (d.stufen.length && T('stufen')) {
-      ueber('Ist · Soll · Zielbild');
+      ueber(d.ohneZiel ? 'Ist · Soll' : 'Ist · Soll · Zielbild');   /* v3018d */
       var mitMpi = d.stufen.some(function (s) { return zahl(s.mpi) != null; });
       var sp3 = mitMpi ? [['Stufe', 58, 'l'], ['Ertragswert', 28], ['zum Kaufpreis', 24], ['Marktpreisindikation', 38], ['Maßnahmen', 26]]
         : [['Stufe', 70, 'l'], ['Ertragswert', 32], ['zum Kaufpreis', 30], ['Maßnahmen', 32]];

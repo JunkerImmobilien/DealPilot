@@ -45,6 +45,9 @@ async function exportWerbungskostenPDF(mode) {
     if (typeof toast === 'function') toast('Bitte erst Werte eingeben');
     return;
   }
+  /* v3018d · Tor (pdf-pruefung.js): gemessen entstand das PDF mit leerem Gebaeudeanteil und AfA-Satz -
+     die AfA kam dann aus Vorgabewerten */
+  if (window.DpPdfPruefung && !window.DpPdfPruefung.tor('steuer', 'Werbungskosten-PDF')) return;
 
   // v645: Jahr-Quelle = State.cfRows -> exakt dieselben (Jahr, Index)-Paare wie der Bildschirm
   // (_computeYearTotal(cfRows[yi].cal, yi)). Behebt den Versatz durch fixes new Date().getFullYear().

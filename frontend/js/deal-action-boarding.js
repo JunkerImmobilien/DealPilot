@@ -819,7 +819,7 @@
            Der alte Zweig entschied an `_lastBmfResults`, also an einem
            Zustand, den niemand sieht. */
         if (window.DealPilotBmfWahl && typeof window.DealPilotBmfWahl.zeige === 'function') return window.DealPilotBmfWahl.zeige();
-        if (window._lastBmfResults && typeof window.exportBmfPdf === 'function') return window.exportBmfPdf();
+        if (window._lastBmfResults && typeof window.exportPDFKaufpreisaufteilung === 'function') return window.exportPDFKaufpreisaufteilung();   /* v3018d */
         if (typeof window.openBMFModal === 'function') { window.openBMFModal(); toast('Erst berechnen lassen, dann als PDF-Anlage exportieren.'); return; }
         toast('BMF-Rechner nicht geladen.');
         return;

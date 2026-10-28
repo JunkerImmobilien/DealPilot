@@ -336,6 +336,7 @@
   function exp(which) {
     try {
       if (which === 'invest' && typeof window.exportPDF === 'function') return window.exportPDF();
+      if (which === 'bmf' && typeof window.exportPDFKaufpreisaufteilung === 'function') return window.exportPDFKaufpreisaufteilung();   /* v3018d · der genaue Export */
       if (which === 'bmf' && typeof window.exportBmfPdf === 'function') return window.exportBmfPdf();
     } catch (e) { console.warn('[v449] export ' + which, e); }
   }

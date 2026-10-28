@@ -1223,7 +1223,10 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   })();
   if (a.berichts_abgleich) block('Abgleich mit dem Marktbericht', clean(a.berichts_abgleich) + '\n\nSach- und Ertragswert im Bericht sind ein Plausibilitäts-Quercheck nach ImmoWertV-Logik — indikativ, kein Gutachten nach § 194 BauGB.');
   if (a.optischer_eindruck) block('Optischer Eindruck aus den Fotos', clean(a.optischer_eindruck) + '\n\nEin visueller Eindruck aus den mitgesendeten Bildern — keine Feststellung.');
-  if (a.potenzial_text) block('Ankauf · Bestand · Zielbild', clean(a.potenzial_text) + '\n\nDie Zahlen je Stand stehen auf der Seite Wertpotenzial.');
+  /* v3018d · ohne angelegtes Zielbild kein Baustein „… · Zielbild" (DpPotenzial hat_ziel) */
+  var _hatZiel = true;
+  try { if (window.DpPotenzial && typeof window.DpPotenzial.modell === 'function') _hatZiel = !!window.DpPotenzial.modell().hat_ziel; } catch (e) { _hatZiel = true; }
+  if (a.potenzial_text && _hatZiel) block('Ankauf · Bestand · Zielbild', clean(a.potenzial_text) + '\n\nDie Zahlen je Stand stehen auf der Seite Wertpotenzial.');
   (function () {
     var t = [];
     try {
@@ -1273,6 +1276,9 @@ async function exportPDF() {
 
   if (typeof window.jspdf === 'undefined') { toast('PDF-Bibliothek l\u00e4dt noch...'); return; }
   if (!State || !State.kpis || !State.kpis.kp) { toast('\u26a0 Bitte zuerst Kaufpreis eingeben'); return; }
+  /* v3018d · EIN Tor fuer alle Investment-Fassungen (pdf-pruefung.js) - gemessen entstand das PDF
+     mit leerer Miete: Bruttomietrendite 0,00 %, DSCR 0,00, kein Hinweis */
+  if (window.DpPdfPruefung && !window.DpPdfPruefung.tor('investment', 'Investment-PDF')) return;
 
   // V65.3: Globaler try/catch um den gesamten PDF-Build damit Crashes (z.B. bei
   // exotischen Finanzierungen wie Tilgungsaussetzungsdarlehen + D2) keinen
@@ -3533,9 +3539,9 @@ async function _exportPDFInner() {
          weiter statt neuer Seite. */
       var _pdZeichnen = function (anschluss) {
       _dpPdfStdMark('potenzial');   /* v3018 */
-      if (anschluss) { if (cy > 200) cy = newPage('Wert & Zielbild · Fortsetzung'); else cy += 4; }
+      if (anschluss) { if (cy > 200) cy = newPage((typeof _wzTitel === 'string' ? _wzTitel : 'Wert & Zielbild') + ' · Fortsetzung'); else cy += 4; }
       else cy = newPage('Wertpotenzial');
-      cy = secH(doc, cy, 'Wertpotenzial · Mieterhöhung und Zielbild', M, CW);
+      cy = secH(doc, cy, 'Wertpotenzial · Mieterhöhung' + (_PD.hat_ziel === false ? '' : ' und Zielbild'), M, CW);   /* v3018d */
       _absatz(_PD.satz_invest + ' ' + _PD.satz_bank, { groesse: 8.6, farbe: C.CH, zeile: 4.4, dy: 3 });
       cy += 4;
       var _tab = function (kopf, breiten, zeilen, fettRe) {
@@ -3583,7 +3589,10 @@ async function _exportPDFInner() {
         cy += 5;
       };
       if (_PD.art === 'mfh' && _PD.wohnungen.length) {
-        _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], [30, 11, 18, 30, 18, 48],
+        /* v3018d · ohne Zielbild keine Spalten Ziel und Maßnahmen (sie trugen nur Striche) */
+        if (_PD.hat_ziel === false) _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung'], [62, 16, 34, 43],
+          _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll]; }));
+        else _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], [30, 11, 18, 30, 18, 48],
           _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll, w.ziel, w.massnahmen]; }));
       }
       /* v2543 · WERTÜBERLEITUNG statt Wertbrücke (Marcel 20.10.2026: Variante B, Farben der
@@ -3648,11 +3657,14 @@ async function _exportPDFInner() {
   try {
     var _WZ = window.DpPdfWertZielbild ? await window.DpPdfWertZielbild.daten({ potenzial: (typeof _PD !== 'undefined' ? _PD : null) }) : null;
     var _pdOk = typeof _pdZeichnen === 'function';
+    /* v3018d · ohne angelegtes Zielbild heisst die Seite nicht „Wert & Zielbild" */
+    var _wzZiel = !(_WZ && _WZ.ohneZiel);
+    var _wzTitel = _wzZiel ? 'Wert & Zielbild' : (typeof _PD !== 'undefined' && _PD ? 'Wert & Potenzial' : 'Wert je Verfahren');
     if (_WZ) {
-      cy = newPage('Wert & Zielbild');
+      cy = newPage(_wzTitel);
       _dpPdfStdMark('wert');   /* v3018 · Werte je Verfahren gegen den Kaufpreis */
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
-      cy = window.DpPdfBlocksatz.absatz(doc, 'Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterh\u00f6hung und Zielbild entwickelt.', { x: M, y: cy + 3, breite: CW, zeile: 4.4 }) + 2;
+      cy = window.DpPdfBlocksatz.absatz(doc, 'Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - ' + (_wzZiel ? 'und wohin sich der Ertragswert mit Mieterh\u00f6hung und Zielbild entwickelt.' : (typeof _PD !== 'undefined' && _PD ? 'und wohin sich der Ertragswert mit der Mieterh\u00f6hung entwickelt.' : 'auf Basis der Miete im Bestand.')), { x: M, y: cy + 3, breite: CW, zeile: 4.4 }) + 2;
       /* v2900 · EIN Abschnitt: Werte je Verfahren und Wertlandschaft, dann das
          Wertpotenzial (Wohnungen, Wertueberleitung, Kennzahlen je Stufe), dann
          Ausblick, Kernaussagen und Erklaerung. Die Tafel Ist/Soll/Zielbild entfaellt
@@ -3662,7 +3674,7 @@ async function _exportPDFInner() {
          nicht noch einmal, sie steht in der Fussnote des Wertpotenzials. */
       var _wzO = function (teile) { return {
         x: M, y: cy, breite: CW, unten: 278, stil: 'invest', teile: teile,
-        neueSeite: function () { cy = newPage('Wert & Zielbild \u00b7 Fortsetzung'); return cy; },
+        neueSeite: function () { cy = newPage(_wzTitel + ' \u00b7 Fortsetzung'); return cy; },
         ueberschrift: function (t, yy) { return secH(doc, yy, t, M, CW); },
         f: { gold: C.GOLD, goldD: C.GOLD_D, goldL: C.GOLD_L, tinte: C.CH, text: [50, 45, 45], grau: C.MID, linie: C.BORDER,
           kopfGrund: C.CH, kopfText: C.GOLD, streifen: C.SURF }

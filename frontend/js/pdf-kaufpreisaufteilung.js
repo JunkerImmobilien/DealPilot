@@ -131,12 +131,13 @@
   }
 
   window.exportPDFKaufpreisaufteilung = function () {
-    if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen.'); return; }
+    /* v3018d · kein alert mehr (gemessen: es hielt den Tab an) - das Tor zeigt, was fehlt,
+       mit Sprung zum Feld bzw. ins Fenster; ungueltige Ergebnisse (Anteil ausserhalb 0-100 %,
+       Gebaeude + Boden ungleich Anschaffungskosten) erzeugen kein PDF. */
+    if (typeof window.jspdf === 'undefined') { if (typeof window.toast === 'function') window.toast('PDF-Bibliothek lädt noch …'); return; }
+    if (window.DpPdfPruefung && !window.DpPdfPruefung.tor('kaufpreisaufteilung', 'Kaufpreisaufteilung')) return;
     var R = window._lastBmfResults;
-    if (!R) {
-      alert('Zuerst im Fenster Kaufpreisaufteilung die amtliche Berechnung starten — dieses PDF gibt nur wieder, was dort gerechnet wurde.');
-      return;
-    }
+    if (!R) { if (typeof window.toast === 'function') window.toast('Zuerst im Fenster Kaufpreisaufteilung berechnen.'); return; }
     var I = window._lastBmfInputs || {};
 
     var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
