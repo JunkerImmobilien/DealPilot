@@ -10,6 +10,8 @@
        da ist — sonst die kurze Aufruftafel „Jetzt kostenlos testen“ mit
        dealpilot.immo-QR (6 s). Nie zwei QR-Tafeln hintereinander.
      · nach dem 10. und 20. Video zusätzlich die Register-Tafel (14 s).
+     · messe-schleife-7: nach jedem n-ten Video ein Werbebild (werbung.js,
+       Menü „Werbung“); dann entfällt die kurze Aufruftafel.
 
    Woher die Videos kommen: landing/medien/videothek/<datei> — online die
    Videothek der App, offline (file://) derselbe Pfad im Ordner zum Mitnehmen.
@@ -214,8 +216,11 @@
         if ((i + 1) % regNach === 0 && i + 1 < V.length && T && T.register.da()) { regDa = true; await tafel('register', T.register.html(null), T.register.sekunden); }
         if (!regDa && T && T.app && T.app.da() && (i + 1) % T.app.nach() === 0 && i + 1 < V.length) { var sa = T.app.sekunden(); await tafel('app', T.app.html(null, sa / TRATE), sa);
           if (T.amtlich && T.amtlich.da()) await tafel('amtlich', T.amtlich.html(null, sa / TRATE), sa); }   /* v2941 */
+        /* messe-schleife-7 · Werbebild nach jedem n-ten Video (werbung.js); ersetzt dann die kurze Aufruftafel */
+        var wbDa = false;
+        if (T && T.werbung && T.werbung.da() && (i + 1) % T.werbung.nach() === 0 && i + 1 < V.length) { var wh = T.werbung.html(); if (wh) { wbDa = true; await tafel('werbung', wh, T.werbung.sekunden()); } }
         if (T && T.gewinnspiel.aktiv()) { var s = T.gewinnspiel.sekunden(); await tafel('gewinnspiel', T.gewinnspiel.html(n === 0 ? null : weiterZeile(n), s / TRATE), s); }
-        else if (n !== 0 && !(T && T.aufruf && !T.aufruf.an())) await tafel('aufruf', aufrufHtml(n), 6);
+        else if (n !== 0 && !wbDa && !(T && T.aufruf && !T.aufruf.an())) await tafel('aufruf', aufrufHtml(n), 6);
       }
       if (n === 0) {
         runde++; log('runde', runde);

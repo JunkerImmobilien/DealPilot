@@ -8,7 +8,8 @@
 <!--
   messe-schleife-1 · Dauerschleife für den Messebildschirm (21.10.2026).
   Aufruf: ohne Parameter der Rundgang (messe-schleife-4: echte Videothek-Aufnahmen, rundgang.js),
-  ?idee=videothek alle Videos der Videothek (messe-schleife-5), ?idee=auswahl die Auswahl, ?idee=1 … 6, ?idee=alle.
+  ?idee=videothek alle Videos der Videothek (messe-schleife-5),
+  ?idee=werbung alle Werbebilder in Dauerschleife (messe-schleife-7, Taste W), ?idee=auswahl die Auswahl, ?idee=1 … 6, ?idee=alle.
   Rundgang-Videos: online landing/medien/videothek/ (volle Videos, Zeitmarken), offline
   messe-schleife/clips/rundgang/rg-*.mp4 (geschnittene Ausschnitte, nicht im Git).
   messe-schleife-2: ohne Netz lauffähig, auch direkt von der Platte (file://):
@@ -19,7 +20,7 @@
 -->
 <script>/* Fehlerprotokoll fuer den Pruefer: window.DPS_FEHLER (Skript-, Versprechen- und Ladefehler) */
 window.DPS_FEHLER=[];addEventListener('error',function(e){DPS_FEHLER.push(e.message||('Ladefehler '+((e.target&&(e.target.currentSrc||e.target.src))||'?')))},true);addEventListener('unhandledrejection',function(e){DPS_FEHLER.push('Promise: '+(e.reason&&e.reason.message||e.reason))});</script>
-<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-6d">
+<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-7">
 </head>
 <body>
 <div id="buehne"></div>
@@ -30,13 +31,15 @@ window.DPS_FEHLER=[];addEventListener('error',function(e){DPS_FEHLER.push(e.mess
      (erzeugt von tools/messe-schleife-daten.mjs), gemeinsame Tafeln, Kanal Videothek (?idee=videothek, Taste V) -->
 <script src="messe-schleife/gewinnspiel.js?v=messe-schleife-5"></script>
 <!-- messe-schleife-6 (v2937): Menue am Stand (Taste E) und Tafel „DealPilot in Zahlen" (app-zahlen.js aus tools/messe-app-zahlen.mjs) -->
-<script src="messe-schleife/einstellungen.js?v=messe-schleife-6"></script>
+<script src="messe-schleife/einstellungen.js?v=messe-schleife-7"></script>
 <script src="messe-schleife/register-stand.js?v=messe-schleife-5h"></script>
 <script src="messe-schleife/app-zahlen.js?v=messe-schleife-6b"></script>
 <script src="messe-schleife/videothek-liste.js?v=messe-schleife-5"></script>
-<script src="messe-schleife/tafeln.js?v=messe-schleife-6c"></script>
-<script src="messe-schleife/rundgang.js?v=messe-schleife-6b"></script>
-<script src="messe-schleife/videothek-kanal.js?v=messe-schleife-6b"></script>
-<script src="messe-schleife/schleife.js?v=messe-schleife-6"></script>
+<script src="messe-schleife/tafeln.js?v=messe-schleife-7"></script>
+<!-- messe-schleife-7: Werbebilder (werbung/*.webp) - Tafel zwischendurch und Kanal ?idee=werbung (Taste W); NACH tafeln.js -->
+<script src="messe-schleife/werbung.js?v=messe-schleife-7"></script>
+<script src="messe-schleife/rundgang.js?v=messe-schleife-7"></script>
+<script src="messe-schleife/videothek-kanal.js?v=messe-schleife-7"></script>
+<script src="messe-schleife/schleife.js?v=messe-schleife-7"></script>
 </body>
 </html>
