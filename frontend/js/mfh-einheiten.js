@@ -1229,11 +1229,14 @@
       if (!w) return;
       var nr = String(w.nr || '').trim(), lage = String(w.lage || '').trim();
       var e = _arbeit.filter(function (x) { return (nr && String(x.nr || '') === nr) || (lage && String(x.lage || '').toLowerCase() === lage.toLowerCase()); })[0];
+      var neu = !e;
       if (!e) { e = { nr: nr || String(_arbeit.length + 1), art: standardArt(), status: 'vermietet' }; _arbeit.push(e); }
       Object.keys(w).forEach(function (k) {
         var v = w[k];
         if (v == null || v === '' || k === 'nr') return;
-        if (String(e[k] == null ? '' : e[k]).trim() !== '' && k !== 'status') return;   /* eigene Angabe bleibt */
+        /* v3016h · eine NEUE Zeile übernimmt alles Gelesene - gemessen: das Ladenlokal blieb „Wohnen“,
+           weil die Vorgabe-Art schon gesetzt war. Bei einer bestehenden Zeile bleibt die eigene Angabe. */
+        if (!neu && String(e[k] == null ? '' : e[k]).trim() !== '' && k !== 'status') return;
         e[k] = String(v);
       });
       n++;
