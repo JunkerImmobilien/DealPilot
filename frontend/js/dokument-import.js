@@ -158,7 +158,7 @@
     Object.keys(ext || {}).forEach(function (k) {
       var v = ext[k];
       if (v && typeof v === 'object' && !Array.isArray(v)) Object.keys(v).forEach(function (k2) { if (o[k2] === undefined) o[k2] = v[k2]; });
-      else o[k] = v;
+      else if (!((v === null || v === undefined || v === '') && o[k] != null && o[k] !== '')) o[k] = v;   /* v3016: leer überschreibt nie die Flurstücksliste */
     });
     return o;
   }
@@ -170,7 +170,7 @@
   function _schreibwert(v, art) {
     if (art === 'datum') return _datumIso(v);
     if (art === 'text') return String(v).trim();
-    if (art === 'auswahl') return String(v).trim();
+    if (art === 'auswahl') return String(v).trim().toUpperCase().replace(/\s/g, '');   /* Energieklasse: „b" → „B" wie im Auswahlfeld */
     var n = _zahl(v); if (n === null) return null;
     if (art === 'jahr') return String(Math.round(n));
     return (n % 1 === 0) ? String(n) : String(n).replace('.', ',');
