@@ -43139,3 +43139,43 @@ PDF und App gefüllt. Bilder: `Downloads/v3018c-bilder/` (vorher-/nachher-*.png)
 **Rest.** Nicht geprüft: Marktbericht-PDF (eigenes Dokument), RND-Gutachten, Exposé/Pass, Track-Record,
 Kaufpreisaufteilung (verlangt vorher die Berechnung im Fenster). Investor sieht seinen Absender jetzt
 im PDF, im Deal-Aktion-Banner/Anfrage-Karten erst ab Pro – Produktentscheidung bestätigen. Nicht auf Prod.
+
+## Rollout-Journal 28.10.2026 — v3022/v3022a/v3022b: Entwurf „Einstellungen schlank" (Schalter, Vorgabe aus)
+
+**Was.** Marcel: „brauchen wir unter Einstellungen die ganzen Parameter und Co-Pilot (KI)? … Kunden nicht
+verwirren". Entwurf hinter Schalter `?einstellungen=schlank` (nur dieser Browser-Tab, sessionStorage),
+`&merken` dauerhaft (`dp_einst_schlank=1`), `?einstellungen=voll` aus. Neues Modul
+`frontend/js/einstellungen-schlank.js` baut das fertige Fenster um (wrappt `showSettings`/`_swSet`),
+löscht nichts: Standardwerte → **Mein Profil** direkt nach Account, dazu „Deine Haltung" (Strategie +
+Risikoneigung, aus Co-Pilot herübergehoben, sofort gespeichert) und eine Deal-Score-Zeile (welche
+Gewichtung gilt, „Auf Standard zurücksetzen"); Co-Pilot nur Länge + Ton, Rest unter „Für Profis";
+Reiter Deal Score aus (eigene Gewichtung wirkt weiter); Datenraum nur genutzt/ab Investor, Mandanten
+nur >1 Halter/ab Pro. `ui.js`: im Entwurf keine Marktlage im Prompt, Verkäuferdruck nur je Objekt
+(neues Feld `ai_verk` im Reiter Pilot-Analyse — der Name steht seit Langem in `storage.js` FIELDS,
+speichert also je Objekt ohne Eingriff in storage.js).
+
+**Nebenbei behoben (wirkt auch ohne Schalter):** `settings.js` opts() — das Einrichtungsfenster schreibt
+`ai_risk = "Konservativ (sicherheitsorientiert)"` / `"Chancenorientiert (höheres Risiko)"`, beide fehlten in
+der Auswahl; jedes Speichern der Einstellungen schrieb still „Konservativ (Sicherheit ist wichtigst)"
+zurück (ein Chancenorientierter wurde konservativ). Falsche Aussage „pro Objekt im KI-Tab
+überschreibbar" in settings.js und help.js korrigiert — gemessen gibt es kein solches Feld, ui.js liest nur das Profil.
+
+**Commit.** 750e86fc (v3022), ac29b526 (v3022a: `.st-tab` trägt `display:flex !important` aus style.css —
+`style.display='none'` wirkte nicht, gemessen per getComputedStyle), 23bd8e92 (v3022b: Score-Zeile zieht
+nach Klick aufs Anlegerprofil nach, Hinweis „Feiner justieren: Reiter Deal Score" zeigt im Entwurf auf
+„Deine Haltung").
+
+**Nachweis (Staging, Demo-Konto, eigener Tab, nichts gespeichert).** Mit Schalter: sichtbare Reiter
+Account · Mein Profil · Kontakt & Logo · Co-Pilot · Darstellung · Datenraum · Mandanten · Plan ·
+Partner-Portal · Rechtliches · Hilfe (Deal Score weg; Datenraum/Mandanten bleiben, Plan partner);
+Co-Pilot-Pane 1.646 → 186 px; `#set_ai_verk`/`#set_ai_markt` ohne id; `#ai_verk` am Objekt da, leer.
+Ohne Schalter: Deal Score `flex`, Pane 1.646 px, kein `#ai_verk`. Demo-Profil unverändert (nur zvE-Schlüssel),
+Preset weiter `lage`. buster-ebenen RC=0. Screenshots vorher/nachher Desktop + 390 px im Scratchpad des Agents.
+
+**Rest.** Entwurf, nicht Standard — Marcels Abnahme offen. Gemessen am Demo-Konto: Deal-Score-Vorlage
+`lage` (Lage-Fokus) aktiv, also rechnen die Messe-Scores NICHT mit der Standardgewichtung. Einrichtung
+(onboarding.js) deckt ab: Tilgung, EK, LTV, DSCR, Mietausfall, Angebotsabschlag, Grenzsteuersatz/zvE/
+Splitting/Kirche, Bundesland, Zielrendite je Lageklasse, Investortyp (→ ai_risk + Score-Vorlage); fehlt:
+Strategie (ai_strat), Mindest-Cashflow, Notar/Grundbuch/Makler/Sonstige, GrESt automatisch,
+Bewirtschaftung je Objektart. Pilot-Analyse mit `ai_verk` je Objekt nicht live ausgelöst (Kontingent) —
+Staging-Abnahmepunkt. Nicht auf Prod.
