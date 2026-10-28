@@ -199,11 +199,17 @@
     var w = b.w, f = b.faktor, rd = function (x) { var n = _zahl(x); return n == null ? null : Math.round(n * f); };
     var ul = rd(w.umlagefaehig_jahr_eur), nul = rd(w.nicht_umlagefaehig_jahr_eur), rl = rd(w.ruecklage_zufuehrung_jahr_eur);
     var werte = [['hg_ul', 'Hausgeld umlagefähig', ul], ['hg_nul', 'Hausgeld nicht umlagefähig (inkl. Rücklage)', nul == null && rl == null ? null : (nul || 0) + (rl || 0)], ['weg_r', 'WEG-Rücklage (Zuführung)', rl]];
-    var zeilen = [];
+    var zeilen = [], verw = rd(w.verwaltung_jahr_eur);
+    /* Aufschlüsselung, damit ein großer Abstand zum bisherigen Wert lesbar ist (gemessen Lindenallee:
+       im Objekt stand nur die Verwaltervergütung) */
+    var teileNul = [];
+    if (verw) teileNul.push('Verwaltung ' + _fmt(verw) + ' €');
+    if (nul != null) teileNul.push((verw ? 'übrige nicht umlagefähige Kosten ' + _fmt(Math.max(0, nul - verw)) : 'nicht umlagefähige Kosten ' + _fmt(nul)) + ' €');
+    if (rl) teileNul.push('Zuführung Rücklage ' + _fmt(rl) + ' €');
     werte.forEach(function (z) {
       if (z[2] == null || !document.getElementById(z[0])) return;
       var ist = _feldWert(z[0]), neu = String(z[2]);
-      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: _fmt(z[2]) + ' € / Jahr' + (ext.jahr ? ' (' + (ext.art || 'Wirtschaftsplan') + ' ' + ext.jahr + ')' : ''), ist: ist, einheit: '€ / Jahr', ort: 'Bewirtschaftung', status: ist === '' ? 'neu' : (_gleich(ist, neu, 'eur') ? 'gleich' : 'abweichung'), herleitung: (ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '') + ' · ' + b.wie });
+      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: _fmt(z[2]) + ' € / Jahr' + (ext.jahr ? ' (' + (ext.art || 'Wirtschaftsplan') + ' ' + ext.jahr + ')' : ''), ist: ist, einheit: '€ / Jahr', ort: 'Bewirtschaftung', status: ist === '' ? 'neu' : (_gleich(ist, neu, 'eur') ? 'gleich' : 'abweichung'), herleitung: (ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '') + ' · ' + b.wie + (z[0] === 'hg_nul' && teileNul.length > 1 ? ' · darin: ' + teileNul.join(' + ') : '') });
     });
     return zeilen;
   }
