@@ -6348,7 +6348,9 @@
        Das stumme Video steht nach der Lesezeit: Band (4 s + 1 s je 15 Zeichen) oder Tafel (3 s + 1 s je 20 Zeichen,
        sie steht neben dem Band und wird mitgelesen). ?sprechtempo (später, mit Sprecher) nimmt die Sprechdauer dazu. */
     var l = lies(titel, text), tf = tafel ? Math.round((3000 + 1000 * kmTafelText(tafel).length / 20) / TEMPO) : 0;
-    var sp = sprich && kmParam('sprechtempo') != null ? Math.round((1500 + 1000 * String(sprich).length / 13) / TEMPO) : 0;
+    /* v3016x · ?sprechtempo=15 nimmt 15 Zeichen/s (gemessen: Marcels Stimmklon spricht rund 16-17), ohne Zahl wie bisher 13 */
+    var spr = Number(kmParam('sprechtempo')), cps = spr >= 8 && spr <= 25 ? spr : 13;
+    var sp = sprich && kmParam('sprechtempo') != null ? Math.round((1500 + 1000 * String(sprich).length / cps) / TEMPO) : 0;
     return Math.round(Math.max(l, tf, sp) * kmF());
   }
   function kmMerke(sprich, tafel) { try { var z = window.DPM_ZEILEN; if (z && z.length) { z[z.length - 1].sprich = sprich || null; if (tafel) z[z.length - 1].tafel = tafel; } } catch (e) {} }
@@ -7223,7 +7225,17 @@
       return [].filter.call(p.querySelectorAll('tr'), function (tr) { var c = tr.cells && tr.cells.length > 1 ? tr.cells[1] : tr; return tr.offsetWidth && re.test(r6Text(c)); })[0] || null;
     };
   }
-  function luWert(tr) { if (!tr) return ''; var v = tr.querySelector('.oabi-vnum') || tr.cells[2] || tr; return r6Text(v); }
+  function luWert(tr) { if (!tr) return ''; var v = tr.querySelector('.oabi-vnum') || tr.cells[2] || tr; return r6Text(v).replace(/\s*öffnet nach dem.*$/, ''); }
+  /* Text eines Elements für Zeile und Sprecher: Tabellenzeile = Zellen mit Punkt getrennt (ohne die Jahresspalte), Risiko = Titel, Betrag, Satz */
+  function luTxt(e) {
+    if (!e) return '';
+    if (e.tagName === 'TR') return [].map.call(e.cells, r6Text).filter(function (x) { return x && !/^\d\.?\d{3}$/.test(x); }).join(' · ');
+    if (e.classList && e.classList.contains('dpu-risiko')) { var b = e.querySelector('b'), p = e.querySelector('p'), eu = /[\d.]+\s*€/.exec(r6Text(e)); return r6Text(b) + (eu ? ' · ' + eu[0] : '') + (p ? ' — ' + r6Text(p) : ''); }
+    return String(e.innerText || e.textContent || '').replace(/\s*\n+\s*/g, ' · ').replace(/\s+/g, ' ').trim();
+  }
+  function luQuelle(tr) { return tr && tr.cells && tr.cells.length > 3 ? r6Text(tr.cells[tr.cells.length - 1]) : ''; }
+  /* im Import-Fenster scrollt .oabi-body - gemessen fand zeige() die Zeile darin nicht (Kegel blieb an der Reiterleiste) */
+  async function luZeige(fn, pad) { var e = fn(); if (e && e.scrollIntoView) { try { e.scrollIntoView({ block: 'center' }); } catch (x) {} await warte(250); } await zeige(fn, pad == null ? 8 : pad); }
   function luKurz(t, n) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
   async function luKapitel(s, nr, titel, unter, sprich) {
     zeige(null); kegelHoch(false); kmTafel(null);
@@ -7369,16 +7381,17 @@
         var ueb = luReiter(/^Übernahme/)(); if (ueb) ueb.click(); await warte(600);
         var fl = luZeile(/^Flur/)() ? luZeile(/^Flur/) : luZeile(/Flurstück|Gemarkung/);
         if (fl()) {
-          await zeige(fl, 8);
-          await kmSag(s, 'Aus dem Grundbuch', luKurz(r6Text(fl().cells[1]), 40) + ': <b>' + luKurz(luWert(fl()), 60) + '</b> — direkt aus dem Grundbuchauszug.',
-            'In der Übernahme stehen die gelesenen Werte, jeder mit seiner Quelle. Aus dem Grundbuchauszug zum Beispiel ' + luKurz(r6Text(fl().cells[1]), 40) + ': ' + luKurz(luWert(fl()), 60) + '.', 2000,
+          await luZeige(fl, 8);
+          var flQ = luQuelle(fl()), flN = luKurz(r6Text(fl().cells[1]), 40), fst = luZeile(/^Flurstück/)();
+          await kmSag(s, 'Jeder Wert mit Quelle', flN + ' <b>' + luKurz(luWert(fl()), 40) + '</b>' + (fst ? ', Flurstück <b>' + luKurz(luWert(fst), 30) + '</b>' : '') + (flQ ? ' — Quelle: ' + flQ : '') + '.',
+            'In der Übernahme stehen die gelesenen Werte, jeder mit seiner Quelle. Zum Beispiel ' + flN + ' ' + luKurz(luWert(fl()), 40) + (fst ? ', Flurstück ' + luKurz(luWert(fst), 30) : '') + (flQ ? ' — gelesen aus dem ' + flQ : '') + '.', 2000,
             { was: 'Nichts — gelesen, nicht getippt.', warum: 'Flur und Flurstück braucht jede Anfrage beim Amt.', folge: 'Sie stehen nach der Übernahme im Objekt.' });
         }
         var gs = luZeile(/Grundstücksfläche/), en = luZeile(/Energie/);
         if (gs() || en()) {
-          await zeige(gs() || en(), 8);
-          await kmSag(s, 'Grundstück und Energie', [gs() ? 'Grundstück <b>' + luKurz(luWert(gs()), 30) + '</b>' : '', en() ? 'Energie <b>' + luKurz(luWert(en()), 30) + '</b>' : ''].filter(Boolean).join(', ') + '.',
-            [gs() ? 'Die Grundstücksfläche: ' + luKurz(luWert(gs()), 30) + '.' : '', en() ? 'Aus dem Energieausweis: ' + luKurz(luWert(en()), 30) + '.' : ''].filter(Boolean).join(' ') + ' Auch diese Werte kommen nur aus den Unterlagen.', 1500,
+          await luZeige(function () { return gs() || en(); }, 8);
+          await kmSag(s, 'Grundstück und Energie', [gs() ? 'Grundstück <b>' + luKurz(luWert(gs()), 30) + (/^[0-9.,]+$/.test(luWert(gs())) ? ' m²' : '') + '</b>' : '', en() ? 'Energie <b>' + luKurz(luWert(en()), 30) + '</b>' : ''].filter(Boolean).join(', ') + '.',
+            [gs() ? 'Die Grundstücksfläche: ' + luKurz(luWert(gs()), 30) + (/^[0-9.,]+$/.test(luWert(gs())) ? ' Quadratmeter' : '') + '.' : '', en() ? 'Die Energieklasse: ' + luKurz(luWert(en()), 30) + '.' : ''].filter(Boolean).join(' ') + ' Auch diese Werte kommen nur aus den Unterlagen.', 1500,
             { was: 'Nichts.', warum: 'Jeder Wert mit Quelle.', folge: 'Was du nicht willst, wählst du einfach ab.' });
         }
         /* je Dokument: das Protokoll 2025 */
@@ -7386,6 +7399,7 @@
         if (p25()) {
           await zeige(p25, 8); await kmPause(1200);
           p25().click(); await warte(700);
+          var lp = luPanel(); if (lp && lp.scrollIntoView) { try { lp.scrollIntoView({ block: 'start' }); } catch (x) {} }
           await zeige(function () { return luPanel(); }, 8);
           var nRp = (function () { var b = p25(); var n = b && b.querySelector('.dpu-n'); return n ? r6Text(n) : ''; })();
           await kmSag(s, 'Das Protokoll 2025', 'Der Reiter zeigt alles, was im Protokoll steht' + (nRp ? ' — und <b>' + nRp + ' Risiken</b> allein aus diesem Dokument' : '') + '.',
@@ -7393,8 +7407,8 @@
             { was: 'Nichts.', warum: 'Hier stehen die Beschlüsse der Gemeinschaft.', folge: 'Jeder Beschluss mit Kosten wird ein Risiko.' });
           var dach = function () { var p = luPanel(); return p && [].filter.call(p.querySelectorAll('tr, li, .dpu-risiko, dd, p'), function (x) { return x.offsetWidth && /Flachdach|Dach/i.test(r6Text(x)) && r6Text(x).length < 400; })[0] || null; };
           if (dach()) {
-            await zeige(dach, 8);
-            var dt = luKurz(r6Text(dach()), 150);
+            await luZeige(dach, 8);
+            var dt = luKurz(luTxt(dach()), 150);
             await kmSag(s, 'Was das Exposé nicht sagt', '<b>' + dt + '</b>',
               'Und hier steht, was im Exposé fehlt: ' + dt + '. Im Exposé heißt es nur: Flachdach mit Abdichtung aus der Bauzeit.', 2500,
               { was: 'Nichts.', warum: 'Das Exposé verkauft — die Protokolle erzählen.', folge: 'Diese Kosten trägt der Käufer mit.' });
@@ -7408,24 +7422,24 @@
           var risiken = [].slice.call(document.querySelectorAll('#oabi-ov [data-panel="ausw"] .dpu-risiko'));
           var hoch = risiken.filter(function (r) { return /hoch/i.test(r.className + ' ' + r6Text(r.querySelector('.dpu-schwere, b, strong'))); }).length;
           DPM_LU.ergebnis = { risiken: risiken.length, these: r6Text(q('#oabi-ov [data-panel="ausw"] .dpu-these')) };
-          await zeige(function () { var t = q('#oabi-ov [data-panel="ausw"] .dpu-these'); return t; }, 8);
+          await luZeige(function () { return q('#oabi-ov [data-panel="ausw"] .dpu-these'); }, 8);
           await kmSag(s, 'Die Investitionsthese', '<b>' + luKurz(DPM_LU.ergebnis.these, 170) + '</b>',
             'Die Auswertung aller Unterlagen beginnt mit einer Investitionsthese, geschrieben aus dem, was in den Unterlagen steht: ' + luKurz(DPM_LU.ergebnis.these, 260), 2500,
             { was: 'Nichts — DealPilot schreibt sie.', warum: 'Eine These zwingt zur Frage: warum dieses Haus?', folge: 'Sie geht gleich ins Feld Investitionsthese.' });
           var r1 = function () { return document.querySelectorAll('#oabi-ov [data-panel="ausw"] .dpu-risiko')[0] || null; };
           if (r1()) {
-            await zeige(r1, 8);
+            await luZeige(r1, 8);
             await kmSag(s, 'Die Risiken', '<b>' + risiken.length + ' Risiken</b>, nach Schwere geordnet — jedes mit Betrag, wo es einen gibt, und mit Quelle.',
               'Darunter die Risiken, nach Schwere geordnet: ' + risiken.length + ' sind es. Jedes mit Betrag, wo die Unterlagen einen nennen, und mit der Quelle — welches Dokument, welche Stelle.', 2500,
               { was: 'Nichts.', warum: 'Ein Risiko ohne Quelle ist ein Gerücht.', folge: 'Die Risiken gehen ins Feld „Bekannte Risiken“.' });
             await zeige(r1, 8);
-            await kmSag(s, 'Das größte Risiko', '<b>' + luKurz(r6Text(r1()), 170) + '</b>',
-              'Ganz oben: ' + luKurz(r6Text(r1()), 240), 2000,
+            await kmSag(s, 'Das größte Risiko', '<b>' + luKurz(luTxt(r1()), 170) + '</b>',
+              'Ganz oben: ' + luKurz(luTxt(r1()), 240), 2000,
               { was: 'Nichts.', warum: 'Das Wichtigste zuerst.', folge: 'Im Kaufpreis gehört es eingepreist.' });
           }
           var weg = function () { var p = q('#oabi-ov [data-panel="ausw"]'); var h = p && [].filter.call(p.querySelectorAll('.dpu-h'), function (x) { return /WEG/.test(r6Text(x)); })[0]; return h ? (h.nextElementSibling || h) : null; };
           if (weg()) {
-            await zeige(weg, 8);
+            await luZeige(weg, 8);
             await kmSag(s, 'Die Eigentümergemeinschaft', 'Der WEG-Teil: <b>Rücklage, Hausgeld, Sonderumlagen</b> und jede Maßnahme mit Status und Kosten.',
               'Und der Teil zur Eigentümergemeinschaft: Rücklage, Hausgeld, Sonderumlagen und jede Maßnahme mit ihrem Status — beschlossen, geplant oder vertagt — und mit den Kosten.', 2500,
               { was: 'Nichts.', warum: 'Wer eine WEG kauft, kauft ihre Beschlüsse mit.', folge: 'Steht später auch in der Pilot-Analyse.' });
@@ -7435,13 +7449,13 @@
         var ueb2 = luReiter(/^Übernahme/)(); if (ueb2) ueb2.click(); await warte(700);
         var zr = luZeile(/Bekannte Risiken/), zt = luZeile(/Investitionsthese/), ze = luZeile(/Einheiten erfassen/);
         if (zr() || zt()) {
-          await zeige(zr() || zt(), 8);
+          await luZeige(function () { return zr() || zt(); }, 8);
           await kmSag(s, 'Bereit zur Übernahme', 'In der Übernahme stehen jetzt auch <b>„Bekannte Risiken“</b> und <b>„Investitionsthese“</b> — als Felder für das Objekt.',
             'In der Übernahme stehen jetzt auch die Zeilen Bekannte Risiken und Investitionsthese. Sie gehen direkt in die gleichnamigen Felder des Objekts.', 2000,
             { was: 'Nichts.', warum: 'Was ausgewertet ist, soll nicht abgetippt werden.', folge: 'Ein Klick übernimmt alles Ausgewählte.' });
         }
         if (ze()) {
-          await zeige(ze, 8);
+          await luZeige(ze, 8);
           await kmSag(s, 'Einheiten erfassen', '<b>' + luKurz(luWert(ze()), 60) + '</b> — aus der Mieterliste.',
             'Und die Wohnungen: ' + luKurz(luWert(ze()), 60).replace(/·/g, ',') + ', gelesen aus der Mieterliste. Nach dem Übernehmen öffnet sich die Erfassung der Einheiten.', 2000,
             { was: 'Nichts.', warum: 'Ein Haus ist die Summe seiner Wohnungen.', folge: 'Die Einheiten-Erfassung öffnet sich gleich.' });
