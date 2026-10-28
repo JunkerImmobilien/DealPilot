@@ -2459,6 +2459,22 @@ function _renderAIServerAnalysis(a) {
       + panel('anschluss', pAF, false) + panel('exit', pEX, false)
       + panel('risk', pS + '<div style="margin-top:16px"></div>' + pR, false);
   } else {
+    /* v3016r · Marcel 28.10.2026: „warum fehlt Ankauf · Bestand · Zielbild? Das möchte ich doch im
+       Ankauf auch einschätzen - dieser Reiter muss im Ankauf bleiben." Er erschien nur, wenn eine
+       Soll-Miete oder ein Zielbild erfasst war (DpPotenzial.modell().aktiv). Im Ankauf steht er jetzt
+       immer da; ohne Angaben sagt er, was hier eingeschätzt wird und wo es eingetragen wird. */
+    if (!_siTab) {
+      var _mfhJa = !!(window.DpMfhEinheiten && typeof window.DpMfhEinheiten.artMitEinheiten === 'function' && window.DpMfhEinheiten.artMitEinheiten());
+      _siTab = tab('si', 'Ankauf \u00b7 Bestand \u00b7 Zielbild', false);
+      _siPanel = panel('si', '<div class="dp-pa-card">' + sec('', I.bank, 'ANKAUF \u00b7 BESTAND \u00b7 ZIELBILD')
+        + '<p class="dp-pa-p">Hier schätzt du ein, was in dem Objekt steckt: <b>heute</b> mit der Ist-Miete, <b>nach Mieterhöhung</b> bis zur zulässigen Vergleichsmiete und im <b>Zielbild</b> nach Umbau oder Neuvermietung – jeweils mit Ertragswert, Restnutzungsdauer und dem Wertzuwachs nach Kosten.</p>'
+        + '<p class="dp-pa-p">Dafür fehlen noch die Soll-Miete und das Zielbild. '
+        + (_mfhJa ? 'Bei einem Haus mit Einheiten trägst du beides je Wohnung ein (Einheiten erfassen › Details: Soll-Miete, Zielbild und Maßnahmen).' : 'Trag sie im Reiter <b>Miete</b> unter Mietentwicklung ein.')
+        + '</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">'
+        + (_mfhJa ? '<button type="button" class="btn btn-outline btn-sm" onclick="try{DpMfhEinheiten.oeffnen(1)}catch(e){}">Einheiten erfassen öffnen</button>' : '')
+        + '<button type="button" class="btn btn-outline btn-sm" onclick="try{switchTab(2)}catch(e){}">Zum Reiter Miete</button></div>'
+        + '<p class="dp-pa-p" style="margin-top:10px;font-size:12.5px;color:#7A7370">Danach die Pilot-Analyse neu abrufen – dann steht hier die Tafel mit allen drei Stufen und dem Absatz des Piloten.</p></div>', false);
+    }
     _rail = tab('briefing', 'Briefing', true) +
       tab('sr', 'St\u00e4rken &amp; Risiken', false) +
       tab('risk', 'Risiko &amp; Szenarien', false) +
