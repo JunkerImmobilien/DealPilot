@@ -7,7 +7,7 @@
 <meta name="description" content="Dein Cockpit für Immobilien-Investments: Cashflow, DSCR, Steuer, Deal Score und bankfertige Unterlagen — in Minuten statt Stunden. 19 Module, 24 Kennzahlen, Server in Deutschland.">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
-<link rel="stylesheet" href="dp2-hero.css?v=landing-videos-1">
+<link rel="stylesheet" href="dp2-hero.css?v=landing-zahlen-1">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
@@ -62,7 +62,7 @@
     <li><a href="#workflow">So funktioniert's</a></li>
     <li><a href="#features">Funktionen<i class="kar"></i></a>
       <ul class="sub">
-        <li><a href="#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die <span data-modulzahl>19</span> Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
         <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
         <li><a href="#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
         <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
@@ -119,8 +119,11 @@
       <div class="hbeleg">
         <div><b><span data-zaehl>30</span> s</b><span>VOM EXPOSÉ ZUR BEWERTUNG</span></div>
         <div><b data-zaehl>24</b><span>KPIs HINTER JEDEM SCORE</span></div>
-        <div><b><span data-zaehl>19</span></b><span>MODULE AN BORD</span></div>
+        <div><b><span data-zaehl data-modulzahl>19</span></b><span>MODULE AN BORD</span></div>
         <div><b><i class="gr">&gt;</i><span data-zaehl data-nutzer>866</span></b><span>REGISTRIERTE NUTZER</span></div>
+        <!-- landing-zahlen-1 · Registerstand, zieht sich aus register-stand.js nach (tools/messe-schleife-daten.mjs) -->
+        <div><b><span data-zaehl data-reg="werte_gesamt">6085</span></b><span>AMTLICHE WERTE IM REGISTER</span></div>
+        <div><b><span data-zaehl data-reg="ausschuesse">201</span></b><span>GUTACHTERAUSSCHÜSSE</span></div>
       </div>
     </div>
 
@@ -243,7 +246,7 @@
   <img class="sec-bild schwach" src="assets/bild/bank.jpg" alt="" loading="lazy">
   <div class="wrap">
   <div class="head rv"><div class="eye">Funktionsumfang</div>
-    <h2>Neunzehn Module — <span class="ac">ein Datenbestand.</span></h2>
+    <h2><span data-modulwort>Neunzehn</span> Module — <span class="ac">ein Datenbestand.</span></h2>
     <p>Was du einmal erfasst, steht überall: im Score, in der Steuer, im PDF für die Bank.
       Kein Abtippen, kein zweiter Rechenweg. Jedes Modul ein eigener Boarding-Pass.</p></div>
   <!-- landing-module-2 · Marcel 28.10.2026: „die 19 Karten besser in Szene setzen, vlt auch animiert,
@@ -735,7 +738,7 @@
 <!-- dp2-ablauf.js abgeloest durch demo-wechsel.js (v1588) -->
 <script src="dp2-video.js?v=v1570"></script>
 <script src="demo-steuer-daten.js?v=v1600"></script>
-<script src="dp2.js?v=v1570"></script>
+<script src="dp2.js?v=landing-zahlen-1"></script>
 <script src="dp2-live.js?v=landing-videothek-5"></script><!-- landing-videothek-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
