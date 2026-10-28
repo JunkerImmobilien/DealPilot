@@ -43545,3 +43545,51 @@ und behoben: eine Staffel mit altem Text „sofort“.
 **Stand vor dem nächsten Prod-Rollout (Prod `fa0ff4e`):** committet, auf Staging teils noch nicht gezogen (Messe-Aufnahme komplett-mfh lief): v3021a, v3022c/d, v3023/a, v3024 (Staging live), v3025 (Backend live, Frontend nicht), v3026 (Migration 024 ausstehend), v3027, v3028 (neuer mb-Endpunkt `/zensus/fortgeschrieben`). Schritte: Aufnahme fertig → mb-DB sichern → pull → backend + mb-backend neu bauen → `POST /jahreswerte/abruf` (nkm, VPI ab 2008) → gold-audit → Browser-Abnahme (Zahlenformat, Indexmiete an Indexwohnung, Vertragsübersicht Miete, Co-Pilot Lindenallee, PDFs Umbruch) → Prüfer → `rollout-prod.ps1 -Freigabe`. **Bis dahin auf Prod kein Demo-Objekt öffnen/speichern** (Prod hat vorgaben-sync noch nicht; ein Browser mit alter Gewichtung würde Scores umschreiben).
 
 **Offen:** Destatis/GENESIS-Leser für weitere Reihen; § 559b Abs. 2 Satz 2 (6-Monats-Verschiebung) nicht abgebildet; Steuer-Overrides je Jahr für Bot/Co-Pilot unsichtbar; Prüfungen für Marktbericht-/RND-/Exposé-/Track-Record-PDF; ETW-Kaufpreisaufteilung druckt MEA nicht; Reiter Bewertung nennt Zielbild auch ohne Zielbild; Hinweis „Bauantrag" bei der degressiven AfA, § 7b-Bauantragszeitraum ungeprüft; Ludwigslust-Parchim verlangt Belegexemplar; Bild 05 der Werbung trägt Registerzahlen fest (nach Ernte neu rendern).
+
+### v3021k–v3021k6a · Webinar komplett-mfh: Kapitel 9 „Unterlagen einlesen“, Nachreichen zeichnet neu · 28.10.2026 — Staging `b8bd87fe`
+
+**Was.** Marcel: „sollten wir das Video, den Rundgang durch die App, mit den neuen Sachen ergänzen? Dem Import
+der ganzen Dokumente, Übernahme und all dem anderen.“ Das Webinar `komplett-mfh` hat jetzt **zehn Kapitel**:
+zwischen Zielbild (8) und Ergebnis (10) liegt Kapitel 9 in einem ZWEITEN neuen Objekt (Lindenallee 14):
+01–07 auf einmal einlesen (Arten erkannt, Schwärzung, „nur was dasteht“), 9 Reiter (Übernahme, je Dokument,
+Auswertung), Grundstück/Flur/Wohnfläche mit Einheit und Quelle, These + Risiken, Einheiten (8 WE);
+Pilot-Analyse › Unterlagen & WEG: Ampel, Kostenkarte (Sonderumlage nicht doppelt), Genau mit Maßnahmen und
+„Dein Anteil“, Baulasten „liegt nicht vor“; Verwaltervergütung 3.313 € als bisheriges Hausgeld eingetippt,
+dann 08 Wirtschaftsplan + 09 Baulastenauskunft nachgereicht: Hausgeld nicht umlagefähig 15.653 €/Jahr
+(Wirtschaftsplan 2026) mit Aufschlüsselung, „bisher im Objekt (Bewirtschaftung): 3.313 € / Jahr“ nicht
+vorgehakt, Steuer-Vorschläge 2026 (Hausverwaltung, nicht umlagefähige NK, Erhaltungsaufwand), „Zuletzt
+nachgereicht – das hat sich geändert“ (3 Punkte), Baulasten gefüllt; Bausteine im PDF (drei Gruppen, Urteil
+einmal, Haken „Optischer Eindruck“ ab, je Objekt gemerkt). Danach wird das Webinar-Objekt wieder geladen.
+KI: einmal echt (`?kumit`, 13 Abrufe), sonst gespielt aus `js/messe-komplett-unterlagen.js` (`kuAbruf`).
+Entwicklungs-Drehbuch `komplett-unterlagen` (nur Kapitel 9). Studio: zehn Kapitel, reicht `kumit` durch.
+**Produktfehler behoben:** nach „Unterlagen nachreichen“ zeigte der Reiter Unterlagen & WEG die ALTE
+Auswertung (3 Änderungen gespeichert, keine im Bild, Baulasten weiter „liegt nicht vor“) – `unterlagen.js`
+`merken()` zeichnet die Analyse neu (`_dpPaNeuZeichnen`) und lässt den Reiter offen.
+
+**Commits.** 5323b4cd (Kapitel 9, Studio), 27377a20, fb2de84e, 601891b9 (Entwicklungs-Drehbuch), 08a1a6c9
+(`unterlagen.js` neu zeichnen + Mitschnitt `js/messe-komplett-unterlagen.js`), e1257bba, b7e49f3f (Texte, Hausgeld
+vorher), 42c595b4 (Kapitel 9 als EINE Szene – das Band zählte Szenen, Kapitel 10 stand als „14“), b8bd87fe.
+**Eigener Fehler:** 42c595b4 nahm fremde, ungesicherte Änderungen eines parallelen Agenten aus `index.html` mit
+(calc.js/zahlenfelder.js v3023, me_soll, MEA-Zeile) – b8bd87fe nimmt sie im Repo zurück, die Arbeitskopie des
+anderen Agenten ist unverändert. Vor jedem Commit `git diff <pfad>` lesen, nicht nur `--stat` der eigenen Zeilen.
+
+**Nachweis.** Mitschnitt-Lauf (einziger KI-Lauf, `?kumit`): 13 Abrufe (extract-expose 1, extract-dokument 10,
+dokumente-auswerten 2, analyze 1). Prüflauf (Studio, `DPM_KM_SCHNELL` 0,35, 1.072 s) und Aufnahme
+(`?sprechtempo=16&sprechvor=500`, Drehbuch 2.571 s): je 132 Zeilen (131 mit Sprechtext), Kegel im Bild in jeder
+Zeile außer den zwei PDF-Seiten (gewollt), 13 KI-Antworten gespielt, 0 echt, 0 fehlend, 0 unscharf; gesperrt nur
+PUT portfolio-spiegel und POST bmf/pipeline; Schreibabrufe nur an die zwei angelegten Objekte, beide danach
+gelöscht; `fetch` wieder echt; Auftrag = Bericht 371 (`refAbweichung` leer). Kapitel 10 nach dem Objektwechsel:
+Deal Score 75, Investor 76, DSCR 2,37, CF vor Steuern 14.460 € (wie 28.10.); CF nach Steuern 9.272 statt 9.355 € –
+Tarif 2025 aus v3021 (eb3b5357), nicht der Wechsel. 2026-1123 unverändert (md5). Sicherung vorher:
+`/root/backups/demo-objekte-vor-km10-20261028-1727.json` (+ `demo-tax-…`).
+Video: `Dateien/Messe/Videos/Komplettbeispiel-MFH/komplett-mfh_2026-10-28b.mp4` (43:11, 96 MB, 1920×1022; Intro aus
+einer kurzen Zweitaufnahme `_intro.mp4` vorangestellt, weil das Drehbuch 8,6 s vor ffmpeg anlief; Roh `_roh.mp4`).
+Vertonung vorbereitet in `…/vertonung-2026-10-28b/`: 98 alte Clips wiederverwendet, 33 neu (`neue-clips.txt`),
+`fertig.sh` mischt (Probe mit Platzhaltertönen: 6 Standbilder, 7,4 s).
+
+**Rest.** Neue Clips erzeugen und `fertig.sh` laufen lassen. „Zielbild im PDF“ kommt im Bank-PDF nicht mehr vor
+(Regex `^WERTPOTENZIAL|^ZIELBILD` trifft seit v3018d nichts – Seite heißt jetzt anders oder fehlt; nicht geprüft).
+Während der Aufnahme änderten andere Agenten vier Testobjekte (Hölderlinstr. 1, Am Markt 9, Hermannstr. 9, Gohliser
+Str. 42) und um 19:15 UTC entstand ein leeres Objekt `3834d152-…` (2026-1126, „Unbenannt“) – nicht aus den
+mitgeschriebenen Läufen, Herkunft offen, nicht gelöscht. `reihe-ueberblick2` ist ebenfalls ein App-Rundgang
+(„Vom neuen Objekt zum DealScore“, 5 min) – unverändert.
