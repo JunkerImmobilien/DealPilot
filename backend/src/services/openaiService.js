@@ -4304,6 +4304,11 @@ async function dokumenteAuswerten(dokumente, objekt, opts) {
     'Jedes Risiko nennt seine Quelle (Dokument und Datum/Seite/TOP). Gleiche Sachverhalte aus mehreren Protokollen zusammenfassen und den Verlauf nennen (z. B. "2022 vertagt, 2024 beschlossen").',
     'Betraege der ganzen Gemeinschaft, wo moeglich, auf den Anteil des Objekts umrechnen (Miteigentumsanteil) und den Rechenweg in einem Halbsatz nennen.',
     'Persoenliche Unterlagen von Mietern werden nicht bewertet.',
+    /* v3016c · gemessen am Lauf Sachsenstr.: ein Eigentuemername rutschte in eine Frage, die Standardklausel
+       Wiederaufbaupflicht stand als „hoch" mit „Existenzbedrohung" */
+    'KEINE Namen von Personen (Eigentuemer, Mieter, Verwalter-Mitarbeiter) - schreibe "eine Wohnung", "ein Eigentuemer". Firmen (Verwaltung, Bank) duerfen genannt werden.',
+    'Standardklauseln, die in fast jeder Teilungserklaerung stehen (Wiederaufbaupflicht, Verwalterzustimmung nach § 12 WEG, getrennte Ruecklagen in Mehrhausanlagen), hoechstens "niedrig" und nur in einem sachlichen Satz. Keine Dramatisierung, keine Worte wie "existenzbedrohend".',
+    'Hoch ist nur, was mit Zahl oder Beschluss belegt ist und den Kaeufer absehbar Geld kostet oder die Nutzung einschraenkt.',
     '',
     'Antworte NUR mit JSON:',
     '{',

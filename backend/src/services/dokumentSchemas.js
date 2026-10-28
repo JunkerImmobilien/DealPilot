@@ -43,7 +43,9 @@
 const DOKUMENT_TYPEN = {
   grundbuch: {
     label: 'Grundbuchauszug',
-    leit: ['Grundbuchauszug', 'Bestandsverzeichnis', 'Abteilung III'],
+    /* v3016c · gemessen am Wohnungsgrundbuch Sachsenstr.: es zitiert Teilungserklaerung und
+       Aufteilungsplan und wurde als Teilungserklaerung erkannt; Datei hiess „GB Auszug" */
+    leit: ['Grundbuchauszug', 'Bestandsverzeichnis', 'Abteilung III', 'Wohnungsgrundbuch', 'Grundbuch von', 'GB Auszug', 'GB-Auszug'],
     keywords: ['Grundbuch', 'Abteilung I', 'Abteilung II', 'Abteilung III',
                'Bestandsverzeichnis', 'Blatt', 'Amtsgericht']
   },
@@ -537,11 +539,14 @@ const SCHEMATA = {
 /* v3016 · Ein PDF kann mehrere Dokumente tragen (gemessen: „Flur u Energie.pdf" =
    Flurkarte + Energieausweis). Weitere Arten nur mit ZWEI Leitbegriffen im ganzen
    Text, nie die gesperrte Art und nie der Marktbericht (der zitiert alles). */
+const WEITERE_ERLAUBT = { energieausweis: 1, kataster: 1, grundbuch: 1, boris: 1, mietaufstellung: 1 };
 function weitereTypen(text, dateiname, haupt) {
   const t = String(text || '').toLowerCase().slice(0, 60000);
   const aus = [];
   Object.keys(DOKUMENT_TYPEN).forEach(function (id) {
-    if (id === haupt || id === 'mieter_unterlagen' || id === 'marktbericht' || !SCHEMATA[id]) return;
+    /* v3016c · nur eigenstaendige Blaetter. Protokolle, Teilungserklaerungen und Kaufvertraege
+       zitieren einander (gemessen: Protokoll 2025 → „Teilungserklaerung", Grundbuch → „Auflassung") */
+    if (id === haupt || !WEITERE_ERLAUBT[id] || !SCHEMATA[id]) return;
     const n = (DOKUMENT_TYPEN[id].leit || []).filter(function (kw) { return t.indexOf(kw.toLowerCase()) !== -1; }).length;
     if (n >= 2) aus.push({ typ: id, leit: n });
   });
