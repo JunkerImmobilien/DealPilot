@@ -91,7 +91,7 @@
     if (preset === 'custom' || eigen) text = '<b>Eigene Gewichtung aktiv.</b> Dein Deal Score rechnet mit selbst gesetzten Gewichten.';
     else if (standard) text = 'Dein Deal Score rechnet mit der <b>Standardgewichtung</b> (Ausgewogen).';
     else text = 'Dein Deal Score rechnet mit dem Bewertungsprofil <b>' + esc(name) + '</b> statt der Standardgewichtung.';
-    return '<div class="dp-es-score" style="margin:10px 0 4px;padding:10px 12px;border:1px solid rgba(201,168,76,.35);border-radius:10px;font-size:13px;line-height:1.5">' +
+    return '<div class="dp-es-score" style="margin:10px 0 4px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:10px;font-size:13px;line-height:1.5">' +
       text +
       (standard ? '' : ' <button type="button" class="btn btn-sm btn-ghost dp-es-score-std" style="margin-left:6px">Auf Standard zurücksetzen</button>') +
       '</div>';
@@ -176,7 +176,7 @@
       /* „Für Profis": Fokus, Eigene Anweisungen, Vorlagen, Eigenes Wissen */
       var det = document.createElement('details');
       det.className = 'dp-es-profis';
-      det.style.cssText = 'margin-top:18px;border-top:1px solid rgba(201,168,76,.3);padding-top:10px';
+      det.style.cssText = 'margin-top:18px;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);padding-top:10px';
       det.innerHTML = '<summary style="cursor:pointer;font-weight:600;font-size:13px;padding:6px 0">Für Profis — Fokus, eigene Anweisungen, eigenes Wissen</summary>';
       var focus = api.querySelector('.ai-focus-checks'), ci = api.querySelector('#set_ai_custom_instructions'),
           sugg = api.querySelector('.ai-suggestions'), wissen = api.querySelector('#set_eigenes_wissen');
