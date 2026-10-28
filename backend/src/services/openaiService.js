@@ -1012,6 +1012,8 @@ function buildPrompt(payload, opts) {
        Feld `score_vergleich` verlangt, das erklaeren soll, WELCHE
        Zusatz-KPIs die Differenz treiben. Das Modell musste raten. */
     isc ? ('Investor Deal Score: ' + (isc.total != null ? isc.total : '–') + ' / 100 (beruecksichtigt zusaetzlich Lage/Substanz/Upside — 24 KPIs)') : '',
+    /* v3016p · unter 70 % der KPIs zeigt die App keinen Score - die Analyse nennt dann auch keinen */
+    payload.score_unvollstaendig ? ('Deal Score und Investor Deal Score: NICHT belastbar, erst ' + payload.score_unvollstaendig + ' erfasst (Schwelle 70 %). Nenne KEINEN Score-Wert und keine Score-Stufe; sag stattdessen, dass fuer ein belastbares Urteil noch Angaben fehlen.') : '',
     /* v2009 - die Aufschluesselung des Investor Deal Score. */
     (isc && (isc.rendite != null || isc.finanzierung != null || isc.risiko != null || isc.lage != null))
       ? ('  davon Rendite ' + (isc.rendite != null ? isc.rendite : '–')

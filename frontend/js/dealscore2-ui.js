@@ -420,6 +420,7 @@ function renderDealScore2() {
     kpiCompPct = result.dataCompleteness;
   }
 
+  window._dpLastDs2Belastbar = !(kpiCompPct < MIN_COMPLETENESS);   /* v3016p · für die Pilot-Analyse */
   if (kpiCompPct < MIN_COMPLETENESS) {
     var pct = Math.round(kpiCompPct * 100);
     var pctNeeded = Math.round(MIN_COMPLETENESS * 100);

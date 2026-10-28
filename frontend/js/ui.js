@@ -1406,6 +1406,9 @@ function _buildAIPayload() {
   // v590: Investor Deal Score (DS2) fuer Score-Vergleich, falls vorhanden
   try {
     var _d2 = window._dpLastDs2;
+    /* v3016p · unter 70 % der KPIs geht kein Investor Deal Score in die Analyse - sonst nennt der Text eine Zahl, die die App selbst nicht zeigt */
+    var _vqA = window.dpScoreVollstaendigkeit ? window.dpScoreVollstaendigkeit() : null;
+    if (_vqA && !_vqA.belastbar) { _d2 = null; payload.score_unvollstaendig = _vqA.filled + ' von ' + _vqA.total + ' KPIs (' + _vqA.percent + ' %)'; payload.dealscore = {}; }
     if (_d2 && _d2.score != null) {
       var _cat = _d2.categories || {};
       payload.investor_score = {

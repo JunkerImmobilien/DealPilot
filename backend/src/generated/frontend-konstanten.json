@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T14:01:29.120Z",
+ "erzeugt_am": "2026-10-28T14:15:29.545Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "5e8a72368e550d83",
-  "index-html": "71102169dae0320b",
+  "storage": "d1c400f3059479c9",
+  "index-html": "20583507b45fdb8d",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -4073,7 +4073,7 @@
      },
      {
       "h": "Warum sehe ich keinen Investor Deal Score?",
-      "text": "Der Investor Deal Score bewertet 24 Kennzahlen und erscheint erst, wenn mindestens 70 % davon ausgefüllt sind. Bis dahin steht dort „Bitte mindestens 70 % der Kennzahlen ausfüllen“ mit deinem aktuellen Stand.\n\nSo geht's:\n1. Klick auf „📋 Welche KPIs fehlen noch?“ — die Liste zeigt die offenen Kennzahlen.\n2. Trag sie in den Reitern Objekt (Lage, Energieklasse, Zustand), Bewirtschaftung und Steuer nach.\n\nDie Kaufgrenzen (DSCR, Cashflow, LTV) zeigt DealPilot schon vorher — dafür reichen Kaufpreis, Miete und Finanzierung.\n\nDer Investor Deal Score gehört zum Investor- und Pro-Plan; im Free-Plan läuft er als Demo, im Starter-Plan ist er nicht enthalten."
+      "text": "Der Investor Deal Score bewertet 24 Kennzahlen und erscheint erst, wenn mindestens 70 % davon ausgefüllt sind. Bis dahin steht dort „Bitte mindestens 70 % der Kennzahlen ausfüllen“ mit deinem aktuellen Stand. Das gilt überall: Unter 70 % zeigt auch die Objektkarte keinen Score, er wird nicht gespeichert, und die Pilot-Analyse nennt keinen Score-Wert, sondern sagt, welche Angaben noch fehlen.\n\nSo geht's:\n1. Klick auf „📋 Welche KPIs fehlen noch?“ — die Liste zeigt die offenen Kennzahlen.\n2. Trag sie in den Reitern Objekt (Lage, Energieklasse, Zustand), Bewirtschaftung und Steuer nach.\n\nDie Kaufgrenzen (DSCR, Cashflow, LTV) zeigt DealPilot schon vorher — dafür reichen Kaufpreis, Miete und Finanzierung.\n\nDer Investor Deal Score gehört zum Investor- und Pro-Plan; im Free-Plan läuft er als Demo, im Starter-Plan ist er nicht enthalten."
      },
      {
       "h": "Warum ist die DSCR im Chart anders als auf der Kennzahlen-Karte?",
@@ -5227,7 +5227,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "1887f850f650a506",
+  "hilfe": "4dcd069fc8003988",
   "bewertung": "bca98c7b04c452b7"
  }
 }
