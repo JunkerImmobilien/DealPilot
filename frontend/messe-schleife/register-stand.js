@@ -1,17 +1,17 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-28T16:24:53.183Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T16:56:46.085Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
  "stand": "2026-10-28",
- "erzeugt": "2026-10-28T16:24:53.183Z",
- "register_commit": "7e79ec97",
+ "erzeugt": "2026-10-28T16:56:46.085Z",
+ "register_commit": "7c77b641",
  "register_lokal_geaendert": true,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
  "dateien": 142,
- "saetze": 18285,
+ "saetze": 18296,
  "kopf": {
-  "werte_gesamt": 6085,
+  "werte_gesamt": 6186,
   "lzs": 2505,
-  "swf": 744,
+  "swf": 845,
   "uk_flaeche": 162,
   "uk_wgfz": 115,
   "vgf": 1389,
@@ -24,11 +24,11 @@ window.DPS_REGISTER = {
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 6085,
-  "mit_ausschuss": 6085,
-  "mit_jahrgang": 6085,
-  "mit_quelle": 6085,
-  "mit_seite": 6084
+  "werte": 6186,
+  "mit_ausschuss": 6186,
+  "mit_jahrgang": 6186,
+  "mit_quelle": 6186,
+  "mit_seite": 6185
  },
  "jahrgaenge": [
   2018,
@@ -191,14 +191,14 @@ window.DPS_REGISTER = {
   },
   "BW": {
    "name": "Baden-Württemberg",
-   "werte": 338,
+   "werte": 437,
    "lzs": {
     "w": 242,
     "anteil": 0.09
    },
    "swf": {
-    "w": 49,
-    "anteil": 0.03
+    "w": 148,
+    "anteil": 0.08
    },
    "uk_flaeche": {
     "w": 1,
@@ -208,7 +208,7 @@ window.DPS_REGISTER = {
     "w": 45,
     "anteil": 0.05
    },
-   "anteil4": 0.05,
+   "anteil4": 0.07,
    "erfasst": true
   },
   "BY": {
@@ -301,14 +301,14 @@ window.DPS_REGISTER = {
   },
   "MV": {
    "name": "Mecklenburg-Vorpommern",
-   "werte": 44,
+   "werte": 46,
    "lzs": {
     "w": 20,
     "anteil": 0.37
    },
    "swf": {
-    "w": 15,
-    "anteil": 0.44
+    "w": 17,
+    "anteil": 0.5
    },
    "uk_flaeche": {
     "w": 2,
@@ -318,7 +318,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.34,
+   "anteil4": 0.36,
    "erfasst": true
   },
   "SN": {

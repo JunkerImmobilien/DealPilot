@@ -1,4 +1,4 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-28T16:24:53.183Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T16:56:46.085Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_VIDEOTHEK = {
  "stand": "2026-10-21",
