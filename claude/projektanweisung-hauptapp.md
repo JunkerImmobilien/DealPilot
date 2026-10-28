@@ -43398,3 +43398,23 @@ komplett-mfh`); kein Pull, kein Rebuild. Danach: `git pull`, mb-backend **und** 
 vorher `pg_dump` der mb-DB (ansehen!), Migration 024 prüfen, `POST /jahreswerte/abruf`, dann im Browser
 ein Objekt mit Indexmiet-Wohnung (nur im Speicher) und eine Pilot-Analyse nachmessen; `gold-audit.py`
 für die neue Datei `indexmiete.js` (Kartenfarben #E6DCC2/#F0E9D6) laufen lassen.
+
+### v3027 · Reiter Miete: Vertragsübersicht statt Objekt-Mietvertrag, wenn Einheiten erfasst sind (Entwurf) · 28.10.2026 — Commit `985f2764`
+
+**Was.** Marcel: „Macht es Sinn, im Tab Miete ‚Mietvertrag für dieses Objekt‘ anzugeben, wenn wir die
+Einheiten erfasst haben?“ Ab zwei Einheiten in `_dpMfh.einheiten` blendet `mietvertrag-objekt.js` die
+Objektfelder aus (sie bleiben gespeichert) und zeigt: Verteilung, Tabelle je Einheit (Vertrag, Mietbeginn,
+letzte Anpassung, Kaltmiete, nächste Erhöhung – § 558 über `sollFuer`, Index über `js/indexmiete.js`,
+Staffel über `mv_naechste_anpassung`), fehlende Angaben rot mit Sprung in genau diese Einheit
+(`DpMfhEinheiten.einheitOeffnen(i)`), Knopf „Einheiten bearbeiten“. Ohne Liste wie bisher, beim MFH mit
+Knopf „Einheiten erfassen“. Leser der Objektfelder gemessen: `calc.js` keiner, `potenzial.js` nur ohne
+Liste, Pilot über die Einheiten, `dealpilot-mb.js` schickte `mv_befristet_bis`/`mv_kuendigungsverzicht_bis`/
+`mv_abw_jahre` mit – jetzt nicht mehr, wenn die Einheiten gelten. Kennzahlen (calc.js) ändern sich damit
+nicht; ein Marktbericht eines MFH mit Liste rechnet die Mietabweichung nur noch je Einheit.
+
+**Nachweis.** `node --check`, `buster-ebenen` sauber, `termin()` im vm an sechs Einheiten (Index mit
+Datum → „ab 12/2026 +53,96 €“, Index ohne Datum → fehlt, Staffel ohne Stufe → fehlt, § 558, leer, ohne
+Vertragsart → fehlt), Zahlen „1.050“ / „850,50“ richtig gelesen.
+
+**Rest.** **Staging-Pull ausstehend** (Messe-Aufnahme lief). Danach im Browser: Lindenallee (Einheiten)
+und eine ETW, 390 px, Screenshots vorher/nachher, Absprung in die Einheit, Kennzahlen gegenlesen.
