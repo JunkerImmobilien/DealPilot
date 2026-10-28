@@ -187,7 +187,21 @@
       '.dpu-quelle{font-size:11.5px;color:#7A7370;margin-top:3px}',
       '.dpu-these{border-left:3px solid ' + GOLD + ';padding:6px 10px;background:#FBF6E9;border-radius:6px;font-size:13px;line-height:1.5}',
       '.dpu-hinweis{font-size:12px;color:#7A7370;margin:6px 0}',
-      '.dpu-gesperrt{padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.3);font-size:12.5px;background:#fff}'
+      '.dpu-gesperrt{padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.3);font-size:12.5px;background:#fff}',
+      /* v3016r · Einfach/Genau */
+      '.dpu-umschalter{display:inline-flex;border:1px solid rgba(42,39,39,.18);border-radius:999px;overflow:hidden;margin:0 0 12px}',
+      '.dpu-umschalter button{border:0;background:#fff;padding:5px 14px;font-size:12.5px;cursor:pointer;color:#2A2727}',
+      '.dpu-umschalter button.on{background:#2A2727;color:#fff}',
+      '.dpu-ampel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 12px}',
+      '.dpu-ampel div{border-radius:12px;padding:12px 14px;background:#fff;border:1px solid rgba(42,39,39,.1);text-align:center}',
+      '.dpu-ampel b{display:block;font-size:26px;line-height:1.1}.dpu-ampel span{font-size:11.5px;color:#7A7370;text-transform:uppercase;letter-spacing:.06em}',
+      '.dpu-ampel .hoch b{color:#B8625C}.dpu-ampel .mittel b{color:#8a6d1f}.dpu-ampel .niedrig b{color:#3FA56C}',
+      '.dpu-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:0 0 12px}',
+      '.dpu-karte{border-radius:12px;padding:12px 14px;background:#fff;border:1px solid rgba(42,39,39,.1);border-top:4px solid #B8625C}',
+      '.dpu-karte.mittel{border-top-color:' + GOLD + '}.dpu-karte.niedrig{border-top-color:#3FA56C}.dpu-karte.neutral{border-top-color:#2A2727}',
+      '.dpu-karte h4{margin:0 0 4px;font-size:14px}.dpu-karte p{margin:0;font-size:12.5px;line-height:1.45;color:#3a3633}',
+      '.dpu-karte .dpu-gross{font-size:22px;font-weight:700;margin:2px 0 4px}',
+      '.dpu-karte .dpu-quelle{margin-top:6px}'
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -261,7 +275,7 @@
       if (w.verwaltung) dl.push('<dt>Verwaltung</dt><dd>' + esc(w.verwaltung) + '</dd>');
       if ((w.sonderumlagen || []).length) dl.push('<dt>Sonderumlagen</dt><dd>' + w.sonderumlagen.map(esc).join('<br>') + '</dd>');
       if (dl.length) h += '<dl class="dpu-dl">' + dl.join('') + '</dl>';
-      if ((w.sanierungen || []).length) h += '<table class="dpu-tbl"><tr><th>Maßnahme</th><th>Status</th><th>Jahr</th><th>Kosten gesamt</th><th>Anteil Objekt</th></tr>'
+      if ((w.sanierungen || []).length) h += '<table class="dpu-tbl"><tr><th>Maßnahmen</th><th>Status</th><th>Jahr</th><th>Kosten gesamt</th><th>Anteil Objekt</th></tr>'
         + w.sanierungen.map(function (s) { return '<tr><td>' + esc(s.massnahme) + '</td><td>' + esc(s.status || '') + '</td><td>' + esc(s.jahr || '') + '</td><td>' + esc(eur(s.kosten_eur)) + '</td><td>' + esc(eur(s.anteil_objekt_eur)) + '</td></tr>'; }).join('') + '</table>';
       if (w.fazit) h += '<p style="font-size:13px;line-height:1.5;margin:6px 0">' + esc(w.fazit) + '</p>';
     }
@@ -273,6 +287,60 @@
     if ((a.offene_fragen || []).length) h += '<div class="dpu-h">Beim Verwalter oder Verkäufer anfragen</div><ul class="dpu-ul">' + a.offene_fragen.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>';
     return h;
   }
+  /* v3016r · Marcel 28.10.2026: „können wir die Unterlagen & WEG einfacher darstellen? auch mit
+     Karten? vlt wieder eine Version zum Umschalten einfach und genau." Einfach = Ampel, was
+     absehbar Geld kostet, die drei wichtigsten Risiken, WEG und These als Karten; Genau = alles. */
+  /* erster Satz - ohne an Abkürzungen („ca.", „z. B.", „Nr.", „Abt.") abzubrechen */
+  var ABK = /(?:\b(?:ca|bzw|ggf|inkl|zzgl|gem|Nr|Abt|Abs|Bj|Mio|Tsd|Whg|St|Str|vgl|evtl|max|min|rd|u\.a|z\.\s?B|d\.\s?h)\.|\b[A-ZÄÖÜa-zäöü]\.)$/;
+  function kurzSatz(t, n) {
+    t = String(t || '').trim(); n = n || 170;
+    var re = /[.!?](?=\s+[A-ZÄÖÜ„"]|$)/g, m, ende = -1;
+    while ((m = re.exec(t))) { if (!ABK.test(t.slice(0, m.index + 1))) { ende = m.index + 1; break; } }
+    var s = ende > 0 ? t.slice(0, ende) : t;
+    return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + ' …' : s;
+  }
+  function einfachHtml(a) {
+    var r = (a.risiken || []).slice();
+    var n = { hoch: 0, mittel: 0, niedrig: 0 };
+    r.forEach(function (x) { var s = String(x.schwere || 'mittel').toLowerCase(); if (n[s] != null) n[s]++; });
+    var ord = { hoch: 0, mittel: 1, niedrig: 2 };
+    r.sort(function (x, y) { return (ord[x.schwere] == null ? 1 : ord[x.schwere]) - (ord[y.schwere] == null ? 1 : ord[y.schwere]) || (Number(y.kosten_eur) || 0) - (Number(x.kosten_eur) || 0); });
+    var jahr = new Date().getFullYear();
+    /* Grundschulden/Hypotheken sind Belastungen des Verkäufers, die mit dem Kaufpreis abgelöst werden - keine Kosten */
+    var kosten = r.filter(function (x) { return zahl(x.kosten_eur) > 0 && String(x.schwere) !== 'niedrig' && (!x.jahr || (x.jahr >= jahr - 1 && x.jahr <= jahr + 2)) && !/grundschuld|hypothek|abt\.?\s*iii/i.test((x.titel || '') + ' ' + (x.quelle || '')); });
+    var summe = kosten.reduce(function (s, x) { return s + zahl(x.kosten_eur); }, 0);
+    var h = '<div class="dpu-ampel"><div class="hoch"><b>' + n.hoch + '</b><span>hoch</span></div><div class="mittel"><b>' + n.mittel + '</b><span>mittel</span></div><div class="niedrig"><b>' + n.niedrig + '</b><span>niedrig</span></div></div>';
+    h += '<div class="dpu-karten">';
+    h += '<div class="dpu-karte' + (summe ? '' : ' niedrig') + '"><h4>Was absehbar Geld kostet</h4>'
+      + (summe ? '<div class="dpu-gross">' + esc(eur(summe)) + '</div><p>' + kosten.slice(0, 3).map(function (x) { return esc(x.titel) + (x.jahr ? ' (' + esc(x.jahr) + ')' : ''); }).join(' · ') + '</p>'
+               : '<p>In den Unterlagen steht keine beschlossene oder bezifferte Ausgabe für die nächsten Jahre.</p>') + '</div>';
+    if (a.weg) {
+      var w = a.weg, san = (w.sanierungen || []).filter(function (s) { return /beschlossen|geplant/.test(String(s.status || '')); });
+      h += '<div class="dpu-karte neutral"><h4>Eigentümergemeinschaft</h4><p>' + esc(kurzSatz(w.fazit || (w.kernpunkte || [])[0] || '', 190)) + '</p>'
+        + (w.ruecklage ? '<p style="margin-top:6px"><b>Rücklage:</b> ' + esc(kurzSatz(w.ruecklage, 120)) + '</p>' : '')
+        + (san.length ? '<p style="margin-top:6px"><b>Beschlossen/geplant:</b> ' + san.slice(0, 3).map(function (s) { return esc(s.massnahme) + (s.kosten_eur ? ' ' + esc(eur(s.kosten_eur)) : ''); }).join(' · ') + '</p>' : '') + '</div>';
+    }
+    if (a.investitionsthese) h += '<div class="dpu-karte neutral" style="border-top-color:' + GOLD + '"><h4>Investitionsthese</h4><p>' + esc(kurzSatz(a.investitionsthese, 230)) + '</p></div>';
+    h += '</div>';
+    if (r.length) {
+      h += '<div class="dpu-h">Die wichtigsten Risiken</div><div class="dpu-karten">' + r.slice(0, 3).map(function (x) {
+        var s = String(x.schwere || 'mittel').toLowerCase();
+        return '<div class="dpu-karte ' + esc(s) + '"><h4>' + esc(x.titel) + '</h4>'
+          + (x.kosten_eur ? '<div class="dpu-gross" style="font-size:18px">' + esc(eur(x.kosten_eur)) + '</div>' : '')
+          + '<p>' + esc(kurzSatz(x.beschreibung, 150)) + '</p>' + ((x.quelle || x.fundstelle) ? '<div class="dpu-quelle">Quelle: ' + esc(x.quelle || x.fundstelle) + '</div>' : '') + '</div>';
+      }).join('') + '</div>'
+        + (r.length > 3 ? '<p class="dpu-hinweis">' + (r.length - 3) + ' weitere Risiken und alle Einzelheiten unter <b>Genau</b>.</p>' : '');
+    }
+    if ((a.offene_fragen || []).length) h += '<p class="dpu-hinweis"><b>' + a.offene_fragen.length + ' Fragen</b> an Verwalter oder Verkäufer stehen unter <b>Genau</b>.</p>';
+    return h;
+  }
+  function ansichtLesen() { try { return localStorage.getItem('dp_unterlagen_ansicht') || 'einfach'; } catch (e) { return 'einfach'; } }
+  function ansicht(btn, art) {
+    try { localStorage.setItem('dp_unterlagen_ansicht', art); } catch (e) {}
+    var w = btn && btn.closest ? btn.closest('.dpu-wrap') : null; if (!w) return;
+    w.querySelectorAll('[data-dpu-ansicht]').forEach(function (x) { x.style.display = x.getAttribute('data-dpu-ansicht') === art ? '' : 'none'; });
+    w.querySelectorAll('.dpu-umschalter button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-art') === art); });
+  }
   /** Reiter „Unterlagen & WEG" der Pilot-Analyse */
   function hatAuswertung() { var d = laden(); return !!(d && d.auswertung); }
   function pilotReiterHtml() {
@@ -280,11 +348,16 @@
     if (!d || !d.auswertung) return '';
     var datum = '';
     try { datum = new Date(d.stand).toLocaleDateString('de-DE'); } catch (e) {}
-    return '<div class="dp-pa-card">'
+    stil();
+    var art = ansichtLesen();
+    return '<div class="dp-pa-card dpu-wrap">'
+      + '<div class="dpu-umschalter"><button type="button" data-art="einfach" class="' + (art === 'einfach' ? 'on' : '') + '" onclick="DpUnterlagen.ansicht(this,\'einfach\')">Einfach</button>'
+      + '<button type="button" data-art="genau" class="' + (art === 'genau' ? 'on' : '') + '" onclick="DpUnterlagen.ansicht(this,\'genau\')">Genau</button></div>'
       + '<div class="dpu-hinweis">Ausgewertet am ' + esc(datum) + ' aus ' + (d.dokumente || []).length + ' Unterlagen: '
       + (d.dokumente || []).map(function (x) { return esc(x.label) + (x.datum ? ' ' + esc(x.datum) : ''); }).join(' · ') + '. '
-      + 'Neue Unterlagen über Datenaufnahme › PDFs einlesen — die Auswertung wird dann ersetzt.</div>'
-      + auswertungHtml(d.auswertung)
+      + 'Neue Unterlagen über Datenaufnahme › Exposé / Dokumente einlesen — die Auswertung wird dann ersetzt.</div>'
+      + '<div data-dpu-ansicht="einfach"' + (art === 'einfach' ? '' : ' style="display:none"') + '>' + einfachHtml(d.auswertung) + '</div>'
+      + '<div data-dpu-ansicht="genau"' + (art === 'genau' ? '' : ' style="display:none"') + '>' + auswertungHtml(d.auswertung) + '</div>'
       + '<div class="dpu-hinweis" style="margin-top:10px">Gelesen und zusammengefasst aus den Unterlagen — keine Rechtsberatung. Prüfe Beschlüsse und Lasten im Original.</div>'
       + '</div>';
   }
@@ -292,6 +365,7 @@
   window.DpUnterlagen = {
     seitenLesen: seitenLesen, istPersoenlich: istPersoenlich, meaProzent: meaProzent, einheitenAus: einheitenAus,
     auswerten: auswerten, laden: laden, merken: merken, promptTeile: promptTeile,
-    dokHtml: dokHtml, auswertungHtml: auswertungHtml, pilotReiterHtml: pilotReiterHtml, hatAuswertung: hatAuswertung, stil: stil
+    dokHtml: dokHtml, auswertungHtml: auswertungHtml, pilotReiterHtml: pilotReiterHtml, hatAuswertung: hatAuswertung, stil: stil,
+    einfachHtml: einfachHtml, ansicht: ansicht   /* v3016r */
   };
 })();

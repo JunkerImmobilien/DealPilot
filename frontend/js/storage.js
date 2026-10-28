@@ -3,6 +3,16 @@
    nicht. pdf.js gibt seit W1 seine Palette nach aussen und _dpPdfSetAccent()
    mutiert C.GOLD IN PLACE. Diese Funktion liest sie zur BAU-Zeit des PDFs.
    Ohne Whitelabel liefert sie [201,168,76] — also exakt wie bisher. */
+/* v3016p · EINE Stelle für „ist der Score belastbar?“ - dieselbe Zählung (24 KPIs) und
+   Schwelle (70 %) wie Kopfleiste (calc.js) und Reiter (dealscore2-ui.js). */
+if (!window.dpScoreVollstaendigkeit) {
+  window.dpScoreVollstaendigkeit = function () {
+    if (!window.DealScore2 || typeof window.DealScore2.getKpiCompleteness !== 'function' || typeof window._buildDeal2FromState !== 'function') return null;
+    var c = window.DealScore2.getKpiCompleteness(window._buildDeal2FromState());
+    if (!c || !isFinite(c.percent)) return null;
+    return { filled: c.filled, total: c.total, percent: c.percent, belastbar: c.percent >= 70 };
+  };
+}
 if (!window._pdfGold) {
   window._pdfGold = function () {
     try {
@@ -373,6 +383,18 @@ function collectData() {
       if (_ds2Res && _ds2Res.categories) d._ds2_categories = _ds2Res.categories;
     }
   } catch(e) {}
+  /* v3016p · Marcel 28.10.2026: „der Investor Deal Score darf kein Ergebnis zeigen, wenn nicht
+     genug Werte zur Verfügung stehen.“ Kopfleiste und Reiter sperrten schon unter 70 % der
+     24 KPIs (calc.js V63, dealscore2-ui.js) - gespeichert und auf der Objektkarte gezeigt wurde
+     der Score trotzdem (gemessen: Lindenallee 14 mit 10/24 KPIs). Unter der Schwelle wird
+     KEIN Score gespeichert; die Vollständigkeit steht dabei, damit jeder Leser sie sieht. */
+  try {
+    var _vq = window.dpScoreVollstaendigkeit ? window.dpScoreVollstaendigkeit() : null;
+    if (_vq) {
+      d._kpi_vollstaendig = _vq.percent;
+      if (!_vq.belastbar) { d._ds2_score = null; d._dealpilot_score = null; }
+    }
+  } catch (e) {}
 
   if (window._currentObjSeq) d['_obj_seq'] = window._currentObjSeq;
   // V104: Deal-Won-Status aus Hidden-Input im Tab Deal-Aktion lesen
@@ -1885,6 +1907,8 @@ async function renderSaved(opts) {
               var liveDp = DealScore.compute();
               if (liveDp && liveDp.score) ds2Score = Math.round(liveDp.score);
             }
+            /* v3016p · unter 70 % der KPIs kein Score auf der Karte */
+            try { var _vqK = window.dpScoreVollstaendigkeit ? window.dpScoreVollstaendigkeit() : null; if (_vqK && !_vqK.belastbar) ds2Score = null; } catch (eV) {}
             function _v(id) { var e = document.getElementById(id); return e ? e.value : ''; }
             function _n(id) { return (typeof parseDe === 'function') ? parseDe(_v(id)) : (parseFloat(_v(id)) || 0); }
             liveKp = _n('kp');
