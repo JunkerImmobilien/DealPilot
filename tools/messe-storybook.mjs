@@ -267,16 +267,49 @@ const zahlen = '<section class="seite"><div class="kick">DealPilot in Zahlen · 
   + '<div class="fuss">Alle Zahlen gemessen: Code im Repository, amtliche Daten in der Marktbericht-Datenbank.</div></section>';
 
 /* v3016o · Marcel 28.10.2026: „5–6 ausschlaggebende Sätze, was DealPilot ist, sowie die USP" */
-const wasIst = '<section class="seite"><div class="kick">Am Stand</div><h1>Was DealPilot ist – in sechs Sätzen</h1>'
-  + '<ol class="sechs">'
-  + '<li><b>DealPilot ist die Prüfzentrale für Immobilien-Investoren</b> – vom ersten Exposé bis zum ganzen Bestand in einem Werkzeug.</li>'
-  + '<li>Jedes Objekt wird durchgerechnet wie bei der Bank: Rendite, Cashflow vor und nach Steuern, DSCR, Finanzierung und Belastungsprobe über bis zu 30 Jahre.</li>'
-  + '<li>Den Wert ermittelt DealPilot nach der Logik der ImmoWertV mit den Daten der Gutachterausschüsse – Ertrags-, Sach- und Vergleichswert, jede Zahl mit Herkunft.</li>'
-  + '<li>Unterlagen wie Exposé, Mietaufstellung, Grundbuch und WEG-Protokolle liest DealPilot in Minuten und macht daraus Felder, Risiken und eine Investitionsthese.</li>'
-  + '<li>Der Pilot erklärt, prüft und schreibt mit – gerechnet wird mit festen Formeln, jede Zahl der KI wird gegengeprüft.</li>'
-  + '<li>Am Ende steht ein klares Urteil und ein Investment Case, den du der Bank auf den Tisch legst.</li>'
-  + '</ol>'
-  + '<h2 class="usp-h">Was DealPilot anders macht</h2><div class="usp">'
+/* v3016q · Marcel 28.10.2026: „5–6 unterschiedliche, vollumfängliche Sätze, die DealPilot komplett
+   beschreiben. Davon möchte ich mehrere Versionen haben, um zu entscheiden, welche ich nehme." */
+const FASSUNGEN = [
+  { k: 'A', name: 'Sachlich – die vollständige Beschreibung', s: [
+    'DealPilot ist eine Analyse- und Steuerungsplattform für Immobilien-Investoren, die ein Objekt vom ersten Exposé über Ankauf und Finanzierung bis in den laufenden Bestand begleitet.',
+    'Sie rechnet jede Kapitalanlage vollständig durch – Rendite, Cashflow vor und nach Steuern, Finanzierung, Kapitaldienstfähigkeit (DSCR) und Belastungsprobe über bis zu 30 Jahre.',
+    'Den Wert ermittelt DealPilot nach der Logik der ImmoWertV mit den amtlichen Daten der Gutachterausschüsse: Ertrags-, Sach- und Vergleichswert, Restnutzungsdauer nach Anlage 2, jede Zahl mit Fundstelle.',
+    'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung und WEG-Protokolle liest DealPilot in Minuten aus und macht daraus ausgefüllte Felder, erfasste Einheiten, Risiken mit Quelle und eine Investitionsthese.',
+    'Die Steuer folgt dem EStG – AfA, Kaufpreisaufteilung nach BMF-Arbeitshilfe, zu versteuerndes Einkommen je Jahr, privat oder in der GmbH –, und im Bestand zeigen Soll/Ist, Zielbild und Portfolio-Cockpit, was jede Maßnahme bringt.',
+    'Ein KI-Pilot erklärt, bewertet und schreibt mit, während feste Formeln rechnen – am Ende stehen ein klares Urteil und ein Investment Case, der bei der Bank besteht.'] },
+  { k: 'B', name: 'Bildsprache – der Pilot vor dem Start', s: [
+    'DealPilot ist das Cockpit für Immobilien-Investoren: Bevor du kaufst, prüft es dein Objekt wie ein Pilot seine Maschine vor dem Start.',
+    'Im Quick-Check reichen Adresse und Preis für eine erste Einschätzung, in der Datenaufnahme liest DealPilot Exposé und Unterlagen ein und füllt die Instrumente für dich.',
+    'Dann rechnet es die ganze Strecke durch – Kaufnebenkosten, Finanzierung, Miete, Bewirtschaftung, Steuer und Cashflow über Jahrzehnte, mit Belastungsprobe für schlechtes Wetter.',
+    'Den Wert misst DealPilot an amtlichen Daten der Gutachterausschüsse und zeigt, ob der Preis trägt – mit Ertrags-, Sach- und Vergleichswert statt Bauchgefühl.',
+    'Der Co-Pilot an deiner Seite erklärt jede Kennzahl, findet die Risiken in Grundbuch und WEG-Protokollen und schreibt deine Investitionsthese.',
+    'Nach der Landung bleibt DealPilot im Einsatz: Bestand, Mieterhöhung, Zielbild und das ganze Portfolio im Blick – und für die Bank liegt der Flugplan als PDF bereit.'] },
+  { k: 'C', name: 'Vom Problem her – was der Investor davon hat', s: [
+    'Wer eine Immobilie kauft, bindet sich für zwanzig, dreißig Jahre – und entscheidet heute oft mit Exposé, Excel und Bauchgefühl; DealPilot ersetzt das durch eine vollständige, nachvollziehbare Prüfung.',
+    'Statt Stunden mit Abtippen liest DealPilot Exposé, Mietaufstellung, Grundbuch und WEG-Protokolle ein und zeigt, was im Kleingedruckten steht – von der beschlossenen Sonderumlage bis zur Last im Grundbuch.',
+    'Statt einer Renditezahl rechnet es den ganzen Weg: Finanzierung, Cashflow vor und nach Steuern, Steuerwirkung, Kapitaldienstfähigkeit und was passiert, wenn Zinsen oder Leerstand steigen.',
+    'Statt einer Wunsch-Bewertung ermittelt es den Wert nach ImmoWertV mit amtlichen Daten der Gutachterausschüsse – und sagt ehrlich, wo eine Zahl fehlt und wie man sie bekommt.',
+    'Statt einer Kaufentscheidung ohne Plan zeigt es im Bestand, welche Mieterhöhung zulässig ist, welche Sanierung sich rechnet und wie das ganze Portfolio dasteht.',
+    'Und statt einer Mappe voller Notizen bekommst du ein klares Urteil und einen Investment Case, den du der Bank auf den Tisch legst.'] },
+  { k: 'D', name: 'Für Bank und Profi – präzise und belastbar', s: [
+    'DealPilot ist eine Software zur Investitionsanalyse und Wertermittlung von Wohn- und Gewerbeimmobilien für private und professionelle Investoren, Finanzierer und Berater.',
+    'Die Investitionsrechnung umfasst Gesamtinvestition, Finanzierung mit Annuität, Tilgung und Bausparvertrag, DSCR, LTV, Cashflow vor und nach Steuern sowie eine Zins- und Mietbelastungsprobe.',
+    'Die Wertermittlung folgt der ImmoWertV 2021 mit Ertrags-, Sach- und Vergleichswertverfahren, Bodenwert aus den Bodenrichtwerten und Liegenschaftszinsen, Sachwertfaktoren und Umrechnungskoeffizienten aus einem Register mit über 6.000 amtlichen Werten.',
+    'Steuerlich rechnet DealPilot nach EStG: Gebäude-AfA, Kaufpreisaufteilung nach BMF-Arbeitshilfe, 15-%-Grenze, Sonder-AfA und das zu versteuernde Einkommen je Jahr, privat oder über eine Kapitalgesellschaft.',
+    'Objektunterlagen – Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis – werden ausgelesen, Personendaten vorher geschwärzt, Risiken mit Fundstelle dokumentiert.',
+    'Ergebnis ist ein nachvollziehbarer Investment Case mit Herkunft jeder Zahl, indikativem Beleihungswert-Check und einem Score, der erst ab ausreichender Datenlage erscheint.'] }
+];
+const fassungHtml = (f, gross) => '<div class="fassung' + (gross ? ' gross' : '') + '"><div class="fassung-k">Fassung ' + f.k + ' · ' + esc(f.name) + '</div><ol class="sechs">'
+  + f.s.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ol></div>';
+const wasIst = '<section class="seite"><div class="kick">Am Stand</div><h1>Was DealPilot ist – vier Fassungen zur Auswahl</h1>'
+  + '<p class="gesch">Jede Fassung beschreibt DealPilot vollständig in sechs Sätzen – vom Exposé über Rechnung, Wert, Unterlagen und Steuer bis zu Bestand und Bank. Sie unterscheiden sich im Ton. Such dir eine aus; die anderen bleiben als Vorrat für Flyer, Website und Gespräch.</p>'
+  + fassungHtml(FASSUNGEN[0], true) + fassungHtml(FASSUNGEN[1])
+  + '<div class="fuss">DealPilot · Messe-Storybook</div></section>'
+  + '<section class="seite"><div class="kick">Am Stand</div><h1>Was DealPilot ist – Fassungen C und D</h1>'
+  + fassungHtml(FASSUNGEN[2]) + fassungHtml(FASSUNGEN[3])
+  + '<div class="fuss">DealPilot · Messe-Storybook</div></section>'
+  + '<section class="seite"><div class="kick">Am Stand</div><h1>Was DealPilot anders macht</h1>'
+  + '<div class="usp">'
   + [['Amtlich statt geschätzt', de(R && R.werte_gesamt) + ' amtliche Registerwerte von ' + de(R && R.ausschuesse) + ' Gutachterausschüssen. Wo kein Wert vorliegt, nennt DealPilot den Weg dorthin – statt eine Zahl zu erfinden.'],
      ['Wertermittlung wie ein Gutachter', 'Drei Verfahren nach ImmoWertV, Restnutzungsdauer nach Anlage 2, Bodenwert aus den Bodenrichtwerten – mit Rechenweg und Fundstelle.'],
      ['Unterlagen statt Abtippen', 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, WEG-Protokolle, Energieausweis – auch Scans. Risiken mit Quelle, Einheiten samt Miete.'],
@@ -299,7 +332,9 @@ const deckblatt = '<section class="seite deck"><img class="deck-logo" src="' + l
 
 const css = `@import url('${fonts}');
 @page{size:A4;margin:0}
-.sechs{margin:6mm 0 4mm;padding-left:7mm;font-size:12pt;line-height:1.55}.sechs li{margin:0 0 3.2mm}
+.sechs{margin:2mm 0 2mm;padding-left:6mm;font-size:10.2pt;line-height:1.48}.sechs li{margin:0 0 1.8mm}
+.fassung{border:1px solid #e6dcc0;border-radius:3mm;padding:3.5mm 5mm 2mm;margin:0 0 4.5mm;background:#fdfbf5}
+.fassung-k{font:700 8.5pt 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a7f33;margin-bottom:1mm}
 .usp-h{font-size:14pt;margin:6mm 0 3mm}
 .usp{display:grid;grid-template-columns:1fr 1fr;gap:4mm}.usp div{border:1px solid #e6dcc0;border-radius:3mm;padding:3.5mm 4mm;background:#fdfbf5}
 .usp b{display:block;font-size:11pt;margin-bottom:1.2mm}.usp span{font-size:9.6pt;line-height:1.45;color:#4a4540}
