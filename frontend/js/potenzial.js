@@ -297,6 +297,73 @@
     var j = +m[1], mo = +m[2] - 1 + n; j += Math.floor(mo / 12); mo = ((mo % 12) + 12) % 12;
     return j + '-' + String(mo + 1).padStart(2, '0');
   }
+  /* ── v3028 · TERMINE EINER MIETERHÖHUNG: verlangbar ab · wirksam ab ────
+     Marcel 28.10.2026 („ja, mach das so"): „sofort" hieß in der App nur, dass das
+     Erhöhungsverlangen JETZT gestellt werden darf - wirksam wird die Erhöhung
+     später. Ab v3028 stehen beide Daten getrennt, an EINER Stelle gerechnet
+     (hier); die Zusammenfassung speichert sie (soll_verlangbar_ab, soll_wirksam_ab),
+     objektWissen.js im Backend liest die gespeicherten Felder.
+     Wortlaut gesetze-im-internet.de, gelesen 28.10.2026:
+       § 558 Abs. 1 BGB  „Der Vermieter kann die Zustimmung zu einer Erhöhung der Miete bis zur
+                          ortsüblichen Vergleichsmiete verlangen, wenn die Miete in dem Zeitpunkt,
+                          zu dem die Erhöhung eintreten soll, seit 15 Monaten unverändert ist. Das
+                          Mieterhöhungsverlangen kann frühestens ein Jahr nach der letzten
+                          Mieterhöhung geltend gemacht werden."
+       § 558b Abs. 1 BGB „Soweit der Mieter der Mieterhöhung zustimmt, schuldet er die erhöhte
+                          Miete mit Beginn des dritten Kalendermonats nach dem Zugang des
+                          Erhöhungsverlangens."
+       § 559b Abs. 2 BGB „Der Mieter schuldet die erhöhte Miete mit Beginn des dritten Monats nach
+                          dem Zugang der Erklärung." (Satz 2: +6 Monate ohne Ankündigung nach
+                          § 555c bzw. bei mehr als 10 % über der angekündigten - hier nicht erfasst)
+       § 557b Abs. 3 BGB „Die geänderte Miete ist mit Beginn des übernächsten Monats nach dem
+                          Zugang der Erklärung zu entrichten." (Abs. 2: mindestens ein Jahr
+                          unverändert - Erklärung also frühestens 10 Monate nach der letzten
+                          Änderung; Rechenkern js/indexmiete.js)
+     Monatsgenau: Zugang 15.10. → 01.01.; Zugang 31.10. → 01.01.; Zugang 01.11. → 01.02.
+     (Nov, Dez, Jan = dritter Kalendermonat). Prüfer: tools/mieterhoehung-termine-pruefen.mjs. */
+  var TERMIN_REGEL = {
+    '558':  { plus: 3, warte: 12, norm: '§ 558b Abs. 1 BGB', warte_norm: '§ 558 Abs. 1 Satz 2 BGB' },
+    '559':  { plus: 3, warte: 0,  norm: '§ 559b Abs. 2 BGB', warte_norm: null },
+    '557b': { plus: 2, warte: 10, norm: '§ 557b Abs. 3 BGB', warte_norm: '§ 557b Abs. 2 BGB' }
+  };
+  function mmjj(ym) { return /^\d{4}-\d{2}/.test(ym || '') ? ym.slice(5, 7) + '/' + ym.slice(0, 4) : ''; }
+  /** Erster Tag, ab dem die Erhöhung geschuldet ist, bei Zugang am Tag `zugang` ('JJJJ-MM-TT'). */
+  function wirksamNachZugang(zugang, art) {
+    var R = TERMIN_REGEL[art] || TERMIN_REGEL['558'];
+    var ym = plusMonate(String(zugang || ''), R.plus);
+    return ym ? ym + '-01' : null;
+  }
+  /**
+   * mhTermine({ art: '558'|'559'|'557b', letzte: 'JJJJ-MM', wirksam_eigen: 'JJJJ-MM', heute: 'JJJJ-MM' })
+   * -> { verlangbar_ab, verlangbar_sofort, wirksam_ab, norm, zugang_angenommen, letzte_fehlt, text, text_lang, hinweis }
+   * verlangbar_ab = frühester Zugang des Verlangens/der Erklärung (nie vor heute);
+   * wirksam_ab    = Beginn der Zahlungspflicht bei Zugang im Monat verlangbar_ab;
+   *                 eine eigene Angabe („Erreichbar ab") gilt als Wirksamkeitsmonat.
+   */
+  function mhTermine(o) {
+    o = o || {};
+    var art = TERMIN_REGEL[o.art] ? o.art : '558', R = TERMIN_REGEL[art];
+    var heute = /^\d{4}-\d{2}/.test(o.heute || '') ? String(o.heute).slice(0, 7) : heuteYm();
+    var letzte = /^\d{4}-\d{2}/.test(o.letzte || '') ? String(o.letzte).slice(0, 7) : null;
+    var frueh = letzte && R.warte ? plusMonate(letzte, R.warte) : heute;
+    var verl = frueh > heute ? frueh : heute;
+    var sofort = verl <= heute;
+    var wirk = plusMonate(verl, R.plus);
+    var eigen = /^\d{4}-\d{2}/.test(o.wirksam_eigen || '') ? String(o.wirksam_eigen).slice(0, 7) : null;
+    var hinweis = null;
+    if (eigen) {
+      if (eigen < heute) eigen = heute;
+      if (eigen < wirk) hinweis = 'dein Termin ' + mmjj(eigen) + ' liegt vor dem frühesten Wirksamwerden (' + mmjj(wirk) + ', ' + R.norm + ') – er gilt nur, wenn das Schreiben schon zugegangen ist';
+      wirk = eigen;
+    }
+    var r = { art: art, verlangbar_ab: verl, verlangbar_sofort: sofort, wirksam_ab: wirk, norm: R.norm,
+      zugang_angenommen: sofort && !eigen, letzte_fehlt: !letzte && !!R.warte, eigene_angabe: !!eigen, hinweis: hinweis };
+    r.text = 'verlangbar ab ' + (sofort ? 'sofort' : mmjj(verl)) + ' · wirksam ab ' + mmjj(wirk);
+    r.grund = eigen ? 'eigene Angabe' : (sofort ? 'Zugang heute angenommen, ' : 'bei Zugang im ' + mmjj(verl) + ', ') + R.norm;
+    r.sperre = r.letzte_fehlt ? 'letzte Erhöhung nicht eingetragen, Sperrfrist (' + R.warte_norm + ') nicht geprüft' : null;
+    r.text_lang = r.text + ' (' + r.grund + ')' + (r.sperre ? ' – ' + r.sperre : '');
+    return r;
+  }
   function umlage559(liste, istM, wfl) {
     /* v3001 · § 559 Abs. 2 BGB: Kosten fuer Erhaltungsmassnahmen gehoeren NICHT zu den umlagefaehigen
        Kosten. Bis v3000 lag die Umlage auf den vollen Kosten. `erh` = Erhaltungsanteil in % je Massnahme
@@ -359,14 +426,23 @@
       if (eig > 0) { r.miete = eig; r.herkunft = 'eigene Angabe'; r.vertrag = vg.art; return r; }
       r.grund = vg.text; r.vertrag = vg.art; return r;
     }
-    /* Termin: eigene Angabe vor der Frist aus dem Mietvertrag. */
+    /* Termin (v3028): verlangbar ab · wirksam ab, gerechnet in mhTermine(). `r.ab` ist der
+       WIRKSAMKEITSMONAT - an ihm hängen das Jahr der Stufe, die Mietentwicklung und das
+       Drei-Jahres-Fenster der Kappungsgrenze (§ 558 Abs. 3: „innerhalb von drei Jahren", gezählt
+       bis zum Wirksamwerden). Bis v3027 war `ab` = max(heute, letzte + 15) und hieß „sofort". */
     var letzte = String(e.mv_letzte_erhoehung || '');
-    var frist = letzte ? plusMonate(letzte, 15) : null;
-    var ab = /^\d{4}-\d{2}/.test(e.soll_ab || '') ? String(e.soll_ab).slice(0, 7) : frist;
-    if (ab && ab < heuteYm()) ab = heuteYm();
-    r.ab = ab;
-    r.ab_text = ab ? (ab <= heuteYm() ? 'sofort' : monatText(ab)) : (letzte ? '' : 'sofort (letzte Erhöhung nicht eingetragen)');
-    r.ab_herkunft = /^\d{4}-\d{2}/.test(e.soll_ab || '') ? 'eigene Angabe' : (frist ? '15 Monate nach der letzten Erhöhung (§ 558 Abs. 1 BGB)' : null);
+    var eigAb = /^\d{4}-\d{2}/.test(e.soll_ab || '') ? String(e.soll_ab).slice(0, 7) : null;
+    function termineSetzen(art) {
+      var t = mhTermine({ art: art, letzte: letzte, wirksam_eigen: eigAb });
+      r.termine = t; r.ab = t.wirksam_ab; r.verlangbar_ab = t.verlangbar_ab;
+      r.ab_text = t.text;
+      r.ab_herkunft = (eigAb ? 'wirksam ab: eigene Angabe' : t.grund)
+        + (art === '558' && letzte ? '; verlangbar frühestens ein Jahr nach der letzten Erhöhung (§ 558 Abs. 1 Satz 2 BGB)' : '')
+        + (t.sperre ? '; ' + t.sperre : '');
+      if (t.hinweis && r.hinweise.indexOf(t.hinweis) < 0) r.hinweise.push(t.hinweis);
+    }
+    termineSetzen('558');
+    var ab = r.ab;
     /* v2545 · DREI-JAHRES-ANRECHNUNG (§ 558 Abs. 3 BGB) — Marcel 20.10.2026.
        Die Kappungsgrenze gilt auf die Miete DREI JAHRE VOR dem Wirksamwerden
        der neuen Erhoehung, nicht auf die heutige. Lag die letzte Erhoehung in
@@ -406,6 +482,8 @@
     r.miete = Math.round((m558 + u.monat) * 100) / 100;
     r.herkunft = u.monat > 0 ? (m558 > ist ? 'gerechnet (§ 558 und § 559)' : 'gerechnet (§ 559)') : 'gerechnet (§ 558)';
     if (u.monat > 0) r.umlage559 = u;
+    /* v3028 · nur Modernisierungsumlage: keine Jahressperre, wirksam nach § 559b Abs. 2 */
+    if (u.monat > 0 && !(m558 > ist)) termineSetzen('559');
     return r;
   }
 
@@ -698,7 +776,7 @@
     var abs = (m.wohnungen || []).map(function (w) { return w.soll && w.soll.miete > w.ist && w.soll.ab ? w.soll.ab : null; }).filter(Boolean).sort();
     var mh = m.stufen.mieterhoehung ? (abs.length ? +String(abs[0] <= heuteYm() ? heuteYm() : abs[0]).slice(0, 4) : new Date().getFullYear()) : null;
     var zf = parseInt(String(wert('zb_fertig_jahr') || '').trim(), 10);
-    return { ankauf: ankauf, mieterhoehung: mh, mieterhoehung_herkunft: abs.length ? 'frühester Termin der Soll-Mieten' : 'sofort',
+    return { ankauf: ankauf, mieterhoehung: mh, mieterhoehung_herkunft: abs.length ? 'frühestes Wirksamwerden der Soll-Mieten, § 558b/§ 559b BGB' : 'ohne Termin – laufendes Jahr',   /* v3028: Jahr = WIRKSAM, nicht verlangbar */
              zielbild: m.stufen.zielbild && zf >= 1990 && zf <= 2100 ? zf : null };
   }
   /* v2541 · Fußzeilen: woher die Marktpreisindikationen und die Jahre kommen */
@@ -881,6 +959,11 @@
     z.wohnungen = m.wohnungen.slice(0, 30).map(function (w) {
       return { nr: w.nr, lage: w.lage, wfl: w.wfl, status: w.status, ist: Math.round(w.ist),
         soll: w.soll && w.soll.miete != null ? Math.round(w.soll.miete) : null, soll_ab: w.soll ? w.soll.ab_text || null : null,
+        /* v3028 · beide Termine als Felder - objektWissen.js (Bot, Co-Pilot, Cockpit-Pilot) liest sie statt den Text zu deuten */
+        soll_verlangbar_ab: w.soll && w.soll.termine ? w.soll.termine.verlangbar_ab : null,
+        soll_verlangbar_sofort: w.soll && w.soll.termine ? w.soll.termine.verlangbar_sofort : null,
+        soll_wirksam_ab: w.soll && w.soll.termine ? w.soll.termine.wirksam_ab : null,
+        soll_termin: w.soll && w.soll.termine ? w.soll.termine.text_lang : null,
         soll_herkunft: w.soll ? w.soll.herkunft : null, ziel: w.ziel != null ? Math.round(w.ziel) : null, ziel_wann: w.ziel_wann || null,
         massnahmen: w.massnahmen.map(function (x) { return x.t + (zahl(x.k) ? ' ' + Math.round(zahl(x.k)) + ' €' : '') + (x.bewohnt ? ' (umgelegt nach § 559 BGB' + (zahl(x.erh) ? ', davon ' + zahl(x.erh) + ' % Erhaltung' : '') + ')' : ''); }).join(', ') || null,
         kosten: Math.round(w.kosten) || 0,
@@ -1489,7 +1572,7 @@
     var mehr1 = S.mieterhoehung ? (S.mieterhoehung.miete_m - S.bestand.miete_m) * 12 : 0;
     var mehr2 = S.zielbild ? (S.zielbild.miete_m - (S.mieterhoehung ? S.mieterhoehung.miete_m : S.bestand.miete_m)) * 12 : 0;
     var abs = m.wohnungen.map(function (w) { return w.soll && w.soll.ab && w.soll.miete > w.ist ? w.soll.ab : null; }).filter(Boolean).sort();
-    d.satz_bank = (S.mieterhoehung ? 'Ohne Mieterwechsel ist ' + (abs.length ? 'ab ' + monatText(abs[0]) + ' ' : '') + 'ein Mehrertrag von ' + eur(mehr1) + ' p. a. erreichbar' : 'Eine Mieterhöhung im Bestand ist nicht angesetzt')
+    d.satz_bank = (S.mieterhoehung ? 'Ohne Mieterwechsel ist ' + (abs.length ? 'ab ' + mmjj(abs[0]) + ' (frühestes Wirksamwerden nach § 558b/§ 559b BGB) ' : '') + 'ein Mehrertrag von ' + eur(mehr1) + ' p. a. erreichbar' : 'Eine Mieterhöhung im Bestand ist nicht angesetzt')
       + (S.zielbild ? (S.mieterhoehung ? ', mit den geplanten Maßnahmen weitere ' : '; mit den geplanten Maßnahmen ') + eur(mehr2) + ' p. a.' : '.')
       + (S.zielbild && S.zielbild.kosten ? ' Maßnahmenkosten ' + eur(S.zielbild.kosten)
         + (m.haus && m.haus.kosten ? ', davon am ganzen Haus ' + eur(m.haus.kosten) + ' (' + m.haus.massnahmen.map(function (x) { return x.t; }).join(', ') + ')' : '') + '.' : '');   /* v2966 */
@@ -1500,7 +1583,7 @@
       : 'Drei Stufen der Mietentwicklung mit Ertragswert je Stufe' + (r && r.aufteilung ? ' und der Wirkung einer Aufteilung in Eigentumswohnungen.' : '.');
     d.wohnungen = m.wohnungen.map(function (w) {
       return { we: (w.nr ? w.nr + ' ' : '') + (w.lage || ''), wfl: w.wfl, ist: w.ist > 0 ? eur(w.ist) : (w.status === 'leer' ? 'leer' : '—'),
-        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.ab ? ' · ' + (w.soll.ab <= heuteYm() ? 'sofort' : monatText(w.soll.ab)) : '') : '—',   /* v2430a: kurz - lange Termintexte liefen im PDF in die Nachbarspalten */
+        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.termine ? ' · verlangbar ' + (w.soll.termine.verlangbar_sofort ? 'sofort' : 'ab ' + mmjj(w.soll.termine.verlangbar_ab)) + ' · wirksam ab ' + mmjj(w.soll.termine.wirksam_ab) : '') : '—',   /* v2430a: lange Termintexte liefen in die Nachbarspalten; v3028: beide Termine, die Spalte bricht in beiden PDFs um (pdf.js _tab, pdf-investment-bank.js 'w') */
         ziel: w.ziel != null ? eur(w.ziel) : '—',
         massnahmen: w.massnahmen.map(function (x) { return x.t; }).join(', ') || '—' };
     });
@@ -2000,7 +2083,7 @@
     var s = w.soll || {};
     var vor = el('zb-soll-vorschlag');
     if (vor) vor.innerHTML = s.herkunft && s.herkunft !== 'eigene Angabe' && s.miete
-      ? 'DealPilot rechnet vor: <b>' + eur2(s.miete / (m.wfl || 1)) + '/m²</b> (' + esc(s.grenze || s.herkunft) + ')' + (s.ab_text ? ', erreichbar ' + esc(s.ab_text) : '') + '. Eigene Angabe überschreibt.' + (s.hinweise && s.hinweise.length ? ' Hinweis: ' + esc(s.hinweise.join(', ')) + '.' : '')
+      ? 'DealPilot rechnet vor: <b>' + eur2(s.miete / (m.wfl || 1)) + '/m²</b> (' + esc(s.grenze || s.herkunft) + ')' + (s.termine ? ', ' + esc(s.termine.text_lang) : '')   /* v3028: verlangbar ab · wirksam ab */ + '. Eigene Angabe überschreibt.' + (s.hinweise && s.hinweise.length ? ' Hinweis: ' + esc(s.hinweise.join(', ')) + '.' : '')
       : (s.grund && s.grund !== 'leer' ? esc(s.grund) : (s.hinweise && s.hinweise.length ? 'Hinweis: ' + esc(s.hinweise.join(', ')) : ''));
     host.innerHTML = !m.aktiv ? 'Ohne Angaben bleibt alles beim Bestand.'
       : 'Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
@@ -2153,6 +2236,7 @@
     sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
     herkunft: herkunft, herkunftAusDaten: herkunftAusDaten, herkunftHtml: herkunftHtml, leeren: leeren,   /* v2988 */
     indexmieteFuer: indexmieteFuer, indexmieteHtml: indexmieteHtml, indexmieteDaten: indexmieteDaten,   /* v3026 */
+    mhTermine: mhTermine, wirksamNachZugang: wirksamNachZugang, TERMIN_REGEL: TERMIN_REGEL, mmjj: mmjj,   /* v3028 */
     _hash: hash, _auftrag: auftrag
   };
 })();

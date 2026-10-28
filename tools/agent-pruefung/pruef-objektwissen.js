@@ -152,6 +152,13 @@ const merk = (s) => flach(s).slice(0, 40);
       pruefe('Potenzial: jede Position mit mehr_monat und Grund (art)', pos.every((x) => typeof x.mehr_monat === 'number' && x.art));
       const s = p.objekte.reduce((a, x) => a + x.in_diesem_jahr.mieterhoehungen_mehr_monat, 0);
       pruefe('Potenzial: Summe = Summe der Objekte', s === p.summe.mehrmiete_monat_eur, s + ' / ' + p.summe.mehrmiete_monat_eur);
+      /* v3028 · verlangbar ab und wirksam ab getrennt - nie mehr nur „sofort" */
+      const mh = pos.filter((x) => !/^Zielbild|Staffel/.test(x.art) && x.verlangen_ab);
+      pruefe('Termine: jede Mieterhöhung mit verlangen_ab UND wirksam_ab', mh.every((x) => /^\d{4}-\d{2}$/.test(x.wirksam_ab || '')), mh.length + ' Positionen');
+      pruefe('Termine: wirksam frühestens 2 Monate nach verlangbar', mh.every((x) => x.wirksam_ab > x.verlangen_ab));
+      pruefe('Termine: kein Termintext beginnt mit „sofort"', pos.every((x) => !/^sofort/i.test(String(x.ab_text || ''))),
+        (pos.find((x) => /^sofort/i.test(String(x.ab_text || ''))) || {}).ab_text);
+      if (mh[0]) console.log('   Beispiel Termin: ' + mh[0].art + ' ' + mh[0].einheit + ': ' + mh[0].ab_text + ' | ' + mh[0].termin);
       if (zeigen) console.log('POTENZIAL ' + JSON.stringify({ jahr: p.jahr, anzahl: p.anzahl, summe: p.summe, erstes: p.objekte[0] }, null, 1).slice(0, 2500));
     }
   }

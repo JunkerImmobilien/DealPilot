@@ -78,6 +78,13 @@ function _indexmieteBlock(im) {
   return z.join('\n');
 }
 
+/* v3028 · Marcel 28.10.2026: „sofort" hiess nur, dass das Verlangen jetzt gestellt werden darf.
+   Dieselbe Regel steht im Pilot-Auftrag (_potenzialBlock) und im Co-Pilot/Cockpit-Pilot (copilotChat);
+   tools/prompt-lecks-pruefen.mjs sucht sie in beiden. */
+const MH_TERMIN_REGEL = 'TERMINE DER MIETERHOEHUNG: Nenne zu jeder Mieterhoehung BEIDE Daten - "verlangbar ab" (wann das Erhoehungsschreiben fruehestens zugehen darf;'
+  + ' Paragraf 558 Abs. 1 BGB: ein Jahr nach der letzten Erhoehung) und "wirksam ab" (ab wann die hoehere Miete geschuldet ist; Paragraf 558b Abs. 1 und'
+  + ' 559b Abs. 2 BGB: Beginn des dritten Monats nach Zugang, Paragraf 557b Abs. 3 BGB: uebernaechster Monat). Das Wort "sofort" nur fuer das Verlangen'
+  + ' benutzen ("verlangbar ab sofort"), NIE fuer die Wirkung. Was in diesem Jahr ankommt, zaehlt nur ab "wirksam ab". Die Daten stehen fertig im Auftrag - nicht selbst nachrechnen.';
 function _potenzialBlock(pz) {
   var z = [], e = function (n) { return n == null ? '-' : Math.round(n).toLocaleString('de-DE') + ' EUR'; };
   z.push('');
@@ -86,6 +93,7 @@ function _potenzialBlock(pz) {
     + ' (Paragraf 558 BGB bis zur Vergleichsmiete, Kappungsgrenze, 15 Monate nach der letzten Erhoehung;'
     + ' Paragraf 559 bei Modernisierung im bewohnten Zustand); Zielbild = nach Umbau oder Neuvermietung.');
   if (pz.kappung && pz.kappung.text) z.push(pz.kappung.text);
+  z.push(MH_TERMIN_REGEL);   /* v3028 */
   var st = pz.stufen || {};
   z.push('');
   /* v2541 · Jahr je Stufe und beide Marktpreisindikationen (Marcel 20.10.2026) */
@@ -156,7 +164,7 @@ function _potenzialBlock(pz) {
   }
   if (Array.isArray(pz.wohnungen) && pz.wohnungen.length > 1) {
     z.push('');
-    z.push('Wohnung | m2 | Ist/Monat | Soll/Monat (ab) | Ziel/Monat (wann) | Massnahmen');
+    z.push('Wohnung | m2 | Ist/Monat | Soll/Monat (verlangbar ab · wirksam ab) | Ziel/Monat (wann) | Massnahmen');
     pz.wohnungen.forEach(function (w) {
       z.push((w.nr || '') + ' ' + (w.lage || '') + ' | ' + (w.wfl || '-') + ' | ' + (w.ist ? e(w.ist) : (w.status === 'leer' ? 'leer' : '-'))
         + ' | ' + (w.soll != null ? e(w.soll) + (w.soll_ab ? ' (' + w.soll_ab + ')' : '') : '-')
@@ -3652,6 +3660,8 @@ async function copilotChat(payload, opts) {
     'Gutachten, und nenne die Spanne mit. Nenne NIEMALS einen Anbieternamen: die Quelle heisst "unabhaengiger',
     'Bewertungspartner". Ist das Feld nicht da und die Frage braucht einen Marktpreis, weise in EINEM Satz auf den',
     'Knopf \u201eMarktpreis \u00b7 1 Abruf\u201c oben hin - und rate keine Zahl.',
+    /* v3028 \u00b7 Mieterhoehungen im Objektwissen (verlangen_ab, wirksam_ab) - beide nennen */
+    MH_TERMIN_REGEL,
     /* v1704: die Regeln, die nur fuer das Portfolio gelten. Sie stehen
        hier und nicht im Frontend-Auftrag, weil sie auch fuer jede
        Rueckfrage danach gelten muessen - nicht nur fuer die Analyse. */

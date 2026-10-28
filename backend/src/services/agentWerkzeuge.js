@@ -483,7 +483,7 @@ async function portfolio_potenzial(ctx, args) {
     summe: { mehrmiete_monat_eur: sM, mehrmiete_jahr_voll_eur: sJ, wirksam_im_jahr_eur: sW, zielbild_zusaetzlich_monat_eur: sZ },
     objekte: objekte.slice(0, 40),
     hinweis: 'Gelesen aus "Mieterhöhung & Zielbild" je Objekt (gerechnet in DealPilot: § 558 Vergleichsmiete mit Kappungsgrenze und '
-      + '15-Monats-Frist, § 559 Modernisierungsumlage, Indexmiete/Staffel als eigene Angabe). mehr_monat = Mehrmiete je Monat, WIRKSAM ab "ab_text" (§ 558b/§ 559b/§ 557b: erst nach Zugang des Erhöhungsschreibens), verlangen_ab = ab wann das Schreiben gestellt werden kann; mieterhoehungen_mehr_monat zählt alles, was im Jahr verlangt werden kann; '
+      + '15-Monats-Frist, § 559 Modernisierungsumlage, Indexmiete/Staffel als eigene Angabe). mehr_monat = Mehrmiete je Monat. TERMINE (v3028) IMMER BEIDE nennen: verlangen_ab = ab wann das Erhöhungsschreiben frühestens zugehen darf (verlangbar_sofort = heute), wirksam_ab = ab wann die höhere Miete geschuldet ist (§ 558b Abs. 1 / § 559b Abs. 2: Beginn des dritten Monats nach Zugang, § 557b Abs. 3: übernächster Monat); „sofort“ NUR für das Verlangen sagen, nie für die Wirkung; ab_text ist die fertige Kurzform, termin die Langform mit Norm; mieterhoehungen_mehr_monat zählt alles, was im Jahr verlangt werden kann; '
       + 'mehr_jahr_voll = volle Jahreswirkung (x12); wirksam_im_jahr_eur = was davon im Jahr ' + jahr + ' ankommt. Zielbild-Positionen sind '
       + 'Planung nach Maßnahmen, nicht Teil der Mieterhöhungssumme - getrennt nennen. Nenne den Stand; Mieterhöhungen sind ein Recht, keine '
       + 'Garantie (Zustimmung des Mieters nach § 558b BGB).' + (ohne ? ' ' + ohne + ' Objekte haben keine Planung - sag das.' : '')
@@ -520,7 +520,9 @@ async function marktmiete(ctx, args) {
     wohnflaeche: a.wohnflaeche, baujahr: a.baujahr, objekte });
   if (r.gefunden) r.hinweis = 'Nenne JEDE Quelle einzeln mit Wert, Stand und Herkunft (amtlich / Bestand / Angebot / eigene Objekte); '
     + 'verrechne sie nicht zu einem Mittelwert. Keine Anbieternamen - Angebote heißen "aktueller Marktdurchschnitt aus Angeboten". '
-    + 'Gutachterausschüsse darfst du nennen. Was fehlt, steht unter "fehlt" mit dem Weg dorthin - sag es.';
+    + 'Gutachterausschüsse darfst du nennen. Was fehlt, steht unter "fehlt" mit dem Weg dorthin - sag es. '
+    + 'Steht beim Zensus "fortgeschrieben", nenne beide Zahlen: den Zensuswert (Stand 15.05.2022) und den fortgeschriebenen mit seinem Etikett '
+    + '("Zensus 2022, fortgeschrieben auf MM/JJJJ mit dem Nettokaltmieten-Index") - rechne nicht selbst fort.';   /* v3028 */
   return r;
 }
 
@@ -4258,7 +4260,7 @@ const WERKZEUGE = [
   { name: 'marktmiete', stufe: 'lesen', fn: marktmiete,
     beschreibung: 'MARKTMIETE an einem Ort (auch ohne eigenes Objekt dort): alle Mietquellen '
       + 'von DealPilot nebeneinander, je mit Stand und Herkunft - amtlich (Gutachterausschuss), '
-      + 'Bestand (Zensus 2022), aktueller Marktdurchschnitt aus Angeboten (aus vorhandenen '
+      + 'Bestand (Zensus 2022, fortgeschrieben mit dem Nettokaltmieten-Index), aktueller Marktdurchschnitt aus Angeboten (aus vorhandenen '
       + 'Marktberichten), Ist-Mieten der eigenen Objekte am Ort - und was fehlt. Nutze es bei '
       + '"wie ist aktuell die Miete für ETWs in Herford mit 80 m²?", "was kostet ein Haus zur '
       + 'Miete in 32052?", "welche Miete ist in Bielefeld marktüblich?". Kostet nichts.',

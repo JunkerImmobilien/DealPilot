@@ -3555,6 +3555,7 @@ async function _exportPDFInner() {
           var zellen = werte.map(function (w, i) {
             var bw = breiten[i] * fak, t = _pc(w);
             if (!istKopf && /Maßnahmen/.test(kopf[i])) return doc.splitTextToSize(t, bw - 5).slice(0, 3);
+            if (!istKopf && /^Mieterhöhung/.test(kopf[i])) return doc.splitTextToSize(t, bw - 3).slice(0, 3);   /* v3028: Betrag · verlangbar · wirksam */
             if (i === 0) return [doc.splitTextToSize(t, bw - 3)[0] || ''];
             return [t];
           });

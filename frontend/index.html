@@ -1864,7 +1864,7 @@ label.dp-required.qc-required::after {
       <div class="g3">
         <div class="f"><label title="Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.">Vergleichsmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="aus Tab Miete" class="trl"></div></div>
         <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
-        <div class="f"><label title="Leer: 15 Monate nach der letzten Erhöhung (Tab Miete, Mietvertrag).">Soll erreichbar ab</label><div class="iw"><input id="zb_soll_ab" type="month"></div></div>
+        <div class="f"><label title="Leer: DealPilot rechnet verlangbar ab (ein Jahr nach der letzten Erhöhung, § 558 Abs. 1 BGB) und wirksam ab (Beginn des dritten Kalendermonats nach Zugang, § 558b Abs. 1 BGB).">Soll wirksam ab</label><div class="iw"><input id="zb_soll_ab" type="month"></div></div>
         <div class="f"><label title="Was nach Umbau oder Neuvermietung erzielbar ist.">Zielmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_ziel_qm" type="text" inputmode="decimal" placeholder="z. B. 9,20" class="trl"></div></div>
         <div class="f s2"><label>Zielbild ab wann</label><div class="iw"><input id="zb_ziel_wann" type="text" placeholder="z. B. nach Sanierung 2027"></div></div>
       </div>
@@ -3666,7 +3666,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-anlage-bmf.js?v=v3018c"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v3026"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v3018d"></script>
+<script src="js/pdf-investment-bank.js?v=v3028"></script>
 <script src="js/bmf-modal.js?v=v3018d"></script>
 <script src="js/bmf-modal-v292.js?v=v3006d"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2943"></script>
@@ -3702,7 +3702,7 @@ label.dp-required.qc-required::after {
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
-<script src="js/mietentwicklung.js?v=v2852"></script>
+<script src="js/mietentwicklung.js?v=v3028"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v3021"></script>
 <script src="js/steuer-verlauf.js?v=v2992"></script>
@@ -3758,7 +3758,7 @@ label.dp-required.qc-required::after {
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v3006c"></script>
 <script src="js/track-record.js?v=v3003a"></script>
-<script src="js/pdf.js?v=v3018d"></script>
+<script src="js/pdf.js?v=v3028"></script>
 <script src="js/pdf-pruefung.js?v=v3018d"></script><!-- v3018d · EIN Tor vor jedem PDF -->
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
@@ -3793,13 +3793,13 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-reiter.js?v=v3002"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3027"></script>
+<script src="js/mfh-einheiten.js?v=v3028"></script>
 <script src="js/mfh-felder.js?v=v3003"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
-<script src="js/potenzial.js?v=v3025b"></script>
-<script src="js/mietvertrag-objekt.js?v=v3027"></script>
+<script src="js/potenzial.js?v=v3028"></script>
+<script src="js/mietvertrag-objekt.js?v=v3028"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
@@ -3809,7 +3809,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2988"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3025b"></script>
+<script src="js/help.js?v=v3028"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3001"></script>

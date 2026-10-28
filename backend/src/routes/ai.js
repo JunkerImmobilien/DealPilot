@@ -1991,7 +1991,7 @@ async function _copilotObjektwissen(uid, payload) {
          Position nur Grund, Wohnung, Betrag, Zeitpunkt; Einzelheiten liefern die Bot-Werkzeuge. */
       const p = await fn('portfolio_potenzial')(wctx, {});
       if (p && p.objekte) p.objekte = p.objekte.map((o) => ({ adresse: o.adresse, stand: o.stand, in_diesem_jahr: o.in_diesem_jahr,
-        positionen: o.positionen.slice(0, 4).map((x) => ({ art: x.art, einheit: x.einheit, mehr_monat: x.mehr_monat, wirksam: x.ab_text })),
+        positionen: o.positionen.slice(0, 4).map((x) => ({ art: x.art, einheit: x.einheit, mehr_monat: x.mehr_monat, verlangbar_ab: x.verlangbar_sofort ? 'sofort' : (x.verlangen_ab || null), wirksam_ab: x.wirksam_ab || null, termin: x.ab_text })),   /* v3028 */
         weitere_positionen: o.positionen.length > 4 ? o.positionen.length - 4 : undefined }));
       wissen.mietpotenzial_dieses_jahr = p;
       /* Mieterhoehungen stehen schon im Potenzial - je Objekt eine Sammelzeile statt einer je Wohnung */

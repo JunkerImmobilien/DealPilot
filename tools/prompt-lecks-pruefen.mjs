@@ -275,7 +275,10 @@ const auftrag = {
     massnahmen_herkunft: { text: 'PRUEF-ZIELBILD-AUS-5-WOHNUNGEN', summe: 136543, n_wohnungen: 5, haus: 0,
       sanierungskosten_investition: 137321, unterschied: 'PRUEF-UNTERSCHIED' },
     miete_nach_modernisierung: { satz: 'PRUEF-MIETE-NACH-MODERNISIERUNG', weg: 'amtlich_nach_modernisierung', wirkt: false },
-    sanierung_regel: 'PRUEF-SANIERUNG-REGEL'
+    sanierung_regel: 'PRUEF-SANIERUNG-REGEL',
+    /* v3028 · Termine je Wohnung: verlangbar ab · wirksam ab (potenzial.js mhTermine) */
+    wohnungen: [{ nr: '1', lage: 'EG', wfl: 60, ist: 500, soll: 560, soll_ab: 'PRUEF-VERLANGBAR-SOFORT-WIRKSAM-01/2027' },
+                { nr: '2', lage: 'OG', wfl: 70, ist: 600, soll: 650, soll_ab: 'PRUEF-VERLANGBAR-03/2027-WIRKSAM-06/2027' }]
   },
   /* ── v3026 · Indexmiete (potenzial.js indexmieteDaten) ── */
   indexmiete: {
@@ -441,6 +444,12 @@ const ERWARTET = [
   ['potenzial: Spaltenname Massnahmen im Zielbild', 'v2988', 'Massnahmen im Zielbild (Kosten)'],
   ['potenzial.miete_nach_modernisierung.satz', 'potenzial.js zusammenfassung()', 'PRUEF-MIETE-NACH-MODERNISIERUNG'],
   ['potenzial.sanierung_regel', 'potenzial.js zusammenfassung()', 'PRUEF-SANIERUNG-REGEL'],
+  /* ── v3028 · Mieterhöhung: verlangbar ab und wirksam ab getrennt ─ */
+  ['potenzial.wohnungen[0].soll_ab', 'potenzial.js zusammenfassung()', 'PRUEF-VERLANGBAR-SOFORT-WIRKSAM-01/2027'],
+  ['potenzial.wohnungen[1].soll_ab', 'potenzial.js zusammenfassung()', 'PRUEF-VERLANGBAR-03/2027-WIRKSAM-06/2027'],
+  ['potenzial: Spalte verlangbar/wirksam', 'v3028', 'Soll/Monat (verlangbar ab · wirksam ab)'],
+  ['potenzial: Regel sofort nur fuers Verlangen', 'v3028', 'Das Wort "sofort" nur fuer das Verlangen'],
+  ['potenzial: Regel Jahr ab wirksam', 'v3028', 'zaehlt nur ab "wirksam ab"'],
   /* ── v3026 · Indexmiete ─ */
   ['indexmiete.zeile', 'potenzial.js indexmieteDaten()', 'PRUEF-INDEXMIETE-ZEILE'],
   ['indexmiete.annahme', 'potenzial.js indexmieteDaten()', 'PRUEF-INDEX-ANNAHME'],

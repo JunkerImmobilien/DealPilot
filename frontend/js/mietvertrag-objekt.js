@@ -122,6 +122,7 @@
     var n = parseFloat(s); return isFinite(n) ? n : 0;
   }
   function datum(s) { var m = String(s || '').match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/); return m ? (m[3] ? m[3] + '.' : '') + m[2] + '.' + m[1] : ''; }
+  function heuteYm() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }   /* v3028 */
   function mon(k) { return k ? k.slice(5, 7) + '/' + k.slice(0, 4) : ''; }
   function eur(x) { return (Math.round(x * 100) / 100).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €'; }
   function artName(a) {
@@ -137,7 +138,7 @@
     if (!art) return { text: '', fehlt: ['Vertragsart'] };
     if (art === 'index') {
       var r = P && P.indexmieteFuer ? P.indexmieteFuer(e) : null;
-      if (r && r.ok) return { text: 'Index: ab ' + mon(r.naechste.wirksam) + ' ' + (r.naechste.plus_monat >= 0 ? '+' : '') + eur(r.naechste.plus_monat) + '/Monat' + (r.naechste.annahme ? ' (Annahme)' : ''), fehlt: [] };
+      if (r && r.ok) return { text: 'Index: Erklärung ab ' + (r.naechste.erklaerung <= heuteYm() ? 'sofort' : mon(r.naechste.erklaerung)) + ' · wirksam ab ' + mon(r.naechste.wirksam) + ' ' + (r.naechste.plus_monat >= 0 ? '+' : '') + eur(r.naechste.plus_monat) + '/Monat' + (r.naechste.annahme ? ' (Annahme)' : ''), fehlt: [] };
       return { text: 'Indexmiete', fehlt: r && r.fehlt ? r.fehlt.map(function (f) { return /Mietbeginn/.test(f) ? 'Mietbeginn oder letzte Erhöhung' : f; }) : ['Mietbeginn oder letzte Erhöhung'] };
     }
     if (art === 'staffel') return e.mv_naechste_anpassung ? { text: 'nächste Staffel ' + datum(e.mv_naechste_anpassung), fehlt: [] } : { text: 'Staffel', fehlt: ['nächste Staffel'] };
@@ -145,7 +146,9 @@
     if (art === 'moebliert_kurz') return { text: 'nach Vertrag', fehlt: [] };
     var s = P && P.sollFuer ? P.sollFuer(e, {}) : null;
     if (!e.mv_letzte_erhoehung && !e.mv_beginn) return { text: '§ 558', fehlt: ['letzte Erhöhung oder Mietbeginn'] };
-    return { text: '§ 558: ' + (s && s.ab_text ? s.ab_text : 'sofort'), fehlt: [] };
+    /* v3028 · nie mehr nur „sofort“: verlangbar ab · wirksam ab (DpPotenzial.mhTermine, § 558b Abs. 1 BGB) */
+    var t = s && s.termine ? s.termine : (P && P.mhTermine ? P.mhTermine({ art: '558', letzte: e.mv_letzte_erhoehung }) : null);
+    return { text: '§ 558: ' + (t ? t.text : '–'), titel: t ? t.text_lang : '', fehlt: [] };
   }
   var STIL = '#mv-einheiten-uebersicht{margin-top:4px}'
     + '#mv-einheiten-uebersicht .mveu-kopf{font:600 12.5px Inter,sans-serif;color:#2A2727;margin:0 0 8px}'
@@ -198,7 +201,7 @@
         + '<td>' + esc(datum(e.mv_beginn) || '–') + '</td>'
         + '<td>' + esc(datum(e.mv_letzte_erhoehung) || '–') + '</td>'
         + '<td class="mveu-r">' + (zahl(e.ist) > 0 && e.status !== 'leer' ? esc(eur(zahl(e.ist))) : '–') + '</td>'
-        + '<td>' + esc(t.text) + fehlt + '</td></tr>';
+        + '<td' + (t.titel ? ' title="' + esc(t.titel) + '"' : '') + '>' + esc(t.text) + fehlt + '</td></tr>';
     }).join('');
     var html = '<div class="mveu-kopf">' + esc(kopf) + '</div>'
       + '<div class="mveu-wrap"><table><thead><tr><th>Einheit</th><th>Vertrag</th><th>Mietbeginn</th><th>Letzte Anp.</th><th>Kaltmiete</th><th>Nächste Erhöhung</th></tr></thead><tbody>' + zeilen + '</tbody></table></div>'

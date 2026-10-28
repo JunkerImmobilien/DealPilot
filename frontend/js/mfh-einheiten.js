@@ -558,7 +558,7 @@
           '<div class="mfh-we-raster">' +
             f('vgl_qm', 'Vergleichsmiete €/m² (Mietspiegel)', '', 'decimal') +
             f('soll', 'Soll-Miete (€/Monat, eigene Angabe)', '', 'decimal') +
-            d('soll_ab', 'Erreichbar ab (eigene Angabe)', 'month') +
+            d('soll_ab', 'Wirksam ab (eigene Angabe)', 'month') +
           '</div><div class="mfh-we-ergebnis" id="mfh-we-soll"></div>') +
         /* v2430 · ZIELBILD — nach Umbau oder Neuvermietung. Massnahmen als
            Chips mit Kosten und Modernisierungspunkten (Anlage 2). */
@@ -604,7 +604,11 @@
         if (!w || e.status === 'leer' || !(ist > 0)) hS.innerHTML = '<p class="mfh-we-hint">Leer stehend oder ohne Ist-Miete: keine Soll-Miete, die Wohnung geht direkt ins Zielbild.</p>';
         else hS.innerHTML = (so && so.miete != null
             ? '<div class="mfh-we-kv"><div><span>Soll-Miete</span><b class="c-soll">' + eur(so.miete) + '/Monat' + (wfl ? ' · ' + (so.miete / wfl).toFixed(2).replace('.', ',') + ' €/m²' : '') + '</b></div>'
-              + '<div><span>erreichbar ab</span><b>' + esc(so.ab_text || '—') + '</b></div>'
+              /* v3028 · getrennt: wann das Verlangen zugehen darf, wann die Miete geschuldet ist (DpPotenzial.mhTermine) */
+              + (so.termine
+                ? '<div><span>verlangbar ab</span><b>' + esc(so.termine.verlangbar_sofort ? 'sofort' : P.mmjj(so.termine.verlangbar_ab)) + '</b></div>'
+                  + '<div><span>wirksam ab</span><b>' + esc(P.mmjj(so.termine.wirksam_ab)) + '</b> <small>(' + esc(so.termine.grund) + ')</small></div>'
+                : '<div><span>wirksam ab</span><b>—</b></div>')
               + '<div><span>Herkunft</span><b>' + esc(so.herkunft || '') + (so.grenze ? ' · ' + esc(so.grenze) : '') + '</b></div></div>'
               + (so.kapp_angerechnet ? '<p class="mfh-we-hint">Kappungsgrenze auf ' + eur(so.kapp_basis) + '/Monat gerechnet — die Miete vor der letzten Erhöhung; die Erhöhung um ' + eur(so.kapp_angerechnet) + ' liegt in den drei Jahren und ist angerechnet (§ 558 Abs. 3 BGB).</p>' : '')
               + (so.umlage559 ? '<p class="mfh-we-hint">Darin Modernisierungsumlage § 559 BGB: ' + eur(so.umlage559.monat) + '/Monat (8 % von ' + eur(so.umlage559.kosten) + (so.umlage559.gedeckelt ? ', gedeckelt auf ' + so.umlage559.kappe_qm + ' €/m²' : '') + ').</p>' : '')

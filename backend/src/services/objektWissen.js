@@ -145,14 +145,49 @@ function unterlagen(data, opts) {
 }
 
 /* ── 3 · Potenzial im Jahr — gelesen aus _potenzial.zusammenfassung ──────── */
-/* `soll_ab` ist dort Text („sofort", „sofort (letzte Erhöhung …)", „Okt 2026"),
-   gerechnet am Stand der Zusammenfassung. „sofort" heisst: ab dem Stand. */
+/* v3028 · TERMINE: Marcel 28.10.2026 („ja, mach das so") - „sofort" hiess in der App nur, dass
+   das Erhoehungsverlangen JETZT gestellt werden darf. Getrennt ausgewiesen werden seither
+   „verlangbar ab" (frühester Zugang) und „wirksam ab" (Beginn der Zahlungspflicht):
+     § 558b Abs. 1 BGB  „... schuldet er die erhöhte Miete mit Beginn des dritten Kalendermonats
+                         nach dem Zugang des Erhöhungsverlangens."
+     § 559b Abs. 2 BGB  „Der Mieter schuldet die erhöhte Miete mit Beginn des dritten Monats nach
+                         dem Zugang der Erklärung."
+     § 557b Abs. 3 BGB  „Die geänderte Miete ist mit Beginn des übernächsten Monats nach dem
+                         Zugang der Erklärung zu entrichten."
+     (gesetze-im-internet.de, gelesen 28.10.2026)
+   GERECHNET wird das an EINER Stelle: frontend/js/potenzial.js mhTermine(). Die Zusammenfassung
+   speichert je Wohnung soll_verlangbar_ab, soll_verlangbar_sofort, soll_wirksam_ab, soll_termin -
+   hier wird nur gelesen. Der Indexpfad liest index.erklaerung_ab / index.ab (js/indexmiete.js).
+
+   ALTER SPEICHERSTAND (vor v3028, nur `soll_ab` als Text „sofort"/„Okt 2026"): bis das Objekt
+   einmal in der App geöffnet wurde, gibt es die Felder nicht. Dafür steht unten _altTermin(),
+   gekennzeichnet als „aus altem Speicherstand umgerechnet". tools/mieterhoehung-termine-pruefen.mjs
+   haelt TERMIN_PLUS und _altTermin() gegen mhTermine() zusammen (dieselben Faelle, dasselbe Ergebnis). */
+const TERMIN_PLUS = { '558': 3, '559': 3, '557b': 2 };
+const TERMIN_NORM = { '558': '§ 558b Abs. 1 BGB', '559': '§ 559b Abs. 2 BGB', '557b': '§ 557b Abs. 3 BGB' };
+function _mmjj(ym) { return /^\d{4}-\d{2}/.test(ym || '') ? ym.slice(5, 7) + '/' + ym.slice(0, 4) : null; }
+function _plusM(ym, n) {
+  const m = /^(\d{4})-(\d{2})/.exec(ym || ''); if (!m) return null;
+  const t = +m[1] * 12 + (+m[2] - 1) + n; return Math.floor(t / 12) + '-' + String(t % 12 + 1).padStart(2, '0');
+}
+function _terminText(verl, sofort, wirk) {
+  return 'verlangbar ab ' + (sofort ? 'sofort' : _mmjj(verl)) + ' · wirksam ab ' + _mmjj(wirk);
+}
+/* nur alter Speicherstand: `soll_ab` als Text, gerechnet am Stand der Zusammenfassung */
 function _abYm(text, stand, heuteYm) {
   const t = String(text || '');
   const m = t.match(/\b(Jan|Feb|Mrz|Apr|Mai|Jun|Jul|Aug|Sep|Okt|Nov|Dez)\s+((?:19|20)\d\d)\b/);
   if (m) return m[2] + '-' + String(MON.indexOf(m[1]) + 1).padStart(2, '0');
   if (/^sofort/i.test(t)) { const s = /^\d{4}-\d{2}/.test(stand || '') ? stand.slice(0, 7) : heuteYm; return s > heuteYm ? s : heuteYm; }
   return null;
+}
+/* Der alte Text war der früheste WIRKSAM-Monat nach § 558 Abs. 1 (letzte + 15) oder „sofort"
+   (schon erreicht). verlangbar = wirksam - plus, nie vor heute; wirksam = verlangbar + plus. */
+function _altTermin(soll_ab, stand, heuteYm, art) {
+  const ab = _abYm(soll_ab, stand, heuteYm); if (!ab) return null;
+  const plus = TERMIN_PLUS[art] || 3;
+  let verl = _plusM(ab, -plus); if (!verl || verl < heuteYm) verl = heuteYm;
+  return { verlangbar_ab: verl, verlangbar_sofort: verl <= heuteYm, wirksam_ab: _plusM(verl, plus), alt: true };
 }
 function _monateIm(jahr, abYm) {
   if (!abYm) return null;
@@ -164,6 +199,8 @@ function _monateIm(jahr, abYm) {
 /**
  * potenzial(data, jahr) -> null | { stand, positionen:[...], summe_monat, summe_im_jahr, ... }
  * Positionen: Mieterhoehung (§ 558 / § 559 / eigene Angabe / Indexmiete), Zielbild.
+ * Je Mieterhoehung: verlangen_ab (JJJJ-MM), verlangbar_sofort, ab = wirksam_ab (JJJJ-MM),
+ * ab_text = „verlangbar ab … · wirksam ab …", termin = Langform mit Norm.
  */
 function potenzial(data, jahr, heute) {
   const d = _daten(data);
@@ -179,18 +216,19 @@ function potenzial(data, jahr, heute) {
       const ist = _zahl(w.ist), soll = _zahl(w.soll);
       const name = (w.nr ? 'Whg ' + w.nr : 'Wohnung') + (w.lage ? ' (' + w.lage + ')' : '');
       const vertrag = vertragVon(w.nr);
-      /* v3024-Schnittstelle: legt potenzial.js je Wohnung `index` ab ({miete, ab|ab_text, herkunft}),
-         wird es hier gelesen - die Rechnung nach § 557b bleibt in der App. */
+      /* Indexmiete: potenzial.js legt je Wohnung `index` ab ({miete, ab = wirksam, erklaerung_ab}) -
+         die Rechnung nach § 557b bleibt in js/indexmiete.js. */
       if (w.index && _zahl(w.index.miete) > ist) {
-        const ab = /^\d{4}-\d{2}/.test(w.index.ab || '') ? w.index.ab.slice(0, 7) : _abYm(w.index.ab_text, z.stand, heuteYm);
-        /* `ab` ist hier schon der Wirksamkeitsmonat nach § 557b Abs. 3 (indexmiete.js: Erklärung + 2) */
+        const wirk = /^\d{4}-\d{2}/.test(w.index.ab || '') ? w.index.ab.slice(0, 7) : null;
+        const erk = /^\d{4}-\d{2}/.test(w.index.erklaerung_ab || '') ? String(w.index.erklaerung_ab).slice(0, 7) : null;
+        const sofort = !!erk && erk <= heuteYm;
         pos.push({ art: 'Indexmiete (§ 557b BGB)', einheit: name, ist_monat: ist, neu_monat: _zahl(w.index.miete), mehr_monat: Math.round((_zahl(w.index.miete) - ist) * 100) / 100,
-          ab: ab, ab_text: (_ymText(ab) || w.index.ab_text || '') + (w.index.erklaerung_ab ? ' (Erklärung ab ' + _ymText(String(w.index.erklaerung_ab).slice(0, 7)) + ')' : '') || null,
-          verlangen_ab: /^\d{4}-\d{2}/.test(w.index.erklaerung_ab || '') ? String(w.index.erklaerung_ab).slice(0, 7) : null,
+          verlangen_ab: erk, verlangbar_sofort: sofort, ab: wirk, wirksam_ab: wirk,
+          ab_text: wirk ? (erk ? _terminText(erk, sofort, wirk) : 'wirksam ab ' + _mmjj(wirk)) : (w.index.ab_text || null),
+          termin: wirk ? 'Erklärung ' + (sofort ? 'ab sofort' : 'ab ' + _mmjj(erk)) + ', wirksam ab dem übernächsten Monat nach Zugang (§ 557b Abs. 3 BGB): ' + _mmjj(wirk) + (sofort ? ' (Zugang heute angenommen)' : '') : null,
           annahme: w.index.annahme ? 'VPI-Zukunftswert ist eine Annahme, kein amtlicher Wert' : undefined,
           herkunft: w.index.herkunft || 'gerechnet in DealPilot (Indexmiete)' });
       } else if (soll != null && ist != null && soll > ist + 0.01) {
-        const ab = _abYm(w.soll_ab, z.stand, heuteYm);
         const her = String(w.soll_herkunft || '');
         const art = vertrag === 'index' ? 'Indexmiete (§ 557b BGB, eigene Angabe)'
           : vertrag === 'staffel' ? 'Staffelmiete (eigene Angabe)'
@@ -198,22 +236,33 @@ function potenzial(data, jahr, heute) {
           : /559/.test(her) ? 'Modernisierungsumlage § 559 BGB'
           : /558/.test(her) ? 'Mieterhöhung § 558 BGB (Vergleichsmiete, Kappungsgrenze)'
           : 'Soll-Miete (eigene Angabe)';
-        /* „sofort“ heisst in der App: das Verlangen darf jetzt gestellt werden. WIRKSAM wird die
-           Erhoehung erst spaeter - § 558b Abs. 1 und § 559b Abs. 2 BGB: ab dem dritten
-           Kalendermonat nach Zugang, Indexmiete § 557b Abs. 3: ab dem uebernaechsten Monat.
-           Staffelmiete steigt ohne Erklaerung. Angenommen: das Schreiben geht diesen Monat zu. */
-        let abW = ab, zugang = null;
-        if (ab && ab <= heuteYm && vertrag !== 'staffel') {
-          const plus = vertrag === 'index' ? 2 : 3;
-          const dt = new Date(now.getFullYear(), now.getMonth() + plus, 1);
-          abW = _ym(dt);
-          zugang = 'frühestens ' + _ymText(abW) + ', wenn das Erhöhungsschreiben noch im ' + _ymText(heuteYm) + ' zugeht ('
-            + (vertrag === 'index' ? '§ 557b Abs. 3' : /559/.test(her) && !/558/.test(her) ? '§ 559b Abs. 2' : '§ 558b Abs. 1') + ' BGB)';
-        }
+        const norm = vertrag === 'index' ? '557b' : (/559/.test(her) && !/558/.test(her)) ? '559' : '558';
+        let t = null;
+        /* Staffel steigt ohne Erklärung (§ 557a BGB) - Termin = nächste Staffel aus den Einheiten */
+        const eSt = vertrag === 'staffel' ? einh.find((x) => x && String(x.nr || '') === String(w.nr || '')) || (einh.length === 1 ? einh[0] : null) : null;
+        const stYm = eSt && /^\d{4}-\d{2}/.test(eSt.mv_naechste_anpassung || '') ? String(eSt.mv_naechste_anpassung).slice(0, 7) : null;
+        if (vertrag === 'staffel') t = null;
+        else if (/^\d{4}-\d{2}/.test(w.soll_wirksam_ab || '')) {
+          /* v3028: gespeichert von potenzial.js mhTermine() */
+          t = { verlangbar_ab: String(w.soll_verlangbar_ab || '').slice(0, 7) || null, wirksam_ab: w.soll_wirksam_ab.slice(0, 7), alt: false };
+          t.verlangbar_sofort = !!t.verlangbar_ab && t.verlangbar_ab <= heuteYm;
+          /* gespeichert in einem früheren Monat: was damals „sofort" war, geht frühestens heute zu */
+          if (t.verlangbar_ab && t.verlangbar_ab < heuteYm) {
+            t.verlangbar_ab = heuteYm;
+            const fr = _plusM(heuteYm, TERMIN_PLUS[norm]);
+            if (t.wirksam_ab < fr) { t.wirksam_ab = fr; t.verschoben = true; }
+          }
+        } else t = _altTermin(w.soll_ab, z.stand, heuteYm, norm);
         pos.push({ art, einheit: name, ist_monat: ist, neu_monat: soll, mehr_monat: Math.round((soll - ist) * 100) / 100,
-          ab: abW, ab_text: zugang || _ymText(abW) || w.soll_ab || null,
-          verlangen_ab: vertrag === 'staffel' ? null : (zugang ? heuteYm : (abW ? _ym(new Date(+abW.slice(0, 4), +abW.slice(5, 7) - 1 - (vertrag === 'index' ? 2 : 3), 1)) : null)),
-          wartefrist: /\(letzte Erh/.test(w.soll_ab || '') ? 'letzte Erhöhung nicht eingetragen - Wartefrist § 558 Abs. 1 BGB (15 Monate) nicht geprüft' : undefined,
+          verlangen_ab: t ? t.verlangbar_ab : null, verlangbar_sofort: t ? t.verlangbar_sofort : undefined,
+          ab: t ? t.wirksam_ab : (vertrag === 'staffel' ? stYm : null), wirksam_ab: t ? t.wirksam_ab : (vertrag === 'staffel' ? stYm : null),
+          ab_text: t ? _terminText(t.verlangbar_ab, t.verlangbar_sofort, t.wirksam_ab)
+            : vertrag === 'staffel' ? (stYm ? 'nächste Staffel wirksam ab ' + _mmjj(stYm) + ' (§ 557a BGB, ohne Erklärung)' : 'nächste Staffel laut Vertrag - Datum nicht eingetragen (§ 557a BGB, ohne Erklärung)')
+            : (/^sofort/i.test(w.soll_ab || '') ? null : (w.soll_ab || null)),   /* v3028: nie ein nacktes „sofort“ */
+          termin: !t ? null : (!t.alt && !t.verschoben && w.soll_termin) ? w.soll_termin
+            : _terminText(t.verlangbar_ab, t.verlangbar_sofort, t.wirksam_ab) + ' (' + (t.verlangbar_sofort ? 'Zugang heute angenommen, ' : 'bei Zugang im ' + _mmjj(t.verlangbar_ab) + ', ') + TERMIN_NORM[norm] + ')'
+              + (t.alt ? ' - aus altem Speicherstand umgerechnet; genau nach einmal Öffnen von „Mieterhöhung & Zielbild"' : ''),
+          wartefrist: /\(letzte Erh/.test(w.soll_ab || '') || /nicht eingetragen/.test(w.soll_termin || '') ? 'letzte Erhöhung nicht eingetragen - Sperrfrist § 558 Abs. 1 BGB (ein Jahr bis zum Verlangen, 15 Monate bis zur Wirkung) nicht geprüft' : undefined,
           herkunft: her || null });
       }
       const ziel = _zahl(w.ziel);
@@ -283,7 +332,7 @@ function todos(data, opts) {
   const p = potenzial(d, jahr, heute);
   if (p) {
     p.positionen.filter((x) => !/^Zielbild/.test(x.art) && ((x.verlangen_ab && +x.verlangen_ab.slice(0, 4) <= jahr) || (x.ab && +x.ab.slice(0, 4) <= jahr))).forEach((x) =>
-      L.push({ art: 'Miete', was: (x.verlangen_ab ? 'Erhöhung verlangen' + (x.verlangen_ab > _ym(heute) ? ' ab ' + _ymText(x.verlangen_ab) : ' (jetzt möglich)') + ' - ' : '') + x.art + ' ' + x.einheit + ': +' + _eur(x.mehr_monat) + '/Monat (' + _eur(x.ist_monat) + ' → ' + _eur(x.neu_monat) + '), wirksam ' + x.ab_text + (x.wartefrist ? '; ' + x.wartefrist : ''), faellig: x.verlangen_ab ? _ymText(x.verlangen_ab) : x.ab_text, quelle: 'Mieterhöhung & Zielbild, Stand ' + (p.stand || '?') }));
+      L.push({ art: 'Miete', was: (x.verlangen_ab ? 'Erhöhung verlangen ' + (x.verlangbar_sofort ? 'ab sofort' : 'ab ' + _mmjj(x.verlangen_ab)) + ' - ' : '') + x.art + ' ' + x.einheit + ': +' + _eur(x.mehr_monat) + '/Monat (' + _eur(x.ist_monat) + ' → ' + _eur(x.neu_monat) + ')' + (x.wirksam_ab ? ', wirksam ab ' + _mmjj(x.wirksam_ab) : (x.ab_text ? ', ' + x.ab_text : '')) + (x.termin ? ' [' + x.termin + ']' : '') + (x.wartefrist ? '; ' + x.wartefrist : ''), faellig: x.verlangen_ab ? (x.verlangbar_sofort ? 'sofort (verlangbar)' : _mmjj(x.verlangen_ab)) : x.ab_text,   /* v3028 */ quelle: 'Mieterhöhung & Zielbild, Stand ' + (p.stand || '?') }));
     (p.nicht_erfasst || []).forEach((t) => L.push({ art: 'Miete', was: t, quelle: 'Einheiten (Mietvertragsart)' }));
   }
   [['d1', 'Darlehen I'], ['d2', 'Darlehen II']].forEach(([k, name]) => {
@@ -328,9 +377,9 @@ function todos(data, opts) {
  *             (Bericht 2025). Mietpreisübersicht eines Ausschusses: nur aus einem
  *             vorhandenen Bericht Stufe 3 (eine Tabelle: Minden-Lübbecke).
  *   Bestand   Zensus 2022 (/zensus/objekt): Klasse nach Baujahr und Größe, Gemeinde
- *             vor Kreis, Stichtag 15.05.2022 — NICHT fortgeschrieben (die
- *             Fortschreibung mit dem Nettokaltmieten-Index rechnet nur der
- *             Marktbericht-Dienst, zensus_miete.js; ein Endpunkt fehlt, offen).
+ *             vor Kreis, Stichtag 15.05.2022 — seit v3028 dazu fortgeschrieben
+ *             auf den jüngsten Monat des Nettokaltmieten-Index (mb-backend
+ *             /zensus/fortgeschrieben, rechnet lib/zensus_miete.js).
  *   Angebot   aktueller Marktdurchschnitt aus Angeboten: nur aus einem schon
  *             erstellten Marktbericht zu einem Objekt am Ort (mietBelegeService,
  *             kostenlos lesbar). Ein neuer Abruf kostet Kontingent — der Weg wird
@@ -383,8 +432,10 @@ async function marktmiete(opt) {
   if (!ags) { const a = await _json(MB_BASE + '/ags?plz=' + plz, 4000); if (a && a.gemeinde_ags) { ags = a.gemeinde_ags; } else if (a && a.kreis_ags) ags = a.kreis_ags; }
 
   const quellen = [], fehlt = [];
-  const [zen, reg] = await Promise.all([
-    _json(MB_BASE + '/zensus/objekt?plz=' + plz + '&ort=' + encodeURIComponent(ort || '') + '&baujahr=' + (bj || '') + '&wfl=' + (wfl || ''), 5000),
+  const zq = '?plz=' + plz + '&ort=' + encodeURIComponent(ort || '') + '&baujahr=' + (bj || '') + '&wfl=' + (wfl || '');
+  const [zen, zfort, reg] = await Promise.all([
+    _json(MB_BASE + '/zensus/objekt' + zq, 5000),
+    _json(MB_BASE + '/zensus/fortgeschrieben' + zq, 5000),   /* v3028 · Fortschreibung mit dem Nettokaltmieten-Index */
     (ags && ZWEIG[art]) ? _json(MB_BASE + '/register/probe?ags=' + ags + '&kennzahl=liegenschaftszinssatz&zweig=' + ZWEIG[art][0], 4000) : Promise.resolve(null)
   ]);
 
@@ -411,10 +462,21 @@ async function marktmiete(opt) {
       const klassen = [];
       if (b.miete_baujahr && _zahl(b.miete_baujahr.wert) > 0) klassen.push({ nach: 'Baujahr ' + b.miete_baujahr.klasse, wert_qm: _zahl(b.miete_baujahr.wert) });
       if (b.miete_flaeche && _zahl(b.miete_flaeche.wert) > 0) klassen.push({ nach: 'Wohnungsgröße ' + b.miete_flaeche.klasse, wert_qm: _zahl(b.miete_flaeche.wert) });
-      quellen.push({ art: 'Bestand', wert_qm: _zahl(b.nettokaltmiete_qm), klassen,
+      const q = { art: 'Bestand', wert_qm: _zahl(b.nettokaltmiete_qm), klassen,
         was: 'durchschnittliche Nettokaltmiete der bewohnten Mietwohnungen (alle Mietverhältnisse, auch alte)',
         herkunft: 'Zensus 2022, ' + (g ? 'Gemeinde ' : 'Kreis ') + (b.name || ''), stand: '15.05.2022',
-        hinweis: 'Bestandsmieten von 2022, nicht fortgeschrieben - liegen typisch unter Neuvermietungsmieten.' });
+        hinweis: 'Bestandsmieten von 2022, nicht fortgeschrieben - liegen typisch unter Neuvermietungsmieten.' };
+      /* v3028 · fortgeschrieben im mb-backend (/zensus/fortgeschrieben, lib/zensus_miete.js - dieselbe
+         Rechnung wie im Ertragswert). Hier wird nichts gerechnet, nur übernommen. */
+      if (zfort && zfort.available && _zahl(zfort.qm) > 0) {
+        q.fortgeschrieben = { wert_qm: _zahl(zfort.qm), zensus_qm: _zahl(zfort.roh_qm), faktor: zfort.faktor, auf_monat: zfort.fortgeschrieben_auf || null,
+          klassen: (zfort.klassen || []).map((x) => ({ nach: x.art + (x.klasse ? ' ' + x.klasse : ''), zensus_qm: x.roh_qm, wert_qm: x.qm })),
+          index: zfort.index ? { wert: zfort.index.wert, monat: zfort.index.monat, basis: zfort.index.basis_wert + ' (' + zfort.index.basis_monat + ')' } : null,
+          etikett: zfort.etikett, rechenweg: zfort.text };
+        q.hinweis = zfort.etikett + ': ' + _zahl(zfort.qm).toFixed(2).replace('.', ',') + ' €/m² (Mittel der Klassen Baujahr/Wohnungsgröße, Zensus '
+          + _zahl(zfort.roh_qm).toFixed(2).replace('.', ',') + ' €/m² × ' + String(zfort.faktor).replace('.', ',') + '). Bestandsmieten - liegen typisch unter Neuvermietungsmieten.';
+      }
+      quellen.push(q);
     }
   } else fehlt.push({ art: 'Bestand', grund: 'keine Zensuswerte zur PLZ ' + plz, weg: 'ergebnisse.zensus2022.de' });
 
@@ -444,7 +506,8 @@ async function marktmiete(opt) {
   if (eigene.length) quellen.push({ art: 'eigene Objekte', was: 'Ist-Nettokaltmiete deiner Objekte am Ort', objekte: eigene, herkunft: 'deine Angaben in DealPilot' });
 
   return { gefunden: true, anfrage: { ort: ort || gemeinde || null, plz, ags, objektart: art, wohnflaeche: wfl, baujahr: bj }, quellen, fehlt,
-    offen: 'Zensus-Fortschreibung auf heute (Nettokaltmieten-Index) noch nicht abrufbar - nur im Marktbericht.' };
+    offen: quellen.some((x) => x.fortgeschrieben) ? undefined : 'Zensus-Fortschreibung (Nettokaltmieten-Index) gerade nicht abrufbar - der Zensuswert steht mit Stand 15.05.2022.' };
 }
 
-module.exports = { unterlagen, potenzial, todos, anteil, adresse, marktmiete, _art };
+module.exports = { unterlagen, potenzial, todos, anteil, adresse, marktmiete, _art,
+  _termine: { TERMIN_PLUS, _altTermin, _monateIm } };   /* v3028: fuer tools/mieterhoehung-termine-pruefen.mjs */

@@ -728,7 +728,7 @@
         var inhalt = werte.map(function (w, i) {
           var bw = spalten[i][1] * fak, links = i === 0 || spalten[i][2] === 'l' || spalten[i][2] === 'u';
           var platzB = bw - (links && i > 0 ? 3 : 0) - 1.5;
-          if (spalten[i][2] === 'u' && !kopfzeile) {
+          if ((spalten[i][2] === 'u' || spalten[i][2] === 'w') && !kopfzeile) {   /* v3028: 'w' bricht um, bleibt rechtsbündig */
             var l = doc.splitTextToSize(String(w), platzB);
             if (l.length > 3) { l = l.slice(0, 3); l[2] = passt(l[2] + ' ...', platzB); }
             zeilen = Math.max(zeilen, l.length); return l;
@@ -1443,9 +1443,9 @@
       einleitung(sauberE(PD.satz_bank));
       if (PD.art === 'mfh' && PD.wohnungen.length) {
         /* v3018d · ohne Zielbild keine Spalten Ziel und Maßnahmen (nur Striche) */
-        if (PD.hat_ziel === false) tabelle([['WE', 60, 'l'], ['m²', 14], ['Ist €/M', 28], ['Mieterhöhung', 52]],
+        if (PD.hat_ziel === false) tabelle([['WE', 60, 'l'], ['m²', 14], ['Ist €/M', 28], ['Mieterhöhung', 52, 'w']],
           PD.wohnungen.map(function (w) { return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll)]; }), { titel: 'Wertpotenzial' });
-        else tabelle([['WE', 26, 'l'], ['m²', 10], ['Ist €/M', 16], ['Mieterhöhung', 28], ['Ziel €/M', 17], ['Maßnahmen', 57, 'u']],
+        else tabelle([['WE', 26, 'l'], ['m²', 10], ['Ist €/M', 16], ['Mieterhöhung', 28, 'w'], ['Ziel €/M', 17], ['Maßnahmen', 57, 'u']],
           PD.wohnungen.map(function (w) {
             return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen)];
           }), { titel: 'Wertpotenzial' });
