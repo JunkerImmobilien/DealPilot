@@ -245,7 +245,10 @@
       gesehen[z[0]] = 1;
       var ist = String(el.value || '').trim();
       var status = ist === '' ? 'neu' : (_gleich(ist, neu, z[2]) ? 'gleich' : 'abweichung');
-      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: (z[2] === 'jahr' ? String(Math.round(_zahl(f[k]))) : typeof f[k] === 'number' ? _fmt(f[k]) : String(f[k])),   /* Baujahr nie „1.967" */ ist: ist, status: status });
+      /* v3017d · Einheit nach Feldtyp: m², €, €/m², % (Baujahr nie mit Tausenderpunkt) */
+      var EINH = { m2: ' m²', eur: ' €', eurm2: ' €/m²', pct: ' %' };
+      var anz = z[2] === 'jahr' ? String(Math.round(_zahl(f[k]))) : (_zahl(f[k]) != null && EINH[z[2]]) ? _fmt(f[k]) + EINH[z[2]] : typeof f[k] === 'number' ? _fmt(f[k]) : String(f[k]);
+      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: anz,   /* Baujahr nie „1.967" */ ist: ist, status: status });
     });
     return zeilen;
   }
