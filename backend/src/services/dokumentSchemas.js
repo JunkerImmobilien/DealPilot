@@ -91,6 +91,34 @@ const DOKUMENT_TYPEN = {
                'Kapitalisierungsfaktor', 'Bodenwertverzinsung',
                'steuerlich absetzbarer Gebäudeanteil']
   },
+  /* v3016 · Marcel 28.10.2026: „es soll einfach alles verwertbare aus allen dokumenten
+     entnommen werden". Vier neue Arten. Persoenliche Unterlagen eines Mieters
+     (Bonitaet, Bescheide, Zahlungsbestaetigungen) werden ERKANNT und NICHT ausgelesen. */
+  energieausweis: {
+    label: 'Energieausweis',
+    leit: ['Energieausweis', 'Endenergiebedarf', 'Endenergieverbrauch', 'Primärenergiebedarf', 'Energieeffizienzklasse'],
+    keywords: ['GEG', 'EnEV', 'kWh', 'Energieträger', 'Modernisierungsempfehlungen', 'Gebäudenutzfläche']
+  },
+  teilungserklaerung: {
+    label: 'Teilungserklärung',
+    leit: ['Teilungserklärung', 'Teilungserklaerung', 'Gemeinschaftsordnung', 'Aufteilungsplan', 'Abgeschlossenheitsbescheinigung'],
+    keywords: ['Sondereigentum', 'Gemeinschaftseigentum', 'Sondernutzungsrecht', 'Miteigentumsanteil', 'Wohnungseigentumsgesetz']
+  },
+  mietvertrag: {
+    label: 'Mietvertrag',
+    leit: ['Mietvertrag', 'Wohnraummietvertrag', 'Mietvertrages', 'Gewerbemietvertrag'],
+    keywords: ['Vermieter', 'Mieter', 'Mietbeginn', 'Kaution', 'Betriebskosten', 'Nettokaltmiete', 'Staffelmiete']
+  },
+  mietaufstellung: {
+    label: 'Mieterliste',
+    leit: ['Mieterliste', 'Mietaufstellung', 'Mieterübersicht', 'Mietenliste', 'Mieteinnahmen je Einheit'],
+    keywords: ['Einheit', 'Wohnung', 'Kaltmiete', 'leerstehend', 'Leerstand', 'Mietbeginn', 'Summe']
+  },
+  mieter_unterlagen: {
+    label: 'Persönliche Unterlagen eines Mieters',
+    leit: ['Mietzahlungsbestätigung', 'Mietschuldenfreiheit', 'Selbstauskunft', 'Rentenbescheid', 'Gehaltsabrechnung', 'Lohnabrechnung', 'SCHUFA', 'Bonitätsauskunft', 'Entschädigungsrente'],
+    keywords: ['Rente', 'Einkommen', 'Arbeitgeber']
+  },
   marktbericht: {
     label: 'Marktbericht',
     leit: ['Grundstücksmarktbericht', 'Kaufpreissammlung', 'Marktbericht'],
@@ -193,7 +221,15 @@ const SCHEMATA = {
       '  "flurstuecke": [{"gemarkung": string, "flur": string, "flurstueck": string, "flaeche_m2": number, "nutzung": string}],',
       '  "abt_ii": [{"lfd_nr": string, "art": string, "berechtigter_art": string (Person / Gemeinde / Versorger / Unternehmen - KEIN Name), "eingetragen_am": string}],',
       '  "abt_iii": [{"lfd_nr": string, "betrag_eur": number, "glaubiger": string, "eingetragen_am": string}],',
-      '  "grundschulden_gesamt_eur": number',
+      '  "grundschulden_gesamt_eur": number,',
+      /* v3016 · Wohnungsgrundbuch: MEA und Sondereigentum; Lasten als Risiko */
+      '  "wohnungsgrundbuch": boolean,',
+      '  "miteigentumsanteil": string (z. B. "125,5/1.000"),',
+      '  "sondereigentum": string (Beschreibung laut Bestandsverzeichnis, z. B. "Wohnung im EG links Nr. 1 laut Aufteilungsplan"),',
+      '  "sondernutzungsrechte": [string],',
+      '  "gemarkung": string, "flur": string, "flurstueck": string (das erste Flurstueck),',
+      '  "grundstuecksflaeche_m2": number (Flaeche des ganzen Grundstuecks laut Bestandsverzeichnis),',
+      '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}] (Lasten in Abt. II wie Wegerecht, Leitungsrecht, Vorkaufsrecht, Niessbrauch, Wohnrecht, Zwangsversteigerungs- oder Sanierungsvermerk; Rangfolge und Abloesung in Abt. III)',
       '}'
     ],
     zahlen: { grundschulden_gesamt_eur: [0, 1e9] }
@@ -249,7 +285,18 @@ const SCHEMATA = {
       '  "sonderumlagen_geplant": [{"beschreibung": string, "betrag_eur": number, "jahr": number}],',
       '  "beschluesse_wichtig": [string],',
       '  "geplante_sanierungen": [{"gewerk": string, "jahr": number, "kosten_geschaetzt_eur": number}],',
-      '  "risiken": [string]',
+      /* v3016 · Marcel 28.10.2026: „WEG Protokolle sollen ausgewertet werden und die
+         wichtigsten Punkte rausgezogen werden und risiken beschrieben werden" */
+      '  "art": "Protokoll"|"Einladung"|"Wirtschaftsplan"|"Jahresabrechnung",',
+      '  "ruecklage_stand_eur": number (Stand der Erhaltungsruecklage der ganzen Gemeinschaft),',
+      '  "ruecklage_zufuehrung_jahr_eur": number,',
+      '  "wirtschaftsplan_gesamt_eur": number,',
+      '  "kernpunkte": [string] (die 3-8 wichtigsten Punkte fuer einen Kaeufer, je ein Satz mit Zahl wo vorhanden),',
+      '  "maengel": [string] (genannte Schaeden und Maengel am Gemeinschaftseigentum),',
+      '  "rechtsstreitigkeiten": [string],',
+      '  "hausgeldrueckstaende": string,',
+      '  "verwalterwechsel": string,',
+      '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}]',
       '}'
     ],
     zahlen: {
@@ -380,6 +427,90 @@ const SCHEMATA = {
     pflicht: ['kaufpreis', 'baujahr', 'wohnflaeche']
   },
 
+  energieausweis: {
+    einleitung: 'Aus dem folgenden Energieausweis (GEG) extrahiere die Daten als JSON.',
+    schema: [
+      '{',
+      '  "ausweisart": "Bedarf"|"Verbrauch",',
+      '  "gueltig_bis": string DD.MM.JJJJ,',
+      '  "energieeffizienzklasse": string (A+ bis H),',
+      '  "endenergie_kwh_m2a": number,',
+      '  "primaerenergie_kwh_m2a": number,',
+      '  "wesentlicher_energietraeger": string,',
+      '  "baujahr_gebaeude": number,',
+      '  "baujahr_waermeerzeuger": number,',
+      '  "anzahl_wohnungen": number,',
+      '  "gebaeudenutzflaeche_m2": number,',
+      '  "modernisierungsempfehlungen": [string],',
+      '  "gemarkung": string, "flur": string, "flurstueck": string (falls im selben Dokument eine Flurkarte oder ein Katasterauszug steht),',
+      '  "grundstuecksflaeche_m2": number (nur aus einer Flurkarte/einem Katasterauszug im selben Dokument),',
+      '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}] (z. B. Klasse F-H, Waermeerzeuger aelter als 30 Jahre - Austauschpflicht § 72 GEG, Ausweis abgelaufen)',
+      '}'
+    ],
+    zahlen: { endenergie_kwh_m2a: [0, 1000], primaerenergie_kwh_m2a: [0, 1500], baujahr_gebaeude: [1500, 2100], baujahr_waermeerzeuger: [1900, 2100], anzahl_wohnungen: [1, 1000], gebaeudenutzflaeche_m2: [1, 1e6], grundstuecksflaeche_m2: [1, 1e7] }
+  },
+
+  teilungserklaerung: {
+    einleitung: 'Aus der folgenden Teilungserklaerung (mit Gemeinschaftsordnung, Baubeschreibung, Aufteilungsplan oder Nachtraegen) extrahiere die Daten als JSON.',
+    schema: [
+      '{',
+      '  "urkunde_datum": string DD.MM.JJJJ,',
+      '  "dokumentteil": "Teilungserklaerung"|"Gemeinschaftsordnung"|"Baubeschreibung"|"Aufteilungsplan"|"Nachtrag",',
+      '  "einheiten_anzahl": number,',
+      '  "einheiten": [{"nr": string, "lage": string, "art": "Wohnung"|"Gewerbe"|"Garage"|"Stellplatz"|"Keller", "mea": string, "wfl_m2": number, "zimmer": number}],',
+      '  "mea_nenner": number (z. B. 1000),',
+      '  "sondernutzungsrechte": [string],',
+      '  "kostenverteilung": string (Schluessel fuer Hausgeld und Instandhaltung),',
+      '  "gebrauchsregeln": [string] (z. B. Vermietung, Gewerbe, Tierhaltung, kurzzeitige Vermietung),',
+      '  "nachtraege": [string] (was ein Nachtrag aendert),',
+      '  "baubeschreibung": [string] (Bauweise, Dach, Heizung, Fenster - je ein Satz),',
+      '  "baujahr": number, "gemarkung": string, "flur": string, "flurstueck": string, "grundstuecksflaeche_m2": number,',
+      '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}] (z. B. Vermietungsbeschraenkung, Kostenlast einzelner Eigentuemer, Sondernutzung Dritter, unklare Abgrenzung)',
+      '}'
+    ],
+    zahlen: { einheiten_anzahl: [1, 10000], mea_nenner: [1, 1e7], baujahr: [1500, 2100], grundstuecksflaeche_m2: [1, 1e7] }
+  },
+
+  mietvertrag: {
+    einleitung: 'Aus dem folgenden Mietvertrag extrahiere die Vertragsdaten als JSON. KEINE Namen, Anschriften oder Bankdaten der Mieter.',
+    schema: [
+      '{',
+      '  "mietbeginn": string DD.MM.JJJJ,',
+      '  "vertragsart": "unbefristet"|"staffel"|"index"|"zeitmiete"|"gewerbe"|"moebliert",',
+      '  "befristet_bis": string DD.MM.JJJJ,',
+      '  "kuendigungsverzicht_bis": string DD.MM.JJJJ,',
+      '  "kaltmiete_eur": number (Nettokaltmiete je Monat),',
+      '  "nebenkosten_vorauszahlung_eur": number,',
+      '  "heizkosten_vorauszahlung_eur": number,',
+      '  "kaution_eur": number,',
+      '  "stellplatz_miete_eur": number,',
+      '  "wohnflaeche_m2": number, "zimmer": number,',
+      '  "lage_einheit": string (z. B. "EG links", "Whg. 3"),',
+      '  "adresse": string (Anschrift des MIETOBJEKTS),',
+      '  "staffeln": [{"ab": string DD.MM.JJJJ, "kaltmiete_eur": number}],',
+      '  "letzte_erhoehung": string DD.MM.JJJJ,',
+      '  "besonderheiten": [string] (Schoenheitsreparaturen, Kleinreparaturen, Moeblierung, Untervermietung),',
+      '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}] (z. B. langer Kuendigungsverzicht, unwirksame Klauseln, Indexmiete, Befristung)',
+      '}'
+    ],
+    zahlen: { kaltmiete_eur: [0, 1e6], nebenkosten_vorauszahlung_eur: [0, 1e5], heizkosten_vorauszahlung_eur: [0, 1e5], kaution_eur: [0, 1e6], stellplatz_miete_eur: [0, 1e4], wohnflaeche_m2: [1, 1e5], zimmer: [0, 100] }
+  },
+
+  mietaufstellung: {
+    einleitung: 'Aus der folgenden Mieterliste / Mietaufstellung eines Mehrfamilienhauses extrahiere JEDE Einheit als JSON. KEINE Mieternamen.',
+    schema: [
+      '{',
+      '  "stichtag": string DD.MM.JJJJ,',
+      '  "adresse": string,',
+      '  "einheiten": [{"nr": string, "lage": string, "nutzung": "wohnen"|"gewerbe"|"stellplatz", "wfl_m2": number, "zimmer": number, "kaltmiete_eur": number (je Monat), "nk_vorauszahlung_eur": number, "status": "vermietet"|"leer", "mietbeginn": string DD.MM.JJJJ, "vertragsart": "unbefristet"|"staffel"|"index"|"zeitmiete"|"gewerbe", "letzte_erhoehung": string DD.MM.JJJJ, "kaution_eur": number}],',
+      '  "summe_kaltmiete_monat_eur": number,',
+      '  "summe_wfl_m2": number,',
+      '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}] (z. B. Leerstand, Gewerbeanteil, viele Altvertraege ohne Erhoehung)',
+      '}'
+    ],
+    zahlen: { summe_kaltmiete_monat_eur: [0, 1e7], summe_wfl_m2: [1, 1e6] }
+  },
+
   marktbericht: {
     einleitung: 'Aus dem folgenden Grundstuecksmarktbericht extrahiere die fuer eine Immobilienbewertung relevanten Daten als JSON.',
     schema: [
@@ -403,6 +534,20 @@ const SCHEMATA = {
   }
 };
 
+/* v3016 · Ein PDF kann mehrere Dokumente tragen (gemessen: „Flur u Energie.pdf" =
+   Flurkarte + Energieausweis). Weitere Arten nur mit ZWEI Leitbegriffen im ganzen
+   Text, nie die gesperrte Art und nie der Marktbericht (der zitiert alles). */
+function weitereTypen(text, dateiname, haupt) {
+  const t = String(text || '').toLowerCase().slice(0, 60000);
+  const aus = [];
+  Object.keys(DOKUMENT_TYPEN).forEach(function (id) {
+    if (id === haupt || id === 'mieter_unterlagen' || id === 'marktbericht' || !SCHEMATA[id]) return;
+    const n = (DOKUMENT_TYPEN[id].leit || []).filter(function (kw) { return t.indexOf(kw.toLowerCase()) !== -1; }).length;
+    if (n >= 2) aus.push({ typ: id, leit: n });
+  });
+  return aus.sort(function (a, b) { return b.leit - a.leit; }).slice(0, 2).map(function (x) { return x.typ; });
+}
+
 /** Baut den vollständigen Prompt für eine Dokumentart. */
 function baueprompt(typ, text) {
   const s = SCHEMATA[typ];
@@ -420,6 +565,7 @@ module.exports = {
   DOKUMENT_TYPEN,
   SCHEMATA,
   klassifiziere,
+  weitereTypen,   /* v3016 */
   baueprompt,
   typenListe: function () {
     return Object.keys(DOKUMENT_TYPEN).map(function (id) {

@@ -618,6 +618,11 @@ function buildPrompt(payload, opts) {
     o.thesis ? '- Investitionsthese des Investors: ' + o.thesis : '',
     o.risiken ? '- Vom Investor benannte Risiken: ' + o.risiken : '',
     o.notizen ? '- Sonstige Bemerkungen des Investors: ' + o.notizen : '',
+    /* v3016 · ausgewertete Unterlagen (WEG-Protokolle, Grundbuch, Teilungserklaerung, Energieausweis).
+       Marcel 28.10.2026: „Moegliche Risiken sollen auch in die Bewertungstext mit einfliessen.“ */
+    o.dok_unterlagen ? '- Ausgewertete Unterlagen: ' + o.dok_unterlagen : '',
+    o.dok_risiken ? '- Risiken aus den Unterlagen (mit Quelle; in Staerken/Risiken und Fazit beruecksichtigen, Kosten in die Rechnung einordnen): ' + o.dok_risiken : '',
+    o.dok_weg ? '- Auswertung der WEG-Unterlagen: ' + o.dok_weg : '',
     '',
     /* v1311: Die Herkunft je Feld — amtlich, abgerufen, geschaetzt. */
     hk ? '## HERKUNFT DER ANGABEN' : '',
@@ -4091,7 +4096,10 @@ async function extractDokument(text, typ, opts) {
   }
   const spec = dokumentSchemas.SCHEMATA[typ];
 
-  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 1400 }, opts || {}));
+  /* v3016 · Listen-Arten (WEG, Teilung, Mieterliste) brauchen mehr Platz: 1.400 Token
+     schnitten eine Mieterliste mit 12 Einheiten mitten im JSON ab. */
+  const _lang = { weg_protokoll: 1, teilungserklaerung: 1, mietaufstellung: 1, grundbuch: 1, energieausweis: 1, mietvertrag: 1 };
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: _lang[typ] ? 3500 : 1400 }, opts || {}));
   const parsed = extractJson(r.text);
   if (!parsed) {
     return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
@@ -4253,7 +4261,75 @@ async function bildZuText(imageDataUrl, opts) {
   return t;
 }
 
+/**
+ * v3016 · seitenLesen: gescannte Seiten (Bilder) als Text. Marcel 28.10.2026 legte 15 PDFs
+ * ab, 14 davon Scans ohne Textschicht (Grundbuch, Teilungserklaerung, WEG-Protokolle).
+ * Der Browser-OCR-Weg las hoechstens 6 Seiten - ein WEG-Protokoll hat 10.
+ * Bis zu 4 Seiten je Aufruf. Personennamen werden schon hier ersetzt (v2210-Linie).
+ */
+async function seitenLesen(bilder, opts) {
+  const o = opts || {};
+  const prompt =
+    'Schreibe den Text dieser gescannten Dokumentseiten VOLLSTAENDIG und WOERTLICH ab, '
+    + 'Seite fuer Seite, getrennt durch eine Zeile "=== Seite N ===". Tabellen als Zeilen '
+    + 'mit " | " zwischen den Spalten. Zahlen, Daten, Flurstuecke, Betraege und Paragraphen '
+    + 'genau so, wie sie dastehen.\n'
+    + 'Ersetze die Namen, Geburtsdaten, Privatanschriften und Bankverbindungen von '
+    + 'PRIVATPERSONEN durch [Name], [Datum], [Anschrift], [Konto]. Behoerden, Firmen, '
+    + 'Verwalter-Firmen, Banken als Glaeubiger und die Anschrift des Grundstuecks bleiben.\n'
+    + 'Keine Einleitung, keine Zusammenfassung, nichts dazuerfinden. Unleserliches: [unleserlich].';
+  const content = [{ type: 'input_text', text: prompt }]
+    .concat((bilder || []).slice(0, 4).map(function (b) { return { type: 'input_image', image_url: b }; }));
+  const r = await _callOpenAIVision(content, { userApiKey: o.userApiKey, model: o.model, maxTokens: 8000 });
+  return String((r && r.text) || '').trim();
+}
+
+/**
+ * v3016 · dokumenteAuswerten: aus ALLEN gelesenen Unterlagen eines Objekts die Risiken,
+ * eine Investitionsthese und die WEG-Auswertung. Marcel 28.10.2026: „in dem Feld Bekannte
+ * Risiken die Risiken aus den WEG Protokollen und auch Baulasten oder etwas aus dem
+ * Grundbuch … auch eine Investitionsthese … WEG Protokolle sollen ausgewertet werden".
+ * Eingang sind die schon ausgelesenen JSON-Daten (ohne Personennamen), nie der Volltext.
+ */
+async function dokumenteAuswerten(dokumente, objekt, opts) {
+  const o = opts || {};
+  const doks = (dokumente || []).slice(0, 30).map(function (d) {
+    return { dokument: d.label || d.typ, datei: d.dateiname || '', daten: d.extracted || {} };
+  });
+  const prompt = [
+    'Du bist ein erfahrener Immobilien-Sachverstaendiger und pruefst die Unterlagen eines Objekts fuer einen Kaeufer/Investor.',
+    'Unten stehen die bereits ausgelesenen Daten aller Unterlagen (je Dokument JSON) und die Eckdaten des Objekts.',
+    '',
+    'REGELN: Nur was in den Unterlagen steht. Nichts erfinden, keine allgemeinen Floskeln ("Zinsrisiko", "Marktrisiko"), keine Rechtsberatung.',
+    'Jedes Risiko nennt seine Quelle (Dokument und Datum/Seite/TOP). Gleiche Sachverhalte aus mehreren Protokollen zusammenfassen und den Verlauf nennen (z. B. "2022 vertagt, 2024 beschlossen").',
+    'Betraege der ganzen Gemeinschaft, wo moeglich, auf den Anteil des Objekts umrechnen (Miteigentumsanteil) und den Rechenweg in einem Halbsatz nennen.',
+    'Persoenliche Unterlagen von Mietern werden nicht bewertet.',
+    '',
+    'Antworte NUR mit JSON:',
+    '{',
+    '  "risiken": [{"titel": string, "beschreibung": string (2-3 Saetze: Sachverhalt, Folge fuer den Kaeufer, was zu tun ist), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null (Anteil des Objekts, sonst gesamt mit Hinweis), "jahr": number|null, "quelle": string}],',
+    '  "risiken_text": string (fuer das Feld "Bekannte Risiken": je Risiko eine Zeile "– Titel: ein Satz (Quelle)", hoch zuerst),',
+    '  "investitionsthese": string (3-5 Saetze: was spricht fuer das Objekt, gestuetzt auf Unterlagen und Eckdaten, mit Zahlen; ehrlich, wenn die Unterlagen dagegen sprechen),',
+    '  "weg": null | {"kernpunkte": [string] (die 5-10 wichtigsten Punkte aus allen WEG-Unterlagen, chronologisch, je mit Jahr), "ruecklage": string (Stand und Entwicklung, Anteil des Objekts), "hausgeld": string, "sanierungen": [{"massnahme": string, "status": "beschlossen"|"geplant"|"vertagt"|"erledigt", "jahr": number|null, "kosten_eur": number|null, "anteil_objekt_eur": number|null}], "sonderumlagen": [string], "verwaltung": string (Verwalter, Wechsel, Stimmung in der Gemeinschaft), "fazit": string (2-3 Saetze)},',
+    '  "grundbuch": null | {"lasten": [string] (Abt. II in Klartext mit Bedeutung), "grundschulden": string},',
+    '  "offene_fragen": [string] (was ein Kaeufer beim Verwalter/Verkaeufer noch anfordern oder fragen sollte, konkret)',
+    '}',
+    '',
+    'Eckdaten des Objekts:',
+    JSON.stringify(objekt || {}),
+    '',
+    'Unterlagen:',
+    JSON.stringify(doks).slice(0, 60000)
+  ].join('\n');
+  const r = await callOpenAI(prompt, { userApiKey: o.userApiKey, maxTokens: 5000 });
+  const parsed = extractJson(r.text);
+  if (!parsed) return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.' };
+  return { success: true, model: r.model, auswertung: parsed };
+}
+
 module.exports = {
+  seitenLesen,         /* v3016 */
+  dokumenteAuswerten,  /* v3016 */
   copilotChat,  /* v585 */
   bildZuText,   /* v1796 — macht nur Text; die Felder macht extractFromText */
   analyze,

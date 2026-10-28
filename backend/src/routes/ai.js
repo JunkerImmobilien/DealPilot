@@ -888,7 +888,20 @@ router.post('/extract-dokument', authenticate, extractLimiter, async (req, res, 
       });
     }
 
+    /* v3016 · persoenliche Unterlagen eines Mieters: erkannt, nicht ausgelesen */
+    if (typ === 'mieter_unterlagen') {
+      return res.json({ success: false, gesperrt: true, typ: typ, label: 'Persönliche Unterlagen eines Mieters',
+        error: 'Persönliche Unterlagen eines Mieters (z. B. Bescheide, Zahlungsbestätigungen) werden nicht ausgelesen — sie gehören nicht zum Objekt.' });
+    }
     const result = await openaiService.extractDokument(text, typ, { userApiKey });
+    /* v3016 · weitere Dokumente im selben PDF (z. B. Flurkarte + Energieausweis) */
+    if (!typWunsch && result && result.success) {
+      const weitere = dokumentSchemas.weitereTypen(text, dateiname || '', typ);
+      result.weitere = [];
+      for (const w of weitere) {
+        try { const r2 = await openaiService.extractDokument(text, w, { userApiKey }); if (r2 && r2.success) result.weitere.push(r2); } catch (e) { /* ein Teil darf fehlen */ }
+      }
+    }
     result.erkennung = {
       typ: erkannt.typ,
       sicherheit: erkannt.sicherheit,
@@ -903,6 +916,46 @@ router.post('/extract-dokument', authenticate, extractLimiter, async (req, res, 
   } catch (err) {
     if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
     if (err.status === 401) return res.status(401).json({ error: err.message });
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
+/* v3016 · Seiten lesen und Gesamtauswertung. Eigener Zaehler: ein Paket mit 15 PDFs
+   braucht schnell 30 Seitenaufrufe, der extractLimiter (30/h) war dafuer nicht gebaut. */
+const seitenLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false,
+  keyGenerator: function (req) { return req.user && req.user.id ? 'u:' + req.user.id : req.ip; },
+  message: { error: 'Zu viele Seiten in der letzten Stunde. Bitte später erneut versuchen.' }
+});
+
+router.post('/seiten-lesen', authenticate, seitenLimiter, async (req, res, next) => {
+  try {
+    const { bilder, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+    if (!config.openai.apiKey && !userApiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfügbar.', needs_user_key: true });
+    const liste = Array.isArray(bilder) ? bilder.filter(function (b) { return typeof b === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(b); }) : [];
+    if (!liste.length || liste.length > 4) return res.status(400).json({ error: '1 bis 4 Seitenbilder (data:image/…) erwartet.' });
+    const text = await openaiService.seitenLesen(liste, { userApiKey });
+    res.json({ success: true, text: schwaerzen.schwaerze(text).text });
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
+router.post('/dokumente-auswerten', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { dokumente, objekt, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+    if (!config.openai.apiKey && !userApiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfügbar.', needs_user_key: true });
+    if (!Array.isArray(dokumente) || !dokumente.length) return res.status(400).json({ error: 'Keine Dokumente übergeben.' });
+    const r = await openaiService.dokumenteAuswerten(dokumente, objekt || {}, { userApiKey });
+    try { if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') await aiCreditsService.logExtract(req.user.id, 'dokumente-auswerten'); } catch (e) { /* nicht kritisch */ }
+    res.json(r);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
     if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
     next(err);
   }

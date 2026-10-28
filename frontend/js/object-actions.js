@@ -1644,6 +1644,18 @@
   }
   async function extractTextFull(file, statusCb) {
     var text = await extractPdfTextRaw(file);
+    /* v3016 · Scans über die KI (unterlagen.js): gemessen 14 von 15 PDFs eines Objekts
+       ohne Textschicht, bis 36 Seiten - Tesseract las hier höchstens 6. Tesseract bleibt
+       der Rückfall, wenn der Weg nicht geht. */
+    if ((!text || text.replace(/\s/g, '').length < 50) && window.DpUnterlagen) {
+      try {
+        var sc = await window.DpUnterlagen.seitenLesen(file, statusCb);
+        if (sc.persoenlich) { file._dpPersoenlich = true; return ''; }
+        file._dpScan = { seiten: sc.seiten, gelesen: sc.gelesen, gekuerzt: !!sc.gekuerzt };
+        text = sc.text;
+      } catch (e) { text = ''; }
+    }
+    if (text && window.DpUnterlagen && window.DpUnterlagen.istPersoenlich(text)) { file._dpPersoenlich = true; return ''; }
     if (!text || text.replace(/\s/g, '').length < 50) { try { text = await extractOCR(file, statusCb); } catch (e) { text = text || ''; } }
     /* v2218h · VOLLER Text zurück. GEMESSEN am RND-Gutachten Westerfeldstr.: 72.169
        Zeichen, „Punktrastermethode" stand erst hinter Zeichen 12.000 - die Erkennung
@@ -1812,18 +1824,28 @@
     var maV = maD || laCat, miV = miD || laCat;
     if (maV) addRow('makrolage', 'Makrolage' + (maD ? '' : ' (aus Lage-Scores)'), pretty(maV), maV, S, 'select', true);
     if (miV) addRow('mikrolage', 'Mikrolage' + (miD ? '' : ' (aus Lage-Scores)'), pretty(miV), miV, S, 'select', true);
+    /* v3016 · Marcel 28.10.2026: „Wenn wir einen Marktbericht haben mit Sterne-Bewertung soll das
+       umgelegt werden auf unsere Felder und daneben … wie es umgelegt wird." */
+    var _lh = _lageHerleitung(d, la, laCat);
+    if (_merged.makrolage && !maD && _lh) _merged.makrolage.herleitung = _lh;
+    if (_merged.mikrolage && !miD && _lh) _merged.mikrolage.herleitung = _lh;
+    if (_merged.makrolage && maD) _merged.makrolage.herleitung = 'steht so im Bericht: „' + d.makrolage + '“';
+    if (_merged.mikrolage && miD) _merged.mikrolage.herleitung = 'steht so im Bericht: „' + d.mikrolage + '“';
     // Wertsteigerung: direkt, sonst aus Prognose
     var wD = validEnum('ds2_wertsteigerung', d.wertsteigerung), pg = numDe(d.prognose_naechstes_jahr_pct);
     var wV = wD || ((pg != null) ? (pg >= 3 ? 'sehr_hoch' : pg >= 2 ? 'hoch' : pg >= 1 ? 'mittel' : pg > 0 ? 'niedrig' : 'keines') : null);
     if (wV) addRow('ds2_wertsteigerung', 'Wertsteigerung' + (wD ? '' : ' (aus Prognose)'), pretty(wV), wV, S, 'select', true);
+    if (_merged.ds2_wertsteigerung && !wD && pg != null) _merged.ds2_wertsteigerung.herleitung = 'Prognose nächstes Jahr ' + String(pg).replace('.', ',') + ' % → ab 3 % sehr hoch · ab 2 % hoch · ab 1 % mittel · über 0 % niedrig';
     // Bevölkerungsentwicklung: direkt, sonst aus Wanderungssaldo
     var bD = validEnum('ds2_bevoelkerung', d.bevoelkerung_entwicklung), ws = numDe(d.wanderungssaldo);
     var bV = bD || ((ws != null) ? (ws >= 8 ? 'stark_wachsend' : ws >= 2 ? 'wachsend' : ws > -2 ? 'stabil' : ws > -8 ? 'leicht_fallend' : 'stark_fallend') : null);
     if (bV) addRow('ds2_bevoelkerung', 'Bevölkerungsentwicklung' + (bD ? '' : ' (aus Wanderungssaldo)'), pretty(bV), bV, S, 'select', true);
+    if (_merged.ds2_bevoelkerung && !bD && ws != null) _merged.ds2_bevoelkerung.herleitung = 'Wanderungssaldo ' + String(ws).replace('.', ',') + ' → ab 8 stark wachsend · ab 2 wachsend · über −2 stabil · über −8 leicht fallend';
     // Nachfrage: direkt, sonst aus Tage am Markt
     var nD = validEnum('ds2_nachfrage', d.nachfrage), tg = numDe(d.markt_tage_auf_dem_markt);
     var nV = nD || ((tg != null) ? (tg <= 30 ? 'sehr_stark' : tg <= 60 ? 'stark' : tg <= 120 ? 'mittel' : tg <= 200 ? 'schwach' : 'sehr_schwach') : null);
     if (nV) addRow('ds2_nachfrage', 'Nachfrage' + (nD ? '' : ' (aus Tage am Markt)'), pretty(nV), nV, S, 'select', true);
+    if (_merged.ds2_nachfrage && !nD && tg != null) _merged.ds2_nachfrage.herleitung = Math.round(tg) + ' Tage am Markt → bis 30 sehr stark · bis 60 stark · bis 120 mittel · bis 200 schwach';
     // Entwicklungsmöglichkeiten: nur direkt aus Bericht (keine Ableitungsquelle)
     var eD = validEnum('ds2_entwicklung', d.entwicklung);
     if (eD) addRow('ds2_entwicklung', 'Entwicklungsmöglichkeiten', pretty(eD), eD, S, 'select', true);
@@ -1841,6 +1863,16 @@
     [['ausst_sanitaer', 'Bad / Sanitär · Standardstufe', d.bad_qualitaet], ['ausst_fussboeden', 'Fußböden · Standardstufe', d.boden_qualitaet], ['ausst_fenster', 'Fenster / Außentüren · Standardstufe', d.fenster_qualitaet]].forEach(function (q) { var n = starFromText(q[2], QUAL_SCALE); if (n > 0) addRow(q[0], q[1], 'Stufe ' + n + ' von 5 (aus der Qualitätsangabe)', String(n), S, 'select', true); });
     // Zustand → Sterne
     [['rate_kueche', 'Küche · Zustand', d.kueche_zustand], ['rate_bad', 'Bad · Zustand', d.bad_zustand], ['rate_boden', 'Boden · Zustand', d.boden_zustand], ['rate_fenster', 'Fenster · Zustand', d.fenster_zustand]].forEach(function (q) { var n = starFromText(q[2], ZUST_SCALE); if (n > 0) addRow(q[0], q[1], _stufeWort(q[0], n), n, S, 'star'); });
+  }
+  /* v3016 · die Rechnung der Lage-Scores als Satz: welche Noten, welcher Schnitt, welche Stufe */
+  function _lageHerleitung(d, avg, cat) {
+    if (avg == null) return '';
+    var N = [['lage_einkaufen', 'Einkaufen'], ['lage_bildung', 'Bildung'], ['lage_gastronomie', 'Gastronomie'], ['lage_gesundheit', 'Gesundheit'], ['lage_freizeit', 'Freizeit']];
+    var f1 = function (n) { return (Math.round(n * 10) / 10).toFixed(1).replace('.', ','); };
+    var teile = N.map(function (p) { var n = numDe(d[p[0]]); return n == null ? null : p[1] + ' ' + f1(n > 5 ? n / 2 : n); }).filter(Boolean);
+    var ger = numDe(d.lage_geraeusch);
+    return 'Ø ' + f1(avg) + ' von 5 aus ' + teile.join(' · ') + (ger != null ? ' (Geräusch ' + f1(ger > 5 ? ger / 2 : ger) + ' zählt nicht mit)' : '')
+      + ' → ' + pretty(cat) + '. Stufen: ab 4,5 sehr gut · ab 3,5 gut · ab 2,5 durchschnittlich · ab 1,5 schwach.';
   }
   function mergeExpose(d) {
     var S = 'Exposé';
@@ -1912,14 +1944,68 @@
     /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
     _vergleich = [];
     _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; }).forEach(function (f) { mergeDokument(f.cache.dokument); });
+    _unterlagenZeilen();   /* v3016 */
   }
   var _vergleich = [];
   function mergeDokument(a) {
     var D = window.DokumentImport; if (!D) return;
-    (D.abgleich(a.extracted || {}) || []).forEach(function (z) {
-      _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: a.label || 'Dokument', kind: 'input' };
+    /* v3016 · ein PDF kann mehrere Dokumente tragen (a.weitere, z. B. Flurkarte + Energieausweis) */
+    [a].concat(a.weitere || []).forEach(function (t) {
+      (D.abgleich(t.extracted || {}, t.typ) || []).forEach(function (z) {
+        _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input' };
+      });
+      (D.vergleich(t.extracted || {}) || []).forEach(function (v) { _vergleich.push({ wort: v.wort, wert: v.wert, eigen: v.eigen, quelle: t.label || 'Dokument' }); });
     });
-    (D.vergleich(a.extracted || {}) || []).forEach(function (v) { _vergleich.push({ wort: v.wort, wert: v.wert, eigen: v.eigen, quelle: a.label || 'Dokument' }); });
+  }
+  /* v3016 · alle erfolgreich gelesenen Unterlagen (ohne Exposé/Marktbericht) als Liste */
+  function _unterlagenListe() {
+    var aus = [];
+    _files.forEach(function (f) {
+      var a = f.cache && f.cache.dokument; if (!a || !a.success) return;
+      [a].concat(a.weitere || []).forEach(function (t) {
+        var x = t.extracted || {};
+        aus.push({ typ: t.typ, label: t.label, dateiname: f.name, extracted: x, datum: x.versammlungsdatum || x.urkunde_datum || x.stichtag || x.mietbeginn || '' });
+      });
+    });
+    return aus;
+  }
+  var _auswertung = null, _auswertungLaeuft = false, _auswertungFehler = '';
+  async function _unterlagenAuswerten() {
+    var U = window.DpUnterlagen, liste = _unterlagenListe();
+    if (!U || !liste.length) return;
+    _auswertungLaeuft = true; _auswertungFehler = ''; renderMergedTable();
+    try { _auswertung = await U.auswerten(liste); }
+    catch (e) { _auswertung = null; _auswertungFehler = e.message || 'Auswertung fehlgeschlagen'; }
+    _auswertungLaeuft = false;
+    recompute(); renderMergedTable();
+  }
+  function _einheitenListe() {
+    var U = window.DpUnterlagen; if (!U) return [];
+    var best = [], vonMiete = false;
+    _unterlagenListe().forEach(function (t) {
+      if (t.typ !== 'mietaufstellung' && t.typ !== 'teilungserklaerung') return;
+      var l = U.einheitenAus(t.typ, t.extracted);
+      if (t.typ === 'mietaufstellung' && l.length) { if (!vonMiete || l.length > best.length) { best = l; vonMiete = true; } }
+      else if (!vonMiete && l.length > best.length) best = l;
+    });
+    return best;
+  }
+  function _unterlagenZeilen() {
+    var U = window.DpUnterlagen; if (!U || _qcMode) return;
+    var a = _auswertung;
+    if (a && a.risiken_text) {
+      var ist = String(($('risiken') || {}).value || '').trim();
+      _merged.risiken = { label: 'Bekannte Risiken', value: a.risiken_text, raw: a.risiken_text, source: 'Unterlagen', kind: 'anhaengen',
+        herleitung: ist ? 'wird unter deinen eigenen Text gesetzt, nichts wird ersetzt' : (a.risiken || []).length + ' Risiken aus ' + _unterlagenListe().length + ' Unterlagen' };
+    }
+    if (a && a.investitionsthese) _merged.thesis = { label: 'Investitionsthese', value: a.investitionsthese, raw: a.investitionsthese, source: 'Unterlagen', kind: 'anhaengen' };
+    if (a) _merged._dok_auswertung = { label: 'Auswertung der Unterlagen', value: 'in der Pilot-Analyse, Reiter „Unterlagen & WEG“', raw: 1, source: 'Unterlagen', kind: 'merken' };
+    var we = _einheitenListe();
+    if (we.length && window.DpMfhEinheiten && typeof window.DpMfhEinheiten.vorbelegen === 'function') {
+      var miete = we.reduce(function (s, e) { return s + (Number(e.ist) || 0); }, 0);
+      _merged.mfh_einheiten_liste = { label: 'Einheiten erfassen', value: we.length + ' Einheiten' + (miete ? ' · ' + fmt0(miete) + ' €/Monat Ist-Miete' : ''), raw: we, source: 'Unterlagen', kind: 'einheiten',
+        herleitung: 'öffnet nach dem Übernehmen das Fenster „Einheiten erfassen“ — dort prüfen und übernehmen' };
+    }
   }
   function _norm(x){ return String(x==null?'':x).trim().toLowerCase().replace(/\s+/g,' '); }
   function addressWarning() {
@@ -1977,7 +2063,7 @@
   function _abweichungen(keys) {
     var out = {};
     keys.forEach(function (id) {
-      var it = _merged[id]; if (!it || it.kind === 'star' || it.kind === 'bool') return;
+      var it = _merged[id]; if (!it || it.kind === 'star' || it.kind === 'bool' || it.kind === 'anhaengen' || it.kind === 'merken' || it.kind === 'einheiten') return;   /* v3016 */
       var ist = _istText(id); if (ist === '') return;
       var el = document.getElementById(id);
       var neu = it.raw != null ? it.raw : it.value;
@@ -2068,12 +2154,15 @@
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">im Objekt: ' + escH(abw[id]) + '</div>';
+      if (it.herleitung) valCell += '<div class="oabi-herl" style="font-size:11.5px;color:#7A7370;margin-top:2px;line-height:1.35">' + escH(it.herleitung) + '</div>';
+      if (it.kind === 'anhaengen' && String(it.value).length > 160) valCell = valCell.replace('<b>' + escH(it.value) + '</b>', '<div style="white-space:pre-wrap;font-size:12px;max-height:120px;overflow:auto">' + escH(it.value) + '</div>');
       return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + (abw[id] !== undefined ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
     }).join('') + '</tbody></table>'
       + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
           + '<b>Ergebnis eines fremden Gutachtens — wird nicht übernommen.</b> DealPilot rechnet selbst; die Zahl dient dem Abgleich.'
           + _vergleich.map(function (v) { return '<div style="margin-top:4px">' + escH(v.wort) + ': <b>' + escH(v.wert) + '</b>' + (v.eigen ? ' · DealPilot: ' + escH(v.eigen) : '') + ' <span class="src">(' + escH(v.quelle) + ')</span></div>'; }).join('')
           + '</div>' : '');
+    _reiterEinbauen(host);   /* v3016 */
     if (ab) ab.disabled = false;
     // Range-Toggle-Handler
     host.querySelectorAll('.oabi-spbtn').forEach(function (b) {
@@ -2088,6 +2177,43 @@
     host.querySelectorAll('input[name="oabi-addr"]').forEach(function (r) {
       r.addEventListener('change', function () { _addrChoice = r.value; renderMergedTable(); });
     });
+  }
+  /* v3016 · Marcel 28.10.2026: „in dem Modal wo die ausgelesenen Sachen stehen dann Reiter rein
+     der unterschiedlichen Dokumente". Reiter 1 bleibt die Übernahme-Tabelle; je PDF ein Reiter
+     mit allem, was gelesen wurde; dazu die Auswertung (Risiken, These, WEG). */
+  var _reiter = 'ueb';
+  function _reiterEinbauen(host) {
+    var U = window.DpUnterlagen; if (!U || !_files.length) return;
+    var reiter = [{ id: 'ueb', label: 'Übernahme' }], panels = {};
+    _files.forEach(function (f, i) {
+      var id = 'f' + i, d = f.cache && f.cache[f.type], h = '', n = 0;
+      if (f.status === 'gesperrt') h = '<div class="dpu-gesperrt"><b>Nicht ausgelesen.</b> ' + escH(f.name) + ' enthält persönliche Unterlagen eines Mieters (z. B. Bescheide, Zahlungsbestätigungen). Sie gehören nicht zum Objekt; gelesen wurden nur die ersten zwei Seiten, um das zu erkennen.</div>';
+      else if (f.type === 'dokument' && d && d.success) {
+        [d].concat(d.weitere || []).forEach(function (t, k) { n += ((t.extracted || {}).risiken || []).length; h += (k ? '<hr style="border:0;border-top:1px solid rgba(42,39,39,.12);margin:12px 0">' : '') + '<div class="dpu-h" style="margin-top:0">' + escH(t.label || 'Dokument') + '</div>' + U.dokHtml(t.extracted || {}); });
+      } else if (d && f.type !== 'dokument') h = U.dokHtml(d);
+      else h = '<p class="dpu-hinweis">' + escH(f.status === 'reading' ? 'wird gelesen …' : ((d && d.error) || 'Aus dieser Datei kam nichts Verwertbares.')) + '</p>';
+      if (f._scan) h = '<p class="dpu-hinweis">Scan: ' + f._scan.gelesen + ' von ' + f._scan.seiten + ' Seiten gelesen' + (f._scan.gekuerzt ? ' (gekürzt)' : '') + '.</p>' + h;
+      var lab = f.status === 'gesperrt' ? 'Persönlich' : (f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'market' ? 'Marktbericht' : 'Exposé');
+      reiter.push({ id: id, label: lab + ' · ' + f.name.replace(/\.pdf$/i, ''), n: n });
+      panels[id] = h;
+    });
+    if (_auswertungLaeuft || _auswertung || _auswertungFehler) {
+      reiter.push({ id: 'ausw', label: 'Auswertung', n: _auswertung ? (_auswertung.risiken || []).length : 0 });
+      panels.ausw = _auswertungLaeuft ? '<p class="dpu-hinweis">Alle Unterlagen werden gemeinsam ausgewertet — Risiken, WEG, Investitionsthese …</p>'
+        : _auswertungFehler ? '<p class="dpu-hinweis">Auswertung nicht möglich: ' + escH(_auswertungFehler) + '</p>' : U.auswertungHtml(_auswertung);
+    }
+    if (!reiter.some(function (r) { return r.id === _reiter; })) _reiter = 'ueb';
+    U.stil();
+    var leiste = '<div class="dpu-tabs" id="oabi-reiter">' + reiter.map(function (r) {
+      return '<button type="button" class="dpu-tab' + (r.id === _reiter ? ' on' : '') + '" data-reiter="' + r.id + '" title="' + escH(r.label) + '">' + escH(r.label) + (r.n ? '<span class="dpu-n">' + r.n + '</span>' : '') + '</button>';
+    }).join('') + '</div>';
+    var ueb = document.createElement('div'); ueb.className = 'dpu-panel'; ueb.setAttribute('data-panel', 'ueb');
+    while (host.firstChild) ueb.appendChild(host.firstChild);
+    host.innerHTML = leiste; host.appendChild(ueb);
+    Object.keys(panels).forEach(function (id) { var p = document.createElement('div'); p.className = 'dpu-panel'; p.setAttribute('data-panel', id); p.innerHTML = panels[id]; host.appendChild(p); });
+    var zeigen = function () { host.querySelectorAll('.dpu-panel').forEach(function (p) { p.style.display = p.getAttribute('data-panel') === _reiter ? '' : 'none'; }); host.querySelectorAll('.dpu-tab').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-reiter') === _reiter); }); };
+    host.querySelectorAll('.dpu-tab').forEach(function (b) { b.addEventListener('click', function () { _reiter = b.getAttribute('data-reiter'); zeigen(); }); });
+    zeigen();
   }
   /* ═══════════════════════════════════════════════════════════════════
      v1317 · DIE FUNKTION, DIE ES NIE GAB
@@ -2173,12 +2299,12 @@
   function setStatus(f, txt) { var st = f.row.querySelector('.oabi-st'); if (st) st.textContent = txt; }
   function renderFileRow(f) {
     f.row.innerHTML =
-      '<span class="nm">' + (f.status === 'ok' ? '✓ ' : f.status === 'err' ? '⚠ ' : '⏳ ') + escH(f.name) + '</span>' +
+      '<span class="nm">' + (f.status === 'ok' ? '✓ ' : f.status === 'gesperrt' ? '⛔ ' : f.status === 'err' ? '⚠ ' : '⏳ ') + escH(f.name) + '</span>' +
       '<select ' + (f.status === 'reading' ? 'disabled' : '') + '><option value="auto"' + (f.userType ? '' : ' selected') + '>Auto</option>' +
         '<option value="market"' + (f.userType === 'market' || (!f.userType && f.type === 'market') ? ' selected' : '') + '>Marktbericht</option>' +
         '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option>' +
         (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') + '</select>' +
-      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'err' ? 'kein Text' : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : 'Exposé')) + '</span>';
+      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'gesperrt' ? 'persönlich · nicht ausgelesen' : f.status === 'err' ? (f.fehler || 'kein Text') : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : 'Exposé')) + '</span>';
     var sel = f.row.querySelector('select');
     if (sel) sel.addEventListener('change', function () { onTypeChange(f, sel.value); });
   }
@@ -2190,10 +2316,21 @@
     'Eigentümerversammlung', 'Eigentuemerversammlung', 'Verkehrswertgutachten', 'Restnutzungsdauergutachten',
     'Gutachten zur Restnutzungsdauer', 'Nutzungsdauergutachten', 'Punktrastermethode', 'Kaufpreisaufteilung',
     'Grundstücksmarktbericht', 'Bodenrichtwertauskunft'];
-  function istDokument(text) {
+  /* v3016 · neue Arten. Diese Wörter stehen auch in Exposés („Mietvertrag liegt vor",
+     „Energieausweis: Bedarf") - sie zählen deshalb nur im Kopf (erste 800 Zeichen) oder
+     im Dateinamen. Ein Exposé, das als Dokument gelesen wird, verliert seine Felder. */
+  var DOK_KOPF = ['Energieausweis', 'Teilungserklärung', 'Teilungserklaerung', 'Gemeinschaftsordnung', 'Aufteilungsplan', 'Mietvertrag',
+    'Wohnraummietvertrag', 'Mieterliste', 'Mietaufstellung', 'Mieterübersicht', 'Mietenliste', 'Einladung zur', 'Protokoll', 'Grundbuch', 'Flurkarte', 'Liegenschaftskarte'];
+  var DOK_NAME = /grundbuch|\bgb\b|teilung|weg|etv|protokoll|energie|flur|kataster|mietvertrag|mieterliste|mietaufstellung|baulast/i;
+  function istDokument(text, name) {
     var t = String(text || '');
     if (/dealpilot/i.test(t)) return false;
-    return DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; });
+    if (DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; })) return true;
+    /* Ein Exposé nennt „Energieausweis“ oft in den Eckdaten - Kaufpreis plus Provision/Exposé heisst: Exposé */
+    var expo = ['kaufpreis', 'provision', 'courtage', 'exposé', 'expose'].filter(function (w) { return t.toLowerCase().indexOf(w) >= 0; }).length;
+    if (expo >= 2 && !DOK_NAME.test(String(name || ''))) return false;
+    var kopf = t.slice(0, 800);
+    return DOK_KOPF.some(function (w) { return kopf.indexOf(w) >= 0; }) || DOK_NAME.test(String(name || ''));
   }
   function classifyType(file, text) {
     var fn = (file && file.name || '').toLowerCase();
@@ -2216,7 +2353,7 @@
   // Typ auflösen: bei klarem Befund direkt; bei 'unknown' erst Marktbericht versuchen und per Inhalt bestätigen, sonst Exposé.
   async function resolveType(f) {
     if (f.userType) { f.type = f.userType; await ensureExtract(f); return; }
-    if (window.DokumentImport && istDokument(f.text)) {
+    if (window.DokumentImport && istDokument(f.text, f.name)) {
       f.type = 'dokument'; await ensureExtract(f);
       if (f.cache.dokument && f.cache.dokument.success) return;
       delete f.cache.dokument;        /* unklar → der alte Weg */
@@ -2234,8 +2371,9 @@
     try {
       if (f.type === 'dokument') {
         var _a = await window.DokumentImport.lesenText(f.text, f.name);
-        f.cache.dokument = _a; f.status = (_a && _a.success) ? 'ok' : 'err';
+        f.cache.dokument = _a; f.status = (_a && _a.success) ? 'ok' : (_a && _a.gesperrt) ? 'gesperrt' : 'err';
         if (_a && _a.success) f.dokLabel = _a.label || 'Dokument';
+        if (_a && !_a.success && _a.error) f.fehler = _a.unklar ? 'Art unklar' : 'nicht gelesen';
       } else { f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok'; }
     }
     catch (e) { f.status = 'err'; }
@@ -2256,11 +2394,14 @@
       _files.push(f); renderFileRow(f);
       try {
         f.text = await extractTextFull(file, function (m) { setStatus(f, m); });
+        if (file._dpScan) f._scan = file._dpScan;
+        if (file._dpPersoenlich) { f.status = 'gesperrt'; f.type = 'dokument'; renderFileRow(f); continue; }   /* v3016 */
         if (!f.text || f.text.replace(/\s/g, '').length < 50) { f.status = 'err'; renderFileRow(f); continue; }
         await resolveType(f);
       } catch (e) { f.status = 'err'; renderFileRow(f); }
     }
     recompute(); renderMergedTable();
+    _unterlagenAuswerten();   /* v3016: Risiken, These, WEG aus allen Unterlagen */
     _extractImportPhotos();  /* v402: Exposé-Bilder asynchron nachladen */
   }
   async function _extractImportPhotos() {
@@ -2294,6 +2435,25 @@
    * braucht sie, um markSvwertAvm() weiterhin NUR im Textfall zu rufen.
    * null heisst: nichts geschrieben, also auch nicht zaehlen. */
   function _wertSchreiben(id, it) {
+    /* v3016 · Unterlagen */
+    if (it.kind === 'anhaengen') {
+      var ta = document.getElementById(id); if (!ta) return null;
+      var alt = String(ta.value || '').trim(), neu = String(it.raw || '').trim();
+      if (!neu || alt.indexOf(neu) >= 0) return null;
+      ta.value = alt ? alt + '\n\n' + (id === 'risiken' ? 'Aus den Unterlagen:\n' : '') + neu : neu;
+      try { ta.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+      return 'text';
+    }
+    if (it.kind === 'merken') {
+      if (!_auswertung || !window.DpUnterlagen) return null;
+      window.DpUnterlagen.merken({ stand: new Date().toISOString(), dokumente: _unterlagenListe().map(function (x) { return { typ: x.typ, label: x.label, datei: x.dateiname, datum: x.datum }; }), auswertung: _auswertung });
+      return 'text';
+    }
+    if (it.kind === 'einheiten') {
+      var liste = it.raw;
+      setTimeout(function () { try { window.DpMfhEinheiten.vorbelegen(liste); } catch (e) {} }, 350);
+      return 'text';
+    }
     /* v2430 · zwei Felder ohne sichtbares Formularfeld (voice-import.js):
        der Modus der Mietentwicklung (verstecktes me_modus) und die
        Wohnungsliste des MFH (geht nach _dpMfh, nicht in ein Feld). */

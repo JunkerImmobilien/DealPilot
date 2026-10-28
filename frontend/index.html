@@ -1050,6 +1050,7 @@ label.dp-required.qc-required::after {
   <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><!-- v1867: Eingabetiefe mit Pillen 1/2/3 (dieselbe Wahl wie in der Pre-Flight-Karte), Stand, Haken - und darunter die Abruf-Box --><div id="oe-ziel" class="oe-ziel"><span class="oe-ziel-lbl">Eingabetiefe</span><span class="dp-pf-stufen oe-pillen" data-oe-pillen title="Einfach · Mittel · Ausgiebig"></span><span id="oe-ziel-status" class="oe-ziel-status"></span></div><label class="oe-kopf-cb"><input type="checkbox" id="oe-details-cb"> weitere Objektdetails angeben</label><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p><div id="oe-abruf-box" class="oe-abruf-box"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die gewählte Eingabetiefe ist vorgemerkt</span></div><div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span><button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div></div>
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
+  <input type="hidden" id="_dok_auswertung" value="">  <!-- v3016: Auswertung der Unterlagen (WEG, Grundbuch, Teilung), JSON - unterlagen.js -->
   <input type="hidden" id="_lage_herkunft" value="">  <!-- v2515: Herkunft je Lage-Feld (gemessen | ki | eigen), JSON -->
   <input type="hidden" id="_immometrica_id" value="">
   <input type="hidden" id="_immometrica_online_since" value="">
@@ -3731,9 +3732,9 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v2992"></script>
+<script src="js/ui.js?v=v3016"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3010"></script>
+<script src="js/storage.js?v=v3016"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v3006c"></script>
@@ -3755,7 +3756,8 @@ label.dp-required.qc-required::after {
 <script src="js/ki-miete.js?v=v3002"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v2932"></script>
-<script src="js/dokument-import.js?v=v2218h"></script>
+<script src="js/dokument-import.js?v=v3016"></script>
+<script src="js/unterlagen.js?v=v3016"></script>
 <script src="js/beleg-import.js?v=v2932"></script>
 <script src="js/financing.js?v=v2261"></script>
 <script src="js/financing-pdf.js?v=v2932"></script>
@@ -3770,7 +3772,7 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-reiter.js?v=v3002"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3015"></script>
+<script src="js/mfh-einheiten.js?v=v3016"></script>
 <script src="js/mfh-felder.js?v=v3003"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/potenzial.js?v=v3001a"></script>
@@ -3853,7 +3855,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3003c"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v2932"></script>
+  <script src="js/object-actions.js?v=v3016"></script>
   <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>
   <script src="js/voice-import.js?v=v3003a"></script>

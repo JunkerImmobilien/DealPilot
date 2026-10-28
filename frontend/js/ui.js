@@ -758,6 +758,10 @@ function _buildAIPayload() {
       bevoelkerung: txt('ds2_bevoelkerung'), nachfrage: txt('ds2_nachfrage'),
       wertsteigerung: txt('ds2_wertsteigerung'), entwicklung: txt('ds2_entwicklung'),
       thesis: g('thesis'), risiken: g('risiken'), notizen: g('notizen'),
+      /* v3016 · die ausgewerteten Unterlagen (WEG, Grundbuch, Teilung, Energieausweis) */
+      dok_unterlagen: (window.DpUnterlagen && window.DpUnterlagen.promptTeile().dok_unterlagen) || null,
+      dok_risiken: (window.DpUnterlagen && window.DpUnterlagen.promptTeile().dok_risiken) || null,
+      dok_weg: (window.DpUnterlagen && window.DpUnterlagen.promptTeile().dok_weg) || null,
       /* ── v1700 · DIE EINHEITEN EINES MEHRFAMILIENHAUSES ─────────────
          Marcel: „bei Mehrfamilienhaeusern gebe ich die Gesamtquadrat-
          meterzahl an, und er sagt, die Wohnungsgroesse sei mit 390 m²
@@ -2434,13 +2438,20 @@ function _renderAIServerAnalysis(a) {
         try { zh = (_bestand && window.DpJahresstaende) ? '<div data-dp-ziel-host="1">' + window.DpJahresstaende.html() + '</div>' : ''; } catch (e) { zh = ''; }
         try { return zh + (window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(g, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : g); } catch (e) { return zh + g; }
       })(), false) : '');   /* v2430 */
+  /* v3016 · Marcel 28.10.2026: „WEG-Protokolle sollen ausgewertet werden … dafür in der
+     Pilot-Analyse einen Reiter erstellen". Er liest die gespeicherte Auswertung der
+     Unterlagen (#_dok_auswertung, unterlagen.js) und erscheint nur, wenn es eine gibt. */
+  var _ulHtml = '';
+  try { _ulHtml = window.DpUnterlagen ? window.DpUnterlagen.pilotReiterHtml() : ''; } catch (e) { _ulHtml = ''; }
+  var _ulTab = _ulHtml ? tab('unterlagen', 'Unterlagen &amp; WEG', false) : '';
+  var _ulPanel = _ulHtml ? panel('unterlagen', _ulHtml, false) : '';
   var _rail, _inhalt;
   if (_bestand) {
     _rail = tab('briefing', 'Briefing', true) + _siTab + _wertTab
       + tab('loc', 'Lage &amp; Markt', false) + tab('steuer', 'Steuer', false)
       + tab('anschluss', 'Anschlussfinanzierung', false) + tab('exit', 'Exit-Strategien', false)
-      + tab('risk', 'Risiko &amp; Szenarien', false);
-    _inhalt = panel('briefing', pB, true) + _siPanel + _wertPanel
+      + tab('risk', 'Risiko &amp; Szenarien', false) + _ulTab;
+    _inhalt = _ulPanel + panel('briefing', pB, true) + _siPanel + _wertPanel
       + panel('loc', pL, false) + panel('steuer', pSt, false)
       + panel('anschluss', pAF, false) + panel('exit', pEX, false)
       + panel('risk', pS + '<div style="margin-top:16px"></div>' + pR, false);
@@ -2448,6 +2459,7 @@ function _renderAIServerAnalysis(a) {
     _rail = tab('briefing', 'Briefing', true) +
       tab('sr', 'St\u00e4rken &amp; Risiken', false) +
       tab('risk', 'Risiko &amp; Szenarien', false) +
+      _ulTab +   /* v3016 */
       tab('loc', 'Lage &amp; Markt', false) +
       /* v2810 · Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt (wertvergleich.js);
          erscheint wie der Verlauf erst, wenn ein Marktbericht vorliegt */
@@ -2465,6 +2477,7 @@ function _renderAIServerAnalysis(a) {
     _inhalt = panel('briefing', pB, true) +
       panel('sr', pS, false) +
       panel('risk', pR, false) +
+      _ulPanel +
       panel('loc', pL, false) +
       _wertPanel +
       panel('verh', pV, false) +

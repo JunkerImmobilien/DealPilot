@@ -169,7 +169,7 @@ var FIELDS = [
   'rate_kueche','rate_bad','rate_boden','rate_fenster',
   'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis',
   /* v1608 · Modernisierungsgrad nach Anlage 2 ImmoWertV */
-  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','_lage_herkunft','einheiten',   /* v2515: _lage_herkunft */
+  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','_lage_herkunft','_dok_auswertung','einheiten',   /* v2515: _lage_herkunft */
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
   'san_ust',   /* v1261: brutto/netto fuer die 15%-Grenze */
@@ -523,6 +523,8 @@ function loadData(d) {
     /* v2515: Herkunft der Lage-Felder (KI/Messung/eigen) - sonst erbt
        Objekt B die Kennzeichnung von A, und ein eigener Wert hiesse KI. */
     '_lage_herkunft',
+    /* v3016: die Auswertung der Unterlagen gehoert zu GENAU einem Objekt */
+    '_dok_auswertung',
     /* v3003a: die Wertangabe. svw_herkunft gibt es erst seit v2996 - aeltere Objekte
        tragen den Schluessel nicht und erbten die Herkunft des vorigen Objekts. */
     'svwert', 'bankval', 'svw_herkunft', 'bankval_migriert',
