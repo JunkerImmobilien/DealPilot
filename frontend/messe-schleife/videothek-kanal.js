@@ -26,7 +26,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-8';
+  var VER = 'messe-schleife-8a';
   var Q = new URLSearchParams(location.search);
   var RATE = Math.max(0.5, Math.min(16, parseFloat(Q.get('rate')) || 1));
   var TRATE = Math.max(0.2, Math.min(20, parseFloat(Q.get('tafelrate')) || 1));
@@ -176,6 +176,10 @@
      Der Wächter (stockt / Neustart) schläft, solange angehalten ist.
      Menü (Taste E) „Kapitelleiste im Video“ schaltet sie ab. */
   var PAUSE_MAX = 180000;
+  /* Nach einem Sprung muss das Video an der neuen Stelle erst puffern - online über eine langsame
+     Leitung gemessen über 8 s (Staging, 240 KB/s). Der Wächter wartet dann bis 30 s statt 8 s,
+     sonst überspränge er das Video, an das gerade jemand gesprungen ist. */
+  var SPRUNG_GEDULD = 30000, sprungAm = -1e9;
   var K = null, kapI = -1, kapNr = -2, angehalten = false, pauseUhr = null, kapUhr = null, kapBereit = 0, kapZieht = false, kapUeber = false;
   function kapErlaubt() { return !(window.DPS_EINST && window.DPS_EINST.get('kapitel') === false); }
   function kapListe() { var v = V && V[kapI]; return v && v.kapitel ? v.kapitel : []; }
@@ -274,6 +278,7 @@
     var v = aktiv; if (!v || tafelOffen) return;
     var d = kapDauer(); t = Math.max(0, Math.min(t, d ? d - 0.3 : t));
     try { v.currentTime = t; } catch (e) { /* leer */ }
+    sprungAm = performance.now();
     log('sprung', wie + ' ' + V[kapI].datei + ' ' + t.toFixed(1));
     kapNr = -3; kapStand(t); kapZeig();
   }
@@ -336,7 +341,7 @@
         /* messe-schleife-8 · angehalten: kein "stockt", kein Neustart - nur warten */
         if (angehalten) { letzt = t; seit = jetzt; if (isFinite(v.duration) && v.duration > 0) balken.style.width = Math.min(100, 100 * t / v.duration) + '%'; requestAnimationFrame(schau); return; }
         if (t !== letzt) { letzt = t; seit = jetzt; }
-        else if (jetzt - seit > 8000) { fehler('Videothek: stockt ' + V[i].datei); log('stockt', V[i].datei); fertig(); return; }
+        else if (jetzt - seit > (jetzt - sprungAm < SPRUNG_GEDULD ? SPRUNG_GEDULD : 8000)) { fehler('Videothek: stockt ' + V[i].datei); log('stockt', V[i].datei); fertig(); return; }
         if (v.paused && !v.ended && jetzt - seit > 800) { var pp = v.play(); if (pp && pp.catch) pp.catch(function () {}); }
         if (isFinite(v.duration) && v.duration > 0) balken.style.width = Math.min(100, 100 * t / v.duration) + '%';
         if (v.ended || (isFinite(v.duration) && t >= v.duration - 0.05)) { fertig(); return; }
