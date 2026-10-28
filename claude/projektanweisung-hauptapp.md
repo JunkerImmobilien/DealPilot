@@ -43106,3 +43106,36 @@ DB `[]`. Prod: Migration 022 eingespielt, Register 6.186 = 6.186 sauber, Landing
 **Rest.** Admin „Anfragen an Ämter" angemeldet abnehmen (Marcel), Testzeile Oder-Spree in Staging
 `mb.amt_anfragen`. Ludwigslust-Parchim verlangt ein Belegexemplar. Läuft: v3018c Seitenumbrüche +
 Nutzerdaten ab Investor im PDF, Werbebilder (Agent), danach Rundgang-Video neu.
+
+
+### v3018c/c1 · Seitenumbrüche in den PDFs, Absender im PDF ab Investor · 28.10.2026 — Staging `35f6a41e`, `8413b353`
+
+**Was.** Marcel: „ob die Seitenumbrüche sinnvoll gewählt werden" und „ob die Daten des Users –
+Anschrift und E-Mail – auf dem PDF ausgegeben werden ab Investor-Plan".
+**Umbrüche** (Prüfer im scratchpad `umbruch-pruefen.mjs`, poppler `pdftotext -bbox-layout`: Füllgrad
+je Seite, Überschrift am Seitenende, Rest-Seite mit „(FORTSETZUNG)"): Investment-PDF – Pilot-Bausteine
+mit Hurenkind-Schutz (≥ 3 Zeilen auf der Folgeseite, ≥ 3 davor); Mieterliste (Einheiten & Zustand),
+Pilot-Analyse (wenn > halbe Seite frei) und Annahmen & Hinweise laufen auf der angebrochenen Seite
+weiter, wenn sie ganz passen (Schätzhöhe je Zeile 8,5 bzw. 11 mm – keine Tabelle bricht dadurch um).
+Steuermappe/Werbungskosten: Folgeseiten (Kasten Steuerwirkung blieb zusammen, stand aber ohne Bezug
+allein) tragen jetzt eine Kopfzeile „Aufstellung Werbungskosten Jahr · Objekt · Fortsetzung"
+(`_wkNeueSeite`). **Absender:** `getBranding()` verglich hart auf `'pro'` – gemessen gab das Konto
+info@ (Plan partner, Firma/Anschrift/E-Mail/Telefon im Profil) PDFs OHNE Absender aus. Neu
+`branding.fuerPdf()` = `get(true)`: ab `custom_logo` (Investor, Pro, Partner); `get()` außerhalb der
+PDFs ab Pro-Familie (`PRO_FAMILIE`, Partner nicht mehr ausgesperrt). pdf.js `_getBranding`, Bank
+`marke()`, BMF-Anlage, Kaufpreisaufteilung lesen `fuerPdf` (Werbungskosten/Track-Record über pdf.js).
+mandant-branding.js umhüllt `get` weiter (Argumente durchgereicht) – Whitelabel bleibt vorn.
+Einstellungs-Hinweis (Kontakt-Reiter) und Hilfe nennen die Grenzen.
+
+**Nachweis.** Staging, Schreibzugriffe/alert abgefangen. Seiten vorher → nachher: Lindenallee
+Investment 22 → 20 (Befunde 3 → 0), Bank 17 = 17, Kurz 6 = 6; ETW 2026-001 Investment 20 → 19
+(2 → 0); Parkstr. Investment 22 = 22 (1 Befund bleibt: S. 21 15 % Pilot-Ende, Annahmen ~200 mm passen
+nicht mehr); Steuermappe 6 Steuerwirkungs-Seiten jetzt mit Kopf; Werbungskosten-Übersicht, BMF-Anlage,
+Bank ETW/Parkstr. ohne Befund. Plan-Simulation per `dp_plan_override` (nur Browser, danach entfernt):
+free/starter PDF leer, investor PDF „Junker Solution | Hermannstr. 9 | info@…", App leer; pro/partner
+PDF und App gefüllt. Bilder: `Downloads/v3018c-bilder/` (vorher-/nachher-*.png), PDFs
+`Downloads/v3018c-vorher-*`, `v3018c-nachher-*`, `v3018c1-nachher-*`.
+
+**Rest.** Nicht geprüft: Marktbericht-PDF (eigenes Dokument), RND-Gutachten, Exposé/Pass, Track-Record,
+Kaufpreisaufteilung (verlangt vorher die Berechnung im Fenster). Investor sieht seinen Absender jetzt
+im PDF, im Deal-Aktion-Banner/Anfrage-Karten erst ab Pro – Produktentscheidung bestätigen. Nicht auf Prod.
