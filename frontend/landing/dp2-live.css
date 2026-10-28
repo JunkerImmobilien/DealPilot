@@ -202,6 +202,83 @@
 .tband-siegel img{width:84px;height:84px}
 .tband-siegel a{display:contents;color:inherit}
 
+/* ══ landing-videothek-5 · Suche und Kapitelmarken (Marcel 28.10.2026) ══════ */
+.vt-leiste .dpl-tab{min-height:44px}
+.vt-suchfeld{margin-left:auto;position:relative;display:flex;align-items:center;flex:0 1 440px;min-width:260px}
+.vt-suchfeld svg{position:absolute;left:14px;width:18px;height:18px;fill:none;stroke:var(--gdh);stroke-width:2;stroke-linecap:round;pointer-events:none}
+.vt-suchfeld .vt-suche{margin-left:0;width:100%;min-width:0;min-height:46px;padding:12px 14px 12px 42px;font-size:15px;
+  border-color:color-mix(in srgb,var(--gd) 45%,transparent);border-radius:0;-webkit-appearance:none;appearance:none}
+.vt-suchfeld .vt-suche:focus{outline:none;border-color:var(--gdh);box-shadow:0 0 0 3px color-mix(in srgb,var(--gd) 25%,transparent)}
+.vt-treffer{padding:30px 0 10px}
+.vt-treffer[hidden]{display:none}
+.vt-t-zahl{margin:0 0 18px;color:var(--mdk);font-size:14.5px;line-height:1.6}
+.vt-t-zahl b{color:var(--gdh)}
+.vt-t-vorschlag{background:none;border:1px solid var(--line);color:var(--gdh);font:600 13px/1 var(--body);padding:0 14px;min-height:44px;cursor:pointer;margin:6px 4px 0 0}
+.vt-t{display:block;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);margin-bottom:14px}
+.vt-t-kopf{width:100%;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.07);padding:0;text-align:left;color:inherit;cursor:pointer;display:flex;flex-direction:row;align-items:stretch;font:inherit}
+.vt-t-bild{position:relative;display:block;flex:0 0 200px;aspect-ratio:16/9;overflow:hidden;background:#000}
+.vt-t-bild img{display:block;width:100%;height:100%;object-fit:cover;filter:brightness(.85);transition:filter .3s}
+.vt-t-bild .vt-nr{position:absolute;left:8px;top:8px;font:700 11px/1 var(--disp);background:var(--runway);color:#14100a;padding:5px 7px}
+.vt-t-kopf:hover .vt-t-bild img{filter:none}
+.vt-t-kopf:hover b{color:var(--gdh)}
+.vt-t-text{padding:12px 16px;display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:0}
+.vt-t-kick{font:700 9.5px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ddk)}
+.vt-t-text b{font:600 16px/1.3 var(--disp);color:#fff;transition:color .2s}
+.vt-t-text .vt-u{font-size:13px;color:var(--gdh);line-height:1.4}
+.vt-t-kap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));column-gap:12px;padding:6px 8px;min-width:0}
+.vt-t-mehr{grid-column:1/-1}
+.vt-t-k{display:flex;align-items:center;gap:14px;min-height:48px;padding:8px 10px;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.06);
+  color:#fff;text-align:left;cursor:pointer;font:500 14.5px/1.35 var(--body);transition:background .2s}
+.vt-t-k:last-of-type{border-bottom:0}
+.vt-t-k:hover,.vt-t-k:focus-visible{background:color-mix(in srgb,var(--gd) 12%,transparent);outline:none}
+.vt-zeit{flex:0 0 auto;min-width:48px;text-align:center;font:700 12px/1 var(--mono);color:#14100a;background:var(--runway);padding:7px 6px}
+.vt-t-kt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;overflow-wrap:anywhere}
+.vt-t-kt small{font:500 11.5px/1.35 var(--mono);color:var(--mdk)}
+.vt-t-pfeil{flex:0 0 auto;display:flex}
+.vt-t-pfeil svg{width:14px;height:14px;fill:var(--gdh)}
+.vt-t-mehr{font:600 11px/1.3 var(--mono);color:var(--ddk);padding:10px 10px 6px;letter-spacing:.06em}
+/* Kapitel im Kinofenster: klickbare Zeitmarken, aktives Kapitel gold */
+.vt-kino-t .dpl-k-kick{padding-right:50px}
+.vt-kino-t .vt-zu{width:44px;height:44px}
+.vt-kap-kopf{font:700 9.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh);margin-top:6px}
+.vt-kap{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.vt-kap li{border-bottom:1px solid var(--line)}
+.vt-kap button{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:6px 8px;background:none;border:0;color:var(--txtd);
+  text-align:left;font:500 14px/1.3 var(--body);cursor:pointer;transition:background .2s}
+.vt-kap button .vt-zeit{background:none;color:var(--gdh);border:1px solid color-mix(in srgb,var(--gd) 50%,transparent);padding:6px 5px}
+.vt-kap button:hover,.vt-kap button:focus-visible{background:rgba(255,255,255,.05);outline:none}
+.vt-kap button.an{background:color-mix(in srgb,var(--gd) 14%,transparent);color:#fff;box-shadow:inset 3px 0 0 var(--gd)}
+.vt-kap button.an .vt-zeit{background:var(--runway);color:#14100a;border-color:transparent}
+.vt-kap-ohne{display:block;padding:12px 8px;color:var(--mdk);font-size:14px}
+/* Ende eines Videos: anhalten, naechstes anbieten - kein automatischer Start */
+.vt-kino-v{position:relative;min-width:0;background:#000}
+.vt-ende{position:absolute;inset:0 0 54px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;
+  background:rgba(3,3,3,.78);backdrop-filter:blur(3px)}
+.vt-ende[hidden]{display:none}
+.vt-ende-vor{display:flex;flex-direction:column;gap:6px;align-items:flex-start;max-width:min(440px,100%);min-height:44px;text-align:left;cursor:pointer;
+  background:var(--ob);border:1px solid var(--gd);color:#fff;padding:14px 18px;font:inherit;transition:background .2s}
+.vt-ende-vor:hover,.vt-ende-vor:focus-visible{background:color-mix(in srgb,var(--gd) 16%,var(--ob));outline:none}
+.vt-ende-vor small{font:700 9.5px/1.3 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gdh)}
+.vt-ende-vor b{font:600 19px/1.25 var(--disp)}
+.vt-ende-vor b span{color:var(--gdh)}
+.vt-ende-nochmal{background:none;border:0;color:var(--mdk);font:600 12px/1 var(--mono);letter-spacing:.08em;min-height:44px;padding:0 14px;cursor:pointer}
+.vt-ende-nochmal:hover{color:#fff}
+@media(min-width:701px){
+  .vt-kino-in{align-items:start}
+  .vt-kino-t{max-height:calc(100vh - 48px);overflow:auto}
+}
+@media(max-width:700px){
+  .vt-suchfeld{flex:1 1 100%;min-width:0;margin-left:0}
+  .vt-t-bild{flex:0 0 112px;aspect-ratio:auto;min-height:72px}
+  .vt-t-text{padding:10px 12px}
+  .vt-t-text b{font-size:15px}
+  .vt-t-k{gap:10px;padding:8px 6px;font-size:14px}
+  .vt-kino-v{position:sticky;top:0;z-index:2}
+  .vt-ende{gap:8px;padding:12px}
+  .vt-ende-vor b{font-size:16px}
+  .vt-kino-t{padding-top:16px}
+}
+
 /* ══ Handy ══════════════════════════════════════════════════════════════ */
 @media(max-width:1080px){
   .dpl-buehne{grid-template-columns:1fr}
