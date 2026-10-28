@@ -14,6 +14,7 @@ import { bwkAnsaetze } from '../lib/immowertv.js';   /* v2186 */
 import * as Jahreswerte from '../services/JahreswerteService.js';   /* v3021 */
 import { oeffentlich as abschlagOeffentlich, RECHERCHE as ABSCHLAG_RECHERCHE, aktive as abschlagAktive } from '../lib/angebot_abschlag.js';   /* v3021 */
 import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js';   /* v3021 */
+import { indexreihen } from '../lib/indexreihen.js';                             /* v3026 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { runLimited, limiterStats } from '../lib/limiter.js';
@@ -985,6 +986,18 @@ router.get('/bwk/ansaetze', (req, res) => {
 // angebotAbschlagMarkt wird daraus gefuellt). Ohne Quellennamen.
 router.get('/jahreswerte/angebotsabschlag', (req, res) => {
   try { res.json(abschlagOeffentlich()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// GET /indexreihen — v3026 · VPI (2020=100), Index der Nettokaltmieten (2020=100) und
+// Baupreisindex (2021=100) als Monatsreihen fuer Haupt-App und Rechenkerne (als Parameter).
+// Kommt aus dem Speicher (lib/indexreihen.js), nie aus GENESIS; ETag + 304, eine Stunde cachebar.
+router.get('/indexreihen', (req, res) => {
+  try {
+    const ir = indexreihen();
+    res.set('ETag', ir.etag);
+    res.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    if (req.headers['if-none-match'] === ir.etag) return res.status(304).end();
+    res.json(ir);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 // GET /jahreswerte/stand — nur ueber den Admin-Proxy: Register (Faelligkeit je Wert) plus
 // Stand der automatischen Reihen und des Angebotsabschlags aus der DB.

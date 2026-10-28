@@ -39,8 +39,11 @@ export const REIHEN = Object.freeze({
     basis: '2020=100',
     genesis: '61111-0002',
     genesis_filter: ['DG'],                 /* v3021a · Deutschland insgesamt */
+    /* v3026 · Indexmiete (§ 557b BGB) braucht die Monate seit Vertragsbeginn bzw. letzter
+       Anpassung - deshalb ab 2008 statt der letzten sechs Jahre (2008-01 = rund 82 auf 2020 = 100). */
+    genesis_startjahr: 2008,
     seite: 'https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Verbraucherpreisindex/Tabellen/Verbraucherpreise-12Kategorien.html',
-    band: [80, 250],
+    band: [70, 250],
     sprung_max_pct: 3,      /* je Monat Abstand zum naechsten belegten Wert */
     schritt_monate: 1,
   },
@@ -56,6 +59,27 @@ export const REIHEN = Object.freeze({
     sprung_max_pct: 5,      /* je Quartal Abstand */
     schritt_monate: 3,
   },
+  /* v3026 · Index der Nettokaltmieten (Bund) - fortgeschrieben wird damit die Zensusmiete 2022
+     (lib/zensus_miete.js NKM_INDEX). Gemessen 28.10.2026 an der echten GENESIS-Antwort:
+     Tabelle 61111-0006 (VPI Deutschland, Monate, COICOP Sonderpositionen), Merkmal CC13B1
+     „Verwendungszw. d. Individualkonsums, Sonderpositionen", Ausprägung CC13-73 „Nettokaltmiete";
+     81 Monate 2020-01 bis 2026-09, Mai 2022 = 102,7, Sep 2026 = 111,9 - alle zehn im Code
+     belegten Monate gleich. Die Länderreihe gäbe es als 61111-0021 (mit Konto abrufbar), sie
+     bleibt bewusst aus: die Fortschreibung bleibt beim Bundesindex (Methodik).
+     Weg 2: Seite „Sondergliederungen", Spalte „Nettokaltmiete" (Spalte per Kopf gesucht). */
+  nkm: {
+    name: 'Index der Nettokaltmieten, Deutschland (2020 = 100)',
+    basis: '2020=100',
+    genesis: '61111-0006',
+    genesis_param: { classifyingvariable1: 'CC13B1', classifyingkey1: 'CC13-73' },
+    genesis_filter: ['DG', 'CC13-73'],
+    genesis_startjahr: 2020,
+    seite: 'https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Verbraucherpreisindex/Tabellen/Verbraucherpreise-Sondergliederungen.html',
+    seite_spalte: /^Nettokaltmiete\b/,
+    band: [80, 250],
+    sprung_max_pct: 1.5,    /* Mieten laufen langsam: 0,1-0,4 % je Monat */
+    schritt_monate: 1,
+  },
 });
 
 /* Abweichung, ab der ein schon belegter Wert als Lesefehler gilt (Prozent). */
@@ -68,7 +92,8 @@ const MONAT_LANG = { januar: '01', februar: '02', 'märz': '03', april: '04', ma
   august: '08', september: '09', oktober: '10', november: '11', dezember: '12' };
 
 function zelle(s) {
-  return String(s).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&auml;/g, 'ä')
+  /* v3026 · weicher Trennstrich: die Seite schreibt Netto&shy;kaltmiete */
+  return String(s).replace(/<[^>]+>/g, '').replace(/&shy;|\u00ad/g, '').replace(/&nbsp;/g, ' ').replace(/&auml;/g, 'ä')
     .replace(/&#228;/g, 'ä').replace(/\s+/g, ' ').trim();
 }
 function zahl(s) {
@@ -90,6 +115,15 @@ function ersteTabelle(html) {
   if (!t) return [];
   return t.split(/<tr/i).slice(1).map((r) => r.split(/<t[hd][^>]*>/i).slice(1).map(zelle));
 }
+/** v3026 · erste Tabelle, deren Kopfzeile eine Zelle nach `muster` führt → { zeilen, spalte } */
+function tabelleMitSpalte(html, muster) {
+  for (const t of String(html || '').split(/<table/i).slice(1)) {
+    const zeilen = t.split(/<tr/i).slice(1).map((r) => r.split(/<t[hd][^>]*>/i).slice(1).map(zelle));
+    const k = (zeilen[0] || []).findIndex((c) => muster.test(c));
+    if (k > 0) return { zeilen, spalte: k };
+  }
+  return { zeilen: [], spalte: 1 };
+}
 
 /**
  * Tabellenseite → { 'JJJJ-MM': wert }. Spalte 1 nach Jahr/Periode ist die
@@ -99,17 +133,19 @@ function ersteTabelle(html) {
 export function parseTabellenseite(reihe, html) {
   const out = {};
   let jahr = null;
-  for (const z of ersteTabelle(html)) {
+  const R = REIHEN[reihe] || {};
+  const tab = R.seite_spalte ? tabelleMitSpalte(html, R.seite_spalte) : { zeilen: ersteTabelle(html), spalte: 1 };
+  for (const z of tab.zeilen) {
     if (!z.length) continue;
     let i = 0;
     if (/^(19|20)\d{2}$/.test(z[0])) { jahr = z[0]; i = 1; }
     if (!jahr) continue;
     const per = (z[i] || '').replace(/\d+$/, '');   /* Fußnotenziffer „Apr1" */
     let mm = null;
-    if (reihe === 'vpi') mm = MONATE[per.toLowerCase().slice(0, 3)] || null;
-    else mm = QUARTAL[per] || null;
+    if (reihe === 'bpi') mm = QUARTAL[per] || null;
+    else mm = MONATE[per.toLowerCase().slice(0, 3)] || null;
     if (!mm) continue;
-    const w = zahl(z[i + 1]);
+    const w = zahl(z[i + tab.spalte]);
     if (w == null) continue;
     out[jahr + '-' + mm] = w;
   }
@@ -149,7 +185,8 @@ export async function holeGenesis(reihe, { fetchImpl = globalThis.fetch, env = p
   const jahr = new Date().getFullYear();
   try {
     const body = new URLSearchParams({ name: R.genesis, area: 'all', compress: 'false', format: 'ffcsv',
-      language: 'de', startyear: String(jahr - 6), endyear: String(jahr) }).toString();
+      language: 'de', startyear: String(R.genesis_startjahr || jahr - 6), endyear: String(jahr),
+      ...(R.genesis_param || {}) }).toString();   /* v3026 · Merkmal serverseitig eingrenzen (61111-0006 ist sonst gross) */
     const r = await fetchImpl(base + '/data/tablefile', { method: 'POST', body,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', username: tok, password: env.GENESIS_PASSWORD || '' } });
     /* v3021a · GENESIS liefert die Tabelle als ZIP, auch mit compress=false (gemessen) */

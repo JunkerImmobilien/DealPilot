@@ -40,6 +40,25 @@ export const NKM_INDEX = {
             '2026-05': 111.3, '2026-06': 111.4, '2026-07': 111.6, '2026-08': 111.8, '2026-09': 111.9 },
 };
 
+/* v3026 · Die Monate oben sind RUECKFALL und Vorrang. Neuere Monate kommen aus dem
+   Jahreswerte-Takt (GENESIS 61111-0006, CC13-73, Tabelle mb.jahreswerte_abruf, reihe 'nkm')
+   über uebernimmNkm() - nie aus dem Anfragepfad. Ein im Code belegter Monat wird nie
+   überschrieben. */
+export const NKM_ABGERUFEN = {};
+export function uebernimmNkm(zeilen) {
+  let neu = 0;
+  for (const z of zeilen || []) {
+    const k = String(z.periode || '');
+    const w = Number(z.wert);
+    if (!/^\d{4}-\d{2}$/.test(k) || !(w > 0)) continue;
+    if (NKM_INDEX.monate[k] != null && !NKM_ABGERUFEN[k]) continue;   /* belegt im Code - bleibt */
+    NKM_INDEX.monate[k] = w;
+    NKM_ABGERUFEN[k] = { abgerufen_am: String(z.abgerufen_am instanceof Date ? z.abgerufen_am.toISOString() : (z.abgerufen_am || '')).slice(0, 10), weg: z.weg || null };
+    neu++;
+  }
+  return neu;
+}
+
 function monat(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 
 /** Index zum Stichtag: Monatswert, sonst der letzte Monatswert davor im selben

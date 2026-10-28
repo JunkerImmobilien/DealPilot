@@ -539,6 +539,7 @@
               'die Höhe ergibt sich erst aus dem Verbraucherpreisindex. Was du hier einträgst, ' +
               'rechnet DealPilot als <b>Annahme</b> fort und kennzeichnet sie auch in der Mietentwicklung.' +
             '</div>' +
+            '<div id="mfh-we-index-tab"></div>' +   /* v3026 · mögliche Anpassung je Jahr aus dem VPI */
             '<div class="mfh-we-raster">' +
               s('mv_erhoehung_art', 'Erhöhung angeben als', [['', '–'], ['prozent', 'Prozent'], ['betrag', 'Euro je Monat']]) +
               f('mv_erhoehung_wert', 'Nächste Erhöhung (Höhe)', 'z. B. 3 oder 45', 'decimal') +
@@ -682,8 +683,12 @@
       box.style.display = (a === 'staffel' || a === 'index') ? '' : 'none';
       var warn = el('mfh-we-index-warn');
       if (warn) warn.style.display = (a === 'index') ? '' : 'none';
+      /* v3026 · Indexmiete: Tabelle Jahr | Index | mögliche Miete | Erhöhung | wirksam ab (potenzial.js → js/indexmiete.js) */
+      var it = el('mfh-we-index-tab');
+      if (it) { try { it.innerHTML = (a === 'index' && window.DpPotenzial && DpPotenzial.indexmieteHtml) ? DpPotenzial.indexmieteHtml({ hat_index: true, art: 'einzel', wohnungen: [{ index: DpPotenzial.indexmieteFuer(e) }] }) : ''; } catch (x) { it.innerHTML = ''; } }
     }
     if (vArt) vArt.addEventListener("change", erhoehungZeigen);
+    ov.addEventListener('change', function (ev) { var k = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-wk'); if (k === 'mv_beginn' || k === 'mv_letzte_erhoehung' || k === 'ist' || k === 'status') erhoehungZeigen(); });   /* v3026 */
     erhoehungZeigen();
     /* v2600 · E3 · Leerstandsblock nur bei Status „leer" */
     var sSt = ov.querySelector('[data-wk="status"]');

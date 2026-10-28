@@ -1,5 +1,5 @@
 {
-  "version": "v3021",
+  "version": "v3026",
   "stand": "2026-10-28",
   "zweck": "Jedes zeit- oder jahresabhaengige Datum im Code: Ort mit allen Spiegelstellen, Stand, Quelle (intern), Turnus, Faelligkeit, Verfahren. Pruefer: tools/jahreswerte-pruefen.mjs (RC=1 bei ueberfaellig oder Spiegel ungleich). Admin: Register & Ernte > Jahreswerte. Pflege: Agent .claude/agents/jahreswerte.md. Wer einen Wert nachzieht, setzt hier stand, erwartet und faellig_am neu.",
   "verfahren_namen": {
@@ -241,12 +241,12 @@
       "gruppe": "wertermittlung",
       "stand": "Monate bis September 2026, Stand 13.10.2026",
       "erwartet": "2026-10-13",
-      "quelle": "Destatis, Verbraucherpreisindex Sondergliederungen, Spalte Nettokaltmiete",
-      "turnus": "quartalsweise nachtragen (monatlich veroeffentlicht)",
+      "quelle": "Destatis GENESIS 61111-0006, Merkmal CC13B1, Auspraegung CC13-73 Nettokaltmiete (2020=100); Weg 2: Seite Verbraucherpreise-Sondergliederungen, Spalte Nettokaltmiete",
+      "turnus": "monatlich veroeffentlicht - Takt JahreswerteService woechentlich (seit v3026)",
       "faellig_am": "2027-01-20",
-      "verfahren": "agent",
+      "verfahren": "automatisch",
       "orte": [ { "datei": "marktbericht/backend/src/lib/zensus_miete.js", "bezeichner": "NKM_INDEX.stand", "block": "export const NKM_INDEX", "muster": "stand: '([\\d-]+)'," } ],
-      "hinweis": "Kandidat fuer den Automatik-Takt (selbe Seite wie VPI-Sondergliederungen) - noch nicht angebunden."
+      "hinweis": "Seit v3026 automatisch: JahreswerteService holt die Reihe (reihe nkm in mb.jahreswerte_abruf, Migration 024), uebernimmNkm() schreibt neue Monate in NKM_INDEX; die Monate im Code bleiben Rueckfall und Vorrang. Gemessen 28.10.2026: GENESIS 81 Monate 2020-01 bis 2026-09, alle zehn Code-Monate gleich. Faellig heisst hier nur: den Rueckfall im Code gelegentlich nachziehen."
     },
     {
       "id": "kappungsgrenzen",

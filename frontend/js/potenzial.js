@@ -330,6 +330,22 @@
     if (art === 'gewerbe' || (e && e.art === 'gewerbe')) return { art: 'gewerbe', s558: false, s559: false, text: 'Gewerbemiete: §§ 558 und 559 BGB gelten nur für Wohnraum – Erhöhungen richten sich nach dem Vertrag. Eine vereinbarte Anpassung trägst du als Soll-Miete ein.' };
     return { art: art, s558: true, s559: true, text: '' };
   }
+  /* v3026 · Indexmiete (§ 557b BGB): mögliche Anpassung je Jahr aus dem VPI. Rechnet der Kern
+     js/indexmiete.js; die VPI-Reihe kommt aus js/indexreihen.js (Server-Cache, nie GENESIS),
+     die Zukunftsannahme aus dem Investmentprofil (indexmiete_vpi_pct, Vorgabe 2,0 % p. a.).
+     Ändert nichts an sollFuer: bei Index bleibt § 558/§ 559 aus (vertragGrenzen). */
+  function indexAnnahme() {
+    var P = window.DealPilotInvestmentProfile, a = null;
+    try { a = P && P.get ? P.get('indexmiete_vpi_pct') : null; } catch (x) {}
+    var n = (a == null || a === '') ? NaN : Number(String(a).replace(',', '.'));
+    return isFinite(n) && n > -5 && n < 15 ? n : null;
+  }
+  function indexmieteFuer(e) {
+    var I = window.DpIndexmiete;
+    if (!I || !e || vertragGrenzen(e).art !== 'index' || e.status === 'leer') return null;
+    var R = window.DpIndexreihen, vpi = R && R.reihe ? R.reihe('vpi') : null;
+    return I.rechne({ miete: zahl(e.ist), beginn: e.mv_beginn, letzte: e.mv_letzte_erhoehung, vpi: vpi, annahme_pct: indexAnnahme() });
+  }
   function sollFuer(e, ctx) {
     ctx = ctx || {};
     var ist = zahl(e.ist), wfl = zahl(e.wfl);
@@ -452,7 +468,7 @@
           massnahmen: mlEigen, kosten: kAlle, kosten_bewohnt: kBew, mea: zahl(e.mea_anteil) || null,
           kosten_haus: ml.filter(function (m) { return m.haus; }).reduce(function (a, m) { return a + m.k; }, 0),   /* v2966 */
           plus_soll: Math.min(20, punkteGewinn(ml, e, geb, true)), plus_ziel: Math.min(20, punkteGewinn(ml, e, geb, false)),
-          vgl_qm: s.vgl_qm || null };
+          vgl_qm: s.vgl_qm || null, index: indexmieteFuer(e) };   /* v3026 */
       });
       out.wfl = flSum;
       out.aufgeteilt = opts.aufgeteilt != null ? !!opts.aufgeteilt : !!D.aufgeteilt;
@@ -466,6 +482,7 @@
       var eO = { ist: istO, wfl: wflO, status: istO > 0 ? 'vermietet' : 'leer',
         soll: zahl(wert('zb_soll_qm')) > 0 && wflO > 0 ? zahl(wert('zb_soll_qm')) * wflO : 0,
         soll_ab: wert('zb_soll_ab'), vgl_qm: 0, mv_letzte_erhoehung: wert('mv_letzte_erhoehung'), mv_letzte_erhoehung_betrag: wert('mv_letzte_erhoehung_betrag'),
+        mv_art: wert('mv_art'), mv_beginn: wert('mv_beginn'),   /* v3026 · bis hier sah die Objektebene ihre Vertragsart nicht */
         massnahmen: objektMassnahmen() };
       var sO = sollFuer(eO, ctx);
       var zQ = zahl(wert('zb_ziel_qm'));
@@ -475,7 +492,8 @@
         ziel: zQ > 0 && wflO > 0 ? zQ * wflO : null, ziel_qm: zQ || null, ziel_wann: wert('zb_ziel_wann'),
         massnahmen: mlO, kosten: mlO.reduce(function (a, m) { return a + zahl(m.k); }, 0),
         kosten_bewohnt: mlO.filter(function (m) { return m.bewohnt; }).reduce(function (a, m) { return a + zahl(m.k); }, 0),
-        plus_soll: Math.min(20, punkteGewinn(mlO, null, null, true)), plus_ziel: Math.min(20, punkteGewinn(mlO, null, null, false)) }];
+        plus_soll: Math.min(20, punkteGewinn(mlO, null, null, true)), plus_ziel: Math.min(20, punkteGewinn(mlO, null, null, false)),
+        index: istO > 0 ? indexmieteFuer(eO) : null }];   /* v3026 */
       if (sO.miete != null && sO.miete > istO) out.hat_soll = true;
       if (zQ > 0 || mlO.length) out.hat_ziel = true;
     }
@@ -494,7 +512,43 @@
         plus: Math.round(gew('plus_ziel') * 10) / 10 } : null
     };
     out.aktiv = !!(out.hat_soll || out.hat_ziel);
+    /* v3026 · Indexmiete: Summe je Haus (nur Wohnungen mit gerechneter Tabelle) */
+    out.hat_index = W.some(function (w) { return !!w.index; });
+    out.indexmiete = out.hat_index && window.DpIndexmiete ? window.DpIndexmiete.haus(W.map(function (w) { return w.index; })) : null;
     return out;
+  }
+
+  /* v3026 · Indexmiete - Tabellen je Wohnung und die Summe; '' ohne Indexvertrag */
+  function indexmieteHtml(m) {
+    m = m || modell();
+    var I = window.DpIndexmiete;
+    if (!I || !m.hat_index) return '';
+    I.stil();
+    var mehr = m.wohnungen.length > 1 || m.art === 'mfh';
+    var t = m.wohnungen.filter(function (w) { return w.index; }).map(function (w) {
+      return '<div class="dp-idx-wrap">' + I.tabelleHtml(w.index, mehr ? 'Wohnung ' + (w.nr || (w.i + 1)) + (w.lage ? ' · ' + w.lage : '') : 'Indexmiete (§ 557b BGB)') + '</div>';
+    }).join('');
+    var z = m.indexmiete ? '<div class="dp-zb-sum"><b>' + esc(I.zeileText(m.indexmiete)) + '</b></div>' : '';
+    return '<div class="dp-idx-block" style="margin-top:10px">' + (mehr ? '<div class="dp-idx-t">Indexmiete (§ 557b BGB) je Wohnung</div>' : '') + t + z + '</div>';
+  }
+  /** v3026 · für Pilot-Prompt, Pilot-Analyse und PDF: null ohne Indexvertrag */
+  function indexmieteDaten() {
+    var m = modell(), I = window.DpIndexmiete;
+    if (!m.hat_index || !I) return null;
+    var R = window.DpIndexreihen, v = R && R.reihe ? R.reihe('vpi') : null;
+    return {
+      zeile: m.indexmiete ? I.zeileText(m.indexmiete) : null,
+      haus: m.indexmiete,
+      vpi_stand: v ? { bis: v.bis, abgerufen_am: v.abgerufen_am || null } : null,
+      wohnungen: m.wohnungen.filter(function (w) { return w.index; }).map(function (w) {
+        var x = w.index;
+        return { nr: w.nr || String(w.i + 1), lage: w.lage || '', ok: !!x.ok, fehlt: x.ok ? null : x.fehlt,
+          miete_heute: x.miete || null, basis: x.basis || null,
+          schritte: x.ok ? x.schritte.map(function (s) { return { jahr: Number(s.wirksam.slice(0, 4)), wirksam_ab: s.wirksam, erklaerung_bis: s.erklaerung,
+            indexmonat: s.indexmonat, index: s.index, annahme: s.annahme, miete_neu: s.miete_neu, plus_monat: s.plus_monat, plus_jahr: s.plus_jahr }; }) : [] };
+      }),
+      annahme: m.indexmiete ? (m.indexmiete.annahme ? 'Zukunftswerte = Annahme ' + m.indexmiete.annahme_pct + ' % VPI p. a., kein amtlicher Wert' : null) : null
+    };
   }
 
   /* ── Abruf beim Marktbericht-Dienst ─────────────────────────────────── */
@@ -1919,7 +1973,8 @@
           + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' : '')
           + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '')
           + (m.aktiv ? '' : ' · noch keine Soll-Miete oder kein Zielbild eingetragen') + '</div>'
-          + herkunftHtml();   /* v2988 */
+          + herkunftHtml()   /* v2988 */
+          + indexmieteHtml(m);   /* v3026 */
       }
       return;
     }
@@ -1948,9 +2003,11 @@
         + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat' + (m.stufen.zielbild.kosten ? ' · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '') + (m.stufen.zielbild.plus ? ' · +' + dez(m.stufen.zielbild.plus, 1).replace(',0', '') + ' Modernisierungspunkte' : '') : '')
         + '<br>' + esc(m.kappung.text) + ' Die Ertragswerte stehen in der Pilot-Analyse (Reiter „Ankauf · Bestand · Zielbild") und in beiden PDFs.';
     if (m.aktiv) host.innerHTML += herkunftHtml();   /* v2988 */
+    var ih = indexmieteHtml(m);   /* v3026 */
+    if (ih) host.innerHTML = (m.aktiv ? host.innerHTML : '') + ih;
   }
   function bindeObjektFelder() {
-    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'zb_markt_qm', 'san', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag'].forEach(function (id) {
+    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'zb_markt_qm', 'san', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_art', 'mv_beginn'].forEach(function (id) {   /* v3026: mv_art, mv_beginn */
       var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
       e.addEventListener('input', function () { objektSumme(); });
       e.addEventListener('change', function () { objektSumme(); });
@@ -2075,6 +2132,9 @@
     return n;
   }
 
+  /* v3026 · kommt die VPI-Reihe nach dem ersten Zeichnen, die Indexmiete nachziehen */
+  window.addEventListener('dp:indexreihen', function () { try { objektKarte(); } catch (e) {} });
+
   window.DpPotenzial = {
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
     ohneZielbild: ohneZielbild,   /* v3018d */
@@ -2087,6 +2147,7 @@
     brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml, stufenWerte: stufenWerte, KURZ_AUSBLICK: KURZ_AUSBLICK,
     sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
     herkunft: herkunft, herkunftAusDaten: herkunftAusDaten, herkunftHtml: herkunftHtml, leeren: leeren,   /* v2988 */
+    indexmieteFuer: indexmieteFuer, indexmieteHtml: indexmieteHtml, indexmieteDaten: indexmieteDaten,   /* v3026 */
     _hash: hash, _auftrag: auftrag
   };
 })();

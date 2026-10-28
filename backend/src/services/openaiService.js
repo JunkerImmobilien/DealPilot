@@ -50,6 +50,34 @@ const OPENAI_URL = 'https://api.openai.com/v1/responses';
    Zielbild (nach Umbau/Neuvermietung). Der Ertragswert je Stufe kommt aus dem
    Marktbericht-Dienst (derselbe Kern wie Stufe 3) - hier wird nichts gerechnet.
    Kennzeichnung: Potenzialwert, keine Verkehrswertermittlung. */
+/* v3026 · Indexmiete (Paragraf 557b BGB). Marcel 28.10.2026: „sollte man das dann auch in der
+   Pilot-Analyse angeben, mit der Indexmiete und der Erhoehung und was drin waere?"
+   Die Zahlen rechnet die App (js/indexmiete.js) aus dem amtlichen VPI; das Modell zitiert sie. */
+function _indexmieteBlock(im) {
+  if (!im || !Array.isArray(im.wohnungen) || !im.wohnungen.length) return '';
+  var e2 = function (n) { return n == null ? '-' : Number(n).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EUR'; };
+  var mt = function (k) { return k ? String(k).slice(5, 7) + '/' + String(k).slice(0, 4) : '-'; };
+  var z = [''];
+  z.push('## INDEXMIETE (Paragraf 557b BGB, gerechnet von DealPilot aus dem Verbraucherpreisindex)');
+  z.push('Regeln: Miete aendert sich nur mit dem VPI; mindestens ein Jahr unveraendert; Erklaerung in Textform, wirksam ab dem uebernaechsten Monat;'
+    + ' keine Erhoehung nach Paragraf 558 und keine Modernisierungsumlage nach 559 (ausser bei nicht zu vertretenden Massnahmen).');
+  z.push('ANWEISUNG: Rechne diese Zahlen NICHT selbst nach und nicht um - zitiere sie so. Werte mit "Annahme" sind KEINE amtlichen Werte,'
+    + ' sondern ein Szenario mit einem angenommenen Preisanstieg; nenne sie ausdruecklich als Annahme. Nenne die Indexmiete in "potenzial_text"'
+    + ' (Mietentwicklung) und, wenn sie fuer die Bewertung zaehlt, kurz in der Investmentbewertung.');
+  if (im.zeile) z.push('Summe: ' + im.zeile);
+  if (im.vpi_stand && im.vpi_stand.bis) z.push('Echte VPI-Werte bis ' + mt(im.vpi_stand.bis) + '.' + (im.annahme ? ' ' + im.annahme + '.' : ''));
+  im.wohnungen.forEach(function (w) {
+    var kopf = '  Wohnung ' + (w.nr || '-') + (w.lage ? ' (' + w.lage + ')' : '');
+    if (!w.ok) { z.push(kopf + ': nicht gerechnet - es fehlt ' + (w.fehlt || []).join(', ') + '. Nenne, welche Angabe fehlt; keine Zahl schaetzen.'); return; }
+    z.push(kopf + ': Miete heute ' + e2(w.miete_heute) + ', Basis VPI ' + (w.basis ? w.basis.wert + ' (' + mt(w.basis.monat) + ', ' + w.basis.herkunft + ')' : '-'));
+    (w.schritte || []).forEach(function (s) {
+      z.push('    ' + s.jahr + ': wirksam ab 01.' + mt(s.wirksam_ab).replace('/', '.') + ' (Erklaerung bis ' + mt(s.erklaerung_bis) + '), VPI ' + s.index + ' (' + mt(s.indexmonat) + (s.annahme ? ', ANNAHME' : ', amtlich') + ')'
+        + ', moegliche Miete ' + e2(s.miete_neu) + ', Erhoehung ' + e2(s.plus_monat) + '/Monat = ' + e2(s.plus_jahr) + '/Jahr');
+    });
+  });
+  return z.join('\n');
+}
+
 function _potenzialBlock(pz) {
   var z = [], e = function (n) { return n == null ? '-' : Math.round(n).toLocaleString('de-DE') + ' EUR'; };
   z.push('');
@@ -797,6 +825,7 @@ function buildPrompt(payload, opts) {
     _ak ? _ankaufBlock(_ak) : '',
     _ak ? _bestandBlock(payload.bestand) : '',   /* v2985 */
     _pz ? _potenzialBlock(_pz) : '',   /* v2430 */
+    payload.indexmiete ? _indexmieteBlock(payload.indexmiete) : '',   /* v3026 */
     _wo ? _zeilen('## WOHNUNGSDETAILS (fuer den Mietspiegel-Vergleich)', [
       ['Zimmer', _wo.zimmer], ['Baeder', _wo.baeder],
       ['Etage', _wo.etage], ['Etagen gesamt', _wo.etagen_gesamt],
@@ -1819,7 +1848,7 @@ function buildPrompt(payload, opts) {
     '  ],',
     /* v2160 · Zielfelder fuer Aufgabe 16 (N62.6, vertieft v2166) */
     '  "steuer_zusammenfassung": "14-20 Saetze in der Gliederung von Aufgabe 16: Werbungskosten nach Art, Ergebnis und Steuerwirkung Jahr 1, Jahr der Wende und warum, Steuerlast danach in EUR, Folge fuer den Cashflow nach Steuer, Sanierung, Hinweis auf Steuerberater",',
-    _pz ? '  "potenzial_text": "4-7 Saetze nach Aufgabe 17 (Mieterhoehung, Zielbild, Ertragswert je Stufe, Wertzuwachs nach Kosten, Aufteilung); null ohne Block",' : '',   /* v2430 */
+    (_pz || payload.indexmiete) ? '  "potenzial_text": "4-7 Saetze nach Aufgabe 17 (Mieterhoehung, Zielbild, Ertragswert je Stufe, Wertzuwachs nach Kosten, Aufteilung); null ohne Block",' : '',   /* v2430 */
     _ak ? '  "soll_ist_steuer": "2-4 Saetze: steuerliche Lage beim Ankauf gegen heute, mit beiden Zahlen; null, wenn keine Steuerzahl zu beiden Zeitpunkten vorliegt",' : '',
     /* v2985 · im Bestand Fragen und Antworten (eigener Reiter), im Ankauf wie bisher ein Absatz */
     _ak ? '  "anschlussfinanzierung": [{ "frage": "Was kostet mich das Ende der Zinsbindung?", "antwort": "3-5 Saetze mit Restschuld, Rate je Anschlusszins, Cashflow und DSCR danach" }, "... 4-6 Eintraege"],'

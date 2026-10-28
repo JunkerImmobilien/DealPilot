@@ -4,7 +4,7 @@
 // automatisch neu ermitteln, und das müssen wir auch bei den Steuerdaten machen."
 //
 // Drei Aufgaben, alle neben dem Server, nie im Anfragepfad:
-//   1. AMTLICHE REIHEN (VPI, Baupreisindex) holen - täglich prüfen, holen,
+//   1. AMTLICHE REIHEN (VPI, Baupreisindex, seit v3026 Index der Nettokaltmieten) holen - täglich prüfen, holen,
 //      wenn der letzte erfolgreiche Abruf älter als 7 Tage ist. Jeder gelesene
 //      Wert läuft durch pruefe() (lib/destatis_reihen.js); nur 'aktiv' wirkt.
 //   2. Beim Start und nach jedem Abruf die aktiven Werte in die Libs laden
@@ -26,6 +26,8 @@ import { VPI_OKTOBER_IMMOWERTV, uebernimmVpiOktober } from '../lib/nrw_modell.js
 import { berechneJahr, setzeAktive, MIN_N, STICHTAG_MONAT_TAG, SEGMENTE } from '../lib/angebot_abschlag.js';
 import { landAusAgs } from '../lib/lzs_naeherung.js';
 import { BWK_JAHRE } from '../lib/immowertv.js';
+import { NKM_INDEX, NKM_ABGERUFEN, uebernimmNkm } from '../lib/zensus_miete.js';   /* v3026 */
+import { setzeIndexreihen } from '../lib/indexreihen.js';                          /* v3026 */
 
 const TAKT_MS = 24 * 3600 * 1000;
 const ABRUF_ALTER_TAGE = 7;
@@ -33,6 +35,11 @@ let _laeuft = false;
 
 /** Im Code belegte Werte einer Reihe als { 'JJJJ-MM': wert } (Basis wie die Abrufe). */
 function belegtImCode(reihe) {
+  if (reihe === 'nkm') {   /* v3026 · Index der Nettokaltmieten, im Code belegte Monate */
+    const o = {};
+    for (const [k, v] of Object.entries(NKM_INDEX.monate)) if (!NKM_ABGERUFEN[k]) o[k] = v;
+    return o;
+  }
   if (reihe === 'bpi') {
     const o = {};
     for (const [k, v] of Object.entries(BPI_TABELLE.monate)) if (!(BPI_TABELLE.abgerufen || {})[k]) o[k] = v;
@@ -52,11 +59,13 @@ async function aktiveZeilen(reihe) {
 
 /** Aktive DB-Werte in die Libs übernehmen (Start + nach jedem Abruf). */
 export async function ladeAktive() {
-  const out = { bpi: 0, vpi: 0, abschlag: 0 };
+  const out = { bpi: 0, vpi: 0, nkm: 0, abschlag: 0 };
   try {
     const z = await aktiveZeilen(null);
     out.bpi = bpiUebernehmen(z.filter((x) => x.reihe === 'bpi'));
     out.vpi = uebernimmVpiOktober(z.filter((x) => x.reihe === 'vpi'));
+    out.nkm = uebernimmNkm(z.filter((x) => x.reihe === 'nkm'));   /* v3026 · Zensusmiete fortschreiben */
+    out.indexreihen = setzeIndexreihen(z);                         /* v3026 · Speicher-Cache für GET /indexreihen */
   } catch (e) { out.fehler_reihen = e.message; }
   try {
     const a = await q('SELECT jahr, segment, pct::float AS pct, n, aktiv FROM mb.angebot_abschlag_jahr WHERE aktiv');

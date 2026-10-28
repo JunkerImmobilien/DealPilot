@@ -177,13 +177,22 @@
         /* v2992 · Abschlag und Wert ohne Abschlag des gespeicherten Berichts - fuer den Hinweis unter den Stufen */
         berichtAb: h ? zahl(h.angebot_abschlag_pct) : null, berichtOhne: h ? zahl(h.market_value_roh) : null,
         berichtDatum: h && h.created_at ? new Date(h.created_at).toLocaleDateString('de-DE') : null,
-        texte: h ? texteAusBericht(h) : [], kern: X.kern || [], stau: X.stau || [], ausblick: sauber(X.ausblick || ''),
+        texte: (h ? texteAusBericht(h) : []).concat(indexmieteText()), kern: X.kern || [], stau: X.stau || [], ausblick: sauber(X.ausblick || ''),
         /* v2833 · der Hinweis zu Mieterhoehung/Zielbild ist Marcels Wortlaut aus
            potenzial.js (KENNZEICHNUNG, v2870) - nie ein eigener Text */
         hinweis: sauber(X.hinweis || ('Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB.'
           + (stufen.length && global.DpPotenzial && global.DpPotenzial.KENNZEICHNUNG ? ' ' + global.DpPotenzial.KENNZEICHNUNG : '')))
       };
     }
+  }
+
+  /* v3026 · Indexmiete (§ 557b BGB) als eine Zeile - nur, wenn es Indexvertraege gibt. Die Zahl
+     rechnet js/indexmiete.js (ueber DpPotenzial.indexmieteDaten), hier wird nur gesetzt. */
+  function indexmieteText() {
+    try {
+      var P = global.DpPotenzial, im = P && typeof P.indexmieteDaten === 'function' ? P.indexmieteDaten() : null;
+      return im && im.zeile ? [{ h: 'Indexmiete (§ 557b BGB)', p: [sauber(im.zeile)] }] : [];
+    } catch (e) { return []; }
   }
 
   /* v3018d · Marcel 28.10.2026: „wenn wir kein Zielbild angegeben haben, das auch nicht im PDF

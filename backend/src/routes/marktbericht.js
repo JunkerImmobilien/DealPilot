@@ -465,6 +465,27 @@ router.get('/location-finder/meta', authenticate, readGet('/location-finder/meta
 router.get('/zensus/objekt', authenticate, readGet('/zensus/objekt'));
 router.get('/lage/gemessen', authenticate, readGet('/lage/gemessen'));   /* v2175 · Lage gemessen */
 router.get('/jahreswerte/angebotsabschlag', authenticate, readGet('/jahreswerte/angebotsabschlag'));   /* v3021 · eine Quelle fuer den Marktdurchschnitt */
+/* v3026 · Indexreihen (VPI, Nettokaltmieten, Baupreis) fuer die Indexmiete und die Fortschreibung.
+   Viele Nutzer, wenig Aenderung (woechentlich): dieser Prozess haelt die Antwort 10 Minuten im
+   Speicher und beantwortet If-None-Match mit 304 - ein Nutzerabruf erreicht weder GENESIS noch
+   (in 10 Minuten mehr als einmal) das Marktbericht-Backend. Faellt das mb-Backend aus, bleibt
+   der letzte Stand bis zu 7 Tage im Speicher; danach 502, und der Browser rechnet mit seinem
+   localStorage-Stand. */
+const _ir = { data: null, etag: null, geholt: 0 };
+router.get('/indexreihen', authenticate, async function (req, res) {
+  const alter = Date.now() - _ir.geholt;
+  if (!_ir.data || alter > 10 * 60 * 1000) {
+    try {
+      const out = await forward('GET', '/indexreihen');
+      if (out.status === 200 && out.data && out.data.reihen) { _ir.data = out.data; _ir.etag = out.data.etag || null; _ir.geholt = Date.now(); }
+    } catch (e) { /* letzter Stand bleibt */ }
+  }
+  if (!_ir.data || Date.now() - _ir.geholt > 7 * 86400000) return res.status(502).json({ error: 'mb_unreachable' });
+  if (_ir.etag) res.set('ETag', _ir.etag);
+  res.set('Cache-Control', 'private, max-age=3600');
+  if (_ir.etag && req.headers['if-none-match'] === _ir.etag) return res.status(304).end();
+  res.json(_ir.data);
+});
 router.get('/bwk/ansaetze', authenticate, readGet('/bwk/ansaetze'));     /* v2186 · Anlage 3 zum Stichtag */   /* v2162 · Zensus je Objekt */
 router.get('/geomap/balance', authenticate, readGet('/geomap/balance'));
 router.get('/geomap/timeseries', authenticate, readGet('/geomap/timeseries'));
