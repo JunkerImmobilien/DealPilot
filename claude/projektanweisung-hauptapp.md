@@ -43179,3 +43179,41 @@ Splitting/Kirche, Bundesland, Zielrendite je Lageklasse, Investortyp (→ ai_ris
 Strategie (ai_strat), Mindest-Cashflow, Notar/Grundbuch/Makler/Sonstige, GrESt automatisch,
 Bewirtschaftung je Objektart. Pilot-Analyse mit `ai_verk` je Objekt nicht live ausgelöst (Kontingent) —
 Staging-Abnahmepunkt. Nicht auf Prod.
+
+
+### v3018d · nur gültige PDFs, eine Kaufpreisaufteilung, kein Zielbild ohne Zielbild · 28.10.2026 — Staging `ae261277`
+
+**Was.** Marcel: „PDF-Export nur dann erlauben, wenn das Dokument auch valide ist – vor allem bei
+Kaufpreisaufteilung, Anschaffungskosten und Steuer-PDF", „die Anlage zur Kaufpreisaufteilung sah
+gerade recht leer aus" und „wenn wir kein Zielbild angegeben haben, das auch nicht im PDF steht".
+**Gültigkeit:** neues `js/pdf-pruefung.js` (`DpPdfPruefung.tor(art, titel)`), eine Prüfung je Art,
+aufgerufen IN der Exportfunktion (jeder Knopf läuft durch): `investment` (pruefeInvestmentDaten –
+jetzt auch Investment-PDF, nicht nur Bank/Kurz), `kaufpreisaufteilung` (Pflichtliste des Fensters
+`_bmfFehlend`, Rechnung vorhanden, Gebäudeanteil 0–100 %, Bodenwert/Verkehrswert > 0, Gebäude +
+Boden = Anschaffungskosten ±0,05 %, ETW ohne MEA), `steuer` (Werbungskosten-PDF: Kaufpreis,
+Gebäudeanteil, AfA-Satz, Steuerjahre). Hinweis im Haus-Stil, Reiter aus dem DOM, „Hinspringen"
+(Reiter öffnen, Feld markieren) bzw. „Fenster öffnen"; Warnungen bleiben Toast. Das blockierende
+`alert()` der Kaufpreisaufteilung ist ersetzt. **Eine Ausgabe:** `exportBmfPdf` leitet auf
+`exportPDFKaufpreisaufteilung` weiter (alter Rumpf als `_exportBmfPdfAlt`, ungerufen); bmf-wahl,
+Deal-Aktion-Smartklappe und ReadyCheck rufen den genauen Export. **Zielbild:** „angegeben" =
+`DpPotenzial.modell().hat_ziel` (Zielmiete oder Maßnahme an Wohnung/Haus). Ohne: `DpPotenzial.
+ohneZielbild()` für alle Texte (auch Marktbericht-Dienst), Kernaussagen „Maßnahmen: 0 €"/
+„Wertzuwachs nach Kosten" und Zeile Maßnahmenkosten weg, Tabelle ohne Ziel/Maßnahmen, Seite „Wert &
+Potenzial", Pilot-Baustein „Ankauf · Bestand · Zielbild" entfällt. Mieterhöhung § 558 bleibt
+(aus dem Ist gerechnet, eigener Teil).
+
+**Nachweis.** Staging, Felder nur im Speicher, Schreibzugriffe abgefangen (nur `/bmf/aufteilung`
+durchgelassen). Vorher (2026-1123): Investment-PDF mit leerer Miete 14 S., Rendite 0,00 %, DSCR 0,00;
+Werbungskosten-PDF mit leerem Gebäudeanteil/AfA-Satz erzeugt (AfA aus Vorgabe); Kaufpreisaufteilung
+mit geleerter Grundstücksfläche aus alter Rechnung erzeugt; ohne Rechnung `alert()`; alte Anlage
+„Lage —", Datei „BMF_Anlage_Finanzamt_____", Fuß überlappt. Nachher: alle vier Fälle Hinweis statt
+PDF, Hinspringen landet in Reiter Objekt auf `gsfl`; vollständig: Kaufpreisaufteilung Text identisch
+(pdftotext-diff leer, 4 S.), Werbungskosten 1 S., Investment 14 S.; ETW 2026-001 genau: alle fünf
+Abschnitte, keine Striche. Zielbild: Lindenallee (ohne) Investment 20 S. „Zielbild" 8 → 0, Bank 17 S.
+10 → 0; Parkstr. (mit) 22 S. 20 → 20. Bilder `Downloads/v3018d-bilder/`, PDFs `Downloads/v3018d-*`.
+
+**Rest.** Nicht geprüft/gebaut: Marktbericht-PDF, RND-Gutachten, Exposé, Track-Record, Steuermappe
+(Portfolio aus der DB, prüft schon „keine Sätze"). Die genaue Kaufpreisaufteilung druckt bei ETW den
+MEA nicht. Die App-Ansicht (Tab Bewertung) nennt das Zielbild weiter auch ohne Zielbild – nur das PDF
+ist bereinigt. `frontend-konstanten.json` nicht neu committet (help.js trägt fremde, ungesicherte
+Änderungen eines parallelen Agenten). Nicht auf Prod.
