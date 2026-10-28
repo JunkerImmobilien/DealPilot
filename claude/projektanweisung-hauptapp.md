@@ -43089,3 +43089,20 @@ genau die zwei aus, fremder Schlüssel erhalten. DB: 2026-1123, 1056, Teststr. 6
 Messlauf gesperrt) – Abnahmepunkt auf Staging: Haken abwählen, speichern, neu laden. Der KI-Prompt
 verlangt in `investmentbewertung`/`dealpilot_insight` weiter ein Urteil; das PDF filtert, der Prompt
 ist unverändert. Nicht auf Prod.
+
+### Prod-Rollout 28.10.2026 spät · v3017d, v3018–v3018b, v3019, v3020, landing-satz-2 — Prod `fa0ff4e`
+
+**Was.** v3017d Einheiten im Import; v3018/a/b PDF-Bausteine nach Ankauf/Bestand, Dopplungen raus, Urteil
+nur einmal, Haken je Objekt (`_pdf_bausteine_aus`, „alle an" als [] wenn das Feld schon existierte); v3019
+Baupreisindex ohne Bezug = Regelfall § 36 Abs. 2 auch für neue Sätze, 101 neue SWF-Werte, Baujahr an
+den Sachwertfaktor (gestaffelte Faktoren rechneten nie); v3020 Anfragen an Ämter (Admin, `mb.amt_anfragen`,
+Migration 022, `ausschuss_kontakte.json` 269 Einträge / 248 mit E-Mail, `tools/sperren-anfrageliste.mjs`);
+landing-satz-2; Stundennachweis-Generator ohne 10-h-Grenze, beide Projekte, Testpauschale 10 h/Monat.
+
+**Nachweis.** Prüfer grün (saat, wertermittlung, score-ketten, buster, rechenkerne, sperren-anfrageliste).
+Staging: Haken Teststr. 6 abgewählt → DB `["staerken","risikoanalyse"]` → nach Neuladen da → alle an →
+DB `[]`. Prod: Migration 022 eingespielt, Register 6.186 = 6.186 sauber, Landing zeigt 6.186 / 201.
+
+**Rest.** Admin „Anfragen an Ämter" angemeldet abnehmen (Marcel), Testzeile Oder-Spree in Staging
+`mb.amt_anfragen`. Ludwigslust-Parchim verlangt ein Belegexemplar. Läuft: v3018c Seitenumbrüche +
+Nutzerdaten ab Investor im PDF, Werbebilder (Agent), danach Rundgang-Video neu.
