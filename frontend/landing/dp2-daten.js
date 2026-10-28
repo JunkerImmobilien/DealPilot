@@ -11,7 +11,8 @@
 
 window.DP_MODULE = [
     {i:'<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 11-13h-8l1-7z"/></svg>',t:'Boarding',s:'Schnellbewertung mit den wichtigsten Zahlen.',b:['Live-Berechnung beim Tippen','BMR, Faktor, Cashflow, LTV','\u00dcbernahme in Vollberechnung']},
-    {i:'\u25A4',t:'PDF-Import',s:'Expos\u00e9 rein \u2014 Felder gef\u00fcllt.',b:['KI-Extraktion der Eckdaten','Bilder aus dem Expos\u00e9','Spart das Abtippen']},
+    /* landing-module-2 · v3016: aus „PDF-Import“ wird „Exposé & Dokumente“ */
+    {i:'\u25A4',t:'Expos\u00e9 & Dokumente',s:'Expos\u00e9 und Unterlagen rein \u2014 Felder, Risiken, These.',b:['Mietaufstellung, Grundbuch, WEG-Protokolle, Energieausweis','Auch Scans \u00b7 Personendaten werden geschw\u00e4rzt','Risiken mit Fundstelle und Investitionsthese']},
     {i:'\u2302',t:'Objekt & Lage',s:'Grunddaten, Fotos, Lageparameter.',b:['Bis zu 30 Objektfotos','Makro/Mikro/Demografie','AfA f\u00fcr Geb\u00e4udeanteil']},
     {i:'\u20AC',t:'Investition',s:'Kaufpreis, Nebenkosten, Sanierung.',b:['Erwerbsnebenkosten komplett','Sanierung nach 8 Gewerken','15%-Regel live']},
     {i:'\u2197',t:'Miete & Markt',s:'Mietstruktur und Markt-Vergleich.',b:['Mietpreis-Analyse \u20ac/m\u00b2','KI-Marktmieten-Recherche','Staffelmiete']},

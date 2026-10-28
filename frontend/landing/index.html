@@ -14,6 +14,7 @@
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
 <link rel="stylesheet" href="dp2-live.css?v=landing-loesungen-1">
+<link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -108,8 +109,9 @@
       <div class="eye">Immobilien-Investmentanalyse</div>
       <h1><span class="zl"><i>Immobilien&shy;entscheidungen</i></span>
           <span class="zl"><i>sind zu groß für <em>ein Bauchgefühl.</em></i></span></h1>
-      <p class="lead">DealPilot ist dein Cockpit für Immobilien-Investments: Cashflow, DSCR,
-        Steuer, Deal Score und bankfertige Unterlagen — in Minuten statt Stunden.
+      <!-- landing-satz-1 · Marcel 28.10.2026: im Hero in einem Satz, was DealPilot ist (Storybook, Fassung A) -->
+      <p class="lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand — mit
+        vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.
         Ab dann fliegst du nach Flugdaten.</p>
       <div class="hero-btn">
         <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro — kostenlos</a>
@@ -231,8 +233,11 @@
        jetzt zusammen - erst was DealPilot tut, dann wie. -->
   <div class="satz rv">
     <div class="eye ctr">Was DealPilot macht</div>
-    <p class="gross">DealPilot rechnet eine Immobilie vollständig durch — vom Exposé über
-      Finanzierung und Steuer bis zur Unterlage, die die Bank annimmt.</p>
+    <!-- landing-satz-1 · Marcel 28.10.2026: in 2–3 Sätzen, mit Link zu „Wie wir rechnen“ -->
+    <p class="gross">Statt Bauchgefühl und Excel bekommst du eine vollständige, nachvollziehbare Prüfung:
+      DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet
+      den Wert mit den Daten der Gutachterausschüsse. Am Ende weißt du, was das Objekt bringt, was es kostet –
+      und hast die Unterlage, die die Bank annimmt.</p>
   </div>
   <!-- landing-methodik-1 · Verweis auf die Methodik-Seite (Marcel 27.10.2026) -->
   <p class="btn-reihe"><a class="btn-dark" href="methodik.html">Wie wir rechnen — Methodik und Regelwerk der Wertermittlung →</a></p>
@@ -259,17 +264,10 @@
     <h2>Neunzehn Module — <span class="ac">ein Datenbestand.</span></h2>
     <p>Was du einmal erfasst, steht überall: im Score, in der Steuer, im PDF für die Bank.
       Kein Abtippen, kein zweiter Rechenweg. Jedes Modul ein eigener Boarding-Pass.</p></div>
-  <div class="bpslide">
-    <div class="bpslide-vp"><div class="bpg" id="bpGrid"></div></div>
-    <div class="bpslide-nav">
-      <div class="bpslide-bar"><i id="bpBar"></i></div>
-      <div class="bpslide-z"><span id="bpZahl">1–4</span> von 19</div>
-      <div class="stx-arr">
-        <button class="stx-a" id="bpPrev" aria-label="Zurück">‹</button>
-        <button class="stx-a" id="bpNext" aria-label="Weiter">›</button>
-      </div>
-    </div>
-  </div>
+  <!-- landing-module-2 · Marcel 28.10.2026: „die 19 Karten besser in Szene setzen, vlt auch animiert,
+       schönere Icons" - vier Phasen als Reiter, Karten mit Linien-Icon (dp2-module.js/.css).
+       Der bisherige Boarding-Pass-Slider (#bpGrid in dp2-inhalt.js) läuft hier nicht mehr. -->
+  <div class="mods" id="modShow"></div>
   <p class="btn-reihe">
     <a class="btn-l" href="leistungsumfang.html">Jedes Modul im Detail — der volle Leistungsumfang
       <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a>
@@ -749,8 +747,9 @@
   </div>
 </div></footer>
 
-<script src="dp2-daten.js?v=v1570"></script>
+<script src="dp2-daten.js?v=landing-module-2"></script>
 <script src="dp2-inhalt.js?v=landing-loesungen-1"></script>
+<script src="dp2-module.js?v=landing-module-2"></script>
 <!-- dp2-ablauf.js abgeloest durch demo-wechsel.js (v1588) -->
 <script src="dp2-video.js?v=v1570"></script>
 <script src="demo-steuer-daten.js?v=v1600"></script>
