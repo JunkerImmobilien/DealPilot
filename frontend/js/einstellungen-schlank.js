@@ -36,10 +36,12 @@
 (function () {
   'use strict';
 
+  /* v3022c · Marcel 28.10.2026: „ja, das ist doch super so“ - die schlanke Fassung ist jetzt STANDARD.
+     Die volle Fassung nur noch über ?einstellungen=voll (Tab) bzw. ?einstellungen=voll&merken (dauerhaft). */
   function aktiv() {
-    try { if (sessionStorage.getItem('dp_einst_schlank') === '1') return true; } catch (e) {}
-    try { if (localStorage.getItem('dp_einst_schlank') === '1') return true; } catch (e) {}
-    return false;
+    try { var s = sessionStorage.getItem('dp_einst_schlank'); if (s === '0') return false; if (s === '1') return true; } catch (e) {}
+    try { if (localStorage.getItem('dp_einst_schlank') === '0') return false; } catch (e) {}
+    return true;
   }
 
   /* URL-Schalter auswerten — einmal beim Laden */
@@ -51,8 +53,8 @@
         sessionStorage.setItem('dp_einst_schlank', '1');
         if (q.has('merken')) localStorage.setItem('dp_einst_schlank', '1');
       } else if (v === 'voll') {
-        sessionStorage.removeItem('dp_einst_schlank');
-        localStorage.removeItem('dp_einst_schlank');
+        sessionStorage.setItem('dp_einst_schlank', '0');
+        if (q.has('merken')) localStorage.setItem('dp_einst_schlank', '0'); else localStorage.removeItem('dp_einst_schlank');
       }
     } catch (e) {}
   })();
