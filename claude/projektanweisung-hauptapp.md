@@ -42995,3 +42995,32 @@ Standbild `Dateien/Messe/Videos/Lindenallee-14/lindenallee-unterlagen_2026-10-28
 **Rest.** ffmpeg lief rund 10 s nach dem Start an → Intro aus der Aufnahme vom Nachmittag vorangestellt (7,1 s,
 gleicher Studio-Vorspann). Vertonung: 29 Clips wiederverwendet, 7 neu nötig (Zeilen 11, 12, 20, 21, 22, 26, 31,
 1.455 Zeichen); Fassung unter 8 min nur mit Inhaltsverlust (Wartetafeln während der KI-Lesung ~95 s).
+
+### v3017–v3017c, Videothek, Landing-Zahlen · Prod-Rollouts 28.10.2026 abends — Prod mit `044ded94`
+
+**Was.** v3017: Unterlagen nachreichen (Pilot-Analyse › Unterlagen & WEG, Import im Modus Ergänzen,
+bisherige Auswertung geht als Grundlage an `/ai/dokumente-auswerten`, Feld `aenderungen`), neue
+Dokumentarten `hausgeld` (Wirtschaftsplan/Hausgeldabrechnung) und `baulasten`; Wirtschaftsplan →
+hg_ul, hg_nul (inkl. Rücklage), weg_r – ETW aus Einzelplan oder Gesamtplan × MEA, ganzes Haus aus
+Gesamtplan; Steuer-Vorschläge als Importzeilen (`window.dpSteuerWert/dpSteuerSetzen`, tax.js):
+Hausverwaltung, nicht umlagefähige Kosten ohne Rücklage, Erhaltungsaufwand aus Sonderumlage und
+Rücklagen-Entnahme; Maßnahmen-Anteil fest gerechnet (`DpUnterlagen.anteil`). v3017a/b: Import-Fenster
+mit Einheit, Zeitraum, Jahr und Herkunft je Zeile („bisher im Objekt (Bewirtschaftung): 3.313 € / Jahr"),
+Aufschlüsselung von hg_nul, Klartext in den Dokument-Reitern. v3017c: Ernte d/e (nur Sperren: Trier,
+BW 761), Methodik länderneutral (Immobilienrichtwerte), Agent register-ernte: IRW in allen Ländern.
+landing-videothek-5 (Agent): Suche, 285 Kapitelmarken, kein Autoplay am Ende. landing-zahlen-1:
+Hero-Leiste + Registerwerte und Ausschüsse aus register-stand.js, Modulzahl aus DP_MODULE.
+
+**Nachweis.** Staging-Browser mit gesperrten Schreibzugriffen: Nachreichen von
+`messe-dateien/lindenallee-14/08-wirtschaftsplan-2026.pdf` und `09-baulastenauskunft.pdf` (fiktive
+Musterunterlagen) – Erkennung hausgeld/baulasten, 35.400 / 15.653 / 9.600 € je Jahr, Steuer 2026
+3.313 / 2.740 / 92.000 €, Baulasten-Block, 4 Änderungen, Dokumentliste 8 → 10; ETW-Fall (MEA 11,8 %)
+Einzelplan = Gesamt × MEA, Sonderumlage-Anteil 4.956 € = Dokument. 2026-1123 danach unverändert
+(md5 2870ee25…). Register Staging und Prod 6.085 = 6.085, Abgleich sauber. Prüfer grün vor jedem Rollout.
+Lindenallee 2026-1123 ins Prod-Demo-Konto gespiegelt (Marcels OK), md5 gleich Staging.
+
+**Rest.** Testunterlagen mit dem Wort „DealPilot" werden absichtlich nicht als Unterlage gelesen
+(`istDokument`) und fallen dann in den Marktbericht-Weg, der Lagewerte erfindet – Schwäche des
+Rückfalls, offen. Offene Entscheidungen Marcel: Baupreisindex ohne Bezug bei NEU geernteten Sätzen
+(Bruchsal, Lahr, Böblingen, Donaueschingen, Ludwigslust-Parchim), Öhringen-Lizenz, wartende
+BW-LZS-Sperren aktivieren. Pilot-Analyse-PDF-Bausteine nach Ankauf/Bestand sortieren, Dopplungen prüfen.
