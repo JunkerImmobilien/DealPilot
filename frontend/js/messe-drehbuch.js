@@ -7714,7 +7714,7 @@
       var n0 = DPM_REIHE.angelegt.length;
       var kn = sbKnopf('new')();
       if (kn) kn.click(); else if (typeof window.sbActionsAction === 'function') sbActionsAction('new');
-      await warteAuf(function () { return DPM_REIHE.angelegt.length > n0 && /Neues Objekt/.test((q('#hdr-obj') || {}).textContent || ''); }, 9000);
+      await warteAuf(function () { return DPM_REIHE.angelegt.length > n0 && /Neues Objekt/.test((q('#hdr-obj') || {}).textContent || ''); }, 30000);   /* gemessen: der POST kam erst nach 4-7 s */
       _ku.l = DPM_REIHE.angelegt.length > n0 ? DPM_REIHE.angelegt[DPM_REIHE.angelegt.length - 1] : null;
       await warte(500);
       rhNur([]);
