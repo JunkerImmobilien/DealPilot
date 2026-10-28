@@ -1,0 +1,214 @@
+[
+ {
+  "land_code": "RP",
+  "ags": "07211000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Trier, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser, freistehend",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr": "Grundstücksmarktbericht 2026: 100 Euro (druckaufbereitete PDF-Datei); ältere Jahrgänge Herausgabepreis zzgl. 10 Euro",
+  "bestell_url": "https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624",
+  "zugang_beleg": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“",
+  "warum_kein_wert": "KOSTENPFLICHTIG — eigener Bericht des örtlichen Ausschusses, nicht der Landesbericht. Der Gutachterausschuss für den Bereich der Stadt Trier gibt einen eigenen Grundstücksmarktbericht 2026 heraus (Berichtsjahr 2025), der nach seiner Inhaltsangabe Liegenschaftszinssätze, Bewirtschaftungskosten und Sachwertfaktoren (Marktanpassungskurven) führt. Er ist nur gegen Gebühr erhältlich: 100 Euro als druckaufbereitete PDF-Datei, Bestellung über das Online-Bestellsystem der Stadt (https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss); ältere Jahrgänge ab 1987 zum Herausgabepreis zzgl. 10 Euro. Ein frei abrufbarer Auszug mit Zahlen liegt nicht vor (auf der Berichtsseite ist nur ein Korrekturblatt S. 25 des Jahrgangs 2025 zu Stellplätzen verlinkt). Ob der Bericht einen Sachwertfaktor für Ein- und Zweifamilienhäuser, freistehend ausweist und in welchem Modell (GND, Baupreisindex, Bewirtschaftungskosten), ist ohne den Bericht nicht feststellbar — es wird keine Zahl angenommen, kein Landeswert und kein Nachbarausschuss an die Stelle gesetzt. Dieser Satz löst den Vorjahres-Weg (Landesgrundstücksmarktbericht 2025, LVermGeo, 150 Euro) für Trier ab: die Stadt hat einen eigenen, jüngeren Bericht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624; Bericht bestellen: https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss (Gebühr 100 Euro, PDF).",
+  "unvollstaendig_grund": "Für Trier, kreisfreie Stadt steht der Sachwertfaktor (§ 21 Abs. 3 ImmoWertV) im kostenpflichtigen Grundstücksmarktbericht 2026 des örtlichen Ausschusses (100 Euro, PDF); kein frei zugängliches Dokument führt die Zahl.",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell nicht erhoben — Bericht kostenpflichtig. Nach § 10 ImmoWertV ist es Voraussetzung jeder Anwendung und steht im Bericht selbst.",
+   "gnd_jahre": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Trier",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Weder der Landesgrundstücksmarktbericht noch ein Nachbarausschuss tritt an die Stelle."
+  },
+  "belege": [
+   {
+    "art": "Bezugsseite des Ausschusses",
+    "fundstelle": "trier.de, Seite „Grundstücksmarktbericht“ (15312.Grundstuecksmarktbericht.html), Abschnitt Inhalte/Gebühr, am 28.10.2026 gelesen",
+    "wert": null,
+    "wortlaut": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Die Sperre ist an der Bezugsseite des zuständigen Ausschusses gemessen (Inhalt, Gebühr, Bestellweg) — kein „noch nicht geprüft“.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "berichtsjahr": 2026,
+  "modellversion": "Bezugsprüfung Grundstücksmarktbericht Trier 2026 (28.10.2026)",
+  "quelle_url": "https://www.trier.de/leben-in-trier/bauen-wohnen/grundstuecksmarkt/15312.Grundstuecksmarktbericht.html",
+  "quelle_parser": "ernte-20261028e-rp (HTML der Bezugsseite und des Online-Bestellsystems, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier — Angabe der Quelle; der Bericht ist kostenpflichtig, eine Zahl wird nicht wiedergegeben.",
+  "lizenz": "nicht gemessen — Bericht kostenpflichtig, Impressum nicht einsehbar",
+  "lizenz_hinweis": "Ohne den Bericht ist sein Nutzungsvermerk nicht lesbar; vor einer Übernahme nach dem Kauf zu prüfen (Vervielfältigung/Speicherung auf Datenträgern).",
+  "fundstelle": "Grundstücksmarktbericht Trier 2026 (kostenpflichtig), Inhaltsangabe auf trier.de",
+  "seite": null
+ },
+ {
+  "land_code": "RP",
+  "ags": "07211000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Trier, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr": "Grundstücksmarktbericht 2026: 100 Euro (druckaufbereitete PDF-Datei); ältere Jahrgänge Herausgabepreis zzgl. 10 Euro",
+  "bestell_url": "https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624",
+  "zugang_beleg": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“",
+  "warum_kein_wert": "KOSTENPFLICHTIG — eigener Bericht des örtlichen Ausschusses, nicht der Landesbericht. Der Gutachterausschuss für den Bereich der Stadt Trier gibt einen eigenen Grundstücksmarktbericht 2026 heraus (Berichtsjahr 2025), der nach seiner Inhaltsangabe Liegenschaftszinssätze, Bewirtschaftungskosten und Sachwertfaktoren (Marktanpassungskurven) führt. Er ist nur gegen Gebühr erhältlich: 100 Euro als druckaufbereitete PDF-Datei, Bestellung über das Online-Bestellsystem der Stadt (https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss); ältere Jahrgänge ab 1987 zum Herausgabepreis zzgl. 10 Euro. Ein frei abrufbarer Auszug mit Zahlen liegt nicht vor (auf der Berichtsseite ist nur ein Korrekturblatt S. 25 des Jahrgangs 2025 zu Stellplätzen verlinkt). Ob der Bericht einen Sachwertfaktor für Reihenhäuser und Doppelhaushälften ausweist und in welchem Modell (GND, Baupreisindex, Bewirtschaftungskosten), ist ohne den Bericht nicht feststellbar — es wird keine Zahl angenommen, kein Landeswert und kein Nachbarausschuss an die Stelle gesetzt. Dieser Satz löst den Vorjahres-Weg (Landesgrundstücksmarktbericht 2025, LVermGeo, 150 Euro) für Trier ab: die Stadt hat einen eigenen, jüngeren Bericht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624; Bericht bestellen: https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss (Gebühr 100 Euro, PDF).",
+  "unvollstaendig_grund": "Für Trier, kreisfreie Stadt steht der Sachwertfaktor (§ 21 Abs. 3 ImmoWertV) im kostenpflichtigen Grundstücksmarktbericht 2026 des örtlichen Ausschusses (100 Euro, PDF); kein frei zugängliches Dokument führt die Zahl.",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell nicht erhoben — Bericht kostenpflichtig. Nach § 10 ImmoWertV ist es Voraussetzung jeder Anwendung und steht im Bericht selbst.",
+   "gnd_jahre": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Trier",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Weder der Landesgrundstücksmarktbericht noch ein Nachbarausschuss tritt an die Stelle."
+  },
+  "belege": [
+   {
+    "art": "Bezugsseite des Ausschusses",
+    "fundstelle": "trier.de, Seite „Grundstücksmarktbericht“ (15312.Grundstuecksmarktbericht.html), Abschnitt Inhalte/Gebühr, am 28.10.2026 gelesen",
+    "wert": null,
+    "wortlaut": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Die Sperre ist an der Bezugsseite des zuständigen Ausschusses gemessen (Inhalt, Gebühr, Bestellweg) — kein „noch nicht geprüft“.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "berichtsjahr": 2026,
+  "modellversion": "Bezugsprüfung Grundstücksmarktbericht Trier 2026 (28.10.2026)",
+  "quelle_url": "https://www.trier.de/leben-in-trier/bauen-wohnen/grundstuecksmarkt/15312.Grundstuecksmarktbericht.html",
+  "quelle_parser": "ernte-20261028e-rp (HTML der Bezugsseite und des Online-Bestellsystems, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier — Angabe der Quelle; der Bericht ist kostenpflichtig, eine Zahl wird nicht wiedergegeben.",
+  "lizenz": "nicht gemessen — Bericht kostenpflichtig, Impressum nicht einsehbar",
+  "lizenz_hinweis": "Ohne den Bericht ist sein Nutzungsvermerk nicht lesbar; vor einer Übernahme nach dem Kauf zu prüfen (Vervielfältigung/Speicherung auf Datenträgern).",
+  "fundstelle": "Grundstücksmarktbericht Trier 2026 (kostenpflichtig), Inhaltsangabe auf trier.de",
+  "seite": null
+ },
+ {
+  "land_code": "RP",
+  "ags": "07211000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Trier, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "etw",
+  "objektart": "etw",
+  "objektart_bez": "Eigentumswohnungen",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr": "Grundstücksmarktbericht 2026: 100 Euro (druckaufbereitete PDF-Datei); ältere Jahrgänge Herausgabepreis zzgl. 10 Euro",
+  "bestell_url": "https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624",
+  "zugang_beleg": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“",
+  "warum_kein_wert": "KOSTENPFLICHTIG — eigener Bericht des örtlichen Ausschusses, nicht der Landesbericht. Der Gutachterausschuss für den Bereich der Stadt Trier gibt einen eigenen Grundstücksmarktbericht 2026 heraus (Berichtsjahr 2025), der nach seiner Inhaltsangabe Liegenschaftszinssätze, Bewirtschaftungskosten und Sachwertfaktoren (Marktanpassungskurven) führt. Er ist nur gegen Gebühr erhältlich: 100 Euro als druckaufbereitete PDF-Datei, Bestellung über das Online-Bestellsystem der Stadt (https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss); ältere Jahrgänge ab 1987 zum Herausgabepreis zzgl. 10 Euro. Ein frei abrufbarer Auszug mit Zahlen liegt nicht vor (auf der Berichtsseite ist nur ein Korrekturblatt S. 25 des Jahrgangs 2025 zu Stellplätzen verlinkt). Ob der Bericht einen Sachwertfaktor für Eigentumswohnungen ausweist und in welchem Modell (GND, Baupreisindex, Bewirtschaftungskosten), ist ohne den Bericht nicht feststellbar — es wird keine Zahl angenommen, kein Landeswert und kein Nachbarausschuss an die Stelle gesetzt. Dieser Satz löst den Vorjahres-Weg (Landesgrundstücksmarktbericht 2025, LVermGeo, 150 Euro) für Trier ab: die Stadt hat einen eigenen, jüngeren Bericht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624; Bericht bestellen: https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss (Gebühr 100 Euro, PDF).",
+  "unvollstaendig_grund": "Für Trier, kreisfreie Stadt steht der Sachwertfaktor (§ 21 Abs. 3 ImmoWertV) im kostenpflichtigen Grundstücksmarktbericht 2026 des örtlichen Ausschusses (100 Euro, PDF); kein frei zugängliches Dokument führt die Zahl.",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell nicht erhoben — Bericht kostenpflichtig. Nach § 10 ImmoWertV ist es Voraussetzung jeder Anwendung und steht im Bericht selbst.",
+   "gnd_jahre": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Trier",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Weder der Landesgrundstücksmarktbericht noch ein Nachbarausschuss tritt an die Stelle."
+  },
+  "belege": [
+   {
+    "art": "Bezugsseite des Ausschusses",
+    "fundstelle": "trier.de, Seite „Grundstücksmarktbericht“ (15312.Grundstuecksmarktbericht.html), Abschnitt Inhalte/Gebühr, am 28.10.2026 gelesen",
+    "wert": null,
+    "wortlaut": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Die Sperre ist an der Bezugsseite des zuständigen Ausschusses gemessen (Inhalt, Gebühr, Bestellweg) — kein „noch nicht geprüft“.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "berichtsjahr": 2026,
+  "modellversion": "Bezugsprüfung Grundstücksmarktbericht Trier 2026 (28.10.2026)",
+  "quelle_url": "https://www.trier.de/leben-in-trier/bauen-wohnen/grundstuecksmarkt/15312.Grundstuecksmarktbericht.html",
+  "quelle_parser": "ernte-20261028e-rp (HTML der Bezugsseite und des Online-Bestellsystems, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier — Angabe der Quelle; der Bericht ist kostenpflichtig, eine Zahl wird nicht wiedergegeben.",
+  "lizenz": "nicht gemessen — Bericht kostenpflichtig, Impressum nicht einsehbar",
+  "lizenz_hinweis": "Ohne den Bericht ist sein Nutzungsvermerk nicht lesbar; vor einer Übernahme nach dem Kauf zu prüfen (Vervielfältigung/Speicherung auf Datenträgern).",
+  "fundstelle": "Grundstücksmarktbericht Trier 2026 (kostenpflichtig), Inhaltsangabe auf trier.de",
+  "seite": null
+ },
+ {
+  "land_code": "RP",
+  "ags": "07211000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Trier, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "vollstaendig": false,
+  "zugang": "kostenpflichtig",
+  "gebuehr": "Grundstücksmarktbericht 2026: 100 Euro (druckaufbereitete PDF-Datei); ältere Jahrgänge Herausgabepreis zzgl. 10 Euro",
+  "bestell_url": "https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624",
+  "zugang_beleg": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“",
+  "warum_kein_wert": "KOSTENPFLICHTIG — eigener Bericht des örtlichen Ausschusses, nicht der Landesbericht. Der Gutachterausschuss für den Bereich der Stadt Trier gibt einen eigenen Grundstücksmarktbericht 2026 heraus (Berichtsjahr 2025), der nach seiner Inhaltsangabe Liegenschaftszinssätze, Bewirtschaftungskosten und Sachwertfaktoren (Marktanpassungskurven) führt. Er ist nur gegen Gebühr erhältlich: 100 Euro als druckaufbereitete PDF-Datei, Bestellung über das Online-Bestellsystem der Stadt (https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss); ältere Jahrgänge ab 1987 zum Herausgabepreis zzgl. 10 Euro. Ein frei abrufbarer Auszug mit Zahlen liegt nicht vor (auf der Berichtsseite ist nur ein Korrekturblatt S. 25 des Jahrgangs 2025 zu Stellplätzen verlinkt). Ob der Bericht einen Sachwertfaktor für Mehrfamilienhäuser ausweist und in welchem Modell (GND, Baupreisindex, Bewirtschaftungskosten), ist ohne den Bericht nicht feststellbar — es wird keine Zahl angenommen, kein Landeswert und kein Nachbarausschuss an die Stelle gesetzt. Dieser Satz löst den Vorjahres-Weg (Landesgrundstücksmarktbericht 2025, LVermGeo, 150 Euro) für Trier ab: die Stadt hat einen eigenen, jüngeren Bericht. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier, Geschäftsstelle: Stadtverwaltung Trier, Amt für Bodenmanagement und Geoinformation, Gerty-Spies-Straße 2, 54290 Trier, 0651-718-1624; Bericht bestellen: https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.TR.04.62&mode=cc&cc_key=Gutachterausschuss (Gebühr 100 Euro, PDF).",
+  "unvollstaendig_grund": "Für Trier, kreisfreie Stadt steht der Sachwertfaktor (§ 21 Abs. 3 ImmoWertV) im kostenpflichtigen Grundstücksmarktbericht 2026 des örtlichen Ausschusses (100 Euro, PDF); kein frei zugängliches Dokument führt die Zahl.",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modell nicht erhoben — Bericht kostenpflichtig. Nach § 10 ImmoWertV ist es Voraussetzung jeder Anwendung und steht im Bericht selbst.",
+   "gnd_jahre": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Trier",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Weder der Landesgrundstücksmarktbericht noch ein Nachbarausschuss tritt an die Stelle."
+  },
+  "belege": [
+   {
+    "art": "Bezugsseite des Ausschusses",
+    "fundstelle": "trier.de, Seite „Grundstücksmarktbericht“ (15312.Grundstuecksmarktbericht.html), Abschnitt Inhalte/Gebühr, am 28.10.2026 gelesen",
+    "wert": null,
+    "wortlaut": "Seite „Grundstücksmarktbericht“ der Stadt Trier, am 28.10.2026 gelesen: „Inhalte des Grundstücksmarktberichtes 2026: Liegenschaftszinssätze, Bewirtschaftungskosten, Sachwertfaktoren (Marktanpassungskurven)“ — „Die Gebühr für den Grundstücksmarktbericht 2026 als druckaufbereitete PDF-Datei beträgt 100 Euro.“ — „Den Grundstücksmarktbericht 2026 können Sie über unser Online-Bestellsystem bequem zu sich nach Hause bestellen.“ Ferner: „Im Jahr 2025 hat die Geschäftsstelle des Gutachterausschusses rund 1.380 Kaufverträge mit einem Volumen von 520 Millionen Euro in die Kaufpreissammlung übernommen.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Die Sperre ist an der Bezugsseite des zuständigen Ausschusses gemessen (Inhalt, Gebühr, Bestellweg) — kein „noch nicht geprüft“.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "berichtsjahr": 2026,
+  "modellversion": "Bezugsprüfung Grundstücksmarktbericht Trier 2026 (28.10.2026)",
+  "quelle_url": "https://www.trier.de/leben-in-trier/bauen-wohnen/grundstuecksmarkt/15312.Grundstuecksmarktbericht.html",
+  "quelle_parser": "ernte-20261028e-rp (HTML der Bezugsseite und des Online-Bestellsystems, 28.10.2026)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier — Angabe der Quelle; der Bericht ist kostenpflichtig, eine Zahl wird nicht wiedergegeben.",
+  "lizenz": "nicht gemessen — Bericht kostenpflichtig, Impressum nicht einsehbar",
+  "lizenz_hinweis": "Ohne den Bericht ist sein Nutzungsvermerk nicht lesbar; vor einer Übernahme nach dem Kauf zu prüfen (Vervielfältigung/Speicherung auf Datenträgern).",
+  "fundstelle": "Grundstücksmarktbericht Trier 2026 (kostenpflichtig), Inhaltsangabe auf trier.de",
+  "seite": null
+ }
+]

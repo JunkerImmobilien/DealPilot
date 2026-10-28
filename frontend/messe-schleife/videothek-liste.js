@@ -1,4 +1,4 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-28T15:46:06.045Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-28T16:24:53.183Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_VIDEOTHEK = {
  "stand": "2026-10-21",
@@ -199,7 +199,7 @@ window.DPS_VIDEOTHEK = {
    "titel": "Das Bank-PDF",
    "unterzeile": "Deine Marke, die Bankfassung — und was die Bank als Investment Case bekommt.",
    "datei": "dealpilot-modul-19-das-bank-pdf.mp4",
-   "dauer": 243
+   "dauer": 250
   },
   {
    "id": "modul-20-bankexport-portfolio",
