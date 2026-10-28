@@ -304,7 +304,9 @@ function collectData() {
      Datensatz bleibt gleich, nichts loest ein Speichern aus. */
   try {
     var _pbAus = _dpPdfBausteineAus();
-    if (_pbAus.length) d._pdf_bausteine_aus = _pbAus;
+    /* v3018b · hatte das Objekt das Feld schon, geht auch „alle an“ als [] mit - sonst behielt der
+       Server die alte Abwahl (gemessen Teststr. 6: alle wieder an, gespeichert, DB unverändert) */
+    if (_pbAus.length || window._dpPbHatFeld) d._pdf_bausteine_aus = _pbAus;
   } catch (e) {}
   /* v1448: Einheitenliste des Mehrfamilienhauses (mfh-einheiten.js) */
   if (window._dpMfh && window._dpMfh.einheiten && window._dpMfh.einheiten.length) d._mfh = window._dpMfh;
@@ -674,6 +676,7 @@ function loadData(d) {
   if (ekNkL) ekNkL.checked = !!d._ek_ist_nk;
   /* v3018a · Bausteine im PDF: fehlt das Feld, sind alle an (sonst erbte das Objekt die Haken des vorigen) */
   _dpPdfBausteineSetzen(d._pdf_bausteine_aus);
+  window._dpPbHatFeld = Array.isArray(d._pdf_bausteine_aus);   /* v3018b */
   /* v1448: Einheitenliste - fehlt sie, ist sie leer (sonst erbte das Objekt die des vorigen) */
   window._dpMfh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh : null;
   /* v2068: RND-Ergebnis. Fehlt es, ist es NULL - sonst erbte das
