@@ -933,9 +933,36 @@ function _dpPdfSecKey(title){
     /* v2985 · Bestand: Exit hat einen eigenen Haken.
        v3018 · die Bestandsstrategie auch (hing bis dahin am Haken der Verhandlung,
        der jetzt in der Gruppe „Ankauf" steht). */
-    'Bestandsstrategie':'bestandsstrategie','Exit-Strategien':'exit'};
+    'Bestandsstrategie':'bestandsstrategie','Exit-Strategien':'exit',
+    /* v3018a · die Empfehlung heisst im PDF „Begründung des Urteils" - derselbe Haken */
+    'Begründung des Urteils':'empfehlung'};
   return m[title]||null;
 }
+
+/* v3018a · Ein Satz, der nur das Urteil noch einmal ausspricht, faellt aus einem
+   Baustein heraus - das Urteil steht einmal, in der Gesamtbewertung. Gestrichen
+   wird ein Satz nur, wenn er das Urteil WOERTLICH enthaelt UND es als Urteil
+   ausspricht (Empfehlung/Urteil/Fazit/lautet/empfehle …) oder fast nur daraus
+   besteht. Gemessen an 2026-1123: „Die Empfehlung fällt eindeutig aus: 'Nicht
+   kaufen.'" faellt, „… ließe sich 'Prüfen' als Option vertreten" bleibt (das ist
+   die Bedingung, unter der sich das Urteil aendert - eigener Inhalt). */
+function _dpOhneUrteil(text, urteil) {
+  var t = String(text == null ? '' : text);
+  var u = String(urteil == null ? '' : urteil).toLowerCase().replace(/[^a-zäöüß ]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!t || !u) return t;
+  var B = 'a-zäöüß';
+  var rxU = new RegExp('(^|[^' + B + '])' + u.replace(/ /g, '\\s+') + '(?=[^' + B + ']|$)', 'i');
+  var rxSag = /empfehl|empfiehlt|urteil|fazit|lautet|einstufung|einschätzung lautet/i;
+  return t.split(/\n\n+/).map(function (abs) {
+    var saetze = abs.split(/(?<=[.!?]['"“”‘’»«]?)\s+(?=[A-ZÄÖÜ„"'‚»«])/);
+    return saetze.filter(function (s) {
+      if (!rxU.test(s.toLowerCase())) return true;
+      var rest = s.toLowerCase().replace(rxU, ' ').replace(/[^a-zäöüß]+/g, '');
+      return !(rxSag.test(s) || rest.length < 12);
+    }).join(' ');
+  }).filter(function (abs) { return abs.trim(); }).join('\n\n');
+}
+try { window._dpOhneUrteil = _dpOhneUrteil; } catch (e) {}
 function _dpPdfSectionOn(title){var k=_dpPdfSecKey(title);if(!k)return true;var cb=document.getElementById('ai-pdf-sec-'+k);return !cb||cb.checked;}
 
 /* v3018 · Marcel 28.10.2026: „wir müssen auch schauen, dass wir nicht Sachen
@@ -1075,7 +1102,19 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   }
 
   // 1. Gesamtbewertung
-  block('Gesamtbewertung', clean(a.gesamtbewertung || a.fazit_kurz), [232, 240, 248], [60, 102, 148]);
+  /* v3018a · Marcel 28.10.2026: „ja, wegfallen – soll nur einmal drin sein". Das
+     Gesamturteil (KAUFEN / PRÜFEN / NICHT KAUFEN, im Bestand HALTEN / …) steht genau
+     EINMAL im PDF: hier, als erste Zeile der Gesamtbewertung. Gemessen am Investment-PDF
+     2026-1123 sagten es bis dahin vier Bausteine - Gesamtbewertung, Empfehlung
+     („NICHT KAUFEN" plus „Die Empfehlung fällt eindeutig aus: 'Nicht kaufen.'"),
+     Investmentbewertung (12-16 Sätze holistische Bewertung) und DealPilot-Insight.
+     Empfehlung heisst jetzt „Begründung des Urteils" und trägt nur noch ihre drei
+     Gründe und was das Urteil ändern würde; Investmentbewertung entfällt (nach
+     Abzug des Urteils bliebe Lage, Risiko und Perspektive - die stehen in Lage & Markt,
+     Risiken und Risikoanalyse). */
+  var _urteil = clean(a.empfehlung || a.fazit_kurz || '');
+  var _gb = clean(a.gesamtbewertung || '');
+  block('Gesamtbewertung', (_urteil ? 'Urteil: ' + _urteil.toUpperCase() + (_gb ? '\n\n' : '') : '') + _gb, [232, 240, 248], [60, 102, 148]);
 
   // 2. Stärken / Risiken
   bulletBlock('Stärken', a.staerken,   [232, 247, 234], [42, 138, 86]);
@@ -1110,16 +1149,14 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     if (ft) block('Investor-Fit', ft, [240, 240, 245], [90, 90, 120]);
   }
 
-  // 6. Empfehlung
-  if (a.empfehlung || a.empfehlung_begruendung) {
-    var emp = clean(a.empfehlung || '').toUpperCase() + '\n\n' + clean(a.empfehlung_begruendung || '');
-    block('Empfehlung', emp, [248, 244, 232], C.GOLD);
+  // 6. Empfehlung - v3018a: nur die Begruendung, das Urteil steht in der Gesamtbewertung
+  if (a.empfehlung_begruendung) {
+    block('Begründung des Urteils', _dpOhneUrteil(clean(a.empfehlung_begruendung), _urteil), [248, 244, 232], C.GOLD);
   }
 
   // V29: Klassische Sektionen aus der alten KI-Analyse
-  if (a.investmentbewertung) {
-    block('Investmentbewertung', clean(a.investmentbewertung), [235, 241, 248], [60, 102, 148]);
-  }
+  /* v3018a · Investmentbewertung entfällt im PDF (wiederholt das Gesamturteil, s. o.) -
+     in der App bleibt sie sichtbar. */
   /* v2985 · BESTAND (Ankauf-Stand vorhanden, Ist-Ansicht - dieselbe Regel wie die Reiter):
      Bestandsstrategie, Anschlussfinanzierung und Exit-Strategien statt Verhandlung/Offerte/Bank.
      Die Rechnung kommt aus bestand-analyse.js (ohne KI), die Fragen aus der Analyse. */
@@ -1218,7 +1255,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
 
   // 7. DealPilot-Insight (V63.45: dunkler Hintergrund mit hellem Text)
   if (a.dealpilot_insight) {
-    block('DealPilot-Insight', clean(a.dealpilot_insight), [40, 38, 38], C.GOLD, true);
+    block('DealPilot-Insight', _dpOhneUrteil(clean(a.dealpilot_insight), _urteil), [40, 38, 38], C.GOLD, true);   /* v3018a */
   }
 
   return cy;

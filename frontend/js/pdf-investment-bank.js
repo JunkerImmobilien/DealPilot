@@ -1687,7 +1687,10 @@
         y += 2;
       }
       if (ai) {
-        if ((ai.empfehlung || ai.recommendation) && an('Empfehlung')) zeile('Empfehlung', sauber(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
+        /* v3018a · das Gesamturteil steht EINMAL - hier als Zeile „Urteil" am Kopf, am Haken der
+           Gesamtbewertung (wie im Investment-PDF, pdf.js); die Begruendung unten ohne Urteilssatz. */
+        var _urteilB = ai.empfehlung || ai.recommendation || '';
+        if (_urteilB && an('Gesamtbewertung')) zeile('Urteil', sauber(_urteilB).slice(0, 60), { summe: true });
         var offerte = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung, offBeg = null;
         /* v2461 · die KI liefert die Offerte als Objekt {empfohlen, begruendung,
            argumente} - gemessen stand im PDF „[object Object]". */
@@ -1728,7 +1731,7 @@
           block('Lage & Markt', t.join('\n'));
         })();
         if (offBeg && !KURZ) block('Kaufpreis-Offerte', offBeg);
-        if (ai.empfehlung_begruendung && !KURZ) block('Empfehlung', ai.empfehlung_begruendung);
+        if (ai.empfehlung_begruendung && !KURZ) block('Begründung des Urteils', typeof window._dpOhneUrteil === 'function' ? window._dpOhneUrteil(ai.empfehlung_begruendung, _urteilB) : ai.empfehlung_begruendung);   /* v3018a */
         if (ai.fazit || ai.summary) {
           var _fz = klar(ai.fazit || ai.summary);
           if (KURZ && _fz.length > 600) { var _ende = _fz.slice(0, 600).lastIndexOf('. '); _fz = _ende > 200 ? _fz.slice(0, _ende + 1) : _fz.slice(0, 600) + ' ...'; }
