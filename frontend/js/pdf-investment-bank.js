@@ -514,6 +514,7 @@
   window.exportPDFBank = async function (opt) {
     opt = opt || {};
     var KURZ = !!opt.kurz;
+    var _std = {};   /* v3018 · welche Standardteile diese Fassung druckt */
     if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen - bitte kurz warten und erneut versuchen.'); return; }
     try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {}
 
@@ -1210,6 +1211,7 @@
     var bindj = num('d1_bindj');
     var hatPhasen = da(K.cf_ns_ezb) !== null || da(K.cf_ns_an) !== null;
     if (hatPhasen) {
+      _std.phasen = true;   /* v3018 · Anschlussfinanzierung steht hier gerechnet (pdf.js _dpPdfGedeckt) */
       /* v2832 · die erste Spalte ist das erste VOLLE Jahr (beim Bestand das Kaufjahr) */
       var _j1 = typeof window._dpPdfJahr1 === 'function' ? window._dpPdfJahr1(false) : 'Heute';
       platz(62, 'Drei Phasen', _j1 + ' · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
@@ -1685,7 +1687,10 @@
         y += 2;
       }
       if (ai) {
-        if ((ai.empfehlung || ai.recommendation) && an('Empfehlung')) zeile('Empfehlung', sauber(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
+        /* v3018a · das Gesamturteil steht EINMAL - hier als Zeile „Urteil" am Kopf, am Haken der
+           Gesamtbewertung (wie im Investment-PDF, pdf.js); die Begruendung unten ohne Urteilssatz. */
+        var _urteilB = ai.empfehlung || ai.recommendation || '';
+        if (_urteilB && an('Gesamtbewertung')) zeile('Urteil', sauber(_urteilB).slice(0, 60), { summe: true });
         var offerte = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung, offBeg = null;
         /* v2461 · die KI liefert die Offerte als Objekt {empfohlen, begruendung,
            argumente} - gemessen stand im PDF „[object Object]". */
@@ -1703,11 +1708,20 @@
             /* v2900 · die Zahlen stehen in der Belastungsprobe, nicht hier ein zweites Mal */
             'Gerechnete Schuldendeckung je Zins- und Mietszenario: siehe Belastungsprobe.'].filter(Boolean));
         }
-        liste('Bankargumente', ai.bankargumente);
+        /* v3018 · im Bestand stehen die Bankargumente unter der Anschlussfinanzierung -
+           wie im Investment-PDF (pdf.js v2985); die Kurzfassung druckt die Anschluss-
+           finanzierung nicht, dort bleiben sie als eigene Liste. */
+        var _bestB = false;
+        try { _bestB = !!(window.DpBestand && window.DpBestand.istBestand()); } catch (e) { _bestB = false; }
+        if (!_bestB || KURZ) liste('Bankargumente', ai.bankargumente);
         /* v2988 · seit v2985 sind anschlussfinanzierung/exit_strategien im Bestand Listen aus {frage, antwort} -
            gemessen stand im Bank-PDF der Parkstr. „[object Object],[object Object],…“ (Seite 15). */
         var _qa = function (v) { if (!Array.isArray(v)) return v; return v.map(function (e) { return e && typeof e === 'object' ? (e.frage ? e.frage + '\n' : '') + (e.antwort || '') : String(e || ''); }).filter(Boolean).join('\n\n'); };
-        if (!KURZ) block('Anschlussfinanzierung', _qa(ai.anschlussfinanzierung));
+        /* v3018 · im Ankauf steht die Anschlussfinanzierung gerechnet unter „Cashflow je Phase" und
+           „Zinsänderungsrisiko" - der KI-Text nannte dazu eigene, abweichende Zahlen. Im Bestand bleibt er. */
+        var _gedecktB = !_bestB && typeof window._dpPdfGedeckt === 'function' && window._dpPdfGedeckt('Anschlussfinanzierung (Ankauf)', _std);
+        if (!KURZ && !_gedecktB) block('Anschlussfinanzierung', [_qa(ai.anschlussfinanzierung),
+          _bestB && ai.bankargumente && ai.bankargumente.length ? 'Argumente für die Bank:\n' + ai.bankargumente.map(function (x) { return '- ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
         if (!KURZ && ai.exit_strategien) block('Exit-Strategien', _qa(ai.exit_strategien));
         if (!KURZ) (function () {
           var t = [];
@@ -1717,7 +1731,7 @@
           block('Lage & Markt', t.join('\n'));
         })();
         if (offBeg && !KURZ) block('Kaufpreis-Offerte', offBeg);
-        if (ai.empfehlung_begruendung && !KURZ) block('Empfehlung', ai.empfehlung_begruendung);
+        if (ai.empfehlung_begruendung && !KURZ) block('Begründung des Urteils', typeof window._dpOhneUrteil === 'function' ? window._dpOhneUrteil(ai.empfehlung_begruendung, _urteilB) : ai.empfehlung_begruendung);   /* v3018a */
         if (ai.fazit || ai.summary) {
           var _fz = klar(ai.fazit || ai.summary);
           if (KURZ && _fz.length > 600) { var _ende = _fz.slice(0, 600).lastIndexOf('. '); _fz = _ende > 200 ? _fz.slice(0, _ende + 1) : _fz.slice(0, 600) + ' ...'; }

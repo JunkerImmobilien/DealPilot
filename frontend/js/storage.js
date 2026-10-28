@@ -298,6 +298,16 @@ function collectData() {
   /* v1433: Eigenkapital = Kaufnebenkosten */
   var ekNk = document.getElementById('ek_ist_nk');
   if (ekNk) d['_ek_ist_nk'] = ekNk.checked;
+  /* v3018a · Bausteine im PDF je Objekt (Marcel 28.10.2026: „ja, sollen gemerkt werden").
+     Gespeichert wird nur, was AUS ist, und nur wenn etwas aus ist: ein Altobjekt ohne
+     das Feld liest sich als „alle an" und bekommt beim Laden kein neues Feld - der
+     Datensatz bleibt gleich, nichts loest ein Speichern aus. */
+  try {
+    var _pbAus = _dpPdfBausteineAus();
+    /* v3018b · hatte das Objekt das Feld schon, geht auch „alle an“ als [] mit - sonst behielt der
+       Server die alte Abwahl (gemessen Teststr. 6: alle wieder an, gespeichert, DB unverändert) */
+    if (_pbAus.length || window._dpPbHatFeld) d._pdf_bausteine_aus = _pbAus;
+  } catch (e) {}
   /* v1448: Einheitenliste des Mehrfamilienhauses (mfh-einheiten.js) */
   if (window._dpMfh && window._dpMfh.einheiten && window._dpMfh.einheiten.length) d._mfh = window._dpMfh;
   /* v2068: das Ergebnis des RND-Wizards (deal-action.js). Gleiches
@@ -664,6 +674,9 @@ function loadData(d) {
      nicht - dann AUS, sonst erbte ein geladenes Objekt den Haken des vorigen. */
   var ekNkL = document.getElementById('ek_ist_nk');
   if (ekNkL) ekNkL.checked = !!d._ek_ist_nk;
+  /* v3018a · Bausteine im PDF: fehlt das Feld, sind alle an (sonst erbte das Objekt die Haken des vorigen) */
+  _dpPdfBausteineSetzen(d._pdf_bausteine_aus);
+  window._dpPbHatFeld = Array.isArray(d._pdf_bausteine_aus);   /* v3018b */
   /* v1448: Einheitenliste - fehlt sie, ist sie leer (sonst erbte das Objekt die des vorigen) */
   window._dpMfh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh : null;
   /* v2068: RND-Ergebnis. Fehlt es, ist es NULL - sonst erbte das
@@ -1141,7 +1154,33 @@ async function saveObj(opts) {
 // V63.47: Form-Reset ohne confirm — wird vom Excel-Import benutzt wenn
 // gerade ein Objekt geladen ist (sonst würde der Import dessen Felder
 // überschreiben statt ein neues Objekt anzulegen).
+/* v3018a · Bausteine im PDF (index.html #ai-pdf-sections, Haken ai-pdf-sec-<schluessel>).
+   Ein Schluessel, zu dem diese Fassung keinen Haken hat (ein Baustein, der entfallen ist
+   oder spaeter kommt), wird still mitgefuehrt und beim Speichern wieder geschrieben -
+   ignoriert, aber nicht verloren. */
+var _dpPdfBausteineFremd = [];
+function _dpPdfBausteineHaken() {
+  return [].slice.call(document.querySelectorAll('#ai-pdf-sections input[type="checkbox"][id^="ai-pdf-sec-"]'));
+}
+function _dpPdfBausteineAus() {
+  var aus = _dpPdfBausteineFremd.slice();
+  _dpPdfBausteineHaken().forEach(function (cb) { if (!cb.checked) aus.push(cb.id.slice(11)); });
+  return aus;
+}
+function _dpPdfBausteineSetzen(liste) {
+  var aus = Array.isArray(liste) ? liste.map(String) : [];
+  var bekannt = {};
+  _dpPdfBausteineHaken().forEach(function (cb) {
+    var k = cb.id.slice(11);
+    bekannt[k] = true;
+    cb.checked = aus.indexOf(k) < 0;
+  });
+  _dpPdfBausteineFremd = aus.filter(function (k) { return !bekannt[k]; });
+}
+window._dpPdfBausteineSetzen = _dpPdfBausteineSetzen;
+
 function _clearFormForNewObject() {
+  _dpPdfBausteineSetzen(null);   /* v3018a · neues Objekt: alle Bausteine an */
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
     if (!e) return;
@@ -1239,6 +1278,7 @@ function newObj() {
 /* v1268: der bisherige Rumpf von newObj - alles ab dem Leeren der Felder.
    Eigene Funktion, damit er auch NACH einem abgewarteten Save laufen kann. */
 function _newObjLeeren() {
+  _dpPdfBausteineSetzen(null);   /* v3018a · neues Objekt: alle Bausteine an */
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
     if (!e) return;

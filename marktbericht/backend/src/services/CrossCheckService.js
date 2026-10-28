@@ -744,6 +744,14 @@ export const CrossCheckService = {
           unterkellerung: (p && p.keller_dg) || ref.keller_dg || null,
           mod_punkte: (p && p.mod_punkte) != null ? p.mod_punkte
             : (ref.mod_punkte != null ? ref.mod_punkte : null),
+          /* v3018 · DAS BAUJAHR KAM HIER NIE AN. Die Feldbruecke kennt 'baujahr'
+             (gutachterausschuss.js), aber dieser Aufruf reichte es nicht durch: jeder
+             nach Baujahrsgruppen gestaffelte Sachwertfaktor meldete 'achse_fehlt'
+             (gemessen 28.10.2026 an Lahr 08317065: ohne Baujahr kein Wert, mit 1960
+             -> 1,08 laut Tabelle S. 43; betroffen auch 16 aeltere Werte in swf-bb,
+             swf-he, swf-nrw, swf-nw-2026-block3, swf-st). Das tatsaechliche Baujahr;
+             ein modifiziertes fuehren die Modelle unter eigenem Feldnamen. */
+          baujahr: buildYear || null,
         };
         _swfTab = mitRegisterStichtag(_wst.eigen ? _wst.iso : null, () => swfNachTabelle({ ..._swfArgs }));   /* v3010 */
         /* v3005 · W2 · Regionalfaktor aus dem Modell des Ausschusses (siehe oben).

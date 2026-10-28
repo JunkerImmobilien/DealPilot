@@ -237,8 +237,13 @@ for (const f of _dateien) {
            Kaufzeitpunkt, angewandt mit dem Index zum Wertermittlungsstichtag (§ 36
            Abs. 2 ImmoWertV, ImmoWertA 36). Pflicht: bezug 'kaufzeitpunkt' UND der
            woertliche Satz des Dokuments UND seine Seite. Ein Index ohne Bezug
-           („Baupreisindex des Statistischen Bundesamtes") bleibt eine Luecke. */
-        const bpiBezug = ma.baupreisindex_bezug === 'kaufzeitpunkt'
+           („Baupreisindex des Statistischen Bundesamtes") war bis v3017 eine Luecke.
+           v3018 · Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist"): nennt das
+           Modell den Index OHNE Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV
+           (Index zum Wertermittlungsstichtag) - bezug 'stichtag_regelfall', ebenfalls mit
+           Wortlaut und Seite. Gesperrt bleibt nur, wo das Modell einen ANDEREN, nicht
+           bestimmbaren Bezug nahelegt (das entscheidet der Ernter am Wortlaut). */
+        const bpiBezug = ['kaufzeitpunkt', 'stichtag_regelfall'].includes(ma.baupreisindex_bezug)
           && typeof ma.baupreisindex_wortlaut === 'string' && ma.baupreisindex_wortlaut.trim().length >= 10
           && /\d/.test(String(ma.baupreisindex_seite ?? ''));
         if (!(typeof bpi === 'number' && isFinite(bpi)) && !bpiBezug) {

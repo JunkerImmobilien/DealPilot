@@ -830,6 +830,14 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     _z.pos = '× Baupreisindex zum Wertermittlungsstichtag (Modell des Ausschusses: Index zum Kaufzeitpunkt)';
     out.baupreisindex_bezug = 'kaufzeitpunkt';
   }
+  /* v3018 · Entscheidung Marcel 28.10.2026: nennt das Modell den Index OHNE Bezugszeitpunkt
+     ("Baupreisindex des Statistischen Bundesamtes"), gilt der Regelfall des § 36 Abs. 2
+     ImmoWertV - Index zum Wertermittlungsstichtag, genau der Wert oben. Der Rechenweg sagt es. */
+  if (ein.baupreisindex_bezug === 'stichtag_regelfall') {
+    const _z = out.staffel[out.staffel.length - 1];
+    _z.pos = '× Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2 ImmoWertV; Modell des Ausschusses nennt keinen abweichenden Bezug)';
+    out.baupreisindex_bezug = 'stichtag_regelfall';
+  }
   if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor`, faktor: regional, wert: null });
   /* v1074-WBTL-1 · Sonstige Bauteile (Gauben, Balkone, Vordaecher,
    * Terrassen) als HERSTELLUNGSKOSTEN zum Stichtag — sie unterliegen

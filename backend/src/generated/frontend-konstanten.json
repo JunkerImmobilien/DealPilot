@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T16:20:39.732Z",
+ "erzeugt_am": "2026-10-28T17:08:17.707Z",
  "quellen": {
   "voice-import": "19e697e6e3a59cff",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "d1c400f3059479c9",
-  "index-html": "0623a2e56f1ebb03",
+  "storage": "5c9ff0d729858353",
+  "index-html": "00006c2ef5d83890",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -3544,7 +3544,7 @@
      },
      {
       "h": "Pilot-Analyse — die schriftliche Einschätzung",
-      "text": "Hier bewertet der Pilot deine Zahlen in Worten: Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente und Fazit — auf Grundlage aller Eingaben dieses Objekts.\n\nSo geht's:\n1. Füll mindestens den Kaufpreis aus — ohne ihn startet die Analyse nicht.\n2. Je vollständiger Miete, Finanzierung und Bewirtschaftung sind, desto konkreter wird das Ergebnis.\n3. Klick Pilot-Analyse starten.\n\nDie Analyse ist in deinem Plan enthalten und zieht nichts von deinem Kontingent ab.\n\nPilot-Analyse im PDF-Export einschließen legt fest, ob die Pilot-Seite ins PDF kommt. Unter Bausteine im PDF wählst du die Teile einzeln, zum Beispiel Gesamtbewertung, Stärken, Risiken, Szenario-Analyse, Verhandlungsempfehlung, Kaufpreis-Offerte und Bankargumente."
+      "text": "Hier bewertet der Pilot deine Zahlen in Worten: Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente und Fazit — auf Grundlage aller Eingaben dieses Objekts.\n\nSo geht's:\n1. Füll mindestens den Kaufpreis aus — ohne ihn startet die Analyse nicht.\n2. Je vollständiger Miete, Finanzierung und Bewirtschaftung sind, desto konkreter wird das Ergebnis.\n3. Klick Pilot-Analyse starten.\n\nDie Analyse ist in deinem Plan enthalten und zieht nichts von deinem Kontingent ab.\n\nPilot-Analyse im PDF-Export einschließen legt fest, ob die Pilot-Seite ins PDF kommt. Unter Bausteine im PDF wählst du die Teile einzeln, sortiert in drei Gruppen: Ankauf und Bestand (Gesamtbewertung, Stärken, Risiken, Lage & Markt, Steuer und mehr), Ankauf (Verhandlungsempfehlung, Kaufpreis-Offerte, Bankargumente) und Bestand (Bestandsstrategie, Anschlussfinanzierung, Exit-Strategien, Ankauf gegen heute). Die Gruppe, die bei diesem Objekt nicht greift, steht blasser — deine Wahl gilt dort trotzdem, sobald das Objekt wechselt.\n\nNichts doppelt: Was das PDF schon gerechnet zeigt, kommt nicht noch einmal als Text — die Szenario-Analyse steht im Stress-Test, der Abgleich mit dem Marktbericht unter Wert & Zielbild, das Zielbild unter Wertpotenzial und die Anschlussfinanzierung im Ankauf unter Cashflow in drei Phasen. Fehlt eine dieser Seiten, kommt der Text wie bisher. Das Urteil (Kaufen, Prüfen, Nicht kaufen – im Bestand Halten, Optimieren, Verkauf prüfen) steht nur einmal, als erste Zeile der Gesamtbewertung; die Begründung nennt die Gründe dafür, die Investmentbewertung kommt nicht ins PDF.\n\nDeine Auswahl wird je Objekt gespeichert. Ein Objekt, bei dem du nichts abgewählt hast, druckt alle Bausteine."
      },
      {
       "h": "Bewertung — Kennzahlen und Score",
@@ -5235,7 +5235,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "a3e0cc570d8691c5",
+  "hilfe": "3dc754326aec3ab5",
   "bewertung": "bca98c7b04c452b7"
  }
 }

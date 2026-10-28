@@ -1,0 +1,2444 @@
+{
+  "_hinweis": "Kontakte der Geschäftsstellen der Gutachterausschüsse für Anfragen zu gesperrten Registerwerten (Marcel 28.10.2026). Schlüssel = Ausschussname wie im Register; abweichende Schreibweisen unter alias. NUR belegte Funktionspostfächer: quelle_url ist die Seite bzw. das Dokument, auf dem die Adresse steht, gelesen_am das Lesedatum. Keine geratenen Adressen, keine Mitarbeiternamen. email_obere_stelle = Oberer Gutachterausschuss/Zentrale Geschäftsstelle, wenn für den Ausschuss selbst keine Adresse belegt ist. Geprüft von tools/sperren-anfrageliste.mjs (RC 1 bei Befund).",
+  "stand": "2026-10-28",
+  "ausschuesse": {
+    "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster": {
+      "land": "BB",
+      "email": "gutachterausschuss@lkee.de",
+      "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-be-bb-hh-hb-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder)": {
+      "land": "BB",
+      "email": "gaa-los-ff@landkreis-oder-spree.de",
+      "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS_FF.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-be-bb-hh-hb-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming": {
+      "land": "BB",
+      "email": "gutachterausschuss@teltow-flaeming.de",
+      "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_TF.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-ost-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz": {
+      "land": "BB",
+      "email": "gaa-spn-osl@lkspn.de",
+      "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-be-bb-hh-hb-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz": {
+      "land": "BB",
+      "email": "gutachterausschuss@cottbus.de",
+      "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-ost-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Grundstückswerte in Berlin": {
+      "land": "BE",
+      "email": "gaa@sensw.berlin.de",
+      "weitere_emails": [
+        "gaa@senstadt.berlin.de"
+      ],
+      "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2600.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10-be.json (Feld warum_kein_wert)"
+    },
+    "GA Igersheim": {
+      "land": "BW",
+      "email": "gutachterausschuss@igersheim.de",
+      "telefon": "07931 43767",
+      "anschrift": "Gemeinde Igersheim, Möhlerplatz 9, 97999 Igersheim",
+      "webseite": "https://www.igersheim.de/start/kommunales-wohnen/bodenrichtwerte.html",
+      "quelle_url": "https://www.igersheim.de/start/kommunales-wohnen/bodenrichtwerte.html",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Achern": {
+      "land": "BW",
+      "email": "gutachterausschuss@achern.de",
+      "telefon": "07841 642-1940",
+      "anschrift": "Rathaus Illenau, Illenauer Allee 70, 77855 Achern",
+      "webseite": "https://www.achern.de/de/Unsere-Stadt/Bauen-Wohnen/Bodenrichtwerte/Gutachterausschuss",
+      "quelle_url": "https://www.achern.de/de/Unsere-Stadt/Bauen-Wohnen/Bodenrichtwerte/Gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Baiersbronn": {
+      "land": "BW",
+      "email": "gga@gemeindebaiersbronn.de",
+      "telefon": "07442 8421-318",
+      "anschrift": "Wilhelm-Heusel-Straße 24, 72270 Baiersbronn (Friedrichstal)",
+      "webseite": "https://www.gemeinde-baiersbronn.de/1238",
+      "quelle_url": "https://www.gemeinde-baiersbronn.de/1238",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Großen Kreisstadt Bühl": {
+      "land": "BW",
+      "email": "gutachterausschuss@buehl.de",
+      "telefon": "07223 935-2775",
+      "anschrift": "Hauptstraße 42, 77815 Bühl",
+      "webseite": "https://www.buehl.de/de/Stadt-Buerger/Leben-in-Buehl/Bauen-und-Wohnen/Gutachterausschuss",
+      "quelle_url": "https://www.buehl.de/de/Stadt-Buerger/Leben-in-Buehl/Bauen-und-Wohnen/Gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Großen Kreisstadt Eppingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@eppingen.de",
+      "telefon": "07262 920-1254",
+      "anschrift": "Gemeinsamer Gutachterausschuss südwestlicher Landkreis Heilbronn, Marktplatz 1, 75031 Eppingen",
+      "webseite": "https://www.eppingen.de/stadtentwicklung-bauen/bauen-wohnen/gemeinsamer-gutachterausschuss",
+      "quelle_url": "https://www.eppingen.de/stadtentwicklung-bauen/bauen-wohnen/gemeinsamer-gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Großen Kreisstadt Gaggenau": {
+      "land": "BW",
+      "email": "gutachterausschuss@gaggenau.de",
+      "quelle_url": "https://www.gaggenau.de/immobilienmarktberichte.235796.htm",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz lzs-swf-bw-2026-teil2.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Großen Kreisstadt Rastatt": {
+      "land": "BW",
+      "email": "gutachterausschuss@rastatt.de",
+      "quelle_url": "https://www.rastatt.de/site/Rastatt-Stadt/get/documents_E-1063714508/rastatt/Dateien/PDFs/2.%20Rathaus%20und%20Politik/Verwaltung/GGA/Inhaltsverzeichnis%20IMB%202024.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz lzs-swf-bw-2026-teil2.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Besigheim": {
+      "land": "BW",
+      "email": "gutachterausschuss@besigheim.de",
+      "telefon": "07143 8078-211",
+      "anschrift": "Geschäftsstelle des Gemeinsamen Gutachterausschusses bei der Stadt Besigheim, Marktplatz 7, 74354 Besigheim",
+      "webseite": "https://www.besigheim.de/rathaus-und-service/ansprechpartner/gutachterausschuss",
+      "quelle_url": "https://www.besigheim.de/rathaus-und-service/ansprechpartner/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Bopfingen": {
+      "land": "BW",
+      "email": "info@gaa-bopfingen.de",
+      "quelle_url": "https://www.bopfingen.de/site/Bopfingen-2021/get/params_E1338868447_Dattachment/23958667/Auszug%20aus%20dem%20Grundst%C3%BCcksmarktbericht%202025.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld warum_kein_wert)",
+      "alias": [
+        "Gutachterausschuss bei der Stadt Bopfingen"
+      ]
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Bretten": {
+      "land": "BW",
+      "email": "gutachterausschuss@bretten.de",
+      "webseite": "https://www.bretten.de/",
+      "quelle_url": "https://Bretten.de/sites/default/files/press/Ver%C3%B6ffentlichung-BRW_2023.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Bruchsal": {
+      "land": "BW",
+      "email": "gutachterausschuss@bruchsal.de",
+      "quelle_url": "https://www.bruchsal.de/site/Bruchsal-Internet-2023/get/documents_E-9812412/bruchsal-internet/StadtBruchsal-Dateien/PDF-Sammlungen/Gutachterausschuss/Gem.%20GAA%20bei%20der%20Stadt%20Bruchsal,%20GMB%202024.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-by-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Calw": {
+      "land": "BW",
+      "email": "info@gutachterausschuss-calw.de",
+      "quelle_url": "https://www.gutachterausschuss-calw.de/grundstuecksmarktberichte",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-swf-ernte-20261028d-bw.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Geislingen an der Steige": {
+      "land": "BW",
+      "email": "gutachterausschuss@geislingen.de",
+      "quelle_url": "https://www.geislingen.de/fileadmin/Dateien/Dateien/PDF-Dateien/Gutachterausschuss/2025/Grundstuecksmarktbericht_2025_Geislingen_GGA_-_Ausschnitt.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld bestell_url)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Münsingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@muensingen.de",
+      "telefon": "07381 182-171",
+      "anschrift": "Bachwiesenstraße 7, 72525 Münsingen",
+      "webseite": "https://www.muensingen.de/de/Rathaus/Gemeinsamer-Gutachterausschuss",
+      "quelle_url": "https://www.muensingen.de/de/Rathaus/Stadtverwaltung-oeffnungzeiten/Organigramm/Sachgebiet/Sachgebiet?view=publish&item=level1&id=1013",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Pfullingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@pfullingen.de",
+      "quelle_url": "https://www.pfullingen.de/resources/01%20Website/Fachbereich%201/Gemeinsamer%20Gutachterausschuss/Liegenschaftszinss%C3%A4tze%20Stichtag%2001.01.2025.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld modellansaetze)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Philippsburg": {
+      "land": "BW",
+      "email": "gutachterausschuss@philippsburg.de",
+      "telefon": "07256 87-150",
+      "anschrift": "Rote-Tor-Str. 6-10, 76661 Philippsburg",
+      "webseite": "https://www.philippsburg.de/index.php/bodenrichtwerte.html",
+      "quelle_url": "https://www.philippsburg.de/index.php/bodenrichtwerte.html",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Reutlingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@reutlingen.de",
+      "quelle_url": "https://www.reutlingen.de/ceasy/resource/?id=65620&download=1",
+      "gelesen_am": "2026-10-19",
+      "herkunft": "Registersatz lzs-swf-bw-2026-wege.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Rheinfelden (Baden)": {
+      "land": "BW",
+      "email": "gutachterausschuss@rheinfelden.de",
+      "telefon": "07623 95-651",
+      "anschrift": "Stadtbauamt, Kirchplatz 2, 79618 Rheinfelden (Baden)",
+      "webseite": "https://www.rheinfelden.de/Stadt-Umwelt/Bauen-Wohnen/Grundstuecke/Bodenrichtwerte",
+      "quelle_url": "https://www.rheinfelden.de/Stadt-Umwelt/Bauen-Wohnen/Grundstuecke/Bodenrichtwerte",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Rottenburg am Neckar": {
+      "land": "BW",
+      "email": "gutachterausschuss@rottenburg.de",
+      "quelle_url": "https://www.ammerbuch.de/fileadmin/Dateien/Amtliche_Bekanntmachungen/2024/2024-10-10_Bekanntmachung_Gutachterausschuss.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Rottweil": {
+      "land": "BW",
+      "email": null,
+      "telefon": "0741 494-0 (Zentrale)",
+      "anschrift": "Bruderschaftsgasse 4, 78628 Rottweil",
+      "webseite": "https://www.rottweil.de/de/Stadt-Buerger/Rathaus/Dienstleistungen-A-Z/Dienstleistung?view=publish&item=service&id=879",
+      "quelle_url": "https://www.rottweil.de/de/Stadt-Buerger/Rathaus/Dienstleistungen-A-Z/Dienstleistung?view=publish&item=service&id=879",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "kein Funktionspostfach; Stadtseite nennt nur die persönliche Adresse des Geschäftsstellenleiters und die allgemeine Stadtadresse (nicht ausdrücklich als Geschäftsstellenkontakt)",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Schwäbisch Hall": {
+      "land": "BW",
+      "email": "baurecht@schwaebischhall.de",
+      "telefon": "0791 751-425",
+      "anschrift": "Fachbereich Baurecht / Denkmalschutz / Gutachterausschuss, Am Säumarkt 6, 74523 Schwäbisch Hall",
+      "webseite": "https://www.schwaebischhall.de/de/rathaus-service/verwaltung/organigramm/6011616/fachbereich-baurecht-denkmalschutz-gutachterausschuss",
+      "quelle_url": "https://www.schwaebischhall.de/de/rathaus-service/verwaltung/organigramm/6011616/fachbereich-baurecht-denkmalschutz-gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Postfach des Fachbereichs, der laut Seite die Geschäftsstelle des Gutachterausschusses ist (Adresse dort per Skript verschlüsselt, entschlüsselt gelesen); kein eigenes gutachterausschuss@-Postfach belegt.",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Sigmaringen": {
+      "land": "BW",
+      "email": "gutachterausschuss@sigmaringen.de",
+      "quelle_url": "https://www.sigmaringen.de/de/Buerger-Rathaus/Planen-Bauen/Gemeinsamer-Gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-swf-ernte-20261028d-bw.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss bei der Stadt Weil am Rhein": {
+      "land": "BW",
+      "email": "gutachterausschuss@weil-am-rhein.de",
+      "quelle_url": "https://www.weil-am-rhein.de/start/rathaus/gemeinsamer+gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-swf-ernte-20261028d-bw.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Bietigheim-Bissingen": {
+      "land": "BW",
+      "email": "gutachter@bietigheim-bissingen.de",
+      "quelle_url": "https://www.bietigheim-bissingen.de/fileadmin/user_upload_stadtverwaltung/seitenstruktur/buergerservice-rathaus-politik/bauen-und-wohnen/gemeinsamer-gutachterausschuss/2023-01-01_Sachwertfaktoren_Ein-_und_Zweifamilienh%C3%A4user.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-by-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Bodensee West": {
+      "land": "BW",
+      "email": "gutachterausschuss@radolfzell.de",
+      "telefon": "+49 7732 81-229",
+      "anschrift": "Stadt Radolfzell am Bodensee, Marktplatz 2, 78315 Radolfzell",
+      "webseite": "https://www.radolfzell.de/Wirtschaft-und-Bauen/Bauen-und-Wohnen/Gutachterausschuss",
+      "quelle_url": "https://www.radolfzell.de/Wirtschaft-und-Bauen/Bauen-und-Wohnen/Gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss der Stadt Metzingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@metzingen.de",
+      "telefon": "+49 7123 395-4210",
+      "anschrift": "Stadt Metzingen, Stuttgarter Straße 2-4, 72555 Metzingen",
+      "webseite": "https://www.metzingen.de/gutachterausschuss",
+      "quelle_url": "https://www.metzingen.de/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss der Stadt Oberndorf am Neckar": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07423 77-1315",
+      "anschrift": "Stadt Oberndorf a. N., Klosterstraße 3, 78727 Oberndorf a. N.",
+      "webseite": "https://www.oberndorf.de/Wirtschaft-und-Bauen/Gutachterausschuss",
+      "quelle_url": "https://www.oberndorf.de/Wirtschaft-und-Bauen/Gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Offizielle Seite nennt nur persönliche Adressen der Mitarbeiter und stadt@oberndorf.de (nicht als Geschäftsstelle ausgewiesen); gutachterausschuss@oberndorf.de nur auf Drittseite",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Filderstadt und Leinfelden-Echterdingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@filderstadt.de",
+      "quelle_url": "https://www.filderstadt.de/start/service/Gutachterausschuss.html",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-swf-ernte-20261028d-bw.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@donaueschingen.de",
+      "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+      "gelesen_am": "2026-10-19",
+      "herkunft": "Registersatz lzs-swf-bw-2026-nachernte.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss für die Ermittlung von Grundstückswerten (Geschäftsstelle c/o Universitätsstadt Tübingen)": {
+      "land": "BW",
+      "email": "gutachterausschuss@tuebingen.de",
+      "quelle_url": "https://www.tuebingen.de/Dateien/grundstuecksmarktbericht_2025.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld bestell_url)"
+    },
+    "Gemeinsamer Gutachterausschuss für die Ermittlung von Grundstückswerten bei der Stadt Göppingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@goeppingen.de",
+      "quelle_url": "https://www.goeppingen.de/site/Goeppingen-Internet-2021/get/documents_E1352601181/Goeppingen/Goeppingen_Anleitungen/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht%202025.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Hegau-Hochrhein bei der Stadt Singen (Hohentwiel)": {
+      "land": "BW",
+      "email": "gutachterausschuss@singen.de",
+      "telefon": "+49 7731 85-490",
+      "anschrift": "Hohgarten 2, 78224 Singen (Hohentwiel)",
+      "webseite": "https://www.singen.de/leben/wohnen-und-bauen/haus_grundstueck/gutachterausschuss",
+      "quelle_url": "https://www.singen.de/-/behoerdenwegweiser/oe6022719",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Heidenheim": {
+      "land": "BW",
+      "email": "gutachterausschuss@heidenheim.de",
+      "quelle_url": "https://www.heidenheim.de/-/behoerdenwegweiser/geschaeftsstelle-des-gutachterausschusses-stadt-heidenheim/oe6006948",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-swf-ernte-20261028d-bw.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Hohenzollern bei der Stadt Hechingen": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07471 940-226",
+      "anschrift": "Stadt Hechingen, Marktplatz 1, 72379 Hechingen",
+      "webseite": "https://www.hechingen.de/de/Wirtschaft-Bauen/Gutachterausschuss",
+      "quelle_url": "https://www.hechingen.de/de/Wirtschaft-Bauen/Gutachterausschuss/Grundstuecksmarktbericht-2024",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Seite nennt nur die persönliche Adresse des Leiters und info@ der Stadt (nicht ausdrücklich als Geschäftsstelle); kein Funktionspostfach",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Horb a. N.": {
+      "land": "BW",
+      "email": "gutachterausschuss@horb.de",
+      "telefon": "07451 / 622 9405",
+      "anschrift": "Gemeinsamer Gutachterausschuss, Ritterschaftsstr. 4, 72160 Horb-Nordstetten",
+      "webseite": "https://www.horb.de/Gutachterausschuss",
+      "quelle_url": "https://www.horb.de/resources/02%20Datenobjekte/Gutachterausschuss/Grundstuecksmarktbericht%202024.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Funktionspostfach steht im Grundstücksmarktbericht 2024 und im Fragebogen auf horb.de; die Webseite selbst nennt nur persönliche Adressen",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss im südlichen Landkreis Karlsruhe": {
+      "land": "BW",
+      "email": "gutachterausschuss@ettlingen.de",
+      "telefon": "07243 101-8380",
+      "anschrift": "Kirchenplatz 1-3, 76275 Ettlingen",
+      "webseite": "https://www.ettlingen.de/-/Behoerdenwegweiser/geschaeftsstelle-des-gutachterausschusses-stadtkaemmerei/oe6013596",
+      "quelle_url": "https://www.ettlingen.de/-/Behoerdenwegweiser/geschaeftsstelle-des-gutachterausschusses-stadtkaemmerei/oe6013596",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss im südlichen Landkreis Karlsruhe (Geschäftsstelle Ettlingen)": {
+      "land": "BW",
+      "email": "gutachterausschuss@ettlingen.de",
+      "webseite": "https://www.ettlingen.de/gutachterausschuss",
+      "quelle_url": "https://www.ettlingen.de/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Künzelsau": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07940 129-616",
+      "anschrift": "Stadtverwaltung Künzelsau, Gemeinsamer Gutachterausschuss, Stuttgarter Straße 7, 74653 Künzelsau",
+      "webseite": "https://www.kuenzelsau.de/bauen+und+wohnen/Gutachterausschuss",
+      "quelle_url": "https://www.kuenzelsau.de/bauen+und+wohnen/Gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "nicht_gefunden": "Adresse nur aus einer Zusammenfassung des Abrufwerkzeugs, auf der geladenen Seite nicht wörtlich gesehen – vor Nutzung prüfen"
+    },
+    "Gemeinsamer Gutachterausschuss Lahr": {
+      "land": "BW",
+      "email": "gutachterausschuss@lahr.de",
+      "quelle_url": "https://www.lahr.de/grundstuecksmarktbericht-2023-2024.265267.htm",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Landkreis Waldshut West": {
+      "land": "BW",
+      "email": "geschaeftsstelle@gga-bad-saeckingen.de",
+      "telefon": "07761 927 607-0",
+      "anschrift": "Kalkdarren 13, 79713 Bad Säckingen",
+      "webseite": "https://www.bad-saeckingen.de/rathaus-service/verwaltungsaufbau/alle-fachbereiche/gem-gutachterausschuss",
+      "quelle_url": "https://www.bad-saeckingen.de/rathaus-service/verwaltungsaufbau/alle-fachbereiche/gem-gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Adresse auf der Seite per TYPO3-Mailschutz verschlüsselt (data-mailto-token), entschlüsselt",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Leutenbach, Schwaikheim, Winnenden, Berglen (BORIS-BW-Nr. 11930)": {
+      "land": "BW",
+      "email": "gutachterausschuss@winnenden.de",
+      "anschrift": "Stadt Winnenden, Stadtentwicklungsamt, Torstraße 10, 71364 Winnenden",
+      "webseite": "https://www.winnenden.de/bauen-umwelt-und-verkehr/bauen-und-wohnen/immobilienbewertung",
+      "quelle_url": "https://www.winnenden.de/bauen-umwelt-und-verkehr/bauen-und-wohnen/immobilienbewertung",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Lörrach-Wiesental": {
+      "land": "BW",
+      "email": "gutachterausschuss@loerrach.de",
+      "quelle_url": "https://www.loerrach.de/ceasy/resource/?id=25273&download=1",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Ludwigsburg und Umgebung": {
+      "land": "BW",
+      "email": "gutachterausschuss@ludwigsburg.de",
+      "webseite": "https://www.ludwigsburg.de/start/leben+in+ludwigsburg/gutachterausschuss.html",
+      "quelle_url": "https://www.ludwigsburg.de/site/Ludwigsburg-Internet-2020/get/params_E1128990737/25433203/Grundstuecksmarktbericht_2026_Immobilienmarkt_2025.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Main-Tauber-Nord bei der Stadt Wertheim": {
+      "land": "BW",
+      "email": "gutachterausschuss@wertheim.de",
+      "webseite": "https://www.wertheim.de/stadtentwicklung/bauen-und-wohnen/gutachterausschuss",
+      "quelle_url": "https://www.wertheim.de/stadtentwicklung/bauen-und-wohnen/gutachterausschuss/verkehrswertgutachten",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Main-Tauber-Süd": {
+      "land": "BW",
+      "email": "gutachterausschuss@bad-mergentheim.de",
+      "telefon": "07931 576020",
+      "anschrift": "Neues Rathaus, Bahnhofplatz 1, 97980 Bad Mergentheim",
+      "webseite": "https://www.bad-mergentheim.de/de/verwaltung/fachaemter/gemeinsamer-gutachterausschuss-main-tauber-sued-id_74/",
+      "quelle_url": "https://www.bad-mergentheim.de/de/verwaltung/fachaemter/gemeinsamer-gutachterausschuss-main-tauber-sued-id_74/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Markgräflerland-Breisgau": {
+      "land": "BW",
+      "email": "gutachterausschuss@muellheim.de",
+      "telefon": "07631-801-650",
+      "anschrift": "Hacher Straße 7, 79379 Müllheim i. M.",
+      "webseite": "https://www.muellheim.de/gemeinsamer-gutachterausschuss/sachwertfaktoren/",
+      "quelle_url": "https://www.muellheim.de/gemeinsamer-gutachterausschuss/sachwertfaktoren/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Markgräflerland-Breisgau (bei der Stadt Müllheim)": {
+      "land": "BW",
+      "email": "gutachterausschuss@muellheim.de",
+      "telefon": "07631-801-650",
+      "anschrift": "Hacher Straße 7, 79379 Müllheim i. M.",
+      "webseite": "https://www.muellheim.de/gemeinsamer-gutachterausschuss/gutachterausschuss-uebersicht/",
+      "quelle_url": "https://www.muellheim.de/gemeinsamer-gutachterausschuss/sachwertfaktoren/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Mittleres Remstal": {
+      "land": "BW",
+      "email": "gutachterausschuss@schorndorf.de",
+      "quelle_url": "https://www.schorndorf.de/ceasy/resource/?id=26566&download=1",
+      "gelesen_am": "2026-10-19",
+      "herkunft": "Registersatz lzs-swf-bw-2026-wege.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss nördliche Ortenau": {
+      "land": "BW",
+      "email": "gutachterausschuss@achern.de",
+      "webseite": "https://www.achern.de/de/Unsere-Stadt/Bauen-Wohnen/Bodenrichtwerte/Gutachterausschuss",
+      "quelle_url": "https://www.achern.de/de/Unsere-Stadt/Bauen-Wohnen/Bodenrichtwerte/Gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Postfach des Gemeinsamen Gutachterausschusses bei der Großen Kreisstadt Achern. Das GGnO-Fachinfo-PDF verweist für weitere Auskünfte auf Achern UND (für andere Teile) auf den Gemeinsamen Gutachterausschuss bei der Großen Kreisstadt Oberkirch – für Oberkircher Gemeinden ist Achern ggf. nicht zuständig",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Nördlicher Ostalbkreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@ellwangen.de",
+      "telefon": "07961 84-229",
+      "anschrift": "Rathaus Ellwangen, Spitalstraße 4, 73479 Ellwangen (Jagst)",
+      "webseite": "https://www.ellwangen.de/buerger/leben-gesellschaft/gutachterausschuss-noerdlicher-ostalbkreis/uebersicht-leistungen-ansprechpartner",
+      "quelle_url": "https://www.ellwangen.de/buerger/rathaus-service/verwaltung/aemter/6034521/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss nordöstlicher Schwarzwald-Baar-Kreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@villingen-schwenningen.de",
+      "telefon": "07721 82-4551",
+      "anschrift": "Vermessungsamt, Geschäftsstelle Gutachterausschuss nordöstlicher Schwarzwald-Baar-Kreis, Winkelstraße 9, 78056 Villingen-Schwenningen",
+      "webseite": "https://www.villingen-schwenningen.de/bauen-wohnen/gutachterausschuss/",
+      "quelle_url": "https://www.villingen-schwenningen.de/bauen-wohnen/gutachterausschuss/grundstuecksmarktbericht/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Oberes Gäu": {
+      "land": "BW",
+      "email": "gutachterausschuss@herrenberg.de",
+      "telefon": "07032 924-186",
+      "anschrift": "Technisches Rathaus, Seeländerplatz 4, 71083 Herrenberg",
+      "webseite": "https://www.herrenberg.de/de/Stadtleben/Stadtentwicklung/Geschaeftsstelle-Gutachterausschuss",
+      "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08115021-Herrenberg_2025.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Oberes Murrtal": {
+      "land": "BW",
+      "email": "gutachten@murrhardt.de",
+      "telefon": "07192 213-411",
+      "anschrift": "Geschäftsstelle beim Baurechtsamt der Stadtverwaltung Murrhardt, Marktplatz 10, 71540 Murrhardt",
+      "webseite": "https://www.murrhardt.de",
+      "quelle_url": "https://www.Grosserlach.de/fileadmin/Dateien/Bilder/Rathaus___Verwaltung/Bodenrichtwerte_2023.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Beleg ist die amtliche Bodenrichtwertliste 2023 (Gemeinde Großerlach); keine eigene Webseite gefunden",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Oberes Nagoldtal": {
+      "land": "BW",
+      "email": "gutachterausschuss@nagold.de",
+      "quelle_url": "https://www.nagold.de/ceasy/resource/?id=27854&download=1",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz lzs-swf-bw-2026-teil2.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Offenburg-Kinzigtal": {
+      "land": "BW",
+      "email": "gutachterausschuss@offenburg.de",
+      "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08317096-GemeinsamerGutachterausschussOffenburg_2025.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Öhringen": {
+      "land": "BW",
+      "email": "gutachterausschuss@oehringen.de",
+      "telefon": "07941 68-0",
+      "anschrift": "Stadt Öhringen, Gemeinsamer Gutachterausschuss, Marktplatz 15, 74613 Öhringen",
+      "webseite": "https://www.oehringen.de/leben-wohnen/gutachterausschuss",
+      "quelle_url": "https://www.oehringen.de/leben-wohnen/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss östlicher Landkreis Biberach": {
+      "land": "BW",
+      "email": "gutachterausschuss@laupheim.de",
+      "quelle_url": "https://www.laupheim.de/fileadmin/Dateien/Dateien/Baudezernat/Gutachterausschuss/Inhaltsverzeichnis_Grundst%C3%BCcksmarktbericht_%C3%96stlicher_LK_BC_2025.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Schwäbisch Gmünd": {
+      "land": "BW",
+      "email": "gutachterausschuss@schwaebisch-gmuend.de",
+      "telefon": "07171 603-6215",
+      "anschrift": "Marktplatz 37, 73525 Schwäbisch Gmünd",
+      "webseite": "https://www.schwaebisch-gmuend.de/grundstuecksmarktbericht.html",
+      "quelle_url": "https://www.schwaebisch-gmuend.de/grundstuecksmarktbericht.html",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Sinsheim/östlicher Rhein-Neckar-Kreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@sinsheim.de",
+      "quelle_url": "https://www.sinsheim.de/fileadmin/Dateien/Website/Dateien/Wirtschaft__Bauen___Umwelt/Gutachterausschuss/IMB_2025_%C3%B6stl.RNK_-_Inhaltsverzeichnis.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Strohgäu": {
+      "land": "BW",
+      "email": "gutachterausschuss@ditzingen.de",
+      "quelle_url": "https://www.ditzingen.de/fileadmin/Dateien/Cross7/Startseite/Bauen_%26_Wirtschaft/Gutachterausschuss/GGA_Strohgaeu_Marktbericht_2023.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld bestell_url)"
+    },
+    "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@schwetzingen.de",
+      "quelle_url": "https://www.schwetzingen.de/site/Schwetzingen_2021/get/params_E1638776855_Dattachment/3521216/Grundst%C3%BCcksmarktbericht%20%20GAA%20s%C3%BCdwestlicher%20RNK_Auswertung%20des%20Jahres%202023.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gemeinsamer Gutachterausschuss Trossingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@trossingen.de",
+      "telefon": "07425/95139-0",
+      "anschrift": "Christian-Messner-Straße 2-6, 78647 Trossingen",
+      "webseite": "https://www.trossingen.de/",
+      "quelle_url": "https://Trossingen.de/fileadmin/Dateien/Webseite/Bilder/Leben_Wohnen/Bauen_Entwicklung/Datenschutz-Informationsblatt.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Beleg ist das Datenschutz-Informationsblatt der Stadt Trossingen (Stand 2020)",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Waiblingen/Korb": {
+      "land": "BW",
+      "email": "gutachterausschuss@waiblingen.de",
+      "telefon": "07151 5001-1201",
+      "webseite": "https://www.waiblingen.de/de/Das-Rathaus/Buergerservice/Bauen-Wohnen/Grundstuecksmarktbericht",
+      "quelle_url": "https://www.waiblingen.de/de/Das-Rathaus/Buergerservice/Bauen-Wohnen/Grundstuecksmarktbericht",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Weil der Stadt – Aidlingen – Grafenau": {
+      "land": "BW",
+      "email": "gutachterausschuss@weil-der-stadt.de",
+      "telefon": "07033 521-235",
+      "anschrift": "Industriestraße 7, 71263 Weil der Stadt",
+      "webseite": "https://www.weil-der-stadt.de/Wirtschaft-Bauen/wohnen/Gutachterausschuss",
+      "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08115050-WeilderStadtAidlingenGrafenau_2025.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss westlicher Landkreis Biberach bei der Stadt Riedlingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@riedlingen.de",
+      "telefon": "+49 7371 183-1442",
+      "anschrift": "Marktplatz 1, 88499 Riedlingen",
+      "webseite": "https://www.riedlingen.de/Stadtverwaltung/Bauen-und-Wohnen/Gemeinsamer-Gutachterausschuss",
+      "quelle_url": "https://www.riedlingen.de/Stadtverwaltung/Bauen-und-Wohnen/Gemeinsamer-Gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gemeinsamer Gutachterausschuss Westlicher Landkreis Ravensburg": {
+      "land": "BW",
+      "email": "gutachterausschuss@ravensburg.de",
+      "quelle_url": "https://www.ravensburg.de/rv/wirtschaft-planen-bauen/gutachen-bodenrichtwerte/kaufpreissammlung-grundstuecksmarktbericht.php",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz lzs-swf-bw-2026-teil2.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss Aalen-Essingen (Gutachterausschuss der Stadt Aalen)": {
+      "land": "BW",
+      "email": "gutachterausschuss@aalen.de",
+      "telefon": "07361 52-1611",
+      "webseite": "https://www.aalen.de/grundstuecksmarktbericht.6362.25.htm",
+      "quelle_url": "https://www.aalen.de/grundstuecksmarktbericht.6362.25.htm",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss bei der Stadt Leonberg": {
+      "land": "BW",
+      "email": "gutachterausschuss@leonberg.de",
+      "telefon": "07152 990-0 (Zentrale)",
+      "anschrift": "Belforter Platz 1, 71229 Leonberg",
+      "webseite": "https://www.leonberg.de/Wirtschaft-Bauen/Rund-ums-Bauen/Gutachterausschuss/",
+      "quelle_url": "https://www.leonberg.de/Wirtschaft-Bauen/Rund-ums-Bauen/Gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Biberach-Mitte": {
+      "land": "BW",
+      "email": "gutachterausschuss.biberach-mitte@biberach-riss.de",
+      "anschrift": "Museumstraße 2, 88400 Biberach an der Riß",
+      "webseite": "https://www.biberach-riss.de/Planen-Bauen-Umwelt/Gutachterausschuss/",
+      "quelle_url": "https://www.biberach-riss.de/Planen-Bauen-Umwelt/Gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Bodman-Ludwigshafen": {
+      "land": "BW",
+      "email": "gutachterausschuss@bodman-ludwigshafen.de",
+      "anschrift": "Gemeinde Bodman-Ludwigshafen, Stabstelle Baurecht und Grundstücksverkehr",
+      "webseite": "https://www.bodman-ludwigshafen.de/de/Rathaus-und-Buergerservice/Bauen-und-Wohnen/Bodenrichtwerte",
+      "quelle_url": "https://www.bodman-ludwigshafen.de/de/Rathaus-und-Buergerservice/Bauen-und-Wohnen/Bodenrichtwerte",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss der Gemeinde Reichenau": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07534 801-0",
+      "anschrift": "Rathaus, Münsterplatz 2, 78479 Reichenau",
+      "webseite": "https://www.reichenau.de/de/Rathaus-Service/Wohnen-Bauen/Bodenrichtwerte",
+      "quelle_url": "https://www.reichenau.de/de/Rathaus-Service/Wohnen-Bauen/Bodenrichtwerte",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Nur rathaus@reichenau.de (allgemein, nicht als Geschäftsstelle ausgewiesen) und persönliche Adresse des Ansprechpartners",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss der Stadt Kornwestheim": {
+      "land": "BW",
+      "email": "gutachterausschuss@kornwestheim.de",
+      "quelle_url": "https://www.kornwestheim.de/site/Kornwestheim_Internet/get/documents_E-892695350/kornwestheim/Kornwestheim_Mediathek/FB%208/SWF_2025_1_2_FH.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-by-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für den Landkreis Esslingen (GuA LKES)": {
+      "land": "BW",
+      "alias": [
+        "Gemeinsamer Gutachterausschuss im Landkreis Esslingen"
+      ],
+      "email": "info@gua-lkes.de",
+      "quelle_url": "https://www.gutachterausschuss-lkes.de/fileadmin/Dateien/Website/Dateien/Grundstuecksmarktbericht_2022__geschuetzte_Leseprobe_ohne_Daten_.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten bei der Stadt Ostfildern": {
+      "land": "BW",
+      "email": null,
+      "telefon": "+49 711 3404-414",
+      "anschrift": "Rathaus Ruit, Otto-Vatter-Straße 12, 73760 Ostfildern",
+      "webseite": "https://www.ostfildern.de/unsere-fachbereiche/Gutachterausschuss-unit2214",
+      "quelle_url": "https://www.ostfildern.de/unsere-fachbereiche/Gutachterausschuss-unit2214",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "kein Funktionspostfach; Stadtseite nennt nur persönliche Adresse des Geschäftsstellenleiters und allgemeine Stadtadresse (nicht ausdrücklich als Geschäftsstellenkontakt)",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten für den Bereich nördlicher Rhein-Neckar-Kreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@gaa-nrnk.de",
+      "quelle_url": "https://www.weinheim.de/site/WeinheimRoot/get/documents_E-58030268/weinheim/Dateien/PDF-Dateien/Gutachterausschuss/GAA_20230725_Immobilienmarktdaten2023.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Esslingen am Neckar": {
+      "land": "BW",
+      "email": "gutachterausschuss@esslingen.de",
+      "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08116019-Esslingen_2025.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br.": {
+      "land": "BW",
+      "email": "gutachterausschuss@freiburg.de",
+      "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08311000_erlaeuterungen_2025.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-bw-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heidelberg": {
+      "land": "BW",
+      "email": "wertermittlung@heidelberg.de",
+      "quelle_url": "https://www.heidelberg.de/HD/Rathaus/Grundstuecksmarktbericht.html",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)",
+      "alias": [
+        "Gutachterausschuss Heidelberg"
+      ]
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Mannheim": {
+      "land": "BW",
+      "email": "gutachterausschuss@mannheim.de",
+      "quelle_url": "https://www.mannheim.de/sites/default/files/2026-06/Bodenrichtwerte%20BORIS%20BW_Oertliche%20Fachinformation-Mannheim_2025%20-%202.Ausgabe.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Pforzheim": {
+      "land": "BW",
+      "email": "gutachterausschuss@pforzheim.de",
+      "quelle_url": "https://cdn.pforzheim-web.de/fileadmin/user_upload/bauen/Gutachterausschuss/Immobilienmarktbericht_2025_Internet.pdf",
+      "gelesen_am": "2026-10-19",
+      "herkunft": "Registersatz lzs-swf-bw-2026-wege.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Sindelfingen und Magstadt": {
+      "land": "BW",
+      "email": "gutachterausschuss@sindelfingen.de",
+      "telefon": "(07031) 94 543",
+      "anschrift": "Stadt Sindelfingen, Geschäftsstelle des Gutachterausschusses, Postfach 180, 71043 Sindelfingen",
+      "webseite": "https://www.sindelfingen.de/bauen-wirtschaft/kaufen-mieten/immobilienwertermittlung",
+      "quelle_url": "https://www.sindelfingen.de/fileadmin/Website/01_Sindelfingen/Dateien/Bauen__Wirtschaft__Verkehr/Bauen/Immobilienwertermittlung/Downloads/2026/Grundst%C3%BCcksmarktbericht_2026.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "steht im Grundstücksmarktbericht 2026 der Stadt; die Webseite zeigt nur einen Platzhalter-Link",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Stuttgart": {
+      "land": "BW",
+      "email": "stadtmessungsamt@stuttgart.de",
+      "quelle_url": "https://www.stuttgart.de/medien/ibs/grundstuecksmarktbericht-internetversion-2026.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm": {
+      "land": "BW",
+      "email": "gutachterausschuss@ulm.de",
+      "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+      "gelesen_am": "2026-10-20",
+      "herkunft": "Registersatz uk-wgfz-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten und sonstige Wertermittlungen in Karlsruhe": {
+      "land": "BW",
+      "email": "gga@karlsruhe.de",
+      "quelle_url": "https://www.karlsruhe.de/fileadmin/user_upload/05_Mobilitaet_Stadtbild/054_Bauen_und_Immobilien/3_Gutachterausschuss/Immobilienmarktbericht_KA_2025_INTERNET.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte Breisgau-Nord Hochschwarzwald": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07661 393-160",
+      "anschrift": "Talvogteistraße 3, 79199 Kirchzarten",
+      "webseite": "https://www.gutachterausschuss-bnh.de/",
+      "kontaktformular_url": "https://www.gutachterausschuss-bnh.de/de/kontakt/",
+      "quelle_url": "https://www.gutachterausschuss-bnh.de/de/impressum/",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "E-Mail auf der eigenen Seite nur per JavaScript verschlüsselt, im Klartext nicht lesbar; service-bw-Eintrag der Gemeinde Kirchzarten ohne E-Mail. gutachterausschuss@kirchzarten.de nur auf Drittportal gesehen, nicht amtlich belegt",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Konstanz": {
+      "land": "BW",
+      "email": "gutachterausschuss@konstanz.de",
+      "quelle_url": "https://www.konstanz.de/site/Konstanz/get/params_E41332991_Dattachment/777530/Immobilienmarktbericht%202026%20Inhalts%C3%BCbersicht.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Neckar-Odenwald-Kreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@mosbach.de",
+      "quelle_url": "https://www.mosbach.de/wirtschaft-und-entwicklung/gutachterausschuss/bodenrichtwerte+_+wertrelevante+daten",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte Mühlacker (Zweckverband Gemeinsamer Gutachterausschuss im Enzkreis)": {
+      "land": "BW",
+      "email": "Gutachter@gua-enzkreis.de",
+      "telefon": "07041 / 98692-0",
+      "anschrift": "Bahnhofstr. 13, 75417 Mühlacker",
+      "webseite": "https://www.gutachterausschuss-enzkreis.de/",
+      "quelle_url": "https://www.gutachterausschuss-enzkreis.de/",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "derselbe Zweckverband wie der Enzkreis-Eintrag",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Östlicher Bodenseekreis": {
+      "land": "BW",
+      "email": "gutachterausschuss@friedrichshafen.de",
+      "quelle_url": "https://www.friedrichshafen.de/fileadmin/user_upload/images_fn/SBW_Downloads/Grundstuecksmarktbericht.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte Südöstlicher Rhein-Neckar-Kreis": {
+      "land": "BW",
+      "email": "verwaltung@gaasornk.de",
+      "telefon": "06224 5739530",
+      "anschrift": "Zweckverband Gutachterausschuss Südöstlicher Rhein-Neckar-Kreis, Weberstraße 4, 69181 Leimen",
+      "webseite": "https://www.leimen.de/bauen-wirtschaft/wirtschaft-handel/gutachterausschuss-suedoestlicher-rhein-neckar-kreis",
+      "quelle_url": "https://www.sandhausen.de/de/Rathaus/Gemeindeverwaltung/Behoerde?view=publish&item=authority&id=1019",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "gleiche Adresse auch auf leimen.de (TYPO3-Mailschutz, entschlüsselt)",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswertermittlung für den Stadtkreis Baden-Baden": {
+      "land": "BW",
+      "email": "gutachterausschuss@baden-baden.de",
+      "telefon": "07221 93-1634",
+      "anschrift": "Briegelackerstraße 8, 76532 Baden-Baden",
+      "webseite": "https://geoportal.baden-baden.de/",
+      "quelle_url": "https://geoportal.baden-baden.de/public/dokumente/bodenrichtwert/Beiblatt%20zur%20Bodenrichtwertkarte%202025.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Gerlingen": {
+      "land": "BW",
+      "email": null,
+      "anschrift": "Stadtverwaltung Gerlingen, Baurecht- und Bauverwaltungsamt, Geschäftsstelle des Gutachterausschusses, Rathausplatz 1, 70839 Gerlingen",
+      "webseite": "https://www.gerlingen.de/",
+      "quelle_url": "https://www.gerlingen.de/site/Gerlingen-Internet-2021/get/params_E-1986216529/24409612/Bodenrichtwerte_Kaufpreissammlung2025_.pdf",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "amtliche Dokumente nennen nur zwei persönliche Adressen der Mitarbeiterinnen, kein Funktionspostfach",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss im Landkreis Emmendingen": {
+      "land": "BW",
+      "email": "gutachterausschuss@emmendingen.de",
+      "telefon": "07641 452-3521",
+      "webseite": "https://www.emmendingen.de/",
+      "quelle_url": "https://www.malterdingen.de/fileadmin/Dateien/KW-4-20.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Beleg ist die amtliche Bekanntmachung im Mitteilungsblatt Malterdingen Nr. 04/2020 (23.01.2020); die Geschäftsstellenseite auf emmendingen.de war nicht abrufbar (404). Anschrift damals Westend 10, inzwischen evtl. verzogen.",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss im Württembergischen Allgäu": {
+      "land": "BW",
+      "email": "gutachterausschuss@wangen.de",
+      "quelle_url": "https://www.wangen.de/fileadmin/1_Wangen.de/2_B%C3%BCrger/1_Leben_in_Wangen/1_-_Bauen_und_Wohnen/Dokumentbibliothek/%C3%9Cbersicht_ermittelte_Liegenschaftszinss%C3%A4tze_01-01-2025.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld modellansaetze)"
+    },
+    "Gutachterausschuss Kämpfelbach": {
+      "land": "BW",
+      "email": null,
+      "anschrift": "Rathaus Bilfingen, Hauptstraße 17, Kämpfelbach",
+      "webseite": "https://www.kaempfelbach.de/rathaus/ortsrecht/",
+      "quelle_url": "https://www.kaempfelbach.de/app/uploads/2025/06/Bodenrichtwert_Bekanntmachung_gueltig_ab_1_1_2025.pdf",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Geschäftsstelle im Rathaus Bilfingen, nur persönlicher Ansprechpartner genannt; kein Funktionspostfach",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Kehl – Appenweier – Willstätt": {
+      "land": "BW",
+      "email": "gutachterausschuss-kaw@stadt-kehl.de",
+      "telefon": "07851 88-4503",
+      "anschrift": "Technisches Rathaus, Rathausplatz 3, 77694 Kehl",
+      "webseite": "https://www.kehl.de/rathaus+_+politik/verwaltungsaufbau/fachbereich+4/gutachterausschuss",
+      "quelle_url": "https://www.kehl.de/rathaus+_+politik/verwaltungsaufbau/fachbereich+4/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Limpurger Land-Bühlertal": {
+      "land": "BW",
+      "email": "gutachterausschuss@gaildorf.de",
+      "telefon": "07971 253-0",
+      "anschrift": "Schloss-Straße 20, 74405 Gaildorf",
+      "webseite": "https://www.gaildorf.de/bodenrichtwerte",
+      "quelle_url": "https://www.gaildorf.de/organisationseinheit/Gemeinsamer-Gutachterausschuss-unit1385",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Linzgau – Gehrenberg": {
+      "land": "BW",
+      "email": "gutachterausschuss@gvv-markdorf.de",
+      "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08435034-Oertliche_Fachinformationen_2025.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-bw-wege.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss mit BORIS-BW-Nr. 32733 (Tuttlingen und 13 Gemeinden)": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07461 99-0 (Zentrale)",
+      "anschrift": "Stadt Tuttlingen, Abt. 9.2 Gutachterwesen und Geoinformation, Rathausstraße 1, 78532 Tuttlingen",
+      "webseite": "https://www.tuttlingen.de/de/Politik-Verwaltung/Verwaltung/Organigramm/Abteilungen?view=publish&item=level1&id=1012",
+      "quelle_url": "https://www.tuttlingen.de/de/Politik-Verwaltung/Verwaltung/Organigramm/Abteilungen?view=publish&item=level1&id=1012",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "kein Funktionspostfach; nur persönliche Adresse des Geschäftsstellenleiters und allgemeine Rathausadresse (nicht ausdrücklich als Geschäftsstellenkontakt). Name lt. Stadt: Gemeinsamer Gutachterausschuss Südlicher Landkreis Tuttlingen",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Renningen, Rutesheim und Weissach": {
+      "land": "BW",
+      "email": "gutachterausschuss@renningen.de",
+      "telefon": "07159 924-167",
+      "anschrift": "Hauptstraße 5, 71272 Renningen",
+      "webseite": "https://www.renningen.de/stadtentwicklung/grundstuecke-immobilien/grundstuecksbewertung/",
+      "quelle_url": "https://www.renningen.de/stadtentwicklung/grundstuecke-immobilien/grundstuecksbewertung/grundstuecksmarktbericht-2023-gekuerzte-version-homepage.pdf?cid=z6j",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Südlicher Landkreis Tuttlingen (Geschäftsstelle Stadt Tuttlingen)": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07461 99-255",
+      "anschrift": "Stadt Tuttlingen, Rathausstraße 1, 78532 Tuttlingen",
+      "webseite": "https://www.tuttlingen.de/de/Wirtschaft-Bauen/Bauen-Wohnen/Grundstuecksmarktbericht",
+      "quelle_url": "https://www.tuttlingen.de/de/Wirtschaft-Bauen/Bauen-Wohnen/Grundstuecksmarktbericht",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Seite nennt nur eine persönliche Adresse des Sachbearbeiters und info@ der Stadt (nicht als Geschäftsstellen-Kontakt) – kein Funktionspostfach",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Sulz am Neckar": {
+      "land": "BW",
+      "email": null,
+      "telefon": "07454 9650-0 (Zentrale)",
+      "anschrift": "Stadtverwaltung Sulz am Neckar, Obere Hauptstraße 2, 72172 Sulz am Neckar",
+      "webseite": "https://www.sulz.de/rathaus-info/stadtverwaltung/mitarbeiter",
+      "quelle_url": "https://www.sulz.de/rathaus-info/stadtverwaltung/mitarbeiter",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "kein Funktionspostfach; Geschäftsstelle nur über persönliche Adresse einer Mitarbeiterin im Baurechtsamt erreichbar",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss Überlinger See": {
+      "land": "BW",
+      "email": "gutachterausschuss@ueberlingen.de",
+      "quelle_url": "https://cms.ueberlingen.de/mediamanager/2026/08/grundstcksmarktbericht_2025_aktuell_genderter_regressionsgeraden_sw.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-by-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss Unteres Remstal": {
+      "land": "BW",
+      "email": "gutachterausschuss@fellbach.de",
+      "quelle_url": "https://www.fellbach.de/ceasy/resource/?id=7663&download=1",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-swf-ernte-20261028d-bw.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss Vaihingen an der Enz und Umgebung": {
+      "land": "BW",
+      "email": "gutachterausschuss@vaihingen.de",
+      "quelle_url": "https://www.vaihingen.de/fileadmin/Dateien/Dateien/Bodenrichtwerte/Bodenrichtwerte_2025/Sonstiges/2023-2024_EFH_ZFH.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-by-bw-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss Wutöschingen": {
+      "land": "BW",
+      "email": null,
+      "anschrift": "Gemeinde Wutöschingen, Kirchstraße 5, 79793 Wutöschingen",
+      "webseite": "https://www.wutoeschingen.de/",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Gemeindeseite verlinkt keine Gutachterausschuss-Seite; Kontakt nur bei Drittportal (ohne E-Mail).",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Zweckverband Gemeinsamer Gutachterausschuss Bottwartal und Umgebung": {
+      "land": "BW",
+      "email": "gutachter@gabottwartal.de",
+      "telefon": "07148 31-504",
+      "anschrift": "Brunnengasse 6, 71723 Großbottwar",
+      "webseite": "https://www.gutachterausschuss-bottwartal.de/",
+      "kontaktformular_url": "https://www.gutachterausschuss-bottwartal.de/ansprechpartner-kontakt/",
+      "quelle_url": "https://www.gutachterausschuss-bottwartal.de/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Zweckverband Gemeinsamer Gutachterausschuss im Enzkreis (Geschäftsstelle Mühlacker)": {
+      "land": "BW",
+      "email": "Gutachter@gua-enzkreis.de",
+      "telefon": "07041 / 98692-0",
+      "anschrift": "Bahnhofstr. 13, 75417 Mühlacker",
+      "webseite": "https://www.gutachterausschuss-enzkreis.de/",
+      "quelle_url": "https://www.gutachterausschuss-enzkreis.de/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Aichach-Friedberg": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-aic-fdb.de",
+      "telefon": "08251 92-313",
+      "anschrift": "Münchener Str. 9, 86551 Aichach",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Altötting": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-aoe.de",
+      "telefon": "08671 502-204",
+      "anschrift": "Landratsamt Altötting, Bahnhofstraße 38, 84503 Altötting",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/altoetting",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/altoetting",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Amberg": {
+      "land": "BY",
+      "email": "gutachterausschuss@amberg.de",
+      "telefon": "(+49) 9621 10-1477",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/amberg",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/amberg",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Amberg-Sulzbach": {
+      "land": "BY",
+      "email": "gutachterausschuss@amberg-sulzbach.de",
+      "webseite": "https://www.kreis-as.de/Bauen-Gewerbe/Bauen-und-Wohnen/Gutachterausschuss/",
+      "quelle_url": "https://www.kreis-as.de/Bauen-Gewerbe/Bauen-und-Wohnen/Gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Ansbach": {
+      "land": "BY",
+      "email": "gutachterausschuss@ansbach.de",
+      "telefon": "0981 51-339",
+      "anschrift": "Nürnberger Str. 32, 91522 Ansbach",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Registereintrag umfasst Stadt UND Landkreis (AGS beider); email = kreisfreie Stadt, email_landkreis = Landkreis",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "email_landkreis": "gaa@landratsamt-ansbach.de",
+      "telefon_landkreis": "0981 468-1052",
+      "anschrift_landkreis": "Crailsheimstr. 1, 91522 Ansbach",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Aschaffenburg": {
+      "land": "BY",
+      "email": "gutachterausschuss@aschaffenburg.de",
+      "anschrift": "Rathaus, Dalbergstraße 15, Zi. 618, 63739 Aschaffenburg",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/aschaffenburg",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/aschaffenburg",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Augsburg": {
+      "land": "BY",
+      "email": "bodenrichtwert@augsburg.de",
+      "telefon": "(0821) 324 - 9364",
+      "anschrift": "Maximilianstraße 6a, 86150 Augsburg",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/augsburg",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/augsburg",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Kontakt des Gutachterausschusses der kreisfreien Stadt Augsburg; eine Quelle unseres Satzes ist eine Leseprobe des LANDKREISES Augsburg – Zuordnung prüfen",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Bad Kissingen": {
+      "land": "BY",
+      "email": "gutachterausschuss@kg.de",
+      "telefon": "0971 801-4162",
+      "anschrift": "Obere Marktstr. 6, 97688 Bad Kissingen",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Bad Tölz-Wolfratshausen": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-toelz.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/bad-toelz",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/bad-toelz",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Bamberg": {
+      "land": "BY",
+      "email": "gutachterausschuss@stadt.bamberg.de",
+      "telefon": "0951 87-1616",
+      "anschrift": "Untere Sandstraße 34, 96049 Bamberg",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Registereintrag umfasst Stadt UND Landkreis (AGS beider); email = kreisfreie Stadt, email_landkreis = Landkreis",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "email_landkreis": "gutachterausschuss@lra-ba.bayern.de",
+      "telefon_landkreis": "0951 85-406",
+      "anschrift_landkreis": "Ludwigstr. 23, 96052 Bamberg",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Bayreuth": {
+      "land": "BY",
+      "email": "Gutachtergeschaeftsstelle@Stadt.Bayreuth.de",
+      "telefon": "0921 25-1462",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/bayreuth",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/bayreuth",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Geschäftsstelle der Stadt Bayreuth (BORIS-Bayern); falls das Register den Landkreis meint, abweichend",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Berchtesgadener Land": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-bgl.de",
+      "anschrift": "Landratsamt Berchtesgadener Land, Salzburger Straße 64, 83435 Bad Reichenhall",
+      "webseite": "https://www.lra-bgl.de/lw/bauen-wohnen/gutachterausschuss/auskunft-ueber-bodenrichtwerte/",
+      "quelle_url": "https://www.lra-bgl.de/lw/bauen-wohnen/gutachterausschuss/auskunft-ueber-bodenrichtwerte/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Cham": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra.landkreis-cham.de",
+      "telefon": "+49 (9971) 78-377",
+      "anschrift": "Landratsamt Cham, Rachelstraße 6, 93413 Cham",
+      "webseite": "https://www.landkreis-cham.de/service-beratung/gutachterausschuss/",
+      "quelle_url": "https://www.landkreis-cham.de/service-beratung/gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Coburg": {
+      "land": "BY",
+      "email": "gutachterausschuss@coburg.de",
+      "telefon": "09561 89-1027",
+      "anschrift": "Steingasse 18, 96450 Coburg",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Registereintrag umfasst Stadt UND Landkreis (AGS beider); email = kreisfreie Stadt, email_landkreis = Landkreis",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "email_landkreis": "gutachterausschuss@landkreis-coburg.de",
+      "telefon_landkreis": "09561 514-4101",
+      "anschrift_landkreis": "Lauterer Str. 60, 96450 Coburg",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Dachau": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-dah.bayern.de",
+      "webseite": "https://www.landratsamt-dachau.de/bauen-wohnen-gewerbe/bauen/gutachterausschuss/",
+      "quelle_url": "https://www.landratsamt-dachau.de/bauen-wohnen-gewerbe/bauen/gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Deggendorf": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-deg.bayern.de",
+      "telefon": "0991 3100-337",
+      "anschrift": "Herrenstr. 18, 94469 Deggendorf",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Dillingen a.d.Donau": {
+      "land": "BY",
+      "email": "wohnungsbau@landratsamt.dillingen.de",
+      "telefon": "09071 51-0",
+      "anschrift": "Landratsamt Dillingen a.d.Donau, Große Allee 24, 89407 Dillingen a.d.Donau",
+      "webseite": "https://www.landkreis-dillingen.de/",
+      "quelle_url": "https://www.landkreis-dillingen.de/aktuelles-kurzinfos/presseberichte/neue-bodenrichtwerte-zum-stichtag-01-01-2026-liegen-vor",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Pressemitteilung 02.06.2026 nennt dieses Postfach für Bestellungen bei der Geschäftsstelle (Marktbericht, schriftliche Auskünfte); kein gutachterausschuss@-Postfach auf amtlicher Seite belegt.",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Dingolfing-Landau": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-dingolfing-landau.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/dingolfing",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/dingolfing",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Donau-Ries": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-donau-ries.de",
+      "webseite": "https://www.donau-ries.de/bauen-wohnen/bauwesen/gutachterausschuss",
+      "quelle_url": "https://www.donau-ries.de/bauen-wohnen/bauwesen/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Ebersberg": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-ebe.de",
+      "telefon": "08092 823-140",
+      "anschrift": "Eichthalstr. 5, 85560 Ebersberg",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Eichstätt": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-ei.bayern.de",
+      "telefon": "08421 70-2402",
+      "anschrift": "Landratsamt Eichstätt, Residenzplatz 1, 85072 Eichstätt",
+      "webseite": "https://www.landkreis-eichstaett.de/buergerservice/themen/bauwesen-und-denkmalschutz/gutachterausschuss",
+      "quelle_url": "https://www.landkreis-eichstaett.de/buergerservice/themen/bauwesen-und-denkmalschutz/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Erding": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-ed.de",
+      "telefon": "08122/58-1554",
+      "anschrift": "Alois-Schießl-Platz 2, 85435 Erding",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/erding",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/erding",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Erlangen": {
+      "land": "BY",
+      "email": "gutachterausschuss@stadt.erlangen.de",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-swf-by-2026-sperren.json (Feld unvollstaendig_grund)"
+    },
+    "Gutachterausschuss für Grundstückswerte Erlangen-Höchstadt": {
+      "land": "BY",
+      "email": "gutachterausschuss@erlangen-hoechstadt.de",
+      "webseite": "https://www.erlangen-hoechstadt.de/buergerservice/a-bis-z/gutachterausschuss-bodenrichtwerte-grundstueckswerte-grundstuecksmarktbericht/",
+      "quelle_url": "https://www.erlangen-hoechstadt.de/buergerservice/a-bis-z/gutachterausschuss-bodenrichtwerte-grundstueckswerte-grundstuecksmarktbericht/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Forchheim": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-fo.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/forchheim",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/forchheim",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Landratsamt Forchheim (Landkreis)",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Freising": {
+      "land": "BY",
+      "email": "gutachterausschuss@kreis-fs.de",
+      "telefon": "08161 600 344 00",
+      "anschrift": "Landshuter Str. 31, 85356 Freising",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Fürstenfeldbruck": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-ffb.bayern.de",
+      "quelle_url": "https://www.lra-ffb.de/fileadmin/user_upload/lra-ffb/pdf/2/21/2023_WertDaten_Rechner_FFB_-_GF_EFH_Leseprobe.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-by-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte Fürth": {
+      "land": "BY",
+      "email": "gutachterausschuss@fuerth.de",
+      "telefon": "0911 974-3352",
+      "anschrift": "Hirschenstraße 2, 90762 Fürth",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/fuerth",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/fuerth",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Garmisch-Partenkirchen": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-gap.de",
+      "telefon": "08821 751-247",
+      "anschrift": "Olympiastr. 10, 82467 Garmisch-Partenkirchen",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "quelle_url_2": "https://www.boris-bayern.de/gutachterausschuss/garmisch",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Günzburg": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-guenzburg.de",
+      "telefon": "08221 95-325",
+      "anschrift": "Krankenhausstraße 36, 89312 Günzburg",
+      "webseite": "https://www.landkreis-guenzburg.de/amt-und-verwaltung/bauen-und-wohnen/gutachterausschuss/",
+      "quelle_url": "https://www.landkreis-guenzburg.de/amt-und-verwaltung/bauen-und-wohnen/gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Haßberge": {
+      "land": "BY",
+      "email": null,
+      "telefon": "09521 27-0",
+      "anschrift": "Landratsamt Haßberge, Am Herrenhof 1, 97437 Haßfurt",
+      "webseite": "https://www.hassberge.de/buergerservice/planen-bauen-wohnen/gutachterausschuss.html",
+      "quelle_url": "https://www.hassberge.de/buergerservice/planen-bauen-wohnen/gutachterausschuss.html",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Seite nennt nur die allgemeine Adresse post@hassberge.de des Landratsamts, keine eigene der (mit Landkreis Schweinfurt gemeinsamen) Geschäftsstelle; gutachterausschuss@hassberge.de nur auf Drittportal",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Hof": {
+      "land": "BY",
+      "email": "gutachterausschuss@stadt-hof.de",
+      "telefon": "09281/ 815 1512",
+      "anschrift": "Karolinenstraße 17, 95028 Hof",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/hof",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/hof",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Gutachterausschuss der Stadt Hof (BORIS-Eintrag hof, = unsere Bestell-URL)",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-frg.de",
+      "quelle_url": "https://www.freyung-grafenau.de/leben-und-wohnen/gutachterausschuss/sachwertfaktoren",
+      "gelesen_am": null,
+      "herkunft": "Registersatz lzs-swf-by-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim": {
+      "land": "BY",
+      "email": "gutachterausschuss@kreis-nea.de",
+      "quelle_url": "https://www.kreis-nea.de/behoerdenwegweiser-a-z/leistung/grundstuecksmarktbericht-bestellung",
+      "gelesen_am": null,
+      "herkunft": "Registersatz lzs-swf-by-2026.json (Feld unvollstaendig_grund)"
+    },
+    "Gutachterausschuss für Grundstückswerte Ingolstadt": {
+      "land": "BY",
+      "email": "gutachterausschuss@ingolstadt.de",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-swf-by-2026-sperren.json (Feld unvollstaendig_grund)"
+    },
+    "Gutachterausschuss für Grundstückswerte Kaufbeuren": {
+      "land": "BY",
+      "email": "gutachterausschuss@kaufbeuren.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/kaufbeuren",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/kaufbeuren",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Kelheim": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-kelheim.de",
+      "telefon": "09441 207-4260",
+      "anschrift": "Donaupark 12, 93309 Kelheim",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Kempten (Allgäu)": {
+      "land": "BY",
+      "email": "gutachterausschuss@kempten.de",
+      "telefon": "0831 2525-6027",
+      "anschrift": "Kronenstraße 8, 87435 Kempten (Allgäu)",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/kempten",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/kempten",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Kitzingen": {
+      "land": "BY",
+      "email": null,
+      "webseite": "https://www.kitzingen.de/digitales-buergerbuero/bauamt-gutachten-wohnraumfoerderung-zuschuesse-denkmalpflege/bauen-und-planen-gutachterausschuss/gutachterausschuss/",
+      "quelle_url": "https://www.kitzingen.de/digitales-buergerbuero/bauamt-gutachten-wohnraumfoerderung-zuschuesse-denkmalpflege/bauen-und-planen-gutachterausschuss/gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "amtliche Seite nennt nur persönliche Adressen und lra@kitzingen.de; gutachterausschuss@kitzingen.de nur auf Drittportal",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Kronach": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-kc.bayern.de",
+      "telefon": "09261 678-247",
+      "webseite": "https://www.landkreis-kronach.de/buergerservice-landratsamt/behoerdenwegweiser/?gutachterausschuss-geschaeftsstelle=&orga=8b02d55e9e856b4fce29906ab07af894",
+      "quelle_url": "https://www.landkreis-kronach.de/aktuelles/meldungen/neue-bodenrichtwerte-fuer-den-landkreis-beschlossen/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Kulmbach": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-kulmbach.de",
+      "telefon": "09221 707-433",
+      "anschrift": "Konrad-Adenauer-Str. 5, 95326 Kulmbach",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Landsberg am Lech": {
+      "land": "BY",
+      "email": "gutachterausschuss@LRA-LL.bayern.de",
+      "telefon": "08191 129-0",
+      "anschrift": "Von-Kühlmann-Str. 15, 86899 Landsberg am Lech",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/landsberg-lkr",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/landsberg-lkr",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Landshut": {
+      "land": "BY",
+      "email": "gutachterausschuss@landshut.de",
+      "anschrift": "Luitpoldstraße 27, 84034 Landshut",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/landshut",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/landshut",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Gutachterausschuss im Bereich der kreisfreien Stadt Landshut (nicht Landkreis)",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Lichtenfels": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-lichtenfels.de",
+      "anschrift": "Landratsamt Lichtenfels",
+      "webseite": "https://www.lkr-lif.de/landratsamt/bauwesen/bauamt/gutachterausschuss-fuer-grundstueckswerte-bodenrichtwerte/index.html",
+      "quelle_url": "https://www.lkr-lif.de/landratsamt/bauwesen/bauamt/gutachterausschuss-fuer-grundstueckswerte-bodenrichtwerte/index.html",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Lindau (Bodensee)": {
+      "land": "BY",
+      "email": null,
+      "telefon": "08382 270-0",
+      "anschrift": "Landratsamt Lindau (Bodensee), Bregenzer Straße 35, 88131 Lindau",
+      "webseite": "https://www.landkreis-lindau.de/Schnellnavigation/Startseite/Bodenrichtwerte-Auskunft.php?object=tx,2562.2.1&ModID=10&FID=2562.135.1&NavID=2562.1&La=1&ort=",
+      "kontaktformular_url": "https://www.landkreis-lindau.de/Schnellnavigation/Startseite/Bodenrichtwerte-Auskunft.php?object=tx,2562.2.1&ModID=10&FID=2562.135.1&NavID=2562.1&La=1&ort=",
+      "quelle_url": "https://www.landkreis-lindau.de/Schnellnavigation/Startseite/Bodenrichtwerte-Auskunft.php?object=tx,2562.2.1&ModID=10&FID=2562.135.1&NavID=2562.1&La=1&ort=",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Offizielle Seite nennt als zuständige Stelle nur bauamt@landkreis-lindau.de (Bauwesen allgemein) plus Online-Formular; gutachterausschuss@landkreis-lindau.de nur auf Drittseite",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Main-Spessart": {
+      "land": "BY",
+      "email": "gutachterausschuss@lramsp.de",
+      "telefon": "09353 793-1264",
+      "anschrift": "Marktplatz 8, 97753 Karlstadt",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Memmingen": {
+      "land": "BY",
+      "email": null,
+      "telefon": "08331 850-2500",
+      "anschrift": "Stadt Memmingen, Schlossergasse 1 (Welfenhaus), 87700 Memmingen",
+      "webseite": "https://www.memmingen.de/digitales-amt/anliegen-a-z/dienstleistung/show/gutachterausschuss.html",
+      "quelle_url": "https://www.memmingen.de/digitales-amt/anliegen-a-z/dienstleistung/show/gutachterausschuss.html",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Amtliche Seite nennt nur persönliche Adressen der Sachbearbeiter und stadt@memmingen.de (Rathaus allgemein). gutachterausschuss@memmingen.de steht nur bei einem Drittportal und angeblich im Bild-PDF der Marktübersicht (nicht maschinenlesbar) - unbelegt.",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Miesbach": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-mb.bayern.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/miesbach",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/miesbach",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Miltenberg": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-mil.de",
+      "telefon": "09371 501-173",
+      "webseite": "https://www.landkreis-miltenberg.de/themen/bauen-und-planen/gutachterausschuss.html",
+      "quelle_url": "https://www.landkreis-miltenberg.de/themen/bauen-und-planen/gutachterausschuss.html",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Mühldorf a.Inn": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-mue.de",
+      "telefon": "08631 699-459",
+      "anschrift": "Töginger Str. 18, 84453 Mühldorf am Inn",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte München": {
+      "land": "BY",
+      "email": "gutachterausschuss@muenchen.de",
+      "telefon": "089 233-787378",
+      "anschrift": "Marsstraße 22, 80335 München",
+      "webseite": "https://stadt.muenchen.de/infos/gutachterausschussmuenchen.html",
+      "quelle_url": "https://stadt.muenchen.de/infos/impressum-datenschutz-gaa.html",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Landeshauptstadt München. Der Landkreis München hat einen eigenen Ausschuss: gutachterausschuss@lra-m.bayern.de, Chiemgaustr. 109, 81549 München (https://www.boris-bayern.de/gutachterausschuss/muenchen-lkr) - prüfen, welcher im Register gemeint ist.",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte München, Landeshauptstadt": {
+      "land": "BY",
+      "email": "gutachterausschuss@muenchen.de",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-swf-by-2026-sperren.json (Feld unvollstaendig_grund)"
+    },
+    "Gutachterausschuss für Grundstückswerte Neu-Ulm": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-nu.de",
+      "webseite": "https://www.landkreis-nu.de/de/Service-Verwaltung/Buergerservice-A-Z/Dienstleistungen-A-Z/Dienstleistung?view=publish&item=service&id=2728",
+      "quelle_url": "https://www.landkreis-nu.de/de/Service-Verwaltung/Buergerservice-A-Z/Dienstleistungen-A-Z/Dienstleistung?view=publish&item=service&id=2728",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "auf der Dienstleistungsseite des Landratsamts als gutachterausschuss(at)landkreis-nu.de",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Neuburg-Schrobenhausen": {
+      "land": "BY",
+      "email": "gutachterausschuss@neuburg-schrobenhausen.de",
+      "telefon": "08431 57-0",
+      "webseite": "https://neuburg-schrobenhausen.de/B%C3%BCrgerservice/Fachbereiche/Bauwesen-Umweltschutz/Bauamt/Gutachterausschuss/",
+      "quelle_url": "https://neuburg-schrobenhausen.de/B%C3%BCrgerservice/Fachbereiche/Bauwesen-Umweltschutz/Bauamt/Gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Neumarkt i.d.OPf.": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-neumarkt.de",
+      "telefon": "09181 470-195",
+      "anschrift": "Nürnberger Str. 1, 92318 Neumarkt",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Neustadt a.d.Waldnaab": {
+      "land": "BY",
+      "email": "gutachterausschuss@neustadt.de",
+      "telefon": "09602 79-5030",
+      "anschrift": "Landratsamt Neustadt a.d.Waldnaab, Am Hohlweg 2, 92660 Neustadt a.d.Waldnaab",
+      "webseite": "https://www.neustadt.de/landratsamt/abteilungen-und-sachgebiete/gutachterausschuss/",
+      "quelle_url": "https://www.neustadt.de/landratsamt/abteilungen-und-sachgebiete/gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Nürnberg": {
+      "land": "BY",
+      "email": "geo-kb@stadt.nuernberg.de",
+      "quelle_url": "https://www.nuernberg.de/imperia/md/gutachterausschuss/dokumente/25v400_gmb_nurnberg_2025_leseprobe.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-by-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte Nürnberger Land": {
+      "land": "BY",
+      "email": "gaa-boris@nuernberger-land.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/nuernberger-land",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/nuernberger-land",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Oberallgäu": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-oa.bayern.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/oberallgaeu",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/oberallgaeu",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Ostallgäu": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-oal.bayern.de",
+      "telefon": "08342 911-457",
+      "anschrift": "Schwabenstr. 11, 87616 Marktoberndorf",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Passau": {
+      "land": "BY",
+      "email": "gutachterausschuss@passau.de",
+      "telefon": "0851 396-402",
+      "anschrift": "Rathausplatz 3, 94032 Passau",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Registereintrag umfasst Stadt UND Landkreis (AGS beider); email = kreisfreie Stadt, email_landkreis = Landkreis",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "email_landkreis": "gutachterausschuss@landkreis-passau.de",
+      "telefon_landkreis": "0851 397-289",
+      "anschrift_landkreis": "Domplatz 11, 94032 Passau",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Pfaffenhofen a.d.Ilm": {
+      "land": "BY",
+      "email": "gutachterausschuss@landratsamt-paf.de",
+      "telefon": "08441 27-177",
+      "anschrift": "Landratsamt Pfaffenhofen a.d. Ilm, Hauptplatz 22, 85276 Pfaffenhofen a.d. Ilm",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/pfaffenhofen",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/pfaffenhofen",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Regen": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra.landkreis-regen.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/regen",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/regen",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Regensburg": {
+      "land": "BY",
+      "email": "gutachterausschuss@regensburg.de",
+      "telefon": "0941 507-2637",
+      "anschrift": "Stadt Regensburg, Bauordnungsamt, Geschäftsstelle des Gutachterausschusses",
+      "webseite": "https://www.regensburg.de/",
+      "quelle_url": "https://www.regensburg.de/sixcms/media.php/98/22_2024_amtsblatt.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Gilt für die kreisfreie Stadt Regensburg (Amtsblatt 22/2024). Der Landkreis Regensburg hat einen eigenen Ausschuss - prüfen, welcher im Register gemeint ist.",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Rhön-Grabfeld": {
+      "land": "BY",
+      "email": null,
+      "telefon": "09771 94-0",
+      "anschrift": "Landratsamt Rhön-Grabfeld, Spörleinstraße 11, 97616 Bad Neustadt a. d. Saale",
+      "webseite": "https://www.rhoen-grabfeld.de/themen/wohnen/gutachterausschuss-bodenrichtwerte",
+      "quelle_url": "https://www.rhoen-grabfeld.de/themen/wohnen/gutachterausschuss-bodenrichtwerte",
+      "gelesen_am": "2026-10-28",
+      "nicht_gefunden": "Seite nennt nur info@rhoen-grabfeld.de als allgemeine Landratsamtsadresse, nicht ausdrücklich als Geschäftsstelle",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Rosenheim": {
+      "land": "BY",
+      "email": "gutachterausschuss@rosenheim.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/rosenheim",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/rosenheim",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "BORIS-Eintrag rosenheim (Stadt Rosenheim, = unsere Bestell-URL); der Landkreis hat einen eigenen Eintrag rosenheim-lkr",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Roth": {
+      "land": "BY",
+      "email": "gutachterausschuss@landratsamt-roth.de",
+      "telefon": "09171 81-1136",
+      "anschrift": "Weinbergweg 1, 91154 Roth",
+      "webseite": "https://www.landratsamt-roth.de/themen/bauen-wohnen/bauen-eigenheim/gutachterausschuss",
+      "quelle_url": "https://www.landratsamt-roth.de/themen/bauen-wohnen/bauen-eigenheim/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Bayern-Marktbericht 2026 nennt hier nur eine persönliche Adresse; das Funktionspostfach steht auf der Seite des Landratsamts",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Rottal-Inn": {
+      "land": "BY",
+      "email": "gaa@rottal-inn.de",
+      "telefon": "08561 20-0",
+      "anschrift": "Landratsamt Rottal-Inn, Ringstraße 4-7, 84347 Pfarrkirchen",
+      "webseite": "https://www.rottal-inn.de/buergerservice-formulare/bauen-wohnen/gutachterausschuss/",
+      "quelle_url": "https://www.rottal-inn.de/buergerservice-formulare/bauen-wohnen/gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Schwabach": {
+      "land": "BY",
+      "email": "gutachterausschuss@schwabach.de",
+      "webseite": "https://www.schwabach.de/de/?id=484:gutachterausschuss",
+      "quelle_url": "https://www.schwabach.de/de/?id=484:gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "auf der Seite per Joomla-Mailschutz (Base64) eingebettet, entschlüsselt",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Schwandorf": {
+      "land": "BY",
+      "email": "Gutachterausschuss@lra-sad.de",
+      "webseite": "https://www.landkreis-schwandorf.de/Wirtschaft-Arbeit-Regionales/Gutachterausschuss.php?object=tx,3300.2&ModID=10&FID=3300.78.1&ort=1913.19",
+      "quelle_url": "https://www.landkreis-schwandorf.de/Wirtschaft-Arbeit-Regionales/Gutachterausschuss.php?object=tx,3300.2&ModID=10&FID=3300.78.1&ort=1913.19",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Schweinfurt": {
+      "land": "BY",
+      "email": "gutachterausschuss@schweinfurt.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/schweinfurt",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/schweinfurt",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Adresse der Stadt Schweinfurt laut BORIS-Bayern; Stadt/Landkreis prüfen",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Starnberg": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-starnberg.de",
+      "telefon": "08151 148-421",
+      "anschrift": "Strandbadstr. 2, 82319 Starnberg",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Straubing": {
+      "land": "BY",
+      "email": "gutachterausschuss@straubing.de",
+      "telefon": "09421 944-60420",
+      "anschrift": "Theresienplatz 20, 94315 Straubing",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/straubing",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/straubing",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Straubing-Bogen": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-straubing-bogen.de",
+      "anschrift": "Leutnerstraße 15, 94315 Straubing",
+      "webseite": "https://www.landkreis-straubing-bogen.de/",
+      "quelle_url": "https://www.landkreis-straubing-bogen.de/media/17491/vorbemerkungen-bodenrichtwerte.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Tirschenreuth": {
+      "land": "BY",
+      "email": "gutachterausschuss@tirschenreuth.de",
+      "webseite": "https://www.kreis-tir.de/landratsamt/bauen-und-wohnen-1/gutachterausschuss",
+      "quelle_url": "https://www.kreis-tir.de/landratsamt/bauen-und-wohnen-1/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Traunstein": {
+      "land": "BY",
+      "email": "gutachterausschuss@traunstein.bayern",
+      "quelle_url": "https://www.traunstein.com/assets/gutachterausschuss/immobilienrechner_info.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-by-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte Unterallgäu": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra.unterallgaeu.de",
+      "telefon": "08261 995-631",
+      "anschrift": "Bad Wörishofer Str. 33, 87719 Mindelheim",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Weiden i.d.OPf.": {
+      "land": "BY",
+      "email": "gutachterausschuss@weiden.de",
+      "telefon": "0961 81-6204",
+      "anschrift": "Neues Rathaus, Stadtplanungsamt, Dr.-Pfleger-Str. 15, 92637 Weiden i.d.OPf.",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/weiden",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/weiden",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Weilheim-Schongau": {
+      "land": "BY",
+      "email": "gutachterausschuss@lra-wm.bayern.de",
+      "webseite": "https://www.boris-bayern.de/gutachterausschuss/weilheim",
+      "quelle_url": "https://www.boris-bayern.de/gutachterausschuss/weilheim",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Weißenburg-Gunzenhausen": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-wug.de",
+      "telefon": "09141 902-334",
+      "anschrift": "Bahnhofstraße 2 (Gebäude A), 91781 Weißenburg i. Bay.",
+      "webseite": "https://www.landkreis-wug.de/Bauen-und-Wohnen/Gutachterausschuss/",
+      "quelle_url": "https://www.landkreis-wug.de/Bauen-und-Wohnen/Gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Wunsiedel i.Fichtelgebirge": {
+      "land": "BY",
+      "email": "gutachterausschuss@landkreis-wunsiedel.de",
+      "telefon": "09232 80-443",
+      "anschrift": "Jean-Paul-Str. 9, 95632 Wunsiedel",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte Würzburg": {
+      "land": "BY",
+      "email": "gutachterausschuss@stadt.wuerzburg.de",
+      "telefon": "0931 37-3309",
+      "anschrift": "Veitshöchheimer Straße 1, 97080 Würzburg",
+      "webseite": "https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/",
+      "quelle_url": "https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Registereintrag umfasst Stadt UND Landkreis (AGS beider); email = kreisfreie Stadt, email_landkreis = Landkreis",
+      "quelle_stelle": "Kapitel 13 \"Kontaktdaten der Gutachterausschüsse\", Immobilienmarktbericht Bayern 2026 des Oberen Gutachterausschusses, S. 201-203",
+      "quelle_url_2": "https://www.boris-bayern.de/gutachterausschuss/wuerzburg",
+      "email_landkreis": "gutachterausschuss@lra-wue.bayern.de",
+      "telefon_landkreis": "0931 8003-5420",
+      "anschrift_landkreis": "Zeppelinstr. 15, 97074 Würzburg",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen)": {
+      "land": "HB",
+      "email": "gutachterausschuss@geo.bremen.de",
+      "quelle_url": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Auszug_Grundst%C3%BCcksmarktbericht%20Bremen%202026_gesichert.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-be-bb-hh-hb-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven)": {
+      "land": "HB",
+      "email": "gutachterausschuss@magistrat.bremerhaven.de",
+      "quelle_url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-be-bb-hh-hb-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landeshauptstadt Wiesbaden": {
+      "land": "HE",
+      "email": "gutachterausschuss@wiesbaden.de",
+      "quelle_url": "https://www.wiesbaden.de/vv/medien/merk/66/Immobilienmarktbericht-2026.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises": {
+      "land": "HE",
+      "email": "gs-gaa-afb-hp@hvbg.hessen.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe": {
+      "land": "HE",
+      "email": "gutachterausschuss@bad-homburg.de",
+      "quelle_url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606002-badhomburg-2026.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel": {
+      "land": "HE",
+      "email": "gutachterausschuss@kassel.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Marburg": {
+      "land": "HE",
+      "email": "gutachterausschuss@marburg-stadt.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main": {
+      "land": "HE",
+      "email": "gutachterausschuss@offenbach.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/IMB%20regional%202025",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-ernte-20261028b-he.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen": {
+      "land": "HE",
+      "email": "gutachterausschuss@giessen.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Wissenschaftsstadt Darmstadt": {
+      "land": "HE",
+      "email": "gutachterausschuss@darmstadt.de",
+      "weitere_emails": [
+        "info@gaa-darmstadt.de"
+      ],
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-he.json (Feld unvollstaendig_grund)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg": {
+      "land": "HE",
+      "email": "gs-gaa-afb-lm@hvbg.hessen.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises": {
+      "land": "HE",
+      "email": "gs-gaa-afb-fd@hvbg.hessen.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau": {
+      "land": "HE",
+      "email": "gs-gaa-afb-bd@hvbg.hessen.de",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-he-2026.json (Feld warum_kein_wert)"
+    },
+    "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH)": {
+      "land": "HE",
+      "email": "info.zggh@hvbg.hessen.de",
+      "quelle_url": "https://www.buck-vermessung.de/wp-content/uploads/2026/01/immobilienmarktbericht-hessen-2025.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-laender-2026.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Grundstückswerte in Hamburg": {
+      "land": "HH",
+      "email": "gutachterausschuss@gv.hamburg.de",
+      "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+      "gelesen_am": "2026-10-19",
+      "herkunft": "Registersatz swf-hh-2026-sperren.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim": {
+      "land": "MV",
+      "email": "gutachterausschuss@kreis-lup.de",
+      "quelle_url": "https://www.geocms.com/geoshop-lk-ludwigslust-parchim/de/mod/2,8,810/ajax/1/GetProduct/con=1125,810&method=store/GMB_2025.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-ost-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte": {
+      "land": "MV",
+      "email": "gaa@lk-seenplatte.de",
+      "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-mv-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg": {
+      "land": "MV",
+      "email": "gutachterausschuss@nordwestmecklenburg.de",
+      "telefon": "03841 3040-8-6270",
+      "anschrift": "Rostocker Straße 76, 23970 Wismar",
+      "webseite": "https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html",
+      "quelle_url": "https://shop.geoport-nwm.de/de/mod/1,33,200/ajax/1/GetProduct/con=420559,200&method=store/GMB_NWM_2026.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Rostock": {
+      "land": "MV",
+      "email": "gutachterausschuss@lkros.de",
+      "weitere_emails": [
+        "gaa@lkros.de"
+      ],
+      "quelle_url": "https://www.geocms.com/geoshop-lk-rostock/de/mod/2,50,830/ajax/1/GetProduct/con=205648,830&method=store/GMB_2026_LRO.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10-mv.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald": {
+      "land": "MV",
+      "email": "gutachterausschuss@kreis-vg.de",
+      "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/datei/download/id/128967,840/grundstuecksmarktbericht_2024.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10-mv.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen": {
+      "land": "MV",
+      "email": "gutachterausschuss@lk-vr.de",
+      "telefon": "03831 357-2818",
+      "anschrift": "Carl-Heydemann-Ring 67, 18437 Stralsund (Besucher: Tribseer Damm 1a)",
+      "webseite": "https://www.lk-vr.de/Kreisverwaltung/Kataster-und-Vermessung/Gutachterausschuss/",
+      "quelle_url": "https://www.lk-vr.de/Kreisverwaltung/Kataster-und-Vermessung/Gutachterausschuss/",
+      "gelesen_am": "2026-10-28",
+      "hinweis": "Drittportal nennt gaa@lk-vr.de - die amtliche Seite nennt gutachterausschuss@lk-vr.de.",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock": {
+      "land": "MV",
+      "email": "gutachterausschuss@rostock.de",
+      "quelle_url": "https://www.geocms.com/geoshop-rostock/de/mod/1,50,860/ajax/1/GetProduct/con=63767,860&method=store/grundstuecksmarktbericht-2026.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-ost-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin": {
+      "land": "MV",
+      "email": "gutachterausschuss@schwerin.de",
+      "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2026-Versand.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz swf-ernte-20261028-mv.json (Feld warum_kein_wert)"
+    },
+    "Oberer Gutachterausschuss für Grundstückswerte im Land Mecklenburg-Vorpommern": {
+      "land": "MV",
+      "email": "wertermittlung@laiv-mv.de",
+      "quelle_url": "https://www.laiv-mv.de/static/LAIV/Geoinformation/Dateien/Wertermittlung/LGMB_2025_Web.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-laender-2026.json (Feld geltungsbereich)"
+    },
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford": {
+      "land": "NW",
+      "email": "gutachterausschuss@kreis-herford.de",
+      "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_0_0531000_2026.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-nw-2026.json (Feld geltungsbereich)"
+    },
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Unna": {
+      "land": "NW",
+      "email": "gutachterausschuss@kreis-unna.de",
+      "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33200_2026.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz uk-wgfz-ernte-20261028b-nw.json (Feld geltungsbereich)"
+    },
+    "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn": {
+      "land": "NW",
+      "email": "gutachterausschuss@bonn.de",
+      "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz uk-flaeche-nw-nachernte-2026-10-27.json (Feld geltungsbereich)"
+    },
+    "Gutachterausschuss für Grundstückswerte der Landeshauptstadt Mainz": {
+      "land": "RP",
+      "alias": [
+        "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz"
+      ],
+      "email": "gutachterausschuss@stadt.mainz.de",
+      "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+      "gelesen_am": null,
+      "herkunft": "Registersatz swf-rp.json (Feld modellansaetze)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Kaiserslautern": {
+      "land": "RP",
+      "email": "gutachterausschuss@kaiserslautern.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://www.kaiserslautern.de/serviceportal/dl/032205/index.html.de",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "0631 365-2658",
+      "anschrift": "Willy-Brandt-Platz 1, Raum 1621, 67653 Kaiserslautern",
+      "webseite": "https://www.kaiserslautern.de/serviceportal/dl/032205/index.html.de"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Koblenz": {
+      "land": "RP",
+      "email": "gutachterausschuss@stadt.koblenz.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://www.koblenz.de/umwelt-und-planung/grundstuecke-und-geodaten/gutachterausschuss/grundstuecksmarktbericht/",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-rp-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Ludwigshafen": {
+      "land": "RP",
+      "email": "gutachterausschuss@ludwigshafen.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://www.ludwigshafen.de/buergernah/buergerservice/dienstleistungen-a-z/detail/services-detail/verkehrswertgutachten/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "0621 504-3296",
+      "anschrift": "Geschäftsstelle des Gutachterausschusses der Stadt Ludwigshafen am Rhein, Rheinuferstraße 9, 67061 Ludwigshafen",
+      "webseite": "https://www.ludwigshafen.de/buergernah/buergerservice/dienstleistungen-a-z/detail/services-detail/verkehrswertgutachten/"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Trier": {
+      "land": "RP",
+      "email": null,
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://gutachterausschuesse.rlp.de/fileadmin/gutachterausschuss/pdf/LGMB-2025_Online_1_3.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-ni-sh-rp-sl-2026.json (Feld zustaendige_stelle)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Worms": {
+      "land": "RP",
+      "email": "gutachterausschuss@worms.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://www.worms.de/neu-de-wAssets/docs/zukunft-gestalten/planen-und-bauen/gutachterausschuss/Auszug-GMB-2025.pdf",
+      "gelesen_am": "2026-10-27",
+      "herkunft": "Registersatz vgf-rp-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich Osteifel-Hunsrück": {
+      "land": "RP",
+      "email": "ga.oeh@vermkv.rlp.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://gutachterausschuesse.rlp.de/fileadmin/gutachterausschuss/pdf/grundstuecksmarktdaten/osteifel-hunsrueck/Info_Transaktionen_OEH-2024.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "webseite": "https://vermka-osteifel-hunsrueck.rlp.de/"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich Rheinhessen-Nahe": {
+      "land": "RP",
+      "email": "vermka-rhn@vermkv.rlp.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://gutachterausschuesse.rlp.de/fileadmin/gutachterausschuss/pdf/Datenschutzerklaerung_Stand_2026.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "06731/494-0",
+      "anschrift": "Ostdeutsche Straße 28, 55232 Alzey",
+      "webseite": "https://www.gutachterausschuesse.rlp.de/",
+      "hinweis": "Postfach des Vermessungs- und Katasteramts Rheinhessen-Nahe, das die Geschäftsstelle führt; dort ausdrücklich beim Gutachterausschuss genannt"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich Rheinpfalz": {
+      "land": "RP",
+      "email": "vermka-rpf@vermkv.rlp.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://gutachterausschuesse.rlp.de/fileadmin/gutachterausschuss/pdf/Datenschutzerklaerung_Stand_2026.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "06341 149-0",
+      "anschrift": "Pestalozzistraße 4, 76829 Landau in der Pfalz",
+      "webseite": "https://www.vermka-rheinpfalz.rlp.de"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich Westeifel-Mosel": {
+      "land": "RP",
+      "email": "vermka-wem@vermkv.rlp.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://gutachterausschuesse.rlp.de/fileadmin/gutachterausschuss/pdf/Datenschutzerklaerung_Stand_2026.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "06531 5017-0",
+      "anschrift": "Im Viertheil 24, 54470 Bernkastel-Kues",
+      "webseite": "https://www.vermka-westeifel-mosel.rlp.de"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich Westerwald-Taunus": {
+      "land": "RP",
+      "email": "ga.wwt@vermkv.rlp.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://gutachterausschuesse.rlp.de/fileadmin/gutachterausschuss/pdf/grundstuecksmarktdaten/westerwald-taunus/2026_Erlaeuterungen_zu_den_zonalen_Bodenrichtwerten_zum_Stichtag_01012026_03_2026.pdf",
+      "gelesen_am": "2026-10-16",
+      "herkunft": "Registersatz uk-flaeche-west-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Bereich Westpfalz": {
+      "land": "RP",
+      "email": "ga.wpf@vermkv.rlp.de",
+      "email_obere_stelle": "oga.rlp@vermkv.rlp.de",
+      "obere_stelle": "Oberer Gutachterausschuss Rheinland-Pfalz",
+      "quelle_url": "https://vermka-westpfalz.rlp.de/ueber-uns/aufgaben/wertermittlung",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "06331 5011-1150",
+      "anschrift": "Vermessungs- und Katasteramt Westpfalz, Bahnhofstraße 59, 66869 Kusel",
+      "webseite": "https://vermka-westpfalz.rlp.de/ueber-uns/aufgaben/wertermittlung"
+    },
+    "Oberer Gutachterausschuss für Grundstückswerte für den Bereich des Landes Rheinland-Pfalz": {
+      "land": "RP",
+      "email": "oga.rlp@vermkv.rlp.de",
+      "telefon": "0261 492-0",
+      "anschrift": "Von-Kuhl-Straße 49, 56070 Koblenz",
+      "webseite": "https://gutachterausschuesse.rlp.de/service/oberer-gutachterausschuss",
+      "quelle_url": "https://gutachterausschuesse.rlp.de/service/oberer-gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Nordfriesland": {
+      "land": "SH",
+      "email": "gutachterausschuss@nordfriesland.de",
+      "quelle_url": "https://www.nordfriesland.de/loadDocument.phtml?ObjSvrID=2271&ObjID=1937&ObjLa=1&Ext=PDF",
+      "gelesen_am": null,
+      "herkunft": "Registersatz vgf-sh-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Pinneberg": {
+      "land": "SH",
+      "email": "gutachterausschuss-pinneberg@lvermgeo.landsh.de",
+      "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaMUeb2025Pinneberg.pdf?__blob=publicationFile&v=2",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Registersatz lzs-ernte-20261028-sh.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Plön": {
+      "land": "SH",
+      "email": "gutachterausschuss.kreis_ploen@lvermgeo.landsh.de",
+      "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-ni-sh-rp-sl-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Rendsburg-Eckernförde": {
+      "land": "SH",
+      "email": "gutachterausschuss@kreis-rd.de",
+      "quelle_url": "https://www.kreis-rendsburg-eckernfoerde.de/bauen/gutachterausschuss",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-ni-sh-rp-sl-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Schleswig-Flensburg": {
+      "land": "SH",
+      "email": "gutachterausschuss@schleswig-flensburg.de",
+      "webseite": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/",
+      "quelle_url": "https://www.schleswig-flensburg.de/Navigation/Wirtschaft/Immobilienmarkt-/Immobilienmarktberichte/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Segeberg": {
+      "land": "SH",
+      "email": "gutachterausschuss@segeberg.de",
+      "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-ni-sh-rp-sl-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Steinburg": {
+      "land": "SH",
+      "email": "gutachterausschuss@steinburg.de",
+      "quelle_url": "https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html",
+      "gelesen_am": null,
+      "herkunft": "Registersatz vgf-sh-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Kreis Stormarn": {
+      "land": "SH",
+      "email": "ga@kreis-stormarn.de",
+      "quelle_url": "https://www.kreis-stormarn.de/lvw/forms/5/59/Marktbericht2024_Teil2.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-ni-sh-rp-sl-2026.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Kiel": {
+      "land": "SH",
+      "email": "gutachterausschuss@kiel.de",
+      "anschrift": "Andreas-Gayk-Straße 23-25, 24103 Kiel",
+      "webseite": "https://www.gutachterausschuss-kiel.de/",
+      "quelle_url": "https://www.gutachterausschuss-kiel.de/kontakt/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Stadt Flensburg": {
+      "land": "SH",
+      "email": "gutachterausschuss-flensburg@lvermgeo.landsh.de",
+      "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-st-th-sh-ni-2025.json (Feld warum_kein_wert)"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Stadt Neumünster": {
+      "land": "SH",
+      "email": "gutachterausschuss@neumuenster.de",
+      "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster",
+      "gelesen_am": null,
+      "herkunft": "Registersatz vgf-sh-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern": {
+      "land": "SL",
+      "email": "gutachter@merzig-wadern.de",
+      "email_obere_stelle": "zgga@lvgl.saarland.de",
+      "obere_stelle": "Zentrale Geschäftsstelle der Gutachterausschüsse Saarland",
+      "quelle_url": "https://www.merzig-wadern.de/Verwaltung-Politik/Gutachterausschuss/index.php?object=tx,2875.1&ModID=9&FID=697.236.1&NavID=2875.116&La=1",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "06861-80-2200",
+      "anschrift": "Bahnhofstraße 7, 66663 Merzig",
+      "webseite": "https://www.merzig-wadern.de/Verwaltung-Politik/Gutachterausschuss/index.php?object=tx,2875.1&ModID=9&FID=697.236.1&NavID=2875.116&La=1",
+      "hinweis": "Landesweit zusätzlich: Zentrale Geschäftsstelle zgga@lvgl.saarland.de (aus Eingabe, nicht neu geprüft)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen": {
+      "land": "SL",
+      "email": "gutachter@landkreis-neunkirchen.de",
+      "email_obere_stelle": "zgga@lvgl.saarland.de",
+      "obere_stelle": "Zentrale Geschäftsstelle der Gutachterausschüsse Saarland",
+      "quelle_url": "https://www.landkreis-neunkirchen.de/bauen-wohnen/gutachterausschuss",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "06824 906-5628",
+      "anschrift": "Wilhelm-Heinrich-Straße 36, 66564 Ottweiler",
+      "webseite": "https://www.landkreis-neunkirchen.de/bauen-wohnen/gutachterausschuss"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis": {
+      "land": "SL",
+      "email": "amt62@kreis-saarlouis.de",
+      "email_obere_stelle": "zgga@lvgl.saarland.de",
+      "obere_stelle": "Zentrale Geschäftsstelle der Gutachterausschüsse Saarland",
+      "quelle_url": "https://geoportal.saarland.de/grundsteuer/",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "+49 6831 444-552",
+      "anschrift": "Kaiser-Friedrich-Ring 31, 66740 Saarlouis",
+      "webseite": "https://geoportal.saarland.de/grundsteuer/",
+      "hinweis": "im Geoportal Saarland als E-Mail-Kontakt des Gutachterausschusses Landkreis Saarlouis verlinkt (Amt 62 der Kreisverwaltung). Die im Register genannte zgga@lvgl.saarland.de (Zentrale Geschäftsstelle) konnte nicht belegt werden, saarland.de antwortete 403"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel": {
+      "land": "SL",
+      "email": "gutachterausschuss@lkwnd.de",
+      "email_obere_stelle": "zgga@lvgl.saarland.de",
+      "obere_stelle": "Zentrale Geschäftsstelle der Gutachterausschüsse Saarland",
+      "quelle_url": "https://www.landkreis-st-wendel.de/bauen",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026",
+      "telefon": "06851 801-4550",
+      "webseite": "https://www.landkreis-st-wendel.de/bauen",
+      "hinweis": "Örtliche Geschäftsstelle beim Landkreis; zgga@lvgl.saarland.de aus der Eingabe ist die Zentrale Geschäftsstelle beim LVGL, hier nicht nachgeprüft (saarland.de antwortet 403)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken": {
+      "land": "SL",
+      "email": "gutachterausschuss@rvsbr.de",
+      "email_obere_stelle": "zgga@lvgl.saarland.de",
+      "obere_stelle": "Zentrale Geschäftsstelle der Gutachterausschüsse Saarland",
+      "quelle_url": "https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2022_Vollversion.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-ni-sh-rp-sl-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis": {
+      "land": "SL",
+      "email": "gutachterausschuss@saarpfalz-kreis.de",
+      "email_obere_stelle": "zgga@lvgl.saarland.de",
+      "obere_stelle": "Zentrale Geschäftsstelle der Gutachterausschüsse Saarland",
+      "quelle_url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/",
+      "gelesen_am": "2026-10-08",
+      "herkunft": "Registersatz vgf-sl.json (Feld lizenz_hinweis)"
+    },
+    "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken": {
+      "land": "SL",
+      "email": "vermessungsamt@saarbruecken.de",
+      "email_obere_stelle": "zgga@lvgl.saarland.de",
+      "obere_stelle": "Zentrale Geschäftsstelle der Gutachterausschüsse Saarland",
+      "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+      "gelesen_am": "2026-10-08",
+      "herkunft": "Registersatz vgf-sl.json (Feld lizenz_hinweis)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Erzgebirgskreis": {
+      "land": "SN",
+      "email": "gutachterausschuss@kreis-erz.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen": {
+      "land": "SN",
+      "email": "gutachterausschuss@lra-bautzen.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-th-st-sn-mv-2026.json (Feld zustaendige_stelle)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Görlitz": {
+      "land": "SN",
+      "email": "gutachterausschuss@kreis-gr.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Leipzig": {
+      "land": "SN",
+      "email": "gutachterausschuss@lk-l.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Meißen": {
+      "land": "SN",
+      "email": null,
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen": {
+      "land": "SN",
+      "email": "gutachterausschuss@landkreis-mittelsachsen.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen": {
+      "land": "SN",
+      "email": "gutachterausschuss@lra-nordsachsen.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge": {
+      "land": "SN",
+      "email": "gutachterausschuss@landratsamt-pirna.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-th-st-sn-mv-2026.json (Feld zustaendige_stelle)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau": {
+      "land": "SN",
+      "email": "gaa@landkreis-zwickau.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld bestell_url)"
+    },
+    "Gutachterausschuss für Grundstückswerte im Vogtlandkreis": {
+      "land": "SN",
+      "email": "gutachterausschuss@vogtlandkreis.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz swf-th-st-sn-mv-2026.json (Feld zustaendige_stelle)"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden": {
+      "land": "SN",
+      "email": "grundstueckswertermittlung@dresden.de",
+      "telefon": "0351 488-4071",
+      "anschrift": "Waisenhausstraße 14, 01069 Dresden",
+      "webseite": "https://www.dresden.de/gutachterausschuss",
+      "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz": {
+      "land": "SN",
+      "email": "gutachterausschuss@stadt-chemnitz.de",
+      "email_obere_stelle": "oga@geosn.sachsen.de",
+      "obere_stelle": "Oberer Gutachterausschuss Sachsen",
+      "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-th-st-sn-mv-2026.json (Feld formel_vorgemerkt)"
+    },
+    "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig": {
+      "land": "SN",
+      "email": "gutachterausschuss@leipzig.de",
+      "telefon": "0341 123-5072",
+      "webseite": "https://www.gutachterausschuss.leipzig.de",
+      "quelle_url": "https://www.gutachterausschuss.leipzig.de",
+      "gelesen_am": "2026-10-28",
+      "herkunft": "Recherche 28.10.2026"
+    },
+    "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt": {
+      "land": "ST",
+      "email": "service.lvermgeo@sachsen-anhalt.de",
+      "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/466710,501/liegzinss_tze_rohertragfaktoren_md.pdf",
+      "gelesen_am": "2026-10-05",
+      "herkunft": "Registersatz lzs-st-th-sh-ni-2025.json (Feld lizenz)"
+    },
+    "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera": {
+      "land": "TH",
+      "email": "gutachter.zeulenroda@tlbg.thueringen.de",
+      "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
+      "gelesen_am": "2026-10-21",
+      "herkunft": "Registersatz nachernte-2026-10b-th.json (Feld zustaendige_stelle)"
+    }
+  }
+}

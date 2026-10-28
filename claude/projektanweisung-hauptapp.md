@@ -42995,3 +42995,97 @@ Standbild `Dateien/Messe/Videos/Lindenallee-14/lindenallee-unterlagen_2026-10-28
 **Rest.** ffmpeg lief rund 10 s nach dem Start an → Intro aus der Aufnahme vom Nachmittag vorangestellt (7,1 s,
 gleicher Studio-Vorspann). Vertonung: 29 Clips wiederverwendet, 7 neu nötig (Zeilen 11, 12, 20, 21, 22, 26, 31,
 1.455 Zeichen); Fassung unter 8 min nur mit Inhaltsverlust (Wartetafeln während der KI-Lesung ~95 s).
+
+### v3017–v3017c, Videothek, Landing-Zahlen · Prod-Rollouts 28.10.2026 abends — Prod mit `044ded94`
+
+**Was.** v3017: Unterlagen nachreichen (Pilot-Analyse › Unterlagen & WEG, Import im Modus Ergänzen,
+bisherige Auswertung geht als Grundlage an `/ai/dokumente-auswerten`, Feld `aenderungen`), neue
+Dokumentarten `hausgeld` (Wirtschaftsplan/Hausgeldabrechnung) und `baulasten`; Wirtschaftsplan →
+hg_ul, hg_nul (inkl. Rücklage), weg_r – ETW aus Einzelplan oder Gesamtplan × MEA, ganzes Haus aus
+Gesamtplan; Steuer-Vorschläge als Importzeilen (`window.dpSteuerWert/dpSteuerSetzen`, tax.js):
+Hausverwaltung, nicht umlagefähige Kosten ohne Rücklage, Erhaltungsaufwand aus Sonderumlage und
+Rücklagen-Entnahme; Maßnahmen-Anteil fest gerechnet (`DpUnterlagen.anteil`). v3017a/b: Import-Fenster
+mit Einheit, Zeitraum, Jahr und Herkunft je Zeile („bisher im Objekt (Bewirtschaftung): 3.313 € / Jahr"),
+Aufschlüsselung von hg_nul, Klartext in den Dokument-Reitern. v3017c: Ernte d/e (nur Sperren: Trier,
+BW 761), Methodik länderneutral (Immobilienrichtwerte), Agent register-ernte: IRW in allen Ländern.
+landing-videothek-5 (Agent): Suche, 285 Kapitelmarken, kein Autoplay am Ende. landing-zahlen-1:
+Hero-Leiste + Registerwerte und Ausschüsse aus register-stand.js, Modulzahl aus DP_MODULE.
+
+**Nachweis.** Staging-Browser mit gesperrten Schreibzugriffen: Nachreichen von
+`messe-dateien/lindenallee-14/08-wirtschaftsplan-2026.pdf` und `09-baulastenauskunft.pdf` (fiktive
+Musterunterlagen) – Erkennung hausgeld/baulasten, 35.400 / 15.653 / 9.600 € je Jahr, Steuer 2026
+3.313 / 2.740 / 92.000 €, Baulasten-Block, 4 Änderungen, Dokumentliste 8 → 10; ETW-Fall (MEA 11,8 %)
+Einzelplan = Gesamt × MEA, Sonderumlage-Anteil 4.956 € = Dokument. 2026-1123 danach unverändert
+(md5 2870ee25…). Register Staging und Prod 6.085 = 6.085, Abgleich sauber. Prüfer grün vor jedem Rollout.
+Lindenallee 2026-1123 ins Prod-Demo-Konto gespiegelt (Marcels OK), md5 gleich Staging.
+
+**Rest.** Testunterlagen mit dem Wort „DealPilot" werden absichtlich nicht als Unterlage gelesen
+(`istDokument`) und fallen dann in den Marktbericht-Weg, der Lagewerte erfindet – Schwäche des
+Rückfalls, offen. Offene Entscheidungen Marcel: Baupreisindex ohne Bezug bei NEU geernteten Sätzen
+(Bruchsal, Lahr, Böblingen, Donaueschingen, Ludwigslust-Parchim), Öhringen-Lizenz, wartende
+BW-LZS-Sperren aktivieren. Pilot-Analyse-PDF-Bausteine nach Ankauf/Bestand sortieren, Dopplungen prüfen.
+
+
+### v3018 · Bausteine im PDF nach Ankauf/Bestand, Dopplungen raus · 28.10.2026 — Staging `e3300ae3`
+
+**Was.** Marcel: „Bausteine im PDF … nach Ankauf und Bestand sortieren, und nicht Sachen doppelt im
+PDF haben, die wir eh standardmäßig schon ausgeben." Auswahl (index.html `#ai-pdf-sections`) in drei
+Gruppen: **Ankauf und Bestand** (Gesamtbewertung, Stärken, Risiken, Risikoanalyse, Investor-Fit,
+Empfehlung, Investmentbewertung, Lage & Markt, Optischer Eindruck, Steuerliche Zusammenfassung,
+Steuerverlauf, DealPilot-Insight) · **Ankauf** (Verhandlungsempfehlung, Kaufpreis-Offerte,
+Bankargumente) · **Bestand** (Bestandsstrategie, Anschlussfinanzierung mit Bankargumenten,
+Exit-Strategien, Ankauf gegen heute). Neue Haken `bestandsstrategie` (hing an `verhandlung`) und
+`exit` (hatte keinen, war immer an). Die Gruppe, die beim Objekt nicht greift
+(`DpBestand.istBestand()`), steht blasser mit Hinweis (`_dpPdfGruppenStand`, beim Aufklappen/Überfahren).
+**Dopplungen** (gemessen am Investment-PDF 2026-1123, 24 S., davon 9 Pilot): Szenario-Analyse ↔
+Stress-Test, Abgleich mit dem Marktbericht ↔ Wert & Zielbild, Ankauf · Bestand · Zielbild ↔
+Wertpotenzial, Anschlussfinanzierung im Ankauf ↔ Cashflow 3 Phasen/Zinsänderungsrisiko. Die KI nannte
+dort eigene, abweichende Zahlen (Objektwert „ca. 941.000 €" in 10 Jahren gegen 1.264.989 € auf S. 5).
+Regel: druckt das PDF den Standardteil (`_dpPdfStdMark('stress'|'wert'|'potenzial'|'phasen')`),
+entfällt der Baustein (`_dpPdfGedeckt`); fehlt der Standardteil, kommt der Text wie bisher. Bankfassung:
+Anschlussfinanzierung im Ankauf entfällt neben „Cashflow je Phase", im Bestand stehen die Bankargumente
+darunter (wie im Investment-PDF). Hilfe (Pilot-Analyse) angepasst. Haken sind nicht gespeichert
+(nicht in `FIELDS`), die IDs blieben – kein Altstand kann brechen.
+
+**Nachweis.** Staging-Browser, Schreibzugriffe abgefangen (saveObj, alle Nicht-GET), jsPDF-`text`
+mitgeschnitten. 2026-1123 (Ankauf): Investment 24 → 22 Seiten, Pilot 9 → 7, Szenario/Abgleich/Zielbild/
+Anschluss-Text 0, „941.000" 0; Bank 17 = 17, KI-Anschlussfinanzierung weg. 2026-1056 Parkstr. 9
+(Bestand): Bestandsstrategie, Anschlussfinanzierung + „Argumente für die Bank", Exit-Strategien da,
+Haken `exit`/`bestandsstrategie` aus → beide weg (23 → 22 S.). buster-ebenen RC=0, frontend-konstanten
+ok. Dateien: `Downloads/v3018-{vorher,nachher}-{Investment,Bank}-Lindenallee14.{pdf,txt}`,
+`v3018-vorher-Auswahl.png`, `v3018-nachher-Auswahl-{Desktop-Bestand,schmal}.jpg`.
+
+**Rest.** Nicht auf Prod (Auftrag: Prod nicht anfassen). Handy: Chrome-Fenster geht nur bis 555 px,
+dort einspaltig ohne Querscrollen; 390 px nicht echt gemessen. KI-interne Doppelung offen für Marcel:
+Gesamtbewertung, Investmentbewertung, Empfehlung und DealPilot-Insight sagen viermal das Gesamturteil
+(Investment-PDF S. 15–21). Haken werden nicht gespeichert (jede Sitzung alle an).
+
+### v3018a · Gesamturteil nur einmal im PDF, Bausteine je Objekt gespeichert · 28.10.2026 — Staging `25b6dbd8`
+
+**Was.** Marcel zu den offenen Fragen aus v3018: „ja, wegfallen – soll nur einmal drin sein" und
+„ja, sollen gemerkt werden". **Urteil:** steht im Investment-PDF als erste Zeile der Gesamtbewertung
+(„Urteil: NICHT KAUFEN"), in der Bankfassung als Zeile „Urteil" am Kopf der Pilot-Analyse – beide am
+Haken „Gesamtbewertung mit Urteil". „Empfehlung" heißt „Begründung des Urteils" (gleicher Haken
+`empfehlung`) und verliert den Satz, der nur das Urteil ausspricht; dasselbe für DealPilot-Insight
+(`_dpOhneUrteil` in pdf.js: Urteil wörtlich UND Empfehlung/Urteil/Fazit/lautet, oder fast nur das
+Urteil; Bedingungen wie „… ließe sich 'Prüfen' vertreten" bleiben). Investmentbewertung kommt nicht
+mehr ins PDF (holistische Wiederholung; Lage/Risiko/Perspektive stehen in eigenen Bausteinen), Haken
+entfällt, in der App bleibt sie. **Speichern:** `d._pdf_bausteine_aus` in storage.js (nur abgewählte
+Schlüssel, nur wenn einer aus ist) – Altobjekt ohne Feld = alle an, bekommt beim Laden kein Feld;
+Schlüssel ohne Haken (z. B. `investbew` aus einem künftigen Stand) werden mitgeführt. Neues Objekt
+und Formular leeren: alle an. Mitcommittet: Buster dokument-import/unterlagen v3017d (aus `862e1c75`),
+frontend-konstanten.json.
+
+**Nachweis.** Staging, Schreibzugriffe abgefangen. 2026-1123: „Nicht kaufen" steht im Investment-PDF
+genau einmal (S. 15, Gesamtbewertung; vorher S. 17 Empfehlung + Satz in der Begründung), im Bank-PDF
+einmal (S. 13 „Urteil"). Seiten Investment 22 = 22 (v3018), Bank 17 = 17; Investmentbewertung weg.
+`_dpOhneUrteil` 7/7 Fälle (scratchpad urteil-test.mjs). Laden 2026-1123: ein saveObj wie in v3018,
+`collectData()._pdf_bausteine_aus` fehlt, alle 18 Haken an. Rundlauf im Speicher: exit/investorfit
+aus + fremder Schlüssel → collectData liefert alle drei; Objektwechsel → alle an; loadData mit Feld →
+genau die zwei aus, fremder Schlüssel erhalten. DB: 2026-1123, 1056, Teststr. 6 unverändert
+(updated_at vor dem Test, kein Feld). Buster RC=0, Konstanten neu.
+
+**Rest.** Ein echter Speicher-/Neuladen-Durchgang gegen die DB ist nicht gelaufen (Schreibzugriff im
+Messlauf gesperrt) – Abnahmepunkt auf Staging: Haken abwählen, speichern, neu laden. Der KI-Prompt
+verlangt in `investmentbewertung`/`dealpilot_insight` weiter ein Urteil; das PDF filtert, der Prompt
+ist unverändert. Nicht auf Prod.

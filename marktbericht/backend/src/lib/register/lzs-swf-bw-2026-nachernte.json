@@ -4222,10 +4222,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326003",
@@ -4237,55 +4237,172 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,258ln(x) + 4,2633, Druck-S. 37). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 11 „Sachwertfaktoren Bad Dürrheim“ (Kap. 7.1)",
+    "wortlaut": "„y = -0,258ln(x) + 4,2633“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 11 „Sachwertfaktoren Bad Dürrheim“ (Kap. 7.1)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 11 „Sachwertfaktoren Bad Dürrheim“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
    "form": "log_1d",
    "liefert": "faktor",
    "achse_feld": "sachwert",
    "a": -0.258,
    "b": 4.2633,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
+   "hinweis": "Gleichung wörtlich aus Abbildung 11 „Sachwertfaktoren Bad Dürrheim“ (Kap. 7.1), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 175.000 bis 820.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    180000,
+    815000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 550000,
+     "faktor": 0.85,
+     "beleg": "Trendlinie bei 550.000 € ≈ 0,85 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
   },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,258ln(x) + 4,2633, Druck-S. 37). Das Modell (Druck-S. …“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326003",
+  "ebene": "gemeinde",
+  "gebiet_name": "Bad Dürrheim",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
-    "efh",
-    "zfh",
     "dhh",
     "rh"
    ],
    "objektarten_ausgeschlossen": [
     "mfh",
     "etw"
-   ]
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
   },
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 37, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,258ln(x) + 4,2633",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 11 „Sachwertfaktoren Bad Dürrheim“ (Kap. 7.1)",
+    "wortlaut": "„y = -0,258ln(x) + 4,2633“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–37",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 11 „Sachwertfaktoren Bad Dürrheim“ (Kap. 7.1)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 11 „Sachwertfaktoren Bad Dürrheim“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.258,
+   "b": 4.2633,
+   "hinweis": "Gleichung wörtlich aus Abbildung 11 „Sachwertfaktoren Bad Dürrheim“ (Kap. 7.1), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 175.000 bis 820.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    180000,
+    815000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 550000,
+     "faktor": 0.85,
+     "beleg": "Trendlinie bei 550.000 € ≈ 0,85 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -4671,10 +4788,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326005",
@@ -4686,25 +4803,23 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,113ln(x) + 2,5247, Druck-S. 37). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.113,
-   "b": 2.5247,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
@@ -4721,20 +4836,139 @@
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 37, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,113ln(x) + 2,5247",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+    "wortlaut": "„y = -0,113ln(x) + 2,5247“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–37",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.113,
+   "b": 2.5247,
+   "hinweis": "Gleichung wörtlich aus Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 91.000 bis 838.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    95000,
+    835000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 150000,
+     "faktor": 1.18,
+     "beleg": "Trendlinie bei 150.000 € ≈ 1,18 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,113ln(x) + 2,5247, Druck-S. 37). Das Modell (Druck-S. …“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326005",
+  "ebene": "gemeinde",
+  "gebiet_name": "Blumberg",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+    "wortlaut": "„y = -0,113ln(x) + 2,5247“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.113,
+   "b": 2.5247,
+   "hinweis": "Gleichung wörtlich aus Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 91.000 bis 838.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    95000,
+    835000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 150000,
+     "faktor": 1.18,
+     "beleg": "Trendlinie bei 150.000 € ≈ 1,18 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -5120,10 +5354,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326006",
@@ -5135,25 +5369,23 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,113ln(x) + 2,5247, Druck-S. 37). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.113,
-   "b": 2.5247,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
@@ -5170,20 +5402,139 @@
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 37, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,113ln(x) + 2,5247",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+    "wortlaut": "„y = -0,113ln(x) + 2,5247“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–37",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.113,
+   "b": 2.5247,
+   "hinweis": "Gleichung wörtlich aus Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 91.000 bis 838.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    95000,
+    835000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 150000,
+     "faktor": 1.18,
+     "beleg": "Trendlinie bei 150.000 € ≈ 1,18 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,113ln(x) + 2,5247, Druck-S. 37). Das Modell (Druck-S. …“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326006",
+  "ebene": "gemeinde",
+  "gebiet_name": "Bräunlingen",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+    "wortlaut": "„y = -0,113ln(x) + 2,5247“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.113,
+   "b": 2.5247,
+   "hinweis": "Gleichung wörtlich aus Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 91.000 bis 838.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    95000,
+    835000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 150000,
+     "faktor": 1.18,
+     "beleg": "Trendlinie bei 150.000 € ≈ 1,18 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -5569,10 +5920,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326027",
@@ -5584,25 +5935,23 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,113ln(x) + 2,5247, Druck-S. 37). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.113,
-   "b": 2.5247,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
@@ -5619,20 +5968,139 @@
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 37, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,113ln(x) + 2,5247",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+    "wortlaut": "„y = -0,113ln(x) + 2,5247“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–37",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.113,
+   "b": 2.5247,
+   "hinweis": "Gleichung wörtlich aus Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 91.000 bis 838.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    95000,
+    835000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 150000,
+     "faktor": 1.18,
+     "beleg": "Trendlinie bei 150.000 € ≈ 1,18 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,113ln(x) + 2,5247, Druck-S. 37). Das Modell (Druck-S. …“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326027",
+  "ebene": "gemeinde",
+  "gebiet_name": "Hüfingen",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+    "wortlaut": "„y = -0,113ln(x) + 2,5247“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 37, Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.113,
+   "b": 2.5247,
+   "hinweis": "Gleichung wörtlich aus Abbildung 12 „Sachwertfaktoren Blumberg, Bräunlingen und Hüfingen“ (Kap. 7.2), Druck-S. 37 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 91.000 bis 838.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    95000,
+    835000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 150000,
+     "faktor": 1.18,
+     "beleg": "Trendlinie bei 150.000 € ≈ 1,18 (Diagramm Druck-S. 37, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 37,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -5991,10 +6459,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326012",
@@ -6006,55 +6474,172 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,005ln(x) + 1,1567, Druck-S. 38). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 13 „Sachwertfaktoren Donaueschingen“ (Kap. 7.3)",
+    "wortlaut": "„y = -0,005ln(x) + 1,1567“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 13 „Sachwertfaktoren Donaueschingen“ (Kap. 7.3)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 13 „Sachwertfaktoren Donaueschingen“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
    "form": "log_1d",
    "liefert": "faktor",
    "achse_feld": "sachwert",
    "a": -0.005,
    "b": 1.1567,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
+   "hinweis": "Gleichung wörtlich aus Abbildung 13 „Sachwertfaktoren Donaueschingen“ (Kap. 7.3), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 81.000 bis 842.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    85000,
+    840000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 1.09,
+     "beleg": "Trendlinie bei 300.000 € ≈ 1,09 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
   },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,005ln(x) + 1,1567, Druck-S. 38). Das Modell (Druck-S. …“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326012",
+  "ebene": "gemeinde",
+  "gebiet_name": "Donaueschingen",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
-    "efh",
-    "zfh",
     "dhh",
     "rh"
    ],
    "objektarten_ausgeschlossen": [
     "mfh",
     "etw"
-   ]
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
   },
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 38, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,005ln(x) + 1,1567",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 13 „Sachwertfaktoren Donaueschingen“ (Kap. 7.3)",
+    "wortlaut": "„y = -0,005ln(x) + 1,1567“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–38",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 13 „Sachwertfaktoren Donaueschingen“ (Kap. 7.3)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 13 „Sachwertfaktoren Donaueschingen“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.005,
+   "b": 1.1567,
+   "hinweis": "Gleichung wörtlich aus Abbildung 13 „Sachwertfaktoren Donaueschingen“ (Kap. 7.3), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 81.000 bis 842.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    85000,
+    840000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 1.09,
+     "beleg": "Trendlinie bei 300.000 € ≈ 1,09 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -6448,6 +7033,189 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326017",
+  "ebene": "gemeinde",
+  "gebiet_name": "Furtwangen",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 3…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326017",
+  "ebene": "gemeinde",
+  "gebiet_name": "Furtwangen",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
+ },
+ {
   "vollstaendig": false,
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
@@ -6460,72 +7228,6 @@
   "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
   "berichtsjahr": 2025,
   "kennzahl": "sachwertfaktor",
-  "zweig": "ezfh",
-  "objektart": "ezfh",
-  "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
-  "zugang": "kostenfrei",
-  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
-  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.04,
-   "b": 1.4401,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
-  "modellansaetze": {
-   "gnd_jahre": 80,
-   "baupreisindex": null,
-   "nhk": "NHK 2010",
-   "alterswertminderung": "linear",
-   "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
-  },
-  "geltungsbereich": {
-   "objektarten": [
-    "efh",
-    "zfh",
-    "dhh",
-    "rh"
-   ],
-   "objektarten_ausgeschlossen": [
-    "mfh",
-    "etw"
-   ]
-  },
-  "belege": [
-   {
-    "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 38, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,04ln(x) + 1,4401",
-    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
-   },
-   {
-    "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
-    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
-   }
-  ],
-  "fundstelle": "Kap. 7, Druck-S. 35–38",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
-  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
- },
- {
-  "vollstaendig": false,
-  "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
-  "stichtag": "2025-01-01",
-  "land_code": "BW",
-  "ags": "08326017",
-  "ebene": "gemeinde",
-  "gebiet_name": "Furtwangen",
-  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
-  "berichtsjahr": 2025,
-  "kennzahl": "sachwertfaktor",
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
@@ -6905,10 +7607,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326020",
@@ -6920,25 +7622,23 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.04,
-   "b": 1.4401,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
@@ -6955,20 +7655,139 @@
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 38, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,04ln(x) + 1,4401",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–38",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 3…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326020",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gütenbach",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -7362,6 +8181,189 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326055",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schonach",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 3…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326055",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schonach",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
+ },
+ {
   "vollstaendig": false,
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
@@ -7374,72 +8376,6 @@
   "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
   "berichtsjahr": 2025,
   "kennzahl": "sachwertfaktor",
-  "zweig": "ezfh",
-  "objektart": "ezfh",
-  "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
-  "zugang": "kostenfrei",
-  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
-  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.04,
-   "b": 1.4401,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
-  "modellansaetze": {
-   "gnd_jahre": 80,
-   "baupreisindex": null,
-   "nhk": "NHK 2010",
-   "alterswertminderung": "linear",
-   "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
-  },
-  "geltungsbereich": {
-   "objektarten": [
-    "efh",
-    "zfh",
-    "dhh",
-    "rh"
-   ],
-   "objektarten_ausgeschlossen": [
-    "mfh",
-    "etw"
-   ]
-  },
-  "belege": [
-   {
-    "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 38, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,04ln(x) + 1,4401",
-    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
-   },
-   {
-    "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
-    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
-   }
-  ],
-  "fundstelle": "Kap. 7, Druck-S. 35–38",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
-  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
- },
- {
-  "vollstaendig": false,
-  "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
-  "stichtag": "2025-01-01",
-  "land_code": "BW",
-  "ags": "08326055",
-  "ebene": "gemeinde",
-  "gebiet_name": "Schonach",
-  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
-  "berichtsjahr": 2025,
-  "kennzahl": "sachwertfaktor",
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
@@ -7819,10 +8755,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326054",
@@ -7834,25 +8770,23 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.04,
-   "b": 1.4401,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
@@ -7869,20 +8803,139 @@
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 38, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,04ln(x) + 1,4401",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–38",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 3…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326054",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schönwald",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -8276,10 +9329,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326060",
@@ -8291,25 +9344,23 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.04,
-   "b": 1.4401,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
@@ -8326,20 +9377,139 @@
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 38, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,04ln(x) + 1,4401",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–38",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 3…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326060",
+  "ebene": "gemeinde",
+  "gebiet_name": "Triberg",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,
@@ -8733,10 +9903,10 @@
   "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
   "stichtag": "2025-01-01",
   "land_code": "BW",
   "ags": "08326068",
@@ -8748,25 +9918,23 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser inkl. Doppel- und Reihenhäuser",
-  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 35) nennt NHK 2010, Gesamtnutzungsdauer 80 Jahre, lineare Alterswertminderung, Außenanlagen pauschal 4 % — den Baupreisindex aber nur als „Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes“, OHNE Zahl zum Stichtag. Nach dem Pflichtfeld-Vertrag (v2176) braucht ein Sachwertfaktor den Index als Zahl, sonst rechnet der Kern mit der Konstanten 1,91 und nichts widerspricht. Dazu: Einheit der x-Achse (Euro oder Tausend Euro) ist im Diagramm nicht eindeutig beschriftet. Gleichung unter formel_vorgemerkt. WEG ZUR QUELLE: Baupreisindex der Auswertung bei der Geschäftsstelle erfragen — Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 ImmoWertV verlangt den Wert des örtlich zuständigen Gutachterausschusses; Baden-Württemberg veröffentlicht keinen Landeswert.",
   "zugang": "kostenfrei",
   "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
   "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
-  "formel_vorgemerkt": {
-   "form": "log_1d",
-   "liefert": "faktor",
-   "achse_feld": "sachwert",
-   "a": -0.04,
-   "b": 1.4401,
-   "hinweis": "gesperrt bis Baupreisindex und x-Einheit belegt sind"
-  },
   "modellansaetze": {
    "gnd_jahre": 80,
    "baupreisindex": null,
    "nhk": "NHK 2010",
    "alterswertminderung": "linear",
    "aussenanlagen": "pauschal 4 %",
-   "modell_quelle": "Kap. 7, Druck-S. 35"
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
   },
   "geltungsbereich": {
    "objektarten": [
@@ -8783,20 +9951,139 @@
   "belege": [
    {
     "art": "gleichung_im_diagramm",
-    "fundstelle": "Kap. 7, Druck-S. 38, Diagramm „Sachwertfaktoren“",
-    "wortlaut": "y = -0,04ln(x) + 1,4401",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    },
    {
     "art": "modellbeschreibung",
-    "fundstelle": "Kap. 7, Druck-S. 35",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
     "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
    }
   ],
-  "fundstelle": "Kap. 7, Druck-S. 35–38",
-  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor EZFH (NHK 2010, GND 80)",
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
   "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
-  "quelle_parser": "v2440-hand (pdftotext -layout + Sichtpruefung der gerenderten Seite, 19.10.2026, Agent register-ernte)"
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („Der Bericht führt den Sachwertfaktor als logarithmische Trendformel über dem vorläufigen Sachwert (y = -0,04ln(x) + 1,4401, Druck-S. 38). Das Modell (Druck-S. 3…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
+ },
+ {
+  "vollstaendig": true,
+  "stufe": "A",
+  "stufe_grund": "Amtliche Trendformel des örtlich zuständigen Ausschusses für seine Gemeindegruppe; der Bericht nennt sie einen Anhaltspunkt mit breiter Streuung — sachverständige Würdigung empfohlen.",
+  "lizenz": "kein Lizenz- und kein Urhebervermerk im Dokument",
+  "stichtag": "2025-01-01",
+  "land_code": "BW",
+  "ags": "08326068",
+  "ebene": "gemeinde",
+  "gebiet_name": "Vöhrenbach",
+  "gaa_name": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis",
+  "berichtsjahr": 2025,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppel- und Reihenhäuser",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis, Rathausplatz 2, 78166 Donaueschingen, Telefon 0771 857-0, gutachterausschuss@donaueschingen.de",
+  "bestell_url": "https://www.donaueschingen.de/gutachterausschuss/Marktberichte",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 %",
+   "modell_quelle": "Kap. 7, Druck-S. 35",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "„Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes.“ (Kap. 7, Druck-S. 35)",
+   "baupreisindex_seite": 35,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug.",
+   "gnd_beleg": "„Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre“ (Kap. 7, Druck-S. 35)",
+   "modifiziertes_baujahr": "Berücksichtigung von Modernisierungsmaßnahmen durch Einführung eines modifizierten Baujahres (Druck-S. 35)",
+   "bodenwert": "Bodenrichtwert auf Grundlage der gültigen Bodenrichtwertkarte (Druck-S. 35)"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "hinweis": "Dieselbe Gleichung wie Ein-/Zweifamilienhäuser: der Bericht leitet die Faktoren für „Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser …)“ gemeinsam ab (Druck-S. 36)."
+  },
+  "belege": [
+   {
+    "art": "gleichung_im_diagramm",
+    "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+    "wortlaut": "„y = -0,04ln(x) + 1,4401“",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   },
+   {
+    "art": "modellbeschreibung",
+    "fundstelle": "Kap. 7, Druck-S. 35–36",
+    "wortlaut": "„Normalherstellungskosten (NHK) 2010 … Gesamtnutzungsdauer der Gebäude für Wohnen 80 Jahre … Gebäudealterswertminderung linear … Preisindex für Wohn- und Gewerbeobjekte des statistischen Bundesamtes. · übliche Außenanlagen pauschal 4 %“; Sachwertfaktoren „für die Grundstücksarten Ein- und Zweifamilienhäuser (inklusive Doppel- und Reihenhäuser, Einfamilienhäuser mit Einliegerwohnung) ermittelt“ (S. 36).",
+    "url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1"
+   }
+  ],
+  "fundstelle": "Kap. 7, Druck-S. 38, Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4)",
+  "modellversion": "GMB 2025 südwestl. Schwarzwald-Baar-Kreis, Sachwertfaktor 1-2 FH inkl. DH/RH (log. Trend über vorläufigem Sachwert, NHK 2010, GND 80), Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“",
+  "quelle_url": "https://www.donaueschingen.de/ceasy/resource/?id=24343&download=1",
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
+   "form": "log_1d",
+   "liefert": "faktor",
+   "achse_feld": "sachwert",
+   "a": -0.04,
+   "b": 1.4401,
+   "hinweis": "Gleichung wörtlich aus Abbildung 14 „Sachwertfaktoren Furtwangen, Gütenbach, Schonach, Schönwald, Triberg, Vöhrenbach“ (Kap. 7.4), Druck-S. 38 (Excel-Trendlinie, logarithmisch). Einheit der x-Achse: Euro — die Achse ist mit 50.000 bis 850.000 beschriftet („Vorläufiger Sachwert“), und nur in Euro ergibt die Gleichung Faktoren um 1. Gültig nur im gezeichneten Bereich (rund 98.000 bis 680.000 €, Achsenskala abgelesen, nach innen gerundet). Der Bericht: die Formel „bietet einen Anhaltspunkt zur Ermittlung eines individuellen Sachwertfaktors“ und ist sachverständig zu würdigen (Druck-S. 36).",
+   "gueltig": [
+    100000,
+    675000
+   ],
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "pruefpunkte": [
+    {
+     "sachwert": 300000,
+     "faktor": 0.94,
+     "beleg": "Trendlinie bei 300.000 € ≈ 0,94 (Diagramm Druck-S. 38, abgelesen)"
+    }
+   ]
+  },
+  "stichtag_hinweis": "Titel: „Grundstücksmarktbericht 2025 – Stichtag 01.01.2025 –“; Auswertung der Verkäufe 01.01.2023 bis 31.12.2024 (Druck-S. 35).",
+  "seite": 38,
+  "lizenz_hinweis": "Grundstücksmarktbericht 2025 (Stichtag 01.01.2025, Veröffentlichung Juli 2025, 73 Seiten), frei abrufbar auf donaueschingen.de (am 28.10.2026 erneut geladen, 5.592.687 Byte). Das Impressum (Druck-S. 72) nennt nur Herausgeber und Kontakt — kein Urheber-, Vervielfältigungs- oder Lizenzvermerk.",
+  "quellenvermerk": "Grundstücksmarktbericht 2025, Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis (Große Kreisstadt Donaueschingen)",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, GND 80 Jahre, BGF nach DIN 277, lineare Alterswertminderung, modifiziertes Baujahr bei Modernisierung, Außenanlagen pauschal 4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Eingang ist der vorläufige Sachwert in Euro.",
+  "neu_in": "v3018 · eigener Satz für DHH/RH (Kern sucht für diese Objektarten nur den Zweig rhdhh); Wert und Beleg wie Zweig ezfh desselben Gebiets."
  },
  {
   "vollstaendig": false,

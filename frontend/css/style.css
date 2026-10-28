@@ -33523,6 +33523,18 @@ body.hdr-banner-only .hdr-v61-row2 {
 .ai-pdf-details .ai-pdf-sections{margin-top:8px}
 /* v604-pdf-details-css END */
 
+/* v3018-pdf-gruppen BEGIN · Bausteine nach Ankauf / Bestand, Dopplungen als Hinweis */
+.ai-pdf-details .ai-pdf-sections{display:block}
+.ai-pdf-gruppe{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 16px;padding:8px 0 10px;border-top:1px solid var(--border,#E0DBD3)}
+.ai-pdf-gruppe:first-child{border-top:0;padding-top:2px}
+.ai-pdf-gruppe-h{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-3,var(--gold));margin-bottom:2px}
+.ai-pdf-gruppe-st{font-weight:500;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted,#7A7370)}
+.ai-pdf-gruppe.ist-aus label{opacity:.55}
+.ai-pdf-doppelt{margin-top:2px;padding:8px 10px;border-radius:var(--r,8px);background:var(--surface,#F8F6F1);font-size:11.5px;line-height:1.5;color:var(--muted,#7A7370)}
+.ai-pdf-doppelt b{color:var(--ch,#2A2727);font-weight:600}
+@media (max-width:560px){.ai-pdf-gruppe{grid-template-columns:1fr}}
+/* v3018-pdf-gruppen END */
+
 /* ===== v607-sidebar-rail BEGIN: eingeklappt = 66px Icon-Rail (statt display:none) ===== */
 /* Grid auf schmale Rail statt 0; Main bleibt in Spalte 2 (kein Overlap) */
 body.dp-sidebar-collapsed .app-wrap { grid-template-columns: 66px 1fr !important; }

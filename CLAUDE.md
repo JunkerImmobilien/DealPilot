@@ -278,6 +278,7 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `beleihungswert-pruefen.mjs` | indikativer Beleihungswert-Check nach BelWertV (`lib/beleihungswert.js`), Mindestzins aus `config.js` jährlich nach dem 30.11. prüfen |
 | `ki-text-zahlen-pruefen.mjs` | KI-Fließtext des Marktberichts: Prozente/Zählungen gegen die vorab gerechneten Prüfzahlen (`lib/ki_text_pruefung.js`, v2670) |
 | `messe-schleife-daten.mjs` | erzeugt Register- und Videothek-Zahlen der Messe-Schleife **und die Registerkarten auf „Wie wir rechnen“** (`frontend/landing/register-stand.js`, seit landing-methodik-3); nach jeder Ernte laufen lassen und beide `register-stand.js` mitcommitten |
+| `sperren-anfrageliste.mjs` | jede Sperre des Registers je Gutachterausschuss mit Grund (`zugang`), Kennzahlen, Preis, Link und belegter E-Mail der Geschäftsstelle (`lib/ausschuss_kontakte.json`) → `Dateien/Register/Sperren-Anfrageliste.csv/.md`, `--land=XX`; dieselbe Rechnung (`lib/sperren_anfragen.js`) speist Admin › „Register & Ernte“ › „Anfragen an Ämter“ (Status in `mb.amt_anfragen`); nach jeder Ernte laufen lassen |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
@@ -681,9 +682,14 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
   also genau der heutige Weg. Im Satz: `baupreisindex_bezug: 'kaufzeitpunkt'`
   plus `baupreisindex_wortlaut` und `baupreisindex_seite`; der Rechenweg sagt
   dann „Baupreisindex zum Wertermittlungsstichtag (Modell des Ausschusses:
-  Index zum Kaufzeitpunkt)". **Ohne Bezugszeitpunkt** („Baupreisindex des
-  Statistischen Bundesamtes", Ludwigslust-Parchim, Böblingen, Lahr) bleibt
-  es eine Sperre — **gilt für neu geerntete Sätze.**
+  Index zum Kaufzeitpunkt)". ~~Ohne Bezugszeitpunkt bleibt es eine Sperre —
+  gilt für neu geerntete Sätze.~~ **Aufgehoben am 28.10.2026 (v3019, Marcel:
+  „ja, wenn das sinnvoll ist")**: auch NEU geerntete Sätze ohne Bezugszeitpunkt
+  sind Werte mit `baupreisindex_bezug: 'stichtag_regelfall'` plus Wortlaut und
+  Seite; der Rechenweg sagt „Baupreisindex zum Wertermittlungsstichtag
+  (Regelfall § 36 Abs. 2 ImmoWertV; Modell des Ausschusses nennt keinen
+  abweichenden Bezug)". So wurden Bruchsal, Böblingen, Lahr,
+  Schwarzwald-Baar-Südwest und Ludwigslust-Parchim zu Werten.
 
   > **Entscheidung 27.10.2026 (Marcel: „so umsetzen, dass es passt"):** Die
   > rund 420 Bestandssätze, deren Modell den Index gar nicht nennt, bleiben

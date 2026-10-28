@@ -2169,7 +2169,7 @@
   "quelle_parser": "v2640-hand (pdftotext -layout/-raw, Seitenbild geprüft, 21.10.2026, Nachernte MV)"
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "land_code": "MV",
   "ags": "13076",
   "ebene": "kreis",
@@ -2180,17 +2180,16 @@
   "objektart": "ezfh",
   "objektart_bez": "Freistehende Ein- und Zweifamilienhäuser (individueller Wohnungsbau)",
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stufe_grund": "Amtliche Klassenmittel des örtlich zuständigen Ausschusses (Tabelle 30, individueller Wohnungsbau, Baujahre 1888–2020); breite Spanne Ø ± Standardabweichung.",
   "berichtsjahr": 2026,
-  "stichtag": null,
-  "warum_kein_wert": "NUR DER BAUPREISINDEX FEHLT ALS ZAHL. Tabelle 30 (S. 65, Seitenbild geprüft) führt die Faktoren vollständig; das Modell (Tabelle 29, S. 64) nennt den Baupreisindex aber nur dem Namen nach („Baupreisindex des Statistischen Bundesamtes“). BEZUGSZEITPUNKT NICHT BESTIMMBAR (geprüft 21.10.2026, v2641): Tabelle 29 nennt weder Basisjahr noch Quartal noch Bezug (Kaufzeitpunkt oder Stichtag); „stichtagsbezogen“ steht laut Rohtext in der Zeile Bodenwert, nicht beim Index. Einen amtlichen Destatis-Wert nachzuschlagen setzte voraus, diesen Zeitpunkt zu raten. Ohne Zahl rechnete der Kern mit der Konstanten 1,91, und nichts widerspräche (Pflichtfeld-Vertrag v2176). Die Tabelle liegt deshalb unter formel_vorgemerkt bereit — sie wird zum Wert, sobald feststeht, mit welchem Index der Ausschuss gerechnet hat (Rückfrage an die Geschäftsstelle) oder Marcel entscheidet, dass „Baupreisindex des Statistischen Bundesamtes“ ohne Zahl den Stichtagsindex meint. Lizenz: auszugsweise Wiedergabe mit Quellenangabe und Belegexemplar erlaubt (S. 2). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, Gemeinsame Geschäftsstelle mit Schwerin, Garnisonsstraße 1, 19288 Ludwigslust, gutachterausschuss@kreis-lup.de, 03871 722-6100; Bezug: https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "stichtag": "2026-01-01",
   "unvollstaendig_grund": "Baupreisindex nicht als Zahl im Modell.",
   "zugang": "kostenfrei",
   "gebuehr": "Download kostenfrei, gedruckt bzw. per E-Mail 50,00 € Schutzgebühr (S. 2)",
   "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, Gemeinsame Geschäftsstelle mit Schwerin, Garnisonsstraße 1, 19288 Ludwigslust, gutachterausschuss@kreis-lup.de, 03871 722-6100",
   "bestell_url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/",
   "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Belegexemplar, ohne Genehmigung gestattet",
-  "lizenz_hinweis": "S. 2, Vervielfältigung und Verbreitung: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.“ — wortgleich mit dem Jahrgang 2025.",
+  "lizenz_hinweis": "S. 2, Vervielfältigung und Verbreitung: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.“ — wie bei den LZS-Werten 2026 derselben Datei; das Belegexemplar ist eine offene Auflage an den Herausgeber.",
   "geltungsbereich": {
    "objektarten": [
     "efh",
@@ -2203,7 +2202,8 @@
    {
     "art": "amtliche Veröffentlichung",
     "fundstelle": "Grundstücksmarktbericht 2026, Abschn. 5.1, Tabelle 29 (Modell) S. 64 und Tabelle 30 S. 65, Abb. 68/69 S. 65",
-    "url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF"
+    "url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+    "wortlaut": "Tabelle 30, EFH/ZFH: bis 200 T€ Ø 1,18 (0,87–1,50) · 200–300 T€ Ø 0,92 (0,75–1,09) · > 300 T€ Ø 0,91 (0,68–1,15). Tabelle 29: „Baupreisindex des Statistischen Bundesamtes“, „Gesamtnutzungsdauer nach Anlage 1“."
    }
   ],
   "fundstelle": "Grundstücksmarktbericht 2026, Abschn. 5.1, Tabelle 29 (Modell) S. 64 und Tabelle 30 S. 65, Abb. 68/69 S. 65",
@@ -2212,7 +2212,7 @@
    "nhk": "Normalherstellungskosten 2010 (NHK 2010)",
    "bruttogrundflaeche": "BGF nach DIN 277-1: 2016-01 bzw. 2021-08",
    "baupreisindex": null,
-   "baupreisindex_wortlaut": "Baupreisindex des Statistischen Bundesamtes (Tabelle 29, S. 64) — keine Zahl, kein Bezugszeitpunkt genannt",
+   "baupreisindex_wortlaut": "Modellparameter: „Baupreisindex — Baupreisindex des Statistischen Bundesamtes“ (Tabelle 29, S. 64)",
    "baujahresklasse": "ohne Berücksichtigung der Baujahresklasse",
    "alterswertminderung": "linear",
    "gnd": "Gesamtnutzungsdauer nach Anlage 1 (zu § 12 Absatz 5 Satz 1 ImmoWertV)",
@@ -2222,11 +2222,14 @@
    "bodenwert": "stichtagsbezogen",
    "aussenanlagen": "pauschal 2 - 4 %",
    "auswahl": "nur schadensfreie Objekte mit lagetypischen Grundstücksgrößen; Baujahre 1888 bis 2020, üblicher Bau- und Unterhaltungszustand",
-   "modell_quelle": "Grundstücksmarktbericht 2026, Tabelle 29, S. 64"
+   "modell_quelle": "Grundstücksmarktbericht 2026, Tabelle 29, S. 64",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_seite": 64,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug. Die Rückfrage aus v2641 (Bezug nicht bestimmbar) ist damit entschieden: „stichtagsbezogen“ steht beim Bodenwert, beim Index steht nichts Abweichendes."
   },
   "quelle_url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
-  "quelle_parser": "v2640-hand (pdftotext -layout/-raw, Seitenbild geprüft, 21.10.2026, Nachernte MV)",
-  "formel_vorgemerkt": {
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
    "form": "baender_1d",
    "achse_feld": "sachwert",
    "achse_bez": "vorläufiger Sachwert in Euro",
@@ -2265,11 +2268,16 @@
      "von": 300000
     }
    ],
-   "hinweis": "Klassengrenzen im Bericht in Tausend Euro; Spanne = Ø ± Standardabweichung. Abb. 68 zeigt zusätzlich die Trendlinie y = −0,352 ln(x) + 5,3675 (R² = 0,2962) — nur Grafik, nicht übernommen. Gegenüber 2023 (Abb. 69): bis 200 T€ 1,08 → 1,18; 200–300 T€ 1,06 → 0,92; über 300 T€ 0,93 → 0,91."
-  }
+   "hinweis": "Tabelle 30 (S. 65), Objektart EFH/ZFH, Klassengrenzen im Bericht in Tausend Euro; Spanne = Ø ± Standardabweichung. Abb. 68 zeigt zusätzlich die Trendlinie y = −0,352 ln(x) + 5,3675 (R² = 0,2962) — nur Grafik, nicht übernommen. Gegenüber 2023 (Abb. 69): bis 200 T€ 1,08 → 1,18; 200–300 T€ 1,06 → 0,92; über 300 T€ 0,93 → 0,91."
+  },
+  "stichtag_hinweis": "Bericht 2026, beschlossen 25.03.2026; Auswertung der Kauffälle bis 31.12.2025, Stichtag nach der Konvention des Berichts (S. 18) 01.01. des Folgejahres — wie die Liegenschaftszinssätze 2026 derselben Datei.",
+  "seite": 65,
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, Grundstücksmarktbericht 2026, Tabelle 30",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, BGF nach DIN 277-1, GND nach Anlage 1 (80 Jahre), RND nach Anlage 2, Alterswertminderung linear, Bodenwert stichtagsbezogen, Außenanlagen pauschal 2–4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Nur schadensfreie Objekte mit lagetypischer Grundstücksgröße.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („NUR DER BAUPREISINDEX FEHLT ALS ZAHL. Tabelle 30 (S. 65, Seitenbild geprüft) führt die Faktoren vollständig; das Modell (Tabelle 29, S. 64) nennt den Baupreisin…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
  },
  {
-  "vollstaendig": false,
+  "vollstaendig": true,
   "land_code": "MV",
   "ags": "13076",
   "ebene": "kreis",
@@ -2280,17 +2288,16 @@
   "objektart": "rhdhh",
   "objektart_bez": "Reihenhäuser und Doppelhaushälften (individueller Wohnungsbau)",
   "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stufe_grund": "Amtliche Klassenmittel des örtlich zuständigen Ausschusses (Tabelle 30, individueller Wohnungsbau, Baujahre 1888–2020); breite Spanne Ø ± Standardabweichung.",
   "berichtsjahr": 2026,
-  "stichtag": null,
-  "warum_kein_wert": "NUR DER BAUPREISINDEX FEHLT ALS ZAHL. Tabelle 30 (S. 65, Seitenbild geprüft) führt die Faktoren vollständig; das Modell (Tabelle 29, S. 64) nennt den Baupreisindex aber nur dem Namen nach („Baupreisindex des Statistischen Bundesamtes“). BEZUGSZEITPUNKT NICHT BESTIMMBAR (geprüft 21.10.2026, v2641): Tabelle 29 nennt weder Basisjahr noch Quartal noch Bezug (Kaufzeitpunkt oder Stichtag); „stichtagsbezogen“ steht laut Rohtext in der Zeile Bodenwert, nicht beim Index. Einen amtlichen Destatis-Wert nachzuschlagen setzte voraus, diesen Zeitpunkt zu raten. Ohne Zahl rechnete der Kern mit der Konstanten 1,91, und nichts widerspräche (Pflichtfeld-Vertrag v2176). Die Tabelle liegt deshalb unter formel_vorgemerkt bereit — sie wird zum Wert, sobald feststeht, mit welchem Index der Ausschuss gerechnet hat (Rückfrage an die Geschäftsstelle) oder Marcel entscheidet, dass „Baupreisindex des Statistischen Bundesamtes“ ohne Zahl den Stichtagsindex meint. Lizenz: auszugsweise Wiedergabe mit Quellenangabe und Belegexemplar erlaubt (S. 2). ACHTUNG Jahrgangswechsel: der im Register geführte Satz 2025 (swf-th-st-sn-mv-2026.json, Klassengrenze 150 T€) wird von diesem jüngeren Satz überdeckt — der Bericht 2026 hat die Klassengrenze auf 200 T€ verschoben. WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, Gemeinsame Geschäftsstelle mit Schwerin, Garnisonsstraße 1, 19288 Ludwigslust, gutachterausschuss@kreis-lup.de, 03871 722-6100; Bezug: https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "stichtag": "2026-01-01",
   "unvollstaendig_grund": "Baupreisindex nicht als Zahl im Modell.",
   "zugang": "kostenfrei",
   "gebuehr": "Download kostenfrei, gedruckt bzw. per E-Mail 50,00 € Schutzgebühr (S. 2)",
   "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, Gemeinsame Geschäftsstelle mit Schwerin, Garnisonsstraße 1, 19288 Ludwigslust, gutachterausschuss@kreis-lup.de, 03871 722-6100",
   "bestell_url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/",
   "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Belegexemplar, ohne Genehmigung gestattet",
-  "lizenz_hinweis": "S. 2, Vervielfältigung und Verbreitung: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.“ — wortgleich mit dem Jahrgang 2025.",
+  "lizenz_hinweis": "S. 2, Vervielfältigung und Verbreitung: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.“ — wie bei den LZS-Werten 2026 derselben Datei; das Belegexemplar ist eine offene Auflage an den Herausgeber.",
   "geltungsbereich": {
    "objektarten": [
     "dhh",
@@ -2303,7 +2310,8 @@
    {
     "art": "amtliche Veröffentlichung",
     "fundstelle": "Grundstücksmarktbericht 2026, Abschn. 5.1, Tabelle 29 (Modell) S. 64 und Tabelle 30 S. 65",
-    "url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF"
+    "url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
+    "wortlaut": "Tabelle 30, RH/DHH: bis 200 T€ Ø 1,00 (0,79–1,19) · > 200 T€ Ø 1,05 (0,93–1,17). Tabelle 29: „Baupreisindex des Statistischen Bundesamtes“, „Gesamtnutzungsdauer nach Anlage 1“."
    }
   ],
   "fundstelle": "Grundstücksmarktbericht 2026, Abschn. 5.1, Tabelle 29 (Modell) S. 64 und Tabelle 30 S. 65",
@@ -2312,7 +2320,7 @@
    "nhk": "Normalherstellungskosten 2010 (NHK 2010)",
    "bruttogrundflaeche": "BGF nach DIN 277-1: 2016-01 bzw. 2021-08",
    "baupreisindex": null,
-   "baupreisindex_wortlaut": "Baupreisindex des Statistischen Bundesamtes (Tabelle 29, S. 64) — keine Zahl, kein Bezugszeitpunkt genannt",
+   "baupreisindex_wortlaut": "Modellparameter: „Baupreisindex — Baupreisindex des Statistischen Bundesamtes“ (Tabelle 29, S. 64)",
    "baujahresklasse": "ohne Berücksichtigung der Baujahresklasse",
    "alterswertminderung": "linear",
    "gnd": "Gesamtnutzungsdauer nach Anlage 1 (zu § 12 Absatz 5 Satz 1 ImmoWertV)",
@@ -2322,11 +2330,14 @@
    "bodenwert": "stichtagsbezogen",
    "aussenanlagen": "pauschal 2 - 4 %",
    "auswahl": "nur schadensfreie Objekte mit lagetypischen Grundstücksgrößen; Baujahre 1888 bis 2020, üblicher Bau- und Unterhaltungszustand",
-   "modell_quelle": "Grundstücksmarktbericht 2026, Tabelle 29, S. 64"
+   "modell_quelle": "Grundstücksmarktbericht 2026, Tabelle 29, S. 64",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_seite": 64,
+   "baupreisindex_bezug_beleg": "Entscheidung Marcel 28.10.2026 („ja, wenn das sinnvoll ist“): nennt das Modell den Index ohne Bezugszeitpunkt, gilt der Regelfall des § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag) — so rechnet DealPilot. Kein Hinweis im Modell auf einen anderen Bezug. Die Rückfrage aus v2641 (Bezug nicht bestimmbar) ist damit entschieden: „stichtagsbezogen“ steht beim Bodenwert, beim Index steht nichts Abweichendes."
   },
   "quelle_url": "https://www.kreis-lup.de/output/download.php?fid=3378.17133.1.PDF",
-  "quelle_parser": "v2640-hand (pdftotext -layout/-raw, Seitenbild geprüft, 21.10.2026, Nachernte MV)",
-  "formel_vorgemerkt": {
+  "quelle_parser": "v3018-hand (Sperre -> Wert nach Entscheidung Marcel 28.10.2026, Regelfall § 36 Abs. 2 ImmoWertV; pdftotext -layout + Sichtpruefung der gerenderten Seiten, 28.10.2026)",
+  "formel": {
    "form": "baender_1d",
    "achse_feld": "sachwert",
    "achse_bez": "vorläufiger Sachwert in Euro",
@@ -2355,7 +2366,12 @@
     }
    ],
    "hinweis": "Klassengrenzen in Tausend Euro; Spanne = Ø ± Standardabweichung."
-  }
+  },
+  "stichtag_hinweis": "Bericht 2026, beschlossen 25.03.2026; Auswertung der Kauffälle bis 31.12.2025, Stichtag nach der Konvention des Berichts (S. 18) 01.01. des Folgejahres — wie die Liegenschaftszinssätze 2026 derselben Datei.",
+  "seite": 65,
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, Grundstücksmarktbericht 2026, Tabelle 30",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, BGF nach DIN 277-1, GND nach Anlage 1 (80 Jahre), RND nach Anlage 2, Alterswertminderung linear, Bodenwert stichtagsbezogen, Außenanlagen pauschal 2–4 %, Baupreisindex zum Wertermittlungsstichtag (Regelfall § 36 Abs. 2). Nur schadensfreie Objekte mit lagetypischer Grundstücksgröße.",
+  "sperre_aufgehoben": "Bis v3017 Sperre („NUR DER BAUPREISINDEX FEHLT ALS ZAHL. Tabelle 30 (S. 65, Seitenbild geprüft) führt die Faktoren vollständig; das Modell (Tabelle 29, S. 64) nennt den Baupreisin…“). Aufgehoben in v3018: der einzige Sperrgrund war der Baupreisindex ohne Zahl/Bezug; nach der Entscheidung vom 28.10.2026 gilt der Regelfall § 36 Abs. 2 ImmoWertV."
  },
  {
   "vollstaendig": false,

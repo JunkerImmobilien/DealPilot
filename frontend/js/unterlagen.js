@@ -276,7 +276,17 @@
   function wert(k, x) {
     if (x === true) return 'ja'; if (x === false) return 'nein';
     /* v3016y · Jahreszahlen und Nummern nie durch toLocaleString („2.026“) */
-    if (typeof x === 'number') return /_eur$/.test(k) ? eur(x) : /jahr|(^|_)(nr|plz)(_|$)/.test(k) ? String(x) : x.toLocaleString('de-DE');
+    if (typeof x === 'number') {
+      if (/_eur$/.test(k)) return eur(x);
+      if (/jahr|(^|_)(nr|plz)(_|$)/.test(k)) return String(x);
+      /* v3017d · Einheit aus dem Feldnamen */
+      var f = x.toLocaleString('de-DE', { maximumFractionDigits: 2 });
+      if (/_eur_m2$|_eur_qm$/.test(k)) return f + ' €/m²';
+      if (/(_m2|_qm|flaeche)$/.test(k)) return f + ' m²';
+      if (/_pct$|_prozent$/.test(k)) return f + ' %';
+      if (/kwh/.test(k)) return f + ' kWh/(m²·a)';
+      return f;
+    }
     return WORT[x] || String(x);   /* v3017a */
   }
   function risikoHtml(x) {
