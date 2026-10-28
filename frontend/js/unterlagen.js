@@ -183,7 +183,7 @@
       '.dpu-risiko.mittel{border-left-color:' + GOLD + '}.dpu-risiko.niedrig{border-left-color:#3FA56C}',
       '.dpu-risiko b{font-size:13px}.dpu-risiko p{margin:3px 0 0;font-size:12.5px;line-height:1.45}',
       '.dpu-pill{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;background:rgba(184,98,92,.14);color:#B8625C}',
-      '.dpu-pill.mittel{background:rgba(201,168,76,.18);color:#8a6d1f}.dpu-pill.niedrig{background:rgba(63,165,108,.14);color:#2f7d52}',
+      '.dpu-pill.mittel{background:color-mix(in srgb, ' + GOLD + ' 18%, transparent);color:#8a6d1f}.dpu-pill.niedrig{background:rgba(63,165,108,.14);color:#2f7d52}',
       '.dpu-quelle{font-size:11.5px;color:#7A7370;margin-top:3px}',
       '.dpu-these{border-left:3px solid ' + GOLD + ';padding:6px 10px;background:#FBF6E9;border-radius:6px;font-size:13px;line-height:1.5}',
       '.dpu-hinweis{font-size:12px;color:#7A7370;margin:6px 0}',
