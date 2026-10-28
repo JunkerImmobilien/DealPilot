@@ -265,7 +265,7 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
     /* v2255d · mit Zeitstempel: index.html kommt ohne Cache-Control (gemessen,
        nur ETag/Last-Modified) - dieselbe Adresse durfte der Browser aus dem
        Speicher holen, samt alter Buster */
-    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1' + ['sprechtempo', 'tempo', 'halt'].map(function (k) { return P.has(k) ? '&' + k + '=' + encodeURIComponent(P.get(k)) : ''; }).join('') + '&_=' + Date.now();   /* v3016s · Tempo-Schalter an die App durchreichen */
+    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1' + ['sprechtempo', 'sprechvor', 'lukurz', 'tempo', 'halt'].map(function (k) { return P.has(k) ? '&' + k + '=' + encodeURIComponent(P.get(k)) : ''; }).join('') + '&_=' + Date.now();   /* v3016s · Tempo-Schalter an die App durchreichen */
     await warte(fx ? fx.dauer : 4000);
     /* warten, bis das Drehbuch in der App bereitsteht (Anmeldung, Plan) */
     var t0 = Date.now();
