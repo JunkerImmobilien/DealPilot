@@ -3737,7 +3737,10 @@ async function _exportPDFInner() {
   // V27: includeAi gilt auch wenn nur das neue JSON-Format (_aiAnalysis) vorliegt
   var includeAi = (!aiInPdf || aiInPdf.checked) && (window._aiText || window._aiAnalysis);
   if (includeAi) {
-  cy = newPage('Pilot-Analyse');
+  /* v3018c · gemessen: ETW 2026-001 S. 11 (13 %) und Parkstr. 2026-1056 S. 14 (24 %) trugen nur
+     einen Rest, danach begann die Pilot-Analyse auf neuer Seite. Ist mehr als die halbe Seite
+     frei, beginnt sie dort - mit ihrem dunklen Kopfbalken als Kapitelanfang. */
+  if (cy > 40 && cy < 140) cy += 8; else cy = newPage('Pilot-Analyse');
 
   // Header-Banner
   doc.setFillColor.apply(doc, C.CH); doc.roundedRect(M, cy, CW, 13, 2, 2, 'F');
