@@ -1961,6 +1961,7 @@
   function _unterlagenListe() {
     var aus = [];
     _files.forEach(function (f) {
+      if (f.cache && f.cache.mietliste && f.cache.mietliste.success && f.type === 'expose') aus.push({ typ: 'mietaufstellung', label: 'Mieterliste (aus dem Exposé)', dateiname: f.name, extracted: f.cache.mietliste.extracted || {}, datum: (f.cache.mietliste.extracted || {}).stichtag || '' });
       var a = f.cache && f.cache.dokument; if (!a || !a.success) return;
       [a].concat(a.weitere || []).forEach(function (t) {
         var x = t.extracted || {};
@@ -2190,7 +2191,7 @@
       if (f.status === 'gesperrt') h = '<div class="dpu-gesperrt"><b>Nicht ausgelesen.</b> ' + escH(f.name) + ' enthält persönliche Unterlagen eines Mieters (z. B. Bescheide, Zahlungsbestätigungen). Sie gehören nicht zum Objekt; gelesen wurden nur die ersten zwei Seiten, um das zu erkennen.</div>';
       else if (f.type === 'dokument' && d && d.success) {
         [d].concat(d.weitere || []).forEach(function (t, k) { n += ((t.extracted || {}).risiken || []).length; h += (k ? '<hr style="border:0;border-top:1px solid rgba(42,39,39,.12);margin:12px 0">' : '') + '<div class="dpu-h" style="margin-top:0">' + escH(t.label || 'Dokument') + '</div>' + U.dokHtml(t.extracted || {}); });
-      } else if (d && f.type !== 'dokument') h = U.dokHtml(d);
+      } else if (d && f.type !== 'dokument') h = U.dokHtml(d) + (f.cache.mietliste && f.cache.mietliste.success ? '<div class="dpu-h">Mieterliste im Exposé</div>' + U.dokHtml(f.cache.mietliste.extracted || {}) : '');
       else h = '<p class="dpu-hinweis">' + escH(f.status === 'reading' ? 'wird gelesen …' : ((d && d.error) || 'Aus dieser Datei kam nichts Verwertbares.')) + '</p>';
       if (f._scan) h = '<p class="dpu-hinweis">Scan: ' + f._scan.gelesen + ' von ' + f._scan.seiten + ' Seiten gelesen' + (f._scan.gekuerzt ? ' (gekürzt)' : '') + '.</p>' + h;
       var lab = f.status === 'gesperrt' ? 'Persönlich' : (f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'market' ? 'Marktbericht' : 'Exposé');
@@ -2374,7 +2375,14 @@
         f.cache.dokument = _a; f.status = (_a && _a.success) ? 'ok' : (_a && _a.gesperrt) ? 'gesperrt' : 'err';
         if (_a && _a.success) f.dokLabel = _a.label || 'Dokument';
         if (_a && !_a.success && _a.error) f.fehler = _a.unklar ? 'Art unklar' : 'nicht gelesen';
-      } else { f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok'; }
+      } else {
+        f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok';
+        /* v3016b · ein MFH-Exposé trägt oft eine Mieterliste - das Exposé-Schema kennt keine
+           Einheiten. Dann dieselbe Liste zusätzlich als Mieterliste lesen (für „Einheiten erfassen"). */
+        if (f.type === 'expose' && !f.cache.mietliste && window.DokumentImport && /Mieterliste|Mietaufstellung|Mieterübersicht|Mietenliste/i.test(f.text)) {
+          try { var _ml = await window.DokumentImport.lesenText(f.text, f.name, 'mietaufstellung'); if (_ml && _ml.success) f.cache.mietliste = _ml; } catch (e2) {}
+        }
+      }
     }
     catch (e) { f.status = 'err'; }
     renderFileRow(f);
