@@ -442,7 +442,7 @@ function collectData() {
       + State.kpis._fuer + ', geladen ist ' + window._currentObjKey);
     /* Was schon am Objekt steht, bleibt — es ist aelter, aber es gehoert
        diesem Objekt. Ueberschrieben wird nur mit einer passenden Rechnung. */
-    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_ltv','_kpis_bwk_y','_kpis_miete_j','_kpis_nmy',
+    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_dscr_art' /* v3031 */,'_kpis_ltv','_kpis_bwk_y','_kpis_miete_j','_kpis_nmy',
      /* v1898: die zwei neuen Bewirtschaftungs-Kennzahlen gehoeren in DIESE
         Rettungsliste. Sie steht hier, weil collectData() ein frisches {} aus
         der FIELDS-Whitelist baut und das Backend `data` als VOLLEN Ersatz
@@ -458,6 +458,7 @@ function collectData() {
     d._kpis_cf_ns = State.kpis.cf_ns;
     d._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs: CF vor Steuer (Jahr) fuers Cockpit */
     d._kpis_dscr = State.kpis.dscr;
+    d._kpis_dscr_art = 'netto';         /* v3031: DSCR ist netto (Reinertrag / Kapitaldienst) */
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
     /* v2931 · Jahresmiete und Nettomietrendite: ankauf.js (KENNZAHLEN), die
        Kartenrueckseite (doppelkarte.js) und der Portfolio-Export lesen beide
@@ -815,6 +816,7 @@ function loadData(d) {
       _o351._kpis_cf_ns = State.kpis.cf_ns;
       _o351._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs */
       _o351._kpis_dscr = State.kpis.dscr;
+      _o351._kpis_dscr_art = 'netto';   /* v3031 */
       _o351._kpis_ltv  = State.kpis.ltv;
       if (State.kpis.nkm_j != null && isFinite(State.kpis.nkm_j)) _o351._kpis_miete_j = State.kpis.nkm_j;   /* v2931 */
       if (State.kpis.nmy != null && isFinite(State.kpis.nmy)) _o351._kpis_nmy = State.kpis.nmy;
@@ -2114,7 +2116,7 @@ async function renderSaved(opts) {
         name: d._name || 'Unbenannt',
         kp: d.kp ? parseFloat(d.kp) : null,
         cf_ns: d._kpis_cf_ns,
-        dscr: d._kpis_dscr,
+        dscr: (window.Dscr && Dscr.ausGespeichert ? Dscr.ausGespeichert(d) : d._kpis_dscr),   /* v3031 */
         bmy: d._kpis_bmy,
         ltv: d._kpis_ltv,                     // V110: LTV für Toggle DSCR↔LTV
         ds2Score: ds2Score,
@@ -2538,7 +2540,7 @@ function _buildXlsxRowForObject(o) {
   var d = o.data || {};
   var name = o.name || d.str || d.kuerzel || 'Unbenannt';
   var bmr = d._kpis_bmy != null ? d._kpis_bmy : '';
-  var dscr = d._kpis_dscr != null ? d._kpis_dscr : '';
+  var dscr = d._kpis_dscr != null ? (window.Dscr && Dscr.ausGespeichert ? Dscr.ausGespeichert(d) : d._kpis_dscr) : '';   /* v3031 */
   var ltv = d._kpis_ltv != null ? d._kpis_ltv : '';
   var cfns = d._kpis_cf_ns != null ? d._kpis_cf_ns : '';
   var ds1 = d._dealpilot_score != null ? d._dealpilot_score : '';
@@ -3030,7 +3032,7 @@ function extractKpisFromData(d) {
   // Use stored summary fields if available (from latest save)
   var stored_bmy = d._kpis_bmy != null ? parseFloat(d._kpis_bmy) : bmy;
   var stored_cf_ns = d._kpis_cf_ns != null ? parseFloat(d._kpis_cf_ns) : 0;
-  var stored_dscr = d._kpis_dscr != null ? parseFloat(d._kpis_dscr) : 0;
+  var stored_dscr = d._kpis_dscr != null ? parseFloat((window.Dscr && Dscr.ausGespeichert ? Dscr.ausGespeichert(d) : d._kpis_dscr)) : 0;   /* v3031 */
 
   return {
     kp: kp,

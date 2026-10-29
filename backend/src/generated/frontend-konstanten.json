@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-29T08:50:26.559Z",
+ "erzeugt_am": "2026-10-29T09:28:20.502Z",
  "quellen": {
   "voice-import": "59453c51096776d6",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "081967dd8cb384da",
-  "index-html": "f44d45a6309d3a47",
+  "storage": "58b153882e898bad",
+  "index-html": "1efbbb0ec3037327",
   "grest": "2ca5ed25cafdbaa7"
  },
  "daten": {
@@ -3638,7 +3638,7 @@
      },
      {
       "h": "Bewertung — Kennzahlen und Score",
-      "text": "Dieser Reiter zeigt das Ergebnis — eingeben musst du hier nichts.\n\nDealPilot Score — derselbe Wert wie im Boarding, aus Cashflow, Rendite, LTV, Risiko und Potenzial. Die Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Der Investor Deal Score ergänzt Lage, Substanz und Upside-Potenzial; seine Zusatzangaben trägst du in Objekt, Investition und Miete ein.\n\nDie Kennzahlen:\n• Bruttomietrendite — Jahres-Nettokaltmiete ÷ Kaufpreis\n• Nettomietrendite — Jahresmiete minus nicht umlagefähige Kosten ÷ Gesamtinvestition\n• Faktor — Kaufpreis ÷ Jahresmiete\n• LTV — Darlehen ÷ Verkehrswert; ohne Verkehrswert ÷ Bankbewertung (wenn höher als der Kaufpreis), sonst ÷ Kaufpreis. Auf Wunsch strenger gegen die Gesamtinvestition\n• DSCR — wie oft die Miete den Kapitaldienst deckt (brutto und netto)\n• Cashflow vor und nach Steuern — heute, am Ende der Zinsbindung und in der Anschlussfinanzierung\n\nDer Rechenweg Cashflow – Korrekte Berechnung zeigt jede Zeile von der Warmmiete bis zum Cashflow nach Steuern."
+      "text": "Dieser Reiter zeigt das Ergebnis — eingeben musst du hier nichts.\n\nDealPilot Score — derselbe Wert wie im Boarding, aus Cashflow, Rendite, LTV, Risiko und Potenzial. Die Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Der Investor Deal Score ergänzt Lage, Substanz und Upside-Potenzial; seine Zusatzangaben trägst du in Objekt, Investition und Miete ein.\n\nDie Kennzahlen:\n• Bruttomietrendite — Jahres-Nettokaltmiete ÷ Kaufpreis\n• Nettomietrendite — Jahresmiete minus nicht umlagefähige Kosten ÷ Gesamtinvestition\n• Faktor — Kaufpreis ÷ Jahresmiete\n• LTV — Darlehen ÷ Verkehrswert; ohne Verkehrswert ÷ Bankbewertung (wenn höher als der Kaufpreis), sonst ÷ Kaufpreis. Auf Wunsch strenger gegen die Gesamtinvestition\n• DSCR — wie oft der Reinertrag (Miete nach nicht umlagefähigen Kosten) den Kapitaldienst deckt; brutto zum Vergleich\n• Cashflow vor und nach Steuern — heute, am Ende der Zinsbindung und in der Anschlussfinanzierung\n\nDer Rechenweg Cashflow – Korrekte Berechnung zeigt jede Zeile von der Warmmiete bis zum Cashflow nach Steuern."
      },
      {
       "h": "Deal-Aktion — Status, PDFs und Bank",
@@ -3696,7 +3696,7 @@
      },
      {
       "h": "DSCR — Schuldendienstdeckung (die Bank-Kennzahl)",
-      "text": "Die DSCR (Debt Service Coverage Ratio) beantwortet eine einzige, aber zentrale Frage: Reicht die Miete, um Zins und Tilgung zu bezahlen?\n\nEin Wert von 1,00 bedeutet: Die Miete deckt den Kapitaldienst exakt. Bei 1,25 deckt die Miete den Kapitaldienst um 25 % über — du hast also einen Puffer von 25 %, falls Mietausfall, Reparaturen oder Zinserhöhungen kommen.\n\nDie Bank schaut bei der Kreditprüfung zuerst auf diese Zahl, weil sie aussagt, ob das Objekt sich „selbst trägt\" oder ob du es aus eigener Tasche querfinanzieren musst.\n\n🔴 KRITISCH — DSCR unter 1,0:\nDie Miete reicht nicht aus, um den Schuldendienst zu bedienen. Du musst monatlich aus eigenem Einkommen zuschießen. Banken finanzieren das nur mit hohem Eigenkapital oder zusätzlichen Sicherheiten — und meist mit Zinsaufschlag. Strategisch nur sinnvoll, wenn die Wertsteigerungs-Story sehr stark ist oder du das Objekt schnell aufwerten kannst.\n\n🟡 KNAPP — DSCR zwischen 1,0 und 1,2:\nDie Bedienung ist gerade so gedeckt, der Puffer ist klein. Bei kleineren Mietausfällen, Reparaturen oder Zinserhöhungen kann die Finanzierung schnell unter Druck geraten. Banken finanzieren das, prüfen aber strenger und fordern oft höhere Tilgungsraten.\n\n🟢 SOLIDE — DSCR ab 1,2:\nDer Banken-Standard. Tilgung und Zins sind komfortabel gedeckt, es gibt einen ausreichenden Puffer. Bei DSCR ab 1,5 spricht man von „sehr solide\" — hier verhandeln Banken auch bessere Konditionen, weil das Risiko niedrig ist.\n\nBei Tilgungsaussetzung mit Bausparvertrag: Die Bausparrate wird in der DSCR mitgerechnet. Sie ist wirtschaftlich nichts anderes als Tilgung, nur an einen anderen Vertrag gerichtet. Würde sie nicht mitgerechnet, wäre der DSCR künstlich hoch und du würdest die Anschlussfinanzierungs-Lücke nicht sehen."
+      "text": "Die DSCR (Debt Service Coverage Ratio) beantwortet eine einzige, aber zentrale Frage: Reicht die Miete nach den laufenden Kosten, um Zins und Tilgung zu bezahlen?\n\nGerechnet wird wie bei der Bank: Reinertrag ÷ Kapitaldienst. Der Reinertrag ist die Miete minus die nicht umlagefähigen Bewirtschaftungskosten — Instandhaltung, Verwaltung, Mietausfall und Leerstand. Ein Wert von 1,00 bedeutet: Der Reinertrag deckt den Kapitaldienst exakt. Bei 1,25 bleibt ein Puffer von 25 %, falls Reparaturen oder Zinserhöhungen kommen. Den Wert ohne Kosten (brutto) zeigt DealPilot zum Vergleich daneben.\n\nDie Bank schaut bei der Kreditprüfung zuerst auf diese Zahl, weil sie aussagt, ob das Objekt sich „selbst trägt\" oder ob du es aus eigener Tasche querfinanzieren musst.\n\n🔴 KRITISCH — DSCR unter 1,0:\nDie Miete reicht nicht aus, um den Schuldendienst zu bedienen. Du musst monatlich aus eigenem Einkommen zuschießen. Banken finanzieren das nur mit hohem Eigenkapital oder zusätzlichen Sicherheiten — und meist mit Zinsaufschlag. Strategisch nur sinnvoll, wenn die Wertsteigerungs-Story sehr stark ist oder du das Objekt schnell aufwerten kannst.\n\n🟡 KNAPP — DSCR zwischen 1,0 und 1,2:\nDie Bedienung ist gerade so gedeckt, der Puffer ist klein. Bei kleineren Mietausfällen, Reparaturen oder Zinserhöhungen kann die Finanzierung schnell unter Druck geraten. Banken finanzieren das, prüfen aber strenger und fordern oft höhere Tilgungsraten.\n\n🟢 SOLIDE — DSCR ab 1,2:\nDer Banken-Standard. Tilgung und Zins sind komfortabel gedeckt, es gibt einen ausreichenden Puffer. Bei DSCR ab 1,5 spricht man von „sehr solide\" — hier verhandeln Banken auch bessere Konditionen, weil das Risiko niedrig ist.\n\nBei Tilgungsaussetzung mit Bausparvertrag: Die Bausparrate wird in der DSCR mitgerechnet. Sie ist wirtschaftlich nichts anderes als Tilgung, nur an einen anderen Vertrag gerichtet. Würde sie nicht mitgerechnet, wäre der DSCR künstlich hoch und du würdest die Anschlussfinanzierungs-Lücke nicht sehen."
      },
      {
       "h": "LTV — Beleihungsauslauf (DealPilot-Bewertungsskala)",
@@ -5333,7 +5333,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "4a2afabf9bc3a335",
+  "hilfe": "94675754969a6f06",
   "bewertung": "bca98c7b04c452b7"
  }
 }

@@ -375,7 +375,7 @@
     },
     'tab5.dscr': {
       title: 'DSCR — Debt Service Coverage Ratio',
-      body: 'Schuldendeckungsgrad: Mieteinnahmen ÷ Kapitaldienst (Zins + Tilgung). Banken wollen ≥ 1,2 sehen (Miete deckt Kapitaldienst + 20% Puffer). Achtung: DSCR berücksichtigt KEINE Bewirtschaftungskosten und Steuern — Cashflow kann trotz DSCR > 1 negativ sein!',
+      body: 'Schuldendeckungsgrad wie bei der Bank: Reinertrag ÷ Kapitaldienst (Zins + Tilgung). Reinertrag = Miete minus nicht umlagefähige Bewirtschaftungskosten (Instandhaltung, Verwaltung, Mietausfall, Leerstand). Banken wollen ≥ 1,2 sehen. Steuern sind nicht enthalten. Darunter steht der Wert ohne Kosten (brutto) zum Vergleich.',   /* v3031 */
       severity: 'pro'
     },
     'tab5.ltv': {

@@ -142,7 +142,7 @@
       /* Dscr.compute braucht nur die Summe des Schuldendienstes; die Aufteilung
          in Zins und Tilgung aendert den DSCR nicht. */
       var r = global.Dscr.compute({ nkm_j: k.nkm_netto_j, ze_j: k.ze_j, zins_j: kd, tilg_j: 0, bsv_j: 0, bwk_cf: k.bwk_cf });
-      if (r && istZahl(r.brutto) && kd > 0) res.dscr = r.brutto;
+      if (r && istZahl(r.netto) && kd > 0) res.dscr = r.netto;   /* v3031: netto */
     }
     return res;
   }

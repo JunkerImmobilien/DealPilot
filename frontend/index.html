@@ -3369,12 +3369,12 @@ label.dp-required.qc-required::after {
         <div class="dscr-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"/></svg></div>
         <div class="dscr-content">
           <div class="dscr-title">DSCR (Debt Service Coverage Ratio)</div>
-          <div class="dscr-sub">Brutto: NKM/Schulden · Netto: (NKM−NUL)/Schulden</div>
+          <div class="dscr-sub">Reinertrag (Miete − nicht umlagefähige Kosten) / Kapitaldienst</div><!-- v3031 -->
         </div>
         <div class="dscr-result">
           <div class="dscr-formula" id="cr-dscr-formula">— € / — € =</div>
           <div class="dscr-val" id="cr-dscr-val">—</div>
-          <div class="dscr-sub" style="margin-top:4px;font-size:.78em">Netto-DSCR: <span id="cr-dscr-netto-val" style="font-weight:700">—</span></div>
+          <div class="dscr-sub" style="margin-top:4px;font-size:.78em">ohne Kosten (brutto): <span id="cr-dscr-netto-val" style="font-weight:700">—</span></div>
         </div>
       </div>
     </div>
@@ -3542,7 +3542,7 @@ label.dp-required.qc-required::after {
         <tr><td>Bruttomietrendite <span class="cf-hint">(statisch · NKM/KP)</span></td><td class="num" id="ph-bmr-now">—</td><td class="num" id="ph-bmr-ezb">—</td><td class="num" id="ph-bmr-an">—</td></tr>
         <tr><td>Cashflow-Rendite <span class="cf-hint">(CF n.St. / Immo-Wert)</span> <button type="button" class="dp-tip" data-tip-id="tab8.cashflow_rendite" tabindex="-1" aria-label="Hilfe zu Cashflow-Rendite"></button></td><td class="num" id="ph-cfy-now">—</td><td class="num" id="ph-cfy-ezb">—</td><td class="num" id="ph-cfy-an">—</td></tr>
         <tr><td>EK-Rendite im Objekt <span class="cf-hint">(CF n.St. / EK im Objekt)</span></td><td class="num" id="ph-ekr-now">—</td><td class="num" id="ph-ekr-ezb">—</td><td class="num" id="ph-ekr-an">—</td></tr>
-        <tr><td>DSCR (Schuldendeckung) <span class="cf-hint" title="Bank-Sicht: Mieten / (Zins+Tilgung). Bewirtschaftungskosten und Steuern sind hier NICHT enthalten — daher kann DSCR &gt; 1 sein, obwohl der Cashflow negativ ist.">ⓘ</span></td><td class="num" id="ph-dscr-now">—</td><td class="num" id="ph-dscr-ezb">—</td><td class="num" id="ph-dscr-an">—</td></tr>
+        <tr><td>DSCR (Schuldendeckung) <span class="cf-hint" title="Bank-Sicht: Reinertrag (Miete minus nicht umlagefähige Kosten) / (Zins+Tilgung). Steuern sind nicht enthalten.">ⓘ</span></td><td class="num" id="ph-dscr-now">—</td><td class="num" id="ph-dscr-ezb">—</td><td class="num" id="ph-dscr-an">—</td></tr>
         <tr><td>LTV (Restschuld / Wert) <button type="button" class="dp-tip" data-tip-id="tab8.ltv_basis" tabindex="-1" aria-label="Hilfe zu tab8.ltv_basis"></button></td><td class="num" id="ph-ltv-now">—</td><td class="num" id="ph-ltv-ezb">—</td><td class="num" id="ph-ltv-an">—</td></tr>
         <tr><td>Restschuld</td><td class="num" id="ph-rs-now">—</td><td class="num" id="ph-rs-ezb">—</td><td class="num" id="ph-rs-an">—</td></tr>
         <tr><td>Immobilienwert</td><td class="num" id="ph-wert-now">—</td><td class="num" id="ph-wert-ezb">—</td><td class="num" id="ph-wert-an">—</td></tr>
@@ -3672,11 +3672,11 @@ label.dp-required.qc-required::after {
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="/vendor/cdn/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="/vendor/cdn/jszip/3.10.1/jszip.min.js"></script>
-<script src="js/dscr-engine.js?v=v2240"></script>
+<script src="js/dscr-engine.js?v=v3031b"></script>
 <script src="js/schwellen.js?v=v2240"></script><!-- v2240 · EINE Quelle fuer die Ampel-Schwellen (DSCR/LTV/Cashflow) aus den Einstellungen -->
 <script src="js/dp-qr.js?v=v2180"></script>
 <script src="js/hausgeld-engine.js?v=v2191a"></script>
-<script src="js/deal-kpis.js?v=v3030"></script>
+<script src="js/deal-kpis.js?v=v3031"></script>
 <script src="js/afa-engine.js?v=v3006"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
@@ -3695,7 +3695,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v3030"></script>
+  <script src="js/calc.js?v=v3031"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -3714,10 +3714,10 @@ label.dp-required.qc-required::after {
 <script src="js/lage-profil.js?v=v2159"></script><!-- v1956 · A-/B-/C-Lage und die Zielrenditen -->
 <script src="js/score-tiers.js?v=v1950"></script>
 <script src="js/dealscore.js?v=v2191"></script>
-<script src="js/qc-heuristik.js?v=v2546a"></script>
+<script src="js/qc-heuristik.js?v=v3031"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v3030"></script>
+<script src="js/tooltip-content.js?v=v3031"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v2421"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
@@ -3751,12 +3751,13 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3026"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3030"></script>
+<script src="js/storage.js?v=v3031"></script>
+<script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
-<script src="js/all-objects.js?v=v3006c"></script>
+<script src="js/all-objects.js?v=v3031"></script>
 <script src="js/track-record.js?v=v3029"></script>
-<script src="js/pdf.js?v=v3030"></script>
+<script src="js/pdf.js?v=v3031"></script>
 <script src="js/pdf-pruefung.js?v=v3029"></script><!-- v3018d · EIN Tor vor jedem PDF -->
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
@@ -3782,7 +3783,7 @@ label.dp-required.qc-required::after {
 <script src="js/financing-pdf.js?v=v2932"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
-<script src="js/quick-check.js?v=v3006c"></script>
+<script src="js/quick-check.js?v=v3031"></script>
 <script src="js/qc-bridge.js?v=qc-v2969"></script>
 <script src="js/bodenrichtwert.js?v=v3030"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
@@ -3791,12 +3792,12 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-reiter.js?v=v3002"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3029"></script>
+<script src="js/mfh-einheiten.js?v=v3031"></script>
 <script src="js/mfh-felder.js?v=v3003"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
-<script src="js/potenzial.js?v=v3028"></script>
+<script src="js/potenzial.js?v=v3031"></script>
 <script src="js/mietvertrag-objekt.js?v=v3028b"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3805,9 +3806,9 @@ label.dp-required.qc-required::after {
 <script src="js/ai-credits.js?v=v2421"></script>
 <script src="js/workflow.js?v=v2181b"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
-<script src="js/bank-charts.js?v=v2988"></script>
+<script src="js/bank-charts.js?v=v3031"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3030"></script>
+<script src="js/help.js?v=v3031"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3001"></script>
@@ -3827,7 +3828,7 @@ label.dp-required.qc-required::after {
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
 <script src="js/ankauf.js?v=v2989"></script>
 <script src="js/zensus-info.js?v=v2500"></script><!-- v2162 · Zensus an Miete und Leerstand; v2500 Kaesten aus -->
-<script src="js/doppelkarte.js?v=v2173"></script>
+<script src="js/doppelkarte.js?v=v3031"></script>
 <script src="js/abweichung.js?v=v2947"></script>
 <script src="js/ankauf-ansicht.js?v=v2985"></script>
 <!-- v2060: breite Tabellen werden auf dem Handy zu Karten (zentral, alle Ansichten) -->
@@ -3849,7 +3850,7 @@ label.dp-required.qc-required::after {
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v3021"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2999"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
-<script src="js/bestand-analyse.js?v=v2985"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
+<script src="js/bestand-analyse.js?v=v3031"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
 <script src="js/jahresstaende.js?v=v2989"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/wert-zielbild.js?v=v2999"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3027"></script>
@@ -3866,7 +3867,7 @@ label.dp-required.qc-required::after {
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v3029"></script>
 <script src="js/bwk-profil.js?v=v2211"></script>
-<script src="js/dashboard.js?v=v3006c"></script>
+<script src="js/dashboard.js?v=v3031"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 

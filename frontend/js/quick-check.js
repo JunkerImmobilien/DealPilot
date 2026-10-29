@@ -883,6 +883,7 @@
     _renderQcRecommendation({
       score: score, kp: kp, nkm: nkm, bmr: bmr, nmr: nmr, cfMon: cfMon,
       dscr: dscr, ltv: ltvPct, ekr: ekr,
+      kd: kpis ? kpis.kd_dscr : 0, dscrBrutto: kpis ? kpis.dscr_brutto : 0,   /* v3031 */
       zielBmr: _zielB, lageklasse: _lk
     });
 

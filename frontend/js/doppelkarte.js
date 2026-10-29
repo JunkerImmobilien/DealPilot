@@ -129,7 +129,7 @@
     neu.cf_ns       = zahl(k._kpis_cf_ns);
     neu.bmy         = zahl(k._kpis_bmy);
     neu.nmr         = zahl(k._kpis_nmy);
-    neu.dscr        = zahl(k._kpis_dscr);
+    neu.dscr        = zahl(window.Dscr && Dscr.ausGespeichert ? Dscr.ausGespeichert(k) : k._kpis_dscr);   /* v3031 */
     neu.ltv         = zahl(k._kpis_ltv);
     neu.ankaufBand  = _datum(a.stichtag);
     /* Der Trend der Vorderseite gehoert nicht auf die Rueckseite: er

@@ -2034,7 +2034,7 @@ async function _exportPDFInner() {
       if (heute && K.dscr != null && isFinite(K.dscr)) return pN(K.dscr, 2);
       try {
         if (window.Dscr && typeof Dscr.compute === 'function')
-          return pN(Dscr.compute({ nkm_j: p.wm, ze_j: 0, zins_j: p.zins, tilg_j: p.tilg, bsv_j: bsv, bwk_cf: p.bwk }).brutto, 2);
+          return pN(Dscr.compute({ nkm_j: p.wm, ze_j: 0, zins_j: p.zins, tilg_j: p.tilg, bsv_j: bsv, bwk_cf: p.bwk }).netto, 2);   /* v3031 */
       } catch (e) {}
       return pN(p.dscr, 2);
     }
