@@ -159,6 +159,7 @@ router.post('/', authenticate, rndLimiter, async (req, res) => {
         '<tr><td style="padding:4px 14px 4px 0;color:#888"><strong>GND</strong></td><td>' + _escHtml(gnd) + ' J</td></tr>' +
         '<tr><td style="padding:4px 14px 4px 0;color:#888"><strong>Alter</strong></td><td>' + _escHtml(alter) + ' J</td></tr>' +
       '</table>' +
+      _kerndatenHtml(state, result, afa) +   /* v3045 · die wichtigsten Daten als Tabelle */
       '<div style="background:#FAF6E8;border-left:3px solid #C9A84C;padding:14px;margin-top:20px;font-size:13px">' +
         '<strong style="color:#2A2727">Anfrage gespeichert:</strong> ' + _escHtml(requestId) + '.json<br>' +
         '<span style="color:#7A7370">Im RND-Modul importieren um das vollständige Gutachten zu erstellen.</span>' +
@@ -174,7 +175,11 @@ router.post('/', authenticate, rndLimiter, async (req, res) => {
       subject: subject,
       text: text,
       html: html,
-      replyTo: enriched.user && enriched.user.email ? enriched.user.email : undefined
+      replyTo: enriched.user && enriched.user.email ? enriched.user.email : undefined,
+      /* v3045 · Marcel 29.10.2026: „alle Daten müssen passend mitgeliefert werden, damit ich sie in
+         meinen Rechenkern legen kann - als JSON und die wichtigsten Daten als Tabelle". Der Anhang
+         ist derselbe Datensatz, der unter STORAGE_DIR abgelegt wird. */
+      attachments: [{ filename: requestId + '.json', content: JSON.stringify(enriched, null, 2), contentType: 'application/json' }]
     });
     return res.json({
       success: true,
@@ -258,6 +263,37 @@ function _escHtml(s) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/* v3045 · Die wichtigsten Daten der Anfrage als Tabelle - was fehlt, steht als „–", nichts wird ergänzt. */
+function _kerndatenHtml(state, result, afa) {
+  const z = (v) => (v == null || v === '' ? null : v);
+  const n = (v, d) => (Number.isFinite(Number(v)) && v !== null && v !== '' ? Number(v).toFixed(d == null ? 0 : d).replace('.', ',') : null);
+  const m = (result && result.methods) || {};
+  const tech = m.technisch && m.technisch.restnutzungsdauer;
+  const raster = m.punktraster && m.punktraster.restnutzungsdauer;
+  const mod = (state && state.mod) || {};
+  const gew = (state && state.gewerke) || {};
+  const zeilen = [
+    ['Objektart', z(state && (state.objektart || state.objart))],
+    ['Baujahr / fiktives Baujahr', z(state && state.baujahr) + (result && result.fiktives_baujahr ? ' / ' + result.fiktives_baujahr : '')],
+    ['Gesamtnutzungsdauer', n(result && result.gnd) ? n(result.gnd) + ' J.' : null],
+    ['Alter am Stichtag', n(result && result.alter) ? n(result.alter) + ' J.' : null],
+    ['Modernisierungspunkte (Anlage 2)', n(result && (result.mod_points != null ? result.mod_points : result.modernisierungspunkte), 1)],
+    ['RND nach Anlage 2 ImmoWertV', n(raster) ? n(raster) + ' J.' : null],
+    ['RND technisch (Gewerke)', n(tech) ? n(tech) + ' J.' : null],
+    ['RND Ergebnis', n(result && result.final_rnd) ? n(result.final_rnd) + ' J.' + (result.final_source ? ' (' + result.final_source + ')' : '') : null],
+    ['AfA heute', n(afa && afa.afa_standard && afa.afa_standard.satz_pct, 2) ? n(afa.afa_standard.satz_pct, 2) + ' %' : null],
+    ['AfA mit RND', n(afa && afa.afa_kurz && afa.afa_kurz.satz_pct, 2) ? n(afa.afa_kurz.satz_pct, 2) + ' %' : null],
+    ['Steuerersparnis je Jahr', n(afa && afa.steuerersparnis_jahr) ? n(afa.steuerersparnis_jahr) + ' €' : null],
+    ['Modernisierungen', Object.keys(mod).length ? Object.keys(mod).map((k) => k + ': ' + mod[k]).join(', ') : null],
+    ['Gewerke (Zustand)', Object.keys(gew).length ? Object.keys(gew).map((k) => k + ': ' + (typeof gew[k] === 'object' ? JSON.stringify(gew[k]) : gew[k])).join(', ') : null],
+  ];
+  return '<h3 style="color:#2A2727;margin-top:24px">Kerndaten für den Rechenkern</h3>'
+    + '<table style="border-collapse:collapse;font-size:13px">'
+    + zeilen.map(([k, v]) => '<tr><td style="padding:4px 14px 4px 0;color:#888;vertical-align:top"><strong>' + _escHtml(k) + '</strong></td><td>' + _escHtml(v == null || /^null/.test(String(v)) ? '–' : v) + '</td></tr>').join('')
+    + '</table>'
+    + '<p style="color:#7A7370;font-size:12px;margin-top:8px">Der vollständige Datensatz hängt als JSON an (Wizard-Zustand, Ergebnis, AfA-Vergleich).</p>';
 }
 
 module.exports = router;

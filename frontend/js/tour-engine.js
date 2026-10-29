@@ -1814,6 +1814,12 @@
   function _heute()    { return new Date().toISOString().slice(0, 10); }
 
   function _angebotFaellig() {
+    /* v3045 · Marcel 29.10.2026: „der fragt auch ständig nach dem Rundgang, muss auch nicht sein".
+       Die Merker lagen nur im Browser - jedes Gerät fragte von vorn. Kein automatisches Angebot
+       mehr; der Rundgang bleibt über Aktionen -> „Rundgang starten" und am Ende der
+       Ersteinrichtung (Haken) erreichbar. */
+    return false;
+    /* eslint-disable no-unreachable */
     if (_ls(OFFER_OFF)) return false;
     if (Tour.isComplete()) return false;
     if (_ls(SEEN_KEY)) return false;
