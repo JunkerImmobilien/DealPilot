@@ -706,7 +706,9 @@ function _mpZusatz(d) {
   var de = function (n) { return Math.round(n).toLocaleString('de-DE') + ' €'; };
   var t = '';
   if (mv.angebot_abschlag && mv.angebot_abschlag.pct > 0) {
-    t += '<br>inkl. ' + String(mv.angebot_abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise'
+    /* v3041 · Marcel: „ich sehe beim Marktwert nicht, ob wir schon was abgezogen haben“ - der Wert vor Abschlag steht davor */
+    t += '<br>' + (mv.angebot_abschlag.roh && mv.angebot_abschlag.roh.estimated ? 'aus ' + de(mv.angebot_abschlag.roh.estimated) + ' (Angebotsniveau) abzüglich ' : 'inkl. ')
+      + String(mv.angebot_abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise'
       + (/rtlich/.test(mv.angebot_abschlag.herkunft || '') ? ' (aus den Kauffällen des Gutachterausschusses)'
         : (/eigene/.test(mv.angebot_abschlag.herkunft || '') ? ' (dein Wert)'
           /* v3021 · jaehrlicher DealPilot-Marktdurchschnitt aus Ortsmessungen: Herkunft mit n und Jahr */
@@ -715,7 +717,8 @@ function _mpZusatz(d) {
   if (g && (g.wert_rohertragsfaktor_eur || g.wert_kaufpreis_mittel_eur)) {
     var teile = [];
     if (g.wert_rohertragsfaktor_eur) teile.push('Rohertragsfaktor ' + String(g.rohertragsfaktor).replace('.', ',') + ' × ' + de(g.rohertrag_eur) + ' = ' + de(g.wert_rohertragsfaktor_eur));
-    if (g.wert_kaufpreis_mittel_eur) teile.push('Ø Kaufpreis ' + de(g.kaufpreis_eur_qm_mittel).replace(' €', ' €/m²') + ' = ' + de(g.wert_kaufpreis_mittel_eur));
+    if (g.wert_kaufpreis_mittel_eur) teile.push('Ø Kaufpreis ' + de(g.kaufpreis_eur_qm_mittel).replace(' €', ' €/m²') + ' × Wohnfläche = ' + de(g.wert_kaufpreis_mittel_eur)
+      + (g.kaufpreis_vertraege ? ' (' + g.kaufpreis_vertraege + ' Kauffälle' + (g.quelle_kennzahl === 'liegenschaftszinssatz' ? ' des Liegenschaftszinses' : '') + ')' : ''));   /* v3041 */
     t += '<br>Gegenprobe aus Kauffällen des Gutachterausschusses' + (g.datengrundlage_jahr ? ' (' + g.datengrundlage_jahr + ')' : '') + ': ' + teile.join(' · ');
   }
   return t;
@@ -4456,7 +4459,12 @@ async function exportPdf(out) {
       (d.sale && d.sale.sample_size) ? d.sale.sample_size + ' Vergleichsangebote' : null,
       /* v2367 · Abschlag und amtliche Gegenprobe auch im PDF */
       (mv.angebot_abschlag && mv.angebot_abschlag.pct > 0)
-        ? 'inkl. ' + String(mv.angebot_abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise' : null,
+        ? (mv.angebot_abschlag.roh && mv.angebot_abschlag.roh.estimated ? 'aus ' + Math.round(mv.angebot_abschlag.roh.estimated).toLocaleString('de-DE') + ' € abzüglich ' : 'inkl. ')
+          + String(mv.angebot_abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise' : null,   /* v3041 */
+      (d.valuation && d.valuation.amtliche_gegenprobe && !d.valuation.amtliche_gegenprobe.wert_rohertragsfaktor_eur && d.valuation.amtliche_gegenprobe.wert_kaufpreis_mittel_eur)   /* v3041 */
+        ? 'Gegenprobe Kauffälle: ' + Math.round(d.valuation.amtliche_gegenprobe.wert_kaufpreis_mittel_eur).toLocaleString('de-DE') + ' € (Ø Kaufpreis'
+          + (d.valuation.amtliche_gegenprobe.kaufpreis_vertraege ? ', ' + d.valuation.amtliche_gegenprobe.kaufpreis_vertraege + ' Kauffälle' : '') + ')'
+        : null,
       (d.valuation && d.valuation.amtliche_gegenprobe && d.valuation.amtliche_gegenprobe.wert_rohertragsfaktor_eur)
         ? 'Gegenprobe Kauffälle: ' + Math.round(d.valuation.amtliche_gegenprobe.wert_rohertragsfaktor_eur).toLocaleString('de-DE') + ' € (Rohertragsfaktor)'
           + (d.valuation.amtliche_gegenprobe.wert_kaufpreis_mittel_eur ? ' · ' + Math.round(d.valuation.amtliche_gegenprobe.wert_kaufpreis_mittel_eur).toLocaleString('de-DE') + ' € (Ø Kaufpreis)' : '')
