@@ -40,6 +40,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 Marcel: *„machen wir heute nicht … notier das einfach nur, machen wir nächstes Mal."*
 
+> **Stand 29.10.2026, spaeter:** 3 (DSCR netto) erledigt mit v3031, Prod 119b7ac. Offen: Nachrechnen der Prod-Objekte (Freigabe abgelehnt, Marcel entscheidet), Telegram-MPI ohne Objekt (v3036) echter Test vor Prod, Plan-Kacheln (v3033) Abnahme.
+>
 > **Stand 29.10.2026:**
 > - Erledigt auf Staging (`7ab5fb69`, v3030): **1** (Bodenrichtwert-Schätzung entfernt), **2** (Leerstand rechnet
 >   mit) und **4** (kein Abschlag-Prozentsatz im PDF).

@@ -43772,3 +43772,17 @@ ist gleich zum Original.
 - v3036 nach Prod erst nach einem echten Test-Abruf über den Staging-Bot.
 - Plan-Kacheln sind ein Entwurf zur Abnahme.
 - Bot-Probe-Fehler (Portfolio-Summe, Rangliste, Feldbezeichnung) haben nichts mit dem DSCR zu tun und sind offen.
+
+### v3037 / v3038 · Kontingent-Prüfung und Telegram-Anleitung · 29.10.2026 · Staging `d6b285eb`
+
+**Kontingent geprüft** (Marcel: „passend abgebucht … oben in der Anzeige … Monat verfällt, Gekauftes nie“):
+- Staging-Konto info@: Im Oktober ging je Art erst 5× der Monat ab, danach nur die Bank, ohne Überschneidung (MPI+: Monat bis 20.10. 15:18, Bank ab 15:41).
+- Monatswechsel nachgestellt und exakt zurückgesetzt: `used` → 0, Bank 17/8/2 unverändert, kein Übertrag. Anzeige 5 + 17 = 22.
+- **Fehler:** Nach einem Abruf im Marktbericht-Fenster blieb die Pille der App bis zum Neuladen alt. Jetzt `postMessage mbv-kontingent` → `AiCredits.refresh`; die Stufenliste lädt ihren Bestand neu.
+- **Dazu:** Der Dokument-Buster von `marktbericht-app/index.html` stand auf 2660 (Ansicht) und 949 (PDF-Weg). Damit wäre auch der v3029a-Handy-Kasten aus dem Cache gekommen. Jetzt 3037.
+
+**v3038** Telegram-Anleitung: `/hilfe` mit Marktpreisindikation ohne Objekt und „Was ich zu deinen Objekten weiß“; App-Hilfe „Telegram-Bot verbinden“ um einen Absatz ergänzt.
+
+**Rest.**
+- v3036 bis v3038 liegen nur auf Staging. Prod-Rollout nach einem echten Test-Abruf „Marktpreisindikation ohne Objekt“ über den Staging-Bot.
+- Nachrechnen der Prod-Objekte offen (siehe oben).
