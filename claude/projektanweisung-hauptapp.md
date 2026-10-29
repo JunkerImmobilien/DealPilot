@@ -43786,3 +43786,26 @@ ist gleich zum Original.
 **Rest.**
 - v3036 bis v3038 liegen nur auf Staging. Prod-Rollout nach einem echten Test-Abruf „Marktpreisindikation ohne Objekt“ über den Staging-Bot.
 - Nachrechnen der Prod-Objekte offen (siehe oben).
+
+### Prod-Rollout 29.10.2026 · v3036–v3038 · Prod `dd4e06c` · Version 1.0.1
+
+**Was.**
+- Telegram: Marktpreisindikation ohne Objekt (v3036).
+- Kontingent-Pille nach einem Abruf im Marktbericht aktuell, Dokument-Buster `marktbericht-app` 3037 (v3037).
+- Telegram-Anleitung in `/hilfe` und in der App-Hilfe (v3038).
+- Marcel 29.10.: „auf prod kannst du erstmal so lassen. bitte aber alles auf prod ausrollen“, also ohne vorherigen echten Test-Abruf über den Staging-Bot und ohne Nachrechnen der Prod-Objekte.
+
+**Nachweis.**
+- `rollout-prod.ps1`: Sicherungen gelesen, gold-audit auf der Basislinie, Serverstand = lokal, HTTP 200.
+- Der Versionsschritt zählte erstmals selbst: **1.0.1 · 2026-10-29 · v3038** (Commit auf staging, mit dem Merge nach main).
+- Gemessen auf Prod:
+  - `version.json` 1.0.1
+  - `marktbericht-view.js`, `deal-action-boarding.js` v3037, `help.js` v3038
+  - `marktbericht-app` lädt `app.js` v3037
+  - Backend healthy, 0 Fehler; `marktpreis_ohne_objekt` und die neue Bot-Hilfe im Container
+
+**Rest.**
+- Erster echter Abruf „Marktpreisindikation ohne Objekt“ (kostet Kontingent) noch nicht gelaufen; beim ersten Einsatz Ergebnis und Abbuchung ansehen.
+- Prod-Objekte bewusst nicht nachgerechnet (Marcel): Gespeicherte Scores auf Karten stehen bis zum nächsten Öffnen auf dem alten Stand. Der DSCR-Wert selbst wird über `Dscr.ausGespeichert` überall netto gelesen.
+- Plan-Kacheln (v3033) als Entwurf zur Abnahme.
+- Bot-Probe-Fehler (Portfolio-Summe, Rangliste, Feldbezeichnung) offen.
