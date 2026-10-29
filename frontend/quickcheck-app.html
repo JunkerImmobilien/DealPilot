@@ -5201,7 +5201,7 @@ const QcApp = (function() {
   function _applyConsensusToQc() {
     /* v893e-src: Standard-Quelle aus Setting (Profil & Anzeige). Default konsens. */
     try {
-      var _src = localStorage.getItem('dp_qb_avm_src') || 'konsens';
+      var _src = 'konsens';   /* v3032: nur noch eine AVM-Quelle (DealPilot) - alte Wahl dp_qb_avm_src gilt nicht mehr */
       if (_src === 'dp' || _src === 'sp' || _src === 'ph') {
         var _pn = _src === 'dp' ? 'DealPilot' : _src === 'sp' ? 'Sprengnetter' : 'PriceHubble';
         var _mm = null;
@@ -6275,7 +6275,7 @@ const QcApp = (function() {
       if(__el&&__el.value){ var __st=JSON.parse(__el.value); if(__st&&__st.card){ var __c=__st.card;
         __avmRaw['DealPilot']={ mw:__c.mw?{low:__c.mw.low,mid:__c.mw.med,high:__c.mw.high}:null, mm:__c.mm?{low:__c.mm.low,mid:__c.mm.med,high:__c.mm.high}:null }; } }
     } catch(e){}
-    var __def='konsens'; try{ __def=localStorage.getItem('dp_qb_avm_src')||'konsens'; }catch(e){}
+    var __def='konsens';   /* v3032: Einstellung entfernt, immer Konsens */
     var __qcSet=[]; /* v893k-qcset: bereits gesetzte QC-Kernwerte fuer die Gesamtuebersicht */
     try {
       var IN=QcEngine.getInputs()||{}; /* v893l-qcsetfull: vollstaendig ueber alle QC-Felder */
