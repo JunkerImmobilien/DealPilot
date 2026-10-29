@@ -350,19 +350,31 @@
         sub = k.testphase + ' aus der Testphase';
         if (k.bank) sub += ' · ' + k.bank + ' gekauft';
       }
-      return '<div class="ai-credits-cell">' +
-               '<div class="ai-credits-label">' + a.kurz + '</div>' +
-               '<div class="ai-credits-value' + (rest === 0 ? ' rd' : ' gn') + '">' + rest + '</div>' +
-               '<div class="ai-credits-sub">' + sub + '</div>' +
+      /* v3033 · Marcel 29.10.2026: „unter Plan die Sachen schöner darstellen". Statt Kürzel
+         (MPI/WEV) der Name, groß die freie Zahl, darunter Monat und Zugekauftes getrennt mit
+         einem Balken für den Monatsverbrauch. Dieselben Daten wie vorher (limit/used/monatlich/bank). */
+      var mFrei = (k.monatlich != null) ? k.monatlich : Math.max(0, (k.limit || 0) - (k.used || 0));
+      var mPct = k.limit ? Math.max(0, Math.min(100, (mFrei / k.limit) * 100)) : 0;
+      var zeilen = '';
+      if ((k.testphase || 0) > 0) zeilen += '<div class="akc-z"><span>Testphase</span><b>' + k.testphase + '</b></div>';
+      else if (k.limit) zeilen += '<div class="akc-z"><span>Monat</span><b>' + mFrei + ' von ' + k.limit + ' frei</b></div>' +
+        '<div class="akc-bar"><i style="width:' + mPct.toFixed(0) + '%"></i></div>';
+      else zeilen += '<div class="akc-z"><span>Monat</span><b>nicht im Plan</b></div>';
+      zeilen += '<div class="akc-z"><span>Zugekauft</span><b>' + (k.bank || 0) + '</b></div>';
+      return '<div class="ai-credits-cell akc">' +
+               '<div class="akc-name">' + a.name + '</div>' +
+               '<div class="akc-wert' + (rest === 0 ? ' rd' : ' gn') + '">' + rest + '<small> frei</small></div>' +
+               zeilen +
              '</div>';
     }).join('');
 
     var avmA = (s.avm && s.avm.a) || 0;
     var avmB = (s.avm && s.avm.b) || 0;
-    zellen += '<div class="ai-credits-cell">' +
-                '<div class="ai-credits-label">Marktwert</div>' +
-                '<div class="ai-credits-value gold">' + (avmA + avmB) + '</div>' +
-                '<div class="ai-credits-sub">zugekaufte Abrufe</div>' +
+    zellen += '<div class="ai-credits-cell akc">' +   /* v3033 */
+                '<div class="akc-name">Marktwert</div>' +
+                '<div class="akc-wert gold">' + (avmA + avmB) + '<small> frei</small></div>' +
+                '<div class="akc-z"><span>Monat</span><b>nicht im Plan</b></div>' +
+                '<div class="akc-z"><span>Zugekauft</span><b>' + (avmA + avmB) + '</b></div>' +
               '</div>';
 
     var resetDate = s.period_reset_at || '—';
@@ -385,6 +397,20 @@
         'zugekaufte Bewertungen bleiben dir dagegen erhalten.';
     }
 
+    if (!document.getElementById('akc-stil')) {   /* v3033 */
+      var _st = document.createElement('style'); _st.id = 'akc-stil';
+      _st.textContent = '.ai-credits-cell.akc{text-align:left;padding:14px 14px 12px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--border,#ece6d6)}' +
+        '.akc-name{font:600 12.5px/1.3 Inter,sans-serif;color:var(--ch,#2A2727);min-height:32px}' +
+        '.akc-wert{font:700 26px/1 "Space Grotesk",Inter,sans-serif;color:var(--ch,#2A2727)}' +
+        '.akc-wert small{font:500 12px Inter,sans-serif;color:var(--muted,#6B645A)}' +
+        '.akc-wert.gn{color:var(--green,#3FA56C)}.akc-wert.rd{color:var(--red,#B8625C)}.akc-wert.gold{color:var(--wl-c9a84c, #C9A84C)}' +
+        '.akc-z{display:flex;justify-content:space-between;gap:8px;font:11.5px/1.35 Inter,sans-serif;color:var(--muted,#6B645A)}' +
+        '.akc-z b{font-weight:600;color:var(--ch,#2A2727);white-space:nowrap}' +
+        '.akc-bar{height:5px;border-radius:3px;background:var(--surface2,#efe9da);overflow:hidden;margin:-2px 0 2px}' +
+        '.akc-bar i{display:block;height:100%;background:var(--wl-c9a84c, #C9A84C);border-radius:3px}' +
+        '@media (max-width:640px){.akc-name{min-height:0}}';
+      document.head.appendChild(_st);
+    }
     host.innerHTML = '' +
       '<div class="ai-credits-box">' +
         '<div class="ai-credits-row">' + zellen + '</div>' +
