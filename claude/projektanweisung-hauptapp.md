@@ -43829,3 +43829,13 @@ ist gleich zum Original.
 **Rest.**
 - Abgleich noch nicht im echten Browser mit Anmeldung durchgeklickt (Chrome-Erweiterung war nicht verbunden): Staging-Abnahmepunkt — einmal auf Gerät A Einrichtung abschließen, auf Gerät B anmelden → keine Einrichtung, Stammdaten da.
 - Erste Anmeldung je Konto nach v3040 auf einem Gerät OHNE alten Browserstand zeigt die Einrichtung noch einmal, wenn der Server nichts kennt — ab dann nie wieder.
+
+### landing-makler-hub-2/-3 · messe-schleife-10 — Prod 1.0.3 (29.10.2026)
+
+**Was.** Marcel: Makler-Hub „unter individuelle Lösungen oder unter Für Partner“ und „auf der Startseite raus“. Abschnitt `#makler-hub` steht jetzt auf `loesungen.html` (nach „Laufende Systeme“), Startseite ohne Abschnitt und ohne Modulkarte (Module zweispaltig, `.pmod-g.zwei`), Menü „Für Partner › Makler-Hub“ auf allen fünf Landing-Seiten, `/#makler-hub` leitet per Skript auf `loesungen.html#makler-hub` (Ziel der QR-Codes auf den Messe-Tafeln). Neu: echte Aufnahme des Hubs (lokale Kopie im Scratchpad, Marke „Muster Immobilien“, Testdaten, Simulationsknöpfe ausgeblendet) als Bild `assets/makler-hub/hub-vorgang.webp` und als Tafel 5 `mh-05-einblick.webp`; Quelle `Dateien/Social-Media/Makler-Hub-2026-10-29/quelle/` (mh.html ?i=5/6, hub-vorgang.png).
+
+**Commit.** `0b853f64` · Prod `a3f3855`.
+
+**Nachweis.** Staging und Prod im Browser: Startseite ohne Abschnitt/Karte, 2 Module, Menü → `loesungen.html#makler-hub`; `/#makler-hub` landet im Abschnitt; Bild lädt (1.600 px), kein Querscroll; QR der Tafel 5 mit jsQR gelesen; buster-ebenen sauber, gold-audit RC=0.
+
+**Rest.** Offen aus derselben Sitzung: Parkstr. 9 Zielbild 9,71 €/m² (Befund: Ertragswert deckelt die Miete auf 5,90 €/m², Zielmiete allein ändert ihn nicht — Entscheidung Marcel) und der Angebotsabschlag Detmold 22,8 % (Messung unten im Chat, Entscheidung Marcel).
