@@ -636,9 +636,9 @@ function loadData(d) {
   try {
     if (d.brw_ki_result && typeof d.brw_ki_result === 'object' && d.brw_ki_result.value) {
       window.currentDeal.brw_ki_result = d.brw_ki_result;
-      // UI-Update — Result-Card mit alten Daten rendern
-      if (window.DealPilotBrw && typeof window.DealPilotBrw.renderResult === 'function') {
-        window.DealPilotBrw.renderResult(d.brw_ki_result);
+      /* v3030: alte KI-Schätzungen werden nicht mehr angezeigt (Daten bleiben erhalten) */
+      if (window.DealPilotBrw && typeof window.DealPilotBrw.clearResult === 'function') {
+        window.DealPilotBrw.clearResult();
       }
     } else {
       // Kein Result gespeichert → Card clearen (sonst zeigt sich altes Objekt)

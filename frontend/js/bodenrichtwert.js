@@ -269,78 +269,17 @@
   window.addEventListener('dp:object-ready', function () { setTimeout(portalBeschriften, 300); });
   setTimeout(portalBeschriften, 1500);
 
-  // ── KI-Anfrage ───────────────────────────────────────────────
-  async function askAi() {
-    var btn = document.getElementById('brw-ai-btn');
-    
-    var plz = _val('plz');
-    var ort = _val('ort');
-    /* v1836 · Mit Hausnummer, aus demselben Grund wie in fetchBoris:
-       eine Strasse laeuft durch mehrere Bodenrichtwertzonen, und die
-       KI-Schaetzung soll fuer das HAUS gelten, nicht fuer die Strasse. */
-    var str = [_val('str'), _val('hnr')].filter(Boolean).join(' ');
-    
-    if (!plz || !ort) {
-      _setStatus('⚠ Erst PLZ + Ort eingeben', 'err');
-      if (typeof toast === 'function') toast('⚠ Bitte erst PLZ + Ort eingeben');
-      return;
-    }
-    
-    var token = _token();
-    if (!token) {
-      _setStatus('⚠ Bitte einloggen', 'err');
-      return;
-    }
-
-    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span> KI sucht…'; }
-    _setStatus('Anfrage läuft…', '');
-    
-    try {
-      var resp = await fetch(_apiBase() + '/ai/bodenrichtwert', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({ str: str, plz: plz, ort: ort })
-      });
-      
-      var data;
-      try { data = await resp.json(); } catch (e) { data = null; }
-      
-      if (!resp.ok) {
-        var msg = (data && (data.error || data.message)) || ('Fehler ' + resp.status);
-        throw new Error(msg);
-      }
-      
-      if (data && data.value && data.value > 0) {
-        var brwEl = _el('brw');
-        if (brwEl) {
-          brwEl.value = String(data.value).replace('.', ',');
-          var ev = new Event('input', { bubbles: true });
-          brwEl.dispatchEvent(ev);
-        }
-        // V187-h4: kurzer Status + ausführliche Result-Box
-        _setStatus('✓ KI-Schätzung übernommen', 'ok');
-        _renderResult(data);
-        if (typeof toast === 'function') {
-          toast('✓ Bodenrichtwert übernommen: ' + data.value + ' €/m²');
-        }
-      } else {
-        _setStatus('⚠ Keine sinnvolle Schätzung möglich', 'err');
-        _clearResult();
-        if (typeof toast === 'function') toast('⚠ KI konnte keinen Wert ermitteln');
-      }
-    } catch (err) {
-      console.error('[brw-ai]', err);
-      _setStatus('⚠ ' + (err.message || 'Fehler'), 'err');
-      _clearResult();
-      if (typeof toast === 'function') toast('⚠ ' + (err.message || 'KI-Fehler'));
-    } finally {
-      if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg></span> KI versuchen'; }
-    }
-  }
-
+  /* ═══ v3030 · DIE KI-SCHÄTZUNG IST ENTFERNT ══════════════════════════════
+     Marcel 28.10.2026: „Bodenrichtwert schätzen … brauchen wir nicht. Ich finde
+     das totalen Quatsch." Eine geschätzte Zahl im Feld rechnete in Bodenwert,
+     Gebäudeanteil und AfA mit — gegen die Regel „kein Treffer heißt kein Wert".
+     Der Knopf war seit v389 nur per CSS versteckt, und das erst, nachdem die
+     Datenaufnahme ihren Stilblock gesetzt hatte (object-actions.js) — auf dem
+     Handy stand er davor sichtbar da. Der automatische Rückfall nach einem
+     leeren BORIS-Abruf (v1265) lief unabhängig davon weiter.
+     Jetzt: kein Knopf, kein Rückfall, alte gespeicherte Schätzungen werden
+     nicht mehr angezeigt (die Daten bleiben im Objekt, storage.js). Liefert
+     BORIS nichts, bleibt das Feld leer, daneben der Weg zum Landesportal. */
 
   // ── V187-h4: Erweiterte Result-Box mit Kontext + Quelle ─────
   function _renderResult(data) {
@@ -903,12 +842,13 @@
   }
 
   function _knopfMarkieren(an) {
-    var btn = document.getElementById('brw-ai-btn');
+    /* v3030: markiert den amtlichen Abruf, nicht mehr die (entfernte) Schätzung */
+    var btn = document.getElementById('brw-boris-btn');
     if (!btn) return;
     btn.classList.toggle('brw-veraltet', !!an);
     btn.title = an
       ? 'Die Adresse hat sich geändert — Bodenrichtwert neu abrufen'
-      : 'DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren';
+      : 'Bodenrichtwert direkt abrufen — gratis (Open Data)';
   }
 
   function _brwAutoPruefen() {
@@ -958,10 +898,7 @@
          Schätzung. Beide Knöpfe bleiben von Hand bedienbar. */
       Promise.resolve(fetchBoris())
         .catch(function () {})
-        .then(function () {
-          if (!_brwLeer()) return;          /* BORIS hat geliefert — fertig */
-          return Promise.resolve(askAi()).catch(function () {});
-        })
+        /* v3030: kein KI-Rückfall mehr - leer bleibt leer, der Portal-Knopf führt weiter. */
         .then(function () { _brwAuto.laeuft = false; });
     } catch (e) { _brwAuto.laeuft = false; }
   }
@@ -1012,7 +949,6 @@
     borisHolen: borisHolen,          /* v1288: der reine Abruf, ohne DOM */
     verfuegbarFuerPlz: borisAvailableForPlz,
     refreshBorisBtn: _refreshBorisBtn,
-    askAi: askAi,
     autoPruefen: _brwAutoPruefen,   /* v1263: Prüfhaken, damit die Automatik messbar ist */
     renderResult: _renderResult,
     clearResult: _clearResult,

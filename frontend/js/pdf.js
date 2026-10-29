@@ -4007,7 +4007,7 @@ async function _exportPDFInner() {
     ['Mietentwicklung',                window._dpPdfMiete().text, 'Annahme', window._dpPdfMiete().modus === 'prog' ? 'Erfahrungswert' : (window._dpPdfMiete().modus === 'detail' ? 'Erhöhungsplan im Objekt' : 'aus den Einheiten')],
     ['Wertsteigerung p.a.',             pP(v('wertstg'), 1), 'Annahme', 'Konservativ B-/C-Stadt'],
     ['Kostensteigerung p.a.',           pP(v('kostenstg'), 1),'Annahme', 'Orientiert an Inflationsrate'],
-    ['Leerstand p.a.',                  pP(v('leerstand'), 1),'Annahme', 'Vollvermietung angenommen'],
+    ['Leerstand p.a.',                  pP(v('leerstand'), 1),'Annahme', v('leerstand') > 0 ? 'von der Miete abgezogen' : 'Vollvermietung angenommen'],   /* v3030 */
     ['Anschlusszinssatz',               pP(v('anschl_z'), 1), 'Annahme', 'Konservativer Puffer \u00fcber aktuellem Niveau'],
     ['Anschluss-Tilgung',               pP(v('anschl_t'), 1), 'Annahme', 'Markt\u00fcblicher Satz'],
     ['Exit-Rendite (Verkaufsszenario)', pP(v('exit_bmy'), 1), 'Annahme', 'Markt\u00fcblich f\u00fcr Standort'],

@@ -2403,6 +2403,7 @@ async function objekt_schnellblick(ctx, args) {
       kp: kp, nk: knkSumme, san: z(d.san) || 0, moebl: z(d.moebl) || 0,
       nkm: nkm, ze: ze, uf: 0,
       bwk_ul: bwkUl, bwk_nul: bwkNul,
+      leerstand_pct: dez(d.leerstand) || 0,   /* v3030: wie calc.js */
       d1: darlehen, d1z: zins.wert, d1t: tilg.wert, ek: ek,
       afa: afa, grenz: dez(d.grenz) || 0,
       ekInklNkLtv: d.ek_inkl_nk === true || d.ek_inkl_nk === 'true'

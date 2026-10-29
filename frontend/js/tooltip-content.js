@@ -282,7 +282,7 @@
     },
     'tab3.leerstand': {
       title: 'Leerstand p.a.',
-      body: 'Anteil der Monate pro Jahr ohne Miete. Bei langjährigen Mietern: 0%. Mit gelegentlichem Mieterwechsel: 2-5%. In strukturschwachen Lagen ggf. 10%+. Reduziert die effektive Jahresmiete.',
+      body: 'Anteil der Monate pro Jahr ohne Miete. Bei langjährigen Mietern: 0%. Mit gelegentlichem Mieterwechsel: 2-5%. In strukturschwachen Lagen ggf. 10%+. Wird von der Miete abgezogen: mindert Cashflow, Nettomietrendite und die steuerpflichtigen Einnahmen. Die Bruttomietrendite bleibt auf der vollen Miete.',   /* v3030 */
       severity: 'beginner'
     },
     'tab3.btj': {

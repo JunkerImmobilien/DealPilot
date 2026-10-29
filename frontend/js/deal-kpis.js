@@ -107,6 +107,19 @@ window.DealKpis = (function() {
     var wm_j  = wm_m * 12;
     var nkm_j = (nkm + ze) * 12;        // Nettokaltmiete + Zusatzeinnahmen p.a.
 
+    /* v3030 · LEERSTAND RECHNET MIT. Marcel 28.10.2026: „zwei Prozent nehmen wir
+       einfach mal an, dass leer steht, und dann wird's abgezogen." Bis hier fuellte
+       das Feld nur Score und PDF; Cashflow, Steuer und DSCR rechneten voll vermietet.
+       Der Leerstand ist entgangene Miete: er mindert den Cashflow UND die Einnahmen
+       der Steuer, also geht er in bwk_nul und in bwk_nul_st (anders als das
+       Mietausfallwagnis, das nur im Cashflow steht). Brutto-Kennzahlen (bmy, DSCR
+       brutto) bleiben auf der vollen Miete - so werden sie ueblich ausgewiesen.
+       Der Kern liest KEINE Einstellung: der Aufrufer gibt leerstand_pct mit, ohne
+       Angabe rechnet er wie bisher (0 %). */
+    var leer_pct = (+i.leerstand_pct > 0 && isFinite(+i.leerstand_pct)) ? (+i.leerstand_pct) / 100 : 0;
+    var leer_j   = nkm_j * leer_pct;
+    if (leer_j > 0) { bwk_nul += leer_j; bwk_nul_st += leer_j; }
+
     // ═════ Bewirtschaftung ═════
     // V63.35: Cashflow-relevant ist NUR der nicht-umlagefähige Teil.
     // bwk_total bleibt als Brutto-Kennzahl erhalten (für NMR und Anzeige).
@@ -224,6 +237,7 @@ window.DealKpis = (function() {
       // BWK
       bwk: bwk, bwk_cf: bwk_cf, bwk_ul: bwk_ul, bwk_nul: bwk_nul,
       bwk_nul_st: bwk_nul_st,   /* v1898: der steuerlich abziehbare Teil */
+      leer_j: leer_j, leer_pct: leer_pct * 100,   /* v3030: Leerstand p.a. (steckt in bwk_nul) */
       // Finanzierung
       d_total: d_total, ltv: ltv,
       zins_j: zins_j, tilg_j: tilg_j, rate_j: rate_j,
