@@ -42,7 +42,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 2. ✅ 2026-1040/1002/1082 von Prod angelegt, Storybook vollständig — **Storybook:** `messe-storybook.mjs` meldete „FEHLT in der DB: 2026-1040, 2026-1002“ (Am Markt 9 Kabelsketal: RND-Gutachten, Privat oder GmbH). Kürzel/Status der Objekte auf Staging prüfen (privat-Fassung steht laut [[demo-konto-staging-prod]] auf „Verloren“).
 3. ✅ Status abgeglichen, Verloren-Fehler behoben (v3046) — **Feld-Diff Staging = Prod** der Demo-Objekte nach dem Neuabruf - Prod-DB-Lesen war im Auto-Modus gesperrt; über die App-API (je Objekt, mit Pausen) oder mit Marcels Freigabe per psql.
 4. ~~Abnahme RND-Anfrage~~ — gestrichen, Marcel testet selbst (29.10.2026).
-5. **Zielanzeige im Kopf** („Ziel x %“, `jahresstaende.js kopfRing()`): erscheint, sobald EIN Hebel rechenbar ist — bei finanzierten Objekten meist nur die Entschuldung bis Ende Zinsbindung (Hölderlinstr.: „Ziel 3 % aus 1 Hebel“), auch ohne Zielbild. Entscheidung Marcel: nur mit definiertem Zielbild zeigen?
+5. ✅ v3048 (Prod 1.0.11) nur mit angelegtem Zielbild — **Zielanzeige im Kopf** („Ziel x %“, `jahresstaende.js kopfRing()`): erscheint, sobald EIN Hebel rechenbar ist — bei finanzierten Objekten meist nur die Entschuldung bis Ende Zinsbindung (Hölderlinstr.: „Ziel 3 % aus 1 Hebel“), auch ohne Zielbild. Entscheidung Marcel: nur mit definiertem Zielbild zeigen?
 6. **N84.9 Hölderlinstr.:** `svw_herkunft = bank` setzen — direkter DB-Schreibzugriff auf Prod im Auto-Modus gesperrt; Marcel setzt es in der App (Objekt › Wert › Herkunft) oder gibt die Regel frei.
 
 ### N85 · BMF-Rechner (Reiterfolge ✅ v3047: Bodenabschlag = Schritt 5/5): Optimierungen und umgekehrte Ertragswertmethode vergleichen und übernehmen (29.10.2026)

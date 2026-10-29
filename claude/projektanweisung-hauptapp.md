@@ -43916,3 +43916,13 @@ ist gleich zum Original.
 **Nachweis.** Status-Diff Prod/Staging per psql; Storybook ohne „FEHLT"; Stories im Browser (Staging): Knopf schaltet, nach 20 s eine Geschichte weiter; Prod liefert `stxPlay`.
 
 **Rest.** N84.4/N85 Entwürfe; N84.9 Entscheidung; Abnahme RND-Anfrage-Mail.
+
+### v3047 · v3048 — Prod 1.0.10 / 1.0.11 (29.10.2026 nachts)
+
+**Was.** v3047: BMF-Rechner — Reiter „Bodenabschlag“ als Schritt 5/5 in `_BMF_PANE_ORDER` (vorher indexOf −1 → Fußzeile Schritt 1, „Weiter“ sprang auf Schritt 1); Übernehmen auf 4 und 5; Bodenabschlag rechnet auch über „Weiter“. v3048: Zielanzeige im Kopf (`jahresstaende.js kopfRing`) nur mit angelegtem Zielbild (Marcel), vorher reichte die Entschuldung.
+
+**Commit.** `f591f4ce` (Prod `9978c7a`), `9c72ad3b` (Prod `97eda6d`).
+
+**Nachweis.** Browser Staging: Schritt 4 → Weiter → 5/5 → Zurück → 4; Hölderlinstr. ohne Ziel-Anzeige, Parkstr. 9 „Ziel 38 %“.
+
+**Rest.** N84.9 (Herkunft „Bank“ Hölderlinstr. — Prod-DB-Schreiben im Auto-Modus gesperrt, Marcel setzt es in der App); Entwürfe N84.4/N85.
