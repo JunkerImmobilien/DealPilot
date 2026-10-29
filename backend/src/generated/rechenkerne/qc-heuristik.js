@@ -215,7 +215,7 @@ window.QcHeuristik = (function () {
     if (nmr < 2) msgs.push('Nettorendite unter 2% — nach Bewirtschaftungskosten bleibt sehr wenig.');
     /* qc-v2450: „Negativer Cashflow von -124" war eine doppelte Verneinung */
     if (cfMon < 0) msgs.push('Negativer Cashflow (' + _eurMon(cfMon) + ') — der Deal kostet dich jeden Monat Geld.');
-    if (dscr > 0 && dscr < 1.0) msgs.push('DSCR unter 1,0 — die Mieteinnahmen decken nicht einmal die Bankrate.');
+    if (dscr > 0 && dscr < 1.0) msgs.push('DSCR unter 1,0 — der Reinertrag (Miete nach Kosten) deckt die Bankrate nicht.');
     if (bewirtPctNkm > 35) msgs.push('Bewirtschaftungskosten über 35% der NKM — IVD-Empfehlung wäre 18-35%.');
     if (ekr > 8 && cfMon > 100) msgs.push('Sehr starke EK-Rendite und positiver Cashflow — solider Deal.');
     if (msgs.length === 0) msgs.push('Solide Eckdaten ohne offensichtliche Probleme. Im vollen Objekt-Modus siehst du den vollständigen Investor Deal Score 2.0 mit ~22 KPIs.');
@@ -270,7 +270,14 @@ window.QcHeuristik = (function () {
     if (!isFinite(zielBmr) || zielBmr <= 0) zielBmr = ZIEL_BMR_RUECKFALL;
     var kpForBmr = nkmYear / (zielBmr / 100);        // KP bei der Ziel-Bruttomietrendite
     var annuitaetJahr;
-    if (dscr && dscr > 0) {
+    /* v3031 · der DSCR ist jetzt netto - die Bankrate kommt deshalb direkt (kd), nur alte
+       Aufrufer ohne kd rechnen ueber den Brutto-Wert zurueck. */
+    var _kd = +d.kd || 0, _dscrB = +d.dscrBrutto || 0;
+    if (_kd > 0) {
+      annuitaetJahr = _kd;
+    } else if (_dscrB > 0) {
+      annuitaetJahr = nkmYear / _dscrB;
+    } else if (dscr && dscr > 0) {
       annuitaetJahr = nkmYear / dscr;
     } else {
       annuitaetJahr = nkmYear * 0.6;                 // Fallback ~60% der NKM

@@ -363,9 +363,11 @@ function buildPrompt(payload, opts) {
     '   finanzierungen und Nachbewertungen können problematisch werden.',
     '',
     'DSCR (Debt Service Coverage Ratio) — Schuldendienstdeckung:',
+    '   Gerechnet wie die Bank: Reinertrag (Miete minus nicht umlagefaehige',   /* v3031 */
+    '   Bewirtschaftungskosten) geteilt durch Zins und Tilgung.',
     '',
     '🔴 KRITISCH — DSCR unter 1,0:',
-    '   Schuldendienst nicht durch Mieteinnahmen gedeckt. Der Investor muss aus',
+    '   Schuldendienst nicht durch den Reinertrag gedeckt. Der Investor muss aus',
     '   eigenem Einkommen zuschießen. Banken finanzieren das nur mit hohem Eigen-',
     '   kapital oder Zusatzsicherheiten — meist mit Zinsaufschlag.',
     '',

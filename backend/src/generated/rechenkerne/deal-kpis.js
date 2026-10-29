@@ -216,7 +216,8 @@ window.DealKpis = (function() {
           };
         })();
     var kd_dscr     = _dscrR.kd;
-    var dscr        = _dscrR.brutto;
+    var dscr        = _dscrR.netto;    /* v3031: massgeblich netto (Reinertrag / Kapitaldienst), Bankpraxis */
+    var dscr_brutto = _dscrR.brutto;   /* v3031: Miete / Kapitaldienst, nur noch zur Anzeige */
     var dscr_netto  = _dscrR.netto;
     var noi_dscr    = _dscrR.noi_brutto;
 
@@ -249,7 +250,7 @@ window.DealKpis = (function() {
       // Renditen
       bmy: bmy, nmy: nmy, fak: fak,
       // DSCR
-      dscr: dscr, dscr_netto: dscr_netto, noi_dscr: noi_dscr, kd_dscr: kd_dscr,
+      dscr: dscr, dscr_netto: dscr_netto, dscr_brutto: dscr_brutto, noi_dscr: noi_dscr, kd_dscr: kd_dscr,
       // EK-Rendite
       ekr: ekr
     };

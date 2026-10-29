@@ -358,7 +358,7 @@
   function buildDealFromData(d){
     return {
       bruttorendite: numN(d._kpis_bmy),
-      dscr:          numN(d._kpis_dscr),
+      dscr:          numN((window.Dscr && Dscr.ausGespeichert ? Dscr.ausGespeichert(d) : d._kpis_dscr)),   /* v3031 */
       ltv:           numN(d._kpis_ltv),
       cashflowMonatlich: (d._kpis_cf_ns!=null ? num(d._kpis_cf_ns)/12 : null),
       /* v2144: ohne Darlehen entfallen DSCR und LTV im Investor Deal
@@ -3735,7 +3735,7 @@
           return z > 0 ? Math.round(z) : null;
         })(),
         zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || null,
-        dscr: _ppZahl(o._kpis_dscr),
+        dscr: _ppZahl(window.Dscr && Dscr.ausGespeichert ? Dscr.ausGespeichert(o) : o._kpis_dscr),   /* v3031 */
         ltv_prozent: _ppZahl(o.ltv) != null ? _ppZahl(o.ltv) : _ppZahl(o._kpis_ltv),
         bruttomietrendite_prozent: _ppZahl(o._kpis_bmy),
         dealpilot_score: _ppZahl(o._dealpilot_score),

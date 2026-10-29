@@ -5201,7 +5201,7 @@ const QcApp = (function() {
   function _applyConsensusToQc() {
     /* v893e-src: Standard-Quelle aus Setting (Profil & Anzeige). Default konsens. */
     try {
-      var _src = localStorage.getItem('dp_qb_avm_src') || 'konsens';
+      var _src = 'konsens';   /* v3032: nur noch eine AVM-Quelle (DealPilot) - alte Wahl dp_qb_avm_src gilt nicht mehr */
       if (_src === 'dp' || _src === 'sp' || _src === 'ph') {
         var _pn = _src === 'dp' ? 'DealPilot' : _src === 'sp' ? 'Sprengnetter' : 'PriceHubble';
         var _mm = null;
@@ -6275,7 +6275,7 @@ const QcApp = (function() {
       if(__el&&__el.value){ var __st=JSON.parse(__el.value); if(__st&&__st.card){ var __c=__st.card;
         __avmRaw['DealPilot']={ mw:__c.mw?{low:__c.mw.low,mid:__c.mw.med,high:__c.mw.high}:null, mm:__c.mm?{low:__c.mm.low,mid:__c.mm.med,high:__c.mm.high}:null }; } }
     } catch(e){}
-    var __def='konsens'; try{ __def=localStorage.getItem('dp_qb_avm_src')||'konsens'; }catch(e){}
+    var __def='konsens';   /* v3032: Einstellung entfernt, immer Konsens */
     var __qcSet=[]; /* v893k-qcset: bereits gesetzte QC-Kernwerte fuer die Gesamtuebersicht */
     try {
       var IN=QcEngine.getInputs()||{}; /* v893l-qcsetfull: vollstaendig ueber alle QC-Felder */
@@ -7187,8 +7187,8 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
 
-  <script src="js/dscr-engine.js?v=v2240"></script>
-  <script src="js/deal-kpis.js?v=v3030"></script>
+  <script src="js/dscr-engine.js?v=v3031b"></script>
+  <script src="js/deal-kpis.js?v=v3031"></script>
   <!-- v1956: das Lage-Profil. Eigenes Dokument, eigene Einbindung -
        gleicher Ursprung, also derselbe Speicher wie im Hauptfenster. -->
   <script src="js/lage-profil.js?v=v2159"></script>
@@ -7234,7 +7234,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2546a"></script>
+  <script src="js/qc-heuristik.js?v=v3031"></script>
   <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v3023a"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->

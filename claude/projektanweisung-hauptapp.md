@@ -43684,3 +43684,33 @@ ist gleich zum Original.
   - beide neuen MP4s antworten mit 206 (Range)
   - Backend healthy, 0 Fehler im Log
 **Rest.** BACKLOG N83: Bodenrichtwert-Schätzen raus, Leerstand einrechnen, DSCR brutto/netto und Abschlag-Wortlaut recherchieren.
+
+### v3030 / v3030b · N83 abgearbeitet · 29.10.2026 · Prod `f0f1362`
+
+**Was.**
+- Bodenrichtwert-Schätzung (KI) ist raus: Knopf, `askAi()`, automatischer Rückfall nach leerem BORIS-Abruf, Anzeige alter Schätzungen.
+  - Ursache für Marcels Beobachtung „nur auf dem Handy“: Der Knopf war seit v389 nur per CSS versteckt, und das erst, nachdem die Datenaufnahme ihren Stilblock gesetzt hatte.
+- Leerstand rechnet mit: (NKM+ZE) × %, in `nul` und `nul_st`.
+  - Kern `DealKpis.compute({leerstand_pct})` (Parameter), dazu calc.js, Bot und Sprachlauf.
+  - Am Feld steht „= … € / Jahr“; Tooltip und PDF-Annahme sind angepasst.
+- Wert-&-Zielbild-PDF nennt keinen Abschlag-Prozentsatz mehr („auf Kaufpreisniveau“, „Angebotsniveau“).
+- v3030b repariert zwei Prüfer:
+  - `feld-waechter` las `FIELDS` mit 0 Zeichen, weil Anführungszeichen in Kommentaren die Klammersuche störten. Jetzt liest er 328 Felder; die Basislinie ist von 26 auf 14 gesenkt.
+  - `bestand-reiter-pruefen` erwartet jetzt den gewollten Reiter „Ankauf · Bestand · Zielbild“.
+
+**Nachweis.**
+- Prüfer: 19 Werkzeuge, 16 Bot-Prüfungen, feld-waechter und bestand-reiter, alle RC=0; buster-ebenen SAUBER.
+- Kabine Staging:
+  - Knopf weg auf 390 und 1180 px.
+  - Parkstr. 9 mit 2 % Leerstand: „= 788 € / Jahr“, `cf_op` −788, `zve_immo` −788, Nettomietrendite 5,42 → 5,28, Bruttomietrendite und DSCR unverändert.
+  - Steuer nur −28 €: Rumpfjahr Dez. 2024; dieselbe Wirkung bei gleich hoher Mietminderung, also kein Leerstand-Fehler.
+  - Folgen-Kette, GrESt (5 PLZ) und Track-Record-Prognose geprüft.
+- Prod:
+  - Buster v3030 auf calc/deal-kpis/bodenrichtwert/pdf-wert-zielbild
+  - kein `brw-ai-btn`, `r-leer-j` vorhanden
+  - Backend healthy, 0 Fehler
+
+**Rest.**
+- DSCR-Ampel netto (Recherche in BACKLOG N83) wartet auf Marcels Go.
+- Seitenbild der Bankfassung mit Bausparvertrag an einem echten Export abnehmen.
+- KfW mit tilgungsfreien Anlaufjahren fehlt als Feature.

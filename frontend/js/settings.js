@@ -877,21 +877,11 @@ function showSettings(initialTab) {
           '</div>' +
         '</div>' +
         /* === V213 collapse-toggle profilanzeige START === */
-        '<hr class="dvd">' +
-        '<h3 class="set-section-h">Markt-Daten im Tab Finanzierung</h3>' +
-        '<div class="v213-set-toggle" style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
-          '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">' +
-            '<input type="checkbox" id="set_collapse_market_cards"' + (_v213IsChecked()?' checked':'') + ' style="margin-top:3px;flex-shrink:0;cursor:pointer;" onchange="_v213OnToggleChange(this)">' +
-            '<span>' +
-              '<span style="display:block;color:var(--ch,#2A2727);font-weight:500">Markt-Daten-Cards standardmäßig zugeklappt</span>' +
-              '<span style="display:block;color:var(--muted,#5F5E5A);margin-top:2px;line-height:1.5;font-weight:400">Wenn aktiviert: Markt-Kontext, Marktzinsen und Pfandbrief-Card im Finanzierung-Tab werden beim Laden zugeklappt. Du kannst sie jederzeit einzeln per Klick öffnen.</span>' +
-            '</span>' +
-          '</label>' +
-          '<div style="margin-top:10px;text-align:right">' +
-            '<button type="button" class="btn btn-sm btn-ghost" onclick="_v213ResetCards()" title="Verwirft alle manuellen Klapp-Entscheidungen">Alle Karten zurücksetzen</button>' +
-          '</div>' +
-        '</div>' +
+        /* v3032 · Marcel 29.10.2026: „Markt-Daten-Cards standardmäßig zugeklappt kann auch raus“.
+           Die Karten klappen weiter an ihrem eigenen Pfeil; die Vorgabe bleibt zugeklappt. */
         /* v875: Investor-Deal-Score-Leiste Default beim Objekt-Oeffnen */
+        /* v3032 · Marcel 29.10.2026: nur bei Darstellung „DealPilot“ - die Score-Leiste gibt es nur dort */
+        ((function () { var th = document.documentElement.getAttribute('data-ui-theme'); return !th || th === 'dealpilot'; })() ? (
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Investor Deal Score beim Öffnen</h3>' +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
@@ -903,16 +893,9 @@ function showSettings(initialTab) {
             '</span>' +
           '</label>' +
         '</div>' +
-        /* v893e-src: Quickboarding Auto-Uebernahme-Quelle */
-        '<hr class="dvd">' +
-        '<h3 class="set-section-h">Quickboarding \u2014 Auto-\u00dcbernahme</h3>' +
-        '<p class="hint" style="margin-bottom:10px">Sind mehrere Marktbewertungen aktiv, bestimmt diese Wahl, welcher Wert nach dem Abruf und beim Spannen-Wechsel automatisch in die Grundmiete \u00fcbernommen wird. Einzelne Karten kannst du weiterhin gezielt \u00fcbernehmen.</p>' +
-        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
-          '<label for="set_qb_avm_src" style="display:block;color:var(--ch,#2A2727);font-weight:500;margin-bottom:8px">Standard-Quelle</label>' +
-          '<select id="set_qb_avm_src" onchange="window._qbAvmSrcSet(this)" style="width:100%;max-width:320px;padding:9px 12px;border:1px solid rgba(201,168,76,0.35);border-radius:8px;background:#fff;color:var(--ch,#2A2727);font:inherit;cursor:pointer">' +
-          (function(){ var cur='konsens'; try{cur=localStorage.getItem('dp_qb_avm_src')||'konsens';}catch(e){} return [['konsens','Konsens (\u00d8 aller aktiven)'],['dp','DealPilot'],['sp','Sprengnetter'],['ph','PriceHubble']].map(function(o){return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join(''); })() +
-          '</select>' +
-        '</div>' +
+        '') : '') +   /* v3032: Ende Investor-Deal-Score-Abschnitt */
+        /* v3032 · „Quickboarding Auto-Übernahme“ entfernt (Marcel 29.10.2026: es gibt nur noch eine
+           AVM-Quelle, DealPilot). quickcheck-app.html nimmt immer den Konsens = DealPilot. */
         /* v893r-exportphotos: Bilder in Export & Netzwerk-Anhang */
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Bilder in Sicherung & Netzwerk</h3>' +
@@ -949,15 +932,8 @@ function showSettings(initialTab) {
         /* v2189: wo der Pilot wartet — die Knöpfe baut pilot-tower.js selbst,
            damit die Liste der Orte an EINER Stelle steht. */
         ((window.DealPilotPilot && typeof window.DealPilotPilot.einstellungenHtml === 'function') ? window.DealPilotPilot.einstellungenHtml() : '') +
-        /* === v648-mb-theme START === */
-        '<hr class="dvd">' +
-        '<h3 class="set-section-h">Marktbericht-Design</h3>' +
-        '<p class="hint" style="margin-bottom:10px">Hell oder Dunkel f\u00fcr den Marktbericht-Bereich. \u00c4nderung wird beim n\u00e4chsten \u00d6ffnen des Marktberichts aktiv.</p>' +
-        '<div class="dp-tt-mode-toggle" id="mb-theme-switch">' +
-          '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='light'?' active':'') + '" data-mbth="light" onclick="_setMbThemeLight()">Hell<span class="dp-tt-mode-btn-label">Wie Objekt-Tab</span></button>' +
-          '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='dark'?' active':'') + '" data-mbth="dark" onclick="_setMbThemeDark()">Dunkel<span class="dp-tt-mode-btn-label">Obsidian/Gold</span></button>' +
-        '</div>' +
-        /* === v648-mb-theme END === */
+        /* v3032 · „Marktbericht-Design“ entfernt (Marcel 29.10.2026). Der Schalter wirkte seit v895e
+           nicht mehr: marktbericht-view.js mbTheme() gibt immer 'light' zurueck. */
         /* v2900: PDF-Export - Vorauswahl der Fassung und Pilot-Analyse; den
            Abschnitt baut pdf-wahl.js selbst (eine Liste der Fassungen). */
         ((window.DealPilotPdfWahl && typeof window.DealPilotPdfWahl.einstellungenHtml === 'function') ? window.DealPilotPdfWahl.einstellungenHtml() : '') +

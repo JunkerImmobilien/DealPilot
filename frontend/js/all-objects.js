@@ -54,7 +54,12 @@
     var ltv = gi > 0 ? (d_total / gi) * 100 : 0;
     var schuldZins = (d1 * num('d1z') + d2 * num('d2z')) / 100;
     var schuldTilg = (d1 * num('d1t') + d2 * num('d2t')) / 100;
-    var dscr = (schuldZins + schuldTilg) > 0 ? (nkm * 12) / (schuldZins + schuldTilg) : 0;
+    /* v3031 · hier stand eine eigene Brutto-Rechnung (Miete / Zins+Tilgung) am Kern vorbei.
+       Jetzt der gespeicherte Wert, netto gelesen (Dscr.ausGespeichert), sonst der Kern mit den
+       gespeicherten nicht umlagef. Kosten. */
+    var dscr = 0;
+    if (window.Dscr && d._kpis_dscr != null && Dscr.ausGespeichert) dscr = Dscr.ausGespeichert(d) || 0;
+    else if (window.Dscr && (schuldZins + schuldTilg) > 0) dscr = Dscr.compute({ nkm_j: nkm * 12, zins_j: schuldZins, tilg_j: schuldTilg, bwk_cf: num('_kpis_bwk_nul_y') }).netto;
     return {
       id: obj.id || obj._id || (obj.kuerzel || ''),
       kuerzel: d.kuerzel || obj.kuerzel || '–',

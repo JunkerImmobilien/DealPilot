@@ -83,9 +83,9 @@ if (!window._wlc) {
       var kd = (r.zy || 0) + (r.ty || 0) + bspar;
       if (!(kd > 0)) return null;
       if (window.Dscr && typeof window.Dscr.compute === 'function') {
-        return window.Dscr.compute({ nkm_j: (r.nkm_m || 0) * 12, ze_j: ze * 12, zins_j: r.zy || 0, tilg_j: r.ty || 0, bsv_j: bspar, bwk_cf: r.bwk_cf_y || 0 }).brutto;
+        return window.Dscr.compute({ nkm_j: (r.nkm_m || 0) * 12, ze_j: ze * 12, zins_j: r.zy || 0, tilg_j: r.ty || 0, bsv_j: bspar, bwk_cf: r.bwk_cf_y || 0 }).netto;   /* v3031: netto wie die Ampel */
       }
-      return ((r.nkm_m || 0) + ze) * 12 / kd;
+      return (((r.nkm_m || 0) + ze) * 12 - (r.bwk_cf_y || 0)) / kd;
     });
     for (var i = roh.length - 2; i >= 0; i--) if (roh[i] == null) roh[i] = roh[i + 1];
     var letzt = null;
@@ -1007,7 +1007,10 @@ if (!window._wlc) {
       var erst = (cfRows[0].nkm_m || 0) * 12;
       if (voll > 0 && erst < voll * 0.9) r0 = cfRows[1];
     }
-    var noiBase = (r0.nkm_m + ze) * 12;
+    /* v3031 · Stresstest NETTO: die nicht umlagef. Kosten bleiben fest, nur die Miete schwankt */
+    var grossBase = (r0.nkm_m + ze) * 12;
+    var bwkBase = r0.bwk_cf_y || 0;
+    var noiBase = grossBase - bwkBase;
     var zinsBase = r0.zy;
     var tilgBase = r0.ty;
     // V63.68: BSV-Sparrate als wirtschaftlicher Tilgungsersatz (siehe _dscrPerYear)
@@ -1030,7 +1033,7 @@ if (!window._wlc) {
       // V63.68: BSV-Sparrate bleibt fix unabhängig von Zinsänderung
       var neuKd = neuZins + tilgBase + bsparBase;
       mietSzen.forEach(function(mietPct) {
-        var neuNoi = noiBase * (1 + mietPct / 100);
+        var neuNoi = grossBase * (1 + mietPct / 100) - bwkBase;   /* v3031 */
         var dscr = neuKd > 0 ? neuNoi / neuKd : 0;
         row.push(dscr);
       });

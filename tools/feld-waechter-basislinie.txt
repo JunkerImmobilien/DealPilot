@@ -1,5 +1,6 @@
 ai-in-pdf	input/checkbox
 ao-search	input/search
+btl_an	input/checkbox
 fa-pdf-anlagev	input/checkbox
 fa-pdf-year	select/select
 gba_e	input/text

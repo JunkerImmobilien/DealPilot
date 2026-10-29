@@ -2270,10 +2270,12 @@ function _calcImmediate(){
     bsv_j:  bsv_in_kd,
     bwk_cf: bwk_cf
   });
-  var noi_dscr    = _dscrMain.noi_brutto;
+  /* v3031 · DSCR massgeblich NETTO: Bankpraxis: Kapitaldienstfaehigkeit am Reinertrag (Miete minus nicht umlagefaehige Bewirtschaftungskosten) / Kapitaldienst. Brutto bleibt als Zusatzangabe. */
+  var noi_dscr    = _dscrMain.noi_netto;   /* Reinertrag */
   var kd_dscr     = _dscrMain.kd;
-  var dscr        = _dscrMain.brutto;
+  var dscr        = _dscrMain.netto;
   var dscr_netto  = _dscrMain.netto;
+  var dscr_brutto = _dscrMain.brutto;
   /* v2240 · Alle Ampeln folgen den persoenlichen Mindest-Schwellen
      (Einstellungen -> DealPilotSchwellen.get(); Vorgabe 1,2 / 90 / 0).
      Die Einstufung macht der Kern (Dscr.classify), die Schwellen bringt
@@ -2286,9 +2288,10 @@ function _calcImmediate(){
   var bankItem2=dscrEl&&dscrEl.closest('.bank-item');
   if(bankItem2)bankItem2.className='bank-item '+Dscr.bankItemCls(dscr, _sw);
   // Detail-Text: bei BSV explizit anzeigen
-  var dscrDetail = 'Mieteinnahmen '+fE(noi_dscr)+' / Kapitaldienst '+fE(kd_dscr)+' p.a.';
+  /* v3031: Reinertrag statt Mieteinnahmen im Zaehler, Brutto als Zusatz */
+  var dscrDetail = 'Reinertrag '+fE(noi_dscr)+' (Miete abzgl. nicht umlagef\u00e4higer Kosten) / Kapitaldienst '+fE(kd_dscr)+' p.a.';
   if (bsv_in_kd > 0) dscrDetail += ' (Zins '+fE(zins_j,0)+' + BSV-Sparrate '+fE(bsv_in_kd,0)+')';
-  dscrDetail += ' | Netto-DSCR: '+fN(dscr_netto,2);
+  dscrDetail += ' | ohne Kosten (brutto): '+fN(dscr_brutto,2);
   st('bank-dscr-d', dscrDetail);
   st('bank-zaer-d','Anschluss kalkuliert bei '+fP(v('anschl_z'),1)+' → '+fE(ar,0)+'/Mon. (Risiko: '+fE(zaer_m,0)+'/Mon.)');
   // LTV bank item coloring
@@ -3155,7 +3158,7 @@ function _calcImmediate(){
        > Wer eine Rechnung abholt, muss wissen, zu wem sie gehoert. */
   State.kpis={_fuer:(window._currentObjKey||null),warm_j:warm_j,nk_vz_j:uf*12,ze_j:ze*12,nkm_netto_j:nkm*12,ze_ezb:ze*12*(_meIncludesZE?_mFac(bindj):1),   /* v2484 */
     bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
-    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,bwk_nul_st:nul_st,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung,
+    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,dscr_brutto:dscr_brutto /* v3031 */,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,bwk_nul_st:nul_st,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung,
     /* v2850 · mstg (Prozent) und d_total, damit DealScore.computeFromKpis(State.kpis)
        dasselbe rechnet wie DealScore.compute(): ohne mstg nahm der Kern 1,5 %, und die
        Bankfassung (pdf-investment-bank.js) zeigte bei 3 % Mietsteigerung 3 Punkte weniger
@@ -4272,7 +4275,8 @@ function renderCFCalc(mode){
   var dscrVal = document.getElementById('cr-dscr-val');
   var dscrSubVal = document.getElementById('cr-dscr-netto-val');
   if (dscrFormula) {
-    var formula = Math.round(nkm_phase).toLocaleString('de-DE') + ' € / ' +
+    /* v3031: Formel mit dem Reinertrag (Zaehler des massgeblichen Netto-DSCR) */
+    var formula = Math.round(noi).toLocaleString('de-DE') + ' € / ' +
                   Math.round(schuldendienst).toLocaleString('de-DE') + ' €';
     if (bsv_in_dscr > 0) {
       formula += ' (inkl. BSV-Sparrate)';
@@ -4281,18 +4285,19 @@ function renderCFCalc(mode){
     dscrFormula.textContent = formula;
   }
   if (dscrVal) {
-    dscrVal.textContent = dscrBrutto > 0 ? dscrBrutto.toFixed(2).replace('.', ',') : '—';
+    /* v3031: Hauptwert und Ampel NETTO, darunter brutto */
+    dscrVal.textContent = (schuldendienst > 0 && isFinite(dscrNetto)) ? dscrNetto.toFixed(2).replace('.', ',') : '—';
     dscrVal.classList.remove('warn', 'bad');
     /* v2240 · Schwellen aus den Einstellungen, Einstufung im Kern */
     var _swV = window.DealPilotSchwellen ? DealPilotSchwellen.get() : null;
-    var _clsV = Dscr.classify(dscrBrutto, _swV);
+    var _clsV = Dscr.classify(dscrNetto, _swV);
     if (_clsV === 'bad') dscrVal.classList.add('bad');
     else if (_clsV === 'warn') dscrVal.classList.add('warn');
   }
   if (dscrSubVal) {
-    dscrSubVal.textContent = dscrNetto > 0 ? dscrNetto.toFixed(2).replace('.', ',') : '—';
+    dscrSubVal.textContent = dscrBrutto > 0 ? dscrBrutto.toFixed(2).replace('.', ',') : '—';   /* v3031: Zusatz brutto */
   }
-  var dscr = dscrBrutto;
+  var dscr = dscrNetto;
 }
 
 function switchCFMode(mode){
@@ -4699,7 +4704,8 @@ function renderPhaseTable() {
   // V63.35: Excel-Logik — wm/bwk in den Phase-Werten zeigen NKM/NUL für Anzeige-Konsistenz
   // Heute
   /* v3029-rechnen: DSCR nur mit Kapitaldienst */
-  function _phDscr(nkm, kd) { return (kd > 0) ? nkm / kd : null; }
+  /* v3031: Zaehler ist der Reinertrag (Miete - nicht umlagef. Kosten) - wie Dscr.compute().netto */
+  function _phDscr(noi, kd) { return (kd > 0 && isFinite(noi)) ? noi / kd : null; }
   var nowVals = {
     wm: K.nkm_j, bwk: K.bwk_cf, zins: K.zins_j, tilg: K.tilg_j,
     cfvst: K.cf_op, ster: K.steuer, cfns: K.cf_ns,
@@ -4708,7 +4714,7 @@ function renderPhaseTable() {
        (Math.max(1, 0)), ohne Wert den LTV 0 %. Jetzt null -> „—". */
     bmy: (kp > 0) ? K.bmy : null, nmy: (K.gi > 0) ? K.nmy : null,
     // V63.57: dscr inkl. BSV-Sparrate (wirtschaftlicher Tilgungsersatz)
-    dscr: _phDscr(K.nkm_j, K.zins_j + K.tilg_j + (K.bspar_j || 0)),
+    dscr: _phDscr(K.nkm_j - K.bwk_cf, K.zins_j + K.tilg_j + (K.bspar_j || 0)),
     ltv: (State.ltv_basis > 0) ? K.ltv : null,
     // V63.67: Heute-Wert ist wert_basis (Verkehrswert / Bankbewertung / Kaufpreis)
     rs: K.d1, wert: wert_basis_ph, eq: wert_basis_ph - K.d1
@@ -4726,7 +4732,7 @@ function renderPhaseTable() {
     bmy: (kp > 0) ? K.nkm_ezb / kp * 100 : null,   /* v3029-rechnen */
     // V63.35: NMR/DSCR auf Excel-Logik (NKM − NUL, UL durchlaufend)
     nmy: (K.gi > 0) ? (K.nkm_ezb - K.bwk_cf_ezb) / K.gi * 100 : null,
-    dscr: _phDscr(K.nkm_ezb, K.zins_ezb + K.tilg_ezb + _bspY_ezb),
+    dscr: _phDscr(K.nkm_ezb - K.bwk_cf_ezb, K.zins_ezb + K.tilg_ezb + _bspY_ezb),
     rs: State.rs,
     // V63.67: EZB-Wert basiert auf wert_basis, nach `bindj` Jahren Wertsteigerung
     wert: wert_basis_ph * Math.pow(1 + wstg_ph, bindj),
@@ -4770,7 +4776,7 @@ function renderPhaseTable() {
     bmy: (kp > 0) ? K.nkm_an / kp * 100 : null,   /* v3029-rechnen */
     nmy: (K.gi > 0) ? (K.nkm_an - K.bwk_cf_an) / K.gi * 100 : null,
     // V63.57: BSV-Sparrate nur wenn sie in dieser Phase noch läuft (after_ezb/never)
-    dscr: _phDscr(K.nkm_an, K.zins_an + K.tilg_an + _bspY_an),   /* v3029-rechnen */
+    dscr: _phDscr(K.nkm_an - K.bwk_cf_an, K.zins_an + K.tilg_an + _bspY_an),   /* v3029-rechnen */
     rs: rs_anschluss,  // V63.55: angepasst je nach BSV-Status
     // V63.67: Anschluss-Wert basiert auf wert_basis, nach `bindj+1` Jahren
     wert: wert_basis_ph * Math.pow(1 + wstg_ph, bindj + 1),
@@ -5260,6 +5266,7 @@ window._dpKpisNachziehen = function () {
     o._kpis_cf_ns = State.kpis.cf_ns;
     o._kpis_cf_vs = State.kpis.cf_op;
     o._kpis_dscr  = State.kpis.dscr;
+    o._kpis_dscr_art = 'netto';   /* v3031 */
     o._kpis_ltv   = State.kpis.ltv;
   } catch (e) {}
 };

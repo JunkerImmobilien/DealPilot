@@ -15,14 +15,10 @@ var CollapsibleCards = (function() {
   var DEFAULT_FROM_SETTINGS_KEY = 'collapseMarketCards';
 
   function _getDefaultCollapsed() {
-    try {
-      var s = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
-      // V213: Default explizit TRUE (zugeklappt) wenn nichts gesetzt ist
-      if (typeof s[DEFAULT_FROM_SETTINGS_KEY] === 'boolean') {
-        return s[DEFAULT_FROM_SETTINGS_KEY];
-      }
-    } catch(e) {}
-    return true; // Default: zugeklappt
+    /* v3032 · Die Einstellung „Markt-Daten-Cards standardmäßig zugeklappt“ ist entfernt
+       (Marcel 29.10.2026). Eine früher gespeicherte Wahl darf ohne Schalter nicht unsichtbar
+       weiterwirken: Vorgabe ist immer zugeklappt, jede Karte klappt an ihrem eigenen Pfeil. */
+    return true;
   }
 
   /**

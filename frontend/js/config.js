@@ -10,12 +10,13 @@
 // V1.1: Logo-Saga abgeschlossen + Auth-Style überarbeitet (intern: 1.1.222)
 // Versionierungs-Strategie: Major.Minor.Patch (siehe CHANGELOG.md)
 window.DealPilotVersion = {
-  label:    'V1.1',
+  /* v3035 · Rueckfall bis frontend/version.json geladen ist (versionsanzeige.js); gepflegt wird dort */
+  label:    'V1.0.0',
   major:    1,
-  minor:    1,
-  patch:    222,
-  semver:   '1.1.222',
-  build:    '2026-05-18',
+  minor:    0,
+  patch:    0,
+  semver:   '1.0.0',
+  build:    '2026-10-29',
   channel:  'stable',
   tagline:  'Investmentanalyse für Profis'
 };

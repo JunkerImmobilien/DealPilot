@@ -30,7 +30,8 @@
  *   //   noi_brutto: 12600,  // Zähler Brutto
  *   //   noi_netto:  10800,  // Zähler Netto
  *   //   kd:        11200,   // Schuldendienst (Zins+Tilg+BSV)
- *   //   schwelle:  'warn'   // 'good' (≥1.2), 'warn' (1.0-1.2), 'bad' (<1.0)
+ *   //   dscr:       0.94,   // v3031: massgeblich = netto (Bankpraxis)
+ *   //   schwelle:  'bad'    // v3031: eingestuft am NETTO-Wert; 'good' (≥1.2), 'warn' (1.0-1.2), 'bad' (<1.0)
  *   //                       // v2240: Dscr.compute(input, schwellen) mit
  *   //                       // { dscrGruen, dscrGelb } aus DealPilotSchwellen.get()
  *   // }
@@ -123,9 +124,31 @@ window.Dscr = (function () {
       noi_brutto:  noi_brutto,
       noi_netto:   noi_netto,
       kd:          kd,
-      schwelle:    classify(brutto, schwellen),
+      /* v3031 · Eingestuft wird NETTO. Bankpraxis: Kapitaldienstfaehigkeit am Reinertrag (Miete minus nicht umlagefaehige Bewirtschaftungskosten) / Kapitaldienst; Mindestwert ueblich 1,2.
+         Bis v3030 stand hier classify(brutto) - eine Ampel, die Kosten nicht kennt, war gruen,
+         wo die Bank 0,96 rechnet. Marcel 29.10.2026: „mach das fertig, dass es richtig ist". */
+      dscr:        netto,      /* v3031: der massgebliche Wert */
+      schwelle:    classify(netto, schwellen),
       hat_bsv:     bsv_j > 0
     };
+  }
+
+  /* v3031 · GESPEICHERTER DSCR, IMMER NETTO GELESEN.
+     Bis v3030 stand in _kpis_dscr der BRUTTO-Wert (Miete / Kapitaldienst). Neu gespeicherte
+     Objekte tragen _kpis_dscr_art = 'netto'. Fuer alte rechnet diese Funktion exakt um,
+     wenn die Bestandteile gespeichert sind (_kpis_miete_j = NKM+ZE p.a., _kpis_bwk_nul_y =
+     nicht umlagef. Kosten = bwk_cf): Kapitaldienst = Miete / DSCR brutto,
+     netto = (Miete - Kosten) / Kapitaldienst. Fehlen sie, bleibt der alte Wert (null-Fall
+     sichtbar statt geraten waere schlechter: der Wert stimmt dann bis zum naechsten Oeffnen).
+     Kein DOM, keine Einstellung - reine Rechnung. */
+  function ausGespeichert(d) {
+    if (!d) return null;
+    var x = parseFloat(d._kpis_dscr);
+    if (!isFinite(x)) return null;
+    if (d._kpis_dscr_art === 'netto') return x;
+    var m = parseFloat(d._kpis_miete_j), b = parseFloat(d._kpis_bwk_nul_y);
+    if (x > 0 && m > 0 && isFinite(b) && b >= 0) return (m - b) / (m / x);
+    return x;
   }
 
   /**
@@ -161,6 +184,7 @@ window.Dscr = (function () {
 
   return {
     compute:     compute,
+    ausGespeichert: ausGespeichert,   /* v3031 */
     classify:    classify,
     label:       label,
     bankItemCls: bankItemCls,

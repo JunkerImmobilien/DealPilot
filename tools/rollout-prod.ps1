@@ -171,6 +171,28 @@ if ($antwort -ne 'JA') {
 }
 
 # ---- 5. Merge und Push ------------------------------------------------
+# ---- 4b. Version stempeln (v3035, Marcel 29.10.2026: Versionspflege) ---
+# patch +1, Datum, Paket -> frontend/version.json, Commit und Push auf staging,
+# damit der Stempel mit diesem Rollout nach main geht. Kein Buster noetig (no-store).
+Schritt "Version stempeln"
+# Wurde die Version seit dem letzten Prod-Stand schon von Hand gesetzt (--minor/--major oder
+# eine neue Datei), gilt sie - sonst zaehlt dieser Rollout die dritte Stelle hoch.
+git diff --quiet "origin/$ZWEIG_ZIEL" $ZWEIG_QUELLE -- frontend/version.json 2>$null
+if ($LASTEXITCODE -ne 0) {
+  $verText = (node tools/version-stempeln.mjs --zeigen) | Select-Object -Last 1
+  Hinweis "Version von Hand gesetzt, wird nicht hochgezaehlt: $verText"
+} else {
+  $verText = (node tools/version-stempeln.mjs) | Select-Object -Last 1
+  if ($LASTEXITCODE -ne 0) { Schlecht "version-stempeln fehlgeschlagen"; exit 1 }
+  $verMsg = Join-Path $env:TEMP 'dp-version-msg.txt'
+  Set-Content -Path $verMsg -Encoding ascii -Value @("$verText", "", "Prod-Rollout: Version gestempelt (tools/version-stempeln.mjs)", "", "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
+  git commit -q -F $verMsg -- frontend/version.json
+  if ($LASTEXITCODE -ne 0) { Schlecht "Versions-Commit fehlgeschlagen"; exit 1 }
+  git push -q origin $ZWEIG_QUELLE
+  if ($LASTEXITCODE -ne 0) { Schlecht "push staging (Version) fehlgeschlagen"; exit 1 }
+  Gut "$verText"
+}
+
 Schritt "Merge $ZWEIG_QUELLE -> $ZWEIG_ZIEL"
 $datum = Get-Date -Format 'dd.MM.yyyy'
 git checkout $ZWEIG_ZIEL --quiet
