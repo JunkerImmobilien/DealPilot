@@ -129,7 +129,12 @@ function stringListe(literal) {
 const nurPruefen = process.argv.includes('--pruefen');
 
 function summe(datei) {
-  return crypto.createHash('sha256').update(fs.readFileSync(datei)).digest('hex').slice(0, 16);
+  /* v3039 · Zeilenenden vor dem Hashen vereinheitlichen. Gemessen 29.10.2026: nach dem
+     Zweigwechsel in rollout-prod.ps1 (checkout main und zurueck) schrieb git die Datei mit CRLF
+     (autocrlf), der Inhalt war gleich, die Summe nicht - und deploy-staging brach mit
+     „Frontend-Konstanten veraltet“ ab. */
+  const s = fs.readFileSync(datei).toString('utf8').replace(/\r\n/g, '\n');
+  return crypto.createHash('sha256').update(s).digest('hex').slice(0, 16);
 }
 
 /* ── Ein DOM, das gerade genug kann ──────────────────────────────────────

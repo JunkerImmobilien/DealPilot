@@ -2,7 +2,7 @@
   "_hinweis": "v3035 · Versionspflege (Marcel 29.10.2026: 'das hier die erste Version'). major.minor setzt Marcel (tools/version-stempeln.mjs --minor/--major), patch zaehlt jeder Prod-Rollout selbst hoch (tools/rollout-prod.ps1). Wird ohne Cache gelesen (versionsanzeige.js) - kein Buster noetig.",
   "major": 1,
   "minor": 0,
-  "patch": 1,
+  "patch": 2,
   "stand": "2026-10-29",
-  "paket": "v3038"
+  "paket": "v3040"
 }
