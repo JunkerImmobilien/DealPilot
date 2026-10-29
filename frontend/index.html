@@ -1506,13 +1506,10 @@ label.dp-required.qc-required::after {
          Bereich, erscheint bei einer ETW also genauso, sobald man
          aufklappt. Wenn ein DESAG-Sachverständiger hier stutzt, versteht
          es sonst niemand. -->
-    <div class="card-title">Gebäudeart nach NHK 2010 · nur Ein- und Zweifamilienhäuser</div>
-    <p class="hint" style="margin:-4px 0 10px">
-      Die NHK 2010 kennen die Hausform nur bei <b>Ein- und Zweifamilienhäusern</b>.
-      Mehrfamilienhäuser haben dort eigene Gebäudearten ohne Hausform, Eigentumswohnungen
-      werden nicht über die NHK bewertet — bei beiden bleibt dieser Block leer.
-      <b>Das ist kein fehlendes Feld.</b>
-    </p>
+    <!-- v3034 · Marcel 29.10.2026: nur bei EFH/ZFH/DHH/RH sichtbar (objekt-bloecke.js) -->
+    <div id="nhk-haus-block">
+    <div class="card-title">Gebäudeart nach NHK 2010</div>
+    <p class="hint" style="margin:-4px 0 10px">Die NHK 2010 unterscheiden bei Ein- und Zweifamilienhäusern nach Hausform, Geschossen und Dach.</p>
     <div class="g3">
       <div class="f"><label>Hausform</label><div class="iw"><select id="nhk_haus">
         <option value="">— keine Angabe —</option>
@@ -1534,6 +1531,7 @@ label.dp-required.qc-required::after {
         <option value="3">Flachdach oder flach geneigtes Dach</option>
       </select></div></div>
     </div>
+    </div><!-- /nhk-haus-block -->
 
     <hr class="dvd">
     <div class="card-title">Garage und Außenanlagen</div>
@@ -1555,8 +1553,10 @@ label.dp-required.qc-required::after {
     
 
     <hr class="dvd">
-    <div class="card-title">Besondere und sonstige Bauteile</div>
-    <p class="sec-desc" style="margin:-6px 0 12px">Herstellungskosten <strong>heute</strong>, ohne Baunebenkosten — die stecken in den NHK bereits drin.</p>
+    <!-- v3034 · Marcel 29.10.2026: nur über Haken (objekt-bloecke.js; Haken setzt sich, sobald ein Wert gespeichert ist) -->
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;margin:2px 0 8px"><input type="checkbox" id="btl_an"> Besondere und sonstige Bauteile erfassen <span style="font-weight:400;opacity:.7">(z. B. Aufzug, Gauben, Balkone)</span></label>
+    <div id="btl-block" style="display:none">
+    <p class="sec-desc" style="margin:-2px 0 12px">Herstellungskosten <strong>heute</strong>, ohne Baunebenkosten — die stecken in den NHK bereits drin.</p>
     <div class="g3">
       <div class="f"><label>Besondere Bauteile (€)</label><div class="iw"><span class="pfx">€</span><input id="bes_bauteile" type="text" inputmode="decimal" placeholder="z. B. Aufzug" class="trl"></div></div>
       <div class="f"><label>Dachgauben (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_gauben" type="text" inputmode="decimal" class="trl"></div></div>
@@ -1565,10 +1565,11 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Terrassen (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_terrassen" type="text" inputmode="decimal" class="trl"></div></div>
       <div class="f"><label>Weitere Bauteile (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_sonstige" type="text" inputmode="decimal" class="trl"></div></div>
     </div>
+    </div><!-- /btl-block -->
 
     <hr class="dvd">
-    <div class="card-title">Ansätze des Sachverständigen</div>
-    <p class="sec-desc" style="margin:-6px 0 12px">Nur für den Ausnahmefall. Leer heißt: der Bericht holt den Wert selbst — Liegenschaftszins aus der Parametertabelle, Bodenrichtwert über BORIS.</p>
+    <div class="card-title">Eigene Werte · Stufe E</div><!-- v3034: hieß „Ansätze des Sachverständigen“ (Marcel 29.10.2026) -->
+    <p class="sec-desc" style="margin:-6px 0 12px">Nur wenn du einen eigenen Wert hast, etwa aus einem Gutachten oder vom Gutachterausschuss. Leer heißt: der Bericht holt den Wert selbst — Liegenschaftszins aus dem Register, Bodenrichtwert über BORIS. Ein eingetragener Wert steht im Bericht als <strong>Stufe E · eigene Angabe</strong>.</p>
     <div class="g3">
       <div class="f"><label title="Der Zinssatz, mit dem der Verkehrswert von Grundstücken im Durchschnitt marktüblich verzinst wird (Paragraf 21 Abs. 2 ImmoWertV). Er kommt vom örtlichen Gutachterausschuss und steuert den Ertragswert stark — schon ein halber Punkt verschiebt ihn spürbar.">Liegenschaftszinssatz (%)</label><div class="iw"><input id="lzs_pct" type="text" inputmode="decimal" placeholder="leer = amtlicher Wert" class="tr"><span class="sfx">%</span></div></div>
       <div class="f"><label>Bodenrichtwert manuell (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw_manuell" type="text" inputmode="decimal" placeholder="leer = amtlicher Abruf" class="trl"></div></div>
@@ -1576,7 +1577,7 @@ label.dp-required.qc-required::after {
       <div class="f s2"><label>Begründung der Anpassung</label><div class="iw"><input id="brw_anpassung_grund" type="text" placeholder="Pflicht, sobald eine Anpassung eingetragen ist" class="tr"></div></div>
       <!-- v3010 · Wertermittlungsstichtag (Marcel 27.10.2026): leer = Tag der Berichtserstellung. Am Stichtag haengen
            Baupreisindex, Alter/Restnutzungsdauer, Mietabweichung, Zensus- und BWK-Fortschreibung und der Jahrgang des Registers. -->
-      <div class="f"><label title="Der Zeitpunkt, auf den sich die Wertermittlung bezieht (§ 2 Abs. 4 ImmoWertV). Leer = heute, also der Tag, an dem der Marktbericht erstellt wird. Ein Datum in der Zukunft wird nicht übernommen.">Wertermittlungsstichtag <span style="font-weight:400;opacity:.7">(leer = heute)</span></label><div class="iw" style="display:flex;gap:6px;align-items:center"><input id="wertermittlungsstichtag" type="date" class="tr" style="flex:1 1 auto;min-width:0"><button type="button" id="wst_kaufdat" class="btn btn-ghost" style="flex:0 0 auto;white-space:nowrap;font-size:12px;padding:4px 8px" title="Kaufdatum aus dem Reiter Objekt übernehmen" onclick="var k=document.getElementById('kaufdat'),w=document.getElementById('wertermittlungsstichtag');if(!k||!k.value){this.textContent='kein Kaufdatum';return;}w.value=k.value;w.dispatchEvent(new Event('input',{bubbles:true}));w.dispatchEvent(new Event('change',{bubbles:true}));">= Kaufdatum</button></div></div>
+      <div class="f"><label title="Der Zeitpunkt, auf den sich die Wertermittlung bezieht (§ 2 Abs. 4 ImmoWertV). Vorgabe: der wirtschaftliche Übergang (Reiter Objekt). Ohne Übergang oder bei einem künftigen Übergang gilt der Tag, an dem der Marktbericht erstellt wird.">Wertermittlungsstichtag <span style="font-weight:400;opacity:.7">(Vorgabe: wirtschaftlicher Übergang)</span></label><div class="iw" style="display:flex;gap:6px;align-items:center"><input id="wertermittlungsstichtag" type="date" class="tr" style="flex:1 1 auto;min-width:0"><button type="button" id="wst_kaufdat" class="btn btn-ghost" style="flex:0 0 auto;white-space:nowrap;font-size:12px;padding:4px 8px" title="Wirtschaftlichen Übergang übernehmen (ohne Übergang das Kaufdatum)" onclick="var u=document.getElementById('wirtschaftlicher_uebergang'),k=document.getElementById('kaufdat'),w=document.getElementById('wertermittlungsstichtag');var q=(u&&u.value)?u.value:(k&&k.value?k.value:'');if(!q){this.textContent='kein Datum';return;}w.value=q;w.dispatchEvent(new Event('input',{bubbles:true}));w.dispatchEvent(new Event('change',{bubbles:true}));">= Übergang</button></div></div>
     </div>
   </div>
 
@@ -3790,6 +3791,7 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <script src="js/objekt-reiter.js?v=v3002"></script>
+<script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v3031"></script>
@@ -3808,7 +3810,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v3031"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3031"></script>
+<script src="js/help.js?v=v3034"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3001"></script>
