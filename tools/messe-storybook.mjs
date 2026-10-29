@@ -39,7 +39,7 @@ const STORYS = [
     zeigen: ['Objektkarte: Kaufpreis, Score, Cashflow', 'Reiter Objekt: acht Modernisierungsfelder, Quelle „aus den acht Feldern“', 'Bewertung › Wert & Zielbild: Ankauf · Bestand · Zielbild nebeneinander', 'Restnutzungsdauer und Ertragswert je Stufe – mit Rechenweg', 'Wertzuwachs nach Kosten: hier negativ – die Antwort, bevor das Geld weg ist'],
     satz: 'DealPilot sagt dir nicht nur, was die Sanierung gebracht hat – sondern auch, wann die nächste Maßnahme sich nicht mehr rechnet.', zielbild: true },
   { seq: '2026-1052', titel: 'So sieht ein gutes Geschäft aus', thema: 'DealScore · Lageklasse A',
-    geschichte: 'Zwölf Wohnungen in Leipzig, Lageklasse A, sauber finanziert. Das Gegenstück zum Lindenhof: Score „Gut“, DSCR über 1,3, positiver Cashflow vor und nach Steuern.',
+    geschichte: 'Zwölf Wohnungen in Leipzig, Lageklasse A, sauber finanziert. Das Gegenstück zum Lindenhof: Score „Gut“, DSCR über 1,2 (nach Bewirtschaftungskosten), positiver Cashflow vor und nach Steuern.',
     zeigen: ['Objektkarte: Score und Pille', 'Reiter Kennzahlen: woraus sich der Score zusammensetzt', 'Portfolio-Cockpit: das Objekt im Vergleich zu den anderen'],
     satz: 'Ein Blick auf den Score sagt dir, wo du genauer hinschauen solltest – und wo nicht.' },
   { seq: '2026-1051', titel: 'Wann DealPilot „Nein“ sagt', thema: 'Risiko · DSCR · Belastungsprobe',
