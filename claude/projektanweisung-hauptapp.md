@@ -43809,3 +43809,8 @@ ist gleich zum Original.
 - Prod-Objekte bewusst nicht nachgerechnet (Marcel): Gespeicherte Scores auf Karten stehen bis zum nächsten Öffnen auf dem alten Stand. Der DSCR-Wert selbst wird über `Dscr.ausGespeichert` überall netto gelesen.
 - Plan-Kacheln (v3033) als Entwurf zur Abnahme.
 - Bot-Probe-Fehler (Portfolio-Summe, Rangliste, Feldbezeichnung) offen.
+
+**Nachtrag v3039 (Staging `91c83210`, nur Werkzeuge):**
+- Marcel: „auf staging steht noch 1.0.0“. `rollout-prod.ps1` committete den Versionsstempel auf staging, der Staging-Server zog ihn aber nicht. Jetzt folgt `git pull` auf Staging direkt nach dem Stempel. Gemessen: Staging und Prod `version.json` beide 1.0.1.
+- Dabei gefunden: `frontend-konstanten.mjs` hashte `index.html` als Rohbytes. Nach dem Zweigwechsel im Rollout schreibt git CRLF (autocrlf); die Summe änderte sich ohne Inhaltsänderung, und deploy-staging brach mit „Konstanten veraltet“ ab. Jetzt wird vor dem Hashen CRLF → LF gerechnet.
+- Geht mit dem nächsten Prod-Rollout nach main; auf Prod ändert sich dadurch nichts.
