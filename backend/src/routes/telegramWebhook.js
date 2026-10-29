@@ -60,7 +60,16 @@ const HILFE =
   + '*Bewertung*\n'
   + '„wie ist der DealScore?" · „Investor Deal Score von Objekt 3"\n'
   + '„hol mir eine Marktpreisindikation" — oder „erweiterte" oder „Wertermittlung". '
-  + 'Vor jedem Abruf frage ich nach, was er aus deinem Kontingent verbraucht.\n\n'
+  + 'Vor jedem Abruf frage ich nach, was er aus deinem Kontingent verbraucht.\n'
+  /* v3038 · Marktpreisindikation ohne Objekt (v3036) */
+  + '„was ist die Wohnung Hauptstr. 5, 32545 Bad Oeynhausen wert? ETW, 80 m², Baujahr 1990" — '
+  + 'Marktpreisindikation für eine Adresse, *ohne ein Objekt anzulegen*\n\n'
+  /* v3038 · Wissen je Objekt (v3025), kostet kein Kontingent */
+  + '*Was ich zu deinen Objekten weiß* (kostet kein Kontingent)\n'
+  + '„was steht in den Unterlagen zu Objekt 3?" — Risiken, Eigentümergemeinschaft, Maßnahmen, Baulasten\n'
+  + '„wie viel Mietpotenzial steckt dieses Jahr in meinen Immobilien?" — je Wohnung mit Grund und ab wann\n'
+  + '„welche To-dos gibt es?" — aus Unterlagen, Mieterhöhungen, Zinsbindung, 15-%-Frist und Anfragen beim Amt\n'
+  + '„wie ist die Miete für ETWs in Herford mit 80 m²?" — jede Quelle einzeln\n\n'
   /* v2960 · Bedienfragen gehen an die Hilfe der App */
   /* v2961 */
   + '*PDFs*\n'
