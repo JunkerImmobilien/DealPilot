@@ -125,25 +125,42 @@
       dots.querySelectorAll('i').forEach(function (d, j) { d.classList.toggle('on', j === akt); });
     }
     dots.addEventListener('click', function (e) {
-      var d = e.target.closest('i[data-i]'); if (d) { zeige(parseInt(d.dataset.i, 10)); halt(); }
+      var d = e.target.closest('i[data-i]'); if (d) { zeige(parseInt(d.dataset.i, 10)); stopp(); }
     });
-    document.getElementById('stxPrev').addEventListener('click', function () { zeige(akt - 1); halt(); });
-    document.getElementById('stxNext').addEventListener('click', function () { zeige(akt + 1); halt(); });
+    document.getElementById('stxPrev').addEventListener('click', function () { zeige(akt - 1); stopp(); });
+    document.getElementById('stxNext').addEventListener('click', function () { zeige(akt + 1); stopp(); });
 
     /* Autoplay - haelt an, sobald jemand selbst blaettert, und laeuft im
        verborgenen Tab gar nicht erst (dort wird jeder Timer gedrosselt). */
-    var uhr = null;
+    /* landing-stories-1 · Marcel 29.10.2026: „Play-Pause-Button einsetzen und den Wechsel etwas
+       erhöhen". 18 s statt 12 s je Geschichte. Die Maus über der Geschichte pausiert nur, solange
+       sie dort ist (bisher hielt sie das Karussell für immer an); Blättern oder der Knopf stoppen. */
+    var uhr = null, gestoppt = false, maus = false, TAKT = 18000;
+    var knopf = document.getElementById('stxPlay');
+    function knopfZeigen() {
+      if (!knopf) return;
+      knopf.textContent = gestoppt ? '▶' : '❚❚';
+      knopf.setAttribute('aria-label', gestoppt ? 'Abspielen' : 'Anhalten');
+      knopf.setAttribute('aria-pressed', gestoppt ? 'false' : 'true');
+    }
     function lauf() {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (uhr) return;
       uhr = setInterval(function () {
-        if (document.visibilityState !== 'visible') return;
+        if (document.visibilityState !== 'visible' || maus) return;
         zeige(akt + 1);
-      }, 12000);
+      }, TAKT);
     }
     function halt() { if (uhr) { clearInterval(uhr); uhr = null; } }
+    function stopp() { gestoppt = true; halt(); knopfZeigen(); }
+    if (knopf) knopf.addEventListener('click', function () {
+      if (gestoppt) { gestoppt = false; zeige(akt + 1); lauf(); } else { gestoppt = true; halt(); }
+      knopfZeigen();
+    });
     var vp = track.parentElement;
-    vp.addEventListener('mouseenter', halt);
-    lauf();
+    vp.addEventListener('mouseenter', function () { maus = true; });
+    vp.addEventListener('mouseleave', function () { maus = false; });
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) gestoppt = true; else lauf();
+    knopfZeigen();
   }
 
   /* ── 3 · Die Cockpit-Matrix ──────────────────────────────────────── */
