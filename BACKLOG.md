@@ -46,6 +46,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 4. **Marktbericht einfacher, weniger Text** — Marcel: „die Angaben dürfen auch einfacher verständlich dargestellt werden, mit weniger Text“. Optik → erst Demo zeigen (Wertkarten: Zahl groß, eine Zeile Herkunft, Rechenweg aufklappbar).
 5. **Zensus-Miete fortgeschrieben auch anzeigen** — `frontend/marktbericht-app/app.js:101` (`_zensusZeilen`, Web + PDF) und Prompt der Pilot-Analyse `backend/src/services/openaiService.js:1238` (Endpunkt `/zensus/fortgeschrieben`). Leerstand, Eigentümerquote, Baualter bleiben „Stichtag 15.05.2022“.
 6. Parkstr. 9 bleibt unverändert (Marcel).
+7. **Steuer-Reiter GmbH: Hinweis „Hebesatz fehlt“ bei beantragter erweiterter Kürzung** — Marcel 29.10.2026 an der Hölderlinstr.: „wir haben doch keinen Hebesatz, wenn VV-GmbH“. Gemessen: `js/tax.js:1690–1692` rechnet bei „beantragt, Prüfpunkte offen“ (`ueberfuehrung-kern.js:254`, vier Prüfpunkte) OHNE erweiterte Kürzung und meldet den fehlenden Hebesatz rot. Vorschlag: bei beantragter Kürzung nicht den Hebesatz anmahnen, sondern auf die offenen Prüfpunkte im Mandanten verweisen (Absprung), und den Betrag ohne Hebesatz als „nicht rechenbar“ statt „0 €“ zeigen.
 
 ---
 
