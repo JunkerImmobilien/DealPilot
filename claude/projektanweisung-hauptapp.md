@@ -43714,3 +43714,61 @@ ist gleich zum Original.
 - DSCR-Ampel netto (Recherche in BACKLOG N83) wartet auf Marcels Go.
 - Seitenbild der Bankfassung mit Bausparvertrag an einem echten Export abnehmen.
 - KfW mit tilgungsfreien Anlaufjahren fehlt als Feature.
+
+### v3031–v3036 · DSCR netto, Einstellungen, Plan, Objekt-Reiter, Version 1.0.0, Landing-Zahlen, Telegram ohne Objekt · 29.10.2026
+
+**Was.**
+- **v3031 · DSCR netto** (Marcel: „mach das fertig, dass es richtig ist“ / „dscr muss überall passen … auch in den Scores“).
+  Bankpraxis ist Reinertrag ÷ Kapitaldienst; Quellen in BACKLOG N83.
+  - Kern: `Dscr.compute()` stuft netto ein, `dscr` = netto, `DealKpis.dscr_brutto` neu.
+  - calc: Bank-Ampel, Cashflow-Kasten und Phasentabelle netto. Deal Score und Investor Deal Score lesen `K.dscr`.
+  - Netto auch in bank-charts (Verlauf und Stresstest mit festen Kosten), bestand-analyse, pdf.js, potenzial, mfh-einheiten.
+  - Die Brutto-Doppelrechnung in all-objects ist entfernt.
+  - Quick-Check: Der Zielkaufpreis bekommt `kd` direkt.
+  - Gespeicherte Werte: `Dscr.ausGespeichert()` rechnet alte Brutto-Werte exakt um. `_kpis_dscr_art = 'netto'` kennzeichnet neue.
+  - `nachrechnen.js` (`DealPilotNachrechnen.offen()/alle()`) rechnet Objekte nur auf Aufruf neu.
+- **v3032** Einstellungen:
+  - Marktbericht-Design entfernt (wirkte seit v895e nicht).
+  - QuickBoarding-Auto-Übernahme entfernt (nur eine AVM-Quelle).
+  - Markt-Daten-Cards-Schalter entfernt; die Vorgabe ist fest zugeklappt.
+  - Investor-Deal-Score-Leiste nur in der Darstellung DealPilot.
+  - qc-bridge `IFRAME_SRC` qc-v3032: Das Quick-Check-Dokument hatte sich mit v3031 geändert, sein Buster nicht.
+- **v3033** Plan-Kacheln: Name statt Kürzel, freie Zahl groß, Monat (x von 5, Balken) und Zugekauft getrennt.
+- **v3034** Reiter Objekt:
+  - NHK-Gebäudeart nur bei EFH/ZFH/DHH/RH.
+  - Bauteile über ein Häkchen (`btl_an`, abgeleitet, Basislinie feld-waechter).
+  - „Eigene Werte · Stufe E“ statt „Ansätze des Sachverständigen“.
+  - Wertermittlungsstichtag = wirtschaftlicher Übergang als Vorgabe (`objekt-bloecke.js`).
+- **v3035** Versionspflege:
+  - `frontend/version.json` (1.0.0), Anzeige über `versionsanzeige.js` (no-store).
+  - `tools/version-stempeln.mjs`.
+  - `rollout-prod.ps1` zählt die Patch-Stelle hoch, außer die Version wurde seit dem letzten Prod-Stand von Hand gesetzt.
+- **landing-zahlen-2/2a:**
+  - Die Nutzerzahl kam nie an: Der relative API-Pfad lieferte auf dealpilot.immo HTML, also stand immer 866 da, bei Server-Stand 870. Jetzt fragt die Landing `app.<host>`.
+  - „Die 19 Module“ im Menü: `.sub b {display:block}` traf auch die Zahl. Sie ist jetzt inline (erster Fix mit `<b>` unvollständig, zurückgenommen).
+- **v3036** Telegram: `marktpreis_ohne_objekt` / `marktpreis_ohne_objekt_abrufen`.
+  - Das Angebot trägt Adressdaten (`frei`) statt Objekt-Id.
+  - Abruf über dieselbe Route mit Stufe 1, ohne `external_ref`.
+- **Storybook:** Gohliser „DSCR über 1,2 (nach Bewirtschaftungskosten)“, neu erzeugt.
+
+**Nachweis.**
+- Prüfer: 20 Werkzeuge RC=0, buster-ebenen SAUBER.
+- Nachrechnen Staging (Konto info@, 21/21): Bismarckstr. DSCR 1,31 → 0,89, Score 58 → 34, DS2 64 → 50.
+  Gestiegene Scores (Hermannstraße 77 → 84) zeigen, dass die gespeicherten schon vorher veraltet waren.
+- Kabine:
+  - NHK nur ZFH, Häkchen automatisch, Stichtag = Übergang.
+  - Plan-Kacheln und Version V1.0.0 im Bild geprüft.
+- Telegram im Staging-Container: unvollständig → 6 fehlende Angaben; vollständig → Angebot mit `frei` und Bestätigungsfrage; Abruf ohne Angebot → verweigert.
+- Prod `119b7ac` (v3031–v3035 und Landing):
+  - Version 1.0.0 ausgeliefert, vom Stempel-Schritt als „von Hand gesetzt“ erkannt.
+  - Landing zeigt 870, Menü einzeilig, Backend healthy.
+
+**Eigene Fehler.**
+- „16 Bot-Prüfungen grün“ bei v3030 war falsch: `$?` las `basename`. Die Prüfungen laufen nur im Container.
+- `git add -N .` hat kurz alle unverfolgten Dateien vorgemerkt; sofort mit `git reset` zurückgenommen.
+
+**Rest.**
+- Nachrechnen auf Prod (Konto info@) hat die Freigabeprüfung abgelehnt. Marcel entscheidet, oder er führt es selbst aus: in der Prod-App Konsole `await DealPilotNachrechnen.alle()`.
+- v3036 nach Prod erst nach einem echten Test-Abruf über den Staging-Bot.
+- Plan-Kacheln sind ein Entwurf zur Abnahme.
+- Bot-Probe-Fehler (Portfolio-Summe, Rangliste, Feldbezeichnung) haben nichts mit dem DSCR zu tun und sind offen.
