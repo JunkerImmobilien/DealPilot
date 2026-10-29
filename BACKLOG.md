@@ -41,9 +41,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 1. ✅ gemessen: kein Anfragesturm (43 Anfragen beim Öffnen) — **Musterstraße 12 (Prod, Demo-Konto):** löste beim Öffnen zweimal die Anfragebremse aus (600/15 min) und schaltete einmal die Seitenleiste ins Menü - auf Staging unauffällig. Netzwerk beim Öffnen messen (read_network_requests), Schleife/Polling suchen.
 2. ✅ 2026-1040/1002/1082 von Prod angelegt, Storybook vollständig — **Storybook:** `messe-storybook.mjs` meldete „FEHLT in der DB: 2026-1040, 2026-1002“ (Am Markt 9 Kabelsketal: RND-Gutachten, Privat oder GmbH). Kürzel/Status der Objekte auf Staging prüfen (privat-Fassung steht laut [[demo-konto-staging-prod]] auf „Verloren“).
 3. ✅ Status abgeglichen, Verloren-Fehler behoben (v3046) — **Feld-Diff Staging = Prod** der Demo-Objekte nach dem Neuabruf - Prod-DB-Lesen war im Auto-Modus gesperrt; über die App-API (je Objekt, mit Pausen) oder mit Marcels Freigabe per psql.
-4. **Abnahme Marcel:** eine RND-Anfrage echt abschicken (Mail an info@ mit Kerndaten-Tabelle und JSON-Anhang).
+4. ~~Abnahme RND-Anfrage~~ — gestrichen, Marcel testet selbst (29.10.2026).
+5. **Zielanzeige im Kopf** („Ziel x %“, `jahresstaende.js kopfRing()`): erscheint, sobald EIN Hebel rechenbar ist — bei finanzierten Objekten meist nur die Entschuldung bis Ende Zinsbindung (Hölderlinstr.: „Ziel 3 % aus 1 Hebel“), auch ohne Zielbild. Entscheidung Marcel: nur mit definiertem Zielbild zeigen?
+6. **N84.9 Hölderlinstr.:** `svw_herkunft = bank` setzen — direkter DB-Schreibzugriff auf Prod im Auto-Modus gesperrt; Marcel setzt es in der App (Objekt › Wert › Herkunft) oder gibt die Regel frei.
 
-### N85 · BMF-Rechner: Optimierungen und umgekehrte Ertragswertmethode vergleichen und übernehmen (29.10.2026)
+### N85 · BMF-Rechner (Reiterfolge ✅ v3047: Bodenabschlag = Schritt 5/5): Optimierungen und umgekehrte Ertragswertmethode vergleichen und übernehmen (29.10.2026)
 
 Marcel: „im BMF-Rechner machen wir die 4 Optimierungen und die umgekehrte Ertragswertmethode nach Jacoby – da muss besser hervorgehen, dass man beides vergleicht, auch die optimierten Varianten, und dann entweder oder übernimmt. Das muss einfach dargestellt werden.“ Optik → erst Demo zeigen: eine Vergleichstafel (amtlich · konservativ 15 % · optimiert 20 % · aggressiv 25 % · Jacoby) mit Gebäudeanteil, AfA/Jahr, Steuerwirkung, Begründungspflicht; je Zeile EIN Knopf „übernehmen“, der in den Reiter Steuer schreibt. Dateien: `js/bmf-bodenabschlag.js`, `js/bmf-modal.js`; `js/bmf-modal-v292.js` steht unter „Nicht anfassen“ (nicht löschen) – nur mit Rückfrage ändern.
 
