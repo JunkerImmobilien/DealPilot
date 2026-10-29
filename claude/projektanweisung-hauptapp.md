@@ -43926,3 +43926,18 @@ ist gleich zum Original.
 **Nachweis.** Browser Staging: Schritt 4 → Weiter → 5/5 → Zurück → 4; Hölderlinstr. ohne Ziel-Anzeige, Parkstr. 9 „Ziel 38 %“.
 
 **Rest.** N84.9 (Herkunft „Bank“ Hölderlinstr. — Prod-DB-Schreiben im Auto-Modus gesperrt, Marcel setzt es in der App); Entwürfe N84.4/N85.
+
+### Sitzungsende 29.10.2026 — Stand und Übergabe
+
+**Prod:** Version 1.0.11 (`97eda6d`, v3048). Alles dieser Sitzung ist ausgerollt und im Journal oben einzeln belegt (v3040 bis v3048, landing-makler-hub-1 bis -3, messe-schleife-9/10, landing-stories-1).
+
+**Entwürfe abgenommen (Marcel: „die Demos sehen top aus, die setzen wir später so um“):**
+- **N84.4 Marktbericht „Werte einfach“** und **N85 BMF-Rechner „Varianten vergleichen und übernehmen“** — Entwurfsfläche https://claude.ai/artifact/SAVCqju6oRXNBa9LjfZcdq, Quellen in `Dateien/Entwuerfe-2026-10-29/`. Umsetzen wie gezeigt:
+  - Marktbericht: je Wert eine Karte mit großer Zahl, EINE Zeile Herkunft („aus X € Angebotsniveau, minus Y %“), Rechenweg erst auf Klick (`<details>`); führendes Verfahren als Etikett; Gegenprobe Kauffälle als dritte Karte; nicht maßgeblicher Sachwert als eine Zeile statt Karte; Bodenwert und Miete im Ertragswert als kleine Karten darunter.
+  - BMF-Rechner Schritt 4: eine Tafel mit Amtlich · Konservativ −15 % · Optimiert −20 % · Aggressiv −25 % · umgekehrte Ertragswertmethode (Jacoby); Spalten Gebäudeanteil, AfA/Jahr, Steuer/Jahr, 10 Jahre, Nachweis; je Zeile „Übernehmen“, gewählte Zeile hervorgehoben, darunter „Gewählt“ und „Was beim Übernehmen passiert“. Werte aus dem echten Lauf des Objekts (im Entwurf Beispielzahlen). Jacoby-Herleitung im Kern prüfen, bevor sie angezeigt wird.
+
+**Offen für die nächste Sitzung:**
+- **N84.9 Hölderlinstr.:** `svw_herkunft = bank` — Schreiben auf Prod-DB im Auto-Modus gesperrt; Marcel setzt es in der App (Objekt › Wert › Herkunft) oder per Freigabe.
+- Umsetzung N84.4 und N85 nach den Entwürfen (oben).
+- Optimierung: Objekt öffnen lädt Verlauf ×8 und Objektliste ×6 (43 Anfragen, Musterstraße 12).
+- RND-Anfrage-Mail mit Kerndaten-Tabelle und JSON-Anhang: Marcel testet selbst.
