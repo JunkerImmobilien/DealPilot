@@ -426,10 +426,12 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
     angebotObjekt: (angebot && angebot.objekt_id) || null,
     /* v2960a · die bestaetigte Stufe, nur aus dem Angebot */
     angebotStufe: (angebot && [1, 2, 3].indexOf(Number(angebot.stufe)) >= 0) ? Number(angebot.stufe) : null,
+    /* v3036 · Preisansage ohne Objekt: die Adressdaten, fuer die der Preis genannt wurde */
+    angebotFrei: (angebot && angebot.frei && !angebot.objekt_id) ? angebot.frei : null,
     bestaetigung: null,
     berichtPdfLink: null,
-    merkeAngebot: async function (id, adresse, stufe) {
-      try { await angebotSetzen(chatId, userId, id, adresse, stufe); } catch (e) {}
+    merkeAngebot: async function (id, adresse, stufe, frei) {
+      try { await angebotSetzen(chatId, userId, id, adresse, stufe, frei); } catch (e) {}
     },
     angebotVerbraucht: async function () {
       try { await angebotLoeschen(chatId, userId); } catch (e) {}
@@ -707,7 +709,7 @@ async function zustandSetzen(chatId, userId, z) {
  */
 const ANGEBOT_FRIST_MS = 30 * 60 * 1000;
 
-async function angebotSetzen(chatId, userId, objektId, adresse, stufe) {
+async function angebotSetzen(chatId, userId, objektId, adresse, stufe, frei) {
   await zeileSichern(chatId, userId);
   await query(
     `UPDATE telegram_dialog SET angebot = $3::jsonb, aktualisiert = now()
@@ -715,6 +717,7 @@ async function angebotSetzen(chatId, userId, objektId, adresse, stufe) {
     [String(chatId), userId,
      JSON.stringify({ objekt_id: objektId, adresse: adresse || null,
                       stufe: stufe || null,   /* v2960a */
+                      frei: (!objektId && frei) ? frei : undefined,   /* v3036: ohne Objekt */
                       zeit: new Date().toISOString() })]);
 }
 
@@ -727,7 +730,7 @@ async function angebotLoeschen(chatId, userId) {
 
 /** Ist das Angebot noch frisch? Gibt die Objekt-Id zurück oder null. */
 function angebotGueltig(a) {
-  if (!a || !a.objekt_id) return null;
+  if (!a || (!a.objekt_id && !a.frei)) return null;   /* v3036: auch ohne Objekt (frei) */
   const t = Date.parse(a.zeit || '');
   if (!Number.isFinite(t)) return null;
   if (Date.now() - t > ANGEBOT_FRIST_MS) return null;
