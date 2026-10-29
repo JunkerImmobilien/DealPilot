@@ -540,7 +540,12 @@
     if (!doc || !doc.getElementById) return;
     var el = doc.getElementById('hdr-ziel-mini');
     var z = ZIEL_RING_IM_KOPF ? zielerreichung() : null;
-    if (!z || !istZahl(z.gesamt)) { if (el) el.style.display = 'none'; return; }
+    /* v3048 · Marcel 29.10.2026: „nur wenn ein Zielbild angelegt ist". Vorher reichte EIN rechenbarer
+       Hebel - bei finanzierten Objekten fast immer die Entschuldung (Hölderlinstr.: „Ziel 3 % aus
+       1 Hebel"), was wie ein Zielbild aussah, ohne dass es eines gab. Angelegt = das Potenzial-Modell
+       hat eine Zielbild-Stufe (sammeln(): ziel.nkm). */
+    var zielbildDa = !!(z && z.eingabe && z.eingabe.ziel && istZahl(z.eingabe.ziel.nkm));
+    if (!z || !istZahl(z.gesamt) || !zielbildDa) { if (el) el.style.display = 'none'; return; }
     var row = doc.querySelector ? doc.querySelector('.hdr-v61-row1') : null;
     if (!el) {
       if (!row) return;
