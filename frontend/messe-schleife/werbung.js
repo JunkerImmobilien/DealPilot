@@ -18,12 +18,19 @@
    2 · DAUERSCHLEIFE: Kanal „Werbung" (?idee=werbung, Taste W) — alle Bilder
        hintereinander, Ueberblendung, Dauer = werbung_sek.
 
+   3 · MAKLER-HUB (messe-schleife-9, 29.10.2026): vier Tafeln mh-0*.webp,
+       Marcel: „aus E:Makler Hub alles zum Projekt ziehen … im DealPilot-Design
+       als Werbung … dazwischen angezeigt … und ein QR-Code zum Scannen".
+       Quelle Dateien/Social-Media/Makler-Hub-2026-10-29/quelle/mh.html; jeder
+       QR fuehrt auf dealpilot.immo/#makler-hub (mit jsQR gelesen). Im Zug jeder
+       vierte Platz; abschaltbar ueber werbung_hub (Taste E).
+
    Fehlt ein Bild, faellt es still aus dem Zug (Eintrag in DPS_FEHLER).
    Laeuft auch von der Platte (file://), ohne Netz, alle Pfade relativ.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-7';
+  var VER = 'messe-schleife-9';
   var Q = new URLSearchParams(location.search);
   var EIN = window.DPS_EINST || null;
   function fehler(t) { (window.DPS_FEHLER = window.DPS_FEHLER || []).push(t); }
@@ -39,10 +46,15 @@
     { id: '01', datei: '01-boarding-pass.webp', titel: 'Boarding-Pass · Ertragswert', fav: true },
     { id: '05m', datei: '05-register-karte-motiv.webp', titel: 'Register · amtliche Daten' },
     { id: '03', datei: '03-akte-siegel.webp', titel: 'Akte mit Siegel · Rechenweg', fav: true },
-    { id: '06m', datei: '06-statement-motiv.webp', titel: 'Kein Faktor. Kein Bauchgefühl.' }
+    { id: '06m', datei: '06-statement-motiv.webp', titel: 'Kein Faktor. Kein Bauchgefühl.' },
+    { id: 'mh1', datei: 'mh-01-ablauf.webp', titel: 'Makler-Hub · vom Erstkontakt zum Notar', hub: true },
+    { id: 'mh2', datei: 'mh-02-aemter.webp', titel: 'Makler-Hub · die Ämter fragt der Hub', hub: true },
+    { id: 'mh3', datei: 'mh-03-board.webp', titel: 'Makler-Hub · Board und Briefing', hub: true },
+    { id: 'mh4', datei: 'mh-04-melden.webp', titel: 'Makler-Hub · Makler, meldet euch', hub: true }
   ];
-  /* Zug fuer die eingestreute Tafel: 8 von 12 Plaetzen sind Favoriten. */
-  var ZUG = ['01m', '03m', '02m', '01', '03', '04m', '01m', '03m', '05m', '01', '03', '06m'];
+  /* Zug fuer die eingestreute Tafel: 8 von 16 Plaetzen sind Favoriten, jeder
+     vierte ist Makler-Hub (messe-schleife-9). */
+  var ZUG = ['01m', '03m', 'mh1', '02m', '01', '03', 'mh2', '04m', '01m', '03m', 'mh3', '05m', '01', '03', 'mh4', '06m'];
 
   var OK = {};   /* id -> true (geladen) / false (fehlt); unbekannt = noch nicht geladen */
   function pfad(b) { return 'messe-schleife/werbung/' + b.datei + '?v=' + VER; }
@@ -53,7 +65,9 @@
     im.src = pfad(b);
   });
   function bild(id) { return BILDER.filter(function (b) { return b.id === id; })[0]; }
-  function bereit() { return BILDER.filter(function (b) { return OK[b.id] === true; }); }
+  function hubAn() { return !(EIN && EIN.get('werbung_hub') === false); }
+  function zeigbar(b) { return !!b && OK[b.id] === true && (!b.hub || hubAn()); }
+  function bereit() { return BILDER.filter(zeigbar); }
 
   function an() { return !(EIN && EIN.get('werbung') === false); }
   function sekunden() { return Math.max(4, Number(EIN && EIN.get('werbung_sek')) || 10); }
@@ -65,7 +79,7 @@
   function naechstes() {
     for (var k = 0; k < ZUG.length; k++) {
       var id = ZUG[(zugPos + k) % ZUG.length];
-      if (OK[id] === true) {
+      if (zeigbar(bild(id))) {
         zugPos = (zugPos + k + 1) % ZUG.length;
         try { localStorage.setItem('dps_werbung_zug', String(zugPos)); } catch (e) { /* ohne Speicher */ }
         return bild(id);

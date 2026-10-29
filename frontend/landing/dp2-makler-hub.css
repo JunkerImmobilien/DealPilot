@@ -1,0 +1,53 @@
+/* ══ landing-makler-hub-1 · Abschnitt #makler-hub (29.10.2026) ═════════
+   Marcel: „auf der Landingpage genauer beschreiben, was Makler-Hub ist und
+   was es kann, und wenn Makler Interesse haben, sollen sie sich melden.
+   Dann ein QR-Code zum Scannen."
+   Nur Tokens aus dp2.css (kein Gold-Literal, gold-audit). */
+.mh-phasen{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:0 0 34px;padding:0;list-style:none;
+  border:1px solid var(--line);counter-reset:mh}
+.mh-phasen > li{padding:24px 22px 22px;border-right:1px solid var(--line);position:relative}
+.mh-phasen > li:last-child{border-right:0}
+.mh-phasen .mh-nr{display:flex;align-items:center;gap:12px;font:700 10px/1 var(--mono);letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gdh)}
+.mh-phasen .mh-nr b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  background:var(--runway);color:#14100a;font:700 14px/1 var(--disp);letter-spacing:0}
+.mh-phasen h3{font-size:19px;margin:14px 0 10px;color:#fff}
+.mh-phasen ul{margin:0;padding:0;list-style:none;font-size:13.6px;color:var(--mdk)}
+.mh-phasen ul li{padding:3px 0;line-height:1.45}
+.mh-phasen ul li i{font-style:normal;font:500 11px/1 var(--mono);color:var(--ddk);margin-right:7px}
+.mh-zeichen{display:flex;flex-wrap:wrap;gap:8px 22px;margin:-18px 0 40px;font:500 11px/1.4 var(--mono);
+  letter-spacing:.06em;color:var(--ddk)}
+.mh-zeichen span{display:inline-flex;align-items:center;gap:8px}
+.mh-z{display:inline-block;width:9px;height:9px;flex:none}
+.mh-z.auto{border-radius:50%;background:var(--gdh)}
+.mh-z.makler{background:var(--gd);transform:rotate(45deg) scale(.86)}
+.mh-z.extern{border:1.5px solid var(--ddk)}
+
+.mh-blatt{margin-bottom:46px}
+.mh-blatt .mlbl{color:var(--gdh)}
+
+.mh-kontakt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;align-items:center;
+  border:1px solid var(--line);background:rgba(255,255,255,.025);padding:36px 40px;position:relative}
+.mh-kontakt::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--runway)}
+.mh-kontakt h3{font-size:clamp(22px,2.8vw,32px);margin:12px 0 12px;color:#fff}
+.mh-kontakt h3 .ac{color:var(--gdh)}
+.mh-kontakt p{margin:0 0 22px;color:var(--mdk);font-size:16px;max-width:60ch}
+.mh-kontakt .mh-knoepfe{display:flex;flex-wrap:wrap;gap:12px}
+.mh-kontakt .mh-fein{margin:16px 0 0;font-size:12.5px;color:var(--ddk)}
+.mh-qr{text-align:center;margin:0}
+.mh-qr img{display:block;width:168px;height:168px;background:var(--cream,#FDFCFA);padding:10px;
+  box-shadow:0 0 0 1px var(--line)}
+.mh-qr figcaption{margin-top:10px;font:500 10.5px/1.45 var(--mono);letter-spacing:.06em;color:var(--mdk);max-width:168px}
+
+@media (max-width:980px){
+  .mh-phasen{grid-template-columns:repeat(2,1fr)}
+  .mh-phasen > li:nth-child(2){border-right:0}
+  .mh-phasen > li:nth-child(-n+2){border-bottom:1px solid var(--line)}
+}
+@media (max-width:640px){
+  .mh-phasen{grid-template-columns:1fr}
+  .mh-phasen > li{border-right:0;border-bottom:1px solid var(--line)}
+  .mh-phasen > li:last-child{border-bottom:0}
+  .mh-kontakt{grid-template-columns:1fr;padding:28px 22px}
+  .mh-qr{display:none}   /* am Handy ist der Knopf der Weg, nicht der Code */
+}

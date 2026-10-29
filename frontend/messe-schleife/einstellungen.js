@@ -32,7 +32,8 @@
     aufruf: true,                        /* Aufruf-Tafel „Jetzt kostenlos testen" */
     werbung: true,                       /* messe-schleife-7 · Werbebilder zwischendurch (werbung.js) */
     werbung_nach: 3,                     /* nach jeder n-ten Station (Rundgang) bzw. jedem n-ten Video (Videothek) */
-    werbung_sek: 10,                     /* Sekunden je Bild, auch im Kanal Werbung */
+    werbung_sek: 10,
+    werbung_hub: true,                   /* messe-schleife-9 · Makler-Hub-Tafeln im Werbezug (werbung.js) */                     /* Sekunden je Bild, auch im Kanal Werbung */
     start: 'rundgang',                   /* Startkanal ohne ?idee=: rundgang | videothek | werbung | auswahl */
     leiste: true,                        /* Leiste unten bei Mausbewegung */
     kapitel: true                        /* messe-schleife-8 · Kapitelleiste im Video (Kanal Videothek) */
@@ -55,6 +56,7 @@
     ['werbung', 'Werbebilder zwischendurch', 'schalter'],
     ['werbung_nach', 'Werbung nach jeder … Station bzw. jedem … Video', 'zahl', 1, 30],
     ['werbung_sek', 'Werbung: Sekunden je Bild (auch Kanal W)', 'zahl', 4, 60],
+    ['werbung_hub', 'Makler-Hub-Werbung mit im Zug', 'schalter'],
     ['Videothek', null],
     ['app_nach', 'DealPilot in Zahlen nach jedem … Video', 'zahl', 1, 30],
     ['register_nach', 'Register-Tafel nach jedem … Video', 'zahl', 1, 30],
