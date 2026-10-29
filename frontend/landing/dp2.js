@@ -302,7 +302,12 @@
   /* ── Nutzerzahl vom eigenen Host ─────────────────────────────────── */
   /* Die Zahl steht fertig im HTML. Kommt sie frisch herein und hat sich
      geaendert, laeuft sie noch einmal hoch - dann sieht man, dass sie lebt. */
-  fetch('/api/v1/public/stats')
+  /* landing-zahlen-2 · Die Landing liegt auf dealpilot.immo, die API auf app.dealpilot.immo. Der relative
+     Pfad lieferte die Landing selbst (HTML), r.json() scheiterte still, und im Hero stand immer der
+     Startwert 866 - gemessen 29.10.2026, der Server zaehlte 870. CORS fuer dealpilot.immo ist frei. */
+  var _statsUrl = '/api/v1/public/stats', _h = location.hostname;
+  if (/dealpilot\.immo$/.test(_h) && !/^app\./.test(_h)) _statsUrl = 'https://app.' + _h.replace(/^www\./, '') + '/api/v1/public/stats';
+  fetch(_statsUrl)
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d.registrierte_nutzer) return;
