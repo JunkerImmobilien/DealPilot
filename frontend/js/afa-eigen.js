@@ -119,7 +119,7 @@
      „beim Übernehmen direkt in Tab Steuer auf eigenen AfA-Satz ändern" (Marcel 29.10.2026). */
   function setzen(rnd, grundlage) {
     if (!aufbauen()) return false;
-    var n = Number(rnd); if (!(n >= 3 && n <= 200)) return false;
+    var n = Math.round(Number(rnd)); if (!(n >= 3 && n <= 200)) return false;   /* ganze Jahre: angezeigte RND und Satz passen zusammen */
     var sel = el('afa_satz'); el('afa-eigen-box').hidden = false;
     el('afa_rnd_jahre').value = fmt(n, 0);
     el('afa_eigen').value = fmt(100 / n, 2);
