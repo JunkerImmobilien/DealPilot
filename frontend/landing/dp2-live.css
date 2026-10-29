@@ -345,7 +345,8 @@
 .pmod-cta:hover{background:var(--runway);color:#14100a;border-color:transparent}
 .pmod-f{margin:18px 0 0;font-size:12.6px;color:var(--ddk);line-height:1.6}
 .pmod-f a{color:var(--gdh)}
-@media(max-width:900px){.pmod-g{grid-template-columns:1fr}.pmod{padding:24px 16px 18px}.pmod-h h3{font-size:22px}}
+.pmod-g.zwei{grid-template-columns:repeat(2,1fr)}   /* landing-makler-hub-3 · zwei Module ohne Makler-Hub */
+@media(max-width:900px){.pmod-g,.pmod-g.zwei{grid-template-columns:1fr}.pmod{padding:24px 16px 18px}.pmod-h h3{font-size:22px}}
 
 /* landing-module-1a · Marcel 27.10.2026: „mehr Platz zwischen Bild und den Partnern" - seit die
    Kanzlei-Zeile weg ist, sass das Hausbild direkt unter dem Logo-Laufband. */
