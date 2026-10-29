@@ -68,9 +68,9 @@
     var vw = zahl(h.irw_vergleichswert_eur);
     if (vw == null && h.vergleichsfaktor_amtlich) vw = zahl(h.vergleichswert_eur);
     var v = [];
-    v.push({ art: 'mpi', name: 'Marktpreisindikation', sub: mitAb ? 'nach ' + ab.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' % Abschlag auf Angebotspreise' : 'aus Angebotspreisen vergleichbarer Objekte',
+    v.push({ art: 'mpi', name: 'Marktpreisindikation', sub: mitAb ? 'auf Kaufpreisniveau (Angebotspreise liegen über den erzielten Kaufpreisen)' : 'aus Angebotspreisen vergleichbarer Objekte',   /* v3030: kein Prozentsatz nach außen */
       unten: zahl(h.market_value_low), mitte: mw, oben: zahl(h.market_value_high), fuehrend: fu === 'vergleichswert' && vw == null });
-    if (mitAb) v.push({ art: 'roh', name: 'ohne Abschlag', sub: 'Angebotsniveau, wie ausgeschrieben', unten: zahl(h.market_value_roh_low), mitte: roh, oben: zahl(h.market_value_roh_high) });
+    if (mitAb) v.push({ art: 'roh', name: 'Angebotsniveau', sub: 'wie ausgeschrieben, vor Anpassung an Kaufpreise', unten: zahl(h.market_value_roh_low), mitte: roh, oben: zahl(h.market_value_roh_high) });
     if (ew != null) v.push({ art: 'ew', name: /vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert',
       sub: zahl(h.ertragswert_von_eur) != null ? 'Spanne aus dem Liegenschaftszins' : '', unten: zahl(h.ertragswert_von_eur), mitte: ew, oben: zahl(h.ertragswert_bis_eur), fuehrend: fu === 'ertragswert' });
     if (sw != null) v.push({ art: 'sw', name: swVorl ? 'Sachwert (nur Plausibilität)' : 'Sachwert', sub: swVorl ? 'Herstellungskosten ohne Marktanpassung, kein Marktwert' : '', mitte: sw, ohneAbw: swVorl, /* v2979 */ fuehrend: fu === 'sachwert' });
@@ -370,7 +370,7 @@
     if (d.stufen.length && T('mpiZeile')) {
       var ohne = d.stufen.filter(function (s) { return zahl(s.mpiOhne) != null; });
       if (ohne.length) {
-        y = BS.absatz(doc, 'Marktpreisindikation je Stufe ohne Abschlag (Angebotsniveau): ' + ohne.map(function (s) { return sauber(s.titel) + ' ' + eur(s.mpiOhne); }).join(' · ') + '.',
+        y = BS.absatz(doc, 'Marktpreisindikation je Stufe auf Angebotsniveau (vor Anpassung an Kaufpreise): ' + ohne.map(function (s) { return sauber(s.titel) + ' ' + eur(s.mpiOhne); }).join(' · ') + '.',
           { x: x, y: y + 2.4, breite: B, zeile: 3.7, unten: unten, neueSeite: function () { return o.neueSeite(); },
             stil: function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); setT(f.text || f.tinte); } }) - 2.4 + 3;
       }
@@ -394,9 +394,9 @@
         var dk = d.kaufpreis ? (s.wert - d.kaufpreis) / d.kaufpreis * 100 : null;
         var w = [sauber(s.titel), eur(s.wert), dk != null ? pz(dk) : ''].concat(mitMpi ? [zahl(s.mpi) != null ? eur(s.mpi) : ''] : []).concat([zahl(s.kosten) ? eur(s.kosten) : '']);
         if (mitMpi && zahl(s.mpi) != null) {
-          /* „nach x % Abschlag · ohne y €" klein unter der Zahl */
-          var unterM = (zahl(s.mpiAb) != null ? 'nach ' + Number(s.mpiAb).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' % Abschlag' : '')
-            + (zahl(s.mpiOhne) != null ? (zahl(s.mpiAb) != null ? ' · ' : '') + 'ohne ' + eur(s.mpiOhne) : '');
+          /* v3030 · Marcel 28.10.: niemand soll den Rechenweg herauslesen - kein Prozentsatz,
+             nur das Angebotsniveau klein unter der Zahl (vorher „nach x % Abschlag · ohne y €") */
+          var unterM = zahl(s.mpiOhne) != null ? 'Angebotsniveau ' + eur(s.mpiOhne) : '';
           if (unterM) {
             var bxM = 0; for (var q = 0; q < 4; q++) bxM += sp3[q][1] * fk3;
             doc.setFont('helvetica', 'normal'); doc.setFontSize(6.2); setT(f.grau);
@@ -422,7 +422,7 @@
         doc.setFont('helvetica', 'italic'); doc.setFontSize(6.8); setT(f.grau);
         var _hz = doc.splitTextToSize(sauber('Die Stufen sind mit den Angebotspreisen vom ' + new Date().toLocaleDateString('de-DE')
           + ' neu gerechnet; die Werte je Verfahren oben stammen aus dem Marktbericht' + (d.berichtDatum ? ' vom ' + d.berichtDatum : '')
-          + '. Abschlag und Angebotsniveau können deshalb leicht abweichen.'), B);
+          + '. Kaufpreis- und Angebotsniveau können deshalb leicht abweichen.'), B);
         platz(_hz.length * 3 + 2);
         doc.text(_hz, x, y + 3.2); y += _hz.length * 3 + 1;
       }

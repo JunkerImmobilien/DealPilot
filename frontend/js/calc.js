@@ -1576,6 +1576,18 @@ function _calcImmediate(){
     if (window.DealPilotErbbau && DealPilotErbbau.istAn()) erbZins = DealPilotErbbau.zinsJahr() || 0;
   } catch (_e) {}
   if (erbZins > 0) { nul += erbZins; bwk += erbZins; }
+  /* v3030 · LEERSTAND RECHNET MIT (Marcel 28.10.2026: „zwei Prozent nehmen wir einfach
+     mal an, dass leer steht, und dann wird's abgezogen"). Entgangene Miete auf NKM +
+     Zusatzeinnahmen: mindert Cashflow und Steuer-Einnahmen (steht deshalb in nul und
+     damit in nul_st), Brutto-Kennzahlen bleiben auf der vollen Miete. Gleiche Regel wie
+     DealKpis.compute({leerstand_pct}). In der Jahresschleife waechst er wie alle Kosten
+     mit kstg statt mit der Miete - bei 2 % und 0,5 Punkten Unterschied sind das nach
+     15 Jahren rund 0,15 % der Miete, bewusst in Kauf genommen statt neun Stellen. */
+  var leerJ = 0;
+  (function () { var lp = v('leerstand'); if (lp > 0 && isFinite(lp)) leerJ = nkm_j * lp / 100; })();
+  if (leerJ > 0) { nul += leerJ; bwk += leerJ; }
+  State.leerstandJ = leerJ;
+  st('r-leer-j', leerJ > 0 ? '= ' + fE(leerJ) + ' / Jahr' : '');
   st('erb_zins_j', erbZins > 0 ? fE(erbZins) : '–');st('r-erb-zins', erbZins > 0 ? fE(erbZins) : '–');
   /* ═══ v1898 · DAS MIETAUSFALLWAGNIS IST KEIN WERBUNGSKOSTENABZUG ═══════
    *

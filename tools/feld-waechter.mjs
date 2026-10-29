@@ -96,6 +96,12 @@ function blockEnde(s, auf) {
   let tiefe = 0;
   for (let i = auf; i < s.length; i++) {
     const c = s[i];
+    /* v3030 · Kommentare ueberspringen. FIELDS traegt inzwischen lange Kommentare mit
+       Anfuehrungszeichen; die Zeichenketten-Regel unten lief darin aus dem Tritt, der Block
+       kam mit 0 Zeichen zurueck, und ALLE Felder galten als ungespeichert (185 rot, darunter
+       afa_satz, das in FIELDS steht). */
+    if (c === '/' && s[i + 1] === '*') { const e = s.indexOf('*/', i + 2); if (e < 0) return -1; i = e + 1; continue; }
+    if (c === '/' && s[i + 1] === '/') { const e = s.indexOf('\n', i + 2); if (e < 0) return -1; i = e; continue; }
     if (c === '[') tiefe++;
     else if (c === ']') { tiefe--; if (tiefe === 0) return i; }
     else if (c === "'" || c === '"') {           /* Zeichenketten ueberspringen */
@@ -148,10 +154,22 @@ for (const q of quellen) {
 }
 
 /* ── Der Abgleich ─────────────────────────────────────────────────────── */
+/* v3030 · Zwei weitere Speicherwege, beide nachgelesen:
+   (a) Praefix-Gruppen: storage.js greift die PDF-Bausteine als
+       querySelectorAll('[id^="ai-pdf-sec-"]') und speichert sie als
+       _pdf_bausteine_aus (v3018a) - ohne eine einzelne id zu nennen.
+   (b) Bedien-Auswahl `<x>_wahl` vor einem versteckten Feld `<x>`, das in
+       FIELDS steht (vgf-merkmale.js baut die id als m.feld + '_wahl'). */
+const praefixe = new Set();
+for (const q of quellen) for (const t of q.matchAll(/\[id\^=\\?["']([A-Za-z0-9_-]+)\\?["']\]/g)) praefixe.add(t[1]);
+const _istEigenWeg = (id) => [...praefixe].some((p) => id.startsWith(p))
+  || (/_wahl$/.test(id) && inFields.has(id.replace(/_wahl$/, '')));
+
 const verloren = [];
 for (const [id, info] of felder) {
   if (inFields.has(id)) continue;
   if (eigen.has(id)) continue;
+  if (_istEigenWeg(id)) continue;   /* v3030 */
   verloren.push(id + '\t' + info.tag + '/' + info.typ);
 }
 verloren.sort();

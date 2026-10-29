@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-28T22:33:33.222Z",
+ "erzeugt_am": "2026-10-29T08:50:26.559Z",
  "quellen": {
-  "voice-import": "147850ca801bbad4",
+  "voice-import": "59453c51096776d6",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "ede97e023ec599eb",
-  "index-html": "7ac913d91207b2fa",
+  "storage": "081967dd8cb384da",
+  "index-html": "f44d45a6309d3a47",
   "grest": "2ca5ed25cafdbaa7"
  },
  "daten": {
@@ -3852,7 +3852,7 @@
      },
      {
       "h": "Bodenwert und Bodenrichtwert",
-      "text": "Der Bodenwert geht in Ertrags- und Sachwert ein: Grundstücksfläche × Bodenrichtwert, danach — nur wenn angegeben — Anpassung für Zuschnitt oder Lage, Erschließungsbeitrag und bei Wohnungen der Miteigentumsanteil.\n\nDen Bodenrichtwert holt der Bericht selbst aus BORIS. Klappt der automatische Abruf für die Adresse nicht, nimmt er den Wert aus dem Feld Bodenrichtwert (€/m²) im Reiter Objekt. Dort helfen Bodenrichtwert abrufen (Direktabruf, gratis), BORIS-Portal und Bodenrichtwert schätzen — eine Schätzung bitte auf BORIS prüfen.\n\nGut zu wissen:\n• Eigentumswohnung ohne Miteigentumsanteil: kein Bodenwert („–“). Der volle Grundstückswert würde alles verzerren. Den Anteil findest du in der Teilungserklärung, meist als Bruch wie 125/1000.\n• Weicht die GFZ ab, wird nur mit einem eingetragenen Umrechnungskoeffizienten umgerechnet — einer wird nie erfunden.\n• Eine Anpassung trägst du unter Ansätze des Sachverständigen ein („Bodenwert-Anpassung (%)“ mit „Begründung der Anpassung“)."
+      "text": "Der Bodenwert geht in Ertrags- und Sachwert ein: Grundstücksfläche × Bodenrichtwert, danach — nur wenn angegeben — Anpassung für Zuschnitt oder Lage, Erschließungsbeitrag und bei Wohnungen der Miteigentumsanteil.\n\nDen Bodenrichtwert holt der Bericht selbst aus BORIS. Klappt der automatische Abruf für die Adresse nicht, nimmt er den Wert aus dem Feld Bodenrichtwert (€/m²) im Reiter Objekt. Dort helfen Bodenrichtwert abrufen (Direktabruf, gratis), BORIS-Portal. Liefert der Abruf nichts, bleibt das Feld leer — den Wert dann im Landesportal nachsehen und eintragen.\n\nGut zu wissen:\n• Eigentumswohnung ohne Miteigentumsanteil: kein Bodenwert („–“). Der volle Grundstückswert würde alles verzerren. Den Anteil findest du in der Teilungserklärung, meist als Bruch wie 125/1000.\n• Weicht die GFZ ab, wird nur mit einem eingetragenen Umrechnungskoeffizienten umgerechnet — einer wird nie erfunden.\n• Eine Anpassung trägst du unter Ansätze des Sachverständigen ein („Bodenwert-Anpassung (%)“ mit „Begründung der Anpassung“)."
      },
      {
       "h": "So rechnet DealPilot den Ertragswert",
@@ -5333,7 +5333,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "5cceeec90bff4f75",
+  "hilfe": "4a2afabf9bc3a335",
   "bewertung": "bca98c7b04c452b7"
  }
 }

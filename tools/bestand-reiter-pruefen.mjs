@@ -75,7 +75,8 @@ function setze({ ankauf, soll }) {
   W.DealPilotAnkaufAnsicht = { aktiv: () => !!soll };
   W._dpAnkauf = ankauf ? { daten: {} } : null;
 }
-const ALT_REITER = ['Briefing', 'Stärken & Risiken', 'Risiko & Szenarien', 'Lage & Markt', 'Wert & Marktpreis', 'Verhandlung & Offerte', 'Bank', 'Steuer'];
+/* v3030: der Reiter „Ankauf · Bestand · Zielbild“ gehoert seit dem Zielbild-Umbau zur Ankauf-Analyse (gewollt, im Webinar 28.10. zu sehen) */
+const ALT_REITER = ['Briefing', 'Stärken & Risiken', 'Risiko & Szenarien', 'Lage & Markt', 'Wert & Marktpreis', 'Verhandlung & Offerte', 'Bank', 'Steuer', 'Ankauf · Bestand · Zielbild'];
 const BESTAND_REITER = ['Briefing', 'Wert & Marktpreis', 'Lage & Markt', 'Steuer', 'Anschlussfinanzierung', 'Exit-Strategien', 'Risiko & Szenarien'];
 const neu = { bestand_modus: true, empfehlung: 'Halten', fazit_kurz: 'Halten', empfehlung_begruendung: 'PRUEF-BEGRUENDUNG',
   verhandlungsempfehlung: 'PRUEF-BESTANDSSTRATEGIE', bankargumente: ['PRUEF-BANKARGUMENT'],

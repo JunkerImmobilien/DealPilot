@@ -1165,9 +1165,7 @@ label.dp-required.qc-required::after {
                 <button type="button" class="btn-brw" id="brw-portal-btn" onclick="DealPilotBrw.openBoris()" title="Öffnet das Bodenrichtwert-Portal des Bundeslandes (nach Adresse)"><!-- v2949: hiess „BORIS-Portal", die Länder nennen ihre Portale verschieden -->
                   <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span> <span data-brw-portal-name>Bodenrichtwert-Portal</span>
                 </button>
-                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
-                  <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span> Bodenrichtwert schätzen
-                </button>
+                <!-- v3030: Knopf „Bodenrichtwert schätzen" (KI) entfernt - Marcel 28.10.2026 -->
                 <span id="brw-ai-status" class="brw-ai-status"></span>
               </div>
               <!-- V190: Container für KI-Result-Card mit Confidence/Begründung/BORIS-Verify -->
@@ -2056,7 +2054,7 @@ label.dp-required.qc-required::after {
       <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trend"/></svg></span>Prognose-Annahmen</div>
         <div class="ass-row"><span class="ass-l">Wertsteigerung p.a.</span><div class="ass-inp"><input id="wertstg" type="text" inputmode="decimal" value="1.5" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
         <div class="ass-row"><span class="ass-l">Kostensteigerung p.a. <button type="button" class="dp-tip" data-tip-id="tab3.kostensteigerung" tabindex="-1" aria-label="Hilfe zu Kostensteigerung"></button></span><div class="ass-inp"><input id="kostenstg" type="text" inputmode="decimal" value="1.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
-        <div class="ass-row"><span class="ass-l">Leerstand p.a. <button type="button" class="dp-tip" data-tip-id="tab3.leerstand" tabindex="-1" aria-label="Hilfe zu Leerstand"></button></span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Leerstand p.a. <button type="button" class="dp-tip" data-tip-id="tab3.leerstand" tabindex="-1" aria-label="Hilfe zu Leerstand"></button></span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span><span class="cf-hint" id="r-leer-j" style="margin-left:6px;white-space:nowrap"></span><!-- v3030 --></div></div>
         <div class="ass-row"><span class="ass-l">Betrachtungszeitraum <button type="button" class="dp-tip" data-tip-id="tab3.btj" tabindex="-1" aria-label="Hilfe zu Betrachtungszeitraum"></button></span><div class="ass-inp"><input id="btj" type="text" inputmode="decimal" value="15" min="5" max="50" step="1" oninput="calc()"><span class="unit">Jahre</span></div></div>
         <div class="ass-row"><span class="ass-l">Exit-Rendite (Verkauf %) <button type="button" class="dp-tip" data-tip-id="tab3.exit_bmy" tabindex="-1" aria-label="Hilfe zu Exit-Rendite"></button></span><div class="ass-inp"><input id="exit_bmy" type="text" inputmode="decimal" value="5.0" step="0.1" oninput="calc()"><span class="unit">%</span></div></div>
       </div>
@@ -3665,7 +3663,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v3018c"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
-<script src="js/pdf-wert-zielbild.js?v=v3026"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
+<script src="js/pdf-wert-zielbild.js?v=v3030"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
 <script src="js/pdf-investment-bank.js?v=v3029"></script>
 <script src="js/bmf-modal.js?v=v3018d"></script>
 <script src="js/bmf-modal-v292.js?v=v3006d"></script>
@@ -3678,7 +3676,7 @@ label.dp-required.qc-required::after {
 <script src="js/schwellen.js?v=v2240"></script><!-- v2240 · EINE Quelle fuer die Ampel-Schwellen (DSCR/LTV/Cashflow) aus den Einstellungen -->
 <script src="js/dp-qr.js?v=v2180"></script>
 <script src="js/hausgeld-engine.js?v=v2191a"></script>
-<script src="js/deal-kpis.js?v=v3006e"></script>
+<script src="js/deal-kpis.js?v=v3030"></script>
 <script src="js/afa-engine.js?v=v3006"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
@@ -3697,7 +3695,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v3029"></script>
+  <script src="js/calc.js?v=v3030"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -3719,7 +3717,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-heuristik.js?v=v2546a"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v3006"></script>
+<script src="js/tooltip-content.js?v=v3030"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v2421"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
@@ -3753,12 +3751,12 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3026"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3018b"></script>
+<script src="js/storage.js?v=v3030"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v3006c"></script>
 <script src="js/track-record.js?v=v3029"></script>
-<script src="js/pdf.js?v=v3029"></script>
+<script src="js/pdf.js?v=v3030"></script>
 <script src="js/pdf-pruefung.js?v=v3029"></script><!-- v3018d · EIN Tor vor jedem PDF -->
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
@@ -3786,7 +3784,7 @@ label.dp-required.qc-required::after {
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v3006c"></script>
 <script src="js/qc-bridge.js?v=qc-v2969"></script>
-<script src="js/bodenrichtwert.js?v=v2952"></script>
+<script src="js/bodenrichtwert.js?v=v3030"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
@@ -3809,7 +3807,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2988"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3029"></script>
+<script src="js/help.js?v=v3030"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3001"></script>
@@ -3881,7 +3879,7 @@ label.dp-required.qc-required::after {
   <script src="js/object-actions.js?v=v3029"></script>
   <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>
-  <script src="js/voice-import.js?v=v3029"></script>
+  <script src="js/voice-import.js?v=v3030"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

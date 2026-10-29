@@ -6247,6 +6247,7 @@
       kp: kp, nk: nkEur, san: san, moebl: moebl,
       nkm: nkm, ze: ze,
       bwk_ul: ul, bwk_nul: nul, bwk_nul_st: _B.nul_st,   /* v1898 */
+      leerstand_pct: _rfNum(_rfFeld('leerstand')) || 0,   /* v3030: wie calc.js */
       d1: d1, d1z: d1z || 0, d1t: d1t || 0,
       ek: ek, afa: afa, grenz: _rfNum(_rfFeld('grenz')) || 0
     });
