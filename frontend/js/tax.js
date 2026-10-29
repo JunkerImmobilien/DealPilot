@@ -1203,7 +1203,8 @@ function renderTaxTimeline() {
         + 'title="Klick: Berechnung für ' + t.year + ' anzeigen">'
         + '<div class="tax-tl-year">' + t.year + '</div>'
         + '<div class="tax-tl-amount" style="color:' + color + '">' + (hasKst ? '&minus;' + Math.round(kst).toLocaleString('de-DE') + ' &euro;' : '0 &euro;') + '</div>'
-        + '<div class="tax-tl-label">' + (hasKst ? 'K&ouml;rperschaftsteuer' : 'kein KSt') + '</div>'
+        /* v3042 · „Körperschaftsteuer" (18 Versalien) ragte über die 85-px-Kachel - Marcel 29.10.2026 */
+        + '<div class="tax-tl-label">' + (hasKst ? 'KSt' : 'keine KSt') + '</div>'
         + '</div>';
     });
     chtml += '</div>';
