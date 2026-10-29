@@ -38,9 +38,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ### N86 · Nach dem Neuabruf der Demo-Objekte (29.10.2026)
 
-1. **Musterstraße 12 (Prod, Demo-Konto):** löste beim Öffnen zweimal die Anfragebremse aus (600/15 min) und schaltete einmal die Seitenleiste ins Menü - auf Staging unauffällig. Netzwerk beim Öffnen messen (read_network_requests), Schleife/Polling suchen.
-2. **Storybook:** `messe-storybook.mjs` meldet „FEHLT in der DB: 2026-1040, 2026-1002“ (Am Markt 9 Kabelsketal: RND-Gutachten, Privat oder GmbH). Kürzel/Status der Objekte auf Staging prüfen (privat-Fassung steht laut [[demo-konto-staging-prod]] auf „Verloren“).
-3. **Feld-Diff Staging = Prod** der Demo-Objekte nach dem Neuabruf - Prod-DB-Lesen war im Auto-Modus gesperrt; über die App-API (je Objekt, mit Pausen) oder mit Marcels Freigabe per psql.
+1. ✅ gemessen: kein Anfragesturm (43 Anfragen beim Öffnen) — **Musterstraße 12 (Prod, Demo-Konto):** löste beim Öffnen zweimal die Anfragebremse aus (600/15 min) und schaltete einmal die Seitenleiste ins Menü - auf Staging unauffällig. Netzwerk beim Öffnen messen (read_network_requests), Schleife/Polling suchen.
+2. ✅ 2026-1040/1002/1082 von Prod angelegt, Storybook vollständig — **Storybook:** `messe-storybook.mjs` meldete „FEHLT in der DB: 2026-1040, 2026-1002“ (Am Markt 9 Kabelsketal: RND-Gutachten, Privat oder GmbH). Kürzel/Status der Objekte auf Staging prüfen (privat-Fassung steht laut [[demo-konto-staging-prod]] auf „Verloren“).
+3. ✅ Status abgeglichen, Verloren-Fehler behoben (v3046) — **Feld-Diff Staging = Prod** der Demo-Objekte nach dem Neuabruf - Prod-DB-Lesen war im Auto-Modus gesperrt; über die App-API (je Objekt, mit Pausen) oder mit Marcels Freigabe per psql.
 4. **Abnahme Marcel:** eine RND-Anfrage echt abschicken (Mail an info@ mit Kerndaten-Tabelle und JSON-Anhang).
 
 ### N85 · BMF-Rechner: Optimierungen und umgekehrte Ertragswertmethode vergleichen und übernehmen (29.10.2026)
