@@ -1160,7 +1160,7 @@
        * Der Timer ist hier kein Rennen um Daten, sondern eine Notbremse gegen
        * ein iframe, das gar nichts mehr meldet. */
       to = setTimeout(function () { cleanup(); reject(new Error('Zeitueberschreitung')); }, 90000);
-      fr.src = '/marktbericht-app/index.html?v=949&theme=light&autopdf=1&report=' + encodeURIComponent(rid);
+      fr.src = '/marktbericht-app/index.html?v=3037&theme=light&autopdf=1&report=' + encodeURIComponent(rid);
       document.body.appendChild(fr);
     });
   }
