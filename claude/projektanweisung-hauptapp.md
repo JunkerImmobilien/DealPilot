@@ -43887,3 +43887,17 @@ ist gleich zum Original.
 **Steuerfrage (Marcel):** Grenzsatz 44,3 % = 42 % × 1,055 (Soli voll, ohne KiSt); 47,0 % = 42 % × 1,119 in der Soli-Milderungszone (Einzel ca. 74–115 Tsd. € zvE, Splitting ca. 150–230 Tsd.) oder 47,5 % = 45 % × 1,055 ab ca. 278 Tsd. €. Ø 37,3 % passt zu ca. 160–170 Tsd. € zvE (Einzel). Am echten Kern `tax.js` nachgerechnet — richtig.
 
 **Rest.** Prod-Demo-Objekte restlich abrufen (Chrome getrennt); Abgleich Staging/Prod + Storybook; N84.4 Demo „Marktbericht einfacher“; N84.9 Entscheidung Hölderlinstr.; N85 BMF-Vergleich (unten im Backlog).
+
+### v3045 · v3045b — Prod 1.0.6 / 1.0.7, Neuabruf Prod abgeschlossen (29.10.2026 nachts)
+
+**Was.**
+- **v3045:** RND-Knöpfe „Restnutzungsdauer ermitteln“ und „Restnutzungsdauer-Gutachten anfragen“ nur in der Box, die mit „Eigenen Satz …“ aufgeht (Marcel). Anfrage geht an `RND_REQUEST_MAIL_TO` (Prod nicht gesetzt → info@dealpilot.immo), Antwortadresse = Nutzer, Ablage `/app/data/rnd-requests`.
+- **v3045b:** kein automatisches Rundgang-Angebot mehr (`tour-engine.js _angebotFaellig()` → false; Aktionen und Haken in der Ersteinrichtung bleiben). RND-Anfrage-Mail mit Tabelle „Kerndaten für den Rechenkern“ und dem gespeicherten Datensatz als JSON-Anhang.
+- **Neuabruf Prod** (Pause 60 s je Objekt): 11 Objekte frisch (Am Markt 9, Gohliser, Bismarck, Lindenallee, Westerfeld, Wilhelm-Busch, Parkstr. 9, Am Markt 18, Lindenhof 14, Löhner, Bäckerstr.). Hauptstr. 51 Gewerbe ohne Ist-Miete (richtig ohne Ertragswert), 8 ohne Zielbild-Modell, **Musterstraße 12 löste zum zweiten Mal die Anfragebremse aus** (verdächtig: viele Anfragen beim Öffnen auf Prod).
+- **Storybook** neu (`node tools/messe-storybook.mjs`, Staging): 16 Objekte, 24 Seiten; **FEHLT in der DB: 2026-1040, 2026-1002** (Am Markt 9 Kabelsketal, RND-Gutachten / Privat oder GmbH) — nicht aus dieser Sitzung.
+
+**Commit.** `d03c35a5` (Prod `b853ac1`, 1.0.6), `42a3de9b` (Prod `2803314`, 1.0.7).
+
+**Nachweis.** `_kerndatenHtml` mit Beispieldaten erzeugt (Tabelle mit „–“ für Fehlendes); im Prod-Container vorhanden; Prod antwortet 200.
+
+**Rest.** RND-Anfrage einmal echt abschicken und Mail mit Anhang ansehen (Abnahme Marcel); Musterstraße 12 auf Prod untersuchen (Anfragesturm?); Storybook 2026-1040/1002; Feld-Diff Staging/Prod (Prod-DB-Lesen war gesperrt); N84.4, N84.9, N85.
