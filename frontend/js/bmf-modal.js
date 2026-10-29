@@ -462,6 +462,8 @@ function switchPane(id){
   });
   // V289.2.3: Footer-Navigation aktualisieren
   if(typeof _updateFooterNav === 'function') _updateFooterNav(id);
+  /* v3047 · auch über „Weiter" erreicht rechnet der Bodenabschlag seine Seite (sonst nur beim Reiter-Klick) */
+  if (id === 'p-boden') { try { if (window.DpBmfBodenabschlag && window.DpBmfBodenabschlag.rechnen) window.DpBmfBodenabschlag.rechnen(); } catch(e) {} }
   try { _bmfTabsSperren(); } catch(e) {}   /* v1492 */
 
   /* v1499: JETZT rechnen - der Reiter zeigt gleich ein Ergebnis. */
@@ -2407,7 +2409,10 @@ setTimeout(_initBmfAdvancedButton, 1500);
 // ─────────────────────────────────────────────────────────────────
 // V289.2.3: Pane-Navigation Footer
 // ─────────────────────────────────────────────────────────────────
-var _BMF_PANE_ORDER = ['p-ak', 'p-bmf', 'p-afa', 'p-hebel'];
+/* v3047 · Marcel 29.10.2026: „wenn ich im Reiter Bodenabschlag auf Weiter klicke, kommt Schritt 1".
+   Der Reiter wird von bmf-bodenabschlag.js eingehängt und stand hier nicht - indexOf = -1, die
+   Fußzeile zeigte Schritt 1, „Weiter" sprang auf Index 0. Jetzt Schritt 5 von 5. */
+var _BMF_PANE_ORDER = ['p-ak', 'p-bmf', 'p-afa', 'p-hebel', 'p-boden'];
 
 function _currentPaneId(){
   var active = document.querySelector('.bmfmo-pane.active');
@@ -2438,8 +2443,8 @@ function _updateFooterNav(paneId){
   }
   // Weiter: bis Pane 3
   _show('btnBmfNext', !isLast);
-  // Übernehmen + PDF: nur auf letzter Pane
-  _show('btnBmfApply', isLast);
+  // Übernehmen: auf der Auswahl (Schritt 4) und auf dem Bodenabschlag (Schritt 5) - v3047
+  _show('btnBmfApply', isLast || paneId === 'p-hebel');
   _show('btnBmfPdf', false);   /* v1859: war derselbe Export wie „Kaufpreisaufteilung als PDF" — doppelt, bleibt aus */
   // Abbrechen: immer
   _show('btnBmfCancel', true);
@@ -2448,10 +2453,11 @@ function _updateFooterNav(paneId){
   var hint = document.getElementById('bmfmoFooterHint');
   if(hint){
     var hints = {
-      'p-ak':    '<b>Schritt 1 / 4:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
-      'p-bmf':   '<b>Schritt 2 / 4:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
-      'p-afa':   '<b>Schritt 3 / 4:</b> Vergleich der vier Varianten (Amtlich / Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
-      'p-hebel': '<b>Schritt 4 / 4:</b> Wählen Sie die Variante per Klick auf eine Karte. Bei „Übernehmen" wird der Gebäudeanteil ins Steuermodul geschrieben.'
+      'p-ak':    '<b>Schritt 1 / 5:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
+      'p-bmf':   '<b>Schritt 2 / 5:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
+      'p-afa':   '<b>Schritt 3 / 5:</b> Vergleich der vier Varianten (Amtlich / Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
+      'p-hebel': '<b>Schritt 4 / 5:</b> Wählen Sie die Variante per Klick auf eine Karte. Bei „Übernehmen" wird der Gebäudeanteil ins Steuermodul geschrieben. Weiter: Szenario Bodenabschlag (optional).',
+      'p-boden': '<b>Schritt 5 / 5:</b> Szenario jenseits der amtlichen Aufteilung — Abschlag auf den Bodenwert, Restnutzungsdauer und Begründung für den Vertragstext.'
     }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];
   }

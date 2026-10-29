@@ -43901,3 +43901,18 @@ ist gleich zum Original.
 **Nachweis.** `_kerndatenHtml` mit Beispieldaten erzeugt (Tabelle mit „–“ für Fehlendes); im Prod-Container vorhanden; Prod antwortet 200.
 
 **Rest.** RND-Anfrage einmal echt abschicken und Mail mit Anhang ansehen (Abnahme Marcel); Musterstraße 12 auf Prod untersuchen (Anfragesturm?); Storybook 2026-1040/1002; Feld-Diff Staging/Prod (Prod-DB-Lesen war gesperrt); N84.4, N84.9, N85.
+
+### v3046 · landing-stories-1 — Prod 1.0.8 / 1.0.9, Demo-Konto repariert (29.10.2026 nachts)
+
+**Was.**
+- **v3046 (Fehler, auch auf Prod):** `loadData()` setzte `_deal_won_state` aus dem Objekt, `_deal_lost_state` nicht — das versteckte Feld behielt „Verloren" des vorher geöffneten Objekts, und das nächste Speichern (`storage.js:417`) schrieb es ins neue. Auf Staging standen nach der Abruf-Schleife 14 Demo-Objekte auf „Verloren" (Speicherzeiten 17:38–17:42 UTC = Reihenfolge der Schleife; fünf schon seit 09:35). Fix in `storage.js` (`loadData`).
+- **Demo-Konto Staging repariert (Marcels Freigabe für Prod-Lesen):** Sicherung `/root/backups/demo-objekte-staging-20261029-1910.tsv.gz` (21 Zeilen); `_deal_lost` bei 12 Objekten auf false (Prod-Stand); 2026-1040 (Am Markt 18), 2026-1002 (Am Markt 9 privat, verloren) und 2026-1082 (Sachsenstraße 18) von Prod nach Staging angelegt (gleiche id, Staging-Konto). Status-Diff danach: nur Staging-Testobjekte/Doppel (1078, 1106, 1119, 1122) und Prod-Doppel 1004 verschieden.
+- **Storybook** neu: 18 Objekte, 24 Seiten, keine Lücke mehr.
+- **Musterstraße 12:** 43 Anfragen beim Öffnen, dann Ruhe — kein Sturm; doppelte Abrufe (Verlauf ×8, Objektliste ×6) wären Optimierung.
+- **landing-stories-1:** Play/Pause zwischen den Pfeilen, 18 s je Geschichte, Maus pausiert nur solange, Blättern/Knopf stoppen.
+
+**Commit.** `b678a14d` (Prod `2b40196`, 1.0.8), `16eafde8` (Prod `bd9e872`, 1.0.9).
+
+**Nachweis.** Status-Diff Prod/Staging per psql; Storybook ohne „FEHLT"; Stories im Browser (Staging): Knopf schaltet, nach 20 s eine Geschichte weiter; Prod liefert `stxPlay`.
+
+**Rest.** N84.4/N85 Entwürfe; N84.9 Entscheidung; Abnahme RND-Anfrage-Mail.
