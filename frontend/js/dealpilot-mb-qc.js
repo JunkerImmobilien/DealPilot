@@ -166,7 +166,8 @@ if (!window._wlc) {
        (dealpilot-mb.js). Fehlte bis v2489: der Quick-Check rechnete trotz eigenem
        Wert mit dem oertlichen Satz oder dem Marktdurchschnitt. */
     try { var _e = global.DealPilotAbschlag && global.DealPilotAbschlag.eigen ? global.DealPilotAbschlag.eigen() : null;
-      if (_e != null) o.angebot_abschlag_pct = _e; } catch (e) {}
+      if (_e != null) o.angebot_abschlag_pct = _e;
+      if (global.DealPilotAbschlag.deckel) o.abschlag_deckel_pct = global.DealPilotAbschlag.deckel(); } catch (e) {}   /* v3043 */
     return o;
   }
 

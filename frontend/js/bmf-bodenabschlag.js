@@ -489,6 +489,13 @@
   function rndRechnen() {
     var info = el('bmf-boden-rnd-info');
     function sagen(t) { if (info) info.textContent = t; }
+    /* v3044 · Marcel 29.10.2026 (Hüllhorst): „mit Klick direkt auf 46-51 Jahre … warum öffnet sich nicht das
+       RND-Modal?" Der Knopf rechnete bisher SELBST aus den Modernisierungs-Auswahlen des BMF-Reiters und
+       öffnete den Assistenten nur bei Lücken - der Marktbericht rechnet aber mit den Angaben aus dem Reiter
+       Objekt (Hüllhorst 41,7 J.). Zwei Wege, zwei Zahlen. Jetzt immer der Assistent (rnd-wizard.js, Kern
+       rnd-calc.js) mit der Vorbefüllung aus dem Objekt; die eigene Rechnung darunter bleibt nur als
+       Rückfall, wenn der Assistent nicht geladen ist. */
+    if (wizardOeffnen('')) return;
 
     if (!window.DealPilotRND || typeof window.DealPilotRND.calcAll !== 'function') {
       sagen('Der Restnutzungsdauer-Rechner ist nicht geladen.'); return;
@@ -608,7 +615,7 @@
     var W  = window.DealPilotRND_Wizard;
     if (!W || typeof W.open !== 'function' || typeof DA.getRndPrefill !== 'function') return false;
     var info = el('bmf-boden-rnd-info');
-    if (info) info.textContent = fehltTxt + ' Der Restnutzungsdauer-Rechner ist geöffnet.';
+    if (info) info.textContent = (fehltTxt ? fehltTxt + ' ' : '') + 'Der Restnutzungsdauer-Rechner ist geöffnet.';
     try {
       W.open({
         /* v1506: der Wizard soll hier einen Wert liefern, keine Anfrage
@@ -637,6 +644,8 @@
             if (!werte.length) return;
             spanneSetzen(Math.min.apply(null, werte), Math.max.apply(null, werte));
             window._lastRndResult = { result: r };
+            /* v3044 · und im Reiter Steuer den eigenen AfA-Satz setzen (Modellwert des Kerns) */
+            try { if (window.DpAfaEigen && window.DpAfaEigen.setzen) window.DpAfaEigen.setzen(r.final_rnd, 'RND-Ermittlung DealPilot (indikativ, Anlage 2 ImmoWertV)'); } catch (e) {}
             if (info) info.textContent = 'Aus dem Restnutzungsdauer-Rechner übernommen: technisch ' +
               tech + ' Jahre, nach Anlage 2 ' + raster + ' Jahre.';
             try { W.close(); } catch (e) {}

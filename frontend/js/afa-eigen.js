@@ -42,12 +42,23 @@
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-letzte" hidden>Letzte Ermittlung übernehmen</button>' +
       '</div>';
     (f || sel.parentNode).appendChild(box);
+    /* v3044 · Marcel 29.10.2026: „wo ist die Anfrage geblieben, die sonst im Tab Steuern für die RND stand?"
+       Die Karte (deal-action.js renderRndRecommendation) hat seit v852 keinen Aufrufer mehr, und
+       „Restnutzungsdauer ermitteln" lag hinter der Auswahl „Eigenen Satz …" versteckt. Jetzt sichtbar:
+       ermitteln (Assistent, Ergebnis wird übernommen) und Gutachten anfragen (bisheriger Weg). */
+    var leiste = document.createElement('div'); leiste.id = 'afa-rnd-leiste';
+    leiste.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';
+    leiste.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-ermitteln-sichtbar">Restnutzungsdauer ermitteln</button>'
+      + '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-anfragen">Restnutzungsdauer-Gutachten anfragen</button>';
+    (f || sel.parentNode).appendChild(leiste);
+    el('afa-rnd-ermitteln-sichtbar').onclick = ermitteln;
+    el('afa-rnd-anfragen').onclick = function () { var D = window.DealPilotDealAction; if (D && D.openExpertWithRnd) D.openExpertWithRnd(); };
 
     sel.addEventListener('change', function () { if (sel.value === 'eigen') { box.hidden = false; letzteZeigen(); var e = el('afa_rnd_jahre'); if (e) e.focus(); } else if (!istEigen(sel.value)) box.hidden = true; });
     el('afa_rnd_jahre').addEventListener('input', function () { var r = zahl(this.value); if (r) { el('afa_eigen').value = fmt(100 / r, 2); anwenden(); } });
     el('afa_eigen').addEventListener('input', anwenden);
     el('afa_eigen_grundlage').addEventListener('input', anwenden);
-    el('afa-rnd-ermitteln').onclick = function () { var D = window.DealPilotDealAction; if (D && D.openExpertWithRnd) D.openExpertWithRnd(); };
+    el('afa-rnd-ermitteln').onclick = ermitteln;   /* v3044: Assistent im Übernehmen-Modus */
     el('afa-rnd-letzte').onclick = function () {
       var r = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd;
       if (r) { el('afa_rnd_jahre').value = fmt(r, 0); el('afa_eigen').value = fmt(100 / r, 2); if (!el('afa_eigen_grundlage').value) el('afa_eigen_grundlage').value = 'RND-Ermittlung DealPilot (indikativ)'; anwenden(); }
@@ -104,5 +115,28 @@
   window.addEventListener('dp:object-ready', function () { setTimeout(wiederherstellen, 150); });
   function start() { if (!aufbauen()) setTimeout(start, 400); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
-  window.DpAfaEigen = { anwenden: anwenden, wiederherstellen: wiederherstellen };
+  /* v3044 · Ergebnis einer Restnutzungsdauer-Ermittlung als eigenen AfA-Satz setzen (Reiter Steuer):
+     „beim Übernehmen direkt in Tab Steuer auf eigenen AfA-Satz ändern" (Marcel 29.10.2026). */
+  function setzen(rnd, grundlage) {
+    if (!aufbauen()) return false;
+    var n = Math.round(Number(rnd)); if (!(n >= 3 && n <= 200)) return false;   /* ganze Jahre: angezeigte RND und Satz passen zusammen */
+    var sel = el('afa_satz'); el('afa-eigen-box').hidden = false;
+    el('afa_rnd_jahre').value = fmt(n, 0);
+    el('afa_eigen').value = fmt(100 / n, 2);
+    if (grundlage || !el('afa_eigen_grundlage').value) el('afa_eigen_grundlage').value = grundlage || 'RND-Ermittlung DealPilot (indikativ)';
+    anwenden();
+    if (typeof window.calc === 'function') { try { window.calc(); } catch (e) {} }
+    return true;
+  }
+  /* v3044 · derselbe Assistent und Kern wie im Bodenabschlag, Modus „übernehmen" */
+  function ermitteln() {
+    var DA = window.DealPilotDealAction || {}, W = window.DealPilotRND_Wizard;
+    if (!W || typeof W.open !== 'function') { if (DA.openExpertWithRnd) DA.openExpertWithRnd(); return; }
+    W.open({ modus: 'uebernehmen', prefill: (typeof DA.getRndPrefill === 'function') ? DA.getRndPrefill() : {},
+      onComplete: function (stand) {
+        var res = (stand && stand.result) || (window._lastRndResult && window._lastRndResult.result) || null;
+        if (res) { window._lastRndResult = { result: res }; setzen(res.final_rnd, 'RND-Ermittlung DealPilot (indikativ, Anlage 2 ImmoWertV)'); letzteZeigen(); }
+      } });
+  }
+  window.DpAfaEigen = { anwenden: anwenden, wiederherstellen: wiederherstellen, setzen: setzen, ermitteln: ermitteln };
 })();

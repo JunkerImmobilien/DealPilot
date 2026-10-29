@@ -76,9 +76,16 @@ const LZS_AB = Object.freeze({ MIN_ANGEBOTE: 8, MIN_FALLZAHL: 10, MAX_ALTER_JAHR
    Gilt fuer beide oertlichen Wege (Rohertragsfaktor- und LZS-Satz), nicht fuer die eigene
    Angabe und nicht fuer die Ortsmessung (`messung`), die roh bleibt. */
 export const ABSCHLAG_OBERGRENZE = 10;
-function gedeckelt(pct) {
-  return pct > ABSCHLAG_OBERGRENZE
-    ? { pct: ABSCHLAG_OBERGRENZE, zusatz: ' — gemessen ' + String(pct).replace('.', ',') + ' %, gedeckelt auf ' + ABSCHLAG_OBERGRENZE + ' % (DealPilot-Obergrenze)' }
+/* v3043 · Grenze aus dem Investmentprofil (ref.abschlag_deckel_pct): 0 = keine Deckelung,
+   ohne Angabe ABSCHLAG_OBERGRENZE. Der Kern liest keine Einstellungen - sie kommen als Parameter. */
+function deckelVon(ref) {
+  const n = ref ? Number(ref.abschlag_deckel_pct) : NaN;
+  if (ref && ref.abschlag_deckel_pct !== null && ref.abschlag_deckel_pct !== undefined && ref.abschlag_deckel_pct !== '' && Number.isFinite(n)) return n > 0 ? n : null;
+  return ABSCHLAG_OBERGRENZE;
+}
+function gedeckelt(pct, grenze) {
+  return (grenze != null && pct > grenze)
+    ? { pct: grenze, zusatz: ' — gemessen ' + String(pct).replace('.', ',') + ' %, gedeckelt auf ' + String(grenze).replace('.', ',') + ' %' + (grenze === ABSCHLAG_OBERGRENZE ? ' (DealPilot-Obergrenze)' : ' (deine Obergrenze)') }
     : { pct, zusatz: '' };
 }
 const LZS_AB_TEILMARKT = {
@@ -171,7 +178,7 @@ export function abschlagAusLzs(ref, sale, area, opt) {
       return nein('K8: ' + String(pctRoh).replace('.', ',') + ' % unter ' + LZS_AB.BAND_MIN + ' %',
         { zweig: z.zweig, kaufpreis_eur_qm: kp, median_angebote: round(med, 0) });
     }
-    const dk = gedeckelt(pctRoh), pct = dk.pct;
+    const dk = gedeckelt(pctRoh, deckelVon(ref)), pct = dk.pct;
     const herkunft = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des '
       + String(kurz || 'Gutachterausschusses').replace(/^Gutachterausschuss/, 'Gutachterausschusses') + ' ' + jahr
       + ' (' + Math.round(kp).toLocaleString('de-DE') + ' €/m²' + (fz ? ', ' + fz + ' Kauffälle' : '')   /* v2578a: kein Zweig-Kuerzel im Kundentext, es steht in pruefung_lzs */
@@ -638,7 +645,7 @@ export const ValuationService = {
         const _kpQm = _rfSatz ? Number((_rfSatz.modellansaetze || {}).kaufpreis_eur_qm_mittel) : NaN;
         if (isFinite(_eigen) && _eigen >= 0 && _eigen < 50) { _abPct = _eigen; _abHerk = 'eigene Angabe'; }
         else if (_kpQm > 0 && Number(sale.median_per_sqm) > 0) {
-          const _dk = gedeckelt(round(Math.max(0, (1 - _kpQm / Number(sale.median_per_sqm)) * 100), 1));   /* v3041: Obergrenze 10 % statt 25 % */
+          const _dk = gedeckelt(round(Math.max(0, (1 - _kpQm / Number(sale.median_per_sqm)) * 100), 1), deckelVon(ref));   /* v3041: Obergrenze 10 % statt 25 % */
           _abPct = _dk.pct;
           _abHerk = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des Gutachterausschusses ('
             + Math.round(_kpQm).toLocaleString('de-DE') + ' €/m²) gegen den Median der Angebote ('

@@ -669,6 +669,8 @@ export const CrossCheckService = {
         aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
         garagen_bgf_qm: (p && p.garagen_bgf_qm) || ref.garagen_bgf_qm || null,
         garagen_stufe: (p && p.garagen_stufe) || ref.garagen_stufe || null,
+        /* v3043 · eigene RND der Garage aus ihrem Alter (nhk2010.js) */
+        garagen_baujahr: (p && p.garagen_baujahr) || ref.garagen_baujahr || null, baujahr_haus: ref.build_year || null, stichtag_jahr: _wst.datum.getFullYear(),
       };
       let _sw = nhkSachwert({ ..._ein1 }, _bwSw, (p && p.sachwertfaktor_param) || null);
 
@@ -825,6 +827,7 @@ export const CrossCheckService = {
             aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
             garagen_bgf_qm: (p && p.garagen_bgf_qm) || ref.garagen_bgf_qm || null,
             garagen_stufe: (p && p.garagen_stufe) || ref.garagen_stufe || null,
+            garagen_baujahr: (p && p.garagen_baujahr) || ref.garagen_baujahr || null, baujahr_haus: ref.build_year || null, stichtag_jahr: _wst.datum.getFullYear(),   /* v3043 */
             /* v1074-WAUS9-9 · Kette, zweiter Lauf. */
             ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
             bauteile_hk: (p && p.bauteile_hk) || ref.bauteile_hk || null,
@@ -2661,6 +2664,30 @@ export const CrossCheckService = {
         ? 'Führendes Verfahren: ' + _vn + '. ' + out.verfahrenswahl.grund
         : 'Kein führendes Verfahren ausgewiesen. ' + out.verfahrenswahl.grund
           + (out.verfahrenswahl.weg ? ' ' + out.verfahrenswahl.weg : ''));
+    }
+
+    /* ══ v3043 · SACHWERT NUR, WO ER GEBRAUCHT WIRD ══════════════════════════
+       Marcel 29.10.2026: „Sachwert kann da raus, wo er nicht gebraucht wird". Gemessen an
+       Hüllhorst (ETW, Bericht 370): vorläufiger Sachwert 273.328 € ohne Sachwertfaktor neben
+       Vergleichswert 145.000 € (amtlicher Vergleichsfaktor) und Ertragswert 156.000 €.
+       § 6 Abs. 1 ImmoWertV: das Verfahren nach der Art des Objekts und den Gepflogenheiten
+       des Marktes. Führt ein anderes Verfahren (Ertrags- oder Vergleichswert), nennt die Wahl
+       den Sachwert nicht als weiteres Verfahren und gibt es keinen Sachwertfaktor, ist der
+       Sachwert reine Herstellungskostenrechnung — er erscheint nicht. Die Rechnung bleibt
+       intern in `sachwert_nicht_massgeblich`. Ein marktangepasster Sachwert (amtlicher
+       Faktor) bleibt immer stehen. */
+    {
+      const _vw = out.verfahrenswahl || {};
+      const _fuehrt = _vw.verfahren || _vw.waere || null;
+      const _swWeiter = Array.isArray(_vw.weitere) && _vw.weitere.indexOf('sachwert') >= 0;
+      if (out.sachwert && out.sachwert.available && !out.sachwert.marktangepasst
+          && (_fuehrt === 'ertragswert' || _fuehrt === 'vergleichswert') && !_swWeiter) {
+        const _vName = _fuehrt === 'ertragswert' ? 'das Ertragswertverfahren' : 'das Vergleichswertverfahren';
+        out.sachwert_nicht_massgeblich = out.sachwert;
+        out.sachwert = { available: false, nicht_massgeblich: true, verfahren: 'Sachwertverfahren',
+          grund: 'Für dieses Objekt ist ' + _vName + ' maßgeblich (§ 6 Abs. 1 ImmoWertV). Ein Sachwert ohne '
+            + 'Sachwertfaktor bildet hier keinen Marktwert ab und wird nicht ausgewiesen.' };
+      }
     }
 
     /* v3010 · Hier stand der DealPilot-Merkmalskatalog zum Zins (angepassterZins, out.zins_anpassung):

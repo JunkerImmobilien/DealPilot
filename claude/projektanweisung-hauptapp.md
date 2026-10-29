@@ -43858,3 +43858,18 @@ ist gleich zum Original.
 - Detmold neu erzeugt (Marcel: „kannst du gerne selber auslösen“), im mb-Container über `ReportOrchestrator.generate` mit dem Rich-Body von Bericht 376 (Konto, Stufe 3): **Bericht 396**. Angebotsniveau 915.000 €, Abschlag gemessen 21,3 % → 10 %, Marktwert 830.000 € (vorher 725.000 € bei 22,8 %); Gegenprobe Ø Kaufpreis LZS-Kauffälle 1.245 €/m² × 546 m² = 680.000 € (41 Fälle). Chrome-Erweiterung nicht verbunden — Web-Darstellung von 396 und der Pilot-Analyse noch nicht im Browser gesehen.
 - **v3042** (`716ebe1e`): KSt-Verlauf der Gesellschaft — „Körperschaftsteuer“ (18 Versalien) ragte über die 85-px-Jahreskachel (`tax.js:1206`, `.tax-tl-label`); jetzt „KSt“/„keine KSt“ + `overflow-wrap:anywhere`. Nicht im Browser nachgemessen.
 - Prod wartet auf den Blick in den Browser (Bericht 396, Pilot-Analyse Bismarckstr. 27, Steuer-Reiter Hölderlinstr.), dann `rollout-prod.ps1 -Freigabe` für v3041 + v3042.
+
+### Prod 1.0.4 (v3041 + v3042) und Neuabruf der Demo-Objekte (29.10.2026 abends)
+
+**Was.** Prod `75e06f1` (Version 1.0.4) mit v3041/v3042, Marcels Freigabe. Pilot-Analyse „Abruf Marktpreise“ je Demo-Objekt im Browser (Chrome, Demo-Konto) über `DpPotenzial._auftrag(DpPotenzial.modell(), {})` → `POST /marktbericht/potenzial/markt` (derselbe Auftrag wie der Knopf nach „Ja“).
+- **Staging:** 13 Objekte neu abgerufen; Kontingent `mpi_plus_bank` des Demo-Kontos +20 (Staging-DB). Offen: Bäckerstr. 7 (zweimal Zeitüberschreitung), Teststraße 5 (Gewerbe ohne Ist-Miete, kein Ertragswert — richtig). 7 Objekte ohne Zielbild-Modell (u. a. Hölderlinstr., Alexanderstr., Hüllhorst, Musterweg 7) haben keinen Abruf in der Pilot-Analyse.
+- **Prod:** Kontingent +20 mit Freigabe (Sicherung `/root/backups/ai_credits_demo-20261029-1749.csv`). 6 Objekte neu abgerufen (Am Markt 9, Gohliser Str., Bismarckstr., Lindenallee 14, Westerfeldstr., Wilhelm-Busch-Str.). Danach sprang die Seitenleiste beim Öffnen der Musterstraße 12 vom Portfolio ins Menü, ein Klick auf „Portfolio“ stellte sie auf „Aktionen“, und die Prod-API meldete „Zu viele Anfragen in kurzer Zeit“ (Sperre gegen zu viele Anfragen durch die Abruf-Schleifen). Abgebrochen nach drei Fehlversuchen (Regel 2).
+- Beobachtet: Ertragswert Bismarckstr. 27 heute 885.000 € (Abruf 21.10.: 1.195.000 €) — Regeländerungen seit dem 21.10., nicht v3041.
+
+**Nachweis.** Staging Bismarckstr. 27 in der Oberfläche: Marktpreisindikation 830.000 € „abzüglich 10 % Abschlag“, „ohne Abschlag 915.000 €“, Zeile „Ø Kaufpreis aus Kauffällen“ 680.000 €. Konto-Abgleich v3040 live: 7 Stammdatenfelder + Erledigt-Merker am Konto, kein OpenAI-Schlüssel.
+
+**Rest (Backlog N84.10).**
+- Prod: restliche Objekte abrufen (Hauptstr. 51, Parkstr. 9, Lindenhof 14, Bäckerstr. 7, Ravensberger Weg 38, Sachsenstraße 18, Löhner Str. 278, Musterstraße 12 …), mit Pause zwischen den Aufrufen; vorher prüfen, ob beim Umschalten der Seitenleiste ein leeres „Neues Objekt“ gespeichert wurde.
+- Staging = Prod per Feld-Diff, danach `node tools/messe-storybook.mjs`.
+- Entscheidung Marcel offen: Mietband 20 → 10 %, Mehrmiete ohne Befristung 5 Jahre in den Wert (Recherche im Chat, Quellen dort).
+- PDF für Timo: `Dateien/Makler-Hub/Makler-Hub - Bewertungsfelder Ersttermin.pdf` (Quelle daneben als HTML).

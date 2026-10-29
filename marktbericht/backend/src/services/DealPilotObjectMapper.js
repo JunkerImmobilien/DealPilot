@@ -575,6 +575,7 @@ export const DealPilotObjectMapper = {
       vgf_wohnlage: String(pick(d, ['vgf_wohnlage']) || '').trim() || null,
       vermietungsstand: String(pick(d, ['vermstand', 'vermietungsstand']) || '').trim() || null,   /* v3008 */
       vgf_ausstattung: String(pick(d, ['vgf_ausstattung']) || '').trim() || null,
+      abschlag_deckel_pct: dez(pick(d, ['abschlag_deckel_pct'])),   /* v3043 */
       angebot_abschlag_pct: dez(pick(d, ['angebot_abschlag_pct'])),   /* v2367 · eigener Angebotsabschlag */
       nhk_typ: (function () {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);
@@ -597,6 +598,7 @@ export const DealPilotObjectMapper = {
       hinterland_rentierlich: /^(ja|true|1)$/i.test(String(pick(d, ['hinterland_rentierlich']) || '')),
       garagen_bgf_qm: num(pick(d, ['garagen_bgf_qm'])),
       garagen_stufe: num(pick(d, ['garagen_stufe'])),
+      garagen_baujahr: num(pick(d, ['garagen_baujahr'])),   /* v3043 */
       aussenanlagen_pct: dez(pick(d, ['aussenanlagen_pct'])),
       aussenanlagen: num(pick(d, ['aussenanlagen'])),
       bes_bauteile: num(pick(d, ['bes_bauteile'])),

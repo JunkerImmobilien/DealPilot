@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-29T17:20:06.055Z",
+ "erzeugt_am": "2026-10-29T18:27:56.330Z",
  "quellen": {
   "voice-import": "fd1708d211c4b4d0",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "33e9a0e32b801dd4",
-  "index-html": "124a30d17f72e37f",
+  "storage": "3c4a6f5b89ddb55d",
+  "index-html": "9fa9b4c466e8dd42",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -687,6 +687,7 @@
    "hinterland_rentierlich",
    "garagen_bgf_qm",
    "garagen_stufe",
+   "garagen_baujahr",
    "aussenanlagen_pct",
    "aussenanlagen",
    "ausst_aussenwaende",
@@ -2541,6 +2542,11 @@
      }
     ],
     "label": "Garage – Standardstufe"
+   },
+   {
+    "id": "garagen_baujahr",
+    "kind": "text",
+    "label": "Garage – Baujahr"
    },
    {
     "id": "aussenanlagen_pct",
@@ -5254,6 +5260,7 @@
     "hinterland_rentierlich",
     "garagen_bgf_qm",
     "garagen_stufe",
+    "garagen_baujahr",
     "aussenanlagen_pct",
     "aussenanlagen",
     "ausst_aussenwaende",
@@ -5334,6 +5341,6 @@
  },
  "inhalt": {
   "hilfe": "18880bc8e63ce17a",
-  "bewertung": "bca98c7b04c452b7"
+  "bewertung": "f427bd734c0570c3"
  }
 }

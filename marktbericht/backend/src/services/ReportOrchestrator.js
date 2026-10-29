@@ -51,9 +51,21 @@ import { ableiten as ausstAbleiten, zusammenfuehren as ausstMerge }
 import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
 import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 import { objektartNormal, gewerbeArt, zinsObjektart, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
-import { zensusMieteAmStichtag } from '../lib/zensus_miete.js';   /* v2993 */
+import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v2993, v3043: Fortschreibung im Zensus-Block */
 import { protokolliereMessung as protokolliereAbschlag } from './JahreswerteService.js';   /* v3021 */
 import { stichtagVon, stichtagJahr, stichtagIso } from '../lib/stichtag.js';   /* v3010 · Wertermittlungsstichtag */
+
+/* v3043 · Fortschreibungsfaktor der Zensus-Miete zum Stichtag an den Zensus-Block haengen */
+function zensusMitFortschreibung(zensus, stichtag) {
+  try {
+    if (!zensus || !zensus.available) return zensus;
+    const idx = nkmIndexAm(stichtag);
+    if (!idx || !(NKM_INDEX.basis_wert > 0)) return zensus;
+    return Object.assign({}, zensus, { fortschreibung: { faktor: Math.round(idx.wert / NKM_INDEX.basis_wert * 10000) / 10000,
+      index: idx.wert, bezug: idx.bezug, basis: NKM_INDEX.basis_wert, basis_bezug: '2022-05',
+      quelle: 'Index der Nettokaltmieten (Statistisches Bundesamt), Mai 2022 = ' + String(NKM_INDEX.basis_wert).replace('.', ',') } });
+  } catch (e) { return zensus; }
+}
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -231,6 +243,10 @@ export const ReportOrchestrator = {
       angebot_abschlag_pct: (input.angebot_abschlag_pct != null && input.angebot_abschlag_pct !== ''
         && isFinite(Number(String(input.angebot_abschlag_pct).replace(',', '.'))))
         ? Number(String(input.angebot_abschlag_pct).replace(',', '.')) : null,
+      /* v3043 · Obergrenze des oertlich gemessenen Abschlags (Investmentprofil); 0 = aus, null = 10 % */
+      abschlag_deckel_pct: (input.abschlag_deckel_pct != null && input.abschlag_deckel_pct !== ''
+        && isFinite(Number(String(input.abschlag_deckel_pct).replace(',', '.'))))
+        ? Number(String(input.abschlag_deckel_pct).replace(',', '.')) : null,
       /* v2361 · WGFZ des Objekts (oberirdische Geschossflaeche § 16 Abs. 4 / Grundstueck) */
       wgfz_objekt: Number(String(input.wgfz_objekt == null ? '' : input.wgfz_objekt).replace(',', '.')) > 0
         ? Number(String(input.wgfz_objekt).replace(',', '.')) : null,
@@ -312,6 +328,7 @@ export const ReportOrchestrator = {
       /* v1072-WGAR-4 · Garage als eigene bauliche Anlage. */
       garagen_bgf_qm: input.garagen_bgf_qm ? Number(input.garagen_bgf_qm) : null,
       garagen_stufe: input.garagen_stufe ? Number(input.garagen_stufe) : null,
+      garagen_baujahr: input.garagen_baujahr ? Number(input.garagen_baujahr) : null,   /* v3043 */
       aussenanlagen_pct: input.aussenanlagen_pct ? Number(input.aussenanlagen_pct) : null,
       aussenanlagen: input.aussenanlagen ? Number(input.aussenanlagen) : null,
       /* v1074-WAUS9-3 · Die ref-Liste ist ausdruecklich — wer hier fehlt,
@@ -1978,7 +1995,10 @@ export const ReportOrchestrator = {
       enthaelt_demodaten: !!((sale && sale.enthaelt_demodaten) || (rent && rent.enthaelt_demodaten)),
       datenquellen: Object.assign({}, (sale && sale.quellen) || {}, (rent && rent.quellen) || {}),
       land_value: landValue,
-      zensus,                // Zensus 2022: Leerstand/Eigentuemerquote/Ø-Miete (gratis, offline-CSV)
+      /* v3043 · Marcel 29.10.2026: die Zensus-Miete im Bericht fortgeschrieben zeigen (Index der
+         Nettokaltmieten zum Stichtag, wie im Ertragswert seit v2993). Nur die MIETE - Leerstand,
+         Eigentümerquote und Baualter haben keine Fortschreibung und bleiben beim 15.05.2022. */
+      zensus: zensusMitFortschreibung(zensus, stichtagVon(ref).datum),   // Zensus 2022: Leerstand/Eigentuemerquote/Ø-Miete
       valuation,
       cross_check: crossCheck,   // Sachwert/Ertragswert-Quercheck (vereinfacht, indikativ)
       deal_score: deal,

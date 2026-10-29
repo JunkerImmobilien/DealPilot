@@ -55,7 +55,7 @@ var WM_FIELDS = [
   'vgf_wohnlage','vgf_ausstattung',   /* v3008: Klassen des Gutachterausschusses (Vergleichsfaktor) */
   'nhk_haus','nhk_geschosse','nhk_dach',
   'hinterland_qm','hinterland_eur_qm','hinterland_rentierlich',
-  'garagen_bgf_qm','garagen_stufe','aussenanlagen_pct','aussenanlagen',
+  'garagen_bgf_qm','garagen_stufe','garagen_baujahr' /* v3043 */,'aussenanlagen_pct','aussenanlagen',
   'ausst_aussenwaende','ausst_dach','ausst_fenster','ausst_innenwaende',
   'ausst_decken','ausst_fussboeden','ausst_sanitaer','ausst_heizung','ausst_technik',
   'bes_bauteile','btl_gauben','btl_balkone','btl_vordach','btl_terrassen','btl_sonstige',

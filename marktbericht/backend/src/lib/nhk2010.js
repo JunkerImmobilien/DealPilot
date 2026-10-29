@@ -921,9 +921,22 @@ export function sachwert(ein, bodenwertErgebnis, param) {
       + (NHK_2010.WERTE['14.1|' + _garO] - NHK_2010.WERTE['14.1|' + _garU]) * (_garRoh - _garU)) * 100) / 100;
     if (Number.isFinite(_garKw)) {
       const _garGnd = Number(ein.garagen_gnd) || GND_GARAGE;
-      const _garRnd = Number.isFinite(Number(ein.garagen_rnd))
-        ? Number(ein.garagen_rnd)
-        : Math.max(0, Math.min(_garGnd, rnd));
+      /* v3043 · EIGENE RESTNUTZUNGSDAUER DER GARAGE - Marcel 29.10.2026: „die Garage soll ihre
+         eigene RND bekommen, wenn es nicht groß viele Felder bekommt". Bis v3042 nahm sie ohne
+         `garagen_rnd` die RND des HAUSES (nach Modernisierung): Hüllhorst, Bericht 370, Garage
+         64,6 m² mit 41,7 J. = 43.537 €. Jetzt linear aus ihrem Alter (§ 38 ImmoWertV, GND 60):
+         Baujahr der Garage (EIN optionales Feld), sonst Baujahr des Hauses. Über der GND bleibt
+         sie bei 0 — keine erfundene Mindest-RND. Die Haus-RND gilt nur noch ohne jedes Baujahr. */
+      const _garBj = Number(ein.garagen_baujahr) > 1800 ? Number(ein.garagen_baujahr)
+        : (Number(ein.baujahr_haus) > 1800 ? Number(ein.baujahr_haus) : null);
+      const _garStJahr = Number(ein.stichtag_jahr) > 1900 ? Number(ein.stichtag_jahr) : new Date().getFullYear();
+      let _garRndQuelle;
+      const _garRnd = Number.isFinite(Number(ein.garagen_rnd)) && ein.garagen_rnd !== null && ein.garagen_rnd !== ''
+        ? (_garRndQuelle = 'eigene Angabe', Number(ein.garagen_rnd))
+        : (_garBj
+          ? (_garRndQuelle = (Number(ein.garagen_baujahr) > 1800 ? 'Baujahr der Garage ' : 'Baujahr des Hauses ') + _garBj,
+             Math.max(0, Math.min(_garGnd, _garGnd - (_garStJahr - _garBj))))
+          : (_garRndQuelle = 'Restnutzungsdauer des Hauses (kein Baujahr)', Math.max(0, Math.min(_garGnd, rnd))));
       /* v1427-GPK · dieselbe Konvention wie beim Wohnhaus */
       const _garKwStichtag = Math.round(_garKw * _index3 * 100) / 100;
       const _garHerst = Math.round(_garKwStichtag * _garBgf);
@@ -933,12 +946,12 @@ export function sachwert(ein, bodenwertErgebnis, param) {
       out.staffel.push({
         pos: '+ Garage / Stellplatz',
         detail: _garBgf + ' m² × ' + _garKw + ' €/m² × ' + (index || 1)
-          + ' − Alterswertminderung (' + Math.round(_garGnd - _garRnd) + ' von ' + _garGnd + ' Jahren)',
+          + ' − Alterswertminderung (' + Math.round(_garGnd - _garRnd) + ' von ' + _garGnd + ' Jahren; ' + _garRndQuelle + ')',
         wert: _garWert,
       });
       out.garage = {
         bgf_qm: _garBgf, standardstufe: _garStufe, kennwert_eur_qm: _garKw,
-        gnd_jahre: _garGnd, rnd_jahre: _garRnd,
+        gnd_jahre: _garGnd, rnd_jahre: _garRnd, rnd_quelle: _garRndQuelle, baujahr: _garBj,   /* v3043 */
         herstellungskosten_eur: _garHerst, wert_eur: _garWert,
         quelle: 'NHK 2010, Gebäudeart 14.1 (Einzel-/Mehrfachgaragen); '
           + 'Gesamtnutzungsdauer 60 Jahre nach Anlage 3 SW-RL',

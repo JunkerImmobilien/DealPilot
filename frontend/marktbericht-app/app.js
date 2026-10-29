@@ -98,13 +98,19 @@ function _zensusZeilen(z) {
   const out = [];
   const g = z.gemeinde, k = z.kreis;
   const kn = (k && k.name) || z.kreis_name || 'Kreis';
-  if (g && g.nettokaltmiete_qm != null) out.push(['Ø Nettokaltmiete Gemeinde ' + g.name + ' (Zensus 2022)', de(g.nettokaltmiete_qm, 2) + ' €/m²']);
+  /* v3043 · Mieten fortgeschrieben (Index der Nettokaltmieten zum Stichtag, ReportOrchestrator);
+     Leerstand und Eigentümerquote bleiben beim 15.05.2022 - für sie gibt es keine Fortschreibung. */
+  const _zFort = z.fortschreibung && z.fortschreibung.faktor > 0 ? z.fortschreibung : null;
+  const _zBez = _zFort ? String(_zFort.bezug || '').replace(/^(d{4})-(d{2}).*/, '$2/$1') : '';
+  const _zM = (qm) => de(_zFort ? qm * _zFort.faktor : qm, 2) + ' €/m²';
+  const _zQ = (zus) => '(' + (zus ? zus + ', ' : '') + 'Zensus 2022' + (_zFort ? ', fortgeschrieben auf ' + _zBez : '') + ')';
+  if (g && g.nettokaltmiete_qm != null) out.push(['Ø Nettokaltmiete Gemeinde ' + g.name + ' ' + _zQ(''), _zM(g.nettokaltmiete_qm)]);
   /* kreisfreie Stadt: Gemeinde = Kreis -> nur eine Zeile */
   if (z.nettokaltmiete_qm != null && !(g && g.name === kn && g.nettokaltmiete_qm === z.nettokaltmiete_qm))
-    out.push(['Ø Nettokaltmiete Kreis ' + kn + ' (Zensus 2022)', de(z.nettokaltmiete_qm, 2) + ' €/m²']);
+    out.push(['Ø Nettokaltmiete Kreis ' + kn + ' ' + _zQ(''), _zM(z.nettokaltmiete_qm)]);
   for (const [feld, wort] of [['miete_baujahr', 'Baujahr'], ['miete_flaeche', 'Größe']]) {
     const a = g && g[feld] && g[feld].wert != null ? [g[feld], 'Gemeinde'] : (k && k[feld] && k[feld].wert != null ? [k[feld], 'Kreis'] : null);
-    if (a) out.push(['Ø Nettokaltmiete ' + wort + ' ' + a[0].klasse + ' (' + a[1] + ', Zensus 2022)', de(a[0].wert, 2) + ' €/m²']);
+    if (a) out.push(['Ø Nettokaltmiete ' + wort + ' ' + a[0].klasse + ' ' + _zQ(a[1]), _zM(a[0].wert)]);
   }
   const lb = g && g.leerstandsquote != null ? [g, 'Gemeinde'] : [k || z, 'Kreis'];
   if (lb[0].leerstandsquote != null) out.push(['Leerstandsquote ' + lb[1] + ' (Zensus 2022)', de(lb[0].leerstandsquote, 1) + ' %']);
@@ -1203,7 +1209,8 @@ function _renderWertverfahren(d) {
      * Gutachterausschuss ueberhaupt keine Sachwertfaktoren ab. Auch ein
      * gepflegter eigener Wert wird deshalb verworfen \u2014 am Pruefobjekt
      * stand 1,15 im Feld und blieb wirkungslos. */
-    + karte('sac', 'Sachwert', sw.available ? eur(sw.value_eur) : '\u2013',
+    /* v3043 \u00b7 nicht ma\u00dfgeblicher Sachwert (CrossCheckService) erscheint gar nicht */
+    + (sw.nicht_massgeblich ? '' : karte('sac', 'Sachwert', sw.available ? eur(sw.value_eur) : '\u2013',
         sw.available
           /* v1143b \u00b7 EIGENER FEHLER. Ich hatte `sachwertfaktor` fuer eine Zahl
            * gehalten \u2014 nhk2010.js:882 setzt aber ein OBJEKT
@@ -1229,7 +1236,7 @@ function _renderWertverfahren(d) {
                   : 'vorl\u00e4ufig \u00b7 ohne Sachwertfaktor, kein Marktwert'))
           : (sw.grund || 'nicht ausgewiesen'),
         'sach', sw.staffel,
-        (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null)
+        (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null))
     + '</div>'
     /* v2380 · welches Verfahren fuehrt - und wenn keines, warum (auch am Bildschirm) */
     + ((cc.verfahrenswahl && (cc.verfahrenswahl.verfahren || cc.verfahrenswahl.nicht_gerechnet))
@@ -4493,7 +4500,7 @@ async function exportPdf(out) {
     /* v2990 · wie die Haupt-App seit v2979 (wertvergleich.js): ohne Sachwertfaktor nur Plausibilitaet,
        keine Marktaussage - Titel und Unterzeile sagen es, die Zeilen bleiben kurz. */
     const _swPl = !!(sw.available && (sw.vorlaeufig === true || sw.marktangepasst === false));
-    card3(M + cardW + 6, _swPl ? 'SACHWERT · NUR PLAUSIBILITÄT' : 'SACHWERT · INDIKATIV', sw.available ? sw.value_eur : null, sw.available ? [
+    card3(M + cardW + 6, sw.nicht_massgeblich ? 'SACHWERT · NICHT MASSGEBLICH' : (_swPl ? 'SACHWERT · NUR PLAUSIBILITÄT' : 'SACHWERT · INDIKATIV'), sw.available ? sw.value_eur : null, sw.available ? [
       _swPl ? 'Herstellungskosten ohne Marktanpassung, kein Marktwert' : null,
       /* v1056-WKRT-1 · Die drei Felder gab es im Ergebnis nicht; die Karte
        * zeigte "ohne Bodenwert · Gebäude – · RND undefined J." neben einer
@@ -4534,7 +4541,9 @@ async function exportPdf(out) {
              brw_fehlt: 'Bodenrichtwert fehlt' }[sw.sachwertfaktor_grund]
            || String(sw.sachwertfaktor_grund).replace(/_/g, ' '))
         : null,
-    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar'],
+    ] : (sw.nicht_massgeblich   /* v3043 · kurz statt Begründungssatz */
+          ? ['anderes Verfahren maßgeblich (§ 6 ImmoWertV)']
+          : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar']),
       _fuehrt('sachwert'));   /* v1062-WFUE-3 */
     card3(M + 2 * (cardW + 6), 'ERTRAGSWERT · INDIKATIV', ew.available ? ew.value_eur : null, ew.available ? [
       'Rohertrag ' + euro(ew.rohertrag_pa_eur) + ' p.a.',

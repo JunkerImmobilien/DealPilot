@@ -1546,6 +1546,8 @@ label.dp-required.qc-required::after {
         <option value="4">4 · Massivbauweise</option>
         <option value="5">5 · Massiv mit besonderer Ausführung</option>
       </select></div></div>
+      <!-- v3043 · eigene Restnutzungsdauer der Garage (GND 60 J.); leer = Baujahr des Hauses -->
+      <div class="f"><label>Garage – Baujahr</label><div class="iw"><input id="garagen_baujahr" type="text" inputmode="numeric" placeholder="leer = wie das Haus" class="tr"></div></div>
       <div class="f"><label>Außenanlagen (% des Gebäudesachwerts)</label><div class="iw"><input id="aussenanlagen_pct" type="text" inputmode="decimal" placeholder="z. B. 5 bis 7 – alternativ Betrag" class="tr"><span class="sfx">%</span></div></div>
       <div class="f"><label>Außenanlagen (€)</label><div class="iw"><span class="pfx">€</span><input id="aussenanlagen" type="text" inputmode="decimal" placeholder="Wege, Einfriedung, Ver- und Entsorgung" class="trl"></div></div>
     </div>
@@ -3668,7 +3670,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-investment-bank.js?v=v3029"></script>
 <script src="js/bmf-modal.js?v=v3018d"></script>
 <script src="js/bmf-modal-v292.js?v=v3006d"></script>
-<script src="js/bmf-bodenabschlag.js?v=v2943"></script>
+<script src="js/bmf-bodenabschlag.js?v=v3044"></script>
 <script src="js/pdf-kaufpreisaufteilung.js?v=v3018d"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="/vendor/cdn/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3703,7 +3705,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3028"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3042"></script>
+<script src="js/tax.js?v=v3043"></script>
 <script src="js/steuer-verlauf.js?v=v2992"></script>
 <script src="js/config.js?v=v3035"></script>
 <script src="js/versionsanzeige.js?v=v3035"></script><!-- v3035: Versionsanzeige aus version.json -->
@@ -3753,7 +3755,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3026"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3031"></script>
+<script src="js/storage.js?v=v3043"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -3787,12 +3789,12 @@ label.dp-required.qc-required::after {
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v3031"></script>
-<script src="js/qc-bridge.js?v=qc-v3032"></script>
+<script src="js/qc-bridge.js?v=v3043"></script>
 <script src="js/bodenrichtwert.js?v=v3030"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
-<script src="js/objekt-reiter.js?v=v3002"></script>
+<script src="js/objekt-reiter.js?v=v3043"></script>
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
@@ -3840,7 +3842,7 @@ label.dp-required.qc-required::after {
 <script src="js/portfolio-export.js?v=v2180"></script>
 <script src="js/deal-action.js?v=v3006c"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
-<script src="js/afa-eigen.js?v=v1871"></script>
+<script src="js/afa-eigen.js?v=v3044a"></script>
 <script src="js/deal-action-readycheck.js?v=v3029"></script>
 <script src="js/deal-action-boarding.js?v=v3037"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
@@ -3852,12 +3854,12 @@ label.dp-required.qc-required::after {
 <script src="js/avm-missing-reset.js?v=443"></script>
 <script src="js/avm-section.js?v=v3023a"></script>
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
-<script src="js/marktwert-abschlag.js?v=v3021"></script><!-- v2237 · Abschlag auf Angebotspreise -->
+<script src="js/marktwert-abschlag.js?v=v3043"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2999"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
 <script src="js/bestand-analyse.js?v=v3031"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
 <script src="js/jahresstaende.js?v=v2989"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/wert-zielbild.js?v=v2999"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
-<script src="js/dealpilot-mb.js?v=v3027"></script>
+<script src="js/dealpilot-mb.js?v=v3043"></script>
 <script src="js/mb-abgleich.js?v=v3002d"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v3037"></script>
@@ -3869,7 +3871,7 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-wizard.js?v=v3006c"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v3029"></script>
+<script src="js/investment-profile.js?v=v3043"></script>
 <script src="js/bwk-profil.js?v=v2211"></script>
 <script src="js/dashboard.js?v=v3031"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->

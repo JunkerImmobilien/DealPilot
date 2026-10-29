@@ -76,6 +76,16 @@
     var n = (v == null || v === '') ? NaN : Number(String(v).replace(',', '.'));
     return (isFinite(n) && n >= 0 && n < 50) ? n : null;
   }
+  /* v3043 · Obergrenze des ÖRTLICH gemessenen Abschlags (Investmentprofil, Marcel 29.10.2026:
+     „Checkbox mit Deckelung, Standard auf 10 %"). 0 = keine Deckelung. Gilt nicht für den
+     eigenen Satz (eigen()) - der ist ohnehin deine Angabe. */
+  function deckel() {
+    var P = profil(), an = null, v = null;
+    try { an = P && P.get ? P.get('abschlag_deckeln') : null; v = P && P.get ? P.get('abschlag_deckel_pct') : null; } catch (e) {}
+    if (an === false) return 0;
+    var n = (v == null || v === '') ? NaN : Number(String(v).replace(',', '.'));
+    return (isFinite(n) && n > 0 && n < 50) ? n : 10;
+  }
   /* v2490 · Herkunft eines Kartensatzes in Kundensprache (card.abschlag.quelle
      kommt aus mapCard: 'dein Wert' | 'oertliche Kauffaelle' | 'Marktdurchschnitt').
      Nach aussen keine Datenquelle - nur, WOHER der Satz stammt. */
@@ -137,7 +147,7 @@
       .observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  global.DealPilotAbschlag = { satz: satz, markt: markt, quelle: quelle, anwenden: anwenden, eigen: eigen, herkunftText: herkunftText, laden: laden };
+  global.DealPilotAbschlag = { satz: satz, markt: markt, quelle: quelle, anwenden: anwenden, eigen: eigen, deckel: deckel /* v3043 */, herkunftText: herkunftText, laden: laden };
   /* v3021 · frueh laden (Profil-Hinweis „leer = Ø Markt x %") und nach der Anmeldung erneut */
   try { laden(); global.addEventListener('dp:plan-ready', function () { laden(); }); } catch (e) {}
 })(window);
