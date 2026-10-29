@@ -39,19 +39,13 @@
       '<div class="cf-hint" id="afa-eigen-hinweis" style="margin-top:6px">Eine eingetragene Restnutzungsdauer ergibt den Satz: 100 ÷ RND. Das Finanzamt verlangt dafür einen Nachweis (Gutachten).</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-ermitteln">Restnutzungsdauer ermitteln</button>' +
+        '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-anfragen">Restnutzungsdauer-Gutachten anfragen</button>' +   /* v3045 */
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-letzte" hidden>Letzte Ermittlung übernehmen</button>' +
       '</div>';
     (f || sel.parentNode).appendChild(box);
-    /* v3044 · Marcel 29.10.2026: „wo ist die Anfrage geblieben, die sonst im Tab Steuern für die RND stand?"
-       Die Karte (deal-action.js renderRndRecommendation) hat seit v852 keinen Aufrufer mehr, und
-       „Restnutzungsdauer ermitteln" lag hinter der Auswahl „Eigenen Satz …" versteckt. Jetzt sichtbar:
-       ermitteln (Assistent, Ergebnis wird übernommen) und Gutachten anfragen (bisheriger Weg). */
-    var leiste = document.createElement('div'); leiste.id = 'afa-rnd-leiste';
-    leiste.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';
-    leiste.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-ermitteln-sichtbar">Restnutzungsdauer ermitteln</button>'
-      + '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-anfragen">Restnutzungsdauer-Gutachten anfragen</button>';
-    (f || sel.parentNode).appendChild(leiste);
-    el('afa-rnd-ermitteln-sichtbar').onclick = ermitteln;
+    /* v3045 · Marcel 29.10.2026: „es reicht, wenn man im Tab Steuern eigenen Satz auswählt und dann die
+       Buttons Restnutzungsdauer ermitteln sieht. Die Anfrage darf auch gerne da drauf." - beide Knöpfe
+       stehen in der Box, die mit „Eigenen Satz …" aufgeht (v3044 hatte sie dauerhaft sichtbar gemacht). */
     el('afa-rnd-anfragen').onclick = function () { var D = window.DealPilotDealAction; if (D && D.openExpertWithRnd) D.openExpertWithRnd(); };
 
     sel.addEventListener('change', function () { if (sel.value === 'eigen') { box.hidden = false; letzteZeigen(); var e = el('afa_rnd_jahre'); if (e) e.focus(); } else if (!istEigen(sel.value)) box.hidden = true; });

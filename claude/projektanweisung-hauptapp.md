@@ -43873,3 +43873,17 @@ ist gleich zum Original.
 - Staging = Prod per Feld-Diff, danach `node tools/messe-storybook.mjs`.
 - Entscheidung Marcel offen: Mietband 20 → 10 %, Mehrmiete ohne Befristung 5 Jahre in den Wert (Recherche im Chat, Quellen dort).
 - PDF für Timo: `Dateien/Makler-Hub/Makler-Hub - Bewertungsfelder Ersttermin.pdf` (Quelle daneben als HTML).
+
+### v3043 · v3044 · v3044a — Prod 1.0.5 (29.10.2026 spätabends)
+
+**Was.**
+- **v3043:** Garage mit eigener RND (GND 60 − Alter; Baujahr Garage, sonst Haus; Feld „Garage – Baujahr“); Sachwert ohne Faktor erscheint nicht, wenn Ertrags-/Vergleichswert maßgeblich (§ 6 Abs. 1, `sachwert_nicht_massgeblich`, Web ohne Karte, PDF „nicht maßgeblich“); Zensus-Miete fortgeschrieben in Marktbericht (`zensus.fortschreibung`) und Pilot-Prompt; Steuer-Reiter: bei beantragter erweiterter Kürzung Prüfpunkte statt Hebesatz; Investmentprofil „örtlich gemessenen Abschlag deckeln“ + Obergrenze (Standard an, 10 %) → `abschlag_deckel_pct` bis `ValuationService.deckelVon()`. Ebene C bewusst neu eingefroren.
+- **v3044/a:** BMF-Bodenabschlag „Restnutzungsdauer berechnen“ öffnet immer den RND-Assistenten (vorher eigene Rechnung aus BMF-Auswahlen: Hüllhorst 46–51 J. gegen 41,7 J. im Bericht); Übernahme setzt zusätzlich den eigenen AfA-Satz im Reiter Steuer (`DpAfaEigen.setzen`, ganze Jahre); sichtbare Knöpfe „Restnutzungsdauer ermitteln“ / „Restnutzungsdauer-Gutachten anfragen“. Die alte Empfehlungskarte (`renderRndRecommendation`) hat seit v852 keinen Aufrufer.
+
+**Commit.** `5794db63`, `31635ece`, `b9543057` · Prod `c7dac96` (1.0.5).
+
+**Nachweis.** wertermittlung-pruefen RC=0 (nach bewusstem Einfrieren); prompt-lecks sauber; buster sauber; Container-Lauf Staging: Hüllhorst 397 Sachwert „nicht maßgeblich“, Garage RND 0 aus Baujahr 1962, Zensus-Faktor 1,0896 (09/2026); Bismarck 398 Deckel 15 → „gemessen 21,3 %, gedeckelt auf 15 % (deine Obergrenze)“; Browser Staging: Knöpfe da, `DpAfaEigen.setzen(41.7)` → 42 J. / eigener Satz; Prod-Dateien nachgemessen.
+
+**Steuerfrage (Marcel):** Grenzsatz 44,3 % = 42 % × 1,055 (Soli voll, ohne KiSt); 47,0 % = 42 % × 1,119 in der Soli-Milderungszone (Einzel ca. 74–115 Tsd. € zvE, Splitting ca. 150–230 Tsd.) oder 47,5 % = 45 % × 1,055 ab ca. 278 Tsd. €. Ø 37,3 % passt zu ca. 160–170 Tsd. € zvE (Einzel). Am echten Kern `tax.js` nachgerechnet — richtig.
+
+**Rest.** Prod-Demo-Objekte restlich abrufen (Chrome getrennt); Abgleich Staging/Prod + Storybook; N84.4 Demo „Marktbericht einfacher“; N84.9 Entscheidung Hölderlinstr.; N85 BMF-Vergleich (unten im Backlog).
