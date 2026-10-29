@@ -1,16 +1,4 @@
 ai-in-pdf	input/checkbox
-ai-pdf-sec-bank	input/checkbox
-ai-pdf-sec-empfehlung	input/checkbox
-ai-pdf-sec-gesamt	input/checkbox
-ai-pdf-sec-insight	input/checkbox
-ai-pdf-sec-investbew	input/checkbox
-ai-pdf-sec-investorfit	input/checkbox
-ai-pdf-sec-offerte	input/checkbox
-ai-pdf-sec-risiken	input/checkbox
-ai-pdf-sec-risikoanalyse	input/checkbox
-ai-pdf-sec-staerken	input/checkbox
-ai-pdf-sec-szenarien	input/checkbox
-ai-pdf-sec-verhandlung	input/checkbox
 ao-search	input/search
 fa-pdf-anlagev	input/checkbox
 fa-pdf-year	select/select
