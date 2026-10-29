@@ -43814,3 +43814,18 @@ ist gleich zum Original.
 - Marcel: „auf staging steht noch 1.0.0“. `rollout-prod.ps1` committete den Versionsstempel auf staging, der Staging-Server zog ihn aber nicht. Jetzt folgt `git pull` auf Staging direkt nach dem Stempel. Gemessen: Staging und Prod `version.json` beide 1.0.1.
 - Dabei gefunden: `frontend-konstanten.mjs` hashte `index.html` als Rohbytes. Nach dem Zweigwechsel im Rollout schreibt git CRLF (autocrlf); die Summe änderte sich ohne Inhaltsänderung, und deploy-staging brach mit „Konstanten veraltet“ ab. Jetzt wird vor dem Hashen CRLF → LF gerechnet.
 - Geht mit dem nächsten Prod-Rollout nach main; auf Prod ändert sich dadurch nichts.
+
+### v3040 · messe-schleife-9 · landing-makler-hub-1 — Prod 1.0.2 (29.10.2026)
+
+**Was.**
+- **v3040 · Stammdaten und Ersteinrichtung am Konto.** Marcel: „ich bekomme ständig … die Ersteinrichtung, und Adresse, E-Mail etc. muss ich immer wieder neu eingeben“. Gemessen: `dp_user_settings` und `dp_onboarding_done_v1:<uid>` lagen nur im localStorage. Neu `js/konto-stammdaten.js` + user_settings-Schlüssel `stammdaten` (Server gewinnt, nie gegen leer; fremder Browserstand wird weder hochgeladen noch gelöscht; `openai_api_key` bleibt lokal; Logo fällt über 190 KB weg). `onboarding.js` wartet bis 6 s auf den Abgleich.
+- **Makler-Hub-Werbung in der Messe-Schleife:** vier Tafeln `messe-schleife/werbung/mh-0*.webp` (Ablauf, Ämter, Board, Melden), Quelle `Dateien/Social-Media/Makler-Hub-2026-10-29/quelle/mh.html` + `render.mjs`; jeder vierte Platz im Zug, Schalter `werbung_hub` (Taste E). QR → `dealpilot.immo/#makler-hub`, mit jsQR aus den fertigen Bildern gelesen. Inhalte gemessen am Makler-Hub 0.9.0 (23 Schritte in 4 Phasen, Board-Spalten), keine Kundennamen, keine Preise.
+- **Landing `#makler-hub`:** vier Phasen, sechs Funktionen, „Interesse melden“/„Rückruf anfragen“ (mailto info@), QR (mailto) ab 641 px; Modulkarte verweist jetzt dorthin.
+
+**Commit.** `83e9d018`, `34c926ed`, `f73a489e` (Konstanten) · Prod `b85dc1d`.
+
+**Nachweis.** Modul-Lauf gegen 6 Fälle, 14/14 grün (Scratchpad `stammdaten-test.cjs`); Staging/Prod: Dateien mit richtiger Größe und Typ (nicht die 60-KB-Rückfallseite), `stammdaten` im Backend-Container, API 401 ohne Anmeldung; Landing bei 1440 und 390 px ohne Querscroll; gold-audit RC=0.
+
+**Rest.**
+- Abgleich noch nicht im echten Browser mit Anmeldung durchgeklickt (Chrome-Erweiterung war nicht verbunden): Staging-Abnahmepunkt — einmal auf Gerät A Einrichtung abschließen, auf Gerät B anmelden → keine Einrichtung, Stammdaten da.
+- Erste Anmeldung je Konto nach v3040 auf einem Gerät OHNE alten Browserstand zeigt die Einrichtung noch einmal, wenn der Server nichts kennt — ab dann nie wieder.
