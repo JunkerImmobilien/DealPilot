@@ -36,6 +36,19 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N84 · Marktbericht nach Hüllhorst/Detmold — Marcels Entscheidungen vom 29.10.2026, nächste Sitzung
+
+Übergeben, weil die Sitzung nach dreimal demselben Fehler zu lang war (Regel 4). Stand und Nachweise: Journal `claude/projektanweisung-hauptapp.md`, Einträge v3040/v3041.
+
+1. **v3041 auf Prod** — liegt auf Staging (`5b68200f`): Angebotsabschlag max. 10 %, Ø Kaufpreis aus Kauffällen (Marktbericht + Pilot-Analyse), Abschlag mit Betrag davor. Abnahme: Bericht Bismarckstr. 27 Detmold auf Staging neu abrufen (Erwartung: Abschlag 10 % „gemessen 22,8 %, gedeckelt“, Gegenprobe ≈ 680.000 €), Pilot-Analyse ansehen, dann `rollout-prod.ps1 -Freigabe`.
+2. **Garage mit eigener Restnutzungsdauer** — Marcel: „soll seine eigene RND bekommen, wenn es nicht groß viele Felder bekommt“. Gemessen: `marktbericht/backend/src/lib/nhk2010.js:924` nimmt ohne `garagen_rnd` die RND des HAUSES (`Math.min(_garGnd, rnd)`) — Hüllhorst (Bericht 370): Garage 64,6 m² mit RND 41,7 J. = 43.537 €. Neu: RND = GND 60 − Alter der Garage; Alter aus EINEM optionalen Feld „Baujahr Garage“, ohne Angabe Baujahr des Hauses (dann bei alten Häusern RND nahe 0 — Mindest-RND klären, nicht erfinden). Danach `wertermittlung-pruefen.mjs` (Ebene C bewusst neu einfrieren, wenn Demo-Objekte Garagen haben).
+3. **Sachwert nur, wo er gebraucht wird** — Marcel: „Sachwert kann da raus, wo er nicht gebraucht wird“. Hüllhorst ist eine ETW: Sachwert 273.328 € ohne Sachwertfaktor neben Vergleichswert 145.000 € (amtlicher Vergleichsfaktor) und Ertragswert 156.000 €. Regel: Sachwert erscheint nur, wo die Verfahrenswahl (`cross_check.verfahrenswahl`) ihn führt oder ein Sachwertfaktor vorliegt (Ein-/Zweifamilienhaus, DHH/RH); bei ETW und Renditeobjekten nicht. Web, PDF und Pilot-Analyse gleich.
+4. **Marktbericht einfacher, weniger Text** — Marcel: „die Angaben dürfen auch einfacher verständlich dargestellt werden, mit weniger Text“. Optik → erst Demo zeigen (Wertkarten: Zahl groß, eine Zeile Herkunft, Rechenweg aufklappbar).
+5. **Zensus-Miete fortgeschrieben auch anzeigen** — `frontend/marktbericht-app/app.js:101` (`_zensusZeilen`, Web + PDF) und Prompt der Pilot-Analyse `backend/src/services/openaiService.js:1238` (Endpunkt `/zensus/fortgeschrieben`). Leerstand, Eigentümerquote, Baualter bleiben „Stichtag 15.05.2022“.
+6. Parkstr. 9 bleibt unverändert (Marcel).
+
+---
+
 ### N83 · Nach der Vollprüfung v3029 — Marcels Entscheidungen vom 28.10.2026 (abends), nächste Sitzung
 
 Marcel: *„machen wir heute nicht … notier das einfach nur, machen wir nächstes Mal."*
