@@ -1943,6 +1943,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   margin-top: 2px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  overflow-wrap: anywhere;   /* v3042 · ein langes Wort bricht in der Kachel um statt herauszuragen */
 }
 .tax-tl-total {
   display: flex;

@@ -68,6 +68,19 @@ import { etwKleinobjektAusgenommen } from './WertParameterService.js';   /* v257
    Zins-Stichprobe (nur rentierliche, vermietete Faelle eines Geschaeftsjahres). */
 const LZS_AB = Object.freeze({ MIN_ANGEBOTE: 8, MIN_FALLZAHL: 10, MAX_ALTER_JAHRE: 2,
   FLAECHE_MIN: 0.5, FLAECHE_MAX: 2.0, RND_ABW_MAX: 20, BAND_MIN: 0, BAND_MAX: 25 });
+/* v3041 · OBERGRENZE DES ÖRTLICH GEMESSENEN ABSCHLAGS - Marcel 29.10.2026 („maximal 15 %,
+   eher 10 %"). Gemessen an Detmold, Bismarckstr. 27: 1 − 1.245/1.613 = 22,8 %. Der Ø Kaufpreis
+   der Zins-Stichprobe (aeltere vermietete MFH, Ø RND 24 J., Berichtsjahr 2025) gegen den
+   Median ALLER heutigen MFH-Angebote misst Objektmischung und Zeit mit, nicht nur die
+   Verhandlung. Darueber wird gedeckelt; die Messung bleibt im Herkunftstext stehen.
+   Gilt fuer beide oertlichen Wege (Rohertragsfaktor- und LZS-Satz), nicht fuer die eigene
+   Angabe und nicht fuer die Ortsmessung (`messung`), die roh bleibt. */
+export const ABSCHLAG_OBERGRENZE = 10;
+function gedeckelt(pct) {
+  return pct > ABSCHLAG_OBERGRENZE
+    ? { pct: ABSCHLAG_OBERGRENZE, zusatz: ' — gemessen ' + String(pct).replace('.', ',') + ' %, gedeckelt auf ' + ABSCHLAG_OBERGRENZE + ' % (DealPilot-Obergrenze)' }
+    : { pct, zusatz: '' };
+}
 const LZS_AB_TEILMARKT = {
   etw: ['etw', 'we_v', 'we', 'wohnung'], etw_selbst: ['etw', 'we_s', 'we_e', 'we', 'wohnung'],
   efh: ['efh', 'ezfh'], zfh: ['zfh', 'ezfh'], villa: ['efh_villa', 'altbauvilla'],
@@ -86,16 +99,21 @@ export function ausschussKurz(n) {
   return s;
 }
 /** Prueft K1-K8 und liefert den Abschlag aus dem Ø Kaufpreis des LZS-Satzes oder den Grund, warum nicht. */
-export function abschlagAusLzs(ref, sale, area) {
+/* v3041 · opt.nurKaufpreis: dieselben Kriterien K1-K5 und K7 fuer den Ø Kaufpreis selbst
+   (Gegenprobe „Ø Kaufpreis aus Kauffällen × Wohnfläche"), ohne Angebote (K6) und ohne Band (K8). */
+export function abschlagAusLzs(ref, sale, area, opt) {
+  const nurKp = !!(opt && opt.nurKaufpreis);
   const nein = (grund, extra) => Object.assign({ verwendet: false, grund }, extra || {});
   try {
     if (!ref || !ref.ags) return nein('keine AGS');
     if (istGewerbe(ref) || istGrundstueck(ref)) return nein('Gewerbe/Grundstück - kein Wohnteilmarkt');
     const med = Number(sale && sale.median_per_sqm);
     const n = Number(sale && sale.sample_size);
-    if (!(med > 0)) return nein('kein Angebotsmedian');
-    if (!(n >= LZS_AB.MIN_ANGEBOTE)) return nein('K6: nur ' + (Number.isFinite(n) ? n : 0) + ' Angebote (mindestens ' + LZS_AB.MIN_ANGEBOTE + ')');
-    if (sale.enthaelt_demodaten === true || sale.datenherkunft === 'demo') return nein('K6: Demodaten');
+    if (!nurKp) {
+      if (!(med > 0)) return nein('kein Angebotsmedian');
+      if (!(n >= LZS_AB.MIN_ANGEBOTE)) return nein('K6: nur ' + (Number.isFinite(n) ? n : 0) + ' Angebote (mindestens ' + LZS_AB.MIN_ANGEBOTE + ')');
+      if (sale.enthaelt_demodaten === true || sale.datenherkunft === 'demo') return nein('K6: Demodaten');
+    }
     const objart = ref.property_subtype || ref.property_type;
     const obj = { objart, nutzung: ref.nutzung || ref.usage_type || 'vermietet', haustyp: ref.haustyp || null,
       baujahr: ref.build_year || null, einheiten: ref.units || null, lage: ref.lage || null,
@@ -141,17 +159,24 @@ export function abschlagAusLzs(ref, sale, area) {
     if (rnd != null && rm > 0 && Math.abs(rnd - rm) > LZS_AB.RND_ABW_MAX) {
       return nein('K7: RND ' + rnd + ' J. weicht mehr als ' + LZS_AB.RND_ABW_MAX + ' J. von der Ø RND ' + rm + ' J. ab', { zweig: z.zweig });
     }
-    const pct = round((1 - kp / med) * 100, 1);
-    if (!(pct >= LZS_AB.BAND_MIN && pct <= LZS_AB.BAND_MAX)) {
-      return nein('K8: ' + String(pct).replace('.', ',') + ' % außerhalb des Bands ' + LZS_AB.BAND_MIN + ' bis ' + LZS_AB.BAND_MAX + ' %',
+    const kurz = ausschussKurz(satz.gaa_name || z.ausschuss);
+    if (nurKp) {
+      return { verwendet: true, quelle: 'liegenschaftszinssatz', ausschuss: kurz, ausschuss_lang: satz.gaa_name || z.ausschuss || null,
+        berichtsjahr: jahr, zweig: z.zweig, kaufpreis_eur_qm: kp, fallzahl: fz, objektgroesse_qm: og || null,
+        rnd_objekt: rnd, rnd_mittel: rm || null, quelle_url: satz.quelle_url || null, seite: satz.seite || null };
+    }
+    const pctRoh = round((1 - kp / med) * 100, 1);
+    /* v3041: nach oben gedeckelt statt verworfen (Marcel 29.10.2026); unter 0 % bleibt K8 */
+    if (!(pctRoh >= LZS_AB.BAND_MIN)) {
+      return nein('K8: ' + String(pctRoh).replace('.', ',') + ' % unter ' + LZS_AB.BAND_MIN + ' %',
         { zweig: z.zweig, kaufpreis_eur_qm: kp, median_angebote: round(med, 0) });
     }
-    const kurz = ausschussKurz(satz.gaa_name || z.ausschuss);
+    const dk = gedeckelt(pctRoh), pct = dk.pct;
     const herkunft = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des '
       + String(kurz || 'Gutachterausschusses').replace(/^Gutachterausschuss/, 'Gutachterausschusses') + ' ' + jahr
       + ' (' + Math.round(kp).toLocaleString('de-DE') + ' €/m²' + (fz ? ', ' + fz + ' Kauffälle' : '')   /* v2578a: kein Zweig-Kuerzel im Kundentext, es steht in pruefung_lzs */
-      + ') gegen den Median der Angebote (' + Math.round(med).toLocaleString('de-DE') + ' €/m², ' + n + ' Angebote)';
-    return { verwendet: true, pct, herkunft, quelle: 'liegenschaftszinssatz', ausschuss: kurz, berichtsjahr: jahr,
+      + ') gegen den Median der Angebote (' + Math.round(med).toLocaleString('de-DE') + ' €/m², ' + n + ' Angebote)' + dk.zusatz;
+    return { verwendet: true, pct, pct_gemessen: pctRoh, gedeckelt: pctRoh > pct, herkunft, quelle: 'liegenschaftszinssatz', ausschuss: kurz, berichtsjahr: jahr,
       kurz: (kurz || 'Gutachterausschuss') + ' ' + jahr, zweig: z.zweig, kaufpreis_eur_qm: kp, fallzahl: fz,
       median_angebote: round(med, 0), angebote: n, objektgroesse_qm: og || null, rnd_objekt: rnd, rnd_mittel: rm || null,
       register_ags: satz.ags || null, quelle_url: satz.quelle_url || null };
@@ -613,10 +638,11 @@ export const ValuationService = {
         const _kpQm = _rfSatz ? Number((_rfSatz.modellansaetze || {}).kaufpreis_eur_qm_mittel) : NaN;
         if (isFinite(_eigen) && _eigen >= 0 && _eigen < 50) { _abPct = _eigen; _abHerk = 'eigene Angabe'; }
         else if (_kpQm > 0 && Number(sale.median_per_sqm) > 0) {
-          _abPct = round(Math.max(0, Math.min(25, (1 - _kpQm / Number(sale.median_per_sqm)) * 100)), 1);
+          const _dk = gedeckelt(round(Math.max(0, (1 - _kpQm / Number(sale.median_per_sqm)) * 100), 1));   /* v3041: Obergrenze 10 % statt 25 % */
+          _abPct = _dk.pct;
           _abHerk = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des Gutachterausschusses ('
             + Math.round(_kpQm).toLocaleString('de-DE') + ' €/m²) gegen den Median der Angebote ('
-            + Math.round(Number(sale.median_per_sqm)).toLocaleString('de-DE') + ' €/m²)';
+            + Math.round(Number(sale.median_per_sqm)).toLocaleString('de-DE') + ' €/m²)' + _dk.zusatz;
           /* v2578 · kurze Herkunft fuer die Zeile an der Zahl */
           const _rfK = ausschussKurz(_rfSatz.gaa_name || _rfSatz.ausschuss || null);
           _abMeta = { quelle: 'rohertragsfaktor', ausschuss: _rfK,
@@ -712,7 +738,31 @@ export const ValuationService = {
           miete_eur_qm_mittel: _ma.nettokaltmiete_eur_qm_mittel || null,
           geltung: { brw_von: _g.brw_von || null, brw_bis: _g.brw_bis || null, baujahr_von: _g.baujahr_von || null, baujahr_bis: _g.baujahr_bis || null },
           hinweis: 'Durchschnittswerte des Gutachterausschusses aus tatsächlichen Kauffällen — eine Gegenprobe, kein Verkehrswert.',
+          quelle_kennzahl: 'rohertragsfaktor',   /* v3041 */
         };
+      } else {
+        /* ══ v3041 · Ø KAUFPREIS AUS DEN KAUFFÄLLEN DES LIEGENSCHAFTSZINSES ═══════════════
+           Marcel 29.10.2026: „mit dem Liegenschaftszins auf die Vergleichswerte auf Grundlage
+           von Verkäufen … wenn wir das berechnen können, dann sollten wir das mit ausgeben,
+           auch im Marktbericht … und in den Pilot-Analyse-Tabs". Jeder LZS-Satz fuehrt den
+           Ø Kaufpreis seiner Kauffaelle (modellansaetze.kaufpreis_eur_qm). Dieselben Kriterien
+           wie beim Abschlag (K1-K5, K7: Teilmarkt, amtlich A/B, nicht gesperrt, hoechstens zwei
+           Jahre alt, >= 10 Faelle, Flaeche und RND im Modellrahmen) - ohne Angebote und Band.
+           Kein Vergleichswert nach §§ 24-26 (keine Anpassung an das Objekt), eine Gegenprobe. */
+        const _kpL = abschlagAusLzs(ref, sale, area, { nurKaufpreis: true });
+        if (_kpL && _kpL.verwendet && Number(_kpL.kaufpreis_eur_qm) > 0 && area > 0) {
+          out.amtliche_gegenprobe = {
+            quelle_kennzahl: 'liegenschaftszinssatz',
+            ausschuss: _kpL.ausschuss_lang || _kpL.ausschuss || null, ausschuss_kurz: _kpL.ausschuss || null,
+            quelle_url: _kpL.quelle_url || null, seite: _kpL.seite || null, berichtsjahr: _kpL.berichtsjahr || null,
+            datengrundlage_jahr: null, rohertragsfaktor: null, rohertrag_eur: null, rohertrag_basis: null, wert_rohertragsfaktor_eur: null,
+            kaufpreis_eur_qm_mittel: Number(_kpL.kaufpreis_eur_qm), kaufpreis_vertraege: _kpL.fallzahl || null,
+            wert_kaufpreis_mittel_eur: roundNice(Number(_kpL.kaufpreis_eur_qm) * area),
+            modell: { objektgroesse_qm: _kpL.objektgroesse_qm, rnd_mittel: _kpL.rnd_mittel, rnd_objekt: _kpL.rnd_objekt },
+            hinweis: 'Ø Kaufpreis der Kauffälle, aus denen der Gutachterausschuss seinen Liegenschaftszinssatz abgeleitet hat, × Wohnfläche — '
+              + 'tatsächliche Verkäufe, aber ohne Anpassung an dieses Objekt: eine Gegenprobe, kein Vergleichswert nach §§ 24–26 ImmoWertV.',
+          };
+        }
       }
       out.market_value.basis_median_sqm = round(base / 5, 0) * 5; // €/m² auf 5er
       out.market_value.confidence = sale.confidence;

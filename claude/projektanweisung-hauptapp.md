@@ -43829,3 +43829,32 @@ ist gleich zum Original.
 **Rest.**
 - Abgleich noch nicht im echten Browser mit Anmeldung durchgeklickt (Chrome-Erweiterung war nicht verbunden): Staging-Abnahmepunkt — einmal auf Gerät A Einrichtung abschließen, auf Gerät B anmelden → keine Einrichtung, Stammdaten da.
 - Erste Anmeldung je Konto nach v3040 auf einem Gerät OHNE alten Browserstand zeigt die Einrichtung noch einmal, wenn der Server nichts kennt — ab dann nie wieder.
+
+### landing-makler-hub-2/-3 · messe-schleife-10 — Prod 1.0.3 (29.10.2026)
+
+**Was.** Marcel: Makler-Hub „unter individuelle Lösungen oder unter Für Partner“ und „auf der Startseite raus“. Abschnitt `#makler-hub` steht jetzt auf `loesungen.html` (nach „Laufende Systeme“), Startseite ohne Abschnitt und ohne Modulkarte (Module zweispaltig, `.pmod-g.zwei`), Menü „Für Partner › Makler-Hub“ auf allen fünf Landing-Seiten, `/#makler-hub` leitet per Skript auf `loesungen.html#makler-hub` (Ziel der QR-Codes auf den Messe-Tafeln). Neu: echte Aufnahme des Hubs (lokale Kopie im Scratchpad, Marke „Muster Immobilien“, Testdaten, Simulationsknöpfe ausgeblendet) als Bild `assets/makler-hub/hub-vorgang.webp` und als Tafel 5 `mh-05-einblick.webp`; Quelle `Dateien/Social-Media/Makler-Hub-2026-10-29/quelle/` (mh.html ?i=5/6, hub-vorgang.png).
+
+**Commit.** `0b853f64` · Prod `a3f3855`.
+
+**Nachweis.** Staging und Prod im Browser: Startseite ohne Abschnitt/Karte, 2 Module, Menü → `loesungen.html#makler-hub`; `/#makler-hub` landet im Abschnitt; Bild lädt (1.600 px), kein Querscroll; QR der Tafel 5 mit jsQR gelesen; buster-ebenen sauber, gold-audit RC=0.
+
+**Rest.** Offen aus derselben Sitzung: Parkstr. 9 Zielbild 9,71 €/m² (Befund: Ertragswert deckelt die Miete auf 5,90 €/m², Zielmiete allein ändert ihn nicht — Entscheidung Marcel) und der Angebotsabschlag Detmold 22,8 % (Messung unten im Chat, Entscheidung Marcel).
+
+### v3041 · Angebotsabschlag max. 10 %, Ø Kaufpreis aus Kauffällen — nur Staging (29.10.2026)
+
+**Was.** Marcel: Detmold 22,8 % „maximal 15 %, eher 10 %“; Vergleichswerte aus Verkäufen in Marktbericht und Pilot-Analyse; beim Marktwert nicht sichtbar, ob abgezogen wurde. `ValuationService`: örtlicher Abschlag (RF- und LZS-Satz) gedeckelt auf `ABSCHLAG_OBERGRENZE = 10`, Messung im Herkunftstext; `abschlagAusLzs(…, { nurKaufpreis })` (K1–K5, K7) speist `amtliche_gegenprobe` auch ohne Rohertragsfaktor-Satz (`quelle_kennzahl: 'liegenschaftszinssatz'`). `PotenzialService` `mpi.kauffaelle`; `potenzial.js` Zeile „Ø Kaufpreis aus Kauffällen“ (Tafel + PDF-Tabelle); Marktbericht Web/PDF „aus X € (Angebotsniveau) abzüglich Y %“.
+
+**Commit.** `5b68200f` (Staging, mb-backend neu gebaut).
+
+**Nachweis.** Lauf im Staging-Container an Bismarckstr. 27 Detmold (Bericht 376): Abschlag 22,8 → 10 % gedeckelt, Ø Kaufpreis 1.245 €/m² × 546 m² = 679.770 €; wertermittlung-pruefen RC=0; buster sauber.
+
+**Rest.**
+- **Nicht auf Prod:** die neuen Zeilen sind im Browser noch nicht gesehen — dafür braucht es einen neuen Bericht (Kontingent). Abnahme: Bericht Detmold auf Staging neu abrufen, Zeile unter der Marktpreisindikation und die Pilot-Analyse ansehen, dann `rollout-prod.ps1 -Freigabe`.
+- Zensus-Miete fortgeschrieben auch in `_zensusZeilen` (Marktbericht Web/PDF, `marktbericht-app/app.js:101`) und im Prompt der Pilot-Analyse (`backend/src/services/openaiService.js:1238`) — Bestandsaufnahme liegt vor, nicht gebaut.
+- Hüllhorst (Bericht 370, ETW): Sachwert 273.328 € ist ein vorläufiger Sachwert ohne Sachwertfaktor; Garage 43.537 € mit RND 41,7 J. aus der Wohnungs-RND — Entscheidung Marcel, ob Sachwert bei ETW entfällt.
+- Sitzung beendet nach dreimal demselben Fehler (gerades `"` nach „ in einem Skript-String).
+
+**Nachtrag v3041/v3042 (29.10.2026, Staging `716ebe1e`):**
+- Detmold neu erzeugt (Marcel: „kannst du gerne selber auslösen“), im mb-Container über `ReportOrchestrator.generate` mit dem Rich-Body von Bericht 376 (Konto, Stufe 3): **Bericht 396**. Angebotsniveau 915.000 €, Abschlag gemessen 21,3 % → 10 %, Marktwert 830.000 € (vorher 725.000 € bei 22,8 %); Gegenprobe Ø Kaufpreis LZS-Kauffälle 1.245 €/m² × 546 m² = 680.000 € (41 Fälle). Chrome-Erweiterung nicht verbunden — Web-Darstellung von 396 und der Pilot-Analyse noch nicht im Browser gesehen.
+- **v3042** (`716ebe1e`): KSt-Verlauf der Gesellschaft — „Körperschaftsteuer“ (18 Versalien) ragte über die 85-px-Jahreskachel (`tax.js:1206`, `.tax-tl-label`); jetzt „KSt“/„keine KSt“ + `overflow-wrap:anywhere`. Nicht im Browser nachgemessen.
+- Prod wartet auf den Blick in den Browser (Bericht 396, Pilot-Analyse Bismarckstr. 27, Steuer-Reiter Hölderlinstr.), dann `rollout-prod.ps1 -Freigabe` für v3041 + v3042.

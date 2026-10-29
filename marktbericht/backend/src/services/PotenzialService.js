@@ -700,6 +700,14 @@ export const PotenzialService = {
           berichtsjahr: gp.berichtsjahr || null, seite: gp.seite || null,
           hinweis: 'Rohertragsfaktor des Gutachterausschusses × Jahresnettokaltmiete der Stufe — Durchschnitt aus Kauffällen, eine Gegenprobe, kein Verkehrswert.' }
           : { verfuegbar: false, grund: 'Der Gutachterausschuss veröffentlicht für dieses Segment keinen Rohertragsfaktor (oder er liegt nicht im Register).' },
+        /* v3041 · Ø Kaufpreis aus Kauffällen × Wohnfläche (Rohertragsfaktor- oder Liegenschaftszins-Satz,
+           ValuationService). Hängt weder an der Miete noch an den Maßnahmen: in jeder Stufe derselbe Wert. */
+        kauffaelle: gp && Number(gp.wert_kaufpreis_mittel_eur) > 0
+          ? { verfuegbar: true, wert: Number(gp.wert_kaufpreis_mittel_eur), kaufpreis_eur_qm: Number(gp.kaufpreis_eur_qm_mittel) || null,
+              faelle: gp.kaufpreis_vertraege || null, ausschuss: gp.ausschuss_kurz || gp.ausschuss || null, berichtsjahr: gp.berichtsjahr || null,
+              quelle_kennzahl: gp.quelle_kennzahl || null, quelle_url: gp.quelle_url || null,
+              hinweis: 'Ø Kaufpreis tatsächlicher Verkäufe laut Gutachterausschuss × Wohnfläche — ohne Anpassung an dieses Objekt, eine Gegenprobe, kein Verkehrswert. Unabhängig von Miete und Maßnahmen.' }
+          : { verfuegbar: false, grund: 'Kein passender Ø Kaufpreis aus Kauffällen des Gutachterausschusses (Teilmarkt, Jahrgang, Fallzahl oder Modellrahmen).' },
       };
       for (const s of ['bestand'].concat(STUFEN)) {
         const h = out.haus[s]; if (!h) continue;

@@ -933,7 +933,7 @@
     });
     /* v2541 */
     z.jahre = jahre(m);
-    if (r && r.mpi) z.marktpreisindikation = { angebote: r.mpi.angebote || null, rohertragsfaktor: r.mpi.rohertragsfaktor || null };
+    if (r && r.mpi) z.marktpreisindikation = { angebote: r.mpi.angebote || null, rohertragsfaktor: r.mpi.rohertragsfaktor || null, kauffaelle: r.mpi.kauffaelle || null };   /* v3041: kauffaelle */
     if (r && r.basis && r.basis.bestandsbasis) z.ertragswert_basis = r.basis.bestandsbasis.hinweis;   /* v2488 */
     if (gesperrt(r)) { z.ertragswert_gesperrt = true; z.ertragswert_hinweis = GESPERRT_KURZ + '. ' + GESPERRT_LANG; }
     if (r && r.aufteilung && r.aufteilung.je_stufe) {
@@ -1094,6 +1094,13 @@
   function pk(n) { return dez(n, 1).replace(',0', ''); }   /* Punkte ohne „,0" */
   /* v2577 · Herkunft des Angebotsabschlags in zwei Worten (die volle Herkunft steht unter „So ist gerechnet") */
   /* v2578 · dazu der Ausschuss mit Jahrgang (k), wo der Abschlag örtlich gemessen ist */
+  /* v3041 · Unterzeile „1.245 €/m² × 427 m² · Gutachterausschuss … 2025 · 41 Kauffälle“ */
+  function kauffaelleUnter(K) {
+    if (!K) return '';
+    return [K.kaufpreis_eur_qm ? Math.round(K.kaufpreis_eur_qm).toLocaleString('de-DE') + ' €/m² × Wohnfläche' : '',
+      K.ausschuss ? esc(String(K.ausschuss).replace(/^Der\s+/, '')) + (K.berichtsjahr ? ' ' + esc(String(K.berichtsjahr)) : '') : '',
+      K.faelle ? esc(String(K.faelle)) + ' Kauffälle' : '', 'Gegenprobe, kein Verkehrswert'].filter(Boolean).join(' · ');
+  }
   function abschlagKurz(h, k) { h = String(h || ''); return /^örtlich/.test(h) ? 'örtlich gemessen' + (k ? ', ' + esc(String(k)) : '') : (/eigene/.test(h) ? 'eigene Angabe' : (h ? 'Marktdurchschnitt' : '')); }
   function abschlagPct(p) { return p == null ? null : String(Math.round(Number(p) * 10) / 10).replace('.', ','); }
 
@@ -1253,6 +1260,7 @@
     var MPI = W && W.mpi ? W.mpi : null;
     var mpiDa = !!(MPI && MPI.angebote && MPI.angebote.verfuegbar);
     var rfDa = !!(MPI && MPI.rohertragsfaktor && MPI.rohertragsfaktor.verfuegbar);
+    var kfDa = !!(MPI && MPI.kauffaelle && MPI.kauffaelle.verfuegbar);   /* v3041 · Ø Kaufpreis aus Kauffällen */
     function x(k) { return k === 'ankauf' ? A : kz[k]; }
     var rows = [
       { gr: 'Miete & Rendite' },
@@ -1282,6 +1290,9 @@
       if (rfDa) rows.push({ t: 'Rohertragsfaktor × Miete', u: 'Faktor ' + pk(MPI.rohertragsfaktor.faktor) + ' · '
           + esc(String(MPI.rohertragsfaktor.ausschuss || 'Gutachterausschuss').replace(/^Der\s+/, '')) + (MPI.rohertragsfaktor.berichtsjahr ? ' ' + esc(MPI.rohertragsfaktor.berichtsjahr) : ''),
         f: function (k) { var w = WS[k]; return w && w.rf != null ? eur(w.rf) : null; } });
+      /* v3041 · Marcel 29.10.2026: „wenn Vergleichswerte möglich, dann auf jeden Fall mit angeben, auch in den Pilot-Analyse-Tabs“ */
+      if (kfDa) rows.push({ t: 'Ø Kaufpreis aus Kauffällen', u: kauffaelleUnter(MPI.kauffaelle),
+        f: function (k) { return WS[k] ? zz(eur(MPI.kauffaelle.wert), k === 'bestand' ? '' : 'unabhängig von Miete und Maßnahmen') : null; } });
     }
     var JA = jahre(m);   /* v2541 · Jahr je Stufe im Spaltenkopf */
     var jahrVon = function (k) { var j = k === 'ankauf' || k === 'bestand' ? JA.ankauf : JA[k]; return j ? String(j) : (k === 'zielbild' ? 'Jahr offen' : ''); };
@@ -1599,12 +1610,14 @@
       [m.art === 'mfh' ? 'Ertragswert (Haus als Ganzes)' : 'Ertragswert', function (k) { return H[k] && H[k].wert != null ? eur(H[k].wert) : '—'; }],
       /* v2541 · Marktpreisindikation je Stufe, beide Wege */
       ['Marktpreisindikation (Angebote)', function (k) { return H[k] && H[k].mpi_angebote != null ? eur(H[k].mpi_angebote) : '—'; }],
-      ['Rohertragsfaktor × Miete', function (k) { return H[k] && H[k].mpi_rohertrag ? eur(H[k].mpi_rohertrag.wert) : '—'; }]
-    ].filter(function (z) { return !zu || (z[0] !== 'Restnutzungsdauer' && !/^Ertragswert|^Miete im Ertragswert|^davon Anhebung|^Marktpreis|^Rohertragsfaktor/.test(z[0])); })   /* v2431, v2488, v2541 */
+      ['Rohertragsfaktor × Miete', function (k) { return H[k] && H[k].mpi_rohertrag ? eur(H[k].mpi_rohertrag.wert) : '—'; }],
+      ['Ø Kaufpreis aus Kauffällen', function (k) { var K = r && r.mpi && r.mpi.kauffaelle; return K && K.verfuegbar && H[k] ? eur(K.wert) : '—'; }]   /* v3041 */
+    ].filter(function (z) { return !zu || (z[0] !== 'Restnutzungsdauer' && !/^Ertragswert|^Miete im Ertragswert|^davon Anhebung|^Marktpreis|^Rohertragsfaktor|^Ø Kaufpreis/.test(z[0])); })   /* v2431, v2488, v2541 */
       .filter(function (z) {   /* v2541 · eine Zeile ohne Quelle erscheint nicht */
         var M = r && r.mpi;
         if (z[0] === 'Marktpreisindikation (Angebote)') return !!(M && M.angebote && M.angebote.verfuegbar);
         if (z[0] === 'Rohertragsfaktor × Miete') return !!(M && M.rohertragsfaktor && M.rohertragsfaktor.verfuegbar);
+        if (z[0] === 'Ø Kaufpreis aus Kauffällen') return !!(M && M.kauffaelle && M.kauffaelle.verfuegbar);   /* v3041 */
         return true;
       })
       .map(function (z) { return [z[0]].concat(d.spalten.map(z[1])); });
