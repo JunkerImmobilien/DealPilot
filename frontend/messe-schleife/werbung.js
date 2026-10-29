@@ -24,13 +24,15 @@
        Quelle Dateien/Social-Media/Makler-Hub-2026-10-29/quelle/mh.html; jeder
        QR fuehrt auf dealpilot.immo/#makler-hub (mit jsQR gelesen). Im Zug jeder
        vierte Platz; abschaltbar ueber werbung_hub (Taste E).
+       messe-schleife-10: Tafel 5 „Echter Blick in den Hub“ — Aufnahme der echten
+       Oberflaeche (lokale Kopie, neutrale Marke „Muster Immobilien“, Testdaten).
 
    Fehlt ein Bild, faellt es still aus dem Zug (Eintrag in DPS_FEHLER).
    Laeuft auch von der Platte (file://), ohne Netz, alle Pfade relativ.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-9';
+  var VER = 'messe-schleife-10';
   var Q = new URLSearchParams(location.search);
   var EIN = window.DPS_EINST || null;
   function fehler(t) { (window.DPS_FEHLER = window.DPS_FEHLER || []).push(t); }
@@ -50,11 +52,12 @@
     { id: 'mh1', datei: 'mh-01-ablauf.webp', titel: 'Makler-Hub · vom Erstkontakt zum Notar', hub: true },
     { id: 'mh2', datei: 'mh-02-aemter.webp', titel: 'Makler-Hub · die Ämter fragt der Hub', hub: true },
     { id: 'mh3', datei: 'mh-03-board.webp', titel: 'Makler-Hub · Board und Briefing', hub: true },
-    { id: 'mh4', datei: 'mh-04-melden.webp', titel: 'Makler-Hub · Makler, meldet euch', hub: true }
+    { id: 'mh4', datei: 'mh-04-melden.webp', titel: 'Makler-Hub · Makler, meldet euch', hub: true },
+    { id: 'mh5', datei: 'mh-05-einblick.webp', titel: 'Makler-Hub · echter Blick in den Ablauf', hub: true }
   ];
   /* Zug fuer die eingestreute Tafel: 8 von 16 Plaetzen sind Favoriten, jeder
      vierte ist Makler-Hub (messe-schleife-9). */
-  var ZUG = ['01m', '03m', 'mh1', '02m', '01', '03', 'mh2', '04m', '01m', '03m', 'mh3', '05m', '01', '03', 'mh4', '06m'];
+  var ZUG = ['01m', '03m', 'mh1', '02m', '01', '03', 'mh2', '04m', '01m', '03m', 'mh3', '05m', '01', '03', 'mh4', '06m', 'mh5'];
 
   var OK = {};   /* id -> true (geladen) / false (fehlt); unbekannt = noch nicht geladen */
   function pfad(b) { return 'messe-schleife/werbung/' + b.datei + '?v=' + VER; }
