@@ -60,7 +60,16 @@ const HILFE =
   + '*Bewertung*\n'
   + '„wie ist der DealScore?" · „Investor Deal Score von Objekt 3"\n'
   + '„hol mir eine Marktpreisindikation" — oder „erweiterte" oder „Wertermittlung". '
-  + 'Vor jedem Abruf frage ich nach, was er aus deinem Kontingent verbraucht.\n\n'
+  + 'Vor jedem Abruf frage ich nach, was er aus deinem Kontingent verbraucht.\n'
+  /* v3038 · Marktpreisindikation ohne Objekt (v3036) */
+  + '„was ist die Wohnung Hauptstr. 5, 32545 Bad Oeynhausen wert? ETW, 80 m², Baujahr 1990" — '
+  + 'Marktpreisindikation für eine Adresse, *ohne ein Objekt anzulegen*\n\n'
+  /* v3038 · Wissen je Objekt (v3025), kostet kein Kontingent */
+  + '*Was ich zu deinen Objekten weiß* (kostet kein Kontingent)\n'
+  + '„was steht in den Unterlagen zu Objekt 3?" — Risiken, Eigentümergemeinschaft, Maßnahmen, Baulasten\n'
+  + '„wie viel Mietpotenzial steckt dieses Jahr in meinen Immobilien?" — je Wohnung mit Grund und ab wann\n'
+  + '„welche To-dos gibt es?" — aus Unterlagen, Mieterhöhungen, Zinsbindung, 15-%-Frist und Anfragen beim Amt\n'
+  + '„wie ist die Miete für ETWs in Herford mit 80 m²?" — jede Quelle einzeln\n\n'
   /* v2960 · Bedienfragen gehen an die Hilfe der App */
   /* v2961 */
   + '*PDFs*\n'
@@ -426,10 +435,12 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
     angebotObjekt: (angebot && angebot.objekt_id) || null,
     /* v2960a · die bestaetigte Stufe, nur aus dem Angebot */
     angebotStufe: (angebot && [1, 2, 3].indexOf(Number(angebot.stufe)) >= 0) ? Number(angebot.stufe) : null,
+    /* v3036 · Preisansage ohne Objekt: die Adressdaten, fuer die der Preis genannt wurde */
+    angebotFrei: (angebot && angebot.frei && !angebot.objekt_id) ? angebot.frei : null,
     bestaetigung: null,
     berichtPdfLink: null,
-    merkeAngebot: async function (id, adresse, stufe) {
-      try { await angebotSetzen(chatId, userId, id, adresse, stufe); } catch (e) {}
+    merkeAngebot: async function (id, adresse, stufe, frei) {
+      try { await angebotSetzen(chatId, userId, id, adresse, stufe, frei); } catch (e) {}
     },
     angebotVerbraucht: async function () {
       try { await angebotLoeschen(chatId, userId); } catch (e) {}
@@ -707,7 +718,7 @@ async function zustandSetzen(chatId, userId, z) {
  */
 const ANGEBOT_FRIST_MS = 30 * 60 * 1000;
 
-async function angebotSetzen(chatId, userId, objektId, adresse, stufe) {
+async function angebotSetzen(chatId, userId, objektId, adresse, stufe, frei) {
   await zeileSichern(chatId, userId);
   await query(
     `UPDATE telegram_dialog SET angebot = $3::jsonb, aktualisiert = now()
@@ -715,6 +726,7 @@ async function angebotSetzen(chatId, userId, objektId, adresse, stufe) {
     [String(chatId), userId,
      JSON.stringify({ objekt_id: objektId, adresse: adresse || null,
                       stufe: stufe || null,   /* v2960a */
+                      frei: (!objektId && frei) ? frei : undefined,   /* v3036: ohne Objekt */
                       zeit: new Date().toISOString() })]);
 }
 
@@ -727,7 +739,7 @@ async function angebotLoeschen(chatId, userId) {
 
 /** Ist das Angebot noch frisch? Gibt die Objekt-Id zurück oder null. */
 function angebotGueltig(a) {
-  if (!a || !a.objekt_id) return null;
+  if (!a || (!a.objekt_id && !a.frei)) return null;   /* v3036: auch ohne Objekt (frei) */
   const t = Date.parse(a.zeit || '');
   if (!Number.isFinite(t)) return null;
   if (Date.now() - t > ANGEBOT_FRIST_MS) return null;

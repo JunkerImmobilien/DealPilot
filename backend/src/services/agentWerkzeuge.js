@@ -4517,8 +4517,110 @@ const WERKZEUGE = [
     parameter: { type: 'object',
       properties: Object.assign({}, OBJEKT_ARGS,
         { stufe: { type: 'integer', description: '1, 2 oder 3' } }),
-      additionalProperties: false } }
+      additionalProperties: false } },
+  /* v3036 · Marktpreisindikation ohne angelegtes Objekt */
+  { name: 'marktpreis_ohne_objekt', stufe: 'lesen', fn: marktpreis_ohne_objekt,
+    beschreibung: 'Nennt Preis und Kontingent fuer eine MARKTPREISINDIKATION (Stufe 1) zu einer Adresse, '
+      + 'OHNE ein Objekt anzulegen - wenn der Nutzer nur schnell einen Marktwert fuer eine Adresse will. '
+      + 'Braucht Strasse mit Hausnummer, PLZ, Ort, Objektart, Wohnflaeche und Baujahr. DealPilot stellt '
+      + 'danach die Bestaetigungsfrage selbst.',
+    parameter: { type: 'object', properties: {
+      strasse: { type: 'string', description: 'Strasse mit Hausnummer' },
+      plz: { type: 'string', description: 'fuenfstellige Postleitzahl' },
+      ort: { type: 'string' },
+      objektart: { type: 'string', description: 'ETW, EFH, ZFH, MFH, DHH oder RH' },
+      wohnflaeche: { type: 'number', description: 'Wohnflaeche in m2' },
+      baujahr: { type: 'integer' } }, additionalProperties: false } },
+  { name: 'marktpreis_ohne_objekt_abrufen', stufe: 'kostet', fn: marktpreis_ohne_objekt_abrufen,
+    beschreibung: 'Ruft die Marktpreisindikation OHNE Objekt ab. KOSTET GUTHABEN. Nur nach der '
+      + 'Bestaetigungsfrage und dem ausdruecklichen Ja des Nutzers. Die Angaben kommen aus der '
+      + 'bestaetigten Preisansage, nicht aus deinen Angaben.',
+    parameter: { type: 'object', properties: {}, additionalProperties: false } }
 ];
+
+/* ── v3036 · MARKTPREISINDIKATION OHNE OBJEKT ─────────────────────────────
+ * Marcel 29.10.2026: „Marktpreisindikation abrufen können, ohne gleich ein Objekt
+ * anlegen zu müssen". Zwei Schritte wie bei marktbericht_preis/_abrufen: erst der
+ * Preis mit Bestaetigungsfrage (das Angebot traegt die Adressdaten statt einer
+ * Objekt-Id), abgerufen wird erst nach dem Ja - und nur mit den Daten des
+ * Angebots, nie mit Angaben aus dem Modell. Immer Stufe 1. Es wird kein Objekt
+ * angelegt; der Bericht steht danach in DealPilot im Verlauf. */
+const _FREI_ARTEN = { ETW: 1, EFH: 1, ZFH: 1, MFH: 1, DHH: 1, RH: 1 };
+function _freiAus(args) {
+  const a = args || {};
+  const str = String(a.strasse || '').trim(), plz = String(a.plz || '').replace(/\D/g, '');
+  const ort = String(a.ort || '').trim(), art = String(a.objektart || '').trim().toUpperCase();
+  const wfl = parseFloat(String(a.wohnflaeche == null ? '' : a.wohnflaeche).replace(',', '.'));
+  const bj = parseInt(String(a.baujahr == null ? '' : a.baujahr), 10);
+  const fehlt = [];
+  if (!str || !/\d/.test(str)) fehlt.push('Straße mit Hausnummer');
+  if (plz.length !== 5) fehlt.push('Postleitzahl');
+  if (!ort) fehlt.push('Ort');
+  if (!_FREI_ARTEN[art]) fehlt.push('Objektart (ETW, EFH, ZFH, MFH, DHH oder RH)');
+  if (!(wfl > 10 && wfl < 20000)) fehlt.push('Wohnfläche in m²');
+  if (!(bj > 1700 && bj <= new Date().getFullYear() + 3)) fehlt.push('Baujahr');
+  return { fehlt, frei: { str, plz, ort, objart: art, wfl, baujahr: bj } };
+}
+function _freiAdresse(f) { return f.str + ', ' + f.plz + ' ' + f.ort; }
+
+async function marktpreis_ohne_objekt(ctx, args) {
+  const { fehlt, frei } = _freiAus(args);
+  if (fehlt.length) {
+    if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
+    return { ok: false, abrufbar: false, fehlende_angaben: fehlt,
+      hinweis: 'Fuer eine Marktpreisindikation ohne Objekt fehlen Angaben. Frag den Nutzer genau nach '
+             + 'diesen (fehlende_angaben). Nichts abrufen, keine Kosten nennen.' };
+  }
+  const v = await markt.voranschlag(ctx.userId, null, 1);
+  if (!v.moeglich) {
+    return { ok: false, fehler: v.grund, hinweis: 'Der Preis liess sich gerade nicht ermitteln. Sag das dem Nutzer; nichts abrufen.' };
+  }
+  if (v.verbraucht_einen_abruf && v.bestand != null && v.bestand < 1) {
+    if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
+    return { ok: false, abrufbar: false, kontingent_leer: true,
+      hinweis: 'Das Kontingent fuer Marktpreisindikationen ist aufgebraucht (0 frei). Sag das dem Nutzer; '
+             + 'nachkaufen geht in DealPilot (pakete_und_preise nennt die Preise).' };
+  }
+  const adr = _freiAdresse(frei);
+  ctx.bestaetigung = 'Bestätigung: *' + v.name + '* für *' + adr + '* (' + frei.objart + ', '
+    + String(frei.wfl).replace('.', ',') + ' m², Baujahr ' + frei.baujahr + ') — ohne Objekt anzulegen. '
+    + (v.verbraucht_einen_abruf ? 'Das verbraucht 1 ' + v.name + ' aus deinem Kontingent'
+        + (v.bestand != null ? ' (noch ' + v.bestand + ' frei)' : '') + '.' : '')
+    + '\nSoll ich sie abrufen? Antworte *Ja* oder *Nein*.';
+  if (typeof ctx.merkeAngebot === 'function') await ctx.merkeAngebot(null, adr, 1, frei);
+  return { ok: true, abrufbar: true, gilt_fuer: adr, stufe: 1, name: v.name,
+    hinweis: 'Das Angebot steht. DealPilot schickt die Bestaetigungsfrage mit Kontingent SELBST. Stelle sie '
+           + 'NICHT selbst und nenne keine Kosten. Sag in einem Satz, dass es eine Marktpreisindikation '
+           + '(Marktwert-Spanne, Lage) ohne angelegtes Objekt ist.' };
+}
+
+async function marktpreis_ohne_objekt_abrufen(ctx) {
+  const frei = ctx.angebotFrei || null;
+  if (!frei) {
+    return { ok: false, hinweis: 'Es steht keine bestaetigte Preisansage ohne Objekt. Rufe zuerst '
+           + 'marktpreis_ohne_objekt mit den Angaben auf. Nichts abgerufen, nichts verbraucht.' };
+  }
+  const adr = _freiAdresse(frei);
+  ctx.angebotFrei = null; ctx.angebotObjekt = null; ctx.angebotStufe = null;
+  try {
+    const r = await markt.abrufenFrei(ctx.userId, frei);
+    if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
+    if (r && r.no_data) {
+      return { ok: false, keine_daten: true, abgerufen_fuer: adr,
+        hinweis: 'Fuer diese Adresse lagen keine Marktdaten vor. Es wurde nichts berechnet und nichts abgebucht.' };
+    }
+    if (r && r.report_id) ctx.berichtPdfLink = markt.berichtPdfLink(r.report_id);
+    return { ok: true, stufe: 1, name: (markt.STUFEN[1] || {}).name || 'Marktpreisindikation',
+      abgerufen_fuer: adr, ohne_objekt: true, zahlen: _berichtZahlen(r),
+      report_id: (r && r.report_id) || null, pdf_link: (r && r.report_id) ? markt.berichtPdfLink(r.report_id) : null,
+      hinweis: 'Nenne Marktwert-Spanne und die wichtigsten Zahlen aus "zahlen". Sag, dass kein Objekt angelegt '
+             + 'wurde und der Bericht in DealPilot im Verlauf steht; wer weiterrechnen will, legt daraus ein Objekt an.' };
+  } catch (e) {
+    if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
+    return { ok: false, fehler: String(e && e.message || e).slice(0, 200), kontingent: !!(e && e.kontingent),
+      hinweis: 'Der Abruf ist fehlgeschlagen. Sag das dem Nutzer mit dem Grund.' };
+  }
+}
 
 function fuerModell() {
   return WERKZEUGE.map((w) => ({

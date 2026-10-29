@@ -102,7 +102,7 @@
        WER AM CSS IN marktbericht-app/index.html ETWAS AENDERT, ZIEHT
        DIESE ZAHL HOCH. Der app.js-Buster INNERHALB der Seite reicht
        nicht - er wird ja erst gelesen, wenn die Seite neu geholt wird. */
-    return '/marktbericht-app/index.html?v=2660&theme=' + mbTheme() + (query ? '&' + query : '');
+    return '/marktbericht-app/index.html?v=3037&theme=' + mbTheme() + (query ? '&' + query : '');
   }
 
   // iframe waechst auf Content-Hoehe -> kein innerer Scrollbalken, Seite scrollt
@@ -293,6 +293,8 @@
   window.addEventListener('message', function (ev) {
     try { if (ev.data && ev.data.type === 'mbv-close') closeMarktberichtView(); } catch (e) {}
     try { if (ev.data && ev.data.type === 'mbv-scrolltop') _mbvScrollTop(); } catch (e) {} /* v945-scroll */
+    /* v3037: nach einem Abruf im Marktbericht die Kontingent-Pille neu laden */
+    try { if (ev.data && ev.data.type === 'mbv-kontingent' && ev.origin === location.origin && window.AiCredits && AiCredits.refresh) AiCredits.refresh(true); } catch (e) {}
   });
   global.closeMarktberichtView = closeMarktberichtView;
 })(window);

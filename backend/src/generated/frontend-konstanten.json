@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-29T09:47:08.841Z",
+ "erzeugt_am": "2026-10-29T10:08:48.272Z",
  "quellen": {
   "voice-import": "59453c51096776d6",
   "objektart-felder": "a9b7856466ce82eb",
   "storage": "58b153882e898bad",
-  "index-html": "87e6d0ce93072f2f",
+  "index-html": "d7d38d504adc7581",
   "grest": "2ca5ed25cafdbaa7"
  },
  "daten": {
@@ -4132,7 +4132,7 @@
      },
      {
       "h": "Telegram-Bot verbinden",
-      "text": "Der Telegram-Bot steht im Reiter Account & Sicherheit. Damit fragst du Objekte ab, änderst Felder, legst neue Objekte per Sprachnachricht an und rufst Portfolio-Zahlen ab — über deinen eigenen Bot. Auch Unterlagen beim Amt bereitet er vor: „Unterlagen für Objekt 3 anfordern“ (oder /unterlagen) zeigt je Unterlage Amt, Kanal, Gebühr und Ansprechpartner und schreibt das Anschreiben als Entwurf — verschicken tust du selbst.\n\nWas der Bot (wie Co-Pilot und Portfolio-Pilot) noch weiß: die ausgewerteten Unterlagen je Objekt (Risiken, WEG, Maßnahmen mit deinem Anteil, Baulasten, Grundbuch, offene Fragen), das Mietpotenzial eines Jahres („Wie viel Potenzial steckt dieses Jahr in meinen Immobilien?“ – je Wohnung mit Grund und ab wann), deine offenen Punkte („Welche To-dos gibt es?“ – aus Unterlagen, Mieterhöhungen, Zinsbindung, 15-%-Frist, Anfragen beim Amt, fehlenden PDF-Angaben) und die Marktmiete an einem Ort („Wie ist aktuell die Miete für ETWs in Herford mit 80 m²?“ – jede Quelle einzeln: Gutachterausschuss, Zensus 2022, aktueller Marktdurchschnitt aus deinen Marktberichten, deine eigenen Objekte). Das kostet kein Kontingent.\n\nSo geht's:\n1. In Telegram @BotFather öffnen und /newbot schicken.\n2. Einen Namen vergeben und einen Benutzernamen, der auf „bot“ endet.\n3. Die Einwilligung lesen und anhaken. Deine Objektdaten gelangen dabei in die Vereinigten Arabischen Emirate, und Bot-Chats sind nicht Ende-zu-Ende-verschlüsselt.\n4. Den Token von BotFather einfügen und auf Bot verbinden klicken.\n5. Verbindungscode erzeugen, den Bot öffnen, /start schicken und den Code eintippen.\n\nDanach kannst du den Chat „Stilllegen“, „Trennen“ (löscht auch den Chatverlauf im Bot) oder den Bot ganz entfernen."
+      "text": "Der Telegram-Bot steht im Reiter Account & Sicherheit. Damit fragst du Objekte ab, änderst Felder, legst neue Objekte per Sprachnachricht an und rufst Portfolio-Zahlen ab — über deinen eigenen Bot. Auch Unterlagen beim Amt bereitet er vor: „Unterlagen für Objekt 3 anfordern“ (oder /unterlagen) zeigt je Unterlage Amt, Kanal, Gebühr und Ansprechpartner und schreibt das Anschreiben als Entwurf — verschicken tust du selbst.\n\nWas der Bot (wie Co-Pilot und Portfolio-Pilot) noch weiß: die ausgewerteten Unterlagen je Objekt (Risiken, WEG, Maßnahmen mit deinem Anteil, Baulasten, Grundbuch, offene Fragen), das Mietpotenzial eines Jahres („Wie viel Potenzial steckt dieses Jahr in meinen Immobilien?“ – je Wohnung mit Grund und ab wann), deine offenen Punkte („Welche To-dos gibt es?“ – aus Unterlagen, Mieterhöhungen, Zinsbindung, 15-%-Frist, Anfragen beim Amt, fehlenden PDF-Angaben) und die Marktmiete an einem Ort („Wie ist aktuell die Miete für ETWs in Herford mit 80 m²?“ – jede Quelle einzeln: Gutachterausschuss, Zensus 2022, aktueller Marktdurchschnitt aus deinen Marktberichten, deine eigenen Objekte). Das kostet kein Kontingent.\n\nMarktpreisindikation ohne Objekt: Für eine Adresse, die du (noch) nicht anlegen willst, reicht ein Satz mit Straße, PLZ, Ort, Objektart, Wohnfläche und Baujahr („Was ist die Wohnung Hauptstr. 5, 32545 Bad Oeynhausen wert? ETW, 80 m², Baujahr 1990“). Der Bot nennt vorher, was es aus deinem Kontingent verbraucht, und ruft erst nach deinem Ja ab; der Bericht steht danach in DealPilot im Verlauf.\n\nSo geht's:\n1. In Telegram @BotFather öffnen und /newbot schicken.\n2. Einen Namen vergeben und einen Benutzernamen, der auf „bot“ endet.\n3. Die Einwilligung lesen und anhaken. Deine Objektdaten gelangen dabei in die Vereinigten Arabischen Emirate, und Bot-Chats sind nicht Ende-zu-Ende-verschlüsselt.\n4. Den Token von BotFather einfügen und auf Bot verbinden klicken.\n5. Verbindungscode erzeugen, den Bot öffnen, /start schicken und den Code eintippen.\n\nDanach kannst du den Chat „Stilllegen“, „Trennen“ (löscht auch den Chatverlauf im Bot) oder den Bot ganz entfernen."
      },
      {
       "h": "Plan und Kontingent",
@@ -5333,7 +5333,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "ac60048b9900f05d",
+  "hilfe": "18880bc8e63ce17a",
   "bewertung": "bca98c7b04c452b7"
  }
 }

@@ -312,5 +312,32 @@ function berichtPdfLink(reportId) {
   return b + '/marktbericht-app/index.html?report=' + encodeURIComponent(reportId) + '&autopdf=1';
 }
 
-module.exports = { voranschlag, abrufen, STUFEN, fehlendeAngaben, objektNutzlast, feldName,
+/* ── v3036 · MARKTPREISINDIKATION OHNE OBJEKT ─────────────────────────────
+ *
+ * Marcel 29.10.2026: „Marktpreisindikation abrufen können, ohne gleich ein
+ * Objekt anlegen zu müssen". Derselbe geldfuehrende Weg wie `abrufen` — die
+ * Route bucht genau einmal —, nur ohne `external_ref`: die Nutzlast traegt die
+ * sechs Pflichtangaben der Stufe 1 (Strasse, PLZ, Ort, Objektart, Wohnflaeche,
+ * Baujahr) wie ein Objekt ohne Kennung. Immer Stufe 1, immer schnell. */
+async function abrufenFrei(userId, frei) {
+  const f = frei || {};
+  const o = { str: f.str, plz: f.plz, ort: f.ort, objart: f.objart, objektart: f.objart,
+    wfl: f.wfl, baujahr: f.baujahr };
+  const r = await ruf(userId, '/marktbericht/reports/from-dealpilot', {
+    method: 'POST',
+    timeoutMs: 120000,
+    body: { fast: true, wert_stufe: 1, object: o }   /* wert_stufe NIE weglassen - der Default waere 2 */
+  });
+  if (r.status === 402) {
+    const e = new Error((r.body && r.body.message) || 'Dein Kontingent für diese Bewertung ist aufgebraucht.');
+    e.fachlich = true; e.kontingent = true; throw e;
+  }
+  if (r.status !== 200 && r.status !== 201) {
+    const e = new Error((r.body && (r.body.message || r.body.error)) || ('HTTP ' + r.status));
+    e.fachlich = Boolean(r.body && (r.body.message || r.body.error)); throw e;
+  }
+  return r.body;
+}
+
+module.exports = { voranschlag, abrufen, abrufenFrei, STUFEN, fehlendeAngaben, objektNutzlast, feldName,
   berichte, berichtPdfLink };

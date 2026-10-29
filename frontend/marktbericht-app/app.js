@@ -562,6 +562,12 @@ async function generate() {
     if (prog) { prog.classList.add('hide'); prog.innerHTML = ''; }
     btn.disabled = false;
     btn.textContent = 'Marktbericht erstellen';
+    /* v3037 · Marcel 29.10.2026: „ob die Kontingente auch passend abgebucht werden oben in der
+       Anzeige". Abgebucht wurde richtig, aber nach einem Abruf hier stiess niemand die Pille der
+       Haupt-App an - sie zeigte bis zum Neuladen den alten Stand. Jetzt: eigene Stufenliste neu
+       laden und der App Bescheid geben (marktbericht-view.js -> AiCredits.refresh). */
+    try { if (window.DealPilotMbStufen && DealPilotMbStufen.restHolen) DealPilotMbStufen.restHolen(); } catch (e) {}
+    try { if (window.parent && window.parent !== window) parent.postMessage({ type: 'mbv-kontingent' }, '*'); } catch (e) {}
   }
 }
 
