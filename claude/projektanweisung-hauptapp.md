@@ -43853,3 +43853,8 @@ ist gleich zum Original.
 - Zensus-Miete fortgeschrieben auch in `_zensusZeilen` (Marktbericht Web/PDF, `marktbericht-app/app.js:101`) und im Prompt der Pilot-Analyse (`backend/src/services/openaiService.js:1238`) — Bestandsaufnahme liegt vor, nicht gebaut.
 - Hüllhorst (Bericht 370, ETW): Sachwert 273.328 € ist ein vorläufiger Sachwert ohne Sachwertfaktor; Garage 43.537 € mit RND 41,7 J. aus der Wohnungs-RND — Entscheidung Marcel, ob Sachwert bei ETW entfällt.
 - Sitzung beendet nach dreimal demselben Fehler (gerades `"` nach „ in einem Skript-String).
+
+**Nachtrag v3041/v3042 (29.10.2026, Staging `716ebe1e`):**
+- Detmold neu erzeugt (Marcel: „kannst du gerne selber auslösen“), im mb-Container über `ReportOrchestrator.generate` mit dem Rich-Body von Bericht 376 (Konto, Stufe 3): **Bericht 396**. Angebotsniveau 915.000 €, Abschlag gemessen 21,3 % → 10 %, Marktwert 830.000 € (vorher 725.000 € bei 22,8 %); Gegenprobe Ø Kaufpreis LZS-Kauffälle 1.245 €/m² × 546 m² = 680.000 € (41 Fälle). Chrome-Erweiterung nicht verbunden — Web-Darstellung von 396 und der Pilot-Analyse noch nicht im Browser gesehen.
+- **v3042** (`716ebe1e`): KSt-Verlauf der Gesellschaft — „Körperschaftsteuer“ (18 Versalien) ragte über die 85-px-Jahreskachel (`tax.js:1206`, `.tax-tl-label`); jetzt „KSt“/„keine KSt“ + `overflow-wrap:anywhere`. Nicht im Browser nachgemessen.
+- Prod wartet auf den Blick in den Browser (Bericht 396, Pilot-Analyse Bismarckstr. 27, Steuer-Reiter Hölderlinstr.), dann `rollout-prod.ps1 -Freigabe` für v3041 + v3042.
