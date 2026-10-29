@@ -870,6 +870,12 @@ function loadData(d) {
     var wonEl = document.getElementById('_deal_won_state');
     if (wonEl) {
       wonEl.value = (d && d._deal_won) ? 'true' : 'false';
+      /* v3046 · FEHLER: der VERLOREN-Status wurde hier nicht aus dem geladenen Objekt gesetzt.
+         Das versteckte Feld behielt den Wert des vorher geöffneten Objekts, und das nächste
+         Speichern (Z. 417) schrieb ihn ins neue Objekt. Gemessen am 29.10.2026 auf Staging:
+         14 Demo-Objekte standen nach einer Abruf-Schleife auf „Verloren“. */
+      var _lostLd = document.getElementById('_deal_lost_state');
+      if (_lostLd) _lostLd.value = (d && (d._deal_lost === true || d._deal_lost === 'true')) ? 'true' : 'false';
       var atEl = document.getElementById('_deal_won_at_state');
       if (atEl) atEl.value = (d && d._deal_won_at) ? d._deal_won_at : '';
       if (window.DealPilotDealAction && typeof DealPilotDealAction.refreshWonUI === 'function') {
