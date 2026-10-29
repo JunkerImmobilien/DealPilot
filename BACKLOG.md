@@ -40,6 +40,28 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 Marcel: *„machen wir heute nicht … notier das einfach nur, machen wir nächstes Mal."*
 
+> **Stand 29.10.2026:**
+> - Erledigt auf Staging (`7ab5fb69`, v3030): **1** (Bodenrichtwert-Schätzung entfernt), **2** (Leerstand rechnet
+>   mit) und **4** (kein Abschlag-Prozentsatz im PDF).
+> - Aus **5** in der Kabine nachgemessen:
+>   - Folgen-Kette nach dem Import: EK, Mietausfall, AfA nach Baujahr und GrESt nach PLZ (5 Stichproben)
+>   - Hausgeld-Aufteilung 78 : 22 als Vorgabe gekennzeichnet
+>   - Track-Record-Prognose beim offenen Objekt (Kennung passt, 5 Zeilen)
+> - Die beiden roten Prüfer sind repariert (`79a1485c`, v3030b).
+> - **Offen:**
+>   - **3** (DSCR-Ampel netto, wartet auf Marcels Go, siehe unten)
+>   - Seitenbild der Bankfassung mit Bausparvertrag: Abnahme an einem echten Export, das Abfangen des Speicherns in
+>     der Kabine lief zweimal ins Leere
+>   - KfW mit tilgungsfreien Anlaufjahren ist ein eigenes Feature, nicht begonnen.
+>
+> **Zu 3, Recherche:** Banken prüfen die Kapitaldienstfähigkeit am Reinertrag: Miete minus
+> Bewirtschaftungskosten (Instandhaltung, Verwaltung, Mietausfallwagnis), geteilt durch den Kapitaldienst.
+> Quellen: kreditwesen.de (Fachaufsatz Kapitaldienstfähigkeit von Immobilien), Dr. Klein (Finanzlexikon
+> Kapitaldienstfähigkeit), wohnglueck.de (Mietausfallwagnis); als Mindestwert gilt allgemein 1,2.
+> Vorschlag: Ampel und Score-Teilnote auf netto stellen und beide Werte beschriftet zeigen.
+> Wirkung an Parkstr. 9: brutto 2,43, netto 1,96, Score bleibt 94; ändern würden sich nur knappe Objekte und
+> die DSCR-Zahlen im Messe-Storybook.
+
 0. ~~Prod-Rollout v3029 + landing-videothek-7~~ **erledigt 29.10.2026, Prod `dc0cdf7`** (Videos per Skript hochgeladen, md5 gleich).
 1. **„Bodenrichtwert schätzen" raus.** Marcel: *„totalen Quatsch … brauchen wir nicht."* Zu entfernen:
    - der Knopf `#brw-ai-btn` (`index.html` ~1167)
