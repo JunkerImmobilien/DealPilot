@@ -190,6 +190,10 @@ if ($LASTEXITCODE -ne 0) {
   if ($LASTEXITCODE -ne 0) { Schlecht "Versions-Commit fehlgeschlagen"; exit 1 }
   git push -q origin $ZWEIG_QUELLE
   if ($LASTEXITCODE -ne 0) { Schlecht "push staging (Version) fehlgeschlagen"; exit 1 }
+  # v3039 · auch der Staging-Server zieht den Stempel - sonst zeigt Staging die alte Version
+  # (Marcel 29.10.2026: „auf staging steht noch 1.0.0“).
+  $null = ssh $STAGING_HOST "cd /opt/dealpilot && git pull -q --ff-only"
+  if ($LASTEXITCODE -ne 0) { Hinweis "Staging-Server hat den Versionsstempel nicht gezogen - deploy-staging nachholen" }
   Gut "$verText"
 }
 
