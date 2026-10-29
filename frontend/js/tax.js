@@ -1688,9 +1688,16 @@ function _gesDetailHtml(j) {
     var st = P.erwStatus || {};
     var gew = st.aktiv
       ? 'erweiterte K&uuml;rzung (&sect; 9 Nr. 1 S. 2 GewStG) &rarr; 0 &euro;'
-      : (fE(j.gewst || 0, 0) + ' (Gewerbeertrag ' + fE(j.gewerbeertrag || 0, 0) + ' nach K&uuml;rzung Grundsteuer ' + fE(j.gewKuerzung || 0, 0) + ', &times; 3,5 % &times; ' + String(P.hebesatz).replace('.', ',') + ' %)'
-         + (st.beantragt ? ' &middot; <b style="color:var(--red)">erweiterte K&uuml;rzung beantragt, Pr&uuml;fpunkte offen</b>' : '')
-         + (!(P.hebesatz > 0) ? ' &middot; <b style="color:var(--red)">Hebesatz fehlt &mdash; bitte im Mandanten erg&auml;nzen</b>' : ''));
+      /* v3043 · Marcel 29.10.2026 (Hölderlinstr.): „wir haben doch keinen Hebesatz, wenn VV-GmbH".
+         Bei BEANTRAGTER erweiterter Kürzung ist nicht der Hebesatz das Thema, sondern die offenen
+         Prüfpunkte (ueberfuehrung-kern.js) - sind sie bestätigt, ist die GewSt 0 €. Ohne Hebesatz
+         steht dort „nicht rechenbar" statt eines zufälligen 0 €. */
+      : (st.beantragt
+          ? (P.hebesatz > 0 ? fE(j.gewst || 0, 0) + ' bis zur Bestätigung (ohne erweiterte K&uuml;rzung, Hebesatz ' + String(P.hebesatz).replace('.', ',') + ' %)' : 'bis zur Best&auml;tigung nicht rechenbar')
+            + ' &middot; <b style="color:var(--red)">erweiterte K&uuml;rzung beantragt &mdash; ' + ((st.offen && st.offen.length) || 'die') + ' Pr&uuml;fpunkte im Mandanten best&auml;tigen, dann 0 &euro;</b>'
+          : (P.hebesatz > 0
+              ? fE(j.gewst || 0, 0) + ' (Gewerbeertrag ' + fE(j.gewerbeertrag || 0, 0) + ' nach K&uuml;rzung Grundsteuer ' + fE(j.gewKuerzung || 0, 0) + ', &times; 3,5 % &times; ' + String(P.hebesatz).replace('.', ',') + ' %)'
+              : 'nicht rechenbar &middot; <b style="color:var(--red)">Hebesatz fehlt &mdash; bitte im Mandanten erg&auml;nzen</b>'));
     var moebl = parseDe((document.getElementById('moebl') || {}).value) || 0;
     var h = '<div class="tax-item" style="grid-column:1/-1;opacity:.92"><div class="tax-label">davon K&ouml;rperschaftsteuer + Soli ' + fE(j.kstSoli || 0, 0) + ' &middot; Gewerbesteuer</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.5">' + gew + '</div></div>';
     if (st.aktiv && moebl > 0) h += '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Pr&uuml;fpunkt erweiterte K&uuml;rzung</div><div class="tax-val" style="font-size:12px;font-weight:400">Das Objekt ist m&ouml;bliert (' + fE(moebl, 0) + '). Mitvermietete Einrichtung kann die K&uuml;rzung gef&auml;hrden, wenn sie nicht untergeordnet ist.</div></div>';

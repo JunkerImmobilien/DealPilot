@@ -621,7 +621,7 @@
     ds2_zustand: 'Zustand', ds2_energie: 'Energieklasse', standardstufe: 'Standardstufe', zimmer: 'Zimmer', etage: 'Etage',
     mea: 'Miteigentumsanteil', einheiten: 'Wohneinheiten', nutzungsart: 'Nutzungsart',
     bgf: 'Bruttogrundfläche', nhk_haus: 'Hausform (NHK)', nhk_geschosse: 'Geschosse und Unterkellerung', nhk_dach: 'Dachausbildung',
-    garagen_bgf_qm: 'Garage · Bruttogrundfläche', garagen_stufe: 'Garage · Standardstufe' };
+    garagen_bgf_qm: 'Garage · Bruttogrundfläche', garagen_stufe: 'Garage · Standardstufe', garagen_baujahr: 'Garage · Baujahr' };   /* v3043 */
   /* v1854 · Marcel: „bei der Stufe 2, dass da alle wichtigen Felder rot
      markiert sind und dann halt bei der Stufe 3 auch" — Stufe 2 nimmt die
      Felder, die die erweiterte Indikation rechnet (Zustand, Energie,

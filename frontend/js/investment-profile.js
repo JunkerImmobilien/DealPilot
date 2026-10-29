@@ -386,9 +386,17 @@ window.DealPilotInvestmentProfile = (function() {
       '<div class="ip-grid">',
         field('ip_angebot_abschlag_pct', 'Abschlag auf Angebotspreise', p.angebot_abschlag_pct, '%',
           (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'leer = Ø Markt ' + String(m.pct).replace('.', ',') + ' %' : 'leer = Marktdurchschnitt'; })()),
+        /* v3043 · Obergrenze des örtlich gemessenen Abschlags (Standard an, 10 %) */
+        field('ip_abschlag_deckel_pct', 'Obergrenze örtlich gemessener Abschlag', p.abschlag_deckel_pct, '%', 'leer = 10 %'),
         /* v3026 · Indexmiete (§ 557b BGB): Zukunft ist KEIN amtlicher Wert - die Annahme gehört dem Nutzer */
         field('ip_indexmiete_vpi_pct', 'Indexmiete: Preisanstieg ab heute (Annahme)', p.indexmiete_vpi_pct, '% p. a.', 'leer = 2,0 % (Annahme, kein amtlicher Wert)'),
       '</div>',
+      /* v3043 · Deckelung des örtlich gemessenen Abschlags - Marcel 29.10.2026 */
+      '<label class="ip-check" style="display:flex;gap:9px;align-items:flex-start;margin:6px 0 16px;cursor:pointer;font-size:13px;line-height:1.45">'
+        + '<input type="checkbox" id="ip_abschlag_deckeln" style="margin-top:3px"' + (get('abschlag_deckeln') === false ? '' : ' checked') + '>'
+        + '<span><b>Örtlich gemessenen Abschlag deckeln</b><br><span class="hint" style="color:var(--muted)">'
+        + 'Der Abschlag aus den Kauffällen des Gutachterausschusses misst auch Objektmischung und Zeit mit. '
+        + 'Mit Haken gilt höchstens die Obergrenze oben (leer = 10 %). Dein eigener Abschlag wird nie gedeckelt.</span></span></label>',
 
       // V63.96: KI-Analyse-Parameter wandern in den Settings-Tab "KI" (Marcels Wunsch).
       // Vorher hier — jetzt zwischen Eigene Anweisungen und Vorlagen im KI-Tab.
@@ -465,6 +473,8 @@ window.DealPilotInvestmentProfile = (function() {
       grest_auto:             (function(){ var c = document.getElementById('ip_grest_auto'); return c ? !!c.checked : null; })(),
       maklerkosten:           v('ip_maklerkosten'),
       angebot_abschlag_pct:   v('ip_angebot_abschlag_pct'),   /* v2237 · leer -> Marktdurchschnitt */
+      abschlag_deckeln:       (function(){ var c = document.getElementById('ip_abschlag_deckeln'); return c ? !!c.checked : null; })(),   /* v3043 */
+      abschlag_deckel_pct:    v('ip_abschlag_deckel_pct'),
       indexmiete_vpi_pct:     v('ip_indexmiete_vpi_pct'),     /* v3026 · leer -> 2,0 % Annahme */
       bundesland:             s('ip_bundesland'),
       // V63.90: KI-Analyse-Standards

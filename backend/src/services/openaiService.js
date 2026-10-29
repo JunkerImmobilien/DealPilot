@@ -1255,6 +1255,17 @@ function buildPrompt(payload, opts) {
           var src = (_zg && _zg[p[0]] && _zg[p[0]].wert != null) ? [_zg[p[0]], 'Gemeinde'] : ((_zk && _zk[p[0]] && _zk[p[0]].wert != null) ? [_zk[p[0]], 'Kreis'] : null);
           if (src) L.push('  Nettokaltmiete ' + p[1] + ' ' + src[0].klasse + ' (' + src[1] + '): ' + _zf(src[0].wert, 2) + ' EUR/m2');
         });
+        /* v3043 · Fortschreibung der Zensus-MIETE zum Stichtag (Index der Nettokaltmieten,
+           ReportOrchestrator). Leerstand und Eigentuemerquote bleiben beim 15.05.2022. */
+        var _zfo = _zs.fortschreibung && Number(_zs.fortschreibung.faktor) > 0 ? _zs.fortschreibung : null;
+        if (_zfo) {
+          var _zfv = function (n) { return n == null ? null : _zf(Number(n) * Number(_zfo.faktor), 2) + ' EUR/m2'; };
+          var _zft = [];
+          if (_zg && _zg.nettokaltmiete_qm != null) _zft.push('Gemeinde ' + _zfv(_zg.nettokaltmiete_qm));
+          if (_zs.nettokaltmiete_qm != null) _zft.push('Kreis ' + _zfv(_zs.nettokaltmiete_qm));
+          if (_zft.length) L.push('  Zensus-Bestandsmiete FORTGESCHRIEBEN auf ' + String(_zfo.bezug || '') + ' (Index der Nettokaltmieten, Faktor '
+            + String(_zfo.faktor).replace('.', ',') + '): ' + _zft.join(', ') + ' - nenne fuer heute diese Werte, die Werte oben sind Stand Mai 2022.');
+        }
         var _zl = (_zg && _zg.leerstandsdauer) || (_zk && _zk.leerstandsdauer);
         if (_zl && _zl.length) L.push('  Dauer des Leerstands (Anteil der leeren Wohnungen): '
           + _zl.map(function (x) { return x.text + ' ' + _zf(x.anteil_pct, 1) + ' %'; }).join(', '));
