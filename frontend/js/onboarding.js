@@ -1562,6 +1562,14 @@ window.DealPilotOnboarding = (function () {
       seit = seit || Date.now();
       var da = !!document.querySelector('#sb-list, #sidebar');
       if (!da && (Date.now() - seit) < 2500) { setTimeout(function () { warten(seit); }, 120); return; }
+      /* v3040 · erst den Abgleich mit dem Konto abwarten (konto-stammdaten.js):
+         ob die Einrichtung schon erledigt ist, weiss der Server, nicht der
+         Browser. Hoechstens 6 s, danach gilt der Browserstand. */
+      var K = window.DpKontoStammdaten;
+      if (K && !_erzwungen()) {
+        try { K.start(); } catch (e) {}
+        if (!K.fertig() && (Date.now() - seit) < 6000) { setTimeout(function () { warten(seit); }, 150); return; }
+      }
       if (!_faellig()) return;
       var modus = _erzwungen();
       if (modus) {

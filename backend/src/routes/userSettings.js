@@ -67,7 +67,10 @@ const { query } = require('../db/pool');
 /* v3024 - `browser_vorgaben`: Bewertungsprofil, Deal-Score-Gewichte, Anlegerprofil-Set und
    Investmentprofil (js/vorgaben-sync.js). Gemessen 28.10.2026: dasselbe Demo-Konto rechnete auf
    Staging mit Lage-Fokus, im Prod-Browser mit Standard - Westerfeldstr. 140 77 GUT gegen 85 SEHR GUT. */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe', 'browser_vorgaben'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
+/* v3040 - `stammdaten`: Name, Firma, Adresse, E-Mail, Logo (dp_user_settings) und der Merker
+   „Ersteinrichtung erledigt" (js/konto-stammdaten.js). Marcel 29.10.2026: musste beides bei
+   jeder Anmeldung neu eingeben - es lag nur im Browser. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe', 'browser_vorgaben', 'stammdaten'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {
