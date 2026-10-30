@@ -43999,3 +43999,29 @@ Offen zur Entscheidung: Marktwert- vs. Marktpreisindikation-Titel; Grenzsteuersa
 persönlicher `#grenz`); Jacoby-RND aus Anlage 2 statt RND-Assistent; Schritt 5 und PDF der Kaufpreisaufteilung
 kennen Jacoby noch nicht; Messe-Drehbücher greifen auf `.wv-*` (Bodenwert steht jetzt unten) — Storybook prüfen.
 Prod: v3049–v3052 noch nicht ausgerollt (erst nach Browser-Abnahme).
+
+### v3053 · v3054 · v3055 · v3056 · v3057/a — Abnahme im Browser, Vorgabezins, Feedback in der Hilfe (30.10.2026)
+
+**Was.**
+- **v3053** Seiten-Buster `marktbericht-app/index.html?v=` in `marktbericht-view.js` und `deal-action-boarding.js`
+  3037 → 3050: v3050 änderte die Seite, ein Browser mit ihr im Cache hätte das alte `app.js` geladen. Der
+  Buster-Prüfer sieht diese Ebene nicht.
+- **v3054** BMF-Tafel: Quellenvermerk der Jacoby-Zeile als Tooltip statt fünfzeiligem Absatz.
+- **v3055** Investmentprofil: „Indikativer Marktzins" ließ sich nie speichern, wenn einmal ein eigener Satz
+  gespeichert war (Nullen gefiltert, über alten Stand gelegt). Jetzt fallen GEZEIGTE leere Felder (`ip_<key>`)
+  auf die Vorgabe zurück; nicht gezeigte bleiben (v1783).
+- **v3056** Entscheidung Marcel 30.10.: Vorgabezins nach Beleihung bleibt (v3029). Das Feld „Marktzinssatz" zeigt
+  jetzt die wirksame Zahl (10 J., EK 10 %, LTV ~104 % → 4,87 %) mit Begründung, die Stufe (4,23 %) als Untergrenze.
+- **v3057/a** Hilfe: Knopf „Feedback & Support" unter der Themenliste (Menüpunkt seit v1914 auf Marcels Wunsch aus).
+
+**Nachweis (Browser, Staging).** Wertkarten in 7 Stufe-3-Berichten (398, 397, 375, 329, 379, 378, 371), alle
+führenden Verfahren, hell und dunkel, `<details>` klappt. BMF-Tafel an Lindenallee 14 mit echter Pipeline: 66,3 /
+71,3 / 73,0 / 74,7 / Jacoby 78,2 % (LZS 2,8 % Stufe A); Reiter 2–4 dort gesperrt, weil das Kaufvertragsdatum fehlt
+(v1492, gewollt — meine erste Vermutung eines Fehlers zurückgenommen). Profil: Marktzins gewählt → `zins_override`
+entfernt, Feld zeigt 4,87 % mit Satz. Hilfe-Knopf öffnet das Feedback-Fenster.
+
+**Rest / Auffällig.** Objekt **2026-1123 Lindenallee 14 (`2b57a20f`) ist auf Staging gelöscht** (DB 0 Zeilen, auch
+tax/avm) — nicht durch diese Sitzung; Backend-Log reicht nur bis zum Neubau ~19:30 UTC. Sicherung
+`/root/backups/demo-objekte-staging-20261029-1910.tsv.gz`. Neu: **2026-1127 „Unbenannt"** (21:01 UTC), vermutlich aus
+den Testläufen (App öffnete je Laden ein neues Objekt). Beides wartet auf Marcel. Übernehmen-Knopf der BMF-Tafel
+nicht geklickt (schreibt ins Objekt). Prod: v3049–v3057a nicht ausgerollt.
