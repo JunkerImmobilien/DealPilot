@@ -902,6 +902,10 @@
             '<input type="text" id="help-search-input" placeholder="Suchen oder den Piloten fragen — Enter fragt" autocomplete="off" style="padding-left:36px">' +
           '</div>' +
           '<div class="settings-tabs ms-tabs help-sidebar-list" id="help-sidebar"></div>' +
+          /* v3057 · Marcel 30.10.2026: „wo ist Feedback und Support? … kannst du das in die Hilfe
+             packen". Der Menüpunkt ist seit v1914 auf seinen Wunsch ausgeblendet (layout-varianten.css),
+             das Fenster dahinter hängt weiter an sbActionsAction('feedback'). */
+          '<button type="button" class="help-support-btn" onclick="hideHelp();if(typeof sbActionsAction===\'function\')sbActionsAction(\'feedback\')" style="margin:12px 14px 14px;padding:10px 12px;border-radius:10px;border:1px solid var(--wl-c9a84c, #C9A84C);background:transparent;color:inherit;font:600 13px Inter,sans-serif;cursor:pointer;text-align:left">Feedback &amp; Support<span style="display:block;font-weight:400;font-size:11.5px;opacity:.7;margin-top:2px">Fehler melden, Frage stellen, Wunsch äußern</span></button>' +
         '</aside>' +
 
         // V118: Content rechts (wie Settings) — X-Button + Pane + AI-Bar als Footer
