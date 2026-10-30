@@ -3437,6 +3437,10 @@ async function extractMarketData(text, opts) {
     '  - balkon_flaeche: Number (Fläche Balkon/Terrasse in m²)',
     '  - energie_label: String (A+, A, B, ..., H)',
     '',
+    'BAUSUBSTANZ UND LEERSTAND (NUR wenn der Bericht es ausdruecklich nennt - NICHT schaetzen, sonst null):',
+    '  - gebaeudezustand: Zustand der Bausubstanz des ganzen Gebaeudes, genau einer von [neubau, gut, normal, renovierungsbeduerftig, stark_sanierungsbeduerftig]',
+    '  - leerstandsquote_pct: marktaktiver Wohnungsleerstand im Gebiet (Gemeinde/Stadtteil) in % (Zahl, z. B. 2.8) - NICHT der Leerstand im Objekt',
+    '',
     'WICHTIG:',
     '  - Zahlen IMMER als Number, NICHT als String',
     '  - Tausenderpunkte und Kommas korrekt deutsch (3.500,50 = 3500.5)',
@@ -3458,7 +3462,9 @@ async function extractMarketData(text, opts) {
   const ext = parsed.extracted || parsed;
   const cleaned = {};
   // String-Felder
-  ['adresse','plz','ort','objektart','bewertungsdatum','konfidenz','makrolage','mikrolage','bevoelkerung_entwicklung','nachfrage','wertsteigerung','entwicklung',
+  /* v3049 · gebaeudezustand (ds2_zustand) und leerstandsquote_pct (ds2_mietausfall) - die zwei
+     Kennzahlen des Investor Deal Score, die kein Import bediente */
+  ['adresse','plz','ort','objektart','bewertungsdatum','konfidenz','makrolage','mikrolage','bevoelkerung_entwicklung','nachfrage','wertsteigerung','entwicklung','gebaeudezustand',
    'kueche_qualitaet','bad_qualitaet','boden_qualitaet','fenster_qualitaet','kueche_zustand','bad_zustand','boden_zustand','fenster_zustand','badezimmer','etage','etagen','modernisierungsjahr','garagen','stellplatz_aussen','balkon_flaeche','energie_label'
   ].forEach(k => {
     if (ext[k] != null && ext[k] !== '') cleaned[k] = String(ext[k]).trim();
@@ -3470,7 +3476,8 @@ async function extractMarketData(text, opts) {
    'wertentwicklung_3jahre_pct','wertentwicklung_1jahr_pct','prognose_naechstes_jahr_pct',
    'markt_durchschnittspreis','markt_tage_auf_dem_markt',
    'bevoelkerung','arbeitslosenquote_pct','wanderungssaldo',
-   'marktmiete_qm','marktmiete_monat'  /* V356-marktmiete */
+   'marktmiete_qm','marktmiete_monat',  /* V356-marktmiete */
+   'leerstandsquote_pct'  /* v3049 */
   ].forEach(k => {
     const v = ext[k];
     if (v == null || v === '') return;

@@ -1762,6 +1762,8 @@
   var _STUFE_Z = { 1: 'Stark sanierungsbedürftig', 2: 'Renovierungsbedürftig', 3: 'Gepflegt', 4: 'Modernisiert', 5: 'Neuwertig' };
   function _stufeWort(id, n) { var m = String(id).indexOf('qual_') === 0 ? _STUFE_Q : _STUFE_Z; return (m[n] || String(n)) + ' (Stufe ' + n + ' von 5)'; }
   function pretty(v) { return String(v == null ? '' : v).replace(/_/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); }); }
+  /* v3049 · Klartext der Option („Renovierungsbedürftig“ statt „Renovierungsbeduerftig“) */
+  function _optWort(id, v) { var el = document.getElementById(id), o = el && el.querySelector('option[value="' + v + '"]'); return o ? o.textContent.trim() : pretty(v); }
   function lageAvg(d) { var sum = 0, c = 0; ['lage_einkaufen', 'lage_bildung', 'lage_gastronomie', 'lage_gesundheit', 'lage_freizeit'].forEach(function (k) { var n = numDe(d[k]); if (n != null) { sum += (n > 5 ? n / 2 : n); c++; } }); return c >= 3 ? (sum / c) : null; }
   function lageCat(avg) { return avg >= 4.5 ? 'sehr_gut' : avg >= 3.5 ? 'gut' : avg >= 2.5 ? 'durchschnittlich' : avg >= 1.5 ? 'schwach' : 'sehr_schwach'; }
 
@@ -1809,7 +1811,8 @@
     ds2_bevoelkerung: ['stark_wachsend','wachsend','stabil','leicht_fallend','stark_fallend'],
     ds2_nachfrage: ['sehr_stark','stark','mittel','schwach','sehr_schwach'],
     ds2_wertsteigerung: ['sehr_hoch','hoch','mittel','niedrig','keines'],
-    ds2_entwicklung: ['mehrere','eine_starke','begrenzt','kaum','keine']
+    ds2_entwicklung: ['mehrere','eine_starke','begrenzt','kaum','keine'],
+    ds2_zustand: ['neubau','gut','normal','renovierungsbeduerftig','stark_sanierungsbeduerftig']   /* v3049 */
   };
   function validEnum(id, v) { if (v == null) return null; var t = String(v).trim().toLowerCase().replace(/\s+/g,'_'); var a = DS2_ENUMS[id]; return (a && a.indexOf(t) >= 0) ? t : null; }
   function mergeMarket(d) {
@@ -1861,6 +1864,18 @@
     // Entwicklungsmöglichkeiten: nur direkt aus Bericht (keine Ableitungsquelle)
     var eD = validEnum('ds2_entwicklung', d.entwicklung);
     if (eD) addRow('ds2_entwicklung', 'Entwicklungsmöglichkeiten', pretty(eD), eD, S, 'select', true);
+    /* v3049 · Marcel 30.10.2026: „alle 24 KPI" - Bausubstanz und Mietausfallrisiko bediente
+       kein Import. Beide nur, wenn der Bericht sie nennt (der Prompt schaetzt sie nicht), und nur
+       in leere Felder. Die Leerstand-Stufen sind die von lage_stufen.js (Marktbericht, Zensus). */
+    var zD = validEnum('ds2_zustand', d.gebaeudezustand);
+    if (zD) addRow('ds2_zustand', 'Bausubstanz', _optWort('ds2_zustand', zD), zD, S, 'select', true);
+    if (_merged.ds2_zustand && zD) _merged.ds2_zustand.herleitung = 'steht so im Bericht: „' + d.gebaeudezustand + '“';
+    var lq = numDe(d.leerstandsquote_pct);
+    if (lq != null && lq >= 0 && lq < 100) {
+      var maV = lq < 1.5 ? 'sehr_niedrig' : lq < 3 ? 'niedrig' : lq < 6 ? 'mittel' : lq < 9 ? 'erhoeht' : 'hoch';
+      addRow('ds2_mietausfall', 'Mietausfallrisiko (aus Leerstand)', _optWort('ds2_mietausfall', maV), maV, S, 'select', true);
+      if (_merged.ds2_mietausfall) _merged.ds2_mietausfall.herleitung = 'Leerstand ' + String(lq).replace('.', ',') + ' % → unter 1,5 % sehr niedrig · unter 3 % niedrig · unter 6 % mittel · unter 9 % erhöht · darüber hoch';
+    }
     // Stammdaten
     addRow('bad_anz', 'Badezimmer', d.badezimmer, d.badezimmer, S, 'input'); addRow('etage', 'Etage', d.etage, d.etage, S, 'input');
     addRow('etagen_ges', 'Anzahl Etagen', d.etagen, d.etagen, S, 'input'); addRow('modernis', 'Modernisierungsjahr', d.modernisierungsjahr || d.sanierungsjahr, d.modernisierungsjahr || d.sanierungsjahr, S, 'input');
