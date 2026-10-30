@@ -3412,7 +3412,7 @@ async function extractMarketData(text, opts) {
     '  - wertentwicklung_1jahr_pct: Veränderung im letzten Jahr in % (Zahl)',
     '  - prognose_naechstes_jahr_pct: Prognose nächstes Jahr in % (Zahl)',
     '  - markt_durchschnittspreis: Durchschnittspreis im Stadtteil/PLZ-Gebiet in Euro',
-    '  - markt_tage_auf_dem_markt: Durchschnittliche Tage auf dem Markt (Zahl)',
+    '  - markt_tage_auf_dem_markt: Durchschnittliche Tage auf dem Markt bzw. Vermarktungsdauer in Tagen (Zahl)',
     '',
     'SOZIO-ÖKONOMIE (falls enthalten):',
     '  - bevoelkerung: Einwohnerzahl der Stadt (Zahl)',
@@ -3436,6 +3436,12 @@ async function extractMarketData(text, opts) {
     '  - stellplatz_aussen: Number (Anzahl Außenstellplätze)',
     '  - balkon_flaeche: Number (Fläche Balkon/Terrasse in m²)',
     '  - energie_label: String (A+, A, B, ..., H)',
+    '',
+    /* v3049 · gemessen 30.10.2026: marktmiete_* stand in der Auswertung unten (V356), aber nie im
+       Prompt dieses Berichts - die Marktmiete eines Marktberichts kam deshalb nie an */
+    'MIETE (NUR falls der Bericht eine Markt-/Vergleichsmiete nennt - nichts erfinden):',
+    '  - marktmiete_qm: Marktmiete (Nettokaltmiete) pro m² in Euro (Zahl; bei einer Spanne der genannte Mittel-/Empfehlungswert)',
+    '  - marktmiete_monat: Marktmiete (Nettokaltmiete) pro Monat in Euro (Zahl)',
     '',
     'BAUSUBSTANZ UND LEERSTAND (NUR wenn der Bericht es ausdruecklich nennt - NICHT schaetzen, sonst null):',
     '  - gebaeudezustand: Zustand der Bausubstanz des ganzen Gebaeudes, genau einer von [neubau, gut, normal, renovierungsbeduerftig, stark_sanierungsbeduerftig]',
