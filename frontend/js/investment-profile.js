@@ -550,8 +550,16 @@ window.DealPilotInvestmentProfile = (function() {
     var inp=document.getElementById('ip_zins_override'); if(!inp || inp._mktWired) return; inp._mktWired=1;
     var lab=document.querySelector('label[for="ip_zins_override"]');
     function setLabel(market){ if(lab) lab.textContent = market ? 'Marktzinssatz' : 'Eigener Zinssatz (optional)'; }
-    function toMarket(){ var r=_mktZins(); if(r==null) return; inp.dataset.market='1'; inp.value=r.toFixed(2); inp.readOnly=true; setLabel(true); _radio('markt'); }
-    function toOverride(){ inp.dataset.market=''; inp.readOnly=false; setLabel(false); _radio('eigen'); }
+    /* v3056 · Marcel 30.10.2026 (Entscheidung: Zins nach Beleihung). Das Feld zeigte den Stufenzins
+       (4,23 %), neue Objekte bekamen aber getZins() nach dem LTV der Vorgabe-Finanzierung (4,87 %,
+       v3029). Jetzt steht hier dieselbe Zahl, die ein neues Objekt bekommt, mit dem Grund darunter. */
+    function _hinweis(txt){ var h=document.getElementById('ip_zins_wirk'); if(!h){ var feld=inp.closest('.ip-field'); if(!feld) return; h=document.createElement('div'); h.id='ip_zins_wirk'; h.className='ip-hint'; feld.appendChild(h); } h.textContent=txt||''; h.style.display=txt?'':'none'; }
+    function toMarket(){ var r=_mktZins(); if(r==null) return; var eff=r, l=null;
+      try { l=vorgabeLtv(); var b=parseInt((document.getElementById('ip_zinsbindung_default')||{}).value,10)||10; var n=(l!=null)?window.dpGetIndicativeZins(b,null,l):null; if(typeof n==='number'&&isFinite(n)&&n>r) eff=n; } catch(e){}
+      inp.dataset.market='1'; inp.value=eff.toFixed(2); inp.readOnly=true; setLabel(true); _radio('markt');
+      var f2=function(x){ return x.toFixed(2).replace('.', ','); };
+      _hinweis(eff>r ? 'Neue Objekte bekommen ' + f2(eff) + ' %: deine Vorgabe-Finanzierung beleiht rund ' + Math.round(l) + ' % vom Kaufpreis (Eigenkapital ' + String(get('ek_quote_default')).replace('.', ',') + ' %, Nebenkosten mitfinanziert). Die gewählte Stufe (' + f2(r) + ' %) ist die Untergrenze.' : 'Neue Objekte bekommen ' + f2(eff) + ' % (gewählte Stufe).'); }
+    function toOverride(){ inp.dataset.market=''; inp.readOnly=false; setLabel(false); _radio('eigen'); _hinweis(''); }
     /* v2211 · Entweder-oder: die Radios schalten das Feld */
     function _radio(w){ var r=document.querySelector('input[name="ip_zins_modus"][value="'+w+'"]'); if(r) r.checked=true; }
     [].slice.call(document.querySelectorAll('input[name="ip_zins_modus"]')).forEach(function(r){
@@ -563,6 +571,8 @@ window.DealPilotInvestmentProfile = (function() {
     if(!String(inp.value).trim()){ toMarket(); if(inp.dataset.market!=='1'){ setTimeout(function(){ if(!String(inp.value).trim()) toMarket(); },500); } }
     else { toOverride(); }
     ['ip_zinsbindung_default','ip_zins_margin'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktBound) return; el._mktBound=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') toMarket(); }); });
+    /* v3056 · Eigenkapital und Nebenkosten ändern den LTV der Vorgabe - nach dem Auto-Save neu anzeigen */
+    ['ip_ek_quote_default','ip_notar_pct','ip_grundbuch_pct','ip_maklerkosten','ip_sonstige_nk_pct','ip_bundesland'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktLtv) return; el._mktLtv=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') setTimeout(toMarket, 700); }); });
     inp.addEventListener('input', function(){ if(inp.dataset.market==='1' && document.activeElement===inp) toOverride(); });
   }
   /* ══ v2257 · EIGENKAPITAL UND MIETAUSFALL KOMMEN NACH ══════════════════
