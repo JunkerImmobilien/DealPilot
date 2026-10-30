@@ -765,7 +765,9 @@
         /* dieselbe Rundung wie phase5 (zwei Stellen) - so steht im Reiter Steuer, was hier steht */
         z.geb = Number(Number(j.gebaeudeanteil_prozent).toFixed(2));
         z.unter = 'nach Jacoby · Liegenschaftszins ' + String(j.lzs_pct).replace('.', ',') + ' % (Stufe ' + (j.lzs_stufe || '?') + ')'
-          + ' · RND ' + j.rnd_jahre + ' J.' + (j.ausschuss ? ' · ' + j.ausschuss : '');
+          + ' · RND ' + j.rnd_jahre + ' J.';
+        /* v3054 · der Quellenvermerk des Ausschusses ist ein ganzer Absatz - in der Zeile nur als Tooltip */
+        if (j.ausschuss) z.quelle = 'Liegenschaftszins: ' + j.ausschuss;
         z.jacoby = j;
         var inv = (ein && ein.phase1_inputs && ein.phase1_inputs.investition) || (ein && ein.investition) || {};
         var p2 = r.phase2_inventar || {}, p3 = r.phase3_prognose_ak || {};
@@ -854,7 +856,7 @@
           ? '<button type="button" data-tafel="' + z.id + '" style="min-height:40px;padding:8px 12px;border-radius:10px;border:none;background:var(--wl-c9a84c, #C9A84C);color:#050505;font:700 13px Inter,sans-serif;cursor:pointer">Gewählt</button>'
           : '<button type="button" data-tafel="' + z.id + '" style="min-height:40px;padding:8px 12px;border-radius:10px;border:1px solid #CFC9BC;background:#FFFFFF;color:#2A2727;font:600 13px Inter,sans-serif;cursor:pointer">Übernehmen</button>');
       var name = '<div><div style="font:600 14px/1.3 Inter,sans-serif;color:#1a1814">' + esc(z.name) + '</div>'
-        + '<div style="font-size:11.5px;line-height:1.4;color:#6B6356;margin-top:2px">' + esc(z.unter) + '</div></div>';
+        + '<div style="font-size:11.5px;line-height:1.4;color:#6B6356;margin-top:2px"' + (z.quelle ? ' title="' + esc(z.quelle) + '"' : '') + '>' + esc(z.unter) + '</div></div>';
       if (z.fehlt) {
         return '<div style="' + stil + '">' + name
           + '<div style="grid-column:span ' + (mitSteuer ? 5 : 3) + ';font-size:12px;color:#6B6356;line-height:1.45;padding-right:14px">' + esc(z.fehlt) + '</div>'
