@@ -43941,3 +43941,31 @@ ist gleich zum Original.
 - Umsetzung N84.4 und N85 nach den Entwürfen (oben).
 - Optimierung: Objekt öffnen lädt Verlauf ×8 und Objektliste ×6 (43 Anfragen, Musterstraße 12).
 - RND-Anfrage-Mail mit Kerndaten-Tabelle und JSON-Anhang: Marcel testet selbst.
+
+### v3049 · v3049a — Marktbericht-Import füllt die fehlenden KPIs des Investor Deal Score (30.10.2026)
+
+**Was.** Marcel: „wenn ich aus den Testunterlagen die PDF reinlade, wird der Investor Deal Score nur 13 Felder
+ausgefüllt … alle 24 KPI?" Gemessen am Code: elf KPIs hatten in keinem Dokument-Import ein Zielfeld. Marcel:
+„für mich wäre das ein Marktbericht … den können wir aber schon" — richtig: der Marktbericht-Import
+(`extractMarketData` → `mergeMarket`, Datei heißt „…Markt…") bedient neun davon. Es fehlten Bausubstanz und
+Mietausfallrisiko; dazu kam beim echten Lauf ein alter Fehler heraus: **`marktmiete_qm` stand seit V356 in der
+Auswertung, aber nie im Prompt des Marktberichts** — die Marktmiete eines Marktberichts kam nie an (damit fehlten
+Ist-/Marktmiete, Mietsteigerung, Faktor vs. Markt).
+- `openaiService.extractMarketData`: Marktmiete im Prompt; neu `gebaeudezustand` (→ `ds2_zustand`) und
+  `leerstandsquote_pct` (→ `ds2_mietausfall`), beide nur, wenn der Bericht sie nennt; Vermarktungsdauer = Tage am Markt.
+- `object-actions.js` `mergeMarket`: beide in leere Felder, Leerstand-Stufen wie `lage_stufen.js`
+  (<1,5 / <3 / <6 / <9 %) mit Herleitung, Klartext aus der Option (`_optWort`). Buster v3049.
+- Test-PDF `10 Marktbericht Lindenallee 14.pdf` (`Dateien/Testunterlagen/Lindenallee 14/` und
+  `frontend/messe-dateien/lindenallee-14/10-marktbericht-lindenallee-14.pdf`), fiktives Büro, als Testunterlage
+  gekennzeichnet; HTML-Quelle im Scratchpad, gedruckt mit Chrome headless.
+
+**Commits.** 37bd0368, 665df67e (Frontend-Konstanten), 17d449b7 (Prompt Marktmiete).
+
+**Nachweis.** Staging, Backend neu gebaut, echter `extractMarketData`-Lauf (gpt-4.1) am pdftotext des Test-PDFs:
+marktmiete_qm 8.25, makrolage durchschnittlich, mikrolage gut, bevoelkerung stabil, nachfrage stark,
+wertsteigerung mittel, entwicklung mehrere, gebaeudezustand normal, leerstandsquote 2.8, Qualität Normal/Normal/
+Normal/Standard, Tage 58. Buster-Prüfer SAUBER, alle Prüfer in deploy-staging grün.
+
+**Rest.** Browser-Abnahme offen (Chrome-Erweiterung war nicht verbunden): Lindenallee-Unterlagen 01–10 in ein neues
+Objekt laden, „Ausgewählte übernehmen", KPI-Vollständigkeit muss 24/24 zeigen (Zins/Tilgung sind vorbelegt). Prod
+noch nicht ausgerollt.
