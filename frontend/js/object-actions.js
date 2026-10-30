@@ -2568,19 +2568,32 @@
     var files = Array.prototype.slice.call(fileList).filter(function (f) { return /\.pdf$/i.test(f.name) && f.size <= 100 * 1024 * 1024; });
     if (!files.length) { toast('Bitte gültige PDF-Dateien (max 100 MB) wählen.'); return; }
     var filesHost = $('oabi-files');
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
+    /* v3052 · Marcel 30.10.2026: „schneller auswerten bei bleibender Qualität". Bis v3051 lief jede
+       Datei erst ganz durch (Text, dann KI), bevor die nächste begann - zehn Unterlagen mit je
+       7-17 s Auslesung warteten aufeinander. Jetzt DREI Dateien gleichzeitig: dieselben Prompts,
+       dasselbe Modell, dieselbe Zahl der Abrufe (die Bremse zählt Abrufe je Stunde, nicht
+       gleichzeitige). Die Zeilen werden vorab in Upload-Reihenfolge angelegt, die Liste bleibt so. */
+    var neu = files.map(function (file) {
       var row = document.createElement('div'); row.className = 'oabi-file'; filesHost.appendChild(row);
       var f = { name: file.name, file: file, text: '', type: 'expose', userType: null, cache: {}, status: 'reading', row: row };
       _files.push(f); renderFileRow(f);
+      return f;
+    });
+    async function eineDatei(f) {
+      var file = f.file;
       try {
         f.text = await extractTextFull(file, function (m) { setStatus(f, m); });
         if (file._dpScan) f._scan = file._dpScan;
-        if (file._dpPersoenlich) { f.status = 'gesperrt'; f.type = 'dokument'; renderFileRow(f); continue; }   /* v3016 */
-        if (!f.text || f.text.replace(/\s/g, '').length < 50) { f.status = 'err'; renderFileRow(f); continue; }
+        if (file._dpPersoenlich) { f.status = 'gesperrt'; f.type = 'dokument'; renderFileRow(f); return; }   /* v3016 */
+        if (!f.text || f.text.replace(/\s/g, '').length < 50) { f.status = 'err'; renderFileRow(f); return; }
         await resolveType(f);
       } catch (e) { f.status = 'err'; renderFileRow(f); }
     }
+    var naechste = 0;
+    async function arbeiter() { while (naechste < neu.length) { await eineDatei(neu[naechste++]); } }
+    var GLEICHZEITIG = 3, laeufer = [];
+    for (var w = 0; w < Math.min(GLEICHZEITIG, neu.length); w++) laeufer.push(arbeiter());
+    await Promise.all(laeufer);
     recompute(); renderMergedTable();
     _unterlagenAuswerten();   /* v3016: Risiken, These, WEG aus allen Unterlagen */
     _extractImportPhotos();  /* v402: Exposé-Bilder asynchron nachladen */
