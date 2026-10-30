@@ -43969,3 +43969,33 @@ Normal/Standard, Tage 58. Buster-Prüfer SAUBER, alle Prüfer in deploy-staging 
 **Rest.** Browser-Abnahme offen (Chrome-Erweiterung war nicht verbunden): Lindenallee-Unterlagen 01–10 in ein neues
 Objekt laden, „Ausgewählte übernehmen", KPI-Vollständigkeit muss 24/24 zeigen (Zins/Tilgung sind vorbelegt). Prod
 noch nicht ausgerollt.
+
+### v3050 · v3051 · v3052 — Entwürfe N84.4 und N85 umgesetzt, Import parallel (30.10.2026)
+
+**Was.**
+- **v3050 (N84.4)** `frontend/marktbericht-app/app.js` `_renderWertverfahren()` neu: je Wert eine Karte (große Zahl,
+  EINE Herkunftszeile, Rechenweg in `<details>`), „Führend: …" als Pille, Gegenprobe Kauffälle als eigene Karte,
+  Bodenwert und Miete im Ertragswert als kleine Karten, nicht maßgeblicher Sachwert u. ä. als eine Zeile, Fußzeile
+  § 194 BauGB. Nur Web-Ansicht, PDF (jsPDF) unverändert, Rechnung unverändert. Quellennachweis bleibt OFFEN
+  (dl-de/by verlangt sichtbare Namensnennung). Titel bleibt „Marktpreisindikation" (Entwurf: „Marktwert") — v1971/v2380.
+- **v3051 (N85)** `bmf-bodenabschlag.js`: Tafel „Welche Aufteilung soll gelten?" in Schritt 4 — Amtlich · −15 % ·
+  −20 % · −25 % · Jacoby; Gebäudeanteil aus `phase5_varianten`/`phase4_bmf.jacoby`, AfA = Gebäude-AK × `#afa_satz`,
+  Steuer = AfA × 40,45 % (Vorgabe `grenzsteuersatz`), 10 Jahre nur bei linearer AfA. Je Zeile „Übernehmen" (Varianten
+  über `_v292Apply`, Jacoby schreibt `#geb_ant` + Klausel). AfA-Satz wird NICHT überschrieben (`afa-eigen.js`:
+  eigener Satz nie per Automatik). Jacoby-Herleitung geprüft: Am Markt 18 grün, 300.000/90.000/2,5 %/40 J → 75,9992 %.
+  Ohne amtlichen Zins (A/B) Grund statt Zahl. `bmf-modal-v292.js` unverändert.
+- **v3052** Import (`handleFiles`): drei Unterlagen gleichzeitig statt nacheinander, dieselben Prompts und Abrufe.
+
+**Commits.** d112a73b (v3050), e9d32c22 (v3051), ef0d1746 (v3052). Beide Entwürfe von Agenten in Arbeitskopien
+gebaut (Basis war main 97eda6d9, Dateien dort gleich staging → per cherry-pick übernommen).
+
+**Nachweis.** Renderlauf `_renderWertverfahren` in Node mit Mitschnitten (Bericht 371, Westerfeld Stufe 2/3) und fünf
+synthetischen Fällen, Wortvergleich alt/neu ohne Inhaltsverlust. BMF: Prüfskript mit echter `runPipeline`,
+AfA 4.557/4.850/4.948/5.045 € = heutige Anzeige, ALLES GRÜN. Import: Warteschlange simuliert (10 Dateien, max. 3
+gleichzeitig, 438 statt 1.170 ms). Buster SAUBER, deploy-staging grün.
+
+**Rest.** Browser-Abnahme aller drei (Chrome-Erweiterung nicht verbunden); Testberichte neu abrufen (Marcel 30.10.).
+Offen zur Entscheidung: Marktwert- vs. Marktpreisindikation-Titel; Grenzsteuersatz der Tafel (Vorgabe 40,45 % oder
+persönlicher `#grenz`); Jacoby-RND aus Anlage 2 statt RND-Assistent; Schritt 5 und PDF der Kaufpreisaufteilung
+kennen Jacoby noch nicht; Messe-Drehbücher greifen auf `.wv-*` (Bodenwert steht jetzt unten) — Storybook prüfen.
+Prod: v3049–v3052 noch nicht ausgerollt (erst nach Browser-Abnahme).

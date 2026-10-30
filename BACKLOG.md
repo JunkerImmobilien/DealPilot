@@ -45,7 +45,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 5. ✅ v3048 (Prod 1.0.11) nur mit angelegtem Zielbild — **Zielanzeige im Kopf** („Ziel x %“, `jahresstaende.js kopfRing()`): erscheint, sobald EIN Hebel rechenbar ist — bei finanzierten Objekten meist nur die Entschuldung bis Ende Zinsbindung (Hölderlinstr.: „Ziel 3 % aus 1 Hebel“), auch ohne Zielbild. Entscheidung Marcel: nur mit definiertem Zielbild zeigen?
 6. **N84.9 Hölderlinstr.:** `svw_herkunft = bank` setzen — direkter DB-Schreibzugriff auf Prod im Auto-Modus gesperrt; Marcel setzt es in der App (Objekt › Wert › Herkunft) oder gibt die Regel frei.
 
-### N85 · BMF-Rechner (Reiterfolge ✅ v3047; Entwurf abgenommen 29.10., Dateien/Entwuerfe-2026-10-29/N85-…) : Optimierungen und umgekehrte Ertragswertmethode vergleichen und übernehmen (29.10.2026)
+### N85 · ✅ v3051 Tafel (30.10.2026, Browser-Abnahme offen) · BMF-Rechner (Reiterfolge ✅ v3047; Entwurf abgenommen 29.10., Dateien/Entwuerfe-2026-10-29/N85-…) : Optimierungen und umgekehrte Ertragswertmethode vergleichen und übernehmen (29.10.2026)
 
 Marcel: „im BMF-Rechner machen wir die 4 Optimierungen und die umgekehrte Ertragswertmethode nach Jacoby – da muss besser hervorgehen, dass man beides vergleicht, auch die optimierten Varianten, und dann entweder oder übernimmt. Das muss einfach dargestellt werden.“ Optik → erst Demo zeigen: eine Vergleichstafel (amtlich · konservativ 15 % · optimiert 20 % · aggressiv 25 % · Jacoby) mit Gebäudeanteil, AfA/Jahr, Steuerwirkung, Begründungspflicht; je Zeile EIN Knopf „übernehmen“, der in den Reiter Steuer schreibt. Dateien: `js/bmf-bodenabschlag.js`, `js/bmf-modal.js`; `js/bmf-modal-v292.js` steht unter „Nicht anfassen“ (nicht löschen) – nur mit Rückfrage ändern.
 
