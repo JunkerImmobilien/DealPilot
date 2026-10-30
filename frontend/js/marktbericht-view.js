@@ -102,7 +102,7 @@
        WER AM CSS IN marktbericht-app/index.html ETWAS AENDERT, ZIEHT
        DIESE ZAHL HOCH. Der app.js-Buster INNERHALB der Seite reicht
        nicht - er wird ja erst gelesen, wenn die Seite neu geholt wird. */
-    return '/marktbericht-app/index.html?v=3037&theme=' + mbTheme() + (query ? '&' + query : '');
+    return '/marktbericht-app/index.html?v=3050&theme=' + mbTheme() + (query ? '&' + query : '');
   }
 
   // iframe waechst auf Content-Hoehe -> kein innerer Scrollbalken, Seite scrollt
