@@ -662,3 +662,333 @@
   });
 
 })();
+
+/* ════════════════════════════════════════════════════════════════════
+   v3051 · N85 · WELCHE AUFTEILUNG SOLL GELTEN? — EINE VERGLEICHSTAFEL
+   ════════════════════════════════════════════════════════════════════
+   Marcel 29.10.2026: „im BMF-Rechner machen wir die 4 Optimierungen und
+   die umgekehrte Ertragswertmethode nach Jacoby – da muss besser
+   hervorgehen, dass man beides vergleicht, auch die optimierten Varianten,
+   und dann entweder oder übernimmt. Das muss einfach dargestellt werden."
+   Entwurf abgenommen am 29.10.2026 (Dateien/Entwuerfe-2026-10-29/
+   N85-BMF-Varianten-vergleichen.dc.html): fünf Zeilen, je Zeile EIN Knopf.
+
+   GERECHNET WIRD HIER NICHTS NEUES — jede Zahl kommt aus einer Rechnung,
+   die es schon gibt:
+     Gebäudeanteil   Pipeline phase5_varianten (amtlich/15/20/25 %),
+                     Jacoby aus phase4_bmf.jacoby (jacobyService.js, am
+                     Gutachten Am Markt 18 auf den Cent geprüft)
+     Gebäude-AK      Pipeline phase8_finale_ak; für Jacoby derselbe Kern
+                     DealKpis.gebaeudeAhk mit denselben Eingaben wie die
+                     Pipeline (_ahkKern) — mit Gegenprobe an „amtlich":
+                     weicht der Kern dort um mehr als 1 € von phase8 ab,
+                     steht bei Jacoby keine AfA statt einer falschen.
+     AfA-Satz        der Satz im Reiter Steuer (#afa_satz, auch ein eigener
+                     Satz aus der Restnutzungsdauer) — genau der, mit dem
+                     der Reiter nach dem Übernehmen rechnet. Er wird beim
+                     Übernehmen NICHT überschrieben (bmf-modal.js
+                     _applyBmfToAfaConfig, afa-eigen.js: „ein eigener Satz
+                     wird nie von einer Automatik überschrieben").
+     Grenzsteuersatz die Vorbelegung des Rechners, 40,45 %
+                     (DealPilotConfig.investmentProfileDefaults, dieselbe
+                     Zahl wie GRENZSTEUER_DEFAULT der Pipeline). Fehlt sie,
+                     fallen die Steuer-Spalten weg — kein erfundener Satz.
+
+   Die alten Karten (#varGrid) bleiben im DOM und werden weiter von
+   bmf-modal-v292.js gezeichnet (Nicht anfassen) — sie sind nur verdeckt,
+   die Tafel steht an ihrer Stelle. Übernommen wird für die vier
+   Pipeline-Varianten über window._v292Apply (derselbe Weg wie der Knopf
+   unten), für Jacoby über dasselbe Feld #geb_ant.
+   ════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var VARIANTEN = [
+    { id: 'amtlich',     name: 'Amtlich (BMF-Arbeitshilfe)', kurz: 'Amtlich',     unter: 'Arbeitshilfe des BMF, Stand Juni 2023', nachweis: 'keiner nötig' },
+    { id: 'konservativ', name: 'Konservativ',  kurz: 'Konservativ', unter: '15 % Abschlag auf den Bodenwert', nachweis: 'kurze Begründung' },
+    { id: 'optimiert',   name: 'Optimiert',    kurz: 'Optimiert',   unter: '20 % Abschlag auf den Bodenwert', nachweis: 'Begründung + Belege' },
+    { id: 'aggressiv',   name: 'Aggressiv',    kurz: 'Aggressiv',   unter: '25 % Abschlag auf den Bodenwert', nachweis: 'Gutachten empfohlen' },
+    { id: 'jacoby',      name: 'Umgekehrte Ertragswertmethode', kurz: 'Jacoby', unter: 'nach Jacoby, aus dem Ertragswert', nachweis: 'Herleitung + Gutachten' }
+  ];
+
+  function el(id) { return document.getElementById(id); }
+  function eur(v) {
+    if (v == null || !isFinite(v)) return '—';
+    return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Math.round(v)) + ' €';
+  }
+  function pct(v, d) {
+    if (v == null || !isFinite(v)) return '—';
+    d = d == null ? 1 : d;
+    return Number(v).toFixed(d).replace('.', ',') + ' %';
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  /* ── Die Daten der Tafel — reine Funktion, damit sie ohne Browser prüfbar ist ──
+     r       Pipeline-Antwort (window._v292State.response)
+     ein     Pipeline-Eingaben (window._v292State.lastInputs)
+     o.afa   { methode, satzPct } aus Afa.parseSelectValue(#afa_satz)
+     o.grenzPct  Grenzsteuersatz in % oder null
+     o.gebaeudeAhk  DealKpis.gebaeudeAhk */
+  function daten(r, ein, o) {
+    o = o || {};
+    if (!r || !r.ok || !r.phase5_varianten) return null;
+    var p5 = r.phase5_varianten, p8 = r.phase8_finale_ak || {};
+    var afa = o.afa || { methode: 'linear', satzPct: 2 };
+    var satz = Number(afa.satzPct) || 0;
+    var linear = afa.methode === 'linear';
+    var grenz = (o.grenzPct > 0 && o.grenzPct < 100) ? o.grenzPct : null;
+
+    function werte(gebAk) {
+      if (gebAk == null || !isFinite(gebAk)) return { afa: null, steuer: null, zehn: null };
+      var a = gebAk * satz / 100;
+      var s = grenz != null ? a * grenz / 100 : null;
+      /* Degressiv sinkt der Betrag jedes Jahr - zehnmal das erste Jahr waere falsch. */
+      return { afa: a, steuer: s, zehn: (s != null && linear) ? s * 10 : null };
+    }
+
+    var zeilen = VARIANTEN.map(function (v) {
+      var z = { id: v.id, name: v.name, kurz: v.kurz, unter: v.unter, nachweis: v.nachweis };
+      if (v.id !== 'jacoby') {
+        var pv = p5[v.id];
+        if (!pv) { z.fehlt = 'nicht gerechnet'; return z; }
+        z.geb = pv.gebaeude_pct;
+        z.gebAk = p8[v.id] ? p8[v.id].gebaeude_ak : null;
+        if (v.id === 'amtlich' && r.phase4_bmf && r.phase4_bmf.verfahren) {
+          z.unter = 'Arbeitshilfe des BMF, Stand Juni 2023 · ' + ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[r.phase4_bmf.verfahren] || r.phase4_bmf.verfahren);
+        }
+      } else {
+        var j = r.phase4_bmf && r.phase4_bmf.jacoby;
+        if (!j || !j.verfuegbar) {
+          z.fehlt = 'nicht gerechnet — ' + ((j && (j.grund || j.hinweis)) || 'keine Angaben aus dem Marktbericht-Dienst');
+          return z;
+        }
+        /* dieselbe Rundung wie phase5 (zwei Stellen) - so steht im Reiter Steuer, was hier steht */
+        z.geb = Number(Number(j.gebaeudeanteil_prozent).toFixed(2));
+        z.unter = 'nach Jacoby · Liegenschaftszins ' + String(j.lzs_pct).replace('.', ',') + ' % (Stufe ' + (j.lzs_stufe || '?') + ')'
+          + ' · RND ' + j.rnd_jahre + ' J.' + (j.ausschuss ? ' · ' + j.ausschuss : '');
+        z.jacoby = j;
+        var inv = (ein && ein.phase1_inputs && ein.phase1_inputs.investition) || (ein && ein.investition) || {};
+        var p2 = r.phase2_inventar || {}, p3 = r.phase3_prognose_ak || {};
+        if (typeof o.gebaeudeAhk === 'function' && p3.nk_aufschluesselung) {
+          var kern = function (g) {
+            return o.gebaeudeAhk({ kp: Number(inv.kp_brutto) || 0, nk: p3.nk_gesamt, nkNurImmo: p3.nk_aufschluesselung.grest,
+              nkAbzug: Number(inv.gs_kosten_ak) || 0, gebAntPct: g, inventar: p2.inventar_gesamt }).gebAhk;
+          };
+          /* Gegenprobe: derselbe Kern muss an „amtlich" die Zahl der Pipeline treffen. */
+          var probe = (p5.amtlich && p8.amtlich) ? Math.abs(kern(p5.amtlich.gebaeude_pct) - p8.amtlich.gebaeude_ak) : Infinity;
+          if (probe <= 1) z.gebAk = kern(z.geb);
+          else z.akHinweis = 'Gebäude-AK nicht gegengeprüft';
+        }
+      }
+      if (!(z.geb > 0 && z.geb < 100)) { z.fehlt = 'Gebäudeanteil ' + pct(z.geb, 1) + ' nicht plausibel'; return z; }
+      var w = werte(z.gebAk);
+      z.afa = w.afa; z.steuer = w.steuer; z.zehn = w.zehn;
+      return z;
+    });
+    return { zeilen: zeilen, satz: satz, linear: linear, methode: afa.methode, grenz: grenz };
+  }
+
+  /* ── Woher die Eingaben kommen ── */
+  function afaAusReiter() {
+    var s = el('afa_satz'), v = s ? s.value : '2.0';
+    if (window.Afa && typeof window.Afa.parseSelectValue === 'function') return window.Afa.parseSelectValue(v);
+    var n = parseFloat(String(v || '').replace(',', '.'));
+    return { methode: 'linear', satzPct: isFinite(n) && n > 0 ? n : 2 };
+  }
+  function grenzVorbelegung() {
+    var D = window.DealPilotConfig && window.DealPilotConfig.investmentProfileDefaults;
+    var g = D ? Number(D.grenzsteuersatz) : NaN;
+    return isFinite(g) && g > 0 ? g : null;
+  }
+
+  function wahlJetzt() {
+    var st = window._v292State || {};
+    return window._dpBmfTafelWahl || st.selectedVariant || 'amtlich';
+  }
+
+  /* ── Zeichnen ── */
+  function zeichnen() {
+    var pane = el('p-hebel'); if (!pane) return;
+    var st = window._v292State || {};
+    var D = daten(st.response, st.lastInputs, {
+      afa: afaAusReiter(), grenzPct: grenzVorbelegung(),
+      gebaeudeAhk: window.DealKpis && window.DealKpis.gebaeudeAhk
+    });
+    var host = el('bmf-wahl-tafel');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'bmf-wahl-tafel';
+      pane.insertBefore(host, pane.firstChild);
+    }
+    if (!D) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    host.style.display = '';
+    /* die alten Karten verdecken, nicht entfernen - bmf-modal-v292.js zeichnet weiter hinein */
+    var grid = el('varGrid'); if (grid) grid.style.display = 'none';
+
+    /* Jacoby nicht verfuegbar: die Wahl faellt auf die Pipeline-Variante zurueck */
+    var wahl = wahlJetzt();
+    var gew = D.zeilen.filter(function (z) { return z.id === wahl && !z.fehlt; })[0];
+    if (!gew) { wahl = st.selectedVariant || 'amtlich'; gew = D.zeilen.filter(function (z) { return z.id === wahl; })[0]; }
+
+    var mitSteuer = D.grenz != null;
+    var spalten = mitSteuer ? '2.3fr 0.9fr 1fr 1fr 1.05fr 1.4fr 1.15fr' : '2.3fr 0.9fr 1fr 1.4fr 1.15fr';
+    var kopfZelle = 'font:600 10.5px/1.3 \'JetBrains Mono\',monospace;letter-spacing:.06em;text-transform:uppercase;color:#6B6356';
+    var rechts = 'text-align:right;padding-right:14px';
+    var kopf =
+      '<div style="display:grid;grid-template-columns:' + spalten + ';align-items:end;padding:10px 18px;background:#F7F5F0;border-bottom:1px solid #E6E0D3">' +
+        '<div style="' + kopfZelle + '">Variante</div>' +
+        '<div style="' + kopfZelle + ';' + rechts + '">Gebäude</div>' +
+        '<div style="' + kopfZelle + ';' + rechts + '">AfA / Jahr</div>' +
+        (mitSteuer ? '<div style="' + kopfZelle + ';' + rechts + '">Steuer / Jahr</div><div style="' + kopfZelle + ';' + rechts + '">10 Jahre</div>' : '') +
+        '<div style="' + kopfZelle + '">Nachweis</div><div></div>' +
+      '</div>';
+
+    var zeilen = D.zeilen.map(function (z, i) {
+      var an = z.id === wahl;
+      var stil = 'display:grid;grid-template-columns:' + spalten + ';align-items:center;padding:13px 18px;'
+        + (i ? 'border-top:1px solid #EEEAE1;' : '')
+        + (an ? 'background:#FBF6E9;box-shadow:inset 4px 0 0 var(--wl-c9a84c, #C9A84C);' : 'background:#FFFFFF;');
+      var knopf = z.fehlt
+        ? '<button type="button" disabled style="min-height:40px;padding:8px 12px;border-radius:10px;border:1px solid #E6E0D3;background:#F7F5F0;color:#8A8272;font:600 13px Inter,sans-serif;cursor:not-allowed">Nicht verfügbar</button>'
+        : (an
+          ? '<button type="button" data-tafel="' + z.id + '" style="min-height:40px;padding:8px 12px;border-radius:10px;border:none;background:var(--wl-c9a84c, #C9A84C);color:#050505;font:700 13px Inter,sans-serif;cursor:pointer">Gewählt</button>'
+          : '<button type="button" data-tafel="' + z.id + '" style="min-height:40px;padding:8px 12px;border-radius:10px;border:1px solid #CFC9BC;background:#FFFFFF;color:#2A2727;font:600 13px Inter,sans-serif;cursor:pointer">Übernehmen</button>');
+      var name = '<div><div style="font:600 14px/1.3 Inter,sans-serif;color:#1a1814">' + esc(z.name) + '</div>'
+        + '<div style="font-size:11.5px;line-height:1.4;color:#6B6356;margin-top:2px">' + esc(z.unter) + '</div></div>';
+      if (z.fehlt) {
+        return '<div style="' + stil + '">' + name
+          + '<div style="grid-column:span ' + (mitSteuer ? 5 : 3) + ';font-size:12px;color:#6B6356;line-height:1.45;padding-right:14px">' + esc(z.fehlt) + '</div>'
+          + '<div>' + knopf + '</div></div>';
+      }
+      var zahl = 'font:600 14px Inter,sans-serif;color:#1a1814;font-variant-numeric:tabular-nums;' + rechts;
+      return '<div style="' + stil + '">' + name
+        + '<div style="' + zahl + '">' + pct(z.geb, 1) + '</div>'
+        + '<div style="' + zahl + '"' + (z.akHinweis ? ' title="' + esc(z.akHinweis) + '"' : '') + '>' + eur(z.afa) + '</div>'
+        + (mitSteuer ? '<div style="' + zahl + '">' + eur(z.steuer) + '</div><div style="' + zahl + '">' + eur(z.zehn) + '</div>' : '')
+        + '<div style="font-size:12.5px;color:#3a352b">' + esc(z.nachweis) + '</div>'
+        + '<div>' + knopf + '</div></div>';
+    }).join('');
+
+    var satzTxt = pct(D.satz, 2) + (D.linear ? ' linear' : ' degressiv');
+    var steuerZeile = gew && !gew.fehlt
+      ? 'Gebäudeanteil ' + pct(gew.geb, 1) + ' · AfA ' + eur(gew.afa) + ' je Jahr · Nachweis: ' + gew.nachweis
+      : '';
+    var imReiter = el('geb_ant') ? String(el('geb_ant').value || '').trim() : '';
+
+    host.innerHTML =
+      '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">BMF-Rechner · Schritt 4 von 5</div>' +
+      '<h3 style="margin:0 0 6px;font:600 20px/1.3 \'Space Grotesk\',sans-serif;color:#1a1814">Welche Aufteilung soll gelten?</h3>' +
+      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Fünf Wege nebeneinander: die amtliche Arbeitshilfe, drei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode. Eine Variante wählen und übernehmen — sie geht in den Reiter Steuer.</p>' +
+      '<div style="border:1px solid #E6E0D3;border-radius:12px;overflow:hidden;background:#FFFFFF">' +
+        '<div style="overflow-x:auto"><div style="min-width:' + (mitSteuer ? 760 : 600) + 'px">' + kopf + zeilen + '</div></div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px">' +
+        '<div style="padding:12px 14px;border:1px solid #E6E0D3;border-radius:10px;background:#FBF6E9">' +
+          '<div style="font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin-bottom:6px">Gewählt</div>' +
+          '<div style="font:600 15px/1.35 Inter,sans-serif;color:#1a1814">' + esc(gew ? gew.name : '—') + '</div>' +
+          '<div style="font-size:12.5px;color:#3a352b;margin-top:3px">' + esc(steuerZeile) + '</div>' +
+          (imReiter ? '<div style="font-size:11.5px;color:#6B6356;margin-top:5px">Im Reiter Steuer steht heute: ' + esc(imReiter) + ' % Gebäudeanteil</div>' : '') +
+        '</div>' +
+        '<div style="padding:12px 14px;border:1px solid #E6E0D3;border-radius:10px;background:#FFFFFF">' +
+          '<div style="font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin-bottom:6px">Was beim Übernehmen passiert</div>' +
+          '<div style="font-size:12.5px;line-height:1.55;color:#3a352b">Der Gebäudeanteil geht in den Reiter Steuer, die Begründung in den Vertragstext. Gerechnet wird dort mit dem eingestellten AfA-Satz (' + esc(satzTxt) + ') — er bleibt, wie er ist; ein eigener Satz aus der Restnutzungsdauer bleibt verknüpft.</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:10px;font-size:11.5px;line-height:1.55;color:#6B6356">AfA auf die Gebäude-Anschaffungskosten einschließlich der anteiligen Nebenkosten, volles Jahr' +
+        (mitSteuer ? '; Steuerwirkung bei ' + pct(D.grenz, 2) + ' Grenzsteuersatz (Vorbelegung des Rechners, ohne Solidaritätszuschlag und Kirchensteuer)' : '') +
+        (D.linear ? '' : '; degressiv sinkt der Betrag jedes Jahr, deshalb keine 10-Jahres-Summe') +
+        '. Abweichungen von der Arbeitshilfe brauchen eine Begründung; das Finanzamt kann sie verwerfen (BFH, Urteil vom 21.07.2020, IX R 26/19). Die umgekehrte Ertragswertmethode ist zulässig (BFH, Urteil vom 20.09.2022, IX R 12/21), ihre Wahl muss aber ebenso sachlich begründet werden.</div>';
+
+    [].forEach.call(host.querySelectorAll('[data-tafel]'), function (b) {
+      b.addEventListener('click', function () { uebernehmen(b.getAttribute('data-tafel')); });
+    });
+  }
+
+  /* ── Übernehmen ──
+     Die vier Pipeline-Varianten gehen über window._v292Apply - denselben Weg
+     wie der Knopf unten im Fenster (Feld, Kennzeichen, Rücksetzknopf, calc).
+     Nur das Schliessen des Fensters wird hier ausgelassen: wer in der Tafel
+     wählt, soll sehen, was gewählt ist, und kann zu Schritt 5 weiter. */
+  function uebernehmen(id) {
+    var st = window._v292State;
+    if (!st || !st.response || !st.response.ok) return;
+    if (id === 'jacoby') {
+      window._dpBmfTafelWahl = 'jacoby';
+      if (!jacobySchreiben()) { window._dpBmfTafelWahl = null; }
+      try { if (typeof window.selectKlausel === 'function') window.selectKlausel('jacoby'); } catch (e) {}
+      zeichnen();
+      return;
+    }
+    if (typeof window._v292SelectVariant === 'function') window._v292SelectVariant(id);
+    if (typeof window._v292Apply === 'function') {
+      var zu = window.closeBMFModal;
+      window.closeBMFModal = function () {};
+      try { window._v292Apply(); } finally { window.closeBMFModal = zu; }
+    }
+    zeichnen();
+  }
+
+  function jacobySchreiben() {
+    var st = window._v292State;
+    var j = st && st.response && st.response.phase4_bmf && st.response.phase4_bmf.jacoby;
+    var p = j && j.verfuegbar ? Number(Number(j.gebaeudeanteil_prozent).toFixed(2)) : null;
+    function toast(t) { try { if (typeof window.toast === 'function') window.toast(t); } catch (e) {} }
+    if (!(p > 0 && p < 100)) { toast('⚠ Nicht übernommen: kein plausibler Gebäudeanteil nach Jacoby.'); return false; }
+    var g = el('geb_ant');
+    if (!g) { toast('Reiter Steuer nicht gefunden.'); return false; }
+    g.value = p.toFixed(2).replace('.', ',');
+    g.classList.add('from-bmf-v292');
+    g.style.background = 'var(--gold-bg, #FFF7E0)';
+    g.style.borderColor = 'var(--wl-c9a84c, #C9A84C)';
+    g.title = 'Aus dem BMF-Rechner übernommen · umgekehrte Ertragswertmethode nach Jacoby · ' + new Date().toLocaleString('de-DE');
+    g.dispatchEvent(new Event('input', { bubbles: true }));
+    var label = g.closest('.f') && g.closest('.f').querySelector('label');
+    if (label) {
+      var badge = label.querySelector('.v292-bmf-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'v292-bmf-badge';
+        badge.style.cssText = 'margin-left:6px;padding:2px 6px;background:var(--wl-c9a84c, #C9A84C);color:#fff;border-radius:3px;font-size:10px;font-weight:600;letter-spacing:.05em';
+        label.appendChild(badge);
+      }
+      badge.title = 'Aus dem BMF-Rechner übernommen';
+      badge.textContent = '🤖 BMF · Jacoby';
+    }
+    if (typeof window.calc === 'function') { try { window.calc(); } catch (e) {} }
+    toast('✓ Umgekehrte Ertragswertmethode übernommen — Gebäudeanteil ' + pct(p, 2) + ' im Reiter Steuer');
+    return true;
+  }
+
+  /* ── Einhängen: nach jedem Zeichnen der v292-Schicht, und beim Knopf unten ── */
+  var n = 0;
+  (function wickeln() {
+    if (typeof window._v292RenderAll !== 'function' || typeof window._v292SelectVariant !== 'function') {
+      if (++n < 120) setTimeout(wickeln, 500);
+      return;
+    }
+    if (!window._v292RenderAll._dpTafel) {
+      var alt = window._v292RenderAll;
+      var neu = function () { var r = alt.apply(this, arguments); try { zeichnen(); } catch (e) { console.warn('[v3051] Tafel:', e.message); } return r; };
+      neu._dpTafel = true; window._v292RenderAll = neu;
+    }
+    if (!window._v292SelectVariant._dpTafel) {
+      var altS = window._v292SelectVariant;
+      /* eine Wahl der vier (auch über die Klausel-Knöpfe) beendet die Jacoby-Wahl */
+      var neuS = function (name) { if (['amtlich', 'konservativ', 'optimiert', 'aggressiv'].indexOf(name) >= 0) window._dpBmfTafelWahl = name; return altS.apply(this, arguments); };
+      neuS._dpTafel = true; window._v292SelectVariant = neuS;
+    }
+    if (typeof window.applyToTax === 'function' && !window.applyToTax._dpTafel) {
+      var altA = window.applyToTax;
+      var neuA = function () {
+        if (window._dpBmfTafelWahl === 'jacoby') {
+          if (jacobySchreiben() && typeof window.closeBMFModal === 'function') window.closeBMFModal();
+          return;
+        }
+        return altA.apply(this, arguments);
+      };
+      neuA._dpTafel = true; window.applyToTax = neuA;
+    }
+  })();
+
+  window.DpBmfWahlTafel = { daten: daten, zeichnen: zeichnen, uebernehmen: uebernehmen, VARIANTEN: VARIANTEN };
+})();
