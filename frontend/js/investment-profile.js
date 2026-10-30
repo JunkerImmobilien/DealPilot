@@ -483,6 +483,14 @@ window.DealPilotInvestmentProfile = (function() {
       ai_risk:                s('ip_ai_risk'),
       ai_markt:               s('ip_ai_markt')
     };
+    /* v3055 · Marcel 30.10.2026: „indikativen Zins und 10 Jahre angenommen, aber er trägt einen
+       anderen Zins ein". Gemessen: Radio „Indikativer Marktzins" gewählt, gespeichert, im Profil
+       blieb zins_override 4,25 - jedes neue Objekt bekam 4,25 statt 4,23. Die Nullen wurden hier
+       entfernt und das Ergebnis dann über den ALTEN Stand gelegt (v1783): ein geleertes Feld fiel
+       nie auf die Vorgabe zurück, es behielt still seinen alten Wert. Jetzt: was das Formular
+       ZEIGT (ip_<schlüssel>) und leer ist, wird aus dem Profil entfernt. Was es nicht zeigt,
+       bleibt wie seit v1783 erhalten. */
+    var _geleert = Object.keys(p).filter(function (k) { return p[k] === null && document.getElementById('ip_' + k); });
     // Nullen rausfiltern (User hat das Feld leer gelassen → fällt auf Default zurück)
     Object.keys(p).forEach(function(k) { if (p[k] === null) delete p[k]; });
 
@@ -513,6 +521,7 @@ window.DealPilotInvestmentProfile = (function() {
     var _zusammen = {};
     Object.keys(_vorher).forEach(function (k) { _zusammen[k] = _vorher[k]; });
     Object.keys(p).forEach(function (k) { _zusammen[k] = p[k]; });
+    _geleert.forEach(function (k) { delete _zusammen[k]; });   /* v3055 */
     save(_zusammen);
     // V63.90: KI-Tab Display & hidden Inputs sofort updaten
     syncAiParamsToTab();
