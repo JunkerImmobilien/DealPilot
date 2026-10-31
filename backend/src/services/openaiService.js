@@ -2060,6 +2060,19 @@ function extractJson(text) {
     }
   }
 
+  // 5) v3058: Zahl mit führender Null — das Modell schreibt "plz": 04275
+  //    (Leipzig, Dresden, Erfurt …). Gültiges JSON kennt das nicht; die Ziffern
+  //    werden als String gerettet, damit die Null nicht verloren geht.
+  if (first >= 0) {
+    const nullen = /(:\s*)(0\d+)(\s*[,}\]\r\n])/g;
+    const geflickt = (last > first ? text.slice(first, last + 1) : text.slice(first)).replace(nullen, '$1"$2"$3');
+    try { return JSON.parse(geflickt); } catch (e) { /* fallthrough */ }
+    const recovered = _recoverTruncatedJson(geflickt);
+    if (recovered) {
+      try { return JSON.parse(recovered); } catch (e) { /* still fails */ }
+    }
+  }
+
   return null;
 }
 
@@ -3260,7 +3273,7 @@ async function extractExpose(text, opts) {
     '',
     'FELDER:',
     '  - adresse: vollständige Adresse als String (z.B. "Dresdenstraße 116, 32052 Herford")',
-    '  - plz: Postleitzahl (5 Ziffern)',
+    '  - plz: Postleitzahl als STRING mit 5 Ziffern, führende Null behalten (z.B. "04275")',
     '  - ort: Stadt/Gemeinde',
     '  - kaufpreis: Zahl in Euro, ohne Währungssymbol (z.B. 285000)',
     '  - wohnflaeche: Zahl in m² (z.B. 96.5)',
@@ -3293,7 +3306,7 @@ async function extractExpose(text, opts) {
     '  - marktmiete_monat: Marktmiete (Nettokaltmiete) pro Monat in Euro (Zahl)',
     '',  // V356-marktmiete
     'WICHTIG:',
-    '  - Zahlen IMMER als Number, NICHT als String',
+    '  - Zahlen IMMER als Number, NICHT als String — einzige Ausnahme: plz ist ein String',
     '  - Bei mehreren Mietangaben: bevorzugt Nettokaltmiete, sonst Kaltmiete',
     '  - Wenn das Objekt LEERSTEHEND verkauft wird (kein aktueller Mieter): nettokaltmiete weglassen',
     '  - Tausenderpunkte und Kommas korrekt deutsch interpretieren (3.500,50 = 3500.5)',
@@ -3317,6 +3330,8 @@ async function extractExpose(text, opts) {
   ['adresse', 'plz', 'ort', 'objektart', 'energieklasse', 'heizungsart', 'zustand', 'stellplatz'].forEach(k => {
     if (ext[k] != null && ext[k] !== '') cleaned[k] = String(ext[k]).trim();
   });
+  /* v3058: kam die PLZ als Zahl (4275), fehlt die führende Null */
+  if (cleaned.plz && /^\d{4}$/.test(cleaned.plz)) cleaned.plz = '0' + cleaned.plz;
   /* v3029-import · deutsche Schreibweise als Text richtig lesen: bis v3028 wurde "285.000" zu 285
      und "3.500,50" zu 3,5 (der Prompt verlangt Zahlen, aber nicht jede Antwort haelt sich daran). */
   const _zahlDe = (v) => {
@@ -3373,7 +3388,7 @@ async function extractMarketData(text, opts) {
     '',
     'KERNFELDER:',
     '  - adresse: vollständige Adresse als String',
-    '  - plz: 5 Ziffern',
+    '  - plz: STRING mit 5 Ziffern, führende Null behalten (z.B. "04275")',
     '  - ort: Stadt/Gemeinde',
     '  - objektart: einer von "Wohnung","Eigentumswohnung","Einfamilienhaus","Mehrfamilienhaus","Reihenhaus","Doppelhaushälfte"',
     '  - wohnflaeche: Zahl in m²',
