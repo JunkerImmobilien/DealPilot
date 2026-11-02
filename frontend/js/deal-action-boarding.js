@@ -315,6 +315,8 @@
     } else {
       chips = '<div class="dab-allset">\u2713 Alle Grundfelder vollst\u00e4ndig \u2014 startklar f\u00fcr die Bank</div>';
     }
+    /* v3073 · Detailgrad: ausgeblendete, leere Merkmale sind kein Chip, sondern eine Zeile */
+    try { if (window.DealPilotReadyCheck && DealPilotReadyCheck.vorgabeZeile) chips += DealPilotReadyCheck.vorgabeZeile(d); } catch (e) {}
     host.innerHTML =
       '<div class="dab-rowflex"><div class="dab-donut"><svg width="96" height="96" viewBox="0 0 96 96">' +
         '<circle cx="48" cy="48" r="40" fill="none" stroke="rgba(111,214,160,.15)" stroke-width="7"/>' +

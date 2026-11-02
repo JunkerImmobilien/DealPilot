@@ -34,7 +34,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v3063">
+<link rel="stylesheet" href="css/style.css?v=v3073">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -1047,8 +1047,9 @@ label.dp-required.qc-required::after {
 <div id="ank-ansicht-host"></div>
 <div class="sec active" id="s0">
   <div id="obj-action-bar"></div>
-  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><!-- v1867: Eingabetiefe mit Pillen 1/2/3 (dieselbe Wahl wie in der Pre-Flight-Karte), Stand, Haken - und darunter die Abruf-Box --><div id="oe-ziel" class="oe-ziel"><span class="oe-ziel-lbl">Eingabetiefe</span><span class="dp-pf-stufen oe-pillen" data-oe-pillen title="Einfach · Mittel · Ausgiebig"></span><span id="oe-ziel-status" class="oe-ziel-status"></span></div><label class="oe-kopf-cb"><input type="checkbox" id="oe-details-cb"> weitere Objektdetails angeben</label><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p><div id="oe-abruf-box" class="oe-abruf-box"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die gewählte Eingabetiefe ist vorgemerkt</span></div><div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span><button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div></div>
+  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte (js/detailgrad.js) = Stufe 1/2/3 des Marktberichts; derselbe Schalter steht in der Reiterleiste. Ersetzt Eingabetiefe 1/2/3 und den Haken „weitere Objektdetails". Darunter die Abruf-Box --><div id="oe-ziel" class="oe-ziel"><span class="oe-ziel-lbl">Detailgrad</span><span class="dp-dg-host" data-dp-detailgrad="objekt"></span><span id="oe-ziel-status" class="oe-ziel-status"></span></div><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p><div id="oe-abruf-box" class="oe-abruf-box"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die Stufe folgt dem Detailgrad</span></div><div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span><button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div></div>
   <input type="hidden" id="_avm_state" value="">
+  <input type="hidden" id="dp_stufe" value="">  <!-- v3073: Detailgrad JE OBJEKT (js/detailgrad.js): 1 Einsteiger · 2 Fortgeschritten · 3 Experte; leer bei einem Bestandsobjekt = Experte -->
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
   <input type="hidden" id="_dok_auswertung" value="">  <!-- v3016: Auswertung der Unterlagen (WEG, Grundbuch, Teilung), JSON - unterlagen.js -->
   <input type="hidden" id="_lage_herkunft" value="">  <!-- v2515: Herkunft je Lage-Feld (gemessen | ki | eigen), JSON -->
@@ -1174,7 +1175,7 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
-        <div class="f s2" id="oe-auto-wrap" data-oe-stufe-min="3"><label id="oe-auto-lbl">Parameter der Verkehrswertermittlung <span class="oe-q">&middot; nach ImmoWertV, nur f&uuml;r Stufe 3</span></label><div id="oe-auto" class="oe-auto"></div></div>
+        <div class="f s2" id="oe-auto-wrap"><label id="oe-auto-lbl">Parameter der Verkehrswertermittlung <span class="oe-q">&middot; nach ImmoWertV, nur f&uuml;r Stufe 3</span></label><div id="oe-auto" class="oe-auto"></div></div>
         <div id="oe-anfragen" class="oe-anfragen"><div class="oe-anfragen-kopf"><span class="oe-anfragen-lbl">Anfragen</span><button type="button" class="oe-btn" style="font-size:12.5px"
             onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">
             Unterlagen beim Amt anfordern
@@ -1264,7 +1265,7 @@ label.dp-required.qc-required::after {
          Lage als Einschätzung NEBEN der Datenlage, Wertanker. Alle Feld-IDs sind
          die alten — nur die Ordnung ist neu. Umgebaut von tools/n4-umbau-index.mjs. -->
     <!-- ═══ v1854 · N4 · drei Karten statt eines Akkordeons (tools/n4d-karten.mjs) ═══ -->
-<div class="card oe-karte" id="oe-karte-gewerke" data-oe-detail="1"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Gewerke &amp; Ausstattung <span class="oe-ct-hint">Art · modernisiert · Standardstufe — die Stufe wird vorgeschlagen</span></div>
+<div class="card oe-karte" id="oe-karte-gewerke"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Gewerke &amp; Ausstattung <span class="oe-ct-hint">Art · modernisiert · Standardstufe — die Stufe wird vorgeschlagen</span></div>
 <table class="oe-gewerke" id="oe-gewerke"><thead><tr><th>Gewerk</th><th>Art / Ausführung</th><th>modernisiert</th><th>Standardstufe</th><th>Gewicht</th></tr></thead><tbody>
     <tr><td class="oe-g">Außenwände <button type="button" class="dp-tip" data-tip-id="tab1.eq_walls" tabindex="-1" aria-label="Hilfe zu Außenwände"></button></td><td><div class="f oe-cell"><label class="oe-sr"><span class="oe-sr-g">Außenwände · </span>Art</label><select id="eq_walls"><option value="">– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr"><span class="oe-sr-g">Außenwände · </span>modernisiert</label><select id="mod_aussenwand"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr"><span class="oe-sr-g">Außenwände · </span>Standardstufe</label><select id="ausst_aussenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">23</td></tr>
     <tr><td class="oe-g">Dach <button type="button" class="dp-tip" data-tip-id="tab1.eq_roof" tabindex="-1" aria-label="Hilfe zu Dacheindeckung"></button></td><td><div class="f oe-cell"><label class="oe-sr"><span class="oe-sr-g">Dach · </span>Art</label><select id="eq_roof"><option value="">– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr"><span class="oe-sr-g">Dach · </span>modernisiert</label><select id="mod_dach"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr"><span class="oe-sr-g">Dach · </span>Standardstufe</label><select id="ausst_dach"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">15</td></tr>
@@ -1279,7 +1280,7 @@ label.dp-required.qc-required::after {
         </tbody></table>
         <p class="hint oe-gew-hint" id="oe-gewerke-hint">Die Stufe je Gewerk wird aus Art und Modernisierung <b>vorgeschlagen</b> (gestrichelt) und lässt sich überschreiben. Aus den Stufen entstehen die Standardstufe oben, die Modernisierungspunkte (Anlage 2) und der Modernisierungsgrad der Restnutzungsdauer — früher die Sterne.</p>
 </div>
-<div class="card oe-karte" id="oe-karte-bauteile" data-oe-detail="1"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-land"/></svg></span>Bauteile &amp; Grundstück <span class="oe-ct-hint">verfeinert den Marktbericht</span></div>
+<div class="card oe-karte" id="oe-karte-bauteile"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-land"/></svg></span>Bauteile &amp; Grundstück <span class="oe-ct-hint">verfeinert den Marktbericht</span></div>
   <div class="g3">
           <div class="f"><label>Aufzug <button type="button" class="dp-tip" data-tip-id="tab1.eq_elevator" tabindex="-1" aria-label="Hilfe zu Aufzug"></button></label><select id="eq_elevator"><option value="">– keine Angabe –</option><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
       <div class="f"><label>Gäste-WC <button type="button" class="dp-tip" data-tip-id="tab1.eq_guest_wc" tabindex="-1" aria-label="Hilfe zu Gäste-WC"></button></label><select id="eq_guest_wc"><option value="">– keine Angabe –</option><option value="GAESTE_WC">Ja</option><option value="KEIN_GAESTE_WC">Nein</option></select></div>
@@ -1453,7 +1454,7 @@ label.dp-required.qc-required::after {
 
        Keine oninput="calc()"-Aufrufe: calc() liest keines dieser Felder.
        Sie sind Wertermittlung, keine Investitionsrechnung. -->
-  <div class="card" data-collapsible="wm-obj" data-collapse-title="Sach- und Ertragswert · Stufe 3" data-oe-stufe-min="3">
+  <div class="card" data-collapsible="wm-obj" data-collapse-title="Sach- und Ertragswert · Stufe 3">
     <div class="ct-row">
       <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Sach- und Ertragswert · Stufe 3</div>
     </div>
@@ -3002,7 +3003,7 @@ label.dp-required.qc-required::after {
         <div class="ct ct-pro" style="margin:0;padding:0;border:none"><span class="ct-ico"><svg width="22" height="22"><use href="#i-settings"/></svg></span>Eingabe-Modus</div>
         <div class="hint" style="margin-top:4px">Wähle, ob du BWK detailliert pro Position oder als Prozentsatz der Kaltmiete eingeben möchtest.</div>
       </div>
-      <div class="bwk-mode-btns">
+      <div class="bwk-mode-btns" id="bwk-modus-btns">
         <button class="mode-btn active" data-mode="detail" onclick="switchBwkMode('detail')">Detailliert</button>
         <button class="mode-btn" data-mode="percent" onclick="switchBwkMode('percent')">% der NKM</button>
       </div>
@@ -3669,7 +3670,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-anlage-bmf.js?v=v3018c"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v3030"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v3029"></script>
+<script src="js/pdf-investment-bank.js?v=v3073"></script>
 <script src="js/bmf-modal.js?v=v3051"></script>
 <script src="js/bmf-modal-v292.js?v=v3006d"></script>
 <script src="js/bmf-bodenabschlag.js?v=v3054"></script>
@@ -3758,13 +3759,13 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3059"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3065"></script>
+<script src="js/storage.js?v=v3073"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v3031"></script>
 <script src="js/track-record.js?v=v3029"></script>
-<script src="js/pdf.js?v=v3031"></script>
+<script src="js/pdf.js?v=v3073"></script>
 <script src="js/pdf-pruefung.js?v=v3029"></script><!-- v3018d · EIN Tor vor jedem PDF -->
 <script src="js/auth.js?v=v3035"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
@@ -3797,16 +3798,19 @@ label.dp-required.qc-required::after {
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
-<script src="js/objekt-reiter.js?v=v3043"></script>
+<!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
+<script src="js/data/detailgrad-zuordnung.js?v=v3073"></script>
+<script src="js/detailgrad.js?v=v3073"></script>
+<script src="js/objekt-reiter.js?v=v3073"></script>
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
-<script src="js/feld-hilfe.js?v=v1872"></script>
+<script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v3067"></script>
 <script src="js/mfh-felder.js?v=v3003"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
-<script src="js/potenzial.js?v=v3071"></script>
+<script src="js/potenzial.js?v=v3073"></script>
 <script src="js/mietvertrag-objekt.js?v=v3028b"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3822,7 +3826,7 @@ label.dp-required.qc-required::after {
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3001"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2966f"></script>
-<script src="js/messe-drehbuch.js?v=v3021k6"></script>
+<script src="js/messe-drehbuch.js?v=v3073"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v2252"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
@@ -3830,7 +3834,7 @@ label.dp-required.qc-required::after {
   <script src="js/tour-engine.js?v=v3045"></script>
   <script src="js/tour-content.js?v=v2940a"></script>
   <!-- v1740 � Grund-Setup VOR dem Rundgang (Aussehen, Stammdaten, Rechenwerte) -->
-  <script src="js/onboarding.js?v=v3040"></script>
+  <script src="js/onboarding.js?v=v3073"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
@@ -3846,8 +3850,8 @@ label.dp-required.qc-required::after {
 <script src="js/deal-action.js?v=v3006c"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v3045"></script>
-<script src="js/deal-action-readycheck.js?v=v3029"></script>
-<script src="js/deal-action-boarding.js?v=v3053"></script>
+<script src="js/deal-action-readycheck.js?v=v3073"></script>
+<script src="js/deal-action-boarding.js?v=v3073"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
 <script src="js/netzwerk-einreichung.js?v=v2200"></script> <!-- v856-einreichung -->
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
@@ -3863,7 +3867,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresstaende.js?v=v3048"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/wert-zielbild.js?v=v2999"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3043"></script>
-<script src="js/mb-abgleich.js?v=v3002d"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
+<script src="js/mb-abgleich.js?v=v3073"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v3053"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
@@ -3886,10 +3890,10 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3003c"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v3052"></script>
+  <script src="js/object-actions.js?v=v3073"></script>
   <script src="js/dpsh-score-hero.js?v=v3059"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>
-  <script src="js/voice-import.js?v=v3030"></script>
+  <script src="js/voice-import.js?v=v3073"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>
@@ -4318,7 +4322,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 <script src="js/copilot.js?v=v3025b"></script>
-<script src="js/copilot-pillen.js?v=v2553"></script>
+<script src="js/copilot-pillen.js?v=v3073"></script>
 <script src="js/dp-diktat.js?v=v1760"></script><!-- v1760 · Mikrofon fuer Textfelder -->
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
 <script src="js/pilot-berichte.js?v=v2947"></script><!-- v1769 · beide Piloten holen die Marktberichte (V6) -->

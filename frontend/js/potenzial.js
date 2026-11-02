@@ -2490,8 +2490,8 @@
     document.addEventListener('click', function (ev) {
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-pot-stufe3]') : null;
       if (!b) return;
-      var R = window.DealPilotObjektReiter;
-      try { if (R && typeof R.zielSetzen === 'function') R.zielSetzen(3); } catch (e) {}
+      /* v3073: Stufe 3 = Detailgrad Experte */
+      try { if (window.DpDetailgrad) DpDetailgrad.setzen(3); } catch (e) {}
       try { if (typeof window.switchTab === 'function') window.switchTab(0); } catch (e) {}
       setTimeout(function () { var z = el('oe-ziel-status'); if (z && z.scrollIntoView) z.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 250);
     });

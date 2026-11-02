@@ -1008,51 +1008,26 @@
     var catalog = _qcTarget ? buildCatalog() : buildFullCatalog();
     rueckfragen(OA, { transcript: '', fields: {}, unsicher: [] }, catalog, true);  }
 
-  /* === v1115-WEIN - DER CO-PILOT STELLT SICH VOR =======================
-     Marcels Ansage vom 14.09.2026: "wenn wir den Sprechlauf starten, dann
-     sollten wir einmal kurz sagen: Hey, ich bin dein Co-Pilot, irgendwie
-     eine coole Einleitung machen, ich leite dich hier heute durch, dann
-     kurz erklaeren, fragen: bist du das erste Mal hier? Soll ich dir das
-     kurz erklaeren? ... Man soll einfach auswaehlen koennen: Was ist man
-     fuer ein Investor? Ist man Einsteiger? Ist man Profi? Braucht man
-     Hilfestellungen?"
+  /* === v3073 · DER TON KOMMT AUS DEM DETAILGRAD ======================
+     Bis v3072 fragte der Co-Pilot beim ersten geführten Lauf nach der
+     Erfahrung („Erste Immobilie · Schon ein paar gemacht · Profi", v1115,
+     Merker dp_rf_erfahrung) und setzte damit den Ton. Marcel 02.11.2026:
+     „Dann müssen wir in der geführten Eingabe auch nicht mehr fragen, wo
+     er steht, weil wir das ja dann anhand der drei Stufen wissen."
 
-     DIE ERFAHRUNGSFRAGE IST KEINE NEUE EINSTELLUNG. Sie setzt den Ton,
-     den es seit v1378 gibt (Lernmodus / Normal / Investor-Modus) - nur
-     dass ihn bisher niemand gefragt hat: er stand als Knopf in der
-     Nebenleiste, und wer ihn nicht fand, bekam immer Normal.
-
-     Sie kommt EINMAL. Wer schon gewaehlt hat, faengt sofort an - die
-     Antwort steht in `dp_rf_erfahrung`, und wer sie aendern will, sagt
-     es unterwegs oder nimmt den Knopf. */
-  var RF_ERF_SPEICHER = 'dp_rf_erfahrung';
-
-  function _rfErfahrung() {
-    try { return localStorage.getItem(RF_ERF_SPEICHER) || ''; } catch (e) { return ''; }
+     Der Detailgrad des Objekts (js/detailgrad.js) sagt es jetzt:
+       Einsteiger      -> Lernmodus  (Wozu-Satz an jeder Frage)
+       Fortgeschritten -> Normal
+       Experte         -> Investor-Modus (knapp)
+     Der Ton-Knopf und „erklär mir das" bleiben; wer unterwegs umstellt,
+     behält das für diesen Lauf. Die Frage, ihre drei Aktionen und ihr
+     Merker sind ausgebaut. */
+  function _rfTonAusDetailgrad() {
+    var s = 1;
+    try { s = window.DpDetailgrad ? DpDetailgrad.stufe() : 2; } catch (e) { s = 2; }
+    _rfModusSetzen(s >= 3 ? 'profi' : (s === 2 ? 'normal' : 'lernen'), true);
+    try { localStorage.removeItem('dp_rf_erfahrung'); } catch (e) {}   /* der alte Merker der Frage */
   }
-
-  function _rfEinstieg(weiter) {
-    _rfEinstiegWeiter = weiter;
-    /* Wer schon einmal gewaehlt hat, wird nicht wieder gefragt. */
-    if (_rfErfahrung()) { weiter(); return; }
-    _rfBlase('co',
-      '<b>Moin, ich bin dein Co-Pilot.</b> Ich nehme das Objekt mit dir zusammen auf — ' +
-      'du sprichst oder tippst, ich rechne unterwegs mit und hole, was ich selbst holen kann: ' +
-      'Bodenrichtwert, Lage, Marktpreisindikation.' +
-      '<div class="vi-rf-wozu" style="margin-top:8px"><b>Damit ich den richtigen Ton treffe:</b> ' +
-      'wie viel Erfahrung hast du mit Immobilien-Investments?</div>');
-    _rfAktion('erf_neu',
-      'Ich erkläre bei jeder Frage, wozu die Angabe dient — und was sie am Ende bewirkt.',
-      'Erste Immobilie');
-    _rfAktion('erf_mittel',
-      'Kurze Fragen, Erklärung auf Zuruf: sag jederzeit "erklär mir das".',
-      'Schon ein paar gemacht');
-    _rfAktion('erf_profi',
-      'Knapp und ohne Beiwerk. Die Erklärungen bleiben auf Abruf verfügbar.',
-      'Profi');
-  }
-
-  var _rfEinstiegWeiter = null;
 
   /* v2050 - die gemerkte Ansage HOLEN und dabei verbrauchen. Wer sie
      angehaengt hat, bekommt sie kein zweites Mal: sonst stuende sie
@@ -1114,57 +1089,6 @@
     _rfDranZeichnen();
   }
 
-
-  function _rfErfahrungGewaehlt(art) {
-    var modus = art === 'erf_neu' ? 'lernen' : (art === 'erf_profi' ? 'profi' : 'normal');
-    try { localStorage.setItem(RF_ERF_SPEICHER, art); } catch (e) {}
-    _rfAktionWeg('erf_neu'); _rfAktionWeg('erf_mittel'); _rfAktionWeg('erf_profi');
-    _rfModusSetzen(modus, true);
-    _rfBlase('ich', art === 'erf_neu' ? 'Erste Immobilie.'
-      : (art === 'erf_profi' ? 'Profi.' : 'Schon ein paar gemacht.'));
-
-    /* ═══ v2050 · EINE BLASE, NICHT ZWEI ════════════════════════════
-
-       Bestaetigung und Ansage stehen zusammen. Vorher war die Ansage
-       schon durch, bevor der Nutzer ueberhaupt gefragt worden war -
-       jetzt ist sie die ANTWORT auf seine Wahl.
-
-       Bei „Erste Immobilie“ sind die Punkte 1 und 4 der alten Liste
-       weg: sie sagten dasselbe wie die Ansage (der Reihe nach fragen,
-       am Ende eine Uebersicht), und im selben Absatz waere die
-       Wiederholung sichtbar gewesen.
-
-       Punkt 2 und 3 BLEIBEN. Punkt 3 ist seit v2049 sogar wichtiger:
-       dort ist der Knopf „Weiss ich nicht“ weggefallen, und dieser
-       Satz ist jetzt der einzige Ort, an dem der Weg erklaert wird. */
-    var _ans = _rfAnsageHolen();
-    var _vor = _ans ? '<div style="margin-top:8px">' + _ans + '</div>' : '';
-
-    if (art === 'erf_neu') {
-      _rfBlase('co',
-        'Alles klar — dann gehen wir es in Ruhe an.' + _vor +
-        '<div class="vi-rf-wozu" style="margin-top:8px">' +
-        'Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
-        'Marktpreisindikation — du sagst nur, ob ich soll.<br>' +
-        'Weisst du etwas nicht, sag <b>"weiß ich nicht"</b> — ich frage später ' +
-        'noch einmal oder rechne ohne.</div>' +
-        '<div style="margin-top:8px">Du kannst mich jederzeit unterbrechen: ' +
-        '<b>"erklär mir das"</b>, <b>"warum fragst du das"</b> oder eine eigene Frage — ' +
-        'danach machen wir weiter, wo wir waren.</div>');
-    } else if (art === 'erf_profi') {
-      _rfBlase('co', 'Verstanden — kurz und knapp.' + _vor +
-        '<div style="margin-top:8px"><b>"weiß ich nicht"</b> überspringt, ' +
-        '<b>"fertig"</b> bringt dich zur Übersicht, ' +
-        'und <b>"erklär mir das"</b> gibt es trotzdem, wenn du es brauchst.</div>');
-    } else {
-      _rfBlase('co', 'Gut. Ich halte es kurz und erkläre, wenn du fragst.' + _vor +
-        '<div style="margin-top:8px">Sag einfach <b>"erklär mir das"</b>. ' +
-        '<b>"weiß ich nicht"</b> überspringt.</div>');
-    }
-
-    var w = _rfEinstiegWeiter; _rfEinstiegWeiter = null;
-    if (w) setTimeout(w, 300);
-  }
 
   /* ── Aufnahme + Live-Vorschau ─────────────────────────────────────── */
   function pickMime() {
@@ -3139,7 +3063,7 @@
   function _rfZiel() {
     try {
       var R = window.DealPilotObjektReiter;
-      var z = (R && typeof R.zielstufe === 'function') ? R.zielstufe() : 1;
+      var z = window.DpDetailgrad ? DpDetailgrad.stufe() : 1;   /* v3073: Detailgrad = Stufe */
       return (z >= 1 && z <= 3) ? z : 1;
     } catch (e) { return 1; }
   }
@@ -3173,7 +3097,7 @@
     var neu = _rfStufeBloecke(z);
     if (!neu.length) return false;
     _rf.stufeAn = 1;
-    _rfBlase('co', '<b>Eingabetiefe ' + (z >= 3 ? 'Ausgiebig' : 'Mittel') + '.</b><br>'
+    _rfBlase('co', '<b>Detailgrad ' + (z >= 3 ? 'Experte' : 'Fortgeschritten') + '.</b><br>'
       + '<span style="opacity:.8">Dafür brauche ich noch ' + neu.length
       + (neu.length === 1 ? ' Angabe' : ' Angaben') + ' — '
       + (z >= 3 ? 'ohne sie rechnet der Sach- und Ertragswert nicht zu Ende.'
@@ -3478,10 +3402,32 @@
     }
     return k.ids.length ? k : null;
   }
+  /* ══ v3073 · DIE GEFÜHRTE EINGABE FRAGT NUR DEN DETAILGRAD ══════════
+     Marcel 02.11.2026: „Passt sich die geführte Eingabe auf die
+     Eingabetiefe an?" Jetzt ja: ein Block wird nur gefragt, wenn eines
+     seiner Felder im gewählten Detailgrad (Einsteiger · Fortgeschritten ·
+     Experte, js/detailgrad.js) sichtbar ist. KEINE zweite Liste — es zählt
+     dieselbe Markierung, die das Formular ausblendet (DpDetailgrad.ebene).
+     Ein ausgeblendetes Feld rechnet mit seiner Vorgabe, danach zu fragen
+     hiesse, die Stufe zu übergehen. Ein Feld, das nicht im Formular steht,
+     wird weiter gefragt (keine Aussage = kein Ausschluss). */
+  function _rfImDetailgrad(ids) {
+    var D = window.DpDetailgrad;
+    if (!D || !ids || !ids.length) return true;
+    var s = D.stufe(), kennt = false;
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (!el) continue;
+      kennt = true;
+      if (D.ebene(el) <= s) return true;
+    }
+    return !kennt;
+  }
   function _rfZugeschnitten(fields) {
     return RFRAGEN.map(_rfZuschnitt)
       .map(function (e) { return _rfNachArt(e, fields); })
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter(function (e) { return _rfImDetailgrad(e.ids); });   /* v3073 */
   }
 
   function _rfLuecken(fields) {
@@ -7473,10 +7419,9 @@
 
   var AKT_ICON = {
     brw: '📍', lage: '🌍', markt: '📊', markt2: '📈',
-    erklaer: '💡', erf_neu: '🌱', erf_mittel: '○', erf_profi: '⚡',   /* v1115 */
+    erklaer: '💡',   /* v1115 · v3073: erf_neu/erf_mittel/erf_profi ausgebaut (Ton aus dem Detailgrad) */
     tiefe: '＋', tabelle: '✓', adresse: '📮',
     knf_neu: '⇄', knf_alt: '✓',  /* v1376 (C7) */
-    wert: '⚖️',                   /* v1386: Wertermittlung nach ImmoWertV */
     nachfass: '↻'                 /* v1377 (C5) */
   };
 
@@ -7608,13 +7553,11 @@
               return a.art === 'markt' || a.art === 'markt2'
                   || a.art === 'brw' || a.art === 'lage';
             }).length;
-            var erf  = akt.filter(function (a) { return a.art.indexOf('erf_') === 0; }).length;
             var rest = akt.length - knf - nf;
             return '<span class="vi-dran-lbl">' +
               (knf && rest ? 'Eine Entscheidung steht offen — und ich kann etwas holen:'
                : knf       ? 'Zwei Werte widersprechen sich — welcher gilt?'
                : nf        ? 'Offen geblieben:'
-               : erf       ? 'Damit ich den richtigen Ton treffe:'
                /* v1119-WEIN2 · EINE Zeile statt zweier. Marcels Befund vom
                   14.09.2026: „für mich stehen dort zu viele Doppelinformationen.
                   Es steht da einmal: Wo geht's jetzt weiter? und er fragt
@@ -7800,10 +7743,6 @@
       if (_fs.an && _fs.stream) _fsHoeren(true);
       return;
     }
-    /* v1115-WEIN: die Erfahrungsfrage aus dem Einstieg. */
-    if (art === 'erf_neu' || art === 'erf_mittel' || art === 'erf_profi') {
-      _rfErfahrungGewaehlt(art); return;
-    }
     /* v1115-WERK: die Erklaerung auf Abruf. */
     if (art === 'erklaer') { _rfErklaerZeigen(); return; }
     /* v2204 · N63.7 */
@@ -7872,8 +7811,7 @@
     /* v1377 (C5) */
     if (art === 'nachfass') { _rfBlase('ich', 'Ja, die trage ich nach.'); _rfNachfassStarten(); return; }
     if (art === 'tabelle')  { _rfZurTabelle(); return; }
-    /* v1386 */
-    if (art === 'wert')     { _rfBlase('ich', 'Ja, mach die Wertermittlung.'); _rfWertStarten(); return; }
+    /* v3073: die Aktion 'wert' (Frage „Ja, Wertermittlung") ist ausgebaut - die Stufe ist der Detailgrad */
     if (art === 'rnd')      { _rfBlase('ich', 'Ja, ermittle die Restnutzungsdauer.'); _rfRndStarten(); return; }
 
 
@@ -9014,22 +8952,23 @@
       _rf.marktGefragt = 1;
       return;
     }
-    /* v1862 · Die Eingabetiefe ist schon gewählt (Reiter Objekt, Pre-Flight-
-       Pillen) — dann ist die Stufe keine Frage mehr. Ausgiebig: die
-       Wertermittlung nach ImmoWertV am Ende enthält die Marktpreisindikation,
-       ein zweiter Abruf vorher kostete doppelt. Mittel: die erweiterte,
-       wie gewählt. Einfach: das Angebot wie bisher. */
+    /* v1862 · Die Stufe ist schon gewählt — sie ist keine Frage mehr.
+       v3073: die Stufe ist der Detailgrad des Objekts (js/detailgrad.js).
+       Experte: die Wertermittlung nach ImmoWertV am Ende enthält die
+       Marktpreisindikation, ein zweiter Abruf vorher kostete doppelt.
+       Fortgeschritten: die erweiterte, wie gewählt. Einsteiger: das
+       Angebot der Marktpreisindikation (Stufe 1) — ohne „Welche Stufe?". */
     var _z = _rfZiel();
     if (_z >= 3 && kg.wev > 0) {
       _rf.marktGefragt = 1;
-      _rfBlase('co', '<span style="opacity:.8">Du hast <b>Eingabetiefe Ausgiebig</b> gewählt: '
+      _rfBlase('co', '<span style="opacity:.8">Dein Detailgrad ist <b>Experte</b>: '
         + 'die Wertermittlung nach ImmoWertV hole ich am Ende — mit Marktpreisindikation, '
         + 'Boden-, Ertrags- und Sachwert. Vorher frage ich, was sie braucht.</span>');
       return;
     }
     if (_z >= 2 && kg.mpi_plus > 0) {
       _rf.marktGefragt = 1;
-      _rfBlase('co', '<span style="opacity:.8">Du hast <b>Eingabetiefe Mittel</b> gewählt — '
+      _rfBlase('co', '<span style="opacity:.8">Dein Detailgrad ist <b>Fortgeschritten</b> — '
         + 'ich hole die <b>erweiterte Marktpreisindikation</b>, sobald Zustand, Energieausweis '
         + 'und Lage stehen.</span>');
       _rfMarktWaehlen(2);
@@ -9047,7 +8986,7 @@
     _rfBlase('co', (_mbGewollt
         ? 'Du hast die <b>Marktbewertung</b> mit ausgewählt — ich hole sie hier gleich mit, ' +
           'dann landen ihre Werte in derselben Übersicht wie alles andere. ' +
-          '<b>Welche Stufe?</b>'
+          (_z >= 2 ? '<b>Welche Stufe?</b>' : 'Zu deinem Detailgrad <b>Einsteiger</b> gehört die <b>Marktpreisindikation</b> (Stufe 1).')
         : 'Für diese Adresse kann ich eine <b>Marktpreisindikation</b> holen — ' +
           'Kaufpreisniveau, <b>Marktmiete</b> und die Lagebewertung. ') +
       ' Sie läuft im Hintergrund; wir machen solange weiter.');
@@ -9059,7 +8998,7 @@
     if (kg.mpi) _rfAktion('markt',
       'Kaufpreisniveau, Marktmiete, Makro- und Mikrolage — läuft gleich im Hintergrund.',
       'Marktpreisindikation', { frei: kg.mpi, stufe: 1 });
-    if (kg.mpi_plus) _rfAktion('markt2',
+    if (kg.mpi_plus && _z >= 2) _rfAktion('markt2',   /* v3073: Einsteiger = Stufe 1, keine Stufenwahl */
       'Zusätzlich Preishistorie, amtliche Makrolage und eine Einordnung im Fließtext. ' +
       'Sie liest auch Zustand, Energieausweis, Bodenrichtwert und deine Lagebewertung — ' +
       'die kommen erst in den nächsten Etappen, deshalb hole ich sie am Ende von Etappe 4.',
@@ -10301,6 +10240,7 @@
       if (!el) return;
       if (el.readOnly || el.disabled || el.type === 'hidden') return;
       if (String(el.value || '').trim() !== '') return;      /* steht schon */
+      if (!_rfImDetailgrad([id])) return;                     /* v3073: über dem Detailgrad - rechnet mit Vorgabe */
       var sec = el.closest('.sec');
       var k = sec ? sec.id : '';
       if (!TIEFE_SEC[k]) return;                              /* nur bekannte Bereiche */
@@ -10470,24 +10410,27 @@
       + 'und rechne das Sachwertverfahren durch.</span>');
       return false;
     }
-    /* v1862 · Eingabetiefe Ausgiebig heißt Stufe 3 — das ist die Wahl,
+    /* v1862 · Detailgrad Experte heißt Stufe 3 — das ist die Wahl,
        nicht erst eine Frage. Die Fragen dazu sind oben schon gestellt. */
     if (_rfZiel() >= 3) {
-      _rfBlase('co', '<span style="opacity:.8">Du hast <b>Eingabetiefe Ausgiebig</b> gewählt — '
+      _rfBlase('co', '<span style="opacity:.8">Dein Detailgrad ist <b>Experte</b> — '
         + 'die Wertermittlung nach ImmoWertV (Stufe 3) gehört dazu, ich starte sie.</span>');
       _rfWertStarten();
       return true;
     }
-    _rfAktion('wert',
-      'Soll ich noch eine Wertermittlung nach ImmoWertV anschließen? Stufe 3: Boden-, Ertrags- und Sachwert.',
-      'Ja, Wertermittlung');
-    return true;
+    /* v3073 · Marcel 02.11.2026: „Dann müssen wir in der geführten Eingabe
+       auch nicht mehr fragen, wo er steht, weil wir das ja dann anhand der
+       drei Stufen wissen." Die Wertermittlung (Stufe 3) gibt es nur im
+       Detailgrad Experte — hier steht dazu ein Satz, keine Frage. Die
+       frühere Aktion „Ja, Wertermittlung" ist ausgebaut. */
+    _rfBlase('co', '<span style="opacity:.8">Die <b>Wertermittlung nach ImmoWertV</b> (Stufe 3) gehört zum '
+      + 'Detailgrad <b>Experte</b> — umschalten kannst du über jedem Reiter. Ich bleibe bei deinem Detailgrad.</span>');
+    return false;
   }
 
   function _rfWertStarten() {
     if (!_rf || _rf.wertAn) return;
     _rf.wertAn = 1;
-    _rfAktionWeg('wert');
     /* v1862 · dazu die Pflicht der Stufe 3 (BGF, NHK-Typ, Nutzungsart, MEA …),
        ohne Doppelfrage zu den vier Blöcken hier; gesagt zählt wie eingetragen. */
     var neu = RFRAGEN_WERT.filter(function (e) { return _rfFehlt(e, _rf.data.fields); });
@@ -10822,7 +10765,7 @@
         && _rfWertVerfuegbar() && !_rfStufeBloecke(3).length) {
       _rf.wertGefragt = 1; _rf.wertAuto = 1;
       _rfBlase('co', '<span style="opacity:.8">Alles da, was die <b>Wertermittlung nach ImmoWertV</b> '
-        + 'braucht — ich starte sie jetzt. Du hast sie mit <b>Eingabetiefe Ausgiebig</b> gewählt.</span>');
+        + 'braucht — ich starte sie jetzt. Sie gehört zu deinem Detailgrad <b>Experte</b>.</span>');
       _rfWertStarten();
       return;
     }
@@ -12540,7 +12483,7 @@
 
        Sie wird jetzt gemerkt und spaeter verbraucht: beim Neuling
        haengt `_rfErfahrungGewaehlt` sie an seine Bestaetigung (eine
-       Blase statt zwei), beim Wiederkehrer blaest `_rfAnsage` sie
+       Blase statt zwei), seit v3073 (keine Tonfrage mehr) blaest `_rfAnsage` sie
        einzeln vor der ersten Frage. */
     _rf.ansage = (alle
       ? vorTxt + 'Ich führe dich durch — <b>' + luecken.length + '</b> ' +
@@ -12604,7 +12547,7 @@
          nicht mehr vor der Begruessung. */
       var _losgehts = function () {
         if (!_rf) return;
-        _rfAnsage();   /* leer, wenn die Tonwahl sie schon angehaengt hat */
+        _rfAnsage();   /* v3073: die Ansage steht immer als eigene Blase vor der ersten Frage */
         /* v1308: die uebernommenen Werte zum Nachsehen. */
         if (_rf.vorlaufZeigen) {
           try { _rfVorlaufKarte(_rf.vorlaufQuelle); } catch (ex) {}
@@ -12615,11 +12558,9 @@
         }
         _rfFrage();
       };
-      /* v1115-WEIN: Der Co-Pilot stellt sich vor und fragt EINMAL nach der
-         Erfahrung - erst danach beginnt der Fragenlauf. Wer schon gewaehlt
-         hat, merkt davon nichts. */
-      if (alle && !_rfErfahrung()) _rfEinstieg(_losgehts);
-      else _losgehts();
+      /* v3073: keine Erfahrungsfrage mehr - der Ton folgt dem Detailgrad */
+      if (alle) _rfTonAusDetailgrad();
+      _losgehts();
     });
   }
 

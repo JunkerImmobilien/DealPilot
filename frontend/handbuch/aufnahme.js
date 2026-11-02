@@ -101,8 +101,8 @@
     if (window._currentObjKey) throw new Error('ein Objekt ist geladen — Abbruch, nichts wird angefasst');
     _art = art;
     try { window._newObjLeeren && window._newObjLeeren(); } catch (e) {}
-    var R = window.DealPilotObjektReiter; try { R && R.zielSetzen && R.zielSetzen(3); } catch (e) {}
-    var cb = $('oe-details-cb'); if (cb && !cb.checked) { cb.checked = true; cb.dispatchEvent(new Event('change', { bubbles: true })); }
+    /* v3073: alle Felder zeigen = Detailgrad Experte, nur für diese Aufnahme */
+    try { if (window.DpDetailgrad) DpDetailgrad.setzen(3, { fluechtig: true, still: true }); } catch (e) {}
     var w = Object.assign({}, GEMEINSAM, BEISPIEL[art] || {});
     setze('objart', w.objart);
     var n = 0; Object.keys(w).forEach(function (k) { if (k !== 'objart' && w[k] !== '' && setze(k, w[k])) n++; });

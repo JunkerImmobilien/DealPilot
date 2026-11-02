@@ -911,7 +911,9 @@
     if (d2an && !(d2 > 0)) { d2an = false; d2 = null; }
 
     /* ── Seite 1 ─────────────────────────────────────────────── */
-    kopf(KURZ ? 'Investment Case · Kurzfassung' : 'Investment Case', (adr || 'Objekt ohne Anschrift') + ' · Finanzierungsunterlage · Stand ' + heute());
+    /* v3073 · Detailgrad: Stufe im Kopf, Annahmen unten (DpDetailgrad.annahmen) */
+    var _dg = null; try { _dg = window.DpDetailgrad && DpDetailgrad.annahmen ? DpDetailgrad.annahmen() : null; } catch (e) { _dg = null; }
+    kopf(KURZ ? 'Investment Case · Kurzfassung' : 'Investment Case', (adr || 'Objekt ohne Anschrift') + ' · Finanzierungsunterlage · Stand ' + heute() + (_dg ? ' · Detailgrad ' + _dg.name : ''));
 
     /* v2830 · Titelbild: Zuschnitt nur so weit, wie das Foto es traegt -
        ein Hochformat wurde auf 2,5 : 1 geschnitten und zeigte einen Streifen.
@@ -1944,6 +1946,15 @@
     if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
     y += 2;
+    /* v3073 · ausgeblendete Werte des Detailgrads, mit Herkunft der Vorgabe; was oben steht, nicht doppelt */
+    if (_dg && _dg.stufe < 3 && (_dg.zeilen.length || _dg.neutral || _dg.weitere)) {
+      var _schon = { mietstg: 1, wertstg: 1, kostenstg: 1, leerstand: 1, anschl_z: 1, anschl_t: 1, exit_bmy: 1, btj: 1, afa_satz: 1, geb_ant: 1, grenz: 1, gest_p: 1 };
+      abschnitt('Detailgrad ' + _dg.name + ' · Werte aus Vorgaben');
+      _dg.zeilen.forEach(function (z) { if (!_schon[z.id]) zeile(sauber(z.label), sauber(z.wert) + '  ·  ' + sauber(z.quelle)); });
+      if (_dg.neutral) zeile('Score-Merkmale ohne Angabe', _dg.neutral + '  ·  neutral (60 Punkte)');
+      if (_dg.weitere) zeile('Weitere ausgeblendete Angaben', _dg.weitere + '  ·  im Objekt erfasst oder abgeleitet, rechnen weiter');
+      y += 2;
+    }
 
     if (!KURZ) abschnitt('Grundlagen und Hinweise');
     var hinweis = 'Alle Werte beruhen auf den im Objekt erfassten Angaben und den dort hinterlegten Annahmen '

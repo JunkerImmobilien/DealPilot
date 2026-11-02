@@ -139,7 +139,7 @@
     var t = [];
     t.push(d.filled + ' von ' + d.total + ' Feldern sind gefüllt (' + d.percent + ' %).');
     if (d.stufe) {
-      t.push('Eingabetiefe ' + d.stufe + ' ist gewählt; davon kommen '
+      t.push('Detailgrad ' + ((window.DpDetailgrad && DpDetailgrad.NAMEN[d.stufe]) || d.stufe) + ' (Stufe ' + d.stufe + ') ist gewählt; davon kommen '
         + d.stufe_felder + ' Pflichtfelder der Wertermittlung dazu.');
     }
     if (!d.missing.length) {
@@ -148,8 +148,8 @@
     } else {
       t.push('Offen sind noch ' + d.missing.length + '.');
       if (d.stufe && d.stufe < 3) {
-        t.push('Für eine Wertermittlung nach ImmoWertV braucht es Eingabetiefe 3 — '
-          + 'die Pille dafür steht oben im Reiter Objekt.');
+        t.push('Für eine Wertermittlung nach ImmoWertV braucht es den Detailgrad Experte (Stufe 3) — '
+          + 'der Schalter steht über jedem Reiter.');
       }
     }
     return t.join(' ');
@@ -168,7 +168,7 @@
     var score = d.missing.filter(function (m) { return !m.stufe && !m.art; });
     var t = ['Es fehlen ' + d.missing.length + ' Angaben:'];
     if (score.length) t.push('• ' + score.length + ' für den Investor-Deal-Score');
-    if (stufe.length) t.push('• ' + stufe.length + ' für die Wertermittlung (Eingabetiefe '
+    if (stufe.length) t.push('• ' + stufe.length + ' für die Wertermittlung (Stufe '
       + (d.stufe || '?') + ')');
     if (art.length)   t.push('• ' + art.length + ' Pflichtfelder der Objektart');
     t.push('Klick auf eine Angabe, dann springe ich hin.');
