@@ -338,6 +338,48 @@ function _renderSrcLink(src) {
   return _kmEsc(label);
 }
 
+/* v3086 · Mietrecht-Kachel auf/zu (gemerkt) */
+function kiMieteRechtUmschalten(btn) {
+  var k = btn && btn.closest ? btn.closest('.kmu-recht') : null; if (!k) return;
+  var auf = !k.classList.contains('auf');
+  k.classList.toggle('auf', auf);
+  btn.setAttribute('aria-expanded', String(auf));
+  var pf = k.querySelector('.kmu-recht-pfeil'); if (pf) pf.textContent = auf ? 'weniger' : 'Erklärung';
+  try { localStorage.setItem('dp_mietrecht_auf', auf ? '1' : '0'); } catch (e) {}
+}
+
+/* v3086 · Marcel 02.11.2026: „bitte Pilot-Mietpreis-Analyse auch, dass man es minimieren kann“.
+   Ein Knopf im Kopf der Box klappt den Inhalt (#ki-miete-body) ein; gemerkt je Nutzer. Laeuft eine
+   Recherche, klappt die Box von selbst auf - sonst saehe man das Ergebnis nicht. */
+(function () {
+  var LS = 'dp_kimiete_zu';
+  function box() { return document.getElementById('ki-miete-box'); }
+  function setzen(zu) {
+    var b = box(); if (!b) return;
+    b.classList.toggle('kmu-zu', zu);
+    var k = b.querySelector('.kmu-klapp'); if (k) { k.textContent = zu ? 'aufklappen' : 'einklappen'; k.setAttribute('aria-expanded', String(!zu)); }
+    try { localStorage.setItem(LS, zu ? '1' : '0'); } catch (e) {}
+  }
+  function einbauen() {
+    var b = box(); if (!b || b.querySelector('.kmu-klapp')) return;
+    var kopf = b.querySelector('.ki-lage-header'); if (!kopf) return;
+    var st = document.getElementById('kmu-klapp-stil');
+    if (!st) { st = document.createElement('style'); st.id = 'kmu-klapp-stil';
+      st.textContent = '#ki-miete-box.kmu-zu #ki-miete-body{display:none}'
+        + '.kmu-klapp{border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 45%,transparent);background:transparent;color:inherit;border-radius:8px;padding:5px 10px;font:500 12px Inter,sans-serif;cursor:pointer;margin-left:8px}';
+      document.head.appendChild(st); }
+    var k = document.createElement('button'); k.type = 'button'; k.className = 'kmu-klapp';
+    k.addEventListener('click', function () { setzen(!box().classList.contains('kmu-zu')); });
+    var btn = document.getElementById('ki-miete-btn');
+    if (btn && btn.parentNode === kopf) kopf.insertBefore(k, btn.nextSibling); else kopf.appendChild(k);
+    var zu = false; try { zu = localStorage.getItem(LS) === '1'; } catch (e) {}
+    setzen(zu);
+    if (btn) btn.addEventListener('click', function () { setzen(false); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', einbauen); else einbauen();
+  setTimeout(einbauen, 1500);
+})();
+
 function kiMieteApplyMarktmiete(value) {
   var el = document.getElementById('ds2_marktmiete');
   if (el) {
@@ -429,6 +471,11 @@ function _kmUStil() {
     '.kmu-recht{border:1px solid #EFE7D6;border-radius:10px;padding:8px 12px;background:#fff}',
     '.kmu-rz{display:grid;grid-template-columns:150px 1fr;gap:2px 12px;padding:7px 0;border-top:1px solid #F1ECE1}',
     '.kmu-rz:nth-child(2){border-top:0}',
+    '.kmu-recht-kopf{all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:center;width:100%;padding:2px 0 4px}',
+    '.kmu-recht-pfeil{font:500 11px Inter,sans-serif;color:var(--wl-b8932f,#b8932f)}',
+    '.kmu-recht-pfeil::after{content:" ›"}.kmu-recht.auf .kmu-recht-pfeil::after{content:" ⌄"}',
+    '.kmu-recht:not(.auf) .kmu-rz p{display:none}',
+    '.kmu-recht:not(.auf) .kmu-rz{padding:4px 0}',
     '.kmu-rz>span:first-child{font:600 13px "Space Grotesk",sans-serif;color:#2A2727}',
     '.kmu-rz>span:nth-child(2){font:500 13px Inter,sans-serif}',
     '.kmu-rz p{grid-column:1/-1;margin:2px 0 0;font-size:12px;color:#4A4542;line-height:1.45}',
@@ -539,7 +586,11 @@ function _kmUebersicht(o) {
       var kpText = 'Im laufenden Mietverhältnis darf die Miete in drei Jahren um höchstens ' + (kp.pct || '–') + ' % steigen, und nie über die ortsübliche Vergleichsmiete (§ 558 BGB)'
         + (ist && kp.pct ? ' — bei deiner Miete also auf höchstens ' + _kmQmK(ist * (1 + kp.pct / 100)) : '') + '.';
       var quelleKp = kp.herkunft === 'verordnung' ? ' · ' + lnk(kp.verordnung || 'Landesverordnung', kp.url) : ' · gesetzliche Grenze (§ 558 Abs. 3 Satz 1 BGB)';
-      h += '<div class="kmu-recht"><span class="kmu-t">Mietrecht an dieser Adresse</span>'
+      /* v3086 · Marcel 02.11.2026: „die Mietrecht-Kachel zum Minimieren - nur das Wichtigste, die beiden
+         Zeilen dann stehen lassen“. Zugeklappt (Vorgabe): zwei Zeilen; aufgeklappt: Erklaerung und Quelle. */
+      var _mrAuf = false; try { _mrAuf = localStorage.getItem('dp_mietrecht_auf') === '1'; } catch (e) {}
+      h += '<div class="kmu-recht' + (_mrAuf ? ' auf' : '') + '"><button type="button" class="kmu-recht-kopf" onclick="kiMieteRechtUmschalten(this)" aria-expanded="' + _mrAuf + '">'
+        + '<span class="kmu-t">Mietrecht an dieser Adresse</span><span class="kmu-recht-pfeil">' + (_mrAuf ? 'weniger' : 'Erklärung') + '</span></button>'
         + '<div class="kmu-rz"><span>Mietpreisbremse</span><span>' + brWert + '</span><p>' + brText + quelleBr + '</p></div>'
         + '<div class="kmu-rz"><span>Kappungsgrenze</span><span><b>' + kpWert + '</b></span><p>' + kpText + quelleKp + '</p></div>'
         + '</div>';
