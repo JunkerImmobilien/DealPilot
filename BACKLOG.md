@@ -36,6 +36,22 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N91 · KfW/Förderung aktuell halten, Darlehensarten, Neubau mit Bauphase — Marcel 02.11.2026
+
+Marcel: *„an einigen Stellen fragen wir KfW-Programme ab — können wir diese immer aktuell halten? … die Konditionen
+auslesen und unterschiedliche Darlehensarten? Geht die Berechnung auch mit Neubau? Und dann KfW-Programme zum Auswählen?“*
+
+**Gemessen 02.11.:** Empfehlungen fest im Code (`calc.js updateFESH()` ~Z. 4384: KfW 261/458/159, BAFA; `financing.js:464`),
+ohne Stand und Quelle, wahrscheinlich veraltet. Darlehen: D1 Annuität/Tilgungsaussetzung, D2 + KfW. Neubau: AfA ja
+(§ 7 Abs. 5a degressiv, § 7b), Bauphase (Bauzeit, Teilauszahlung, Bereitstellungszinsen) nein.
+
+1. **Förderregister** wie das Jahreswerte-Register: je Programm (261, 297/298, 300, 308, 458, 159, BAFA BEG EM …)
+   Bedingungen, Höchstbetrag, Zuschuss, Zins je Laufzeit/Zinsbindung, Stand, Quelle (kfw.de/konditionen) — Pflege per
+   Agent, Fälligkeit im Deploy-Prüfer. Vorher prüfen, ob kfw.de/konditionen maschinenlesbar ist.
+2. Feste Empfehlungen in `updateFESH()` auf das Register umstellen (nie ohne Stand anzeigen).
+3. KfW als wählbares Darlehen mit Programm (Zins aus dem Register, tilgungsfreie Jahre, Tilgungszuschuss).
+4. Neubau-Modus: Bauphase mit Teilauszahlungen und Bereitstellungszinsen, Mietbeginn nach Fertigstellung.
+
 ### N90 · Befunde aus dem Wissens-Rückblick (02.11.2026)
 
 1. **Rechtstext:** `frontend/legal/agb.html:77` „angeboten von Junker Immobilien“ (verlinkt aus `reseller.html:397`,
@@ -57,6 +73,7 @@ Mieterwechsel ohne Maßnahme prognostizieren.
 Kappung und nächste Erhöhung werden gerechnet. **Mietpreisbremse:** Daten da, nicht ausgewertet. **Mietspiegel:**
 Paket `mietrecht-ort` liegt ungenutzt. **Neuvertragsmiete:** fehlt. Miete nach Sanierung amtlich nur Minden-Lübbecke.
 
+0a. **Vorschlag 02.11. (abends):** Einsteiger ~45 · Fortgeschritten ~150 · Experte = alle 288 Felder; Namen NICHT „Investor/Profi“ (kollidieren mit den Plannamen Investor/Pro). Entscheidung Marcel offen.
 0. **Neu 02.11. (der erste Entwurf ging am Thema vorbei — Marcel meinte die TABS des Arbeitsbereichs):** `design/Vorschläge/arbeitsbereich-detailgrad-demo.html` + `arbeitsbereich-detailgrad-bestand.md`. Vor dem Bau: `d1` im Hauptformular rechnen, EK-Vorgabe ohne Kaufpreis, „Bereit für die Bank" je Stufe, AfA-Vorgabe nach Baujahr. Offen außerdem: § 558-Soll rechnet auf `ds2_marktmiete` (Angebotsmiete) statt ortsüblicher Vergleichsmiete.
 1. ~~✅ Entwurf `design/Vorschläge/detailstufen-konzept.md`~~ (überholt) + `detailstufen-demo.html` (02.11., 9/21/33 Felder je Stufe).
    **Entscheidungen offen:** (a) Namen Sichtflug · Instrumentenflug · Langstrecke mit Klarnamen; (b) Einstieg bekommt
@@ -4168,6 +4185,8 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3065** (`4f43cdcf`) — FESH-Hinweis an den vorhandenen Sanierungs-Kacheln (V117); die doppelten Haken aus v3064 sind zurückgebaut. **Befund:** nach dem Fachbegriff gesucht, nicht nach dem Kürzel „fesh“.
 
 - **02.11.2026 · v3062–v3064a** (Prod 1.0.14) — Mietpreisbremse + Mietrecht-Karte, Auto-Save + Plan A, FESH-Regel (BMF 26.01.2026). **Befund:** Bremse-Daten lagen ungelesen vor; „Auto-Save aktiv" stimmte für Textfelder nicht; Zielmieten über der Bremse liefen ohne Hinweis.
 

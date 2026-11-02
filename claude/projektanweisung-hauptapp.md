@@ -44083,3 +44083,10 @@ Hinweis „Erhaltungsanteil nicht eingetragen — 0 % abgezogen". **Commits** ac
 d15bbf89, 5c33f144. **Nachweis** und Einzelheiten `wissen/2026-11-02.md` Teil 4. **Prod 1.0.14** Merge `8bda18b`,
 Sicherungen `haupt/mb-20261102-0733`, 200. **Rest** N89 (Detailgrad-Entwurf neu, Vergleichsmiete = Marktmiete),
 Mietleiter MFH, Rückfrage 2-Gewerke im Tab Objekt.
+
+### v3065 — FESH-Doppelung zurückgebaut (02.11.2026)
+
+**Was.** Der Block „Sanierungsbedarf“ (Tab Investition, V117, Kacheln fesh_*) bestand schon; v3064 hatte vier
+eigene Haken daneben gebaut. Zurückgebaut, Steuerhinweis liest die vorhandenen Kacheln. **Commit** 4f43cdcf. **Nachweis**
+Staging: keine [data-fesh] mehr, #san-fesh-hinweis im Block, Kacheln gebunden. Meine Aussage „FESH gibt es nicht“
+ist zurückgenommen (wissen/2026-11-02.md Teil 5). **Rest** N89 Vorschlag Detailgrad, N91 KfW/Neubau.
