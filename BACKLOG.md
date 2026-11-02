@@ -47,7 +47,7 @@ Schreibweisen; 29 bleiben mehrdeutig („bitte prüfen“). Mit AGS wären es al
 Befund und Demo: `wissen/2026-11-02.md` Teil 14, `frontend/demo-quickcheck-bewertung.html`. Eine Karte statt sechs Blöcke, eine
 Schrift, Lageklasse Standard B und wirksam im Ergebnis, Marktspanne als „im Rahmen", Zielkaufpreis mit greifender Grenze,
 keine Kappungserhöhung ohne Mieter, Rechtsquelle mit Link (`mietpotenzial-kern.js:130` „von DealPilot gesetzt“ ersetzen).
-**Umgesetzt v3081/a/b (02.11.2026)** nach Marcels Abnahme — Score unberührt, Urteil „Objekt passt — Finanzierung prüfen" mit Eigenkapitalbedarf, Lageklasse Standard B. Offen: Lageklasse A/C am echten Lauf nachmessen.
+**Umgesetzt v3081/a/b (02.11.2026)** nach Marcels Abnahme — Score unberührt, Urteil „Objekt passt — Finanzierung prüfen" mit Eigenkapitalbedarf, Lageklasse Standard B. Lageklassen A/B/C am 02.11.2026 nachgemessen (wissen „Lageklassen A/B/C“).
 
 ### N94 · Bayern-Bodenrichtwerte — Bezugswege (02.11.2026)
 
@@ -4235,6 +4235,8 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3077–v3086** (Prod 1.0.23–1.0.34) — Detailgrad in den Einstellungen, Marktbericht-Stufe getrennt, Mietpreis-Analyse neu mit Mietrecht, Quick-Check-Bewertung in einer Karte (N95), Mietpotenzial aus eigenen Werten, Gemeinde per AGS (N96), Zielkaufpreis exakt. Einzelheiten `wissen/2026-11-02.md` Teil 12–14 ff.
 
 - **02.11.2026 · v3073–v3076** (Prod 1.0.20–1.0.22) — Detailstufen, Erhaltungsspalte, Quick-Check P1.1–P1.3, zwei Scores mit Einstellung. Einzelheiten `wissen/2026-11-02.md` Teil 11.
 

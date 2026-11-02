@@ -44192,3 +44192,9 @@ Kurzname der Verordnung ohne „(§ 1)“. **Prod** 1.0.32 (1856ba3). **Nachweis
 **Was.** `zielKaufpreis()` rechnet die Cashflow-Grenze exakt, wenn `darlehen` und `annuitaetPct` übergeben werden (Quick-Check);
 die 5-%-EK-Näherung bleibt nur für Aufrufer ohne diese Angaben. Gespiegelt, Backend neu gebaut. **Prod** 1.0.33 (493f587).
 **Nachweis** Hölderlinstr. 139.000 → 97.744 €, Gegenprobe 97.000 € → CF +4 €, kein Nachlass. **Rest** —
+
+### v3086 — Pilot-Mietpreis-Analyse einklappbar, Mietrecht kurz; Lageklassen A/B/C nachgemessen (02.11.2026) · Prod 1.0.34
+
+**Was.** Box „Pilot-Mietpreis-Analyse“ ein-/ausklappbar (gemerkt), Mietrecht-Kachel zugeklappt = zwei Zeilen. Lageklassen am
+echten Lauf: A/B „Objekt passt — Finanzierung prüfen“, C „Finger weg“ mit Rendite-Ziel 110.000 €, Score unverändert 19.
+**Prod** 1.0.34 (77d2a32). **Nachweis** wissen 02.11. „v3086“ und „Lageklassen“. **Rest** siehe „Sitzungsende 02.11.2026“.
