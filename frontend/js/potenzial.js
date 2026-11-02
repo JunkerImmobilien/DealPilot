@@ -252,6 +252,98 @@
     zeichnen();
   }
 
+
+  /* ══ v3067 · DIE MIETLEITER — EINE FÜR ETW UND MFH-WOHNUNG ═════════════
+     Marcel 02.11.2026: „was geht und wann zum Übernehmen" — erst im MFH-Fenster
+     (v3066), jetzt auch für ETW/EFH/ZFH. Der Bau steht HIER, damit beide dieselbe
+     Leiter zeigen; die Aufrufer geben nur ihre Felder (f.sollSetzen, f.zielSetzen).
+     Rechnet nichts selbst: Soll/Termine aus sollFuer (modell), Kappung und
+     Mietpreisbremse aus mietrechtDaten. */
+  function leiterZeilen(m, idx, f) {
+    var w = m && m.wohnungen && m.wohnungen[idx]; if (!w) return [];
+    f = f || {};
+    var wfl = zahl(w.wfl), ist = zahl(w.ist), so = w.soll || {};
+    var d = mietrechtDaten(m, idx);
+    var qm = function (x) { return wfl > 0 ? ' · ' + eur2(x / wfl) + '/m²' : ''; };
+    var z = [];
+    z.push({ c: 'heute', t: 'Heute', v: ist > 0 ? eur(ist) + '/Monat' + qm(ist) : 'leer',
+      u: f.mv_beginn ? 'Mietvertrag seit ' + deDatum(String(f.mv_beginn).slice(0, 10)) : '' });
+    if (!(ist > 0)) z.push({ c: 'soll', t: 'Mieterhöhung', v: '—', u: 'nicht vermietet — es zählt die Neuvermietung' });
+    else if (so.vertrag) z.push({ c: 'soll', t: 'Mieterhöhung', v: 'nach Vertrag', u: so.grund || '' });
+    else if (so.miete != null && so.miete > ist + 0.01) {
+      var eigenS = so.herkunft === 'eigene Angabe', wirk = so.termine && so.termine.wirksam_ab;
+      z.push({ c: 'soll', t: 'Mieterhöhung', v: 'auf ' + eur(so.miete) + '/Monat' + qm(so.miete),
+        u: (so.termine ? so.termine.text : '') + (so.grenze ? ' · Grenze ' + so.grenze : '')
+          + (so.umlage559 && so.umlage559.monat > 0 ? ' · darin Umlage § 559 ' + eur(so.umlage559.monat) : '')
+          + (so.termine && so.termine.letzte_fehlt ? ' · letzte Erhöhung nicht eingetragen' : ''),
+        tag: eigenS ? 'eigene Angabe' : 'DealPilot rechnet vor',
+        k: (eigenS || !f.sollSetzen) ? null : { lbl: 'übernehmen', fn: function () { f.sollSetzen(so.miete, wirk); } } });
+    } else z.push({ c: 'soll', t: 'Mieterhöhung', v: 'kein Spielraum', u: so.grund || '' });
+    var br = d.bremse, og = d.obergrenze;
+    if (br && br.gilt === true && og) z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'höchstens ' + eur2(og) + '/m²',
+      u: 'Mietpreisbremse gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') + ' · Vergleichsmiete + 10 %',
+      k: f.zielSetzen ? { lbl: 'als Zielmiete', fn: function () { f.zielSetzen(og); } } : null });
+    else if (br && br.gilt === false) z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'frei', u: 'keine Mietpreisbremse an dieser Adresse' });
+    else z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'bitte prüfen', u: (br && br.text) || '' });
+    var zq = zahl(f.ziel_qm), bad = !!(og && br && br.gilt === true && zq > og + 0.004);
+    z.push({ c: 'ziel', t: 'Zielbild', v: zq > 0 ? eur2(zq) + '/m²' + (wfl ? ' · ' + eur(zq * wfl) + '/Monat' : '') : 'noch keine Zielmiete', bad: bad,
+      u: bad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
+        : (f.ziel_wann ? String(f.ziel_wann) : 'Zielmiete und Maßnahmen darunter eintragen') });
+    z._kapp = d.kapp && d.kapp.text;
+    return z;
+  }
+  function leiterHtml(z) {
+    leiterStil();
+    return '<div class="dp-ml">' + z.map(function (r, j) {
+      return '<div class="dp-ml-z dp-ml-' + r.c + (r.bad ? ' dp-ml-bad' : '') + '"><span class="dp-ml-p"></span>'
+        + '<div class="dp-ml-txt"><span class="dp-ml-t">' + esc(r.t) + (r.tag ? ' <i>' + esc(r.tag) + '</i>' : '') + '</span>'
+        + '<b class="dp-ml-v">' + esc(r.v) + '</b>' + (r.u ? '<span class="dp-ml-u">' + esc(r.u) + '</span>' : '') + '</div>'
+        + (r.k ? '<button type="button" class="dp-ml-k" data-ml="' + j + '">' + esc(r.k.lbl) + ' ›</button>' : '') + '</div>';
+    }).join('') + '</div>' + (z._kapp ? '<p class="dp-ml-fuss">' + esc(z._kapp) + '</p>' : '');
+  }
+  function leiterBinden(host, z) {
+    host.querySelectorAll('[data-ml]').forEach(function (b) {
+      var r = z[+b.getAttribute('data-ml')];
+      b.addEventListener('click', function () { if (r && r.k) r.k.fn(); });
+    });
+  }
+  function leiterStil() {
+    if (el('dp-ml-stil')) return;
+    var s = document.createElement('style'); s.id = 'dp-ml-stil';
+    s.textContent = [
+      '.dp-ml{display:flex;flex-direction:column;border:1px solid #EFE7D6;border-radius:10px;padding:2px 12px;background:#fff}',
+      '.dp-ml-z{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:start;padding:8px 0;border-top:1px solid #F1ECE1}',
+      '.dp-ml-z:first-child{border-top:none}',
+      '.dp-ml-p{width:10px;height:10px;border-radius:50%;margin:5px 0 0 4px;background:#8A8272}',
+      '.dp-ml-soll .dp-ml-p{background:#3d6fa8}.dp-ml-neu .dp-ml-p{background:var(--wl-c9a84c, #C9A84C)}.dp-ml-ziel .dp-ml-p{background:#2f7d55}',
+      '.dp-ml-txt{display:flex;flex-direction:column;gap:1px;min-width:0}',
+      '.dp-ml-t{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#7A7370}',
+      '.dp-ml-t i{font:400 10.5px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#8A8272;font-style:normal}',
+      '.dp-ml-v{font:600 14px/1.35 "Space Grotesk",sans-serif;color:#2A2727}',
+      '.dp-ml-u{font-size:11.5px;color:#7A7370;line-height:1.4}',
+      '.dp-ml-bad .dp-ml-v{color:#B8625C}.dp-ml-bad .dp-ml-p{background:#B8625C}',
+      '.dp-ml-k{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;color:#2A2727;border-radius:7px;padding:5px 9px;font:500 12px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+      '.dp-ml-k:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,#fff)}',
+      '.dp-ml-fuss{font-size:11.5px;color:#8A8272;margin:6px 0 0;line-height:1.45}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  /* ETW/EFH/ZFH: die Leiter oben in der Karte „Mieterhöhung und Zielbild" (Tab Investition). */
+  function objektLeiter(m) {
+    var einzel = el('zb-einzel'); if (!einzel) return;
+    var host = el('zb-leiter');
+    if (!host) { host = document.createElement('div'); host.id = 'zb-leiter'; host.style.margin = '0 0 12px'; einzel.insertBefore(host, einzel.firstChild); }
+    var wfl = zahl(wert('wfl'));
+    function setz(id, v) { var e = el(id); if (!e) return; e.value = v; try { e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} }
+    var z = leiterZeilen(m, 0, {
+      mv_beginn: wert('mv_beginn'), ziel_qm: wert('zb_ziel_qm'), ziel_wann: wert('zb_ziel_wann'),
+      sollSetzen: function (miete, ab) { if (wfl > 0) setz('zb_soll_qm', (miete / wfl).toFixed(2).replace('.', ',')); if (ab) setz('zb_soll_ab', ab); },
+      zielSetzen: function (og) { setz('zb_ziel_qm', og.toFixed(2).replace('.', ',')); if (!wert('zb_ziel_wann')) setz('zb_ziel_wann', 'bei Mieterwechsel'); }
+    });
+    host.innerHTML = leiterHtml(z);
+    leiterBinden(host, z);
+  }
+
   /* ══ v3062 · MIETPREISBREMSE UND MIETRECHT AUF EINEN BLICK ══════════════
      Marcel 02.11.2026: „ja, die Mietpreisbremse kannst du umsetzen und die
      Kappungsgrenzen — und stellst du es auch einfacher dar?"
@@ -2327,6 +2419,7 @@
   function objektSumme() {
     var host = el('zb-summe'); if (!host) return;
     var m = modell(), w = m.wohnungen[0] || {};
+    if (m.art !== 'mfh') { try { objektLeiter(m); } catch (e) { console.warn('[leiter]', e); } }   /* v3067 */
     var s = w.soll || {};
     var vor = el('zb-soll-vorschlag');
     if (vor) vor.innerHTML = s.herkunft && s.herkunft !== 'eigene Angabe' && s.miete
@@ -2477,6 +2570,7 @@
   window.DpPotenzial = {
     mietpreisbremse: mietpreisbremse, mietrechtDaten: mietrechtDaten, mietrechtHtml: mietrechtHtml, mietrechtKarte: mietrechtKarte,   /* v3062 */
     standardhebung: standardhebung, standardhebungHtml: standardhebungHtml, feshBinden: feshBinden,   /* v3064 */
+    leiterZeilen: leiterZeilen, leiterHtml: leiterHtml, leiterBinden: leiterBinden,   /* v3067 */
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
     ohneZielbild: ohneZielbild,   /* v3018d */
     KENNZEICHNUNG: KENNZEICHNUNG, GESPERRT_KURZ: GESPERRT_KURZ, GESPERRT_LANG: GESPERRT_LANG, gesperrt: gesperrt, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,

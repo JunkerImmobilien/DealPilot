@@ -1865,7 +1865,8 @@ label.dp-required.qc-required::after {
       <!-- v2988: eigene marktuebliche Miete NACH den Massnahmen (Zielbild-Ertragswert, im Bericht „eigene Angabe") -->
       <div class="f s2"><label title="Die marktübliche Miete der Wohnungen NACH den Maßnahmen (€/m², nicht die Wunschmiete). Leer: DealPilot nimmt sie aus der amtlichen Mietübersicht, wo diese nach Modernisierung staffelt (Minden-Lübbecke: Klasse nach Modernisierungspunkten); sonst bleibt der Ertragswert beim Mietband des Bestands. Im Bericht als „eigene Angabe“.">Marktübliche Miete nach Modernisierung (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_markt_qm" type="text" inputmode="decimal" placeholder="leer = amtlich bzw. Bestand" class="trl"></div></div></div>
     <div id="zb-einzel">
-      <p class="sec-desc" style="margin:0 0 12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
+      <!-- v3067 · oben steht die Mietleiter (potenzial.js objektLeiter); der Satz darunter bleibt als Erklärung -->
+      <p class="sec-desc" style="margin:0 0 12px;font-size:12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
       <div class="g3">
         <div class="f"><label title="Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.">Vergleichsmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="aus Tab Miete" class="trl"></div></div>
         <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
@@ -3802,12 +3803,12 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3066"></script>
+<script src="js/mfh-einheiten.js?v=v3067"></script>
 <script src="js/mfh-felder.js?v=v3003"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
-<script src="js/potenzial.js?v=v3065"></script>
+<script src="js/potenzial.js?v=v3067"></script>
 <script src="js/mietvertrag-objekt.js?v=v3028b"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
