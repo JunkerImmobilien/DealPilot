@@ -146,7 +146,7 @@
        erreichbar. Er steht jetzt wieder da, gleich neben dem Anlegerprofil, das
        dieselben Gewichte als Vorlage setzt. */
     benenne('standardwerte', 'Mein Profil', 'Steuer, Finanzierung, Zielrendite, Haltung');
-    benenne('dealscore', 'Deal Score', 'Gewichtung der Kennzahlen, Schwellen');
+    benenne('dealscore', 'Deal Score', 'Ein oder zwei Scores, Gewichtung');   /* v3076 */
     benenne('api', 'Co-Pilot (KI)', 'Länge und Ton der Analysen');
     if (liste && tab('account') && tab('standardwerte')) liste.insertBefore(tab('standardwerte'), tab('account').nextSibling);
     if (liste && tab('standardwerte') && tab('dealscore')) liste.insertBefore(tab('dealscore'), tab('standardwerte').nextSibling);

@@ -754,7 +754,13 @@ window.DealScore2 = (function() {
     });
     var completeness = totalKpis > 0 ? totalAvailable / totalKpis : 0;
 
+    /* v3076 · zwei Scores, immer gerechnet; `score` oben bleibt unverändert. */
+    var zwei = _zweiScores(cats, cfg, deal);
+
     return {
+      investment: zwei.investment,       /* v3076 */
+      finanzierung: zwei.finanzierung,   /* v3076 · nicht verwechseln mit categories.finanzierung */
+      gesamt: zwei.gesamt,               /* v3076 · Gesamturteil der Zwei-Score-Ansicht */
       score: Math.round(totalScore),
       deckel: deckel,   /* v3069 */
       score_ohne_deckel: Math.round(scoreOhneDeckel),
@@ -784,6 +790,166 @@ window.DealScore2 = (function() {
       parts.push('Abzüge wegen: ' + negText);
     }
     return parts.join(' · ');
+  }
+
+  /* ═══ v3076 · ZWEI SCORES: INVESTMENT UND FINANZIERUNG ═══════════════════
+     Marcel 02.11.2026: „zwei getrennte Bewertungen anbieten … und in den
+     Einstellungen zwischen beiden wählen". Grundlage: design/Vorschläge/
+     score-benchmark-p1.md (Abschnitte 4 und 5) und die abgenommene Demo
+     design/Vorschläge/zwei-scores-demo.html (Variante A).
+
+     DER KERN RECHNET IMMER BEIDE. Ob einer oder zwei Scores ANGEZEIGT
+     werden, entscheidet allein die Anzeige (Merker dp_score_ansicht, gelesen
+     in dealscore2-ui.js und dpsh-score-hero.js — nie hier). Der bisherige
+     `score` bleibt bitgleich: Snapshots, Objektkarte, Kopfzeile und PDF
+     lesen ihn weiter.
+
+     ZUORDNUNG — nur die vorhandenen 24 DS2-Kennzahlen, nichts neu erfunden:
+       Investment (das Objekt, egal wie es finanziert wird)
+         rendite      Bruttorendite, Nettorendite (Objektrendite vor Kapitaldienst)
+         risiko       Leerstand, Instandhaltung, Bausubstanz, Energieklasse,
+                      Mietausfall-Risiko, Ausstattungsqualität
+         lage         Ist-/Marktmiete, Mietwachstum, Bevölkerung, Nachfrage, Mikrolage
+         upside       Mietsteigerung, Faktor vs. Markt (Kaufpreis gegen Markt),
+                      Wertsteigerung, Entwicklungsmöglichkeiten
+       Finanzierung (trägt die geplante Finanzierung)
+         finanzierung DSCR, LTV, Zinssatz, Tilgung, EK-Bedarf
+                      (samt Wechselwirkung LTV × DSCR)
+         rendite      Cashflow / Mon., Cash-on-Cash — beide erst nach dem
+                      Kapitaldienst bzw. gegen das Eigenkapital gerechnet
+
+     GEWICHTE: jede Kennzahl behält ihr effektives Gewicht aus dem aktiven
+     Profil (Hauptgewicht × Untergewicht ÷ Summe der Untergewichte ihrer
+     Kategorie). Die zwei Scores teilen die Kennzahlen nur auf, sie gewichten
+     nicht neu. Bei „Ausgewogen": Investment = Objektrendite 19,25 · Risiko 20
+     · Lage 10 · Upside 10 (auf 100 normiert); Finanzierung = Kapitaldienst &
+     Beleihung 25 · Cashflow & EK-Rendite 15,75. Folge: sind alle vier
+     Rendite-Kennzahlen da, ist das gewichtete Mittel beider Scores (vor der
+     Grenze) genau der bisherige Score ohne Grenze — tools/zwei-scores-pruefen.mjs
+     prüft das an jedem Fall.
+
+     GRENZE: ScoreTier.dscrDeckel (score-tiers.js, v3070) deckelt den
+     Finanzierungs-Score UND das Gesamturteil. Den Marktwert kennt dieser
+     Kern nur, wenn der Aufrufer ihn als deal.marktwert mitgibt.
+     GESAMTURTEIL (Demo-Variante A): Stufe des Investment-Scores, höchstens
+     bis zur DSCR-Grenze.
+     EMPFEHLUNG (Demo): „Kaufen" nur bei Investment ≥ 70 und Finanzierung
+     ≥ 50 — und nur, wenn die Miete den Kapitaldienst trägt (DSCR ≥ 1,0).
+     Beim Barkauf gilt die Finanzierung als erfüllt. */
+  var ZWEI_SCHWELLE = { investment: 70, finanzierung: 50 };
+  var ZWEI_ZUORDNUNG = {
+    investment: [
+      { kat: 'rendite', keys: ['bruttorendite', 'nettorendite'], name: 'Objektrendite' },
+      { kat: 'risiko', name: 'Risiko & Zustand' },
+      { kat: 'lage',   name: 'Lage & Markt' },
+      { kat: 'upside', name: 'Potenzial & Preis' }
+    ],
+    finanzierung: [
+      { kat: 'finanzierung', name: 'Kapitaldienst & Beleihung' },
+      { kat: 'rendite', keys: ['cashflow', 'cashOnCash'], name: 'Cashflow & EK-Rendite' }
+    ]
+  };
+
+  function _zweiTeil(teile, cats, cfg) {
+    var summe = 0, gSumme = 0, gruppen = [], kpis = [];
+    teile.forEach(function (t) {
+      var cat = cats[t.kat];
+      if (!cat || !cat.breakdown) return;
+      var sw = (cfg.subWeights && cfg.subWeights[t.kat]) || {};
+      var subTot = 0;
+      Object.keys(sw).forEach(function (k) { subTot += Number(sw[k]) || 0; });
+      var bd = cat.breakdown.filter(function (b) { return !t.keys || t.keys.indexOf(b.key) >= 0; });
+      var teilW = 0;
+      bd.forEach(function (b) { teilW += Number(b.weight) || 0; });
+      var gw = subTot > 0 ? (Number(cfg.weights[t.kat]) || 0) * teilW / subTot : 0;
+      var s = 0, w = 0, n = 0;
+      bd.forEach(function (b) {
+        if (!b.applied) return;
+        s += b.points * b.weight; w += b.weight; n++;
+        kpis.push({ kategorie: t.kat, name: b.name, points: b.points, value: b.value, unit: b.unit, weight: b.weight });
+      });
+      /* Ganze Kategorie: deren Score (mit Rückfall und Wechselwirkung) unverändert.
+         Teil einer Kategorie: nur die eigenen Kennzahlen, Rückfall wie _aggregate(). */
+      var sc = !t.keys ? cat.score : (w > 0 ? s / w : cfg.neutralFallback);
+      sc = clamp(sc, 0, 100);
+      gruppen.push({
+        key: t.kat + (t.keys ? '_teil' : ''), kat: t.kat, name: t.name,
+        score: Math.round(sc), gewicht: gw,
+        availableKpis: n, totalKpis: bd.length,
+        kpis: bd.map(function (b) { return b.name; }),
+        hinweis: (!t.keys && cat.interactionNote) ? cat.interactionNote : null
+      });
+      summe += sc * gw; gSumme += gw;
+    });
+    gruppen.forEach(function (g) {
+      g.anteil = gSumme > 0 ? Math.round(g.gewicht / gSumme * 1000) / 10 : 0;
+      g.gewicht = Math.round(g.gewicht * 100) / 100;
+    });
+    var sortiert = kpis.slice().sort(function (a, b) { return b.points - a.points; });
+    return {
+      roh: clamp(gSumme > 0 ? summe / gSumme : cfg.neutralFallback, 0, 100),
+      gewicht: gSumme,
+      gruppen: gruppen,
+      positives: sortiert.filter(function (k) { return k.points >= 75; }).slice(0, 4),
+      negatives: sortiert.slice().reverse().filter(function (k) { return k.points <= 50; }).slice(0, 4)
+    };
+  }
+
+  function _zweiStufe(s) {
+    if (window.ScoreTier && window.ScoreTier.stufe) return window.ScoreTier.stufe(s).wort;
+    return s >= 85 ? 'Sehr gut' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : s >= 35 ? 'Schwach' : 'Kritisch';
+  }
+
+  function _zweiScores(cats, cfg, deal) {
+    var inv = _zweiTeil(ZWEI_ZUORDNUNG.investment, cats, cfg);
+    var fin = _zweiTeil(ZWEI_ZUORDNUNG.finanzierung, cats, cfg);
+    var barkauf = _ds2Barkauf(deal);
+    var dscr = barkauf ? null : num(deal.dscr);
+    var mw = num(deal.marktwert), darl = num(deal.darlehen);
+    var ueber = (mw !== null && mw > 0 && darl !== null) ? (darl > mw) : null;
+    var dk = (dscr !== null && window.ScoreTier && window.ScoreTier.dscrDeckel) ? window.ScoreTier.dscrDeckel(dscr, ueber) : null;
+
+    var iS = Math.round(inv.roh);
+    var fRoh = Math.round(fin.roh);
+    var fS = (dk && fRoh > dk.max) ? dk.max : fRoh;
+    var gS = (dk && iS > dk.max) ? dk.max : iS;
+
+    /* Trägt die Miete den Kapitaldienst nicht (Grenze unter 70, also DSCR < 1,0),
+       ist die Finanzierung nicht erfüllt — auch wenn ihr Score noch 50 erreicht. */
+    var traegtNicht = !!(dk && dk.max < ZWEI_SCHWELLE.investment);
+    var invOk = iS >= ZWEI_SCHWELLE.investment;
+    var finOk = barkauf || (fS >= ZWEI_SCHWELLE.finanzierung && !traegtNicht);
+    var text, art;
+    if (iS < 50)                                  { text = 'Nicht kaufen';                      art = 'nein'; }
+    else if (traegtNicht && fS < 35 && !invOk)    { text = 'So nicht kaufen';                   art = 'nein'; }
+    else if (invOk && finOk)                      { text = 'Kaufen';                            art = 'ja'; }
+    else if (invOk)                               { text = 'Objekt passt, Finanzierung umbauen'; art = 'halb'; }
+    else if (finOk)                               { text = 'Verhandeln';                        art = 'halb'; }
+    else                                          { text = 'Verhandeln, Finanzierung umbauen';  art = 'halb'; }
+    var fehlt = [];
+    if (!invOk) fehlt.push('Investment');
+    if (!finOk) fehlt.push('Finanzierung');
+
+    return {
+      investment: {
+        score: iS, stufe: _zweiStufe(iS), schwelle: ZWEI_SCHWELLE.investment,
+        gruppen: inv.gruppen, positives: inv.positives, negatives: inv.negatives,
+        anteil: Math.round(inv.gewicht / ((inv.gewicht + fin.gewicht) || 1) * 1000) / 10
+      },
+      finanzierung: {
+        score: fS, score_ohne_deckel: fRoh, stufe: _zweiStufe(fS), schwelle: ZWEI_SCHWELLE.finanzierung,
+        deckel: dk ? dk.grund : null, gedeckelt: fS < fRoh, barkauf: barkauf,
+        gruppen: fin.gruppen, positives: fin.positives, negatives: fin.negatives,
+        anteil: Math.round(fin.gewicht / ((inv.gewicht + fin.gewicht) || 1) * 1000) / 10
+      },
+      gesamt: {
+        score: gS, stufe: _zweiStufe(gS),
+        deckel: dk ? { max: dk.max, grund: dk.grund } : null,
+        gedeckelt: gS < iS,
+        ueberMarktwert: ueber,
+        empfehlung: { text: text, art: art, fehlt: fehlt }
+      }
+    };
   }
 
   /* ─────────────────────────────────────────────────────────────
@@ -985,7 +1151,10 @@ window.DealScore2 = (function() {
     _scoreFinanzierung: scoreFinanzierung,
     _scoreRisiko: scoreRisiko,
     _scoreLage: scoreLage,
-    _scoreUpside: scoreUpside
+    _scoreUpside: scoreUpside,
+    _zweiScores: _zweiScores,          /* v3076 */
+    ZWEI_ZUORDNUNG: ZWEI_ZUORDNUNG,    /* v3076 · für Anzeige und Prüfer */
+    ZWEI_SCHWELLE: ZWEI_SCHWELLE
   };
 })();
 /* v838b-ds2-icons: 6 Profil-Emojis -> Inline-SVG (6 ersetzt) */
