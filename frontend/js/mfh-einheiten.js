@@ -607,50 +607,15 @@
       if (!inp) { e[k] = v; return; }
       inp.value = v; try { inp.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) { e[k] = v; }
     }
-    function leiterZeichnen(m, w) {
-      var host = el('mfh-we-leiter'); if (!host || !P || !w) return;
-      var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist), so = w.soll || {};
-      var d = P.mietrechtDaten ? P.mietrechtDaten(m, m.wohnungen.indexOf(w)) : null;
-      var qm = function (x) { return wfl > 0 ? ' · ' + (x / wfl).toFixed(2).replace('.', ',') + ' €/m²' : ''; };
-      var eur2q = function (x) { return x.toFixed(2).replace('.', ',') + ' €/m²'; };
-      var zeilen = [];
-      /* 1 · heute */
-      zeilen.push({ c: 'heute', t: 'Heute', v: ist > 0 ? eur(ist) + '/Monat' + qm(ist) : 'leer', u: e.mv_beginn ? 'Mietvertrag seit ' + String(e.mv_beginn).split('-').reverse().join('.') : '' });
-      /* 2 · Mieterhöhung, Mieter bleibt */
-      if (!(ist > 0)) zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: '—', u: 'Wohnung leer — es zählt die Neuvermietung' });
-      else if (so.vertrag) zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: 'nach Vertrag', u: so.grund || '' });
-      else if (so.miete != null && so.miete > ist + 0.01) {
-        var eigenS = so.herkunft === 'eigene Angabe';
-        var wirk = so.termine && so.termine.wirksam_ab;
-        zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: 'auf ' + eur(so.miete) + '/Monat' + qm(so.miete),
-          u: (so.termine ? so.termine.text : '') + (so.grenze ? ' · Grenze ' + so.grenze : '') + (so.umlage559 && so.umlage559.monat > 0 ? ' · darin Umlage § 559 ' + eur(so.umlage559.monat) : ''),
-          k: eigenS ? null : { lbl: 'übernehmen', fn: function () { feldSetzen('soll', String(Math.round(so.miete))); if (wirk) feldSetzen('soll_ab', wirk); } },
-          tag: eigenS ? 'eigene Angabe' : 'DealPilot rechnet vor' });
-      } else zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: 'kein Spielraum', u: so.grund || '' });
-      /* 3 · Neuvermietung */
-      var br = d && d.bremse, og = d && d.obergrenze;
-      if (br && br.gilt === true && og) zeilen.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'höchstens ' + eur2q(og),
-        u: 'Mietpreisbremse gilt' + (br.bis ? ' bis ' + br.bis.split('-').reverse().join('.') : '') + ' · Vergleichsmiete + 10 %',
-        k: { lbl: 'als Zielmiete', fn: function () { feldSetzen('ziel_qm', og.toFixed(2).replace('.', ',')); if (!e.ziel_wann) feldSetzen('ziel_wann', 'bei Mieterwechsel'); } } });
-      else if (br && br.gilt === false) zeilen.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'frei', u: 'keine Mietpreisbremse an dieser Adresse' });
-      else zeilen.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'bitte prüfen', u: (br && br.text) || 'Gemeinde noch nicht ermittelt' });
-      /* 4 · Zielbild */
-      var zq = zahl(e.ziel_qm), zielBad = !!(og && br && br.gilt === true && zq > og + 0.004);
-      zeilen.push({ c: 'ziel', t: 'Zielbild', v: zq > 0 ? eur2q(zq) + (wfl ? ' · ' + eur(zq * wfl) + '/Monat' : '') : 'noch keine Zielmiete', bad: zielBad,
-        u: zielBad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
-          : (e.ziel_wann ? String(e.ziel_wann) : 'Maßnahmen und Zielmiete unten eintragen') });
-      host.innerHTML = '<div class="mfh-ml">' + zeilen.map(function (z, j) {
-        return '<div class="mfh-ml-z mfh-ml-' + z.c + (z.bad ? ' mfh-ml-bad' : '') + '">'
-          + '<span class="mfh-ml-p"></span>'
-          + '<div class="mfh-ml-txt"><span class="mfh-ml-t">' + esc(z.t) + (z.tag ? ' <i>' + esc(z.tag) + '</i>' : '') + '</span>'
-          + '<b class="mfh-ml-v">' + esc(z.v) + '</b>' + (z.u ? '<span class="mfh-ml-u">' + esc(z.u) + '</span>' : '') + '</div>'
-          + (z.k ? '<button type="button" class="mfh-ml-k" data-ml="' + j + '">' + esc(z.k.lbl) + ' ›</button>' : '') + '</div>';
-      }).join('') + '</div>'
-        + (d && d.kapp ? '<p class="mfh-we-hint" style="margin:6px 0 0">' + esc(d.kapp.text) + '</p>' : '');
-      host.querySelectorAll('[data-ml]').forEach(function (b) {
-        var z = zeilen[+b.getAttribute('data-ml')];
-        b.addEventListener('click', function () { if (z && z.k) z.k.fn(); });
+    function leiterZeichnen(m, w) {   /* v3067 · die Leiter kommt aus potenzial.js (eine für ETW und MFH) */
+      var host = el('mfh-we-leiter'); if (!host || !P || !w || !P.leiterZeilen) return;
+      var z = P.leiterZeilen(m, m.wohnungen.indexOf(w), {
+        mv_beginn: e.mv_beginn, ziel_qm: e.ziel_qm, ziel_wann: e.ziel_wann,
+        sollSetzen: function (miete, ab) { feldSetzen('soll', String(Math.round(miete))); if (ab) feldSetzen('soll_ab', ab); },
+        zielSetzen: function (og) { feldSetzen('ziel_qm', og.toFixed(2).replace('.', ',')); if (!e.ziel_wann) feldSetzen('ziel_wann', 'bei Mieterwechsel'); }
       });
+      host.innerHTML = P.leiterHtml(z);
+      P.leiterBinden(host, z);
     }
     function aktualisieren() {
       var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist);
@@ -1104,20 +1069,6 @@
       /* v2430 · Bloecke wie in der freigegebenen Vorlage: Mietvertrag, Soll (blau), Zielbild (gruen), Ertragswert (Gold) */
       '#mfh-we-ov .mfh-we-kopf .mfh-we-unter{display:block;font-size:12px;color:#8A8272;font-weight:400;margin-top:2px}',
       '#mfh-we-ov .mfh-we-blk{border:1px solid #EFE7D6;border-radius:12px;padding:12px 14px;margin:0 0 12px;display:grid;gap:10px}',
-      /* v3066 · Mietleiter */
-      '#mfh-we-ov .mfh-ml{display:flex;flex-direction:column;position:relative}',
-      '#mfh-we-ov .mfh-ml-z{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:start;padding:8px 0;border-top:1px solid #F1ECE1}',
-      '#mfh-we-ov .mfh-ml-z:first-child{border-top:none}',
-      '#mfh-we-ov .mfh-ml-p{width:10px;height:10px;border-radius:50%;margin:5px 0 0 4px;background:#8A8272}',
-      '#mfh-we-ov .mfh-ml-soll .mfh-ml-p{background:#3d6fa8}#mfh-we-ov .mfh-ml-neu .mfh-ml-p{background:var(--wl-c9a84c, #C9A84C)}#mfh-we-ov .mfh-ml-ziel .mfh-ml-p{background:#2f7d55}',
-      '#mfh-we-ov .mfh-ml-txt{display:flex;flex-direction:column;gap:1px;min-width:0}',
-      '#mfh-we-ov .mfh-ml-t{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#7A7370}',
-      '#mfh-we-ov .mfh-ml-t i{font:400 10.5px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#8A8272;font-style:normal}',
-      '#mfh-we-ov .mfh-ml-v{font:600 14px/1.35 "Space Grotesk",sans-serif;color:#2A2727}',
-      '#mfh-we-ov .mfh-ml-u{font-size:11.5px;color:#7A7370;line-height:1.4}',
-      '#mfh-we-ov .mfh-ml-bad .mfh-ml-v{color:#B8625C}#mfh-we-ov .mfh-ml-bad .mfh-ml-p{background:#B8625C}',
-      '#mfh-we-ov .mfh-ml-k{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;color:#2A2727;border-radius:7px;padding:5px 9px;font:500 12px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
-      '#mfh-we-ov .mfh-ml-k:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,#fff)}',
       '#mfh-we-ov details.mfh-we-eigen>summary{cursor:pointer;font-size:12.5px;color:#6B6356;padding:4px 0}',
       '#mfh-we-ov details.mfh-we-eigen[open]>summary{margin-bottom:8px}',
       '#mfh-we-ov .mfh-we-blk-t{display:flex;align-items:center;gap:8px;font:600 11.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#6B6356}',

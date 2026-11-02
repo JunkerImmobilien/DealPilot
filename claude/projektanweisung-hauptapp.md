@@ -44090,3 +44090,10 @@ Mietleiter MFH, Rückfrage 2-Gewerke im Tab Objekt.
 eigene Haken daneben gebaut. Zurückgebaut, Steuerhinweis liest die vorhandenen Kacheln. **Commit** 4f43cdcf. **Nachweis**
 Staging: keine [data-fesh] mehr, #san-fesh-hinweis im Block, Kacheln gebunden. Meine Aussage „FESH gibt es nicht“
 ist zurückgenommen (wissen/2026-11-02.md Teil 5). **Rest** N89 Vorschlag Detailgrad, N91 KfW/Neubau.
+
+### v3066 — Einheiten bearbeiten: Satz einmal, Mietleiter mit Übernehmen (02.11.2026) · Prod 1.0.15
+
+**Was.** Schritt Gebäude: der Satz je Abschnitt einmal statt je Zeile. Wohnungsfenster: Block „Miete — was geht und
+wann“ (Heute → Mieterhöhung → Bei Neuvermietung → Zielbild) mit „übernehmen“ (setzt Feld + change). **Commit**
+83690a64. **Nachweis** Westerfeldstr. Whg 3, Knöpfe gesetzt und verworfen, _dpMfh unverändert. **Prod 1.0.15** Merge
+e33cd9f. **Rest** Kappung/Bremse HE 25.11. (Nachfolge erwartet Mitte November), BW 31.12. — erneut prüfen.
