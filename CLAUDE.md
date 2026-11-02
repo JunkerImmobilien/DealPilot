@@ -513,7 +513,9 @@ eingebauten Default, und der stimmt nur auf dem Server.
 > wird nicht gelesen — der Wächter war damit wirkungslos, obwohl er lief.
 >
 > **Seit v1259 vergleicht er gegen `tools/gold-audit-basislinie.txt`** —
-> je Datei eine Zahl, 468 eingefroren. **Mehr als dort steht = rot**, auch
+> je Datei eine Zahl, damals 468 eingefroren — **heute 413 in 53 Dateien**
+> (Kopf der Basislinie, nachgemessen 02.11.2026; hier stand bis dahin nur
+> „468 eingefroren“). **Mehr als dort steht = rot**, auch
 > wenn die Gesamtzahl gleich bliebe; eine Datei, die dort gar nicht steht,
 > ist immer rot. Weniger = grün mit dem Hinweis, die Basislinie zu senken
 > (`--basislinie-schreiben`). **Der Deckel darf sinken, nie steigen.**
