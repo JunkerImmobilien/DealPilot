@@ -259,6 +259,7 @@
       '.oabi-file .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       ".oabi-file select{font:inherit;font-size:11.5px;padding:3px 6px;border:1px solid var(--border,#E7E2DC);border-radius:6px;background:#fff}",
       '.oabi-st{font-size:11px;color:var(--muted,#7A7370);min-width:64px;text-align:right}',
+      '.oabi-einzeln{font:inherit;font-size:11px;padding:3px 8px;border:1px solid var(--border,#E7E2DC);border-radius:6px;background:#fff;color:var(--text,#2A2727);cursor:pointer;white-space:nowrap}',   /* v3093a */
       '.oabi-tbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}',
       '.oabi-tbl td{padding:7px 8px;border-bottom:1px solid rgba(42,39,39,0.07)}',
       '.oabi-tbl .src{font-size:10.5px;color:var(--wl-9a7f33, #9a7f33)}',
@@ -2514,6 +2515,13 @@
         '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option>' +
         (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') + '</select>' +
       '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'gesperrt' ? 'persönlich · nicht ausgelesen' : f.status === 'err' ? (f.fehler || 'kein Text') : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : 'Exposé')) + '</span>';
+    /* v3093a · N106 · Foto-Gruppe wieder auflösen */
+    if (f.fotos && f.fotos.length > 1 && f.seitenTexte && f.status !== 'reading') {
+      var _tr = document.createElement('button'); _tr.type = 'button'; _tr.className = 'oabi-einzeln';
+      _tr.textContent = 'einzeln auswerten'; _tr.title = 'Die Fotos sind verschiedene Unterlagen: jedes Foto als eigenes Dokument auswerten (ohne neuen Lese-Abruf).';
+      _tr.addEventListener('click', function () { _fotoGruppeTrennen(f); });
+      f.row.appendChild(_tr);
+    }
     var sel = f.row.querySelector('select');
     if (sel) sel.addEventListener('change', function () { onTypeChange(f, sel.value); });
   }
@@ -2602,6 +2610,54 @@
     f.userType = (v === 'auto') ? null : v;
     await resolveType(f); recompute(); renderMergedTable();
   }
+  /* v3093a · N106 · mehrere Fotos = Seiten EINES Dokuments. Jede Seite einzeln lesen (wie bisher je
+     Foto ein Abruf von /ai/seiten-lesen), Text merken, zusammen einordnen. Ist eine Seite persönlich,
+     bleibt das ganze Dokument gesperrt - lieber eine Unterlage zu wenig als ein Ausweis an die KI. */
+  var _SEITE = function (i, n) { return '\n\n--- Seite ' + (i + 1) + ' von ' + n + ' ---\n\n'; };
+  async function _fotoGruppeLesen(f) {
+    var n = f.fotos.length, texte = [], persoenlich = false;
+    try {
+      for (var i = 0; i < n; i++) {
+        var foto = f.fotos[i];
+        var t = await extractTextFull(foto, function (m) { setStatus(f, 'Seite ' + (i + 1) + '/' + n + ' · ' + m); });
+        if (foto._dpPersoenlich) persoenlich = true;
+        texte.push(t || '');
+      }
+      f.seitenTexte = texte;
+      f._scan = { seiten: n, gelesen: n, gekuerzt: false, foto: true };
+      if (persoenlich) { f.status = 'gesperrt'; f.type = 'dokument'; renderFileRow(f); return; }
+      f.text = texte.map(function (t, k) { return (k ? _SEITE(k, n) : '') + t; }).join('');
+      if (f.text.replace(/\s/g, '').length < 50) { f.status = 'err'; renderFileRow(f); return; }
+      await resolveType(f);
+    } catch (e) { f.status = 'err'; renderFileRow(f); }
+  }
+  /* „einzeln auswerten": die Gruppe in ein Dokument je Foto auflösen - mit den gemerkten Seitentexten,
+     ohne neuen Lese-Abruf (die Einordnung je Seite läuft neu, wie bei jeder Datei). */
+  async function _fotoGruppeTrennen(f) {
+    var idx = _files.indexOf(f);
+    if (idx < 0 || !f.fotos || !f.seitenTexte) return;
+    var vor = f.row, einzel = [];
+    f.fotos.forEach(function (foto, i) {
+      var row = document.createElement('div'); row.className = 'oabi-file';
+      vor.parentNode.insertBefore(row, vor.nextSibling); vor = row;
+      var e = { name: foto.name, file: foto, text: f.seitenTexte[i] || '', type: 'expose', userType: null, cache: {}, status: 'reading', row: row,
+        _scan: { seiten: 1, gelesen: 1, gekuerzt: false, foto: true } };
+      einzel.push(e);
+    });
+    _files.splice.apply(_files, [idx, 1].concat(einzel));
+    if (f.row && f.row.parentNode) f.row.parentNode.removeChild(f.row);
+    einzel.forEach(renderFileRow);
+    for (var k = 0; k < einzel.length; k++) {
+      var e = einzel[k];
+      try {
+        if (e.file._dpPersoenlich) { e.status = 'gesperrt'; e.type = 'dokument'; renderFileRow(e); continue; }
+        if (e.text.replace(/\s/g, '').length < 50) { e.status = 'err'; renderFileRow(e); continue; }
+        await resolveType(e);
+      } catch (err) { e.status = 'err'; renderFileRow(e); }
+    }
+    recompute(); renderMergedTable();
+    _unterlagenAuswerten();
+  }
   async function handleFiles(fileList) {
     /* v3090 · Marcel 02.11.2026: „könnte ich auch Bilder bei den PDFs import reingeben?“ - Fotos von Unterlagen
        (JPG, PNG, WebP) laufen wie eine gescannte Seite: Texterkennung und Schwärzen auf dem Server. */
@@ -2613,14 +2669,28 @@
        7-17 s Auslesung warteten aufeinander. Jetzt DREI Dateien gleichzeitig: dieselben Prompts,
        dasselbe Modell, dieselbe Zahl der Abrufe (die Bremse zählt Abrufe je Stunde, nicht
        gleichzeitige). Die Zeilen werden vorab in Upload-Reihenfolge angelegt, die Liste bleibt so. */
-    var neu = files.map(function (file) {
+    /* v3093a · N106 · Marcel 02.11.2026 (Browsertest): mehrere Fotos DERSELBEN Unterlage wurden je Foto
+       ein eigenes „Dokument" mit Bruchstück-Text. Jetzt gilt: zwei oder mehr gleichzeitig gewählte Fotos
+       sind die Seiten EINES Dokuments (Reihenfolge der Auswahl). Gelesen wird weiter je Foto - dieselbe
+       Zahl der Abrufe -, die Seitentexte werden gemerkt. „einzeln auswerten" in der Zeile hebt das auf,
+       ohne neuen Lese-Abruf. PDFs bleiben je Datei ein Dokument. */
+    var _fotoListe = files.filter(_istFoto);
+    var _fotoGruppe = _fotoListe.length >= 2 ? _fotoListe : null;
+    var neu = [];
+    files.forEach(function (file) {
+      if (_fotoGruppe && _istFoto(file) && file !== _fotoGruppe[0]) return;   /* steckt in der Gruppe */
       var row = document.createElement('div'); row.className = 'oabi-file'; filesHost.appendChild(row);
       var f = { name: file.name, file: file, text: '', type: 'expose', userType: null, cache: {}, status: 'reading', row: row };
+      if (_fotoGruppe && file === _fotoGruppe[0]) {
+        f.fotos = _fotoGruppe.slice();
+        f.name = 'Foto-Unterlage · ' + f.fotos.length + ' Seiten (' + f.fotos.map(function (x) { return x.name; }).join(', ') + ')';
+      }
       _files.push(f); renderFileRow(f);
-      return f;
+      neu.push(f);
     });
     async function eineDatei(f) {
       var file = f.file;
+      if (f.fotos) return _fotoGruppeLesen(f);
       try {
         f.text = await extractTextFull(file, function (m) { setStatus(f, m); });
         if (file._dpScan) f._scan = file._dpScan;

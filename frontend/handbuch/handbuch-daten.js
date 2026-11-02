@@ -2,7 +2,7 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "6ec29b8d9970bf63",
+  "index.html": "b0c57a019e06783a",
   "tooltip-content.js": "c7e4453dda8ecdd5",
   "help.js": "c0eb500c02240b2f",
   "tour-content.js": "e85775a89313350d",
@@ -10,17 +10,17 @@ window.DP_HANDBUCH = {
   "deal-action-readycheck.js": "51f7c11dd7e2ab57",
   "feld-hilfe.js": "3a7e9964af3920bc",
   "mfh-einheiten.js": "acbd7bca8272b72f",
-  "calc.js": "6d32d34add6cfdca",
+  "calc.js": "b8263e671d222c33",
   "ui.js": "89a8dcbe10de86ee",
   "pdf.js": "83b2fb88e72be57c",
-  "pdf-investment-bank.js": "da1ac2e19d4be831",
+  "pdf-investment-bank.js": "09aab6da82a8772e",
   "financing-pdf.js": "f6581f49c29dab13",
   "werbungskosten-pdf.js": "9a17188d51895f0e",
   "pdf-anlage-bmf.js": "bc9178281594e5de",
   "pdf-kaufpreisaufteilung.js": "33d5e894dcbc0726",
   "frontend-konstanten.json": "508e10ebd04b5723",
   "aufnahme.json": "433c9aa7f5c9ec56",
-  "handbuch-ablaeufe.mjs": "3cb0575ca00a0152"
+  "handbuch-ablaeufe.mjs": "704f0f1b46714632"
  },
  "reiter": [
   {
@@ -17713,12 +17713,13 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "Im Fenster **Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente** die Dateien auswählen oder hineinziehen. Mehrere PDFs oder Fotos (JPG, PNG) auf einmal gehen, bis 100 MB je Datei. Ein Foto wird wie eine gescannte Seite gelesen.",
+     "t": "Im Fenster **Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente** die Dateien auswählen oder hineinziehen. Mehrere PDFs oder Fotos (JPG, PNG) auf einmal gehen, bis 100 MB je Datei. Ein Foto wird wie eine gescannte Seite gelesen. Mehrere Fotos auf einmal gelten als Seiten EINER Unterlage; sind es verschiedene, in der Zeile **einzeln auswerten** klicken.",
      "kosten": "",
      "plan": "",
      "belege": [
       "js/object-actions.js: Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente",
-      "js/object-actions.js: mehrere Dateien möglich · max 100 MB je Datei"
+      "js/object-actions.js: mehrere Dateien möglich · max 100 MB je Datei",
+      "js/object-actions.js: _tr.textContent = 'einzeln auswerten';"
      ]
     },
     {
