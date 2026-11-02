@@ -301,6 +301,15 @@
       '.dp-mr-bad .dp-mr-v{color:#B8625C}',
       '.dp-mr-eng .dp-mr-z{grid-template-columns:130px 1fr;}',
       '.dp-mr-eng .dp-mr-u{grid-column:2}',
+      '.dp-mr-liste{margin-top:10px;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden;background:#fff}',
+      '.dp-mr-w{padding:8px 12px;border-top:1px solid #EFEBE3}',
+      '.dp-mr-w:first-child{border-top:none}',
+      '.dp-mr-w1{display:flex;gap:10px;align-items:baseline;font-size:12.5px}',
+      '.dp-mr-w1 b{font-family:"Space Grotesk",sans-serif;font-weight:600;color:#2A2727;white-space:nowrap}',
+      '.dp-mr-w1 span{white-space:nowrap;color:#6B6356}',
+      '.dp-mr-w1 .dp-mr-w-v{margin-left:auto;color:#2A2727;font-weight:600}',
+      '.dp-mr-w2{font-size:11.5px;color:#7A7370;line-height:1.45;margin-top:2px}',
+      '.dp-mr-w.dp-mr-bad .dp-mr-w2 b{color:#B8625C}',
       '@media(max-width:700px){.dp-mr-z{grid-template-columns:1fr}.dp-mr-v{white-space:normal}}'
     ].join('');
     document.head.appendChild(s);
@@ -321,19 +330,21 @@
       + '<span class="oe-ct-hint">' + esc(ort || 'Ort fehlt') + ' · aus den Landesverordnungen</span></div>';
     if (m.art === 'mfh') {
       var W = m.wohnungen || [];
+      /* v3062b · je Wohnung zwei Zeilen statt einer Tabelle: die Karte steht im Tab Miete in der
+         schmalen rechten Spalte (gemessen ~390 px), dort brach „8,43 €/m²" um. */
       var zeilen = W.map(function (w, j) {
-        var d = mietrechtDaten(m, j), s = w.soll || {};
+        var d = mietrechtDaten(m, j);
         var naechst = d.zeilen.filter(function (r) { return r.k === 'Nächste Erhöhung'; })[0];
         var ziel = d.zeilen.filter(function (r) { return r.k === 'Zielmiete'; })[0];
-        return '<tr' + (ziel ? ' class="dp-mr-bad"' : '') + '><td>' + esc(w.nr) + (w.lage ? ' · ' + esc(w.lage) : '') + '</td>'
-          + '<td>' + (w.ist > 0 && w.wfl > 0 ? eur2(w.ist / w.wfl) + '/m²' : (w.status === 'leer' ? 'leer' : '—')) + '</td>'
-          + '<td>' + esc(naechst ? naechst.v : '—') + (naechst && naechst.u ? '<br><small>' + esc(naechst.u) + '</small>' : '') + '</td>'
-          + '<td>' + (w.ziel_qm ? eur2(w.ziel_qm) + '/m²' + (ziel ? '<br><small style="color:#B8625C">über der Bremse (max. ' + eur2(d.obergrenze) + ')</small>' : '') : '—') + '</td></tr>';
+        var istQm = w.ist > 0 && w.wfl > 0 ? eur2(w.ist / w.wfl) + '/m²' : (w.status === 'leer' ? 'leer' : '—');
+        return '<div class="dp-mr-w' + (ziel ? ' dp-mr-bad' : '') + '">'
+          + '<div class="dp-mr-w1"><b>' + esc(w.nr) + (w.lage ? ' · ' + esc(w.lage) : '') + '</b><span>' + istQm + '</span>'
+          + '<span class="dp-mr-w-v">' + esc(naechst ? naechst.v : '—') + '</span></div>'
+          + '<div class="dp-mr-w2">' + esc(naechst && naechst.u ? naechst.u : '')
+          + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m²' + (ziel ? ' — <b>über der Mietpreisbremse</b> (höchstens ' + eur2(d.obergrenze) + '/m², außer § 556e/§ 556f)' : '') : '') + '</div></div>';
       }).join('');
       k.innerHTML = kopf + mietrechtHtml({ kappung: m.kappung, vgl: m.vgl, wohnungen: [] }, 0)
-        + (W.length ? '<table class="dp-mr-tab" style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px">'
-          + '<thead><tr style="text-align:left;color:#7A7370;font-size:11px"><th>Wohnung</th><th>Ist</th><th>Nächste Erhöhung</th><th>Zielmiete</th></tr></thead><tbody>'
-          + zeilen + '</tbody></table><p class="hint" style="margin:6px 0 0">Ändern je Wohnung im Fenster „Einheiten erfassen“ › Details.</p>' : '');
+        + (W.length ? '<div class="dp-mr-liste">' + zeilen + '</div><p class="hint" style="margin:6px 0 0">Ändern je Wohnung im Fenster „Einheiten erfassen“ › Details.</p>' : '');
       return;
     }
     k.innerHTML = kopf + mietrechtHtml(m, 0);
