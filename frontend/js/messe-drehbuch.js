@@ -1719,7 +1719,7 @@
     var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
     var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
     _rh = { start: Date.now() - 1000, berichte: [], spr: 0, sprMax: sprMax || 0, seqKey: sk, seq: sk ? ls(sk) : undefined,
-      merker: { dp_zielstufe: ls('dp_zielstufe'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
+      merker: { dp_detailgrad_zuletzt: ls('dp_detailgrad_zuletzt'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
       kacheln: ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].filter(rhGewaehlt) };
     await rhLaden();
     rhSpion(); rhMikroAn();
@@ -1766,8 +1766,9 @@
       }
       try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {}
       zurueck();
-      try { if (window.DealPilotObjektReiter) DealPilotObjektReiter.zielSetzen(parseInt(r.merker.dp_zielstufe, 10) || 1); } catch (e) {}
-      ls('dp_zielstufe', r.merker.dp_zielstufe);
+      /* v3073: der Detailgrad hängt am Objekt; zurück kommt nur die Vorgabe für neue Objekte */
+      ls('dp_detailgrad_zuletzt', r.merker.dp_detailgrad_zuletzt);
+      try { if (window.DpDetailgrad) DpDetailgrad.anwenden(); } catch (e) {}
       await new Promise(function (ok) { setTimeout(ok, Math.max(0, _rhNachlauf - Date.now())); });
       /* GEMESSEN (Esc während Stufe 2): der gespielte Stream lief nach dem
          Abbruch zu Ende, der Auftrag wurde als „fertig, ungesehen" gemerkt
@@ -1813,8 +1814,8 @@
      „was fehlt" wechselt dafür den Reiter - gemessen sprang Stufe 2 nach
      Investition, und alle folgenden Kegel lagen auf verborgenen Feldern */
   async function stufeWaehlen(n) {
-    var p = q('#oab-dp-stufen [data-oe-ziel="' + n + '"]');
-    if (p) p.click(); else { try { DealPilotObjektReiter.zielSetzen(n); } catch (e) {} }
+    var p = q('#oab-dp-stufen [data-dp-dg-setzen="' + n + '"]');   /* v3073: Detailgrad */
+    if (p) p.click(); else { try { DpDetailgrad.setzen(n, { still: true }); } catch (e) {} }
     await warte(700);
     if (!q('#s0.active')) reiter('s0');
   }
@@ -1952,7 +1953,7 @@
     szenen: [
       async function (s) {   /* 1 · drei Stufen */
         await rhStart(0);
-        try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
+        try { DpDetailgrad.setzen(1, { still: true }); } catch (e) {}
         await warte(600);
         await zeige(function () { return q('#oe-abruf-box'); }, 8);
         var f = [kontingentFrei(1), kontingentFrei(2), kontingentFrei(3)];
@@ -2076,12 +2077,12 @@
     szenen: [
       async function (s) {   /* 1 · Stufe 2 wählen */
         await rhStart(5);
-        try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
+        try { DpDetailgrad.setzen(1, { still: true }); } catch (e) {}
         await zeige(function () { return q('#oab-bar'); }, 8);
         await b2oZeile(s, 'Komplettbeispiel', 'Eine Wohnung, nur erzählt — und gleich mit der Marktbewertung <b>Stufe 2</b>.');
         await zeige(function () { return q('#oab-dp-stufen'); }, 10);
         await warte(900);
-        var p = q('#oab-dp-stufen [data-oe-ziel="2"]'); if (p) p.click();
+        var p = q('#oab-dp-stufen [data-dp-dg-setzen="2"]'); if (p) p.click();
         await warte(700);
         await b2oZeile(s, 'Stufe 2 wählen', 'Mittel · Stufe 2: die erweiterte Indikation — mit Kaufpreis, Miete, Zustand, Energie und Ausstattung.');
       },
@@ -2612,7 +2613,7 @@
     var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
     var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
     _rh = { start: Date.now() - 1000, berichte: [], spr: 0, sprMax: 0, seqKey: sk, seq: sk ? ls(sk) : undefined,
-      merker: { dp_zielstufe: ls('dp_zielstufe'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
+      merker: { dp_detailgrad_zuletzt: ls('dp_detailgrad_zuletzt'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
       kacheln: ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].filter(rhGewaehlt) };
     await rhLaden();
     rhSpion(); rhMikroAn();
@@ -4666,7 +4667,7 @@
     DPM_REIHE.angelegt = []; DPM_REIHE.gesperrt = []; DPM_REIHE.gespielt = []; DPM_REIHE.geloescht = []; DPM_REIHE.abrufe = []; DPM_REIHE.fertig = null;
     var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
     _rh = { start: Date.now() - 1000, berichte: [], spr: 0, sprMax: 0, seqKey: null, seq: undefined,
-      merker: { dp_zielstufe: ls('dp_zielstufe'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
+      merker: { dp_detailgrad_zuletzt: ls('dp_detailgrad_zuletzt'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
       kacheln: ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].filter(rhGewaehlt) };
     await rhLaden();
     rhSpion(); rhMikroAn();
@@ -5211,7 +5212,7 @@
         try { _rh.mitschnitt = new URLSearchParams(location.search).get('mitschnitt') === '25'; } catch (e) {}
         /* v2373a · Geokodierung für den Bodenrichtwert-Abruf aus dem Mitschnitt (nie im Mitschnitt-Lauf selbst) */
         if (!_rh.mitschnitt && window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.gefuehrt25geo) _rh.geo = JSON.parse(JSON.stringify(DPM_REIHE_DATEN.gefuehrt25geo));
-        try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
+        try { DpDetailgrad.setzen(1, { still: true }); } catch (e) {}
         await zeige(function () { return q('#oab-bar'); }, 8);
         await b2oZeile(s, 'Ein neues Objekt', 'Leer angelegt. Oben im Reiter Objekt die Datenaufnahme — einer der Wege ist die <b>' + rhNameKachel('gefuehrt') + '</b>.');
         rhNur(['gefuehrt']);

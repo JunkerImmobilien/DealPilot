@@ -776,12 +776,50 @@ window.DealPilotOnboarding = (function () {
       + '<b>Einstellungen › Allgemein</b>, den Rundgang über das Hilfe-Symbol oben.</p>';
   }
 
+  /* ══ v3073 · DETAILGRAD · Marcel 02.11.2026: „Die Stufenauswahl mit den
+     Feldern sollten wir bei der Ersteinrichtung in dem Modal abfragen." ═══
+     Die Wahl ist die VORGABE für neue Objekte (DpDetailgrad.vorgabeSetzen,
+     js/detailgrad.js) — jedes Objekt merkt sich danach seinen eigenen
+     Detailgrad. Ohne Wahl bleibt es für einen neuen Nutzer bei Einsteiger.
+     Gesetzt wird beim Klick auf die Kachel, wie bei der Tour-Wahl. */
+  var DETAILGRAD = [
+    { n: 1, name: 'Einsteiger', unter: 'Marktbericht Stufe 1 · Marktpreisindikation',
+      fuer: 'Nur die wichtigsten Felder je Reiter (rund 45). Der Rest rechnet mit deinen Standardwerten.' },
+    { n: 2, name: 'Fortgeschritten', unter: 'Marktbericht Stufe 2 · erweiterte Indikation',
+      fuer: 'Dazu Gewerke, Sanierung, Zielbild, Mietvertrag und zweites Darlehen (rund 150 Felder).' },
+    { n: 3, name: 'Experte', unter: 'Marktbericht Stufe 3 · Wertermittlung nach ImmoWertV',
+      fuer: 'Alle Felder, mit Bauteilen und Sach- und Ertragswert — wie ein Gutachten.' }
+  ];
+  function _dgVorgabe() {
+    try { var n = parseInt(localStorage.getItem('dp_detailgrad_zuletzt'), 10); return (n >= 1 && n <= 3) ? n : 1; } catch (e) { return 1; }
+  }
+  function sDetailgrad() {
+    var akt = _wahl.detailgrad || _dgVorgabe();
+    return '<p class="dpo-vor">Wie viele Felder möchtest du bei einem Objekt sehen? '
+      + 'Das lässt sich <b>jederzeit umschalten</b> — über jedem Reiter, '
+      + 'für jedes Objekt einzeln. <b>Nichts geht verloren:</b> ausgeblendete Felder behalten '
+      + 'ihre Werte und rechnen weiter.</p>'
+      + '<div class="dpo-kacheln dpo-kacheln-3">'
+      + DETAILGRAD.map(function (d) {
+          return '<button type="button" class="dpo-kachel' + (akt === d.n ? ' an' : '') + '" data-dgwahl="' + d.n + '">'
+            + '<span class="dpo-k-name">' + esc(d.name) + '</span>'
+            + '<span class="dpo-k-unter">' + esc(d.unter) + '</span>'
+            + '<span class="dpo-k-fuer">' + esc(d.fuer) + '</span>'
+            + (d.n === 1 ? '<span class="dpo-k-std">Standard</span>' : '')
+            + '</button>';
+        }).join('')
+      + '</div>'
+      + '<p class="dpo-fuss">Die Wahl gilt für <b>neue</b> Objekte. Objekte, die du schon angelegt hast, '
+      + 'behalten ihren Stand.</p>';
+  }
+
   var SCHRITTE = [
     { titel: 'Wie soll DealPilot aussehen?', kurz: 'Aussehen',    bau: s1 },
     { titel: 'Deine Daten',                  kurz: 'Daten',       bau: s2 },
     { titel: 'Dein Anlegerprofil — womit sollen wir rechnen?', kurz: 'Finanzierung',bau: s3 },
     { titel: 'Steuer',                       kurz: 'Steuer',      bau: s4 },
     { titel: 'Wie soll DealPilot bewerten?', kurz: 'Bewertung',   bau: s5 },
+    { titel: 'Wie tief möchtest du einsteigen?', kurz: 'Detailgrad', bau: sDetailgrad },   /* v3073 */
     { titel: 'Möchtest du Hilfe beim Start?', kurz: 'Hilfe',      bau: s6 }
   ];
 
@@ -941,8 +979,18 @@ window.DealPilotOnboarding = (function () {
 
     _ov.addEventListener('click', function (ev) {
       if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); return; }
-      var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ],[data-pilotwahl],[data-tourwahl]') : null;
+      var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ],[data-pilotwahl],[data-tourwahl],[data-dgwahl]') : null;
       if (k) {
+        if (k.hasAttribute('data-dgwahl')) {   /* v3073 · Detailgrad = Vorgabe für neue Objekte */
+          _wahl.detailgrad = parseInt(k.getAttribute('data-dgwahl'), 10) || 1;
+          try {
+            if (window.DpDetailgrad && DpDetailgrad.vorgabeSetzen) DpDetailgrad.vorgabeSetzen(_wahl.detailgrad);
+            else localStorage.setItem('dp_detailgrad_zuletzt', String(_wahl.detailgrad));
+          } catch (e) {}
+          Array.prototype.forEach.call(k.parentNode.querySelectorAll('.dpo-kachel'), function (x) { x.classList.remove('an'); });
+          k.classList.add('an');
+          return;
+        }
         if (k.hasAttribute('data-tourwahl')) {   /* v3016l */
           var tc = el('dpo_tour'); if (tc) tc.checked = k.getAttribute('data-tourwahl') === 'ja';
           Array.prototype.forEach.call(k.parentNode.querySelectorAll('.dpo-kachel'), function (x) { x.classList.remove('an'); });

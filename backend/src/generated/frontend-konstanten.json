@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-02T09:53:15.156Z",
+ "erzeugt_am": "2026-11-02T09:58:53.060Z",
  "quellen": {
-  "voice-import": "fd1708d211c4b4d0",
+  "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "9ec50d08fbb36856",
-  "index-html": "a43ba469bcf536ea",
+  "storage": "c8f93fd41b04ada7",
+  "index-html": "0142fc9a71da606d",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -658,6 +658,7 @@
    "_ueberf_link",
    "ueberf_daten",
    "_dp_herkunft",
+   "dp_stufe",
    "erbbauzins",
    "erb_restlz",
    "erb_zs_ang",

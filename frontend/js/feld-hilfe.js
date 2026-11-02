@@ -50,7 +50,7 @@
       }
     } catch (e) {}
     if (DS2.indexOf(id) >= 0) teile.push('geht in den Investor Deal Score');
-    var e3 = document.querySelector('.card[data-oe-stufe-min="3"]');
+    var e3 = document.querySelector('.card[data-collapsible="wm-obj"]');   /* v3073: Karte Sach- und Ertragswert */
     var el = $(id);
     if (el && e3 && e3.contains(el) && !teile.some(function (t) { return /Stufe 3/.test(t); })) teile.push('verfeinert Sach- und Ertragswert (ohne Angabe gilt der Ansatz der Anlage 3 ImmoWertV)');
     if (el && /^(eq_|mod_)/.test(id)) teile.push(/^mod_/.test(id) ? 'Modernisierungspunkte nach Anlage 2 ImmoWertV (Restnutzungsdauer)' : 'Vorschlag der Standardstufe je Gewerk (Anlage 4 ImmoWertV)');

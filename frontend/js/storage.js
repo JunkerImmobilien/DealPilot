@@ -210,6 +210,9 @@ var FIELDS = [
      Ein Feld, JSON darin. Kein zweiter Speicherweg, keine zweite Tabelle:
      `FIELDS` wird ohnehin gespeichert, geladen und synchronisiert. */
   '_dp_herkunft',
+  /* v3073 · Detailgrad JE OBJEKT (js/detailgrad.js): 1 Einsteiger · 2 Fortgeschritten · 3 Experte.
+     Fehlt das Feld (Bestandsobjekt), gilt Experte. */
+  'dp_stufe',
   /* v1312 · Erbbaurecht: die Vertragsangaben. Die Checkbox selbst laeuft
      ueber _erbpacht (Checkboxen gehen nicht ueber FIELDS). */
   'erbbauzins','erb_restlz','erb_zs_ang','erb_entsch'
@@ -595,7 +598,9 @@ function loadData(d) {
     /* v2660: der Mietvertrag am Objekt - fehlte er im geladenen Objekt, erbte B Vertragsart,
        Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
     'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',
-    'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre'
+    'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre',
+    /* v3073: sonst erbt ein Bestandsobjekt ohne Detailgrad den des vorigen Objekts (leer = Experte) */
+    'dp_stufe'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);

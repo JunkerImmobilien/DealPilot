@@ -10,7 +10,8 @@
     "felder": "Element-ids von input/select/textarea (ohne type=hidden). Ein ausgeblendetes Feld behaelt seinen Wert und rechnet weiter.",
     "js": "Karten mit 'js' werden von dem genannten Modul eingehaengt; sie existieren erst nach dessen Lauf.",
     "bwk_modus": "Bewirtschaftung hat zwei sich ausschliessende Modi (calc.js switchBwkMode): #bwk-detail-mode (Standard, index.html:3104) und #bwk-percent-mode (index.html:3016). Einsteiger sieht nur den Detail-Modus mit den vier Feldern; der Umschalter kommt ab Fortgeschritten.",
-    "nr": "Steht nr, gilt document.querySelectorAll(selektor)[nr]."
+    "nr": "Steht nr, gilt document.querySelectorAll(selektor)[nr].",
+    "experte": "v3073: Was nicht gelistet ist, ist Experte. Bereiche, die KEINE Karte sind und trotzdem erst in Experte erscheinen, stehen ausdruecklich unter experte (sonst blieben sie in jeder Stufe sichtbar)."
   },
   "reiter": {
     "s0": {
@@ -111,6 +112,15 @@
           "mod_leitungen",
           "ausst_technik",
           "mod_grundriss"
+        ]
+      },
+      "experte": {
+        "karten": [
+          {
+            "titel": "Parameter der Verkehrswertermittlung (in Automatisch ermittelt)",
+            "selektor": "#oe-auto-wrap",
+            "art": "block"
+          }
         ]
       }
     },
@@ -359,10 +369,9 @@
         "karten": [
           {
             "titel": "Eingabe-Modus (Detailliert | % der NKM)",
-            "selektor": "#s4 .bwk-mode-btns",
+            "selektor": "#bwk-modus-btns",
             "art": "kind",
-            "nr": 0,
-            "hinweis": "erster Treffer = Karte Eingabe-Modus (index.html:3002); der zweite steckt in der Quick-Eingabe. Beim Bau besser eine id vergeben."
+            "hinweis": "v3073: id vergeben (index.html), vorher #s4 .bwk-mode-btns Treffer 0"
           },
           {
             "titel": "Prozent-Modus: BWK – Quick-Eingabe + Berechnete BWK",
@@ -450,6 +459,15 @@
       "fortgeschritten": {
         "karten": [],
         "felder": []
+      },
+      "experte": {
+        "karten": [
+          {
+            "titel": "Bausteine im PDF",
+            "selektor": ".ai-pdf-details",
+            "art": "block"
+          }
+        ]
       }
     },
     "s6": {
@@ -550,6 +568,16 @@
           }
         ],
         "felder": []
+      },
+      "experte": {
+        "karten": [
+          {
+            "titel": "In Gesellschaft überführen",
+            "selektor": "#dpuew-stage",
+            "art": "block",
+            "js": "deal-action.js"
+          }
+        ]
       }
     }
   }

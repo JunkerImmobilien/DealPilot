@@ -583,7 +583,7 @@
       ev.preventDefault();
       try { if (b3.closest('#mba-miete') && typeof window.switchTab === 'function') window.switchTab(0); } catch (e) {}
       if (window.DealPilotObjektReiter && typeof DealPilotObjektReiter.stufeAbrufen === 'function') {
-        try { DealPilotObjektReiter.zielSetzen && DealPilotObjektReiter.zielSetzen(3); } catch (e) {}
+        try { if (window.DpDetailgrad) DpDetailgrad.setzen(3); } catch (e) {}   /* v3073: Stufe 3 = Detailgrad Experte */
         DealPilotObjektReiter.stufeAbrufen(3);
       }
       return;

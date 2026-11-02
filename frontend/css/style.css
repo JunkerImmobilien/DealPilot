@@ -38885,16 +38885,7 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .f.oe-pflicht-fehlt input, .f.oe-pflicht-fehlt select { border-color: #B8625C !important; box-shadow: 0 0 0 2px color-mix(in srgb, #B8625C 18%, transparent); }
 .oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }
 .oe-anfragen-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }
-.card[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
-/* v1967 - die Regel verlangte `.card`. Die Leiste der ImmoWertV-Parameter
-   ist aber ein Formularfeld (`div.f.s2#oe-auto-wrap`), kein Karten-Element,
-   und blieb deshalb bei Stufe 1 und 2 stehen.
-
-   Die bestehende Regel wird NICHT geschwaecht - sie bleibt, wie sie ist.
-   Daneben steht eine zweite mit derselben Spezifitaet (0,3,0) fuer `.f`.
-   Vorher gegengelesen: `oe-stufe-aus` kommt in dieser Datei genau einmal
-   vor, es gibt also keine zweite Regel, die sich damit erschlaegt. */
-.f[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
+/* v3073: die Regeln der Eingabetiefe (oe-stufe-aus) sind ausgebaut - Detailgrad am Dateiende */
 
 /* v1852b · Eingabetiefe im Reiterkopf, Übernahme am Verkehrswert */
 .oe-kopf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px; padding: 10px 14px; border: 1px solid var(--border-g, #e9dcb3); border-left: 3px solid var(--wl-c9a84c, #C9A84C); border-radius: 10px; background: var(--karte, #FBF6E9); }
@@ -38908,9 +38899,6 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-ziel-btn b { font-weight: 600; font-size: 12.5px; }
 .oe-ziel-btn small { font-size: 10.5px; color: var(--muted, #7A7370); font-weight: 400; }
 .oe-ziel-btn.on small { color: inherit; }
-.oe-kopf-cb { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
-.oe-kopf-cb input { accent-color: var(--wl-c9a84c, #C9A84C); }
-.oe-karte[data-oe-detail].oe-aus { display: none !important; }
 .oe-karte .card-title { margin-top: 10px; }
 
 /* ═══ v1855 · Checkboxen dezent (Marcel: „riesig") — schlaegt v1147-CB33 durch html-Anker ═══ */
@@ -39088,13 +39076,9 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 .oe-ct-hint { font-size: 11.5px !important; color: #5f5955 !important; letter-spacing: .02em; }
 .oe-opt { font-size: 10.5px !important; color: #5f5955 !important; border-color: #b9b2aa !important; }
 .oe-ziel-hint, .oe-bgf-hint, .oe-abruf-foot span { color: #5f5955; }
-.oe-pillen { display: inline-flex; gap: 6px; margin: 0 10px 0 2px; }
-.oe-pillen .dp-pf-pille { cursor: pointer; }
 .oe-kopf .oe-abruf-box { flex: 1 1 100%; margin-top: 8px; border-top: 1px dashed var(--border-g, #e9dcb3); }
 .oe-btn-klein { font-size: 11px; padding: 3px 8px; margin-top: 4px; }
 .oe-bgf-hint { display: block; font-size: 11px; margin-top: 3px; }
-.oe-pillen .dp-pf-pille { border-color: #b9b2aa; color: #2A2727; opacity: 1; }
-.oe-pillen .dp-pf-pille.on { color: #050505; }
 
 /* ===== v1868 · Marcel: „die Eingabetiefe ein bisschen schmaler … und die Marktpreis-Karte als
    schmaleren Streifen". Gemessen: Kopf 405 px (drei Abruf-Zeilen à 76 px), Ergebnisblock 371 px.
@@ -41328,9 +41312,6 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
        die Ansicht bleibt ueber sbActionsAction('view-all') erreichbar. */
 .sb-act-item.sb-act-item[data-act="view-all"] { display: none !important; }
 
-/* (2) Der Haken „weitere Objektdetails angeben" folgt seit v2969 der
-       Eingabetiefe (objekt-reiter.js) — als Schalter ist er weg. */
-.oe-kopf .oe-kopf-cb { display: none !important; }
 /* Die drei Stufen-Zeilen waehlen die Tiefe per Klick — das muss man sehen. */
 .oe-abruf-zeilen .oe-row[data-oe-zeile] { cursor: pointer; }
 .oe-abruf-zeilen .oe-row[data-oe-zeile]:not(.on):hover { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent); }
@@ -41512,3 +41493,53 @@ body.qc-standalone-active nav.tabs { display: none !important; }
 #settings-modal .dp-pa details[open] .dp-pa-pf { transform: rotate(90deg); }
 #settings-modal .dp-pa details.dp-pa-karte > .plan-credits-desc { margin-top: 10px; }
 #settings-modal .dp-pa button { font-family: inherit; }
+
+
+/* ══ v3073 · DETAILGRAD Einsteiger · Fortgeschritten · Experte (js/detailgrad.js) ══
+   Marcel 02.11.2026. Ersetzt die Eingabetiefe 1/2/3, den Haken „weitere
+   Objektdetails" und ihre Regeln (oe-stufe-aus, oe-aus, oe-kopf-cb, oe-pillen).
+   Das Modul schreibt data-dp-dg="2|3" an Karten, Bereiche und Feldhüllen,
+   die Stufe steht als dp-dg-1/2/3 am <body>. Ausblenden ist NUR Anzeige.
+   Der Anker trägt die Reiter-id (:is(#s0,…)) — bewusst ID-Spezifität, weil
+   einzelne Karten ihr display selbst mit id und !important setzen. */
+body.dp-dg-1 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="2"],
+body.dp-dg-1 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3"],
+body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3"] { display: none !important; }
+
+/* Schalter: über jedem Reitertitel (reiter) und im Reiter Objekt (objekt) */
+.dp-dg-host { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.dp-dg-reiter { float: right; margin: 2px 0 8px 14px; color: var(--text, #2A2727); }
+.dp-dg-lbl { font: 500 10px "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.dp-dg-schalter { display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; border: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
+.dp-dg-knopf { border: 0; background: transparent; color: inherit; opacity: .78; cursor: pointer; padding: 5px 11px; border-radius: 8px; font: 600 12px "Space Grotesk", Inter, system-ui, sans-serif; line-height: 1.15; text-align: left; min-height: 0; }
+.dp-dg-knopf small { display: block; font: 500 9.5px "JetBrains Mono", monospace; letter-spacing: .03em; opacity: .8; margin-top: 1px; }
+.dp-dg-knopf:hover { opacity: 1; box-shadow: inset 0 0 0 1px var(--wl-c9a84c, #C9A84C); }
+.dp-dg-knopf.on { opacity: 1; color: #050505; background: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f)); }
+.dp-dg-knopf:focus-visible { outline: 2px solid var(--wl-c9a84c, #C9A84C); outline-offset: 1px; }
+.oe-kopf .dp-dg-host { color: #2A2727; }
+@media (max-width: 640px) {
+  .dp-dg-reiter { float: none; display: flex; margin: 0 0 10px; }
+  .dp-dg-reiter .dp-dg-lbl { display: none; }
+  .dp-dg-reiter .dp-dg-schalter { width: 100%; }
+  .dp-dg-reiter .dp-dg-knopf { flex: 1 1 0; text-align: center; }
+  .dp-dg-knopf { padding: 5px 8px; font-size: 11.5px; }
+  .oe-kopf .oe-ziel .dp-dg-host { flex-basis: 100%; }
+  .oe-kopf .dp-dg-schalter { width: 100%; }
+  .oe-kopf .dp-dg-knopf { flex: 1 1 0; }
+}
+
+/* Fußzeile je Reiter: „+ n weitere Felder in …" */
+.dp-dg-weiter { display: flex; gap: 8px 14px; flex-wrap: wrap; align-items: center; margin: 16px 0 6px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); font-size: 12px; color: #5f5955; }
+.dp-dg-mehr { border: 1px dashed var(--wl-c9a84c, #C9A84C); background: transparent; color: inherit; border-radius: 8px; padding: 4px 10px; cursor: pointer; font: 12px Inter, system-ui, sans-serif; min-height: 0; }
+.dp-dg-mehr b { font: 600 11.5px "JetBrains Mono", monospace; color: var(--wl-b8932f, #b8932f); }
+.dp-dg-mehr:hover { border-style: solid; }
+.dp-dg-erfasst { color: #1f6a40; }
+
+/* Hinweis beim Wechsel */
+.dp-dg-toast { position: fixed; left: 50%; bottom: 18px; z-index: 10050; transform: translate(-50%, 160%); max-width: min(560px, calc(100vw - 32px)); background: #050505; color: #F3EEE2; padding: 11px 16px; border-radius: 12px; border-left: 3px solid var(--wl-c9a84c, #C9A84C); font-size: 13px; line-height: 1.45; box-shadow: 0 10px 30px rgba(0,0,0,.3); transition: transform .25s; pointer-events: none; }
+.dp-dg-toast.zeig { transform: translate(-50%, 0); }
+
+/* Abruf-Zeile Stufe 3 unter Experte, „Bereit für die Bank": Vorgabe-Zeile */
+.oe-row.oe-row-gesperrt .oe-k { opacity: .7; }
+.dp-rc-vorgabe { margin-top: 8px; font-size: 11.5px; color: #7a5a12; background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent); border-left: 3px solid var(--wl-c9a84c, #C9A84C); padding: 5px 9px; border-radius: 0 7px 7px 0; }
+.dp-rc-vorgabe-knopf { border: 0; background: none; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; min-height: 0; }

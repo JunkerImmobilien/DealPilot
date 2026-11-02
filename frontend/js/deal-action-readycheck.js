@@ -87,8 +87,23 @@
     return null;
   }
 
-  /* Liest den tatsaechlichen Feldzustand: existiert? gefuellt? */
+  /* ── v3073 · VORSCHLAG C: DER DETAILGRAD ZAEHLT MIT ─────────────────
+     Marcel 02.11.2026: Einsteiger · Fortgeschritten · Experte (detailgrad.js).
+     Ein Feld, das in der gewaehlten Stufe ausgeblendet UND leer ist, zaehlt
+     nicht - es rechnet mit seiner Vorgabe oder neutral (Score 60). Ein
+     ausgeblendetes, aber GEFUELLTES Feld zaehlt weiter: es rechnet ja.
+     Statt eines Chips steht eine Zeile „n rechnen mit Vorgabe". */
+  function dgAus(el) {
+    var D = window.DpDetailgrad;
+    try { return !!(D && el && D.ausgeblendet(el)); } catch (e) { return false; }
+  }
   function fieldState(key) {
+    var st = fieldStateRoh(key);
+    if (st.exists && !st.filled && dgAus(firstEl(FIELD_TARGETS[key]))) return { exists: false, filled: false, vorgabe: true };
+    return st;
+  }
+  /* Liest den tatsaechlichen Feldzustand: existiert? gefuellt? */
+  function fieldStateRoh(key) {
     var el = firstEl(FIELD_TARGETS[key]);
     if (!el) return { exists: false, filled: false };
     if (key === 'qualitaet') {
@@ -174,14 +189,14 @@
    * > ihnen nicht zu fragen, schon — die Anzeige meldete Vollständigkeit
    * > für die Hälfte der Arbeit.
    *
-   * Die Stufe kommt aus `zielstufe()`, also aus derselben Pille, die der
-   * Nutzer im Reiter Objekt gesetzt hat. Fehlt das Modul, zählt wie
-   * bisher nur der Score — kein harter Ausfall. */
+   * Die Stufe ist seit v3073 der Detailgrad (detailgrad.js, je Objekt):
+   * Einsteiger = Stufe 1, Fortgeschritten = 2, Experte = 3. Fehlt das
+   * Modul, zählt wie bisher nur der Score — kein harter Ausfall. */
   function stufenPflicht() {
     var OR = window.DealPilotObjektReiter;
     if (!OR || typeof OR.pflichtFuer !== 'function') return { stufe: null, felder: [] };
     var stufe = 1;
-    try { stufe = parseInt(OR.zielstufe && OR.zielstufe(), 10) || 1; } catch (e) { stufe = 1; }
+    try { stufe = (window.DpDetailgrad && DpDetailgrad.stufe()) || 1; } catch (e) { stufe = 1; }
     var ids;
     try { ids = OR.pflichtFuer(stufe) || []; } catch (e) { return { stufe: stufe, felder: [] }; }
     var raus = [];
@@ -190,6 +205,7 @@
       if (SCORE_IDS[id]) return;
       var e = document.getElementById(id);
       if (!e) return;                        /* nicht im DOM — nicht zaehlen */
+      if (dgAus(e) && String(e.value || '').trim() === '') return;   /* v3073: ausgeblendet und leer */
       raus.push({ id: id, name: (OR.FELDNAMEN && OR.FELDNAMEN[id]) || id,
         gefuellt: String(e.value || '').trim() !== '' });
     });
@@ -223,6 +239,7 @@
       if (!OA.pflicht(art, id)) return;
       var e = document.getElementById(id);
       if (!e) return;                       /* nicht im DOM — nicht zaehlen */
+      if (dgAus(e) && String(e.value || '').trim() === '') return;   /* v3073: ausgeblendet und leer */
       raus.push({ id: id, name: ART_PFLICHT[id],
         gefuellt: String(e.value || '').trim() !== '' });
     });
@@ -230,9 +247,10 @@
   }
 
   function getData() {
-    var total = 0, missing = [];
+    var total = 0, missing = [], vorgabe = [];
     Object.keys(FIELD_TARGETS).forEach(function (k) {
       var f = fieldState(k);
+      if (f.vorgabe) { vorgabe.push(LABELS[k] || k); return; }   /* v3073 */
       if (!f.exists) return;       // Feld nicht im DOM -> nicht zaehlen
       total++;
       if (!f.filled) missing.push({ key: k, name: LABELS[k] || k });
@@ -251,7 +269,8 @@
     var filled = total - missing.length;
     var percent = total ? Math.round(filled / total * 100) : 0;
     return { percent: percent, filled: filled, total: total, missing: missing,
-      stufe: sp.stufe, stufe_felder: sp.felder.length };
+      stufe: sp.stufe, stufe_felder: sp.felder.length,
+      vorgabe: vorgabe.length, vorgabe_namen: vorgabe };
   }
 
   function buildHtml(d) {
@@ -266,6 +285,7 @@
     } else {
       body = '<div class="dp-rc-allset">\u2713 Alle Angaben vollst\u00e4ndig</div>';
     }
+    body += vorgabeZeile(d);
     var exp =
       '<div class="dp-rc-exports">' +
         '<span class="dp-rc-exp-label">Exporte:</span>' +
@@ -277,7 +297,7 @@
        sind - und die Zahl aendert sich, wenn der Nutzer die Eingabetiefe
        umstellt. Ohne die Stufe daneben sieht das wie ein Fehler aus. */
     var stufeTxt = d.stufe
-      ? ' \u00b7 Eingabetiefe ' + d.stufe + (d.stufe_felder ? ' (+' + d.stufe_felder + ')' : '')
+      ? ' \u00b7 ' + ((window.DpDetailgrad && DpDetailgrad.NAMEN[d.stufe]) || 'Stufe') + ' (Stufe ' + d.stufe + ')' + (d.stufe_felder ? ' (+' + d.stufe_felder + ')' : '')
       : '';
     return '<div id="da-readycheck" class="da-readycheck">' +
       '<div class="dp-rc-head"><span class="dp-rc-title">Bereit f\u00fcr die Bank?</span>' +
@@ -286,6 +306,17 @@
       '<div class="dp-rc-bar"><div class="dp-rc-bar-fill" style="width:' + pct + '%"></div></div>' +
       body + exp +
     '</div>';
+  }
+
+  /* v3073 · eine Zeile statt Chips fuer die ausgeblendeten, leeren Merkmale */
+  function vorgabeZeile(d) {
+    if (!d || !d.vorgabe) return '';
+    var n = (d.stufe || 1) + 1, D = window.DpDetailgrad;
+    var name = (D && D.NAMEN && D.NAMEN[n]) || 'der n\u00e4chsten Stufe';
+    return '<div class="dp-rc-vorgabe" title="' + esc((d.vorgabe_namen || []).join(', ')) + '">'
+      + d.vorgabe + (d.vorgabe === 1 ? ' Merkmal rechnet' : ' Merkmale rechnen') + ' mit Vorgabe oder neutral'
+      + (n <= 3 ? ' \u2014 <button type="button" class="dp-rc-vorgabe-knopf" data-dp-dg-setzen="' + n + '">genauer in ' + esc(name) + '</button>' : '')
+      + '</div>';
   }
 
   function inject() {
@@ -326,6 +357,8 @@
         ? document.getElementById(key.slice(7))
         : firstEl(FIELD_TARGETS[key] || []);
     if (!el) return;
+    /* v3073: liegt das Ziel über dem Detailgrad, hebt der Sprung ihn */
+    try { if (window.DpDetailgrad) DpDetailgrad.feldZeigen(el); } catch (e) {}
     var sec = el.closest ? el.closest('.sec') : null;
     if (sec) {
       var tabs = document.querySelectorAll('.tab');
@@ -351,7 +384,7 @@
     } catch (e) { console.warn('[v449] export ' + which, e); }
   }
 
-  window.DealPilotReadyCheck = { jump: jump, exp: exp, refresh: inject, getData: getData };
+  window.DealPilotReadyCheck = { jump: jump, exp: exp, refresh: inject, getData: getData, vorgabeZeile: vorgabeZeile };
 
   var _obs = null;
   function startObserver() {
@@ -380,6 +413,7 @@
   }
   document.addEventListener('input', refresh, true);
   document.addEventListener('change', refresh, true);
+  window.addEventListener('dp:detailgrad', refresh);   /* v3073 */
 
   /* v450: Beim Laden eines Objekts (loadData) und beim Neuberechnen (calc) feuert
      KEIN input-Event -> der Block blieb auf dem leeren Stand stehen. Wir haengen

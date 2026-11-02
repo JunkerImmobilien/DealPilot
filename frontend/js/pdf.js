@@ -1229,7 +1229,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   /* v3018d · ohne angelegtes Zielbild kein Baustein „… · Zielbild" (DpPotenzial hat_ziel) */
   var _hatZiel = true;
   try { if (window.DpPotenzial && typeof window.DpPotenzial.modell === 'function') _hatZiel = !!window.DpPotenzial.modell().hat_ziel; } catch (e) { _hatZiel = true; }
-  if (a.potenzial_text && _hatZiel) block('Ankauf · Bestand · Zielbild', clean(a.potenzial_text) + '\n\nDie Zahlen je Stand stehen auf der Seite Wertpotenzial.');
+  if (a.potenzial_text && _hatZiel && _dpDgStufe() >= 2) block('Ankauf · Bestand · Zielbild',   /* v3073: nicht in Einsteiger */ clean(a.potenzial_text) + '\n\nDie Zahlen je Stand stehen auf der Seite Wertpotenzial.');
   (function () {
     var t = [];
     try {
@@ -1272,6 +1272,21 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   return cy;
 }
 
+
+/* ══ v3073 · DAS INVESTMENT-PDF FOLGT DEM DETAILGRAD ═══════════════════
+   Marcel 02.11.2026: „Passen sich die PDFs an, das Investment-PDF?" und
+   „Für Einsteiger brauchen wir kein Zielbild im PDF. Generell sollte das
+   einfach und übersichtlich aussehen."
+     Einsteiger      ohne Wertpotenzial, ohne Wert & Zielbild, ohne den
+                     Analyse-Baustein „Ankauf · Bestand · Zielbild", ohne
+                     „Vermögenszuwachs im Detail"
+     Fortgeschritten Zielbild nur, wenn eins eingetragen ist (wie seit v3018d)
+     Experte         wie bisher
+   Gerechnet wird nichts anders - es fallen Seiten weg, keine Zahlen. Die
+   Stufe steht auf dem Deckblatt, und die Annahmen-Tabelle nennt, welche
+   ausgeblendeten Werte mit welcher Vorgabe rechnen (DpDetailgrad.annahmen). */
+function _dpDgStufe() { try { return window.DpDetailgrad ? DpDetailgrad.stufe() : 3; } catch (e) { return 3; } }
+function _dpDgAnnahmen() { try { return window.DpDetailgrad && DpDetailgrad.annahmen ? DpDetailgrad.annahmen() : null; } catch (e) { return null; } }
 
 async function exportPDF() {
 
@@ -1380,6 +1395,12 @@ async function _exportPDFInner() {
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
   doc.setTextColor.apply(doc, _cv([165, 155, 135], C.MID));
   doc.text(objDetail, W / 2, 87, { align: 'center' });
+  /* v3073 · die Stufe auf dem Deckblatt */
+  (function () {
+    var _dg = _dpDgAnnahmen(); if (!_dg) return;
+    doc.setFontSize(8); doc.setTextColor.apply(doc, _cv([150, 140, 120], C.MUTED));
+    doc.text('Detailgrad ' + _dg.name + ' \u00b7 Stufe ' + _dg.stufe + (_dg.zeilen.length ? ' \u00b7 ' + _dg.zeilen.length + ' Werte aus Vorgaben, siehe Annahmen' : ''), W / 2, 94.5, { align: 'center' });
+  })();
 
   // 4 Cover-KPIs
   var cw4 = (CW - 12) / 4;
@@ -3434,7 +3455,7 @@ async function _exportPDFInner() {
   // (= konsistent zu Tab-Tabelle, Wasserfall und Equity-Build).
   // V63.98: ALLE DREI Tabellen (Vermögenszuwachs / CF-Überschuss / Wertsteigerung)
   //         landen jetzt zusammen auf einer eigenen Seite (Marcels Wunsch).
-  if (State.cfRows && State.cfRows.length) {
+  if (State.cfRows && State.cfRows.length && _dpDgStufe() >= 2) {   /* v3073: nicht in Einsteiger */
     // V63.98: IMMER neue Seite für diesen 3er-Block — egal wo cy steht
     cy = newPage('Vermögenszuwachs im Detail');
     cy += 3;
@@ -3541,7 +3562,7 @@ async function _exportPDFInner() {
   ══════════════════════════════════════════════════ */
   try {
     var _PZ = window.DpPotenzial || null, _PD = null;
-    if (_PZ && _PZ.modell && _PZ.modell().aktiv) {
+    if (_PZ && _PZ.modell && _PZ.modell().aktiv && _dpDgStufe() >= 2) {   /* v3073: kein Wertpotenzial in Einsteiger */
       await Promise.race([_PZ.rechnen(), new Promise(function (f) { setTimeout(f, 40000); })]);
       _PD = _PZ.pdfDaten();
     }
@@ -3691,7 +3712,7 @@ async function _exportPDFInner() {
      Daten entfaellt die Seite still.
   ══════════════════════════════════════════════════ */
   try {
-    var _WZ = window.DpPdfWertZielbild ? await window.DpPdfWertZielbild.daten({ potenzial: (typeof _PD !== 'undefined' ? _PD : null) }) : null;
+    var _WZ = (window.DpPdfWertZielbild && _dpDgStufe() >= 2) ? await window.DpPdfWertZielbild.daten(   /* v3073: nicht in Einsteiger */{ potenzial: (typeof _PD !== 'undefined' ? _PD : null) }) : null;
     var _pdOk = typeof _pdZeichnen === 'function';
     /* v3018d · ohne angelegtes Zielbild heisst die Seite nicht „Wert & Zielbild" */
     var _wzZiel = !(_WZ && _WZ.ohneZiel);
@@ -4040,6 +4061,20 @@ async function _exportPDFInner() {
     if (v('bspar_quote_min') > 0)
       _baseAnnahmen.push(['Mindest-Sparquote', pP(v('bspar_quote_min'), 0), 'Vertrag', 'Voraussetzung für Zuteilung']);
   }
+  /* v3073 · Detailgrad: welche ausgeblendeten Werte mit einer Vorgabe rechnen.
+     Der Wert ist der im Feld (nie erfunden); was oben schon steht, nicht doppelt. */
+  (function () {
+    var _dg = _dpDgAnnahmen(); if (!_dg || _dg.stufe >= 3) return;
+    var _schon = { mietstg: 1, wertstg: 1, kostenstg: 1, leerstand: 1, anschl_z: 1, anschl_t: 1, exit_bmy: 1, btj: 1, afa_satz: 1, geb_ant: 1, grenz: 1 };
+    _baseAnnahmen.unshift(['Detailgrad', _dg.name + ' (Stufe ' + _dg.stufe + ')', 'Einstellung', 'ausgeblendete Felder rechnen mit ihrem Wert weiter']);
+    _dg.zeilen.forEach(function (z) {
+      if (_schon[z.id]) return;
+      var _l1 = function (t) { return String(t == null ? '' : t).replace(/[\u2012-\u2014\u2212]/g, '-').replace(/[^\x00-\xFF\u20AC]/g, ''); };
+      _baseAnnahmen.push([_l1(z.label), _l1(z.wert), 'Vorgabe', _l1(z.quelle)]);   /* nur Latin-1 */
+    });
+    if (_dg.neutral) _baseAnnahmen.push(['Score-Merkmale ohne Angabe', String(_dg.neutral), 'neutral', 'gehen mit 60 Punkten in den Investor Deal Score ein']);
+    if (_dg.weitere) _baseAnnahmen.push(['Weitere ausgeblendete Angaben', String(_dg.weitere), 'im Objekt', 'erfasst oder abgeleitet, rechnen weiter']);
+  })();
   // V63.66: Wert-Anker für Wertsteigerung explizit, wenn nicht Kaufpreis
   if (State.wert_basis && State.wert_basis !== v('kp')) {
     var _wbLabel2 = State.wert_basis_text || 'Bankbewertung';   /* v2996 */

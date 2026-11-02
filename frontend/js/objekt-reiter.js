@@ -122,8 +122,8 @@
 
      Der Absprung ist nicht neu gebaut: `abweichend(feld)` gibt es seit
      v1852 und macht genau das Richtige — es öffnet die Detailkarte
-     (`#oe-karte-gewerke`, `data-oe-detail="1"`), setzt die Eingabetiefe
-     auf Stufe 3, klappt auf, rollt hin und setzt den Fokus. Der
+     (`#oe-karte-gewerke`; seit v3073 hebt es den Detailgrad, bis das Feld
+     sichtbar ist), klappt auf, rollt hin und setzt den Fokus. Der
      Klick-Verteiler auf `[data-oe-feld]` liegt schon. Es fehlte nur der
      Knopf.
 
@@ -590,18 +590,15 @@
   /* „abweichend eintragen": Ebene 3 öffnen und das Feld zeigen */
   function abweichend(feld) {
     var el = $(feld); if (!el) return;
+    /* v3073 · liegt das Feld über dem gewählten Detailgrad (Gewerke ab
+       Fortgeschritten, Sach- und Ertragswert ab Experte), will der Nutzer
+       genau dorthin: der Detailgrad folgt dem Klick (ersetzt v1852/v1854:
+       Eingabetiefe und Haken „weitere Objektdetails"). */
+    if (window.DpDetailgrad) { try { DpDetailgrad.feldZeigen(el); } catch (e) {} }
     var card = document.querySelector('.card[data-collapsible="wm-obj"]');
     if (card && card.contains(el)) {
-      /* v1852: liegt das Feld in Ebene 3 und ist die Eingabetiefe kleiner,
-         will der Nutzer gerade genau dorthin — die Tiefe folgt dem Klick. */
-      if (card.classList.contains('oe-stufe-aus')) { try { localStorage.setItem(ZIEL_KEY, '3'); } catch (e) {} zielAnwenden(); }
       if (card.classList.contains('v212-collapsed')) { var t = card.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
     }
-    /* v1854: liegt das Feld in einer zugeschalteten Detailkarte, die gerade
-       aus ist, setzt der Sprung den Haken — der Nutzer will genau dorthin. */
-    var dk = el.closest('.oe-karte[data-oe-detail]'), cb = $('oe-details-cb');
-    /* v2969: der Haken folgt der Eingabetiefe - der Sprung hebt die Tiefe auf 2. */
-    if (dk && dk.classList.contains('oe-aus') && cb) { if (zielstufe() < 2) { try { localStorage.setItem(ZIEL_KEY, '2'); } catch (e) {} } zielAnwenden(); }
     /* Reiterwechsel, wenn das Feld woanders liegt (Kaufpreis, Miete) */
     var sec = el.closest('.sec');
     if (sec && !sec.classList.contains('active')) { var tab = document.querySelector('[data-target-sec="' + sec.id + '"]'); if (tab) tab.click(); }
@@ -673,7 +670,7 @@
      der Anlage 3; sie verfeinern. Das steht jetzt dran, statt dass ein
      fehlender Rahmen wie ein Fehler wirkt. */
   function optionalMarkieren() {
-    var e3 = document.querySelector('.card[data-oe-stufe-min="3"]'); if (!e3) return;
+    var e3 = document.querySelector('.card[data-collapsible="wm-obj"]'); if (!e3) return;   /* v3073: Karte Sach- und Ertragswert (Experte) */
     var pflicht = pflichtFuer(3);
     e3.querySelectorAll('.f').forEach(function (f) {
       var el = f.querySelector('input,select'); if (!el || !el.id) return;
@@ -693,28 +690,15 @@
     box.style.display = '';
   }
 
-  /* ═══ Eingabetiefe (Zielstufe) — Marcel: „wichtig ist dass wir wählen
-     können wie detailreich die eingabe wird" ═════════════════════════════
-     1: nur Ebene 1 offen, Ebene 2 zu, Ebene 3 weg.
-     2: Ebene 2 offen, Ebene 3 weg.
-     3: alles, Ebene 3 aufgeklappt. Pflichtfelder der Zielstufe werden
-     markiert, solange sie leer sind. Merker je Nutzer, nicht je Objekt. */
-  /* v1854 · Haken „weitere Objektdetails angeben": Merker je Nutzer. */
-  function detailsAnwenden() {
-    var cb = $('oe-details-cb'); if (!cb) return;
-    document.querySelectorAll('.oe-karte[data-oe-detail]').forEach(function (k) { k.classList.toggle('oe-aus', !cb.checked); });
-  }
-  function detailsInit() {
-    var cb = $('oe-details-cb'); if (!cb) return;
-    try { cb.checked = localStorage.getItem('dp_details') === '1'; } catch (e) {}
-    cb.addEventListener('change', function () {
-      try { localStorage.setItem('dp_details', cb.checked ? '1' : '0'); } catch (e) {}
-      detailsAnwenden();
-    });
-    detailsAnwenden();
-  }
-  var ZIEL_KEY = 'dp_zielstufe';
-  function zielstufe() { try { var z = parseInt(localStorage.getItem(ZIEL_KEY), 10); return (z >= 1 && z <= 3) ? z : 1; } catch (e) { return 1; } }
+  /* ═══ Stufe = Detailgrad (v3073) ═══════════════════════════════════════
+     Bis v3072 stand hier die Eingabetiefe 1/2/3 (Merker je
+     Nutzer) und der Haken „weitere Objektdetails". Marcel 02.11.2026: EIN
+     Schalter Einsteiger · Fortgeschritten · Experte, gemerkt je Objekt,
+     gekoppelt an die Stufe des Marktberichts — js/detailgrad.js. Was
+     sichtbar ist, entscheidet dort die Zuordnung; hier bleiben nur die
+     Pflichtfelder der Stufe (pflichtFuer) und ihre Markierung. */
+  function dgStufe() { try { return window.DpDetailgrad ? DpDetailgrad.stufe() : 3; } catch (e) { return 3; } }
+  var DG_NAMEN = { 1: 'Einsteiger', 2: 'Fortgeschritten', 3: 'Experte' };
   /* v2001 · Marcel: „wenn ich oben mit den kleinen Kreisen wechsle, dann
      steht immer noch: fuer Stufe 3 fehlt noch." Gemessen: `_fehlStufe`
      wurde NUR in stufeAbrufen() gesetzt - die Zeile unten zeigte die
@@ -722,22 +706,25 @@
      Wahl. Die Eingabetiefe selbst bleibt ein Merker je NUTZER (siehe
      oben) - verwirrend war nicht die gemerkte Tiefe, sondern dass die
      Zeile ihr nicht folgte. */
-  function zielSetzen(z) { try { localStorage.setItem(ZIEL_KEY, String(z)); } catch (e) {} fehlZeileSetzen(z); zielAnwenden(); stufen(); }
   function zielAnwenden() {
-    var z = zielstufe();
-    document.querySelectorAll('[data-oe-ziel]').forEach(function (b) { b.classList.toggle('on', parseInt(b.getAttribute('data-oe-ziel'), 10) === z); });
+    var z = dgStufe();
     /* v1866 · im Reiter Objekt nur noch der Stand; gewählt wird oben (Pre-Flight) */
     var stat = $('oe-ziel-status');
     if (stat) {
-      var NAMEN = { 1: 'Einfach · Stufe 1', 2: 'Mittel · Stufe 2', 3: 'Ausgiebig · Stufe 3' };
+      var NAMEN = { 1: 'Einsteiger · Stufe 1', 2: 'Fortgeschritten · Stufe 2', 3: 'Experte · Stufe 3' };
       var fz = fehltFuer(z).length;
       stat.innerHTML = '<b>' + NAMEN[z] + '</b> ' + (fz ? st('x', fz + ' fehlt') + '<span class="oe-q">„' + fz + ' fehlt" in der Zeile unten zeigt die Felder.</span>' : st('a', 'bereit'));
     }
     var hint = $('oe-ziel-hint');
     /* v1868 · ein Satz je Stufe — Marcel: „ein bisschen schmaler, dass wir alles draufkriegen" */
-    if (hint) hint.textContent = z === 1 ? 'Einfach: Adresse, Objektart, Wohnfläche, Baujahr — Marktpreisindikation.'
-      : z === 2 ? 'Mittel: dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe — erweiterte Indikation, Gewerke sichtbar.'
-      : 'Ausgiebig: dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ — Sach- und Ertragswert, Block unten.';
+    if (hint) hint.textContent = z === 1 ? 'Einsteiger: die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben — Marktbericht Stufe 1 (Marktpreisindikation).'
+      : z === 2 ? 'Fortgeschritten: dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II — Marktbericht Stufe 2 (erweiterte Indikation).'
+      : 'Experte: alle Felder, dazu Bauteile und Sach- und Ertragswert — Marktbericht Stufe 3 (Wertermittlung nach ImmoWertV).';
+    /* v3073 · Ausblenden ist Sache von detailgrad.js (das alte Stufen-Attribut und
+       der Haken „weitere Objektdetails" sind ausgebaut). Der Block Sach- und
+       Ertragswert wird beim Wechsel auf Experte aufgeklappt (Listener
+       dp:detailgrad unten). Ausgeblendet heisst nur Anzeige: die Felder
+       behalten ihre Werte und rechnen weiter. */
     /* ══ v1967 · ALLE Stufe-3-Bereiche, nicht nur der erste ════════════
 
        Hier stand `querySelector` — SINGULAR. Der Mechanismus war gebaut,
@@ -751,22 +738,6 @@
        alles davon braucht erst die Wertermittlung nach ImmoWertV. Kein
        einziges dieser Felder steht in pflichtFuer(1) oder
        pflichtFuer(2) — `brw` kommt erst bei `stufe >= 3` dazu. */
-    document.querySelectorAll('[data-oe-stufe-min="3"]').forEach(function (e3) {
-      e3.classList.toggle('oe-stufe-aus', z < 3);
-      if (z === 3 && e3.classList.contains('v212-collapsed')) { var t = e3.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
-    });
-    /* v1854 · die Detailkarten (Gewerke, Bauteile) hängen am Haken; Mittel
-       und Ausgiebig setzen ihn von selbst, Einfach lässt ihn, wie er war. */
-    var cb = $('oe-details-cb');
-    if (cb) {
-      /* v2969 · Marcel 27.10.: „Warum gibt es eine Checkbox mit weitere
-         Objektdetails?" Der Haken war eine zweite Schaltstelle neben der
-         Eingabetiefe. Jetzt entscheidet allein die Tiefe: Stufe 1 ohne,
-         ab Stufe 2 mit Gewerken und Bauteilen. Der Haken bleibt als
-         unsichtbarer Traeger im DOM; abweichend() hebt beim Sprung die Tiefe. */
-      cb.checked = z >= 2;
-      detailsAnwenden();
-    }
     /* Pflichtfelder markieren: nur die der Zielstufe, nur solange leer.
        v1852b: die Stylesheet-Regel kam am Eingabefeld nicht an (gemessen:
        Rahmen blieb var(--border), auch der Schatten fehlte — eine
@@ -839,18 +810,30 @@
     var konto = { 1: rest('mpi'), 2: rest('mpi_plus'), 3: rest('wev') };
     /* v1855 · drei Kacheln unten in der Karte „Marktbericht abrufen" */
     var kacheln = {
-      1: { name: 'Einfach · Stufe 1', sub: 'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.', art: 'Marktpreisindikation' },
-      2: { name: 'Mittel · Stufe 2', sub: 'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.', art: 'erweiterte Indikation' },
-      3: { name: 'Ausgiebig · Stufe 3', sub: 'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', art: 'Wertermittlung' }
+      1: { name: 'Einsteiger · Stufe 1', sub: 'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.', art: 'Marktpreisindikation' },
+      2: { name: 'Fortgeschritten · Stufe 2', sub: 'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.', art: 'erweiterte Indikation' },
+      3: { name: 'Experte · Stufe 3', sub: 'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', art: 'Wertermittlung' }
     };
     var ab = { 2: 'ab Investor', 3: 'ab Pro' };
-    var z = zielstufe();
+    var z = dgStufe();
     /* v1858 · Marcel: „nicht so viel Weiß … in der gleichen Größe wie oben
        auch das Feld Bodenrichtwert … den Button an die Seite." Drei Zeilen
        im Raster der Leiste statt drei Kacheln. */
     box.innerHTML = '<div class="oe-auto oe-abruf-zeilen">' + [1, 2, 3].map(function (s) {
       var fehlt = fehltFuer(s).length, r = konto[s], k = kacheln[s];
       var aus = r === 0;
+      /* v3073 · Marcel 02.11.2026: die Wertermittlung (Stufe 3) gibt es nur
+         im Detailgrad Experte. Darunter ist sie nicht wählbar — die Zeile
+         sagt, wohin man schalten muss. Am Abruf und am Kontingent ändert
+         sich nichts. */
+      if (s === 3 && z < 3) {
+        return '<div class="oe-row oe-row-gesperrt" data-oe-zeile="3" role="button" tabindex="0" aria-pressed="false" title="' + esc(k.sub) + '">'
+          + '<span class="oe-k">' + k.name + '</span>'
+          + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + '</span>'
+          + '<span class="oe-q oe-q-kompakt">Für die Wertermittlung (Stufe 3) auf Experte schalten.</span>'
+          + '<span><button type="button" class="oe-btn" data-dp-dg-setzen="3" title="Detailgrad Experte: alle Felder, Sach- und Ertragswert">Auf Experte schalten</button></span>'
+          + '</div>';
+      }
       var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
       /* v1868 · kompakt: Name, frei, Pille — der Satz dazu steckt im Tooltip */
       return '<div class="oe-row' + (s === z ? ' on' : '') + '" data-oe-zeile="' + s + '" role="button" tabindex="0" aria-pressed="' + (s === z) + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
@@ -862,23 +845,22 @@
     }).join('') + '</div>';
     preflightPillen();
   }
-  /* v1858 · dieselbe Eingabetiefe als drei Pillen in der Pre-Flight-Kachel
-     „DealPilot" (object-actions.js, #oab-dp-stufen). Klick setzt sie. */
-  /* v1867 · dieselben Pillen an zwei Orten: Pre-Flight-Kachel (#oab-dp-stufen)
-     und Reiter-Kopf ([data-oe-pillen]). Eine Wahl, ein Merker. */
+  /* v1858 · drei Pillen in der Pre-Flight-Kachel „DealPilot"
+     (object-actions.js, #oab-dp-stufen). v3073: sie setzen den Detailgrad
+     (data-dp-dg-setzen, Klick verdrahtet detailgrad.js) — im Reiter Objekt
+     steht statt der Pillen der Schalter Einsteiger · Fortgeschritten · Experte. */
   function preflightPillen() {
-    var hosts = [].slice.call(document.querySelectorAll('#oab-dp-stufen, [data-oe-pillen]'));
+    var hosts = [].slice.call(document.querySelectorAll('#oab-dp-stufen'));
     hosts.forEach(pillenIn);
   }
   function pillenIn(host) {
     if (!host) return;
-    var z = zielstufe();
+    var z = dgStufe();
     host.innerHTML = [1, 2, 3].map(function (s) {
       var fehlt = fehltFuer(s).length;
-      return '<i class="dp-pf-pille' + (s === z ? ' on' : '') + (fehlt ? ' fehlt' : '') + '" data-oe-ziel="' + s + '" title="Stufe ' + s + (fehlt ? ' · ' + fehlt + ' Feld(er) fehlen' : ' · bereit') + '">' + s + '</i>';
+      return '<i class="dp-pf-pille' + (s === z ? ' on' : '') + (fehlt ? ' fehlt' : '') + '" data-dp-dg-setzen="' + s + '" title="' + DG_NAMEN[s] + ' · Stufe ' + s + (fehlt ? ' · ' + fehlt + ' Feld(er) fehlen' : ' · bereit') + '">' + s + '</i>';
     }).join('');
-    /* Klick auf die Pille darf die Kachel nicht an-/abwählen */
-    if (!host._oeBound) { host._oeBound = true; host.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); var p = e.target.closest('[data-oe-ziel]'); if (p) zielSetzen(parseInt(p.getAttribute('data-oe-ziel'), 10)); }); }
+    /* Klick: detailgrad.js (Capture am document, die Kachel bleibt unberührt) */
   }
   var _fehlStufe = null;   /* v1852: die zuletzt angefragte Stufe — die Fehlliste folgt der Eingabe */
   function fehlendeNachziehen() { if (_fehlStufe) fehlendeZeigen(_fehlStufe, fehltFuer(_fehlStufe)); }
@@ -887,6 +869,13 @@
      nach dem Loeschen die Fehlliste des geloeschten Objekts stehen. */
   function fehlZeileSetzen(z) { _fehlStufe = z; fehlendeZeigen(z, fehltFuer(z)); }
   function stufeAbrufen(s) {
+    /* v3073 · Stufe 3 nur im Detailgrad Experte */
+    if (s === 3 && dgStufe() < 3) {
+      _fehlStufe = null;
+      var box = $('oe-fehlt');
+      if (box) { box.innerHTML = '<b>Wertermittlung (Stufe 3):</b> nur im Detailgrad Experte. <button type="button" class="oe-btn" data-dp-dg-setzen="3">Auf Experte schalten</button>'; box.style.display = ''; }
+      return;
+    }
     var fehlt = fehltFuer(s);
     _fehlStufe = s;
     if (fehlt.length) { fehlendeZeigen(s, fehlt); abweichend(fehlt[0]); return; }
@@ -1231,7 +1220,6 @@
         return;
       }
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }
-      var zb = e.target.closest('[data-oe-ziel]'); if (zb) { zielSetzen(parseInt(zb.getAttribute('data-oe-ziel'), 10)); return; }
       if (e.target.closest('#oe-vw-btn')) { verkehrswertSetzen(); return; }
       /* v1855 · Absprung in den Marktbericht (derselbe Weg wie der Kopf-Knopf) */
       if (e.target.closest('#oe-mb-oeffnen')) {
@@ -1243,11 +1231,10 @@
       if (amt && window.DealPilotUnterlagen && typeof DealPilotUnterlagen.oeffnen === 'function') { DealPilotUnterlagen.oeffnen(amt.getAttribute('data-oe-amt')); return; }
       var s = e.target.closest('[data-oe-stufe]');
       if (s && !s.disabled) { stufeAbrufen(parseInt(s.getAttribute('data-oe-stufe'), 10)); return; }
-      /* v2969 · Marcel 27.10.: „man kann nur Stufe 1-3 oben anklicken, aber nicht
-         die Schaltfläche Einfach · Stufe 1". Die ganze Zeile waehlt jetzt die
-         Eingabetiefe - dieselbe Wahl wie die Kreise oben. */
+      /* v2969 · die ganze Zeile waehlt die Stufe. v3073: das ist der
+         Detailgrad (Einsteiger · Fortgeschritten · Experte). */
       var zr = e.target.closest('[data-oe-zeile]');
-      if (zr) zielSetzen(parseInt(zr.getAttribute('data-oe-zeile'), 10));
+      if (zr && window.DpDetailgrad) DpDetailgrad.setzen(parseInt(zr.getAttribute('data-oe-zeile'), 10));
     });
     /* Pflichtfelder: Markierung und Fehlzahl folgen der Eingabe */
     Object.keys(FELDNAMEN).forEach(function (id) {
@@ -1284,12 +1271,22 @@
     window.addEventListener('dp:object-ready', function () {
       /* v2001 · fehlZeileSetzen mit: ein frisches (leeres) Objekt trug
          sonst die Fehlliste des vorigen weiter. */
-      setTimeout(function () { alles(); stufen(); fehlZeileSetzen(zielstufe()); }, 120);
+      setTimeout(function () { alles(); stufen(); fehlZeileSetzen(dgStufe()); }, 120);
       setTimeout(alles, 1800);
     });
     window.addEventListener('dp:plan-ready', function () { stufen(); });
     document.addEventListener('dp:plan-ready', function () { stufen(); });
-    detailsInit();
+    /* v3073 · der Detailgrad wechselt: Pflichtfelder, Abruf-Zeilen und
+       Fehlliste folgen; beim Wechsel auf Experte klappt der Block Sach- und
+       Ertragswert auf (wie zuvor bei Eingabetiefe 3). */
+    window.addEventListener('dp:detailgrad', function (ev) {
+      var d = (ev && ev.detail) || {};
+      if (d.stufe === 3 && d.alt < 3) {
+        var e3 = document.querySelector('.card[data-collapsible="wm-obj"]');
+        if (e3 && e3.classList.contains('v212-collapsed')) { var t = e3.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
+      }
+      zielAnwenden(); stufen(); fehlZeileSetzen(dgStufe());
+    });
     alles(); stufen();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', verdrahten); else verdrahten();
@@ -1356,7 +1353,8 @@
   }
 
   window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte, verlauf: verlauf,
-    zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen,
+    /* v3073: die Stufe liest und setzt window.DpDetailgrad (stufe/setzen) */
+    fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen,
     /* v2079: die Beschriftungen mit exportiert - der Readycheck in
        deal-action-readycheck.js braucht sie, und eine zweite Namensliste
        dort waere genau die Doppelung, die pflichtFuer vermeidet. */
