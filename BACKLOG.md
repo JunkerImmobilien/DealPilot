@@ -36,7 +36,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N98 · Pilot-Analyse neu — NÄCHSTER SCHRITT: Demo Fassung 4 (Marcel 02.11.2026, abends)
+### N98 · Pilot-Analyse neu — Fassung 4 liegt vor, Marcel sieht sie an (02.11.2026, spät)
+
+**Fassung 4 gebaut** (`8f24553f`, Artifact https://claude.ai/artifact/JwQwWMA1vqub5wmuPqi4q2 v7, `design/Vorschläge/pilot-analyse-neu.html`): alle acht Punkte unten umgesetzt — Marktpreis Ø auf allen Karten (ohne Abschlag darunter, Spanne nur im Detail; Soll = Bestand, Zielbild mit besserer Ausstattung), Ertragswert überall ohne Spanne, Gesamtbewertung als Text (Detail = Briefing-Abschnitte), neue Unterreiter **Risiken & Szenarien** (Stärken, Risiken, Risikoanalyse, Worst · **Plan** · Best — Plan als Vorschlag für den fehlenden Base Case) und **Lage & Markt** (Werte zu einem Zeitpunkt, keine Zeitreihen), PDF-Auswahl nach Unterreitern (Unterlagen & WEG gesperrt), Wert- und Steuerverlauf neu (eine €-Achse, Fadenkreuz, Legende, Farben geprüft), Steuer nach den tax.js-Gruppen mit Steuerwirkung, Steuer auch im Ankauf. **Offen bei Marcel:** Fassung 4 abnehmen; Plan als Base Case in die Analyse aufnehmen?; Lage & Markt als eigener Unterreiter (Vorschlag) oder in Wert & Verlauf.
+
+**Auftrag Fassung 4 (erledigt):**
 
 **Marcel zu Fassung 3:** „gut umgesetzt“. Für Fassung 4 (Demo, noch NICHT in die App bauen):
 1. **Marktpreisindikation auf allen Karten** (Ankauf, Bestand, Soll, Zielbild): erst der Durchschnitt, dazu „mit/ohne Abschlag“; im Detail die Spanne.
@@ -57,26 +61,38 @@ Demo: `design/Vorschläge/pilot-analyse-neu.html` (sieben Ideen: Cockpit-Karten,
 **Marcel zu Fassung 2 (02.11.2026):** Phasenwechsel automatisch, nur Einfach/Detail; Tabellen großartig; Ankauf · Bestand · Zielbild schon im Ankauf (mit gesetzlich umsetzbarer Soll-Miete, Marktpreisindikation mit Spanne/Herkunft/Abschlag, Ertragswert) fürs Bankgespräch; Wert & Verlauf: Marktbericht dort abrufen, Berichte aus der Bewertung nehmen oder löschen (gelöscht = auch im Tab Deal Score weg); Unterlagen & WEG als Mischung aus heutigem Reiter (Karten) und Demo; Bestand-Übersicht nicht „Halten“; im Detail Spannen und führendes Verfahren, in Auflistungen nur das führende. **Fassung 3** (Artifact v3): Bestand-Urteil = Kurs („Auf Kurs“, Plan gegen Ist) mit nächsten Schritten; Ankauf-Urteil = Investor Deal Score mit Empfehlung.
 **Entschieden:** Wirtschaftsplan-Übernahme nie vorgehakt (gebaut v3088a). **Offen bei Marcel:** Fassung 3 ansehen; Sonderumlage (siehe N100).
 
-### N103 · Objekt: Detailgrad- und Marktbericht-Kacheln verschlanken — Demo zuerst (Marcel 02.11.2026)
+### N103 · Objekt: Detailgrad- und Marktbericht-Kacheln verschlanken — Demo liegt vor, Marcel wählt (02.11.2026)
+
+**Demo** `design/Vorschläge/objekt-kacheln-verschlanken.html` (`922b6dcf`): heute 1:1 nachgebaut (Gerüst `index.html:1050`, Statuszeile `objekt-reiter.js:745-751`, Kacheln `stufen()` 851-871, CSS `style.css:39088-39106`) und drei Varianten — **A** Kachel mit Berichtsname, einer Zeile, Pillen (Kopf −⅓ am Desktop, −40 % bei 390 px, **Empfehlung**), **B** Stufenleiste in einer Zeile, **C** Liste mit Auswahlpunkt. Kacheltitel sollen den Berichtsnamen tragen statt „Einsteiger · Stufe 1“ (vermischt Detailgrad und Stufe). Der falsche Zusatz „die Stufe folgt dem Detailgrad“ ist schon raus (v3094a). **Offen:** Marcels Wahl, dann bauen.
+
 
 Marcel: *„oben den Detailgrad, Marktbericht abrufen … die Kacheln sind cool, jede Stufe … mit weniger Text darstellen und ein bisschen verschlanken.“* Erst messen (welche Texte, wo gebaut), dann Demo mit vorher/nachher.
 
-### N104 · Testobjekt Lindenallee 14 erweitern (Marcel 02.11.2026)
+### N104 · Testobjekt Lindenallee 14 erweitern (Marcel 02.11.2026) — Verträge da, **Entscheidung Marcel: Paket oder ETW?**
 
+**Gemacht (02.11.2026; `Dateien/Testunterlagen` ist nicht versioniert):** `11 Mietvertrag WE 1 (unbefristet …)`, `12 … WE 3 (Staffelmiete)`, `13 … WE 6 (Indexmiete)` passend zur Mietaufstellung, Platzhalter statt Namen; Protokoll 2025 mit Kasten „Auftrag bereits erteilt“ (04.07.2025); Kaution WE 6 auf 1.410 € (§ 551 BGB). Alte 02/07 unter `Lindenallee 14 (Fassung 28.10. nachmittags, vor N104)`. **Widerspruch:** Exposé, Mietaufstellung, Drehbuch und `unterlagen.js` beschreiben ein **MFH-Paket mit 8 Wohnungen** (1.090.000 €) — nur der Wirtschaftsplan hat zusätzlich den Einzelplan WE 5, und WE 5 steht leer. Deshalb NICHT auf ETW umgestellt; die Investitionsthese („das gesamte Gebäude“) lag richtig. **Zeitachse:** SU fällig 01.03.2026, Kauf heute → nach BGH schuldet der Verkäufer; soll der Käufer zahlen, Fälligkeit hinter den Übergang (z. B. 01.03.2027). Ungereimtheiten (Wittekind/Weserland, PLZ 32049/32052, Wohnung 3 139/1000 gegen WE 5 118/1000) — evtl. gewollte Prüffallen. Messe-Kopien `frontend/messe-dateien/lindenallee-14/` unverändert.
+
+**Ursprünglicher Auftrag:** 
 Mietverträge zum Einlesen ergänzen: einer mit **Indexmiete**, einer mit **Staffelmiete**, einer normal (sofort erhöhbar) — „wirklich ein ganzheitliches Bild“, auch für die Übernahme. **Flachdach-Sonderumlage:** Lindenallee ist der Kauf EINER Wohnung (Einzelplan WE 5); eine beschlossene, nach dem Eigentumswechsel fällige Sonderumlage trifft den Käufer (BGH V ZR 257/16). Beim Kauf des ganzen Hauses wäre der Käufer allein die Gemeinschaft und könnte den Beschluss aufheben, ein bereits erteilter Auftrag bliebe bindend. Im Protokoll der Testunterlage deshalb „Auftrag bereits erteilt“ ergänzen. Investitionsthese sagte bei leerer Objektart „das gesamte Gebäude“ — beim Neubau der Testunterlagen die Objektart (ETW) im Exposé eindeutig machen. Testunterlagen liegen unter `Dateien/Testunterlagen/`; ein Scan-Test (Bild-PDF + JPG, nur Seite 1) unter `Dateien/Testunterlagen/Scan-Test/`.
 
 ### N105 · Steuerkanzlei-Brücke — Konzept liegt vor, Marcel entscheidet (02.11.2026)
 
 Konzept: `design/Vorschläge/steuerkanzlei-bruecke.md`. Lesefassung: `design/Vorschläge/steuerkanzlei-bruecke.html` (Artifact https://claude.ai/artifact/NLcZai63Wcs3fi4B1WUHu2). Vorhanden: Partner-Konten (Rolle steuerberater), Seats per Stripe, Einladung, Freigabe je Objekt mit share_audit (055_reseller_core.sql, resellerService.js, mandant-freigaben.js). Fehlt: Freigabe je Steuerjahr, eingefrorener Stand, Selbstverbinden bestehender Nutzer, mehrere Kanzleien, Rückgabe mit Grund. DATEV/Addison: kein Import von Anlage-V-Daten in die ESt belegt (DATEV-Format nur Buchhaltung, Marktplatz ab 25 Kunden); ELSTER direkt = ganze Erklärung. Empfehlung Stufe 1: Freigabe je Steuerjahr + Kanzlei-Paket (PDF + CSV je Anlage-V-Zeile). **Fragen an Marcel** stehen im Konzept (u. a. „Aviso“ = WISO Steuer?, Preis für Weg 2, darf die Kanzlei korrigieren).
 
-### N106 · Kleinigkeiten aus dem Browsertest 02.11.2026
+### N106 · Kleinigkeiten aus dem Browsertest 02.11.2026 — Rest: Online-Dauer (Marcel)
+
+**Erledigt** v3093/v3093a (Prod 1.0.42), siehe Fertig. **Offen:** Online-Dauer braucht eine neue Aktivitätstabelle mit Herzschlag (heute nur `audit_log`-Zeitpunkte, `landing_events` anonym) — Marcel entscheidet; Abnahme register-with-verify/verify-email mit echter Mail; eine Wirtschaftsplan-Seite allein wird als „Marktbericht“ eingeordnet (Rückfall in `resolveType`).
+
 
 - `users.last_login_at` bleibt nach Registrierung + erstem Einstieg leer (5 von 16 Nutzern auf Prod) — beim Einstieg nach der Verifizierung mitsetzen.
 - Eine Online-Dauer wird nirgends erfasst; wer sie will, braucht eine Sitzungs-/Aktivitätstabelle (Datenschutz: nur Zeitpunkte, Zweck nennen).
 - Handbuch-Erzeugung ist rot mit 11 alten Belegen (N93), deshalb steht im Handbuch noch der alte Fenstertitel „PDFs einlesen“.
 - Foto-Import: mehrere Fotos derselben Unterlage werden noch nicht zu einem Dokument zusammengeführt.
 
-### N100 · Sonderumlage in Cashflow und Steuer — ENTSCHIEDEN, bauen (Marcel 02.11.2026: „so wie dein Vorschlag“)
+### N100 · Sonderumlage — ✅ gebaut v3092/a/b (Prod 1.0.42), Rest: Abnahme
+
+Siehe Fertig. **Rest:** echter Import Lindenallee (08/06/07) mit SU, Speichern/Laden `weg_su`; „Zurücknehmen“ setzt eine eigene Angabe statt die Überschreibung zu löschen (tax.js hat keine Löschfunktion); 15-%-Prüfung zählt Rücklagen-Entnahmen nicht mit.
+
 
 **Bauen:** Cashflow automatisch im Fälligkeitsjahr (Liquidität); Steuer nur als Vorschlag mit Feldern „Jahr der Verwendung“ und „Art“ (Erhaltung/Herstellung), Vorbelegung Fälligkeitsjahr bei sofortiger Maßnahme; in den 3 Jahren nach Kauf gegen die 15-%-Grenze prüfen. Erst messen, wo einmalige Ausgaben je Jahr im Cashflow (calc.js `cfRows`) und in der Steuer je Jahr (`dpSteuerWert`) landen können. Anteil nach MEA wie v3090a.
 
@@ -115,7 +131,11 @@ nur nach Marcels Entscheidung (Geld).
 
 Marcel: *„30 % … Ist das irgendwo eine Grundlage? … genauer, wir wissen das Mehrfamilienhaus oder so … haben wir Tabellen?“* **Befund:** 30 % ist keine amtliche Quote, sondern Marcels Abnahme der Demo v2183 (`bwk-profil.js` STANDARD.etw.nul_pct); im Formular steht als Rückfall noch 22 % (`quickcheck-app.html` qc_hg_split). Der Quick-Check nimmt für JEDE Objektart den ETW-Anteil. **Tabellen vorhanden:** ImmoWertV Anlage 3, fortgeschrieben (Verwaltung 439 € je ETW / 367 € je Wohnung, Instandhaltung 14,40 €/m², `bwk-profil.js`, `marktbericht/.../immowertv.js` BWK je Jahr). **Vorschlag:** ETW: nicht umlagefähig in Euro = Verwaltung ETW (Anlage 3) + Rücklage (bis Wirtschaftsplan vorliegt: Annahme, Marcel entscheidet die Größe), Anteil daraus statt fester 30 % — kleine Wohnungen bekommen so einen höheren Anteil (Verwaltung ist fix je Einheit). Häuser (EFH/MFH): wie die Haupt-App, Verwaltung je Einheit + Instandhaltung je m² (Anlage 3) gegen Betriebskosten; braucht für MFH die Zahl der Einheiten im Quick-Check.
 
-### N93 · Hilfen, Anleitungen und „Wie wir rechnen“ nachziehen — nach v3073/v3075/v3076 (Marcel 02.11.2026)
+### N93 · Hilfen und „Wie wir rechnen“ — 1–3 ✅ v3094 (Prod 1.0.42), Rest: Drehbücher und Storybook
+
+**Offen (Punkt 4, gemessen 02.11.):** Quick-Check-Szenen (`messe-drehbuch.js` 537–551, 676–745, 844–863, 1152) zeigen auf seit v3081 ausgeblendete `#score-block/#ai-verdict/#ai-negotiate-v`, `qcScore()` liest versteckte Elemente; Z.744 „Pro und Contra“, Z.700 `#ai-opinion` zugeklappt, Z.666 „Wohnung ist leer“; alte Stufennamen Einfach/Mittel/Ausgiebig (Z.2036/2038/2047/2092); `DpDetailgrad.setzen` ohne `fluechtig` (Z.1818/1959/2083/2088/5220) speichert `dp_stufe` ins Objekt; Investition Z.2292/2309 (Standardwerte statt GNotKG, „Sonstige vorbelegt“, „Standardwerte“ → „Mein Profil“). Storybook vom 29.10. neu erzeugen (2026-1051 evtl. jetzt „Kritisch“). **Entscheidung Marcel:** die zweite Stufe des Zielkaufpreises (Miete in 3 J.) ist seit v3081 im Quick-Check nicht mehr sichtbar (`quickcheck-app.html:5728`) — zurück in die Karte? Haupt-App: Upside/Potenzial-Bonus rechnen noch mit Marktmiete bzw. „Mietsteigerung“, nicht mit zulässiger Miete.
+
+**Ursprünglicher Auftrag:**
 
 Marcel: *„Ändern bzw. ergänzen wir dann auch, wie wir rechnen, und unsere Hilfen und Anleitungen …, auch wie der
 Quick-Check bewertet, mit welchen Daten und woher sie kommen.“*
@@ -164,9 +184,9 @@ ohne Stand und Quelle, wahrscheinlich veraltet. Darlehen: D1 Annuität/Tilgungsa
 1. **Rechtstext:** `frontend/legal/agb.html:77` „angeboten von Junker Immobilien“ (verlinkt aus `reseller.html:397`,
    Prod 200) — Betreiber ist Junker Solution (`frontend/agb.html` richtig). Marcel entscheidet, ob die Reseller-AGB
    angeglichen oder auf `agb.html` umgelenkt wird.
-2. **CLAUDE.md nachmessen** und korrigieren (mit „Hier stand bis …“): Kerosin-Zahl/N60.24, Gold-Basislinie 468 → 413,
+2. **CLAUDE.md nachmessen** und korrigieren (mit „Hier stand bis …“): Kerosin-Zahl/N60.24, ~~Gold-Basislinie 468 → 413~~ (✅ 02.11.),
    UK-Flächenformel auch MFH (v2360), GND-Absatz, Baupreisindex-Zahl.
-3. **Memory** `gutachterpruefung-entscheidungen`: E5 als zurückgenommen (v2612) kennzeichnen.
+3. ~~**Memory** `gutachterpruefung-entscheidungen`: E5 als zurückgenommen (v2612) kennzeichnen.~~ ✅ 02.11.
 4. **Westerfeldstr. 140:** vier oder sechs Wohnungen (Marcel vs. Gutachten laut Journal)?
 
 ### N89 · Detailstufen Anfänger bis Profi + Zielbild als Mietleiter — Marcel 02.11.2026 (Messe-Feedback), Demo zuerst
@@ -4292,6 +4312,10 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3092–v3092b · Sonderumlage in Cashflow und Steuer (N100)** (`d162152e`, `fe0ae8e9`, `ebded3dc`, Prod 1.0.42): Befund: einmalige Ausgaben gab es im Cashflow nicht; die SU kam nur aus dem Import und landete ungespeichert im Steuervorschlag, beim ganzen Haus mit dem Betrag der Einheit (4.956 statt 42.000 €). Jetzt `js/sonderumlage.js` + Feld `weg_su`, beide Jahresschleifen in calc.js, Verkäufer bei Fälligkeit vor Übergang, Steuer als Vorschlag mit 15-%-Prüfung, Import-Zeile nie vorgehakt, Fälligkeit als TT.MM.JJJJ. Gemessen CF 2026 −1.048 → −6.004 €, Karte bei 358 px ohne Überlauf.
+- **02.11.2026 · v3093/v3093a · last_login_at, Handbuch, Fotos als ein Dokument (N106)** (`4a1153d3`, `426e6b5e`, Prod 1.0.42): Befund: nur `authenticate()` stempelte, vier Wege gaben ein JWT ohne Stempel aus → `stempleAnmeldung()` überall; das Handbuch war rot (11 alte Belege) und schrieb deshalb nie neu → grün, neuer Fenstertitel; mehrere gleichzeitig gewählte Fotos = ein Dokument, „einzeln auswerten“ ohne neuen Lese-Abruf.
+- **02.11.2026 · v3094/v3094a · Hilfen, Handbuch, Prozess-Atlas, Tour, „Wie wir rechnen“ (N93.1–3)** (`0a2d846f`, `1d4f947e`, Prod 1.0.42): Methodik Kap. 10.1–10.6 gegen den Code (DSCR-Staffel, zwei Scores, Mietpotenzial-Kern, Zielkaufpreis, Quick-Check-Karte, GNotKG, Anlage 3), PDF 16 S.; help.js u. a. falsche Quick-Check-Schwellen 75/60/40 → 70/50/35; Prozess-Atlas 69/73 → 73/73; Objektkopf-Zusatz „die Stufe folgt dem Detailgrad“ berichtigt.
 
 - **02.11.2026 · v3090–v3090b · Quick-Check aufgeräumt, Fotos im Unterlagen-Import, Erhaltungsaufwand nach MEA** (`4765616a`, `8e16189c`, `0320e85c`, Prod 1.0.40): Stellplatz-Textfeld raus (rechnete nirgends, bleibt versteckt für die Exposé-Notiz); Karte „Zustand und Sanierung“ aufgelöst — Zustand in den Objektdaten, „+ Sanierung“ unter dem Kaufpreis (nicht auf den Kaufpreis, sonst Nebenkosten und Faktor auf die Sanierung). Import nimmt JPG/PNG/WebP, Fenster „Unterlagen: PDF oder Foto“. Im Browser auf Prod gemessen (Testunterlage Wirtschaftsplan als Scan-PDF und als Foto, Original mit Textschicht zum Vergleich): Werte gleich, Zeilen nicht vorgehakt, Bild geht nur an unseren Server; Fehler gefunden und behoben: Erhaltungsaufwand 92.000 € statt Anteil 10.856 € bei einem Einzelplan (Gemeinschaftsbeträge mit Faktor 1). Offen: Investitionsthese sagte bei leerer Objektart „das gesamte Gebäude“; Handbuch-Erzeugung ist rot mit 11 alten Belegen (N93).
 
