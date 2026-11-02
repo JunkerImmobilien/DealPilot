@@ -292,6 +292,22 @@ window.QcHeuristik = (function () {
     var annuitaetsFaktor = annuitaetJahr / heutigesDarlehen;   // z.B. 0.058 (5,8%)
     if (annuitaetsFaktor < 0.04) annuitaetsFaktor = 0.058;
     var deltaKp = (cfMon < 0) ? Math.abs(cfMon) * 12 / annuitaetsFaktor : 0;
+    /* ── v3085 · CASHFLOW NULL EXAKT, WENN DIE FINANZIERUNG BEKANNT IST ──────
+       Marcel 02.11.2026 (Hölderlinstr. 1): „er sagt Cashflow null bei 104.000 - dann gebe ich
+       104.000 ein, und er sagt, das Ziel ist 98.000. Da passt doch was nicht."
+       Gemessen: die Naeherung oben nimmt pauschal 5 % Eigenkapital an und rechnet die Rate aus dem
+       DSCR zurueck - der ist seit v3031 netto. Ergebnis 104.000 statt 98.000 €.
+       Exakt, wenn der Aufrufer Darlehen und Annuitaet (Zins + Tilgung in %) hereinreicht: die
+       Finanzierungsquote q = Darlehen / Kaufpreis bleibt beim niedrigeren Preis gleich (die Knoepfe
+       100 % / 100 % + NK sind Quoten), also sinkt die Rate um Annuitaet × q je Euro Preis.
+         Preis fuer Cashflow 0 = Kaufpreis − (−Cashflow × 12) ÷ (Annuitaet × q)
+       Hoelderlinstr.: 139.000 − 2.628 ÷ (6,37 % × 1,0) = 97.744 €. Gegenprobe: mit diesem Preis
+       eingetragen ist der Cashflow 0 und der Zielkaufpreis = Kaufpreis (kein Nachlass mehr). */
+    var _ann = +d.annuitaetPct || 0, _dl = +d.darlehen || 0;
+    if (_ann > 0 && _dl > 0 && kp > 0) {
+      var _q = _dl / kp;
+      deltaKp = (cfMon < 0) ? Math.abs(cfMon) * 12 / (_ann / 100 * _q) : 0;
+    }
     var kpForCf0 = kp - deltaKp;
 
     /* ── v1939 · DER MARKT IST DIE DRITTE OBERGRENZE ───────────────────

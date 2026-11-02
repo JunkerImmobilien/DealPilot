@@ -6157,7 +6157,9 @@ const QcApp = (function() {
       })(),
       lageklasse: (inputs.lageklasse || null),
       /* v3081 · Zins + Tilgung in %, fuer „mit x € mehr Eigenkapital traegt es sich“ */
-      annuitaetPct: (QcEngine.num(inputs.zins) || 0) + (QcEngine.num(inputs.tilg) || 0)
+      annuitaetPct: (QcEngine.num(inputs.zins) || 0) + (QcEngine.num(inputs.tilg) || 0),
+      /* v3085 · das Darlehen dazu, damit der Kern die Cashflow-Grenze exakt rechnet (statt 5 % EK-Annahme) */
+      darlehen: QcEngine.num(k.darlehen) || 0
     };
     _qcUrteilDaten = daten;   /* v3075 · dieselben Zahlen fuer den Zielkaufpreis im Mietpotenzial-Block */
 
@@ -7575,7 +7577,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v3081a"></script>
+  <script src="js/qc-heuristik.js?v=v3085"></script>
   <script src="js/dealscore.js?v=v3075"></script>
   <!-- v3075 · die zulaessige Miete (Kappung, Vergleichsmiete, Sperrfrist) - derselbe Kern wie potenzial.js -->
   <script src="js/mietpotenzial-kern.js?v=v3084b"></script>
