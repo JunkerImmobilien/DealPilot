@@ -7,7 +7,7 @@ Junker Digital sind Marken darunter.
 
 Antworte auf **Deutsch**, im Du.
 
-## Die vier Dateien, die die Arbeit steuern
+## Die fünf Ablagen, die die Arbeit steuern
 
 | Datei | sagt |
 |---|---|
@@ -15,6 +15,9 @@ Antworte auf **Deutsch**, im Du.
 | `BACKLOG.md` | **was** ansteht |
 | `FALLEN.md` | **wo** schon jemand hingefallen ist |
 | `claude/projektanweisung-*.md` | **der Gesamtstand** — Produkt, Architektur, Geld, Daten, Server, Chronik |
+| `wissen/JJJJ-MM-TT.md` | **was an diesem Tag galt und warum** — je Arbeitstag eine Datei: Getanes, Regeln, Kombinatorik, Berechnungen, Ansichten, Abläufe, Fallen (seit 02.11.2026, Einstieg `wissen/README.md`) |
+
+**Jede Sitzung schreibt ihre Tagesdatei in `wissen/`** (Marcel 02.11.2026: *„ich möchte, dass wir alles immer wissen, was genau ist“*) — zusätzlich zu Journal und Backlog, nicht statt ihrer.
 
 Die Langfassung und Quelle für die Projektanweisung in der Claude-App liegt
 in **`claude/`**. **Sie wird nach jedem Rollout fortgeschrieben** — Eintrag im

@@ -36,6 +36,26 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N87 · Portfolio-Cockpit › Steuer-Gesamtbetrachtung — Marcel 02.11.2026, Demo zuerst
+
+Marcel: *„Steuerliche Gesamtbetrachtung mit Steuerverlauf und Steuer-Modul über alles mit den Karten und den
+Grafiken sollte unter Portfolio-Cockpit erreichbar und zu sehen sein … den Unterpunkt Steuer könnten wir dort
+vielleicht mit den anderen Bereichen in einzelne Unter-Tabs umgliedern und alles einfach mit Visualisierung und
+Karten darstellen und zusätzlich in genau.“*
+
+**Gemessen 02.11.:** Das Cockpit hat Portfolio Score, Ansicht Einfach/Genau (Karten Vermögen, Miete, Cashflow
+vor/nach Steuer, Zielbild, Entwicklung, Deal Score), 04 Geteilte Objekte, 08 Steuer-Mappe (Anlage V, PDF),
+09 Jahresabschluss — **keinen** Steuerverlauf über alle Objekte. Das Objekt zeigt seit v3060 nur noch seine eigene
+Wirkung (`wissen/2026-11-02.md` Abschnitt 4).
+
+1. **Demo** in `design/Vorschläge/` mit echten Zahlen des Demo-Kontos: Unter-Reiter (z. B. Überblick · Steuer ·
+   Finanzierung · Bewertung · Mappe/Abschluss), Steuer einfach (Karten: Erstattung/Nachzahlung gesamt je Jahr,
+   Wendepunkt des Portfolios, Verlustjahre) und genau (Tabelle je Jahr × Objekt, zvE, Steuer ohne/mit Bestand).
+2. Rechnung: je Jahr die Summe der Objekt-V+V-Ergebnisse auf zvE, gegen zvE ohne Immobilien — **eine** Rechnung
+   (`Tax.calcImmoTaxImpact`), keine zweite; Daten aus den gespeicherten `State.taxTimeline`-Schnappschüssen je Objekt
+   prüfen (Steuer-Mappe nutzt `_computeYearTotal` mit `vorgabe`).
+3. Nach Abnahme bauen, Staging, Prod.
+
 ### N86 · Nach dem Neuabruf der Demo-Objekte (29.10.2026)
 
 1. ✅ gemessen: kein Anfragesturm (43 Anfragen beim Öffnen) — **Musterstraße 12 (Prod, Demo-Konto):** löste beim Öffnen zweimal die Anfragebremse aus (600/15 min) und schaltete einmal die Seitenleiste ins Menü - auf Staging unauffällig. Netzwerk beim Öffnen messen (read_network_requests), Schleife/Polling suchen.
@@ -4104,6 +4124,17 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3060/v3060a** (`ce118c0e`, `d0cba71a`, Prod 1.0.12) — Steuer im Objekt zeigt nur dieses Objekt:
+  Kopf Ergebnis V+V + Erstattung/Nachzahlung durch das Objekt, Rechenweg zugeklappt, Jahreskarten mit V+V.
+  **Befund:** die Rechnung war schon objektbezogen (Steuer ohne − mit auf zvE + Vorobjekte), missverständlich war
+  die Ansicht mit den Gesamtgrößen vorn.
+- **02.11.2026 · v3059** (`7e353b9f`, Prod 1.0.12) — Mein Profil (Karten nach Reiterwechsel), Deal-Score-Reiter
+  zurück, Bewertung nur Investor Deal Score bei vollem Plan + KPI ≥ 70 %, „Verkäufer unter Zeitdruck?“ samt toter
+  Leitungen ausgebaut. **Befund:** `data-swk` überlebte den `innerHTML`-Neuaufbau; der Reiter war seit v3022
+  absichtlich versteckt.
+- **02.11.2026 · Prod 1.0.12** (`c65d7a2`) — v3049–v3060a inkl. Import (v3049 Bausubstanz/Leerstand/Marktmiete,
+  v3052 parallel, v3058 PLZ mit führender Null).
 
 ### N80 · Maßnahmen am ganzen Haus im MFH-Zielbild, Messkabine Handy/Tablet — 26.10.2026 (`v2966`–`v2966g`, `eb9cef00` … `da20f550`)
 
