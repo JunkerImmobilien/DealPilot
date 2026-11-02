@@ -36,6 +36,21 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N92 · P1 — Quick-Check Mietpotenzial und Bewertungsschema (Marcel 02.11.2026, Priorität sehr hoch)
+
+Marcels Auftrag (eingefügt am 02.11.2026, vollständig im Chat): P1.1 Mietpotenzial im Quick-Check (aktuelle Miete,
+Sollmiete, Kappung, rechtlich zulässige Entwicklung) · P1.2 Drei-Jahres-Prognose (Jahres-NKM, Bruttorendite) · P1.3
+persönliche Zielrendite → Zielkaufpreis · P1.4 Bewertungsschema analysieren · P1.5 LTV-Gewichtung prüfen · P1.6
+Benchmark A–H (heute vs. Alternative: Wirtschaftlichkeit 25 / Mietpotenzial 20 / Kaufpreis vs. Marktwert 20 /
+Standort 15 / Zustand 10 / Finanzierung 10, oder zwei Scores Investment/Finanzierung) · P1.7 Gesamtbewertung (KI)
+erweitern · P1.8 Score transparent (Punkte je Kategorie, positive/negative Faktoren). Ziel: realistisch, nicht
+möglichst viele gute Scores. „Angebotsmieten und rechtlich zulässige Bestandsmieten nicht gleichsetzen.“
+
+1. Messen: `design/Vorschläge/score-benchmark-p1.md` (Bestand je Score mit Datei:Zeile, was es zu P1.1–P1.3 schon gibt —
+   u. a. `zielKaufpreis()`, Zielrendite je Lage, `potenzial.js sollFuer/mhTermine/mietpreisbremse`).
+2. Entscheidung Marcel zur Gewichtung anhand des Benchmarks.
+3. Bauen: Kerne (`dealscore.js` u. a.) + `rechenkerne-spiegeln` + `score-ketten-pruefen` + Telegram-Bot.
+
 ### N91 · KfW/Förderung aktuell halten, Darlehensarten, Neubau mit Bauphase — Marcel 02.11.2026
 
 Marcel: *„an einigen Stellen fragen wir KfW-Programme ab — können wir diese immer aktuell halten? … die Konditionen
@@ -4185,6 +4200,8 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3066/v3067** (Prod 1.0.15/1.0.16) — Einheiten bearbeiten: Satz einmal statt achtmal; Mietleiter „was geht und wann“ mit Übernehmen, eine Leiter für ETW und MFH (`potenzial.js leiterZeilen`).
 
 - **02.11.2026 · v3065** (`4f43cdcf`) — FESH-Hinweis an den vorhandenen Sanierungs-Kacheln (V117); die doppelten Haken aus v3064 sind zurückgebaut. **Befund:** nach dem Fachbegriff gesucht, nicht nach dem Kürzel „fesh“.
 
