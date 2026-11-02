@@ -36,6 +36,16 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N90 · Befunde aus dem Wissens-Rückblick (02.11.2026)
+
+1. **Rechtstext:** `frontend/legal/agb.html:77` „angeboten von Junker Immobilien“ (verlinkt aus `reseller.html:397`,
+   Prod 200) — Betreiber ist Junker Solution (`frontend/agb.html` richtig). Marcel entscheidet, ob die Reseller-AGB
+   angeglichen oder auf `agb.html` umgelenkt wird.
+2. **CLAUDE.md nachmessen** und korrigieren (mit „Hier stand bis …“): Kerosin-Zahl/N60.24, Gold-Basislinie 468 → 413,
+   UK-Flächenformel auch MFH (v2360), GND-Absatz, Baupreisindex-Zahl.
+3. **Memory** `gutachterpruefung-entscheidungen`: E5 als zurückgenommen (v2612) kennzeichnen.
+4. **Westerfeldstr. 140:** vier oder sechs Wohnungen (Marcel vs. Gutachten laut Journal)?
+
 ### N89 · Detailstufen Anfänger bis Profi + Zielbild als Mietleiter — Marcel 02.11.2026 (Messe-Feedback), Demo zuerst
 
 Marcel: *„von Anfänger bis Profi alles dabei … Anfänger mit dem Umfang überfordert … mit Umschalten den Detailgrad
