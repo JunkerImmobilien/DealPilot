@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-02T06:32:15.379Z",
+ "erzeugt_am": "2026-11-02T06:51:05.078Z",
  "quellen": {
   "voice-import": "fd1708d211c4b4d0",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "7773ac58de4684c7",
-  "index-html": "99ac0b7752dd831d",
+  "storage": "9ec50d08fbb36856",
+  "index-html": "59bd38e45f0a190e",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -510,7 +510,6 @@
    "kp4",
    "kp4l",
    "bank_inst",
-   "san_fesh",
    "d2",
    "d2z",
    "d2t",

@@ -1662,6 +1662,10 @@ label.dp-required.qc-required::after {
             <div class="kv kv-hl"><span><b>Summe Sanierung</b></span><span class="kv-v c-gold" id="fesh_total">— €</span></div>
             <button class="fesh-apply-btn" onclick="applyFESHToSanierung()">→ In Sanierungskosten übernehmen</button>
           </div>
+          <!-- v3065 · Steuerhinweis Standardhebung (FESH-Regel, BMF-Schreiben vom 26.01.2026) an DIESEN
+               Kacheln - potenzial.js feshBinden(). v3064 hatte daneben vier eigene Haken gebaut; der Block
+               hier besteht seit V117 (Fenster, Elektrik, Sanitär, Heizung + Dach/Fassade, Bäder, Küche, Sonstiges). -->
+          <div id="san-fesh-hinweis"></div>
           <div id="fesh_kfw_recommendation" class="info-box info-blue" style="margin-top:10px;display:none">
             <div class="info-box-title">💡 KfW-Förderempfehlung</div>
             <div class="info-box-content" id="fesh_kfw_text"></div>
@@ -1672,20 +1676,6 @@ label.dp-required.qc-required::after {
             <label>Sanierungskosten</label>
             <div class="iw"><span class="pfx">€</span><input id="san" type="text" inputmode="decimal" placeholder="" class="trl" oninput="syncSanTaxOnSanInput(); calc(); _v292_6_toggle15pct();"></div>
             <span class="hint" id="san_limit_hint">Grenze wird berechnet...</span>
-            <!-- v3064 · FESH-Regel (BMF-Schreiben vom 26.01.2026): Standardhebung, wenn mindestens 3 der 4
-                 zentralen Bereiche deutlich verbessert werden -> Herstellungskosten (AfA), kein Erhaltungsaufwand.
-                 Haken in #san_fesh (F,E,S,H), Hinweis aus potenzial.js feshBinden(). -->
-            <div class="f" id="san-fesh" style="margin-top:8px">
-              <label>Standard deutlich gehoben bei <span class="hint" style="font-weight:400">— Fenster · Elektro · Sanitär · Heizung (FESH)</span></label>
-              <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px">
-                <label style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" data-fesh="F"> Fenster</label>
-                <label style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" data-fesh="E"> Elektro</label>
-                <label style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" data-fesh="S"> Sanitär</label>
-                <label style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" data-fesh="H"> Heizung</label>
-              </div>
-              <input type="hidden" id="san_fesh">
-              <div id="san-fesh-hinweis"></div>
-            </div>
             <!-- v2988: Kann-Feld - wann ist die Sanierung ausgefuehrt? Mapper sanStatus (bOM im Marktbericht) -->
             <div class="f" style="margin-top:8px">
               <label for="san_ausgefuehrt">Sanierung ausgeführt am <span class="hint" style="font-weight:400">— optional</span></label>
@@ -3769,7 +3759,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3059"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3064"></script>
+<script src="js/storage.js?v=v3065"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -3817,7 +3807,7 @@ label.dp-required.qc-required::after {
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
-<script src="js/potenzial.js?v=v3064a"></script>
+<script src="js/potenzial.js?v=v3065"></script>
 <script src="js/mietvertrag-objekt.js?v=v3028b"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>

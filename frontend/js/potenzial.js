@@ -236,28 +236,20 @@
       + 'sie laufen über die AfA des Gebäudes (bei deinem AfA-Satz von ' + sz + ' % rund ' + jt + ' Jahre) und sind <b>kein sofort abziehbarer Erhaltungsaufwand</b> — '
       + 'auch unterhalb der 15-%-Grenze. Eine neue Wärmepumpe allein hebt den Standard nicht. Grundlage: BMF-Schreiben vom 26.01.2026; bitte mit dem Steuerberater abstimmen.</div>';
   }
-  /* Vier Haken an den Sanierungskosten (Tab Investition), gespeichert in #san_fesh (z. B. „F,S,H"). */
+  /* v3065 · Der Hinweis hängt an den VORHANDENEN Kacheln des Blocks „Sanierungsbedarf" (Tab
+     Investition, fesh_f/e/s/h, Bäder fesh_b zählt als Sanitär) - nicht an eigenen Haken wie in v3064. */
+  var FESH_KACHEL = { fesh_f: 'F', fesh_e: 'E', fesh_s: 'S', fesh_b: 'S', fesh_h: 'H' };
   function feshBinden() {
-    var host = el('san-fesh'); if (!host) return;
-    var fld = el('san_fesh');
-    var boxes = host.querySelectorAll('input[data-fesh]');
-    function lesen() { var v = String((fld && fld.value) || ''); boxes.forEach(function (b) { b.checked = v.indexOf(b.getAttribute('data-fesh')) >= 0; }); }
+    var h = el('san-fesh-hinweis'); if (!h) return;
     function zeichnen() {
-      var h = el('san-fesh-hinweis'); if (!h) return;
+      var b = Object.keys(FESH_KACHEL).filter(function (id) { var c = el(id); return c && c.checked; }).map(function (id) { return FESH_KACHEL[id]; }).join(',');
+      var html = standardhebungHtml([], b);
       var zb = standardhebung(objektMassnahmen());
-      var html = standardhebungHtml([], fld ? fld.value : '');
-      if (!html && zb.anzahl >= 2) html = '<div class="hint" style="margin-top:6px">Laut Zielbild-Maßnahmen betroffen: ' + esc(zb.bereiche.join(', ')) + ' — oben ankreuzen, wenn der Standard dort deutlich gehoben wird.</div>';
+      if (!html && zb.anzahl >= 2) html = '<div class="hint" style="margin-top:6px">Laut Zielbild-Maßnahmen betroffen: ' + esc(zb.bereiche.join(', ')) + ' — die Steuerfolge prüft der Hinweis, sobald die Bereiche oben angekreuzt sind.</div>';
       h.innerHTML = html;
     }
-    if (!host._dpFesh) {
-      host._dpFesh = true;
-      boxes.forEach(function (b) { b.addEventListener('change', function () {
-        var v = [].slice.call(boxes).filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute('data-fesh'); }).join(',');
-        if (fld) { fld.value = v; try { fld.dispatchEvent(new Event('input', { bubbles: true })); fld.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
-        zeichnen();
-      }); });
-    }
-    lesen(); zeichnen();
+    Object.keys(FESH_KACHEL).forEach(function (id) { var c = el(id); if (c && !c._dpFesh) { c._dpFesh = true; c.addEventListener('change', zeichnen); } });
+    zeichnen();
   }
 
   /* ══ v3062 · MIETPREISBREMSE UND MIETRECHT AUF EINEN BLICK ══════════════
