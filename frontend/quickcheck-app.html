@@ -3349,6 +3349,15 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
    lang=de, notfalls Umbruch im Wort. */
 .card-title > span { min-width: 0; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; }
 </style>
+<!-- v3081b · Marcel 02.11.2026: „ständig, wenn man Quick-Check lädt, sieht man kurz einen alten Stand … wie Obsidian“.
+     Gemessen: #score-block (alter dunkler Score-Kasten, #2A2727, 1236×346 px) stand ~0,5 s sichtbar, weil die Regeln,
+     die ihn ausblenden, erst in qb-reskin-style4 HINTER dem Body stehen (Z. ~7580) - der Parser zeichnet vorher.
+     Dieselben drei Regeln hier im Kopf; die späteren bleiben (doppelt, !important, unschädlich). -->
+<style id="qb-reskin-frueh">
+#score-block .sb-header, #score-block .sb-hero, #score-block .kpis { display:none !important; }
+#score-block #particle-canvas, #score-block .qc-bgfx { display:none !important; }
+#score-block { background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
+</style>
 </head>
 <body class="dp-neue-karte"><!-- qb-rename-v699 · v1645: die Marke fest - dieses Dokument ist IMMER hell -->
 
