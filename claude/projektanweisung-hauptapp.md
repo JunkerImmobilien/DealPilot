@@ -44155,3 +44155,14 @@ führen in die Einstellungen; kein stilles Hochschalten mehr aus Mietanalyse/Pot
 
 **Was.** Keine Einstellungs-Hinweise mehr im Reiter Objekt; Pillen/Zeilen nur bis zum Detailgrad; Stufe-3-Knöpfe in Mietanalyse
 und Potenzial nur bei Experte. **Commit** ee3e40ba. **Nachweis** wissen Teil 13. **Rest** —
+
+### v3080 · v3081/a/b — Mietpreis-Analyse als Übersicht, Quick-Check-Bewertung in einer Karte, kein Aufblitzen (02.11.2026) · Prod 1.0.26
+
+**Was.** v3080 Pilot-Mietpreis-Analyse: ansetzbare Miete oben, Skala mit Band, Werte als Zeilen, Herkunft zugeklappt; Fußzeile
+„+ weitere Felder“ entfernt. v3081 Quick-Check: eine Karte (Urteil mit Lageklasse Standard B, drei Prüfsteine, Zielkaufpreis mit
+greifender Grenze, Miete mit Rechtsquelle, je drei Punkte dafür/dagegen, KI zugeklappt); Kern  mit Zweig
+„Objekt passt — Finanzierung prüfen“ (Eigenkapitalbedarf) und ; Score unberührt (Marcel). v3081b alter
+Score-Kasten blitzte beim Laden ~0,5 s auf (Ausblende-Regeln standen hinter dem Body) → in den Kopf. **Commits** 25a892d6,
+7dec6f02, 38d017fb, 9bf458c0; **Prod** 1.0.26 (e2e5cea). Erster Rollout brach am Zweigwechsel ab (Notizen während des Laufs
+geändert), zweiter meldete zu früh „nicht 200“ — nachgemessen 200, Backend healthy, Dateien und Kern im Image. **Nachweis**
+wissen Teil 14. **Rest** Lageklasse A/C am echten Lauf nachmessen.
