@@ -5842,7 +5842,7 @@ const QcApp = (function() {
     try {
       const T = (window.QcHeuristik && QcHeuristik.zielKaufpreisTeile) ? QcHeuristik.zielKaufpreisTeile(D) : null;
       if (T && kp > 0) {
-        const zk = (lbl, v, art, satz) => v == null ? '' : `<div class="qcb-zk${T.greift === art ? ' greift' : ''}"><span class="qcb-l">${lbl}</span><div class="v">${e0(Math.floor(v / 1000) * 1000)}</div><span class="u">${v >= kp ? 'kein Nachlass nötig' : 'Nachlass ' + e0(kp - v) + ' (' + Math.round((1 - v / kp) * 100) + ' %)'}${T.greift === art ? ' — diese Grenze greift' : ''}${satz ? ' · ' + satz : ''}</span></div>`;
+        const zk = (lbl, v, art, satz) => { if (v == null) return ''; const vr = v >= kp ? kp : Math.floor(v / 1000) * 1000; return `<div class="qcb-zk${T.greift === art ? ' greift' : ''}"><span class="qcb-l">${lbl}</span><div class="v">${e0(v >= kp ? v : vr)}</div><span class="u">${v >= kp ? 'kein Nachlass nötig' : 'Nachlass ' + e0(kp - vr) + ' (' + Math.round((1 - vr / kp) * 100) + ' %)'}${T.greift === art ? ' — diese Grenze greift' : ''}${satz ? ' · ' + satz : ''}</span></div>`; };
         const zr = D.zielBmr != null ? String(D.zielBmr).replace('.', ',') + ' %' : '6 %';
         h += `<div class="qcb-box"><span class="qcb-l">Zielkaufpreis · was der Preis sein müsste</span><div class="qcb-ziel">`
           + zk('Rendite-Ziel ' + (lk ? lk + '-Lage' : '(ohne Lageklasse)'), T.rendite, 'rendite', zr + ' brutto')
@@ -7535,7 +7535,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v3081"></script>
+  <script src="js/qc-heuristik.js?v=v3081a"></script>
   <script src="js/dealscore.js?v=v3075"></script>
   <!-- v3075 · die zulaessige Miete (Kappung, Vergleichsmiete, Sperrfrist) - derselbe Kern wie potenzial.js -->
   <script src="js/mietpotenzial-kern.js?v=v3081"></script>

@@ -330,7 +330,7 @@ window.QcHeuristik = (function () {
     var t = _zkTeile(d), kp = t.kp, g = null;
     if (t.ziel < kp) g = (t.ziel === t.cashflow) ? 'cashflow' : (t.markt != null && t.ziel === t.markt) ? 'markt' : 'rendite';
     var dk = function (x) { return (isFinite(x) && x > 0) ? Math.min(x, kp) : null; };
-    return { ziel: t.ziel, greift: g, rendite: dk(t.rendite), cashflow: dk(t.cashflow), markt: t.markt != null ? Math.min(t.markt, kp) : null };
+    return { ziel: t.ziel, greift: g, rendite: dk(t.rendite), cashflow: dk(t.cashflow), markt: t.markt };
   }
 
   /* ── v3075 · ZIELKAUFPREIS ZWEISTUFIG (P1.3, Marcel 02.11.2026) ─────────
