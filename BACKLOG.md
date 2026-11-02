@@ -36,6 +36,29 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N89 · Detailstufen Anfänger bis Profi + Zielbild als Mietleiter — Marcel 02.11.2026 (Messe-Feedback), Demo zuerst
+
+Marcel: *„von Anfänger bis Profi alles dabei … Anfänger mit dem Umfang überfordert … mit Umschalten den Detailgrad
+erweitern oder vereinfachen … mit jeder Stufe zu einer Bewertung und einem Investment-PDF … ein einfach angelegtes
+Objekt später erweitern.“* Und: Zielbild *„cool, aber überfordernd“*; erreichbare Miete nach Sanierung **und** bei
+Mieterwechsel ohne Maßnahme prognostizieren.
+
+**Gemessen** (`wissen/2026-11-02.md` Teil 2): Eingabetiefe 1/2/3 gibt es schon, aber nur im Reiter Objekt.
+Kappung und nächste Erhöhung werden gerechnet. **Mietpreisbremse:** Daten da, nicht ausgewertet. **Mietspiegel:**
+Paket `mietrecht-ort` liegt ungenutzt. **Neuvertragsmiete:** fehlt. Miete nach Sanierung amtlich nur Minden-Lübbecke.
+
+1. Entwurf `design/Vorschläge/detailstufen-konzept.md` + `detailstufen-demo.html` → Marcels Wahl.
+2. Danach in dieser Reihenfolge: Mietpreisbremse anzeigen (Daten vorhanden) → Mietleiter-Karte (ETW + MFH je
+   Wohnung) → Neuvertragsmiete aus Angebotsmieten (Herkunft „Marktdaten“, nie amtlich) → `mietrecht-ort` einbinden.
+
+### N88 · Einstellungen: Plan-Reiter und Modal vereinfachen — Marcel 02.11.2026, Demo zuerst
+
+Marcel: *„Plan … sieht zusammengewürfelt aus und weicht optisch vom Gesamtkonzept ab. Schriftarten, Farbe und Form
+sollten passen. Generell könnte das Modal und die Unterreiter … deutlich einfacher … dargestellt werden.“*
+**Gemessen:** drei Schriftfamilien im Plan-Reiter (Cormorant, Space Grotesk, JetBrains Mono), drei Blockformen,
+12 Reiter, unten „Auto-Save aktiv“ **und** „Speichern“. Entwurf `design/Vorschläge/einstellungen-einfach-demo.html`
+(A: aufgeräumt, B: weniger Reiter) → Marcels Wahl → bauen.
+
 ### N87 · Portfolio-Cockpit › Steuer-Gesamtbetrachtung — Marcel 02.11.2026, Demo zuerst
 
 Marcel: *„Steuerliche Gesamtbetrachtung mit Steuerverlauf und Steuer-Modul über alles mit den Karten und den
@@ -4124,6 +4147,10 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3061/v3061a** (`5822bcdb`, `613aee26`, Prod 1.0.13) — Bestand/Ankauf öffnet die Objektliste;
+  Quick Boarding ohne Objekt im Kopf und ohne Reiterleiste. **Befund:** der Schalter filterte nur; die Reiterleiste
+  sollte laut V63.76 im Boarding verborgen sein, keine Regel tat es mehr.
 
 - **02.11.2026 · v3060/v3060a** (`ce118c0e`, `d0cba71a`, Prod 1.0.12) — Steuer im Objekt zeigt nur dieses Objekt:
   Kopf Ergebnis V+V + Erstattung/Nachzahlung durch das Objekt, Rechenweg zugeklappt, Jahreskarten mit V+V.

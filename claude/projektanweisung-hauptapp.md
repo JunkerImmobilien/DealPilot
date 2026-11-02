@@ -44060,3 +44060,14 @@ gelesen. Prod 200, `dealpilot-backend` healthy, Buster v3059/v3060a ausgeliefert
 25 → 22 von Hand (das Schreiben unter Windows erzeugt Backslash-Pfade).
 
 **Rest.** N87 Portfolio-Cockpit › Steuer-Gesamtbetrachtung (Demo zuerst). Ab heute je Tag `wissen/JJJJ-MM-TT.md`.
+
+### v3061 · v3061a — Seitenleiste öffnet die Liste, Quick Boarding ohne Objekt (02.11.2026)
+
+**Was.** Klick auf Bestand/Ankauf (`doppelkarte.js`) klappt die Objektliste auf (`DealPilotLayout.portfolio(false)`,
+neu nach außen gegeben). Quick Boarding (`body.qc-standalone-active`) blendet Nummer, Name, Ziel-Ring, Autosave,
+Vollständigkeit, Score-Kachel der Seitenleiste und (v3061a) die Reiterleiste `nav.tabs` aus. Die Reiterleiste sollte
+laut V63.76 schon immer verborgen sein; gemessen stand sie da, sobald man aus einem Objekt wechselte.
+**Commits** `5822bcdb`, `613aee26`. **Nachweis** Staging: Liste 0 → 873 px (Ankauf, 17) bzw. 530 px (Bestand, 10);
+im Boarding alle sechs Teile `display:none`, danach zurück. **Prod 1.0.13** Merge `70053ef`, Sicherungen
+`haupt/mb-20261102-0647`, 200. **Rest** Bestandsaufnahme Zielbild/Mietrecht in `wissen/2026-11-02.md` Teil 2;
+Entwürfe Einstellungen/Plan (N88) und Detailstufen + Mietleiter (N89) in Arbeit.
