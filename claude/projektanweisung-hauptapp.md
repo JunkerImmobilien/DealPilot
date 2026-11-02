@@ -44181,3 +44181,8 @@ wissen 02.11. „v3081c–g“. **Rest** —
 „Woher die Zahlen kommen“ in einfachen Worten. v3083 Namensstamm-Abgleich im Kern (Freiburg i. Br.). **Prod** 1.0.31
 (20c514b). **Nachweis** wissen 02.11. „v3082 · v3083“, 30 Orte/16 Länder und 942 Schreibweisen. **Rest** Quick-Check per AGS
 statt Ortsname.
+
+### v3084/a/b — Quick-Check bestimmt die Gemeinde per AGS (N96, 02.11.2026) · Prod 1.0.32
+
+**Was.** AGS-Abruf im Quick-Check (lesend, je PLZ+Ort gemerkt), Ortsname nur Rückfall; Abruf braucht objart/baujahr/wfl;
+Kurzname der Verordnung ohne „(§ 1)“. **Prod** 1.0.32 (1856ba3). **Nachweis** Winsen 21423 → 15 % + Bremse. **Rest** —

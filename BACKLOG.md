@@ -40,7 +40,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 Der Quick-Check ordnet Kappung und Mietpreisbremse über den Ortsnamen zu (`_qcMietpotenzial`), der Hauptteil per AGS
 (`potenzial.js agsHolen` → `/marktbericht/wertparameter/zinssatz`). Seit v3083 trifft der Namensstamm 909/942
-Schreibweisen; 29 bleiben mehrdeutig („bitte prüfen“). Mit AGS wären es alle. Kosten: ein Backend-Abruf je PLZ.
+Schreibweisen; 29 bleiben mehrdeutig („bitte prüfen“). Mit AGS wären es alle. Kosten: ein Backend-Abruf je PLZ. **Erledigt v3084/a/b (02.11.2026, Prod 1.0.32).**
 
 ### N95 · Quick-Check-Bewertung neu (02.11.2026)
 
