@@ -44150,3 +44150,8 @@ Zuordnung → galt als Experte); Zeile „Gewichtung anpassen ›" aus Mein Prof
 **Was.** Pillen/Abrufzeilen wählen nur die Marktbericht-Stufe (`mbWahl`), freigegeben bis zum Detailgrad; gesperrte Stufen
 führen in die Einstellungen; kein stilles Hochschalten mehr aus Mietanalyse/Potenzial. **Commit** 15d546b5, **Prod** dfdaa0e.
 **Nachweis** `wissen/2026-11-02.md` Teil 13 (dort auch Stand Schleswig-Holstein). **Rest** —
+
+### v3079 — im Reiter Objekt nur freigegebene Stufen (02.11.2026)
+
+**Was.** Keine Einstellungs-Hinweise mehr im Reiter Objekt; Pillen/Zeilen nur bis zum Detailgrad; Stufe-3-Knöpfe in Mietanalyse
+und Potenzial nur bei Experte. **Commit** ee3e40ba. **Nachweis** wissen Teil 13. **Rest** —
