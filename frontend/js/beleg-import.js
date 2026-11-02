@@ -194,12 +194,14 @@
     for (var i = 1; i <= max; i++) {
       try {
         var page = await pdf.getPage(i);
-        var vp = page.getViewport({ scale: 2 });
+        /* v3089 · ~2200 px breit für die Texterkennung auf dem Server (ocr.js), statt Faktor 2 (~1190 px) */
+        var _vp0 = page.getViewport({ scale: 1 });
+        var vp = page.getViewport({ scale: Math.min(3.8, 2200 / _vp0.width) });
         var canvas = document.createElement('canvas');
         canvas.width = vp.width; canvas.height = vp.height;
         var ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport: vp }).promise;
-        out.push(canvas.toDataURL('image/jpeg', 0.82));
+        out.push(canvas.toDataURL('image/jpeg', 0.85));
       } catch (e) { /* einzelne Seite ueberspringen, Rest weiterlesen */ }
     }
     return out;

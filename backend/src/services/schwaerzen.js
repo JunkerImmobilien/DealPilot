@@ -28,6 +28,12 @@
    ════════════════════════════════════════════════════════════════════ */
 
 const W = '[A-ZÄÖÜ][a-zäöüßA-ZÄÖÜ\\-]+';                 // ein Namenswort
+/* v3089 · ein Eigentümername hinter „Wohnung": ein oder mehrere Namenswörter mit „/" verbunden,
+   nie ein Lage-, Nummern- oder Gebäudewort (Wohnung Nr. 5, Wohnung im EG, Wohnung Dachgeschoss) */
+const STOP_WE = '(?!(?:Nr|Nummer|Erdgeschoss|Obergeschoss|Dachgeschoss|Untergeschoss|Kellergeschoss|Souterrain|Haus|Hinterhaus|Vorderhaus|Seitenflügel|Eingang|Aufgang|Treppenhaus|Links|Rechts|Mitte|Typ|Gesamt|Größe|Wohnfläche|Miete|Lage|Etage|Ebene|Nord|Süd|Ost|West|Mieter|Eigentümer|Leerstand|Sanierung|Fenster|Bad|Küche|Heizung|Dach|Fassade|Balkon|Terrasse|Garten|Stellplatz|Garage|Tiefgarage|Keller|Abrechnung|Kosten|Rücklage|Instandhaltung)\\b)';
+/* kein Hauptwort mit typischer Endung („und Kostentragung“, „sowie Sanierung“) */
+const NOMEN_WE = String.raw`(?![A-ZÄÖÜ][a-zäöüß]*(?:ung|ungen|heit|keit|schaft|tion|kosten|arbeiten|maßnahmen?|umlage|beschluss)\b)`;
+const NAME_WE = STOP_WE + NOMEN_WE + W + '(?:\\s*/\\s*' + W + ')*';
 const DATUM = '\\d{1,2}\\.\\s?\\d{1,2}\\.\\s?\\d{2,4}';
 
 const REGELN = [
@@ -57,6 +63,16 @@ const REGELN = [
   // Anrede + Name (bis drei Wörter, Titel erlaubt)
   { name: 'anrede',
     re: new RegExp('\\b(Herrn?|Frau|Eheleute|Notarin|Notar)\\s+((?:Dr\\.|Prof\\.|Dipl\\.-[A-Za-z]+\\.?)\\s*)*' + W + '(?:\\s+(?:und\\s+)?' + W + '){0,3}', 'g'),
+    ersatz: (m, p1) => p1 + ' [Name]' },
+  // v3089 · Eigentümer in WEG-Protokollen: „der Wohnung Grannemann/Hülsmeier", „den Wohnungen
+  // Lingemann und Meyer". Gemessen 02.11.2026 an einem echten Protokoll: diese Namen blieben stehen,
+  // weil kein Signalwort (Herr, Frau, Eheleute) davorsteht. Lage- und Nummernwörter sind ausgenommen.
+  { name: 'wohnung_name',
+    re: new RegExp('\\b(Wohnung(?:en)?|Whg\\.|Einheit(?:en)?|Sondereigentum)\\s+' + NAME_WE + '(?:\\s*(?:,|und|sowie)\\s*' + NAME_WE + ')*', 'g'),
+    ersatz: (m, p1) => p1 + ' [Name]' },
+  // v3089 · abgekürzte Anrede: „Hr. Müller", „Fr. Schmidt"
+  { name: 'anrede_kurz',
+    re: new RegExp('\\b(Hr\\.|Fr\\.|Hrn\\.)\\s*' + W + '(?:\\s*/\\s*' + W + ')?', 'g'),
     ersatz: (m, p1) => p1 + ' [Name]' },
   // Anschrift einer Person
   { name: 'wohnhaft',

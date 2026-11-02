@@ -50,11 +50,13 @@
   async function seiteAlsBild(pdf, nr) {
     var page = await pdf.getPage(nr);
     var vp0 = page.getViewport({ scale: 1 });
-    var vp = page.getViewport({ scale: Math.min(2.2, 1500 / vp0.width) });
+    /* v3089 · die Seite wird auf dem Server per Texterkennung gelesen (ocr.js). Gemessen 02.11.2026
+       an der Mietaufstellung: 1500 px/JPEG 72 % → 87,8 % der Zahlen, 2200 px/85 % → 98,6 %. */
+    var vp = page.getViewport({ scale: Math.min(3.8, 2200 / vp0.width) });
     var cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
     var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height);
     await page.render({ canvasContext: cx, viewport: vp }).promise;
-    return cv.toDataURL('image/jpeg', 0.72);
+    return cv.toDataURL('image/jpeg', 0.85);
   }
   async function bilderLesen(pdf, nrs) {
     var bilder = [];
