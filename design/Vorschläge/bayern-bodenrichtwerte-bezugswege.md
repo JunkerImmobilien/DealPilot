@@ -214,6 +214,44 @@ Z. 311–405):
 
 ---
 
+## 7a · Fassung 02.11.2026 mittags — kurz, mit Bitte um ein Gespräch (Marcels Wunsch, nicht versandt)
+
+**An:** `oga-bayern@landshut.de` (Oberer Gutachterausschuss, Geschäftsstelle Landshut) · **Cc:** `gdi-by@ldbv.bayern.de`
+**Betreff:** Bodenrichtwerte Bayern in der Software DealPilot – Bitte um Freigabe und kurzes Gespräch
+
+> Sehr geehrte Damen und Herren,
+>
+> mein Name ist Marcel Junker. Ich bin DESAG-geprüfter Sachverständiger für Immobilienbewertung und
+> betreibe mit Junker Solution die Software DealPilot. Mit DealPilot prüfen Immobilieninvestoren
+> Kaufangebote: von der Rendite- und Finanzierungsrechnung bis zu einem Marktbericht mit indikativer
+> Wertermittlung nach ImmoWertV (Boden-, Ertrags- und Sachwert). Wir arbeiten dabei streng mit
+> amtlichen Daten und nennen im Bericht zu jeder Zahl den Gutachterausschuss, den Stichtag und die
+> Quelle.
+>
+> Den Bodenrichtwert rufen wir in den anderen Bundesländern für die einzelne Objektadresse über die
+> offenen BORIS-Dienste ab. Für Bayern suchen wir gerade nach einer sauberen Lösung, das ebenso zu
+> automatisieren. Nach den Nutzungsbedingungen liegen die Rechte an den Werten bei den
+> Gutachterausschüssen, deshalb möchten wir das nicht ohne Ihr Einverständnis tun.
+>
+> Daher meine Bitte:
+>
+> - Wäre eine Freigabe denkbar, dass DealPilot den Bodenrichtwert für die Adresse eines Nutzers
+>   automatisch abruft und nur in dessen Bericht mit Quellenvermerk zeigt? Wir speichern keine Zonen
+>   flächig und geben keine Daten weiter.
+> - Falls dafür eine Lizenz oder die Zustimmung der einzelnen Ausschüsse nötig ist: Wie wäre der
+>   richtige Weg, und zu welchen Bedingungen?
+>
+> Gern würde ich das in einem kurzen Gespräch (Telefon oder Video, 20–30 Minuten) mit Ihnen
+> besprechen und DealPilot dabei auch kurz zeigen. Nennen Sie mir einfach einen Termin, der Ihnen passt.
+>
+> Bis dahin verweisen wir unsere Nutzer auf den BayernAtlas und lassen sie den Wert selbst eintragen.
+>
+> Mit freundlichen Grüßen
+>
+> Marcel Junker
+> Junker Solution · DealPilot
+> [Anschrift] · [Telefon] · [E-Mail] · dealpilot.immo
+
 ## 7 · Entwurf der Anfrage (nicht versandt)
 
 **An:** Oberer Gutachterausschuss für Grundstückswerte im Freistaat Bayern,
