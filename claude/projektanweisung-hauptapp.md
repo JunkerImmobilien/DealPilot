@@ -44160,8 +44160,8 @@ und Potenzial nur bei Experte. **Commit** ee3e40ba. **Nachweis** wissen Teil 13.
 
 **Was.** v3080 Pilot-Mietpreis-Analyse: ansetzbare Miete oben, Skala mit Band, Werte als Zeilen, Herkunft zugeklappt; Fußzeile
 „+ weitere Felder“ entfernt. v3081 Quick-Check: eine Karte (Urteil mit Lageklasse Standard B, drei Prüfsteine, Zielkaufpreis mit
-greifender Grenze, Miete mit Rechtsquelle, je drei Punkte dafür/dagegen, KI zugeklappt); Kern  mit Zweig
-„Objekt passt — Finanzierung prüfen“ (Eigenkapitalbedarf) und ; Score unberührt (Marcel). v3081b alter
+greifender Grenze, Miete mit Rechtsquelle, je drei Punkte dafür/dagegen, KI zugeklappt); Kern `qc-heuristik.js` mit Zweig
+„Objekt passt — Finanzierung prüfen“ (Eigenkapitalbedarf) und `zielKaufpreisTeile()`; Score unberührt (Marcel). v3081b alter
 Score-Kasten blitzte beim Laden ~0,5 s auf (Ausblende-Regeln standen hinter dem Body) → in den Kopf. **Commits** 25a892d6,
 7dec6f02, 38d017fb, 9bf458c0; **Prod** 1.0.26 (e2e5cea). Erster Rollout brach am Zweigwechsel ab (Notizen während des Laufs
 geändert), zweiter meldete zu früh „nicht 200“ — nachgemessen 200, Backend healthy, Dateien und Kern im Image. **Nachweis**
