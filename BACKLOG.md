@@ -36,6 +36,19 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N93 · Hilfen, Anleitungen und „Wie wir rechnen“ nachziehen — nach v3073/v3075/v3076 (Marcel 02.11.2026)
+
+Marcel: *„Ändern bzw. ergänzen wir dann auch, wie wir rechnen, und unsere Hilfen und Anleitungen …, auch wie der
+Quick-Check bewertet, mit welchen Daten und woher sie kommen.“*
+
+1. `frontend/landing/methodik.html` („Wie wir rechnen“): DSCR-Staffel (v3070), Mietpotenzial nur aus zulässiger Miete,
+   Zielkaufpreis zweistufig, zwei Scores (Investment/Finanzierung), Quick-Check-Bewertung mit Daten und Herkunft
+   (Kappung/Mietpreisbremse aus Landesverordnungen, Vergleichsmiete, Marktpreisindikation, Lage) — keine Quellennamen
+   nach außen (CLAUDE.md: „aktueller Marktdurchschnitt“).
+2. `frontend/js/help.js`: Themen zu Detailstufen, Mietleiter, Mietrecht-Karte, FESH-Hinweis, Förderregister, zwei Scores, Quick-Check.
+3. Handbuch/Prozess-Atlas (`handbuch.html`, `prozess-atlas.js`) und Tour (`tour-content.js`) auf die Stufen prüfen.
+4. Messe-Drehbücher (`messe-drehbuch.js`) und Storybook gegen die neuen Ansichten prüfen (Memory „Storybook muss passen“).
+
 ### N92 · P1 — Quick-Check Mietpotenzial und Bewertungsschema (Marcel 02.11.2026, Priorität sehr hoch)
 
 Marcels Auftrag (eingefügt am 02.11.2026, vollständig im Chat): P1.1 Mietpotenzial im Quick-Check (aktuelle Miete,
