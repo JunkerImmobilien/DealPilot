@@ -44097,3 +44097,10 @@ ist zurückgenommen (wissen/2026-11-02.md Teil 5). **Rest** N89 Vorschlag Detail
 wann“ (Heute → Mieterhöhung → Bei Neuvermietung → Zielbild) mit „übernehmen“ (setzt Feld + change). **Commit**
 83690a64. **Nachweis** Westerfeldstr. Whg 3, Knöpfe gesetzt und verworfen, _dpMfh unverändert. **Prod 1.0.15** Merge
 e33cd9f. **Rest** Kappung/Bremse HE 25.11. (Nachfolge erwartet Mitte November), BW 31.12. — erneut prüfen.
+
+### v3067 — eine Mietleiter für ETW und MFH (02.11.2026) · Prod 1.0.16
+
+**Was.** Leiter-Bau nach `potenzial.js` (`leiterZeilen/leiterHtml/leiterBinden`), ETW-Karte „Mieterhöhung und
+Zielbild“ mit Leiter oben (`objektLeiter`), MFH-Fenster nutzt dieselbe; v3066-Leiter und CSS entfernt. **Commit**
+5ceb9599. **Nachweis** Hüllhorst (ohne Knöpfe, richtig), Westerfeld Whg 3 (Knopf + Verwerfen). **Prod 1.0.16** Merge
+7f2a970. **Rest** N89 Detailgrad (Zuordnung in Arbeit), N91 KfW, N92 P1-Paket (Benchmark in Arbeit).

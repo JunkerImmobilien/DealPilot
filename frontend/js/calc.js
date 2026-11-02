@@ -4397,52 +4397,70 @@ function updateFESH() {
   var hasFenster = selected.some(function(s) { return s.area === 'f'; });
   var hasDachFassade = selected.some(function(s) { return s.area === 'd'; });
 
-  // KfW 261 - Wohngebäude-Kredit (für energetische Sanierung)
+  /* v3068 · Marcel 02.11.2026: „KfW-Programme immer aktuell halten“. Recherche
+     design/Vorschläge/kfw-foerderregister-recherche.md (kfw.de/bafa.de, gelesen 02.11.2026):
+     ALLE bisherigen Links lieferten 404; KfW 458 versprach „bis 70 %, max. 23.500 €“ —
+     ein Vermieter bekommt nur die Grundförderung 30 % (1. WE höchstens 8.400 €); 261 nannte
+     „bis 45 %“ (KfW heute: bis zu 40 %, im Regelfall 5–15 %); BAFA lief auch für die Heizung
+     (die liegt seit Jahren bei KfW 458/459) und hatte eine Schwelle „< 60.000 €“ ohne Grundlage.
+     Jetzt: nur Programme, die für VERMIETER gelten, mit Stand. Das Förderregister (N91) löst
+     diese festen Texte später ab. */
+  var KFW_STAND = '02.11.2026';
+  var hasHuelle = hasFenster || hasDachFassade;
+
+  // KfW 261 - Sanierung zum Effizienzhaus (Kredit mit Tilgungszuschuss)
   if (hasEnergyMaßnahme) {
     recommendations.push({
-      program: 'KfW 261 – Wohngebäude-Kredit (Bestand)',
-      amount: 'bis 150.000 €/Wohneinheit',
-      benefit: 'Bis zu 45% Tilgungszuschuss bei Effizienzhaus-Standard',
-      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Wohngebäude-Kredit-(261)/',
-      reason: 'Du hast ' + (hasFenster ? 'Fenster' : '') +
-              (hasFenster && hasHeating ? ', ' : '') +
-              (hasHeating ? 'Heizung' : '') +
-              (hasDachFassade ? (hasFenster || hasHeating ? ', ' : '') + 'Dach/Fassade' : '') +
-              ' ausgewählt → energetische Sanierung'
+      program: 'KfW 261 – Wohngebäude-Kredit (Sanierung zum Effizienzhaus)',
+      amount: 'bis 150.000 € je Wohneinheit',
+      benefit: 'Tilgungszuschuss je nach Effizienzhaus-Stufe, im Regelfall 5–15 %, mit Boni bis zu 40 % — nur, wenn das Gebäude insgesamt Effizienzhaus-Niveau erreicht',
+      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Bundesförderung-für-effiziente-Gebäude-Wohngebäude-Kredit-(261-262)/',
+      reason: 'Energetische Bereiche ausgewählt (' + selected.filter(function (x) { return ['f', 'h', 'd'].indexOf(x.area) >= 0; }).map(function (x) { return x.label; }).join(', ') + ')'
     });
   }
 
-  // KfW 458 - Heizungsförderung (BEG EM)
+  // KfW 458 - Heizungsförderung (Zuschuss) - für Vermieter nur die Grundförderung
   if (hasHeating) {
     recommendations.push({
-      program: 'KfW 458 – Heizungsförderung (BEG)',
-      amount: 'Zuschuss bis 70% (max. 23.500 €)',
-      benefit: 'Förderung für Wärmepumpe, Solarthermie, Biomasseheizung',
-      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Heizungsförderung-für-Privatpersonen-(458)/',
-      reason: 'Heizungs-Sanierung ausgewählt'
+      program: 'KfW 458 – Heizungsförderung (Zuschuss)',
+      amount: 'für Vermieter 30 % Grundförderung: 1. Wohneinheit höchstens 8.400 € (30 % von 28.000 €), 2.–6. je bis 4.500 €',
+      benefit: 'Klimageschwindigkeits- und Einkommensbonus gibt es nur bei Selbstnutzung; GbR und Gesellschaften über KfW 459',
+      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Heizungsförderung-für-Privatpersonen-Wohngebäude-(458)/',
+      reason: 'Heizung ausgewählt'
     });
   }
 
-  // KfW 159 - Altersgerecht Umbauen (oft passend bei Bädern)
-  var hasBader = selected.some(function(s) { return s.area === 'b'; });
+  // BAFA BEG Einzelmaßnahmen - nur Gebäudehülle (Fenster, Dämmung), NICHT die Heizung
+  if (hasHuelle) {
+    recommendations.push({
+      program: 'BAFA – Einzelmaßnahmen Gebäudehülle (Zuschuss)',
+      amount: '15 % Zuschuss, +5 % mit Sanierungsfahrplan (iSFP); förderfähig 1. WE bis 30.000 €, 2.–6. je 15.000 €',
+      benefit: 'Direktzuschuss für Fenster und Dämmung; der Heizungstausch läuft über KfW 458',
+      url: 'https://www.bafa.de/DE/Energie/Effiziente_Gebaeude/Sanierung_Wohngebaeude/Gebaeudehuelle/gebaeudehuelle_node.html',
+      reason: 'Fenster bzw. Dach/Fassade ausgewählt'
+    });
+  }
+
+  // KfW 359 - Ergänzungskredit zu einer Einzelmaßnahmen-Zusage
+  if (hasHeating || hasHuelle) {
+    recommendations.push({
+      program: 'KfW 359 – Ergänzungskredit Einzelmaßnahmen',
+      amount: 'bis 120.000 € je Wohneinheit',
+      benefit: 'Kredit zusätzlich zu einer Zuschuss-Zusage (KfW 458/459 oder BAFA, höchstens 12 Monate alt); ohne Einkommensgrenze',
+      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Einzelmaßnahmen-Ergänzungskredit-Wohngebäude-(358-359)/',
+      reason: 'Finanziert den Eigenanteil der Einzelmaßnahmen'
+    });
+  }
+
+  // KfW 159 - Altersgerecht Umbauen (Kredit, ohne Zuschuss)
+  var hasBader = selected.some(function(s) { return s.area === 'b' || s.area === 's'; });
   if (hasBader) {
     recommendations.push({
-      program: 'KfW 159 – Altersgerecht Umbauen',
-      amount: 'bis 50.000 €/Wohneinheit',
-      benefit: 'Günstiger Kredit für barrierefreie Umbauten (Bad, Türen, Aufzug)',
-      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Altersgerecht-Umbauen-Kredit-(159)/',
-      reason: 'Bäder-Sanierung könnte barrierefrei ausgeführt werden'
-    });
-  }
-
-  // BAFA für Einzelmaßnahmen
-  if (hasEnergyMaßnahme && total < 60000) {
-    recommendations.push({
-      program: 'BAFA-Zuschuss (Einzelmaßnahmen)',
-      amount: 'Zuschuss bis 20%',
-      benefit: 'Direktzuschuss ohne Kredit – Auszahlung nach Maßnahme',
-      url: 'https://www.bafa.de/DE/Energie/Effiziente_Gebaeude/Sanierung_Wohngebaeude/sanierung_wohngebaeude_node.html',
-      reason: 'Bei kleineren Sanierungsmaßnahmen oft attraktiver als Kredit'
+      program: 'KfW 159 – Altersgerecht Umbauen (Kredit)',
+      amount: 'bis 50.000 € je Wohneinheit',
+      benefit: 'Kredit für barrierereduzierende Umbauten (Bad, Türen, Aufzug); kein Zuschuss',
+      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Altersgerecht-Umbauen-(159)/',
+      reason: 'Bad/Sanitär ausgewählt — wenn barrierereduzierend umgebaut wird'
     });
   }
 
@@ -4453,7 +4471,7 @@ function updateFESH() {
 
   kfwBox.style.display = '';
   kfwText.innerHTML =
-    '<p style="margin-bottom:8px">Basierend auf deinen Sanierungsbereichen kommen folgende Förderungen in Frage:</p>' +
+    '<p style="margin-bottom:8px">Für Vermieter kommen nach deinen Sanierungsbereichen in Frage (Stand der Förderbedingungen ' + KFW_STAND + ' — vor dem Antrag beim Förderinstitut prüfen, der Antrag muss vor Auftragsvergabe gestellt sein):</p>' +
     recommendations.map(function(r) {
       return '<div class="kfw-rec">' +
         '<div class="kfw-rec-head"><b>' + r.program + '</b></div>' +
