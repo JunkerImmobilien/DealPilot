@@ -30,7 +30,7 @@
 const W = '[A-ZÄÖÜ][a-zäöüßA-ZÄÖÜ\\-]+';                 // ein Namenswort
 /* v3089 · ein Eigentümername hinter „Wohnung": ein oder mehrere Namenswörter mit „/" verbunden,
    nie ein Lage-, Nummern- oder Gebäudewort (Wohnung Nr. 5, Wohnung im EG, Wohnung Dachgeschoss) */
-const STOP_WE = '(?!(?:Nr|Nummer|Erdgeschoss|Obergeschoss|Dachgeschoss|Untergeschoss|Kellergeschoss|Souterrain|Haus|Hinterhaus|Vorderhaus|Seitenflügel|Eingang|Aufgang|Treppenhaus|Links|Rechts|Mitte|Typ|Gesamt|Größe|Wohnfläche|Miete|Lage|Etage|Ebene|Nord|Süd|Ost|West|Mieter|Eigentümer|Leerstand|Sanierung|Fenster|Bad|Küche|Heizung|Dach|Fassade|Balkon|Terrasse|Garten|Stellplatz|Garage|Tiefgarage|Keller|Abrechnung|Kosten|Rücklage|Instandhaltung)\\b)';
+const STOP_WE = '(?!(?:Familie|Fam|Herr|Herrn|Frau|Eheleute|Hr|Fr|Nr|Nummer|Erdgeschoss|Obergeschoss|Dachgeschoss|Untergeschoss|Kellergeschoss|Souterrain|Haus|Hinterhaus|Vorderhaus|Seitenflügel|Eingang|Aufgang|Treppenhaus|Links|Rechts|Mitte|Typ|Gesamt|Größe|Wohnfläche|Miete|Lage|Etage|Ebene|Nord|Süd|Ost|West|Mieter|Eigentümer|Leerstand|Sanierung|Fenster|Bad|Küche|Heizung|Dach|Fassade|Balkon|Terrasse|Garten|Stellplatz|Garage|Tiefgarage|Keller|Abrechnung|Kosten|Rücklage|Instandhaltung)\\b)';
 /* kein Hauptwort mit typischer Endung („und Kostentragung“, „sowie Sanierung“) */
 const NOMEN_WE = String.raw`(?![A-ZÄÖÜ][a-zäöüß]*(?:ung|ungen|heit|keit|schaft|tion|kosten|arbeiten|maßnahmen?|umlage|beschluss)\b)`;
 const NAME_WE = STOP_WE + NOMEN_WE + W + '(?:\\s*/\\s*' + W + ')*';

@@ -18,6 +18,8 @@ const FAELLE = [
   ['dass sie und Familie Brinkmann zurzeit', 'dass sie und Familie [Name] zurzeit'],
   ['Herr Hans Beispiel, Mindener Straße 56, 32049 Herford', 'Herr [Name], [Anschrift]'],
   ['Objekt Sachsenstr. 16, 32052 Herford', 'Objekt Sachsenstr. 16, 32052 Herford'],
+  ['der Wohnung Grannemann/Hülsmeier und Familie Brinkmann', 'der Wohnung [Name] und Familie [Name]'],
+  ['den Wohnungen Meyer und Herrn Schulz', 'den Wohnungen [Name] und Herrn [Name]'],
   ['IBAN DE89 3704 0044 0532 0130 00', 'IBAN [IBAN]']
 ];
 let rot = 0;
