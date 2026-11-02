@@ -40,7 +40,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 Marcel: *„dass wir die Pilotanalyse komplett neu aufbauen, ähnlich mit den Reitern, aber übersichtlicher, einmal für Ist im Ankauf und aber auch im Bestand … mit Pillen … Unterlagen nachreichen (Wirtschaftsplan, WEG-Protokolle, Abrechnungen), ordnet automatisch zu und fragt, ob übernehmen … Wert und Marktpreis mit Stufen … Exit, Anschlussfinanzierung, Stresstest.“*
 Demo: `design/Vorschläge/pilot-analyse-neu.html` (sieben Ideen: Cockpit-Karten, Flugbahn Plan/Ist, Unterlagen-Eingang mit Übernahme, WEG-Radar, Flugbuch je Jahr, Szenarien-Regler, Pilot-Fragenzeile). Vorschlag: 1+3+4+6+7 zuerst, 2+5 als zweite Stufe (brauchen gespeicherte Jahresstände).
-**Marcel entscheidet:** Reihenfolge; Wirtschaftsplan-Übernahme immer mit Haken?; Sonderumlage automatisch in den Cashflow des Fälligkeitsjahrs?
+**Marcel 02.11.2026 zu Fassung 1:** Cockpit-Karten super, aber zu viel drin; Wert-Karte muss Verfahren und Stufe nennen (Marktpreisindikation, Ertragswert); kein Flugplan/Flugbuch; Ankauf · Bestand · Zielbild mit Tabellen muss bleiben; ganzer Reiter statt Ideen untereinander; Verlauf der Marktberichte gegen das Einkalkulierte. **Fassung 2** (gleiche Datei, Artifact v2): Reiter mit Phase, Unterreitern (Bestand: Übersicht · Ankauf/Bestand/Zielbild · Wert & Verlauf · Steuer · Unterlagen & WEG · Anschluss & Exit; Ankauf: Übersicht · Kaufpreis & Offerte · Finanzierung & Stresstest · Ankauf/Zielbild · Unterlagen & WEG), Einfach/Detail, Pilot-Fragenzeile mit Sprung.
+**Marcel entscheidet:** Fassung 2 so bauen?; Wirtschaftsplan-Übernahme immer mit Haken?; Sonderumlage automatisch in den Cashflow des Fälligkeitsjahrs?
+
+### N99 · Gescannte Seiten gehen ungeschwärzt an die KI (02.11.2026)
+
+Marcel: *„Können wir erst auf dem Server die personenbezogenen Daten schwärzen und schicken das dann zum Auslesen in die KI?“* Gemessen: Text-PDFs werden vor dem Versand geschwärzt (`backend/src/services/schwaerzen.js`, v2210; `routes/ai.js` extract-expose, extract-dokument, extract-rndg, extract-market-data), die Gesamtauswertung `/dokumente-auswerten` bekommt nur ausgelesene Felder, `store:false`. **Lücke:** Scans gehen als Bild an OpenAI (`/seiten-lesen`, `/extract-beleg`); geschwärzt wird erst die Antwort, das Modell ist nur angewiesen, Namen zu ersetzen. Datenschutzerklärung sagt das offen („Bilder werden nicht geschwärzt“). **Vorschlag:** Texterkennung auf dem eigenen Server (Tesseract, deutsch) → schwärzen → nur Text an die KI; Bildweg nur noch als Rückfall bei unlesbarer Seite, mit Hinweis. Vorher an 5 echten Scans messen, ob die Auslesequalität hält. **Marcel entscheidet.** Rechtliches (AVV mit OpenAI, Drittland) prüft Marcel bzw. sein Datenschutzberater.
+
 
 ### N96 · Quick-Check: Gemeinde per AGS statt Ortsname (02.11.2026)
 

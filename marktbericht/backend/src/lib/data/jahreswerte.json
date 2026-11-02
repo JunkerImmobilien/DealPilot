@@ -71,6 +71,33 @@
       ]
     },
     {
+      "id": "gnotkg_tabelle_b",
+      "name": "Notar- und Grundbuchgebuehren (GNotKG § 34, Tabelle B)",
+      "gruppe": "steuer",
+      "stand": "Anlage 2 GNotKG, Fundstelle BGBl. 2025 I Nr. 109 (gelesen 02.11.2026); Entwurf einer Anpassung zum 01.01.2027",
+      "wert_text": "Tabelle B: 300.000 EUR = 635 EUR, 1 Mio. EUR = 1.735 EUR; Stufen bis 500.000 je 30.000 +50, darueber je 50.000 +80",
+      "erwartet": "50,80",
+      "quelle": "gesetze-im-internet.de/gnotkg/__34.html und /anlage_2.html",
+      "turnus": "bei Gesetzesaenderung (Kostenrechtsaenderungsgesetze; naechste geplant zum 01.01.2027)",
+      "faellig_am": "2026-12-15",
+      "verfahren": "agent",
+      "orte": [
+        {
+          "datei": "frontend/js/gnotkg.js",
+          "bezeichner": "STUFEN (Tabelle B)",
+          "muster": "\\[500000, 30000, (\\d+)\\], \\[5000000, 50000, (\\d+)\\]"
+        },
+        {
+          "datei": "tools/gnotkg-pruefen.mjs",
+          "bezeichner": "SOLL (Anlage 2) und ANTEIL - mit der Tabelle neu"
+        },
+        {
+          "datei": "frontend/js/investment-profile.js",
+          "bezeichner": "Text \"bei 150.000 € rund 1,2 % Notar, bei 500.000 € rund 0,9 %\""
+        }
+      ]
+    },
+    {
       "id": "afa_degressiv_7_5a",
       "name": "Degressive AfA § 7 Abs. 5a EStG (5 %)",
       "gruppe": "steuer",
