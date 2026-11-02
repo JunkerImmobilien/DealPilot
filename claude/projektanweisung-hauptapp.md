@@ -44208,3 +44208,8 @@ echten Lauf: A/B „Objekt passt — Finanzierung prüfen“, C „Finger weg“
 
 **Was.** Zwei-Score-Ansicht: Gesamturteil = Gesamtscore (wie Seitenleiste), Empfehlung an den Schwellen. `js/gnotkg.js` + Einstellung `nk_gnotkg`, Quick-Check und Objekt rechnen Notar/Grundbuch nach Tabelle B.
 **Commit** 45a00f5d. **Staging** ausgerollt, auf dem Server nachgemessen (Datei, Buster, Kern). **Nachweis** gnotkg-pruefen, zwei-scores-pruefen (96), score-ketten (216), buster-ebenen grün; wissen 02.11. „v3088“. **Rest** Browser-Abnahme Quick-Check/Bewertung (Staging ohne Anmeldung), danach Prod.
+
+### v3088a–v3089d · Scans als geschwärzter Text, Wirtschaftsplan nie vorgehakt (02.11.2026)
+
+**Was.** Tesseract im Backend-Image, `services/ocr.js`; Dokumentbilder gehen nur noch als geschwärzter Text an OpenAI (seitenLesen, Belege, Telegram). Render 2200 px. Schwärzen um Eigentümer hinter „Wohnung“, Familie, Hr./Fr., Anschrift hinter Namen erweitert. Datenschutzerklärung 1.3. Wirtschaftsplan-Zeilen im Import nie vorgehakt.
+**Commit** 8fb2fedb, dea348b1, 7e953172, c9ea222c. **Prod** 1.0.36 (674b297) und 1.0.37 (c0562ad), Tesseract/Schwärzen im Prod-Container nachgemessen. **Nachweis** `tools/ocr-messen.cjs` (98,7 % / 99,2 %), `tools/schwaerzen-pruefen.cjs` (16), abgefangene Anfrage ohne Bild. **Rest** Browser-Abnahme eines echten Uploads; N100, N101.

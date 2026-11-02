@@ -64,8 +64,8 @@ const REGELN = [
   { name: 'anrede',
     re: new RegExp('\\b(Herrn?|Frau|Eheleute|Notarin|Notar)\\s+((?:Dr\\.|Prof\\.|Dipl\\.-[A-Za-z]+\\.?)\\s*)*' + W + '(?:\\s+(?:und\\s+)?' + W + '){0,3}', 'g'),
     ersatz: (m, p1) => p1 + ' [Name]' },
-  // v3089 · Eigentümer in WEG-Protokollen: „der Wohnung Grannemann/Hülsmeier", „den Wohnungen
-  // Lingemann und Meyer". Gemessen 02.11.2026 an einem echten Protokoll: diese Namen blieben stehen,
+  // v3089 · Eigentümer in WEG-Protokollen: „der Wohnung Albers/Kowalski", „den Wohnungen
+  // Petersen und Meyer". Gemessen 02.11.2026 an einem echten Protokoll: diese Namen blieben stehen,
   // weil kein Signalwort (Herr, Frau, Eheleute) davorsteht. Lage- und Nummernwörter sind ausgenommen.
   { name: 'wohnung_name',
     re: new RegExp('\\b(Wohnung(?:en)?|Whg\\.|Einheit(?:en)?|Sondereigentum)\\s+' + NAME_WE + '(?:\\s*(?:,|und|sowie)\\s*' + NAME_WE + ')*', 'g'),
@@ -74,12 +74,12 @@ const REGELN = [
   { name: 'anrede_kurz',
     re: new RegExp('\\b(Hr\\.|Fr\\.|Hrn\\.)\\s*' + W + '(?:\\s*/\\s*' + W + ')?', 'g'),
     ersatz: (m, p1) => p1 + ' [Name]' },
-  // v3089 · „Familie Brinkmann" (gemessen am echten Protokoll 2025, blieb stehen)
+  // v3089 · „Familie Lorenz" (gemessen am echten Protokoll 2025, blieb stehen)
   { name: 'familie',
     re: new RegExp('\\b(Familie|Fam\\.)\\s+' + W + '(?:\\s*/\\s*' + W + ')?', 'g'),
     ersatz: (m, p1) => p1 + ' [Name]' },
-  // v3089 · Privatanschrift direkt hinter einem geschwärzten Namen: „Herr [Name], Mindener Straße 56,
-  // 32049 Herford" (gemessen an einer echten Teilungserklärung). Läuft NACH den Namensregeln.
+  // v3089 · Privatanschrift direkt hinter einem geschwärzten Namen: „Herr [Name], Ahornweg 12,
+  // 12345 Musterstadt" (Muster gemessen an einer echten Teilungserklärung, Beispiel erfunden). Läuft NACH den Namensregeln.
   { name: 'anschrift_nach_name',
     re: /(\[Name\]),\s*[A-ZÄÖÜ][^,\n]{2,40}?\s\d+\s?[a-zA-Z]?(?:\s*-\s*\d+)?,\s*\d{5}\s+[A-ZÄÖÜ][A-Za-zäöüß.\- ]{1,40}/g,
     ersatz: (m, p1) => p1 + ', [Anschrift]' },

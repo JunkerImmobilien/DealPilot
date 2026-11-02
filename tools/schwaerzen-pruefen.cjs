@@ -5,20 +5,20 @@
 const path = require('path');
 const s = require(path.join(__dirname, '..', 'backend', 'src', 'services', 'schwaerzen.js'));
 const FAELLE = [
-  ['Die Wohnung Grannemann/Hülsmeier mit allen Nebengewerken', 'Die Wohnung [Name] mit allen Nebengewerken'],
-  ['den Wohnungen Lingemann und Grannemann/Hülsmeier und Kostentragung', 'den Wohnungen [Name] und Kostentragung'],
+  ['Die Wohnung Albers/Kowalski mit allen Nebengewerken', 'Die Wohnung [Name] mit allen Nebengewerken'],
+  ['den Wohnungen Petersen und Albers/Kowalski und Kostentragung', 'den Wohnungen [Name] und Kostentragung'],
   ['die Wohnung Nr. 5 im Erdgeschoss', 'die Wohnung Nr. 5 im Erdgeschoss'],
   ['Wohnung Dachgeschoss links', 'Wohnung Dachgeschoss links'],
   ['Kosten der Wohnung Kellergeschoss', 'Kosten der Wohnung Kellergeschoss'],
   ['Rücksprache mit Hr. Becker', 'Rücksprache mit Hr. [Name]'],
   ['Herr Max Mustermann stimmt zu', 'Herr [Name] stimmt zu'],
   ['Müller, Erika, geb. 01.02.1960', '[Name], geb. [Datum]'],
-  ['Fa. Rudolph (Dachdecker) 16.888,43 €', 'Fa. Rudolph (Dachdecker) 16.888,43 €'],
-  ['Lübberstr. 12-20, 32052 Herford', 'Lübberstr. 12-20, 32052 Herford'],
-  ['dass sie und Familie Brinkmann zurzeit', 'dass sie und Familie [Name] zurzeit'],
-  ['Herr Hans Beispiel, Mindener Straße 56, 32049 Herford', 'Herr [Name], [Anschrift]'],
-  ['Objekt Sachsenstr. 16, 32052 Herford', 'Objekt Sachsenstr. 16, 32052 Herford'],
-  ['der Wohnung Grannemann/Hülsmeier und Familie Brinkmann', 'der Wohnung [Name] und Familie [Name]'],
+  ['Fa. Dachbau Nord (Dachdecker) 16.888,43 €', 'Fa. Dachbau Nord (Dachdecker) 16.888,43 €'],
+  ['Industriestr. 4-8, 12345 Musterstadt', 'Industriestr. 4-8, 12345 Musterstadt'],
+  ['dass sie und Familie Lorenz zurzeit', 'dass sie und Familie [Name] zurzeit'],
+  ['Herr Hans Beispiel, Ahornweg 12, 12345 Musterstadt', 'Herr [Name], [Anschrift]'],
+  ['Objekt Lindenallee 14, 32052 Herford', 'Objekt Lindenallee 14, 32052 Herford'],
+  ['der Wohnung Albers/Kowalski und Familie Lorenz', 'der Wohnung [Name] und Familie [Name]'],
   ['den Wohnungen Meyer und Herrn Schulz', 'den Wohnungen [Name] und Herrn [Name]'],
   ['IBAN DE89 3704 0044 0532 0130 00', 'IBAN [IBAN]']
 ];
