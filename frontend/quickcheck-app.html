@@ -5747,6 +5747,13 @@ const QcApp = (function() {
       '.qcb-miete .v{font:600 16px "Space Grotesk",sans-serif;text-align:right;white-space:nowrap}',
       '.qcb-miete .qcb-fuss{grid-column:1/-1}',
       '.qcb-pc{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
+      '.qcb-bal{display:flex;align-items:flex-end;gap:14px;padding:10px 4px 4px}',
+      '.qcb-b{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}',
+      '.qcb-b b{font:600 14px/1.2 "Space Grotesk",sans-serif;white-space:nowrap}',
+      '.qcb-b b small{font:500 11px Inter,sans-serif;color:#2f7d55}',
+      '.qcb-bar{display:block;width:100%;max-width:80px;border-radius:6px 6px 2px 2px;background:#8A8272}',
+      '.qcb-b-soll .qcb-bar{background:#3d6fa8}.qcb-b-markt .qcb-bar{background:#2f7d55}',
+      '.qcb-b i{font:500 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.05em;text-transform:uppercase;color:#7A7370;font-style:normal;text-align:center}',
       '.qcb-pc ul{margin:5px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}',
       '.qcb-pc li{padding-left:17px;position:relative;font-size:12.5px;line-height:1.45}',
       '.qcb-pro li::before{content:"✓";position:absolute;left:0;color:#2f7d55;font-weight:700}',
@@ -5858,28 +5865,44 @@ const QcApp = (function() {
       if (mp && mp.kapp) q.push('Kappungsgrenze ' + mp.kapp.pct + ' % in drei Jahren (' + (mp.kapp.herkunft === 'verordnung' ? link(mp.kapp.verordnung || 'Landesverordnung', mp.kapp.url) : 'gesetzlich, § 558 Abs. 3 Satz 1 BGB') + ')');
       let kopfT, pot = '';
       if (leer) {
-        kopfT = 'Keine Ist-Miete — die Wohnung gilt als frei. Angesetzt ist die Zielmiete bei Neuvermietung: die Marktmiete der DealPilot-Bewertung.';
-        q.push('spätere Erhöhungen frühestens 15 Monate nach Mietbeginn');
+        /* v3081e · Marcel: „wir sehen ja nicht, ob sie leer ist“ - also keine Aussage zum Leerstand */
+        kopfT = 'Keine Miete angegeben — angesetzt ist die Marktmiete der DealPilot-Bewertung.';
       } else {
         kopfT = 'Deine Ist-Miete, abgeglichen mit der Marktmiete der DealPilot-Bewertung'
           + (mp && mp.markt_monat > 0 ? ' (' + e0(mp.markt_monat) + ', ' + qm(mp.markt_monat) + ')' : '')
           + ' als Annahme für die ortsübliche Miete.';
         const z = mp && mp.zul;
         const grundM = QcEngine.num(inputs.nkm_grund) > 0 ? Math.min(QcEngine.num(inputs.nkm_grund), nkm) : nkm;
-        if (z && z.miete_monat > 0) {
-          if (z.grund === 'vergleichsmiete_erreicht') pot = 'Die Ist-Miete liegt schon an der Marktmiete — Erhöhungsspielraum nach § 558 BGB sehen wir nicht.';
-          else if (z.miete_monat - grundM > 0.5) pot = 'In drei Jahren zulässig: <b>' + e0(mp.nkm_3j) + '</b> (+' + String(Math.round(z.plus_pct * 10) / 10).replace('.', ',') + ' %) — begrenzt durch '
-            + (z.grund === 'kappung' ? 'die Kappungsgrenze' : 'die Marktmiete') + '. Ob die letzte Erhöhung länger als 15 Monate zurückliegt, prüfen.';
-        } else if (!(mp && mp.markt_monat > 0)) {
-          pot = 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
-        }
-        if (mp && mp.markt_monat > 0 && mp.markt_monat > nkm + 0.5) pot += (pot ? ' ' : '') + 'Bei Neuvermietung: ' + e0(mp.markt_monat) + '.';
-        if (mp && mp.markt_monat > 0 && mp.markt_monat < nkm * 0.9) pot += (pot ? ' ' : '') + 'Die Ist-Miete liegt über der Marktmiete — Risiko bei Mieterwechsel.';
+        void z; void grundM;
+        if (!(mp && mp.markt_monat > 0)) pot = 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
+        else if (mp.markt_monat < nkm * 0.9) pot = 'Die Ist-Miete liegt über der Marktmiete — Risiko bei Mieterwechsel.';
       }
       h += `<div class="qcb-box qcb-miete"><span><span class="qcb-l">Angesetzte Miete</span><br>${kopfT}</span>`
         + `<span class="v">${e0(nkm)} / Monat${wfl > 0 ? `<br><small style="font:500 12px Inter,sans-serif;color:#7A7370">${qm(nkm)} kalt</small>` : ''}</span>`
         + (pot ? `<p class="qcb-fuss" style="color:#2A2727;font-size:12.5px">${pot}</p>` : '')
         + (q.length ? `<p class="qcb-fuss">${q.join(' · ')}.</p>` : '') + `</div>`;
+
+      /* v3081e · Marcel 02.11.2026: „wenn Miete drin steht, die unter dem Wert liegt, was wir nehmen
+         können, ist das ein Potenzial - da eine Karte wäre top.“ Drei Balken wie die Mietleiter
+         (potenzial.js): Ist · in drei Jahren zulässig (Kappung, höchstens Marktmiete) · bei Neuvermietung
+         (Marktmiete der Bewertung). Nur wenn die Ist-Miete darunter liegt; gerechnet hat _qcMietpotenzial. */
+      if (!leer && mp && mp.markt_monat > nkm + 0.5) {
+        const z3 = (mp.zul && mp.zul.miete_monat > 0) ? mp.nkm_3j : null;
+        const balken = [{ c: 'ist', t: 'Ist heute', v: nkm }];
+        if (z3 != null && z3 > nkm + 0.5) balken.push({ c: 'soll', t: 'in 3 Jahren zulässig', v: z3 });
+        balken.push({ c: 'markt', t: 'bei Neuvermietung', v: mp.markt_monat });
+        const max = Math.max.apply(null, balken.map(b => b.v));
+        const jahr = x => e0(x * 12);
+        h += `<div class="qcb-box qcb-pot"><span class="qcb-l">Mietpotenzial</span><div class="qcb-bal">`
+          + balken.map(b => `<div class="qcb-b qcb-b-${b.c}"><b>${e0(b.v)}${b.c !== 'ist' ? ` <small>+${Math.round((b.v / nkm - 1) * 100)} %</small>` : ''}</b>`
+            + `<span class="qcb-bar" style="height:${Math.max(10, Math.round(b.v / max * 90))}px"></span><i>${b.t}</i></div>`).join('')
+          + `</div><p class="qcb-fuss" style="color:#2A2727;font-size:12.5px">`
+          + (z3 != null && z3 > nkm + 0.5
+              ? 'Im laufenden Mietverhältnis: bis <b>' + e0(z3) + '</b> in drei Jahren (+' + jahr(z3 - nkm) + ' im Jahr) — begrenzt durch ' + (mp.zul.grund === 'kappung' ? 'die Kappungsgrenze von ' + mp.kapp.pct + ' %' : 'die Marktmiete') + '. '
+              : '')
+          + 'Bei einem Mieterwechsel: <b>' + e0(mp.markt_monat) + '</b> (+' + jahr(mp.markt_monat - nkm) + ' im Jahr).'
+          + '</p><p class="qcb-fuss">Vergleichsgröße ist die Marktmiete der DealPilot-Bewertung als Annahme für die ortsübliche Miete. Wann die letzte Erhöhung war, sehen wir nicht — vor einer Erhöhung prüfen (§ 558 Abs. 1 BGB: frühestens 15 Monate nach der letzten).</p></div>';
+      }
     }
 
     /* 5 · Dafür / Dagegen, je drei */
