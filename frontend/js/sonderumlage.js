@@ -142,7 +142,7 @@
     var j = zahl(e.jahr), b = zahl(e.betrag);
     if (!j || !(b > 0)) return 'Cashflow: Jahr und Betrag eintragen.';
     if (vorUebergang(e)) { var u = uebergang(); return 'Fällig vor dem Übergang (' + datumText(u) + '): schuldet der Verkäufer - nicht im Cashflow.'; }
-    return 'Cashflow: −' + eur(b) + ' einmalig im Jahr ' + j + (e.faellig ? ' (fällig ' + esc(e.faellig) + ')' : '') + '.';
+    return 'Cashflow: −' + eur(b) + ' einmalig im Jahr ' + j + (e.faellig ? ' (fällig ' + esc(datumText(datum(e.faellig)) || e.faellig) + ')' : '')   /* v3092b · Import liefert ISO, angezeigt wird TT.MM.JJJJ */ + '.';
   }
 
   function render() {
