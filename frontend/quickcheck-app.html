@@ -8051,13 +8051,18 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
      oder KI, einmal je PLZ+Ort, ueber Auth des Elternfensters. Bis die Antwort da ist (oder wenn sie
      ausbleibt), gilt der Ortsname mit Namensstamm (v3083). Kommt der Schluessel, wird neu gerechnet. */
   var _qcAgs = {}, _qcAgsLauf = {};
-  function _qcAgsFuer(plz, ort){
+  function _qcAgsFuer(plz, ort, i){
     var k = plz + '|' + String(ort||'').trim().toLowerCase();
     if (_qcAgs[k] !== undefined) return _qcAgs[k];
     if (_qcAgsLauf[k] || plz.length !== 5) return null;
     var P = _par(), A = P && P.Auth;
     if (!A || typeof A.apiCall !== 'function') return null;
-    _qcAgsLauf[k] = A.apiCall('/marktbericht/wertparameter/zinssatz', { method:'POST', body:{ object:{ plz:plz, ort:ort } } })
+    /* v3084a · gemessen: ohne Objektart, Baujahr und Flaeche antwortet der Dienst nur „verfuegbar: false“
+       und liefert KEINEN Schluessel - dann fiel der Quick-Check still auf den Ortsnamen zurueck. Fuer den
+       Schluessel spielen die Werte keine Rolle; fehlen sie, gehen neutrale Platzhalter mit. */
+    i = i || {};
+    _qcAgsLauf[k] = A.apiCall('/marktbericht/wertparameter/zinssatz', { method:'POST', body:{ object:{ plz:plz, ort:ort,
+      objart:(i.objektart || 'Eigentumswohnung'), baujahr:(String(i.bj || '').trim() || '1990'), wfl:(String(i.wfl || '').trim() || '70') } } })
       .then(function(r){ _qcAgs[k] = (r && r.ags && /^\d{8}$/.test(String(r.ags))) ? String(r.ags) : null; })
       .catch(function(){ _qcAgs[k] = null; })
       .then(function(){ delete _qcAgsLauf[k]; if (_qcAgs[k]) { try { QcApp.scheduleUpdate(); } catch (e) {} } });
@@ -8070,7 +8075,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var grund = n(i.nkm_grund)>0 ? Math.min(n(i.nkm_grund), nkm) : nkm, zusatz = Math.max(0, nkm-grund);
     var plz = String(i.plz||'').trim(), land = null;
     try { var P=_par(), G=(P&&P.DealPilotGrest)||window.DealPilotGrest; if (plz.length===5&&G&&G.forPlz) { var g=G.forPlz(plz); land=(g&&g.bundesland)||null; } } catch (e) {}
-    var D = _kappDaten(), _ags = _qcAgsFuer(plz, i.ort);
+    var D = _kappDaten(), _ags = _qcAgsFuer(plz, i.ort, i);
     var ort = _ags ? { ags:_ags } : { land:land, ort:i.ort };   /* v3084: AGS vor Ortsname */
     var kapp = Km.kappungAus(D, ort, {});
     var bremse = Km.mietpreisbremseAus(D, ort);
