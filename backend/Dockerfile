@@ -18,6 +18,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Verify LibreOffice is installed (build-time check, fails build if missing)
 RUN libreoffice --version
 
+# v3089 · Texterkennung auf dem eigenen Server: gescannte Dokumente werden hier gelesen und
+# geschwaerzt, nur Text geht an die KI (src/services/ocr.js). Eigene Schicht NACH LibreOffice,
+# damit deren Cache bleibt. poppler-utils (pdftoppm) fuer die Qualitaetsmessung.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tesseract-ocr \
+    tesseract-ocr-deu \
+    poppler-utils \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN tesseract --version && tesseract --list-langs | grep -q deu
+
 # Install Node dependencies first (better layer caching)
 COPY package*.json ./
 RUN npm install --omit=dev

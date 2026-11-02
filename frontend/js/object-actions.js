@@ -2044,14 +2044,15 @@
       var ktx = _kontext();
       (D.abgleich(t.extracted || {}, t.typ, ktx) || []).forEach(function (z) {
         if (z.hinweis) { _importHinweise.push(z.hinweis); return; }
-        _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
+        /* v3088a · Marcel 02.11.2026: Wirtschaftsplan/Abrechnung „immer erst mal auflisten und zum Übernehmen aktiv anstoßen“ - nie vorgehakt */
+        _merged[z.feld] = { nurAktiv: t.typ === 'hausgeld', label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
       });
       /* v3017 · Wirtschaftsplan/Abrechnung → Steuer-Reiter. Weicht der Vorschlag vom heutigen Wert ab,
          ist die Zeile nicht vorgehakt und zeigt den bisherigen Wert („erstmal drauf hinweisen") */
       if (typeof D.steuerVorschlaege === 'function' && typeof window.dpSteuerWert === 'function') {
         D.steuerVorschlaege(t.extracted || {}, t.typ, ktx).forEach(function (s) {
           var w = window.dpSteuerWert(s.jahr, s.feld); if (w === null) return;
-          _merged['steuer:' + s.jahr + ':' + s.feld] = { label: 'Steuer ' + s.jahr + ' · ' + s.wort, value: fmt0(s.betrag) + ' € im Jahr ' + s.jahr, raw: String(s.betrag),
+          _merged['steuer:' + s.jahr + ':' + s.feld] = { nurAktiv: true, label: 'Steuer ' + s.jahr + ' · ' + s.wort, value: fmt0(s.betrag) + ' € im Jahr ' + s.jahr, raw: String(s.betrag),
             ist: (w.eigen || w.wert) ? String(Math.round(w.wert)) : '', istEigen: !!w.eigen, source: t.label || 'Dokument', kind: 'steuer', jahr: s.jahr, feld: s.feld, herleitung: s.hinweis };
         });
       }
@@ -2315,13 +2316,16 @@
     var nAbw = Object.keys(abw).length;
     var abwKopf = nAbw ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
       + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '';
+    /* v3088a · Hinweis, wenn Zeilen aus Wirtschaftsplan/Abrechnung bewusst nicht vorgehakt sind */
+    var nAktiv = keys.filter(function (id) { return _merged[id] && _merged[id].nurAktiv && abw[id] === undefined; }).length;
+    if (nAktiv) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px"><b>' + nAktiv + (nAktiv === 1 ? ' Wert' : ' Werte') + ' aus Wirtschaftsplan oder Abrechnung</b> (Hausgeld, Steuer) stehen hier nur zur Ansicht. Hak an, was übernommen werden soll.</div>';
     host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(_bisherKopf(it)) + escH(_bisherText(it, abw[id])) + '</div>';
       if (it.herleitung) valCell += '<div class="oabi-herl" style="font-size:11.5px;color:#7A7370;margin-top:2px;line-height:1.35">' + escH(it.herleitung) + '</div>';
       if (it.kind === 'anhaengen' && String(it.value).length > 160) valCell = valCell.replace('<b>' + escH(it.value) + '</b>', '<div style="white-space:pre-wrap;font-size:12px;max-height:120px;overflow:auto">' + escH(it.value) + '</div>');
-      return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + (abw[id] !== undefined ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
+      return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + ((abw[id] !== undefined || it.nurAktiv) ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
     }).join('') + '</tbody></table>'
       + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
           + '<b>Ergebnis eines fremden Gutachtens — wird nicht übernommen.</b> DealPilot rechnet selbst; die Zahl dient dem Abgleich.'

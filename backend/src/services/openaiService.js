@@ -19,6 +19,7 @@ const config = require('../config');
    Bis v2010 war agentLauf.js sein einziger Leser. */
 const projektwissen = require('./projektwissen');
 const dokumentSchemas = require('./dokumentSchemas');   /* v1678 */
+const ocr = require('./ocr');   /* v3089 · Dokumentbilder nur als geschwaerzter Text hinaus */
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 
@@ -3985,8 +3986,29 @@ async function copilotChat(payload, opts) {
  * Nutzt dieselbe Responses-API wie callOpenAI, aber mit Bild-Input
  * (input_image) und OHNE web_search. Gibt strukturiertes JSON je Beleg.
  * ───────────────────────────────────────────────────────────────────── */
+/* v3089 · Marcel 02.11.2026: „erst auf den Servern schwärzen und nur den Text hinschicken“.
+   Ein DOKUMENT-Aufruf (opts.dokument) schickt kein Bild mehr: jedes input_image wird hier per
+   Tesseract gelesen, geschwaerzt und als Text eingesetzt. Objektfotos (ohne opts.dokument) bleiben
+   Bilder. Notschalter KI_DOKUMENT_BILDER=erlaubt stellt den alten Weg her (ocr.aktiv()). */
+async function _dokumentBilderZuText(contentParts) {
+  const bilder = contentParts.filter(function (p) { return p && p.type === 'input_image'; });
+  if (!bilder.length) return { teile: contentParts, ocr: null };
+  const lesungen = await ocr.bilderZuText(bilder.map(function (p) { return p.image_url; }));
+  let n = 0;
+  const hinweis = { type: 'input_text', text: 'HINWEIS: Der Inhalt liegt als Texterkennung (OCR) des Dokuments vor, nicht als Bild. Personendaten sind bereits durch [Name], [Datum], [Anschrift], [Konto] ersetzt. Tabellen koennen als Zeilen mit Leerzeichen statt Spalten erscheinen; OCR-Lesefehler bei Zahlen sind moeglich - unsichere Werte null lassen.' };
+  const teile = [];
+  contentParts.forEach(function (p) {
+    if (p && p.type === 'input_image') { const l = lesungen[n++]; teile.push({ type: 'input_text', text: '=== Seite ' + n + ' (Texterkennung, Lesbarkeit ' + l.konfidenz + ' %) ===\n' + (l.text || '[keine Schrift erkannt]') }); }
+    else teile.push(p);
+  });
+  teile.splice(1, 0, hinweis);
+  return { teile: teile, ocr: lesungen.map(function (l) { return { konfidenz: l.konfidenz, woerter: l.woerter, lesbar: l.lesbar, geschwaerzt: l.geschwaerzt }; }) };
+}
+
 async function _callOpenAIVision(contentParts, opts) {
   opts = opts || {};
+  let _ocrInfo = null;
+  if (opts.dokument && ocr.aktiv()) { const d = await _dokumentBilderZuText(contentParts); contentParts = d.teile; _ocrInfo = d.ocr; }
   const apiKey = config.openai.apiKey || opts.userApiKey || null;
   const keySource = config.openai.apiKey ? 'server' : (opts.userApiKey ? 'user' : 'none');
   if (!apiKey) {
@@ -4025,7 +4047,7 @@ async function _callOpenAIVision(contentParts, opts) {
       }
     }
   }
-  return { text: (text || '').trim(), raw: data, model: model };
+  return { text: (text || '').trim(), raw: data, model: model, ocr: _ocrInfo };   /* v3089: Lesbarkeit je Seite */
 }
 
 const _BELEG_KATEGORIEN = ['Notar & Grundbuch', 'Maklergebühr', 'Grunderwerbsteuer', 'Fahrtkosten', 'Verpflegung', 'Unterkunft', 'Handwerker / Sanierung', 'Material / Sanierung', 'Herstellungskosten (Erweiterung)', 'Sonstiges'];
@@ -4134,7 +4156,7 @@ async function _extractBelegPage(image, opts) {
      als Anschaffungskost oder als laufende Werbungskost gelesen wird. */
   const _prompt = (opts.modus === "wk") ? _WK_PROMPT : _BELEG_PROMPT;
   const content = [{ type: "input_text", text: _prompt }, { type: "input_image", image_url: image }];
-  const r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000 });
+  const r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, dokument: true });   /* v3089 */
   const parsed = extractJson(r.text);
   if (parsed == null) { throw new Error('JSON-Parse (Antwort evtl. zu dicht/abgeschnitten)'); }
   let pos = Array.isArray(parsed) ? parsed
@@ -4363,7 +4385,7 @@ async function bildZuText(imageDataUrl, opts) {
     { type: 'input_image', image_url: imageDataUrl }
   ];
   const r = await _callOpenAIVision(content, {
-    userApiKey: o.userApiKey, model: o.model, maxTokens: 2000
+    userApiKey: o.userApiKey, model: o.model, maxTokens: 2000, dokument: true   /* v3089 */
   });
   const t = String((r && r.text) || '').trim();
   if (!t || /^KEIN_INHALT/i.test(t)) return '';
@@ -4389,7 +4411,7 @@ async function seitenLesen(bilder, opts) {
     + 'Keine Einleitung, keine Zusammenfassung, nichts dazuerfinden. Unleserliches: [unleserlich].';
   const content = [{ type: 'input_text', text: prompt }]
     .concat((bilder || []).slice(0, 4).map(function (b) { return { type: 'input_image', image_url: b }; }));
-  const r = await _callOpenAIVision(content, { userApiKey: o.userApiKey, model: o.model, maxTokens: 8000 });
+  const r = await _callOpenAIVision(content, { userApiKey: o.userApiKey, model: o.model, maxTokens: 8000, dokument: true });   /* v3089 */
   return String((r && r.text) || '').trim();
 }
 
