@@ -1998,6 +1998,9 @@ function _renderQuickForm(years) {
     '<th class="num">AfA</th>' +
     '<th class="num">Bewirtschaftung</th>' +
     '<th class="num">Sonstige WK</th>' +
+    /* v3074 · Marcel 02.11.2026: „stehen die Erhaltung unten bei Steuer im Detail drin?" - im Detail ja
+       (6.5), hier fehlte sie: Westerfeldstr. 2028 erklärten die Spalten 39.976 von 69.242 € Werbungskosten. */
+    '<th class="num" title="Erhaltungsaufwand und anschaffungsnahe Herstellungskosten des Jahres (im Detail-Modus unter 6.5)">Erhaltung / Sanierung</th>' +
     '<th class="num ytf-result">= Verlust/Überschuss</th>' +
     '<th class="num ytf-result">Steuer-Effekt</th>' +
     '</tr></thead><tbody>';
@@ -2025,6 +2028,7 @@ function _renderQuickForm(years) {
       _ytfCell(y.year, 'afa', v.afa, totals.auto.afa) +
       _ytfCellComputed(bewirt) +
       _ytfCellComputed(sonst) +
+      _ytfCellComputed((v.erhaltungsaufwand || 0) + (v.anschaffungsnah || 0)) +   /* v3074 */
       '<td class="num ytf-result" style="color:' + (totals.ergebnis >= 0 ? 'var(--gold-d)' : 'var(--green)') + '">' +
         ergSign + Math.round(totals.ergebnis).toLocaleString('de-DE') + ' €</td>' +
       '<td class="num ytf-result" style="color:' + refundColor + ';font-weight:700">' +
@@ -2035,7 +2039,8 @@ function _renderQuickForm(years) {
   html += '</tbody></table></div>' +
     '<p class="hint" style="margin-top:8px">' +
       '💡 Klicke ein Feld an, um den App-Vorschlag manuell zu überschreiben (z.B. tatsächliche Werbungskosten lt. Steuerbescheid). ' +
-      'Der Pfeil ↺ neben einem überschriebenen Wert setzt ihn auf den Vorschlag zurück.' +
+      'Der Pfeil ↺ neben einem überschriebenen Wert setzt ihn auf den Vorschlag zurück. ' +
+      'Umlagefähige Nebenkosten sind Einnahme und Werbungskosten zugleich und heben sich auf — sie stehen nur im Detail-Modus.' +
     '</p>';
 
   return html;
