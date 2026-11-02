@@ -35,6 +35,10 @@ window.DealPilotInvestmentProfile = (function() {
   // Liefert den effektiven Wert: User-Override hat Vorrang vor Default.
   function get(key) {
     var p = load();
+    /* v3087 · die alten Vorbelegungen (Notar 1,7, Sonstige 1,5) stehen bei jedem im
+       Speicher, der das Profil einmal gesichert hat - saveFromForm schreibt alle Felder.
+       Ohne Merker nk_stand gelten sie als nicht selbst gesetzt. */
+    if (!p.nk_stand && ((key === 'notar_pct' && Number(p[key]) === 1.7) || (key === 'sonstige_nk_pct' && Number(p[key]) === 1.5))) return defaults()[key];
     if (p[key] !== undefined && p[key] !== null && p[key] !== '') return p[key];
     /* v2261: wer frueher „Notar & Grundbuch" gesetzt hat, behaelt seinen Ansatz -
        Notar = alter Wert minus Grundbuch. */
@@ -339,10 +343,10 @@ window.DealPilotInvestmentProfile = (function() {
       '<h3 class="ip-section">Standort & Nebenkosten</h3>',
       '<div class="ip-grid">',
         blEl(),
-        field('ip_notar_pct',       'Notar',             get('notar_pct'),       '%', 'vom Kaufpreis'),
+        field('ip_notar_pct',       'Notar',             get('notar_pct'),       '%', 'inkl. Grundschuld · üblich 0,9–1,2 %'),
         field('ip_grundbuch_pct',   'Grundbuchamt',      get('grundbuch_pct'),   '%', 'vom Kaufpreis'),
         field('ip_maklerkosten',    'Maklergebühr',      get('maklerkosten'),    '%', 'inkl. MwSt — 0, wenn ohne Makler'),
-        field('ip_sonstige_nk_pct', 'Sonstige Kosten',   get('sonstige_nk_pct'), '%', 'Gutachten, Anfahrt, Gebühren'),
+        field('ip_sonstige_nk_pct', 'Sonstige Kosten',   get('sonstige_nk_pct'), '%', 'nur wenn du sie ansetzt — Gutachten, Anfahrt'),
       '</div>',
       /* v2261 · Grunderwerbsteuer automatisch nach Bundesland */
       '<label class="ip-check" style="display:flex;gap:9px;align-items:flex-start;margin:6px 0 16px;cursor:pointer;font-size:13px;line-height:1.45">'
@@ -442,6 +446,7 @@ window.DealPilotInvestmentProfile = (function() {
       notar_pct:              v('ip_notar_pct'),          /* v2261 */
       grundbuch_pct:          v('ip_grundbuch_pct'),
       sonstige_nk_pct:        v('ip_sonstige_nk_pct'),
+      nk_stand:               'v3087',   /* ab hier ist jeder Nebenkosten-Satz selbst gesetzt */
       grest_auto:             (function(){ var c = document.getElementById('ip_grest_auto'); return c ? !!c.checked : null; })(),
       maklerkosten:           v('ip_maklerkosten'),
       angebot_abschlag_pct:   v('ip_angebot_abschlag_pct'),   /* v2237 · leer -> Marktdurchschnitt */

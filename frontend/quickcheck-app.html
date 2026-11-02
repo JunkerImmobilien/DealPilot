@@ -3882,7 +3882,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
    Ohne PLZ: 6,5 % Grunderwerbsteuer wie die Vorbelegung im Objekt. */
 window._qcKnkPct = function () {
   var P = null; try { P = window.parent && window.parent !== window ? window.parent : window; } catch (e) { P = window; }
-  var grest = 6.5, notar = 2.2;
+  var grest = 6.5, notar = 1.0;
   try {
     var plz = ((document.getElementById('qc_plz') || {}).value || '').trim();
     var G = (P && P.DealPilotGrest) || window.DealPilotGrest;
@@ -3891,11 +3891,11 @@ window._qcKnkPct = function () {
   /* v2261: dieselben vier Saetze wie das Objekt (main.js setDefaults) - Notar,
      Grundbuch, Makler, Sonstige aus den Einstellungen; Grunderwerbsteuer nach
      PLZ nur mit Automatik, sonst Satz des Profil-Bundeslands. */
-  var gb = 0.5, makler = 0, sonst = 1.5, IP = null;
+  var gb = 0.5, makler = 0, sonst = 0, IP = null;   /* v3087 */
   try {
     IP = (P && P.DealPilotInvestmentProfile) || window.DealPilotInvestmentProfile;
     var num = function (k, d) { var x = IP && typeof IP.get === 'function' ? parseFloat(IP.get(k)) : NaN; return isFinite(x) ? x : d; };
-    notar = num('notar_pct', 1.7); gb = num('grundbuch_pct', 0.5); makler = num('maklerkosten', 0); sonst = num('sonstige_nk_pct', 1.5);
+    notar = num('notar_pct', 1.0); gb = num('grundbuch_pct', 0.5); makler = num('maklerkosten', 0); sonst = num('sonstige_nk_pct', 0);
     if (IP && IP.get('grest_auto') === false) {
       var G2 = (P && P.DealPilotGrest) || window.DealPilotGrest, bl = IP.get('bundesland');
       if (G2 && G2.rates && bl && isFinite(G2.rates[bl])) grest = Number(G2.rates[bl]);
@@ -4396,6 +4396,9 @@ const QcApp = (function() {
       + '<div class="qc-knk-hinweis">Haken raus = Position entfällt</div>';
     KNK_POS.forEach(([k, name]) => {
       const satz = roh[k] || 0, an = !aus[k];
+      /* v3087 · Marcel 02.11.2026: „sonstige Kosten sollten wir rauslassen ... wenn man sie
+         selber setzt, kann man sie mit auflisten“ - die Zeile nur bei einem eigenen Satz. */
+      if (k === 'sonst' && !(satz > 0)) return;
       let zusatz = '';
       if (k === 'grest') zusatz = T.grestQuelle === 'plz' ? ' <span class="klein">· ' + (T.bundesland || '') + ' (aus der PLZ)</span>'
         : T.grestQuelle === 'profil' ? ' <span class="klein">· ' + (T.bundesland || '') + ' (Bundesland aus deinen Einstellungen)</span>'

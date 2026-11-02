@@ -1094,9 +1094,14 @@ window.DealPilotConfig = (function() {
          Set ziehen". Vier getrennte Saetze statt eines kombinierten - das Objekt
          fuehrt sie ohnehin getrennt (notar_p, gba_p, makler_p, ji_p). Notar 1,70 +
          Grundbuch 0,50 = die bisherigen 2,20 „Notar & Grundbuch". */
-      notar_pct:              1.70,   // % Notar
+      /* v3087 · Marcel 02.11.2026: Notar 1,7 % war zu hoch. GNotKG Tabelle B, gerechnet
+         (Beurkundung 2,0 + Vollzug 0,5 + Betreuung 0,5 + Grundschuld 1,0 auf 100 % Darlehen,
+         Auslagen, 19 % USt): 150.000 € = 1,17 %, 300.000 € = 1,03 %, 500.000 € = 0,90 %.
+         Grundbuchamt (Vormerkung 0,5 + Eigentum 1,0 + Grundschuld 1,0, ohne USt):
+         0,59 / 0,53 / 0,47 %. Sonstige gibt es nur, wenn man sie selbst setzt. */
+      notar_pct:              1.00,   // % Notar inkl. Grundschuldbestellung
       grundbuch_pct:          0.50,   // % Grundbuchamt
-      sonstige_nk_pct:        1.50,   // % Sonstige (Gutachten, Anfahrt, Gebuehren)
+      sonstige_nk_pct:        0,      // % Sonstige - v3087: nur wenn selbst gesetzt
       grest_auto:             true,   // Grunderwerbsteuer nach Bundesland aus der Objektadresse
       // V63.90: KI-Analyse-Standardparameter (vorher nur als Selects im KI-Tab,
       // jetzt persönlicher Default — nutzt der KI-Prompt-Builder via hidden inputs)
