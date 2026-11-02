@@ -44198,3 +44198,8 @@ die 5-%-EK-Näherung bleibt nur für Aufrufer ohne diese Angaben. Gespiegelt, Ba
 **Was.** Box „Pilot-Mietpreis-Analyse“ ein-/ausklappbar (gemerkt), Mietrecht-Kachel zugeklappt = zwei Zeilen. Lageklassen am
 echten Lauf: A/B „Objekt passt — Finanzierung prüfen“, C „Finger weg“ mit Rendite-Ziel 110.000 €, Score unverändert 19.
 **Prod** 1.0.34 (77d2a32). **Nachweis** wissen 02.11. „v3086“ und „Lageklassen“. **Rest** siehe „Sitzungsende 02.11.2026“.
+
+### v3087 · Kaufnebenkosten Notar 1,0 %, Sonstige nur selbst gesetzt (02.11.2026)
+
+**Was.** Vorbelegung Notar 1,7 → 1,0 % (GNotKG Tabelle B nachgerechnet: 0,90–1,17 % bei 150–500 T€ inkl. Grundschuld), Sonstige 1,5 → 0, im Quick-Check nur bei eigenem Satz; alte gespeicherte 1,7/1,5 ohne Merker `nk_stand` gelten als Vorbelegung.
+**Commit** f70b090e, aff60824. **Staging** ausgerollt. **Nachweis** Node-Lauf mit echten config.js/investment-profile.js (vier Fälle), Buster-Prüfer RC=0, wissen 02.11. „v3087“. **Rest** Browser-Abnahme Quick-Check (Staging ohne Anmeldung); Prod nach Abnahme. Dazu: Demo Pilot-Analyse neu (N98), Befund Seitenleisten-Score (N97).

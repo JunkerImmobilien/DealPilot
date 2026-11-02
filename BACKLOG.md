@@ -36,6 +36,16 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N98 · Pilot-Analyse neu: Ankauf und Bestand — Marcel 02.11.2026, Demo liegt vor
+
+Marcel: *„dass wir die Pilotanalyse komplett neu aufbauen, ähnlich mit den Reitern, aber übersichtlicher, einmal für Ist im Ankauf und aber auch im Bestand … mit Pillen … Unterlagen nachreichen (Wirtschaftsplan, WEG-Protokolle, Abrechnungen), ordnet automatisch zu und fragt, ob übernehmen … Wert und Marktpreis mit Stufen … Exit, Anschlussfinanzierung, Stresstest.“*
+Demo: `design/Vorschläge/pilot-analyse-neu.html` (sieben Ideen: Cockpit-Karten, Flugbahn Plan/Ist, Unterlagen-Eingang mit Übernahme, WEG-Radar, Flugbuch je Jahr, Szenarien-Regler, Pilot-Fragenzeile). Vorschlag: 1+3+4+6+7 zuerst, 2+5 als zweite Stufe (brauchen gespeicherte Jahresstände).
+**Marcel entscheidet:** Reihenfolge; Wirtschaftsplan-Übernahme immer mit Haken?; Sonderumlage automatisch in den Cashflow des Fälligkeitsjahrs?
+
+### N97 · Seitenleiste zeigt den alten Gesamtscore, Reiter Bewertung zwei Scores (02.11.2026)
+
+Marcel an Westerfeldstr.: Seitenleiste „Gute Bewertung 72“, Reiter Bewertung „Gesamturteil Solide 69“ (Investment 69, Finanzierung 75). Gemessen im Code: `calc.js:235` zeichnet die Seitenleiste aus `result.score` — dem bisherigen Gesamtscore, den der Kern seit v3076 bewusst bitgleich weiterrechnet (`dealscore2.js:795`, Objektkarte, Kopfzeile, PDF lesen ihn). Er ist das gewichtete Mittel beider Scores vor der DSCR-Grenze. Das Gesamturteil der Zwei-Score-Ansicht ist dagegen die Stufe des Investment-Scores. **Marcel entscheidet**, welche Zahl bei „zwei Scores“ in Seitenleiste, Karte und PDF steht.
+
 ### N96 · Quick-Check: Gemeinde per AGS statt Ortsname (02.11.2026)
 
 Der Quick-Check ordnet Kappung und Mietpreisbremse über den Ortsnamen zu (`_qcMietpotenzial`), der Hauptteil per AGS
@@ -4235,6 +4245,8 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3087 · Kaufnebenkosten** (`f70b090e`): Notar 1,7 → 1,0 %, Sonstige 1,5 → 0 und im Quick-Check nur bei eigenem Satz. Befund: GNotKG Tabelle B nachgerechnet (Beurkundung 2,0 + Vollzug 0,5 + Betreuung 0,5 + Grundschuld 1,0, USt): 150 T 1,17 %, 300 T 1,03 %, 500 T 0,90 %; Grundbuch 0,47–0,59 %. Alte gespeicherte 1,7/1,5 ohne Merker `nk_stand` gelten als Vorbelegung (Node-Lauf mit echten Dateien, vier Fälle). Browser-Abnahme Quick-Check offen (Staging ohne Anmeldung).
 
 - **02.11.2026 · v3077–v3086** (Prod 1.0.23–1.0.34) — Detailgrad in den Einstellungen, Marktbericht-Stufe getrennt, Mietpreis-Analyse neu mit Mietrecht, Quick-Check-Bewertung in einer Karte (N95), Mietpotenzial aus eigenen Werten, Gemeinde per AGS (N96), Zielkaufpreis exakt. Einzelheiten `wissen/2026-11-02.md` Teil 12–14 ff.
 

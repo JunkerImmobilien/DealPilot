@@ -1,0 +1,477 @@
+<title>Pilot-Analyse neu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: eine Spalte, oben Phasen-Schalter Ankauf/Bestand, darunter sieben Ideen als
+   eigene Tafeln mit je einem bedienbaren Modell, am Ende der Vorschlag. DealPilot-Marke. */
+:root{
+  --bg:#FDFCFA; --tafel:#FFFFFF; --karte:#FBF6E9; --fg:#1d1b19; --mut:#6b6660; --linie:#e8e1d2;
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f; --gold-text:#8a6d1f;
+  --gruen:#3FA56C; --gruen-bg:#e6f3eb; --rot:#B8625C; --rot-bg:#f6e7e5; --gelb:#b88a1f; --gelb-bg:#f8efd6;
+  --plan:#9b958c;
+  --f-disp:"Space Grotesk",system-ui,sans-serif; --f-body:Inter,system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#050505; --tafel:#111010; --karte:#1a1712; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --plan:#7d776e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#050505; --tafel:#111010; --karte:#1a1712; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --plan:#7d776e; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:400 14.5px/1.55 var(--f-body);margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-block:28px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+.lbl{font:600 10.5px/1.3 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+h1,h2,h3{font-family:var(--f-disp);text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,4vw,36px);font-weight:700;line-height:1.12}
+h2{font-size:21px;font-weight:600}
+h3{font-size:15px;font-weight:600}
+p{margin:0;max-width:68ch}
+.kopf{display:grid;gap:12px}
+.kopf .objekt{font-size:13px;color:var(--mut)}
+.leiste{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:1px solid var(--linie)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.phase{display:inline-flex;border:1px solid var(--linie);border-radius:10px;padding:3px;background:var(--tafel)}
+.phase button{border:0;background:transparent;color:var(--fg);font:600 13px var(--f-disp);padding:7px 16px;border-radius:7px;cursor:pointer}
+.phase button[aria-pressed="true"]{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#050505}
+.sprung{display:flex;flex-wrap:wrap;gap:6px}
+.sprung a{font:600 11.5px var(--f-mono);color:var(--mut);text-decoration:none;border:1px solid var(--linie);border-radius:999px;padding:4px 10px}
+.sprung a:hover,.sprung a:focus-visible{color:var(--gold-text);border-color:var(--gold)}
+button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.idee{background:var(--tafel);border:1px solid var(--linie);border-radius:14px;padding:22px;display:grid;gap:16px;scroll-margin-top:70px}
+.idee-kopf{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:baseline}
+.idee-kopf .nr{font:600 11px var(--f-mono);color:var(--gold-text);letter-spacing:.08em}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font:600 10.5px var(--f-mono);letter-spacing:.05em;padding:3px 8px;border-radius:6px;background:var(--karte);color:var(--mut)}
+.basis{font-size:12.5px;color:var(--mut);border-top:1px dashed var(--linie);padding-top:10px}
+.basis b{color:var(--fg);font-weight:600}
+.nur-bestand{font-size:13px;color:var(--mut);background:var(--karte);border-radius:10px;padding:12px 14px}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 10.5px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.p-gut{background:var(--gruen-bg);color:var(--gruen)} .p-acht{background:var(--gelb-bg);color:var(--gelb)} .p-krit{background:var(--rot-bg);color:var(--rot)} .p-neutral{background:var(--karte);color:var(--mut)}
+
+/* Idee 1 */
+.raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.kachel{background:var(--karte);border-radius:12px;padding:14px;display:grid;gap:6px;align-content:start;min-width:0}
+.kachel .zeile{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.kachel .wert{font:600 22px/1.15 var(--f-disp);font-variant-numeric:tabular-nums}
+.kachel .satz{font-size:12.5px;color:var(--mut)}
+.kachel details{font-size:12.5px}
+.kachel summary{cursor:pointer;color:var(--gold-text);font-weight:600;list-style:none}
+.kachel summary::-webkit-details-marker{display:none}
+.kachel details[open] summary{margin-bottom:6px}
+.kachel dl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin:0;font-variant-numeric:tabular-nums}
+.kachel dt{color:var(--mut)} .kachel dd{margin:0;text-align:right}
+
+/* Idee 2 */
+.reiterchen{display:flex;gap:6px;flex-wrap:wrap}
+.reiterchen button{border:1px solid var(--linie);background:transparent;color:var(--fg);font:600 12px var(--f-disp);padding:5px 11px;border-radius:8px;cursor:pointer}
+.reiterchen button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold-text);background:var(--karte)}
+.chart-box{overflow-x:auto}
+.chart-box svg{display:block;width:100%;min-width:520px;height:auto}
+.legende{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.legende i{display:inline-block;width:18px;height:0;border-top:2px dashed var(--plan);vertical-align:middle;margin-right:6px}
+.legende i.ist{border-top:2.5px solid var(--gold)}
+.befund{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13.5px}
+
+/* Idee 3 */
+.zwei{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px}
+@media (max-width:760px){.zwei{grid-template-columns:1fr}}
+.ablage{border:1.5px dashed var(--gold);border-radius:12px;padding:16px;text-align:center;font-size:13px;color:var(--mut);background:var(--karte)}
+.ablage b{display:block;color:var(--fg);font:600 14px var(--f-disp);margin-bottom:2px}
+.dok{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--linie);font-size:13px}
+.dok:last-child{border-bottom:0}
+.dok small{display:block;color:var(--mut);font-size:11.5px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th{font:600 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:left;padding:6px 8px;border-bottom:1px solid var(--linie)}
+td{padding:8px;border-bottom:1px solid var(--linie);vertical-align:top}
+td.z{text-align:right;white-space:nowrap}
+.tab-box{overflow-x:auto}
+.btn{border:0;border-radius:9px;padding:9px 16px;font:600 13px var(--f-disp);cursor:pointer;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#050505}
+.btn.leise{background:transparent;border:1px solid var(--linie);color:var(--fg)}
+.meldung{font-size:13px;color:var(--gruen);min-height:1.4em}
+
+/* Idee 4 */
+.beschluss{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--linie);align-items:start}
+.beschluss:last-child{border-bottom:0}
+.beschluss .streifen{align-self:stretch;border-radius:2px}
+.beschluss .t{font-size:13.5px} .beschluss .t small{display:block;color:var(--mut);font-size:12px}
+.balken{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:150px;padding-top:6px}
+.balken .s{display:grid;gap:4px;justify-items:center;font-size:11.5px;color:var(--mut);height:100%;align-content:end}
+.balken .saeule{width:100%;max-width:44px;border-radius:5px 5px 0 0;background:var(--gold);position:relative}
+.balken .saeule .rl{position:absolute;inset:auto 0 0 0;background:var(--gold-lo);opacity:.55;border-radius:0}
+.balken .s b{color:var(--fg);font:600 12px var(--f-disp);font-variant-numeric:tabular-nums}
+
+/* Idee 5 */
+.jahre{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.jahr{border:1px solid var(--linie);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start}
+.jahr.laufend{border-color:var(--gold)}
+.jahr .kopfz{display:flex;justify-content:space-between;align-items:center}
+.jahr .kopfz h3{font-size:18px}
+.jahr dl{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin:0;font-size:12.5px;font-variant-numeric:tabular-nums}
+.jahr dt{color:var(--mut)} .jahr dd{margin:0;text-align:right}
+
+/* Idee 6 */
+.regler{display:grid;gap:14px}
+.regler label{display:grid;gap:4px;font-size:13px}
+.regler label span{display:flex;justify-content:space-between}
+.regler output{font:600 13px var(--f-mono)}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.ergebnis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.ergebnis .kachel .wert{font-size:20px}
+.exit{background:var(--karte);border-radius:12px;padding:14px;display:grid;gap:6px;font-size:13px}
+
+/* Idee 7 */
+.fragen{display:flex;flex-wrap:wrap;gap:8px}
+.fragen button{border:1px solid var(--gold);background:transparent;color:var(--fg);border-radius:999px;padding:6px 13px;font:500 13px var(--f-body);cursor:pointer}
+.fragen button[aria-pressed="true"]{background:var(--karte);color:var(--gold-text);font-weight:600}
+.antwort{background:var(--karte);border-radius:12px;padding:16px;display:grid;gap:8px;font-size:13.5px}
+.antwort .von{font:600 10.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-text)}
+.antwort a{color:var(--gold-text);font-weight:600}
+
+.vorschlag{background:var(--karte);border-radius:14px;padding:22px;display:grid;gap:14px}
+.vorschlag ol{margin:0;padding-left:20px;display:grid;gap:8px;max-width:72ch}
+.struktur{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.struktur > div{background:var(--tafel);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start}
+.struktur .reihe{display:flex;flex-wrap:wrap;gap:6px}
+.struktur .reihe span{font:600 12px var(--f-disp);border:1px solid var(--linie);border-radius:8px;padding:4px 9px}
+.klein{font-size:12.5px;color:var(--mut)}
+@media (prefers-reduced-motion:no-preference){.antwort,.kachel{transition:background .2s}}
+</style>
+
+<div class="wrap">
+  <header class="kopf">
+    <span class="lbl">Demo · Pilot-Analyse · 02.11.2026</span>
+    <h1>Pilot-Analyse für Ankauf und Bestand</h1>
+    <p>Sieben Ideen, jede als bedienbares Modell. Oben schaltest du zwischen <b>Ankauf</b> (prüfen, bieten, entscheiden) und <b>Bestand</b> (Plan gegen Ist, Unterlagen, WEG, Szenarien). Am Ende steht mein Vorschlag, welche Ideen zusammen die neue Pilot-Analyse ergeben.</p>
+    <p class="objekt">Beispielobjekt mit erfundenen Zahlen: ETW 72 m², Baujahr 1972, NRW · gekauft 03/2024 für 189.000 € · Darlehen 150.000 € zu 3,2 % mit 2 % Tilgung, Zinsbindung bis 03/2034 · MEA 62/1000</p>
+  </header>
+
+  <nav class="leiste" aria-label="Phase und Ideen">
+    <div class="phase" role="group" aria-label="Phase">
+      <button type="button" id="ph-ankauf" aria-pressed="false" data-phase="ankauf">Ankauf</button>
+      <button type="button" id="ph-bestand" aria-pressed="true" data-phase="bestand">Bestand</button>
+    </div>
+    <div class="sprung">
+      <a href="#idee1">1 Cockpit</a><a href="#idee2">2 Flugbahn</a><a href="#idee3">3 Unterlagen-Eingang</a><a href="#idee4">4 WEG-Radar</a><a href="#idee5">5 Flugbuch</a><a href="#idee6">6 Szenarien</a><a href="#idee7">7 Pilot fragen</a><a href="#vorschlag">Vorschlag</a>
+    </div>
+  </nav>
+
+  <!-- IDEE 1 -->
+  <section class="idee" id="idee1">
+    <div class="idee-kopf">
+      <div><span class="nr">IDEE 1</span><h2>Cockpit aus Karten mit Pillen</h2></div>
+      <div class="tags"><span class="tag">Ankauf</span><span class="tag">Bestand</span><span class="tag">Einstieg</span></div>
+    </div>
+    <p>Die erste Ansicht beantwortet in fünf Sekunden: Wo stehe ich, wo muss ich hinsehen? Jede Karte hat eine Pille, eine Zahl und einen Satz. Wer mehr will, klappt die Karte auf, und von dort geht es in den passenden Reiter.</p>
+    <div class="raster" id="cockpit"></div>
+    <p class="basis">Baut auf: <b>Ankauf-Stand</b> (ankauf.js), <b>Wert &amp; Zielbild</b> (wert-zielbild.js), <b>Bestand-Analyse</b> (bestand-analyse.js), <b>DealScore</b>. Neu ist nur die Zusammenstellung, keine neue Rechnung.</p>
+  </section>
+
+  <!-- IDEE 2 -->
+  <section class="idee" id="idee2">
+    <div class="idee-kopf">
+      <div><span class="nr">IDEE 2</span><h2>Flugbahn: Plan gegen Ist</h2></div>
+      <div class="tags"><span class="tag">Bestand</span></div>
+    </div>
+    <p>Beim Kauf wird die Prognose eingefroren. Jedes Jahr kommt der echte Wert dazu: aus dem Marktbericht (mit Stufe), aus Mieteingang, Wirtschaftsplan und Darlehenskonto. So siehst du, ob dein Haus sich so entwickelt, wie du gerechnet hast.</p>
+    <div class="reiterchen" role="group" aria-label="Kennzahl">
+      <button type="button" data-k="wert" aria-pressed="true">Wert</button>
+      <button type="button" data-k="miete" aria-pressed="false">Miete</button>
+      <button type="button" data-k="hausgeld" aria-pressed="false">Hausgeld</button>
+      <button type="button" data-k="restschuld" aria-pressed="false">Restschuld</button>
+    </div>
+    <div class="chart-box"><svg id="flugbahn" viewBox="0 0 720 260" role="img" aria-label="Plan gegen Ist"></svg></div>
+    <div class="legende"><span><i></i>Plan beim Kauf (03/2024)</span><span><i class="ist"></i>Ist</span></div>
+    <div class="befund" id="flug-befund"></div>
+    <p class="basis">Baut auf: <b>Ankauf-Stand</b> als eingefrorene Prognose (gibt es), <b>Marktbericht Stufe 1–3</b> je Abruf (gibt es). Neu: die Ist-Punkte je Jahr speichern statt nur den letzten Stand.</p>
+  </section>
+
+  <!-- IDEE 3 -->
+  <section class="idee" id="idee3">
+    <div class="idee-kopf">
+      <div><span class="nr">IDEE 3</span><h2>Unterlagen-Eingang mit Übernahme-Vorschlag</h2></div>
+      <div class="tags"><span class="tag">Bestand</span><span class="tag">Ankauf</span></div>
+    </div>
+    <p>Du legst ab, was kommt: Wirtschaftsplan, Protokoll, Hausgeldabrechnung. DealPilot erkennt die Art, ordnet sie dem Jahr zu und fragt, was übernommen werden soll. Nichts ändert sich ohne deinen Haken.</p>
+    <div class="zwei">
+      <div style="display:grid;gap:12px;align-content:start">
+        <div class="ablage"><b>PDF hier ablegen</b>oder vom Handy fotografieren</div>
+        <div>
+          <div class="dok"><div>Wirtschaftsplan 2027<small>erkannt · WEG Lindenhof · 4 Seiten</small></div><span class="pill p-acht">3 Vorschläge</span></div>
+          <div class="dok"><div>Protokoll Eigentümerversammlung 14.06.2026<small>erkannt · 7 Beschlüsse, 2 betreffen dich</small></div><span class="pill p-krit">Sonderumlage</span></div>
+          <div class="dok"><div>Hausgeldabrechnung 2025<small>erkannt · umlagefähig 2.630 €</small></div><span class="pill p-gut">übernommen</span></div>
+        </div>
+      </div>
+      <div style="display:grid;gap:10px;align-content:start;min-width:0">
+        <h3>Aus dem Wirtschaftsplan 2027 übernehmen?</h3>
+        <div class="tab-box"><table>
+          <thead><tr><th></th><th>Position</th><th class="z">bisher</th><th class="z">neu</th><th>geht nach</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox" id="ue1" checked aria-label="Hausgeld übernehmen"></td><td>Hausgeld / Monat</td><td class="z">312 €</td><td class="z">338 €</td><td>Bewirtschaftung ab 01/2027</td></tr>
+            <tr><td><input type="checkbox" id="ue2" checked aria-label="Nicht umlagefähig übernehmen"></td><td>davon nicht umlagefähig</td><td class="z">84 €</td><td class="z">97 €</td><td>Cashflow und Steuer 2027</td></tr>
+            <tr><td><input type="checkbox" id="ue3" checked aria-label="Rücklage übernehmen"></td><td>Zuführung Erhaltungsrücklage</td><td class="z">35 €</td><td class="z">41 €</td><td>Bewirtschaftung (steuerlich erst bei Verwendung)</td></tr>
+          </tbody>
+        </table></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="uebernehmen">Ausgewählte übernehmen</button><button type="button" class="btn leise" id="spaeter">Später</button></div>
+        <div class="meldung" id="ue-meldung" role="status"></div>
+      </div>
+    </div>
+    <p class="basis">Baut auf: <b>Dokument-Import</b> (dokument-import.js, liest WEG-Protokoll schon heute, Wirtschaftsplan/Abrechnung seit v3017), <b>Datenraum</b>, <b>Bewirtschaftung je Jahr</b>. Neu: Jahresbezug und die Übernahme in Steuer und Bewirtschaftung des richtigen Jahres.</p>
+  </section>
+
+  <!-- IDEE 4 -->
+  <section class="idee" id="idee4">
+    <div class="idee-kopf">
+      <div><span class="nr">IDEE 4</span><h2>WEG-Radar: Beschlüsse und Hausgeld-Verlauf</h2></div>
+      <div class="tags"><span class="tag">Bestand</span><span class="tag">Ankauf (Protokolle 3 Jahre)</span></div>
+    </div>
+    <p>Aus allen Protokollen und Wirtschaftsplänen entsteht eine Liste, die nur zeigt, was dich Geld kostet oder deinen Wert berührt. Im Ankauf ist es die Prüfung der letzten drei Jahre, im Bestand der laufende Blick.</p>
+    <div class="zwei">
+      <div style="min-width:0">
+        <div class="beschluss"><span class="streifen" style="background:var(--rot)"></span><div class="t">Sonderumlage Dachsanierung, 92.000 € gesamt<small>Beschluss 14.06.2026, TOP 5 · dein Anteil 62/1000 = 5.704 €, fällig 03/2027 · steuerlich Erhaltungsaufwand, wenn die WEG ihn verbaut</small></div><span class="pill p-krit">5.704 €</span></div>
+        <div class="beschluss"><span class="streifen" style="background:var(--gelb)"></span><div class="t">Rücklage wird angehoben<small>Beschluss 14.06.2026, TOP 3 · +6 € im Monat ab 2027</small></div><span class="pill p-acht">+72 €/J.</span></div>
+        <div class="beschluss"><span class="streifen" style="background:var(--gelb)"></span><div class="t">Prüfauftrag Heizungstausch bis 2028<small>Beschluss 14.06.2026, TOP 7 · noch keine Kosten, nächste Umlage wahrscheinlich</small></div><span class="pill p-acht">beobachten</span></div>
+        <div class="beschluss"><span class="streifen" style="background:var(--gruen)"></span><div class="t">Verwaltervertrag verlängert bis 2029<small>Beschluss 22.05.2025, TOP 2 · Vergütung unverändert</small></div><span class="pill p-gut">ok</span></div>
+      </div>
+      <div style="display:grid;gap:8px;align-content:start">
+        <h3>Hausgeld je Monat laut Wirtschaftsplan</h3>
+        <div class="balken" id="hg-balken"></div>
+        <p class="klein">Dunkler Anteil: Zuführung zur Rücklage. Rücklage der WEG 2026: 38 €/m² Wohnfläche, für ein Haus von 1972 eher knapp.</p>
+      </div>
+    </div>
+    <p class="basis">Baut auf: <b>WEG-Protokoll-Import</b> (gibt es), Reiter <b>Unterlagen &amp; WEG</b> (gibt es). Neu: die Beschlüsse als Liste mit Betrag und Fälligkeit, die Sonderumlage als Ausgabe im Cashflow des Fälligkeitsjahrs.</p>
+  </section>
+
+  <!-- IDEE 5 -->
+  <section class="idee" id="idee5">
+    <div class="idee-kopf">
+      <div><span class="nr">IDEE 5</span><h2>Flugbuch: ein Blatt je Jahr</h2></div>
+      <div class="tags"><span class="tag">Bestand</span><span class="tag">Steuer</span></div>
+    </div>
+    <p>Jedes Jahr wird abgeschlossen wie ein Flugbucheintrag: Mieteinnahmen, Hausgeld, Zinsen, AfA und das steuerliche Ergebnis, dazu der Wert mit Stufe. Abgeschlossene Jahre ändern sich nicht mehr, das laufende Jahr füllt sich mit Belegen.</p>
+    <div class="jahre">
+      <div class="jahr"><div class="kopfz"><h3>2024</h3><span class="pill p-gut">abgeschlossen</span></div>
+        <dl><dt>Miete (ab 04)</dt><dd>6.300 €</dd><dt>nicht umlagefähig</dt><dd>720 €</dd><dt>Zinsen</dt><dd>3.580 €</dd><dt>AfA</dt><dd>2.300 €</dd><dt>steuerl. Ergebnis</dt><dd>−1.840 €</dd><dt>Wert</dt><dd>189.000 € · Kaufpreis</dd></dl></div>
+      <div class="jahr"><div class="kopfz"><h3>2025</h3><span class="pill p-gut">abgeschlossen</span></div>
+        <dl><dt>Miete</dt><dd>8.520 €</dd><dt>nicht umlagefähig</dt><dd>984 €</dd><dt>Zinsen</dt><dd>4.700 €</dd><dt>AfA</dt><dd>3.060 €</dd><dt>steuerl. Ergebnis</dt><dd>−224 €</dd><dt>Wert</dt><dd>194.000 € · Stufe 2</dd></dl></div>
+      <div class="jahr laufend"><div class="kopfz"><h3>2026</h3><span class="pill p-acht">läuft · 2 Belege fehlen</span></div>
+        <dl><dt>Miete</dt><dd>8.640 €</dd><dt>nicht umlagefähig</dt><dd>1.008 €</dd><dt>Zinsen</dt><dd>4.620 €</dd><dt>AfA</dt><dd>3.060 €</dd><dt>steuerl. Ergebnis</dt><dd>−48 €</dd><dt>Wert</dt><dd>205.000 € · Stufe 3</dd></dl></div>
+      <div class="jahr"><div class="kopfz"><h3>2027</h3><span class="pill p-neutral">Plan</span></div>
+        <dl><dt>Miete</dt><dd>8.900 €</dd><dt>nicht umlagefähig</dt><dd>1.164 €</dd><dt>Sonderumlage</dt><dd>5.704 €</dd><dt>Zinsen</dt><dd>4.540 €</dd><dt>steuerl. Ergebnis</dt><dd>−5.570 €</dd><dt>Steuer-Effekt</dt><dd>ca. +2.340 € bei 42 %</dd></dl></div>
+    </div>
+    <p class="basis">Baut auf: <b>Steuerformular je Jahr</b> (Quick- und Detail-Modus, gibt es), <b>Anlage V</b> (gibt es). Neu: das Jahr abschließen und die Werte aus den Belegen des Eingangs (Idee 3) vorschlagen.</p>
+  </section>
+
+  <!-- IDEE 6 -->
+  <section class="idee" id="idee6">
+    <div class="idee-kopf">
+      <div><span class="nr">IDEE 6</span><h2>Szenarien: Anschluss, Stresstest, Exit</h2></div>
+      <div class="tags"><span class="tag">Bestand</span><span class="tag">Ankauf</span></div>
+    </div>
+    <p id="sz-satz">Drei Regler, sofort das Ergebnis. Gerechnet wird ab dem Ende der Zinsbindung 03/2034 mit der Restschuld laut Plan (115.300 €) und gleicher Tilgung von 2 %.</p>
+    <div class="zwei">
+      <div class="regler">
+        <label for="r-zins"><span>Anschlusszins <output id="o-zins">4,0 %</output></span><input type="range" id="r-zins" min="2" max="7" step="0.25" value="4"></label>
+        <label for="r-leer"><span>Leerstand je Jahr <output id="o-leer">0 Monate</output></span><input type="range" id="r-leer" min="0" max="6" step="1" value="0"></label>
+        <label for="r-miete"><span>Miete bis 2034 <output id="o-miete">+10 %</output></span><input type="range" id="r-miete" min="-10" max="25" step="5" value="10"></label>
+        <label style="display:flex;gap:8px;align-items:center;grid-template-columns:none"><input type="checkbox" id="r-umlage"> Weitere Sonderumlage 5.000 € im selben Jahr</label>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start;min-width:0">
+        <div class="ergebnis">
+          <div class="kachel"><span class="lbl">Rate / Monat</span><span class="wert" id="e-rate">–</span></div>
+          <div class="kachel"><span class="lbl">Cashflow / Monat</span><span class="wert" id="e-cf">–</span></div>
+          <div class="kachel"><span class="lbl">DSCR</span><span class="wert" id="e-dscr">–</span><span id="e-pill"></span></div>
+        </div>
+        <div class="exit">
+          <span class="lbl">Exit ab 03/2034 · steuerfrei nach § 23 EStG</span>
+          <div>Wert laut Plan 2034: <b>219.300 €</b> · Restschuld: <b>115.300 €</b></div>
+          <div>Erlös vor Verkaufskosten: <b>104.000 €</b> · eingesetztes Eigenkapital: 54.120 €</div>
+          <div class="klein">Zinsbindung und Spekulationsfrist enden im selben Monat. Das ist der natürliche Entscheidungspunkt: verlängern, umschulden oder verkaufen.</div>
+        </div>
+      </div>
+    </div>
+    <p class="basis">Baut auf: <b>Anschlussfinanzierung und Exit</b> (bestand-analyse.js, rechnet heute mit festen 3/4/5 %), <b>DSCR-Kern</b> <code>Dscr.compute()</code>. Neu: frei verschiebbare Regler und Leerstand/Sonderumlage als Stressfaktoren.</p>
+  </section>
+
+  <!-- IDEE 7 -->
+  <section class="idee" id="idee7">
+    <div class="idee-kopf">
+      <div><span class="nr">IDEE 7</span><h2>Pilot fragen: Antworten mit Zahlen und Sprung</h2></div>
+      <div class="tags"><span class="tag">Ankauf</span><span class="tag">Bestand</span><span class="tag">Co-Pilot</span></div>
+    </div>
+    <p>Über jeder Ansicht steht eine Zeile mit drei Fragen, die zur Phase passen. Die Antwort nennt die Zahl, sagt, woher sie kommt, und springt zur Stelle, wo man es ändert. Für alles andere bleibt der Co-Pilot unten.</p>
+    <div class="fragen" id="fragen" role="group" aria-label="Fragen an den Piloten"></div>
+    <div class="antwort" id="antwort" aria-live="polite"></div>
+    <p class="basis">Baut auf: <b>Co-Pilot-Pillen</b> (copilot-pillen.js, Gruppe „Ankauf · Bestand · Zielbild“ gibt es), <b>Tageslimit</b> je Plan. Neu: Antworten, die erst aus der Rechnung kommen und nur zum Formulieren die KI brauchen.</p>
+  </section>
+
+  <!-- VORSCHLAG -->
+  <section class="vorschlag" id="vorschlag">
+    <span class="lbl">Mein Vorschlag</span>
+    <h2>Zusammen ergeben 1, 3, 4, 6 und 7 die neue Pilot-Analyse; 2 und 5 kommen als zweite Stufe</h2>
+    <div class="struktur">
+      <div><h3>Ankauf · fünf Reiter</h3><div class="reihe"><span>Überblick</span><span>Kaufpreis &amp; Offerte</span><span>Finanzierung &amp; Stress</span><span>Unterlagen &amp; WEG</span><span>Briefing</span></div><p class="klein">Überblick = Idee 1 mit Ankauf-Karten. Offerte bleibt gesperrt über dem Angebotspreis (v2946).</p></div>
+      <div><h3>Bestand · fünf Reiter</h3><div class="reihe"><span>Überblick</span><span>Plan gegen Ist</span><span>Unterlagen &amp; WEG</span><span>Steuer je Jahr</span><span>Szenarien &amp; Exit</span></div><p class="klein">Beim Wechsel von Ankauf zu Bestand („gewonnen“) wird der Plan eingefroren. Das macht der Ankauf-Stand heute schon.</p></div>
+    </div>
+    <ol>
+      <li><b>Erst die Hülle:</b> Überblick-Karten (Idee 1) und Fragenzeile (Idee 7) über den vorhandenen Rechnungen. Keine neue Zahl, nur neue Anordnung.</li>
+      <li><b>Dann der Eingang:</b> Wirtschaftsplan und Protokoll mit Jahresbezug und Übernahme-Haken (Ideen 3 und 4). Den größten Teil liest der Dokument-Import schon.</li>
+      <li><b>Dann die Regler:</b> Szenarien (Idee 6) ersetzen die festen 3/4/5 %.</li>
+      <li><b>Zweite Stufe:</b> Flugbahn und Flugbuch (Ideen 2 und 5). Sie brauchen gespeicherte Jahresstände, das ist ein eigenes Datenpaket.</li>
+    </ol>
+    <p class="klein"><b>Von dir zu entscheiden:</b> (a) Ist die Reihenfolge so richtig? (b) Soll ein erkannter Wirtschaftsplan immer nachfragen, bevor er übernimmt? Ich empfehle: ja, immer mit Haken. (c) Soll die Sonderumlage automatisch in den Cashflow des Fälligkeitsjahrs?</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  var phase = 'bestand';
+  var eur = function(x){ return Math.round(x).toLocaleString('de-DE') + ' €'; };
+  var pill = function(art, t){ return '<span class="pill p-' + art + '">' + t + '</span>'; };
+
+  /* ---------- Idee 1 ---------- */
+  var KARTEN = {
+    bestand: [
+      ['Wert', 'gut', 'über Plan', '205.000 €', 'Marktbericht Stufe 3 vom 20.10.2026, Plan 194.700 €.', [['Plan 2026','194.700 €'],['Ist (Stufe 3)','205.000 €'],['Spanne','192.000–214.000 €'],['Abweichung','+5,3 %']]],
+      ['Miete', 'gut', 'über Plan', '720 €', 'Kaltmiete im Monat, Plan 700 €. Nächste Erhöhung frühestens 04/2027.', [['Plan 2026','700 €'],['Ist','720 €'],['zulässig 2029','792 € (Kappung 15 %)']]],
+      ['Hausgeld', 'acht', 'steigt schneller', '338 €', 'ab 01/2027 laut Wirtschaftsplan, Plan war 303 €.', [['2024','285 €'],['2026','312 €'],['2027','338 €'],['Plan 2027','303 €']]],
+      ['WEG', 'krit', 'Sonderumlage', '5.704 €', 'Dachsanierung, fällig 03/2027. Liquidität einplanen.', [['Beschluss','14.06.2026'],['dein Anteil','62/1000'],['fällig','03/2027']]],
+      ['Finanzierung', 'gut', 'im Plan', '142.300 €', 'Restschuld heute, wie geplant. Zinsbindung bis 03/2034.', [['Rate','650 €/Monat'],['DSCR','0,98'],['Restschuld 2034','115.300 €']]],
+      ['Steuer 2026', 'neutral', '2 Belege fehlen', '−48 €', 'steuerliches Ergebnis bisher. Es fehlen Grundsteuer und Abrechnung.', [['Einnahmen','8.640 €'],['Werbungskosten','8.688 €'],['offen','Grundsteuer, Abrechnung 2026']]]
+    ],
+    ankauf: [
+      ['Kaufpreis', 'acht', '5 % über Wert', '199.000 €', 'Angebot. Ertragswert 186.000 €, Sachwert 194.000 € (Stufe 3).', [['Angebot','199.000 €'],['Ertragswert','186.000 €'],['Sachwert','194.000 €'],['Marktpreis Stufe 2','192.000 €']]],
+      ['Offerte', 'gut', 'bereit', '189.000 €', 'Vorschlag für dein Angebot an den Verkäufer, mit Begründung als PDF.', [['Abschlag','−5,0 %'],['begründet mit','Ertragswert, Sonderumlage-Risiko'],['Grenze','nie über Angebot']]],
+      ['Finanzierung', 'krit', 'Zuschuss', 'DSCR 0,87', 'Darlehen 150.000 €, Rate 650 €. Die Miete von 650 € trägt die Rate nicht ganz.', [['Kaufnebenkosten','8,0 % · 15.120 €'],['Eigenkapital','54.120 €'],['LTV','79 %']]],
+      ['Miete', 'gut', 'Potenzial', '650 → 700 €', 'heute 650 €, in drei Jahren zulässig 700 € (Mietspiegel, Kappung).', [['heute','9,03 €/m²'],['Vergleichsmiete','9,80 €/m²'],['Kappung','15 % in 3 J.']]],
+      ['Unterlagen', 'krit', '3 fehlen', '6 von 9', 'Es fehlen Wirtschaftsplan, Protokolle 2023–2025 und Energieausweis.', [['vorhanden','Grundbuch, Teilungserklärung, Exposé …'],['fehlt','Wirtschaftsplan, Protokolle, Energieausweis']]],
+      ['Lage', 'gut', 'Standard B', 'Lageklasse B', 'Wohnlage mittel, Nachfrage stabil, Kaufkraft leicht über Kreis.', [['Bodenrichtwert','260 €/m²'],['Leerstand Kreis','2,1 %']]]
+    ]
+  };
+  function cockpit(){
+    document.getElementById('cockpit').innerHTML = KARTEN[phase].map(function(k){
+      return '<div class="kachel"><div class="zeile"><span class="lbl">' + k[0] + '</span>' + pill(k[1], k[2]) + '</div>'
+        + '<span class="wert">' + k[3] + '</span><span class="satz">' + k[4] + '</span>'
+        + '<details><summary>Details ›</summary><dl>' + k[5].map(function(z){ return '<dt>' + z[0] + '</dt><dd>' + z[1] + '</dd>'; }).join('') + '</dl></details></div>';
+    }).join('');
+  }
+
+  /* ---------- Idee 2 ---------- */
+  var J = [2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034];
+  var DATEN = {
+    wert: { plan: J.map(function(j){ return 189000*Math.pow(1.015, j-2024); }), ist: [189000,194000,205000], fmt: eur,
+            satz: function(p,i){ return 'Wert 2026 ' + eur(i) + ' gegen Plan ' + eur(p) + ' · Marktbericht Stufe 3'; }, gut: 1 },
+    miete: { plan: J.map(function(j){ return 650*Math.pow(1.025, j-2024); }), ist: [650,690,720], fmt: function(x){ return Math.round(x) + ' €'; },
+            satz: function(p,i){ return 'Kaltmiete 2026 ' + Math.round(i) + ' € gegen Plan ' + Math.round(p) + ' €'; }, gut: 1 },
+    hausgeld: { plan: J.map(function(j){ return 285*Math.pow(1.02, j-2024); }), ist: [285,296,312,338], fmt: function(x){ return Math.round(x) + ' €'; },
+            satz: function(p,i){ return 'Hausgeld 2027 ' + Math.round(i) + ' € gegen Plan ' + Math.round(p) + ' €'; }, gut: -1 },
+    restschuld: { plan: J.map(function(j){ var t=j-2024+0.25; return 150000*Math.pow(1.032,t) - 7800*(Math.pow(1.032,t)-1)/0.032; }), ist: [148900,145700,142300], fmt: eur,
+            satz: function(p,i){ return 'Restschuld 2026 ' + eur(i) + ' gegen Plan ' + eur(p); }, gut: -1 }
+  };
+  function flugbahn(k){
+    var d = DATEN[k], svg = document.getElementById('flugbahn');
+    var W=720,H=260,L=78,R=20,T=16,B=34;
+    var alle = d.plan.concat(d.ist), mn = Math.min.apply(null, alle), mx = Math.max.apply(null, alle);
+    var pad = (mx-mn)*0.12 || 1; mn -= pad; mx += pad;
+    var x = function(i){ return L + i*(W-L-R)/(J.length-1); }, y = function(v){ return T + (mx-v)*(H-T-B)/(mx-mn); };
+    var s = '';
+    for (var g=0; g<=4; g++){ var v = mn + g*(mx-mn)/4, yy = y(v);
+      s += '<line x1="'+L+'" x2="'+(W-R)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--linie)" stroke-width="1"/>'
+        + '<text x="'+(L-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="var(--mut)" font-family="JetBrains Mono,monospace">'+d.fmt(v)+'</text>'; }
+    J.forEach(function(j,i){ if (i%2===0 || i===J.length-1) s += '<text x="'+x(i)+'" y="'+(H-10)+'" text-anchor="middle" font-size="11" fill="var(--mut)" font-family="JetBrains Mono,monospace">'+j+'</text>'; });
+    s += '<polyline fill="none" stroke="var(--plan)" stroke-width="2" stroke-dasharray="5 5" points="'+d.plan.map(function(v,i){ return x(i)+','+y(v); }).join(' ')+'"/>';
+    var area = 'M'+x(0)+','+y(d.ist[0]) + d.ist.map(function(v,i){ return ' L'+x(i)+','+y(v); }).join('') + ' L'+x(d.ist.length-1)+','+(H-B)+' L'+x(0)+','+(H-B)+' Z';
+    s += '<path d="'+area+'" fill="var(--gold)" fill-opacity=".12"/>';
+    s += '<polyline fill="none" stroke="var(--gold)" stroke-width="2.5" points="'+d.ist.map(function(v,i){ return x(i)+','+y(v); }).join(' ')+'"/>';
+    d.ist.forEach(function(v,i){ var last = i===d.ist.length-1; s += '<circle cx="'+x(i)+'" cy="'+y(v)+'" r="'+(last?5.5:3.5)+'" fill="'+(last?'var(--gold)':'var(--tafel)')+'" stroke="var(--gold)" stroke-width="2"/>'; });
+    var n = d.ist.length-1, p = d.plan[n], i = d.ist[n];
+    s += '<text x="'+(x(n)+10)+'" y="'+(y(i)-8)+'" font-size="12" font-weight="600" fill="var(--fg)" font-family="Space Grotesk,sans-serif">'+d.fmt(i)+'</text>';
+    svg.innerHTML = s;
+    var abw = (i-p)/p*100, gut = d.gut*abw >= -0.5;
+    var art = Math.abs(abw) < 1.5 ? 'gut' : (gut ? 'gut' : 'acht');
+    var wort = Math.abs(abw) < 1.5 ? 'im Plan' : (abw > 0 ? 'über Plan' : 'unter Plan');
+    document.getElementById('flug-befund').innerHTML = pill(art, wort + ' ' + (abw>0?'+':'') + abw.toFixed(1).replace('.',',') + ' %') + '<span>' + d.satz(p,i) + '</span>';
+  }
+  document.querySelectorAll('#idee2 .reiterchen button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#idee2 .reiterchen button').forEach(function(x){ x.setAttribute('aria-pressed', x===b ? 'true' : 'false'); });
+      flugbahn(b.getAttribute('data-k'));
+    });
+  });
+
+  /* ---------- Idee 3 ---------- */
+  document.getElementById('uebernehmen').addEventListener('click', function(){
+    var n = ['ue1','ue2','ue3'].filter(function(id){ return document.getElementById(id).checked; }).length;
+    document.getElementById('ue-meldung').textContent = n ? n + ' Position' + (n>1?'en':'') + ' übernommen in Bewirtschaftung und Steuer 2027. Rückgängig im Verlauf. (Demo)' : 'Nichts ausgewählt, nichts übernommen.';
+  });
+  document.getElementById('spaeter').addEventListener('click', function(){
+    document.getElementById('ue-meldung').textContent = 'Bleibt im Eingang liegen und erscheint auf der Überblick-Karte. (Demo)';
+  });
+
+  /* ---------- Idee 4 ---------- */
+  var HG = [[2023,276,32],[2024,285,33],[2025,296,34],[2026,312,35],[2027,338,41]], hmax = 360;
+  document.getElementById('hg-balken').innerHTML = HG.map(function(h){
+    return '<div class="s"><b>' + h[1] + ' €</b><div class="saeule" style="height:' + (h[1]/hmax*100) + '%"><div class="rl" style="height:' + (h[2]/h[1]*100) + '%"></div></div>' + h[0] + (h[0]===2027?' Plan':'') + '</div>';
+  }).join('');
+
+  /* ---------- Idee 6 ---------- */
+  var RS = 115300, MIETE = 720, NU = 97;
+  function szenario(){
+    var z = +document.getElementById('r-zins').value, l = +document.getElementById('r-leer').value,
+        m = +document.getElementById('r-miete').value, u = document.getElementById('r-umlage').checked;
+    document.getElementById('o-zins').textContent = z.toFixed(2).replace(/0$/,'').replace('.',',') + ' %';
+    document.getElementById('o-leer').textContent = l + (l===1?' Monat':' Monate');
+    document.getElementById('o-miete').textContent = (m>0?'+':'') + m + ' %';
+    var rateJ = RS*(z+2)/100, mieteJ = MIETE*(1+m/100)*(12-l), nuJ = NU*12 + (u?5000:0);
+    var cf = (mieteJ - nuJ - rateJ)/12, dscr = (mieteJ - nuJ)/rateJ;
+    document.getElementById('e-rate').textContent = eur(rateJ/12);
+    document.getElementById('e-cf').textContent = (cf>=0?'+':'−') + eur(Math.abs(cf));
+    document.getElementById('e-dscr').textContent = dscr.toFixed(2).replace('.',',');
+    document.getElementById('e-pill').innerHTML = dscr >= 1.2 ? pill('gut','trägt sich') : dscr >= 1.0 ? pill('acht','knapp') : pill('krit','Zuschuss nötig');
+  }
+  ['r-zins','r-leer','r-miete','r-umlage'].forEach(function(id){ document.getElementById(id).addEventListener('input', szenario); });
+
+  /* ---------- Idee 7 ---------- */
+  var FRAGEN = {
+    bestand: [
+      ['Liege ich im Plan?', 'Wert und Miete liegen über Plan (+5,3 % und +2,9 %), das Hausgeld darüber (+11,5 % für 2027). Unterm Strich trägt die Wertentwicklung den teureren Betrieb: Vermögenszuwachs seit Kauf rund 23.700 €, davon 7.700 € Tilgung.', 'Quelle: Marktbericht Stufe 3 vom 20.10.2026, Wirtschaftsplan 2027, Darlehenskonto.', 'Zur Flugbahn', '#idee2'],
+      ['Was bedeutet die Sonderumlage?', 'Du zahlst im März 2027 einmalig 5.704 €. Dein Cashflow 2027 fällt damit auf rund −480 € im Monat, gerechnet über das Jahr. Steuerlich wird es Erhaltungsaufwand, wenn die WEG das Dach saniert, bei 42 % also rund 2.400 € zurück.', 'Quelle: Protokoll 14.06.2026, TOP 5; MEA 62/1000.', 'Zum WEG-Radar', '#idee4'],
+      ['Wann lohnt sich der Verkauf?', 'Frühestens 03/2034: Dann ist der Verkauf steuerfrei und die Zinsbindung läuft aus. Nach Plan bleiben 104.000 € vor Verkaufskosten, bei 54.120 € eingesetztem Eigenkapital.', 'Quelle: Kaufdatum, § 23 EStG, Plan-Projektion.', 'Zu den Szenarien', '#idee6']
+    ],
+    ankauf: [
+      ['Was soll ich bieten?', 'Biete 189.000 €. Das sind 5 % unter dem Angebot und liegen zwischen Ertragswert (186.000 €) und Sachwert (194.000 €). Die offene Frage zum Dach spricht für den Abschlag.', 'Quelle: Wertermittlung Stufe 3, Unterlagen-Prüfung.', 'Zur Offerte', '#idee1'],
+      ['Was fehlt an Unterlagen?', 'Drei Dinge: Wirtschaftsplan, Protokolle der letzten drei Jahre und Energieausweis. Ohne Protokolle bleibt eine beschlossene Sonderumlage unsichtbar. Die Liste kannst du direkt an den Makler schicken.', 'Quelle: Datenraum, Pflichtliste Bank.', 'Zum Unterlagen-Eingang', '#idee3'],
+      ['Hält die Finanzierung?', 'Nicht ganz: DSCR 0,87 bei 650 € Rate und 650 € Miete, du legst rund 84 € im Monat zu. Mit der zulässigen Miete von 700 € in drei Jahren steigt der DSCR auf 0,95. Ohne mehr Eigenkapital bleibt es ein Zuschussobjekt bis zur Erhöhung.', 'Quelle: Reiter Finanzierung, Dscr.compute().', 'Zum Stresstest', '#idee6']
+    ]
+  };
+  function fragen(){
+    var box = document.getElementById('fragen');
+    box.innerHTML = FRAGEN[phase].map(function(f,i){ return '<button type="button" data-i="'+i+'" aria-pressed="'+(i===0)+'">'+f[0]+'</button>'; }).join('');
+    box.querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){
+      box.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', x===b ? 'true' : 'false'); });
+      antwort(+b.getAttribute('data-i'));
+    }); });
+    antwort(0);
+  }
+  function antwort(i){
+    var f = FRAGEN[phase][i];
+    document.getElementById('antwort').innerHTML = '<span class="von">Pilot · ' + f[0] + '</span><p>' + f[1] + '</p><p class="klein">' + f[2] + '</p><a href="' + f[4] + '">' + f[3] + ' ›</a>';
+  }
+
+  /* ---------- Phase ---------- */
+  function setPhase(p){
+    phase = p;
+    document.querySelectorAll('.phase button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-phase')===p ? 'true' : 'false'); });
+    cockpit(); fragen();
+    document.getElementById('sz-satz').textContent = p === 'ankauf'
+      ? 'Vor dem Kauf: derselbe Stresstest, damit du weißt, was in zehn Jahren passiert. Gerechnet ab Zinsbindungsende 03/2034 mit der Restschuld laut Plan (115.300 €).'
+      : 'Drei Regler, sofort das Ergebnis. Gerechnet wird ab dem Ende der Zinsbindung 03/2034 mit der Restschuld laut Plan (115.300 €) und gleicher Tilgung von 2 %.';
+  }
+  document.querySelectorAll('.phase button').forEach(function(b){ b.addEventListener('click', function(){ setPhase(b.getAttribute('data-phase')); }); });
+
+  setPhase('bestand'); flugbahn('wert'); szenario();
+})();
+</script>
