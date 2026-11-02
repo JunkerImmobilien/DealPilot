@@ -44203,3 +44203,8 @@ echten Lauf: A/B „Objekt passt — Finanzierung prüfen“, C „Finger weg“
 
 **Was.** Vorbelegung Notar 1,7 → 1,0 % (GNotKG Tabelle B nachgerechnet: 0,90–1,17 % bei 150–500 T€ inkl. Grundschuld), Sonstige 1,5 → 0, im Quick-Check nur bei eigenem Satz; alte gespeicherte 1,7/1,5 ohne Merker `nk_stand` gelten als Vorbelegung.
 **Commit** f70b090e, aff60824. **Staging** ausgerollt. **Nachweis** Node-Lauf mit echten config.js/investment-profile.js (vier Fälle), Buster-Prüfer RC=0, wissen 02.11. „v3087“. **Rest** Browser-Abnahme Quick-Check (Staging ohne Anmeldung); Prod nach Abnahme. Dazu: Demo Pilot-Analyse neu (N98), Befund Seitenleisten-Score (N97).
+
+### v3088 · Gesamtscore über zwei Scores, Notar/Grundbuch nach GNotKG (02.11.2026)
+
+**Was.** Zwei-Score-Ansicht: Gesamturteil = Gesamtscore (wie Seitenleiste), Empfehlung an den Schwellen. `js/gnotkg.js` + Einstellung `nk_gnotkg`, Quick-Check und Objekt rechnen Notar/Grundbuch nach Tabelle B.
+**Commit** 45a00f5d. **Staging** ausgerollt, auf dem Server nachgemessen (Datei, Buster, Kern). **Nachweis** gnotkg-pruefen, zwei-scores-pruefen (96), score-ketten (216), buster-ebenen grün; wissen 02.11. „v3088“. **Rest** Browser-Abnahme Quick-Check/Bewertung (Staging ohne Anmeldung), danach Prod.

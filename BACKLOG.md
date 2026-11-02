@@ -42,10 +42,6 @@ Marcel: *„dass wir die Pilotanalyse komplett neu aufbauen, ähnlich mit den Re
 Demo: `design/Vorschläge/pilot-analyse-neu.html` (sieben Ideen: Cockpit-Karten, Flugbahn Plan/Ist, Unterlagen-Eingang mit Übernahme, WEG-Radar, Flugbuch je Jahr, Szenarien-Regler, Pilot-Fragenzeile). Vorschlag: 1+3+4+6+7 zuerst, 2+5 als zweite Stufe (brauchen gespeicherte Jahresstände).
 **Marcel entscheidet:** Reihenfolge; Wirtschaftsplan-Übernahme immer mit Haken?; Sonderumlage automatisch in den Cashflow des Fälligkeitsjahrs?
 
-### N97 · Seitenleiste zeigt den alten Gesamtscore, Reiter Bewertung zwei Scores (02.11.2026)
-
-Marcel an Westerfeldstr.: Seitenleiste „Gute Bewertung 72“, Reiter Bewertung „Gesamturteil Solide 69“ (Investment 69, Finanzierung 75). Gemessen im Code: `calc.js:235` zeichnet die Seitenleiste aus `result.score` — dem bisherigen Gesamtscore, den der Kern seit v3076 bewusst bitgleich weiterrechnet (`dealscore2.js:795`, Objektkarte, Kopfzeile, PDF lesen ihn). Er ist das gewichtete Mittel beider Scores vor der DSCR-Grenze. Das Gesamturteil der Zwei-Score-Ansicht ist dagegen die Stufe des Investment-Scores. **Marcel entscheidet**, welche Zahl bei „zwei Scores“ in Seitenleiste, Karte und PDF steht.
-
 ### N96 · Quick-Check: Gemeinde per AGS statt Ortsname (02.11.2026)
 
 Der Quick-Check ordnet Kappung und Mietpreisbremse über den Ortsnamen zu (`_qcMietpotenzial`), der Hauptteil per AGS
@@ -4245,6 +4241,9 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3088 · Gesamtscore über zwei Scores** (`45a00f5d`): Marcel an Westerfeldstr. „Seitenleiste 72, Gesamturteil 69“. Befund: Seitenleiste (`calc.js:235`) zeigte den Gesamtscore (gewichtetes Mittel), die Zwei-Score-Ansicht als Gesamturteil den Investment-Score. Marcel: Gesamtscore oben in die schwarze Leiste. Jetzt ist `gesamt.score` = Gesamtscore mit DSCR-Staffel (inkl. Darlehen > Marktwert), Empfehlung bleibt an den Schwellen (Investment ≥ 70, Finanzierung ≥ 50). `zwei-scores-pruefen` V3/V5 nachgezogen, 96 Läufe grün; score-ketten 216 Punkte gleich.
+- **02.11.2026 · v3088 · Notar und Grundbuch nach GNotKG** (`45a00f5d`): `js/gnotkg.js`, Einstellung „nach Gebührenordnung berechnen“ (Vorgabe an), Quick-Check mit Darlehen nach Beleihung, Objekt: Vorbelegung wandert mit Kaufpreis/Darlehen bis zum eigenen Eintrag. `tools/gnotkg-pruefen.mjs` gegen Anlage 2 grün. Browser-Abnahme offen (Staging ohne Anmeldung).
 
 - **02.11.2026 · v3087 · Kaufnebenkosten** (`f70b090e`): Notar 1,7 → 1,0 %, Sonstige 1,5 → 0 und im Quick-Check nur bei eigenem Satz. Befund: GNotKG Tabelle B nachgerechnet (Beurkundung 2,0 + Vollzug 0,5 + Betreuung 0,5 + Grundschuld 1,0, USt): 150 T 1,17 %, 300 T 1,03 %, 500 T 0,90 %; Grundbuch 0,47–0,59 %. Alte gespeicherte 1,7/1,5 ohne Merker `nk_stand` gelten als Vorbelegung (Node-Lauf mit echten Dateien, vier Fälle). Browser-Abnahme Quick-Check offen (Staging ohne Anmeldung).
 
