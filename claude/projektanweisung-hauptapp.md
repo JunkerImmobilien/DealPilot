@@ -44112,3 +44112,10 @@ nur Vermieter-Programme mit Stand 02.11.2026, gültige Links. v3069: DSCR < 1,0 
 Score höchstens 49, in dealscore.js und dealscore2.js gleich, gespiegelt, Staging-Backend von Hand neu gebaut. **Commits**
 f01f3003, 93d4704d. **Nachweis** DealScore.computeFromKpis gut 91 / DSCR 0,95 → 49 (ohne Grenze 61). **Prod 1.0.17** Merge
 ba026c7. **Rest** Zwei-Score-Entscheidung (Demo), Bänder-Recherche, N89 Bau, N91 Förderregister (Lizenzfrage KfW).
+
+### v3070 — harte Grenze als DSCR-Staffel nach Recherche (02.11.2026) · Prod 1.0.18
+
+**Was.** `ScoreTier.dscrDeckel` (score-tiers.js, gespiegelt) als einzige Stelle; DS1 und DS2 lesen sie. Staffel
+1,2 / 1,0 / 0,8 → kein / 84 / 69 / 49, Kritisch 34 bei Darlehen über Marktwert (nur DS1). Ersetzt die pauschale 49 aus
+v3069. **Commit** c6bf9a84. **Nachweis** Staging 91/84/57/49/28. **Prod 1.0.18** Merge 16f34d6. **Rest** Zwei-Score-
+Entscheidung; Benchmark-Zins auf Markt (4,4 %) heben.

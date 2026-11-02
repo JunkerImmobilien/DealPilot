@@ -1677,6 +1677,15 @@ function _calcImmediate(){
     var kfwBox = el('d2_kfw_box');
     var tadBox = el('d2_tad_box');
     if (kfwBox) kfwBox.style.display = d2_type === 'kfw' ? '' : 'none';
+    /* v3072 · die Links in Darlehen 2 aus dem Förderregister (nur Kredite) */
+    var _kl = el('d2_kfw_links'), _fr = window.DpFoerderregister;
+    if (_kl && _fr && !_kl._dpGefuellt && d2_type === 'kfw') {
+      _kl._dpGefuellt = true;
+      _kl.innerHTML = (_fr.programme || []).filter(function (p) { return p.darlehen2; }).map(function (p) {
+        return '<li><a href="' + p.url + '" target="_blank" rel="noopener">' + p.name + ' →</a></li>'; }).join('')
+        + '<li><a href="' + _fr.konditionen_url + '" target="_blank" rel="noopener">Aktuelle KfW-Zinsen (Konditionenanzeiger) →</a></li>';
+      var _st = el('d2_kfw_stand'); if (_st) _st.textContent = 'Stand ' + String(_fr.stand).split('-').reverse().join('.') + '. Das KfW-Darlehen rechnet hier noch wie ein Annuitätendarlehen — tilgungsfreie Anlaufjahre und Tilgungszuschuss sind noch nicht abgebildet.';
+    }
     if (tadBox) tadBox.style.display = d2_type === 'tilgungsaussetzung' ? '' : 'none';
 
     // Hint für d2t
@@ -4397,72 +4406,20 @@ function updateFESH() {
   var hasFenster = selected.some(function(s) { return s.area === 'f'; });
   var hasDachFassade = selected.some(function(s) { return s.area === 'd'; });
 
-  /* v3068 · Marcel 02.11.2026: „KfW-Programme immer aktuell halten“. Recherche
-     design/Vorschläge/kfw-foerderregister-recherche.md (kfw.de/bafa.de, gelesen 02.11.2026):
-     ALLE bisherigen Links lieferten 404; KfW 458 versprach „bis 70 %, max. 23.500 €“ —
-     ein Vermieter bekommt nur die Grundförderung 30 % (1. WE höchstens 8.400 €); 261 nannte
-     „bis 45 %“ (KfW heute: bis zu 40 %, im Regelfall 5–15 %); BAFA lief auch für die Heizung
-     (die liegt seit Jahren bei KfW 458/459) und hatte eine Schwelle „< 60.000 €“ ohne Grundlage.
-     Jetzt: nur Programme, die für VERMIETER gelten, mit Stand. Das Förderregister (N91) löst
-     diese festen Texte später ab. */
-  var KFW_STAND = '02.11.2026';
+  /* v3072 · Die Empfehlungen kommen aus dem Förderregister (js/data/foerderregister.js,
+     gepflegt über das Jahreswerte-Register „foerderprogramme"). Bis v3071 standen die
+     Texte hier fest (v3068 hatte sie nach der Recherche korrigiert). */
+  var FR = window.DpFoerderregister || null;
+  var KFW_STAND = FR && FR.stand ? FR.stand.split('-').reverse().join('.') : '—';
   var hasHuelle = hasFenster || hasDachFassade;
-
-  // KfW 261 - Sanierung zum Effizienzhaus (Kredit mit Tilgungszuschuss)
-  if (hasEnergyMaßnahme) {
-    recommendations.push({
-      program: 'KfW 261 – Wohngebäude-Kredit (Sanierung zum Effizienzhaus)',
-      amount: 'bis 150.000 € je Wohneinheit',
-      benefit: 'Tilgungszuschuss je nach Effizienzhaus-Stufe, im Regelfall 5–15 %, mit Boni bis zu 40 % — nur, wenn das Gebäude insgesamt Effizienzhaus-Niveau erreicht',
-      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Bundesförderung-für-effiziente-Gebäude-Wohngebäude-Kredit-(261-262)/',
-      reason: 'Energetische Bereiche ausgewählt (' + selected.filter(function (x) { return ['f', 'h', 'd'].indexOf(x.area) >= 0; }).map(function (x) { return x.label; }).join(', ') + ')'
-    });
-  }
-
-  // KfW 458 - Heizungsförderung (Zuschuss) - für Vermieter nur die Grundförderung
-  if (hasHeating) {
-    recommendations.push({
-      program: 'KfW 458 – Heizungsförderung (Zuschuss)',
-      amount: 'für Vermieter 30 % Grundförderung: 1. Wohneinheit höchstens 8.400 € (30 % von 28.000 €), 2.–6. je bis 4.500 €',
-      benefit: 'Klimageschwindigkeits- und Einkommensbonus gibt es nur bei Selbstnutzung; GbR und Gesellschaften über KfW 459',
-      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Heizungsförderung-für-Privatpersonen-Wohngebäude-(458)/',
-      reason: 'Heizung ausgewählt'
-    });
-  }
-
-  // BAFA BEG Einzelmaßnahmen - nur Gebäudehülle (Fenster, Dämmung), NICHT die Heizung
-  if (hasHuelle) {
-    recommendations.push({
-      program: 'BAFA – Einzelmaßnahmen Gebäudehülle (Zuschuss)',
-      amount: '15 % Zuschuss, +5 % mit Sanierungsfahrplan (iSFP); förderfähig 1. WE bis 30.000 €, 2.–6. je 15.000 €',
-      benefit: 'Direktzuschuss für Fenster und Dämmung; der Heizungstausch läuft über KfW 458',
-      url: 'https://www.bafa.de/DE/Energie/Effiziente_Gebaeude/Sanierung_Wohngebaeude/Gebaeudehuelle/gebaeudehuelle_node.html',
-      reason: 'Fenster bzw. Dach/Fassade ausgewählt'
-    });
-  }
-
-  // KfW 359 - Ergänzungskredit zu einer Einzelmaßnahmen-Zusage
-  if (hasHeating || hasHuelle) {
-    recommendations.push({
-      program: 'KfW 359 – Ergänzungskredit Einzelmaßnahmen',
-      amount: 'bis 120.000 € je Wohneinheit',
-      benefit: 'Kredit zusätzlich zu einer Zuschuss-Zusage (KfW 458/459 oder BAFA, höchstens 12 Monate alt); ohne Einkommensgrenze',
-      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Einzelmaßnahmen-Ergänzungskredit-Wohngebäude-(358-359)/',
-      reason: 'Finanziert den Eigenanteil der Einzelmaßnahmen'
-    });
-  }
-
-  // KfW 159 - Altersgerecht Umbauen (Kredit, ohne Zuschuss)
   var hasBader = selected.some(function(s) { return s.area === 'b' || s.area === 's'; });
-  if (hasBader) {
-    recommendations.push({
-      program: 'KfW 159 – Altersgerecht Umbauen (Kredit)',
-      amount: 'bis 50.000 € je Wohneinheit',
-      benefit: 'Kredit für barrierereduzierende Umbauten (Bad, Türen, Aufzug); kein Zuschuss',
-      url: 'https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Altersgerecht-Umbauen-(159)/',
-      reason: 'Bad/Sanitär ausgewählt — wenn barrierereduzierend umgebaut wird'
-    });
-  }
+  var ausl = { energie: hasEnergyMaßnahme, heizung: hasHeating, huelle: hasHuelle, bad: hasBader };
+  var warum = { energie: 'Energetische Bereiche ausgewählt', heizung: 'Heizung ausgewählt', huelle: 'Fenster bzw. Dach/Fassade ausgewählt', bad: 'Bad/Sanitär ausgewählt — wenn barrierereduzierend umgebaut wird' };
+  (FR && FR.programme || []).forEach(function (pr) {
+    var treffer = (pr.ausloeser || []).filter(function (k) { return ausl[k]; });
+    if (!treffer.length) return;
+    recommendations.push({ program: pr.name, amount: pr.betrag, benefit: pr.vorteil, url: pr.url, reason: warum[treffer[0]] || '' });
+  });
 
   if (recommendations.length === 0) {
     kfwBox.style.display = 'none';

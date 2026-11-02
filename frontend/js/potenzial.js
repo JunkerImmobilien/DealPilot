@@ -290,11 +290,27 @@
       u: bad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
         : (f.ziel_wann ? String(f.ziel_wann) : 'Zielmiete und Maßnahmen darunter eintragen') });
     z._kapp = d.kapp && d.kapp.text;
+    /* v3071 · Marcel 02.11.2026: „ein Balkendiagramm IST / nach Mieterhöhung (wenn möglich,
+       sonst weglassen) / Zielbild". Werte €/Monat aus denselben Zeilen - nichts neu gerechnet. */
+    z._balken = [];
+    if (ist > 0) z._balken.push({ c: 'heute', t: 'Ist', v: ist });
+    if (ist > 0 && so.miete != null && so.miete > ist + 0.01) z._balken.push({ c: 'soll', t: 'nach Mieterhöhung', v: so.miete });
+    if (zq > 0 && wfl > 0) z._balken.push({ c: 'ziel', t: 'Zielbild', v: zq * wfl, bad: bad });
     return z;
+  }
+  function balkenHtml(b) {
+    if (!b || b.length < 2) return '';   /* ein Balken allein sagt nichts */
+    var max = Math.max.apply(null, b.map(function (x) { return x.v; })) || 1, basis = b[0].v;
+    return '<div class="dp-mb" role="img" aria-label="Miete je Monat: ' + b.map(function (x) { return x.t + ' ' + eur(x.v); }).join(', ') + '">'
+      + b.map(function (x) {
+        var dif = (x !== b[0] && basis > 0) ? ' <small>' + (x.v >= basis ? '+' : '') + Math.round((x.v / basis - 1) * 100) + ' %</small>' : '';
+        return '<div class="dp-mb-s dp-mb-' + x.c + (x.bad ? ' dp-mb-bad' : '') + '"><b>' + eur(x.v) + dif + '</b>'
+          + '<span class="dp-mb-bar" style="height:' + Math.max(8, Math.round(x.v / max * 92)) + 'px"></span><i>' + esc(x.t) + '</i></div>';
+      }).join('') + '</div>';
   }
   function leiterHtml(z) {
     leiterStil();
-    return '<div class="dp-ml">' + z.map(function (r, j) {
+    return balkenHtml(z._balken) + '<div class="dp-ml">' + z.map(function (r, j) {
       return '<div class="dp-ml-z dp-ml-' + r.c + (r.bad ? ' dp-ml-bad' : '') + '"><span class="dp-ml-p"></span>'
         + '<div class="dp-ml-txt"><span class="dp-ml-t">' + esc(r.t) + (r.tag ? ' <i>' + esc(r.tag) + '</i>' : '') + '</span>'
         + '<b class="dp-ml-v">' + esc(r.v) + '</b>' + (r.u ? '<span class="dp-ml-u">' + esc(r.u) + '</span>' : '') + '</div>'
@@ -324,7 +340,15 @@
       '.dp-ml-bad .dp-ml-v{color:#B8625C}.dp-ml-bad .dp-ml-p{background:#B8625C}',
       '.dp-ml-k{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;color:#2A2727;border-radius:7px;padding:5px 9px;font:500 12px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
       '.dp-ml-k:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,#fff)}',
-      '.dp-ml-fuss{font-size:11.5px;color:#8A8272;margin:6px 0 0;line-height:1.45}'
+      '.dp-ml-fuss{font-size:11.5px;color:#8A8272;margin:6px 0 0;line-height:1.45}',
+      /* v3071 · Balken Ist / nach Mieterhöhung / Zielbild */
+      '.dp-mb{display:flex;align-items:flex-end;gap:14px;padding:10px 14px 8px;margin:0 0 10px;border:1px solid #EFE7D6;border-radius:10px;background:#fff}',
+      '.dp-mb-s{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}',
+      '.dp-mb-s b{font:600 13px/1.2 "Space Grotesk",sans-serif;color:#2A2727;white-space:nowrap}',
+      '.dp-mb-s b small{font:500 11px Inter,sans-serif;color:#2f7d55}',
+      '.dp-mb-bar{display:block;width:100%;max-width:70px;border-radius:6px 6px 2px 2px;background:#8A8272}',
+      '.dp-mb-soll .dp-mb-bar{background:#3d6fa8}.dp-mb-ziel .dp-mb-bar{background:#2f7d55}.dp-mb-bad .dp-mb-bar{background:#B8625C}',
+      '.dp-mb-s i{font:500 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.05em;text-transform:uppercase;color:#7A7370;font-style:normal;text-align:center}'
     ].join('');
     document.head.appendChild(s);
   }

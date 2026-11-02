@@ -375,6 +375,26 @@
         { "datei": "backend/src/services/marketRatesService.js", "bezeichner": "STATIC_MARKET_CONTEXT, STATIC_PFANDBRIEF" }
       ],
       "hinweis": "Die Werte kommen im Betrieb live; ueberfaellig heisst hier nur: der Rueckfall ist alt (Warnung, kein Abbruch)."
+    },
+    {
+      "id": "foerderprogramme",
+      "name": "Förderprogramme KfW/BAFA für Vermieter (Bedingungen, Höchstbeträge, Links)",
+      "gruppe": "finanzierung",
+      "stand": "Recherche 02.11.2026 (kfw.de, bafa.de)",
+      "wert_text": "261, 458 (Grundförderung 30 %), BAFA Gebäudehülle, 359, 159, 298, 296; Zinsen nur verlinkt",
+      "erwartet": "2026-11-02",
+      "quelle": "design/Vorschläge/kfw-foerderregister-recherche.md; kfw.de Produktseiten, bafa.de; Konditionenanzeiger kfw-formularsammlung.de",
+      "turnus": "monatlich prüfen (Programmänderungen, Budgets); bekannte Termine: 15.12.2026 Budget EH 55 Neubau, 01.02.2027 Absenkung 458",
+      "faellig_am": "2026-12-01",
+      "verfahren": "agent",
+      "orte": [
+        {
+          "datei": "frontend/js/data/foerderregister.js",
+          "bezeichner": "stand",
+          "muster": "stand: '([\\d-]+)'"
+        }
+      ],
+      "hinweis": "Jeder Link muss HTTP 200 liefern (Umlaute prozent-kodiert prüfen). Zinsen nicht übernehmen (KfW-Impressum), nur verlinken."
     }
   ]
 }
