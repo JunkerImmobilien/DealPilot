@@ -41,7 +41,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 Befund und Demo: `wissen/2026-11-02.md` Teil 14, `frontend/demo-quickcheck-bewertung.html`. Eine Karte statt sechs Blöcke, eine
 Schrift, Lageklasse Standard B und wirksam im Ergebnis, Marktspanne als „im Rahmen", Zielkaufpreis mit greifender Grenze,
 keine Kappungserhöhung ohne Mieter, Rechtsquelle mit Link (`mietpotenzial-kern.js:130` „von DealPilot gesetzt“ ersetzen).
-Wartet auf Marcels Abnahme der Demo.
+**Umgesetzt v3081/a/b (02.11.2026)** nach Marcels Abnahme — Score unberührt, Urteil „Objekt passt — Finanzierung prüfen" mit Eigenkapitalbedarf, Lageklasse Standard B. Offen: Lageklasse A/C am echten Lauf nachmessen.
 
 ### N94 · Bayern-Bodenrichtwerte — Bezugswege (02.11.2026)
 
