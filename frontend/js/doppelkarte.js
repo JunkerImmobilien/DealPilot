@@ -291,6 +291,11 @@
         if (!b) return;
         ev.stopPropagation();
         modusSetzen(b.getAttribute('data-dk-modus') === 'ankauf');
+        /* v3061 · Marcel 02.11.2026: „wenn wir in der Seitenleiste auf Bestand oder
+           Ankauf klicken, soll sich automatisch die Objektliste öffnen". Der Schalter
+           filterte nur - die Liste blieb hinter „Portfolio" zugeklappt (#sb-list 0 px).
+           Nur auf den KLICK, nicht beim Laden (modusSetzen läuft auch von dort). */
+        try { if (window.DealPilotLayout && DealPilotLayout.portfolio) DealPilotLayout.portfolio(false); } catch (e) {}
       });
       /* v2040 - NICHT mehr in die Liste. Marcel: „das soll ganz nach
          oben ... unter das DealPilot Logo."
