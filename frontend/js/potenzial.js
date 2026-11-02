@@ -188,6 +188,77 @@
   }
 
 
+
+  /* ══ v3064 · STANDARDHEBUNG — DIE FESH-REGEL ═══════════════════════════
+     Marcel 02.11.2026: „die FESH-Regel, also Fenster, Elektrik, Sanitär, Heizung
+     einhalten und den Kunden hinweisen, dass wenn wir darüber kommen und den
+     Standard in über zwei Gewerken heben, wir über 50 Jahre bzw. die
+     Abschreibungszeit verteilen müssen und es kein Erhaltungsaufwand ist."
+     Rechtsgrundlage: BMF-Schreiben vom 26.01.2026 (ersetzt die Schreiben vom
+     18.07.2003 und 20.10.2017): Standardhebung = wesentliche Verbesserung, wenn ein
+     Maßnahmenbündel mindestens DREI der vier zentralen Bereiche Heizung, Sanitär,
+     Elektro, Fenster deutlich verbessert — maßgeblich ausschließlich diese vier.
+     Dann Herstellungskosten (AfA), kein Erhaltungsaufwand. Eine Wärmepumpe allein
+     hebt den Standard nicht; energetische Wirkung allein reicht nicht.
+     DealPilot kann nicht sehen, ob „deutlich gehoben" oder „zeitgemäß ersetzt" —
+     deshalb ein HINWEIS, keine stille Umbuchung. Leitungen zählen vorsichtig für
+     Sanitär UND Elektro (sie umfassen Wasser/Abwasser und Strom). */
+  var FESH = { fenster: ['F'], elektrik: ['E'], bad: ['S'], leitungen: ['S', 'E'], heizung: ['H'] };
+  var FESH_NAME = { F: 'Fenster', E: 'Elektro', S: 'Sanitär', H: 'Heizung' };
+  function afaJahre() {
+    try {
+      var v = wert('afa_satz') || '2.0';
+      var p = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(v) : { methode: 'linear', satzPct: parseFloat(String(v).replace(',', '.')) || 2 };
+      var s = (p.methode !== 'linear') ? 3 : p.satzPct;
+      if (!(s > 0)) return 50;
+      return Math.round(100 / s * 10) / 10;
+    } catch (e) { return 50; }
+  }
+  function standardhebung(liste, buchstaben) {
+    var set = {};
+    (liste || []).forEach(function (m) { (FESH[m && m.id] || []).forEach(function (b) { set[b] = 1; }); });
+    String(buchstaben || '').split(/[,\s]+/).forEach(function (b) { if (FESH_NAME[b]) set[b] = 1; });
+    var b = ['F', 'E', 'S', 'H'].filter(function (x) { return set[x]; });
+    return { bereiche: b.map(function (x) { return FESH_NAME[x]; }), anzahl: b.length, hebung: b.length >= 3 };
+  }
+  function standardhebungHtml(liste, buchstaben) {
+    var r = standardhebung(liste, buchstaben);
+    if (r.anzahl < 2) return '';
+    var j = afaJahre(), jt = (Math.abs(j - 100 / 3) < 0.1) ? '33⅓' : String(j).replace('.', ',');
+    var stil = 'margin:10px 0 0;padding:9px 12px;border-radius:8px;font-size:12.5px;line-height:1.5;';
+    if (!r.hebung) return '<div class="dp-fesh dp-fesh-2" style="' + stil + 'background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 10%,#fff);border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 35%,transparent)">'
+      + '<b>Steuer · 2 von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). Kommt ein dritter dazu — Fenster, Elektro, Sanitär oder Heizung — '
+      + 'und wird der Standard dabei deutlich gehoben, sind die Kosten Herstellungskosten (AfA über ' + jt + ' Jahre), kein Erhaltungsaufwand (BMF-Schreiben vom 26.01.2026).</div>';
+    return '<div class="dp-fesh dp-fesh-3" style="' + stil + 'background:color-mix(in srgb,#B8625C 8%,#fff);border:1px solid color-mix(in srgb,#B8625C 35%,transparent)">'
+      + '<b style="color:#B8625C">Steuer · Standardhebung: ' + r.anzahl + ' von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). '
+      + 'Wird dabei der Standard jeweils deutlich gehoben (nicht nur zeitgemäß ersetzt), sind die Kosten <b>Herstellungskosten</b>: '
+      + 'sie laufen über die AfA des Gebäudes (bei deinem Satz ' + jt + ' Jahre) und sind <b>kein sofort abziehbarer Erhaltungsaufwand</b> — '
+      + 'auch unterhalb der 15-%-Grenze. Eine neue Wärmepumpe allein hebt den Standard nicht. Grundlage: BMF-Schreiben vom 26.01.2026; bitte mit dem Steuerberater abstimmen.</div>';
+  }
+  /* Vier Haken an den Sanierungskosten (Tab Investition), gespeichert in #san_fesh (z. B. „F,S,H"). */
+  function feshBinden() {
+    var host = el('san-fesh'); if (!host) return;
+    var fld = el('san_fesh');
+    var boxes = host.querySelectorAll('input[data-fesh]');
+    function lesen() { var v = String((fld && fld.value) || ''); boxes.forEach(function (b) { b.checked = v.indexOf(b.getAttribute('data-fesh')) >= 0; }); }
+    function zeichnen() {
+      var h = el('san-fesh-hinweis'); if (!h) return;
+      var zb = standardhebung(objektMassnahmen());
+      var html = standardhebungHtml([], fld ? fld.value : '');
+      if (!html && zb.anzahl >= 2) html = '<div class="hint" style="margin-top:6px">Laut Zielbild-Maßnahmen betroffen: ' + esc(zb.bereiche.join(', ')) + ' — oben ankreuzen, wenn der Standard dort deutlich gehoben wird.</div>';
+      h.innerHTML = html;
+    }
+    if (!host._dpFesh) {
+      host._dpFesh = true;
+      boxes.forEach(function (b) { b.addEventListener('change', function () {
+        var v = [].slice.call(boxes).filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute('data-fesh'); }).join(',');
+        if (fld) { fld.value = v; try { fld.dispatchEvent(new Event('input', { bubbles: true })); fld.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
+        zeichnen();
+      }); });
+    }
+    lesen(); zeichnen();
+  }
+
   /* ══ v3062 · MIETPREISBREMSE UND MIETRECHT AUF EINEN BLICK ══════════════
      Marcel 02.11.2026: „ja, die Mietpreisbremse kannst du umsetzen und die
      Kappungsgrenzen — und stellst du es auch einfacher dar?"
@@ -246,7 +317,8 @@
         /* v3062a · die § 559-Umlage gehört in die Zeile: Wohnung 3 Westerfeldstr. stieg auf 9,92 €/m² bei
            Vergleichsmiete 8,40 - 588 € nach § 558 plus 107 € Umlage. „Grenze: Vergleichsmiete" allein war falsch. */
         u: (s.termine ? s.termine.text : '') + (s.grenze ? ' · Grenze § 558: ' + s.grenze : '')
-          + (s.umlage559 && s.umlage559.monat > 0 ? ' · darin Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat' : '')
+          + (s.umlage559 && s.umlage559.monat > 0 ? ' · darin Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat'
+              + (s.umlage559.ohne_erh ? ' (Erhaltungsanteil nicht eingetragen — 0 % abgezogen)' : '') : '')
           + (s.herkunft === 'eigene Angabe' ? ' · eigene Angabe' : ''),
         warn: !!(s.termine && s.termine.letzte_fehlt) || !!(s.hinweise && s.hinweise.length),
         lang: [s.termine && s.termine.sperre, (s.hinweise || []).join(', ')].filter(Boolean).join(' · ') });
@@ -537,7 +609,11 @@
     var roh = k * 0.08 / 12;
     var kappeQm = (istM > 0 && istM / wfl < 7) ? 2 : 3;
     var deckel = kappeQm * wfl;
-    return { monat: Math.min(roh, deckel), kosten: k, gedeckelt: roh > deckel, kappe_qm: kappeQm };
+    /* v3064 · Marcel: „kann ich wirklich alles auf die Miete umlegen?" - nein: nur der
+       Modernisierungsanteil. Ohne eingetragenen Erhaltungsanteil zieht DealPilot 0 % ab; das
+       stimmt nur, wenn nichts Altes, Abgängiges ersetzt wird. Gezählt, damit es gesagt wird. */
+    var ohneErh = (liste || []).filter(function (m) { return m.bewohnt && m.id !== 'renovierung' && (m.erh == null || String(m.erh).trim() === ''); }).length;
+    return { monat: Math.min(roh, deckel), kosten: k, gedeckelt: roh > deckel, kappe_qm: kappeQm, ohne_erh: ohneErh };
   }
   /**
    * Soll-Miete einer Wohnung (€/Monat) samt Herkunft.
@@ -2240,6 +2316,7 @@
           + herkunftHtml()   /* v2988 */
           + indexmieteHtml(m);   /* v3026 */
       }
+      try { feshBinden(); } catch (e) {}   /* v3064 */
       try { mietrechtKarte(); } catch (e) { console.warn('[mietrecht]', e); }   /* v3062 */
       return;
     }
@@ -2270,6 +2347,8 @@
     if (m.aktiv) host.innerHTML += herkunftHtml();   /* v2988 */
     var ih = indexmieteHtml(m);   /* v3026 */
     if (ih) host.innerHTML = (m.aktiv ? host.innerHTML : '') + ih;
+    host.innerHTML += standardhebungHtml(objektMassnahmen());   /* v3064 */
+    try { feshBinden(); } catch (e) {}
     try { mietrechtKarte(); } catch (e) { console.warn('[mietrecht]', e); }   /* v3062 */
   }
   function bindeObjektFelder() {
@@ -2283,6 +2362,7 @@
     kappungLaden().then(function () { objektKarte(); });
     bindeObjektFelder();
     objektKarte();
+    try { feshBinden(); } catch (e) {}   /* v3064 */
     var a = el('objart'); if (a && !a._dpZb) { a._dpZb = true; a.addEventListener('change', objektKarte); }
     /* me_modus ist ein verstecktes Feld: setzt es die Übernahme aus Sprache
        oder Import, folgt der Modus (Knöpfe, Rechnung) hier. */
@@ -2403,6 +2483,7 @@
 
   window.DpPotenzial = {
     mietpreisbremse: mietpreisbremse, mietrechtDaten: mietrechtDaten, mietrechtHtml: mietrechtHtml, mietrechtKarte: mietrechtKarte,   /* v3062 */
+    standardhebung: standardhebung, standardhebungHtml: standardhebungHtml, feshBinden: feshBinden,   /* v3064 */
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
     ohneZielbild: ohneZielbild,   /* v3018d */
     KENNZEICHNUNG: KENNZEICHNUNG, GESPERRT_KURZ: GESPERRT_KURZ, GESPERRT_LANG: GESPERRT_LANG, gesperrt: gesperrt, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,

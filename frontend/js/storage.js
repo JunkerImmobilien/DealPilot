@@ -82,7 +82,7 @@ var FIELDS = [
   'ek','d1','d1z','d1t','d1_bindj','anschl_z','anschl_t','anschl_bj',
   'hg_ul','grundsteuer','ul_sonst','hg_nul','weg_r','eigen_r',
   'mietausfall','nul_sonst','kp1','kp1l','kp2','kp2l','kp3','kp3l','kp4','kp4l',
-  'bank_inst',   /* v3059: ai_strat/ai_verk/ai_risk/ai_markt raus - kein Eingabefeld mehr, die Werte stehen im Investmentprofil */
+  'bank_inst', 'san_fesh',   /* v3064: FESH-Haken an den Sanierungskosten */ /* v3059: ai_strat/ai_verk/ai_risk/ai_markt raus - kein Eingabefeld mehr, die Werte stehen im Investmentprofil */
   'd2','d2z','d2t','d2_bindj','d2_inst','d2_type','bwk_ul_pct','bwk_nul_pct','bwk_kp_pct',
   // V63.49: D1-Typ + Bausparvertrag
   'd1_type', 'd1_auszahl', 'd1_vertrag',

@@ -626,6 +626,8 @@
           + '<div><span>Zielmiete</span><b class="c-ziel">' + (w.ziel != null ? eur(w.ziel) + '/Monat' : '—') + '</b></div>'
           + '<div><span>Kosten gesamt</span><b>' + eur(w.kosten) + (w.kosten_haus ? '<small style="display:block;font-weight:400;color:#8A8272">davon Anteil Haus ' + eur(w.kosten_haus) + '</small>' : '') + '</b></div>'
           + '<div><span>Modernisierungspunkte</span><b>' + (pkt ? '+' + pkt : '0') + ' (Anlage 2)</b></div></div>'
+          /* v3064 · FESH-Regel: Wohnungs- und Hausmaßnahmen zusammen (potenzial.js standardhebungHtml) */
+          + (P.standardhebungHtml ? P.standardhebungHtml((w.massnahmen || []).concat((m.haus && m.haus.massnahmen) || [])) : '')
           + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus: Maßnahmen dafür trägst du im Schritt Gebäude unter „Maßnahmen am ganzen Haus“ ein — ihr Kostenanteil und ihre Punkte sind hier schon enthalten. Die Zielmiete fließt nicht in die Mietentwicklung — nur in Pilot-Analyse und PDF.</p>';
       }
       ewZeichnen(m);
