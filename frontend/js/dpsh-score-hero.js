@@ -393,9 +393,11 @@
   function zweiHtml(d) {
     var r2 = d.r2, inv = r2.investment, fin = r2.finanzierung, ges = r2.gesamt, em = ges.empfehlung || { fehlt: [] };
     var deckel = ges.deckel
-      ? '<span class="dpz-deckel">DSCR-Grenze greift \u00b7 h\u00f6chstens ' + ges.deckel.max + (ges.gedeckelt ? ' (Investment ' + inv.score + ')' : '') + '</span>'
+      ? '<span class="dpz-deckel">DSCR-Grenze greift \u00b7 h\u00f6chstens ' + ges.deckel.max + (ges.gedeckelt ? ' (ohne Grenze ' + ges.score_ohne_deckel + ')' : '') + '</span>'
       : '';
-    var warum = 'Investment <b>' + inv.score + '</b> (Schwelle ' + inv.schwelle + ') \u00b7 Finanzierung <b>' + fin.score + '</b> (Schwelle ' + fin.schwelle + '). ' +
+    /* v3088: der Gesamtscore ist das gewichtete Mittel, die Empfehlung kommt aus den zwei Schwellen. */
+    var warum = 'Gesamt aus Investment <b>' + inv.score + '</b> (' + zZahl(inv.anteil) + '\u00a0%) und Finanzierung <b>' + fin.score + '</b> (' + zZahl(fin.anteil) + '\u00a0%). ' +
+      'Empfehlung nach Schwellen: Investment ab ' + inv.schwelle + ', Finanzierung ab ' + fin.schwelle + '. ' +
       ((em.fehlt && em.fehlt.length) ? 'Nicht erreicht: ' + listDe(em.fehlt) + '.' : 'Beide Schwellen erreicht.') +
       (ges.deckel ? ' ' + esc(ges.deckel.grund) + '.' : '');
     var kopf = '<div class="dpz-kopf">' +
@@ -413,8 +415,7 @@
     else if (fin.gedeckelt) finFuss = 'Ohne Grenze ' + fin.score_ohne_deckel + ' \u2192 begrenzt auf ' + fin.score + ': ' + esc(fin.deckel) + '.';
     else if (fin.deckel) finFuss = 'DSCR-Grenze (h\u00f6chstens ' + ges.deckel.max + ') \u00e4ndert hier nichts: ' + esc(fin.deckel) + '.';
     else finFuss = 'DSCR ab 1,2 \u2014 keine Grenze.';
-    var invFuss = 'Ein-Score-Ansicht: ' + r2.score + ' / 100 (' + esc(r2.label) + ').' +
-      (ges.gedeckelt ? ' Gesamturteil auf ' + ges.score + ' begrenzt.' : '');
+    var invFuss = 'Zählt ' + zZahl(inv.anteil) + '\u00a0% zum Gesamtscore ' + ges.score + '.';
     return '<div class="dpz">' + kopf +
       '<div class="dpz-zwei">' +
         zKarte('Investment-Score', 'Wie gut ist die Immobilie, egal wie sie finanziert wird?', inv, invFuss) +

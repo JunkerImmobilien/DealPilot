@@ -138,7 +138,8 @@ for (const preset of PRESETS) {
       }
       /* V3 */
       const dk = ScoreTier.dscrDeckel(deal.dscr, deal.darlehen > deal.marktwert);
-      const erwG = dk ? Math.min(r.investment.score, dk.max) : r.investment.score;
+      /* v3088: Gesamt = Gesamtscore ohne Grenze, begrenzt mit der Staffel (inkl. Darlehen > Marktwert) */
+      const erwG = dk ? Math.min(r.score_ohne_deckel, dk.max) : r.score_ohne_deckel;
       pruef(r.gesamt.score === erwG, `V3 ${tag}: Gesamt ${r.gesamt.score} ≠ ${erwG}`);
       if (dk) pruef(r.finanzierung.score <= dk.max, `V3 ${tag}: Finanzierung ${r.finanzierung.score} über ${dk.max}`);
       pruef(r.gesamt.stufe === ScoreTier.stufe(r.gesamt.score).wort, `V3 ${tag}: Stufe ${r.gesamt.stufe}`);
@@ -157,7 +158,7 @@ for (const preset of PRESETS) {
   const { deal } = dealFuer(FAELLE[6], 'vgl', { barkauf: true });
   const r = DealScore2.compute(deal, cfg);
   pruef(r.gesamt.deckel === null && r.finanzierung.barkauf === true, 'V5 Barkauf: Grenze oder Barkauf-Kennung falsch');
-  pruef(r.gesamt.score === r.investment.score, 'V5 Barkauf: Gesamt ≠ Investment');
+  pruef(r.gesamt.score === r.score, 'V5 Barkauf: Gesamt ≠ Gesamtscore');   /* v3088 */
   pruef(r.investment.score < 70 || r.gesamt.empfehlung.text === 'Kaufen', `V5 Barkauf: Empfehlung „${r.gesamt.empfehlung.text}" bei Investment ${r.investment.score}`);
 }
 

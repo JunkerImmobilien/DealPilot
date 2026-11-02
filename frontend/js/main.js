@@ -55,6 +55,32 @@ function _dpProfilWert(schluessel, rueckfall) {
    auf Knopfdruck, mit Anzeige vorher/nachher und „Rueckgaengig". Die
    Grunderwerbsteuer: ist die Automatik an (grest_auto), der Satz des Bundeslands
    aus der Postleitzahl, sonst der Satz des Profil-Bundeslands. */
+/* v3088 · Notar und Grundbuch nach Gebuehrenordnung (gnotkg.js), wenn die Einstellung an ist und
+   ein Kaufpreis dasteht. Darlehen: Feld d1, sonst der Kaufpreis (Grundschuld in voller Hoehe). */
+function _dpNkGnotkg() {
+  try {
+    var IP = window.DealPilotInvestmentProfile, G = window.DealPilotGnotkg;
+    if (!G || (IP && IP.get && IP.get('nk_gnotkg') === false)) return null;
+    var kp = parseDe((el('kp') || {}).value || ''); if (!(kp > 0)) return null;
+    var d = parseDe((el('d1') || {}).value || ''); if (!(d > 0)) d = kp;
+    return { notar: G.notar(kp, d).pct, gb: G.grundbuch(kp, d).pct };
+  } catch (e) { return null; }
+}
+/* Solange Notar und Grundbuch noch die selbst gesetzte Vorbelegung tragen (Merker data-gn-auto
+   = derselbe Wert), wandern sie mit Kaufpreis und Darlehen mit. Wer einen eigenen Satz tippt,
+   beendet das fuer dieses Feld. Laeuft in der Capture-Phase VOR calc() des Feldes. */
+function _dpNkGnotkgNachziehen() {
+  var gn = _dpNkGnotkg(); if (!gn) return;
+  [['notar_p', gn.notar, 'notar'], ['gba_p', gn.gb, 'gba']].forEach(function (z) {
+    var e = el(z[0]); if (!e || e.dataset.gnAuto == null || e.value !== e.dataset.gnAuto) return;
+    var neu = String(z[1]).replace('.', ','); if (neu === e.value) return;
+    e.value = neu; e.dataset.gnAuto = neu;
+    try { if (typeof syncCostPct === 'function') syncCostPct(z[2]); } catch (x) {}
+  });
+}
+document.addEventListener('input', function (ev) {
+  var id = ev.target && ev.target.id; if (id === 'kp' || id === 'd1') _dpNkGnotkgNachziehen();
+}, true);
 function _dpNkZiel() {
   var gest = null;
   try {
@@ -64,7 +90,8 @@ function _dpNkZiel() {
     if (auto && G && G.forPlz && plz) { var r = G.forPlz(plz); if (r && isFinite(r.rate)) gest = r.rate; }
     if (gest == null) { var bl = IP && IP.get && IP.get('bundesland'); if (bl && G && G.rates && isFinite(G.rates[bl])) gest = G.rates[bl]; }
   } catch (e) {}
-  return { notar_p: _dpProfilWert('notar_pct', 1.00), gba_p: _dpProfilWert('grundbuch_pct', 0.50),
+  var _gn = _dpNkGnotkg();   /* v3088 */
+  return { notar_p: _gn ? _gn.notar : _dpProfilWert('notar_pct', 1.00), gba_p: _gn ? _gn.gb : _dpProfilWert('grundbuch_pct', 0.50),
            makler_p: _dpProfilWert('maklerkosten', 0), ji_p: _dpProfilWert('sonstige_nk_pct', 0),
            gest_p: gest != null ? gest : 6.50 };
 }
@@ -102,6 +129,8 @@ function setDefaults() {
      Makler gar nicht. Die Grunderwerbsteuer: Satz des Bundeslands aus dem Profil;
      ist die Automatik an, setzt grest-plz-lookup.js ihn nach der Postleitzahl. */
   sv('notar_p',  _dpProfilWert('notar_pct', 1.00));   /* v3087 */
+  /* v3088: Merker - die Vorbelegung darf mit dem Kaufpreis nach Gebuehrenordnung mitwandern */
+  try { if (!(window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get('nk_gnotkg') === false)) { el('notar_p').dataset.gnAuto = el('notar_p').value; } else { delete el('notar_p').dataset.gnAuto; } } catch (e) {}
   sv('makler_p', _dpProfilWert('maklerkosten', 0));
   /* v1238 · Testbericht Block D: „Grundbuchamt mit 0,5 % vorbelegen — der
      Anwender kennt den Wert nicht."
@@ -114,6 +143,7 @@ function setDefaults() {
      NEUE Objekte. Bestehende behalten ihren gespeicherten Wert — ihre
      Zahlen verschieben sich nicht rueckwirkend. */
   sv('gba_p',   _dpProfilWert('grundbuch_pct', 0.50));
+  try { if (!(window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get('nk_gnotkg') === false)) { el('gba_p').dataset.gnAuto = el('gba_p').value; } else { delete el('gba_p').dataset.gnAuto; } } catch (e) {}
   sv('gest_p',  (function () {
     try {
       var bl = window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get('bundesland');

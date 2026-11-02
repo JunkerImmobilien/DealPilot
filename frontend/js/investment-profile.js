@@ -348,6 +348,11 @@ window.DealPilotInvestmentProfile = (function() {
         field('ip_maklerkosten',    'Maklergebühr',      get('maklerkosten'),    '%', 'inkl. MwSt — 0, wenn ohne Makler'),
         field('ip_sonstige_nk_pct', 'Sonstige Kosten',   get('sonstige_nk_pct'), '%', 'nur wenn du sie ansetzt — Gutachten, Anfahrt'),
       '</div>',
+      /* v3088 · Notar und Grundbuch nach Gebuehrenordnung (gnotkg.js) */
+      '<label class="ip-check" style="display:flex;gap:9px;align-items:flex-start;margin:6px 0 10px;cursor:pointer;font-size:13px;line-height:1.45">'
+        + '<input type="checkbox" id="ip_nk_gnotkg" style="margin-top:3px"' + (get('nk_gnotkg') === false ? '' : ' checked') + '>'
+        + '<span><b>Notar und Grundbuch nach Gebührenordnung berechnen</b><br><span class="hint" style="color:var(--muted)">'
+        + 'Die Gebühren sind gesetzlich festgelegt (GNotKG) und steigen mit Kaufpreis und Darlehen, aber langsamer: bei 150.000 € rund 1,2 % Notar, bei 500.000 € rund 0,9 %. Ohne Haken gelten die festen Sätze oben.</span></span></label>',
       /* v2261 · Grunderwerbsteuer automatisch nach Bundesland */
       '<label class="ip-check" style="display:flex;gap:9px;align-items:flex-start;margin:6px 0 16px;cursor:pointer;font-size:13px;line-height:1.45">'
         + '<input type="checkbox" id="ip_grest_auto" style="margin-top:3px"' + (get('grest_auto') === false ? '' : ' checked') + '>'
@@ -448,6 +453,7 @@ window.DealPilotInvestmentProfile = (function() {
       sonstige_nk_pct:        v('ip_sonstige_nk_pct'),
       nk_stand:               'v3087',   /* ab hier ist jeder Nebenkosten-Satz selbst gesetzt */
       grest_auto:             (function(){ var c = document.getElementById('ip_grest_auto'); return c ? !!c.checked : null; })(),
+      nk_gnotkg:              (function(){ var c = document.getElementById('ip_nk_gnotkg'); return c ? !!c.checked : null; })(),   /* v3088 */
       maklerkosten:           v('ip_maklerkosten'),
       angebot_abschlag_pct:   v('ip_angebot_abschlag_pct'),   /* v2237 · leer -> Marktdurchschnitt */
       abschlag_deckeln:       (function(){ var c = document.getElementById('ip_abschlag_deckeln'); return c ? !!c.checked : null; })(),   /* v3043 */

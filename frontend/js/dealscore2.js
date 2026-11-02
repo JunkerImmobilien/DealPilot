@@ -755,7 +755,7 @@ window.DealScore2 = (function() {
     var completeness = totalKpis > 0 ? totalAvailable / totalKpis : 0;
 
     /* v3076 · zwei Scores, immer gerechnet; `score` oben bleibt unverändert. */
-    var zwei = _zweiScores(cats, cfg, deal);
+    var zwei = _zweiScores(cats, cfg, deal, scoreOhneDeckel);   /* v3088 */
 
     return {
       investment: zwei.investment,       /* v3076 */
@@ -900,7 +900,12 @@ window.DealScore2 = (function() {
     return s >= 85 ? 'Sehr gut' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : s >= 35 ? 'Schwach' : 'Kritisch';
   }
 
-  function _zweiScores(cats, cfg, deal) {
+  /* v3088 · Marcel 02.11.2026 (Westerfeldstr.: Seitenleiste 72, Gesamturteil 69): „oben in der
+     schwarzen Leiste einfach den Gesamtscore anzeigen“. Das Gesamturteil ist jetzt der EINE
+     Investor Deal Score (gewichtetes Mittel beider Teile, dieselbe Zahl wie Seitenleiste, Karte
+     und PDF), begrenzt mit derselben DSCR-Staffel. Die Empfehlung haengt weiter an den zwei
+     Schwellen. gesamtOhne fehlt nur im Pruefer-Aufruf V2 - dann wie bisher der Investment-Score. */
+  function _zweiScores(cats, cfg, deal, gesamtOhne) {
     var inv = _zweiTeil(ZWEI_ZUORDNUNG.investment, cats, cfg);
     var fin = _zweiTeil(ZWEI_ZUORDNUNG.finanzierung, cats, cfg);
     var barkauf = _ds2Barkauf(deal);
@@ -912,7 +917,8 @@ window.DealScore2 = (function() {
     var iS = Math.round(inv.roh);
     var fRoh = Math.round(fin.roh);
     var fS = (dk && fRoh > dk.max) ? dk.max : fRoh;
-    var gS = (dk && iS > dk.max) ? dk.max : iS;
+    var gRoh = (gesamtOhne != null && isFinite(gesamtOhne)) ? Math.round(gesamtOhne) : iS;
+    var gS = (dk && gRoh > dk.max) ? dk.max : gRoh;
 
     /* Trägt die Miete den Kapitaldienst nicht (Grenze unter 70, also DSCR < 1,0),
        ist die Finanzierung nicht erfüllt — auch wenn ihr Score noch 50 erreicht. */
@@ -945,7 +951,7 @@ window.DealScore2 = (function() {
       gesamt: {
         score: gS, stufe: _zweiStufe(gS),
         deckel: dk ? { max: dk.max, grund: dk.grund } : null,
-        gedeckelt: gS < iS,
+        gedeckelt: gS < gRoh, score_ohne_deckel: gRoh,
         ueberMarktwert: ueber,
         empfehlung: { text: text, art: art, fehlt: fehlt }
       }

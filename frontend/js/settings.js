@@ -716,7 +716,7 @@ function showSettings(initialTab) {
                   '<span><b>' + t + '</b><br><span style="opacity:.72;font-size:12px">' + s + '</span></span></label>';
               }
               return opt('eins', 'Ein Investor Deal Score (wie bisher)', 'Ein Ring über alle 24 Kennzahlen.') +
-                     opt('zwei', 'Zwei Scores: Investment + Finanzierung', 'Objekt und Finanzierung getrennt bewertet; Gesamturteil = Investment-Score, höchstens bis zur DSCR-Grenze. Objektkarte und Seitenleiste zeigen weiter einen Wert.');
+                     opt('zwei', 'Zwei Scores: Investment + Finanzierung', 'Objekt und Finanzierung getrennt bewertet, darüber der Gesamtscore aus beiden — dieselbe Zahl wie auf der Objektkarte und in der Seitenleiste. Die Empfehlung richtet sich nach beiden Einzelscores.');
             })() +
           '</div>' +
           // V63.21: INLINE-Konfiguration (statt Modal-über-Modal — User-Wunsch V22)

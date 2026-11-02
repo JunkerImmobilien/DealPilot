@@ -3880,6 +3880,8 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
      + Grundbuchamt 0,5 + Sonstige 1,5 (+ Makler 0)
    Dieselben Bausteine hier, gelesen aus der Hauptanwendung (gleiche Herkunft).
    Ohne PLZ: 6,5 % Grunderwerbsteuer wie die Vorbelegung im Objekt. */
+/* v3088 · Zahl aus dem Feld ohne QcEngine (die ist hier noch nicht geladen): Punkt = Tausender */
+function QcEngineNum(s) { s = String(s || '').replace(/\s|€/g, ''); if (/,/.test(s)) s = s.replace(/\./g, '').replace(',', '.'); else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); var n = parseFloat(s); return isFinite(n) ? n : 0; }
 window._qcKnkPct = function () {
   var P = null; try { P = window.parent && window.parent !== window ? window.parent : window; } catch (e) { P = window; }
   var grest = 6.5, notar = 1.0;
@@ -3896,6 +3898,16 @@ window._qcKnkPct = function () {
     IP = (P && P.DealPilotInvestmentProfile) || window.DealPilotInvestmentProfile;
     var num = function (k, d) { var x = IP && typeof IP.get === 'function' ? parseFloat(IP.get(k)) : NaN; return isFinite(x) ? x : d; };
     notar = num('notar_pct', 1.0); gb = num('grundbuch_pct', 0.5); makler = num('maklerkosten', 0); sonst = num('sonstige_nk_pct', 0);
+    /* v3088 · Notar und Grundbuch nach Gebuehrenordnung (gnotkg.js im Hauptfenster), wenn die
+       Einstellung an ist. Darlehen nach der gewaehlten Beleihung: 100 % + NK rund Kaufpreis x 1,1. */
+    var GN = (P && P.DealPilotGnotkg) || window.DealPilotGnotkg;
+    var _kpQ = QcEngineNum(((document.getElementById('qc_kp') || {}).value) || '');
+    window._qcKnkGnotkg = false;
+    if (GN && _kpQ > 0 && !(IP && IP.get && IP.get('nk_gnotkg') === false)) {
+      var _lb = document.querySelector('.ltv-btn.active'), _lv = _lb ? _lb.getAttribute('data-ltv') : '100';
+      var _q = _lv === 'voll' ? 1.1 : (parseFloat(_lv) > 0 ? parseFloat(_lv) / 100 : 1);
+      notar = GN.notar(_kpQ, _kpQ * _q).pct; gb = GN.grundbuch(_kpQ, _kpQ * _q).pct; window._qcKnkGnotkg = true;
+    }
     if (IP && IP.get('grest_auto') === false) {
       var G2 = (P && P.DealPilotGrest) || window.DealPilotGrest, bl = IP.get('bundesland');
       if (G2 && G2.rates && bl && isFinite(G2.rates[bl])) grest = Number(G2.rates[bl]);
@@ -4408,7 +4420,7 @@ const QcApp = (function() {
         + '<span class="p">' + _pctDe(satz) + ' %</span><span class="e">' + (kp ? (an ? eur(kp * satz / 100) : '0 €') : '—') + '</span></div>';
     });
     h += '<div class="qc-knk-zeile summe"><span></span><span>Summe</span><span class="p">' + _pctDe(knk) + ' %</span><span class="e">' + (kp ? eur(kp * knk / 100) : '—') + '</span></div>';
-    h += '<span class="qc-herkunft">Sätze aus deinen Einstellungen (Investmentprofil › Kaufnebenkosten), wie sie auch ein neues Objekt bekommt. '
+    h += '<span class="qc-herkunft">' + (window._qcKnkGnotkg ? 'Notar und Grundbuch nach Gebührenordnung (GNotKG) für diesen Kaufpreis und dein Darlehen. Übrige ' : '') + 'Sätze aus deinen Einstellungen (Investmentprofil › Kaufnebenkosten), wie sie auch ein neues Objekt bekommt. '
       + 'Grunderwerbsteuer nach dem Landessatz 2026. Was du hier abwählst, geht so auch ins Objekt.</span></details>';
     box.innerHTML = h;
     const d = box.querySelector('details');

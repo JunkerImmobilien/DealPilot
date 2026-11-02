@@ -1103,6 +1103,7 @@ window.DealPilotConfig = (function() {
       grundbuch_pct:          0.50,   // % Grundbuchamt
       sonstige_nk_pct:        0,      // % Sonstige - v3087: nur wenn selbst gesetzt
       grest_auto:             true,   // Grunderwerbsteuer nach Bundesland aus der Objektadresse
+      nk_gnotkg:              true,   // v3088 · Notar + Grundbuch nach Gebuehrenordnung (gnotkg.js), sonst die festen Saetze
       // V63.90: KI-Analyse-Standardparameter (vorher nur als Selects im KI-Tab,
       // jetzt persönlicher Default — nutzt der KI-Prompt-Builder via hidden inputs)
       ai_strat:  'Buy & Hold (Langfristig halten)',
