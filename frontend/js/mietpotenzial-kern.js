@@ -58,6 +58,12 @@
     return String(s || '').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
       .replace(/\(.*?\)/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
   }
+  /* v3083 · der Ortsname ohne Lage-Zusatz (im/i/am/a/an/ob/bei/in/vor/v d … und Klammern sind in norm() schon weg) */
+  function stamm(n) {
+    var w = String(n || '').split(' '), out = [];
+    for (var i = 0; i < w.length; i++) { if (i > 0 && /^(im|i|am|a|an|ob|bei|in|vor|v|d|der|dem|den|o|ostfriesland|westf|westfalen|oldb|oldenburg|schwarzwald|wald|harz|thueringen|holstein|hessen|pfalz|breisgau|br|main|m|oder|saale|lahn|neckar|rhein|donau|elbe|weser|ruhr|sieg|mosel|nahe|kreis|stadt|st)$/.test(w[i])) break; out.push(w[i]); }
+    return out.join(' ');
+  }
   function gemeindeFinden(daten, ort) {
     ort = ort || {};
     var a = String(ort.ags || '').replace(/\D/g, '');
@@ -77,6 +83,11 @@
     var liste = Array.isArray(out.L.gemeinden) ? out.L.gemeinden : [];
     var gleich = liste.filter(function (x) { return x && norm(x.name) === name; });
     if (!gleich.length) gleich = liste.filter(function (x) { return x && norm(x.name).indexOf(name + ' ') === 0; });
+    /* v3083 · Namensstamm: „Freiburg im Breisgau“ gegen „Freiburg i. Br.“, „Frankfurt am Main“ gegen
+       „Frankfurt a.M.“, „Halle“ gegen „Halle (Saale)“. Gemessen 02.11.2026: 59 von 821 Gemeinden der
+       Verordnungen tragen einen Zusatz; Freiburg fiel über den Ortsnamen auf „20 %, keine Bremse“. Nur
+       eindeutig je Land, sonst mehrdeutig (bitte prüfen). */
+    if (!gleich.length) { var st = stamm(name); if (st) gleich = liste.filter(function (x) { return x && stamm(norm(x.name)) === st; }); }
     out.g = gleich.length === 1 ? gleich[0] : null;
     out.mehrdeutig = gleich.length > 1;
     out.zuordnung = 'ortsname';
