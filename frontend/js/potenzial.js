@@ -2377,6 +2377,7 @@
 
   window.DpPotenzial = {
     mietpreisbremse: mietpreisbremse, mietrechtDaten: mietrechtDaten, mietrechtHtml: mietrechtHtml, mietrechtKarte: mietrechtKarte,   /* v3062 */
+    mietrechtOrt: function () { var g = agsJetzt(); return { ags: g, kapp: kappung(g), bremse: mietpreisbremse(g) }; },   /* v3082: fuer die Pilot-Mietpreis-Analyse */
     standardhebung: standardhebung, standardhebungHtml: standardhebungHtml, feshBinden: feshBinden,   /* v3064 */
     leiterZeilen: leiterZeilen, leiterHtml: leiterHtml, leiterBinden: leiterBinden,   /* v3067 */
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,

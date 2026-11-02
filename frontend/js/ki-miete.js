@@ -426,6 +426,16 @@ function _kmUStil() {
     '.kmu-mehr{border:1px solid #EFE7D6;border-radius:10px;padding:6px 12px;background:#fff}',
     '.kmu-mehr>summary{cursor:pointer;font:600 10.5px/1.6 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
     '.kmu-fuss{font-size:11px;color:#8A8272;line-height:1.45;margin:0}',
+    '.kmu-recht{border:1px solid #EFE7D6;border-radius:10px;padding:8px 12px;background:#fff}',
+    '.kmu-rz{display:grid;grid-template-columns:150px 1fr;gap:2px 12px;padding:7px 0;border-top:1px solid #F1ECE1}',
+    '.kmu-rz:nth-child(2){border-top:0}',
+    '.kmu-rz>span:first-child{font:600 13px "Space Grotesk",sans-serif;color:#2A2727}',
+    '.kmu-rz>span:nth-child(2){font:500 13px Inter,sans-serif}',
+    '.kmu-rz p{grid-column:1/-1;margin:2px 0 0;font-size:12px;color:#4A4542;line-height:1.45}',
+    '.kmu-rz p a{color:var(--wl-b8932f,#b8932f)}',
+    '.kmu-li{margin:8px 0 2px;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.5;color:#4A4542}',
+    '.kmu-li .ki-miete-source{display:inline}',
+    '@media (max-width:640px){.kmu-rz{grid-template-columns:1fr}}',
     '@media (max-width:640px){.kmu .dp-ml-z{grid-template-columns:18px 1fr auto}.kmu .dp-ml-z .dp-ml-k{grid-column:2/4;justify-self:start}.kmu-risk{grid-template-columns:1fr}}'
   ].join('');
   document.head.appendChild(s);
@@ -502,6 +512,40 @@ function _kmUebersicht(o) {
     }).join('') + '</div>';
   }
 
+  /* ── v3082 · Mietrecht an dieser Adresse ──
+     Marcel 02.11.2026 (Westerfeldstr.): „ich sehe nicht direkt, ob dort eine Mietpreisbremse gilt bzw.
+     Obergrenze.“ Regel aus dem Kern (mietpotenzial-kern.js über DpPotenzial.mietrechtOrt), Obergrenze
+     nur mit einer amtlichen Vergleichsmiete - sonst steht da, woran sie hängt. */
+  try {
+    var MR = (window.DpPotenzial && DpPotenzial.mietrechtOrt) ? DpPotenzial.mietrechtOrt() : null;
+    if (MR && (MR.bremse || MR.kapp)) {
+      var br = MR.bremse || {}, kp = MR.kapp || {};
+      var lnk = function (t, u) { return u ? '<a href="' + _kmEsc(u) + '" target="_blank" rel="noopener">' + _kmEsc(t) + '</a>' : _kmEsc(t); };
+      var dat = function (x) { return x ? String(x).split('-').reverse().join('.') : ''; };
+      var brWert, brText;
+      if (br.gilt === true) {
+        brWert = '<b style="color:#B8625C">gilt</b>' + (br.bis ? ' bis ' + dat(br.bis) : '');
+        if (a) { var og = Math.round(a.wert_qm * 1.1 * 100) / 100;
+          brText = 'Bei einer Neuvermietung höchstens <b>' + _kmQmK(og) + '</b> (amtliche Vergleichsmiete ' + _kmQmK(a.wert_qm) + ' + 10 %, § 556d BGB)'
+            + (wfl > 0 ? ' = ' + _kmEur(og * wfl) + ' im Monat' : '') + '.'; }
+        else brText = 'Bei einer Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB). Maßgeblich ist der Mietspiegel der Gemeinde — einen amtlichen Wert dafür haben wir hier nicht, deshalb nennen wir keine Euro-Grenze. Der Marktdurchschnitt oben ist eine Angebotsmiete und liegt meist darüber.';
+        brText += ' Ausnahmen: Neubau (erstmals ab Oktober 2014 vermietet), umfassend modernisiert, oder die Vormiete lag schon höher.';
+      } else if (br.gilt === false) {
+        brWert = '<b style="color:#2f7d55">gilt hier nicht</b>';
+        brText = 'Bei einer Neuvermietung ist die Miete frei vereinbar — Orientierung ist der Markt.';
+      } else { brWert = 'bitte prüfen'; brText = _kmEsc(br.text || ''); }
+      var quelleBr = br.verordnung ? ' · ' + lnk(br.verordnung, br.url) : '';
+      var kpWert = (kp.pct ? kp.pct + ' % in 3 Jahren' : '—');
+      var kpText = 'Im laufenden Mietverhältnis darf die Miete in drei Jahren um höchstens ' + (kp.pct || '–') + ' % steigen, und nie über die ortsübliche Vergleichsmiete (§ 558 BGB)'
+        + (ist && kp.pct ? ' — bei deiner Miete also auf höchstens ' + _kmQmK(ist * (1 + kp.pct / 100)) : '') + '.';
+      var quelleKp = kp.herkunft === 'verordnung' ? ' · ' + lnk(kp.verordnung || 'Landesverordnung', kp.url) : ' · gesetzliche Grenze (§ 558 Abs. 3 Satz 1 BGB)';
+      h += '<div class="kmu-recht"><span class="kmu-t">Mietrecht an dieser Adresse</span>'
+        + '<div class="kmu-rz"><span>Mietpreisbremse</span><span>' + brWert + '</span><p>' + brText + quelleBr + '</p></div>'
+        + '<div class="kmu-rz"><span>Kappungsgrenze</span><span><b>' + kpWert + '</b></span><p>' + kpText + quelleKp + '</p></div>'
+        + '</div>';
+    }
+  } catch (e) {}
+
   /* ── Mietausfall in einer Zeile ── */
   var WORT = { sehr_niedrig: 'Sehr niedrig', niedrig: 'Niedrig', mittel: 'Mittel', erhoeht: 'Erhöht', hoch: 'Hoch' };
   var lz = (b.leerstand && !b.leerstand.fehlt) ? b.leerstand : null, bv = (b.bevoelkerung && !b.bevoelkerung.fehlt) ? b.bevoelkerung : null;
@@ -515,15 +559,19 @@ function _kmUebersicht(o) {
       + (bel.length ? '<span class="kmu-u">' + bel.join(' · ') + '</span>' : '') + '</div>';
   }
 
-  /* ── alles Weitere zugeklappt ── */
-  var mehr = '';
-  if (o.sugMarkt && o.sugMarkt.reasoning) mehr += '<div class="ki-miete-reasoning">' + _kmEsc(o.sugMarkt.reasoning) + '</div>';
-  mehr += _renderQuellen(o.sugMarkt);
-  if (o.sugMarkt && o.sugMarkt.vergleich_text) mehr += '<div class="ki-miete-reasoning km-vgl-text">' + _kmEsc(o.sugMarkt.vergleich_text) + '</div>';
-  if (o.belege) mehr += _kmVergleichHtml(o.belege, pilot, o.istQm, o.sugMarkt);
-  if (o.sugAusfall && o.sugAusfall.reasoning) mehr += '<div class="ki-miete-reasoning">' + _kmEsc(o.sugAusfall.reasoning) + '</div>';
-  if (o.belege) mehr += _kmRisikoHtml(o.belege, o.ausfallVal, o.sugAusfall);
-  if (mehr) h += '<details class="kmu-mehr"><summary>Woher die Zahlen kommen</summary>' + mehr + '</details>';
+  /* ── v3082 · Woher die Zahlen kommen — ein Satz je Wert, in einfachen Worten ──
+     Marcel 02.11.2026: „der Bereich ist etwas vielfältig, und so genau weiß ich nicht, was ich damit
+     anfangen soll. Kann man das einfach direkt erklären?“ Bis v3081 standen hier die Rohbelege
+     (_kmVergleichHtml/_kmRisikoHtml) mit allen Fußnoten. */
+  var stand = function (x) { return x ? ' (Stand ' + String(x).slice(8, 10) + '.' + String(x).slice(5, 7) + '.' + String(x).slice(0, 4) + ')' : ''; };
+  var li = [];
+  if (ist != null) li.push('<b>Deine Ist-Miete</b> — die Nettokaltmiete, die du eingetragen hast, geteilt durch die Wohnfläche.');
+  if (band) li.push('<b>Marktübliches Band</b> — der Bereich, den die Wertermittlung im Marktbericht als marktüblich anerkennt. Liegt eine Miete darüber, rechnet der Ertragswert nur mit der Obergrenze, weil ein neuer Mieter sie voraussichtlich nicht zahlt.');
+  if (a) li.push('<b>Amtliche Vergleichsmiete</b> — aus der Mietpreisübersicht des Gutachterausschusses' + (a.quelle ? ' (' + _kmEsc(a.quelle) + ')' : '') + '. Sie bildet vor allem bestehende Mietverträge ab und ist deshalb meist niedriger als Angebote.');
+  if (m) li.push('<b>Marktdurchschnitt</b> — was Vermieter in der Umgebung gerade verlangen: der mittlere Wert aus ' + (m.anzahl != null ? m.anzahl + ' ' : '') + 'aktuellen Angeboten' + stand(m.stand) + '. Angebote sind keine abgeschlossenen Mieten und liegen oft etwas darüber.');
+  if (pilot != null) li.push('<b>Pilot-Recherche</b> — eine Schätzung der KI aus Mietspiegeln und Webquellen; sie ist eine Plausibilitätsprobe, kein Beleg.' + (o.sugMarkt ? ' ' + _renderQuellen(o.sugMarkt).replace(/<\/?div[^>]*>/g, '') : ''));
+  if (lz) li.push('<b>Mietausfall-Risiko</b> — aus dem amtlichen Leerstand der Gemeinde (Zensus 2022) und der Bevölkerungsentwicklung des Kreises. Es beschreibt den Ort, nicht dein Objekt.');
+  if (li.length) h += '<details class="kmu-mehr"><summary>Woher die Zahlen kommen</summary><ul class="kmu-li">' + li.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></details>';
 
   h += '<p class="kmu-fuss">Die Pilot-Recherche ist eine Schätzung; Marktdurchschnitt und Band stammen aus dem Marktbericht und tragen dort ihren Stand.</p>';
   return h + '</div>';
