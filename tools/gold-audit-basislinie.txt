@@ -11,7 +11,7 @@
 #   spaeterer Lauf deutlich weniger, hat er weniger GESUCHT, nicht
 #   weniger gefunden. Dann ist "sauber" eine Luege.
 #
-# Gesamt zum Zeitpunkt des Einfrierens: 416 Fundstellen in 53 Datei(en)
+# Gesamt zum Zeitpunkt des Einfrierens: 413 Fundstellen in 53 Datei(en)
 js/apikeys.js	1
 js/auth-401-handler.js	2
 js/auth.js	7
@@ -48,7 +48,7 @@ js/register-easter-egg.js	2
 js/reseller-portal.js	46
 js/rnd-wizard.js	18
 js/session-expired-banner.js	5
-js/settings.js	25
+js/settings.js	22
 js/star-rating.js	1
 js/tax-periods.js	20
 js/tax.js	8

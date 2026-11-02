@@ -2254,6 +2254,8 @@
        neu ausgerechnet. Nach aussen gegeben statt dort nachgebaut - ein
        zweiter Weg zu derselben Marke laeuft auseinander. */
     karteMarke: karteMarke,
+    /* v3061: der Umschalter Bestand/Ankauf (doppelkarte.js) klappt die Objektliste auf */
+    portfolio: portfolio,
     schalter: function () { baueSchalter(); schalterNachziehen();
       try { localStorage.setItem('dp_layout_schalter', '1'); } catch (e) {} }
   };

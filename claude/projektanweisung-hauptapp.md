@@ -44025,3 +44025,38 @@ tax/avm) — nicht durch diese Sitzung; Backend-Log reicht nur bis zum Neubau ~1
 `/root/backups/demo-objekte-staging-20261029-1910.tsv.gz`. Neu: **2026-1127 „Unbenannt"** (21:01 UTC), vermutlich aus
 den Testläufen (App öffnete je Laden ein neues Objekt). Beides wartet auf Marcel. Übernehmen-Knopf der BMF-Tafel
 nicht geklickt (schreibt ins Objekt). Prod: v3049–v3057a nicht ausgerollt.
+
+### v3058 — Exposé-Import und PLZ mit führender Null (31.10.2026, Nachtrag 02.11.)
+
+**Was.** `"plz": 04275` (Leipzig) ist kein gültiges JSON → `extractJson()` null → Route `success:false` mit HTTP 200
+→ `pdf-import.js` machte stumm ein leeres Ergebnis. Behoben: `extractJson()` Stufe 5 flickt führende Nullen zu
+Strings (alle Aufrufer), Prompts Exposé/Marktbericht führen `plz` als String, `extractExpose()` ergänzt die Null bei
+vier Ziffern, `pdf-import.js` zeigt `success:false` als Fehler. **Commits** `9a0b75bc`, `5b97d240`. Stand bis
+02.11. nicht im Journal — nachgetragen, Einzelheiten `wissen/2026-10-31.md`.
+
+### v3059 · v3060 · v3060a — Mein Profil, Deal-Score-Reiter, Bewertung, Zeitdruck-Feld, Steuer im Objekt (02.11.2026)
+
+**Was.**
+- **v3059** Mein Profil: beim zweiten Besuch stand das Rohformular statt der Karten (`data-swk` überlebte den
+  `innerHTML`-Neuaufbau am Behälter, `aufbauen()` brach ab; jetzt Maßstab `:scope > .swk-oben`). Reiter **Deal
+  Score** in der schlanken Fassung wieder sichtbar, hinter Mein Profil; Score-Zeile mit „Gewichtung anpassen ›“.
+  **Bewertung:** der einfache Deal Score entfällt bei vollem Plan (`hasFullFeature('deal_score_v2')`) UND KPI ≥
+  Schwelle (`window._dpDs2Schwelle()`, eine Stelle). **Pilot-Analyse:** „Verkäufer unter Zeitdruck?“ ausgebaut samt
+  `syncAiParamsToTab()` und `ai_strat/ai_verk/ai_risk/ai_markt` aus `FIELDS` (keine Eingabefelder mehr); der
+  Verkäuferdruck geht nicht mehr in den Prompt.
+- **v3060/a** Steuer im Objekt: Kopf mit „Ergebnis V+V dieses Objekts“ und „Erstattung/Nachzahlung durch dieses
+  Objekt“, Rechenweg (zvE, Bestand, Steuer ohne/mit) zugeklappt (`dp_tax_rechenweg`); Steuerverlauf „dieses
+  Objekts“, Jahreskarten mit V+V-Ergebnis. **Rechnung unverändert** — `refund` war schon objektbezogen.
+
+**Commits.** `7e353b9f` (v3059), `ce118c0e` (v3060), `d0cba71a` (v3060a).
+
+**Nachweis (Browser, Staging).** Mein Profil nach Co-Pilot und nach Darstellung je 7 Karten; Deal-Score-Reiter
+öffnet mit 5 Reglern; Westerfeld/Lindenhof 88 %, Bismarck 100 % → nur Investor Deal Score; Bismarck 2026 −19.716 €
+/ +7.423 €, Karte 2023 „+1.447 € · V+V − 3.575 €“.
+
+**Prod 1.0.12** (`rollout-prod.ps1 -Freigabe`): v3049–v3060a, 22 Commits, 26 Dateien, Merge `c65d7a2`, Version
+`d6e9834f`. Sicherungen `/root/backups/haupt-20261102-0621.sql.gz` (16 M), `mb-20261102-0621.sql.gz` (30 M), Köpfe
+gelesen. Prod 200, `dealpilot-backend` healthy, Buster v3059/v3060a ausgeliefert. Gold-Basislinie `js/settings.js`
+25 → 22 von Hand (das Schreiben unter Windows erzeugt Backslash-Pfade).
+
+**Rest.** N87 Portfolio-Cockpit › Steuer-Gesamtbetrachtung (Demo zuerst). Ab heute je Tag `wissen/JJJJ-MM-TT.md`.
