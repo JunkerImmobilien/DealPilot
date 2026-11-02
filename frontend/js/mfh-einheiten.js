@@ -346,8 +346,10 @@
   /* Schritt 1 — Gebaeude */
   function schritt1() {
     function zeile(id, fuerWohnung) {
-      return '<tr><td style="padding:5px 10px 5px 0">' + esc(labelVon(id)) + '<div style="font-size:11px;color:#8A8272" title="Anlage 2: maximal ' + maxPunkte(id) + ' von 20 Punkten">'
-        + (fuerWohnung ? ' · gilt für jede Einheit, bis sie widerspricht' : ' · gilt für das ganze Haus') + '</div></td>'
+      /* v3066 · Marcel 02.11.2026: „unter Gebäude steht teilweise zehnmal der gleiche Satz". Der Satz
+         steht jetzt EINMAL in der Abschnittsüberschrift; die Zeile trägt nur noch ihr Gewerk. */
+      void fuerWohnung;
+      return '<tr><td style="padding:5px 10px 5px 0" title="Anlage 2: maximal ' + maxPunkte(id) + ' von 20 Punkten">' + esc(labelVon(id)) + '</td>'
         + '<td style="padding:5px 0;text-align:right">' + selHtml('data-geb="' + id + '"', _geb[id], STUFEN) + '</td></tr>';
     }
     var _vor = GEB_IDS.concat(WE_IDS).filter(function (id) { return _objektVorher[id]; }).length;
@@ -356,9 +358,9 @@
       + 'Die Kriterien sind die der Anlage 2 ImmoWertV — dieselben wie im Restnutzungsdauer-Assistenten.</div>'
       + (_vor ? '<div style="font-size:12.5px;color:#6B6356;margin:-4px 0 10px">' + '<b>' + _vor + ' Angaben' + (_vor === 1 ? ' stammt' : ' stammen') + ' aus dem Tab Objekt</b> und sind unten schon gesetzt. Was du hier änderst, geht zurück dorthin.</div>' : '')
       + '<table style="width:100%;border-collapse:collapse;font-size:13px"><tbody>'
-      + '<tr><td colspan="2" style="padding:8px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Gemeinsam — vom Haus geerbt</td></tr>'
+      + '<tr><td colspan="2" style="padding:8px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Gemeinsam — vom Haus geerbt <span style="text-transform:none;letter-spacing:0;font:400 11.5px Inter,sans-serif">· gilt für das ganze Haus</span></td></tr>'
       + GEB_IDS.map(function (id) { return zeile(id, false); }).join('')
-      + '<tr><td colspan="2" style="padding:12px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Vorgabe für die Wohnungen</td></tr>'
+      + '<tr><td colspan="2" style="padding:12px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Vorgabe für die Wohnungen <span style="text-transform:none;letter-spacing:0;font:400 11.5px Inter,sans-serif">· gilt für jede Wohnung, bis sie in ihrem Fenster abweicht</span></td></tr>'
       + WE_IDS.map(function (id) { return zeile(id, true); }).join('')
       + '</tbody></table>'
       /* v2541 · Jahr, in dem das Zielbild erreicht ist - dasselbe Feld wie im Reiter Objekt (zb_fertig_jahr) */
@@ -554,15 +556,22 @@
            Mieterhoehung", freiwillig. DealPilot rechnet vor (§ 558 bis zur
            Vergleichsmiete, Kappungsgrenze, 15 Monate; § 559 bei Massnahmen im
            bewohnten Zustand); eine eigene Angabe ueberschreibt. */
-        blk('soll', 'Soll-Miete (Mieter bleibt) <span class="mfh-we-kann">kann, nicht muss</span>',
+        /* v3066 · Marcel 02.11.2026: „Soll und Zielbild mit den Angaben … steht oben, darunter kommt dann
+           erst die Eingabe … deutlich einfacher, optisch leichter nachvollziehbar, und was geht und wann zum
+           Übernehmen." Oben die LEITER (heute → Mieterhöhung → Neuvermietung → nach Sanierung) mit je einem
+           Knopf „übernehmen", der das Feld darunter setzt - derselbe Weg wie eine Eingabe von Hand. Die
+           eigenen Angaben zur Mieterhöhung stehen zugeklappt darunter. */
+        blk('soll', 'Miete — was geht und wann <span class="mfh-we-kann">kann, nicht muss</span>',
+          '<div id="mfh-we-leiter" class="mfh-we-leiter"></div>' +
+          '<details class="mfh-we-eigen"><summary>Eigene Angaben zur Mieterhöhung (Mieter bleibt)</summary>' +
           '<div class="mfh-we-raster">' +
             f('vgl_qm', 'Vergleichsmiete €/m² (Mietspiegel)', '', 'decimal') +
             f('soll', 'Soll-Miete (€/Monat, eigene Angabe)', '', 'decimal') +
             d('soll_ab', 'Wirksam ab (eigene Angabe)', 'month') +
-          '</div><div class="mfh-we-ergebnis" id="mfh-we-soll"></div>') +
+          '</div><div class="mfh-we-ergebnis" id="mfh-we-soll"></div></details>') +
         /* v2430 · ZIELBILD — nach Umbau oder Neuvermietung. Massnahmen als
            Chips mit Kosten und Modernisierungspunkten (Anlage 2). */
-        blk('ziel', 'Zielbild · nach Umbau <span class="mfh-we-kann">kann, nicht muss</span>',
+        blk('ziel', 'Zielbild · Neuvermietung oder nach Sanierung <span class="mfh-we-kann">kann, nicht muss</span>',
           '<div id="mfh-we-mass"></div>' +
           '<div class="mfh-we-raster">' +
             f('ziel_qm', 'Zielmiete (€/m²)', 'z. B. 9,20', 'decimal') +
@@ -590,6 +599,59 @@
     /* ── Rechnungen der Blöcke (nichts davon ist ein Ertragswert) ── */
     var _ewArt = _weg ? 'etw' : 'haus';
     function opts() { return { einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM }; }
+    /* v3066 · DIE MIETLEITER. Rechnet nichts selbst: Soll und Termine aus sollFuer (über modell),
+       Kappung und Mietpreisbremse aus potenzial.js mietrechtDaten. „übernehmen" setzt das Feld und löst
+       change aus - der Weg einer Eingabe von Hand (data-wk-Bindung unten). */
+    function feldSetzen(k, v) {
+      var inp = ov.querySelector('[data-wk="' + k + '"]');
+      if (!inp) { e[k] = v; return; }
+      inp.value = v; try { inp.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) { e[k] = v; }
+    }
+    function leiterZeichnen(m, w) {
+      var host = el('mfh-we-leiter'); if (!host || !P || !w) return;
+      var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist), so = w.soll || {};
+      var d = P.mietrechtDaten ? P.mietrechtDaten(m, m.wohnungen.indexOf(w)) : null;
+      var qm = function (x) { return wfl > 0 ? ' · ' + (x / wfl).toFixed(2).replace('.', ',') + ' €/m²' : ''; };
+      var eur2q = function (x) { return x.toFixed(2).replace('.', ',') + ' €/m²'; };
+      var zeilen = [];
+      /* 1 · heute */
+      zeilen.push({ c: 'heute', t: 'Heute', v: ist > 0 ? eur(ist) + '/Monat' + qm(ist) : 'leer', u: e.mv_beginn ? 'Mietvertrag seit ' + String(e.mv_beginn).split('-').reverse().join('.') : '' });
+      /* 2 · Mieterhöhung, Mieter bleibt */
+      if (!(ist > 0)) zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: '—', u: 'Wohnung leer — es zählt die Neuvermietung' });
+      else if (so.vertrag) zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: 'nach Vertrag', u: so.grund || '' });
+      else if (so.miete != null && so.miete > ist + 0.01) {
+        var eigenS = so.herkunft === 'eigene Angabe';
+        var wirk = so.termine && so.termine.wirksam_ab;
+        zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: 'auf ' + eur(so.miete) + '/Monat' + qm(so.miete),
+          u: (so.termine ? so.termine.text : '') + (so.grenze ? ' · Grenze ' + so.grenze : '') + (so.umlage559 && so.umlage559.monat > 0 ? ' · darin Umlage § 559 ' + eur(so.umlage559.monat) : ''),
+          k: eigenS ? null : { lbl: 'übernehmen', fn: function () { feldSetzen('soll', String(Math.round(so.miete))); if (wirk) feldSetzen('soll_ab', wirk); } },
+          tag: eigenS ? 'eigene Angabe' : 'DealPilot rechnet vor' });
+      } else zeilen.push({ c: 'soll', t: 'Mieterhöhung', v: 'kein Spielraum', u: so.grund || '' });
+      /* 3 · Neuvermietung */
+      var br = d && d.bremse, og = d && d.obergrenze;
+      if (br && br.gilt === true && og) zeilen.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'höchstens ' + eur2q(og),
+        u: 'Mietpreisbremse gilt' + (br.bis ? ' bis ' + br.bis.split('-').reverse().join('.') : '') + ' · Vergleichsmiete + 10 %',
+        k: { lbl: 'als Zielmiete', fn: function () { feldSetzen('ziel_qm', og.toFixed(2).replace('.', ',')); if (!e.ziel_wann) feldSetzen('ziel_wann', 'bei Mieterwechsel'); } } });
+      else if (br && br.gilt === false) zeilen.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'frei', u: 'keine Mietpreisbremse an dieser Adresse' });
+      else zeilen.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'bitte prüfen', u: (br && br.text) || 'Gemeinde noch nicht ermittelt' });
+      /* 4 · Zielbild */
+      var zq = zahl(e.ziel_qm), zielBad = !!(og && br && br.gilt === true && zq > og + 0.004);
+      zeilen.push({ c: 'ziel', t: 'Zielbild', v: zq > 0 ? eur2q(zq) + (wfl ? ' · ' + eur(zq * wfl) + '/Monat' : '') : 'noch keine Zielmiete', bad: zielBad,
+        u: zielBad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
+          : (e.ziel_wann ? String(e.ziel_wann) : 'Maßnahmen und Zielmiete unten eintragen') });
+      host.innerHTML = '<div class="mfh-ml">' + zeilen.map(function (z, j) {
+        return '<div class="mfh-ml-z mfh-ml-' + z.c + (z.bad ? ' mfh-ml-bad' : '') + '">'
+          + '<span class="mfh-ml-p"></span>'
+          + '<div class="mfh-ml-txt"><span class="mfh-ml-t">' + esc(z.t) + (z.tag ? ' <i>' + esc(z.tag) + '</i>' : '') + '</span>'
+          + '<b class="mfh-ml-v">' + esc(z.v) + '</b>' + (z.u ? '<span class="mfh-ml-u">' + esc(z.u) + '</span>' : '') + '</div>'
+          + (z.k ? '<button type="button" class="mfh-ml-k" data-ml="' + j + '">' + esc(z.k.lbl) + ' ›</button>' : '') + '</div>';
+      }).join('') + '</div>'
+        + (d && d.kapp ? '<p class="mfh-we-hint" style="margin:6px 0 0">' + esc(d.kapp.text) + '</p>' : '');
+      host.querySelectorAll('[data-ml]').forEach(function (b) {
+        var z = zeilen[+b.getAttribute('data-ml')];
+        b.addEventListener('click', function () { if (z && z.k) z.k.fn(); });
+      });
+    }
     function aktualisieren() {
       var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist);
       var u = el('mfh-we-unter');
@@ -616,9 +678,9 @@
             : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier oder die Marktmiete im Tab Miete lässt DealPilot vorrechnen.</p>')
           /* v3062 · statt eines langen Satzes die Mietrecht-Zeilen dieser Wohnung (Kappung,
              nächste Erhöhung, Mietpreisbremse, Zielmiete gegen die Bremse) - potenzial.js */
-          + (P.mietrechtHtml ? '<div style="margin-top:10px">' + P.mietrechtHtml(m, m.wohnungen.indexOf(w), { eng: true }) + '</div>'
-            : '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>');
+          + '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>';
       }
+      leiterZeichnen(m, w);   /* v3066 */
       var hZ = el('mfh-we-ziel');
       if (hZ && w) {
         var pkt = w.plus_ziel || 0;
@@ -1042,6 +1104,22 @@
       /* v2430 · Bloecke wie in der freigegebenen Vorlage: Mietvertrag, Soll (blau), Zielbild (gruen), Ertragswert (Gold) */
       '#mfh-we-ov .mfh-we-kopf .mfh-we-unter{display:block;font-size:12px;color:#8A8272;font-weight:400;margin-top:2px}',
       '#mfh-we-ov .mfh-we-blk{border:1px solid #EFE7D6;border-radius:12px;padding:12px 14px;margin:0 0 12px;display:grid;gap:10px}',
+      /* v3066 · Mietleiter */
+      '#mfh-we-ov .mfh-ml{display:flex;flex-direction:column;position:relative}',
+      '#mfh-we-ov .mfh-ml-z{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:start;padding:8px 0;border-top:1px solid #F1ECE1}',
+      '#mfh-we-ov .mfh-ml-z:first-child{border-top:none}',
+      '#mfh-we-ov .mfh-ml-p{width:10px;height:10px;border-radius:50%;margin:5px 0 0 4px;background:#8A8272}',
+      '#mfh-we-ov .mfh-ml-soll .mfh-ml-p{background:#3d6fa8}#mfh-we-ov .mfh-ml-neu .mfh-ml-p{background:var(--wl-c9a84c, #C9A84C)}#mfh-we-ov .mfh-ml-ziel .mfh-ml-p{background:#2f7d55}',
+      '#mfh-we-ov .mfh-ml-txt{display:flex;flex-direction:column;gap:1px;min-width:0}',
+      '#mfh-we-ov .mfh-ml-t{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#7A7370}',
+      '#mfh-we-ov .mfh-ml-t i{font:400 10.5px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#8A8272;font-style:normal}',
+      '#mfh-we-ov .mfh-ml-v{font:600 14px/1.35 "Space Grotesk",sans-serif;color:#2A2727}',
+      '#mfh-we-ov .mfh-ml-u{font-size:11.5px;color:#7A7370;line-height:1.4}',
+      '#mfh-we-ov .mfh-ml-bad .mfh-ml-v{color:#B8625C}#mfh-we-ov .mfh-ml-bad .mfh-ml-p{background:#B8625C}',
+      '#mfh-we-ov .mfh-ml-k{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;color:#2A2727;border-radius:7px;padding:5px 9px;font:500 12px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+      '#mfh-we-ov .mfh-ml-k:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,#fff)}',
+      '#mfh-we-ov details.mfh-we-eigen>summary{cursor:pointer;font-size:12.5px;color:#6B6356;padding:4px 0}',
+      '#mfh-we-ov details.mfh-we-eigen[open]>summary{margin-bottom:8px}',
       '#mfh-we-ov .mfh-we-blk-t{display:flex;align-items:center;gap:8px;font:600 11.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#6B6356}',
       '#mfh-we-ov .mfh-we-blk-t::before{content:"";width:8px;height:8px;border-radius:2px;background:#8A8272;flex:0 0 auto}',
       '#mfh-we-ov .mfh-we-blk.soll .mfh-we-blk-t{color:#3d6fa8}#mfh-we-ov .mfh-we-blk.soll .mfh-we-blk-t::before{background:#3d6fa8}',
