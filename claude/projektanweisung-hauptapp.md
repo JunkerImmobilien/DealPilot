@@ -44126,3 +44126,14 @@ Entscheidung; Benchmark-Zins auf Markt (4,4 %) heben.
 Quelle für KfW-/BAFA-Hinweise und Darlehen-2-Links, Jahreswerte-Eintrag `foerderprogramme` (fällig 01.12.2026). **Commit**
 fee34a4b. **Nachweis** Westerfeld Whg 3 Balken 585/695/665, Empfehlungen aus dem Register mit Stand. **Prod 1.0.19** Merge
 f376887. **Rest** v3073 Detailgrad (Worktree), Quick-Check-Ausbau P1.1–P1.3, Zwei-Score-Umfang.
+
+### v3073 · v3074 · v3075 · v3076 — Detailstufen, Erhaltungsspalte, Quick-Check P1, zwei Scores (02.11.2026) · Prod 1.0.20–1.0.22
+
+**Was.** v3073 Detailgrad Einsteiger/Fortgeschritten/Experte (ersetzt Eingabetiefe, gekoppelt an MB-Stufe 1/2/3, je Objekt
+`dp_stufe`, Ersteinrichtung, geführte Eingabe, PDF-Annahmen). v3074 Spalte Erhaltung/Sanierung im Steuerformular.
+v3075 Quick-Check: `mietpotenzial-kern.js` (eine Rechnung für Leiter und QC), zulässige Miete nach 3 J., Zielkaufpreis
+zweistufig, Zustand + Sanierung, Zustand-Grenze im DealPilot Score, Mietbonus-Fehler behoben. v3076 Investor Deal Score
+wahlweise zwei Scores (Investment/Finanzierung), Einstellung `dp_score_ansicht`. Drei Pakete in Worktree-Kopien gebaut.
+**Merges** c56e46a9, 842ca7ba, 18c7c450; **Prod** 1.0.20 (8a0ead5), 1.0.21 (3f07c1d), 1.0.22 (df226e3). **Nachweis** und
+Einzelheiten `wissen/2026-11-02.md` Teil 11. **Rest** Abnahme Zustand-Grenze/Bonus, Messe-Drehbücher, Handbuch, N93,
+Bayern-BRW (iFrame, registry-Text, Anfrage).

@@ -36,6 +36,15 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N94 · Bayern-Bodenrichtwerte — Bezugswege (02.11.2026)
+
+Recherche `design/Vorschläge/bayern-bodenrichtwerte-bezugswege.md`: keine freie Alternative; 40/54 Ausschüsse zeigen den
+Wert offen, 13 gebührenpflichtig (München, Nürnberg, Augsburg …). 1. BayernAtlas-iFrame mit BRW-Ebene an der Adresse
+(erlaubt, 0 €) + eigener Eintrag. 2. `registry.js`-Hinweistext berichtigen (kein LDBV-Lizenzprodukt). 3. **Marcel:**
+Die „Freigabe (Aktennotiz Junker Solution)“ im Bayern-Adapter ist im Repo nicht belegt — Schreiben vorlegen oder Zeile
+streichen. 4. Anfrage an den Oberen Gutachterausschuss (Entwurf Abschnitt 7) — nicht gesendet. 5. Lizenzen je Ausschuss
+nur nach Marcels Entscheidung (Geld).
+
 ### N93 · Hilfen, Anleitungen und „Wie wir rechnen“ nachziehen — nach v3073/v3075/v3076 (Marcel 02.11.2026)
 
 Marcel: *„Ändern bzw. ergänzen wir dann auch, wie wir rechnen, und unsere Hilfen und Anleitungen …, auch wie der
@@ -4213,6 +4222,8 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3073–v3076** (Prod 1.0.20–1.0.22) — Detailstufen, Erhaltungsspalte, Quick-Check P1.1–P1.3, zwei Scores mit Einstellung. Einzelheiten `wissen/2026-11-02.md` Teil 11.
 
 - **02.11.2026 · v3070** (Prod 1.0.18) — harte Grenze als recherchierte DSCR-Staffel an einer Stelle (`ScoreTier.dscrDeckel`), ersetzt die pauschale 49 aus v3069.
 
