@@ -225,6 +225,7 @@
     var r = standardhebung(liste, buchstaben);
     if (r.anzahl < 2) return '';
     var j = afaJahre(), jt = (Math.abs(j - 100 / 3) < 0.1) ? '33⅓' : String(j).replace('.', ',');
+    var sz = String(Math.round(10000 / j) / 100).replace('.', ',');   /* v3064a: den Satz mitnennen (eigener Satz aus Gutachten z. B. 6,25 % = 16 J.) */
     var stil = 'margin:10px 0 0;padding:9px 12px;border-radius:8px;font-size:12.5px;line-height:1.5;';
     if (!r.hebung) return '<div class="dp-fesh dp-fesh-2" style="' + stil + 'background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 10%,#fff);border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 35%,transparent)">'
       + '<b>Steuer · 2 von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). Kommt ein dritter dazu — Fenster, Elektro, Sanitär oder Heizung — '
@@ -232,7 +233,7 @@
     return '<div class="dp-fesh dp-fesh-3" style="' + stil + 'background:color-mix(in srgb,#B8625C 8%,#fff);border:1px solid color-mix(in srgb,#B8625C 35%,transparent)">'
       + '<b style="color:#B8625C">Steuer · Standardhebung: ' + r.anzahl + ' von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). '
       + 'Wird dabei der Standard jeweils deutlich gehoben (nicht nur zeitgemäß ersetzt), sind die Kosten <b>Herstellungskosten</b>: '
-      + 'sie laufen über die AfA des Gebäudes (bei deinem Satz ' + jt + ' Jahre) und sind <b>kein sofort abziehbarer Erhaltungsaufwand</b> — '
+      + 'sie laufen über die AfA des Gebäudes (bei deinem AfA-Satz von ' + sz + ' % rund ' + jt + ' Jahre) und sind <b>kein sofort abziehbarer Erhaltungsaufwand</b> — '
       + 'auch unterhalb der 15-%-Grenze. Eine neue Wärmepumpe allein hebt den Standard nicht. Grundlage: BMF-Schreiben vom 26.01.2026; bitte mit dem Steuerberater abstimmen.</div>';
   }
   /* Vier Haken an den Sanierungskosten (Tab Investition), gespeichert in #san_fesh (z. B. „F,S,H"). */
