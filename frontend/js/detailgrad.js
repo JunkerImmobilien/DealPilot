@@ -255,6 +255,10 @@
   function fusszeile(sec) {
     var s = stufe();
     var fuss = sec.querySelector(':scope > .dp-dg-weiter');
+    /* v3080 · Marcel 02.11.2026: „das braucht man dann ja gar nicht mehr — nur umschaltbar
+       in den Einstellungen". Keine Fußzeile „+ n weitere Felder" mehr in den Reitern. */
+    if (fuss) fuss.remove();
+    return;
     if (s >= 3) { if (fuss) fuss.remove(); return; }
     var n = { 2: 0, 3: 0 }, k = { 2: 0, 3: 0 }, erfasst = 0;
     felderIn(sec).forEach(function (f) {

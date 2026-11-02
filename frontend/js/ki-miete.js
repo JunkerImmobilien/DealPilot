@@ -158,87 +158,12 @@ async function runKiMiete() {
        Funktion stehen und die lokale nie gesehen haetten. */
     var _esc = _kmEsc;
 
-    var html = '';
-
-    if (marktVal != null && !isNaN(marktVal)) {
-      var diff = marktVal - istQm;
-      var diffPct = istQm > 0 ? (diff / istQm * 100) : 0;
-      var marktAbs = marktVal * wfl;
-      var diffCol = diffPct > 5 ? '#3FA56C' : diffPct < -5 ? '#B8625C' : '#C9A84C';
-      var diffSign = diffPct > 0 ? '+' : '';
-
-      html += '<div class="ki-miete-block">';
-      html += '<div class="ki-miete-block-header">' +
-                '<span class="ki-miete-block-icon">💰</span>' +
-                '<span class="ki-miete-block-title">Marktmiete</span>' +
-                '<span class="ki-miete-block-value">' + marktVal.toFixed(2).replace('.', ',') + ' €/m²</span>' +
-              '</div>';
-
-      html += '<div class="ki-miete-compare">' +
-                '<div class="ki-miete-compare-row">' +
-                  '<span>Marktmiete (KI):</span>' +
-                  '<strong>' + marktVal.toFixed(2).replace('.', ',') + ' €/m² · ' + Math.round(marktAbs).toLocaleString('de-DE') + ' €/Mon</strong>' +
-                '</div>' +
-                '<div class="ki-miete-compare-row">' +
-                  '<span>Deine Ist-Miete:</span>' +
-                  '<strong>' + istQm.toFixed(2).replace('.', ',') + ' €/m² · ' + Math.round(nkm).toLocaleString('de-DE') + ' €/Mon</strong>' +
-                '</div>' +
-                '<div class="ki-miete-compare-row" style="color:' + diffCol + '">' +
-                  '<span>Differenz:</span>' +
-                  '<strong>' + diffSign + diff.toFixed(2).replace('.', ',') + ' €/m² (' + diffSign + diffPct.toFixed(1).replace('.', ',') + ' %)</strong>' +
-                '</div>' +
-              '</div>';
-
-      if (sugMarkt.reasoning) {
-        html += '<div class="ki-miete-reasoning">' + _esc(sugMarkt.reasoning) + '</div>';
-      }
-      html += _renderQuellen(sugMarkt);
-      if (sugMarkt.vergleich_text) html += '<div class="ki-miete-reasoning km-vgl-text">' + _esc(sugMarkt.vergleich_text) + '</div>';
-      html += _kmVergleichHtml(belege, marktVal, istQm, sugMarkt);
-
-      html += '<div class="ki-miete-actions">';
-      html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyMarktmiete(' + marktVal + ')">Marktmiete (€/m²) übernehmen</button>';
-      var newNkm = Math.round(marktVal * wfl);
-      if (Math.abs(newNkm - nkm) > 5) {
-        html += '<button type="button" class="btn btn-outline btn-sm" onclick="kiMieteApplyNkm(' + newNkm + ')">NKM auf ' + newNkm.toLocaleString('de-DE') + ' € setzen</button>';
-      }
-      html += '</div>';
-      html += '</div>';
-    } else if (belege) {
-      /* v2500 · die Belege stehen auch ohne KI-Wert da */
-      html += '<div class="ki-miete-block"><div class="ki-miete-block-header"><span class="ki-miete-block-icon">💰</span><span class="ki-miete-block-title">Marktmiete</span></div>'
-        + _kmVergleichHtml(belege, null, istQm, null) + '</div>';
-    }
-
-    if (ausfallVal && ausfallMap[ausfallVal]) {
-      var info = ausfallMap[ausfallVal];
-      html += '<div class="ki-miete-block">';
-      html += '<div class="ki-miete-block-header">' +
-                '<span class="ki-miete-block-icon">🛡</span>' +
-                '<span class="ki-miete-block-title">Mietausfall-Risiko</span>' +
-                '<span class="ki-miete-block-value" style="color:' + info.col + '">' + info.label + '</span>' +
-              '</div>';
-      if (sugAusfall.reasoning) {
-        html += '<div class="ki-miete-reasoning">' + _esc(sugAusfall.reasoning) + '</div>';
-      }
-      html += _renderQuellen(sugAusfall);
-      if (sugAusfall.vergleich_text) html += '<div class="ki-miete-reasoning km-vgl-text">' + _esc(sugAusfall.vergleich_text) + '</div>';
-      html += _kmRisikoHtml(belege, ausfallVal, sugAusfall);
-      html += '<div class="ki-miete-actions">';
-      html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyAusfall(\'' + _esc(ausfallVal) + '\')">Risiko-Einstufung übernehmen</button>';
-      html += '</div>';
-      html += '</div>';
-    } else if (belege) {
-      html += '<div class="ki-miete-block"><div class="ki-miete-block-header"><span class="ki-miete-block-icon">🛡</span><span class="ki-miete-block-title">Mietausfall-Risiko</span></div>'
-        + _kmRisikoHtml(belege, null, null) + '</div>';
-    }
-
-    if (!html) {
-      html = '<div class="ki-miete-err">Keine Empfehlungen erhalten.</div>';
-    } else {
-      html += '<div class="ki-miete-disclaimer">Die Werte der KI sind Schätzungen — vor Verwendung gegen Mietspiegel/Vergleichsmieten prüfen.'
-        + (belege ? ' Die Vergleichswerte darunter stammen aus DealPilots eigenen Daten (Marktbericht, Zensus 2022, Regionaldatenbank) und tragen ihren Stand.' : '') + '</div>';
-    }
+    /* v3080 · eine Antwort oben, Werte als Zeilen, Einzelheiten zugeklappt (_kmUebersicht unten).
+       Bis v3079 standen hier Marktmiete-Block, Vergleichstabelle und Risiko-Block untereinander. */
+    var html = (marktVal != null || ausfallVal || belege)
+      ? _kmUebersicht({ belege: belege, marktVal: marktVal, istQm: istQm, wfl: wfl, nkm: nkm, sugMarkt: sugMarkt, sugAusfall: sugAusfall, ausfallVal: ausfallVal })
+      : '<div class="ki-miete-err">Keine Empfehlungen erhalten.</div>';
+    void ausfallMap; void _esc;
 
     body.innerHTML = html;
 
@@ -449,3 +374,157 @@ window.runKiMiete = runKiMiete;
 window.kiMieteApplyMarktmiete = kiMieteApplyMarktmiete;
 window.kiMieteApplyNkm = kiMieteApplyNkm;
 window.kiMieteApplyAusfall = kiMieteApplyAusfall;
+
+/* ══ v3080 · ÜBERSICHT STATT ZAHLENWAND ═══════════════════════════════════
+   Marcel 02.11.2026: „brauchen wir überhaupt die ganzen Werte? Was muss der
+   Kunde wissen? Ziel ist eine plausible Recherche, welche Miete ich
+   tatsächlich ansetzen kann … orientieren, wie wir das unter Einheiten und
+   Zielmiete gemacht haben."
+   Oben EINE Antwort: die ansetzbare Miete mit Begründung in einem Satz.
+   Darunter eine Skala mit dem marktüblichen Band und den Vergleichswerten,
+   dann die Werte als Zeilen im Stil der Mietleiter (Punkt · Titel · Wert ·
+   Übernehmen). Alles Weitere (Begründung der KI, Quellen, Zensus-Details)
+   steht zugeklappt unter „Woher die Zahlen kommen".
+   Gerechnet wird nichts Neues: der Ansatz ist der Wert, den der Ertragswert
+   ansetzt (belege.ertrag); fehlt er, die Regel des Ertragswerts — Ist-Miete,
+   solange sie im Band liegt, sonst die obere Kante. Ohne Band (kein
+   Marktbericht) wird nur eingeordnet, nicht gekappt. */
+function _kmUStil() {
+  if (document.getElementById('kmu-stil')) return;
+  var s = document.createElement('style'); s.id = 'kmu-stil';
+  s.textContent = [
+    '.kmu{display:flex;flex-direction:column;gap:10px}',
+    '.kmu-urteil{border:1px solid #EFE7D6;border-left:4px solid #3FA56C;border-radius:10px;padding:10px 14px;background:#fff;display:flex;flex-direction:column;gap:2px}',
+    '.kmu-urteil.kmu-hoch{border-left-color:#B8625C}.kmu-urteil.kmu-luft{border-left-color:#3d6fa8}.kmu-urteil.kmu-offen{border-left-color:#8A8272}',
+    '.kmu-t{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
+    '.kmu-v{font:600 20px/1.25 "Space Grotesk",sans-serif;color:#2A2727}',
+    '.kmu-v small{font:500 13px Inter,sans-serif;color:#7A7370;margin-left:6px}',
+    '.kmu-u{font-size:12.5px;color:#4A4542;line-height:1.45}',
+    '.kmu-skala{position:relative;height:44px;margin:4px 6px 0;border-radius:6px}',
+    '.kmu-linie{position:absolute;left:0;right:0;top:20px;height:4px;border-radius:2px;background:#EFE7D6}',
+    '.kmu-band{position:absolute;top:14px;height:16px;border-radius:5px;background:color-mix(in srgb,#3FA56C 22%,transparent);border:1px solid color-mix(in srgb,#3FA56C 55%,transparent)}',
+    '.kmu-pkt{position:absolute;top:15px;width:14px;height:14px;margin-left:-7px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.18)}',
+    '.kmu-pkt.kmu-ist{width:4px;height:28px;top:8px;margin-left:-2px;border-radius:2px;border:0;box-shadow:none;background:#2A2727}',
+    '.kmu-ach{position:absolute;top:32px;font:500 10px "JetBrains Mono",monospace;color:#8A8272;transform:translateX(-50%);white-space:nowrap}',
+    '.kmu-p-ist{background:#2A2727}.kmu-p-markt{background:#3d6fa8}.kmu-p-pilot{background:var(--wl-c9a84c,#C9A84C)}.kmu-p-amtlich{background:#2f7d55}',
+    /* Zeilen im Stil der Mietleiter (potenzial.js leiterStil, dort privat) */
+    '.kmu .dp-ml{display:flex;flex-direction:column;border:1px solid #EFE7D6;border-radius:10px;padding:2px 12px;background:#fff}',
+    '.kmu .dp-ml-z{display:grid;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #F1ECE1}',
+    '.kmu .dp-ml-z:first-child{border-top:none}',
+    '.kmu .dp-ml-p{width:10px;height:10px;border-radius:50%;margin:0 0 0 4px}',
+    '.kmu .dp-ml-txt{display:flex;flex-direction:column;gap:1px;min-width:0}',
+    '.kmu .dp-ml-t{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#7A7370}',
+    '.kmu .dp-ml-t i{font:400 10.5px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#8A8272;font-style:normal}',
+    '.kmu .dp-ml-v{font:600 14px/1.35 "Space Grotesk",sans-serif;color:#2A2727}',
+    '.kmu .dp-ml-k{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;color:#2A2727;border-radius:7px;padding:5px 9px;font:500 12px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+    '.kmu .dp-ml-k:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,#fff)}',
+    '.kmu .dp-ml-z{grid-template-columns:18px 1fr auto auto}',
+    '.kmu .dp-ml-v small{font:500 11.5px Inter,sans-serif;color:#7A7370;margin-left:4px}',
+    '.kmu-k-voll{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#050505;border-color:transparent}',
+    '.kmu-risk{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;border:1px solid #EFE7D6;border-radius:10px;padding:8px 12px;background:#fff}',
+    '.kmu-risk .kmu-u{grid-column:1/2}',
+    '.kmu-mehr{border:1px solid #EFE7D6;border-radius:10px;padding:6px 12px;background:#fff}',
+    '.kmu-mehr>summary{cursor:pointer;font:600 10.5px/1.6 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
+    '.kmu-fuss{font-size:11px;color:#8A8272;line-height:1.45;margin:0}',
+    '@media (max-width:640px){.kmu .dp-ml-z{grid-template-columns:18px 1fr auto}.kmu .dp-ml-z .dp-ml-k{grid-column:2/4;justify-self:start}.kmu-risk{grid-template-columns:1fr}}'
+  ].join('');
+  document.head.appendChild(s);
+}
+function _kmEur(n) { return Math.round(n).toLocaleString('de-DE') + ' €'; }
+function _kmQmK(n) { return Number(n).toFixed(2).replace('.', ',') + ' €/m²'; }
+function _kmUebersicht(o) {
+  _kmUStil();
+  var b = o.belege || {}, ist = o.istQm > 0 ? o.istQm : null, wfl = o.wfl;
+  var band = (b.band && b.band.unten_qm > 0 && b.band.oben_qm > 0) ? { lo: b.band.unten_qm, hi: b.band.oben_qm } : null;
+  var m = (b.markt && !b.markt.fehlt && b.markt.wert_qm != null) ? b.markt : null;
+  var a = (b.amtlich && !b.amtlich.fehlt && b.amtlich.wert_qm != null) ? b.amtlich : null;
+  var pilot = (o.marktVal != null && isFinite(o.marktVal)) ? o.marktVal : null;
+
+  /* ── der Ansatz ── */
+  var ansatz = null, art = 'offen', satz = '';
+  var bandTxt = band ? 'marktüblichen Band (' + _kmQmK(band.lo).replace(' €/m²', '') + ' – ' + _kmQmK(band.hi) + ')' : '';
+  if (b.ertrag && b.ertrag.wert_qm != null) ansatz = b.ertrag.wert_qm;
+  if (ist != null && band) {
+    if (ist > band.hi + 0.005) { art = 'hoch'; if (ansatz == null) ansatz = band.hi;
+      satz = 'Deine Ist-Miete liegt über dem ' + bandTxt + '. Dauerhaft ansetzbar ist höchstens die obere Kante — bei einer Neuvermietung trägt der Markt die heutige Miete voraussichtlich nicht.'; }
+    else if (ist < band.lo - 0.005) { art = 'luft'; if (ansatz == null) ansatz = ist;
+      satz = 'Deine Ist-Miete liegt unter dem ' + bandTxt + ' — angesetzt wird, was vereinbart ist. Was du wann erhöhen darfst, zeigt die Mietleiter unter Einheiten bzw. Zielmiete.'; }
+    else { art = 'ok'; if (ansatz == null) ansatz = ist;
+      satz = 'Deine Ist-Miete liegt im ' + bandTxt + ' und ist damit plausibel. So setzt sie auch der Ertragswert an.'; }
+  } else if (ist != null && m && m.q25_qm != null && m.q75_qm != null) {
+    ansatz = ansatz != null ? ansatz : ist;
+    if (ist > m.q75_qm) { art = 'hoch'; satz = 'Deine Ist-Miete liegt über drei Vierteln der aktuellen Angebote in der Umgebung (mittlere Hälfte ' + _kmQmK(m.q25_qm).replace(' €/m²', '') + ' – ' + _kmQmK(m.q75_qm) + '). Prüfe, ob Ausstattung und Zustand das tragen.'; }
+    else if (ist < m.q25_qm) { art = 'luft'; satz = 'Deine Ist-Miete liegt unter den meisten Angeboten der Umgebung — Luft nach oben. Was zulässig ist, zeigt die Mietleiter.'; }
+    else { art = 'ok'; satz = 'Deine Ist-Miete liegt in der mittleren Hälfte der Angebote der Umgebung und ist damit plausibel.'; }
+    satz += ' Ein marktübliches Band gibt es erst mit dem Marktbericht.';
+  } else if (ist == null && band) {
+    art = 'offen'; ansatz = (band.lo + band.hi) / 2;
+    satz = 'Noch keine Ist-Miete eingetragen. Für die Planung ist der Anker der Marktüblichkeit (Mitte des Bands ' + _kmQmK(band.lo).replace(' €/m²', '') + ' – ' + _kmQmK(band.hi) + ') ein belastbarer Ansatz.';
+  } else if (ist != null) {
+    art = 'offen'; ansatz = ist;
+    satz = 'Für eine belastbare Einordnung fehlen Vergleichswerte — mit dem Marktbericht kommen Marktdurchschnitt und marktübliches Band dazu.';
+  } else {
+    satz = 'Trag im Reiter Miete die Nettokaltmiete ein oder ruf den Marktbericht ab — dann ordnet die Analyse ein.';
+  }
+
+  var h = '<div class="kmu">';
+  h += '<div class="kmu-urteil kmu-' + art + '"><span class="kmu-t">' + (ist == null && ansatz != null ? 'Ansatz für die Planung' : 'Ansetzbare Miete') + '</span>'
+    + (ansatz != null ? '<b class="kmu-v">' + _kmQmK(ansatz) + (wfl > 0 ? '<small>' + _kmEur(ansatz * wfl) + ' / Monat</small>' : '') + '</b>' : '')
+    + '<span class="kmu-u">' + _kmEsc(satz) + '</span></div>';
+
+  /* ── Werte als Zeilen (Stil Mietleiter), mit Skala ── */
+  var zeilen = [];
+  if (ist != null) zeilen.push({ c: 'ist', t: 'Deine Ist-Miete', h: 'Nettokaltmiete durch Wohnfläche', v: ist });
+  if (a) zeilen.push({ c: 'amtlich', t: 'Amtliche Vergleichsmiete', h: 'Mietpreisübersicht des Gutachterausschusses · eher Bestandsmieten', v: a.wert_qm });
+  if (m) zeilen.push({ c: 'markt', t: 'Marktdurchschnitt', h: 'aktuelle Angebote der Umgebung (Median)' + (m.anzahl != null ? ', ' + m.anzahl + ' Angebote' : ''), v: m.wert_qm });
+  if (pilot != null) zeilen.push({ c: 'pilot', t: 'Pilot-Recherche', h: 'Mietspiegel und Webquellen, Schätzung', v: pilot });
+  /* Vorschlag für das Feld Marktmiete: amtlich > Marktdurchschnitt > Pilot */
+  var vorschlag = a ? 'amtlich' : m ? 'markt' : pilot != null ? 'pilot' : null;
+
+  if (zeilen.length) {
+    var werte = zeilen.map(function (z) { return z.v; }); if (band) werte.push(band.lo, band.hi);
+    var lo = Math.min.apply(null, werte), hi = Math.max.apply(null, werte), sp = (hi - lo) || 1;
+    lo -= sp * 0.12; hi += sp * 0.12; sp = hi - lo;
+    var x = function (v) { return ((v - lo) / sp * 100).toFixed(1) + '%'; };
+    var sk = '<div class="kmu-skala" aria-hidden="true"><span class="kmu-linie"></span>';
+    if (band) sk += '<span class="kmu-band" style="left:' + x(band.lo) + ';width:' + ((band.hi - band.lo) / sp * 100).toFixed(1) + '%" title="marktübliches Band"></span>'
+      + '<span class="kmu-ach" style="left:' + x(band.lo) + '">' + _kmQmK(band.lo).replace(' €/m²', '') + '</span><span class="kmu-ach" style="left:' + x(band.hi) + '">' + _kmQmK(band.hi).replace(' €/m²', '') + '</span>';
+    zeilen.forEach(function (z) { if (z.c !== 'ist') sk += '<span class="kmu-pkt kmu-p-' + z.c + '" style="left:' + x(z.v) + '" title="' + _kmEsc(z.t) + ' ' + _kmQmK(z.v) + '"></span>'; });
+    if (ist != null) sk += '<span class="kmu-pkt kmu-ist" style="left:' + x(ist) + '" title="Deine Ist-Miete ' + _kmQmK(ist) + '"></span>';
+    h += sk + '</div>';
+
+    h += '<div class="dp-ml">' + zeilen.map(function (z) {
+      var abw = (ist != null && z.c !== 'ist') ? ' <small>' + ((z.v / ist - 1) * 100 >= 0 ? '+' : '') + Math.round((z.v / ist - 1) * 100) + ' % zur Ist-Miete</small>' : '';
+      var knopf = z.c === 'ist' ? '<span></span>'
+        : '<button type="button" class="dp-ml-k' + (z.c === vorschlag ? ' kmu-k-voll' : '') + '" onclick="kiMieteApplyMarktmiete(' + Number(z.v).toFixed(2) + ')" title="In das Feld Marktmiete (€/m²) übernehmen — es fließt in den Investor Deal Score">als Marktmiete</button>';
+      return '<div class="dp-ml-z"><span class="dp-ml-p kmu-p-' + z.c + '"></span><span class="dp-ml-txt"><span class="dp-ml-t">' + _kmEsc(z.t) + ' <i>' + _kmEsc(z.h) + '</i></span>'
+        + '<span class="dp-ml-v">' + _kmQmK(z.v) + abw + '</span></span><span></span>' + knopf + '</div>';
+    }).join('') + '</div>';
+  }
+
+  /* ── Mietausfall in einer Zeile ── */
+  var WORT = { sehr_niedrig: 'Sehr niedrig', niedrig: 'Niedrig', mittel: 'Mittel', erhoeht: 'Erhöht', hoch: 'Hoch' };
+  var lz = (b.leerstand && !b.leerstand.fehlt) ? b.leerstand : null, bv = (b.bevoelkerung && !b.bevoelkerung.fehlt) ? b.bevoelkerung : null;
+  var risiko = o.ausfallVal || (lz && lz.anhalt ? lz.anhalt.wert : null);
+  if (risiko && WORT[risiko]) {
+    var bel = [];
+    if (lz && lz.marktaktiv_pct != null) bel.push('Leerstand ' + String(Number(lz.marktaktiv_pct).toFixed(1)).replace('.', ',') + ' % (Zensus 2022, ' + _kmEsc(lz.name || lz.ebene || '') + ')');
+    if (bv && bv.trend_pct_pa != null) bel.push('Bevölkerung ' + (bv.trend_pct_pa >= 0 ? '+' : '') + String(Number(bv.trend_pct_pa).toFixed(2)).replace('.', ',') + ' % pro Jahr');
+    h += '<div class="kmu-risk"><span><span class="kmu-t">Mietausfall-Risiko</span> <b style="font:600 14px Space Grotesk,sans-serif;color:' + (/erhoeht|hoch/.test(risiko) ? '#B8625C' : risiko === 'mittel' ? '#b8932f' : '#2f7d55') + '">' + WORT[risiko] + '</b></span>'
+      + '<button type="button" class="dp-ml-k" onclick="kiMieteApplyAusfall(\'' + _kmEsc(risiko) + '\')">übernehmen</button>'
+      + (bel.length ? '<span class="kmu-u">' + bel.join(' · ') + '</span>' : '') + '</div>';
+  }
+
+  /* ── alles Weitere zugeklappt ── */
+  var mehr = '';
+  if (o.sugMarkt && o.sugMarkt.reasoning) mehr += '<div class="ki-miete-reasoning">' + _kmEsc(o.sugMarkt.reasoning) + '</div>';
+  mehr += _renderQuellen(o.sugMarkt);
+  if (o.sugMarkt && o.sugMarkt.vergleich_text) mehr += '<div class="ki-miete-reasoning km-vgl-text">' + _kmEsc(o.sugMarkt.vergleich_text) + '</div>';
+  if (o.belege) mehr += _kmVergleichHtml(o.belege, pilot, o.istQm, o.sugMarkt);
+  if (o.sugAusfall && o.sugAusfall.reasoning) mehr += '<div class="ki-miete-reasoning">' + _kmEsc(o.sugAusfall.reasoning) + '</div>';
+  if (o.belege) mehr += _kmRisikoHtml(o.belege, o.ausfallVal, o.sugAusfall);
+  if (mehr) h += '<details class="kmu-mehr"><summary>Woher die Zahlen kommen</summary>' + mehr + '</details>';
+
+  h += '<p class="kmu-fuss">Die Pilot-Recherche ist eine Schätzung; Marktdurchschnitt und Band stammen aus dem Marktbericht und tragen dort ihren Stand.</p>';
+  return h + '</div>';
+}
