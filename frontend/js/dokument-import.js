@@ -265,15 +265,45 @@
     var gemeinschaft = function (n) { return ext.umfang === 'einzel' ? n : (anteil == null ? null : n * anteil); };
     var ohneMea = false;
     (ext.ruecklage_entnahmen || []).forEach(function (x) { var n = _zahl(x.betrag_eur); if (n > 0) { var a = gemeinschaft(n); if (a == null) { ohneMea = true; return; } erh += a; teile.push((x.zweck || 'Entnahme') + ' (Rücklage)'); } });
-    (ext.sonderumlagen || []).forEach(function (x) {
-      if (_zahl(x.jahr) && _zahl(x.jahr) !== jahr) return;
-      var n = _zahl(x.betrag_einheit_eur) != null ? _zahl(x.betrag_einheit_eur) : gemeinschaft(_zahl(x.betrag_gesamt_eur) || 0);
-      if (n == null) { ohneMea = true; return; }
-      if (n > 0) { erh += n; teile.push((x.zweck || 'Sonderumlage') + ' (Sonderumlage)'); }
-    });
+    /* v3092 · N100 (Marcel 02.11.2026 „so wie dein Vorschlag"): die Sonderumlage steht hier NICHT mehr im
+       Erhaltungsaufwand des Planjahres. Sie läuft über sonderumlagenAus() in die Liste im Reiter
+       Bewirtschaftung (sonderumlage.js): Cashflow automatisch im Fälligkeitsjahr, Steuer nur als Vorschlag
+       mit „Jahr der Verwendung" und „Art" (BFH IX R 19/24: absetzbar erst, wenn die Gemeinschaft das Geld
+       ausgibt) und Prüfung gegen die 15-%-Grenze. Hier mitgerechnet, stünde sie doppelt im Steuer-Reiter. */
     if (ohneMea) teile.push('ohne Miteigentumsanteil nicht anteilig rechenbar');
     if (anteil != null && anteil !== 1 && erh > 0) teile.push('Anteil ' + String(Math.round(anteil * 10000) / 100).replace('.', ',') + ' %');
     if (erh > 0) aus.push({ jahr: jahr, feld: 'erhaltungsaufwand', wort: 'Erhaltungsaufwand', betrag: Math.round(erh), hinweis: teile.join(', ') + ' · absetzbar im Jahr, in dem die Gemeinschaft das Geld für Erhaltung ausgibt; in den ersten drei Jahren nach Kauf zählt es zur 15-%-Grenze - mit dem Steuerberater abstimmen' });
+    return aus;
+  }
+  /* v3092 · N100 · die Sonderumlagen eines Wirtschaftsplans/einer Abrechnung (sonderumlagen) oder eines
+     Versammlungsprotokolls (sonderumlagen_geplant) als ANTEIL dieses Objekts. Dieselbe Anteilsregel wie
+     der Erhaltungsaufwand (v3090a): Wohnung → Betrag der Einheit laut Plan, sonst Betrag der Gemeinschaft ×
+     Miteigentumsanteil; ganzes Haus → Betrag der Gemeinschaft. Ohne MEA bei einer Wohnung kein Betrag
+     (Hinweis statt einer falschen Zahl). Bis v3091 nahm der Steuer-Vorschlag den Betrag der Einheit auch
+     beim ganzen Haus (Lindenallee 14, MFH: 4.956 statt 42.000 €). */
+  function sonderumlagenAus(ext, typ, ktx) {
+    if (!ext || (typ !== 'hausgeld' && typ !== 'weg_protokoll')) return [];
+    var art = _ktxArt(ktx), etw = art === 'ETW';
+    var mea = (ktx && ktx.mea > 0) ? ktx.mea : ((typeof parseDe === 'function' ? parseDe(_feldWert('mea')) : parseFloat(_feldWert('mea'))) || 0);
+    var meaWie = '';
+    if (!(mea > 0) && ext.mea && window.DpUnterlagen && window.DpUnterlagen.meaProzent) { var mp = window.DpUnterlagen.meaProzent(ext.mea); if (mp > 0) { mea = mp; meaWie = ' (laut Plan ' + ext.mea + ')'; } }
+    var quelle = typ === 'hausgeld' ? ((ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '')) : ('Protokoll' + (ext.versammlungsdatum ? ' ' + ext.versammlungsdatum : ''));
+    var roh = typ === 'hausgeld'
+      ? (ext.sonderumlagen || []).map(function (x) { return { zweck: x.zweck, gesamt: _zahl(x.betrag_gesamt_eur), einheit: _zahl(x.betrag_einheit_eur), jahr: _zahl(x.jahr) || _zahl(ext.jahr), faellig: x.faellig || '' }; })
+      : (ext.sonderumlagen_geplant || []).map(function (x) { return { zweck: String(x.beschreibung || '').replace(/^\s*sonderumlage\s*(für|fuer)?\s*/i, ''), gesamt: _zahl(x.betrag_eur), einheit: null, jahr: _zahl(x.jahr), faellig: '' }; });
+    var aus = [];
+    roh.forEach(function (x) {
+      var betrag = null, wie = '';
+      if (etw) {
+        if (x.einheit != null && x.einheit > 0) { betrag = x.einheit; wie = 'Betrag der Wohnung laut ' + quelle; }
+        else if (x.gesamt > 0 && mea > 0) { betrag = x.gesamt * mea / 100; wie = _fmt(x.gesamt) + ' € der Gemeinschaft × Miteigentumsanteil ' + String(Math.round(mea * 100) / 100).replace('.', ',') + ' %' + meaWie; }
+        else if (x.gesamt > 0) { aus.push({ hinweis: 'Sonderumlage ' + (x.zweck || '') + ' (' + _fmt(x.gesamt) + ' € der Gemeinschaft) nicht übernommen - ohne Miteigentumsanteil ist der Anteil der Wohnung offen. Trag den MEA im Reiter Objekt ein und lies die Unterlage erneut ein.' }); return; }
+      } else if (art) {
+        if (x.gesamt > 0) { betrag = x.gesamt; wie = 'Betrag der Gemeinschaft laut ' + quelle + ' (ganzes Haus)'; }
+      } else if (x.einheit > 0) { betrag = x.einheit; wie = 'Betrag der Wohnung laut ' + quelle + ' - Objektart noch offen, bitte prüfen'; }
+      if (!(betrag > 0) || !x.jahr) return;
+      aus.push({ zweck: String(x.zweck || 'Sonderumlage').trim(), jahr: x.jahr, faellig: String(x.faellig || ''), betrag: Math.round(betrag), gesamt: x.gesamt || null, wie: wie, quelle: quelle });
+    });
     return aus;
   }
   function _abgleich(ext, typ, ktx) {
@@ -518,6 +548,7 @@
     lesenText: lesenText,
     abgleich: _abgleich,
     steuerVorschlaege: steuerVorschlaege,   /* v3017 */
+    sonderumlagenAus: sonderumlagenAus,     /* v3092 · N100 */
     vergleich: vergleich
   };
 

@@ -1084,6 +1084,7 @@ function _calcImmediate(){
   st('san_limit_max', fE(sanLimit, 0));
   st('san_limit_actual', fE(sanIstNetto, 0));
   var sanPct = sanLimit > 0 ? (sanIstNetto / sanLimit * 100) : 0;
+  State.san15 = { limit: sanLimit, istNetto: sanIstNetto };   /* v3092 · N100: Sonderumlage gegen dieselbe Grenze (sonderumlage.js) */
   /* ═══ v1898 · DIE NUTZUNGSDAUER WIRD AUSGELESEN, NICHT ANGENOMMEN ════════
    * Hier stand „50 Jahre AfA" als feste Zahl in der Status-Pille. tax.js
    * leitet sie aber aus dem AfA-Satz ab (`afa_nutzungsdauer`, tax.js:1127):
@@ -2429,6 +2430,13 @@ function _calcImmediate(){
   //   das aufgebaute Sparguthaben als eigene Vermögensposition berücksichtigt werden.
   // V63.60: Anschluss-Logik korrigiert — bei 'after_ezb'/'never' bleibt RS voll
   //   (Sparguthaben bleibt im Vertrag gebunden, wird NICHT Sondertilgung), Sparrate läuft weiter.
+  /* v3092 · N100 · Sonderumlagen der WEG: einmalige Ausgabe im Jahr der Fälligkeit (BGH V ZR 257/16,
+     § 28 Abs. 3 WEG - der Erwerber schuldet, was nach dem Eigentumswechsel fällig wird). Nur Liquidität:
+     CF v. St. und n. St. sinken, die Steuer der Projektion bleibt unberührt (Werbungskosten erst bei
+     Verwendung durch die Gemeinschaft, BFH IX R 19/24 - das ist ein Vorschlag im Steuer-Reiter, keine
+     Automatik). Nicht in bwk_cf_y: DSCR je Jahr misst den laufenden Betrieb, keine Einmalzahlung. */
+  var _suJahr = {};
+  try { if (window.DpSonderumlage && typeof DpSonderumlage.jeJahr === 'function') _suJahr = DpSonderumlage.jeJahr() || {}; } catch (_suE) { _suJahr = {}; }
   var rs_loop = d1, cfkum = 0;
   /* v1260: Die Jahres-Cashflows MITSCHREIBEN. Die Schleife unten rechnet
      `cf_y_ns` für jedes Jahr und addiert es sofort in `cfkum` — der einzelne
@@ -2521,6 +2529,8 @@ function _calcImmediate(){
     var tax_y_loop = _mtxYear((nkm_y-bwk_st_y-_zy_eff)-_afa_eff, _calYearBase + y - 1);
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
+    var _su_loop = (_suJahr[_calYearBase + y - 1] > 0) ? _suJahr[_calYearBase + y - 1] : 0;   /* v3092 · N100: Einmalzahlung, wie cfRows */
+    cf_y_ns -= _su_loop;
     cfkum+=cf_y_ns;
     /* ═══ v1260c · Die Tilgung MUSS hier abgezogen werden ═══════════════════
        ZURÜCKGENOMMEN: v1260 hat `cf_y_ns` roh in die Reihe gelegt. Das war
@@ -2553,7 +2563,7 @@ function _calcImmediate(){
     bspar_kum += bspar_y_loop;
     rs_loop=Math.max(0,rs_loop-ty*_ef);  /* v816-ef-tilg: Tilgung im letzten Jahr anteilig */
     miete_kum += nkm_y;
-    bwk_kum   += bwk_cf_y;
+    bwk_kum   += bwk_cf_y + _su_loop;   /* v3092: Aufschluesselung bleibt summengleich */
     zins_kum  += _zy_eff;  /* v816-ef-kum */
     tax_kum   += tax_y_loop;
   }
@@ -3293,6 +3303,7 @@ function _calcImmediate(){
   var bsv_zuteil_jahr = (lc_proj && lc_proj.jahreBisZuteilung > 0) ? lc_proj.jahreBisZuteilung : 999;
   // V63.64: kumuliertes Sparguthaben pro Jahr — für Bank-Charts (Equity-Aufbau, Waterfall)
   var bspar_kum_proj = 0;
+  /* v3092 · _suJahr (Sonderumlagen je Jahr) steht vor der ersten Jahresschleife */
 
   for(var y=1;y<=btj;y++){
     var cal=_v268_baseYear+y-1; // V268-06: Kaufjahr-basiert
@@ -3632,9 +3643,11 @@ function _calcImmediate(){
       taxEffect_y     = _mtxYear(zve_op_y - _afaPush, _v268_baseYear + y - 1);
       cfns_y          = cfop_y - taxEffect_y;
     }
+    var su_y = (_suJahr[cal] > 0) ? _suJahr[cal] : 0;   /* v3092 · N100: nach allen Neuberechnungen oben abziehen */
+    if (su_y) { cfop_y -= su_y; cfns_y -= su_y; }
     var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);  // V354: kombinierte RS fuer Anzeige
     var eff_rs = Math.max(0, _rs_push - bspar_kum_proj);
-    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush,rs_d1:rs3,rs_d2:(typeof rs3_d2==='number'?rs3_d2:null)});  /* v2989: Restschuld je Darlehen fuer die Jahresstaende (jahresstaende.js) - nur mitgefuehrt, nichts neu gerechnet */  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
+    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,su_y:su_y,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush,rs_d1:rs3,rs_d2:(typeof rs3_d2==='number'?rs3_d2:null)});  /* v2989: Restschuld je Darlehen fuer die Jahresstaende (jahresstaende.js) - nur mitgefuehrt, nichts neu gerechnet */  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
   }
   /* v1898 · WOHER DAS zvE JE JAHR KAM — die Herkunft ist ausweisbar, statt
      dass eine Zahl ohne Vermerk dasteht. 'steuerzeitraum' = aus Marcels
@@ -3940,6 +3953,7 @@ function _calcImmediate(){
     } catch (e) { /* fallback: Quick-Methode-Werte bleiben drin */ }
   }
   renderProjTable();
+  try { if (window.DpSonderumlage) DpSonderumlage.render(); } catch (_suR) {}   /* v3092 · N100: Liste + 15-%-Status */
   renderCFCalc(window._cfMode || 'heute');
   if(typeof renderBankTable==='function')renderBankTable();
   if(typeof renderPhaseTable==='function')renderPhaseTable();
@@ -4069,7 +4083,8 @@ function renderProjTable(){
     return'<tr class="'+(r.y===bj?'ezb':'')+'">'+
       '<td class="tal">'+r.cal+'</td>'+
       '<td>'+fE(r.nkm_m)+'</td><td>'+fE(r.wm_m)+'</td>'+
-      '<td class="neg">–'+fE(r.bwk_cf_y || r.bwk_y)+'</td>'+
+      /* v3092 · N100: die Sonderumlage steht in der Kostenspalte, damit die Zeile aufgeht (CF = Miete - Kosten - Zins - Tilgung) */
+      (r.su_y > 0 ? '<td class="neg" title="inkl. Sonderumlage '+fE(r.su_y,0)+' (einmalig, Fälligkeitsjahr)">–'+fE((r.bwk_cf_y || r.bwk_y) + r.su_y)+' <span class="proj-su-mark" style="font-size:10px;color:var(--muted)">inkl. SU</span></td>' : '<td class="neg">–'+fE(r.bwk_cf_y || r.bwk_y)+'</td>')+
       '<td class="neg">–'+fE(r.zy)+'</td>'+
       '<td class="neg">–'+fE(tilgOrBspar)+'</td>'+
       '<td class="'+(cf_vst_j>=0?'pos':'neg')+'">'+fE(cf_vst_j,0,true)+'</td>'+
@@ -4094,7 +4109,7 @@ function renderProjTable(){
     State.cfRows.forEach(function(r) {
       sumNkmM += r.nkm_m;
       sumWmM  += r.wm_m;
-      sumBwk  += (r.bwk_cf_y || r.bwk_y);
+      sumBwk  += (r.bwk_cf_y || r.bwk_y) + (r.su_y || 0);   /* v3092 */
       sumZins += r.zy;
       sumTilg += hasBspar ? (r.bspar_y || 0) : r.ty;
       sumCfVst += r.cfop_y;

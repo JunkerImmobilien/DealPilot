@@ -2077,6 +2077,19 @@
             ist: (w.eigen || w.wert) ? String(Math.round(w.wert)) : '', istEigen: !!w.eigen, source: t.label || 'Dokument', kind: 'steuer', jahr: s.jahr, feld: s.feld, herleitung: s.hinweis };
         });
       }
+      /* v3092 · N100 · Sonderumlagen aus Wirtschaftsplan/Abrechnung oder Protokoll → Liste im Reiter
+         Bewirtschaftung (sonderumlage.js). Nie vorgehakt (wie v3088a). Schlüssel Jahr + Betrag: dieselbe
+         Umlage aus Protokoll UND Plan steht nur einmal da, der Plan (mit Fälligkeitstag) gewinnt. */
+      if (typeof D.sonderumlagenAus === 'function' && window.DpSonderumlage) {
+        D.sonderumlagenAus(t.extracted || {}, t.typ, ktx).forEach(function (s) {
+          if (s.hinweis) { _importHinweise.push(s.hinweis); return; }
+          var key = 'su:' + s.jahr + ':' + s.betrag, alt = _merged[key];
+          if (alt && alt.su && alt.su.faellig && !s.faellig) return;
+          _merged[key] = { nurAktiv: true, label: 'Sonderumlage · ' + s.zweck, value: fmt0(s.betrag) + ' € fällig ' + (s.faellig || s.jahr), raw: String(s.betrag),
+            source: t.label || 'Dokument', kind: 'sonderumlage', su: s, ort: 'Bewirtschaftung',
+            herleitung: s.wie + ' · Cashflow: einmalige Ausgabe im Fälligkeitsjahr · Steuer: Vorschlag mit Jahr der Verwendung und Art im Reiter Bewirtschaftung' };
+        });
+      }
       (D.vergleich(t.extracted || {}) || []).forEach(function (v) { _vergleich.push({ wort: v.wort, wert: v.wert, eigen: v.eigen, quelle: t.label || 'Dokument' }); });
     });
   }
@@ -2339,7 +2352,7 @@
       + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '';
     /* v3088a · Hinweis, wenn Zeilen aus Wirtschaftsplan/Abrechnung bewusst nicht vorgehakt sind */
     var nAktiv = keys.filter(function (id) { return _merged[id] && _merged[id].nurAktiv && abw[id] === undefined; }).length;
-    if (nAktiv) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px"><b>' + nAktiv + (nAktiv === 1 ? ' Wert' : ' Werte') + ' aus Wirtschaftsplan oder Abrechnung</b> (Hausgeld, Steuer) stehen hier nur zur Ansicht. Hak an, was übernommen werden soll.</div>';
+    if (nAktiv) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px"><b>' + nAktiv + (nAktiv === 1 ? ' Wert' : ' Werte') + ' aus WEG-Unterlagen</b> (Hausgeld, Steuer, Sonderumlage) stehen hier nur zur Ansicht. Hak an, was übernommen werden soll.</div>';
     host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
@@ -2667,6 +2680,9 @@
     }
     if (it.kind === 'steuer') {   /* v3017 */
       return (typeof window.dpSteuerSetzen === 'function' && window.dpSteuerSetzen(it.jahr, it.feld, it.raw)) ? 'text' : null;
+    }
+    if (it.kind === 'sonderumlage') {   /* v3092 · N100 */
+      return (window.DpSonderumlage && window.DpSonderumlage.uebernehmen(it.su)) ? 'text' : null;
     }
     if (it.kind === 'merken') {
       if (!_auswertung || !window.DpUnterlagen) return null;

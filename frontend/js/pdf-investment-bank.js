@@ -1338,7 +1338,7 @@
         if (y > H - 30) { doc.addPage(); kopf('Cashflow-Entwicklung', 'Fortsetzung'); tabZeile(sp.map(function (s) { return s[0]; }), false, true); }
         /* Steuer: tax_y > 0 ist eine Belastung - gezeigt mit Vorzeichen der Kasse (wie pdf.js) */
         var st = da(r.tax_y) === null ? null : -r.tax_y;
-        tabZeile([r.cal || r.y, fmt(r.nkm_y), fmt(r.bwk_cf_y != null ? r.bwk_cf_y : r.bwk_y), fmt(r.zy), fmt(_bsvJ ? (r.ty || 0) + (r.bspar_y || 0) : r.ty), fmt(r.cfop_y),
+        tabZeile([r.cal || r.y, fmt(r.nkm_y), fmt((r.bwk_cf_y != null ? r.bwk_cf_y : r.bwk_y) + (r.su_y || 0)) /* v3092 N100: inkl. Sonderumlage */, fmt(r.zy), fmt(_bsvJ ? (r.ty || 0) + (r.bspar_y || 0) : r.ty), fmt(r.cfop_y),
           st === null ? '-' : (st > 0.5 ? '+' : '') + fmt(st), fmt(r.cfns_y), fmt(r.rs), pct(r.ltv_y, 0)]);
       });
       y += 1;
