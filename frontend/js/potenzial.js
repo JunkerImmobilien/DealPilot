@@ -243,12 +243,16 @@
       else if (!(ist > 0)) z.push({ k: 'Nächste Erhöhung', v: '—', u: 'nicht vermietet' });
       else if (s.miete != null && s.miete > ist + 0.01) z.push({ k: 'Nächste Erhöhung',
         v: 'auf ' + eur(s.miete) + '/Monat' + (wfl ? ' (' + eur2(s.miete / wfl) + '/m²)' : ''),
-        u: (s.termine ? s.termine.text : '') + (s.grenze ? ' · Grenze: ' + s.grenze : '') + (s.herkunft === 'eigene Angabe' ? ' · eigene Angabe' : ''),
+        /* v3062a · die § 559-Umlage gehört in die Zeile: Wohnung 3 Westerfeldstr. stieg auf 9,92 €/m² bei
+           Vergleichsmiete 8,40 - 588 € nach § 558 plus 107 € Umlage. „Grenze: Vergleichsmiete" allein war falsch. */
+        u: (s.termine ? s.termine.text : '') + (s.grenze ? ' · Grenze § 558: ' + s.grenze : '')
+          + (s.umlage559 && s.umlage559.monat > 0 ? ' · darin Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat' : '')
+          + (s.herkunft === 'eigene Angabe' ? ' · eigene Angabe' : ''),
         warn: !!(s.termine && s.termine.letzte_fehlt) || !!(s.hinweise && s.hinweise.length),
         lang: [s.termine && s.termine.sperre, (s.hinweise || []).join(', ')].filter(Boolean).join(' · ') });
       else {
         var fr = s.termine ? (s.termine.letzte_fehlt ? 'Datum der letzten Erhöhung eintragen — Sperrfrist sonst nicht geprüft'
-          : 'frühestens ' + (s.termine.verlangbar_sofort ? 'sofort' : mmjj(s.termine.verlangbar_ab)) + ' verlangbar') : '';
+          : (s.termine.verlangbar_sofort ? 'Sperrfrist abgelaufen' : 'Sperrfrist bis ' + mmjj(s.termine.verlangbar_ab))) : '';
         z.push({ k: 'Nächste Erhöhung', v: 'kein Spielraum',
           u: (s.grund || '') + (fr ? ' · ' + fr : ''), warn: !!(s.termine && s.termine.letzte_fehlt) });
       }
