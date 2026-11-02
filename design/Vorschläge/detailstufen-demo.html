@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot Detailstufen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Entwurf 02.11.2026 · Demo-first, nicht in der App · alle Zahlen sind BEISPIELE */
+:root{
+  --obsidian:#050505; --gold:var(--wl-c9a84c,#C9A84C); --gold-hi:var(--wl-e8cc7a,#E8CC7A); --gold-lo:var(--wl-b8932f,#b8932f);
+  --green:#3FA56C; --red:#B8625C; --creme:#FDFCFA; --karte:#FBF6E9; --ink:#1d1b19; --muted:#8a837c;
+  --line:rgba(201,168,76,.28);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--obsidian);color:var(--creme);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 16px 80px}
+h1{font-family:'Space Grotesk',sans-serif;font-size:28px;margin:0 0 4px;color:var(--gold-hi)}
+h2{font-family:'Space Grotesk',sans-serif;font-size:19px;margin:0 0 10px}
+h3{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:0 0 8px}
+.mono,.lbl{font-family:'JetBrains Mono',monospace}
+.lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lead{color:#cfc9c0;max-width:72ch;margin:0 0 18px;font-size:14.5px}
+.beispiel{display:inline-block;font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.12em;padding:3px 8px;border:1px solid var(--red);color:#e6a49e;border-radius:4px;vertical-align:middle}
+.runway{height:3px;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));border-radius:2px;margin:14px 0 22px}
+
+/* Hauptreiter */
+.views{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.views button,.seg button{font:600 13px 'Space Grotesk',sans-serif;cursor:pointer;border:1px solid var(--line);background:#111;color:var(--creme);padding:9px 14px;border-radius:8px}
+.views button.on{background:var(--gold);color:var(--obsidian);border-color:var(--gold)}
+.view{display:none}.view.on{display:block}
+
+/* Stufenschalter */
+.stufen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.stufe{cursor:pointer;text-align:left;border:1px solid var(--line);background:#0e0d0c;color:var(--creme);border-radius:10px;padding:12px 14px;font-family:Inter,sans-serif}
+.stufe b{display:block;font:600 16px 'Space Grotesk',sans-serif;color:var(--gold-hi)}
+.stufe span{font-size:12px;color:#bdb6ad}
+.stufe .n{font:600 11px 'JetBrains Mono',monospace;color:var(--muted);margin-top:6px;display:block}
+.stufe.on{border-color:var(--gold);background:linear-gradient(180deg,rgba(201,168,76,.16),rgba(201,168,76,.03));box-shadow:0 0 0 1px var(--gold) inset}
+
+.grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start}
+.panel{background:var(--karte);color:var(--ink);border-radius:12px;padding:16px}
+.panel.dark{background:#0f0e0d;color:var(--creme);border:1px solid var(--line)}
+.gruppe{margin-bottom:14px}
+.gruppe .gk{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #e6dcc3;padding-bottom:4px;margin-bottom:8px}
+.gruppe .gk h3{margin:0;color:var(--ink)}
+.felder{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.f label{display:block;font-size:11.5px;color:#5d564f;margin-bottom:2px}
+.f input,.f select{width:100%;font:500 13.5px Inter,sans-serif;padding:7px 8px;border:1px solid #d9cfb6;border-radius:6px;background:#fff;color:var(--ink)}
+.f.vorgabe input{background:#f6efdc;border-style:dashed;color:#6d6457}
+.tag{font:600 9.5px 'JetBrains Mono',monospace;letter-spacing:.06em;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:1px}
+.tag.v{background:#efe3bf;color:#7a5f17}.tag.p{background:#1d1b19;color:var(--gold-hi)}.tag.m{background:#e3efe7;color:#2c7a4f}
+.f.neu{animation:neu 1.2s ease}
+@keyframes neu{from{box-shadow:0 0 0 3px rgba(201,168,76,.7);border-radius:6px}to{box-shadow:none}}
+.versteckt{display:none}
+.hinweis{font-size:12.5px;background:#f3ead2;border-left:3px solid var(--gold);padding:8px 10px;border-radius:4px;color:#4c463f;margin-top:8px}
+.vorgabenliste{font-size:12.5px;color:#4c463f;margin:6px 0 0;padding-left:18px}
+
+/* Ergebnis */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.kpi{background:#151413;border:1px solid #2a2622;border-radius:8px;padding:9px 10px}
+.kpi .w{font:600 20px 'Space Grotesk',sans-serif}
+.kpi .h{font-size:11px;color:var(--muted)}
+.kpi.aus .w{color:#5f5953;font-size:14px}
+.ring{display:flex;gap:12px;align-items:center;margin:6px 0 4px}
+.ring svg{flex:0 0 auto}
+.pill{display:inline-block;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:var(--gold);color:var(--obsidian)}
+.siegel{display:inline-block;font:600 10.5px 'JetBrains Mono',monospace;padding:2px 7px;border:1px dashed var(--gold);color:var(--gold-hi);border-radius:4px}
+.pdf{margin-top:12px;background:var(--creme);color:var(--ink);border-radius:8px;padding:12px;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.pdf .band{background:var(--obsidian);color:var(--gold-hi);font:600 11px 'JetBrains Mono',monospace;letter-spacing:.08em;padding:6px 8px;border-radius:4px;margin:-2px -2px 8px}
+.pdf ul{margin:4px 0 0;padding-left:16px;font-size:12px}
+.pdf .fehlt{color:#8a5a55}
+.btn{display:inline-block;margin-top:10px;font:600 13px 'Space Grotesk',sans-serif;background:var(--gold);color:var(--obsidian);border:0;padding:9px 14px;border-radius:8px;cursor:pointer}
+.zaehler{font:500 12px 'JetBrains Mono',monospace;color:#bdb6ad}
+
+/* Mietleiter */
+.seg{display:inline-flex;gap:4px;margin:0 8px 14px 0}
+.seg button.on{background:var(--gold);color:var(--obsidian);border-color:var(--gold)}
+.schalter{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 14px;font-size:13px;color:#cfc9c0}
+.schalter label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.leiter{display:flex;flex-direction:column-reverse;gap:8px}
+.sprosse{display:grid;grid-template-columns:150px 1fr 170px;gap:12px;align-items:center;background:var(--karte);color:var(--ink);border-radius:10px;padding:10px 12px}
+.sprosse .nm b{display:block;font:600 14px 'Space Grotesk',sans-serif}
+.sprosse .nm small{font-size:11.5px;color:#6d6457}
+.bar{height:26px;background:#ece2c8;border-radius:5px;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));border-radius:5px}
+.bar.heute i{background:#7b746c}
+.bar em{position:absolute;left:8px;top:4px;font:600 13px 'JetBrains Mono',monospace;font-style:normal;color:var(--obsidian)}
+.wert{text-align:right}
+.wert b{font:600 17px 'Space Grotesk',sans-serif;display:block}
+.wert small{font-size:11.5px;color:#5d564f}
+.plus{color:var(--green);font-weight:600}
+.herk{display:inline-block;font:600 9.5px 'JetBrains Mono',monospace;letter-spacing:.05em;padding:2px 6px;border-radius:3px;margin:3px 3px 0 0;white-space:nowrap}
+.h-amt{background:#e3efe7;color:#256b45}
+.h-markt{background:#f1e5c2;color:#7a5f17}
+.h-eigen{background:#e9e5df;color:#4c463f}
+.h-naeh{background:transparent;color:#7a5f17;border:1px dashed var(--gold-lo)}
+.h-weg{background:#f6e3e0;color:#8a4740}
+.detail{grid-column:1/-1;font-size:12px;color:#5d564f;border-top:1px dashed #d9cfb6;padding-top:6px}
+.lang{background:#3a1f1c;border:1px solid var(--red);color:#f0c9c4;padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:10px}
+table.mfh{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:13px}
+table.mfh th{font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right;padding:0 8px}
+table.mfh th:first-child{text-align:left}
+table.mfh td{background:var(--karte);color:var(--ink);padding:9px 8px;text-align:right;vertical-align:top}
+table.mfh td:first-child{text-align:left;border-radius:8px 0 0 8px}
+table.mfh td:last-child{border-radius:0 8px 8px 0}
+table.mfh td b{font:600 14px 'Space Grotesk',sans-serif}
+table.mfh td small{display:block;font-size:11px;color:#6d6457}
+table.mfh tr.summe td{background:#1a1816;color:var(--gold-hi)}
+table.mfh tr.summe td small{color:#bdb6ad}
+.flag{color:var(--red);font-weight:600}
+.legende{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 0}
+.fuss{font-size:12px;color:var(--muted);margin-top:28px;border-top:1px solid #2a2622;padding-top:12px}
+
+@media (max-width:820px){
+  .grid2{grid-template-columns:1fr}
+  .sprosse{grid-template-columns:1fr;gap:6px}
+  .wert{text-align:left}
+}
+@media (max-width:640px){
+  .stufen{grid-template-columns:1fr}
+  .stufe{padding:10px 12px}
+  h1{font-size:23px}
+  table.mfh thead{display:none}
+  table.mfh,table.mfh tbody,table.mfh tr,table.mfh td{display:block;width:100%}
+  table.mfh tr{margin-bottom:10px}
+  table.mfh td{text-align:left;border-radius:0!important;padding:6px 10px}
+  table.mfh td:first-child{border-radius:8px 8px 0 0!important}
+  table.mfh td:last-child{border-radius:0 0 8px 8px!important}
+  table.mfh td[data-k]::before{content:attr(data-k);display:block;font:600 10px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lbl">Vorschlag · Entwurf 02.11.2026 · nicht in der App</div>
+  <h1>Detailstufen und Mietleiter</h1>
+  <p class="lead">Zwei Ansichten zum Durchklicken: wie ein Einsteiger eine Wohnung mit wenigen Feldern anlegt und trotzdem Bewertung und PDF bekommt — und wie das Zielbild als einfache Mietleiter aussehen könnte. <span class="beispiel">Alle Zahlen: BEISPIEL</span></p>
+  <div class="views">
+    <button class="on" data-view="v-anlegen">1 · Neue Wohnung anlegen</button>
+    <button data-view="v-leiter">2 · Zielbild als Mietleiter</button>
+  </div>
+  <div class="runway"></div>
+
+  <!-- ============ Ansicht 1 ============ -->
+  <section class="view on" id="v-anlegen">
+    <div class="stufen" id="stufen">
+      <button class="stufe on" data-s="1"><b>Sichtflug</b><span>Einsteiger · ich will wissen, ob es sich rechnet</span><span class="n" id="n1"></span></button>
+      <button class="stufe" data-s="2"><b>Instrumentenflug</b><span>Investor · Finanzierung, Zustand, Steuer kurz</span><span class="n" id="n2"></span></button>
+      <button class="stufe" data-s="3"><b>Langstrecke</b><span>Profi · Wertermittlung, Steuer, Bank-Mappe</span><span class="n" id="n3"></span></button>
+    </div>
+
+    <div class="grid2">
+      <div class="panel" id="formular"></div>
+      <div class="panel dark" id="ergebnis"></div>
+    </div>
+  </section>
+
+  <!-- ============ Ansicht 2 ============ -->
+  <section class="view" id="v-leiter">
+    <div>
+      <span class="seg"><button class="on" data-obj="etw">Wohnung</button><button data-obj="mfh">MFH · 3 Wohnungen</button></span>
+    </div>
+    <div class="schalter">
+      <label><input type="checkbox" id="sw-bremse" checked> Mietpreisbremse gilt in der Gemeinde <span class="herk h-amt">amtlich · Landesverordnung</span></label>
+      <label><input type="checkbox" id="sw-spiegel"> Mietspiegel eingebunden (Paket mietrecht-ort)</label>
+    </div>
+    <div id="leiter-host"></div>
+    <div class="legende">
+      <span class="herk h-amt">amtlich</span><span class="herk h-markt">Marktdaten · aktueller Marktdurchschnitt</span><span class="herk h-eigen">eigene Angabe</span><span class="herk h-naeh">DealPilot-Näherung</span><span class="herk h-weg">fehlt · Weg zur Quelle</span>
+    </div>
+  </section>
+
+  <p class="fuss">Entwurf zu <span class="mono">design/Vorschläge/detailstufen-konzept.md</span>. Stufen bauen auf der vorhandenen Eingabetiefe auf (<span class="mono">objekt-reiter.js</span>, <span class="mono">dp_zielstufe</span>); die Mietleiter rechnet wie <span class="mono">potenzial.js</span> (Kappung, Sperrfrist) plus Mietpreisbremse § 556d BGB. Rechtliche Vereinfachungen der Demo: Vormiete-Ausnahme § 556e nur als Maximum, § 556f bei umfassender Modernisierung nur als Hinweis.</p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  function eur(x, d) { return (x == null || !isFinite(x)) ? '–' : x.toLocaleString('de-DE', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function num(s) { var v = parseFloat(String(s).replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : null; }
+
+  /* ---------- Ansichten ---------- */
+  document.querySelectorAll('.views button').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('.views button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('on', v.id === b.dataset.view); });
+    };
+  });
+
+  /* ---------- Ansicht 1: Felder je Stufe ----------
+     s = ab welcher Stufe sichtbar; v = Vorgabe (vom Profil/Markt belegt, Herkunft p/m) */
+  var GRUPPEN = [
+    { t: 'Lage und Objekt', f: [
+      { id: 'plz', l: 'PLZ', s: 1, w: '32052' }, { id: 'ort', l: 'Ort', s: 1, w: 'Herford' },
+      { id: 'str', l: 'Straße, Nr.', s: 1, w: 'Musterweg 12' },
+      { id: 'objart', l: 'Objektart', s: 1, w: 'Wohnung (ETW)' },
+      { id: 'wfl', l: 'Wohnfläche m²', s: 1, w: '62' }, { id: 'baujahr', l: 'Baujahr', s: 1, w: '1972' },
+      { id: 'zimmer', l: 'Zimmer', s: 2, w: '2,5' }, { id: 'etage', l: 'Etage', s: 2, w: '1. OG' },
+      { id: 'zustand', l: 'Zustand', s: 2, w: 'gepflegt' }, { id: 'energie', l: 'Energieklasse', s: 2, w: 'E' },
+      { id: 'standard', l: 'Standardstufe', s: 2, w: '2,5' },
+      { id: 'gsfl', l: 'Grundstück m²', s: 3, w: '940' }, { id: 'brw', l: 'Bodenrichtwert €/m²', s: 3, w: '210', v: 'm' },
+      { id: 'mea', l: 'MEA ‰', s: 3, w: '84' }, { id: 'bgf', l: 'BGF m²', s: 3, w: '' }, { id: 'nutz', l: 'Nutzungsart', s: 3, w: 'vermietet' }
+    ]},
+    { t: 'Kauf und Miete', f: [
+      { id: 'kp', l: 'Kaufpreis €', s: 1, w: '129.000' }, { id: 'nkm', l: 'Kaltmiete €/Monat', s: 1, w: '590' },
+      { id: 'hg', l: 'Hausgeld nicht umlagef. €', s: 2, w: '95', v: 'p' },
+      { id: 'marktmiete', l: 'Marktmiete €/m²', s: 2, w: '9,90', v: 'm' },
+      { id: 'mietvertrag', l: 'Mietbeginn / letzte Erhöhung', s: 3, w: '2011 / 03-2022' },
+      { id: 'zb', l: 'Zielbild (Mietleiter)', s: 3, w: 'siehe Ansicht 2' }
+    ]},
+    { t: 'Finanzierung', f: [
+      { id: 'ek', l: 'Eigenkapital €', s: 1, w: '25.800', v: 'p' },
+      { id: 'zins', l: 'Zins %', s: 2, w: '3,80', v: 'p' }, { id: 'tilg', l: 'Tilgung %', s: 2, w: '2,00', v: 'p' },
+      { id: 'zb_bind', l: 'Zinsbindung Jahre', s: 3, w: '10', v: 'p' }, { id: 'bsv', l: 'Bausparvertrag', s: 3, w: 'nein' }
+    ]},
+    { t: 'Kosten und Steuer', f: [
+      { id: 'leer', l: 'Leerstand %', s: 2, w: '3', v: 'p' }, { id: 'ih', l: 'Instandhaltung €/m²', s: 2, w: '12', v: 'p' },
+      { id: 'grenz', l: 'Grenzsteuersatz %', s: 2, w: '42', v: 'p' },
+      { id: 'afa', l: 'AfA-Satz / Gebäudeanteil', s: 3, w: '2 % / 78 %' }, { id: 's7b', l: '§ 7b Sonder-AfA', s: 3, w: 'nein' },
+      { id: 'wk', l: 'Werbungskosten €/Jahr', s: 3, w: '480' }
+    ]}
+  ];
+  var stufe = 1, seen = {};
+  var NAMEN = { 1: 'Sichtflug', 2: 'Instrumentenflug', 3: 'Langstrecke' };
+  var alle = []; GRUPPEN.forEach(function (g) { alle = alle.concat(g.f); });
+  [1, 2, 3].forEach(function (s) {
+    var n = alle.filter(function (f) { return f.s <= s; }).length;
+    var v = alle.filter(function (f) { return f.s <= s && f.v; }).length;
+    document.getElementById('n' + s).textContent = n + ' Felder · ' + v + ' vorbelegt' + (s === 3 ? ' · im Original ≈ 238' : '');
+  });
+
+  var form = document.getElementById('formular');
+  var html = '';
+  GRUPPEN.forEach(function (g, gi) {
+    html += '<div class="gruppe" data-g="' + gi + '"><div class="gk"><h3>' + g.t + '</h3><span class="lbl" data-gz="' + gi + '"></span></div><div class="felder">';
+    g.f.forEach(function (f) {
+      var tag = f.v === 'p' ? '<span class="tag p">PROFIL</span>' : f.v === 'm' ? '<span class="tag m">MARKT</span>' : '';
+      html += '<div class="f' + (f.v ? ' vorgabe' : '') + '" data-s="' + f.s + '" data-id="' + f.id + '"><label>' + f.l + tag + '</label><input value="' + f.w + '" data-id="' + f.id + '"></div>';
+    });
+    html += '</div></div>';
+  });
+  html += '<div id="sicht-vorgaben"></div>';
+  form.innerHTML = html;
+  form.addEventListener('input', function (e) {
+    var box = e.target.closest('.f'); if (box) { box.classList.remove('vorgabe'); var t = box.querySelector('.tag'); if (t) { t.className = 'tag v'; t.textContent = 'EIGENE'; } box.dataset.eigen = '1'; }
+    rechne();
+  });
+
+  function wert(id) { var i = form.querySelector('input[data-id="' + id + '"]'); return i ? num(i.value) : null; }
+
+  function setStufe(s) {
+    stufe = s;
+    document.querySelectorAll('.stufe').forEach(function (b) { b.classList.toggle('on', +b.dataset.s === s); });
+    form.querySelectorAll('.f').forEach(function (f) {
+      var vis = +f.dataset.s <= s;
+      var war = !f.classList.contains('versteckt');
+      f.classList.toggle('versteckt', !vis);
+      if (vis && !war && seen[f.dataset.id]) { f.classList.remove('neu'); void f.offsetWidth; f.classList.add('neu'); }
+      seen[f.dataset.id] = true;
+    });
+    GRUPPEN.forEach(function (g, gi) {
+      var sicht = g.f.filter(function (f) { return f.s <= s; }).length;
+      var el = form.querySelector('[data-g="' + gi + '"]');
+      el.style.display = sicht ? '' : 'none';
+      form.querySelector('[data-gz="' + gi + '"]').textContent = sicht + ' von ' + g.f.length;
+    });
+    var vb = document.getElementById('sicht-vorgaben');
+    var versteckt = alle.filter(function (f) { return f.s > s; });
+    var eigeneVersteckt = versteckt.filter(function (f) { var b = form.querySelector('.f[data-id="' + f.id + '"]'); return b && b.dataset.eigen; });
+    var vorgVersteckt = versteckt.filter(function (f) { return f.v; });
+    vb.innerHTML = s < 3
+      ? '<div class="hinweis"><b>DealPilot rechnet im ' + NAMEN[s] + ' zusätzlich mit ' + vorgVersteckt.length + ' Vorgaben</b> aus deinem Investmentprofil und den Marktdaten:'
+        + '<ul class="vorgabenliste">' + vorgVersteckt.map(function (f) { var b = form.querySelector('input[data-id="' + f.id + '"]'); return '<li>' + f.l + ': ' + b.value + (f.v === 'p' ? ' (Profil)' : ' (Marktdaten)') + '</li>'; }).join('') + '</ul>'
+        + (eigeneVersteckt.length ? '<p style="margin:6px 0 0"><b>' + eigeneVersteckt.length + ' eigene Angabe(n) ausgeblendet</b> — sie bleiben gespeichert und zählen weiter.</p>' : '')
+        + '<p style="margin:6px 0 0">Umschalten jederzeit — ausgeblendete Felder behalten ihre Werte.</p></div>'
+      : '<div class="hinweis">Alle Felder sichtbar. Felder mit gestricheltem Rahmen sind noch Vorgaben — tippst du etwas ein, werden sie zur eigenen Angabe.</div>';
+    rechne();
+  }
+  document.querySelectorAll('.stufe').forEach(function (b) { b.onclick = function () { setStufe(+b.dataset.s); }; });
+
+  function ring(score) {
+    var r = 26, c = 2 * Math.PI * r, p = Math.max(0, Math.min(100, score)) / 100;
+    return '<svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="' + r + '" fill="none" stroke="#2a2622" stroke-width="6"/>'
+      + '<circle cx="32" cy="32" r="' + r + '" fill="none" stroke="#C9A84C" stroke-width="6" stroke-linecap="round" stroke-dasharray="' + (c * p) + ' ' + c + '" transform="rotate(-90 32 32)"/>'
+      + '<text x="32" y="38" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="18" fill="#FDFCFA">' + score + '</text></svg>';
+  }
+  function stufeWort(s) { return s >= 85 ? 'SEHR GUT' : s >= 70 ? 'GUT' : s >= 50 ? 'SOLIDE' : s >= 35 ? 'SCHWACH' : 'KRITISCH'; }
+
+  function rechne() {
+    var kp = wert('kp') || 0, nkm = wert('nkm') || 0, wfl = wert('wfl') || 1, ek = wert('ek') || 0;
+    var hg = wert('hg') || 0, zins = (wert('zins') || 0) / 100, tilg = (wert('tilg') || 0) / 100, ih = wert('ih') || 0, leer = (wert('leer') || 0) / 100;
+    var nk = kp * 0.105;                                  /* Kaufnebenkosten NRW: GrESt 6,5 + Notar/Grundbuch 2 + Makler 2 (Beispiel) */
+    var darl = Math.max(0, kp + nk - ek);
+    var rate = darl * (zins + tilg) / 12;
+    var brutto = kp ? nkm * 12 / kp * 100 : null;
+    var bewirt = hg + ih * wfl / 12 + nkm * leer;
+    var netto = kp ? (nkm * 12 - bewirt * 12) / (kp + nk) * 100 : null;
+    var cf = nkm - bewirt - rate;
+    var dscr = rate ? (nkm - bewirt) / (darl * zins / 12 + darl * tilg / 12) : null;
+    var faktor = nkm ? kp / (nkm * 12) : null;
+    var qmPreis = kp / wfl;
+    var score = Math.round(Math.max(0, Math.min(100, 30 + (brutto - 3) * 9 + (cf > 0 ? 10 : cf / 25) + (dscr > 1 ? 8 : 0))));
+    var ds2Vorg = { 1: 9, 2: 4, 3: 0 }[stufe], ds2Eig = { 1: 8, 2: 15, 3: 21 }[stufe];
+    var ds2 = score + ({ 1: -2, 2: 1, 3: 3 }[stufe]);
+    var ver = stufe === 3;
+
+    var e = '<div class="lbl">Ergebnis · ' + NAMEN[stufe] + '</div>';
+    e += '<div class="ring">' + ring(score) + '<div><h3 style="margin:0 0 4px">DealPilot-Score</h3><span class="pill">' + stufeWort(score) + '</span></div></div>';
+    e += '<div class="kpis">'
+      + '<div class="kpi"><div class="w">' + eur(brutto, 2) + ' %</div><div class="h">Bruttomietrendite · eigene Angaben</div></div>'
+      + '<div class="kpi"><div class="w" style="color:' + (cf >= 0 ? '#3FA56C' : '#D8564C') + '">' + eur(cf) + ' €</div><div class="h">Cashflow / Monat vor Steuer' + (stufe === 1 ? ' · mit Profil-Vorgaben' : '') + '</div></div>'
+      + '<div class="kpi"><div class="w">' + eur(dscr, 2) + '</div><div class="h">DSCR</div></div>'
+      + '<div class="kpi"><div class="w">' + eur(faktor, 1) + '</div><div class="h">Kaufpreisfaktor · ' + eur(qmPreis) + ' €/m²</div></div>'
+      + '</div>';
+    e += '<div class="kpi" style="margin-bottom:8px"><div class="h">Investor Deal Score (24 KPIs)</div><div class="w">' + ds2 + ' <span style="font-size:12px;color:#bdb6ad">' + stufeWort(ds2).toLowerCase() + '</span></div>'
+      + '<div class="h">' + ds2Eig + ' eigene/Markt · ' + ds2Vorg + ' aus Vorgaben · ' + (24 - ds2Eig - ds2Vorg) + ' offen</div>'
+      + (ds2Vorg / 24 >= 0.3 ? '<span class="siegel">vorläufig · ' + ds2Vorg + ' von 24 aus Vorgaben</span>' : '') + '</div>';
+    e += '<div class="kpis">'
+      + '<div class="kpi' + (stufe === 1 ? '' : '') + '"><div class="w" style="font-size:16px">' + eur(Math.round(wfl * 2280 / 1000) * 1000) + ' €</div><div class="h">Marktpreisindikation · Marktdaten</div></div>'
+      + (ver ? '<div class="kpi"><div class="w" style="font-size:16px">' + eur(124000) + ' €</div><div class="h">Verkehrswert ImmoWertV · Ertrags-/Sachwert</div></div>'
+             : '<div class="kpi aus"><div class="w">nicht gerechnet</div><div class="h">Verkehrswert ImmoWertV — fehlen Grundstück, BRW, MEA. Kein Verfahren rechnet halb.</div></div>')
+      + '</div>';
+    var pdfTitel = { 1: 'KURZBERICHT · SICHTFLUG — VEREINFACHTE RECHNUNG', 2: 'INVESTORBERICHT · INSTRUMENTENFLUG', 3: 'INVESTMENT-BERICHT · LANGSTRECKE' }[stufe];
+    var fehlt = { 1: ['Verkehrswert nach ImmoWertV', 'Steuer: AfA, § 7b — Cashflow nach Steuer fehlt', 'Bank-Export, „Bereit für die Bank?“', 'Zielbild / Mietleiter'],
+                  2: ['Verkehrswert nach ImmoWertV (Grundstück, BRW, MEA fehlen)', 'Steuer: AfA nur pauschal', 'Bank-Mappe'], 3: [] }[stufe];
+    e += '<div class="pdf"><div class="band">' + pdfTitel + '</div>'
+      + '<div style="font-size:12px"><b>Musterweg 12, 32052 Herford</b> · ETW 62 m² · Bj 1972 <span class="beispiel" style="font-size:9px;padding:1px 5px">BEISPIEL</span></div>'
+      + '<ul><li>Jede Zahl mit Herkunft: <i>eigene Angabe · Marktdaten · amtlich · DealPilot-Vorgabe</i></li>'
+      + (ds2Vorg ? '<li>' + ds2Vorg + ' Werte aus deinem Investmentprofil, als Vorgabe gekennzeichnet — nicht amtlich</li>' : '<li>keine Vorgaben mehr offen</li>')
+      + '</ul>'
+      + (fehlt.length ? '<div style="font-size:12px;margin-top:6px"><b>Was dieser Bericht nicht enthält</b><ul class="fehlt">' + fehlt.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div>' : '')
+      + '</div>';
+    e += '<button class="btn" type="button" onclick="this.textContent=\'PDF wird erstellt … (Demo)\'">Investment-PDF erstellen</button> '
+      + (stufe < 3 ? '<button class="btn" type="button" style="background:transparent;color:#E8CC7A;border:1px solid #C9A84C" onclick="document.querySelector(\'.stufe[data-s=&quot;' + (stufe + 1) + '&quot;]\').click()">Genauer rechnen → ' + NAMEN[stufe + 1] + '</button>' : '');
+    document.getElementById('ergebnis').innerHTML = e;
+  }
+  setStufe(1);
+
+  /* ---------- Ansicht 2: Mietleiter ----------
+     Rechnung wie potenzial.js: ohne Maßnahme = min(Vergleichsmiete, Ist × 1,15) (Kappung 15 %, Gemeinde in VO),
+     Wechsel = mit Bremse max(VM × 1,10, Vormiete), ohne Bremse Marktmiete Neuvertrag. */
+  var KAPP = 0.15;
+  var ETW = { name: 'Gartenweg 3 · ETW', wfl: 62, ist: 6.90, seit: 2011, letzte: '03/2022', vm: 8.70, neu: 10.20, san: 11.60, sanKosten: 38000, wirksam: '01.02.2027', naechste: '02/2030' };
+  var MFH = { vm: 8.40, neu: 9.60, san: 11.00, sanKosten: 96000, we: [
+    { n: 'WE 1 · EG links', wfl: 58, ist: 5.80, seit: 2008, letzte: 'nie', wirksam: '01.02.2027' },
+    { n: 'WE 2 · OG', wfl: 71, ist: 8.10, seit: 2021, letzte: '01/2026', wirksam: '01.04.2027', sperre: 'verlangbar ab 01/2027 (Sperrfrist 12 Monate)' },
+    { n: 'WE 3 · DG', wfl: 46, ist: 0, leer: true }
+  ]};
+  var obj = 'etw';
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.onclick = function () { obj = b.dataset.obj; document.querySelectorAll('.seg button').forEach(function (x) { x.classList.toggle('on', x === b); }); leiter(); };
+  });
+  document.getElementById('sw-bremse').onchange = leiter;
+  document.getElementById('sw-spiegel').onchange = leiter;
+
+  function herkVM() {
+    return document.getElementById('sw-spiegel').checked
+      ? '<span class="herk h-amt">Vergleichsmiete: Mietspiegel (amtlich)</span>'
+      : '<span class="herk h-naeh">Vergleichsmiete genähert · Mietspiegel prüfen</span>';
+  }
+  function stufen(e, vm, neu, san) {
+    var bremse = document.getElementById('sw-bremse').checked;
+    var ohne = e.leer ? null : Math.min(vm, e.ist * (1 + KAPP));
+    var wechsel = bremse ? Math.max(vm * 1.10, e.ist || 0) : neu;
+    return { heute: e.leer ? null : e.ist, ohne: ohne, wechsel: wechsel, san: san, bremse: bremse };
+  }
+
+  function leiter() {
+    var host = document.getElementById('leiter-host');
+    var bremse = document.getElementById('sw-bremse').checked;
+    if (obj === 'etw') {
+      var e = ETW, s = stufen(e, e.vm, e.neu, e.san), max = s.san * 1.05;
+      var zeilen = [
+        { k: 'heute', nm: 'Heute', sub: 'Mieter seit ' + e.seit + ', letzte Erhöhung ' + e.letzte, w: s.heute,
+          h: '<span class="herk h-eigen">eigene Angabe</span>', d: '' },
+        { k: 'ohne', nm: 'Ohne Maßnahme', sub: 'Mieter bleibt · normale Erhöhung', w: s.ohne,
+          h: '<span class="herk h-amt">Kappung 15 % · Landesverordnung</span>' + herkVM(),
+          d: 'Wirksam ab <b>' + e.wirksam + '</b> (Zugang 11/2026, § 558b BGB). Gedeckelt durch die Kappung 15 % in 3 Jahren; die Vergleichsmiete (' + eur(e.vm, 2) + ' €/m²) ist erst mit der nächsten Erhöhung ab ' + e.naechste + ' erreichbar.' },
+        { k: 'wechsel', nm: 'Bei Mieterwechsel', sub: 'neu vermietet, ohne Umbau', w: s.wechsel,
+          h: bremse ? '<span class="herk h-amt">Mietpreisbremse § 556d</span>' + herkVM() : '<span class="herk h-markt">Neuvertragsmiete · aktueller Marktdurchschnitt</span>',
+          d: bremse ? 'Höchstens Vergleichsmiete + 10 % (' + eur(e.vm, 2) + ' × 1,10). Die Gemeinde steht in der Mietpreisbremsen-Verordnung — Daten liegen heute schon in kappungsgrenzen.json, werden aber noch nicht ausgewertet.'
+                    : 'Keine Mietpreisbremse: Neuvertragsmiete aus Angebotsmieten im Zustand „gepflegt", mit Angebotsabschlag.' },
+        { k: 'san', nm: 'Nach Sanierung', sub: 'Umbau, dann neu vermietet', w: s.san,
+          h: '<span class="herk h-markt">Marktdaten · Zustand modernisiert</span><span class="herk h-eigen">Kosten: eigene Angabe</span>',
+          d: 'Sanierung ca. ' + eur(e.sanKosten) + ' € (Beispiel). Nach umfassender Modernisierung gilt die Mietpreisbremse bei der ersten Vermietung nicht (§ 556f BGB). Amtlich gibt es diese Miete heute nur im Kreis Minden-Lübbecke — sonst Marktdaten oder eigene Angabe.' }
+      ];
+      var h = '<div class="lang">Mieter seit ' + e.seit + ' · Abstand zur Vergleichsmiete <b>' + eur(e.vm - e.ist, 2) + ' €/m²</b> — hier liegt das Potenzial ohne Umbau.</div><div class="leiter">';
+      var vorher = null;
+      zeilen.forEach(function (z) {
+        var mon = z.w * e.wfl, diff = vorher != null ? (z.w - vorher) * e.wfl * 12 : null;
+        h += '<div class="sprosse"><div class="nm"><b>' + z.nm + '</b><small>' + z.sub + '</small></div>'
+          + '<div><div class="bar ' + (z.k === 'heute' ? 'heute' : '') + '"><i style="width:' + (z.w / max * 100) + '%"></i><em>' + eur(z.w, 2) + ' €/m²</em></div>' + z.h + '</div>'
+          + '<div class="wert"><b>' + eur(mon) + ' € / Monat</b><small>' + (diff != null ? '<span class="plus">+' + eur(diff) + ' € / Jahr</span> zur Sprosse darunter' : 'Ausgangspunkt') + '</small></div>'
+          + (z.d ? '<div class="detail">' + z.d + '</div>' : '') + '</div>';
+        vorher = z.w;
+      });
+      host.innerHTML = '<h2>' + e.name + ' · ' + e.wfl + ' m² <span class="beispiel">BEISPIEL</span></h2>' + h + '</div>';
+    } else {
+      var rows = '', sum = { heute: 0, ohne: 0, wechsel: 0, san: 0 };
+      MFH.we.forEach(function (w) {
+        var s = stufen(w, MFH.vm, MFH.neu, MFH.san);
+        var m = function (x) { return x == null ? null : x * w.wfl; };
+        sum.heute += m(s.heute) || 0; sum.ohne += m(s.ohne != null ? s.ohne : s.wechsel) || 0; sum.wechsel += m(s.wechsel); sum.san += m(s.san);
+        var lang = w.seit && w.seit <= 2012;
+        rows += '<tr><td><b>' + w.n + '</b><small>' + w.wfl + ' m² · ' + (w.leer ? '<span class="flag">leer</span>' : 'Mieter seit ' + w.seit + ', letzte Erhöhung ' + w.letzte) + '</small>'
+          + (lang ? '<small class="flag">lange keine Anpassung · ' + eur(MFH.vm - w.ist, 2) + ' €/m² unter Vergleichsmiete</small>' : '') + '</td>'
+          + '<td data-k="Heute">' + (w.leer ? '–<small>leer</small>' : '<b>' + eur(m(s.heute)) + ' €</b><small>' + eur(s.heute, 2) + ' €/m² · eigene Angabe</small>') + '</td>'
+          + '<td data-k="Ohne Maßnahme">' + (w.leer ? '–<small>direkt Neuvermietung</small>' : '<b>' + eur(m(s.ohne)) + ' €</b><small>' + eur(s.ohne, 2) + ' €/m² · ab ' + w.wirksam + (w.sperre ? '<br>' + w.sperre : '') + '</small>') + '</td>'
+          + '<td data-k="Bei Mieterwechsel"><b>' + eur(m(s.wechsel)) + ' €</b><small>' + eur(s.wechsel, 2) + ' €/m² · ' + (s.bremse ? 'Bremse: VM + 10 %' : 'Marktdurchschnitt') + '</small></td>'
+          + '<td data-k="Nach Sanierung"><b>' + eur(m(s.san)) + ' €</b><small>' + eur(s.san, 2) + ' €/m² · Marktdaten</small></td></tr>';
+      });
+      rows += '<tr class="summe"><td><b>Haus gesamt</b><small>Sanierung ca. ' + eur(MFH.sanKosten) + ' € (Beispiel)</small></td>'
+        + '<td data-k="Heute"><b>' + eur(sum.heute) + ' €</b><small>' + eur(sum.heute * 12) + ' € / Jahr</small></td>'
+        + '<td data-k="Ohne Maßnahme"><b>' + eur(sum.ohne) + ' €</b><small>+' + eur((sum.ohne - sum.heute) * 12) + ' € / Jahr (WE 3 neu vermietet)</small></td>'
+        + '<td data-k="Bei Mieterwechsel"><b>' + eur(sum.wechsel) + ' €</b><small>+' + eur((sum.wechsel - sum.heute) * 12) + ' € / Jahr</small></td>'
+        + '<td data-k="Nach Sanierung"><b>' + eur(sum.san) + ' €</b><small>+' + eur((sum.san - sum.heute) * 12) + ' € / Jahr</small></td></tr>';
+      host.innerHTML = '<h2>Bahnhofstraße 7 · MFH, 3 Wohnungen <span class="beispiel">BEISPIEL</span></h2>'
+        + '<p class="lead" style="margin-bottom:6px">Dieselbe Leiter, je Wohnung eine Zeile, Kaltmiete pro Monat. Klick auf eine Zeile öffnet in der App das heutige „Details · Plan" — nichts fällt weg.</p>'
+        + '<div style="margin-bottom:6px">' + herkVM() + (bremse ? '<span class="herk h-amt">Mietpreisbremse § 556d</span>' : '<span class="herk h-markt">Neuvertragsmiete · Marktdurchschnitt</span>') + '<span class="herk h-amt">Kappung 15 %</span><span class="herk h-markt">Sanierung: Zustand modernisiert</span></div>'
+        + '<table class="mfh"><thead><tr><th>Wohnung</th><th>Heute</th><th>Ohne Maßnahme</th><th>Bei Mieterwechsel</th><th>Nach Sanierung</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    }
+  }
+  leiter();
+})();
+</script>
+</body>
+</html>
