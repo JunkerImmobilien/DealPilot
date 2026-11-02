@@ -44174,3 +44174,10 @@ DealPilot-Bewertung (Annahme für die ortsübliche Miete), Kappung und Bremse au
 Leerstand-Annahme; Karte „Mietpotenzial“ (Ist / 3 J. zulässig / Neuvermietung), wenn die Ist-Miete darunter liegt; ehrlicher
 Satz ohne Daten; Einstellung „Standard für neue Quick-Checks“ nennt den Rückfall B. **Prod** 1.0.29 (d6aa47e). **Nachweis**
 wissen 02.11. „v3081c–g“. **Rest** —
+
+### v3082 · v3083 — Mietrecht in der Mietpreis-Analyse, Gemeinde per Namensstamm (02.11.2026) · Prod 1.0.30/1.0.31
+
+**Was.** v3082 Block „Mietrecht an dieser Adresse“ (Bremse, Obergrenze nur mit amtlicher Vergleichsmiete, Kappung) und
+„Woher die Zahlen kommen“ in einfachen Worten. v3083 Namensstamm-Abgleich im Kern (Freiburg i. Br.). **Prod** 1.0.31
+(20c514b). **Nachweis** wissen 02.11. „v3082 · v3083“, 30 Orte/16 Länder und 942 Schreibweisen. **Rest** Quick-Check per AGS
+statt Ortsname.

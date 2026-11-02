@@ -36,6 +36,12 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N96 · Quick-Check: Gemeinde per AGS statt Ortsname (02.11.2026)
+
+Der Quick-Check ordnet Kappung und Mietpreisbremse über den Ortsnamen zu (`_qcMietpotenzial`), der Hauptteil per AGS
+(`potenzial.js agsHolen` → `/marktbericht/wertparameter/zinssatz`). Seit v3083 trifft der Namensstamm 909/942
+Schreibweisen; 29 bleiben mehrdeutig („bitte prüfen“). Mit AGS wären es alle. Kosten: ein Backend-Abruf je PLZ.
+
 ### N95 · Quick-Check-Bewertung neu (02.11.2026)
 
 Befund und Demo: `wissen/2026-11-02.md` Teil 14, `frontend/demo-quickcheck-bewertung.html`. Eine Karte statt sechs Blöcke, eine
