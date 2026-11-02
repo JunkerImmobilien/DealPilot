@@ -370,7 +370,9 @@
 
     var avmA = (s.avm && s.avm.a) || 0;
     var avmB = (s.avm && s.avm.b) || 0;
-    zellen += '<div class="ai-credits-cell akc">' +   /* v3033 */
+    /* v3063 · Variante A (Marcel 02.11.2026): die Kachel „Marktwert · 0 frei · nicht im Plan" nur,
+       wenn wirklich Marktwerte zugekauft sind - sonst ist sie eine Zeile ohne Aussage. */
+    if (avmA + avmB > 0) zellen += '<div class="ai-credits-cell akc">' +   /* v3033 */
                 '<div class="akc-name">Marktwert</div>' +
                 '<div class="akc-wert gold">' + (avmA + avmB) + '<small> frei</small></div>' +
                 '<div class="akc-z"><span>Monat</span><b>nicht im Plan</b></div>' +
