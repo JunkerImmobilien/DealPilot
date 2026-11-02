@@ -221,7 +221,7 @@ window.DealPilotInvestmentProfile = (function() {
         '<div class="ip-lage-box">' + zeilen + '</div>',
         /* v2159 · N62.11: die Standardklasse fuer neue Quick-Checks. */
         '<label class="ip-lage-std-z">Standard für neue Quick-Checks ',
-        '<select class="ip-lage-std"><option value="">keine Vorgabe</option>' +
+        '<select class="ip-lage-std"><option value="">keine Vorgabe (Quick-Check nimmt B-Lage)</option>' +
           LP.KLASSEN.map(function (k) {
             return '<option value="' + k + '"' + ((LP.standard && LP.standard() === k) ? ' selected' : '') + '>' + LP.ETIKETT[k].name + '</option>';
           }).join('') + '</select></label>',
