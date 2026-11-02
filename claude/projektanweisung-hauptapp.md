@@ -44213,3 +44213,8 @@ echten Lauf: A/B „Objekt passt — Finanzierung prüfen“, C „Finger weg“
 
 **Was.** Tesseract im Backend-Image, `services/ocr.js`; Dokumentbilder gehen nur noch als geschwärzter Text an OpenAI (seitenLesen, Belege, Telegram). Render 2200 px. Schwärzen um Eigentümer hinter „Wohnung“, Familie, Hr./Fr., Anschrift hinter Namen erweitert. Datenschutzerklärung 1.3. Wirtschaftsplan-Zeilen im Import nie vorgehakt.
 **Commit** 8fb2fedb, dea348b1, 7e953172, c9ea222c. **Prod** 1.0.36 (674b297) und 1.0.37 (c0562ad), Tesseract/Schwärzen im Prod-Container nachgemessen. **Nachweis** `tools/ocr-messen.cjs` (98,7 % / 99,2 %), `tools/schwaerzen-pruefen.cjs` (16), abgefangene Anfrage ohne Bild. **Rest** Browser-Abnahme eines echten Uploads; N100, N101.
+
+### v3090–v3090b · Quick-Check aufgeräumt, Fotos im Import, Erhaltungsaufwand nach MEA (02.11.2026)
+
+**Was.** Stellplatz-Textfeld raus, Zustand in die Objektdaten, „+ Sanierung“ unter den Kaufpreis; Unterlagen-Import nimmt Fotos („Unterlagen: PDF oder Foto“); Erhaltungsaufwand-Vorschlag anteilig nach MEA.
+**Commit** 4765616a, 8e16189c, 0320e85c. **Prod** 1.0.39 (0b7b1f1), 1.0.40 (7d33af1). **Nachweis** Browser-Test auf Prod mit Scan-PDF und Foto, Vergleich mit Textschicht; fünf Fälle Anteilsrechnung. **Rest** N100 Sonderumlage bauen, N102 Anteil je Objektart (Marcel), Handbuch-Belege (N93).
