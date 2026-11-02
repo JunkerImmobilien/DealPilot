@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Objekt-Kacheln verschlanken</title>
+<!-- N103 · Demo, nicht in der App. Vorher = Texte 1:1 aus objekt-reiter.js (zielAnwenden Z.745-751, stufen Z.841-871)
+     und index.html Z.1050, gemessen auf Staging am 02.11.2026 (leeres Objekt, Detailgrad Experte, Kopf 1280 x 190 px). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FDFCFA; --flaeche:#FFFFFF; --karte:#FBF6E9; --text:#2A2727; --muted:#5f5955; --muted2:#8a837d;
+  --rand:#E0DBD3; --rand-g:#e9dcb3; --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+  --gruen:#3FA56C; --rot:#B8625C; --on:color-mix(in srgb,#C9A84C 9%,#fff);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#050505; --flaeche:#0E0D0C; --karte:#14120E; --text:#EDE8DF; --muted:#A9A199; --muted2:#7d766f;
+    --rand:#2b2824; --rand-g:#3a3222; --on:color-mix(in srgb,#C9A84C 14%,#0E0D0C); --gold-lo:#E8CC7A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#050505; --flaeche:#0E0D0C; --karte:#14120E; --text:#EDE8DF; --muted:#A9A199; --muted2:#7d766f;
+  --rand:#2b2824; --rand-g:#3a3222; --on:color-mix(in srgb,#C9A84C 14%,#0E0D0C); --gold-lo:#E8CC7A;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;padding:24px 16px 60px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font:700 26px/1.15 "Space Grotesk",sans-serif;margin:0 0 6px;letter-spacing:-.01em}
+h2{font:600 18px "Space Grotesk",sans-serif;margin:34px 0 4px}
+.lead{color:var(--muted);max-width:760px;margin:0 0 14px}
+.mono{font-family:"JetBrains Mono",monospace}
+.leiste{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 12px;border:1px solid var(--rand);border-radius:10px;background:var(--flaeche);margin:14px 0 6px}
+.leiste .lbl{font:500 10.5px "JetBrains Mono",monospace;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.seg{display:inline-flex;border:1px solid var(--rand);border-radius:999px;overflow:hidden}
+.seg button{font:500 12px Inter,sans-serif;background:transparent;color:var(--text);border:0;padding:5px 11px;cursor:pointer}
+.seg button.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#050505;font-weight:600}
+.bez{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-lo);margin:18px 0 6px}
+.bez span{color:var(--muted2);text-transform:none;letter-spacing:0}
+.notiz{font-size:12.5px;color:var(--muted);margin:8px 0 0;max-width:820px}
+.notiz b{color:var(--text)}
+.gegen{display:grid;grid-template-columns:1fr;gap:6px}
+.rahmen{border:1px dashed var(--rand);border-radius:12px;padding:10px;background:var(--flaeche)}
+.handy .rahmen{max-width:390px}
+
+/* ---------- gemeinsam: Kopf wie .oe-kopf ---------- */
+.kopf{border:1px solid var(--rand-g);border-left:3px solid var(--gold);border-radius:10px;background:var(--karte);padding:8px 12px}
+.st{display:inline-block;font:10px "JetBrains Mono",monospace;padding:1px 6px;border-radius:4px;border:1px solid;vertical-align:middle;white-space:nowrap}
+.st.a{color:var(--gruen);border-color:var(--gruen)} .st.x{color:var(--rot);border-color:var(--rot)} .st.g{color:var(--muted);border-color:var(--rand)}
+.btn{font:11px Inter,sans-serif;padding:4px 8px;border-radius:6px;border:1px solid var(--gold);background:transparent;color:var(--gold-lo);cursor:pointer;white-space:nowrap}
+.btn.solid{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#050505;border-color:transparent;font-weight:600}
+.btn.fehlt{border-style:dashed}
+
+/* ---------- VORHER (Nachbau der heutigen Darstellung) ---------- */
+.v-ziel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px}
+.v-ziel .lbl{font:500 10.5px "JetBrains Mono",monospace;color:var(--muted);letter-spacing:.04em;margin-right:4px}
+.v-ziel .q{color:var(--muted);font-size:11.5px;margin-left:4px}
+.v-hint{font-size:11.5px;color:var(--muted);margin:4px 0 0}
+.v-box{margin-top:6px;padding-top:6px;border-top:1px dashed var(--rand-g)}
+.v-titel{display:flex;gap:8px;align-items:baseline;font:600 11px "Space Grotesk",sans-serif;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px}
+.v-titel small{margin-left:auto;font:400 11.5px "JetBrains Mono",monospace;text-transform:none;letter-spacing:.02em;color:var(--muted)}
+.v-reihe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.v-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:6px 10px;border:1px solid var(--rand-g);border-radius:8px;background:var(--flaeche);align-items:center}
+.v-row.on{border-color:var(--gold);background:var(--on)}
+.v-row .k{font-weight:600;font-size:12px}
+.v-row .w{font:11px "JetBrains Mono",monospace;display:flex;gap:6px;align-items:center;grid-column:1}
+.v-row .a{grid-column:2;grid-row:1/3}
+.v-foot{margin-top:6px;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+@media (max-width:760px){.v-reihe{grid-template-columns:1fr}}
+.handy .v-reihe{grid-template-columns:1fr}
+
+/* ---------- VARIANTE A · Kachel mit Titel, einer Zeile, Pillen ---------- */
+.a-kopf{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+.a-kopf .t{font:600 13px "Space Grotesk",sans-serif}
+.a-kopf .dg{font:500 10.5px "JetBrains Mono",monospace;color:var(--muted);margin-left:auto}
+.a-kopf .dg b{color:var(--gold-lo);font-weight:500}
+.a-reihe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.a-k{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;align-items:center;padding:8px 11px;border:1px solid var(--rand-g);border-radius:9px;background:var(--flaeche);cursor:pointer;text-align:left;color:inherit;font:inherit}
+.a-k.on{border-color:var(--gold);background:var(--on);box-shadow:inset 0 2px 0 var(--gold)}
+.a-k .h{font:600 14px "Space Grotesk",sans-serif;line-height:1.15;display:flex;align-items:baseline;gap:6px;min-width:0}
+.a-k .h i{font:500 10px "JetBrains Mono",monospace;font-style:normal;color:var(--gold-lo);letter-spacing:.04em}
+.a-k .z{font-size:11.5px;color:var(--muted);line-height:1.3}
+.a-k .h i{white-space:nowrap}
+.a-k .h{grid-column:1;grid-row:1}.a-k .z{grid-column:1;grid-row:2}
+.a-k .f{grid-column:2;grid-row:1/3;display:flex;gap:6px;align-items:center}
+.a-fuss{display:flex;justify-content:flex-end;margin-top:6px}
+.link{font:11px Inter,sans-serif;color:var(--gold-lo);text-decoration:none;border-bottom:1px solid transparent}
+.link:hover{border-bottom-color:currentColor}
+@media (max-width:760px){.a-reihe{grid-template-columns:1fr}.a-k{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:center;padding:7px 10px}.a-k .h{grid-column:1;grid-row:1}.a-k .z{grid-column:1;grid-row:2}.a-k .f{grid-column:2;grid-row:1/3;margin:0}}
+.handy .a-reihe{grid-template-columns:1fr}
+.handy .a-k{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:center;padding:7px 10px}
+.handy .a-k .h{grid-column:1;grid-row:1}
+.handy .a-k .z{grid-column:1;grid-row:2}
+.handy .a-k .f{grid-column:2;grid-row:1/3;margin:0}
+.handy .a-k .f .st.g{display:none}
+
+/* ---------- VARIANTE B · Stufenleiste in einer Zeile ---------- */
+.b-zeile{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.b-seg{display:flex;flex:1 1 420px;border:1px solid var(--rand-g);border-radius:9px;overflow:hidden;background:var(--flaeche)}
+.b-seg button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:2px;align-items:flex-start;border:0;border-left:1px solid var(--rand-g);background:transparent;color:inherit;font:inherit;padding:7px 10px;cursor:pointer;text-align:left}
+.b-seg button:first-child{border-left:0}
+.b-seg button.on{background:var(--on);box-shadow:inset 0 -2px 0 var(--gold)}
+.b-seg .h{font:600 13px "Space Grotesk",sans-serif;display:flex;gap:6px;align-items:center;width:100%}
+.b-seg .h i{font-style:normal;font:500 10px "JetBrains Mono",monospace;color:var(--muted2)}
+.b-seg .punkt{width:7px;height:7px;border-radius:50%;margin-left:auto;flex:0 0 auto}
+.b-seg .punkt.a{background:var(--gruen)} .b-seg .punkt.x{background:var(--rot)}
+.b-seg .z{font:10.5px "JetBrains Mono",monospace;color:var(--muted)}
+.b-akt{display:flex;flex-direction:column;justify-content:center;gap:4px;align-items:flex-end}
+.b-akt .btn{font-size:12px;padding:6px 12px}
+.b-detail{font-size:11.5px;color:var(--muted);margin-top:6px}
+.b-detail b{color:var(--text);font-weight:600}
+.handy .b-seg{flex-basis:100%}
+@media (max-width:760px){.b-seg{flex-basis:100%}.b-akt{flex-direction:row;width:100%;justify-content:space-between;align-items:center}}
+.handy .b-akt{flex-direction:row;width:100%;justify-content:space-between;align-items:center}
+
+/* ---------- VARIANTE C · drei Zeilen wie eine Liste, nur Titel + Pille ---------- */
+.c-kopf{display:flex;align-items:baseline;gap:8px;margin:0 0 6px}
+.c-kopf .t{font:600 11px "Space Grotesk",sans-serif;text-transform:uppercase;letter-spacing:.07em}
+.c-kopf .dg{margin-left:auto}
+.c-liste{border:1px solid var(--rand-g);border-radius:9px;overflow:hidden;background:var(--flaeche)}
+.c-z{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:6px 10px;border-top:1px solid var(--rand-g);cursor:pointer}
+.c-z:first-child{border-top:0}
+.c-z.on{background:var(--on)}
+.c-z .r{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--rand);display:inline-block}
+.c-z.on .r{border-color:var(--gold);box-shadow:inset 0 0 0 3px var(--flaeche),inset 0 0 0 7px var(--gold)}
+.c-z .h{font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-z .h small{font-weight:400;color:var(--muted);font-size:11.5px;margin-left:6px}
+.c-z .p{display:flex;gap:5px}
+@media (max-width:560px){.c-z .h small{display:none}}
+.handy .c-z .h small{display:none}
+
+table.texte{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;background:var(--flaeche);border:1px solid var(--rand);border-radius:10px;overflow:hidden}
+table.texte th,table.texte td{padding:7px 10px;border-top:1px solid var(--rand);text-align:left;vertical-align:top}
+table.texte th{font:500 10.5px "JetBrains Mono",monospace;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border-top:0}
+table.texte td:first-child{font:11px "JetBrains Mono",monospace;color:var(--muted);white-space:nowrap}
+table.texte s{color:var(--muted2)}
+.tabw{overflow-x:auto}
+.empf{border:1px solid var(--gold);border-radius:12px;padding:14px 16px;background:var(--karte);margin-top:28px}
+.empf h2{margin-top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Detailgrad und „Marktbericht abrufen“ verschlanken</h1>
+  <p class="lead">N103 · Demo, nichts davon steht in der App. Oben steht der heutige Kopf im Reiter Objekt mit seinem Text 1:1, darunter drei schlankere Fassungen. Mit der Leiste schaltest du Detailgrad, Hell/Dunkel und die Handybreite um.</p>
+
+  <div class="leiste" role="group" aria-label="Demo-Schalter">
+    <span class="lbl">Detailgrad</span>
+    <span class="seg" id="sw-dg"><button data-v="1">Einsteiger</button><button data-v="2">Fortgeschritten</button><button data-v="3" class="on">Experte</button></span>
+    <span class="lbl">Objekt</span>
+    <span class="seg" id="sw-obj"><button data-v="leer" class="on">leer</button><button data-v="voll">vollständig</button></span>
+    <span class="lbl">Ansicht</span>
+    <span class="seg" id="sw-ansicht"><button data-v="breit" class="on">Desktop</button><button data-v="handy">390 px</button></span>
+    <span class="lbl">Farbe</span>
+    <span class="seg" id="sw-theme"><button data-v="auto" class="on">System</button><button data-v="light">Hell</button><button data-v="dark">Dunkel</button></span>
+  </div>
+
+  <div id="buehne"></div>
+
+  <h2>Was heute dasteht, was es künftig heißt</h2>
+  <p class="lead">Der linke Text kommt aus dem Code: <span class="mono">frontend/js/objekt-reiter.js</span> und <span class="mono">frontend/index.html</span>. Der rechte ist der Vorschlag für Variante A.</p>
+  <div class="tabw"><table class="texte">
+    <tr><th>Stelle</th><th>heute</th><th>Vorschlag (A)</th></tr>
+    <tr><td>index.html:1050</td><td>Detailgrad <i>(Etikett)</i></td><td>entfällt: der Detailgrad steht klein rechts im Kartentitel</td></tr>
+    <tr><td>objekt-reiter.js:745</td><td><b>Experte</b> · Marktbericht Stufe 3 <span class="st x">15 fehlt</span> „15 fehlt“ in der Zeile unten zeigt die Felder.</td><td>entfällt: die Pille „15 fehlt“ sitzt an der Kachel selbst</td></tr>
+    <tr><td>objekt-reiter.js:749</td><td>Einsteiger: die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben — Marktbericht Stufe 1 (Marktpreisindikation).</td><td>entfällt (wandert in den Tooltip und in die Einstellungen, wo der Detailgrad gewählt wird)</td></tr>
+    <tr><td>objekt-reiter.js:750</td><td>Fortgeschritten: dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II — Marktbericht Stufe 2 (erweiterte Indikation).</td><td>entfällt (wie oben)</td></tr>
+    <tr><td>objekt-reiter.js:751</td><td>Experte: alle Felder, dazu Bauteile und Sach- und Ertragswert — Marktbericht Stufe 3 (Wertermittlung nach ImmoWertV).</td><td>entfällt (wie oben)</td></tr>
+    <tr><td>index.html:1050</td><td>Marktbericht abrufen <i>· die Stufe folgt dem Detailgrad</i></td><td>Marktbericht abrufen <i>· Detailgrad Experte</i>. <b>Der Zusatz von heute stimmt seit v3078 nicht mehr</b>: die Stufe ist eine eigene Wahl, der Detailgrad gibt nur frei.</td></tr>
+    <tr><td>objekt-reiter.js:842</td><td><b>Einsteiger · Stufe 1</b> · Tooltip: Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.</td><td><b>Marktpreis</b> · Marktwert, Spanne, Lage</td></tr>
+    <tr><td>objekt-reiter.js:843</td><td><b>Fortgeschritten · Stufe 2</b> · Tooltip: Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.</td><td><b>Erweitert</b> · + Rendite, Abschlag</td></tr>
+    <tr><td>objekt-reiter.js:844</td><td><b>Experte · Stufe 3</b> · Tooltip: Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.</td><td><b>Wertermittlung</b> · Sach- und Ertragswert (Tooltip nennt Bodenwert, Zins, Faktor)</td></tr>
+    <tr><td>objekt-reiter.js:867</td><td>7 frei <span class="st x">15 fehlt</span> / <span class="st a">bereit</span></td><td>bleibt (zwei Pillen); „— frei“ ohne Kontingentantwort wird zu nichts statt Strich</td></tr>
+    <tr><td>objekt-reiter.js:869</td><td>Knopf „was fehlt“ / „abrufen“</td><td>bleibt</td></tr>
+    <tr><td>index.html:1050</td><td>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme. · Im Marktbericht öffnen →</td><td>nur der Link „Im Marktbericht öffnen →“, der Satz in den Tooltip</td></tr>
+  </table></div>
+
+  <div class="empf">
+    <h2>Empfehlung</h2>
+    <p class="notiz" style="max-width:none"><b>Variante A.</b> Sie behält die Kacheln, die Marcel „cool“ findet, und streicht die drei Sätze darüber. Jede Stufe zeigt dann nur Titel, eine Zeile und zwei Pillen. In der App ist der Kopf heute 190 px hoch (Staging, 1280 px breit, Experte). In dieser Demo bei 1158 px Breite: Nachbau von heute rund 168 px, A rund 112 px, B rund 88 px, C 76 bis 153 px (eine bis drei Stufen). Bei 390 px (Experte): heute rund 393 px, A rund 225 px, B rund 140 px, C rund 150 px (headless Chrome, je nach Schriftladung ±5 px). Gespart wird bei A durch die Statuszeile, den Hinweissatz und den Fußsatz, die alle wegfallen. Die Kacheln tragen dann den Namen des <b>Berichts</b> (Marktpreis · Erweitert · Wertermittlung) statt des Detailgrads. Seit v3078 sind beide eine eigene Wahl, und „Einsteiger · Stufe 1“ auf der Kachel vermischt sie wieder. B ist die schmalste Fassung, verliert aber den Kachel-Charakter. C ist eine nüchterne Liste, für Handys gut, am Desktop am wenigsten markant.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var S = { dg: 3, obj: 'leer', ansicht: 'breit' };
+  /* Stand je Stufe — Zahlen wie auf Staging gemessen (leeres Objekt): 6 / 12 / 15 fehlen, 0 / 17 / 7 frei */
+  var FEHLT = { leer: {1:6,2:12,3:15}, voll: {1:0,2:0,3:0} };
+  var FREI = {1:0,2:17,3:7};
+  var ALT = {
+    1:{ name:'Einsteiger · Stufe 1' }, 2:{ name:'Fortgeschritten · Stufe 2' }, 3:{ name:'Experte · Stufe 3' }
+  };
+  var ALT_HINT = {
+    1:'Einsteiger: die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben — Marktbericht Stufe 1 (Marktpreisindikation).',
+    2:'Fortgeschritten: dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II — Marktbericht Stufe 2 (erweiterte Indikation).',
+    3:'Experte: alle Felder, dazu Bauteile und Sach- und Ertragswert — Marktbericht Stufe 3 (Wertermittlung nach ImmoWertV).'
+  };
+  var SUB = {
+    1:'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.',
+    2:'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.',
+    3:'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.'
+  };
+  var NEU = { 1:{h:'Marktpreis', z:'Marktwert, Spanne, Lage'}, 2:{h:'Erweitert', z:'+ Rendite, Abschlag'}, 3:{h:'Wertermittlung', z:'Sach- und Ertragswert'} };
+  var B_KURZ = {1:'Marktwert · Spanne', 2:'+ Rendite · Abschlag', 3:'ImmoWertV'};
+  var DG = {1:'Einsteiger',2:'Fortgeschritten',3:'Experte'};
+
+  function stufen(){ var a=[]; for (var s=1;s<=S.dg;s++) a.push(s); return a; }
+  function f(s){ return FEHLT[S.obj][s]; }
+  function pille(s){ return f(s) ? '<span class="st x">'+f(s)+' fehlt</span>' : '<span class="st a">bereit</span>'; }
+  function frei(s){ return '<span class="st g">'+FREI[s]+' frei</span>'; }
+  function knopf(s,w){ return '<button class="btn'+(s===w?' solid':'')+(f(s)?' fehlt':'')+'"'+(FREI[s]===0?' disabled title="Kontingent aufgebraucht"':'')+'>'+(f(s)?'was fehlt':'abrufen')+'</button>'; }
+
+  function vorher(){
+    var w = S.dg, fz = f(w);
+    return '<div class="kopf">'
+      + '<div class="v-ziel"><span class="lbl">Detailgrad</span><span><b>'+DG[S.dg]+'</b> · Marktbericht Stufe '+w+' '+(fz?'<span class="st x">'+fz+' fehlt</span><span class="q">„'+fz+' fehlt“ in der Zeile unten zeigt die Felder.</span>':'<span class="st a">bereit</span>')+'</span></div>'
+      + '<p class="v-hint">'+ALT_HINT[S.dg]+'</p>'
+      + '<div class="v-box"><div class="v-titel">Marktbericht abrufen <small>die Stufe folgt dem Detailgrad</small></div>'
+      + '<div class="v-reihe">'+stufen().map(function(s){
+          return '<div class="v-row'+(s===w?' on':'')+'" title="'+SUB[s]+'"><span class="k">'+ALT[s].name+'</span><span class="a">'+knopf(s,w)+'</span><span class="w">'+FREI[s]+' frei '+pille(s)+'</span></div>';
+        }).join('')+'</div>'
+      + '<div class="v-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span><button class="btn">Im Marktbericht öffnen →</button></div></div>'
+      + '</div>';
+  }
+  function varA(){
+    var w = S.dg;
+    return '<div class="kopf"><div class="a-kopf"><span class="t">Marktbericht abrufen</span><span class="dg" title="Bis zu welcher Stufe du abrufen kannst, legt der Detailgrad in den Einstellungen fest.">Detailgrad <b>'+DG[S.dg]+'</b> ⚙</span></div>'
+      + '<div class="a-reihe">'+stufen().map(function(s){
+          return '<div class="a-k'+(s===w?' on':'')+'" role="button" tabindex="0" title="'+SUB[s]+'"><span class="h"><i>STUFE '+s+'</i>'+NEU[s].h+'</span><span class="z">'+NEU[s].z+'</span><span class="f">'+frei(s)+pille(s)+knopf(s,w)+'</span></div>';
+        }).join('')+'</div>'
+      + '<div class="a-fuss"><a class="link" href="#" title="Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.">Im Marktbericht öffnen →</a></div></div>';
+  }
+  function varB(){
+    var w = S.dg;
+    return '<div class="kopf"><div class="b-zeile"><div class="b-seg" role="group" aria-label="Marktbericht-Stufe">'+stufen().map(function(s){
+          return '<button class="'+(s===w?'on':'')+'" title="'+SUB[s]+'"><span class="h"><i>'+s+'</i>'+NEU[s].h+'<span class="punkt '+(f(s)?'x':'a')+'"></span></span><span class="z">'+B_KURZ[s]+'</span></button>';
+        }).join('')+'</div>'
+      + '<div class="b-akt">'+knopf(w,w)+'<a class="link" href="#">Im Marktbericht öffnen →</a></div></div>'
+      + '<div class="b-detail"><b>Stufe '+w+'</b> · '+FREI[w]+' frei · '+(f(w)?f(w)+' Felder fehlen':'bereit')+' · Detailgrad '+DG[S.dg]+'</div></div>';
+  }
+  function varC(){
+    var w = S.dg;
+    return '<div class="kopf"><div class="c-kopf"><span class="t">Marktbericht</span><span class="dg st g">'+DG[S.dg]+'</span></div>'
+      + '<div class="c-liste">'+stufen().map(function(s){
+          return '<div class="c-z'+(s===w?' on':'')+'" title="'+SUB[s]+'"><span class="r"></span><span class="h">'+s+' · '+NEU[s].h+'<small>'+NEU[s].z+'</small></span><span class="p">'+frei(s)+pille(s)+'</span>'+knopf(s,w)+'</div>';
+        }).join('')+'</div></div>';
+  }
+
+  function block(bez, html, notiz){
+    return '<div><div class="bez">'+bez+'</div><div class="rahmen">'+html+'</div>'+(notiz?'<p class="notiz">'+notiz+'</p>':'')+'</div>';
+  }
+  function zeichnen(){
+    var b = document.getElementById('buehne');
+    b.className = S.ansicht === 'handy' ? 'handy' : '';
+    b.innerHTML =
+      '<div class="gegen">'
+      + block('Vorher <span>· heute, Text 1:1</span>', vorher(), 'Drei Sätze erklären dasselbe dreimal: die Statuszeile, der Hinweissatz zum Detailgrad und der Fußsatz. Der Zusatz „die Stufe folgt dem Detailgrad“ ist seit v3078 falsch.')
+      + block('Variante A <span>· Kachel: Titel, eine Zeile, Pillen</span>', varA(), 'Die Kacheln bleiben, jede mit Stufennummer, Berichtsname und einer Zeile. Statuszeile und Hinweissatz entfallen, der Detailgrad steht klein im Titel, der Satz zur Stufe liegt im Tooltip.')
+      + block('Variante B <span>· Stufenleiste in einer Zeile</span>', varB(), 'Die drei Stufen werden ein Segmentschalter mit Ampelpunkt, und es gibt nur einen Knopf für die gewählte Stufe. Das ist die flachste Fassung (eine Zeile plus Detailzeile).')
+      + block('Variante C <span>· Liste mit Auswahlpunkt</span>', varC(), 'Eine Zeile je Stufe: Auswahlpunkt, Name, Pillen und Knopf. Am Handy fällt die Unterzeile weg, und nur der Name bleibt.')
+      + '</div>';
+  }
+  function seg(id, key, fn){
+    var el = document.getElementById(id);
+    el.addEventListener('click', function(e){
+      var t = e.target.closest('button'); if (!t) return;
+      [].forEach.call(el.children, function(c){ c.classList.toggle('on', c === t); });
+      fn(t.getAttribute('data-v'));
+    });
+  }
+  seg('sw-dg','dg', function(v){ S.dg = +v; zeichnen(); });
+  seg('sw-obj','obj', function(v){ S.obj = v; zeichnen(); });
+  seg('sw-ansicht','ansicht', function(v){ S.ansicht = v; zeichnen(); });
+  seg('sw-theme','theme', function(v){ if (v === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v); });
+  zeichnen();
+})();
+</script>
+</body>
+</html>
