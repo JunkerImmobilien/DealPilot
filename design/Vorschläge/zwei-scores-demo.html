@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zwei Scores</title>
+<!-- Demo 02.11.2026 · Marcel: "bau mal eine Demo, wie das aussehen würde".
+     Zahlen aus design/Vorschläge/score-benchmark-p1.md (Abschnitt 3, Fälle A–H),
+     nachgerechnet mit den echten Kernen, die Zwei-Score-Rechnung ist eine Nachbildung
+     im Bericht und steht so NICHT im Code. Nichts in frontend/ ist umgebaut. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ob:#050505;--cream:#FDFCFA;--card:#FBF6E9;--sand:#eee6d3;--ink:#1d1c1a;--ink2:#6b6356;--line:#e6dfcf;
+    --gold:var(--wl-c9a84c,#C9A84C);--gold-hi:var(--wl-e8cc7a,#E8CC7A);--gold-lo:var(--wl-b8932f,#b8932f);
+    --green:#3FA56C;--red:#B8625C;--red2:#D8564C;
+    --runway:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif}
+  button,input,select{font-family:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 16px 70px}
+  .tag{font:600 11px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-lo)}
+  h1{font:600 28px/1.2 "Space Grotesk",Inter,sans-serif;margin:6px 0 6px}
+  h2{font:600 20px/1.3 "Space Grotesk",Inter,sans-serif;margin:34px 0 8px}
+  h3{font:600 16px/1.3 "Space Grotesk",Inter,sans-serif;margin:0}
+  .lead{color:var(--ink2);max-width:780px;margin:0 0 14px}
+  .entwurf{display:inline-block;font:700 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
+    padding:5px 9px;border-radius:999px;background:var(--card);color:var(--gold-lo);border:1px solid var(--sand)}
+  .karte{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .band{height:4px;background:var(--runway)}
+  .pad{padding:18px}
+
+  /* Wähler */
+  .waehler{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0 18px}
+  @media(max-width:760px){.waehler{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .waehler button{all:unset;box-sizing:border-box;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;font-size:13px;line-height:1.3;color:var(--ink);min-width:0}
+  .waehler button:hover{border-color:var(--gold)}
+  .waehler button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .waehler button b{display:block;font:700 13px/1.2 "JetBrains Mono",monospace;color:var(--gold-lo);margin-bottom:3px}
+  .waehler button[aria-pressed="true"]{background:var(--ob);color:#f6f2e8;border-color:var(--ob)}
+  .waehler button[aria-pressed="true"] b{color:var(--gold-hi)}
+
+  /* Kopf des Falls */
+  .fallkopf{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between}
+  .fallkopf .obj{color:var(--ink2);font-size:13.5px}
+  .eck{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .eck span{font:500 12px/1 "JetBrains Mono",monospace;background:var(--card);border:1px solid var(--sand);border-radius:7px;padding:6px 8px;color:var(--ink)}
+
+  /* Gesamtaussage */
+  .gesamt{margin-top:16px;border-radius:14px;padding:14px 16px;background:var(--ob);color:#f6f2e8;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+  .gesamt .wort{font:700 22px/1.1 "Space Grotesk",sans-serif}
+  .gesamt .empf{font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;padding:7px 10px;border-radius:999px;background:var(--runway);color:#1a1508}
+  .gesamt .empf.nein{background:rgba(216,86,76,.18);color:#f0a59d}
+  .gesamt .empf.halb{background:rgba(201,168,76,.18);color:var(--gold-hi)}
+  .gesamt .warum{flex:1 1 280px;font-size:13.5px;color:rgba(255,255,255,.72)}
+  .gesamt .lbl{font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px}
+  .deckel{display:inline-block;margin-top:6px;font:700 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;
+    color:#f0a59d;border:1px solid rgba(216,86,76,.5);border-radius:6px;padding:4px 7px}
+
+  /* Zwei Scores */
+  .zwei{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+  @media(max-width:820px){.zwei{grid-template-columns:1fr}}
+  .score{display:flex;gap:16px;align-items:center}
+  .ring{width:104px;height:104px;flex:0 0 auto;position:relative}
+  .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ring .n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 32px/1 "Space Grotesk",sans-serif}
+  .pill{display:inline-block;font:700 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;padding:5px 9px;border-radius:999px;margin-top:6px}
+  .score .was{font-size:12.5px;color:var(--ink2);margin-top:6px}
+  .kat{margin-top:16px}
+  .kz{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline;margin:10px 0 0}
+  .kz .t{font-size:13.5px;font-weight:500}
+  .kz .p{font:600 12.5px/1 "JetBrains Mono",monospace;white-space:nowrap}
+  .kz .bar{grid-column:1/-1;height:7px;border-radius:5px;background:#f0ece3;overflow:hidden}
+  .kz .bar i{display:block;height:100%;border-radius:5px;background:var(--gold)}
+  .kz .m{grid-column:1/-1;font-size:12px;color:var(--ink2)}
+  .kz.offen .bar{background:repeating-linear-gradient(135deg,#f0ece3 0 6px,#fff 6px 12px)}
+  .kz.offen .p{color:var(--ink2);font-weight:500}
+  .summe{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--ink2)}
+
+  /* Faktoren */
+  .fakt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+  @media(max-width:820px){.fakt{grid-template-columns:1fr}}
+  .fakt ul{list-style:none;margin:8px 0 0;padding:0}
+  .fakt li{position:relative;padding:6px 0 6px 24px;font-size:13.5px;border-bottom:1px solid #f4f0e7}
+  .fakt li:last-child{border-bottom:0}
+  .fakt li::before{position:absolute;left:0;top:6px;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font:700 12px/17px "JetBrains Mono",monospace;text-align:center}
+  .fakt .plus li::before{content:"+";background:rgba(63,165,108,.13);color:#2d7d52}
+  .fakt .minus li::before{content:"−";background:rgba(184,98,92,.14);color:var(--red)}
+
+  /* Mietpotenzial */
+  .miete{margin-top:16px}
+  .mzeile{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:8px}
+  .mzeile .gross{font:700 22px/1.1 "Space Grotesk",sans-serif}
+  .mzeile .pfeil{color:var(--gold-lo);font:700 18px/1 "JetBrains Mono",monospace}
+  .mzeile .klein{font-size:12.5px;color:var(--ink2)}
+  .neben{margin-top:8px;font-size:12.5px;color:var(--ink2);border-left:3px solid var(--sand);padding-left:9px}
+  .zk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+  @media(max-width:520px){.zk{grid-template-columns:1fr}}
+  .zk div{background:var(--card);border:1px solid var(--sand);border-radius:10px;padding:10px 12px}
+  .zk .l{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-lo)}
+  .zk .w{font:700 19px/1.2 "Space Grotesk",sans-serif;margin-top:4px}
+  .zk .h{font-size:12px;color:var(--ink2);margin-top:2px}
+
+  /* Vergleich */
+  .vgl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+  @media(max-width:820px){.vgl{grid-template-columns:1fr}}
+  .vgl .alt{background:#f7f5f0}
+  .vgl .wert{font:700 26px/1 "Space Grotesk",sans-serif}
+  .vgl p{font-size:13.5px;margin:8px 0 0}
+  .vgl .klein{font-size:12.5px;color:var(--ink2)}
+
+  /* Übersicht */
+  .uebersicht{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+  @media(max-width:900px){.uebersicht{grid-template-columns:1fr}}
+  .tabwrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{padding:7px 8px;border-bottom:1px solid #f0ece3;text-align:left;white-space:nowrap}
+  th{font:600 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+  td.z{text-align:right;font-family:"JetBrains Mono",monospace}
+  tr.akt td{background:var(--card)}
+  tbody tr{cursor:pointer}
+  .matrix svg{width:100%;height:auto;display:block}
+  .matrix text{font-family:"JetBrains Mono",monospace}
+  .matrix .pt{cursor:pointer}
+
+  /* Marcels Beispiel */
+  .bsp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px}
+  @media(max-width:820px){.bsp{grid-template-columns:1fr}}
+  .feld{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:8px 10px;align-items:center;font-size:13.5px}
+  .feld input,.feld select{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--ink)}
+  .feld input:focus,.feld select:focus{outline:2px solid var(--gold);outline-offset:0;border-color:var(--gold)}
+  .erg div{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #f0ece3;font-size:13.5px}
+  .erg b{font-family:"JetBrains Mono",monospace;white-space:nowrap}
+  .erg .falsch b{text-decoration:line-through;color:var(--red)}
+  .erg .haupt b{color:#2d7d52;font-size:15px}
+  .regel{font-size:13.5px}
+  .regel li{margin:4px 0}
+  .schalter{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .schalter button{all:unset;cursor:pointer;font:600 12px/1 Inter,sans-serif;padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+  .schalter button[aria-pressed="true"]{background:var(--ob);color:#f6f2e8;border-color:var(--ob)}
+  .schalter button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .fuss{margin-top:30px;font-size:12px;color:var(--ink2)}
+  @media(max-width:420px){
+    h1{font-size:23px}
+    .ring{width:88px;height:88px}.ring .n{font-size:27px}
+    .gesamt .wort{font-size:19px}
+    .feld{grid-template-columns:minmax(0,1fr) 110px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tag">Score P1 · Demo 02.11.2026</div>
+  <h1>Zwei Scores statt einem</h1>
+  <p class="lead"><b>Investment-Score</b>: wie gut ist die Immobilie, unabhängig davon, wie sie finanziert wird.
+    <b>Finanzierungs-Score</b>: trägt die geplante Finanzierung. Gekauft wird nur, wenn beide ihre Schwelle erreichen.
+    Nichts in der App ist umgebaut.</p>
+  <span class="entwurf">Nachgerechnet, Entwurf · Fälle aus dem Score-Benchmark P1</span>
+
+  <div class="waehler" id="waehler" role="group" aria-label="Fall wählen"></div>
+
+  <div class="karte" id="fall">
+    <div class="band"></div>
+    <div class="pad">
+      <div class="fallkopf">
+        <h3 id="f-titel"></h3>
+        <div class="obj" id="f-obj"></div>
+      </div>
+      <div class="eck" id="f-eck"></div>
+
+      <div class="gesamt" id="f-gesamt"></div>
+    </div>
+  </div>
+
+  <div class="zwei">
+    <div class="karte"><div class="band"></div><div class="pad" id="f-inv"></div></div>
+    <div class="karte"><div class="band"></div><div class="pad" id="f-fin"></div></div>
+  </div>
+
+  <div class="fakt">
+    <div class="karte"><div class="pad"><h3>Positive Faktoren</h3><ul class="plus" id="f-plus"></ul></div></div>
+    <div class="karte"><div class="pad"><h3>Negative Faktoren</h3><ul class="minus" id="f-minus"></ul></div></div>
+  </div>
+
+  <div class="karte miete"><div class="band"></div><div class="pad" id="f-miete"></div></div>
+
+  <div class="vgl" id="f-vgl"></div>
+
+  <h2>Alle acht Fälle auf einen Blick</h2>
+  <p class="lead">Rechts oben (Investment ≥ 70, Finanzierung ≥ 50) liegt das Feld „Kaufen“. Anklicken wählt den Fall.</p>
+  <div class="uebersicht">
+    <div class="karte"><div class="pad tabwrap"><table id="tab"></table></div></div>
+    <div class="karte matrix"><div class="pad"><svg id="mx" viewBox="0 0 340 300" role="img" aria-label="Investment- gegen Finanzierungs-Score"></svg></div></div>
+  </div>
+
+  <h2>Regel für die Gesamtaussage</h2>
+  <div class="karte"><div class="pad regel">
+    <ol>
+      <li><b>Kaufen</b> nur, wenn Investment ≥ 70 <b>und</b> Finanzierung ≥ 50.</li>
+      <li><b>Harte Grenze:</b> DSCR unter 1,0 oder Cashflow nach Kapitaldienst unter 0 → Finanzierungs-Score höchstens <b>Schwach</b> (49), Gesamturteil nie besser als <b>Schwach</b>.</li>
+      <li>Stufen wie überall in DealPilot: Sehr gut ≥ 85 · Gut ≥ 70 · Solide ≥ 50 · Schwach ≥ 35 · Kritisch &lt; 35.</li>
+    </ol>
+    <div><b>Offene Entscheidung:</b> Welche Stufe trägt das Gesamturteil?</div>
+    <div class="schalter" id="regel">
+      <button type="button" data-r="a" aria-pressed="true">A · Investment-Stufe, gedeckelt</button>
+      <button type="button" data-r="b" aria-pressed="false">B · die schwächere der beiden</button>
+    </div>
+    <p class="klein" style="color:var(--ink2);font-size:12.5px;margin:10px 0 0">A: Bei E sagt das Urteil dann „gutes Objekt, Finanzierung umbauen“ (Schwach), und F bleibt Schwach. B: F wird Kritisch, wie heute, aber E auch. Das wollte der Umbau gerade vermeiden.</p>
+  </div></div>
+
+  <h2>Marcels Beispiel: Zielkaufpreis mit zulässiger Miete</h2>
+  <div class="karte"><div class="band"></div><div class="pad bsp">
+    <div class="feld">
+      <label for="b-kp">Kaufpreis (€)</label><input id="b-kp" type="number" inputmode="numeric" value="180000" step="1000" min="0">
+      <label for="b-nkm">Nettokaltmiete p. a. (€)</label><input id="b-nkm" type="number" inputmode="numeric" value="10800" step="100" min="0">
+      <label for="b-ziel">Zielrendite brutto (%)</label><input id="b-ziel" type="number" inputmode="decimal" value="8" step="0.1" min="0.1">
+      <label for="b-kap">Kappungsgrenze § 558 Abs. 3</label>
+      <select id="b-kap"><option value="20">20 %</option><option value="15">15 % (angespannter Markt)</option></select>
+    </div>
+    <div class="erg" id="b-erg"></div>
+  </div></div>
+
+  <p class="fuss">Quelle der Zahlen: <code>design/Vorschläge/score-benchmark-p1.md</code>, Abschnitt 3 (echte Kerne für „heute“, Zwei-Score-Rechnung als Nachbildung). Annahmen dort: Nebenkosten 10,5 %, Zins 3,8 %, Tilgung 2 %, LTV gegen den Kaufpreis. Investment = fünf Teilnoten mit 25/20/20/15/10 Punkten, auf 90 normiert. Finanzierung = DSCR 40 + Cashflow 30 + LTV 30. Den Liquiditätspuffer hat der Benchmark nicht gerechnet, er ist als offene Kategorie gezeigt. Mietpotenzial nur aus der rechtlich zulässigen Miete: min(Vergleichsmiete, Ist × (1 + Kappung)), nie unter Ist. Angebotsmiete erscheint nur als gekennzeichnete Zeile „bei Neuvermietung“.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  // ── Daten: score-benchmark-p1.md, Tabellen 3 / 3.1 / 3.2 / 3.3 ──
+  // t = Teilnoten 0–100: Aktuell · Prognose · Preis · Standort · Zustand
+  // ds1p = DS1-Punkte 0–100: Cashflow · NMR · LTV · DSCR · Potenzial
+  var F = [
+    {id:'A', kurz:'Hoher LTV, hohe Rendite', obj:'MFH 4 WE · Gelsenkirchen', lage:'C', kp:250000, nkm:2000, wfl:260, bj:1972,
+     zust:'normal, Energieklasse E', ek:'nur Nebenkosten', mw:265000, vgl:7.2, ang:8.0, kap:20, inv:0,
+     bmr:9.60, nmr:6.81, cf:358, dscr:1.30, ltv:100.0, ds1:79, ds1v:77, ds2:81,
+     ds1p:{cf:100,nmr:100,ltv:25,dscr:86,pot:48}, t:[100,70,76,60,83], I:79, Fs:72,
+     nkm3:2000, bmr3:9.60, ziel:7, zkH:250000, zk3:342857,
+     plus:['Bruttorendite 9,6 %, weit über dem Ziel der C-Lage (7 %)','Cashflow +358 €/Monat, DSCR 1,30','Kaufpreis 6 % unter Marktwert'],
+     minus:['LTV 100 %: nur die Nebenkosten aus Eigenkapital','Kein zulässiges Mietpotenzial: Ist-Miete 7,69 €/m² liegt über der Vergleichsmiete 7,2 €/m²','C-Lage, Standort 60 von 100'],
+     heute:'Gut. Der LTV kostet 13 Punkte und damit „Sehr gut“, obwohl die Bank es trägt. Leicht streng, nicht falsch.',
+     neu:'Objekt und Finanzierung beide Gut. Der hohe LTV steht jetzt dort, wo er hingehört, und senkt nicht mehr die Bewertung der Immobilie.'},
+    {id:'B', kurz:'Niedriger LTV, geringe Rendite', obj:'ETW · München-Schwabing', lage:'A', kp:500000, nkm:1250, wfl:70, bj:2012,
+     zust:'gut, Energieklasse B', ek:'55 % der Gesamtinvestition', mw:510000, vgl:18.5, ang:22.5, kap:15, inv:0,
+     bmr:3.00, nmr:2.39, cf:-108, dscr:0.91, ltv:50.0, ds1:31, ds1v:35, ds2:55,
+     ds1p:{cf:23,nmr:13,ltv:100,dscr:6,pot:36}, t:[16,35,69,93,93], I:54, Fs:39,
+     nkm3:1295, bmr3:3.11, ziel:3.5, zkH:428571, zk3:444000,
+     plus:['A-Lage, Standort 93 von 100','Guter Zustand, Baujahr 2012','LTV nur 50 %'],
+     minus:['Bruttorendite 3,0 % unter dem Ziel der A-Lage (3,5 %)','DSCR 0,91 und Cashflow −108 €/Monat: harte Grenze','Zulässiges Mietpotenzial nur +3,6 % (Vergleichsmiete 18,5 €/m²)'],
+     heute:'Kritisch (31). Bei 50 % Eigenkapital in A-Lage zu streng. Die Wohnung ist teuer, aber kein Notfall.',
+     neu:'Objekt Solide, Finanzierung Schwach (Deckel). Das Urteil sagt jetzt, was es ist: zu teuer für die Miete, die Rate trägt sich knapp nicht.'},
+    {id:'C', kurz:'Niedrige Ist-Miete, Potenzial', obj:'ETW · Köln-Kalk', lage:'B', kp:195000, nkm:600, wfl:75, bj:1965,
+     zust:'normal, Energieklasse D', ek:'Nebenkosten + 10 %', mw:215000, vgl:10.6, ang:13.5, kap:15, inv:0,
+     bmr:3.69, nmr:2.74, cf:-357, dscr:0.58, ltv:90.0, ds1:23, ds1v:20, ds2:51,
+     ds1p:{cf:0,nmr:25,ltv:50,dscr:0,pot:61}, t:[22,52,84,73,83], I:58, Fs:15,
+     nkm3:690, bmr3:4.25, ziel:5, zkH:108518, zk3:165600,
+     plus:['Ist-Miete 8,00 €/m² weit unter der Vergleichsmiete 10,6 €/m²: zulässig +15 % in 3 Jahren','Kaufpreis 9 % unter Marktwert'],
+     minus:['DSCR 0,58 und Cashflow −357 €/Monat: harte Grenze','Bruttorendite heute 3,7 %, Ziel der B-Lage 5 %','Angebotsmiete 13,5 €/m² (+69 %) zählt nicht als Potenzial, sie ist nur bei Neuvermietung erreichbar'],
+     heute:'Kritisch (23). DS1 sieht das Potenzial nicht, DS2 überzeichnet es mit +69 % Angebotsmiete (Upside 100).',
+     neu:'Objekt Solide mit zulässigem Potenzial (+15 %), Finanzierung Kritisch. Beides stimmt, und keins verdeckt das andere.'},
+    {id:'D', kurz:'Hohe Rendite, Sanierungsbedarf', obj:'MFH 6 WE · Pirmasens', lage:'C', kp:300000, nkm:2600, wfl:400, bj:1958,
+     zust:'stark sanierungsbedürftig, Energieklasse G', ek:'Nebenkosten + 20 %', mw:290000, vgl:6.3, ang:6.8, kap:20, inv:140000,
+     bmr:10.40, nmr:7.06, cf:790, dscr:1.68, ltv:80.0, ds1:86, ds1v:88, ds2:72,
+     ds1p:{cf:100,nmr:100,ltv:75,dscr:100,pot:30}, t:[100,70,56,27,13], I:62, Fs:93,
+     nkm3:2600, bmr3:10.40, ziel:7, zkH:290000, zk3:445714,
+     plus:['Bruttorendite 10,4 %','Cashflow +790 €/Monat, DSCR 1,68'],
+     minus:['Investitionsbedarf 140.000 € = 47 % des Kaufpreises (Zustand 13 von 100)','Standort 27 von 100, Bevölkerung stark fallend','Kaufpreis 3 % über Marktwert','Ist-Miete 6,50 €/m² schon über der Vergleichsmiete 6,3 €/m²'],
+     heute:'Sehr gut (86). Deutlich zu milde: Der Quick-Check kennt weder Investitionsbedarf noch Zustand noch Lage.',
+     neu:'Finanzierung Sehr gut, Objekt nur Solide. Die Rate trägt, aber die Sanierung und die Lage drücken die Immobilie unter die Kaufschwelle.'},
+    {id:'E', kurz:'Kaufpreis deutlich unter Marktwert', obj:'ETW · Bielefeld', lage:'B', kp:150000, nkm:680, wfl:68, bj:1990,
+     zust:'gut, Energieklasse C', ek:'Nebenkosten + 10 %', mw:205000, vgl:9.4, ang:10.5, kap:15, inv:0,
+     bmr:5.44, nmr:4.17, cf:-77, dscr:0.88, ltv:90.0, ds1:48, ds1v:41, ds2:59,
+     ds1p:{cf:31,nmr:72,ltv:50,dscr:0,pot:90}, t:[64,48,100,73,93], I:73, Fs:24,
+     nkm3:680, bmr3:5.44, ziel:5, zkH:131406, zk3:163200,
+     plus:['Kaufpreis 27 % unter Marktwert (Preis 100 von 100)','Guter Zustand, Baujahr 1990','Bruttorendite 5,4 % über dem Ziel der B-Lage'],
+     minus:['DSCR 0,88 und Cashflow −77 €/Monat: harte Grenze','LTV 90 %','Ist-Miete 10,00 €/m² schon über der Vergleichsmiete 9,4 €/m²'],
+     heute:'Schwach (48). 30 Punkte hängen allein am Eigenkapital: bei LTV 70 % wären es 78 (Gut).',
+     neu:'Objekt Gut, Finanzierung Kritisch. Die Aussage lautet nicht mehr „schlechter Deal“, sondern „guter Kauf, so nicht finanzierbar“.'},
+    {id:'F', kurz:'Hoher LTV, negativer Cashflow', obj:'ETW · Frankfurt-Bornheim', lage:'A', kp:420000, nkm:1150, wfl:85, bj:2008,
+     zust:'gut, Energieklasse C', ek:'0 € (110 % finanziert)', mw:400000, vgl:14.0, ang:17.0, kap:15, inv:0,
+     bmr:3.29, nmr:2.56, cf:-1251, dscr:0.44, ltv:110.5, ds1:9, ds1v:6, ds2:43,
+     ds1p:{cf:0,nmr:19,ltv:0,dscr:0,pot:30}, t:[19,35,53,87,93], I:50, Fs:0,
+     nkm3:1190, bmr3:3.40, ziel:3.5, zkH:172789, zk3:408000,
+     plus:['A-Lage, Standort 87 von 100','Guter Zustand, Baujahr 2008'],
+     minus:['Cashflow −1.251 €/Monat, DSCR 0,44: harte Grenze','LTV 110 %: Kaufpreis und Nebenkosten voll finanziert','Bruttorendite 3,3 % unter dem Ziel der A-Lage (3,5 %)','Kaufpreis 5 % über Marktwert'],
+     heute:'Kritisch (9). Richtig. DS2 (43) und eine Ein-Score-Gewichtung mit 10 % Finanzierung (45) wären zu milde.',
+     neu:'Objekt knapp Solide, Finanzierung 0. Ohne Deckel stünde das Gesamturteil bei Solide; mit Deckel nie besser als Schwach.'},
+    {id:'G', kurz:'Solide, stabil vermietet', obj:'MFH 8 WE · Herford', lage:'B', kp:640000, nkm:3650, wfl:560, bj:1994,
+     zust:'gut, Energieklasse C', ek:'Nebenkosten + 20 %', mw:660000, vgl:6.9, ang:7.6, kap:20, inv:0,
+     bmr:6.84, nmr:4.72, cf:309, dscr:1.12, ltv:80.0, ds1:81, ds1v:82, ds2:76,
+     ds1p:{cf:100,nmr:91,ltv:75,dscr:72,pot:39}, t:[84,70,71,73,93], I:77, Fs:81,
+     nkm3:3864, bmr3:7.25, ziel:5, zkH:640000, zk3:927360,
+     plus:['Bruttorendite 6,8 %, Cashflow +309 €/Monat','Zulässig +5,9 % bis zur Vergleichsmiete 6,9 €/m² (Kappung 20 % greift nicht)','Guter Zustand, Baujahr 1994'],
+     minus:['DSCR 1,12: trägt, aber mit wenig Luft','B-Lage, Standort 73 von 100'],
+     heute:'Gut (81). Passt.',
+     neu:'Beide Gut. Kaufen. Der Fall zeigt, dass zwei Ringe ein gutes Objekt nicht schlechter machen.'},
+    {id:'H', kurz:'Hoher Preis, optimistische Prognose', obj:'ETW · Hamburg-Eimsbüttel', lage:'A', kp:460000, nkm:1120, wfl:80, bj:1999,
+     zust:'gut, Energieklasse D', ek:'Nebenkosten + 20 %', mw:390000, vgl:13.2, ang:17.5, kap:15, inv:0,
+     bmr:2.92, nmr:2.31, cf:-800, dscr:0.55, ltv:80.0, ds1:18, ds1v:20, ds2:51,
+     ds1p:{cf:0,nmr:10,ltv:75,dscr:0,pot:30}, t:[15,30,20,87,93], I:40, Fs:23,
+     nkm3:1120, bmr3:2.92, ziel:3.5, zkH:241633, zk3:384000,
+     plus:['A-Lage, Standort 87 von 100','Guter Zustand, Baujahr 1999'],
+     minus:['Kaufpreis 18 % über Marktwert (390.000 €)','Ist-Miete 14,00 €/m² schon über der Vergleichsmiete 13,2 €/m²: kein zulässiges Potenzial','Verkäuferprognose 17,5 €/m² nur bei Neuvermietung','Cashflow −800 €/Monat, DSCR 0,55: harte Grenze'],
+     heute:'Kritisch (18). Richtig. DS2 zeigt 51 (Solide), weil die Angebotsmiete als Potenzial zählt.',
+     neu:'Objekt Schwach, Finanzierung Kritisch. Die Verkäuferprognose bringt keinen Punkt, weil sie rechtlich nicht erreichbar ist.'}
+  ];
+
+  var INV_KAT = [
+    {n:'Aktuelle Wirtschaftlichkeit', w:25},
+    {n:'Mietpotenzial (rechtlich zulässig, 3 J.)', w:20},
+    {n:'Kaufpreis vs. Marktwert', w:20},
+    {n:'Lage', w:15},
+    {n:'Zustand / Investitionsbedarf', w:10}
+  ];
+  var regel = 'a';
+  var akt = 'A';
+
+  // ── Helfer ──
+  var nf0 = new Intl.NumberFormat('de-DE',{maximumFractionDigits:0});
+  var nf1 = new Intl.NumberFormat('de-DE',{minimumFractionDigits:0,maximumFractionDigits:1});
+  var nf2 = new Intl.NumberFormat('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+  function eur(x){ return nf0.format(Math.round(x)) + ' €'; }
+  function pct(x){ return nf2.format(x) + ' %'; }
+  function sgn(x){ return (x > 0 ? '+' : x < 0 ? '−' : '') + nf0.format(Math.abs(x)); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  var STUFEN = ['Kritisch','Schwach','Solide','Gut','Sehr gut'];
+  function stufeIdx(s){ return s >= 85 ? 4 : s >= 70 ? 3 : s >= 50 ? 2 : s >= 35 ? 1 : 0; }
+  function farbe(s){ return s >= 70 ? '#3FA56C' : s >= 50 ? 'var(--gold)' : '#B8625C'; }
+  function pillStil(s){
+    return s >= 70 ? 'background:rgba(63,165,108,.12);color:#2d7d52'
+         : s >= 50 ? 'background:var(--card);color:var(--gold-lo);border:1px solid var(--sand)'
+         : 'background:rgba(184,98,92,.12);color:#B8625C';
+  }
+  function hart(f){ return f.dscr < 1 || f.cf < 0; }
+  function finScore(f){ return hart(f) ? Math.min(f.Fs, 49) : f.Fs; }
+
+  function gesamt(f){
+    var fs = finScore(f), gi;
+    if (regel === 'a') gi = stufeIdx(f.I);
+    else gi = Math.min(stufeIdx(f.I), stufeIdx(fs));
+    if (hart(f)) gi = Math.min(gi, 1);
+    var e, k;
+    if (f.I < 50)                         { e = 'Nicht kaufen'; k = 'nein'; }
+    else if (hart(f) && fs < 35 && f.I < 70){ e = 'So nicht kaufen'; k = 'nein'; }
+    else if (f.I >= 70 && fs >= 50)       { e = 'Kaufen'; k = ''; }
+    else if (f.I >= 70)                   { e = 'Objekt passt, Finanzierung umbauen'; k = 'halb'; }
+    else if (fs >= 50)                    { e = 'Verhandeln'; k = 'halb'; }
+    else                                  { e = 'Verhandeln, Finanzierung umbauen'; k = 'halb'; }
+    return {idx:gi, empf:e, kl:k};
+  }
+
+  function ring(score){
+    var r = 44, u = 2 * Math.PI * r, d = u * Math.max(0, Math.min(100, score)) / 100;
+    return '<div class="ring"><svg viewBox="0 0 104 104" aria-hidden="true">'
+      + '<circle cx="52" cy="52" r="' + r + '" fill="none" stroke="#f0ece3" stroke-width="9"/>'
+      + '<circle cx="52" cy="52" r="' + r + '" fill="none" stroke="' + (score >= 70 ? '#3FA56C' : score >= 50 ? '#C9A84C' : '#B8625C')
+      + '" style="stroke:' + farbe(score) + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + d.toFixed(1) + ' ' + u.toFixed(1) + '"/>'
+      + '</svg><div class="n">' + score + '</div></div>';
+  }
+  function balken(titel, pkt, max, meta, offen){
+    var w = offen ? 100 : Math.max(0, Math.min(100, pkt / max * 100));
+    return '<div class="kz' + (offen ? ' offen' : '') + '"><span class="t">' + esc(titel) + '</span>'
+      + '<span class="p">' + (offen ? 'nicht gerechnet' : nf1.format(pkt) + ' / ' + max) + '</span>'
+      + '<span class="bar"><i style="width:' + w.toFixed(1) + '%;' + (offen ? 'background:transparent' : '') + '"></i></span>'
+      + (meta ? '<span class="m">' + esc(meta) + '</span>' : '') + '</div>';
+  }
+
+  // ── Zeichnen ──
+  function zeichneWaehler(){
+    document.getElementById('waehler').innerHTML = F.map(function(f){
+      return '<button type="button" data-id="' + f.id + '" aria-pressed="' + (f.id === akt) + '"><b>Fall ' + f.id + '</b>' + esc(f.kurz) + '</button>';
+    }).join('');
+  }
+
+  function zeichneFall(){
+    var f = F.filter(function(x){ return x.id === akt; })[0];
+    var fs = finScore(f), g = gesamt(f), h = hart(f);
+
+    document.getElementById('f-titel').textContent = 'Fall ' + f.id + ' · ' + f.kurz;
+    document.getElementById('f-obj').textContent = f.obj + ' · ' + f.lage + '-Lage · Bj ' + f.bj;
+    document.getElementById('f-eck').innerHTML = [
+      'KP ' + eur(f.kp), 'Marktwert ' + eur(f.mw), 'NKM ' + eur(f.nkm) + '/Mon.', nf0.format(f.wfl) + ' m²',
+      'EK: ' + f.ek, f.zust, f.inv ? 'Investitionsbedarf ' + eur(f.inv) : 'kein Investitionsbedarf'
+    ].map(function(s){ return '<span>' + esc(s) + '</span>'; }).join('');
+
+    document.getElementById('f-gesamt').innerHTML =
+      '<div><div class="lbl">Gesamturteil</div><div class="wort">' + STUFEN[g.idx] + '</div>'
+      + (h ? '<span class="deckel">Deckel aktiv · DSCR ' + nf2.format(f.dscr) + ' · CF ' + sgn(f.cf) + ' €</span>' : '') + '</div>'
+      + '<span class="empf ' + g.kl + '">' + esc(g.empf) + '</span>'
+      + '<div class="warum">Investment <b style="color:#fff">' + f.I + '</b> (Schwelle 70) · Finanzierung <b style="color:#fff">' + fs + '</b> (Schwelle 50). '
+      + (f.I >= 70 && fs >= 50 ? 'Beide Schwellen erreicht.'
+         : 'Nicht erreicht: ' + [f.I < 70 ? 'Investment' : '', fs < 50 ? 'Finanzierung' : ''].filter(Boolean).join(' und ') + '.') + '</div>';
+
+    // Investment
+    var summeInv = 0;
+    var meta = [
+      'BMR ' + pct(f.bmr) + ' · NMR ' + pct(f.nmr) + ' · ohne Finanzierung',
+      'heute ' + pct(f.bmr) + ' → nach 3 J. ' + pct(f.bmr3) + ' (zulässig, Kappung ' + f.kap + ' %)',
+      'KP / Marktwert ' + nf2.format(f.kp / f.mw) + ' (' + (f.kp <= f.mw ? nf0.format((1 - f.kp / f.mw) * 100) + ' % darunter' : nf0.format((f.kp / f.mw - 1) * 100) + ' % darüber') + ')',
+      f.lage + '-Lage · Mikrolage, Bevölkerung, Nachfrage',
+      f.zust + (f.inv ? ' · Bedarf ' + nf0.format(f.inv / f.kp * 100) + ' % des KP' : '')
+    ];
+    var bal = INV_KAT.map(function(k, i){
+      var p = f.t[i] * k.w / 100; summeInv += p;
+      return balken(k.n, Math.round(p * 10) / 10, k.w, meta[i]);
+    }).join('');
+    document.getElementById('f-inv').innerHTML =
+      '<div class="score">' + ring(f.I) + '<div><h3>Investment-Score</h3>'
+      + '<span class="pill" style="' + pillStil(f.I) + '">' + STUFEN[stufeIdx(f.I)].toUpperCase() + '</span>'
+      + '<div class="was">Wie gut ist die Immobilie, egal wie sie finanziert wird?</div></div></div>'
+      + '<div class="kat">' + bal + '</div>'
+      + '<div class="summe">Summe ' + nf1.format(Math.round(summeInv * 10) / 10) + ' von 90 Punkten → auf 100 normiert: <b>' + f.I + '</b>'
+      + (Math.round(summeInv / 90 * 100) !== f.I ? ' (Teilnoten hier gerundet, der Benchmark rechnet ungerundet)' : '') + '</div>';
+
+    // Finanzierung
+    var pD = f.ds1p.dscr * 0.4, pC = f.ds1p.cf * 0.3, pL = f.ds1p.ltv * 0.3;
+    document.getElementById('f-fin').innerHTML =
+      '<div class="score">' + ring(fs) + '<div><h3>Finanzierungs-Score</h3>'
+      + '<span class="pill" style="' + pillStil(fs) + '">' + STUFEN[stufeIdx(fs)].toUpperCase() + '</span>'
+      + '<div class="was">Trägt die geplante Finanzierung dieses Objekt?</div></div></div>'
+      + '<div class="kat">'
+      + balken('DSCR', Math.round(pD * 10) / 10, 40, 'DSCR ' + nf2.format(f.dscr) + (f.dscr < 1 ? ' · unter 1,0: harte Grenze' : ''))
+      + balken('Cashflow nach Kapitaldienst', Math.round(pC * 10) / 10, 30, sgn(f.cf) + ' €/Monat' + (f.cf < 0 ? ' · negativ: harte Grenze' : ''))
+      + balken('LTV', Math.round(pL * 10) / 10, 30, 'LTV ' + nf1.format(f.ltv) + ' % gegen den Kaufpreis')
+      + balken('Liquiditätspuffer', 0, 0, 'Im Benchmark nicht gerechnet: Rücklage nach Kauf fehlt als Eingabe im Quick-Check', true)
+      + '</div>'
+      + '<div class="summe">Summe ' + nf1.format(Math.round((pD + pC + pL) * 10) / 10) + ' von 100 Punkten'
+      + (h && f.Fs > 49 ? ' → gedeckelt auf 49' : h ? ' · harte Grenze (höchstens 49) ändert hier nichts' : '') + '</div>';
+
+    // Faktoren
+    document.getElementById('f-plus').innerHTML = f.plus.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+    document.getElementById('f-minus').innerHTML = f.minus.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+
+    // Mietpotenzial
+    var istQm = f.nkm / f.wfl, angNkm = f.ang * f.wfl, angBmr = angNkm * 12 / f.kp;
+    var zuw = f.nkm3 / f.nkm - 1;
+    var grund = f.nkm3 <= f.nkm ? 'Ist-Miete ' + nf2.format(istQm) + ' €/m² liegt schon auf oder über der Vergleichsmiete ' + nf1.format(f.vgl) + ' €/m²: kein zulässiger Anstieg.'
+      : (f.nkm * (1 + f.kap / 100) <= f.vgl * f.wfl + 0.5 ? 'Die Kappungsgrenze ' + f.kap + ' % begrenzt den Anstieg (Vergleichsmiete ' + nf1.format(f.vgl) + ' €/m² läge höher).'
+         : 'Die Vergleichsmiete ' + nf1.format(f.vgl) + ' €/m² begrenzt den Anstieg (Kappung ' + f.kap + ' % ließe mehr zu).');
+    var zk3d = Math.min(f.zk3, f.mw);
+    document.getElementById('f-miete').innerHTML =
+      '<h3>Mietpotenzial · rechtlich zulässig</h3>'
+      + '<div class="mzeile"><span class="klein">Bruttorendite heute</span><span class="gross">' + pct(f.bmr) + '</span>'
+      + '<span class="pfeil">→</span><span class="klein">nach 3 J.</span><span class="gross" style="color:' + (f.bmr3 > f.bmr ? '#2d7d52' : 'var(--ink)') + '">' + pct(f.bmr3) + '</span>'
+      + '<span class="klein">NKM ' + eur(f.nkm) + ' → ' + eur(f.nkm3) + '/Mon. (' + (zuw > 0 ? '+' + nf1.format(zuw * 100) + ' %' : '±0 %') + ', Kappung ' + f.kap + ' %)</span></div>'
+      + '<div class="neben">' + esc(grund) + '</div>'
+      + '<div class="neben">Bei Neuvermietung (Angebotsmiete ' + nf1.format(f.ang) + ' €/m², nicht im Score): ' + eur(angNkm) + '/Mon., BMR ' + pct(angBmr * 100) + '</div>'
+      + '<div class="zk"><div><div class="l">Zielkaufpreis heute · Ziel ' + nf1.format(f.ziel) + ' %</div><div class="w">' + eur(f.zkH) + '</div>'
+      + '<div class="h">bestehender Kern: Rendite, Cashflow 0 und Marktwert, der kleinste zählt</div></div>'
+      + '<div><div class="l">mit zulässiger Miete in 3 J.</div><div class="w">' + eur(zk3d) + '</div>'
+      + '<div class="h">' + (f.zk3 > f.mw ? 'rechnerisch ' + eur(f.zk3) + ', gedeckelt auf den Marktwert' : 'NKM nach 3 J. × 12 / Zielrendite, unter dem Marktwert') + '</div></div></div>';
+
+    // Vergleich
+    document.getElementById('f-vgl').innerHTML =
+      '<div class="karte alt"><div class="pad"><div class="tag">Heute · ein Score (DS1)</div>'
+      + '<div style="display:flex;gap:12px;align-items:center;margin-top:8px"><span class="wert" style="color:' + farbe(f.ds1) + '">' + f.ds1 + '</span>'
+      + '<span class="pill" style="' + pillStil(f.ds1) + ';margin:0">' + STUFEN[stufeIdx(f.ds1)].toUpperCase() + '</span></div>'
+      + '<p>' + esc(f.heute) + '</p>'
+      + '<p class="klein">Punkte CF · NMR · LTV · DSCR · Pot.: ' + [f.ds1p.cf, f.ds1p.nmr, f.ds1p.ltv, f.ds1p.dscr, f.ds1p.pot].join(' · ')
+      + ' · „Vorsichtig“ ' + f.ds1v + ' · DS2 ' + f.ds2 + '</p></div></div>'
+      + '<div class="karte"><div class="band"></div><div class="pad"><div class="tag">Neu · zwei Scores</div>'
+      + '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px">'
+      + '<span class="wert" style="color:' + farbe(f.I) + '">' + f.I + '</span><span class="klein">Investment</span>'
+      + '<span class="wert" style="color:' + farbe(fs) + '">' + fs + '</span><span class="klein">Finanzierung</span>'
+      + '<span class="pill" style="background:var(--ob);color:var(--gold-hi);margin:0">' + STUFEN[g.idx].toUpperCase() + '</span></div>'
+      + '<p>' + esc(f.neu) + '</p></div></div>';
+  }
+
+  function zeichneTabelle(){
+    var kopf = '<thead><tr><th>Fall</th><th>heute</th><th>Invest.</th><th>Finanz.</th><th>Gesamt</th><th>Empfehlung</th></tr></thead>';
+    var zeilen = F.map(function(f){
+      var fs = finScore(f), g = gesamt(f);
+      function z(s){ return '<td class="z" style="color:' + farbe(s) + ';font-weight:700">' + s + '</td>'; }
+      return '<tr data-id="' + f.id + '"' + (f.id === akt ? ' class="akt"' : '') + '><td><b>' + f.id + '</b></td>'
+        + z(f.ds1) + z(f.I) + z(fs) + '<td>' + STUFEN[g.idx] + (hart(f) ? ' ⌃' : '') + '</td><td>' + esc(g.empf) + '</td></tr>';
+    }).join('');
+    document.getElementById('tab').innerHTML = kopf + '<tbody>' + zeilen + '</tbody>'
+      + '<caption style="caption-side:bottom;text-align:left;font-size:11.5px;color:var(--ink2);padding-top:8px">„heute“ = DS1 im Quick-Check · ⌃ = harte Grenze aktiv</caption>';
+  }
+
+  function zeichneMatrix(){
+    // x: Investment 0..100 → 40..320, y: Finanzierung 0..100 → 260..20
+    function X(v){ return 40 + v * 2.8; } function Y(v){ return 260 - v * 2.4; }
+    var s = '';
+    s += '<rect x="' + X(70) + '" y="' + Y(100) + '" width="' + (X(100) - X(70)) + '" height="' + (Y(50) - Y(100)) + '" fill="rgba(63,165,108,.10)"/>';
+    s += '<text x="' + (X(85)) + '" y="' + (Y(100) + 16) + '" text-anchor="middle" font-size="10" fill="#2d7d52" font-weight="700">KAUFEN</text>';
+    s += '<rect x="' + X(0) + '" y="' + Y(49) + '" width="' + (X(100) - X(0)) + '" height="' + (Y(0) - Y(49)) + '" fill="rgba(184,98,92,.05)"/>';
+    s += '<line x1="' + X(70) + '" y1="' + Y(0) + '" x2="' + X(70) + '" y2="' + Y(100) + '" stroke="#b8932f" stroke-dasharray="4 4"/>';
+    s += '<line x1="' + X(0) + '" y1="' + Y(50) + '" x2="' + X(100) + '" y2="' + Y(50) + '" stroke="#b8932f" stroke-dasharray="4 4"/>';
+    s += '<line x1="' + X(0) + '" y1="' + Y(0) + '" x2="' + X(100) + '" y2="' + Y(0) + '" stroke="#cfc6b2"/>';
+    s += '<line x1="' + X(0) + '" y1="' + Y(0) + '" x2="' + X(0) + '" y2="' + Y(100) + '" stroke="#cfc6b2"/>';
+    [0, 50, 70, 100].forEach(function(v){ s += '<text x="' + X(v) + '" y="276" text-anchor="middle" font-size="10" fill="#6b6356">' + v + '</text>'; });
+    [0, 50, 100].forEach(function(v){ s += '<text x="32" y="' + (Y(v) + 3) + '" text-anchor="end" font-size="10" fill="#6b6356">' + v + '</text>'; });
+    s += '<text x="' + X(50) + '" y="294" text-anchor="middle" font-size="10.5" fill="#1d1c1a">Investment-Score →</text>';
+    s += '<text x="10" y="' + Y(50) + '" text-anchor="middle" font-size="10.5" fill="#1d1c1a" transform="rotate(-90 10 ' + Y(50) + ')">Finanzierung →</text>';
+    F.forEach(function(f){
+      var fs = finScore(f), a = f.id === akt;
+      var c = (f.I >= 70 && fs >= 50) ? '#3FA56C' : (hart(f) ? '#B8625C' : '#C9A84C');
+      s += '<g class="pt" data-id="' + f.id + '" tabindex="0" role="button" aria-label="Fall ' + f.id + '">'
+        + '<circle cx="' + X(f.I) + '" cy="' + Y(fs) + '" r="' + (a ? 13 : 10) + '" fill="' + (a ? '#050505' : '#fff') + '" stroke="' + c + '" stroke-width="2.5"/>'
+        + '<text x="' + X(f.I) + '" y="' + (Y(fs) + 4) + '" text-anchor="middle" font-size="11" font-weight="700" fill="' + (a ? '#E8CC7A' : '#1d1c1a') + '">' + f.id + '</text></g>';
+    });
+    document.getElementById('mx').innerHTML = s;
+  }
+
+  function beispiel(){
+    function v(id){ var x = parseFloat(document.getElementById(id).value); return Number.isFinite(x) ? x : null; }
+    var kp = v('b-kp'), nkm = v('b-nkm'), ziel = v('b-ziel'), kap = v('b-kap');
+    var out = document.getElementById('b-erg');
+    if (kp === null || nkm === null || ziel === null || ziel <= 0 || kap === null) { out.innerHTML = '<div>Bitte Kaufpreis, Miete und Zielrendite eingeben.</div>'; return; }
+    var r = ziel / 100;
+    var heute = nkm / r, n3 = nkm * (1 + kap / 100), zul = n3 / r, alt = nkm * 1.25 / r;
+    out.innerHTML =
+      '<div><span>Bruttorendite heute</span><b>' + pct(nkm / kp * 100) + '</b></div>'
+      + '<div><span>Zielkaufpreis heute (' + eur(nkm) + ' / ' + nf1.format(ziel) + ' %)</span><b>' + eur(heute) + '</b></div>'
+      + '<div><span>Zulässige NKM nach 3 J. (+' + kap + ' % Kappung)</span><b>' + eur(n3) + '</b></div>'
+      + '<div class="haupt"><span>Zielkaufpreis mit zulässiger Miete</span><b>' + eur(zul) + '</b></div>'
+      + '<div><span>BMR nach 3 J. zum heutigen Kaufpreis</span><b>' + pct(n3 / kp * 100) + '</b></div>'
+      + '<div class="falsch"><span>Mit +25 % Miete gerechnet: liegt über jeder Kappungsgrenze, erreichbar nur durch Neuvermietung oder § 559</span><b>' + eur(alt) + '</b></div>'
+      + '<p style="font-size:12px;color:var(--ink2);margin:8px 0 0">Nur die Renditebedingung. Der echte Kern nimmt zusätzlich den Kaufpreis bei Cashflow 0 und den Marktwert, der kleinste Wert zählt. Im Beispiel bindet der Cashflow nicht (+132 €).</p>';
+  }
+
+  function waehle(id){ akt = id; alles(); }
+  function alles(){ zeichneWaehler(); zeichneFall(); zeichneTabelle(); zeichneMatrix(); }
+
+  document.getElementById('waehler').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-id]'); if (b) waehle(b.getAttribute('data-id'));
+  });
+  document.getElementById('tab').addEventListener('click', function(e){
+    var tr = e.target.closest('tr[data-id]'); if (tr) { waehle(tr.getAttribute('data-id')); window.scrollTo({top:0,behavior:'smooth'}); }
+  });
+  document.getElementById('mx').addEventListener('click', function(e){
+    var g = e.target.closest('[data-id]'); if (g) waehle(g.getAttribute('data-id'));
+  });
+  document.getElementById('mx').addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var g = e.target.closest('[data-id]'); if (g) { e.preventDefault(); waehle(g.getAttribute('data-id')); }
+  });
+  document.getElementById('regel').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-r]'); if (!b) return;
+    regel = b.getAttribute('data-r');
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+    alles();
+  });
+  ['b-kp','b-nkm','b-ziel','b-kap'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', beispiel);
+    document.getElementById(id).addEventListener('change', beispiel);
+  });
+
+  // Gegenprobe: Teilnoten ergeben die Investment-Scores des Benchmarks, Finanzierungsanteile die Finanzierungs-Scores.
+  F.forEach(function(f){
+    var s = 0; INV_KAT.forEach(function(k, i){ s += f.t[i] * k.w / 100; });
+    var inv = Math.round(s / 90 * 100);
+    var fin = Math.round(f.ds1p.dscr * 0.4 + f.ds1p.cf * 0.3 + f.ds1p.ltv * 0.3);
+    if (Math.abs(inv - f.I) > 1 || Math.abs(fin - f.Fs) > 1) console.warn('Abweichung Fall ' + f.id, inv, f.I, fin, f.Fs);
+  });
+
+  alles(); beispiel();
+})();
+</script>
+</body>
+</html>

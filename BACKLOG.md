@@ -4201,6 +4201,8 @@ Damit es niemand für gemessen hält:
 
 ## Fertig
 
+- **02.11.2026 · v3068/v3069** (Prod 1.0.17) — KfW-/BAFA-Hinweise korrigiert (tote Links, 458 für Vermieter nur 30 %), harte Grenze im Score (DSCR < 1,0 bzw. negativer Cashflow → höchstens Schwach, DS1 und DS2). **Befund:** Benchmark A–H, `design/Vorschläge/score-benchmark-p1.md`.
+
 - **02.11.2026 · v3066/v3067** (Prod 1.0.15/1.0.16) — Einheiten bearbeiten: Satz einmal statt achtmal; Mietleiter „was geht und wann“ mit Übernehmen, eine Leiter für ETW und MFH (`potenzial.js leiterZeilen`).
 
 - **02.11.2026 · v3065** (`4f43cdcf`) — FESH-Hinweis an den vorhandenen Sanierungs-Kacheln (V117); die doppelten Haken aus v3064 sind zurückgebaut. **Befund:** nach dem Fachbegriff gesucht, nicht nach dem Kürzel „fesh“.

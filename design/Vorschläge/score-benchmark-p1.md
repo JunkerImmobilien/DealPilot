@@ -331,3 +331,317 @@ milde**, weil die Finanzierung nur 10 % zählt.
   alten Wert.
 - Texte, die die Gewichte nennen: Einstellungsdialog
   (`dealscore.js:802-890`), `tooltip-content.js`, `prozess-atlas.js:97`.
+
+---
+
+## 5 · Recherche: realistische Bänder (02.11.2026)
+
+Die Bänder in 3.3 waren eine fachliche Schätzung. Hier stehen sie neu, gesetzt
+aus einer Web-Recherche (Stand 2025/2026) und den **amtlichen Liegenschaftszinssätzen
+aus dem eigenen Register**. Quellen stehen am Ende. Es gilt dieselbe Vorbemerkung wie
+oben: ein Band ist eine **begründete Einordnung, kein Messwert**. Marcel entscheidet.
+
+> **Vorweg der wichtigste Befund:** Für die Mindest-DSCR privater Vermieter gibt es
+> **keine Bankrichtlinie und keine Aufsichtsquelle**, die eine Zahl nennt. § 48u KWG
+> kennt als Instrumente nur eine LTV-Obergrenze und eine Tilgungsvorgabe, keine
+> Schuldendienstdeckung. Die Zahlen 1,1 / 1,2 / 1,35 stammen durchweg aus
+> Vermittler-Ratgebern, und die sagen selbst: „jede Bank legt ihre Mindestdeckung
+> selbst fest". Die DSCR-Schwellen unten sind deshalb **Branchenpraxis, nicht Norm**.
+
+### 5.1 Was die Recherche hergibt
+
+**1 · DSCR / Kapitaldienstfähigkeit**
+
+| Aussage | Quelle (Art) |
+|---|---|
+| DSCR = Reinertrag (nach Verwaltung, Instandhaltung, Mietausfall, nicht umlagefähigen Kosten) / Kapitaldienst. 1,0 = Miete deckt Zins und Tilgung genau, ohne Puffer. 1,2 ist der übliche Beispielwert mit 20 % Puffer, „jede Bank legt ihre Mindestdeckung selbst fest" | finanzplusimmo.de (Darlehensvermittler § 34i, 2026) |
+| Banken verlangen 1,20 bis 1,35; 1,10–1,24 „grenzwertig" (mehr EK oder Sicherheiten), unter 1,10 „kritisch", dann zählt die persönliche Bonität | veltivo.de, openpr.de (Ratgeber, **nur Suchtreffer, nicht geöffnet**) |
+| Liegt die DSCR unter 1, zahlt der Käufer monatlich aus seinem Einkommen zu. Die Bank prüft dann die **persönliche** Kapitaldienstfähigkeit (§ 18a KWG, § 505b BGB) | finanzplusimmo.de; drklein.de |
+| In der Haushaltsrechnung rechnen Banken die Miete nur zu rund **60–80 %** an (Dr. Klein: Sicherheitsabschlag 10–20 %) | drklein.de/renditeobjekte (25.06.2026); Vermittler- und Forenquellen |
+| Für den Beleihungswert gelten mindestens **15 %** Bewirtschaftungskosten vom Rohertrag (§ 11 BelWertV), in der Tragfähigkeitsrechnung oft mehr | finanzplusimmo.de; `marktbericht/backend/src/lib/beleihungswert.js` |
+| Einige Banken finanzieren auch Objekte mit DSCR < 1, wenn die Bonität gut und der monatliche Eigenanteil klein ist | openpr.de (Ratgeber, Suchtreffer) |
+
+**Was DSCR < 1 heißt:** Das Objekt trägt seine Finanzierung nicht selbst. Die
+Finanzierung steht dann auf dem Einkommen des Käufers, nicht auf dem Objekt. Ein
+Zuschuss von 10 % der Miete (B, E) ist etwas anderes als einer von 60–110 % (C, F, H).
+
+**2 · LTV / Beleihungsauslauf**
+
+| Aussage | Quelle |
+|---|---|
+| Durchschnittlicher Beleihungsauslauf im Neugeschäft: **82,50 %** im 2. Tertial 2026 (Vorjahr 83,44 %), Tilgung 1,91 %, Darlehen 276.635 € | Dr. Klein Trendindikator T2/2026 (Europace-Daten, 16.09.2026) |
+| Für Kapitalanleger: Eigenkapital **„Kaufnebenkosten plus 5 bis 10 %"** empfohlen | Interhyp, Kapitalanleger-PDF (Stand Sept. 2025) |
+| MFH: viele Banken verlangen **20–30 %** Eigenkapital, Nebenkosten aus eigenen Mitteln; **110 % gibt es „selten"** | Dr. Klein, MFH als Renditeobjekt (06.10.2026) |
+| Mindestens die Kaufnebenkosten als Eigenkapital | Dr. Klein, Renditeobjekte (25.06.2026) |
+| Realkreditgrenze: **60 % des Beleihungswerts** (§ 14 PfandBG). Der Beleihungswert liegt unter dem Marktwert (Vergleichswert −10 %, § 19 BelWertV) und darf ihn nie übersteigen | `beleihungswert.js` (v2630), PfandBG |
+| Zinsaufschlag 60 % → 95 % Beleihung: **+0,16 bis +0,44 Pp** je nach Zinsbindung; 10 J. ab 4,4 % (60 %) bzw. 4,5 % (80 %) | capitalo.de (Marktbandbreite 18.09.2026, kein Bankpreisblatt) |
+
+**Folgerung:** LTV 90–100 % gegen den Kaufpreis ist bei Kapitalanlegern **üblich und
+von Vermittlern empfohlen**; 110 % ist die Ausnahme. Ein hoher LTV ist für sich kein
+Urteil über das Objekt, er verschiebt das Risiko in Zins und Cashflow. Der Benchmark
+rechnet alle Fälle mit 3,8 %. Nach capitalo.de liegt der Markt im September 2026
+eher bei 4,4–4,5 %; dazu weiter unten die Empfindlichkeit.
+
+**3 · Bruttomietrendite / Kaufpreisfaktor**
+
+| Quelle | Werte |
+|---|---|
+| Baufi24-Mietrenditeatlas H2/2025 (18.02.2026) | München 3,22 % · Frankfurt 3,24 % · Hamburg 3,02 % · Köln 3,50 % · Berlin 3,36 % · Gelsenkirchen 5,24 % · Top 7 ≈ 3,4 % · 50 Städte ≈ 4,1 %. **Rechnet mit Angebotsmieten**, liegt also über der Bestands-BMR |
+| Baufi24 H1/2026 (18.08.2026) | 52 Städte 4,17 %, Spitze Chemnitz 5,77 %, Gelsenkirchen 5,16 %, Hamburg 3,00 % als Schlusslicht |
+| Dr. Klein, MFH (06.10.2026) | BMR sehr gute Lagen **3–4 %**, gute/mittlere **4–5,5 %**, weniger gefragte **5,5–7 %+**. Faktor „gut" 20–25, in Top-Lagen 23–25. Faustregel: **NMR über dem Finanzierungszins**; bei Zins 3,5–4,5 % und NMR 2–3 % „oft schwer rentabel" |
+| Interhyp (Sept. 2025) | BMR **≥ 5 % gilt als lukrativ** (Orientierungswert) |
+| **Amtliche Liegenschaftszinssätze im Register** (netto, Marktgleichgewicht) | Gelsenkirchen MFH 3,4 % / ETW verm. 2,6 % · Köln MFH 2,9 % / ETW verm. 1,9 % · Bielefeld MFH 2,5 % / ETW verm. 2,9 % · Herford MFH 2,8 % (alle GMD NRW, Stichtag 31.12.2025) · Frankfurt MFH 2,8 % (sehr gut) bis 4,3 % (einfach), 01.01.2026 · München, Pirmasens: gesperrt |
+
+**Daraus abgeleitete Renditebänder (Ist-BMR):**
+
+| Lage | schwach | solide | gut |
+|---|---|---|---|
+| A (Top 7) | < 3,0 % | 3,0–4,0 % | > 4,0 % |
+| B (Groß-/Mittelstadt) | < 4,0 % | 4,0–5,5 % | > 5,5 % |
+| C (Kleinstadt, Strukturschwäche) | < 5,5 % | 5,5–7,0 % | > 7,0 % |
+
+Die Vorgaben in `lage-profil.js:84` (Ziel-BMR A 3,5 / B 5,0 / C 7,0 %) liegen damit
+**in** diesen Bändern; C liegt an der oberen Kante. Die Recherche bestätigt sie.
+
+**4 · Cashflow nach Kapitaldienst, vor Steuern**
+
+- Ziel **≥ 0 €/Monat** und „idealerweise ein kleiner Überschuss" (clean-invoice.com, drklein.de).
+- Ein negativer Cashflow macht ein Objekt **nicht automatisch** zum schlechten Investment,
+  weil Tilgung und Wertentwicklung mitzählen. Bedingung ist, dass der Zuschuss dauerhaft
+  tragbar ist (clean-invoice.com, Ratgeber).
+- Interhyp empfiehlt, den Cashflow über eine niedrigere Tilgung oder eine tilgungsfreie
+  Anlaufphase zu steuern. **Eine einzelne €-Schwelle nennt keine Quelle.** Darum taugt
+  der Cashflow in € schlecht als harte Grenze: er wächst mit der Objektgröße. Die DSCR
+  ist dimensionslos.
+
+**5 · Sanierungsbedarf / Instandhaltungsstau**
+
+- Wertermittlung: Baumängel und Bauschäden sind **besondere objektspezifische
+  Grundstücksmerkmale** (§ 8 Abs. 3 ImmoWertV). Sie werden nach der Marktanpassung
+  durch **marktgerechte Abschläge** berücksichtigt, also nicht zwingend in Höhe der
+  vollen Kosten, sondern so, wie der Markt sie einpreist.
+- Laufende Instandhaltung im Ertragswertmodell: **14,40 €/m² Wfl. p. a.** (2026),
+  Verwaltung 367 €/WE (ETW 439 €), Mietausfallwagnis 2 % (Anlage 3 ImmoWertV, über
+  den VPI fortgeschrieben; `jahreswerte.json` `bwk_anlage3`, Quelle OGA Brandenburg).
+- Rücklagen-Faustregeln: Peters'sche Formel (Herstellungskosten × 1,5 / 80 je m² und
+  Jahr), VPB 1 €/m² und Monat, Verwalter 7–12 €/m² und Jahr (immowelt.de, jacasa.de;
+  Ratgeber). Liquiditätsreserve: mindestens 2–3 Nettokaltmieten (drklein.de).
+- **Profi-Praxis also:** Der Investitionsbedarf geht **voll in die Gesamtinvestition**
+  (Kaufpreis + Nebenkosten + Sanierung). Rendite und Kapitaldienst werden auf diese
+  Summe gerechnet, sonst sieht ein Sanierungsobjekt besser aus, als es ist.
+
+**6 · Mietsteigerungspotenzial: wie viel Prognose seriös ist**
+
+- **Bestand:** höchstens bis zur ortsüblichen Vergleichsmiete, frühestens 15 Monate
+  nach Einzug bzw. ein Jahr nach der letzten Erhöhung, und höchstens **+20 % in drei
+  Jahren**, in Gebieten mit Landesverordnung **+15 %** (§ 558 Abs. 1 und 3 BGB).
+  Erhöhungen nach §§ 559–560 zählen nicht mit.
+- **Neuvermietung:** Die Mietpreisbremse ist bis **Ende 2029** verlängert (Bundestag
+  26.06.2025). Im Gebiet gilt höchstens Vergleichsmiete + 10 % (§ 556d BGB), Ausnahmen
+  nach §§ 556e, 556f (Vormiete, Neubau, umfassende Modernisierung). Laut
+  `frontend/js/data/kappungsgrenzen.json` (Stand 19.10.2026) gilt sie in **München,
+  Frankfurt, Hamburg, Köln und Bielefeld**, also für B, F, H, C und E.
+- **Markt:** Neuvertragsmieten MFH 2025 **+3,5 %** (vdp, 10.02.2026), Bestandsmieten
+  (VPI Nettokaltmiete) 2025 **+2,1 %** (Destatis).
+- **Seriös ist:** die zulässige Miete nach `sollFuer`-Logik (Vergleichsmiete ∧ Kappung
+  ∧ Sperrfrist). Eine Fortschreibung der Vergleichsmiete um rund 2 % p. a. ist
+  vertretbar, wenn sie gekennzeichnet ist. Die Angebotsmiete darf nur als Szenario
+  „bei Neuvermietung" erscheinen, und in Bremsengebieten auch dann **nur bis
+  Vergleichsmiete + 10 %**.
+
+> **Das trifft DS2 doppelt.** Die Angebotsmiete ist nicht nur keine Bestandsprognose,
+> sie ist in fünf der acht Fälle auch bei Neuvermietung **nicht zulässig**:
+>
+> | Fall | Vergleichsmiete | + 10 % (§ 556d) | Angebot (DS2-Upside) |
+> |---|---:|---:|---:|
+> | B | 18,50 | **20,35** | 22,50 |
+> | C | 10,60 | **11,66** | 13,50 |
+> | E | 9,40 | **10,34** | 10,50 |
+> | F | 14,00 | **15,40** | 17,00 |
+> | H | 13,20 | **14,52** | 17,50 (Verkäufer) |
+
+### 5.2 Kennzahlen je Fall gegen die Recherche
+
+Nachgerechnet aus den Eckdaten in Abschnitt 3. Faktor = KP / Jahres-NKM.
+Darlehen/MW = Darlehen gegen den Marktwert.
+
+| Fall | Faktor | KP/MW | BMR / Markt-BMR (Baufi24) | NMR vs. Zins 3,8 % | amtl. LZS (Register) | DSCR | CF in % der NKM | Darlehen/MW |
+|---|---:|---:|---|---|---|---:|---:|---:|
+| A | 10,4 | 0,94 | 9,60 / GE 5,24 | 6,81 > 3,8 | GE MFH 3,4 | 1,30 | +18 % | 94 % |
+| B | 33,3 | 0,98 | 3,00 / M 3,22 | **2,39 < 3,8** | gesperrt | 0,91 | −9 % | 49 % |
+| C | 27,1 | 0,91 | 3,69 / K 3,50 | **2,74 < 3,8** | K ETW 1,9 | 0,58 | −60 % | 82 % |
+| D | 9,6 | 1,03 | 10,40 / – | 7,06 > 3,8 | gesperrt | 1,68 (mit Sanierung ≈ 1,06) | +30 % | 83 % |
+| E | 18,4 | **0,73** | 5,44 / – | 4,17 > 3,8 | BI ETW 2,9 | 0,88 | −11 % | 66 % |
+| F | 30,4 | 1,05 | 3,29 / F 3,24 | **2,56 < 3,8** | F MFH 2,8–4,3 | 0,44 | **−109 %** | **116 %** |
+| G | 14,6 | 0,97 | 6,84 / – | 4,72 > 3,8 | HF MFH 2,8 | 1,12 | +8 % | 78 % |
+| H | 34,2 | **1,18** | 2,92 / HH 3,02 | **2,31 < 3,8** | Formelwerk | 0,55 | −71 % | 94 % |
+
+**D mit Sanierung (Überschlag, nur im Bericht gerechnet):** Ein Kapitaldienst von
+13.920 € und eine DSCR von 1,68 ergeben einen Reinertrag von 23.400 €. Werden die
+140.000 € zu 5,8 % (Zins + Tilgung) finanziert, steigt der Kapitaldienst auf 22.040 €.
+Die DSCR liegt dann bei **≈ 1,06**, der Cashflow bei rund +113 €/Monat. Die Miete
+liegt mit 6,50 €/m² schon über der Vergleichsmiete von 6,30 €. Die Sanierung hebt
+also kaum Miete, sie erhält nur den Bestand.
+
+**Zinsempfindlichkeit:** Bei 4,4 % statt 3,8 % (capitalo.de, Sept. 2026) fallen alle
+DSCR um den Faktor 5,8 / 6,4 ≈ 0,91: A 1,18 · B 0,82 · C 0,53 · D 1,52 · **E 0,80**
+· F 0,40 · **G 1,01** · H 0,50. E und G rutschen damit an die Kanten der Deckel
+unten. Der Deckel muss deshalb mit dem **eingegebenen** Zins rechnen, nie mit einer
+Konstanten.
+
+### 5.3 Recherchierte Bänder je Fall
+
+**Gesamt** gilt für einen einzelnen Ring. **Investment** und **Finanzierung** gelten
+für die Zwei-Score-Variante. ✓ = im Band, ✗ = außerhalb (mit Richtung).
+
+**A · Gelsenkirchen MFH, LTV 100 %, BMR 9,6 %**
+Gesamt **Gut 70–84** · Investment **Gut 70–84** · Finanzierung **Solide–Gut 60–79**.
+Die BMR liegt fast doppelt über dem Stadtwert (5,24 %), die NMR doppelt über dem
+amtlichen MFH-Zins (3,4 %) und über dem Darlehenszins (positiver Hebel). „Sehr gut"
+verhindern die C-Lage, Energieklasse E und ein Darlehen, das gegen den Beleihungswert
+(MW −10 %) bei rund 105 % liegt. Interhyp empfiehlt NK + 5–10 % Eigenkapital, A bringt
+nur die NK. Die DSCR 1,30 liegt im Bankband 1,20–1,35, die Finanzierung ist also
+tragfähig, aber ohne Reserve beim Eigenkapital.
+→ DS1 79 ✓ · DS2 81 ✓ · Alternative 79 ✓ · Investment 79 ✓ · Finanzierung 72 ✓
+
+**B · München-Schwabing ETW, LTV 50 %, BMR 3,0 %**
+Gesamt **Schwach bis untere Solide, 40–55** · Investment **Solide 50–64** ·
+Finanzierung **Schwach 35–49**.
+Die BMR liegt knapp unter dem Münchner Angebotsschnitt (3,22 %) und ist damit
+**markttypisch für die A-Lage** und liegt genau an der Untergrenze des
+Solide-Bands A (3,0 %). Die NMR von 2,39 % liegt unter dem Zins. Dr. Klein nennt das „oft schwer
+rentabel". DSCR 0,91 heißt: das Objekt trägt sich nicht, aber die Zuzahlung beträgt
+nur 9 % der Miete. Bei 50 % Eigenkapital liegt der Kredit unter der Realkreditgrenze.
+„Kritisch" ist nach keiner Quelle begründbar.
+→ DS1 31 ✗ zu streng · DS2 55 ✓ (Rand) · Alternative 52 ✓ · Investment 54 ✓ · Finanzierung 39 ✓
+
+**C · Köln-Kalk ETW, LTV 90 %, Ist-Miete 8,00 €/m²**
+Gesamt **Schwach 35–49** · Investment **Solide 55–69** · Finanzierung **Kritisch 0–34**.
+Die BMR von 3,69 % liegt über dem Kölner Schnitt, der KP 9 % unter dem Marktwert. Die
+Miete darf in drei Jahren um 15 % steigen (Kappung Köln), bei Neuvermietung bis
+11,66 €/m² (Bremse). Das Objekt ist solide. Die Finanzierung trägt es nicht: DSCR 0,58,
+Zuzahlung 60 % der Miete, also rund 4.300 € im Jahr. Mit dem Darlehenszins über der
+NMR wird jeder weitere Fremdkapital-Euro teurer, als er einbringt.
+→ DS1 23 ✗ zu streng · DS2 51 ✗ zu mild (knapp) · Alternative 54 ✗ zu mild · Investment 58 ✓ · Finanzierung 15 ✓
+
+**D · Pirmasens MFH, Sanierung 140.000 € (47 % des KP)**
+Gesamt **Solide 50–64** · Investment **Solide 50–64** · Finanzierung (mit
+Sanierungskredit) **Solide 50–69**.
+BMR 10,4 % und Faktor 9,6 sehen nach „Sehr gut" aus. Profis rechnen aber auf die
+Gesamtinvestition: (300.000 + 31.500 + 140.000) ergibt eine BMR von 6,6 %. Das ist das
+Solide-Band der C-Lage. Der KP liegt 3 % **über** dem Marktwert, Zustand G, Bevölkerung
+fallend. Mit finanzierter Sanierung sinkt die DSCR auf ≈ 1,06. Das ist nach den
+Vermittlerquellen „grenzwertig", die Bank verlangt mehr Eigenkapital oder Sicherheiten.
+→ DS1 86 ✗ viel zu mild · DS2 72 ✗ zu mild · Alternative 65 ✗ (1 Punkt über) ·
+Investment 62 ✓ · Finanzierung 93 ✗ zu mild (der Kapitaldienst kennt die Sanierung nicht,
+ein Datenfehler, kein Gewichtungsfehler)
+
+**E · Bielefeld ETW, KP 27 % unter Marktwert**
+Gesamt **Solide 55–69** · Investment **Gut 70–84** · Finanzierung **Schwach 35–49**.
+Die NMR von 4,17 % liegt deutlich über dem amtlichen ETW-Zins Bielefeld (2,9 %) und
+über dem Darlehenszins. Faktor 18,4 liegt unter der 20er-Faustregel. Der Preisvorteil
+von 55.000 € ist real. Gegen den Marktwert beträgt das Darlehen 66 %, die Beleihung ist
+also gut. DSCR 0,88 und −77 €/Monat (11 % der Miete) machen die Finanzierung schwach,
+aber nicht kritisch. Ohne den knappen Kapitaldienst wäre das Gesamturteil „Gut".
+→ DS1 48 ✗ zu streng · DS2 59 ✓ · Alternative 68 ✓ · Investment 73 ✓ · Finanzierung 24 ✗ zu streng
+(die DS1-Kurven geben ab DSCR ≤ 0,9 null Punkte und messen den LTV gegen den KP statt gegen den MW)
+
+**F · Frankfurt-Bornheim ETW, 110 % finanziert, −1.251 €/Monat**
+Gesamt **Kritisch 0–34** · Investment **Schwach–Solide 40–54** · Finanzierung **Kritisch 0–20**.
+Die BMR liegt mit 3,29 % genau auf dem Frankfurter Schnitt (3,24 %). Das Objekt ist
+markttypisch, aber 5 % über dem Marktwert gekauft. Die Finanzierung liegt außerhalb
+dessen, was die Quellen als üblich beschreiben: 110 % gibt es „selten", das Darlehen
+beträgt 116 % des Marktwerts, die DSCR 0,44, die Zuzahlung mehr als die ganze Miete
+(15.000 € im Jahr). Dazu kommen nach capitalo.de Zinsaufschläge für hohe Beleihung, die
+der Benchmark nicht einrechnet.
+→ DS1 9 ✓ · DS2 43 ✗ zu mild · Alternative 45 ✗ zu mild · Investment 50 ✓ · Finanzierung 0 ✓
+
+**G · Herford MFH 8 WE, LTV 80 %**
+Gesamt **Gut 70–84** · Investment **Gut 70–84** · Finanzierung **Solide–Gut 60–74**.
+Die NMR von 4,72 % liegt deutlich über dem amtlichen MFH-Zins Herford (2,8 %), die
+BMR von 6,84 % im Gut-Band der B-Lage, der KP 3 % unter dem Marktwert. Der Cashflow ist
+positiv. Die DSCR von 1,12 liegt aber **unter** dem verbreiteten Bankwert 1,2 und gilt
+als „grenzwertig". Bei 4,4 % Zins wären es 1,01.
+→ DS1 81 ✓ · DS2 76 ✓ · Alternative 78 ✓ · Investment 77 ✓ · Finanzierung 81 ✗ (7 Punkte zu mild)
+
+**H · Hamburg-Eimsbüttel ETW, KP 18 % über Marktwert, Verkäuferprognose 17,50 €/m²**
+Gesamt **Kritisch bis untere Schwach, 15–40** · Investment **Schwach 35–49** ·
+Finanzierung **Kritisch 0–34**.
+70.000 € über dem Marktwert gekauft, das ist rund die Hälfte des eingesetzten
+Eigenkapitals. Die BMR liegt mit 2,92 % unter dem Hamburger Schnitt. Die Ist-Miete von
+14,00 €/m² liegt schon über der Vergleichsmiete (13,20 €), § 558 bringt also nichts.
+Bei Neuvermietung erlaubt die Bremse höchstens 14,52 €/m², die Verkäuferprognose von
+17,50 € ist rechtlich nicht erreichbar. DSCR 0,55, Zuzahlung 71 % der Miete. **Die
+Grenze zwischen Kritisch und Schwach ist hier Ermessen**, deshalb ist das Band breiter.
+→ DS1 18 ✓ · DS2 51 ✗ zu mild · Alternative 38 ✓ (Rand) · Investment 40 ✓ · Finanzierung 23 ✓
+
+**Trefferbild:**
+
+| Variante | im Band | daneben |
+|---|---:|---|
+| DS1 heute | 4 / 8 | B, C, E zu streng; D viel zu mild |
+| DS2 balanced | 4 / 8 | C, D, F, H zu mild (Angebotsmiete als Upside, LTV-Belohnung) |
+| Alternative (ein Ring) | 5 / 8 | C, F zu mild; D 1 Punkt darüber |
+| Zwei Scores: Investment | **8 / 8** | – |
+| Zwei Scores: Finanzierung | 5 / 8 | D (Sanierung fehlt im Kapitaldienst), E zu streng, G leicht zu mild |
+| **Investment mit DSCR-Deckel (5.4)** | **8 / 8** | H an der Kante (40) |
+| **Alternative mit DSCR-Deckel (5.4)** | **7 / 8** | D 65 (1 Punkt über) |
+
+### 5.4 Empfehlung: die harte Grenze
+
+**Die Grenze hängt an der DSCR (netto, wie seit v3031), nicht am Cashflow in €.**
+Die DSCR ist die Kennzahl, mit der Banken die Tragfähigkeit prüfen, und sie ist
+unabhängig von der Objektgröße. Der Cashflow dient nur als zweite Zeile im Text.
+
+| Stufe | Bedingung (mit dem **eingegebenen** Zins) | Höchsturteil | Begründung |
+|---|---|---|---|
+| 0 | Barkauf oder DSCR ≥ 1,2 | kein Deckel | Bankübliche Mindestdeckung mit Puffer erreicht |
+| 1 | 1,0 ≤ DSCR < 1,2 | **Gut (≤ 84)** | Trägt sich, aber unter dem verbreiteten Bankwert. „Sehr gut" nur mit Reserve |
+| 2 | 0,8 ≤ DSCR < 1,0 | **Solide (≤ 69)** | Trägt sich nicht selbst, Zuzahlung klein. Die Bank stützt sich auf das Einkommen |
+| 3 | DSCR < 0,8 | **Schwach (≤ 49)** | Zuzahlung erheblich (C −60 %, H −71 %). Die Finanzierung trägt das Objekt nicht |
+| 4 | DSCR < 0,8 **und** Darlehen > Marktwert | **Kritisch (≤ 34)** | Unterdeckt und unbesichert zugleich (F: 116 % des MW). Restschuld bleibt auch nach Verkauf |
+
+Am Fall wirkt der Deckel so: auf den Investment-Score gelegt C 58 → **49**,
+E 73 → **69**, F 50 → **34**. Auf die Alternative gelegt C 54 → 49, F 45 → 34.
+B, H, A, D und G bleiben unverändert.
+
+**Die Empfehlung aus Abschnitt 4 wird damit präziser:** zwei Scores anzeigen
+(Investment und Finanzierung) und als Gesamturteil bzw. Empfehlung **den
+Investment-Score unter dem DSCR-Deckel** nehmen. Das trifft alle acht Bänder. Ist nur
+ein Ring gewollt, trifft die Alternative mit demselben Deckel sieben von acht.
+
+**Was der Deckel nicht löst:** D braucht Zustand und Investitionsbedarf im Quick-Check
+(Gesamtinvestition in Rendite **und** Kapitaldienst). E zeigt, dass die DS1-Kurven für
+LTV (gegen den KP) und DSCR (≤ 0,9 = 0) zu hart sind. In der Finanzierungsnote sollte
+der LTV gegen den Marktwert bzw. Beleihungswert gemessen werden.
+
+### 5.5 Kurzfassung
+
+**Bänder je Fall:**
+A Gut 70–84 · B Schwach/Solide 40–55 · C Schwach 35–49 · D Solide 50–64 ·
+E Solide 55–69 · F Kritisch 0–34 · G Gut 70–84 · H Kritisch/Schwach 15–40.
+
+**Harte Grenze:** DSCR ≥ 1,2 frei · 1,0–1,2 höchstens Gut · 0,8–1,0 höchstens Solide ·
+< 0,8 höchstens Schwach · < 0,8 und Darlehen > Marktwert höchstens Kritisch. Gerechnet
+mit dem eingegebenen Zins.
+
+**Wichtigste Quellen:**
+- Dr. Klein, MFH als Renditeobjekt (06.10.2026): https://www.drklein.de/finanzierung-mehrfamilienhaus-beleihen-faq.html
+- Dr. Klein, Renditeobjekte (25.06.2026): https://www.drklein.de/renditeobjekte.html
+- Dr. Klein Trendindikator T2/2026 (16.09.2026): https://www.drklein.de/fileadmin/drk/ueber-dr-klein/pressemitteilungen/pm-drk-dtb-2026-T2.pdf
+- Interhyp, Immobilie als Kapitalanlage (Sept. 2025): https://start.immocation.de/hubfs/Interhyp_Immocation_Info-PDF_Kapitalanleger_September2025.pdf
+- Baufi24-Mietrenditeatlas H2/2025: https://www.baufi24.de/presse/pressemitteilungen/mietrendite-trend-022026/ · H1/2026: https://www.baufi24.de/presse/pressemitteilungen/mietrendite-trend-082026/
+- vdp-Index Q4/2025 (10.02.2026): https://www.pfandbrief.de/wp-content/uploads/2026/02/20260210_vdp_PM_vdp-Index_Q4_2025_DE_final.pdf
+- Destatis VPI 2025: https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/01/PD26_019_611.html (Nettokaltmieten +2,1 % nach IHK Hannover: https://www.ihk.de/hannover/hauptnavigation/standort/konjunktur-statistik/aktuell/inflationsrate-2025-stabil-bei-2-2-prozent-6940438)
+- § 558 BGB: https://www.gesetze-im-internet.de/bgb/__558.html · Mietpreisbremse bis 2029: https://www.lto.de/recht/nachrichten/n/bundestag-verlaengert-mietpreisbremse-bis-2029
+- § 48u KWG: https://www.gesetze-im-internet.de/kredwg/__48u.html · § 8 ImmoWertV: https://www.gesetze-im-internet.de/immowertv_2022/__8.html
+- Zinsen nach Beleihung (Marktbandbreite 18.09.2026): https://www.capitalo.de/anbieter/capitalo/news/bauzinsen-aktuell
+- DSCR-Praxis (Vermittler, 2026): https://finanzplusimmo.de/ratgeber/traegt-sich-das-mehrfamilienhaus-selbst
+- Cashflow-Faustregel (Ratgeber): https://www.clean-invoice.com/wissen/allgemein/mietrendite-berechnen · Rücklagen (Ratgeber): https://www.immowelt.de/ratgeber/wohnen/instandhaltungsruecklage, https://www.jacasa.de/ratgeber/lexikon/instandhaltungsruecklage
+- Amtliche Liegenschaftszinssätze: Register `lzs-swf-2026-nachernte.json` (GMD NRW, https://www.opengeodata.nrw.de/produkte/infrastruktur_bauen_wohnen/boris/GMD/GMDNRW_CSV.zip), `lzs-he-2026.json`; Bewirtschaftungskosten: `jahreswerte.json` `bwk_anlage3`
+
+**Grenzen der Recherche:** Kein Primärtext einer Bank-Kreditrichtlinie war erreichbar.
+Die Bundesbank-Seite zu Wohnimmobilienfinanzierungen nennt keine LTV- oder DSTI-Werte.
+Die DSCR-Schwellen 1,10 / 1,24 / 1,35 stammen aus Ratgeber-Suchtreffern, die nicht
+geöffnet wurden. Baufi24 rechnet mit Angebotsmieten und überzeichnet die Bestands-BMR.
+Für München und Pirmasens führt das Register keinen offenen Liegenschaftszins (Sperre).
