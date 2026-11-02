@@ -44166,3 +44166,11 @@ Score-Kasten blitzte beim Laden ~0,5 s auf (Ausblende-Regeln standen hinter dem 
 7dec6f02, 38d017fb, 9bf458c0; **Prod** 1.0.26 (e2e5cea). Erster Rollout brach am Zweigwechsel ab (Notizen während des Laufs
 geändert), zweiter meldete zu früh „nicht 200“ — nachgemessen 200, Backend healthy, Dateien und Kern im Image. **Nachweis**
 wissen Teil 14. **Rest** Lageklasse A/C am echten Lauf nachmessen.
+
+### v3081c–g — Quick-Check: Mietpotenzial nur aus eigenen Werten, Potenzial-Karte (02.11.2026) · Prod 1.0.27–1.0.29
+
+**Was.** Felder Vergleichsmiete, letzte Erhöhung und Kappung im Quick-Check entfernt; Abgleich mit der Marktmiete der
+DealPilot-Bewertung (Annahme für die ortsübliche Miete), Kappung und Bremse aus den Landesverordnungen; keine
+Leerstand-Annahme; Karte „Mietpotenzial“ (Ist / 3 J. zulässig / Neuvermietung), wenn die Ist-Miete darunter liegt; ehrlicher
+Satz ohne Daten; Einstellung „Standard für neue Quick-Checks“ nennt den Rückfall B. **Prod** 1.0.29 (d6aa47e). **Nachweis**
+wissen 02.11. „v3081c–g“. **Rest** —
