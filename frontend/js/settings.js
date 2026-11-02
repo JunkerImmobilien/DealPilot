@@ -1555,9 +1555,6 @@ function _saveSettings() {
         } else {
           try { localStorage.setItem('dp_investment_profile', JSON.stringify(ip)); } catch(e) {}
         }
-        if (DealPilotInvestmentProfile.syncAiParamsToTab) {
-          DealPilotInvestmentProfile.syncAiParamsToTab();
-        }
       } catch (e) { console.warn('[settings] AI-Standardparameter persist:', e); }
     }
   })();

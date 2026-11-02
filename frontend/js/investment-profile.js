@@ -163,34 +163,6 @@ window.DealPilotInvestmentProfile = (function() {
       try { blEl.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
     }
 
-    // V63.90: KI-Analyse-Standards aus Profil → hidden inputs + Display
-    syncAiParamsToTab();
-  }
-
-  /**
-   * V63.90: Synchronisiert die KI-Analyse-Parameter aus dem Profil
-   * - Schreibt sie in die hidden inputs (#ai_strat, #ai_verk, #ai_risk, #ai_markt)
-   *   sodass der bestehende Prompt-Builder weiter g('ai_strat') etc. nutzen kann.
-   * - Aktualisiert die Display-Spans im KI-Tab.
-   * Wird aufgerufen aus applyToNewObject() und nach Speichern in Settings.
-   */
-  function syncAiParamsToTab() {
-    var p = load();
-    var d = defaults();
-    var aiStrat = p.ai_strat || d.ai_strat || 'Buy & Hold (Langfristig halten)';
-    var aiVerk  = p.ai_verk  || d.ai_verk  || 'Mittel (normale Situation)';
-    var aiRisk  = p.ai_risk  || d.ai_risk  || 'Moderat (ausgewogen)';
-    var aiMarkt = p.ai_markt || d.ai_markt || 'Ausgeglichen (stabil)';
-    function setVal(id, val) { var el = document.getElementById(id); if (el) el.value = val; }
-    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
-    setVal('ai_strat', aiStrat);
-    setVal('ai_verk',  aiVerk);
-    setVal('ai_risk',  aiRisk);
-    setVal('ai_markt', aiMarkt);
-    setText('ai-param-strat-display', aiStrat);
-    setText('ai-param-verk-display',  aiVerk);
-    setText('ai-param-risk-display',  aiRisk);
-    setText('ai-param-markt-display', aiMarkt);
   }
 
   // Pretty-Render: Settings-Pane HTML
@@ -523,8 +495,6 @@ window.DealPilotInvestmentProfile = (function() {
     Object.keys(p).forEach(function (k) { _zusammen[k] = p[k]; });
     _geleert.forEach(function (k) { delete _zusammen[k]; });   /* v3055 */
     save(_zusammen);
-    // V63.90: KI-Tab Display & hidden Inputs sofort updaten
-    syncAiParamsToTab();
     if (typeof toast === 'function') toast('✓ Investmentprofil gespeichert');
   }
 
@@ -633,7 +603,6 @@ window.DealPilotInvestmentProfile = (function() {
     wireMarketRate: wireMarketRate,
     getHausgeldMonthly: getHausgeldMonthly,
     getHausgeldEstimate: getHausgeldEstimate,
-    syncAiParamsToTab: syncAiParamsToTab,
     renderPaneHtml: renderPaneHtml,
     wireLageProfil: wireLageProfil,   /* v1957 */
     saveFromForm: saveFromForm,

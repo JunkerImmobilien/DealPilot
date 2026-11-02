@@ -464,8 +464,24 @@
     try { if (deal && window.DealScore2 && typeof window.DealScore2.getKpiCompleteness === 'function') comp = window.DealScore2.getKpiCompleteness(deal); } catch (e) {}
     var depthPct = comp ? comp.percent : null;
     var html = '';
-    var c = classicData(depthPct); if (c) html += heroHtml(c);
-    var i = investorData(deal, comp); if (i) html += heroHtml(i);
+    var i = investorData(deal, comp);
+    /* v3059 · Marcel 02.11.2026: „wenn wir einen Investor Deal Score haben, [soll]
+       der Dealscore dadrüber nicht mehr angezeigt werden. Das ist natürlich am Plan
+       gekoppelt und daran, ob es schon einen belastbaren Dealscore gibt."
+       Der einfache Score entfällt nur, wenn BEIDES gilt: der Plan führt den Investor
+       Deal Score voll (Investor/Pro, nicht die Free-Demo, nicht Starter) UND die
+       KPI-Vollständigkeit erreicht die Schwelle aus dealscore2-ui.js. Sonst bleibt
+       er stehen - er ist dann der einzige Score mit Aussage. */
+    var nurInvestor = false;
+    try {
+      var vollerPlan = !!(window.DealPilotConfig && DealPilotConfig.pricing && DealPilotConfig.pricing.hasFullFeature &&
+                          DealPilotConfig.pricing.hasFullFeature('deal_score_v2'));
+      var schwelle = (typeof window._dpDs2Schwelle === 'function') ? window._dpDs2Schwelle() : 0.70;
+      nurInvestor = vollerPlan && !!(i && !i.empty) && !!comp && comp.percent >= schwelle * 100;
+    } catch (e) {}
+    document.body.classList.toggle('dpsh-nur-investor', nurInvestor);
+    if (!nurInvestor) { var c = classicData(depthPct); if (c) html += heroHtml(c); }
+    if (i) html += heroHtml(i);
     m.innerHTML = html;
     if (html) animate(m);
   }

@@ -321,6 +321,19 @@ function _ds2GrenzenBlock(deal, aufHell) {
   '</div>';
 }
 
+/* v3059 · Ab welcher KPI-Vollständigkeit der Investor Deal Score belastbar ist
+   (V63.1: 70 %; der alte Einstellungs-Regler dp_user_settings.completeness_threshold
+   wird weiter respektiert). Gelesen von renderDealScore2() UND vom Score-Hero
+   (dpsh-score-hero.js), der damit entscheidet, ob der einfache Deal Score entfällt. */
+window._dpDs2Schwelle = function () {
+  var s = 0.70;
+  try {
+    var u = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
+    if (typeof u.completeness_threshold === 'number' && u.completeness_threshold >= 0.5 && u.completeness_threshold <= 1) s = u.completeness_threshold;
+  } catch (e) {}
+  return s;
+};
+
 function renderDealScore2() {
 
   var box = document.getElementById('dealscore2-box');
@@ -397,15 +410,7 @@ function renderDealScore2() {
 
   // V63.1: Investor Deal Score (DS2) wird ERST ab 70% KPI-Vollständigkeit angezeigt.
   // Die KPI-Vollständigkeit (24 KPIs) zählt jetzt zentral via DealScore2.getKpiCompleteness.
-  var MIN_COMPLETENESS = 0.70;     // V63.1: hochgesetzt 50% → 70% wie vom User gewünscht
-  // (User-Settings-Slider bleibt bestehen für Backwards-Compat, aber Standard ist 0.70)
-  try {
-    var _userSettings = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
-    if (typeof _userSettings.completeness_threshold === 'number' &&
-        _userSettings.completeness_threshold >= 0.5 && _userSettings.completeness_threshold <= 1) {
-      MIN_COMPLETENESS = _userSettings.completeness_threshold;
-    }
-  } catch(e) {}
+  var MIN_COMPLETENESS = window._dpDs2Schwelle();   /* v3059: eine Stelle für die Schwelle */
 
   // V63.1: KPI-Vollständigkeit über getKpiCompleteness (24 KPIs)
   var kpiCompPct = 0;
