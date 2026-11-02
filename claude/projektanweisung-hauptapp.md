@@ -44218,3 +44218,12 @@ echten Lauf: A/B „Objekt passt — Finanzierung prüfen“, C „Finger weg“
 
 **Was.** Stellplatz-Textfeld raus, Zustand in die Objektdaten, „+ Sanierung“ unter den Kaufpreis; Unterlagen-Import nimmt Fotos („Unterlagen: PDF oder Foto“); Erhaltungsaufwand-Vorschlag anteilig nach MEA.
 **Commit** 4765616a, 8e16189c, 0320e85c. **Prod** 1.0.39 (0b7b1f1), 1.0.40 (7d33af1). **Nachweis** Browser-Test auf Prod mit Scan-PDF und Foto, Vergleich mit Textschicht; fünf Fälle Anteilsrechnung. **Rest** N100 Sonderumlage bauen, N102 Anteil je Objektart (Marcel), Handbuch-Belege (N93).
+
+### v3091 · Anteil nicht umlagefähig aus Anlage 3 je Objektart (02.11.2026)
+
+**Was.** Quick-Check rechnet den Anteil „nicht umlagefähig“ aus Verwaltung (Anlage 3, je ETW bzw. je Wohnung) und Instandhaltung/Rücklage statt fest 30 %; Feld „Wohnungen“ beim MFH; Herkunftssatz nennt die Rechnung. `bwk-profil.js nulAnteil()`.
+**Commit** eb35b25e. **Prod** 1.0.41 (80927f2). **Nachweis** sechs Fälle mit der echten Datei (27,9 / 35,9 / 25,1 / 41,5 / 39,7 %, ohne Hausgeld kein Vorschlag). **Rest** Browser-Blick in den Quick-Check.
+
+### Sitzungsende 02.11.2026 (abends)
+
+Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwei Scores, Scans als geschwärzter Text (Tesseract im Backend-Image, Datenschutzerklärung 1.3), Wirtschaftsplan nie vorgehakt, Quick-Check aufgeräumt, Fotos im Unterlagen-Import, Erhaltungsaufwand nach MEA, Anteil nicht umlagefähig aus Anlage 3. Konzept Steuerkanzlei-Brücke in design/Vorschläge. Offen: BACKLOG N98 (Pilot-Analyse Fassung 4), N100, N101, N103–N106.

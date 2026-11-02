@@ -36,13 +36,45 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N98 · Pilot-Analyse neu: Ankauf und Bestand — Marcel 02.11.2026, Demo liegt vor
+### N98 · Pilot-Analyse neu — NÄCHSTER SCHRITT: Demo Fassung 4 (Marcel 02.11.2026, abends)
+
+**Marcel zu Fassung 3:** „gut umgesetzt“. Für Fassung 4 (Demo, noch NICHT in die App bauen):
+1. **Marktpreisindikation auf allen Karten** (Ankauf, Bestand, Soll, Zielbild): erst der Durchschnitt, dazu „mit/ohne Abschlag“; im Detail die Spanne.
+2. **Ertragswert ohne Spanne.** DealPilot rechnet einen festen Ertragswert — die Spanne in Fassung 3 (189–208 T€ usw.) war von mir erfunden (aus einer LZS-Spanne abgeleitet). Zurückgenommen, raus.
+3. **Gesamtbewertung als Text:** Übersicht wenige Sätze; Detail ausführlich wie das heutige **Briefing** (Gesamtbewertung, Bestand/Strategie, Investmentbewertung, Investor-Fit, Insight).
+4. **Stärken & Risiken, Risiko & Szenarien (Worst/Best Case — einen Base Case gibt es heute nicht)** einbauen; prüfen, was davon in den Ankauf gehört.
+5. **PDF-Auswahl** wie heute (Bausteine `ai-pdf-sec-*`, index.html:3184-3210) — was soll aus dem neuen Reiter ins PDF; WEG-Unterlagen nicht, Risiken für die Bank ja („dass wir uns damit beschäftigt haben“).
+6. **Lage & Markt** fehlt: Makro, Mikro, Entwicklung (heute Unterreiter „Lage & Markt“, ki-lage.js, Lage-Gegenüberstellung) — eigener Unterreiter oder in Wert & Verlauf. Zeitreihen (Bevölkerung, Kaufkraft, Mietentwicklung) gibt es heute NICHT, nur Texte und Stufen.
+7. **Grafiken professionell**, auch **Steuerverlauf** (heute handgezeichnetes SVG `steuer-verlauf.js`: Balken Ergebnis V+V, Linie Cashflow nach Steuer, Marken Zinsbindung/§ 23).
+8. **Steuer-Tabelle erklären:** „Ergebnis Anlage V −1.840 €“ allein sagt nichts — Einnahmen und Werbungskosten nach Gruppen zeigen (tax.js `_computeYearTotal` 1801-1884: Finanzierung, Betriebskosten, Verwaltung, Sonstiges, AfA, Erhaltung/anschaffungsnah), Steuerwirkung dazu.
+**Bestandsaufnahme der heutigen Pilot-Analyse** (Agent, 02.11.2026): Inhalt in `ui.js _renderAIServerAnalysis` 1912-2533; Unterreiter Ankauf: Briefing · Stärken & Risiken · Risiko & Szenarien · [Unterlagen & WEG] · Lage & Markt · [Wert & Marktpreis] · Verhandlung & Offerte · Bank · Steuer · Ankauf/Bestand/Zielbild; Bestand: Briefing · ABZ · [Wert & Marktpreis] · Lage & Markt · Steuer · Anschlussfinanzierung · Exit · Risiko & Szenarien · [Unterlagen & WEG]. KI-Felder: openaiService.js 1793-1891. Marktbericht-Verlauf: `ui.js _dpLoadVerlauf` 3518ff (Chart.js); Löschen von Berichten heute nur im Tab Deal-Aktion (`deal-action-boarding.js` 1081, DELETE /marktbericht/reports/:id). Stress-Test gerechnet: `bank-charts.js` 993-1123.
+
+### N98-alt · Pilot-Analyse neu: Ankauf und Bestand — Verlauf Fassung 1–3
 
 Marcel: *„dass wir die Pilotanalyse komplett neu aufbauen, ähnlich mit den Reitern, aber übersichtlicher, einmal für Ist im Ankauf und aber auch im Bestand … mit Pillen … Unterlagen nachreichen (Wirtschaftsplan, WEG-Protokolle, Abrechnungen), ordnet automatisch zu und fragt, ob übernehmen … Wert und Marktpreis mit Stufen … Exit, Anschlussfinanzierung, Stresstest.“*
 Demo: `design/Vorschläge/pilot-analyse-neu.html` (sieben Ideen: Cockpit-Karten, Flugbahn Plan/Ist, Unterlagen-Eingang mit Übernahme, WEG-Radar, Flugbuch je Jahr, Szenarien-Regler, Pilot-Fragenzeile). Vorschlag: 1+3+4+6+7 zuerst, 2+5 als zweite Stufe (brauchen gespeicherte Jahresstände).
 **Marcel 02.11.2026 zu Fassung 1:** Cockpit-Karten super, aber zu viel drin; Wert-Karte muss Verfahren und Stufe nennen (Marktpreisindikation, Ertragswert); kein Flugplan/Flugbuch; Ankauf · Bestand · Zielbild mit Tabellen muss bleiben; ganzer Reiter statt Ideen untereinander; Verlauf der Marktberichte gegen das Einkalkulierte. **Fassung 2** (gleiche Datei, Artifact v2): Reiter mit Phase, Unterreitern (Bestand: Übersicht · Ankauf/Bestand/Zielbild · Wert & Verlauf · Steuer · Unterlagen & WEG · Anschluss & Exit; Ankauf: Übersicht · Kaufpreis & Offerte · Finanzierung & Stresstest · Ankauf/Zielbild · Unterlagen & WEG), Einfach/Detail, Pilot-Fragenzeile mit Sprung.
 **Marcel zu Fassung 2 (02.11.2026):** Phasenwechsel automatisch, nur Einfach/Detail; Tabellen großartig; Ankauf · Bestand · Zielbild schon im Ankauf (mit gesetzlich umsetzbarer Soll-Miete, Marktpreisindikation mit Spanne/Herkunft/Abschlag, Ertragswert) fürs Bankgespräch; Wert & Verlauf: Marktbericht dort abrufen, Berichte aus der Bewertung nehmen oder löschen (gelöscht = auch im Tab Deal Score weg); Unterlagen & WEG als Mischung aus heutigem Reiter (Karten) und Demo; Bestand-Übersicht nicht „Halten“; im Detail Spannen und führendes Verfahren, in Auflistungen nur das führende. **Fassung 3** (Artifact v3): Bestand-Urteil = Kurs („Auf Kurs“, Plan gegen Ist) mit nächsten Schritten; Ankauf-Urteil = Investor Deal Score mit Empfehlung.
 **Entschieden:** Wirtschaftsplan-Übernahme nie vorgehakt (gebaut v3088a). **Offen bei Marcel:** Fassung 3 ansehen; Sonderumlage (siehe N100).
+
+### N103 · Objekt: Detailgrad- und Marktbericht-Kacheln verschlanken — Demo zuerst (Marcel 02.11.2026)
+
+Marcel: *„oben den Detailgrad, Marktbericht abrufen … die Kacheln sind cool, jede Stufe … mit weniger Text darstellen und ein bisschen verschlanken.“* Erst messen (welche Texte, wo gebaut), dann Demo mit vorher/nachher.
+
+### N104 · Testobjekt Lindenallee 14 erweitern (Marcel 02.11.2026)
+
+Mietverträge zum Einlesen ergänzen: einer mit **Indexmiete**, einer mit **Staffelmiete**, einer normal (sofort erhöhbar) — „wirklich ein ganzheitliches Bild“, auch für die Übernahme. **Flachdach-Sonderumlage:** Lindenallee ist der Kauf EINER Wohnung (Einzelplan WE 5); eine beschlossene, nach dem Eigentumswechsel fällige Sonderumlage trifft den Käufer (BGH V ZR 257/16). Beim Kauf des ganzen Hauses wäre der Käufer allein die Gemeinschaft und könnte den Beschluss aufheben, ein bereits erteilter Auftrag bliebe bindend. Im Protokoll der Testunterlage deshalb „Auftrag bereits erteilt“ ergänzen. Investitionsthese sagte bei leerer Objektart „das gesamte Gebäude“ — beim Neubau der Testunterlagen die Objektart (ETW) im Exposé eindeutig machen. Testunterlagen liegen unter `Dateien/Testunterlagen/`; ein Scan-Test (Bild-PDF + JPG, nur Seite 1) unter `Dateien/Testunterlagen/Scan-Test/`.
+
+### N105 · Steuerkanzlei-Brücke — Konzept liegt vor, Marcel entscheidet (02.11.2026)
+
+Konzept: `design/Vorschläge/steuerkanzlei-bruecke.md`. Vorhanden: Partner-Konten (Rolle steuerberater), Seats per Stripe, Einladung, Freigabe je Objekt mit share_audit (055_reseller_core.sql, resellerService.js, mandant-freigaben.js). Fehlt: Freigabe je Steuerjahr, eingefrorener Stand, Selbstverbinden bestehender Nutzer, mehrere Kanzleien, Rückgabe mit Grund. DATEV/Addison: kein Import von Anlage-V-Daten in die ESt belegt (DATEV-Format nur Buchhaltung, Marktplatz ab 25 Kunden); ELSTER direkt = ganze Erklärung. Empfehlung Stufe 1: Freigabe je Steuerjahr + Kanzlei-Paket (PDF + CSV je Anlage-V-Zeile). **Fragen an Marcel** stehen im Konzept (u. a. „Aviso“ = WISO Steuer?, Preis für Weg 2, darf die Kanzlei korrigieren).
+
+### N106 · Kleinigkeiten aus dem Browsertest 02.11.2026
+
+- `users.last_login_at` bleibt nach Registrierung + erstem Einstieg leer (5 von 16 Nutzern auf Prod) — beim Einstieg nach der Verifizierung mitsetzen.
+- Eine Online-Dauer wird nirgends erfasst; wer sie will, braucht eine Sitzungs-/Aktivitätstabelle (Datenschutz: nur Zeitpunkte, Zweck nennen).
+- Handbuch-Erzeugung ist rot mit 11 alten Belegen (N93), deshalb steht im Handbuch noch der alte Fenstertitel „PDFs einlesen“.
+- Foto-Import: mehrere Fotos derselben Unterlage werden noch nicht zu einem Dokument zusammengeführt.
 
 ### N100 · Sonderumlage in Cashflow und Steuer — ENTSCHIEDEN, bauen (Marcel 02.11.2026: „so wie dein Vorschlag“)
 
@@ -79,7 +111,7 @@ Die „Freigabe (Aktennotiz Junker Solution)“ im Bayern-Adapter ist im Repo ni
 streichen. 4. Anfrage an den Oberen Gutachterausschuss (Entwurf Abschnitt 7) — nicht gesendet. 5. Lizenzen je Ausschuss
 nur nach Marcels Entscheidung (Geld).
 
-### N102 · Quick-Check: Anteil nicht umlagefähig je Objektart — Vorschlag, Marcel entscheidet (02.11.2026)
+### N102 · ✅ erledigt v3091 (Prod 1.0.41) — Quick-Check: Anteil nicht umlagefähig je Objektart (02.11.2026)
 
 Marcel: *„30 % … Ist das irgendwo eine Grundlage? … genauer, wir wissen das Mehrfamilienhaus oder so … haben wir Tabellen?“* **Befund:** 30 % ist keine amtliche Quote, sondern Marcels Abnahme der Demo v2183 (`bwk-profil.js` STANDARD.etw.nul_pct); im Formular steht als Rückfall noch 22 % (`quickcheck-app.html` qc_hg_split). Der Quick-Check nimmt für JEDE Objektart den ETW-Anteil. **Tabellen vorhanden:** ImmoWertV Anlage 3, fortgeschrieben (Verwaltung 439 € je ETW / 367 € je Wohnung, Instandhaltung 14,40 €/m², `bwk-profil.js`, `marktbericht/.../immowertv.js` BWK je Jahr). **Vorschlag:** ETW: nicht umlagefähig in Euro = Verwaltung ETW (Anlage 3) + Rücklage (bis Wirtschaftsplan vorliegt: Annahme, Marcel entscheidet die Größe), Anteil daraus statt fester 30 % — kleine Wohnungen bekommen so einen höheren Anteil (Verwaltung ist fix je Einheit). Häuser (EFH/MFH): wie die Haupt-App, Verwaltung je Einheit + Instandhaltung je m² (Anlage 3) gegen Betriebskosten; braucht für MFH die Zahl der Einheiten im Quick-Check.
 
