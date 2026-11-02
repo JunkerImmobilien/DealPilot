@@ -1,0 +1,556 @@
+{
+  "stand": "2026-11-02",
+  "zweck": "Zuordnung Arbeitsbereich zu Detailstufen Einsteiger / Fortgeschritten / Experte. Was hier nicht steht, ist Experte. 'fortgeschritten' listet nur, was zu Einsteiger DAZUKOMMT.",
+  "regeln": {
+    "karte.art": {
+      "karte": "selektor trifft die .card selbst",
+      "kind": "selektor trifft ein Element IN der Karte; Karte = element.closest('.card')",
+      "block": "selektor trifft einen Bereich, der keine .card ist (Unterbereich einer Karte oder JS-Host); er wird selbst ein-/ausgeblendet"
+    },
+    "felder": "Element-ids von input/select/textarea (ohne type=hidden). Ein ausgeblendetes Feld behaelt seinen Wert und rechnet weiter.",
+    "js": "Karten mit 'js' werden von dem genannten Modul eingehaengt; sie existieren erst nach dessen Lauf.",
+    "bwk_modus": "Bewirtschaftung hat zwei sich ausschliessende Modi (calc.js switchBwkMode): #bwk-detail-mode (Standard, index.html:3104) und #bwk-percent-mode (index.html:3016). Einsteiger sieht nur den Detail-Modus mit den vier Feldern; der Umschalter kommt ab Fortgeschritten.",
+    "nr": "Steht nr, gilt document.querySelectorAll(selektor)[nr]."
+  },
+  "reiter": {
+    "s0": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Objektdaten",
+            "selektor": "#plz",
+            "art": "kind"
+          },
+          {
+            "titel": "Automatisch ermittelt",
+            "selektor": "#qz-card",
+            "art": "karte"
+          },
+          {
+            "titel": "Lage & Einschätzung",
+            "selektor": "#oe-karte-lage",
+            "art": "karte"
+          },
+          {
+            "titel": "Objektfotos",
+            "selektor": "#img-inp",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "str",
+          "hnr",
+          "plz",
+          "ort",
+          "objart",
+          "wfl",
+          "zimmer",
+          "etage",
+          "einheiten",
+          "baujahr",
+          "ds2_zustand",
+          "ds2_energie",
+          "kaufdat",
+          "brw",
+          "brw_stichtag",
+          "ausst",
+          "lageklasse",
+          "makrolage",
+          "mikrolage",
+          "svwert",
+          "svw_herkunft",
+          "img-inp"
+        ]
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Gewerke & Ausstattung",
+            "selektor": "#oe-karte-gewerke",
+            "art": "karte"
+          },
+          {
+            "titel": "Sonstige Bemerkungen",
+            "selektor": "#notizen",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "nutzungsart",
+          "etagen_ges",
+          "standardstufe",
+          "vermstand",
+          "gsfl",
+          "mea",
+          "kuerzel",
+          "ds2_bevoelkerung",
+          "ds2_nachfrage",
+          "ds2_wertsteigerung",
+          "ds2_entwicklung",
+          "notizen",
+          "eq_walls",
+          "mod_aussenwand",
+          "ausst_aussenwaende",
+          "eq_roof",
+          "mod_dach",
+          "ausst_dach",
+          "eq_windows",
+          "mod_fenster",
+          "ausst_fenster",
+          "eq_heating",
+          "mod_heizung",
+          "ausst_heizung",
+          "eq_bath",
+          "mod_baeder",
+          "ausst_sanitaer",
+          "eq_floor",
+          "ausst_fussboeden",
+          "mod_innenausbau",
+          "ausst_innenwaende",
+          "ausst_decken",
+          "mod_leitungen",
+          "ausst_technik",
+          "mod_grundriss"
+        ]
+      }
+    },
+    "s1": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Kaufpreis & Nebenkosten",
+            "selektor": "#kp",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "kp",
+          "gest_p",
+          "notar_p",
+          "gba_p",
+          "makler_p",
+          "ji_p"
+        ]
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Sanierung",
+            "selektor": "#sanbedarf_toggle",
+            "art": "kind"
+          },
+          {
+            "titel": "Sanierung · FESH-Kacheln",
+            "selektor": "#sanbedarf_body",
+            "art": "block"
+          },
+          {
+            "titel": "Inventar",
+            "selektor": "#moebl",
+            "art": "kind"
+          },
+          {
+            "titel": "Mieterhöhung und Zielbild",
+            "selektor": "#zb-karte",
+            "art": "karte"
+          },
+          {
+            "titel": "Mietleiter ETW/EFH/ZFH (in der Zielbild-Karte)",
+            "selektor": "#zb-leiter",
+            "art": "block",
+            "js": "potenzial.js"
+          }
+        ],
+        "felder": [
+          "sanbedarf_toggle",
+          "fesh_f",
+          "fesh_f_cost",
+          "fesh_e",
+          "fesh_e_cost",
+          "fesh_s",
+          "fesh_s_cost",
+          "fesh_h",
+          "fesh_h_cost",
+          "fesh_d",
+          "fesh_d_cost",
+          "fesh_b",
+          "fesh_b_cost",
+          "fesh_k",
+          "fesh_k_cost",
+          "fesh_o",
+          "fesh_o_cost",
+          "san",
+          "san_ausgefuehrt",
+          "san_ust",
+          "san_tax_active",
+          "san_tax_years",
+          "moebl",
+          "zb_fertig_jahr",
+          "zb_markt_qm",
+          "zb_vgl_qm",
+          "zb_soll_qm",
+          "zb_soll_ab",
+          "zb_ziel_qm",
+          "zb_ziel_wann"
+        ]
+      }
+    },
+    "s2": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Mietstruktur",
+            "selektor": "#nkm",
+            "art": "kind"
+          },
+          {
+            "titel": "Mietentwicklung · Prognose",
+            "selektor": "#mietstg",
+            "art": "kind"
+          },
+          {
+            "titel": "Prognose-Annahmen",
+            "selektor": "#wertstg",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "nkm",
+          "ze",
+          "umlagef",
+          "mietstg",
+          "wertstg",
+          "leerstand"
+        ]
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Mietpreis-Analyse",
+            "selektor": "#ds2_marktmiete",
+            "art": "kind"
+          },
+          {
+            "titel": "Mietvertrag für dieses Objekt",
+            "selektor": "#mv-objekt-karte",
+            "art": "karte"
+          },
+          {
+            "titel": "Mietrecht an dieser Adresse",
+            "selektor": "#dp-mietrecht-karte",
+            "art": "karte",
+            "js": "potenzial.js"
+          }
+        ],
+        "felder": [
+          "ds2_marktmiete",
+          "ds2_mietausfall",
+          "mv_art",
+          "mv_beginn",
+          "mv_letzte_erhoehung",
+          "mv_letzte_erhoehung_betrag",
+          "mv_befristet_bis",
+          "mv_kuendigungsverzicht_bis",
+          "mv_abw_jahre",
+          "kostenstg",
+          "btj",
+          "exit_bmy"
+        ]
+      }
+    },
+    "s3": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Empfohlen für Ihr Objekt (Zinsen kompakt)",
+            "selektor": "#v10-zins-compact",
+            "art": "karte"
+          },
+          {
+            "titel": "Darlehen I – Hauptdarlehen",
+            "selektor": "#d1",
+            "art": "kind"
+          },
+          {
+            "titel": "Finanzierungsübersicht",
+            "selektor": "#ltv-explanation",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "ek",
+          "d1",
+          "d1z",
+          "d1t",
+          "d1_bindj"
+        ]
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Indikative Konditionen nach Zinsbindung",
+            "selektor": "#mr-pf-grid",
+            "art": "kind"
+          },
+          {
+            "titel": "Darlehen II – Zusatzdarlehen",
+            "selektor": "#d2",
+            "art": "kind"
+          },
+          {
+            "titel": "Bankargumente",
+            "selektor": "#bi-dscr",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "d1_type",
+          "bank_inst",
+          "ek_ist_nk",
+          "ek_inkl_nk",
+          "d1_anschl_enable",
+          "anschl_z",
+          "anschl_t",
+          "anschl_bj",
+          "d2_enable",
+          "d2_type",
+          "d2_inst",
+          "d2_vertrag",
+          "d2_bspar",
+          "d2_auszahl",
+          "d2_vertragsdatum",
+          "d2",
+          "d2z",
+          "d2t",
+          "d2_bindj",
+          "d2_anschl_enable",
+          "d2_az",
+          "d2_at"
+        ]
+      }
+    },
+    "s4": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Umlagefähige Kosten / Jahr",
+            "selektor": "#hg_ul",
+            "art": "kind"
+          },
+          {
+            "titel": "Nicht umlagefähige Kosten / Jahr",
+            "selektor": "#hg_nul",
+            "art": "kind"
+          },
+          {
+            "titel": "BWK Zusammenfassung",
+            "selektor": "#r-bwk",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "hg_ul",
+          "grundsteuer",
+          "hg_nul",
+          "mietausfall"
+        ]
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Eingabe-Modus (Detailliert | % der NKM)",
+            "selektor": "#s4 .bwk-mode-btns",
+            "art": "kind",
+            "nr": 0,
+            "hinweis": "erster Treffer = Karte Eingabe-Modus (index.html:3002); der zweite steckt in der Quick-Eingabe. Beim Bau besser eine id vergeben."
+          },
+          {
+            "titel": "Prozent-Modus: BWK – Quick-Eingabe + Berechnete BWK",
+            "selektor": "#bwk-percent-mode",
+            "art": "block"
+          },
+          {
+            "titel": "BWK – Quick-Eingabe",
+            "selektor": "#bwk_ul_pct",
+            "art": "kind"
+          },
+          {
+            "titel": "Berechnete BWK",
+            "selektor": "#bwk_pct_nkm",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "bwk_ul_pct",
+          "bwk_nul_pct",
+          "ul_sonst",
+          "weg_r",
+          "eigen_r",
+          "nul_sonst"
+        ]
+      }
+    },
+    "s3-tax": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Persönliche Steuer",
+            "selektor": "#tax-personal-card",
+            "art": "karte"
+          },
+          {
+            "titel": "Steuerverlauf",
+            "selektor": "#tax-timeline-card",
+            "art": "karte"
+          }
+        ],
+        "felder": [
+          "grenz"
+        ]
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Was mit diesen Werten passiert",
+            "selektor": "#tax-flow-hint",
+            "art": "karte"
+          },
+          {
+            "titel": "AfA-Konfiguration",
+            "selektor": "#afa_satz",
+            "art": "kind"
+          },
+          {
+            "titel": "Steuer-Modul · Echte Progression",
+            "selektor": "#tax-result-box",
+            "art": "kind"
+          }
+        ],
+        "felder": [
+          "zve",
+          "grenz_auto",
+          "afa_satz",
+          "geb_ant"
+        ]
+      }
+    },
+    "s5": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Investment-Analyse (ai-box)",
+            "selektor": ".ai-box",
+            "art": "block"
+          }
+        ],
+        "felder": [
+          "ai-in-pdf"
+        ]
+      },
+      "fortgeschritten": {
+        "karten": [],
+        "felder": []
+      }
+    },
+    "s6": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "DealPilot Score",
+            "selektor": "#dealscore-card",
+            "art": "karte"
+          },
+          {
+            "titel": "Investor Deal Score",
+            "selektor": "#dealscore2-card",
+            "art": "karte"
+          },
+          {
+            "titel": "Cashflow – Korrekte Berechnung",
+            "selektor": "#cr-title",
+            "art": "kind"
+          },
+          {
+            "titel": "Alle Kennzahlen",
+            "selektor": "#r-bmy",
+            "art": "kind"
+          },
+          {
+            "titel": "Wert & Zielbild",
+            "selektor": "#card-wert-zielbild",
+            "art": "karte",
+            "js": "wert-zielbild.js"
+          }
+        ],
+        "felder": []
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Kennzahlen-Bewertung",
+            "selektor": "#kpi-eval-card",
+            "art": "karte"
+          },
+          {
+            "titel": "Pilot-Kurzfazit",
+            "selektor": "#ai-mini-card",
+            "art": "karte"
+          },
+          {
+            "titel": "Vermögenszuwachs · 10 Jahre",
+            "selektor": "#card-vermoegen-zuwachs",
+            "art": "karte"
+          },
+          {
+            "titel": "Cashflow-Projektion",
+            "selektor": "#card-cashflow-projektion",
+            "art": "karte"
+          }
+        ],
+        "felder": []
+      }
+    },
+    "s8": {
+      "einsteiger": {
+        "karten": [
+          {
+            "titel": "Bereit für die Bank (Readiness)",
+            "selektor": "#dab-cockpit",
+            "art": "block",
+            "js": "deal-action-boarding.js"
+          },
+          {
+            "titel": "Dokumente & Exporte (Investment-PDF)",
+            "selektor": "#dab-smart",
+            "art": "block",
+            "js": "deal-action-boarding.js"
+          },
+          {
+            "titel": "Dein Netzwerk",
+            "selektor": "#dab-rails-host",
+            "art": "block",
+            "js": "deal-action-boarding.js"
+          }
+        ],
+        "felder": []
+      },
+      "fortgeschritten": {
+        "karten": [
+          {
+            "titel": "Marktberichte",
+            "selektor": "#dab-mb-host",
+            "art": "block",
+            "js": "deal-action-boarding.js"
+          },
+          {
+            "titel": "Bordkarte & Unterlagen",
+            "selektor": "#dab-dr-host",
+            "art": "block",
+            "js": "deal-action-boarding.js"
+          }
+        ],
+        "felder": []
+      }
+    }
+  }
+}

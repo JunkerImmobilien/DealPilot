@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Entwurf 02.11.2026 · Detailgrad des echten Arbeitsbereichs (Einfach · Standard · Profi).
+/* Entwurf 02.11.2026 · Detailgrad des echten Arbeitsbereichs (Einsteiger · Fortgeschritten · Experte; Folgeauftrag 02.11.2026).
    Kartentitel, Reihenfolge und Feldzahlen aus frontend/index.html gemessen
    (Bestand: arbeitsbereich-detailgrad-bestand.md). Nichts hier ist App-Code. */
 :root{
@@ -147,9 +147,9 @@ main{max-width:1180px;margin:0 auto;padding:12px 20px 60px}
     <div class="marke">Deal<b>Pilot</b></div>
     <div class="obj"><b>Musterstraße 12 · 12345 Musterstadt</b> · ETW <span class="bsp">BEISPIEL</span></div>
     <div class="stufen" role="group" aria-label="Detailgrad">
-      <button type="button" data-stufe="1">Einfach<small id="z1">– Felder</small></button>
-      <button type="button" data-stufe="2">Standard<small id="z2">– Felder</small></button>
-      <button type="button" data-stufe="3">Profi<small id="z3">– Felder</small></button>
+      <button type="button" data-stufe="1">Einsteiger<small id="z1">– Felder</small></button>
+      <button type="button" data-stufe="2">Fortgeschritten<small id="z2">– Felder</small></button>
+      <button type="button" data-stufe="3">Experte<small id="z3">– Felder</small></button>
     </div>
   </div>
   <nav class="tabs" id="tabs" aria-label="Reiter"></nav>
@@ -157,12 +157,12 @@ main{max-width:1180px;margin:0 auto;padding:12px 20px 60px}
 
 <div class="leiste">
   <div class="satz" id="satz"></div>
-  <button class="knopf" type="button" id="szenario">Vorführung: in Einfach anlegen → auf Standard erweitern</button>
+  <button class="knopf" type="button" id="szenario">Vorführung: als Einsteiger anlegen → auf Fortgeschritten erweitern</button>
 </div>
 
 <main id="inhalt"></main>
 
-<div class="fuss">Entwurf 02.11.2026 · Kartentitel und Feldzahlen aus <span class="mono">frontend/index.html</span> gemessen, Zuordnung zu den Stufen ist ein Vorschlag. Alle Zahlen sind BEISPIELE; die Rechnung hier ist eine vereinfachte Vorführung, nicht der Rechenkern. Bestand und Begründung: <span class="mono">arbeitsbereich-detailgrad-bestand.md</span>.</div>
+<div class="fuss">Entwurf 02.11.2026 · Kartentitel und Feldzahlen aus <span class="mono">frontend/index.html</span> gemessen, Zuordnung zu den Stufen nach <span class="mono">arbeitsbereich-detailgrad-zuordnung.json</span> (geprüft gegen index.html). Alle Zahlen sind BEISPIELE; die Rechnung hier ist eine vereinfachte Vorführung, nicht der Rechenkern. Bestand und Begründung: <span class="mono">arbeitsbereich-detailgrad-bestand.md</span>.</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -174,9 +174,9 @@ var TABS = [
   {t:'Objektdaten', q:'index.html:1087', ab:1, breit:1, f:[
     ['Straße','str',1,'p','Musterstraße'],['Hausnummer','hnr',1,'o','12'],['PLZ','plz',1,'p','12345'],['Ort','ort',1,'p','Musterstadt'],
     ['Objektart','objart',1,'p','ETW'],['Wohnfläche m²','wfl',1,'p','72'],['Baujahr','baujahr',1,'p','1994'],
-    ['Nutzungsart','nutzungsart',2,'p','',1,3],['Zimmer','zimmer',2,'p',''],['Etage','etage',2,'p',''],['Etagen gesamt','etagen_ges',2,'o',''],
-    ['Wohneinheiten (nur MFH)','einheiten',2,'o',''],['Zustand','ds2_zustand',2,'p',''],['Standardstufe','standardstufe',2,'p',''],['Energieklasse','ds2_energie',2,'p',''],
-    ['Vermietungsstand','vermstand',2,'o',''],['Grundstücksfläche m²','gsfl',2,'p','',1,3],['Miteigentumsanteil','mea',2,'p','',1,3],['Kaufdatum','kaufdat',2,'o',''],['Kürzel','kuerzel',2,'a','MS_MUS_12'],
+    ['Zimmer','zimmer',1,'p','',1,2],['Etage','etage',1,'p','',1,2],['Wohneinheiten (nur MFH)','einheiten',1,'o',''],['Zustand','ds2_zustand',1,'p','',1,2],['Energieklasse','ds2_energie',1,'p','',1,2],['Kaufdatum','kaufdat',1,'o',''],
+    ['Nutzungsart','nutzungsart',2,'p','',1,3],['Etagen gesamt','etagen_ges',2,'o',''],['Standardstufe','standardstufe',2,'p',''],['Vermietungsstand','vermstand',2,'o',''],
+    ['Grundstücksfläche m²','gsfl',2,'p','',1,3],['Miteigentumsanteil','mea',2,'p','',1,3],['Kürzel','kuerzel',2,'a','MS_MUS_12'],
     ['These · Risiken · Exit-Strategie','thesis',3,'g','',3],['Wirtschaftlicher Übergang','wirtschaftlicher_uebergang',3,'o',''],['Halter','halter',3,'o',''],
     ['Überführung in Gesellschaft (Verkehrswert, Preis, Halter seit, Gesellschafterdarlehen, Restschuld, Zins, Ende)','mand_ueberf_cb',3,'g','',8]]},
   {t:'Automatisch ermittelt', q:'index.html:1142', ab:1, f:[
@@ -187,9 +187,8 @@ var TABS = [
     ['Aufzug · Gäste-WC · Abstellraum · Bäder · Balkon','eq_elevator',3,'g','',5],['Garagen · Stellplätze','garagen',3,'g','',2],['Modernisierung · Baustatus','modernis',3,'g','',2],
     ['Gemarkung · Flur · Flurstück','gemarkung',3,'g','',3],['Hinterland (Fläche, €/m², rentierlich)','hinterland_qm',3,'g','',3],['Erbbaurecht (6 Angaben)','erbpacht',3,'g','',6]]},
   {t:'Lage & Einschätzung', q:'index.html:1330', ab:1, f:[
-    ['Makrolage','makrolage',1,'o','mittel'],['Mikrolage','mikrolage',1,'o',''],
-    ['Lageklasse','lageklasse',2,'o',''],['Bevölkerung','ds2_bevoelkerung',2,'o',''],['Nachfrage','ds2_nachfrage',2,'o',''],['Wertsteigerung (Lage)','ds2_wertsteigerung',2,'o',''],['Entwicklung','ds2_entwicklung',2,'o',''],
-    ['Wertangabe €','svwert',2,'o',''],['Herkunft der Wertangabe','svw_herkunft',2,'o',''],
+    ['Lageklasse','lageklasse',1,'o',''],['Makrolage','makrolage',1,'o','mittel'],['Mikrolage','mikrolage',1,'o',''],['Wertangabe €','svwert',1,'o',''],['Herkunft der Wertangabe','svw_herkunft',1,'o',''],
+    ['Bevölkerung','ds2_bevoelkerung',2,'o',''],['Nachfrage','ds2_nachfrage',2,'o',''],['Wertsteigerung (Lage)','ds2_wertsteigerung',2,'o',''],['Entwicklung','ds2_entwicklung',2,'o',''],
     ['Bankbewertung · Soll-Wert','bankval',3,'g','',2]]},
   {t:'Objektfotos', q:'index.html:1422', ab:1, f:[['Fotos (bis zu 6, erscheinen im PDF)','img-inp',1,'o','']]},
   {t:'Sonstige Bemerkungen', q:'index.html:1433', ab:2, f:[['Notizen','notizen',2,'o','']]},
@@ -197,97 +196,98 @@ var TABS = [
     ['BGF m²','bgf',3,'p',''],
     ['NHK-Typ, Modernisierungspunkte, Sachwertfaktor, Liegenschaftszins, UK Fläche/WGFZ, Bodenrichtwert manuell und Anpassung, Garagen, Außenanlagen, besondere Bauteile, Stichtag … (ohne Angabe: Ansätze der Anlage 3)','nhk_haus',3,'g','',29]]}
  ]},
- {id:'s1', lbl:'Investition', titel:'Investition', desc:'Kaufpreis, Nebenkosten, Sanierung, Inventar', karten:[
+ {id:'s1', lbl:'Investition', titel:'Investition', desc:'Kaufpreis, Nebenkosten, Sanierung, Inventar, Zielbild', karten:[
   {t:'Kaufpreis & Nebenkosten', q:'index.html:1600', ab:1, f:[
     ['Kaufpreis €','kp',1,'p','129000'],
-    ['Grunderwerbsteuer %','gest_p',2,'v','6,5'],['Notar %','notar_p',2,'v','1,70'],['Grundbuch %','gba_p',2,'v','0,50'],['Makler %','makler_p',2,'v','3,57'],['Sonstige %','ji_p',2,'v','1,50'],
+    ['Grunderwerbsteuer %','gest_p',1,'v','6,5'],['Notar %','notar_p',1,'v','1,70'],['Grundbuch %','gba_p',1,'v','0,50'],['Makler %','makler_p',1,'v','3,57'],['Sonstige %','ji_p',1,'v','1,50'],
     ['Nebenkosten in € (5 Felder, aus den Sätzen)','gest_e',3,'g','',5]]},
   {t:'Sanierung', q:'index.html:1640', ab:2, f:[
-    ['Sanierungsbedarf','sanbedarf_toggle',2,'o',''],['Sanierung gesamt €','san',2,'o',''],['ausgeführt am','san_ausgefuehrt',2,'o',''],
-    ['8 Gewerke je Haken + Kosten','fesh',3,'g','',16],['USt · steuerlich verteilen · Jahre','san_ust',3,'g','',3]]},
-  {t:'Inventar', q:'index.html:1762', ab:2, f:[
+    ['Sanierungsbedarf einschätzen','sanbedarf_toggle',2,'o',''],['FESH-Kacheln (#sanbedarf_body): 8 Gewerke je Haken + Kosten','fesh',2,'g','',16],
+    ['Sanierung gesamt €','san',2,'o',''],['ausgeführt am','san_ausgefuehrt',2,'o',''],['USt · steuerlich verteilen · Jahre','san_ust',2,'g','',3]]},
+  {t:'Inventar', q:'index.html:1766', ab:2, f:[
     ['Inventar gesamt €','moebl',2,'o',''],['Detail: Küche, Möbel, Geräte, PV, Stellplatz, Sonstiges, steuerlich + Jahre','inv_detail_toggle',3,'g','',9]]},
-  {t:'Mieterhöhung und Zielbild', q:'index.html:1854', ab:3, f:[['Zielbild: fertig im Jahr, Markt-/Vergleichs-/Soll-/Zielmiete, ab wann','zb',3,'g','',7]]}
+  {t:'Mieterhöhung und Zielbild · Mietleiter', q:'index.html:1858 · #zb-leiter potenzial.js:335', ab:2, f:[
+    ['Mietleiter (ETW/EFH/ZFH): Ist → Soll nach Mietrecht → Zielmiete, je Stufe „übernehmen"','zb',2,'g','',7]]}
  ]},
- {id:'s2', lbl:'Miete', titel:'Miete', desc:'Mieteinnahmen und Prognose', karten:[
-  {t:'Mietstruktur', q:'index.html:1909', ab:1, f:[
-    ['Nettokaltmiete €/Monat','nkm',1,'p','690'],['Zusatzeinnahmen €/Monat','ze',2,'o',''],['Umlagen €/Monat','umlagef',2,'o','']]},
-  {t:'Mietpreis-Analyse', q:'index.html:1918', ab:2, f:[['Marktmiete €/m²','ds2_marktmiete',2,'o',''],['Mietausfall-Risiko','ds2_mietausfall',2,'o','']]},
-  {t:'Mietvertrag für dieses Objekt', q:'index.html:1971', ab:3, f:[['Vertragsart, Beginn, letzte Erhöhung + Betrag, befristet, Kündigungsverzicht, Abweichung','mv_art',3,'g','',7]]},
-  {t:'Mietrecht an dieser Adresse', q:'potenzial.js:324 (JS)', ab:2, art:'info', text:'Mietpreisbremse, Kappungsgrenze, Modernisierungsumlage — aus den Landesverordnungen, keine Eingabe.'},
-  {t:'Mietentwicklung · Prognose', q:'index.html:1992', ab:2, f:[
-    ['Mietsteigerung % p.a.','mietstg',2,'v','1,5'],['Staffel/Index: Soll, Anzahl, Intervall, %, Zusatzeinnahmen steigen','me_soll',3,'g','',5]]},
-  {t:'Prognose-Annahmen', q:'index.html:2057', ab:2, f:[
-    ['Wertsteigerung % p.a.','wertstg',2,'v','1,5'],['Leerstand %','leerstand',2,'v','2'],
-    ['Kostensteigerung % p.a.','kostenstg',3,'v','1,0'],['Betrachtung Jahre','btj',3,'v','15'],['Exit-Faktor','exit_bmy',3,'v','5,0']]}
+ {id:'s2', lbl:'Miete', titel:'Miete', desc:'Mieteinnahmen, Mietvertrag, Mietrecht und Prognose', karten:[
+  {t:'Mietstruktur', q:'index.html:1914', ab:1, f:[
+    ['Nettokaltmiete €/Monat','nkm',1,'p','690'],['Zusatzeinnahmen €/Monat','ze',1,'o',''],['Umlagen €/Monat','umlagef',1,'o','']]},
+  {t:'Mietpreis-Analyse', q:'index.html:1923', ab:2, f:[['Marktmiete €/m²','ds2_marktmiete',2,'o',''],['Mietausfall-Risiko','ds2_mietausfall',2,'o','']]},
+  {t:'Mietvertrag für dieses Objekt', q:'index.html:1976', ab:2, f:[['Vertragsart, Beginn, letzte Erhöhung + Betrag, befristet, Kündigungsverzicht, Abweichung','mv_art',2,'g','',7]]},
+  {t:'Mietrecht an dieser Adresse', q:'potenzial.js:481 (JS)', ab:2, art:'info', text:'Mietpreisbremse, Kappungsgrenze, Modernisierungsumlage — aus den Landesverordnungen, keine Eingabe.'},
+  {t:'Mietentwicklung · Prognose', q:'index.html:1997', ab:1, f:[
+    ['Mietsteigerung % p.a.','mietstg',1,'v','1,5'],['Staffel/Index: Soll, Anzahl, Intervall, %, Zusatzeinnahmen steigen','me_soll',3,'g','',5]]},
+  {t:'Prognose-Annahmen', q:'index.html:2062', ab:1, f:[
+    ['Wertsteigerung % p.a.','wertstg',1,'v','1,5'],['Leerstand %','leerstand',1,'v','2'],
+    ['Kostensteigerung % p.a.','kostenstg',2,'v','1,0'],['Betrachtung Jahre','btj',2,'v','15'],['Exit-Faktor','exit_bmy',2,'v','5,0']]}
  ]},
  {id:'s3', lbl:'Finanzierung', titel:'Finanzierung', desc:'Darlehen, Zinsen, Bankargumente', karten:[
-  {t:'Empfohlen für dein Objekt', q:'index.html:2425', ab:1, art:'info', text:'Indikative Zinsen nach Zinsbindung (variabel · 10 · 15 · 20 Jahre) — keine Eingabe.'},
-  {t:'Markt-Kontext (EZB & Geldmarkt)', q:'index.html:2463', ab:3, art:'info', text:'Leitzins, Euribor — keine Eingabe.'},
-  {t:'Aktuelle Marktzinsen (Bundesbank)', q:'index.html:2507', ab:3, art:'info', text:'Zeitreihe Wohnungsbaukredite — keine Eingabe.'},
-  {t:'Indikative Konditionen nach Zinsbindung', q:'index.html:2595', ab:2, art:'info', text:'Bundesanleihe + Marktaufschlag — keine Eingabe.'},
-  {t:'Darlehen I – Hauptdarlehen', q:'index.html:2694', ab:1, breit:1, abgeleitet:1, f:[
-    ['Eigenkapital €','ek',1,'v','12900'],['Zins %','d1z',1,'v','3,60'],['Tilgung %','d1t',1,'v','1,5'],
-    ['Darlehensbetrag €','d1',2,'o',''],['Zinsbindung Jahre','d1_bindj',2,'v','10'],['Darlehensart','d1_type',2,'o','Annuität'],['EK enthält Nebenkosten (2 Haken)','ek_inkl_nk',2,'g','',2],
-    ['Bank, Vertragsnr., Vertragsdatum, Auszahlung','bank_inst',3,'g','',4],['Anschlussfinanzierung (Schalter, Zins, Tilgung, Bindung)','anschl_z',3,'g','',4]]},
-  {t:'Bausparvertrag (nur bei Darlehensart Bauspar)', q:'index.html:2821', ab:3, f:[['Bausparkasse, Vertrag, Summe, Rate, Mindestquote, Zinsen','bspar',3,'g','',9]]},
-  {t:'Darlehen II – Zusatzdarlehen', q:'index.html:2876', ab:3, f:[['Zweites Darlehen (14 Angaben)','d2',3,'g','',14]]},
-  {t:'Finanzierungsübersicht', q:'index.html:2951', ab:1, art:'finanz'},
-  {t:'Bankargumente', q:'index.html:2977', ab:2, art:'info', text:'Argumente für das Bankgespräch aus den Kennzahlen — keine Eingabe.'}
+  {t:'Empfohlen für Ihr Objekt', q:'index.html:2430', ab:1, art:'info', text:'Indikative Zinsen nach Zinsbindung (variabel · 10 · 15 · 20 Jahre) — keine Eingabe.'},
+  {t:'Markt-Kontext (EZB & Geldmarkt)', q:'index.html:2468', ab:3, art:'info', text:'Leitzins, Euribor — keine Eingabe.'},
+  {t:'Aktuelle Marktzinsen (Bundesbank)', q:'index.html:2512', ab:3, art:'info', text:'Zeitreihe Wohnungsbaukredite — keine Eingabe.'},
+  {t:'Indikative Konditionen nach Zinsbindung', q:'index.html:2600', ab:2, art:'info', text:'Bundesanleihe + Marktaufschlag — keine Eingabe.'},
+  {t:'Darlehen I – Hauptdarlehen', q:'index.html:2699', ab:1, breit:1, abgeleitet:1, f:[
+    ['Eigenkapital €','ek',1,'v','12900'],['Darlehensbetrag €','d1',1,'a',''],['Zins %','d1z',1,'v','3,60'],['Tilgung %','d1t',1,'v','1,5'],['Zinsbindung Jahre','d1_bindj',1,'v','10'],
+    ['Darlehensart','d1_type',2,'o','Annuität'],['Bank','bank_inst',2,'o',''],['EK = Nebenkosten · EK inkl. Nebenkosten','ek_ist_nk',2,'g','',2],['Anschlussfinanzierung (Schalter, Zins, Tilgung, Bindung)','anschl_z',2,'g','',4],
+    ['Vertragsnr., Vertragsdatum, Auszahlung','d1_vertrag',3,'g','',3]]},
+  {t:'Bausparvertrag (nur bei Darlehensart Bauspar)', q:'index.html:2826', ab:3, f:[['Bausparkasse, Vertrag, Summe, Rate, Mindestquote, Zinsen','bspar',3,'g','',9]]},
+  {t:'Darlehen II – Zusatzdarlehen', q:'index.html:2881', ab:2, f:[['Zweites Darlehen (14 Angaben)','d2',2,'g','',14]]},
+  {t:'Finanzierungsübersicht', q:'index.html:2956', ab:1, art:'finanz'},
+  {t:'Bankargumente', q:'index.html:2982', ab:2, art:'info', text:'Argumente für das Bankgespräch aus den Kennzahlen — keine Eingabe.'}
  ]},
- {id:'s4', lbl:'Bewirtschaftung', titel:'Bewirtschaftung', desc:'Laufende Kosten', karten:[
-  {t:'Eingabe-Modus', q:'index.html:2997', ab:2, art:'info', text:'Euro je Objektart (Standard) oder Prozent der Nettokaltmiete — Umschalter, keine Zahl.'},
-  {t:'BWK – Quick-Eingabe', q:'index.html:3013', ab:2, f:[['umlagefähig % NKM','bwk_ul_pct',2,'v','17'],['nicht umlagefähig % NKM','bwk_nul_pct',2,'v','16'],['in % vom Kaufpreis','bwk_kp_pct',3,'o','']]},
-  {t:'Berechnete BWK', q:'index.html:3081', ab:1, art:'bwk'},
-  {t:'Umlagefähige Kosten / Jahr', q:'index.html:3101', ab:2, f:[['Hausgeld umlagefähig €','hg_ul',2,'o',''],['Grundsteuer €','grundsteuer',2,'o',''],['Sonstige €','ul_sonst',3,'o','']]},
-  {t:'Nicht umlagefähige Kosten / Jahr', q:'index.html:3107', ab:2, f:[['Hausgeld nicht umlagefähig €','hg_nul',2,'o',''],['WEG-Rücklage €','weg_r',2,'o',''],['Mietausfall €/Jahr','mietausfall',2,'v','83'],['Eigene Rücklage · Sonstige','eigen_r',3,'g','',2]]},
-  {t:'BWK Zusammenfassung', q:'index.html:3121', ab:2, art:'info', text:'Summe umlagefähig / nicht umlagefähig — keine Eingabe.'},
-  {t:'Detailpositionen (optional)', q:'index.html:3129', ab:3, f:[['4 freie Positionen mit Bezeichnung','kp1',3,'g','',8]]}
+ {id:'s4', lbl:'Bewirtschaftung', titel:'Bewirtschaftung', desc:'Laufende Kosten — Einsteiger im Modus „Detailliert"', karten:[
+  {t:'Eingabe-Modus', q:'index.html:3002', ab:2, art:'info', text:'Detailliert (Standard) oder % der Nettokaltmiete — zwei Modi, die sich ausschließen (calc.js switchBwkMode).'},
+  {t:'BWK – Quick-Eingabe (Modus %)', q:'index.html:3018', ab:2, f:[['umlagefähig % NKM','bwk_ul_pct',2,'v','17'],['nicht umlagefähig % NKM','bwk_nul_pct',2,'v','16'],['in % vom Kaufpreis','bwk_kp_pct',3,'o','']]},
+  {t:'Berechnete BWK (Modus %)', q:'index.html:3086', ab:2, art:'info', text:'Rechnet die Prozentsätze in Euro um — keine Eingabe.'},
+  {t:'Umlagefähige Kosten / Jahr', q:'index.html:3106', ab:1, f:[['Hausgeld umlagefähig €','hg_ul',1,'v','1380'],['Grundsteuer €','grundsteuer',1,'o',''],['Sonstige €','ul_sonst',2,'o','']]},
+  {t:'Nicht umlagefähige Kosten / Jahr', q:'index.html:3112', ab:1, f:[['Hausgeld nicht umlagefähig €','hg_nul',1,'v','590'],['Mietausfall €/Jahr','mietausfall',1,'v','83'],['WEG-Rücklage €','weg_r',2,'o',''],['Eigene Rücklage €','eigen_r',2,'v','430'],['Sonstige €','nul_sonst',2,'o','']]},
+  {t:'BWK Zusammenfassung', q:'index.html:3126', ab:1, art:'bwk'},
+  {t:'Detailpositionen (optional)', q:'index.html:3134', ab:3, f:[['4 freie Positionen mit Bezeichnung','kp1',3,'g','',8]]}
  ]},
  {id:'s3-tax', lbl:'Steuer', titel:'Steuer', desc:'Persönliche Steuer und AfA', karten:[
-  {t:'Was mit diesen Werten passiert', q:'index.html:2106', ab:2, art:'info', text:'Erklärung des Steuerwegs — keine Eingabe.'},
-  {t:'Persönliche Steuer', q:'index.html:2158', ab:1, f:[
+  {t:'Was mit diesen Werten passiert', q:'index.html:2111', ab:2, art:'info', text:'Erklärung des Steuerwegs — keine Eingabe.'},
+  {t:'Persönliche Steuer', q:'index.html:2163', ab:1, f:[
     ['Grenzsteuersatz %','grenz',1,'v','40,45'],['zu versteuerndes Einkommen €','zve',2,'o',''],['automatisch aus zvE','grenz_auto',2,'o',''],['Splitting · Kirchensteuer','st_splitting',3,'g','',2]]},
-  {t:'AfA-Konfiguration', q:'index.html:2199', ab:2, f:[['AfA-Satz %','afa_satz',2,'v','2,0'],['Gebäudeanteil %','geb_ant',2,'v','80'],['§ 7b Sonder-AfA (5 Angaben)','afa_sonder7b_aktiv',3,'g','',5]]},
-  {t:'Steuer-Modul · Echte Progression 2026', q:'index.html:2349', ab:2, art:'info', text:'Rechnet mit Grenzsteuersatz oder zvE — keine Eingabe.'},
-  {t:'Steuerverlauf', q:'index.html:2368', ab:1, art:'steuer'},
-  {t:'Steuerformular pro Jahr', q:'index.html:2379', ab:3, f:[['Jahr · Anlage V','fa-pdf-year',3,'g','',2]]}
+  {t:'AfA-Konfiguration', q:'index.html:2204', ab:2, f:[['AfA-Satz % (nach Baujahr)','afa_satz',2,'v','2,0'],['Gebäudeanteil %','geb_ant',2,'v','80'],['§ 7b Sonder-AfA (5 Angaben)','afa_sonder7b_aktiv',3,'g','',5]]},
+  {t:'Steuer-Modul · Echte Progression 2026', q:'index.html:2354', ab:2, art:'info', text:'Rechnet mit Grenzsteuersatz oder zvE — keine Eingabe.'},
+  {t:'Steuerverlauf', q:'index.html:2373', ab:1, art:'steuer'},
+  {t:'Steuerformular pro Jahr', q:'index.html:2384', ab:3, f:[['Jahr · Anlage V','fa-pdf-year',3,'g','',2]]}
  ]},
  {id:'s5', lbl:'Pilot-Analyse', titel:'Pilot-Investment-Analyse', desc:'DealPilot bewertet deine Zahlen — Urteil, Stärken, Risiken, Verhandlung', karten:[
-  {t:'Investment-Analyse', q:'index.html:3166 (.ai-box)', ab:1, art:'info', text:'Knopf „Analyse starten" (Kontingent). Das Investment-PDF entsteht auch ohne Analyse.'},
-  {t:'Pilot-Analyse im PDF', q:'index.html:3183', ab:1, f:[['Analyse ins PDF übernehmen','ai-in-pdf',1,'o','']]},
-  {t:'Ankauf · Bestand · Zielbild', q:'wert-zielbild.js:564 (JS)', ab:1, art:'info', text:'Einfach: bis zu sechs Kernaussagen. Genau (ab Profi offen): alle Zahlen — heutiger Umschalter Einfach | Genau.'},
-  {t:'Bausteine im PDF', q:'index.html:3190', ab:3, f:[['18 Haken: Gesamtbewertung, Stärken, Risiken … Exit-Strategien','ai-pdf-sec',3,'g','',18]]}
+  {t:'Investment-Analyse', q:'index.html:3157 (.ai-box)', ab:1, art:'info', text:'Knopf „Analyse starten" (Kontingent). Das Investment-PDF entsteht auch ohne Analyse.'},
+  {t:'Pilot-Analyse im PDF', q:'index.html:3174', ab:1, f:[['Analyse ins PDF übernehmen','ai-in-pdf',1,'o','']]},
+  {t:'Ankauf · Bestand · Zielbild', q:'wert-zielbild.js:564 (JS)', ab:1, art:'info', text:'Einfach: bis zu sechs Kernaussagen. Genau: alle Zahlen — der heutige Umschalter Einfach | Genau bleibt.'},
+  {t:'Bausteine im PDF', q:'index.html:3181', ab:3, f:[['18 Haken: Gesamtbewertung, Stärken, Risiken … Exit-Strategien','ai-pdf-sec',3,'g','',18]]}
  ]},
  {id:'s6', lbl:'Bewertung', titel:'Bewertung', desc:'Score, Kennzahlen, Cashflow — keine Eingaben', karten:[
-  {t:'DealPilot Score · Investor Deal Score', q:'index.html:3228 / 3250', ab:1, breit:1, art:'score'},
-  {t:'Kennzahlen-Bewertung', q:'index.html:3279', ab:2, art:'info', text:'Ampel je Kennzahl, lokal ohne Pilot-Anfrage.'},
-  {t:'Wertverlauf (AVM)', q:'index.html:3293', ab:3, art:'info', text:'Verlauf der Wertangaben.'},
-  {t:'Pilot-Kurzfazit', q:'index.html:3296', ab:2, art:'info', text:'Erscheint nach einer Pilot-Analyse.'},
-  {t:'Cashflow – Korrekte Berechnung', q:'index.html:3347', ab:1, art:'cashflow'},
-  {t:'Alle Kennzahlen', q:'index.html:3384', ab:2, art:'kpi'},
-  {t:'Bausparvertrag · Lebenszyklus', q:'index.html:3400', ab:3, art:'info', text:'Nur mit Bausparvertrag.'},
-  {t:'Wert & Zielbild', q:'wert-zielbild.js:771 (JS)', ab:1, art:'info', text:'Einfach: Kernaussagen zu Wert und Potenzial. Im Detail (Wertüberleitung, Wohnungen) ab Profi.'},
-  {t:'Vermögenszuwachs · 10 Jahre', q:'index.html:3416', ab:2, art:'info', text:'Tilgung + Wertsteigerung + Cashflow.'},
-  {t:'Zinsänderungsrisiko · Detail', q:'index.html:3471', ab:3, art:'info', text:'Anschlusszins-Szenarien.'},
-  {t:'Kennzahlen-Vergleich · Heute · Ende Zinsbindung', q:'index.html:3522', ab:3, art:'info', text:'Drei Phasen nebeneinander.'},
-  {t:'Cashflow-Projektion', q:'index.html:3569', ab:2, art:'info', text:'Verlauf über den Betrachtungszeitraum.'},
-  {t:'Wertpotenzial', q:'potenzial.js:2090 (JS)', ab:3, art:'info', text:'Detail unter „Wert & Zielbild".'}
+  {t:'DealPilot Score · Investor Deal Score', q:'index.html:3233 / 3255', ab:1, breit:1, art:'score'},
+  {t:'Kennzahlen-Bewertung', q:'index.html:3284', ab:2, art:'info', text:'Ampel je Kennzahl, lokal ohne Pilot-Anfrage.'},
+  {t:'Wertverlauf (AVM)', q:'index.html:3298', ab:3, art:'info', text:'Verlauf der Wertangaben.'},
+  {t:'Pilot-Kurzfazit', q:'index.html:3301', ab:2, art:'info', text:'Erscheint nach einer Pilot-Analyse.'},
+  {t:'Cashflow – Korrekte Berechnung', q:'index.html:3352', ab:1, art:'cashflow'},
+  {t:'Alle Kennzahlen', q:'index.html:3389', ab:1, art:'kpi'},
+  {t:'Bausparvertrag · Lebenszyklus', q:'index.html:3405', ab:3, art:'info', text:'Nur mit Bausparvertrag.'},
+  {t:'Wert & Zielbild', q:'wert-zielbild.js:771 (JS)', ab:1, art:'info', text:'Kernaussagen zu Wert und Potenzial. Im Detail (Wertüberleitung, Wohnungen) bei Experte.'},
+  {t:'Vermögenszuwachs · 10 Jahre', q:'index.html:3421', ab:2, art:'info', text:'Tilgung + Wertsteigerung + Cashflow.'},
+  {t:'Zinsänderungsrisiko · Detail', q:'index.html:3476', ab:3, art:'info', text:'Anschlusszins-Szenarien.'},
+  {t:'Kennzahlen-Vergleich · Heute · Ende Zinsbindung', q:'index.html:3527', ab:3, art:'info', text:'Drei Phasen nebeneinander.'},
+  {t:'Cashflow-Projektion', q:'index.html:3574', ab:2, art:'info', text:'Verlauf über den Betrachtungszeitraum.'},
+  {t:'Wertpotenzial', q:'potenzial.js:2251 (JS)', ab:3, art:'info', text:'Detail unter „Wert & Zielbild".'}
  ]},
  {id:'s8', lbl:'Deal-Aktion', titel:'Deal-Aktion', desc:'Was möchtest du als Nächstes tun?', karten:[
-  {t:'Bereit für die Bank?', q:'deal-action-boarding.js:118', ab:1, art:'bereit'},
-  {t:'Dokumente & Exporte', q:'deal-action-boarding.js:126', ab:1, breit:1, art:'pdf'},
-  {t:'Marktberichte', q:'deal-action-boarding.js:136', ab:2, art:'info', text:'Erzeugte Marktberichte als PDF.'},
-  {t:'Bordkarte & Unterlagen', q:'deal-action-boarding.js:140', ab:2, art:'info', text:'Bankgespräch vorbereiten: persönliche und Objekt-Unterlagen.'},
-  {t:'Dein Netzwerk', q:'deal-action-boarding.js:171', ab:1, art:'info', text:'Geprüfte Partner — Bankanfrage, Gutachten, Beratung. Objektdaten gehen mit.'},
-  {t:'In Gesellschaft überführen', q:'deal-action.js:612', ab:3, art:'info', text:'Privat-Objekt einfrieren, GmbH-Objekt anlegen.'}
+  {t:'Bereit für die Bank?', q:'deal-action-boarding.js:116 #dab-cockpit', ab:1, art:'bereit'},
+  {t:'Dokumente & Exporte', q:'deal-action-boarding.js:127 #dab-smart', ab:1, breit:1, art:'pdf'},
+  {t:'Marktberichte', q:'deal-action-boarding.js:137 #dab-mb-host', ab:2, art:'info', text:'Erzeugte Marktberichte als PDF (Marktbericht Stufe 2 ab hier).'},
+  {t:'Bordkarte & Unterlagen', q:'deal-action-boarding.js:168 #dab-dr-host', ab:2, art:'info', text:'Bankgespräch vorbereiten: persönliche und Objekt-Unterlagen.'},
+  {t:'Dein Netzwerk', q:'deal-action-boarding.js:172 #dab-rails-host', ab:1, art:'info', text:'Geprüfte Partner — Bankanfrage, Gutachten, Beratung. Objektdaten gehen mit.'},
+  {t:'In Gesellschaft überführen', q:'deal-action.js:609 #dpuew-stage', ab:3, art:'info', text:'Privat-Objekt einfrieren, GmbH-Objekt anlegen.'}
  ]}
 ];
 /* Merkmale des Investor Deal Score (deal-action-readycheck.js:23 FIELD_TARGETS) */
 var MERKMALE = [['Zins','d1z'],['Tilgung','d1t'],['Baujahr','baujahr'],['Energie','ds2_energie'],['Qualität (Gewerke)','gewerke'],['Mikrolage','mikrolage'],['Makrolage','makrolage'],
   ['Bevölkerung','ds2_bevoelkerung'],['Nachfrage','ds2_nachfrage'],['Mietwachstum','mietstg'],['Wertsteigerung','ds2_wertsteigerung'],['Entwicklung','ds2_entwicklung'],
-  ['Leerstand','leerstand'],['Instandhaltung','weg_r'],['Mietausfall','mietausfall'],['Marktmiete','ds2_marktmiete'],['Zustand','ds2_zustand']];
-var NAMEN = {1:'Einfach',2:'Standard',3:'Profi'};
+  ['Leerstand','leerstand'],['Instandhaltung','hg_nul'],['Mietausfall','mietausfall'],['Marktmiete','ds2_marktmiete'],['Zustand','ds2_zustand']];
+var NAMEN = {1:'Einsteiger',2:'Fortgeschritten',3:'Experte'};
 
 /* Felder-Verzeichnis */
 var FELD = {};
@@ -310,15 +310,16 @@ function rechnung(){
   var gi = kp * (1 + nkP/100);
   var ekEig = eigene.ek != null && eigene.ek !== '';
   var ek = ekEig ? (num(eigene.ek)||0) : Math.round(kp * 0.10);
-  var d1Eig = stufe >= 2 && eigene.d1 != null && eigene.d1 !== '';
+  var d1Eig = eigene.d1 != null && eigene.d1 !== '';
   var d1 = d1Eig ? num(eigene.d1) : Math.max(0, gi - ek);
   var z = (num(wert('d1z'))||0)/100, t = (num(wert('d1t'))||0)/100;
   var rate = d1 * (z + t) / 12;
-  var nul = nkm * ((num(wert('bwk_nul_pct'))||0) + 1) / 100;
+  var nul = ((num(wert('hg_nul'))||0) + (num(wert('eigen_r'))||0) + (num(wert('mietausfall'))||0)) / 12;
   var cf = nkm - nul - rate;
   return {kp:kp, nkm:nkm, nkP:nkP, gi:gi, ek:ek, ekEig:ekEig, d1:d1, d1Eig:d1Eig, rate:rate, nul:nul, cf:cf,
     brutto: kp ? nkm*12/kp*100 : 0, dscr: rate ? (nkm - nul)/rate : 0};
 }
+function afaNachBaujahr(){ var bj = parseInt(wert('baujahr'), 10); return !bj ? '2,0' : bj > 2022 ? '3,0' : bj < 1925 ? '2,5' : '2,0'; }
 function feldHtml(F){
   if (F.art === 'g') return '<div class="gruppe">▦ <span>' + esc(F.lbl) + '</span><span class="n">' + F.n + ' Felder</span></div>';
   var cls = 'f' + (F.art === 'v' && !eigene[F.id] ? ' v' : '') + (F.art === 'a' ? ' a' : '') + (neu[F.id] ? ' neu' : '');
@@ -329,6 +330,8 @@ function feldHtml(F){
   if (neu[F.id]) chip += '<span class="chip n">neu</span>';
   var w = eigene[F.id] != null ? eigene[F.id] : (F.art === 'v' || F.art === 'a' ? F.wert : '');
   if (F.id === 'ek' && !eigene.ek) w = String(Math.round((num(wert('kp'))||0) * 0.10));
+  if (F.id === 'd1' && !eigene.d1) w = String(Math.round(rechnung().d1));
+  if (F.id === 'afa_satz' && !eigene.afa_satz) w = afaNachBaujahr();
   return '<div class="' + cls + '"><label for="i-' + F.id + '">' + esc(F.lbl) + ' ' + chip + '</label>'
     + '<input id="i-' + F.id + '" data-id="' + F.id + '" value="' + esc(w) + '" placeholder="' + (F.art === 'v' ? 'Vorgabe' : 'leer') + '"' + (F.art === 'a' ? ' readonly' : '') + '></div>';
 }
@@ -342,15 +345,15 @@ function karteHtml(k){
   if (k.f){
     var vis = k.f.map(function(f){ return FELD[f[1]]; }).filter(function(F){ return sichtbar(F, stufe); });
     h += '<div class="felder">' + vis.map(feldHtml).join('') + '</div>';
-    if (k.abgeleitet && !R.d1Eig) h += '<div class="vorg">Darlehensbetrag <b>abgeleitet</b>: Gesamtkosten ' + eur(R.gi) + ' − Eigenkapital ' + eur(R.ek) + ' = <b>' + eur(R.d1) + '</b> (wie im Quick-Check, <span class="mono">quick-check.js:1978</span>).</div>';
+    if (k.abgeleitet && !R.d1Eig) h += '<div class="vorg">Darlehensbetrag <b>abgeleitet</b>: Gesamtkosten ' + eur(R.gi) + ' − Eigenkapital ' + eur(R.ek) + ' = <b>' + eur(R.d1) + '</b> (läuft schon heute mit: <span class="mono">financing.js:843</span>, überschreibbar).</div>';
     var vv = versteckteVorgaben(k);
     if (vv.length) h += '<div class="vorg">Rechnet mit Vorgabe: ' + vv.map(function(F){ return esc(F.lbl.replace(/ %.*| €.*/,'')) + ' <b>' + esc(wert(F.id)) + (F.lbl.indexOf('%') >= 0 ? ' %' : '') + '</b>'; }).join(' · ') + '</div>';
   }
   if (k.art === 'info') h += '<div class="info">' + esc(k.text) + '</div>';
   if (k.art === 'finanz') h += '<div class="kv"><span>Gesamtkosten (inkl. ' + R.nkP.toFixed(2).replace('.', ',') + ' % NK)</span><span>' + eur(R.gi) + '</span><span>Eigenkapital' + (R.ekEig ? '' : ' · Vorgabe 10 %') + '</span><span>' + eur(R.ek) + '</span><span>Darlehen</span><span>' + eur(R.d1) + '</span><span>Rate / Monat</span><span>' + eur(R.rate) + '</span></div>';
-  if (k.art === 'bwk') h += '<div class="kv"><span>nicht umlagefähig (' + esc(wert('bwk_nul_pct')) + ' % NKM)</span><span>' + eur(R.nkm * (num(wert('bwk_nul_pct'))||0) / 100) + '/M</span><span>Mietausfall (1 % NKM)</span><span>' + eur(R.nkm*0.01) + '/M</span></div>'
-    + (stufe < 2 ? '<div class="vorg">Bewirtschaftung je Objektart aus den Einstellungen (<span class="mono">bwk-profil.js</span>). Eigene Beträge ab Standard.</div>' : '');
-  if (k.art === 'steuer') h += '<div class="info">Steuerwirkung je Jahr mit Grenzsteuersatz <b>' + esc(wert('grenz')) + ' %</b>' + (stufe < 2 ? ', AfA <b>2,0 %</b> auf <b>80 %</b> Gebäudeanteil (Vorgaben)' : '') + '.</div>';
+  if (k.art === 'bwk') h += '<div class="kv"><span>umlagefähig / Jahr</span><span>' + eur(num(wert('hg_ul'))||0) + '</span><span>nicht umlagefähig / Jahr</span><span>' + eur(R.nul*12) + '</span></div>'
+    + '<div class="vorg">Hausgeld und Rücklage setzt <span class="mono">bwk-profil.js</span> je Objektart, sobald Objektart und Wohnfläche stehen; Mietausfall 1 % der Jahresmiete (<span class="mono">investment-profile.js:582</span>).</div>';
+  if (k.art === 'steuer') h += '<div class="info">Steuerwirkung je Jahr mit Grenzsteuersatz <b>' + esc(wert('grenz')) + ' %</b>' + (stufe < 2 ? ', AfA <b>' + afaNachBaujahr() + ' %</b> nach Baujahr auf <b>80 %</b> Gebäudeanteil (Vorgaben)' : '') + '.</div>';
   if (k.art === 'cashflow') h += '<div class="kv"><span>Nettokaltmiete</span><span>' + eur(R.nkm) + '</span><span>nicht umlagefähige Kosten</span><span class="neg">' + eur(-R.nul) + '</span><span>Rate</span><span class="neg">' + eur(-R.rate) + '</span><span><b>Cashflow vor Steuern / Monat</b></span><span class="' + (R.cf >= 0 ? 'pos' : 'neg') + '">' + eur(R.cf) + '</span></div>';
   if (k.art === 'kpi') h += '<div class="kv"><span>Bruttomietrendite</span><span>' + R.brutto.toFixed(2).replace('.', ',') + ' %</span><span>DSCR</span><span>' + R.dscr.toFixed(2).replace('.', ',') + '</span><span>Faktor</span><span>' + (R.nkm ? (R.kp/(R.nkm*12)).toFixed(1).replace('.', ',') : '–') + '</span></div>';
   if (k.art === 'score') h += scoreHtml(R);
@@ -385,14 +388,14 @@ function bereitHtml(){
   var P = pflichtListe(stufe), fehlt = P.filter(function(F){ return !eigene[F.id]; });
   var ok = P.length - fehlt.length;
   return '<div class="info">Pflicht in <b>' + NAMEN[stufe] + '</b>: ' + ok + ' von ' + P.length + ' erfasst' + (fehlt.length ? ' — fehlt: ' + fehlt.map(function(F){ return esc(F.lbl); }).join(', ') : ' — <b style="color:#3FA56C">startklar</b>') + '.</div>'
-    + '<div class="vorg">Heute zählt die Bereitschaft die 17 Score-Merkmale immer mit (<span class="mono">deal-action-readycheck.js:23</span>). In Einfach hieße das „Bank nicht bereit", obwohl das PDF entsteht — die Zählung muss der Stufe folgen.</div>';
+    + '<div class="vorg">Vorschlag: Heute zählt die Bereitschaft die 17 Score-Merkmale immer (<span class="mono">deal-action-readycheck.js:232</span>). Künftig nur, was in der gewählten Stufe sichtbar oder erfasst ist; der Rest erscheint als „wird mit Vorgabe gerechnet".</div>';
 }
 function pdfHtml(){
   var vg = Object.keys(FELD).map(function(id){ return FELD[id]; }).filter(function(F){ return F.art === 'v' && !eigene[F.id]; });
   return '<div class="pdf"><div class="blatt"><div class="bk">DealPilot · Investment</div><div class="z g"></div><div class="z"></div><div class="z k"></div><div class="z"></div><div class="z k"></div><div class="z g"></div><div class="z"></div><div class="z"></div><div class="z k"></div><div class="an">Annahmen (Vorgaben) · ' + vg.length + '</div><div class="z k"></div><div class="z k"></div></div>'
     + '<div><div class="zeile"><div class="t"><b>Investment-PDF</b><small>Business-Case: Kaufpreis, Finanzierung, Cashflow, DSCR/LTV, Score — in jeder Stufe.</small></div><button class="knopf gold" type="button" onclick="toast(\'BEISPIEL: Investment-PDF entsteht aus ' + NAMEN[stufe] + ' — ' + vg.length + ' Werte als Vorgabe gekennzeichnet.\')">PDF erzeugen</button></div>'
-    + (stufe >= 2 ? '<div class="zeile"><div class="t">Finanzamt (Steuer) · Kaufpreisaufteilung<small>ab Standard</small></div></div>' : '')
-    + (stufe >= 3 ? '<div class="zeile"><div class="t">Track Record<small>ab Profi</small></div></div>' : '')
+    + (stufe >= 2 ? '<div class="zeile"><div class="t">Finanzamt (Steuer) · Kaufpreisaufteilung<small>ab Fortgeschritten</small></div></div>' : '')
+    + (stufe >= 3 ? '<div class="zeile"><div class="t">Track Record<small>bei Experte</small></div></div>' : '')
     + '<p class="info" style="margin:8px 0 0">Im PDF stehen die Vorgaben in einem Block <b>„Annahmen"</b>: ' + vg.slice(0, 8).map(function(F){ return esc(F.lbl.replace(/ %.*| €.*/,'')) + ' ' + esc(wert(F.id)); }).join(' · ') + (vg.length > 8 ? ' …' : '') + '</p></div></div>';
 }
 function render(){
@@ -443,7 +446,7 @@ document.getElementById('szenario').addEventListener('click', function(){
   eigene = {}; neu = {};
   ['str','hnr','plz','ort','objart','wfl','baujahr','kp','nkm','makrolage'].forEach(function(id){ eigene[id] = FELD[id].wert; });
   stufe = 1; tab = 's0'; render();
-  toast('Objekt in <b>Einfach</b> angelegt: 10 Angaben, der Rest kommt aus den Einstellungen. In 3 Sekunden wird auf Standard erweitert …');
+  toast('Objekt als <b>Einsteiger</b> angelegt: 10 Angaben, der Rest kommt aus den Einstellungen. In 3 Sekunden wird auf Fortgeschritten erweitert …');
   setTimeout(function(){ stufeSetzen(2); }, 3000);
 });
 (function start(){
