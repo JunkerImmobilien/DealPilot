@@ -4,21 +4,22 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
 <style>
 /* Layout: der ganze Reiter Pilot-Analyse wie in der App. Objektkopf, Hauptreiter, darin Phase
-   (automatisch), Unterreiter, Einfach/Detail, Pilot-Fragenzeile, Inhalt. Fassung 3. */
+   (automatisch), Unterreiter, Einfach/Detail, PDF, Pilot-Fragenzeile, Inhalt. Fassung 4. */
 :root{
-  --bg:#FDFCFA; --tafel:#FFFFFF; --karte:#FBF6E9; --fg:#1d1b19; --mut:#6b6660; --linie:#e8e1d2;
+  --bg:#FDFCFA; --tafel:#FFFFFF; --karte:#FBF6E9; --fg:#1d1b19; --mut:#6b6660; --linie:#e8e1d2; --gitter:#efe9dc;
   --obs:#050505; --obs-fg:#f1ede5; --obs-mut:#a49d92;
   --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f; --gold-text:#8a6d1f;
   --gruen:#3FA56C; --gruen-bg:#e6f3eb; --rot:#B8625C; --rot-bg:#f6e7e5; --gelb:#b88a1f; --gelb-bg:#f8efd6; --plan:#9b958c;
+  --c1:#2f6db5; --c2:#a6812a;   /* Grafikreihen, geprüft (Helligkeit, Sättigung, Farbsehschwäche, Kontrast) */
   --s1:#8fa3b8; --s2:#C9A84C; --s3:#3FA56C;
   --f-disp:"Space Grotesk",system-ui,sans-serif; --f-body:Inter,system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --obs:#000000;
-  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --plan:#7d776e; color-scheme:dark}}
+  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --gitter:#221f1a; --obs:#000000;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --plan:#7d776e; --c1:#4a86cf; --c2:#a6812a; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --obs:#000000;
-  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --plan:#7d776e; color-scheme:dark}
+  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --gitter:#221f1a; --obs:#000000;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --plan:#7d776e; --c1:#4a86cf; --c2:#a6812a; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font:400 14px/1.5 var(--f-body);margin:0}
 .wrap{max-width:1160px;margin:0 auto;padding-block:20px 70px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:14px}
@@ -38,7 +39,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 .hauptreiter{display:flex;gap:2px;overflow-x:auto;background:var(--obs);padding:0 10px;border-top:1px solid #1d1b19}
 .hauptreiter span{font:500 12.5px var(--f-disp);color:var(--obs-mut);padding:10px 12px;white-space:nowrap;border-bottom:2px solid transparent}
 .hauptreiter span.an{color:var(--gold-hi);border-bottom-color:var(--gold)}
-.innen{padding:18px;display:grid;gap:14px}
+.innen{padding:18px;display:grid;gap:14px;min-width:0}
 
 .steuerzeile{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .reihe{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -48,8 +49,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 .phase-chip{font:600 12px var(--f-disp);padding:6px 12px;border-radius:8px;background:var(--karte)}
 .phase-info{font-size:12px;color:var(--mut)}
 .demo-schalter{font-size:11.5px;color:var(--mut);border:1px dashed var(--linie);background:transparent;border-radius:7px;padding:4px 8px;cursor:pointer}
-.unterreiter{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--linie)}
-.unterreiter button{border:0;background:transparent;color:var(--mut);font:600 13px var(--f-disp);padding:9px 12px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.unterreiter{display:flex;gap:2px;overflow-x:auto;overflow-y:hidden;border-bottom:1px solid var(--linie);scrollbar-width:thin}
+.unterreiter button{border:0;background:transparent;color:var(--mut);font:600 13px var(--f-disp);padding:9px 11px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
 .unterreiter button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--gold)}
 
 .fragen{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -74,9 +75,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 .briefing .urteil .zahl{font-size:34px}
 .briefing .urteil .unter{display:block;font:500 12px var(--f-body);color:var(--obs-mut);margin-top:6px}
 .briefing p{font-size:13.5px;color:var(--obs-fg)}
+.briefing p + p{margin-top:6px}
 .briefing ul{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--obs-fg);display:grid;gap:3px}
 .briefing .quelle{grid-column:2;font-size:11.5px;color:var(--obs-mut)}
 @media (max-width:620px){.briefing{grid-template-columns:1fr}.briefing .quelle{grid-column:1}}
+
+.text-abschnitte{display:grid;gap:10px}
+.ta{border-left:3px solid var(--gold);padding:2px 0 2px 14px;display:grid;gap:4px}
+.ta h4{margin:0;font:600 10.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-text)}
+.ta p{font-size:13.5px}
 
 .karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .k{background:var(--karte);border-radius:12px;padding:12px 14px;display:grid;gap:5px;align-content:start;min-width:0}
@@ -86,7 +93,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 .rk{border-radius:12px;padding:12px 14px;background:var(--tafel);border:1px solid var(--linie);border-top:4px solid var(--rot);display:grid;gap:4px;align-content:start;min-width:0}
 .rk.mittel{border-top-color:var(--gold)} .rk.niedrig{border-top-color:var(--gruen)} .rk.neutral{border-top-color:var(--fg)}
 .rk h4{margin:0;font:600 14px var(--f-disp)} .rk p{font-size:12.5px;line-height:1.45}
-.rk .gross{font:700 22px var(--f-disp)}
+.rk .gross{font:700 22px var(--f-disp);font-variant-numeric:tabular-nums}
+.rk dl{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin:4px 0 0;font-size:12.5px;font-variant-numeric:tabular-nums}
+.rk dt{color:var(--mut)} .rk dd{margin:0;text-align:right;font-weight:600}
+.karten.breit{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
 
 .tab-box{overflow-x:auto;border:1px solid var(--linie);border-radius:12px}
 table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
@@ -95,6 +105,8 @@ th small{display:block;font:500 11px var(--f-body);letter-spacing:0;text-transfo
 td{padding:8px 10px;border-bottom:1px solid var(--linie);vertical-align:top}
 tr:last-child td{border-bottom:0}
 tr.gruppe td{background:var(--karte);font:600 10.5px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut);padding:6px 10px}
+tr.summe td{font-weight:600;border-top:1.5px solid var(--fg)}
+tr.ein td:first-child{padding-left:22px}
 tr.aus td{opacity:.45}
 td.z,th.z{text-align:right;white-space:nowrap}
 td.gut{color:var(--gruen)} td.schlecht{color:var(--rot)}
@@ -105,17 +117,36 @@ td small{display:block;color:var(--mut);font-size:11.5px;white-space:normal}
 .spalten{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:12px}
 @media (max-width:860px){.spalten{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.spalten{grid-template-columns:1fr}}
-.spalte{border:1px solid var(--linie);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start}
+.spalte{border:1px solid var(--linie);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
 .spalte.heute{border-color:var(--gold)}
 .spalte .zeit{font-size:12px;color:var(--mut)}
 .spalte dl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;margin:0;font-size:13px;font-variant-numeric:tabular-nums}
 .spalte dt{color:var(--mut)} .spalte dd{margin:0;text-align:right;font-weight:600}
+.spalte dd small{display:block;font-weight:400;color:var(--mut);font-size:11px}
 
-.chart-box{overflow-x:auto}
+/* Grafiken */
+.grafik{border:1px solid var(--linie);border-radius:12px;padding:14px 14px 10px;display:grid;gap:8px;min-width:0}
+.grafik-kopf{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.grafik-kopf h3{font-size:14px}
+.chart-box{position:relative;overflow-x:auto;overflow-y:hidden}
 .chart-box svg{display:block;width:100%;min-width:560px;height:auto}
-.legende{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);align-items:center}
-.legende i{display:inline-block;width:18px;height:0;border-top:2px dashed var(--plan);vertical-align:middle;margin-right:6px}
-.legende .pkt{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.chart-box .achse{font:500 11px var(--f-mono);fill:var(--mut)}
+.chart-box .marke{font:500 11px var(--f-body);fill:var(--mut)}
+.chart-box .wert-lbl{font:600 12px var(--f-disp);fill:var(--fg)}
+.chart-box .treffer{fill:transparent;cursor:crosshair}
+.chart-box .fadenkreuz{stroke:var(--mut);stroke-width:1;stroke-dasharray:2 3;opacity:0;pointer-events:none}
+.tip{position:absolute;pointer-events:none;background:var(--obs);color:var(--obs-fg);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.45;min-width:170px;box-shadow:0 6px 18px rgba(0,0,0,.18);opacity:0;transition:opacity .12s;z-index:2;font-variant-numeric:tabular-nums}
+.tip b{display:block;font:600 10.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--obs-mut);margin-bottom:3px}
+.tip .z{display:flex;justify-content:space-between;gap:14px}
+.tip .z i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.legende{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mut);align-items:center}
+.legende .sw{display:inline-block;vertical-align:middle;margin-right:6px}
+.sw.linie{width:18px;height:0;border-top:2.5px solid var(--c2)}
+.sw.plan{width:18px;height:0;border-top:2px dashed var(--plan)}
+.sw.balken{width:10px;height:12px;border-radius:2px 2px 0 0;background:var(--c1)}
+.sw.punkt{width:9px;height:9px;border-radius:50%;background:var(--c1)}
+.sw.raute{width:8px;height:8px;background:var(--c2);transform:rotate(45deg)}
+.sw.spanne{width:4px;height:14px;border-radius:2px;background:var(--c1);opacity:.3}
 
 .abruf{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--karte);border-radius:12px;padding:10px 12px}
 select{font:500 13px var(--f-body);padding:6px 8px;border-radius:8px;border:1px solid var(--linie);background:var(--tafel);color:var(--fg)}
@@ -132,20 +163,26 @@ select{font:500 13px var(--f-body);padding:6px 8px;border-radius:8px;border:1px 
 input[type=range]{width:100%;accent-color:var(--gold)}
 .raster2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px}
 @media (max-width:760px){.raster2{grid-template-columns:1fr}}
-.dok{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--linie);font-size:13px}
-.dok:last-child{border-bottom:0}
-.dok small{display:block;color:var(--mut);font-size:11.5px}
 .ablage{border:1.5px dashed var(--gold);border-radius:12px;padding:12px;text-align:center;font-size:12.5px;color:var(--mut);background:var(--karte)}
 .ablage b{display:block;color:var(--fg);font:600 13.5px var(--f-disp)}
 .schutz{font-size:12px;color:var(--mut);display:flex;gap:8px;align-items:flex-start}
 .schutz::before{content:"";flex:0 0 8px;height:8px;margin-top:5px;border-radius:2px;background:var(--gruen)}
+
+/* PDF-Auswahl */
+.pdf-tafel{border:1px solid var(--gold);border-radius:12px;padding:14px 16px;display:grid;gap:12px;background:var(--tafel)}
+.pdf-gruppen{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 18px}
+.pdf-gruppe{display:grid;gap:5px;align-content:start}
+.pdf-gruppe label{font-size:13px;display:flex;gap:7px;align-items:flex-start}
+.pdf-gruppe label input{margin-top:3px}
+.pdf-gruppe label.gesperrt{color:var(--mut)}
+.pdf-gruppe label small{display:block;color:var(--mut);font-size:11.5px}
 
 .notiz{background:var(--karte);border-radius:14px;padding:18px 20px;display:grid;gap:10px}
 .notiz ul{margin:0;padding-left:18px;display:grid;gap:6px;max-width:84ch}
 </style>
 
 <div class="wrap">
-  <div class="demo-hinweis"><span class="lbl">Demo · Reiter Pilot-Analyse · Fassung 3 · 02.11.2026</span><span>Beispielobjekt, alle Zahlen erfunden und in sich gerechnet</span></div>
+  <div class="demo-hinweis"><span class="lbl">Demo · Reiter Pilot-Analyse · Fassung 4 · 02.11.2026</span><span>Beispielobjekt, alle Zahlen erfunden und in sich gerechnet</span></div>
 
   <div class="app">
     <div class="objkopf">
@@ -163,11 +200,15 @@ input[type=range]{width:100%;accent-color:var(--gold)}
           <span class="phase-info" id="phase-info"></span>
           <button type="button" class="demo-schalter" id="demo-phase">Demo: andere Phase zeigen</button>
         </div>
-        <div class="seg" role="group" aria-label="Ansicht">
-          <button type="button" data-modus="einfach" aria-pressed="true">Einfach</button>
-          <button type="button" data-modus="detail" aria-pressed="false">Detail</button>
+        <div class="reihe">
+          <button type="button" class="btn leise" id="pdf-auf" aria-expanded="false" aria-controls="pdf-tafel">PDF zusammenstellen</button>
+          <div class="seg" role="group" aria-label="Ansicht">
+            <button type="button" data-modus="einfach" aria-pressed="true">Einfach</button>
+            <button type="button" data-modus="detail" aria-pressed="false">Detail</button>
+          </div>
         </div>
       </div>
+      <div class="pdf-tafel" id="pdf-tafel" hidden></div>
       <div class="unterreiter" role="tablist" id="unterreiter"></div>
       <div class="fragen" id="fragen" role="group" aria-label="Pilot fragen"></div>
       <div class="antwort" id="antwort" aria-live="polite" hidden></div>
@@ -176,32 +217,38 @@ input[type=range]{width:100%;accent-color:var(--gold)}
   </div>
 
   <section class="notiz">
-    <span class="lbl">Was sich gegenüber Fassung 2 geändert hat</span>
+    <span class="lbl">Was sich gegenüber Fassung 3 geändert hat</span>
     <ul>
-      <li><b>Die Phase wechselt automatisch:</b> Ankauf, solange das Objekt nicht gewonnen ist, danach Bestand. Der Knopf „Demo: andere Phase zeigen“ gibt es nur hier.</li>
-      <li><b>Ankauf · Soll · Zielbild schon im Ankauf:</b> mit der gesetzlich umsetzbaren Soll-Miete, Marktpreisindikation mit Spanne, Herkunft und Abschlag sowie Ertragswert je Spalte. Das ist die Tabelle für das Bankgespräch. Im Bestand kommen die Spalten Bestand (Ist) und Soll dazu.</li>
-      <li><b>Übersicht im Bestand ohne „Halten“:</b> Stattdessen steht dort der Kurs, also ob das Objekt im Plan liegt, und darunter, was als Nächstes zu tun ist. Im Ankauf steht der Investor Deal Score mit Empfehlung.</li>
-      <li><b>Führendes Verfahren:</b> In Karten und Spalten erscheint nur das führende Verfahren (hier Ertragswert, vermietete Wohnung). Im Detail stehen alle Verfahren mit Spanne, das führende ist markiert.</li>
-      <li><b>Wert &amp; Verlauf:</b> Marktbericht direkt abrufen, die neue Zeile erscheint in der Tabelle. Jeder Bericht lässt sich aus der Bewertung nehmen oder endgültig löschen; gelöscht ist er auch im Tab Deal Score weg.</li>
-      <li><b>Unterlagen &amp; WEG:</b> Einfach zeigt die Karten wie heute (was Geld kostet, Gemeinschaft, These, Risiken). Im Detail stehen Beschlüsse, Hausgeld-Verlauf, Unterlagenliste und die Übernahme aus dem Wirtschaftsplan, die nie vorgehakt ist.</li>
+      <li><b>Marktpreisindikation auf allen Karten</b> (Ankauf, Bestand, Soll, Zielbild): vorne der Durchschnitt mit Abschlag, darunter „ohne Abschlag“. Die Spanne steht nur im Detail. Soll hat denselben Marktpreis wie Bestand, denn eine höhere Miete ändert den Angebotspreis vergleichbarer Wohnungen nicht. Zielbild rechnet mit der besseren Ausstattung nach Bad und Küche.</li>
+      <li><b>Ertragswert ohne Spanne.</b> DealPilot rechnet einen festen Ertragswert. Die Spannen aus Fassung 3 (189–208 T€ usw.) hatte ich aus einer Spanne des Liegenschaftszinses abgeleitet, also erfunden. Sie sind überall raus, auch in Grafik, Berichtstabelle und Pilot-Antworten.</li>
+      <li><b>Gesamtbewertung als Text:</b> Einfach zeigt wenige Sätze. Detail zeigt sie ausführlich wie das heutige Briefing: Gesamtbewertung, Bestand und Strategie (nur Bestand), Investmentbewertung, Investor-Fit und DealPilot-Insight.</li>
+      <li><b>Neuer Unterreiter „Risiken &amp; Szenarien“</b> in beiden Phasen: Stärken, Risiken, Risikoanalyse sowie Worst und Best Case. Neu ist der <b>Plan</b> in der Mitte, also deine Eingaben. Einen eigenen Base Case gibt es heute nicht. In den Ankauf gehören die Stärken und Risiken für die Bank und die Szenarien. Der Stresstest mit Reglern bleibt bei der Finanzierung.</li>
+      <li><b>Neuer Unterreiter „Lage &amp; Markt“</b> mit Makrolage, Mikrolage und Entwicklung. Jede Zeile nennt ihre Stufe und ihre Herkunft. Zeitreihen zu Bevölkerung, Kaufkraft oder Mieten haben wir heute nicht. Deshalb gibt es dort Werte zu einem Zeitpunkt und keine Verlaufsgrafik.</li>
+      <li><b>PDF zusammenstellen</b> (Knopf oben): Die Bausteine sind nach Unterreitern geordnet wie heute. Risiken und Szenarien sind für die Bank angehakt. Unterlagen &amp; WEG kommen nicht ins PDF.</li>
+      <li><b>Grafiken neu:</b> Wertverlauf und Steuerverlauf haben eine gemeinsame Euro-Achse, ein Fadenkreuz mit Werten beim Überfahren und eine Legende. Die Farben sind auf Farbsehschwäche geprüft. Der Steuerverlauf zeigt Balken für das Ergebnis Anlage V und eine Linie für den Cashflow nach Steuer. Markiert sind Sonderumlage, Zinsbindungsende und das Ende der Frist nach § 23 EStG.</li>
+      <li><b>Steuer erklärt:</b> Die Tabelle zeigt Einnahmen und Werbungskosten nach den Gruppen des Reiters Steuer: Finanzierung, Betriebskosten, Verwaltung, Sonstiges, AfA sowie Erhaltung und anschaffungsnaher Aufwand. Darunter steht die Steuerwirkung. Steuer gibt es jetzt auch im Ankauf, dort als Plan.</li>
     </ul>
   </section>
 </div>
 
 <script>
 (function(){
-  var S = { phase: 'bestand', modus: 'einfach', reiter: { bestand: 'uebersicht', ankauf: 'uebersicht' }, frage: null };
+  var S = { phase: 'bestand', modus: 'einfach', reiter: { bestand: 'uebersicht', ankauf: 'uebersicht' }, frage: null, pdf: false };
   var eur = function(x){ return Math.round(x).toLocaleString('de-DE') + ' €'; };
+  var sEur = function(x){ var r = Math.round(x); return (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r).toLocaleString('de-DE') + ' €'; };
   var te = function(x){ return Math.round(x / 1000).toLocaleString('de-DE') + ' T€'; };
   var de = function(x, n){ return Number(x).toLocaleString('de-DE', { minimumFractionDigits: n, maximumFractionDigits: n }); };
   var pill = function(a, t){ return '<span class="pill p-' + a + '">' + t + '</span>'; };
   var stufe = function(n){ return n ? '<span class="stufe st' + n + '">Stufe ' + n + '</span>' : '<span class="stufe st0">Kaufpreis</span>'; };
   var FUEHR = '<span class="fuehrend">führend</span>';
+  var ABSCHLAG = 0.09;
+  var ohneAbschlag = function(v){ return Math.round(v / (1 - ABSCHLAG) / 100) * 100; };
   var karte = function(lbl, chip, wert, p, satz){
     return '<div class="k"><div class="kopf"><span class="lbl">' + lbl + '</span>' + (chip || '') + '</div><span class="w">' + wert + '</span>'
       + (p ? '<span>' + p + '</span>' : '') + (satz ? '<span class="s">' + satz + '</span>' : '') + '</div>';
   };
   var absatz = function(t, von){ return '<div class="absatz"><b class="von">' + (von || 'Pilot') + '</b>' + t + '</div>'; };
+  var abschnitte = function(liste){ return '<div class="text-abschnitte">' + liste.map(function(a){ return '<div class="ta"><h4>' + a[0] + '</h4><p>' + a[1] + '</p></div>'; }).join('') + '</div>'; };
   function tabelle(kopf, zeilen){
     return '<div class="tab-box"><table><thead><tr>' + kopf.map(function(k, i){ return '<th' + (i ? ' class="z"' : '') + '>' + k + '</th>'; }).join('') + '</tr></thead><tbody>'
       + zeilen.map(function(z){
@@ -211,59 +258,63 @@ input[type=range]{width:100%;accent-color:var(--gold)}
   }
 
   var REITER = {
-    ankauf:  [['uebersicht','Übersicht'],['abz','Ankauf · Soll · Zielbild'],['wert','Wert & Verlauf'],['kaufpreis','Kaufpreis & Offerte'],['finanz','Finanzierung & Stresstest'],['weg','Unterlagen & WEG']],
-    bestand: [['uebersicht','Übersicht'],['abz','Ankauf · Bestand · Soll · Zielbild'],['wert','Wert & Verlauf'],['steuer','Steuer'],['weg','Unterlagen & WEG'],['exit','Anschluss & Exit']]
+    ankauf:  [['uebersicht','Übersicht'],['abz','Ankauf · Soll · Zielbild'],['wert','Wert & Verlauf'],['lage','Lage & Markt'],['risiko','Risiken & Szenarien'],['kaufpreis','Kaufpreis & Offerte'],['finanz','Finanzierung & Stresstest'],['steuer','Steuer'],['weg','Unterlagen & WEG']],
+    bestand: [['uebersicht','Übersicht'],['abz','Ankauf · Bestand · Soll · Zielbild'],['wert','Wert & Verlauf'],['lage','Lage & Markt'],['steuer','Steuer'],['risiko','Risiken & Szenarien'],['weg','Unterlagen & WEG'],['exit','Anschluss & Exit']]
   };
 
   /* ═══ Gegenüberstellung ═══
      Spalten: a = Ankauf (Offerte 189.000, Miete 650), i = Bestand heute (Ist 720), s = Soll (gesetzlich
-     umsetzbar), z = Zielbild 2028 (Bad + Küche 18.000 €). Im Ankauf sind Soll und Zielbild Plan. */
+     umsetzbar), z = Zielbild 2028 (Bad + Küche 18.000 €). Im Ankauf sind Soll und Zielbild Plan.
+     Ertragswert: ein Wert, keine Spanne. Marktpreisindikation: Durchschnitt mit Abschlag 9 %,
+     Spanne nur im Detail. Soll = Marktpreis wie Bestand (Miete ändert den Angebotspreis nicht),
+     Zielbild = Marktpreis bei besserer Ausstattung. */
   var SP = {
     ankauf:  [['a', 'Ankauf', 'zur Offerte 189.000 €'], ['s', 'Soll', 'gesetzlich umsetzbar, ab 03/2027'], ['z', 'Zielbild', 'nach Bad und Küche, 2028']],
     bestand: [['a', 'Ankauf', 'eingefroren 03/2024'], ['i', 'Bestand', 'heute, 11/2026'], ['s', 'Soll', 'gesetzlich umsetzbar, ab 04/2027'], ['z', 'Zielbild', 'nach Bad und Küche, 2028']]
   };
   var Z = {
     ankauf: {
-      miete:   { a: 650, s: 700, z: 828 }, qm: { a: 9.03, s: 9.72, z: 11.50 },
-      ew:      { a: 186000, s: 194000, z: 226000 }, ewsp: { a: [178000, 195000], s: [186000, 203000], z: [216000, 237000] },
-      mp:      { a: 192000, s: null, z: null }, mpsp: { a: [180000, 204000] },
-      hg:      { a: 285, s: 302, z: 309 }, nu: { a: 60, s: 64, z: 65 },
-      cf:      { a: -60, s: -14, z: 113 }, br: { a: 4.13, s: 4.44, z: 4.80 }, dscr: { a: 0.91, s: 0.98, z: 1.17 },
-      rs:      { a: 150000, s: 139900, z: 136600 }
+      miete: { a: 650, s: 700, z: 828 }, qm: { a: 9.03, s: 9.72, z: 11.50 },
+      ew:    { a: 186000, s: 194000, z: 226000 },
+      mp:    { a: 192000, s: 192000, z: 201000 }, mpsp: { a: [180000, 204000], s: [180000, 204000], z: [189000, 212000] },
+      mpw:   { a: 'Marktbericht 12.02.2024', s: 'wie Ankauf, die Miete ändert den Marktpreis nicht', z: 'Ausstattung nach Bad und Küche' },
+      hg:    { a: 285, s: 302, z: 309 }, nu: { a: 60, s: 64, z: 65 },
+      cf:    { a: -60, s: -14, z: 113 }, br: { a: 4.13, s: 4.44, z: 4.80 }, dscr: { a: 0.91, s: 0.98, z: 1.17 },
+      rs:    { a: 150000, s: 139900, z: 136600 }
     },
     bestand: {
-      miete:   { a: 650, i: 720, s: 749, z: 828 }, qm: { a: 9.03, i: 10.00, s: 10.40, z: 11.50 },
-      ew:      { a: 186000, i: 198000, s: 204000, z: 226000 }, ewsp: { a: [178000, 195000], i: [189000, 208000], s: [195000, 214000], z: [216000, 237000] },
-      mp:      { a: 192000, i: 205000, s: null, z: null }, mpsp: { a: [180000, 204000], i: [192000, 214000] },
-      hg:      { a: 285, i: 312, s: 338, z: 345 }, nu: { a: 60, i: 84, s: 97, z: 99 },
-      cf:      { a: -60, i: -14, s: 2, z: 79 }, br: { a: 4.13, i: 4.57, s: 4.76, z: 4.80 }, dscr: { a: 0.91, i: 0.98, s: 1.00, z: 1.12 },
-      rs:      { a: 150000, i: 142300, s: 139900, z: 136600 }
+      miete: { a: 650, i: 720, s: 749, z: 828 }, qm: { a: 9.03, i: 10.00, s: 10.40, z: 11.50 },
+      ew:    { a: 186000, i: 198000, s: 204000, z: 226000 },
+      mp:    { a: 192000, i: 205000, s: 205000, z: 214000 }, mpsp: { a: [180000, 204000], i: [192000, 214000], s: [192000, 214000], z: [201000, 224000] },
+      mpw:   { a: 'Marktbericht 12.02.2024', i: 'Marktbericht 20.10.2026', s: 'wie Bestand, die Miete ändert den Marktpreis nicht', z: 'Ausstattung nach Bad und Küche' },
+      hg:    { a: 285, i: 312, s: 338, z: 345 }, nu: { a: 60, i: 84, s: 97, z: 99 },
+      cf:    { a: -60, i: -14, s: 2, z: 79 }, br: { a: 4.13, i: 4.57, s: 4.76, z: 4.80 }, dscr: { a: 0.91, i: 0.98, s: 1.00, z: 1.12 },
+      rs:    { a: 150000, i: 142300, s: 139900, z: 136600 }
     }
   };
   function abzTabelle(){
     var p = S.phase, sp = SP[p], d = Z[p];
     var kopf = [''].concat(sp.map(function(c){ return c[1] + '<small>' + c[2] + '</small>'; }));
-    var zeile = function(name, f){ return sp.map(function(c){ return f(c[0]); }); };
-    var plus = function(x){ return (x > 0 ? '+' : x < 0 ? '−' : '') + eur(Math.abs(x)); };
+    var zeile = function(f){ return sp.map(function(c){ return f(c[0]); }); };
     var rows = [
       { gruppe: 'Wert' },
-      ['Kaufpreis / Investition'].concat(zeile(0, function(k){ return k === 'z' ? '189.000 € + 18.000 €<small>Maßnahmen aus Eigenkapital</small>' : '189.000 €'; })),
-      ['Ertragswert ' + FUEHR + '<small>Stufe 3 · LZS 2,4 % · RND aus Baujahr und Punkten</small>'].concat(zeile(0, function(k){ return '<b>' + eur(d.ew[k]) + '</b><small>Spanne ' + te(d.ewsp[k][0]) + '–' + te(d.ewsp[k][1]) + '</small>'; })),
-      ['Marktpreisindikation<small>Stufe 2 · aus Angebotspreisen, Abschlag 9 % (Marktdurchschnitt)</small>'].concat(zeile(0, function(k){ return d.mp[k] ? eur(d.mp[k]) + '<small>Spanne ' + te(d.mpsp[k][0]) + '–' + te(d.mpsp[k][1]) + ' · ohne Abschlag ' + te(d.mp[k] / 0.91) + '</small>' : '<small>kein Bericht für diesen Stand</small>'; })),
+      ['Kaufpreis / Investition'].concat(zeile(function(k){ return k === 'z' ? '189.000 € + 18.000 €<small>Maßnahmen aus Eigenkapital</small>' : '189.000 €'; })),
+      ['Ertragswert ' + FUEHR + '<small>Stufe 3 · LZS ' + (p === 'ankauf' ? '2,6' : '2,4') + ' % · RND aus Baujahr und Punkten</small>'].concat(zeile(function(k){ return '<b>' + eur(d.ew[k]) + '</b>'; })),
+      ['Marktpreisindikation<small>Stufe 2 · Durchschnitt aus Angebotspreisen, Abschlag 9 % (aktueller Marktdurchschnitt)</small>'].concat(zeile(function(k){ return eur(d.mp[k]) + '<small>ohne Abschlag ' + eur(ohneAbschlag(d.mp[k])) + '</small><small>Spanne ' + te(d.mpsp[k][0]) + '–' + te(d.mpsp[k][1]) + '</small><small>' + d.mpw[k] + '</small>'; })),
       { gruppe: 'Miete' },
-      ['Kaltmiete / Monat'].concat(zeile(0, function(k){ return eur(d.miete[k]); })),
-      ['Kaltmiete €/m²'].concat(zeile(0, function(k){ return de(d.qm[k], 2) + ' €'; })),
-      ['Rechtsgrundlage'].concat(zeile(0, function(k){ return k === 's' ? '<small>Mietspiegel ' + (p === 'ankauf' ? '2024: 9,72' : '2026: 10,40') + ' €/m², Kappung 15 % in 3 J., Sperrfrist 15 Monate</small>' : k === 'z' ? '<small>nach Modernisierung, Neuvermietung oder § 559 BGB</small>' : k === 'i' ? '<small>Mietvertrag, zuletzt erhöht 04/2025</small>' : '<small>Mietvertrag laut Exposé</small>'; })),
+      ['Kaltmiete / Monat'].concat(zeile(function(k){ return eur(d.miete[k]); })),
+      ['Kaltmiete €/m²'].concat(zeile(function(k){ return de(d.qm[k], 2) + ' €'; })),
+      ['Rechtsgrundlage'].concat(zeile(function(k){ return k === 's' ? '<small>Mietspiegel ' + (p === 'ankauf' ? '2024: 9,72' : '2026: 10,40') + ' €/m², Kappung 15 % in 3 J., Sperrfrist 15 Monate</small>' : k === 'z' ? '<small>nach Modernisierung, Neuvermietung oder § 559 BGB</small>' : k === 'i' ? '<small>Mietvertrag, zuletzt erhöht 04/2025</small>' : '<small>Mietvertrag laut Exposé</small>'; })),
       { gruppe: 'Kosten und Ergebnis' },
-      ['Hausgeld / Monat'].concat(zeile(0, function(k){ return eur(d.hg[k]); })),
-      ['davon nicht umlagefähig'].concat(zeile(0, function(k){ return eur(d.nu[k]); })),
-      ['Cashflow vor Steuer / Monat'].concat(zeile(0, function(k){ return { t: plus(d.cf[k]), k: d.cf[k] >= 0 ? 'gut' : 'schlecht' }; })),
-      ['Bruttorendite'].concat(zeile(0, function(k){ return de(d.br[k], 2) + ' %'; })),
-      ['DSCR'].concat(zeile(0, function(k){ return { t: de(d.dscr[k], 2), k: d.dscr[k] >= 1 ? 'gut' : 'schlecht' }; })),
+      ['Hausgeld / Monat'].concat(zeile(function(k){ return eur(d.hg[k]); })),
+      ['davon nicht umlagefähig'].concat(zeile(function(k){ return eur(d.nu[k]); })),
+      ['Cashflow vor Steuer / Monat'].concat(zeile(function(k){ return { t: sEur(d.cf[k]), k: d.cf[k] >= 0 ? 'gut' : 'schlecht' }; })),
+      ['Bruttorendite'].concat(zeile(function(k){ return de(d.br[k], 2) + ' %'; })),
+      ['DSCR'].concat(zeile(function(k){ return { t: de(d.dscr[k], 2), k: d.dscr[k] >= 1 ? 'gut' : 'schlecht' }; })),
       { gruppe: 'Finanzierung und Vermögen' },
-      ['Restschuld'].concat(zeile(0, function(k){ return eur(d.rs[k]); })),
-      ['Beleihung auf Ertragswert'].concat(zeile(0, function(k){ return de(d.rs[k] / d.ew[k] * 100, 1) + ' %'; })),
-      ['Vermögen (Ertragswert − Restschuld)'].concat(zeile(0, function(k){ return eur(d.ew[k] - d.rs[k]); }))
+      ['Restschuld'].concat(zeile(function(k){ return eur(d.rs[k]); })),
+      ['Beleihung auf Ertragswert'].concat(zeile(function(k){ return de(d.rs[k] / d.ew[k] * 100, 1) + ' %'; })),
+      ['Vermögen (Ertragswert − Restschuld)'].concat(zeile(function(k){ return eur(d.ew[k] - d.rs[k]); }))
     ];
     return tabelle(kopf, rows);
   }
@@ -273,61 +324,112 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       var k = c[0];
       var pl = d.cf[k] >= 0 ? pill('gut', 'trägt sich') : d.dscr[k] >= 0.95 ? pill('acht', 'knapp') : pill('krit', 'Zuschuss');
       return '<div class="spalte' + (k === 'i' ? ' heute' : '') + '"><div class="reihe" style="justify-content:space-between"><h3>' + c[1] + '</h3>' + pl + '</div><span class="zeit">' + c[2] + '</span><dl>'
-        + '<dt>Ertragswert <span class="fuehrend">führend</span></dt><dd>' + eur(d.ew[k]) + '</dd>'
+        + '<dt>Ertragswert ' + FUEHR + '</dt><dd>' + eur(d.ew[k]) + '</dd>'
+        + '<dt>Marktpreis Ø</dt><dd>' + eur(d.mp[k]) + '<small>ohne Abschlag ' + te(ohneAbschlag(d.mp[k])) + '</small></dd>'
         + '<dt>Kaltmiete</dt><dd>' + eur(d.miete[k]) + '</dd>'
-        + '<dt>Cashflow / Monat</dt><dd>' + (d.cf[k] > 0 ? '+' : d.cf[k] < 0 ? '−' : '') + eur(Math.abs(d.cf[k])) + '</dd>'
+        + '<dt>Cashflow / Monat</dt><dd>' + sEur(d.cf[k]) + '</dd>'
         + '<dt>DSCR</dt><dd>' + de(d.dscr[k], 2) + '</dd>'
         + '<dt>Vermögen</dt><dd>' + eur(d.ew[k] - d.rs[k]) + '</dd></dl></div>';
     }).join('') + '</div>';
+  }
+
+  /* ═══ Grafik-Werkzeug: gemeinsame Hover-Schicht ═══
+     Jede Grafik legt je x-Schritt eine unsichtbare Trefferfläche an (breiter als die Marke);
+     Überfahren zeigt Fadenkreuz und Tooltip mit allen Werten des Schritts. */
+  var TIPS = {};
+  function hoverVerdrahten(){
+    document.querySelectorAll('.chart-box[data-tip-id]').forEach(function(box){
+      var daten = TIPS[box.getAttribute('data-tip-id')], tip = box.querySelector('.tip'), kreuz = box.querySelector('.fadenkreuz'), svg = box.querySelector('svg');
+      box.querySelectorAll('.treffer').forEach(function(r){
+        var zeig = function(){
+          var i = +r.getAttribute('data-i'), d = daten[i];
+          tip.innerHTML = '<b>' + d.kopf + '</b>' + d.zeilen.map(function(z){ return '<div class="z"><span>' + (z.f ? '<i style="background:' + z.f + '"></i>' : '') + z.n + '</span><span>' + z.w + '</span></div>'; }).join('');
+          var vb = svg.viewBox.baseVal, sk = svg.getBoundingClientRect().width / vb.width;
+          var x = +r.getAttribute('data-x');
+          kreuz.setAttribute('x1', x); kreuz.setAttribute('x2', x); kreuz.style.opacity = 1;
+          var px = x * sk - box.scrollLeft, w = tip.offsetWidth || 190;
+          tip.style.left = Math.max(4, Math.min(px + 12, box.clientWidth - w - 4)) + 'px';
+          tip.style.top = '8px'; tip.style.opacity = 1;
+        };
+        var weg = function(){ tip.style.opacity = 0; kreuz.style.opacity = 0; };
+        r.addEventListener('pointerenter', zeig); r.addEventListener('focus', zeig);
+        r.addEventListener('pointerleave', weg); r.addEventListener('blur', weg);
+      });
+    });
+  }
+  function chartRahmen(id, W, H, s, aria){
+    return '<div class="chart-box" data-tip-id="' + id + '"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + aria + '">' + s + '</svg><div class="tip" aria-hidden="true"></div></div>';
+  }
+  /* Balken mit gerundetem Datenende, am Nullpunkt verankert */
+  function balken(x, w, y0, y1, farbe){
+    var r = Math.min(4, Math.abs(y1 - y0), w / 2), oben = y1 < y0;
+    if (Math.abs(y1 - y0) < 0.5) return '';
+    if (oben) return '<path fill="' + farbe + '" d="M' + x + ',' + y0 + 'V' + (y1 + r) + 'Q' + x + ',' + y1 + ' ' + (x + r) + ',' + y1 + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y1 + ' ' + (x + w) + ',' + (y1 + r) + 'V' + y0 + 'Z"/>';
+    return '<path fill="' + farbe + '" d="M' + x + ',' + y0 + 'V' + (y1 - r) + 'Q' + x + ',' + y1 + ' ' + (x + r) + ',' + y1 + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y1 + ' ' + (x + w) + ',' + (y1 - r) + 'V' + y0 + 'Z"/>';
   }
 
   /* ═══ Marktberichte (Wert & Verlauf) ═══ */
   var BERICHTE = {
     ankauf: [
       { id: 'a1', datum: '12.02.2024', t: 2024.12, stufe: 2, verf: 'Marktpreisindikation', wert: 192000, sp: [180000, 204000], an: true, satz: 'Angebotspreise, Abschlag 9 %' },
-      { id: 'a2', datum: '14.02.2024', t: 2024.12, stufe: 3, verf: 'Ertragswert', wert: 186000, sp: [178000, 195000], an: true, fuehrend: true, satz: 'LZS 2,6 %, Miete 9,03 €/m², RND 34 J.' },
-      { id: 'a3', datum: '14.02.2024', t: 2024.12, stufe: 3, verf: 'Sachwert', wert: 194000, sp: null, an: true, satz: 'BRW 250 €/m², SWF 1,10' }
+      { id: 'a2', datum: '14.02.2024', t: 2024.12, stufe: 3, verf: 'Ertragswert', wert: 186000, an: true, fuehrend: true, satz: 'LZS 2,6 %, Miete 9,03 €/m², RND 34 J.' },
+      { id: 'a3', datum: '14.02.2024', t: 2024.12, stufe: 3, verf: 'Sachwert', wert: 194000, an: true, satz: 'BRW 250 €/m², SWF 1,10' }
     ],
     bestand: [
-      { id: 'b0', datum: '03/2024', t: 2024.17, stufe: 0, verf: 'Kaufpreis', wert: 189000, sp: null, an: true, fest: true, satz: 'notarieller Kaufvertrag' },
+      { id: 'b0', datum: '03/2024', t: 2024.17, stufe: 0, verf: 'Kaufpreis', wert: 189000, an: true, fest: true, satz: 'notarieller Kaufvertrag' },
       { id: 'b1', datum: '20.11.2024', t: 2024.87, stufe: 1, verf: 'Marktpreisindikation', wert: 191000, sp: [178000, 204000], an: true, satz: 'Schnellabruf' },
       { id: 'b2', datum: '14.06.2025', t: 2025.45, stufe: 2, verf: 'Marktpreisindikation', wert: 196000, sp: [184000, 208000], an: true, satz: 'Angebotspreise, Abschlag 9 %' },
+      { id: 'b6', datum: '14.06.2025', t: 2025.45, stufe: 3, verf: 'Ertragswert', wert: 192000, an: true, satz: 'LZS 2,5 %, Miete 10,00 €/m², RND 33 J.' },
       { id: 'b3', datum: '20.10.2026', t: 2026.8, stufe: 2, verf: 'Marktpreisindikation', wert: 205000, sp: [192000, 214000], an: true, satz: 'Angebotspreise, Abschlag 9 %' },
-      { id: 'b4', datum: '20.10.2026', t: 2026.8, stufe: 3, verf: 'Ertragswert', wert: 198000, sp: [189000, 208000], an: true, fuehrend: true, satz: 'LZS 2,4 %, Miete 10,00 €/m², RND 32 J.' },
-      { id: 'b5', datum: '20.10.2026', t: 2026.8, stufe: 3, verf: 'Sachwert', wert: 211000, sp: null, an: true, satz: 'BRW 260 €/m², SWF 1,12, BPI 2,00' }
+      { id: 'b4', datum: '20.10.2026', t: 2026.8, stufe: 3, verf: 'Ertragswert', wert: 198000, an: true, fuehrend: true, satz: 'LZS 2,4 %, Miete 10,00 €/m², RND 32 J.' },
+      { id: 'b5', datum: '20.10.2026', t: 2026.8, stufe: 3, verf: 'Sachwert', wert: 211000, an: true, satz: 'BRW 260 €/m², SWF 1,12, BPI 2,00' }
     ]
   };
   var loeschFrage = null, abrufLaeuft = false;
   function einkalk(t){ return 189000 * Math.pow(1.015, t - 2024.17); }
+  function datumAus(t){ var j = Math.floor(t), m = Math.round((t - j) * 12) + 1; return (m < 10 ? '0' : '') + m + '/' + j; }
   function wertChart(){
-    var W = 720, H = 240, L = 76, R = 24, T = 18, B = 34;
-    var t0 = 2024.0, t1 = 2034.2, mn = 170000, mx = 232000;
+    var W = 760, H = 270, L = 64, R = 128, T = 16, B = 30;
+    var t0 = 2024.0, t1 = 2034.3, mn = 170000, mx = 235000;
     var x = function(t){ return L + (t - t0) / (t1 - t0) * (W - L - R); }, y = function(v){ return T + (mx - v) / (mx - mn) * (H - T - B); };
     var s = '';
-    [180000, 195000, 210000, 225000].forEach(function(v){ s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--linie)"/><text x="' + (L - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="11" fill="var(--mut)" font-family="JetBrains Mono,monospace">' + (v / 1000) + ' T€</text>'; });
-    [2024, 2026, 2028, 2030, 2032, 2034].forEach(function(j){ s += '<text x="' + x(j + 0.1) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="11" fill="var(--mut)" font-family="JetBrains Mono,monospace">' + j + '</text>'; });
-    var plan = []; for (var t = 2024.17; t <= t1 + 0.01; t += 0.5) plan.push(x(t) + ',' + y(einkalk(t)));
+    [180000, 195000, 210000, 225000].forEach(function(v){ s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--gitter)"/><text class="achse" x="' + (L - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (v / 1000) + ' T€</text>'; });
+    [2024, 2026, 2028, 2030, 2032, 2034].forEach(function(j){ s += '<text class="achse" x="' + x(j) + '" y="' + (H - 8) + '" text-anchor="middle">' + j + '</text>'; });
+    /* Plan: gestrichelt, neutral */
+    var plan = []; for (var t = 2024.17; t <= t1 + 0.01; t += 0.25) plan.push(x(t).toFixed(1) + ',' + y(einkalk(t)).toFixed(1));
     s += '<polyline fill="none" stroke="var(--plan)" stroke-width="2" stroke-dasharray="5 5" points="' + plan.join(' ') + '"/>';
-    s += '<text x="' + (x(t1) - 4) + '" y="' + (y(219300) - 8) + '" text-anchor="end" font-size="11" fill="var(--mut)" font-family="Inter,sans-serif">einkalkuliert 2034: 219.300 €</text>';
-    var farbe = ['var(--mut)', 'var(--s1)', 'var(--s2)', 'var(--s3)'];
+    s += '<text class="marke" x="' + (x(t1) + 6) + '" y="' + (y(einkalk(t1)) + 4) + '">Plan ' + te(einkalk(t1)) + '</text>';
     var akt = BERICHTE[S.phase].filter(function(b){ return b.an; });
-    var linie = akt.filter(function(b){ return b.fuehrend || b.stufe <= 2; }).filter(function(b){ return b.verf !== 'Sachwert'; });
-    /* Linie: je Zeitpunkt der führende Wert (Stufe 3 Ertragswert, sonst Marktpreis, sonst Kaufpreis) */
-    var proT = {}; linie.forEach(function(b){ var a = proT[b.t]; if (!a || b.fuehrend || (b.stufe > a.stufe && !a.fuehrend)) proT[b.t] = b; });
-    var pkte = Object.keys(proT).map(Number).sort().map(function(t){ return proT[t]; });
-    if (pkte.length > 1) s += '<polyline fill="none" stroke="var(--gold)" stroke-width="2.5" points="' + pkte.map(function(b){ return x(b.t) + ',' + y(b.wert); }).join(' ') + '"/>';
-    akt.forEach(function(b){ if (b.sp) s += '<line x1="' + x(b.t) + '" x2="' + x(b.t) + '" y1="' + y(b.sp[0]) + '" y2="' + y(b.sp[1]) + '" stroke="' + farbe[b.stufe] + '" stroke-width="3" stroke-opacity=".35" stroke-linecap="round"/>'; });
-    akt.forEach(function(b){
-      if (b.stufe === 3) s += '<rect x="' + (x(b.t) - 4.5) + '" y="' + (y(b.wert) - 4.5) + '" width="9" height="9" fill="' + (b.fuehrend ? 'var(--s3)' : 'var(--tafel)') + '" stroke="var(--s3)" stroke-width="2" transform="rotate(45 ' + x(b.t) + ' ' + y(b.wert) + ')"/>';
-      else s += '<circle cx="' + x(b.t) + '" cy="' + y(b.wert) + '" r="5" fill="' + farbe[b.stufe] + '" stroke="var(--tafel)" stroke-width="2"/>';
+    var mp = akt.filter(function(b){ return b.verf === 'Marktpreisindikation'; });
+    var ew = akt.filter(function(b){ return b.verf === 'Ertragswert' || b.verf === 'Kaufpreis'; }).sort(function(a, b){ return a.t - b.t; });
+    /* Spannen der Marktpreisindikation: dünne, halbtransparente Balken */
+    mp.forEach(function(b){ if (b.sp) s += '<line x1="' + x(b.t) + '" x2="' + x(b.t) + '" y1="' + y(b.sp[0]) + '" y2="' + y(b.sp[1]) + '" stroke="var(--c1)" stroke-width="4" stroke-opacity=".28" stroke-linecap="round"/>'; });
+    /* Führender Wert: Ertragswert (ab Kaufpreis) als Goldlinie */
+    if (ew.length > 1) s += '<polyline fill="none" stroke="var(--c2)" stroke-width="2.5" stroke-linejoin="round" points="' + ew.map(function(b){ return x(b.t) + ',' + y(b.wert); }).join(' ') + '"/>';
+    ew.forEach(function(b){
+      if (b.verf === 'Kaufpreis') s += '<circle cx="' + x(b.t) + '" cy="' + y(b.wert) + '" r="5" fill="var(--tafel)" stroke="var(--c2)" stroke-width="2"/>';
+      else s += '<rect x="' + (x(b.t) - 5) + '" y="' + (y(b.wert) - 5) + '" width="10" height="10" fill="var(--c2)" stroke="var(--tafel)" stroke-width="2" transform="rotate(45 ' + x(b.t) + ' ' + y(b.wert) + ')"/>';
     });
-    var letzt = pkte[pkte.length - 1];
-    if (letzt) s += '<text x="' + (x(letzt.t) + 10) + '" y="' + (y(letzt.wert) - 8) + '" font-size="12" font-weight="600" fill="var(--fg)" font-family="Space Grotesk,sans-serif">' + eur(letzt.wert) + '</text>';
-    return '<div class="chart-box"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Wertverlauf aus Marktberichten gegen den beim Kauf einkalkulierten Wert">' + s + '</svg></div>'
-      + '<div class="legende"><span><i></i>beim Kauf einkalkuliert (+1,5 % im Jahr)</span><span><span class="pkt" style="background:var(--s1)"></span>Stufe 1</span><span><span class="pkt" style="background:var(--s2)"></span>Stufe 2</span><span><span class="pkt" style="background:var(--s3);border-radius:2px;transform:rotate(45deg)"></span>Stufe 3 (gefüllt = führend)</span><span>Balken = Spanne · Linie = führender Wert je Zeitpunkt</span></div>';
+    mp.forEach(function(b){ s += '<circle cx="' + x(b.t) + '" cy="' + y(b.wert) + '" r="5" fill="var(--c1)" stroke="var(--tafel)" stroke-width="2"/>'; });
+    /* Direkte Beschriftung: nur die letzten Werte je Reihe */
+    var lE = ew[ew.length - 1], lM = mp[mp.length - 1];
+    if (lE) s += '<text class="wert-lbl" x="' + (x(lE.t) + 10) + '" y="' + (y(lE.wert) + (lM && lM.wert > lE.wert ? 14 : -8)) + '">' + te(lE.wert) + ' Ertragswert</text>';
+    if (lM) s += '<text class="wert-lbl" x="' + (x(lM.t) + 10) + '" y="' + (y(lM.wert) - 8) + '">' + te(lM.wert) + ' Marktpreis</text>';
+    /* Hover: je Berichtszeitpunkt */
+    var zeiten = []; akt.forEach(function(b){ if (zeiten.indexOf(b.t) < 0) zeiten.push(b.t); }); zeiten.sort();
+    var tips = zeiten.map(function(t){
+      var z = akt.filter(function(b){ return b.t === t; });
+      return { kopf: z[0].datum, zeilen: z.map(function(b){ return { n: b.verf + (b.stufe ? ' · St. ' + b.stufe : ''), w: eur(b.wert), f: b.verf === 'Marktpreisindikation' ? 'var(--c1)' : b.verf === 'Sachwert' ? 'var(--plan)' : 'var(--c2)' }; }).concat([{ n: 'Plan', w: eur(Math.round(einkalk(t) / 100) * 100), f: 'var(--plan)' }]) };
+    });
+    TIPS.wert = tips;
+    s += '<line class="fadenkreuz" y1="' + T + '" y2="' + (H - B) + '"/>';
+    zeiten.forEach(function(t, i){ var xi = x(t); s += '<rect class="treffer" tabindex="0" data-i="' + i + '" data-x="' + xi + '" x="' + (xi - 18) + '" y="' + T + '" width="36" height="' + (H - T - B) + '"><title>' + tips[i].kopf + '</title></rect>'; });
+    return '<div class="grafik"><div class="grafik-kopf"><h3>Wert gegen Plan</h3><span class="klein">Berichte in der Bewertung · Überfahren zeigt die Werte</span></div>'
+      + chartRahmen('wert', W, H, s, 'Wertverlauf: Ertragswert und Marktpreisindikation aus Marktberichten gegen den beim Kauf einkalkulierten Wert')
+      + '<div class="legende"><span><span class="sw linie"></span>Ertragswert (führend)</span><span><span class="sw punkt"></span>Marktpreisindikation Ø</span><span><span class="sw spanne"></span>deren Spanne</span><span><span class="sw plan"></span>beim Kauf einkalkuliert, +1,5 % im Jahr</span></div></div>';
   }
   function trend(){
-    var b = BERICHTE[S.phase].filter(function(x){ return x.an && (x.fuehrend || x.stufe === 2 || x.stufe === 0) && x.verf !== 'Sachwert'; });
+    var b = BERICHTE[S.phase].filter(function(x){ return x.an && (x.verf === 'Ertragswert' || x.verf === 'Kaufpreis'); }).sort(function(a, c){ return a.t - c.t; });
     if (b.length < 2) return null;
     var e = b[0], l = b[b.length - 1]; if (l.t - e.t < 0.5) return null;
     return (Math.pow(l.wert / e.wert, 1 / (l.t - e.t)) - 1) * 100;
@@ -342,24 +444,209 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       var akt = b.fest ? '<small>fest</small>'
         : loeschFrage === b.id ? '<span class="reihe" style="justify-content:flex-end"><small>endgültig löschen, auch im Tab Deal Score?</small><button type="button" class="btn rot klein-btn" data-ja="' + b.id + '">Löschen</button><button type="button" class="btn leise klein-btn" data-nein="1">Abbrechen</button></span>'
         : '<span class="reihe" style="justify-content:flex-end"><label class="klein"><input type="checkbox" data-an="' + b.id + '"' + (b.an ? ' checked' : '') + '> in Bewertung</label><button type="button" class="btn leise klein-btn" data-loesch="' + b.id + '">Löschen</button></span>';
+      var wert = '<b>' + eur(b.wert) + '</b>' + (b.verf === 'Marktpreisindikation' ? '<small>ohne Abschlag ' + eur(ohneAbschlag(b.wert)) + '</small>' : '');
       return { kl: b.an ? '' : 'aus', zellen: [
-        b.datum, stufe(b.stufe), b.verf + (b.fuehrend ? ' ' + FUEHR : '') + '<small>' + b.satz + '</small>', '<b>' + eur(b.wert) + '</b>',
+        b.datum, stufe(b.stufe), b.verf + (b.fuehrend ? ' ' + FUEHR : '') + '<small>' + b.satz + '</small>', wert,
         b.sp ? te(b.sp[0]) + '–' + te(b.sp[1]) : '–', S.phase === 'bestand' ? { t: (abw >= 0 ? '+' : '−') + de(Math.abs(abw), 1) + ' %', k: abw >= 0.5 ? 'gut' : abw <= -0.5 ? 'schlecht' : '' } : { t: (b.wert / 199000 * 100 - 100 >= 0 ? '+' : '−') + de(Math.abs(b.wert / 199000 * 100 - 100), 1) + ' %' }, akt ] };
     });
-    return tabelle(['Bericht', 'Stufe', 'Verfahren', 'Wert', 'Spanne', S.phase === 'bestand' ? 'zum Einkalkulierten' : 'zum Angebot', ''], zeilen);
+    return tabelle(['Bericht', 'Stufe', 'Verfahren', 'Wert', 'Spanne<small>nur Marktpreis</small>', S.phase === 'bestand' ? 'zum Plan' : 'zum Angebot', ''], zeilen);
   }
   function wertEinfach(){
-    var tr = trend(), b = BERICHTE[S.phase];
-    var fuehr = b.filter(function(x){ return x.an && x.fuehrend; }).slice(-1)[0] || b.filter(function(x){ return x.an; }).slice(-1)[0];
+    var tr = trend(), b = BERICHTE[S.phase].filter(function(x){ return x.an; });
+    var fuehr = b.filter(function(x){ return x.fuehrend; }).slice(-1)[0];
+    var mpL = b.filter(function(x){ return x.verf === 'Marktpreisindikation'; }).slice(-1)[0];
     return (S.phase === 'bestand' ? wertChart() : '') + abrufLeiste() + '<div class="karten">'
-      + (fuehr ? karte('Wert', stufe(fuehr.stufe) + (fuehr.fuehrend ? ' ' + FUEHR : ''), eur(fuehr.wert), '', fuehr.verf + (fuehr.sp ? ', Spanne ' + te(fuehr.sp[0]) + '–' + te(fuehr.sp[1]) : '')) : '')
-      + (S.phase === 'bestand' ? karte('Einkalkuliert', '', '+1,5 % / Jahr', '', 'beim Kauf, für 10/2026 196.500 €') + karte('Trend der Berichte', '', tr == null ? '–' : (tr >= 0 ? '+' : '') + de(tr, 1) + ' % / Jahr', tr != null && tr > 1.5 ? pill('gut', 'über Plan') : tr != null ? pill('acht', 'unter Plan') : '', 'aus den Berichten in der Bewertung')
-        : karte('Angebot', '', '199.000 €', pill('acht', '+7 % zum Ertragswert'), 'Exposé') + karte('Offerte', '', '189.000 €', pill('gut', 'begründet'), 'zwischen Ertrags- und Sachwert'))
+      + (fuehr ? karte('Ertragswert', stufe(fuehr.stufe) + ' ' + FUEHR, eur(fuehr.wert), '', fuehr.satz) : '')
+      + (mpL ? karte('Marktpreis Ø', stufe(mpL.stufe), eur(mpL.wert), '', 'ohne Abschlag ' + eur(ohneAbschlag(mpL.wert)) + (S.modus === 'detail' && mpL.sp ? ' · Spanne ' + te(mpL.sp[0]) + '–' + te(mpL.sp[1]) : '')) : '')
+      + (S.phase === 'bestand' ? karte('Trend Ertragswert', '', tr == null ? '–' : (tr >= 0 ? '+' : '') + de(tr, 1) + ' % / Jahr', tr != null && tr > 1.5 ? pill('gut', 'über Plan') : tr != null ? pill('acht', 'unter Plan') : '', 'Plan beim Kauf: +1,5 % / Jahr')
+        : karte('Angebot', '', '199.000 €', pill('acht', '+7 % zum Ertragswert'), 'Exposé'))
       + '</div>' + berichtTabelle();
   }
   function wertDetail(){
-    return wertEinfach() + '<div class="absatz"><b class="von">Beim Kauf einkalkuliert (03/2024, eingefroren)</b>Wert +1,5 % im Jahr · Miete +2,5 % im Jahr · Hausgeld +2,0 % im Jahr · Zins 3,2 % bis 03/2034, danach 4,0 % · Tilgung 2 %. Führendes Verfahren: Ertragswert, weil die Wohnung vermietet ist und als Renditeobjekt gekauft wurde. Marktpreisindikation und Sachwert dienen der Plausibilität.</div>';
+    return wertEinfach() + '<div class="absatz"><b class="von">Beim Kauf einkalkuliert (03/2024, eingefroren)</b>Wert +1,5 % im Jahr · Miete +2,5 % im Jahr · Hausgeld +2,0 % im Jahr · Zins 3,2 % bis 03/2034, danach 4,0 % · Tilgung 2 %. Führendes Verfahren ist der Ertragswert, weil die Wohnung vermietet ist und als Renditeobjekt gekauft wurde. Er ist ein Wert ohne Spanne. Marktpreisindikation und Sachwert dienen der Plausibilität. Eine Spanne hat nur die Marktpreisindikation, aus der Streuung der Angebotspreise.</div>';
   }
+
+  /* ═══ Lage & Markt ═══ Werte zu einem Zeitpunkt, keine Zeitreihen (gibt es heute nicht). */
+  function lageEinfach(){
+    return '<div class="karten">'
+      + karte('Lageklasse', '', 'B', pill('gut', 'Standard'), 'Reiter Objekt, von dir bestätigt')
+      + karte('Makrolage', '', 'solide', pill('gut', '64 / 100'), 'Bielefeld, Oberzentrum')
+      + karte('Mikrolage', '', 'gut', pill('gut', 'ruhig, versorgt'), 'Wohnstraße, ÖPNV 300 m')
+      + karte('Mietspiegel', '', '10,40 €/m²', pill('neutral', 'Ist 10,00'), 'Mietspiegel Bielefeld 2026')
+      + karte('Entwicklung', '', 'stabil', pill('acht', 'leicht steigend'), 'Bevölkerung, Wohnungsmarkt')
+      + '</div>'
+      + abschnitte([
+        ['Makrolage', 'Bielefeld ist Oberzentrum mit Universität und Mittelstand. Die Zahl der Einwohner bleibt stabil, die Arbeitslosigkeit liegt leicht über dem Landesschnitt.'],
+        ['Mikrolage', 'Ruhige Wohnstraße in Schildesche. Bus 300 m, Stadtbahn 800 m, Nahversorgung fußläufig. Keine Lärmquelle im Umkreis von 200 m.'],
+        ['Entwicklung', 'Wenig Neubau im Stadtteil, gefragte kleine Wohnungen. Die Mieten folgen dem Mietspiegel und steigen moderat.']
+      ]);
+  }
+  function lageDetail(){
+    return lageEinfach() + tabelle(['Merkmal', 'Wert', 'Stand', 'Stufe', 'Herkunft'], [
+      { gruppe: 'Makrolage' },
+      ['Makro-Score', '64 / 100', '10/2026', pill('gut', 'solide'), 'DealPilot aus amtlicher Statistik'],
+      ['Einwohner', '334.000', '2024', '–', 'Zensus / Regionalstatistik'],
+      ['Arbeitslosenquote', '7,6 %', '09/2026', pill('acht', 'über Land'), 'Bundesagentur für Arbeit'],
+      ['Kaufkraftindex', '96', '2026', pill('acht', 'unter Bund'), 'amtliche Statistik'],
+      { gruppe: 'Mikrolage' },
+      ['ÖPNV', 'Bus 300 m · Stadtbahn 800 m', 'live', pill('gut', 'gut'), 'Kartendienst'],
+      ['Nahversorgung', 'Supermarkt 450 m', 'live', pill('gut', 'gut'), 'Kartendienst'],
+      ['Leerstand Zensus', '2,1 %', '2022', pill('gut', 'niedrig'), 'Zensus 2022, Gitterzelle'],
+      { gruppe: 'Markt' },
+      ['Mietspiegel', '10,40 €/m²', '2026', '–', 'Mietspiegel Bielefeld 2026'],
+      ['Marktmiete Ø', '10,80 €/m²', '10/2026', '–', 'aktueller Marktdurchschnitt'],
+      ['Kaufpreisniveau ETW Ø', '2.850 €/m²', '10/2026', '–', 'aktueller Marktdurchschnitt, Abschlag 9 %']
+    ]) + '<p class="klein">Zeitreihen (Bevölkerung, Kaufkraft, Mieten über Jahre) haben wir heute nicht, nur den letzten Stand. Eine Verlaufsgrafik kommt erst, wenn die Daten gespeichert werden.</p>';
+  }
+
+  /* ═══ Risiken & Szenarien ═══
+     Worst: Miete −10 %, Zins +1 %; Best: Miete +5 %; Plan = deine Eingaben (heute kein eigener Fall). */
+  var SZ = {
+    ankauf:  { basis: 'Ankauf zur Offerte', miete: 650, nu: 60, rate: 650, zinsPlus: 125, wert: 186000 },
+    bestand: { basis: 'Bestand heute', miete: 720, nu: 84, rate: 650, zinsPlus: 119, wert: 198000 }
+  };
+  function szenario(f, m, z, w){ var mi = f.miete * (1 + m), rate = f.rate + (z ? f.zinsPlus : 0); return { miete: mi, rate: rate, cf: mi - f.nu - rate, dscr: (mi - f.nu) / rate, wert: f.wert * (1 + w) }; }
+  function szenarioKarten(){
+    var f = SZ[S.phase];
+    var faelle = [
+      ['Worst Case', 'Miete −10 %, Zins +1 %', szenario(f, -0.10, true, -0.05), ''],
+      ['Plan', 'deine Eingaben', szenario(f, 0, false, 0), 'neutral'],
+      ['Best Case', 'Miete +5 %, Wert +1 % im Jahr mehr', szenario(f, 0.05, false, 0.05), 'niedrig']
+    ];
+    return '<div class="karten breit">' + faelle.map(function(c){
+      var r = c[2];
+      return '<div class="rk ' + c[3] + '"><h4>' + c[0] + '</h4><span class="klein">' + c[1] + '</span><dl>'
+        + '<dt>Kaltmiete</dt><dd>' + eur(r.miete) + '</dd><dt>Rate</dt><dd>' + eur(r.rate) + '</dd>'
+        + '<dt>Cashflow / Monat</dt><dd>' + sEur(r.cf) + '</dd><dt>DSCR</dt><dd>' + de(r.dscr, 2) + '</dd>'
+        + '<dt>Ertragswert in 5 J.</dt><dd>' + te(r.wert * Math.pow(1.015, 5)) + '</dd></dl></div>';
+    }).join('') + '</div>';
+  }
+  function staerkenRisiken(){
+    var ank = S.phase === 'ankauf';
+    var st = ank ? [['Miete unter Mietspiegel', '9,03 gegen 9,72 €/m²; +50 € in drei Jahren gesetzlich möglich.'], ['Preis begründet', 'Offerte zwischen Ertrags- und Sachwert.'], ['Gefragte Größe', '72 m², zwei Zimmer, wenig Neubau im Stadtteil.']]
+      : [['Miete steigt planmäßig', '+2,9 % über Plan, Soll 749 € ab 04/2027.'], ['Wert über Plan', 'Ertragswert 198.000 € gegen 196.500 € Plan.'], ['Dach danach erledigt', 'Gemeinschaftseigentum für Jahre saniert.']];
+    var ri = ank ? [['Protokolle fehlen', 'Ob eine Sonderumlage beschlossen ist, bleibt offen.', 'hoch'], ['DSCR unter 1', 'Die Miete trägt die Rate heute nicht ganz (0,91).', 'mittel'], ['Heizung von 1998', 'Austausch in den nächsten Jahren wahrscheinlich.', 'mittel']]
+      : [['Sonderumlage 03/2027', '5.704 € auf einmal; Cashflow 2027 negativ.', 'hoch'], ['Hausgeld steigt schneller', '+5,1 % über Plan.', 'mittel'], ['Anschlusszins 2034', 'Ab rund 5,2 % trägt die Miete die Rate nicht.', 'mittel']];
+    return '<div class="raster2"><div style="display:grid;gap:8px;align-content:start"><span class="lbl">Stärken</span>'
+      + st.map(function(s){ return '<div class="rk niedrig"><h4>' + s[0] + '</h4><p>' + s[1] + '</p></div>'; }).join('') + '</div>'
+      + '<div style="display:grid;gap:8px;align-content:start"><span class="lbl">Risiken' + (ank ? ' · für die Bank' : '') + '</span>'
+      + ri.map(function(r){ return '<div class="rk' + (r[2] === 'mittel' ? ' mittel' : '') + '"><div class="reihe" style="justify-content:space-between"><h4>' + r[0] + '</h4>' + pill(r[2] === 'hoch' ? 'krit' : 'acht', r[2]) + '</div><p>' + r[1] + '</p></div>'; }).join('') + '</div></div>';
+  }
+  function risikoEinfach(){ return staerkenRisiken() + '<span class="lbl">Szenarien</span>' + szenarioKarten(); }
+  function risikoDetail(){
+    var ank = S.phase === 'ankauf';
+    return risikoEinfach() + abschnitte([
+      ['Finanzierungsrisiko (Beleihung und DSCR)', ank ? 'Beleihung 80,6 % auf den Ertragswert und DSCR 0,91. Die Bank sieht einen Zuschuss aus dem Einkommen. Mit der Soll-Miete steigt der DSCR auf 0,98, nach Bad und Küche auf 1,17.' : 'Beleihung 71,9 % auf den Ertragswert, DSCR 0,98. Bis zur Zinsbindung sinkt die Beleihung planmäßig auf 58 %.'],
+      ['Cashflow-Stabilität', ank ? 'Ein Mieter, ein Vertrag. Zwei Monate Leerstand kosten rund 1.300 €. Die Rücklage der WEG ist unbekannt, solange der Wirtschaftsplan fehlt.' : 'Ein Mieter seit 2019, pünktlich. 2027 drückt die Sonderumlage den Cashflow einmalig auf −5.728 €.'],
+      ['Abhängigkeit von Annahmen', 'Am stärksten wirkt der Anschlusszins ab 03/2034: Ein Prozentpunkt mehr kostet rund 96 € im Monat. Die Wertsteigerung von 1,5 % im Jahr spielt erst beim Verkauf eine Rolle.']
+    ]) + '<p class="klein">Einen Base Case rechnet die Analyse heute nicht. „Plan“ zeigt deine Eingaben als Mitte zwischen Worst und Best Case. Vorschlag: diesen Plan künftig als eigenen Fall in die Analyse aufnehmen.</p>';
+  }
+
+  /* ═══ Steuer ═══ Gruppen wie tax.js _computeYearTotal (Finanzierung, Betriebskosten, Verwaltung,
+     Sonstiges, AfA, Erhaltung/anschaffungsnah). Einnahmen = Kaltmiete + umgelegte Nebenkosten.
+     Zuführung zur Rücklage nicht abziehbar (erst bei Verwendung, BFH IX R 19/24).
+     Kauf 18.03.2024, AfA ab 04/2024; Gebäudeanteil 163.300 € × 2 % = 3.266 €. Grenzsteuersatz 35 %. */
+  var GST = 0.35;
+  function steuerJahre(){
+    var J = [
+      { j: 2024, km: 5850, nk: 2025, zins: 3600, fin: 450, bu: 81, verw: 162, sonst: 120, afa: 2450, erh: 0, nuAll: 540, rate: 5850 },
+      { j: 2025, km: 8430, nk: 2568, zins: 4720, fin: 0, bu: 240, verw: 336, sonst: 80, afa: 3266, erh: 0, nuAll: 984, rate: 7800 },
+      { j: 2026, km: 8640, nk: 2736, zins: 4610, fin: 0, bu: 252, verw: 336, sonst: 80, afa: 3266, erh: 0, nuAll: 1008, rate: 7800 },
+      { j: 2027, km: 8901, nk: 2892, zins: 4500, fin: 0, bu: 312, verw: 360, sonst: 80, afa: 3266, erh: 5704, nuAll: 1164 + 5704, rate: 7800 }
+    ];
+    for (var j = 2028; j <= 2034; j++){
+      var n = j - 2027, f = Math.pow(1.02, n);
+      J.push({ j: j, km: Math.round(8988 * Math.pow(1.025, n - 1)), nk: Math.round(2892 * f), zins: 4390 - 115 * (n - 1), fin: 0, bu: Math.round(312 * f), verw: Math.round(360 * f), sonst: 80, afa: 3266, erh: 0, nuAll: Math.round(1164 * f), rate: 7800 });
+    }
+    J.forEach(function(y){
+      y.ein = y.km + y.nk;
+      y.wk = y.zins + y.fin + y.nk + y.bu + y.verw + y.sonst + y.afa + y.erh;
+      y.erg = y.ein - y.wk;
+      y.wirk = -y.erg * GST;
+      y.cfv = y.km - y.nuAll - y.rate - y.sonst;
+      y.cfn = y.cfv + y.wirk;
+      y.plan = S.phase === 'ankauf' || y.j >= 2027;
+    });
+    return J;
+  }
+  function steuerChart(){
+    var J = steuerJahre();
+    var W = 760, H = 280, L = 64, R = 20, T = 30, B = 30;
+    var werte = []; J.forEach(function(y){ werte.push(y.erg, y.cfn); });
+    var mn = Math.min(-7000, Math.floor(Math.min.apply(null, werte) / 1000) * 1000), mx = Math.max(2000, Math.ceil(Math.max.apply(null, werte) / 1000) * 1000);
+    var schritt = (W - L - R) / J.length, bw = Math.min(26, schritt * 0.42);
+    var xm = function(i){ return L + schritt * (i + 0.5); }, y = function(v){ return T + (mx - v) / (mx - mn) * (H - T - B); };
+    var s = '';
+    for (var v = Math.ceil(mn / 2000) * 2000; v <= mx; v += 2000) s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="' + (v === 0 ? 'var(--mut)' : 'var(--gitter)') + '"' + (v === 0 ? ' stroke-width="1"' : '') + '/><text class="achse" x="' + (L - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (v === 0 ? '0' : (v < 0 ? '−' : '') + de(Math.abs(v) / 1000, 0) + ' T€') + '</text>';
+    J.forEach(function(r, i){ s += '<text class="achse" x="' + xm(i) + '" y="' + (H - 8) + '" text-anchor="middle"' + (r.plan ? ' opacity=".75"' : '') + '>' + r.j + '</text>'; });
+    /* Marken: Sonderumlage 2027, Zinsbindung und § 23 EStG 03/2034 */
+    var mk = function(i, txt){ return '<line x1="' + xm(i) + '" x2="' + xm(i) + '" y1="' + (T - 14) + '" y2="' + (H - B) + '" stroke="var(--plan)" stroke-dasharray="3 4"/><text class="marke" x="' + (xm(i) + (i === J.length - 1 ? -4 : 4)) + '" y="' + (T - 18) + '"' + (i === J.length - 1 ? ' text-anchor="end"' : '') + '>' + txt + '</text>'; };
+    J.forEach(function(r, i){ if (r.j === 2027) s += mk(i, 'Sonderumlage Dach'); if (r.j === 2034) s += mk(i, 'Zinsbindung + § 23 EStG 03/2034'); });
+    /* Balken: Ergebnis Anlage V; Planjahre heller */
+    J.forEach(function(r, i){ s += '<g opacity="' + (r.plan && S.phase === 'bestand' ? '.55' : '1') + '">' + balken(xm(i) - bw / 2, bw, y(0), y(r.erg), 'var(--c1)') + '</g>'; });
+    /* Linie: Cashflow nach Steuer */
+    s += '<polyline fill="none" stroke="var(--c2)" stroke-width="2.5" stroke-linejoin="round" points="' + J.map(function(r, i){ return xm(i) + ',' + y(r.cfn); }).join(' ') + '"/>';
+    J.forEach(function(r, i){ s += '<circle cx="' + xm(i) + '" cy="' + y(r.cfn) + '" r="4" fill="var(--c2)" stroke="var(--tafel)" stroke-width="2"/>'; });
+    /* Direktbeschriftung: nur der Ausreißer 2027 */
+    J.forEach(function(r, i){ if (r.j === 2027) s += '<text class="wert-lbl" x="' + (xm(i) + 9) + '" y="' + (y(r.cfn) + 4) + '">' + sEur(r.cfn) + '</text>'; });
+    TIPS.steuer = J.map(function(r){ return { kopf: r.j + (r.plan ? ' · Plan' : ''), zeilen: [
+      { n: 'Ergebnis Anlage V', w: sEur(r.erg), f: 'var(--c1)' }, { n: 'Steuerwirkung', w: sEur(r.wirk) },
+      { n: 'Cashflow vor Steuer', w: sEur(r.cfv) }, { n: 'Cashflow nach Steuer', w: sEur(r.cfn), f: 'var(--c2)' }] }; });
+    s += '<line class="fadenkreuz" y1="' + T + '" y2="' + (H - B) + '"/>';
+    J.forEach(function(r, i){ s += '<rect class="treffer" tabindex="0" data-i="' + i + '" data-x="' + xm(i) + '" x="' + (xm(i) - schritt / 2) + '" y="' + T + '" width="' + schritt + '" height="' + (H - T - B) + '"><title>' + r.j + '</title></rect>'; });
+    return '<div class="grafik"><div class="grafik-kopf"><h3>Steuerverlauf</h3><span class="klein">Grenzsteuersatz 35 % aus dem Investmentprofil' + (S.phase === 'bestand' ? ' · ab 2027 Plan (heller)' : ' · alles Plan') + '</span></div>'
+      + chartRahmen('steuer', W, H, s, 'Steuerverlauf: Ergebnis Anlage V je Jahr als Balken und Cashflow nach Steuer als Linie, 2024 bis 2034')
+      + '<div class="legende"><span><span class="sw balken"></span>Ergebnis Anlage V (unter null = Verlust, mindert die Steuer)</span><span><span class="sw linie"></span>Cashflow nach Steuer</span></div></div>';
+  }
+  function steuerEinfach(){
+    var J = steuerJahre().slice(0, 4), ank = S.phase === 'ankauf';
+    return steuerChart() + '<div class="karten">' + J.map(function(r){
+      var p = ank || r.plan ? pill('neutral', 'Plan') : r.j === 2026 ? pill('acht', '2 Belege fehlen') : pill('gut', 'erklärt');
+      return karte(String(r.j), p, sEur(r.erg), '', 'Ergebnis Anlage V · Steuer ' + sEur(r.wirk));
+    }).join('') + '</div>';
+  }
+  function steuerDetail(){
+    var J = steuerJahre().slice(0, 4), ank = S.phase === 'ankauf';
+    var kopf = [''].concat(J.map(function(r){ return r.j + (ank || r.plan ? '<small>Plan</small>' : r.j === 2024 ? '<small>ab 04/2024</small>' : ''); }));
+    var z = function(n, f, kl){ var row = [n].concat(J.map(function(r){ return f(r); })); return kl ? { kl: kl, zellen: row } : row; };
+    var neg = function(v){ return v ? '−' + eur(v) : '–'; };
+    return steuerChart() + tabelle(kopf, [
+      { gruppe: 'Einnahmen' },
+      z('Kaltmiete', function(r){ return eur(r.km); }, 'ein'),
+      z('Umgelegte Nebenkosten<small>vom Mieter gezahlt, stehen gleich hoch auch bei den Betriebskosten</small>', function(r){ return eur(r.nk); }, 'ein'),
+      z('Summe Einnahmen', function(r){ return eur(r.ein); }, 'summe'),
+      { gruppe: 'Werbungskosten' },
+      z('Finanzierung<small>Schuldzinsen' + (J[0].fin ? '; 2024 dazu Notar und Grundbuch für die Grundschuld' : '') + '</small>', function(r){ return neg(r.zins + r.fin); }, 'ein'),
+      z('Betriebskosten<small>umgelegte Nebenkosten und nicht umlagefähiger Teil des Hausgelds ohne Verwaltung und Rücklage</small>', function(r){ return neg(r.nk + r.bu); }, 'ein'),
+      z('Verwaltung<small>WEG-Verwalter</small>', function(r){ return neg(r.verw); }, 'ein'),
+      z('Sonstiges<small>Fahrten, Porto</small>', function(r){ return neg(r.sonst); }, 'ein'),
+      z('AfA Gebäude 2 %<small>Gebäudeanteil 163.300 €, 2024 anteilig 9 Monate</small>', function(r){ return neg(r.afa); }, 'ein'),
+      z('Erhaltung und anschaffungsnah<small>2027: Sonderumlage Dach im Jahr der Verwendung, als Erhaltung. Die 3-Jahres-Frist nach dem Kauf endet am 18.03.2027; danach greift die 15-%-Grenze nicht mehr.</small>', function(r){ return neg(r.erh); }, 'ein'),
+      z('Summe Werbungskosten', function(r){ return neg(r.wk); }, 'summe'),
+      { gruppe: 'Ergebnis' },
+      z('Ergebnis Anlage V', function(r){ return { t: sEur(r.erg), k: r.erg >= 0 ? '' : 'schlecht' }; }, 'summe'),
+      z('Steuerwirkung bei 35 %<small>Verlust mindert die Steuer, Gewinn erhöht sie</small>', function(r){ return { t: sEur(r.wirk), k: r.wirk >= 0 ? 'gut' : 'schlecht' }; }),
+      z('Cashflow vor Steuer', function(r){ return sEur(r.cfv); }),
+      z('Cashflow nach Steuer', function(r){ return { t: sEur(r.cfn), k: r.cfn >= 0 ? 'gut' : 'schlecht' }; }, 'summe')
+    ]) + absatz('Warum das Ergebnis negativ ist, obwohl du die Wohnung nur knapp bezuschusst: Die AfA von 3.266 € im Jahr ist eine Ausgabe nur auf dem Papier. Sie senkt das Ergebnis, kostet dich aber kein Geld. Die Zuführung zur Rücklage ist umgekehrt Geld, das du zahlst, das aber erst zählt, wenn die WEG es ausgibt. 2027 wird die Sonderumlage verwendet. Sie bringt rund 2.000 € Steuer zurück und federt den Abfluss von 5.704 € ab.', 'Pilot erklärt');
+  }
+
+  /* ═══ Gesamtbewertung (Texte) ═══ */
+  var GESAMT = {
+    ankauf: [
+      ['Gesamtbewertung', 'Gut (72). Das Objekt allein erreicht 69 Punkte, knapp unter der Schwelle von 70 für „Kaufen“. Mit der Offerte von 189.000 € und der gesetzlich möglichen Miete wird es ein solides Investment. Empfehlung: verhandeln.'],
+      ['Investmentbewertung', 'Das Angebot von 199.000 € liegt 7 % über dem Ertragswert von 186.000 €. Die Marktpreisindikation liegt bei 192.000 € im Durchschnitt, ohne Abschlag bei 211.000 €. Die Bruttorendite von 4,13 % ist für Bielefeld unterdurchschnittlich. Sie steigt mit der Soll-Miete auf 4,44 % und nach Bad und Küche auf 4,80 %.'],
+      ['Investor-Fit', 'Passt zu deinem Profil „Kapitalanlage, langfristig halten“ bei einem Zuschuss bis 100 € im Monat. Nicht passend ist der DSCR unter 1, wenn du mehrere Objekte finanzieren willst. Die Bank rechnet den Zuschuss gegen dein Einkommen.'],
+      ['DealPilot-Insight', 'Der Hebel liegt in der Miete, nicht im Preis. Jede 10.000 € weniger Kaufpreis bringen rund 35 € Cashflow im Monat. Die Soll-Miete bringt 50 €, das Zielbild 173 €.']
+    ],
+    bestand: [
+      ['Gesamtbewertung', 'Auf Kurs. Wert und Miete liegen über dem Plan vom Kauf, die Restschuld genau im Plan. Das Hausgeld steigt schneller als einkalkuliert. Die Sonderumlage 2027 ist die einzige große Belastung in Sicht.'],
+      ['Bestand und Strategie', 'Halten und die Miete planmäßig erhöhen: 04/2027 auf 749 €. Bad und Küche nach dem Dach (2028) machen den Cashflow positiv und heben den Ertragswert auf 226.000 €. Ein Verkauf vor 03/2034 wäre steuerpflichtig. Das Ende der Zinsbindung fällt in denselben Monat.'],
+      ['Investmentbewertung', 'Ertragswert 198.000 € (+0,8 % zum Plan), Marktpreisindikation 205.000 € im Durchschnitt, ohne Abschlag 225.300 €. Seit dem Kauf sind 19.700 € Vermögen entstanden. Davon stammen 7.700 € aus der Tilgung und 12.000 € aus dem Wert.'],
+      ['Investor-Fit', 'Passt weiter zu deinem Profil. Der Zuschuss liegt mit 14 € im Monat weit unter deiner Grenze von 100 €. Für ein weiteres Objekt reicht die Beleihung von 71,9 % noch nicht als Sicherheit.'],
+      ['DealPilot-Insight', 'Lege für 03/2027 rund 5.700 € zurück. Die Steuer gibt dir davon im Folgejahr etwa 2.000 € zurück, aber erst mit dem Bescheid für 2027.']
+    ]
+  };
 
   /* ═══ Inhalte je Phase ═══ */
   var INHALT = {
@@ -367,21 +654,21 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       uebersicht: {
         einfach: function(){
           return '<div class="briefing"><div class="urteil"><small>Investor Deal Score</small><span class="zahl">72</span> Gut<span class="unter">Investment 69 · Finanzierung 75</span></div>'
-            + '<div><p><b>Empfehlung: Verhandeln.</b> Das Objekt allein erreicht 69 Punkte, knapp unter der Schwelle von 70 für „Kaufen“. Das Angebot liegt 7 % über dem Ertragswert. Mit der Offerte von 189.000 € und der gesetzlich möglichen Miete von 700 € in drei Jahren wird es ein solides Investment.</p></div>'
+            + '<div><p><b>Empfehlung: Verhandeln.</b> Das Angebot liegt 7 % über dem Ertragswert. Mit der Offerte von 189.000 € und der gesetzlich möglichen Miete von 700 € in drei Jahren wird es ein solides Investment.</p><p>Vor der Unterschrift fehlen noch die Protokolle der Eigentümerversammlungen.</p></div>'
             + '<span class="quelle">aus dem Tab Bewertung · Pilot-Analyse vom 18.02.2024</span></div>'
             + '<div class="karten">'
-            + karte('Wert', stufe(3) + ' ' + FUEHR, '186.000 €', pill('acht', 'Angebot +7 %'), 'Ertragswert, Spanne 178–195 T€')
+            + karte('Ertragswert', stufe(3) + ' ' + FUEHR, '186.000 €', pill('acht', 'Angebot +7 %'), 'LZS 2,6 %, RND 34 J.')
+            + karte('Marktpreis Ø', stufe(2), '192.000 €', '', 'ohne Abschlag ' + eur(ohneAbschlag(192000)))
             + karte('Offerte', '', '189.000 €', pill('gut', 'bereit'), '−5 % zum Angebot')
             + karte('Soll-Miete', '', '700 €', pill('gut', '+50 € in 3 J.'), 'Mietspiegel, Kappung 15 %')
             + karte('DSCR', '', '0,91', pill('krit', 'Zuschuss'), '−60 € im Monat')
-            + karte('Zielbild', '', '+113 €', pill('gut', 'trägt sich'), 'Cashflow nach Bad und Küche')
             + karte('Unterlagen', '', '6 von 9', pill('acht', '3 fehlen'), 'Protokolle, Wirtschaftsplan')
             + '</div>';
         },
         detail: function(){
-          return tabelle(['Kennzahl', 'Wert', 'Spanne', 'Bewertung', 'Quelle'], [
-            ['Ertragswert ' + stufe(3) + ' ' + FUEHR, '186.000 €', '178–195 T€', pill('acht', 'Angebot +7 %'), 'Wertermittlung 14.02.2024'],
-            ['Marktpreisindikation ' + stufe(2), '192.000 €', '180–204 T€', '–', 'Marktbericht 12.02.2024, Abschlag 9 % (ohne: 211.000 €)'],
+          return abschnitte(GESAMT.ankauf) + tabelle(['Kennzahl', 'Wert', 'Spanne', 'Bewertung', 'Quelle'], [
+            ['Ertragswert ' + stufe(3) + ' ' + FUEHR, '186.000 €', '–', pill('acht', 'Angebot +7 %'), 'Wertermittlung 14.02.2024'],
+            ['Marktpreisindikation ' + stufe(2), '192.000 €<small>ohne Abschlag 211.000 €</small>', '180–204 T€', '–', 'Marktbericht 12.02.2024, Abschlag 9 %'],
             ['Sachwert ' + stufe(3), '194.000 €', '–', '–', 'Wertermittlung 14.02.2024'],
             ['Angebotspreis', '199.000 €', '–', '–', 'Exposé'],
             ['Offerte', '189.000 €', '–', pill('gut', 'begründet'), 'zwischen Ertrags- und Sachwert'],
@@ -392,8 +679,10 @@ input[type=range]{width:100%;accent-color:var(--gold)}
           ]);
         }
       },
-      abz: { einfach: function(){ return abzEinfach() + absatz('Für das Bankgespräch: Heute trägt die Miete die Rate nicht ganz (DSCR 0,91). Mit der gesetzlich umsetzbaren Miete ab 2027 steigt der DSCR auf 0,98, nach Bad und Küche auf 1,17. Der Ertragswert wächst mit: von 186.000 € auf 226.000 €.'); }, detail: function(){ return abzTabelle() + absatz('Soll ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt: Mietspiegel 9,72 €/m², begrenzt durch die Kappungsgrenze von 15 % in drei Jahren und die Sperrfrist. Zielbild rechnet die Maßnahmen aus dem Reiter Objekt (Bad 11.000 €, Küche 7.000 €, +3 Modernisierungspunkte) mit der Zielmiete 11,50 €/m².'); } },
+      abz: { einfach: function(){ return abzEinfach() + absatz('Für das Bankgespräch: Heute trägt die Miete die Rate nicht ganz (DSCR 0,91). Mit der gesetzlich umsetzbaren Miete ab 2027 steigt der DSCR auf 0,98, nach Bad und Küche auf 1,17. Der Ertragswert steigt dabei von 186.000 € auf 226.000 €.'); }, detail: function(){ return abzTabelle() + absatz('Soll ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt: Mietspiegel 9,72 €/m², begrenzt durch die Kappungsgrenze von 15 % in drei Jahren und die Sperrfrist. Zielbild rechnet die Maßnahmen aus dem Reiter Objekt (Bad 11.000 €, Küche 7.000 €, +3 Modernisierungspunkte) mit der Zielmiete 11,50 €/m². Die Marktpreisindikation im Zielbild rechnet mit der besseren Ausstattung.'); } },
       wert: { einfach: wertEinfach, detail: wertDetail },
+      lage: { einfach: lageEinfach, detail: lageDetail },
+      risiko: { einfach: risikoEinfach, detail: risikoDetail },
       kaufpreis: {
         einfach: function(){
           return '<div class="karten">' + karte('Offerte', '', '189.000 €', pill('gut', 'begründet'), '10.000 € unter dem Angebot') + karte('Obergrenze', '', '194.000 €', '', 'Ertragswert bei Soll-Miete') + '</div>'
@@ -402,7 +691,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
         },
         detail: function(){
           return tabelle(['Verfahren', 'Stufe', 'Wert', 'Spanne', 'zum Angebot'], [
-            ['Ertragswert ' + FUEHR + '<small>Miete 9,03 €/m², LZS 2,6 %, RND 34 J.</small>', stufe(3), '186.000 €', '178–195 T€', { t: '−6,5 %' }],
+            ['Ertragswert ' + FUEHR + '<small>Miete 9,03 €/m², LZS 2,6 %, RND 34 J.</small>', stufe(3), '186.000 €', '–', { t: '−6,5 %' }],
             ['Marktpreisindikation<small>Angebotspreise, Abschlag 9 %; ohne Abschlag 211.000 €</small>', stufe(2), '192.000 €', '180–204 T€', { t: '−3,5 %' }],
             ['Sachwert<small>BRW 250 €/m², SWF 1,10</small>', stufe(3), '194.000 €', '–', { t: '−2,5 %' }],
             ['Angebot', stufe(0), '199.000 €', '–', '±0']
@@ -410,59 +699,42 @@ input[type=range]{width:100%;accent-color:var(--gold)}
         }
       },
       finanz: { einfach: function(){ return exitEinfach(true); }, detail: function(){ return exitDetail(); } },
+      steuer: { einfach: steuerEinfach, detail: steuerDetail },
       weg: { einfach: wegEinfach, detail: wegDetail }
     },
     bestand: {
       uebersicht: {
         einfach: function(){
           return '<div class="briefing"><div class="urteil"><small>Kurs</small>Auf Kurs<span class="unter">Wert +0,8 % · Miete +2,9 % zum Plan</span></div>'
-            + '<div><p>Wert und Miete liegen über dem, was du beim Kauf einkalkuliert hast; das Hausgeld steigt schneller. Zwei Dinge brauchen dich:</p>'
+            + '<div><p>Wert und Miete liegen über dem Plan vom Kauf, das Hausgeld steigt schneller. Zwei Dinge brauchen dich:</p>'
             + '<ul><li><b>03/2027</b> · Sonderumlage Dach 5.704 € fällig. Liquidität bereithalten.</li><li><b>ab 04/2027</b> · Mieterhöhung auf 749 € zulässig (+29 €).</li></ul></div>'
             + '<span class="quelle">Plan gegen Ist · Marktbericht 20.10.2026, Wertermittlung Stufe 3, Wirtschaftsplan 2027</span></div>'
             + '<div class="karten">'
-            + karte('Wert', stufe(3) + ' ' + FUEHR, '198.000 €', pill('gut', '+0,8 % zum Plan'), 'Ertragswert, Spanne 189–208 T€')
+            + karte('Ertragswert', stufe(3) + ' ' + FUEHR, '198.000 €', pill('gut', '+0,8 % zum Plan'), 'LZS 2,4 %, RND 32 J.')
+            + karte('Marktpreis Ø', stufe(2), '205.000 €', '', 'ohne Abschlag ' + eur(ohneAbschlag(205000)))
             + karte('Kaltmiete', '', '720 €', pill('gut', '+2,9 % zum Plan'), 'Soll ab 04/2027: 749 €')
             + karte('Cashflow', '', '−14 €', pill('acht', 'knapp'), 'im Monat, vor Steuer')
             + karte('Restschuld', '', '142.300 €', pill('gut', 'im Plan'), 'Zinsbindung bis 03/2034')
             + karte('WEG', '', '5.704 €', pill('krit', 'Sonderumlage'), 'fällig 03/2027')
-            + karte('Steuer 2026', '', '−48 €', pill('acht', '2 Belege fehlen'), 'Grundsteuer, Abrechnung')
             + '</div>';
         },
         detail: function(){
-          return tabelle(['Kennzahl', 'Plan beim Kauf', 'Ist', 'Spanne', 'Abweichung', 'Quelle'], [
-            ['Ertragswert ' + stufe(3) + ' ' + FUEHR, '196.500 €', '198.000 €', '189–208 T€', { t: '+0,8 %', k: 'gut' }, 'Wertermittlung 20.10.2026'],
-            ['Marktpreisindikation ' + stufe(2), '196.500 €', '205.000 €', '192–214 T€', { t: '+4,3 %', k: 'gut' }, 'Marktbericht 20.10.2026, Abschlag 9 %'],
+          return abschnitte(GESAMT.bestand) + tabelle(['Kennzahl', 'Plan beim Kauf', 'Ist', 'Spanne', 'Abweichung', 'Quelle'], [
+            ['Ertragswert ' + stufe(3) + ' ' + FUEHR, '196.500 €', '198.000 €', '–', { t: '+0,8 %', k: 'gut' }, 'Wertermittlung 20.10.2026'],
+            ['Marktpreisindikation ' + stufe(2), '196.500 €', '205.000 €<small>ohne Abschlag 225.300 €</small>', '192–214 T€', { t: '+4,3 %', k: 'gut' }, 'Marktbericht 20.10.2026, Abschlag 9 %'],
             ['Sachwert ' + stufe(3), '196.500 €', '211.000 €', '–', { t: '+7,4 %', k: 'gut' }, 'Wertermittlung 20.10.2026'],
             ['Kaltmiete / Monat', '700 €', '720 €', '–', { t: '+2,9 %', k: 'gut' }, 'Mieteingang 10/2026'],
             ['Hausgeld / Monat', '297 €', '312 €', '–', { t: '+5,1 %', k: 'schlecht' }, 'Wirtschaftsplan 2026'],
             ['Cashflow vor Steuer / Monat', '−12 €', '−14 €', '–', { t: '−2 €', k: 'schlecht' }, 'Reiter Finanzierung'],
-            ['Restschuld', '142.300 €', '142.300 €', '–', '±0', 'Darlehenskonto'],
-            ['Steuerliches Ergebnis 2026', '−310 €', '−48 €', '–', { t: '+262 €', k: 'gut' }, 'Reiter Steuer']
-          ]) + absatz('Führend ist der Ertragswert: Die Wohnung ist vermietet und als Renditeobjekt gekauft. Marktpreisindikation und Sachwert liegen darüber und stützen ihn. Der Kurs („Auf Kurs“) misst den führenden Wert, die Miete und die Restschuld gegen den Plan vom Kauf.');
-        }
-      },
-      abz: { einfach: function(){ return abzEinfach() + absatz('Vom Kauf bis heute: +19.700 € Vermögen auf Basis des Ertragswerts. Die gesetzlich umsetzbare Miete ab 04/2027 bringt den Cashflow trotz höherem Hausgeld auf null; das Zielbild macht ihn positiv (+79 €) und bringt den Ertragswert auf 226.000 €.'); }, detail: function(){ return abzTabelle() + absatz('Ankauf ist der Stand beim Gewinnen des Objekts und ändert sich nicht mehr. Bestand liest die heutigen Werte. Soll: Mietspiegel 2026 10,40 €/m², Kappung 15 % seit der letzten Erhöhung 04/2025, frühestens 04/2027. Zielbild: Bad 11.000 €, Küche 7.000 €, Zielmiete 11,50 €/m².'); } },
-      wert: { einfach: wertEinfach, detail: wertDetail },
-      steuer: {
-        einfach: function(){
-          return '<div class="karten">'
-            + karte('2024', pill('gut', 'erklärt'), '−1.840 €', '', 'steuerliches Ergebnis, ab 04/2024')
-            + karte('2025', pill('gut', 'erklärt'), '−224 €', '', 'steuerliches Ergebnis')
-            + karte('2026', pill('acht', '2 Belege fehlen'), '−48 €', '', 'bisher, Grundsteuer fehlt')
-            + karte('2027', pill('neutral', 'Plan'), '−5.570 €', '', 'Sonderumlage im Jahr der Verwendung')
-            + '</div>';
-        },
-        detail: function(){
-          return tabelle(['', '2024', '2025', '2026', '2027 Plan'], [
-            ['Mieteinnahmen', '6.300 €', '8.520 €', '8.640 €', '8.900 €'],
-            ['Hausgeld nicht umlagefähig', '−540 €', '−984 €', '−1.008 €', '−1.164 €'],
-            ['Sonderumlage Dach (Erhaltung)<small>abziehbar, wenn die WEG das Geld verwendet</small>', '–', '–', '–', '−5.704 €'],
-            ['Schuldzinsen', '−3.580 €', '−4.700 €', '−4.620 €', '−4.540 €'],
-            ['AfA Gebäude 2 %', '−2.300 €', '−3.060 €', '−3.060 €', '−3.060 €'],
-            ['Ergebnis Anlage V', { t: '−1.840 €', k: 'schlecht' }, { t: '−224 €', k: 'schlecht' }, { t: '−48 €', k: 'schlecht' }, { t: '−5.570 €', k: 'schlecht' }]
+            ['Restschuld', '142.300 €', '142.300 €', '–', '±0', 'Darlehenskonto']
           ]);
         }
       },
+      abz: { einfach: function(){ return abzEinfach() + absatz('Vom Kauf bis heute: +19.700 € Vermögen auf Basis des Ertragswerts. Mit der gesetzlich umsetzbaren Miete ab 04/2027 kommt der Cashflow trotz höherem Hausgeld auf null. Das Zielbild macht ihn positiv (+79 €) und bringt den Ertragswert auf 226.000 €.'); }, detail: function(){ return abzTabelle() + absatz('Ankauf ist der Stand beim Gewinnen des Objekts und ändert sich nicht mehr. Bestand liest die heutigen Werte. Soll: Mietspiegel 2026 10,40 €/m², Kappung 15 % seit der letzten Erhöhung 04/2025, frühestens 04/2027. Zielbild: Bad 11.000 €, Küche 7.000 €, Zielmiete 11,50 €/m², Marktpreisindikation mit besserer Ausstattung.'); } },
+      wert: { einfach: wertEinfach, detail: wertDetail },
+      lage: { einfach: lageEinfach, detail: lageDetail },
+      steuer: { einfach: steuerEinfach, detail: steuerDetail },
+      risiko: { einfach: risikoEinfach, detail: risikoDetail },
       weg: { einfach: wegEinfach, detail: wegDetail },
       exit: { einfach: function(){ return exitEinfach(false); }, detail: function(){ return exitDetail(); } }
     }
@@ -474,23 +746,15 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     var oben = '<div class="reihe" style="justify-content:space-between"><div class="ablage" style="flex:1 1 260px"><b>PDF hier ablegen</b>Wirtschaftsplan, Protokoll, Abrechnung, Teilungserklärung</div>'
       + '<div class="schutz" style="flex:1 1 260px">Gescannte Seiten werden auf unserem Server gelesen und Personendaten geschwärzt; an die KI geht nur Text.</div></div>';
     var karten = ank
-      ? '<div class="karten" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">'
+      ? '<div class="karten breit">'
         + '<div class="rk mittel"><h4>Was absehbar Geld kostet</h4><span class="gross">unklar</span><p>Ohne Protokolle 2021–2023 bleibt offen, ob eine Sonderumlage beschlossen ist.</p></div>'
         + '<div class="rk neutral"><h4>Eigentümergemeinschaft</h4><p>8 Einheiten, Verwaltung Weserland GmbH. Teilungserklärung ohne Auffälligkeiten.</p></div>'
         + '<div class="rk neutral" style="border-top-color:var(--gold)"><h4>Investitionsthese</h4><p>Solide Wohnung unter Marktmiete; Hebel sind Mieterhöhung und Bad.</p></div></div>'
-        + '<span class="lbl">Die wichtigsten Risiken</span><div class="karten" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">'
-        + '<div class="rk"><h4>Protokolle fehlen</h4><p>Beschlüsse zu Dach und Heizung (Baujahr 1972) unbekannt.</p><span class="klein">Quelle: Datenraum</span></div>'
-        + '<div class="rk mittel"><h4>Heizung von 1998</h4><p>Austausch in den nächsten Jahren wahrscheinlich.</p><span class="klein">Quelle: Energieausweis</span></div>'
-        + '<div class="rk niedrig"><h4>Grundschuld Verkäufer</h4><p>Üblich, wird mit dem Kaufpreis abgelöst.</p><span class="klein">Quelle: Grundbuch Abt. III</span></div></div>'
-      : '<div class="karten" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">'
+      : '<div class="karten breit">'
         + '<div class="rk"><h4>Was absehbar Geld kostet</h4><span class="gross">5.704 €</span><p>Sonderumlage Dachsanierung, fällig 03/2027 (dein Anteil 62/1000).</p></div>'
         + '<div class="rk neutral"><h4>Eigentümergemeinschaft</h4><p>Beschlüsse einstimmig, Verwalter bis 2029 bestellt. <b>Rücklage:</b> 38 €/m², für 1972 knapp.</p></div>'
-        + '<div class="rk neutral" style="border-top-color:var(--gold)"><h4>Investitionsthese</h4><p>Nach dem Dach ist das Gemeinschaftseigentum für Jahre erledigt; Hebel bleibt die Miete.</p></div></div>'
-        + '<span class="lbl">Die wichtigsten Risiken</span><div class="karten" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">'
-        + '<div class="rk"><h4>Sonderumlage Dach</h4><p>5.704 € in 03/2027; Cashflow 2027 wird negativ.</p><span class="klein">Protokoll 14.06.2026, TOP 5</span></div>'
-        + '<div class="rk mittel"><h4>Heizungstausch geprüft</h4><p>Prüfauftrag bis 2028, nächste Umlage wahrscheinlich.</p><span class="klein">Protokoll 14.06.2026, TOP 7</span></div>'
-        + '<div class="rk mittel"><h4>Hausgeld steigt</h4><p>+8 % zu 2027, Rücklage angehoben.</p><span class="klein">Wirtschaftsplan 2027</span></div></div>';
-    return oben + karten;
+        + '<div class="rk neutral" style="border-top-color:var(--gold)"><h4>Investitionsthese</h4><p>Nach dem Dach ist das Gemeinschaftseigentum für Jahre erledigt; Hebel bleibt die Miete.</p></div></div>';
+    return oben + karten + '<p class="klein">Die Risiken aus den Unterlagen stehen jetzt gesammelt unter „Risiken &amp; Szenarien“.</p>';
   }
   function wegDetail(){
     if (S.phase === 'ankauf') return wegEinfach() + tabelle(['Unterlage', 'Stand', 'Bank braucht', 'Prüfpunkt'], [
@@ -504,7 +768,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       ['Wirtschaftsplan 2024', pill('acht', 'fehlt'), 'oft', 'Hausgeld, Rücklage'],
       ['Hausgeldabrechnung 2023', pill('acht', 'fehlt'), 'nein', 'umlagefähiger Anteil']
     ]) + '<div class="reihe"><button type="button" class="btn leise" id="anfrage">Fehlende Unterlagen beim Makler anfragen</button><span class="meldung" id="weg-meldung" role="status"></span></div>';
-    return '<h3>Aus dem Wirtschaftsplan 2027 übernehmen?</h3><p class="klein">Nichts ist vorgehakt. Hak an, was übernommen werden soll.</p>'
+    return wegEinfach() + '<h3>Aus dem Wirtschaftsplan 2027 übernehmen?</h3><p class="klein">Nichts ist vorgehakt. Hak an, was übernommen werden soll.</p>'
       + tabelle(['Position', 'bisher', 'neu', 'geht nach'], [
         ['<label><input type="checkbox" id="ue1"> Hausgeld umlagefähig / Monat</label>', '228 €', '241 €', 'Bewirtschaftung 2027'],
         ['<label><input type="checkbox" id="ue2"> nicht umlagefähig / Monat</label>', '84 €', '97 €', 'Cashflow, Steuer 2027'],
@@ -541,7 +805,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       + '</div></div>';
   }
   function exitDetail(){
-    var z = [3, 4, 5, 6].map(function(p){ var r = rechne(p, 0, 10); return [de(p, 1) + ' %', eur(r.rate), { t: (r.cf >= 0 ? '+' : '−') + eur(Math.abs(r.cf)), k: r.cf >= 0 ? 'gut' : 'schlecht' }, de(r.dscr, 2)]; });
+    var z = [3, 4, 5, 6].map(function(p){ var r = rechne(p, 0, 10); return [de(p, 1) + ' %', eur(r.rate), { t: sEur(r.cf), k: r.cf >= 0 ? 'gut' : 'schlecht' }, de(r.dscr, 2)]; });
     return exitEinfach(S.phase === 'ankauf') + tabelle(['Anschlusszins', 'Rate / Monat', 'Cashflow / Monat', 'DSCR'], z)
       + absatz('Miete +10 % bis 2034 (792 €), nicht umlagefähig 97 €, Tilgung 2 %. Über rund 5,2 % Anschlusszins trägt die Miete die Rate nicht mehr.');
   }
@@ -553,21 +817,55 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     document.getElementById('o-miete').textContent = (RG.miete > 0 ? '+' : '') + RG.miete + ' %';
     var r = rechne(RG.zins, RG.leer, RG.miete);
     document.getElementById('e-rate').textContent = eur(r.rate);
-    document.getElementById('e-cf').textContent = (r.cf >= 0 ? '+' : '−') + eur(Math.abs(r.cf));
+    document.getElementById('e-cf').textContent = sEur(r.cf);
     document.getElementById('e-dscr').textContent = de(r.dscr, 2);
     document.getElementById('e-pill').innerHTML = r.dscr >= 1.2 ? pill('gut', 'trägt sich') : r.dscr >= 1.0 ? pill('acht', 'knapp') : pill('krit', 'Zuschuss');
+  }
+
+  /* ═══ PDF-Auswahl ═══ Bausteine wie heute (ai-pdf-sec-*), nach Unterreitern geordnet. */
+  var PDF = {
+    ankauf: [
+      ['Übersicht', [['Gesamtbewertung mit Urteil', 1], ['Investmentbewertung', 0, 'wiederholt das Urteil'], ['Investor-Fit', 1], ['DealPilot-Insight', 1]]],
+      ['Ankauf · Soll · Zielbild', [['Gegenüberstellung mit Marktpreis und Ertragswert', 1, 'für die Bank']]],
+      ['Wert & Lage', [['Wert und Berichte', 1], ['Lage & Markt', 1]]],
+      ['Risiken & Szenarien', [['Stärken', 1], ['Risiken', 1, 'für die Bank: zeigt, dass du dich damit beschäftigt hast'], ['Risikoanalyse', 1], ['Worst · Plan · Best', 1]]],
+      ['Kaufpreis & Finanzierung', [['Verhandlungsempfehlung', 1], ['Kaufpreis-Offerte', 1], ['Bankargumente', 1], ['Stresstest', 1]]],
+      ['Steuer', [['Steuerliche Zusammenfassung', 1], ['Steuerverlauf', 1]]],
+      ['Unterlagen & WEG', [['Unterlagenliste und Beschlüsse', -1, 'nicht im PDF: interne Prüfung']]]
+    ],
+    bestand: [
+      ['Übersicht', [['Gesamtbewertung mit Kurs', 1], ['Bestand und Strategie', 1], ['Investmentbewertung', 0, 'wiederholt das Urteil'], ['Investor-Fit', 1], ['DealPilot-Insight', 1]]],
+      ['Ankauf · Bestand · Soll · Zielbild', [['Gegenüberstellung', 1]]],
+      ['Wert & Lage', [['Wert gegen Plan mit Grafik', 1], ['Lage & Markt', 1]]],
+      ['Steuer', [['Steuerliche Zusammenfassung', 1], ['Steuerverlauf', 1]]],
+      ['Risiken & Szenarien', [['Stärken', 1], ['Risiken', 1, 'für die Bank'], ['Risikoanalyse', 1], ['Worst · Plan · Best', 1]]],
+      ['Anschluss & Exit', [['Anschlussfinanzierung mit Bankargumenten', 1], ['Exit-Strategien', 1]]],
+      ['Unterlagen & WEG', [['Beschlüsse, Wirtschaftsplan', -1, 'nicht im PDF: interne Prüfung']]]
+    ]
+  };
+  function pdfTafel(){
+    var t = document.getElementById('pdf-tafel');
+    t.hidden = !S.pdf; document.getElementById('pdf-auf').setAttribute('aria-expanded', S.pdf);
+    if (!S.pdf) return;
+    t.innerHTML = '<div class="reihe" style="justify-content:space-between"><h3>PDF zusammenstellen · ' + (S.phase === 'ankauf' ? 'Ankauf' : 'Bestand') + '</h3><span class="klein">gerechnete Seiten (Stresstest, Wertpotenzial) kommen nicht noch einmal als Text</span></div>'
+      + '<div class="pdf-gruppen">' + PDF[S.phase].map(function(g){
+        return '<div class="pdf-gruppe"><span class="lbl">' + g[0] + '</span>' + g[1].map(function(b){
+          return '<label' + (b[1] < 0 ? ' class="gesperrt"' : '') + '><input type="checkbox"' + (b[1] > 0 ? ' checked' : '') + (b[1] < 0 ? ' disabled' : '') + '><span>' + b[0] + (b[2] ? '<small>' + b[2] + '</small>' : '') + '</span></label>';
+        }).join('') + '</div>';
+      }).join('') + '</div><div class="reihe"><button type="button" class="btn" id="pdf-los">PDF erstellen</button><span class="meldung" id="pdf-meldung" role="status"></span></div>';
+    document.getElementById('pdf-los').addEventListener('click', function(){ var n = t.querySelectorAll('input:checked').length; document.getElementById('pdf-meldung').textContent = 'PDF mit ' + n + ' Bausteinen erstellt. (Demo)'; });
   }
 
   /* ═══ Pilot-Fragen ═══ */
   var FRAGEN = {
     ankauf: [
-      ['Was soll ich bieten?', 'Biete 189.000 €: 5 % unter dem Angebot, zwischen Ertragswert (186.000 €) und Sachwert (194.000 €). Mehr als 194.000 € (Ertragswert bei Soll-Miete) würde ich nicht zahlen.', 'Quelle: Wertermittlung Stufe 3, Marktbericht Stufe 2.', 'kaufpreis', 'einfach'],
+      ['Was soll ich bieten?', 'Biete 189.000 €. Das sind 5 % unter dem Angebot, zwischen Ertragswert (186.000 €) und Sachwert (194.000 €). Mehr als 194.000 € (Ertragswert bei Soll-Miete) würde ich nicht zahlen.', 'Quelle: Wertermittlung Stufe 3, Marktbericht Stufe 2.', 'kaufpreis', 'einfach'],
       ['Wie erkläre ich es der Bank?', 'Mit Ankauf · Soll · Zielbild: DSCR heute 0,91, mit der gesetzlich möglichen Miete 0,98, nach Bad und Küche 1,17. Der Ertragswert steigt dabei von 186.000 € auf 226.000 €, die Beleihung auf den Ertragswert sinkt von 80,6 % auf 60,4 %.', 'Quelle: Reiter Finanzierung, Wertermittlung.', 'abz', 'detail'],
-      ['Was fehlt an Unterlagen?', 'Protokolle 2021–2023, Wirtschaftsplan 2024 und Hausgeldabrechnung 2023. Ohne Protokolle bleibt eine beschlossene Sonderumlage unsichtbar.', 'Quelle: Datenraum.', 'weg', 'detail']
+      ['Was passiert im schlechtesten Fall?', 'Bei 10 % weniger Miete und 1 % mehr Zins zahlst du rund 250 € im Monat zu. Der DSCR fällt auf 0,68.', 'Quelle: Risiken & Szenarien, Worst Case.', 'risiko', 'einfach']
     ],
     bestand: [
-      ['Liege ich im Plan?', 'Ja. Der führende Wert (Ertragswert) liegt 0,8 % über dem Plan, die Miete 2,9 %, die Restschuld genau im Plan. Das Hausgeld liegt 5 % darüber.', 'Quelle: Wertermittlung 20.10.2026, Mieteingang, Darlehenskonto.', 'uebersicht', 'detail'],
-      ['Was bedeutet die Sonderumlage?', 'Du zahlst im März 2027 einmalig 5.704 €. Steuerlich zählt sie, sobald die WEG das Geld für das Dach verwendet.', 'Quelle: Protokoll 14.06.2026, TOP 5; BFH IX R 19/24.', 'weg', 'einfach'],
+      ['Liege ich im Plan?', 'Ja. Der Ertragswert als führender Wert liegt 0,8 % über dem Plan, die Miete 2,9 %, die Restschuld genau im Plan. Das Hausgeld liegt 5 % darüber.', 'Quelle: Wertermittlung 20.10.2026, Mieteingang, Darlehenskonto.', 'uebersicht', 'detail'],
+      ['Warum ist mein Steuerergebnis negativ?', 'Vor allem wegen der AfA von 3.266 € im Jahr. Sie kostet kein Geld, senkt aber das Ergebnis. 2027 kommt die Sonderumlage dazu, sobald die WEG sie für das Dach verwendet.', 'Quelle: Reiter Steuer; BFH IX R 19/24.', 'steuer', 'detail'],
       ['Wann kann ich die Miete erhöhen?', 'Ab 04/2027 auf 749 € (Mietspiegel 10,40 €/m²). Die Kappungsgrenze erlaubt bis 828 €, der Mietspiegel ist hier die Grenze.', 'Quelle: Mietvertrag, Mietspiegel 2026.', 'abz', 'detail']
     ]
   };
@@ -595,11 +893,13 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     var ur = document.getElementById('unterreiter');
     ur.innerHTML = REITER[S.phase].map(function(r){ return '<button type="button" role="tab" data-r="' + r[0] + '" aria-selected="' + (S.reiter[S.phase] === r[0]) + '">' + r[1] + '</button>'; }).join('');
     ur.querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ S.reiter[S.phase] = b.getAttribute('data-r'); loeschFrage = null; zeichne(); }); });
-    document.getElementById('inhalt').innerHTML = '<div style="display:grid;gap:14px">' + INHALT[S.phase][S.reiter[S.phase]][S.modus]() + '</div>';
+    document.getElementById('inhalt').innerHTML = '<div style="display:grid;gap:14px;min-width:0">' + INHALT[S.phase][S.reiter[S.phase]][S.modus]() + '</div>';
+    pdfTafel();
     verdrahten();
   }
   function meldung(t){ var m = document.getElementById('weg-meldung') || document.getElementById('offerte-meldung'); if (m) m.textContent = t; }
   function verdrahten(){
+    hoverVerdrahten();
     ['r-zins', 'r-leer', 'r-miete'].forEach(function(id){ var e = document.getElementById(id); if (e) e.addEventListener('input', regler); });
     regler();
     var u = document.getElementById('uebernehmen');
@@ -619,8 +919,8 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       setTimeout(function(){
         abrufLaeuft = false;
         var neu = S.phase === 'bestand'
-          ? (st === 3 ? { verf: 'Ertragswert', wert: 199000, sp: [190000, 209000], fuehrend: true, satz: 'LZS 2,4 %, Miete 10,00 €/m², RND 32 J.' } : { verf: 'Marktpreisindikation', wert: st === 1 ? 204000 : 207000, sp: [196000, 216000], satz: st === 1 ? 'Schnellabruf' : 'Angebotspreise, Abschlag 9 %' })
-          : (st === 3 ? { verf: 'Ertragswert', wert: 186000, sp: [178000, 195000], fuehrend: true, satz: 'LZS 2,6 %, Miete 9,03 €/m²' } : { verf: 'Marktpreisindikation', wert: 193000, sp: [181000, 205000], satz: 'Angebotspreise, Abschlag 9 %' });
+          ? (st === 3 ? { verf: 'Ertragswert', wert: 199000, fuehrend: true, satz: 'LZS 2,4 %, Miete 10,00 €/m², RND 32 J.' } : { verf: 'Marktpreisindikation', wert: st === 1 ? 204000 : 207000, sp: [196000, 216000], satz: st === 1 ? 'Schnellabruf' : 'Angebotspreise, Abschlag 9 %' })
+          : (st === 3 ? { verf: 'Ertragswert', wert: 186000, fuehrend: true, satz: 'LZS 2,6 %, Miete 9,03 €/m²' } : { verf: 'Marktpreisindikation', wert: 193000, sp: [181000, 205000], satz: 'Angebotspreise, Abschlag 9 %' });
         if (neu.fuehrend) BERICHTE[S.phase].forEach(function(x){ x.fuehrend = false; });
         BERICHTE[S.phase].push(Object.assign({ id: 'n' + Date.now(), datum: S.phase === 'bestand' ? '02.11.2026' : '20.02.2024', t: S.phase === 'bestand' ? 2026.84 : 2024.14, stufe: st, an: true }, neu));
         zeichne();
@@ -628,6 +928,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     });
   }
   document.querySelectorAll('[data-modus]').forEach(function(b){ b.addEventListener('click', function(){ S.modus = b.getAttribute('data-modus'); zeichne(); }); });
+  document.getElementById('pdf-auf').addEventListener('click', function(){ S.pdf = !S.pdf; pdfTafel(); });
   document.getElementById('demo-phase').addEventListener('click', function(){ S.phase = S.phase === 'bestand' ? 'ankauf' : 'bestand'; S.frage = null; loeschFrage = null; fragen(); antwort(); zeichne(); });
   fragen(); zeichne();
 })();
