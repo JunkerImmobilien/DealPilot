@@ -5874,7 +5874,11 @@ const QcApp = (function() {
         const z = mp && mp.zul;
         const grundM = QcEngine.num(inputs.nkm_grund) > 0 ? Math.min(QcEngine.num(inputs.nkm_grund), nkm) : nkm;
         void z; void grundM;
-        if (!(mp && mp.markt_monat > 0)) pot = 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
+        /* v3081f · Marcel: „wie gehst du damit um, wenn wir keine Daten haben?“ - ohne Marktmiete kein Abgleich und keine
+           Potenzial-Karte; der Satz sagt, ob die Bewertung noch fehlt oder ob sie keine Mieten fand. */
+        if (!(mp && mp.markt_monat > 0)) pot = span
+          ? 'Die DealPilot-Marktbewertung fand für diese Adresse keine Vergleichsmieten — ein Abgleich und ein Mietpotenzial sind deshalb nicht möglich. Mietspiegel der Gemeinde oder aktuelle Angebote selbst prüfen.'
+          : 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
         else if (mp.markt_monat < nkm * 0.9) pot = 'Die Ist-Miete liegt über der Marktmiete — Risiko bei Mieterwechsel.';
       }
       h += `<div class="qcb-box qcb-miete"><span><span class="qcb-l">Angesetzte Miete</span><br>${kopfT}</span>`
