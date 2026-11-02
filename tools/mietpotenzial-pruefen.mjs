@@ -1,0 +1,247 @@
+#!/usr/bin/env node
+/* tools/mietpotenzial-pruefen.mjs · v3075 — Prüfstrecke „zulässige Miete nach 3 Jahren"
+
+   Marcel 02.11.2026 (P1.1–P1.3): der Quick-Check zeigt die rechtlich zulässige
+   Bestandsmiete nach drei Jahren und einen zweistufigen Zielkaufpreis. Die Regeln
+   liegen seit v3075 in frontend/js/mietpotenzial-kern.js; potenzial.js ruft sie auf.
+
+   Geprüft an den ECHTEN Dateien (vm, Uhr fest auf 28.10.2026 wie
+   tools/mieterhoehung-termine-pruefen.mjs):
+     A  Marcels Beispiel: 180.000 €, NKM 10.800 €/J., Ziel 8 %
+        -> heute 135.000 €, mit zulässiger Miete 162.000 € (Kappung 20 %) / 155.250 € (15 %)
+     B  zulaessig(): Kappung, Vergleichsmiete, an der Vergleichsmiete, ohne Vergleichsmiete,
+        Staffel, Sperrfrist; Angebotsmiete geht nie ein
+     C  neuvermietung(): eigene Zeile, Mietpreisbremse 110 %
+     D  kappungAus()/mietpreisbremseAus(): AGS und Ortsname
+     E  potenzial.js = Kern: sollFuer, kappung, mietpreisbremse, mhTermine über ein Raster
+        (Prüfsumme eingefroren; mit --alt=<alte potenzial.js> Fall für Fall gegen den alten Stand)
+     F  dealscore.js: Mietpotenzial-Bonus (statt nie erreichbarem mstg 1,5), Zustand-Grenze,
+        Haupt-App unverändert; Benchmark Fall D nicht mehr „Sehr gut"
+     G  qc-heuristik.js kategorien(): der Rechenweg nennt die Kurven, die die Punkte vergeben
+   RC=0 sauber, RC=1 Abweichung. */
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+
+const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const JS = (d) => path.join(WURZEL, 'frontend/js', d);
+const ARG = Object.fromEntries(process.argv.slice(2).map((a) => { const m = /^--([^=]+)(?:=(.*))?$/.exec(a); return m ? [m[1], m[2] ?? true] : [a, true]; }));
+
+let fehler = 0, n = 0;
+function gleich(name, ist, soll) {
+  n++;
+  const ok = JSON.stringify(ist) === JSON.stringify(soll);
+  if (!ok) { fehler++; console.log('  FEHLER ' + name + ': ist ' + JSON.stringify(ist) + ', soll ' + JSON.stringify(soll)); }
+}
+function wahr(name, b) { gleich(name, !!b, true); }
+const rund = (x) => Math.round(x);
+
+/* ── vm-Fenster, Uhr fest 28.10.2026 ─────────────────────────────────── */
+const ECHT = Date;
+class FestDate extends ECHT {
+  constructor(...a) { if (a.length) super(...a); else super(2026, 9, 28, 12, 0, 0); }
+  static now() { return new ECHT(2026, 9, 28, 12, 0, 0).getTime(); }
+}
+const KAPP = JSON.parse(fs.readFileSync(JS('data/kappungsgrenzen.json'), 'utf8'));
+function fenster(feld) {
+  const F = feld || {};
+  const el = (id) => (id in F ? { value: F[id] } : null);
+  const f = {
+    addEventListener() {}, removeEventListener() {}, dispatchEvent() {},
+    localStorage: { getItem() { return null; }, setItem() {} },
+    setTimeout() {}, clearTimeout() {}, innerWidth: 1280,
+    fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve(JSON.parse(JSON.stringify(KAPP))) })
+  };
+  f.window = f; f.self = f;
+  f.document = { readyState: 'complete', addEventListener() {}, getElementById: el, querySelector: () => null,
+    querySelectorAll() { return []; }, createElement() { return { style: {}, setAttribute() {}, appendChild() {} }; },
+    head: { appendChild() {} }, body: { appendChild() {} } };
+  return vm.createContext(Object.assign(f, { Date: FestDate, console, Math, JSON, Number, String, Object, Array, isFinite, parseFloat, parseInt, RegExp, Promise }));
+}
+function lade(ctx, datei, name) { vm.runInContext(fs.readFileSync(datei, 'utf8'), ctx, { filename: name || path.basename(datei) }); }
+
+const cK = fenster(); lade(cK, JS('mietpotenzial-kern.js'));
+const K = cK.DpMietpotenzial;
+if (!K || !K.zulaessig) { console.log('ABBRUCH: DpMietpotenzial fehlt'); process.exit(2); }
+const cH = fenster(); lade(cH, JS('dscr-engine.js')); lade(cH, JS('deal-kpis.js')); lade(cH, JS('score-tiers.js')); lade(cH, JS('qc-heuristik.js')); lade(cH, JS('dealscore.js'));
+const H = cH.QcHeuristik, DS = cH.DealScore, DK = cH.DealKpis, ST = cH.ScoreTier;
+const HEUTE = '2026-10';
+
+/* ── A · Marcels Beispiel ────────────────────────────────────────────── */
+for (const [k, soll3] of [[20, 162000], [15, 155250]]) {
+  const z = K.zulaessig({ ist: 900, wfl: 0, kappung_pct: k, heute: HEUTE });
+  gleich('A zulässige Miete ' + k + ' % (Monat)', z.miete_monat, 900 * (1 + k / 100));
+  gleich('A Grenze ' + k + ' %', z.grund, 'kappung');
+  const zk = H.zielKaufpreisZweistufig({ kp: 180000, nkm: 900, nkmZul: z.miete_monat, zielBmr: 8, cfMon: 132 });
+  gleich('A Zielkaufpreis heute (8 %)', rund(zk.heute), 135000);
+  gleich('A Zielkaufpreis mit zulässiger Miete (' + k + ' %)', rund(zk.nach3), soll3);
+  gleich('A Nachlass heute', rund(zk.nachlass_heute), 45000);
+  gleich('A Nachlass nach 3 J. (' + k + ' %)', rund(zk.nachlass_3j), 180000 - soll3);
+  gleich('A Bruttorendite heute 6,0 %', Math.round(zk.bmr_heute * 10) / 10, 6);
+  gleich('A Bruttorendite nach 3 J. (' + k + ' %)', Math.round(zk.bmr_3j * 10) / 10, k === 20 ? 7.2 : 6.9);
+}
+/* Marcels ursprüngliche 168.750 € (13.500 € NKM) sind mit der Kappung NICHT erreichbar */
+gleich('A 13.500 € NKM übersteigt jede Kappung', K.zulaessig({ ist: 900, wfl: 0, kappung_pct: 20, heute: HEUTE }).miete_jahr < 13500, true);
+/* Sanierung zählt zur Gesamtinvestition */
+gleich('A mit 20.000 € Sanierung: heute 115.000 €', rund(H.zielKaufpreisZweistufig({ kp: 180000, nkm: 900, zielBmr: 8, cfMon: 132, san: 20000 }).heute), 115000);
+/* der Marktwert deckelt auch die zweite Stufe */
+gleich('A Marktwert 150.000 deckelt die zweite Stufe', rund(H.zielKaufpreisZweistufig({ kp: 180000, nkm: 900, nkmZul: 1080, zielBmr: 8, cfMon: 132, marktwert: 150000 }).nach3), 150000);
+/* bisherige Aufrufer ohne san: zielKaufpreis unverändert */
+gleich('A zielKaufpreis ohne san unverändert', rund(H.zielKaufpreis({ kp: 180000, nkm: 900, zielBmr: 8, cfMon: 132 })), 135000);
+
+/* ── B · zulaessig() ─────────────────────────────────────────────────── */
+let z = K.zulaessig({ ist: 500, wfl: 60, vgl_qm: 10, kappung_pct: 15, heute: HEUTE });
+gleich('B1 Kappung bindet (575 < 600)', [z.miete_monat, z.grund], [575, 'kappung']);
+z = K.zulaessig({ ist: 500, wfl: 60, vgl_qm: 9, kappung_pct: 20, heute: HEUTE });
+gleich('B2 Vergleichsmiete bindet (540 < 600)', [z.miete_monat, z.grund], [540, 'vergleichsmiete']);
+z = K.zulaessig({ ist: 650, wfl: 60, vgl_qm: 10, kappung_pct: 20, heute: HEUTE });
+gleich('B3 schon über der Vergleichsmiete: bleibt bei Ist', [z.miete_monat, z.grund, z.plus_pct], [650, 'vergleichsmiete_erreicht', 0]);
+z = K.zulaessig({ ist: 500, wfl: 60, kappung_pct: 20, heute: HEUTE });
+gleich('B4 ohne Vergleichsmiete: Kappung mit Hinweis', [z.miete_monat, z.grund, z.vgl_fehlt], [600, 'kappung', true]);
+z = K.zulaessig({ ist: 500, wfl: 60, vgl_qm: 12, kappung_pct: 20, mv_art: 'staffel', heute: HEUTE });
+gleich('B5 Staffelmiete: kein § 558', [z.miete_monat, z.grund], [500, 'vertrag']);
+z = K.zulaessig({ ist: 500, wfl: 60, vgl_qm: 12, kappung_pct: 20, letzte: '2026-01', heute: HEUTE });
+gleich('B6 Sperrfrist: verlangbar 01/2027, wirksam 04/2027, Höhe unverändert', [z.miete_monat, z.sperrfrist, z.termine.verlangbar_ab, z.termine.wirksam_ab], [600, true, '2027-01', '2027-04']);
+wahr('B6 Termintext nennt die Sperrfrist', /Sperrfrist/.test(z.termin_text));
+z = K.zulaessig({ ist: 500, wfl: 60, vgl_qm: 12, kappung_pct: 20, heute: HEUTE });
+gleich('B7 ohne letzte Erhöhung: Hinweis Sperrfrist ungeprüft', z.hinweise.length, 1);
+gleich('B8 nächste Erhöhung = sollFuer', [z.naechste.miete, z.naechste.ab], [600, '2027-01']);
+gleich('B9 Kappung außerhalb 15/20 -> Gesetz 20 %', K.zulaessig({ ist: 500, wfl: 60, kappung_pct: 30, heute: HEUTE }).kappung_pct, 20);
+/* Angebotsmiete ist kein Parameter von zulaessig(): ein Feld `markt_qm` ändert nichts */
+gleich('B10 Angebotsmiete wird ignoriert', K.zulaessig({ ist: 500, wfl: 60, vgl_qm: 9, kappung_pct: 20, markt_qm: 14, heute: HEUTE }).miete_monat, 540);
+
+/* ── C · neuvermietung() ─────────────────────────────────────────────── */
+let nv = K.neuvermietung({ markt_qm: 14, wfl: 60, vgl_qm: 10, bremse: { gilt: true } });
+gleich('C1 Bremse: höchstens 11,00 €/m²', [nv.qm, nv.gedeckelt, nv.monat], [11, true, 660]);
+nv = K.neuvermietung({ markt_qm: 14, wfl: 60, vgl_qm: 10, bremse: { gilt: false } });
+gleich('C2 ohne Bremse: Marktmiete', [nv.qm, nv.gedeckelt], [14, false]);
+nv = K.neuvermietung({ markt_qm: 14, wfl: 60, bremse: { gilt: true } });
+gleich('C3 Bremse ohne Vergleichsmiete: ungeprüft gekennzeichnet', [nv.qm, nv.ungeprueft], [14, true]);
+gleich('C4 ohne Marktmiete: keine Zeile', K.neuvermietung({ wfl: 60 }), null);
+
+/* ── D · Kappung und Bremse aus der Liste ────────────────────────────── */
+const OPT = { heute: '2026-10-28' };
+gleich('D1 Aachen per AGS: 15 %', [K.kappungAus(KAPP, { ags: '05334002' }, OPT).pct, K.kappungAus(KAPP, { ags: '05334002' }, OPT).herkunft], [15, 'verordnung']);
+gleich('D2 Aachen per Ortsname: 15 %', [K.kappungAus(KAPP, { land: 'NW', ort: 'Aachen' }, OPT).pct, K.kappungAus(KAPP, { land: 'NW', ort: 'Aachen' }, OPT).zuordnung], [15, 'ortsname']);
+wahr('D2 Text nennt die Zuordnung über den Ortsnamen', /Ortsnamen/.test(K.kappungAus(KAPP, { land: 'NW', ort: 'Aachen' }, OPT).text));
+gleich('D3 Hüllhorst (nicht gelistet): 20 % Gesetz', [K.kappungAus(KAPP, { land: 'NW', ort: 'Hüllhorst' }, OPT).pct, K.kappungAus(KAPP, { land: 'NW', ort: 'Hüllhorst' }, OPT).herkunft], [20, 'gesetz']);
+gleich('D4 eigene Angabe 15 % geht vor', K.kappungAus(KAPP, { land: 'NW', ort: 'Hüllhorst' }, { eigen_pct: 15 }).herkunft, 'eigen');
+gleich('D5 ohne Liste: Auffang 20 %, prüfen', [K.kappungAus(null, { land: 'NW', ort: 'Aachen' }).pct, K.kappungAus(null, {}).pruefen], [20, true]);
+gleich('D6 ohne Ort: Gemeinde nicht ermittelt', /Gemeinde noch nicht ermittelt/.test(K.kappungAus(KAPP, { land: 'NW' }).text), true);
+gleich('D7 Bremse Aachen per Ortsname', K.mietpreisbremseAus(KAPP, { land: 'NW', ort: 'Aachen' }, OPT).gilt, true);
+gleich('D8 Bremse Hüllhorst', K.mietpreisbremseAus(KAPP, { land: 'NW', ort: 'Hüllhorst' }, OPT).gilt, false);
+const koeln = K.kappungAus(KAPP, { land: 'NW', ort: 'Köln' }, OPT);
+gleich('D9 Köln (Umlaut) per Ortsname', koeln.pct, 15);
+
+/* ── E · potenzial.js rechnet mit dem Kern - dieselben Ergebnisse wie vorher ── */
+async function potenzialLaden(datei, mitKern) {
+  const c = fenster();
+  if (mitKern) lade(c, JS('mietpotenzial-kern.js'));
+  lade(c, datei, 'potenzial.js');
+  await c.DpPotenzial.kappungLaden();
+  return c.DpPotenzial;
+}
+const AGS = ['05334002', '05758016', '09162000', '11000000', '06412000', '99999999', '', '0533'];
+function raster(P, mitListe) {
+  const aus = [];
+  const MASSN = [null, [{ id: 'bad', t: 'Bad', k: 12000, bewohnt: true }], [{ id: 'sonst', t: 'Fenster und Heizung', k: 10000, bewohnt: true, erh: 20 }], [{ id: 'renovierung', t: 'Renovierung', k: 3000, bewohnt: true }]];
+  for (const ist of [0, 500, 820]) for (const vgl of [0, 8, 10, 14]) for (const kp of [15, 20]) for (const letzte of ['', '2024-01-01', '2025-03-01', '2026-01-01', '2026-09-01'])
+    for (const betrag of ['', '50']) for (const soll of ['', '640']) for (const art of ['', 'staffel', 'index']) for (let mi = 0; mi < MASSN.length; mi++) {
+      const e = { ist, wfl: 60, status: ist ? 'vermietet' : 'leer', vgl_qm: '', soll, soll_ab: soll ? '2027-05' : '', mv_art: art, mv_letzte_erhoehung: letzte, mv_letzte_erhoehung_betrag: betrag };
+      if (MASSN[mi]) e.massnahmen = MASSN[mi];
+      aus.push(P.sollFuer(e, { kapp: { pct: kp }, vgl_qm: vgl }));
+    }
+  /* Kappung und Bremse haengen an der Liste (kappungsgrenzen.json, eigener Erntestrang) - in der
+     Pruefsumme nie (die Liste wird nachgeerntet), mit --alt Fall fuer Fall, sonst unten direkt gegen den Kern */
+  if (mitListe) for (const ags of AGS) { aus.push(P.kappung(ags)); aus.push(P.mietpreisbremse(ags)); }
+  for (const art of ['558', '559', '557b']) for (const letzte of [null, '2025-03', '2026-01', '2026-08']) for (const eig of [null, '2026-11', '2027-06'])
+    aus.push(P.mhTermine({ art, letzte, wirksam_eigen: eig, heute: HEUTE }));
+  return aus;
+}
+const P = await potenzialLaden(JS('potenzial.js'), true);
+const neu = raster(P, false);
+const SUMME = crypto.createHash('sha256').update(JSON.stringify(neu)).digest('hex');
+/* Eingefroren am 02.11.2026 gegen den Stand VOR v3075 (git HEAD f376887a, potenzial.js ohne Kern):
+   node tools/mietpotenzial-pruefen.mjs --alt=<alte potenzial.js> meldete alle Fälle gleich. */
+const SUMME_SOLL = '852a5a0654d9af4af90892e410605866cf92a32fcd135ea2cea455d2c7496a1f';   /* 5796 Fälle, ohne Liste */
+gleich('E Raster ' + neu.length + ' Fälle: Prüfsumme wie vor v3075 (bei Abweichung: --alt=<alte potenzial.js>)', SUMME, SUMME_SOLL);
+if (ARG.summe) console.log('Prüfsumme Raster: ' + SUMME + ' (' + neu.length + ' Fälle)');
+if (typeof ARG.alt === 'string') {
+  const A = await potenzialLaden(path.resolve(ARG.alt), false);
+  const alt = raster(A, true), neuL = raster(P, true);
+  let ab = 0;
+  alt.forEach((x, i) => { if (JSON.stringify(x) !== JSON.stringify(neuL[i])) { ab++; if (ab <= 5) console.log('  ABWEICHUNG Fall ' + i + ':\n    alt ' + JSON.stringify(x) + '\n    neu ' + JSON.stringify(neuL[i])); } });
+  gleich('E --alt: ' + alt.length + ' Fälle Fall für Fall gleich', ab, 0);
+}
+for (const ags of AGS) {
+  gleich('E kappung(' + (ags || 'leer') + ') = Kern', P.kappung(ags), JSON.parse(JSON.stringify(K.kappungAus(KAPP, { ags }))));
+  gleich('E mietpreisbremse(' + (ags || 'leer') + ') = Kern', P.mietpreisbremse(ags), JSON.parse(JSON.stringify(K.mietpreisbremseAus(KAPP, { ags }))));
+}
+gleich('E sollFuer im Kern = potenzial.js (ohne Maßnahmen)', JSON.stringify(K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', mv_letzte_erhoehung: '2025-03-01' }, { kapp: { pct: 20 }, vgl_qm: 10 })),
+  JSON.stringify(P.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', mv_letzte_erhoehung: '2025-03-01' }, { kapp: { pct: 20 }, vgl_qm: 10 })));
+
+/* ── F · dealscore.js ────────────────────────────────────────────────── */
+const basis = { kp: 200000, cf_m: 50, nmy: 3.5, ltv: 80, dscr: 1.3, wp_kpi: 0, darlehen: 160000 };
+const pot = (K2) => DS.computeFromKpis(K2).breakdown.find((b) => b.key === 'potenzial').score;
+gleich('F1 Quick-Check bisher (mstg 1,5): kein Bonus', pot(Object.assign({}, basis, { mstg: 1.5 })), 30);
+gleich('F2 zulässig +20 %: +10', pot(Object.assign({}, basis, { miet_potenzial_pct: 20 })), 40);
+gleich('F3 zulässig +15 %: +7,5', pot(Object.assign({}, basis, { miet_potenzial_pct: 15 })), 37.5);
+gleich('F4 an der Vergleichsmiete (0 %): kein Bonus', pot(Object.assign({}, basis, { miet_potenzial_pct: 0 })), 30);
+gleich('F5 Haupt-App unverändert: mstg 3 -> +10', pot(Object.assign({}, basis, { mstg: 3 })), 40);
+gleich('F6 Haupt-App unverändert: mstg 1,5 -> 0', pot(Object.assign({}, basis, { mstg: 1.5 })), 30);
+const gut = Object.assign({}, basis, { cf_m: 400, nmy: 6, ltv: 70, dscr: 1.8, wp_kpi: 20000 });
+gleich('F7 ohne Zustand: Sehr gut bleibt', DS.computeFromKpis(gut).score >= 85, true);
+gleich('F8 sanierungsbedürftig: höchstens 69', DS.computeFromKpis(Object.assign({}, gut, { zustand: 'stark_sanierungsbeduerftig' })).score, 69);
+gleich('F9 Sanierung 30 % des KP: höchstens 69', DS.computeFromKpis(Object.assign({}, gut, { san: 60000 })).score, 69);
+gleich('F10 Sanierung 12 % des KP: höchstens 84', DS.computeFromKpis(Object.assign({}, gut, { san: 24000 })).score, 84);
+gleich('F11 Zustand normal/gut: keine Grenze', DS.computeFromKpis(Object.assign({}, gut, { zustand: 'normal' })).score, DS.computeFromKpis(gut).score);
+wahr('F12 Grund steht in der Interpretation', /sanierungsbedürftig/.test(DS.computeFromKpis(Object.assign({}, gut, { zustand: 'stark_sanierungsbeduerftig' })).interpretation));
+/* DSCR-Grenze (v3070) unverändert: niedrigere Grenze gewinnt */
+gleich('F13 DSCR 0,85 + sanierungsbedürftig: 69 (beide)', DS.computeFromKpis(Object.assign({}, gut, { dscr: 0.85, zustand: 'stark_sanierungsbeduerftig' })).score <= 69, true);
+gleich('F14 DSCR 0,7: 49 bleibt (DSCR-Grenze strenger)', DS.computeFromKpis(Object.assign({}, gut, { dscr: 0.7, zustand: 'stark_sanierungsbeduerftig' })).score <= 49, true);
+
+/* Benchmark Fall D (design/Vorschläge/score-benchmark-p1.md): MFH Pirmasens, KP 300.000, NKM 2.600,
+   400 m², stark sanierungsbedürftig, Sanierung 140.000 €, EK NK + 20 %, Marktwert 290.000, Vergleichsmiete
+   6,30 €/m², Kappung 20 %. So, wie der Quick-Check rechnet (_dpPilotScore): Sanierung in der
+   Gesamtinvestition, das Eigenkapital trägt sie nicht -> Darlehen. */
+function fallD(mitP1, ekPlus) {
+  const kp = 300000, knk = 0.105, san = mitP1 ? 140000 : 0, ek = 91500 + (ekPlus || 0), nkm = 2600;
+  const gesamt = kp * (1 + knk) + san, d1 = Math.max(0, gesamt - ek);
+  const k = DK.compute({ kp, nk: kp * knk, san, nkm, ze: 0, bwk_ul: 0, bwk_nul: 7800, d1, d1z: 3.8, d1t: 2, ek, svw: 0, afa: 0, grenz: 0, ekInklNkLtv: false });
+  const zul = K.zulaessig({ ist: nkm, wfl: 400, vgl_qm: 6.3, kappung_pct: 20, heute: HEUTE });
+  const r = DS.computeFromKpis(Object.assign({ kp, cf_m: k.cf_m, nmy: k.nmy, ltv: k.ltv, dscr: k.dscr, wp_kpi: 0, darlehen: d1 },
+    mitP1 ? { miet_potenzial_pct: zul.plus_pct, zustand: 'stark_sanierungsbeduerftig', san } : { mstg: 1.5 }));
+  return { score: r.score, stufe: ST.stufe(r.score).wort, ohne: r.score_ohne_deckel, deckel: r.deckel, nmy: k.nmy, dscr: k.dscr, cf: k.cf_m, ltv: k.ltv, zul };
+}
+const d0 = fallD(false), d1 = fallD(true);
+gleich('F15 Fall D vor v3075: 86 Sehr gut (wie im Benchmark)', [d0.score, d0.stufe], [86, 'Sehr gut']);
+wahr('F16 Fall D mit Zustand und Sanierung: nicht mehr „Sehr gut", höchstens Solide', d1.score <= 69);
+/* Gegenprobe: traegt das Eigenkapital die Sanierung, bleiben Cashflow und DSCR stark - dann greift die Zustand-Grenze */
+const d2 = fallD(true, 140000);
+gleich('F17 Fall D, Sanierung aus Eigenkapital: Grenze 69 greift', [d2.score, d2.ohne > 69, /sanierungsbedürftig/.test(d2.deckel || '')], [69, true, true]);
+if (ARG.v || ARG.fallD) {
+  console.log('Fall D vorher: ' + d0.score + ' ' + d0.stufe + ' | nachher: ' + d1.score + ' ' + d1.stufe + ' (ohne Grenze ' + d1.ohne + ', Grenze: ' + d1.deckel + ')');
+  console.log('  Sanierung aus Eigenkapital: ' + d2.score + ' (ohne Grenze ' + d2.ohne + ')');
+  console.log('  NMR ' + d1.nmy.toFixed(2) + ' %, DSCR ' + d1.dscr.toFixed(2) + ', CF ' + Math.round(d1.cf) + ' €/Mon, LTV ' + d1.ltv.toFixed(1) + ' %, zulässige Miete +' + d1.zul.plus_pct.toFixed(1) + ' % (' + d1.zul.grund + ')');
+}
+
+/* ── G · Rechenwege der Kategorien ───────────────────────────────────── */
+const kat = H.kategorien({ bmr: 6, nmr: 4, ekr: 5, cfMon: 100, dscr: 1.3, ltv: 85, bewirtPctNkm: 20, kp: 200000, wp: 10000, mietPotPct: 15 },
+  { rendite: 67, cashflow: 75, risiko: 87, ltv: 62, potenzial: 52 });
+const rw = Object.fromEntries(kat.map((k) => [k.id, k.rechenweg]));
+wahr('G1 Rendite: NMR-Kurve 2 / 3,5 / 5 %', /2 % = 0 Pkt, 3,5 % = 50 Pkt, 5 % = 100 Pkt/.test(rw.rendite));
+wahr('G1 Rendite: keine alte BMR/EKR-Gewichtung', !/Gewicht 40 %|Eigenkapitalrendite/.test(rw.rendite));
+wahr('G2 Cashflow: −200 / 0 / +200', /−200 €\/Mon = 0 Pkt, 0 € = 50 Pkt, \+200 €\/Mon = 100 Pkt/.test(rw.cashflow));
+wahr('G3 DSCR: 0,9 / 1,0 / 1,2 / 1,5', /0,9 und darunter = 0 Pkt, 1,0 = 60 Pkt, 1,2 = 80 Pkt, 1,5 und mehr = 100 Pkt/.test(rw.sicherheit));
+wahr('G4 LTV linear, keine Stufen 30/60/80/90', /\(110 − LTV\) × 2,5/.test(rw.finanzierung) && !/ab 100 % → 30 Pkt/.test(rw.finanzierung));
+wahr('G5 Potenzial statt Effizienz', kat.find((k) => k.id === 'bewirt').was === 'Potenzial' && /Wertpuffer/.test(rw.bewirt) && /\+7,50 Pkt/.test(rw.bewirt));
+/* Gegenprobe: der Text nennt die Kurve, die die Punkte wirklich vergibt */
+const pr = DS.computeFromKpis({ kp: 200000, cf_m: 0, nmy: 3.5, ltv: 90, dscr: 1.2, wp_kpi: 20000, miet_potenzial_pct: 20, darlehen: 1 }).breakdown;
+const pb = Object.fromEntries(pr.map((b) => [b.key, Math.round(b.score)]));
+gleich('G6 Stützstellen aus dem Text = Punkte des Kerns (CF 0 € = 50, NMR 3,5 % = 50, LTV 90 % = 50, DSCR 1,2 = 80, Puffer 10 % + 20 % Miete = 70)',
+  [pb.cashflow, pb.rendite, pb.ltv, pb.risiko, pb.potenzial], [50, 50, 50, 80, 70]);
+
+console.log('mietpotenzial-pruefen (v3075): ' + (n - fehler) + ' von ' + n + ' ok');
+process.exit(fehler ? 1 : 0);

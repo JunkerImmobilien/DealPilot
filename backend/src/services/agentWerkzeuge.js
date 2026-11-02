@@ -2707,7 +2707,9 @@ async function objekt_schnellblick(ctx, args) {
           {}) : undefined,
       kategorien: K ? rechenkerne.heuristikTeil('kategorien',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
-          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
+          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0,
+          /* v3075: der Rechenweg der Kategorie Potenzial nennt den Wertpuffer, mit dem der Score rechnet */
+          kp: kp, wp: wp },
         teilnotenRoh, nichtAnwendbar) : undefined,
       empfehlung: H && H.empfehlung ? H.empfehlung.verdict : null,
       empfehlung_text: H && H.empfehlung ? H.empfehlung.text : null,

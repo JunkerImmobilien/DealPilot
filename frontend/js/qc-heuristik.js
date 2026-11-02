@@ -269,6 +269,11 @@ window.QcHeuristik = (function () {
       : Number(String(d.zielBmr).replace(',', '.'));
     if (!isFinite(zielBmr) || zielBmr <= 0) zielBmr = ZIEL_BMR_RUECKFALL;
     var kpForBmr = nkmYear / (zielBmr / 100);        // KP bei der Ziel-Bruttomietrendite
+    /* v3075 · Sanierungskosten gehoeren zur Gesamtinvestition (Marcel 02.11.2026, P1): die
+       Zielrendite muss auf Kaufpreis + Sanierung erreicht werden, also zaehlt der Kaufpreis
+       um die Sanierung weniger. Ohne `san` (alle bisherigen Aufrufer) unveraendert. */
+    var _san = +d.san > 0 ? +d.san : 0;
+    if (_san > 0) kpForBmr -= _san;
     var annuitaetJahr;
     /* v3031 · der DSCR ist jetzt netto - die Bankrate kommt deshalb direkt (kd), nur alte
        Aufrufer ohne kd rechnen ueber den Brutto-Wert zurueck. */
@@ -317,6 +322,51 @@ window.QcHeuristik = (function () {
       ziel = kp;
     }
     return ziel;
+  }
+
+  /* ── v3075 · ZIELKAUFPREIS ZWEISTUFIG (P1.3, Marcel 02.11.2026) ─────────
+   *
+   * „Wie weit muss ich runter, damit ich meinen 8-Prozenter bekomme - heute
+   * und mit der Miete, die ich in drei Jahren verlangen DARF?"
+   *
+   *   heute  = zielKaufpreis() - unveraendert: Zielrendite, Cashflow 0, Markt
+   *   nach 3 = zulaessige Jahresmiete nach 3 J. / Zielrendite − Sanierung,
+   *            hoechstens bereinigter Marktwert
+   *
+   * Die Miete nach 3 Jahren ist die RECHTLICH ZULAESSIGE Bestandsmiete
+   * (js/mietpotenzial-kern.js zulaessig(): Vergleichsmiete ∧ Kappungsgrenze),
+   * NIE die Angebotsmiete - die gilt nur bei Neuvermietung. Ohne `nkmZul`
+   * gibt es nur die erste Stufe. Pruefmassstab Marcels Beispiel: 180.000 €,
+   * NKM 10.800 €/J., Ziel 8 % -> heute 135.000 €, nach 3 J. 162.000 € (Kappung
+   * 20 %) bzw. 155.250 € (15 %) - tools/mietpotenzial-pruefen.mjs.
+   *
+   * Kein Kern liest Einstellungen: die Zielrendite gibt der Aufrufer herein. */
+  function zielKaufpreisZweistufig(d) {
+    d = d || {};
+    var kp = +d.kp || 0, nkm = +d.nkm || 0, san = +d.san > 0 ? +d.san : 0;
+    var rueck = (d.zielBmr == null || d.zielBmr === '');
+    var z = rueck ? ZIEL_BMR_RUECKFALL : Number(String(d.zielBmr).replace(',', '.'));
+    if (!isFinite(z) || z <= 0) { z = ZIEL_BMR_RUECKFALL; rueck = true; }
+    if (!(kp > 0) || !(nkm > 0)) return null;
+    var basis = kp + san;
+    var heute = zielKaufpreis(d);
+    var r = { ziel_bmr: z, ziel_rueckfall: rueck, kp: kp, san: san,
+      nkm_jahr: nkm * 12, bmr_heute: nkm * 12 / basis * 100, bmr_basis: san > 0 ? 'kaufpreis_und_sanierung' : 'kaufpreis',
+      heute: heute, nachlass_heute: Math.max(0, kp - heute), nachlass_heute_pct: Math.max(0, kp - heute) / kp * 100,
+      nach3: null, nachlass_3j: null, nachlass_3j_pct: null, nkm_jahr_3j: null, bmr_3j: null };
+    var nz = +d.nkmZul || 0;
+    if (nz > 0) {
+      var markt = +d.marktwert;
+      var z3 = nz * 12 / (z / 100) - san;
+      if (isFinite(markt) && markt > 0) z3 = Math.min(z3, markt);
+      if (!isFinite(z3) || z3 <= 0 || z3 >= kp) z3 = kp;   /* wie zielKaufpreis(): kein Nachlass noetig */
+      r.nach3 = z3;
+      r.nachlass_3j = Math.max(0, kp - z3);
+      r.nachlass_3j_pct = r.nachlass_3j / kp * 100;
+      r.nkm_jahr_3j = nz * 12;
+      r.bmr_3j = nz * 12 / basis * 100;
+    }
+    return r;
   }
 
   /* ── v1939 · WORAN ES KONKRET LIEGT ─────────────────────────────────────
@@ -981,38 +1031,60 @@ window.QcHeuristik = (function () {
     };
     var zwei = function (v) { return (+v || 0).toFixed(2).replace('.', ','); };
     var cf = +d.cfMon || 0;
+    /* v3075 · DER RECHENWEG BESCHREIBT DIE VERGEBENEN PUNKTE (Benchmark Befund 8).
+       Bis v3074 standen hier die Kurven der alten Rueckfallformel (BMR/NMR/EKR 40/40/20,
+       LTV-Stufen 30/60/80/90, Effizienz als Bewirtschaftungsquote) - die Punkte daneben kamen
+       aber aus DealScore.computeFromKpis() (dealscore.js). Kunde und Telegram-Bot lasen eine
+       Begruendung, die nicht zur Zahl gehoerte. Jetzt die Kurven aus dealscore.js:
+         Rendite    NMR linear 2 % = 0, 3,5 % = 50, 5 % = 100
+         Cashflow   linear −200 € = 0, 0 € = 50, +200 € = 100
+         Sicherheit DSCR ≤ 0,9 = 0, 1,0 = 60, 1,2 = 80, ≥ 1,5 = 100
+         LTV        (110 − LTV) × 2,5
+         Potenzial  30 + Wertpuffer/KP × 300 (hoechstens +60), Mietpotenzial bis +10
+       Die id `bewirt` bleibt (Anzeige-Schluessel in quick-check.js, messe-drehbuch.js);
+       die Kategorie dahinter ist und war das Potenzial. */
+    var eur = function (v) { return Math.round(+v || 0).toLocaleString('de-DE') + ' €'; };
+    var hatWp = d.wp != null && isFinite(+d.wp) && +d.kp > 0;
+    var mp = (d.mietPotPct == null || d.mietPotPct === '' || !isFinite(+d.mietPotPct)) ? null : +d.mietPotPct;
+    var potWert = (hatWp ? 'Wertpuffer ' + eur(d.wp) : 'Wertpuffer + Mietpotenzial')
+      + (mp != null ? ' · Miete +' + (Math.round(mp * 10) / 10).toLocaleString('de-DE') + ' % zulässig' : '');
     return [
       { id: 'rendite', was: 'Rendite', punkte: pz(p.rendite),
         wert: zwei(d.bmr) + ' % BMR · ' + zwei(d.nmr) + ' % NMR',
-        rechenweg: 'Bruttomietrendite ' + zwei(d.bmr) + ' % (Skala 3 % = 0, 7 % = 100, Gewicht 40 %) · '
-          + 'Nettomietrendite ' + zwei(d.nmr) + ' % (Skala 1 % = 0, 5 % = 100, Gewicht 40 %) · '
-          + 'Eigenkapitalrendite ' + (na.ekr ? ('entfällt — ' + na.ekr)
-              : (zwei(d.ekr) + ' % (Skala 0 % = 0, 12 % = 100, Gewicht 20 %)')) },
+        rechenweg: 'Nettomietrendite ' + zwei(d.nmr) + ' % · Skala 2 % = 0 Pkt, 3,5 % = 50 Pkt, 5 % = 100 Pkt (linear) · '
+          + 'Formel: (NKM × 12 − nicht umlagefähige Kosten) / Gesamtinvestition (Kaufpreis + Nebenkosten + Sanierung) · '
+          + 'Bruttomietrendite ' + zwei(d.bmr) + ' % steht zur Information daneben, sie geht nicht in die Punkte ein' },
       { id: 'cashflow', was: 'Cashflow', punkte: pz(p.cashflow),
         wert: (cf >= 0 ? '+' : '') + Math.round(cf).toLocaleString('de-DE') + ' €/Mon',
         rechenweg: 'Cashflow vor Steuern ' + (cf >= 0 ? '+' : '') + Math.round(cf).toLocaleString('de-DE')
-          + ' €/Monat · Skala −200 €/Mon = 0 Pkt, +300 €/Mon = 100 Pkt (linear) · '
-          + 'Formel: NKM − Annuität − BWK_NUL/12' },
+          + ' €/Monat · Skala −200 €/Mon = 0 Pkt, 0 € = 50 Pkt, +200 €/Mon = 100 Pkt (linear) · '
+          + 'Formel: NKM − nicht umlagefähige Kosten − Zins − Tilgung' },
       { id: 'sicherheit', was: 'Sicherheit', punkte: na.dscr ? '–' : pz(p.risiko),
         wert: na.dscr ? ('entfällt — ' + na.dscr) : ('DSCR ' + (d.dscr ? zwei(d.dscr) : '–')),
         rechenweg: na.dscr
           ? ('Ohne Kapitaldienst gibt es keinen Deckungsgrad — ' + na.dscr)
-          : ('DSCR ' + (d.dscr ? zwei(d.dscr) : '–') + ' · Skala 0,9 = 0 Pkt, 1,5 = 100 Pkt · '
-            + 'Formel: (NKM × 12 − BWK_NUL) / Annuität · Faustregel Bank: ab 1,2 guter Deckungsgrad') },
+          : ('DSCR ' + (d.dscr ? zwei(d.dscr) : '–') + ' · Skala 0,9 und darunter = 0 Pkt, 1,0 = 60 Pkt, 1,2 = 80 Pkt, 1,5 und mehr = 100 Pkt · '
+            + 'Formel: (NKM × 12 − nicht umlagefähige Kosten) / Kapitaldienst (Zins + Tilgung) · '
+            + 'Harte Grenze: unter 1,2 höchstens „Gut", unter 1,0 höchstens „Solide", unter 0,8 höchstens „Schwach"') },
       { id: 'finanzierung', was: 'Finanzierung', punkte: na.ltv ? '–' : pz(p.ltv),
         wert: na.ltv ? ('entfällt — ' + na.ltv) : ('LTV ' + (+d.ltv || 0).toFixed(0) + ' %'),
         rechenweg: na.ltv
           ? ('Ohne Darlehen gibt es kein Loan-to-Value — ' + na.ltv)
-          : ('Loan-to-Value ' + (+d.ltv || 0).toFixed(0) + ' % · Stufen: ab 100 % → 30 Pkt '
-            + '(kein Eigenkapital eingesetzt = riskant), ab 90 % → 60 Pkt, ab 80 % → 80 Pkt, '
-            + 'unter 80 % → 90 Pkt') },
-      { id: 'bewirt', was: 'Effizienz', punkte: na.bwk ? '–' : pz(p.potenzial),
-        wert: na.bwk ? ('entfällt — ' + na.bwk) : ((+d.bewirtPctNkm || 0).toFixed(0) + ' % der NKM'),
-        rechenweg: na.bwk
-          ? ('Ohne hinterlegte Bewirtschaftung gibt es keine Quote — ' + na.bwk)
-          : ('Bewirtschaftungskosten ' + (+d.bewirtPctNkm || 0).toFixed(0) + ' % der Nettokaltmiete · '
-            + 'Skala 18 % = 100 Pkt, 40 % = 30 Pkt (linear dazwischen) · IVD-Empfehlung ETW 18–35 % · '
-            + 'Formel: (BWK_NUL + BWK_UL) / NKM_jährlich × 100') }
+          : ('Loan-to-Value ' + (+d.ltv || 0).toFixed(0) + ' % · Skala linear (110 − LTV) × 2,5: '
+            + '70 % und darunter = 100 Pkt, 80 % = 75 Pkt, 90 % = 50 Pkt, 100 % = 25 Pkt, 110 % und mehr = 0 Pkt · '
+            + 'Formel: Darlehen / Kaufpreis') },
+      { id: 'bewirt', was: 'Potenzial', punkte: pz(p.potenzial),
+        wert: potWert,
+        rechenweg: (hatWp
+            ? 'Wertpuffer ' + eur(d.wp) + ' = ' + zwei(+d.wp / +d.kp * 100) + ' % des Kaufpreises'
+            : 'Wertpuffer (Marktwert − Kaufpreis) im Verhältnis zum Kaufpreis')
+          + ' · Skala 0 % = 30 Pkt, 10 % = 60 Pkt, 20 % und mehr = 90 Pkt · '
+          + (mp != null
+            ? 'zulässige Steigerung der Bestandsmiete in 3 Jahren +' + zwei(mp) + ' % (Vergleichsmiete und Kappungsgrenze, nicht die Angebotsmiete) → +'
+              + zwei(Math.min(10, Math.max(0, mp) / 2)) + ' Pkt (halber Prozentwert, höchstens +10)'
+            : 'Mietsteigerung über 1,5 % p. a. → +10 Pkt')
+          + ' · Bewirtschaftungskosten ' + (na.bwk ? ('entfallen — ' + na.bwk) : ((+d.bewirtPctNkm || 0).toFixed(0) + ' % der NKM'))
+          + ' gehen über Cashflow und Nettomietrendite ein, nicht hier' }
     ];
   }
 
@@ -1031,6 +1103,7 @@ window.QcHeuristik = (function () {
     einschaetzung: einschaetzung,
     empfehlung: empfehlung,
     zielKaufpreis: zielKaufpreis,
+    zielKaufpreisZweistufig: zielKaufpreisZweistufig,   /* v3075 */
     bewerten: bewerten,
     stufensatz: stufensatz,         /* v1936 */
     marktwertBereinigt: marktwertBereinigt, /* v1939 */

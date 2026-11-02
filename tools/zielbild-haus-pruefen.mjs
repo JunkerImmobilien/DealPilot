@@ -13,6 +13,7 @@ const doc = { getElementById: (id) => (id in FELD ? { value: FELD[id] } : null),
 const win = { DpMfhEinheiten: { maxPunkte: (g) => MAX[g] || 2, punkteVon: (g, st) => ({ '0': 0, 'h': MAX[g] / 2 })[st] || 0, punkteObjekt: (g, v) => (v === 'neu' ? MAX[g] : 0) } };
 win.window = win; win.document = doc; win.addEventListener = () => {};
 const ctx = vm.createContext(Object.assign(win, { console, setTimeout, Promise, JSON, Math, Date, isFinite, parseFloat, String, Number, Array, Object, fetch: undefined }));
+vm.runInContext(fs.readFileSync('frontend/js/mietpotenzial-kern.js', 'utf8'), ctx);   /* v3075: Kern vor potenzial.js, wie index.html */
 vm.runInContext(fs.readFileSync('frontend/js/potenzial.js', 'utf8'), ctx);
 const P = win.DpPotenzial;
 let fehler = 0; const ist = (n, a, b) => { const ok = Math.abs(a - b) < 1e-6; if (!ok) fehler++; console.log((ok ? 'ok   ' : 'FEHL ') + n + ': ' + a + (ok ? '' : ' statt ' + b)); };

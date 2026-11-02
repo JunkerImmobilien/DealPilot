@@ -35,6 +35,10 @@
 (function () {
   'use strict';
   if (window.DpPotenzial) return;
+  /* v3075 · die reinen Mietrechts-Regeln (Kappung, Bremse, Termine, Soll-Miete) liegen im Kern
+     js/mietpotenzial-kern.js - er wird in index.html VOR dieser Datei geladen. */
+  var K = window.DpMietpotenzial;
+  if (!K) { try { console.error('[potenzial] js/mietpotenzial-kern.js fehlt - Mieterhöhung nicht rechenbar'); } catch (e) {} return; }
 
   /* v2870 · Marcel 22.10.2026: der alte Satz („Potenzialwert …, keine Verkehrswertermittlung“) sagte nicht, was gemeint war */
   var KENNZEICHNUNG = 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.';
@@ -150,42 +154,13 @@
     return _kappLauf;
   }
   function deDatum(iso) { return /^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.split('-').reverse().join('.') : ''; }
+  /* v3075 · die Regel liegt in js/mietpotenzial-kern.js (kappungAus, Texte woertlich), damit der
+     Quick-Check dieselbe Liste liest. Hier nur noch: die eigene Angabe am Objekt und die AGS. */
   function kappung(ags) {
     var eigen = zahl(wert('zb_kappung_pct')) || zahl(window._dpMfh && window._dpMfh.kappung_pct);
-    if (eigen === 15 || eigen === 20) return { pct: eigen, herkunft: 'eigen', pruefen: false, text: 'Kappungsgrenze ' + eigen + ' % in 3 Jahren (eigene Angabe).' };
-    var std = function (warum) {
-      return { pct: 20, herkunft: 'auffang', pruefen: true,
-        text: 'Kappungsgrenze 20 % in 3 Jahren (§ 558 Abs. 3 BGB) — ' + warum + ', bitte prüfen.' };
-    };
-    if (!_kapp) return std('die Liste der Landesverordnungen liegt nicht vor');
-    var a = String(ags || '').replace(/\D/g, '');
-    if (a.length !== 8) return std('Gemeinde noch nicht ermittelt');
-    var land = PRAEFIX[a.slice(0, 2)], L = land && _kapp.laender[land];
-    if (!L) return std('Land nicht in der Liste');
-    var heute = new Date().toISOString().slice(0, 10);
-    var std2 = Number(_kapp.standard_kappung_pct) || 20;
-    /* Name der Verordnung fuer den Kundentext: die amtliche Kurzform in
-       Klammern (z. B. „Mieterschutzverordnung NRW"), sonst bis „vom". */
-    var voll = String(L.verordnung || ''), kl = /\(([^)]+)\)/.exec(voll);
-    var vo = kl ? kl[1].split(/\s[–—-]\s/)[0] : voll.split(' vom ')[0];
-    var g = (Array.isArray(L.gemeinden) ? L.gemeinden : []).filter(function (x) { return x && x.ags === a; })[0];
-    var pruef = L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.';
-    /* Die Liste vereinigt Kappung und Mietpreisbremse: ein Eintrag mit
-       kappung15 = false ist KEINE 15-%-Gemeinde. */
-    if (g && g.kappung15) {
-      var bis = g.kappung_gueltig_bis || L.gueltig_bis || null;
-      if (bis && bis < heute) {
-        return { pct: std2, herkunft: 'ausgelaufen', pruefen: true, url: L.url || null,
-          text: 'Kappungsgrenze ' + std2 + ' % in 3 Jahren: die Verordnung (' + vo + ') ist am ' + deDatum(bis) + ' ausgelaufen, bitte prüfen.' };
-      }
-      return { pct: 15, herkunft: 'verordnung', pruefen: !!L.unsicher, url: L.url || null, verordnung: vo,
-        text: 'Kappungsgrenze 15 % in 3 Jahren: ' + (g.name || 'die Gemeinde') + ' steht in der ' + vo
-          + (L.fundstelle ? ' (' + L.fundstelle + (bis ? ', gültig bis ' + deDatum(bis) : '') + ')' : '') + pruef };
-    }
-    return { pct: std2, herkunft: 'gesetz', pruefen: !!L.unsicher,
-      text: 'Kappungsgrenze ' + std2 + ' % in 3 Jahren: Gemeinde nicht in der Landesverordnung (von DealPilot gesetzt)'
-        + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '. Eigene Angabe möglich.') };
+    return K.kappungAus(_kapp, { ags: ags }, { eigen_pct: eigen });
   }
+  function kappungDaten() { return _kapp; }   /* v3075 · fuer den Quick-Check (quick-check.js) */
 
 
 
@@ -379,28 +354,7 @@
      Rechnet NICHTS Neues zur Miete: Kappung, Termine und Soll kommen aus
      kappung()/sollFuer() über modell(). Neu ist nur die Bremse (§ 556d Abs. 1
      BGB: bei Mietbeginn höchstens ortsübliche Vergleichsmiete + 10 %). */
-  function mietpreisbremse(ags) {
-    var leer = function (warum) { return { gilt: null, pruefen: true, text: 'Mietpreisbremse: ' + warum + ', bitte prüfen.' }; };
-    if (!_kapp) return leer('die Liste der Landesverordnungen liegt nicht vor');
-    var a = String(ags || '').replace(/\D/g, '');
-    if (a.length !== 8) return leer('Gemeinde noch nicht ermittelt');
-    var land = PRAEFIX[a.slice(0, 2)], L = land && _kapp.laender[land];
-    if (!L) return leer('Land nicht in der Liste');
-    var heute = new Date().toISOString().slice(0, 10);
-    var g = (Array.isArray(L.gemeinden) ? L.gemeinden : []).filter(function (x) { return x && x.ags === a; })[0];
-    var V = L.mietpreisbremse_verordnung || {};
-    var voll = String(V.verordnung || L.verordnung || ''), kl = /\(([^)]+)\)/.exec(voll);
-    var vo = kl ? kl[1].split(/\s[–—-]\s/)[0] : voll.split(' vom ')[0];
-    if (g && g.mietpreisbremse) {
-      var bis = g.mietpreisbremse_gueltig_bis || V.gueltig_bis || L.gueltig_bis || null;
-      if (bis && bis < heute) return { gilt: null, pruefen: true, bis: bis, herkunft: 'ausgelaufen',
-        text: 'Mietpreisbremse: die Verordnung (' + vo + ') ist am ' + deDatum(bis) + ' ausgelaufen, bitte prüfen.' };
-      return { gilt: true, pruefen: !!L.unsicher, bis: bis, verordnung: vo, url: V.url || L.url || null, name: g.name || '',
-        text: 'Mietpreisbremse gilt' + (bis ? ' bis ' + deDatum(bis) : '') + ' (' + vo + ')' + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
-    }
-    return { gilt: false, pruefen: !!L.unsicher,
-      text: 'Keine Mietpreisbremse: Gemeinde nicht in der Landesverordnung' + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
-  }
+  function mietpreisbremse(ags) { return K.mietpreisbremseAus(_kapp, { ags: ags }); }   /* v3075 · Regel im Kern */
 
   /* Eine Wohnung des Modells (m.wohnungen[i]) als höchstens vier Zeilen. */
   function mietrechtDaten(m, i) {
@@ -636,115 +590,13 @@
   }
 
   /* ── § 558 / § 559: die Soll-Miete einer Wohnung ─────────────────────── */
-  function plusMonate(iso, n) {
-    var m = /^(\d{4})-(\d{2})/.exec(iso || ''); if (!m) return null;
-    var j = +m[1], mo = +m[2] - 1 + n; j += Math.floor(mo / 12); mo = ((mo % 12) + 12) % 12;
-    return j + '-' + String(mo + 1).padStart(2, '0');
-  }
-  /* ── v3028 · TERMINE EINER MIETERHÖHUNG: verlangbar ab · wirksam ab ────
-     Marcel 28.10.2026 („ja, mach das so"): „sofort" hieß in der App nur, dass das
-     Erhöhungsverlangen JETZT gestellt werden darf - wirksam wird die Erhöhung
-     später. Ab v3028 stehen beide Daten getrennt, an EINER Stelle gerechnet
-     (hier); die Zusammenfassung speichert sie (soll_verlangbar_ab, soll_wirksam_ab),
-     objektWissen.js im Backend liest die gespeicherten Felder.
-     Wortlaut gesetze-im-internet.de, gelesen 28.10.2026:
-       § 558 Abs. 1 BGB  „Der Vermieter kann die Zustimmung zu einer Erhöhung der Miete bis zur
-                          ortsüblichen Vergleichsmiete verlangen, wenn die Miete in dem Zeitpunkt,
-                          zu dem die Erhöhung eintreten soll, seit 15 Monaten unverändert ist. Das
-                          Mieterhöhungsverlangen kann frühestens ein Jahr nach der letzten
-                          Mieterhöhung geltend gemacht werden."
-       § 558b Abs. 1 BGB „Soweit der Mieter der Mieterhöhung zustimmt, schuldet er die erhöhte
-                          Miete mit Beginn des dritten Kalendermonats nach dem Zugang des
-                          Erhöhungsverlangens."
-       § 559b Abs. 2 BGB „Der Mieter schuldet die erhöhte Miete mit Beginn des dritten Monats nach
-                          dem Zugang der Erklärung." (Satz 2: +6 Monate ohne Ankündigung nach
-                          § 555c bzw. bei mehr als 10 % über der angekündigten - hier nicht erfasst)
-       § 557b Abs. 3 BGB „Die geänderte Miete ist mit Beginn des übernächsten Monats nach dem
-                          Zugang der Erklärung zu entrichten." (Abs. 2: mindestens ein Jahr
-                          unverändert - Erklärung also frühestens 10 Monate nach der letzten
-                          Änderung; Rechenkern js/indexmiete.js)
-     Monatsgenau: Zugang 15.10. → 01.01.; Zugang 31.10. → 01.01.; Zugang 01.11. → 01.02.
-     (Nov, Dez, Jan = dritter Kalendermonat). Prüfer: tools/mieterhoehung-termine-pruefen.mjs. */
-  var TERMIN_REGEL = {
-    '558':  { plus: 3, warte: 12, norm: '§ 558b Abs. 1 BGB', warte_norm: '§ 558 Abs. 1 Satz 2 BGB' },
-    '559':  { plus: 3, warte: 0,  norm: '§ 559b Abs. 2 BGB', warte_norm: null },
-    '557b': { plus: 2, warte: 10, norm: '§ 557b Abs. 3 BGB', warte_norm: '§ 557b Abs. 2 BGB' }
-  };
-  function mmjj(ym) { return /^\d{4}-\d{2}/.test(ym || '') ? ym.slice(5, 7) + '/' + ym.slice(0, 4) : ''; }
-  /** Erster Tag, ab dem die Erhöhung geschuldet ist, bei Zugang am Tag `zugang` ('JJJJ-MM-TT'). */
-  function wirksamNachZugang(zugang, art) {
-    var R = TERMIN_REGEL[art] || TERMIN_REGEL['558'];
-    var ym = plusMonate(String(zugang || ''), R.plus);
-    return ym ? ym + '-01' : null;
-  }
-  /**
-   * mhTermine({ art: '558'|'559'|'557b', letzte: 'JJJJ-MM', wirksam_eigen: 'JJJJ-MM', heute: 'JJJJ-MM' })
-   * -> { verlangbar_ab, verlangbar_sofort, wirksam_ab, norm, zugang_angenommen, letzte_fehlt, text, text_lang, hinweis }
-   * verlangbar_ab = frühester Zugang des Verlangens/der Erklärung (nie vor heute);
-   * wirksam_ab    = Beginn der Zahlungspflicht bei Zugang im Monat verlangbar_ab;
-   *                 eine eigene Angabe („Erreichbar ab") gilt als Wirksamkeitsmonat.
-   */
-  function mhTermine(o) {
-    o = o || {};
-    var art = TERMIN_REGEL[o.art] ? o.art : '558', R = TERMIN_REGEL[art];
-    var heute = /^\d{4}-\d{2}/.test(o.heute || '') ? String(o.heute).slice(0, 7) : heuteYm();
-    var letzte = /^\d{4}-\d{2}/.test(o.letzte || '') ? String(o.letzte).slice(0, 7) : null;
-    var frueh = letzte && R.warte ? plusMonate(letzte, R.warte) : heute;
-    var verl = frueh > heute ? frueh : heute;
-    var sofort = verl <= heute;
-    var wirk = plusMonate(verl, R.plus);
-    var eigen = /^\d{4}-\d{2}/.test(o.wirksam_eigen || '') ? String(o.wirksam_eigen).slice(0, 7) : null;
-    var hinweis = null;
-    if (eigen) {
-      if (eigen < heute) eigen = heute;
-      if (eigen < wirk) hinweis = 'dein Termin ' + mmjj(eigen) + ' liegt vor dem frühesten Wirksamwerden (' + mmjj(wirk) + ', ' + R.norm + ') – er gilt nur, wenn das Schreiben schon zugegangen ist';
-      wirk = eigen;
-    }
-    var r = { art: art, verlangbar_ab: verl, verlangbar_sofort: sofort, wirksam_ab: wirk, norm: R.norm,
-      zugang_angenommen: sofort && !eigen, letzte_fehlt: !letzte && !!R.warte, eigene_angabe: !!eigen, hinweis: hinweis };
-    r.text = 'verlangbar ab ' + (sofort ? 'sofort' : mmjj(verl)) + ' · wirksam ab ' + mmjj(wirk);
-    r.grund = eigen ? 'eigene Angabe' : (sofort ? 'Zugang heute angenommen, ' : 'bei Zugang im ' + mmjj(verl) + ', ') + R.norm;
-    r.sperre = r.letzte_fehlt ? 'letzte Erhöhung nicht eingetragen, Sperrfrist (' + R.warte_norm + ') nicht geprüft' : null;
-    r.text_lang = r.text + ' (' + r.grund + ')' + (r.sperre ? ' – ' + r.sperre : '');
-    return r;
-  }
-  function umlage559(liste, istM, wfl) {
-    /* v3001 · § 559 Abs. 2 BGB: Kosten fuer Erhaltungsmassnahmen gehoeren NICHT zu den umlagefaehigen
-       Kosten. Bis v3000 lag die Umlage auf den vollen Kosten. `erh` = Erhaltungsanteil in % je Massnahme
-       (eigene Angabe, leer = 0); Renovierung ist Erhaltung und wird nie umgelegt. */
-    var k = (liste || []).filter(function (m) { return m.bewohnt && m.id !== 'renovierung'; }).reduce(function (a, m) {
-      var e = Math.min(100, Math.max(0, zahl(m.erh))); return a + zahl(m.k) * (1 - e / 100); }, 0);
-    if (!(k > 0) || !(wfl > 0)) return { monat: 0, kosten: 0 };
-    var roh = k * 0.08 / 12;
-    var kappeQm = (istM > 0 && istM / wfl < 7) ? 2 : 3;
-    var deckel = kappeQm * wfl;
-    /* v3064 · Marcel: „kann ich wirklich alles auf die Miete umlegen?" - nein: nur der
-       Modernisierungsanteil. Ohne eingetragenen Erhaltungsanteil zieht DealPilot 0 % ab; das
-       stimmt nur, wenn nichts Altes, Abgängiges ersetzt wird. Gezählt, damit es gesagt wird. */
-    var ohneErh = (liste || []).filter(function (m) { return m.bewohnt && m.id !== 'renovierung' && (m.erh == null || String(m.erh).trim() === ''); }).length;
-    return { monat: Math.min(roh, deckel), kosten: k, gedeckelt: roh > deckel, kappe_qm: kappeQm, ohne_erh: ohneErh };
-  }
-  /**
-   * Soll-Miete einer Wohnung (€/Monat) samt Herkunft.
-   * e: { ist, wfl, status, soll, soll_ab, vgl_qm, mv_letzte_erhoehung, massnahmen }
-   * ctx: { kapp: {pct,text}, vgl_qm }
-   */
-  /* v3016t · Marcel 28.10.2026: „gleicht er das auch mit dem Mietvertrag ab? Bei Indexmietverträgen oder
-     Staffelmiete können wir das nicht umlegen." Gemessen: sollFuer kannte mv_art nicht - § 558 und § 559
-     liefen auch bei Staffel- und Indexmiete. Die Regeln:
-       Staffelmiete  § 557a Abs. 2 BGB: Erhöhungen nach §§ 558 bis 559b während der Staffel ausgeschlossen.
-       Indexmiete    § 557b Abs. 2 BGB: § 558 ausgeschlossen; § 559 nur für bauliche Maßnahmen, die der
-                     Vermieter nicht zu vertreten hat (z. B. gesetzliche Pflicht) - das erfasst das Formular
-                     nicht, also keine Umlage, mit Hinweis.
-       Gewerbe       §§ 558/559 gelten nur für Wohnraum.
-     Eine EIGENE Soll-Angabe (z. B. die nächste Staffel) bleibt immer möglich. */
-  function vertragGrenzen(e) {
-    var art = String((e && e.mv_art) || '').toLowerCase();
-    if (art === 'staffel') return { art: art, s558: false, s559: false, text: 'Staffelmiete: Erhöhungen nach §§ 558 bis 559b BGB sind während der Staffel ausgeschlossen (§ 557a Abs. 2 BGB) – die Miete steigt nur nach den vereinbarten Staffeln. Die nächste Staffel trägst du als Soll-Miete ein.' };
-    if (art === 'index') return { art: art, s558: false, s559: false, text: 'Indexmiete: keine Erhöhung bis zur Vergleichsmiete (§ 557b Abs. 2 BGB); eine Modernisierungsumlage nur für Maßnahmen, die der Vermieter nicht zu vertreten hat (z. B. gesetzliche Pflicht) – deshalb hier nicht eingerechnet. Die Indexanpassung trägst du als Soll-Miete ein.' };
-    if (art === 'gewerbe' || (e && e.art === 'gewerbe')) return { art: 'gewerbe', s558: false, s559: false, text: 'Gewerbemiete: §§ 558 und 559 BGB gelten nur für Wohnraum – Erhöhungen richten sich nach dem Vertrag. Eine vereinbarte Anpassung trägst du als Soll-Miete ein.' };
-    return { art: art, s558: true, s559: true, text: '' };
-  }
+  /* v3075 · TERMINE, § 559-UMLAGE, VERTRAGSGRENZEN UND SOLL-MIETE liegen in js/mietpotenzial-kern.js
+     (woertlich, mit dem Gesetzeswortlaut aus v3028/v3001/v3016t). Der Quick-Check rechnet damit die
+     zulaessige Miete nach drei Jahren - EINE Rechnung fuer Objekt und Quick-Check. Die Namen bleiben,
+     damit alle Aufrufer in dieser Datei und DpPotenzial unveraendert lesen. */
+  var plusMonate = K.plusMonate, TERMIN_REGEL = K.TERMIN_REGEL, mmjj = K.mmjj;
+  var wirksamNachZugang = K.wirksamNachZugang, mhTermine = K.mhTermine;
+  var umlage559 = K.umlage559, vertragGrenzen = K.vertragGrenzen;
   /* v3026 · Indexmiete (§ 557b BGB): mögliche Anpassung je Jahr aus dem VPI. Rechnet der Kern
      js/indexmiete.js; die VPI-Reihe kommt aus js/indexreihen.js (Server-Cache, nie GENESIS),
      die Zukunftsannahme aus dem Investmentprofil (indexmiete_vpi_pct, Vorgabe 2,0 % p. a.).
@@ -761,78 +613,9 @@
     var R = window.DpIndexreihen, vpi = R && R.reihe ? R.reihe('vpi') : null;
     return I.rechne({ miete: zahl(e.ist), beginn: e.mv_beginn, letzte: e.mv_letzte_erhoehung, vpi: vpi, annahme_pct: indexAnnahme() });
   }
+  /* v3075 · Rechnung im Kern; hier kommt nur die Katalog-Aufloesung der Massnahmen dazu. */
   function sollFuer(e, ctx) {
-    ctx = ctx || {};
-    var ist = zahl(e.ist), wfl = zahl(e.wfl);
-    var r = { miete: null, herkunft: null, grenze: null, ab: null, ab_text: '', hinweise: [] };
-    if (e.status === 'leer' || !(ist > 0)) { r.grund = 'leer'; return r; }
-    var vg = vertragGrenzen(e);
-    var u = vg.s559 ? umlage559(massnahmenVon(e), ist, wfl) : { monat: 0, kosten: 0 };
-    if (!vg.s559 && massnahmenVon(e).some(function (m) { return m.bewohnt; })) r.hinweise.push('Umlage nicht eingerechnet – ' + vg.text);
-    if (!vg.s558) {
-      var eig = zahl(e.soll);
-      if (eig > 0) { r.miete = eig; r.herkunft = 'eigene Angabe'; r.vertrag = vg.art; return r; }
-      r.grund = vg.text; r.vertrag = vg.art; return r;
-    }
-    /* Termin (v3028): verlangbar ab · wirksam ab, gerechnet in mhTermine(). `r.ab` ist der
-       WIRKSAMKEITSMONAT - an ihm hängen das Jahr der Stufe, die Mietentwicklung und das
-       Drei-Jahres-Fenster der Kappungsgrenze (§ 558 Abs. 3: „innerhalb von drei Jahren", gezählt
-       bis zum Wirksamwerden). Bis v3027 war `ab` = max(heute, letzte + 15) und hieß „sofort". */
-    var letzte = String(e.mv_letzte_erhoehung || '');
-    var eigAb = /^\d{4}-\d{2}/.test(e.soll_ab || '') ? String(e.soll_ab).slice(0, 7) : null;
-    function termineSetzen(art) {
-      var t = mhTermine({ art: art, letzte: letzte, wirksam_eigen: eigAb });
-      r.termine = t; r.ab = t.wirksam_ab; r.verlangbar_ab = t.verlangbar_ab;
-      r.ab_text = t.text;
-      r.ab_herkunft = (eigAb ? 'wirksam ab: eigene Angabe' : t.grund)
-        + (art === '558' && letzte ? '; verlangbar frühestens ein Jahr nach der letzten Erhöhung (§ 558 Abs. 1 Satz 2 BGB)' : '')
-        + (t.sperre ? '; ' + t.sperre : '');
-      if (t.hinweis && r.hinweise.indexOf(t.hinweis) < 0) r.hinweise.push(t.hinweis);
-    }
-    termineSetzen('558');
-    var ab = r.ab;
-    /* v2545 · DREI-JAHRES-ANRECHNUNG (§ 558 Abs. 3 BGB) — Marcel 20.10.2026.
-       Die Kappungsgrenze gilt auf die Miete DREI JAHRE VOR dem Wirksamwerden
-       der neuen Erhoehung, nicht auf die heutige. Lag die letzte Erhoehung in
-       diesem Fenster, wird ihre Hoehe (`mv_letzte_erhoehung_betrag`, €/Monat;
-       bei mehreren die Summe, ohne § 559 und Betriebskosten) von der Ist-Miete
-       abgezogen. Ohne Hoehe bleibt die Rechnung beim Ist - mit Hinweis, denn
-       dann ist der Spielraum zu gross gerechnet. */
-    var basisK = ist;
-    var betragL = zahl(e.mv_letzte_erhoehung_betrag);
-    var imFenster = /^\d{4}-\d{2}/.test(letzte) && letzte.slice(0, 7) > plusMonate(ab || heuteYm(), -36);
-    if (imFenster && betragL > 0 && betragL < ist) {
-      basisK = ist - betragL; r.kapp_basis = basisK; r.kapp_angerechnet = betragL;
-    } else if (imFenster && !(betragL > 0)) {
-      r.hinweise.push('die letzte Erhöhung liegt in den drei Jahren der Kappungsgrenze — ihre Höhe eintragen, sonst ist der Spielraum zu groß gerechnet');
-    }
-    var eigen = zahl(e.soll);
-    if (eigen > 0) {
-      r.miete = eigen; r.herkunft = 'eigene Angabe';
-      var kc = ctx.kapp && ctx.kapp.pct ? basisK * (1 + ctx.kapp.pct / 100) + u.monat : null;
-      if (kc && eigen > kc + 0.5) r.hinweise.push('liegt über der Kappungsgrenze (' + ctx.kapp.pct + ' % in 3 Jahren)');
-      return r;
-    }
-    var vgl = zahl(e.vgl_qm) || zahl(ctx.vgl_qm);
-    var m558 = ist;
-    if (vgl > 0 && wfl > 0) {
-      var ziel = vgl * wfl, kappe = basisK * (1 + ((ctx.kapp && ctx.kapp.pct) || 20) / 100);
-      m558 = Math.max(ist, Math.min(ziel, kappe));
-      r.grenze = (kappe < ziel) ? 'Kappungsgrenze ' + ((ctx.kapp && ctx.kapp.pct) || 20) + ' %' + (r.kapp_angerechnet ? ' (letzte Erhöhung angerechnet)' : '') : 'Vergleichsmiete';
-      r.vgl_qm = vgl; r.vgl_herkunft = zahl(e.vgl_qm) ? 'eigene Angabe' : (ctx.vgl_herkunft || 'am Objekt');
-    }
-    if (m558 <= ist + 0.01 && !(u.monat > 0)) {
-      r.grund = !(vgl > 0) ? 'Keine Vergleichsmiete eingetragen.'
-        : (kappe <= ist + 0.01 && vgl * wfl > ist + 0.01) ? 'Die Kappungsgrenze ist durch die letzte Erhöhung ausgeschöpft.'
-        : 'Die Miete liegt schon an der Vergleichsmiete.';
-      return r;
-    }
-    r.miete = Math.round((m558 + u.monat) * 100) / 100;
-    r.herkunft = u.monat > 0 ? (m558 > ist ? 'gerechnet (§ 558 und § 559)' : 'gerechnet (§ 559)') : 'gerechnet (§ 558)';
-    if (u.monat > 0) r.umlage559 = u;
-    /* v3028 · nur Modernisierungsumlage: keine Jahressperre, wirksam nach § 559b Abs. 2 */
-    if (u.monat > 0 && !(m558 > ist)) termineSetzen('559');
-    return r;
+    return K.sollFuer(e, Object.assign({}, ctx || {}, { massnahmenVon: massnahmenVon }));
   }
 
   /* ── Das Modell: Wohnungen und Stufen ───────────────────────────────── */
@@ -2598,7 +2381,7 @@
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
     ohneZielbild: ohneZielbild,   /* v3018d */
     KENNZEICHNUNG: KENNZEICHNUNG, GESPERRT_KURZ: GESPERRT_KURZ, GESPERRT_LANG: GESPERRT_LANG, gesperrt: gesperrt, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,
-    kappung: kappung, kappungLaden: kappungLaden, agsHolen: agsHolen,
+    kappung: kappung, kappungLaden: kappungLaden, kappungDaten: kappungDaten, agsHolen: agsHolen,   /* v3075: kappungDaten */
     massnahmenVon: massnahmenVon, massnahmenSpiegeln: massnahmenSpiegeln, massnahmenBinden: massnahmenBinden,
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,

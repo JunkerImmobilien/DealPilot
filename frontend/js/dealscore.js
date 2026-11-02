@@ -3,12 +3,14 @@
    DEALPILOT – dealscore.js
    Deal Score 0-100 mit gewichteten Faktoren
 
-   Faktoren (Default-Gewichtung in Settings änderbar):
-   - Cashflow:       30%   (CF n.St./Mon. > 200€ = 100pt, < -100 = 0pt)
-   - Rendite (NMR):  25%   (NMR > 4.5% = 100, < 2% = 0)
-   - LTV:            15%   (LTV < 80% = 100, > 110% = 0)
-   - Risiko:         15%   (DSCR > 1.3 = 100, < 0.9 = 0)
-   - Potenzial:      15%   (Wertpuffer + Mietpotenzial)
+   Faktoren (Default-Gewichtung in Settings änderbar; v3075: Kurven wie der Code rechnet,
+   hier standen bis v3074 andere - Benchmark design/Vorschläge/score-benchmark-p1.md 1.1):
+   - Cashflow:       30%   (CF v.St./Mon. linear: −200 € = 0, 0 € = 50, +200 € = 100)
+   - Rendite (NMR):  25%   (linear: 2 % = 0, 3,5 % = 50, 5 % = 100)
+   - LTV:            15%   (linear (110 − LTV) × 2,5: ≤ 70 % = 100, 90 % = 50, ≥ 110 % = 0)
+   - Risiko:         15%   (DSCR ≤ 0,9 = 0, 1,0 = 60, 1,2 = 80, ≥ 1,5 = 100)
+   - Potenzial:      15%   (30 + Wertpuffer/KP × 300, höchstens +60; Mietpotenzial bis +10)
+   Harte Grenzen: DSCR (ScoreTier.dscrDeckel, v3070) und Zustand/Sanierung (v3075).
 
    Output: { score 0-100, color, label, breakdown[], interpretation }
 ═══════════════════════════════════════════════════ */
@@ -172,14 +174,42 @@ var DealScore = (function() {
     return 80 + ((dscr - 1.2) / 0.3) * 20;
   }
 
-  function _scorePotenzial(wertpuffer, kp, mietsteig_pct) {
+  function _scorePotenzial(wertpuffer, kp, mietsteig_pct, mietpot_pct) {
     // Wertpuffer relativ zu KP: 0% → 30, 10% → 60, 20%+ → 90
     // Mietsteigerung > 1.5% → +10
     if (!kp) return 50;
     var puffer_pct = (wertpuffer / kp) * 100;
     var s = 30 + Math.min(60, puffer_pct * 3);
-    if (mietsteig_pct > 1.5) s += 10;
+    /* v3075 · ZULÄSSIGES MIETPOTENZIAL (P1, Marcel 02.11.2026). Der Quick-Check gab `mstg`
+       fest mit 1,5 mit, der Bonus verlangt > 1,5 - er kam dort NIE. Jetzt gibt der Quick-Check
+       die rechtlich zulässige Steigerung der Bestandsmiete in drei Jahren mit
+       (js/mietpotenzial-kern.js zulaessig(): Vergleichsmiete ∧ Kappungsgrenze, nie die
+       Angebotsmiete): + halber Prozentwert, höchstens +10 (Kappung 20 % = +10, 15 % = +7,5,
+       an der Vergleichsmiete 0). Ohne diese Angabe bleibt der alte Weg (Haupt-App: Feld
+       Mietsteigerung p. a. > 1,5 % = +10) - dort ändert sich nichts. */
+    if (mietpot_pct != null) s += Math.min(10, Math.max(0, mietpot_pct) / 2);
+    else if (mietsteig_pct > 1.5) s += 10;
     return Math.max(0, Math.min(100, s));
+  }
+
+  /* v3075 · ZUSTAND UND SANIERUNG (P1, Benchmark Fall D: 47 % des Kaufpreises Sanierung
+     darf nicht „Sehr gut" heißen). Der Quick-Check gibt den Zustand und die Sanierungskosten
+     mit; die Kosten stecken schon in der Gesamtinvestition (NMR, Darlehen, Cashflow, DSCR).
+     Was die Kennzahlen nicht zeigen, ist das RISIKO einer Sanierung - deshalb eine Grenze wie
+     beim DSCR, nicht eine sechste Kategorie (die Gewichte bleiben):
+       sanierungsbedürftig oder Sanierung ≥ 25 % des Kaufpreises  → höchstens 69 (Solide)
+       renovierungsbedürftig oder Sanierung ≥ 10 % des Kaufpreises → höchstens 84 (Gut)
+     Zustand-Werte wie das Hauptformular (ds2_zustand). Ohne Angabe: keine Grenze. */
+  function _zustandDeckel(K) {
+    var z = String((K && K.zustand) || '').toLowerCase();
+    var san = Number(K && K.san) || 0, kp = Number(K && K.kp) || 0;
+    var q = (san > 0 && kp > 0) ? san / kp * 100 : 0;
+    var qt = Math.round(q).toLocaleString('de-DE') + ' % des Kaufpreises';
+    if (z === 'stark_sanierungsbeduerftig' || z === 'sanierungsbeduerftig') return { max: 69, grund: 'Zustand sanierungsbedürftig' + (q > 0 ? ' (Sanierung ' + qt + ')' : '') + ' — Kosten- und Terminrisiko' };
+    if (q >= 25) return { max: 69, grund: 'Sanierung ' + qt + ' — Kosten- und Terminrisiko' };
+    if (z === 'renovierungsbeduerftig') return { max: 84, grund: 'Zustand renovierungsbedürftig' + (q > 0 ? ' (Sanierung ' + qt + ')' : '') };
+    if (q >= 10) return { max: 84, grund: 'Sanierung ' + qt };
+    return null;
   }
 
   /**
@@ -231,6 +261,8 @@ var DealScore = (function() {
     var wp = K.wp_kpi || 0;
     var kp = K.kp || 1;
     var mstg = K.mstg || 1.5;
+    /* v3075: zulässige Steigerung der Bestandsmiete in 3 Jahren (%), nur der Quick-Check gibt sie */
+    var mietpot = (K.miet_potenzial_pct == null || K.miet_potenzial_pct === '' || !isFinite(+K.miet_potenzial_pct)) ? null : +K.miet_potenzial_pct;
 
     /* v2141: beim Barkauf tragen LTV und DSCR `weight: 0` und
        `score: null`. Sie bleiben in der Liste - eine Kategorie, die
@@ -247,7 +279,8 @@ var DealScore = (function() {
       barkauf
         ? { key: 'risiko', label: 'Risiko (DSCR)', weight: 0, score: null, entfaellt: 'ohne Kapitaldienst gibt es keinen Deckungsgrad', input: 'entfällt — Barkauf' }
         : { key: 'risiko', label: 'Risiko (DSCR)', weight: weights.risiko, score: _scoreRisiko(dscr), input: 'DSCR ' + dscr.toFixed(2) },
-      { key: 'potenzial', label: 'Potenzial (Wertpuffer + Miete)', weight: weights.potenzial, score: _scorePotenzial(wp, kp, mstg), input: 'Puffer ' + Math.round(wp).toLocaleString('de-DE') + ' €' }
+      { key: 'potenzial', label: 'Potenzial (Wertpuffer + Miete)', weight: weights.potenzial, score: _scorePotenzial(wp, kp, mstg, mietpot),
+        input: 'Puffer ' + Math.round(wp).toLocaleString('de-DE') + ' €' + (mietpot != null ? ' · zulässige Miete +' + (Math.round(mietpot * 10) / 10).toLocaleString('de-DE') + ' % in 3 J.' : '') }
     ];
 
     /* v2141: auf die TATSAECHLICH vergebenen Gewichte hochrechnen.
@@ -271,6 +304,10 @@ var DealScore = (function() {
        beide Kerne. Darlehen über dem Marktwert: Marktwert = Kaufpreis + Wertpuffer. */
     var _ueber = (K.wp_kpi != null && K.kp > 0 && ltv > 0) ? (ltv / 100 * K.kp > K.kp + Number(K.wp_kpi)) : null;
     var _dk = (!barkauf && window.ScoreTier && window.ScoreTier.dscrDeckel) ? window.ScoreTier.dscrDeckel(dscr, _ueber) : null;
+    /* v3075 · zweite Grenze: Zustand/Sanierung. Es gilt die niedrigere; genannt wird, was greift. */
+    var _zd = _zustandDeckel(K);
+    if (_zd && (!_dk || _zd.max < _dk.max)) _dk = _zd;
+    else if (_zd && _dk && _zd.max === _dk.max) _dk = { max: _dk.max, grund: _dk.grund + '; ' + _zd.grund };
     var deckel = _dk ? _dk.grund : null;
     var scoreOhneDeckel = score;
     if (_dk && score > _dk.max) score = _dk.max;
@@ -297,6 +334,7 @@ var DealScore = (function() {
       interpretation: (_dk && scoreOhneDeckel > _dk.max ? 'Begrenzt auf höchstens ' + _dk.max + ': ' + deckel + ' (ohne Grenze ' + scoreOhneDeckel + '). ' : '') + _interpret(score, components, K),
       weights: weights,
       deckel: deckel,   /* v3069 */
+      zustand_deckel: _zd ? _zd.grund : null,   /* v3075 */
       score_ohne_deckel: scoreOhneDeckel
     };
   }
