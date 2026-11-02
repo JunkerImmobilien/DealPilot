@@ -614,7 +614,10 @@
               + (so.umlage559 ? '<p class="mfh-we-hint">Darin Modernisierungsumlage § 559 BGB: ' + eur(so.umlage559.monat) + '/Monat (8 % von ' + eur(so.umlage559.kosten) + (so.umlage559.gedeckelt ? ', gedeckelt auf ' + so.umlage559.kappe_qm + ' €/m²' : '') + ').</p>' : '')
               + (so.hinweise && so.hinweise.length ? '<p class="mfh-we-hint" style="color:#B8625C">Hinweis: ' + esc(so.hinweise.join(', ')) + '.</p>' : '')
             : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier oder die Marktmiete im Tab Miete lässt DealPilot vorrechnen.</p>')
-          + '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>';
+          /* v3062 · statt eines langen Satzes die Mietrecht-Zeilen dieser Wohnung (Kappung,
+             nächste Erhöhung, Mietpreisbremse, Zielmiete gegen die Bremse) - potenzial.js */
+          + (P.mietrechtHtml ? '<div style="margin-top:10px">' + P.mietrechtHtml(m, m.wohnungen.indexOf(w), { eng: true }) + '</div>'
+            : '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>');
       }
       var hZ = el('mfh-we-ziel');
       if (hZ && w) {
