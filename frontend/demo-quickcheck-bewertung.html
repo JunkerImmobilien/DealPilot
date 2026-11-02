@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quick-Check Bewertung · Demo</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Demo v3081 · Marcel 02.11.2026: „schriftarten unterschiedlich, verschiedene unsortierte
+   Karten, zu viele Informationen … das muss einfacher sein und zielgerichteter bewertet sein."
+   Nur Darstellung, Zahlen vom Lauf mit dem Exposé Hölderlinstr. 1 auf Staging. */
+:root{--ob:#050505;--gold:#C9A84C;--gold-hi:#E8CC7A;--gold-lo:#b8932f;--gruen:#3FA56C;--gruen-d:#2f7d55;--rot:#B8625C;--ch:#2A2727;--mut:#7A7370;--linie:#EFE7D6;--creme:#FDFCFA;--karte:#FBF6E9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--creme);color:var(--ch);font:400 14px/1.5 Inter,system-ui,sans-serif;padding:24px 16px 60px}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.demo-band{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.lbl{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.box{background:#fff;border:1px solid var(--linie);border-radius:12px;padding:14px 16px}
+
+/* 1 · Urteil */
+.urteil{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;border-left:5px solid var(--rot)}
+.ring{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;border:6px solid #F1E3E1;border-top-color:var(--rot);font:700 24px "Space Grotesk",sans-serif}
+.urteil h2{margin:2px 0 4px;font:600 21px/1.25 "Space Grotesk",sans-serif}
+.urteil p{margin:0;color:#4A4542}
+.lage{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.seg{display:inline-flex;border:1px solid var(--linie);border-radius:9px;padding:2px;gap:2px}
+.seg button{border:0;background:transparent;font:600 12px "Space Grotesk",sans-serif;padding:5px 11px;border-radius:7px;cursor:pointer;color:var(--ch)}
+.seg button.on{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#050505}
+.lage small{font-size:11px;color:var(--mut)}
+
+/* 2 · Drei Prüfsteine */
+.pruef{display:flex;flex-direction:column}
+.pz{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid #F1ECE1}
+.pz:first-child{border-top:0;padding-top:2px}
+.dot{width:12px;height:12px;border-radius:50%}
+.ok{background:var(--gruen)}.mid{background:var(--gold)}.bad{background:var(--rot)}
+.pz b{display:block;font:600 15px/1.3 "Space Grotesk",sans-serif}
+.pz span.u{font-size:12.5px;color:var(--mut)}
+.pz .w{font:600 15px "Space Grotesk",sans-serif;text-align:right;white-space:nowrap}
+.pz .w small{display:block;font:500 11px Inter,sans-serif;color:var(--mut)}
+
+/* 3 · Zielkaufpreis */
+.ziel{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.zk{border:1px solid var(--linie);border-radius:10px;padding:10px 12px;background:var(--karte)}
+.zk.binde{border-color:var(--gold);background:#fff}
+.zk .v{font:700 20px "Space Grotesk",sans-serif;margin:2px 0}
+.zk .u{font-size:12px;color:var(--mut)}
+.hinweis{font-size:12.5px;color:#4A4542;margin:8px 0 0}
+
+/* 4 · Miete */
+.miete{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center}
+.miete .v{font:600 17px "Space Grotesk",sans-serif;text-align:right}
+.quelle{font-size:11.5px;color:var(--mut);grid-column:1/-1}
+.quelle a{color:var(--gold-lo)}
+
+/* 5 · Pro / Contra */
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pc ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.pc li{padding-left:18px;position:relative;font-size:13px}
+.pc .pro li::before{content:"✓";position:absolute;left:0;color:var(--gruen-d);font-weight:700}
+.pc .con li::before{content:"!";position:absolute;left:3px;color:var(--rot);font-weight:700}
+
+details.box>summary{cursor:pointer;list-style:none}
+details.box>summary::-webkit-details-marker{display:none}
+details.box>summary::after{content:" ›";color:var(--mut)}
+details[open].box>summary::after{content:" ⌄"}
+details.box p{margin:8px 0 0;color:#4A4542}
+
+.notiz{border:1px dashed var(--gold);border-radius:12px;padding:12px 14px;background:#fff;font-size:12.5px;color:#4A4542}
+.notiz b{color:var(--ch)}
+@media (max-width:640px){
+  .urteil{grid-template-columns:auto 1fr}.lage{grid-column:1/-1;align-items:flex-start}
+  .ziel,.pc{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="demo-band"><span>Demo · Quick-Check · Bewertung neu</span><span>Hölderlinstr. 1, 32547 Bad Oeynhausen · ETW 73 m² · Bj 1983</span></div>
+
+  <!-- 1 · Urteil: EIN Satz, der den Grund nennt -->
+  <div class="box urteil">
+    <div class="ring">19</div>
+    <div>
+      <span class="lbl">Ersteinschätzung · Kritisch</span>
+      <h2>Objekt passt, Finanzierung nicht</h2>
+      <p>Preis und Rendite liegen im Rahmen für eine B-Lage. Mit 100 % Finanzierung zu 4,87 % trägt sich die Wohnung aber nicht: −219 € im Monat.</p>
+    </div>
+    <div class="lage">
+      <span class="lbl">Lageklasse</span>
+      <div class="seg" role="group" aria-label="Lageklasse"><button type="button">A</button><button type="button" class="on">B</button><button type="button">C</button></div>
+      <small>Standard B · Ziel 5,0 % brutto</small>
+    </div>
+  </div>
+
+  <!-- 2 · Drei Prüfsteine, jede Zeile mit Ampel und Zahl -->
+  <div class="box pruef">
+    <div class="pz"><span class="dot ok"></span><span><b>Preis im Rahmen des Marktes</b><span class="u">Kaufpreis 1.896 €/m² · Marktbewertung 122.000 – 162.000 € (Mitte 143.000 €). Innerhalb der Spanne gibt es keinen belastbaren Vor- oder Nachteil.</span></span><span class="w">139.000 €<small>−3 % zur Mitte</small></span></div>
+    <div class="pz"><span class="dot ok"></span><span><b>Rendite erfüllt das Ziel der B-Lage</b><span class="u">Bruttorendite auf die Marktmiete · Ziel 5,0 % · Kaufpreisfaktor 18,0</span></span><span class="w">5,6 %<small>Ziel 5,0 %</small></span></div>
+    <div class="pz"><span class="dot bad"></span><span><b>Finanzierung trägt sich nicht</b><span class="u">100 % + Nebenkosten · 4,87 % Zins · 1,5 % Tilgung · DSCR 0,7. Mit rund 41.000 € mehr Eigenkapital läge der Cashflow bei null.</span></span><span class="w">−219 €<small>pro Monat</small></span></div>
+  </div>
+
+  <!-- 3 · Zielkaufpreis: welche Grenze greift -->
+  <div class="box">
+    <span class="lbl">Zielkaufpreis · was der Preis sein müsste</span>
+    <div class="ziel" style="margin-top:8px">
+      <div class="zk"><span class="lbl">Rendite-Ziel B-Lage</span><div class="v">139.000 €</div><span class="u">kein Nachlass nötig · 5,6 % ≥ 5,0 %</span></div>
+      <div class="zk binde"><span class="lbl">Cashflow null · deine Finanzierung</span><div class="v">104.000 €</div><span class="u">Nachlass 35.000 € (25 %) — diese Grenze greift</span></div>
+    </div>
+    <p class="hinweis">Verhandlungsrahmen, kein Wert. Den Preis bremst die Finanzierung, nicht die Lage — mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.</p>
+  </div>
+
+  <!-- 4 · Miete mit Herkunft -->
+  <div class="box miete">
+    <span><span class="lbl">Angesetzte Miete</span><br>Das Exposé nennt keine Miete — gerechnet wird mit der Marktmiete bei Neuvermietung.</span>
+    <span class="v">643 € / Monat<br><small style="font:500 12px Inter;color:var(--mut)">8,77 €/m² kalt</small></span>
+    <span class="quelle">Marktmiete: DealPilot-Marktbewertung vom 02.11.2026 · Mietpreisbremse: gilt in Bad Oeynhausen nicht (<a href="https://recht.nrw.de/lrgv/rechtsverordnung/07112025-mieterschutzverordnung-nrw-mietschvo-nrw/" target="_blank" rel="noopener">Mieterschutzverordnung NRW</a>, gültig bis 28.02.2030) · spätere Erhöhungen: höchstens 20 % in drei Jahren (§ 558 Abs. 3 BGB), frühestens 15 Monate nach Mietbeginn.</span>
+  </div>
+
+  <!-- 5 · Pro / Contra: je höchstens drei, aus denselben Zahlen -->
+  <div class="box pc">
+    <div class="pro"><span class="lbl" style="color:var(--gruen-d)">Dafür</span><ul><li>Rendite 5,6 % über dem Ziel der B-Lage</li><li>Kaufpreis im Rahmen der Marktbewertung</li><li>Hausgeld 415 € plausibel für 73 m²</li></ul></div>
+    <div class="con"><span class="lbl" style="color:var(--rot)">Dagegen</span><ul><li>Cashflow −219 € pro Monat bei voller Finanzierung</li><li>DSCR 0,7 — die Miete deckt die Rate nicht</li><li>Keine Ist-Miete: Vermietbarkeit nicht belegt</li></ul></div>
+  </div>
+
+  <!-- 6 · KI-Kommentar zugeklappt -->
+  <details class="box"><summary class="lbl">Kommentar des Co-Piloten</summary>
+    <p>Der Kaufpreis passt zur Lage, die Rendite auch — das Problem ist die volle Fremdfinanzierung bei aktuellem Zins. Prüfe, wie viel Eigenkapital du einbringen willst; ab etwa 41.000 € mehr trägt sich die Wohnung selbst.</p>
+  </details>
+
+  <div class="notiz"><b>Was sich gegenüber heute ändert:</b> eine Schrift (Space Grotesk für Zahlen, Inter für Text, JetBrains Mono für Beschriftungen) statt drei · eine Karte mit fester Reihenfolge statt sechs Blöcken · der Kaufpreis innerhalb der Marktspanne gilt als „im Rahmen“ statt als Vorteil · die Lageklasse steht oben, Standard B, und bestimmt Ziel und Urteil · beim Zielkaufpreis steht, welche Grenze greift · keine Kappungs-Erhöhung für eine Wohnung ohne Mieter, jede Rechtsangabe mit Quelle · der KI-Text ist zugeklappt.</div>
+</div>
+<script>
+/* Demo: Lageklasse umschalten zeigt nur, wo sie wirkt (Zahlen bleiben Demo) */
+document.querySelectorAll('.seg button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.seg button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    var z = { A: '3,8', B: '5,0', C: '7,0' }[b.textContent];
+    document.querySelector('.lage small').textContent = (b.textContent === 'B' ? 'Standard B · ' : '') + 'Ziel ' + z + ' % brutto';
+  });
+});
+</script>
+</body>
+</html>
