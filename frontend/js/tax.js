@@ -762,10 +762,10 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
   try { _rwOffen = localStorage.getItem('dp_tax_rechenweg') === '1'; } catch (e) {}
   box.innerHTML =
     '<div class="tax-grid tax-objekt-kopf">' +
-      '<div class="tax-item tax-highlight"><div class="tax-label">Ergebnis V+V dieses Objekts ' + displayYear + '</div><div class="tax-val" style="font-size:20px;color:' + (isProfit ? 'var(--gold-d)' : 'var(--green)') + '">' + fE(totals.ergebnis, 0, true) + '</div>' +
-        '<div class="tax-label" style="margin-top:4px;text-transform:none;letter-spacing:0">' + (isProfit ? 'Überschuss — erhöht dein zu versteuerndes Einkommen' : 'Verlust — mindert dein zu versteuerndes Einkommen') + '</div></div>' +
-      '<div class="tax-item tax-result"><div class="tax-label">' + refundLabel + ' durch dieses Objekt</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div>' +
-        '<div class="tax-label" style="margin-top:4px;text-transform:none;letter-spacing:0">' + (impact.refund >= 0 ? 'so viel weniger Steuer zahlst du mit diesem Objekt' : 'so viel mehr Steuer zahlst du mit diesem Objekt') + '</div></div>' +
+      '<div class="tax-item tax-highlight" style="grid-column:auto;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:12px 16px"><div class="tax-label">Ergebnis V+V dieses Objekts ' + displayYear + '</div><div class="tax-val" style="font-size:20px;color:' + (isProfit ? 'var(--gold-d)' : 'var(--green)') + '">' + fE(totals.ergebnis, 0, true) + '</div>' +
+        '<div class="tax-label" style="font-weight:400;font-size:12px">' + (isProfit ? 'Überschuss — erhöht dein zu versteuerndes Einkommen' : 'Verlust — mindert dein zu versteuerndes Einkommen') + '</div></div>' +
+      '<div class="tax-item tax-result" style="grid-column:auto;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:12px 16px"><div class="tax-label">' + refundLabel + ' durch dieses Objekt</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div>' +
+        '<div class="tax-label" style="font-weight:400;font-size:12px">' + (impact.refund >= 0 ? 'so viel weniger Steuer zahlst du mit diesem Objekt' : 'so viel mehr Steuer zahlst du mit diesem Objekt') + '</div></div>' +
     '</div>' +
     '<details class="tax-rechenweg" style="margin-top:12px"' + (_rwOffen ? ' open' : '') + ' ontoggle="try{localStorage.setItem(\'dp_tax_rechenweg\',this.open?\'1\':\'0\')}catch(e){}">' +
     '<summary style="cursor:pointer;font-size:13px;font-weight:600;padding:6px 0">Rechenweg — mit deinem Einkommen und den vorher gekauften Objekten</summary>' +
