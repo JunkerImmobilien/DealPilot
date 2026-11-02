@@ -210,6 +210,7 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
        Wahrheiten. */
     const _frist = require('../config').auth.verifyGnadenfristStunden;
     const _ablauf = new Date(new Date(user.created_at).getTime() + _frist * 3600 * 1000);
+    await userService.stempleAnmeldung(user.id);   /* v3093 (N106): Token = Einstieg */
     res.status(201).json({
       success: true,
       message: 'Anmeldung erfolgreich. Du kannst sofort loslegen – bitte bestätige deine E-Mail-Adresse innerhalb von '
@@ -366,6 +367,7 @@ router.get('/verify-email', async (req, res) => {
       name: user.name,
       role: user.role
     });
+    await userService.stempleAnmeldung(user.id);   /* v3093 (N106): Auto-Login nach Klick */
 
     // Audit
     try {

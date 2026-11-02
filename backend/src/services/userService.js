@@ -214,7 +214,7 @@ async function authenticate({ email, plainPassword, ipAddress }) {
   } catch (e) { /* nicht kritisch */ }
 
   // Update last login
-  await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [user.id]);
+  await stempleAnmeldung(user.id);
 
   return {
     id: user.id,
@@ -335,8 +335,30 @@ async function updatePasswordById(userId, newPassword) {
   await query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, userId]);
 }
 
+/* ══ v3093 · LETZTER EINSTIEG AN JEDER SITZUNGSAUSGABE (N106) ═══════
+   `last_login_at` wurde nur in `authenticate()` gesetzt, also beim
+   Passwort-Login. Drei Wege geben aber eine Sitzung aus, ohne dort
+   vorbeizukommen: `/auth/register-with-verify` (Token sofort, Gnadenfrist
+   v2136), `/auth/verify-email` (Token im Hash nach dem Klick) und
+   `/auth/register`. Gemessen auf Prod am 02.11.2026: 5 von 16 Nutzern
+   mit leerem `last_login_at` - genau die, die nach der Registrierung nie
+   das Passwortformular gesehen haben.
+
+   Darum steht der Stempel jetzt an JEDER Stelle, die `jwtUtil.sign()`
+   fuer einen Nutzer ruft (die Telegram-Dienste signieren nur fuer
+   interne Aufrufe und zaehlen nicht). Nicht kritisch: ein Fehler hier
+   darf keine Anmeldung kippen. */
+async function stempleAnmeldung(userId) {
+  try {
+    await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [userId]);
+  } catch (e) {
+    console.warn('[userService] last_login_at nicht gesetzt:', e.message);
+  }
+}
+
 module.exports = {
   createUser,
+  stempleAnmeldung,       /* v3093 — last_login_at an jeder Sitzungsausgabe */
   gewaehreTestphase,      /* v1185 — vier Wochen Pro + Testpaket, eine Quelle */
   authenticate,
   getById,

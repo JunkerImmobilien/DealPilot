@@ -67,6 +67,7 @@ router.post('/register', validate({ body: registerSchema }), async (req, res, ne
     await userService.gewaehreTestphase(user.id, user.email);
 
     const token = jwtUtil.sign(sessionFromUser(user));
+    await userService.stempleAnmeldung(user.id);   /* v3093 (N106) */
     await objectService.logAudit({
       userId: user.id,
       action: 'register',
@@ -152,6 +153,9 @@ router.post('/2fa/verify-login', validate({ body: verifyLoginSchema }), async (r
     if (!user) return res.status(401).json({ error: 'User nicht gefunden.' });
 
     const token = jwtUtil.sign(sessionFromUser(user));
+    /* v3093 (N106): authenticate() stempelt schon beim Passwortschritt;
+       hier der Zeitpunkt, an dem die Sitzung wirklich entsteht. */
+    await userService.stempleAnmeldung(user.id);
 
     await objectService.logAudit({
       userId: user.id,

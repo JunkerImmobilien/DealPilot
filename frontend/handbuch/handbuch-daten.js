@@ -2,25 +2,25 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "bee0d983ce22dc84",
-  "tooltip-content.js": "ede920d2f6583fdc",
-  "help.js": "b74be784baf941a9",
+  "index.html": "6ec29b8d9970bf63",
+  "tooltip-content.js": "c7e4453dda8ecdd5",
+  "help.js": "c0eb500c02240b2f",
   "tour-content.js": "e85775a89313350d",
-  "objekt-reiter.js": "146e176f961a3b25",
-  "deal-action-readycheck.js": "4d9c815073f8d2ab",
-  "feld-hilfe.js": "db5913c4ec4dc08e",
-  "mfh-einheiten.js": "5e60dcc317b72017",
-  "calc.js": "3228bc67dcae9693",
-  "ui.js": "6b89df3942f02a34",
-  "pdf.js": "49d7957ea03775f6",
-  "pdf-investment-bank.js": "10cbfde495bf4f0d",
+  "objekt-reiter.js": "a2c83d0a545a682d",
+  "deal-action-readycheck.js": "51f7c11dd7e2ab57",
+  "feld-hilfe.js": "3a7e9964af3920bc",
+  "mfh-einheiten.js": "acbd7bca8272b72f",
+  "calc.js": "6d32d34add6cfdca",
+  "ui.js": "89a8dcbe10de86ee",
+  "pdf.js": "83b2fb88e72be57c",
+  "pdf-investment-bank.js": "da1ac2e19d4be831",
   "financing-pdf.js": "f6581f49c29dab13",
-  "werbungskosten-pdf.js": "663a552eebc9b241",
-  "pdf-anlage-bmf.js": "41997cf31f29fb07",
-  "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
-  "frontend-konstanten.json": "79c6746b87625bae",
+  "werbungskosten-pdf.js": "9a17188d51895f0e",
+  "pdf-anlage-bmf.js": "bc9178281594e5de",
+  "pdf-kaufpreisaufteilung.js": "33d5e894dcbc0726",
+  "frontend-konstanten.json": "508e10ebd04b5723",
   "aufnahme.json": "433c9aa7f5c9ec56",
-  "handbuch-ablaeufe.mjs": "4882e1047f133976"
+  "handbuch-ablaeufe.mjs": "3cb0575ca00a0152"
  },
  "reiter": [
   {
@@ -147,8 +147,9 @@ window.DP_HANDBUCH = {
       "ds2_nachfrage",
       "ds2_wertsteigerung",
       "ds2_entwicklung",
-      "bankval",
       "svwert",
+      "svw_herkunft",
+      "bankval",
       "wert_soll"
      ]
     },
@@ -156,17 +157,6 @@ window.DP_HANDBUCH = {
      "titel": "Sonstige Bemerkungen",
      "felder": [
       "notizen"
-     ]
-    },
-    {
-     "titel": "Mieterhöhung und Zielbild",
-     "felder": [
-      "zb_fertig_jahr",
-      "zb_vgl_qm",
-      "zb_soll_qm",
-      "zb_soll_ab",
-      "zb_ziel_qm",
-      "zb_ziel_wann"
      ]
     },
     {
@@ -178,6 +168,8 @@ window.DP_HANDBUCH = {
       "sachwertfaktor",
       "uk_flaeche",
       "wgfz_objekt",
+      "vgf_wohnlage_wahl",
+      "vgf_ausstattung_wahl",
       "stellplatz_miete_monat",
       "sonstige_jahr",
       "nhk_haus",
@@ -185,6 +177,7 @@ window.DP_HANDBUCH = {
       "nhk_dach",
       "garagen_bgf_qm",
       "garagen_stufe",
+      "garagen_baujahr",
       "aussenanlagen_pct",
       "aussenanlagen",
       "bes_bauteile",
@@ -196,7 +189,8 @@ window.DP_HANDBUCH = {
       "lzs_pct",
       "brw_manuell",
       "brw_anpassung_pct",
-      "brw_anpassung_grund"
+      "brw_anpassung_grund",
+      "wertermittlungsstichtag"
      ]
     }
    ]
@@ -208,7 +202,7 @@ window.DP_HANDBUCH = {
    "desc": "Kaufpreis, Nebenkosten, Gesamtinvestition und Prognose-Annahmen",
    "hilfe": {
     "titel": "Investition — Kaufpreis und Kaufnebenkosten",
-    "text": "Trag den <strong>Kaufpreis</strong> ein und darunter die Kaufnebenkosten. Jede Position gibt es doppelt — in Prozent und in Euro; änderst du eins, rechnet DealPilot das andere nach:\n• <strong>Makler</strong>\n• <strong>Notar</strong>\n• <strong>Grundbuchamt</strong> (bei neuen Objekten mit 0,5 % vorbelegt)\n• <strong>Grunderwerbsteuer</strong> (neu vorbelegt mit 6,5 % — prüf den Satz deines Bundeslands)\n• <strong>Sonstige</strong> — Bausachverständiger, Anfahrt, Gutachten\n\nDaraus entstehen <strong>Summe Nebenkosten</strong> und die <strong>Gesamtinvestition</strong> = Kaufpreis + Nebenkosten + Sanierungskosten + Inventarkosten. Der <strong>Markt-Faktor</strong> (Kaufpreis ÷ Jahres-Nettokaltmiete) rechnet sich selbst.\n\nUnter <strong>Sanierung</strong> schätzt du Gewerke ab und übernimmst die Summe in die <strong>Sanierungskosten</strong>. DealPilot prüft dabei die <strong>15 %-Grenze</strong> (§ 6 Abs. 1 Nr. 1a EStG) — gemessen netto, deshalb wählst du, ob dein Betrag brutto oder netto ist. <strong>Inventarkosten</strong> (Küche, Möbel, Geräte …) zählen nicht zur Grenze und werden separat abgeschrieben."
+    "text": "Trag den <strong>Kaufpreis</strong> ein und darunter die Kaufnebenkosten. Jede Position gibt es doppelt — in Prozent und in Euro; änderst du eins, rechnet DealPilot das andere nach:\n• <strong>Makler</strong>\n• <strong>Notar</strong>\n• <strong>Grundbuchamt</strong> (bei neuen Objekten mit 0,5 % vorbelegt)\n• <strong>Grunderwerbsteuer</strong> (neu vorbelegt mit 6,5 % — prüf den Satz deines Bundeslands)\n• <strong>Sonstige</strong> — Bausachverständiger, Anfahrt, Gutachten\n\nDaraus entstehen <strong>Summe Nebenkosten</strong> und die <strong>Gesamtinvestition</strong> = Kaufpreis + Nebenkosten + Sanierungskosten. Inventar (Küche, Möbel) steckt im Kaufpreis und kommt nicht noch einmal dazu. Der <strong>Markt-Faktor</strong> (Kaufpreis ÷ Jahres-Nettokaltmiete) rechnet sich selbst.\n\nUnter <strong>Sanierung</strong> schätzt du Gewerke ab und übernimmst die Summe in die <strong>Sanierungskosten</strong>. DealPilot prüft dabei die <strong>15 %-Grenze</strong> (§ 6 Abs. 1 Nr. 1a EStG) — gemessen netto, deshalb wählst du, ob dein Betrag brutto oder netto ist. <strong>Inventarkosten</strong> (Küche, Möbel, Geräte …) zählen nicht zur Grenze und werden separat abgeschrieben."
    },
    "tour": {
     "titel": "Tab 2: Investition",
@@ -235,6 +229,7 @@ window.DP_HANDBUCH = {
      "titel": "Sanierung Sanierungsbedarf einschätzen",
      "felder": [
       "san",
+      "san_ausgefuehrt",
       "san_ust"
      ]
     },
@@ -248,6 +243,18 @@ window.DP_HANDBUCH = {
       "inv_pv",
       "inv_stellplatz",
       "inv_sonst"
+     ]
+    },
+    {
+     "titel": "Mieterhöhung und Zielbild",
+     "felder": [
+      "zb_fertig_jahr",
+      "zb_markt_qm",
+      "zb_vgl_qm",
+      "zb_soll_qm",
+      "zb_soll_ab",
+      "zb_ziel_qm",
+      "zb_ziel_wann"
      ]
     }
    ]
@@ -680,7 +687,7 @@ window.DP_HANDBUCH = {
    "titel": "",
    "tip": {
     "titel": "Wohnfläche",
-    "text": "Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig).",
+    "text": "Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig). Im Marktbericht: Grundlage der Miete je m² im Ertragswert, des Vergleichswerts (Preis je m² × Fläche) und — über die Bruttogrundfläche — der Baukosten im Sachwert.",
     "beispiel": "",
     "paragraf": "WoFlV"
    },
@@ -725,7 +732,12 @@ window.DP_HANDBUCH = {
    "optionen": null,
    "hinweis": "",
    "titel": "",
-   "tip": null,
+   "tip": {
+    "titel": "Baujahr",
+    "text": "Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: fertiggestellt vor 1925 = 2,5%, 1925 bis 2022 = 2,0%, fertiggestellt ab 2023 = 3,0% (§ 7 Abs. 4 Satz 1 Nr. 2 EStG). 5,0% degressiv (§ 7 Abs. 5a) nur bei Baubeginn oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029. Auch relevant für GEG-Sanierungspflichten. Im Marktbericht: Baujahr und Modernisierungspunkte ergeben die Restnutzungsdauer — sie bestimmt im Ertragswert den Vervielfältiger und im Sachwert die Alterswertminderung.",
+    "beispiel": "",
+    "paragraf": "§ 7 Abs. 4 EStG"
+   },
    "ds2": false,
    "pflichtMarke": true,
    "woher": "Exposé oder Energieausweis",
@@ -828,7 +840,7 @@ window.DP_HANDBUCH = {
    "hinweis": "",
    "titel": "",
    "tip": {
-    "titel": "Zustand der Wohnung",
+    "titel": "Zustand der Wohnung / des Gebäudes",
     "text": "Subjektive Einschätzung des Bauzustands. Beeinflusst den DealScore-Risiko-Anteil und unterstützt die Auto-AfA-Vorauswahl (Neubau ab Baujahr 2023 → degressive AfA möglich).",
     "beispiel": "",
     "paragraf": ""
@@ -878,7 +890,12 @@ window.DP_HANDBUCH = {
    ],
    "hinweis": "",
    "titel": "Die Normalherstellungskosten 2010 staffeln die Baukosten nach fünf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualität des Gebäudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.",
-   "tip": null,
+   "tip": {
+    "titel": "Standardstufe",
+    "text": "Im Marktbericht: Die Standardstufe (1 sehr einfach bis 5 stark gehoben) bestimmt die Baukosten je m² im Sachwert (Normalherstellungskosten 2010). Für den Ertragswert spielt sie keine Rolle — dort zählt die Miete.",
+    "beispiel": "",
+    "paragraf": ""
+   },
    "ds2": false,
    "pflichtMarke": false,
    "woher": "",
@@ -1002,7 +1019,12 @@ window.DP_HANDBUCH = {
    "optionen": null,
    "hinweis": "",
    "titel": "",
-   "tip": null,
+   "tip": {
+    "titel": "Grundstücksfläche",
+    "text": "Im Marktbericht: Fläche × Bodenrichtwert ergibt den Bodenwert. Er geht in den Ertragswert (der Boden wird verzinst) und in den Sachwert ein. Weicht die Fläche stark vom typischen Grundstück der Bodenrichtwertzone ab, rechnet der Bericht den Richtwert um, wo der Gutachterausschuss dafür eine Tabelle führt.",
+    "beispiel": "",
+    "paragraf": ""
+   },
    "ds2": false,
    "pflichtMarke": false,
    "woher": "Grundbuchauszug oder Flurkarte",
@@ -1018,7 +1040,7 @@ window.DP_HANDBUCH = {
    "label": "Miteigentumsanteil (%)",
    "typ": "zahl",
    "einheit": "%",
-   "platzhalter": "7.06",
+   "platzhalter": "7,06",
    "optionen": null,
    "hinweis": "",
    "titel": "",
@@ -1166,6 +1188,7 @@ window.DP_HANDBUCH = {
    "wirkung": [
     "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
     "geht in die Pilot-Analyse ein",
+    "steht im Investment-PDF",
     "steht im Bank-PDF (Investment Case)"
    ]
   },
@@ -1186,7 +1209,8 @@ window.DP_HANDBUCH = {
    "woher": "",
    "wirkung": [
     "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
-    "geht in die Pilot-Analyse ein"
+    "geht in die Pilot-Analyse ein",
+    "steht im Investment-PDF"
    ]
   },
   "halter": {
@@ -1377,7 +1401,7 @@ window.DP_HANDBUCH = {
    "titel": "",
    "tip": {
     "titel": "Bodenrichtwert",
-    "text": "Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands.",
+    "text": "Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands. Im Marktbericht: Bodenrichtwert × Grundstücksfläche ergibt den Bodenwert — er steckt im Ertragswert und im Sachwert.",
     "beispiel": "Beispiel: München-Schwabing: 8.000 €/m². Münster-Geist: 420 €/m².",
     "paragraf": ""
    },
@@ -2790,7 +2814,12 @@ window.DP_HANDBUCH = {
    "optionen": null,
    "hinweis": "",
    "titel": "",
-   "tip": null,
+   "tip": {
+    "titel": "Garagen und Stellplätze",
+    "text": "Im Marktbericht: Vermietete Stellplätze gehen mit ihrer Miete in den Ertragswert ein; Garagen zählen im Sachwert mit eigenen Baukosten. Stellplätze ohne Miete bringen im Ertragswert weder Ertrag noch Kosten.",
+    "beispiel": "",
+    "paragraf": ""
+   },
    "ds2": false,
    "pflichtMarke": false,
    "woher": "",
@@ -2936,7 +2965,7 @@ window.DP_HANDBUCH = {
    "label": "Zusätzliche Fläche / Hinterland (m²)",
    "typ": "zahl",
    "einheit": "m²",
-   "platzhalter": "nur die Fläche AUSSERHALB des Baulands",
+   "platzhalter": "außerhalb des Baulands",
    "optionen": null,
    "hinweis": "",
    "titel": "",
@@ -3082,7 +3111,7 @@ window.DP_HANDBUCH = {
    "id": "erb_wert_ist_erb",
    "reiter": "s0",
    "karte": "Bauteile & Grundstück",
-   "label": "Verkehrswert / Bankbewertung ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)",
+   "label": "Marktwert/Verkehrswert ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)",
    "typ": "haken",
    "einheit": "",
    "platzhalter": "",
@@ -3125,7 +3154,12 @@ window.DP_HANDBUCH = {
    ],
    "hinweis": "",
    "titel": "",
-   "tip": null,
+   "tip": {
+    "titel": "Lage im Verkehrswert",
+    "text": "Im Marktbericht: Die Lage-Einschätzung fließt in den Deal Score. Den Verkehrswert bestimmt die Lage über den Bodenrichtwert, die marktübliche Miete und die Kaufpreise vergleichbarer Objekte in der Umgebung — nicht über dieses Feld.",
+    "beispiel": "",
+    "paragraf": ""
+   },
    "ds2": false,
    "pflichtMarke": false,
    "woher": "",
@@ -3415,6 +3449,77 @@ window.DP_HANDBUCH = {
     "geht in die Pilot-Analyse ein"
    ]
   },
+  "svwert": {
+   "id": "svwert",
+   "reiter": "s0",
+   "karte": "Lage & Einschätzung",
+   "label": "Marktwert / Verkehrswert (Herkunft daneben wählen)",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "237000",
+   "optionen": null,
+   "hinweis": "(Herkunft daneben wählen)",
+   "titel": "Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten. Daneben wählen, woher der Wert stammt: Nur Gutachten und Bankbewertung tragen den LTV. Den Wertpuffer tragen auch Marktbericht und eigene Schätzung, die Marktpreisindikation aus Angeboten nicht.",
+   "tip": {
+    "titel": "Verkehrswert (§ 194 BauGB)",
+    "text": "Der \"objektive\" Marktwert nach Sachverständigen-Gutachten — meist via Sachwertverfahren, Ertragswertverfahren oder Vergleichswertverfahren. Wenn höher als Kaufpreis → Wertpuffer und besseres Verhandlungsargument bei der Bank.",
+    "beispiel": "",
+    "paragraf": "§ 194 BauGB"
+   },
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten.",
+   "wirkung": [
+    "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
+    "geht in die Pilot-Analyse ein",
+    "steht im Investment-PDF",
+    "steht im Bank-PDF (Investment Case)"
+   ]
+  },
+  "svw_herkunft": {
+   "id": "svw_herkunft",
+   "reiter": "s0",
+   "karte": "Lage & Einschätzung",
+   "label": "Herkunft",
+   "typ": "auswahl",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": [
+    {
+     "wert": "",
+     "text": "Herkunft: automatisch"
+    },
+    {
+     "wert": "gutachten",
+     "text": "Verkehrswertgutachten (§ 194 BauGB)"
+    },
+    {
+     "wert": "bank",
+     "text": "Bankbewertung (Marktwert)"
+    },
+    {
+     "wert": "marktbericht",
+     "text": "DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)"
+    },
+    {
+     "wert": "indikation",
+     "text": "Marktpreisindikation (Angebotspreise)"
+    },
+    {
+     "wert": "eigene",
+     "text": "eigene Schätzung"
+    }
+   ],
+   "hinweis": "",
+   "titel": "Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": [
+    "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)"
+   ]
+  },
   "bankval": {
    "id": "bankval",
    "reiter": "s0",
@@ -3435,37 +3540,7 @@ window.DP_HANDBUCH = {
    "ds2": false,
    "pflichtMarke": false,
    "woher": "",
-   "wirkung": [
-    "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
-    "steht im Investment-PDF"
-   ]
-  },
-  "svwert": {
-   "id": "svwert",
-   "reiter": "s0",
-   "karte": "Lage & Einschätzung",
-   "label": "Verkehrswert (§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)",
-   "typ": "zahl",
-   "einheit": "",
-   "platzhalter": "237000",
-   "optionen": null,
-   "hinweis": "(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)",
-   "titel": "Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt",
-   "tip": {
-    "titel": "Verkehrswert (§ 194 BauGB)",
-    "text": "Der \"objektive\" Marktwert nach Sachverständigen-Gutachten — meist via Sachwertverfahren, Ertragswertverfahren oder Vergleichswertverfahren. Wenn höher als Kaufpreis → Wertpuffer und besseres Verhandlungsargument bei der Bank.",
-    "beispiel": "",
-    "paragraf": "§ 194 BauGB"
-   },
-   "ds2": false,
-   "pflichtMarke": false,
-   "woher": "",
-   "wirkung": [
-    "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
-    "geht in die Pilot-Analyse ein",
-    "steht im Investment-PDF",
-    "steht im Bank-PDF (Investment Case)"
-   ]
+   "wirkung": []
   },
   "wert_soll": {
    "id": "wert_soll",
@@ -3510,108 +3585,6 @@ window.DP_HANDBUCH = {
     "geht in die Pilot-Analyse ein"
    ]
   },
-  "zb_fertig_jahr": {
-   "id": "zb_fertig_jahr",
-   "reiter": "s0",
-   "karte": "Mieterhöhung und Zielbild",
-   "label": "Zielbild fertig (Jahr)",
-   "typ": "zahl",
-   "einheit": "",
-   "platzhalter": "z. B. 2028",
-   "optionen": null,
-   "hinweis": "",
-   "titel": "In welchem Jahr ist das Zielbild erreicht (Umbau fertig, neu vermietet)? Leer: in Pilot-Analyse und PDF steht das Jahr als offen.",
-   "tip": null,
-   "ds2": false,
-   "pflichtMarke": false,
-   "woher": "",
-   "wirkung": []
-  },
-  "zb_vgl_qm": {
-   "id": "zb_vgl_qm",
-   "reiter": "s0",
-   "karte": "Mieterhöhung und Zielbild",
-   "label": "Vergleichsmiete (€/m²)",
-   "typ": "zahl",
-   "einheit": "",
-   "platzhalter": "aus Tab Miete",
-   "optionen": null,
-   "hinweis": "",
-   "titel": "Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.",
-   "tip": null,
-   "ds2": false,
-   "pflichtMarke": false,
-   "woher": "",
-   "wirkung": []
-  },
-  "zb_soll_qm": {
-   "id": "zb_soll_qm",
-   "reiter": "s0",
-   "karte": "Mieterhöhung und Zielbild",
-   "label": "Soll-Miete (Mieter bleibt, €/m²)",
-   "typ": "zahl",
-   "einheit": "",
-   "platzhalter": "leer = gerechnet",
-   "optionen": null,
-   "hinweis": "",
-   "titel": "Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.",
-   "tip": null,
-   "ds2": false,
-   "pflichtMarke": false,
-   "woher": "",
-   "wirkung": []
-  },
-  "zb_soll_ab": {
-   "id": "zb_soll_ab",
-   "reiter": "s0",
-   "karte": "Mieterhöhung und Zielbild",
-   "label": "Soll erreichbar ab",
-   "typ": "text",
-   "einheit": "",
-   "platzhalter": "",
-   "optionen": null,
-   "hinweis": "",
-   "titel": "Leer: 15 Monate nach der letzten Erhöhung (Tab Miete, Mietvertrag).",
-   "tip": null,
-   "ds2": false,
-   "pflichtMarke": false,
-   "woher": "",
-   "wirkung": []
-  },
-  "zb_ziel_qm": {
-   "id": "zb_ziel_qm",
-   "reiter": "s0",
-   "karte": "Mieterhöhung und Zielbild",
-   "label": "Zielmiete (€/m²)",
-   "typ": "zahl",
-   "einheit": "",
-   "platzhalter": "z. B. 9,20",
-   "optionen": null,
-   "hinweis": "",
-   "titel": "Was nach Umbau oder Neuvermietung erzielbar ist.",
-   "tip": null,
-   "ds2": false,
-   "pflichtMarke": false,
-   "woher": "",
-   "wirkung": []
-  },
-  "zb_ziel_wann": {
-   "id": "zb_ziel_wann",
-   "reiter": "s0",
-   "karte": "Mieterhöhung und Zielbild",
-   "label": "Zielbild ab wann",
-   "typ": "text",
-   "einheit": "",
-   "platzhalter": "z. B. bei Mieterwechsel, nach Sanierung 2027",
-   "optionen": null,
-   "hinweis": "",
-   "titel": "",
-   "tip": null,
-   "ds2": false,
-   "pflichtMarke": false,
-   "woher": "",
-   "wirkung": []
-  },
   "bgf": {
    "id": "bgf",
    "reiter": "s0",
@@ -3619,7 +3592,7 @@ window.DP_HANDBUCH = {
    "label": "Bruttogrundfläche (m²)",
    "typ": "zahl",
    "einheit": "m²",
-   "platzhalter": "nur für den Sachwert bei Häusern",
+   "platzhalter": "nur Häuser (Sachwert)",
    "optionen": null,
    "hinweis": "",
    "titel": "Bruttogrundfläche nach DIN 277: alle Grundflächen aller Grundrissebenen, außen gemessen. NICHT die Wohnfläche — die BGF ist regelmäßig deutlich größer und ist die Bezugsgröße der NHK.",
@@ -3759,10 +3732,44 @@ window.DP_HANDBUCH = {
    "label": "WGFZ des Objekts",
    "typ": "zahl",
    "einheit": "",
-   "platzhalter": "z. B. 1,2 — oberirdische Geschossfläche / Grundstück",
+   "platzhalter": "z. B. 1,2",
    "optionen": null,
    "hinweis": "",
    "titel": "Wertrelevante Geschossflächenzahl nach Paragraf 16 Abs. 4 ImmoWertV: Fläche aller oberirdischen Geschosse (Außenmaße, ausgebautes oder ausbaufähiges Dachgeschoss zu 75 Prozent, ohne Keller) geteilt durch die Grundstücksfläche. Weicht sie von der WGFZ der Bodenrichtwertzone ab, rechnet DealPilot den Bodenrichtwert mit den Umrechnungskoeffizienten des Gutachterausschusses um — vor allem bei Mehrfamilienhäusern.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "vgf_wohnlage_wahl": {
+   "id": "vgf_wohnlage_wahl",
+   "reiter": "s0",
+   "karte": "Sach- und Ertragswert · Stufe 3",
+   "label": "Wohnlage (Gutachterausschuss)",
+   "typ": "auswahl",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": [],
+   "hinweis": "",
+   "titel": "Wohnlage nach der Lagekarte des örtlichen Gutachterausschusses (z. B. Konstanz: Lageklasse der Bodenrichtwertkarte). Nicht die DealPilot-Lageeinschätzung. Leer lassen, wenn sie aus der Bodenrichtwertkarte kommt; eintragen, wenn der Ausschuss eine Ausnahme nennt (z. B. Seesicht).",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "Leer lassen, wenn sie aus der Bodenrichtwertkarte kommt; eintragen, wenn der Ausschuss eine Ausnahme nennt (z.",
+   "wirkung": []
+  },
+  "vgf_ausstattung_wahl": {
+   "id": "vgf_ausstattung_wahl",
+   "reiter": "s0",
+   "karte": "Sach- und Ertragswert · Stufe 3",
+   "label": "Ausstattungsklasse (Gutachterausschuss)",
+   "typ": "auswahl",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": [],
+   "hinweis": "",
+   "titel": "Ausstattungsklasse nach dem Merkmalskatalog des örtlichen Gutachterausschusses. Sie ist nicht die Standardstufe nach Anlage 4 ImmoWertV; ohne Angabe bildet DealPilot keinen Vergleichsfaktor.",
    "tip": null,
    "ds2": false,
    "pflichtMarke": false,
@@ -3869,7 +3876,12 @@ window.DP_HANDBUCH = {
    ],
    "hinweis": "",
    "titel": "",
-   "tip": null,
+   "tip": {
+    "titel": "Geschosse und Unterkellerung",
+    "text": "Im Marktbericht: Wählt den Gebäudetyp in der Baukostentabelle des Sachwerts — ein Keller oder ein ausgebautes Dachgeschoss ändern die Baukosten je m². Im Ertragswert wirkt es nicht.",
+    "beispiel": "",
+    "paragraf": ""
+   },
    "ds2": false,
    "pflichtMarke": false,
    "woher": "",
@@ -3952,6 +3964,23 @@ window.DP_HANDBUCH = {
      "text": "5 · Massiv mit besonderer Ausführung"
     }
    ],
+   "hinweis": "",
+   "titel": "",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "garagen_baujahr": {
+   "id": "garagen_baujahr",
+   "reiter": "s0",
+   "karte": "Sach- und Ertragswert · Stufe 3",
+   "label": "Garage – Baujahr",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "leer = wie das Haus",
+   "optionen": null,
    "hinweis": "",
    "titel": "",
    "tip": null,
@@ -4103,7 +4132,7 @@ window.DP_HANDBUCH = {
    "label": "Liegenschaftszinssatz (%)",
    "typ": "zahl",
    "einheit": "%",
-   "platzhalter": "leer = amtlicher bzw. gesetzlicher Wert",
+   "platzhalter": "leer = amtlicher Wert",
    "optionen": null,
    "hinweis": "",
    "titel": "Der Zinssatz, mit dem der Verkehrswert von Grundstücken im Durchschnitt marktüblich verzinst wird (Paragraf 21 Abs. 2 ImmoWertV). Er kommt vom örtlichen Gutachterausschuss und steuert den Ertragswert stark — schon ein halber Punkt verschiebt ihn spürbar.",
@@ -4160,6 +4189,23 @@ window.DP_HANDBUCH = {
    "optionen": null,
    "hinweis": "",
    "titel": "",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "wertermittlungsstichtag": {
+   "id": "wertermittlungsstichtag",
+   "reiter": "s0",
+   "karte": "Sach- und Ertragswert · Stufe 3",
+   "label": "Wertermittlungsstichtag (Vorgabe: wirtschaftlicher Übergang)",
+   "typ": "datum",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Der Zeitpunkt, auf den sich die Wertermittlung bezieht (§ 2 Abs. 4 ImmoWertV). Vorgabe: der wirtschaftliche Übergang (Reiter Objekt). Ohne Übergang oder bei einem künftigen Übergang gilt der Tag, an dem der Marktbericht erstellt wird.",
    "tip": null,
    "ds2": false,
    "pflichtMarke": false,
@@ -4248,7 +4294,7 @@ window.DP_HANDBUCH = {
    "titel": "",
    "tip": {
     "titel": "Notarkosten",
-    "text": "Notar- und Grundbuchgebühren nach GNotKG-Tabelle. Üblich: 1,5-2,0% des Kaufpreises. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung.",
+    "text": "Notar- und Grundbuchgebühren nach GNotKG-Tabelle. Üblich: 1,5-2,0% des Kaufpreises. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung. Die Bestellung der Grundschuld ist kein Teil der Anschaffungskosten, sondern Finanzierungskosten (sofort abziehbar): im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ eintragen, dann fällt sie aus der AfA-Basis.",
     "beispiel": "",
     "paragraf": "GNotKG"
    },
@@ -4290,7 +4336,7 @@ window.DP_HANDBUCH = {
    "titel": "",
    "tip": {
     "titel": "Grundbuchamt",
-    "text": "Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung).",
+    "text": "Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung). Steuerlich gehört nur der Erwerb zu den Anschaffungskosten; die Kosten der Grundschuld (Notar und Grundbuch) sind Finanzierungskosten und sofort abziehbare Werbungskosten. Trag sie im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ ein — DealPilot nimmt sie dann aus der AfA-Basis heraus; die Gesamtinvestition bleibt gleich.",
     "beispiel": "",
     "paragraf": ""
    },
@@ -4431,6 +4477,23 @@ window.DP_HANDBUCH = {
     "steht im Bank-PDF (Investment Case)"
    ]
   },
+  "san_ausgefuehrt": {
+   "id": "san_ausgefuehrt",
+   "reiter": "s1",
+   "karte": "Sanierung Sanierungsbedarf einschätzen",
+   "label": "Sanierung ausgeführt am — optional",
+   "typ": "datum",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": null,
+   "hinweis": "— optional",
+   "titel": "",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
   "san_ust": {
    "id": "san_ust",
    "reiter": "s1",
@@ -4478,7 +4541,8 @@ window.DP_HANDBUCH = {
    "wirkung": [
     "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
     "steht im Investment-PDF",
-    "steht im Bank-PDF (Investment Case)"
+    "steht im Bank-PDF (Investment Case)",
+    "steht im PDF Kaufpreisaufteilung"
    ]
   },
   "inv_kueche": {
@@ -4497,7 +4561,10 @@ window.DP_HANDBUCH = {
    "pflichtMarke": false,
    "woher": "",
    "wirkung": [
-    "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)"
+    "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
+    "steht im Investment-PDF",
+    "steht im Bank-PDF (Investment Case)",
+    "steht im PDF Kaufpreisaufteilung"
    ]
   },
   "inv_moebel": {
@@ -4576,6 +4643,125 @@ window.DP_HANDBUCH = {
    "typ": "zahl",
    "einheit": "",
    "platzhalter": "0",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "zb_fertig_jahr": {
+   "id": "zb_fertig_jahr",
+   "reiter": "s1",
+   "karte": "Mieterhöhung und Zielbild",
+   "label": "Zielbild fertig (Jahr)",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "z. B. 2028",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "In welchem Jahr ist das Zielbild erreicht (Umbau fertig, neu vermietet)? Leer: in Pilot-Analyse und PDF steht das Jahr als offen.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "zb_markt_qm": {
+   "id": "zb_markt_qm",
+   "reiter": "s1",
+   "karte": "Mieterhöhung und Zielbild",
+   "label": "Marktübliche Miete nach Modernisierung (€/m²)",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "leer = amtlich bzw. Bestand",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Die marktübliche Miete der Wohnungen NACH den Maßnahmen (€/m², nicht die Wunschmiete). Leer: DealPilot nimmt sie aus der amtlichen Mietübersicht, wo diese nach Modernisierung staffelt (Minden-Lübbecke: Klasse nach Modernisierungspunkten); sonst bleibt der Ertragswert beim Mietband des Bestands. Im Bericht als „eigene Angabe“.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "zb_vgl_qm": {
+   "id": "zb_vgl_qm",
+   "reiter": "s1",
+   "karte": "Mieterhöhung und Zielbild",
+   "label": "Vergleichsmiete (€/m²)",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "aus Tab Miete",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "zb_soll_qm": {
+   "id": "zb_soll_qm",
+   "reiter": "s1",
+   "karte": "Mieterhöhung und Zielbild",
+   "label": "Soll-Miete (Mieter bleibt, €/m²)",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "leer = gerechnet",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "zb_soll_ab": {
+   "id": "zb_soll_ab",
+   "reiter": "s1",
+   "karte": "Mieterhöhung und Zielbild",
+   "label": "Soll wirksam ab",
+   "typ": "text",
+   "einheit": "",
+   "platzhalter": "",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Leer: DealPilot rechnet verlangbar ab (ein Jahr nach der letzten Erhöhung, § 558 Abs. 1 BGB) und wirksam ab (Beginn des dritten Kalendermonats nach Zugang, § 558b Abs. 1 BGB).",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "zb_ziel_qm": {
+   "id": "zb_ziel_qm",
+   "reiter": "s1",
+   "karte": "Mieterhöhung und Zielbild",
+   "label": "Zielmiete (€/m²)",
+   "typ": "zahl",
+   "einheit": "",
+   "platzhalter": "z. B. 9,20",
+   "optionen": null,
+   "hinweis": "",
+   "titel": "Was nach Umbau oder Neuvermietung erzielbar ist.",
+   "tip": null,
+   "ds2": false,
+   "pflichtMarke": false,
+   "woher": "",
+   "wirkung": []
+  },
+  "zb_ziel_wann": {
+   "id": "zb_ziel_wann",
+   "reiter": "s1",
+   "karte": "Mieterhöhung und Zielbild",
+   "label": "Zielbild ab wann",
+   "typ": "text",
+   "einheit": "",
+   "platzhalter": "z. B. nach Sanierung 2027",
    "optionen": null,
    "hinweis": "",
    "titel": "",
@@ -4866,7 +5052,7 @@ window.DP_HANDBUCH = {
    "label": "Soll-Mietspiegel (€/m²)",
    "typ": "zahl",
    "einheit": "",
-   "platzhalter": "9.50",
+   "platzhalter": "9,50",
    "optionen": null,
    "hinweis": "Marktmiete laut lokalem Mietspiegel",
    "titel": "",
@@ -5934,6 +6120,7 @@ window.DP_HANDBUCH = {
    "woher": "",
    "wirkung": [
     "geht in den Investor Deal Score",
+    "zählt im Readycheck der Deal-Aktion (Instandhaltung)",
     "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
     "geht in die Pilot-Analyse ein",
     "steht im Investment-PDF",
@@ -6297,13 +6484,13 @@ window.DP_HANDBUCH = {
    "titel": "",
    "tip": {
     "titel": "AfA-Satz",
-    "text": "Wie schnell wird das Gebäude abgeschrieben? Linear 2,0% (50 Jahre): Standard ab Baujahr 1925. Linear 2,5% (40 Jahre): vor 1925. Linear 3,0% (33 Jahre): Wohnzwecke mit Bauantrag ab 2023. Degressiv 5,0%: nur für Neubau-Wohnbau (Bauantrag 10/2023 – 09/2029).",
+    "text": "Wie schnell wird das Gebäude abgeschrieben? Maßgeblich ist die Fertigstellung (§ 7 Abs. 4 Satz 1 Nr. 2 EStG): Linear 3,0% (33⅓ Jahre): fertiggestellt ab 2023 (Buchst. a). Linear 2,0% (50 Jahre): fertiggestellt 1925 bis 2022 (Buchst. b). Linear 2,5% (40 Jahre): fertiggestellt vor 1925 (Buchst. c). Degressiv 5,0% (§ 7 Abs. 5a): nur Wohngebäude mit Baubeginn (Baubeginnsanzeige) oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029, beim Kauf bis Ende des Fertigstellungsjahres.",
     "beispiel": "",
     "paragraf": "§ 7 EStG"
    },
    "ds2": false,
    "pflichtMarke": false,
-   "woher": "",
+   "woher": "5a): nur Wohngebäude mit Baubeginn (Baubeginnsanzeige) oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029, beim Kauf bis Ende des Fertigstellungsjahres.",
    "wirkung": [
     "rechnet in den Kennzahlen mit (Cashflow, Renditen, DSCR · Reiter Bewertung)",
     "geht in die Pilot-Analyse ein",
@@ -7464,6 +7651,31 @@ window.DP_HANDBUCH = {
        "id": "ausst",
        "stufe": 0,
        "grund": "Altfeld, ersetzt durch die Standardstufe (NHK 2010). Die App blendet es nicht mehr ein; gespeicherte Werte bleiben lesbar."
+      },
+      {
+       "id": "svw_herkunft",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "vgf_wohnlage_wahl",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "vgf_ausstattung_wahl",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "garagen_baujahr",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "wertermittlungsstichtag",
+       "stufe": 0,
+       "grund": ""
       }
      ],
      "bilder": [
@@ -8440,7 +8652,48 @@ window.DP_HANDBUCH = {
        "nachAuswahl": true
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "san_ausgefuehrt",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_fertig_jahr",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_markt_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_vgl_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_soll_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_soll_ab",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_ziel_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_ziel_wann",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-etw-s1-1.webp",
@@ -10936,6 +11189,31 @@ window.DP_HANDBUCH = {
        "id": "ausst",
        "stufe": 0,
        "grund": "Altfeld, ersetzt durch die Standardstufe (NHK 2010). Die App blendet es nicht mehr ein; gespeicherte Werte bleiben lesbar."
+      },
+      {
+       "id": "svw_herkunft",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "vgf_wohnlage_wahl",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "vgf_ausstattung_wahl",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "garagen_baujahr",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "wertermittlungsstichtag",
+       "stufe": 0,
+       "grund": ""
       }
      ],
      "bilder": [
@@ -11900,7 +12178,48 @@ window.DP_HANDBUCH = {
        "nachAuswahl": true
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "san_ausgefuehrt",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_fertig_jahr",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_markt_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_vgl_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_soll_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_soll_ab",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_ziel_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_ziel_wann",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-efh-s1-1.webp",
@@ -14344,6 +14663,31 @@ window.DP_HANDBUCH = {
        "id": "ausst",
        "stufe": 0,
        "grund": "Altfeld, ersetzt durch die Standardstufe (NHK 2010). Die App blendet es nicht mehr ein; gespeicherte Werte bleiben lesbar."
+      },
+      {
+       "id": "svw_herkunft",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "vgf_wohnlage_wahl",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "vgf_ausstattung_wahl",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "garagen_baujahr",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "wertermittlungsstichtag",
+       "stufe": 0,
+       "grund": ""
       }
      ],
      "bilder": [
@@ -15266,7 +15610,48 @@ window.DP_HANDBUCH = {
        "nachAuswahl": true
       }
      ],
-     "weitere": [],
+     "weitere": [
+      {
+       "id": "san_ausgefuehrt",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_fertig_jahr",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_markt_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_vgl_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_soll_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_soll_ab",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_ziel_qm",
+       "stufe": 0,
+       "grund": ""
+      },
+      {
+       "id": "zb_ziel_wann",
+       "stufe": 0,
+       "grund": ""
+      }
+     ],
      "bilder": [
       {
        "datei": "hb-mfh-s1-1.webp",
@@ -17028,35 +17413,35 @@ window.DP_HANDBUCH = {
    {
     "key": "vgl_qm",
     "label": "Vergleichsmiete €/m² (Mietspiegel)",
-    "block": "Soll-Miete (Mieter bleibt) kann, nicht muss",
+    "block": "Miete — was geht und wann kann, nicht muss",
     "typ": "eingabe",
     "platzhalter": ""
    },
    {
     "key": "soll",
     "label": "Soll-Miete (€/Monat, eigene Angabe)",
-    "block": "Soll-Miete (Mieter bleibt) kann, nicht muss",
+    "block": "Miete — was geht und wann kann, nicht muss",
     "typ": "eingabe",
     "platzhalter": ""
    },
    {
     "key": "soll_ab",
-    "label": "Erreichbar ab (eigene Angabe)",
-    "block": "Soll-Miete (Mieter bleibt) kann, nicht muss",
+    "label": "Wirksam ab (eigene Angabe)",
+    "block": "Miete — was geht und wann kann, nicht muss",
     "typ": "datum",
     "platzhalter": ""
    },
    {
     "key": "ziel_qm",
     "label": "Zielmiete (€/m²)",
-    "block": "Zielbild · nach Umbau kann, nicht muss",
+    "block": "Zielbild · Neuvermietung oder nach Sanierung kann, nicht muss",
     "typ": "eingabe",
     "platzhalter": "z. B. 9,20"
    },
    {
     "key": "ziel_wann",
     "label": "Wann",
-    "block": "Zielbild · nach Umbau kann, nicht muss",
+    "block": "Zielbild · Neuvermietung oder nach Sanierung kann, nicht muss",
     "typ": "eingabe",
     "platzhalter": "z. B. bei Mieterwechsel"
    }
@@ -17074,8 +17459,12 @@ window.DP_HANDBUCH = {
     "text": "<strong>Ist</strong> ist, was heute gezahlt wird. Die <strong>Soll-Miete (Mieter bleibt)</strong> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Das <strong>Zielbild</strong> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig — ohne Angaben ändert sich nichts."
    },
    {
+    "titel": "Verlangbar ab und wirksam ab",
+    "text": "Zu jeder Mieterhöhung stehen <strong>zwei Daten</strong>. <strong>Verlangbar ab</strong> sagt, wann dein Erhöhungsschreiben frühestens beim Mieter ankommen darf — bei der Vergleichsmiete ein Jahr nach der letzten Erhöhung (§ 558 Abs. 1 BGB). „Verlangbar ab sofort\" heißt: du darfst es heute verschicken.\n\n<strong>Wirksam ab</strong> sagt, ab wann die höhere Miete geschuldet ist: bei der Vergleichsmiete mit Beginn des dritten Kalendermonats nach Zugang (§ 558b Abs. 1 BGB, Zugang 15.10. → 01.01., Zugang 01.11. → 01.02.), bei der Modernisierungsumlage mit Beginn des dritten Monats nach Zugang (§ 559b Abs. 2 BGB), bei der Indexmiete ab dem übernächsten Monat (§ 557b Abs. 3 BGB). Ist das Schreiben schon heute verlangbar, rechnet DealPilot mit Zugang heute und sagt das dazu.\n\nWas „in diesem Jahr\" ankommt, zählt nur die Monate ab „wirksam ab\". Trägst du im Feld <strong>Wirksam ab (eigene Angabe)</strong> selbst einen Monat ein, gilt dein Termin."
+   },
+   {
     "titel": "Schritt für Schritt: ein Zielbild anlegen",
-    "text": "So legst du bei Eigentumswohnung, Einfamilien- oder Zweifamilienhaus ein Zielbild an:\n\n1. Objekt öffnen, Reiter <strong>Objekt</strong>, Karte <strong>Mieterhöhung und Zielbild (optional)</strong> aufklappen.\n2. <strong>Vergleichsmiete (€/m²)</strong> eintragen, wenn du den Mietspiegel kennst — leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.\n3. <strong>Soll-Miete (Mieter bleibt, €/m²)</strong> leer lassen: Darunter steht „DealPilot rechnet vor: …“ mit Begründung. Eine eigene Zahl überschreibt den Vorschlag. <strong>Soll erreichbar ab</strong> ist ohne Angabe 15 Monate nach der letzten Erhöhung.\n4. <strong>Zielmiete (€/m²)</strong> eintragen — was nach Umbau oder bei einem neuen Mieter erzielbar ist — und unter <strong>Zielbild ab wann</strong> den Anlass, z. B. „bei Mieterwechsel“.\n5. Unter <strong>Maßnahmen</strong> die Chips anklicken, die du planst, und je Maßnahme die <strong>Kosten €</strong> eintragen.\n6. Wird mit Mieter in der Wohnung modernisiert: Haken <strong>bewohnt (§ 559)</strong>.\n7. <strong>Zielbild fertig (Jahr)</strong> eintragen, damit Pilot-Analyse und PDF ein Jahr nennen (leer = offen).\n\nUnter der Karte steht sofort die Summe: Ist, Mieterhöhung und Zielbild je Monat, die Maßnahmenkosten und die gewonnenen Modernisierungspunkte. DealPilot speichert die Angaben mit dem Objekt."
+    "text": "So legst du bei Eigentumswohnung, Einfamilien- oder Zweifamilienhaus ein Zielbild an:\n\n1. Objekt öffnen, Reiter <strong>Investition</strong>, Karte <strong>Mieterhöhung und Zielbild (optional)</strong> aufklappen.\n2. <strong>Vergleichsmiete (€/m²)</strong> eintragen, wenn du den Mietspiegel kennst — leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.\n3. <strong>Soll-Miete (Mieter bleibt, €/m²)</strong> leer lassen: Darunter steht „DealPilot rechnet vor: …“ mit Begründung. Eine eigene Zahl überschreibt den Vorschlag. <strong>Soll erreichbar ab</strong> ist ohne Angabe 15 Monate nach der letzten Erhöhung.\n4. <strong>Zielmiete (€/m²)</strong> eintragen — was nach Umbau oder bei einem neuen Mieter erzielbar ist — und unter <strong>Zielbild ab wann</strong> den Anlass, z. B. „bei Mieterwechsel“.\n5. Unter <strong>Maßnahmen</strong> die Chips anklicken, die du planst, und je Maßnahme die <strong>Kosten €</strong> eintragen.\n6. Wird mit Mieter in der Wohnung modernisiert: Haken <strong>Mieter bleibt drin — Kosten auf die Miete umlegen</strong> und, falls ein Teil ohnehin fällige Reparatur ist, <strong>davon Erhaltung %</strong>.\n7. <strong>Zielbild fertig (Jahr)</strong> eintragen, damit Pilot-Analyse und PDF ein Jahr nennen (leer = offen).\n\nUnter der Karte steht sofort die Summe: Ist, Mieterhöhung und Zielbild je Monat, die Maßnahmenkosten und die gewonnenen Modernisierungspunkte. DealPilot speichert die Angaben mit dem Objekt."
    },
    {
     "titel": "Maßnahmen: Kosten und Modernisierungspunkte",
@@ -17083,7 +17472,7 @@ window.DP_HANDBUCH = {
    },
    {
     "titel": "Beim Mehrfamilienhaus: je Wohnung",
-    "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche <strong>Einheiten erfassen</strong> öffnen.\n2. Im Schritt <strong>Gebäude</strong> den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt, den Haken <strong>In Wohnungseigentum aufgeteilt</strong> setzen und die <strong>Kosten der Aufteilung</strong> prüfen (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch <strong>Zielbild fertig (Jahr)</strong>.\n3. Ebenfalls im Schritt Gebäude, unter <strong>Maßnahmen am ganzen Haus · Zielbild</strong>: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die <strong>Kosten €</strong> eintragen (bei Modernisierung mit Mietern: <strong>bewohnt (§ 559)</strong>). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung <strong>Details</strong>: Mietvertrag, Soll-Miete, <strong>Zielbild · nach Umbau</strong> mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit <strong>Übernehmen</strong> schließen."
+    "text": "Beim Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Investition zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche <strong>Einheiten erfassen</strong> öffnen.\n2. Im Schritt <strong>Gebäude</strong> den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt (oder soll es aufgeteilt werden), setzt du im Schritt <strong>Einheiten</strong> unter der Liste den Haken <strong>In Wohnungseigentum aufgeteilt</strong> – erst dann erscheinen die Erklärung und das Feld <strong>Kosten der Aufteilung</strong> (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch <strong>Zielbild fertig (Jahr)</strong>.\n3. Ebenfalls im Schritt Gebäude, unter <strong>Maßnahmen am ganzen Haus · Zielbild</strong>: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die <strong>Kosten €</strong> eintragen (bei Modernisierung mit Mietern: <strong>Mieter bleibt drin — Kosten auf die Miete umlegen</strong>). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung <strong>Details</strong>: Mietvertrag, Soll-Miete, <strong>Zielbild · nach Umbau</strong> mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit <strong>Übernehmen</strong> schließen."
    },
    {
     "titel": "Ertragswerte rechnen — kostenlos",
@@ -17099,11 +17488,11 @@ window.DP_HANDBUCH = {
    },
    {
     "titel": "Wo du es einträgst",
-    "text": "Bei ETW, EFH und ZFH im Reiter Objekt, Karte „Mieterhöhung und Zielbild (optional)“. Beim Mehrfamilienhaus je Wohnung: „Einheiten erfassen“ → in der Liste <strong>Details</strong> → Blöcke Mietvertrag, Soll-Miete, Zielbild und Ertragswert. Die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen. Eingetragen wird im laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. Auch die geführte Eingabe und die Spracheingabe fragen freiwillig danach."
+    "text": "Bei ETW, EFH und ZFH im Reiter Investition, Karte „Mieterhöhung und Zielbild (optional)“. Beim Mehrfamilienhaus je Wohnung: „Einheiten erfassen“ → in der Liste <strong>Details</strong> → Blöcke Mietvertrag, Soll-Miete, Zielbild und Ertragswert. Die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen. Eingetragen wird im laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. Auch die geführte Eingabe und die Spracheingabe fragen freiwillig danach."
    },
    {
     "titel": "Wie DealPilot die Soll-Miete vorrechnet",
-    "text": "Ohne eigene Angabe: bis zur ortsüblichen Vergleichsmiete (§ 558 BGB; Vergleichsmiete an der Wohnung, sonst die Marktmiete aus dem Reiter Miete), frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze — 15 % in drei Jahren, wo die Gemeinde in der Landesverordnung steht, sonst 20 %. Ist die Gemeinde unbekannt oder die Verordnung ausgelaufen, steht 20 % mit dem Hinweis, es zu prüfen. Eine Maßnahme mit Haken „bewohnt (§ 559)“ erhöht die Soll-Miete um 8 % der Kosten im Jahr, gedeckelt auf 3 €/m² (2 €/m² unter 7 €/m²) in sechs Jahren. Deine eigene Angabe überschreibt immer."
+    "text": "Ohne eigene Angabe: bis zur ortsüblichen Vergleichsmiete (§ 558 BGB; Vergleichsmiete an der Wohnung, sonst die Marktmiete aus dem Reiter Miete), frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze — 15 % in drei Jahren, wo die Gemeinde in der Landesverordnung steht, sonst 20 %. Ist die Gemeinde unbekannt oder die Verordnung ausgelaufen, steht 20 % mit dem Hinweis, es zu prüfen. Eine Maßnahme mit Haken „Mieter bleibt drin — Kosten auf die Miete umlegen“ erhöht die Soll-Miete um 8 % der Kosten im Jahr (Modernisierungsumlage § 559 BGB, ohne den Erhaltungsanteil), gedeckelt auf 3 €/m² (2 €/m² unter 7 €/m²) in sechs Jahren. Deine eigene Angabe überschreibt immer."
    },
    {
     "titel": "Maßnahmen und Restnutzungsdauer",
@@ -17119,7 +17508,9 @@ window.DP_HANDBUCH = {
    }
   ]
  },
- "auffaellig": [],
+ "auffaellig": [
+  "mod_punkte trägt den Hilfetext tab1.wert_mod („Modernisierungspunkte“)"
+ ],
  "aufnahme": {
   "am": "2026-10-21",
   "ansicht": {
@@ -17313,20 +17704,20 @@ window.DP_HANDBUCH = {
    "siehe": [],
    "schritte": [
     {
-     "t": "Das Objekt öffnen. In der Leiste oben im Objekt („Daten einlesen“ bzw. „Daten übernehmen aus“) die Kachel **Exposé / Marktbericht** wählen und **Abrufen** drücken.",
+     "t": "Das Objekt öffnen. In der Leiste oben im Objekt („Daten einlesen“ bzw. „Daten übernehmen aus“) die Kachel **Exposé / Dokumente** wählen und **Abrufen** drücken.",
      "kosten": "",
      "plan": "",
      "belege": [
       "js/object-actions.js: <span class=\"k-heute\">Daten einlesen</span>",
-      "js/object-actions.js: pfTileTool('import', _doc, 'Exposé / Marktbericht'"
+      "js/object-actions.js: pfTileTool('import', _doc, 'Exposé / Dokumente'"
      ]
     },
     {
-     "t": "Im Fenster **PDFs einlesen — Exposé, Marktbericht, Dokumente** die Dateien auswählen oder hineinziehen. Mehrere PDFs auf einmal gehen, bis 100 MB je Datei.",
+     "t": "Im Fenster **Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente** die Dateien auswählen oder hineinziehen. Mehrere PDFs oder Fotos (JPG, PNG) auf einmal gehen, bis 100 MB je Datei. Ein Foto wird wie eine gescannte Seite gelesen.",
      "kosten": "",
      "plan": "",
      "belege": [
-      "js/object-actions.js: PDFs einlesen — Exposé, Marktbericht, Dokumente",
+      "js/object-actions.js: Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente",
       "js/object-actions.js: mehrere Dateien möglich · max 100 MB je Datei"
      ]
     },
@@ -17410,14 +17801,15 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "Reiter **Objekt**: oben die **Eingabetiefe** wählen (Pillen 1 · 2 · 3 — Einfach, Mittel, Ausgiebig). Sie bestimmt, welche Felder für den Marktbericht Pflicht sind. Den Haken **weitere Objektdetails angeben** setzen, wenn du alle Felder sehen willst. Dann Adresse, Objektart, Wohnfläche und Baujahr eintragen.",
+     "t": "Wie viele Felder die Reiter zeigen, steht im **Detailgrad der Eingabe** unter Einstellungen › **Mein Profil**: **Einsteiger**, **Fortgeschritten** oder **Experte** (alle Felder) — er gilt für alle Objekte, ausgeblendete Felder behalten ihre Werte und rechnen weiter. Im Reiter **Objekt** steht oben der gewählte **Detailgrad**. Dann Adresse, Objektart, Wohnfläche und Baujahr eintragen.",
      "kosten": "",
      "plan": "",
      "belege": [
       "index.html: <span class=\"tab-lbl\">Objekt</span>",
-      "index.html: <span class=\"oe-ziel-lbl\">Eingabetiefe</span>",
-      "index.html: weitere Objektdetails angeben",
-      "js/objekt-reiter.js: name: 'Einfach · Stufe 1'"
+      "index.html: <span class=\"oe-ziel-lbl\">Detailgrad</span>",
+      "js/einstellungen-schlank.js: benenne('standardwerte', 'Mein Profil'",
+      "js/einstellungen-schlank.js: Detailgrad der Eingabe",
+      "js/detailgrad.js: var NAMEN = { 1: 'Einsteiger', 2: 'Fortgeschritten', 3: 'Experte' };"
      ]
     },
     {
@@ -17668,13 +18060,13 @@ window.DP_HANDBUCH = {
    ],
    "schritte": [
     {
-     "t": "Reiter **Objekt**, oben die **Eingabetiefe** wählen: **Einfach · Stufe 1** (Marktpreisindikation), **Mittel · Stufe 2** (erweiterte Indikation, ab Plan Investor) oder **Ausgiebig · Stufe 3** (Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert, ab Plan Pro).",
+     "t": "Die Stufe des Marktberichts folgt dem **Detailgrad** (Einstellungen › Mein Profil): **Einsteiger · Stufe 1** (Marktpreisindikation), **Fortgeschritten · Stufe 2** (erweiterte Indikation, ab Plan Investor) oder **Experte · Stufe 3** (Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert, ab Plan Pro). Im Reiter **Objekt** lässt sich unter dem Detailgrad auch eine niedrigere Stufe wählen.",
      "kosten": "",
      "plan": "Stufe 2 ab Investor, Stufe 3 ab Pro",
      "belege": [
-      "js/objekt-reiter.js: name: 'Einfach · Stufe 1'",
-      "js/objekt-reiter.js: name: 'Mittel · Stufe 2'",
-      "js/objekt-reiter.js: name: 'Ausgiebig · Stufe 3'",
+      "js/objekt-reiter.js: name: 'Einsteiger · Stufe 1'",
+      "js/objekt-reiter.js: name: 'Fortgeschritten · Stufe 2'",
+      "js/objekt-reiter.js: name: 'Experte · Stufe 3'",
       "js/objekt-reiter.js: var ab = { 2: 'ab Investor', 3: 'ab Pro' };"
      ]
     },
@@ -17950,13 +18342,14 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "Im Fenster **Anschaffungskosten & BMF-Kaufpreisaufteilung** die vier Reiter der Reihe nach: **1 Anschaffungskosten** · **2 BMF-Aufteilung** · **3 AfA-Vorschau** · **4 AfA-Hebel**, jeweils mit **Weiter →**. Die Reiter 2 bis 4 öffnen erst, wenn die Pflichtangaben vollständig sind.",
+     "t": "Im Fenster **Anschaffungskosten & BMF-Kaufpreisaufteilung** die Reiter der Reihe nach: **1 Anschaffungskosten** · **2 BMF-Aufteilung** · **3 AfA-Vorschau** · **4 AfA-Hebel**, jeweils mit **Weiter →**; danach optional **Bodenabschlag** (Szenario jenseits der amtlichen Aufteilung). Die Reiter 2 bis 4 öffnen erst, wenn die Pflichtangaben vollständig sind.",
      "kosten": "",
      "plan": "",
      "belege": [
       "js/bmf-modal-html.html: Anschaffungskosten &amp; BMF-Kaufpreisaufteilung",
       "js/bmf-modal-html.html: switchPane('p-hebel')",
-      "js/bmf-modal.js: 'p-hebel': '<b>Schritt 4 / 4:</b>",
+      "js/bmf-modal.js: 'p-hebel': '<b>Schritt 4 / 5:</b>",
+      "js/bmf-bodenabschlag.js: b.textContent = 'Bodenabschlag';",
       "js/bmf-modal-html.html: Weiter →"
      ]
     },
@@ -18073,13 +18466,13 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "**Soll-Miete (Mieter bleibt, €/m²)** leer lassen: Darunter steht „DealPilot rechnet vor: …“ — bis zur Vergleichsmiete, frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze. Eine eigene Zahl überschreibt den Vorschlag. **Soll erreichbar ab** ist ohne Angabe 15 Monate nach der letzten Erhöhung.",
+     "t": "**Soll-Miete (Mieter bleibt, €/m²)** leer lassen: Darunter steht „DealPilot rechnet vor: …“ — bis zur Vergleichsmiete, frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze. Eine eigene Zahl überschreibt den Vorschlag. **Soll wirksam ab** leer lassen: DealPilot rechnet, ab wann die Erhöhung verlangt werden kann (ein Jahr nach der letzten, § 558 Abs. 1 BGB) und ab wann sie wirkt (Beginn des dritten Kalendermonats nach Zugang, § 558b Abs. 1 BGB).",
      "kosten": "",
      "plan": "",
      "belege": [
       "index.html: Soll-Miete (Mieter bleibt, €/m²)",
       "js/potenzial.js: DealPilot rechnet vor: ",
-      "index.html: Soll erreichbar ab"
+      "index.html: Soll wirksam ab"
      ]
     },
     {
@@ -18102,21 +18495,22 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "Wird mit Mieter in der Wohnung modernisiert, den Haken **bewohnt (§ 559)** setzen: 8 % der Kosten im Jahr kommen auf die Soll-Miete, gedeckelt. **Zielbild fertig (Jahr)** setzt das Jahr für Pilot-Analyse und PDF.",
+     "t": "Wird mit Mieter in der Wohnung modernisiert, den Haken **Mieter bleibt drin — Kosten auf die Miete umlegen** setzen: als Modernisierungsumlage (§ 559 BGB) kommen 8 % der Kosten im Jahr auf die Soll-Miete, ohne den Anteil für Erhaltung (**davon Erhaltung %**), gedeckelt. **Zielbild fertig (Jahr)** setzt das Jahr für Pilot-Analyse und PDF.",
      "kosten": "",
      "plan": "",
      "belege": [
-      "js/potenzial.js: bewohnt (§ 559)",
+      "js/potenzial.js: > Mieter bleibt drin — Kosten auf die Miete umlegen</label>",
+      "js/potenzial.js: <span>davon Erhaltung %</span>",
       "index.html: Zielbild fertig (Jahr)"
      ]
     },
     {
-     "t": "Mehrfamilienhaus: unter der Wohnfläche **Einheiten erfassen** öffnen, in der Liste bei jeder Wohnung **Details** — dort stehen Mietvertrag, Soll-Miete, **Zielbild · nach Umbau** mit den Maßnahmen der Wohnung und der Ertragswert. Ist das Haus aufgeteilt, im Schritt Gebäude **In Wohnungseigentum aufgeteilt** anhaken und die **Kosten der Aufteilung** prüfen (Vorbelegung 1.800 € je Wohnung).",
+     "t": "Mehrfamilienhaus: unter der Wohnfläche **Einheiten erfassen** öffnen, in der Liste bei jeder Wohnung **Details** — dort stehen Mietvertrag, Soll-Miete, **Zielbild · Neuvermietung oder nach Sanierung** mit den Maßnahmen der Wohnung und der Ertragswert. Ist das Haus aufgeteilt, im Schritt Gebäude **In Wohnungseigentum aufgeteilt** anhaken und die **Kosten der Aufteilung** prüfen (Vorbelegung 1.800 € je Wohnung).",
      "kosten": "",
      "plan": "",
      "belege": [
       "js/mfh-einheiten.js: Einheiten erfassen",
-      "js/mfh-einheiten.js: Zielbild · nach Umbau",
+      "js/mfh-einheiten.js: Zielbild · Neuvermietung oder nach Sanierung",
       "js/mfh-einheiten.js: In Wohnungseigentum aufgeteilt",
       "js/mfh-einheiten.js: Kosten der Aufteilung"
      ]
