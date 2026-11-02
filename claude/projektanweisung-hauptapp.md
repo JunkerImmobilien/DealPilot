@@ -44104,3 +44104,11 @@ e33cd9f. **Rest** Kappung/Bremse HE 25.11. (Nachfolge erwartet Mitte November), 
 Zielbild“ mit Leiter oben (`objektLeiter`), MFH-Fenster nutzt dieselbe; v3066-Leiter und CSS entfernt. **Commit**
 5ceb9599. **Nachweis** Hüllhorst (ohne Knöpfe, richtig), Westerfeld Whg 3 (Knopf + Verwerfen). **Prod 1.0.16** Merge
 7f2a970. **Rest** N89 Detailgrad (Zuordnung in Arbeit), N91 KfW, N92 P1-Paket (Benchmark in Arbeit).
+
+### v3068 · v3069 — KfW korrigiert, harte Grenze im Score (02.11.2026) · Prod 1.0.17
+
+**Was.** v3068: `calc.js updateFESH()` und `#d2_kfw_box` nach Recherche (`design/Vorschläge/kfw-foerderregister-recherche.md`):
+nur Vermieter-Programme mit Stand 02.11.2026, gültige Links. v3069: DSCR < 1,0 oder Cashflow nach Kapitaldienst < 0 →
+Score höchstens 49, in dealscore.js und dealscore2.js gleich, gespiegelt, Staging-Backend von Hand neu gebaut. **Commits**
+f01f3003, 93d4704d. **Nachweis** DealScore.computeFromKpis gut 91 / DSCR 0,95 → 49 (ohne Grenze 61). **Prod 1.0.17** Merge
+ba026c7. **Rest** Zwei-Score-Entscheidung (Demo), Bänder-Recherche, N89 Bau, N91 Förderregister (Lizenzfrage KfW).
