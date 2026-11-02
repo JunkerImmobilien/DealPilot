@@ -290,7 +290,7 @@
       kind: 'investor', logo: 'Investor <b>Deal Score</b>', eyebrow: 'Investor Deal Score',
       icon: IC.shield, action: { label: 'Alle KPIs', icon: IC.list },
       score: r2.score, depth: comp ? comp.percent : null, label: r2.label, detail: investorNarrative(r2),
-      cats: cats, stats: stats, stub: ['Investor-Pass', 'IDS-PASS', 'Stand ' + today()], seed: 70
+      cats: cats, stats: stats, stub: ['Investor-Pass', 'IDS-PASS', 'Stand ' + today()], seed: 70, r2: r2   /* v3076: r2 fuer die Zwei-Score-Ansicht */
     };
   }
 
@@ -338,6 +338,92 @@
         '<div class="dpsh-verdictbar">' + verdict + '</div>' +
       '</div></div>' +
       '<div class="dpsh-perf"></div><div class="dpsh-stub"><span class="dpsh-notch t"></span><span class="dpsh-notch b"></span><div class="dpsh-stublabel">' + esc(d.stub[0]) + '</div><div class="dpsh-qr">' + qrSVG(d.seed, 96) + '</div><div class="dpsh-stubmeta"><div class="m1">' + esc(d.stub[1]) + '</div><div class="m2">' + esc(d.stub[2]) + '</div></div></div>' +
+    '</div>';
+  }
+
+  /* ═══ v3076 · ZWEI SCORES: INVESTMENT + FINANZIERUNG ═══════════════════════
+     Gestaltung nach der abgenommenen Demo design/Vorschläge/zwei-scores-demo.html:
+     dunkle Zeile mit Gesamturteil und Empfehlung, darunter zwei weiße Karten mit
+     Ring, Stufe, Punkten je Kategorie, dann positive und negative Faktoren.
+     Die Zahlen kommen fertig aus DealScore2.compute() (investment, finanzierung,
+     gesamt) - hier wird nichts gerechnet. Objektkarte und Seitenleiste zeigen
+     weiter den einen gespeicherten Investor Deal Score (score).
+     SVG-Attribute verstehen kein var(): Gold kommt über _dpshGold(). Gruen und
+     Rot sind Statusfarben und bleiben fest. */
+  function scoreAnsicht() {
+    if (typeof window._dpScoreAnsicht === 'function') { try { return window._dpScoreAnsicht(); } catch (e) {} }
+    try { return localStorage.getItem('dp_score_ansicht') === 'zwei' ? 'zwei' : 'eins'; } catch (e) { return 'eins'; }
+  }
+  function zFarbe(s) { return s >= 70 ? '#3FA56C' : s >= 50 ? _dpshGold() : '#B8625C'; }
+  function zKl(s) { return s >= 70 ? 'g' : s >= 50 ? 'o' : 'r'; }
+  function zZahl(x) { return String(x).replace('.', ','); }
+  function zRing(score) {
+    var r = 44, u = 2 * Math.PI * r, dd = u * Math.max(0, Math.min(100, score)) / 100;
+    return '<div class="dpz-ring"><svg viewBox="0 0 104 104" aria-hidden="true">' +
+      '<circle cx="52" cy="52" r="' + r + '" fill="none" stroke="#f0ece3" stroke-width="9"/>' +
+      '<circle cx="52" cy="52" r="' + r + '" fill="none" stroke="' + zFarbe(score) + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + dd.toFixed(1) + ' ' + u.toFixed(1) + '"/>' +
+      '</svg><div class="dpz-n">' + score + '</div></div>';
+  }
+  function zBalken(g) {
+    return '<div class="dpz-kz"><span class="dpz-t">' + esc(g.name) + ' <span class="dpz-anteil">' + zZahl(g.anteil) + '\u00a0%</span></span>' +
+      '<span class="dpz-p">' + g.score + ' / 100</span>' +
+      '<span class="dpz-bar"><i style="width:' + Math.max(0, Math.min(100, g.score)) + '%;background:' + zFarbe(g.score) + '"></i></span>' +
+      '<span class="dpz-m">' + esc((g.kpis || []).join(' \u00b7 ')) + ' \u2014 ' + g.availableKpis + '/' + g.totalKpis + ' KPIs' +
+      (g.hinweis ? ' \u00b7 ' + esc(g.hinweis) : '') + '</span></div>';
+  }
+  function zKarte(titel, frage, t, fuss) {
+    return '<div class="dpz-karte"><div class="dpz-band"></div><div class="dpz-pad">' +
+      '<div class="dpz-score">' + zRing(t.score) + '<div><h3 class="dpz-h3">' + esc(titel) + '</h3>' +
+        '<span class="dpz-pill dpz-' + zKl(t.score) + '">' + esc(String(t.stufe || '').toUpperCase()) + '</span>' +
+        '<div class="dpz-was">' + esc(frage) + '</div></div></div>' +
+      '<div class="dpz-kat">' + (t.gruppen || []).map(zBalken).join('') + '</div>' +
+      (fuss ? '<div class="dpz-summe">' + fuss + '</div>' : '') +
+    '</div></div>';
+  }
+  function zFaktoren(r2, art) {
+    var li = [];
+    [['investment', 'Investment'], ['finanzierung', 'Finanzierung']].forEach(function (p) {
+      ((r2[p[0]] && r2[p[0]][art]) || []).forEach(function (k) {
+        li.push('<li>' + esc(k.name) + ' <span class="dpz-tag">' + p[1] + ' \u00b7 ' + Math.round(k.points) + '/100</span></li>');
+      });
+    });
+    if (li.length) return li.join('');
+    return '<li class="dpz-leer">' + (art === 'positives' ? 'Noch keine ausgepr\u00e4gten St\u00e4rken bewertbar.' : 'Keine kritischen Schw\u00e4chen.') + '</li>';
+  }
+  function zweiHtml(d) {
+    var r2 = d.r2, inv = r2.investment, fin = r2.finanzierung, ges = r2.gesamt, em = ges.empfehlung || { fehlt: [] };
+    var deckel = ges.deckel
+      ? '<span class="dpz-deckel">DSCR-Grenze greift \u00b7 h\u00f6chstens ' + ges.deckel.max + (ges.gedeckelt ? ' (Investment ' + inv.score + ')' : '') + '</span>'
+      : '';
+    var warum = 'Investment <b>' + inv.score + '</b> (Schwelle ' + inv.schwelle + ') \u00b7 Finanzierung <b>' + fin.score + '</b> (Schwelle ' + fin.schwelle + '). ' +
+      ((em.fehlt && em.fehlt.length) ? 'Nicht erreicht: ' + listDe(em.fehlt) + '.' : 'Beide Schwellen erreicht.') +
+      (ges.deckel ? ' ' + esc(ges.deckel.grund) + '.' : '');
+    var kopf = '<div class="dpz-kopf">' +
+      '<div class="dpz-kopf-l"><div class="dpz-lbl">Gesamturteil \u00b7 Investor Deal Score</div>' +
+        '<div class="dpz-wort">' + esc(ges.stufe) + ' <span class="dpz-wert">' + ges.score + ' / 100</span></div>' + deckel + '</div>' +
+      '<span class="dpz-empf dpz-empf-' + esc(em.art || 'halb') + '">' + esc(em.text || '') + '</span>' +
+      '<div class="dpz-warum">' + warum + '</div>' +
+      '<div class="dpz-knoepfe">' +
+        '<button class="dpz-knopf" type="button" onclick="DealPilotScoreHero.action(\'investor\')">' + IC.list + 'Alle KPIs</button>' +
+        '<button class="dpz-knopf" type="button" onclick="DealPilotScoreHero.action(\'classic\')" title="Einstellungen \u203a Deal Score \u203a Bewertung als">' + IC.sliders + 'Ansicht</button>' +
+      '</div>' +
+    '</div>';
+    var finFuss;
+    if (fin.barkauf) finFuss = 'Barkauf \u2014 ohne Kapitaldienst gilt die Finanzierung als erf\u00fcllt.';
+    else if (fin.gedeckelt) finFuss = 'Ohne Grenze ' + fin.score_ohne_deckel + ' \u2192 begrenzt auf ' + fin.score + ': ' + esc(fin.deckel) + '.';
+    else if (fin.deckel) finFuss = 'DSCR-Grenze (h\u00f6chstens ' + ges.deckel.max + ') \u00e4ndert hier nichts: ' + esc(fin.deckel) + '.';
+    else finFuss = 'DSCR ab 1,2 \u2014 keine Grenze.';
+    var invFuss = 'Ein-Score-Ansicht: ' + r2.score + ' / 100 (' + esc(r2.label) + ').' +
+      (ges.gedeckelt ? ' Gesamturteil auf ' + ges.score + ' begrenzt.' : '');
+    return '<div class="dpz">' + kopf +
+      '<div class="dpz-zwei">' +
+        zKarte('Investment-Score', 'Wie gut ist die Immobilie, egal wie sie finanziert wird?', inv, invFuss) +
+        zKarte('Finanzierungs-Score', 'Tr\u00e4gt die geplante Finanzierung dieses Objekt?', fin, finFuss) +
+      '</div>' +
+      '<div class="dpz-fakt">' +
+        '<div class="dpz-karte"><div class="dpz-pad"><h3 class="dpz-h3">Positive Faktoren</h3><ul class="dpz-plus">' + zFaktoren(r2, 'positives') + '</ul></div></div>' +
+        '<div class="dpz-karte"><div class="dpz-pad"><h3 class="dpz-h3">Negative Faktoren</h3><ul class="dpz-minus">' + zFaktoren(r2, 'negatives') + '</ul></div></div>' +
+      '</div>' +
     '</div>';
   }
 
@@ -481,7 +567,8 @@
     } catch (e) {}
     document.body.classList.toggle('dpsh-nur-investor', nurInvestor);
     if (!nurInvestor) { var c = classicData(depthPct); if (c) html += heroHtml(c); }
-    if (i) html += heroHtml(i);
+    /* v3076 · Einstellung „Bewertung als: zwei Scores" - nur die Anzeige wechselt, gerechnet ist beides. */
+    if (i) html += (!i.empty && i.r2 && i.r2.investment && scoreAnsicht() === 'zwei') ? zweiHtml(i) : heroHtml(i);
     m.innerHTML = html;
     if (html) animate(m);
   }
@@ -561,7 +648,7 @@
       if (clickOriginal('#dealscore-box', 'Gewicht')) return;
       if (clickOriginal('#dealscore-card', 'Gewicht')) return;
     },
-    _debug: { classicData: classicData, investorData: investorData }
+    _debug: { classicData: classicData, investorData: investorData, zweiHtml: zweiHtml }   /* v3076: zweiHtml fuer den Rauchtest */
   };
 
   /* ===================== CSS ===================== */
@@ -569,6 +656,56 @@
 'body.dpsh-on #dealscore-card,body.dpsh-on #dealscore2-card,body.dpsh-on #ds2-readonly-card{display:none!important}',
 '#dpsh-mount{display:flex;flex-direction:column;gap:16px;margin-bottom:18px}',
 '#dpsh-mount *{box-sizing:border-box}',
+/* v3076 · Zwei-Score-Ansicht (Demo zwei-scores-demo.html) */
+'.dpz{display:flex;flex-direction:column;gap:16px;font-family:"Inter",system-ui,sans-serif;color:#1d1c1a}',
+'.dpz-kopf{border-radius:14px;padding:14px 16px;background:#050505;color:#f6f2e8;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}',
+'.dpz-lbl{font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px}',
+'.dpz-wort{font:700 22px/1.1 "Space Grotesk",sans-serif;color:#f6f2e8}',
+'.dpz-wert{font:600 13px/1 "JetBrains Mono",monospace;color:rgba(255,255,255,.6);margin-left:6px}',
+'.dpz-deckel{display:inline-block;margin-top:6px;font:700 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#f0a59d;border:1px solid rgba(216,86,76,.5);border-radius:6px;padding:4px 7px}',
+'.dpz-empf{font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;padding:7px 10px;border-radius:999px}',
+'.dpz-empf-ja{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1508}',
+'.dpz-empf-halb{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);color:var(--wl-e8cc7a, #E8CC7A)}',
+'.dpz-empf-nein{background:rgba(216,86,76,.18);color:#f0a59d}',
+'.dpz-warum{flex:1 1 280px;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.72)}',
+'.dpz-warum b{color:#fff}',
+'.dpz-knoepfe{display:flex;gap:6px;flex-wrap:wrap}',
+'#dpsh-mount .dpz-knopf{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;background:transparent;color:#b3ada2;border:1px solid rgba(255,255,255,.18);font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.4px;text-transform:uppercase;cursor:pointer}',
+'#dpsh-mount .dpz-knopf:hover{color:var(--wl-e8cc7a, #E8CC7A);border-color:var(--wl-c9a84c, #C9A84C)}',
+'#dpsh-mount .dpz-knopf svg{width:14px;height:14px}',
+'.dpz-zwei,.dpz-fakt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}',
+'@media(max-width:820px){.dpz-zwei,.dpz-fakt{grid-template-columns:1fr}}',
+'.dpz-karte{background:#fff;border:1px solid #e6dfcf;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.03);min-width:0}',
+'.dpz-band{height:4px;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))}',
+'.dpz-pad{padding:18px}',
+'.dpz-score{display:flex;gap:16px;align-items:center}',
+'.dpz-ring{width:104px;height:104px;flex:0 0 auto;position:relative}',
+'.dpz-ring svg{width:100%;height:100%;transform:rotate(-90deg)}',
+'.dpz-n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 32px/1 "Space Grotesk",sans-serif;color:#1d1c1a}',
+'.dpz-h3{font:600 16px/1.3 "Space Grotesk",sans-serif;margin:0;color:#1d1c1a}',
+'.dpz-pill{display:inline-block;font:700 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;padding:5px 9px;border-radius:999px;margin-top:6px}',
+'.dpz-g{background:rgba(63,165,108,.12);color:#2d7d52}',
+'.dpz-o{background:#FBF6E9;color:var(--wl-b8932f, #b8932f);border:1px solid #eee6d3}',
+'.dpz-r{background:rgba(184,98,92,.12);color:#B8625C}',
+'.dpz-was{font-size:12.5px;color:#6b6356;margin-top:6px}',
+'.dpz-kat{margin-top:12px}',
+'.dpz-kz{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline;margin:10px 0 0}',
+'.dpz-t{font-size:13.5px;font-weight:500}',
+'.dpz-anteil{font:600 11px/1 "JetBrains Mono",monospace;color:#6b6356}',
+'.dpz-p{font:600 12.5px/1 "JetBrains Mono",monospace;white-space:nowrap}',
+'.dpz-bar{grid-column:1/-1;height:7px;border-radius:5px;background:#f0ece3;overflow:hidden}',
+'.dpz-bar i{display:block;height:100%;border-radius:5px}',
+'.dpz-m{grid-column:1/-1;font-size:12px;color:#6b6356}',
+'.dpz-summe{margin-top:12px;padding-top:10px;border-top:1px dashed #e6dfcf;font-size:12.5px;color:#6b6356}',
+'.dpz-fakt ul{list-style:none;margin:8px 0 0;padding:0}',
+'.dpz-fakt li{position:relative;padding:6px 0 6px 24px;font-size:13.5px;border-bottom:1px solid #f4f0e7;color:#1d1c1a}',
+'.dpz-fakt li:last-child{border-bottom:0}',
+'.dpz-fakt li::before{position:absolute;left:0;top:6px;width:17px;height:17px;border-radius:50%;font:700 12px/17px "JetBrains Mono",monospace;text-align:center}',
+'.dpz-plus li::before{content:"+";background:rgba(63,165,108,.13);color:#2d7d52}',
+'.dpz-minus li::before{content:"\u2212";background:rgba(184,98,92,.14);color:#B8625C}',
+'.dpz-fakt li.dpz-leer::before{content:none}',
+'.dpz-fakt li.dpz-leer{padding-left:0;color:#6b6356}',
+'.dpz-tag{font:600 10.5px/1 "JetBrains Mono",monospace;color:#6b6356;margin-left:4px}',
 '.dpsh-pass{display:flex;border-radius:18px;overflow:hidden;position:relative;background:#1b1815;box-shadow:0 22px 60px -30px rgba(20,15,5,.5)}',
 '.dpsh-main{flex:1;position:relative;background:radial-gradient(120% 150% at 78% -10%,#0d0c09,#050505 62%);min-width:0}',
 '.dpsh-star{position:absolute;inset:0;opacity:.38;pointer-events:none;background-image:radial-gradient(1px 1px at 22% 28%,color-mix(in srgb, var(--gold, #C9A84C) 45%, transparent),transparent),radial-gradient(1px 1px at 72% 16%,rgba(255,255,255,.22),transparent),radial-gradient(1px 1px at 88% 60%,color-mix(in srgb, var(--gold, #C9A84C) 35%, transparent),transparent),radial-gradient(1px 1px at 42% 84%,rgba(255,255,255,.18),transparent)}',

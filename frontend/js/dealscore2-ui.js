@@ -37,6 +37,11 @@ function _buildDeal2FromState() {
        Score, statt mit 0 bzw. 85 Punkten zu Buche zu stehen. Die
        Summe steht hier schon — sie wird nur weitergereicht. */
     deal.darlehen = darlV108;
+    /* v3076 · Marktwert für die Grenze „Darlehen über Marktwert" der Zwei-Score-Rechnung -
+       dieselbe Regel wie dealscore.js (Kaufpreis + Wertpuffer K.wp_kpi). Der bisherige
+       Score liest ihn nicht. */
+    var kpMwV3076 = v('kp');
+    if (k.wp_kpi != null && isFinite(Number(k.wp_kpi)) && kpMwV3076 > 0) deal.marktwert = kpMwV3076 + Number(k.wp_kpi);
     ekV108 = State.gi - darlV108;   // kann auch negativ werden (Über-Finanzierung)
   }
 
@@ -334,6 +339,30 @@ window._dpDs2Schwelle = function () {
   return s;
 };
 
+/* v3076 · BEWERTUNG ALS EIN SCORE ODER ZWEI (Marcel 02.11.2026).
+   Nur die ANZEIGE liest diesen Merker - der Kern (dealscore2.js) rechnet immer
+   beide Scores. 'eins' = Investor Deal Score wie bisher, 'zwei' = Investment-
+   und Finanzierungs-Score mit Gesamturteil. Gesetzt im Reiter Deal Score der
+   Einstellungen (settings.js), am Konto gehalten über vorgaben-sync.js. */
+window._dpScoreAnsicht = function () {
+  try { return localStorage.getItem('dp_score_ansicht') === 'zwei' ? 'zwei' : 'eins'; } catch (e) { return 'eins'; }
+};
+
+/* v3076 · kompakte Zeilen fuer die (unter dem Score-Hero ausgeblendete) DS2-Karte */
+function _ds2ZweiKompakt(r) {
+  if (!r || !r.investment || !r.gesamt || window._dpScoreAnsicht() !== 'zwei') return '';
+  var ge = r.gesamt, em = ge.empfehlung || {};
+  function zeile(t, s, w) {
+    return '<div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0"><span>' + t + '</span><b>' + s + ' / 100 · ' + _escDs2(w) + '</b></div>';
+  }
+  return '<div class="ds2-zwei" style="margin:12px 0;padding:12px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;font-size:12.5px;line-height:1.5">' +
+    zeile('Investment-Score', r.investment.score, r.investment.stufe) +
+    zeile('Finanzierungs-Score', r.finanzierung.score, r.finanzierung.stufe) +
+    zeile('Gesamturteil', ge.score, ge.stufe) +
+    '<div style="margin-top:4px">Empfehlung: <b>' + _escDs2(em.text || '') + '</b>' + (ge.deckel ? ' · ' + _escDs2(ge.deckel.grund) : '') + '</div>' +
+  '</div>';
+}
+
 function renderDealScore2() {
 
   var box = document.getElementById('dealscore2-box');
@@ -593,6 +622,7 @@ function renderDealScore2() {
         '<div class="ds-metrics ds2-metrics">' + catBars + '</div>' +
       '</div>' +
 
+      _ds2ZweiKompakt(result) +   /* v3076 */
       _ds2GrenzenBlock(deal) +
 
       '<div class="ds2-pn-grid">' +

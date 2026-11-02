@@ -702,6 +702,23 @@ function showSettings(initialTab) {
               '<p class="ds-pane-sub">Erweiterter Score mit 24 KPIs · ab 70% KPI-Vollständigkeit sichtbar · Investor/Pro-Plan</p>' +
             '</div>' +
           '</div>' +
+          /* v3076 · Marcel 02.11.2026: „in den Einstellungen zwischen beiden wählen".
+             Nur die Anzeige - der Kern rechnet immer beide Scores. Gespeichert wird über
+             den Auto-Save (v3063): change am Modal -> _saveSettings() -> dp_score_ansicht. */
+          '<div class="ds-ansicht" role="radiogroup" aria-label="Bewertung als" style="margin:4px 0 16px;padding:12px 14px;border:1px solid var(--border, #e6dfcf);border-radius:12px">' +
+            '<div style="font-weight:600;font-size:13px;margin-bottom:8px">Bewertung als</div>' +
+            (function () {
+              var a = (typeof window._dpScoreAnsicht === 'function') ? window._dpScoreAnsicht() : 'eins';
+              function opt(w, t, s) {
+                return '<label style="display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer;font-size:13px;line-height:1.4">' +
+                  '<input type="radio" name="set-score-ansicht" value="' + w + '"' + (a === w ? ' checked' : '') +
+                  ' style="margin-top:3px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
+                  '<span><b>' + t + '</b><br><span style="opacity:.72;font-size:12px">' + s + '</span></span></label>';
+              }
+              return opt('eins', 'Ein Investor Deal Score (wie bisher)', 'Ein Ring über alle 24 Kennzahlen.') +
+                     opt('zwei', 'Zwei Scores: Investment + Finanzierung', 'Objekt und Finanzierung getrennt bewertet; Gesamturteil = Investment-Score, höchstens bis zur DSCR-Grenze. Objektkarte und Seitenleiste zeigen weiter einen Wert.');
+            })() +
+          '</div>' +
           // V63.21: INLINE-Konfiguration (statt Modal-über-Modal — User-Wunsch V22)
           '<div id="ds2-settings-body-inline" class="ds2-settings-body-inline">' +
             '<p class="hint">Lade Investor Deal Score Konfiguration...</p>' +
@@ -1603,6 +1620,18 @@ function _saveSettings(opt) {
   if (document.getElementById('ds2-settings-body-inline') && typeof ds2SaveConfig === 'function') {
     try { ds2SaveConfig(); } catch(e) { console.warn('[DS2 inline save]', e); }
   }
+
+  /* v3076 · Bewertung als ein Score oder zwei - ein Anzeige-Merker, kein Rechenparameter. */
+  (function () {
+    var r = document.querySelector('input[name="set-score-ansicht"]:checked');
+    if (!r) return;
+    var neu = (r.value === 'zwei') ? 'zwei' : 'eins', alt = 'eins';
+    try { alt = (localStorage.getItem('dp_score_ansicht') === 'zwei') ? 'zwei' : 'eins'; } catch (e) {}
+    if (alt === neu) return;
+    try { localStorage.setItem('dp_score_ansicht', neu); } catch (e) {}
+    try { if (typeof renderDealScore2 === 'function') renderDealScore2(); } catch (e) {}
+    try { if (window.DealPilotScoreHero && typeof DealPilotScoreHero.render === 'function') DealPilotScoreHero.render(); } catch (e) {}
+  })();
 
   // Save dealscore weights
   if (typeof DealScore !== 'undefined') {

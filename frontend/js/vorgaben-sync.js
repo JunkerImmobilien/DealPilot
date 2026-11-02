@@ -45,7 +45,8 @@
     'dp_dealscore_weights',   /* DealPilot-Score-Gewichte (dealscore.js) */
     'dp_dealscore_eigen',     /* v2191 · eigene DS-Regler aktiv */
     'dp_std_set',             /* Anlegerprofil-Set (standardwerte-karten.js) */
-    'dp_investment_profile'   /* Investmentprofil inkl. Co-Pilot-Strategie */
+    'dp_investment_profile',  /* Investmentprofil inkl. Co-Pilot-Strategie */
+    'dp_score_ansicht'        /* v3076 · Bewertung als ein Score oder zwei (nur Anzeige) */
   ];
   var LS_NUTZER = 'dp_vorgaben_nutzer';
   var SS_NEU = 'dp_vorgaben_neu_';
