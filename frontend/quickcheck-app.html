@@ -3599,6 +3599,11 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
           <option value="stark_sanierungsbeduerftig">sanierungsbedürftig</option>
         </select>
       </div>
+      <!-- v3091 · Wohnungen, nur beim Mehrfamilienhaus: Verwaltung je Wohnung (Anlage 3) für den Anteil nicht umlagefähig -->
+      <div class="field" id="qc_einheiten_feld" hidden>
+        <label for="qc_einheiten">Wohnungen</label>
+        <input type="text" id="qc_einheiten" placeholder="6" inputmode="numeric" autocomplete="off">
+      </div>
       <!-- ══ v1956 · DIE LAGEKLASSE ═══════════════════════════════════════
            Marcel am 07.10.2026: „beim Quick-Check kann man dann angeben, ob
            man A-, B- oder C-Lage investiert, und dann wird dieses
@@ -4633,7 +4638,9 @@ const QcApp = (function() {
          Objektart); eine amtliche Quote fuer das Hausgeld gibt es nicht. */
       const splitIst = QcEngine.num(inputs.hg_split);
       const NQ = window._qcNulQuelle || {};
-      const quelle = (NQ.pct != null && splitIst != null && Math.abs(splitIst - NQ.pct) < 1e-9)
+      const quelle = (NQ.berechnet && splitIst != null && Math.abs(splitIst - NQ.pct) < 0.05)
+        ? 'berechnet: ' + NQ.text + ' = ' + fmt0(NQ.eur) + ' € im Jahr'
+        : (NQ.pct != null && splitIst != null && Math.abs(splitIst - NQ.pct) < 1e-9)
         ? (NQ.eigen ? 'dein Standard aus den Einstellungen (Bewirtschaftung je Objektart, ETW)'
                     : 'DealPilot-Standard für Eigentumswohnungen (änderbar in Einstellungen › Bewirtschaftung je Objektart)')
         : 'deine Angabe hier';
@@ -7485,8 +7492,31 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         window._qcNulQuelle = { pct: bwk, eigen: (bwk != null && _std != null && Math.abs(bwk - _std) > 1e-9) };
       } catch(e){}
       autoHg();
+      nulSetzen();   /* v3091 */
     } catch(e){}
   }
+  /* v3091 · Anteil nicht umlagefähig aus Anlage 3 (bwk-profil.js nulAnteil), solange der Nutzer ihn
+     hier nicht selbst gesetzt hat. Ein eigener ETW-Standard aus den Einstellungen gewinnt bei Wohnungen. */
+  function nulSetzen(){
+    try {
+      var hs = document.getElementById("qc_hg_split"); if (!hs) return;
+      if (!hs._nulBound) { hs._nulBound = 1; hs.addEventListener("input", function(){ if (hs.dataset.nulAuto === "1") hs.dataset.nulAuto = ""; else hs.dataset.userSet = "1"; }); }
+      var art = ((document.getElementById("qc_objektart") || {}).value || "").toUpperCase();
+      var ef = document.getElementById("qc_einheiten_feld"); if (ef) ef.hidden = art !== "MFH";
+      if (hs.dataset.userSet === "1") return;
+      var BP = window.parent && window.parent.DealPilotBwkProfil; if (!BP || !BP.nulAnteil) return;
+      var p = BP.lesen ? BP.lesen() : null, S = BP.STANDARD || {};
+      var eigen = art === "ETW" && p && p.etw && S.etw && isFinite(p.etw.nul_pct) && Math.abs(p.etw.nul_pct - S.etw.nul_pct) > 1e-9;
+      if (eigen) return;
+      var r = BP.nulAnteil({ objart: art, wfl: (document.getElementById("qc_wfl") || {}).value, hg_monat: (document.getElementById("qc_hg") || {}).value, einheiten: (document.getElementById("qc_einheiten") || {}).value });
+      if (!r) return;
+      var neu = String(r.pct).replace(".", ",");
+      window._qcNulQuelle = { pct: r.pct, text: r.text, eur: r.eur_jahr, berechnet: true };
+      if (hs.value !== neu) { hs.dataset.nulAuto = "1"; hs.value = neu; try { hs.dispatchEvent(new Event("input", { bubbles: true })); } catch(e){} }
+    } catch(e){}
+  }
+  ["qc_hg", "qc_wfl", "qc_objektart", "qc_einheiten"].forEach(function(id){ var e = document.getElementById(id); if (e && !e._nulB) { e._nulB = 1; e.addEventListener("input", function(){ setTimeout(nulSetzen, 50); }); e.addEventListener("change", function(){ setTimeout(nulSetzen, 50); }); } });
+  setTimeout(nulSetzen, 2500);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply); else apply();
   setTimeout(apply, 1500); /* Zinsdaten laden ggf. asynchron nach */
   /* v719/dpfk-zins-retry: Marktzins kommt asynchron (Pfandbrief-Raten) -> mehrfach versuchen,

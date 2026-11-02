@@ -68,7 +68,7 @@
   var BASIS_ALT = { verw: 230, inst_qm: 9.0, stp_inst: 68, stp_verw: 30 };
   var STANDARD = {
     faktor: 1,
-    etw: { hg_qm: 4.00, nul_pct: 30, ruecklage_qm: 0.50 },
+    etw: { hg_qm: 4.00, nul_pct: 30, ruecklage_qm: 0.50, verw: 439, inst_qm: 14.40 },   /* v3091: verw/inst_qm = Anlage 3 je ETW (Rückfall, Jahreswerte vom Server) */
     efh: { verw: 367, inst_qm: 14.40, stp_inst: 108, bk_qm: 2.20 },
     mfh: { verw: 367, stp_verw: 48, inst_qm: 14.40, stp_inst: 108, bk_qm: 2.50 }
   };
@@ -128,6 +128,8 @@
       if (w.inst_qm > 0) { STANDARD.efh.inst_qm = w.inst_qm; STANDARD.mfh.inst_qm = w.inst_qm; }
       if (w.inst_garage > 0) { STANDARD.efh.stp_inst = w.inst_garage; STANDARD.mfh.stp_inst = w.inst_garage; }
       if (w.verw_garage > 0) STANDARD.mfh.stp_verw = w.verw_garage;
+      if (w.verw_etw > 0) STANDARD.etw.verw = w.verw_etw;   /* v3091 */
+      if (w.inst_qm > 0) STANDARD.etw.inst_qm = w.inst_qm;
       STANDARD.jahr = r.stichtag_jahr; leisteZeichnen();
     }).catch(function () {});
   }
@@ -141,6 +143,32 @@
 
   /* ── Der Vorschlag fuer ein Objekt ────────────────────────────────── */
   function artVon(objart) { return ART[String(objart || '').toUpperCase()] || null; }
+  /* v3091 · ANTEIL NICHT UMLAGEFÄHIG AUS ANLAGE 3 (Marcel 02.11.2026: „30 % … ist das irgendwo eine
+     Grundlage? … genauer, wir wissen das Mehrfamilienhaus oder so … haben wir Tabellen?").
+     Es gibt keine amtliche Quote für das Hausgeld; die 30 % waren Marcels Abnahme der Demo v2183.
+     Genauer wird es aus den Bestandteilen, die der Eigentümer selbst trägt:
+       ETW   Verwaltung je Eigentumswohnung (Anlage 3) + Rücklage der Gemeinschaft. Die Rücklage
+             = Instandhaltung je m² (Anlage 3) abzüglich der eigenen Rücklage fürs Sondereigentum,
+             die DealPilot getrennt führt (etw.ruecklage_qm) - sonst stünde sie doppelt.
+       Haus  Verwaltung je Wohnung × Wohnungen + Instandhaltung je m² (Anlage 3), wie vorschlag().
+     Anteil = diese Summe / Hausgeld (bzw. Bewirtschaftung) im Jahr, begrenzt auf 5-80 %.
+     o = { objart, wfl, hg_monat, einheiten } → { pct, eur_jahr, text, art } oder null. */
+  function nulAnteil(o) {
+    var a = artVon(o && o.objart), wfl = zahl(o && o.wfl), hg = zahl(o && o.hg_monat);
+    if (!a || !(wfl > 0) || !(hg > 0)) return null;
+    var S = STANDARD, eur, text;
+    if (a === 'etw') {
+      var verw = S.etw.verw, inst = S.etw.inst_qm, eig = (S.etw.ruecklage_qm || 0) * 12, rl = Math.max(0, inst - eig);
+      eur = verw + rl * wfl;
+      text = 'Verwaltung ' + de(verw) + ' € je Wohnung + Rücklage der Gemeinschaft ' + de(rl, 2) + ' €/m² × ' + de(wfl) + ' m² (Instandhaltung ' + de(inst, 2) + ' €/m² nach ImmoWertV Anlage 3, ohne die eigene Rücklage fürs Sondereigentum)';
+    } else {
+      var h = S[a], we = a === 'mfh' ? Math.max(1, zahl(o.einheiten) || 1) : 1;
+      eur = h.verw * we + h.inst_qm * wfl;
+      text = 'Verwaltung ' + de(h.verw) + ' € × ' + de(we) + (we === 1 ? ' Wohnung' : ' Wohnungen') + ' + Instandhaltung ' + de(h.inst_qm, 2) + ' €/m² × ' + de(wfl) + ' m² (ImmoWertV Anlage 3)';
+    }
+    var pct = Math.min(80, Math.max(5, Math.round(eur / (hg * 12) * 1000) / 10));
+    return { pct: pct, eur_jahr: Math.round(eur), text: text, art: a };
+  }
   function vorschlag(o) {
     var a = artVon(o.objart), p = lesen();
     var wfl = zahl(o.wfl);
@@ -278,6 +306,6 @@
   function start() { css(); vomServer(); jahresFaktor(); setTimeout(leisteZeichnen, 1500); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  window.DealPilotBwkProfil = { lesen: lesen, vorschlag: vorschlag, einsetzen: einsetzen, leisteZeichnen: leisteZeichnen,
+  window.DealPilotBwkProfil = { nulAnteil: nulAnteil, lesen: lesen, vorschlag: vorschlag, einsetzen: einsetzen, leisteZeichnen: leisteZeichnen,
     einstellungenHtml: einstellungenHtml, verdrahten: verdrahten, STANDARD: STANDARD };
 })();
