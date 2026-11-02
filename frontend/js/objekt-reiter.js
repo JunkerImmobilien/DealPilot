@@ -857,14 +857,9 @@
          sich nichts. */
       /* v3078 · jede Stufe über dem Detailgrad ist gesperrt; freigeschaltet
          wird in den Einstellungen, nicht hier */
-      if (s > z) {
-        return '<div class="oe-row oe-row-gesperrt" title="' + esc(k.sub) + '">'
-          + '<span class="oe-k">' + k.name + '</span>'
-          + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + '</span>'
-          + '<span class="oe-q oe-q-kompakt">' + gesperrtSatz(s) + '</span>'
-          + '<span><button type="button" class="oe-btn" data-dp-dg-einst="1" title="Einstellungen › Mein Profil › Detailgrad der Eingabe">in den Einstellungen freischalten</button></span>'
-          + '</div>';
-      }
+      /* v3079 · Marcel: „wenn wir Einsteiger ausgewählt haben, gibt es halt nur
+         die Stufe und fertig" — Stufen über dem Detailgrad erscheinen nicht. */
+      if (s > z) return '';
       var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
       /* v1868 · kompakt: Name, frei, Pille — der Satz dazu steckt im Tooltip */
       return '<div class="oe-row' + (s === w ? ' on' : '') + '" data-oe-zeile="' + s + '" role="button" tabindex="0" aria-pressed="' + (s === w) + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
@@ -889,7 +884,7 @@
     var z = dgStufe(), w = mbWahl();
     /* v3078 · eigene Wahl (data-oe-mb); über dem Detailgrad gesperrt (data-dp-dg-einst → Einstellungen) */
     host.innerHTML = [1, 2, 3].map(function (s) {
-      if (s > z) return '<i class="dp-pf-pille gesperrt" data-dp-dg-einst="1" title="Marktbericht Stufe ' + s + ' · ' + gesperrtSatz(s) + ' Klick: Einstellungen">' + s + '</i>';
+      if (s > z) return '';   /* v3079: nur freigegebene Stufen */
       var fehlt = fehltFuer(s).length;
       return '<i class="dp-pf-pille' + (s === w ? ' on' : '') + (fehlt ? ' fehlt' : '') + '" data-oe-mb="' + s + '" title="Marktbericht Stufe ' + s + (fehlt ? ' · ' + fehlt + ' Feld(er) fehlen' : ' · bereit') + '">' + s + '</i>';
     }).join('');
@@ -906,7 +901,7 @@
     if (s > dgStufe()) {
       _fehlStufe = null;
       var box = $('oe-fehlt');
-      if (box) { box.innerHTML = '<b>Marktbericht Stufe ' + s + ':</b> ' + gesperrtSatz(s) + ' <button type="button" class="oe-btn" data-dp-dg-einst="1">in den Einstellungen freischalten</button>'; box.style.display = ''; }
+      if (box) { box.innerHTML = ''; box.style.display = 'none'; }   /* v3079: kein Hinweis im Reiter */
       return;
     }
     _mbWahl = s;

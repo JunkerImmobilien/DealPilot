@@ -38954,6 +38954,8 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 .dp-pf-pille.fehlt { border-style: dashed; }
 /* v3078 · über dem Detailgrad gesperrt, Klick führt in die Einstellungen */
 .dp-pf-pille.gesperrt { opacity: .3; border-style: dotted; }
+/* v3079 · Stufe-3-Abrufknöpfe außerhalb des Reiters Objekt nur im Detailgrad Experte */
+body.dp-dg-1 .mba-stufe3, body.dp-dg-2 .mba-stufe3, body.dp-dg-1 [data-dp-pot-stufe3], body.dp-dg-2 [data-dp-pot-stufe3] { display: none !important; }
 .dp-pf-pille:hover { opacity: 1; border-color: var(--wl-c9a84c, #C9A84C); }
 
 /* v1858 · Hover-Hilfe an jedem Feld; gelbe i-Knoepfe weichen, wenn sie an ist */
