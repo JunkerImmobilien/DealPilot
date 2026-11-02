@@ -41464,4 +41464,8 @@ body.qc-standalone-active #hdr-obj,
 body.qc-standalone-active #hdr-ziel-mini,
 body.qc-standalone-active #hdr-autosave,
 body.qc-standalone-active #tabs-status-badge,
-body.qc-standalone-active .dpl-teil-score { display: none !important; }
+/* v3061a: auch die Reiterleiste des Objekts (nav.tabs). V63.76 wollte sie im Boarding
+   ausblenden (Kommentar oben, ui.js enterQuickCheckMode) - gemessen stand sie mit
+   display:flex da, sobald man aus einem Objekt ins Boarding wechselte. */
+body.qc-standalone-active .dpl-teil-score,
+body.qc-standalone-active nav.tabs { display: none !important; }
