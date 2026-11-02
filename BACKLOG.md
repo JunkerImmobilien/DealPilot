@@ -36,6 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N95 · Quick-Check-Bewertung neu (02.11.2026)
+
+Befund und Demo: `wissen/2026-11-02.md` Teil 14, `frontend/demo-quickcheck-bewertung.html`. Eine Karte statt sechs Blöcke, eine
+Schrift, Lageklasse Standard B und wirksam im Ergebnis, Marktspanne als „im Rahmen", Zielkaufpreis mit greifender Grenze,
+keine Kappungserhöhung ohne Mieter, Rechtsquelle mit Link (`mietpotenzial-kern.js:130` „von DealPilot gesetzt“ ersetzen).
+Wartet auf Marcels Abnahme der Demo.
+
 ### N94 · Bayern-Bodenrichtwerte — Bezugswege (02.11.2026)
 
 Recherche `design/Vorschläge/bayern-bodenrichtwerte-bezugswege.md`: keine freie Alternative; 40/54 Ausschüsse zeigen den
