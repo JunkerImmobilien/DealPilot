@@ -65,7 +65,7 @@
       subClimb: 150,
       title: 'Quick-Boarding Score',
       body: 'Sobald alle Pflichtfelder gefüllt sind, zeigt ein **Score-Ring** die Bewertung — jede weitere Änderung rechnet sofort neu. Bis dahin steht dort, wie viele Pflichtfelder noch offen sind.',
-      bodyMore: 'Was im Score-Bereich passiert:\n\n• **Score-Ring** mit Wert 0–100 und Stufe\n• **7 Kennzahlen** mit Zielwert: Bruttomietrendite, Nettomietrendite, EK-Rendite, Cashflow, DSCR, LTV, Bewirtschaftung\n• **Stufen**: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch\n\nDie Berechnung passiert, ohne dass du speichern musst.\n\n**Tipp:** Spiel mit Kaufpreis, Miete und Eigenkapital — du siehst sofort, wie sich die Bewertung ändert. Perfekt für die Verhandlungs-Vorbereitung.',
+      bodyMore: 'Was im Score-Bereich passiert:\n\n• **Score-Ring** mit Wert 0–100 und Stufe\n• **7 Kennzahlen** mit Zielwert: Bruttomietrendite, Nettomietrendite, EK-Rendite, Cashflow, DSCR, LTV, Bewirtschaftung\n• **Stufen**: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch\n• **Bewertung in einer Karte**: Urteil mit Lageklasse A · B · C, drei Prüfsteine (Preis gegen den Markt, Rendite gegen dein Lage-Ziel, Finanzierung), Zielkaufpreis und die angesetzte Miete mit Kappungsgrenze und Mietpreisbremse der Gemeinde\n\nDie Berechnung passiert, ohne dass du speichern musst. Die Lageklasse ändert Urteil und Zielkaufpreis, nicht den Score.\n\n**Tipp:** Spiel mit Kaufpreis, Miete und Eigenkapital — du siehst sofort, wie sich die Bewertung ändert. Perfekt für die Verhandlungs-Vorbereitung.',
       placement: 'auto'
     },
     
@@ -194,7 +194,7 @@
       icon: 'i-home',
       title: 'Tab 1: Objekt',
       body: 'Hier trägst du die **Stammdaten** ein: Adresse, Wohnfläche, Baujahr, Etage, Zimmer, Fotos.',
-      bodyMore: '**Wichtigste Felder:**\n\n• **Straße + PLZ + Ort** — für Lage, Bodenrichtwert und Marktbewertung\n• **Wohnfläche** — Basis für Euro/m²-Vergleiche\n• **Baujahr** — wichtig für Restnutzungsdauer und Bewertung (den AfA-Satz wählst du im Reiter Steuer)\n• **Etage / Zimmer / Balkon / Keller** — Wertfaktoren\n• **Fotos** — je nach Plan 3 bis 30 pro Objekt; bis zu 6 erscheinen im Investment-PDF\n\nFehlende Pflichtfelder sind **rot umrandet**. Tipp: Adresse so genau wie möglich — davon hängen Bodenrichtwert und Lage ab.',
+      bodyMore: '**Wichtigste Felder:**\n\n• **Straße + PLZ + Ort** — für Lage, Bodenrichtwert und Marktbewertung\n• **Wohnfläche** — Basis für Euro/m²-Vergleiche\n• **Baujahr** — wichtig für Restnutzungsdauer und Bewertung (den AfA-Satz wählst du im Reiter Steuer)\n• **Etage / Zimmer / Balkon / Keller** — Wertfaktoren\n• **Fotos** — je nach Plan 3 bis 30 pro Objekt; bis zu 6 erscheinen im Investment-PDF\n\nWie viele Felder du siehst, bestimmt dein **Detailgrad** (Einsteiger, Fortgeschritten, Experte) in Einstellungen › Mein Profil. Die **Marktbericht-Stufe** wählst du hier selbst — angeboten bis zu deinem Detailgrad.\n\nFehlende Pflichtfelder sind **rot umrandet**. Tipp: Adresse so genau wie möglich — davon hängen Bodenrichtwert und Lage ab.',
       placement: 'auto'
     },
     
@@ -282,7 +282,7 @@
       icon: 'i-percent',
       title: 'DealScore 0-100',
       body: 'Der **DealPilot Score** bündelt die Bewertung in **5 Hauptfaktoren** zu einer Zahl von 0-100 — dein schnellster Vergleichswert.',
-      bodyMore: 'Die 5 Faktoren des DealPilot Scores:\n\n• **Cashflow** (30 %)\n• **Rendite** — Nettomietrendite (25 %)\n• **Beleihung** — LTV (15 %)\n• **Risiko** — DSCR (15 %)\n• **Potenzial** — Wertpuffer und Mietsteigerung (15 %)\n\n**Skala:**\n• **ab 85** Sehr gut\n• **ab 70** Gut\n• **ab 50** Solide\n• **ab 35** Schwach\n• **darunter** Kritisch\n\nDie Gewichte kannst du in den Einstellungen unter Deal Score anpassen.',
+      bodyMore: 'Die 5 Faktoren des DealPilot Scores:\n\n• **Cashflow** (30 %)\n• **Rendite** — Nettomietrendite (25 %)\n• **Beleihung** — LTV (15 %)\n• **Risiko** — DSCR (15 %)\n• **Potenzial** — Wertpuffer und Mietsteigerung (15 %)\n\n**Harte Grenze:** Trägt die Miete den Kapitaldienst nicht, ist der Score gedeckelt — DSCR unter 1,2 höchstens 84, unter 1,0 höchstens 69, unter 0,8 höchstens 49.\n\n**Skala:**\n• **ab 85** Sehr gut\n• **ab 70** Gut\n• **ab 50** Solide\n• **ab 35** Schwach\n• **darunter** Kritisch\n\nDie Gewichte kannst du in den Einstellungen unter Deal Score anpassen.',
       placement: 'auto'
     },
     
@@ -295,7 +295,7 @@
       icon: 'i-cpu',
       title: 'Investor Deal Score',
       body: 'Der **Investor Deal Score** ist die erweiterte Bewertung mit **24 KPIs in 5 Kategorien** — deutlich tiefer als die 5 Faktoren des Basis-Scores — im **Investor- und Pro-Plan**.',
-      bodyMore: '**Die 5 Kategorien:** Rendite, Finanzierung, Risiko, Lage, Upside\n\n**Was er zusätzlich prüft:**\n• Cash-on-Cash, DSCR, LTV, Zins\n• Leerstand, Instandhaltung, Baujahr, Energie\n• Marktmiete gegen Ist-Miete, Bevölkerung, Mikrolage\n• Mietsteigerung, Kaufpreisfaktor, Wertsteigerung\n\n**Wo finden:**\n• Im Reiter Bewertung als eigene Cockpit-Karte\n• Im Kopf oben rechts: Umschalter „Investor Deal Score“\n\n**Plan-Verfügbarkeit:**\n• **Free**: als Demo\n• **Starter**: nicht enthalten\n• **Investor & Pro**: voll, mit eigenen Gewichtungen und Bewertungsprofilen in den Einstellungen',
+      bodyMore: '**Die 5 Kategorien:** Rendite, Finanzierung, Risiko, Lage, Upside\n\n**Was er zusätzlich prüft:**\n• Cash-on-Cash, DSCR, LTV, Zins\n• Leerstand, Instandhaltung, Baujahr, Energie\n• Marktmiete gegen Ist-Miete, Bevölkerung, Mikrolage\n• Mietsteigerung, Kaufpreisfaktor, Wertsteigerung\n\n**Wo finden:**\n• Im Reiter Bewertung als eigene Cockpit-Karte\n• Im Kopf oben rechts: Umschalter „Investor Deal Score“\n• Wahlweise als **zwei Scores** — Investment und Finanzierung, darüber der Gesamtscore (Einstellungen › Deal Score › „Bewertung als“)\n\n**Plan-Verfügbarkeit:**\n• **Free**: als Demo\n• **Starter**: nicht enthalten\n• **Investor & Pro**: voll, mit eigenen Gewichtungen und Bewertungsprofilen in den Einstellungen',
       placement: 'center'
     },
     

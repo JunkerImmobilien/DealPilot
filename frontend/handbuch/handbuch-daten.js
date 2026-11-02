@@ -2,10 +2,10 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "b0c57a019e06783a",
+  "index.html": "7a8e61a762271ef5",
   "tooltip-content.js": "c7e4453dda8ecdd5",
-  "help.js": "c0eb500c02240b2f",
-  "tour-content.js": "e85775a89313350d",
+  "help.js": "adc62d5a9049af39",
+  "tour-content.js": "5b9c9cb1ae07064a",
   "objekt-reiter.js": "a2c83d0a545a682d",
   "deal-action-readycheck.js": "51f7c11dd7e2ab57",
   "feld-hilfe.js": "3a7e9964af3920bc",
@@ -20,7 +20,7 @@ window.DP_HANDBUCH = {
   "pdf-kaufpreisaufteilung.js": "33d5e894dcbc0726",
   "frontend-konstanten.json": "508e10ebd04b5723",
   "aufnahme.json": "433c9aa7f5c9ec56",
-  "handbuch-ablaeufe.mjs": "704f0f1b46714632"
+  "handbuch-ablaeufe.mjs": "1e4399d744b21620"
  },
  "reiter": [
   {
@@ -29,8 +29,8 @@ window.DP_HANDBUCH = {
    "titel": "Objekt & Fotos",
    "desc": "Grunddaten, Lage und Objektfotos für den Bankexport",
    "hilfe": {
-    "titel": "Objekt — Grunddaten, Lage und Eingabetiefe",
-    "text": "Hier beginnt jedes Objekt: <strong>PLZ</strong>, <strong>Ort</strong>, <strong>Straße</strong>, <strong>Hausnummer</strong>, <strong>Objektart</strong>, <strong>Wohnfläche (m²)</strong> und <strong>Baujahr</strong>. Dazu kommen Zimmer, Zustand, Standardstufe (NHK 2010), Energieklasse, Vermietungsstand und die Wertanker (<strong>Bankbewertung</strong>, <strong>Verkehrswert</strong>).\n\n<strong>Eingabetiefe</strong> — sie bestimmt, welche Felder Pflicht sind:\n• <strong>Einfach · Stufe 1</strong> — Adresse, Objektart, Wohnfläche, Baujahr: Marktpreisindikation.\n• <strong>Mittel · Stufe 2</strong> — dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe: erweiterte Indikation.\n• <strong>Ausgiebig · Stufe 3</strong> — dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ: Sach- und Ertragswert nach ImmoWertV.\n\nFehlende Pflichtfelder sind rot umrandet; „x fehlt“ zeigt sie dir. In der Box <strong>Marktbericht abrufen</strong> holst du den Bericht der gewählten Stufe — Stufe 2 gibt es ab Investor, Stufe 3 ab Pro.\n\nTipp: Liegt der Verkehrswert über dem Kaufpreis, zeigt DealPilot oben den <strong>Sofortigen Wertpuffer / Equity</strong>."
+    "titel": "Objekt — Grunddaten, Lage und Marktbericht-Stufe",
+    "text": "Hier beginnt jedes Objekt: <strong>PLZ</strong>, <strong>Ort</strong>, <strong>Straße</strong>, <strong>Hausnummer</strong>, <strong>Objektart</strong>, <strong>Wohnfläche (m²)</strong> und <strong>Baujahr</strong>. Dazu kommen Zimmer, Zustand, Standardstufe (NHK 2010), Energieklasse, Vermietungsstand und die Wertanker (<strong>Bankbewertung</strong>, <strong>Verkehrswert</strong>).\n\nWie viele Felder die Reiter zeigen, bestimmt dein <strong>Detailgrad</strong> (Einsteiger, Fortgeschritten oder Experte) — eingestellt unter Einstellungen › <strong>Mein Profil</strong>, gültig für alle Objekte. Oben im Reiter steht er mit der gewählten Marktbericht-Stufe.\n\n<strong>Marktbericht-Stufe</strong> — sie bestimmt, welche Felder für den Bericht Pflicht sind. Du wählst sie selbst, in der Box <strong>Marktbericht abrufen</strong> oder mit den Pillen 1 · 2 · 3 auf der Kachel DealPilot. Angeboten werden nur die Stufen bis zu deinem Detailgrad:\n• <strong>Einsteiger · Stufe 1</strong> — Adresse, Objektart, Wohnfläche, Baujahr: Marktpreisindikation.\n• <strong>Fortgeschritten · Stufe 2</strong> — dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe: erweiterte Indikation.\n• <strong>Experte · Stufe 3</strong> — dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ: Sach- und Ertragswert nach ImmoWertV.\nOhne eigene Wahl gilt die höchste freigegebene Stufe.\n\nFehlende Pflichtfelder sind rot umrandet; „x fehlt“ zeigt sie dir. Stufe 2 gibt es ab Investor, Stufe 3 ab Pro.\n\nTipp: Liegt der Verkehrswert über dem Kaufpreis, zeigt DealPilot oben den <strong>Sofortigen Wertpuffer / Equity</strong>."
    },
    "tour": {
     "titel": "Boarding-Pass zum Objekt",
@@ -202,7 +202,7 @@ window.DP_HANDBUCH = {
    "desc": "Kaufpreis, Nebenkosten, Gesamtinvestition und Prognose-Annahmen",
    "hilfe": {
     "titel": "Investition — Kaufpreis und Kaufnebenkosten",
-    "text": "Trag den <strong>Kaufpreis</strong> ein und darunter die Kaufnebenkosten. Jede Position gibt es doppelt — in Prozent und in Euro; änderst du eins, rechnet DealPilot das andere nach:\n• <strong>Makler</strong>\n• <strong>Notar</strong>\n• <strong>Grundbuchamt</strong> (bei neuen Objekten mit 0,5 % vorbelegt)\n• <strong>Grunderwerbsteuer</strong> (neu vorbelegt mit 6,5 % — prüf den Satz deines Bundeslands)\n• <strong>Sonstige</strong> — Bausachverständiger, Anfahrt, Gutachten\n\nDaraus entstehen <strong>Summe Nebenkosten</strong> und die <strong>Gesamtinvestition</strong> = Kaufpreis + Nebenkosten + Sanierungskosten. Inventar (Küche, Möbel) steckt im Kaufpreis und kommt nicht noch einmal dazu. Der <strong>Markt-Faktor</strong> (Kaufpreis ÷ Jahres-Nettokaltmiete) rechnet sich selbst.\n\nUnter <strong>Sanierung</strong> schätzt du Gewerke ab und übernimmst die Summe in die <strong>Sanierungskosten</strong>. DealPilot prüft dabei die <strong>15 %-Grenze</strong> (§ 6 Abs. 1 Nr. 1a EStG) — gemessen netto, deshalb wählst du, ob dein Betrag brutto oder netto ist. <strong>Inventarkosten</strong> (Küche, Möbel, Geräte …) zählen nicht zur Grenze und werden separat abgeschrieben."
+    "text": "Trag den <strong>Kaufpreis</strong> ein und darunter die Kaufnebenkosten. Jede Position gibt es doppelt — in Prozent und in Euro; änderst du eins, rechnet DealPilot das andere nach:\n• <strong>Makler</strong>\n• <strong>Notar</strong> und <strong>Grundbuchamt</strong> — DealPilot rechnet sie nach der gesetzlichen Gebührenordnung (GNotKG) aus Kaufpreis und Darlehen vor; die Vorbelegung zieht mit, wenn du Kaufpreis oder Darlehen änderst, bis du selbst einen Wert einträgst. Abschalten: Einstellungen › Mein Profil, Haken <strong>Notar und Grundbuch nach Gebührenordnung berechnen</strong>\n• <strong>Grunderwerbsteuer</strong> (neu vorbelegt mit 6,5 % — prüf den Satz deines Bundeslands)\n• <strong>Sonstige</strong> — Bausachverständiger, Anfahrt, Gutachten\n\nDaraus entstehen <strong>Summe Nebenkosten</strong> und die <strong>Gesamtinvestition</strong> = Kaufpreis + Nebenkosten + Sanierungskosten. Inventar (Küche, Möbel) steckt im Kaufpreis und kommt nicht noch einmal dazu. Der <strong>Markt-Faktor</strong> (Kaufpreis ÷ Jahres-Nettokaltmiete) rechnet sich selbst.\n\nUnter <strong>Sanierung</strong> schätzt du Gewerke ab und übernimmst die Summe in die <strong>Sanierungskosten</strong>. DealPilot prüft dabei die <strong>15 %-Grenze</strong> (§ 6 Abs. 1 Nr. 1a EStG) — gemessen netto, deshalb wählst du, ob dein Betrag brutto oder netto ist. <strong>Inventarkosten</strong> (Küche, Möbel, Geräte …) zählen nicht zur Grenze und werden separat abgeschrieben."
    },
    "tour": {
     "titel": "Tab 2: Investition",
@@ -17463,6 +17463,18 @@ window.DP_HANDBUCH = {
     "text": "Zu jeder Mieterhöhung stehen <strong>zwei Daten</strong>. <strong>Verlangbar ab</strong> sagt, wann dein Erhöhungsschreiben frühestens beim Mieter ankommen darf — bei der Vergleichsmiete ein Jahr nach der letzten Erhöhung (§ 558 Abs. 1 BGB). „Verlangbar ab sofort\" heißt: du darfst es heute verschicken.\n\n<strong>Wirksam ab</strong> sagt, ab wann die höhere Miete geschuldet ist: bei der Vergleichsmiete mit Beginn des dritten Kalendermonats nach Zugang (§ 558b Abs. 1 BGB, Zugang 15.10. → 01.01., Zugang 01.11. → 01.02.), bei der Modernisierungsumlage mit Beginn des dritten Monats nach Zugang (§ 559b Abs. 2 BGB), bei der Indexmiete ab dem übernächsten Monat (§ 557b Abs. 3 BGB). Ist das Schreiben schon heute verlangbar, rechnet DealPilot mit Zugang heute und sagt das dazu.\n\nWas „in diesem Jahr\" ankommt, zählt nur die Monate ab „wirksam ab\". Trägst du im Feld <strong>Wirksam ab (eigene Angabe)</strong> selbst einen Monat ein, gilt dein Termin."
    },
    {
+    "titel": "Die Mietleiter: was geht und wann",
+    "text": "Oben in der Karte <strong>Mieterhöhung und Zielbild</strong> (Reiter Investition; beim Mehrfamilienhaus je Wohnung unter „Einheiten erfassen“ › Details, Block „Miete — was geht und wann“) steht die <strong>Mietleiter</strong>, eine Zeile je Schritt:\n\n• <strong>Heute</strong> — die Ist-Miete, mit Beginn des Mietvertrags.\n• <strong>Mieterhöhung</strong> — die nächste zulässige Erhöhung mit Betrag, „verlangbar ab“ und „wirksam ab“ und der Grenze, die greift (Vergleichsmiete oder Kappungsgrenze). <strong>übernehmen</strong> trägt sie als Soll-Miete ein. Bei Staffel- oder Indexmiete steht „nach Vertrag“, ohne Spielraum „kein Spielraum“ mit Grund.\n• <strong>Bei Neuvermietung</strong> — wo die Mietpreisbremse gilt, die Obergrenze Vergleichsmiete + 10 % (<strong>als Zielmiete</strong> übernehmbar), sonst „frei“ oder „bitte prüfen“.\n• <strong>Zielbild</strong> — deine Zielmiete. Liegt sie über der Mietpreisbremse, ist sie rot markiert: erlaubt nur mit höherer Vormiete (§ 556e BGB) oder nach umfassender Modernisierung (§ 556f BGB).\n\nDarüber zeigen Balken Ist, nach Mieterhöhung und Zielbild. Gerechnet wird nur, was das Mietrecht erlaubt — die Angebotsmiete ist nie die Bestandsmiete."
+   },
+   {
+    "titel": "Mietrecht an dieser Adresse",
+    "text": "Im Reiter <strong>Miete</strong>, direkt unter dem Mietvertrag, steht die Karte <strong>Mietrecht an dieser Adresse</strong>: ob die <strong>Mietpreisbremse</strong> gilt (und bis wann), die <strong>Kappungsgrenze</strong> (15 % oder 20 % in drei Jahren) und die nächste mögliche Erhöhung — beim Mehrfamilienhaus je Wohnung in zwei Zeilen. Eine Zielmiete über der Bremse ist rot markiert.\n\nDie Regeln kommen aus den <strong>Landesverordnungen</strong> und werden mit Link genannt. Die Gemeinde bestimmt DealPilot über den Gemeindeschlüssel, den auch der Marktbericht nutzt. Ist sie noch nicht ermittelt oder die Verordnung ausgelaufen, rechnet DealPilot mit der gesetzlichen Kappungsgrenze von 20 % und schreibt „bitte prüfen“ dazu — ebenso, wenn die Liste eines Landes als unsicher gilt."
+   },
+   {
+    "titel": "Sanierung: Standardhebung und Förderhinweise",
+    "text": "Im Reiter <strong>Investition</strong>, Block <strong>Sanierungsbedarf</strong>, kreuzt du die Bereiche an. Zwei Hinweise rechnet DealPilot daraus:\n\n• <strong>Standardhebung</strong> — Fenster, Elektro, Sanitär (auch Bäder) und Heizung sind die vier zentralen Bereiche. Ab <strong>zwei</strong> weist DealPilot vorab darauf hin, ab <strong>drei</strong> deutlich: wird der Standard dabei jeweils deutlich gehoben (nicht nur zeitgemäß ersetzt), sind die Kosten <strong>Herstellungskosten</strong> und laufen über die Abschreibung des Gebäudes — kein sofort abziehbarer Erhaltungsaufwand, auch unterhalb der 15-%-Grenze. Eine neue Wärmepumpe allein hebt den Standard nicht. Grundlage: BMF-Schreiben vom 26.01.2026; bitte mit dem Steuerberater abstimmen.\n• <strong>Förderung</strong> — passend zu den Bereichen nennt DealPilot Programme für Vermieter mit Volumen, Vorteil und Link, mit dem Stand der Förderbedingungen. Zinsen stehen dort nicht; sie ändern sich laufend — den aktuellen Satz zeigt der verlinkte Konditionenanzeiger in Darlehen 2. Der Antrag muss vor der Beauftragung gestellt werden."
+   },
+   {
     "titel": "Schritt für Schritt: ein Zielbild anlegen",
     "text": "So legst du bei Eigentumswohnung, Einfamilien- oder Zweifamilienhaus ein Zielbild an:\n\n1. Objekt öffnen, Reiter <strong>Investition</strong>, Karte <strong>Mieterhöhung und Zielbild (optional)</strong> aufklappen.\n2. <strong>Vergleichsmiete (€/m²)</strong> eintragen, wenn du den Mietspiegel kennst — leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.\n3. <strong>Soll-Miete (Mieter bleibt, €/m²)</strong> leer lassen: Darunter steht „DealPilot rechnet vor: …“ mit Begründung. Eine eigene Zahl überschreibt den Vorschlag. <strong>Soll erreichbar ab</strong> ist ohne Angabe 15 Monate nach der letzten Erhöhung.\n4. <strong>Zielmiete (€/m²)</strong> eintragen — was nach Umbau oder bei einem neuen Mieter erzielbar ist — und unter <strong>Zielbild ab wann</strong> den Anlass, z. B. „bei Mieterwechsel“.\n5. Unter <strong>Maßnahmen</strong> die Chips anklicken, die du planst, und je Maßnahme die <strong>Kosten €</strong> eintragen.\n6. Wird mit Mieter in der Wohnung modernisiert: Haken <strong>Mieter bleibt drin — Kosten auf die Miete umlegen</strong> und, falls ein Teil ohnehin fällige Reparatur ist, <strong>davon Erhaltung %</strong>.\n7. <strong>Zielbild fertig (Jahr)</strong> eintragen, damit Pilot-Analyse und PDF ein Jahr nennen (leer = offen).\n\nUnter der Karte steht sofort die Summe: Ist, Mieterhöhung und Zielbild je Monat, die Maßnahmenkosten und die gewonnenen Modernisierungspunkte. DealPilot speichert die Angaben mit dem Objekt."
    },
@@ -17647,12 +17659,15 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "Ergebnis lesen: **QUICK CHECK SCORE** mit Kennzahlen, die Bewertung und die **Verhandlungs-Empfehlung** mit Zielkaufpreis.",
+     "t": "Ergebnis lesen: **QUICK CHECK SCORE** mit Kennzahlen und darunter die Bewertung in einer Karte — Urteil mit Score und Lageklasse **A · B · C**, drei Prüfsteine (Preis gegen den Markt, Rendite gegen dein Lage-Ziel, Finanzierung), der **Zielkaufpreis** und die **angesetzte Miete** mit Kappungsgrenze und Mietpreisbremse der Gemeinde. Die Lageklasse ändert Urteil und Zielkaufpreis, nicht den Score.",
      "kosten": "",
      "plan": "",
      "belege": [
       "quickcheck-app.html: QUICK CHECK SCORE",
-      "quickcheck-app.html: Verhandlungs-Empfehlung"
+      "quickcheck-app.html: Ersteinschätzung · ",
+      "quickcheck-app.html: Zielkaufpreis · was der Preis sein müsste",
+      "quickcheck-app.html: Angesetzte Miete",
+      "quickcheck-app.html: data-qcb-lage"
      ]
     },
     {
@@ -18061,14 +18076,16 @@ window.DP_HANDBUCH = {
    ],
    "schritte": [
     {
-     "t": "Die Stufe des Marktberichts folgt dem **Detailgrad** (Einstellungen › Mein Profil): **Einsteiger · Stufe 1** (Marktpreisindikation), **Fortgeschritten · Stufe 2** (erweiterte Indikation, ab Plan Investor) oder **Experte · Stufe 3** (Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert, ab Plan Pro). Im Reiter **Objekt** lässt sich unter dem Detailgrad auch eine niedrigere Stufe wählen.",
+     "t": "Die Stufe des Marktberichts wählst du selbst — im Reiter **Objekt** in der Box **Marktbericht abrufen** oder mit den Pillen 1 · 2 · 3 auf der Kachel **DealPilot**: **Einsteiger · Stufe 1** (Marktpreisindikation), **Fortgeschritten · Stufe 2** (erweiterte Indikation, ab Plan Investor) oder **Experte · Stufe 3** (Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert, ab Plan Pro). Angeboten werden nur die Stufen bis zu deinem **Detailgrad** (Einstellungen › Mein Profil); ohne eigene Wahl gilt die höchste davon. Die Wahl ändert den Detailgrad nicht.",
      "kosten": "",
      "plan": "Stufe 2 ab Investor, Stufe 3 ab Pro",
      "belege": [
       "js/objekt-reiter.js: name: 'Einsteiger · Stufe 1'",
       "js/objekt-reiter.js: name: 'Fortgeschritten · Stufe 2'",
       "js/objekt-reiter.js: name: 'Experte · Stufe 3'",
-      "js/objekt-reiter.js: var ab = { 2: 'ab Investor', 3: 'ab Pro' };"
+      "js/objekt-reiter.js: var ab = { 2: 'ab Investor', 3: 'ab Pro' };",
+      "js/objekt-reiter.js: function mbWahl() { var z = dgStufe(); return Math.min(_mbWahl || z, z); }",
+      "js/objekt-reiter.js: data-oe-mb="
      ]
     },
     {
