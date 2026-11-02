@@ -87,9 +87,29 @@
      `backend/src/generated/rechenkerne/score-tiers.js`, und der
      Telegram-Dienst liest sie seitdem ueber `services/rechenkerne.js`.
      **Wer diese Datei aendert, muss die Spiegelung neu laufen lassen.** */
+  /* v3070 · HARTE GRENZE NACH DSCR — EINE STELLE FÜR BEIDE SCORE-KERNE.
+     Recherche 02.11.2026 (design/Vorschläge/score-benchmark-p1.md, Abschnitt 5):
+     eine Mindest-DSCR steht in keiner Norm (§ 48u KWG kennt nur LTV und Tilgung);
+     Branchenpraxis der Banken liegt bei 1,1–1,35, unter 1,0 trägt sich das Objekt
+     nicht selbst. Staffel (ersetzt die pauschale Grenze 49 aus v3069):
+       DSCR ≥ 1,2 oder Barkauf        → kein Deckel
+       1,0 bis unter 1,2              → höchstens 84 (Gut)
+       0,8 bis unter 1,0              → höchstens 69 (Solide)
+       unter 0,8                      → höchstens 49 (Schwach)
+       unter 0,8 und Darlehen > Marktwert → höchstens 34 (Kritisch)
+     dscr: Zahl oder null (Barkauf); ueberMarktwert: true/false/null (unbekannt). */
+  function dscrDeckel(dscr, ueberMarktwert) {
+    if (dscr == null || !isFinite(dscr) || !(dscr > 0) || dscr >= 1.2) return null;
+    var d = dscr.toFixed(2).replace('.', ',');
+    if (dscr >= 1.0) return { max: 84, grund: 'DSCR ' + d + ' unter 1,2 — wenig Puffer für Zinsanstieg und Leerstand' };
+    if (dscr >= 0.8) return { max: 69, grund: 'DSCR ' + d + ' unter 1,0 — die Miete trägt den Kapitaldienst nicht ganz' };
+    if (ueberMarktwert === true) return { max: SCHWACH - 1, grund: 'DSCR ' + d + ' unter 0,8 und Darlehen über dem Marktwert' };
+    return { max: GOLD - 1, grund: 'DSCR ' + d + ' unter 0,8 — die Miete deckt den Kapitaldienst deutlich nicht' };
+  }
   var API = {
     classify: classify,
     stufe: stufe,
+    dscrDeckel: dscrDeckel,   /* v3070 */
     TOP: TOP,
     GREEN: GREEN,
     GOLD: GOLD,

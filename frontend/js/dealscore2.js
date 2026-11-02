@@ -708,11 +708,13 @@ window.DealScore2 = (function() {
     totalScore = clamp(totalScore, 0, 100);
     /* v3069 · dieselbe harte Grenze wie dealscore.js: DSCR < 1,0 oder negativer Cashflow
        nach Kapitaldienst (vor Steuern) → höchstens 49 (Schwach). Beim Barkauf (dscr null) keine. */
-    var _dscrD = num(deal.dscr), _cfD = num(deal.cashflowMonatlich), deckel = null;
-    if (_dscrD !== null && _dscrD > 0 && _dscrD < 1.0) deckel = 'DSCR ' + _dscrD.toFixed(2).replace('.', ',') + ' unter 1,0 — die Miete trägt den Kapitaldienst nicht';
-    else if (_dscrD !== null && _cfD !== null && _cfD < 0) deckel = 'Cashflow ' + Math.round(_cfD) + ' €/Monat nach Kapitaldienst — die Miete trägt die Rate nicht';
+    /* v3070 · Staffel aus score-tiers.js (ScoreTier.dscrDeckel). Den Marktwert kennt dieser
+       Kern nicht - die Stufe „Kritisch bei Darlehen über Marktwert" greift hier daher nicht. */
+    var _dscrD = num(deal.dscr), deckel = null;
+    var _dk = (_dscrD !== null && window.ScoreTier && window.ScoreTier.dscrDeckel) ? window.ScoreTier.dscrDeckel(_dscrD, null) : null;
+    if (_dk) deckel = _dk.grund;
     var scoreOhneDeckel = totalScore;
-    if (deckel && totalScore > 49) totalScore = 49;
+    if (_dk && totalScore > _dk.max) totalScore = _dk.max;
 
     // Ampel-Logik
     var label, color;
@@ -761,7 +763,7 @@ window.DealScore2 = (function() {
       categories: cats,
       positives: positives,
       negatives: negatives,
-      explanation: (deckel && scoreOhneDeckel > 49 ? 'Begrenzt auf „Schwach“: ' + deckel + ' (ohne Grenze ' + Math.round(scoreOhneDeckel) + '). ' : '') + explanation,
+      explanation: (_dk && scoreOhneDeckel > _dk.max ? 'Begrenzt auf höchstens ' + _dk.max + ': ' + deckel + ' (ohne Grenze ' + Math.round(scoreOhneDeckel) + '). ' : '') + explanation,
       configUsed: cfg,
       // V59: Vollständigkeit ausweisen — Konsumenten (UI) können Score "ausgrauen" wenn zu wenig Daten
       dataCompleteness: completeness,

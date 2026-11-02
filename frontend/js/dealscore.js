@@ -267,11 +267,13 @@ var DealScore = (function() {
        Deal nicht über „Schwach" heben, wenn die Miete den Kapitaldienst nicht trägt.
        DSCR unter 1,0 oder Cashflow nach Kapitaldienst (vor Steuern) unter null →
        höchstens 49 (Schwach). Beim Barkauf gibt es keinen Kapitaldienst - keine Grenze. */
-    var deckel = null;
-    if (!barkauf && dscr > 0 && dscr < 1.0) deckel = 'DSCR ' + dscr.toFixed(2).replace('.', ',') + ' unter 1,0 — die Miete trägt den Kapitaldienst nicht';
-    else if (!barkauf && K.cf_m != null && cf_m < 0) deckel = 'Cashflow ' + Math.round(cf_m) + ' €/Monat nach Kapitaldienst — die Miete trägt die Rate nicht';
+    /* v3070 · die Staffel steht in score-tiers.js (ScoreTier.dscrDeckel), eine Stelle für
+       beide Kerne. Darlehen über dem Marktwert: Marktwert = Kaufpreis + Wertpuffer. */
+    var _ueber = (K.wp_kpi != null && K.kp > 0 && ltv > 0) ? (ltv / 100 * K.kp > K.kp + Number(K.wp_kpi)) : null;
+    var _dk = (!barkauf && window.ScoreTier && window.ScoreTier.dscrDeckel) ? window.ScoreTier.dscrDeckel(dscr, _ueber) : null;
+    var deckel = _dk ? _dk.grund : null;
     var scoreOhneDeckel = score;
-    if (deckel && score > 49) score = 49;
+    if (_dk && score > _dk.max) score = _dk.max;
 
     var color, label;
     // V63.32: Score-Schwellen identisch zum Quick-Check (gleiche Farbskala für gleiche Werte)
@@ -292,7 +294,7 @@ var DealScore = (function() {
       color: color,
       label: label,
       breakdown: components,
-      interpretation: (deckel && scoreOhneDeckel > 49 ? 'Begrenzt auf „Schwach": ' + deckel + ' (ohne Grenze ' + scoreOhneDeckel + '). ' : '') + _interpret(score, components, K),
+      interpretation: (_dk && scoreOhneDeckel > _dk.max ? 'Begrenzt auf höchstens ' + _dk.max + ': ' + deckel + ' (ohne Grenze ' + scoreOhneDeckel + '). ' : '') + _interpret(score, components, K),
       weights: weights,
       deckel: deckel,   /* v3069 */
       score_ohne_deckel: scoreOhneDeckel
