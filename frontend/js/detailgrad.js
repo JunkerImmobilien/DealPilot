@@ -45,6 +45,23 @@
  *   feldZeigen(el)          hebt die Stufe, bis el sichtbar ist
  *   NAMEN, MB               Beschriftungen
  * Ereignis  window 'dp:detailgrad'  detail {stufe, alt}
+ *
+ * v3077 · Marcel 02.11.2026: „die Einstellung Einsteiger bis Profi soll in
+ * die Einstellungen und nicht in den Tab Objekt." Seitdem gilt der
+ * Detailgrad JE NUTZER (Merker dp_detailgrad_zuletzt), nicht mehr je
+ * Objekt. Der Schalter steht in Einstellungen › Mein Profil; im Reiter
+ * Objekt steht nur noch die Stufe mit dem Weg dorthin, über den Reitern
+ * gar nichts mehr. Das Objektfeld #dp_stufe wird weiter mitgeschrieben
+ * (der Marktbericht-Abruf liest es), entscheidet aber nichts mehr.
+ * Bestandsnutzer ohne Merker: das erste geöffnete Objekt setzt Experte
+ * (für sie ändert sich nichts), ein ganz neuer Nutzer startet Einsteiger
+ * bzw. mit seiner Wahl aus der Ersteinrichtung.
+ *
+ * v3077 · Die Datenaufnahme-Leiste (#obj-action-bar: DealPilot, Exposé,
+ * Sprache, ImmoMetrica, Geführte Eingabe) wird NIE ausgeblendet. Sie stand
+ * nicht in der Zuordnung, galt damit als Experte und war in Einsteiger und
+ * Fortgeschritten verschwunden — Marcel: „nur bei Stufe 3 ist die
+ * Datenaufnahme-Karte nutzbar".
  * ══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -59,6 +76,8 @@
      Deal-Aktion baut Tafeln (.dab-panel) und Bühnen (.da-stage). */
   var UNIVERSUM = { s8: '.dab-panel, .da-stage' };
   var FELD_SEL = 'input:not([type="hidden"]), select, textarea';
+  /* nie markieren: eigene Bausteine und die Datenaufnahme-Leiste (v3077) */
+  var NIE = '.dp-dg-weiter, [data-dp-detailgrad], #obj-action-bar';
 
   function gueltig(v) { var n = parseInt(v, 10); return (n >= 1 && n <= 3) ? n : null; }
   function lsGet() { try { return localStorage.getItem(LS); } catch (e) { return null; } }
@@ -79,18 +98,21 @@
   function feld() { return document.getElementById(FELD_ID); }
   var _stufe = null, _fluechtig = null;
 
+  /* v3077 · je Nutzer: Merker > zuletzt bestimmt > Einsteiger */
   function stufe() {
     if (_fluechtig) return _fluechtig;
-    var f = feld(), v = f && gueltig(f.value);
-    return v || _stufe || vorgabe();
+    return gueltig(lsGet()) || _stufe || 1;
   }
 
-  /* Objektwechsel: Feld des Objekts > Bestandsobjekt (Experte) > Vorgabe */
+  /* Objektwechsel: die Stufe des Nutzers gilt; das Objektfeld zieht nur
+     nach (ohne Speicherereignis). Bestandsnutzer ohne Merker: ein
+     geöffnetes Objekt macht sie zu Experten — einmal, dann gilt der Merker. */
   function ermitteln(key) {
     var vorher = stufe();
     _fluechtig = null;
-    var f = feld(), v = f && gueltig(f.value);
-    if (!v) { v = key ? 3 : vorgabe(); if (f) f.value = String(v); }
+    if (!gueltig(lsGet()) && key) lsSet(3);
+    var v = stufe(), f = feld();
+    if (f && f.value !== String(v)) f.value = String(v);
     _stufe = v;
     anwenden();
     if (v !== vorher) melden(vorher, v);
@@ -166,7 +188,7 @@
       });
     });
     var lvl = function (f) { return (f.id && feldStufe[f.id]) || 3; };
-    var felder = [].slice.call(sec.querySelectorAll(FELD_SEL)).filter(function (f) { return !f.closest('.dp-dg-weiter, [data-dp-detailgrad]'); });
+    var felder = [].slice.call(sec.querySelectorAll(FELD_SEL)).filter(function (f) { return !f.closest(NIE); });
 
     /* Behälter: jede Karte (und was im Reiter als Karte gilt) plus die
        gelisteten Bereiche. Ein Behälter erscheint so früh wie das früheste
@@ -174,6 +196,7 @@
        Feld wird nie von seiner Karte verschluckt. */
     var beh = [].slice.call(sec.querySelectorAll('.card' + (UNIVERSUM[id] ? ', ' + UNIVERSUM[id] : '')));
     expl.forEach(function (L, el) { if (beh.indexOf(el) < 0) beh.push(el); });
+    beh = beh.filter(function (b) { return !b.closest(NIE) && !b.querySelector('#obj-action-bar'); });
     var soll = new Map();
     beh.forEach(function (b) {
       var L = expl.has(b) ? expl.get(b) : 3;
@@ -225,7 +248,7 @@
     return String(f.value || '').trim() !== '';
   }
   function felderIn(root) {
-    return [].slice.call(root.querySelectorAll(FELD_SEL)).filter(function (f) { return !f.closest('.dp-dg-weiter, [data-dp-detailgrad]'); });
+    return [].slice.call(root.querySelectorAll(FELD_SEL)).filter(function (f) { return !f.closest(NIE); });
   }
 
   /* ── Fußzeile je Reiter: „+ n weitere Felder in …" ─────────────────── */
@@ -268,6 +291,9 @@
      ausserhalb des Bildes. Im Reiter Objekt steht der grosse Schalter in
      der Abrufleiste (index.html #oe-ziel), dort entfällt dieser. */
   function reiterSchalter() {
+    /* v3077 · aus: der Schalter steht in den Einstellungen (Marcel 02.11.2026) */
+    [].slice.call(document.querySelectorAll('[data-dp-detailgrad="reiter"]')).forEach(function (h) { h.remove(); });
+    return;
     REITER.forEach(function (id) {
       if (id === 's0') return;
       var sec = document.getElementById(id); if (!sec) return;
@@ -428,6 +454,20 @@
   document.addEventListener('click', function (e) {
     if (e.target && e.target.closest && e.target.closest('.tab[data-target-sec]')) setTimeout(anwenden, 60);
   });
+  /* v3077 · „ändern ›" im Reiter Objekt: Einstellungen › Mein Profil, zum Schalter */
+  document.addEventListener('click', function (e) {
+    if (!e.target || !e.target.closest || !e.target.closest('#oe-dg-einst')) return;
+    e.preventDefault();
+    try { if (typeof window.showSettings === 'function') window.showSettings(); } catch (_) {}
+    setTimeout(function () {
+      var t = document.querySelector('#settings-modal .st-tab[data-tab="standardwerte"]');
+      if (t && typeof window._swSet === 'function') window._swSet(t);
+      setTimeout(function () {
+        var h = document.querySelector('#settings-modal .dp-es-detailgrad');
+        if (h && h.scrollIntoView) h.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 120);
+    }, 80);
+  });
   window.addEventListener('dp:object-ready', function (e) {
     ermitteln((e && e.detail && e.detail.key) || window._currentObjKey || null);
   });
@@ -442,7 +482,7 @@
     stufe: stufe, setzen: setzen, anwenden: anwenden, ebene: ebene,
     ausgeblendet: ausgeblendet, feldZeigen: feldZeigen, NAMEN: NAMEN, MB: MB,
     annahmen: annahmen,   /* Investment-PDF (pdf.js) und Bankfassung (pdf-investment-bank.js) */
-    /* Vorgabe für NEUE Objekte (Ersteinrichtung, onboarding.js); ändert kein bestehendes Objekt */
-    vorgabeSetzen: function (n) { n = gueltig(n); if (n) lsSet(n); return n; }
+    /* Ersteinrichtung (onboarding.js): seit v3077 ist das die Stufe des Nutzers */
+    vorgabeSetzen: function (n) { n = gueltig(n); if (n) { lsSet(n); anwenden(); } return n; }
   };
 })();

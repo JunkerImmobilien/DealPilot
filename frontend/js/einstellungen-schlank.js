@@ -204,7 +204,18 @@
         box.className = 'dp-es-haltung';
         box.innerHTML = '<h3 class="ip-section">Deine Haltung</h3>' +
           '<p class="hint">Strategie und Risikoneigung gehen in die Pilot-Analyse ein und färben ihre Empfehlung — die Zahlen ändern sie nicht. Änderungen gelten sofort.</p>' +
-          '<div class="g2 dp-es-haltung-grid"></div>' + scoreZeileHtml();
+          '<div class="g2 dp-es-haltung-grid"></div>';
+        /* v3077 · Marcel 02.11.2026: die Zeile „Gewichtung anpassen ›" ist raus — der
+           Reiter Deal Score steht direkt daneben. Dafür steht hier der Detailgrad
+           (vorher im Reiter Objekt und über jedem Reiter). */
+        var dg = document.createElement('div');
+        dg.className = 'dp-es-detailgrad';
+        dg.innerHTML = '<h3 class="ip-section">Detailgrad der Eingabe</h3>' +
+          '<p class="hint">Wie viele Felder du in den Reitern siehst — gilt für alle Objekte. Einsteiger: die wichtigsten Felder, Marktbericht Stufe 1. ' +
+          'Fortgeschritten: dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II, Stufe 2. Experte: alle Felder und die Wertermittlung nach ImmoWertV, Stufe 3. ' +
+          'Ausgeblendete Felder behalten ihre Werte und rechnen weiter.</p>' +
+          '<div class="dp-dg-host" data-dp-detailgrad="einstellungen"></div>';
+        sw.insertBefore(dg, host);
         var grid = box.querySelector('.dp-es-haltung-grid');
         /* Risikoauswahl auf die Texte des Einrichtungsfensters bringen;
            ein gespeicherter Fremdtext bleibt als eigene Option stehen. */
@@ -219,10 +230,7 @@
         sw.insertBefore(box, host);
         strat.addEventListener('change', function () { profilSchreiben('ai_strat', strat.value); });
         risk.addEventListener('change', function () { profilSchreiben('ai_risk', risk.value); });
-        scoreZeileVerdrahten(box);
-        /* Ein Klick auf ein Anlegerprofil (standardwerte-karten.js) setzt
-           die Score-Vorlage sofort — die Zeile zieht nach. */
-        host.addEventListener('click', function () { setTimeout(function () { scoreZeileNeu(box); }, 150); });
+        try { if (window.DpDetailgrad) DpDetailgrad.anwenden(); } catch (e) {}
       }
       if (paramGrid) verstecke(paramGrid);
       /* Verkäufer/Markt: im Entwurf nicht mehr gezeigt — und damit das
