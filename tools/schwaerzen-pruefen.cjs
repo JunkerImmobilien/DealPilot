@@ -15,6 +15,9 @@ const FAELLE = [
   ['Müller, Erika, geb. 01.02.1960', '[Name], geb. [Datum]'],
   ['Fa. Rudolph (Dachdecker) 16.888,43 €', 'Fa. Rudolph (Dachdecker) 16.888,43 €'],
   ['Lübberstr. 12-20, 32052 Herford', 'Lübberstr. 12-20, 32052 Herford'],
+  ['dass sie und Familie Brinkmann zurzeit', 'dass sie und Familie [Name] zurzeit'],
+  ['Herr Hans Beispiel, Mindener Straße 56, 32049 Herford', 'Herr [Name], [Anschrift]'],
+  ['Objekt Sachsenstr. 16, 32052 Herford', 'Objekt Sachsenstr. 16, 32052 Herford'],
   ['IBAN DE89 3704 0044 0532 0130 00', 'IBAN [IBAN]']
 ];
 let rot = 0;

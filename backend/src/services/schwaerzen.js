@@ -74,6 +74,15 @@ const REGELN = [
   { name: 'anrede_kurz',
     re: new RegExp('\\b(Hr\\.|Fr\\.|Hrn\\.)\\s*' + W + '(?:\\s*/\\s*' + W + ')?', 'g'),
     ersatz: (m, p1) => p1 + ' [Name]' },
+  // v3089 · „Familie Brinkmann" (gemessen am echten Protokoll 2025, blieb stehen)
+  { name: 'familie',
+    re: new RegExp('\\b(Familie|Fam\\.)\\s+' + W + '(?:\\s*/\\s*' + W + ')?', 'g'),
+    ersatz: (m, p1) => p1 + ' [Name]' },
+  // v3089 · Privatanschrift direkt hinter einem geschwärzten Namen: „Herr [Name], Mindener Straße 56,
+  // 32049 Herford" (gemessen an einer echten Teilungserklärung). Läuft NACH den Namensregeln.
+  { name: 'anschrift_nach_name',
+    re: /(\[Name\]),\s*[A-ZÄÖÜ][^,\n]{2,40}?\s\d+\s?[a-zA-Z]?(?:\s*-\s*\d+)?,\s*\d{5}\s+[A-ZÄÖÜ][A-Za-zäöüß.\- ]{1,40}/g,
+    ersatz: (m, p1) => p1 + ', [Anschrift]' },
   // Anschrift einer Person
   { name: 'wohnhaft',
     re: /\b(wohnhaft(?:\s+in)?)\s+[^\n;]{3,80}?(?=[;\n]|,\s*(?:und|als|nachstehend|im Folgenden)|$)/gi,
