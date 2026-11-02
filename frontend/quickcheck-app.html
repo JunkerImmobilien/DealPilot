@@ -3659,7 +3659,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   <div class="card">
     <div class="card-title">
       <span class="card-title-ic" id="ico-grp-zustand"></span>
-      <span>Zustand und Mietpotenzial <span class="hint" style="font-style:italic">— optional</span></span>
+      <span>Zustand und Sanierung <span class="hint" style="font-style:italic">— optional</span></span>
     </div>
     <div class="row row-2">
       <div class="field">
@@ -3678,27 +3678,10 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <span class="hint">Zählen zur Gesamtinvestition (Rendite, Darlehen, Zielkaufpreis)</span>
       </div>
     </div>
-    <div class="row row-3" style="margin-top:10px">
-      <div class="field">
-        <label for="qc_vgl_qm">Vergleichsmiete (€/m²)</label>
-        <input type="text" id="qc_vgl_qm" placeholder="z. B. 7,20" inputmode="decimal" autocomplete="off">
-        <span class="hint">Ortsübliche Miete (Mietspiegel), nicht die Angebotsmiete</span>
-      </div>
-      <div class="field">
-        <label for="qc_mv_letzte">Letzte Mieterhöhung</label>
-        <input type="text" id="qc_mv_letzte" placeholder="MM/JJJJ" inputmode="numeric" autocomplete="off">
-        <span class="hint">Für die Sperrfrist (§ 558 Abs. 1 BGB)</span>
-      </div>
-      <div class="field">
-        <label for="qc_kappung">Kappungsgrenze</label>
-        <select id="qc_kappung">
-          <option value="">automatisch (Gemeinde)</option>
-          <option value="15">15 % in 3 Jahren</option>
-          <option value="20">20 % in 3 Jahren</option>
-        </select>
-        <span class="hint" id="qc-kappung-hint">Aus PLZ und Ort (Landesverordnungen)</span>
-      </div>
-    </div>
+    <!-- v3081d · Marcel 02.11.2026: „die Felder sollen raus — Abgleich nur mit Werten, die wir haben und über
+         Schnittstellen bekommen.“ Vergleichsmiete, letzte Mieterhöhung und Kappungsgrenze sind ausgebaut;
+         Kappung und Mietpreisbremse kommen aus den Landesverordnungen (PLZ/Ort), die Vergleichsgröße ist die
+         Marktmiete der DealPilot-Bewertung (_qcMietpotenzial). -->
   </div>
 
   <!-- Bewirtschaftung -->
@@ -4020,7 +4003,7 @@ const QcEngine = (function() {
        `zustand` traegt die Werte des Hauptformulars (ds2_zustand), `san` heisst wie dort;
        qc-save schreibt sie als qc_<id>, quick-check.js uebernimmt sie ins Objekt. */
     { id: 'zustand', required: false }, { id: 'san', required: false },
-    { id: 'vgl_qm', required: false }, { id: 'mv_letzte', required: false }, { id: 'kappung', required: false }
+    /* v3081d: vgl_qm, mv_letzte, kappung ausgebaut */
   ];
   function num(v) {
     if (v == null || v === '') return null;
@@ -5861,20 +5844,41 @@ const QcApp = (function() {
       }
     } catch (_) {}
 
-    /* 4 · Angesetzte Miete mit Herkunft */
+    /* 4 · Miete: Ansatz, Herkunft und Potenzial (v3081d: nur eigene Werte, keine Eingabefelder) */
     if (nkm > 0) {
-      const ausMb = !!(mm && ['low', 'med', 'high'].some(x => Math.round(mm[x]) === Math.round(nkm)));
       let mp = null; try { mp = window._qcMietpotenzial ? window._qcMietpotenzial(inputs, null) : null; } catch (_) {}
-      const q = [];
-      if (ausMb) q.push('Marktmiete: DealPilot-Marktbewertung');
       const link = (t, u) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>` : esc(t);
-      if (mp && mp.bremse) q.push(mp.bremse.gilt === true ? 'Mietpreisbremse gilt — ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) + (mp.bremse.bis ? ', bis ' + mp.bremse.bis.split('-').reverse().join('.') : '')
-        : mp.bremse.gilt === false ? 'keine Mietpreisbremse — die Gemeinde steht nicht in der ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) : esc(mp.bremse.text || ''));
-      if (mp && mp.kapp) q.push(ausMb
-        ? 'spätere Erhöhungen: höchstens ' + mp.kapp.pct + ' % in drei Jahren (§ 558 Abs. 3 BGB), frühestens 15 Monate nach Mietbeginn'
-        : 'Kappungsgrenze ' + mp.kapp.pct + ' % in drei Jahren (' + (mp.kapp.herkunft === 'verordnung' ? link(mp.kapp.verordnung || 'Landesverordnung', mp.kapp.url) : '§ 558 Abs. 3 Satz 1 BGB') + ')');
-      h += `<div class="qcb-box qcb-miete"><span><span class="qcb-l">Angesetzte Miete</span><br>${ausMb ? 'Keine Ist-Miete angegeben — gerechnet wird mit der Marktmiete bei Neuvermietung.' : 'Deine Angabe (Ist-Miete).'}</span>`
-        + `<span class="v">${e0(nkm)} / Monat${wfl > 0 ? `<br><small style="font:500 12px Inter,sans-serif;color:#7A7370">${(nkm / wfl).toFixed(2).replace('.', ',')} €/m² kalt</small>` : ''}</span>`
+      const qm = x => (x / (wfl || 1)).toFixed(2).replace('.', ',') + ' €/m²';
+      const leer = !!(mp && mp.leer);
+      const q = [];
+      if (mp && mp.bremse) q.push(mp.bremse.gilt === true
+        ? 'Mietpreisbremse gilt — ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) + ': bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); einen Mietspiegelwert haben wir für den Ort nicht, vor Vertragsschluss prüfen'
+        : mp.bremse.gilt === false ? 'keine Mietpreisbremse — die Gemeinde steht nicht in der ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url)
+        : esc(mp.bremse.text || ''));
+      if (mp && mp.kapp) q.push('Kappungsgrenze ' + mp.kapp.pct + ' % in drei Jahren (' + (mp.kapp.herkunft === 'verordnung' ? link(mp.kapp.verordnung || 'Landesverordnung', mp.kapp.url) : 'gesetzlich, § 558 Abs. 3 Satz 1 BGB') + ')');
+      let kopfT, pot = '';
+      if (leer) {
+        kopfT = 'Keine Ist-Miete — die Wohnung gilt als frei. Angesetzt ist die Zielmiete bei Neuvermietung: die Marktmiete der DealPilot-Bewertung.';
+        q.push('spätere Erhöhungen frühestens 15 Monate nach Mietbeginn');
+      } else {
+        kopfT = 'Deine Ist-Miete, abgeglichen mit der Marktmiete der DealPilot-Bewertung'
+          + (mp && mp.markt_monat > 0 ? ' (' + e0(mp.markt_monat) + ', ' + qm(mp.markt_monat) + ')' : '')
+          + ' als Annahme für die ortsübliche Miete.';
+        const z = mp && mp.zul;
+        const grundM = QcEngine.num(inputs.nkm_grund) > 0 ? Math.min(QcEngine.num(inputs.nkm_grund), nkm) : nkm;
+        if (z && z.miete_monat > 0) {
+          if (z.grund === 'vergleichsmiete_erreicht') pot = 'Die Ist-Miete liegt schon an der Marktmiete — Erhöhungsspielraum nach § 558 BGB sehen wir nicht.';
+          else if (z.miete_monat - grundM > 0.5) pot = 'In drei Jahren zulässig: <b>' + e0(mp.nkm_3j) + '</b> (+' + String(Math.round(z.plus_pct * 10) / 10).replace('.', ',') + ' %) — begrenzt durch '
+            + (z.grund === 'kappung' ? 'die Kappungsgrenze' : 'die Marktmiete') + '. Ob die letzte Erhöhung länger als 15 Monate zurückliegt, prüfen.';
+        } else if (!(mp && mp.markt_monat > 0)) {
+          pot = 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
+        }
+        if (mp && mp.markt_monat > 0 && mp.markt_monat > nkm + 0.5) pot += (pot ? ' ' : '') + 'Bei Neuvermietung: ' + e0(mp.markt_monat) + '.';
+        if (mp && mp.markt_monat > 0 && mp.markt_monat < nkm * 0.9) pot += (pot ? ' ' : '') + 'Die Ist-Miete liegt über der Marktmiete — Risiko bei Mieterwechsel.';
+      }
+      h += `<div class="qcb-box qcb-miete"><span><span class="qcb-l">Angesetzte Miete</span><br>${kopfT}</span>`
+        + `<span class="v">${e0(nkm)} / Monat${wfl > 0 ? `<br><small style="font:500 12px Inter,sans-serif;color:#7A7370">${qm(nkm)} kalt</small>` : ''}</span>`
+        + (pot ? `<p class="qcb-fuss" style="color:#2A2727;font-size:12.5px">${pot}</p>` : '')
         + (q.length ? `<p class="qcb-fuss">${q.join(' · ')}.</p>` : '') + `</div>`;
     }
 
@@ -8023,14 +8027,22 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var plz = String(i.plz||'').trim(), land = null;
     try { var P=_par(), G=(P&&P.DealPilotGrest)||window.DealPilotGrest; if (plz.length===5&&G&&G.forPlz) { var g=G.forPlz(plz); land=(g&&g.bundesland)||null; } } catch (e) {}
     var D = _kappDaten(), ort = { land:land, ort:i.ort };
-    var kapp = Km.kappungAus(D, ort, { eigen_pct:n(i.kappung) });
+    var kapp = Km.kappungAus(D, ort, {});
     var bremse = Km.mietpreisbremseAus(D, ort);
-    var zul = Km.zulaessig({ ist:grund, wfl:wfl, vgl_qm:(n(i.vgl_qm)||null), kappung_pct:kapp.pct, letzte:_ym(i.mv_letzte) });
-    /* Marktmiete aus der Marktpreisindikation (€/Monat fuer die ganze Flaeche) - eigene Zeile */
-    var mm = 0;
-    try { mm = Number(avm && (avm.marktmiete || avm.marktmieteCold)) || 0; } catch (e) {}
-    var neu = (mm>0 && wfl>0) ? Km.neuvermietung({ markt_qm:mm/wfl, wfl:wfl, vgl_qm:n(i.vgl_qm), bremse:bremse }) : null;
-    return { kapp:kapp, bremse:bremse, zul:zul, neu:neu, zusatz:zusatz,
+    /* v3081d · Marcel 02.11.2026: keine Eingabefelder mehr - Abgleich nur mit Werten, die wir haben.
+       Vergleichsgroesse ist die Marktmiete der DealPilot-Bewertung (Mitte der Spanne, #_mb_state),
+       sonst die eines Bewertungspartners. Sie steht fuer die ortsuebliche Miete und ist als solche
+       ANNAHME gekennzeichnet (vgl_quelle). Eine Wohnung ohne Ist-Miete (die Miete im Feld IST die
+       Marktmiete der Bewertung) gilt als frei: ihr Potenzial ist die Zielmiete bei Neuvermietung. */
+    var mm = 0, mmSpanne = null;
+    try { var _st = JSON.parse((document.getElementById('_mb_state')||{}).value||'null'); if (_st && _st.card && _st.card.mm) { mmSpanne = _st.card.mm; mm = Number(_st.card.mm.med)||0; } } catch (e) {}
+    if (!(mm>0)) { try { mm = Number(avm && (avm.marktmiete || avm.marktmieteCold)) || 0; } catch (e) {} }
+    var leer = !!(mmSpanne && ['low','med','high'].some(function(x){ return Math.abs(Number(mmSpanne[x]||0) - nkm) < 1; }));
+    var vglQm = (mm>0 && wfl>0) ? Math.round(mm/wfl*100)/100 : null;
+    var zul = leer ? null : Km.zulaessig({ ist:grund, wfl:wfl, vgl_qm:vglQm, kappung_pct:kapp.pct, letzte:null });
+    var neu = (mm>0 && wfl>0) ? Km.neuvermietung({ markt_qm:mm/wfl, wfl:wfl, vgl_qm:null, bremse:bremse }) : null;
+    return { kapp:kapp, bremse:bremse, zul:zul, neu:neu, zusatz:zusatz, leer:leer, markt_monat:mm, vgl_qm:vglQm,
+      vgl_quelle:(vglQm ? 'marktbewertung' : null),
       nkm_heute:nkm, nkm_3j:(zul && zul.miete_monat>0 ? zul.miete_monat : grund) + zusatz };
   };
 
