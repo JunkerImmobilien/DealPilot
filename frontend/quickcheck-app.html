@@ -3586,9 +3586,18 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
           <option>D</option><option>E</option><option>F</option><option>G</option><option>H</option>
         </select>
       </div>
+      <!-- v3090 · Marcel 02.11.2026: das Textfeld „Stellplatz (Tiefgarage / Außen)" rechnete nirgends mit -
+           gerechnet wird mit „Stellplatz (€)" unter den Mieteinnahmen. Versteckt behalten: der Exposé-Import
+           schreibt es weiter als Notiz ins Objekt (quick-check.js). Der Zustand kommt an diese Stelle. -->
+      <input type="hidden" id="qc_stellplatz" value="">
       <div class="field">
-        <label for="qc_stellplatz">Stellplatz</label>
-        <input type="text" id="qc_stellplatz" placeholder="Tiefgarage / Außen" autocomplete="off">
+        <label for="qc_zustand">Zustand</label>
+        <select id="qc_zustand">
+          <option value="">– keine Angabe</option>
+          <option value="gut">gut</option>
+          <option value="normal">mittel</option>
+          <option value="stark_sanierungsbeduerftig">sanierungsbedürftig</option>
+        </select>
       </div>
       <!-- ══ v1956 · DIE LAGEKLASSE ═══════════════════════════════════════
            Marcel am 07.10.2026: „beim Quick-Check kann man dann angeben, ob
@@ -3651,38 +3660,8 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     </div>
   </div>
 
-  <!-- ══ v3075 · ZUSTAND UND MIETPOTENZIAL (P1, Marcel 02.11.2026) ═══════════
-       Ersteinschaetzung „lohnt sich ein genauer Blick?": Sanierung in die
-       Gesamtinvestition, Zustand ins Urteil, und die Miete, die in drei Jahren
-       RECHTLICH verlangt werden darf (js/mietpotenzial-kern.js) - nie die
-       Angebotsmiete. Alles optional; leer rechnet wie bisher. -->
-  <div class="card">
-    <div class="card-title">
-      <span class="card-title-ic" id="ico-grp-zustand"></span>
-      <span>Zustand und Sanierung <span class="hint" style="font-style:italic">— optional</span></span>
-    </div>
-    <div class="row row-2">
-      <div class="field">
-        <label for="qc_zustand">Zustand</label>
-        <select id="qc_zustand">
-          <option value="">– keine Angabe</option>
-          <option value="gut">gut</option>
-          <option value="normal">mittel</option>
-          <option value="stark_sanierungsbeduerftig">sanierungsbedürftig</option>
-        </select>
-        <span class="hint">Sanierungsbedürftig: Urteil höchstens „Solide"</span>
-      </div>
-      <div class="field">
-        <label for="qc_san">Sanierungskosten (€)</label>
-        <input type="text" id="qc_san" placeholder="0" inputmode="decimal" autocomplete="off">
-        <span class="hint">Zählen zur Gesamtinvestition (Rendite, Darlehen, Zielkaufpreis)</span>
-      </div>
-    </div>
-    <!-- v3081d · Marcel 02.11.2026: „die Felder sollen raus — Abgleich nur mit Werten, die wir haben und über
-         Schnittstellen bekommen.“ Vergleichsmiete, letzte Mieterhöhung und Kappungsgrenze sind ausgebaut;
-         Kappung und Mietpreisbremse kommen aus den Landesverordnungen (PLZ/Ort), die Vergleichsgröße ist die
-         Marktmiete der DealPilot-Bewertung (_qcMietpotenzial). -->
-  </div>
+  <!-- v3090 · die Karte „Zustand und Sanierung" (v3075) ist aufgelöst: Zustand steht in den Objektdaten,
+       die Sanierungskosten unter dem Kaufpreis. -->
 
   <!-- Bewirtschaftung -->
   <div class="card">
@@ -3749,6 +3728,16 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <label class="req" for="qc_tilg">Tilgung (%)</label>
         <input type="text" id="qc_tilg" name="qcfin_tilg" placeholder="1,5" inputmode="decimal" autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore data-bwignore readonly onfocus="this.removeAttribute('readonly')">
         <span class="hint">Standardannahme – anpassbar</span>
+      </div>
+    </div>
+    <!-- v3090 · Marcel: „die Sanierungskosten könnten raus … einfach auf den Kaufpreis schlagen". Nicht auf den
+         Kaufpreis: Grunderwerbsteuer, Notar und Faktor würden dann auf die Sanierung gerechnet. Deshalb eine
+         eigene Zeile direkt darunter - sie zählt zur Gesamtinvestition (ohne Nebenkosten) und zur Zustand-Grenze. -->
+    <div class="row row-4" style="margin-top:10px">
+      <div class="field">
+        <label for="qc_san">+ Sanierung (€) <span class="hint" style="font-style:italic">optional</span></label>
+        <input type="text" id="qc_san" placeholder="0" inputmode="decimal" autocomplete="off">
+        <span class="hint">ohne Nebenkosten · ab 10 % des Kaufpreises begrenzt sie das Urteil</span>
       </div>
     </div>
   </div>
@@ -4283,7 +4272,7 @@ const QcApp = (function() {
     _setIcon('ico-grp-obj', 'file', { size: 14 });
     _setIcon('ico-grp-miete', 'wallet', { size: 14 });
     _setIcon('ico-grp-bewirt', 'coins', { size: 14 });
-    _setIcon('ico-grp-zustand', 'home', { size: 14 });   /* v3075 */
+    /* v3090: ico-grp-zustand entfällt mit der Karte */
     _setIcon('ico-grp-fin', 'bank', { size: 14 });
     _setIcon('ico-grp-photo', 'camera', { size: 14 });
     _setIcon('ai-icon', 'chart', { size: 20, stroke:'#fff' }); /* v893p-icons: kein Sparkle */
