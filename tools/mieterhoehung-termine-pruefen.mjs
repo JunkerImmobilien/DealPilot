@@ -56,6 +56,8 @@ const dokument = {
 };
 fenster.window = fenster; fenster.document = dokument;
 const ctx = vm.createContext(Object.assign(fenster, { Date: FestDate, console, Math, JSON, Number, String, Object, Array, isFinite, parseFloat, parseInt, RegExp, Promise }));
+/* v3075: die Regeln liegen in js/mietpotenzial-kern.js - er wird wie in index.html VOR potenzial.js geladen */
+vm.runInContext(fs.readFileSync(path.join(WURZEL, 'frontend/js/mietpotenzial-kern.js'), 'utf8'), ctx, { filename: 'mietpotenzial-kern.js' });
 vm.runInContext(fs.readFileSync(QUELLE_FE, 'utf8'), ctx, { filename: 'potenzial.js' });
 const P = ctx.DpPotenzial;
 if (!P || !P.mhTermine) { console.log('ABBRUCH: DpPotenzial.mhTermine fehlt'); process.exit(2); }

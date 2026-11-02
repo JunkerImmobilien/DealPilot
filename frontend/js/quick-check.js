@@ -212,6 +212,37 @@
     return { abs: kp * (knkP - gestP) / 100 + grest, grest: grest, inv: Math.min(kp, inv) };
   }
 
+  /* ══ v3075 · ZULAESSIGES MIETPOTENZIAL FUER DEN SCORE ══════════════════
+     Dieselbe Rechnung wie im Quick-Check-iframe (_qcMietpotenzial) und im Objekt
+     (potenzial.js): js/mietpotenzial-kern.js. Die Liste der Landesverordnungen
+     liegt bei potenzial.js (kappungDaten); ohne sie gilt das Gesetz (20 %). */
+  function _qcMietPotPct(v, n, nkm) {
+    try {
+      var K = window.DpMietpotenzial;
+      if (!K || !(nkm > 0)) return null;
+      var D = (window.DpPotenzial && DpPotenzial.kappungDaten) ? DpPotenzial.kappungDaten() : null;
+      var plz = String(v('qc_plz') || '').trim(), land = null;
+      if (plz.length === 5 && window.DealPilotGrest && DealPilotGrest.forPlz) { var g = DealPilotGrest.forPlz(plz); land = (g && g.bundesland) || null; }
+      var kapp = K.kappungAus(D, { land: land, ort: v('qc_ort') }, { eigen_pct: n('qc_kappung') });
+      var grund = n('qc_nkm_grund') > 0 ? Math.min(n('qc_nkm_grund'), nkm) : nkm;
+      var lz = String(v('qc_mv_letzte') || '').trim(), m = /^(\d{1,2})[.\/](\d{4})$/.exec(lz) || null;
+      var z = K.zulaessig({ ist: grund, wfl: n('qc_wfl'), vgl_qm: n('qc_vgl_qm') || null, kappung_pct: kapp.pct,
+        letzte: m ? m[2] + '-' + String(+m[1]).padStart(2, '0') : (/^\d{4}-\d{2}/.test(lz) ? lz.slice(0, 7) : null) });
+      return (z && z.grund && z.grund !== 'keine_miete' && z.grund !== 'vertrag') ? z.plus_pct : null;
+    } catch (e) { return null; }
+  }
+  /* v3075 · versteckte Traeger fuer die neuen Quick-Check-Felder. qc-bridge.js schreibt
+     jeden Eingabewert des iframes nach qc_<id> - aber nur, wo es das Feld gibt. Hier
+     angelegt statt in qc-bridge.js, damit die Bruecke unberuehrt bleibt. */
+  function _qcTraegerAnlegen() {
+    ['qc_zustand', 'qc_san', 'qc_vgl_qm', 'qc_mv_letzte', 'qc_kappung'].forEach(function (id) {
+      if (document.getElementById(id) || !document.body) return;
+      var e = document.createElement('input'); e.type = 'hidden'; e.id = id; e.value = '';
+      (document.getElementById('qc-carrier') || document.body).appendChild(e);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _qcTraegerAnlegen); else _qcTraegerAnlegen();
+
   function qcCalc() {
     function v(id) { var e = document.getElementById(id); return e ? e.value : ''; }
     function n(id) { return (typeof parseDe === 'function') ? parseDe(v(id)) : (parseFloat((v(id)||'').replace(',', '.')) || 0); }
@@ -646,7 +677,12 @@
           ltv: ltvPct,
           dscr: dscr,
           wp_kpi: wpEstimate,
-          mstg: 1.5,
+          /* v3075 · hier stand `mstg: 1.5` - der Bonus im Kern verlangt > 1,5 und kam
+             nie. Jetzt die rechtlich zulaessige Steigerung der Bestandsmiete in drei
+             Jahren (js/mietpotenzial-kern.js), dazu Zustand und Sanierung. */
+          miet_potenzial_pct: _qcMietPotPct(v, n, nkm),
+          zustand: v('qc_zustand') || null,
+          san: n('qc_san') || 0,
           /* v2141: Marcel am 12.10.2026: "das mit dem score muss aber
              auch beim quickcheck passen und auch beim investor deal
              score. also in der gesamten app."
@@ -1833,7 +1869,12 @@
       bewirt_mode:  v('qc_bewirt_mode') || 'hg',
       bewirt_period: v('qc_bewirt_period') || 'y',     // V63.24
       nul_raw:      n('qc_nul'),
-      ul_raw:       n('qc_ul')
+      ul_raw:       n('qc_ul'),
+      /* v3075 · Zustand, Sanierung, Vergleichsmiete, letzte Erhoehung aus dem Quick-Check */
+      zustand:      v('qc_zustand'),
+      san:          n('qc_san'),
+      vgl_qm:       n('qc_vgl_qm'),
+      mv_letzte:    v('qc_mv_letzte')
     };
 
     if (!snapshot.kp || !snapshot.nkm) {
@@ -1975,7 +2016,8 @@
         }
       } catch (e) {}
       var _nkP = _pz('makler_p') + _pz('notar_p') + _pz('gba_p') + _pz('ji_p') + _gest;
-      var darlehen = Math.max(0, snapshot.kp * (1 + _nkP / 100) - snapshot.ek);
+      /* v3075 · die Sanierung gehoert zur Gesamtinvestition - wie im Quick-Check traegt das Darlehen sie, soweit das Eigenkapital es nicht tut */
+      var darlehen = Math.max(0, snapshot.kp * (1 + _nkP / 100) + (snapshot.san > 0 ? snapshot.san : 0) - snapshot.ek);
       set('d1', String(Math.round(darlehen)));
     }
 
@@ -2098,8 +2140,23 @@
     // V63.32 KRITISCHER FIX: san und moebl explizit auf 0 setzen.
     // calc.js Z.433: gi = kp + nk + san + moebl. Wenn san/moebl vom Demo-Datensatz
     // oder vorherigen Objekt befüllt sind, wird GI größer als im QC angezeigt → NMR/LTV stimmen nicht.
-    set('san',   '0');
+    /* v3075 · die Sanierungskosten aus dem Quick-Check gehen mit (Feld `san`, wie dort);
+       ohne Angabe bleibt die 0 aus V63.32. */
+    set('san',   snapshot.san > 0 ? String(Math.round(snapshot.san)) : '0');
     set('moebl', '0');
+    /* v3075 · Zustand (dieselben Werte wie ds2_zustand), Vergleichsmiete (§ 558, Tab
+       Investition) und letzte Mieterhoehung (Mietvertrag, Datumsfeld) */
+    var _zOk = { neubau: 1, gut: 1, normal: 1, renovierungsbeduerftig: 1, stark_sanierungsbeduerftig: 1 };
+    if (snapshot.zustand && _zOk[snapshot.zustand]) {
+      set('ds2_zustand', snapshot.zustand);
+      try { var _zs = document.getElementById('ds2_zustand'); if (_zs) _zs.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    }
+    if (snapshot.vgl_qm > 0) set('zb_vgl_qm', snapshot.vgl_qm.toFixed(2).replace('.', ','));
+    (function () {
+      var s = String(snapshot.mv_letzte || '').trim(), m = /^(\d{1,2})[.\/](\d{4})$/.exec(s);
+      var ym = m ? m[2] + '-' + String(+m[1]).padStart(2, '0') : (/^\d{4}-\d{2}/.test(s) ? s.slice(0, 7) : null);
+      if (ym) set('mv_letzte_erhoehung', ym + '-01');
+    })();
     // V63.32: ze (Zusatzeinnahmen) auf 0 wenn keine Komponenten — sonst Demo-Wert ze=90
     if (!qcZusatz) {
       set('ze', '0');

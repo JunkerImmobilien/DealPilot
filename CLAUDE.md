@@ -268,6 +268,7 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `rnd-eingabe-pruefen.mjs` | Abbildung Objekt → RND-Eingabe (GND, Punkte, Zustand), Alter ≥ GND rechnet wie Alter = GND (v2939) |
 | `zielurteil-pruefen.mjs` | Wort und Ampel der Lageklasse, 409 Fälle |
 | `beleg-leser-pruefen.mjs` | Ämter-Belegprüfung, 79 Fälle, läuft auch im Container |
+| `mietpotenzial-pruefen.mjs` | zulässige Bestandsmiete nach 3 J. (`js/mietpotenzial-kern.js`: Kappung, Vergleichsmiete, Sperrfrist, Bremse), Zielkaufpreis zweistufig gegen Marcels Beispiel (180.000 / 8 % → 135.000, 162.000 bzw. 155.250 €), `potenzial.js` = Kern über 5.796 Fälle (Prüfsumme; `--alt=<alte potenzial.js>` Fall für Fall), Mietpotenzial-Bonus und Zustand-Grenze in `dealscore.js`, Rechenwege von `kategorien()` (v3075) |
 | `buster-ebenen-pruefen.mjs` | Cache-Buster über alle fünf Dokumente |
 | `objekt-mapper-pruefen.mjs` | Empfindlichkeit der Reiter-Objekt-Felder |
 | `prompt-lecks-pruefen.mjs` | 88 Felder kommen im Prompt an |

@@ -3642,6 +3642,56 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     </div>
   </div>
 
+  <!-- ══ v3075 · ZUSTAND UND MIETPOTENZIAL (P1, Marcel 02.11.2026) ═══════════
+       Ersteinschaetzung „lohnt sich ein genauer Blick?": Sanierung in die
+       Gesamtinvestition, Zustand ins Urteil, und die Miete, die in drei Jahren
+       RECHTLICH verlangt werden darf (js/mietpotenzial-kern.js) - nie die
+       Angebotsmiete. Alles optional; leer rechnet wie bisher. -->
+  <div class="card">
+    <div class="card-title">
+      <span class="card-title-ic" id="ico-grp-zustand"></span>
+      <span>Zustand und Mietpotenzial <span class="hint" style="font-style:italic">— optional</span></span>
+    </div>
+    <div class="row row-2">
+      <div class="field">
+        <label for="qc_zustand">Zustand</label>
+        <select id="qc_zustand">
+          <option value="">– keine Angabe</option>
+          <option value="gut">gut</option>
+          <option value="normal">mittel</option>
+          <option value="stark_sanierungsbeduerftig">sanierungsbedürftig</option>
+        </select>
+        <span class="hint">Sanierungsbedürftig: Urteil höchstens „Solide"</span>
+      </div>
+      <div class="field">
+        <label for="qc_san">Sanierungskosten (€)</label>
+        <input type="text" id="qc_san" placeholder="0" inputmode="decimal" autocomplete="off">
+        <span class="hint">Zählen zur Gesamtinvestition (Rendite, Darlehen, Zielkaufpreis)</span>
+      </div>
+    </div>
+    <div class="row row-3" style="margin-top:10px">
+      <div class="field">
+        <label for="qc_vgl_qm">Vergleichsmiete (€/m²)</label>
+        <input type="text" id="qc_vgl_qm" placeholder="z. B. 7,20" inputmode="decimal" autocomplete="off">
+        <span class="hint">Ortsübliche Miete (Mietspiegel), nicht die Angebotsmiete</span>
+      </div>
+      <div class="field">
+        <label for="qc_mv_letzte">Letzte Mieterhöhung</label>
+        <input type="text" id="qc_mv_letzte" placeholder="MM/JJJJ" inputmode="numeric" autocomplete="off">
+        <span class="hint">Für die Sperrfrist (§ 558 Abs. 1 BGB)</span>
+      </div>
+      <div class="field">
+        <label for="qc_kappung">Kappungsgrenze</label>
+        <select id="qc_kappung">
+          <option value="">automatisch (Gemeinde)</option>
+          <option value="15">15 % in 3 Jahren</option>
+          <option value="20">20 % in 3 Jahren</option>
+        </select>
+        <span class="hint" id="qc-kappung-hint">Aus PLZ und Ort (Landesverordnungen)</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Bewirtschaftung -->
   <div class="card">
     <div class="card-title">
@@ -3756,6 +3806,8 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <ul id="ai-cons"></ul>
       </div>
     </div>
+    <!-- v3075 · Mietpotenzial (rechtlich zulässig) und Zielkaufpreis zweistufig -->
+    <div id="ai-mietpotenzial-host"></div>
     <!-- Marktcheck (nur sichtbar wenn Sprengnetter-Daten vorhanden) -->
     <div id="ai-marktcheck-host"></div>
     <div class="ai-opinion">
@@ -3954,7 +4006,12 @@ const QcEngine = (function() {
     { id: 'lageklasse', required: false },
     /* qc-v2546a: die wirksamen Kaufnebenkosten-Saetze (GrESt;Notar;Grundbuch;
        Makler;Sonstige) - versteckt, damit die Abwahl ins Objekt durchgeht. */
-    { id: 'knk_teile', required: false }
+    { id: 'knk_teile', required: false },
+    /* v3075 · P1 (Marcel 02.11.2026): Zustand, Sanierung und Mietpotenzial - alle frei.
+       `zustand` traegt die Werte des Hauptformulars (ds2_zustand), `san` heisst wie dort;
+       qc-save schreibt sie als qc_<id>, quick-check.js uebernimmt sie ins Objekt. */
+    { id: 'zustand', required: false }, { id: 'san', required: false },
+    { id: 'vgl_qm', required: false }, { id: 'mv_letzte', required: false }, { id: 'kappung', required: false }
   ];
   function num(v) {
     if (v == null || v === '') return null;
@@ -4222,6 +4279,7 @@ const QcApp = (function() {
     _setIcon('ico-grp-obj', 'file', { size: 14 });
     _setIcon('ico-grp-miete', 'wallet', { size: 14 });
     _setIcon('ico-grp-bewirt', 'coins', { size: 14 });
+    _setIcon('ico-grp-zustand', 'home', { size: 14 });   /* v3075 */
     _setIcon('ico-grp-fin', 'bank', { size: 14 });
     _setIcon('ico-grp-photo', 'camera', { size: 14 });
     _setIcon('ai-icon', 'chart', { size: 20, stroke:'#fff' }); /* v893p-icons: kein Sparkle */
@@ -4660,7 +4718,8 @@ const QcApp = (function() {
     var zins = QcEngine.num(inputs.zins) || 3.8;
     var tilg = QcEngine.num(inputs.tilg) || 1.5;
     var nkm  = QcEngine.num(inputs.nkm);
-    var knk  = k.gesamt - kp;
+    var san  = k.san > 0 ? k.san : 0;   /* v3075 */
+    var knk  = k.gesamt - kp - san;
 
     var z = [
       ['Kaufpreis', eur(kp), ''],
@@ -4671,7 +4730,7 @@ const QcApp = (function() {
       return Object.keys(L).filter(function (x) { return T[x] > 0; }).map(function (x) {
         return ['&nbsp;&nbsp;davon ' + L[x] + ' (' + pct(T[x]) + ')', eur(kp * T[x] / 100), ''];
       });
-    })()).concat([
+    })()).concat(san > 0 ? [['+ Sanierungskosten', eur(san), '']] : []).concat([
       ['= Gesamtinvestition', eur(k.gesamt), 'stark'],
       ['– Eigenkapital', eur(k.ekValue), ''],
       ['= Darlehen', eur(k.darlehen) + ' @ ' + pct(zins) + ' / ' + pct(tilg) + ' Tilg.', 'stark'],
@@ -5528,7 +5587,8 @@ const QcApp = (function() {
 
       const nkmCurrent = QcEngine.num(inputs.nkm);
       if (nkmCurrent && avmMieteForCheck && avmMieteForCheck > nkmCurrent * 1.10) {
-        pros.push(`Bestandsmiete <strong>${Math.round((avmMieteForCheck/nkmCurrent - 1) * 100)}% unter Marktmiete</strong> — Mietsteigerungspotenzial`);
+        /* v3075 · Angebots-/Marktmiete und zulaessige Bestandsmiete nie gleichsetzen (Marcel 02.11.2026) */
+        pros.push(`Marktmiete <strong>${Math.round((avmMieteForCheck/nkmCurrent - 1) * 100)}% über der Bestandsmiete</strong> — Potenzial bei Neuvermietung; im Bestand gilt die Kappungsgrenze (siehe Mietpotenzial)`);
       } else if (nkmCurrent && avmMieteForCheck && avmMieteForCheck < nkmCurrent * 0.90) {
         cons.push(`NKM <strong>${Math.round((nkmCurrent/avmMieteForCheck - 1) * 100)}% über Marktmiete</strong> — Risiko bei Mieterwechsel`);
       }
@@ -5635,6 +5695,61 @@ const QcApp = (function() {
     // V4: Marktcheck-Block rausgenommen (Wunsch) — AVM-Daten fließen weiterhin in Pros/Cons + Opinion
     const mcHost = document.getElementById('ai-marktcheck-host');
     if (mcHost) mcHost.innerHTML = '';
+    try { _renderMietpotenzial(score, inputs); } catch (_e) { try { console.warn('[qc] Mietpotenzial', _e); } catch (_x) {} }   /* v3075 */
+  }
+
+  /* ══ v3075 · MIETPOTENZIAL UND ZIELKAUFPREIS ZWEISTUFIG (P1.1–P1.3) ══════
+     Marcel 02.11.2026: „lohnt sich ein genauer Blick?" - mit der Miete, die in
+     drei Jahren RECHTLICH verlangt werden darf. Gerechnet wird hier nichts:
+       zulaessige Miete   window._qcMietpotenzial -> js/mietpotenzial-kern.js
+       Zielkaufpreis      QcHeuristik.zielKaufpreisZweistufig (gespiegelter Kern)
+     Die Marktmiete steht als EIGENE Zeile „bei Neuvermietung", gedeckelt durch
+     die Mietpreisbremse, und geht in keine Zahl darueber ein. */
+  let _qcUrteilDaten = null;
+  function _renderMietpotenzial(score, inputs) {
+    const host = document.getElementById('ai-mietpotenzial-host');
+    if (!host) return;
+    const mp = score && score.kpi && score.kpi.mietpot;
+    const hint = document.getElementById('qc-kappung-hint');
+    if (hint && mp && mp.kapp) hint.textContent = (inputs.kappung ? 'Eigene Angabe' : 'Automatisch: ' + mp.kapp.pct + ' %' + (mp.kapp.herkunft === 'verordnung' ? ' (Landesverordnung)' : mp.kapp.pruefen ? ' (bitte prüfen)' : ' (Gesetz)'));
+    if (!mp || !mp.zul || !(mp.zul.ist_monat > 0)) { host.innerHTML = ''; return; }
+    const z = mp.zul, D = _qcUrteilDaten || {};
+    const kp = QcEngine.num(inputs.kp) || 0, san = Math.max(0, QcEngine.num(inputs.san) || 0);
+    const zk = (window.QcHeuristik && QcHeuristik.zielKaufpreisZweistufig)
+      ? QcHeuristik.zielKaufpreisZweistufig({ kp: kp, nkm: mp.nkm_heute, nkmZul: mp.nkm_3j, san: san,
+          zielBmr: D.zielBmr, marktwert: D.marktwert, cfMon: D.cfMon, dscr: D.dscr }) : null;
+    const e0 = x => (x == null || !isFinite(x)) ? '—' : Math.round(x).toLocaleString('de-DE') + ' €';
+    const p1 = x => (x == null || !isFinite(x)) ? '—' : (Math.round(x * 10) / 10).toFixed(1).replace('.', ',') + ' %';
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const basisT = san > 0 ? 'auf Kaufpreis + Sanierung' : 'auf den Kaufpreis';
+    const zelle = (l, v, u) => `<div class="ai-marktcheck-cell"><div class="ai-marktcheck-cell-l">${l}</div><div class="ai-marktcheck-cell-v">${v}</div>${u ? `<div style="font-size:11.5px;color:var(--ch2);margin-top:2px;line-height:1.35">${u}</div>` : ''}</div>`;
+    const plus3 = mp.nkm_3j - mp.nkm_heute;
+    let cells = '';
+    cells += zelle('Jahres-NKM heute', e0(mp.nkm_heute * 12), 'Bruttorendite ' + p1(zk ? zk.bmr_heute : null) + ' ' + basisT);
+    cells += zelle('Zulässig nach 3 Jahren', e0(mp.nkm_3j * 12) + (plus3 > 0.5 ? ' <span style="font-size:12px;font-weight:500;color:#3FA56C">+' + p1(z.plus_pct) + '</span>' : ''),
+      'Bruttorendite ' + p1(zk ? zk.bmr_3j : null) + ' · Grenze: ' + esc(z.grund === 'vergleichsmiete' ? 'Vergleichsmiete' : z.grund === 'vergleichsmiete_erreicht' ? 'an der Vergleichsmiete' : z.grund === 'kappung' ? 'Kappungsgrenze ' + z.kappung_pct + ' %' : 'keine'));
+    if (zk) {
+      const zt = 'Ziel ' + p1(zk.ziel_bmr).replace(',0 %', ' %') + (zk.ziel_rueckfall ? ' (ohne Lageklasse: 6 %)' : '');
+      cells += zelle('Zielkaufpreis heute', e0(zk.heute), zt + ' · ' + (zk.nachlass_heute > 0 ? 'Nachlass ' + e0(zk.nachlass_heute) + ' (' + p1(zk.nachlass_heute_pct) + ')' : 'kein Nachlass nötig'));
+      if (zk.nach3 != null) cells += zelle('Zielkaufpreis mit zulässiger Miete', e0(zk.nach3), zt + ' · ' + (zk.nachlass_3j > 0 ? 'Nachlass ' + e0(zk.nachlass_3j) + ' (' + p1(zk.nachlass_3j_pct) + ')' : 'kein Nachlass nötig'));
+    }
+    const zeilen = [];
+    zeilen.push(esc(z.grund_text));
+    if (mp.kapp && mp.kapp.text) zeilen.push(esc(mp.kapp.text));
+    if (z.termin_text) zeilen.push(esc(z.termin_text) + '.');
+    (z.hinweise || []).forEach(h => zeilen.push(esc(h.charAt(0).toUpperCase() + h.slice(1)) + '.'));
+    if (mp.zusatz > 0) zeilen.push('Stellplatz, Küche und Sonstiges (' + e0(mp.zusatz) + '/Monat) bleiben unverändert — Kappung und Vergleichsmiete gelten für die Wohnungsmiete.');
+    if (mp.neu) {
+      zeilen.push('<strong>Bei Neuvermietung</strong> (Marktmiete, nicht die Bestandsmiete): '
+        + (Math.round(mp.neu.qm * 100) / 100).toFixed(2).replace('.', ',') + ' €/m² → ' + e0(mp.neu.jahr + mp.zusatz * 12) + '/Jahr. ' + esc(mp.neu.text) + '.');
+    }
+    if (zk && zk.nach3 != null) zeilen.push('Der Zielkaufpreis mit zulässiger Miete rechnet mit der Miete in drei Jahren und höchstens dem Marktwert — er ist ein Verhandlungsrahmen, kein Wert.');
+    host.innerHTML = `
+<div class="ai-marktcheck">
+  <div class="ai-marktcheck-head">Mietpotenzial — rechtlich zulässig <span style="font-weight:400;font-size:12px;color:var(--ch2)">(Bestandsmiete, § 558 BGB)</span></div>
+  <div class="ai-marktcheck-grid">${cells}</div>
+  <div class="ai-marktcheck-verdict">${zeilen.join('<br>')}</div>
+</div>`;
   }
 
   function renderMarktcheck(score, inputs) {
@@ -5802,6 +5917,8 @@ const QcApp = (function() {
          steckt; und die Objektart fuer die Pruefliste (kein Hausgeld beim MFH). */
       teilnoten: (score.sub && ('potenzial' in score.sub || 'risiko' in score.sub)) ? score.sub : null,
       objektart: inputs.objektart || null,
+      /* v3075 · Sanierung zaehlt zur Gesamtinvestition - auch im Zielkaufpreis */
+      san: Math.max(0, QcEngine.num(inputs.san) || 0),
       /* ══ v1956 · DIE ZIELRENDITE DER GEWAEHLTEN LAGEKLASSE ═════════
          Marcel: „dann geht im Quick-Check in unsere Bewertung mit ein,
          um wie viel ich den Kaufpreis verhandeln muss, damit ich
@@ -5822,6 +5939,7 @@ const QcApp = (function() {
       })(),
       lageklasse: (inputs.lageklasse || null)
     };
+    _qcUrteilDaten = daten;   /* v3075 · dieselben Zahlen fuer den Zielkaufpreis im Mietpotenzial-Block */
 
     /* KEIN RUECKFALL auf eine eigene Kette: fehlt der Kern, sagt die Box
        das und urteilt nicht. Ein zweites Urteil waere genau der Zustand,
@@ -7234,8 +7352,10 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v3031"></script>
-  <script src="js/dealscore.js?v=v3070"></script>
+  <script src="js/qc-heuristik.js?v=v3075"></script>
+  <script src="js/dealscore.js?v=v3075"></script>
+  <!-- v3075 · die zulaessige Miete (Kappung, Vergleichsmiete, Sperrfrist) - derselbe Kern wie potenzial.js -->
+  <script src="js/mietpotenzial-kern.js?v=v3075"></script>
   <script src="js/avm-section.js?v=v3023a"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
@@ -7678,14 +7798,63 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
      ueberall im Quick-Check (QcEngine.num: „200.000" = 200000, „3,8" = 3,8). */
   function n(v){ var x=(typeof QcEngine!=='undefined'&&QcEngine.num)?QcEngine.num(v):parseFloat(String(v==null?"":v).replace(",", ".")); return (x!=null&&isFinite(x))?x:0; }
   function r1(x){ return (x==null)?null:Math.round(x*10)/10; }
+
+  /* ══ v3075 · ZULAESSIGE MIETE NACH 3 JAHREN (P1.1/P1.2) ═══════════════
+     Die Regeln rechnet js/mietpotenzial-kern.js - derselbe Kern wie die
+     Mieterhoehung im Objekt (potenzial.js). Der Quick-Check kennt keine AGS:
+     die Gemeinde wird ueber Land (aus der PLZ) und Ortsnamen gesucht; das steht
+     im Text. Die Liste der Landesverordnungen nimmt er vom Hauptfenster, sonst
+     laedt er sie selbst (einmal) und rechnet danach neu. */
+  var _kappD = null, _kappLauf = false;
+  function _par(){ try { return (window.parent && window.parent !== window) ? window.parent : null; } catch (e) { return null; } }
+  function _kappDaten(){
+    if (_kappD) return _kappD;
+    try { var P=_par(), D=P&&P.DpPotenzial&&P.DpPotenzial.kappungDaten?P.DpPotenzial.kappungDaten():null; if (D&&D.laender) return (_kappD=D); } catch (e) {}
+    if (!_kappLauf && typeof fetch==='function') {
+      _kappLauf = true;
+      fetch('js/data/kappungsgrenzen.json', { cache:'no-cache' }).then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){ if (d && d.laender) { _kappD = d; try { QcApp.scheduleUpdate(); } catch (e) {} } }).catch(function(){});
+    }
+    return null;
+  }
+  function _ym(s){
+    s = String(s==null?'':s).trim(); var m;
+    if ((m=/^(\d{4})-(\d{1,2})/.exec(s))) return m[1]+'-'+String(+m[2]).padStart(2,'0');
+    if ((m=/^(?:\d{1,2}[.\/])?(\d{1,2})[.\/](\d{4})$/.exec(s))) return m[2]+'-'+String(+m[1]).padStart(2,'0');
+    return null;
+  }
+  window._qcMietpotenzial = function(inputs, avm){
+    var Km = window.DpMietpotenzial; if (!Km) return null;
+    var i = inputs||{}, nkm=n(i.nkm), wfl=n(i.wfl);
+    if (!(nkm>0)) return null;
+    var grund = n(i.nkm_grund)>0 ? Math.min(n(i.nkm_grund), nkm) : nkm, zusatz = Math.max(0, nkm-grund);
+    var plz = String(i.plz||'').trim(), land = null;
+    try { var P=_par(), G=(P&&P.DealPilotGrest)||window.DealPilotGrest; if (plz.length===5&&G&&G.forPlz) { var g=G.forPlz(plz); land=(g&&g.bundesland)||null; } } catch (e) {}
+    var D = _kappDaten(), ort = { land:land, ort:i.ort };
+    var kapp = Km.kappungAus(D, ort, { eigen_pct:n(i.kappung) });
+    var bremse = Km.mietpreisbremseAus(D, ort);
+    var zul = Km.zulaessig({ ist:grund, wfl:wfl, vgl_qm:(n(i.vgl_qm)||null), kappung_pct:kapp.pct, letzte:_ym(i.mv_letzte) });
+    /* Marktmiete aus der Marktpreisindikation (€/Monat fuer die ganze Flaeche) - eigene Zeile */
+    var mm = 0;
+    try { mm = Number(avm && (avm.marktmiete || avm.marktmieteCold)) || 0; } catch (e) {}
+    var neu = (mm>0 && wfl>0) ? Km.neuvermietung({ markt_qm:mm/wfl, wfl:wfl, vgl_qm:n(i.vgl_qm), bremse:bremse }) : null;
+    return { kapp:kapp, bremse:bremse, zul:zul, neu:neu, zusatz:zusatz,
+      nkm_heute:nkm, nkm_3j:(zul && zul.miete_monat>0 ? zul.miete_monat : grund) + zusatz };
+  };
+
   window._dpPilotScore = function(inputs, avm){
     var i = inputs||{};
     if (!window.DealKpis || !window.DealScore || typeof window.DealScore.computeFromKpis!=="function") return null;
     var kp=n(i.kp), nkm=n(i.nkm);
     if (!kp || !nkm) return { score:null, label:"\u2013", tier:null, sub:{}, kpi:{} };
     var hgY=n(i.hg)*12, split=(n(i.hg_split)||22)/100, knk=(n(i.knk)||window._qcKnkPct())/100;   /* v2254 */
-    var gesamt=kp*(1+knk), ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
-    var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, nkm:nkm, ze:0,
+    /* v3075 · Sanierungskosten gehoeren zur Gesamtinvestition (DealKpis gi = kp + nk + san):
+       sie senken die Nettomietrendite und - soweit das Eigenkapital sie nicht traegt - erhoehen
+       sie das Darlehen und damit den Kapitaldienst. */
+    var san=Math.max(0,n(i.san));
+    var gesamt=kp*(1+knk)+san, ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
+    var mp = window._qcMietpotenzial ? window._qcMietpotenzial(i, avm) : null;
+    var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, san:san, nkm:nkm, ze:0,
       bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),
       ek:ek, svw:0, afa:0, grenz:0,
       /* qc-v2546a: LTV wieder gegen den KAUFPREIS (deal-kpis.js: ekInklNkLtv false
@@ -7695,7 +7864,11 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
          der Marktwert geht ueber wp_kpi unten in den Score. */
       ekInklNkLtv:false });
     var mw = (avm&&avm.marktwert)||0;
-    var K = { kp:kp, cf_m:k.cf_m, nmy:k.nmy, ltv:k.ltv, dscr:k.dscr, wp_kpi:(mw>kp?mw-kp:0), mstg:1.5 };
+    /* v3075 · statt `mstg: 1.5` (der Bonus verlangt > 1,5 und kam nie) die rechtlich zulaessige
+       Steigerung der Bestandsmiete in 3 Jahren; dazu Zustand und Sanierung fuer die Grenze im Kern. */
+    var K = { kp:kp, cf_m:k.cf_m, nmy:k.nmy, ltv:k.ltv, dscr:k.dscr, wp_kpi:(mw>kp?mw-kp:0),
+      miet_potenzial_pct:(mp && mp.zul && mp.zul.grund && mp.zul.grund!=='keine_miete' && mp.zul.grund!=='vertrag') ? mp.zul.plus_pct : null,
+      zustand:(i.zustand||null), san:san };
     var r = window.DealScore.computeFromKpis(K);
     var sub = {}; (r.breakdown||[]).forEach(function(c){ sub[c.key] = (c.score!=null)?Math.round(c.score):null; });
     var bwkPct = (k.nkm_j>0)?(k.bwk/k.nkm_j*100):null;
@@ -7704,8 +7877,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
        sie — und er soll NICHT nachrechnen (v1227b). Also durchreichen statt
        nebenan noch einmal bilden. QcEngine.computeScore() gibt sie schon lange
        mit; die beiden Wege sind damit gleichauf. */
-    return { score:r.score, label:r.label, tier:r.color, sub:sub,
-      kpi:{ bmr:r1(k.bmy), nmr:r1(k.nmy), ekr:r1(k.ekr), cfMon:Math.round(k.cf_m),
+    return { score:r.score, label:r.label, tier:r.color, sub:sub, deckel:(r.deckel||null), interpretation:(r.interpretation||''),   /* v3075 */
+      kpi:{ san:san, mietpot:mp,   /* v3075 */
+            bmr:r1(k.bmy), nmr:r1(k.nmy), ekr:r1(k.ekr), cfMon:Math.round(k.cf_m),
             dscr:(k.dscr!=null)?Math.round(k.dscr*100)/100:null, ltvPct:Math.round(k.ltv),
             bwkPctOfNkm:(bwkPct!=null)?Math.round(bwkPct):null,
             gesamt:Math.round(gesamt), ekValue:Math.round(ek||0),
