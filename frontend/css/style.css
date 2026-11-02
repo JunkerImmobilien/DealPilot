@@ -38952,6 +38952,8 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 .dp-pf-pille { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(243,234,208,.45); font: 600 10px "JetBrains Mono", monospace; font-style: normal; color: #f3ead0; cursor: pointer; opacity: .75; }
 .dp-pf-pille.on { background: var(--wl-c9a84c, #C9A84C); border-color: var(--wl-c9a84c, #C9A84C); color: #050505; opacity: 1; }
 .dp-pf-pille.fehlt { border-style: dashed; }
+/* v3078 · über dem Detailgrad gesperrt, Klick führt in die Einstellungen */
+.dp-pf-pille.gesperrt { opacity: .3; border-style: dotted; }
 .dp-pf-pille:hover { opacity: 1; border-color: var(--wl-c9a84c, #C9A84C); }
 
 /* v1858 · Hover-Hilfe an jedem Feld; gelbe i-Knoepfe weichen, wenn sie an ist */

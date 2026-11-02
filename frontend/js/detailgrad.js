@@ -456,8 +456,8 @@
   });
   /* v3077 · „ändern ›" im Reiter Objekt: Einstellungen › Mein Profil, zum Schalter */
   document.addEventListener('click', function (e) {
-    if (!e.target || !e.target.closest || !e.target.closest('#oe-dg-einst')) return;
-    e.preventDefault();
+    if (!e.target || !e.target.closest || !e.target.closest('#oe-dg-einst, [data-dp-dg-einst]')) return;
+    e.preventDefault(); e.stopPropagation();   /* v3078: gesperrte Pille in der Kachel */
     try { if (typeof window.showSettings === 'function') window.showSettings(); } catch (_) {}
     setTimeout(function () {
       var t = document.querySelector('#settings-modal .st-tab[data-tab="standardwerte"]');
@@ -467,7 +467,7 @@
         if (h && h.scrollIntoView) h.scrollIntoView({ block: 'center', behavior: 'smooth' });
       }, 120);
     }, 80);
-  });
+  }, true);
   window.addEventListener('dp:object-ready', function (e) {
     ermitteln((e && e.detail && e.detail.key) || window._currentObjKey || null);
   });

@@ -583,7 +583,8 @@
       ev.preventDefault();
       try { if (b3.closest('#mba-miete') && typeof window.switchTab === 'function') window.switchTab(0); } catch (e) {}
       if (window.DealPilotObjektReiter && typeof DealPilotObjektReiter.stufeAbrufen === 'function') {
-        try { if (window.DpDetailgrad) DpDetailgrad.setzen(3); } catch (e) {}   /* v3073: Stufe 3 = Detailgrad Experte */
+        /* v3078 · kein stilles Hochschalten des Detailgrads mehr: unter Experte
+           zeigt stufeAbrufen(3) den Weg in die Einstellungen */
         DealPilotObjektReiter.stufeAbrufen(3);
       }
       return;

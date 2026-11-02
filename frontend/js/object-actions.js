@@ -330,7 +330,7 @@
        dann die Stufen auswählen können". Die drei Pillen sind dieselbe
        Stufe wie im Reiter Objekt — seit v3073 der Detailgrad
        (js/detailgrad.js; objekt-reiter.js rendert die Pillen). Der Abruf-Schritt nimmt die gewählte Stufe. */
-    var _dpInner = '<span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-stufen" id="oab-dp-stufen" title="Detailgrad = Stufe der Marktbewertung: Einsteiger · Fortgeschritten · Experte"></span>';
+    var _dpInner = '<span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-stufen" id="oab-dp-stufen" title="Stufe der Marktbewertung · freigegeben bis zum Detailgrad (Einstellungen)"></span>';
       /* ══ v1954 · DER QR WIRD ERZEUGT, NICHT MITGESCHLEPPT ═══════════
          Marcel am 07.10.2026: "der QR-Code koennte auch schoener
          dargestellt werden. Der sieht irgendwie kuenstlich aus."
@@ -988,7 +988,7 @@
           if (mbImSprechlauf) { try { console.log('[obj-actions] DealPilot-Marktbewertung lief schon im Sprechlauf'); } catch (e) {} continue; }
           /* v1858 · die gewählte Stufe (Eingabetiefe) — fehlen Pflichtfelder,
              zeigt der Reiter Objekt die Liste und es wird NICHT abgerufen. */
-          var _R = window.DealPilotObjektReiter, _z = window.DpDetailgrad ? DpDetailgrad.stufe() : 1;   /* v3073: Detailgrad */
+          var _R = window.DealPilotObjektReiter, _z = (_R && _R.mbWahl) ? _R.mbWahl() : (window.DpDetailgrad ? DpDetailgrad.stufe() : 1);   /* v3078: gewählte Marktbericht-Stufe */
           if (_R && typeof _R.fehltFuer === 'function' && _R.fehltFuer(_z).length) {
             setProg('Stufe ' + _z + ': Angaben fehlen — siehe Reiter Objekt');
             try { _R.stufeAbrufen(_z); } catch (e) {}

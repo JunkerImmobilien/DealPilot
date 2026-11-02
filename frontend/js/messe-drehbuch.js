@@ -1814,8 +1814,11 @@
      „was fehlt" wechselt dafür den Reiter - gemessen sprang Stufe 2 nach
      Investition, und alle folgenden Kegel lagen auf verborgenen Feldern */
   async function stufeWaehlen(n) {
-    var p = q('#oab-dp-stufen [data-dp-dg-setzen="' + n + '"]');   /* v3073: Detailgrad */
-    if (p) p.click(); else { try { DpDetailgrad.setzen(n, { still: true }); } catch (e) {} }
+    /* v3078 · Detailgrad und Marktbericht-Stufe sind getrennt: erst freigeben, dann wählen */
+    try { DpDetailgrad.setzen(n, { still: true }); } catch (e) {}
+    await warte(300);
+    var p = q('#oab-dp-stufen [data-oe-mb="' + n + '"]');
+    if (p) p.click();
     await warte(700);
     if (!q('#s0.active')) reiter('s0');
   }
@@ -2082,7 +2085,9 @@
         await b2oZeile(s, 'Komplettbeispiel', 'Eine Wohnung, nur erzählt — und gleich mit der Marktbewertung <b>Stufe 2</b>.');
         await zeige(function () { return q('#oab-dp-stufen'); }, 10);
         await warte(900);
-        var p = q('#oab-dp-stufen [data-dp-dg-setzen="2"]'); if (p) p.click();
+        try { DpDetailgrad.setzen(2, { still: true }); } catch (e) {}   /* v3078: erst freigeben */
+        await warte(300);
+        var p = q('#oab-dp-stufen [data-oe-mb="2"]'); if (p) p.click();
         await warte(700);
         await b2oZeile(s, 'Stufe 2 wählen', 'Mittel · Stufe 2: die erweiterte Indikation — mit Kaufpreis, Miete, Zustand, Energie und Ausstattung.');
       },

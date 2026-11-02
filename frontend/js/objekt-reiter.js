@@ -699,6 +699,35 @@
      Pflichtfelder der Stufe (pflichtFuer) und ihre Markierung. */
   function dgStufe() { try { return window.DpDetailgrad ? DpDetailgrad.stufe() : 3; } catch (e) { return 3; } }
   var DG_NAMEN = { 1: 'Einsteiger', 2: 'Fortgeschritten', 3: 'Experte' };
+  /* v3078 · Marcel 02.11.2026: „können wir das trennen und es je nach Wahl
+     freigeben?" Die Marktbericht-Stufe (Pillen 1-2-3 auf der Kachel
+     DealPilot, Zeilen „Marktbericht abrufen") ist eine EIGENE Wahl und
+     ändert den Detailgrad nicht mehr. Der Detailgrad (Einstellungen) gibt
+     frei, bis wohin gewählt werden kann: Einsteiger 1, Fortgeschritten
+     1–2, Experte 1–3. Darüber: gesperrt, mit dem Weg in die Einstellungen.
+     Ohne eigene Wahl gilt die höchste freigegebene Stufe. */
+  var _mbWahl = null;
+  function mbWahl() { var z = dgStufe(); return Math.min(_mbWahl || z, z); }
+  function mbWaehlen(s) {
+    if (!(s >= 1 && s <= dgStufe())) return false;
+    _mbWahl = s;
+    try { zielAnwenden(); } catch (e) {}
+    try { stufen(); } catch (e) {}
+    try { preflightPillen(); } catch (e) {}
+    try { fehlZeileSetzen(s); } catch (e) {}
+    return true;
+  }
+  function gesperrtSatz(s) {
+    return 'Stufe ' + s + ' ist ab dem Detailgrad ' + DG_NAMEN[s] + ' freigegeben.';
+  }
+  /* Klick auf eine freigegebene Pille. Capture: die Pille liegt in der
+     Kachel (label), die sonst mit an- oder abgewählt würde. */
+  document.addEventListener('click', function (e) {
+    var p = e.target && e.target.closest ? e.target.closest('[data-oe-mb]') : null;
+    if (!p) return;
+    e.preventDefault(); e.stopPropagation();
+    mbWaehlen(parseInt(p.getAttribute('data-oe-mb'), 10));
+  }, true);
   /* v2001 · Marcel: „wenn ich oben mit den kleinen Kreisen wechsle, dann
      steht immer noch: fuer Stufe 3 fehlt noch." Gemessen: `_fehlStufe`
      wurde NUR in stufeAbrufen() gesetzt - die Zeile unten zeigte die
@@ -711,9 +740,9 @@
     /* v1866 · im Reiter Objekt nur noch der Stand; gewählt wird oben (Pre-Flight) */
     var stat = $('oe-ziel-status');
     if (stat) {
-      var NAMEN = { 1: 'Einsteiger · Stufe 1', 2: 'Fortgeschritten · Stufe 2', 3: 'Experte · Stufe 3' };
-      var fz = fehltFuer(z).length;
-      stat.innerHTML = '<b>' + NAMEN[z] + '</b> ' + (fz ? st('x', fz + ' fehlt') + '<span class="oe-q">„' + fz + ' fehlt" in der Zeile unten zeigt die Felder.</span>' : st('a', 'bereit'));
+      /* v3078 · Detailgrad und gewählte Marktbericht-Stufe getrennt */
+      var w = mbWahl(), fz = fehltFuer(w).length;
+      stat.innerHTML = '<b>' + DG_NAMEN[z] + '</b> · Marktbericht Stufe ' + w + ' ' + (fz ? st('x', fz + ' fehlt') + '<span class="oe-q">„' + fz + ' fehlt" in der Zeile unten zeigt die Felder.</span>' : st('a', 'bereit'));
     }
     var hint = $('oe-ziel-hint');
     /* v1868 · ein Satz je Stufe — Marcel: „ein bisschen schmaler, dass wir alles draufkriegen" */
@@ -815,7 +844,7 @@
       3: { name: 'Experte · Stufe 3', sub: 'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', art: 'Wertermittlung' }
     };
     var ab = { 2: 'ab Investor', 3: 'ab Pro' };
-    var z = dgStufe();
+    var z = dgStufe(), w = mbWahl();
     /* v1858 · Marcel: „nicht so viel Weiß … in der gleichen Größe wie oben
        auch das Feld Bodenrichtwert … den Button an die Seite." Drei Zeilen
        im Raster der Leiste statt drei Kacheln. */
@@ -826,21 +855,23 @@
          im Detailgrad Experte. Darunter ist sie nicht wählbar — die Zeile
          sagt, wohin man schalten muss. Am Abruf und am Kontingent ändert
          sich nichts. */
-      if (s === 3 && z < 3) {
-        return '<div class="oe-row oe-row-gesperrt" data-oe-zeile="3" role="button" tabindex="0" aria-pressed="false" title="' + esc(k.sub) + '">'
+      /* v3078 · jede Stufe über dem Detailgrad ist gesperrt; freigeschaltet
+         wird in den Einstellungen, nicht hier */
+      if (s > z) {
+        return '<div class="oe-row oe-row-gesperrt" title="' + esc(k.sub) + '">'
           + '<span class="oe-k">' + k.name + '</span>'
           + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + '</span>'
-          + '<span class="oe-q oe-q-kompakt">Für die Wertermittlung (Stufe 3) auf Experte schalten.</span>'
-          + '<span><button type="button" class="oe-btn" data-dp-dg-setzen="3" title="Detailgrad Experte: alle Felder, Sach- und Ertragswert">Auf Experte schalten</button></span>'
+          + '<span class="oe-q oe-q-kompakt">' + gesperrtSatz(s) + '</span>'
+          + '<span><button type="button" class="oe-btn" data-dp-dg-einst="1" title="Einstellungen › Mein Profil › Detailgrad der Eingabe">in den Einstellungen freischalten</button></span>'
           + '</div>';
       }
       var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
       /* v1868 · kompakt: Name, frei, Pille — der Satz dazu steckt im Tooltip */
-      return '<div class="oe-row' + (s === z ? ' on' : '') + '" data-oe-zeile="' + s + '" role="button" tabindex="0" aria-pressed="' + (s === z) + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
+      return '<div class="oe-row' + (s === w ? ' on' : '') + '" data-oe-zeile="' + s + '" role="button" tabindex="0" aria-pressed="' + (s === w) + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
         + '<span class="oe-k">' + k.name + '</span>'
         + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + ' ' + (fehlt ? st('x', fehlt + ' fehlt') : st('a', 'bereit')) + '</span>'
         + '<span class="oe-q oe-q-kompakt">' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '</span>'
-        + '<span><button type="button" class="oe-btn' + (s === z ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">' + (fehlt ? 'was fehlt' : 'abrufen') + '</button></span>'
+        + '<span><button type="button" class="oe-btn' + (s === w ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">' + (fehlt ? 'was fehlt' : 'abrufen') + '</button></span>'
         + '</div>';
     }).join('') + '</div>';
     preflightPillen();
@@ -855,10 +886,12 @@
   }
   function pillenIn(host) {
     if (!host) return;
-    var z = dgStufe();
+    var z = dgStufe(), w = mbWahl();
+    /* v3078 · eigene Wahl (data-oe-mb); über dem Detailgrad gesperrt (data-dp-dg-einst → Einstellungen) */
     host.innerHTML = [1, 2, 3].map(function (s) {
+      if (s > z) return '<i class="dp-pf-pille gesperrt" data-dp-dg-einst="1" title="Marktbericht Stufe ' + s + ' · ' + gesperrtSatz(s) + ' Klick: Einstellungen">' + s + '</i>';
       var fehlt = fehltFuer(s).length;
-      return '<i class="dp-pf-pille' + (s === z ? ' on' : '') + (fehlt ? ' fehlt' : '') + '" data-dp-dg-setzen="' + s + '" title="' + DG_NAMEN[s] + ' · Stufe ' + s + (fehlt ? ' · ' + fehlt + ' Feld(er) fehlen' : ' · bereit') + '">' + s + '</i>';
+      return '<i class="dp-pf-pille' + (s === w ? ' on' : '') + (fehlt ? ' fehlt' : '') + '" data-oe-mb="' + s + '" title="Marktbericht Stufe ' + s + (fehlt ? ' · ' + fehlt + ' Feld(er) fehlen' : ' · bereit') + '">' + s + '</i>';
     }).join('');
     /* Klick: detailgrad.js (Capture am document, die Kachel bleibt unberührt) */
   }
@@ -869,13 +902,14 @@
      nach dem Loeschen die Fehlliste des geloeschten Objekts stehen. */
   function fehlZeileSetzen(z) { _fehlStufe = z; fehlendeZeigen(z, fehltFuer(z)); }
   function stufeAbrufen(s) {
-    /* v3073 · Stufe 3 nur im Detailgrad Experte */
-    if (s === 3 && dgStufe() < 3) {
+    /* v3078 · nur bis zum Detailgrad (Einstellungen) */
+    if (s > dgStufe()) {
       _fehlStufe = null;
       var box = $('oe-fehlt');
-      if (box) { box.innerHTML = '<b>Wertermittlung (Stufe 3):</b> nur im Detailgrad Experte. <button type="button" class="oe-btn" data-dp-dg-setzen="3">Auf Experte schalten</button>'; box.style.display = ''; }
+      if (box) { box.innerHTML = '<b>Marktbericht Stufe ' + s + ':</b> ' + gesperrtSatz(s) + ' <button type="button" class="oe-btn" data-dp-dg-einst="1">in den Einstellungen freischalten</button>'; box.style.display = ''; }
       return;
     }
+    _mbWahl = s;
     var fehlt = fehltFuer(s);
     _fehlStufe = s;
     if (fehlt.length) { fehlendeZeigen(s, fehlt); abweichend(fehlt[0]); return; }
@@ -1231,10 +1265,10 @@
       if (amt && window.DealPilotUnterlagen && typeof DealPilotUnterlagen.oeffnen === 'function') { DealPilotUnterlagen.oeffnen(amt.getAttribute('data-oe-amt')); return; }
       var s = e.target.closest('[data-oe-stufe]');
       if (s && !s.disabled) { stufeAbrufen(parseInt(s.getAttribute('data-oe-stufe'), 10)); return; }
-      /* v2969 · die ganze Zeile waehlt die Stufe. v3073: das ist der
-         Detailgrad (Einsteiger · Fortgeschritten · Experte). */
+      /* v2969 · die ganze Zeile waehlt die Stufe. v3078: die Marktbericht-
+         Stufe, nicht mehr den Detailgrad. */
       var zr = e.target.closest('[data-oe-zeile]');
-      if (zr && window.DpDetailgrad) DpDetailgrad.setzen(parseInt(zr.getAttribute('data-oe-zeile'), 10));
+      if (zr) mbWaehlen(parseInt(zr.getAttribute('data-oe-zeile'), 10));
     });
     /* Pflichtfelder: Markierung und Fehlzahl folgen der Eingabe */
     Object.keys(FELDNAMEN).forEach(function (id) {
@@ -1271,7 +1305,7 @@
     window.addEventListener('dp:object-ready', function () {
       /* v2001 · fehlZeileSetzen mit: ein frisches (leeres) Objekt trug
          sonst die Fehlliste des vorigen weiter. */
-      setTimeout(function () { alles(); stufen(); fehlZeileSetzen(dgStufe()); }, 120);
+      setTimeout(function () { alles(); stufen(); fehlZeileSetzen(mbWahl()); }, 120);
       setTimeout(alles, 1800);
     });
     window.addEventListener('dp:plan-ready', function () { stufen(); });
@@ -1280,12 +1314,13 @@
        Fehlliste folgen; beim Wechsel auf Experte klappt der Block Sach- und
        Ertragswert auf (wie zuvor bei Eingabetiefe 3). */
     window.addEventListener('dp:detailgrad', function (ev) {
+      _mbWahl = null;   /* v3078: nach einem Wechsel gilt die höchste freigegebene Stufe */
       var d = (ev && ev.detail) || {};
       if (d.stufe === 3 && d.alt < 3) {
         var e3 = document.querySelector('.card[data-collapsible="wm-obj"]');
         if (e3 && e3.classList.contains('v212-collapsed')) { var t = e3.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
       }
-      zielAnwenden(); stufen(); fehlZeileSetzen(dgStufe());
+      zielAnwenden(); stufen(); fehlZeileSetzen(mbWahl());
     });
     alles(); stufen();
   }
@@ -1355,6 +1390,7 @@
   window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte, verlauf: verlauf,
     /* v3073: die Stufe liest und setzt window.DpDetailgrad (stufe/setzen) */
     fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen,
+    mbWahl: mbWahl, mbWaehlen: mbWaehlen,   /* v3078: Marktbericht-Stufe, freigegeben bis zum Detailgrad */
     /* v2079: die Beschriftungen mit exportiert - der Readycheck in
        deal-action-readycheck.js braucht sie, und eine zweite Namensliste
        dort waere genau die Doppelung, die pflichtFuer vermeidet. */
