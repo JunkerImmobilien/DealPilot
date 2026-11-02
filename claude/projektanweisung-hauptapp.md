@@ -44186,3 +44186,9 @@ statt Ortsname.
 
 **Was.** AGS-Abruf im Quick-Check (lesend, je PLZ+Ort gemerkt), Ortsname nur Rückfall; Abruf braucht objart/baujahr/wfl;
 Kurzname der Verordnung ohne „(§ 1)“. **Prod** 1.0.32 (1856ba3). **Nachweis** Winsen 21423 → 15 % + Bremse. **Rest** —
+
+### v3085 — Zielkaufpreis Cashflow null exakt mit Darlehen und Annuität (02.11.2026) · Prod 1.0.33
+
+**Was.** `zielKaufpreis()` rechnet die Cashflow-Grenze exakt, wenn `darlehen` und `annuitaetPct` übergeben werden (Quick-Check);
+die 5-%-EK-Näherung bleibt nur für Aufrufer ohne diese Angaben. Gespiegelt, Backend neu gebaut. **Prod** 1.0.33 (493f587).
+**Nachweis** Hölderlinstr. 139.000 → 97.744 €, Gegenprobe 97.000 € → CF +4 €, kein Nachlass. **Rest** —
