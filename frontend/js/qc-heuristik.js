@@ -260,7 +260,7 @@ window.QcHeuristik = (function () {
      hätte eine 0 die 6 % ersetzt und durch null geteilt. */
   var ZIEL_BMR_RUECKFALL = 6;     /* Prozent, wenn der Aufrufer nichts sagt */
 
-  function zielKaufpreis(d) {
+  function _zkTeile(d) {
     var kp = +d.kp || 0, nkm = +d.nkm || 0;
     var cfMon = +d.cfMon || 0, dscr = +d.dscr || 0;
     var nkmYear = nkm * 12;
@@ -321,7 +321,16 @@ window.QcHeuristik = (function () {
       // Wenn KP schon unter den Zielen → keine Preissenkung nötig
       ziel = kp;
     }
-    return ziel;
+    return { ziel: ziel, rendite: kpForBmr, cashflow: kpForCf0, markt: (isFinite(markt) && markt > 0) ? markt : null, kp: kp };
+  }
+  function zielKaufpreis(d) { return _zkTeile(d).ziel; }
+  /* v3081 · die drei Grenzen einzeln, damit die Bewertung sagt, WELCHE greift
+     (Marcel 02.11.2026: Zielkaufpreis „Ziel 5 %“ stand dort, gebunden war er durch Cashflow 0). */
+  function zielKaufpreisTeile(d) {
+    var t = _zkTeile(d), kp = t.kp, g = null;
+    if (t.ziel < kp) g = (t.ziel === t.cashflow) ? 'cashflow' : (t.markt != null && t.ziel === t.markt) ? 'markt' : 'rendite';
+    var dk = function (x) { return (isFinite(x) && x > 0) ? Math.min(x, kp) : null; };
+    return { ziel: t.ziel, greift: g, rendite: dk(t.rendite), cashflow: dk(t.cashflow), markt: t.markt != null ? Math.min(t.markt, kp) : null };
   }
 
   /* ── v3075 · ZIELKAUFPREIS ZWEISTUFIG (P1.3, Marcel 02.11.2026) ─────────
@@ -702,6 +711,35 @@ window.QcHeuristik = (function () {
      * WERT_SCHWELLE) unter dem bereinigten Marktwert, steht der Wertpuffer
      * dabei - und bei verfehlter Lage-Rendite das ausdrückliche „trotzdem".
      * `d.marktwert` ist schon bereinigt (Angebotsabschlag drin). */
+    /* ── v3081 · OBJEKT PASST, FINANZIERUNG NICHT ─────────────────────────
+     *
+     * Marcel 02.11.2026: „der Score wird ja aus beidem ermittelt, aber eher
+     * Richtung prüfen und mit Angabe, was notwendig wäre mit Einbringung
+     * Eigenkapital." Gemessen an der Hölderlinstr. 1 (139.000 €, 5,6 % brutto,
+     * B-Ziel 5 %, Preis in der Marktspanne): Score 19, Urteil „Finger weg" -
+     * allein wegen 100 % Finanzierung zu 4,87 % (Cashflow −219 €/Monat).
+     *
+     * Der SCORE bleibt (vergleichbar). Das URTEIL wird PRUEFEN, wenn die
+     * Lage-Rendite erfüllt ist, der Preis nicht über dem Marktwert liegt und
+     * der Cashflow negativ ist - mit dem Eigenkapital, das ihn auf null
+     * bringt. Die Annuität (Zins + Tilgung in %) reicht der AUFRUFER herein
+     * (`d.annuitaetPct`); ohne sie keine Zahl, nur der Hinweis. */
+    var finanzierung = null;
+    if ((verdict === 'KRITISCH' || verdict === 'PASS') && lage && lage.passt && !ueberMarkt && cfMon < 0) {
+      var ann = +d.annuitaetPct;
+      var ekMehr = (isFinite(ann) && ann > 0) ? Math.ceil((-cfMon * 12) / (ann / 100) / 1000) * 1000 : null;
+      finanzierung = { ek_mehr: ekMehr, cf_mon: cfMon, dscr: (+d.dscr > 0 ? +d.dscr : null) };
+      verdict = 'PRUEFEN';
+      farbklasse = 'qc-rec-gold';
+      var pctT = function (x) { return (Math.round(x * 10) / 10).toFixed(1).replace('.', ',') + ' %'; };
+      advice = 'Das Objekt passt: ' + b(pctT(lage.ist)) + ' brutto erfüllen dein Ziel für die ' + lage.klasse + '-Lage' +
+               ((isFinite(markt) && markt > 0) ? ', und der Preis liegt nicht über dem Marktwert' : '') + '. ' +
+               'Es scheitert an der Finanzierung: Cashflow ' + _eurMon(cfMon) +
+               (finanzierung.dscr ? ', DSCR ' + finanzierung.dscr.toFixed(2).replace('.', ',') : '') + '. ' +
+               (ekMehr ? 'Mit rund ' + b(_fmtEur(ekMehr)) + ' mehr Eigenkapital trägt sich das Objekt selbst (Cashflow null). ' : '') +
+               'Prüfe, wie viel Eigenkapital du einbringen willst — oder verhandle den Preis auf ' + b(_fmtEur(ziel)) + '.';
+    }
+
     var wert = null;
     if (isFinite(markt) && markt > 0 && kp > 0 && (markt - kp) / kp * 100 >= WERT_SCHWELLE) {
       var puffer = markt - kp, pp = Math.round((markt - kp) / kp * 100);
@@ -715,7 +753,7 @@ window.QcHeuristik = (function () {
             : 'Ein Preis klar unter Markt ist ein zusätzliches Argument für den Kauf.');
     }
 
-    return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel, lage: lage, wert: wert };
+    return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel, lage: lage, wert: wert, finanzierung: finanzierung };
   }
 
   /* ── 4 · DER SATZ ZUR STUFE ─────────────────────────────────────────────
@@ -1103,6 +1141,7 @@ window.QcHeuristik = (function () {
     einschaetzung: einschaetzung,
     empfehlung: empfehlung,
     zielKaufpreis: zielKaufpreis,
+    zielKaufpreisTeile: zielKaufpreisTeile,   /* v3081 */
     zielKaufpreisZweistufig: zielKaufpreisZweistufig,   /* v3075 */
     bewerten: bewerten,
     stufensatz: stufensatz,         /* v1936 */

@@ -126,8 +126,11 @@
       return mit({ pct: std2, herkunft: 'gesetz', pruefen: true,
         text: 'Kappungsgrenze ' + std2 + ' % in 3 Jahren: der Ortsname passt auf mehrere Gemeinden der Landesverordnung — bitte prüfen oder eigene Angabe.' });
     }
-    return mit({ pct: std2, herkunft: 'gesetz', pruefen: !!L.unsicher,
-      text: 'Kappungsgrenze ' + std2 + ' % in 3 Jahren: Gemeinde nicht in der Landesverordnung (von DealPilot gesetzt)' + perName
+    /* v3081 · Marcel 02.11.2026: „warum, und keine Quelle“. Die 20 % setzt nicht DealPilot,
+       sondern das Gesetz (§ 558 Abs. 3 Satz 1 BGB) - die Verordnung, in der die Gemeinde
+       NICHT steht, wird mit Link genannt. */
+    return mit({ pct: std2, herkunft: 'gesetz', pruefen: !!L.unsicher, url: L.url || null, verordnung: vo,
+      text: 'Kappungsgrenze ' + std2 + ' % in 3 Jahren (gesetzliche Grenze, § 558 Abs. 3 Satz 1 BGB): die Gemeinde steht nicht in der ' + vo + perName
         + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '. Eigene Angabe möglich.') });
   }
 
@@ -152,8 +155,8 @@
         text: 'Mietpreisbremse gilt' + (bis ? ' bis ' + deDatum(bis) : '') + ' (' + vo + ')' + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
     }
     if (f.mehrdeutig) return leer('der Ortsname passt auf mehrere Gemeinden der Landesverordnung');
-    return { gilt: false, pruefen: !!L.unsicher,
-      text: 'Keine Mietpreisbremse: Gemeinde nicht in der Landesverordnung' + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
+    return { gilt: false, pruefen: !!L.unsicher, url: V.url || L.url || null, verordnung: vo,   /* v3081: Quelle mitgeben */
+      text: 'Keine Mietpreisbremse: die Gemeinde steht nicht in der ' + vo + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
   }
 
   /* ── v3028 · TERMINE EINER MIETERHÖHUNG: verlangbar ab · wirksam ab ────

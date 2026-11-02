@@ -5696,6 +5696,7 @@ const QcApp = (function() {
     const mcHost = document.getElementById('ai-marktcheck-host');
     if (mcHost) mcHost.innerHTML = '';
     try { _renderMietpotenzial(score, inputs); } catch (_e) { try { console.warn('[qc] Mietpotenzial', _e); } catch (_x) {} }   /* v3075 */
+    try { _renderBewertungNeu(score, inputs, _urteil, pros, cons); } catch (_e) { try { console.warn('[qc] Bewertung v3081', _e); } catch (_x) {} }
   }
 
   /* ══ v3075 · MIETPOTENZIAL UND ZIELKAUFPREIS ZWEISTUFIG (P1.1–P1.3) ══════
@@ -5705,6 +5706,183 @@ const QcApp = (function() {
        Zielkaufpreis      QcHeuristik.zielKaufpreisZweistufig (gespiegelter Kern)
      Die Marktmiete steht als EIGENE Zeile „bei Neuvermietung", gedeckelt durch
      die Mietpreisbremse, und geht in keine Zahl darueber ein. */
+  /* ══ v3081 · BEWERTUNG IN EINER KARTE ═══════════════════════════════════
+     Marcel 02.11.2026: „Schriftarten unterschiedlich, verschiedene unsortierte
+     Karten, zu viele Informationen … das muss einfacher sein und zielgerichteter
+     bewertet sein." Abgenommen als Demo (/demo-quickcheck-bewertung.html).
+     Feste Reihenfolge: Urteil mit Grund und Lageklasse · drei Prüfsteine (Preis
+     gegen Marktspanne, Rendite gegen Lage-Ziel, Tragfähigkeit) · Zielkaufpreis
+     mit der Grenze, die greift · angesetzte Miete mit Herkunft und Rechtsquelle ·
+     je drei Punkte dafür/dagegen · KI-Text zugeklappt.
+     Gerechnet wird hier NICHTS: Urteil, Ziel und Eigenkapital kommen aus
+     QcHeuristik (empfehlung, zielKaufpreisTeile), Miete aus _qcMietpotenzial,
+     Spanne aus dem Schnappschuss der Marktbewertung (#_mb_state). Die alten
+     Blöcke bleiben im DOM (andere Module schreiben hinein), sind aber unsichtbar. */
+  function _qcbStil() {
+    if (document.getElementById('qcb-stil')) return;
+    const s = document.createElement('style'); s.id = 'qcb-stil';
+    s.textContent = [
+      '#ai-card.qcb-an .ai-verdict-big,#ai-card.qcb-an .ai-negotiate,#ai-card.qcb-an .ai-points,#ai-card.qcb-an #ai-mietpotenzial-host,#ai-card.qcb-an #ai-marktcheck-host{display:none!important}',
+      '#ai-card.qcb-an .ai-head-title{font:600 18px/1.2 "Space Grotesk",Inter,sans-serif}',
+      '.qcb{display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.5 Inter,system-ui,sans-serif;color:#2A2727}',
+      '.qcb-l{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
+      '.qcb-box{background:#fff;border:1px solid #EFE7D6;border-radius:12px;padding:12px 14px}',
+      '.qcb-urteil{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;border-left:5px solid #3FA56C}',
+      '.qcb-urteil.warn{border-left-color:var(--wl-c9a84c,#C9A84C)}.qcb-urteil.bad{border-left-color:#B8625C}',
+      '.qcb-ring{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;border:5px solid #EFE7D6;font:700 21px "Space Grotesk",sans-serif}',
+      '.qcb-urteil h4{margin:2px 0 3px;font:600 18px/1.25 "Space Grotesk",sans-serif;color:#2A2727;text-transform:none;letter-spacing:0}',
+      '.qcb-urteil p{margin:0;color:#4A4542;font-size:13px}',
+      '.qcb-lage{display:flex;flex-direction:column;align-items:flex-end;gap:4px}',
+      '.qcb-seg{display:inline-flex;border:1px solid #EFE7D6;border-radius:9px;padding:2px;gap:2px}',
+      '.qcb-seg button{border:0;background:transparent;font:600 12px "Space Grotesk",sans-serif;padding:5px 11px;border-radius:7px;cursor:pointer;color:#2A2727}',
+      '.qcb-seg button.on{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#050505}',
+      '.qcb-lage small{font-size:11px;color:#7A7370}',
+      '.qcb-pz{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-top:1px solid #F1ECE1}',
+      '.qcb-pz:first-child{border-top:0;padding-top:0}.qcb-pz:last-child{padding-bottom:0}',
+      '.qcb-dot{width:11px;height:11px;border-radius:50%;background:#8A8272}.qcb-dot.ok{background:#3FA56C}.qcb-dot.mid{background:var(--wl-c9a84c,#C9A84C)}.qcb-dot.bad{background:#B8625C}',
+      '.qcb-pz b{display:block;font:600 14px/1.3 "Space Grotesk",sans-serif}',
+      '.qcb-pz .u{font-size:12px;color:#7A7370}',
+      '.qcb-pz .w{font:600 14px "Space Grotesk",sans-serif;text-align:right;white-space:nowrap}',
+      '.qcb-pz .w small{display:block;font:500 11px Inter,sans-serif;color:#7A7370}',
+      '.qcb-ziel{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:8px}',
+      '.qcb-zk{border:1px solid #EFE7D6;border-radius:10px;padding:8px 11px;background:#FBF6E9}',
+      '.qcb-zk.greift{border-color:var(--wl-c9a84c,#C9A84C);background:#fff}',
+      '.qcb-zk .v{font:700 17px "Space Grotesk",sans-serif;margin:2px 0}',
+      '.qcb-zk .u,.qcb-fuss{font-size:11.5px;color:#7A7370}',
+      '.qcb-fuss{margin:7px 0 0;line-height:1.45}',
+      '.qcb-fuss a{color:var(--wl-b8932f,#b8932f)}',
+      '.qcb-miete{display:grid;grid-template-columns:1fr auto;gap:3px 14px;align-items:center}',
+      '.qcb-miete .v{font:600 16px "Space Grotesk",sans-serif;text-align:right;white-space:nowrap}',
+      '.qcb-miete .qcb-fuss{grid-column:1/-1}',
+      '.qcb-pc{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
+      '.qcb-pc ul{margin:5px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}',
+      '.qcb-pc li{padding-left:17px;position:relative;font-size:12.5px;line-height:1.45}',
+      '.qcb-pro li::before{content:"✓";position:absolute;left:0;color:#2f7d55;font-weight:700}',
+      '.qcb-con li::before{content:"!";position:absolute;left:3px;color:#B8625C;font-weight:700}',
+      '#ai-card.qcb-an details.qcb-ki{margin-top:10px}',
+      'details.qcb-ki>summary{cursor:pointer;list-style:none}details.qcb-ki>summary::-webkit-details-marker{display:none}',
+      'details.qcb-ki>summary::after{content:" ›";color:#7A7370}details.qcb-ki[open]>summary::after{content:" ⌄"}',
+      'details.qcb-ki .ai-opinion{margin-top:8px;font:400 13px/1.55 Inter,sans-serif}',
+      'details.qcb-ki .ai-opinion-l{display:none}',
+      '@media (max-width:640px){.qcb-urteil{grid-template-columns:auto 1fr}.qcb-lage{grid-column:1/-1;align-items:flex-start}.qcb-pc{grid-template-columns:1fr}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  function _renderBewertungNeu(score, inputs, urteil, pros, cons) {
+    const card = document.getElementById('ai-card'); if (!card) return;
+    _qcbStil();
+    card.classList.add('qcb-an');
+    let host = document.getElementById('qcb-host');
+    if (!host) {
+      host = document.createElement('div'); host.id = 'qcb-host';
+      const kopf = card.querySelector('.ai-head');
+      if (kopf && kopf.nextSibling) card.insertBefore(host, kopf.nextSibling); else card.appendChild(host);
+      /* KI-Text: dasselbe Element (runRealAi schreibt in #ai-opinion), nur zugeklappt */
+      const op = card.querySelector('.ai-opinion');
+      if (op) {
+        const det = document.createElement('details'); det.className = 'qcb-box qcb-ki';
+        det.innerHTML = '<summary class="qcb-l">Kommentar des Co-Piloten</summary>';
+        det.appendChild(op); card.appendChild(det);
+      }
+    }
+    const k = score.kpi || {}, D = _qcUrteilDaten || {}, e = (urteil && urteil.kern) || {};
+    const kp = QcEngine.num(inputs.kp) || 0, nkm = QcEngine.num(inputs.nkm) || 0, wfl = QcEngine.num(inputs.wfl) || 0;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const e0 = x => Math.round(x).toLocaleString('de-DE') + ' €';
+    const p1 = x => (Math.round(x * 10) / 10).toFixed(1).replace('.', ',') + ' %';
+    const pz = (ton, titel, text, wert, unter) => `<div class="qcb-pz"><span class="qcb-dot ${ton}"></span><span><b>${titel}</b><span class="u">${text}</span></span><span class="w">${wert}${unter ? `<small>${unter}</small>` : ''}</span></div>`;
+
+    /* Lageklasse und ihr Ziel */
+    const lk = inputs.lageklasse || '';
+    let zielT = '';
+    try { const zb = window.DealPilotLageProfil && lk ? window.DealPilotLageProfil.zielBmr(lk) : null; if (zb != null) zielT = 'Ziel ' + String(zb).replace('.', ',') + ' % brutto'; } catch (_) {}
+
+    /* 1 · Urteil */
+    const ton = urteil && urteil.ton === 'bad' ? 'bad' : urteil && urteil.ton === 'warn' ? 'warn' : '';
+    let h = `<div class="qcb"><div class="qcb-box qcb-urteil ${ton}">`
+      + `<div class="qcb-ring">${score.score != null ? Math.round(score.score) : '–'}</div>`
+      + `<div><span class="qcb-l">Ersteinschätzung · ${esc(score.label || '')}</span><h4>${esc(urteil ? urteil.ueberschrift : '')}</h4><p>${urteil ? urteil.rat : ''}</p></div>`
+      + `<div class="qcb-lage"><span class="qcb-l">Lageklasse</span><div class="qcb-seg" role="group" aria-label="Lageklasse">`
+      + ['A', 'B', 'C'].map(x => `<button type="button" data-qcb-lage="${x}" class="${x === lk ? 'on' : ''}">${x}</button>`).join('')
+      + `</div><small>${esc(zielT || 'keine Lageklasse')}</small></div></div>`;
+
+    /* 2 · Drei Prüfsteine */
+    let span = null, mm = null, mbStand = '';
+    try { const st = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null'); if (st && st.card) { span = st.card.mw || null; mm = st.card.mm || null; } } catch (_) {}
+    let p = '';
+    if (span && span.low > 0 && span.high > 0 && kp > 0) {
+      const ab = Math.round((kp / span.med - 1) * 100);
+      const unter = kp < span.low, ueber = kp > span.high;
+      p += pz(ueber ? 'bad' : 'ok', ueber ? 'Preis über der Marktspanne' : unter ? 'Preis unter der Marktspanne' : 'Preis im Rahmen des Marktes',
+        (wfl > 0 ? e0(kp / wfl) + '/m² · ' : '') + 'DealPilot-Marktbewertung ' + e0(span.low) + ' – ' + e0(span.high) + ' (Mitte ' + e0(span.med) + ')'
+        + (!unter && !ueber ? '. Innerhalb der Spanne gibt es keinen belastbaren Vor- oder Nachteil.' : ''),
+        e0(kp), (ab >= 0 ? '+' : '') + ab + ' % zur Mitte');
+    } else if (urteil && urteil.marktwert > 0 && kp > 0) {
+      const ab = Math.round((kp / urteil.marktwert - 1) * 100);
+      p += pz(ab > 5 ? 'bad' : 'ok', ab > 5 ? 'Preis über dem Marktwert' : 'Preis im Rahmen des Marktwerts', 'Marktwert ' + e0(urteil.marktwert), e0(kp), (ab >= 0 ? '+' : '') + ab + ' %');
+    } else {
+      p += pz('', 'Preis ohne Marktvergleich', 'Für den Vergleich oben die DealPilot-Marktbewertung abrufen.', kp ? e0(kp) : '–', '');
+    }
+    const bmr = QcEngine.num(k.bmr) || 0, kpf = nkm > 0 ? kp / (nkm * 12) : null;
+    const lageE = e.lage || null;
+    if (lageE) p += pz(lageE.passt ? 'ok' : 'bad', lageE.passt ? 'Rendite erfüllt das Ziel der ' + lageE.klasse + '-Lage' : 'Rendite unter dem Ziel der ' + lageE.klasse + '-Lage',
+      'Bruttorendite · Ziel ' + String(lageE.ziel).replace('.', ',') + ' %' + (kpf ? ' · Kaufpreisfaktor ' + kpf.toFixed(1).replace('.', ',') : '')
+      + (lageE.passt ? '' : '. Die Lageklasse ist deine Grenze — der Deal kann trotzdem gut sein, siehe Urteil.'),
+      p1(bmr), 'Ziel ' + String(lageE.ziel).replace('.', ',') + ' %');
+    else p += pz(bmr >= 5 ? 'ok' : bmr >= 4 ? 'mid' : 'bad', 'Bruttorendite', 'ohne Lageklasse an der festen Skala (ab 5 % gut)' + (kpf ? ' · Kaufpreisfaktor ' + kpf.toFixed(1).replace('.', ',') : ''), p1(bmr), '');
+    const cf = QcEngine.num(k.cfMon) || 0, dscr = QcEngine.num(k.dscr) || 0, Sw = window._qcSw();
+    const fin = e.finanzierung || null;
+    const finTon = (cf >= Sw.cfGruen && (!dscr || dscr >= Sw.dscrGruen)) ? 'ok' : cf < 0 ? 'bad' : 'mid';
+    const finT = (k.ltvPct != null ? k.ltvPct + ' % finanziert' : 'Finanzierung') + ' · ' + esc(String(inputs.zins || '–')) + ' % Zins · ' + esc(String(inputs.tilg || '–')) + ' % Tilgung' + (dscr ? ' · DSCR ' + dscr.toFixed(2).replace('.', ',') : '')
+      + (fin && fin.ek_mehr ? '. Mit rund ' + e0(fin.ek_mehr) + ' mehr Eigenkapital läge der Cashflow bei null.' : '');
+    p += pz(finTon, finTon === 'ok' ? 'Finanzierung trägt sich' : finTon === 'bad' ? 'Finanzierung trägt sich nicht' : 'Finanzierung knapp', finT, (cf > 0 ? '+' : '') + e0(cf), 'pro Monat');
+    h += `<div class="qcb-box">${p}</div>`;
+
+    /* 3 · Zielkaufpreis mit der Grenze, die greift */
+    try {
+      const T = (window.QcHeuristik && QcHeuristik.zielKaufpreisTeile) ? QcHeuristik.zielKaufpreisTeile(D) : null;
+      if (T && kp > 0) {
+        const zk = (lbl, v, art, satz) => v == null ? '' : `<div class="qcb-zk${T.greift === art ? ' greift' : ''}"><span class="qcb-l">${lbl}</span><div class="v">${e0(Math.floor(v / 1000) * 1000)}</div><span class="u">${v >= kp ? 'kein Nachlass nötig' : 'Nachlass ' + e0(kp - v) + ' (' + Math.round((1 - v / kp) * 100) + ' %)'}${T.greift === art ? ' — diese Grenze greift' : ''}${satz ? ' · ' + satz : ''}</span></div>`;
+        const zr = D.zielBmr != null ? String(D.zielBmr).replace('.', ',') + ' %' : '6 %';
+        h += `<div class="qcb-box"><span class="qcb-l">Zielkaufpreis · was der Preis sein müsste</span><div class="qcb-ziel">`
+          + zk('Rendite-Ziel ' + (lk ? lk + '-Lage' : '(ohne Lageklasse)'), T.rendite, 'rendite', zr + ' brutto')
+          + zk('Cashflow null · deine Finanzierung', T.cashflow, 'cashflow', '')
+          + (T.markt != null ? zk('Marktwert', T.markt, 'markt', '') : '')
+          + `</div><p class="qcb-fuss">Verhandlungsrahmen, kein Wert.${T.greift === 'cashflow' ? ' Den Preis bremst die Finanzierung, nicht die Lage — mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.' : ''}</p></div>`;
+      }
+    } catch (_) {}
+
+    /* 4 · Angesetzte Miete mit Herkunft */
+    if (nkm > 0) {
+      const ausMb = !!(mm && ['low', 'med', 'high'].some(x => Math.round(mm[x]) === Math.round(nkm)));
+      let mp = null; try { mp = window._qcMietpotenzial ? window._qcMietpotenzial(inputs, null) : null; } catch (_) {}
+      const q = [];
+      if (ausMb) q.push('Marktmiete: DealPilot-Marktbewertung');
+      const link = (t, u) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>` : esc(t);
+      if (mp && mp.bremse) q.push(mp.bremse.gilt === true ? 'Mietpreisbremse gilt — ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) + (mp.bremse.bis ? ', bis ' + mp.bremse.bis.split('-').reverse().join('.') : '')
+        : mp.bremse.gilt === false ? 'keine Mietpreisbremse — die Gemeinde steht nicht in der ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) : esc(mp.bremse.text || ''));
+      if (mp && mp.kapp) q.push(ausMb
+        ? 'spätere Erhöhungen: höchstens ' + mp.kapp.pct + ' % in drei Jahren (§ 558 Abs. 3 BGB), frühestens 15 Monate nach Mietbeginn'
+        : 'Kappungsgrenze ' + mp.kapp.pct + ' % in drei Jahren (' + (mp.kapp.herkunft === 'verordnung' ? link(mp.kapp.verordnung || 'Landesverordnung', mp.kapp.url) : '§ 558 Abs. 3 Satz 1 BGB') + ')');
+      h += `<div class="qcb-box qcb-miete"><span><span class="qcb-l">Angesetzte Miete</span><br>${ausMb ? 'Keine Ist-Miete angegeben — gerechnet wird mit der Marktmiete bei Neuvermietung.' : 'Deine Angabe (Ist-Miete).'}</span>`
+        + `<span class="v">${e0(nkm)} / Monat${wfl > 0 ? `<br><small style="font:500 12px Inter,sans-serif;color:#7A7370">${(nkm / wfl).toFixed(2).replace('.', ',')} €/m² kalt</small>` : ''}</span>`
+        + (q.length ? `<p class="qcb-fuss">${q.join(' · ')}.</p>` : '') + `</div>`;
+    }
+
+    /* 5 · Dafür / Dagegen, je drei */
+    const kurz = a => a.slice(0, 3).map(x => '<li>' + x + '</li>').join('');
+    h += `<div class="qcb-box qcb-pc"><div class="qcb-pro"><span class="qcb-l" style="color:#2f7d55">Dafür</span><ul>${kurz(pros) || '<li>—</li>'}</ul></div>`
+      + `<div class="qcb-con"><span class="qcb-l" style="color:#B8625C">Dagegen</span><ul>${kurz(cons) || '<li>Keine kritischen Punkte</li>'}</ul></div></div>`;
+    host.innerHTML = h + '</div>';
+
+    host.querySelectorAll('[data-qcb-lage]').forEach(b => b.addEventListener('click', () => {
+      const s = document.getElementById('qc_lageklasse'); if (!s) return;
+      s.value = b.getAttribute('data-qcb-lage');
+      try { s.dispatchEvent(new Event('change', { bubbles: true })); } catch (_) {}
+      try { scheduleUpdate(); } catch (_) {}
+    }));
+  }
+
   let _qcUrteilDaten = null;
   function _renderMietpotenzial(score, inputs) {
     const host = document.getElementById('ai-mietpotenzial-host');
@@ -5937,7 +6115,9 @@ const QcApp = (function() {
           return window.DealPilotLageProfil.zielBmr(inputs.lageklasse);
         } catch (e) { return null; }
       })(),
-      lageklasse: (inputs.lageklasse || null)
+      lageklasse: (inputs.lageklasse || null),
+      /* v3081 · Zins + Tilgung in %, fuer „mit x € mehr Eigenkapital traegt es sich“ */
+      annuitaetPct: (QcEngine.num(inputs.zins) || 0) + (QcEngine.num(inputs.tilg) || 0)
     };
     _qcUrteilDaten = daten;   /* v3075 · dieselben Zahlen fuer den Zielkaufpreis im Mietpotenzial-Block */
 
@@ -5973,6 +6153,7 @@ const QcApp = (function() {
                     kurz: 'gemessen an deiner Lage-Vorgabe zu teuer' }   /* qc-v2450: „zu kaufen ist passt nicht" */
     };
     var w = WORTE[e.verdict] || WORTE.PRUEFEN;
+    if (e.finanzierung) w = { ton: 'warn', zeichen: '🔍', kopf: 'Objekt passt — Finanzierung prüfen', kurz: 'tragfähig mit mehr Eigenkapital' };   /* v3081 */
 
     /* Die Schwachpunkte als Verhandlungsargument — sie standen schon
        vorher im Rat, nur in einem der drei Zweige. */
@@ -5996,7 +6177,8 @@ const QcApp = (function() {
       rat: e.text + (argumente && (e.verdict === 'VERHANDELN' || e.verdict === 'KRITISCH')
         ? ' Argumente für das Gespräch: ' + argumente + '.' : ''),
       ziel_kp: e.ziel_kp,
-      marktwert: mw
+      marktwert: mw,
+      kern: e   /* v3081 · Lage, Finanzierung, Wert fuer die neue Karte */
     };
   }
 
@@ -7328,8 +7510,9 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
     }
     function vorbelegen() {
       var s = el(), LP = window.DealPilotLageProfil;
-      if (!s || !LP || !LP.standard) return;
-      var k = LP.standard();
+      if (!s) return;
+      /* v3081 · Marcel 02.11.2026: „Standard kannst du B-Lage auswählen“ - ohne Profil-Vorgabe B */
+      var k = (LP && LP.standard && LP.standard()) || 'B';
       if (k && !s.value) { s.value = k; s.dataset.lkVorgabe = k;
         try { s.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
       hinweis();
@@ -7352,10 +7535,10 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v3075"></script>
+  <script src="js/qc-heuristik.js?v=v3081"></script>
   <script src="js/dealscore.js?v=v3075"></script>
   <!-- v3075 · die zulaessige Miete (Kappung, Vergleichsmiete, Sperrfrist) - derselbe Kern wie potenzial.js -->
-  <script src="js/mietpotenzial-kern.js?v=v3075"></script>
+  <script src="js/mietpotenzial-kern.js?v=v3081"></script>
   <script src="js/avm-section.js?v=v3023a"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
