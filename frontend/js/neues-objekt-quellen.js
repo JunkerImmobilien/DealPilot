@@ -47,8 +47,8 @@
   var TEXTE = {
     dealpilot:   { t: 'DealPilot Marktbewertung', u: 'Markteinschätzung aus unseren Daten' },
     dpmb:        { t: 'DealPilot Marktbewertung', u: 'Markteinschätzung aus unseren Daten' },
-    import:      { t: 'Exposé oder Marktbericht', u: 'PDF einlesen — Adresse, Fläche, Preis' },
-    expose:      { t: 'Exposé oder Marktbericht', u: 'PDF einlesen — Adresse, Fläche, Preis' },
+    import:      { t: 'Exposé oder Marktbericht', u: 'PDF oder Foto einlesen — Adresse, Fläche, Preis' },
+    expose:      { t: 'Exposé oder Marktbericht', u: 'PDF oder Foto einlesen — Adresse, Fläche, Preis' },
     voice:       { t: 'Sprache',                  u: 'Das Objekt frei einsprechen' },
     immometrica: { t: 'ImmoMetrica',              u: 'Aus dem Bestand übernehmen' },
     spr:         { t: 'Bewertungspartner',        u: 'Externe Marktbewertung' },

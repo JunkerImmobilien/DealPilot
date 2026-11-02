@@ -251,12 +251,28 @@
     if (verw != null && verw > 0) aus.push({ jahr: jahr, feld: 'hausverwaltung', wort: 'Hausverwaltung', betrag: Math.round(verw * f), hinweis: b.wie });
     if (nul != null && nul > 0) aus.push({ jahr: jahr, feld: 'nk_n_umlf', wort: 'Nicht-umlagefähige Nebenkosten (ohne Rücklage und Verwaltung)', betrag: Math.max(0, Math.round((nul - (verw || 0)) * f)), hinweis: b.wie + ' · die Rücklagen-Zuführung ist erst absetzbar, wenn die Gemeinschaft sie ausgibt' });
     var erh = 0, teile = [];
-    (ext.ruecklage_entnahmen || []).forEach(function (x) { var n = _zahl(x.betrag_eur); if (n > 0) { erh += n * (ext.umfang === 'einzel' ? 1 : f); teile.push((x.zweck || 'Entnahme') + ' (Rücklage)'); } });
+    /* v3090 · Gemessen 02.11.2026 im Browser (Prod, Testunterlage Lindenallee, Einzelplan WE 5, MEA 118/1.000):
+       Vorschlag „Erhaltungsaufwand 92.000 €" für EINE Wohnung - Rücklagen-Entnahme 50.000 € und Sonderumlage
+       42.000 € der ganzen Gemeinschaft, multipliziert mit dem Faktor des Einzelplans (1). Beträge der
+       Gemeinschaft gehen jetzt mit dem Miteigentumsanteil ein: beim Gesamtplan × MEA ist das f, beim Einzelplan
+       der MEA aus dem Objekt oder aus dem Plan selbst. Ohne MEA kein Vorschlag (statt einer falschen Zahl). */
+    var anteil = f;
+    if (b.w === ext.einzel && ext.umfang !== 'einzel') {
+      var _mea = (ktx && ktx.mea > 0) ? ktx.mea : 0;
+      if (!(_mea > 0) && ext.mea && window.DpUnterlagen && window.DpUnterlagen.meaProzent) _mea = window.DpUnterlagen.meaProzent(ext.mea) || 0;
+      anteil = _mea > 0 ? _mea / 100 : null;
+    }
+    var gemeinschaft = function (n) { return ext.umfang === 'einzel' ? n : (anteil == null ? null : n * anteil); };
+    var ohneMea = false;
+    (ext.ruecklage_entnahmen || []).forEach(function (x) { var n = _zahl(x.betrag_eur); if (n > 0) { var a = gemeinschaft(n); if (a == null) { ohneMea = true; return; } erh += a; teile.push((x.zweck || 'Entnahme') + ' (Rücklage)'); } });
     (ext.sonderumlagen || []).forEach(function (x) {
       if (_zahl(x.jahr) && _zahl(x.jahr) !== jahr) return;
-      var n = _zahl(x.betrag_einheit_eur) != null && _ktxArt(ktx) === 'ETW' ? _zahl(x.betrag_einheit_eur) : (_zahl(x.betrag_gesamt_eur) || 0) * f;
+      var n = _zahl(x.betrag_einheit_eur) != null ? _zahl(x.betrag_einheit_eur) : gemeinschaft(_zahl(x.betrag_gesamt_eur) || 0);
+      if (n == null) { ohneMea = true; return; }
       if (n > 0) { erh += n; teile.push((x.zweck || 'Sonderumlage') + ' (Sonderumlage)'); }
     });
+    if (ohneMea) teile.push('ohne Miteigentumsanteil nicht anteilig rechenbar');
+    if (anteil != null && anteil !== 1 && erh > 0) teile.push('Anteil ' + String(Math.round(anteil * 10000) / 100).replace('.', ',') + ' %');
     if (erh > 0) aus.push({ jahr: jahr, feld: 'erhaltungsaufwand', wort: 'Erhaltungsaufwand', betrag: Math.round(erh), hinweis: teile.join(', ') + ' · absetzbar im Jahr, in dem die Gemeinschaft das Geld für Erhaltung ausgibt; in den ersten drei Jahren nach Kauf zählt es zur 15-%-Grenze - mit dem Steuerberater abstimmen' });
     return aus;
   }

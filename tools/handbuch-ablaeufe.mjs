@@ -97,8 +97,8 @@ export const ABLAEUFE = [
     schritte: [
       { t: 'Das Objekt öffnen. In der Leiste oben im Objekt („Daten einlesen“ bzw. „Daten übernehmen aus“) die Kachel **Exposé / Marktbericht** wählen und **Abrufen** drücken.',
         belege: [[J('object-actions.js'), '<span class="k-heute">Daten einlesen</span>'], [J('object-actions.js'), "pfTileTool('import', _doc, 'Exposé / Marktbericht'"]] },
-      { t: 'Im Fenster **PDFs einlesen — Exposé, Marktbericht, Dokumente** die Dateien auswählen oder hineinziehen. Mehrere PDFs auf einmal gehen, bis 100 MB je Datei.',
-        belege: [[J('object-actions.js'), 'PDFs einlesen — Exposé, Marktbericht, Dokumente'], [J('object-actions.js'), 'mehrere Dateien möglich · max 100 MB je Datei']] },
+      { t: 'Im Fenster **Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente** die Dateien auswählen oder hineinziehen. Mehrere PDFs oder Fotos (JPG, PNG) auf einmal gehen, bis 100 MB je Datei. Ein Foto wird wie eine gescannte Seite gelesen.',
+        belege: [[J('object-actions.js'), 'Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente'], [J('object-actions.js'), 'mehrere Dateien möglich · max 100 MB je Datei']] },
       { t: 'DealPilot erkennt den Typ jeder Datei (auch gescannte PDFs); du kannst ihn je Datei umstellen. Alle Werte werden zusammengeführt — widersprechen sich zwei Dateien, führt der Marktbericht.',
         belege: [[J('object-actions.js'), 'Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar'], [J('object-actions.js'), 'Marktbericht führt bei Konflikt']] },
       { t: 'Liste prüfen: Weicht ein gelesener Wert von dem ab, was schon im Objekt steht, ist die Zeile markiert und nicht vorgehakt. Gefundene Bilder lassen sich in die Objektfotos übernehmen.',

@@ -1654,7 +1654,28 @@
     } finally { try { await worker.terminate(); } catch (e) {} }
     return all.join('\n\n');
   }
+  /* v3090 · Foto einer Unterlage: auf ~2200 px Breite bringen (gemessen: so liest die Texterkennung 99 % der
+     Zahlen) und wie eine gescannte Seite über /ai/seiten-lesen lesen - nur Text geht an die KI. */
+  function _istFoto(f) { return /^image\/(jpeg|png|webp)$/i.test(f.type || '') || /\.(jpe?g|png|webp)$/i.test(f.name || ''); }
+  async function _fotoLesen(file, statusCb) {
+    if (statusCb) statusCb('Foto wird gelesen …');
+    var url = await new Promise(function (ok, nein) { var r = new FileReader(); r.onload = function () { ok(r.result); }; r.onerror = function () { nein(r.error); }; r.readAsDataURL(file); });
+    var img = await new Promise(function (ok, nein) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { nein(new Error('Bild nicht lesbar')); }; i.src = url; });
+    var s = Math.min(1, 2200 / Math.max(1, img.naturalWidth)), cv = document.createElement('canvas');
+    if (img.naturalWidth < 1600) s = Math.min(2, 1600 / Math.max(1, img.naturalWidth));
+    cv.width = Math.round(img.naturalWidth * s); cv.height = Math.round(img.naturalHeight * s);
+    var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(img, 0, 0, cv.width, cv.height);
+    var r2 = await window.Auth.apiCall('/ai/seiten-lesen', { method: 'POST', body: { bilder: [cv.toDataURL('image/jpeg', 0.85)] } });
+    if (!r2 || !r2.success) throw new Error((r2 && r2.error) || 'Foto konnte nicht gelesen werden.');
+    file._dpScan = { seiten: 1, gelesen: 1, gekuerzt: false, foto: true };
+    return String(r2.text || '');
+  }
   async function extractTextFull(file, statusCb) {
+    if (_istFoto(file)) {
+      var ft = ''; try { ft = await _fotoLesen(file, statusCb); } catch (e) { ft = ''; }
+      if (ft && window.DpUnterlagen && window.DpUnterlagen.istPersoenlich(ft)) { file._dpPersoenlich = true; return ''; }
+      return ft;
+    }
     var text = await extractPdfTextRaw(file);
     /* v3016 · Scans über die KI (unterlagen.js): gemessen 14 von 15 PDFs eines Objekts
        ohne Textschicht, bis 36 Seiten - Tesseract las hier höchstens 6. Tesseract bleibt
@@ -2444,12 +2465,12 @@
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
-        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_ergaenzen ? 'Unterlagen nachreichen' : 'PDFs einlesen — Exposé, Marktbericht, Dokumente') + '</h3></div>' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente') + '</h3></div>' +
         (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage – gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
-        '<div class="oabi-sub">Mehrere PDFs gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
+        '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
-          '<div class="oabi-drop" id="oabi-drop">📁 PDFs auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
-            '<input type="file" id="oabi-input" accept="application/pdf,.pdf" multiple style="display:none"></div>' +
+          '<div class="oabi-drop" id="oabi-drop">📁 PDFs oder Fotos auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
+            '<input type="file" id="oabi-input" accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple style="display:none"></div>' +
           '<div class="oabi-files" id="oabi-files"></div><div id="oabi-result"></div>' +
         '</div>' +
         '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oabi-cancel">Schließen</button>' +
@@ -2569,8 +2590,10 @@
     await resolveType(f); recompute(); renderMergedTable();
   }
   async function handleFiles(fileList) {
-    var files = Array.prototype.slice.call(fileList).filter(function (f) { return /\.pdf$/i.test(f.name) && f.size <= 100 * 1024 * 1024; });
-    if (!files.length) { toast('Bitte gültige PDF-Dateien (max 100 MB) wählen.'); return; }
+    /* v3090 · Marcel 02.11.2026: „könnte ich auch Bilder bei den PDFs import reingeben?“ - Fotos von Unterlagen
+       (JPG, PNG, WebP) laufen wie eine gescannte Seite: Texterkennung und Schwärzen auf dem Server. */
+    var files = Array.prototype.slice.call(fileList).filter(function (f) { return (/\.pdf$/i.test(f.name) || _istFoto(f)) && f.size <= 100 * 1024 * 1024; });
+    if (!files.length) { toast('Bitte PDFs oder Fotos (JPG, PNG, max 100 MB) wählen.'); return; }
     var filesHost = $('oabi-files');
     /* v3052 · Marcel 30.10.2026: „schneller auswerten bei bleibender Qualität". Bis v3051 lief jede
        Datei erst ganz durch (Text, dann KI), bevor die nächste begann - zehn Unterlagen mit je
