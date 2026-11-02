@@ -44071,3 +44071,15 @@ laut V63.76 schon immer verborgen sein; gemessen stand sie da, sobald man aus ei
 im Boarding alle sechs Teile `display:none`, danach zurück. **Prod 1.0.13** Merge `70053ef`, Sicherungen
 `haupt/mb-20261102-0647`, 200. **Rest** Bestandsaufnahme Zielbild/Mietrecht in `wissen/2026-11-02.md` Teil 2;
 Entwürfe Einstellungen/Plan (N88) und Detailstufen + Mietleiter (N89) in Arbeit.
+
+
+### v3062–v3064a — Mietrecht, Auto-Save, Plan A, FESH-Regel (02.11.2026) · Prod 1.0.14
+
+**Was.** v3062/a/b Mietpreisbremse (§ 556d) aus `kappungsgrenzen.json` + Karte „Mietrecht an dieser Adresse" (Tab
+Miete; MFH je Wohnung; MFH-Fenster), § 559-Umlage in der Zeile. v3063 Einstellungen nur noch Auto-Save (change,
+still, Schließen speichert inkl. Mandant), Plan-Reiter Variante A. v3064/a FESH-Regel nach BMF-Schreiben vom
+26.01.2026 (3 von 4 → Herstellungskosten, AfA-Satz genannt) in Zielbild, MFH-Fenster und Tab Investition (#san_fesh);
+Hinweis „Erhaltungsanteil nicht eingetragen — 0 % abgezogen". **Commits** ac2a4726, de707294, d0913a98, 7e3b3f96,
+d15bbf89, 5c33f144. **Nachweis** und Einzelheiten `wissen/2026-11-02.md` Teil 4. **Prod 1.0.14** Merge `8bda18b`,
+Sicherungen `haupt/mb-20261102-0733`, 200. **Rest** N89 (Detailgrad-Entwurf neu, Vergleichsmiete = Marktmiete),
+Mietleiter MFH, Rückfrage 2-Gewerke im Tab Objekt.

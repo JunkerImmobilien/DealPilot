@@ -57,7 +57,8 @@ Mieterwechsel ohne Maßnahme prognostizieren.
 Kappung und nächste Erhöhung werden gerechnet. **Mietpreisbremse:** Daten da, nicht ausgewertet. **Mietspiegel:**
 Paket `mietrecht-ort` liegt ungenutzt. **Neuvertragsmiete:** fehlt. Miete nach Sanierung amtlich nur Minden-Lübbecke.
 
-1. ✅ Entwurf `design/Vorschläge/detailstufen-konzept.md` + `detailstufen-demo.html` (02.11., 9/21/33 Felder je Stufe).
+0. **Neu 02.11. (der erste Entwurf ging am Thema vorbei — Marcel meinte die TABS des Arbeitsbereichs):** `design/Vorschläge/arbeitsbereich-detailgrad-demo.html` + `arbeitsbereich-detailgrad-bestand.md`. Vor dem Bau: `d1` im Hauptformular rechnen, EK-Vorgabe ohne Kaufpreis, „Bereit für die Bank" je Stufe, AfA-Vorgabe nach Baujahr. Offen außerdem: § 558-Soll rechnet auf `ds2_marktmiete` (Angebotsmiete) statt ortsüblicher Vergleichsmiete.
+1. ~~✅ Entwurf `design/Vorschläge/detailstufen-konzept.md`~~ (überholt) + `detailstufen-demo.html` (02.11., 9/21/33 Felder je Stufe).
    **Entscheidungen offen:** (a) Namen Sichtflug · Instrumentenflug · Langstrecke mit Klarnamen; (b) Einstieg bekommt
    Kaufpreis + Kaltmiete als Pflicht (heute Stufe 1 ohne beide → keine Investment-Bewertung möglich); (c) 70-%-Schwelle
    des Investor Deal Score: Empfehlung „vorläufig · n von 24 aus Vorgaben“, Hauptergebnis DealPilot-Score; (d) Stufe
@@ -4167,6 +4168,8 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3062–v3064a** (Prod 1.0.14) — Mietpreisbremse + Mietrecht-Karte, Auto-Save + Plan A, FESH-Regel (BMF 26.01.2026). **Befund:** Bremse-Daten lagen ungelesen vor; „Auto-Save aktiv" stimmte für Textfelder nicht; Zielmieten über der Bremse liefen ohne Hinweis.
 
 - **02.11.2026 · v3061/v3061a** (`5822bcdb`, `613aee26`, Prod 1.0.13) — Bestand/Ankauf öffnet die Objektliste;
   Quick Boarding ohne Objekt im Kopf und ohne Reiterleiste. **Befund:** der Schalter filterte nur; die Reiterleiste
