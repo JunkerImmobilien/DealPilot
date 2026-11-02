@@ -44137,3 +44137,10 @@ wahlweise zwei Scores (Investment/Finanzierung), Einstellung `dp_score_ansicht`.
 **Merges** c56e46a9, 842ca7ba, 18c7c450; **Prod** 1.0.20 (8a0ead5), 1.0.21 (3f07c1d), 1.0.22 (df226e3). **Nachweis** und
 Einzelheiten `wissen/2026-11-02.md` Teil 11. **Rest** Abnahme Zustand-Grenze/Bonus, Messe-Drehbücher, Handbuch, N93,
 Bayern-BRW (iFrame, registry-Text, Anfrage).
+
+### v3077/a — Detailgrad in die Einstellungen, Datenaufnahme-Leiste in jeder Stufe (02.11.2026)
+
+**Was.** Detailgrad je Nutzer statt je Objekt, Schalter nur noch in Einstellungen › Mein Profil (Reiter Objekt: Anzeige +
+„in den Einstellungen ändern ›", über den Reitern kein Schalter mehr); `#obj-action-bar` nie ausgeblendet (fehlte in der
+Zuordnung → galt als Experte); Zeile „Gewichtung anpassen ›" aus Mein Profil entfernt. **Commit** 3fcda349 + v3077a.
+**Nachweis** `wissen/2026-11-02.md` Teil 12. **Rest** —

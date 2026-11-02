@@ -210,6 +210,7 @@
            (vorher im Reiter Objekt und über jedem Reiter). */
         var dg = document.createElement('div');
         dg.className = 'dp-es-detailgrad';
+        dg.style.marginBottom = '18px';   /* v3077a · Luft vor „Deine Haltung“ */
         dg.innerHTML = '<h3 class="ip-section">Detailgrad der Eingabe</h3>' +
           '<p class="hint">Wie viele Felder du in den Reitern siehst — gilt für alle Objekte. Einsteiger: die wichtigsten Felder, Marktbericht Stufe 1. ' +
           'Fortgeschritten: dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II, Stufe 2. Experte: alle Felder und die Wertermittlung nach ImmoWertV, Stufe 3. ' +
