@@ -95,6 +95,7 @@
   }
   function voKurz(voll) {
     voll = String(voll || ''); var kl = /\(([^)]+)\)/.exec(voll);
+    if (kl && /^\s*(§|\d)/.test(kl[1])) kl = null;   /* v3084b: „(§ 1)“ ist kein Kurzname (NI Mietpreisbremse) */
     return kl ? kl[1].split(/\s[–—-]\s/)[0] : voll.split(' vom ')[0];
   }
 
