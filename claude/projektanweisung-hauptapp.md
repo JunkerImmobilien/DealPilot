@@ -44119,3 +44119,10 @@ ba026c7. **Rest** Zwei-Score-Entscheidung (Demo), Bänder-Recherche, N89 Bau, N9
 1,2 / 1,0 / 0,8 → kein / 84 / 69 / 49, Kritisch 34 bei Darlehen über Marktwert (nur DS1). Ersetzt die pauschale 49 aus
 v3069. **Commit** c6bf9a84. **Nachweis** Staging 91/84/57/49/28. **Prod 1.0.18** Merge 16f34d6. **Rest** Zwei-Score-
 Entscheidung; Benchmark-Zins auf Markt (4,4 %) heben.
+
+### v3071 · v3072 — Balken in der Mietleiter, Förderregister (02.11.2026) · Prod 1.0.19
+
+**Was.** v3071 Balken Ist/Soll/Zielbild in `potenzial.js leiterHtml`. v3072 `js/data/foerderregister.js` als einzige
+Quelle für KfW-/BAFA-Hinweise und Darlehen-2-Links, Jahreswerte-Eintrag `foerderprogramme` (fällig 01.12.2026). **Commit**
+fee34a4b. **Nachweis** Westerfeld Whg 3 Balken 585/695/665, Empfehlungen aus dem Register mit Stand. **Prod 1.0.19** Merge
+f376887. **Rest** v3073 Detailgrad (Worktree), Quick-Check-Ausbau P1.1–P1.3, Zwei-Score-Umfang.
