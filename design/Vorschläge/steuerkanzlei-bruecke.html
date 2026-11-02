@@ -1,0 +1,310 @@
+<title>Steuerkanzlei-Brücke</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: Konzeptpapier in einer Spalte; dunkler Kopf mit Kernaussage, danach Abschnitte als Tafeln,
+   Ablauf als Statuskette, Exportwege als Vergleichstabelle, Stufen als drei Spalten. DealPilot-Marke. */
+:root{
+  --bg:#FDFCFA; --tafel:#FFFFFF; --karte:#FBF6E9; --fg:#1d1b19; --mut:#6b6660; --linie:#e8e1d2;
+  --obs:#050505; --obs-fg:#f1ede5; --obs-mut:#a49d92;
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f; --gold-text:#8a6d1f;
+  --gruen:#3FA56C; --gruen-bg:#e6f3eb; --rot:#B8625C; --rot-bg:#f6e7e5; --gelb:#b88a1f; --gelb-bg:#f8efd6; --blau:#5b7a99; --blau-bg:#e8eef4;
+  --f-disp:"Space Grotesk",system-ui,sans-serif; --f-body:Inter,system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --obs:#000;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --blau:#8fa9c4; --blau-bg:#1a222b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --obs:#000;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --rot-bg:#2e1715; --gelb-bg:#2b2310; --blau:#8fa9c4; --blau-bg:#1a222b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:400 15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-block:0 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:30px}
+h1,h2,h3{font-family:var(--f-disp);text-wrap:balance;margin:0}
+h2{font-size:24px;font-weight:600}
+h3{font-size:16px;font-weight:600}
+p{margin:0;max-width:72ch}
+.lbl{font:600 11px/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+code{font:500 12.5px var(--f-mono);background:var(--karte);padding:1px 5px;border-radius:4px}
+a{color:var(--gold-text)}
+
+.kopf{background:var(--obs);color:var(--obs-fg);border-radius:0 0 22px 22px;padding:40px 32px 34px;display:grid;gap:16px;margin-left:calc(-1*max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1*max(16px,env(safe-area-inset-right,0px)))}
+.kopf .lbl{color:var(--gold-hi)}
+.kopf h1{font-size:clamp(30px,5vw,46px);font-weight:700;line-height:1.05}
+.kopf h1 span{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));-webkit-background-clip:text;background-clip:text;color:transparent}
+.kopf p{color:var(--obs-fg);font-size:16px}
+.kopf .meta{display:flex;gap:10px;flex-wrap:wrap}
+.kopf .meta span{font:600 11.5px var(--f-mono);color:var(--obs-mut);border:1px solid #2c2822;border-radius:999px;padding:4px 10px}
+
+.marke{display:inline-block;font:600 10px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px;white-space:nowrap;vertical-align:1px}
+.m-b{background:var(--gruen-bg);color:var(--gruen)} .m-a{background:var(--gelb-bg);color:var(--gelb)} .m-o{background:var(--blau-bg);color:var(--blau)}
+.legende{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mut);align-items:center}
+
+.abschnitt{display:grid;gap:16px}
+.abschnitt > .kopfzeile{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--linie);padding-bottom:8px}
+.abschnitt > .kopfzeile .nr{font:700 13px var(--f-mono);color:var(--gold-text)}
+
+.kern{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.kern div{background:var(--tafel);border:1px solid var(--linie);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
+.kern div b{font:600 15px var(--f-disp)}
+.kern div p{font-size:13.5px;color:var(--mut)}
+.kern div.haupt{background:var(--karte);border-color:transparent}
+
+.fortschritt{background:var(--tafel);border:1px solid var(--linie);border-radius:14px;padding:18px;display:grid;gap:10px}
+.balken{height:14px;border-radius:999px;background:var(--karte);overflow:hidden;display:flex}
+.balken i{display:block;height:100%}
+.zeilen{display:grid;gap:8px}
+.zeile{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;font-size:14px;align-items:start}
+.zeile .ic{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--f-mono);margin-top:1px}
+.ic.ja{background:var(--gruen-bg);color:var(--gruen)} .ic.nein{background:var(--rot-bg);color:var(--rot)}
+.zeile small{display:block;color:var(--mut);font-size:12.5px}
+.zwei{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+
+.wege{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.weg{background:var(--tafel);border:1px solid var(--linie);border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start}
+.weg ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14px}
+.weg .tag{justify-self:start;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--karte);color:var(--gold-text)}
+
+.kette{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kette .st{font:600 12.5px var(--f-disp);padding:7px 12px;border-radius:9px;border:1px solid var(--linie);background:var(--tafel)}
+.kette .st.m{border-color:var(--gold);background:var(--karte)}
+.kette .st.k{border-color:var(--fg)}
+.kette .st.end{background:var(--obs);color:var(--obs-fg);border-color:var(--obs)}
+.kette .pf{color:var(--mut);font:600 14px var(--f-mono)}
+.kette-legende{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--mut)}
+.kette-legende span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid var(--gold);background:var(--karte)}
+.kette-legende span.k::before{border-color:var(--fg);background:var(--tafel)}
+
+.tab-box{overflow-x:auto;border:1px solid var(--linie);border-radius:14px;background:var(--tafel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{font:600 10.5px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut);text-align:left;padding:10px 12px;border-bottom:1px solid var(--linie);background:var(--karte);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--linie);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td b{font-family:var(--f-disp)}
+td small{display:block;color:var(--mut);font-size:12px}
+.punkte{display:inline-flex;gap:3px}
+.punkte i{width:9px;height:9px;border-radius:50%;background:var(--linie)}
+.punkte i.an{background:var(--gold)}
+tr.empf td{background:var(--karte)}
+
+.modell{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.box{border:1px solid var(--linie);border-radius:12px;padding:12px 14px;background:var(--tafel);display:grid;gap:4px;align-content:start}
+.box.neu{border-color:var(--gold);border-style:dashed}
+.box h3{font:600 13.5px var(--f-mono)}
+.box p{font-size:12.5px;color:var(--mut)}
+.box .neu-tag{justify-self:start;font:600 10px var(--f-mono);color:var(--gold-text);letter-spacing:.06em}
+
+.liste{display:grid;gap:10px}
+.liste > div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:12px 0;border-bottom:1px solid var(--linie)}
+.liste > div:last-child{border-bottom:0}
+.liste b{font:600 14px var(--f-disp)}
+.liste p{font-size:14px}
+@media (max-width:620px){.liste > div{grid-template-columns:1fr;gap:4px}}
+
+.stufen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:820px){.stufen{grid-template-columns:1fr}}
+.stufe{border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start;border:1px solid var(--linie);background:var(--tafel)}
+.stufe.jetzt{background:var(--obs);color:var(--obs-fg);border-color:var(--obs)}
+.stufe.jetzt .lbl{color:var(--gold-hi)}
+.stufe.jetzt li{color:var(--obs-fg)}
+.stufe h3{font-size:19px}
+.stufe ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:13.5px}
+
+.fragen{counter-reset:f;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.fragen div{counter-increment:f;background:var(--tafel);border:1px solid var(--linie);border-radius:12px;padding:14px 16px 14px 50px;position:relative;font-size:14px}
+.fragen div::before{content:counter(f);position:absolute;left:14px;top:13px;width:24px;height:24px;border-radius:50%;background:var(--karte);color:var(--gold-text);font:700 12px var(--f-mono);display:grid;place-items:center}
+.fragen b{display:block;font:600 14px var(--f-disp);margin-bottom:2px}
+
+.quellen{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;font-size:13px}
+.quellen ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px}
+.quellen a{word-break:break-word}
+.hinweis{font-size:13px;color:var(--mut);background:var(--karte);border-radius:12px;padding:12px 14px}
+</style>
+
+<div class="wrap">
+  <header class="kopf">
+    <span class="lbl">Konzept · DealPilot · 02.11.2026 · noch nichts gebaut</span>
+    <h1>Steuerkanzlei-<span>Brücke</span></h1>
+    <p>Mandanten und Kanzleien verbinden sich in DealPilot, der Mandant reicht ein Steuerjahr ein, die Kanzlei prüft, gibt zurück oder frei und übernimmt die Daten in ihre Software. Zwei Wege führen hinein: Die Kanzlei kauft Seats für ihre Mandanten, oder ein bestehender Nutzer verbindet sich selbst.</p>
+    <div class="meta"><span>Code-Lesung Zweig staging</span><span>Recherche DATEV · ELSTER · Wolters Kluwer · Buhl</span><span>Rechtliches nicht anwaltlich geprüft</span></div>
+  </header>
+
+  <div class="legende"><span>Jede Aussage ist gekennzeichnet:</span><span><span class="marke m-b">belegt</span> im Code oder auf einer offiziellen Seite gelesen</span><span><span class="marke m-a">Annahme</span> Schluss oder Erfahrungswert</span><span><span class="marke m-o">offen</span> bei der Gegenseite zu erfragen</span></div>
+
+  <!-- 1 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">1</span><h2>Das Wichtigste in Kürze</h2></div>
+    <div class="kern">
+      <div class="haupt"><b>Rund 70 % gibt es schon</b><p>Partner-Konto, Seats mit Stripe, Einladung per Link, Freigabe je Objekt mit Prüfung und Protokoll. <span class="marke m-b">belegt</span></p></div>
+      <div><b>Drei Dinge fehlen</b><p>Bezug auf ein Steuerjahr, ein eingefrorener Stand beim „fertig“ und mehr als eine Kanzlei je Nutzer. <span class="marke m-b">belegt</span></p></div>
+      <div><b>Beide Wege, eine Tabelle</b><p>Ob die Kanzlei einlädt oder der Nutzer sich verbindet: Der Unterschied ist nur, wer verknüpft und wer den Seat zahlt.</p></div>
+      <div><b>Kein Direktimport in DATEV oder Addison</b><p>DATEV übernimmt Anlage-V-Werte nur aus der eigenen Buchhaltung. Offen ist das DATEV-Format, aber in die Kanzlei-Buchhaltung. <span class="marke m-b">belegt</span></p></div>
+      <div><b>ELSTER ginge, lohnt aber nicht</b><p>ERiC ist kostenlos, doch DealPilot müsste eine vollständige Einkommensteuererklärung bauen, nicht nur die Anlage V. <span class="marke m-a">Annahme</span></p></div>
+      <div class="haupt"><b>Empfehlung: Stufe 1 jetzt</b><p>Freigabe je Steuerjahr mit eingefrorenem Stand und ein Kanzlei-Paket aus PDF und CSV je Anlage-V-Zeile. Das passt zu jeder Kanzleisoftware, ohne Partnervertrag.</p></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">2</span><h2>Was es schon gibt</h2></div>
+    <div class="fortschritt">
+      <div class="reihe" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span class="lbl">Kanzlei-Ablauf, gemessen am Code</span><b style="font-family:var(--f-disp)">≈ 70 % vorhanden</b></div>
+      <div class="balken" role="img" aria-label="70 Prozent vorhanden"><i style="width:70%;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo))"></i></div>
+    </div>
+    <div class="zwei">
+      <div class="zeilen">
+        <span class="lbl">Fertig</span>
+        <div class="zeile"><span class="ic ja">✓</span><div>Partner-Konto mit Rolle <code>steuerberater</code>, Berater der Kanzlei, Mandantenliste<small>Migration 055_reseller_core.sql</small></div></div>
+        <div class="zeile"><span class="ic ja">✓</span><div>Seats kaufen, im Pool halten, zuweisen und entziehen, per Stripe<small>resellerPortal.js · Plan partner 149 €/Monat</small></div></div>
+        <div class="zeile"><span class="ic ja">✓</span><div>Einladung per Link, beim Annehmen wird ein Seat zugewiesen<small>resellerInvite.js · acceptInvite()</small></div></div>
+        <div class="zeile"><span class="ic ja">✓</span><div>Freigabe je Objekt: eingereicht → bestätigt / zurückgegeben / widerrufen, mit Protokoll<small>mandant-freigaben.js · share_audit</small></div></div>
+        <div class="zeile"><span class="ic ja">✓</span><div>Anlage V 2025 Zeile für Zeile mit Kennzahlen, Steuermappe als PDF<small>anlage-v-2025.js · werbungskosten-pdf.js</small></div></div>
+        <div class="zeile"><span class="ic ja">✓</span><div>Partner-Branding im Look der Kanzlei<small>Whitelabel, Logo, PDF</small></div></div>
+      </div>
+      <div class="zeilen">
+        <span class="lbl">Fehlt</span>
+        <div class="zeile"><span class="ic nein">✕</span><div><b>Kein Steuerjahr</b><small>Ein Objekt hat je Kanzlei nur eine Freigabe, nicht 2025 und 2026 nebeneinander.</small></div></div>
+        <div class="zeile"><span class="ic nein">✕</span><div><b>Kein eingefrorener Stand</b><small>Die Kanzlei sieht immer die Live-Daten; ändert der Mandant nach „fertig“, prüft sie etwas anderes.</small></div></div>
+        <div class="zeile"><span class="ic nein">✕</span><div><b>„Zurück“ sperrt aus</b><small>Nach dem Zurückgeben sieht der Berater das Objekt nicht mehr, Rückfragen sind so nicht möglich.</small></div></div>
+        <div class="zeile"><span class="ic nein">✕</span><div><b>Ein Nutzer, eine Kanzlei</b><small>Steuerberater und Finanzierer zugleich geht nicht.</small></div></div>
+        <div class="zeile"><span class="ic nein">✕</span><div><b>Kein Selbstverbinden</b><small>Weg 2 fehlt: Ohne Einladung der Kanzlei kommt kein Nutzer hinein.</small></div></div>
+        <div class="zeile"><span class="ic nein">✕</span><div><b>Zu viel Einblick</b><small>Die Kanzlei bekommt heute auch KI-Analyse und alle Objektdaten. Für die Steuer reicht das Steuerjahr.</small></div></div>
+      </div>
+    </div>
+    <p class="hinweis"><b>Namensfalle:</b> <code>mandanten.js</code> verwaltet die <b>Halter</b> eines Objekts (Privat, GmbH, UG, GbR), keine Kanzlei-Mandanten. Im Konzept heißt der Kanzlei-Kunde Mandant, der Eigentümer im Objekt Halter.</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">3</span><h2>Zwei Wege hinein, ein Ablauf</h2></div>
+    <div class="wege">
+      <div class="weg"><span class="tag">Weg 1 · Kanzlei kauft Seats</span>
+        <ol><li>Kanzlei hat ein Partner-Konto und kauft Seats.</li><li>Sie lädt den Mandanten ein, neu mit Steuerjahr und Rolle „Steuerberatung“.</li><li>Der Mandant legt sein Konto an, der Seat zahlt sein Abo.</li><li>Er erfasst Objekte, Mieten und Kosten.</li></ol></div>
+      <div class="weg"><span class="tag">Weg 2 · Nutzer verbindet sich</span>
+        <ol><li>Der Nutzer hat schon ein Abo und eigene Objekte.</li><li>Er verbindet sich über einen <b>Verbindungscode der Kanzlei</b>, kein Kanzlei-Verzeichnis nötig.</li><li>Kein Seat nötig, er zahlt sein Abo selbst.</li><li>Er kann mehrere Partner haben, jeweils mit eigener Freigabe.</li></ol></div>
+    </div>
+    <h3>Der Ablauf je Steuerjahr</h3>
+    <div class="kette" role="list" aria-label="Statuskette">
+      <span class="st m" role="listitem">verknüpfen · 2025, Objekte A und B</span><span class="pf">→</span>
+      <span class="st m" role="listitem">fertig melden</span><span class="pf">→</span>
+      <span class="st k" role="listitem">eingereicht · Stand eingefroren</span><span class="pf">→</span>
+      <span class="st k" role="listitem">in Prüfung</span><span class="pf">→</span>
+      <span class="st k" role="listitem">zurück mit Rückfrage</span><span class="pf">↺</span>
+      <span class="st m" role="listitem">korrigieren · Version 2</span><span class="pf">→</span>
+      <span class="st k" role="listitem">freigegeben</span><span class="pf">→</span>
+      <span class="st end" role="listitem">übertragen</span>
+    </div>
+    <div class="kette-legende"><span>Mandant handelt</span><span class="k">Kanzlei handelt</span><span style="padding-left:0">Widerruf durch den Mandanten jederzeit, der Zugriff endet sofort.</span></div>
+    <p>Der Mandant entscheidet, <b>was</b> sichtbar ist und wann es fertig ist. Die Kanzlei entscheidet, <b>ob</b> es so übernommen wird, und ändert selbst keine Mandantendaten, sondern gibt zurück. Geprüft und übertragen wird immer ein eingefrorener Stand mit Versionsnummer, nie die Live-Daten.</p>
+  </section>
+
+  <!-- 4 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">4</span><h2>Datenmodell</h2><span class="lbl">Bestehendes erweitern, nichts daneben bauen</span></div>
+    <div class="modell">
+      <div class="box"><h3>resellers</h3><p>die Kanzlei, mit Beratern in reseller_members</p></div>
+      <div class="box"><h3>reseller_clients</h3><p>der Mandant der Kanzlei · <b>neu:</b> Herkunft Einladung oder Verbindung, Seat-Pflicht ja/nein</p></div>
+      <div class="box neu"><span class="neu-tag">NEU</span><h3>steuer_mandate</h3><p>Kanzlei × Mandant × Steuerjahr, Status, Einwilligung mit Zeitpunkt und Textversion, Widerruf</p></div>
+      <div class="box neu"><span class="neu-tag">NEU</span><h3>steuer_mandat_objekte</h3><p>welche Objekte zu diesem Steuerjahr gehören</p></div>
+      <div class="box neu"><span class="neu-tag">NEU</span><h3>steuer_staende</h3><p>der eingefrorene Stand je Version: Anlage-V-Zeilen und Kennzahlen je Objekt, Prüfsumme, Steuermappe als PDF</p></div>
+      <div class="box neu"><span class="neu-tag">NEU</span><h3>steuer_rueckfragen</h3><p>Rückfrage der Kanzlei je Zeile oder Kennzahl, mit Text und Erledigt-Datum</p></div>
+      <div class="box neu"><span class="neu-tag">NEU</span><h3>steuer_uebertragungen</h3><p>wohin übertragen wurde (Paket, DATEV-Format, ELSTER), wann, von wem, Ergebnis</p></div>
+      <div class="box"><h3>share_audit → partner_audit</h3><p>ein Protokoll für Objektfreigaben und Steuermandate; der Mandant kann es einsehen</p></div>
+    </div>
+    <p class="hinweis">Technisch offen: Die Anlage-V-Zuordnung liegt heute nur im Browser. Für einen Stand, den der Server erzeugt oder prüft, gehört sie wie die anderen Rechenkerne ins Backend gespiegelt, oder der Browser rechnet den Stand und lädt ihn mit Prüfsumme hoch.</p>
+  </section>
+
+  <!-- 5 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">5</span><h2>Rechte und Datenschutz</h2><span class="marke m-a">Annahme · vor dem Bau mit Datenschutzberatung abstimmen</span></div>
+    <div class="liste">
+      <div><b>Rollen</b><p>Die Kanzlei verarbeitet die Daten für ihre eigene Beratung und ist damit eigene Verantwortliche. Nutzt sie DealPilot als Werkzeug für ihre Mandanten (Weg 1), braucht es einen AVV zwischen DealPilot und Kanzlei.</p></div>
+      <div><b>Einwilligung</b><p>Je Steuerjahr und Objektauswahl, ausdrücklich, ohne Vorhaken. Gespeichert werden Zeitpunkt, Textversion und Umfang.</p></div>
+      <div><b>Widerruf</b><p>Jederzeit, sofort wirksam in DealPilot. Was die Kanzlei schon übertragen hat, unterliegt ihren Aufbewahrungspflichten; das muss im Einwilligungstext stehen.</p></div>
+      <div><b>Berufsgeheimnis</b><p>Als Dienstleister einer Kanzlei muss DealPilot zur Verschwiegenheit verpflichtet sein (§ 62a StBerG). Vertrag mit Verschwiegenheitsklausel, Serverstandort Deutschland.</p></div>
+      <div><b>Datensparsamkeit</b><p>Die Kanzlei sieht nur das freigegebene Steuerjahr und die gewählten Objekte, nicht Deal-Score, KI-Analysen oder Finanzierungsanfragen.</p></div>
+      <div><b>Protokoll und Löschung</b><p>Jede Sicht, Entscheidung und Übertragung wird protokolliert. Endet das Mandat, werden Stände nach einer festen Frist gelöscht. <span class="marke m-o">Frist offen</span></p></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">6</span><h2>Wege in die Steuersoftware</h2></div>
+    <div class="tab-box"><table>
+      <thead><tr><th>Weg</th><th>Aufwand</th><th>Voraussetzung</th><th>Nutzen</th><th>Stand</th></tr></thead>
+      <tbody>
+        <tr class="empf"><td><b>A · Kanzlei-Paket</b><small>PDF-Steuermappe + CSV je Objekt, Zeile und Kennzahl + Belege als ZIP</small></td><td><span class="punkte"><i class="an"></i><i></i><i></i><i></i></span></td><td>keine</td><td>Funktioniert mit jeder Kanzleisoftware; die Kanzlei übernimmt Kennzahlen oder liest die CSV ein.</td><td><span class="marke m-b">belegt</span></td></tr>
+        <tr class="empf"><td><b>H · Ausfüllhilfe</b><small>„Zeile · Kennzahl · Betrag“ zum Abtippen</small></td><td><span class="punkte"><i class="an"></i><i></i><i></i><i></i></span></td><td>keine</td><td>Nutzer ohne Kanzlei überträgt in Mein ELSTER oder WISO selbst, in wenigen Minuten.</td><td><span class="marke m-b">belegt</span></td></tr>
+        <tr><td><b>B · DATEV-Format</b><small>EXTF-CSV „Buchungsstapel“</small></td><td><span class="punkte"><i class="an"></i><i class="an"></i><i></i><i></i></span></td><td>offenes Format; Kanzlei bucht das Mandat in DATEV Rechnungswesen</td><td>Über „DATEV Vermietung und Verpachtung“ weiter in die Anlage V; für reine ESt-Mandate ein Umweg.</td><td><span class="marke m-b">belegt</span> <span class="marke m-a">Eignung</span></td></tr>
+        <tr><td><b>C · DATEV-Marktplatz</b><small>Datenservice, DATEVconnect online</small></td><td><span class="punkte"><i class="an"></i><i class="an"></i><i class="an"></i><i></i></span></td><td>Partnerschaft, Prüfung durch DATEV, mindestens 25 Kunden, laufende Gebühren</td><td>Übertragung per Knopfdruck, Listung im Marktplatz als Vertriebsweg zu Kanzleien.</td><td><span class="marke m-b">belegt</span></td></tr>
+        <tr><td><b>D · Direkt in DATEV Einkommensteuer</b></td><td>–</td><td>–</td><td>DATEV nennt nur den eigenen Weg aus der Buchhaltung.</td><td><span class="marke m-o">nicht belegt</span></td></tr>
+        <tr><td><b>E · Addison</b><small>Wolters Kluwer</small></td><td><span class="punkte"><i class="an"></i><i class="an"></i><i></i><i></i></span></td><td>Kanzlei nutzt Addison Buchhaltung</td><td>Buchungsimport im DATEV-Format; ein Import in die Einkommensteuer ist nicht belegt.</td><td><span class="marke m-o">offen</span></td></tr>
+        <tr><td><b>F · ELSTER direkt</b><small>ERiC</small></td><td><span class="punkte"><i class="an"></i><i class="an"></i><i class="an"></i><i class="an"></i></span></td><td>Herstellerregistrierung beim Bayerischen Landesamt für Steuern, jährliche Updates, Haftung</td><td>Abgabe ohne Kanzlei, aber nur mit vollständiger Erklärung, nicht mit der Anlage V allein.</td><td><span class="marke m-b">belegt</span> <span class="marke m-a">Umfang</span></td></tr>
+        <tr><td><b>G · WISO, Taxfix, SteuerSparErklärung</b></td><td>–</td><td>–</td><td>Kein offener Importweg für fremde Daten gefunden.</td><td><span class="marke m-o">nicht belegt</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="hinweis"><b>„Aviso Steuer“</b> gibt es so nicht. Gemeint ist sehr wahrscheinlich WISO Steuer (Buhl), per Spracheingabe leicht zu „Aviso“ verhört. <span class="marke m-a">Annahme</span></p>
+  </section>
+
+  <!-- 7 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">7</span><h2>Empfehlung in drei Stufen</h2></div>
+    <div class="stufen">
+      <div class="stufe jetzt"><span class="lbl">Stufe 1 · jetzt, ohne Partnervertrag</span><h3>Freigabe je Steuerjahr und Kanzlei-Paket</h3>
+        <ul><li>Steuerjahr mit eingefrorenem Stand, Rückfragen, Freigabe, Protokoll</li><li>Verbindungscode der Kanzlei, mehrere Partner je Nutzer</li><li>Kanzlei-Paket: Steuermappe als PDF, CSV je Anlage-V-Zeile, Belege</li><li>Ausfüllhilfe für Nutzer ohne Kanzlei</li><li>Nutzen ab Tag 1, keine Abhängigkeit von DATEV, Addison oder Buhl</li></ul></div>
+      <div class="stufe"><span class="lbl">Stufe 2 · wenn Kanzleien fragen</span><h3>DATEV-Format, später Marktplatz</h3>
+        <ul><li>EXTF-Buchungsstapel je Objekt und Jahr, vorher mit einer Partnerkanzlei an einer Probedatei testen</li><li>Marktplatz-Partner, sobald 25 Kanzleikunden absehbar sind</li><li>Mit dem DATEV-Partnermanagement klären, ob es einen Weg direkt in die Einkommensteuer gibt</li><li>Addison: gleiche Anfrage bei Wolters Kluwer</li></ul></div>
+      <div class="stufe"><span class="lbl">Stufe 3 · zurückstellen</span><h3>ELSTER direkt</h3>
+        <ul><li>Nur, wenn DealPilot bewusst eine ganze Einkommensteuererklärung anbieten will</li><li>Für die Anlage V allein lohnt es nicht</li><li>Prüfen, ob ein bestehender ELSTER-Hersteller eine Übernahme-Schnittstelle anbietet</li></ul></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">8</span><h2>Offene Fragen an dich</h2></div>
+    <div class="fragen">
+      <div><b>„Aviso Steuer“</b>Ist WISO Steuer gemeint oder ein anderes Programm?</div>
+      <div><b>Preis für Weg 2</b>Zahlt die Kanzlei für Mandanten, die sich mit eigenem Abo verbinden, oder kosten nur Seats aus Weg 1?</div>
+      <div><b>Vorteil beim Verbinden</b>Bekommt ein Nutzer aus Weg 2 einen Vorteil, etwa Rabatt oder Kontingent?</div>
+      <div><b>Korrigieren oder zurückgeben</b>Darf die Kanzlei Werte selbst ändern? Vorschlag: nur zurückgeben, der Mandant bleibt Herr seiner Daten.</div>
+      <div><b>Steuerjahr oder Dauer</b>Reicht „verknüpft für 2025“ mit neuer Zustimmung je Jahr, oder auch „bis auf Widerruf“?</div>
+      <div><b>Welche Halter</b>Nur Privat mit Anlage V, oder auch GmbH, UG und GbR mit Buchhaltung und Feststellungserklärung?</div>
+      <div><b>Testkanzlei</b>Gibt es eine Kanzlei für Stufe 1 und eine DATEV-Probedatei, und welche Software nutzt sie?</div>
+      <div><b>Anlage V 2026</b>Freigabe für 2026 erst, wenn das amtliche Formular vorliegt, wie heute die Anlage-V-Ansicht?</div>
+      <div><b>Belege im Paket</b>Sollen Rechnungen und Kontoauszüge mit? Dafür müssen sie je Kostenzeile zugeordnet sein; das ist heute nicht nachgemessen.</div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="abschnitt">
+    <div class="kopfzeile"><span class="nr">9</span><h2>Quellen</h2></div>
+    <div class="quellen">
+      <div><span class="lbl">DATEV</span><ul>
+        <li><a href="https://www.datev.de/web/de/berufsgruppenuebergreifend/ueber-datev/portfolio/oekosystem/partnering/datev-marktplatz/faq-fuer-softwarehersteller">FAQ für Softwarehersteller</a></li>
+        <li><a href="https://www.datev.de/web/de/berufsgruppenuebergreifend/ueber-datev/portfolio/oekosystem/partnering/datev-marktplatz/erste-schritte-zum-partnerstatus">Erste Schritte zum Partnerstatus</a></li>
+        <li><a href="https://www.datev.de/web/de/shop/produkt-details/datev-vermietung-und-verpachtung-74552">DATEV Vermietung und Verpachtung</a></li>
+        <li><a href="https://developer.datev.de/datev/platform/en/dtvf">DATEV-Format (EXTF)</a></li>
+        <li><a href="https://developer.datev.de/datev/platform/en/file-interfaces">Datei-Schnittstellen</a></li>
+      </ul></div>
+      <div><span class="lbl">ELSTER</span><ul>
+        <li><a href="https://www.elster.de/eportal/infoseite/entwickler">Entwickler-Infoseite</a></li>
+        <li><a href="https://www.elster.de/elsterweb/registrierung-entwickler">Registrierung für Entwickler</a></li>
+        <li><a href="https://www.elster.de/eportal/infoseite/rechtliches">Rechtliches</a></li>
+      </ul></div>
+      <div><span class="lbl">Addison und Consumer-Software</span><ul>
+        <li><a href="https://www.wolterskluwer.com/de-de/solutions/addison-komplettloesung-mittelstand/addison-steuern-sme">Addison Steuern SME</a></li>
+        <li><a href="https://www.buhl.de/steuer/?p=5792">Buhl, WISO Steuer</a></li>
+        <li><a href="https://taxfix.de/sicherheit/">Taxfix, Sicherheit</a></li>
+        <li>Kein Importweg gefunden gilt für die am 02.11.2026 durchsuchten Seiten, nicht allgemein.</li>
+      </ul></div>
+      <div><span class="lbl">Im Repo</span><ul>
+        <li><code>backend/migrations/055_reseller_core.sql</code>, <code>056</code>, <code>057</code>, <code>026_tax_snapshots.sql</code></li>
+        <li><code>backend/src/services/resellerService.js</code>, <code>routes/resellerPortal.js</code>, <code>resellerInvite.js</code></li>
+        <li><code>frontend/js/mandant-freigaben.js</code>, <code>reseller-portal.js</code>, <code>anlage-v-2025.js</code>, <code>werbungskosten-pdf.js</code></li>
+        <li>Langfassung: <code>design/Vorschläge/steuerkanzlei-bruecke.md</code></li>
+      </ul></div>
+    </div>
+    <p class="hinweis">Rechtsnormen genannt, Wortlaut nicht nachgelesen: Art. 6, 7, 28 DSGVO · § 57, § 62a, § 66 StBerG · § 203 StGB · § 147 AO.</p>
+  </section>
+</div>
