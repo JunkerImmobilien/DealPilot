@@ -187,6 +187,242 @@
         + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '. Eigene Angabe möglich.') };
   }
 
+
+
+  /* ══ v3064 · STANDARDHEBUNG — DIE FESH-REGEL ═══════════════════════════
+     Marcel 02.11.2026: „die FESH-Regel, also Fenster, Elektrik, Sanitär, Heizung
+     einhalten und den Kunden hinweisen, dass wenn wir darüber kommen und den
+     Standard in über zwei Gewerken heben, wir über 50 Jahre bzw. die
+     Abschreibungszeit verteilen müssen und es kein Erhaltungsaufwand ist."
+     Rechtsgrundlage: BMF-Schreiben vom 26.01.2026 (ersetzt die Schreiben vom
+     18.07.2003 und 20.10.2017): Standardhebung = wesentliche Verbesserung, wenn ein
+     Maßnahmenbündel mindestens DREI der vier zentralen Bereiche Heizung, Sanitär,
+     Elektro, Fenster deutlich verbessert — maßgeblich ausschließlich diese vier.
+     Dann Herstellungskosten (AfA), kein Erhaltungsaufwand. Eine Wärmepumpe allein
+     hebt den Standard nicht; energetische Wirkung allein reicht nicht.
+     DealPilot kann nicht sehen, ob „deutlich gehoben" oder „zeitgemäß ersetzt" —
+     deshalb ein HINWEIS, keine stille Umbuchung. Leitungen zählen vorsichtig für
+     Sanitär UND Elektro (sie umfassen Wasser/Abwasser und Strom). */
+  var FESH = { fenster: ['F'], elektrik: ['E'], bad: ['S'], leitungen: ['S', 'E'], heizung: ['H'] };
+  var FESH_NAME = { F: 'Fenster', E: 'Elektro', S: 'Sanitär', H: 'Heizung' };
+  function afaJahre() {
+    try {
+      var v = wert('afa_satz') || '2.0';
+      var p = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(v) : { methode: 'linear', satzPct: parseFloat(String(v).replace(',', '.')) || 2 };
+      var s = (p.methode !== 'linear') ? 3 : p.satzPct;
+      if (!(s > 0)) return 50;
+      return Math.round(100 / s * 10) / 10;
+    } catch (e) { return 50; }
+  }
+  function standardhebung(liste, buchstaben) {
+    var set = {};
+    (liste || []).forEach(function (m) { (FESH[m && m.id] || []).forEach(function (b) { set[b] = 1; }); });
+    String(buchstaben || '').split(/[,\s]+/).forEach(function (b) { if (FESH_NAME[b]) set[b] = 1; });
+    var b = ['F', 'E', 'S', 'H'].filter(function (x) { return set[x]; });
+    return { bereiche: b.map(function (x) { return FESH_NAME[x]; }), anzahl: b.length, hebung: b.length >= 3 };
+  }
+  function standardhebungHtml(liste, buchstaben) {
+    var r = standardhebung(liste, buchstaben);
+    if (r.anzahl < 2) return '';
+    var j = afaJahre(), jt = (Math.abs(j - 100 / 3) < 0.1) ? '33⅓' : String(j).replace('.', ',');
+    var sz = String(Math.round(10000 / j) / 100).replace('.', ',');   /* v3064a: den Satz mitnennen (eigener Satz aus Gutachten z. B. 6,25 % = 16 J.) */
+    var stil = 'margin:10px 0 0;padding:9px 12px;border-radius:8px;font-size:12.5px;line-height:1.5;';
+    if (!r.hebung) return '<div class="dp-fesh dp-fesh-2" style="' + stil + 'background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 10%,#fff);border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 35%,transparent)">'
+      + '<b>Steuer · 2 von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). Kommt ein dritter dazu — Fenster, Elektro, Sanitär oder Heizung — '
+      + 'und wird der Standard dabei deutlich gehoben, sind die Kosten Herstellungskosten (AfA über ' + jt + ' Jahre), kein Erhaltungsaufwand (BMF-Schreiben vom 26.01.2026).</div>';
+    return '<div class="dp-fesh dp-fesh-3" style="' + stil + 'background:color-mix(in srgb,#B8625C 8%,#fff);border:1px solid color-mix(in srgb,#B8625C 35%,transparent)">'
+      + '<b style="color:#B8625C">Steuer · Standardhebung: ' + r.anzahl + ' von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). '
+      + 'Wird dabei der Standard jeweils deutlich gehoben (nicht nur zeitgemäß ersetzt), sind die Kosten <b>Herstellungskosten</b>: '
+      + 'sie laufen über die AfA des Gebäudes (bei deinem AfA-Satz von ' + sz + ' % rund ' + jt + ' Jahre) und sind <b>kein sofort abziehbarer Erhaltungsaufwand</b> — '
+      + 'auch unterhalb der 15-%-Grenze. Eine neue Wärmepumpe allein hebt den Standard nicht. Grundlage: BMF-Schreiben vom 26.01.2026; bitte mit dem Steuerberater abstimmen.</div>';
+  }
+  /* Vier Haken an den Sanierungskosten (Tab Investition), gespeichert in #san_fesh (z. B. „F,S,H"). */
+  function feshBinden() {
+    var host = el('san-fesh'); if (!host) return;
+    var fld = el('san_fesh');
+    var boxes = host.querySelectorAll('input[data-fesh]');
+    function lesen() { var v = String((fld && fld.value) || ''); boxes.forEach(function (b) { b.checked = v.indexOf(b.getAttribute('data-fesh')) >= 0; }); }
+    function zeichnen() {
+      var h = el('san-fesh-hinweis'); if (!h) return;
+      var zb = standardhebung(objektMassnahmen());
+      var html = standardhebungHtml([], fld ? fld.value : '');
+      if (!html && zb.anzahl >= 2) html = '<div class="hint" style="margin-top:6px">Laut Zielbild-Maßnahmen betroffen: ' + esc(zb.bereiche.join(', ')) + ' — oben ankreuzen, wenn der Standard dort deutlich gehoben wird.</div>';
+      h.innerHTML = html;
+    }
+    if (!host._dpFesh) {
+      host._dpFesh = true;
+      boxes.forEach(function (b) { b.addEventListener('change', function () {
+        var v = [].slice.call(boxes).filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute('data-fesh'); }).join(',');
+        if (fld) { fld.value = v; try { fld.dispatchEvent(new Event('input', { bubbles: true })); fld.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
+        zeichnen();
+      }); });
+    }
+    lesen(); zeichnen();
+  }
+
+  /* ══ v3062 · MIETPREISBREMSE UND MIETRECHT AUF EINEN BLICK ══════════════
+     Marcel 02.11.2026: „ja, die Mietpreisbremse kannst du umsetzen und die
+     Kappungsgrenzen — und stellst du es auch einfacher dar?"
+     Gemessen vorher: die Bremse stand in kappungsgrenzen.json (759 Gemeinden,
+     je mit mietpreisbremse_gueltig_bis), aber KEIN Code las sie. Die Kappung
+     und die Termine rechnete potenzial.js, sie standen aber nur in der
+     zugeklappten Zielbild-Karte im Tab Investition und im MFH-Fenster als
+     langer Satz — nicht dort, wo der Mietvertrag eingetragen wird.
+     Rechnet NICHTS Neues zur Miete: Kappung, Termine und Soll kommen aus
+     kappung()/sollFuer() über modell(). Neu ist nur die Bremse (§ 556d Abs. 1
+     BGB: bei Mietbeginn höchstens ortsübliche Vergleichsmiete + 10 %). */
+  function mietpreisbremse(ags) {
+    var leer = function (warum) { return { gilt: null, pruefen: true, text: 'Mietpreisbremse: ' + warum + ', bitte prüfen.' }; };
+    if (!_kapp) return leer('die Liste der Landesverordnungen liegt nicht vor');
+    var a = String(ags || '').replace(/\D/g, '');
+    if (a.length !== 8) return leer('Gemeinde noch nicht ermittelt');
+    var land = PRAEFIX[a.slice(0, 2)], L = land && _kapp.laender[land];
+    if (!L) return leer('Land nicht in der Liste');
+    var heute = new Date().toISOString().slice(0, 10);
+    var g = (Array.isArray(L.gemeinden) ? L.gemeinden : []).filter(function (x) { return x && x.ags === a; })[0];
+    var V = L.mietpreisbremse_verordnung || {};
+    var voll = String(V.verordnung || L.verordnung || ''), kl = /\(([^)]+)\)/.exec(voll);
+    var vo = kl ? kl[1].split(/\s[–—-]\s/)[0] : voll.split(' vom ')[0];
+    if (g && g.mietpreisbremse) {
+      var bis = g.mietpreisbremse_gueltig_bis || V.gueltig_bis || L.gueltig_bis || null;
+      if (bis && bis < heute) return { gilt: null, pruefen: true, bis: bis, herkunft: 'ausgelaufen',
+        text: 'Mietpreisbremse: die Verordnung (' + vo + ') ist am ' + deDatum(bis) + ' ausgelaufen, bitte prüfen.' };
+      return { gilt: true, pruefen: !!L.unsicher, bis: bis, verordnung: vo, url: V.url || L.url || null, name: g.name || '',
+        text: 'Mietpreisbremse gilt' + (bis ? ' bis ' + deDatum(bis) : '') + ' (' + vo + ')' + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
+    }
+    return { gilt: false, pruefen: !!L.unsicher,
+      text: 'Keine Mietpreisbremse: Gemeinde nicht in der Landesverordnung' + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
+  }
+
+  /* Eine Wohnung des Modells (m.wohnungen[i]) als höchstens vier Zeilen. */
+  function mietrechtDaten(m, i) {
+    var w = (m && m.wohnungen && m.wohnungen[i || 0]) || null;
+    var kapp = (m && m.kappung) || kappung(agsJetzt());
+    var br = mietpreisbremse(agsJetzt());
+    var s = (w && w.soll) || {};
+    var vglQm = zahl(s.vgl_qm) || zahl(w && w.vgl_qm) || zahl(m && m.vgl && m.vgl.qm);
+    var vglHer = s.vgl_herkunft || (m && m.vgl && m.vgl.herkunft) || '';
+    var z = [];
+    /* 1 · Kappungsgrenze */
+    z.push({ k: 'Kappungsgrenze', v: kapp.pct + ' % in 3 Jahren',
+      u: kapp.herkunft === 'verordnung' ? (kapp.verordnung || 'Landesverordnung') : kapp.herkunft === 'eigen' ? 'eigene Angabe'
+        : kapp.herkunft === 'gesetz' ? 'gesetzlich (§ 558 Abs. 3 BGB)' : 'bitte prüfen',
+      warn: !!kapp.pruefen, lang: kapp.text });
+    /* 2 · Nächste Erhöhung (§ 558) — aus sollFuer, nichts nachgerechnet */
+    if (w) {
+      var ist = zahl(w.ist), wfl = zahl(w.wfl);
+      if (s.vertrag) z.push({ k: 'Nächste Erhöhung', v: 'nach Vertrag', u: s.grund || '' });
+      else if (!(ist > 0)) z.push({ k: 'Nächste Erhöhung', v: '—', u: 'nicht vermietet' });
+      else if (s.miete != null && s.miete > ist + 0.01) z.push({ k: 'Nächste Erhöhung',
+        v: 'auf ' + eur(s.miete) + '/Monat' + (wfl ? ' (' + eur2(s.miete / wfl) + '/m²)' : ''),
+        /* v3062a · die § 559-Umlage gehört in die Zeile: Wohnung 3 Westerfeldstr. stieg auf 9,92 €/m² bei
+           Vergleichsmiete 8,40 - 588 € nach § 558 plus 107 € Umlage. „Grenze: Vergleichsmiete" allein war falsch. */
+        u: (s.termine ? s.termine.text : '') + (s.grenze ? ' · Grenze § 558: ' + s.grenze : '')
+          + (s.umlage559 && s.umlage559.monat > 0 ? ' · darin Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat'
+              + (s.umlage559.ohne_erh ? ' (Erhaltungsanteil nicht eingetragen — 0 % abgezogen)' : '') : '')
+          + (s.herkunft === 'eigene Angabe' ? ' · eigene Angabe' : ''),
+        warn: !!(s.termine && s.termine.letzte_fehlt) || !!(s.hinweise && s.hinweise.length),
+        lang: [s.termine && s.termine.sperre, (s.hinweise || []).join(', ')].filter(Boolean).join(' · ') });
+      else {
+        var fr = s.termine ? (s.termine.letzte_fehlt ? 'Datum der letzten Erhöhung eintragen — Sperrfrist sonst nicht geprüft'
+          : (s.termine.verlangbar_sofort ? 'Sperrfrist abgelaufen' : 'Sperrfrist bis ' + mmjj(s.termine.verlangbar_ab))) : '';
+        z.push({ k: 'Nächste Erhöhung', v: 'kein Spielraum',
+          u: (s.grund || '') + (fr ? ' · ' + fr : ''), warn: !!(s.termine && s.termine.letzte_fehlt) });
+      }
+    }
+    /* 3 · Mietpreisbremse bei Neuvermietung */
+    var obergrenze = (br.gilt && vglQm > 0) ? Math.round(vglQm * 1.1 * 100) / 100 : null;
+    var markt = /Marktmiete/i.test(vglHer);
+    z.push({ k: 'Mietpreisbremse', v: br.gilt === true ? 'gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') : br.gilt === false ? 'gilt hier nicht' : 'bitte prüfen',
+      u: br.gilt === true
+        ? (obergrenze ? 'bei Neuvermietung höchstens ' + eur2(obergrenze) + '/m² (Vergleichsmiete ' + eur2(vglQm) + ' + 10 %'
+            + (vglHer ? ', ' + vglHer : '') + ')' : 'Vergleichsmiete eintragen — dann rechnet DealPilot die Obergrenze')
+        : br.gilt === false ? 'Neuvermietung ohne Obergrenze nach § 556d' : '',
+      warn: br.gilt === null || !!br.pruefen || (br.gilt === true && markt), lang: br.text
+        + (br.gilt === true && markt ? ' Die Obergrenze ist auf der Marktmiete gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
+        + (br.gilt === true ? ' Ausnahmen: höhere Vormiete (§ 556e BGB), erste Vermietung nach umfassender Modernisierung oder Neubau (§ 556f BGB).' : '') });
+    /* 4 · Zielmiete gegen die Bremse */
+    var zq = zahl(w && w.ziel_qm);
+    if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
+      u: 'zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f) — sonst höchstens ' + eur2(obergrenze) + '/m²' });
+    return { zeilen: z, bremse: br, obergrenze: obergrenze, kapp: kapp };
+  }
+
+  function mietrechtHtml(m, i, o) {
+    o = o || {};
+    mietrechtStil();
+    var d = mietrechtDaten(m, i);
+    return '<div class="dp-mr' + (o.eng ? ' dp-mr-eng' : '') + '">' + d.zeilen.map(function (r) {
+      return '<div class="dp-mr-z' + (r.bad ? ' dp-mr-bad' : r.warn ? ' dp-mr-warn' : '') + '"' + (r.lang ? ' title="' + esc(r.lang) + '"' : '') + '>'
+        + '<span class="dp-mr-k">' + esc(r.k) + '</span><b class="dp-mr-v">' + esc(r.v) + '</b>'
+        + (r.u ? '<span class="dp-mr-u">' + esc(r.u) + '</span>' : '') + '</div>';
+    }).join('') + '</div>';
+  }
+
+  function mietrechtStil() {
+    if (el('dp-mr-stil')) return;
+    var s = document.createElement('style'); s.id = 'dp-mr-stil';
+    s.textContent = [
+      '.dp-mr{display:flex;flex-direction:column;gap:0;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden;background:#fff}',
+      '.dp-mr-z{display:grid;grid-template-columns:150px minmax(0,auto) 1fr;gap:4px 14px;align-items:baseline;padding:9px 14px;border-top:1px solid #EFEBE3;font-size:13px}',
+      '.dp-mr-z:first-child{border-top:none}',
+      '.dp-mr-k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A7370}',
+      '.dp-mr-v{font-family:"Space Grotesk",sans-serif;font-weight:600;color:#2A2727;white-space:nowrap}',
+      '.dp-mr-u{color:#6B6356;font-size:12px;line-height:1.45}',
+      '.dp-mr-warn .dp-mr-k::after{content:" ⚠";color:var(--wl-b8932f, #b8932f)}',
+      '.dp-mr-bad{background:color-mix(in srgb,#B8625C 7%,#fff)}',
+      '.dp-mr-bad .dp-mr-v{color:#B8625C}',
+      '.dp-mr-eng .dp-mr-z{grid-template-columns:130px 1fr;}',
+      '.dp-mr-eng .dp-mr-u{grid-column:2}',
+      '.dp-mr-liste{margin-top:10px;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden;background:#fff}',
+      '.dp-mr-w{padding:8px 12px;border-top:1px solid #EFEBE3}',
+      '.dp-mr-w:first-child{border-top:none}',
+      '.dp-mr-w1{display:flex;gap:10px;align-items:baseline;font-size:12.5px}',
+      '.dp-mr-w1 b{font-family:"Space Grotesk",sans-serif;font-weight:600;color:#2A2727;white-space:nowrap}',
+      '.dp-mr-w1 span{white-space:nowrap;color:#6B6356}',
+      '.dp-mr-w1 .dp-mr-w-v{margin-left:auto;color:#2A2727;font-weight:600}',
+      '.dp-mr-w2{font-size:11.5px;color:#7A7370;line-height:1.45;margin-top:2px}',
+      '.dp-mr-w.dp-mr-bad .dp-mr-w2 b{color:#B8625C}',
+      '@media(max-width:700px){.dp-mr-z{grid-template-columns:1fr}.dp-mr-v{white-space:normal}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  /* Karte im Tab Miete, direkt unter dem Mietvertrag (#mv-objekt-karte). */
+  function mietrechtKarte() {
+    var anker = el('mv-objekt-karte'); if (!anker || !anker.parentNode) return;
+    mietrechtStil();
+    var k = el('dp-mietrecht-karte');
+    if (!k) {
+      k = document.createElement('div'); k.className = 'card'; k.id = 'dp-mietrecht-karte'; k.style.marginBottom = '14px';
+      anker.parentNode.insertBefore(k, anker.nextSibling);
+    }
+    var m = modell();
+    var ort = wert('ort');
+    var kopf = '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-doc"/></svg></span>Mietrecht an dieser Adresse'
+      + '<span class="oe-ct-hint">' + esc(ort || 'Ort fehlt') + ' · aus den Landesverordnungen</span></div>';
+    if (m.art === 'mfh') {
+      var W = m.wohnungen || [];
+      /* v3062b · je Wohnung zwei Zeilen statt einer Tabelle: die Karte steht im Tab Miete in der
+         schmalen rechten Spalte (gemessen ~390 px), dort brach „8,43 €/m²" um. */
+      var zeilen = W.map(function (w, j) {
+        var d = mietrechtDaten(m, j);
+        var naechst = d.zeilen.filter(function (r) { return r.k === 'Nächste Erhöhung'; })[0];
+        var ziel = d.zeilen.filter(function (r) { return r.k === 'Zielmiete'; })[0];
+        var istQm = w.ist > 0 && w.wfl > 0 ? eur2(w.ist / w.wfl) + '/m²' : (w.status === 'leer' ? 'leer' : '—');
+        return '<div class="dp-mr-w' + (ziel ? ' dp-mr-bad' : '') + '">'
+          + '<div class="dp-mr-w1"><b>' + esc(w.nr) + (w.lage ? ' · ' + esc(w.lage) : '') + '</b><span>' + istQm + '</span>'
+          + '<span class="dp-mr-w-v">' + esc(naechst ? naechst.v : '—') + '</span></div>'
+          + '<div class="dp-mr-w2">' + esc(naechst && naechst.u ? naechst.u : '')
+          + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m²' + (ziel ? ' — <b>über der Mietpreisbremse</b> (höchstens ' + eur2(d.obergrenze) + '/m², außer § 556e/§ 556f)' : '') : '') + '</div></div>';
+      }).join('');
+      k.innerHTML = kopf + mietrechtHtml({ kappung: m.kappung, vgl: m.vgl, wohnungen: [] }, 0)
+        + (W.length ? '<div class="dp-mr-liste">' + zeilen + '</div><p class="hint" style="margin:6px 0 0">Ändern je Wohnung im Fenster „Einheiten erfassen“ › Details.</p>' : '');
+      return;
+    }
+    k.innerHTML = kopf + mietrechtHtml(m, 0);
+  }
+
   /* ── Gemeindeschlüssel ────────────────────────────────────────────────
      Kommt aus dem Marktbericht-Dienst (/wertparameter/zinssatz, dieselbe
      Auflösung PLZ → Gemeinde wie im Bericht) und reist mit dem Ergebnis im
@@ -374,7 +610,11 @@
     var roh = k * 0.08 / 12;
     var kappeQm = (istM > 0 && istM / wfl < 7) ? 2 : 3;
     var deckel = kappeQm * wfl;
-    return { monat: Math.min(roh, deckel), kosten: k, gedeckelt: roh > deckel, kappe_qm: kappeQm };
+    /* v3064 · Marcel: „kann ich wirklich alles auf die Miete umlegen?" - nein: nur der
+       Modernisierungsanteil. Ohne eingetragenen Erhaltungsanteil zieht DealPilot 0 % ab; das
+       stimmt nur, wenn nichts Altes, Abgängiges ersetzt wird. Gezählt, damit es gesagt wird. */
+    var ohneErh = (liste || []).filter(function (m) { return m.bewohnt && m.id !== 'renovierung' && (m.erh == null || String(m.erh).trim() === ''); }).length;
+    return { monat: Math.min(roh, deckel), kosten: k, gedeckelt: roh > deckel, kappe_qm: kappeQm, ohne_erh: ohneErh };
   }
   /**
    * Soll-Miete einer Wohnung (€/Monat) samt Herkunft.
@@ -2061,7 +2301,7 @@
     var karte = el('zb-karte'); if (!karte) return;
     /* v2430b · die Gemeinde gleich holen (Leseroute, kein Kontingent) - sonst
        stand bis zum ersten Rechnen „20 %, Gemeinde noch nicht ermittelt". */
-    if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { objektSumme(); } catch (e) {} } });
+    if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { objektSumme(); } catch (e) {} try { mietrechtKarte(); } catch (e) {} } });
     var mfh = artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length;
     var sumHost = el('zb-mfh-summe'), einzel = el('zb-einzel');
     if (mfh) {
@@ -2077,6 +2317,8 @@
           + herkunftHtml()   /* v2988 */
           + indexmieteHtml(m);   /* v3026 */
       }
+      try { feshBinden(); } catch (e) {}   /* v3064 */
+      try { mietrechtKarte(); } catch (e) { console.warn('[mietrecht]', e); }   /* v3062 */
       return;
     }
     if (sumHost) sumHost.style.display = 'none';
@@ -2106,6 +2348,9 @@
     if (m.aktiv) host.innerHTML += herkunftHtml();   /* v2988 */
     var ih = indexmieteHtml(m);   /* v3026 */
     if (ih) host.innerHTML = (m.aktiv ? host.innerHTML : '') + ih;
+    host.innerHTML += standardhebungHtml(objektMassnahmen());   /* v3064 */
+    try { feshBinden(); } catch (e) {}
+    try { mietrechtKarte(); } catch (e) { console.warn('[mietrecht]', e); }   /* v3062 */
   }
   function bindeObjektFelder() {
     ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'zb_markt_qm', 'san', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_art', 'mv_beginn'].forEach(function (id) {   /* v3026: mv_art, mv_beginn */
@@ -2118,6 +2363,7 @@
     kappungLaden().then(function () { objektKarte(); });
     bindeObjektFelder();
     objektKarte();
+    try { feshBinden(); } catch (e) {}   /* v3064 */
     var a = el('objart'); if (a && !a._dpZb) { a._dpZb = true; a.addEventListener('change', objektKarte); }
     /* me_modus ist ein verstecktes Feld: setzt es die Übernahme aus Sprache
        oder Import, folgt der Modus (Knöpfe, Rechnung) hier. */
@@ -2237,6 +2483,8 @@
   window.addEventListener('dp:indexreihen', function () { try { objektKarte(); } catch (e) {} });
 
   window.DpPotenzial = {
+    mietpreisbremse: mietpreisbremse, mietrechtDaten: mietrechtDaten, mietrechtHtml: mietrechtHtml, mietrechtKarte: mietrechtKarte,   /* v3062 */
+    standardhebung: standardhebung, standardhebungHtml: standardhebungHtml, feshBinden: feshBinden,   /* v3064 */
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
     ohneZielbild: ohneZielbild,   /* v3018d */
     KENNZEICHNUNG: KENNZEICHNUNG, GESPERRT_KURZ: GESPERRT_KURZ, GESPERRT_LANG: GESPERRT_LANG, gesperrt: gesperrt, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,

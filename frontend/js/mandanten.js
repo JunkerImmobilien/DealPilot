@@ -1126,7 +1126,10 @@
       /* v827-back-btn: Zurueck-Button (uiCancel) - Rueckkehr zur Uebersicht. Speichern via unterem Global-Button. */
       + '<div style="margin-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
       +   '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiCancel()"><span class="ic">\u2190</span> Zur\u00fcck zur \u00dcbersicht</button>'
-      +   '<span style="font-size:12px;color:#7A7370">\u00c4nderungen werden mit \u201eSpeichern\u201c unten \u00fcbernommen.</span>'
+      /* v3063 · der globale Speichern-Knopf ist weg (Auto-Save). Der Mandant hat seinen eigenen -
+         uiSave() kehrt in die Uebersicht zurueck; beim Schliessen der Einstellungen wird er ohnehin mitgenommen. */
+      +   '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.uiSave()">Mandant übernehmen</button>'
+      +   '<span style="font-size:12px;color:#7A7370">Beim Schließen der Einstellungen wird er auch gespeichert.</span>'
       + '</div>';
   }
 

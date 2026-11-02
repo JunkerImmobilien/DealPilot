@@ -36,6 +36,49 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N90 · Befunde aus dem Wissens-Rückblick (02.11.2026)
+
+1. **Rechtstext:** `frontend/legal/agb.html:77` „angeboten von Junker Immobilien“ (verlinkt aus `reseller.html:397`,
+   Prod 200) — Betreiber ist Junker Solution (`frontend/agb.html` richtig). Marcel entscheidet, ob die Reseller-AGB
+   angeglichen oder auf `agb.html` umgelenkt wird.
+2. **CLAUDE.md nachmessen** und korrigieren (mit „Hier stand bis …“): Kerosin-Zahl/N60.24, Gold-Basislinie 468 → 413,
+   UK-Flächenformel auch MFH (v2360), GND-Absatz, Baupreisindex-Zahl.
+3. **Memory** `gutachterpruefung-entscheidungen`: E5 als zurückgenommen (v2612) kennzeichnen.
+4. **Westerfeldstr. 140:** vier oder sechs Wohnungen (Marcel vs. Gutachten laut Journal)?
+
+### N89 · Detailstufen Anfänger bis Profi + Zielbild als Mietleiter — Marcel 02.11.2026 (Messe-Feedback), Demo zuerst
+
+Marcel: *„von Anfänger bis Profi alles dabei … Anfänger mit dem Umfang überfordert … mit Umschalten den Detailgrad
+erweitern oder vereinfachen … mit jeder Stufe zu einer Bewertung und einem Investment-PDF … ein einfach angelegtes
+Objekt später erweitern.“* Und: Zielbild *„cool, aber überfordernd“*; erreichbare Miete nach Sanierung **und** bei
+Mieterwechsel ohne Maßnahme prognostizieren.
+
+**Gemessen** (`wissen/2026-11-02.md` Teil 2): Eingabetiefe 1/2/3 gibt es schon, aber nur im Reiter Objekt.
+Kappung und nächste Erhöhung werden gerechnet. **Mietpreisbremse:** Daten da, nicht ausgewertet. **Mietspiegel:**
+Paket `mietrecht-ort` liegt ungenutzt. **Neuvertragsmiete:** fehlt. Miete nach Sanierung amtlich nur Minden-Lübbecke.
+
+1. ✅ Entwurf `design/Vorschläge/detailstufen-konzept.md` + `detailstufen-demo.html` (02.11., 9/21/33 Felder je Stufe).
+   **Entscheidungen offen:** (a) Namen Sichtflug · Instrumentenflug · Langstrecke mit Klarnamen; (b) Einstieg bekommt
+   Kaufpreis + Kaltmiete als Pflicht (heute Stufe 1 ohne beide → keine Investment-Bewertung möglich); (c) 70-%-Schwelle
+   des Investor Deal Score: Empfehlung „vorläufig · n von 24 aus Vorgaben“, Hauptergebnis DealPilot-Score; (d) Stufe
+   global + je Objekt; (e) drei Stufen-Mechaniken (`dp_zielstufe`, `workflow_detail_level`, Einfach|Genau) zu einem
+   Merker; (f) Mieterwechsel-Sprosse mit genäherter Vergleichsmiete gekennzeichnet zeigen; (g) Kundentext „aktueller
+   Marktdurchschnitt im Zustand modernisiert“. Vorgänger-Entwurf vom 07.09.: `eingabemodus-demo.html`.
+2. Danach in dieser Reihenfolge: Mietpreisbremse anzeigen (Daten vorhanden) → Mietleiter-Karte (ETW + MFH je
+   Wohnung) → Neuvertragsmiete aus Angebotsmieten (Herkunft „Marktdaten“, nie amtlich) → `mietrecht-ort` einbinden.
+
+### N88 · Einstellungen: Plan-Reiter und Modal vereinfachen — Marcel 02.11.2026, Demo zuerst
+
+Marcel: *„Plan … sieht zusammengewürfelt aus und weicht optisch vom Gesamtkonzept ab. Schriftarten, Farbe und Form
+sollten passen. Generell könnte das Modal und die Unterreiter … deutlich einfacher … dargestellt werden.“*
+**Gemessen:** drei Schriftfamilien im Plan-Reiter (Cormorant, Space Grotesk, JetBrains Mono), drei Blockformen,
+12 Reiter, unten „Auto-Save aktiv“ **und** „Speichern“. Entwurf `design/Vorschläge/einstellungen-einfach-demo.html`
+(A: aufgeräumt, B: weniger Reiter) → Marcels Wahl → bauen. ✅ Entwurf liegt (02.11.).
+**Entscheidungen offen:** A oder B (B: 5 Bereiche Konto · Mein Profil & Score · Darstellung & Marke · Plan &
+Abrechnung · Hilfe & Rechtliches); nur Auto-Save oder nur Speichern; Kachel „Marktwert · nicht im Plan“ weg?; eigenes
+Nachkaufpaket für Partner (Viertel-Regel 24,75 €) — `settings.js:2050 PAKET_PLAENE` kennt Partner nicht. Der
+12. Reiter ist „Partner-Portal“ (nur Plan partner, `data-rp="1"`).
+
 ### N87 · Portfolio-Cockpit › Steuer-Gesamtbetrachtung — Marcel 02.11.2026, Demo zuerst
 
 Marcel: *„Steuerliche Gesamtbetrachtung mit Steuerverlauf und Steuer-Modul über alles mit den Karten und den
@@ -4124,6 +4167,10 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **02.11.2026 · v3061/v3061a** (`5822bcdb`, `613aee26`, Prod 1.0.13) — Bestand/Ankauf öffnet die Objektliste;
+  Quick Boarding ohne Objekt im Kopf und ohne Reiterleiste. **Befund:** der Schalter filterte nur; die Reiterleiste
+  sollte laut V63.76 im Boarding verborgen sein, keine Regel tat es mehr.
 
 - **02.11.2026 · v3060/v3060a** (`ce118c0e`, `d0cba71a`, Prod 1.0.12) — Steuer im Objekt zeigt nur dieses Objekt:
   Kopf Ergebnis V+V + Erstattung/Nachzahlung durch das Objekt, Rechenweg zugeklappt, Jahreskarten mit V+V.

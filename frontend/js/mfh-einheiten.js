@@ -614,7 +614,10 @@
               + (so.umlage559 ? '<p class="mfh-we-hint">Darin Modernisierungsumlage § 559 BGB: ' + eur(so.umlage559.monat) + '/Monat (8 % von ' + eur(so.umlage559.kosten) + (so.umlage559.gedeckelt ? ', gedeckelt auf ' + so.umlage559.kappe_qm + ' €/m²' : '') + ').</p>' : '')
               + (so.hinweise && so.hinweise.length ? '<p class="mfh-we-hint" style="color:#B8625C">Hinweis: ' + esc(so.hinweise.join(', ')) + '.</p>' : '')
             : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier oder die Marktmiete im Tab Miete lässt DealPilot vorrechnen.</p>')
-          + '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>';
+          /* v3062 · statt eines langen Satzes die Mietrecht-Zeilen dieser Wohnung (Kappung,
+             nächste Erhöhung, Mietpreisbremse, Zielmiete gegen die Bremse) - potenzial.js */
+          + (P.mietrechtHtml ? '<div style="margin-top:10px">' + P.mietrechtHtml(m, m.wohnungen.indexOf(w), { eng: true }) + '</div>'
+            : '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>');
       }
       var hZ = el('mfh-we-ziel');
       if (hZ && w) {
@@ -623,6 +626,8 @@
           + '<div><span>Zielmiete</span><b class="c-ziel">' + (w.ziel != null ? eur(w.ziel) + '/Monat' : '—') + '</b></div>'
           + '<div><span>Kosten gesamt</span><b>' + eur(w.kosten) + (w.kosten_haus ? '<small style="display:block;font-weight:400;color:#8A8272">davon Anteil Haus ' + eur(w.kosten_haus) + '</small>' : '') + '</b></div>'
           + '<div><span>Modernisierungspunkte</span><b>' + (pkt ? '+' + pkt : '0') + ' (Anlage 2)</b></div></div>'
+          /* v3064 · FESH-Regel: Wohnungs- und Hausmaßnahmen zusammen (potenzial.js standardhebungHtml) */
+          + (P.standardhebungHtml ? P.standardhebungHtml((w.massnahmen || []).concat((m.haus && m.haus.massnahmen) || [])) : '')
           + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus: Maßnahmen dafür trägst du im Schritt Gebäude unter „Maßnahmen am ganzen Haus“ ein — ihr Kostenanteil und ihre Punkte sind hier schon enthalten. Die Zielmiete fließt nicht in die Mietentwicklung — nur in Pilot-Analyse und PDF.</p>';
       }
       ewZeichnen(m);

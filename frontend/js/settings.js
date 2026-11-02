@@ -946,12 +946,13 @@ function showSettings(initialTab) {
       '</div>' +    // pane-wrap Ende
       '<div class="settings-footer save-row">' +
         '<div class="save-info">' +
+          /* v3063 · Marcel 02.11.2026: „es soll automatisch gespeichert werden". Bis hier stand
+             „Auto-Save aktiv" UND ein Speichern-Knopf - und Textfelder landeten nur im Entwurf. */
           '<span id="settings-dirty-hint" class="settings-dirty-hint" style="display:none">● ungespeicherte Änderungen</span>' +
-          '<span class="save-info-text">Auto-Save aktiv · Änderungen werden direkt übernommen</span>' +
+          '<span class="save-info-text" id="set-autosave-status">Änderungen werden automatisch gespeichert</span>' +
         '</div>' +
         '<div class="btns">' +
-          '<button class="btn btn-ghost" onclick="closeSettings()">Abbrechen</button>' +
-          '<button class="btn btn-gold" onclick="_saveSettings()"><span class="ic"><svg width="12" height="12"><use href="#i-check"/></svg></span>Speichern</button>' +
+          '<button class="btn btn-gold" onclick="closeSettings()">Schließen</button>' +
         '</div>' +
       '</div>' +
       '</div>' +    // set-modal-content Ende
@@ -978,6 +979,14 @@ function showSettings(initialTab) {
     el.addEventListener('input', _setOnInput);
     el.addEventListener('change', _setOnInput);
   });
+  /* v3063 · Auto-Save: ein Lauscher am Modal (auch für Felder, die erst beim Reiterwechsel
+     gebaut werden). Datei- und Passwortfelder nicht; Bereiche mit data-kein-autosave auch nicht. */
+  modal.addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (!t || t.type === 'file' || t.type === 'password') return;
+    if (t.closest && t.closest('[data-kein-autosave]')) return;
+    _setAutoSpeichern();
+  }, true);
 
   // V26: Tab-Initialwahl
   if (initialTab) {
@@ -1398,8 +1407,10 @@ function _setOnInput() {
 }
 
 function closeSettings() {
-  if (window._SetDraft && window._SetDraft.dirty) {
-    if (!confirm('Du hast ungespeicherte Änderungen. Trotzdem schließen?')) return;
+  /* v3063 · Schließen speichert (auch einen offenen Mandanten) statt zu fragen. */
+  clearTimeout(_setAutoTimer);
+  if (document.getElementById('settings-modal')) {
+    try { _saveSettings({ leise: true, mitMandanten: true }); } catch (e) { console.warn('[settings close-save]', e); }
   }
   var m = document.getElementById('settings-modal');
   if (m) m.remove();
@@ -1511,7 +1522,31 @@ function _resetDsWeights() {
   });
 }
 
-function _saveSettings() {
+/* v3063 · AUTOMATISCH SPEICHERN. Gespeichert wird beim Verlassen eines Feldes (change), nicht bei
+   jedem Tastendruck: ein geleertes Profilfeld fällt seit v3055 auf die Vorgabe zurück, und ein
+   halb getipptes Feld soll das nicht auslösen. Still heißt: keine Meldung je Feld (toast wird für
+   den Lauf stummgeschaltet), kein alert bei Gewichten ≠ 100 %, und KEIN Mandanten-Editor -
+   dessen uiSave() springt in die Übersicht zurück und würde einen aus dem Formular werfen. Den
+   Mandanten nimmt erst das Schließen mit (oder sein eigener Knopf „Übernehmen"). */
+var _setAutoTimer = null;
+function _setAutoStatus(txt, farbe) {
+  var el = document.getElementById('set-autosave-status');
+  if (el) { el.textContent = txt; el.style.color = farbe || ''; }
+}
+function _setAutoSpeichern() {
+  clearTimeout(_setAutoTimer);
+  _setAutoStatus('wird gespeichert …');
+  _setAutoTimer = setTimeout(function () {
+    try { _saveSettings({ leise: true }); } catch (e) { console.warn('[settings auto]', e); _setAutoStatus('nicht gespeichert — bitte erneut ändern', '#B8625C'); }
+  }, 500);
+}
+
+function _saveSettings(opt) {
+  opt = opt || {};
+  var _leise = !!opt.leise;
+  var _toastOrig = window.toast, _hinweis = '';
+  if (_leise) window.toast = function () {};
+  try {
   // V26: Sicherstellen, dass aktuelle Form-Werte im Draft sind, bevor wir speichern
   _setCollectFormIntoDraft();
 
@@ -1577,7 +1612,8 @@ function _saveSettings() {
       if (inp) w[k] = parseInt(inp.value) || 0;
     });
     if (Object.keys(w).length === 5) {
-      try { DealScore.setWeights(w); } catch (e) { alert(e.message); return; }
+      try { DealScore.setWeights(w); }
+      catch (e) { if (_leise) _hinweis = 'Deal-Score-Gewichte: ' + e.message; else { alert(e.message); return; } }
     }
   }
 
@@ -1612,12 +1648,9 @@ function _saveSettings() {
   }
 
   // v818-global-save-mand: Mandanten-Editor (Steuerregime/Buchhaltung) mitspeichern, wenn offen.
-  if (window.DealPilotMandanten && typeof window.DealPilotMandanten.uiSaveIfOpen === 'function') {
-    try { window.DealPilotMandanten.uiSaveIfOpen(); } catch (e) { console.warn('[settings] Mandanten-Save fehlgeschlagen:', e); }
-  }
-
-  // v819-global-save-mand: Mandanten-Editor (Steuerregime/Buchhaltung) mitspeichern, wenn offen.
-  if (window.DealPilotMandanten && typeof window.DealPilotMandanten.uiSaveIfOpen === 'function') {
+  // v3063: nicht beim stillen Speichern je Feld (uiSave springt in die Übersicht), nur beim Schließen.
+  // (Der zweite, gleichlautende Block v819 war eine Doppelung und ist entfernt.)
+  if ((!_leise || opt.mitMandanten) && window.DealPilotMandanten && typeof window.DealPilotMandanten.uiSaveIfOpen === 'function') {
     try { window.DealPilotMandanten.uiSaveIfOpen(); } catch (e) { console.warn('[settings] Mandanten-Save fehlgeschlagen:', e); }
   }
 
@@ -1626,17 +1659,12 @@ function _saveSettings() {
   window._SetDraft.dirty = false;
   _setUpdateDirtyHint();
 
-  if (typeof toast === 'function') toast('✓ Einstellungen gespeichert');
+  if (!_leise && typeof toast === 'function') toast('✓ Einstellungen gespeichert');
   if (typeof renderDealScore === 'function') renderDealScore();
-
-  // Visual feedback at save button
-  var btn = document.querySelector('.settings-footer .btn-gold');
-  if (btn) {
-    var orig = btn.innerHTML;
-    btn.innerHTML = '✓ Gespeichert';
-    btn.disabled = true;
-    setTimeout(function() { btn.innerHTML = orig; btn.disabled = false; }, 1500);
-  }
+  var _uhr = new Date().toTimeString().slice(0, 5);
+  if (_hinweis) _setAutoStatus(_hinweis + ' — der Rest ist gespeichert (' + _uhr + ')', '#B8625C');
+  else _setAutoStatus('✓ Alles gespeichert · ' + _uhr, '#3FA56C');
+  } finally { if (_leise) window.toast = _toastOrig; }
 }
 
 window.Settings = Settings;
@@ -2062,11 +2090,11 @@ function _kaufBlockHtml(planKey) {
      Position. */
 
   if (pakete.length) {
-    h += '<div class="plan-credits-section">' +
-      '<h3 class="plan-credits-title">Bewertungspakete</h3>' +
-      '<p class="plan-credits-desc">Ist dein Monatskontingent aufgebraucht, legst du hier nach. ' +
-        'Jedes Paket ist für jeden Plan kaufbar — such dir aus, was du brauchst. ' +
-        'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
+    h += '<section class="plan-credits-section dp-pa-karte">' +
+      '<div class="dp-pa-eti">Nachkaufen</div>' +
+      '<h3 class="plan-credits-title">Mehr Bewertungen</h3>' +
+      '<p class="plan-credits-desc">Für jeden Plan kaufbar. Zugekauftes verfällt nie und wird erst ' +
+        'verbraucht, wenn dein Monatskontingent leer ist.</p>' +
       '<div class="plan-paket-grid">';
     pakete.forEach(function (x) {
       var b = _paketName(x.pk);
@@ -2088,7 +2116,7 @@ function _kaufBlockHtml(planKey) {
         '</div>' +
       '</div>';
     });
-    h += '</div></div>';
+    h += '</div></section>';
   }
 
   /* v1294: Der Einzelkauf funktioniert seit v1183, wurde aber nie
@@ -2096,10 +2124,11 @@ function _kaufBlockHtml(planKey) {
      `creditPacks` ist seit v1246 leer. */
   var einzeln = P.einzelkauf || [];
   if (einzeln.length > 0) {
-    h += '<div class="plan-credits-section plan-einzel-section">' +
-      '<h4 class="plan-credits-title" style="font-size:14px">Oder einzeln — genau die eine, die gerade fehlt</h4>' +
-      '<p class="plan-credits-desc">Einzelne Bewertungen kosten mehr als im Kontingent; dafür zahlst du nur, ' +
-        'was du wirklich brauchst. Auch sie verfallen nie.</p>' +
+    h += '<details class="plan-credits-section plan-einzel-section dp-pa-karte">' +
+      '<summary><span><span class="dp-pa-eti">Einzeln kaufen</span>' +
+      '<span class="plan-credits-title">Genau die eine, die gerade fehlt</span></span><span class="dp-pa-pf">›</span></summary>' +
+      '<p class="plan-credits-desc">Einzeln kostet mehr als im Paket, dafür zahlst du nur, ' +
+        'was du brauchst. Auch das verfällt nie.</p>' +
       '<div class="plan-einzel-grid">';
     einzeln.forEach(function (e) {
       /* Rechts der GESAMTPREIS, darunter klein der Stueckpreis — sonst
@@ -2114,7 +2143,7 @@ function _kaufBlockHtml(planKey) {
           'onclick="_buyCreditPack(\'' + e.key + '\', this)">Kaufen</button>' +
       '</div>';
     });
-    h += '</div></div>';
+    h += '</div></details>';
   }
   return h;
 }
@@ -2141,10 +2170,18 @@ function _renderPlanPane() {
      unerreichbar — also fuer genau die Gruppe, die als einzige nachkaufen
      DARF (`/credits/checkout` weist Free mit `upgrade_required` ab).
      Gemessen im DOM: `.plan-credits-section` 0 Treffer bei Plan „pro". */
+  /* v3063 · VARIANTE A (Marcel 02.11.2026: „a"; Entwurf design/Vorschläge/einstellungen-einfach-demo.html).
+     Vorher: Kontingent, Plan-Karte, Pakete in Serifenschrift, Einzelkauf - drei Formen, drei Schriften.
+     Jetzt: EINE Kartenform; zuerst „Dein Plan" mit dem Kontingent darin, dann Nachkaufen, dann
+     „Einzeln kaufen" zugeklappt. Die Bausteine (Daten, Preise, Kauf-Knöpfe) bleiben dieselben. */
   if (_v234_1CurrentPlan !== 'free') {
-    return '<h3 class="set-section-h">Dein Kontingent</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">' +
-           _v234_1Header +
-           _kaufBlockHtml(_v234_1CurrentPlan); /* v611-kerosin-paid · v1296d */
+    return '<div class="dp-pa">' +
+             '<section class="dp-pa-karte dp-pa-plan">' + _v234_1Header +
+               '<div class="dp-pa-kont"><div class="dp-pa-eti">Kontingent</div>' +
+               '<div id="set-ai-credits-host"><div class="hint">Lädt…</div></div></div>' +
+             '</section>' +
+             _kaufBlockHtml(_v234_1CurrentPlan) + /* v611-kerosin-paid · v1296d */
+           '</div>';
   }
 
   // Free-User: Status-Header + bisherige Plan-Card-Logik (siehe unten)
