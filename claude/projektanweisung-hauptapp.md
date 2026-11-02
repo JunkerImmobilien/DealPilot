@@ -44144,3 +44144,9 @@ Bayern-BRW (iFrame, registry-Text, Anfrage).
 „in den Einstellungen ändern ›", über den Reitern kein Schalter mehr); `#obj-action-bar` nie ausgeblendet (fehlte in der
 Zuordnung → galt als Experte); Zeile „Gewichtung anpassen ›" aus Mein Profil entfernt. **Commit** 3fcda349 + v3077a.
 **Nachweis** `wissen/2026-11-02.md` Teil 12. **Rest** —
+
+### v3078 — Marktbericht-Stufe getrennt vom Detailgrad (02.11.2026) · Prod 1.0.24
+
+**Was.** Pillen/Abrufzeilen wählen nur die Marktbericht-Stufe (`mbWahl`), freigegeben bis zum Detailgrad; gesperrte Stufen
+führen in die Einstellungen; kein stilles Hochschalten mehr aus Mietanalyse/Potenzial. **Commit** 15d546b5, **Prod** dfdaa0e.
+**Nachweis** `wissen/2026-11-02.md` Teil 13 (dort auch Stand Schleswig-Holstein). **Rest** —
