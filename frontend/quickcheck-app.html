@@ -5868,9 +5868,9 @@ const QcApp = (function() {
         /* v3081e · Marcel: „wir sehen ja nicht, ob sie leer ist“ - also keine Aussage zum Leerstand */
         kopfT = 'Keine Miete angegeben — angesetzt ist die Marktmiete der DealPilot-Bewertung.';
       } else {
-        kopfT = 'Deine Ist-Miete, abgeglichen mit der Marktmiete der DealPilot-Bewertung'
-          + (mp && mp.markt_monat > 0 ? ' (' + e0(mp.markt_monat) + ', ' + qm(mp.markt_monat) + ')' : '')
-          + ' als Annahme für die ortsübliche Miete.';
+        kopfT = (mp && mp.markt_monat > 0)
+          ? 'Deine Ist-Miete, abgeglichen mit der Marktmiete der DealPilot-Bewertung (' + e0(mp.markt_monat) + ', ' + qm(mp.markt_monat) + ') als Annahme für die ortsübliche Miete.'
+          : 'Deine Ist-Miete.';   /* v3081f: ohne Marktmiete kein Abgleich behaupten */
         const z = mp && mp.zul;
         const grundM = QcEngine.num(inputs.nkm_grund) > 0 ? Math.min(QcEngine.num(inputs.nkm_grund), nkm) : nkm;
         void z; void grundM;
