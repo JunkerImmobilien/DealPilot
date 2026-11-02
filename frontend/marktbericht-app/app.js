@@ -1008,24 +1008,68 @@ function _renderWertverfahren(d) {
         + '</td><td>' + rechts + '</td></tr>';
     }).join('') + '</tbody></table>';
   }
-  function aufklapper(kennung, beschriftung, inhalt) {
+  /* ══ v3050 · N84.4 · WERTE EINFACH ══════════════════════════════════════════
+     Marcel 29.10.2026: „die Angaben dürfen auch einfacher verständlich dargestellt
+     werden, mit weniger Text" — Entwurf N84.4 abgenommen („umsetzen wie gezeigt").
+     Je Wert eine Karte: große Zahl, EINE Zeile Herkunft, alles Weitere hinter EINEM
+     Aufklapper (<details>). Das führende Verfahren trägt „führend". Was entfällt oder
+     ohne Wert bleibt, steht als EINE Zeile statt als Karte mit Strich.
+     Es wird nichts weggelassen, nur eingeklappt: jede Zeile, die bis v3049 sichtbar
+     war, steht im Aufklapper ihrer Karte. Sichtbar bleibt, was die Zahl einschränkt
+     (ohne Bodenwert, insoweit indikativ, Zins passt nur eingeschränkt, vorläufig), der
+     WEG zur Quelle, wo kein amtlicher Wert vorliegt, und der Quellennachweis (Auflage
+     der Lizenz — eine Namensnennung hinter einem Klick erfüllt sie nicht sicher).
+     Klassen wv-k / wv-t / wv-v / wv-mehr / wv-rw / wv-boden / wv-nachweis bleiben:
+     messe-drehbuch.js greift die Karten darüber. */
+  function aufklapper(beschriftung, inhalt) {
     if (!inhalt) return '';
-    return '<div class="wv-mehr" data-wv="' + kennung + '" data-label="' + beschriftung + '">'
-      + '\u25b8 ' + beschriftung + '</div>'
-      + '<div class="wv-erk" id="wv-e-' + kennung + '">' + inhalt + '</div>';
+    return '<details class="wv-auf"><summary class="wv-mehr" data-label="' + beschriftung + '">'
+      + '▸ ' + beschriftung + '</summary>'
+      + '<div class="wv-erk">' + inhalt + '</div></details>';
   }
-  function karte(kennung, titel, wert, unten, art, staffel, vorbehalt) {
-    return '<div class="wv-k">'
-      + '<div class="wv-t">' + titel + '</div>'
-      + '<div class="wv-v">' + wert + '</div>'
-      + '<div class="wv-s">' + (unten || '') + '</div>'
-      + aufklapper(kennung, 'was bedeutet das?', _wvErklaerung(art))
-      + aufklapper('rw-' + kennung, 'Rechenweg', rechenweg(staffel))
-      /* v1143-VORL · Der Vorbehalt stand nur im PDF. */
-      + aufklapper('vb-' + kennung, 'warum vorläufig?',
-          vorbehalt ? '<div class="wv-vb">' + esc(vorbehalt) + '</div>' : '')
+  function absatz(html) { return html ? '<div class="wv-abs">' + html + '</div>' : ''; }
+  function erklaerung(art) {
+    var t = _wvErklaerung(art);
+    return t ? '<div class="wv-abs wv-erkl"><b>Was bedeutet das?</b> ' + esc(t) + '</div>' : '';
+  }
+  /* v1143-VORL · der Vorbehalt bleibt bei seiner Zahl, jetzt im Aufklapper */
+  function vorbehalt(t) {
+    return t ? '<div class="wv-abs wv-vb"><b>Warum vorläufig?</b> ' + esc(t) + '</div>' : '';
+  }
+  function marken(liste) {
+    liste = (liste || []).filter(Boolean);
+    return liste.length ? '<div class="wv-marken">' + liste.map(function (m) { return '<span class="wv-marke">' + m + '</span>'; }).join('') + '</div>' : '';
+  }
+  function karte(o) {
+    return '<div class="' + (o.klein ? 'wv-kk' : 'wv-k') + (o.fuehrend ? ' wv-k-fuehrend' : '') + (o.klasse ? ' ' + o.klasse : '') + '">'
+      + '<div class="wv-kopfz"><div class="wv-t">' + o.titel + '</div>'
+      + (o.fuehrend ? '<span class="wv-badge">führend</span>'
+          : (o.zweit ? '<span class="wv-badge wv-badge-2">zweites Verfahren</span>' : ''))
+      + '</div>'
+      + '<div class="wv-v">' + o.wert + '</div>'
+      + '<div class="wv-s">' + (o.herkunft || '') + '</div>'
+      + marken(o.marken)
+      + (o.sichtbar || '')
+      + aufklapper(o.label || 'Rechenweg ansehen', o.inhalt)
       + '</div>';
   }
+  function zeile(titel, text) {
+    return '<div class="wv-zeile"><span class="wv-zeile-t">' + titel + '</span><span class="wv-zeile-x">' + text + '</span></div>';
+  }
+  function deZahl(x) { return String(x).replace('.', ','); }
+  /* v1099b-WQL · der Weg zur Quelle (Liegenschaftszins bzw. Sachwertfaktor), unverändert gebaut */
+  function quelleBlock(ql) {
+    if (!ql || !ql.satz) return '';
+    return '<div class="wv-quelle">'
+      + esc(ql.satz.text)
+      /* v1118-WAQ - warum hier keine Zahl steht. */
+      + (ql.satz.warum_kein_wert ? ' ' + esc(ql.satz.warum_kein_wert) : '')
+      + (ql.satz.kosten ? ' ' + esc(ql.satz.kosten) : '')
+      + ' <a href="' + esc(ql.url) + '" target="_blank" rel="noopener">zur Quelle</a>'
+      + (ql.satz.hinweis ? '<br><span class="wv-quelle-hw">' + esc(ql.satz.hinweis) + '</span>' : '')
+      + '</div>';
+  }
+
 
   var box = document.createElement('div');
   box.id = 'wv-box';
@@ -1037,249 +1081,264 @@ function _renderWertverfahren(d) {
       /* v2592 \u00b7 ein Stichtag vor dem Vorjahr wird gesagt (registry.js) */
       + (lv.stichtag_veraltet ? ' (\u00e4lter als ein Jahr \u2013 neueren Wert beim Gutachterausschuss pr\u00fcfen)' : '')
     : (lv.dienst_ausfall && lv.note ? lv.note : 'kein amtlicher Bodenrichtwert verf\u00fcgbar');
+  var vw = cc.verfahrenswahl || null;
+  var fuehrt = (vw && vw.verfahren) || null;
+  var VW_NAME = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren', bodenwert: 'Bodenwert' };
+  var VW_KURZ = { sachwert: 'Sachwert', ertragswert: 'Ertragswert', vergleichswert: 'Vergleichswert', bodenwert: 'Bodenwert' };
+  /* v2380 · welches Verfahren führt und warum — jetzt im Aufklapper der führenden Karte */
+  var fuehrGrund = fuehrt
+    ? absatz('<b>Führendes Verfahren:</b> ' + esc(VW_NAME[fuehrt] || fuehrt) + (vw.grund ? ' — ' + esc(vw.grund) : ''))
+    : '';
+
+  var mv = (d.valuation && d.valuation.market_value) || {};
+  var g = (d.valuation && d.valuation.amtliche_gegenprobe) || null;
+  var deEur = function (n) { return Math.round(n).toLocaleString('de-DE') + ' €'; };
+
+  /* ── Bodenwert ─────────────────────────────────────────────────────────── */
+  var bodenWert = e.bodenwert_eur != null ? eur(e.bodenwert_eur)
+    : ((cc.bodenwert && cc.bodenwert.vollstaendig !== false && cc.bodenwert.wert != null) ? eur(cc.bodenwert.wert) : '–');
+  var bodenRw = rechenweg(
+    (cc.bodenwert && cc.bodenwert.schritte && cc.bodenwert.schritte.length)
+      ? cc.bodenwert.schritte.concat([{ pos: '= Bodenwert', wert: cc.bodenwert.wert, summe: true }])
+      : null);
+  var flaecheErheblich = !!(cc.flaeche && cc.flaeche.erheblich && cc.flaeche.hinweis);
+  var bodenKarte = karte({
+    klein: true, klasse: 'wv-boden', titel: 'Bodenwert', wert: bodenWert,
+    herkunft: lv.available ? 'Bodenrichtwert ' + bodenZeile : bodenZeile,
+    fuehrend: fuehrt === 'bodenwert',
+    /* v1198b · ein Strich ohne Grund sieht aus wie ein Fehler — der Grund bleibt sichtbar */
+    sichtbar: ((cc.bodenwert && cc.bodenwert.vollstaendig === false
+        && Array.isArray(cc.bodenwert.hinweise) && cc.bodenwert.hinweise.length)
+        ? '<div class="wv-bwgrund">' + cc.bodenwert.hinweise.map(esc).join('<br>') + '</div>' : '')
+      /* v2990 · Grundstücksgröße: Kernaussage sichtbar, der ganze Hinweis im Aufklapper */
+      + (flaecheErheblich ? '<div class="wv-quelle"><b>Grundstücksgröße:</b> ' + esc(_mbFlaecheKern(cc.flaeche, d.ref)) + '</div>' : ''),
+    inhalt: bodenRw
+      + (flaecheErheblich ? absatz('<b>Ganzer Hinweis zur Grundstücksgröße:</b> ' + esc(cc.flaeche.hinweis)) : '')
+      + (fuehrt === 'bodenwert' ? fuehrGrund : ''),
+  });
+
+  /* ── Liegenschaftszins: Herkunftszeile und Weg zur Quelle ─────────────── */
+  var lzsPct = hk.liegenschaftszins_pct != null ? hk.liegenschaftszins_pct : e.liegenschaftszins_pct;
+  var lzsZeile = hk.kurz
+    ? 'Liegenschaftszinssatz: ' + (lzsPct != null ? deZahl(lzsPct) + ' % · ' : '')
+      + esc(hk.kurz) + (hk.indikativ && !/indikativ/.test(hk.kurz) ? ' (indikativ)' : '')
+    : (lzsPct != null ? 'Liegenschaftszinssatz: ' + deZahl(lzsPct) + ' %'
+        + (e.liegenschaftszins_herkunft && e.liegenschaftszins_herkunft.etikett ? ' · ' + esc(e.liegenschaftszins_herkunft.etikett) : '') : '');
+  /* v2390 · unter A: woher, dass es genauer geht, und wie — bleibt sichtbar (Marcel 19.10.2026) */
+  var unterA = hk.unter_a
+    ? '<div class="wv-quelle"><b>Ertragswert insoweit indikativ.</b> '
+      + esc(hk.lang || '') + '. '
+      + (hk.weg && hk.weg.text ? esc(hk.weg.text) : '')
+      + (hk.weg && hk.weg.url && !(hk.quelle_link && hk.quelle_link.url)
+          ? ' <a href="' + esc(hk.weg.url) + '" target="_blank" rel="noopener">zur Quelle</a>' : '')
+      + '</div>'
+    : '';
+  var lzsQuelle = quelleBlock(hk.quelle_link);
+  /* Der Weg zur Quelle steht offen, wo er die einzige Auskunft ist (kein Wert, unter A);
+     belegt er einen amtlichen Wert, steht er im Aufklapper. */
+  var lzsWegOffen = !e.available || !!hk.unter_a
+    || !!(hk.quelle_link && hk.quelle_link.satz && hk.quelle_link.satz.warum_kein_wert);
+  /* v2401 · Stufe N: der Rechenweg der DealPilot-Formel */
+  var lzsFormel = e.liegenschaftszins_formel_hinweis ? '<div class="wv-quelle">' + esc(e.liegenschaftszins_formel_hinweis) + '</div>' : '';
+
+  /* ── Karten und Zeilen der Verfahren ──────────────────────────────────── */
+  var karten = [], zeilen = [];
+
+  /* v2660 · E7 · Vergleichswert aus dem Immobilienrichtwert (nur wo ein Richtwert vorliegt) */
+  if (vi && vi.verfuegbar) {
+    karten.push(karte({
+      titel: 'Vergleichswert', wert: eur(vi.vergleichswert_eur),
+      herkunft: 'Immobilienrichtwert ' + eur(cc.irw && cc.irw.wert_qm) + '/m² · amtlich',
+      fuehrend: fuehrt === 'vergleichswert',
+      zweit: fuehrt !== 'vergleichswert' && !!(vw && (vw.weitere || []).indexOf('vergleichswert') >= 0),
+      inhalt: absatz('Vergleichswert nach § 24 ImmoWertV aus dem Immobilienrichtwert '
+          + eur(cc.irw && cc.irw.wert_qm) + '/m²' + (cc.irw && cc.irw.zonennummer ? ' (Zone ' + esc(cc.irw.zonennummer) + ')' : '')
+          + ', angepasst ' + eur(vi.wert_qm) + '/m² · Stufe A, amtlich'
+          + ((vi.hinweise || []).length ? ' · ' + vi.hinweise.map(esc).join(' · ') : ''))
+        + rechenweg(_irwStaffel(vi.rechenweg))
+        + (fuehrt === 'vergleichswert' ? fuehrGrund : '')
+        + erklaerung('irw'),
+    }));
+  } else if (vi) {
+    zeilen.push(zeile('Vergleichswert', esc(vi.hinweis_kunde || vi.hinweis || 'kein Vergleichswert')
+      + (vi.weg && vi.weg.url ? ' <a href="' + esc(vi.weg.url) + '" target="_blank" rel="noopener">Umrechnungsvorschrift</a>' : '')));
+  }
+
+  /* v1971 · die Karte heißt, was sie ist (Angebote = Marktpreisindikation, kein Vergleichswert) */
+  var vglTitel = (vi && vi.verfuegbar) ? 'Marktpreisindikation aus Angebotspreisen'
+    : ((cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation');
+  var vglKaufpreise = (cc.comparison && cc.comparison.basis) === 'kaufpreise' && !(vi && vi.verfuegbar);
+  var ab = mv.angebot_abschlag && mv.angebot_abschlag.pct > 0 ? mv.angebot_abschlag : null;
+  var abHerkunft = ab ? (/rtlich/.test(ab.herkunft || '') ? 'aus den Kauffällen des Gutachterausschusses'
+      : (/eigene/.test(ab.herkunft || '') ? 'dein Wert'
+        : (/^DealPilot-Marktdurchschnitt/.test(ab.herkunft || '') ? ab.herkunft : 'Marktdurchschnitt'))) : '';
+  var vglHerkunft = vglKaufpreise ? 'amtlicher Vergleichsfaktor · § 20, § 25 ImmoWertV'
+    : ((ab && ab.roh && ab.roh.estimated)
+        ? 'aus ' + deEur(ab.roh.estimated) + ' Angebotsniveau, minus ' + deZahl(ab.pct) + ' %'
+        : 'Angebotspreise, keine Kaufpreise');
+  var vglFuehrt = fuehrt === 'vergleichswert' && !(vi && vi.verfuegbar);
+  karten.push(karte({
+    titel: vglTitel, wert: eur(v), herkunft: vglHerkunft, fuehrend: vglFuehrt,
+    inhalt: absatz(vglKaufpreise ? 'Amtlicher Vergleichsfaktor · § 20, § 25 ImmoWertV.'
+          /* v2380 · Angebotspreise heißen so, auch wenn irgendwo eine amtliche Grundlage existiert */
+          : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV).')
+      /* v3041 · der Wert vor Abschlag steht davor */
+      + (ab ? absatz((ab.roh && ab.roh.estimated ? 'Aus ' + deEur(ab.roh.estimated) + ' (Angebotsniveau) abzüglich ' : 'Inkl. ')
+          + deZahl(ab.pct) + ' % Abschlag auf Angebotspreise (' + esc(abHerkunft) + ').') : '')
+      + ((mv.low != null && mv.high != null && mv.low !== mv.high)
+          ? absatz('Spanne ' + eur(mv.low) + ' bis ' + eur(mv.high) + '.') : '')
+      + (vglFuehrt ? fuehrGrund : '')
+      + erklaerung('vergleich'),
+  }));
+
+  /* v1200 · der Ertragswert sagt, WIE gerechnet wurde */
+  var ewModell = !!(e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length);
+  var ewMiete = e.miete_qm != null
+    ? 'Miete ' + deZahl(e.miete_qm) + ' €/m²'
+      + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : ''))
+    : '';
+  /* v2382/v2600/v2993 · das Band der Marktüblichkeit mit seinem Maßstab */
+  var ewBand = e.miete_band
+    ? 'Band ' + deZahl(e.miete_band.unten_qm) + '–' + deZahl(e.miete_band.oben_qm) + ' €/m² ('
+      + (e.miete_band.anker_qm != null
+        ? esc(e.miete_band.anker_etikett || 'Vergleichsmiete') + ' ' + deZahl(e.miete_band.anker_qm) + ' ± ' + (e.miete_band.band_pct || 20) + ' %'
+          + (e.miete_band.anker_stufe === 'zensus' && e.miete_band.angebot_qm != null
+            ? '; Angebotsniveau ' + deZahl(e.miete_band.angebot_qm) + ' €/m², nicht angesetzt (Angebote sind keine Vertragsmieten)' : '')
+        : [e.miete_band.amtlich_qm != null ? 'amtlich ' + deZahl(e.miete_band.amtlich_qm) : null,
+           e.miete_band.angebot_qm != null ? 'Angebot ' + deZahl(e.miete_band.angebot_qm) : null].filter(Boolean).join(' · ')) + ')'
+    : '';
+  if (e.available) {
+    karten.push(karte({
+      titel: 'Ertragswert', wert: eur(e.value_eur),
+      herkunft: lzsZeile || ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.'),
+      fuehrend: fuehrt === 'ertragswert',
+      marken: [
+        e.bodenwert_fehlt ? 'ohne Bodenwert gerechnet' : null,
+        /* v2390 · Zins unter A: die Karte sagt es selbst (steht der Block unter A offen, dort) */
+        (e.indikativ_wegen_zins && !hk.unter_a) ? 'insoweit indikativ' : null,
+        e.vorlaeufig_vor_bog ? 'vorläufig' : null,
+        /* v2595 · Modellprüfung des Zinses */
+        ewModell ? 'Zins passt nur eingeschränkt' : null,
+      ],
+      sichtbar: unterA + (lzsWegOffen ? lzsQuelle : ''),
+      inhalt: absatz('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.'
+          + (e.bodenwert_fehlt ? ' · <b>ohne Bodenwert gerechnet</b>' : '')
+          + (e.indikativ_wegen_zins && e.liegenschaftszins_herkunft
+              ? ' · <b>insoweit indikativ</b> (Zins: ' + esc(e.liegenschaftszins_herkunft.etikett) + ')' : '')
+          + (ewMiete ? ' · ' + ewMiete : '')
+          + (ewBand ? ' · ' + ewBand : ''))
+        /* v2600 · E2/E3/E4/E10 · besondere Merkmale, vorläufig, Spanne, Liquidationshinweis */
+        + ewZusatz(e).map(function (t) { return absatz(esc(t)); }).join('')
+        + (ewModell ? absatz('<b>Zins passt nur eingeschränkt</b> (' + esc(e.modellpruefung.kurz.replace(/^Zins passt nur eingeschränkt: /, '')) + ')') : '')
+        + lzsFormel
+        + (lzsWegOffen ? '' : lzsQuelle)
+        + rechenweg(e.staffel)
+        + vorbehalt(ewModell ? 'Modellprüfung des Liegenschaftszinses: ' + e.modellpruefung.text : null)
+        + (fuehrt === 'ertragswert' ? fuehrGrund : '')
+        + erklaerung('ertrag'),
+    }));
+  } else {
+    /* v2800 · Code-Gründe als Satz mit Ort im Formular */
+    zeilen.push(zeile('Ertragswert', esc(ewGrundText(e) || 'nicht ausgewiesen')
+      + (lzsZeile ? '<span class="wv-zeile-zus">' + lzsZeile + '</span>' : ''))
+      + unterA + lzsFormel + lzsQuelle);
+  }
+
+  /* v3043 · nicht maßgeblicher Sachwert: eine Zeile „entfällt" statt Karte */
+  var swQuelle = quelleBlock(sw.sachwertfaktor_quelle_link);
+  if (sw.available) {
+    var swFaktor = (function () {
+      /* v1143b · `sachwertfaktor` ist ein Objekt { wert, stufe, quelle } oder eine Zahl */
+      var f = sw.sachwertfaktor;
+      var z = (f && typeof f === 'object') ? f.wert : f;
+      var s = (f && typeof f === 'object') ? f.stufe : null;
+      if (z == null) return '';
+      return ' · Faktor ' + deZahl(z) + (s ? ' · Stufe ' + s : '');
+    })();
+    var swHerkunft = sw.pauschal   /* v2390 · vereinfachter Sachwert, nicht im Vergleich */
+      ? 'vereinfachter Sachwert (Pauschalansatz), vorläufig · kein Marktwert'
+      : sw.marktangepasst
+        ? 'marktangepasst' + swFaktor
+        : (sw.sachwertfaktor_standard
+            ? 'vorläufig · Sachwertfaktor ' + deZahl(sw.sachwertfaktor_standard) + ' (Standard, ohne Marktanpassung)'
+            : 'vorläufig · ohne Sachwertfaktor, kein Marktwert');
+    karten.push(karte({
+      titel: 'Sachwert', wert: eur(sw.value_eur), herkunft: swHerkunft,
+      fuehrend: fuehrt === 'sachwert',
+      zweit: fuehrt !== 'sachwert' && !!(vw && (vw.weitere || []).indexOf('sachwert') >= 0),
+      /* v1106-WQLS · ohne Marktanpassung ist der Weg zum Sachwertfaktor die Auskunft — offen */
+      sichtbar: sw.marktangepasst ? '' : swQuelle,
+      inhalt: (sw.pauschal && sw.fehlt && sw.fehlt.length ? absatz('Es fehlt: ' + esc(sw.fehlt.join(', ')) + '.') : '')
+        + (sw.marktangepasst ? swQuelle : '')
+        + rechenweg(sw.staffel)
+        + vorbehalt(!sw.marktangepasst ? (sw.sachwertfaktor_hinweis || null) : null)
+        + (fuehrt === 'sachwert' ? fuehrGrund : '')
+        + erklaerung('sach'),
+    }));
+  } else if (sw.nicht_massgeblich) {
+    zeilen.push(zeile('Sachwert', 'entfällt — ' + esc(sw.grund || 'für dieses Objekt nicht maßgeblich')));
+  } else {
+    zeilen.push(zeile('Sachwert', esc(sw.grund || 'nicht ausgewiesen')) + swQuelle);
+  }
+
+  /* v2367/v3041 · Gegenprobe aus den Kauffällen des Gutachterausschusses — eigene Karte */
+  if (g && (g.wert_kaufpreis_mittel_eur || g.wert_rohertragsfaktor_eur)) {
+    var gTeile = [];
+    if (g.wert_rohertragsfaktor_eur) gTeile.push('Rohertragsfaktor ' + deZahl(g.rohertragsfaktor) + ' × ' + deEur(g.rohertrag_eur)
+      + (g.rohertrag_basis ? ' (' + esc(g.rohertrag_basis) + ')' : '') + ' = ' + deEur(g.wert_rohertragsfaktor_eur));
+    if (g.wert_kaufpreis_mittel_eur) gTeile.push('Ø Kaufpreis ' + deEur(g.kaufpreis_eur_qm_mittel).replace(' €', ' €/m²') + ' × Wohnfläche = ' + deEur(g.wert_kaufpreis_mittel_eur)
+      + (g.kaufpreis_vertraege ? ' (' + g.kaufpreis_vertraege + ' Kauffälle' + (g.quelle_kennzahl === 'liegenschaftszinssatz' ? ' des Liegenschaftszinses' : '') + ')' : ''));
+    var gJahr = g.datengrundlage_jahr || g.berichtsjahr || null;
+    karten.push(karte({
+      titel: 'Gegenprobe Kauffälle',
+      wert: eur(g.wert_kaufpreis_mittel_eur || g.wert_rohertragsfaktor_eur),
+      herkunft: g.wert_kaufpreis_mittel_eur
+        ? 'Ø Kaufpreis ' + deEur(g.kaufpreis_eur_qm_mittel).replace(' €', ' €/m²') + ' × Wohnfläche'
+        : 'Rohertragsfaktor ' + deZahl(g.rohertragsfaktor) + ' × Rohertrag',
+      label: 'Woher kommt das?',
+      inhalt: absatz('Gegenprobe aus Kauffällen des Gutachterausschusses'
+          + (g.ausschuss ? ' (' + esc(g.ausschuss) + ')' : '')
+          + (gJahr ? ', ' + esc(String(gJahr)) : '') + ': ' + gTeile.join(' · ') + '.')
+        + (g.hinweis ? absatz(esc(g.hinweis)) : '')
+        + (g.quelle_url ? absatz('<a href="' + esc(g.quelle_url) + '" target="_blank" rel="noopener">zur Quelle</a>'
+            + (g.seite ? ' (S. ' + esc(String(g.seite)) + ')' : '')) : ''),
+    }));
+  }
+
+  /* v2380 · kein führendes Verfahren: warum, und der Weg */
+  if (vw && !vw.verfahren && vw.nicht_gerechnet) {
+    zeilen.push(zeile('Führend', 'Kein führendes Verfahren ausgewiesen. ' + esc(vw.weg || '')));
+  }
+
+  /* v2367 · auf welcher Miete der Ertragswert steht — als kleine Karte */
+  var mieteKarte = (e.available && e.miete_qm != null)
+    ? karte({
+        klein: true, titel: 'Miete im Ertragswert', wert: deZahl(e.miete_qm) + ' €/m²',
+        herkunft: /Ist-Miete/.test(e.miete_quelle || '')
+          ? 'Ist-Miete, soweit marktüblich' + (e.miete_band && e.miete_band.band_pct ? ' (± ' + e.miete_band.band_pct + ' % um die Vergleichsmiete)' : '')
+          : esc(e.miete_quelle || 'marktübliche Miete'),
+        label: 'Woher kommt das?',
+        inhalt: ewBand ? absatz(ewBand + '.') : '',
+      })
+    : '';
+  var fuehrPill = fuehrt
+    ? '<span class="wv-pill" title="' + esc(vw.grund || '') + '">Führend: ' + esc(VW_KURZ[fuehrt] || fuehrt) + '</span>'
+    : '';
 
   box.innerHTML =
-    '<h3 class="wv-h">Bodenwert</h3>'
-    /* v2273 \u00b7 ohne Ertragswert (gemessen Bericht 215, Detmold: Ertragswert nicht verf\u00fcgbar)
-       stand hier ein Strich, obwohl der Rechenweg darunter den Bodenwert nennt (477.250 EUR).
-       Jetzt der Wert des Bodenwert-Blocks - nur wenn er vollst\u00e4ndig ist (ETW ohne MEA bleibt
-       der Strich, v1198). */
-    + '<div class="wv-boden"><b>' + (e.bodenwert_eur != null ? eur(e.bodenwert_eur)
-        : ((cc.bodenwert && cc.bodenwert.vollstaendig !== false && cc.bodenwert.wert != null) ? eur(cc.bodenwert.wert) : '\u2013'))
-    + '</b><span>' + bodenZeile + '</span></div>'
-    /* ── v1198b · Ein Strich ohne Grund sieht aus wie ein Fehler ───────────
-       Seit v1198 steht hier korrekt „–", wenn der Bodenwert nicht angesetzt
-       werden darf — bei einer Eigentumswohnung ohne Miteigentumsanteil.
-       Warum, stand nirgends: der Rechenweg darunter zeigte weiter
-       „950 m² × 90 €/m² = 85.500 €", und die Zahl daneben war ein Strich.
-       Das liest sich wie ein Anzeigefehler, nicht wie eine Entscheidung.
-
-       `ErtragswertService.bodenwert()` legt den fertigen Satz in
-       `hinweise` ab — er wurde nur nie gezeigt. Dieselbe Regel wie in
-       v1197: keine Zahl (und kein Strich) ohne Herkunft. */
-    + ((cc.bodenwert && cc.bodenwert.vollstaendig === false
-        && Array.isArray(cc.bodenwert.hinweise) && cc.bodenwert.hinweise.length)
-        ? '<div class="wv-bwgrund">' + cc.bodenwert.hinweise.map(esc).join('<br>') + '</div>'
-        : '')
-    + (hk.kurz ? '<div class="wv-hk">Liegenschaftszinssatz: '
-        + (hk.liegenschaftszins_pct != null ? String(hk.liegenschaftszins_pct).replace('.', ',') + ' % \u00b7 ' : '')
-        + esc(hk.kurz) + (hk.indikativ && !/indikativ/.test(hk.kurz) ? ' (indikativ)' : '') + '</div>' : '')
-    /* v2390 · Unter A: woher (Klartext), dass es genauer geht, und wie.
-       Marcel 19.10.2026: der Wert bleibt, aber er steht als das da, was er ist. */
-    + (hk.unter_a
-        ? '<div class="wv-quelle"><b>Ertragswert insoweit indikativ.</b> '
-          + esc(hk.lang || '') + '. '
-          + (hk.weg && hk.weg.text ? esc(hk.weg.text) : '')
-          + (hk.weg && hk.weg.url && !(hk.quelle_link && hk.quelle_link.url)
-              ? ' <a href="' + esc(hk.weg.url) + '" target="_blank" rel="noopener">zur Quelle</a>' : '')
-          + '</div>'
-        : '')
-    /* v2401 \u00b7 Stufe N: der Rechenweg der DealPilot-Formel, sichtbar */
-    + (e.liegenschaftszins_formel_hinweis
-        ? '<div class="wv-quelle">' + esc(e.liegenschaftszins_formel_hinweis) + '</div>' : '')
-    /* ═══ v1099b-WQL · DER WEG ZUR QUELLE, AUF DEM BILDSCHIRM ═══════════
-       Marcels Vorgabe: "gib im Marktbericht bei den Liegenschaftszinsen
-       und Sachwertfaktoren den Link an, wenn der Kunde die Adresse
-       eingegeben hat. Dann kann er selber die Werte holen oder kaufen."
-
-       Er steht IMMER da, nicht nur wenn eine Zahl fehlt: wo eine steht,
-       belegt er sie; wo keine steht, ist er die einzige Auskunft, die wir
-       geben koennen.
-
-       `rel="noopener"` und `target="_blank"`, weil der Nutzer seinen
-       Bericht nicht verlieren soll, wenn er nachschaut. */
-    + ((hk.quelle_link && hk.quelle_link.satz)
-        ? '<div class="wv-quelle">'
-          + esc(hk.quelle_link.satz.text)
-          /* v1118-WAQ - warum hier keine Zahl steht. */
-          + (hk.quelle_link.satz.warum_kein_wert
-              ? ' ' + esc(hk.quelle_link.satz.warum_kein_wert) : '')
-          + (hk.quelle_link.satz.kosten ? ' ' + esc(hk.quelle_link.satz.kosten) : '')
-          + ' <a href="' + esc(hk.quelle_link.url) + '" target="_blank" rel="noopener">'
-          + 'zur Quelle</a>'
-          + (hk.quelle_link.satz.hinweis ? '<br><span class="wv-quelle-hw">' + esc(hk.quelle_link.satz.hinweis) + '</span>' : '')
-          + '</div>'
-        : '')
-    /* v1141-RW \u00b7 Der Bodenwert geht in BEIDE anderen Verfahren ein, deshalb
-     * gehoert sein Weg direkt unter seine Zahl \u2014 nicht in eine der Karten.
-     * Seine Schritte heissen `schritte` (ErtragswertService.bodenwert), die
-     * der Verfahren `staffel`; er fuehrt kein `summe`-Flag, darum wird die
-     * Ergebniszeile hier angehaengt. */
-    + aufklapper('bod', 'Rechenweg', rechenweg(
-        (cc.bodenwert && cc.bodenwert.schritte && cc.bodenwert.schritte.length)
-          ? cc.bodenwert.schritte.concat([
-              { pos: '= Bodenwert', wert: cc.bodenwert.wert, summe: true },
-            ])
-          : null))
-    /* v2990 · Grundstuecksgroesse: Kernaussage sichtbar, der ganze Hinweis aufklappbar.
-       Stand bisher NUR im PDF, dort als langer Absatz in Braunrot. */
-    + ((cc.flaeche && cc.flaeche.erheblich && cc.flaeche.hinweis)
-        ? '<div class="wv-quelle"><b>Grundstücksgröße:</b> ' + esc(_mbFlaecheKern(cc.flaeche, d.ref)) + '</div>'
-          + aufklapper('flh', 'Ganzer Hinweis zur Grundstücksgröße', esc(cc.flaeche.hinweis))
-        : '')
-    + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
-    + '<div class="wv-g' + (vi ? ' wv-g4' : '') + '">'
-    /* ══ v2660 · E7 · VERGLEICHSWERT AUS DEM IMMOBILIENRICHTWERT ═══════════
-       Eigene Karte (nur wo ein Richtwert vorliegt). Die Angebotskarte daneben
-       bleibt die Marktpreisindikation - zwei Zahlen, zwei Namen. */
-    + (vi ? karte('irw', 'Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)',
-        vi.verfuegbar ? eur(vi.vergleichswert_eur) : '–',
-        vi.verfuegbar
-          ? ('Immobilienrichtwert ' + eur(cc.irw && cc.irw.wert_qm) + '/m²' + (cc.irw && cc.irw.zonennummer ? ' (Zone ' + esc(cc.irw.zonennummer) + ')' : '')
-             + ' · angepasst ' + eur(vi.wert_qm) + '/m² · Stufe A, amtlich'
-             + (cc.verfahrenswahl && cc.verfahrenswahl.verfahren === 'vergleichswert' ? ' · <b>führendes Verfahren</b>'
-                : ((cc.verfahrenswahl && (cc.verfahrenswahl.weitere || []).indexOf('vergleichswert') >= 0) ? ' · zweites Verfahren' : ''))
-             + ((vi.hinweise || []).length ? ' · ' + vi.hinweise.map(esc).join(' · ') : ''))
-          : (esc(vi.hinweis_kunde || vi.hinweis || 'kein Vergleichswert')
-             + (vi.weg && vi.weg.url ? ' <a href="' + esc(vi.weg.url) + '" target="_blank" rel="noopener">Umrechnungsvorschrift</a>' : '')),
-        'irw', vi.verfuegbar ? _irwStaffel(vi.rechenweg) : null) : '')
-    /* ══ v1971 · DIE KARTE HEISST, WAS SIE IST ══════════════════════════
-
-       Hier stand Titel „Vergleichswert" und Unterzeile „fuehrend bei
-       Eigentumswohnungen" — beides fest, unabhaengig davon, woraus die
-       Zahl gebildet ist und ob ueberhaupt ein Verfahren fuehrt.
-
-       Der Hinweis auf die Angebotsbasis stand nur im EINGEKLAPPTEN
-       Erklaertext. Was eingeklappt ist, wird nicht gelesen.
-
-       Marcel am 08.10.2026: „Vergleichswert muessen wir auf jeden Fall
-       umbenennen." */
-    + karte('vgl', (vi && vi.verfuegbar) ? 'Marktpreisindikation aus Angebotspreisen'   /* v2660 · die Zahl ist v (Angebote) */
-        : ((cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation'),
-        eur(v),
-        ((cc.comparison && cc.comparison.basis) === 'kaufpreise' && !(vi && vi.verfuegbar)
-          ? 'amtlicher Vergleichsfaktor · § 20, § 25 ImmoWertV'
-          /* v2380 · Angebotspreise heissen so, auch wenn irgendwo eine amtliche Grundlage existiert */
-          : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV)')
-          /* v2367 · Abschlag auf Angebotspreise und amtliche Gegenprobe sichtbar */
-          + _mpZusatz(d),
-        'vergleich')
-    /* ── v1200 · Die Karte verschwieg, WIE gerechnet wurde ─────────────────
-       Sie zeigte nur „Reinertrag 3.767 € p. a.". Dass ohne Bodenwert
-       gerechnet wurde — bei einer Eigentumswohnung ohne Miteigentumsanteil
-       der Normalfall — stand zwar im Datensatz (`verfahren`:
-       „vereinfachtes Ertragswertverfahren (ohne Bodenwerttrennung)"), aber
-       nirgends auf dem Schirm. Der Nutzer las eine Zahl und hatte keinen
-       Anlass, sie fuer weniger belastbar zu halten als die daneben.
-
-       Die Sachwert-Karte macht es seit jeher richtig und begruendet ihr
-       eigenes Fehlen. Hier zieht der Ertragswert nach. */
-    + karte('ert', 'Ertragswert', e.available ? eur(e.value_eur) : '–',
-        e.available
-          ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.'
-             + (e.bodenwert_fehlt ? ' · <b>ohne Bodenwert gerechnet</b>' : '')
-             /* v2390 · Zins unter A: die Karte sagt es selbst */
-             + (e.indikativ_wegen_zins && e.liegenschaftszins_herkunft
-                ? ' · <b>insoweit indikativ</b> (Zins: ' + esc(e.liegenschaftszins_herkunft.etikett) + ')' : '')
-             /* v2367 · auf welcher Miete der Ertragswert steht */
-             + (e.miete_qm != null ? ' · Miete ' + String(e.miete_qm).replace('.', ',') + ' €/m²'
-                + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : '')) : '')
-             /* v2382 · das Band der Marktueblichkeit mit beiden Vergleichswerten */
-             + (e.miete_band ? ' · Band ' + String(e.miete_band.unten_qm).replace('.', ',') + '–' + String(e.miete_band.oben_qm).replace('.', ',') + ' €/m² ('
-                /* v2600 · E1 · Massstab ist der Anker (amtlich / Ø Miete des Satzes / Angebotsmiete) ± 20 % */
-                + (e.miete_band.anker_qm != null
-                  ? esc(e.miete_band.anker_etikett || 'Vergleichsmiete') + ' ' + String(e.miete_band.anker_qm).replace('.', ',') + ' ± ' + (e.miete_band.band_pct || 20) + ' %'
-                    /* v2993 · Zensus-Anker: das Angebotsniveau steht daneben, ausdruecklich nicht angesetzt */
-                    + (e.miete_band.anker_stufe === 'zensus' && e.miete_band.angebot_qm != null
-                      ? '; Angebotsniveau ' + String(e.miete_band.angebot_qm).replace('.', ',') + ' €/m², nicht angesetzt (Angebote sind keine Vertragsmieten)' : '')
-                  : [e.miete_band.amtlich_qm != null ? 'amtlich ' + String(e.miete_band.amtlich_qm).replace('.', ',') : null,
-                     e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ')) + ')' : '')
-             /* v2600 · E2/E3/E4/E10 · besondere Merkmale, vorlaeufig, Spanne, Liquidationshinweis */
-             + ewZusatz(e).map((t) => ' · ' + esc(t)).join('')
-             /* v2595 · Modellpruefung des Zinses: weicht das Objekt von dessen Stichprobe ab, steht es an der Zahl */
-             + (e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length
-                ? ' · <b>Zins passt nur eingeschränkt</b> (' + esc(e.modellpruefung.kurz.replace(/^Zins passt nur eingeschränkt: /, '')) + ')' : ''))
-          : esc(ewGrundText(e)),   /* v2800 · Code-Gruende (gewerbe_ohne_nutzungsart) als Satz mit Ort im Formular */
-        'ertrag', e.staffel,
-        (e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length)
-          ? 'Modellprüfung des Liegenschaftszinses: ' + e.modellpruefung.text : null)
-    /* v1143-VORL \u00b7 Die Karte zeigte bei vorhandenem Sachwert eine LEERE
-     * Unterzeile \u2014 die wichtigste Einschraenkung fehlte damit genau dort,
-     * wo die Zahl steht. Das PDF sagt "INDIKATIV \u00b7 ohne Sachwertfaktor \u2014
-     * Herstellungskosten, kein Marktwert", der Bildschirm sagte nichts.
-     *
-     * Am Pruefobjekt fuehrte das direkt zur Rueckfrage, ob 268.172 EUR
-     * gegen 191.339 EUR plausibel seien: ohne den Vorbehalt sieht es aus
-     * wie ein Widerspruch zwischen drei gleichrangigen Zahlen. Der
-     * vorlaeufige Sachwert nach \u00a7 35 ist aber gar kein Marktwert \u2014 es
-     * fehlt die Marktanpassung nach \u00a7 21 Abs. 3.
-     *
-     * Der Grund steht im Antwortobjekt (`sachwertfaktor_hinweis`) und war
-     * nirgends sichtbar: fuer Eigentumswohnungen leitet der
-     * Gutachterausschuss ueberhaupt keine Sachwertfaktoren ab. Auch ein
-     * gepflegter eigener Wert wird deshalb verworfen \u2014 am Pruefobjekt
-     * stand 1,15 im Feld und blieb wirkungslos. */
-    /* v3043 \u00b7 nicht ma\u00dfgeblicher Sachwert (CrossCheckService) erscheint gar nicht */
-    + (sw.nicht_massgeblich ? '' : karte('sac', 'Sachwert', sw.available ? eur(sw.value_eur) : '\u2013',
-        sw.available
-          /* v1143b \u00b7 EIGENER FEHLER. Ich hatte `sachwertfaktor` fuer eine Zahl
-           * gehalten \u2014 nhk2010.js:882 setzt aber ein OBJEKT
-           * `{ wert, stufe, quelle }`. Auf dem Bildschirm stand daraufhin
-           * "marktangepasst \u00b7 Faktor [object Object]". Aufgefallen im ersten
-           * Lauf, bei dem ueberhaupt ein Faktor griff (EFH Hiddenhausen,
-           * 0,925 Stufe A) \u2014 vorher gab es keinen Fall, der die Zeile
-           * erreicht haette. Beide Formen werden jetzt gelesen. */
-          ? (sw.pauschal   /* v2390 · vereinfachter Sachwert, nicht im Vergleich */
-              ? 'vereinfachter Sachwert (Pauschalansatz), vorläufig · kein Marktwert'
-                + (sw.fehlt && sw.fehlt.length ? ' · es fehlt: ' + sw.fehlt.join(', ') : '')
-            : sw.marktangepasst
-              ? ('marktangepasst' + (function () {
-                  var f = sw.sachwertfaktor;
-                  var z = (f && typeof f === 'object') ? f.wert : f;
-                  var s = (f && typeof f === 'object') ? f.stufe : null;
-                  if (z == null) return '';
-                  return ' \u00b7 Faktor ' + String(z).replace('.', ',')
-                       + (s ? ' \u00b7 Stufe ' + s : '');
-                })())
-              : (sw.sachwertfaktor_standard
-                  ? 'vorl\u00e4ufig \u00b7 Sachwertfaktor ' + String(sw.sachwertfaktor_standard).replace('.', ',') + ' (Standard, ohne Marktanpassung)'
-                  : 'vorl\u00e4ufig \u00b7 ohne Sachwertfaktor, kein Marktwert'))
-          : (sw.grund || 'nicht ausgewiesen'),
-        'sach', sw.staffel,
-        (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null))
-    + '</div>'
-    /* v2380 · welches Verfahren fuehrt - und wenn keines, warum (auch am Bildschirm) */
-    + ((cc.verfahrenswahl && (cc.verfahrenswahl.verfahren || cc.verfahrenswahl.nicht_gerechnet))
-        ? '<div class="wv-hk">' + (cc.verfahrenswahl.verfahren
-            ? 'Führendes Verfahren: ' + esc(({ sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren', bodenwert: 'Bodenwert' })[cc.verfahrenswahl.verfahren] || cc.verfahrenswahl.verfahren) + ' — ' + esc(cc.verfahrenswahl.grund || '')
-            : 'Kein führendes Verfahren ausgewiesen. ' + esc(cc.verfahrenswahl.weg || '')) + '</div>'
-        : '')
-    /* v1106-WQLS - derselbe Weg wie beim Liegenschaftszins, nur fuer den
-       Sachwertfaktor. Er steht UNTER den drei Karten, weil er sich auf die
-       Sachwertkarte bezieht und nicht auf den Bodenwert darueber. */
-    + ((sw.sachwertfaktor_quelle_link && sw.sachwertfaktor_quelle_link.satz)
-        ? '<div class="wv-quelle">'
-          + esc(sw.sachwertfaktor_quelle_link.satz.text)
-          /* v1118-WAQ - warum hier keine Zahl steht. */
-          + (sw.sachwertfaktor_quelle_link.satz.warum_kein_wert
-              ? ' ' + esc(sw.sachwertfaktor_quelle_link.satz.warum_kein_wert) : '')
-          + (sw.sachwertfaktor_quelle_link.satz.kosten
-              ? ' ' + esc(sw.sachwertfaktor_quelle_link.satz.kosten) : '')
-          + ' <a href="' + esc(sw.sachwertfaktor_quelle_link.url) + '" target="_blank"'
-          + ' rel="noopener">zur Quelle</a>'
-          + (sw.sachwertfaktor_quelle_link.satz.hinweis
-              ? '<br><span class="wv-quelle-hw">'
-                + esc(sw.sachwertfaktor_quelle_link.satz.hinweis) + '</span>' : '')
-          + '</div>'
-        : '')
+    '<div class="wv-kopf"><h3 class="wv-h">Wertermittlung</h3>' + fuehrPill + '</div>'
+    + '<div class="wv-g">' + karten.join('') + '</div>'
+    + (zeilen.length ? '<div class="wv-zeilen">' + zeilen.join('') + '</div>' : '')
+    + '<div class="wv-g2">' + bodenKarte + mieteKarte + '</div>'
     /* === v1107-WNACH - DIE NAMENSNENNUNG IST EINE AUFLAGE ==============
        Wo eine Zahl unter dl-de/by-2-0 steht, gehoert ihr Quellenvermerk
-       sichtbar dazu. Bis hierher hing er an jedem Registersatz und
-       erschien nirgends - und damit durfte keine dieser Zahlen zum Kunden.
-       Genannt wird nur, was in diesem Bericht wirklich steckt. */
+       sichtbar dazu. Genannt wird nur, was in diesem Bericht wirklich steckt.
+       v3050: bleibt offen (nicht eingeklappt), kompakt am Ende. */
     + (function () {
         var qn = (cc && cc.quellen_nachweis) || [];
         if (!qn.length) return '';
-        /* v1402 · DER JAHRGANG GEHOERT ZUR NAMENSNENNUNG.
-           Marcels Anstoss: aeltere Berichte sind guenstiger oder sogar
-           gebuehrenfrei — „dann koennte man diese verwenden und einen
-           vermerk daran setzen". Genau der Vermerk stand hier nicht. Eine
-           Quellenangabe ohne Datum sagt, WER die Zahl erhoben hat, aber
-           nicht WANN; bei einem Bericht von 2016 ist das die wichtigere
-           Haelfte. Ab vier Jahren wird es ausdruecklich benannt — nicht
-           als Warnung, sondern als Tatsache, die der Leser einordnen
-           koennen muss (Paragraf 10 ImmoWertV, Modellkonformitaet zum
-           Wertermittlungsstichtag). */
+        /* v1402 · der Jahrgang gehört zur Namensnennung, ab vier Jahren ausdrücklich benannt
+           (§ 10 ImmoWertV, Modellkonformität zum Wertermittlungsstichtag). */
         var jetzt = new Date().getFullYear();
         return '<div class="wv-nachweis"><b>Quellennachweis</b>'
           + qn.map(function (q) {
@@ -1296,14 +1355,7 @@ function _renderWertverfahren(d) {
                           : '')
                       + '</span>'
                     : '')
-                /* v1409 · DIE LIZENZ GEHOERT SICHTBAR DAZU.
-                   Sie wird seit v1107 im Nachweis gesammelt und wurde
-                   nirgends ausgegeben — dabei entscheidet gerade sie, was
-                   der Kunde mit der Zahl tun darf. Gemessen am 15.09.2026:
-                   18 Sachwertfaktor-Saetze tragen GAR KEINE Lizenzangabe,
-                   die meisten davon auch keine Quell-URL. Wer sie verwendet,
-                   weiss nicht, unter welchen Bedingungen. Ein Strich sagt
-                   mehr als ein Weglassen. */
+                /* v1409 · die Lizenz gehört sichtbar dazu — fehlt sie, fällt es auf */
                 + ' <span class="wv-nw-liz' + (q.lizenz ? '' : ' wv-nw-liz-offen') + '">'
                 +   (q.lizenz ? esc(q.lizenz) : 'Lizenz nicht hinterlegt')
                 + '</span>'
@@ -1312,95 +1364,96 @@ function _renderWertverfahren(d) {
                 + '</div>';
             }).join('')
           + '</div>';
-      })();
-
-
+      })()
+    + '<p class="wv-fuss">Indikative Wertermittlung, kein Verkehrswertgutachten nach § 194 BauGB.</p>';
 
   if (!document.getElementById('wv-css')) {
     var st = document.createElement('style'); st.id = 'wv-css';
-    st.textContent = '#wv-box .wv-h{margin:22px 0 10px;font-size:12px;letter-spacing:.05em;'
-      + 'text-transform:uppercase;opacity:.65}'
-      /* v1141d · Bei 390 px stand das Euro-Zeichen allein in der zweiten
-       * Zeile: der Kopfbetrag mass 66 px bei 33 px Zeilenhoehe. Ursache ist
-       * `nowrap` in der Flex-Zeile — das <b> wird gequetscht und bricht
-       * INNEN um, statt dass die Zeile umbricht. Derselbe Befundtyp wie die
-       * Cashflow-Kacheln in v1138c: eine Zahl, die man in zwei Zeilen liest,
-       * liest man falsch. */
-      + '#wv-box .wv-boden{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}'
-      + '#wv-box .wv-boden b{font-size:22px;white-space:nowrap}'
-      + '#wv-box .wv-boden span{font-size:12px;opacity:.7}'
-      + '#wv-box .wv-hk{margin-top:6px;font-size:12px;opacity:.75}'
-      /* v1099b-WQL · Der Quellenhinweis steht leiser als die Zahl, aber
-         nicht versteckt: er ist eine Auskunft, keine Fussnote. Der Link
-         traegt die Markenfarbe ueber das Whitelabel-Token - ein hartes
-         Gold waere beim Mandanten falsch. */
-      + '#wv-box .wv-quelle{margin-top:8px;padding:7px 10px;border-radius:7px;'
+    st.textContent = '#wv-box .wv-kopf{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:22px 0 12px}'
+      + '#wv-box .wv-h{margin:0;font-size:12px;letter-spacing:.05em;text-transform:uppercase;opacity:.65}'
+      + '#wv-box .wv-pill{font:600 12px/1 Inter,system-ui,sans-serif;padding:7px 12px;border-radius:999px;'
+      + '  background:var(--gold-soft,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent));color:var(--wl-c9a84c,#C9A84C);'
+      + '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}'
+      /* Karten: Zahl groß, eine Zeile Herkunft. auto-fit trägt 2 bis 5 Karten. */
+      + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}'
+      + '#wv-box .wv-g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:14px}'
+      + '#wv-box .wv-k,#wv-box .wv-kk{padding:18px 20px;border:1px solid var(--line,rgba(128,128,128,.22));border-radius:14px;'
+      + '  background:var(--panel,transparent);display:flex;flex-direction:column;gap:6px;min-width:0}'
+      + '#wv-box .wv-kk{padding:14px 18px;border-radius:12px}'
+      + '#wv-box .wv-k-fuehrend{border:2px solid var(--wl-c9a84c,#C9A84C);background:var(--gold-soft,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent))}'
+      + '#wv-box .wv-kopfz{display:flex;justify-content:space-between;align-items:center;gap:8px}'
+      + "#wv-box .wv-t{font:700 11px/1.3 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;opacity:.7}"
+      + "#wv-box .wv-badge{font:700 10.5px/1 'JetBrains Mono',monospace;padding:4px 7px;border-radius:6px;white-space:nowrap;"
+      + '  background:var(--wl-c9a84c,#C9A84C);color:var(--obsidian,#050505)}'
+      + '#wv-box .wv-badge-2{background:transparent;color:var(--wl-c9a84c,#C9A84C);border:1px solid var(--wl-c9a84c,#C9A84C)}'
+      /* v1141d · eine Zahl, die man in zwei Zeilen liest, liest man falsch — nowrap */
+      + "#wv-box .wv-v{font:700 32px/1.1 'Space Grotesk',sans-serif;letter-spacing:-.02em;white-space:nowrap;margin:2px 0}"
+      + "#wv-box .wv-kk .wv-v{font-size:22px}"
+      + '#wv-box .wv-s{font-size:13px;line-height:1.45;opacity:.75}'
+      + '#wv-box .wv-marken{display:flex;flex-wrap:wrap;gap:6px}'
+      + '#wv-box .wv-marke{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;'
+      + '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);'
+      + '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent)}'
+      /* der eine Aufklapper je Karte */
+      + '#wv-box .wv-auf{margin-top:6px;border-top:1px solid var(--line,rgba(128,128,128,.22));padding-top:10px}'
+      + '#wv-box .wv-auf > summary{list-style:none}'
+      + '#wv-box .wv-auf > summary::-webkit-details-marker{display:none}'
+      + '#wv-box .wv-mehr{font-size:12.5px;font-weight:600;cursor:pointer;color:var(--wl-c9a84c,#C9A84C)}'
+      + '#wv-box .wv-erk{margin-top:9px;font-size:12px;line-height:1.55;opacity:.9}'
+      + '#wv-box .wv-abs{margin:0 0 7px}'
+      + '#wv-box .wv-erkl{opacity:.8}'
+      /* eine Zeile statt einer Karte: entfällt / ohne Wert */
+      + '#wv-box .wv-zeilen{display:flex;flex-direction:column;gap:8px;margin-top:14px}'
+      + '#wv-box .wv-zeile{display:flex;gap:12px;align-items:baseline;padding:11px 16px;border-radius:10px;font-size:13px;line-height:1.5;'
+      + '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent)}'
+      + "#wv-box .wv-zeile-t{font:700 11px/1.5 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;opacity:.8}"
+      + '#wv-box .wv-zeile-x{min-width:0;overflow-wrap:anywhere}'
+      + '#wv-box .wv-zeile-zus{display:block;font-size:12px;opacity:.75;margin-top:2px}'
+      + '#wv-box .wv-zeile a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline}'
+      + '#wv-box .wv-fuss{margin:14px 0 0;font-size:11.5px;line-height:1.5;opacity:.6}'
+      /* v1099b-WQL · der Quellenhinweis leiser als die Zahl, aber nicht versteckt */
+      + '#wv-box .wv-quelle{margin-top:4px;padding:7px 10px;border-radius:7px;'
       + '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent);border-left:3px solid var(--wl-c9a84c,#c9a84c);'
       + '  font-size:11.5px;line-height:1.5;opacity:.9}'
       + '#wv-box .wv-quelle a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
       + '  white-space:nowrap}'
+      + '#wv-box .wv-erk a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline}'
       + '#wv-box .wv-quelle-hw{display:block;margin-top:3px;font-size:10.5px;opacity:.7}'
-      /* v1107-WNACH - leiser als der Quellenhinweis, aber lesbar: eine
-         Namensnennung, die niemand liest, erfuellt die Lizenz nicht. */
-      + '#wv-box .wv-nachweis{margin-top:18px;padding:10px 12px;border-radius:8px;'
+      /* v1107-WNACH - leiser als der Quellenhinweis, aber lesbar */
+      + '#wv-box .wv-nachweis{margin-top:16px;padding:10px 12px;border-radius:8px;'
       + '  border:1px solid rgba(128,128,128,.2);font-size:11px;line-height:1.5;opacity:.85}'
       + '#wv-box .wv-nachweis b{display:block;margin-bottom:5px;font-size:11px;'
       + '  letter-spacing:.04em;text-transform:uppercase;opacity:.7}'
       + '#wv-box .wv-nw-z{margin-top:4px}'
       + '#wv-box .wv-nw-kz{opacity:.65}'
-      /* v1402: der Jahrgang steht als eigene Marke — ab vier Jahren in Rot,
-         weil er dann die Aussagekraft der Zahl begrenzt. Rot ist hier eine
-         Statusfarbe und bleibt in jeder Marke dieselbe. */
+      /* v1402: Rot ist hier eine Statusfarbe und bleibt in jeder Marke dieselbe. */
       + '#wv-box .wv-nw-jg{opacity:.65;white-space:nowrap}'
       + '#wv-box .wv-nw-alt{opacity:1;color:#B8625C;white-space:normal}'
-      /* v1409: die Lizenz als eigene Marke — fehlt sie, faellt es auf. */
       + '#wv-box .wv-nw-liz{opacity:.6;white-space:nowrap}'
       + '#wv-box .wv-nw-liz-offen{opacity:1;color:#B8625C;white-space:normal}'
       + '#wv-box .wv-nachweis a{color:var(--wl-c9a84c,#c9a84c);text-decoration:underline;'
       + '  word-break:break-all}'
-
       /* v1198b · Der Grund, warum kein Bodenwert dasteht. */
-      + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 32%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent)}'
-      + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
-      /* v2660 · vier Karten (mit Vergleichswert aus dem Immobilienrichtwert): 2 × 2 */
-      + '#wv-box .wv-g.wv-g4{grid-template-columns:repeat(2,minmax(0,1fr))}'
-      + '#wv-box .wv-k{padding:13px 15px;border:1px solid rgba(128,128,128,.22);border-radius:8px}'
-      + '#wv-box .wv-t{font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}'
-      + '#wv-box .wv-v{font-size:20px;font-weight:600;margin:4px 0 2px}'
-      + '#wv-box .wv-s{font-size:11.5px;opacity:.7;min-height:16px}'
-      + '#wv-box .wv-mehr{margin-top:8px;font-size:11.5px;cursor:pointer;'
-      + 'color:var(--wl-c9a84c,#C9A84C)}'
-      + '#wv-box .wv-erk{display:none;margin-top:7px;font-size:11.5px;line-height:1.55;opacity:.85}'
-      /* v1141-RW · Der Rechenweg steht in einer 3-Spalten-Kachel, also eng.
-       * `overflow-wrap` statt fester Breite: lieber ein Umbruch in der
-       * Beschriftung als eine abgeschnittene Zahl. Die Zahlenspalte bleibt
-       * deshalb `nowrap` und tabellarisch — nur links darf brechen. */
-      /* v1141c · Der Bodenwert-Weg steht NICHT in einer Kachel, sondern über
-       * die volle Breite (gemessen 856 px). Beschriftung links, Zahl ganz
-       * rechts — dazwischen ein halber Bildschirm. Eine Rechnung liest man
-       * nur, wenn Position und Betrag beieinanderstehen. */
-      + '#wv-box > .wv-erk .wv-rw{max-width:440px}'
-      + '#wv-box .wv-rw{width:100%;border-collapse:collapse;font-size:11px}'
+      + '#wv-box .wv-bwgrund{margin-top:4px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 32%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent)}'
+      /* v1141-RW · Rechenweg: links darf brechen, die Zahlenspalte bleibt nowrap und tabellarisch */
+      + '#wv-box .wv-rw{width:100%;border-collapse:collapse;font-size:11.5px;margin:2px 0 8px}'
       + '#wv-box .wv-rw td{padding:3px 0;vertical-align:top;overflow-wrap:anywhere}'
       + '#wv-box .wv-rw td:last-child{text-align:right;white-space:nowrap;padding-left:10px;'
       + 'font-variant-numeric:tabular-nums;width:1%}'
       + '#wv-box .wv-rw-s td{font-weight:600;border-top:1px solid rgba(128,128,128,.28);padding-top:5px}'
       + '#wv-box .wv-rw-s td:last-child{color:var(--wl-c9a84c,#C9A84C)}'
       + '#wv-box .wv-rw-d{font-size:10px;line-height:1.4;opacity:.6;margin-top:2px;font-weight:400}'
-      + '#wv-box .wv-vb{font-size:11px;line-height:1.5}';
+      + '#wv-box .wv-vb{font-size:11.5px;line-height:1.5}'
+      + '@media (max-width:640px){#wv-box .wv-v{font-size:28px}#wv-box .wv-zeile{flex-direction:column;gap:2px}}';
     document.head.appendChild(st);
   }
   wrap.appendChild(box);
 
-  box.querySelectorAll('.wv-mehr').forEach(function (m) {
-    m.addEventListener('click', function () {
-      var z = document.getElementById('wv-e-' + m.getAttribute('data-wv'));
-      var auf = z.style.display !== 'block';
-      z.style.display = auf ? 'block' : 'none';
-      /* v1141-RW: die Beschriftung stand hier fest verdrahtet \u2014 mit einem
-       * zweiten Aufklapper haette der Rechenweg beim Zuklappen pl\u00f6tzlich
-       * "was bedeutet das?" geheissen. */
-      m.textContent = (auf ? '\u25be' : '\u25b8') + ' ' + m.getAttribute('data-label');
+  /* v1141-RW: die Beschriftung folgt dem Zustand (▸ zu, ▾ auf) */
+  box.querySelectorAll('details.wv-auf').forEach(function (dt) {
+    dt.addEventListener('toggle', function () {
+      var m = dt.querySelector('summary.wv-mehr');
+      if (m) m.textContent = (dt.open ? '▾' : '▸') + ' ' + m.getAttribute('data-label');
     });
   });
 }

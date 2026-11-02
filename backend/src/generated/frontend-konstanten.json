@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-29T19:27:03.426Z",
+ "erzeugt_am": "2026-11-02T05:18:51.805Z",
  "quellen": {
   "voice-import": "fd1708d211c4b4d0",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "3f30fd0505055787",
-  "index-html": "4e9d2b01c36ae729",
+  "storage": "9ec50d08fbb36856",
+  "index-html": "175a644ccfbdd9e2",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -510,10 +510,6 @@
    "kp4",
    "kp4l",
    "bank_inst",
-   "ai_strat",
-   "ai_verk",
-   "ai_risk",
-   "ai_markt",
    "d2",
    "d2z",
    "d2t",

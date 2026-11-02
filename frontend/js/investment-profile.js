@@ -163,34 +163,6 @@ window.DealPilotInvestmentProfile = (function() {
       try { blEl.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
     }
 
-    // V63.90: KI-Analyse-Standards aus Profil → hidden inputs + Display
-    syncAiParamsToTab();
-  }
-
-  /**
-   * V63.90: Synchronisiert die KI-Analyse-Parameter aus dem Profil
-   * - Schreibt sie in die hidden inputs (#ai_strat, #ai_verk, #ai_risk, #ai_markt)
-   *   sodass der bestehende Prompt-Builder weiter g('ai_strat') etc. nutzen kann.
-   * - Aktualisiert die Display-Spans im KI-Tab.
-   * Wird aufgerufen aus applyToNewObject() und nach Speichern in Settings.
-   */
-  function syncAiParamsToTab() {
-    var p = load();
-    var d = defaults();
-    var aiStrat = p.ai_strat || d.ai_strat || 'Buy & Hold (Langfristig halten)';
-    var aiVerk  = p.ai_verk  || d.ai_verk  || 'Mittel (normale Situation)';
-    var aiRisk  = p.ai_risk  || d.ai_risk  || 'Moderat (ausgewogen)';
-    var aiMarkt = p.ai_markt || d.ai_markt || 'Ausgeglichen (stabil)';
-    function setVal(id, val) { var el = document.getElementById(id); if (el) el.value = val; }
-    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
-    setVal('ai_strat', aiStrat);
-    setVal('ai_verk',  aiVerk);
-    setVal('ai_risk',  aiRisk);
-    setVal('ai_markt', aiMarkt);
-    setText('ai-param-strat-display', aiStrat);
-    setText('ai-param-verk-display',  aiVerk);
-    setText('ai-param-risk-display',  aiRisk);
-    setText('ai-param-markt-display', aiMarkt);
   }
 
   // Pretty-Render: Settings-Pane HTML
@@ -483,6 +455,14 @@ window.DealPilotInvestmentProfile = (function() {
       ai_risk:                s('ip_ai_risk'),
       ai_markt:               s('ip_ai_markt')
     };
+    /* v3055 · Marcel 30.10.2026: „indikativen Zins und 10 Jahre angenommen, aber er trägt einen
+       anderen Zins ein". Gemessen: Radio „Indikativer Marktzins" gewählt, gespeichert, im Profil
+       blieb zins_override 4,25 - jedes neue Objekt bekam 4,25 statt 4,23. Die Nullen wurden hier
+       entfernt und das Ergebnis dann über den ALTEN Stand gelegt (v1783): ein geleertes Feld fiel
+       nie auf die Vorgabe zurück, es behielt still seinen alten Wert. Jetzt: was das Formular
+       ZEIGT (ip_<schlüssel>) und leer ist, wird aus dem Profil entfernt. Was es nicht zeigt,
+       bleibt wie seit v1783 erhalten. */
+    var _geleert = Object.keys(p).filter(function (k) { return p[k] === null && document.getElementById('ip_' + k); });
     // Nullen rausfiltern (User hat das Feld leer gelassen → fällt auf Default zurück)
     Object.keys(p).forEach(function(k) { if (p[k] === null) delete p[k]; });
 
@@ -513,9 +493,8 @@ window.DealPilotInvestmentProfile = (function() {
     var _zusammen = {};
     Object.keys(_vorher).forEach(function (k) { _zusammen[k] = _vorher[k]; });
     Object.keys(p).forEach(function (k) { _zusammen[k] = p[k]; });
+    _geleert.forEach(function (k) { delete _zusammen[k]; });   /* v3055 */
     save(_zusammen);
-    // V63.90: KI-Tab Display & hidden Inputs sofort updaten
-    syncAiParamsToTab();
     if (typeof toast === 'function') toast('✓ Investmentprofil gespeichert');
   }
 
@@ -541,8 +520,16 @@ window.DealPilotInvestmentProfile = (function() {
     var inp=document.getElementById('ip_zins_override'); if(!inp || inp._mktWired) return; inp._mktWired=1;
     var lab=document.querySelector('label[for="ip_zins_override"]');
     function setLabel(market){ if(lab) lab.textContent = market ? 'Marktzinssatz' : 'Eigener Zinssatz (optional)'; }
-    function toMarket(){ var r=_mktZins(); if(r==null) return; inp.dataset.market='1'; inp.value=r.toFixed(2); inp.readOnly=true; setLabel(true); _radio('markt'); }
-    function toOverride(){ inp.dataset.market=''; inp.readOnly=false; setLabel(false); _radio('eigen'); }
+    /* v3056 · Marcel 30.10.2026 (Entscheidung: Zins nach Beleihung). Das Feld zeigte den Stufenzins
+       (4,23 %), neue Objekte bekamen aber getZins() nach dem LTV der Vorgabe-Finanzierung (4,87 %,
+       v3029). Jetzt steht hier dieselbe Zahl, die ein neues Objekt bekommt, mit dem Grund darunter. */
+    function _hinweis(txt){ var h=document.getElementById('ip_zins_wirk'); if(!h){ var feld=inp.closest('.ip-field'); if(!feld) return; h=document.createElement('div'); h.id='ip_zins_wirk'; h.className='ip-hint'; feld.appendChild(h); } h.textContent=txt||''; h.style.display=txt?'':'none'; }
+    function toMarket(){ var r=_mktZins(); if(r==null) return; var eff=r, l=null;
+      try { l=vorgabeLtv(); var b=parseInt((document.getElementById('ip_zinsbindung_default')||{}).value,10)||10; var n=(l!=null)?window.dpGetIndicativeZins(b,null,l):null; if(typeof n==='number'&&isFinite(n)&&n>r) eff=n; } catch(e){}
+      inp.dataset.market='1'; inp.value=eff.toFixed(2); inp.readOnly=true; setLabel(true); _radio('markt');
+      var f2=function(x){ return x.toFixed(2).replace('.', ','); };
+      _hinweis(eff>r ? 'Neue Objekte bekommen ' + f2(eff) + ' %: deine Vorgabe-Finanzierung beleiht rund ' + Math.round(l) + ' % vom Kaufpreis (Eigenkapital ' + String(get('ek_quote_default')).replace('.', ',') + ' %, Nebenkosten mitfinanziert). Die gewählte Stufe (' + f2(r) + ' %) ist die Untergrenze.' : 'Neue Objekte bekommen ' + f2(eff) + ' % (gewählte Stufe).'); }
+    function toOverride(){ inp.dataset.market=''; inp.readOnly=false; setLabel(false); _radio('eigen'); _hinweis(''); }
     /* v2211 · Entweder-oder: die Radios schalten das Feld */
     function _radio(w){ var r=document.querySelector('input[name="ip_zins_modus"][value="'+w+'"]'); if(r) r.checked=true; }
     [].slice.call(document.querySelectorAll('input[name="ip_zins_modus"]')).forEach(function(r){
@@ -554,6 +541,8 @@ window.DealPilotInvestmentProfile = (function() {
     if(!String(inp.value).trim()){ toMarket(); if(inp.dataset.market!=='1'){ setTimeout(function(){ if(!String(inp.value).trim()) toMarket(); },500); } }
     else { toOverride(); }
     ['ip_zinsbindung_default','ip_zins_margin'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktBound) return; el._mktBound=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') toMarket(); }); });
+    /* v3056 · Eigenkapital und Nebenkosten ändern den LTV der Vorgabe - nach dem Auto-Save neu anzeigen */
+    ['ip_ek_quote_default','ip_notar_pct','ip_grundbuch_pct','ip_maklerkosten','ip_sonstige_nk_pct','ip_bundesland'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktLtv) return; el._mktLtv=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') setTimeout(toMarket, 700); }); });
     inp.addEventListener('input', function(){ if(inp.dataset.market==='1' && document.activeElement===inp) toOverride(); });
   }
   /* ══ v2257 · EIGENKAPITAL UND MIETAUSFALL KOMMEN NACH ══════════════════
@@ -614,7 +603,6 @@ window.DealPilotInvestmentProfile = (function() {
     wireMarketRate: wireMarketRate,
     getHausgeldMonthly: getHausgeldMonthly,
     getHausgeldEstimate: getHausgeldEstimate,
-    syncAiParamsToTab: syncAiParamsToTab,
     renderPaneHtml: renderPaneHtml,
     wireLageProfil: wireLageProfil,   /* v1957 */
     saveFromForm: saveFromForm,

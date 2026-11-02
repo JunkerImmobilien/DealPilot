@@ -2456,7 +2456,7 @@ function _updateFooterNav(paneId){
       'p-ak':    '<b>Schritt 1 / 5:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
       'p-bmf':   '<b>Schritt 2 / 5:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
       'p-afa':   '<b>Schritt 3 / 5:</b> Vergleich der vier Varianten (Amtlich / Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
-      'p-hebel': '<b>Schritt 4 / 5:</b> Wählen Sie die Variante per Klick auf eine Karte. Bei „Übernehmen" wird der Gebäudeanteil ins Steuermodul geschrieben. Weiter: Szenario Bodenabschlag (optional).',
+      'p-hebel': '<b>Schritt 4 / 5:</b> Welche Aufteilung soll gelten? Eine Zeile übernehmen — der Gebäudeanteil geht in den Reiter Steuer. Weiter: Szenario Bodenabschlag (optional).',   /* v3051 · N85 */
       'p-boden': '<b>Schritt 5 / 5:</b> Szenario jenseits der amtlichen Aufteilung — Abschlag auf den Bodenwert, Restnutzungsdauer und Begründung für den Vertragstext.'
     }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];
@@ -2697,7 +2697,14 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
   /* Quote bevorzugt aus Pipeline-Variante, Fallback _lastBmfResults (konservativ) */
   var _p5 = window._v292State && window._v292State.response && window._v292State.response.phase5_varianten;
   var gebPctVar;
-  if (_p5 && _p5[_selVar] && typeof _p5[_selVar].gebaeude_pct === 'number') {
+  /* v3051 · N85: in der Vergleichstafel (bmf-bodenabschlag.js) ist auch die umgekehrte
+     Ertragswertmethode waehlbar - dann traegt die Klausel deren Quote und Herleitung. */
+  var _jac = (window._dpBmfTafelWahl === 'jacoby' && window._v292State && window._v292State.response
+    && window._v292State.response.phase4_bmf && window._v292State.response.phase4_bmf.jacoby) || null;
+  if (_jac && !_jac.verfuegbar) _jac = null;
+  if (_jac) {
+    gebPctVar = Number(Number(_jac.gebaeudeanteil_prozent).toFixed(2));
+  } else if (_p5 && _p5[_selVar] && typeof _p5[_selVar].gebaeude_pct === 'number') {
     gebPctVar = _p5[_selVar].gebaeude_pct;
   } else {
     gebPctVar = (window._lastBmfResults && window._lastBmfResults.gebaeudeanteil_prozent
@@ -2755,6 +2762,20 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
   /* Ohne Pipeline-Variante sind die Betraege die amtlichen (Rueckfall oben) -
      dann auch der amtliche Text. */
   var _textKey = (_p5 && _p5[_selVar]) ? _selVar : 'amtlich';
+  if (_jac) {
+    _textKey = 'jacoby';
+    texts.jacoby =
+      '<p><strong>Kaufpreisaufteilung (umgekehrte Ertragswertmethode nach Jacoby)</strong></p>' +
+      '<p>Die Vertragsparteien sind sich darüber einig, dass sich der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
+      'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> aus folgenden Komponenten zusammensetzt:</p>' +
+      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
+      '<li>Gebäude inkl. wesentlicher Gebäudeteile: <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
+      '<p>Die Aufteilung folgt der umgekehrten Ertragswertmethode (BFH, Urteil vom 20.09.2022, IX R 12/21): ausgehend vom Kaufpreis und dem Bodenwert ' +
+      'mit einem Liegenschaftszinssatz von ' + String(_jac.lzs_pct).replace('.', ',') + ' %' + (_jac.ausschuss ? ' (' + _jac.ausschuss + ')' : '') +
+      ' und einer Restnutzungsdauer von ' + _jac.rnd_jahre + ' Jahren. Die Herleitung liegt bei. ' +
+      'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung — insbesondere der AfA-Berechnung — zugrunde gelegt wird. ' +
+      'Stand: ' + datum + '.</p>';
+  }
   if(el) el.innerHTML = texts[_textKey] || texts.amtlich;
 }
 

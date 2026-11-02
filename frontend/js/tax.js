@@ -751,7 +751,24 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
     });
   }
 
+  /* v3060 · DIESES OBJEKT ZUERST. Marcel 02.11.2026: im Objekt will er sehen, „wie
+     verhält sich dieses Objekt steuerlich" - nicht die ganze Steuer. Oben zwei
+     Kacheln: das V+V-Ergebnis des Objekts und die Erstattung/Nachzahlung, die
+     allein durch das Objekt entsteht (impact.refund = Steuer ohne − mit, auf zvE
+     plus Saldo der vorher gekauften Objekte - schon immer objektbezogen). Der
+     Rechenweg mit den Gesamtgrößen (zvE, Bestand, Steuer ohne/mit) bleibt
+     vollständig, aber zugeklappt; die Gesamtbetrachtung gehört ins Portfolio-Cockpit. */
+  var _rwOffen = false;
+  try { _rwOffen = localStorage.getItem('dp_tax_rechenweg') === '1'; } catch (e) {}
   box.innerHTML =
+    '<div class="tax-grid tax-objekt-kopf">' +
+      '<div class="tax-item tax-highlight" style="grid-column:auto;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:12px 16px"><div class="tax-label">Ergebnis V+V dieses Objekts ' + displayYear + '</div><div class="tax-val" style="font-size:20px;color:' + (isProfit ? 'var(--gold-d)' : 'var(--green)') + '">' + fE(totals.ergebnis, 0, true) + '</div>' +
+        '<div class="tax-label" style="font-weight:400;font-size:12px">' + (isProfit ? 'Überschuss — erhöht dein zu versteuerndes Einkommen' : 'Verlust — mindert dein zu versteuerndes Einkommen') + '</div></div>' +
+      '<div class="tax-item tax-result" style="grid-column:auto;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:12px 16px"><div class="tax-label">' + refundLabel + ' durch dieses Objekt</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div>' +
+        '<div class="tax-label" style="font-weight:400;font-size:12px">' + (impact.refund >= 0 ? 'so viel weniger Steuer zahlst du mit diesem Objekt' : 'so viel mehr Steuer zahlst du mit diesem Objekt') + '</div></div>' +
+    '</div>' +
+    '<details class="tax-rechenweg" style="margin-top:12px"' + (_rwOffen ? ' open' : '') + ' ontoggle="try{localStorage.setItem(\'dp_tax_rechenweg\',this.open?\'1\':\'0\')}catch(e){}">' +
+    '<summary style="cursor:pointer;font-size:13px;font-weight:600;padding:6px 0">Rechenweg — mit deinem Einkommen und den vorher gekauften Objekten</summary>' +
     /* V283b: Neues Layout — LINKS=OHNE Immobilie, RECHTS=MIT Immobilie */
     '<div class="tax-grid">' +
       /* ─── LINKS: Ausgangs-zvE ─── */
@@ -870,7 +887,8 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       '<div class="tax-item"><div class="tax-label">Grenzsteuersatz aktuell</div><div class="tax-val">' + (impact.grenzsteuersatzAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
       /* ─── RECHTS: Durchschnittssteuersatz ─── */
       '<div class="tax-item"><div class="tax-label">Durchschnittssteuersatz</div><div class="tax-val">' + (impact.avgAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
-    '</div>';
+    '</div>' +
+    '</details>';
 
   /* mand v805: GmbH/UG -> Koerperschaftsteuer-Ansicht statt ESt/Erstattung */
   if (_mandCorp && _mandRate != null) {
@@ -1213,7 +1231,7 @@ function renderTaxTimeline() {
     box.innerHTML = chtml;
     return;
   } else if (_tlHdr) {
-    _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf &middot; wann das Objekt steuerlich positiv wird';
+    _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf dieses Objekts &middot; wann es steuerlich positiv wird';
   }
   /* v2544 · DIE GRAFIK MIT WENDEPUNKT über der Kärtchen-Reihe (steuer-verlauf.js;
      Marcel 20.10.2026: „wann ein Objekt ins Positive läuft und man Steuern zahlen
@@ -1250,6 +1268,13 @@ function renderTaxTimeline() {
         sign + Math.round(Math.abs(t.refund)).toLocaleString('de-DE') + ' €' +
       '</div>' +
       '<div class="tax-tl-label">' + (positive ? 'Erstattung' : 'Nachzahlung') + '</div>' +
+      /* v3060 · Marcel 02.11.2026: „wie verhält sich dieses Objekt steuerlich und was
+         macht es jedes Jahr an Verlust oder Gewinn und welche Erstattung oder
+         Nachzahlung habe ich". Der Betrag oben war schon die Wirkung DIESES Objekts
+         (Steuer ohne − mit, auf zvE + Saldo der vorher gekauften Objekte); jetzt
+         steht das V+V-Ergebnis des Objekts darunter. */
+      '<div class="tax-tl-vv" style="margin-top:4px;font-size:11px;color:var(--muted,#7A7370)">V+V ' +
+        (t.immoResult < 0 ? '−' : '+') + ' ' + Math.round(Math.abs(t.immoResult)).toLocaleString('de-DE') + ' €</div>' +
     '</div>';
   });
   html += '</div>';
@@ -1259,7 +1284,7 @@ function renderTaxTimeline() {
   // Total
   var totalRefund = timeline.reduce(function(s, t) { return s + t.refund; }, 0);
   html += '<div class="tax-tl-total">' +
-    '<span>Summe über ' + timeline.length + ' Jahre:</span>' +
+    '<span>Summe dieses Objekts über ' + timeline.length + ' Jahre:</span>' +
     '<span style="color:' + (totalRefund >= 0 ? 'var(--green)' : 'var(--red)') + ';font-weight:700;font-size:18px">' +
       (totalRefund >= 0 ? '+' : '') + Math.round(totalRefund).toLocaleString('de-DE') + ' €' +
     '</span>' +

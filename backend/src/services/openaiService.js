@@ -2060,6 +2060,19 @@ function extractJson(text) {
     }
   }
 
+  // 5) v3058: Zahl mit führender Null — das Modell schreibt "plz": 04275
+  //    (Leipzig, Dresden, Erfurt …). Gültiges JSON kennt das nicht; die Ziffern
+  //    werden als String gerettet, damit die Null nicht verloren geht.
+  if (first >= 0) {
+    const nullen = /(:\s*)(0\d+)(\s*[,}\]\r\n])/g;
+    const geflickt = (last > first ? text.slice(first, last + 1) : text.slice(first)).replace(nullen, '$1"$2"$3');
+    try { return JSON.parse(geflickt); } catch (e) { /* fallthrough */ }
+    const recovered = _recoverTruncatedJson(geflickt);
+    if (recovered) {
+      try { return JSON.parse(recovered); } catch (e) { /* still fails */ }
+    }
+  }
+
   return null;
 }
 
@@ -3260,7 +3273,7 @@ async function extractExpose(text, opts) {
     '',
     'FELDER:',
     '  - adresse: vollständige Adresse als String (z.B. "Dresdenstraße 116, 32052 Herford")',
-    '  - plz: Postleitzahl (5 Ziffern)',
+    '  - plz: Postleitzahl als STRING mit 5 Ziffern, führende Null behalten (z.B. "04275")',
     '  - ort: Stadt/Gemeinde',
     '  - kaufpreis: Zahl in Euro, ohne Währungssymbol (z.B. 285000)',
     '  - wohnflaeche: Zahl in m² (z.B. 96.5)',
@@ -3293,7 +3306,7 @@ async function extractExpose(text, opts) {
     '  - marktmiete_monat: Marktmiete (Nettokaltmiete) pro Monat in Euro (Zahl)',
     '',  // V356-marktmiete
     'WICHTIG:',
-    '  - Zahlen IMMER als Number, NICHT als String',
+    '  - Zahlen IMMER als Number, NICHT als String — einzige Ausnahme: plz ist ein String',
     '  - Bei mehreren Mietangaben: bevorzugt Nettokaltmiete, sonst Kaltmiete',
     '  - Wenn das Objekt LEERSTEHEND verkauft wird (kein aktueller Mieter): nettokaltmiete weglassen',
     '  - Tausenderpunkte und Kommas korrekt deutsch interpretieren (3.500,50 = 3500.5)',
@@ -3317,6 +3330,8 @@ async function extractExpose(text, opts) {
   ['adresse', 'plz', 'ort', 'objektart', 'energieklasse', 'heizungsart', 'zustand', 'stellplatz'].forEach(k => {
     if (ext[k] != null && ext[k] !== '') cleaned[k] = String(ext[k]).trim();
   });
+  /* v3058: kam die PLZ als Zahl (4275), fehlt die führende Null */
+  if (cleaned.plz && /^\d{4}$/.test(cleaned.plz)) cleaned.plz = '0' + cleaned.plz;
   /* v3029-import · deutsche Schreibweise als Text richtig lesen: bis v3028 wurde "285.000" zu 285
      und "3.500,50" zu 3,5 (der Prompt verlangt Zahlen, aber nicht jede Antwort haelt sich daran). */
   const _zahlDe = (v) => {
@@ -3373,7 +3388,7 @@ async function extractMarketData(text, opts) {
     '',
     'KERNFELDER:',
     '  - adresse: vollständige Adresse als String',
-    '  - plz: 5 Ziffern',
+    '  - plz: STRING mit 5 Ziffern, führende Null behalten (z.B. "04275")',
     '  - ort: Stadt/Gemeinde',
     '  - objektart: einer von "Wohnung","Eigentumswohnung","Einfamilienhaus","Mehrfamilienhaus","Reihenhaus","Doppelhaushälfte"',
     '  - wohnflaeche: Zahl in m²',
@@ -3412,7 +3427,7 @@ async function extractMarketData(text, opts) {
     '  - wertentwicklung_1jahr_pct: Veränderung im letzten Jahr in % (Zahl)',
     '  - prognose_naechstes_jahr_pct: Prognose nächstes Jahr in % (Zahl)',
     '  - markt_durchschnittspreis: Durchschnittspreis im Stadtteil/PLZ-Gebiet in Euro',
-    '  - markt_tage_auf_dem_markt: Durchschnittliche Tage auf dem Markt (Zahl)',
+    '  - markt_tage_auf_dem_markt: Durchschnittliche Tage auf dem Markt bzw. Vermarktungsdauer in Tagen (Zahl)',
     '',
     'SOZIO-ÖKONOMIE (falls enthalten):',
     '  - bevoelkerung: Einwohnerzahl der Stadt (Zahl)',
@@ -3437,6 +3452,16 @@ async function extractMarketData(text, opts) {
     '  - balkon_flaeche: Number (Fläche Balkon/Terrasse in m²)',
     '  - energie_label: String (A+, A, B, ..., H)',
     '',
+    /* v3049 · gemessen 30.10.2026: marktmiete_* stand in der Auswertung unten (V356), aber nie im
+       Prompt dieses Berichts - die Marktmiete eines Marktberichts kam deshalb nie an */
+    'MIETE (NUR falls der Bericht eine Markt-/Vergleichsmiete nennt - nichts erfinden):',
+    '  - marktmiete_qm: Marktmiete (Nettokaltmiete) pro m² in Euro (Zahl; bei einer Spanne der genannte Mittel-/Empfehlungswert)',
+    '  - marktmiete_monat: Marktmiete (Nettokaltmiete) pro Monat in Euro (Zahl)',
+    '',
+    'BAUSUBSTANZ UND LEERSTAND (NUR wenn der Bericht es ausdruecklich nennt - NICHT schaetzen, sonst null):',
+    '  - gebaeudezustand: Zustand der Bausubstanz des ganzen Gebaeudes, genau einer von [neubau, gut, normal, renovierungsbeduerftig, stark_sanierungsbeduerftig]',
+    '  - leerstandsquote_pct: marktaktiver Wohnungsleerstand im Gebiet (Gemeinde/Stadtteil) in % (Zahl, z. B. 2.8) - NICHT der Leerstand im Objekt',
+    '',
     'WICHTIG:',
     '  - Zahlen IMMER als Number, NICHT als String',
     '  - Tausenderpunkte und Kommas korrekt deutsch (3.500,50 = 3500.5)',
@@ -3458,7 +3483,9 @@ async function extractMarketData(text, opts) {
   const ext = parsed.extracted || parsed;
   const cleaned = {};
   // String-Felder
-  ['adresse','plz','ort','objektart','bewertungsdatum','konfidenz','makrolage','mikrolage','bevoelkerung_entwicklung','nachfrage','wertsteigerung','entwicklung',
+  /* v3049 · gebaeudezustand (ds2_zustand) und leerstandsquote_pct (ds2_mietausfall) - die zwei
+     Kennzahlen des Investor Deal Score, die kein Import bediente */
+  ['adresse','plz','ort','objektart','bewertungsdatum','konfidenz','makrolage','mikrolage','bevoelkerung_entwicklung','nachfrage','wertsteigerung','entwicklung','gebaeudezustand',
    'kueche_qualitaet','bad_qualitaet','boden_qualitaet','fenster_qualitaet','kueche_zustand','bad_zustand','boden_zustand','fenster_zustand','badezimmer','etage','etagen','modernisierungsjahr','garagen','stellplatz_aussen','balkon_flaeche','energie_label'
   ].forEach(k => {
     if (ext[k] != null && ext[k] !== '') cleaned[k] = String(ext[k]).trim();
@@ -3470,7 +3497,8 @@ async function extractMarketData(text, opts) {
    'wertentwicklung_3jahre_pct','wertentwicklung_1jahr_pct','prognose_naechstes_jahr_pct',
    'markt_durchschnittspreis','markt_tage_auf_dem_markt',
    'bevoelkerung','arbeitslosenquote_pct','wanderungssaldo',
-   'marktmiete_qm','marktmiete_monat'  /* V356-marktmiete */
+   'marktmiete_qm','marktmiete_monat',  /* V356-marktmiete */
+   'leerstandsquote_pct'  /* v3049 */
   ].forEach(k => {
     const v = ext[k];
     if (v == null || v === '') return;

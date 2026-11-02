@@ -43916,3 +43916,112 @@ ist gleich zum Original.
 **Nachweis.** Status-Diff Prod/Staging per psql; Storybook ohne „FEHLT"; Stories im Browser (Staging): Knopf schaltet, nach 20 s eine Geschichte weiter; Prod liefert `stxPlay`.
 
 **Rest.** N84.4/N85 Entwürfe; N84.9 Entscheidung; Abnahme RND-Anfrage-Mail.
+
+### v3047 · v3048 — Prod 1.0.10 / 1.0.11 (29.10.2026 nachts)
+
+**Was.** v3047: BMF-Rechner — Reiter „Bodenabschlag“ als Schritt 5/5 in `_BMF_PANE_ORDER` (vorher indexOf −1 → Fußzeile Schritt 1, „Weiter“ sprang auf Schritt 1); Übernehmen auf 4 und 5; Bodenabschlag rechnet auch über „Weiter“. v3048: Zielanzeige im Kopf (`jahresstaende.js kopfRing`) nur mit angelegtem Zielbild (Marcel), vorher reichte die Entschuldung.
+
+**Commit.** `f591f4ce` (Prod `9978c7a`), `9c72ad3b` (Prod `97eda6d`).
+
+**Nachweis.** Browser Staging: Schritt 4 → Weiter → 5/5 → Zurück → 4; Hölderlinstr. ohne Ziel-Anzeige, Parkstr. 9 „Ziel 38 %“.
+
+**Rest.** N84.9 (Herkunft „Bank“ Hölderlinstr. — Prod-DB-Schreiben im Auto-Modus gesperrt, Marcel setzt es in der App); Entwürfe N84.4/N85.
+
+### Sitzungsende 29.10.2026 — Stand und Übergabe
+
+**Prod:** Version 1.0.11 (`97eda6d`, v3048). Alles dieser Sitzung ist ausgerollt und im Journal oben einzeln belegt (v3040 bis v3048, landing-makler-hub-1 bis -3, messe-schleife-9/10, landing-stories-1).
+
+**Entwürfe abgenommen (Marcel: „die Demos sehen top aus, die setzen wir später so um“):**
+- **N84.4 Marktbericht „Werte einfach“** und **N85 BMF-Rechner „Varianten vergleichen und übernehmen“** — Entwurfsfläche https://claude.ai/artifact/SAVCqju6oRXNBa9LjfZcdq, Quellen in `Dateien/Entwuerfe-2026-10-29/`. Umsetzen wie gezeigt:
+  - Marktbericht: je Wert eine Karte mit großer Zahl, EINE Zeile Herkunft („aus X € Angebotsniveau, minus Y %“), Rechenweg erst auf Klick (`<details>`); führendes Verfahren als Etikett; Gegenprobe Kauffälle als dritte Karte; nicht maßgeblicher Sachwert als eine Zeile statt Karte; Bodenwert und Miete im Ertragswert als kleine Karten darunter.
+  - BMF-Rechner Schritt 4: eine Tafel mit Amtlich · Konservativ −15 % · Optimiert −20 % · Aggressiv −25 % · umgekehrte Ertragswertmethode (Jacoby); Spalten Gebäudeanteil, AfA/Jahr, Steuer/Jahr, 10 Jahre, Nachweis; je Zeile „Übernehmen“, gewählte Zeile hervorgehoben, darunter „Gewählt“ und „Was beim Übernehmen passiert“. Werte aus dem echten Lauf des Objekts (im Entwurf Beispielzahlen). Jacoby-Herleitung im Kern prüfen, bevor sie angezeigt wird.
+
+**Offen für die nächste Sitzung:**
+- **N84.9 Hölderlinstr.:** `svw_herkunft = bank` — Schreiben auf Prod-DB im Auto-Modus gesperrt; Marcel setzt es in der App (Objekt › Wert › Herkunft) oder per Freigabe.
+- Umsetzung N84.4 und N85 nach den Entwürfen (oben).
+- Optimierung: Objekt öffnen lädt Verlauf ×8 und Objektliste ×6 (43 Anfragen, Musterstraße 12).
+- RND-Anfrage-Mail mit Kerndaten-Tabelle und JSON-Anhang: Marcel testet selbst.
+
+### v3049 · v3049a — Marktbericht-Import füllt die fehlenden KPIs des Investor Deal Score (30.10.2026)
+
+**Was.** Marcel: „wenn ich aus den Testunterlagen die PDF reinlade, wird der Investor Deal Score nur 13 Felder
+ausgefüllt … alle 24 KPI?" Gemessen am Code: elf KPIs hatten in keinem Dokument-Import ein Zielfeld. Marcel:
+„für mich wäre das ein Marktbericht … den können wir aber schon" — richtig: der Marktbericht-Import
+(`extractMarketData` → `mergeMarket`, Datei heißt „…Markt…") bedient neun davon. Es fehlten Bausubstanz und
+Mietausfallrisiko; dazu kam beim echten Lauf ein alter Fehler heraus: **`marktmiete_qm` stand seit V356 in der
+Auswertung, aber nie im Prompt des Marktberichts** — die Marktmiete eines Marktberichts kam nie an (damit fehlten
+Ist-/Marktmiete, Mietsteigerung, Faktor vs. Markt).
+- `openaiService.extractMarketData`: Marktmiete im Prompt; neu `gebaeudezustand` (→ `ds2_zustand`) und
+  `leerstandsquote_pct` (→ `ds2_mietausfall`), beide nur, wenn der Bericht sie nennt; Vermarktungsdauer = Tage am Markt.
+- `object-actions.js` `mergeMarket`: beide in leere Felder, Leerstand-Stufen wie `lage_stufen.js`
+  (<1,5 / <3 / <6 / <9 %) mit Herleitung, Klartext aus der Option (`_optWort`). Buster v3049.
+- Test-PDF `10 Marktbericht Lindenallee 14.pdf` (`Dateien/Testunterlagen/Lindenallee 14/` und
+  `frontend/messe-dateien/lindenallee-14/10-marktbericht-lindenallee-14.pdf`), fiktives Büro, als Testunterlage
+  gekennzeichnet; HTML-Quelle im Scratchpad, gedruckt mit Chrome headless.
+
+**Commits.** 37bd0368, 665df67e (Frontend-Konstanten), 17d449b7 (Prompt Marktmiete).
+
+**Nachweis.** Staging, Backend neu gebaut, echter `extractMarketData`-Lauf (gpt-4.1) am pdftotext des Test-PDFs:
+marktmiete_qm 8.25, makrolage durchschnittlich, mikrolage gut, bevoelkerung stabil, nachfrage stark,
+wertsteigerung mittel, entwicklung mehrere, gebaeudezustand normal, leerstandsquote 2.8, Qualität Normal/Normal/
+Normal/Standard, Tage 58. Buster-Prüfer SAUBER, alle Prüfer in deploy-staging grün.
+
+**Rest.** Browser-Abnahme offen (Chrome-Erweiterung war nicht verbunden): Lindenallee-Unterlagen 01–10 in ein neues
+Objekt laden, „Ausgewählte übernehmen", KPI-Vollständigkeit muss 24/24 zeigen (Zins/Tilgung sind vorbelegt). Prod
+noch nicht ausgerollt.
+
+### v3050 · v3051 · v3052 — Entwürfe N84.4 und N85 umgesetzt, Import parallel (30.10.2026)
+
+**Was.**
+- **v3050 (N84.4)** `frontend/marktbericht-app/app.js` `_renderWertverfahren()` neu: je Wert eine Karte (große Zahl,
+  EINE Herkunftszeile, Rechenweg in `<details>`), „Führend: …" als Pille, Gegenprobe Kauffälle als eigene Karte,
+  Bodenwert und Miete im Ertragswert als kleine Karten, nicht maßgeblicher Sachwert u. ä. als eine Zeile, Fußzeile
+  § 194 BauGB. Nur Web-Ansicht, PDF (jsPDF) unverändert, Rechnung unverändert. Quellennachweis bleibt OFFEN
+  (dl-de/by verlangt sichtbare Namensnennung). Titel bleibt „Marktpreisindikation" (Entwurf: „Marktwert") — v1971/v2380.
+- **v3051 (N85)** `bmf-bodenabschlag.js`: Tafel „Welche Aufteilung soll gelten?" in Schritt 4 — Amtlich · −15 % ·
+  −20 % · −25 % · Jacoby; Gebäudeanteil aus `phase5_varianten`/`phase4_bmf.jacoby`, AfA = Gebäude-AK × `#afa_satz`,
+  Steuer = AfA × 40,45 % (Vorgabe `grenzsteuersatz`), 10 Jahre nur bei linearer AfA. Je Zeile „Übernehmen" (Varianten
+  über `_v292Apply`, Jacoby schreibt `#geb_ant` + Klausel). AfA-Satz wird NICHT überschrieben (`afa-eigen.js`:
+  eigener Satz nie per Automatik). Jacoby-Herleitung geprüft: Am Markt 18 grün, 300.000/90.000/2,5 %/40 J → 75,9992 %.
+  Ohne amtlichen Zins (A/B) Grund statt Zahl. `bmf-modal-v292.js` unverändert.
+- **v3052** Import (`handleFiles`): drei Unterlagen gleichzeitig statt nacheinander, dieselben Prompts und Abrufe.
+
+**Commits.** d112a73b (v3050), e9d32c22 (v3051), ef0d1746 (v3052). Beide Entwürfe von Agenten in Arbeitskopien
+gebaut (Basis war main 97eda6d9, Dateien dort gleich staging → per cherry-pick übernommen).
+
+**Nachweis.** Renderlauf `_renderWertverfahren` in Node mit Mitschnitten (Bericht 371, Westerfeld Stufe 2/3) und fünf
+synthetischen Fällen, Wortvergleich alt/neu ohne Inhaltsverlust. BMF: Prüfskript mit echter `runPipeline`,
+AfA 4.557/4.850/4.948/5.045 € = heutige Anzeige, ALLES GRÜN. Import: Warteschlange simuliert (10 Dateien, max. 3
+gleichzeitig, 438 statt 1.170 ms). Buster SAUBER, deploy-staging grün.
+
+**Rest.** Browser-Abnahme aller drei (Chrome-Erweiterung nicht verbunden); Testberichte neu abrufen (Marcel 30.10.).
+Offen zur Entscheidung: Marktwert- vs. Marktpreisindikation-Titel; Grenzsteuersatz der Tafel (Vorgabe 40,45 % oder
+persönlicher `#grenz`); Jacoby-RND aus Anlage 2 statt RND-Assistent; Schritt 5 und PDF der Kaufpreisaufteilung
+kennen Jacoby noch nicht; Messe-Drehbücher greifen auf `.wv-*` (Bodenwert steht jetzt unten) — Storybook prüfen.
+Prod: v3049–v3052 noch nicht ausgerollt (erst nach Browser-Abnahme).
+
+### v3053 · v3054 · v3055 · v3056 · v3057/a — Abnahme im Browser, Vorgabezins, Feedback in der Hilfe (30.10.2026)
+
+**Was.**
+- **v3053** Seiten-Buster `marktbericht-app/index.html?v=` in `marktbericht-view.js` und `deal-action-boarding.js`
+  3037 → 3050: v3050 änderte die Seite, ein Browser mit ihr im Cache hätte das alte `app.js` geladen. Der
+  Buster-Prüfer sieht diese Ebene nicht.
+- **v3054** BMF-Tafel: Quellenvermerk der Jacoby-Zeile als Tooltip statt fünfzeiligem Absatz.
+- **v3055** Investmentprofil: „Indikativer Marktzins" ließ sich nie speichern, wenn einmal ein eigener Satz
+  gespeichert war (Nullen gefiltert, über alten Stand gelegt). Jetzt fallen GEZEIGTE leere Felder (`ip_<key>`)
+  auf die Vorgabe zurück; nicht gezeigte bleiben (v1783).
+- **v3056** Entscheidung Marcel 30.10.: Vorgabezins nach Beleihung bleibt (v3029). Das Feld „Marktzinssatz" zeigt
+  jetzt die wirksame Zahl (10 J., EK 10 %, LTV ~104 % → 4,87 %) mit Begründung, die Stufe (4,23 %) als Untergrenze.
+- **v3057/a** Hilfe: Knopf „Feedback & Support" unter der Themenliste (Menüpunkt seit v1914 auf Marcels Wunsch aus).
+
+**Nachweis (Browser, Staging).** Wertkarten in 7 Stufe-3-Berichten (398, 397, 375, 329, 379, 378, 371), alle
+führenden Verfahren, hell und dunkel, `<details>` klappt. BMF-Tafel an Lindenallee 14 mit echter Pipeline: 66,3 /
+71,3 / 73,0 / 74,7 / Jacoby 78,2 % (LZS 2,8 % Stufe A); Reiter 2–4 dort gesperrt, weil das Kaufvertragsdatum fehlt
+(v1492, gewollt — meine erste Vermutung eines Fehlers zurückgenommen). Profil: Marktzins gewählt → `zins_override`
+entfernt, Feld zeigt 4,87 % mit Satz. Hilfe-Knopf öffnet das Feedback-Fenster.
+
+**Rest / Auffällig.** Objekt **2026-1123 Lindenallee 14 (`2b57a20f`) ist auf Staging gelöscht** (DB 0 Zeilen, auch
+tax/avm) — nicht durch diese Sitzung; Backend-Log reicht nur bis zum Neubau ~19:30 UTC. Sicherung
+`/root/backups/demo-objekte-staging-20261029-1910.tsv.gz`. Neu: **2026-1127 „Unbenannt"** (21:01 UTC), vermutlich aus
+den Testläufen (App öffnete je Laden ein neues Objekt). Beides wartet auf Marcel. Übernehmen-Knopf der BMF-Tafel
+nicht geklickt (schreibt ins Objekt). Prod: v3049–v3057a nicht ausgerollt.

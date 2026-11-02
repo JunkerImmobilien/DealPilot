@@ -1396,16 +1396,14 @@ function _buildAIPayload() {
              verschieben. Die Marktlage fällt weg; den Verkäuferdruck gibt es
              nur noch je Objekt (Reiter Pilot-Analyse), und nur, wenn er
              angegeben ist. Ohne Schalter bleibt alles wie bisher. */
+          /* v3059: das Objektfeld ist ausgebaut - Verkäuferdruck fällt ganz weg. */
           var _schlank = !!(window.DpEinstSchlank && DpEinstSchlank.aktiv && DpEinstSchlank.aktiv());
-          var _verkObj = '';
           if (_schlank) {
             delete _prof.marktlage;
-            _verkObj = DpEinstSchlank.verkaeuferObjekt ? DpEinstSchlank.verkaeuferObjekt() : '';
-            if (_verkObj) _prof.verkaeufer_druck = _verkObj; else delete _prof.verkaeufer_druck;
+            delete _prof.verkaeufer_druck;
           }
           Object.keys(_prof).forEach(function (k) {
             if (_prof[k] == null || _prof[k] === '') { delete _prof[k]; return; }
-            if (_schlank && k === 'verkaeufer_druck') { _gesetzt.push(k); return; }
             var rk = _ZU_ROH[k] || k;
             if (_roh[rk] != null && _roh[rk] !== '') _gesetzt.push(k);
           });

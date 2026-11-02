@@ -150,7 +150,15 @@
   }
 
   function aufbauen(host) {
-    if (!host || host.getAttribute('data-swk')) return;
+    /* v3059 · settings.js baut das Formular bei JEDEM Wechsel auf „Mein Profil“
+       (und „Darstellung“) per innerHTML neu - der Behälter bleibt derselbe und
+       trug noch data-swk vom ersten Aufbau. Damit brach aufbauen() ab, und beim
+       zweiten Besuch stand das lange Rohformular statt der Karten da (Marcel
+       02.11.2026: „wieder auf Mein Profil klicken und habe eine andere Ansicht").
+       Maßgeblich ist deshalb, ob die Karten-Ebene WIRKLICH im Behälter steckt. */
+    if (!host) return;
+    if (host.querySelector(':scope > .swk-oben')) return;
+    host.removeAttribute('data-swk');
     var kinder = [].slice.call(host.children);
     if (!kinder.some(function (k) { return k.matches && k.matches('h3.ip-section'); })) return;
     css();
@@ -212,7 +220,10 @@
     setMarkieren(host);
     host.setAttribute('data-swk', 'karten');
     /* Werte der Karten folgen den Feldern */
-    host.addEventListener('input', function () { if (host.getAttribute('data-swk') === 'karten') return; host._swkDirty = 1; });
+    if (!host._swkLauscht) {   /* v3059: der Behälter überlebt den Neuaufbau - einmal reicht */
+      host._swkLauscht = 1;
+      host.addEventListener('input', function () { if (host.getAttribute('data-swk') === 'karten') return; host._swkDirty = 1; });
+    }
   }
 
   function karteneZeichnen(host) {

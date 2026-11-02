@@ -733,6 +733,8 @@
       err.needs_user_key = !!data.needs_user_key;
       throw err;
     }
+    /* v3058: success:false kommt mit HTTP 200 — bis hier wurde daraus stumm ein leeres Ergebnis */
+    if (data.success === false) throw new Error(data.error || 'Die KI-Antwort konnte nicht ausgewertet werden.');
     return data.extracted || {};
   }
 
@@ -1085,6 +1087,8 @@
       err.needs_user_key = !!data.needs_user_key;
       throw err;
     }
+    /* v3058: success:false kommt mit HTTP 200 — bis hier wurde daraus stumm ein leeres Ergebnis */
+    if (data.success === false) throw new Error(data.error || 'Die KI-Antwort konnte nicht ausgewertet werden.');
     return data.extracted || {};
   };
 

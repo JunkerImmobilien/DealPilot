@@ -22,14 +22,12 @@
      · Co-Pilot (KI): zwei Auswahlen (Länge, Ton); Fokus, Eigene
        Anweisungen, Vorlagen und Eigenes Wissen unter „Für Profis".
        Marktphase und Verkäuferbereitschaft stehen dort nicht mehr — und
-       gehen im Entwurf auch NICHT mehr in den Prompt (ui.js): was man
-       nicht sieht, darf das Urteil nicht verschieben. Die
-       Verkäuferbereitschaft gibt es stattdessen je Objekt im Reiter
-       Pilot-Analyse (Feld ai_verk, speichert über die FIELDS-Liste von
-       storage.js, die den Namen seit Langem führt).
-     · Deal Score: Reiter ausgeblendet. Eigene Gewichte/Profile WIRKEN
-       WEITER (kein stilles Umrechnen); ist etwas anderes als „Ausgewogen"
-       aktiv, sagt es „Mein Profil" und bietet „auf Standard" an.
+       gehen auch NICHT mehr in den Prompt (ui.js): was man nicht sieht,
+       darf das Urteil nicht verschieben. (Das Objektfeld dafür im Reiter
+       Pilot-Analyse ist seit v3059 ausgebaut.)
+     · Deal Score: Reiter seit v3059 wieder sichtbar, direkt hinter „Mein
+       Profil"; die Zeile unter „Deine Haltung" sagt, welche Gewichtung gilt,
+       und führt mit „Gewichtung anpassen ›" hin.
      · Datenraum nur, wenn genutzt oder ab Investor; Mandanten nur, wenn
        mehr als „Privat" angelegt ist oder ab Pro.
    ═════════════════════════════════════════════════════════════════════ */
@@ -74,7 +72,6 @@
     var p = P.load() || {};
     p[feld] = wert;
     P.save(p);
-    try { if (P.syncAiParamsToTab) P.syncAiParamsToTab(); } catch (e) {}
   }
 
   /* ── Deal-Score-Zeile: was gilt gerade, und wie kommt man zum Standard ── */
@@ -94,10 +91,16 @@
     return '<div class="dp-es-score" style="margin:10px 0 4px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:10px;font-size:13px;line-height:1.5">' +
       text +
       (standard ? '' : ' <button type="button" class="btn btn-sm btn-ghost dp-es-score-std" style="margin-left:6px">Auf Standard zurücksetzen</button>') +
+      ' <button type="button" class="btn btn-sm btn-ghost dp-es-score-gew" style="margin-left:6px">Gewichtung anpassen ›</button>' +
       '</div>';
   }
 
   function scoreZeileVerdrahten(root) {
+    var g = root.querySelector('.dp-es-score-gew');   /* v3059: Weg zum Reiter Deal Score */
+    if (g) g.addEventListener('click', function () {
+      var t = document.querySelector('#settings-modal .st-tab[data-tab="dealscore"]');
+      if (t && typeof window._swSet === 'function') window._swSet(t);
+    });
     var b = root.querySelector('.dp-es-score-std');
     if (!b) return;
     b.addEventListener('click', function () {
@@ -136,11 +139,17 @@
       if (d) d.textContent = desc;
     }
 
-    /* Reiter: Deal Score weg, Mein Profil nach vorn */
-    verstecke(tab('dealscore'));
+    /* Reiter: Mein Profil nach vorn, Deal Score direkt dahinter.
+       v3059 · Marcel 02.11.2026: „in den einstellungen habe ich keinen Reiter mehr
+       gefunden um die Dealscore gewichtungen anzupassen". Seit v3022 war der Reiter
+       hier ausgeblendet - die Gewichte wirkten weiter, waren aber nicht mehr
+       erreichbar. Er steht jetzt wieder da, gleich neben dem Anlegerprofil, das
+       dieselben Gewichte als Vorlage setzt. */
     benenne('standardwerte', 'Mein Profil', 'Steuer, Finanzierung, Zielrendite, Haltung');
+    benenne('dealscore', 'Deal Score', 'Gewichtung der Kennzahlen, Schwellen');
     benenne('api', 'Co-Pilot (KI)', 'Länge und Ton der Analysen');
     if (liste && tab('account') && tab('standardwerte')) liste.insertBefore(tab('standardwerte'), tab('account').nextSibling);
+    if (liste && tab('standardwerte') && tab('dealscore')) liste.insertBefore(tab('dealscore'), tab('standardwerte').nextSibling);
 
     /* Datenraum / Mandanten nur, wenn genutzt oder ab Plan */
     var plan = '';
@@ -254,13 +263,10 @@
       window._swSet = n2;
     }
   }
-  /* Der Hinweis unter dem Anlegerprofil verweist auf den Reiter Deal Score,
-     den es im Entwurf nicht gibt. Er wird bei jedem Reiterwechsel neu gebaut. */
+  /* Die Score-Zeile unter „Deine Haltung" zieht bei jedem Reiterwechsel nach.
+     (v3059: der Hinweis „Feiner justieren: Reiter Deal Score" stimmt wieder
+     und bleibt stehen - der Reiter ist zurück.) */
   function hinweisAnpassen() {
-    var h = document.querySelector('#settings-modal .swk-hinweis');
-    if (h && /Reiter Deal Score/.test(h.textContent)) {
-      h.textContent = h.textContent.replace(/\s*Feiner justieren: Reiter Deal Score\./, ' Welche Gewichtung gerade gilt, steht oben unter „Deine Haltung“.');
-    }
     var box = document.querySelector('#settings-modal .dp-es-haltung');
     if (box) scoreZeileNeu(box);
   }
@@ -271,28 +277,12 @@
     if (t) t.textContent = e[0]; if (s) s.textContent = e[1];
   }
 
-  /* Verkäuferbereitschaft je Objekt — nur im Entwurf, im Reiter Pilot-Analyse */
-  function objektFeld() {
-    if (!aktiv() || document.getElementById('ai_verk')) return;
-    var btn = document.getElementById('ai-btn');
-    if (!btn || !btn.parentNode) return;
-    var w = document.createElement('div');
-    w.className = 'f dp-es-verk';
-    w.style.cssText = 'max-width:420px;margin:0 0 12px';
-    w.innerHTML = '<label for="ai_verk">Verkäufer unter Zeitdruck? <span class="f-hint">(nur dieses Objekt, freiwillig)</span></label>' +
-      '<select id="ai_verk"><option value="">keine Angabe</option>' +
-      '<option>Hoch (dringender Verkauf, Zeitdruck)</option>' +
-      '<option>Niedrig (gut situiert, kein Druck)</option></select>';
-    btn.parentNode.insertBefore(w, btn);
-  }
-
-  window.DpEinstSchlank = {
-    aktiv: aktiv,
-    /* für ui.js: Verkäuferbereitschaft dieses Objekts ('' = keine Angabe) */
-    verkaeuferObjekt: function () { var e = document.getElementById('ai_verk'); return e ? (e.value || '') : ''; }
-  };
+  /* v3059 · Das Objektfeld „Verkäufer unter Zeitdruck?" (v3022, Reiter
+     Pilot-Analyse) ist ausgebaut - Marcel 02.11.2026: „das ist doch ein altes
+     feld oder? bitte lass uns das rausnehmen". Die Verkäuferbereitschaft geht
+     damit gar nicht mehr in den Prompt (ui.js). */
+  window.DpEinstSchlank = { aktiv: aktiv };
 
   einhaengen();
-  objektFeld();
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { einhaengen(); objektFeld(); });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', einhaengen);
 })();
