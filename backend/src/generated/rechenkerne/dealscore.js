@@ -262,6 +262,17 @@ var DealScore = (function() {
     });
     var score = Math.round(gewichtSumme > 0 ? total / gewichtSumme : 0);
 
+    /* v3069 · HARTE GRENZE (Marcel 02.11.2026: „setze zudem erstmal die harte Grenze").
+       Benchmark design/Vorschläge/score-benchmark-p1.md: eine starke Rendite darf einen
+       Deal nicht über „Schwach" heben, wenn die Miete den Kapitaldienst nicht trägt.
+       DSCR unter 1,0 oder Cashflow nach Kapitaldienst (vor Steuern) unter null →
+       höchstens 49 (Schwach). Beim Barkauf gibt es keinen Kapitaldienst - keine Grenze. */
+    var deckel = null;
+    if (!barkauf && dscr > 0 && dscr < 1.0) deckel = 'DSCR ' + dscr.toFixed(2).replace('.', ',') + ' unter 1,0 — die Miete trägt den Kapitaldienst nicht';
+    else if (!barkauf && K.cf_m != null && cf_m < 0) deckel = 'Cashflow ' + Math.round(cf_m) + ' €/Monat nach Kapitaldienst — die Miete trägt die Rate nicht';
+    var scoreOhneDeckel = score;
+    if (deckel && score > 49) score = 49;
+
     var color, label;
     // V63.32: Score-Schwellen identisch zum Quick-Check (gleiche Farbskala für gleiche Werte)
     //   ≥80 → grün-strong "Top Deal"
@@ -281,8 +292,10 @@ var DealScore = (function() {
       color: color,
       label: label,
       breakdown: components,
-      interpretation: _interpret(score, components, K),
-      weights: weights
+      interpretation: (deckel && scoreOhneDeckel > 49 ? 'Begrenzt auf „Schwach": ' + deckel + ' (ohne Grenze ' + scoreOhneDeckel + '). ' : '') + _interpret(score, components, K),
+      weights: weights,
+      deckel: deckel,   /* v3069 */
+      score_ohne_deckel: scoreOhneDeckel
     };
   }
 
