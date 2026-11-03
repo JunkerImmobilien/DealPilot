@@ -4124,8 +4124,11 @@ const _WK_PROMPT =
   '{"positionen":[{"datum":"TT.MM.JJJJ oder null","jahr":JJJJ oder null,"aussteller":"string oder null",' +
   '"betrag_netto":Zahl oder null,"ust_betrag":Zahl oder null,"ust_satz":19 oder 7 oder 0 oder null,' +
   '"betrag_brutto":Zahl oder null,"kategorie":"eine aus der Liste",' +
-  '"konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}]}\n' +
+  '"konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}],"rechnungsbetrag":Zahl oder null}\n' +
   'Regeln:\n' +
+  /* v3154e · Gegenprobe im Browser: Summe der Positionen gegen den ausgewiesenen Rechnungsbetrag */
+  '- "rechnungsbetrag" ist der auf der Seite ausgewiesene Gesamt-/End-/Rechnungsbetrag BRUTTO des Belegs ' +
+  '(nicht der bereits gezahlte Teilbetrag), sonst null. Er ist KEINE eigene Position.\n' +
   '- HAUSGELD- ODER NEBENKOSTENABRECHNUNG? Dann NICHT eine Summe zurueckgeben, sondern AUFTEILEN. ' +
   'Solche Abrechnungen weisen die Aufteilung fast immer selbst aus - such nach Spalten oder Abschnitten ' +
   'wie "umlagefaehig"/"umlegbar"/"auf Mieter umlagefaehig" gegen "nicht umlagefaehig"/"nicht umlegbar" ' +
@@ -4157,18 +4160,38 @@ const _WK_PROMPT =
   '- Kategorie exakt eine aus: ' + _WK_KATEGORIEN.join(', ') + '.\n' +
   '- Nicht sicher lesbar -> null und konfidenz "niedrig". Erfinde nichts.';
 
-async function _extractBelegPage(image, opts) {
+/* v3154e · Marcel 03.11.2026 (Belegscanner): eine Hotelrechnung MIT Textebene kam in drei Läufen mit drei
+   verschiedenen Beträgen zurück - die Texterkennung des gerenderten Bildes bringt die Tabellenspalten
+   durcheinander. Liefert der Browser die exakte Textebene der PDF-Seite, wird DIESE genommen: hier auf dem
+   Server geschwärzt (schwaerzen.js, wie die Texterkennung), dann als Text an die KI. Ohne Textebene (Scan,
+   Foto) bleibt der Weg über die Texterkennung. */
+async function _extractBelegPage(image, opts, textEbene) {
   /* v1406: zwei Prompts, eine Mechanik. `modus` entscheidet, ob der Beleg
      als Anschaffungskost oder als laufende Werbungskost gelesen wird. */
   const _prompt = (opts.modus === "wk") ? _WK_PROMPT : _BELEG_PROMPT;
-  const content = [{ type: "input_text", text: _prompt }, { type: "input_image", image_url: image }];
-  const r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, dokument: true });   /* v3089 */
+  const _te = typeof textEbene === 'string' ? textEbene.slice(0, 20000) : '';
+  let r, quelle = 'texterkennung';
+  if (_te.replace(/\s/g, '').length >= 80) {
+    const sw = require('./schwaerzen').schwaerze(_te);
+    const content = [{ type: "input_text", text: _prompt },
+      { type: "input_text", text: 'HINWEIS: Der Inhalt ist die exakte Textebene der PDF-Seite (keine Texterkennung, kein Bild). ' +
+        'Personendaten sind durch Platzhalter ersetzt. Zahlen exakt so uebernehmen, wie sie dastehen.\n=== Seite (Textebene) ===\n' + sw.text }];
+    r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000 });
+    quelle = 'textebene';
+  } else {
+    const content = [{ type: "input_text", text: _prompt }, { type: "input_image", image_url: image }];
+    r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, dokument: true });   /* v3089 */
+  }
   const parsed = extractJson(r.text);
   if (parsed == null) { throw new Error('JSON-Parse (Antwort evtl. zu dicht/abgeschnitten)'); }
   let pos = Array.isArray(parsed) ? parsed
           : (Array.isArray(parsed.positionen) ? parsed.positionen
           : ((parsed && (parsed.betrag_brutto != null || parsed.betrag_netto != null || parsed.aussteller)) ? [parsed] : []));
-  return Array.isArray(pos) ? pos : [];
+  pos = Array.isArray(pos) ? pos : [];
+  pos.forEach(function (x) { if (x && typeof x === 'object') x.quelle = quelle; });   /* v3154e */
+  const rb = parsed && !Array.isArray(parsed) ? Number(parsed.rechnungsbetrag) : NaN;
+  pos.rechnungsbetrag = Number.isFinite(rb) && rb > 0 ? rb : null;
+  return pos;
 }
 
 /**
@@ -4187,7 +4210,7 @@ async function extractBeleg(images, opts) {
   async function worker() {
     while (next < imgs.length) {
       const my = next++;
-      try { out[my] = await _extractBelegPage(imgs[my], opts); }
+      try { out[my] = await _extractBelegPage(imgs[my], opts, Array.isArray(opts.texte) ? opts.texte[my] : null); }   /* v3154e */
       catch (e) { out[my] = []; err[my] = (e && e.message) ? String(e.message).slice(0, 120) : 'Fehler'; }
     }
   }
@@ -4201,7 +4224,10 @@ async function extractBeleg(images, opts) {
   });
   let diag = imgs.length + ' Seite(n)';
   if (!pos.length) { diag += ', 0 Treffer'; if (errN) diag += ' - ' + errN + ' Seite(n) mit Fehler: ' + firstErr; }
-  return { positionen: pos, pages: imgs.length, diag: diag };
+  /* v3154e · der größte ausgewiesene Rechnungsbetrag aller Seiten (Folgeseiten wiederholen ihn oder haben keinen) */
+  let rechnungsbetrag = null;
+  out.forEach(function (r) { if (r && r.rechnungsbetrag > 0 && (rechnungsbetrag == null || r.rechnungsbetrag > rechnungsbetrag)) rechnungsbetrag = r.rechnungsbetrag; });
+  return { positionen: pos, pages: imgs.length, diag: diag, rechnungsbetrag: rechnungsbetrag };
 }
 
 

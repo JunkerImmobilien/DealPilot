@@ -22,6 +22,7 @@
      Dateien, aus denen nichts kam - die stehen jetzt als rote Zeile in der Liste statt in einem Nebensatz. */
   var _bilder      = {};
   var _leer        = [];   // [{name, grund}]
+  var _betrag      = {};   // v3154e · Rechnungsbetrag laut Beleg je Datei (Gegenprobe)
 
   var KAT = ['Notar & Grundbuch', 'Maklergebühr', 'Grunderwerbsteuer', 'Fahrtkosten',
              'Verpflegung', 'Unterkunft', 'Gutachten', 'Anwalt',
@@ -195,12 +196,41 @@
     });
   }
 
+  /* v3154e · die Textebene einer PDF-Seite als Tabelle: Zeilen nach der Höhe auf der Seite, Spalten nach
+     Abstand („ | "). Gemessen an einer Hotelrechnung: die Texterkennung des Bildes lieferte in drei Läufen
+     drei verschiedene Beträge; nach Lage gebaute Zeilen ergeben die Rechnung exakt (Gesamt 179,20 €).
+     Der Server schwärzt den Text, bevor er an die KI geht (wie bei der Texterkennung). */
+  async function _seitenText(page) {
+    try {
+      var tc = await page.getTextContent();
+      var it = (tc.items || []).filter(function (x) { return x && x.str && String(x.str).trim(); }).map(function (x) {
+        return { x: x.transform[4], y: x.transform[5], w: x.width || 0, h: Math.abs(x.height || x.transform[3] || 8), t: String(x.str) };
+      });
+      it.sort(function (a, b) { return b.y - a.y || a.x - b.x; });
+      var zeilen = [];
+      it.forEach(function (o) {
+        var z = zeilen.filter(function (r) { return Math.abs(r.y - o.y) <= Math.max(2, o.h * 0.45); })[0];
+        if (z) z.w.push(o); else zeilen.push({ y: o.y, w: [o] });
+      });
+      return zeilen.map(function (r) {
+        r.w.sort(function (a, b) { return a.x - b.x; });
+        var txt = '', ende = null;
+        r.w.forEach(function (o) {
+          if (ende != null) txt += (o.x - ende > Math.max(6, o.h * 0.9)) ? ' | ' : (o.x - ende > 0.5 ? ' ' : '');
+          txt += o.t; ende = o.x + o.w;
+        });
+        return txt.replace(/\s+\|\s+/g, ' | ').trim();
+      }).join('\n');
+    } catch (e) { return ''; }
+  }
+
   /* PDF -> JPEG-dataURLs (gespiegelt aus pdf-import.js _renderWholePages) */
   async function _pdfToImages(file) {
     await _loadPdfJs();
     var ab = await _readAs(file, 'buffer');
     var pdf = await window.pdfjsLib.getDocument({ data: ab }).promise;
     var out = [];
+    out.texte = [];   /* v3154e */
     var max = Math.min(pdf.numPages, MAX_PAGES);
     for (var i = 1; i <= max; i++) {
       try {
@@ -213,6 +243,7 @@
         var ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport: vp }).promise;
         out.push(canvas.toDataURL('image/jpeg', 0.85));
+        out.texte.push(await _seitenText(page));   /* v3154e */
       } catch (e) { /* einzelne Seite ueberspringen, Rest weiterlesen */ }
     }
     return out;
@@ -394,7 +425,7 @@
     if (scan) scan.classList.add('on');
     var setT = function (s) { var e = document.getElementById('bi-scan-t'); if (e) e.textContent = s; };
 
-    _rows = []; _bilder = {}; _leer = []; var docCount = 0; var leer = []; var skipped = [];
+    _rows = []; _bilder = {}; _leer = []; _betrag = {}; var docCount = 0; var leer = []; var skipped = [];
 
     // 1) CSV/Excel lokal parsen — KEINE KI, KEIN Kerosin
     for (var i = 0; i < tableFiles.length; i++) {
@@ -413,7 +444,10 @@
         setT('Belege werden vorbereitet … (' + (j + 1) + '/' + aiFiles.length + ')');
         try {
           var imgs = await _fileToImages(aiFiles[j]);
-          if (imgs.length) { belege.push({ name: aiFiles[j].name, images: imgs }); _bilder[aiFiles[j].name] = imgs; }
+          if (imgs.length) {
+            var _tx = Array.isArray(imgs.texte) && imgs.texte.some(function (t) { return t && t.replace(/\s/g, '').length >= 80; }) ? imgs.texte : null;   /* v3154e */
+            belege.push(_tx ? { name: aiFiles[j].name, images: imgs, texte: _tx } : { name: aiFiles[j].name, images: imgs }); _bilder[aiFiles[j].name] = imgs;
+          }
           else skipped.push(aiFiles[j].name);
         } catch (e) { skipped.push(aiFiles[j].name); }
       }
@@ -432,6 +466,7 @@
             var nochmal = [];
             (res && res.results || []).forEach(function (r) {
               var poss = Array.isArray(r.positionen) ? r.positionen : (r.data ? [r.data] : []);
+              if (r.rechnungsbetrag > 0) _betrag[r.name] = r.rechnungsbetrag;   /* v3154e */
               if (poss.length) { docCount++; _pushPositions(r.name, poss); }
               else nochmal.push(r);
             });
@@ -447,6 +482,7 @@
                   if (resp2.ok) {
                     var res2 = await resp2.json(), x2 = res2 && res2.results && res2.results[0];
                     if (x2) poss2 = Array.isArray(x2.positionen) ? x2.positionen : (x2.data ? [x2.data] : []);
+                    if (x2 && x2.rechnungsbetrag > 0) _betrag[r0.name] = x2.rechnungsbetrag;   /* v3154e */
                     if (!poss2.length && x2) r0 = x2;
                   }
                 } catch (e2) {}
@@ -622,7 +658,8 @@
   function _pruefen() {
     _rows.forEach(function (r) {
       var g = [];
-      if (!(r.brutto > 0)) g.push('kein Betrag erkannt');
+      if (!r.brutto) g.push('kein Betrag erkannt');
+      if (r.brutto < 0) g.push('Gutschrift / Abzug (negativer Betrag)');
       if (r.netto > 0 && r.ust >= 0 && r.brutto > 0 && Math.abs(r.netto + r.ust - r.brutto) > Math.max(1, r.brutto * 0.01)) g.push('Netto + USt ergibt nicht den Bruttobetrag');
       var d = String(r.datum || '').trim();
       if (!d || d === '—' || !/\d/.test(d)) g.push('kein Rechnungsdatum erkannt');
@@ -655,6 +692,21 @@
         if (vorher.length) { r.keep = false; r.pruefen.push('möglicherweise doppelt (gleicher Betrag und gleiche Kategorie, oft von Seite 2)'); }
       });
     });
+    /* v3154e · GEGENPROBE: Summe der Positionen gegen den Rechnungsbetrag, den die KI auf dem Beleg liest.
+       Die Zeile, die genau den Rechnungsbetrag trägt, ist die Gesamtzeile (bei mehreren Positionen). */
+    Object.keys(_betrag).forEach(function (nm) {
+      var rb = _betrag[nm], g = _rows.filter(function (r) { return r.name === nm && !r.junk; });
+      if (!(rb > 0) || !g.length) return;
+      if (g.length > 1) g.forEach(function (r) {
+        if (r.keep && Math.abs(r.brutto - rb) < 0.01) { r.summe = true; r.keep = false; r.pruefen.push('trägt genau den Rechnungsbetrag – das ist die Gesamtzeile, nicht zusätzlich übernommen'); }
+      });
+      var sum = g.filter(function (r) { return r.keep || /Verpflegung|Rücklage/.test(r.kategorie); }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
+      var ok = Math.abs(sum - rb) <= Math.max(1, rb * 0.01);
+      g.forEach(function (r) {
+        r.gegenprobe = { summe: sum, rechnungsbetrag: rb, ok: ok };
+        if (!ok) r.pruefen.push('Positionen ergeben ' + _fmtEur(sum) + ' €, der Beleg weist ' + _fmtEur(rb) + ' € aus');
+      });
+    });
   }
   function _werteZeile(r) {
     return [['Datum', r.datum], ['Jahr', r.jahr || '–'], ['Aussteller', r.aussteller], ['Beschreibung', r.beschreibung],
@@ -669,6 +721,7 @@
     });
     var h = []; alle.forEach(function (x) { (x.pruefen || []).forEach(function (g) { if (h.indexOf(g) < 0) h.push(g); }); });
     var gew = alle.filter(function (x) { return x.keep; }).reduce(function (a, x) { return a + (x.brutto || 0); }, 0);
+    if (_betrag[r.name] > 0) h.unshift('Rechnungsbetrag laut Beleg: ' + _fmtEur(_betrag[r.name]) + ' € · Summe der Positionen: ' + _fmtEur(r.gegenprobe ? r.gegenprobe.summe : gew) + ' € – ' + (r.gegenprobe && r.gegenprobe.ok ? 'passt ✓' : 'passt NICHT'));
     h.push('Ausgewählt aus dieser Datei: ' + _fmtEur(gew) + ' € brutto – bitte mit dem Rechnungsbetrag auf dem Bild vergleichen.');   /* v3154c */
     window.DpEingang.vorschau({ titel: r.name, bilder: _bilder[r.name] || null, werte: werte, hinweise: h });
   }
@@ -687,7 +740,7 @@
     var seen = {};
     _rows.forEach(function (r) {
       var b = String(r.beschreibung || '').toLowerCase();
-      var isJunk = (!(r.brutto > 0)) || /^\s*(summe|gesamtsumme|zwischensumme)\b|offene posten|nicht lesbar|unleserlich|unlesbar/.test(b);   /* v3154c */
+      var isJunk = (!r.brutto || !isFinite(r.brutto)) ||   /* v3154e: Gutschrift (negativ) zählt mit */ /^\s*(summe|gesamtsumme|zwischensumme)\b|offene posten|nicht lesbar|unleserlich|unlesbar/.test(b);   /* v3154c */
       r.junk = isJunk; r.dup = false;
       if (isJunk) { r.keep = false; return; }
       var d = String(r.datum || '').trim();
@@ -842,7 +895,7 @@
     var jeJahr = {}, ohneJahr = 0, nichtAbsetzbar = 0, nichtAbsetzbarEur = 0, nichtJeKat = {};
     _rows.forEach(function (r) {
       if (!r.keep) return;
-      if (!(r.brutto > 0)) return;
+      if (!r.brutto || !isFinite(r.brutto)) return;   /* v3154e: Gutschriften mindern */
       var f = FIELD_MAP_WK[r.kategorie];
       /* `null` ist eine ANTWORT, kein fehlender Eintrag: die Zuführung zur
          Erhaltungsrücklage ist beim Eigentümer nicht sofort abziehbar. */
