@@ -42,12 +42,9 @@
   function saetze(t, n) {
     t = String(t || '').replace(/\s+/g, ' ').trim();
     if (!t) return '';
-    var teile = t.match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g) || [t], out = [];
-    for (var i = 0; i < teile.length && out.length < n; i++) {
-      var s = teile[i].trim();
-      if (out.length && /^\d/.test(s)) { out[out.length - 1] += ' ' + s; continue; }   /* „3. OG" o. ä. nicht trennen */
-      out.push(s);
-    }
+    /* nur an einem Satzende trennen, auf das ein Großbuchstabe, eine Ziffer am Satzanfang oder ein Anführungszeichen folgt -
+       nie im Tausenderpunkt (2.002 €) oder in Abkürzungen mit Kleinbuchstaben danach (z. B., ca. 5 %) */
+    var teile = t.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"(])/), out = teile.slice(0, n);
     return out.join(' ');
   }
 
