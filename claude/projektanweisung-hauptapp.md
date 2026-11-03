@@ -44268,3 +44268,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `492db33e`, `ef037b19` (Buster v3099f, weil v3099e kurz mit altem Inhalt auslag), `67fe1cf0`, `414b85d0`; Staging per git pull. **Nicht Prod.**
 - **Nachweis:** Parkstr. 9 und Lindenhof 14, jeder Unterreiter in beiden Modi gemessen (Zeichen, Grafiken), gedrückter Knopf mit Verlauf, keine Konsolenfehler.
 - **Rest:** Abnahme Marcel; Herkunftsmarke für Belege, falls „erklärt“ gewünscht; cf_ns gegen cfns_y klären.
+
+### v3110–v3111 · Bordbuch (03.11.2026, nur Staging)
+
+- **Was:** Mechaniker unten rechts (`js/bordbuch.js`), Tab-Aufnahme per `getDisplayMedia`, Zuschneiden, Zoom, Rahmen/Stift, Diktat, Strg+V; Migration 095 (`art`, `bilder`, `kontext`); `GET /wuensche/:id/bilder`; Liste mit Bildern; Admin-Zusatz „Backlog-User (Bordbuch)“; `wuensche-holen.mjs` mit Bildern.
+- **Commit:** `1e6a1e02` bis `8e715c54` (v3110–v3111).
+- **Nachweis:** Staging: Fenster mit Testbild, Zuschneiden 1600×900 → 560×315, Zoom, Rahmen, Eintrag W-2 mit Bild über die API, `wuensche-holen.mjs --nur=staging` schrieb `Dateien/Backlog-Bilder/staging-W2-1.jpg`, Bild geprüft. Ausblenden/Einblenden geprüft.
+- **Rest:** Die Chrome-Freigabe der Tab-Aufnahme testet Marcel; danach Prod und Freischaltung im Admin (N110).
