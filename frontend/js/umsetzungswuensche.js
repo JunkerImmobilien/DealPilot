@@ -18,6 +18,7 @@
     ['finanzierung', 'Finanzierung & Bank'], ['marktbericht', 'Marktbericht & Bewertung'], ['unterlagen', 'Unterlagen & Import'],
     ['admin', 'Admin & Konten'], ['design', 'Optik & Bedienung'], ['sonstiges', 'Sonstiges']];
   var DRINGLICH = [['spaeter', 'Irgendwann'], ['normal', 'Normal'], ['dringend', 'Dringend']];
+  var ARTEN = [['fehler', 'Fehler'], ['wunsch', 'Wunsch'], ['idee', 'Idee']];   /* v3110 · Bordbuch */
   var STATUS = [['neu', 'Neu'], ['backlog', 'Im Backlog'], ['arbeit', 'In Arbeit'], ['erledigt', 'Erledigt'], ['abgelehnt', 'Abgelehnt']];
   var name = function (liste, k) { for (var i = 0; i < liste.length; i++) if (liste[i][0] === k) return liste[i][1]; return k; };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
@@ -54,6 +55,10 @@
       '.dpw-w-pflege{display:grid;grid-template-columns:150px 110px 1fr auto;gap:8px;margin-top:10px;align-items:center}',
       '.dpw-w-pflege .dpw-knopf{padding:7px 12px;font-size:12.5px}',
       '.dpw-filter{display:flex;gap:6px;flex-wrap:wrap}',
+      '.dpw-bilder{margin-top:8px;display:flex;flex-direction:column;gap:8px}',
+      '.dpw-bildknopf{align-self:flex-start;border:1px solid #E3D9C4;background:#fff;border-radius:8px;padding:5px 10px;font:500 12.5px Inter,sans-serif;cursor:pointer;color:#2A2727}',
+      '.dpw-bilder a{display:block;border:1px solid #E3D9C4;border-radius:8px;overflow:hidden;line-height:0}',
+      '.dpw-bilder img{width:100%;height:auto}',
       '.dpw-filter button{border:1px solid #E3D9C4;background:#fff;border-radius:20px;padding:4px 11px;font:500 12px Inter,sans-serif;cursor:pointer;color:#2A2727}',
       '.dpw-filter button.an{background:#2A2727;color:#FDFCFA;border-color:#2A2727}',
       '@media (max-width:600px){.dpw-hg{padding:12px 8px}.dpw-reihe,.dpw-w-pflege{grid-template-columns:1fr}.dpw-kopf,.dpw-inhalt{padding-left:16px;padding-right:16px}}'
@@ -75,10 +80,12 @@
       var opt = function (liste, wert) { return liste.map(function (e) { return '<option value="' + e[0] + '"' + (e[0] === wert ? ' selected' : '') + '>' + e[1] + '</option>'; }).join(''); };
       return '<div class="dpw-w" data-id="' + w.id + '">'
         + '<div class="dpw-w-kopf"><div><b>W-' + w.id + ' · ' + esc(w.titel) + '</b>'
-        + '<div class="dpw-w-meta">' + esc(name(BEREICHE, w.bereich)) + ' · ' + esc(name(DRINGLICH, w.dringlichkeit)) + ' · von ' + esc(w.von || '–') + ' am ' + datum(w.created_at)
+        + '<div class="dpw-w-meta">' + esc(name(ARTEN, w.art || 'wunsch')) + ' · ' + esc(name(BEREICHE, w.bereich)) + ' · ' + esc(name(DRINGLICH, w.dringlichkeit)) + ' · von ' + esc(w.von || '–') + ' am ' + datum(w.created_at)
         + (w.backlog_nr ? ' · Backlog ' + esc(w.backlog_nr) : '') + '</div></div>'
         + '<span class="dpw-pille ' + esc(w.status) + '">' + esc(name(STATUS, w.status)) + '</span></div>'
         + (w.beschreibung ? '<p class="dpw-w-text">' + esc(w.beschreibung) + '</p>' : '')
+        + (w.kontext ? '<div class="dpw-w-meta">' + esc([w.kontext.reiter && ('Reiter „' + w.kontext.reiter + '“'), w.kontext.objekt && ('Objekt ' + w.kontext.objekt), w.kontext.fenster && ('Fenster ' + w.kontext.fenster), w.kontext.version && ('Version ' + w.kontext.version)].filter(Boolean).join(' · ')) + '</div>' : '')
+        + (w.bild_anzahl > 0 ? '<div class="dpw-bilder" data-bilder="' + w.id + '"><button type="button" class="dpw-bildknopf" data-akt="bilder">📷 ' + w.bild_anzahl + (w.bild_anzahl === 1 ? ' Bild' : ' Bilder') + ' ansehen</button></div>' : '')
         + (w.antwort ? '<p class="dpw-w-antwort">' + esc(w.antwort) + '</p>' : '')
         + '<div class="dpw-w-pflege"><select data-f="status">' + opt(STATUS, w.status) + '</select>'
         + '<input data-f="backlog_nr" placeholder="Backlog-Nr." value="' + esc(w.backlog_nr || '') + '">'
@@ -99,7 +106,7 @@
     var hg = document.createElement('div'); hg.className = 'dpw-hg'; hg.id = 'dpw-hg';
     var opts = function (liste, wert) { return liste.map(function (e) { return '<option value="' + e[0] + '"' + (e[0] === wert ? ' selected' : '') + '>' + e[1] + '</option>'; }).join(''); };
     hg.innerHTML = '<div class="dpw" role="dialog" aria-modal="true" aria-labelledby="dpw-titel">'
-      + '<div class="dpw-kopf"><div><h3 id="dpw-titel">Umsetzungswünsche</h3><p>Was soll in DealPilot gebaut oder geändert werden? Neue Wünsche landen im Backlog.</p></div>'
+      + '<div class="dpw-kopf"><div><h3 id="dpw-titel">Bordbuch · Umsetzungswünsche</h3><p>Was soll in DealPilot gebaut oder geändert werden? Neue Einträge landen im Backlog.' + (window.DpBordbuch ? ' <button type="button" class="dpw-bildknopf" data-akt="screenshot" style="margin-left:4px">📷 mit Screenshot eintragen</button>' : '') + '</p></div>'
       + '<button class="dpw-zu" type="button" aria-label="Schließen">×</button></div>'
       + '<div class="dpw-inhalt">'
       + '<div><label class="dpw-l" for="dpw-t">Titel</label><input id="dpw-t" maxlength="200" placeholder="z. B. Quick-Check: Hausgeld aus dem Exposé übernehmen"></div>'
@@ -118,6 +125,8 @@
     document.addEventListener('keydown', taste);
     hg.addEventListener('click', function (e) { if (e.target === hg) zu(); });
     hg.querySelector('.dpw-zu').addEventListener('click', zu);
+    var sk = hg.querySelector('[data-akt="screenshot"]');
+    if (sk) sk.addEventListener('click', function () { zu(); setTimeout(function () { DpBordbuch.start(); }, 80); });
     var setzeFilter = function () { hg.querySelectorAll('[data-filter]').forEach(function (b) { b.classList.toggle('an', b.getAttribute('data-filter') === filter); }); };
     hg.querySelectorAll('[data-filter]').forEach(function (b) { b.addEventListener('click', function () { filter = b.getAttribute('data-filter'); setzeFilter(); zeichneListe(); }); });
     setzeFilter();
@@ -139,6 +148,18 @@
     });
 
     hg.querySelector('#dpw-liste').addEventListener('click', function (e) {
+      /* v3110 · Bilder erst auf Klick laden (die Liste trägt nur die Anzahl) */
+      var bk = e.target.closest('[data-akt="bilder"]');
+      if (bk) {
+        var box = bk.closest('[data-bilder]'), wid = box.getAttribute('data-bilder');
+        bk.disabled = true; bk.textContent = 'lädt …';
+        api('/' + wid + '/bilder').then(function (r) {
+          box.innerHTML = (r.bilder || []).map(function (u, i) {
+            return /^data:image\/(jpeg|png|webp);base64,/.test(u) ? '<a href="' + u + '" download="W-' + wid + '-' + (i + 1) + '.jpg" title="Herunterladen"><img alt="Bild ' + (i + 1) + ' zu W-' + wid + '" src="' + u + '"></a>' : '';
+          }).join('');
+        }).catch(function (err) { bk.disabled = false; bk.textContent = 'Bilder nicht geladen: ' + err.message; });
+        return;
+      }
       var b = e.target.closest('[data-akt="sichern"]'); if (!b) return;
       var karte = b.closest('.dpw-w'), id = karte.getAttribute('data-id');
       var wert = function (f) { return karte.querySelector('[data-f="' + f + '"]').value; };

@@ -861,8 +861,8 @@
             </div>
 
             <div class="action-section" id="zusatz-ep">
-              <h4>Zusatz: Entwicklungspartner</h4>
-              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Darf in der App unter System › Umsetzungswünsche Wünsche fürs Backlog schreiben und sieht die gemeinsame Liste.</p>
+              <h4>Zusatz: Backlog-User (Bordbuch)</h4>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Sieht in der App den Mechaniker neben dem Piloten (Alt+B): Fehler, Wünsche und Ideen mit Screenshot, Markierung und Diktat ins Backlog. Dazu System › Umsetzungswünsche mit der gemeinsamen Liste.</p>
               <div id="zusatz-ep-stand" style="font-size:0.85em;margin:0 0 8px 0;">lädt …</div>
               <div class="action-row">
                 <button class="btn btn-primary btn-sm" data-action="zusatz-ep-an">Freischalten</button>
@@ -981,7 +981,7 @@
   async function handleZusatzEp(id, aktiv) {
     try {
       await API.setZusatzPartner(id, aktiv);
-      toast(aktiv ? '✓ Entwicklungspartner freigeschaltet' : '✓ Entwicklungspartner abgeschaltet', 'success');
+      toast(aktiv ? '✓ Backlog-User freigeschaltet' : '✓ Backlog-User abgeschaltet', 'success');
       ladeZusatzRk(id);
     } catch (err) {
       toast('Fehler: ' + (err.message || 'unbekannt'), 'error');

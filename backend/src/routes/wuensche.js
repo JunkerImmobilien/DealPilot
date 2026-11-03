@@ -17,6 +17,23 @@ const zusatz = require('../services/zusatzService');
 const BEREICHE = ['quickcheck', 'objekt', 'steuer', 'finanzierung', 'marktbericht', 'unterlagen', 'admin', 'design', 'sonstiges'];
 const DRINGLICH = ['spaeter', 'normal', 'dringend'];
 const STATUS = ['neu', 'backlog', 'arbeit', 'erledigt', 'abgelehnt'];
+const ARTEN = ['fehler', 'wunsch', 'idee'];   /* v3110 · Bordbuch */
+const BILD_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+const BILD_MAX = 4 * 1024 * 1024, BILDER_MAX = 4;
+
+/* Bilder prüfen: nur data:-URLs von JPEG/PNG/WebP, höchstens 4 und je 4 MB Text. */
+function bilderAus(liste) {
+  if (!Array.isArray(liste)) return [];
+  return liste.filter((b) => typeof b === 'string' && b.length <= BILD_MAX && BILD_RE.test(b)).slice(0, BILDER_MAX);
+}
+function kontextAus(k) {
+  if (!k || typeof k !== 'object') return null;
+  const out = {};
+  ['reiter', 'objekt', 'objekt_name', 'seite', 'fenster', 'version', 'browser', 'ansicht'].forEach((f) => {
+    if (k[f] != null) out[f] = String(k[f]).slice(0, 300);
+  });
+  return Object.keys(out).length ? out : null;
+}
 
 async function istPartner(userId) {
   const z = await zusatz.holen(userId, zusatz.PARTNER);
@@ -41,7 +58,8 @@ router.get('/', authenticate, nurPartner, async (req, res) => {
   try {
     const r = await query(
       `SELECT w.id, w.titel, w.beschreibung, w.bereich, w.dringlichkeit, w.status, w.backlog_nr,
-              w.antwort, w.geaendert_von, w.created_at, w.updated_at,
+              w.antwort, w.geaendert_von, w.created_at, w.updated_at, w.art, w.kontext,
+              jsonb_array_length(w.bilder) AS bild_anzahl,
               COALESCE(NULLIF(u.name, ''), split_part(u.email, '@', 1)) AS von,
               (w.user_id = $1) AS eigen
          FROM umsetzungswuensche w LEFT JOIN users u ON u.id = w.user_id
@@ -55,17 +73,31 @@ router.get('/', authenticate, nurPartner, async (req, res) => {
   }
 });
 
+/* v3110 · Bilder eines Eintrags (in der Liste stehen nur die Anzahlen) */
+router.get('/:id/bilder', authenticate, nurPartner, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!(id > 0)) return res.status(400).json({ error: 'id_ungueltig' });
+  try {
+    const r = await query('SELECT bilder FROM umsetzungswuensche WHERE id = $1', [id]);
+    if (!r.rowCount) return res.status(404).json({ error: 'nicht_gefunden' });
+    res.json({ bilder: r.rows[0].bilder || [] });
+  } catch (e) { res.status(500).json({ error: 'server_error' }); }
+});
+
 router.post('/', authenticate, nurPartner, async (req, res) => {
   const b = req.body || {};
   const titel = text(b.titel, 200);
   if (titel.length < 3) return res.status(400).json({ error: 'titel_fehlt', text: 'Bitte einen Titel mit mindestens 3 Zeichen.' });
   const bereich = BEREICHE.includes(b.bereich) ? b.bereich : 'sonstiges';
   const dringlichkeit = DRINGLICH.includes(b.dringlichkeit) ? b.dringlichkeit : 'normal';
+  const art = ARTEN.includes(b.art) ? b.art : 'wunsch';
+  const bilder = bilderAus(b.bilder);
   try {
     const r = await query(
-      `INSERT INTO umsetzungswuensche (user_id, titel, beschreibung, bereich, dringlichkeit)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [req.user.id, titel, text(b.beschreibung, 8000), bereich, dringlichkeit]);
+      `INSERT INTO umsetzungswuensche (user_id, titel, beschreibung, bereich, dringlichkeit, art, bilder, kontext)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb) RETURNING id`,
+      [req.user.id, titel, text(b.beschreibung, 8000), bereich, dringlichkeit, art,
+       JSON.stringify(bilder), JSON.stringify(kontextAus(b.kontext))]);
     res.json({ ok: true, id: r.rows[0].id });
   } catch (e) {
     console.error('[wuensche/neu]', e.message);
