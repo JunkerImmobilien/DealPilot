@@ -954,7 +954,7 @@
       if (!(_nvQm > 0) || !(w.wfl > 0) || w.art === 'gewerbe' || !K || !K.neuvermietung) return {};
       var vq = w.soll && w.soll.vgl_qm > 0 ? w.soll.vgl_qm : zahl(m.vgl && !m.vgl.marktmiete ? m.vgl.qm : 0);
       var r = K.neuvermietung({ markt_qm: _nvQm, wfl: w.wfl, vgl_qm: vq, bremse: _br });
-      return r ? { neu_jahr: Math.round(r.jahr), neu_qm: r.qm, neu_herkunft: _nvHer, neu_bremse: r.text || null } : {};
+      return r ? { neu_jahr: Math.round(r.jahr), neu_qm: r.qm, neu_herkunft: _nvHer, neu_bremse: r.text || null, neu_gedeckelt: !!r.gedeckelt } : {};
     };
     var d558 = function (w) {
       var vq = w.soll && w.soll.vgl_qm > 0 ? w.soll.vgl_qm : 0;

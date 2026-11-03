@@ -490,7 +490,7 @@ function stufeNeuvermietung(S558, bb, wlB, kB, leerPct, basisWert) {
     const T = r558 && r558.ziel_monat > 0 ? Math.max(z.ist, r558.ziel_monat * 12) : z.ist;
     const U = N - T;
     const r = { nr: w.nr || null, ziel_mieterhoehung_monat: Math.round(T / 12 * 100) / 100, neu_monat: Math.round(N / 12 * 100) / 100,
-      neu_qm: zahl(w.neu_qm), neu_herkunft: w.neu_herkunft || null, bremse: w.neu_bremse || null };
+      neu_qm: zahl(w.neu_qm), neu_herkunft: w.neu_herkunft || null, bremse: w.neu_bremse || null, gedeckelt: !!w.neu_gedeckelt };
     if (!(U > 1)) { r.grund = 'die Neuvermietungsmiete liegt nicht über der Zielmiete der Stufe Mieterhöhung'; zeilen.push(r); return; }
     let bw = 0, kw = 0;
     for (let m = 0; m < mon; m++) {
@@ -506,17 +506,18 @@ function stufeNeuvermietung(S558, bb, wlB, kB, leerPct, basisWert) {
   });
   const mit = zeilen.filter((x) => x.barwert_eur != null);
   if (!mit.length) return { verfuegbar: false, zeilen, satz: zeilen.length ? 'Neuvermietung: keine Wohnung, deren Neuvermietungsmiete über der Zielmiete der Mieterhöhung liegt.' : null };
-  const ann = 'Annahmen: ' + Math.round(f * 100) + ' % der Mieter wechseln je Jahr (rund ' + Math.round(1 / f) + ' Jahre Mietdauer), '
+  const ann = 'Annahmen: ' + Math.round(f * 100) + ' % der Mieter wechseln je Jahr (im Schnitt ' + String(Math.round(10 / f) / 10).replace('.', ',') + ' Jahre Mietdauer), '
     + (L != null ? 'Leerstand ' + String(Math.round(L * 1000) / 10).replace('.', ',') + ' % laut Feld „Leerstand p.a.“' : 'kein Leerstand eingetragen (Feld „Leerstand p.a.“)')
     + ', Kosten je Wechsel ' + NV_KOSTEN_MONATE + ' Monatsmiete — keine amtlichen Werte, sondern Annahmen.';
   const wert = basisWert != null ? Math.round(basisWert + summe) : null;
+  const wertR = wert != null ? Math.round(wert / 1000) * 1000 : null;   /* der Satz nennt die gerundete Zahl wie die Kachel */
   return {
     verfuegbar: true, wert, barwert_eur: Math.round(summe), kosten_barwert_eur: Math.round(kosten), zeilen, annahmen: ann,
     fluktuation_pct: f * 100, leerstand_pct: L != null ? L * 100 : null, kosten_monate: NV_KOSTEN_MONATE,
     satz: 'Bei Mieterwechsel ist mehr möglich als die Vergleichsmiete: ' + mit.length + ' Wohnung' + (mit.length === 1 ? '' : 'en') + ' bis zur Neuvermietungsmiete ('
-      + (mit[0].neu_herkunft || 'Marktmiete') + (mit.some((x) => x.bremse && /höchstens/.test(x.bremse)) ? ', gedeckelt durch die Mietpreisbremse' : '') + '), '
+      + (mit[0].neu_herkunft || 'Marktmiete') + (mit.some((x) => x.gedeckelt) ? ', bei ' + mit.filter((x) => x.gedeckelt).length + ' Wohnung(en) gedeckelt durch die Mietpreisbremse' : '') + '), '
       + 'jeweils erst, wenn die Wohnung frei wird. Barwert der Mehrmiete ' + eurJ(summe) + ' nach Leerstand und Kosten, zusätzlich zur Stufe Mieterhöhung'
-      + (wert != null ? ' (zusammen ' + eurJ(wert) + ')' : '') + '. ' + ann + ' Nicht unterstellt: dass Wohnungen heute frei sind.',
+      + (wertR != null ? ' (zusammen rund ' + eurJ(wertR) + ')' : '') + '. ' + ann + ' Nicht unterstellt: dass Wohnungen heute frei sind.',
   };
 }
 
