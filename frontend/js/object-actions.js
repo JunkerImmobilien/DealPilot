@@ -2488,7 +2488,12 @@
      Warnung). Waren es nur solche Dateien, schließt der Eingang dahinter. */
   function _belegeAutomatisch() {
     if (!_eingang || !window.DpEingang || typeof window.DpEingang.belegeAuslesen !== 'function') return;
-    var kand = _files.filter(function (f) { return f.file && !f._anBeleg && (f.type === 'rechnung' || (f.status === 'err' && !f.userType)); });
+    /* v3155a · gemessen: ein Kassenbon-Foto bekam im Browser Text aus der Texterkennung, lief als „Exposé"
+       durch und lieferte keinen Wert - auch das gehört ins Prüffenster (Bild + Warnung), nicht in den Eingang */
+    var kand = _files.filter(function (f) {
+      if (!f.file || f._anBeleg || f.userType) return false;
+      return f.type === 'rechnung' || f.status === 'err' || (f.status === 'ok' && (f.type === 'expose' || f.type === 'market') && !_hatWerte(f));
+    });
     if (!kand.length) return;
     kand.forEach(function (f) { f._anBeleg = true; });
     var nurBelege = _files.every(function (f) { return f._anBeleg; });
