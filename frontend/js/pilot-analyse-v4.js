@@ -27,7 +27,12 @@
 (function () {
   'use strict';
   var MERKER = 'dp_pa_modus';
-  var C = { c1: '#2f6db5', c2: '#a6812a', plan: '#9b958c', linie: '#2A2727', gut: '#3FA56C', rot: '#B8625C' };
+  /* v3151 · Marcel 03.11.2026: „die Grafiken schöner darstellen, farblich ähnlich wie im Tab Steuern, und
+     Zahlen dran". Farben wie steuer-verlauf.js: Gold der Marke (Balken, Fläche), Anthrazit als Linie mit
+     weißen Punkten, Grün für Gutes, Rot für Negatives, Gold dunkel gestrichelt für Plan/Marken. Gold nur
+     als var(--wl-…) und deshalb nur in style="…" (var() wirkt nicht in SVG-Attributen). */
+  var C = { c1: '#2A2727', c2: 'var(--wl-c9a84c, #C9A84C)', plan: 'var(--wl-b8932f, #b8932f)', linie: '#2A2727', gut: '#3FA56C', rot: '#B8625C',
+            gold: 'var(--wl-c9a84c, #C9A84C)', goldHell: 'var(--wl-e8cc7a, #E8CC7A)' };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function txt(s) { try { if (typeof window._escClean === 'function') return window._escClean(s); } catch (e) {} return esc(s); }
@@ -186,7 +191,10 @@
       '.dp-pa4-ch{position:relative;overflow-x:auto}',
       '.dp-pa4-ch svg{display:block;width:100%;height:auto;min-width:540px}',
       '.dp-pa4-ch .ax{font:500 10px "JetBrains Mono",monospace;fill:#8A8272}',
-      '.dp-pa4-ch .gl{stroke:#EFEAE0}',
+      '.dp-pa4-ch .gl{stroke:#EFEAE0}.dp-pa4-ch .nl{stroke:#2A2727;stroke-width:1.2}',
+      '.dp-pa4-ch .wz{font:600 10.5px "JetBrains Mono",monospace;fill:#2A2727;paint-order:stroke;stroke:#fff;stroke-width:3.5px;stroke-linejoin:round}',
+      '.dp-pa4-ch .wz-l{fill:var(--wl-b8932f, #b8932f)}',
+      '.dp-pa4-leg i.b{width:10px;height:12px;border-radius:2px}',
       '.dp-pa4-ch .hit{fill:transparent;cursor:crosshair}',
       '.dp-pa4-ch .kreuz{stroke:#8A8272;stroke-dasharray:2 3;opacity:0;pointer-events:none}',
       '.dp-pa4-tip{position:absolute;pointer-events:none;background:#fff;border:1px solid #E6DCC2;border-radius:8px;padding:7px 10px;font:400 12px Inter,sans-serif;color:#2A2727;box-shadow:0 6px 18px rgba(0,0,0,.12);min-width:210px;display:none;font-variant-numeric:tabular-nums;z-index:3}',
@@ -453,40 +461,80 @@
   /* ── Grafik-Werkzeug (Bauart Steuerverlauf) ──────────────────────────
      cfg: { x: [Beschriftung], reihen: [{ name, farbe, werte:[Zahl|null], art:'linie'|'gestrichelt'|'punkt'|'raute', aus:Bool }],
             fmt(v) für Achse/Tooltip, tip(i) optional zusätzliche Tooltip-Zeilen, aria } */
+  /* v3151 · art 'balken' (abgerundet, vom Nullpunkt, Farbe je Vorzeichen über farbeNeg), flaeche:true
+     (Verlauf unter der Linie), Zahlen an den Werten (cfg.kurz, ausgedünnt, damit nichts überlappt;
+     r.zahlen === false schaltet eine Reihe aus). */
+  var _gid = 0;
   function linien(host, cfg) {
     if (!host) return;
     stil();
-    var W = 900, H = cfg.hoehe || 300, L = 70, Rr = 16, T = 18, U = 34, n = cfg.x.length;
+    var W = 900, H = cfg.hoehe || 300, L = 70, Rr = 16, T = 26, U = 34, n = cfg.x.length;
     var vs = [];
     cfg.reihen.forEach(function (r) { if (r.aus) return; r.werte.forEach(function (v) { if (zahl(v)) vs.push(Number(v)); }); });
     if (!vs.length || n < 1) { host.innerHTML = ''; return; }
+    var hatBalken = cfg.reihen.some(function (r) { return !r.aus && r.art === 'balken'; });
     var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
-    if (cfg.null) { lo = Math.min(0, lo); hi = Math.max(0, hi); }
+    if (cfg.null || hatBalken) { lo = Math.min(0, lo); hi = Math.max(0, hi); }
     if (hi === lo) { hi = hi + Math.abs(hi || 1) * 0.1; lo = lo - Math.abs(lo || 1) * 0.1; }
     var st = nice(hi - lo); lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
     var y = function (v) { return T + (H - T - U) * (1 - (v - lo) / (hi - lo)); };
     var gap = (W - L - Rr) / n, x = function (i) { return L + i * gap + gap / 2; };
     var fmt = cfg.fmt || function (v) { return String(v); };
-    var s = '';
+    var kurz = cfg.kurz || cfg.achse || fmt;
+    var schritt = n <= 8 ? 1 : Math.ceil(n / 7);
+    var zeigen = function (i) { return cfg.nurLetzte ? i === n - 1 : (i % schritt === 0 || i === n - 1); };   /* nurLetzte: viele Reihen (Index) */
+    var s = '', lab = '', gid = 'dpPa4g' + (++_gid);
+    s += '<defs><linearGradient id="' + gid + '" x1="0" x2="0" y1="0" y2="1"><stop offset="0" style="stop-color:var(--wl-c9a84c, #C9A84C);stop-opacity:.32"/><stop offset="1" style="stop-color:var(--wl-c9a84c, #C9A84C);stop-opacity:.02"/></linearGradient></defs>';
     for (var v = lo; v <= hi + st / 2; v += st) s += '<line class="gl" x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/><text class="ax" x="' + (L - 7) + '" y="' + (y(v) + 3.5).toFixed(1) + '" text-anchor="end">' + esc(cfg.achse ? cfg.achse(v) : fmt(v)) + '</text>';
+    if (lo < 0 && hi > 0) s += '<line class="nl" x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(0).toFixed(1) + '" y2="' + y(0).toFixed(1) + '"/>';
     cfg.x.forEach(function (lbl, i) { if (i % (n > 14 ? 2 : 1) === 0 || i === n - 1) s += '<text class="ax" x="' + x(i).toFixed(1) + '" y="' + (H - U + 16) + '" text-anchor="middle">' + esc(lbl) + '</text>'; });
-    cfg.reihen.forEach(function (r) {
-      if (r.aus) return;
-      var pk = []; r.werte.forEach(function (w, i) { if (zahl(w)) pk.push([x(i), y(Number(w))]); });
-      if (r.art === 'linie' || r.art === 'gestrichelt') {
-        if (pk.length > 1) s += '<polyline fill="none" stroke="' + r.farbe + '" stroke-width="' + (r.art === 'linie' ? 2.2 : 1.8) + '"' + (r.art === 'gestrichelt' ? ' stroke-dasharray="5 4"' : '') + ' points="' + pk.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ') + '"/>';
-        if (r.art === 'linie') pk.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3" fill="#fff" stroke="' + r.farbe + '" stroke-width="1.5"/>'; });
-      } else if (r.art === 'raute') {
-        pk.forEach(function (p) { s += '<rect x="' + (p[0] - 5).toFixed(1) + '" y="' + (p[1] - 5).toFixed(1) + '" width="10" height="10" transform="rotate(45 ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')" fill="' + r.farbe + '" stroke="#fff" stroke-width="2"/>'; });
-      } else {
-        pk.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="5.5" fill="' + (r.hohl ? '#fff' : r.farbe) + '" stroke="' + (r.hohl ? r.farbe : '#fff') + '" stroke-width="2"/>'; });
-      }
+    /* Balken zuerst (hinten), Linien und Punkte darüber */
+    var bR = cfg.reihen.filter(function (r) { return !r.aus && r.art === 'balken'; }), kB = bR.length;
+    var bw = kB ? Math.min(30, gap * 0.62 / kB) : 0;
+    bR.forEach(function (r, j) {
+      r.werte.forEach(function (w, i) {
+        if (!zahl(w)) return;
+        w = Number(w);
+        var xx = x(i) - (kB * bw + (kB - 1) * 3) / 2 + j * (bw + 3), y1 = y(w), y0 = y(0), hh = Math.max(1.5, Math.abs(y1 - y0));
+        var f = (w < 0 && r.farbeNeg) ? r.farbeNeg : r.farbe;
+        s += '<rect x="' + xx.toFixed(1) + '" y="' + Math.min(y0, y1).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="3" style="fill:' + f + '"/>';
+        if (cfg.zahlen !== false && r.zahlen !== false && zeigen(i)) {
+          var ty = w >= 0 ? y1 - 5 : y1 + 13;
+          lab += '<text class="wz" x="' + (xx + bw / 2).toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="middle">' + esc(kurz(w)) + '</text>';
+        }
+      });
     });
+    cfg.reihen.forEach(function (r) {
+      if (r.aus || r.art === 'balken') return;
+      var pk = []; r.werte.forEach(function (w, i) { if (zahl(w)) pk.push([x(i), y(Number(w)), Number(w), i]); });
+      var pts = pk.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+      if (r.art === 'linie' || r.art === 'gestrichelt') {
+        if (r.flaeche && pk.length > 1) {
+          var yb = y(Math.max(lo, Math.min(0, hi)));
+          s += '<polygon points="' + pk[0][0].toFixed(1) + ',' + yb.toFixed(1) + ' ' + pts + ' ' + pk[pk.length - 1][0].toFixed(1) + ',' + yb.toFixed(1) + '" style="fill:url(#' + gid + ')"/>';
+        }
+        if (pk.length > 1) s += '<polyline fill="none" style="stroke:' + r.farbe + '" stroke-width="' + (r.art === 'linie' ? 2.4 : 2) + '" stroke-linejoin="round"' + (r.art === 'gestrichelt' ? ' stroke-dasharray="6 4"' : '') + ' points="' + pts + '"/>';
+        if (r.art === 'linie') pk.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.4" fill="#fff" style="stroke:' + r.farbe + '" stroke-width="1.8"/>'; });
+      } else if (r.art === 'raute') {
+        pk.forEach(function (p) { s += '<rect x="' + (p[0] - 5).toFixed(1) + '" y="' + (p[1] - 5).toFixed(1) + '" width="10" height="10" transform="rotate(45 ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')" style="fill:' + r.farbe + '" stroke="#fff" stroke-width="2"/>'; });
+      } else {
+        pk.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="6" style="fill:' + (r.hohl ? '#fff' : r.farbe) + ';stroke:' + (r.hohl ? r.farbe : '#fff') + '" stroke-width="2"/>'; });
+      }
+      /* Zahlen: Linien ausgedünnt, Punkte (Berichte) immer; über dem Wert, bei 'unten' darunter */
+      if (cfg.zahlen !== false && r.zahlen !== false) pk.forEach(function (p) {
+        var allein = r.art === 'punkt' || r.art === 'raute';
+        if (!allein && !zeigen(p[3])) return;
+        var ty = r.unten ? p[1] + 17 : p[1] - 9;
+        lab += '<text class="wz' + (r.art === 'gestrichelt' ? ' wz-l' : '') + '" x="' + p[0].toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="middle">' + esc(kurz(p[2])) + '</text>';
+      });
+    });
+    s += lab;
     s += '<line class="kreuz" x1="0" x2="0" y1="' + T + '" y2="' + (H - U) + '"/>';
     for (var i = 0; i < n; i++) s += '<rect class="hit" data-i="' + i + '" x="' + (L + i * gap).toFixed(1) + '" y="' + T + '" width="' + gap.toFixed(1) + '" height="' + (H - U - T) + '" tabindex="-1"/>';
     var leg = '<div class="dp-pa4-leg">' + cfg.reihen.map(function (r) {
-      var cl = r.art === 'linie' ? 'l' : r.art === 'gestrichelt' ? 'd' : r.art === 'raute' ? 'r' : 'p';
-      return '<span style="color:' + r.farbe + '"><i class="' + cl + '" style="' + (cl === 'r' || cl === 'p' ? 'background:' + (r.hohl ? '#fff;border:2px solid ' + r.farbe : r.farbe) : '') + '"></i><span style="color:#6B645A">' + esc(r.name) + '</span></span>';
+      var cl = r.art === 'linie' ? 'l' : r.art === 'gestrichelt' ? 'd' : r.art === 'raute' ? 'r' : r.art === 'balken' ? 'b' : 'p';
+      return '<span style="color:' + r.farbe + '"><i class="' + cl + '" style="' + (cl === 'r' || cl === 'p' || cl === 'b' ? 'background:' + (r.hohl ? '#fff;border:2px solid ' + r.farbe : r.farbe) : '') + '"></i><span style="color:#6B645A">' + esc(r.name) + '</span></span>'
+        + (cl === 'b' && r.farbeNeg ? '<span><i class="b" style="background:' + r.farbeNeg + '"></i><span style="color:#6B645A">' + esc(r.nameNeg || 'negativ') + '</span></span>' : '');
     }).join('') + '</div>';
     host.innerHTML = (cfg.chips ? '' : leg) + '<div class="dp-pa4-ch"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(cfg.aria || '') + '">' + s + '</svg><div class="dp-pa4-tip"></div></div>';
     var ch = host.querySelector('.dp-pa4-ch'), tip = host.querySelector('.dp-pa4-tip'), kreuz = host.querySelector('.kreuz'), svg = host.querySelector('svg');
@@ -544,10 +592,10 @@
     var kpR = jahre.map(function (j) { return (j === kj && zahl(k.kp)) ? Number(k.kp) : null; });
     var reihen = [
       { name: 'Plan-Wert (deine Wertsteigerung)', farbe: C.plan, werte: plan, art: 'gestrichelt' },
-      { name: 'Restschuld', farbe: C.c1, werte: rs, art: 'linie' },
-      { name: 'Marktpreis Ø laut Bericht', farbe: C.c2, werte: mpi, art: 'punkt' }
+      { name: 'Restschuld', farbe: C.linie, werte: rs, art: 'linie', flaeche: true, unten: true },
+      { name: 'Marktpreis Ø laut Bericht', farbe: C.gut, werte: mpi, art: 'punkt' }
     ];
-    if (mpo.some(zahl)) reihen.push({ name: 'ohne Abschlag', farbe: C.c2, werte: mpo, art: 'punkt', hohl: true });
+    if (mpo.some(zahl)) reihen.push({ name: 'ohne Abschlag', farbe: C.gut, werte: mpo, art: 'punkt', hohl: true, zahlen: false });
     if (kpR.some(zahl)) reihen.push({ name: 'Kaufpreis', farbe: '#2A2727', werte: kpR, art: 'raute' });
     /* Zahlen oben */
     var letzter = null; hist.forEach(function (h) { var nach = zahl(h.mpi_nach_abschlag) ? Number(h.mpi_nach_abschlag) : (zahl(h.market_value) ? Number(h.market_value) : null); if (nach != null) letzter = { h: h, wert: nach }; });
@@ -565,10 +613,10 @@
     } else if (!hist.length) satz = 'Noch kein Marktbericht zu diesem Objekt – die Grafik zeigt deinen Plan-Wert und die Restschuld. Mit dem ersten Bericht erscheint der Marktpreis als Punkt.';
     var oben = (zahlen.length ? '<div class="dp-pa4-zahlen">' + zahlen.join('') + '</div>' : '') + (satz ? '<p class="dp-pa4-satz">' + satz + '</p>' : '');
     host.innerHTML = oben + '<div data-dp-pa4-g></div>'
-      + erkl('<b>So liest du die Grafik:</b> Die gestrichelte Linie ist dein <b>Plan-Wert</b> – der Kaufpreis, fortgeschrieben mit der Wertsteigerung aus deinen Eingaben. Die blaue Linie ist die <b>Restschuld</b> deiner Darlehen; der Abstand zwischen beiden ist das Eigenkapital im Objekt nach Plan. '
+      + erkl('<b>So liest du die Grafik:</b> Die gestrichelte Linie ist dein <b>Plan-Wert</b> – der Kaufpreis, fortgeschrieben mit der Wertsteigerung aus deinen Eingaben. Die dunkle Linie mit der Fläche ist die <b>Restschuld</b> deiner Darlehen; der Abstand zwischen beiden ist das Eigenkapital im Objekt nach Plan. '
         + 'Die Punkte sind die <b>Marktpreisindikationen</b> deiner Marktberichte: gefüllt mit dem Abschlag auf Angebotspreise (aktueller Marktdurchschnitt), hohl ohne Abschlag. Der Ertragswert steht ohne Spanne in der Tafel darunter, weil er ein gerechneter Einzelwert ist.');
     linien(host.querySelector('[data-dp-pa4-g]'), {
-      x: jahre.map(String), reihen: reihen, fmt: eur, achse: te, aria: 'Wert gegen Plan von ' + jahre[0] + ' bis ' + jahre[jahre.length - 1],
+      x: jahre.map(String), reihen: reihen, fmt: eur, achse: te, hoehe: 320, aria: 'Wert gegen Plan von ' + jahre[0] + ' bis ' + jahre[jahre.length - 1],
       tip: function (i) {
         var t = '';
         if (zahl(plan[i]) && zahl(rs[i])) t += '<div><span>Eigenkapital (Plan)</span><span>' + eur(plan[i] - rs[i]) + '</span></div>';
@@ -588,7 +636,7 @@
       return { name: m.label, farbe: m.color, art: 'linie', aus: !an[i], key: m.key, fmtAbs: m.fmt,
         werte: hist.map(function (h) { return zahl(h[m.key]) && b ? Math.round(Number(h[m.key]) / b * 1000) / 10 : null; }) };
     });
-    linien(box, { x: hist.map(function (h, i) { return (i + 1) + '. ' + new Date(h.created_at).toLocaleDateString('de-DE'); }), reihen: reihen, chips: true,
+    linien(box, { x: hist.map(function (h, i) { return (i + 1) + '. ' + new Date(h.created_at).toLocaleDateString('de-DE'); }), reihen: reihen, chips: true, nurLetzte: true,
       fmt: function (v) { return 'Index ' + de(v, 1); }, achse: function (v) { return de(v, 0); }, aria: 'Entwicklung der Marktberichte, Index erster Bericht = 100',
       tip: function (i) {
         return '<div style="display:block;color:#7A7370;margin-top:3px">' + reihen.filter(function (r) { return !r.aus && zahl(hist[i][r.key]); }).map(function (r) { return esc(r.name) + ': ' + esc(r.fmtAbs(Number(hist[i][r.key]))); }).join('<br>') + '</div>';
@@ -602,20 +650,22 @@
      lage       Mikro- und Makrolage (0–100) und Preistrend laut Marktbewertung (#_mb_state) */
   function balkenGruppen(host, cfg) {
     stil();
-    var W = 900, H = cfg.hoehe || 220, L = 70, Rr = 16, T = 14, U = 30, n = cfg.x.length, vs = [0];
+    var W = 900, H = cfg.hoehe || 220, L = 70, Rr = 16, T = 24, U = 30, n = cfg.x.length, vs = [0];
     cfg.reihen.forEach(function (r) { r.werte.forEach(function (v) { if (zahl(v)) vs.push(Number(v)); }); });
     var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs); if (hi === lo) hi = lo + 1;
     var st = nice(hi - lo); lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
     var y = function (v) { return T + (H - T - U) * (1 - (v - lo) / (hi - lo)); };
     var gap = (W - L - Rr) / n, k = cfg.reihen.length, bw = Math.min(34, gap * 0.7 / k), s = '';
     for (var v = lo; v <= hi + st / 2; v += st) s += '<line class="gl" x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/><text class="ax" x="' + (L - 7) + '" y="' + (y(v) + 3.5).toFixed(1) + '" text-anchor="end">' + esc(cfg.achse ? cfg.achse(v) : String(v)) + '</text>';
-    s += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(0).toFixed(1) + '" y2="' + y(0).toFixed(1) + '" stroke="#2A2727" stroke-width="1.2"/>';
+    s += '<line class="nl" x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(0).toFixed(1) + '" y2="' + y(0).toFixed(1) + '"/>';
     cfg.x.forEach(function (lbl, i) {
       var x0 = L + i * gap + (gap - k * bw - (k - 1) * 2) / 2;
       cfg.reihen.forEach(function (r, j) {
         var w = r.werte[i]; if (!zahl(w)) return;
         var y1 = y(Number(w)), y0 = y(0), hh = Math.max(1.5, Math.abs(y1 - y0));
-        s += '<rect x="' + (x0 + j * (bw + 2)).toFixed(1) + '" y="' + Math.min(y0, y1).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="3" fill="' + r.farbe + '"/>';
+        s += '<rect x="' + (x0 + j * (bw + 2)).toFixed(1) + '" y="' + Math.min(y0, y1).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="3" style="fill:' + ((Number(w) < 0 && r.farbeNeg) ? r.farbeNeg : r.farbe) + '"/>'
+          /* v3151 · die Zahl am Balken */
+          + '<text class="wz" x="' + (x0 + j * (bw + 2) + bw / 2).toFixed(1) + '" y="' + (Number(w) >= 0 ? y1 - 5 : y1 + 13).toFixed(1) + '" text-anchor="middle">' + esc(Math.round(Number(w)).toLocaleString('de-DE') + ' €') + '</text>';
       });
       s += '<text class="ax" x="' + (L + i * gap + gap / 2).toFixed(1) + '" y="' + (H - U + 16) + '" text-anchor="middle">' + esc(lbl) + '</text>';
     });
@@ -653,14 +703,14 @@
     if (zahl(r0.cfop_y) && zahl(r0.tax_y) && zahl(r0.cfns_y)) {
       var k = kpis(), ue = String((document.getElementById('wirtschaftlicher_uebergang') || document.getElementById('kaufdat') || {}).value || '');
       var ueT = /^\d{4}-\d{2}-\d{2}/.test(ue) ? ue.slice(8, 10) + '.' + ue.slice(5, 7) + '.' : '';
-      satz = '<p class="dp-pa4-erkl" style="margin-top:4px">Die gelbe Linie summiert den Cashflow nach Steuer <b>je Kalenderjahr</b> – mit den Erstattungen aus dem Reiter Steuer. '
+      satz = '<p class="dp-pa4-erkl" style="margin-top:4px">Die Linie summiert den Cashflow nach Steuer <b>je Kalenderjahr</b> – mit den Erstattungen aus dem Reiter Steuer. '
         + r0.cal + (ueT ? ' (ab ' + ueT + ')' : '') + ': vor Steuer ' + sEur(r0.cfop_y) + ', ' + (r0.tax_y <= 0 ? 'Erstattung ' + sEur(-r0.tax_y) : 'Steuer ' + eur(r0.tax_y)) + ', nach Steuer <b>' + sEur(r0.cfns_y) + '</b>.'
         + (zahl(k.cf_ns) ? ' Die Kachel „Cashflow“ oben rechnet dagegen ein volles, eingeschwungenes Jahr (' + sEur(k.cf_ns / 12) + ' / Monat nach Steuer).' : '') + '</p>';
     }
     host.innerHTML = '<h5>Wohin es läuft · Vermögen aus dem Objekt</h5><div></div>' + satz;
-    linien(host.querySelector('div'), { x: R.map(function (r) { return String(r.cal); }), hoehe: 210, null: true, fmt: eur, achse: te, aria: 'Eigenkapital im Objekt und aufsummierter Cashflow nach Steuer je Kalenderjahr',
-      reihen: [{ name: 'Eigenkapital im Objekt (Plan-Wert − Restschuld)', farbe: C.c1, werte: eq, art: 'linie' },
-               { name: 'Cashflow nach Steuer inkl. Erstattungen, je Kalenderjahr aufsummiert', farbe: C.c2, werte: cf, art: 'linie' }],
+    linien(host.querySelector('div'), { x: R.map(function (r) { return String(r.cal); }), hoehe: 260, null: true, fmt: eur, achse: te, aria: 'Eigenkapital im Objekt und aufsummierter Cashflow nach Steuer je Kalenderjahr',
+      reihen: [{ name: 'Eigenkapital im Objekt (Plan-Wert − Restschuld)', farbe: C.gold, farbeNeg: C.rot, nameNeg: 'Eigenkapital negativ', werte: eq, art: 'balken' },
+               { name: 'Cashflow nach Steuer inkl. Erstattungen, je Kalenderjahr aufsummiert', farbe: C.linie, werte: cf, art: 'linie' }],
       tip: function (i) {
         var r = R[i]; if (!r) return '';
         return '<div style="display:block;color:#7A7370;margin-top:3px;border-top:1px solid #F1ECE1;padding-top:3px">Jahr ' + r.cal + ': vor Steuer ' + esc(sEur(r.cfop_y || 0))
@@ -681,7 +731,7 @@
     });
     if (x.length < 2) { host.innerHTML = ''; return; }
     balkenGruppen(host, { titel: 'Wohin es läuft · Miete und Cashflow je Monat', x: x, hoehe: 210, achse: function (v) { return Math.round(v).toLocaleString('de-DE'); },
-      reihen: [{ name: 'Kaltmiete / Monat', farbe: C.c1, werte: miete }, { name: 'Cashflow vor Steuer / Monat', farbe: C.c2, werte: cfm }] });
+      reihen: [{ name: 'Kaltmiete / Monat', farbe: C.gold, werte: miete }, { name: 'Cashflow vor Steuer / Monat', farbe: C.gut, farbeNeg: C.rot, werte: cfm }] });
   }
   function miniLage(host) {
     var c = null; try { var st = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null'); c = st && st.card; } catch (e) { c = null; }
@@ -689,7 +739,7 @@
     var bar = function (lbl, v, farbe) { return zahl(v) ? '<span>' + lbl + '</span><span class="bahn"><i style="width:' + Math.max(2, Math.min(100, v)) + '%;--c:' + farbe + '"></i></span><b>' + Math.round(v) + ' / 100</b>' : ''; };
     var tr = zahl(c.trendRaw) ? Number(c.trendRaw) : null;
     host.innerHTML = '<h5>Wohin es läuft · Lage laut Marktbewertung</h5><div class="dp-pa4-hb">'
-      + bar('Mikrolage', c.microRaw, C.c1) + bar('Makrolage', c.macroRaw, C.c1)
+      + bar('Mikrolage', c.microRaw, C.gold) + bar('Makrolage', c.macroRaw, C.gold)
       + (tr != null ? '<span>Preistrend</span><span style="font:500 12px Inter,sans-serif;color:' + (tr >= 0 ? '#2E7D50' : '#B8625C') + '">' + (tr >= 0 ? '▲ steigend' : '▼ fallend') + '</span><b>' + (tr > 0 ? '+' : '') + de(tr, 1) + ' %</b>' : '')
       + '</div>';
   }
