@@ -2539,6 +2539,25 @@
         (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') +
         (window.DpEingang ? '<option value="rechnung"' + (f.type === 'rechnung' ? ' selected' : '') + '>Rechnung / Beleg</option>' : '') + '</select>' +
       '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'gesperrt' ? 'persönlich · nicht ausgelesen' : f.status === 'err' ? (f.fehler || 'kein Text') : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung · Werbungskosten' : 'Exposé')) + '</span>';
+    /* v3154 · Prüfansicht je Datei (Bild links, gelesene Werte rechts) und Warnung, wenn nichts kam */
+    if (f.status !== 'reading' && window.DpEingang && window.DpEingang.vorschau) {
+      var _leer = f.status !== 'ok' || !_hatWerte(f);
+      if (_leer && f.status === 'ok') {
+        var _w = document.createElement('span'); _w.className = 'oabi-nichts';
+        _w.setAttribute('style', 'color:#B8625C;font-weight:600;font-size:12px;margin-left:6px');
+        _w.textContent = '⚠ nichts gelesen'; _w.title = 'Aus dieser Datei kam kein Wert. Typ umstellen, schärferes Bild verwenden oder von Hand eintragen.';
+        f.row.appendChild(_w);
+      }
+      if (f.file) {
+        var _ans = document.createElement('button'); _ans.type = 'button'; _ans.className = 'oabi-einzeln';
+        _ans.textContent = 'Ansehen'; _ans.title = 'Datei und gelesene Werte nebeneinander';
+        _ans.addEventListener('click', function () {
+          window.DpEingang.vorschau({ titel: f.name, datei: f.file, werte: _werteAus(f),
+            warnung: f.type === 'rechnung' ? 'Rechnung: die Beträge liest der Beleg-Leser („Belege auslesen"), dort mit eigener Prüfansicht.' : (_leer ? null : '') });
+        });
+        f.row.appendChild(_ans);
+      }
+    }
     /* v3093a · N106 · Foto-Gruppe wieder auflösen */
     if (f.fotos && f.fotos.length > 1 && f.seitenTexte && f.status !== 'reading') {
       var _tr = document.createElement('button'); _tr.type = 'button'; _tr.className = 'oabi-einzeln';
@@ -2886,14 +2905,49 @@
      Jetzt liegt der ganze Rumpf in try/finally: was beim Schreiben
      schiefgeht, kostet dieses eine Feld - nicht den Rest des Ablaufs.
      Ein Rueckruf, an dem eine Kette haengt, gehoert in ein finally. */
+  /* v3154 · die gelesenen Werte einer Datei als Liste [Wort, Wert] für die Prüfansicht */
+  function _werteAus(f) {
+    var c = f && f.cache && f.cache[f.type], out = [];
+    if (!c || f.type === 'rechnung') return out;
+    var lauf = function (o, tiefe) {
+      Object.keys(o || {}).forEach(function (k) {
+        if (out.length >= 60 || /^(success|error|diag|hinweis|gesperrt|unklar|_.*)$/.test(k)) return;
+        var v = o[k];
+        if (v == null || v === '' || v === false) return;
+        if (typeof v === 'object') { if (!Array.isArray(v) && tiefe < 1) lauf(v, tiefe + 1); else if (Array.isArray(v) && v.length) out.push([k.replace(/_/g, ' '), v.length + ' Einträge']); return; }
+        out.push([k.replace(/_/g, ' '), String(v).slice(0, 160)]);
+      });
+    };
+    lauf(c, 0);
+    return out;
+  }
+  /* v3154 · hat eine Datei überhaupt einen Wert geliefert? (Warnung „nichts gelesen" im Prüf-Fenster und im Verlauf) */
+  function _hatWerte(f) {
+    var c = f && f.cache && f.cache[f.type];
+    if (!c) return false;
+    if (f.type === 'rechnung') return true;            /* geht an den Beleg-Leser, der warnt selbst */
+    if (f.type === 'dokument') return !!c.success;
+    return Object.keys(c).some(function (k) {
+      if (/^(success|error|diag|hinweis|_.*)$/.test(k)) return false;
+      var v = c[k];
+      if (v == null || v === '' || v === false) return false;
+      if (Array.isArray(v)) return v.length > 0;
+      if (typeof v === 'object') return Object.keys(v).length > 0;
+      return true;
+    });
+  }
   function applyMerged() {
     var ov = $('oabi-ov'); if (!ov) return;
     if (_qcMode) { return applyMergedQc(ov); }  /* v418 */
     var n = 0, _applied = [], _san = '', _folgen = '';
+    var _E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null;   /* v3154 · Änderungen merken für „Zurücknehmen" */
+    if (_E) _E.txStart();
     try {
     ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
       var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it) return;
+      var _vor = _E ? _E.feldStand(id) : null;
       var _art = _wertSchreiben(id, it);
+      if (_art && _E) { try { _E.feldGeaendert(id, _vor, it); } catch (e) {} }
       if (_art) {
         if (_art === "text" && id === "svwert" && it.source === "Marktbericht") markSvwertAvm();
         n++; _applied.push(id);
@@ -2913,7 +2967,11 @@
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
     /* v3120 · Verlauf im Reiter Unterlagen & WEG: was wann eingelesen und übernommen wurde */
     try {
+      var _aend = _E ? _E.txEnde() : [];
+      /* v3154 · Dateien, aus denen nichts kam (Fehler, gesperrt, kein Wert): im Verlauf als Warnung */
+      var _ohne = _files.filter(function (f) { return f.status !== 'ok' || (f.type !== 'rechnung' && !_hatWerte(f)); }).map(function (f) { return f.name; });
       if (window.DpEingang) window.DpEingang.protokoll({
+        aenderungen: _aend, nicht_gelesen: _ohne, quelle: 'Eingang',
         dokumente: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé' }; }),
         uebernommen: _applied.map(function (id) { var x = _merged[id]; return x ? (x.label + ': ' + String(x.value).slice(0, 120)) : id; })
       });

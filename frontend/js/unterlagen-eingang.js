@@ -70,7 +70,11 @@
     if (NICHT.test(t.slice(0, 2500)) || NICHT.test(n)) return false;
     var treffer = 0;
     [/rechnungs\s*-?\s*(nummer|nr\.?|datum)/i, /\brechnung\b/i, /quittung|betrag dankend erhalten/i, /zahlbar (bis|innerhalb)|zahlungsziel|f(ä|ae)llig am/i,
-     /ust\.?-?\s*id|steuer-?nr|umsatzsteuer|mwst|mehrwertsteuer|19\s*%/i, /grundsteuerbescheid|beitragsrechnung|versicherungsschein/i].forEach(function (r) { if (r.test(t)) treffer++; });
+     /ust\.?-?\s*id|steuer-?nr|umsatzsteuer|mwst|mehrwertsteuer|19\s*%/i, /grundsteuerbescheid|beitragsrechnung|versicherungsschein/i,
+     /* v3154 · gemessen an einer zweisprachigen Hotelrechnung („Invoice No.", „VAT", „Gross EUR"): kam nur auf 2 Treffer
+        und lief als Exposé durch - nichts übernommen. Englische Merkmale und der Rechnungsbetrag zählen mit. */
+     /invoice\s*(no|number|date|nr)|\bvat\b|gross\s*(eur|amount)|net\s*(eur|amount)|amount\s*due|total\s*(eur|amount|due)/i,
+     /(rechnungs|gesamt|end|zahl)betrag|betrag:?\s*(eur|€)|summe\s*brutto|bruttobetrag/i].forEach(function (r) { if (r.test(t)) treffer++; });
     if (/rechnung|quittung|beleg|invoice/i.test(n)) treffer++;
     if (/quittung|betrag dankend erhalten/i.test(t)) treffer++;   /* v3120c · eine Quittung ist eindeutig - gemessen: Schornsteinfeger-Quittung kam nur auf 2 */
     return treffer >= 3;
@@ -168,10 +172,14 @@
     if (!zahl(e.wfl)) setz('wfl', zahl(ext.wohnflaeche_m2));
     if (!zahl(e.zimmer)) setz('zimmer', zahl(ext.zimmer));
     /* Gesamtmiete des Objekts nachziehen - dieselbe Summe wie „Einheiten erfassen" */
+    var nkVor = feldStand('nkm');   /* v3154 */
     try {
       var M = window.DpMfhEinheiten, s = M && M._summe ? M._summe(E) : null, nk = el('nkm');
       if (s && s.ist > 0 && nk) { nk.value = String(Math.round(s.ist * 100) / 100).replace('.', ','); nk.dispatchEvent(new Event('input', { bubbles: true })); }
     } catch (x) {}
+    txMerk({ t: 'einheit', i: i, label: 'Mietvertrag → ' + einheitName(e, i), vor: alt, nach: JSON.parse(JSON.stringify(e)) });
+    var nkE = el('nkm');
+    if (nkVor && nkE && feldWert(nkE) !== nkVor.wert) txMerk({ t: 'feld', id: 'nkm', label: 'Nettokaltmiete', vor: nkVor.wert, nach: feldWert(nkE) });
     var o = lesen();
     o.einheiten_aenderungen = (Array.isArray(o.einheiten_aenderungen) ? o.einheiten_aenderungen : []).concat([{ am: heute, einheit: einheitName(e, i), quelle: quelle || 'Mietvertrag',
       vorher: { ist: alt.ist || '', mv_art: alt.mv_art || '', mv_beginn: alt.mv_beginn || '' } }]).slice(-50);
@@ -194,10 +202,56 @@
     } else return;
     schreiben(o);
   }
+  /* ── v3154 · Änderungen eines Imports merken (für „Zurücknehmen" im Verlauf) ──────────────
+     Marcel 03.11.2026: „im Verlauf eingelesen und übernommen … wenn wir das löschen können und auch
+     zurücknehmen können". Jeder Import läuft als Vorgang: Steuerwerte (über _setYearOverride),
+     Formularfelder (object-actions.js) und Einheiten (mvUebernehmen) merken je vorher/nachher.
+     Zurückgenommen wird nur, was seitdem niemand geändert hat - sonst wird es benannt. */
+  var _tx = null;
+  function txStart() { _tx = []; }
+  function txMerk(a) {
+    if (!_tx || !a) return;
+    if (a.t === 'steuer') {
+      var d = _tx.filter(function (x) { return x.t === 'steuer' && x.jahr === a.jahr && x.feld === a.feld; })[0];
+      if (d) { d.nach = a.nach; return; }
+    }
+    if (a.t === 'feld') {
+      var d2 = _tx.filter(function (x) { return x.t === 'feld' && x.id === a.id; })[0];
+      if (d2) { d2.nach = a.nach; return; }
+    }
+    _tx.push(a);
+  }
+  function txEnde() { var t = _tx || []; _tx = null; return t; }
+  function feldWert(el) { return el.type === 'checkbox' ? !!el.checked : String(el.value == null ? '' : el.value); }
+  /** Stand eines Formularfelds vor dem Schreiben (object-actions.js) */
+  function feldStand(id) { var e = el(id); return e ? { wert: feldWert(e) } : null; }
+  var NICHT_ZURUECK = { sonderumlage: 'Sonderumlage', merken: 'Unterlagen-Auswertung', einheiten: 'Einheitenliste', star: 'Bewertung (Sterne)' };
+  /** Nach dem Schreiben: was hat sich geändert? kind steuer/mv_einheit merken ihre Hooks selbst. */
+  function feldGeaendert(id, vor, it) {
+    if (!_tx || !it) return;
+    if (it.kind === 'steuer' || it.kind === 'mv_einheit') return;
+    var e = el(id);
+    if (NICHT_ZURUECK[it.kind] || id === 'me_modus' || id === 'mfh_wohnungen' || !e || !vor) {
+      txMerk({ t: 'nicht', label: it.label || NICHT_ZURUECK[it.kind] || id }); return;
+    }
+    var nach = feldWert(e);
+    if (nach !== vor.wert) txMerk({ t: 'feld', id: id, label: it.label || id, vor: vor.wert, nach: nach });
+  }
+
   function einhaengen() {
     if (typeof window._setYearOverride === 'function' && !window._setYearOverride._dpEingang) {
       var orig = window._setYearOverride;
-      var neu = function (year, field, value) { var r = orig.apply(this, arguments); try { herkunftSetzen(year, field, value); } catch (e) {} return r; };
+      var neu = function (year, field, value) {
+        var ov = window._taxYearlyOverrides || {}, k = 'y' + year;
+        var vor = ov[k] && typeof ov[k][field] === 'number' ? ov[k][field] : null;
+        var r = orig.apply(this, arguments);
+        try { herkunftSetzen(year, field, value); } catch (e) {}
+        try {
+          var ov2 = window._taxYearlyOverrides || {}, nach = ov2[k] && typeof ov2[k][field] === 'number' ? ov2[k][field] : null;
+          if (_tx && vor !== nach) txMerk({ t: 'steuer', jahr: Number(year), feld: field, vor: vor, nach: nach });   /* v3154 */
+        } catch (e) {}
+        return r;
+      };
       neu._dpEingang = true; window._setYearOverride = neu;
     }
     if (typeof window.dpSteuerSetzen === 'function' && !window.dpSteuerSetzen._dpEingang) {
@@ -229,29 +283,162 @@
   function protokoll(e) {
     if (!e) return;
     var o = lesen();
-    o.verlauf = o.verlauf.concat([{ am: new Date().toISOString(), dokumente: (e.dokumente || []).slice(0, 30), uebernommen: (e.uebernommen || []).slice(0, 60) }]).slice(-50);
+    /* v3154 · je Eintrag eine Kennung, die gemerkten Änderungen (Zurücknehmen) und die Dateien, aus denen nichts kam */
+    var aend = Array.isArray(e.aenderungen) ? e.aenderungen : [];
+    o.verlauf = o.verlauf.concat([{ id: 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), am: new Date().toISOString(),
+      quelle: e.quelle || null, dokumente: (e.dokumente || []).slice(0, 30), uebernommen: (e.uebernommen || []).slice(0, 60),
+      nicht_gelesen: (e.nicht_gelesen || []).slice(0, 30), aenderungen: aend.slice(0, 200) }]).slice(-50);
     schreiben(o);
     /* v3120a · gemessen: der Reiter Unterlagen & WEG zeigte den Verlauf erst nach dem nächsten Zeichnen */
-    setTimeout(function () { try { if (typeof window._dpPaNeuZeichnen === 'function') window._dpPaNeuZeichnen(); } catch (x) {} }, 300);
+    setTimeout(neuZeichnen, 300);
+  }
+  function neuZeichnen() { try { if (typeof window._dpPaNeuZeichnen === 'function') window._dpPaNeuZeichnen(); } catch (x) {} }
+  function gleich(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function nahe(a, b) { return (a == null && b == null) || (a != null && b != null && Math.abs(Number(a) - Number(b)) < 0.005); }
+
+  /** v3154 · Einen Import zurücknehmen: jede gemerkte Änderung rückwärts, nur wo der Wert noch der übernommene ist. */
+  function zuruecknehmen(id) {
+    var o = lesen(), x = o.verlauf.filter(function (v) { return v.id === id; })[0];
+    if (!x || x.zurueck) return null;
+    var ok = 0, konflikt = [], nicht = [], steuer = false;
+    (x.aenderungen || []).slice().reverse().forEach(function (a) {
+      if (a.t === 'nicht') { nicht.push(a.label); return; }
+      if (a.t === 'feld') {
+        var e = el(a.id);
+        if (!e || feldWert(e) !== a.nach) { konflikt.push(a.label); return; }
+        if (e.type === 'checkbox') e.checked = !!a.vor; else e.value = a.vor;
+        try { e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } catch (y) {}
+        ok++; return;
+      }
+      if (a.t === 'steuer') {
+        var ov = window._taxYearlyOverrides || {}, k = 'y' + a.jahr, jetzt = ov[k] && typeof ov[k][a.feld] === 'number' ? ov[k][a.feld] : null;
+        if (!nahe(jetzt, a.nach) || typeof window._setYearOverride !== 'function') { konflikt.push(a.feld + ' ' + a.jahr); return; }
+        window._setYearOverride(a.jahr, a.feld, a.vor == null ? '' : a.vor);
+        steuer = true; ok++; return;
+      }
+      if (a.t === 'einheit') {
+        var m = window._dpMfh, E = m && m.einheiten;
+        if (!E || !E[a.i] || !gleich(E[a.i], a.nach)) { konflikt.push(a.label); return; }
+        var ziel = E[a.i];
+        Object.keys(ziel).forEach(function (kk) { delete ziel[kk]; });
+        Object.keys(a.vor || {}).forEach(function (kk) { ziel[kk] = a.vor[kk]; });
+        ok++;
+      }
+    });
+    if (steuer) {
+      ['renderYearlyTaxForm', 'renderTaxTimeline', 'renderTaxModule'].forEach(function (f) { try { if (typeof window[f] === 'function') window[f](); } catch (y) {} });
+    }
+    try { if (typeof window.calc === 'function') setTimeout(window.calc, 60); } catch (y) {}
+    o = lesen();
+    o.verlauf.forEach(function (v) { if (v.id === id) v.zurueck = { am: new Date().toISOString(), anzahl: ok, konflikt: konflikt, nicht: nicht }; });
+    schreiben(o);
+    setTimeout(neuZeichnen, 120);
+    var msg = ok + ' Wert(e) zurückgenommen.' + (konflikt.length ? ' Seitdem von Hand geändert, deshalb belassen: ' + konflikt.join(', ') + '.' : '')
+      + (nicht.length ? ' Nicht automatisch zurücknehmbar: ' + nicht.join(', ') + '.' : '');
+    try { if (window.toast) window.toast(msg); } catch (y) {}
+    return { anzahl: ok, konflikt: konflikt, nicht: nicht };
+  }
+  /** v3154 · Eintrag aus dem Verlauf löschen - die übernommenen Werte bleiben stehen. */
+  function eintragLoeschen(id) {
+    var o = lesen(), n = o.verlauf.length;
+    o.verlauf = o.verlauf.filter(function (v) { return v.id !== id; });
+    if (o.verlauf.length === n) return false;
+    schreiben(o); setTimeout(neuZeichnen, 120);
+    return true;
+  }
+  /* Zwei Klicks statt Bestätigungsfenster: der erste fragt im Knopf selbst nach */
+  function knopf(art, id, btn) {
+    if (!btn) return;
+    if (btn.getAttribute('data-sicher') !== '1') {
+      btn.setAttribute('data-sicher', '1');
+      btn.textContent = art === 'zurueck' ? 'Wirklich zurücknehmen?' : 'Wirklich löschen?';
+      setTimeout(function () { if (btn.isConnected && btn.getAttribute('data-sicher') === '1') { btn.removeAttribute('data-sicher'); btn.textContent = art === 'zurueck' ? 'Zurücknehmen' : 'Löschen'; } }, 5000);
+      return;
+    }
+    if (art === 'zurueck') zuruecknehmen(id); else eintragLoeschen(id);
+  }
+  /** Eintrag ohne Kennung (vor v3154) bekommt beim ersten Zeichnen eine - löschen geht dann auch dort */
+  function kennungenNachziehen(o) {
+    var neu = false;
+    o.verlauf.forEach(function (v, i) { if (!v.id) { v.id = 'a' + i + '-' + String(v.am || '').replace(/\D/g, '').slice(0, 14); neu = true; } });
+    return neu;
   }
   function verlaufHtml() {
-    var o = lesen(), v = o.verlauf.slice().reverse(), ae = (o.einheiten_aenderungen || []).slice().reverse();
+    var o = lesen();
+    if (kennungenNachziehen(o)) { var f0 = el('_dok_eingang'); if (f0) f0.value = JSON.stringify(o); }   /* still, ohne Speicher-Ereignis */
+    var v = o.verlauf.slice().reverse(), ae = (o.einheiten_aenderungen || []).slice().reverse();
     if (!v.length && !ae.length) return '';
     var datum = function (s) { try { return new Date(s).toLocaleDateString('de-DE'); } catch (x) { return ''; } };
-    var h = '<div style="overflow-x:auto"><table class="abw-tafel" style="min-width:520px"><thead><tr><th>Eingelesen</th><th>Unterlagen</th><th>Übernommen</th></tr></thead><tbody>'
+    var kb = 'font:600 11.5px/1 inherit;padding:5px 9px;border-radius:6px;cursor:pointer;margin:2px 0;white-space:nowrap;';
+    var h = '<div style="overflow-x:auto"><table class="abw-tafel" style="min-width:620px"><thead><tr><th>Eingelesen</th><th>Unterlagen</th><th>Übernommen</th><th></th></tr></thead><tbody>'
       + v.map(function (x) {
-        return '<tr><td class="abw-wort" style="white-space:nowrap">' + esc(datum(x.am)) + '</td><td>' + x.dokumente.map(function (d) { return esc((d.typ ? d.typ + ': ' : '') + d.name); }).join('<br>') + '</td>'
-          + '<td>' + (x.uebernommen.length ? x.uebernommen.map(esc).join('<br>') : '<i>nichts übernommen</i>') + '</td></tr>';
-      }).join('') + '</tbody></table></div>';
+        var ng = (x.nicht_gelesen || []).length
+          ? '<div style="margin-top:6px;color:#B8625C;font-weight:600">⚠ Nichts gelesen aus: ' + x.nicht_gelesen.map(esc).join(', ') + ' – bitte von Hand prüfen</div>' : '';
+        var zr = x.zurueck
+          ? '<div style="margin-top:6px;color:#8a7a55"><b>Zurückgenommen am ' + esc(datum(x.zurueck.am)) + '</b> (' + x.zurueck.anzahl + ' Wert(e))'
+            + (x.zurueck.konflikt && x.zurueck.konflikt.length ? ' · belassen, weil seitdem geändert: ' + x.zurueck.konflikt.map(esc).join(', ') : '')
+            + (x.zurueck.nicht && x.zurueck.nicht.length ? ' · nicht automatisch: ' + x.zurueck.nicht.map(esc).join(', ') : '') + '</div>' : '';
+        var kannZurueck = !x.zurueck && (x.aenderungen || []).some(function (a) { return a.t !== 'nicht'; });
+        var aktion = (kannZurueck ? '<button type="button" style="' + kb + 'border:1px solid var(--wl-c9a84c,#C9A84C);background:transparent;color:inherit" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)">Zurücknehmen</button><br>' : '')
+          + '<button type="button" style="' + kb + 'border:1px solid rgba(184,98,92,.55);background:transparent;color:#B8625C" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag aus dem Verlauf entfernen - übernommene Werte bleiben">Löschen</button>';
+        return '<tr' + (x.zurueck ? ' style="opacity:.6"' : '') + '><td class="abw-wort" style="white-space:nowrap">' + esc(datum(x.am)) + '</td><td>' + x.dokumente.map(function (d) { return esc((d.typ ? d.typ + ': ' : '') + d.name); }).join('<br>') + ng + '</td>'
+          + '<td>' + (x.uebernommen.length ? x.uebernommen.map(esc).join('<br>') : '<i>nichts übernommen</i>') + zr + '</td><td style="text-align:right">' + aktion + '</td></tr>';
+      }).join('') + '</tbody></table></div>'
+      + '<p class="dp-pa-p" style="margin-top:6px;font-size:12px;opacity:.75">Zurücknehmen setzt die übernommenen Werte auf den Stand davor – nur dort, wo seitdem niemand etwas geändert hat. Löschen entfernt nur den Eintrag; die Werte bleiben.</p>';
     if (ae.length) h += '<p class="dp-pa-p" style="margin-top:10px"><b>Mietverträge den Einheiten zugeordnet:</b> ' + ae.map(function (a) { return esc(a.einheit) + ' (' + esc(datum(a.am)) + ', vorher ' + (a.vorher.ist ? esc(a.vorher.ist) + ' €' : '–') + ')'; }).join(' · ') + '</p>';
     return h;
+  }
+
+  /* ── v3154 · PRÜFANSICHT: links das eingescannte Bild, rechts die gelesenen Werte ─────────────
+     Marcel 03.11.2026: „dass man immer das eingescannte Bild sieht und daneben auch die eingelesenen
+     Werte … wenn er da keine Werte übernehmen kann, müssen wir natürlich davor warnen."
+     opts = { titel, bilder: [dataURL] | null, datei: File | null, werte: [[Wort, Wert]], warnung, hinweise: [] }
+     Die Bilder bleiben im Browser (nichts wird gespeichert oder verschickt). */
+  function vorschau(opts) {
+    opts = opts || {};
+    var alt = el('dp-eg-vorschau'); if (alt) alt.remove();
+    var ov = document.createElement('div');
+    ov.id = 'dp-eg-vorschau';
+    ov.setAttribute('style', 'position:fixed;inset:0;z-index:100060;background:rgba(5,5,5,.72);display:flex;align-items:center;justify-content:center;padding:16px');
+    var werte = (opts.werte || []).filter(function (w) { return w && w[1] != null && String(w[1]).trim() !== ''; });
+    var warn = opts.warnung || (!werte.length ? 'Aus dieser Datei konnte nichts gelesen werden. Bitte die Werte von Hand eintragen oder ein schärferes Bild verwenden.' : '');
+    ov.innerHTML = '<div style="background:var(--surface,#FDFCFA);color:var(--text,#2A2727);border-radius:14px;max-width:1180px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
+      + '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--wl-c9a84c,#C9A84C)"><b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(opts.titel || 'Beleg') + '</b>'
+      + '<button type="button" data-zu style="border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:inherit" aria-label="Schließen">×</button></div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:16px;padding:16px;overflow:auto">'
+      + '<div data-bilder style="flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:10px;background:#efece4;border-radius:8px;padding:8px;min-height:200px;align-items:center;justify-content:flex-start"><span style="opacity:.6;padding:30px">Bild wird geladen …</span></div>'
+      + '<div style="flex:1 1 300px;min-width:0">'
+      + (warn ? '<div style="margin-bottom:12px;padding:10px 12px;border-radius:8px;background:rgba(184,98,92,.12);border:1px solid rgba(184,98,92,.5);color:#B8625C;font-weight:600">⚠ ' + esc(warn) + '</div>' : '')
+      + (opts.hinweise && opts.hinweise.length ? '<div style="margin-bottom:12px;padding:10px 12px;border-radius:8px;background:rgba(0,0,0,.04);border:1px solid var(--wl-c9a84c,#C9A84C)"><b>Bitte prüfen:</b><br>' + opts.hinweise.map(esc).join('<br>') + '</div>' : '')
+      + (werte.length ? '<table style="width:100%;border-collapse:collapse;font-size:13.5px">' + werte.map(function (w) {
+          return '<tr><td style="padding:6px 8px 6px 0;border-bottom:1px solid rgba(0,0,0,.07);opacity:.75;vertical-align:top">' + esc(w[0]) + '</td><td style="padding:6px 0;border-bottom:1px solid rgba(0,0,0,.07);font-weight:600;text-align:right">' + esc(w[1]) + '</td></tr>';
+        }).join('') + '</table>' : '')
+      + '<p style="font-size:12px;opacity:.65;margin-top:12px">Links die Datei, rechts was daraus gelesen wurde. Stimmt etwas nicht, die Zeile abwählen oder den Wert nach der Übernahme von Hand korrigieren.</p>'
+      + '</div></div></div>';
+    document.body.appendChild(ov);
+    var zu = function () { try { ov.remove(); } catch (e) {} document.removeEventListener('keydown', esc1); };
+    var esc1 = function (e) { if (e.key === 'Escape') zu(); };
+    document.addEventListener('keydown', esc1);
+    ov.addEventListener('click', function (e) { if (e.target === ov || (e.target.hasAttribute && e.target.hasAttribute('data-zu'))) zu(); });
+    var box = ov.querySelector('[data-bilder]');
+    var zeige = function (b) {
+      if (!b || !b.length) { box.innerHTML = '<span style="opacity:.6;padding:30px">Keine Bildansicht für diese Datei.</span>'; return; }
+      box.innerHTML = b.slice(0, 12).map(function (src, i) { return '<img alt="Seite ' + (i + 1) + '" src="' + src + '" style="max-width:100%;height:auto;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#fff">'; }).join('');
+    };
+    if (opts.bilder) zeige(opts.bilder);
+    else if (opts.datei && window.DealPilotBelegImport && typeof window.DealPilotBelegImport.bilder === 'function') {
+      window.DealPilotBelegImport.bilder(opts.datei).then(zeige, function () { zeige(null); });
+    } else zeige(null);
+    return ov;
   }
 
   /* tax.js, beleg-import.js und object-actions.js laden vor dieser Datei; sicherheitshalber auch später */
   einhaengen();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', einhaengen); else setTimeout(einhaengen, 0);
 
-  window.DpEingang = { VERSION: 'v3120', oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v3154', oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen,
-    jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen };
+    jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
+    /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
+    zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, knopf: knopf, vorschau: vorschau };
 })();

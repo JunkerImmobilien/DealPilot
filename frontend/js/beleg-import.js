@@ -18,6 +18,10 @@
   var MAX_PAGES    = 30;   // Seiten pro PDF (jede Seite = 1 Vision-Call, backend-seitig aggregiert)
   var _pdfjsLoaded = false;
   var _rows        = [];   // [{name, datum, netto, ust, brutto, aussteller, kategorie, konfidenz, keep}]
+  /* v3154 · Prüfansicht: die gerenderten Seiten je Datei (nur im Browser, nur für dieses Fenster) und die
+     Dateien, aus denen nichts kam - die stehen jetzt als rote Zeile in der Liste statt in einem Nebensatz. */
+  var _bilder      = {};
+  var _leer        = [];   // [{name, grund}]
 
   var KAT = ['Notar & Grundbuch', 'Maklergebühr', 'Grunderwerbsteuer', 'Fahrtkosten',
              'Verpflegung', 'Unterkunft', 'Gutachten', 'Anwalt',
@@ -383,7 +387,7 @@
     if (scan) scan.classList.add('on');
     var setT = function (s) { var e = document.getElementById('bi-scan-t'); if (e) e.textContent = s; };
 
-    _rows = []; var docCount = 0; var leer = []; var skipped = [];
+    _rows = []; _bilder = {}; _leer = []; var docCount = 0; var leer = []; var skipped = [];
 
     // 1) CSV/Excel lokal parsen — KEINE KI, KEIN Kerosin
     for (var i = 0; i < tableFiles.length; i++) {
@@ -402,7 +406,7 @@
         setT('Belege werden vorbereitet … (' + (j + 1) + '/' + aiFiles.length + ')');
         try {
           var imgs = await _fileToImages(aiFiles[j]);
-          if (imgs.length) belege.push({ name: aiFiles[j].name, images: imgs });
+          if (imgs.length) { belege.push({ name: aiFiles[j].name, images: imgs }); _bilder[aiFiles[j].name] = imgs; }
           else skipped.push(aiFiles[j].name);
         } catch (e) { skipped.push(aiFiles[j].name); }
       }
@@ -418,25 +422,51 @@
           else if (!resp.ok) { belege.forEach(function (b) { leer.push(b.name + ' (Fehler ' + resp.status + ')'); }); }
           else {
             var res = await resp.json();
+            var nochmal = [];
             (res && res.results || []).forEach(function (r) {
               var poss = Array.isArray(r.positionen) ? r.positionen : (r.data ? [r.data] : []);
               if (poss.length) { docCount++; _pushPositions(r.name, poss); }
-              else leer.push(r.name + (r.diag ? ' (' + r.diag + ')' : (r.error ? ' (' + r.error + ')' : '')));
+              else nochmal.push(r);
             });
+            /* v3154 · SICHERHEITSSCHLEIFE: was im Sammellauf nichts ergab, wird einmal EINZELN neu gelesen
+               (eigener Abruf, volle Aufmerksamkeit für diese eine Datei). Erst danach gilt es als unlesbar. */
+            for (var q = 0; q < nochmal.length; q++) {
+              var r0 = nochmal[q], b0 = q < 5 ? belege.filter(function (b) { return b.name === r0.name; })[0] : null;   /* höchstens 5 Zweitversuche je Lauf (Grenze 30 Abrufe je Stunde) */
+              var poss2 = [];
+              if (b0) {
+                setT('Zweiter Leseversuch: ' + r0.name + ' (' + (q + 1) + '/' + nochmal.length + ')');
+                try {
+                  var resp2 = await fetch('/api/v1/ai/extract-beleg', { method: 'POST', headers: _hdrs(), body: JSON.stringify({ belege: [b0], modus: _modus, einzeln: true }) });
+                  if (resp2.ok) {
+                    var res2 = await resp2.json(), x2 = res2 && res2.results && res2.results[0];
+                    if (x2) poss2 = Array.isArray(x2.positionen) ? x2.positionen : (x2.data ? [x2.data] : []);
+                    if (!poss2.length && x2) r0 = x2;
+                  }
+                } catch (e2) {}
+              }
+              if (poss2.length) {
+                docCount++; var vorher = _rows.length; _pushPositions(r0.name, poss2);
+                for (var z = vorher; z < _rows.length; z++) _rows[z].zweiter = true;
+              } else leer.push(r0.name + (r0.diag ? ' (' + r0.diag + ')' : (r0.error ? ' (' + r0.error + ')' : '')));
+            }
           }
         } catch (e) { belege.forEach(function (b) { leer.push(b.name + ' (Netzwerkfehler)'); }); }
       }
     }
 
     _flagRows();
+    _pruefen();
     var ohne = skipped.map(function (n) { return n + ' (nicht renderbar)'; }).concat(leer);
+    _leer = ohne.map(function (t) { var m = t.match(/^(.*?) \((.*)\)$/); return m ? { name: m[1], grund: m[2] } : { name: t, grund: '' }; });
     var nDup = _rows.filter(function (r) { return r.dup; }).length;
     var nJunk = _rows.filter(function (r) { return r.junk; }).length;
     var note = document.getElementById('bi-note');
     if (note) {
       var t = docCount + ' Datei(en) gelesen · ' + _rows.length + ' Position(en) erkannt. Prüfe jede Zeile, bevor du übernimmst.';
       if (nDup || nJunk) t += ' ' + nDup + ' doppelt und ' + nJunk + ' ohne Wert automatisch abgewählt.';
-      if (ohne.length) t += ' Ohne Ergebnis: ' + ohne.join(', ') + '.';
+      if (ohne.length) t += ' ' + ohne.length + ' Datei(en) ohne Ergebnis – rot markiert, sie werden NICHT übernommen.';
+      var nPr = _rows.filter(function (r) { return r.pruefen && r.pruefen.length; }).length;
+      if (nPr) t += ' ' + nPr + ' Zeile(n) mit „prüfen" – Bild und Werte über das Vorschaubild vergleichen.';
       note.textContent = t;
     }
     if (!_rows.length && scan) { setT('Nichts erkannt.'); }
@@ -533,12 +563,24 @@
   function _render() {
     var box = document.getElementById('bi-review');
     if (!box) return;
-    if (!_rows.length) { box.innerHTML = '<p style="color:#a4443d">Keine Belege gelesen.</p>'; return; }
+    var leerZeilen = _leer.map(function (x, k) {
+      return '<tr class="bi-leer" style="background:rgba(184,98,92,.10)"><td></td><td>' + _mini(x.name, 'DealPilotBelegImport._ansehenLeer(' + k + ')') + '</td>'
+        + '<td colspan="8" style="color:#B8625C;font-weight:600">⚠ ' + _esc(x.name) + ' – nichts gelesen' + (x.grund ? ' (' + _esc(x.grund) + ')' : '')
+        + '<div style="font-weight:400;font-size:11.5px">Auch der zweite Leseversuch ergab keinen Betrag. Diese Datei wird nicht übernommen – bitte ansehen und von Hand eintragen.</div></td></tr>';
+    }).join('');
+    var leerBanner = _leer.length ? '<div style="margin:0 0 10px;padding:10px 12px;border-radius:8px;background:rgba(184,98,92,.10);border:1px solid rgba(184,98,92,.5);color:#B8625C;font-weight:600">⚠ '
+      + _leer.length + ' Datei(en) konnten nicht gelesen werden und werden nicht übernommen. Sie stehen rot unten in der Liste.</div>' : '';
+    if (!_rows.length) {
+      box.innerHTML = leerBanner + (leerZeilen ? '<table><tbody>' + leerZeilen + '</tbody></table>' : '<p style="color:#a4443d">Keine Belege gelesen.</p>');
+      return;
+    }
     var opts = function (sel) { return _katListe().map(function (k) { return '<option' + (k === sel ? ' selected' : '') + '>' + _esc(k) + '</option>'; }).join(''); };
     var body = _rows.map(function (r, i) {
       return '<tr' + (r.keep ? '' : ' class="off"') + ' data-i="' + i + '">' +
         '<td><input type="checkbox"' + (r.keep ? ' checked' : '') + ' onchange="DealPilotBelegImport._keep(' + i + ',this.checked)"></td>' +
-        '<td>' + _esc(r.name) + (r.teil ? ' <span style="color:#b39a4e">#' + r.teil + '/' + r.teilvon + '</span>' : '') +
+        '<td>' + _mini(r.name, 'DealPilotBelegImport._ansehen(' + i + ')') + '</td>' +
+        '<td>' + _esc(r.name) +
+          (r.pruefen && r.pruefen.length ? ' <span title="' + _esc(r.pruefen.join(' · ')) + '" style="background:var(--wl-c9a84c,#C9A84C);color:#2A2727;padding:0 6px;border-radius:10px;font-size:10px;font-weight:700;cursor:help">prüfen</span>' : '') + (r.teil ? ' <span style="color:#b39a4e">#' + r.teil + '/' + r.teilvon + '</span>' : '') +
           (r.dup ? ' <span style="background:#B8625C;color:#fff;padding:0 6px;border-radius:10px;font-size:10px;font-weight:600">doppelt</span>' : '') +
           (r.junk ? ' <span style="background:#9a9a9a;color:#fff;padding:0 6px;border-radius:10px;font-size:10px;font-weight:600">ignoriert</span>' : '') +
           (r.beschreibung ? '<div style="font-size:11px;color:#999">' + _esc(r.beschreibung) + '</div>' : '') + '</td>' +
@@ -551,9 +593,9 @@
         '<td><span class="bi-conf ' + _confClass(r.konfidenz) + '">' + _esc(r.konfidenz) + '</span></td>' +
       '</tr>';
     }).join('');
-    box.innerHTML =
-      '<table><thead><tr><th></th><th>Datei</th><th>Datum</th><th>Netto</th><th>USt</th><th>Brutto</th><th>Aussteller</th><th>Kategorie</th><th>Konfidenz</th></tr></thead>' +
-      '<tbody>' + body + '</tbody></table>' +
+    box.innerHTML = leerBanner +
+      '<table><thead><tr><th></th><th>Bild</th><th>Datei</th><th>Datum</th><th>Netto</th><th>USt</th><th>Brutto</th><th>Aussteller</th><th>Kategorie</th><th>Konfidenz</th></tr></thead>' +
+      '<tbody>' + body + leerZeilen + '</tbody></table>' +
       '<div class="bi-sums" id="bi-sums"></div>' +
       '<div id="bi-ampel"></div>';
     var take = document.getElementById('bi-take');
@@ -568,6 +610,49 @@
 
   /* Dubletten (gleiches Datum + Brutto) und Muell/0-/Summenzeilen automatisch
      markieren und abwaehlen (keep=false). Nutzer kann jederzeit wieder anhaken. */
+  /* v3154 · PRÜFSCHLEIFE je Zeile: was nicht zusammenpasst, wird benannt (Pille „prüfen"); ohne Betrag oder
+     ohne Jahr wird die Zeile abgewählt, weil sie nicht richtig landen kann. Nichts wird still korrigiert. */
+  function _pruefen() {
+    _rows.forEach(function (r) {
+      var g = [];
+      if (!(r.brutto > 0)) g.push('kein Betrag erkannt');
+      if (r.netto > 0 && r.ust >= 0 && r.brutto > 0 && Math.abs(r.netto + r.ust - r.brutto) > Math.max(1, r.brutto * 0.01)) g.push('Netto + USt ergibt nicht den Bruttobetrag');
+      var d = String(r.datum || '').trim();
+      if (!d || d === '—' || !/\d/.test(d)) g.push('kein Rechnungsdatum erkannt');
+      if (!r.jahr) g.push('kein Jahr erkannt – bitte Datum prüfen');
+      if (!r.aussteller || r.aussteller === '—') g.push('kein Aussteller erkannt');
+      if (/nied|low/i.test(String(r.konfidenz || ''))) g.push('die Lesung war unsicher');
+      if (r.brutto > 25000) g.push('ungewöhnlich hoher Betrag');
+      if (r.zweiter) g.push('erst im zweiten Leseversuch erkannt');
+      r.pruefen = g;
+      if (!r.jahr && _modus === 'wk') r.keep = false;
+    });
+  }
+  function _werteZeile(r) {
+    return [['Datum', r.datum], ['Jahr', r.jahr || '–'], ['Aussteller', r.aussteller], ['Beschreibung', r.beschreibung],
+      ['Netto', _fmtEur(r.netto) + ' €'], ['USt', _fmtEur(r.ust) + ' €'], ['Brutto', _fmtEur(r.brutto) + ' €'], ['Kategorie', r.kategorie], ['Sicherheit der Lesung', r.konfidenz]];
+  }
+  function _ansehen(i) {
+    var r = _rows[i]; if (!r || !window.DpEingang || !window.DpEingang.vorschau) return;
+    var alle = _rows.filter(function (x) { return x.name === r.name; }), werte = [];
+    alle.forEach(function (x, k) {
+      if (alle.length > 1) werte.push(['— Position ' + (k + 1) + ' von ' + alle.length + (x.keep ? '' : ' (abgewählt)'), ' ']);
+      werte = werte.concat(_werteZeile(x));
+    });
+    var h = []; alle.forEach(function (x) { (x.pruefen || []).forEach(function (g) { if (h.indexOf(g) < 0) h.push(g); }); });
+    window.DpEingang.vorschau({ titel: r.name, bilder: _bilder[r.name] || null, werte: werte, hinweise: h });
+  }
+  function _ansehenLeer(k) {
+    var x = _leer[k]; if (!x || !window.DpEingang || !window.DpEingang.vorschau) return;
+    window.DpEingang.vorschau({ titel: x.name, bilder: _bilder[x.name] || null, werte: [],
+      warnung: 'Aus dieser Datei konnte auch im zweiten Versuch nichts gelesen werden' + (x.grund ? ' (' + x.grund + ')' : '') + '. Sie wird nicht übernommen – bitte die Beträge von Hand im Reiter Steuer eintragen.' });
+  }
+  function _mini(name, onclick) {
+    var b = _bilder[name];
+    return b && b[0] ? '<img src="' + b[0] + '" alt="" title="Ansehen: Bild und gelesene Werte" onclick="' + onclick + '" style="width:38px;height:50px;object-fit:cover;object-position:top;border-radius:3px;border:1px solid #ddd;cursor:zoom-in;background:#fff;display:block">'
+      : '<button type="button" onclick="' + onclick + '" style="font-size:11px;padding:3px 6px;cursor:pointer">Ansehen</button>';
+  }
+
   function _flagRows() {
     var seen = {};
     _rows.forEach(function (r) {
@@ -770,14 +855,26 @@
       + (fremd.length ? '\n\nACHTUNG: Für ' + fremd.join(', ') + ' führt dieser Objekt-Tab kein Jahr. '
                         + 'Der Wert wird trotzdem hinterlegt, ist aber erst sichtbar, wenn der '
                         + 'Betrachtungszeitraum so weit reicht.' : '')
+      + (_leer.length ? '\n\nNICHT gelesen und nicht übernommen: ' + _leer.map(function (x) { return x.name; }).join(', ') : '')
+      + (function () { var p = _rows.filter(function (r) { return r.keep && r.pruefen && r.pruefen.length; }).length; return p ? '\n\n' + p + ' ausgewählte Zeile(n) tragen den Hinweis „prüfen".' : ''; })()
       + '\n\nOK = übernehmen (addieren)\nAbbrechen = nichts tun';
     if (!window.confirm(text)) return;
 
     var n = 0, jahreOk = [];
+    var _E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null;   /* v3154 · für „Zurücknehmen" */
+    if (_E) _E.txStart();
     jahre.forEach(function (j) {
       var r = window.dpWkUebernehmen(parseInt(j, 10), jeJahr[j], 'add');
       if (r && r.ok) { n += r.anzahl; jahreOk.push(j); }
     });
+    try {
+      var _aend = _E ? _E.txEnde() : [];
+      var _gen = {}; _rows.forEach(function (r) { if (r.keep && r.brutto > 0 && r.jahr) _gen[r.name] = true; });
+      if (_E) _E.protokoll({ quelle: 'Belege', aenderungen: _aend,
+        dokumente: Object.keys(_gen).map(function (nm) { return { name: nm, typ: 'Beleg' }; }),
+        uebernommen: jahreOk.sort().map(function (j) { var f = jeJahr[j]; return 'Steuer ' + j + ': ' + Object.keys(f).map(function (k) { return (LABELS_WK[k] || k) + ' +' + _fmtEur(f[k]) + ' €'; }).join(' · '); }),
+        nicht_gelesen: _leer.map(function (x) { return x.name; }) });
+    } catch (e) {}
 
     var meld = n + ' Position(en) in ' + jahreOk.length + ' Jahr(en) übernommen.';
     if (nichtAbsetzbar) {
@@ -818,6 +915,7 @@
     open: open, close: close, apply: apply, csv: csv,
     /* v3120 · der gemeinsame Eingang (unterlagen-eingang.js) übergibt erkannte Rechnungen direkt */
     oeffnenMit: function (files, modus) { open(modus || 'wk'); if (files && files.length) setTimeout(function () { _onPick(files); }, 50); },
-    _keep: _keep, _kat: _kat
+    _keep: _keep, _kat: _kat,
+    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer
   };
 })();
