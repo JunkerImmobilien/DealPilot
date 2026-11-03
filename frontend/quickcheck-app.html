@@ -7142,6 +7142,7 @@ function renderTransferList() {
     showToast('Neuer Vorgang \u2014 alles zur\u00fcckgesetzt');
   }
   function showToast(msg, dauer) {
+    document.querySelectorAll('.toast').forEach(function (x) { x.remove(); });   /* v3098 · eine Meldung zur Zeit */
     const t = document.createElement('div');
     t.className = 'toast';
     t.textContent = msg;
@@ -7649,7 +7650,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
   <script src="js/marktwert-abschlag.js?v=v3043"></script><!-- v2237 -->
-  <script src="js/dealpilot-mb-qc.js?v=v3098"></script>
+  <script src="js/dealpilot-mb-qc.js?v=v3098a"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">

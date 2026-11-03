@@ -59,6 +59,7 @@ if (!window._wlc) {
     try { if (typeof global.toast === 'function') return global.toast(m); } catch (e) {}
     try { console.log('[dp-mb]', m); } catch (e) {}
     try {
+      document.querySelectorAll('.toast').forEach(function (x) { x.remove(); });   /* eine Meldung zur Zeit */
       var t = document.createElement('div');
       t.className = 'toast'; t.textContent = m; t.setAttribute('role', 'status');
       document.body.appendChild(t);
