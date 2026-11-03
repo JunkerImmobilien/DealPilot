@@ -44295,3 +44295,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `b839d89f`, `f3e2c735`, `4b7b0174`, `d6dbe500`, `d84f1b0c`, dazu Konstanten/Handbuch; Staging per git pull. **Nicht Prod.**
 - **Nachweis:** Parkstr. 9 mit Lindenallee-Verträgen 11/12/13 und Wirtschaftsplan 2026: Zuordnung WE 1 → Whg. 1, WE 3 → Whg. 3 (sicher), WE 6 unsicher und ohne Wahl nicht übernommen; Objektmiete = Summe der Einheiten; Herkunft gesetzt und von Hand gelöscht; Verlauf im Reiter; Objekt nicht gespeichert, Server-Stand danach unverändert. Prüfer: Handbuch, Prozess-Atlas, Buster, Konstanten grün.
 - **Rest:** siehe N116 (Rechnungs-Pfad mit echter Rechnung, Mietername, Datenraum-Überwachung als Konzept).
+
+### v3150 · Stufe Mieterhöhung zum Stichtag (N114) und Mietername ohne KI (03.11.2026, nur Staging)
+
+- **Was:** Marcels drei Festlegungen: § 558 erst ab Wirksamkeit, abgezinst, RND des Bestands; Ziel ortsübliche Vergleichsmiete; ohne Historie 36 Monate als vorsichtige Annahme mit Sensitivität. Mietername per Regel auf dem Server (`services/mieterName.js`), nicht an die KI.
+- **Commit:** `c069cc6c`, Konstanten `b7194e3e`.
+- **Nachweis:** wertermittlung-pruefen RC 0 (B21/B21b nachgezogen, B61 neu), mietpotenzial 104/104, score-ketten, buster sauber. Staging Westerfeld: 740.000 / 760.000 / 795.000 €, RND Mieterhöhung = Bestand 26,3 J.
+- **Rest:** N117 Stufe Neuvermietung (Annahmen Marcel), N118 Scans; Prod nach Marcels Abnahme.
