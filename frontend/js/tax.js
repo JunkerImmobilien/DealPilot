@@ -2402,6 +2402,20 @@ function dpWkUebernehmen(jahr, posten, modus) {
 }
 window.dpWkUebernehmen = dpWkUebernehmen;
 
+/* v3155 · Marcel 03.11.2026: „wenn wir Fahrtkosten schon eingetragen haben … summieren und draufrechnen,
+   und da Neuer und Alter Wert schreiben". Das Prüffenster der Belege zeigt je Feld den bisherigen Stand:
+   override = von Hand oder aus einem Beleg eingetragen (wird addiert), auto = Schätzung der App
+   (Schuldzinsen, Nebenkosten, Verwaltung - ein Beleg ersetzt sie, wie dpWkUebernehmen es tut). */
+function dpWkStand(jahr, feld) {
+  var j = parseInt(jahr, 10), ov = _getYearOverride(j, feld), auto = null;
+  try {
+    var s = (typeof _v269_getStartYear === 'function') ? _v269_getStartYear() : null, idx = s != null ? j - s : -1;
+    if (window.State && State.cfRows && idx >= 0 && idx < State.cfRows.length) { var a = _computeAutoForYear(idx, j); if (a && typeof a[feld] === 'number' && isFinite(a[feld])) auto = a[feld]; }
+  } catch (e) {}
+  return { override: (typeof ov === 'number' && isFinite(ov)) ? ov : null, auto: auto };
+}
+window.dpWkStand = dpWkStand;
+
 /** Welche Jahre der Tab Steuern gerade führt — damit der Beleg-Import
  *  merkt, wenn ein Beleg in ein Jahr fällt, das es hier gar nicht gibt. */
 function dpWkJahre() {

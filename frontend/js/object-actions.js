@@ -2366,8 +2366,8 @@
     /* v3120 · erkannte Rechnungen: an den Beleg-Leser (Werbungskosten je Jahr, jede Zeile bestätigen) */
     var _rech = _files.filter(function (f) { return f.type === 'rechnung' && f.file; });
     if (_rech.length) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid var(--wl-c9a84c,#C9A84C);background:var(--gold-bg, rgba(201,168,76,.08));font-size:12.5px">'
-      + '<b>' + _rech.length + (_rech.length === 1 ? ' Rechnung/Beleg' : ' Rechnungen/Belege') + ' erkannt</b> (' + _rech.map(function (f) { return escH(f.name); }).join(', ') + '). Sie werden als Werbungskosten im richtigen Steuerjahr gelesen – du bestätigst jede Zeile. '
-      + '<button type="button" class="oabi-btn" id="oabi-belege" style="margin-left:6px">Als Werbungskosten auslesen</button></div>';
+      + '<b>' + _rech.length + (_rech.length === 1 ? ' Rechnung/Beleg' : ' Rechnungen/Belege') + ' erkannt</b> (' + _rech.map(function (f) { return escH(f.name); }).join(', ') + '). Sie öffnen sich im Prüffenster der Belege – dort siehst du Bild, Positionen und wohin sie übernommen werden. '
+      + '<button type="button" class="oabi-btn" id="oabi-belege" style="margin-left:6px">Prüffenster öffnen</button></div>';
     host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
@@ -2481,6 +2481,20 @@
      `_oabiDone` wird VOR dem Aufruf geleert: ein zweiter Aufruf — etwa
      weil `close()` nach `applyMerged()` noch einmal durchläuft — darf die
      Kette nicht ein zweites Mal weiterschieben. */
+  /* v3155 · Marcel 03.11.2026: „liest die Hotelrechnung nicht ein … er graut das aus und zeigt mir nichts an".
+     Gemessen: der Eingang erkannte die Rechnung, gelesen wurde sie aber erst nach einem zweiten Knopf
+     („Als Werbungskosten auslesen"). Jetzt öffnet sich das Prüffenster der Belege von selbst - mit den
+     Rechnungen und den Dateien, aus denen der Eingang keinen Text bekam (Kassenbon-Fotos: dort Bild +
+     Warnung). Waren es nur solche Dateien, schließt der Eingang dahinter. */
+  function _belegeAutomatisch() {
+    if (!_eingang || !window.DpEingang || typeof window.DpEingang.belegeAuslesen !== 'function') return;
+    var kand = _files.filter(function (f) { return f.file && !f._anBeleg && (f.type === 'rechnung' || (f.status === 'err' && !f.userType)); });
+    if (!kand.length) return;
+    kand.forEach(function (f) { f._anBeleg = true; });
+    var nurBelege = _files.every(function (f) { return f._anBeleg; });
+    if (nurBelege) { var ov = $('oabi-ov'); try { if (ov) ov.remove(); } catch (e) {} _fireOabiDone(); }
+    window.DpEingang.belegeAuslesen(kand.map(function (f) { return f.file; }));
+  }
   function _fireOabiDone(payload) {
     var done = _oabiDone;
     _oabiDone = null;
@@ -2552,6 +2566,7 @@
         var _ans = document.createElement('button'); _ans.type = 'button'; _ans.className = 'oabi-einzeln';
         _ans.textContent = 'Ansehen'; _ans.title = 'Datei und gelesene Werte nebeneinander';
         _ans.addEventListener('click', function () {
+          if (f.type === 'rechnung' && window.DpEingang.belegeAuslesen) { window.DpEingang.belegeAuslesen(_files.filter(function (x) { return x.type === 'rechnung' && x.file; }).map(function (x) { return x.file; })); return; }   /* v3155 */
           window.DpEingang.vorschau({ titel: f.name, datei: f.file, werte: _werteAus(f),
             warnung: f.type === 'rechnung' ? 'Rechnung: die Beträge liest der Beleg-Leser („Belege auslesen"), dort mit eigener Prüfansicht.' : (_leer ? null : '') });
         });
@@ -2755,6 +2770,7 @@
     for (var w = 0; w < Math.min(GLEICHZEITIG, neu.length); w++) laeufer.push(arbeiter());
     await Promise.all(laeufer);
     recompute(); renderMergedTable();
+    try { _belegeAutomatisch(); } catch (e) {}   /* v3155 */
     _unterlagenAuswerten();   /* v3016: Risiken, These, WEG aus allen Unterlagen */
     _extractImportPhotos();  /* v402: Exposé-Bilder asynchron nachladen */
   }

@@ -269,7 +269,31 @@
     st.id = 'beleg-import-css';
     st.textContent =
       '#beleg-import-ov{position:fixed;inset:0;z-index:100000;background:rgba(5,5,5,.66);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Inter,system-ui,sans-serif}' +
-      '#beleg-import-ov .bi-card{background:#FDFCFA;width:min(920px,96vw);max-height:92vh;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.5)}' +
+      /* v3155 · Marcel: „ein größeres Modal, so groß wie die Hilfe" - gemessen Hilfe 1180 × 924 px (88 vh), Ecken 14 px */
+      '#beleg-import-ov .bi-card{background:#FDFCFA;width:min(1180px,calc(100vw - 32px));height:min(924px,88vh);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.5)}' +
+      '@media (max-width:640px){#beleg-import-ov{padding:0}#beleg-import-ov .bi-card{width:100vw;height:100vh;border-radius:0}}' +
+      '#beleg-import-ov .bi-obj{font-size:12.5px;color:var(--wl-e8cc7a, #E8CC7A);font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+      '#beleg-import-ov .bi-leiste{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;margin-bottom:12px}' +
+      '#beleg-import-ov .bi-beleg{flex:0 0 auto;display:flex;gap:8px;align-items:center;max-width:270px;padding:6px 10px 6px 6px;border:1px solid #e6e0d2;border-radius:10px;background:#fff;cursor:pointer;text-align:left;font-family:inherit;color:#2A2727}' +
+      '#beleg-import-ov .bi-beleg.an{border-color:var(--wl-c9a84c, #C9A84C);box-shadow:inset 0 0 0 2px var(--wl-c9a84c, #C9A84C)}' +
+      '#beleg-import-ov .bi-beleg img{width:34px;height:44px;object-fit:cover;object-position:top;border-radius:3px;border:1px solid #ddd;background:#fff}' +
+      '#beleg-import-ov .bi-beleg .bi-ohne{width:34px;height:44px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#888;border:1px solid #ddd;border-radius:3px}' +
+      '#beleg-import-ov .bi-bt{display:flex;flex-direction:column;min-width:0;font-size:12px;line-height:1.35}' +
+      '#beleg-import-ov .bi-bt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}' +
+      '#beleg-import-ov .bi-beleg.gruen .bi-bt span{color:#2e7d4f}#beleg-import-ov .bi-beleg.gelb .bi-bt span{color:#8a6d18}#beleg-import-ov .bi-beleg.rot .bi-bt span{color:#B8625C}' +
+      '#beleg-import-ov .bi-detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px}' +
+      '@media (max-width:820px){#beleg-import-ov .bi-detail{grid-template-columns:1fr}}' +
+      '#beleg-import-ov .bi-bild{background:#efece4;border-radius:8px;padding:8px;max-height:50vh;overflow:auto;display:flex;flex-direction:column;gap:8px}' +
+      '#beleg-import-ov .bi-bild img{width:100%;height:auto;border-radius:4px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}' +
+      '#beleg-import-ov .bi-werte{min-width:0;overflow:auto;max-height:50vh}' +
+      '#beleg-import-ov .bi-pr{font-size:11px;color:#8a6d18;margin-top:3px;line-height:1.4}' +
+      '#beleg-import-ov .bi-k{font-size:11.5px;color:#888}' +
+      '#beleg-import-ov .bi-rot{padding:12px;border-radius:8px;background:rgba(184,98,92,.1);border:1px solid rgba(184,98,92,.5);color:#B8625C;font-weight:600;line-height:1.45}' +
+      '#beleg-import-ov .bi-gelb{padding:8px 10px;border-radius:8px;background:rgba(217,164,65,.12);border:1px solid rgba(217,164,65,.55);margin-bottom:8px;font-size:12.5px;font-weight:600}' +
+      '#beleg-import-ov .bi-gruen{padding:8px 10px;border-radius:8px;background:rgba(63,165,108,.1);border:1px solid rgba(63,165,108,.45);margin-bottom:8px;font-size:12.5px;font-weight:600;color:#2e7d4f}' +
+      '#beleg-import-ov .bi-ziel-box{margin-top:16px;padding:12px 14px;border:1.5px solid var(--wl-c9a84c, #C9A84C);border-radius:10px;background:#fff}' +
+      '#beleg-import-ov .bi-h{font-weight:700;font-size:13.5px;margin-bottom:8px;color:#141414}' +
+      '#beleg-import-ov .bi-nicht{margin-top:8px;font-size:12px;color:#8a7a55;line-height:1.45}' +
       '#beleg-import-ov .bi-bar{background:#141414;color:#fff;display:flex;align-items:center;gap:10px;padding:14px 18px}' +
       '#beleg-import-ov .bi-bar .bi-t{font-weight:700;font-size:15px;letter-spacing:.2px}' +
       /* v1116-x: war ein nacktes Text-x (22px, #fff, opacity .75).
@@ -281,7 +305,7 @@
       '#beleg-import-ov .bi-bar .bi-x:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}' +
       '#beleg-import-ov .bi-bar .bi-x:active{transform:scale(.94)}' +
       '#beleg-import-ov .bi-hero{background:' + GRAD + ';color:#2c2410;padding:10px 18px;font-size:12.5px;font-weight:600}' +
-      '#beleg-import-ov .bi-body{padding:18px;overflow:auto}' +
+      '#beleg-import-ov .bi-body{padding:18px;overflow:auto;flex:1;min-height:0}' +
       '#beleg-import-ov .bi-drop{border:2px dashed ' + GOLD + ';border-radius:10px;padding:34px 18px;text-align:center;color:#555}' +
       '#beleg-import-ov .bi-drop .bi-big{font-size:15px;color:#141414;font-weight:600;margin-bottom:6px}' +
       '#beleg-import-ov .bi-btn{background:' + GRAD + ';color:#2c2410;border:1px solid ' + GOLD3 + ';padding:9px 18px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}' +
@@ -315,8 +339,16 @@
      Werbungskosten, sonst Anschaffungskosten wie bisher. Ohne Argument
      bleibt alles, wie es war: der Aufruf aus dem BMF-Modal aendert sich
      nicht. */
+  /* v3155 · Marcel: „oben dann auch noch mal, um welches Objekt es sich handelt" */
+  function _objektName() {
+    var g = function (id) { var e = document.getElementById(id); return e && e.value ? String(e.value).trim() : ''; };
+    var a = [(g('str') + ' ' + g('hnr')).trim(), (g('plz') + ' ' + g('ort')).trim()].filter(function (x) { return x; }).join(', ');
+    var k = g('kuerzel');
+    return (a || 'ohne Anschrift') + (k ? ' · ' + k : '');
+  }
   function open(modus) {
     _modus = (modus === 'wk') ? 'wk' : 'ak';
+    _sel = null;
     if (!_hasFeature()) {
       alert('Der KI-Beleg-Import ist ab dem Investor-Plan verfügbar.');
       return;
@@ -328,7 +360,8 @@
     ov.id = 'beleg-import-ov';
     ov.innerHTML =
       '<div class="bi-card">' +
-        '<div class="bi-bar"><span class="bi-t">📎 ' + (_modus === 'wk' ? 'Belege & Abrechnungen einlesen' : 'Belege importieren') + '</span>' +
+        '<div class="bi-bar"><span class="bi-t">📎 ' + (_modus === 'wk' ? 'Belege prüfen und übernehmen' : 'Belege importieren') + '</span>' +
+          '<span class="bi-obj" title="Für dieses Objekt wird übernommen">Objekt: ' + _esc(_objektName()) + '</span>' +   /* v3155 */
           '<button class="bi-x" type="button" onclick="DealPilotBelegImport.close()" aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
         '<div class="bi-hero">KI liest Datum · Betrag · USt · Aussteller · Kategorie — du bestätigst jede Zeile, bevor sie in die ' + (_modus === 'wk' ? 'Werbungskosten' : 'Anschaffungskosten') + ' fließt.</div>' +   /* v2273: im WK-Modus stand hier „Anschaffungskosten“ */
         '<div class="bi-body">' +
@@ -603,53 +636,127 @@
   function _confClass(c) { c = String(c || '').toLowerCase(); if (c.indexOf('hoch') >= 0) return ''; if (c.indexOf('nied') >= 0 || c.indexOf('low') >= 0) return 'low'; return 'mid'; }
 
 
+  /* ══ v3155 · DAS PRÜFFENSTER ═══════════════════════════════════════════════════════════════
+     Marcel 03.11.2026: „oben alle Belege und kann dann auswählen … sichtbar und einfach, was wir übernehmen
+     und wohin … Neuer und Alter Wert". Oben die Leiste aller Belege (Status, Summe), darunter Bild und
+     Positionen des gewählten Belegs, unten „Was übernommen wird – und wohin" mit bisher / aus den Belegen / neu.
+     Das ersetzt das frühere Bestätigungsfenster (window.confirm): die Tafel IST die Bestätigung. */
+  var _sel = null, _liste = [];
+  function _dateien() {
+    var n = [];
+    _rows.forEach(function (r) { if (n.indexOf(r.name) < 0) n.push(r.name); });
+    _leer.forEach(function (x) { if (n.indexOf(x.name) < 0) n.push(x.name); });
+    return n;
+  }
+  function _gegenprobe(nm) {
+    var rb = _betrag[nm]; if (!(rb > 0)) return null;
+    var sum = _rows.filter(function (r) { return r.name === nm && !r.junk && r.keep; }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
+    return { summe: sum, rechnungsbetrag: rb, ok: Math.abs(sum - rb) <= Math.max(1, rb * 0.01) };
+  }
+  function _dateiStatus(nm) {
+    var rs = _rows.filter(function (r) { return r.name === nm; }), lx = _leer.filter(function (x) { return x.name === nm; })[0];
+    if (!rs.length) return { cls: 'rot', text: '✗ nicht gelesen', grund: lx && lx.grund };
+    var gp = _gegenprobe(nm), sum = rs.filter(function (r) { return r.keep; }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
+    var pr = (gp && !gp.ok) || rs.some(function (r) { return r.keep && r.pruefen && r.pruefen.length; });
+    return { cls: pr ? 'gelb' : 'gruen', text: (pr ? '⚠ bitte prüfen' : '✓ gelesen') + ' · ' + _fmtEur(sum) + ' €' };
+  }
+  function _planWk() {
+    var jeJahr = {}, ohneJahr = 0, nichtJeKat = {};
+    _rows.forEach(function (r) {
+      if (!r.keep || !r.brutto || !isFinite(r.brutto)) return;
+      var f = FIELD_MAP_WK[r.kategorie];
+      if (f === null) { nichtJeKat[r.kategorie] = (nichtJeKat[r.kategorie] || 0) + r.brutto; return; }
+      if (!f) return;
+      if (!r.jahr) { ohneJahr++; return; }
+      var k = String(r.jahr); (jeJahr[k] = jeJahr[k] || {}); jeJahr[k][f] = (jeJahr[k][f] || 0) + r.brutto;
+    });
+    var zeilen = [];
+    Object.keys(jeJahr).sort().forEach(function (j) {
+      Object.keys(jeJahr[j]).forEach(function (f) {
+        var st = (typeof window.dpWkStand === 'function') ? window.dpWkStand(j, f) : { override: null, auto: null };
+        var b = jeJahr[j][f];
+        zeilen.push({ jahr: j, feld: f, label: LABELS_WK[f] || f, betrag: b, override: st.override, auto: st.auto, neu: st.override != null ? st.override + b : b });
+      });
+    });
+    var gefuehrt = []; try { gefuehrt = (typeof window.dpWkJahre === 'function') ? (window.dpWkJahre() || []) : []; } catch (e) {}
+    var fremd = gefuehrt.length ? Object.keys(jeJahr).filter(function (j) { return gefuehrt.indexOf(parseInt(j, 10)) < 0; }) : [];
+    return { jeJahr: jeJahr, zeilen: zeilen, ohneJahr: ohneJahr, nichtJeKat: nichtJeKat, fremd: fremd };
+  }
+  function _zielHtml() {
+    var eur = function (v) { return _fmtEur(v) + ' €'; }, h, n;
+    if (_modus === 'wk') {
+      var p = _planWk(); n = p.zeilen.length;
+      h = '<table><thead><tr><th>Wohin</th><th class="num">bisher</th><th class="num">aus den Belegen</th><th class="num">neu</th></tr></thead><tbody>'
+        + (p.zeilen.map(function (z) {
+            var bisher = z.override != null ? eur(z.override) + '<div class="bi-k">eingetragen – wird addiert</div>'
+              : (z.auto > 0 ? eur(z.auto) + '<div class="bi-k">Schätzung der App – der Beleg ersetzt sie</div>' : '–');
+            return '<tr><td><b>Steuer ' + z.jahr + '</b> · ' + _esc(z.label) + '</td><td class="num">' + bisher + '</td><td class="num">' + (z.betrag < 0 ? '− ' : '+ ') + eur(Math.abs(z.betrag)) + '</td><td class="num"><b>' + eur(z.neu) + '</b></td></tr>';
+          }).join('') || '<tr><td colspan="4" class="bi-k">Noch nichts ausgewählt.</td></tr>') + '</tbody></table>';
+      var nicht = [];
+      Object.keys(p.nichtJeKat).forEach(function (k) { nicht.push(k + ' ' + eur(p.nichtJeKat[k]) + (/Verpflegung/.test(k) ? ' (steuerlich nur als Pauschale)' : ' (erst bei Verwendung absetzbar)')); });
+      if (p.ohneJahr) nicht.push(p.ohneJahr + ' Position(en) ohne Jahr');
+      if (_leer.length) nicht.push('nicht gelesen: ' + _leer.map(function (x) { return x.name; }).join(', '));
+      if (nicht.length) h += '<div class="bi-nicht"><b>Wird nicht übernommen:</b> ' + nicht.map(_esc).join(' · ') + '</div>';
+      if (p.fremd.length) h += '<div class="bi-nicht">Für ' + p.fremd.join(', ') + ' führt der Reiter Steuer noch kein Jahr – der Wert wird hinterlegt und erscheint, sobald der Zeitraum so weit reicht.</div>';
+    } else {
+      var a = _aggregate(), f = Object.keys(a.byField); n = f.length;
+      h = '<table><thead><tr><th>Wohin</th><th class="num">bisher</th><th class="num">aus den Belegen</th><th class="num">neu (addiert)</th></tr></thead><tbody>'
+        + (f.map(function (k) { var e = document.getElementById(k), alt = e ? (_parseDe(e.value) || 0) : 0;
+            return '<tr><td>' + _esc(_beschrift()[k] || k) + '</td><td class="num">' + (alt ? eur(alt) : '–') + '</td><td class="num">+ ' + eur(a.byField[k]) + '</td><td class="num"><b>' + eur(alt + a.byField[k]) + '</b></td></tr>';
+          }).join('') || '<tr><td colspan="4" class="bi-k">Noch nichts ausgewählt.</td></tr>') + '</tbody></table>'
+        + '<div class="bi-nicht">Haben Felder schon Werte, fragt die Übernahme, ob ersetzt oder addiert wird.</div>';
+    }
+    return { html: h, anzahl: n };
+  }
+  function _waehle(i) { if (_liste[i] != null) { _sel = _liste[i]; _render(); } }
   function _render() {
     var box = document.getElementById('bi-review');
     if (!box) return;
-    var leerZeilen = _leer.map(function (x, k) {
-      return '<tr class="bi-leer" style="background:rgba(184,98,92,.10)"><td></td><td>' + _mini(x.name, 'DealPilotBelegImport._ansehenLeer(' + k + ')') + '</td>'
-        + '<td colspan="8" style="color:#B8625C;font-weight:600">⚠ ' + _esc(x.name) + ' – nichts gelesen' + (x.grund ? ' (' + _esc(x.grund) + ')' : '')
-        + '<div style="font-weight:400;font-size:11.5px">Auch der zweite Leseversuch ergab keinen Betrag. Diese Datei wird nicht übernommen – bitte ansehen und von Hand eintragen.</div></td></tr>';
-    }).join('');
-    var leerBanner = _leer.length ? '<div style="margin:0 0 10px;padding:10px 12px;border-radius:8px;background:rgba(184,98,92,.10);border:1px solid rgba(184,98,92,.5);color:#B8625C;font-weight:600">⚠ '
-      + _leer.length + ' Datei(en) konnten nicht gelesen werden und werden nicht übernommen. Sie stehen rot unten in der Liste.</div>' : '';
-    if (!_rows.length) {
-      box.innerHTML = leerBanner + (leerZeilen ? '<table><tbody>' + leerZeilen + '</tbody></table>' : '<p style="color:#a4443d">Keine Belege gelesen.</p>');
-      return;
-    }
+    var files = _dateien(); _liste = files;
+    if (!files.length) { box.innerHTML = '<p style="color:#a4443d">Keine Belege gelesen.</p>'; return; }
+    if (!_sel || files.indexOf(_sel) < 0) _sel = files.filter(function (nm) { return _dateiStatus(nm).cls !== 'gruen'; })[0] || files[0];
     var opts = function (sel) { return _katListe().map(function (k) { return '<option' + (k === sel ? ' selected' : '') + '>' + _esc(k) + '</option>'; }).join(''); };
-    var body = _rows.map(function (r, i) {
-      return '<tr' + (r.keep ? '' : ' class="off"') + ' data-i="' + i + '">' +
-        '<td><input type="checkbox"' + (r.keep ? ' checked' : '') + ' onchange="DealPilotBelegImport._keep(' + i + ',this.checked)"></td>' +
-        '<td>' + _mini(r.name, 'DealPilotBelegImport._ansehen(' + i + ')') + '</td>' +
-        '<td>' + _esc(r.name) +
-          (r.pruefen && r.pruefen.length ? ' <span title="' + _esc(r.pruefen.join(' · ')) + '" style="background:var(--wl-c9a84c,#C9A84C);color:#2A2727;padding:0 6px;border-radius:10px;font-size:10px;font-weight:700;cursor:help">prüfen</span>' : '') + (r.teil ? ' <span style="color:#b39a4e">#' + r.teil + '/' + r.teilvon + '</span>' : '') +
-          (r.dup ? ' <span style="background:#B8625C;color:#fff;padding:0 6px;border-radius:10px;font-size:10px;font-weight:600">doppelt</span>' : '') +
-          (r.junk ? ' <span style="background:#9a9a9a;color:#fff;padding:0 6px;border-radius:10px;font-size:10px;font-weight:600">ignoriert</span>' : '') +
-          (r.beschreibung ? '<div style="font-size:11px;color:#999">' + _esc(r.beschreibung) + '</div>' : '') + '</td>' +
-        '<td>' + _esc(r.datum) + '</td>' +
-        '<td class="num">' + _fmtEur(r.netto) + ' €</td>' +
-        '<td class="num">' + _fmtEur(r.ust) + ' €</td>' +
-        '<td class="num" style="font-weight:600">' + _fmtEur(r.brutto) + ' €</td>' +
-        '<td>' + _esc(r.aussteller) + '</td>' +
-        '<td><select onchange="DealPilotBelegImport._kat(' + i + ',this.value)">' + opts(r.kategorie) + '</select></td>' +
-        '<td><span class="bi-conf ' + _confClass(r.konfidenz) + '">' + _esc(r.konfidenz) + '</span></td>' +
-      '</tr>';
+    var leiste = files.map(function (nm, i) {
+      var st = _dateiStatus(nm), b = _bilder[nm];
+      return '<button type="button" class="bi-beleg ' + st.cls + (nm === _sel ? ' an' : '') + '" onclick="DealPilotBelegImport._waehle(' + i + ')" title="' + _esc(nm) + '">'
+        + (b && b[0] ? '<img src="' + b[0] + '" alt="">' : '<span class="bi-ohne">Datei</span>')
+        + '<span class="bi-bt"><b>' + _esc(nm) + '</b><span>' + _esc(st.text) + '</span></span></button>';
     }).join('');
-    box.innerHTML = leerBanner +
-      '<table><thead><tr><th></th><th>Bild</th><th>Datei</th><th>Datum</th><th>Netto</th><th>USt</th><th>Brutto</th><th>Aussteller</th><th>Kategorie</th><th>Konfidenz</th></tr></thead>' +
-      '<tbody>' + body + leerZeilen + '</tbody></table>' +
-      '<div class="bi-sums" id="bi-sums"></div>' +
-      '<div id="bi-ampel"></div>';
+    var st0 = _dateiStatus(_sel), bilder = _bilder[_sel] || [];
+    var bild = bilder.length ? bilder.slice(0, 12).map(function (src, k) { return '<img src="' + src + '" alt="Seite ' + (k + 1) + '">'; }).join('') : '<div class="bi-k" style="padding:30px;text-align:center">Keine Bildansicht (Tabelle).</div>';
+    var rechts;
+    if (st0.cls === 'rot') {
+      rechts = '<div class="bi-rot">⚠ Aus dieser Datei konnte nichts gelesen werden' + (st0.grund ? ' (' + _esc(st0.grund) + ')' : '') + '. Auch der zweite Leseversuch ergab keinen Betrag.<br>Sie wird nicht übernommen – bitte links ansehen und die Beträge von Hand im Reiter Steuer eintragen.</div>';
+    } else {
+      var idx = []; _rows.forEach(function (r, i) { if (r.name === _sel) idx.push(i); });
+      var gp = _gegenprobe(_sel);
+      rechts = (gp ? '<div class="' + (gp.ok ? 'bi-gruen' : 'bi-gelb') + '">Rechnungsbetrag laut Beleg ' + _fmtEur(gp.rechnungsbetrag) + ' € · ausgewählte Positionen ' + _fmtEur(gp.summe) + ' € – ' + (gp.ok ? 'passt ✓' : 'passt NICHT, bitte Positionen prüfen') + '</div>'
+          : '<div class="bi-k" style="margin-bottom:8px">Kein Rechnungsbetrag erkannt – die Summe bitte mit dem Bild vergleichen.</div>')
+        + '<table><thead><tr><th></th><th>Position</th><th>Datum</th><th class="num">Brutto</th><th>Kategorie → Ziel</th></tr></thead><tbody>'
+        + idx.map(function (i) {
+            var r = _rows[i], f = _feldKarte()[r.kategorie];
+            var ziel = _modus === 'wk' ? (f === null ? 'wird nicht übernommen' : (f ? 'Steuer ' + (r.jahr || '?') + ' · ' + (LABELS_WK[f] || f) : '–')) : (f ? (_beschrift()[f] || f) : 'nur 15-%-Prüfung');
+            return '<tr' + (r.keep ? '' : ' class="off"') + '><td><input type="checkbox"' + (r.keep ? ' checked' : '') + ' onchange="DealPilotBelegImport._keep(' + i + ',this.checked)"></td>'
+              + '<td>' + _esc(r.beschreibung || r.aussteller || '—') + (r.pruefen && r.pruefen.length ? '<div class="bi-pr">⚠ ' + r.pruefen.map(_esc).join('<br>⚠ ') + '</div>' : '') + '</td>'
+              + '<td style="white-space:nowrap">' + _esc(r.datum) + '</td><td class="num"><b>' + _fmtEur(r.brutto) + ' €</b></td>'
+              + '<td><select onchange="DealPilotBelegImport._kat(' + i + ',this.value)">' + opts(r.kategorie) + '</select><div class="bi-k">→ ' + _esc(ziel) + '</div></td></tr>';
+          }).join('') + '</tbody></table>'
+        + (idx.length ? '<div class="bi-k" style="margin-top:6px">Aussteller: ' + _esc(_rows[idx[0]].aussteller) + '</div>' : '');
+    }
+    var z = _zielHtml();
+    box.innerHTML = '<div class="bi-leiste">' + leiste + '</div>'
+      + '<div class="bi-detail"><div class="bi-bild">' + bild + '</div><div class="bi-werte">' + rechts + '</div></div>'
+      + '<div class="bi-ziel-box"><div class="bi-h">Was übernommen wird – und wohin</div>' + z.html + '</div>'
+      + '<div class="bi-sums" id="bi-sums"></div><div id="bi-ampel"></div>';
     var take = document.getElementById('bi-take');
-    if (take) take.disabled = false;
+    if (take) { take.disabled = !z.anzahl; if (_modus === 'wk') take.textContent = z.anzahl ? z.anzahl + (z.anzahl === 1 ? ' Wert übernehmen' : ' Werte übernehmen') : 'Nichts zu übernehmen'; }
     var csvb = document.getElementById('bi-csv');
     if (csvb) csvb.disabled = false;
-    _sums();
+    if (_modus !== 'wk') _sums();
   }
 
-  function _keep(i, v) { if (_rows[i]) { _rows[i].keep = !!v; var tr = document.querySelector('#bi-review tr[data-i="' + i + '"]'); if (tr) tr.classList.toggle('off', !v); _sums(); } }
-  function _kat(i, v)  { if (_rows[i]) { _rows[i].kategorie = v; _sums(); } }
+  function _keep(i, v) { if (_rows[i]) { _rows[i].keep = !!v; _render(); } }   /* v3155: Leiste, Gegenprobe und Ziel ziehen mit */
+  function _kat(i, v)  { if (_rows[i]) { _rows[i].kategorie = v; _render(); } }
 
   /* Dubletten (gleiches Datum + Brutto) und Muell/0-/Summenzeilen automatisch
      markieren und abwaehlen (keep=false). Nutzer kann jederzeit wieder anhaken. */
@@ -704,7 +811,7 @@
       var ok = Math.abs(sum - rb) <= Math.max(1, rb * 0.01);
       g.forEach(function (r) {
         r.gegenprobe = { summe: sum, rechnungsbetrag: rb, ok: ok };
-        if (!ok) r.pruefen.push('Positionen ergeben ' + _fmtEur(sum) + ' €, der Beleg weist ' + _fmtEur(rb) + ' € aus');
+        /* v3155 · die Gegenprobe steht frisch gerechnet oben im Prüffenster (_gegenprobe), nicht mehr fest an jeder Zeile */
       });
     });
   }
@@ -892,80 +999,29 @@
      gebuchtes Jahr fällt später niemandem auf, und dann steht die
      Abrechnung im falschen Veranlagungszeitraum.                        */
   function _applyWk() {
-    var jeJahr = {}, ohneJahr = 0, nichtAbsetzbar = 0, nichtAbsetzbarEur = 0, nichtJeKat = {};
-    _rows.forEach(function (r) {
-      if (!r.keep) return;
-      if (!r.brutto || !isFinite(r.brutto)) return;   /* v3154e: Gutschriften mindern */
-      var f = FIELD_MAP_WK[r.kategorie];
-      /* `null` ist eine ANTWORT, kein fehlender Eintrag: die Zuführung zur
-         Erhaltungsrücklage ist beim Eigentümer nicht sofort abziehbar. */
-      if (f === null) { nichtAbsetzbar++; nichtAbsetzbarEur += r.brutto; nichtJeKat[r.kategorie] = (nichtJeKat[r.kategorie] || 0) + r.brutto; return; }
-      if (!f) return;
-      if (!r.jahr) { ohneJahr++; return; }
-      var k = String(r.jahr);
-      (jeJahr[k] = jeJahr[k] || {});
-      jeJahr[k][f] = (jeJahr[k][f] || 0) + r.brutto;
-    });
-
-    var jahre = Object.keys(jeJahr);
-    if (!jahre.length) {
-      var m = 'Nichts zu übernehmen.';
-      if (ohneJahr) m = ohneJahr + ' Position(en) ohne erkennbares Jahr — bitte das Jahr in der Liste ergänzen.';
-      else if (nichtAbsetzbar) m = 'Nur nicht absetzbare Posten erkannt (' + Object.keys(nichtJeKat).join(', ') + ') — Rücklagenzuführung erst bei Verwendung, Verpflegung nur als Pauschale.';
-      try { if (window.toast) window.toast(m); } catch (e) {}
-      return;
-    }
+    var p = _planWk();
+    if (!p.zeilen.length) { try { if (window.toast) window.toast('Nichts zu übernehmen.'); } catch (e) {} return; }
     if (typeof window.dpWkUebernehmen !== 'function') {
       try { if (window.toast) window.toast('✗ Steuer-Modul nicht geladen — Seite neu laden.'); } catch (e) {}
       return;
     }
-
-    /* Vorhandene Jahre, die der Tab Steuern gar nicht führt, benennen —
-       sonst landet ein Beleg in einem Jahr, das niemand sieht. */
-    var gefuehrt = [];
-    try { gefuehrt = (typeof window.dpWkJahre === 'function') ? (window.dpWkJahre() || []) : []; } catch (e) {}
-    var fremd = gefuehrt.length
-      ? jahre.filter(function (j) { return gefuehrt.indexOf(parseInt(j, 10)) < 0; })
-      : [];
-
-    var text = 'Diese Beträge werden zu den Werten der Jahre ADDIERT:\n\n'
-      + jahre.sort().map(function (j) {
-          var f = jeJahr[j];
-          return j + ':  ' + Object.keys(f).map(function (k) {
-            return (LABELS_WK[k] || k) + ' ' + _fmtEur(f[k]) + ' €';
-          }).join(' · ');
-        }).join('\n')
-      + (fremd.length ? '\n\nACHTUNG: Für ' + fremd.join(', ') + ' führt dieser Objekt-Tab kein Jahr. '
-                        + 'Der Wert wird trotzdem hinterlegt, ist aber erst sichtbar, wenn der '
-                        + 'Betrachtungszeitraum so weit reicht.' : '')
-      + (_leer.length ? '\n\nNICHT gelesen und nicht übernommen: ' + _leer.map(function (x) { return x.name; }).join(', ') : '')
-      + (function () { var p = _rows.filter(function (r) { return r.keep && r.pruefen && r.pruefen.length; }).length; return p ? '\n\n' + p + ' ausgewählte Zeile(n) tragen den Hinweis „prüfen".' : ''; })()
-      + '\n\nOK = übernehmen (addieren)\nAbbrechen = nichts tun';
-    if (!window.confirm(text)) return;
-
-    var n = 0, jahreOk = [];
+    /* v3155 · kein window.confirm mehr: „Was übernommen wird – und wohin" steht vorher sichtbar im Fenster */
+    var n = 0;
     var _E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null;   /* v3154 · für „Zurücknehmen" */
     if (_E) _E.txStart();
-    jahre.forEach(function (j) {
-      var r = window.dpWkUebernehmen(parseInt(j, 10), jeJahr[j], 'add');
-      if (r && r.ok) { n += r.anzahl; jahreOk.push(j); }
+    Object.keys(p.jeJahr).forEach(function (j) {
+      var r = window.dpWkUebernehmen(parseInt(j, 10), p.jeJahr[j], 'add');
+      if (r && r.ok) n += r.anzahl;
     });
     try {
       var _aend = _E ? _E.txEnde() : [];
-      var _gen = {}; _rows.forEach(function (r) { if (r.keep && r.brutto > 0 && r.jahr) _gen[r.name] = true; });
+      var _gen = {}; _rows.forEach(function (r) { if (r.keep && r.brutto && r.jahr) _gen[r.name] = true; });
       if (_E) _E.protokoll({ quelle: 'Belege', aenderungen: _aend,
         dokumente: Object.keys(_gen).map(function (nm) { return { name: nm, typ: 'Beleg' }; }),
-        uebernommen: jahreOk.sort().map(function (j) { var f = jeJahr[j]; return 'Steuer ' + j + ': ' + Object.keys(f).map(function (k) { return (LABELS_WK[k] || k) + ' +' + _fmtEur(f[k]) + ' €'; }).join(' · '); }),
+        uebernommen: p.zeilen.map(function (z) { return 'Steuer ' + z.jahr + ' · ' + z.label + ': ' + (z.override != null ? _fmtEur(z.override) + ' € → ' : '') + _fmtEur(z.neu) + ' € (' + (z.betrag < 0 ? '−' : '+') + _fmtEur(Math.abs(z.betrag)) + ' €)'; }),
         nicht_gelesen: _leer.map(function (x) { return x.name; }) });
     } catch (e) {}
-
-    var meld = n + ' Position(en) in ' + jahreOk.length + ' Jahr(en) übernommen.';
-    if (nichtAbsetzbar) {
-      meld += ' Bewusst NICHT übernommen: ' + Object.keys(nichtJeKat).map(function (k) { return k + ' ' + _fmtEur(nichtJeKat[k]) + ' €'; }).join(', ')
-        + ' (Rücklagenzuführung erst bei Verwendung absetzbar, Verpflegung nur als Pauschale).';
-    }
-    if (ohneJahr) meld += ' ' + ohneJahr + ' ohne Jahr übersprungen.';
-    try { if (window.toast) window.toast(meld); } catch (e) {}
+    try { if (window.toast) window.toast('✓ ' + n + (n === 1 ? ' Wert' : ' Werte') + ' in den Reiter Steuer übernommen.'); } catch (e) {}
     close();
   }
 
@@ -998,6 +1054,6 @@
     /* v3120 · der gemeinsame Eingang (unterlagen-eingang.js) übergibt erkannte Rechnungen direkt */
     oeffnenMit: function (files, modus) { open(modus || 'wk'); if (files && files.length) setTimeout(function () { _onPick(files); }, 50); },
     _keep: _keep, _kat: _kat,
-    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer
+    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle
   };
 })();
