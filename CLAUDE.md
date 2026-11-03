@@ -50,6 +50,14 @@ zum Zusammenführen steht dort in Abschnitt 6.
 Abschluss selbst nach "Fertig" verschieben, mit Datum und Commit-Hash,
 und committen.
 
+**Umsetzungswünsche der Entwicklungspartner (seit v3097, 03.11.2026):** Partner
+schreiben Wünsche in der App unter System › Umsetzungswünsche (Tabelle
+`umsetzungswuensche`, freigeschaltet im Admin über den Zusatz „Entwicklungspartner“).
+**Zu Beginn jeder Backlog-Sitzung `node tools/wuensche-holen.mjs` laufen lassen**
+(liest Prod und Staging, nur lesend) und neue Wünsche als eigenen Punkt mit
+„W-<id> (Prod)“ ins Backlog eintragen. Die IDs zählen je Server getrennt. Den Stand
+in der App setzen Marcel oder der Partner, Claude schreibt dort nicht.
+
 **Der Marktbericht-Strang hat ein eigenes Ziel, das über die Wertermittlung
 hinausgeht: die Ernte.** Für jedes der 16 Bundesländer sollen zwei amtliche
 Kennzahlen im Register liegen — Liegenschaftszinssatz (§ 21 Abs. 2) und

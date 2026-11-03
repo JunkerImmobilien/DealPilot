@@ -44240,3 +44240,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `41b8e807`, `0e03f586` (Konstanten), `cfa447da` (Handbuch). Prod 1.0.43 = `9eff245`, Sicherungen `/root/backups/haupt-20261103-0819.sql.gz` (16 MB) und `mb-…` (30 MB), beide Köpfe gelesen.
 - **Nachweis:** Staging hat 56 s und 1 Sitzung für das Demo-Konto geschrieben, die Admin-SQL wurde an der Datenbank geprüft. Prod: Migration gelaufen, Backend healthy, Endpunkt 401 ohne Token, `aktivitaet.js?v=v3095` wird ausgeliefert. Gold 413 = Basislinie, Buster sauber, Score-Ketten grün, Handbuch grün.
 - **Rest:** Admin-Ansicht im Browser (Marcels Anmeldung), Datenschutz-Absatz gegenlesen, N107 (Prüfung der Konstanten im Prod-Rollout). Prod 1.0.42 lief mit Konstanten vor v3092, 1.0.43 hat das nachgeholt.
+
+### v3096–v3097a · Zielkaufpreis zweite Stufe, Umsetzungswünsche der Entwicklungspartner (03.11.2026)
+
+- **Was:** Quick-Check-Karte mit der Zeile „Rendite-Ziel mit zulässiger Miete in 3 Jahren“ (v3096/a, IFRAME_SRC qc-v3096a). Umsetzungswünsche: Migration 094, `routes/wuensche.js`, Zusatz `entwicklungspartner` (Admin), `js/umsetzungswuensche.js` (System-Menü, nur Partner), `tools/wuensche-holen.mjs` (v3097/a, Handbuch neu).
+- **Commit:** `b9e917bc`, `84583de4`, `dc4e2478`, `722e3356`, Handbuch. Prod 1.0.44 = `4edbd61`, Sicherungen `/root/backups/haupt-20261103-0908.sql.gz` (16 MB) und `mb-20261103-0908.sql.gz` (30 MB), Köpfe gelesen.
+- **Nachweis:** Staging im Browser geprüft: Zeile 115.000 € unter 96.000 und 81.000 €, W-1 eingetragen, Stand gesetzt, gefiltert. Prod: `/wuensche/zugang` 401 ohne Token, `umsetzungswuensche.js?v=v3097` und `qc-bridge.js?v=v3096a` werden ausgeliefert, die Quick-Check-Seite enthält die neue Funktion. Gold 413, Buster sauber, Score-Ketten grün, Handbuch grün.
+- **Rest:** Prod-Freischaltung der Partner im Admin (Marcel). Das Lesen von Prod mit `wuensche-holen.mjs` braucht eine Rechtefreigabe.
