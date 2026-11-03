@@ -2439,6 +2439,26 @@
       "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
       "gelesen_am": "2026-10-21",
       "herkunft": "Registersatz nachernte-2026-10b-th.json (Feld zustaendige_stelle)"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg": {
+      "land": "HE",
+      "email": "gs-gaa-afb-kb@hvbg.hessen.de",
+      "webseite": "https://www.gutachterausschuss.hessen.de",
+      "telefon": "(0611) 535 4300",
+      "anschrift": "Amt für Bodenmanagement Korbach, Geschäftsstelle des Gutachterausschusses, Medebacher Landstraße 27, 34497 Korbach",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-11-03",
+      "herkunft": "Immobilienmarktbericht 2026 AfB Korbach, Impressum (PDF-S. 2), Datei 2026_IMB_AFB_KORBACH.pdf"
+    },
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner": {
+      "land": "HE",
+      "email": "gs-gaa-afb-hr@hvbg.hessen.de",
+      "webseite": "https://www.gutachterausschuss.hessen.de",
+      "telefon": "(0611) 535-2166",
+      "anschrift": "Amt für Bodenmanagement Homberg (Efze), Geschäftsstelle Gutachterausschuss, Hans-Scholl-Straße 6, 34576 Homberg (Efze)",
+      "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+      "gelesen_am": "2026-11-03",
+      "herkunft": "Immobilienmarktbericht 2026 AfB Homberg (Efze), Impressum (PDF-S. 3), Datei 2026_IMB_AfB_Homberg.pdf"
     }
   }
 }

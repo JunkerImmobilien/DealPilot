@@ -1,13 +1,13 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-28T21:52:48.826Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-11-03T09:04:44.271Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
- "stand": "2026-10-28",
- "erzeugt": "2026-10-28T21:52:48.826Z",
+ "stand": "2026-11-03",
+ "erzeugt": "2026-11-03T09:04:44.271Z",
  "register_commit": "01c21d6c",
- "register_lokal_geaendert": false,
+ "register_lokal_geaendert": true,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 142,
- "saetze": 18296,
+ "dateien": 144,
+ "saetze": 18317,
  "kopf": {
   "werte_gesamt": 6186,
   "lzs": 2505,
@@ -162,9 +162,9 @@ window.DPS_REGISTER = {
    },
    "uk_wgfz": {
     "w": 10,
-    "anteil": 0.56
+    "anteil": 0.27
    },
-   "anteil4": 0.76,
+   "anteil4": 0.73,
    "erfasst": true
   },
   "RP": {
@@ -312,13 +312,13 @@ window.DPS_REGISTER = {
    },
    "uk_flaeche": {
     "w": 2,
-    "anteil": 0.22
+    "anteil": 0.18
    },
    "uk_wgfz": {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.36,
+   "anteil4": 0.35,
    "erfasst": true
   },
   "SN": {

@@ -96,7 +96,7 @@
         "koeffizient": 1.0729,
         "bodenwert_eur_qm": 150,
         "rundung_eur_qm": 1,
-        "seite": 155
+        "seite": 165
       }
     },
     "geltungsbereich": {
@@ -126,7 +126,7 @@
       {
         "art": "amtliche Veröffentlichung",
         "datei": "`2026_IMB_AFB_Limburg.pdf",
-        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 154–155 (PDF 156–157): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
+        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 164–165 (PDF 166–167): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
       },
       {
         "art": "amtliche Veröffentlichung",
@@ -137,17 +137,18 @@
     "stufe": "A",
     "stufe_grund": "Eigene regionale Auswertung des örtlich zuständigen Ausschusses (Kaufverträge 2010–2017), im Immobilienmarktbericht 2026 mit Stichtag 01.01.2026 und in den BRW-Erläuterungen 2026 veröffentlicht.",
     "stichtag": "2026-01-01",
-    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 154; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
+    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 164; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
     "berichtsjahr": 2026,
     "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
     "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
     "lizenz_hinweis": "Wörtlich aus dem Impressum/Vervielfältigungshinweis, weiter: „Die bereitgestellten Daten und Metadaten dürfen für kommerzielle und nicht kommerzielle Nutzung insbesondere 1. vervielfältigt, ausgedruckt, präsentiert, verändert, bearbeitet sowie an Dritte übermittelt werden, […] Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“ Inhaltlich dl-de/zero-2-0; die Kennung nennt das Dokument nicht. Der Quellenvermerk wird trotzdem geführt und weist die Umformung aus.",
     "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Immobilienmarktbericht 2026, Kap. 9.4 (Werte unverändert, für die Berechnung in eine Tabelle umgeformt)",
-    "fundstelle": "Kap. 9.4, S. 154–155 (PDF 156–157); BRW-Erläuterungen 2026, S. 2",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, S. 2",
     "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 ImmoWertV), individueller Wohnungsbau.",
     "belege_meta": {
       "dokument": "Immobilienmarktbericht 2026, Amt für Bodenmanagement Limburg a. d. Lahn – Geschäftsstelle des Gutachterausschusses",
-      "abgerufen_am": "2026-10-16"
+      "abgerufen_am": "2026-10-16",
+      "auflage_hinweis": "Seiten nach der aktualisierten 3. Auflage des Immobilienmarktberichts 2026 (veröffentlicht am 26.10.2026, Datei vom 28.10.2026; geändert nur Kapitel 3). Tabelle, Modellbeschreibung und Beispiel in Kap. 9.4 am 03.11.2026 unverändert nachgelesen; die Fassung vom 16.10.2026 trug dieselben Inhalte auf S. 154–155."
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
     "quelle_parser": "v2290-uk-ernte-west (IMB/BRW-Erläuterungen, pdftotext und Seitenbild, 16.10.2026)",
@@ -251,7 +252,7 @@
         "koeffizient": 1.0729,
         "bodenwert_eur_qm": 150,
         "rundung_eur_qm": 1,
-        "seite": 155
+        "seite": 165
       }
     },
     "geltungsbereich": {
@@ -281,7 +282,7 @@
       {
         "art": "amtliche Veröffentlichung",
         "datei": "`2026_IMB_AFB_Limburg.pdf",
-        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 154–155 (PDF 156–157): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
+        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 164–165 (PDF 166–167): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
       },
       {
         "art": "amtliche Veröffentlichung",
@@ -292,17 +293,18 @@
     "stufe": "A",
     "stufe_grund": "Eigene regionale Auswertung des örtlich zuständigen Ausschusses (Kaufverträge 2010–2017), im Immobilienmarktbericht 2026 mit Stichtag 01.01.2026 und in den BRW-Erläuterungen 2026 veröffentlicht.",
     "stichtag": "2026-01-01",
-    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 154; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
+    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 164; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
     "berichtsjahr": 2026,
     "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
     "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
     "lizenz_hinweis": "Wörtlich aus dem Impressum/Vervielfältigungshinweis, weiter: „Die bereitgestellten Daten und Metadaten dürfen für kommerzielle und nicht kommerzielle Nutzung insbesondere 1. vervielfältigt, ausgedruckt, präsentiert, verändert, bearbeitet sowie an Dritte übermittelt werden, […] Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“ Inhaltlich dl-de/zero-2-0; die Kennung nennt das Dokument nicht. Der Quellenvermerk wird trotzdem geführt und weist die Umformung aus.",
     "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Immobilienmarktbericht 2026, Kap. 9.4 (Werte unverändert, für die Berechnung in eine Tabelle umgeformt)",
-    "fundstelle": "Kap. 9.4, S. 154–155 (PDF 156–157); BRW-Erläuterungen 2026, S. 2",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, S. 2",
     "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 ImmoWertV), individueller Wohnungsbau.",
     "belege_meta": {
       "dokument": "Immobilienmarktbericht 2026, Amt für Bodenmanagement Limburg a. d. Lahn – Geschäftsstelle des Gutachterausschusses",
-      "abgerufen_am": "2026-10-16"
+      "abgerufen_am": "2026-10-16",
+      "auflage_hinweis": "Seiten nach der aktualisierten 3. Auflage des Immobilienmarktberichts 2026 (veröffentlicht am 26.10.2026, Datei vom 28.10.2026; geändert nur Kapitel 3). Tabelle, Modellbeschreibung und Beispiel in Kap. 9.4 am 03.11.2026 unverändert nachgelesen; die Fassung vom 16.10.2026 trug dieselben Inhalte auf S. 154–155."
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
     "quelle_parser": "v2290-uk-ernte-west (IMB/BRW-Erläuterungen, pdftotext und Seitenbild, 16.10.2026)",
@@ -406,7 +408,7 @@
         "koeffizient": 1.0729,
         "bodenwert_eur_qm": 150,
         "rundung_eur_qm": 1,
-        "seite": 155
+        "seite": 165
       }
     },
     "geltungsbereich": {
@@ -436,7 +438,7 @@
       {
         "art": "amtliche Veröffentlichung",
         "datei": "`2026_IMB_AFB_Limburg.pdf",
-        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 154–155 (PDF 156–157): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
+        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 164–165 (PDF 166–167): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
       },
       {
         "art": "amtliche Veröffentlichung",
@@ -447,17 +449,18 @@
     "stufe": "A",
     "stufe_grund": "Eigene regionale Auswertung des örtlich zuständigen Ausschusses (Kaufverträge 2010–2017), im Immobilienmarktbericht 2026 mit Stichtag 01.01.2026 und in den BRW-Erläuterungen 2026 veröffentlicht.",
     "stichtag": "2026-01-01",
-    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 154; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
+    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 164; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
     "berichtsjahr": 2026,
     "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
     "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
     "lizenz_hinweis": "Wörtlich aus dem Impressum/Vervielfältigungshinweis, weiter: „Die bereitgestellten Daten und Metadaten dürfen für kommerzielle und nicht kommerzielle Nutzung insbesondere 1. vervielfältigt, ausgedruckt, präsentiert, verändert, bearbeitet sowie an Dritte übermittelt werden, […] Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“ Inhaltlich dl-de/zero-2-0; die Kennung nennt das Dokument nicht. Der Quellenvermerk wird trotzdem geführt und weist die Umformung aus.",
     "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Immobilienmarktbericht 2026, Kap. 9.4 (Werte unverändert, für die Berechnung in eine Tabelle umgeformt)",
-    "fundstelle": "Kap. 9.4, S. 154–155 (PDF 156–157); BRW-Erläuterungen 2026, S. 2",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, S. 2",
     "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 ImmoWertV), individueller Wohnungsbau.",
     "belege_meta": {
       "dokument": "Immobilienmarktbericht 2026, Amt für Bodenmanagement Limburg a. d. Lahn – Geschäftsstelle des Gutachterausschusses",
-      "abgerufen_am": "2026-10-16"
+      "abgerufen_am": "2026-10-16",
+      "auflage_hinweis": "Seiten nach der aktualisierten 3. Auflage des Immobilienmarktberichts 2026 (veröffentlicht am 26.10.2026, Datei vom 28.10.2026; geändert nur Kapitel 3). Tabelle, Modellbeschreibung und Beispiel in Kap. 9.4 am 03.11.2026 unverändert nachgelesen; die Fassung vom 16.10.2026 trug dieselben Inhalte auf S. 154–155."
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
     "quelle_parser": "v2290-uk-ernte-west (IMB/BRW-Erläuterungen, pdftotext und Seitenbild, 16.10.2026)",
@@ -561,7 +564,7 @@
         "koeffizient": 1.0729,
         "bodenwert_eur_qm": 150,
         "rundung_eur_qm": 1,
-        "seite": 155
+        "seite": 165
       }
     },
     "geltungsbereich": {
@@ -591,7 +594,7 @@
       {
         "art": "amtliche Veröffentlichung",
         "datei": "`2026_IMB_AFB_Limburg.pdf",
-        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 154–155 (PDF 156–157): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
+        "fundstelle": "Immobilienmarktbericht 2026 AfB Limburg, Kap. 9.4 „Umrechungskoeffizienten für Grundstücksgrößen“, S. 164–165 (PDF 166–167): Modellbeschreibung (Untersuchungsbereich, räumlicher Anwendungsbereich, Untersuchungszeitraum 2010–2017, Stichtag 01.01.2026, 2.922 Kaufverträge, 150–1.500 m², 20–1.390 €/m²), Tabelle 200–1.500 m², Beispiel"
       },
       {
         "art": "amtliche Veröffentlichung",
@@ -602,17 +605,18 @@
     "stufe": "A",
     "stufe_grund": "Eigene regionale Auswertung des örtlich zuständigen Ausschusses (Kaufverträge 2010–2017), im Immobilienmarktbericht 2026 mit Stichtag 01.01.2026 und in den BRW-Erläuterungen 2026 veröffentlicht.",
     "stichtag": "2026-01-01",
-    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 154; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
+    "stichtag_hinweis": "Stichtag laut Modellbeschreibung S. 164; Untersuchungszeitraum 2010–2017, „regelmäßig plausibilisiert und ggf. fortgeschrieben“.",
     "berichtsjahr": 2026,
     "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
     "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
     "lizenz_hinweis": "Wörtlich aus dem Impressum/Vervielfältigungshinweis, weiter: „Die bereitgestellten Daten und Metadaten dürfen für kommerzielle und nicht kommerzielle Nutzung insbesondere 1. vervielfältigt, ausgedruckt, präsentiert, verändert, bearbeitet sowie an Dritte übermittelt werden, […] Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“ Inhaltlich dl-de/zero-2-0; die Kennung nennt das Dokument nicht. Der Quellenvermerk wird trotzdem geführt und weist die Umformung aus.",
     "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Immobilienmarktbericht 2026, Kap. 9.4 (Werte unverändert, für die Berechnung in eine Tabelle umgeformt)",
-    "fundstelle": "Kap. 9.4, S. 154–155 (PDF 156–157); BRW-Erläuterungen 2026, S. 2",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, S. 2",
     "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 ImmoWertV), individueller Wohnungsbau.",
     "belege_meta": {
       "dokument": "Immobilienmarktbericht 2026, Amt für Bodenmanagement Limburg a. d. Lahn – Geschäftsstelle des Gutachterausschusses",
-      "abgerufen_am": "2026-10-16"
+      "abgerufen_am": "2026-10-16",
+      "auflage_hinweis": "Seiten nach der aktualisierten 3. Auflage des Immobilienmarktberichts 2026 (veröffentlicht am 26.10.2026, Datei vom 28.10.2026; geändert nur Kapitel 3). Tabelle, Modellbeschreibung und Beispiel in Kap. 9.4 am 03.11.2026 unverändert nachgelesen; die Fassung vom 16.10.2026 trug dieselben Inhalte auf S. 154–155."
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
     "quelle_parser": "v2290-uk-ernte-west (IMB/BRW-Erläuterungen, pdftotext und Seitenbild, 16.10.2026)",

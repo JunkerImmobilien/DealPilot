@@ -678,6 +678,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Bezug bzw. Lizenz). NICHT aktiv: register-vorgemerkt/lzs-ernte-20261028d-bw-wartet.json
                                (958 LZS-Sperren „nicht abgeleitet/nicht veroeffentlicht“, damit Stufe N weiterrechnet). */
                             'lzs-swf-ernte-20261028d-bw.json',
+                            /* Ernte 03.11.2026 (UK): WGFZ-Sperren fuer die sechs regionalen hessischen Ausschuesse
+                               (AfB Heppenheim, Limburg, Korbach, Fulda, Buedingen, Homberg; je Kreis, IMB 2026
+                               gelesen - keiner fuehrt WGFZ-Koeffizienten), Main-Taunus Gewerbe „linear im
+                               Einzelfall“ unter formel_vorgemerkt; UK-Flaeche-Sperren MV Seenplatte und
+                               Vorpommern-Ruegen (genehmigungspflichtig, bisher ohne Satz). */
+                            'uk-wgfz-ernte-20261103-he.json', 'uk-flaeche-ernte-20261103-mv.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

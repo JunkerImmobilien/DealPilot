@@ -1,0 +1,109 @@
+[
+ {
+  "land_code": "MV",
+  "ebene": "kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "formel": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quellenvermerk": null,
+  "modellansaetze": {},
+  "quelle_parser": "ernte-20261103-uk-flaeche-mv (Geoshop-Listen und Produktblätter gelesen, 03.11.2026; Lizenz aus den Registersätzen nachernte-2026-10b-mv.json)",
+  "ags": "13071",
+  "gebiet_name": "Landkreis Mecklenburgische Seenplatte",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "berichtsjahr": 2024,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte/170141,820.html",
+  "gebuehr": "0,00 € (Geoshop, Download nach Bestellung)",
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — jüngster Bericht des Ausschusses ist der Grundstücksmarktbericht 2024 (Berichtszeitraum 01.01.–31.12.2023, beschlossen am 26.11.2024, 149 Seiten; im Geoshop am 03.11.2026 kein neuerer Jahrgang gelistet, nur die Berichte über den land- und forstwirtschaftlichen Bodenmarkt 2025/2026). Ob er Umrechnungskoeffizienten für die Grundstücksgröße führt, ist in dieser Ernte nicht nachgelesen (der Bericht ist nur über den Warenkorb des Geoshops abrufbar). Unabhängig davon ist er urheberrechtlich geschützt: „Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ (S. 2) — eine Genehmigung liegt nicht vor. Kein Landeswert als Ersatz: der landesweite Satz des Oberen Gutachterausschusses M-V ist selbst gesperrt. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de; Bericht 2024 kostenfrei im Geoshop: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte/170141,820.html",
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses im Landkreis Mecklenburgische Seenplatte, gaa@lk-seenplatte.de; Geoshop: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+  },
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "lizenz": "urheberrechtlich geschützt — Nachdruck und Vervielfältigung nur mit Genehmigung des Herausgebers",
+  "lizenz_wortlaut": "Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.",
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Produktblatt „GSMB 2024 LK MSE“ (Geoshop)",
+    "fundstelle": "Produktbeschreibung: Grundstücksmarktbericht 2024, 149 Seiten, Daten 01.01.2023–31.12.2023, beschlossen am 26.11.2024, Preis 0,00 €",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/mod/media/ajax/1/GetMedia/?con=170144,820"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte",
+    "fundstelle": "S. 2 „Vervielfältigung und Verbreitung“ (Wortlaut aus nachernte-2026-10b-mv.json)",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+   }
+  ],
+  "fundstelle": "Produktblatt GSMB 2024 (Geoshop); Grundstücksmarktbericht 2024, S. 2 (Lizenz)",
+  "seite": "S. 2",
+  "belege_meta": {
+   "dokument": "Geoshop Landkreis Mecklenburgische Seenplatte, Liste Grundstücksmarktberichte",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  },
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Jahrgang 2024",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte"
+ },
+ {
+  "land_code": "MV",
+  "ebene": "kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "formel": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quellenvermerk": null,
+  "modellansaetze": {},
+  "quelle_parser": "ernte-20261103-uk-flaeche-mv (Geoshop-Listen und Produktblätter gelesen, 03.11.2026; Lizenz aus den Registersätzen nachernte-2026-10b-mv.json)",
+  "ags": "13073",
+  "gebiet_name": "Landkreis Vorpommern-Rügen",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "berichtsjahr": 2019,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG UND VERALTET — jüngster im Geoshop gelisteter Bericht ist weiterhin der Grundstücksmarktbericht 2019 (Kauffälle 2017/2018; Liste am 03.11.2026 gelesen: 2011/2012, 2015, 2017, 2019). Ob er Umrechnungskoeffizienten für die Grundstücksgröße führt, ist in dieser Ernte nicht nachgelesen; ein Bericht aus Kauffällen 2017/2018 läge ohnehin außerhalb der zulässigen Jahrgänge. Lizenz (S. 2): „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ Kein Landeswert als Ersatz: der landesweite Satz des Oberen Gutachterausschusses M-V ist selbst gesperrt. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund), gutachterausschuss@lk-vr.de; Geoshop: https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses im Landkreis Vorpommern-Rügen, gutachterausschuss@lk-vr.de; Geoshop: https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+  },
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "lizenz": "Vervielfältigung und Verbreitung nur mit Genehmigung des Herausgebers",
+  "lizenz_wortlaut": "Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.",
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Geoshop Landkreis Vorpommern-Rügen, Seite „Grundstücksmarkt“",
+    "fundstelle": "Produktliste: Grundstücksmarktberichte 2011/2012, 2015, 2017, 2019 (abgerufen 03.11.2026)",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarktbericht 2019 Vorpommern-Rügen",
+    "fundstelle": "S. 2 „Vervielfältigung und Verbreitung“ (Wortlaut aus nachernte-2026-10b-mv.json)",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+   }
+  ],
+  "fundstelle": "Geoshop-Produktliste (03.11.2026); Grundstücksmarktbericht 2019, S. 2 (Lizenz)",
+  "seite": "S. 2",
+  "belege_meta": {
+   "dokument": "Geoshop Landkreis Vorpommern-Rügen, Seite Grundstücksmarkt",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  },
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen, Jahrgang 2019",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen"
+ }
+]

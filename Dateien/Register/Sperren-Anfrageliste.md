@@ -1,17 +1,17 @@
 # Sperren — Anfrageliste an die Gutachterausschüsse
 
-Stand 2026-10-28 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den aktiven Registerdateien und `ausschuss_kontakte.json` (Stand 2026-10-28).
+Stand 2026-11-03 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den aktiven Registerdateien und `ausschuss_kontakte.json` (Stand 2026-10-28).
 
 ## Zusammenfassung
 
 | | |
 |---|---:|
 | Ausschüsse mit Sperren | 475 |
-| Sperren | 12110 |
-| davon Ausschüsse mit belegter E-Mail der Geschäftsstelle | 248 |
+| Sperren | 12131 |
+| davon Ausschüsse mit belegter E-Mail der Geschäftsstelle | 250 |
 | nur E-Mail der oberen Stelle | 2 |
 | nur Kontaktformular | 2 |
-| ohne Kontakt | 223 |
+| ohne Kontakt | 221 |
 
 **Sperren je Grund** (Feld `zugang`)
 
@@ -19,12 +19,12 @@ Stand 2026-10-28 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 |---|---:|
 | kostenpflichtig | 3461 |
 | auf Anfrage | 3412 |
-| ohne Angabe | 2958 |
-| genehmigungspflichtig | 779 |
-| nicht abgeleitet | 475 |
+| ohne Angabe | 2956 |
+| genehmigungspflichtig | 782 |
+| nicht abgeleitet | 482 |
 | frei, aber nicht verwertbar | 287 |
 | kostenfrei, aber nicht verwertbar | 278 |
-| nicht veröffentlicht | 253 |
+| nicht veröffentlicht | 266 |
 | nur nichtkommerziell | 194 |
 | auf Anfrage (kostenfrei) | 9 |
 | veraltet | 4 |
@@ -38,9 +38,9 @@ Stand 2026-10-28 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | BW | 111 | 8727 | 95 |
 | BY | 175 | 1166 | 77 |
 | HB | 3 | 17 | 2 |
-| HE | 19 | 295 | 12 |
+| HE | 19 | 314 | 14 |
 | HH | 1 | 7 | 1 |
-| MV | 9 | 99 | 9 |
+| MV | 9 | 101 | 9 |
 | NI | 11 | 395 | 0 |
 | NW | 70 | 185 | 2 |
 | RP | 13 | 479 | 12 |
@@ -385,15 +385,15 @@ Stand 2026-10-28 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 
 | Ausschuss | Sperren | Kennzahlen | Grund | Preis | Jg. | E-Mail | Link |
 |---|---:|---|---|---|---|---|---|
-| Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau | 142 | Vergleichsfaktor (§ 20) 126, Sachwertfaktor 8, Liegenschaftszinssatz 8 | ohne Angabe 126, kostenfrei, aber nicht verwertbar 16 |  | 2026 | gs-gaa-afb-bd@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
-| Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises | 20 | Vergleichsfaktor (§ 20) 10, Sachwertfaktor 10 | ohne Angabe 10, kostenfrei, aber nicht verwertbar 10 |  | 2026 | gs-gaa-afb-hp@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
-| Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg | 20 | Vergleichsfaktor (§ 20) 8, Sachwertfaktor 8, Liegenschaftszinssatz 4 | ohne Angabe 12, kostenfrei, aber nicht verwertbar 8 |  | 2026 | gs-gaa-afb-lm@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026) |
+| Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau | 144 | Vergleichsfaktor (§ 20) 126, Sachwertfaktor 8, Liegenschaftszinssatz 8, UK WGFZ 2 | ohne Angabe 126, kostenfrei, aber nicht verwertbar 16, nicht veröffentlicht 2 |  | 2026 | gs-gaa-afb-bd@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
+| Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises | 25 | Vergleichsfaktor (§ 20) 10, Sachwertfaktor 10, UK WGFZ 5 | ohne Angabe 10, kostenfrei, aber nicht verwertbar 10, nicht abgeleitet 5 |  | 2026 | gs-gaa-afb-hp@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
+| Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg | 25 | Vergleichsfaktor (§ 20) 8, Sachwertfaktor 8, UK WGFZ 5, Liegenschaftszinssatz 4 | ohne Angabe 12, kostenfrei, aber nicht verwertbar 8, nicht veröffentlicht 4, nicht abgeleitet 1 |  | 2026 | gs-gaa-afb-lm@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026) |
 | Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf | 15 | Vergleichsfaktor (§ 20) 6, Sachwertfaktor 6, UK Grundstücksgröße 3 | ohne Angabe 9, kostenfrei, aber nicht verwertbar 6 |  | 2026 | – | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
-| Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner | 12 | Vergleichsfaktor (§ 20) 6, UK Grundstücksgröße 3, Sachwertfaktor 3 | ohne Angabe 9, kostenfrei, aber nicht verwertbar 3 |  | 2026 | – | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
+| Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner | 15 | Vergleichsfaktor (§ 20) 6, UK Grundstücksgröße 3, Sachwertfaktor 3, UK WGFZ 3 | ohne Angabe 9, kostenfrei, aber nicht verwertbar 3, nicht veröffentlicht 3 |  | 2026 | gs-gaa-afb-hr@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
 | Gutachterausschuss für Immobilienwerte für den Bereich der Wissenschaftsstadt Darmstadt | 11 | Sachwertfaktor 4, Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 2, UK Grundstücksgröße 1, UK WGFZ 1 | kostenfrei, aber nicht verwertbar 7, ohne Angabe 4 |  | 2026 | gutachterausschuss@darmstadt.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
+| Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises | 11 | Vergleichsfaktor (§ 20) 4, Sachwertfaktor 4, UK WGFZ 2, UK Grundstücksgröße 1 | ohne Angabe 5, kostenfrei, aber nicht verwertbar 4, nicht veröffentlicht 2 |  | 2026 | gs-gaa-afb-fd@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
+| Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg | 10 | Vergleichsfaktor (§ 20) 4, Sachwertfaktor 4, UK WGFZ 2 | ohne Angabe 4, kostenfrei, aber nicht verwertbar 4, nicht veröffentlicht 2 |  | 2026 | gs-gaa-afb-kb@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
 | Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 2, Sachwertfaktor 2, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 7, kostenfrei, aber nicht verwertbar 2 |  | 2026 | gutachterausschuss@bad-homburg.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026) |
-| Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises | 9 | Vergleichsfaktor (§ 20) 4, Sachwertfaktor 4, UK Grundstücksgröße 1 | ohne Angabe 5, kostenfrei, aber nicht verwertbar 4 |  | 2026 | gs-gaa-afb-fd@hvbg.hessen.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
-| Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg | 8 | Vergleichsfaktor (§ 20) 4, Sachwertfaktor 4 | ohne Angabe 4, kostenfrei, aber nicht verwertbar 4 |  | 2026 | – | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
 | Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Frankfurt am Main | 8 | UK WGFZ 3, Vergleichsfaktor (§ 20) 2, Sachwertfaktor 2, UK Grundstücksgröße 1 | ohne Angabe 6, kostenfrei, aber nicht verwertbar 2 |  | 2026 | – | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
 | Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main | 8 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 2, Sachwertfaktor 2, UK Grundstücksgröße 1 | ohne Angabe 8 |  | 2026 | gutachterausschuss@offenbach.de | [Quelle](https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Vergleichsfaktoren) |
 | Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel | 7 | Vergleichsfaktor (§ 20) 2, Sachwertfaktor 2, Liegenschaftszinssatz 1, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 5, kostenfrei, aber nicht verwertbar 2 |  | 2026 | gutachterausschuss@kassel.de | [Quelle](https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/) |
@@ -418,10 +418,10 @@ Stand 2026-10-28 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte im Landkreis Rostock | 22 | Liegenschaftszinssatz 10, Sachwertfaktor 5, Vergleichsfaktor (§ 20) 4, UK Grundstücksgröße 1, UK WGFZ 1, rohertragsfaktor 1 | genehmigungspflichtig 20, ohne Angabe 2 | Bericht kostenlos im Geoshop, gedruckt 60,00 € | 2026 | gutachterausschuss@lkros.de | [Quelle](https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald | 17 | Liegenschaftszinssatz 6, Vergleichsfaktor (§ 20) 4, Sachwertfaktor 3, UK WGFZ 2, UK Grundstücksgröße 1, rohertragsfaktor 1 | genehmigungspflichtig 16, ohne Angabe 1 | Bericht digital kostenfrei im Geoshop VG — die Hürde ist die Genehmigung, nicht der Preis | 2026 | gutachterausschuss@kreis-vg.de | [Quelle](https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html) |
 | Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock | 16 | Liegenschaftszinssatz 6, Vergleichsfaktor (§ 20) 4, Sachwertfaktor 3, UK Grundstücksgröße 1, UK WGFZ 1, rohertragsfaktor 1 | genehmigungspflichtig 14, ohne Angabe 2 | Bericht als Download kostenfrei, digitaler Versand bzw. Post 50,00 € (S. 81) — die Hürde ist die Genehmigung, nicht der Preis | 2026 | gutachterausschuss@rostock.de | [Quelle](https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html) |
-| Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte | 10 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1 | genehmigungspflichtig 9, ohne Angabe 1 | Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis | 2026 | gaa@lk-seenplatte.de | [Quelle](https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html) |
+| Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte | 11 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1, UK Grundstücksgröße 1 | genehmigungspflichtig 10, ohne Angabe 1 | Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis | 2026 | gaa@lk-seenplatte.de | [Quelle](https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html) |
+| Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen | 10 | Liegenschaftszinssatz 4, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1, UK Grundstücksgröße 1 | genehmigungspflichtig 7, nicht abgeleitet 2, ohne Angabe 1 | Schutzgebühr 50,00 € pro Exemplar (S. 2, Tarifstelle 3.1.1 GAKostVO M-V) | 2026 | gutachterausschuss@lk-vr.de | [Quelle](https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim | 9 | Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 2, UK WGFZ 2, Liegenschaftszinssatz 1, Sachwertfaktor 1 | kostenfrei, aber nicht verwertbar 4, nicht abgeleitet 3, ohne Angabe 2 | Download kostenfrei, gedruckt bzw. per E-Mail 50,00 € Schutzgebühr (S. 2) | 2026 | gutachterausschuss@kreis-lup.de | [Quelle](https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg | 9 | Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 2, Sachwertfaktor 2, UK WGFZ 1, UK Grundstücksgröße 1 | genehmigungspflichtig 8, ohne Angabe 1 | PDF im Geoshop NWM kostenfrei, gedruckt 60,00 € bei der Geschäftsstelle — die Hürde ist die Genehmigung, nicht der Preis | 2026 | gutachterausschuss@nordwestmecklenburg.de | [Quelle](https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html) |
-| Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen | 9 | Liegenschaftszinssatz 4, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1 | genehmigungspflichtig 6, nicht abgeleitet 2, ohne Angabe 1 | Schutzgebühr 50,00 € pro Exemplar (S. 2, Tarifstelle 3.1.1 GAKostVO M-V) | 2026 | gutachterausschuss@lk-vr.de | [Quelle](https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html) |
 | Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin | 5 | Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1 | nicht abgeleitet 2, ohne Angabe 2, kostenpflichtig 1 |  | 2026 | gutachterausschuss@schwerin.de | [Quelle](https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf#page=79) |
 | Oberer Gutachterausschuss für Grundstückswerte im Land Mecklenburg-Vorpommern | 2 | UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 2 |  | 2026 | wertermittlung@laiv-mv.de | [Quelle](https://www.laiv-mv.de/static/LAIV/Geoinformation/Dateien/Wertermittlung/LGMB_2025_Web.pdf) |
 
@@ -571,7 +571,7 @@ Stand 2026-10-28 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Ausschuss | Sperren | Kennzahlen | Grund | Preis | Jg. | E-Mail | Link |
 |---|---:|---|---|---|---|---|---|
 | Gutachterausschuss für Grundstückswerte im Erzgebirgskreis | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 7, ohne Angabe 2 | auf schriftlichen Antrag gegen Gebührenbescheid, Höhe vorab zu erfragen | 2026 | gutachterausschuss@kreis-erz.de | [Quelle](https://www.erzgebirgskreis.de/landratsamt-service/struktur-aufgaben/aemter-von-a-bis-z/geschaeftsstelle-gutachterausschuss) |
-| Gutachterausschuss für Grundstückswerte im Landkreis Bautzen | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 7, ohne Angabe 2 | Bericht kostenfrei; Verwertung nur mit Erlaubnis des Herausgebers | 2026 | gutachterausschuss@lra-bautzen.de | [Quelle](https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf) |
+| Gutachterausschuss für Grundstückswerte im Landkreis Bautzen | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 8, nicht abgeleitet 1 | Bericht kostenfrei; Verwertung nur mit Erlaubnis des Herausgebers | 2026 | gutachterausschuss@lra-bautzen.de | [Quelle](https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Görlitz | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | auf Anfrage 4, kostenpflichtig 3, ohne Angabe 2 | nicht genannt (kein Bericht online) | 2026 | gutachterausschuss@kreis-gr.de | [Quelle](https://www.kreis-goerlitz.de/Landratsamt/Aemteruebersicht.htm/03-Landratsamt/Aemter/Geschaeftsstelle-Gutachterausschuss.html?eps=50) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Leipzig | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 7, ohne Angabe 2 | aktueller Bericht 70 bis 167 € (Gutachterausschusssatzung), ältere Jahrgänge die Hälfte | 2026 | gutachterausschuss@lk-l.de | [Quelle](https://fs.egov.sachsen.de/formcycle/form/provide/8323) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Meißen | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 6, nicht abgeleitet 3 |  | 2026 | (obere Stelle: oga@geosn.sachsen.de) | [Quelle](https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF) |

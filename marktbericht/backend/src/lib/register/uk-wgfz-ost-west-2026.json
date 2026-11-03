@@ -3278,36 +3278,38 @@
   "jahrgang": 2026,
   "berichtsjahr": 2026,
   "vollstaendig": false,
-  "warum_kein_wert": "Verzicht: „Da die Bodenwerte im gesamten Landkreis diese Grenze [150 EUR/m²] in den Ortslagen überwiegend nicht überschreiten, wird auf eine Anpassung der Bodenwerte hinsichtlich der WGFZ durch den Gutachterausschuss verzichtet.“",
+  "warum_kein_wert": "Verzicht (Grundstücksmarktbericht Stand 01.01.2026, Abschn. 10.2.1, S. 64): „Da die Bodenwerte im gesamten Landkreis diese Grenze [150 €/m²] in den Ortslagen überwiegend nicht überschreiten, wird auf eine Anpassung der Bodenwerte hinsichtlich der WGFZ durch den Gutachterausschuss verzichtet.“ Weg: Geschäftsstelle des Gutachterausschusses im Landratsamt Bautzen (gutachterausschuss@lra-bautzen.de); Bericht: https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf.",
   "geltungsbereich": {
    "objektarten": [],
    "objektarten_ausgeschlossen": [],
-   "ausserhalb_weg": "Grundstücksmarktbericht/Erläuterungen des Ausschusses: https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf"
+   "ausserhalb_weg": "Grundstücksmarktbericht des Ausschusses (Stand 01.01.2026): https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf"
   },
   "belege": [
    {
     "art": "amtliche Veröffentlichung",
-    "dokument": "Grundstücksmarktbericht Landkreis Bautzen",
-    "fundstelle": "Abschnitt Wertrelevante Geschossflächenzahl / ganzer Text; Textsuche über alle 103 Seiten von GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf",
-    "url": "https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf"
+    "dokument": "Grundstücksmarktbericht Landkreis Bautzen – Stand 01.01.2026 (beschlossen am 15.06.2026)",
+    "fundstelle": "Abschn. 10.2.1 „Berücksichtigung abweichende wertrelevante Geschossflächenzahlen“, S. 64",
+    "url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf"
    }
   ],
-  "fundstelle": "Abschnitt Wertrelevante Geschossflächenzahl / ganzer Text; Textsuche über alle 103 Seiten von GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf",
+  "fundstelle": "Abschn. 10.2.1, S. 64",
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": null,
   "stichtag_hinweis": "Ohne Wert kein Stichtag.",
-  "quelle_url": "https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf",
-  "seite": null,
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.landkreis-bautzen.de/download/boden/Grundstuecksmarktbericht_Landkreis_Bautzen_Stand_01012026.pdf",
+  "seite": "S. 64",
+  "lizenz": "urheberrechtlich geschützt — Verwertung für nichteigene oder wirtschaftliche Zwecke und öffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
   "quellenvermerk": null,
   "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte im Landkreis Bautzen, Jahrgang 2026",
-  "quelle_parser": "v-uk-wgfz-ernte-2 (pdftotext -layout, Seitenbild wo noetig, 18.10.2026)",
+  "quelle_parser": "ernte-20261103-uk (Grundstücksmarktbericht 2026, pdftotext -layout, 03.11.2026)",
   "modellansaetze": {},
   "belege_meta": {
-   "abgerufen_am": "2026-10-18",
-   "dokument": "Grundstücksmarktbericht Landkreis Bautzen"
-  }
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03",
+   "dokument": "Grundstücksmarktbericht Landkreis Bautzen – Stand 01.01.2026 (beschlossen am 15.06.2026)"
+  },
+  "zugang": "nicht abgeleitet"
  },
  {
   "kennzahl": "umrechnungskoeffizient_wgfz",

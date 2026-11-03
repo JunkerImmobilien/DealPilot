@@ -1,0 +1,994 @@
+[
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06431",
+  "ebene": "kreis",
+  "gebiet_name": "Bergstraße, Landkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss führt keine WGFZ-Umrechnungskoeffizienten: „Gleiches gilt auch für die GFZ-Umrechnungskoeffizienten, die seit dem 01.01.2024 nicht mehr Bestandteil der Richtwertdefinition für Geschosswohnungsbau sind.“ Für Investorengrundstücke (Mehrfamilienhausbebauung) ist eine Abhängigkeit von Bodenrichtwert, Kaufpreis und WGFZ „zwar statistisch erfassbar …; eine Ableitung von entsprechenden Umrechnungskoeffizienten konnte auf Basis dieser Untersuchungsergebnisse nicht durchgeführt werden.“ Für Ein- und Zweifamilienhausgrundstücke ist „die GFZ-Abhängigkeit der Kaufpreise dieser Grundstücke überwiegend nicht wertrelevant“ (Immobilienmarktbericht Südhessen 2026, Kap. 8.1, S. 86). Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 nennen ebenfalls keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht abgeleitet",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+    "datei": "`2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf",
+    "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten 01.01.2026, Seite 1–2 von 2: GFZ nur als allgemeines Merkmal, keine Umrechnungskoeffizienten",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606051-gaa-hp-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+  "seite": "Kap. 8.1 „Bodenwert“, S. 86",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichtes und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06432",
+  "ebene": "kreis",
+  "gebiet_name": "Darmstadt-Dieburg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss führt keine WGFZ-Umrechnungskoeffizienten: „Gleiches gilt auch für die GFZ-Umrechnungskoeffizienten, die seit dem 01.01.2024 nicht mehr Bestandteil der Richtwertdefinition für Geschosswohnungsbau sind.“ Für Investorengrundstücke (Mehrfamilienhausbebauung) ist eine Abhängigkeit von Bodenrichtwert, Kaufpreis und WGFZ „zwar statistisch erfassbar …; eine Ableitung von entsprechenden Umrechnungskoeffizienten konnte auf Basis dieser Untersuchungsergebnisse nicht durchgeführt werden.“ Für Ein- und Zweifamilienhausgrundstücke ist „die GFZ-Abhängigkeit der Kaufpreise dieser Grundstücke überwiegend nicht wertrelevant“ (Immobilienmarktbericht Südhessen 2026, Kap. 8.1, S. 86). Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 nennen ebenfalls keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht abgeleitet",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+    "datei": "`2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf",
+    "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten 01.01.2026, Seite 1–2 von 2: GFZ nur als allgemeines Merkmal, keine Umrechnungskoeffizienten",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606051-gaa-hp-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+  "seite": "Kap. 8.1 „Bodenwert“, S. 86",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichtes und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06433",
+  "ebene": "kreis",
+  "gebiet_name": "Groß-Gerau, Landkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss führt keine WGFZ-Umrechnungskoeffizienten: „Gleiches gilt auch für die GFZ-Umrechnungskoeffizienten, die seit dem 01.01.2024 nicht mehr Bestandteil der Richtwertdefinition für Geschosswohnungsbau sind.“ Für Investorengrundstücke (Mehrfamilienhausbebauung) ist eine Abhängigkeit von Bodenrichtwert, Kaufpreis und WGFZ „zwar statistisch erfassbar …; eine Ableitung von entsprechenden Umrechnungskoeffizienten konnte auf Basis dieser Untersuchungsergebnisse nicht durchgeführt werden.“ Für Ein- und Zweifamilienhausgrundstücke ist „die GFZ-Abhängigkeit der Kaufpreise dieser Grundstücke überwiegend nicht wertrelevant“ (Immobilienmarktbericht Südhessen 2026, Kap. 8.1, S. 86). Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 nennen ebenfalls keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht abgeleitet",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+    "datei": "`2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf",
+    "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten 01.01.2026, Seite 1–2 von 2: GFZ nur als allgemeines Merkmal, keine Umrechnungskoeffizienten",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606051-gaa-hp-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+  "seite": "Kap. 8.1 „Bodenwert“, S. 86",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichtes und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06437",
+  "ebene": "kreis",
+  "gebiet_name": "Odenwaldkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss führt keine WGFZ-Umrechnungskoeffizienten: „Gleiches gilt auch für die GFZ-Umrechnungskoeffizienten, die seit dem 01.01.2024 nicht mehr Bestandteil der Richtwertdefinition für Geschosswohnungsbau sind.“ Für Investorengrundstücke (Mehrfamilienhausbebauung) ist eine Abhängigkeit von Bodenrichtwert, Kaufpreis und WGFZ „zwar statistisch erfassbar …; eine Ableitung von entsprechenden Umrechnungskoeffizienten konnte auf Basis dieser Untersuchungsergebnisse nicht durchgeführt werden.“ Für Ein- und Zweifamilienhausgrundstücke ist „die GFZ-Abhängigkeit der Kaufpreise dieser Grundstücke überwiegend nicht wertrelevant“ (Immobilienmarktbericht Südhessen 2026, Kap. 8.1, S. 86). Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 nennen ebenfalls keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht abgeleitet",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+    "datei": "`2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf",
+    "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten 01.01.2026, Seite 1–2 von 2: GFZ nur als allgemeines Merkmal, keine Umrechnungskoeffizienten",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606051-gaa-hp-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+  "seite": "Kap. 8.1 „Bodenwert“, S. 86",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichtes und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06438",
+  "ebene": "kreis",
+  "gebiet_name": "Offenbach, Landkreis (ohne Stadt Offenbach — eigener Ausschuss)",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss führt keine WGFZ-Umrechnungskoeffizienten: „Gleiches gilt auch für die GFZ-Umrechnungskoeffizienten, die seit dem 01.01.2024 nicht mehr Bestandteil der Richtwertdefinition für Geschosswohnungsbau sind.“ Für Investorengrundstücke (Mehrfamilienhausbebauung) ist eine Abhängigkeit von Bodenrichtwert, Kaufpreis und WGFZ „zwar statistisch erfassbar …; eine Ableitung von entsprechenden Umrechnungskoeffizienten konnte auf Basis dieser Untersuchungsergebnisse nicht durchgeführt werden.“ Für Ein- und Zweifamilienhausgrundstücke ist „die GFZ-Abhängigkeit der Kaufpreise dieser Grundstücke überwiegend nicht wertrelevant“ (Immobilienmarktbericht Südhessen 2026, Kap. 8.1, S. 86). Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 nennen ebenfalls keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht abgeleitet",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Heppenheim, Odenwaldstraße 6, 64646 Heppenheim, (0611) 535-8904, GS-GAA-AfB-HP@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+    "datei": "`2026_IMB_SÜDHESSEN_ AFB_HEPPENHEIM_GESAMTAUSGABE.pdf",
+    "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten 01.01.2026, Seite 1–2 von 2: GFZ nur als allgemeines Merkmal, keine Umrechnungskoeffizienten",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606051-gaa-hp-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 8.1 „Bodenwert“, S. 86",
+  "seite": "Kap. 8.1 „Bodenwert“, S. 86",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichtes und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Bergstraße, Darmstadt-Dieburg, Groß-Gerau, Offenbach und des Odenwaldkreises, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht Südhessen 2026 (Gesamtausgabe), Amt für Bodenmanagement Heppenheim",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06434",
+  "ebene": "kreis",
+  "gebiet_name": "Hochtaunuskreis (ohne die Städte Oberursel und Bad Homburg v. d. Höhe — eigene Ausschüsse)",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht für Wohnbauland keine WGFZ-Umrechnungskoeffizienten. Kap. 9 „Wertrelevante Daten“ führt nur Umrechnungskoeffizienten für die Grundstücksgröße (Kap. 9.4, S. 164–165) und vermerkt dazu: „Die ausgewiesenen Umrechnungskoeffizienten sind nicht um die Geschossfläche (GFZ) bereinigt.“ Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 (Seite 2 von 2) nennen für Wohnbauland ebenfalls nur die Flächentabelle. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+    "datei": "`2026_IMB_AFB_Limburg.pdf",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 2 von 2: nur Flächentabelle (EFH/ZFH) und für gewerbliche Bauflächen im Main-Taunus-Kreis die Empfehlung einer linearen WGFZ-Umrechnung im Einzelfall",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606052-gaa-lm-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "seite": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06436",
+  "ebene": "kreis",
+  "gebiet_name": "Main-Taunus-Kreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht für Wohnbauland keine WGFZ-Umrechnungskoeffizienten. Kap. 9 „Wertrelevante Daten“ führt nur Umrechnungskoeffizienten für die Grundstücksgröße (Kap. 9.4, S. 164–165) und vermerkt dazu: „Die ausgewiesenen Umrechnungskoeffizienten sind nicht um die Geschossfläche (GFZ) bereinigt.“ Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 (Seite 2 von 2) nennen für Wohnbauland ebenfalls nur die Flächentabelle. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+    "datei": "`2026_IMB_AFB_Limburg.pdf",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 2 von 2: nur Flächentabelle (EFH/ZFH) und für gewerbliche Bauflächen im Main-Taunus-Kreis die Empfehlung einer linearen WGFZ-Umrechnung im Einzelfall",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606052-gaa-lm-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "seite": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06439",
+  "ebene": "kreis",
+  "gebiet_name": "Rheingau-Taunus-Kreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht für Wohnbauland keine WGFZ-Umrechnungskoeffizienten. Kap. 9 „Wertrelevante Daten“ führt nur Umrechnungskoeffizienten für die Grundstücksgröße (Kap. 9.4, S. 164–165) und vermerkt dazu: „Die ausgewiesenen Umrechnungskoeffizienten sind nicht um die Geschossfläche (GFZ) bereinigt.“ Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 (Seite 2 von 2) nennen für Wohnbauland ebenfalls nur die Flächentabelle. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+    "datei": "`2026_IMB_AFB_Limburg.pdf",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 2 von 2: nur Flächentabelle (EFH/ZFH) und für gewerbliche Bauflächen im Main-Taunus-Kreis die Empfehlung einer linearen WGFZ-Umrechnung im Einzelfall",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606052-gaa-lm-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "seite": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06533",
+  "ebene": "kreis",
+  "gebiet_name": "Limburg-Weilburg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht für Wohnbauland keine WGFZ-Umrechnungskoeffizienten. Kap. 9 „Wertrelevante Daten“ führt nur Umrechnungskoeffizienten für die Grundstücksgröße (Kap. 9.4, S. 164–165) und vermerkt dazu: „Die ausgewiesenen Umrechnungskoeffizienten sind nicht um die Geschossfläche (GFZ) bereinigt.“ Die Erläuterungen zu den Bodenrichtwerten 01.01.2026 (Seite 2 von 2) nennen für Wohnbauland ebenfalls nur die Flächentabelle. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+    "datei": "`2026_IMB_AFB_Limburg.pdf",
+    "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 2 von 2: nur Flächentabelle (EFH/ZFH) und für gewerbliche Bauflächen im Main-Taunus-Kreis die Empfehlung einer linearen WGFZ-Umrechnung im Einzelfall",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606052-gaa-lm-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "seite": "Kap. 9.4, S. 164–165 (PDF 166–167); BRW-Erläuterungen 2026, Seite 2 von 2",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Limburg a. d. Lahn (aktualisierte 3. Auflage, veröffentlicht am 26.10.2026)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06633",
+  "ebene": "kreis",
+  "gebiet_name": "Kassel, Landkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten. Kap. 9.2 nennt das Maß der baulichen Nutzung („d.h. GRZ oder GFZ“) nur als möglichen Einflussfaktor und führt allein die hessenweiten Umrechnungskoeffizienten für Grundstücksflächen (S. 155–156); der Bericht (222 Seiten, Volltext durchsucht) und die Erläuterungen zu den Bodenrichtwerten 01.01.2026 enthalten keine Tabelle oder Formel für die WGFZ. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Korbach (Landkreise Kassel und Waldeck-Frankenberg), gutachterausschuss.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Korbach (Landkreise Kassel und Waldeck-Frankenberg), gutachterausschuss.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Korbach (Landkreise Kassel und Waldeck-Frankenberg)",
+    "datei": "`2026_IMB_AFB_KORBACH.pdf",
+    "fundstelle": "Kap. 9.2, S. 155–156 (PDF 156–157); BRW-Erläuterungen 2026",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 1–2 von 2: nur Flächentabelle (hessenweit, hilfsweise), keine WGFZ-Umrechnung",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606057-gaa-kb-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 9.2, S. 155–156 (PDF 156–157); BRW-Erläuterungen 2026",
+  "seite": "Kap. 9.2, S. 155–156 (PDF 156–157); BRW-Erläuterungen 2026",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Korbach (Landkreise Kassel und Waldeck-Frankenberg)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06635",
+  "ebene": "kreis",
+  "gebiet_name": "Waldeck-Frankenberg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten. Kap. 9.2 nennt das Maß der baulichen Nutzung („d.h. GRZ oder GFZ“) nur als möglichen Einflussfaktor und führt allein die hessenweiten Umrechnungskoeffizienten für Grundstücksflächen (S. 155–156); der Bericht (222 Seiten, Volltext durchsucht) und die Erläuterungen zu den Bodenrichtwerten 01.01.2026 enthalten keine Tabelle oder Formel für die WGFZ. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Korbach (Landkreise Kassel und Waldeck-Frankenberg), gutachterausschuss.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Korbach (Landkreise Kassel und Waldeck-Frankenberg), gutachterausschuss.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Korbach (Landkreise Kassel und Waldeck-Frankenberg)",
+    "datei": "`2026_IMB_AFB_KORBACH.pdf",
+    "fundstelle": "Kap. 9.2, S. 155–156 (PDF 156–157); BRW-Erläuterungen 2026",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 1–2 von 2: nur Flächentabelle (hessenweit, hilfsweise), keine WGFZ-Umrechnung",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606057-gaa-kb-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 9.2, S. 155–156 (PDF 156–157); BRW-Erläuterungen 2026",
+  "seite": "Kap. 9.2, S. 155–156 (PDF 156–157); BRW-Erläuterungen 2026",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Korbach (Landkreise Kassel und Waldeck-Frankenberg)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06631",
+  "ebene": "kreis",
+  "gebiet_name": "Fulda, Landkreis (ohne Stadt Fulda — eigener Ausschuss)",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten. Kap. 10.4 „Umrechnungskoeffizienten Grundstück“ nennt die Geschossflächenzahl nur als möglichen Einflussfaktor („Der Bodenwert eines Grundstücks kann neben dem Maß der baulichen Nutzung (d.h. Grundflächenzahl (GRZ) oder Geschossflächenzahl (GFZ)) auch durch die Grundstücksfläche … beeinflusst werden“, S. 104) und leitet nur Flächenkoeffizienten für den Landkreis Fulda ab. Die Erläuterungen zu den Bodenrichtwerten 01.01.2026: „Derzeit liegen noch keine Umrechnungskoeffizienten vor.“ Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Washingtonallee 1, 36041 Fulda, (0611) 535-1202, gs-gaa-afb-fd@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Washingtonallee 1, 36041 Fulda, (0611) 535-1202, gs-gaa-afb-fd@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Fulda (Landkreis Fulda und Vogelsbergkreis)",
+    "datei": "`2026_IMB_AfB_Fulda.pdf",
+    "fundstelle": "Kap. 10.4, S. 104",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 1 von 1: „Derzeit liegen noch keine Umrechnungskoeffizienten vor.“",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606055-gaa-fd-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 10.4, S. 104",
+  "seite": "Kap. 10.4, S. 104",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten sind ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Fulda (Landkreis Fulda und Vogelsbergkreis)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06535",
+  "ebene": "kreis",
+  "gebiet_name": "Vogelsbergkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten. Kap. 10.4 „Umrechnungskoeffizienten Grundstück“ nennt die Geschossflächenzahl nur als möglichen Einflussfaktor („Der Bodenwert eines Grundstücks kann neben dem Maß der baulichen Nutzung (d.h. Grundflächenzahl (GRZ) oder Geschossflächenzahl (GFZ)) auch durch die Grundstücksfläche … beeinflusst werden“, S. 104) und leitet nur Flächenkoeffizienten für den Landkreis Fulda ab. Die Erläuterungen zu den Bodenrichtwerten 01.01.2026: „Derzeit liegen noch keine Umrechnungskoeffizienten vor.“ Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Washingtonallee 1, 36041 Fulda, (0611) 535-1202, gs-gaa-afb-fd@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Fulda, Washingtonallee 1, 36041 Fulda, (0611) 535-1202, gs-gaa-afb-fd@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Fulda (Landkreis Fulda und Vogelsbergkreis)",
+    "datei": "`2026_IMB_AfB_Fulda.pdf",
+    "fundstelle": "Kap. 10.4, S. 104",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 1 von 1: „Derzeit liegen noch keine Umrechnungskoeffizienten vor.“",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606055-gaa-fd-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 10.4, S. 104",
+  "seite": "Kap. 10.4, S. 104",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten sind ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Fulda (Landkreis Fulda und Vogelsbergkreis)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06435",
+  "ebene": "kreis",
+  "gebiet_name": "Main-Kinzig-Kreis (einschließlich Stadt Hanau)",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten. Kap. 8.1 „Umrechnungskoeffizienten“ (S. 72) führt nur die Koeffizienten für die Grundstücksgröße im individuellen Wohnungsbau; der Bericht (111 Seiten, Volltext durchsucht) erwähnt die Geschossflächenzahl an keiner Stelle, und die Erläuterungen zu den Bodenrichtwerten 01.01.2026 führen keine Umrechnung. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Büdingen, Bahnhofstraße 33, 63654 Büdingen, +49 611 535 7444, gs-gaa-afb-bd@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Büdingen, Bahnhofstraße 33, 63654 Büdingen, +49 611 535 7444, gs-gaa-afb-bd@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Büdingen (Main-Kinzig-Kreis, Wetteraukreis, Stadt Hanau)",
+    "datei": "`2026_IMB_AFB_Büdingen.pdf",
+    "fundstelle": "Kap. 8.1, S. 72",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten 01.01.2026, Seite 1 von 1: keine Umrechnungskoeffizienten",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606053-gaa-bd-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 8.1, S. 72",
+  "seite": "Kap. 8.1, S. 72",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Büdingen (Main-Kinzig-Kreis, Wetteraukreis, Stadt Hanau)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06440",
+  "ebene": "kreis",
+  "gebiet_name": "Wetteraukreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten. Kap. 8.1 „Umrechnungskoeffizienten“ (S. 72) führt nur die Koeffizienten für die Grundstücksgröße im individuellen Wohnungsbau; der Bericht (111 Seiten, Volltext durchsucht) erwähnt die Geschossflächenzahl an keiner Stelle, und die Erläuterungen zu den Bodenrichtwerten 01.01.2026 führen keine Umrechnung. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Büdingen, Bahnhofstraße 33, 63654 Büdingen, +49 611 535 7444, gs-gaa-afb-bd@hvbg.hessen.de; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Büdingen, Bahnhofstraße 33, 63654 Büdingen, +49 611 535 7444, gs-gaa-afb-bd@hvbg.hessen.de; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Büdingen (Main-Kinzig-Kreis, Wetteraukreis, Stadt Hanau)",
+    "datei": "`2026_IMB_AFB_Büdingen.pdf",
+    "fundstelle": "Kap. 8.1, S. 72",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten 01.01.2026, Seite 1 von 1: keine Umrechnungskoeffizienten",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606053-gaa-bd-2026.pdf"
+   }
+  ],
+  "fundstelle": "Kap. 8.1, S. 72",
+  "seite": "Kap. 8.1, S. 72",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Main-Kinzig-Kreises, des Wetteraukreises und der Stadt Hanau, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Büdingen (Main-Kinzig-Kreis, Wetteraukreis, Stadt Hanau)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06632",
+  "ebene": "kreis",
+  "gebiet_name": "Hersfeld-Rotenburg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten: der Immobilienmarktbericht 2026 (137 Seiten, Volltext durchsucht) enthält keinen Abschnitt zu Umrechnungskoeffizienten (das Wort steht nur in der Aufgabenbeschreibung der Gutachterausschüsse, S. 12–13), und die Erläuterungen zu den Bodenrichtwerten 01.01.2026 kündigen „nachfolgend die Umrechnungskoeffizienten“ an, führen auf dem einseitigen Blatt aber keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Homberg (Efze); Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen (gds.hessen.de).; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Homberg (Efze); Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen (gds.hessen.de).; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Homberg (Efze) (Landkreise Hersfeld-Rotenburg, Schwalm-Eder, Werra-Meißner)",
+    "datei": "`2026_IMB_AfB_Homberg.pdf",
+    "fundstelle": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 1 von 1: angekündigt, keine Koeffizienten abgedruckt",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606056-gaa-hr-2026.pdf"
+   }
+  ],
+  "fundstelle": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+  "seite": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Homberg (Efze) (Landkreise Hersfeld-Rotenburg, Schwalm-Eder, Werra-Meißner)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06634",
+  "ebene": "kreis",
+  "gebiet_name": "Schwalm-Eder-Kreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten: der Immobilienmarktbericht 2026 (137 Seiten, Volltext durchsucht) enthält keinen Abschnitt zu Umrechnungskoeffizienten (das Wort steht nur in der Aufgabenbeschreibung der Gutachterausschüsse, S. 12–13), und die Erläuterungen zu den Bodenrichtwerten 01.01.2026 kündigen „nachfolgend die Umrechnungskoeffizienten“ an, führen auf dem einseitigen Blatt aber keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Homberg (Efze); Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen (gds.hessen.de).; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Homberg (Efze); Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen (gds.hessen.de).; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Homberg (Efze) (Landkreise Hersfeld-Rotenburg, Schwalm-Eder, Werra-Meißner)",
+    "datei": "`2026_IMB_AfB_Homberg.pdf",
+    "fundstelle": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 1 von 1: angekündigt, keine Koeffizienten abgedruckt",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606056-gaa-hr-2026.pdf"
+   }
+  ],
+  "fundstelle": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+  "seite": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Homberg (Efze) (Landkreise Hersfeld-Rotenburg, Schwalm-Eder, Werra-Meißner)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06636",
+  "ebene": "kreis",
+  "gebiet_name": "Werra-Meißner-Kreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner",
+  "zweig": "alle",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ausschuss veröffentlicht keine WGFZ-Umrechnungskoeffizienten: der Immobilienmarktbericht 2026 (137 Seiten, Volltext durchsucht) enthält keinen Abschnitt zu Umrechnungskoeffizienten (das Wort steht nur in der Aufgabenbeschreibung der Gutachterausschüsse, S. 12–13), und die Erläuterungen zu den Bodenrichtwerten 01.01.2026 kündigen „nachfolgend die Umrechnungskoeffizienten“ an, führen auf dem einseitigen Blatt aber keine. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Homberg (Efze); Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen (gds.hessen.de).; Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "zugang": "nicht veröffentlicht",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Homberg (Efze); Immobilienmarktbericht 2026 kostenfrei im Geodatenshop Hessen (gds.hessen.de).; https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 AfB Homberg (Efze) (Landkreise Hersfeld-Rotenburg, Schwalm-Eder, Werra-Meißner)",
+    "datei": "`2026_IMB_AfB_Homberg.pdf",
+    "fundstelle": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+    "url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 1 von 1: angekündigt, keine Koeffizienten abgedruckt",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606056-gaa-hr-2026.pdf"
+   }
+  ],
+  "fundstelle": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+  "seite": "IMB 2026 (Volltext, 137 S.); BRW-Erläuterungen 2026, Seite 1 von 1",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, Volltext je Bericht, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Immobilienmarktbericht 2026 AfB Homberg (Efze) (Landkreise Hersfeld-Rotenburg, Schwalm-Eder, Werra-Meißner)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "HE",
+  "ags": "06436",
+  "ebene": "kreis",
+  "gebiet_name": "Main-Taunus-Kreis",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "ausschuss": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
+  "zweig": "gewerbe",
+  "jahrgang": 2026,
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Für gewerbliche Bauflächen im Main-Taunus-Kreis nennt der Ausschuss keine Tabelle, sondern eine Empfehlung unter Vorbehalt: „Der Gutachterausschuss empfiehlt für den Bereich des Main-Taunus-Kreises eine lineare Umrechnung des Bodenrichtwertes für gewerbliche Bauflächen bei abweichender WGFZ. Es ist im Einzelfall zu prüfen, ob deren Anwendung sachgerecht ist.“ (Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten 01.01.2026, Seite 2 von 2). Die Anwendung steht damit unter sachverständiger Einzelfallprüfung; ein Anwendungsbeispiel druckt das Blatt nicht. Die Regel ist unter formel_vorgemerkt festgehalten, gerechnet wird sie nicht. Weg: Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de; Erläuterungen: https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606052-gaa-lm-2026.pdf",
+  "zugang": "nicht abgeleitet",
+  "formel": null,
+  "formel_vorgemerkt": {
+   "form": "wgfz_potenz",
+   "exponent": 1,
+   "bezug": "Bodenwert je m² = Bodenrichtwert × WGFZ(Objekt) / WGFZ(Bodenrichtwertgrundstück)",
+   "wortlaut": "Der Gutachterausschuss empfiehlt für den Bereich des Main-Taunus-Kreises eine lineare Umrechnung des Bodenrichtwertes für gewerbliche Bauflächen bei abweichender WGFZ. Es ist im Einzelfall zu prüfen, ob deren Anwendung sachgerecht ist.",
+   "vorbehalt": "Einzelfallprüfung durch den Sachverständigen; kein Anwendungsbeispiel im Dokument.",
+   "seite": "Erläuterungen 01.01.2026, Seite 2 von 2"
+  },
+  "geltungsbereich": {
+   "objektarten": [
+    "gewerbe"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses beim Amt für Bodenmanagement Limburg a. d. Lahn, Berner Straße 11, 65552 Limburg, (0611) 535-6000, GS-GAA-AfB-LM@hvbg.hessen.de"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten, Bodenrichtwerte 01.01.2026, Gutachterausschuss beim AfB Limburg a. d. Lahn",
+    "fundstelle": "Abschnitt „Gewerbliche Bauflächen“, Seite 2 von 2",
+    "url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606052-gaa-lm-2026.pdf"
+   }
+  ],
+  "fundstelle": "Erläuterungen 01.01.2026, Abschnitt „Gewerbliche Bauflächen“, Seite 2 von 2",
+  "seite": "Seite 2 von 2",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag (Bodenrichtwerte 01.01.2026).",
+  "quelle_url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-11/0606052-gaa-lm-2026.pdf",
+  "lizenz": "im Dokument keine Lizenzangabe",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261103-uk-wgfz-he (pdftotext -layout, 03.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Erläuterungen zu den Bodenrichtwerten 01.01.2026 (AfB Limburg)",
+   "abgerufen_am": "2026-11-03",
+   "gelesen_am": "2026-11-03"
+  }
+ }
+]
