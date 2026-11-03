@@ -735,14 +735,25 @@
   }
 
   /* ── Das Modell: Wohnungen und Stufen ───────────────────────────────── */
+  /* v3150 · N114 Punkt 2 (Marcel 03.11.2026): die Mieterhöhung nach § 558 endet an der ORTSÜBLICHEN
+     VERGLEICHSMIETE, nicht an der Neuvermietungsmiete. Deshalb der Mietspiegel VOR der Marktmiete;
+     die Marktmiete bleibt nur Ersatz und ist markiert (marktmiete: true) - der Wertkern nimmt dann
+     die marktübliche Miete der Wertermittlung statt ihrer (PotenzialService stufe558). */
   function objektVgl() {
     var v = zahl(wert('zb_vgl_qm'));
     if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)' };
-    v = zahl(wert('ds2_marktmiete'));
-    if (v > 0) return { qm: v, herkunft: 'Marktmiete (Tab Miete)' };
     v = zahl(wert('me_soll'));
     if (v > 0) return { qm: v, herkunft: 'Soll-Mietspiegel (Tab Miete)' };
+    v = zahl(wert('ds2_marktmiete'));
+    if (v > 0) return { qm: v, herkunft: 'Marktmiete (Tab Miete)', marktmiete: true };
     return { qm: 0, herkunft: null };
+  }
+  /* v3150 · der Teil der Soll-Miete nach § 558 (ohne Modernisierungsumlage § 559) */
+  function soll558(w) {
+    var sm = w && w.soll && w.soll.miete != null ? w.soll.miete : null;
+    if (sm == null) return w ? w.ist : 0;
+    var u = w.soll.umlage559 && w.soll.umlage559.monat > 0 ? w.soll.umlage559.monat : 0;
+    return Math.max(w.ist, sm - u);
   }
   function artMitEinheiten() { return !!(M().artMitEinheiten && M().artMitEinheiten()); }
   function objektMassnahmen() { try { var l = JSON.parse(wert('zb_massnahmen') || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
@@ -793,7 +804,8 @@
           massnahmen: mlEigen, kosten: kAlle, kosten_bewohnt: kBew, mea: zahl(e.mea_anteil) || null,
           kosten_haus: ml.filter(function (m) { return m.haus; }).reduce(function (a, m) { return a + m.k; }, 0),   /* v2966 */
           plus_soll: Math.min(20, punkteGewinn(ml, e, geb, true)), plus_ziel: Math.min(20, punkteGewinn(ml, e, geb, false)),
-          vgl_qm: s.vgl_qm || null, index: indexmieteFuer(e) };   /* v3026 */
+          vgl_qm: s.vgl_qm || null, index: indexmieteFuer(e),   /* v3026 */
+          letzte: e.mv_letzte_erhoehung || null, letzte_betrag: zahl(e.mv_letzte_erhoehung_betrag) || null, mv_art: e.mv_art || null };   /* v3150 */
       });
       out.wfl = flSum;
       out.aufgeteilt = opts.aufgeteilt != null ? !!opts.aufgeteilt : !!D.aufgeteilt;
@@ -818,7 +830,8 @@
         massnahmen: mlO, kosten: mlO.reduce(function (a, m) { return a + zahl(m.k); }, 0),
         kosten_bewohnt: mlO.filter(function (m) { return m.bewohnt; }).reduce(function (a, m) { return a + zahl(m.k); }, 0),
         plus_soll: Math.min(20, punkteGewinn(mlO, null, null, true)), plus_ziel: Math.min(20, punkteGewinn(mlO, null, null, false)),
-        index: istO > 0 ? indexmieteFuer(eO) : null }];   /* v3026 */
+        index: istO > 0 ? indexmieteFuer(eO) : null,   /* v3026 */
+        letzte: eO.mv_letzte_erhoehung || null, letzte_betrag: zahl(eO.mv_letzte_erhoehung_betrag) || null, mv_art: eO.mv_art || null }];   /* v3150 */
       if (sO.miete != null && sO.miete > istO) out.hat_soll = true;
       if (zQ > 0 || mlO.length) out.hat_ziel = true;
     }
@@ -827,12 +840,14 @@
     var W = out.wohnungen, fl = out.wfl || 0;
     function gew(k) { return fl > 0 ? W.reduce(function (a, w) { return a + (w[k] || 0) * w.wfl; }, 0) / fl : 0; }
     var istS = W.reduce(function (a, w) { return a + w.ist; }, 0);
-    var sollS = W.reduce(function (a, w) { return a + ((w.soll && w.soll.miete != null && w.soll.miete > w.ist) ? w.soll.miete : w.ist); }, 0);
+    /* v3150 · N114 Punkt 1: die Stufe Mieterhöhung ist der Bestand mit den Erhöhungen nach § 558 BGB -
+       geplante Modernisierungen (Kosten, Umlage § 559, Punkte und damit eine längere RND) gehören ins Zielbild */
+    var sollS = W.reduce(function (a, w) { return a + soll558(w); }, 0);
+    var hat558 = W.some(function (w) { return soll558(w) > w.ist + 0.005; });
     var zielS = W.reduce(function (a, w) { return a + (w.ziel != null ? w.ziel : ((w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist)); }, 0);
     out.stufen = {
       bestand: { miete_m: istS, kosten: 0, plus: 0 },
-      mieterhoehung: out.hat_soll ? { miete_m: sollS, kosten: W.reduce(function (a, w) { return a + w.kosten_bewohnt; }, 0),
-        plus: Math.round(gew('plus_soll') * 10) / 10 } : null,
+      mieterhoehung: hat558 ? { miete_m: sollS, kosten: 0, plus: 0 } : null,   /* v3150 */
       zielbild: out.hat_ziel ? { miete_m: zielS, kosten: W.reduce(function (a, w) { return a + w.kosten; }, 0),
         plus: Math.round(gew('plus_ziel') * 10) / 10 } : null
     };
@@ -889,7 +904,9 @@
                  nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null,
                    /* v2600 · E2/E3 · Restlaufzeit der Mietabweichung, waehlbarer Leerstandsabzug */
                    mv_art: e.mv_art || null, mv_befristet_bis: e.mv_befristet_bis || null, mv_kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
-                   mv_abw_jahre: e.mv_abw_jahre || null, leer_abzug: e.leer_abzug === true, leer_monate: e.leer_monate || null, herrichtung_eur: e.herrichtung_eur || null };
+                   mv_abw_jahre: e.mv_abw_jahre || null, leer_abzug: e.leer_abzug === true, leer_monate: e.leer_monate || null, herrichtung_eur: e.herrichtung_eur || null,
+                   /* v3150 · Wartefrist und Kappungs-Anrechnung reisen auch im Arbeitsstand des Fensters mit */
+                   mv_letzte_erhoehung: e.mv_letzte_erhoehung || null, mv_letzte_erhoehung_betrag: e.mv_letzte_erhoehung_betrag || null };
       });
       /* v2487 · GEMESSEN (Mitschnitt-Lauf Modul 26, neues MFH): im Wohnungsfenster VOR dem
          ersten „Übernehmen" sind Wohnfläche und Kaltmiete im Reiter Objekt noch leer - der
@@ -908,7 +925,7 @@
       return m.wohnungen.reduce(function (a, w) {
         if (!istW(w)) return a;
         var x = k === 'bestand' ? w.ist : (k === 'mieterhoehung'
-          ? ((w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist)
+          ? soll558(w)   /* v3150 */
           : (w.ziel != null ? w.ziel : ((w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist)));
         return a + x;
       }, 0) * 12;
@@ -924,15 +941,25 @@
        damit der Pruefwert aller Objekte ohne dieses Feld gleich bleibt */
     var _zmq = zahl(wert('zb_markt_qm'));
     if (_zmq > 0) body.zielbild_markt_qm = Math.round(_zmq * 100) / 100;
+    /* v3150 · N114 · je Wohnung: ortsübliche Vergleichsmiete (Ziel der Stufe), ihre Herkunft, die
+       Soll-Miete nach § 558 und die Erhöhungshistorie - der Wertkern rechnet den Pfad selbst */
+    var d558 = function (w) {
+      var vq = w.soll && w.soll.vgl_qm > 0 ? w.soll.vgl_qm : 0;
+      var vh = w.soll ? w.soll.vgl_herkunft || null : null;
+      var e = w.e || {};
+      return { vgl_jahr: vq > 0 && w.wfl > 0 ? Math.round(vq * w.wfl * 12) : null, vgl_herkunft: vh,
+        vgl_marktmiete: !!(vq > 0 && vh && vh === m.vgl.herkunft && m.vgl.marktmiete),
+        soll558_jahr: Math.round(soll558(w) * 12), letzte: w.letzte || null, letzte_betrag: w.letzte_betrag || null, mv_art: w.mv_art || null };
+    };
     if (m.art === 'mfh') {
       body.wohnungen = m.wohnungen.map(function (w) {
         var sm = (w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist;
-        return { nr: w.nr, art: w.art, wfl: w.wfl, mea_pct: w.mea || null,
-          miete_jahr: { bestand: Math.round(w.ist * 12), mieterhoehung: Math.round(sm * 12),
-                        zielbild: Math.round((w.ziel != null ? w.ziel : sm) * 12) } };
+        return Object.assign({ nr: w.nr, art: w.art, wfl: w.wfl, mea_pct: w.mea || null,
+          miete_jahr: { bestand: Math.round(w.ist * 12), mieterhoehung: Math.round(soll558(w) * 12),
+                        zielbild: Math.round((w.ziel != null ? w.ziel : sm) * 12) } }, d558(w));
       });
       body.aufteilung = { aktiv: !!m.aufgeteilt, kosten_eur: Math.round(m.aufteilungskosten || 0), kosten_herkunft: m.aufteilungskosten_herkunft };
-    }
+    } else if (m.wohnungen[0]) body.einzel558 = d558(m.wohnungen[0]);   /* v3150 */
     return body;
   }
   var _lauf = null;
@@ -1116,7 +1143,9 @@
     opts = opts || {};
     var H = herkunft(), r = ergebnis(), zl = r && r.haus && r.haus.zielbild ? r.haus.zielbild : null;
     var mnm = zl && zl.miete_nach_modernisierung ? zl.miete_nach_modernisierung : null;
+    var mh = r && r.haus && r.haus.mieterhoehung && r.haus.mieterhoehung.rechenweg558 ? r.haus.mieterhoehung.rechenweg558 : null;   /* v3150 */
     var z = [];
+    if (mh && mh.satz) z.push('<b>Mieterhöhung:</b> ' + esc(mh.satz) + (mh.verschoben ? ' ' + esc(mh.verschoben) : ''));
     if (H.text) z.push('<b>' + esc(H.text) + '</b>');
     if (H.unterschied) z.push(esc(H.unterschied));
     if (mnm && mnm.satz) z.push((mnm.wirkt ? '' : '<b>Miete im Zielbild:</b> ') + esc(mnm.satz));
@@ -1202,6 +1231,13 @@
     } catch (e) { /* nur Auskunft */ }
     var _zl = h.zielbild && h.zielbild.miete_nach_modernisierung;
     if (_zl) z.miete_nach_modernisierung = { satz: _zl.satz, weg: _zl.weg, wirkt: !!_zl.wirkt, qm_vorher: _zl.qm_vorher, qm_nachher: _zl.qm_nachher };
+    /* v3150 · N114 · der Rechenweg der Stufe Mieterhöhung (Wert zum Stichtag) */
+    var _mh = h.mieterhoehung && h.mieterhoehung.rechenweg558;
+    if (_mh) z.mieterhoehung_rechenweg = { satz: _mh.satz + (_mh.verschoben ? ' ' + _mh.verschoben : ''), mindermiete_eur: _mh.mindermiete_eur,
+      sensitiv_eur: _mh.sensitiv_eur, rnd_jahre: _mh.rnd_jahre, kappung_text: _mh.kappung_text,
+      wohnungen: (_mh.wohnungen || []).map(function (x) { return { nr: x.nr, ist: x.ist_monat, ziel: x.ziel_monat, ziel_herkunft: x.ziel_herkunft,
+        erste: x.erste_anhebung, jahre: x.jahre_bis_ziel, barwert: x.mindermiete_barwert_eur, annahme: x.annahmen || x.grund || null,
+        sensitiv: x.sensitiv ? x.sensitiv.text + ' (' + Math.round(x.sensitiv.unterschied_eur).toLocaleString('de-DE') + ' €)' : null }; }) };
     if (r && r.sanierung && r.sanierung.text) z.sanierung_regel = r.sanierung.text + (r.sanierung.hinweis ? ' ' + r.sanierung.hinweis : '');
     z.wohnungen = m.wohnungen.slice(0, 30).map(function (w) {
       return { nr: w.nr, lage: w.lage, wfl: w.wfl, status: w.status, ist: Math.round(w.ist),

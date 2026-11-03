@@ -753,7 +753,7 @@ fallB('B21', () => {
      „ohne Laufzeit: Szenarien 3/5/10 Jahre, nichts angesetzt". */
   const z = b && b.zeilen && b.zeilen[0];
   pruefe('B', 'B21', 'ohne Laufzeit (Wohnung, unter dem Band): § 558-Pfad angesetzt, keine Szenarien', !!z && b.n_angesetzt === 1 && b.n_offen === 0
-    && !b.szenarien && z.jahre_quelle === 'bgb558' && z.barwert_eur < 0 && z.pfad558 && z.pfad558.schritte[0].ab_monat === 3
+    && !b.szenarien && z.jahre_quelle === 'bgb558' && z.barwert_eur < 0 && z.pfad558 && z.pfad558.schritte[0].ab_monat === 36   /* v3150 · ohne Historie: vorsichtige Annahme 36 Monate */
     && z.pfad558.schritte[0].miete_monat === Math.round(Math.min(500 * (1 + z.pfad558.kappung_pct / 100), (z.differenz_jahr * -1 + 6000) / 12) * 100) / 100,
     z ? z.jahre + ' J., ' + z.barwert_eur + ' €, ' + JSON.stringify(z.pfad558 && z.pfad558.schritte.slice(0, 2)) : 'keine Zeile');
   pruefe('B', 'B21', 'Ertragswert = vorläufig + Barwert des Pfads (+ eigener boG)', !!e && !!z
@@ -778,8 +778,12 @@ fallB('B21', () => {
 fallB('B21b', () => {
   const r0 = westerfeldMit((w) => { w.ist_monat = 500; });
   const z0 = r0 && r0.ertragswert.miete_bog && r0.ertragswert.miete_bog.zeilen[0];
-  pruefe('B', 'B21b', 'ohne letzte Erhöhung: wie bis v3139, Wartefrist unterstellt und benannt', !!z0 && z0.pfad558 && z0.pfad558.wartefrist_geprueft === false
-    && z0.pfad558.schritte[0].ab_monat === 3 && /Wartefrist als erfüllt unterstellt/.test(z0.pfad558.annahmen));
+  /* v3150 · N114 Punkt 3 (Marcel 03.11.2026): ohne Historie ist die Kappungsreserve nicht belegt - vorsichtige
+     Annahme 36 Monate (keine gesetzliche Frist) und Sensitivitaet mit dem fruehesten Termin (3 Monate, § 558b) */
+  pruefe('B', 'B21b', 'ohne letzte Erhöhung: erste Anhebung nach 36 Monaten als vorsichtige Annahme benannt, Sensitivität ab Monat 3', !!z0 && z0.pfad558 && z0.pfad558.wartefrist_geprueft === false
+    && z0.pfad558.schritte[0].ab_monat === 36 && z0.pfad558.vorsichtig36 === true && /vorsichtige Bewertungsannahme \(keine gesetzliche Frist\)/i.test(z0.pfad558.annahmen)
+    && z0.pfad558.sensitiv && z0.pfad558.sensitiv.erste_ab_monat === 3 && z0.pfad558.sensitiv.barwert_eur > z0.barwert_eur,
+    z0 && z0.pfad558 ? z0.pfad558.annahmen + ' | ' + JSON.stringify(z0.pfad558.sensitiv) : '–');
   /* letzte Erhoehung einen Monat vor dem Stichtag des Falls: erste Anhebung erst 15 Monate danach */
   const st = r0 && r0.wertermittlungsstichtag && r0.wertermittlungsstichtag.datum ? new Date(r0.wertermittlungsstichtag.datum) : null;
   const ym = (d, off) => { const t = d.getUTCFullYear() * 12 + d.getUTCMonth() + off; return Math.floor(t / 12) + '-' + String(t % 12 + 1).padStart(2, '0'); };
@@ -789,8 +793,8 @@ fallB('B21b', () => {
   pruefe('B', 'B21b', 'letzte Erhöhung 1 Monat vor Stichtag: erste Anhebung 14 Monate nach Stichtag (15 nach der letzten)', !!z1 && z1.pfad558
     && z1.pfad558.wartefrist_geprueft && z1.pfad558.schritte[0].ab_monat === 14 && z1.pfad558.kappung_angerechnet_eur === 20,
     z1 && z1.pfad558 ? JSON.stringify(z1.pfad558.schritte.slice(0, 2)) + ' ' + z1.pfad558.erste_anhebung : '–');
-  pruefe('B', 'B21b', 'späte Anhebung → größere Mindermiete → kleinerer Ertragswert', !!z1 && !!z0 && z1.barwert_eur < z0.barwert_eur
-    && r1.ertragswert_kern.wert_ungerundet < r0.ertragswert_kern.wert_ungerundet, (z0 && z0.barwert_eur) + ' → ' + (z1 && z1.barwert_eur));
+  pruefe('B', 'B21b', 'belegte Historie (erste Anhebung nach 14 Monaten) → kleinere Mindermiete als die vorsichtige Annahme 36 → höherer Ertragswert', !!z1 && !!z0 && z1.barwert_eur > z0.barwert_eur
+    && r1.ertragswert_kern.wert_ungerundet > r0.ertragswert_kern.wert_ungerundet, (z0 && z0.barwert_eur) + ' → ' + (z1 && z1.barwert_eur));
   const kz = r1 && (r1.ertragswert_kern.staffel || []).find((x) => /Merkmal: Mietabweichung/.test(x.pos));
   pruefe('B', 'B21b', 'Rechenweg-Zeile „Mindermiete bis zur rechtlich zulässigen Anpassung" mit erster Anhebung und Barwert', !!kz
     && /Mindermiete bis zur rechtlich zulässigen Anpassung/.test(kz.detail || '') && /erste ab \d{2}\/\d{4}/.test(kz.detail || '') && /Barwert/.test(kz.detail || ''), kz ? kz.detail : '–');
@@ -1300,6 +1304,38 @@ fallB('B54', () => {
   const kE = bE ? ertragswert(Object.assign({}, bE.ein), bE.bodenwert) : null, zE = bE ? PSM._eineStufe(bE, {}, kE, bE.ein.miete_markt_jahr, 0, 136000) : null;
   pruefe('B', 'B54', 'eigene bOM-Angabe (Wegerecht) bleibt in jeder Stufe voll', !!zE && !zE.sanierungsstau && zE.wert_ungerundet === kE.wert_ungerundet && bE.ein.bog_quelle === null,
     zE ? 'quelle ' + bE.ein.bog_quelle + ', Δ ' + (zE.wert_ungerundet - kE.wert_ungerundet) : 'kein Lauf');
+});
+
+/* v3150 · B61 · N114 · die Stufe Mieterhoehung als Wert zum Stichtag (Marcel 03.11.2026), am Beispiel der
+   Vorgabe: Bestand 6,50 €/m², ortsuebliche Vergleichsmiete 8,00, Neuvermietung 10,00, 60 m², Kappung 15 %.
+   Die Stufe endet bei 8,00 (nie 10,00), die erste Anhebung ohne Historie erst nach 36 Monaten (vorsichtige
+   Annahme, Sensitivitaet ab Monat 3), die Mindermiete bis dahin als abgezinster Barwert; ist nur die
+   Marktmiete eingetragen, gilt der Anker der Wertermittlung. */
+fallB('B61', () => {
+  if (!PSM || typeof PSM._stufe558 !== 'function') return pruefe('B', 'B61', 'PotenzialService._stufe558 geladen', false, psGrund || '_stufe558 fehlt');
+  const band = { unten_qm: 6.4, oben_qm: 9.6, anker_qm: 8.0 };
+  const zeile = () => ({ wfl: 60, ist: 4680, ist_qm: 6.5, qm: 6.5, herkunft: 'ist_im_band', roh: 4680, basis: 4680, band, markt: 8.0 });
+  const basis = { ein: { lzs_pct: 2.5 }, stichtag: '2026-10-21', kappung: { pct: 15, text: 'Kappungsgrenze 15 % in 3 Jahren' } };
+  const kB = { lzs: { pct: 2.5 }, nutzungsdauer: { rnd: 40 } };
+  const w = (x) => [Object.assign({ nr: '1', art: 'wohnen', wfl: 60, vgl_jahr: 5760, vgl_herkunft: 'Mietspiegel', soll558_jahr: 5382 }, x || {})];
+  const a = PSM._stufe558(basis, {}, { zeilen: [zeile()] }, w(), kB);
+  const z = a && a.zeilen[0];
+  wert('B', 'B61', 'Zielmiete der Stufe = Vergleichsmiete 8,00 €/m² (480 €/Monat), nicht die Neuvermietung', z ? z.ziel_monat : null, 480, 0);
+  wert('B', 'B61', 'Rohertrag der Wohnung in der Stufe 5.760 €/Jahr', a ? a.mieten[0] : null, 5760, 0);
+  pruefe('B', 'B61', 'ohne Historie: erste Anhebung 36 Monate nach Stichtag (10/2029), als vorsichtige Annahme', !!z && z.vorsichtig36 && z.erste_anhebung === '2029-10'
+    && z.schritte[0].miete_monat === 448.5 && z.schritte[1].miete_monat === 480, z ? JSON.stringify(z.schritte) + ' ' + z.erste_anhebung : '–');
+  pruefe('B', 'B61', 'Mindermiete als boG abgezinst (negativ), Sensitivität mit früherem Termin kleiner', !!a && a.bog.wert < 0 && z.sensitiv && z.sensitiv.barwert_eur > z.mindermiete_barwert_eur
+    && a.sensitiv_eur > 0, a ? a.bog.wert + ' / Sensitivität ' + a.sensitiv_eur : '–');
+  pruefe('B', 'B61', 'Satz nennt Stichtag, RND wie im Bestand, Zielbild für Modernisierung, keine Neuvermietung', !!a && /Restnutzungsdauer 40 J. wie im Bestand/.test(a.satz)
+    && /zählen erst im Zielbild/.test(a.satz) && /Neuvermietungsmiete ist nicht Teil/.test(a.satz), a && a.satz);
+  const b = PSM._stufe558(basis, {}, { zeilen: [zeile()] }, w({ vgl_jahr: 7200, vgl_herkunft: 'Marktmiete (Tab Miete)', vgl_marktmiete: true }), kB);
+  pruefe('B', 'B61', 'nur Marktmiete 10,00 eingetragen: Ziel = Anker 8,00 der Wertermittlung, mit Begründung', !!b && b.zeilen[0].ziel_monat === 480 && /kann über der ortsüblichen Vergleichsmiete liegen/.test(b.zeilen[0].ziel_herkunft),
+    b && b.zeilen[0].ziel_herkunft);
+  const c = PSM._stufe558(basis, {}, { zeilen: [zeile()] }, w({ letzte: '2025-03', letzte_betrag: 20 }), kB);
+  pruefe('B', 'B61', 'belegte Historie (letzte Erhöhung 03/2025, 20 €): erste Anhebung 01/2027, keine Annahme, kleinerer Abzug', !!c && c.zeilen[0].erste_anhebung === '2027-01' && !c.zeilen[0].vorsichtig36
+    && c.bog.wert > a.bog.wert, c ? c.zeilen[0].erste_anhebung + ' ' + c.bog.wert : '–');
+  const d = PSM._stufe558(basis, {}, { zeilen: [zeile()] }, w({ mv_art: 'staffel' }), kB);
+  pruefe('B', 'B61', 'Staffelmiete: keine Erhöhung nach § 558, Miete wie Bestand', !!d && d.mieten[0] === 4680 && /557a/.test(d.zeilen[0].grund || ''), d && d.zeilen[0].grund);
 });
 
 /* v3005 · B55 Regionalfaktor aus dem Sachwertmodell (Hamburg 1,75, § 36 Abs. 3) · B56 Baupreisindex

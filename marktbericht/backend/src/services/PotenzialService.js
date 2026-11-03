@@ -30,6 +30,7 @@ import { ValuationService } from './ValuationService.js';         /* v2541 */
 import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 */
 import { marktmiete as amtlicheMiete, klasseAusPunkten, KLASSE_TEXT } from '../lib/mietmodell_nrw.js';   /* v2988 */
 import { MIETBAND } from './CrossCheckService.js';   /* v2988 */
+import { erhoehungspfad558, ausschluss558, kappungFuer } from '../lib/kappung.js';   /* v3150 */
 
 /* ══ v2541 · MARKTPREISINDIKATION JE STUFE UND JE WOHNUNG ═════════════════════
    Marcel 20.10.2026: „dann kann man den Ertragswert sehen, aber auch die
@@ -66,7 +67,9 @@ const ZIELBILD_REF = () => ({ condition: 'modernisiert', modernization: 'umfasse
   modernization_year: new Date().getFullYear(), bom_eur: null, bom_grund: null });
 
 /* v2870 · Marcel 22.10.2026, neuer Wortlaut (vorher „Potenzialwert …, keine Verkehrswertermittlung“) */
-export const KENNZEICHNUNG = 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.';
+/* v3150 · die Stufe Mieterhoehung ist seit N114 ein Wert ZUM STICHTAG (Erhoehungen erst ab Wirksamkeit, abgezinst);
+   der Ausblick-Satz gilt nur noch fuer das Zielbild. */
+export const KENNZEICHNUNG = 'Der Ertragswert nach Mieterhöhung bezieht sich auf den heutigen Stichtag: die nach § 558 BGB zulässigen Erhöhungen zählen erst ab ihrer Wirksamkeit und sind abgezinst, Gebäudezustand und Restnutzungsdauer sind die des Bestands. Der Ertragswert im Zielbild ist ein Ausblick: er unterstellt, dass die Maßnahmen umgesetzt sind, und ist kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag.';
 const STUFEN = ['mieterhoehung', 'zielbild'];
 
 const zahl = (v) => {
@@ -309,7 +312,7 @@ function mieteNachModernisierung(wb, basis, s, plus, kosten, eigenQm) {
       + qm2(anker0) + ') staffelt nicht nach Modernisierung.' + EIGEN_T } };
 }
 
-function eineStufe(basis, ref, basisKern, miete, plus, kosten) {
+function eineStufe(basis, ref, basisKern, miete, plus, kosten, bogMiete) {
   const ein = Object.assign({}, basis.ein);
   /* v2854 · SANIERUNGSSTAU UND MASSNAHMEN NICHT DOPPELT. Der Bestand traegt die
      Sanierungskosten des Objekts als boG (§ 8 Abs. 3, Mapper bomAus). Die Stufe
@@ -343,6 +346,10 @@ function eineStufe(basis, ref, basisKern, miete, plus, kosten) {
        gilt dort nicht mehr (sonst doppelt, Prompt-Regel 5). Der Leerstandsabzug bleibt. */
     if (Array.isArray(ein.bog_posten)) ein.bog_posten = ein.bog_posten.filter((x) => !/Mietabweichung/.test(String(x.pos || '')));
     ein.vorlaeufig_vor_bog = false;
+    /* v3150 · Stufe Mieterhoehung: die Mindermiete bis zur Wirksamkeit der Erhoehungen als boG */
+    if (bogMiete && Math.round(bogMiete.wert)) {
+      ein.bog_posten = (Array.isArray(ein.bog_posten) ? ein.bog_posten : []).concat([{ pos: bogMiete.pos, wert: Math.round(bogMiete.wert), detail: bogMiete.detail || '' }]);
+    }
   }
   let k = ErtragswertService.ertragswert(ein, basis.bodenwert);
   /* Untergrenze: die Stufe rechnet nie mit einer kürzeren RND als der Bestand. */
@@ -354,6 +361,104 @@ function eineStufe(basis, ref, basisKern, miete, plus, kosten) {
   const z = kernZusammenfassung(k);
   if (z) { z.mod_punkte = rndInfo.mod_punkte; z.mod_punkte_plus = rndInfo.plus; z.miete_wohnen_jahr = ein.miete_markt_jahr; z.sanierungsstau = stau; }
   return z;
+}
+
+/* ══ v3150 · N114 · DIE STUFE „MIETERHÖHUNG" ALS WERT ZUM STICHTAG (Marcel 03.11.2026) ══════════
+   Vorgaben zur sachverständigen Bewertung, Punkte 1-3:
+   (1) Die Stufe bildet den Wert zum Wertermittlungsstichtag ab. Eine zulässige Mieterhöhung zählt
+       erst ab ihrer Wirksamkeit, die Mehrerträge sind abgezinst - keine sofortige volle
+       Kapitalisierung. Gebäudezustand und Restnutzungsdauer sind die des BESTANDS: eine erst
+       durch geplante Modernisierung erreichbare längere RND, die Modernisierungsumlage
+       (§ 559 BGB) und die Maßnahmenkosten gehören ins Zielbild (sonst doppelt).
+   (2) Die Stufe endet an der ortsüblichen Vergleichsmiete (§ 558 BGB) unter Kappung und Fristen.
+       Eine höhere Neuvermietungsmiete ist NICHT Teil dieser Stufe. Ist im Objekt statt einer
+       Vergleichsmiete nur die Marktmiete (Neuvermietung) eingetragen, gilt die marktübliche
+       Miete der Wertermittlung (Anker des Bandes) - mit dem Satz, warum.
+   (3) Ohne Erhöhungshistorie: erste Anhebung als vorsichtige Annahme erst nach 36 Monaten,
+       mit Sensitivität (lib/kappung.js, opts.vorsichtig36).
+   Rechenweg wie im Bestand (ImmoWertA 31.(2) b) und c), EW-RL Anl. 3 Bsp. 1): Rohertrag mit der
+   Zielmiete der Stufe, die Mindermiete bis dahin als Barwert (boG, Liegenschaftszins des
+   Bestands, Restnutzungsdauer des Bestands als Deckel). Je Wohnung ersetzt die Stufe nur die
+   Bestands-Zeile der Mietabweichung, die sie neu rechnet; Überhöhungen und Gewerbe bleiben. */
+const ymAb = (st, off) => { const t = st.getUTCFullYear() * 12 + st.getUTCMonth() + off; return String(Math.floor(t / 12)) + '-' + String((t % 12) + 1).padStart(2, '0'); };
+function stufe558(basis, ref, bb, wlB, kB) {
+  if (!bb) return null;
+  const lzs = kB && kB.lzs && Number(kB.lzs.pct) > 0 ? Number(kB.lzs.pct) : Number(basis.ein.lzs_pct);
+  const rnd = kB && kB.nutzungsdauer ? Number(kB.nutzungsdauer.rnd) : null;
+  const st = basis.stichtag ? new Date(basis.stichtag + 'T00:00:00Z') : new Date();
+  const kapp = basis.kappung || kappungFuer(ref.ags, ref.kappung_pct, st);
+  const mb = basis.miet_bog || null;
+  const bestPost = (Array.isArray(basis.ein.bog_posten) ? basis.ein.bog_posten : []).find((x) => /Mietabweichung/.test(String(x.pos || '')));
+  const bestWert = bestPost ? Number(bestPost.wert) || 0 : 0;
+  const bestZeilen = bestPost && mb && Array.isArray(mb.zeilen) ? mb.zeilen.filter((x) => x && x.nutzung !== 'gewerbe') : [];
+  const zeileVon = (nr, n) => {
+    if (!bestZeilen.length) return null;
+    if (nr != null) { const f = bestZeilen.find((x) => x.nr != null && String(x.nr) === String(nr)); if (f) return f; }
+    return n === 1 && bestZeilen.length === 1 ? bestZeilen[0] : null;
+  };
+  const nW = wlB.filter((w) => w && w.art !== 'gewerbe').length;
+  const mieten = [], zeilen = [];
+  let alt = 0, neu = 0;
+  const eurJ = (x) => Math.round(x).toLocaleString('de-DE') + ' €';
+  bb.zeilen.forEach((z, i) => {
+    const w = wlB[i] || {};
+    mieten[i] = z ? z.basis : null;
+    if (!z || z.herkunft === 'leer_marktueblich' || !(z.ist > 0) || !(z.wfl > 0)) return;
+    const nr = w.nr || null;
+    const r = { nr, ist_monat: Math.round(z.ist / 12 * 100) / 100, ist_qm: z.ist_qm, ziel_monat: null, ziel_qm: null, ziel_herkunft: null };
+    const aus = ausschluss558(w.mv_art);
+    if (aus) { r.grund = aus; zeilen.push(r); return; }
+    /* Zielmiete der Stufe: ortsuebliche Vergleichsmiete, sonst eigene Soll-Miete; nur Marktmiete -> Anker */
+    let zielJ = null;
+    const vglJ = zahl(w.vgl_jahr), sollJ = zahl(w.soll558_jahr);
+    if (vglJ > 0 && !w.vgl_marktmiete) { zielJ = vglJ; r.ziel_herkunft = 'ortsübliche Vergleichsmiete (' + (w.vgl_herkunft || 'Objekt') + ')'; }
+    else if (vglJ > 0 && w.vgl_marktmiete && z.markt > 0) {
+      zielJ = z.markt * z.wfl * 12;
+      r.ziel_herkunft = 'marktübliche Miete der Wertermittlung (' + pctQm(z.markt) + '); im Objekt ist nur die Marktmiete bei Neuvermietung (' + pctQm(vglJ / 12 / z.wfl) + ') eingetragen, sie kann über der ortsüblichen Vergleichsmiete liegen und zählt hier nicht';
+    } else if (sollJ > z.ist) { zielJ = sollJ; r.ziel_herkunft = 'eigene Angabe Soll-Miete'; }
+    if (!(zielJ > 0)) { r.grund = 'keine Vergleichsmiete eingetragen'; zeilen.push(r); return; }
+    /* Bandregel wie im Bestand (v2936): im Band zaehlt die Zielmiete, ausserhalb der Anker */
+    const nb = mieteNachBand(r2(zielJ / 12 / z.wfl), z.band, z.markt);
+    let T = nb.fuehrt ? zielJ : (Number(nb.qm) > 0 ? nb.qm * z.wfl * 12 : zielJ);
+    if (!nb.fuehrt && Number(nb.qm) > 0) r.ziel_herkunft += '; außerhalb des Bandes der Marktüblichkeit, angesetzt der Anker ' + pctQm(nb.qm);
+    T = Math.max(T, z.roh);
+    r.ziel_monat = Math.round(T / 12 * 100) / 100; r.ziel_qm = r2(T / 12 / z.wfl);
+    if (!(T > z.ist + 0.5)) { r.grund = 'die Miete liegt schon an der Zielmiete'; zeilen.push(r); return; }
+    const pf = erhoehungspfad558(z.ist, T, lzs, kapp.pct, rnd, { stichtag: st, letzte: w.letzte || null,
+      letzteBetragMonat: zahl(w.letzte_betrag) || null, mvArt: w.mv_art || null, vorsichtig36: true });
+    if (!pf) { r.grund = 'kein Erhöhungspfad rechenbar'; zeilen.push(r); return; }
+    const bz = zeileVon(nr, nW);
+    const altW = bz && bz.angesetzt && Number.isFinite(Number(bz.barwert_eur)) ? Number(bz.barwert_eur) : 0;
+    alt += altW; neu += pf.barwert_eur;
+    mieten[i] = z.basis + (T - z.roh);
+    Object.assign(r, { schritte: pf.schritte.map((x) => ({ ab: ymAb(st, x.ab_monat), miete_monat: x.miete_monat })),
+      erste_anhebung: pf.erste_anhebung || (pf.schritte.length ? ymAb(st, pf.schritte[0].ab_monat) : null),
+      jahre_bis_ziel: pf.jahre, mindermiete_barwert_eur: pf.barwert_eur, bestand_barwert_eur: altW || null,
+      mehrertrag_jahr: Math.round(T - z.roh), annahmen: pf.annahmen, vorsichtig36: !!pf.vorsichtig36,
+      sensitiv: pf.sensitiv || null, wartefrist_geprueft: !!pf.wartefrist_geprueft, kappung_basis_unbekannt: !!pf.kappung_basis_unbekannt });
+    zeilen.push(r);
+  });
+  const mit = zeilen.filter((x) => x.schritte);
+  const sens = mit.reduce((a, x) => a + ((x.sensitiv && x.sensitiv.unterschied_eur) || 0), 0);
+  const bogWert = bestWert - alt + neu;
+  const detail = mit.map((x) => (x.nr ? x.nr + ': ' : '') + eurJ(x.ist_monat) + ' → ' + eurJ(x.ziel_monat) + '/Monat, erste Anhebung '
+    + (x.erste_anhebung ? x.erste_anhebung.slice(5, 7) + '/' + x.erste_anhebung.slice(0, 4) : '–') + (x.vorsichtig36 ? ' (vorsichtige Annahme 36 Monate)' : '')
+    + ', ' + String(x.jahre_bis_ziel).replace('.', ',') + ' J. bis zur Zielmiete, Barwert ' + eurJ(x.mindermiete_barwert_eur)).join('; ');
+  const datum = st.toISOString().slice(0, 10).split('-').reverse().join('.');
+  return {
+    mieten, zeilen, lzs_pct: lzs, rnd_jahre: rnd, kappung_pct: kapp.pct, kappung_text: kapp.text, stichtag: st.toISOString().slice(0, 10),
+    bog: { pos: 'besonderes objektspezifisches Merkmal: Mietabweichung bis zur Wirksamkeit der Mieterhöhungen (§ 558 BGB)', wert: bogWert,
+      detail: 'Mindermiete bis zur Zielmiete, monatlich abgezinst mit dem Liegenschaftszins ' + String(lzs).replace('.', ',') + ' %: ' + detail
+        + (bestWert && Math.round(bestWert - alt) ? '; übrige Abweichungen wie im Bestand ' + eurJ(bestWert - alt) : '') },
+    n_wohnungen: mit.length, sensitiv_eur: sens || null,
+    satz: 'Mieterhöhung zum Stichtag ' + datum + ': '
+      + (mit.length ? mit.length + ' Wohnung' + (mit.length === 1 ? '' : 'en') + ' bis zur ortsüblichen Vergleichsmiete nach § 558 BGB (' + kapp.text + '), jede Erhöhung erst ab ihrer Wirksamkeit, '
+        + 'die Mindermiete bis dahin abgezinst (Barwert zusammen ' + eurJ(neu) + '). Restnutzungsdauer ' + (rnd != null ? String(rnd).replace('.', ',') + ' J.' : '–')
+        + ' wie im Bestand; geplante Modernisierungen, ihre Umlage nach § 559 BGB und eine längere Restnutzungsdauer zählen erst im Zielbild. Eine höhere Neuvermietungsmiete ist nicht Teil dieser Stufe.'
+        + (mit.some((x) => x.vorsichtig36) ? ' Wo die bisherigen Erhöhungen nicht eingetragen sind, gilt als vorsichtige Bewertungsannahme die erste Anhebung erst nach 36 Monaten (keine gesetzliche Frist); '
+          + 'wäre die Wartefrist schon erfüllt, läge der Wert um rund ' + eurJ(sens) + ' höher.' : '')
+        : 'keine Wohnung mit zulässiger Erhöhung.'),
+  };
 }
 
 /** Zins für Wohnungseigentum aus derselben Kaskade (A–E, N) wie der Bericht. */
@@ -648,7 +753,8 @@ export const PotenzialService = {
        Ist aus der Eingabe des Berichts, Stufenmiete aus der Variante. */
     const wlB = wl.some((w) => w.art !== 'gewerbe') ? wl : [{ art: 'wohnen', wfl: zahl(basis.wohnflaeche_wohnen) || zahl(basis.ein.wohnflaeche_qm),
       miete_jahr: Object.assign({ bestand: (!ref.vacancy && zahl(ref.monthly_net_rent) > 0) ? zahl(ref.monthly_net_rent) * 12 : 0 },
-        ...varianten.filter((v) => v && STUFEN.indexOf(v.key) >= 0).map((v) => ({ [v.key]: zahl(v.miete_wohnen_jahr) }))) }];
+        ...varianten.filter((v) => v && STUFEN.indexOf(v.key) >= 0).map((v) => ({ [v.key]: zahl(v.miete_wohnen_jahr) }))),
+      ...(auftrag.einzel558 && typeof auftrag.einzel558 === 'object' ? auftrag.einzel558 : {}) }];   /* v3150 · Ziel und Historie fuer den Pfad nach § 558 */
     const bb = bestandsBasis(basis, wlB);
     /* v2988 · Band und marktuebliche Miete nach den Massnahmen je Stufe */
     const MNM = {};
@@ -657,17 +763,30 @@ export const PotenzialService = {
       MNM[v.key] = mieteNachModernisierung(wb, basis, v.key, zahl(v.mod_punkte_plus) || 0, zahl(v.kosten) || 0, auftrag.zielbild_markt_qm);
     }
     const ovS = (s) => (MNM[s] ? MNM[s].ov : null);
-    const anhebungN = (s) => (bb ? bb.zeilen.filter((z, i) => z && stufenMiete(z, wlB[i], s, ovS(s)) > z.basis + 0.5).length : 0);
+    /* v3150 · N114 · die Stufe Mieterhoehung nach § 558 (Wert zum Stichtag) */
+    let S558 = null;
+    try { S558 = varianten.some((v) => v && v.key === 'mieterhoehung') ? stufe558(basis, ref, bb, wlB, kB) : null; }
+    catch (e) { console.log('[potenzial] stufe558: ' + e.message); S558 = null; }
+    const mieteStufe = (z, i, s) => (s === 'mieterhoehung' && S558 ? (S558.mieten[i] != null ? S558.mieten[i] : z.basis) : stufenMiete(z, wlB[i], s, ovS(s)));   /* v3150 */
+    const anhebungN = (s) => (bb ? bb.zeilen.filter((z, i) => z && mieteStufe(z, i, s) > z.basis + 0.5).length : 0);
     bestand.anhebung_jahr = 0;
     for (const v of varianten) {
       if (!v || STUFEN.indexOf(v.key) < 0) continue;
       let m = zahl(v.miete_wohnen_jahr);
       if (m == null) continue;
-      if (bb) m = bb.zeilen.reduce((a, z, i) => a + (z ? stufenMiete(z, wlB[i], v.key, ovS(v.key)) : 0), 0);
+      if (bb) m = bb.zeilen.reduce((a, z, i) => a + (z ? mieteStufe(z, i, v.key) : 0), 0);
       else m = Math.max(m, Number(basis.ein.miete_markt_jahr) || 0);   /* ohne Basis: nie unter dem Bestand */
-      const z = eineStufe(basis, ref, kB, m, zahl(v.mod_punkte_plus) || 0, zahl(v.kosten) || 0);
+      /* v3150 · Mieterhoehung: RND, Punkte und Kosten des Bestands (N114 Punkt 1), Mindermiete als boG */
+      const _mh = v.key === 'mieterhoehung';
+      const z = eineStufe(basis, ref, kB, m, _mh ? 0 : (zahl(v.mod_punkte_plus) || 0), _mh ? 0 : (zahl(v.kosten) || 0), _mh && S558 ? S558.bog : null);
+      if (z && _mh && S558) {
+        z.rechenweg558 = { satz: S558.satz, wohnungen: S558.zeilen, lzs_pct: S558.lzs_pct, rnd_jahre: S558.rnd_jahre, kappung_pct: S558.kappung_pct,
+          kappung_text: S558.kappung_text, stichtag: S558.stichtag, mindermiete_eur: Math.round(S558.bog.wert), sensitiv_eur: S558.sensitiv_eur };
+        if (zahl(v.mod_punkte_plus) > 0 || zahl(v.kosten) > 0) z.rechenweg558.verschoben = 'Modernisierungen dieser Stufe (' + (zahl(v.kosten) > 0 ? Math.round(zahl(v.kosten)).toLocaleString('de-DE') + ' €' : '')
+          + (zahl(v.mod_punkte_plus) > 0 ? (zahl(v.kosten) > 0 ? ', ' : '') + '+' + String(zahl(v.mod_punkte_plus)).replace('.', ',') + ' Punkte' : '') + ') zählen erst im Zielbild.';
+      }
       if (z) {
-        z.kosten = zahl(v.kosten) || 0;
+        z.kosten = _mh ? 0 : (zahl(v.kosten) || 0);   /* v3150 */
         z.anhebung_jahr = Math.round(z.miete_wohnen_jahr - bestand.miete_wohnen_jahr);   /* v2488 */
         z.anhebung_wohnungen = anhebungN(v.key);
         z.miete_nach_modernisierung = MNM[v.key] ? MNM[v.key].info : null;   /* v2988 */
@@ -752,7 +871,7 @@ export const PotenzialService = {
       const bbW = bb && wlB === wl ? bb : null;
       const mieteW = (w, i, s) => {
         const z = bbW ? bbW.zeilen[i] : null;
-        return z ? stufenMiete(z, w, s, ovS(s)) : (zahl(w.miete_jahr && w.miete_jahr[s]) || 0);
+        return z ? (s === 'mieterhoehung' && S558 ? mieteStufe(z, i, s) : stufenMiete(z, w, s, ovS(s))) : (zahl(w.miete_jahr && w.miete_jahr[s]) || 0);   /* v3150 */
       };
       const summeMiete = {};
       stufenAlle.forEach((s) => { summeMiete[s] = wl.reduce((a, w, i) => a + mieteW(w, i, s), 0); });
@@ -796,6 +915,11 @@ export const PotenzialService = {
             const mw = mieteW(w, i, s);
             if (r.art === 'gewerbe') { summe += r.anteil_am_haus[s] || 0; r.als_etw = r.als_etw || {}; r.als_etw[s] = null; return; }
             const e = etwEingabe(basis, ref, w, mw, lzs, bwk, rnd, r.anteil);
+            /* v3150 · Stufe Mieterhoehung: die Mindermiete der Wohnung bis zur Zielmiete auch als Eigentumswohnung */
+            if (s === 'mieterhoehung' && S558 && bbW) {
+              const zr = S558.zeilen.find((x) => x.schritte && x.nr != null && String(x.nr) === String(w.nr));
+              if (zr && zr.mindermiete_barwert_eur) e.ein.bog_posten = [{ pos: 'besonderes objektspezifisches Merkmal: Mindermiete bis zur Wirksamkeit der Mieterhöhung', wert: zr.mindermiete_barwert_eur }];
+            }
             const k = mw > 0 ? ErtragswertService.ertragswert(e.ein, e.bw) : null;
             const wert = k && k.vollstaendig ? k.wert : null;
             r.als_etw = r.als_etw || {};
@@ -886,5 +1010,6 @@ export default PotenzialService;
 
 /* v2854 · fuer den Pruefer (tools/wertermittlung-pruefen.mjs B54): dieselbe Stufenrechnung */
 export { eineStufe as _eineStufe };
+export { stufe558 as _stufe558 };   /* v3150 · Pruefer B61 */
 /* v2988 · fuer Knotenprobe und Pruefer: Miete nach Modernisierung, Stufenmiete, Bestandsbasis */
 export { mieteNachModernisierung as _mieteNachModernisierung, stufenMiete as _stufenMiete, bestandsBasis as _bestandsBasis };

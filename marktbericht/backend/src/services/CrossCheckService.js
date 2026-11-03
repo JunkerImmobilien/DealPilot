@@ -200,7 +200,8 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag, opts = {})
     const _aus558 = (art === 'underrent' && z.nutzung !== 'gewerbe') ? ausschluss558(z.mv_art) : null;
     if (jahre == null && art === 'underrent' && z.nutzung !== 'gewerbe' && opts.kappung && Number(z.ist_jahr) > 0 && !_aus558) {
       pfad = erhoehungspfad558(Number(z.ist_jahr), Number(z.ist_jahr) - d, lzsPct, opts.kappung.pct, R,
-        { stichtag: st, letzte: z.letzte_erhoehung || null, letzteBetragMonat: z.letzte_erhoehung_betrag || null, mvArt: z.mv_art || null });
+        { stichtag: st, letzte: z.letzte_erhoehung || null, letzteBetragMonat: z.letzte_erhoehung_betrag || null, mvArt: z.mv_art || null,
+          vorsichtig36: true });   /* v3150 · ohne Erhoehungshistorie: vorsichtige Annahme 36 Monate + Sensitivitaet */
       if (pfad) { jahre = pfad.jahre; quelle = 'bgb558'; }
     }
     const zeile = { nr: z.nr || null, art, differenz_jahr: d, jahre: jahre != null ? deckel(jahre) : null, jahre_quelle: quelle,
@@ -213,7 +214,8 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag, opts = {})
                         /* v3140 · N114 */
                         wartefrist_geprueft: !!pfad.wartefrist_geprueft, letzte_erhoehung: pfad.letzte_erhoehung || null,
                         erste_anhebung: pfad.erste_anhebung || null, kappung_angerechnet_eur: pfad.kappung_angerechnet_eur ?? null,
-                        kappung_basis_unbekannt: !!pfad.kappung_basis_unbekannt, hinweis: pfad.hinweis || null };
+                        kappung_basis_unbekannt: !!pfad.kappung_basis_unbekannt, hinweis: pfad.hinweis || null,
+                        vorsichtig36: !!pfad.vorsichtig36, sensitiv: pfad.sensitiv || null };   /* v3150 */
     } else if (jahre != null && jahre > 0) {
       zeile.barwert_eur = barwertAbweichung(d, lzsPct, zeile.jahre);
       zeile.angesetzt = true;
@@ -1929,7 +1931,7 @@ export const CrossCheckService = {
                 /* v2993 · Pfad nach § 558 BGB: die Differenz schrumpft mit jeder Anhebung - kein einzelner Barwertfaktor */
                 /* v3140 · N114 · als „Mindermiete bis zur rechtlich zulaessigen Anpassung" mit der ersten Anhebung */
                 ? 'Mindermiete bis zur rechtlich zulässigen Anpassung: −' + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr anfangs, abnehmend mit jeder Anhebung nach § 558 BGB (Kappung ' + x.pfad558.kappung_pct + ' %'
-                  + (x.pfad558.erste_anhebung ? ', erste ab ' + x.pfad558.erste_anhebung.slice(5, 7) + '/' + x.pfad558.erste_anhebung.slice(0, 4) : (x.pfad558.wartefrist_geprueft ? '' : ', Wartefrist unterstellt')) + '), '
+                  + (x.pfad558.erste_anhebung ? ', erste ab ' + x.pfad558.erste_anhebung.slice(5, 7) + '/' + x.pfad558.erste_anhebung.slice(0, 4) + (x.pfad558.vorsichtig36 ? ' (vorsichtige Annahme 36 Monate)' : '') : '') + '), '
                   + String(x.jahre).replace('.', ',') + ' J. bis zur marktüblichen Miete, Barwert ' + Math.round(x.barwert_eur).toLocaleString('de-DE') + ' €'
                 : (x.differenz_jahr > 0 ? '+' : '−') + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr × Barwertfaktor '
                   + String(x.jahre).replace('.', ',') + ' J. (' + (x.jahre_quelle === 'eingabe' ? 'eigene Angabe' : x.jahre_quelle === 'befristung' ? 'Befristung' : 'Kündigungsverzicht') + ')')).join('; ') });
@@ -1958,7 +1960,10 @@ export const CrossCheckService = {
                    /* v2488 · Band und Vergleichsmiete fuer die Bestandsbasis je Wohnung */
                    miete_band: _band || null, markt_qm: _refQm > 0 ? _refQm : null,
                    /* v2520 · der Bestand trennt vermietete und leere Flaeche */
-                   miete_aufteilung: _aufteilung } });
+                   miete_aufteilung: _aufteilung,
+                   /* v3150 · die Mietabweichung je Wohnung (Bestand) - die Stufe Mieterhoehung ersetzt nur die Zeilen der Wohnungen, die sie neu rechnet */
+                   miet_bog: _mietBog || null, kappung: (function () { try { return kappungFuer(ref.ags, ref.kappung_pct, _wst.datum); } catch (e) { return null; } })(),
+                   stichtag: _wst && _wst.datum instanceof Date ? _wst.datum.toISOString().slice(0, 10) : null } });
       } catch (e) { /* nur Zusatz */ }
 
       if (kern.vollstaendig && kern.wert != null && _ertragUnterdruecken) {
@@ -2142,7 +2147,10 @@ export const CrossCheckService = {
               + (_ohneL.length ? (_mitL.length ? (_ohneL.map((x) => x.nr).filter(Boolean).join(', ') || 'Übrige') + ': ' : '') + _ohneL[0].pfad558.annahmen + '. ' : '')
               + (_p0.kappung_text || '') + '.'
               + ' Je Wohnung: ' + _p558.map((x) => (x.nr ? x.nr + ' ' : '') + String(x.jahre).replace('.', ',') + ' J., ' + _eu(x.barwert_eur)).join('; ') + '.'
-              + (_ohneL.length ? ' Die letzte Mieterhöhung ist nicht eingetragen: liegt sie weniger als 15 Monate zurück, verlängert sich die Dauer (§ 558 Abs. 1 BGB) und der Abzug wird größer - mit Datum und Betrag (Reiter Objekt, Wohnungen) wird sie genau.' : '')
+              /* v3150 · N114 Punkt 3: ohne Historie 36 Monate als vorsichtige Annahme, mit Sensitivitaet */
+              + (_ohneL.length ? ' Die bisherigen Mieterhöhungen sind nicht eingetragen, die verbleibende Kappungsreserve ist damit nicht belegt. Deshalb ist keine sofortige Erhöhung angesetzt, sondern als vorsichtige Bewertungsannahme die erste Anhebung erst 36 Monate nach dem Stichtag. Die 36 Monate sind keine gesetzliche Wartefrist, sondern der Rückblick der Kappungsgrenze (§ 558 Abs. 3 BGB). Mit Datum und Betrag der letzten Erhöhung (Reiter Objekt, Wohnungen) wird es genau.'
+                + (_ohneL.some((x) => x.pfad558.sensitiv) ? ' Sensitivität: ist die Wartefrist heute schon erfüllt (erste Anhebung nach drei Monaten, § 558b BGB), wäre der Abzug um '
+                  + _eu(_ohneL.reduce((a, x) => a + ((x.pfad558.sensitiv && x.pfad558.sensitiv.unterschied_eur) || 0), 0)) + ' kleiner.' : '') : '')
               + (_p558.some((x) => x.pfad558.kappung_basis_unbekannt) ? ' Wo der Betrag der letzten Erhöhung fehlt, ist die Kappungsgrenze erst angesetzt, wenn die Erhöhung aus dem Drei-Jahres-Fenster fällt (sicher erreichbar) - mit dem Betrag wird es genauer.' : ''));
           }
           if (_mietBog.n_offen && _mietBog.szenarien) {

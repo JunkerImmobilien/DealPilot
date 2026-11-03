@@ -95,6 +95,12 @@
   function mvVorschlag(ext) {
     var E = einheiten(); if (!E) return null;
     var lage = String((ext && ext.lage_einheit) || '').trim(), wfl = zahl(ext && ext.wohnflaeche_m2);
+    /* v3150 · derselbe Mieter steht schon an einer Einheit (Name ohne KI gelesen, routes/ai.js) */
+    var mn = ext && ext.mieter_name && ext.mieter_name.name ? String(ext.mieter_name.name).toLowerCase().replace(/\s+/g, ' ').trim() : '';
+    if (mn) {
+      var t0 = E.map(function (e, i) { return e.mv_mieter && String(e.mv_mieter).toLowerCase().replace(/\s+/g, ' ').trim() === mn ? i : -1; }).filter(function (i) { return i >= 0; });
+      if (t0.length === 1) return { i: t0[0], sicher: true, grund: 'Mieter „' + ext.mieter_name.name + '" steht schon an dieser Einheit' };
+    }
     var nr = (lage.match(/(?:whg|wohnung|we|einheit|nr)\.?\s*(\d+)/i) || [])[1];
     if (nr) {
       var t = E.map(function (e, i) { return String(e.nr || (i + 1)) === nr ? i : -1; }).filter(function (i) { return i >= 0; });
@@ -127,6 +133,7 @@
     if (zahl(ext.nebenkosten_vorauszahlung_eur)) t.push('NK ' + eur(zahl(ext.nebenkosten_vorauszahlung_eur)));
     if (Array.isArray(ext.staffeln) && ext.staffeln.length) t.push(ext.staffeln.length + ' Staffeln');
     if (ext.lage_einheit) t.push('laut Vertrag: ' + ext.lage_einheit);
+    if (ext.mieter_name && ext.mieter_name.name) t.push('Mieter ' + ext.mieter_name.name + (ext.mieter_name.sicher ? '' : ' (bitte prüfen)') + ' – ohne KI gelesen');   /* v3150 */
     return t.join(' · ');
   }
   /** Übernimmt einen Mietvertrag in die gewählte Einheit. Überschreibt Miete und Vertragsdaten (neuer
@@ -136,8 +143,10 @@
     var e = E[i], alt = JSON.parse(JSON.stringify(e)), heute = new Date().toISOString().slice(0, 10);
     var setz = function (k, v) { if (v !== null && v !== undefined && v !== '') e[k] = String(v); };
     /* v3120a · ein NEUER Vertrag (anderer Mietbeginn) ersetzt den alten ganz - gemessen: Whg. 1 behielt
-       „nächste Anpassung 01.04.2027" des alten Staffelvertrags, obwohl der neue unbefristet ist. Der Name
-       des Mieters wird nie ausgelesen (Datenschutz); beim neuen Vertrag wird der alte geleert. */
+       „nächste Anpassung 01.04.2027" des alten Staffelvertrags, obwohl der neue unbefristet ist. Beim neuen
+       Vertrag wird auch der alte Mietername geleert.
+       v3150 · Marcel 03.11.2026: der Name des Mieters wird jetzt ausgelesen, aber NICHT von der KI - Regeln auf
+       unserem Server vor dem Schwärzen (backend/src/services/mieterName.js), Feld ext.mieter_name. */
     var neuerVertrag = isoAus(ext.mietbeginn) && isoAus(ext.mietbeginn) !== String(e.mv_beginn || '');
     if (neuerVertrag) ['mv_art', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_naechste_anpassung', 'mv_befristet_bis', 'mv_kuendigungsverzicht_bis',
       'mv_kaution', 'nk_vorauszahlung', 'stellplatz_miete', 'mv_mieter', 'mv_abw_jahre'].forEach(function (k) { if (k in e) e[k] = ''; });
@@ -151,6 +160,7 @@
     setz('mv_befristet_bis', isoAus(ext.befristet_bis));
     setz('mv_kuendigungsverzicht_bis', isoAus(ext.kuendigungsverzicht_bis));
     setz('mv_letzte_erhoehung', isoAus(ext.letzte_erhoehung));
+    if (ext.mieter_name && ext.mieter_name.name && (neuerVertrag || !String(e.mv_mieter || '').trim())) setz('mv_mieter', ext.mieter_name.name);   /* v3150 */
     if (Array.isArray(ext.staffeln)) {
       var naechste = ext.staffeln.map(function (s) { return isoAus(s && s.ab); }).filter(function (d) { return d && d > heute; }).sort()[0];
       setz('mv_naechste_anpassung', naechste);

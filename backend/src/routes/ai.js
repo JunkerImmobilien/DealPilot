@@ -21,6 +21,7 @@ const openaiService = require('../services/openaiService');
 const aiCreditsService = require('../services/aiCreditsService');  // V63.86
 const dokumentSchemas = require('../services/dokumentSchemas');   /* v1678 */
 const schwaerzen = require('../services/schwaerzen');   /* v2210 */
+const { mieterAusText } = require('../services/mieterName');   /* v3150 · Mietername nur hier, nie an die KI */
 const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
 const voiceExtractService = require('../services/voiceExtractService');  // v503-voice
 const marketRatesService = require('../services/marketRatesService');  /* v1951: Marktzins fuer die Quick-Check-Einordnung */
@@ -902,6 +903,16 @@ router.post('/extract-dokument', authenticate, extractLimiter, async (req, res, 
         try { const r2 = await openaiService.extractDokument(text, w, { userApiKey }); if (r2 && r2.success) result.weitere.push(r2); } catch (e) { /* ein Teil darf fehlen */ }
       }
     }
+    /* v3150 · Marcel 03.11.2026: der Name des Mieters wird ausgelesen, aber NICHT an die KI geschickt -
+       Regeln auf dem rohen Text hier auf dem Server (services/mieterName.js), die KI sah nur den geschwärzten. */
+    try {
+      [result].concat(Array.isArray(result && result.weitere) ? result.weitere : []).forEach(function (r) {
+        if (r && r.success && r.typ === 'mietvertrag' && r.extracted && typeof r.extracted === 'object') {
+          const mn = mieterAusText(_rohText);
+          if (mn) r.extracted.mieter_name = { name: mn.name, sicher: mn.sicher, herkunft: 'aus dem Vertrag gelesen, ohne KI' };
+        }
+      });
+    } catch (e) { /* nur Zusatz */ }
     result.erkennung = {
       typ: erkannt.typ,
       sicherheit: erkannt.sicherheit,

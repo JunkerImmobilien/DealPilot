@@ -107,7 +107,44 @@ export function ausschluss558(mvArt) {
   return null;
 }
 
+/* ══ v3150 · N114 · UNBEKANNTE ERHÖHUNGSHISTORIE: 36 MONATE ALS VORSICHTIGE ANNAHME ══
+   Marcel 03.11.2026 (Vorgaben zur sachverständigen Bewertung, Punkt 3): „Kann die
+   verbleibende Kappungsreserve nicht nachgewiesen werden, darf keine unbelegte sofortige
+   Mieterhöhung angesetzt werden. Als vorsichtige Modellannahme kann die nächste
+   Mietsteigerung erst nach 36 Monaten berücksichtigt werden" - ausdrücklich als
+   KONSERVATIVE BEWERTUNGSANNAHME, nicht als gesetzliche Frist (die 36 Monate sind der
+   Rückblick der Kappungsgrenze, § 558 Abs. 3, keine Wartefrist). Dazu eine
+   Sensitivitätsrechnung mit dem frühesten rechtlich möglichen Zeitpunkt.
+   opts.vorsichtig36 = true: ist die letzte Erhöhung NICHT eingetragen, wirkt die erste
+   Anhebung frühestens im Monat 36 nach dem Stichtag; out.sensitiv rechnet denselben Pfad
+   mit Wartefrist erfüllt (Verlangen am Stichtag, Wirkung nach drei Monaten, § 558b).
+   Mit eingetragener letzter Erhöhung gilt die Rechnung wie v3140 (konkret, keine Annahme). */
 export function erhoehungspfad558(istJahr, ansatzJahr, lzsPct, kappungPct, rndJahre, opts = {}) {
+  if (opts.vorsichtig36 && !opts._innen) {
+    const st0 = opts.stichtag instanceof Date ? opts.stichtag : null;
+    let l0 = st0 && opts.letzte ? ymOffset(st0, opts.letzte) : null;
+    if (l0 != null && l0 > 0) l0 = null;
+    if (l0 == null) {
+      const v = erhoehungspfad558(istJahr, ansatzJahr, lzsPct, kappungPct, rndJahre, Object.assign({}, opts, { _innen: true, _ersteAb: 36 }));
+      const f = erhoehungspfad558(istJahr, ansatzJahr, lzsPct, kappungPct, rndJahre, Object.assign({}, opts, { _innen: true }));
+      if (!v) return v;
+      v.vorsichtig36 = true;
+      v.annahmen = 'Mieterhöhung nach § 558 BGB: die bisherigen Erhöhungen sind nicht eingetragen, die verbleibende Kappungsreserve ist damit nicht belegt. '
+        + 'Vorsichtige Bewertungsannahme (keine gesetzliche Frist): die erste Anhebung wirkt erst 36 Monate nach dem Wertermittlungsstichtag'
+        + (st0 && v.schritte.length ? ' (ab ' + mmjj(ymPlus(st0, v.schritte[0].ab_monat)) + ')' : '')
+        + ', danach alle drei Jahre um die Kappungsgrenze von ' + kappungPct + ' %, höchstens bis zur Zielmiete';
+      v.hinweis = 'letzte Erhöhung nicht eingetragen - vorsichtige Annahme 36 Monate';
+      if (st0 && v.schritte.length) v.erste_anhebung = ymPlus(st0, v.schritte[0].ab_monat);
+      if (f) {
+        v.sensitiv = { erste_ab_monat: f.schritte.length ? f.schritte[0].ab_monat : null,
+          erste_anhebung: st0 && f.schritte.length ? ymPlus(st0, f.schritte[0].ab_monat) : null,
+          barwert_eur: f.barwert_eur, jahre: f.jahre, unterschied_eur: f.barwert_eur - v.barwert_eur,
+          text: 'Sensitivität: ist die Wartefrist heute schon erfüllt, wirkt die erste Anhebung nach drei Monaten (§ 558b BGB)'
+            + (st0 && f.schritte.length ? ', ab ' + mmjj(ymPlus(st0, f.schritte[0].ab_monat)) : '') };
+      }
+      return v;
+    }
+  }
   const I = Number(istJahr) / 12, A = Number(ansatzJahr) / 12, k = Number(kappungPct) / 100, i = Number(lzsPct) / 100;
   if (!(I > 0) || !(A > I) || !(k > 0) || !(i > 0)) return null;
   if (ausschluss558(opts.mvArt)) return null;
@@ -129,7 +166,7 @@ export function erhoehungspfad558(istJahr, ansatzJahr, lzsPct, kappungPct, rndJa
   const schritte = [];
   while (m < maxMon) {
     /* Wartefrist: 15 Monate nach der letzten Erhoehung (§ 558 Abs. 1), fruehestens Verlangen am Stichtag + 3 (§ 558b) */
-    const frueh = letzteWirk == null ? 3 : Math.max(3, letzteWirk + 15);
+    const frueh = letzteWirk == null ? Math.max(3, Number(opts._ersteAb) || 0) : Math.max(3, letzteWirk + 15);   /* v3150 · _ersteAb: vorsichtige Annahme */
     if (m >= frueh) {
       const basis = mieteAm(m - 36);
       if (basis != null) {
