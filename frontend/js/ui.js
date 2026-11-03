@@ -1842,6 +1842,7 @@ window._dpPaTab = function (id, btn) {
        eines Unterreiters wird beides aus dem heutigen Stand neu gebaut. */
     try { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); } catch (e2) {}
     if ((id === 'anschluss' || id === 'exit') && window.DpBestand) { try { window.DpBestand.mountAll(); } catch (e3) {} }   /* v2985 */
+    if (window.DpPilotV4 && (id === 'wert' || id === 'steuer')) { try { window.DpPilotV4.neuZeichnen(); } catch (e7) {} }   /* v3099 */
     if (id === 'si' && window.DpJahresstaende) { try { window.DpJahresstaende.mount(); } catch (e4) {} }   /* v2989 */
     if (id === 'si' && typeof window._dpPaSollIstNeu === 'function') {
       var altH = wrap.querySelector('.abw-tafel-host');
@@ -1970,6 +1971,7 @@ function _renderAIServerAnalysis(a) {
   };
 
   // Panel 1 — Briefing
+  var _pbHinweis = '', _pbScore = '', _pbFit = '', _pbOptisch = '', _pbAnschluss = '';   /* v3099 · Bausteine fuer Fassung 4 (pilot-analyse-v4.js) */
   var pB = sec('', I.brief, 'BRIEFING');
   pB += '<div class="dp-pa-card"><div class="dp-pa-empf-row">' + empfBadge(a.empfehlung || a.fazit_kurz) + '</div>' +
         p(a.gesamtbewertung || a.fazit_kurz) + p(a.empfehlung_begruendung) + '</div>';
@@ -1978,9 +1980,9 @@ function _renderAIServerAnalysis(a) {
     if (a.bestand_modus && has(a.verhandlungsempfehlung))
       pB += '<div class="dp-pa-card">' + sec('', I.deal, 'BESTANDSSTRATEGIE · WAS DU JETZT TUN KANNST') + p(a.verhandlungsempfehlung) + '</div>';
     else if (!a.bestand_modus)
-      pB += '<div class="dp-pa-card" data-dp-pa-bestand-alt="1"><div class="dp-pa-stand dp-pa-stand-alt" style="margin:0"><b>Diese Analyse bewertet das Objekt noch als Kaufangebot.</b> '
+      pB += (_pbHinweis = '<div class="dp-pa-card" data-dp-pa-bestand-alt="1"><div class="dp-pa-stand dp-pa-stand-alt" style="margin:0"><b>Diese Analyse bewertet das Objekt noch als Kaufangebot.</b> '
         + 'Sie stammt aus der Zeit, bevor der Pilot Bestandsobjekte als Halteentscheidung bewertet. Analyse neu abrufen, dann heißt die Empfehlung Halten, Optimieren oder Verkauf prüfen, '
-        + 'und der Pilot beantwortet die Fragen zu Anschlussfinanzierung und Exit.</div></div>';
+        + 'und der Pilot beantwortet die Fragen zu Anschlussfinanzierung und Exit.</div></div>');
   }
   if (has(a.investmentbewertung))
     pB += '<div class="dp-pa-card">' + sec('', I.deal, 'INVESTMENTBEWERTUNG') + p(a.investmentbewertung) + '</div>';
@@ -1992,18 +1994,19 @@ function _renderAIServerAnalysis(a) {
     var _scH = [];
     try { var _d1 = DealScore.computeFromKpis(State.kpis); _d1 = _d1 && typeof _d1 === 'object' ? _d1.score : _d1; if (isFinite(_d1)) _scH.push('DealPilot-Score ' + Math.round(_d1)); } catch (e) {}
     try { if (window.DealScore2 && typeof window._buildDeal2FromState === 'function') { var _d2 = window.DealScore2.compute(window._buildDeal2FromState()); if (_d2 && isFinite(_d2.score)) _scH.push('Investor Deal Score ' + Math.round(_d2.score) + ' (steht auf der Objektkarte)'); } } catch (e) {}
-    pB += '<div class="dp-pa-card">' + sec('', I.deal, 'SCORE-VERGLEICH') + p(a.score_vergleich)
+    pB += (_pbScore = '<div class="dp-pa-card">' + sec('', I.deal, 'SCORE-VERGLEICH') + p(a.score_vergleich)
       + (_scH.length ? '<div class="dp-pa-fuss">Heute: ' + _scH.join(' · ') + '. Die Zahlen im Text sind der Stand der Analyse. '
         + 'Der Score im Marktbericht ist eine eigene Bewertung des Berichts und heißt dort „Score laut Marktbericht“.</div>' : '')
-      + '</div>';
+      + '</div>');
   }
   if (a.investor_fit && typeof a.investor_fit === 'object') {
-    var f = a.investor_fit;
+    var f = a.investor_fit, _pbFit0 = pB.length;
     pB += '<div class="dp-pa-card">' + sec('', I.deal, 'INVESTOR-FIT') + '<div class="dp-pa-fit">';
     if (f.cashflow_investor)        pB += '<div class="dp-pa-fit-row"><span class="dp-pa-fit-l">Cashflow-Investor</span>' + fitBadge(f.cashflow_investor) + '<span class="dp-pa-fit-r">' + fitReason(f.cashflow_investor) + '</span></div>';
     if (f.wertsteigerungs_investor) pB += '<div class="dp-pa-fit-row"><span class="dp-pa-fit-l">Wertsteigerungs-Investor</span>' + fitBadge(f.wertsteigerungs_investor) + '<span class="dp-pa-fit-r">' + fitReason(f.wertsteigerungs_investor) + '</span></div>';
     if (f.sicherheitsorientiert)    pB += '<div class="dp-pa-fit-row"><span class="dp-pa-fit-l">Sicherheitsorientiert</span>' + fitBadge(f.sicherheitsorientiert) + '<span class="dp-pa-fit-r">' + fitReason(f.sicherheitsorientiert) + '</span></div>';
     pB += '</div></div>';
+    _pbFit = pB.slice(_pbFit0);
   }
   if (has(a.dealpilot_insight))
     pB += '<div class="dp-pa-card dp-pa-insight">' + sec('', I.deal, 'DEALPILOT-INSIGHT') + '<p class="dp-pa-p dp-pa-italic">' + _escClean(a.dealpilot_insight) + '</p></div>';
@@ -2029,11 +2032,11 @@ function _renderAIServerAnalysis(a) {
      Feststellung, und der Prompt verbietet ausdruecklich, daraus Baujahr,
      Flaeche oder Wert abzuleiten. */
   if (has(a.optischer_eindruck)) {
-    pS += '<div class="dp-pa-card">' + sec('', I.sr, 'OPTISCHER EINDRUCK AUS DEN FOTOS')
+    pS += (_pbOptisch = '<div class="dp-pa-card">' + sec('', I.sr, 'OPTISCHER EINDRUCK AUS DEN FOTOS')
        + p(a.optischer_eindruck)
        + '<div class="dp-pa-fuss">Ein visueller Eindruck aus den mitgesendeten '
        + 'Bildern — keine Feststellung. Baujahr, Fläche und Wert kommen '
-       + 'aus der Erfassung, nicht aus dem Foto.</div></div>';
+       + 'aus der Erfassung, nicht aus dem Foto.</div></div>');
   }
 
   // Panel 3 — Risiko & Szenarien
@@ -2048,8 +2051,8 @@ function _renderAIServerAnalysis(a) {
   }
   /* v2985 · im Bestand hat die Anschlussfinanzierung einen eigenen Reiter */
   if (!_bestand && has(a.anschlussfinanzierung))
-    pR += '<div class="dp-pa-card">' + sec('', I.risk, 'ANSCHLUSSFINANZIERUNG')
-      + (Array.isArray(a.anschlussfinanzierung) ? qa(a.anschlussfinanzierung) : p(a.anschlussfinanzierung)) + '</div>';
+    pR += (_pbAnschluss = '<div class="dp-pa-card">' + sec('', I.risk, 'ANSCHLUSSFINANZIERUNG')
+      + (Array.isArray(a.anschlussfinanzierung) ? qa(a.anschlussfinanzierung) : p(a.anschlussfinanzierung)) + '</div>');
   if (a.szenarien && typeof a.szenarien === 'object') {
     pR += '<div class="dp-pa-cols">' +
       '<div class="dp-pa-card dp-pa-tone-bad">' + sec('bad', I.risk, 'WORST CASE') + '<div class="dp-pa-kv-sub">Miete -10%, Zins +1%</div>' + p(a.szenarien.worst_case) + '</div>' +
@@ -2079,7 +2082,7 @@ function _renderAIServerAnalysis(a) {
      eine andere Art von Aussage ist: nicht recherchiert, sondern
      gegenuebergestellt. Steht nur, wenn ein Bericht vorlag. */
   if (has(a.berichts_abgleich)) {
-    pL += '<div class="dp-pa-card dp-pa-abgl">' + sec('', I.loc, 'ABGLEICH MIT DEM MARKTBERICHT')
+    pL += '<div class="dp-pa-card dp-pa-abgl dp-pa-d">' + sec('', I.loc, 'ABGLEICH MIT DEM MARKTBERICHT')
        + p(a.berichts_abgleich)
        + '<div class="dp-pa-fuss">Sach- und Ertragswert im Bericht sind ein Plausibilit\u00e4ts-Quercheck '
        + 'nach ImmoWertV-Logik \u2014 indikativ, kein Gutachten nach \u00a7 194 BauGB.</div></div>';
@@ -2090,7 +2093,7 @@ function _renderAIServerAnalysis(a) {
      Tabelle: vier Spalten tragen bei 390 px nicht. */
   var _lg = _lageZeilen(a);
   if (_lg.length) {
-    pL += '<div class="dp-pa-card dp-pa-ggs">' + sec('', I.loc, 'GEGENÜBERSTELLUNG')
+    pL += '<div class="dp-pa-card dp-pa-ggs dp-pa-d">' + sec('', I.loc, 'GEGENÜBERSTELLUNG')
        + '<div class="dp-pa-kv-sub">Ihre Angabe · Marktbericht · Recherche</div>'
        + _lg.map(function (z) {
            var u = String(z.urteil || '').toLowerCase();
@@ -2110,7 +2113,7 @@ function _renderAIServerAnalysis(a) {
        + 'nicht gemessen. Der Marktbericht leitet die Lage aus Messdaten ab.</div></div>';
   }
   if (Array.isArray(a.quellen) && a.quellen.length) {
-    pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
+    pL += '<div class="dp-pa-card dp-pa-d">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
       a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; })
         .filter(function (x, i, arr) { return arr.indexOf(x) === i; }).join('') +   /* v2947 · mehrere Portale = ein Eintrag */
       '</ul></div>';
@@ -2456,13 +2459,14 @@ function _renderAIServerAnalysis(a) {
   /* v2840 · Marcel 22.10.2026: „für viele Kunden sehr unübersichtlich … oben einen Reiter:
      einfach und genau". Einfach = Kernaussagen + Klartext (wert-zielbild.js), Genau = alles
      Bisherige mit Sprungleiste. Ohne wert-zielbild.js bleibt es beim Bisherigen. */
-  var _siPanel = (_siHtml || _potHtml ? panel('si', (function () {
+  var _siInner = (_siHtml || _potHtml ? (function () {
         var g = _potHtml + (_potHtml && _siHtml ? '<div style="margin-top:12px"></div>' : '') + _siHtml;
         /* v2989 · Zielerreichung und Jahresstaende OBEN, in Einfach und Genau (jahresstaende.js) */
         var zh = '';
         try { zh = (_bestand && window.DpJahresstaende) ? '<div data-dp-ziel-host="1">' + window.DpJahresstaende.html() + '</div>' : ''; } catch (e) { zh = ''; }
         try { return zh + (window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(g, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : g); } catch (e) { return zh + g; }
-      })(), false) : '');   /* v2430 */
+      })() : '');   /* v2430 */
+  var _siPanel = _siInner ? panel('si', _siInner, false) : '';   /* v3099 · Inhalt getrennt fuer Fassung 4 */
   /* v3016 · Marcel 28.10.2026: „WEG-Protokolle sollen ausgewertet werden … dafür in der
      Pilot-Analyse einen Reiter erstellen". Er liest die gespeicherte Auswertung der
      Unterlagen (#_dok_auswertung, unterlagen.js) und erscheint nur, wenn es eine gibt. */
@@ -2488,14 +2492,14 @@ function _renderAIServerAnalysis(a) {
     if (!_siTab) {
       var _mfhJa = !!(window.DpMfhEinheiten && typeof window.DpMfhEinheiten.artMitEinheiten === 'function' && window.DpMfhEinheiten.artMitEinheiten());
       _siTab = tab('si', 'Ankauf \u00b7 Bestand \u00b7 Zielbild', false);
-      _siPanel = panel('si', '<div class="dp-pa-card">' + sec('', I.bank, 'ANKAUF \u00b7 BESTAND \u00b7 ZIELBILD')
+      _siPanel = panel('si', (_siInner = '<div class="dp-pa-card">' + sec('', I.bank, 'ANKAUF \u00b7 BESTAND \u00b7 ZIELBILD')
         + '<p class="dp-pa-p">Hier schätzt du ein, was in dem Objekt steckt: <b>heute</b> mit der Ist-Miete, <b>nach Mieterhöhung</b> bis zur zulässigen Vergleichsmiete und im <b>Zielbild</b> nach Umbau oder Neuvermietung – jeweils mit Ertragswert, Restnutzungsdauer und dem Wertzuwachs nach Kosten.</p>'
         + '<p class="dp-pa-p">Dafür fehlen noch die Soll-Miete und das Zielbild. '
         + (_mfhJa ? 'Bei einem Haus mit Einheiten trägst du beides je Wohnung ein (Einheiten erfassen › Details: Soll-Miete, Zielbild und Maßnahmen).' : 'Trag sie im Reiter <b>Miete</b> unter Mietentwicklung ein.')
         + '</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">'
         + (_mfhJa ? '<button type="button" class="btn btn-outline btn-sm" onclick="try{DpMfhEinheiten.oeffnen(1)}catch(e){}">Einheiten erfassen öffnen</button>' : '')
         + '<button type="button" class="btn btn-outline btn-sm" onclick="try{switchTab(2)}catch(e){}">Zum Reiter Miete</button></div>'
-        + '<p class="dp-pa-p" style="margin-top:10px;font-size:12.5px;color:#7A7370">Danach die Pilot-Analyse neu abrufen – dann steht hier die Tafel mit allen drei Stufen und dem Absatz des Piloten.</p></div>', false);
+        + '<p class="dp-pa-p" style="margin-top:10px;font-size:12.5px;color:#7A7370">Danach die Pilot-Analyse neu abrufen – dann steht hier die Tafel mit allen drei Stufen und dem Absatz des Piloten.</p></div>'), false);
     }
     _rail = tab('briefing', 'Briefing', true) +
       tab('sr', 'St\u00e4rken &amp; Risiken', false) +
@@ -2525,6 +2529,29 @@ function _renderAIServerAnalysis(a) {
       panel('bank', pK, false) +
       panel('steuer', pSt, false) +
       _siPanel;
+  }
+  /* v3099 · PILOT-ANALYSE FASSUNG 4 (Marcel 03.11.2026: „auf Staging einbauen und umsetzen").
+     pilot-analyse-v4.js baut Kopfzeile (Phase, PDF, Einfach | Detail), die Unterreiter der
+     Demo und Übersicht, Risiken & Szenarien, Steuer und den Wertverlauf neu. Alle übrigen
+     Teile kommen unverändert von hier. Ohne die Datei oder bei einem Fehler bleibt es beim
+     Bisherigen darunter. */
+  if (window.DpPilotV4 && window.DpPilotV4.huelle) {
+    try {
+      var V4 = window.DpPilotV4;
+      var _wertInner = '<div data-dp-pa-wertverlauf="1"></div><div id="dp-pa-wert-body"></div>'
+        + '<div id="dp-pa-verlauf-wrap" class="dp-pa-d" style="display:none;margin-top:16px"><h4 class="dp-wv-h" style="margin:0 0 8px">Verlauf · Marktberichte und Abrufe</h4>'
+        + '<div class="dp-pa-card" id="dp-pa-verlauf-body"></div></div>';
+      var _v4 = V4.huelle({
+        bestand: _bestand, kopf: _kopf,
+        uebersicht: V4.uebersicht(a, _bestand, { hinweis: _pbHinweis, score: _pbScore, fit: _pbFit }),
+        si: _siInner, wert: _wertInner, lage: pL, steuer: V4.steuer(a),
+        risiko: V4.risiko(a, _bestand, { optisch: _pbOptisch, anschluss: _bestand ? '' : _pbAnschluss }),
+        verhandlung: pV, bank: pK, unterlagen: _ulHtml,
+        anschlussExit: _bestand ? pAF + '<div style="margin-top:16px"></div>' + pEX : ''
+      });
+      try { setTimeout(function () { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); }, 0); } catch (e5) {}
+      return _v4;
+    } catch (eV4) { try { console.warn('[pilot-analyse v4]', eV4); } catch (e6) {} }
   }
   return '<div class="dp-pa-wrap' + (_bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-ansicht="' + (_bestand ? 'bestand' : 'ankauf') + '">' + _kopf +
     '<nav class="dp-pa-rail">' + _rail + '</nav>' +
@@ -3424,6 +3451,23 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     var ktxt = root.querySelector('#dpv-txt');
     if (ktxt) _dpVerlaufKiText(hist, mets, ktxt);
 
+    /* v3099 · Marcel 03.11.2026: „Grafiken und Verläufe einheitlich, so ähnlich wie im Tab Steuern" -
+       statt des Chart.js-Bildes dieselbe SVG-Bauart wie der Steuerverlauf (pilot-analyse-v4.js) */
+    if (cv && window.DpPilotV4 && window.DpPilotV4.indexVerlauf) {
+      var _box = document.createElement('div'); _box.className = 'dpv-svgbox';
+      cv.parentNode.parentNode.replaceChild(_box, cv.parentNode);
+      var _an = mets.map(function (m, i) { return i < 2; });
+      var _zeich = function () { window.DpPilotV4.indexVerlauf(_box, hist, mets, _an); };
+      _zeich();
+      root.querySelectorAll('.dpv-chip').forEach(function (ch, i) {
+        ch.addEventListener('click', function () {
+          _an[i] = !_an[i]; ch.classList.toggle('on', _an[i]);
+          var row = root.querySelector('[data-mrow="' + ch.getAttribute('data-k') + '"]'); if (row) row.style.opacity = _an[i] ? '1' : '.45';
+          _zeich();
+        });
+      });
+      return;
+    }
     if (!cv || typeof window.Chart === 'undefined') { wireChips(null); return; }
     var gridCol = light ? 'rgba(122,115,112,.14)' : 'rgba(201,168,76,.10)';
     var axisCol = light ? '#5A5350' : 'rgba(232,226,212,.6)';
@@ -3543,6 +3587,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
           h.mpi_nach_abschlag = ab > 0 ? Number(h.market_value) : null;   /* v2947 (N78.2) */
         });
         try { if (window.DpWertvergleich) window.DpWertvergleich.fuellen(hist); } catch (e) {}   /* v2810 */
+        try { if (window.DpPilotV4) window.DpPilotV4.wertverlauf(hist); } catch (e) {}   /* v3099 · Wert gegen Plan */
         var abHtml = _dpAbrufeHtml(abrufe);
         /* v2217 · Marcel 14.10.2026: „Marktbericht auch erst, wenn wir schon
            einen Report haben." Bis hier erschien der Reiter erst ab ZWEI
