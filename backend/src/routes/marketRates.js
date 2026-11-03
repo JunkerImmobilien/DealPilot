@@ -64,6 +64,17 @@ router.post('/refresh', authenticate, requireRole('admin'), async (req, res, nex
  *
  * ?ltv=85 liefert zusaetzlich `fuer_ltv` { ltv, zuschlag, rates{b} }.
  */
+/* v3157 · GET /api/v1/market-rates/bauzins/matrix[?ltv=60,80,95]
+   Die ganze Tabelle Zinsbindung (5/10/15/20 J) × Beleihungsauslauf, mit Stand, Herkunft und Methode.
+   Öffentlich wie /bauzins (auch mit API-Schlüssel nutzbar). */
+router.get('/bauzins/matrix', async (req, res, next) => {
+  try {
+    const d = await bauzinsService.getBauzins();
+    const liste = req.query.ltv ? String(req.query.ltv).split(',').map((x) => Number(String(x).replace(/\s/g, '').replace(',', '.'))) : null;
+    res.json(bauzinsService.matrix(d, liste));
+  } catch (err) { next(err); }
+});
+
 router.get('/bauzins', async (req, res, next) => {
   try {
     const d = await bauzinsService.getBauzins();

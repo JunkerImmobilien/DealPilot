@@ -124,6 +124,12 @@ setInterval(() => {
 }, 15 * 60 * 1000).unref();
 
 
+/* v3157 · Anfrage mit API-Schlüssel (dpk_…)? */
+function _hatApiKey(req) {
+  const k = req.headers && req.headers['x-api-key'];
+  return typeof k === 'string' && /^dpk_/.test(k);
+}
+
 /* Wer ist das? Gibt die Nutzerkennung zurueck oder null. */
 function _kontoAusToken(req) {
   try {
@@ -203,10 +209,15 @@ async function _ausnahmeLaden(konto) {
 
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
-  max: (req) => (_kontoAusToken(req) ? LIMIT_KONTO : config.rateLimit.max),
+  /* v3157 · Schnittstellen-Prüfung 03.11.2026: ein API-Schlüssel (x-api-key) lief in das IP-Limit
+     (200 je 15 min), obwohl er sein eigenes Limit hat (120/min, middleware/auth.js). Für Anfragen mit
+     Schlüssel gilt hier 1.800 je 15 min je IP - genau 120/min; die Kennung bleibt die IP, damit
+     erfundene Schlüssel nicht je Versuch einen frischen Zähler bekommen. */
+  max: (req) => (_kontoAusToken(req) ? LIMIT_KONTO : (_hatApiKey(req) ? 1800 : config.rateLimit.max)),
   keyGenerator: (req) => {
     const konto = _kontoAusToken(req);
     if (konto) return 'u:' + konto;
+    if (_hatApiKey(req)) return 'k:' + _ipSchluessel(req.ip);
     return 'ip:' + _ipSchluessel(req.ip);
   },
   /* Die eingebaute Pruefung warnt bei einem eigenen keyGenerator, weil

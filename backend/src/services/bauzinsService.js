@@ -401,6 +401,32 @@ async function aktualisieren(opts) {
   return daten;
 }
 
+/* v3157 · Marcel 03.11.2026: „eine Schnittstelle, um die Bauzinsen unter verschiedenen Beleihungsstufen und
+   Finanzierungsjahren auszulesen". Die ganze Tabelle Zinsbindung × Beleihungsauslauf in einem Aufruf, mit
+   Stand und Herkunft - dieselbe Formel wie /bauzins (zinsFuer), keine zweite Rechnung. */
+const MATRIX_LTV = [50, 60, 70, 80, 90, 100, 110];
+function matrix(d, ltvListe) {
+  var ltvs = (Array.isArray(ltvListe) && ltvListe.length ? ltvListe : MATRIX_LTV).filter(function (x) { return isFinite(x) && x > 0 && x < 300; });
+  var f = d.formel || {}, saetze = {};
+  (d.maturities || []).forEach(function (b) {
+    saetze[b] = {};
+    ltvs.forEach(function (l) { saetze[b][l] = (f.bund && f.bund[b] != null && f.aufschlag && f.aufschlag[b] != null) ? zinsFuer(f.bund[b], f.aufschlag[b], l) : null; });
+  });
+  return {
+    stand: (f.bund_datum && (f.bund_datum['10'] || f.bund_datum[10])) || (d.abgerufen ? String(d.abgerufen).slice(0, 10) : null),
+    abgerufen: d.abgerufen || null,
+    quelle: d.quelle,
+    methode: 'Modell: Rendite der Bundesanleihe je Laufzeit (Deutsche Bundesbank, Tageswert) + Marktaufschlag der Banken (MFI-Zinsstatistik der Bundesbank, Monatswert) + Kalibrierung K + Zuschlag je Beleihungsauslauf. Indikative Konditionen, kein Angebot einer Bank.',
+    einheit: 'Prozent p. a., nominal',
+    bindungen_jahre: (d.maturities || []).map(Number),
+    beleihungsauslauf_pct: ltvs,
+    saetze: saetze,
+    zuschlag_je_ltv: ltvs.reduce(function (a, l) { a[l] = zuschlagLtv(l); return a; }, {}),
+    kalibrierung: { k: f.k, stand: f.k_stand, bezug: f.k_bezug },
+    fehlt: d.fehlt || []
+  };
+}
+
 async function getBauzins() {
   if (_cache && (Date.now() - _cache.t) < CACHE_TTL_MS) return _cache.wert;
   var dbDaten = null;
@@ -466,6 +492,7 @@ function starteTakt() {
 
 module.exports = {
   getBauzins,
+  matrix, MATRIX_LTV,   /* v3157 */
   aktualisieren,
   abrufenLive,
   berechnen,

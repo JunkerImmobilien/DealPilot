@@ -880,6 +880,12 @@ router.get('/objects/history', async (req, res) => {
               (data->'nutzer_einschaetzung')                                AS lage_nutzer,
               (data->>'bevoelkerung_trend_pct')::numeric                    AS bevoelkerung_trend_pct,
               (data->'zensus')                                              AS zensus,
+              /* v3157 . Schnittstelle: Herkunft A-E/N mit Klartext und Weg, Quellennachweis der verwendeten
+                 Registersaetze und der Marktdaten, Wertermittlungsstichtag. Keine Backticks hier. */
+              (data->'wertermittlung_herkunft')                             AS herkunft,
+              (data->'cross_check'->'quellen_nachweis')                     AS quellen_nachweis,
+              (data->'quellen_nachweis_markt')                              AS quellen_nachweis_markt,
+              (data->>'wertermittlungsstichtag')                            AS wertermittlungsstichtag,
               (data ? 'cross_check')                                        AS hat_crosscheck
          FROM mb.object_snapshots
         WHERE user_id = $1${cond}

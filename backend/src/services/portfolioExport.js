@@ -81,6 +81,53 @@ const projektwissen = require('./projektwissen');
 const MB_BASE = (process.env.MB_BACKEND_URL
   || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
 
+/* v3157 · ein Punkt des Marktbericht-Verlaufs mit allem, was die Wertermittlung traegt: Stufe, Verfahren,
+   Herkunft A-E/N, indikativ, Quellen. Wunsch aus dem Modul Portfolio-Strategie (Protokoll 03.11.2026, P1).
+   Zahlen kommen aus mb /objects/history - eine Stelle, keine zweite Rechnung. */
+function _zahl(v) { if (v === null || v === undefined || v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : null; }
+function _verlaufPunkt(x) {
+  const h = (x.herkunft && typeof x.herkunft === 'object') ? x.herkunft : null;
+  const ew = _zahl(x.ertragswert_eur), sw = _zahl(x.sachwert_eur), vw = _zahl(x.vergleichswert_eur);
+  return {
+    datum: x.created_at, bericht_id: x.report_id,
+    wert_stufe: x.wert_stufe != null ? Number(x.wert_stufe) : null,
+    wertermittlungsstichtag: x.wertermittlungsstichtag || null,
+    marktwert_eur: _zahl(x.market_value), marktwert_von: _zahl(x.market_value_low), marktwert_bis: _zahl(x.market_value_high),
+    eur_pro_qm: _zahl(x.median_sqm), wohnflaeche: _zahl(x.living_area), baujahr: x.build_year || null,
+    ertragswert: ew != null ? { eur: ew, von: _zahl(x.ertragswert_von_eur), bis: _zahl(x.ertragswert_bis_eur), bezeichnung: x.ertragswert_bezeichnung || null,
+      miete_ist_qm: _zahl(x.ew_miete_ist_qm), miete_vergleich_qm: _zahl(x.ew_miete_vergleich_qm), miete_stufe: x.ew_miete_stufe || null } : null,
+    sachwert: sw != null ? { eur: sw, gebaeude_eur: _zahl(x.sw_gebaeude_eur), faktor: _zahl(x.sw_faktor), faktor_stufe: x.swf_stufe || null,
+      faktor_grund: x.sw_faktor_grund || null, marktangepasst: x.sw_marktangepasst === true, vorlaeufig: x.sachwert_vorlaeufig === true } : null,
+    bodenwert_eur: _zahl(x.sw_bodenwert_eur),
+    vergleichswert: (vw != null || _zahl(x.irw_vergleichswert_eur) != null) ? { eur: vw, amtlich: _zahl(x.vergleichsfaktor_amtlich) != null,
+      irw_eur: _zahl(x.irw_vergleichswert_eur), ausschuss: x.vergleich_ausschuss || null, hinweis: x.vergleich_hinweis || null } : null,
+    lzs: x.lzs_pct != null ? { pct: _zahl(x.lzs_pct), stufe: x.lzs_stufe || null, zweig: x.lzs_zweig || null, jahr: x.lzs_berichtsjahr || null, aus_register: x.lzs_aus_register === true } : null,
+    rnd_jahre: _zahl(x.sw_rnd_jahre), gnd_jahre: _zahl(x.gnd_jahre),
+    fuehrend: x.fuehrend ? { verfahren: x.fuehrend, grund: x.fuehrend_grund || null, quelle: x.fuehrend_quelle || null } : null,
+    indikativ: h ? !!h.indikativ : null,
+    herkunft: h ? { stufe: h.stufe || null, kurz: h.kurz || null, lang: h.lang || null, ebene: h.ebene || null, unter_a: h.unter_a,
+      weg: h.weg || null, quelle: h.quelle || null, quelle_link: h.quelle_link || null } : null,
+    herkunft_ebene: h ? (h.ebene || null) : null,
+    quellen_nachweis: Array.isArray(x.quellen_nachweis) ? x.quellen_nachweis : [],
+    quellen_nachweis_markt: Array.isArray(x.quellen_nachweis_markt) ? x.quellen_nachweis_markt : [],
+    miete_vergleich_qm: _zahl(x.ew_miete_vergleich_qm),
+    beleihungswert_eur: null   /* wird unten fuer den juengsten Stufe-3-Bericht gesetzt */
+  };
+}
+
+/* v3157 · POST an den Marktbericht (Beleihungswert); gleicher Schutz wie mbHolen */
+async function mbSenden(pfad, userId, body) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 12000);
+  try {
+    const r = await fetch(MB_BASE + pfad + '?user_id=' + encodeURIComponent(userId), { method: 'POST', signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ user_id: userId }, body || {})) });
+    const text = await r.text();
+    if (r.status >= 400) return { fehler: 'HTTP ' + r.status };
+    try { return JSON.parse(text); } catch (e) { return { fehler: 'keine JSON-Antwort' }; }
+  } catch (e) { return { fehler: String(e && e.message || e).slice(0, 120) }; } finally { clearTimeout(t); }
+}
+
 async function mbHolen(pfad, userId) {
   const url = MB_BASE + pfad + '?user_id=' + encodeURIComponent(userId);
   /* Der Export darf an einem langsamen Nachbarn nicht haengen bleiben.
@@ -322,8 +369,64 @@ const STRUKTUREN = {
       status: 'das MIETVERHAELTNIS: vermietet | leer | eigennutzung | gekuendigt',
       zustand: 'Note 1-5: 5 neuwertig, 4 modernisiert, 3 gepflegt, 2 renovierungsbed., 1 sanierungsbed.',
       massnahme: 'geplante Massnahme als Freitext, z. B. "Bad modernisieren"',
-      kosten: 'geschaetzte Kosten dieser Massnahme in Euro'
+      kosten: 'geschaetzte Kosten dieser Massnahme in Euro',
+      /* v3157 · Schnittstellen-Pruefung 03.11.2026: die folgenden Felder gingen roh mit, standen aber hier nicht */
+      etage: 'Geschoss als Freitext', balkon_qm: 'Balkon-/Terrassenflaeche in m2', keller: 'Kellerabteil vorhanden (true/false)',
+      stellplatz: 'Stellplatz zugeordnet (true/false)', stellplatz_miete: 'Stellplatzmiete pro MONAT in Euro',
+      mea_anteil: 'Miteigentumsanteil der Einheit (Zaehler, z. B. 125 von 1.000)', gew: 'Gewichtung/Anteil der Einheit an Hauskosten',
+      nk_vorauszahlung: 'Nebenkostenvorauszahlung pro MONAT in Euro',
+      mod: 'Modernisierungsstand der Einheit je Bauteil (Schluessel wie gebaeude; "0" nicht, "h" teilweise, "v" erneuert)',
+      ziel_qm: 'Zielbild: Kaltmiete in Euro/m2 nach den Massnahmen', ziel_wann: 'Zielbild: ab wann (Jahr oder JJJJ-MM)',
+      vgl_qm: 'ortsuebliche Vergleichsmiete der Einheit in Euro/m2 (Mietspiegel oder eigene Angabe)',
+      markt_qm: 'Marktmiete der Einheit in Euro/m2 (aktueller Marktdurchschnitt)',
+      kappung_pct: 'Kappungsgrenze in Prozent (15 oder 20) fuer diese Einheit, falls abweichend',
+      leer_monate: 'erwarteter Leerstand in Monaten (bei Mieterwechsel/Massnahme)', leer_abzug: 'true = Leerstand im Ertrag abziehen',
+      massnahmen: 'Liste der Massnahmen der Einheit - siehe massnahme_eintrag unten',
+      mv_art: 'Vertragsart: unbefristet | staffel | index | zeitmiete | gewerbe | moebliert_kurz',
+      mv_beginn: 'Mietbeginn (JJJJ-MM-TT)', mv_mieter: 'Name des Mieters (aus dem Vertrag gelesen ohne KI oder von Hand)',
+      mv_kaution: 'Kaution in Euro', mv_letzte_erhoehung: 'Datum der letzten Mieterhoehung (JJJJ-MM-TT)',
+      mv_letzte_erhoehung_betrag: 'Betrag der letzten Erhoehung in Euro pro Monat',
+      mv_naechste_anpassung: 'naechste Staffel/Indexanpassung (JJJJ-MM-TT)', mv_erhoehung_art: 'Art der Anpassung (Staffel: betrag | prozent)',
+      mv_erhoehung_wert: 'Hoehe je Anpassung (Euro oder Prozent, je nach mv_erhoehung_art)', mv_rhythmus_jahre: 'Abstand der Anpassungen in Jahren',
+      mv_stufen_offen: 'Zahl der noch offenen Staffelstufen', mv_befristet_bis: 'Zeitmietvertrag befristet bis (JJJJ-MM-TT)',
+      mv_kuendigungsverzicht_bis: 'Kuendigungsverzicht bis (JJJJ-MM-TT)', mv_abw_jahre: 'abweichende Laufzeit in Jahren',
+      mv_in_mietentwicklung: 'true = Vertrag fliesst in die Mietentwicklung des Objekts ein', mv_notiz: 'Notiz zum Vertrag (Freitext)'
+    },
+    massnahme_eintrag: {
+      id: 'Kennung der Massnahme im Katalog (Gewerk)', t: 'Bezeichnung', k: 'Kosten in Euro',
+      bewohnt: 'true = im bewohnten Zustand, Umlage nach § 559 BGB moeglich', erh: 'davon Erhaltungsanteil in Prozent (nicht umlagefaehig)'
+    },
+    weitere: {
+      haus_massnahmen: 'Massnahmen am gemeinsamen Eigentum, gleiche Felder wie massnahme_eintrag',
+      aufteilungskosten: 'Kosten der Aufteilung nach WEG in Euro'
     }
+  },
+  _potenzial: {
+    was: 'Ertragswert je Stufe (Bestand, Mieterhoehung § 558 BGB, Neuvermietung, Zielbild) - das letzte Ergebnis aus der App, nicht neu gerechnet',
+    felder: {
+      stand: 'Zeitpunkt der Rechnung', hash: 'Pruefwert der Eingaben - weicht er ab, sind die Daten seitdem geaendert',
+      ags: 'Gemeindeschluessel', plz: 'Postleitzahl',
+      ergebnis: 'volle Antwort des Rechenkerns (Stufen, Rechenweg, Herkunft je Parameter, Kappung, Neuvermietung)',
+      zusammenfassung: 'Kurzfassung: Werte je Stufe, Kappungsgrenze, Kennzeichnung'
+    },
+    hinweis: 'Live neu rechnen: POST /api/v1/marktbericht/potenzial'
+  },
+  _tax_overrides: {
+    was: 'Steuer-Jahreswerte der Anlage V, die vom Vorschlag der App abweichen (von Hand oder aus Belegen)',
+    form: '{ "y2026": { "fahrtkosten": 64, "hotel": 141.2, ... } } - Euro je Jahr',
+    hinweis: 'Felder ohne Eintrag rechnet die App selbst (Schaetzung); siehe /api/v1/tax-records fuer die fertige Jahresrechnung'
+  },
+  _dok_eingang: {
+    was: 'Eingang fuer Belege, Unterlagen, Rechnungen (JSON als Text)',
+    felder: {
+      verlauf: 'je Import: am, quelle, dokumente[{name,typ}], uebernommen[], nicht_gelesen[], aenderungen[{t,vor,nach,...}], zurueck',
+      herkunft: 'je Steuerjahr und Feld: aus welcher Unterlage/welchem Beleg der Wert stammt (quelle, dok, am, betrag)',
+      einheiten_aenderungen: 'Mietvertraege, die Einheiten zugeordnet wurden (am, einheit, quelle, vorher)'
+    }
+  },
+  _dok_auswertung: {
+    was: 'Auswertung der Unterlagen (WEG-Protokolle, Wirtschaftsplan, Teilungserklaerung ...): Dokumentliste, Risiken, Beschluesse',
+    hinweis: 'Die Dateien selbst liegen nicht auf dem Server'
   },
   _ankauf: {
     was: 'Der eingefrorene Stand beim Nutzen-/Lastenwechsel - das SOLL. '
@@ -590,21 +693,41 @@ async function bauen(userId, opt) {
            gefragt: „ob das Objekt im Preis gestiegen ist". */
         verlauf: v ? v.slice()
           .sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)))
-          .map((x) => ({
-            datum: x.created_at, bericht_id: x.report_id,
-            marktwert_eur: x.market_value || null,
-            marktwert_von: x.market_value_low || null,
-            marktwert_bis: x.market_value_high || null,
-            eur_pro_qm: x.median_sqm || null,
-            wohnflaeche: x.living_area || null, baujahr: x.build_year || null
-          })) : []
+          .map((x) => _verlaufPunkt(x)) : []
       };
     });
   }
 
+  /* v3157 · Beleihungswert (BelWertV, indikativ) je Objekt mit Ertrags- oder Sachwert - aus derselben Rechnung
+     wie im Cockpit (mb POST /beleihungswert, neuester Stand je Objekt). */
+  let belwFehler = null;
+  try {
+    const refs = objekte.filter((o) => o.marktbericht && (o.marktbericht.verlauf || []).some((v) => v.ertragswert || v.sachwert)).map((o) => String(o.id)).slice(0, 60);
+    if (refs.length) {
+      const bw = await mbSenden('/beleihungswert', userId, { refs: refs });
+      if (bw && bw.fehler) belwFehler = bw.fehler;
+      else if (bw && bw.objekte) objekte.forEach((o) => {
+        const e = bw.objekte[String(o.id)];
+        if (!e || !o.marktbericht) return;
+        o.marktbericht.beleihungswert = e.verfuegbar ? { eur: e.beleihungswert || null, basis: e.basis || null, bericht_id: e.bericht && e.bericht.report_id,
+          stand: bw.stand, indikativ: true, hinweis: 'indikativer Beleihungswert-Check nach BelWertV, kein Gutachten' } : { verfuegbar: false, grund: e.grund || null };
+        const pkt = (o.marktbericht.verlauf || []).filter((v) => e.bericht && v.bericht_id === e.bericht.report_id)[0];
+        if (pkt && e.verfuegbar) pkt.beleihungswert_eur = e.beleihungswert || null;
+      });
+    }
+  } catch (e) { belwFehler = String(e && e.message || e).slice(0, 120); }
+
+  /* v3157 · Bauzinsen als Tabelle Zinsbindung × Beleihungsauslauf, mit Stand und Methode */
+  let bauzins = null;
+  try { const bz = require('./bauzinsService'); bauzins = bz.matrix(await bz.getBauzins()); }
+  catch (e) { bauzins = { fehler: String(e && e.message || e).slice(0, 120) }; }
+
   return {
     dealpilot_export: 'portfolio',
     format_version: 1,
+    /* v3157 · Marktdaten fuer alle Objekte gleich */
+    markt: { bauzins: bauzins },
+    beleihungswert_fehler: belwFehler || undefined,
     erzeugt_am: new Date().toISOString(),
     anzahl_objekte: objekte.length,
     /* v2047 - die Deckung gehoert in den Kopf, nicht ins Kleingedruckte. */
