@@ -14,7 +14,8 @@ const { query } = require('../db/pool');
 const subscriptionService = require('./subscriptionService');
 
 const RECHENKERNE = 'rechenkerne_api';
-const BEKANNT = [RECHENKERNE];
+const PARTNER = 'entwicklungspartner';   /* v3097 · Umsetzungswünsche (routes/wuensche.js) */
+const BEKANNT = [RECHENKERNE, PARTNER];
 const KERN_SPALTE = { rnd: 'kontingent_rnd', verkehrswert: 'kontingent_vw' };
 
 async function holen(userId, zusatz) {
@@ -99,4 +100,4 @@ async function setzen(userId, zusatz, werte, von) {
   return r.rows[0];
 }
 
-module.exports = { RECHENKERNE, BEKANNT, holen, monatsZaehlung, darfRechnen, aufrufZaehlen, setzen };
+module.exports = { RECHENKERNE, PARTNER, BEKANNT, holen, monatsZaehlung, darfRechnen, aufrufZaehlen, setzen };

@@ -840,6 +840,10 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item sb-act-feedback" type="button" onclick="sbActionsAction('feedback')">
         <span class="sb-act-ico" data-icon="feedback"></span><span class="sb-act-l">Feedback &amp; Support</span>
       </button>
+      <!-- v3097 · nur fuer Entwicklungspartner (js/umsetzungswuensche.js blendet ein) -->
+      <button class="sb-act-item sb-act-wuensche" type="button" style="display:none" onclick="if(window.DpWuensche)DpWuensche.oeffnen()">
+        <span class="sb-act-ico" data-icon="feedback"></span><span class="sb-act-l">Umsetzungswünsche</span>
+      </button>
     </div>
   </div>
 
@@ -3784,7 +3788,8 @@ label.dp-required.qc-required::after {
 <script src="js/subscription.js?v=v2933"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
 <script src="js/dealscore2.js?v=v3088"></script>
-<script src="js/aktivitaet.js?v=v3095"></script><!-- v3095 · Online-Dauer, ein Puls pro Minute (routes/aktivitaet.js) -->
+<script src="js/aktivitaet.js?v=v3095"></script>
+<script src="js/umsetzungswuensche.js?v=v3097"></script><!-- v3097 · Umsetzungswuensche der Entwicklungspartner (routes/wuensche.js) --><!-- v3095 · Online-Dauer, ein Puls pro Minute (routes/aktivitaet.js) -->
 <script src="js/vorgaben-sync.js?v=v3076"></script><!-- v3024 · Bewertungs-Vorgaben am Konto (user_settings browser_vorgaben) -->
 <script src="js/konto-stammdaten.js?v=v3040"></script><!-- v3040 · Stammdaten und Ersteinrichtung am Konto (user_settings stammdaten) -->
 <script src="js/dealscore2-ui.js?v=v3076"></script>

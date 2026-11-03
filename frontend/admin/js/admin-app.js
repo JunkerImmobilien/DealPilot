@@ -860,6 +860,16 @@
               </div>
             </div>
 
+            <div class="action-section" id="zusatz-ep">
+              <h4>Zusatz: Entwicklungspartner</h4>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Darf in der App unter System › Umsetzungswünsche Wünsche fürs Backlog schreiben und sieht die gemeinsame Liste.</p>
+              <div id="zusatz-ep-stand" style="font-size:0.85em;margin:0 0 8px 0;">lädt …</div>
+              <div class="action-row">
+                <button class="btn btn-primary btn-sm" data-action="zusatz-ep-an">Freischalten</button>
+                <button class="btn btn-sm" data-action="zusatz-ep-aus">Abschalten</button>
+              </div>
+            </div>
+
             <div class="action-section">
               <h4>Passwort zurücksetzen</h4>
               <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Generiert ein neues Passwort. Wird nur einmal angezeigt!</p>
@@ -906,6 +916,8 @@
       $$('[data-action="delete-dsgvo"]')[0].addEventListener('click', () => handleDeleteDsgvo(id, u.email));
       $$('[data-action="zusatz-rk-an"]')[0].addEventListener('click', () => handleZusatzRk(id, true));
       $$('[data-action="zusatz-rk-aus"]')[0].addEventListener('click', () => handleZusatzRk(id, false));
+      $$('[data-action="zusatz-ep-an"]')[0].addEventListener('click', () => handleZusatzEp(id, true));
+      $$('[data-action="zusatz-ep-aus"]')[0].addEventListener('click', () => handleZusatzEp(id, false));
       ladeZusatzRk(id);
 
     } catch (err) {
@@ -945,6 +957,9 @@
     try {
       const r = await API.getZusaetze(id);
       const z = r.rechenkerne, m = r.monat || {};
+      const ep = r.entwicklungspartner, epEl = $('#zusatz-ep-stand');
+      if (epEl) epEl.innerHTML = (ep && ep.aktiv ? '<span class="pill pill-active">Freigeschaltet</span>' : '<span class="pill pill-plan">Nicht freigeschaltet</span>')
+        + (ep && ep.updated_at ? ' <span style="color:var(--text-muted)">geändert ' + fmtDate(ep.updated_at) + (ep.geaendert_von ? ' von ' + escapeHtml(ep.geaendert_von) : '') + '</span>' : '');
       const kg = (v) => (v == null ? 'ohne Grenze' : v);
       if (z) {
         if (z.kontingent_rnd != null) $('#zusatz-rk-rnd').value = z.kontingent_rnd;
@@ -959,6 +974,17 @@
           + (z.geaendert_von ? ' von ' + escapeHtml(z.geaendert_von) : '') + '</span>' : '');
     } catch (err) {
       el.textContent = 'Stand nicht lesbar: ' + (err.message || 'unbekannt');
+    }
+  }
+
+  /* v3097 · Zusatz Entwicklungspartner */
+  async function handleZusatzEp(id, aktiv) {
+    try {
+      await API.setZusatzPartner(id, aktiv);
+      toast(aktiv ? '✓ Entwicklungspartner freigeschaltet' : '✓ Entwicklungspartner abgeschaltet', 'success');
+      ladeZusatzRk(id);
+    } catch (err) {
+      toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
     }
   }
 

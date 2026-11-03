@@ -1901,6 +1901,7 @@ router.get('/users/:id/zusaetze', requireAdmin, async (req, res) => {
   try {
     res.json({
       rechenkerne: await _zusatzService.holen(req.params.id, _zusatzService.RECHENKERNE),
+      entwicklungspartner: await _zusatzService.holen(req.params.id, _zusatzService.PARTNER),
       monat: await _zusatzService.monatsZaehlung(req.params.id)
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -1916,6 +1917,18 @@ router.post('/users/:id/zusaetze/rechenkerne', requireAdmin, requireRole('owner'
       z.aktiv ? 'user.zusatz_rechenkerne_an' : 'user.zusatz_rechenkerne_aus', 'user', req.params.id,
       { kontingent_rnd: z.kontingent_rnd, kontingent_vw: z.kontingent_vw }, req.ip, req.headers['user-agent']);
     res.json({ success: true, rechenkerne: z });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+/* v3097 · Zusatz „Entwicklungspartner“: darf Umsetzungswünsche in die App schreiben (Marcel 03.11.2026) */
+router.post('/users/:id/zusaetze/entwicklungspartner', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const b = req.body || {};
+    const z = await _zusatzService.setzen(req.params.id, _zusatzService.PARTNER, { aktiv: b.aktiv !== false }, req.adminUser.email);
+    await audit(db, req.adminUser.id, req.adminUser.email,
+      z.aktiv ? 'user.zusatz_partner_an' : 'user.zusatz_partner_aus', 'user', req.params.id, {}, req.ip, req.headers['user-agent']);
+    res.json({ success: true, entwicklungspartner: z });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 

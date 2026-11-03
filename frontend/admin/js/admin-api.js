@@ -148,6 +148,7 @@ return {
       call('POST', `/users/${id}/toggle-test`, { reason }),
     // v2977: Zusatz Schnittstelle Rechenkerne
     getZusaetze: (id) => call('GET', `/users/${id}/zusaetze`),
+    setZusatzPartner: (id, aktiv) => call('POST', `/users/${id}/zusaetze/entwicklungspartner`, { aktiv: aktiv }),
     setZusatzRechenkerne: (id, werte) =>
       call('POST', `/users/${id}/zusaetze/rechenkerne`, werte),
     deleteUser: (id, confirm_email, reason) =>
