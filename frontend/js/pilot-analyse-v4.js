@@ -475,6 +475,7 @@
     var hatBalken = cfg.reihen.some(function (r) { return !r.aus && r.art === 'balken'; });
     var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
     if (cfg.null || hatBalken) { lo = Math.min(0, lo); hi = Math.max(0, hi); }
+    if (cfg.zahlen !== false && hi > 0) hi += (hi - lo) * 0.09;   /* v3151 · Platz fuer die Zahl am hoechsten Wert */
     if (hi === lo) { hi = hi + Math.abs(hi || 1) * 0.1; lo = lo - Math.abs(lo || 1) * 0.1; }
     var st = nice(hi - lo); lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
     var y = function (v) { return T + (H - T - U) * (1 - (v - lo) / (hi - lo)); };
@@ -652,7 +653,7 @@
     stil();
     var W = 900, H = cfg.hoehe || 220, L = 70, Rr = 16, T = 24, U = 30, n = cfg.x.length, vs = [0];
     cfg.reihen.forEach(function (r) { r.werte.forEach(function (v) { if (zahl(v)) vs.push(Number(v)); }); });
-    var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs); if (hi === lo) hi = lo + 1;
+    var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs); if (hi === lo) hi = lo + 1; if (hi > 0) hi += (hi - lo) * 0.12;   /* v3151 · Platz fuer die Zahl */
     var st = nice(hi - lo); lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
     var y = function (v) { return T + (H - T - U) * (1 - (v - lo) / (hi - lo)); };
     var gap = (W - L - Rr) / n, k = cfg.reihen.length, bw = Math.min(34, gap * 0.7 / k), s = '';
