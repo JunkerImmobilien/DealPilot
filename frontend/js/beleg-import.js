@@ -23,6 +23,10 @@
   var _bilder      = {};
   var _leer        = [];   // [{name, grund}]
   var _betrag      = {};   // v3154e · Rechnungsbetrag laut Beleg je Datei (Gegenprobe)
+  /* v3156 · VIER-AUGEN-PRINZIP (Marcel: „das muss passen, das ist Buchhaltung"): der Server liest jeden Beleg zweimal.
+     _sicher[name] = 'doppelt_gleich' | 'eine_passt' | 'unsicher'; _zweit[name] = Summe der anderen Lesung.
+     _geprueft[name] = der Nutzer hat bestätigt, die Positionen mit dem Bild verglichen zu haben. */
+  var _sicher = {}, _zweit = {}, _geprueft = {};
 
   var KAT = ['Notar & Grundbuch', 'Maklergebühr', 'Grunderwerbsteuer', 'Fahrtkosten',
              'Verpflegung', 'Unterkunft', 'Gutachten', 'Anwalt',
@@ -458,7 +462,7 @@
     if (scan) scan.classList.add('on');
     var setT = function (s) { var e = document.getElementById('bi-scan-t'); if (e) e.textContent = s; };
 
-    _rows = []; _bilder = {}; _leer = []; _betrag = {}; var docCount = 0; var leer = []; var skipped = [];
+    _rows = []; _bilder = {}; _leer = []; _betrag = {}; _sicher = {}; _zweit = {}; _geprueft = {}; var docCount = 0; var leer = []; var skipped = [];
 
     // 1) CSV/Excel lokal parsen — KEINE KI, KEIN Kerosin
     for (var i = 0; i < tableFiles.length; i++) {
@@ -500,6 +504,8 @@
             (res && res.results || []).forEach(function (r) {
               var poss = Array.isArray(r.positionen) ? r.positionen : (r.data ? [r.data] : []);
               if (r.rechnungsbetrag > 0) _betrag[r.name] = r.rechnungsbetrag;   /* v3154e */
+              if (r.sicherheit) _sicher[r.name] = r.sicherheit;   /* v3156 */
+              if (r.zweitlesung) _zweit[r.name] = r.zweitlesung;
               if (poss.length) { docCount++; _pushPositions(r.name, poss); }
               else nochmal.push(r);
             });
@@ -516,6 +522,7 @@
                     var res2 = await resp2.json(), x2 = res2 && res2.results && res2.results[0];
                     if (x2) poss2 = Array.isArray(x2.positionen) ? x2.positionen : (x2.data ? [x2.data] : []);
                     if (x2 && x2.rechnungsbetrag > 0) _betrag[r0.name] = x2.rechnungsbetrag;   /* v3154e */
+                    if (x2 && x2.sicherheit) { _sicher[r0.name] = x2.sicherheit; _zweit[r0.name] = x2.zweitlesung || null; }   /* v3156 */
                     if (!poss2.length && x2) r0 = x2;
                   }
                 } catch (e2) {}
@@ -653,17 +660,42 @@
     var sum = _rows.filter(function (r) { return r.name === nm && !r.junk && r.keep; }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
     return { summe: sum, rechnungsbetrag: rb, ok: Math.abs(sum - rb) <= Math.max(1, rb * 0.01) };
   }
+  /* v3156 · SICHER nur, wenn (1) zwei unabhängige Lesungen dieselben Beträge ergaben, (2) die Positionen den
+     Rechnungsbetrag ergeben und (3) niemand einen Betrag von Hand geändert hat. Alles andere zählt erst nach
+     der Bestätigung „mit dem Bild verglichen". */
+  function _dateiSicher(nm) {
+    var gp = _gegenprobe(nm);
+    return _sicher[nm] === 'doppelt_gleich' && !!gp && gp.ok && !_rows.some(function (r) { return r.name === nm && r.hand != null; });
+  }
+  function _zaehlt(r) { return !!r && r.keep && (_dateiSicher(r.name) || !!_geprueft[r.name]); }
+  function _pruefung(v) { if (_sel) { _geprueft[_sel] = !!v; _render(); } }
   function _dateiStatus(nm) {
     var rs = _rows.filter(function (r) { return r.name === nm; }), lx = _leer.filter(function (x) { return x.name === nm; })[0];
     if (!rs.length) return { cls: 'rot', text: '✗ nicht gelesen', grund: lx && lx.grund };
-    var gp = _gegenprobe(nm), sum = rs.filter(function (r) { return r.keep; }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
-    var pr = (gp && !gp.ok) || rs.some(function (r) { return r.keep && r.pruefen && r.pruefen.length; });
-    return { cls: pr ? 'gelb' : 'gruen', text: (pr ? '⚠ bitte prüfen' : '✓ gelesen') + ' · ' + _fmtEur(sum) + ' €' };
+    var sum = rs.filter(function (r) { return r.keep; }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
+    if (_dateiSicher(nm)) return { cls: 'gruen', text: '✓ sicher · ' + _fmtEur(sum) + ' €' };
+    if (_geprueft[nm]) return { cls: 'gruen', text: '✓ von dir bestätigt · ' + _fmtEur(sum) + ' €' };
+    return { cls: 'gelb', text: '⚠ prüfen und bestätigen · ' + _fmtEur(sum) + ' €' };
+  }
+  function _sicherheitHtml(nm) {
+    var gp = _gegenprobe(nm), z = _zweit[nm], s = _sicher[nm], h = '';
+    var zeile = function (ok, t) { return '<div style="margin:2px 0">' + (ok ? '✓ ' : '✗ ') + t + '</div>'; };
+    h += zeile(s === 'doppelt_gleich', s === 'doppelt_gleich' ? 'Zweimal unabhängig gelesen – gleiches Ergebnis'
+      : 'Zweimal gelesen – die Lesungen weichen ab' + (z && z.summe != null ? ' (andere Lesung: ' + _fmtEur(z.summe) + ' €)' : ''));
+    h += zeile(!!gp && gp.ok, gp ? 'Rechnungsbetrag laut Beleg ' + _fmtEur(gp.rechnungsbetrag) + ' € · ausgewählte Positionen ' + _fmtEur(gp.summe) + ' €' + (gp.ok ? '' : ' – passt nicht') : 'Kein Rechnungsbetrag erkannt – Summe nicht gegenprüfbar');
+    if (_rows.some(function (r) { return r.name === nm && r.hand != null; })) h += zeile(false, 'Betrag von Hand geändert');
+    var sicher = _dateiSicher(nm);
+    var box = '<div class="' + (sicher || _geprueft[nm] ? 'bi-gruen' : 'bi-gelb') + '" style="font-weight:500">'
+      + '<div style="font-weight:700;margin-bottom:4px">' + (sicher ? 'Sicher – wird übernommen' : (_geprueft[nm] ? 'Von dir bestätigt – wird übernommen' : 'Nicht sicher – wird erst nach deiner Bestätigung übernommen')) + '</div>' + h;
+    if (!sicher) box += '<label style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-weight:700;cursor:pointer"><input type="checkbox"' + (_geprueft[nm] ? ' checked' : '')
+      + ' onchange="DealPilotBelegImport._pruefung(this.checked)" style="margin-top:2px"> Ich habe die Positionen mit dem Bild links verglichen – Beträge und Kategorien stimmen.</label>';
+    return box + '</div>';
   }
   function _planWk() {
-    var jeJahr = {}, ohneJahr = 0, nichtJeKat = {};
+    var jeJahr = {}, ohneJahr = 0, nichtJeKat = {}, offen = {};
     _rows.forEach(function (r) {
       if (!r.keep || !r.brutto || !isFinite(r.brutto)) return;
+      if (!_zaehlt(r)) { offen[r.name] = true; return; }   /* v3156 · Sperre */
       var f = FIELD_MAP_WK[r.kategorie];
       if (f === null) { nichtJeKat[r.kategorie] = (nichtJeKat[r.kategorie] || 0) + r.brutto; return; }
       if (!f) return;
@@ -680,7 +712,7 @@
     });
     var gefuehrt = []; try { gefuehrt = (typeof window.dpWkJahre === 'function') ? (window.dpWkJahre() || []) : []; } catch (e) {}
     var fremd = gefuehrt.length ? Object.keys(jeJahr).filter(function (j) { return gefuehrt.indexOf(parseInt(j, 10)) < 0; }) : [];
-    return { jeJahr: jeJahr, zeilen: zeilen, ohneJahr: ohneJahr, nichtJeKat: nichtJeKat, fremd: fremd };
+    return { jeJahr: jeJahr, zeilen: zeilen, ohneJahr: ohneJahr, nichtJeKat: nichtJeKat, fremd: fremd, offen: Object.keys(offen) };
   }
   function _zielHtml() {
     var eur = function (v) { return _fmtEur(v) + ' €'; }, h, n;
@@ -696,6 +728,7 @@
       Object.keys(p.nichtJeKat).forEach(function (k) { nicht.push(k + ' ' + eur(p.nichtJeKat[k]) + (/Verpflegung/.test(k) ? ' (steuerlich nur als Pauschale)' : ' (erst bei Verwendung absetzbar)')); });
       if (p.ohneJahr) nicht.push(p.ohneJahr + ' Position(en) ohne Jahr');
       if (_leer.length) nicht.push('nicht gelesen: ' + _leer.map(function (x) { return x.name; }).join(', '));
+      if (p.offen.length) nicht.unshift('noch nicht bestätigt: ' + p.offen.join(', '));   /* v3156 */
       if (nicht.length) h += '<div class="bi-nicht"><b>Wird nicht übernommen:</b> ' + nicht.map(_esc).join(' · ') + '</div>';
       if (p.fremd.length) h += '<div class="bi-nicht">Für ' + p.fremd.join(', ') + ' führt der Reiter Steuer noch kein Jahr – der Wert wird hinterlegt und erscheint, sobald der Zeitraum so weit reicht.</div>';
     } else {
@@ -730,8 +763,7 @@
     } else {
       var idx = []; _rows.forEach(function (r, i) { if (r.name === _sel) idx.push(i); });
       var gp = _gegenprobe(_sel);
-      rechts = (gp ? '<div class="' + (gp.ok ? 'bi-gruen' : 'bi-gelb') + '">Rechnungsbetrag laut Beleg ' + _fmtEur(gp.rechnungsbetrag) + ' € · ausgewählte Positionen ' + _fmtEur(gp.summe) + ' € – ' + (gp.ok ? 'passt ✓' : 'passt NICHT, bitte Positionen prüfen') + '</div>'
-          : '<div class="bi-k" style="margin-bottom:8px">Kein Rechnungsbetrag erkannt – die Summe bitte mit dem Bild vergleichen.</div>')
+      rechts = _sicherheitHtml(_sel)   /* v3156 */
         + '<table><thead><tr><th></th><th>Position</th><th>Datum</th><th class="num">Brutto</th><th>Kategorie → Ziel</th></tr></thead><tbody>'
         + idx.map(function (i) {
             var r = _rows[i], f = _feldKarte()[r.kategorie];
@@ -877,7 +909,7 @@
   function _aggregate() {
     var byField = {}, sanierung = 0, sanNetto = 0, total = 0, count = 0;
     _rows.forEach(function (r) {
-      if (!r.keep) return;
+      if (!_zaehlt(r)) return;   /* v3156 · nur Gesichertes */
       count++; total += r.brutto;
       if (SANIERUNG[r.kategorie]) {
         sanierung += r.brutto;   // Anzeige und Uebernahme: brutto (Werbungskosten des Privatvermieters)
@@ -1040,7 +1072,7 @@
     if (_modus === 'wk') { _applyWk(); return; }
     var byField = {};
     _rows.forEach(function (r) {
-      if (!r.keep) return;
+      if (!_zaehlt(r)) return;   /* v3156 */
       var f = _feldKarte()[r.kategorie];
       if (f && r.brutto > 0) byField[f] = (byField[f] || 0) + r.brutto;
     });
@@ -1065,6 +1097,6 @@
     /* v3120 · der gemeinsame Eingang (unterlagen-eingang.js) übergibt erkannte Rechnungen direkt */
     oeffnenMit: function (files, modus) { open(modus || 'wk'); if (files && files.length) setTimeout(function () { _onPick(files); }, 50); },
     _keep: _keep, _kat: _kat,
-    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle, _betragSetzen: _betragSetzen
+    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle, /* v3156 */ _pruefung: _pruefung, _betragSetzen: _betragSetzen
   };
 })();

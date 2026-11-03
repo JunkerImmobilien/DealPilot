@@ -2119,7 +2119,8 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
         const out = await openaiService.extractBeleg(imgs, { userApiKey, modus: _modus, texte: texte });
         const positionen = (out && Array.isArray(out.positionen)) ? out.positionen : [];
         results.push({ name: nm, ok: positionen.length > 0, positionen: positionen, pages: (out && out.pages) || imgs.length, diag: (out && out.diag) || '',
-          rechnungsbetrag: (out && out.rechnungsbetrag) || null });
+          rechnungsbetrag: (out && out.rechnungsbetrag) || null,
+          sicherheit: (out && out.sicherheit) || null, zweitlesung: (out && out.zweitlesung) || null, summe: (out && out.summe) != null ? out.summe : null });   /* v3156 */
         if (positionen.length > 0) okCount++;
       } catch (e) {
         results.push({ name: nm, ok: false, error: (e && e.message) ? String(e.message).slice(0, 160) : 'Lesefehler', diag: 'Fehler: ' + ((e && e.message) ? String(e.message).slice(0, 120) : '') });

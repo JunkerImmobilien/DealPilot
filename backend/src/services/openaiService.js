@@ -4203,12 +4203,28 @@ async function _extractBelegPage(image, opts, textEbene) {
  * So werden lange PDFs (Rechnungslisten) und dichte Tabellen vollstaendig gelesen.
  * @returns { positionen: [...] }
  */
-async function extractBeleg(images, opts) {
-  opts = opts || {};
-  const imgs = (images || []).slice(0, 30);
-  const out = new Array(imgs.length);
-  const err = new Array(imgs.length);
-  const CONC = 4;
+/* v3156 · Marcel 03.11.2026: „das muss passen, das ist Buchhaltung". VIER-AUGEN-PRINZIP: jede Seite wird
+   ZWEIMAL unabhängig gelesen (gemessen: dieselbe Hotelrechnung ergab je Lauf andere Positionen). Stimmen beide
+   Lesungen überein (gleiche Beträge, gleicher Rechnungsbetrag), heißt das Ergebnis 'doppelt_gleich'. Weichen sie
+   ab, gewinnt die Lesung, deren Positionen den Rechnungsbetrag ergeben ('eine_passt'); sonst 'unsicher'.
+   Was nicht 'doppelt_gleich' ist UND die Gegenprobe nicht besteht, übernimmt der Browser nur nach ausdrücklicher
+   Prüfung des Nutzers. */
+function _belegSumme(pos, rb) {
+  const liste = (pos || []).filter(function (x) { return x && Number.isFinite(Number(x.betrag_brutto)); });
+  let summe = 0;
+  liste.forEach(function (x) {
+    const b = Number(x.betrag_brutto);
+    if (rb > 0 && liste.length > 1 && Math.abs(b - rb) < 0.01) return;   /* die Gesamtzeile zählt nicht mit */
+    summe += b;
+  });
+  return Math.round(summe * 100) / 100;
+}
+function _belegFingerabdruck(pos, rb) {
+  const b = (pos || []).map(function (x) { return Math.round(Number(x && x.betrag_brutto) * 100); }).filter(Number.isFinite).sort(function (a, c) { return a - c; });
+  return b.join(',') + '|' + (rb > 0 ? Math.round(rb * 100) : '-');
+}
+async function _belegLesung(imgs, opts) {
+  const out = new Array(imgs.length), err = new Array(imgs.length);
   let next = 0;
   async function worker() {
     while (next < imgs.length) {
@@ -4218,21 +4234,35 @@ async function extractBeleg(images, opts) {
     }
   }
   const runners = [];
-  for (let w = 0; w < Math.min(CONC, imgs.length); w++) runners.push(worker());
+  for (let w = 0; w < Math.min(4, imgs.length); w++) runners.push(worker());
   await Promise.all(runners);
-  let pos = []; let errN = 0; let firstErr = '';
+  let pos = [], errN = 0, firstErr = '', rb = null;
   out.forEach(function (r, i) {
-    if (Array.isArray(r) && r.length) { pos = pos.concat(r); }
+    if (Array.isArray(r) && r.length) pos = pos.concat(r);
     else if (err[i]) { errN++; if (!firstErr) firstErr = err[i]; }
+    if (r && r.rechnungsbetrag > 0 && (rb == null || r.rechnungsbetrag > rb)) rb = r.rechnungsbetrag;   /* v3154e */
   });
-  let diag = imgs.length + ' Seite(n)';
-  if (!pos.length) { diag += ', 0 Treffer'; if (errN) diag += ' - ' + errN + ' Seite(n) mit Fehler: ' + firstErr; }
-  /* v3154e · der größte ausgewiesene Rechnungsbetrag aller Seiten (Folgeseiten wiederholen ihn oder haben keinen) */
-  let rechnungsbetrag = null;
-  out.forEach(function (r) { if (r && r.rechnungsbetrag > 0 && (rechnungsbetrag == null || r.rechnungsbetrag > rechnungsbetrag)) rechnungsbetrag = r.rechnungsbetrag; });
-  return { positionen: pos, pages: imgs.length, diag: diag, rechnungsbetrag: rechnungsbetrag };
+  return { pos: pos, rb: rb, errN: errN, firstErr: firstErr };
 }
-
+async function extractBeleg(images, opts) {
+  opts = opts || {};
+  const imgs = (images || []).slice(0, 30);
+  const L = await Promise.all([_belegLesung(imgs, opts), _belegLesung(imgs, opts)]);
+  const A = L[0], B = L[1];
+  const passt = function (x) { return x.rb > 0 && x.pos.length && Math.abs(_belegSumme(x.pos, x.rb) - x.rb) <= Math.max(1, x.rb * 0.01); };
+  let wahl = A, sicherheit = 'unsicher';
+  if (A.pos.length && _belegFingerabdruck(A.pos, A.rb) === _belegFingerabdruck(B.pos, B.rb)) sicherheit = 'doppelt_gleich';
+  else if (passt(A)) { sicherheit = 'eine_passt'; }
+  else if (passt(B)) { wahl = B; sicherheit = 'eine_passt'; }
+  else if (!A.pos.length && B.pos.length) wahl = B;
+  let diag = imgs.length + ' Seite(n)';
+  if (!wahl.pos.length) { diag += ', 0 Treffer'; if (wahl.errN) diag += ' - ' + wahl.errN + ' Seite(n) mit Fehler: ' + wahl.firstErr; }
+  const andere = wahl === A ? B : A;
+  return { positionen: wahl.pos, pages: imgs.length, diag: diag, rechnungsbetrag: wahl.rb,
+    sicherheit: sicherheit,
+    zweitlesung: { summe: _belegSumme(andere.pos, andere.rb), rechnungsbetrag: andere.rb, anzahl: andere.pos.length },
+    summe: _belegSumme(wahl.pos, wahl.rb) };
+}
 
 /**
  * v1678 — extractDokument: eine beliebige Dokumentart einlesen.
