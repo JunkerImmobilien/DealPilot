@@ -101,6 +101,16 @@ Marcel: Objekte aus ImmoMetrica, die zum Kunden passen (neu oder im Preis gesenk
 
 v3152/v3152a (`3439e180`, `5a950a58`): Marcel: „Feld Leerstand in Prozent nehmen“. Rechnung in `PotenzialService.stufeNeuvermietung` auf der Stufe Mieterhöhung: Mehrmiete (Neuvermietungsmiete − Zielmiete Mieterhöhung) erst bei Mieterwechsel, abgezinst, minus Leerstand (Feld `leerstand`) und 1 Monatsmiete Kosten je erstem Wechsel, RND-Deckel. Neuvermietungsmiete = Mitte des Marktdurchschnitts bzw. Marktmiete, Mietpreisbremse (Kern `neuvermietung`). Westerfeld: 760.000 → 795.000 € (+34.012 €). **Offen:** Fluktuation 8 % und Kosten 1 Monatsmiete bestätigen; eigene Spalte in Wert & Zielbild und PDF (heute Satz im Erklärblock). Prüfer B62.
 
+### N119 · Belegscanner: Prüfansicht, Sicherheitsschleife, Verlauf zurücknehmen (Marcel 03.11.2026) — **gebaut v3153–v3154h, nur Staging**
+
+Marcel: „Verlauf … löschen und zurücknehmen“, „immer das eingescannte Bild und daneben die eingelesenen Werte“, „davor warnen“, „Sicherheitsschleife“. Gebaut: Verlauf mit Zurücknehmen (Steuerwerte, Felder, Einheiten je vorher/nachher, nur wo unverändert) und Löschen; Prüfansicht Bild|Werte im Beleg-Leser und im Eingang („Ansehen“); unlesbare Dateien als rote Zeile + Banner; zweiter Leseversuch je Datei (max. 5); Prüfpille je Zeile; Summen-/Gesamt-/Doppelzeilen abgewählt; Gegenprobe Positionen gegen Rechnungsbetrag; PDF-Textebene statt Texterkennung (Server schwärzt); Kategorien Übernachtung/Hotel und Verpflegung (nur Pauschale); Rechnungserkennung zweisprachig. Nebenbei behoben: leere Steuer-Jahreswerte wurden nicht gespeichert (v3154h), Pilot-Analyse sprang beim Neuzeichnen auf „Übersicht“.
+
+**Offen:**
+- Hotelrechnung (Testdatei Immobiliengipfel_Hotel): Einzelzahlen jetzt exakt, aber die KI fasst den 7-%-Block teils mit dem Frühstück zusammen → Gegenprobe meldet 18 € Differenz. Nicht weiter am Prompt gedreht (drei Anläufe).
+- Kassenbon-Fotos (Thermopapier, zerknittert, überlagert): Texterkennung findet nichts → rot markiert. Besser lesbar nur mit Bild an die KI (gesperrt seit v3089, Schwärzen) oder besserer Vorverarbeitung (Kontrast, Entzerren) vor Tesseract.
+- Undo im Eingang für Sonderumlage, Unterlagen-Auswertung, Einheitenliste, Sterne: nur benannt, nicht automatisch.
+- Marcel-Abnahme, dann Prod.
+
 ### N118 · Mietername auch aus gescannten Mietverträgen (03.11.2026)
 
 v3150 liest den Namen des Mieters ohne KI nur aus PDFs mit Textebene (`/ai/extract-dokument`, `services/mieterName.js`). Bei Scans wird der Text schon beim Erkennen geschwärzt (`/ai/seiten-lesen`, `ocr.js`), der Name kommt nicht mehr an. Lösung: Regel dort auf dem rohen Text laufen lassen und den Namen getrennt an die App geben.
