@@ -9,8 +9,9 @@
    'entwicklungspartner').
 
    Bild aus der Luftfahrt: Im technischen Bordbuch trägt die Crew ein, was ihr
-   auffällt — die Wartung arbeitet es ab. Deshalb steht neben dem Piloten (F1)
-   ein Mechaniker mit Klemmbrett.
+   auffällt — die Wartung arbeitet es ab. Deshalb steht unten rechts ein
+   Mechaniker mit Klemmbrett (unten links liegt die Benutzerkarte der
+   Seitenleiste, gemessen 03.11.: dort verdeckte er sie).
 
    Ablauf: Klick auf den Mechaniker → html2canvas fotografiert den sichtbaren
    Ausschnitt (Mechaniker und Fenster ausgenommen) → Fenster mit dem Bild:
@@ -35,10 +36,10 @@
     if (document.getElementById('dp-bb-stil')) return;
     var s = document.createElement('style'); s.id = 'dp-bb-stil';
     s.textContent = [
-      '#dp-bb-fab{position:fixed;left:74px;bottom:12px;width:46px;height:76px;z-index:10057;cursor:pointer;border:0;padding:0;background:transparent;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));display:none}',
+      '#dp-bb-fab{position:fixed;right:18px;bottom:14px;width:46px;height:76px;z-index:10057;cursor:pointer;border:0;padding:0;background:transparent;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));display:none}',
       '#dp-bb-fab.an{display:block}',
       '#dp-bb-fab svg{width:100%;height:100%;overflow:visible}',
-      '#dp-bb-fab .bb-schild{position:absolute;left:50%;bottom:calc(100% + 4px);transform:translateX(-50%);white-space:nowrap;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.04em;background:#141210;color:#f3ead0;border:1px solid ' + G + ';border-radius:6px;padding:3px 7px;opacity:0;transition:opacity .2s;pointer-events:none}',
+      '#dp-bb-fab .bb-schild{position:absolute;right:0;bottom:calc(100% + 4px);white-space:nowrap;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.04em;background:#141210;color:#f3ead0;border:1px solid ' + G + ';border-radius:6px;padding:3px 7px;opacity:0;transition:opacity .2s;pointer-events:none}',
       '#dp-bb-fab:hover .bb-schild,#dp-bb-fab:focus-visible .bb-schild{opacity:1}',
       '#dp-bb-fab.knipst svg{animation:bb-blitz .5s ease-in-out infinite alternate}',
       '@keyframes bb-blitz{from{opacity:1}to{opacity:.45}}',
@@ -46,7 +47,7 @@
       '@keyframes bb-atem{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.3px)}}',
       '#dp-bb-fab:hover .bb-arm{transform:rotate(-24deg)}',
       '#dp-bb-fab .bb-arm{transform-origin:31px 71px;transition:transform .35s cubic-bezier(.3,1.4,.5,1)}',
-      '@media (max-width:640px){#dp-bb-fab{left:64px;width:38px;height:62px}}',
+      '@media (max-width:640px){#dp-bb-fab{right:10px;bottom:84px;width:38px;height:62px}}',
       '@media print{#dp-bb-fab{display:none!important}}',
       '@media (prefers-reduced-motion:reduce){#dp-bb-fab .bb-oben{animation:none}}',
       /* Fenster */
