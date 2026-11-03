@@ -44261,3 +44261,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `985cdfa6`, `c2ed52a3`, `fcd61e4a`, `9c9975ec`, `338d6e63`, Stand auf Staging gezogen. **Nicht Prod**, Marcel nimmt zuerst ab.
 - **Nachweis:** Parkstr. 9 (Bestand) und Lindenhof 14 (Ankauf), alle Unterreiter ohne Überlauf, 390 px ohne Seitenüberlauf, Tooltip und Fadenkreuz, Detail mit 14 Abschnitten, Steuer-Tabelle mit Wendepunkt gleich dem Steuerverlauf (2029), Konsole ohne Fehler; buster-ebenen sauber, Konstanten und Handbuch grün.
 - **Rest:** Abnahme durch Marcel (Plan als Base Case, Stil der Unterreiter-Knöpfe), danach Prod.
+
+### v3099e–v3099h · Pilot-Analyse Fassung 4 nach Marcels Durchsicht (03.11.2026)
+
+- **Was:** „Neu abrufen“ unter dem Stand (#ai-btn in der v4-Hülle per :has ausgeblendet, PDF-Bausteine auf Knopfdruck); Einfach/Detail überall wirksam (Kürzen fremder Reiter, Schalter von Zielbild und Unterlagen folgen, btn-clean gegen die .sec-Knopfregel, Modus-Zeile); Bestand ohne Urteil; Zielbild-Detail: Tabelle → Jahresstände → Abgleiche; Einfach kürzer; Mini-Grafiken (Vermögen, Miete/Cashflow je Stufe, Lage-Balken); Steuer mit Beleg-Stand je Jahr und „Belege einlesen“; Unterlagen & WEG immer da.
+- **Commit:** `492db33e`, `ef037b19` (Buster v3099f, weil v3099e kurz mit altem Inhalt auslag), `67fe1cf0`, `414b85d0`; Staging per git pull. **Nicht Prod.**
+- **Nachweis:** Parkstr. 9 und Lindenhof 14, jeder Unterreiter in beiden Modi gemessen (Zeichen, Grafiken), gedrückter Knopf mit Verlauf, keine Konsolenfehler.
+- **Rest:** Abnahme Marcel; Herkunftsmarke für Belege, falls „erklärt“ gewünscht; cf_ns gegen cfns_y klären.
