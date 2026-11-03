@@ -2569,7 +2569,7 @@
     /* v3120 · der Schutz gilt den eigenen DealPilot-Berichten. Steht ein eindeutiger Leitbegriff am Anfang
        (gemessen: „Wohnraummietvertrag … TESTDOKUMENT für DealPilot" der Lindenallee-Verträge lief als
        Marktbericht durch), ist es ein Dokument, auch wenn „DealPilot" darin vorkommt. */
-    if (/dealpilot/i.test(t) && !DOK_LEIT.some(function (w) { return t.slice(0, 400).indexOf(w) >= 0; })) return false;
+    if (/dealpilot/i.test(t) && !DOK_LEIT.concat(DOK_KOPF).some(function (w) { return t.slice(0, 200).indexOf(w) >= 0; })) return false;   /* v3120b: Titel = erste 200 Zeichen, beide Listen */
     /* Ein Exposé nennt „Energieausweis“ oft in den Eckdaten - Kaufpreis plus Provision/Exposé heisst: Exposé.
        v3016k · VOR den Leitbegriffen: gemessen 28.10. las der Import das Exposé Lindenallee als
        Energieausweis, weil es „Protokolle der Eigentümerversammlungen“ als Unterlage nennt. */

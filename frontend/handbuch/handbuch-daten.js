@@ -2,14 +2,14 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "cb632de2c55fd429",
+  "index.html": "1776f237ecc15564",
   "tooltip-content.js": "c7e4453dda8ecdd5",
-  "help.js": "adc62d5a9049af39",
+  "help.js": "b6fc8eb38595bcef",
   "tour-content.js": "5e8c84b4525cd4fa",
   "objekt-reiter.js": "a2c83d0a545a682d",
   "deal-action-readycheck.js": "51f7c11dd7e2ab57",
   "feld-hilfe.js": "3a7e9964af3920bc",
-  "mfh-einheiten.js": "acbd7bca8272b72f",
+  "mfh-einheiten.js": "ea1f7850e7a150e9",
   "calc.js": "b8263e671d222c33",
   "ui.js": "086f5866a140f4b2",
   "pdf.js": "83b2fb88e72be57c",
@@ -18,9 +18,9 @@ window.DP_HANDBUCH = {
   "werbungskosten-pdf.js": "9a17188d51895f0e",
   "pdf-anlage-bmf.js": "bc9178281594e5de",
   "pdf-kaufpreisaufteilung.js": "33d5e894dcbc0726",
-  "frontend-konstanten.json": "792e75c33a5eae1c",
+  "frontend-konstanten.json": "c59ccb0b5011804e",
   "aufnahme.json": "433c9aa7f5c9ec56",
-  "handbuch-ablaeufe.mjs": "1e4399d744b21620"
+  "handbuch-ablaeufe.mjs": "d9122672a3a4847a"
  },
  "reiter": [
   {
@@ -442,7 +442,7 @@ window.DP_HANDBUCH = {
    "desc": "Vollständige Steuerlogik – AfA, Progression, jährliche Werbungskosten und Finanzamt-PDFs",
    "hilfe": {
     "titel": "Steuer — zvE, AfA und Steuerwirkung",
-    "text": "Unter <strong>Persönliche Steuer</strong> trägst du das <strong>Zu versteuernde Einkommen (zvE) vor Immobilie</strong> ein. Daraus berechnet DealPilot den <strong>Persönl. Grenzsteuersatz</strong> nach § 32a EStG — du kannst ihn übersteuern, wenn du „automatisch berechnen“ abhakst.\n\n<strong>AfA-Konfiguration:</strong>\n• <strong>AfA-Satz</strong> — 2,0 % linear (Standard), 2,5 % für Baujahre vor 1925, 3,0 % für Wohnzwecke ab 2023 oder 5,0 % degressiv bei Neubauten\n• <strong>Gebäudeanteil am KP (%)</strong> — der Rest ist Grund und Boden, der nicht abgeschrieben wird. Den Anteil kannst du mit dem <strong>BMF-Rechner</strong> ermitteln.\n• <strong>Sonder-AfA § 7b EStG</strong> — wird nur angesetzt, wenn du alle Voraussetzungen bestätigst\n\nDas <strong>Steuer-Modul</strong> rechnet die Steuerwirkung als Differenz zweier Tarifberechnungen, mit und ohne dieses Objekt. Deine gespeicherten Bestandsobjekte rechnen in der Reihenfolge ihres Kaufs mit. Im <strong>Steuerformular pro Jahr</strong> trägst du echte Werbungskosten ein; Belege liest <strong>Belege &amp; Abrechnungen einlesen (KI)</strong> ein.\n\nDealPilot ist eine Rechenhilfe, keine Steuerberatung."
+    "text": "Unter <strong>Persönliche Steuer</strong> trägst du das <strong>Zu versteuernde Einkommen (zvE) vor Immobilie</strong> ein. Daraus berechnet DealPilot den <strong>Persönl. Grenzsteuersatz</strong> nach § 32a EStG — du kannst ihn übersteuern, wenn du „automatisch berechnen“ abhakst.\n\n<strong>AfA-Konfiguration:</strong>\n• <strong>AfA-Satz</strong> — 2,0 % linear (Standard), 2,5 % für Baujahre vor 1925, 3,0 % für Wohnzwecke ab 2023 oder 5,0 % degressiv bei Neubauten\n• <strong>Gebäudeanteil am KP (%)</strong> — der Rest ist Grund und Boden, der nicht abgeschrieben wird. Den Anteil kannst du mit dem <strong>BMF-Rechner</strong> ermitteln.\n• <strong>Sonder-AfA § 7b EStG</strong> — wird nur angesetzt, wenn du alle Voraussetzungen bestätigst\n\nDas <strong>Steuer-Modul</strong> rechnet die Steuerwirkung als Differenz zweier Tarifberechnungen, mit und ohne dieses Objekt. Deine gespeicherten Bestandsobjekte rechnen in der Reihenfolge ihres Kaufs mit. Im <strong>Steuerformular pro Jahr</strong> trägst du echte Werbungskosten ein; Belege liest <strong>Belege, Unterlagen &amp; Rechnungen einlesen (KI)</strong> ein.\n\nDealPilot ist eine Rechenhilfe, keine Steuerberatung."
    },
    "tour": {
     "titel": "Tab 6: Steuer",
@@ -18382,12 +18382,12 @@ window.DP_HANDBUCH = {
      ]
     },
     {
-     "t": "Werbungskosten je Jahr: Karte **Steuerformular pro Jahr · individuelle Werte**. DealPilot schlägt Werte vor; du überschreibst sie, etwa mit den Zahlen aus dem Bescheid. Belege liest **Belege & Abrechnungen einlesen (KI)**.",
+     "t": "Werbungskosten je Jahr: Karte **Steuerformular pro Jahr · individuelle Werte**. DealPilot schlägt Werte vor; du überschreibst sie, etwa mit den Zahlen aus dem Bescheid. Belege liest **Belege, Unterlagen & Rechnungen einlesen (KI)**.",
      "kosten": "",
      "plan": "",
      "belege": [
       "index.html: Steuerformular pro Jahr · individuelle Werte",
-      "index.html: Belege &amp; Abrechnungen einlesen (KI)"
+      "index.html: Belege, Unterlagen &amp; Rechnungen einlesen (KI)"
      ]
     },
     {

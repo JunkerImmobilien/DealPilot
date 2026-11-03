@@ -274,8 +274,8 @@ export const ABLAEUFE = [
         belege: [[J('bmf-modal-html.html'), 'Anschaffungskosten &amp; BMF-Kaufpreisaufteilung'], [J('bmf-modal-html.html'), "switchPane('p-hebel')"], [J('bmf-modal.js'), "'p-hebel': '<b>Schritt 4 / 5:</b>"], [J('bmf-bodenabschlag.js'), "b.textContent = 'Bodenabschlag';"], [J('bmf-modal-html.html'), 'Weiter →']] },
       { t: 'Im Reiter 4 eine Variante per Klick wählen und **✓ Übernehmen** — Gebäudeanteil und AfA-Satz stehen danach im Reiter Steuer. Ausgabe: **Kaufpreisaufteilung als PDF** oder **BMF-Arbeitshilfe als PDF**.',
         belege: [[J('bmf-modal-html.html'), '✓ Übernehmen'], [J('bmf-modal.js'), 'Kaufpreisaufteilung als PDF'], [J('bmf-modal.js'), 'BMF-Arbeitshilfe als PDF']] },
-      { t: 'Werbungskosten je Jahr: Karte **Steuerformular pro Jahr · individuelle Werte**. DealPilot schlägt Werte vor; du überschreibst sie, etwa mit den Zahlen aus dem Bescheid. Belege liest **Belege & Abrechnungen einlesen (KI)**.',
-        belege: [[IX, 'Steuerformular pro Jahr · individuelle Werte'], [IX, 'Belege &amp; Abrechnungen einlesen (KI)']] },
+      { t: 'Werbungskosten je Jahr: Karte **Steuerformular pro Jahr · individuelle Werte**. DealPilot schlägt Werte vor; du überschreibst sie, etwa mit den Zahlen aus dem Bescheid. Belege liest **Belege, Unterlagen & Rechnungen einlesen (KI)**.',
+        belege: [[IX, 'Steuerformular pro Jahr · individuelle Werte'], [IX, 'Belege, Unterlagen &amp; Rechnungen einlesen (KI)']] },
       { t: 'Finanzamt-PDF: unter **Steuerjahr** ein Jahr wählen, optional **Anlage V** anhaken und **Finanzamt-PDF** klicken. Dasselbe PDF gibt es im Reiter Deal-Aktion unter „PDFs herunterladen“.',
         belege: [[IX, '>Steuerjahr<'], [IX, 'id="fa-pdf-anlagev"'], [IX, 'title="Finanzamt-PDF für das gewählte Steuerjahr erzeugen'], [J('deal-action-boarding.js'), 'Finanzamt-PDF (Steuerformular)']] }
     ],

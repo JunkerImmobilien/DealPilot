@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-03T09:43:26.084Z",
+ "erzeugt_am": "2026-11-03T09:48:39.845Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
   "storage": "84ced67919c6d925",
-  "index-html": "8d40dc9904f06b8f",
+  "index-html": "1776f237ecc15564",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -3635,7 +3635,7 @@
      },
      {
       "h": "Steuer — zvE, AfA und Steuerwirkung",
-      "text": "Unter Persönliche Steuer trägst du das Zu versteuernde Einkommen (zvE) vor Immobilie ein. Daraus berechnet DealPilot den Persönl. Grenzsteuersatz nach § 32a EStG — du kannst ihn übersteuern, wenn du „automatisch berechnen“ abhakst.\n\nAfA-Konfiguration:\n• AfA-Satz — 2,0 % linear (Standard), 2,5 % für Baujahre vor 1925, 3,0 % für Wohnzwecke ab 2023 oder 5,0 % degressiv bei Neubauten\n• Gebäudeanteil am KP (%) — der Rest ist Grund und Boden, der nicht abgeschrieben wird. Den Anteil kannst du mit dem BMF-Rechner ermitteln.\n• Sonder-AfA § 7b EStG — wird nur angesetzt, wenn du alle Voraussetzungen bestätigst\n\nDas Steuer-Modul rechnet die Steuerwirkung als Differenz zweier Tarifberechnungen, mit und ohne dieses Objekt. Deine gespeicherten Bestandsobjekte rechnen in der Reihenfolge ihres Kaufs mit. Im Steuerformular pro Jahr trägst du echte Werbungskosten ein; Belege liest Belege & Abrechnungen einlesen (KI) ein.\n\nDealPilot ist eine Rechenhilfe, keine Steuerberatung."
+      "text": "Unter Persönliche Steuer trägst du das Zu versteuernde Einkommen (zvE) vor Immobilie ein. Daraus berechnet DealPilot den Persönl. Grenzsteuersatz nach § 32a EStG — du kannst ihn übersteuern, wenn du „automatisch berechnen“ abhakst.\n\nAfA-Konfiguration:\n• AfA-Satz — 2,0 % linear (Standard), 2,5 % für Baujahre vor 1925, 3,0 % für Wohnzwecke ab 2023 oder 5,0 % degressiv bei Neubauten\n• Gebäudeanteil am KP (%) — der Rest ist Grund und Boden, der nicht abgeschrieben wird. Den Anteil kannst du mit dem BMF-Rechner ermitteln.\n• Sonder-AfA § 7b EStG — wird nur angesetzt, wenn du alle Voraussetzungen bestätigst\n\nDas Steuer-Modul rechnet die Steuerwirkung als Differenz zweier Tarifberechnungen, mit und ohne dieses Objekt. Deine gespeicherten Bestandsobjekte rechnen in der Reihenfolge ihres Kaufs mit. Im Steuerformular pro Jahr trägst du echte Werbungskosten ein; Belege liest Belege, Unterlagen & Rechnungen einlesen (KI) ein.\n\nDealPilot ist eine Rechenhilfe, keine Steuerberatung."
      },
      {
       "h": "Pilot-Analyse — die schriftliche Einschätzung",
@@ -4106,7 +4106,7 @@
      },
      {
       "h": "Belege einlesen (KI)",
-      "text": "Zwei Wege, ein Fenster:\n• Anschaffungskosten — Deal-Aktion → Kaufpreisaufteilung → Belege. Notar, Makler, Grunderwerbsteuer, Gutachten, Fahrten usw. landen in den Feldern der Anschaffungskosten.\n• Laufende Werbungskosten — Reiter Steuer → Belege & Abrechnungen einlesen (KI). Eine Hausgeldabrechnung wird in umlagefähig, nicht umlagefähig und Verwaltung aufgeteilt. Die Zuführung zur Erhaltungsrücklage wird erkannt, aber bewusst nicht übernommen.\n\nSo geht's:\n1. Ordner auswählen oder Einzelne Dateien — PDFs, Fotos, CSV oder Excel, bis zu 40 Belege je Lauf.\n2. Die KI liest Datum, Betrag, USt, Aussteller und Kategorie. Du bestätigst jede Zeile.\n3. Übernehmen. Bei den Werbungskosten zählt das Jahr: Zeilen ohne Jahr werden übersprungen, bis du es nachträgst.\n\nCSV-Auswertung lädt die Liste herunter."
+      "text": "Zwei Wege, ein Fenster:\n• Anschaffungskosten — Deal-Aktion → Kaufpreisaufteilung → Belege. Notar, Makler, Grunderwerbsteuer, Gutachten, Fahrten usw. landen in den Feldern der Anschaffungskosten.\n• Laufende Werbungskosten — Reiter Steuer → Belege, Unterlagen & Rechnungen einlesen (KI). Eine Hausgeldabrechnung wird in umlagefähig, nicht umlagefähig und Verwaltung aufgeteilt. Die Zuführung zur Erhaltungsrücklage wird erkannt, aber bewusst nicht übernommen.\n\nSo geht's:\n1. Ordner auswählen oder Einzelne Dateien — PDFs, Fotos, CSV oder Excel, bis zu 40 Belege je Lauf.\n2. Die KI liest Datum, Betrag, USt, Aussteller und Kategorie. Du bestätigst jede Zeile.\n3. Übernehmen. Bei den Werbungskosten zählt das Jahr: Zeilen ohne Jahr werden übersprungen, bis du es nachträgst.\n\nCSV-Auswertung lädt die Liste herunter."
      },
      {
       "h": "Daten exportieren: PDF, Sicherung, Tabellen",
@@ -5359,7 +5359,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "c6b304cba99fabcc",
+  "hilfe": "3fb54eef6bb69f73",
   "bewertung": "f427bd734c0570c3"
  }
 }
