@@ -337,7 +337,10 @@ function collectData() {
         var felder = Object.keys(e).filter(function (f) { return typeof e[f] === 'number' && isFinite(e[f]); });
         if (felder.length) { _tyoSauber[yk] = {}; felder.forEach(function (f) { _tyoSauber[yk][f] = e[f]; }); }
       });
-      if (Object.keys(_tyoSauber).length) d._tax_overrides = _tyoSauber;
+      /* v3154h · IMMER schreiben, auch leer. Gemessen: wurde der letzte Jahreswert entfernt (Zurücknehmen im
+         Verlauf, ebenso von Hand im Reiter Steuer), fehlte das Feld beim Speichern - und der alte Stand blieb
+         auf dem Server stehen; nach dem Neuladen waren die Werte wieder da. */
+      d._tax_overrides = _tyoSauber;
     }
   } catch (e) {}
   /* v2030: der eingefrorene Ankauf-Stand (ankauf.js). Gleiches Muster
