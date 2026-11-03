@@ -524,6 +524,8 @@
     var zq = zahl(w && w.ziel_qm);
     if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
       u: 'zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f) — sonst höchstens ' + eur2(obergrenze) + '/m²' });
+    /* v3158 · was hier gilt, am Objekt merken (Schnittstelle) - auch ohne Potenzial-Rechnung; nur fuer das Objekt selbst (i == null) */
+    try { if (i == null && window.dpMarktdatenMerken) window.dpMarktdatenMerken({ kappung: kapp ? Object.assign({ ags: agsJetzt() }, kapp) : null, mietpreisbremse: br ? Object.assign({ ags: agsJetzt(), obergrenze_qm: obergrenze || null }, br) : null, vergleichsmiete: vglQm ? { qm: vglQm, herkunft: vglHer || null } : null }); } catch (e) {}
     return { zeilen: z, bremse: br, obergrenze: obergrenze, kapp: kapp, vgl_qm: vglQm || null, vgl_herkunft: vglHer || null };   /* v3130: vgl fuer den Zielmiete-Vorschlag */
   }
 

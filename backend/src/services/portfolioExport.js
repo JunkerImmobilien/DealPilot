@@ -430,6 +430,7 @@ const STRUKTUREN = {
       kappung: 'Kappungsgrenze § 558 Abs. 3 BGB: pct (15/20), Gebiet/Verordnung, gilt bis, eigene Angabe ja/nein, ags',
       mietpreisbremse: 'Mietpreisbremse § 556d BGB: gilt (true/false/null = bitte pruefen), bis, Verordnung, Link, ags',
       marktmiete: 'Marktmiete in Euro/m2: qm (angesetzt), mitte_qm, art (eigen | markt), herkunft',
+      vergleichsmiete: 'ortsuebliche Vergleichsmiete in Euro/m2 mit Herkunft (Mietspiegel, eigene Angabe)',
       zensus: 'Zensus-2022-Werte zur Lage (Gemeinde/Gitter): Mieten, Leerstand, Baualter - wie im Abgleich der App'
     }
   },
