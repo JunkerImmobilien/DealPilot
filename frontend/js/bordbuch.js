@@ -190,24 +190,54 @@
   /* v3110d · ERST ALLES LESEN, DANN ALLES SCHREIBEN. Abwechselnd lesen und
      schreiben ließ den Browser nach jedem setProperty alle Stile neu rechnen —
      bei dieser Seite fror der Tab ein (gemessen 03.11.2026). Unsichtbare
-     Teilbäume (display:none) werden übersprungen, sie fotografiert niemand. */
+     Teilbäume (display:none) werden übersprungen, sie fotografiert niemand.
+     v3110e · ALLE berechneten Eigenschaften statt einer Liste, und auch ::before
+     und ::after: die feste Liste verfehlte u. a. -webkit-text-fill-color,
+     -webkit-text-stroke-color und text-decoration (gemessen: 22 Eigenschaften
+     tragen color(...)), und die Pseudoelemente liest html2canvas ebenfalls.
+     Pseudoelemente lassen sich nicht inline stylen — sie bekommen eine Regel
+     über ein data-Attribut in der Kopie. Dauer gemessen 1,4 s bei 1.591 Elementen. */
   var FARB_RE = /(?:^|[\s,(])(?:color|oklab|oklch|lab|lch)\(/;
   function farbenGlaetten(doc) {
-    var win = doc.defaultView, aend = [];
+    var win = doc.defaultView, aend = [], pseudo = [], nr = 0;
+    var sammle = function (cs) {
+      var out = [];
+      for (var i = 0; i < cs.length; i++) {
+        var p = cs[i], v = cs.getPropertyValue(p);
+        if (v && v.indexOf('(') >= 0 && FARB_RE.test(v)) out.push([p, zuRgba(v)]);
+      }
+      return out;
+    };
     var pruefe = function (el) {
-        var cs; try { cs = win.getComputedStyle(el); } catch (e) { return 3; }
-        if (cs.display === 'none') return 2;   /* FILTER_REJECT: ganzen Teilbaum auslassen */
-        for (var j = 0; j < FARB_PROPS.length; j++) {
-          var v = cs.getPropertyValue(FARB_PROPS[j]);
-          if (v && FARB_RE.test(v)) aend.push([el, FARB_PROPS[j], zuRgba(v)]);
-        }
-        return 1;
+      var cs; try { cs = win.getComputedStyle(el); } catch (e) { return 3; }
+      if (cs.display === 'none') return 2;   /* FILTER_REJECT: ganzen Teilbaum auslassen */
+      var eigen = sammle(cs);
+      if (eigen.length) aend.push([el, eigen]);
+      ['::before', '::after'].forEach(function (ps) {
+        var pc; try { pc = win.getComputedStyle(el, ps); } catch (e) { return; }
+        if (!pc || !pc.content || pc.content === 'none' || pc.content === 'normal') return;
+        var w = sammle(pc);
+        if (w.length) pseudo.push([el, ps, w]);
+      });
+      return 1;
     };
     [doc.documentElement, doc.body].forEach(function (el) { if (el) pruefe(el); });   /* Wurzel und body besucht der TreeWalker nicht */
     var gang = doc.createTreeWalker(doc.body || doc.documentElement, 1, { acceptNode: pruefe });
     while (gang.nextNode()) { /* nur sammeln */ }
-    for (var i = 0; i < aend.length; i++) aend[i][0].style.setProperty(aend[i][1], aend[i][2], 'important');
-    return aend.length;
+    /* schreiben */
+    for (var i = 0; i < aend.length; i++) {
+      for (var k = 0; k < aend[i][1].length; k++) aend[i][0].style.setProperty(aend[i][1][k][0], aend[i][1][k][1], 'important');
+    }
+    if (pseudo.length) {
+      var regeln = pseudo.map(function (x) {
+        var id = x[0].getAttribute('data-bb-f') || String(++nr);
+        x[0].setAttribute('data-bb-f', id);
+        return '[data-bb-f="' + id + '"]' + x[1] + '{' + x[2].map(function (pv) { return pv[0] + ':' + pv[1] + ' !important'; }).join(';') + '}';
+      });
+      var st = doc.createElement('style'); st.textContent = regeln.join('\n');
+      (doc.head || doc.documentElement).appendChild(st);
+    }
+    return aend.length + pseudo.length;
   }
   /* Rückfall: die Bildschirmaufnahme des Browsers (fragt einmal nach, zeigt aber
      genau das, was man sieht — auch den Inhalt von iframes). Braucht einen Klick. */
