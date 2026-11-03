@@ -16,7 +16,14 @@
    "regionalfaktor": 1,
    "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
-   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für die Bauwirtschaft des Statistischen Bundesamtes (Preisindizes für Neubauten in konventioneller Bauart)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Restnutzungsdauer: Gesamtnutzungsdauer gemäß Anlage 1 ImmoWertV abzüglich des Al- ters der baulichen Anlagen (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05512000",
@@ -89,7 +96,14 @@
    "regionalfaktor": 1,
    "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
-   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für die Bauwirtschaft des Statistischen Bundesamtes (Preisindizes für Neubauten in konventioneller Bauart)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Restnutzungsdauer: Gesamtnutzungsdauer gemäß Anlage 1 ImmoWertV abzüglich des Al- ters der baulichen Anlagen (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05512000",
@@ -166,7 +180,14 @@
    "regionalfaktor": 1,
    "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
-   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für die Bauwirtschaft des Statistischen Bundesamtes (Preisindizes für Neubauten in konventioneller Bauart)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Restnutzungsdauer: Gesamtnutzungsdauer gemäß Anlage 1 ImmoWertV abzüglich des Al- ters der baulichen Anlagen (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05512000",
@@ -244,7 +265,14 @@
    "regionalfaktor": 1,
    "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
-   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für die Bauwirtschaft des Statistischen Bundesamtes (Preisindizes für Neubauten in konventioneller Bauart)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Restnutzungsdauer: Gesamtnutzungsdauer gemäß Anlage 1 ImmoWertV abzüglich des Al- ters der baulichen Anlagen (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 88 (GMB_10500_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05512000",
@@ -323,7 +351,11 @@
    "gnd_jahre": 80,
    "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
-   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex) mit Basis 2010 = 100",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 45 (GMB_11100_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05914000",
@@ -399,7 +431,11 @@
    "gnd_jahre": 80,
    "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
-   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex) mit Basis 2010 = 100",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 45 (GMB_11100_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05914000",
@@ -478,7 +514,11 @@
    "gnd_jahre": 80,
    "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
-   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex) mit Basis 2010 = 100",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 45 (GMB_11100_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05914000",
@@ -567,7 +607,11 @@
    "gnd_jahre": 80,
    "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
    "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
-   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex) mit Basis 2010 = 100",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 45 (GMB_11100_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05914000",
@@ -646,7 +690,10 @@
   "auflagen": "Der Bericht druckt die Marktanpassung als prozentualen Zu-/Abschlag auf den vorläufigen Sachwert (liefert zuschlag_prozent); Faktor = 1 + Zuschlag/100. \"Durchschnittswerte\" — Marktanpassungskurve des durchschnittlichen Käuferverhaltens.",
   "modellansaetze": {
    "regionalfaktor": 1,
-   "wortlaut": "Kap. 7.1 Modell (Druck-S. 64–65): bereinigter normierter Kaufpreis (§§ 7, 8; typische Nebengebäude enthalten, untypische wie Scheunen ausgeschlossen); NHK 2010 (Anlage 4), Baunebenkosten enthalten; Regionalfaktor 1,0; Mischkalkulation bei teilweisem DG-Ausbau/Teilunterkellerung; Gebäudestandard nach Fragebogen (Anlage 4); Bezugsmaßstab BGF DIN 277-1:2005-02. Eine Gesamtnutzungsdauer ist im gelesenen Modellblock nicht beziffert."
+   "wortlaut": "Kap. 7.1 Modell (Druck-S. 64–65): bereinigter normierter Kaufpreis (§§ 7, 8; typische Nebengebäude enthalten, untypische wie Scheunen ausgeschlossen); NHK 2010 (Anlage 4), Baunebenkosten enthalten; Regionalfaktor 1,0; Mischkalkulation bei teilweisem DG-Ausbau/Teilunterkellerung; Gebäudestandard nach Fragebogen (Anlage 4); Bezugsmaßstab BGF DIN 277-1:2005-02. Eine Gesamtnutzungsdauer ist im gelesenen Modellblock nicht beziffert.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wurde als Modellgröße behandelt und nach Anlage 1 ImmoWertV festgesetzt. (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 72 (GMB_11200_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05915000",
@@ -721,7 +768,10 @@
   "auflagen": "Der Bericht druckt die Marktanpassung als prozentualen Zu-/Abschlag auf den vorläufigen Sachwert (liefert zuschlag_prozent); Faktor = 1 + Zuschlag/100. \"Durchschnittswerte\" — Marktanpassungskurve des durchschnittlichen Käuferverhaltens.",
   "modellansaetze": {
    "regionalfaktor": 1,
-   "wortlaut": "Kap. 7.1 Modell (Druck-S. 64–65): bereinigter normierter Kaufpreis (§§ 7, 8; typische Nebengebäude enthalten, untypische wie Scheunen ausgeschlossen); NHK 2010 (Anlage 4), Baunebenkosten enthalten; Regionalfaktor 1,0; Mischkalkulation bei teilweisem DG-Ausbau/Teilunterkellerung; Gebäudestandard nach Fragebogen (Anlage 4); Bezugsmaßstab BGF DIN 277-1:2005-02. Eine Gesamtnutzungsdauer ist im gelesenen Modellblock nicht beziffert."
+   "wortlaut": "Kap. 7.1 Modell (Druck-S. 64–65): bereinigter normierter Kaufpreis (§§ 7, 8; typische Nebengebäude enthalten, untypische wie Scheunen ausgeschlossen); NHK 2010 (Anlage 4), Baunebenkosten enthalten; Regionalfaktor 1,0; Mischkalkulation bei teilweisem DG-Ausbau/Teilunterkellerung; Gebäudestandard nach Fragebogen (Anlage 4); Bezugsmaßstab BGF DIN 277-1:2005-02. Eine Gesamtnutzungsdauer ist im gelesenen Modellblock nicht beziffert.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wurde als Modellgröße behandelt und nach Anlage 1 ImmoWertV festgesetzt. (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 72 (GMB_11200_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05915000",
@@ -795,10 +845,16 @@
   "verwendung": "produkt",
   "auflagen": "Gilt für Ausstattungsklasse 4 (mittlerer bis guter Wohnkomfort, Ziffer 8.1); \"bei anderen Ausstattungsmerkmalen ist der Wert entsprechend zu erhöhen bzw. zu senken\" — nicht beziffert, nicht hinterlegt. Grundstücksgröße = Feld flaeche (Grundstücksfläche m²).",
   "modellansaetze": {
-   "gnd_jahre": null,
+   "gnd_jahre": 80,
    "regionalfaktor": 1,
    "baupreisindex": "Baupreisindex gemäß Veröffentlichung des Statistischen Bundesamtes (keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort)."
+   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort).",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex gem. Veröffentlichung durch das statistische Bundesamt",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 69 (GMB_11300_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_wortlaut": "Gesamtnutzungsdauer gem. Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 69 (GMB_11300_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05916000",
@@ -903,10 +959,16 @@
   "verwendung": "produkt",
   "auflagen": "Wohnlageklasse (Ziffer 8.2) und Modernisierungsgrad (Ziffer 8.3) sind Herner Skalen, nicht Anlage 2 ImmoWertV — Felder wohnlageklasse und modernisierungsgrad_herne; ohne sie rechnet der Satz nicht (Gleichung als Ganzes).",
   "modellansaetze": {
-   "gnd_jahre": null,
+   "gnd_jahre": 80,
    "regionalfaktor": 1,
    "baupreisindex": "Baupreisindex gemäß Veröffentlichung des Statistischen Bundesamtes (keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort)."
+   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort).",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex gem. Veröffentlichung durch das statistische Bundesamt",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 69 (GMB_11300_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_wortlaut": "Gesamtnutzungsdauer gem. Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 69 (GMB_11300_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05916000",
@@ -1010,10 +1072,16 @@
   "verwendung": "produkt",
   "auflagen": "Nur Mietwohngebäude mit Gewerbeanteil unter 20 % (Feld gewerbeanteil_prozent ist Pflicht, Bedingung < 20). Baujahrsklasse aus dem Baujahr: bis 1944 Mittelwert 0,830; ab 1946 Regression; für das Baujahr 1945 trifft der Bericht keine Aussage (\"vor\"/\"nach\" 1945). Modernisierungsgrad nach Herner Ziffer 8.3.",
   "modellansaetze": {
-   "gnd_jahre": null,
+   "gnd_jahre": 80,
    "regionalfaktor": 1,
    "baupreisindex": "Baupreisindex gemäß Veröffentlichung des Statistischen Bundesamtes (keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort)."
+   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort).",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex gem. Veröffentlichung durch das statistische Bundesamt",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 69 (GMB_11300_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_wortlaut": "Gesamtnutzungsdauer gem. Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 69 (GMB_11300_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05916000",
@@ -1357,7 +1425,11 @@
   "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit und Plausibilität am Stichprobenmittel): der Bericht druckt die Trendlinie nur als Formel im Diagramm. Der Ausgangswert ist \"objektspezifisch anzupassen\" (§ 39): gute Lagen höher, einfache Lagen niedriger; bei ZFH ggf. Abschläge für nicht zeitgemäße Aufteilung.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindizes für den Neubau von Wohngebäuden (2010 = 100), „Preisindizes für die Bauwirtschaft“ des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 67 (GMB_11800_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05117000",
@@ -1431,7 +1503,11 @@
   "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit und Plausibilität am Stichprobenmittel): der Bericht druckt die Trendlinie nur als Formel im Diagramm. Der Ausgangswert ist \"objektspezifisch anzupassen\" (§ 39): gute Lagen höher, einfache Lagen niedriger; bei ZFH ggf. Abschläge für nicht zeitgemäße Aufteilung.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindizes für den Neubau von Wohngebäuden (2010 = 100), „Preisindizes für die Bauwirtschaft“ des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 67 (GMB_11800_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05117000",
@@ -1505,7 +1581,11 @@
   "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit und Plausibilität am Stichprobenmittel): der Bericht druckt die Trendlinie nur als Formel im Diagramm. Der Ausgangswert ist \"objektspezifisch anzupassen\" (§ 39): gute Lagen höher, einfache Lagen niedriger; bei ZFH ggf. Abschläge für nicht zeitgemäße Aufteilung.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindizes für den Neubau von Wohngebäuden (2010 = 100), „Preisindizes für die Bauwirtschaft“ des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 67 (GMB_11800_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05117000",
@@ -1581,7 +1661,11 @@
    "gnd_jahre": 80,
    "regionalfaktor": 1,
    "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis (keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 9.4 (Druck-S. 43–44): NHK 2010; Bezugsmaßstab BGF in Anlehnung an DIN 277-1:2005-02; Regionalfaktor 1,0 (§ 36 Abs. 3); Preisindex Destatis; GND in der Regel 80 Jahre (Anlage 1); RND = GND − Alter, ggf. modifiziert nach Modernisierungszustand (Anlage 2); lineare Wertminderung; Fragebogenerhebung der Käufer."
+   "wortlaut": "Kap. 9.4 (Druck-S. 43–44): NHK 2010; Bezugsmaßstab BGF in Anlehnung an DIN 277-1:2005-02; Regionalfaktor 1,0 (§ 36 Abs. 3); Preisindex Destatis; GND in der Regel 80 Jahre (Anlage 1); RND = GND − Alter, ggf. modifiziert nach Modernisierungszustand (Anlage 2); lineare Wertminderung; Fragebogenerhebung der Käufer.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des statistischen Bundesamtes",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 43 (GMB_12000_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05119000",
@@ -1674,7 +1758,11 @@
   "auflagen": "Signifikanter Einfluss nur des vorläufigen Sachwerts (Wohnlage, EFH/ZFH, Gebäudestandard, Gebäudeart nicht signifikant). Kaufpreise 2025 mit Indexreihen und BRW/Baukostenindex auf den 01.01.2026 umgerechnet. Stichprobe enthält energetisch sanierte wie unsanierte Gebäude.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 8.1 Marktanpassung – Sachwertfaktoren (Druck-S. 45): GND 80 Jahre bei Wohngebäuden unter Berücksichtigung eines fiktiven Alters; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 Marktanpassung – Sachwertfaktoren (Druck-S. 45): GND 80 Jahre bei Wohngebäuden unter Berücksichtigung eines fiktiven Alters; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Umrechnung auf den Wertermittlungsstichtag über die Preisindizes für Bauwerke des Statistischen Bundesamtes (Baupreisindex)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 48 (GMB_12200_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05122000",
@@ -1747,7 +1835,11 @@
   "auflagen": "Signifikanter Einfluss nur des vorläufigen Sachwerts (Wohnlage, EFH/ZFH, Gebäudestandard, Gebäudeart nicht signifikant). Kaufpreise 2025 mit Indexreihen und BRW/Baukostenindex auf den 01.01.2026 umgerechnet. Stichprobe enthält energetisch sanierte wie unsanierte Gebäude.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 8.1 Marktanpassung – Sachwertfaktoren (Druck-S. 45): GND 80 Jahre bei Wohngebäuden unter Berücksichtigung eines fiktiven Alters; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 Marktanpassung – Sachwertfaktoren (Druck-S. 45): GND 80 Jahre bei Wohngebäuden unter Berücksichtigung eines fiktiven Alters; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Umrechnung auf den Wertermittlungsstichtag über die Preisindizes für Bauwerke des Statistischen Bundesamtes (Baupreisindex)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 48 (GMB_12200_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05122000",
@@ -1818,7 +1910,11 @@
   "auflagen": "Die Universitätsstadt Siegen hat einen eigenen Gutachterausschuss (eigener Satz, AGS 05970040) — dieser Kreissatz gilt dort NICHT; der Ort (Feld ort) ist Pflicht und muss einer der zehn Kreisgemeinden sein. Die Kaufpreisauswertung 2025 war bei Redaktionsschluss nicht abgeschlossen; der Ausschuss kündigt eine Überprüfung an.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 8 (Druck-S. ~55): ImmoWertV 2021/ImmoWertA; durchschnittliche Gesamtnutzungsdauer 80 Jahre; Bodenwert nach BRW, Übergrößen auf das Bodenrichtwertgrundstück (700 m²) bereinigt; Gebäudedaten aus Fragebögen/Bauakten; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8 (Druck-S. ~55): ImmoWertV 2021/ImmoWertA; durchschnittliche Gesamtnutzungsdauer 80 Jahre; Bodenwert nach BRW, Übergrößen auf das Bodenrichtwertgrundstück (700 m²) bereinigt; Gebäudedaten aus Fragebögen/Bauakten; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex (Basisjahr 2010 = 100)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 76 (GMB_32500_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05970",
@@ -1937,7 +2033,14 @@
   "auflagen": "Gilt für Bocholt OHNE die Ortsteile Barlo, Hemden, Liedern, Spork und Suderwick (Feld ortsteil; dort kein Wert). 256 Kauffälle 2024/2025 insgesamt, keine Fallzahl je Gebäudetyp abgedruckt. \"Im Randbereich der Kurven nimmt die Aussagegenauigkeit ab.\"",
   "modellansaetze": {
    "regionalfaktor": 1,
-   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert."
+   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 89 (GMB_21000_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wird pauschal festgelegt auf: 80 Jahre für Ein- und Zweifamilienhäuser",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 89 (GMB_21000_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05554008",
@@ -2022,7 +2125,14 @@
   "auflagen": "Gilt für Bocholt OHNE die Ortsteile Barlo, Hemden, Liedern, Spork und Suderwick (Feld ortsteil; dort kein Wert). 256 Kauffälle 2024/2025 insgesamt, keine Fallzahl je Gebäudetyp abgedruckt. \"Im Randbereich der Kurven nimmt die Aussagegenauigkeit ab.\"",
   "modellansaetze": {
    "regionalfaktor": 1,
-   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert."
+   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 89 (GMB_21000_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wird pauschal festgelegt auf: 80 Jahre für Ein- und Zweifamilienhäuser",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 89 (GMB_21000_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05554008",
@@ -2103,7 +2213,14 @@
   "auflagen": "Gilt für Bocholt OHNE die Ortsteile Barlo, Hemden, Liedern, Spork und Suderwick (Feld ortsteil; dort kein Wert). 256 Kauffälle 2024/2025 insgesamt, keine Fallzahl je Gebäudetyp abgedruckt. \"Im Randbereich der Kurven nimmt die Aussagegenauigkeit ab.\"",
   "modellansaetze": {
    "regionalfaktor": 1,
-   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert."
+   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 89 (GMB_21000_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wird pauschal festgelegt auf: 80 Jahre für Ein- und Zweifamilienhäuser",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 89 (GMB_21000_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05554008",
@@ -2177,7 +2294,14 @@
   "verwendung": "produkt",
   "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wird pauschal festgelegt auf: 80 Jahre für Ein- und Zweifamilienhäuser",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05170008",
@@ -2249,7 +2373,14 @@
   "verwendung": "produkt",
   "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wird pauschal festgelegt auf: 80 Jahre für Ein- und Zweifamilienhäuser",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05170008",
@@ -2321,7 +2452,14 @@
   "verwendung": "produkt",
   "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wird pauschal festgelegt auf: 80 Jahre für Ein- und Zweifamilienhäuser",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05170008",
@@ -2393,7 +2531,14 @@
   "verwendung": "produkt",
   "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Sie wird pauschal festgelegt auf: 80 Jahre für Ein- und Zweifamilienhäuser",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 175 (GMB_21900_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05170008",
@@ -3017,7 +3162,14 @@
   "verwendung": "produkt",
   "auflagen": "Keine Lagedifferenzierung (einfache bis sehr gute Wohnlagen ohne signifikanten Unterschied); ZFH gemeinsam mit EFH ausgewertet. \"Wichtiger Hinweis\": die Faktoren schwanken mit dem Kaufzeitpunkt (Hypothekenzinsen) — § 7 Abs. 2 ImmoWertV, ggf. Marktanpassung durch Zu-/Abschläge.",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 51 (GMB_26400_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "§ 4 Abs. 2 und § 12 Abs. 5 i.V.m. Anlage 1 ImmoWertV: 80 Jahre",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 51 (GMB_26400_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05170024",
@@ -3088,7 +3240,14 @@
   "verwendung": "produkt",
   "auflagen": "Keine Lagedifferenzierung (einfache bis sehr gute Wohnlagen ohne signifikanten Unterschied); ZFH gemeinsam mit EFH ausgewertet. \"Wichtiger Hinweis\": die Faktoren schwanken mit dem Kaufzeitpunkt (Hypothekenzinsen) — § 7 Abs. 2 ImmoWertV, ggf. Marktanpassung durch Zu-/Abschläge.",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 51 (GMB_26400_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "§ 4 Abs. 2 und § 12 Abs. 5 i.V.m. Anlage 1 ImmoWertV: 80 Jahre",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 51 (GMB_26400_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05170024",
@@ -3159,7 +3318,14 @@
   "verwendung": "produkt",
   "auflagen": "Keine Lagedifferenzierung (einfache bis sehr gute Wohnlagen ohne signifikanten Unterschied); ZFH gemeinsam mit EFH ausgewertet. \"Wichtiger Hinweis\": die Faktoren schwanken mit dem Kaufzeitpunkt (Hypothekenzinsen) — § 7 Abs. 2 ImmoWertV, ggf. Marktanpassung durch Zu-/Abschläge.",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex für die Bauwirtschaft des Statistischen Bundesamtes (Baupreisindex), 2010 = 100.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 51 (GMB_26400_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "§ 4 Abs. 2 und § 12 Abs. 5 i.V.m. Anlage 1 ImmoWertV: 80 Jahre",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 51 (GMB_26400_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05170024",
@@ -3231,7 +3397,11 @@
   "auflagen": "Mittelwert ohne Abhängigkeit vom vorläufigen Sachwert (\"gesicherter Zusammenhang nicht nachweisbar\"); wegen der großen Streuung sind die Streudiagramme (Höhe des Sachwerts, Verkaufsjahr) sachverständig zu würdigen. Nur RND ≥ 20 Jahre, keine sanierungsbedürftigen Objekte.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex des Statistischen Bundesamtes",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 35 (GMB_27600_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05562032",
@@ -3299,7 +3469,11 @@
   "auflagen": "Mittelwert ohne Abhängigkeit vom vorläufigen Sachwert (\"gesicherter Zusammenhang nicht nachweisbar\"); wegen der großen Streuung sind die Streudiagramme (Höhe des Sachwerts, Verkaufsjahr) sachverständig zu würdigen. Nur RND ≥ 20 Jahre, keine sanierungsbedürftigen Objekte.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex des Statistischen Bundesamtes",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 35 (GMB_27600_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05562032",
@@ -3367,7 +3541,11 @@
   "auflagen": "Mittelwert ohne Abhängigkeit vom vorläufigen Sachwert (\"gesicherter Zusammenhang nicht nachweisbar\"); wegen der großen Streuung sind die Streudiagramme (Höhe des Sachwerts, Verkaufsjahr) sachverständig zu würdigen. Nur RND ≥ 20 Jahre, keine sanierungsbedürftigen Objekte.",
   "modellansaetze": {
    "gnd_jahre": 80,
-   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex des Statistischen Bundesamtes",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 35 (GMB_27600_2026.pdf)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Grundstücksmarktbericht (Seitentext maschinell gegen den Wortlaut geprüft): das Modell nennt den Baupreisindex ohne abweichenden Bezugszeitpunkt bzw. ausdrücklich zum Wertermittlungsstichtag/Auswertungsstichtag; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
   },
   "korrekturen": [],
   "ags": "05562032",
@@ -3525,7 +3703,10 @@
   "verwendung": "produkt",
   "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit): der Bericht druckt die Funktion und ihr Konfidenzintervall. Durchschnittlicher Faktor für das gesamte Stadtgebiet; leicht signifikante Einflüsse (Kernstadtlagen Siegen-Stadt/Weidenau/Geisweid höher, Gebäudestandard und BRW positiv) sind NICHT als Umrechnungskoeffizienten beziffert — Zu-/Abschläge sachverständig an der Standardabweichung (1σ ± 0,12).",
   "modellansaetze": {
-   "wortlaut": "Kap. 8.2 (Druck-S. ~56): Sachwertmodell §§ 35–39 ImmoWertV, Regelungslücken nach Handlungsempfehlung AGVGA.NRW (Stand 12/2023); Parameter nicht im Detail gelesen."
+   "wortlaut": "Kap. 8.2 (Druck-S. ~56): Sachwertmodell §§ 35–39 ImmoWertV, Regelungslücken nach Handlungsempfehlung AGVGA.NRW (Stand 12/2023); Parameter nicht im Detail gelesen.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: Gemäß § 4 Absatz 2 i.V.m. Anlage 1 ImmoWertV. (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre)",
+   "gnd_seite": "Grundstücksmarktbericht 2026, Modellbeschreibung Sachwertfaktoren, PDF-S. 60 (GMB_28200_2026.pdf)"
   },
   "korrekturen": [],
   "ags": "05970040",

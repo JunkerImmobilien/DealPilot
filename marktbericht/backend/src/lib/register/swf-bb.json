@@ -33,7 +33,14 @@
    "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "ermittlung": "einfache Regression, R² = 0,140",
    "stichtag": "01.01.2025",
-   "kauffaelle_gesamt": 65
+   "kauffaelle_gesamt": 65,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "80 Jahre (gemäß Anlage 1 ImmoWertV)",
+   "gnd_seite": "GMB 2025 Stadt Brandenburg an der Havel, Modellansätze und -parameter Sachwertfaktoren, PDF-S. 66",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihe für die Bauwirtschaft des Statistischen Bundesamts – Preisindex für den Neubau von Wohngebäuden Deutschland (2021 =100); gesuchter Index (2010) = Index zum Wertermittlungsstichtag (2021) / 70,9 × 100",
+   "baupreisindex_seite": "GMB 2025 Stadt Brandenburg an der Havel, PDF-S. 66",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Brandenburg an der Havel",
@@ -108,7 +115,14 @@
    "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "ermittlung": "einfache Regression, R² = 0,145",
    "stichtag": "01.01.2025",
-   "kauffaelle_gesamt": 42
+   "kauffaelle_gesamt": 42,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "80 Jahre (gemäß Anlage 1 ImmoWertV)",
+   "gnd_seite": "GMB 2025 Stadt Brandenburg an der Havel, Modellansätze und -parameter Sachwertfaktoren, PDF-S. 66",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihe für die Bauwirtschaft des Statistischen Bundesamts – Preisindex für den Neubau von Wohngebäuden Deutschland (2021 =100); gesuchter Index (2010) = Index zum Wertermittlungsstichtag (2021) / 70,9 × 100",
+   "baupreisindex_seite": "GMB 2025 Stadt Brandenburg an der Havel, PDF-S. 66",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Brandenburg an der Havel",
@@ -179,7 +193,14 @@
    "modellgrundlage": "ImmoWertV § 21 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "ermittlung": "einfache Regression, R² = 0,236",
    "stichtag": "01.01.2025",
-   "kauffaelle_gesamt": 20
+   "kauffaelle_gesamt": 20,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "80 Jahre (gemäß Anlage 1 ImmoWertV)",
+   "gnd_seite": "GMB 2025 Stadt Brandenburg an der Havel, Modellansätze und -parameter Sachwertfaktoren, PDF-S. 66",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihe für die Bauwirtschaft des Statistischen Bundesamts – Preisindex für den Neubau von Wohngebäuden Deutschland (2021 =100); gesuchter Index (2010) = Index zum Wertermittlungsstichtag (2021) / 70,9 × 100",
+   "baupreisindex_seite": "GMB 2025 Stadt Brandenburg an der Havel, PDF-S. 66",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Brandenburg an der Havel",
@@ -279,7 +300,7 @@
       {
        "von": 7,
        "bis": null,
-       "wert": 1.0,
+       "wert": 1,
        "bez": "teilsaniert bis saniert (MODG ab 7)",
        "fallzahl": 24,
        "min": 0.54,
@@ -344,7 +365,14 @@
    "stichtag": "01.01.2026",
    "auswertungszeitraum": "2024 bis 2025",
    "kauffaelle_gesamt": 142,
-   "hinweis": "Die Modellansätze und -parameter stehen im Bericht auf den Seiten 117 bis 119 und sind für die Modellkonformität nach § 10 ImmoWertV maßgeblich."
+   "hinweis": "Die Modellansätze und -parameter stehen im Bericht auf den Seiten 117 bis 119 und sind für die Modellkonformität nach § 10 ImmoWertV maßgeblich.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): nach Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Cottbus/Chóśebuz, Modellansätze Sachwertfaktoren, Druck-S. 118 (PDF-S. 120)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2020 – Preisindex für den Neubau von Wohngebäuden (Umbasierung von 2015 auf 2010 bei Verwendung von NHK 2010); gesuchter Index (2010) = Index zum Wertermittlungsstichtag (2015) / 90,1 × 100",
+   "baupreisindex_seite": "GMB 2025 Cottbus/Chóśebuz, Druck-S. 118 (PDF-S. 120)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Cottbus/Chóśebuz",
@@ -364,8 +392,8 @@
      "max": 770000
     },
     "standardstufe": {
-     "min": 1.0,
-     "max": 4.0
+     "min": 1,
+     "max": 4
     },
     "baujahr": {
      "min": null,
@@ -444,7 +472,14 @@
    "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "stichtag": "01.01.2026",
    "kauffaelle_gesamt": 48,
-   "hinweis": "Die Modellansätze stehen im Bericht auf den Seiten 117 bis 119."
+   "hinweis": "Die Modellansätze stehen im Bericht auf den Seiten 117 bis 119.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): nach Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Cottbus/Chóśebuz, Modellansätze Sachwertfaktoren, Druck-S. 118 (PDF-S. 120)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2020 – Preisindex für den Neubau von Wohngebäuden (Umbasierung von 2015 auf 2010 bei Verwendung von NHK 2010); gesuchter Index (2010) = Index zum Wertermittlungsstichtag (2015) / 90,1 × 100",
+   "baupreisindex_seite": "GMB 2025 Cottbus/Chóśebuz, Druck-S. 118 (PDF-S. 120)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Cottbus/Chóśebuz",
@@ -516,7 +551,14 @@
    "bezeichnung": "SW23",
    "stichtag": "01.07.2024",
    "funktion": "y = 2953,7 · x^-0,642, R² = 0,50",
-   "kauffaelle_gesamt": 10
+   "kauffaelle_gesamt": 10,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND) nach § 4 Abs. 2 bzw. Anlage 1 ImmoWertV: Einfamilienhäuser: 80 Jahre",
+   "gnd_seite": "GMB 2025 Oder-Spree/Frankfurt (Oder), IV. Ermittlung von Sachwertfaktoren, S. 141",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des statistischen Bundesamtes 2021 - Preisindex für den Neubau von Wohngebäuden (Umbasierung auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Oder-Spree/Frankfurt (Oder), IV. Ermittlung von Sachwertfaktoren, S. 140",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Frankfurt (Oder)",
@@ -583,7 +625,14 @@
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert des typischen Objektes",
    "typisches_objekt": "übliche Außenanlagen, ein bis zwei Garagen oder Carports, typische Nebengebäude, Einbauküche mittleren Standards",
    "nicht_beruecksichtigt": "große Villen über 300 m² Wohnfläche · Bauern- und Vierseitengehöfte · Grundstücke über 1.500 m² · Wohnfläche unter 80 oder über 300 m² · Bodenwertanteil am Kaufpreis über 80 % · Abweichung zwischen Kaufpreis und normiertem Kaufpreis über 20 % · Grundstücke mit direktem oder indirektem Wasserzugang · ungewöhnliche oder persönliche Verhältnisse · Erbbaurecht · Mischnutzung Wohnen/Gewerbe · Paketverkäufe",
-   "besonderheit": "Kauffälle mit denkmalgeschützten Hauptgebäuden wurden ausdrücklich EINBEZOGEN."
+   "besonderheit": "Kauffälle mit denkmalgeschützten Hauptgebäuden wurden ausdrücklich EINBEZOGEN.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "80 Jahre (gemäß Anlage 1 ImmoWertV 2021)",
+   "gnd_seite": "GMB 2025 Landeshauptstadt Potsdam, Sachwertfaktoren – Modellansätze und -parameter, S. 107",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindizes für Neubau von Wohngebäuden in Deutschland (2021 =100) – Statistisches Bundesamt; Indizes müssen auf das Jahr 2010 umgerechnet werden: gesuchter Index (2010) = Index zum Wertermittlungsstichtag (2021) …",
+   "baupreisindex_seite": "GMB 2025 Landeshauptstadt Potsdam, Sachwertfaktoren – Modellansätze und -parameter, S. 108",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landeshauptstadt Potsdam",
@@ -669,7 +718,14 @@
    "verfahren": "Sachwertverfahren §§ 35 bis 39 ImmoWertV 2021",
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert des typischen Objektes",
    "typisches_objekt": "übliche Außenanlagen, KEINE Garagen/Carports/Nebengebäude, Einbauküche mittleren Standards",
-   "unterschied_zu_ezfh": "Beim freistehenden Haus sind ein bis zwei Garagen oder Carports und typische Nebengebäude im vorläufigen Sachwert enthalten, beim Reihenhaus NICHT. Wer denselben vorläufigen Sachwert für beide Zweige bildet, rechnet mit dem falschen Modell."
+   "unterschied_zu_ezfh": "Beim freistehenden Haus sind ein bis zwei Garagen oder Carports und typische Nebengebäude im vorläufigen Sachwert enthalten, beim Reihenhaus NICHT. Wer denselben vorläufigen Sachwert für beide Zweige bildet, rechnet mit dem falschen Modell.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "80 Jahre (gemäß Anlage 1 ImmoWertV 2021)",
+   "gnd_seite": "GMB 2025 Landeshauptstadt Potsdam, Sachwertfaktoren – Modellansätze und -parameter, S. 107",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindizes für Neubau von Wohngebäuden in Deutschland (2021 =100) – Statistisches Bundesamt; Indizes müssen auf das Jahr 2010 umgerechnet werden: gesuchter Index (2010) = Index zum Wertermittlungsstichtag (2021) …",
+   "baupreisindex_seite": "GMB 2025 Landeshauptstadt Potsdam, Sachwertfaktoren – Modellansätze und -parameter, S. 108",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landeshauptstadt Potsdam",
@@ -906,7 +962,7 @@
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis plus/minus boG) / vorläufiger Sachwert",
    "gnd_jahre": 80,
    "nhk": "NHK 2010 gem. Anlage 4 ImmoWertV, Bezugsmaßstab Brutto-Grundfläche",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "baunebenkosten": "keine, in den NHK 2010 enthalten",
    "alterswertminderung": "linear",
    "kauffaelle_gesamt": 232,
@@ -1102,7 +1158,7 @@
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis plus/minus boG) / vorläufiger Sachwert",
    "gnd_jahre": 80,
    "nhk": "NHK 2010 gem. Anlage 4 ImmoWertV, Bezugsmaßstab Brutto-Grundfläche",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "besonderheit": "Konjunkturelle Anpassung des Bodenwertes auf den Kaufzeitpunkt."
   },
@@ -1380,7 +1436,14 @@
    "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
    "stichtag": "01.01.2025",
    "kauffaelle_gesamt": 438,
-   "ermittlung": "Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\", getrennt nach Region und Baujahresklasse"
+   "ermittlung": "Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\", getrennt nach Region und Baujahresklasse",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: Entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Dahme-Spreewald, Anlage 2 Modellansätze und -parameter Sachwertfaktoren, Seite 138",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Entsprechend 5.3.5 VV EW-SW — VV EW-SW Nr. 5.3.5 (bravors.brandenburg.de/verwaltungsvorschriften/vv_ew_sw, gelesen 03.11.2026): „Als Baupreisindex ist der zum Wertermittlungsstichtag aktuelle Preisindex für den Neubau von Wohngebäuden aus den Indexreihen für die Bauwirtschaft des Statistischen Bundesamts zu verwenden.“",
+   "baupreisindex_seite": "GMB 2025 Dahme-Spreewald, Anlage 2, Seite 137",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Dahme-Spreewald, drei Regionen",
@@ -1623,7 +1686,14 @@
    "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
    "stichtag": "01.01.2025",
    "kauffaelle_gesamt": 66,
-   "ermittlung": "Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\", getrennt nach Region und Baujahresklasse"
+   "ermittlung": "Ableitung über die Regressionsfunktion „Sachwertfaktor und Zeitverlauf\", getrennt nach Region und Baujahresklasse",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: Entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Dahme-Spreewald, Anlage 2 Modellansätze und -parameter Sachwertfaktoren, Seite 138",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Entsprechend 5.3.5 VV EW-SW — VV EW-SW Nr. 5.3.5 (bravors.brandenburg.de/verwaltungsvorschriften/vv_ew_sw, gelesen 03.11.2026): „Als Baupreisindex ist der zum Wertermittlungsstichtag aktuelle Preisindex für den Neubau von Wohngebäuden aus den Indexreihen für die Bauwirtschaft des Statistischen Bundesamts zu verwenden.“",
+   "baupreisindex_seite": "GMB 2025 Dahme-Spreewald, Anlage 2, Seite 137",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Dahme-Spreewald, drei Regionen",
@@ -1711,7 +1781,7 @@
    "modell_je_kategorie": {
     "stadtlage": {
      "form": "konstante",
-     "wert": 1.0,
+     "wert": 1,
      "rundung_stellen": 2,
      "liefert": "faktor",
      "hinweis": "68 Kauffälle nach Ausreißerbereinigung, Stichprobenspanne des Sachwertfaktors 0,62 bis 1,38. Bodenrichtwert 9 bis 55 €/m², Restnutzungsdauer 10 bis 78 Jahre, Baujahre 1880 bis 2022, Standardstufe 1,3 bis 3,6."
@@ -1735,7 +1805,14 @@
    "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
    "ermittlung": "arithmetischer Mittelwert je Stichprobe, Ausreißer über 2,5facher Standardabweichung separat je Stichprobe eliminiert",
    "kauffaelle_gesamt": 154,
-   "hinweis": "Die Modellansätze nach § 12 Abs. 6 ImmoWertV stehen in Anlage 1 des Berichts."
+   "hinweis": "Die Modellansätze nach § 12 Abs. 6 ImmoWertV stehen in Anlage 1 des Berichts.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Elbe-Elster, Anlage 1 Modellansätze und -parameter Sachwertfaktoren, S. 93",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2020 – Preisindex für den Neubau von Wohngebäuden (Umbasierung auf 2021) mit quartalsweiser Aktualisierung",
+   "baupreisindex_seite": "GMB 2025 Elbe-Elster, Anlage 1, S. 93",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Elbe-Elster, unterschieden nach Stadtlage und ländlichem Gebiet",
@@ -1878,7 +1955,14 @@
    "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
    "ermittlung": "arithmetischer Mittelwert je Stichprobe",
    "kauffaelle_gesamt": 32,
-   "hinweis": "Modellansätze in Anlage 1 des Berichts."
+   "hinweis": "Modellansätze in Anlage 1 des Berichts.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Elbe-Elster, Anlage 1 Modellansätze und -parameter Sachwertfaktoren, S. 93",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2020 – Preisindex für den Neubau von Wohngebäuden (Umbasierung auf 2021) mit quartalsweiser Aktualisierung",
+   "baupreisindex_seite": "GMB 2025 Elbe-Elster, Anlage 1, S. 93",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Elbe-Elster, unterschieden nach Stadtlage und ländlichem Gebiet",
@@ -2120,7 +2204,7 @@
         "1940": 1.1,
         "1960": 1.06,
         "1980": 1.03,
-        "2000": 1.0,
+        "2000": 1,
         "2020": 0.97
        },
        "rundung_stellen": 3,
@@ -2168,7 +2252,7 @@
        0.71
       ],
       "500": [
-       1.0,
+       1,
        0.94,
        0.9,
        0.86,
@@ -2202,7 +2286,7 @@
       ],
       "1250": [
        1.06,
-       1.0,
+       1,
        0.95,
        0.92,
        0.89,
@@ -2236,7 +2320,7 @@
       "2500": [
        1.12,
        1.05,
-       1.0,
+       1,
        0.96,
        0.93,
        0.91,
@@ -2258,7 +2342,7 @@
         "1900": 1.08,
         "1920": 1.05,
         "1940": 1.03,
-        "1960": 1.0,
+        "1960": 1,
         "1980": 0.97,
         "2000": 0.95,
         "2020": 0.92
@@ -2283,7 +2367,10 @@
    "berechnungsmodell": "Sachwertfaktor aus normiertem Kaufpreis und vorläufigem Sachwert, Einflüsse besonderer objektspezifischer Grundstücksmerkmale eliminiert",
    "ermittlung": "multiple Regressionsanalysen je Region, Ausreißerbereinigung mit mathematisch-statistischen Methoden",
    "kauffaelle_gesamt": 608,
-   "besonderheit": "Keine Innenbesichtigung der Objekte. Gebäude mit Teilen verschiedener Gebäudetypen oder Standardstufen werden im Gebäudemix gerechnet; Gesamt- und Restnutzungsdauer richten sich nach dem größten Gebäudeteil."
+   "besonderheit": "Keine Innenbesichtigung der Objekte. Gebäude mit Teilen verschiedener Gebäudetypen oder Standardstufen werden im Gebäudemix gerechnet; Gesamt- und Restnutzungsdauer richten sich nach dem größten Gebäudeteil.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Havelland, Modellansätze und -parameter Sachwertfaktoren, S. 120"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Havelland, zwei landesplanerische Räume",
@@ -2447,7 +2534,7 @@
        1.14,
        1.08,
        1.03,
-       1.0
+       1
       ],
       "175": [
        1.65,
@@ -2540,7 +2627,10 @@
    "modellgrundlage": "ImmoWertV, Brandenburgische Gutachterausschussverordnung (BbgGAV), Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW), Erfassungsrichtlinie (KPSErf-RL)",
    "ermittlung": "multiple Regressionsanalysen je Region mit Ausreißerbereinigung; im weiteren Metropolenraum arithmetischer Mittelwert, weil keine Funktion ableitbar war",
    "kauffaelle_gesamt": 197,
-   "stichtag": "01.07.2025"
+   "stichtag": "01.07.2025",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Havelland, Modellansätze und -parameter Sachwertfaktoren, S. 120"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Havelland, zwei landesplanerische Räume",
@@ -2706,7 +2796,14 @@
    "bodenwert": "marktübliche Grundstücksfläche mal Bodenrichtwert zum Kaufzeitpunkt, OHNE Größenanpassung",
    "garagen": "pauschalisierter Ansatz nach 5.3.4 VV EW-SW oder Berechnung nach NHK 2010; Carports und weitere Nebengebäude als Zeitwert NACH der Marktanpassung",
    "alterswertminderung": "linear",
-   "kauffaelle_gesamt": 213
+   "kauffaelle_gesamt": 213,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Märkisch-Oderland, Modell zur Berechnung der Sachwerte für EFH, DHH, ZFH, RH, S. 71",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "x Bundesbaupreisindex Wohngebäude insgesamt, 2010 = 100",
+   "baupreisindex_seite": "GMB 2025 Märkisch-Oderland, Modell zur Berechnung der Sachwerte, S. 71",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Märkisch-Oderland, gestaffelt nach Bodenrichtwertniveau",
@@ -2786,8 +2883,8 @@
       "150000": 1.04,
       "175000": 1.02,
       "200000": 1.01,
-      "225000": 1.0,
-      "250000": 1.0,
+      "225000": 1,
+      "250000": 1,
       "275000": 0.99
      },
      "rundung_stellen": 2,
@@ -2809,7 +2906,7 @@
       "375000": 1.07,
       "400000": 1.04,
       "425000": 1.02,
-      "450000": 1.0,
+      "450000": 1,
       "475000": 0.98,
       "500000": 0.96
      },
@@ -2829,7 +2926,14 @@
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
    "stichtag": "01.01.2026",
    "kauffaelle_gesamt": 42,
-   "hinweis": "Stichprobenbeschreibung nach 6.2 VV EW-SW: 42 Kauffälle, Bodenrichtwert 11 bis 390 €/m², Grundstücksgröße 200 bis 1.293 m², Wohnfläche 58 bis 202 m²."
+   "hinweis": "Stichprobenbeschreibung nach 6.2 VV EW-SW: 42 Kauffälle, Bodenrichtwert 11 bis 390 €/m², Grundstücksgröße 200 bis 1.293 m², Wohnfläche 58 bis 202 m².",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Märkisch-Oderland, Modell zur Berechnung der Sachwerte für EFH, DHH, ZFH, RH, S. 71",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "x Bundesbaupreisindex Wohngebäude insgesamt, 2010 = 100",
+   "baupreisindex_seite": "GMB 2025 Märkisch-Oderland, Modell zur Berechnung der Sachwerte, S. 71",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Märkisch-Oderland, gestaffelt nach Bodenrichtwertniveau",
@@ -3081,7 +3185,7 @@
       "150": 1.05,
       "175": 1.03,
       "200": 1.02,
-      "225": 1.0,
+      "225": 1,
       "250": 0.99,
       "275": 0.98,
       "300": 0.97,
@@ -3128,7 +3232,14 @@
     "Berliner Umland städtischer Bereich": "Y = 7E-07 x² - 0,0011 x + 1,2046   (R² = 0,1005)",
     "Berliner Umland ländlicher Bereich": "Y = -0,108 ln(x) + 1,5896          (R² = 0,0462)",
     "weiterer Metropolenraum": "Y = 3,502 x^-0,235                 (R² = 0,0617)"
-   }
+   },
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Oberhavel, Anlage 1 Modellansätze und -parameter Sachwertfaktoren, Seite 121 (Anlage 1 Blatt 1)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes 2020- Preisindex für den Neubau von Wohngebäuden (umbasiert auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Oberhavel, Anlage 1 Blatt 1, Seite 121",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Oberhavel, gegliedert in drei Regionen",
@@ -3284,7 +3395,14 @@
    "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
    "bezeichnung": "SW23",
    "stichtag": "01.07.2024",
-   "hinweis": "Der vollständige Modellansatz steht im Anhang des Berichts (Abschnitt IV, S. 140)."
+   "hinweis": "Der vollständige Modellansatz steht im Anhang des Berichts (Abschnitt IV, S. 140).",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND) nach § 4 Abs. 2 bzw. Anlage 1 ImmoWertV: Einfamilienhäuser: 80 Jahre",
+   "gnd_seite": "GMB 2025 Oder-Spree/Frankfurt (Oder), IV. Ermittlung von Sachwertfaktoren, S. 141",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des statistischen Bundesamtes 2021 - Preisindex für den Neubau von Wohngebäuden (Umbasierung auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Oder-Spree/Frankfurt (Oder), IV. Ermittlung von Sachwertfaktoren, S. 140",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Oder-Spree. Die Stadt Frankfurt (Oder) gehört zum selben Gutachterausschuss, ist hier aber NICHT erfasst: der Bericht weist die Stichprobe ausdrücklich für den Landkreis aus.",
@@ -3444,7 +3562,14 @@
    "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
    "bezeichnung": "SW23",
    "stichtag": "01.07.2024",
-   "kauffaelle_gesamt": 43
+   "kauffaelle_gesamt": 43,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND) nach § 4 Abs. 2 bzw. Anlage 1 ImmoWertV: Einfamilienhäuser: 80 Jahre",
+   "gnd_seite": "GMB 2025 Oder-Spree/Frankfurt (Oder), IV. Ermittlung von Sachwertfaktoren, S. 141",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des statistischen Bundesamtes 2021 - Preisindex für den Neubau von Wohngebäuden (Umbasierung auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Oder-Spree/Frankfurt (Oder), IV. Ermittlung von Sachwertfaktoren, S. 140",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Oder-Spree",
@@ -3572,7 +3697,7 @@
     },
     "doerfer": {
      "form": "konstante",
-     "wert": 1.0,
+     "wert": 1,
      "rundung_stellen": 2,
      "liefert": "faktor",
      "hinweis": "95 Kauffälle 2025 — die mit Abstand größte der drei Stichproben."
@@ -3588,7 +3713,14 @@
    "modellgrundlage": "ImmoWertV 2021 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
    "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
    "ermittlung": "arithmetisches Mittel je Lagetyp und Jahrgang aus Verträgen, die nicht älter als drei Jahre sind",
-   "kauffaelle_gesamt": 154
+   "kauffaelle_gesamt": 154,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Ostprignitz-Ruppin, 13.3 Modellansätze und -parameter Sachwertfaktoren, Druck-S. 72 (PDF-S. 80)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes 2020 – Preisindex für den Neubau von Wohngebäuden (Basis: 2010=100)",
+   "baupreisindex_seite": "GMB 2025 Ostprignitz-Ruppin, 13.3, Druck-S. 72 (PDF-S. 80)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Ostprignitz-Ruppin, drei Lagetypen",
@@ -3731,7 +3863,14 @@
   "modellansaetze": {
    "modellgrundlage": "ImmoWertV 2021 und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) vom 03.05.2023",
    "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
-   "kauffaelle_gesamt": 73
+   "kauffaelle_gesamt": 73,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Ostprignitz-Ruppin, 13.3 Modellansätze und -parameter Sachwertfaktoren, Druck-S. 72 (PDF-S. 80)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes 2020 – Preisindex für den Neubau von Wohngebäuden (Basis: 2010=100)",
+   "baupreisindex_seite": "GMB 2025 Ostprignitz-Ruppin, 13.3, Druck-S. 72 (PDF-S. 80)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Ostprignitz-Ruppin, drei Lagetypen",
@@ -3873,7 +4012,7 @@
         "650000": 1.04,
         "700000": 1.03,
         "750000": 1.01,
-        "800000": 1.0,
+        "800000": 1,
         "850000": 0.99,
         "900000": 0.96,
         "950000": 0.95,
@@ -4008,7 +4147,14 @@
    "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
    "kauffaelle_gesamt": 146,
-   "besonderheit": "Der Bericht weist für zwei Bereiche zusätzliche signifikante Abhängigkeiten aus: im Berliner Umland bis 500 €/m² zur RESTNUTZUNGSDAUER (R = 0,33, Faktoren 0,96 bis 1,16 bei 21 bis 74 Jahren), ab 550 €/m² zur HÖHE DES BODENRICHTWERTS (R = 0,30, Faktoren 1,02 bis 1,14 bei 550 bis 950 €/m²). Diese zweiten Abhängigkeiten sind hier NICHT abgebildet — der Bericht druckt dafür keine Tabelle ab, nur den Befund."
+   "besonderheit": "Der Bericht weist für zwei Bereiche zusätzliche signifikante Abhängigkeiten aus: im Berliner Umland bis 500 €/m² zur RESTNUTZUNGSDAUER (R = 0,33, Faktoren 0,96 bis 1,16 bei 21 bis 74 Jahren), ab 550 €/m² zur HÖHE DES BODENRICHTWERTS (R = 0,30, Faktoren 1,02 bis 1,14 bei 550 bis 950 €/m²). Diese zweiten Abhängigkeiten sind hier NICHT abgebildet — der Bericht druckt dafür keine Tabelle ab, nur den Befund.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): nach Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Potsdam-Mittelmark, Anlage 4 Hinweise und Berechnungsansatz von Sachwertfaktoren, Druck-S. 106 (PDF-S. 114)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes – Preisindex für den Neubau von Wohngebäuden (2015=100) zum Zeitpunkt der Auswertung",
+   "baupreisindex_seite": "GMB 2025 Potsdam-Mittelmark, Anlage 4, Druck-S. 106 (PDF-S. 114)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Potsdam-Mittelmark, zwei Regionen mit je zwei Bodenrichtwertbereichen",
@@ -4238,7 +4384,14 @@
   "modellansaetze": {
    "modellgrundlage": "ImmoWertV und Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
-   "kauffaelle_gesamt": 67
+   "kauffaelle_gesamt": 67,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): nach Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Potsdam-Mittelmark, Anlage 4 Hinweise und Berechnungsansatz von Sachwertfaktoren, Druck-S. 106 (PDF-S. 114)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes – Preisindex für den Neubau von Wohngebäuden (2015=100) zum Zeitpunkt der Auswertung",
+   "baupreisindex_seite": "GMB 2025 Potsdam-Mittelmark, Anlage 4, Druck-S. 106 (PDF-S. 114)",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Potsdam-Mittelmark, Berliner Umland mit zwei Bodenrichtwertbereichen, weiterer Metropolenraum",
@@ -4341,7 +4494,7 @@
      "1.9": 0.81,
      "2.1": 0.88,
      "2.3": 0.94,
-     "2.5": 1.0,
+     "2.5": 1,
      "2.7": 1.05,
      "2.9": 1.1,
      "3.1": 1.15,
@@ -4361,7 +4514,14 @@
    "bestimmtheitsmass": 0.29,
    "kauffaelle_gesamt": 218,
    "kauffaelle_bereinigt": 210,
-   "hinweis": "Die Modellansätze stehen in Anhang 13.5 und sind laut Bericht bei der Verkehrswertermittlung ZWINGEND anzusetzen (Modellkonformität). Keine Innenbesichtigung; Angaben der Käufer über Fragebogen nach § 197 BauGB, Gebäude von außen fotografiert."
+   "hinweis": "Die Modellansätze stehen in Anhang 13.5 und sind laut Bericht bei der Verkehrswertermittlung ZWINGEND anzusetzen (Modellkonformität). Keine Innenbesichtigung; Angaben der Käufer über Fragebogen nach § 197 BauGB, Gebäude von außen fotografiert.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Prignitz, 13.5 Modellbeschreibung für Sachwertfaktoren, S. 93",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindizes für die Bauwirtschaft des Statistischen Bundesamts [https://www-genesis.destatis.de/] – Baupreisindex für den Neubau von Wohngebäuden (Umbasierung auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Prignitz, 13.5, S. 93",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Prignitz",
@@ -4456,7 +4616,7 @@
      "1.8": 0.83,
      "2.0": 0.89,
      "2.2": 0.95,
-     "2.4": 1.0,
+     "2.4": 1,
      "2.6": 1.05,
      "2.8": 1.09,
      "3.0": 1.13,
@@ -4471,7 +4631,14 @@
    "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / vorläufiger Sachwert",
    "ermittlung": "multiple Regressionsanalyse; Restnutzungsdauer, Bodenrichtwertniveau und Baujahr wurden geprüft und ausgeschlossen",
    "bestimmtheitsmass": 0.23,
-   "kauffaelle_bereinigt": 134
+   "kauffaelle_bereinigt": 134,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Prignitz, 13.5 Modellbeschreibung für Sachwertfaktoren, S. 93",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindizes für die Bauwirtschaft des Statistischen Bundesamts [https://www-genesis.destatis.de/] – Baupreisindex für den Neubau von Wohngebäuden (Umbasierung auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Prignitz, 13.5, S. 93",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Prignitz",
@@ -4544,7 +4711,7 @@
     },
     {
      "von": 3.5,
-     "bis": 5.0,
+     "bis": 5,
      "kategorie": "4"
     }
    ],
@@ -4563,7 +4730,7 @@
      {
       "von": 21,
       "bis": 100,
-      "wert": 1.0,
+      "wert": 1,
       "bez": "21–100 €/m²",
       "fallzahl": 5,
       "min": 0.82,
@@ -4675,7 +4842,14 @@
    "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
    "geltung": "typische Eigenheimgrundstücke: freistehende Einfamilienhäuser, Doppelhaushälften und Reihenhäuser",
-   "bgf": "Brutto-Grundfläche in Anlehnung an DIN 277 (1987), alle Grundrissebenen"
+   "bgf": "Brutto-Grundfläche in Anlehnung an DIN 277 (1987), alle Grundrissebenen",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Teltow-Fläming, Anhang A1.5 Tabelle 74 Modell zur Ableitung von Sachwertfaktoren, Seite 112",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Entsprechend 5.3.5 VV EW-SW — VV EW-SW Nr. 5.3.5 (bravors.brandenburg.de/verwaltungsvorschriften/vv_ew_sw, gelesen 03.11.2026): „Als Baupreisindex ist der zum Wertermittlungsstichtag aktuelle Preisindex für den Neubau von Wohngebäuden aus den Indexreihen für die Bauwirtschaft des Statistischen Bundesamts zu verwenden.“",
+   "baupreisindex_seite": "GMB 2025 Teltow-Fläming, Anhang A1.5 Tabelle 74, Seite 113",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Teltow-Fläming",
@@ -4762,7 +4936,7 @@
     },
     {
      "von": 3.5,
-     "bis": 5.0,
+     "bis": 5,
      "kategorie": "4"
     }
    ],
@@ -4857,7 +5031,14 @@
    "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
    "bgf": "Brutto-Grundfläche in Anlehnung an DIN 277 (1987), alle Grundrissebenen",
-   "kauffaelle_gesamt": 66
+   "kauffaelle_gesamt": 66,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Teltow-Fläming, Anhang A1.5 Tabelle 74 Modell zur Ableitung von Sachwertfaktoren, Seite 112",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Entsprechend 5.3.5 VV EW-SW — VV EW-SW Nr. 5.3.5 (bravors.brandenburg.de/verwaltungsvorschriften/vv_ew_sw, gelesen 03.11.2026): „Als Baupreisindex ist der zum Wertermittlungsstichtag aktuelle Preisindex für den Neubau von Wohngebäuden aus den Indexreihen für die Bauwirtschaft des Statistischen Bundesamts zu verwenden.“",
+   "baupreisindex_seite": "GMB 2025 Teltow-Fläming, Anhang A1.5 Tabelle 74, Seite 113",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Teltow-Fläming",
@@ -4944,7 +5125,7 @@
     },
     {
      "von": 3.5,
-     "bis": 5.0,
+     "bis": 5,
      "kategorie": "4"
     }
    ],
@@ -5011,7 +5192,14 @@
   "modellansaetze": {
    "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg",
    "berechnungsmodell": "Sachwertfaktor = (Kaufpreis ± boG) / vorläufiger Sachwert",
-   "kauffaelle_gesamt": 24
+   "kauffaelle_gesamt": 24,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (Anlage 1 ImmoWertV: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre)",
+   "gnd_seite": "GMB 2025 Teltow-Fläming, Anhang A1.5 Tabelle 74 Modell zur Ableitung von Sachwertfaktoren, Seite 112",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Entsprechend 5.3.5 VV EW-SW — VV EW-SW Nr. 5.3.5 (bravors.brandenburg.de/verwaltungsvorschriften/vv_ew_sw, gelesen 03.11.2026): „Als Baupreisindex ist der zum Wertermittlungsstichtag aktuelle Preisindex für den Neubau von Wohngebäuden aus den Indexreihen für die Bauwirtschaft des Statistischen Bundesamts zu verwenden.“",
+   "baupreisindex_seite": "GMB 2025 Teltow-Fläming, Anhang A1.5 Tabelle 74, Seite 113",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Teltow-Fläming",
@@ -5075,66 +5263,251 @@
   "kennzahl": "sachwertfaktor",
   "zweig": "ezfh",
   "formel": {
-   "form": "potenz",
-   "achse_feld": "sachwert",
-   "achse_bez": "vorläufiger Sachwert in Euro",
-   "a": 21.252,
-   "b": -0.249,
-   "gueltig_von": 75000,
-   "gueltig_bis": 650000,
-   "bedingungen": [
+   "form": "verzweigt",
+   "liefert": "faktor",
+   "achse_k_feld": "brw_klasse",
+   "achse_k_bez": "Bodenrichtwertbereich (Kap. 8.2.2: Regionen mit Bodenrichtwertniveau <= 30 EUR/m² und über 30 EUR/m²)",
+   "kategorien": [
+    "bis_30",
+    "ueber_30"
+   ],
+   "zuordnung_feld": "brw",
+   "kategorie_baender": [
     {
-     "feld": "brw",
-     "groesser_als": 30,
-     "bez": "Bodenrichtwert",
-     "text": "über 30 €/m² liegt"
+     "von": null,
+     "bis": 30,
+     "kategorie": "bis_30"
+    },
+    {
+     "von": 30.01,
+     "bis": null,
+     "kategorie": "ueber_30"
     }
    ],
-   "rundung_stellen": 2,
-   "liefert": "faktor",
-   "hinweis": "DIE FUNKTION IST ABGEDRUCKT, die Tabelle ist ihr Ergebnis. y = 21,252 · x^-0,249 (R² = 0,1987). Alle 16 Stützstellen der Tabelle 28 nachgerechnet und zeichengleich (nach der Rundungskorrektur v1103-WRND: davor lag die Maschine bei 350.000 € auf 0,89 statt der abgedruckten 0,88, weil zweimal gerundet wurde) — deshalb ist hier die Funktion geführt und nicht die Tabelle: sie rechnet auch zwischen den abgedruckten Stützstellen richtig, statt linear zu interpolieren.",
-   "normobjekt": "Modellansätze nach VV EW-SW Land Brandenburg."
+   "modell_je_kategorie": {
+    "bis_30": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 19.219,
+     "b": -0.245,
+     "gueltig_von": 75000,
+     "gueltig_bis": 650000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Abbildung 40, S. 57: y = 19,219x^-0,245, R² = 0,211; 92 Kauffälle 2025, Bodenrichtwert 6–30 EUR/m². Tabelle 27 (S. 57–58) ist das Ergebnis dieser Funktion, 17 Stützstellen 75.000–650.000 EUR."
+    },
+    "ueber_30": {
+     "form": "potenz",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "a": 21.252,
+     "b": -0.249,
+     "gueltig_von": 75000,
+     "gueltig_bis": 650000,
+     "rundung_stellen": 2,
+     "liefert": "faktor",
+     "hinweis": "Abbildung 42, S. 59: y = 21,252x^-0,249, R² = 0,1987; 61 Kauffälle 2025, Bodenrichtwert 35–120 EUR/m². Tabelle 28 (S. 59) ist das Ergebnis dieser Funktion, 16 Stützstellen 75.000–650.000 EUR."
+    }
+   },
+   "hinweis": "Zwei amtliche Regressionsfunktionen je Bodenrichtwertbereich; die Tabellen 27 und 28 sind ihr gerundetes Ergebnis. Zwischen den Bereichen wird nicht gemittelt. Außerhalb 75.000–650.000 EUR vorläufigem Sachwert hat der Ausschuss nach eigener Aussage kein ausreichendes Datenmaterial (S. 54) — keine Extrapolation."
   },
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021, § 21 Abs. 1 f.",
    "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
-   "funktion": "y = 21,252 · x^-0,249, R² = 0,1987"
+   "funktion": "BRW <= 30 EUR/m²: y = 19,219 · x^-0,245 (R² = 0,211); BRW > 30 EUR/m²: y = 21,252 · x^-0,249 (R² = 0,1987)",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (80 Jahre)",
+   "gnd_seite": "GMB 2025 Uckermark, Abbildung 38 Modellansätze und Modellparameter für die Ermittlung von Sachwertfaktoren, S. 55",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2020 – Preisindex für den Neubau von Wohngebäuden (Umbasierung auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Uckermark, Abbildung 38, S. 55",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 am Bericht: das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag), in Brandenburg zusätzlich VV EW-SW Nr. 5.3.5 („zum Wertermittlungsstichtag aktuelle Preisindex“)."
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Uckermark",
-   "sachlich": "Ein- und Zweifamilienhäuser, NUR bei einem Bodenrichtwert über 30 €/m²",
+   "sachlich": "freistehende Ein- und Zweifamilienhäuser, getrennt nach Bodenrichtwert <= 30 EUR/m² (92 Kauffälle) und > 30 EUR/m² (61 Kauffälle), Verkäufe 2025",
    "extrapolation": "gesperrt",
    "spannen": {
     "sachwert_eur": {
      "min": 75000,
      "max": 650000
     },
-    "brw_eur_qm": {
-     "min": 31,
-     "max": null
+    "brw_bis_30_eur_qm": {
+     "min": 6,
+     "max": 30
+    },
+    "brw_ueber_30_eur_qm": {
+     "min": 35,
+     "max": 120
     }
    },
-   "vorbehalt": "ZWEI GRENZEN, DIE BEIDE GELTEN.\n\n(1) DER BODENRICHTWERT MUSS ÜBER 30 €/m² LIEGEN. Der Bericht führt diese Auswertung ausdrücklich nur für dieses Segment; für Grundstücke mit 30 €/m² oder darunter gilt sie NICHT. Der Auswerter prüft das nicht — die Form `potenz` kennt nur eine Achse. Wer für ein Objekt mit niedrigerem Bodenrichtwert rechnet, verlässt den Anwendungsbereich, ohne dass es auffällt. DAS IST DIE WICHTIGSTE OFFENE STELLE DIESES REZEPTS.\n\n(2) Die Stichprobe reicht von 75.000 bis 650.000 € vorläufigem Sachwert; darüber und darunter ist die Extrapolation gesperrt.\n\nDas Bestimmtheitsmaß liegt bei 0,1987 — das Modell erklärt rund ein Fünftel der Streuung. Der Faktor ist eine Orientierung, keine Punktlandung.",
+   "vorbehalt": "Zwei Funktionen, ausgewählt über den Bodenrichtwert (<= 30 / > 30 EUR/m²); ohne Bodenrichtwert kein Wert. Vorläufiger Sachwert 75.000–650.000 EUR, außerhalb hat der Ausschuss „kein ausreichendes Datenmaterial“ (S. 54) — keine Extrapolation. Bestimmtheitsmaß 0,211 bzw. 0,1987: Orientierung, keine Punktlandung.",
    "hinweis": "Der Bericht führt zusätzlich eine Tabelle 29 „Ein- und Zweifamilienhäuser nach Baujahr und Standardstufe\" (S. 60) — sie ist hier nicht ausgewertet und könnte eine Verfeinerung tragen."
   },
   "belege": [
-   "Grundstücksmarktbericht 2025 Landkreis Uckermark, Abbildung 42 (Funktion y = 21,252x^-0,249, R² = 0,1987) und Tabelle 28, S. 59: 16 Stützstellen von 75.000 bis 650.000 € vorläufigem Sachwert, alle 16 gegen den Auswerter geprüft."
+   "Grundstücksmarktbericht 2025 Landkreis Uckermark (Berichtszeitraum 01.01.–31.12.2025, veröffentlicht April 2026), Abbildung 40 (y = 19,219x^-0,245, R² = 0,211) und Tabelle 27, S. 57–58: 17 Stützstellen 75.000–650.000 EUR, alle 17 mit der echten Funktion (swf_modelle.auswerten) nachgerechnet und zeichengleich (03.11.2026).",
+   "Grundstücksmarktbericht 2025 Landkreis Uckermark, Abbildung 42 (y = 21,252x^-0,249, R² = 0,1987) und Tabelle 28, S. 59: 16 Stützstellen, geprüft v1103-WRND; Stichprobe S. 56 bzw. 58."
   ],
   "stufe": "C",
-  "stufe_grund": "Amtliche Funktion, an acht Stützstellen gegen die abgedruckte Tabelle geprüft und zeichengleich. Stufe C, weil das Bestimmtheitsmaß bei 0,1987 liegt und die Bodenrichtwert-Grenze (über 30 €/m²) vom Auswerter nicht geprüft werden kann.",
+  "stufe_grund": "Amtliche Funktionen je Bodenrichtwertbereich, gegen beide abgedruckten Tabellen geprüft (17 + 16 Stützstellen zeichengleich). Stufe C wegen des niedrigen Bestimmtheitsmaßes (0,21 / 0,20).",
   "fallzahl": null,
   "streuung": null,
-  "stichtag": "2026-01-01",
+  "stichtag": "2025-07-01",
   "berichtsjahr": 2025,
   "modellversion": "GMB 2025",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf",
-  "quelle_parser": "v1084-WREZ",
+  "quelle_parser": "v1084-WREZ; 03.11.2026 um den Bereich BRW <= 30 EUR/m² ergänzt (pdftotext S. 54–59)",
   "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
   "lizenz": "dl-de/by-2-0",
   "verwendung": "produkt",
   "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
-  "fundstelle": "Abbildung 42 und Tabelle 28, S. 59. Modellgrundlage: VV EW-SW Land Brandenburg"
+  "fundstelle": "Kap. 8.2.2, Abbildungen 38–42, Tabellen 27 und 28, S. 54–59. Modellgrundlage: VV EW-SW Land Brandenburg",
+  "stichtag_hinweis": "Stichtag (Auswertungszeitraum) 01.07.2025 (01.01.2025 – 31.12.2025), Abbildungen 39 und 41, S. 56/58. Bis 03.11.2026 stand hier 2026-01-01.",
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 200000,
+    "brw": 15
+   },
+   "soll": 0.97,
+   "quelle": "Tabelle 27, S. 57 (200.000 EUR, BRW <= 30)",
+   "ist": 0.97,
+   "ergebnis": "getroffen"
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12073",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "baender_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "baender": [
+    {
+     "von": 75000,
+     "bis": 100000,
+     "wert": 1.07,
+     "min": 0.76,
+     "max": 1.31,
+     "fallzahl": 8,
+     "bez": "75.000–100.000"
+    },
+    {
+     "von": 100000.01,
+     "bis": 150000,
+     "wert": 0.83,
+     "min": 0.61,
+     "max": 1.18,
+     "fallzahl": 14,
+     "bez": ">100.000–150.000"
+    },
+    {
+     "von": 150000.01,
+     "bis": 200000,
+     "wert": 0.93,
+     "min": 0.62,
+     "max": 1.3,
+     "fallzahl": 13,
+     "bez": ">150.000–200.000"
+    },
+    {
+     "von": 200000.01,
+     "bis": 300000,
+     "wert": 0.92,
+     "min": 0.73,
+     "max": 1.13,
+     "fallzahl": 12,
+     "bez": ">200.000–300.000"
+    },
+    {
+     "von": 300000.01,
+     "bis": 500000,
+     "wert": 0.86,
+     "min": 0.72,
+     "max": 1.09,
+     "fallzahl": 7,
+     "bez": ">300.000–500.000"
+    }
+   ],
+   "hinweis": "Abbildung 47, S. 65: Mittelwerte des Sachwertfaktors je Klasse des vorläufigen Sachwerts mit Spanne und Fallzahl (54 Kauffälle 2025). Klassenmittel, keine Funktion — zwischen den Klassen wird nicht interpoliert, außerhalb 75.000–500.000 EUR kein Wert."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW) Land Brandenburg vom 03.05.2023",
+   "verfahren": "Sachwertverfahren nach ImmoWertV 2021; Modell wie Kap. 8.2.2 (Abbildung 38)",
+   "berechnungsmodell": "Sachwertfaktor = normierter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer: entsprechend Anlage 1 ImmoWertV (80 Jahre)",
+   "gnd_seite": "GMB 2025 Uckermark, Abbildung 38 Modellansätze und Modellparameter für die Ermittlung von Sachwertfaktoren, S. 55 (gilt nach S. 64 auch für Reihenhäuser und Doppelhaushälften)",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2020 – Preisindex für den Neubau von Wohngebäuden (Umbasierung auf 2010)",
+   "baupreisindex_seite": "GMB 2025 Uckermark, Abbildung 38, S. 55",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV, VV EW-SW Nr. 5.3.5.",
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschal 4 % des vorläufigen Hauptgebäudesachwerts"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Uckermark",
+   "sachlich": "Reihenhäuser und Doppelhaushälften, Verkäufe 2025 (54 Kauffälle), Bodenrichtwert 6–100 EUR/m², Restnutzungsdauer 18–80 Jahre",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ],
+   "extrapolation": "gesperrt (Klassen 75.000–500.000 EUR vorläufiger Sachwert)",
+   "interpolation": "keine (Klassenmittel)",
+   "vorbehalt": "Klassenmittel aus 7 bis 14 Fällen mit breiten Spannen (z. B. 0,61–1,18); der Faktor ist eine Orientierung. Der Ausschuss druckt keine Funktion — deshalb kein Ausgleich zwischen den Klassen."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Uckermark, Kap. 8.3.2, Abbildung 47, S. 65 (Stichprobe Abbildung 46, S. 65)",
+    "wortlaut": "75.000-100.000: 1,07 (0,76-1,31, 8 Kauffälle) · >100.000-150.000: 0,83 (0,61-1,18, 14) · >150.000-200.000: 0,93 (0,62-1,30, 13) · >200.000-300.000: 0,92 (0,73-1,13, 12) · >300.000-500.000: 0,86 (0,72-1,09, 7)"
+   },
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 8.3.2, S. 64–65",
+    "wortlaut": "Fallzahlen 8+14+13+12+7 = 54 = „Die Stichprobe umfasst 54 Kauffälle“ (S. 64)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 250000
+   },
+   "soll": 0.92,
+   "quelle": "Abbildung 47, S. 65 (Klasse >200.000–300.000, abgedruckter Mittelwert)",
+   "ist": 0.92,
+   "ergebnis": "getroffen"
+  },
+  "stufe": "C",
+  "stufe_grund": "Amtliche Klassenmittel aus dem Bericht, am gerenderten Diagramm abgelesen (Datenbeschriftungen) und gegen die Textschicht geprüft; Stufe C wegen kleiner Fallzahlen je Klasse.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf",
+  "quelle_parser": "hand 03.11.2026 (pdftotext + pdftoppm S. 65)",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_beleg": "Impressum S. 3: „Für den Grundstücksmarktbericht gilt die Lizenz Datenlizenz Deutschland – Namensnennung – Version 2.0“; Gebühr: kostenfrei im automatisierten Abrufverfahren.",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.3.2, Abbildung 47, S. 65"
  }
 ]

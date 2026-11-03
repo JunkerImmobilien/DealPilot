@@ -60,7 +60,11 @@
    "bodenwert": "objektspezifisch angepasster Bodenrichtwert mittels Umrechnungskoeffizienten, Stand 01.01.2024",
    "kauffaelle_gesamt": 263,
    "bestimmtheitsmass": 0.28,
-   "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen."
+   "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise ausgewiesene Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2021 – Preisindex für den Neubau von Wohngebäuden",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Landeshauptstadt Dresden, Kap. 7 Erforderliche Daten, Modellparameter Sachwertfaktoren, PDF-S. 76",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {
    "raeumlich": "Landeshauptstadt Dresden",
@@ -174,7 +178,11 @@
    "bodenwert": "objektspezifisch angepasster Bodenrichtwert mittels Umrechnungskoeffizienten, Stand 01.01.2024",
    "kauffaelle_gesamt": 263,
    "bestimmtheitsmass": 0.28,
-   "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen."
+   "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise ausgewiesene Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2021 – Preisindex für den Neubau von Wohngebäuden",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Landeshauptstadt Dresden, Kap. 7 Erforderliche Daten, Modellparameter Sachwertfaktoren, PDF-S. 76",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {
    "raeumlich": "Landeshauptstadt Dresden",
@@ -288,7 +296,11 @@
    "bodenwert": "objektspezifisch angepasster Bodenrichtwert mittels Umrechnungskoeffizienten, Stand 01.01.2024",
    "kauffaelle_gesamt": 263,
    "bestimmtheitsmass": 0.28,
-   "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen."
+   "besonderheit": "Die Kaufpreise sind um Garagengebäude, Carports und weitere Nebengebäude bereinigt (mit NHK ermittelt); im Wohngebäude integrierte Garagen tragen den Wertansatz des Wohngebäudes. Nicht überdachte Stellplätze stecken im Ansatz der Außenanlagen.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise ausgewiesene Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2021 – Preisindex für den Neubau von Wohngebäuden",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Landeshauptstadt Dresden, Kap. 7 Erforderliche Daten, Modellparameter Sachwertfaktoren, PDF-S. 76",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {
    "raeumlich": "Landeshauptstadt Dresden",

@@ -1,17 +1,17 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-11-03T09:04:44.271Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-11-03T09:16:04.839Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
  "stand": "2026-11-03",
- "erzeugt": "2026-11-03T09:04:44.271Z",
- "register_commit": "01c21d6c",
+ "erzeugt": "2026-11-03T09:16:04.839Z",
+ "register_commit": "95550954",
  "register_lokal_geaendert": true,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
  "dateien": 144,
- "saetze": 18317,
+ "saetze": 18318,
  "kopf": {
-  "werte_gesamt": 6186,
+  "werte_gesamt": 6187,
   "lzs": 2505,
-  "swf": 845,
+  "swf": 846,
   "uk_flaeche": 162,
   "uk_wgfz": 115,
   "vgf": 1389,
@@ -24,11 +24,11 @@ window.DPS_REGISTER = {
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 6186,
-  "mit_ausschuss": 6186,
-  "mit_jahrgang": 6186,
-  "mit_quelle": 6186,
-  "mit_seite": 6185
+  "werte": 6187,
+  "mit_ausschuss": 6187,
+  "mit_jahrgang": 6187,
+  "mit_quelle": 6187,
+  "mit_seite": 6186
  },
  "jahrgaenge": [
   2018,
@@ -279,13 +279,13 @@ window.DPS_REGISTER = {
   },
   "BB": {
    "name": "Brandenburg",
-   "werte": 285,
+   "werte": 286,
    "lzs": {
     "w": 100,
     "anteil": 0.88
    },
    "swf": {
-    "w": 36,
+    "w": 37,
     "anteil": 0.67
    },
    "uk_flaeche": {

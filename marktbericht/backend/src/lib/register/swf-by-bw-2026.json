@@ -43,7 +43,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -135,7 +139,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -227,7 +235,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -319,7 +331,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -411,7 +427,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -503,7 +523,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -595,7 +619,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -687,7 +715,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -779,7 +811,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -871,7 +907,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -963,7 +1003,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1055,7 +1099,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1143,7 +1191,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1231,7 +1283,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1319,7 +1375,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1407,7 +1467,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1495,7 +1559,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1583,7 +1651,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1671,7 +1743,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1759,7 +1835,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1847,7 +1927,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -1935,7 +2019,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2023,7 +2111,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2111,7 +2203,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2200,7 +2296,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2289,7 +2389,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2378,7 +2482,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2467,7 +2575,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2556,7 +2668,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2645,7 +2761,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2734,7 +2854,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2823,7 +2947,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -2912,7 +3040,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -3001,7 +3133,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -3090,7 +3226,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",
@@ -3179,7 +3319,11 @@
    "baupreisindex": null,
    "baupreisindex_hinweis": "Das Blatt nennt den Baupreisindex NICHT. § 36 Abs. 2 ImmoWertV verlangt ihn fuer die NHK 2010; mit welchem Index der vorlaeufige Sachwert gebildet wurde, ist dem Dokument nicht zu entnehmen.",
    "aussenanlagen": null,
-   "alterswertminderung": null
+   "alterswertminderung": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Ansatz der Normalherstellungskosten entsprechend NHK 2010 Anlage 4 ImmoWertV",
+   "baupreisindex_seite": "Gemeinsamer Gutachterausschuss Hegau-Hochrhein, Sachwertfaktoren 2025 (Stichtag 01.01.2025), „Modellparameter Sachwertfaktoren 2025“, PDF-S. 2",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026."
   },
   "geltungsbereich": {
    "raeumlich": "Singen (Hohentwiel), Aach, Büsingen am Hochrhein, Engen, Gailingen am Hochrhein, Gottmadingen, Hilzingen, Mühlhausen-Ehingen, Rielasingen-Worblingen, Steißlingen, Tengen, Volkertshausen (Landkreis Konstanz)",

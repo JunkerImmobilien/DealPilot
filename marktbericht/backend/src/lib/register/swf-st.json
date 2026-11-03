@@ -189,8 +189,16 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0,
-   "kauffaelle_gesamt": 551
+   "regionalfaktor": 1,
+   "kauffaelle_gesamt": 551,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -441,8 +449,16 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0,
-   "kauffaelle_gesamt": 551
+   "regionalfaktor": 1,
+   "kauffaelle_gesamt": 551,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -693,8 +709,16 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0,
-   "kauffaelle_gesamt": 551
+   "regionalfaktor": 1,
+   "kauffaelle_gesamt": 551,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -945,8 +969,16 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0,
-   "kauffaelle_gesamt": 551
+   "regionalfaktor": 1,
+   "kauffaelle_gesamt": 551,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -1156,7 +1188,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "kauffaelle_gesamt": 478
+   "kauffaelle_gesamt": 478,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -1354,7 +1394,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "kauffaelle_gesamt": 478
+   "kauffaelle_gesamt": 478,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -1552,7 +1600,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "kauffaelle_gesamt": 478
+   "kauffaelle_gesamt": 478,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -1750,7 +1806,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "kauffaelle_gesamt": 478
+   "kauffaelle_gesamt": 478,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Dessau-Roßlau, Landkreise Anhalt-Bitterfeld, Wittenberg und Jerichower Land, OHNE die Großstadtrandlage von Magdeburg",
@@ -1910,7 +1974,7 @@
        "exponent": -1.88,
        "gueltig": [
         2.6,
-        4.0
+        4
        ]
       }
      ],
@@ -1962,9 +2026,17 @@
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
    "nhk": "NHK 2010 gemäß Anlage 4 ImmoWertV",
    "bgf": "Brutto-Grundfläche gemäß Anlage 4 ImmoWertV, aus den Außenmaßen der Gebäude auf Basis amtlicher Geobasisdaten",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "baupreisindex": "Baupreisindex der jeweiligen Gebäudeart, Basisjahr 2010=100, Deutschland insgesamt",
-   "besonderheit": "Die Modernisierungspunkte sind nach einer eigenen Tabelle vergeben, und zurückliegende Maßnahmen werden im Verhältnis Alter der Maßnahme zu Wirkungsdauer abgewertet (Dach 40 Jahre, Fenster 30, Leitungen 35, Heizung 20, Wärmedämmung 30, Bäder 20, Innenausbau 25). Wer die RND nach der reinen Anlage 2 ermittelt, rechnet mit einer anderen Grundlage."
+   "besonderheit": "Die Modernisierungspunkte sind nach einer eigenen Tabelle vergeben, und zurückliegende Maßnahmen werden im Verhältnis Alter der Maßnahme zu Wirkungsdauer abgewertet (Dach 40 Jahre, Fenster 30, Leitungen 35, Heizung 20, Wärmedämmung 30, Bäder 20, Innenausbau 25). Wer die RND nach der reinen Anlage 2 ermittelt, rechnet mit einer anderen Grundlage.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Halle (Saale)",
@@ -1997,7 +2069,7 @@
     },
     "standardstufe_ab_1991": {
      "min": 2.6,
-     "max": 4.0
+     "max": 4
     }
    },
    "vorbehalt": "DIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Der Bericht sagt es für beide Gleichungen ausdrücklich: vorläufiger Sachwert und Wohnfläche korrelieren mit 0,60 (vor 1991), vorläufiger Sachwert und Gebäudestandard mit 0,63 (ab 1991). Eine Größe zu verändern und die anderen festzuhalten, führt aus dem Modell heraus.\n\nDIE GLEICHUNG GILT NUR INNERHALB IHRER SPANNEN. Jedes Glied führt sein Minimum und Maximum mit; liegt ein Merkmal außerhalb, wird nicht gerechnet. Das ist strenger als eine Tabelle mit Randwerten — bei einer Regression mit negativen Exponenten wächst der Fehler außerhalb der Stichprobe schnell.\n\nDER MITTLERE ABSOLUTE PROZENTUALE FEHLER wird in den Berichten je Region angegeben; er liegt im Bereich von zehn Prozent.\n\nEINE KAUFPREISBEREINIGUNG hat der Ausschuss nur für Kamin (2.000 €), Wintergarten (1.000 €/m²), Photovoltaik (150 €/m² Anlagenfläche), ab der dritten Garage (2.000 €) und ausgewiesene Einbauküchen vorgenommen. Wer andere besondere objektspezifische Merkmale im vorläufigen Sachwert lässt, rechnet modellfremd.",
@@ -2132,7 +2204,7 @@
        "exponent": -1.88,
        "gueltig": [
         2.6,
-        4.0
+        4
        ]
       }
      ],
@@ -2181,7 +2253,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "besonderheit": "Gemeinsame Regressionsanalyse mit den freistehenden Ein- und Zweifamilienhäusern; die Gebäudeart ist ohne Einfluss."
+   "besonderheit": "Gemeinsame Regressionsanalyse mit den freistehenden Ein- und Zweifamilienhäusern; die Gebäudeart ist ohne Einfluss.",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Halle (Saale)",
@@ -2334,8 +2414,16 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung „Modellparameter für die Ableitung von Sachwertfaktoren\" des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0,
-   "besonderheit": "Die Auswertung umfasst den Regionstyp Großstadt (Magdeburg) UND die Großstadtrandlage, einschließlich der Großstadtrandlage von Wolfsburg in Niedersachsen. Hier ist nur die Stadt Magdeburg hinterlegt; die Randlagen brauchen die Gemarkungszuordnung aus dem Blatt „Regionstypen\"."
+   "regionalfaktor": 1,
+   "besonderheit": "Die Auswertung umfasst den Regionstyp Großstadt (Magdeburg) UND die Großstadtrandlage, einschließlich der Großstadtrandlage von Wolfsburg in Niedersachsen. Hier ist nur die Stadt Magdeburg hinterlegt; die Randlagen brauchen die Gemarkungszuordnung aus dem Blatt „Regionstypen\".",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landeshauptstadt Magdeburg",
@@ -2439,7 +2527,7 @@
       {
        "feld": "sachwert",
        "bez": "vorläufiger Sachwert",
-       "koeffizient": -3.69e-06,
+       "koeffizient": -0.00000369,
        "exponent": 1,
        "gueltig": [
         62000,
@@ -2542,7 +2630,7 @@
       {
        "feld": "rnd",
        "bez": "Restnutzungsdauer (kubisch)",
-       "koeffizient": 1.242e-05,
+       "koeffizient": 0.00001242,
        "exponent": 3,
        "gueltig": [
         15,
@@ -2575,9 +2663,17 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "zeitanpassung": "Zeitmodellierung mit dem 641. Tag (01.01.2024) für das erste Halbjahr 2024, auf Empfehlung des Gutachterausschusses; Anwendbarkeit bis 01.07.2024 beschlossen.",
-   "kauffaelle_zentren": 71
+   "kauffaelle_zentren": 71,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Altmarkkreis Salzwedel und Landkreis Stendal",
@@ -2681,7 +2777,7 @@
       {
        "feld": "sachwert",
        "bez": "vorläufiger Sachwert",
-       "koeffizient": -3.69e-06,
+       "koeffizient": -0.00000369,
        "exponent": 1,
        "gueltig": [
         62000,
@@ -2784,7 +2880,7 @@
       {
        "feld": "rnd",
        "bez": "Restnutzungsdauer (kubisch)",
-       "koeffizient": 1.242e-05,
+       "koeffizient": 0.00001242,
        "exponent": 3,
        "gueltig": [
         15,
@@ -2817,9 +2913,17 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "zeitanpassung": "Zeitmodellierung mit dem 641. Tag (01.01.2024) für das erste Halbjahr 2024, auf Empfehlung des Gutachterausschusses; Anwendbarkeit bis 01.07.2024 beschlossen.",
-   "kauffaelle_zentren": 71
+   "kauffaelle_zentren": 71,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Altmarkkreis Salzwedel und Landkreis Stendal",
@@ -2905,7 +3009,7 @@
       {
        "feld": "sachwert",
        "bez": "vorläufiger Sachwert",
-       "koeffizient": -2.6e-06,
+       "koeffizient": -0.0000026,
        "exponent": 1,
        "gueltig": [
         32000,
@@ -2988,7 +3092,7 @@
        "exponent": 1,
        "gueltig": [
         2.1,
-        4.0
+        4
        ]
       }
      ],
@@ -3006,7 +3110,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0
+   "regionalfaktor": 1,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum und Dorf",
@@ -3043,7 +3155,7 @@
     },
     "standardstufe_ab_1991": {
      "min": 2.1,
-     "max": 4.0
+     "max": 4
     }
    },
    "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell."
@@ -3103,7 +3215,7 @@
       {
        "feld": "sachwert",
        "bez": "vorläufiger Sachwert",
-       "koeffizient": -2.6e-06,
+       "koeffizient": -0.0000026,
        "exponent": 1,
        "gueltig": [
         32000,
@@ -3186,7 +3298,7 @@
        "exponent": 1,
        "gueltig": [
         2.1,
-        4.0
+        4
        ]
       }
      ],
@@ -3204,7 +3316,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0
+   "regionalfaktor": 1,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde und Salzlandkreis, Regionstypen Mittelzentrum, Grundzentrum und Dorf",
@@ -3241,7 +3361,7 @@
     },
     "standardstufe_ab_1991": {
      "min": 2.1,
-     "max": 4.0
+     "max": 4
     }
    },
    "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell."
@@ -3279,7 +3399,7 @@
     {
      "feld": "sachwert",
      "bez": "vorläufiger Sachwert",
-     "koeffizient": -1.46e-06,
+     "koeffizient": -0.00000146,
      "exponent": 1,
      "gueltig": [
       39000,
@@ -3336,7 +3456,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
@@ -3400,7 +3528,7 @@
     {
      "feld": "sachwert",
      "bez": "vorläufiger Sachwert",
-     "koeffizient": -1.46e-06,
+     "koeffizient": -0.00000146,
      "exponent": 1,
      "gueltig": [
       39000,
@@ -3457,7 +3585,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
@@ -3521,7 +3657,7 @@
     {
      "feld": "sachwert",
      "bez": "vorläufiger Sachwert",
-     "koeffizient": -1.46e-06,
+     "koeffizient": -0.00000146,
      "exponent": 1,
      "gueltig": [
       39000,
@@ -3578,7 +3714,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
@@ -3642,7 +3786,7 @@
     {
      "feld": "sachwert",
      "bez": "vorläufiger Sachwert",
-     "koeffizient": -1.46e-06,
+     "koeffizient": -0.00000146,
      "exponent": 1,
      "gueltig": [
       39000,
@@ -3699,7 +3843,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
@@ -3876,7 +4028,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1
+   "regionalfaktor": 1,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Burgenlandkreis",
@@ -3992,7 +4152,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Burgenlandkreis",
@@ -4070,7 +4238,7 @@
       {
        "feld": "sachwert",
        "bez": "vorläufiger Sachwert",
-       "koeffizient": -2.6e-06,
+       "koeffizient": -0.0000026,
        "exponent": 1,
        "gueltig": [
         32000,
@@ -4153,7 +4321,7 @@
        "exponent": 1,
        "gueltig": [
         2.1,
-        4.0
+        4
        ]
       }
      ],
@@ -4171,7 +4339,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1.0
+   "regionalfaktor": 1,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Harz, Regionstypen Mittelzentrum, Grundzentrum und Dorf",
@@ -4208,7 +4384,7 @@
     },
     "standardstufe_ab_1991": {
      "min": 2.1,
-     "max": 4.0
+     "max": 4
     }
    },
    "vorbehalt": "DER MITTLERE ABSOLUTE PROZENTUALE FEHLER BETRÄGT FÜR BAUJAHRE VOR 1991 ± 23 PROZENT. Das ist die höchste Unsicherheit, die ein Blatt dieses Ausschusses ausweist — und sie steht dort ausdrücklich. Ein Faktor von 0,86 kann demnach zwischen rund 0,66 und 1,06 liegen.\n\nDIE GLEICHUNG IST NICHT AUF DEN BERLINER-UMLAND-TYP EINES EINFAMILIENHAUSES GEMÜNZT: die Stichprobe beginnt bei 32.000 € vorläufigem Sachwert und einem Bodenrichtwert von 10 €/m². Für höherwertige Objekte endet sie bei 333.000 €.\n\nDIE EINFLUSSGRÖSSEN SIND NICHT UNABHÄNGIG. Wer eine davon verändert und die anderen festhält, verlässt das Modell.",
@@ -4247,7 +4423,7 @@
     {
      "feld": "sachwert",
      "bez": "vorläufiger Sachwert",
-     "koeffizient": -1.46e-06,
+     "koeffizient": -0.00000146,
      "exponent": 1,
      "gueltig": [
       39000,
@@ -4304,7 +4480,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
@@ -4368,7 +4552,7 @@
     {
      "feld": "sachwert",
      "bez": "vorläufiger Sachwert",
-     "koeffizient": -1.46e-06,
+     "koeffizient": -0.00000146,
      "exponent": 1,
      "gueltig": [
       39000,
@@ -4425,7 +4609,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreise Börde, Harz und Salzlandkreis, alle Regionstypen",
@@ -4602,7 +4794,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1
+   "regionalfaktor": 1,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Mansfeld-Südharz",
@@ -4718,7 +4918,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Mansfeld-Südharz",
@@ -4887,7 +5095,15 @@
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
    "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
-   "regionalfaktor": 1
+   "regionalfaktor": 1,
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Saalekreis",
@@ -5003,7 +5219,15 @@
   "korrekturen": [],
   "modellansaetze": {
    "modellgrundlage": "Landesweite Modellbeschreibung des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt",
-   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert"
+   "berechnungsmodell": "Sachwertfaktor = bereinigter Kaufpreis / vorläufiger Sachwert",
+   "gnd_jahre": 80,
+   "gnd_wortlaut": "Gesamtnutzungsdauer (GND): übliche Gesamtnutzungsdauer bei ordnungsgemäßer Instandhaltung gemäß Anlage 1 der ImmoWertV (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser 80 Jahre; Objektart des Modells: EFH/ZFH sowie RH/DHH)",
+   "gnd_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: Der für die jeweilige Gebäudeart zutreffende Baupreisindex mit dem Basisjahr 2010=100 für die Bauwirtschaft (Deutschland insgesamt) des Statistischen Bundesamtes.",
+   "baupreisindex_seite": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, „Modellparameter für die Ableitung von Sachwertfaktoren“ (sachwertfaktoren_modellbeschreibung.pdf, verlinkt auf www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html), S. 1",
+   "baupreisindex_hinweis": "Nachgetragen 03.11.2026 an der Modellbeschreibung (PDF vom 19.03.2025, 3 Seiten): das Modell nennt keinen abweichenden Bezugszeitpunkt; es gilt der Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag).",
+   "modell_quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/454065,501/sachwertfaktoren_modellbeschreibung.pdf"
   },
   "geltungsbereich": {
    "raeumlich": "Landkreis Saalekreis",

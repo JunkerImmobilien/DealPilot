@@ -161,7 +161,11 @@
    "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
    "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
    "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
-   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Statistisches Bundesamt; Neubau von Wohngebäuden insgesamt, Basisjahr 2010",
+   "baupreisindex_seite": "Datenblatt Sachwertfaktoren 2025 Hansestadt Lübeck (gaSW2025Luebeck.pdf), Bewertungsmodell, BPI, S. 1",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {},
   "belege": [
@@ -330,7 +334,11 @@
    "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
    "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
    "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
-   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Statistisches Bundesamt; Neubau von Wohngebäuden insgesamt, Basisjahr 2010",
+   "baupreisindex_seite": "Datenblatt Sachwertfaktoren 2025 Hansestadt Lübeck (gaSW2025Luebeck.pdf), Bewertungsmodell, BPI, S. 1",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {},
   "belege": [
@@ -578,7 +586,11 @@
    "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
    "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
    "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
-   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "BPI: Statistisches Bundesamt; Neubau von Wohngebäuden insgesamt, Basisjahr 2010",
+   "baupreisindex_seite": "Datenblatt Sachwertfaktoren 2025 Kreis Herzogtum Lauenburg (gaSW2025HzgtLauenburg.pdf), Bewertungsmodell, S. 2",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {},
   "belege": [
@@ -705,7 +717,7 @@
      1.21
     ],
     "450000": [
-     1.0,
+     1,
      1.2
     ],
     "475000": [
@@ -742,7 +754,11 @@
    "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
    "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
    "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
-   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "BPI: Statistisches Bundesamt; Neubau von Wohngebäuden insgesamt, Basisjahr 2010",
+   "baupreisindex_seite": "Datenblatt Sachwertfaktoren 2025 Kreis Herzogtum Lauenburg (gaSW2025HzgtLauenburg.pdf), Bewertungsmodell, S. 2",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {},
   "belege": [
@@ -915,7 +931,7 @@
     ],
     "525000": [
      null,
-     1.0,
+     1,
      1.1
     ],
     "550000": [
@@ -996,7 +1012,11 @@
    "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
    "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
    "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
-   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "BPI: Statistisches Bundesamt; Neubau von Wohngebäuden insgesamt, Basisjahr 2010",
+   "baupreisindex_seite": "Datenblatt Sachwertfaktoren 2025 Kreis Ostholstein (gaSW2025Ostholstein.pdf), Bewertungsmodell, S. 2",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {},
   "belege": [
@@ -1166,7 +1186,7 @@
     ],
     "550000": [
      null,
-     1.0,
+     1,
      1.1
     ],
     "575000": [
@@ -1202,7 +1222,11 @@
    "baupreisindex": "Statistisches Bundesamt, Neubau Wohngebaeude, Basisjahr 2010",
    "aussenanlagen": "pauschal nach Standardstufe: 1,0 bis unter 2,0 = 5.000 EUR; 2,0 bis unter 3,5 = 8.000 EUR; 3,5 bis unter 4,5 = 12.000 EUR; ab 4,5 = 15.000 EUR - kein separater Ansatz fuer Carport oder Garage",
    "bodenwert": "lagebezogenes Bodenwertniveau, an die Groesse angepasst, beitrags- und abgabenfrei",
-   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale"
+   "bog": "nur Kaufpreise ohne besondere objektspezifische Grundstuecksmerkmale",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "BPI: Statistisches Bundesamt; Neubau von Wohngebäuden insgesamt, Basisjahr 2010",
+   "baupreisindex_seite": "Datenblatt Sachwertfaktoren 2025 Kreis Ostholstein (gaSW2025Ostholstein.pdf), Bewertungsmodell, S. 2",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 03.11.2026 am Dokument (Seitentext maschinell gegen den Wortlaut geprüft)."
   },
   "geltungsbereich": {},
   "belege": [

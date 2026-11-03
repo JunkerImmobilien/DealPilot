@@ -78,7 +78,7 @@
    "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
    "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
    "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
-   "gnd_jahre": null,
+   "gnd_jahre": 80,
    "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
    "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
    "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
@@ -90,7 +90,14 @@
    "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
    "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
    "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
-   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Pro Quadratmeter Bruttogrundfläche (BGF) in Abhängigkeit von Gebäudetyp und Standardstufe in Verbindung mit Normalherstellungskosten 2010 (NHK 2010) nach ImmoWertV 2021 — der Bericht nennt keinen Baupreisindex",
+   "baupreisindex_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten (Sachwertverfahren), PDF-S. 37",
+   "gnd_wortlaut": "Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021 (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre). Textschicht zweispaltig verschränkt: „Gesamtnutzungsdauer faktoren durch den Bezug auf die unterschiedlichen entsprechend Anlage 1 der ImmoWertV 2021“",
+   "gnd_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten, PDF-S. 37",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026.",
+   "gnd_nachtrag_20261103": "Seit 03.11.2026 als Zahl 80 geführt: der Bericht verweist für die Gesamtnutzungsdauer auf Anlage 1 ImmoWertV, und Anlage 1 legt für Ein- und Zweifamilienhäuser, Doppel-, Reihen- und Mehrfamilienhäuser 80 Jahre fest. Die Zahl ist damit durch den Verweis des Ausschusses bestimmt, nicht geschätzt (der Kern rechnete ohne Feld ebenfalls mit 80). Der Vorbehalt im gnd_hinweis bleibt als Dokumentation stehen."
   },
   "geltungsbereich": {},
   "belege": [
@@ -193,7 +200,7 @@
    "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
    "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
    "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
-   "gnd_jahre": null,
+   "gnd_jahre": 80,
    "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
    "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
    "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
@@ -205,7 +212,14 @@
    "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
    "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
    "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
-   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Pro Quadratmeter Bruttogrundfläche (BGF) in Abhängigkeit von Gebäudetyp und Standardstufe in Verbindung mit Normalherstellungskosten 2010 (NHK 2010) nach ImmoWertV 2021 — der Bericht nennt keinen Baupreisindex",
+   "baupreisindex_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten (Sachwertverfahren), PDF-S. 37",
+   "gnd_wortlaut": "Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021 (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre). Textschicht zweispaltig verschränkt: „Gesamtnutzungsdauer faktoren durch den Bezug auf die unterschiedlichen entsprechend Anlage 1 der ImmoWertV 2021“",
+   "gnd_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten, PDF-S. 37",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026.",
+   "gnd_nachtrag_20261103": "Seit 03.11.2026 als Zahl 80 geführt: der Bericht verweist für die Gesamtnutzungsdauer auf Anlage 1 ImmoWertV, und Anlage 1 legt für Ein- und Zweifamilienhäuser, Doppel-, Reihen- und Mehrfamilienhäuser 80 Jahre fest. Die Zahl ist damit durch den Verweis des Ausschusses bestimmt, nicht geschätzt (der Kern rechnete ohne Feld ebenfalls mit 80). Der Vorbehalt im gnd_hinweis bleibt als Dokumentation stehen."
   },
   "geltungsbereich": {},
   "belege": [
@@ -308,7 +322,7 @@
    "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
    "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
    "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
-   "gnd_jahre": null,
+   "gnd_jahre": 80,
    "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
    "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
    "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
@@ -320,7 +334,14 @@
    "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
    "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
    "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
-   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Pro Quadratmeter Bruttogrundfläche (BGF) in Abhängigkeit von Gebäudetyp und Standardstufe in Verbindung mit Normalherstellungskosten 2010 (NHK 2010) nach ImmoWertV 2021 — der Bericht nennt keinen Baupreisindex",
+   "baupreisindex_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten (Sachwertverfahren), PDF-S. 37",
+   "gnd_wortlaut": "Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021 (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre). Textschicht zweispaltig verschränkt: „Gesamtnutzungsdauer faktoren durch den Bezug auf die unterschiedlichen entsprechend Anlage 1 der ImmoWertV 2021“",
+   "gnd_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten, PDF-S. 37",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026.",
+   "gnd_nachtrag_20261103": "Seit 03.11.2026 als Zahl 80 geführt: der Bericht verweist für die Gesamtnutzungsdauer auf Anlage 1 ImmoWertV, und Anlage 1 legt für Ein- und Zweifamilienhäuser, Doppel-, Reihen- und Mehrfamilienhäuser 80 Jahre fest. Die Zahl ist damit durch den Verweis des Ausschusses bestimmt, nicht geschätzt (der Kern rechnete ohne Feld ebenfalls mit 80). Der Vorbehalt im gnd_hinweis bleibt als Dokumentation stehen."
   },
   "geltungsbereich": {},
   "belege": [
@@ -422,7 +443,7 @@
    "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
    "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
    "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
-   "gnd_jahre": null,
+   "gnd_jahre": 80,
    "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
    "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
    "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
@@ -434,7 +455,14 @@
    "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
    "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
    "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
-   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Pro Quadratmeter Bruttogrundfläche (BGF) in Abhängigkeit von Gebäudetyp und Standardstufe in Verbindung mit Normalherstellungskosten 2010 (NHK 2010) nach ImmoWertV 2021 — der Bericht nennt keinen Baupreisindex",
+   "baupreisindex_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten (Sachwertverfahren), PDF-S. 37",
+   "gnd_wortlaut": "Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021 (Anlage 1: Ein- und Zweifamilienhäuser, Doppelhäuser, Reihenhäuser, Mehrfamilienhäuser 80 Jahre). Textschicht zweispaltig verschränkt: „Gesamtnutzungsdauer faktoren durch den Bezug auf die unterschiedlichen entsprechend Anlage 1 der ImmoWertV 2021“",
+   "gnd_seite": "Immobilienmarktbericht Heilbronn 2025, 6.2.1 Angesetzte Ausgangsdaten, PDF-S. 37",
+   "baupreisindex_nachtrag_20261103": "Das Modell nennt keinen Baupreisindex und keinen Bezugszeitpunkt; die NHK 2010 werden nach § 36 Abs. 2 ImmoWertV mit dem Baupreisindex angepasst — Regelfall (Index zum Wertermittlungsstichtag), Entscheidung Marcel 27./28.10.2026 (v3019). Nachgetragen 03.11.2026.",
+   "gnd_nachtrag_20261103": "Seit 03.11.2026 als Zahl 80 geführt: der Bericht verweist für die Gesamtnutzungsdauer auf Anlage 1 ImmoWertV, und Anlage 1 legt für Ein- und Zweifamilienhäuser, Doppel-, Reihen- und Mehrfamilienhäuser 80 Jahre fest. Die Zahl ist damit durch den Verweis des Ausschusses bestimmt, nicht geschätzt (der Kern rechnete ohne Feld ebenfalls mit 80). Der Vorbehalt im gnd_hinweis bleibt als Dokumentation stehen."
   },
   "geltungsbereich": {
    "raeumlich": "Stadt Heilbronn, Kernstadt und Stadtteile",
