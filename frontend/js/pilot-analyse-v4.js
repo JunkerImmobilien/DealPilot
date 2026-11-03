@@ -44,7 +44,7 @@
     if (!t) return '';
     /* nur an einem Satzende trennen, auf das ein Großbuchstabe, eine Ziffer am Satzanfang oder ein Anführungszeichen folgt -
        nie im Tausenderpunkt (2.002 €) oder in Abkürzungen mit Kleinbuchstaben danach (z. B., ca. 5 %) */
-    var teile = t.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"(])/), out = teile.slice(0, n);
+    var teile = t.split(/(?<=[.!?])(?<!(?:^|[\s(])(?:z|B|u|a|d|h|v|o|ca|bzw|ggf|inkl|etc|Nr|Str|evtl|max|min|rd|sog|vgl|Mio|Mrd|Tsd|Abs|S|Dr|St|zzgl|abzgl)\.)\s+(?=[A-ZÄÖÜ„"(])/), out = teile.slice(0, n);
     return out.join(' ');
   }
 
@@ -206,7 +206,13 @@
     if (w && w.ertragswert && zahl(w.ertragswert.wert)) z.push(zahlKachel('Ertragswert', eur(w.ertragswert.wert), w.ertragswert.vorlaeufig ? 'vorläufig' : (zahl(w.ertragswert.lzs_pct) ? 'LZS ' + de(w.ertragswert.lzs_pct, 2) + ' %' : ''), C.c1));
     var sc = investorScore();
     if (sc != null) z.push(zahlKachel('Investor Deal Score', String(sc), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc).wort : ''), '#2A2727'));
-    return z.length ? '<div class="dp-pa4-zahlen">' + z.join('') + '</div>' : '';
+    return '<div class="dp-pa4-zahlen" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
+  }
+  /* Der Marktbericht (DpWertZielbild) lädt oft erst nach dem Zeichnen - dann die Kacheln neu */
+  function kzNeu() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa4-kz]'), function (h) {
+      try { var t = document.createElement('div'); t.innerHTML = kennzahlen(h.getAttribute('data-dp-pa4-kz') === 'b'); if (t.firstChild) h.parentNode.replaceChild(t.firstChild, h); } catch (e) {}
+    });
   }
 
   /** Das Gesamtstatement: alle Aussagen der Analyse in einer Lesefolge (Detail). */
@@ -431,6 +437,7 @@
   var _letzteHist = null;
   function wertverlauf(hist) {
     _letzteHist = hist || null;
+    try { kzNeu(); } catch (e) {}
     Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa-wertverlauf]'), function (host) {
       try { wertverlaufIn(host, hist || []); } catch (e) { host.innerHTML = ''; }
     });
@@ -549,6 +556,7 @@
       + '<div class="dp-pa4-seg" role="group" aria-label="Darstellung"><button type="button" data-dp-pa-modus-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
       + '<button type="button" data-dp-pa-modus-knopf="detail" aria-pressed="' + (m === 'detail') + '">Detail</button></div></div></div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
+    try { setTimeout(function () { if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(kzNeu, function () {}); }, 0); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
       + (o.kopf || '') + kopf
       + '<nav class="dp-pa-rail">' + reiter.join('') + '</nav>'
