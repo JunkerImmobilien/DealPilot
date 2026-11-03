@@ -169,6 +169,57 @@
   }
 
   /* ─── Aufnahme ───────────────────────────────────────────── */
+  /* v3110c · html2canvas 1.4.1 kennt keine modernen Farbangaben. Die App nutzt
+     color-mix(); der Browser liefert das berechnet als „color(srgb r g b / a)“,
+     und html2canvas bricht mit „unsupported color function "color"“ ab (gemessen
+     03.11.2026 auf Staging, radial-gradient). In der KOPIE, die html2canvas
+     fotografiert, werden diese Werte vorher in rgba() umgeschrieben. Die echte
+     Seite bleibt unberührt. */
+  var FARB_PROPS = ['color', 'background-color', 'background-image', 'border-top-color', 'border-right-color',
+    'border-bottom-color', 'border-left-color', 'outline-color', 'box-shadow', 'text-shadow', 'fill', 'stroke',
+    'text-decoration-color', 'column-rule-color'];
+  function zuRgba(wert) {
+    return String(wert)
+      .replace(/color\(srgb\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.e+-]+%?))?\)/g, function (_, r, g, b, a) {
+        var al = a == null ? 1 : (/%$/.test(a) ? parseFloat(a) / 100 : parseFloat(a));
+        var k = function (v) { return Math.max(0, Math.min(255, Math.round(parseFloat(v) * 255))); };
+        return 'rgba(' + k(r) + ', ' + k(g) + ', ' + k(b) + ', ' + (isFinite(al) ? al : 1) + ')';
+      })
+      .replace(/(?:color|oklab|oklch|lab|lch)\([^()]*\)/g, 'rgba(0, 0, 0, 0)');
+  }
+  function farbenGlaetten(doc) {
+    var win = doc.defaultView, alle = doc.querySelectorAll('*');
+    for (var i = 0; i < alle.length; i++) {
+      var el = alle[i], cs;
+      try { cs = win.getComputedStyle(el); } catch (e) { continue; }
+      for (var j = 0; j < FARB_PROPS.length; j++) {
+        var v = cs.getPropertyValue(FARB_PROPS[j]);
+        if (v && /(?:^|[\s,(])(?:color|oklab|oklch|lab|lch)\(/.test(v)) el.style.setProperty(FARB_PROPS[j], zuRgba(v), 'important');
+      }
+    }
+  }
+  /* Rückfall: die Bildschirmaufnahme des Browsers (fragt einmal nach, zeigt aber
+     genau das, was man sieht — auch den Inhalt von iframes). Braucht einen Klick. */
+  function bildschirmAufnahme() {
+    if (!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) return Promise.resolve(null);
+    return navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' }, audio: false, preferCurrentTab: true, selfBrowserSurface: 'include' })
+      .then(function (stream) {
+        return new Promise(function (ok) {
+          var v = document.createElement('video'); v.muted = true; v.srcObject = stream;
+          v.onloadedmetadata = function () {
+            v.play().then(function () {
+              setTimeout(function () {
+                var c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+                c.getContext('2d').drawImage(v, 0, 0);
+                stream.getTracks().forEach(function (t) { t.stop(); });
+                ok(c);
+              }, 350);
+            }).catch(function () { stream.getTracks().forEach(function (t) { t.stop(); }); ok(null); });
+          };
+        });
+      }).catch(function () { return null; });
+  }
+
   function aufnehmen() {
     if (typeof window.html2canvas !== 'function') return Promise.resolve(null);
     var w = document.documentElement.clientWidth || window.innerWidth, h = window.innerHeight;
@@ -177,6 +228,7 @@
     return window.html2canvas(document.body, {
       x: window.scrollX, y: window.scrollY, width: w, height: h, windowWidth: w, windowHeight: h,
       scale: scale, useCORS: true, logging: false, backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
+      onclone: function (doc) { try { farbenGlaetten(doc); } catch (e) { console.warn('[Bordbuch] Farben', e); } },
       ignoreElements: function (el) {
         return el.id === 'dp-bb-fab' || (el.classList && (el.classList.contains('bb-hg') || el.classList.contains('toast')));
       }
@@ -260,7 +312,7 @@
       + '<div class="bb-werkzeug"><button type="button" data-w="rahmen" class="an">▭ Rahmen</button><button type="button" data-w="stift">✎ Stift</button>'
       + '<button type="button" data-a="zurueck">↶ Rückgängig</button><button type="button" data-a="leeren">Markierungen weg</button>'
       + '<span class="bb-hinweis">Bild einfügen: Strg+V</span></div>'
-      + '<div class="bb-leinwand">' + (basis ? '<canvas></canvas>' : '<div class="bb-leer">Der Screenshot ging hier nicht. Füge ein Bild mit Strg+V ein oder wähle eine Datei.</div>') + '</div>'
+      + '<div class="bb-leinwand">' + (basis ? '<canvas></canvas>' : '<div class="bb-leer">Der automatische Screenshot ging hier nicht.<br><button type="button" class="bb-knopf" data-a="aufnahme" style="margin:10px 0 6px">Bildschirm aufnehmen</button><br>Der Browser fragt einmal, welcher Tab — „Diesen Tab“ wählen. Oder ein Bild mit Strg+V einfügen.</div>') + '</div>'
       + '<div class="bb-weitere"></div>'
       + '<div><button type="button" class="bb-link" data-a="datei">+ weiteres Bild aus Datei</button><input type="file" accept="image/*" hidden></div>'
       + '</div><div class="bb-form">'
@@ -317,6 +369,17 @@
       if (was === 'datei') datei.click();
       if (was === 'liste') { zu(); if (window.DpWuensche) DpWuensche.oeffnen(); }
       if (was === 'senden') senden(a);
+      if (was === 'aufnahme') {
+        hg.style.visibility = 'hidden';
+        bildschirmAufnahme().then(function (c) {
+          hg.style.visibility = '';
+          if (!c) { meldung('Keine Aufnahme — Bild mit Strg+V einfügen geht immer.', true); return; }
+          var lw = hg.querySelector('.bb-leinwand');
+          lw.innerHTML = '<canvas></canvas>';
+          canvas = lw.querySelector('canvas'); canvas.width = c.width; canvas.height = c.height;
+          flaeche = zeichenflaeche(canvas, c);
+        });
+      }
     });
     try { if (window.DealPilotDiktat) DealPilotDiktat.knopfAn('dp-bb-text'); } catch (e) {}
 
