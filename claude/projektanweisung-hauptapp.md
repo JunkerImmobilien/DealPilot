@@ -44282,3 +44282,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `45372f07`; Staging per git pull.
 - **Nachweis:** Westerfeldstr. 140 (9,87 → 9,24 €/m² durch die Bremse) und Parkstr. 9 (10,36 €/m²), übernehmen/alle übernehmen nur im Arbeitsstand (gespeicherte `_dpMfh` unverändert nach Abbrechen), 390 px ohne Überlauf, keine Konsolenfehler; `mietpotenzial-pruefen` 104/104, `score-ketten` grün, Buster SAUBER.
 - **Rest:** Marcel entscheidet über den Ansatz „obere Spanne = saniert“; Prod nach Abnahme.
+
+### v3140 · Mindermiete bis zur rechtlich zulässigen Anpassung, N114 (03.11.2026, nur Staging)
+- **Was:** Der § 558-Pfad des Ertragswerts (`marktbericht/backend/src/lib/kappung.js`, seit v2993) beachtet die letzte Mieterhöhung je Wohnung: Wartefrist 15 Monate (§ 558 Abs. 1, § 558b Abs. 1), Kappung auf die Miete drei Jahre vor Wirksamwerden (§ 558 Abs. 3; ohne Betrag erst nach Ablauf des Fensters), Staffel-/Indexmiete ohne § 558. Mapper reicht `mv_letzte_erhoehung`/`_betrag`/`mv_art`. Rechenweg „Mindermiete bis zur rechtlich zulässigen Anpassung … erste ab MM/JJJJ, Barwert“. Norm: ImmoWertA 31.(2) b)/c), 8.(3).2 (hess. Fassung S. 33).
+- **Commit:** `e3bf5d80`; mb-backend auf Staging neu gebaut.
+- **Nachweis:** `wertermittlung-pruefen` RC 0 (A 118/118, B 238/238 mit neuen B21b/B21c, C 99/99 unverändert), Mutationsprobe (15 → 14 Monate) wird rot; `mietpotenzial-pruefen` 104/104, `score-ketten` grün, `kappungsgrenzen` grün, `objekt-mapper` sauber. Im Container: 415 €/Monat, −100 € unter Markt: ohne letzte Erhöhung −1.597 €, letzte 07/2026 −4.310 €, mit Betrag −2.823 €. Westerfeld unverändert 740.000 € (alle Wohnungen im Band); Marcels „erhöhter“ Wert ist die Potenzial-Stufe „Mieterhöhung“ 785.000 € (≈ 20.000 € Miete, ≈ 23.000 € RND).
+- **Rest:** Marcel entscheidet: Stufe „Mieterhöhung“ als Stichtagswert, RND aus bewohnten Maßnahmen, Pfad nur bis zur ortsüblichen Vergleichsmiete. Prod nach Abnahme.
