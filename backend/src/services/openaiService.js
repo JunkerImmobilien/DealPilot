@@ -4110,6 +4110,9 @@ const _WK_KATEGORIEN = [
   'Schuldzinsen', 'Kontoführung', 'Steuerberatung',
   'Fahrtkosten', 'Inserat / Vermietung', 'Porto & Telefon',
   'Gericht & Rechtsanwalt', 'Sonstiges',
+  /* v3154 · gemessen an einer Hotelrechnung: ohne diese beiden Kategorien landete alles unter
+     „Inserat / Vermietung". Der Reiter Steuer führt die Felder hotel und verpflegung. */
+  'Übernachtung / Hotel', 'Verpflegung (nur Pauschale)',
 ];
 
 const _WK_PROMPT =
@@ -4147,6 +4150,9 @@ const _WK_PROMPT =
   'betrag_brutto = Gesamt-/Endbetrag.\n' +
   '- Eine Handwerkerrechnung ist "Erhaltungsaufwand / Reparatur" - es sei denn, sie schafft etwas NEUES ' +
   '(Anbau, Ausbau, Erweiterung), dann "Sonstiges" mit einem Hinweis in der beschreibung.\n' +
+  '- REISEKOSTEN (Hotelrechnung): Uebernachtung und Kurtaxe -> "Übernachtung / Hotel"; Fruehstueck, ' +
+  'Getraenke und andere Mahlzeiten -> "Verpflegung (nur Pauschale)"; Parkgebuehren -> "Fahrtkosten". ' +
+  'Summen- und Zahlungszeilen (Gesamtbetrag, Kartenzahlung) sind KEINE eigene Position.\n' +
   '- Betraege als Dezimalzahl mit Punkt (1234.56), ohne Waehrungszeichen.\n' +
   '- Kategorie exakt eine aus: ' + _WK_KATEGORIEN.join(', ') + '.\n' +
   '- Nicht sicher lesbar -> null und konfidenz "niedrig". Erfinde nichts.';

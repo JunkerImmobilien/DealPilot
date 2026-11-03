@@ -80,7 +80,11 @@
     'Erhaltungsaufwand / Reparatur', 'Grundsteuer', 'Versicherung',
     'Schuldzinsen', 'Kontoführung', 'Steuerberatung',
     'Fahrtkosten', 'Inserat / Vermietung', 'Porto & Telefon',
-    'Gericht & Rechtsanwalt', 'Sonstiges'
+    'Gericht & Rechtsanwalt', 'Sonstiges',
+    /* v3154 · Reisekosten: der Reiter Steuer führt hotel und verpflegung - gemessen landete eine
+       Hotelrechnung ohne diese Kategorien unter „Inserat / Vermietung". Verpflegung ist steuerlich nur
+       als Pauschale (Verpflegungsmehraufwand) absetzbar, nicht nach Beleg: deshalb kein Feld (null). */
+    'Übernachtung / Hotel', 'Verpflegung (nur Pauschale)'
   ];
 
   /* Kategorie -> Feld der Anlage-V-Jahrestabelle (tax.js, _taxYearlyOverrides).
@@ -100,7 +104,9 @@
     'Inserat / Vermietung':                  'inserat',
     'Porto & Telefon':                       'porto',
     'Gericht & Rechtsanwalt':                'gericht',
-    'Sonstiges':                             'sonst_kosten'
+    'Sonstiges':                             'sonst_kosten',
+    'Übernachtung / Hotel':                  'hotel',
+    'Verpflegung (nur Pauschale)':           null
   };
 
   var LABELS_WK = {
@@ -109,7 +115,8 @@
     schuldzinsen: 'Schuldzinsen', kontofuehrung: 'Kontoführung',
     steuerber: 'Steuerberatung', fahrtkosten: 'Fahrtkosten',
     inserat: 'Inserate / Vermietung', porto: 'Porto & Telefon',
-    gericht: 'Gericht & Rechtsanwalt', sonst_kosten: 'Sonstige Kosten'
+    gericht: 'Gericht & Rechtsanwalt', sonst_kosten: 'Sonstige Kosten',
+    hotel: 'Übernachtung / Hotel'
   };
 
   /* Die im aktuellen Modus geltenden Tabellen — damit der restliche Code
@@ -809,14 +816,14 @@
      gebuchtes Jahr fällt später niemandem auf, und dann steht die
      Abrechnung im falschen Veranlagungszeitraum.                        */
   function _applyWk() {
-    var jeJahr = {}, ohneJahr = 0, nichtAbsetzbar = 0, nichtAbsetzbarEur = 0;
+    var jeJahr = {}, ohneJahr = 0, nichtAbsetzbar = 0, nichtAbsetzbarEur = 0, nichtJeKat = {};
     _rows.forEach(function (r) {
       if (!r.keep) return;
       if (!(r.brutto > 0)) return;
       var f = FIELD_MAP_WK[r.kategorie];
       /* `null` ist eine ANTWORT, kein fehlender Eintrag: die Zuführung zur
          Erhaltungsrücklage ist beim Eigentümer nicht sofort abziehbar. */
-      if (f === null) { nichtAbsetzbar++; nichtAbsetzbarEur += r.brutto; return; }
+      if (f === null) { nichtAbsetzbar++; nichtAbsetzbarEur += r.brutto; nichtJeKat[r.kategorie] = (nichtJeKat[r.kategorie] || 0) + r.brutto; return; }
       if (!f) return;
       if (!r.jahr) { ohneJahr++; return; }
       var k = String(r.jahr);
@@ -828,7 +835,7 @@
     if (!jahre.length) {
       var m = 'Nichts zu übernehmen.';
       if (ohneJahr) m = ohneJahr + ' Position(en) ohne erkennbares Jahr — bitte das Jahr in der Liste ergänzen.';
-      else if (nichtAbsetzbar) m = 'Nur Rücklagenzuführungen erkannt — die sind nicht sofort absetzbar.';
+      else if (nichtAbsetzbar) m = 'Nur nicht absetzbare Posten erkannt (' + Object.keys(nichtJeKat).join(', ') + ') — Rücklagenzuführung erst bei Verwendung, Verpflegung nur als Pauschale.';
       try { if (window.toast) window.toast(m); } catch (e) {}
       return;
     }
@@ -878,9 +885,8 @@
 
     var meld = n + ' Position(en) in ' + jahreOk.length + ' Jahr(en) übernommen.';
     if (nichtAbsetzbar) {
-      meld += ' ' + nichtAbsetzbar + ' Rücklagenzuführung(en) über '
-        + _fmtEur(nichtAbsetzbarEur) + ' € wurden bewusst NICHT übernommen '
-        + '(erst bei Verwendung absetzbar).';
+      meld += ' Bewusst NICHT übernommen: ' + Object.keys(nichtJeKat).map(function (k) { return k + ' ' + _fmtEur(nichtJeKat[k]) + ' €'; }).join(', ')
+        + ' (Rücklagenzuführung erst bei Verwendung absetzbar, Verpflegung nur als Pauschale).';
     }
     if (ohneJahr) meld += ' ' + ohneJahr + ' ohne Jahr übersprungen.';
     try { if (window.toast) window.toast(meld); } catch (e) {}
