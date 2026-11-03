@@ -27,6 +27,7 @@
      _sicher[name] = 'doppelt_gleich' | 'eine_passt' | 'unsicher'; _zweit[name] = Summe der anderen Lesung.
      _geprueft[name] = der Nutzer hat bestätigt, die Positionen mit dem Bild verglichen zu haben. */
   var _sicher = {}, _zweit = {}, _geprueft = {};
+  var _roh = {};   /* v3162 · Originaldateien je Name (fuer die Ablage nach der Uebernahme) */
 
   var KAT = ['Notar & Grundbuch', 'Maklergebühr', 'Grunderwerbsteuer', 'Fahrtkosten',
              'Verpflegung', 'Unterkunft', 'Gutachten', 'Anwalt',
@@ -462,7 +463,7 @@
     if (scan) scan.classList.add('on');
     var setT = function (s) { var e = document.getElementById('bi-scan-t'); if (e) e.textContent = s; };
 
-    _rows = []; _bilder = {}; _leer = []; _betrag = {}; _sicher = {}; _zweit = {}; _geprueft = {}; var docCount = 0; var leer = []; var skipped = [];
+    _rows = []; _bilder = {}; _leer = []; _betrag = {}; _sicher = {}; _zweit = {}; _geprueft = {}; _roh = {}; var docCount = 0; var leer = []; var skipped = [];
 
     // 1) CSV/Excel lokal parsen — KEINE KI, KEIN Kerosin
     for (var i = 0; i < tableFiles.length; i++) {
@@ -481,6 +482,7 @@
         setT('Belege werden vorbereitet … (' + (j + 1) + '/' + aiFiles.length + ')');
         try {
           var imgs = await _fileToImages(aiFiles[j]);
+          _roh[aiFiles[j].name] = aiFiles[j];   /* v3162 · Original fuer die Ablage */
           if (imgs.length) {
             var _tx = Array.isArray(imgs.texte) && imgs.texte.some(function (t) { return t && t.replace(/\s/g, '').length >= 80; }) ? imgs.texte : null;   /* v3154e */
             belege.push(_tx ? { name: aiFiles[j].name, images: imgs, texte: _tx } : { name: aiFiles[j].name, images: imgs }); _bilder[aiFiles[j].name] = imgs;
@@ -730,6 +732,7 @@
       if (_leer.length) nicht.push('nicht gelesen: ' + _leer.map(function (x) { return x.name; }).join(', '));
       if (p.offen.length) nicht.unshift('noch nicht bestätigt: ' + p.offen.join(', '));   /* v3156 */
       if (nicht.length) h += '<div class="bi-nicht"><b>Wird nicht übernommen:</b> ' + nicht.map(_esc).join(' · ') + '</div>';
+      if (window.DpAblage && window._currentObjKey) h += '<div class="bi-nicht">Die Originale werden in der Ablage des Objekts gespeichert (Ordner Rechnungen/Jahr).</div>';   /* v3162 */
       if (p.fremd.length) h += '<div class="bi-nicht">Für ' + p.fremd.join(', ') + ' führt der Reiter Steuer noch kein Jahr – der Wert wird hinterlegt und erscheint, sobald der Zeitraum so weit reicht.</div>';
     } else {
       var a = _aggregate(), f = Object.keys(a.byField); n = f.length;
@@ -1065,6 +1068,16 @@
         nicht_gelesen: _leer.map(function (x) { return x.name; }) });
     } catch (e) {}
     try { if (window.toast) window.toast('✓ ' + n + (n === 1 ? ' Wert' : ' Werte') + ' in den Reiter Steuer übernommen.'); } catch (e) {}
+    /* v3162 · alle gelesenen Belege (auch die unlesbaren) als Original in die Ablage: Rechnungen/<Jahr> */
+    try {
+      if (window.DpAblage && window._currentObjKey) {
+        var _ab = Object.keys(_roh).map(function (nm) {
+          var j = (_rows.filter(function (r) { return r.name === nm && r.jahr; })[0] || {}).jahr;
+          return { file: _roh[nm], ordner: window.DpAblage.ordnerFuer('rechnung', '', j) };
+        });
+        if (_ab.length) window.DpAblage.ablegenAlle(_ab, { quelle: 'beleg' }).then(function () { try { window.DpAblage.fuellen(); } catch (x) {} });
+      }
+    } catch (e) {}
     close();
   }
 
