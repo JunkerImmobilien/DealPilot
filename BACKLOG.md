@@ -36,7 +36,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N98 · Pilot-Analyse neu — Fassung 4 liegt vor, Marcel sieht sie an (02.11.2026, spät)
+### N98 · Pilot-Analyse neu — Fassung 4 liegt vor, **geparkt: Marcel sieht sie sich in Ruhe an (03.11.2026)**
 
 **Fassung 4 gebaut** (`8f24553f`, Artifact https://claude.ai/artifact/JwQwWMA1vqub5wmuPqi4q2 v7, `design/Vorschläge/pilot-analyse-neu.html`): alle acht Punkte unten umgesetzt — Marktpreis Ø auf allen Karten (ohne Abschlag darunter, Spanne nur im Detail; Soll = Bestand, Zielbild mit besserer Ausstattung), Ertragswert überall ohne Spanne, Gesamtbewertung als Text (Detail = Briefing-Abschnitte), neue Unterreiter **Risiken & Szenarien** (Stärken, Risiken, Risikoanalyse, Worst · **Plan** · Best — Plan als Vorschlag für den fehlenden Base Case) und **Lage & Markt** (Werte zu einem Zeitpunkt, keine Zeitreihen), PDF-Auswahl nach Unterreitern (Unterlagen & WEG gesperrt), Wert- und Steuerverlauf neu (eine €-Achse, Fadenkreuz, Legende, Farben geprüft), Steuer nach den tax.js-Gruppen mit Steuerwirkung, Steuer auch im Ankauf. **Offen bei Marcel:** Fassung 4 abnehmen; Plan als Base Case in die Analyse aufnehmen?; Lage & Markt als eigener Unterreiter (Vorschlag) oder in Wert & Verlauf.
 
@@ -53,6 +53,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 8. **Steuer-Tabelle erklären:** „Ergebnis Anlage V −1.840 €“ allein sagt nichts — Einnahmen und Werbungskosten nach Gruppen zeigen (tax.js `_computeYearTotal` 1801-1884: Finanzierung, Betriebskosten, Verwaltung, Sonstiges, AfA, Erhaltung/anschaffungsnah), Steuerwirkung dazu.
 **Bestandsaufnahme der heutigen Pilot-Analyse** (Agent, 02.11.2026): Inhalt in `ui.js _renderAIServerAnalysis` 1912-2533; Unterreiter Ankauf: Briefing · Stärken & Risiken · Risiko & Szenarien · [Unterlagen & WEG] · Lage & Markt · [Wert & Marktpreis] · Verhandlung & Offerte · Bank · Steuer · Ankauf/Bestand/Zielbild; Bestand: Briefing · ABZ · [Wert & Marktpreis] · Lage & Markt · Steuer · Anschlussfinanzierung · Exit · Risiko & Szenarien · [Unterlagen & WEG]. KI-Felder: openaiService.js 1793-1891. Marktbericht-Verlauf: `ui.js _dpLoadVerlauf` 3518ff (Chart.js); Löschen von Berichten heute nur im Tab Deal-Aktion (`deal-action-boarding.js` 1081, DELETE /marktbericht/reports/:id). Stress-Test gerechnet: `bank-charts.js` 993-1123.
 
+### N107 · `rollout-prod.ps1` prüft die Frontend-Konstanten nicht (03.11.2026)
+
+`deploy-staging.ps1` bricht ab, wenn `backend/src/generated/frontend-konstanten.json` veraltet ist. `rollout-prod.ps1` tut das nicht: Prod 1.0.42 ging mit Konstanten vor v3092 raus (Feld `weg_su`, Hilfe). Prod 1.0.43 hat das nachgeholt. Abhilfe: dieselbe Prüfung (`node tools/frontend-konstanten.mjs --pruefen`) in die Vorbedingungen von `rollout-prod.ps1` aufnehmen.
+
+### N108 · Entwicklungspartner: Konto auf Staging und Weg ins Backlog (Marcel 03.11.2026)
+
+**Erledigt 03.11. auf Staging:** Das Konto des Entwicklungspartners hat Pro (wie Admin › Plan ändern, 1 Jahr, ohne Stripe). Die 19 Demo-Objekte des Demo-Kontos sind kopiert (neue IDs, Objekt-ID auch in `data` und `ai_analysis` ersetzt; Steuer 285 Zeilen, Bemerkungen, Snapshots, AVM). Dazu 115 Marktberichte samt Zuordnung (`mb.object_snapshots` `dp:<neue ID>`). Das Demo-Konto ist unverändert. Nicht übernommen: die Gewichtung Lage-Fokus (`user_settings.browser_vorgaben`), deshalb können seine Scores bei Neuberechnung von der Demo abweichen. **Offen bei Marcel:** auf welchem Weg der Partner Umsetzungswünsche ins Backlog bringt (Vorschlag: GitHub-Issues mit Label `backlog`, die Claude zu Sitzungsbeginn mit `gh` einliest).
+
 ### N98-alt · Pilot-Analyse neu: Ankauf und Bestand — Verlauf Fassung 1–3
 
 Marcel: *„dass wir die Pilotanalyse komplett neu aufbauen, ähnlich mit den Reitern, aber übersichtlicher, einmal für Ist im Ankauf und aber auch im Bestand … mit Pillen … Unterlagen nachreichen (Wirtschaftsplan, WEG-Protokolle, Abrechnungen), ordnet automatisch zu und fragt, ob übernehmen … Wert und Marktpreis mit Stufen … Exit, Anschlussfinanzierung, Stresstest.“*
@@ -68,7 +76,9 @@ Demo: `design/Vorschläge/pilot-analyse-neu.html` (sieben Ideen: Cockpit-Karten,
 
 Marcel: *„oben den Detailgrad, Marktbericht abrufen … die Kacheln sind cool, jede Stufe … mit weniger Text darstellen und ein bisschen verschlanken.“* Erst messen (welche Texte, wo gebaut), dann Demo mit vorher/nachher.
 
-### N104 · Testobjekt Lindenallee 14 erweitern (Marcel 02.11.2026) — Verträge da, **Entscheidung Marcel: Paket oder ETW?**
+### N104 · Testobjekt Lindenallee 14 erweitern (Marcel 02.11.2026) — Verträge da, **bleibt MFH (Marcel 03.11.2026)**
+
+**Entschieden 03.11.:** Lindenallee bleibt Mehrfamilienhaus, keine Umstellung auf ETW. Noch offen ist nur die Frage nach der Fälligkeit der Sonderumlage (01.03.2026, vor dem Übergang → zahlt der Verkäufer). Sie bleibt so, bis Marcel etwas anderes sagt.
 
 **Gemacht (02.11.2026; `Dateien/Testunterlagen` ist nicht versioniert):** `11 Mietvertrag WE 1 (unbefristet …)`, `12 … WE 3 (Staffelmiete)`, `13 … WE 6 (Indexmiete)` passend zur Mietaufstellung, Platzhalter statt Namen; Protokoll 2025 mit Kasten „Auftrag bereits erteilt“ (04.07.2025); Kaution WE 6 auf 1.410 € (§ 551 BGB). Alte 02/07 unter `Lindenallee 14 (Fassung 28.10. nachmittags, vor N104)`. **Widerspruch:** Exposé, Mietaufstellung, Drehbuch und `unterlagen.js` beschreiben ein **MFH-Paket mit 8 Wohnungen** (1.090.000 €) — nur der Wirtschaftsplan hat zusätzlich den Einzelplan WE 5, und WE 5 steht leer. Deshalb NICHT auf ETW umgestellt; die Investitionsthese („das gesamte Gebäude“) lag richtig. **Zeitachse:** SU fällig 01.03.2026, Kauf heute → nach BGH schuldet der Verkäufer; soll der Käufer zahlen, Fälligkeit hinter den Übergang (z. B. 01.03.2027). Ungereimtheiten (Wittekind/Weserland, PLZ 32049/32052, Wohnung 3 139/1000 gegen WE 5 118/1000) — evtl. gewollte Prüffallen. Messe-Kopien `frontend/messe-dateien/lindenallee-14/` unverändert.
 
@@ -79,7 +89,9 @@ Mietverträge zum Einlesen ergänzen: einer mit **Indexmiete**, einer mit **Staf
 
 Konzept: `design/Vorschläge/steuerkanzlei-bruecke.md`. Lesefassung: `design/Vorschläge/steuerkanzlei-bruecke.html` (Artifact https://claude.ai/artifact/NLcZai63Wcs3fi4B1WUHu2). Vorhanden: Partner-Konten (Rolle steuerberater), Seats per Stripe, Einladung, Freigabe je Objekt mit share_audit (055_reseller_core.sql, resellerService.js, mandant-freigaben.js). Fehlt: Freigabe je Steuerjahr, eingefrorener Stand, Selbstverbinden bestehender Nutzer, mehrere Kanzleien, Rückgabe mit Grund. DATEV/Addison: kein Import von Anlage-V-Daten in die ESt belegt (DATEV-Format nur Buchhaltung, Marktplatz ab 25 Kunden); ELSTER direkt = ganze Erklärung. Empfehlung Stufe 1: Freigabe je Steuerjahr + Kanzlei-Paket (PDF + CSV je Anlage-V-Zeile). **Fragen an Marcel** stehen im Konzept (u. a. „Aviso“ = WISO Steuer?, Preis für Weg 2, darf die Kanzlei korrigieren).
 
-### N106 · Kleinigkeiten aus dem Browsertest 02.11.2026 — Rest: Online-Dauer (Marcel)
+### N106 · Kleinigkeiten aus dem Browsertest 02.11.2026 — Online-Dauer ✅ v3095 (Prod 1.0.43)
+
+**Online-Dauer gebaut** (Marcel 03.11.: „auf jeden Fall“), siehe Fertig. **Rest:** Admin-Ansicht im Browser ansehen (die Anmeldung braucht Marcels Passwort; SQL und Formatierung wurden einzeln geprüft); Datenschutz-Absatz „Nutzungszeit“ (Version 1.4) gegenlesen.
 
 **Erledigt** v3093/v3093a (Prod 1.0.42), siehe Fertig. **Offen:** Online-Dauer braucht eine neue Aktivitätstabelle mit Herzschlag (heute nur `audit_log`-Zeitpunkte, `landing_events` anonym) — Marcel entscheidet; Abnahme register-with-verify/verify-email mit echter Mail; eine Wirtschaftsplan-Seite allein wird als „Marktbericht“ eingeordnet (Rückfall in `resolveType`).
 
@@ -131,7 +143,9 @@ nur nach Marcels Entscheidung (Geld).
 
 Marcel: *„30 % … Ist das irgendwo eine Grundlage? … genauer, wir wissen das Mehrfamilienhaus oder so … haben wir Tabellen?“* **Befund:** 30 % ist keine amtliche Quote, sondern Marcels Abnahme der Demo v2183 (`bwk-profil.js` STANDARD.etw.nul_pct); im Formular steht als Rückfall noch 22 % (`quickcheck-app.html` qc_hg_split). Der Quick-Check nimmt für JEDE Objektart den ETW-Anteil. **Tabellen vorhanden:** ImmoWertV Anlage 3, fortgeschrieben (Verwaltung 439 € je ETW / 367 € je Wohnung, Instandhaltung 14,40 €/m², `bwk-profil.js`, `marktbericht/.../immowertv.js` BWK je Jahr). **Vorschlag:** ETW: nicht umlagefähig in Euro = Verwaltung ETW (Anlage 3) + Rücklage (bis Wirtschaftsplan vorliegt: Annahme, Marcel entscheidet die Größe), Anteil daraus statt fester 30 % — kleine Wohnungen bekommen so einen höheren Anteil (Verwaltung ist fix je Einheit). Häuser (EFH/MFH): wie die Haupt-App, Verwaltung je Einheit + Instandhaltung je m² (Anlage 3) gegen Betriebskosten; braucht für MFH die Zahl der Einheiten im Quick-Check.
 
-### N93 · Hilfen und „Wie wir rechnen“ — 1–3 ✅ v3094 (Prod 1.0.42), Rest: Drehbücher und Storybook
+### N93 · Hilfen und „Wie wir rechnen“ — 1–3 ✅ v3094 (Prod 1.0.42); Drehbücher entfallen (Messe vorbei), Rest: Zielkaufpreis-Entscheidung
+
+**03.11.2026, Marcel: „welche Messe-Drehbücher? Die Messe war schon.“** Punkt 4 (Drehbücher, Storybook) entfällt, die Liste darunter bleibt nur als Befund stehen. Sollen die Messe-Videos oder das Storybook je wieder laufen, ist sie der Einstieg.
 
 **Offen (Punkt 4, gemessen 02.11.):** Quick-Check-Szenen (`messe-drehbuch.js` 537–551, 676–745, 844–863, 1152) zeigen auf seit v3081 ausgeblendete `#score-block/#ai-verdict/#ai-negotiate-v`, `qcScore()` liest versteckte Elemente; Z.744 „Pro und Contra“, Z.700 `#ai-opinion` zugeklappt, Z.666 „Wohnung ist leer“; alte Stufennamen Einfach/Mittel/Ausgiebig (Z.2036/2038/2047/2092); `DpDetailgrad.setzen` ohne `fluechtig` (Z.1818/1959/2083/2088/5220) speichert `dp_stufe` ins Objekt; Investition Z.2292/2309 (Standardwerte statt GNotKG, „Sonstige vorbelegt“, „Standardwerte“ → „Mein Profil“). Storybook vom 29.10. neu erzeugen (2026-1051 evtl. jetzt „Kritisch“). **Entscheidung Marcel:** die zweite Stufe des Zielkaufpreises (Miete in 3 J.) ist seit v3081 im Quick-Check nicht mehr sichtbar (`quickcheck-app.html:5728`) — zurück in die Karte? Haupt-App: Upside/Potenzial-Bonus rechnen noch mit Marktmiete bzw. „Mietsteigerung“, nicht mit zulässiger Miete.
 
@@ -4312,6 +4326,8 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+- **03.11.2026 · v3095/v3095a · Online-Dauer je Nutzer und Tag (N106)** (`41b8e807`, `0e03f586`, `cfa447da`, Prod 1.0.43): Befund: Es gab nur `last_login_at` und Zeitpunkte im `audit_log`, keine Dauer. Neu sind Migration 093 `nutzer_aktivitaet` (Summe je Tag, Sitzungen, erster und letzter Puls; keine Seiten, keine IP; 400 Tage Aufbewahrung), `POST /aktivitaet/puls` (Abstand zum vorigen Puls, höchstens 90 s; ab 150 s Pause neue Sitzung, so zählen zwei Tabs nicht doppelt) und `js/aktivitaet.js` (ein Puls pro Minute, nur angemeldet, bei sichtbarem Fenster und mit Eingabe in den letzten 5 min oder Fokus im iframe). Im Admin gibt es die Spalte „Online 30 T.“ und im Detail heute/7/30 Tage, Sitzungen und die letzten 14 Tage. Datenschutz 1.4 hat einen Absatz „Nutzungszeit“. Gemessen auf Staging: 56 s, 1 Sitzung. Prod: Tabelle da, der Endpunkt gibt 401 ohne Anmeldung, die Datei wird ausgeliefert. Nebenbei: Die Frontend-Konstanten waren seit v3092 veraltet, deshalb lief Prod 1.0.42 mit alten Konstanten; mit 1.0.43 ist das behoben. `rollout-prod.ps1` prüft sie nicht (siehe N107).
 
 - **02.11.2026 · v3092–v3092b · Sonderumlage in Cashflow und Steuer (N100)** (`d162152e`, `fe0ae8e9`, `ebded3dc`, Prod 1.0.42): Befund: einmalige Ausgaben gab es im Cashflow nicht; die SU kam nur aus dem Import und landete ungespeichert im Steuervorschlag, beim ganzen Haus mit dem Betrag der Einheit (4.956 statt 42.000 €). Jetzt `js/sonderumlage.js` + Feld `weg_su`, beide Jahresschleifen in calc.js, Verkäufer bei Fälligkeit vor Übergang, Steuer als Vorschlag mit 15-%-Prüfung, Import-Zeile nie vorgehakt, Fälligkeit als TT.MM.JJJJ. Gemessen CF 2026 −1.048 → −6.004 €, Karte bei 358 px ohne Überlauf.
 - **02.11.2026 · v3093/v3093a · last_login_at, Handbuch, Fotos als ein Dokument (N106)** (`4a1153d3`, `426e6b5e`, Prod 1.0.42): Befund: nur `authenticate()` stempelte, vier Wege gaben ein JWT ohne Stempel aus → `stempleAnmeldung()` überall; das Handbuch war rot (11 alte Belege) und schrieb deshalb nie neu → grün, neuer Fenstertitel; mehrere gleichzeitig gewählte Fotos = ein Dokument, „einzeln auswerten“ ohne neuen Lese-Abruf.
