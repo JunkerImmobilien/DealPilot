@@ -50,7 +50,23 @@ if (!window._wlc) {
   function fmt0(n) { try { return new Intl.NumberFormat('de-DE').format(Math.round(n)); } catch (e) { return String(Math.round(n)); } }
   function deNum(n, d) { try { return new Intl.NumberFormat('de-DE', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }).format(n); } catch (e) { return String(n); } }
   function eur(n) { return fmt0(n) + ' €'; }
-  function toast(m) { try { if (typeof global.toast === 'function') return global.toast(m); } catch (e) {} try { console.log('[dp-mb]', m); } catch (e) {} }
+  /* v3098 · Im Quick-Check-Dokument gibt es KEIN globales toast() (showToast liegt in
+     einer Closure). Bis hier gingen deshalb alle Meldungen dieses Moduls nur in die
+     Konsole, auch „Kontingent aufgebraucht“. Marcel 03.11.2026: „das ging nicht weil
+     kein Kontingent, er sagt mir das aber nicht“. Jetzt baut das Modul die Meldung
+     selbst (Klasse .toast aus quickcheck-app.html), Warnungen stehen 7 s statt 3 s. */
+  function toast(m) {
+    try { if (typeof global.toast === 'function') return global.toast(m); } catch (e) {}
+    try { console.log('[dp-mb]', m); } catch (e) {}
+    try {
+      var t = document.createElement('div');
+      t.className = 'toast'; t.textContent = m; t.setAttribute('role', 'status');
+      document.body.appendChild(t);
+      setTimeout(function () { t.classList.add('show'); }, 10);
+      var dauer = /^⚠/.test(String(m)) ? 7000 : 3000;
+      setTimeout(function () { t.classList.remove('show'); setTimeout(function () { t.remove(); }, 400); }, dauer);
+    } catch (e) {}
+  }
 
   /* ── CSS einmalig injizieren (Praefix dpx-) ── */
   function injectCss() {
@@ -357,7 +373,7 @@ if (!window._wlc) {
   }
   async function run() {
     var i = inputs();
-    if (!i.plz && !i.ort) { toast('Bitte mindestens PLZ oder Ort ausfüllen'); return; }
+    if (!i.plz && !i.ort) { toast('Bitte mindestens PLZ oder Ort ausfüllen'); return { ok: false, text: 'PLZ oder Ort fehlt' }; }
     var _dph = await _dpmbHealth();
     if (false && _dph && _dph.mode === 'stub') { /* v892-dp-live: DealPilot ruft IMMER den Microservice (entkoppelt von AVM_MODE) */
       var _p = _dpmbStubPayload(i);
@@ -374,13 +390,15 @@ if (!window._wlc) {
       });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
-        if (data && data.needs_credits) toast('⚠ ' + (data.error || 'Kontingent aufgebraucht'));
-        else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (data && (data.error || data.message) ? ': ' + (data.error || data.message) : ''));
-        return;
+        /* v3098 · 402 = Kontingent leer, 403 = Plan ohne diese Stufe — beides mit eigenem Text vom Server */
+        var _txt = (data && (data.error || data.message)) || '';
+        if (data && data.needs_credits) toast('⚠ DealPilot-Marktbewertung nicht abgerufen: ' + (_txt || 'Kontingent aufgebraucht.'));
+        else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (_txt ? ': ' + _txt : ''));
+        return { ok: false, kontingent: !!(data && data.needs_credits), text: _txt || (data && data.needs_credits ? 'Kontingent aufgebraucht' : 'fehlgeschlagen') };
       }
       if (data && data.no_data) {
         toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor (nichts berechnet)');
-        return;
+        return { ok: false, text: 'keine Marktdaten für diese Adresse' };
       }
       var payload = data.data || data;
       D = mapCard(payload); mode = 'med'; collapsed = false; /* v830-mb-expanded: nach Abruf offen */
@@ -389,7 +407,8 @@ if (!window._wlc) {
       var _lc = (data._kerosin && typeof data._kerosin.charged === 'number') ? data._kerosin.charged : ((typeof data.cost === 'number') ? data.cost : (data.charged || data.liters || null));
       /* v2192: hier stand „(−2 L)" - Liter gibt es seit v1176 nicht mehr */
       toast('✓ DealPilot-Marktbewertung' + (_lc ? ' · ' + _lc + ' vom Kontingent' : ''));
-    } catch (e) { toast('⚠ Netzwerkfehler bei der DealPilot-Marktbewertung'); }
+      return { ok: true };
+    } catch (e) { toast('⚠ Netzwerkfehler bei der DealPilot-Marktbewertung'); return { ok: false, text: 'Netzwerkfehler' }; }
   }
 
   global.DealPilotMBQc = { run: run };

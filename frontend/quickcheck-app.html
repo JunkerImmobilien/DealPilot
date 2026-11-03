@@ -7052,6 +7052,7 @@ function renderTransferList() {
     var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
     var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', immometrica:'ImmoMetrica', ph:'PriceHubble', spr:'Sprengnetter', dpmb:'DealPilot', ki:'KI-Recherche' };
     var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
+    var _qbFehler = [];   /* v3098 · gescheiterte Abrufe fuer die Schlussmeldung */
     _progressRender(steps);
 
     for (var i = 0; i < ordered.length; i++) {
@@ -7109,7 +7110,8 @@ function renderTransferList() {
              (_hasExpose). Fehlt sie danach immer noch, anhalten wie bei ph/spr -
              statt run() still mit 'Bitte PLZ oder Ort' abbrechen zu lassen. */
           if (_qcMissingFull('dpmb').length) await _qcPauseForMissing('dpmb');
-          try { if (window.DealPilotMBQc) await window.DealPilotMBQc.run(); } catch (e) {}
+          /* v3098 · Ergebnis merken: die Schlussmeldung sagte sonst „✓ Abruf abgeschlossen (… + DealPilot)“, auch wenn die Marktbewertung am Kontingent scheiterte */
+          try { if (window.DealPilotMBQc) { var _mbr = await window.DealPilotMBQc.run(); if (_mbr && _mbr.ok === false) _qbFehler.push('DealPilot-Marktbewertung: ' + (_mbr.text || 'fehlgeschlagen')); } } catch (e) {}
         }
         if (ordered[i] === 'ki')  await kiResearch({ silent:true });
       } catch (e) { /* einzelner Abruf fehlgeschlagen — weiter */ }
@@ -7117,7 +7119,8 @@ function renderTransferList() {
     }
     try { if (typeof _applyConsensusToQc === 'function') _applyConsensusToQc(); } catch (e) {} /* v893d-konsens: finaler Konsens (dpmb lief zuletzt, schreibt Feld nicht) */
     setTimeout(function(){ _progressRender(null); }, 1400);
-    showToast('✓ Abruf abgeschlossen (' + ordered.map(function(s){return labels[s];}).join(' + ') + ')');
+    if (_qbFehler.length) showToast('⚠ Abruf abgeschlossen, aber nicht alles kam an — ' + _qbFehler.join(' · '), 8000);
+    else showToast('✓ Abruf abgeschlossen (' + ordered.map(function(s){return labels[s];}).join(' + ') + ')');
     try { _qbSetRunBtn('reset'); } catch(e){}
   }
 
@@ -7138,13 +7141,13 @@ function renderTransferList() {
     try { if (typeof scheduleUpdate==='function') scheduleUpdate(); } catch(e){}
     showToast('Neuer Vorgang \u2014 alles zur\u00fcckgesetzt');
   }
-  function showToast(msg) {
+  function showToast(msg, dauer) {
     const t = document.createElement('div');
     t.className = 'toast';
     t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => t.classList.add('show'), 10);
-    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, dauer || 3000);
   }
   function fireConfetti() {
     const colors = [window._qcGold('--gold', '#C9A84C'), window._qcGold('--gold-2', '#E8C964'), '#5ED99E', '#3FA56C', window._qcGold('--gold-3', '#9a7f33')];
@@ -7646,7 +7649,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
   <script src="js/marktwert-abschlag.js?v=v3043"></script><!-- v2237 -->
-  <script src="js/dealpilot-mb-qc.js?v=v3043"></script>
+  <script src="js/dealpilot-mb-qc.js?v=v3098"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">
