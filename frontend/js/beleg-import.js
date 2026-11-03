@@ -816,6 +816,8 @@
 
   window.DealPilotBelegImport = {
     open: open, close: close, apply: apply, csv: csv,
+    /* v3120 · der gemeinsame Eingang (unterlagen-eingang.js) übergibt erkannte Rechnungen direkt */
+    oeffnenMit: function (files, modus) { open(modus || 'wk'); if (files && files.length) setTimeout(function () { _onPick(files); }, 50); },
     _keep: _keep, _kat: _kat
   };
 })();

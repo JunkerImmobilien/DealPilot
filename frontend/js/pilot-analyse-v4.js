@@ -414,18 +414,22 @@
     var heute = new Date().getFullYear(), O = window._taxYearlyOverrides || {};
     var jahre = R.map(function (r) { return r.cal; }).filter(function (j) { return j <= heute; });
     var chips = '';
+    /* v3120 · seit dem gemeinsamen Eingang (unterlagen-eingang.js) trägt jeder übernommene Posten seine
+       Herkunft: „durch Unterlagen belegt" = der Wert stammt noch aus Wirtschaftsplan, Abrechnung oder Beleg */
     if (bestand && jahre.length) chips = '<div class="dp-pa4-belege">' + jahre.map(function (j) {
+      var st = window.DpEingang ? window.DpEingang.jahrStand(j) : null;
       var e = O['y' + j] || {}, n = Object.keys(e).filter(function (k) { return zahl(e[k]); }).length;
-      return n ? '<span class="dp-pa4-bj ok" title="' + n + ' Posten mit eigenen Angaben (aus Belegen oder von Hand)">' + j + ' · eigene Angaben (' + n + ')</span>'
+      if (st && st.belegt) return '<span class="dp-pa4-bj ok" title="' + st.belegt + ' Posten aus Unterlagen oder Belegen' + (st.eigen ? ', ' + st.eigen + ' von Hand' : '') + '">' + j + ' · durch Unterlagen belegt (' + st.belegt + ')' + (st.eigen ? ' + ' + st.eigen + ' von Hand' : '') + '</span>';
+      return n ? '<span class="dp-pa4-bj ok" title="' + n + ' Posten mit eigenen Angaben (von Hand oder vor v3120 eingelesen)">' + j + ' · eigene Angaben (' + n + ')</span>'
         : '<span class="dp-pa4-bj' + (j < heute ? ' fehlt' : '') + '" title="Nur der Vorschlag der App aus deinen Eingaben">' + j + ' · ' + (j < heute ? 'Belege fehlen' : 'laufendes Jahr') + '</span>';
     }).join('') + '</div>';
     var satz = bestand
       ? 'Je Jahr: hast du eigene Angaben gemacht (Belege eingelesen oder von Hand), oder rechnet die App nur mit ihrem Vorschlag? Für abgelaufene Jahre ohne eigene Angaben fehlen die Belege.'
       : 'Im Ankauf ist die Steuer ein Plan aus deinen Eingaben. Belege kommen nach dem Kauf – Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen.';
     return karte(kopfzeile('Belege') + chips + '<p class="dp-pa-p" style="margin:0 0 10px">' + satz + '</p>'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen (KI)</button>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>'
       + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="try{var t=document.querySelector(\'.tab[data-target-sec]\');var b=[].filter.call(document.querySelectorAll(\'.tab\'),function(x){return /Steuer/.test(x.textContent||\'\')})[0];if(b)b.click();}catch(e){}">Zum Reiter Steuer</button></div>'
-      + erkl('Die KI liest PDF oder Foto, teilt eine Hausgeldabrechnung in umlagefähige und nicht umlagefähige Kosten und ordnet jeden Beleg seinem Jahr zu. Du bestätigst jede Zeile, erst dann landet sie in den Werbungskosten des Jahres im Reiter Steuer.'), 'dp-pa4-mt');
+      + erkl('Ein Eingang für alles: Wirtschaftsplan und Abrechnung gehen mit Jahr in die Werbungskosten, Rechnungen über den Beleg-Leser, Mietverträge in die passende Einheit, Protokolle in die WEG-Auswertung. Nichts wird ohne deine Bestätigung übernommen.'), 'dp-pa4-mt');
   }
 
   /** Unterreiter Steuer: Verlauf wie im Reiter Steuer, Text, im Detail die Tabelle */
@@ -731,13 +735,15 @@
   }
 
   /* v3099e · Unterlagen & WEG steht immer da (Fassung 4): ohne Auswertung mit dem Einstieg zum Hochladen */
+  /* v3099e/v3120 · Unterlagen & WEG steht immer da. v3120: EIN Eingang (unterlagen-eingang.js) für Wirtschaftspläne,
+     Protokolle, Mietverträge, Abrechnungen, Rechnungen - und der Verlauf, was wann eingelesen und übernommen wurde. */
   function unterlagenPanel(html) {
-    var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
-      + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DokumentImport&&DokumentImport.oeffnen)DokumentImport.oeffnen()">Unterlagen einlesen (Exposé, Wirtschaftsplan, Protokoll …)</button>'
-      + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen</button></div>';
-    if (html) return kuerzen(html) + karte(kopfzeile('Weitere Unterlagen') + knoepfe, 'dp-pa4-mt');
-    return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet. Lies Teilungserklärung, Wirtschaftsplan, Protokolle der Eigentümerversammlung oder Mietverträge ein – der Pilot wertet sie hier aus (Beschlüsse, Sonderumlagen, Rücklage, Auffälligkeiten).</p>'
-      + '<p class="dp-pa-p">Belege und Abrechnungen für die Steuer liest du über den zweiten Knopf ein; sie landen im Reiter Steuer im richtigen Jahr.</p>' + knoepfe);
+    var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>' + '</div>';
+    var verlauf = '';
+    try { var vh = window.DpEingang ? window.DpEingang.verlaufHtml() : ''; if (vh) verlauf = karte(kopfzeile('Verlauf · eingelesen und übernommen') + vh, 'dp-pa4-mt'); } catch (e) { verlauf = ''; }
+    var erklaerung = '<p class="dp-pa-p">Wirtschaftsplan und Jahresabrechnung → Werbungskosten mit Jahr · Protokolle → Beschlüsse und Sonderumlagen · Mietverträge → passende Einheit und Mieter · Rechnungen → Werbungskosten. Nichts wird ohne deine Bestätigung übernommen.</p>';
+    if (html) return kuerzen(html) + verlauf + karte(kopfzeile('Neue Unterlagen') + erklaerung + knoepfe, 'dp-pa4-mt');
+    return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet.</p>' + erklaerung + knoepfe) + verlauf;
   }
 
   /* ── Hülle ───────────────────────────────────────────────────────────── */

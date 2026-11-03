@@ -2063,6 +2063,15 @@
     /* v3016 · ein PDF kann mehrere Dokumente tragen (a.weitere, z. B. Flurkarte + Energieausweis) */
     [a].concat(a.weitere || []).forEach(function (t) {
       if ((t.typ === 'hausgeld') !== !!nurHausgeld) return;   /* v3029-import: zwei Durchgänge */
+      /* v3120 · Marcel 03.11.2026: neue Mietverträge im Bestand „mit einem Vorschlag, wohin der Mietvertrag
+         zugeordnet wird und der zugehörige Mieter; kann er die Wohnung nicht zuordnen, ordnen wir selbst zu".
+         Bis hier schrieb EIN Vertrag seine Kaltmiete in die Objektmiete (nkm) des ganzen Hauses. */
+      if (t.typ === 'mietvertrag' && window.DpEingang && window.DpEingang.einheiten()) {
+        var _mx = t.extracted || {}, _mv = window.DpEingang.mvVorschlag(_mx) || { i: -1, sicher: false, grund: '' };
+        _merged['mv:' + Object.keys(_merged).length] = { label: 'Mietvertrag → Einheit', value: window.DpEingang.mvText(_mx), raw: _mx, source: t.label || 'Mietvertrag',
+          kind: 'mv_einheit', mv: _mv, nurAktiv: !_mv.sicher, herleitung: _mv.grund + ' · überschreibt Miete und Vertragsdaten der Einheit, Fläche/Zimmer nur wenn leer' };
+        return;
+      }
       var ktx = _kontext();
       (D.abgleich(t.extracted || {}, t.typ, ktx) || []).forEach(function (z) {
         if (z.hinweis) { _importHinweise.push(z.hinweis); return; }
@@ -2325,7 +2334,7 @@
         }).join('') + '<div class="oabi-addr-hinweis" style="font-size:12px;margin-top:4px;opacity:.8">Übernommen werden nur Werte aus dem Dokument der gewählten Adresse.</div></div>';
     }
     /* v3029-import · eine Zeile ohne Zielfeld wird nicht angeboten (sie konnte nie ankommen) */
-    var _SONDER = { steuer: 1, anhaengen: 1, merken: 1, einheiten: 1 };
+    var _SONDER = { steuer: 1, anhaengen: 1, merken: 1, einheiten: 1, mv_einheit: 1 };   /* v3120 */
     var keys = Object.keys(_merged).filter(function (id) {
       var it = _merged[id]; if (!it || _SONDER[it.kind] || id === 'me_modus' || id === 'mfh_wohnungen' || (_qcMode && OBJ2QC[id])) return true;
       return !!document.getElementById(id);
@@ -2354,10 +2363,16 @@
     /* v3088a · Hinweis, wenn Zeilen aus Wirtschaftsplan/Abrechnung bewusst nicht vorgehakt sind */
     var nAktiv = keys.filter(function (id) { return _merged[id] && _merged[id].nurAktiv && abw[id] === undefined; }).length;
     if (nAktiv) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px"><b>' + nAktiv + (nAktiv === 1 ? ' Wert' : ' Werte') + ' aus WEG-Unterlagen</b> (Hausgeld, Steuer, Sonderumlage) stehen hier nur zur Ansicht. Hak an, was übernommen werden soll.</div>';
+    /* v3120 · erkannte Rechnungen: an den Beleg-Leser (Werbungskosten je Jahr, jede Zeile bestätigen) */
+    var _rech = _files.filter(function (f) { return f.type === 'rechnung' && f.file; });
+    if (_rech.length) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid var(--wl-c9a84c,#C9A84C);background:rgba(201,168,76,.08);font-size:12.5px">'
+      + '<b>' + _rech.length + (_rech.length === 1 ? ' Rechnung/Beleg' : ' Rechnungen/Belege') + ' erkannt</b> (' + _rech.map(function (f) { return escH(f.name); }).join(', ') + '). Sie werden als Werbungskosten im richtigen Steuerjahr gelesen – du bestätigst jede Zeile. '
+      + '<button type="button" class="oabi-btn" id="oabi-belege" style="margin-left:6px">Als Werbungskosten auslesen</button></div>';
     host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(_bisherKopf(it)) + escH(_bisherText(it, abw[id])) + '</div>';
+      if (it.kind === 'mv_einheit' && window.DpEingang) valCell += '<div style="margin-top:4px"><select data-mv="' + escH(id) + '" style="max-width:100%;font-size:12.5px">' + window.DpEingang.mvOptionen(it.mv && it.mv.i >= 0 ? it.mv.i : -1) + '</select></div>';   /* v3120 */
       if (it.herleitung) valCell += '<div class="oabi-herl" style="font-size:11.5px;color:#7A7370;margin-top:2px;line-height:1.35">' + escH(it.herleitung) + '</div>';
       if (it.kind === 'anhaengen' && String(it.value).length > 160) valCell = valCell.replace('<b>' + escH(it.value) + '</b>', '<div style="white-space:pre-wrap;font-size:12px;max-height:120px;overflow:auto">' + escH(it.value) + '</div>');
       return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + ((abw[id] !== undefined || it.nurAktiv) ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
@@ -2371,6 +2386,12 @@
           + _importHinweise.filter(function (h, i, a) { return a.indexOf(h) === i; }).map(function (h) { return '<div style="margin-top:2px">' + escH(h) + '</div>'; }).join('') + '</div>' : '');
     _reiterEinbauen(host);   /* v3016 */
     if (ab) ab.disabled = false;
+    /* v3120 · Einheit gewählt = Zeile angehakt; Rechnungen an den Beleg-Leser */
+    host.querySelectorAll('select[data-mv]').forEach(function (sl) {
+      sl.addEventListener('change', function () { var cb = sl.closest('tr') && sl.closest('tr').querySelector('input[type="checkbox"]'); if (cb) cb.checked = sl.value !== ''; });
+    });
+    var _bk = host.querySelector('#oabi-belege');
+    if (_bk) _bk.addEventListener('click', function () { if (window.DpEingang) window.DpEingang.belegeAuslesen(_files.filter(function (f) { return f.type === 'rechnung' && f.file; }).map(function (f) { return f.file; })); });
     // Range-Toggle-Handler
     host.querySelectorAll('.oabi-spbtn').forEach(function (b) {
       b.addEventListener('click', function () {
@@ -2469,17 +2490,19 @@
     }
   }
 
+  var _eingang = false;   /* v3120 */
   function openCombinedImport(onDone, opts) {
     _oabiDone = (typeof onDone === 'function') ? onDone : null;
     _qcMode = !!(opts && opts.target === 'qc');  /* v418 */
     _ergaenzen = !!(opts && opts.ergaenzen) && !!(window.DpUnterlagen && window.DpUnterlagen.laden());   /* v3017 */
+    _eingang = !!(opts && opts.eingang);   /* v3120 · ein Eingang für Belege, Unterlagen, Rechnungen (unterlagen-eingang.js) */
     _auswertung = null;
     _qcPendingMerged = {};
     _merged = {}; _files = []; _importPhotos = [];
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
-        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente') + '</h3></div>' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente') + '</h3></div>' +
         (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage – gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
         '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
@@ -2513,8 +2536,9 @@
       '<select ' + (f.status === 'reading' ? 'disabled' : '') + '><option value="auto"' + (f.userType ? '' : ' selected') + '>Auto</option>' +
         '<option value="market"' + (f.userType === 'market' || (!f.userType && f.type === 'market') ? ' selected' : '') + '>Marktbericht</option>' +
         '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option>' +
-        (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') + '</select>' +
-      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'gesperrt' ? 'persönlich · nicht ausgelesen' : f.status === 'err' ? (f.fehler || 'kein Text') : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : 'Exposé')) + '</span>';
+        (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') +
+        (window.DpEingang ? '<option value="rechnung"' + (f.type === 'rechnung' ? ' selected' : '') + '>Rechnung / Beleg</option>' : '') + '</select>' +
+      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'gesperrt' ? 'persönlich · nicht ausgelesen' : f.status === 'err' ? (f.fehler || 'kein Text') : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung · Werbungskosten' : 'Exposé')) + '</span>';
     /* v3093a · N106 · Foto-Gruppe wieder auflösen */
     if (f.fotos && f.fotos.length > 1 && f.seitenTexte && f.status !== 'reading') {
       var _tr = document.createElement('button'); _tr.type = 'button'; _tr.className = 'oabi-einzeln';
@@ -2573,6 +2597,9 @@
   // Typ auflösen: bei klarem Befund direkt; bei 'unknown' erst Marktbericht versuchen und per Inhalt bestätigen, sonst Exposé.
   async function resolveType(f) {
     if (f.userType) { f.type = f.userType; await ensureExtract(f); return; }
+    /* v3120 · Rechnungen und Belege gehen an den Beleg-Leser (beleg-import.js, Werbungskosten je Jahr) -
+       bis hier liefen sie als „Marktbericht" und dann „Exposé" durch zwei KI-Abrufe ohne Ergebnis */
+    if (window.DpEingang && window.DpEingang.istRechnung(f.text, f.name)) { f.type = 'rechnung'; await ensureExtract(f); return; }
     if (window.DokumentImport && istDokument(f.text, f.name)) {
       f.type = 'dokument'; await ensureExtract(f);
       if (f.cache.dokument && f.cache.dokument.success) return;
@@ -2587,6 +2614,7 @@
   }
   async function ensureExtract(f) {
     if (f.cache[f.type]) return;
+    if (f.type === 'rechnung') { f.cache.rechnung = { beleg: true }; f.status = 'ok'; renderFileRow(f); return; }   /* v3120 */
     f.status = 'reading'; renderFileRow(f);
     try {
       if (f.type === 'dokument') {
@@ -2748,8 +2776,13 @@
       try { ta.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
       return 'text';
     }
-    if (it.kind === 'steuer') {   /* v3017 */
-      return (typeof window.dpSteuerSetzen === 'function' && window.dpSteuerSetzen(it.jahr, it.feld, it.raw)) ? 'text' : null;
+    if (it.kind === 'steuer') {   /* v3017 · v3120: mit Quelle - unterlagen-eingang.js merkt die Herkunft */
+      return (typeof window.dpSteuerSetzen === 'function' && window.dpSteuerSetzen(it.jahr, it.feld, it.raw, { quelle: it.source })) ? 'text' : null;
+    }
+    if (it.kind === 'mv_einheit') {   /* v3120 */
+      var _sl = document.querySelector('#oabi-ov select[data-mv="' + id + '"]');
+      if (!_sl || _sl.value === '' || !window.DpEingang) { _importHinweise.push('Mietvertrag nicht übernommen: keine Einheit gewählt.'); return null; }
+      return window.DpEingang.mvUebernehmen(parseInt(_sl.value, 10), it.raw, it.source) ? 'text' : null;
     }
     if (it.kind === 'sonderumlage') {   /* v3092 · N100 */
       return (window.DpSonderumlage && window.DpSonderumlage.uebernehmen(it.su)) ? 'text' : null;
@@ -2875,6 +2908,13 @@
     _folgen = window.dpImportFolgen ? window.dpImportFolgen(_applied) : '';   /* v3029-import */
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
+    /* v3120 · Verlauf im Reiter Unterlagen & WEG: was wann eingelesen und übernommen wurde */
+    try {
+      if (window.DpEingang) window.DpEingang.protokoll({
+        dokumente: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé' }; }),
+        uebernommen: _applied.map(function (id) { var x = _merged[id]; return x ? (x.label + ': ' + String(x.value).slice(0, 120)) : id; })
+      });
+    } catch (e) {}
     } finally {
       /* v1330: kommt IMMER - auch wenn oben ein Feld geworfen hat. */
       try { ov.remove(); } catch (e) {}
