@@ -414,6 +414,9 @@ function einheitenMieteAus(d, nurWohnenImMix) {
       _d(e.mv_befristet_bis) ? { mv_befristet_bis: _d(e.mv_befristet_bis) } : {},
       _d(e.mv_kuendigungsverzicht_bis) ? { mv_kuendigungsverzicht_bis: _d(e.mv_kuendigungsverzicht_bis) } : {},
       num(e.mv_abw_jahre) > 0 ? { mv_abw_jahre: num(e.mv_abw_jahre) } : {},
+      /* v3140 · N114 · letzte Mieterhoehung (Wartefrist § 558 Abs. 1, Kappungs-Anrechnung § 558 Abs. 3) */
+      (!leer && _d(e.mv_letzte_erhoehung)) ? { mv_letzte_erhoehung: _d(e.mv_letzte_erhoehung) } : {},
+      (!leer && num(e.mv_letzte_erhoehung_betrag) > 0) ? { mv_letzte_erhoehung_betrag: num(e.mv_letzte_erhoehung_betrag) } : {},
       (leer && (e.leer_abzug === true || e.leer_abzug === 'true')) ? { leer_abzug: true,
         leer_monate: num(e.leer_monate) > 0 ? num(e.leer_monate) : null,
         herrichtung_eur: num(e.herrichtung_eur) > 0 ? num(e.herrichtung_eur) : null } : {}));
@@ -461,6 +464,10 @@ export const DealPilotObjectMapper = {
       mv_befristet_bis: (function () { const v = pick(d, ['mv_befristet_bis']); return v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null; })(),
       mv_kuendigungsverzicht_bis: (function () { const v = pick(d, ['mv_kuendigungsverzicht_bis']); return v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null; })(),
       mv_abw_jahre: num(pick(d, ['mv_abw_jahre'])) > 0 ? num(pick(d, ['mv_abw_jahre'])) : null,
+      /* v3140 · N114 · Einzelobjekt: letzte Mieterhoehung und Vertragsart (Wartefrist, Kappung, Staffel/Index) */
+      mv_letzte_erhoehung: (function () { const v = pick(d, ['mv_letzte_erhoehung']); return v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null; })(),
+      mv_letzte_erhoehung_betrag: num(pick(d, ['mv_letzte_erhoehung_betrag'])) > 0 ? num(pick(d, ['mv_letzte_erhoehung_betrag'])) : null,
+      mv_art: pick(d, ['mv_art']) ? String(pick(d, ['mv_art'])) : null,
       /* v1437: Wohneinheiten fehlten - der Ertragswert setzt die Verwaltungskosten
          je BEWERTETER Einheit an (Anlage 3 ImmoWertV) und rechnete auf dem Objektweg
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */

@@ -66,25 +66,108 @@ export function kappungFuer(ags, eigenPct, heute = new Date()) {
  * @param {number} ansatzJahr  marktübliche Miete p. a. (Ansatz im Ertragswert)
  * @returns {null | {jahre, barwert_eur, schritte[], kappung_pct, annahmen}}
  */
-export function erhoehungspfad558(istJahr, ansatzJahr, lzsPct, kappungPct, rndJahre) {
+/* ══ v3140 · N114 · DIE LETZTE ERHÖHUNG ZÄHLT (Marcel 03.11.2026) ══════════════
+   Bis v3139 unterstellte der Pfad immer „Wartefrist erfüllt" und rechnete die
+   Kappungsgrenze auf die heutige Miete - auch wenn die Wohnung vor sechs Monaten
+   erhöht worden war. Dann setzt die erste Anhebung zu früh und zu hoch an, die
+   Mindermiete wird zu klein und der Ertragswert zu hoch. ImmoWertA 31.(2) b)
+   (Muster-AH, FK Städtebau 20.09.2023, hess. Fassung S. 33): „Bei bestehenden
+   Mietverhältnissen sind Mieterhöhungsmöglichkeiten zu berücksichtigen. Bei
+   Wohnraummietverhältnissen sind insoweit … die differenzierten Vorgaben des BGB
+   … zu beachten." Jetzt, wenn die letzte Erhöhung eingetragen ist (opts.letzte):
+     - Wartefrist § 558 Abs. 1 BGB: die Erhöhung wirkt frühestens 15 Monate nach
+       der letzten (Verlangen ein Jahr danach, Wirkung § 558b Abs. 1 drei Monate
+       später) - dieselbe Regel wie frontend/js/mietpotenzial-kern.js mhTermine()
+       (TERMIN_REGEL '558': warte 12, plus 3); tools/wertermittlung-pruefen.mjs
+       vergleicht beide an echten Daten (B21c).
+     - Kappungsgrenze § 558 Abs. 3 BGB: Bezug ist die Miete drei Jahre VOR dem
+       Wirksamwerden. Mit Betrag der letzten Erhöhung (opts.letzteBetragMonat) ist
+       sie bekannt; ohne Betrag und mit der letzten Erhöhung im Fenster rechnet der
+       Pfad erst, wenn sie aus dem Fenster fällt (sicher erreichbar, keine
+       erfundene Zahl) und sagt es.
+     - Staffel- und Indexmiete: keine Erhöhung nach § 558 (§ 557a Abs. 2, § 557b
+       Abs. 2 BGB) -> null, der Aufrufer nennt den Grund.
+   Ohne letzte Erhöhung rechnet der Pfad wie bis v3139 (Annahme im Text benannt). */
+const ymOffset = (st, ym) => {
+  const r = /^(\d{4})-(\d{2})/.exec(String(ym || ''));
+  if (!r || !(st instanceof Date) || !Number.isFinite(st.getTime())) return null;
+  return (Number(r[1]) - st.getUTCFullYear()) * 12 + (Number(r[2]) - 1 - st.getUTCMonth());
+};
+const ymPlus = (st, off) => {
+  const t = st.getUTCFullYear() * 12 + st.getUTCMonth() + off;
+  return String(Math.floor(t / 12)) + '-' + String((t % 12) + 1).padStart(2, '0');
+};
+const mmjj = (ym) => ym.slice(5, 7) + '/' + ym.slice(0, 4);
+const eurM = (x) => (Math.round(x * 100) / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+/** v3140 · Staffel-/Indexmiete schliesst § 558 aus (wie mietpotenzial-kern.js vertragGrenzen) */
+export function ausschluss558(mvArt) {
+  const a = String(mvArt || '').toLowerCase();
+  if (a === 'staffel') return 'Staffelmiete: keine Erhöhung nach § 558 BGB während der Staffel (§ 557a Abs. 2 BGB)';
+  if (a === 'index') return 'Indexmiete: keine Erhöhung bis zur Vergleichsmiete (§ 557b Abs. 2 BGB)';
+  return null;
+}
+
+export function erhoehungspfad558(istJahr, ansatzJahr, lzsPct, kappungPct, rndJahre, opts = {}) {
   const I = Number(istJahr) / 12, A = Number(ansatzJahr) / 12, k = Number(kappungPct) / 100, i = Number(lzsPct) / 100;
   if (!(I > 0) || !(A > I) || !(k > 0) || !(i > 0)) return null;
+  if (ausschluss558(opts.mvArt)) return null;
   const maxMon = Number(rndJahre) > 0 ? Math.round(Number(rndJahre) * 12) : 1200;
-  let m = 0, miete = I, bw = 0;
+  const st = opts.stichtag instanceof Date ? opts.stichtag : null;
+  /* Monat der letzten Erhoehung relativ zum Stichtagsmonat (negativ = Vergangenheit) */
+  let l = st && opts.letzte ? ymOffset(st, opts.letzte) : null;
+  const letzteUngueltig = l != null && l > 0;   /* in der Zukunft eingetragen: nicht verwendbar */
+  if (letzteUngueltig) l = null;
+  const B = (l != null && Number(opts.letzteBetragMonat) > 0 && Number(opts.letzteBetragMonat) < I) ? Number(opts.letzteBetragMonat) : null;
+  /* Miete im Monat t (t < 0: Vergangenheit; null = unbekannt) */
+  const sim = [];
+  const mieteAm = (t) => {
+    if (t >= 0) return sim[t];
+    if (l == null || t >= l) return I;
+    return B != null ? I - B : null;
+  };
+  let m = 0, miete = I, bw = 0, letzteWirk = l;
   const schritte = [];
-  let naechste = 3;
   while (m < maxMon) {
-    if (m === naechste) {
-      const neu = Math.min(A, miete * (1 + k));
-      schritte.push({ ab_monat: m, miete_monat: Math.round(neu * 100) / 100 });
-      miete = neu; naechste += 36;
+    /* Wartefrist: 15 Monate nach der letzten Erhoehung (§ 558 Abs. 1), fruehestens Verlangen am Stichtag + 3 (§ 558b) */
+    const frueh = letzteWirk == null ? 3 : Math.max(3, letzteWirk + 15);
+    if (m >= frueh) {
+      const basis = mieteAm(m - 36);
+      if (basis != null) {
+        const neu = Math.min(A, basis * (1 + k));
+        if (neu > miete + 0.005) {
+          schritte.push({ ab_monat: m, miete_monat: Math.round(neu * 100) / 100 });
+          miete = neu; letzteWirk = m;
+        }
+      }
     }
+    sim[m] = miete;
     if (miete >= A - 0.005) break;
     bw += (miete - A) / Math.pow(1 + i, (m + 1) / 12);
     m++;
   }
-  return { jahre: Math.round(m / 12 * 10) / 10, monate: m, barwert_eur: Math.round(bw), schritte, kappung_pct: kappungPct,
-    gedeckelt_auf_rnd: m >= maxMon,
-    annahmen: 'Mieterhöhung nach § 558 BGB: Wartefrist als erfüllt unterstellt, Verlangen zum Stichtag, Wirkung nach drei Monaten (§ 558b), danach alle drei Jahre um die Kappungsgrenze von '
-      + kappungPct + ' %, höchstens bis zur marktüblichen Miete' };
+  const out = { jahre: Math.round(m / 12 * 10) / 10, monate: m, barwert_eur: Math.round(bw), schritte, kappung_pct: kappungPct,
+    gedeckelt_auf_rnd: m >= maxMon, wartefrist_geprueft: l != null };
+  if (l == null) {
+    out.annahmen = 'Mieterhöhung nach § 558 BGB: Wartefrist als erfüllt unterstellt, Verlangen zum Stichtag, Wirkung nach drei Monaten (§ 558b), danach alle drei Jahre um die Kappungsgrenze von '
+      + kappungPct + ' %, höchstens bis zur marktüblichen Miete';
+    if (letzteUngueltig) out.hinweis = 'die eingetragene letzte Erhöhung liegt nach dem Wertermittlungsstichtag und ist nicht verwendet';
+    else out.hinweis = 'letzte Erhöhung nicht eingetragen';
+    return out;
+  }
+  const lYm = ymPlus(st, l);
+  out.letzte_erhoehung = lYm;
+  out.erste_anhebung = schritte.length ? ymPlus(st, schritte[0].ab_monat) : null;
+  /* erste Anhebung spaeter als die Wartefrist erlaubt -> die Kappung (Fenster) hat sie verschoben */
+  const s0 = schritte.length ? schritte[0].ab_monat : null;
+  const verschoben = s0 != null && s0 > Math.max(3, l + 15);
+  const imFenster = s0 != null && (s0 - 36 < l || verschoben);
+  out.kappung_angerechnet_eur = (imFenster && B != null) ? Math.round(B * 100) / 100 : null;
+  out.kappung_basis_unbekannt = verschoben && B == null;
+  out.annahmen = 'Mieterhöhung nach § 558 BGB: letzte Erhöhung ' + mmjj(lYm)
+    + (out.erste_anhebung ? ', erste Anhebung wirksam ab ' + mmjj(out.erste_anhebung) : '')
+    + ' (Wartefrist § 558 Abs. 1, Wirkung § 558b Abs. 1 BGB)'
+    + (out.kappung_angerechnet_eur != null ? ', die letzte Erhöhung (' + eurM(B) + '/Monat) auf die Kappungsgrenze angerechnet (§ 558 Abs. 3 BGB)' : '')
+    + (out.kappung_basis_unbekannt ? ', Betrag der letzten Erhöhung nicht eingetragen: die Kappungsgrenze erst angesetzt, wenn sie aus dem Drei-Jahres-Fenster fällt' : '')
+    + ', danach alle drei Jahre um die Kappungsgrenze von ' + kappungPct + ' %, höchstens bis zur marktüblichen Miete';
+  return out;
 }

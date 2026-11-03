@@ -13,7 +13,7 @@ import { ErtragswertService } from './ErtragswertService.js';
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { pruefeModell, mieteModellkonform, modellDurchschnitte } from '../lib/modellpruefung.js';   /* v2595, v2600 */
 import { barwertAbweichung } from '../lib/immowertv.js';   /* v2600 · E2 */
-import { kappungFuer, erhoehungspfad558 } from '../lib/kappung.js';   /* v2993 */
+import { kappungFuer, erhoehungspfad558, ausschluss558 } from '../lib/kappung.js';   /* v2993, v3140 */
 import { baupreisindexAm } from '../lib/baupreisindex.js';   /* v2996 */
 import { stichtagAus } from '../lib/stichtag.js';
 import { mitRegisterStichtag } from '../lib/ausschuss_register.js';   /* v3010 · Jahrgang zum Stichtag */   /* v3010 · Wertermittlungsstichtag an einer Stelle */
@@ -195,8 +195,12 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag, opts = {})
     if (belegt.length) { jahre = Math.max(...belegt); quelle = jB != null && jahre === jB ? 'befristung' : 'kuendigungsverzicht'; }
     else if (art === 'underrent' && Number(z.abw_jahre) > 0) { jahre = Number(z.abw_jahre); quelle = 'eingabe'; }
     let pfad = null;
-    if (jahre == null && art === 'underrent' && z.nutzung !== 'gewerbe' && opts.kappung && Number(z.ist_jahr) > 0) {
-      pfad = erhoehungspfad558(Number(z.ist_jahr), Number(z.ist_jahr) - d, lzsPct, opts.kappung.pct, R);
+    /* v3140 · N114 · letzte Erhoehung, ihr Betrag und die Vertragsart der Wohnung (Wartefrist,
+       Kappungs-Anrechnung, Staffel/Index) - lib/kappung.js */
+    const _aus558 = (art === 'underrent' && z.nutzung !== 'gewerbe') ? ausschluss558(z.mv_art) : null;
+    if (jahre == null && art === 'underrent' && z.nutzung !== 'gewerbe' && opts.kappung && Number(z.ist_jahr) > 0 && !_aus558) {
+      pfad = erhoehungspfad558(Number(z.ist_jahr), Number(z.ist_jahr) - d, lzsPct, opts.kappung.pct, R,
+        { stichtag: st, letzte: z.letzte_erhoehung || null, letzteBetragMonat: z.letzte_erhoehung_betrag || null, mvArt: z.mv_art || null });
       if (pfad) { jahre = pfad.jahre; quelle = 'bgb558'; }
     }
     const zeile = { nr: z.nr || null, art, differenz_jahr: d, jahre: jahre != null ? deckel(jahre) : null, jahre_quelle: quelle,
@@ -205,7 +209,11 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag, opts = {})
     if (pfad) {
       zeile.barwert_eur = pfad.barwert_eur; zeile.angesetzt = true;
       zeile.pfad558 = { schritte: pfad.schritte, kappung_pct: pfad.kappung_pct, kappung_text: opts.kappung.text,
-                        kappung_pruefen: !!opts.kappung.pruefen, annahmen: pfad.annahmen };
+                        kappung_pruefen: !!opts.kappung.pruefen, annahmen: pfad.annahmen,
+                        /* v3140 · N114 */
+                        wartefrist_geprueft: !!pfad.wartefrist_geprueft, letzte_erhoehung: pfad.letzte_erhoehung || null,
+                        erste_anhebung: pfad.erste_anhebung || null, kappung_angerechnet_eur: pfad.kappung_angerechnet_eur ?? null,
+                        kappung_basis_unbekannt: !!pfad.kappung_basis_unbekannt, hinweis: pfad.hinweis || null };
     } else if (jahre != null && jahre > 0) {
       zeile.barwert_eur = barwertAbweichung(d, lzsPct, zeile.jahre);
       zeile.angesetzt = true;
@@ -215,7 +223,7 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag, opts = {})
       zeile.angesetzt = false;
       zeile.grund = art === 'overrent'
         ? (Number(z.abw_jahre) > 0 ? 'Mehrertrag nur mit belegter Vertragslaufzeit (Befristung oder Kündigungsverzicht)' : 'keine Vertragslaufzeit angegeben')
-        : 'keine Restlaufzeit angegeben';
+        : (_aus558 ? _aus558 + ' - Dauer der Abweichung eintragen' : 'keine Restlaufzeit angegeben');   /* v3140 */
       offen.push(zeile);
     }
     zeilen.push(zeile);
@@ -1380,6 +1388,8 @@ export const CrossCheckService = {
         const fl = r2(Number(e.wfl) * f);
         /* v2600 · E2/E3 · Vertragsangaben der Wohnung reisen mit (Restlaufzeit, Leerstandsabzug) */
         const vt = { mv_art: e.mv_art || null, befristet_bis: e.mv_befristet_bis || null,
+                     /* v3140 · N114 · Wartefrist und Kappungs-Anrechnung je Wohnung */
+                     letzte_erhoehung: e.mv_letzte_erhoehung || null, letzte_erhoehung_betrag: Number(e.mv_letzte_erhoehung_betrag) > 0 ? Number(e.mv_letzte_erhoehung_betrag) : null,
                      kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
                      abw_jahre: Number(e.mv_abw_jahre) > 0 ? Number(e.mv_abw_jahre) : null };
         if (e.leer || !(Number(e.ist_monat) > 0)) {
@@ -1424,7 +1434,10 @@ export const CrossCheckService = {
               : Math.round(_num(ref.monthly_net_rent) * 12 - _refQm * _wflIst * 12),
              ist_jahr: _ls ? Math.round(_ls.ist_monat_vermietet * 12) : Math.round(_num(ref.monthly_net_rent) * 12),   /* v2993 · fuer den § 558-Pfad */
              befristet_bis: ref.mv_befristet_bis || null, kuendigungsverzicht_bis: ref.mv_kuendigungsverzicht_bis || null,
-             abw_jahre: Number(ref.mv_abw_jahre) > 0 ? Number(ref.mv_abw_jahre) : null }]
+             abw_jahre: Number(ref.mv_abw_jahre) > 0 ? Number(ref.mv_abw_jahre) : null,
+             /* v3140 · N114 */
+             mv_art: ref.mv_art || null, letzte_erhoehung: ref.mv_letzte_erhoehung || null,
+             letzte_erhoehung_betrag: Number(ref.mv_letzte_erhoehung_betrag) > 0 ? Number(ref.mv_letzte_erhoehung_betrag) : null }]
         : []);
     /* v2600 · E3 · Leerstand: Mietausfall bis zur Vermietung + Herrichtung, je leerer Wohnung,
        nur wenn ausdruecklich gewaehlt (voreingestellt aus; Marcel 21.10.: voll vermietet). */
@@ -1914,8 +1927,10 @@ export const CrossCheckService = {
             detail: 'Reinertragsdifferenz je Jahr (Bewirtschaftungskosten gleich): ' + _mietBog.zeilen.filter((x) => x.angesetzt && x.barwert_eur).map((x) => (x.nr ? x.nr + ': ' : '')
               + (x.jahre_quelle === 'bgb558'
                 /* v2993 · Pfad nach § 558 BGB: die Differenz schrumpft mit jeder Anhebung - kein einzelner Barwertfaktor */
-                ? '−' + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr anfangs, abnehmend mit jeder Anhebung nach § 558 BGB (Kappung ' + x.pfad558.kappung_pct + ' %), '
-                  + String(x.jahre).replace('.', ',') + ' J. bis zur marktüblichen Miete = ' + Math.round(x.barwert_eur).toLocaleString('de-DE') + ' €'
+                /* v3140 · N114 · als „Mindermiete bis zur rechtlich zulaessigen Anpassung" mit der ersten Anhebung */
+                ? 'Mindermiete bis zur rechtlich zulässigen Anpassung: −' + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr anfangs, abnehmend mit jeder Anhebung nach § 558 BGB (Kappung ' + x.pfad558.kappung_pct + ' %'
+                  + (x.pfad558.erste_anhebung ? ', erste ab ' + x.pfad558.erste_anhebung.slice(5, 7) + '/' + x.pfad558.erste_anhebung.slice(0, 4) : (x.pfad558.wartefrist_geprueft ? '' : ', Wartefrist unterstellt')) + '), '
+                  + String(x.jahre).replace('.', ',') + ' J. bis zur marktüblichen Miete, Barwert ' + Math.round(x.barwert_eur).toLocaleString('de-DE') + ' €'
                 : (x.differenz_jahr > 0 ? '+' : '−') + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr × Barwertfaktor '
                   + String(x.jahre).replace('.', ',') + ' J. (' + (x.jahre_quelle === 'eingabe' ? 'eigene Angabe' : x.jahre_quelle === 'befristung' ? 'Befristung' : 'Kündigungsverzicht') + ')')).join('; ') });
         }
@@ -2118,9 +2133,17 @@ export const CrossCheckService = {
           const _p558 = _mietBog.zeilen.filter((x) => x.jahre_quelle === 'bgb558' && x.pfad558);
           if (_p558.length) {
             const _p0 = _p558[0].pfad558;
-            out.notes.push('Mindermiete bis zur Anpassung (ImmoWertA zu § 31 c, § 558 BGB): ' + _p0.annahmen + '. ' + (_p0.kappung_text || '') + '.'
-              + ' Je Wohnung: ' + _p558.map((x) => (x.nr ? x.nr + ' ' : '') + String(x.jahre).replace('.', ',') + ' J., ' + _eu(x.barwert_eur)).join('; ')
-              + '. Ist die letzte Erhöhung jünger als 15 Monate oder gilt eine Befristung, verlängert sich die Dauer - mit einem Vertragsdatum wird sie genau.');
+            /* v3140 · N114 · Annahmen je Wohnung (letzte Erhoehung je Vertrag); Fundstelle ImmoWertA 31.(2) b) und c) */
+            const _ohneL = _p558.filter((x) => !x.pfad558.wartefrist_geprueft);
+            const _mitL = _p558.filter((x) => x.pfad558.wartefrist_geprueft);
+            out.notes.push('Mindermiete bis zur rechtlich zulässigen Anpassung (ImmoWertA 31.(2) b) und c), § 8 Abs. 3 ImmoWertV, § 558 BGB): '
+              + 'der vorläufige Ertragswert rechnet mit der marktüblichen Miete, die Mindermiete bis dahin geht als Barwert ab (Liegenschaftszins). '
+              + (_mitL.length ? _mitL.map((x) => (x.nr ? x.nr + ': ' : '') + x.pfad558.annahmen).join('; ') + '. ' : '')
+              + (_ohneL.length ? (_mitL.length ? (_ohneL.map((x) => x.nr).filter(Boolean).join(', ') || 'Übrige') + ': ' : '') + _ohneL[0].pfad558.annahmen + '. ' : '')
+              + (_p0.kappung_text || '') + '.'
+              + ' Je Wohnung: ' + _p558.map((x) => (x.nr ? x.nr + ' ' : '') + String(x.jahre).replace('.', ',') + ' J., ' + _eu(x.barwert_eur)).join('; ') + '.'
+              + (_ohneL.length ? ' Die letzte Mieterhöhung ist nicht eingetragen: liegt sie weniger als 15 Monate zurück, verlängert sich die Dauer (§ 558 Abs. 1 BGB) und der Abzug wird größer - mit Datum und Betrag (Reiter Objekt, Wohnungen) wird sie genau.' : '')
+              + (_p558.some((x) => x.pfad558.kappung_basis_unbekannt) ? ' Wo der Betrag der letzten Erhöhung fehlt, ist die Kappungsgrenze erst angesetzt, wenn die Erhöhung aus dem Drei-Jahres-Fenster fällt (sicher erreichbar) - mit dem Betrag wird es genauer.' : ''));
           }
           if (_mietBog.n_offen && _mietBog.szenarien) {
             const s0 = _mietBog.szenarien[0], s2 = _mietBog.szenarien[_mietBog.szenarien.length - 1];

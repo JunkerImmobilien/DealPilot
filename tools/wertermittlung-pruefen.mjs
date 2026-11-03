@@ -771,6 +771,52 @@ fallB('B21', () => {
   pruefe('B', 'B21', 'Kappungsgrenze: Hamburg 15 % (Verordnung), eigene Angabe geht vor', kh.pct === 15 && kh.herkunft === 'verordnung' && ke.pct === 15 && ke.herkunft === 'eigen' && (kb.pct === 20 || kb.pct === 15),
     kh.pct + ' ' + kb.pct + ' ' + ke.herkunft);
 });
+/* ══ v3140 · N114 · MINDERMIETE BIS ZUR RECHTLICH ZULAESSIGEN ANPASSUNG (Marcel 03.11.2026) ══
+   ImmoWertA 31.(2) b) und c): bei bestehenden Wohnraummietverhaeltnissen die Vorgaben des BGB.
+   Die letzte Erhoehung verschiebt die erste Anhebung (Wartefrist § 558 Abs. 1: 15 Monate) und
+   wird auf die Kappungsgrenze angerechnet (§ 558 Abs. 3). Staffel/Index: kein § 558. */
+fallB('B21b', () => {
+  const r0 = westerfeldMit((w) => { w.ist_monat = 500; });
+  const z0 = r0 && r0.ertragswert.miete_bog && r0.ertragswert.miete_bog.zeilen[0];
+  pruefe('B', 'B21b', 'ohne letzte Erhöhung: wie bis v3139, Wartefrist unterstellt und benannt', !!z0 && z0.pfad558 && z0.pfad558.wartefrist_geprueft === false
+    && z0.pfad558.schritte[0].ab_monat === 3 && /Wartefrist als erfüllt unterstellt/.test(z0.pfad558.annahmen));
+  /* letzte Erhoehung einen Monat vor dem Stichtag des Falls: erste Anhebung erst 15 Monate danach */
+  const st = r0 && r0.wertermittlungsstichtag && r0.wertermittlungsstichtag.datum ? new Date(r0.wertermittlungsstichtag.datum) : null;
+  const ym = (d, off) => { const t = d.getUTCFullYear() * 12 + d.getUTCMonth() + off; return Math.floor(t / 12) + '-' + String(t % 12 + 1).padStart(2, '0'); };
+  const L = st ? ym(st, -1) : '2026-09';
+  const r1 = westerfeldMit((w) => { w.ist_monat = 500; w.mv_letzte_erhoehung = L; w.mv_letzte_erhoehung_betrag = 20; });
+  const z1 = r1 && r1.ertragswert.miete_bog && r1.ertragswert.miete_bog.zeilen[0];
+  pruefe('B', 'B21b', 'letzte Erhöhung 1 Monat vor Stichtag: erste Anhebung 14 Monate nach Stichtag (15 nach der letzten)', !!z1 && z1.pfad558
+    && z1.pfad558.wartefrist_geprueft && z1.pfad558.schritte[0].ab_monat === 14 && z1.pfad558.kappung_angerechnet_eur === 20,
+    z1 && z1.pfad558 ? JSON.stringify(z1.pfad558.schritte.slice(0, 2)) + ' ' + z1.pfad558.erste_anhebung : '–');
+  pruefe('B', 'B21b', 'späte Anhebung → größere Mindermiete → kleinerer Ertragswert', !!z1 && !!z0 && z1.barwert_eur < z0.barwert_eur
+    && r1.ertragswert_kern.wert_ungerundet < r0.ertragswert_kern.wert_ungerundet, (z0 && z0.barwert_eur) + ' → ' + (z1 && z1.barwert_eur));
+  const kz = r1 && (r1.ertragswert_kern.staffel || []).find((x) => /Merkmal: Mietabweichung/.test(x.pos));
+  pruefe('B', 'B21b', 'Rechenweg-Zeile „Mindermiete bis zur rechtlich zulässigen Anpassung" mit erster Anhebung und Barwert', !!kz
+    && /Mindermiete bis zur rechtlich zulässigen Anpassung/.test(kz.detail || '') && /erste ab \d{2}\/\d{4}/.test(kz.detail || '') && /Barwert/.test(kz.detail || ''), kz ? kz.detail : '–');
+  /* ohne Betrag, letzte Erhoehung im Drei-Jahres-Fenster: Kappung erst, wenn sie herausfaellt (36 Monate) */
+  const r2 = westerfeldMit((w) => { w.ist_monat = 500; w.mv_letzte_erhoehung = L; });
+  const z2 = r2 && r2.ertragswert.miete_bog && r2.ertragswert.miete_bog.zeilen[0];
+  pruefe('B', 'B21b', 'ohne Betrag: erste Anhebung 35 Monate nach Stichtag, benannt', !!z2 && z2.pfad558 && z2.pfad558.schritte[0].ab_monat === 35
+    && z2.pfad558.kappung_basis_unbekannt === true && z2.barwert_eur <= z1.barwert_eur, z2 && z2.pfad558 ? z2.pfad558.schritte[0].ab_monat + ' / ' + z2.barwert_eur : '–');
+  /* Staffelmiete: kein § 558-Pfad, nichts erfunden -> offen mit Grund */
+  const r3 = westerfeldMit((w) => { w.ist_monat = 500; w.mv_art = 'staffel'; });
+  const b3 = r3 && r3.ertragswert.miete_bog;
+  pruefe('B', 'B21b', 'Staffelmiete: kein § 558-Pfad, nicht angesetzt, Grund § 557a', !!b3 && b3.n_angesetzt === 0 && /557a/.test(b3.zeilen[0].grund || ''), b3 ? b3.zeilen[0].grund : '–');
+});
+fallB('B21c', () => {
+  /* Dieselbe Terminregel wie frontend/js/mietpotenzial-kern.js mhTermine() - die ECHTE Datei */
+  const req = nodeModule.createRequire(import.meta.url);
+  const MP = req(path.join(WURZEL, 'frontend/js/mietpotenzial-kern.js'));
+  const KP = await_kappung, st = new Date(Date.UTC(2026, 9, 1));
+  const faelle = ['2020-03', '2024-11', '2025-07', '2025-10', '2026-01', '2026-06', '2026-09', '2026-10'];
+  const abw = faelle.filter((L) => {
+    const t = MP.mhTermine({ art: '558', letzte: L, heute: '2026-10' });
+    const p = KP.erhoehungspfad558(12000, 15000, 3, 20, 40, { stichtag: st, letzte: L, letzteBetragMonat: 1 });
+    return !p || p.erste_anhebung !== String(t.wirksam_ab).slice(0, 7);
+  });
+  pruefe('B', 'B21c', 'Wartefrist im Backend = mhTermine() im Frontend (' + faelle.length + ' Daten)', abw.length === 0, abw.join(', '));
+});
 fallB('B22', () => {
   /* WE 1 mit 1.100 €/Monat (11,28 €/m²) ueber dem Band: Mehrertrag */
   const r1 = westerfeldMit((w) => { w.ist_monat = 1100; w.mv_abw_jahre = 5; }), b1 = r1 && r1.ertragswert.miete_bog;
