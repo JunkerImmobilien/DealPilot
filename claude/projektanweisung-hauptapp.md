@@ -44247,3 +44247,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `b9e917bc`, `84583de4`, `dc4e2478`, `722e3356`, Handbuch. Prod 1.0.44 = `4edbd61`, Sicherungen `/root/backups/haupt-20261103-0908.sql.gz` (16 MB) und `mb-20261103-0908.sql.gz` (30 MB), Köpfe gelesen.
 - **Nachweis:** Staging im Browser geprüft: Zeile 115.000 € unter 96.000 und 81.000 €, W-1 eingetragen, Stand gesetzt, gefiltert. Prod: `/wuensche/zugang` 401 ohne Token, `umsetzungswuensche.js?v=v3097` und `qc-bridge.js?v=v3096a` werden ausgeliefert, die Quick-Check-Seite enthält die neue Funktion. Gold 413, Buster sauber, Score-Ketten grün, Handbuch grün.
 - **Rest:** Prod-Freischaltung der Partner im Admin (Marcel). Das Lesen von Prod mit `wuensche-holen.mjs` braucht eine Rechtefreigabe.
+
+### v3098–v3098b · Quick-Check meldet eine gescheiterte Marktbewertung (03.11.2026)
+
+- **Was:** `dealpilot-mb-qc.js` baut seine Meldung selbst (im Quick-Check gibt es kein globales `toast`), `run()` gibt `{ok, text}` zurück, die Schlussmeldung des Pre-Flights nennt gescheiterte Abrufe, es steht immer nur eine Meldung da.
+- **Commit:** `24958246`, `e562096e`, `298bae6c`. Prod 1.0.45 = `b56c0e1`, Sicherungen `haupt-20261103-0921` und `mb-20261103-0921`, Köpfe gelesen.
+- **Nachweis:** Auf Staging wurde ein 402 nachgestellt: Die Meldung „⚠ DealPilot-Marktbewertung nicht abgerufen: …“ ist sichtbar (opacity 1, im Bild), der Pre-Flight meldet „⚠ Abruf abgeschlossen, aber nicht alles kam an …“. Prod liefert `qc-v3098a` und `dealpilot-mb-qc.js?v=v3098a` aus.
+- **Rest:** Bodenrichtwerte Bayern (N109) liegen bei Marcel.
