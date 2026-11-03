@@ -346,15 +346,28 @@
     schreiben(o); setTimeout(neuZeichnen, 120);
     return true;
   }
-  /* Zwei Klicks statt Bestätigungsfenster: der erste fragt im Knopf selbst nach */
+  /* Zwei Klicks statt Bestätigungsfenster: der erste fragt im Knopf selbst nach.
+     v3154g · gemessen: die Pilot-Analyse zeichnet nach dem Speichern neu - ein Merker AM Knopf ging
+     zwischen erstem und zweitem Klick verloren. Der Merker liegt deshalb hier und übersteht das Neuzeichnen. */
+  var _scharf = null;   /* { art, id, bis } */
+  function knopfText(art, id) {
+    var s = _scharf && _scharf.art === art && _scharf.id === id && _scharf.bis > Date.now();
+    return s ? (art === 'zurueck' ? 'Wirklich zurücknehmen?' : 'Wirklich löschen?') : (art === 'zurueck' ? 'Zurücknehmen' : 'Löschen');
+  }
   function knopf(art, id, btn) {
-    if (!btn) return;
-    if (btn.getAttribute('data-sicher') !== '1') {
-      btn.setAttribute('data-sicher', '1');
-      btn.textContent = art === 'zurueck' ? 'Wirklich zurücknehmen?' : 'Wirklich löschen?';
-      setTimeout(function () { if (btn.isConnected && btn.getAttribute('data-sicher') === '1') { btn.removeAttribute('data-sicher'); btn.textContent = art === 'zurueck' ? 'Zurücknehmen' : 'Löschen'; } }, 5000);
+    var s = _scharf && _scharf.art === art && _scharf.id === id && _scharf.bis > Date.now();
+    if (!s) {
+      _scharf = { art: art, id: id, bis: Date.now() + 8000 };
+      if (btn) btn.textContent = knopfText(art, id);
+      setTimeout(function () {
+        if (_scharf && _scharf.id === id && _scharf.bis <= Date.now()) {
+          _scharf = null;
+          document.querySelectorAll('button[data-eg-knopf="' + art + ':' + id + '"]').forEach(function (b) { b.textContent = knopfText(art, id); });
+        }
+      }, 8100);
       return;
     }
+    _scharf = null;
     if (art === 'zurueck') zuruecknehmen(id); else eintragLoeschen(id);
   }
   /** Eintrag ohne Kennung (vor v3154) bekommt beim ersten Zeichnen eine - löschen geht dann auch dort */
@@ -379,8 +392,8 @@
             + (x.zurueck.konflikt && x.zurueck.konflikt.length ? ' · belassen, weil seitdem geändert: ' + x.zurueck.konflikt.map(esc).join(', ') : '')
             + (x.zurueck.nicht && x.zurueck.nicht.length ? ' · nicht automatisch: ' + x.zurueck.nicht.map(esc).join(', ') : '') + '</div>' : '';
         var kannZurueck = !x.zurueck && (x.aenderungen || []).some(function (a) { return a.t !== 'nicht'; });
-        var aktion = (kannZurueck ? '<button type="button" style="' + kb + 'border:1px solid var(--wl-c9a84c,#C9A84C);background:transparent;color:inherit" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)">Zurücknehmen</button><br>' : '')
-          + '<button type="button" style="' + kb + 'border:1px solid rgba(184,98,92,.55);background:transparent;color:#B8625C" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag aus dem Verlauf entfernen - übernommene Werte bleiben">Löschen</button>';
+        var aktion = (kannZurueck ? '<button type="button" data-eg-knopf="zurueck:' + esc(x.id) + '" style="' + kb + 'border:1px solid var(--wl-c9a84c,#C9A84C);background:transparent;color:inherit" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)">' + knopfText('zurueck', x.id) + '</button><br>' : '')
+          + '<button type="button" data-eg-knopf="loeschen:' + esc(x.id) + '" style="' + kb + 'border:1px solid rgba(184,98,92,.55);background:transparent;color:#B8625C" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag aus dem Verlauf entfernen - übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
         return '<tr' + (x.zurueck ? ' style="opacity:.6"' : '') + '><td class="abw-wort" style="white-space:nowrap">' + esc(datum(x.am)) + '</td><td>' + x.dokumente.map(function (d) { return esc((d.typ ? d.typ + ': ' : '') + d.name); }).join('<br>') + ng + '</td>'
           + '<td>' + (x.uebernommen.length ? x.uebernommen.map(esc).join('<br>') : '<i>nichts übernommen</i>') + zr + '</td><td style="text-align:right">' + aktion + '</td></tr>';
       }).join('') + '</tbody></table></div>'
