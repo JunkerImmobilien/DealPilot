@@ -44275,3 +44275,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `1e6a1e02` bis `8e715c54` (v3110–v3111).
 - **Nachweis:** Staging: Fenster mit Testbild, Zuschneiden 1600×900 → 560×315, Zoom, Rahmen, Eintrag W-2 mit Bild über die API, `wuensche-holen.mjs --nur=staging` schrieb `Dateien/Backlog-Bilder/staging-W2-1.jpg`, Bild geprüft. Ausblenden/Einblenden geprüft.
 - **Rest:** Die Chrome-Freigabe der Tab-Aufnahme testet Marcel; danach Prod und Freischaltung im Admin (N110).
+
+### v3130 · Zielmiete nach Sanierung je Wohnung vorschlagen (N115, 03.11.2026, nur Staging)
+
+- **Was:** Kern `zielmieteVorschlag()` (`js/mietpotenzial-kern.js`, Deckel über `neuvermietung()`), `potenzial.js` `marktSaniert()`/`vorschlagFuer()`/`zielVorschlaege()`/`zielVorschlagHtml()`, Block unter der Einheitentabelle (`mfh-einheiten.js`, „übernehmen“ je Wohnung, „alle übernehmen“), Zeile in der Mietleiter des Wohnungsfensters; `dealpilot-mb.js` speichert `mm.qm`/`mm.q75_qm`. Grundlage: `zb_markt_qm`, sonst obere Spanne der Marktbewertung, sonst „Marktbewertung abrufen“.
+- **Commit:** `45372f07`; Staging per git pull.
+- **Nachweis:** Westerfeldstr. 140 (9,87 → 9,24 €/m² durch die Bremse) und Parkstr. 9 (10,36 €/m²), übernehmen/alle übernehmen nur im Arbeitsstand (gespeicherte `_dpMfh` unverändert nach Abbrechen), 390 px ohne Überlauf, keine Konsolenfehler; `mietpotenzial-pruefen` 104/104, `score-ketten` grün, Buster SAUBER.
+- **Rest:** Marcel entscheidet über den Ansatz „obere Spanne = saniert“; Prod nach Abnahme.
