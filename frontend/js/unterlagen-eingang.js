@@ -134,6 +134,12 @@
     var E = einheiten(); if (!E || !E[i] || !ext) return false;
     var e = E[i], alt = JSON.parse(JSON.stringify(e)), heute = new Date().toISOString().slice(0, 10);
     var setz = function (k, v) { if (v !== null && v !== undefined && v !== '') e[k] = String(v); };
+    /* v3120a · ein NEUER Vertrag (anderer Mietbeginn) ersetzt den alten ganz - gemessen: Whg. 1 behielt
+       „nächste Anpassung 01.04.2027" des alten Staffelvertrags, obwohl der neue unbefristet ist. Der Name
+       des Mieters wird nie ausgelesen (Datenschutz); beim neuen Vertrag wird der alte geleert. */
+    var neuerVertrag = isoAus(ext.mietbeginn) && isoAus(ext.mietbeginn) !== String(e.mv_beginn || '');
+    if (neuerVertrag) ['mv_art', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_naechste_anpassung', 'mv_befristet_bis', 'mv_kuendigungsverzicht_bis',
+      'mv_kaution', 'nk_vorauszahlung', 'stellplatz_miete', 'mv_mieter', 'mv_abw_jahre'].forEach(function (k) { if (k in e) e[k] = ''; });
     setz('ist', zahl(ext.kaltmiete_eur));
     if (zahl(ext.kaltmiete_eur)) e.status = 'vermietet';
     setz('mv_art', ART[ext.vertragsart] || '');
@@ -214,6 +220,8 @@
     var o = lesen();
     o.verlauf = o.verlauf.concat([{ am: new Date().toISOString(), dokumente: (e.dokumente || []).slice(0, 30), uebernommen: (e.uebernommen || []).slice(0, 60) }]).slice(-50);
     schreiben(o);
+    /* v3120a · gemessen: der Reiter Unterlagen & WEG zeigte den Verlauf erst nach dem nächsten Zeichnen */
+    setTimeout(function () { try { if (typeof window._dpPaNeuZeichnen === 'function') window._dpPaNeuZeichnen(); } catch (x) {} }, 300);
   }
   function verlaufHtml() {
     var o = lesen(), v = o.verlauf.slice().reverse(), ae = (o.einheiten_aenderungen || []).slice().reverse();
