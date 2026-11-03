@@ -2538,13 +2538,23 @@ function _renderAIServerAnalysis(a) {
   if (window.DpPilotV4 && window.DpPilotV4.huelle) {
     try {
       var V4 = window.DpPilotV4;
+      /* v3099e · Marcel: in Ankauf · Bestand · Soll · Zielbild soll im Detail ZUERST die Tabelle
+         Ankauf · Bestand · Soll (Mieterhöhung) · Zielbild stehen - „das ist eigentlich das Erste, was ich
+         sehen will" -, danach Zielerreichung und Jahresstände, dann die Abgleiche. Gemessen: die
+         Jahresstände standen oben (846 px) und in beiden Ansichten. Jetzt nur im Detail, an zweiter Stelle. */
+      var _zhV4 = '';
+      try { _zhV4 = (_bestand && window.DpJahresstaende) ? '<div data-dp-ziel-host="1">' + window.DpJahresstaende.html() + '</div>' : ''; } catch (eZ) { _zhV4 = ''; }
+      var _gV4 = _potHtml + (_zhV4 ? '<div style="margin-top:12px"></div>' + _zhV4 : '') + (_siHtml ? '<div style="margin-top:12px"></div>' + _siHtml : '');
+      var _siV4 = (_siHtml || _potHtml)
+        ? (function () { try { return window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(_gV4, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : _gV4; } catch (eW) { return _gV4; } })()
+        : _siInner;
       var _wertInner = '<div data-dp-pa-wertverlauf="1"></div><div id="dp-pa-wert-body"></div>'
         + '<div id="dp-pa-verlauf-wrap" class="dp-pa-d" style="display:none;margin-top:16px"><h4 class="dp-wv-h" style="margin:0 0 8px">Verlauf · Marktberichte und Abrufe</h4>'
         + '<div class="dp-pa-card" id="dp-pa-verlauf-body"></div></div>';
       var _v4 = V4.huelle({
         bestand: _bestand, kopf: _kopf,
         uebersicht: V4.uebersicht(a, _bestand, { hinweis: _pbHinweis, score: _pbScore, fit: _pbFit }),
-        si: _siInner, wert: _wertInner, lage: pL, steuer: V4.steuer(a),
+        si: _siV4, wert: _wertInner, lage: pL, steuer: V4.steuer(a, _bestand),
         risiko: V4.risiko(a, _bestand, { optisch: _pbOptisch, anschluss: _bestand ? '' : _pbAnschluss }),
         verhandlung: pV, bank: pK, unterlagen: _ulHtml,
         anschlussExit: _bestand ? pAF + '<div style="margin-top:16px"></div>' + pEX : ''

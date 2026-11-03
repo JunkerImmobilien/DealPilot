@@ -60,13 +60,20 @@
       w.setAttribute('data-dp-pa-modus', m);
       Array.prototype.forEach.call(w.querySelectorAll('[data-dp-pa-modus-knopf]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-dp-pa-modus-knopf') === m)); });
       Array.prototype.forEach.call(w.querySelectorAll('.dp-si'), function (s) { s.setAttribute('data-dp-si-modus', m === 'detail' ? 'genau' : 'einfach'); });
+      /* v3099e · Unterlagen & WEG hat einen eigenen Einfach|Genau-Schalter (unterlagen.js) - er folgt */
+      try {
+        var ub = w.querySelector('.dpu-umschalter button[data-art="' + (m === 'detail' ? 'genau' : 'einfach') + '"]');
+        if (ub && window.DpUnterlagen && window.DpUnterlagen.ansicht) window.DpUnterlagen.ansicht(ub, m === 'detail' ? 'genau' : 'einfach');
+      } catch (e) {}
     });
+    try { localStorage.setItem('dp_unterlagen_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
     neuZeichnen();
   }
   function neuZeichnen() {
     try { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); } catch (e) {}
     try { if (_letzteHist) wertverlauf(_letzteHist); } catch (e) {}
     try { steuerTabelleAlle(); } catch (e) {}
+    try { minisZeichnen(); } catch (e) {}
   }
 
   /* ── Stil ────────────────────────────────────────────────────────────── */
@@ -91,9 +98,37 @@
       '.dp-pa4-reihe{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}',
       '.dp-pa4-phase{font:600 12px "Space Grotesk",Inter,sans-serif;padding:6px 12px;border-radius:8px;background:#FBF6E9;color:#2A2727;white-space:nowrap}',
       '.dp-pa4-info{font:400 12px Inter,system-ui,sans-serif;color:#7A7370}',
-      '.dp-pa4-seg{display:inline-flex;border:1px solid #E6DCC2;border-radius:10px;padding:3px;background:#fff}',
-      '.dp-pa4-seg button{border:0;background:transparent;color:#2A2727;font:600 12.5px "Space Grotesk",Inter,sans-serif;padding:6px 14px;border-radius:7px;cursor:pointer}',
-      '.dp-pa4-seg button[aria-pressed="true"]{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#050505}',
+      /* v3099e · Marcel: „man sieht nicht, wo man ist" - gemessen: der gedrückte Knopf hatte background none
+         (eine ältere Knopf-Regel gewinnt). Jetzt mit !important und höherer Spezifität, dazu die Zeile darunter. */
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg{display:inline-flex !important;border:1px solid #E6DCC2 !important;border-radius:10px !important;padding:3px !important;background:#fff !important;gap:2px}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg button{border:0 !important;background:transparent !important;color:#7A7370 !important;font:600 12.5px "Space Grotesk",Inter,sans-serif !important;padding:6px 14px !important;border-radius:7px !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg button[aria-pressed="true"]{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f)) !important;color:#050505 !important}',
+      '.dp-pa4-modus-zeile{display:flex;align-items:center;gap:8px;margin:0 0 10px;font:500 12px Inter,sans-serif;color:#6B645A}',
+      '.dp-pa4-modus-zeile b{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:#2A2727;color:#FDFCFA}',
+      '.dp-pa-wrap[data-dp-pa-modus="detail"] .dp-pa4-modus-zeile b{background:var(--wl-c9a84c,#C9A84C);color:#050505}',
+      '.dp-pa-wrap[data-dp-pa-v4][data-dp-pa-modus="detail"] > .dp-pa-content{border-left:3px solid var(--wl-c9a84c,#C9A84C);padding-left:12px}',
+      /* „Pilot-Analyse starten" stand über allem - jetzt „Neu abrufen" unter der Stand-Zeile; PDF-Bausteine auf Knopfdruck */
+      '#s5 .ai-box:has(#ai-content .dp-pa-wrap[data-dp-pa-v4]) > #ai-btn{display:none !important}',
+      '#s5 .ai-box:has(#ai-content .dp-pa-wrap[data-dp-pa-v4]):not(.dp-pa4-pdf-offen) > .ai-pdf-toggle{display:none !important}',
+      '.dp-pa4-neu{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-4px 0 12px}',
+      '.dp-pa4-neu button{border:1px solid #E6DCC2;background:#fff;color:#2A2727;border-radius:9px;padding:6px 12px;font:600 12.5px "Space Grotesk",Inter,sans-serif;cursor:pointer}',
+      '.dp-pa4-neu span{font:400 11.5px Inter,sans-serif;color:#7A7370}',
+      /* eigene Schalter anderer Module folgen dem Kopf */
+      '.dp-pa-wrap[data-dp-pa-v4] .dpu-umschalter{display:none !important}',
+      '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-stv-fuss,.dp-pa-wrap[data-dp-pa-modus="einfach"] #dp-pa-wert-body{display:none !important}',
+      /* Mini-Grafiken (Einfach) und Beleg-Stand */
+      '.dp-pa4-mini{margin:0 0 12px}',
+      '.dp-pa4-mini h5{margin:0 0 6px;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
+      '.dp-pa4-hb{display:grid;grid-template-columns:110px minmax(0,1fr) 64px;gap:6px 10px;align-items:center;font:500 12px Inter,sans-serif;color:#2A2727}',
+      '.dp-pa4-hb i{display:block;height:12px;border-radius:0 4px 4px 0;background:var(--c,#2f6db5)}',
+      '.dp-pa4-hb .bahn{background:#F1ECE1;border-radius:0 4px 4px 0}',
+      '.dp-pa4-hb b{text-align:right;font:600 12.5px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums}',
+      '.dp-pa4-belege{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}',
+      '.dp-pa4-bj{display:inline-flex;align-items:center;gap:6px;font:500 12px Inter,sans-serif;padding:4px 10px;border-radius:999px;background:#F1ECE1;color:#4A4542}',
+      '.dp-pa4-bj.ok{background:#E6F3EB;color:#2E7D50}.dp-pa4-bj.fehlt{background:#F8EFD6;color:#8a6d1f}',
+      '.dp-pa4-bj::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}',
+      '.dp-pa4-btn{border:1px solid var(--wl-b8932f,#b8932f);background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#050505;border-radius:9px;padding:7px 13px;font:600 12.5px "Space Grotesk",Inter,sans-serif;cursor:pointer}',
+      '.dp-pa4-btn.leise{background:#fff;border-color:#E6DCC2;color:#2A2727}',
       '.dp-pa4-pdf{border:1px solid #E6DCC2;background:#fff;color:#2A2727;border-radius:9px;padding:7px 12px;font:600 12.5px "Space Grotesk",Inter,sans-serif;cursor:pointer}',
       /* Briefing */
       '.dp-pa4-brief{background:#050505;color:#F1EDE5;border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 22px;align-items:start;margin:0 0 12px}',
@@ -221,7 +256,7 @@
   function gesamtstatement(a, bestand) {
     var t = [], ra = a.risikoanalyse && typeof a.risikoanalyse === 'object' ? a.risikoanalyse : null, sz = a.szenarien && typeof a.szenarien === 'object' ? a.szenarien : null;
     t.push(abschnitt('Gesamtbewertung', absatz(a.gesamtbewertung || a.fazit_kurz)));
-    t.push(abschnitt('Begründung des Urteils', absatz(a.empfehlung_begruendung)));
+    t.push(abschnitt(bestand ? 'Einordnung' : 'Begründung des Urteils', absatz(a.empfehlung_begruendung)));
     t.push(abschnitt('Investmentbewertung', absatz(a.investmentbewertung)));
     if (bestand && a.bestand_modus) t.push(abschnitt('Bestandsstrategie · was du jetzt tun kannst', absatz(a.verhandlungsempfehlung)));
     t.push(abschnitt('Stärken', liste(a.staerken)));
@@ -253,29 +288,36 @@
   }
 
   /** Unterreiter Übersicht. extra = Karten aus ui.js (Score-Vergleich, Investor-Fit, Hinweise). */
+  /** kurz(t): erster Satz, höchstens n Zeichen (Einfach) */
+  function kurz(t, n) { var s = saetze(t, 1); n = n || 150; return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + ' …' : s; }
+
   function uebersicht(a, bestand, extra) {
     extra = extra || {};
     var st = window._dpEmpfStufe ? window._dpEmpfStufe(a.empfehlung || a.fazit_kurz) : { label: a.empfehlung || '—', farbe: 'var(--wl-c9a84c,#C9A84C)' };
     var sc = investorScore();
-    var kurz = saetze(a.gesamtbewertung || a.fazit_kurz, 3), grund = saetze(a.empfehlung_begruendung, 2);
-    var brief = '<div class="dp-pa4-brief"><div class="dp-pa4-urteil"><small>' + (bestand ? 'Urteil im Bestand' : 'Urteil zum Ankauf') + '</small>'
-      + '<span class="dp-pa-empf" style="background:' + st.farbe + ';justify-self:start">' + esc(st.label) + '</span>'
+    /* v3099e · Marcel: im Bestand KEIN Urteil wie „Halten" - „meistens haben wir eh Spekulationsfristen,
+       wir können eh nicht verkaufen". Im Ankauf bleibt es. Einfach: zwei Sätze statt fünf. */
+    var kurzT = saetze(a.gesamtbewertung || a.fazit_kurz, 2), grund = bestand ? '' : kurz(a.empfehlung_begruendung, 220);
+    var brief = '<div class="dp-pa4-brief"><div class="dp-pa4-urteil"><small>' + (bestand ? 'Stand heute' : 'Urteil zum Ankauf') + '</small>'
+      + (bestand ? '' : '<span class="dp-pa-empf" style="background:' + st.farbe + ';justify-self:start">' + esc(st.label) + '</span>')
       + (sc != null ? '<span class="z">' + sc + '</span><span class="u">Investor Deal Score</span>' : '') + '</div>'
-      + '<div><div class="dp-pa-e">' + (kurz ? '<p>' + txt(kurz) + '</p>' : '') + (grund ? '<p>' + txt(grund) + '</p>' : '') + '</div>'
+      + '<div><div class="dp-pa-e">' + (kurzT ? '<p>' + txt(kurzT) + '</p>' : '') + (grund ? '<p>' + txt(grund) + '</p>' : '') + '</div>'
       + '<div class="dp-pa-d">' + absatz(a.gesamtbewertung || a.fazit_kurz) + '</div></div></div>';
     var h = (extra.hinweis || '') + brief + kennzahlen(bestand);
+    /* Einfach: die Tendenz als kleine Grafik (Vermögen im Objekt über die Jahre) */
+    h += '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="vermoegen"></div>';
     if (bestand && a.bestand_modus && has(a.verhandlungsempfehlung))
-      h += '<div class="dp-pa-e">' + karte(kopfzeile('Was du jetzt tun kannst') + '<p class="dp-pa-p">' + txt(saetze(a.verhandlungsempfehlung, 3)) + '</p>') + '</div>';
-    /* Einfach: worauf es ankommt */
-    var st3 = (Array.isArray(a.staerken) ? a.staerken : []).slice(0, 3), ri3 = (Array.isArray(a.risiken) ? a.risiken : []).slice(0, 3);
-    if (st3.length || ri3.length) h += '<div class="dp-pa-e">' + karte(kopfzeile('Worauf es ankommt') + '<div class="dp-pa4-zwei">'
-      + '<div><b style="font:600 12px Inter,sans-serif;color:#2E7D50">Dafür</b><ul class="dp-pa4-liste">' + st3.map(function (x) { return '<li>' + txt(saetze(x, 1)) + '</li>'; }).join('') + '</ul></div>'
-      + '<div><b style="font:600 12px Inter,sans-serif;color:#B8625C">Dagegen</b><ul class="dp-pa4-liste">' + ri3.map(function (x) { return '<li>' + txt(saetze(x, 1)) + '</li>'; }).join('') + '</ul></div></div>'
+      h += '<div class="dp-pa-e">' + karte(kopfzeile('Was du jetzt tun kannst') + '<p class="dp-pa-p">' + txt(kurz(a.verhandlungsempfehlung, 220)) + '</p>') + '</div>';
+    /* Einfach: worauf es ankommt - je zwei, ein Satz */
+    var st2 = (Array.isArray(a.staerken) ? a.staerken : []).slice(0, 2), ri2 = (Array.isArray(a.risiken) ? a.risiken : []).slice(0, 2);
+    if (st2.length || ri2.length) h += '<div class="dp-pa-e">' + karte(kopfzeile('Worauf es ankommt') + '<div class="dp-pa4-zwei">'
+      + '<div><b style="font:600 12px Inter,sans-serif;color:#2E7D50">Dafür</b><ul class="dp-pa4-liste">' + st2.map(function (x) { return '<li>' + txt(kurz(x, 130)) + '</li>'; }).join('') + '</ul></div>'
+      + '<div><b style="font:600 12px Inter,sans-serif;color:#B8625C">Dagegen</b><ul class="dp-pa4-liste">' + ri2.map(function (x) { return '<li>' + txt(kurz(x, 130)) + '</li>'; }).join('') + '</ul></div></div>'
       + '<button type="button" class="dp-pa4-mehr" data-dp-pa-modus-setzen="detail">Ausführlich lesen (Detail)</button>') + '</div>';
     /* Detail: das ganze Statement */
     var gs = gesamtstatement(a, bestand);
     h += '<div class="dp-pa-d">' + karte(kopfzeile(bestand ? 'Gesamtstatement zum Bestand' : 'Gesamtstatement zum Ankauf') + gs
-      + '<p class="dp-pa4-erkl">Das Statement fasst alle Teile der Pilot-Analyse in einer Lesefolge zusammen: erst das Urteil und seine Begründung, dann Stärken, Risiken und Szenarien, '
+      + '<p class="dp-pa4-erkl">Das Statement fasst alle Teile der Pilot-Analyse in einer Lesefolge zusammen: ' + (bestand ? 'erst die Einordnung' : 'erst das Urteil und seine Begründung') + ', dann Stärken, Risiken und Szenarien, '
       + 'danach Lage, ' + (bestand ? 'Potenzial und Steuer' : 'Kaufpreis, Bank, Potenzial und Steuer') + '. Die Zahlen darin sind der Stand der Analyse; die Kacheln oben zeigen die heutige Rechnung.</p>')
       + (extra.score || '') + (extra.fit || '') + '</div>';
     return h;
@@ -285,7 +327,8 @@
   function risiko(a, bestand, extra) {
     extra = extra || {};
     var ra = a.risikoanalyse && typeof a.risikoanalyse === 'object' ? a.risikoanalyse : null, sz = a.szenarien && typeof a.szenarien === 'object' ? a.szenarien : {};
-    var lst = function (arr, n) { return Array.isArray(arr) && arr.length ? '<ul class="dp-pa4-liste">' + arr.map(function (x) { return '<li>' + txt(x) + '</li>'; }).join('') + '</ul>' : '<em class="dp-pa-empty">—</em>'; };
+    /* v3099e · Einfach: drei Punkte mit je einem Satz; Detail: alle, ganz */
+    var lst = function (arr) { return Array.isArray(arr) && arr.length ? '<ul class="dp-pa4-liste">' + arr.map(function (x, i) { return (i < 3 ? '<li class="dp-pa-e">' + txt(kurz(x, 140)) + '</li>' : '') + '<li class="dp-pa-d">' + txt(x) + '</li>'; }).join('') + '</ul>' : '<em class="dp-pa-empty">—</em>'; };
     var h = '<div class="dp-pa-cols">'
       + karte('<div class="dp-pa-sec good"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">STÄRKEN</span><span class="dp-pa-rule"></span></div>' + lst(a.staerken))
       + karte('<div class="dp-pa-sec bad"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">RISIKEN</span><span class="dp-pa-rule"></span></div>' + lst(a.risiken))
@@ -293,8 +336,8 @@
     /* Risikobewertung: Einfach die ersten Sätze, Detail ganz */
     if (ra && (has(ra.finanzierungsrisiko) || has(ra.cashflow_stabilitaet) || has(ra.annahmen_abhaengigkeit))) {
       var zeile = function (lbl, t) { return has(t) ? '<div class="dp-pa-kv"><strong>' + lbl + ':</strong> <span class="dp-pa-e">' + txt(saetze(t, 1)) + '</span><span class="dp-pa-d">' + txt(t) + '</span></div>' : ''; };
-      h += karte(kopfzeile('Risikoanalyse') + zeile('Finanzierungsrisiko (LTV + DSCR)', ra.finanzierungsrisiko) + zeile('Cashflow-Stabilität', ra.cashflow_stabilitaet) + zeile('Abhängigkeit von Annahmen', ra.annahmen_abhaengigkeit)
-        + erkl('<b>Finanzierungsrisiko</b> fragt, ob Beleihung (LTV) und Schuldendienstdeckung (DSCR) einer Bank genügen. <b>Cashflow-Stabilität</b> fragt, wie viel Mietausfall oder Kostensteigerung der Monatsüberschuss verträgt. <b>Abhängigkeit von Annahmen</b> zeigt, welche deiner Eingaben (Mietsteigerung, Zins nach der Bindung, Wertsteigerung) das Ergebnis am stärksten tragen.'), 'dp-pa4-mt');
+      h += '<div class="dp-pa-d">' + karte(kopfzeile('Risikoanalyse') + zeile('Finanzierungsrisiko (LTV + DSCR)', ra.finanzierungsrisiko) + zeile('Cashflow-Stabilität', ra.cashflow_stabilitaet) + zeile('Abhängigkeit von Annahmen', ra.annahmen_abhaengigkeit)
+        + erkl('<b>Finanzierungsrisiko</b> fragt, ob Beleihung (LTV) und Schuldendienstdeckung (DSCR) einer Bank genügen. <b>Cashflow-Stabilität</b> fragt, wie viel Mietausfall oder Kostensteigerung der Monatsüberschuss verträgt. <b>Abhängigkeit von Annahmen</b> zeigt, welche deiner Eingaben (Mietsteigerung, Zins nach der Bindung, Wertsteigerung) das Ergebnis am stärksten tragen.'), 'dp-pa4-mt') + '</div>';
     }
     /* Worst · Plan · Best */
     var k = kpis();
@@ -304,7 +347,7 @@
       + (zahl(k.bmy) && k.bmy > 0 ? '<dt>Bruttorendite</dt><dd>' + de(k.bmy, 2) + ' %</dd>' : '') + '</dl>';
     var szk = function (titel, an, farbe, t, inner, vor) {
       return '<div class="dp-pa4-szk" style="--c:' + farbe + '"><h4>' + titel + (vor ? '<span class="dp-pa4-vor">Vorschlag</span>' : '') + '</h4><span class="an">' + an + '</span>'
-        + (inner || '') + (has(t) ? '<p class="dp-pa-e">' + txt(saetze(t, 2)) + '</p><p class="dp-pa-d">' + txt(t) + '</p>' : (inner ? '' : '<p><em class="dp-pa-empty">—</em></p>')) + '</div>';
+        + (inner || '') + (has(t) ? '<p class="dp-pa-e">' + txt(kurz(t, 160)) + '</p><p class="dp-pa-d">' + txt(t) + '</p>' : (inner ? '' : '<p><em class="dp-pa-empty">—</em></p>')) + '</div>';
     };
     h += karte(kopfzeile('Szenarien · Worst · Plan · Best') + '<div class="dp-pa4-sz">'
       + szk('Worst Case', 'Miete −10 %, Zins +1 Prozentpunkt', C.rot, sz.worst_case)
@@ -359,16 +402,42 @@
       var t = steuerTabelle(); host.innerHTML = t; host.style.display = t ? '' : 'none';
     });
   }
+  /* ── v3099e · Belege je Steuerjahr (Marcel 03.11.2026: „mit den Belegen … dass wir da irgendwas
+     machen können, habe ich nicht gefunden"). Fassung 4 zeigte je Jahr „erklärt" oder „Belege fehlen".
+     GEMESSEN: Belege einlesen gibt es seit v1406 (beleg-import.js, Modus 'wk'), aber nur im Reiter
+     Steuer. Eine Herkunftsmarke „aus Beleg" speichert dpWkUebernehmen NICHT - Belege und Eingaben von
+     Hand landen in denselben Jahreswerten (_taxYearlyOverrides). Ehrlich unterscheidbar ist deshalb
+     nur: eigene Angaben für das Jahr ja/nein. Mehr wird hier nicht behauptet. */
+  function belegeHtml(bestand) {
+    var S = window.State, R = S && Array.isArray(S.cfRows) ? S.cfRows : [];
+    var heute = new Date().getFullYear(), O = window._taxYearlyOverrides || {};
+    var jahre = R.map(function (r) { return r.cal; }).filter(function (j) { return j <= heute; });
+    var chips = '';
+    if (bestand && jahre.length) chips = '<div class="dp-pa4-belege">' + jahre.map(function (j) {
+      var e = O['y' + j] || {}, n = Object.keys(e).filter(function (k) { return zahl(e[k]); }).length;
+      return n ? '<span class="dp-pa4-bj ok" title="' + n + ' Posten mit eigenen Angaben (aus Belegen oder von Hand)">' + j + ' · eigene Angaben (' + n + ')</span>'
+        : '<span class="dp-pa4-bj' + (j < heute ? ' fehlt' : '') + '" title="Nur der Vorschlag der App aus deinen Eingaben">' + j + ' · ' + (j < heute ? 'Belege fehlen' : 'laufendes Jahr') + '</span>';
+    }).join('') + '</div>';
+    var satz = bestand
+      ? 'Je Jahr: hast du eigene Angaben gemacht (Belege eingelesen oder von Hand), oder rechnet die App nur mit ihrem Vorschlag? Für abgelaufene Jahre ohne eigene Angaben fehlen die Belege.'
+      : 'Im Ankauf ist die Steuer ein Plan aus deinen Eingaben. Belege kommen nach dem Kauf – Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen.';
+    return karte(kopfzeile('Belege') + chips + '<p class="dp-pa-p" style="margin:0 0 10px">' + satz + '</p>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="dp-pa4-btn" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen (KI)</button>'
+      + '<button type="button" class="dp-pa4-btn leise" onclick="try{var t=document.querySelector(\'.tab[data-target-sec]\');var b=[].filter.call(document.querySelectorAll(\'.tab\'),function(x){return /Steuer/.test(x.textContent||\'\')})[0];if(b)b.click();}catch(e){}">Zum Reiter Steuer</button></div>'
+      + erkl('Die KI liest PDF oder Foto, teilt eine Hausgeldabrechnung in umlagefähige und nicht umlagefähige Kosten und ordnet jeden Beleg seinem Jahr zu. Du bestätigst jede Zeile, erst dann landet sie in den Werbungskosten des Jahres im Reiter Steuer.'), 'dp-pa4-mt');
+  }
+
   /** Unterreiter Steuer: Verlauf wie im Reiter Steuer, Text, im Detail die Tabelle */
-  function steuer(a) {
+  function steuer(a, bestand) {
     var h = karte(kopfzeile('Steuerverlauf · wann das Objekt steuerlich positiv wird') + '<div data-dp-steuerverlauf="1"></div>'
       + erkl('<b>So liest du die Grafik:</b> Die Balken zeigen je Jahr das Ergebnis der Anlage V (Einnahmen minus Werbungskosten). Grün ist ein Verlust, der deine Steuer senkt, Gold ein Gewinn, auf den Steuer fällig wird. '
         + 'Die Linie ist der Cashflow nach Steuern. Markiert sind der Wendepunkt, das Ende der Zinsbindung und das Datum, ab dem ein Verkauf nach § 23 EStG steuerfrei ist. Es ist dieselbe Rechnung wie im Reiter Steuer.'));
     h += karte(kopfzeile('Steuerliche Zusammenfassung')
       + (has(a.steuer_zusammenfassung)
-        ? '<p class="dp-pa-p dp-pa-e">' + txt(saetze(a.steuer_zusammenfassung, 3)) + '</p><p class="dp-pa-p dp-pa-d">' + txt(a.steuer_zusammenfassung) + '</p>'
+        ? '<p class="dp-pa-p dp-pa-e">' + txt(kurz(a.steuer_zusammenfassung, 220)) + '</p><p class="dp-pa-p dp-pa-d">' + txt(a.steuer_zusammenfassung) + '</p>'
         : '<div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div>')
-      + '<div class="dp-pa-fuss">Eine Einordnung aus deinen Eingaben im Reiter Steuer – keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
+      + '<div class="dp-pa-fuss dp-pa-d">Eine Einordnung aus deinen Eingaben im Reiter Steuer – keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
+    h += belegeHtml(bestand);
     h += '<div class="dp-pa-d">' + karte(kopfzeile('Einnahmen und Werbungskosten nach Gruppen') + '<div class="dp-pa4-tab" data-dp-pa4-steuertab="1"></div>'
       + erkl('Die Gruppen sind die des Reiters Steuer: <b>Finanzierung</b> (Zinsen und Finanzierungskosten), <b>Betriebskosten</b> (umgelegt und nicht umlagefähig), <b>Verwaltung</b>, <b>Sonstiges</b>, <b>AfA</b> sowie <b>Erhaltung und anschaffungsnaher Aufwand</b>. '
         + 'Umgelegte Nebenkosten stehen bei den Einnahmen und bei den Betriebskosten, sie heben sich auf. Die Zuführung zur Erhaltungsrücklage ist nicht abziehbar und fehlt deshalb. Steuerwirkung ist der Unterschied der Steuer mit und ohne dieses Objekt (Plus = Erstattung).'), 'dp-pa4-mt') + '</div>';
@@ -382,7 +451,7 @@
   function linien(host, cfg) {
     if (!host) return;
     stil();
-    var W = 900, H = 300, L = 70, Rr = 16, T = 18, U = 34, n = cfg.x.length;
+    var W = 900, H = cfg.hoehe || 300, L = 70, Rr = 16, T = 18, U = 34, n = cfg.x.length;
     var vs = [];
     cfg.reihen.forEach(function (r) { if (r.aus) return; r.werte.forEach(function (v) { if (zahl(v)) vs.push(Number(v)); }); });
     if (!vs.length || n < 1) { host.innerHTML = ''; return; }
@@ -521,6 +590,136 @@
       } });
   }
 
+  /* ── v3099e · Kleine Grafiken für Einfach (Marcel: „wohin tendiert das Ganze") ──────────────
+     vermoegen  Eigenkapital im Objekt nach Plan (wert_y − rs) und Cashflow nach Steuer aufsummiert,
+                beide € über die Jahre (State.cfRows) – eine Achse
+     abz        Kaltmiete und Cashflow je Monat: Ankauf · Bestand · Soll · Zielbild (DpWertZielbild)
+     lage       Mikro- und Makrolage (0–100) und Preistrend laut Marktbewertung (#_mb_state) */
+  function balkenGruppen(host, cfg) {
+    stil();
+    var W = 900, H = cfg.hoehe || 220, L = 70, Rr = 16, T = 14, U = 30, n = cfg.x.length, vs = [0];
+    cfg.reihen.forEach(function (r) { r.werte.forEach(function (v) { if (zahl(v)) vs.push(Number(v)); }); });
+    var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs); if (hi === lo) hi = lo + 1;
+    var st = nice(hi - lo); lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
+    var y = function (v) { return T + (H - T - U) * (1 - (v - lo) / (hi - lo)); };
+    var gap = (W - L - Rr) / n, k = cfg.reihen.length, bw = Math.min(34, gap * 0.7 / k), s = '';
+    for (var v = lo; v <= hi + st / 2; v += st) s += '<line class="gl" x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/><text class="ax" x="' + (L - 7) + '" y="' + (y(v) + 3.5).toFixed(1) + '" text-anchor="end">' + esc(cfg.achse ? cfg.achse(v) : String(v)) + '</text>';
+    s += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(0).toFixed(1) + '" y2="' + y(0).toFixed(1) + '" stroke="#2A2727" stroke-width="1.2"/>';
+    cfg.x.forEach(function (lbl, i) {
+      var x0 = L + i * gap + (gap - k * bw - (k - 1) * 2) / 2;
+      cfg.reihen.forEach(function (r, j) {
+        var w = r.werte[i]; if (!zahl(w)) return;
+        var y1 = y(Number(w)), y0 = y(0), hh = Math.max(1.5, Math.abs(y1 - y0));
+        s += '<rect x="' + (x0 + j * (bw + 2)).toFixed(1) + '" y="' + Math.min(y0, y1).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="3" fill="' + r.farbe + '"/>';
+      });
+      s += '<text class="ax" x="' + (L + i * gap + gap / 2).toFixed(1) + '" y="' + (H - U + 16) + '" text-anchor="middle">' + esc(lbl) + '</text>';
+    });
+    for (var i = 0; i < n; i++) s += '<rect class="hit" data-i="' + i + '" x="' + (L + i * gap).toFixed(1) + '" y="' + T + '" width="' + gap.toFixed(1) + '" height="' + (H - U - T) + '"/>';
+    host.innerHTML = (cfg.titel ? '<h5>' + esc(cfg.titel) + '</h5>' : '') + '<div class="dp-pa4-leg">' + cfg.reihen.map(function (r) { return '<span><i style="background:' + r.farbe + '"></i>' + esc(r.name) + '</span>'; }).join('') + '</div>'
+      + '<div class="dp-pa4-ch"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(cfg.titel || '') + '">' + s + '</svg><div class="dp-pa4-tip"></div></div>';
+    var ch = host.querySelector('.dp-pa4-ch'), tip = host.querySelector('.dp-pa4-tip');
+    Array.prototype.forEach.call(host.querySelectorAll('.hit'), function (h) {
+      h.addEventListener('mousemove', function (ev) {
+        var i = +h.getAttribute('data-i'), b = ch.getBoundingClientRect();
+        tip.innerHTML = '<b>' + esc(cfg.x[i]) + '</b>' + cfg.reihen.filter(function (r) { return zahl(r.werte[i]); }).map(function (r) { return '<div><span><i style="background:' + r.farbe + '"></i>' + esc(r.name) + '</span><span>' + esc((cfg.fmt || sEur)(Number(r.werte[i]))) + '</span></div>'; }).join('');
+        tip.style.display = 'block';
+        tip.style.left = Math.max(4, Math.min(ev.clientX - b.left + ch.scrollLeft + 14, ch.clientWidth - 230)) + 'px';
+        tip.style.top = Math.max(4, ev.clientY - b.top - 20) + 'px';
+      });
+      h.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
+    });
+  }
+  function miniVermoegen(host) {
+    var R = (window.State && Array.isArray(window.State.cfRows)) ? window.State.cfRows.slice(0, 15) : [];
+    if (R.length < 2) { host.innerHTML = ''; return; }
+    var kum = 0, eq = [], cf = [];
+    R.forEach(function (r) {
+      eq.push(zahl(r.wert_y) && zahl(r.rs) ? Number(r.wert_y) - Number(r.rs) : null);
+      if (zahl(r.cfns_y)) kum += Number(r.cfns_y);
+      cf.push(zahl(r.cfns_y) ? kum : null);
+    });
+    host.innerHTML = '<h5>Wohin es läuft · Vermögen aus dem Objekt</h5><div></div>';
+    linien(host.lastChild, { x: R.map(function (r) { return String(r.cal); }), hoehe: 210, null: true, fmt: eur, achse: te, aria: 'Eigenkapital im Objekt und aufsummierter Cashflow nach Steuer',
+      reihen: [{ name: 'Eigenkapital im Objekt (Plan-Wert − Restschuld)', farbe: C.c1, werte: eq, art: 'linie' },
+               { name: 'Cashflow nach Steuer, aufsummiert', farbe: C.c2, werte: cf, art: 'linie' }] });
+  }
+  function miniAbz(host) {
+    var d = null; try { d = window.DpWertZielbild && window.DpWertZielbild.daten ? window.DpWertZielbild.daten() : null; } catch (e) { d = null; }
+    var x = [], miete = [], cfm = [];
+    if (d && d.ankauf && Array.isArray(d.ankauf.kern)) {
+      var jm = d.ankauf.kern.filter(function (z) { return z.wort === 'Jahresmiete'; })[0], cv = d.ankauf.kern.filter(function (z) { return z.wort === 'Cashflow v. Steuer'; })[0];
+      if (jm && zahl(jm.ankauf)) { x.push('Ankauf'); miete.push(jm.ankauf / 12); cfm.push(cv && zahl(cv.ankauf) ? cv.ankauf / 12 : null); }
+    }
+    var zb = d && d.zielbild, nam = { bestand: 'Bestand', mieterhoehung: 'Soll (Mieterhöhung)', zielbild: 'Zielbild' };
+    if (zb && zb.stufen) ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
+      var s = zb.stufen[k]; if (!s) return;
+      x.push(nam[k]); miete.push(zahl(s.miete_monat) ? s.miete_monat : null); cfm.push(zahl(s.cf_monat) ? s.cf_monat : null);
+    });
+    if (x.length < 2) { host.innerHTML = ''; return; }
+    balkenGruppen(host, { titel: 'Wohin es läuft · Miete und Cashflow je Monat', x: x, hoehe: 210, achse: function (v) { return Math.round(v).toLocaleString('de-DE'); },
+      reihen: [{ name: 'Kaltmiete / Monat', farbe: C.c1, werte: miete }, { name: 'Cashflow vor Steuer / Monat', farbe: C.c2, werte: cfm }] });
+  }
+  function miniLage(host) {
+    var c = null; try { var st = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null'); c = st && st.card; } catch (e) { c = null; }
+    if (!c || (!zahl(c.microRaw) && !zahl(c.macroRaw))) { host.innerHTML = ''; return; }
+    var bar = function (lbl, v, farbe) { return zahl(v) ? '<span>' + lbl + '</span><span class="bahn"><i style="width:' + Math.max(2, Math.min(100, v)) + '%;--c:' + farbe + '"></i></span><b>' + Math.round(v) + ' / 100</b>' : ''; };
+    var tr = zahl(c.trendRaw) ? Number(c.trendRaw) : null;
+    host.innerHTML = '<h5>Wohin es läuft · Lage laut Marktbewertung</h5><div class="dp-pa4-hb">'
+      + bar('Mikrolage', c.microRaw, C.c1) + bar('Makrolage', c.macroRaw, C.c1)
+      + (tr != null ? '<span>Preistrend</span><span style="font:500 12px Inter,sans-serif;color:' + (tr >= 0 ? '#2E7D50' : '#B8625C') + '">' + (tr >= 0 ? '▲ steigend' : '▼ fallend') + '</span><b>' + (tr > 0 ? '+' : '') + de(tr, 1) + ' %</b>' : '')
+      + '</div>';
+  }
+  function minisZeichnen() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa4-mini]'), function (h) {
+      try {
+        var a = h.getAttribute('data-dp-pa4-mini');
+        if (a === 'vermoegen') miniVermoegen(h); else if (a === 'abz') miniAbz(h); else if (a === 'lage') miniLage(h);
+      } catch (e) { h.innerHTML = ''; }
+    });
+  }
+
+  /* ── v3099e · Kürzen für Einfach in Reitern, deren Inhalt aus anderen Modulen kommt
+     (Kaufpreis & Offerte, Bank, Lage, Anschluss & Exit, Unterlagen). Gemessen: Anschluss & Exit war in
+     Einfach und Detail gleich lang (5.887 Zeichen) - „Einfach und Detail funktioniert nicht immer".
+     Lange Absätze: Einfach erster Satz, Detail ganz; Listen: Einfach drei Punkte; Fußnoten nur Detail. */
+  function kuerzen(html) {
+    if (!html) return html;
+    var box = document.createElement('div'); box.innerHTML = html;
+    var frei = function (el) { return !el.closest('.dp-pa-e,.dp-pa-d,.dp-pa4-szk,[data-dp-bestand],table'); };
+    Array.prototype.forEach.call(box.querySelectorAll('p.dp-pa-p'), function (p) {
+      if (!frei(p) || (p.textContent || '').length < 170) return;
+      var e = document.createElement('p'); e.className = 'dp-pa-p dp-pa-e'; e.textContent = kurz(p.textContent, 170);
+      p.classList.add('dp-pa-d'); p.parentNode.insertBefore(e, p);
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('.dp-pa-kv'), function (k) {
+      if (!frei(k) || (k.textContent || '').length < 170) return;
+      var st = k.querySelector('strong'), lbl = st ? st.textContent : '', rest = (k.textContent || '').slice(lbl.length).trim();
+      var e = document.createElement('div'); e.className = 'dp-pa-kv dp-pa-e'; e.innerHTML = (lbl ? '<strong>' + esc(lbl) + '</strong> ' : '') + esc(kurz(rest, 170));
+      k.classList.add('dp-pa-d'); k.parentNode.insertBefore(e, k);
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('ul,ol'), function (l) {
+      if (!frei(l)) return;
+      Array.prototype.forEach.call(l.children, function (li, i) { if (i >= 3) li.classList.add('dp-pa-d'); });
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('.dp-pa-fuss,.dp-pa-offmail'), function (f) { if (frei(f)) f.classList.add('dp-pa-d'); });
+    /* Fragen und Antworten des Piloten: Einfach nur die erste */
+    Array.prototype.forEach.call(box.querySelectorAll('.dp-pa-qa'), function (q) {
+      var kids = Array.prototype.slice.call(q.children), n = 0;
+      kids.forEach(function (c) { if (c.classList.contains('dp-pa-kv') && !c.classList.contains('dp-pa-e')) n++; if (n > 1) c.classList.add('dp-pa-d'); });
+    });
+    return box.innerHTML;
+  }
+
+  /* v3099e · Unterlagen & WEG steht immer da (Fassung 4): ohne Auswertung mit dem Einstieg zum Hochladen */
+  function unterlagenPanel(html) {
+    var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
+      + '<button type="button" class="dp-pa4-btn" onclick="if(window.DokumentImport&&DokumentImport.oeffnen)DokumentImport.oeffnen()">Unterlagen einlesen (Exposé, Wirtschaftsplan, Protokoll …)</button>'
+      + '<button type="button" class="dp-pa4-btn leise" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen</button></div>';
+    if (html) return kuerzen(html) + karte(kopfzeile('Weitere Unterlagen') + knoepfe, 'dp-pa4-mt');
+    return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet. Lies Teilungserklärung, Wirtschaftsplan, Protokolle der Eigentümerversammlung oder Mietverträge ein – der Pilot wertet sie hier aus (Beschlüsse, Sonderumlagen, Rücklage, Auffälligkeiten).</p>'
+      + '<p class="dp-pa-p">Belege und Abrechnungen für die Steuer liest du über den zweiten Knopf ein; sie landen im Reiter Steuer im richtigen Jahr.</p>' + knoepfe);
+  }
+
   /* ── Hülle ───────────────────────────────────────────────────────────── */
   function huelle(o) {
     stil();
@@ -530,22 +729,22 @@
     var reiter = [], inhalt = [];
     var add = function (id, lbl, inner, opt) { opt = opt || {}; if (!inner && !opt.leer) return; reiter.push(tab(id, lbl, !reiter.length, opt.tabExtra)); inhalt.push(panel(id, inner, inhalt.length === 0)); };
     add('uebersicht', 'Übersicht', o.uebersicht);
-    add('si', bestand ? 'Ankauf · Bestand · Soll · Zielbild' : 'Ankauf · Soll · Zielbild', o.si);
+    add('si', bestand ? 'Ankauf · Bestand · Soll · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
     /* Wert & Verlauf erscheint wie bisher erst mit einem Bericht oder Abruf (_dpLoadVerlauf) */
     reiter.push('<button type="button" class="dp-pa-tab" id="dp-pa-tab-wert" style="display:none" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Verlauf</button>');
     inhalt.push(panel('wert', o.wert, false));
-    add('loc', 'Lage &amp; Markt', o.lage);
+    add('loc', 'Lage &amp; Markt', o.lage ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="lage"></div>' + kuerzen(o.lage) : o.lage);
     if (bestand) {
       add('steuer', 'Steuer', o.steuer);
       add('risk', 'Risiken &amp; Szenarien', o.risiko);
-      if (o.unterlagen) add('unterlagen', 'Unterlagen &amp; WEG', o.unterlagen);
-      add('anschluss', 'Anschluss &amp; Exit', o.anschlussExit);
+      add('unterlagen', 'Unterlagen &amp; WEG', unterlagenPanel(o.unterlagen));
+      add('anschluss', 'Anschluss &amp; Exit', kuerzen(o.anschlussExit));
     } else {
       add('risk', 'Risiken &amp; Szenarien', o.risiko);
-      add('verh', 'Kaufpreis &amp; Offerte', o.verhandlung);
-      add('bank', 'Finanzierung &amp; Bank', o.bank);
+      add('verh', 'Kaufpreis &amp; Offerte', kuerzen(o.verhandlung));
+      add('bank', 'Finanzierung &amp; Bank', kuerzen(o.bank));
       add('steuer', 'Steuer', o.steuer);
-      if (o.unterlagen) add('unterlagen', 'Unterlagen &amp; WEG', o.unterlagen);
+      add('unterlagen', 'Unterlagen &amp; WEG', unterlagenPanel(o.unterlagen));
     }
     var phase = bestand ? 'Bestand' : 'Ankauf', info = '';
     try {
@@ -558,9 +757,14 @@
       + '<div class="dp-pa4-seg" role="group" aria-label="Darstellung"><button type="button" data-dp-pa-modus-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
       + '<button type="button" data-dp-pa-modus-knopf="detail" aria-pressed="' + (m === 'detail') + '">Detail</button></div></div></div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
-    try { setTimeout(function () { if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(kzNeu, function () {}); }, 0); } catch (e) {}
+    try { setTimeout(function () { minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); }, function () {}); }, 0); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
-      + (o.kopf || '') + kopf
+      + (o.kopf || '')
+      /* v3099e · Marcel: „Pilot-Analyse starten“ oben drüber gefällt nicht - als „Neu abrufen“ unter den Stand */
+      + '<div class="dp-pa4-neu"><button type="button" onclick="if(typeof runAI===\'function\')runAI()">↻ Analyse neu abrufen</button><span>beschreibt den heutigen Stand dieses Objekts</span></div>'
+      + kopf
+      + '<div class="dp-pa4-modus-zeile"><b class="dp-pa-e">Kurzfassung</b><span class="dp-pa-e">Das Wichtigste mit kleinen Grafiken – „Detail“ zeigt alle Zahlen und Texte.</span>'
+      + '<b class="dp-pa-d">Ausführlich</b><span class="dp-pa-d">Alle Zahlen, Tafeln und Texte der Analyse – „Einfach“ zeigt die Kurzfassung.</span></div>'
       + '<nav class="dp-pa-rail">' + reiter.join('') + '</nav>'
       + '<div class="dp-pa-content">' + inhalt.join('') + '</div></div>';
   }
@@ -573,8 +777,10 @@
     var p = t.closest('[data-dp-pa4-pdf]');
     if (p) {
       ev.preventDefault();
-      var d = document.querySelector('.ai-pdf-details');
-      if (d) { d.open = true; var box = d.closest('.ai-pdf-toggle') || d; try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { box.scrollIntoView(); } }
+      var ab = document.querySelector('#s5 .ai-box'), d = document.querySelector('.ai-pdf-details');
+      var offen = ab ? ab.classList.toggle('dp-pa4-pdf-offen') : true;
+      p.setAttribute('aria-expanded', String(offen));
+      if (offen && d) { d.open = true; var box = d.closest('.ai-pdf-toggle') || d; try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { box.scrollIntoView(); } }
     }
   });
 
