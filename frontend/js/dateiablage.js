@@ -1,4 +1,7 @@
-/* dateiablage.js — v3162 · UNTERLAGEN-ABLAGE JE OBJEKT (Ordner mit Unterordnern)
+/* v3163 · VORERST NICHT EINGEBUNDEN. Marcel 03.11.2026: „lesen wir die nur aus und verwerfen die später … dann haben
+   wir die Mietverträge nicht auf unserem Server“. Datei und Server-Teil (routes/dateien.js) bleiben für den Fall, dass
+   eine Ablage gewünscht wird; index.html lädt die Datei nicht, der Eingang legt nichts ab.
+   dateiablage.js — v3162 · UNTERLAGEN-ABLAGE JE OBJEKT (Ordner mit Unterordnern)
    ───────────────────────────────────────────────────────────────────────────
    Marcel 03.11.2026: „auf unserem Server speichern … Struktur Ordner mit Unterordnern möglich?“
    Backend: routes/dateien.js (verschlüsselt, Grenzen je Plan). Hier:

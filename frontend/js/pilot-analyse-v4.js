@@ -792,8 +792,6 @@
     var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>' + '</div>';
     var verlauf = '';
     try { var vh = window.DpEingang ? window.DpEingang.verlaufHtml() : ''; if (vh) verlauf = karte(kopfzeile('Verlauf · eingelesen und übernommen') + vh, 'dp-pa4-mt'); } catch (e) { verlauf = ''; }
-    /* v3162 · die Ablage des Objekts (Ordner mit Unterordnern, dateiablage.js) */
-    try { if (window.DpAblage) verlauf = karte(kopfzeile('Ablage · Unterlagen des Objekts') + window.DpAblage.html(), 'dp-pa4-mt') + verlauf; } catch (e) {}
     var erklaerung = '<p class="dp-pa-p">Wirtschaftsplan und Jahresabrechnung → Werbungskosten mit Jahr · Protokolle → Beschlüsse und Sonderumlagen · Mietverträge → passende Einheit und Mieter · Rechnungen → Werbungskosten. Nichts wird ohne deine Bestätigung übernommen.</p>';
     if (html) return kuerzen(html) + verlauf + karte(kopfzeile('Neue Unterlagen') + erklaerung + knoepfe, 'dp-pa4-mt');
     return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet.</p>' + erklaerung + knoepfe) + verlauf;

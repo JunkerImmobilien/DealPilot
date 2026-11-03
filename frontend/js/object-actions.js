@@ -2991,18 +2991,8 @@
       var _aend = _E ? _E.txEnde() : [];
       /* v3154 · Dateien, aus denen nichts kam (Fehler, gesperrt, kein Wert): im Verlauf als Warnung */
       var _ohne = _files.filter(function (f) { return f.status !== 'ok' || (f.type !== 'rechnung' && !_hatWerte(f)); }).map(function (f) { return f.name; });
-      /* v3162 · die Originale in die Ablage des Objekts, nach Art sortiert (Rechnungen legt der Beleg-Leser ab) */
-      try {
-        if (window.DpAblage && window._currentObjKey) {
-          var _abl = _files.filter(function (f) { return f.file && f.type !== 'rechnung' && !f._anBeleg; }).map(function (f) {
-            return { file: f.file, ordner: window.DpAblage.ordnerFuer(f.type, f.dokLabel || f.name) };
-          });
-          if (_abl.length) window.DpAblage.ablegenAlle(_abl, { quelle: 'eingang' }).then(function (e) {
-            try { if (e.fehler.length && window.toast) window.toast('Ablage: ' + e.fehler.join('; ')); } catch (x) {}
-            try { if (window.DpAblage.fuellen) window.DpAblage.fuellen(); } catch (x) {}
-          });
-        }
-      } catch (e) {}
+      /* v3163 · Marcel 03.11.2026: „lesen wir die nur aus und verwerfen die später … dann haben wir die Mietverträge
+         nicht auf unserem Server“ - die Originale werden NICHT abgelegt (v3162 rückgebaut), nur die gelesenen Werte. */
       if (window.DpEingang) window.DpEingang.protokoll({
         aenderungen: _aend, nicht_gelesen: _ohne, quelle: 'Eingang',
         dokumente: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé' }; }),

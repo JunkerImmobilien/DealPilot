@@ -4022,6 +4022,9 @@ async function _callOpenAIVision(contentParts, opts) {
     input: [{ role: 'user', content: contentParts }],
     max_output_tokens: opts.maxTokens || 700
   };
+  /* v3163 · Belege werden mit temperature 0 gelesen - gemessen: bei der Standardeinstellung (1) ergab dieselbe
+     Hotelrechnung je Lauf andere Betraege. Fuer Buchhaltung zaehlt Wiederholbarkeit, nicht Abwechslung. */
+  if (opts.temperature != null && !/^(o\d|gpt-5)/.test(String(model))) body.temperature = opts.temperature;
   const resp = await fetch(OPENAI_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
@@ -4156,6 +4159,15 @@ const _WK_PROMPT =
   'betrag_brutto = Gesamt-/Endbetrag.\n' +
   '- Eine Handwerkerrechnung ist "Erhaltungsaufwand / Reparatur" - es sei denn, sie schafft etwas NEUES ' +
   '(Anbau, Ausbau, Erweiterung), dann "Sonstiges" mit einem Hinweis in der beschreibung.\n' +
+  /* v3163 · Tabellenrechnungen (Hotel, Handwerker mit Positionsliste): gemessen wurden Gesamt-, Zahlungs- und
+     MwSt-Zeilen als Positionen gelesen und Uebernachtung mit Fruehstueck zusammengezogen. */
+  '- TABELLE MIT SPALTEN (z. B. "Date | VAT | Description | Qty. | Debit EUR | Credit EUR"): JEDE Zeile mit einem Betrag ' +
+  'in der Soll-/Debit-/Betrag-Spalte ist GENAU EINE Position mit genau diesem Betrag - nicht zusammenfassen, nicht aufteilen. ' +
+  'Betraege in der Haben-/Credit-Spalte sind Zahlungen (Karte, Anzahlung, Gutschein) und KEINE Position. ' +
+  'Die MwSt-Aufstellung ("VAT Tax Breakdown", "Net | VAT | Gross") und die Zeile "Total"/"Gesamt" sind KEINE Positionen. ' +
+  'ust_satz aus der VAT-Spalte der Zeile.\n' +
+  '- SELBSTKONTROLLE vor der Antwort: Die Summe aller betrag_brutto muss den rechnungsbetrag ergeben (auf 0,01 genau). ' +
+  'Stimmt es nicht, lies die Tabelle erneut Zeile fuer Zeile und korrigiere - erfinde aber keinen Betrag.\n' +
   '- REISEKOSTEN (Hotelrechnung): Uebernachtung und Kurtaxe -> "Übernachtung / Hotel"; Fruehstueck, ' +
   'Getraenke und andere Mahlzeiten -> "Verpflegung (nur Pauschale)"; Parkgebuehren -> "Fahrtkosten". ' +
   'Summen- und Zahlungszeilen (Gesamtbetrag, Kartenzahlung) sind KEINE eigene Position.\n' +
@@ -4168,22 +4180,26 @@ const _WK_PROMPT =
    durcheinander. Liefert der Browser die exakte Textebene der PDF-Seite, wird DIESE genommen: hier auf dem
    Server geschwärzt (schwaerzen.js, wie die Texterkennung), dann als Text an die KI. Ohne Textebene (Scan,
    Foto) bleibt der Weg über die Texterkennung. */
+const _ZWEITE_METHODE = 'METHODE FUER DIESE LESUNG: Gehe den Beleg ZEILE FUER ZEILE von oben nach unten durch. Schreibe fuer jede ' +
+  'Zeile mit Betrag zuerst im Kopf: Datum, Beschreibung, Spalte, Betrag. Entscheide dann je Zeile: Position, Zahlung, Summe oder ' +
+  'MwSt-Aufstellung. Nur Positionen gehoeren in "positionen". Pruefe am Ende die Summe gegen den Rechnungsbetrag.';
 async function _extractBelegPage(image, opts, textEbene) {
   /* v1406: zwei Prompts, eine Mechanik. `modus` entscheidet, ob der Beleg
      als Anschaffungskost oder als laufende Werbungskost gelesen wird. */
   const _prompt = (opts.modus === "wk") ? _WK_PROMPT : _BELEG_PROMPT;
   const _te = typeof textEbene === 'string' ? textEbene.slice(0, 20000) : '';
   let r, quelle = 'texterkennung';
+  const _var = opts.variante === 2 ? [{ type: 'input_text', text: _ZWEITE_METHODE }] : [];   /* v3163 */
   if (_te.replace(/\s/g, '').length >= 80) {
     const sw = require('./schwaerzen').schwaerze(_te);
     const content = [{ type: "input_text", text: _prompt },
       { type: "input_text", text: 'HINWEIS: Der Inhalt ist die exakte Textebene der PDF-Seite (keine Texterkennung, kein Bild). ' +
         'Personendaten sind durch Platzhalter ersetzt. Zahlen exakt so uebernehmen, wie sie dastehen.\n=== Seite (Textebene) ===\n' + sw.text }];
-    r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000 });
+    r = await _callOpenAIVision(content.concat(_var), { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, temperature: 0 });
     quelle = 'textebene';
   } else {
     const content = [{ type: "input_text", text: _prompt }, { type: "input_image", image_url: image }];
-    r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, dokument: true });   /* v3089 */
+    r = await _callOpenAIVision(content.concat(_var), { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, dokument: true, temperature: 0 });   /* v3089 */
   }
   const parsed = extractJson(r.text);
   if (parsed == null) { throw new Error('JSON-Parse (Antwort evtl. zu dicht/abgeschnitten)'); }
@@ -4247,7 +4263,8 @@ async function _belegLesung(imgs, opts) {
 async function extractBeleg(images, opts) {
   opts = opts || {};
   const imgs = (images || []).slice(0, 30);
-  const L = await Promise.all([_belegLesung(imgs, opts), _belegLesung(imgs, opts)]);
+  /* v3163 · zwei VERSCHIEDENE Methoden, beide mit temperature 0 - zweimal dieselbe Methode bestaetigt auch denselben Fehler */
+  const L = await Promise.all([_belegLesung(imgs, Object.assign({}, opts, { variante: 1 })), _belegLesung(imgs, Object.assign({}, opts, { variante: 2 }))]);
   const A = L[0], B = L[1];
   const passt = function (x) { return x.rb > 0 && x.pos.length && Math.abs(_belegSumme(x.pos, x.rb) - x.rb) <= Math.max(1, x.rb * 0.01); };
   let wahl = A, sicherheit = 'unsicher';

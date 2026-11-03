@@ -482,7 +482,6 @@
         setT('Belege werden vorbereitet … (' + (j + 1) + '/' + aiFiles.length + ')');
         try {
           var imgs = await _fileToImages(aiFiles[j]);
-          _roh[aiFiles[j].name] = aiFiles[j];   /* v3162 · Original fuer die Ablage */
           if (imgs.length) {
             var _tx = Array.isArray(imgs.texte) && imgs.texte.some(function (t) { return t && t.replace(/\s/g, '').length >= 80; }) ? imgs.texte : null;   /* v3154e */
             belege.push(_tx ? { name: aiFiles[j].name, images: imgs, texte: _tx } : { name: aiFiles[j].name, images: imgs }); _bilder[aiFiles[j].name] = imgs;
@@ -732,7 +731,7 @@
       if (_leer.length) nicht.push('nicht gelesen: ' + _leer.map(function (x) { return x.name; }).join(', '));
       if (p.offen.length) nicht.unshift('noch nicht bestätigt: ' + p.offen.join(', '));   /* v3156 */
       if (nicht.length) h += '<div class="bi-nicht"><b>Wird nicht übernommen:</b> ' + nicht.map(_esc).join(' · ') + '</div>';
-      if (window.DpAblage && window._currentObjKey) h += '<div class="bi-nicht">Die Originale werden in der Ablage des Objekts gespeichert (Ordner Rechnungen/Jahr).</div>';   /* v3162 */
+      h += '<div class="bi-nicht">Die Belege selbst werden nicht gespeichert – nur die übernommenen Werte.</div>';   /* v3163 */
       if (p.fremd.length) h += '<div class="bi-nicht">Für ' + p.fremd.join(', ') + ' führt der Reiter Steuer noch kein Jahr – der Wert wird hinterlegt und erscheint, sobald der Zeitraum so weit reicht.</div>';
     } else {
       var a = _aggregate(), f = Object.keys(a.byField); n = f.length;
@@ -1068,16 +1067,7 @@
         nicht_gelesen: _leer.map(function (x) { return x.name; }) });
     } catch (e) {}
     try { if (window.toast) window.toast('✓ ' + n + (n === 1 ? ' Wert' : ' Werte') + ' in den Reiter Steuer übernommen.'); } catch (e) {}
-    /* v3162 · alle gelesenen Belege (auch die unlesbaren) als Original in die Ablage: Rechnungen/<Jahr> */
-    try {
-      if (window.DpAblage && window._currentObjKey) {
-        var _ab = Object.keys(_roh).map(function (nm) {
-          var j = (_rows.filter(function (r) { return r.name === nm && r.jahr; })[0] || {}).jahr;
-          return { file: _roh[nm], ordner: window.DpAblage.ordnerFuer('rechnung', '', j) };
-        });
-        if (_ab.length) window.DpAblage.ablegenAlle(_ab, { quelle: 'beleg' }).then(function () { try { window.DpAblage.fuellen(); } catch (x) {} });
-      }
-    } catch (e) {}
+    /* v3163 · keine Ablage der Originale (Marcel: nur auslesen, nichts speichern) */
     close();
   }
 
