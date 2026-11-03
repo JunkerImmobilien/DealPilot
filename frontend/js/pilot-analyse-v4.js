@@ -80,6 +80,14 @@
       '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-pa-d,.dp-pa-wrap[data-dp-pa-modus="detail"] .dp-pa-e{display:none !important}',
       /* wert-zielbild hat einen eigenen Einfach|Genau-Schalter - in Fassung 4 steuert der Kopf */
       '.dp-pa-wrap[data-dp-pa-v4] .dp-si-um{display:none !important}',
+      /* Hülle: Fassung 4 hat die Unterreiter waagrecht oben (die bisherige Hülle ist ein Raster mit senkrechter Leiste) */
+      '.dp-pa-wrap[data-dp-pa-v4]{display:block !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-stand{margin:0 0 10px}',
+      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-rail{display:flex !important;flex-direction:row !important;flex-wrap:nowrap !important;gap:2px !important;overflow-x:auto !important;overflow-y:hidden !important;border:0 !important;border-bottom:1px solid #E6DCC2 !important;margin:0 0 14px !important;padding:0 !important;position:static !important;width:auto !important;height:auto !important;background:transparent !important;box-shadow:none !important;scrollbar-width:thin}',
+      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-rail .dp-pa-tab{flex:0 0 auto !important;width:auto !important;min-width:0 !important;border:0 !important;border-bottom:2px solid transparent !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important;padding:9px 11px !important;margin:0 0 -1px !important;font:600 13px "Space Grotesk",Inter,sans-serif !important;color:#7A7370 !important;white-space:nowrap !important;text-align:center !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-rail .dp-pa-tab.active{color:#2A2727 !important;border-bottom-color:var(--wl-c9a84c,#C9A84C) !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-content{width:auto !important;min-width:0 !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-mt{margin-top:12px}',
       '.dp-pa4-kopf{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}',
       '.dp-pa4-reihe{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}',
       '.dp-pa4-phase{font:600 12px "Space Grotesk",Inter,sans-serif;padding:6px 12px;border-radius:8px;background:#FBF6E9;color:#2A2727;white-space:nowrap}',
