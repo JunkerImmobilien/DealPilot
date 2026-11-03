@@ -32,7 +32,7 @@
      quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
      (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
      CLAUDE.md bezieht, ist unberuehrt. */
-  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v3096'; /* v3096: zweite Stufe Zielkaufpreis zurueck in der Karte; v3088: Notar/Grundbuch nach GNotKG; v3087: Kaufnebenkosten Notar 1,0, Sonstige nur selbst gesetzt */   /* v3081: Bewertung in einer Karte; v3075: Zustand, Sanierung, Mietpotenzial (P1); v3043: Abschlag-Deckelung */
+  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v3096a'; /* v3096: zweite Stufe Zielkaufpreis zurueck in der Karte; v3088: Notar/Grundbuch nach GNotKG; v3087: Kaufnebenkosten Notar 1,0, Sonstige nur selbst gesetzt */   /* v3081: Bewertung in einer Karte; v3075: Zustand, Sanierung, Mietpotenzial (P1); v3043: Abschlag-Deckelung */
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };

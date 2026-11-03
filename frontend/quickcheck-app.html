@@ -5785,7 +5785,7 @@ const QcApp = (function() {
      Seit v3081 stand sie nur im ausgeblendeten Mietpotenzial-Block. Eine Zeile unter
      den Grenzen, nur wenn die zulässige Miete in 3 Jahren über der heutigen liegt.
      Gerechnet wird nichts Neues: QcHeuristik.zielKaufpreisZweistufig wie in v3075. */
-  function _qcbZweiteStufe(score, inputs, D, kp, e0) {
+  function _qcbZweiteStufe(score, inputs, D, kp, e0, greift) {
     try {
       const mp = score && score.kpi && score.kpi.mietpot;
       if (!mp || !mp.zul || !(mp.nkm_3j > mp.nkm_heute + 0.5) || !(kp > 0)) return '';
@@ -5796,8 +5796,8 @@ const QcApp = (function() {
       if (!z || z.nach3 == null) return '';
       const v = z.nach3 >= kp ? kp : Math.floor(z.nach3 / 1000) * 1000;
       const nl = z.nach3 >= kp ? 'kein Nachlass nötig' : 'Nachlass ' + e0(kp - v) + ' (' + Math.round((1 - v / kp) * 100) + ' %)';
-      return '<div class="qcb-zk2"><span>Mit zulässiger Miete in 3 Jahren</span><b>' + e0(v) + '</b><small>' + nl + ' · Miete '
-        + e0(mp.nkm_heute) + ' → ' + e0(mp.nkm_3j) + ' im Monat, höchstens Marktwert</small></div>';
+      return '<div class="qcb-zk2"><span>Rendite-Ziel mit zulässiger Miete in 3 Jahren</span><b>' + e0(v) + '</b><small>' + nl + ' · Miete '
+        + e0(mp.nkm_heute) + ' → ' + e0(mp.nkm_3j) + ' im Monat, höchstens Marktwert' + (greift === 'cashflow' ? ' · die Grenze der Finanzierung bleibt' : '') + '</small></div>';
     } catch (_) { return ''; }
   }
 
@@ -5881,7 +5881,7 @@ const QcApp = (function() {
           + zk('Rendite-Ziel ' + (lk ? lk + '-Lage' : '(ohne Lageklasse)'), T.rendite, 'rendite', zr + ' brutto')
           + zk('Cashflow null · deine Finanzierung', T.cashflow, 'cashflow', '')
           + (T.markt != null ? zk('Marktwert', T.markt, 'markt', '') : '')
-          + `</div>${_qcbZweiteStufe(score, inputs, D, kp, e0)}<p class="qcb-fuss">Verhandlungsrahmen, kein Wert.${T.greift === 'cashflow' ? ' Den Preis bremst die Finanzierung, nicht die Lage — mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.' : ''}</p></div>`;
+          + `</div>${_qcbZweiteStufe(score, inputs, D, kp, e0, T.greift)}<p class="qcb-fuss">Verhandlungsrahmen, kein Wert.${T.greift === 'cashflow' ? ' Den Preis bremst die Finanzierung, nicht die Lage — mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.' : ''}</p></div>`;
       }
     } catch (_) {}
 
