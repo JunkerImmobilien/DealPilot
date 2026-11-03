@@ -948,6 +948,17 @@
        Mitte des aktuellen Marktdurchschnitts (nicht die obere Spanne - die gilt für saniert), sonst die
        Marktmiete aus dem Reiter Miete; gedeckelt durch die Mietpreisbremse (Kern neuvermietung). */
     var _ms = marktSaniert(m), _br = mietpreisbremse(agsJetzt());
+    /* v3158 · was hier gilt, am Objekt merken (Schnittstelle, Export) - Kappung, Mietpreisbremse, Marktmiete */
+    try {
+      if (window.dpMarktdatenMerken) {
+        var _kp = kappung(agsJetzt());
+        window.dpMarktdatenMerken({
+          kappung: _kp ? Object.assign({ ags: agsJetzt() }, _kp) : null,   /* ganze Auskunft des Kerns (Satz, Gebiet, Frist, Quelle) */
+          mietpreisbremse: _br ? Object.assign({ ags: agsJetzt() }, _br) : null,   /* gilt: true | false | null (= bitte prüfen) */
+          marktmiete: _ms ? { qm: _ms.qm != null ? _ms.qm : null, mitte_qm: _ms.mitte != null ? _ms.mitte : null, art: _ms.art || null, herkunft: _ms.art === 'eigen' ? 'eigene Angabe' : 'aktueller Marktdurchschnitt' } : null
+        });
+      }
+    } catch (e) {}
     var _nvQm = _ms && _ms.art !== 'eigen' && _ms.mitte > 0 ? _ms.mitte : zahl(wert('ds2_marktmiete'));
     var _nvHer = _ms && _ms.art !== 'eigen' && _ms.mitte > 0 ? 'aktueller Marktdurchschnitt (Mitte)' : (_nvQm > 0 ? 'Marktmiete (Tab Miete)' : null);
     var nv = function (w) {

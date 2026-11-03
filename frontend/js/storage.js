@@ -322,6 +322,10 @@ function collectData() {
   /* v2430: das letzte Potenzial-Ergebnis (Ertragswert je Stufe) samt Pruefwert -
      fuer PDF, Pilot-Analyse und Portfolio-Pilot ohne neuen Abruf. */
   if (window._dpPotenzial && window._dpPotenzial.ergebnis) d._potenzial = window._dpPotenzial;
+  /* v3158 · Marcel 03.11.2026: „die Werte, die wir abgerufen haben, pro Objekt auch abspeichern … Kappungsgrenzen,
+     Mietpreisbremse … dass das mit rübergeht für jedes Objekt". _marktdaten = { zensus, kappung, mietpreisbremse,
+     marktmiete } je mit Stand; gesetzt von potenzial.js und mb-abgleich.js über dpMarktdatenMerken(). */
+  try { if (window._dpMarktdaten && window._dpMarktdaten.fuer && window._dpMarktdaten.fuer === window._currentObjKey) d._marktdaten = window._dpMarktdaten; } catch (e) {}
   /* v2214 · DIE JAHRESWERTE DER ANLAGE V (tax.js _taxYearlyOverrides).
      Gemessen 14.10.2026: sie lebten NUR im Fenster. Kein Ladeweg stellte sie
      wieder her, beim Objektwechsel wanderten sie ins naechste Objekt, und nach
@@ -695,6 +699,8 @@ function loadData(d) {
   window._dpRnd = (d._rnd && d._rnd.rnd_jahre) ? d._rnd : null;
   /* v2430: Potenzial-Ergebnis. Fehlt es, ist es NULL (versteckte-felder-erben). */
   window._dpPotenzial = (d._potenzial && d._potenzial.ergebnis) ? d._potenzial : null;
+  window._dpMarktdaten = (d._marktdaten && typeof d._marktdaten === 'object') ? d._marktdaten : null;   /* v3158 */
+  try { if (window._dpMarktdaten) window._dpMarktdaten.fuer = window._currentObjKey || window._dpMarktdaten.fuer || null; } catch (e) {}
   /* v2214: Jahreswerte der Anlage V. Fehlen sie, sind sie LEER - sonst erbte
      das geladene Objekt die Eingaben des vorigen (gemessen). */
   try {
@@ -905,6 +911,25 @@ function loadData(d) {
 // ══════════════════════════════════════════════════
 // SAVE / NEW
 // ══════════════════════════════════════════════════
+/* v3158 · abgerufene Marktdaten am Objekt merken (gespeichert mit dem nächsten Speichern). teil = { zensus: {...} } u. a.;
+   jeder Teil bekommt seinen Stand. Gehört der Speicher zu einem anderen Objekt, wird er ersetzt. */
+window.dpMarktdatenMerken = function (teil) {
+  try {
+    var key = window._currentObjKey || null;
+    if (!key || !teil || typeof teil !== 'object') return;
+    var m = window._dpMarktdaten;
+    if (!m || m.fuer !== key) m = { fuer: key };
+    var heute = new Date().toISOString().slice(0, 10);
+    Object.keys(teil).forEach(function (k) {
+      var v = teil[k];
+      if (v == null) return;
+      m[k] = Object.assign({}, (typeof v === 'object' ? v : { wert: v }), { stand: heute });
+    });
+    m.stand = heute;
+    window._dpMarktdaten = m;
+  } catch (e) {}
+};
+
 async function saveObj(opts) {
   opts = opts || {};
   /* v1268-kontext: Mit welchem Objekt hat dieser Save angefangen? Zwischen
@@ -1248,7 +1273,7 @@ function _clearFormForNewObject() {
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
   window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
   /* v2430: Einheiten, RND-Vorschlag und Potenzial-Ergebnis gehoeren ebenfalls dem Objekt (versteckte-felder-erben). */
-  window._dpMfh = null; window._dpRnd = null; window._dpPotenzial = null;
+  window._dpMfh = null; window._dpRnd = null; window._dpPotenzial = null; window._dpMarktdaten = null;   /* v3158 */
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
   }
@@ -1373,7 +1398,7 @@ function _newObjLeeren() {
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
   window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
   /* v2430: Einheiten, RND-Vorschlag und Potenzial-Ergebnis gehoeren ebenfalls dem Objekt (versteckte-felder-erben). */
-  window._dpMfh = null; window._dpRnd = null; window._dpPotenzial = null;
+  window._dpMfh = null; window._dpRnd = null; window._dpPotenzial = null; window._dpMarktdaten = null;   /* v3158 */
   // V58: Workflow-Bar zurücksetzen + Outputs nullen
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);

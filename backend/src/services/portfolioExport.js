@@ -424,6 +424,15 @@ const STRUKTUREN = {
       einheiten_aenderungen: 'Mietvertraege, die Einheiten zugeordnet wurden (am, einheit, quelle, vorher)'
     }
   },
+  _marktdaten: {
+    was: 'v3158 · abgerufene Marktdaten am Objekt, je Teil mit Stand (JJJJ-MM-TT): was beim letzten Rechnen galt',
+    felder: {
+      kappung: 'Kappungsgrenze § 558 Abs. 3 BGB: pct (15/20), Gebiet/Verordnung, gilt bis, eigene Angabe ja/nein, ags',
+      mietpreisbremse: 'Mietpreisbremse § 556d BGB: gilt (true/false/null = bitte pruefen), bis, Verordnung, Link, ags',
+      marktmiete: 'Marktmiete in Euro/m2: qm (angesetzt), mitte_qm, art (eigen | markt), herkunft',
+      zensus: 'Zensus-2022-Werte zur Lage (Gemeinde/Gitter): Mieten, Leerstand, Baualter - wie im Abgleich der App'
+    }
+  },
   _dok_auswertung: {
     was: 'Auswertung der Unterlagen (WEG-Protokolle, Wirtschaftsplan, Teilungserklaerung ...): Dokumentliste, Risiken, Beschluesse',
     hinweis: 'Die Dateien selbst liegen nicht auf dem Server'

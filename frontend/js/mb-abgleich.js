@@ -90,6 +90,7 @@
       if (S !== lauf) return null;
       S.lage = r[1] && r[1].felder ? r[1] : null;
       S.zensus = r[2] && r[2].available ? r[2] : null;
+      try { if (S.zensus && window.dpMarktdatenMerken) window.dpMarktdatenMerken({ zensus: S.zensus }); } catch (e) {}   /* v3158 */
       var rows = (r[0] || []).filter(function (x) { return x && x.report_id != null; })
         .sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
       S.anzahl = rows.length;
