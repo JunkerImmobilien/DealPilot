@@ -235,7 +235,7 @@
   function kennzahlen(bestand) {
     var k = kpis(), w = wertDaten(), z = [];
     if (zahl(k.kp) && k.kp > 0) z.push(zahlKachel(bestand ? 'Kaufpreis (Ankauf)' : 'Kaufpreis', eur(k.kp), zahl(k.bmy) ? 'Bruttorendite ' + de(k.bmy, 2) + ' %' : '', '#E6DCC2'));
-    if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat' : '', k.cf_m >= 0 ? C.gut : C.rot));
+    if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer · volles Jahr', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat (volles Jahr)' : '', k.cf_m >= 0 ? C.gut : C.rot));
     if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot));
     if (w && w.marktpreisindikation && zahl(w.marktpreisindikation.mitte)) {
       var oh = w.ohne_abschlag && zahl(w.ohne_abschlag.mitte) ? 'ohne Abschlag ' + eur(w.ohne_abschlag.mitte) : '';
@@ -342,8 +342,8 @@
     }
     /* Worst · Plan · Best */
     var k = kpis();
-    var plan = '<dl>' + (zahl(k.cf_m) ? '<dt>Cashflow vor Steuer</dt><dd>' + sEur(k.cf_m) + ' / Monat</dd>' : '')
-      + (zahl(k.cf_ns) ? '<dt>nach Steuer</dt><dd>' + sEur(k.cf_ns / 12) + ' / Monat</dd>' : '')
+    var plan = '<dl>' + (zahl(k.cf_m) ? '<dt>Cashflow vor Steuer (volles Jahr)</dt><dd>' + sEur(k.cf_m) + ' / Monat</dd>' : '')
+      + (zahl(k.cf_ns) ? '<dt>nach Steuer (volles Jahr)</dt><dd>' + sEur(k.cf_ns / 12) + ' / Monat</dd>' : '')
       + (zahl(k.dscr) && k.dscr > 0 ? '<dt>DSCR</dt><dd>' + de(k.dscr, 2) + '</dd>' : '')
       + (zahl(k.bmy) && k.bmy > 0 ? '<dt>Bruttorendite</dt><dd>' + de(k.bmy, 2) + ' %</dd>' : '') + '</dl>';
     var szk = function (titel, an, farbe, t, inner, vor) {
@@ -639,10 +639,29 @@
       if (zahl(r.cfns_y)) kum += Number(r.cfns_y);
       cf.push(zahl(r.cfns_y) ? kum : null);
     });
-    host.innerHTML = '<h5>Wohin es läuft · Vermögen aus dem Objekt</h5><div></div>';
-    linien(host.lastChild, { x: R.map(function (r) { return String(r.cal); }), hoehe: 210, null: true, fmt: eur, achse: te, aria: 'Eigenkapital im Objekt und aufsummierter Cashflow nach Steuer',
+    /* v3099j · Die Kurve summiert KALENDERJAHRE (cfRows.cfns_y = cfop_y − tax_y, Steuer aus dem Reiter
+       Steuer), die Kachel oben zeigt ein VOLLES eingeschwungenes Jahr (State.kpis.cf_ns, calc.js „V351
+       Volljahr"). Gemessen an Lindenhof 14 (Übergang 01.02.2027): Kachel −870 €/Monat nach Steuer, Kurve
+       steigt, weil 2027 die Erstattung 47.378 € beträgt (Ergebnis Anlage V −125.911 €). Beides stimmt - der
+       Satz unter der Grafik nennt das erste Jahr mit seinen Zahlen, der Tooltip je Jahr vor Steuer, Steuer
+       und nach Steuer. Gerechnet wird nichts neu. */
+    var r0 = R[0], satz = '';
+    if (zahl(r0.cfop_y) && zahl(r0.tax_y) && zahl(r0.cfns_y)) {
+      var k = kpis(), ue = String((document.getElementById('wirtschaftlicher_uebergang') || document.getElementById('kaufdat') || {}).value || '');
+      var ueT = /^\d{4}-\d{2}-\d{2}/.test(ue) ? ue.slice(8, 10) + '.' + ue.slice(5, 7) + '.' : '';
+      satz = '<p class="dp-pa4-erkl" style="margin-top:4px">Die gelbe Linie summiert den Cashflow nach Steuer <b>je Kalenderjahr</b> – mit den Erstattungen aus dem Reiter Steuer. '
+        + r0.cal + (ueT ? ' (ab ' + ueT + ')' : '') + ': vor Steuer ' + sEur(r0.cfop_y) + ', ' + (r0.tax_y <= 0 ? 'Erstattung ' + sEur(-r0.tax_y) : 'Steuer ' + eur(r0.tax_y)) + ', nach Steuer <b>' + sEur(r0.cfns_y) + '</b>.'
+        + (zahl(k.cf_ns) ? ' Die Kachel „Cashflow“ oben rechnet dagegen ein volles, eingeschwungenes Jahr (' + sEur(k.cf_ns / 12) + ' / Monat nach Steuer).' : '') + '</p>';
+    }
+    host.innerHTML = '<h5>Wohin es läuft · Vermögen aus dem Objekt</h5><div></div>' + satz;
+    linien(host.querySelector('div'), { x: R.map(function (r) { return String(r.cal); }), hoehe: 210, null: true, fmt: eur, achse: te, aria: 'Eigenkapital im Objekt und aufsummierter Cashflow nach Steuer je Kalenderjahr',
       reihen: [{ name: 'Eigenkapital im Objekt (Plan-Wert − Restschuld)', farbe: C.c1, werte: eq, art: 'linie' },
-               { name: 'Cashflow nach Steuer, aufsummiert', farbe: C.c2, werte: cf, art: 'linie' }] });
+               { name: 'Cashflow nach Steuer inkl. Erstattungen, je Kalenderjahr aufsummiert', farbe: C.c2, werte: cf, art: 'linie' }],
+      tip: function (i) {
+        var r = R[i]; if (!r) return '';
+        return '<div style="display:block;color:#7A7370;margin-top:3px;border-top:1px solid #F1ECE1;padding-top:3px">Jahr ' + r.cal + ': vor Steuer ' + esc(sEur(r.cfop_y || 0))
+          + ' · ' + (r.tax_y <= 0 ? 'Erstattung ' + esc(sEur(-(r.tax_y || 0))) : 'Steuer ' + esc(eur(r.tax_y))) + ' · nach Steuer ' + esc(sEur(r.cfns_y || 0)) + '</div>';
+      } });
   }
   function miniAbz(host) {
     var d = null; try { d = window.DpWertZielbild && window.DpWertZielbild.daten ? window.DpWertZielbild.daten() : null; } catch (e) { d = null; }
