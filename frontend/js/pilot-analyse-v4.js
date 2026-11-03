@@ -98,7 +98,8 @@
       '.dp-pa4-reihe{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}',
       '.dp-pa4-phase{font:600 12px "Space Grotesk",Inter,sans-serif;padding:6px 12px;border-radius:8px;background:#FBF6E9;color:#2A2727;white-space:nowrap}',
       '.dp-pa4-info{font:400 12px Inter,system-ui,sans-serif;color:#7A7370}',
-      /* v3099e · Marcel: „man sieht nicht, wo man ist" - gemessen: der gedrückte Knopf hatte background none
+      /* v3099e/g · Marcel: „man sieht nicht, wo man ist" - gemessen: der gedrückte Knopf hatte background none;
+         die Regel .sec button:not(…)×8 (style.css, Spezifität 0,9,1) nimmt .btn-clean aus - alle Knöpfe hier tragen sie.
          (eine ältere Knopf-Regel gewinnt). Jetzt mit !important und höherer Spezifität, dazu die Zeile darunter. */
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg{display:inline-flex !important;border:1px solid #E6DCC2 !important;border-radius:10px !important;padding:3px !important;background:#fff !important;gap:2px}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg button{border:0 !important;background:transparent !important;color:#7A7370 !important;font:600 12.5px "Space Grotesk",Inter,sans-serif !important;padding:6px 14px !important;border-radius:7px !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
@@ -313,7 +314,7 @@
     if (st2.length || ri2.length) h += '<div class="dp-pa-e">' + karte(kopfzeile('Worauf es ankommt') + '<div class="dp-pa4-zwei">'
       + '<div><b style="font:600 12px Inter,sans-serif;color:#2E7D50">Dafür</b><ul class="dp-pa4-liste">' + st2.map(function (x) { return '<li>' + txt(kurz(x, 130)) + '</li>'; }).join('') + '</ul></div>'
       + '<div><b style="font:600 12px Inter,sans-serif;color:#B8625C">Dagegen</b><ul class="dp-pa4-liste">' + ri2.map(function (x) { return '<li>' + txt(kurz(x, 130)) + '</li>'; }).join('') + '</ul></div></div>'
-      + '<button type="button" class="dp-pa4-mehr" data-dp-pa-modus-setzen="detail">Ausführlich lesen (Detail)</button>') + '</div>';
+      + '<button type="button" class="btn-clean dp-pa4-mehr" data-dp-pa-modus-setzen="detail">Ausführlich lesen (Detail)</button>') + '</div>';
     /* Detail: das ganze Statement */
     var gs = gesamtstatement(a, bestand);
     h += '<div class="dp-pa-d">' + karte(kopfzeile(bestand ? 'Gesamtstatement zum Bestand' : 'Gesamtstatement zum Ankauf') + gs
@@ -422,8 +423,8 @@
       ? 'Je Jahr: hast du eigene Angaben gemacht (Belege eingelesen oder von Hand), oder rechnet die App nur mit ihrem Vorschlag? Für abgelaufene Jahre ohne eigene Angaben fehlen die Belege.'
       : 'Im Ankauf ist die Steuer ein Plan aus deinen Eingaben. Belege kommen nach dem Kauf – Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen.';
     return karte(kopfzeile('Belege') + chips + '<p class="dp-pa-p" style="margin:0 0 10px">' + satz + '</p>'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="dp-pa4-btn" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen (KI)</button>'
-      + '<button type="button" class="dp-pa4-btn leise" onclick="try{var t=document.querySelector(\'.tab[data-target-sec]\');var b=[].filter.call(document.querySelectorAll(\'.tab\'),function(x){return /Steuer/.test(x.textContent||\'\')})[0];if(b)b.click();}catch(e){}">Zum Reiter Steuer</button></div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen (KI)</button>'
+      + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="try{var t=document.querySelector(\'.tab[data-target-sec]\');var b=[].filter.call(document.querySelectorAll(\'.tab\'),function(x){return /Steuer/.test(x.textContent||\'\')})[0];if(b)b.click();}catch(e){}">Zum Reiter Steuer</button></div>'
       + erkl('Die KI liest PDF oder Foto, teilt eine Hausgeldabrechnung in umlagefähige und nicht umlagefähige Kosten und ordnet jeden Beleg seinem Jahr zu. Du bestätigst jede Zeile, erst dann landet sie in den Werbungskosten des Jahres im Reiter Steuer.'), 'dp-pa4-mt');
   }
 
@@ -713,8 +714,8 @@
   /* v3099e · Unterlagen & WEG steht immer da (Fassung 4): ohne Auswertung mit dem Einstieg zum Hochladen */
   function unterlagenPanel(html) {
     var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
-      + '<button type="button" class="dp-pa4-btn" onclick="if(window.DokumentImport&&DokumentImport.oeffnen)DokumentImport.oeffnen()">Unterlagen einlesen (Exposé, Wirtschaftsplan, Protokoll …)</button>'
-      + '<button type="button" class="dp-pa4-btn leise" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen</button></div>';
+      + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DokumentImport&&DokumentImport.oeffnen)DokumentImport.oeffnen()">Unterlagen einlesen (Exposé, Wirtschaftsplan, Protokoll …)</button>'
+      + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege &amp; Abrechnungen einlesen</button></div>';
     if (html) return kuerzen(html) + karte(kopfzeile('Weitere Unterlagen') + knoepfe, 'dp-pa4-mt');
     return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet. Lies Teilungserklärung, Wirtschaftsplan, Protokolle der Eigentümerversammlung oder Mietverträge ein – der Pilot wertet sie hier aus (Beschlüsse, Sonderumlagen, Rücklage, Auffälligkeiten).</p>'
       + '<p class="dp-pa-p">Belege und Abrechnungen für die Steuer liest du über den zweiten Knopf ein; sie landen im Reiter Steuer im richtigen Jahr.</p>' + knoepfe);
@@ -724,14 +725,14 @@
   function huelle(o) {
     stil();
     var m = modus(), bestand = !!o.bestand;
-    var tab = function (id, lbl, aktiv, extra) { return '<button type="button" class="dp-pa-tab' + (aktiv ? ' active' : '') + '"' + (extra || '') + ' onclick="_dpPaTab(\'' + id + '\',this)">' + lbl + '</button>'; };
+    var tab = function (id, lbl, aktiv, extra) { return '<button type="button" class="btn-clean dp-pa-tab' + (aktiv ? ' active' : '') + '"' + (extra || '') + ' onclick="_dpPaTab(\'' + id + '\',this)">' + lbl + '</button>'; };
     var panel = function (id, inner, aktiv, extra) { return '<section class="dp-pa-panel' + (aktiv ? ' active' : '') + '" id="dp-pa-' + id + '"' + (extra || '') + '>' + inner + '</section>'; };
     var reiter = [], inhalt = [];
     var add = function (id, lbl, inner, opt) { opt = opt || {}; if (!inner && !opt.leer) return; reiter.push(tab(id, lbl, !reiter.length, opt.tabExtra)); inhalt.push(panel(id, inner, inhalt.length === 0)); };
     add('uebersicht', 'Übersicht', o.uebersicht);
     add('si', bestand ? 'Ankauf · Bestand · Soll · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
     /* Wert & Verlauf erscheint wie bisher erst mit einem Bericht oder Abruf (_dpLoadVerlauf) */
-    reiter.push('<button type="button" class="dp-pa-tab" id="dp-pa-tab-wert" style="display:none" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Verlauf</button>');
+    reiter.push('<button type="button" class="btn-clean dp-pa-tab" id="dp-pa-tab-wert" style="display:none" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Verlauf</button>');
     inhalt.push(panel('wert', o.wert, false));
     add('loc', 'Lage &amp; Markt', o.lage ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="lage"></div>' + kuerzen(o.lage) : o.lage);
     if (bestand) {
@@ -753,15 +754,15 @@
       else info = bestand ? 'Fragen und Reiter für das Halten' : 'Fragen und Reiter für die Kaufentscheidung';
     } catch (e) {}
     var kopf = '<div class="dp-pa4-kopf"><div class="dp-pa4-reihe"><span class="dp-pa4-phase">' + phase + '</span><span class="dp-pa4-info">' + esc(info) + '</span></div>'
-      + '<div class="dp-pa4-reihe"><button type="button" class="dp-pa4-pdf" data-dp-pa4-pdf="1" aria-controls="ai-pdf-sections">PDF zusammenstellen</button>'
-      + '<div class="dp-pa4-seg" role="group" aria-label="Darstellung"><button type="button" data-dp-pa-modus-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
-      + '<button type="button" data-dp-pa-modus-knopf="detail" aria-pressed="' + (m === 'detail') + '">Detail</button></div></div></div>';
+      + '<div class="dp-pa4-reihe"><button type="button" class="btn-clean dp-pa4-pdf" data-dp-pa4-pdf="1" aria-controls="ai-pdf-sections">PDF zusammenstellen</button>'
+      + '<div class="dp-pa4-seg" role="group" aria-label="Darstellung"><button type="button" class="btn-clean" data-dp-pa-modus-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
+      + '<button type="button" class="btn-clean" data-dp-pa-modus-knopf="detail" aria-pressed="' + (m === 'detail') + '">Detail</button></div></div></div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
     try { setTimeout(function () { minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); }, function () {}); }, 0); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
       + (o.kopf || '')
       /* v3099e · Marcel: „Pilot-Analyse starten“ oben drüber gefällt nicht - als „Neu abrufen“ unter den Stand */
-      + '<div class="dp-pa4-neu"><button type="button" onclick="if(typeof runAI===\'function\')runAI()">↻ Analyse neu abrufen</button><span>beschreibt den heutigen Stand dieses Objekts</span></div>'
+      + '<div class="dp-pa4-neu"><button type="button" class="btn-clean" onclick="if(typeof runAI===\'function\')runAI()">↻ Analyse neu abrufen</button><span>beschreibt den heutigen Stand dieses Objekts</span></div>'
       + kopf
       + '<div class="dp-pa4-modus-zeile"><b class="dp-pa-e">Kurzfassung</b><span class="dp-pa-e">Das Wichtigste mit kleinen Grafiken – „Detail“ zeigt alle Zahlen und Texte.</span>'
       + '<b class="dp-pa-d">Ausführlich</b><span class="dp-pa-d">Alle Zahlen, Tafeln und Texte der Analyse – „Einfach“ zeigt die Kurzfassung.</span></div>'
