@@ -648,7 +648,7 @@
         if (andere.length >= 2 && r.brutto > 0 && Math.abs(r.brutto - summe) <= Math.max(0.5, r.brutto * 0.01)) {
           r.summe = true; r.keep = false; r.pruefen.push('ist die Summe der übrigen Positionen – nicht zusätzlich übernommen'); return;
         }
-        if (/gesamt|summe|\btotal\b|endbetrag|rechnungsbetrag/i.test(String(r.beschreibung || ''))) {
+        if (/gesamtrechnung|gesamtbetrag|rechnungsbetrag|endbetrag|\btotal\b|^\s*summe/i.test(String(r.beschreibung || ''))) {
           r.keep = false; r.pruefen.push('sieht nach dem Gesamtbetrag aus – nicht zusätzlich zu den Einzelpositionen übernehmen');
         }
         var vorher = g.slice(0, k).filter(function (x) { return x.kategorie === r.kategorie && Math.abs((x.brutto || 0) - (r.brutto || 0)) < 0.01; });
