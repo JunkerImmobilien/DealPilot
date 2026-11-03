@@ -4182,7 +4182,8 @@ const _WK_PROMPT =
    Foto) bleibt der Weg über die Texterkennung. */
 const _ZWEITE_METHODE = 'METHODE FUER DIESE LESUNG: Gehe den Beleg ZEILE FUER ZEILE von oben nach unten durch. Schreibe fuer jede ' +
   'Zeile mit Betrag zuerst im Kopf: Datum, Beschreibung, Spalte, Betrag. Entscheide dann je Zeile: Position, Zahlung, Summe oder ' +
-  'MwSt-Aufstellung. Nur Positionen gehoeren in "positionen". Pruefe am Ende die Summe gegen den Rechnungsbetrag.';
+  'MwSt-Aufstellung. Nur Positionen gehoeren in "positionen". Betraege in der Haben-/Credit-Spalte (Reward, Bonus, Gutschein, Visa, Karte, bar) ' +
+  'sind ZAHLUNGEN, auch wenn sie wie eine Leistung klingen - nie eine Position. Pruefe am Ende die Summe gegen den Rechnungsbetrag.';   /* v3163b: gemessen +40 EUR Reward als Position */
 async function _extractBelegPage(image, opts, textEbene) {
   /* v1406: zwei Prompts, eine Mechanik. `modus` entscheidet, ob der Beleg
      als Anschaffungskost oder als laufende Werbungskost gelesen wird. */
