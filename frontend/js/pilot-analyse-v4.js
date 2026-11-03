@@ -775,6 +775,9 @@
     var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
     var k = t.closest('[data-dp-pa-modus-knopf]') || t.closest('[data-dp-pa-modus-setzen]');
     if (k && k.closest('.dp-pa-wrap[data-dp-pa-v4]')) { ev.preventDefault(); setzeModus(k.getAttribute('data-dp-pa-modus-knopf') || k.getAttribute('data-dp-pa-modus-setzen')); return; }
+    /* v3099g · „Alle Zahlen zeigen (Genau)" in Ankauf · Bestand · Zielbild (wert-zielbild.js) schaltet den ganzen Reiter */
+    var sk = t.closest('[data-dp-si-knopf]');
+    if (sk && sk.closest('.dp-pa-wrap[data-dp-pa-v4]')) { var mm = sk.getAttribute('data-dp-si-knopf') === 'genau' ? 'detail' : 'einfach'; setTimeout(function () { setzeModus(mm); }, 0); }
     var p = t.closest('[data-dp-pa4-pdf]');
     if (p) {
       ev.preventDefault();
