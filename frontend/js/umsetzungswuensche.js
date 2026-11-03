@@ -106,7 +106,7 @@
     var hg = document.createElement('div'); hg.className = 'dpw-hg'; hg.id = 'dpw-hg';
     var opts = function (liste, wert) { return liste.map(function (e) { return '<option value="' + e[0] + '"' + (e[0] === wert ? ' selected' : '') + '>' + e[1] + '</option>'; }).join(''); };
     hg.innerHTML = '<div class="dpw" role="dialog" aria-modal="true" aria-labelledby="dpw-titel">'
-      + '<div class="dpw-kopf"><div><h3 id="dpw-titel">Bordbuch · Umsetzungswünsche</h3><p>Was soll in DealPilot gebaut oder geändert werden? Neue Einträge landen im Backlog.' + (window.DpBordbuch ? ' <button type="button" class="dpw-bildknopf" data-akt="screenshot" style="margin-left:4px">📷 mit Screenshot eintragen</button>' : '') + '</p></div>'
+      + '<div class="dpw-kopf"><div><h3 id="dpw-titel">Bordbuch · Umsetzungswünsche</h3><p>Was soll in DealPilot gebaut oder geändert werden? Neue Einträge landen im Backlog.' + (window.DpBordbuch ? ' <button type="button" class="dpw-bildknopf" data-akt="screenshot" style="margin-left:4px">📷 mit Screenshot eintragen</button>' : '') + (window.DpBordbuch && DpBordbuch.ausgeblendet() ? ' <button type="button" class="dpw-bildknopf" data-akt="mechaniker" style="margin-left:4px">Mechaniker wieder einblenden</button>' : '') + '</p></div>'
       + '<button class="dpw-zu" type="button" aria-label="Schließen">×</button></div>'
       + '<div class="dpw-inhalt">'
       + '<div><label class="dpw-l" for="dpw-t">Titel</label><input id="dpw-t" maxlength="200" placeholder="z. B. Quick-Check: Hausgeld aus dem Exposé übernehmen"></div>'
@@ -126,7 +126,9 @@
     hg.addEventListener('click', function (e) { if (e.target === hg) zu(); });
     hg.querySelector('.dpw-zu').addEventListener('click', zu);
     var sk = hg.querySelector('[data-akt="screenshot"]');
-    if (sk) sk.addEventListener('click', function () { zu(); setTimeout(function () { DpBordbuch.start(); }, 80); });
+    if (sk) sk.addEventListener('click', function () { zu(); DpBordbuch.start(); });
+    var mk = hg.querySelector('[data-akt="mechaniker"]');
+    if (mk) mk.addEventListener('click', function () { DpBordbuch.einblenden(); mk.remove(); });
     var setzeFilter = function () { hg.querySelectorAll('[data-filter]').forEach(function (b) { b.classList.toggle('an', b.getAttribute('data-filter') === filter); }); };
     hg.querySelectorAll('[data-filter]').forEach(function (b) { b.addEventListener('click', function () { filter = b.getAttribute('data-filter'); setzeFilter(); zeichneListe(); }); });
     setzeFilter();

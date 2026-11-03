@@ -13,8 +13,9 @@
    Mechaniker mit Klemmbrett (unten links liegt die Benutzerkarte der
    Seitenleiste, gemessen 03.11.: dort verdeckte er sie).
 
-   Ablauf: Klick auf den Mechaniker → html2canvas fotografiert den sichtbaren
-   Ausschnitt (Mechaniker und Fenster ausgenommen) → Fenster mit dem Bild:
+   Ablauf (seit v3111): Klick auf den Mechaniker → Tab-Aufnahme des Browsers
+   (getDisplayMedia, fragt „Diesen Tab teilen?“) → Fenster mit dem Bild:
+   Ausschnitt/Zuschneiden, Zoom,
    Stift, Rahmen, Rückgängig; Art (Fehler/Wunsch/Idee), Titel, Beschreibung mit
    Diktat (DealPilotDiktat, derselbe Transkriptionsweg wie überall), Bereich,
    Dringlichkeit; weiteres Bild per Einfügen oder Datei. Gespeichert wird in
@@ -41,8 +42,9 @@
       '#dp-bb-fab svg{width:100%;height:100%;overflow:visible}',
       '#dp-bb-fab .bb-schild{position:absolute;right:0;bottom:calc(100% + 4px);white-space:nowrap;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.04em;background:#141210;color:#f3ead0;border:1px solid ' + G + ';border-radius:6px;padding:3px 7px;opacity:0;transition:opacity .2s;pointer-events:none}',
       '#dp-bb-fab:hover .bb-schild,#dp-bb-fab:focus-visible .bb-schild{opacity:1}',
-      '#dp-bb-fab.knipst svg{animation:bb-blitz .5s ease-in-out infinite alternate}',
-      '@keyframes bb-blitz{from{opacity:1}to{opacity:.45}}',
+      '#dp-bb-fab .bb-weg{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#141210;color:#f3ead0;border:1px solid ' + G + ';font:600 12px/16px Inter,sans-serif;text-align:center;opacity:0;transition:opacity .2s;cursor:pointer}',
+      '#dp-bb-fab:hover .bb-weg,#dp-bb-fab:focus-within .bb-weg{opacity:1}',
+      '@media (hover:none){#dp-bb-fab .bb-weg{opacity:.85}}',
       '#dp-bb-fab .bb-oben{animation:bb-atem 3.4s ease-in-out infinite;transform-origin:50px 110px}',
       '@keyframes bb-atem{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.3px)}}',
       '#dp-bb-fab:hover .bb-arm{transform:rotate(-24deg)}',
@@ -62,9 +64,12 @@
       '.bb-werkzeug{display:flex;gap:6px;flex-wrap:wrap;align-items:center}',
       '.bb-werkzeug button{border:1px solid #E3D9C4;background:#fff;border-radius:8px;padding:5px 10px;font:500 12.5px Inter,sans-serif;cursor:pointer;color:#2A2727}',
       '.bb-werkzeug button.an{background:#2A2727;color:#FDFCFA;border-color:#2A2727}',
-      '.bb-werkzeug .bb-hinweis{font-size:11.5px;color:#7A7370;margin-left:auto}',
-      '.bb-leinwand{position:relative;border:1px solid #E3D9C4;border-radius:10px;overflow:hidden;background:#F1ECE1;line-height:0}',
-      '.bb-leinwand canvas{width:100%;height:auto;display:block;cursor:crosshair;touch-action:none}',
+
+      '.bb-leinwand{position:relative;border:1px solid #E3D9C4;border-radius:10px;overflow:auto;max-height:68vh;background:#F1ECE1;line-height:0}',
+      '.bb-leinwand canvas{width:100%;height:auto;display:block;cursor:crosshair;touch-action:none;max-width:none}',
+      '.bb-werkzeug button[disabled]{opacity:.45;cursor:default}',
+      '.bb-zoom{display:inline-flex;align-items:center;gap:4px;margin-left:auto}',
+      '.bb-zoomwert{font:500 11.5px "JetBrains Mono",monospace;color:#7A7370;min-width:44px;text-align:center}',
       '.bb-leer{padding:40px 16px;text-align:center;color:#7A7370;font-size:13px;line-height:1.5}',
       '.bb-weitere{display:flex;gap:8px;flex-wrap:wrap}',
       '.bb-weitere figure{margin:0;position:relative;width:96px;height:64px;border:1px solid #E3D9C4;border-radius:8px;overflow:hidden;background:#fff}',
@@ -169,111 +174,43 @@
   }
 
   /* ─── Aufnahme ───────────────────────────────────────────── */
-  /* v3110c · html2canvas 1.4.1 kennt keine modernen Farbangaben. Die App nutzt
-     color-mix(); der Browser liefert das berechnet als „color(srgb r g b / a)“,
-     und html2canvas bricht mit „unsupported color function "color"“ ab (gemessen
-     03.11.2026 auf Staging, radial-gradient). In der KOPIE, die html2canvas
-     fotografiert, werden diese Werte vorher in rgba() umgeschrieben. Die echte
-     Seite bleibt unberührt. */
-  var FARB_PROPS = ['color', 'background-color', 'background-image', 'border-top-color', 'border-right-color',
-    'border-bottom-color', 'border-left-color', 'outline-color', 'box-shadow', 'text-shadow', 'fill', 'stroke',
-    'text-decoration-color', 'column-rule-color'];
-  function zuRgba(wert) {
-    return String(wert)
-      .replace(/color\(srgb\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.e+-]+%?))?\)/g, function (_, r, g, b, a) {
-        var al = a == null ? 1 : (/%$/.test(a) ? parseFloat(a) / 100 : parseFloat(a));
-        var k = function (v) { return Math.max(0, Math.min(255, Math.round(parseFloat(v) * 255))); };
-        return 'rgba(' + k(r) + ', ' + k(g) + ', ' + k(b) + ', ' + (isFinite(al) ? al : 1) + ')';
-      })
-      .replace(/(?:color|oklab|oklch|lab|lch)\([^()]*\)/g, 'rgba(0, 0, 0, 0)');
-  }
-  /* v3110d · ERST ALLES LESEN, DANN ALLES SCHREIBEN. Abwechselnd lesen und
-     schreiben ließ den Browser nach jedem setProperty alle Stile neu rechnen —
-     bei dieser Seite fror der Tab ein (gemessen 03.11.2026). Unsichtbare
-     Teilbäume (display:none) werden übersprungen, sie fotografiert niemand.
-     v3110e · ALLE berechneten Eigenschaften statt einer Liste, und auch ::before
-     und ::after: die feste Liste verfehlte u. a. -webkit-text-fill-color,
-     -webkit-text-stroke-color und text-decoration (gemessen: 22 Eigenschaften
-     tragen color(...)), und die Pseudoelemente liest html2canvas ebenfalls.
-     Pseudoelemente lassen sich nicht inline stylen — sie bekommen eine Regel
-     über ein data-Attribut in der Kopie. Dauer gemessen 1,4 s bei 1.591 Elementen. */
-  var FARB_RE = /(?:^|[\s,(])(?:color|oklab|oklch|lab|lch)\(/;
-  function farbenGlaetten(doc) {
-    var win = doc.defaultView, aend = [], pseudo = [], nr = 0;
-    var sammle = function (cs) {
-      var out = [];
-      for (var i = 0; i < cs.length; i++) {
-        var p = cs[i], v = cs.getPropertyValue(p);
-        if (v && v.indexOf('(') >= 0 && FARB_RE.test(v)) out.push([p, zuRgba(v)]);
-      }
-      return out;
-    };
-    var pruefe = function (el) {
-      var cs; try { cs = win.getComputedStyle(el); } catch (e) { return 3; }
-      if (cs.display === 'none') return 2;   /* FILTER_REJECT: ganzen Teilbaum auslassen */
-      var eigen = sammle(cs);
-      if (eigen.length) aend.push([el, eigen]);
-      ['::before', '::after'].forEach(function (ps) {
-        var pc; try { pc = win.getComputedStyle(el, ps); } catch (e) { return; }
-        if (!pc || !pc.content || pc.content === 'none' || pc.content === 'normal') return;
-        var w = sammle(pc);
-        if (w.length) pseudo.push([el, ps, w]);
-      });
-      return 1;
-    };
-    [doc.documentElement, doc.body].forEach(function (el) { if (el) pruefe(el); });   /* Wurzel und body besucht der TreeWalker nicht */
-    var gang = doc.createTreeWalker(doc.body || doc.documentElement, 1, { acceptNode: pruefe });
-    while (gang.nextNode()) { /* nur sammeln */ }
-    /* schreiben */
-    for (var i = 0; i < aend.length; i++) {
-      for (var k = 0; k < aend[i][1].length; k++) aend[i][0].style.setProperty(aend[i][1][k][0], aend[i][1][k][1], 'important');
-    }
-    if (pseudo.length) {
-      var regeln = pseudo.map(function (x) {
-        var id = x[0].getAttribute('data-bb-f') || String(++nr);
-        x[0].setAttribute('data-bb-f', id);
-        return '[data-bb-f="' + id + '"]' + x[1] + '{' + x[2].map(function (pv) { return pv[0] + ':' + pv[1] + ' !important'; }).join(';') + '}';
-      });
-      var st = doc.createElement('style'); st.textContent = regeln.join('\n');
-      (doc.head || doc.documentElement).appendChild(st);
-    }
-    return aend.length + pseudo.length;
-  }
-  /* Rückfall: die Bildschirmaufnahme des Browsers (fragt einmal nach, zeigt aber
-     genau das, was man sieht — auch den Inhalt von iframes). Braucht einen Klick. */
-  function bildschirmAufnahme() {
+  /* v3111 · TAB-AUFNAHME DES BROWSERS STATT html2canvas.
+     html2canvas 1.4.1 brauchte an dieser Seite 7–8 s allein zum Kopieren und
+     scheiterte trotzdem an modernen Farben (color(srgb …), oklab(…) aus
+     color-mix) — auch nach drei Korrekturversuchen (v3110c–e, gemessen
+     03.11.2026). Marcel: „der Mechaniker blinkt … und es dauert lange.“
+     getDisplayMedia liefert das echte Bild in einem Augenblick, mit iframes
+     (Quick-Check), Grafiken und Schriften. Der Browser fragt dafür jedes Mal
+     „Diesen Tab teilen?“ — das ist seine Sicherheitsregel, nicht abschaltbar.
+     Muss direkt im Klick starten (Nutzergeste). */
+  function tabAufnahme() {
     if (!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) return Promise.resolve(null);
-    return navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'browser' }, audio: false, preferCurrentTab: true, selfBrowserSurface: 'include' })
-      .then(function (stream) {
-        return new Promise(function (ok) {
-          var v = document.createElement('video'); v.muted = true; v.srcObject = stream;
-          v.onloadedmetadata = function () {
-            v.play().then(function () {
-              setTimeout(function () {
+    var fab = document.getElementById('dp-bb-fab');
+    var p;
+    try {
+      p = navigator.mediaDevices.getDisplayMedia({
+        video: { displaySurface: 'browser', frameRate: 5 }, audio: false,
+        preferCurrentTab: true, selfBrowserSurface: 'include', surfaceSwitching: 'exclude', monitorTypeSurfaces: 'exclude'
+      });
+    } catch (e) { return Promise.resolve(null); }
+    return p.then(function (stream) {
+      if (fab) fab.style.visibility = 'hidden';   /* sich selbst nicht mitfotografieren */
+      return new Promise(function (ok) {
+        var v = document.createElement('video'); v.muted = true; v.playsInline = true; v.srcObject = stream;
+        var fertig = function (c) { stream.getTracks().forEach(function (t) { t.stop(); }); if (fab) fab.style.visibility = ''; ok(c); };
+        v.onloadedmetadata = function () {
+          v.play().then(function () {
+            /* kurz warten: der Freigabe-Dialog muss aus dem Bild sein */
+            setTimeout(function () {
+              try {
                 var c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
-                c.getContext('2d').drawImage(v, 0, 0);
-                stream.getTracks().forEach(function (t) { t.stop(); });
-                ok(c);
-              }, 350);
-            }).catch(function () { stream.getTracks().forEach(function (t) { t.stop(); }); ok(null); });
-          };
-        });
-      }).catch(function () { return null; });
-  }
-
-  function aufnehmen() {
-    if (typeof window.html2canvas !== 'function') return Promise.resolve(null);
-    var w = document.documentElement.clientWidth || window.innerWidth, h = window.innerHeight;
-    var scale = Math.min(1.25, Math.max(0.6, 1600 / w)) * Math.min(window.devicePixelRatio || 1, 1.5);
-    scale = Math.min(scale, 1.5);
-    return window.html2canvas(document.body, {
-      x: window.scrollX, y: window.scrollY, width: w, height: h, windowWidth: w, windowHeight: h,
-      scale: scale, useCORS: true, logging: false, backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
-      onclone: function (doc) { try { farbenGlaetten(doc); } catch (e) { console.warn('[Bordbuch] Farben', e); } },
-      ignoreElements: function (el) {
-        return el.id === 'dp-bb-fab' || (el.classList && (el.classList.contains('bb-hg') || el.classList.contains('toast')));
-      }
-    }).catch(function (e) { console.warn('[Bordbuch] Screenshot', e); return null; });
+                c.getContext('2d').drawImage(v, 0, 0); fertig(c);
+              } catch (e) { fertig(null); }
+            }, 450);
+          }).catch(function () { fertig(null); });
+        };
+      });
+    }).catch(function () { return null; });
   }
 
   /* Bild verkleinern (Breite höchstens 1800 px) und als JPEG ausgeben */
@@ -294,17 +231,28 @@
     });
   }
 
-  /* ─── Zeichnen ───────────────────────────────────────────── */
+  /* ─── Zeichnen, Zuschneiden ─────────────────────────────── */
+  /* v3111 · Werkzeuge: Rahmen, Stift, Ausschnitt. Der Ausschnitt wird gestrichelt
+     aufgezogen; „Zuschneiden“ macht ihn zum neuen Bild (Markierungen werden
+     dabei eingebrannt). Zoom ist reine Anzeige (CSS-Breite), gezeichnet wird
+     immer in Bildpixeln. */
   function zeichenflaeche(canvas, basis) {
-    var ctx = canvas.getContext('2d'), formen = [], werkzeug = 'rahmen', aktuell = null;
-    var lw = Math.max(3, Math.round(canvas.width / 320));
-    function neu() {
+    var ctx = canvas.getContext('2d'), formen = [], werkzeug = 'rahmen', aktuell = null, schnitt = null;
+    var lw = function () { return Math.max(3, Math.round(canvas.width / 320)); };
+    function malen(mitSchnitt) {
       ctx.drawImage(basis, 0, 0);
-      formen.concat(aktuell ? [aktuell] : []).forEach(function (f) {
-        ctx.strokeStyle = ROT; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-        if (f.t === 'rahmen') { ctx.strokeRect(f.x, f.y, f.w, f.h); }
+      formen.concat(aktuell && aktuell.t !== 'schnitt' ? [aktuell] : []).forEach(function (f) {
+        ctx.strokeStyle = ROT; ctx.lineWidth = lw(); ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.setLineDash([]);
+        if (f.t === 'rahmen') ctx.strokeRect(f.x, f.y, f.w, f.h);
         else { ctx.beginPath(); f.p.forEach(function (pt, i) { if (i) ctx.lineTo(pt[0], pt[1]); else ctx.moveTo(pt[0], pt[1]); }); ctx.stroke(); }
       });
+      var sch = (aktuell && aktuell.t === 'schnitt') ? aktuell : schnitt;
+      if (mitSchnitt !== false && sch && sch.w > 4 && sch.h > 4) {
+        ctx.save(); ctx.fillStyle = 'rgba(5,5,5,.45)';
+        ctx.beginPath(); ctx.rect(0, 0, canvas.width, canvas.height); ctx.rect(sch.x, sch.y, sch.w, sch.h); ctx.fill('evenodd');
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = Math.max(2, lw() / 2); ctx.setLineDash([lw() * 2, lw() * 1.5]);
+        ctx.strokeRect(sch.x, sch.y, sch.w, sch.h); ctx.restore();
+      }
     }
     function punkt(e) {
       var r = canvas.getBoundingClientRect();
@@ -312,29 +260,46 @@
     }
     canvas.addEventListener('pointerdown', function (e) {
       e.preventDefault(); canvas.setPointerCapture(e.pointerId);
-      var p = punkt(e);
-      aktuell = werkzeug === 'rahmen' ? { t: 'rahmen', x0: p[0], y0: p[1], x: p[0], y: p[1], w: 0, h: 0 } : { t: 'stift', p: [p] };
+      var pt = punkt(e);
+      aktuell = werkzeug === 'stift' ? { t: 'stift', p: [pt] } : { t: werkzeug, x0: pt[0], y0: pt[1], x: pt[0], y: pt[1], w: 0, h: 0 };
     });
     canvas.addEventListener('pointermove', function (e) {
       if (!aktuell) return;
-      var p = punkt(e);
-      if (aktuell.t === 'rahmen') { aktuell.x = Math.min(aktuell.x0, p[0]); aktuell.y = Math.min(aktuell.y0, p[1]); aktuell.w = Math.abs(p[0] - aktuell.x0); aktuell.h = Math.abs(p[1] - aktuell.y0); }
-      else aktuell.p.push(p);
-      neu();
+      var pt = punkt(e);
+      if (aktuell.t === 'stift') aktuell.p.push(pt);
+      else { aktuell.x = Math.min(aktuell.x0, pt[0]); aktuell.y = Math.min(aktuell.y0, pt[1]); aktuell.w = Math.abs(pt[0] - aktuell.x0); aktuell.h = Math.abs(pt[1] - aktuell.y0); }
+      malen();
     });
     function ende() {
       if (!aktuell) return;
-      if ((aktuell.t === 'rahmen' && aktuell.w > 4 && aktuell.h > 4) || (aktuell.t === 'stift' && aktuell.p.length > 1)) formen.push(aktuell);
-      aktuell = null; neu();
+      if (aktuell.t === 'schnitt') { if (aktuell.w > 8 && aktuell.h > 8) schnitt = aktuell; }
+      else if ((aktuell.t === 'rahmen' && aktuell.w > 4 && aktuell.h > 4) || (aktuell.t === 'stift' && aktuell.p.length > 1)) formen.push(aktuell);
+      aktuell = null; malen();
+      if (api.onAenderung) api.onAenderung();
     }
     canvas.addEventListener('pointerup', ende); canvas.addEventListener('pointercancel', ende);
-    neu();
-    return {
+    malen();
+    var api = {
       werkzeug: function (w) { werkzeug = w; },
-      zurueck: function () { formen.pop(); neu(); },
-      leeren: function () { formen = []; neu(); },
-      anzahl: function () { return formen.length; }
+      zurueck: function () { if (schnitt) schnitt = null; else formen.pop(); malen(); },
+      leeren: function () { formen = []; schnitt = null; malen(); },
+      hatSchnitt: function () { return !!schnitt; },
+      zuschneiden: function () {
+        if (!schnitt) return false;
+        malen(false);
+        var x = Math.max(0, Math.round(schnitt.x)), y = Math.max(0, Math.round(schnitt.y));
+        var w = Math.min(canvas.width - x, Math.round(schnitt.w)), h = Math.min(canvas.height - y, Math.round(schnitt.h));
+        var neu = document.createElement('canvas'); neu.width = w; neu.height = h;
+        neu.getContext('2d').drawImage(canvas, x, y, w, h, 0, 0, w, h);
+        basis = neu; formen = []; schnitt = null;
+        canvas.width = w; canvas.height = h; malen();
+        return true;
+      },
+      /* fürs Speichern: ohne die Abdunklung des Ausschnitts */
+      sauber: function () { malen(false); var c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height; c.getContext('2d').drawImage(canvas, 0, 0); malen(); return c; },
+      onAenderung: null
     };
+    return api;
   }
 
   /* ─── Fenster ────────────────────────────────────────────── */
@@ -350,10 +315,11 @@
       + '<div class="bb-kopf"><div><h3 id="bb-titel">Bordbuch</h3><p>Was ist dir aufgefallen? Markiere die Stelle, beschreibe oder diktiere es — es landet im Backlog.</p></div>'
       + '<button class="bb-zu" type="button" aria-label="Schließen">×</button></div>'
       + '<div class="bb-rumpf"><div class="bb-bild">'
-      + '<div class="bb-werkzeug"><button type="button" data-w="rahmen" class="an">▭ Rahmen</button><button type="button" data-w="stift">✎ Stift</button>'
-      + '<button type="button" data-a="zurueck">↶ Rückgängig</button><button type="button" data-a="leeren">Markierungen weg</button>'
-      + '<span class="bb-hinweis">Bild einfügen: Strg+V</span></div>'
-      + '<div class="bb-leinwand">' + (basis ? '<canvas></canvas>' : '<div class="bb-leer">Der automatische Screenshot ging hier nicht.<br><button type="button" class="bb-knopf" data-a="aufnahme" style="margin:10px 0 6px">Bildschirm aufnehmen</button><br>Der Browser fragt einmal, welcher Tab — „Diesen Tab“ wählen. Oder ein Bild mit Strg+V einfügen.</div>') + '</div>'
+      + '<div class="bb-werkzeug"><button type="button" data-w="rahmen" class="an" title="Rahmen um eine Stelle ziehen">▭ Rahmen</button><button type="button" data-w="stift" title="Frei zeichnen">✎ Stift</button>'
+      + '<button type="button" data-w="schnitt" title="Bereich aufziehen, dann Zuschneiden">⛶ Ausschnitt</button><button type="button" data-a="schneiden" class="bb-schneiden" disabled>✂ Zuschneiden</button>'
+      + '<button type="button" data-a="zurueck">↶ Rückgängig</button><button type="button" data-a="leeren">Alles weg</button>'
+      + '<span class="bb-zoom"><button type="button" data-a="zoom-" aria-label="Verkleinern">−</button><span class="bb-zoomwert">100 %</span><button type="button" data-a="zoom+" aria-label="Vergrößern">+</button><button type="button" data-a="zoom0">Einpassen</button></span></div>'
+      + '<div class="bb-leinwand">' + (basis ? '<canvas></canvas>' : '<div class="bb-leer">Noch kein Bild.<br><button type="button" class="bb-knopf" data-a="aufnahme" style="margin:10px 0 6px">📷 Tab aufnehmen</button><br>Der Browser fragt kurz „Diesen Tab teilen?“ — auf „Teilen“ klicken.<br>Oder ein Bild mit Strg+V einfügen bzw. unten aus einer Datei wählen.</div>') + '</div>'
       + '<div class="bb-weitere"></div>'
       + '<div><button type="button" class="bb-link" data-a="datei">+ weiteres Bild aus Datei</button><input type="file" accept="image/*" hidden></div>'
       + '</div><div class="bb-form">'
@@ -368,8 +334,32 @@
       + '</div></div></div>';
     document.body.appendChild(hg);
 
-    var flaeche = null, canvas = hg.querySelector('canvas');
-    if (basis && canvas) { canvas.width = basis.width; canvas.height = basis.height; flaeche = zeichenflaeche(canvas, basis); }
+    var flaeche = null, canvas = hg.querySelector('canvas'), zoom = 0;   /* 0 = einpassen */
+    var schneidKnopf = hg.querySelector('.bb-schneiden');
+    function zoomSetzen(z) {
+      zoom = z; if (!canvas) return;
+      var lwEl = hg.querySelector('.bb-leinwand');
+      if (!zoom) { canvas.style.width = '100%'; lwEl.classList.remove('gezoomt'); }
+      else { canvas.style.width = Math.round(canvas.width * zoom) + 'px'; lwEl.classList.add('gezoomt'); }
+      var anzeige = zoom || (lwEl.clientWidth / canvas.width);
+      hg.querySelector('.bb-zoomwert').textContent = Math.round(anzeige * 100) + ' %';
+    }
+    function bildSetzen(quelle) {
+      var lwEl = hg.querySelector('.bb-leinwand');
+      lwEl.innerHTML = '<canvas></canvas>';
+      canvas = lwEl.querySelector('canvas'); canvas.width = quelle.width; canvas.height = quelle.height;
+      flaeche = zeichenflaeche(canvas, quelle);
+      flaeche.onAenderung = function () { schneidKnopf.disabled = !flaeche.hatSchnitt(); };
+      var aktivW = hg.querySelector('[data-w].an'); if (aktivW) flaeche.werkzeug(aktivW.getAttribute('data-w'));
+      /* Strg+Mausrad zoomt */
+      lwEl.addEventListener('wheel', function (e) {
+        if (!e.ctrlKey) return; e.preventDefault();
+        var basisZ = zoom || (lwEl.clientWidth / canvas.width);
+        zoomSetzen(Math.max(0.2, Math.min(4, basisZ * (e.deltaY < 0 ? 1.15 : 1 / 1.15))));
+      }, { passive: false });
+      zoomSetzen(0);
+    }
+    if (basis) bildSetzen(basis);
     var zu = function () { hg.remove(); document.removeEventListener('keydown', taste); document.removeEventListener('paste', einfuegen); try { if (window.DealPilotDiktat && DealPilotDiktat.laeuft()) DealPilotDiktat.stoppen(); } catch (e) {} };
     var taste = function (e) { if (e.key === 'Escape') zu(); };
     document.addEventListener('keydown', taste);
@@ -382,6 +372,11 @@
     hg.querySelector('.bb-weitere').addEventListener('click', function (e) { var b = e.target.closest('[data-weg]'); if (b) { weitere.splice(+b.getAttribute('data-weg'), 1); zeigeWeitere(); } });
     var nimmBild = function (datei) {
       if (!datei || !/^image\//.test(datei.type)) return;
+      if (!canvas) {   /* v3111 · noch kein Hauptbild: das eingefügte wird es (mit Markieren und Zuschneiden) */
+        var r = new FileReader();
+        r.onload = function () { var img = new Image(); img.onload = function () { var c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0); bildSetzen(c); }; img.src = r.result; };
+        r.readAsDataURL(datei); return;
+      }
       if (weitere.length >= 3) { meldung('Höchstens vier Bilder.', true); return; }
       dateiAlsBild(datei).then(function (u) { weitere.push(u); zeigeWeitere(); }).catch(function () { meldung('Bild nicht lesbar.', true); });
     };
@@ -405,20 +400,23 @@
     hg.addEventListener('click', function (e) {
       var a = e.target.closest('[data-a]'); if (!a) return;
       var was = a.getAttribute('data-a');
-      if (was === 'zurueck' && flaeche) flaeche.zurueck();
-      if (was === 'leeren' && flaeche) flaeche.leeren();
+      if (was === 'zurueck' && flaeche) { flaeche.zurueck(); schneidKnopf.disabled = !flaeche.hatSchnitt(); }
+      if (was === 'leeren' && flaeche) { flaeche.leeren(); schneidKnopf.disabled = true; }
+      if (was === 'schneiden' && flaeche && flaeche.zuschneiden()) { schneidKnopf.disabled = true; zoomSetzen(0); }
+      if ((was === 'zoom+' || was === 'zoom-') && canvas) {
+        var lwz = hg.querySelector('.bb-leinwand'), bz = zoom || (lwz.clientWidth / canvas.width);
+        zoomSetzen(Math.max(0.2, Math.min(4, bz * (was === 'zoom+' ? 1.25 : 0.8))));
+      }
+      if (was === 'zoom0') zoomSetzen(0);
       if (was === 'datei') datei.click();
       if (was === 'liste') { zu(); if (window.DpWuensche) DpWuensche.oeffnen(); }
       if (was === 'senden') senden(a);
       if (was === 'aufnahme') {
         hg.style.visibility = 'hidden';
-        bildschirmAufnahme().then(function (c) {
+        tabAufnahme().then(function (c) {
           hg.style.visibility = '';
           if (!c) { meldung('Keine Aufnahme — Bild mit Strg+V einfügen geht immer.', true); return; }
-          var lw = hg.querySelector('.bb-leinwand');
-          lw.innerHTML = '<canvas></canvas>';
-          canvas = lw.querySelector('canvas'); canvas.width = c.width; canvas.height = c.height;
-          flaeche = zeichenflaeche(canvas, c);
+          bildSetzen(c);
         });
       }
     });
@@ -432,7 +430,7 @@
         else { meldung('Bitte kurz beschreiben, was dir aufgefallen ist.', true); hg.querySelector('#bb-titel-in').focus(); return; }
       }
       var bilder = [];
-      if (canvas) bilder.push(alsJpeg(canvas, 1800));
+      if (canvas && flaeche) bilder.push(alsJpeg(flaeche.sauber(), 1800));
       bilder = bilder.concat(weitere);
       knopf.disabled = true; meldung('wird eingetragen …');
       Auth.apiCall('/wuensche', { method: 'POST', timeout: 60000, body: {
@@ -451,11 +449,7 @@
   function start() {
     if (laeuft || !zugang) return;
     laeuft = true; holeVersion();
-    var fab = document.getElementById('dp-bb-fab'); if (fab) fab.classList.add('knipst');
-    aufnehmen().then(function (c) {
-      if (fab) fab.classList.remove('knipst');
-      laeuft = false; oeffnen(c);
-    });
+    tabAufnahme().then(function (c) { laeuft = false; oeffnen(c); });
   }
 
   function fabBauen() {
@@ -464,9 +458,20 @@
     var b = document.createElement('button');
     b.id = 'dp-bb-fab'; b.type = 'button';
     b.setAttribute('aria-label', 'Bordbuch: Fehler oder Wunsch mit Screenshot eintragen (Alt+B)');
-    b.innerHTML = figur() + '<span class="bb-schild">Bordbuch · Alt+B</span>';
-    b.addEventListener('click', start);
+    b.innerHTML = figur() + '<span class="bb-schild">Bordbuch · Alt+B</span><span class="bb-weg" role="button" tabindex="0" title="Mechaniker ausblenden (Alt+B geht weiter; einblenden unter System › Umsetzungswünsche)" aria-label="Mechaniker ausblenden">×</span>';
+    b.addEventListener('click', function (e) {
+      if (e.target.closest('.bb-weg')) { e.stopPropagation(); ausblenden(true); meld('Mechaniker ausgeblendet — Alt+B öffnet das Bordbuch weiter, einblenden unter System › Umsetzungswünsche'); return; }
+      start();
+    });
     document.body.appendChild(b);
+  }
+
+  /* v3111 · Marcel: „kann ich den Mechaniker auch ausschalten/ausblenden?“ — je Gerät. */
+  var AUS_KEY = 'dp_bordbuch_aus';
+  function istAus() { try { return localStorage.getItem(AUS_KEY) === '1'; } catch (e) { return false; } }
+  function ausblenden(aus) {
+    try { if (aus) localStorage.setItem(AUS_KEY, '1'); else localStorage.removeItem(AUS_KEY); } catch (e) {}
+    var f = document.getElementById('dp-bb-fab'); if (f) f.classList.toggle('an', zugang && !aus);
   }
 
   function pruefeZugang() {
@@ -475,7 +480,7 @@
       Auth.apiCall('/wuensche/zugang').then(function (r) {
         zugang = !!(r && r.ok);
         fabBauen();
-        var f = document.getElementById('dp-bb-fab'); if (f) f.classList.toggle('an', zugang);
+        var f = document.getElementById('dp-bb-fab'); if (f) f.classList.toggle('an', zugang && !istAus());
         if (zugang) holeVersion();
       }).catch(function () {});
     } catch (e) { /* still */ }
@@ -488,5 +493,6 @@
   else setTimeout(pruefeZugang, 1600);
   window.addEventListener('dp:plan-ready', pruefeZugang);
 
-  window.DpBordbuch = { start: start, oeffnen: oeffnen, pruefeZugang: pruefeZugang };
+  window.DpBordbuch = { start: start, oeffnen: oeffnen, pruefeZugang: pruefeZugang,
+    ausgeblendet: istAus, einblenden: function () { ausblenden(false); }, ausblenden: function () { ausblenden(true); } };
 })();
