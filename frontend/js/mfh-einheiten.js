@@ -449,6 +449,33 @@
 
   function wSchliessen() { var a = el("mfh-we-ov"); if (a && a.parentNode) a.parentNode.removeChild(a); }
 
+  /* v3160 · MIETVERTRAEGE MIT HISTORIE (Schnittstellen-Pruefung 03.11.2026: je Einheit nur der aktuelle Vertrag).
+     Ein neuer Vertrag legt den bisherigen in e.mv_historie ab (neuester zuerst, hoechstens 20) statt ihn zu
+     loeschen. Abgelegt werden Vertragsdaten und Miete zu diesem Zeitpunkt; die Ist-Miete bleibt an der Einheit. */
+  var MV_FELDER = ['mv_art', 'mv_beginn', 'mv_mieter', 'mv_kaution', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_naechste_anpassung',
+    'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre', 'mv_erhoehung_art', 'mv_erhoehung_wert', 'mv_rhythmus_jahre', 'mv_stufen_offen',
+    'mv_in_mietentwicklung', 'mv_notiz', 'nk_vorauszahlung', 'stellplatz_miete'];
+  function vertragAblegen(e, grund, ohneLeeren) {
+    if (!e) return false;
+    var alt = {}; var hat = false;
+    MV_FELDER.forEach(function (k) { if (e[k] !== undefined && e[k] !== '' && e[k] !== null && e[k] !== false) { alt[k] = e[k]; if (/^mv_(art|beginn|mieter|kaution)$/.test(k)) hat = true; } });
+    if (!hat) return false;
+    alt.kaltmiete = e.ist != null && e.ist !== '' ? e.ist : null;
+    alt.abgelegt_am = new Date().toISOString().slice(0, 10);
+    alt.grund = grund || null;
+    e.mv_historie = [alt].concat(Array.isArray(e.mv_historie) ? e.mv_historie : []).slice(0, 20);
+    if (!ohneLeeren) MV_FELDER.forEach(function (k) { if (k in e) e[k] = (k === 'mv_in_mietentwicklung' ? false : ''); });
+    return true;
+  }
+  function historieHtml(e) {
+    var h = Array.isArray(e.mv_historie) ? e.mv_historie : [];
+    var dat = function (v) { return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v.split('-').reverse().join('.') : (v || '–'); };
+    return '<div class="mfh-we-hint" style="margin-top:8px"><button type="button" class="btn btn-outline btn-sm" id="mfh-we-ablegen" title="Den bisherigen Vertrag als früheren Vertrag ablegen und die Felder für den neuen leeren">Neuer Mietvertrag – bisherigen ablegen</button>'
+      + (h.length ? '<div style="margin-top:8px"><b>Frühere Verträge (' + h.length + '):</b><br>' + h.map(function (v) {
+          return esc((v.mv_mieter ? v.mv_mieter + ' · ' : '') + (v.mv_art || 'Vertrag') + ' ab ' + dat(v.mv_beginn) + (v.kaltmiete ? ' · ' + v.kaltmiete + ' €/Monat' : '') + ' · abgelegt ' + dat(v.abgelegt_am) + (v.grund ? ' (' + v.grund + ')' : ''));
+        }).join('<br>') + '</div>' : '') + '</div>';
+  }
+
   function wohnungOeffnen(i) {
     var e = _arbeit[i]; if (!e) return;
     wSchliessen();
@@ -519,6 +546,7 @@
             f('mv_mieter', 'Mieter (Name, optional)', '') +
             f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
           '</div>' +
+          historieHtml(e) +   /* v3160 */
           /* v2600 · E2/E3 · Hinweis zur Restlaufzeit und der waehlbare Leerstandsabzug (nur bei „leer") */
           '<p class="mfh-we-hint">Liegt die Ist-Miete außerhalb von ± 20 % um die marktübliche Miete, rechnet der Ertragswert mit der marktüblichen Miete; '
             + 'die Abweichung wird über die <b>Restlaufzeit</b> beziffert: bei Miete <i>über</i> dem Markt nur mit <b>Befristet bis</b> oder <b>Kündigungsverzicht bis</b>, '
@@ -593,6 +621,12 @@
     function zu() { if (P) P.massnahmenSpiegeln(e); wSchliessen(); zeichnen(); }
     ov.addEventListener("click", function (ev) { if (ev.target === ov) zu(); });
     el("mfh-we-zu").onclick = zu;
+    /* v3160 · bisherigen Vertrag ablegen, Fenster mit leeren Vertragsfeldern neu zeichnen */
+    var _abl = el('mfh-we-ablegen');
+    if (_abl) _abl.onclick = function () {
+      if (_abl.getAttribute('data-sicher') !== '1') { _abl.setAttribute('data-sicher', '1'); _abl.textContent = 'Wirklich ablegen? Die Vertragsfelder werden geleert.'; return; }
+      if (vertragAblegen(e, 'neuer Vertrag (von Hand)')) wohnungOeffnen(i);
+    };
     el("mfh-we-ok").onclick = zu;
     ov.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') zu(); });
 
@@ -1540,7 +1574,7 @@
   }
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
-    vermstandPruefen: vermstandPruefen /* v3001b */, vorbelegen: vorbelegen /* v3016 */,
+    vermstandPruefen: vermstandPruefen /* v3001b */, vertragAblegen: vertragAblegen /* v3160 */, vorbelegen: vorbelegen /* v3016 */,
     oeffnen: oeffnen, knopf: knopf,
     /* v3027 · eine Einheit gezielt öffnen (Absprung aus der Vertragsübersicht im Reiter Miete) */
     einheitOeffnen: function (i) { oeffnen(1); setTimeout(function () { wohnungOeffnen(i); }, 0); }, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,

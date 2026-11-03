@@ -390,7 +390,8 @@ const STRUKTUREN = {
       mv_erhoehung_wert: 'Hoehe je Anpassung (Euro oder Prozent, je nach mv_erhoehung_art)', mv_rhythmus_jahre: 'Abstand der Anpassungen in Jahren',
       mv_stufen_offen: 'Zahl der noch offenen Staffelstufen', mv_befristet_bis: 'Zeitmietvertrag befristet bis (JJJJ-MM-TT)',
       mv_kuendigungsverzicht_bis: 'Kuendigungsverzicht bis (JJJJ-MM-TT)', mv_abw_jahre: 'abweichende Laufzeit in Jahren',
-      mv_in_mietentwicklung: 'true = Vertrag fliesst in die Mietentwicklung des Objekts ein', mv_notiz: 'Notiz zum Vertrag (Freitext)'
+      mv_in_mietentwicklung: 'true = Vertrag fliesst in die Mietentwicklung des Objekts ein', mv_notiz: 'Notiz zum Vertrag (Freitext)',
+      mv_historie: 'v3160 · fruehere Mietvertraege der Einheit, neuester zuerst: dieselben mv_*-Felder plus kaltmiete (Euro/Monat beim Ablegen), abgelegt_am, grund'
     },
     massnahme_eintrag: {
       id: 'Kennung der Massnahme im Katalog (Gewerk)', t: 'Bezeichnung', k: 'Kosten in Euro',

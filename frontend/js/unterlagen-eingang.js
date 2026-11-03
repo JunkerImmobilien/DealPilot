@@ -152,8 +152,13 @@
        v3150 · Marcel 03.11.2026: der Name des Mieters wird jetzt ausgelesen, aber NICHT von der KI - Regeln auf
        unserem Server vor dem Schwärzen (backend/src/services/mieterName.js), Feld ext.mieter_name. */
     var neuerVertrag = isoAus(ext.mietbeginn) && isoAus(ext.mietbeginn) !== String(e.mv_beginn || '');
-    if (neuerVertrag) ['mv_art', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_naechste_anpassung', 'mv_befristet_bis', 'mv_kuendigungsverzicht_bis',
-      'mv_kaution', 'nk_vorauszahlung', 'stellplatz_miete', 'mv_mieter', 'mv_abw_jahre'].forEach(function (k) { if (k in e) e[k] = ''; });
+    /* v3160 · der alte Vertrag wird abgelegt (mv_historie), nicht nur geleert */
+    if (neuerVertrag) {
+      var _M = window.DpMfhEinheiten;
+      if (_M && typeof _M.vertragAblegen === 'function') _M.vertragAblegen(e, 'neuer Vertrag aus ' + (quelle || 'Mietvertrag'));
+      ['mv_art', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_naechste_anpassung', 'mv_befristet_bis', 'mv_kuendigungsverzicht_bis',
+        'mv_kaution', 'nk_vorauszahlung', 'stellplatz_miete', 'mv_mieter', 'mv_abw_jahre'].forEach(function (k) { if (k in e) e[k] = ''; });
+    }
     setz('ist', zahl(ext.kaltmiete_eur));
     if (zahl(ext.kaltmiete_eur)) e.status = 'vermietet';
     setz('mv_art', ART[ext.vertragsart] || '');
