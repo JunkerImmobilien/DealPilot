@@ -260,6 +260,13 @@
       k: f.zielSetzen ? { lbl: 'als Zielmiete', fn: function () { f.zielSetzen(og); } } : null });
     else if (br && br.gilt === false) z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'frei', u: 'keine Mietpreisbremse an dieser Adresse' });
     else z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'bitte prüfen', u: (br && br.text) || '' });
+    /* v3130 · N115 · Vorschlag Zielmiete nach Sanierung (nur Vorschlag, „übernehmen" setzt das Feld) */
+    var zv = vorschlagFuer(m, idx);
+    if (zv && zv.qm != null) z.push({ c: 'ziel', t: 'Vorschlag nach Sanierung', tag: 'DealPilot schlägt vor',
+      v: eur2(zv.qm) + '/m²' + (wfl ? ' · ' + eur(zv.monat) + '/Monat' : ''),
+      u: zv.herkunft + (zv.gedeckelt ? ' · gedeckelt durch die Mietpreisbremse' : zv.ungeprueft ? ' · Mietpreisbremse bitte prüfen' : ''),
+      k: f.zielSetzen && Math.abs(zahl(f.ziel_qm) - zv.qm) > 0.004 ? { lbl: 'übernehmen', fn: function () { f.zielSetzen(zv.qm); } } : null });
+    else if (zv && zv.fehlt) z.push({ c: 'ziel', t: 'Vorschlag nach Sanierung', v: 'noch keine Marktmiete', u: VORSCHLAG_FEHLT });
     var zq = zahl(f.ziel_qm), bad = !!(og && br && br.gilt === true && zq > og + 0.004);
     z.push({ c: 'ziel', t: 'Zielbild', v: zq > 0 ? eur2(zq) + '/m²' + (wfl ? ' · ' + eur(zq * wfl) + '/Monat' : '') : 'noch keine Zielmiete', bad: bad,
       u: bad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
@@ -343,6 +350,115 @@
     leiterBinden(host, z);
   }
 
+  /* ══ v3130 · N115 · ZIELMIETE NACH SANIERUNG JE WOHNUNG — VORSCHLAG ═════
+     Marcel 03.11.2026 („Nummer vier, das können wir umsetzen"). Leitplanken:
+     nur VORSCHLAG, nie vorbelegt - je Wohnung „übernehmen" (und „alle übernehmen");
+     Grundlage die Marktmiete der DealPilot-Marktbewertung des Objekts (beim MFH für
+     die mittlere Wohnungsgröße abgefragt, v2556b), für den sanierten Zustand die
+     obere Spanne; gedeckelt durch die Mietpreisbremse (Kern: zielmieteVorschlag ->
+     neuvermietung). Eine eigene „marktübliche Miete nach Modernisierung" (zb_markt_qm)
+     geht vor. Ohne Marktmiete: kein Vorschlag, sondern der Weg zur Marktbewertung.
+     Nach außen keine Quellennamen - „aktueller Marktdurchschnitt". */
+  var VORSCHLAG_FEHLT = 'Marktbewertung abrufen (Reiter Objekt, „Marktbericht abrufen“ – Stufe 1 genügt), dann schlägt DealPilot je Wohnung eine Zielmiete vor.';
+  function qmDe(x) { return x.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function marktSaniert(m) {
+    var eig = zahl(wert('zb_markt_qm'));
+    if (eig > 0) return { qm: Math.round(eig * 100) / 100, art: 'eigen', herkunft: 'eigene Angabe: marktübliche Miete nach Modernisierung (Tab Investition)' };
+    var st = null; try { st = JSON.parse(wert('_mb_state') || 'null'); } catch (e) { st = null; }
+    var c = st && st.card, key = window._currentObjKey || null;
+    if (!c || !c.mm || (st.fuer && st.fuer.key && key && st.fuer.key !== key)) return null;   /* fremde Karte: kein Wert */
+    var area = zahl(c.area);
+    var mitte = zahl(c.mm.qm) || (area > 0 && c.mm.med ? c.mm.med / area : 0);
+    /* obere Spanne: neue Karten führen q75_qm (oder null); ältere nur high - war das der Ersatz
+       „Mitte × 1,1" (mapCard ohne q75), ist es keine gemessene Spanne */
+    var oben = ('q75_qm' in c.mm) ? zahl(c.mm.q75_qm)
+      : ((area > 0 && c.mm.high && c.mm.med && Math.abs(c.mm.high / c.mm.med - 1.1) > 0.003) ? c.mm.high / area : 0);
+    if (!(mitte > 0)) return null;
+    var W = (m && m.wohnungen || []).filter(function (w) { return w.art !== 'gewerbe' && w.wfl > 0; });
+    var ds = W.length ? W.reduce(function (a, w) { return a + w.wfl; }, 0) / W.length : 0;
+    var qm = Math.round((oben > mitte ? oben : mitte) * 100) / 100;
+    return { qm: qm, mitte: Math.round(mitte * 100) / 100, art: oben > mitte ? 'oben' : 'mitte', wfl_schnitt: ds || null, datum: c.bericht_datum || null,
+      herkunft: 'aktueller Marktdurchschnitt' + (ds > 0 ? ' für Wohnungen um ' + Math.round(ds) + ' m²' : '')
+        + (oben > mitte ? ', obere Spanne als Ansatz für den sanierten Zustand (Mitte ' + qmDe(mitte) + ' €/m²)' : ' (Mitte; keine Spanne in der Marktbewertung)')
+        + (c.bericht_datum ? ' · Marktbewertung vom ' + c.bericht_datum : '') };
+  }
+  function vorschlagFuer(m, idx) {
+    var w = m && m.wohnungen && m.wohnungen[idx];
+    if (!w || !K || !K.zielmieteVorschlag) return null;
+    var b = marktSaniert(m), d = mietrechtDaten(m, idx);
+    var r = K.zielmieteVorschlag({ wfl: w.wfl, basis_qm: b ? b.qm : 0, art: w.art, vermietet: w.ist > 0 && w.status !== 'leer', bremse: d.bremse, vgl_qm: d.vgl_qm });
+    if (!r || r.qm == null) return r;
+    r.herkunft = b.herkunft; r.basis_art = b.art;
+    /* die Marktmiete gilt für die mittlere Wohnungsgröße - weicht diese Wohnung deutlich ab, sagt es der Vorschlag */
+    if (b.wfl_schnitt > 0 && Math.abs(w.wfl / b.wfl_schnitt - 1) > 0.35) r.groesse = 'Wohnung deutlich ' + (w.wfl > b.wfl_schnitt ? 'größer' : 'kleiner') + ' als der Durchschnitt — Marktmiete je m² weicht dann meist ab';
+    return r;
+  }
+  /** v3130 · alle Wohnungen des Arbeitsstands: { markt, zeilen:[{ i, nr, lage, wfl, ist, ziel_qm, v }] } */
+  function zielVorschlaege(opts) {
+    var m = modell(opts);
+    return { markt: marktSaniert(m), bremse: mietpreisbremse(agsJetzt()), zeilen: m.wohnungen.map(function (w, j) {
+      return { i: w.i, nr: w.nr, lage: w.lage, art: w.art, wfl: w.wfl, ist: w.ist, status: w.status, ziel_qm: w.ziel_qm, v: vorschlagFuer(m, j) };
+    }) };
+  }
+  function zielVorschlagHtml(res) {
+    zvStil();
+    if (!res || !res.zeilen || !res.zeilen.length) return '';
+    var kopf = '<div class="dp-zv-kopf"><b>Zielmiete nach Sanierung · Vorschlag</b><span>nur ein Vorschlag — übernommen wird nur, was du anklickst</span></div>';
+    if (!res.markt) return '<div class="dp-zv">' + kopf + '<p class="dp-zv-fehlt">' + esc(VORSCHLAG_FEHLT) + '</p></div>';
+    var offen = 0;
+    var zeilen = res.zeilen.map(function (z) {
+      var name = (z.nr ? 'Nr. ' + z.nr : '#' + (z.i + 1)) + (z.lage ? ' · ' + z.lage : '');
+      var v = z.v, rechts;
+      if (!v) rechts = '<span class="dp-zv-leer">' + (z.art === 'gewerbe' ? 'Gewerbe — kein Vorschlag' : 'Fläche fehlt') + '</span>';
+      else if (v.qm == null) rechts = '<span class="dp-zv-leer">—</span>';
+      else {
+        var gleich = z.ziel_qm != null && Math.abs(z.ziel_qm - v.qm) < 0.005;
+        if (!gleich) offen++;
+        rechts = gleich ? '<span class="dp-zv-ok">übernommen</span>'
+          : '<button type="button" class="dp-ml-k" data-zv="' + z.i + '" data-zv-qm="' + v.qm + '">übernehmen ›</button>';
+      }
+      var mitte = v && v.qm != null
+        ? '<b>' + esc(qmDe(v.qm)) + ' €/m²</b> · ' + esc(eur(v.monat)) + '/Monat'
+          + (v.gedeckelt ? ' <i class="dp-zv-deckel" title="' + esc(v.text) + '">Mietpreisbremse</i>' : v.ungeprueft ? ' <i class="dp-zv-pruef" title="' + esc(v.text) + '">Bremse prüfen</i>' : '')
+          + '<small>' + (z.ist > 0 && z.wfl > 0 ? 'heute ' + esc(qmDe(z.ist / z.wfl)) + ' €/m²' : 'leer') + (z.ziel_qm ? ' · eingetragen ' + esc(qmDe(z.ziel_qm)) + ' €/m²' : '')
+          + (v.groesse ? ' · ' + esc(v.groesse) : '') + '</small>'
+        : '';
+      return '<div class="dp-zv-z"><span class="dp-zv-n">' + esc(name) + '<small>' + (z.wfl ? Math.round(z.wfl) + ' m²' : '') + '</small></span>'
+        + '<span class="dp-zv-v">' + mitte + '</span><span class="dp-zv-k">' + rechts + '</span></div>';
+    }).join('');
+    var br = res.bremse || {};
+    return '<div class="dp-zv">' + kopf
+      + '<p class="dp-zv-her">Grundlage: ' + esc(res.markt.herkunft) + '.</p>'
+      + '<div class="dp-zv-liste">' + zeilen + '</div>'
+      + (offen > 1 ? '<div class="dp-zv-alle"><button type="button" class="dp-ml-k" data-zv-alle="1">alle ' + offen + ' übernehmen ›</button></div>' : '')
+      + '<p class="dp-zv-fuss">' + esc(br.gilt === true ? 'Mietpreisbremse gilt hier: bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); ausgenommen die erste Vermietung nach umfassender Modernisierung (§ 556f BGB).'
+          : br.gilt === false ? 'Keine Mietpreisbremse an dieser Adresse.' : 'Mietpreisbremse bitte prüfen — wo sie gilt, höchstens Vergleichsmiete + 10 % (§ 556d BGB).')
+        + ' Laufende Mietverträge: bis zur Neuvermietung gilt die zulässige Miete (Kappungsgrenze, § 558 BGB); mehr nur über die Modernisierungsumlage (§ 559 BGB). Die Zielmiete geht nur in Zielbild, Pilot-Analyse und PDF, nicht in die Mietentwicklung.</p></div>';
+  }
+  function zvStil() {
+    leiterStil();
+    if (el('dp-zv-stil')) return;
+    var s = document.createElement('style'); s.id = 'dp-zv-stil';
+    s.textContent = [
+      '.dp-zv{margin:14px 0 4px;border:1px solid #EFE7D6;border-radius:10px;padding:10px 12px;background:#fff}',
+      '.dp-zv-kopf{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}',
+      '.dp-zv-kopf b{font:600 11px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#2f7d55}',
+      '.dp-zv-kopf span{font-size:11.5px;color:#8A8272}',
+      '.dp-zv-her,.dp-zv-fuss,.dp-zv-fehlt{font-size:11.5px;color:#7A7370;line-height:1.45;margin:6px 0}',
+      '.dp-zv-fehlt{color:#2A2727}',
+      '.dp-zv-z{display:grid;grid-template-columns:minmax(90px,1.1fr) 2.4fr auto;gap:6px 12px;align-items:center;padding:7px 0;border-top:1px solid #F1ECE1}',
+      '.dp-zv-n{font-size:12.5px;color:#2A2727;min-width:0}.dp-zv-n small{display:block;color:#8A8272;font-size:11px}',
+      '.dp-zv-v{font-size:12.5px;color:#2A2727;min-width:0}.dp-zv-v b{font:600 13.5px "Space Grotesk",sans-serif}',
+      '.dp-zv-v small{display:block;color:#8A8272;font-size:11px;line-height:1.35}',
+      '.dp-zv-v i{font-style:normal;font-size:10.5px;padding:1px 6px;border-radius:999px;margin-left:4px;white-space:nowrap}',
+      '.dp-zv-deckel{background:#EAF3EE;color:#2f7d55}.dp-zv-pruef{background:#F8EDEC;color:#B8625C}',
+      '.dp-zv-ok{font-size:11.5px;color:#2f7d55;white-space:nowrap}.dp-zv-leer{font-size:11.5px;color:#8A8272}',
+      '.dp-zv-alle{text-align:right;padding-top:6px;border-top:1px solid #F1ECE1}',
+      '@media (max-width:560px){.dp-zv-z{grid-template-columns:1fr auto}.dp-zv-v{grid-column:1/-1;grid-row:2}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
   /* ══ v3062 · MIETPREISBREMSE UND MIETRECHT AUF EINEN BLICK ══════════════
      Marcel 02.11.2026: „ja, die Mietpreisbremse kannst du umsetzen und die
      Kappungsgrenzen — und stellst du es auch einfacher dar?"
@@ -407,7 +523,7 @@
     var zq = zahl(w && w.ziel_qm);
     if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
       u: 'zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f) — sonst höchstens ' + eur2(obergrenze) + '/m²' });
-    return { zeilen: z, bremse: br, obergrenze: obergrenze, kapp: kapp };
+    return { zeilen: z, bremse: br, obergrenze: obergrenze, kapp: kapp, vgl_qm: vglQm || null, vgl_herkunft: vglHer || null };   /* v3130: vgl fuer den Zielmiete-Vorschlag */
   }
 
   function mietrechtHtml(m, i, o) {
@@ -2380,6 +2496,7 @@
     mietrechtOrt: function () { var g = agsJetzt(); return { ags: g, kapp: kappung(g), bremse: mietpreisbremse(g) }; },   /* v3082: fuer die Pilot-Mietpreis-Analyse */
     standardhebung: standardhebung, standardhebungHtml: standardhebungHtml, feshBinden: feshBinden,   /* v3064 */
     leiterZeilen: leiterZeilen, leiterHtml: leiterHtml, leiterBinden: leiterBinden,   /* v3067 */
+    marktSaniert: marktSaniert, vorschlagFuer: vorschlagFuer, zielVorschlaege: zielVorschlaege, zielVorschlagHtml: zielVorschlagHtml,   /* v3130 · N115 */
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
     ohneZielbild: ohneZielbild,   /* v3018d */
     KENNZEICHNUNG: KENNZEICHNUNG, GESPERRT_KURZ: GESPERRT_KURZ, GESPERRT_LANG: GESPERRT_LANG, gesperrt: gesperrt, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,

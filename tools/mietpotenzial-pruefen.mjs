@@ -121,6 +121,18 @@ nv = K.neuvermietung({ markt_qm: 14, wfl: 60, bremse: { gilt: true } });
 gleich('C3 Bremse ohne Vergleichsmiete: ungeprüft gekennzeichnet', [nv.qm, nv.ungeprueft], [14, true]);
 gleich('C4 ohne Marktmiete: keine Zeile', K.neuvermietung({ wfl: 60 }), null);
 
+/* ── C5–C10 · v3130 · N115 · zielmieteVorschlag(): Vorschlag je Wohnung, Deckel aus neuvermietung() ── */
+let zv = K.zielmieteVorschlag({ wfl: 60, basis_qm: 12.4, vgl_qm: 10, bremse: { gilt: true }, vermietet: true });
+gleich('C5 Bremse deckelt den Vorschlag auf 11,00 €/m²', [zv.qm, zv.monat, zv.gedeckelt, zv.basis_qm], [11, 660, true, 12.4]);
+wahr('C5 laufender Vertrag: Hinweis Kappung und § 559', /§ 558/.test(zv.bestand) && /§ 559/.test(zv.bestand));
+zv = K.zielmieteVorschlag({ wfl: 72.5, basis_qm: 9.87, bremse: { gilt: false }, vermietet: false });
+gleich('C6 ohne Bremse: Marktmiete, leer = ab Neuvermietung', [zv.qm, zv.monat, zv.gedeckelt, /Neuvermietung/.test(zv.bestand)], [9.87, 715.58, false, true]);
+gleich('C7 ohne Marktmiete: fehlt', K.zielmieteVorschlag({ wfl: 60, bremse: { gilt: true } }), { fehlt: 'marktmiete' });
+gleich('C8 Gewerbe: kein Vorschlag', K.zielmieteVorschlag({ wfl: 60, basis_qm: 12, art: 'gewerbe' }), null);
+zv = K.zielmieteVorschlag({ wfl: 60, basis_qm: 12, bremse: { gilt: true } });
+gleich('C9 Bremse ohne Vergleichsmiete: ungeprüft, nicht gedeckelt', [zv.qm, zv.ungeprueft], [12, true]);
+gleich('C10 ohne Fläche: kein Vorschlag', K.zielmieteVorschlag({ basis_qm: 12 }), null);
+
 /* ── D · Kappung und Bremse aus der Liste ────────────────────────────── */
 const OPT = { heute: '2026-10-28' };
 gleich('D1 Aachen per AGS: 15 %', [K.kappungAus(KAPP, { ags: '05334002' }, OPT).pct, K.kappungAus(KAPP, { ags: '05334002' }, OPT).herkunft], [15, 'verordnung']);
@@ -242,6 +254,45 @@ const pr = DS.computeFromKpis({ kp: 200000, cf_m: 0, nmy: 3.5, ltv: 90, dscr: 1.
 const pb = Object.fromEntries(pr.map((b) => [b.key, Math.round(b.score)]));
 gleich('G6 Stützstellen aus dem Text = Punkte des Kerns (CF 0 € = 50, NMR 3,5 % = 50, LTV 90 % = 50, DSCR 1,2 = 80, Puffer 10 % + 20 % Miete = 70)',
   [pb.cashflow, pb.rendite, pb.ltv, pb.risiko, pb.potenzial], [50, 50, 50, 80, 70]);
+
+/* ── H · v3130 · N115 · Zielmiete-Vorschlag je Wohnung in potenzial.js (echte Datei, Kern darunter) ── */
+async function vorschlagLauf(feld) {
+  const c = fenster(feld);
+  const F = feld || {};
+  c.document.getElementById = (id) => (id in F ? { value: F[id], addEventListener() {}, dispatchEvent() {} } : null);
+  c._dpPotenzial = { ags: '05334002', plz: '52062' };   /* Aachen: Mietpreisbremse gilt (Liste) */
+  lade(c, JS('mietpotenzial-kern.js')); lade(c, JS('potenzial.js'));
+  await c.DpPotenzial.kappungLaden();
+  return c.DpPotenzial;
+}
+const KARTE = (mm) => JSON.stringify({ card: Object.assign({ area: 300, bericht_datum: '01.11.2026' }, { mm }), fuer: { key: null } });
+const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2', wfl: '90', ist: '', status: 'leer' }, { nr: 'G', art: 'gewerbe', wfl: '80', ist: '900' }];
+{
+  /* Marktmiete Mitte 10,00, obere Spanne 12,00; Vergleichsmiete (Tab Miete) 10,00 -> Bremse 11,00 */
+  const P = await vorschlagLauf({ plz: '52062', ds2_marktmiete: '10', _mb_state: KARTE({ med: 3000, high: 3600, qm: 10, q75_qm: 12 }) });
+  const r = P.zielVorschlaege({ einheiten: EINH });
+  gleich('H1 Grundlage obere Spanne 12,00, Mitte 10,00', [r.markt.qm, r.markt.mitte, r.markt.art], [12, 10, 'oben']);
+  gleich('H2 Wohnung 1: gedeckelt auf 11,00 (Bremse), 660 €/Monat', [r.zeilen[0].v.qm, r.zeilen[0].v.monat, r.zeilen[0].v.gedeckelt], [11, 660, true]);
+  gleich('H3 Gewerbe: kein Vorschlag', r.zeilen[2].v, null);
+  wahr('H4 Herkunft ohne Quellennamen, mit Wohnungsgröße und Datum', /aktueller Marktdurchschnitt für Wohnungen um 75 m²/.test(r.markt.herkunft) && /01\.11\.2026/.test(r.markt.herkunft) && !/GeoMap|Scout|PriceHubble|Sprengnetter/i.test(r.markt.herkunft));
+  const h = P.zielVorschlagHtml(r);
+  wahr('H5 HTML: je Wohnung ein „übernehmen", dazu „alle 2 übernehmen"', (h.match(/data-zv="/g) || []).length === 2 && /alle 2 übernehmen/.test(h));
+  wahr('H6 HTML: Hinweis Kappung § 558 und Umlage § 559, § 556d/§ 556f', /§ 558/.test(h) && /§ 559/.test(h) && /§ 556d/.test(h) && /§ 556f/.test(h));
+  const r2 = P.zielVorschlaege({ einheiten: EINH.map((e, i) => i === 0 ? Object.assign({}, e, { ziel_qm: '11,00' }) : e) });
+  wahr('H7 übernommene Wohnung zeigt „übernommen" statt Knopf', /übernommen<\/span>/.test(P.zielVorschlagHtml(r2)) && (P.zielVorschlagHtml(r2).match(/data-zv="/g) || []).length === 1);
+}
+{
+  const P = await vorschlagLauf({ plz: '52062', _mb_state: '' });
+  const r = P.zielVorschlaege({ einheiten: EINH });
+  wahr('H8 ohne Marktbewertung: kein Vorschlag, Weg „Marktbewertung abrufen"', r.markt === null && /Marktbewertung abrufen/.test(P.zielVorschlagHtml(r)) && !/data-zv=/.test(P.zielVorschlagHtml(r)));
+}
+{
+  /* ältere Karte ohne q75: high = Mitte × 1,1 ist keine gemessene Spanne -> Mitte */
+  const P = await vorschlagLauf({ plz: '52062', _mb_state: KARTE({ med: 3000, high: 3300 }) });
+  gleich('H9 alte Karte mit Ersatzspanne × 1,1: Mitte', [P.zielVorschlaege({ einheiten: EINH }).markt.qm, P.zielVorschlaege({ einheiten: EINH }).markt.art], [10, 'mitte']);
+  const P2 = await vorschlagLauf({ plz: '52062', zb_markt_qm: '13,5', _mb_state: KARTE({ med: 3000, high: 3600, qm: 10, q75_qm: 12 }) });
+  gleich('H10 eigene marktübliche Miete nach Modernisierung geht vor', [P2.zielVorschlaege({ einheiten: EINH }).markt.qm, P2.zielVorschlaege({ einheiten: EINH }).markt.art], [13.5, 'eigen']);
+}
 
 console.log('mietpotenzial-pruefen (v3075): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

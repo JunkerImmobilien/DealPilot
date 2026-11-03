@@ -811,7 +811,23 @@
         /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
         + '<div id="mfh-weg-kosten" style="margin:8px 0 0 21px;display:' + (_weg ? 'flex' : 'none') + ';gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Kosten der Aufteilung '
         + '<input class="mfh-in mfh-md" id="mfh-auftk" inputmode="decimal" style="width:120px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
-        + '<span style="font-size:11.5px;color:#8A8272">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>';
+        + '<span style="font-size:11.5px;color:#8A8272">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>'
+      /* v3130 · N115 · Zielmiete nach Sanierung je Wohnung - Vorschlag mit „übernehmen" (potenzial.js zielVorschlagHtml) */
+      + '<div id="mfh-zv"></div>';
+  }
+  /* v3130 · N115 · zeichnet den Vorschlag aus dem Arbeitsstand; „übernehmen" setzt ziel_qm (und, wenn leer,
+     ziel_wann) der Wohnung im Arbeitsstand - gespeichert wird erst mit „Speichern"/„Übernehmen" wie jede Eingabe. */
+  function zvZeichnen() {
+    var h = el('mfh-zv'), P = window.DpPotenzial;
+    if (!h) return;
+    if (!P || !P.zielVorschlaege) { h.innerHTML = ''; return; }
+    try { h.innerHTML = P.zielVorschlagHtml(P.zielVorschlaege({ einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM })); }
+    catch (x) { h.innerHTML = ''; try { console.warn('[v3130] Zielmiete-Vorschlag', x); } catch (y) {} }
+  }
+  function zvSetzen(i, qm) {
+    var e = _arbeit[i]; if (!e || !(qm > 0)) return;
+    e.ziel_qm = qm.toFixed(2).replace('.', ',');
+    if (!String(e.ziel_wann || '').trim()) e.ziel_wann = 'bei Neuvermietung';
   }
 
   /* Schritt 3 — Zustand je Einheit (Vererbung) */
@@ -991,7 +1007,7 @@
     }).join('<span style="color:#D8D2C6">›</span>');
     el('mfh-zurueck').style.visibility = _schritt === 0 ? 'hidden' : 'visible';
     el('mfh-weiter').textContent = _schritt === SCHRITTE.length - 1 ? 'Übernehmen' : 'Weiter ›';
-    zeichnenSumme(); punkteZeigen(); hausBinden();
+    zeichnenSumme(); punkteZeigen(); hausBinden(); zvZeichnen();   /* v3130 */
     var neu = el('mfh-neu'); if (neu) neu.onclick = function () { _arbeit.push({ nr: String(_arbeit.length + 1), art: standardArt(), status: 'vermietet' }); zeichnen(); };
   }
   /* v2966 · N80 · Chips und Kosten der Hausmassnahmen (dieselbe Bedienung wie je Wohnung) */
@@ -1206,11 +1222,13 @@
     document.body.appendChild(m);
     m.addEventListener('input', function (ev) { var t = ev.target; if (t.id === 'mfh-auftk') { _auftK = String(t.value || '').trim() === '' ? null : t.value; return; }
       /* v2541 · Spiegel auf das Feld im Reiter Objekt (gespeichert ueber storage.js) */
-      if (t.id === 'mfh-zbjahr') { var _zj = el('zb_fertig_jahr'); if (_zj) { _zj.value = String(t.value || '').replace(/[^0-9]/g, '').slice(0, 4); try { _zj.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} } return; } if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen(); } });
+      if (t.id === 'mfh-zbjahr') { var _zj = el('zb_fertig_jahr'); if (_zj) { _zj.value = String(t.value || '').replace(/[^0-9]/g, '').slice(0, 4); try { _zj.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} } return; } if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen();
+        if (/^(wfl|ist|nr|lage)$/.test(t.dataset.k)) zvZeichnen(); } });   /* v3130 · Vorschlag folgt Fläche und Ist */
     m.addEventListener('change', function (ev) {
       var t = ev.target; if (t.tagName !== 'SELECT') return;
       if (t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme();
-        if (t.dataset.k === 'art') { zeichnen(); return; } }   /* v2210: Nutzungsart erscheint/verschwindet */
+        if (t.dataset.k === 'art') { zeichnen(); return; }   /* v2210: Nutzungsart erscheint/verschwindet */
+        if (t.dataset.k === 'status') zvZeichnen(); }   /* v3130 */
       if (t.dataset.geb) { _geb[t.dataset.geb] = t.value; }
       if (t.dataset.mk) { var e = _arbeit[+t.dataset.mi]; e.mod = e.mod || {}; e.mod[t.dataset.mk] = t.value; }
       punkteZeigen();
@@ -1224,6 +1242,13 @@
       /* v2021 - der Weg ins Wohnungsfenster, im selben delegierten
          Behandler wie dup und del. */
       if (t.dataset && t.dataset.det != null) { wohnungOeffnen(+t.dataset.det); }
+      /* v3130 · N115 · Vorschlag übernehmen - je Wohnung oder alle offenen */
+      if (t.dataset && t.dataset.zv != null) { zvSetzen(+t.dataset.zv, Number(t.dataset.zvQm)); zeichnen(); }
+      if (t.dataset && t.dataset.zvAlle) {
+        var _P = window.DpPotenzial, _r = _P && _P.zielVorschlaege ? _P.zielVorschlaege({ einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM }) : null;
+        if (_r && _r.markt) _r.zeilen.forEach(function (z) { if (z.v && z.v.qm != null) zvSetzen(z.i, z.v.qm); });
+        zeichnen();
+      }
       if (t.dataset && t.dataset.del != null) { _arbeit.splice(+t.dataset.del, 1); zeichnen(); }
     });
     el('mfh-zu').onclick = schliessen;

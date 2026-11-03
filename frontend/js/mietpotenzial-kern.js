@@ -391,12 +391,41 @@
     return r;
   }
 
+  /**
+   * v3130 · N115 · ZIELMIETE NACH SANIERUNG — NUR EIN VORSCHLAG (Marcel 03.11.2026)
+   * Je Wohnung: Marktmiete für den sanierten Zustand (Grundlage wählt der AUFRUFER und
+   * nennt ihre Herkunft), gedeckelt durch die Mietpreisbremse bei Neuvermietung - die
+   * Deckelung rechnet neuvermietung(), hier wird nichts zweites gerechnet.
+   * p: { wfl, basis_qm, art ('wohnen'|'gewerbe'), vermietet (bool), bremse, vgl_qm }
+   * Ergebnis: null (Gewerbe/ohne Fläche) · { fehlt: 'marktmiete' } · { qm, monat, basis_qm,
+   *   gedeckelt, obergrenze_qm, bremse_gilt, ungeprueft, text, bestand }
+   * Der Vorschlag wird NIE selbst übernommen - das tut der Nutzer je Wohnung.
+   */
+  function zielmieteVorschlag(p) {
+    p = p || {};
+    var wfl = zahl(p.wfl), bq = zahl(p.basis_qm);
+    if (p.art === 'gewerbe' || !(wfl > 0)) return null;
+    if (!(bq > 0)) return { fehlt: 'marktmiete' };
+    var nv = neuvermietung({ markt_qm: bq, wfl: wfl, vgl_qm: p.vgl_qm, bremse: p.bremse });
+    var qm = Math.round(nv.qm * 100) / 100;
+    return {
+      qm: qm, monat: Math.round(qm * wfl * 100) / 100, basis_qm: bq,
+      gedeckelt: nv.gedeckelt, obergrenze_qm: nv.obergrenze_qm, bremse_gilt: nv.bremse_gilt, ungeprueft: !!nv.ungeprueft,
+      text: nv.text,
+      /* laufender Mietvertrag: die Zielmiete ist erst bei Neuvermietung erreichbar */
+      bestand: p.vermietet
+        ? 'Mieter wohnt: bis zur Neuvermietung gilt die zulässige Miete (Kappungsgrenze, § 558 BGB); mehr nur über die Modernisierungsumlage (§ 559 BGB).'
+        : 'Leer: die Zielmiete gilt ab der Neuvermietung.'
+    };
+  }
+
   g.DpMietpotenzial = {
     PRAEFIX: PRAEFIX, TERMIN_REGEL: TERMIN_REGEL,
     zahl: zahl, plusMonate: plusMonate, mmjj: mmjj, deDatum: deDatum,
     gemeindeFinden: gemeindeFinden, kappungAus: kappungAus, mietpreisbremseAus: mietpreisbremseAus,
     wirksamNachZugang: wirksamNachZugang, mhTermine: mhTermine, umlage559: umlage559, vertragGrenzen: vertragGrenzen,
-    sollFuer: sollFuer, zulaessig: zulaessig, neuvermietung: neuvermietung
+    sollFuer: sollFuer, zulaessig: zulaessig, neuvermietung: neuvermietung,
+    zielmieteVorschlag: zielmieteVorschlag   /* v3130 · N115 */
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpMietpotenzial;
 })(typeof window !== 'undefined' ? window : globalThis);

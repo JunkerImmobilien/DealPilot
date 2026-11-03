@@ -311,7 +311,10 @@ if (!window._wlc) {
     if (rsqm != null && area) {
       var lo = rent.q25_per_sqm != null ? rent.q25_per_sqm : rsqm * 0.9;
       var hi = rent.q75_per_sqm != null ? rent.q75_per_sqm : rsqm * 1.1;
-      out.mm = { low: Math.round(lo * area), med: Math.round(rsqm * area), high: Math.round(hi * area), sqm: deNum(rsqm, 2) + ' €/m² kalt' };
+      out.mm = { low: Math.round(lo * area), med: Math.round(rsqm * area), high: Math.round(hi * area), sqm: deNum(rsqm, 2) + ' €/m² kalt',
+                 /* v3130 · N115 · €/m² ungerundet für den Zielmiete-Vorschlag je Wohnung (potenzial.js marktSaniert);
+                    q75 nur, wenn die Marktbewertung ihn wirklich führt - sonst rechnet der Vorschlag mit der Mitte */
+                 qm: rsqm, q75_qm: rent.q75_per_sqm != null ? rent.q75_per_sqm : null };
     }
     /* v783-compare: Vergleichsobjekte aus sale.comparables (Feldnamen an avm-section angleichen) */
     try {
