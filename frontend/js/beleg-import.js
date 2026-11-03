@@ -634,6 +634,27 @@
       r.pruefen = g;
       if (!r.jahr && _modus === 'wk') r.keep = false;
     });
+    /* v3154c · PRÜFUNG JE DATEI. Gemessen an einer Hotelrechnung (zwei Läufe, zwei Ergebnisse): die KI meldete
+       einmal die Gesamtzeile als eigene Position und die Kurtaxe von Seite 2 ein zweites Mal - übernommen wäre
+       die Übernachtung doppelt gezählt. Summen-, Gesamt- und Doppelzeilen werden deshalb benannt und abgewählt. */
+    var jeDatei = {};
+    _rows.forEach(function (r) { if (!r.junk) (jeDatei[r.name] = jeDatei[r.name] || []).push(r); });
+    Object.keys(jeDatei).forEach(function (nm) {
+      var g = jeDatei[nm];
+      if (g.length < 2) return;
+      g.forEach(function (r, k) {
+        var andere = g.filter(function (x) { return x !== r && !x.summe; });
+        var summe = andere.reduce(function (a, x) { return a + (x.brutto || 0); }, 0);
+        if (andere.length >= 2 && r.brutto > 0 && Math.abs(r.brutto - summe) <= Math.max(0.5, r.brutto * 0.01)) {
+          r.summe = true; r.keep = false; r.pruefen.push('ist die Summe der übrigen Positionen – nicht zusätzlich übernommen'); return;
+        }
+        if (/gesamt|summe|\btotal\b|endbetrag|rechnungsbetrag/i.test(String(r.beschreibung || ''))) {
+          r.keep = false; r.pruefen.push('sieht nach dem Gesamtbetrag aus – nicht zusätzlich zu den Einzelpositionen übernehmen');
+        }
+        var vorher = g.slice(0, k).filter(function (x) { return x.kategorie === r.kategorie && Math.abs((x.brutto || 0) - (r.brutto || 0)) < 0.01; });
+        if (vorher.length) { r.keep = false; r.pruefen.push('möglicherweise doppelt (gleicher Betrag und gleiche Kategorie, oft von Seite 2)'); }
+      });
+    });
   }
   function _werteZeile(r) {
     return [['Datum', r.datum], ['Jahr', r.jahr || '–'], ['Aussteller', r.aussteller], ['Beschreibung', r.beschreibung],
@@ -647,6 +668,8 @@
       werte = werte.concat(_werteZeile(x));
     });
     var h = []; alle.forEach(function (x) { (x.pruefen || []).forEach(function (g) { if (h.indexOf(g) < 0) h.push(g); }); });
+    var gew = alle.filter(function (x) { return x.keep; }).reduce(function (a, x) { return a + (x.brutto || 0); }, 0);
+    h.push('Ausgewählt aus dieser Datei: ' + _fmtEur(gew) + ' € brutto – bitte mit dem Rechnungsbetrag auf dem Bild vergleichen.');   /* v3154c */
     window.DpEingang.vorschau({ titel: r.name, bilder: _bilder[r.name] || null, werte: werte, hinweise: h });
   }
   function _ansehenLeer(k) {
@@ -664,7 +687,7 @@
     var seen = {};
     _rows.forEach(function (r) {
       var b = String(r.beschreibung || '').toLowerCase();
-      var isJunk = (!(r.brutto > 0)) || /summe|offene posten|nicht lesbar|unleserlich|unlesbar/.test(b);
+      var isJunk = (!(r.brutto > 0)) || /^\s*(summe|gesamtsumme|zwischensumme)\b|offene posten|nicht lesbar|unleserlich|unlesbar/.test(b);   /* v3154c */
       r.junk = isJunk; r.dup = false;
       if (isJunk) { r.keep = false; return; }
       var d = String(r.datum || '').trim();
