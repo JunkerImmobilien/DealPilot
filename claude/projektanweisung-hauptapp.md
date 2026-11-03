@@ -44288,3 +44288,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `e3bf5d80`; mb-backend auf Staging neu gebaut.
 - **Nachweis:** `wertermittlung-pruefen` RC 0 (A 118/118, B 238/238 mit neuen B21b/B21c, C 99/99 unverändert), Mutationsprobe (15 → 14 Monate) wird rot; `mietpotenzial-pruefen` 104/104, `score-ketten` grün, `kappungsgrenzen` grün, `objekt-mapper` sauber. Im Container: 415 €/Monat, −100 € unter Markt: ohne letzte Erhöhung −1.597 €, letzte 07/2026 −4.310 €, mit Betrag −2.823 €. Westerfeld unverändert 740.000 € (alle Wohnungen im Band); Marcels „erhöhter“ Wert ist die Potenzial-Stufe „Mieterhöhung“ 785.000 € (≈ 20.000 € Miete, ≈ 23.000 € RND).
 - **Rest:** Marcel entscheidet: Stufe „Mieterhöhung“ als Stichtagswert, RND aus bewohnten Maßnahmen, Pfad nur bis zur ortsüblichen Vergleichsmiete. Prod nach Abnahme.
+
+### v3120–v3120c · Ein Eingang für Belege, Unterlagen, Rechnungen (03.11.2026, N116 Stufe 1)
+
+- **Was:** `frontend/js/unterlagen-eingang.js` (DpEingang: Eingang, Rechnungserkennung, Mietvertrag → Einheit, Herkunftsmarke, Verlauf in `#_dok_eingang`); object-actions.js (Typ Rechnung, Zeile Mietvertrag → Einheit, Steuer mit Quelle, Verlauf, DealPilot-Schutz nur ohne Leitbegriff im Titel); beleg-import.js `oeffnenMit`; storage.js speichert `_dok_eingang`; Pilot-Analyse (Unterlagen & WEG, Belege-Karte) und Reiter Steuer mit EINEM Knopf; Hilfe, Prozess-Atlas und Handbuch auf den neuen Knopftext.
+- **Commit:** `b839d89f`, `f3e2c735`, `4b7b0174`, `d6dbe500`, `d84f1b0c`, dazu Konstanten/Handbuch; Staging per git pull. **Nicht Prod.**
+- **Nachweis:** Parkstr. 9 mit Lindenallee-Verträgen 11/12/13 und Wirtschaftsplan 2026: Zuordnung WE 1 → Whg. 1, WE 3 → Whg. 3 (sicher), WE 6 unsicher und ohne Wahl nicht übernommen; Objektmiete = Summe der Einheiten; Herkunft gesetzt und von Hand gelöscht; Verlauf im Reiter; Objekt nicht gespeichert, Server-Stand danach unverändert. Prüfer: Handbuch, Prozess-Atlas, Buster, Konstanten grün.
+- **Rest:** siehe N116 (Rechnungs-Pfad mit echter Rechnung, Mietername, Datenraum-Überwachung als Konzept).
