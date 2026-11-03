@@ -275,7 +275,7 @@
     st.textContent =
       '#beleg-import-ov{position:fixed;inset:0;z-index:100000;background:rgba(5,5,5,.66);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Inter,system-ui,sans-serif}' +
       /* v3155 · Marcel: „ein größeres Modal, so groß wie die Hilfe" - gemessen Hilfe 1180 × 924 px (88 vh), Ecken 14 px */
-      '#beleg-import-ov .bi-card{background:#FDFCFA;width:min(1180px,calc(100vw - 32px));height:min(924px,88vh);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.5)}' +
+      '#beleg-import-ov .bi-card{background:#FDFCFA;width:min(1440px,calc(100vw - 32px));height:min(960px,92vh);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.5)}' +
       '@media (max-width:640px){#beleg-import-ov{padding:0}#beleg-import-ov .bi-card{width:100vw;height:100vh;border-radius:0}}' +
       '#beleg-import-ov .bi-obj{font-size:12.5px;color:var(--wl-e8cc7a, #E8CC7A);font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
       '#beleg-import-ov .bi-leiste{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;margin-bottom:12px}' +
@@ -286,11 +286,15 @@
       '#beleg-import-ov .bi-bt{display:flex;flex-direction:column;min-width:0;font-size:12px;line-height:1.35}' +
       '#beleg-import-ov .bi-bt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}' +
       '#beleg-import-ov .bi-beleg.gruen .bi-bt span{color:#2e7d4f}#beleg-import-ov .bi-beleg.gelb .bi-bt span{color:#8a6d18}#beleg-import-ov .bi-beleg.rot .bi-bt span{color:#B8625C}' +
-      '#beleg-import-ov .bi-detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px}' +
+      /* v3163 · gemessen: das Kategorie-Feld bekam 126 px, „Übernachtung / Hotel" war abgeschnitten - Positionen bekommen mehr Platz */
+      '#beleg-import-ov .bi-detail{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.45fr);gap:16px}' +
+      '#beleg-import-ov .bi-werte select{min-width:210px;max-width:none;width:100%}' +
+      '#beleg-import-ov .bi-werte td:last-child{min-width:220px}' +
+      '#beleg-import-ov .bi-werte td{vertical-align:top}' +
       '@media (max-width:820px){#beleg-import-ov .bi-detail{grid-template-columns:1fr}}' +
-      '#beleg-import-ov .bi-bild{background:#efece4;border-radius:8px;padding:8px;max-height:50vh;overflow:auto;display:flex;flex-direction:column;gap:8px}' +
+      '#beleg-import-ov .bi-bild{background:#efece4;border-radius:8px;padding:8px;max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:8px}' +
       '#beleg-import-ov .bi-bild img{width:100%;height:auto;border-radius:4px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}' +
-      '#beleg-import-ov .bi-werte{min-width:0;overflow:auto;max-height:50vh}' +
+      '#beleg-import-ov .bi-werte{min-width:0;overflow:auto;max-height:46vh}' +
       '#beleg-import-ov .bi-pr{font-size:11px;color:#8a6d18;margin-top:3px;line-height:1.4}' +
       '#beleg-import-ov .bi-k{font-size:11.5px;color:#888}' +
       '#beleg-import-ov .bi-rot{padding:12px;border-radius:8px;background:rgba(184,98,92,.1);border:1px solid rgba(184,98,92,.5);color:#B8625C;font-weight:600;line-height:1.45}' +
