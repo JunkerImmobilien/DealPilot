@@ -269,7 +269,7 @@
       ertragswert_gesperrt: !!(sw && sw.gesperrt), ertragswert_veraltet: !!(sw && sw.veraltet),
       lzs: sw && sw.lzs ? { pct: zahl(sw.lzs.pct), stufe: sw.lzs.stufe || null, etikett: sw.lzs.etikett || null } : null,
       satz: pd && pd.satz_bank ? String(pd.satz_bank) : '',
-      kurz_ausblick: PZ.KURZ_AUSBLICK || 'Ausblick: Mieterhöhung und Zielbild unterstellen die höhere Miete bzw. umgesetzte Maßnahmen – kein heutiger Verkehrswert.'
+      kurz_ausblick: PZ.KURZ_AUSBLICK || 'Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst. Zielbild: Ausblick mit umgesetzten Maßnahmen – kein heutiger Verkehrswert.'
     };
   }
 

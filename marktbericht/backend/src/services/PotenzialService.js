@@ -461,6 +461,65 @@ function stufe558(basis, ref, bb, wlB, kB) {
   };
 }
 
+/* ══ v3152 · N117 · STUFE 3 „NEUVERMIETUNG" (Marcel 03.11.2026) ═══════════════════════════════════
+   Vorgabe Punkt 2: das Potenzial über der ortsüblichen Vergleichsmiete ist eine EIGENE Stufe -
+   realistisch erwartbare Mieterwechsel, Verzögerung, Leerstand, Neuvermietungskosten, Abzinsung; nie
+   „alle Wohnungen frei". Sie baut auf der Stufe Mieterhöhung auf (nicht addiert aus unabhängigen Werten).
+   Je vermietete Wohnung: Mehrmiete U = Neuvermietungsmiete (heutiger Zustand, Mietpreisbremse, aus der
+   App) − Zielmiete der Stufe Mieterhöhung. Erwarteter Anteil neu vermietet nach t Jahren: 1 − (1 − f)^t.
+   Barwert = Σ Monate U/12 × Anteil × (1 − Leerstand) abgezinst mit dem Liegenschaftszins, minus Kosten
+   je erstem Wechsel (eine Monatsmiete der neuen Miete) mit seiner Wahrscheinlichkeit, gedeckelt auf die
+   Restnutzungsdauer des Bestands.
+   Leerstand: Feld „Leerstand p.a." (Marcel: „das könnte man nehmen"); Fluktuation 8 % p. a. und Kosten
+   eine Monatsmiete sind Annahmen (Vorschlag 03.11.2026), im Ergebnis so benannt. */
+const NV_FLUKTUATION = 0.08, NV_KOSTEN_MONATE = 1;
+function stufeNeuvermietung(S558, bb, wlB, kB, leerPct, basisWert) {
+  if (!S558 || !bb) return null;
+  const lzs = S558.lzs_pct / 100, rnd = Number(S558.rnd_jahre) > 0 ? Number(S558.rnd_jahre) : 40;
+  const L = Number.isFinite(Number(leerPct)) && Number(leerPct) >= 0 && Number(leerPct) < 50 ? Number(leerPct) / 100 : null;
+  const f = NV_FLUKTUATION, mon = Math.round(rnd * 12), q = Math.pow(1 - f, 1 / 12);
+  const eurJ = (x) => Math.round(x).toLocaleString('de-DE') + ' €';
+  const zeilen = [];
+  let summe = 0, kosten = 0;
+  bb.zeilen.forEach((z, i) => {
+    const w = wlB[i] || {};
+    if (!z || z.herkunft === 'leer_marktueblich' || !(z.ist > 0)) return;
+    const N = zahl(w.neu_jahr);
+    if (!(N > 0)) return;
+    const r558 = S558.zeilen.find((x) => (x.nr != null && String(x.nr) === String(w.nr || '')) ) || null;
+    const T = r558 && r558.ziel_monat > 0 ? Math.max(z.ist, r558.ziel_monat * 12) : z.ist;
+    const U = N - T;
+    const r = { nr: w.nr || null, ziel_mieterhoehung_monat: Math.round(T / 12 * 100) / 100, neu_monat: Math.round(N / 12 * 100) / 100,
+      neu_qm: zahl(w.neu_qm), neu_herkunft: w.neu_herkunft || null, bremse: w.neu_bremse || null };
+    if (!(U > 1)) { r.grund = 'die Neuvermietungsmiete liegt nicht über der Zielmiete der Stufe Mieterhöhung'; zeilen.push(r); return; }
+    let bw = 0, kw = 0;
+    for (let m = 0; m < mon; m++) {
+      const anteil = 1 - Math.pow(q, m + 1);                 /* erwarteter Anteil neu vermietet bis Monatsende */
+      const ab = Math.pow(1 + lzs, (m + 1) / 12);
+      bw += (U / 12) * anteil * (1 - (L || 0)) / ab;
+      const p1 = Math.pow(q, m) - Math.pow(q, m + 1);         /* erster Wechsel in diesem Monat */
+      kw += p1 * (N / 12) * NV_KOSTEN_MONATE / ab;
+    }
+    r.mehrmiete_jahr = Math.round(U); r.barwert_eur = Math.round(bw - kw); r.kosten_barwert_eur = Math.round(kw);
+    summe += bw - kw; kosten += kw;
+    zeilen.push(r);
+  });
+  const mit = zeilen.filter((x) => x.barwert_eur != null);
+  if (!mit.length) return { verfuegbar: false, zeilen, satz: zeilen.length ? 'Neuvermietung: keine Wohnung, deren Neuvermietungsmiete über der Zielmiete der Mieterhöhung liegt.' : null };
+  const ann = 'Annahmen: ' + Math.round(f * 100) + ' % der Mieter wechseln je Jahr (rund ' + Math.round(1 / f) + ' Jahre Mietdauer), '
+    + (L != null ? 'Leerstand ' + String(Math.round(L * 1000) / 10).replace('.', ',') + ' % laut Feld „Leerstand p.a.“' : 'kein Leerstand eingetragen (Feld „Leerstand p.a.“)')
+    + ', Kosten je Wechsel ' + NV_KOSTEN_MONATE + ' Monatsmiete — keine amtlichen Werte, sondern Annahmen.';
+  const wert = basisWert != null ? Math.round(basisWert + summe) : null;
+  return {
+    verfuegbar: true, wert, barwert_eur: Math.round(summe), kosten_barwert_eur: Math.round(kosten), zeilen, annahmen: ann,
+    fluktuation_pct: f * 100, leerstand_pct: L != null ? L * 100 : null, kosten_monate: NV_KOSTEN_MONATE,
+    satz: 'Bei Mieterwechsel ist mehr möglich als die Vergleichsmiete: ' + mit.length + ' Wohnung' + (mit.length === 1 ? '' : 'en') + ' bis zur Neuvermietungsmiete ('
+      + (mit[0].neu_herkunft || 'Marktmiete') + (mit.some((x) => x.bremse && /höchstens/.test(x.bremse)) ? ', gedeckelt durch die Mietpreisbremse' : '') + '), '
+      + 'jeweils erst, wenn die Wohnung frei wird. Barwert der Mehrmiete ' + eurJ(summe) + ' nach Leerstand und Kosten, zusätzlich zur Stufe Mieterhöhung'
+      + (wert != null ? ' (zusammen ' + eurJ(wert) + ')' : '') + '. ' + ann + ' Nicht unterstellt: dass Wohnungen heute frei sind.',
+  };
+}
+
 /** Zins für Wohnungseigentum aus derselben Kaskade (A–E, N) wie der Bericht. */
 async function etwZins(ref, brwSqm, rnd) {
   try {
@@ -785,6 +844,16 @@ export const PotenzialService = {
         if (zahl(v.mod_punkte_plus) > 0 || zahl(v.kosten) > 0) z.rechenweg558.verschoben = 'Modernisierungen dieser Stufe (' + (zahl(v.kosten) > 0 ? Math.round(zahl(v.kosten)).toLocaleString('de-DE') + ' €' : '')
           + (zahl(v.mod_punkte_plus) > 0 ? (zahl(v.kosten) > 0 ? ', ' : '') + '+' + String(zahl(v.mod_punkte_plus)).replace('.', ',') + ' Punkte' : '') + ') zählen erst im Zielbild.';
       }
+      if (z && _mh && S558) {
+        /* v3152 · N117 · Stufe Neuvermietung auf der Stufe Mieterhoehung */
+        try {
+          const nvS = stufeNeuvermietung(S558, bb, wlB, kB, auftrag.leerstand_pct, z.wert_ungerundet != null ? z.wert_ungerundet : z.wert);
+          if (nvS) {
+            if (nvS.wert != null) nvS.wert = Math.round(nvS.wert / 1000) * 1000;
+            out.haus.neuvermietung = nvS;
+          }
+        } catch (e) { console.log('[potenzial] neuvermietung: ' + e.message); }
+      }
       if (z) {
         z.kosten = _mh ? 0 : (zahl(v.kosten) || 0);   /* v3150 */
         z.anhebung_jahr = Math.round(z.miete_wohnen_jahr - bestand.miete_wohnen_jahr);   /* v2488 */
@@ -1011,5 +1080,6 @@ export default PotenzialService;
 /* v2854 · fuer den Pruefer (tools/wertermittlung-pruefen.mjs B54): dieselbe Stufenrechnung */
 export { eineStufe as _eineStufe };
 export { stufe558 as _stufe558 };   /* v3150 · Pruefer B61 */
+export { stufeNeuvermietung as _stufeNeuvermietung };   /* v3152 · Pruefer B62 */
 /* v2988 · fuer Knotenprobe und Pruefer: Miete nach Modernisierung, Stufenmiete, Bestandsbasis */
 export { mieteNachModernisierung as _mieteNachModernisierung, stufenMiete as _stufenMiete, bestandsBasis as _bestandsBasis };

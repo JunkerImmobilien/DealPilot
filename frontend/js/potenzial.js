@@ -41,7 +41,8 @@
   if (!K) { try { console.error('[potenzial] js/mietpotenzial-kern.js fehlt - Mieterhöhung nicht rechenbar'); } catch (e) {} return; }
 
   /* v2870 · Marcel 22.10.2026: der alte Satz („Potenzialwert …, keine Verkehrswertermittlung“) sagte nicht, was gemeint war */
-  var KENNZEICHNUNG = 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.';
+  /* v3151 · seit v3150 ist die Stufe Mieterhöhung ein Wert zum Stichtag (N114) - gleicher Wortlaut wie PotenzialService */
+  var KENNZEICHNUNG = 'Der Ertragswert nach Mieterhöhung bezieht sich auf den heutigen Stichtag: die nach § 558 BGB zulässigen Erhöhungen zählen erst ab ihrer Wirksamkeit und sind abgezinst, Gebäudezustand und Restnutzungsdauer sind die des Bestands. Der Ertragswert im Zielbild ist ein Ausblick: er unterstellt, dass die Maßnahmen umgesetzt sind, und ist kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag.';
   /* v2431 · Marcel 19.10.2026 (Geld): Ertragswert nur mit Stufe 3 - geprueft im
      Haupt-Backend (services/ertragswertFreigabe.js). Ohne Freigabe kommt
      `ertragswert_gesperrt` zurueck; Mieten, Zielbild, Kosten und Rendite bleiben. */
@@ -943,6 +944,18 @@
     if (_zmq > 0) body.zielbild_markt_qm = Math.round(_zmq * 100) / 100;
     /* v3150 · N114 · je Wohnung: ortsübliche Vergleichsmiete (Ziel der Stufe), ihre Herkunft, die
        Soll-Miete nach § 558 und die Erhöhungshistorie - der Wertkern rechnet den Pfad selbst */
+    /* v3152 · N117 · Stufe Neuvermietung: die Neuvermietungsmiete der Wohnung im HEUTIGEN Zustand =
+       Mitte des aktuellen Marktdurchschnitts (nicht die obere Spanne - die gilt für saniert), sonst die
+       Marktmiete aus dem Reiter Miete; gedeckelt durch die Mietpreisbremse (Kern neuvermietung). */
+    var _ms = marktSaniert(m), _br = mietpreisbremse(agsJetzt());
+    var _nvQm = _ms && _ms.art !== 'eigen' && _ms.mitte > 0 ? _ms.mitte : zahl(wert('ds2_marktmiete'));
+    var _nvHer = _ms && _ms.art !== 'eigen' && _ms.mitte > 0 ? 'aktueller Marktdurchschnitt (Mitte)' : (_nvQm > 0 ? 'Marktmiete (Tab Miete)' : null);
+    var nv = function (w) {
+      if (!(_nvQm > 0) || !(w.wfl > 0) || w.art === 'gewerbe' || !K || !K.neuvermietung) return {};
+      var vq = w.soll && w.soll.vgl_qm > 0 ? w.soll.vgl_qm : zahl(m.vgl && !m.vgl.marktmiete ? m.vgl.qm : 0);
+      var r = K.neuvermietung({ markt_qm: _nvQm, wfl: w.wfl, vgl_qm: vq, bremse: _br });
+      return r ? { neu_jahr: Math.round(r.jahr), neu_qm: r.qm, neu_herkunft: _nvHer, neu_bremse: r.text || null } : {};
+    };
     var d558 = function (w) {
       var vq = w.soll && w.soll.vgl_qm > 0 ? w.soll.vgl_qm : 0;
       var vh = w.soll ? w.soll.vgl_herkunft || null : null;
@@ -956,10 +969,13 @@
         var sm = (w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist;
         return Object.assign({ nr: w.nr, art: w.art, wfl: w.wfl, mea_pct: w.mea || null,
           miete_jahr: { bestand: Math.round(w.ist * 12), mieterhoehung: Math.round(soll558(w) * 12),
-                        zielbild: Math.round((w.ziel != null ? w.ziel : sm) * 12) } }, d558(w));
+                        zielbild: Math.round((w.ziel != null ? w.ziel : sm) * 12) } }, d558(w), nv(w));   /* v3152 */
       });
       body.aufteilung = { aktiv: !!m.aufgeteilt, kosten_eur: Math.round(m.aufteilungskosten || 0), kosten_herkunft: m.aufteilungskosten_herkunft };
-    } else if (m.wohnungen[0]) body.einzel558 = d558(m.wohnungen[0]);   /* v3150 */
+    } else if (m.wohnungen[0]) body.einzel558 = Object.assign(d558(m.wohnungen[0]), nv(m.wohnungen[0]));   /* v3150, v3152 */
+    /* v3152 · N117 · Marcel 03.11.2026: „wir haben ein Feld Leerstand in Prozent, das könnte man nehmen" */
+    var _lq = zahl(wert('leerstand'));
+    if (_lq >= 0 && String(wert('leerstand') || '').trim() !== '') body.leerstand_pct = Math.round(_lq * 100) / 100;
     return body;
   }
   var _lauf = null;
@@ -1146,6 +1162,8 @@
     var mh = r && r.haus && r.haus.mieterhoehung && r.haus.mieterhoehung.rechenweg558 ? r.haus.mieterhoehung.rechenweg558 : null;   /* v3150 */
     var z = [];
     if (mh && mh.satz) z.push('<b>Mieterhöhung:</b> ' + esc(mh.satz) + (mh.verschoben ? ' ' + esc(mh.verschoben) : ''));
+    var nvE = r && r.haus && r.haus.neuvermietung;   /* v3152 · N117 */
+    if (nvE && nvE.satz) z.push('<b>Neuvermietung:</b> ' + esc(nvE.satz));
     if (H.text) z.push('<b>' + esc(H.text) + '</b>');
     if (H.unterschied) z.push(esc(H.unterschied));
     if (mnm && mnm.satz) z.push((mnm.wirkt ? '' : '<b>Miete im Zielbild:</b> ') + esc(mnm.satz));
@@ -1233,6 +1251,8 @@
     if (_zl) z.miete_nach_modernisierung = { satz: _zl.satz, weg: _zl.weg, wirkt: !!_zl.wirkt, qm_vorher: _zl.qm_vorher, qm_nachher: _zl.qm_nachher };
     /* v3150 · N114 · der Rechenweg der Stufe Mieterhöhung (Wert zum Stichtag) */
     var _mh = h.mieterhoehung && h.mieterhoehung.rechenweg558;
+    if (h.neuvermietung) z.neuvermietung = { wert: h.neuvermietung.wert, barwert_eur: h.neuvermietung.barwert_eur, satz: h.neuvermietung.satz,
+      annahmen: h.neuvermietung.annahmen, wohnungen: h.neuvermietung.wohnungen };   /* v3152 */
     if (_mh) z.mieterhoehung_rechenweg = { satz: _mh.satz + (_mh.verschoben ? ' ' + _mh.verschoben : ''), mindermiete_eur: _mh.mindermiete_eur,
       sensitiv_eur: _mh.sensitiv_eur, rnd_jahre: _mh.rnd_jahre, kappung_text: _mh.kappung_text,
       wohnungen: (_mh.wohnungen || []).map(function (x) { return { nr: x.nr, ist: x.ist_monat, ziel: x.ziel_monat, ziel_herkunft: x.ziel_herkunft,
@@ -1493,7 +1513,7 @@
   /* ── v2842 · ABRUFLEISTE (Marcel 22.10.2026: „die Abrufe müssen schlüssiger sein") ──
      Ein Bereich oben: je Abruf Stand/Datum, was er kostet, ein Knopf. Die Rückfrage
      und der Lauf des Marktpreis-Abrufs stehen in derselben Zeile. */
-  var KURZ_AUSBLICK = 'Ausblick: Mieterhöhung und Zielbild unterstellen die höhere Miete bzw. umgesetzte Maßnahmen – kein heutiger Verkehrswert. Maßgeblich für heute ist der Bestand.';
+  var KURZ_AUSBLICK = 'Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst. Zielbild: Ausblick mit umgesetzten Maßnahmen – kein heutiger Verkehrswert.';   /* v3151 */
   function abrufLeiste(r, zu, W) {
     var z1, b1;
     if (zu) { z1 = 'Gehört zu Stufe 3 (Wertermittlung nach ImmoWertV).'; b1 = '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button>'; }

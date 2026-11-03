@@ -1338,6 +1338,31 @@ fallB('B61', () => {
   pruefe('B', 'B61', 'Staffelmiete: keine Erhöhung nach § 558, Miete wie Bestand', !!d && d.mieten[0] === 4680 && /557a/.test(d.zeilen[0].grund || ''), d && d.zeilen[0].grund);
 });
 
+/* v3152 · B62 · N117 · Stufe Neuvermietung auf der Stufe Mieterhoehung: Beispiel der Vorgabe (6,50 / 8,00 /
+   10,00 €/m², 60 m²). Mehrmiete 1.440 €/Jahr erst bei Mieterwechsel (8 % p. a.), Leerstand aus dem Feld,
+   eine Monatsmiete Kosten je Wechsel. Der Barwert liegt deutlich unter der vollen Kapitalisierung. */
+fallB('B62', () => {
+  if (!PSM || typeof PSM._stufeNeuvermietung !== 'function') return pruefe('B', 'B62', 'PotenzialService._stufeNeuvermietung geladen', false, psGrund || 'fehlt');
+  const band = { unten_qm: 6.4, oben_qm: 9.6, anker_qm: 8.0 };
+  const zeile = () => ({ wfl: 60, ist: 4680, ist_qm: 6.5, qm: 6.5, herkunft: 'ist_im_band', roh: 4680, basis: 4680, band, markt: 8.0 });
+  const basis = { ein: { lzs_pct: 2.5 }, stichtag: '2026-10-21', kappung: { pct: 15, text: 'Kappungsgrenze 15 % in 3 Jahren' } };
+  const kB = { lzs: { pct: 2.5 }, nutzungsdauer: { rnd: 40 } };
+  const wl = [{ nr: '1', art: 'wohnen', wfl: 60, vgl_jahr: 5760, vgl_herkunft: 'Mietspiegel', soll558_jahr: 5382, neu_jahr: 7200, neu_qm: 10, neu_herkunft: 'Marktmiete (Tab Miete)' }];
+  const bb = { zeilen: [zeile()] };
+  const S = PSM._stufe558(basis, {}, bb, wl, kB);
+  const n0 = PSM._stufeNeuvermietung(S, bb, wl, kB, null, 500000), n2 = PSM._stufeNeuvermietung(S, bb, wl, kB, 2, 500000);
+  const z = n2 && n2.zeilen[0];
+  wert('B', 'B62', 'Mehrmiete über der Zielmiete der Mieterhöhung 1.440 €/Jahr', z ? z.mehrmiete_jahr : null, 1440, 0);
+  const voll = 1440 * (1 - Math.pow(1.025, -40)) / 0.025;
+  pruefe('B', 'B62', 'Barwert positiv und deutlich unter der vollen Kapitalisierung (nicht alle Wohnungen frei)', !!n2 && n2.barwert_eur > 0 && n2.barwert_eur < voll * 0.75,
+    n2 ? n2.barwert_eur + ' € gegen voll ' + Math.round(voll) + ' €' : '–');
+  pruefe('B', 'B62', 'Leerstand 2 % senkt den Barwert, Wert = Mieterhöhung + Barwert', !!n0 && !!n2 && n2.barwert_eur < n0.barwert_eur && n2.wert === Math.round(500000 + n2.barwert_eur),
+    n0 && n2 ? n0.barwert_eur + ' → ' + n2.barwert_eur + ', Wert ' + n2.wert : '–');
+  pruefe('B', 'B62', 'Annahmen benannt (8 %, Leerstand aus dem Feld, 1 Monatsmiete, keine amtlichen Werte)', !!n2 && /8 % der Mieter/.test(n2.annahmen) && /Leerstand 2 % laut Feld/.test(n2.annahmen) && /keine amtlichen Werte/.test(n2.annahmen), n2 && n2.annahmen);
+  const nG = PSM._stufeNeuvermietung(S, bb, [Object.assign({}, wl[0], { neu_jahr: 5700 })], kB, 2, 500000);
+  pruefe('B', 'B62', 'Neuvermietungsmiete nicht über der Zielmiete: kein Potenzial', !!nG && nG.verfuegbar === false, nG && nG.satz);
+});
+
 /* v3005 · B55 Regionalfaktor aus dem Sachwertmodell (Hamburg 1,75, § 36 Abs. 3) · B56 Baupreisindex
    zum Wertermittlungsstichtag (§ 36 Abs. 2) · B57 GND Wohnhaus mit Mischnutzung 80 (Anlage 1) */
 (() => {
