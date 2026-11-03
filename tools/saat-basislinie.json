@@ -1,7 +1,7 @@
 {
- "stand": "2026-10-28",
- "saetze": 17489,
- "dateien": 132,
+ "stand": "2026-11-03",
+ "saetze": 18318,
+ "dateien": 144,
  "befunde": {
   "berlin.json": {},
   "bodenpreise-nrw.json": {},
@@ -36,6 +36,9 @@
   },
   "lzs-ernte-20261028-bw.json": {},
   "lzs-ernte-20261028-sh.json": {},
+  "lzs-ernte-20261028b-he.json": {},
+  "lzs-ernte-20261028c-mv.json": {},
+  "lzs-ernte-20261028e-rp.json": {},
   "lzs-he-2026.json": {},
   "lzs-ni-aurich-inseln-2026.json": {},
   "lzs-ni-mfh-landesmodell-2026.json": {},
@@ -59,6 +62,7 @@
   "lzs-swf-bw-2026-wege.json": {},
   "lzs-swf-by-2026-sperren.json": {},
   "lzs-swf-by-2026.json": {},
+  "lzs-swf-ernte-20261028d-bw.json": {},
   "lzs-swf-mv-rostock-2026-sperren.json": {},
   "lzs-swf-sh-2026.json": {},
   "lzs-swf-sl-2026.json": {},
@@ -94,22 +98,19 @@
    "modellansaetze.gnd_jahre fehlt als Zahl": 4,
    "modellansaetze.baupreisindex fehlt als Zahl": 4
   },
-  "swf-bb.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 29,
-   "modellansaetze.baupreisindex fehlt als Zahl": 27
-  },
+  "swf-bb.json": {},
   "swf-be-bb-hh-hb-2026.json": {},
   "swf-be.json": {
    "modellansaetze.gnd_jahre fehlt als Zahl": 4
   },
   "swf-bw.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 13,
-   "modellansaetze.baupreisindex fehlt als Zahl": 13
+   "modellansaetze.gnd_jahre fehlt als Zahl": 9,
+   "modellansaetze.baupreisindex fehlt als Zahl": 9
   },
-  "swf-by-bw-2026.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 36
-  },
+  "swf-by-bw-2026.json": {},
   "swf-ernte-20261028-mv.json": {},
+  "swf-ernte-20261028b-he.json": {},
+  "swf-ernte-20261028e-rp.json": {},
   "swf-he.json": {
    "modellansaetze.baupreisindex fehlt als Zahl": 15,
    "modellansaetze.gnd_jahre fehlt als Zahl": 2
@@ -136,36 +137,27 @@
    "modellansaetze.baupreisindex fehlt als Zahl": 31
   },
   "swf-nw-2026-block2.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 14,
-   "modellansaetze.baupreisindex fehlt als Zahl": 69,
+   "modellansaetze.gnd_jahre fehlt als Zahl": 4,
+   "modellansaetze.baupreisindex fehlt als Zahl": 6,
    "beleg[#] ohne Seite, Kapitel oder Datei": 24
   },
   "swf-nw-2026-block3.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 20,
-   "modellansaetze.baupreisindex fehlt als Zahl": 35
+   "modellansaetze.baupreisindex fehlt als Zahl": 4
   },
   "swf-nw-2026-block5.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 20,
-   "modellansaetze.gnd_jahre fehlt als Zahl": 3
+   "modellansaetze.gnd_jahre fehlt als Zahl": 3,
+   "modellansaetze.baupreisindex fehlt als Zahl": 6
   },
-  "swf-nw-he-2026-block4.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 21,
-   "modellansaetze.gnd_jahre fehlt als Zahl": 5
-  },
+  "swf-nw-he-2026-block4.json": {},
   "swf-rp.json": {
    "modellansaetze.baupreisindex fehlt als Zahl": 1
   },
-  "swf-sh.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 6
-  },
+  "swf-sh.json": {},
   "swf-sn.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 7,
-   "modellansaetze.gnd_jahre fehlt als Zahl": 4
+   "modellansaetze.gnd_jahre fehlt als Zahl": 4,
+   "modellansaetze.baupreisindex fehlt als Zahl": 4
   },
-  "swf-st.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 28,
-   "modellansaetze.baupreisindex fehlt als Zahl": 28
-  },
+  "swf-st.json": {},
   "swf-th-st-sn-mv-2026.json": {
    "modellansaetze.gnd_jahre fehlt als Zahl": 1,
    "modellansaetze.baupreisindex fehlt als Zahl": 1
@@ -177,6 +169,8 @@
   "uk-flaeche-bw-2026.json": {},
   "uk-flaeche-by-2026.json": {},
   "uk-flaeche-ernte-20261028-mv.json": {},
+  "uk-flaeche-ernte-20261028c-mv.json": {},
+  "uk-flaeche-ernte-20261103-mv.json": {},
   "uk-flaeche-funde-ernte-lzs.json": {},
   "uk-flaeche-laender-2026.json": {},
   "uk-flaeche-ni-2026.json": {},
@@ -197,6 +191,8 @@
   "uk-irw-nw-sauerland-siegerland-2026.json": {},
   "uk-wgfz-bielefeld-2026.json": {},
   "uk-wgfz-bw-2026.json": {},
+  "uk-wgfz-ernte-20261028b-nw.json": {},
+  "uk-wgfz-ernte-20261103-he.json": {},
   "uk-wgfz-laender-2026.json": {},
   "uk-wgfz-nw-2026.json": {},
   "uk-wgfz-nw2-2026.json": {},
@@ -208,6 +204,8 @@
   "vgf-bw-2026.json": {},
   "vgf-bw-konstanz-2026.json": {},
   "vgf-by-2026.json": {},
+  "vgf-ernte-20261028c-be.json": {},
+  "vgf-ernte-20261028e-rp.json": {},
   "vgf-hb-2026.json": {},
   "vgf-he-2026.json": {},
   "vgf-hh-2026.json": {},
