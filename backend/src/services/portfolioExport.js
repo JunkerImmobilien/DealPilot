@@ -91,7 +91,7 @@ function _verlaufPunkt(x) {
   return {
     datum: x.created_at, bericht_id: x.report_id,
     wert_stufe: x.wert_stufe != null ? Number(x.wert_stufe) : null,
-    wertermittlungsstichtag: x.wertermittlungsstichtag || null,
+    wertermittlungsstichtag: (function () { const w = x.wertermittlungsstichtag; if (!w) return null; try { const o = JSON.parse(w); return o && typeof o === 'object' ? (o.datum || null) : w; } catch (e) { return w; } })(),   /* v3157a: kam als JSON-Text */
     marktwert_eur: _zahl(x.market_value), marktwert_von: _zahl(x.market_value_low), marktwert_bis: _zahl(x.market_value_high),
     eur_pro_qm: _zahl(x.median_sqm), wohnflaeche: _zahl(x.living_area), baujahr: x.build_year || null,
     ertragswert: ew != null ? { eur: ew, von: _zahl(x.ertragswert_von_eur), bis: _zahl(x.ertragswert_bis_eur), bezeichnung: x.ertragswert_bezeichnung || null,
@@ -99,7 +99,7 @@ function _verlaufPunkt(x) {
     sachwert: sw != null ? { eur: sw, gebaeude_eur: _zahl(x.sw_gebaeude_eur), faktor: _zahl(x.sw_faktor), faktor_stufe: x.swf_stufe || null,
       faktor_grund: x.sw_faktor_grund || null, marktangepasst: x.sw_marktangepasst === true, vorlaeufig: x.sachwert_vorlaeufig === true } : null,
     bodenwert_eur: _zahl(x.sw_bodenwert_eur),
-    vergleichswert: (vw != null || _zahl(x.irw_vergleichswert_eur) != null) ? { eur: vw, amtlich: _zahl(x.vergleichsfaktor_amtlich) != null,
+    vergleichswert: (vw != null || _zahl(x.irw_vergleichswert_eur) != null) ? { eur: vw, amtlich: x.vergleichsfaktor_amtlich === true,   /* v3157a: boolean, nicht Zahl */
       irw_eur: _zahl(x.irw_vergleichswert_eur), ausschuss: x.vergleich_ausschuss || null, hinweis: x.vergleich_hinweis || null } : null,
     lzs: x.lzs_pct != null ? { pct: _zahl(x.lzs_pct), stufe: x.lzs_stufe || null, zweig: x.lzs_zweig || null, jahr: x.lzs_berichtsjahr || null, aus_register: x.lzs_aus_register === true } : null,
     rnd_jahre: _zahl(x.sw_rnd_jahre), gnd_jahre: _zahl(x.gnd_jahre),
