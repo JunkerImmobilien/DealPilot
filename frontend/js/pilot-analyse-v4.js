@@ -85,6 +85,8 @@
       '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-rail .dp-pa-tab.active{color:#2A2727 !important;border-bottom-color:var(--wl-c9a84c,#C9A84C) !important}',
       '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-content{width:auto !important;min-width:0 !important}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-mt{margin-top:12px}',
+      /* gemessen bei 390 px: die Tafel der Zielerreichung (jahresstaende.js) stand 78 px über den Rand - quer scrollen wie die übrigen Tafeln */
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-ziel{overflow-x:auto;max-width:100%}',
       '.dp-pa4-kopf{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}',
       '.dp-pa4-reihe{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}',
       '.dp-pa4-phase{font:600 12px "Space Grotesk",Inter,sans-serif;padding:6px 12px;border-radius:8px;background:#FBF6E9;color:#2A2727;white-space:nowrap}',
