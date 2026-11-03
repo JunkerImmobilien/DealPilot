@@ -741,7 +741,7 @@
               + '<td style="white-space:nowrap">' + _esc(r.datum) + '</td>'
               /* v3155b · Betrag von Hand korrigierbar - gemessen: die KI fasste Übernachtung und Frühstück zu einer Zeile zusammen,
                  Abwählen half dort nicht; die Gegenprobe zeigt sofort, ob es danach passt */
-              + '<td class="num"><input type="text" inputmode="decimal" value="' + _fmtEur(r.brutto) + '" onchange="DealPilotBelegImport._betrag(' + i + ',this.value)" title="Betrag korrigieren" style="width:86px;text-align:right;font:600 12.5px Inter,sans-serif;padding:3px 5px;border:1px solid #ddd;border-radius:5px' + (r.hand ? ';border-color:var(--wl-c9a84c, #C9A84C)' : '') + '"> €' + (r.hand ? '<div class="bi-k">von Hand (gelesen ' + _fmtEur(r.hand) + ' €)</div>' : '') + '</td>'
+              + '<td class="num"><input type="text" inputmode="decimal" value="' + _fmtEur(r.brutto) + '" onchange="DealPilotBelegImport._betragSetzen(' + i + ',this.value)" title="Betrag korrigieren" style="width:86px;text-align:right;font:600 12.5px Inter,sans-serif;padding:3px 5px;border:1px solid #ddd;border-radius:5px' + (r.hand ? ';border-color:var(--wl-c9a84c, #C9A84C)' : '') + '"> €' + (r.hand ? '<div class="bi-k">von Hand (gelesen ' + _fmtEur(r.hand) + ' €)</div>' : '') + '</td>'
               + '<td><select onchange="DealPilotBelegImport._kat(' + i + ',this.value)">' + opts(r.kategorie) + '</select><div class="bi-k">→ ' + _esc(ziel) + '</div></td></tr>';
           }).join('') + '</tbody></table>'
         + (idx.length ? '<div class="bi-k" style="margin-top:6px">Aussteller: ' + _esc(_rows[idx[0]].aussteller) + '</div>' : '');
@@ -760,7 +760,7 @@
 
   function _keep(i, v) { if (_rows[i]) { _rows[i].keep = !!v; _render(); } }   /* v3155: Leiste, Gegenprobe und Ziel ziehen mit */
   function _kat(i, v)  { if (_rows[i]) { _rows[i].kategorie = v; _render(); } }
-  function _betrag(i, v) {   /* v3155b */
+  function _betragSetzen(i, v) {   /* v3155b · eigener Name: _betrag ist die Liste der Rechnungsbetraege */
     var r = _rows[i]; if (!r) return;
     var n = _parseDe(v); if (!isFinite(n)) { _render(); return; }
     if (r.hand == null && Math.abs(n - r.brutto) > 0.004) r.hand = r.brutto;
@@ -1065,6 +1065,6 @@
     /* v3120 · der gemeinsame Eingang (unterlagen-eingang.js) übergibt erkannte Rechnungen direkt */
     oeffnenMit: function (files, modus) { open(modus || 'wk'); if (files && files.length) setTimeout(function () { _onPick(files); }, 50); },
     _keep: _keep, _kat: _kat,
-    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle, _betrag: _betrag
+    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle, _betragSetzen: _betragSetzen
   };
 })();
