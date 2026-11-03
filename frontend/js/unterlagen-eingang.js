@@ -72,6 +72,7 @@
     [/rechnungs\s*-?\s*(nummer|nr\.?|datum)/i, /\brechnung\b/i, /quittung|betrag dankend erhalten/i, /zahlbar (bis|innerhalb)|zahlungsziel|f(ä|ae)llig am/i,
      /ust\.?-?\s*id|steuer-?nr|umsatzsteuer|mwst|mehrwertsteuer|19\s*%/i, /grundsteuerbescheid|beitragsrechnung|versicherungsschein/i].forEach(function (r) { if (r.test(t)) treffer++; });
     if (/rechnung|quittung|beleg|invoice/i.test(n)) treffer++;
+    if (/quittung|betrag dankend erhalten/i.test(t)) treffer++;   /* v3120c · eine Quittung ist eindeutig - gemessen: Schornsteinfeger-Quittung kam nur auf 2 */
     return treffer >= 3;
   }
   function belegeAuslesen(files) {
