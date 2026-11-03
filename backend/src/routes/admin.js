@@ -381,7 +381,8 @@ router.get('/users', requireAdmin, async (req, res) => {
         u.last_login_at, u.created_at, u.email_verified_at,
         COALESCE(p.id, 'free') AS plan_id,
         COALESCE(p.name, 'Free') AS plan_name,
-        (SELECT COUNT(*) FROM objects WHERE user_id = u.id) AS object_count
+        (SELECT COUNT(*) FROM objects WHERE user_id = u.id) AS object_count,
+        (SELECT COALESCE(SUM(sekunden), 0) FROM nutzer_aktivitaet WHERE user_id = u.id AND tag > CURRENT_DATE - 30)::int AS online_30d_s
       FROM users u
       LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
       LEFT JOIN plans p ON p.id = s.plan_id
@@ -1027,7 +1028,26 @@ router.get('/users/:id', requireAdmin, async (req, res) => {
       ORDER BY created_at DESC LIMIT 20
     `, [req.params.id]);
 
-    res.json({ user: result.rows[0], audit: auditRows.rows });
+    /* v3095 · Online-Dauer (nutzer_aktivitaet): Summen und die letzten 14 Tage */
+    let online = null;
+    try {
+      const sum = await db.query(`
+        SELECT
+          COALESCE(SUM(sekunden) FILTER (WHERE tag = (NOW() AT TIME ZONE 'Europe/Berlin')::date), 0)::int AS heute_s,
+          COALESCE(SUM(sekunden) FILTER (WHERE tag > CURRENT_DATE - 7), 0)::int  AS tage7_s,
+          COALESCE(SUM(sekunden) FILTER (WHERE tag > CURRENT_DATE - 30), 0)::int AS tage30_s,
+          COALESCE(SUM(sekunden), 0)::int AS gesamt_s,
+          COALESCE(SUM(sitzungen) FILTER (WHERE tag > CURRENT_DATE - 30), 0)::int AS sitzungen30,
+          COUNT(*) FILTER (WHERE tag > CURRENT_DATE - 30)::int AS tage_aktiv30,
+          MIN(tag) AS seit, MAX(letzter_puls) AS zuletzt
+        FROM nutzer_aktivitaet WHERE user_id = $1`, [req.params.id]);
+      const tage = await db.query(`
+        SELECT tag, sekunden, sitzungen FROM nutzer_aktivitaet
+        WHERE user_id = $1 ORDER BY tag DESC LIMIT 14`, [req.params.id]);
+      online = Object.assign({}, sum.rows[0], { tage: tage.rows });
+    } catch (e) { online = null; }
+
+    res.json({ user: result.rows[0], audit: auditRows.rows, online });
   } catch (err) {
     console.error('[admin/users/:id] error:', err);
     res.status(500).json({ error: 'server_error', message: err.message });

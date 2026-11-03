@@ -700,18 +700,27 @@
     }
   }
 
+  /* v3095 · Online-Dauer: Sekunden → „2 h 05 min“ / „14 min“ / „–“ */
+  function fmtDauer(s) {
+    s = Number(s);
+    if (!Number.isFinite(s) || s < 60) return '<span style="color:var(--text-light)">–</span>';
+    const min = Math.round(s / 60);
+    if (min < 60) return min + ' min';
+    return Math.floor(min / 60) + ' h ' + String(min % 60).padStart(2, '0') + ' min';
+  }
+
   // ── User-Liste mit Test-Badge ─────────────────────────
   async function loadUsers() {
     const q = $('#user-search').value.trim();
     const plan = $('#filter-plan').value;
     const status = $('#filter-status').value;
     const tbody = $('#users-list');
-    tbody.innerHTML = '<tr><td colspan="7">Lädt…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8">Lädt…</td></tr>';
     $('#users-error').style.display = 'none';
     try {
       const r = await API.listUsers({ q, plan, status, limit: 100, offset: 0 });
       if (!r.users || r.users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted)">Keine User gefunden</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="color:var(--text-muted)">Keine User gefunden</td></tr>';
         return;
       }
       tbody.innerHTML = r.users.map(u => `
@@ -722,6 +731,7 @@
           <td><span class="pill ${u.is_active ? 'pill-active' : 'pill-inactive'}">${u.is_active ? 'Aktiv' : 'Gesperrt'}</span></td>
           <td>${u.object_count || 0}</td>
           <td>${u.last_login_at ? fmtDate(u.last_login_at) : '<span style="color:var(--text-light)">nie</span>'}</td>
+          <td>${fmtDauer(u.online_30d_s)}</td>
           <td><a href="#" class="row-link" data-user-id="${u.id}">Details</a></td>
         </tr>
       `).join('');
@@ -772,6 +782,12 @@
       const r = await API.getUser(id);
       const u = r.user;
       const audit = r.audit || [];
+      /* v3095 · Online-Dauer (null = Tabelle fehlt noch) */
+      const on = r.online;
+      const onlineHtml = !on ? '' : `
+            <div class="user-info-row"><div class="user-info-label">Online</div><div class="user-info-value">heute ${fmtDauer(on.heute_s)} · 7 T. ${fmtDauer(on.tage7_s)} · 30 T. ${fmtDauer(on.tage30_s)}</div></div>
+            <div class="user-info-row"><div class="user-info-label">Online (30 T.)</div><div class="user-info-value">${on.tage_aktiv30 || 0} Tage aktiv · ${on.sitzungen30 || 0} Sitzungen${on.seit ? ' · gemessen seit ' + fmtDate(on.seit) : ''}</div></div>
+            ${(on.tage || []).length ? '<div class="user-info-row"><div class="user-info-label">Letzte Tage</div><div class="user-info-value" style="font-size:0.85em">' + on.tage.map(function (t) { return fmtDate(t.tag) + ': ' + fmtDauer(t.sekunden); }).join('<br>') + '</div></div>' : ''}`;
 
       /* v859-plan-filter + v11-partner-plan: Starter/Investor/Pro/Partner (Partner garantiert) */
       var _pById = {}; (window._plans || []).forEach(function(p){ _pById[p.id] = p; });
@@ -795,6 +811,7 @@
             <div class="user-info-row"><div class="user-info-label">2FA aktiv</div><div class="user-info-value">${u.totp_enabled ? '✓ Ja' : '✗ Nein'}</div></div>
             <div class="user-info-row"><div class="user-info-label">Registriert</div><div class="user-info-value">${fmtDate(u.created_at)}</div></div>
             <div class="user-info-row"><div class="user-info-label">Letzter Login</div><div class="user-info-value">${u.last_login_at ? fmtDate(u.last_login_at) : '<span style="color:var(--text-light)">nie</span>'}</div></div>
+            ${onlineHtml}
             <div class="user-info-row"><div class="user-info-label">Objekte</div><div class="user-info-value">${u.object_count || 0}</div></div>
             <div class="user-info-row"><div class="user-info-label">KI-Credits</div><div class="user-info-value">${u.credits_used != null ? `${u.credits_used} verbraucht / ${u.bonus_credits || 0} Bonus` : '–'}</div></div>
             ${u.stripe_subscription_id ? `<div class="user-info-row"><div class="user-info-label">Stripe-Sub-ID</div><div class="user-info-value" style="font-family:monospace;font-size:0.85em">${escapeHtml(u.stripe_subscription_id)}</div></div>` : ''}
