@@ -326,6 +326,27 @@ function collectData() {
      Mietpreisbremse … dass das mit rübergeht für jedes Objekt". _marktdaten = { zensus, kappung, mietpreisbremse,
      marktmiete } je mit Stand; gesetzt von potenzial.js und mb-abgleich.js über dpMarktdatenMerken(). */
   try { if (window._dpMarktdaten && window._dpMarktdaten.fuer && window._dpMarktdaten.fuer === window._currentObjKey) d._marktdaten = window._dpMarktdaten; } catch (e) {}
+  /* v3159 · Protokoll Portfolio-Strategie 03.11.2026 (P2): einheiten[].soll_berechnet - die Soll-Miete je Einheit
+     nach § 558 (Kappung, Vergleichsmiete, Termine verlangbar/wirksam, Sperrfrist) und die Umlage § 559, wie die App
+     sie zeigt. Dieselbe Zusammenstellung wie im Reiter (DpPotenzial.modell -> Kern sollFuer), keine zweite Rechnung. */
+  try {
+    if (window.DpPotenzial && typeof window.DpPotenzial.modell === 'function') {
+      var _pm = window.DpPotenzial.modell(), _ws = (_pm && _pm.wohnungen) || [];
+      if (_ws.length) d._soll_einheiten = { stand: new Date().toISOString().slice(0, 10), einheiten: _ws.map(function (w) {
+        var so = w.soll || {}, te = so.termine || {}, u = so.umlage559 || null;
+        var um = u && u.monat > 0 ? u.monat : 0;
+        return { nr: w.nr || null, lage: w.lage || null, art: w.art || null, wfl: w.wfl || null, status: w.status || null,
+          ist_monat: w.ist != null ? w.ist : null,
+          soll_monat: so.miete != null ? so.miete : null,
+          soll558_monat: so.miete != null ? Math.max(w.ist || 0, so.miete - um) : null,
+          umlage559: u, grenze: so.grenze || null, herkunft: so.herkunft || null,
+          verlangbar_ab: so.verlangbar_ab || te.verlangbar_ab || null, wirksam_ab: so.ab || te.wirksam_ab || null,
+          termine_text: so.ab_text || te.text || null, sperre: te.sperre || null, hinweise: so.hinweise || [],
+          vertrag: so.vertrag || null, mv_art: w.mv_art || null, letzte: w.letzte || null, letzte_betrag: w.letzte_betrag || null,
+          ziel_monat: w.ziel != null ? w.ziel : null, ziel_qm: w.ziel_qm || null, ziel_wann: w.ziel_wann || null };
+      }) };
+    }
+  } catch (e) {}
   /* v2214 · DIE JAHRESWERTE DER ANLAGE V (tax.js _taxYearlyOverrides).
      Gemessen 14.10.2026: sie lebten NUR im Fenster. Kein Ladeweg stellte sie
      wieder her, beim Objektwechsel wanderten sie ins naechste Objekt, und nach

@@ -69,6 +69,30 @@ router.get('/portfolio-export', async (req, res, next) => {
 /**
  * GET /objects/:id - get full object data
  */
+/* v3159 · Schnittstellen-Prüfung 03.11.2026: das Objektwissen (objektWissen.js, v3025) hatte keinen Endpunkt -
+   nur Co-Pilot und Bot lasen es. GET /objects/:id/wissen?jahr=2026 liefert dieselbe Fassung: Unterlagen
+   (Risiken, WEG, Anteil, offene Fragen), Potenzial im Jahr (§ 558/§ 559 aus _potenzial) und To-dos. Nichts wird
+   neu gerechnet. */
+router.get('/:id/wissen', validate({ params: idParamSchema }), async (req, res, next) => {
+  try {
+    const obj = await objectService.getById(req.user.id, req.params.id);
+    if (!obj) return res.status(404).json({ error: 'Object not found' });
+    let d = obj.data;
+    if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } }
+    const ow = require('../services/objektWissen');
+    const heute = new Date();
+    const jahr = Number(req.query.jahr) || heute.getFullYear();
+    const sicher = (f) => { try { return f(); } catch (e) { return { fehler: String(e && e.message || e).slice(0, 120) }; } };
+    res.json({
+      id: obj.id, adresse: ow.adresse(d || {}), stand: obj.updated_at, jahr: jahr,
+      unterlagen: sicher(() => ow.unterlagen(d || {})) || null,
+      potenzial: sicher(() => ow.potenzial(d || {}, jahr, heute)) || null,
+      todos: sicher(() => ow.todos(d || {})) || null,
+      hinweis: 'Gelesen, was die App am Objekt abgelegt hat - kein Wert neu ermittelt. Namen in Unterlagen sind geschwärzt.'
+    });
+  } catch (err) { next(err); }
+});
+
 router.get('/:id', validate({ params: idParamSchema }), async (req, res, next) => {
   try {
     let obj = await objectService.getById(req.user.id, req.params.id);
