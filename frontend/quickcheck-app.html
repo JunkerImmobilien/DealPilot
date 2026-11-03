@@ -5753,6 +5753,9 @@ const QcApp = (function() {
       '.qcb-zk .v{font:700 17px "Space Grotesk",sans-serif;margin:2px 0}',
       '.qcb-zk .u,.qcb-fuss{font-size:11.5px;color:#7A7370}',
       '.qcb-fuss{margin:7px 0 0;line-height:1.45}',
+      '.qcb-zk2{display:grid;grid-template-columns:1fr auto;gap:0 12px;align-items:baseline;margin-top:8px;padding-top:8px;border-top:1px dashed #EFE7D6;font-size:12.5px;color:#4A4542}',
+      '.qcb-zk2 b{font:600 14px "Space Grotesk",sans-serif;color:#2A2727;white-space:nowrap}',
+      '.qcb-zk2 small{grid-column:1/-1;font-size:11.5px;color:#7A7370}',
       '.qcb-fuss a{color:var(--wl-b8932f,#b8932f)}',
       '.qcb-miete{display:grid;grid-template-columns:1fr auto;gap:3px 14px;align-items:center}',
       '.qcb-miete .v{font:600 16px "Space Grotesk",sans-serif;text-align:right;white-space:nowrap}',
@@ -5778,6 +5781,26 @@ const QcApp = (function() {
     ].join('');
     document.head.appendChild(s);
   }
+  /* v3096 · Zweite Stufe des Zielkaufpreises zurück in die Karte (Marcel 03.11.2026: „ja“).
+     Seit v3081 stand sie nur im ausgeblendeten Mietpotenzial-Block. Eine Zeile unter
+     den Grenzen, nur wenn die zulässige Miete in 3 Jahren über der heutigen liegt.
+     Gerechnet wird nichts Neues: QcHeuristik.zielKaufpreisZweistufig wie in v3075. */
+  function _qcbZweiteStufe(score, inputs, D, kp, e0) {
+    try {
+      const mp = score && score.kpi && score.kpi.mietpot;
+      if (!mp || !mp.zul || !(mp.nkm_3j > mp.nkm_heute + 0.5) || !(kp > 0)) return '';
+      if (!(window.QcHeuristik && QcHeuristik.zielKaufpreisZweistufig)) return '';
+      const san = Math.max(0, QcEngine.num(inputs.san) || 0);
+      const z = QcHeuristik.zielKaufpreisZweistufig({ kp: kp, nkm: mp.nkm_heute, nkmZul: mp.nkm_3j, san: san,
+        zielBmr: D.zielBmr, marktwert: D.marktwert, cfMon: D.cfMon, dscr: D.dscr });
+      if (!z || z.nach3 == null) return '';
+      const v = z.nach3 >= kp ? kp : Math.floor(z.nach3 / 1000) * 1000;
+      const nl = z.nach3 >= kp ? 'kein Nachlass nötig' : 'Nachlass ' + e0(kp - v) + ' (' + Math.round((1 - v / kp) * 100) + ' %)';
+      return '<div class="qcb-zk2"><span>Mit zulässiger Miete in 3 Jahren</span><b>' + e0(v) + '</b><small>' + nl + ' · Miete '
+        + e0(mp.nkm_heute) + ' → ' + e0(mp.nkm_3j) + ' im Monat, höchstens Marktwert</small></div>';
+    } catch (_) { return ''; }
+  }
+
   function _renderBewertungNeu(score, inputs, urteil, pros, cons) {
     const card = document.getElementById('ai-card'); if (!card) return;
     _qcbStil();
@@ -5858,7 +5881,7 @@ const QcApp = (function() {
           + zk('Rendite-Ziel ' + (lk ? lk + '-Lage' : '(ohne Lageklasse)'), T.rendite, 'rendite', zr + ' brutto')
           + zk('Cashflow null · deine Finanzierung', T.cashflow, 'cashflow', '')
           + (T.markt != null ? zk('Marktwert', T.markt, 'markt', '') : '')
-          + `</div><p class="qcb-fuss">Verhandlungsrahmen, kein Wert.${T.greift === 'cashflow' ? ' Den Preis bremst die Finanzierung, nicht die Lage — mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.' : ''}</p></div>`;
+          + `</div>${_qcbZweiteStufe(score, inputs, D, kp, e0)}<p class="qcb-fuss">Verhandlungsrahmen, kein Wert.${T.greift === 'cashflow' ? ' Den Preis bremst die Finanzierung, nicht die Lage — mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.' : ''}</p></div>`;
       }
     } catch (_) {}
 
