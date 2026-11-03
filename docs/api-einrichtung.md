@@ -477,9 +477,6 @@ sondern höchstens 1.800 je 15 min je IP — das entspricht dem Limit des Schlü
 
 ### Noch offen (ehrlich benannt)
 
-- Mietverträge je Einheit nur der aktuelle, ohne Historie.
-- Hochgeladene Unterlagen liegen nicht auf dem Server (kein Datei-Endpunkt).
-- `einheiten[].soll_berechnet` (§ 558/§ 559 je Einheit) nur live in der App, nicht im Export.
-- Objektwissen (`objektWissen.js`) ohne eigenen Endpunkt.
-- OpenAPI-Beschreibung fehlt.
+- Hochgeladene Unterlagen liegen nicht auf dem Server (kein Datei-Endpunkt) — Entscheidung zu Ablageort und Datenschutz offen.
+- `_soll_einheiten` und `_marktdaten` entstehen beim Speichern in der App; ein Objekt, das seit v3159 nicht gespeichert wurde, hat sie noch nicht.
 
