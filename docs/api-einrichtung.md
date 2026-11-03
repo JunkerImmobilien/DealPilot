@@ -1,6 +1,9 @@
 # DealPilot-Schnittstelle — Einrichtung
 
-Stand 10.10.2026 · gemessen an Staging, nicht aus der Erinnerung geschrieben.
+Stand 03.11.2026 (v3158) · gemessen an Staging, nicht aus der Erinnerung geschrieben.
+Neu seit 10.10.: Bewertungsverlauf mit Stufen und Quellen, Beleihungswert, Bauzins-Tabelle
+(`markt.bauzins`, `/market-rates/bauzins/matrix`), Marktdaten je Objekt (`_marktdaten`),
+Lexikon für alle Einheits- und Steuerfelder, Rate-Limit für Schlüssel — Abschnitt 6.
 
 Diese Seite ist für den **anderen Chat** gedacht: sie sagt, wie man die
 Schnittstelle anspricht und was zurückkommt. **Der Schlüssel selbst steht
@@ -162,6 +165,8 @@ Die Berichte liegen in einer eigenen Datenbank und werden über
 }
 ```
 
+> **Seit v3157 trägt jeder Verlaufspunkt die ganze Wertermittlung** — siehe Abschnitt 6.
+
 > **Fehlt der Block ganz**, hat das Objekt keinen Marktbericht.
 > **Steht im Kopf `marktbericht_fehler`**, war der Dienst nicht
 > erreichbar — dann ist das Fehlen *keine Aussage über die Objekte*.
@@ -196,6 +201,9 @@ Aus `hinweise`, weil es sonst teuer wird:
 | `GET /marktbericht/objects` | alle Objekte **mit** Marktbericht (39 auf Staging) |
 | `GET /marktbericht/objects/history` | der **Verlauf**, ein Eintrag je Bericht (109) |
 | `GET /marktbericht/reports/one?id=…` | ein einzelner Bericht, mit Text |
+| `GET /market-rates/bauzins/matrix[?ltv=60,80,95]` | **v3157** Bauzinsen: Zinsbindung 5/10/15/20 J × Beleihung 50–110 %, Stand, Herkunft, Methode (öffentlich) |
+| `GET /market-rates/bauzins?ltv=85` | Bauzinsen für einen Beleihungsauslauf |
+| `POST /marktbericht/potenzial` | Ertragswert je Stufe live neu rechnen (Bestand, § 558, Neuvermietung, Zielbild) |
 
 Für den Normalfall reicht `/objects/portfolio-export` — es fasst alles
 zusammen.
@@ -397,3 +405,72 @@ Drei Dinge stehen schon, damit es später eine Zeile bleibt:
 
 > Eine Abrechnung, die man später an zwölf Stellen einbauen muss, wird
 > nicht eingebaut. Deshalb steht die Tür schon da — sie ist nur offen.
+
+---
+
+## 6 · Erweiterung v3157/v3158 (03.11.2026)
+
+Anlass: Abgleich mit dem Modul Portfolio-Strategie (Protokoll 03.11.2026) und Marcels Wunsch,
+dass die Schnittstelle **alles** liefert, mit Vertrauensstufe und Quelle.
+
+### `marktbericht.verlauf[]` — je Bericht die ganze Wertermittlung
+
+```jsonc
+{ "datum": "2026-11-01T11:37:09Z", "bericht_id": 411,
+  "wert_stufe": 3,                       // 1 Marktpreisindikation · 2 erweitert · 3 Wertermittlung ImmoWertV
+  "wertermittlungsstichtag": "2025-01-01",
+  "marktwert_eur": 860000, "marktwert_von": 740000, "marktwert_bis": 940000,
+  "ertragswert": { "eur": 740000, "von": null, "bis": null, "miete_ist_qm": 8.19, "miete_vergleich_qm": 7.3, "miete_stufe": "…" },
+  "sachwert": { "eur": …, "gebaeude_eur": …, "faktor": …, "faktor_stufe": "A", "vorlaeufig": false },
+  "bodenwert_eur": …,
+  "vergleichswert": { "eur": 860000, "amtlich": false, "irw_eur": null, "hinweis": "Angebotspreise …" },
+  "lzs": { "pct": 2.6, "stufe": "A", "zweig": "mfh", "jahr": "2024", "aus_register": true },
+  "rnd_jahre": …, "gnd_jahre": 80,
+  "fuehrend": { "verfahren": "ertragswert", "grund": "Renditeobjekt …", "quelle": "§ 6 Abs. 1 ImmoWertV" },
+  "indikativ": false,                    // A/B amtlich = false; C, N, D, E = true
+  "herkunft": { "stufe": "A", "kurz": "amtlich", "lang": "…", "ebene": "amtlich", "weg": null, "quelle": "…", "quelle_link": { … } },
+  "quellen_nachweis": [ … ],             // je verwendetem Registersatz: Vermerk, Lizenz, Kennzahlen, Link
+  "quellen_nachweis_markt": [ … ],
+  "beleihungswert_eur": 580000 }         // nur am jüngsten Bericht mit Ertrags- oder Sachwert
+```
+
+**Vertrauensstufen** (`herkunft.stufe`, `lzs.stufe`, `sachwert.faktor_stufe`):
+A amtlich, kreisscharf · B amtlich, regional · C eigene Ableitung bzw. amtlich mit dünner Datenbasis ·
+N DealPilot-Formel bzw. Landesmittel · D gesetzlicher Auffangwert § 256 BewG · E eigene Angabe.
+`indikativ: true` heißt: nicht amtlich objektgenau.
+
+Zusätzlich je Objekt `marktbericht.beleihungswert` = { eur, basis, bericht_id, stand, indikativ: true }
+(indikativer Check nach BelWertV, kein Gutachten).
+
+### Kopf `markt.bauzins`
+
+Tabelle **Zinsbindung × Beleihungsauslauf** für alle Objekte gleich:
+`saetze["10"]["80"] = 4.02` (Prozent p. a.). Dazu `stand`, `quelle` (live | db | static), `methode`
+(Bundesanleihe je Laufzeit + MFI-Marktaufschlag der Bundesbank + Kalibrierung + Beleihungszuschlag —
+indikativ, kein Bankangebot), `zuschlag_je_ltv`, `kalibrierung`. Einzeln abrufbar unter
+`GET /market-rates/bauzins/matrix`, eigene Beleihungsstufen mit `?ltv=65,95`.
+
+### `daten._marktdaten` — was beim letzten Rechnen galt
+
+`kappung` (Satz, Gebiet, Frist, Quelle), `mietpreisbremse` (gilt true/false/null = prüfen, bis,
+Verordnung, Link), `marktmiete`, `vergleichsmiete`, `zensus` — jeder Teil mit `stand`.
+
+### Lexikon
+
+`lexikon.strukturen` erklärt jetzt auch `_mfh.einheit` mit allen Mietvertragsfeldern (`mv_*`),
+Ziel-/Vergleichs-/Marktmiete, Modernisierung, Leerstand und Maßnahmen (`bewohnt`, `erh`),
+`_potenzial`, `_tax_overrides`, `_dok_eingang`, `_dok_auswertung`, `_marktdaten`.
+
+### Rate-Limit
+
+Anfragen mit `x-api-key` zählen nicht mehr gegen das IP-Limit für Anonyme (200 je 15 min),
+sondern höchstens 1.800 je 15 min je IP — das entspricht dem Limit des Schlüssels (120/min).
+
+### Noch offen (ehrlich benannt)
+
+- Mietverträge je Einheit nur der aktuelle, ohne Historie.
+- Hochgeladene Unterlagen liegen nicht auf dem Server (kein Datei-Endpunkt).
+- `einheiten[].soll_berechnet` (§ 558/§ 559 je Einheit) nur live in der App, nicht im Export.
+- Objektwissen (`objektWissen.js`) ohne eigenen Endpunkt.
+- OpenAPI-Beschreibung fehlt.
+
