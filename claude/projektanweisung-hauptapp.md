@@ -44254,3 +44254,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `24958246`, `e562096e`, `298bae6c`. Prod 1.0.45 = `b56c0e1`, Sicherungen `haupt-20261103-0921` und `mb-20261103-0921`, Köpfe gelesen.
 - **Nachweis:** Auf Staging wurde ein 402 nachgestellt: Die Meldung „⚠ DealPilot-Marktbewertung nicht abgerufen: …“ ist sichtbar (opacity 1, im Bild), der Pre-Flight meldet „⚠ Abruf abgeschlossen, aber nicht alles kam an …“. Prod liefert `qc-v3098a` und `dealpilot-mb-qc.js?v=v3098a` aus.
 - **Rest:** Bodenrichtwerte Bayern (N109) liegen bei Marcel.
+
+### v3099–v3099d · Pilot-Analyse Fassung 4 auf Staging (03.11.2026)
+
+- **Was:** `frontend/js/pilot-analyse-v4.js` (Hülle mit Phase, PDF, Einfach | Detail, Übersicht mit Gesamtstatement, Risiken & Szenarien mit Worst · Plan · Best, Steuer mit Tabelle nach tax.js-Gruppen, Wert gegen Plan und Index-Verlauf als SVG). ui.js `_renderAIServerAnalysis` merkt die Bausteine einzeln und übergibt an `DpPilotV4.huelle`, mit Rückfall auf die bisherige Hülle; `_dpLoadVerlauf` füttert `DpPilotV4.wertverlauf(hist)`; `_dpVerlaufWire` zeichnet den Index-Verlauf als SVG statt mit Chart.js.
+- **Commit:** `985cdfa6`, `c2ed52a3`, `fcd61e4a`, `9c9975ec`, `338d6e63`, Stand auf Staging gezogen. **Nicht Prod**, Marcel nimmt zuerst ab.
+- **Nachweis:** Parkstr. 9 (Bestand) und Lindenhof 14 (Ankauf), alle Unterreiter ohne Überlauf, 390 px ohne Seitenüberlauf, Tooltip und Fadenkreuz, Detail mit 14 Abschnitten, Steuer-Tabelle mit Wendepunkt gleich dem Steuerverlauf (2029), Konsole ohne Fehler; buster-ebenen sauber, Konstanten und Handbuch grün.
+- **Rest:** Abnahme durch Marcel (Plan als Base Case, Stil der Unterreiter-Knöpfe), danach Prod.
