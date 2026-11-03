@@ -2,7 +2,7 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "2f1a74ef2f5a42fc",
+  "index.html": "294a1de3df93e8ef",
   "tooltip-content.js": "c7e4453dda8ecdd5",
   "help.js": "adc62d5a9049af39",
   "tour-content.js": "5e8c84b4525cd4fa",
@@ -11,14 +11,14 @@ window.DP_HANDBUCH = {
   "feld-hilfe.js": "3a7e9964af3920bc",
   "mfh-einheiten.js": "acbd7bca8272b72f",
   "calc.js": "b8263e671d222c33",
-  "ui.js": "ba0e2a9c6a0c383c",
+  "ui.js": "086f5866a140f4b2",
   "pdf.js": "83b2fb88e72be57c",
   "pdf-investment-bank.js": "09aab6da82a8772e",
   "financing-pdf.js": "f6581f49c29dab13",
   "werbungskosten-pdf.js": "9a17188d51895f0e",
   "pdf-anlage-bmf.js": "bc9178281594e5de",
   "pdf-kaufpreisaufteilung.js": "33d5e894dcbc0726",
-  "frontend-konstanten.json": "4f9c208e255733e7",
+  "frontend-konstanten.json": "e5b3b2f81bce582d",
   "aufnahme.json": "433c9aa7f5c9ec56",
   "handbuch-ablaeufe.mjs": "1e4399d744b21620"
  },
