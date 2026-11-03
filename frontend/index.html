@@ -1055,6 +1055,7 @@ label.dp-required.qc-required::after {
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="dp_stufe" value="">  <!-- v3073: Detailgrad JE OBJEKT (js/detailgrad.js): 1 Einsteiger · 2 Fortgeschritten · 3 Experte; leer bei einem Bestandsobjekt = Experte -->
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
+  <input type="hidden" id="_dok_eingang" value="">  <!-- v3120: Herkunft der Steuerposten und Verlauf des Eingangs (unterlagen-eingang.js), JSON -->
   <input type="hidden" id="_dok_auswertung" value="">  <!-- v3016: Auswertung der Unterlagen (WEG, Grundbuch, Teilung), JSON - unterlagen.js -->
   <input type="hidden" id="_lage_herkunft" value="">  <!-- v2515: Herkunft je Lage-Feld (gemessen | ki | eigen), JSON -->
   <input type="hidden" id="_immometrica_id" value="">
@@ -2404,10 +2405,10 @@ label.dp-required.qc-required::after {
          Kategorien, andere Zielfelder, und das Jahr zaehlt. -->
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px">
       <button type="button" class="btn btn-sm"
-              onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open('wk')"
+              onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open('wk')"
               title="Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen als PDF oder Foto einlesen. Die KI teilt eine Hausgeldabrechnung in umlagefähige und nicht umlagefähige Kosten auf und erkennt die Rücklagenzuführung."
               style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border:1px solid var(--wl-b8932f, #b8932f);padding:8px 15px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">
-        📎 Belege &amp; Abrechnungen einlesen (KI)
+        📎 Belege, Unterlagen &amp; Rechnungen einlesen (KI)
       </button>
       <span class="hint" style="margin:0;flex:1 1 260px;min-width:220px;font-size:11.5px;line-height:1.45">
         Hausgeld, Nebenkostenabrechnung, Grundsteuer, Handwerker. Eine Hausgeldabrechnung wird
@@ -3721,7 +3722,7 @@ label.dp-required.qc-required::after {
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v3074"></script>
 <script src="js/steuer-verlauf.js?v=v2992"></script>
-<script src="js/pilot-analyse-v4.js?v=v3099j"></script><!-- v3099 · Pilot-Analyse Fassung 4 (Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
+<script src="js/pilot-analyse-v4.js?v=v3120"></script><!-- v3099 · Pilot-Analyse Fassung 4 (Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
 <script src="js/config.js?v=v3088"></script>
 <script src="js/gnotkg.js?v=v3088"></script><!-- v3088 · Notar und Grundbuch nach Gebuehrenordnung -->
 <script src="js/versionsanzeige.js?v=v3035"></script><!-- v3035: Versionsanzeige aus version.json -->
@@ -3771,7 +3772,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3099f"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3092"></script>
+<script src="js/storage.js?v=v3120"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -3803,7 +3804,7 @@ label.dp-required.qc-required::after {
 <script src="js/dokument-import.js?v=v3092"></script>
 <script src="js/unterlagen.js?v=v3089"></script>
 <script src="js/sonderumlage.js?v=v3092b"></script>
-<script src="js/beleg-import.js?v=v3089"></script>
+<script src="js/beleg-import.js?v=v3120"></script>
 <script src="js/financing.js?v=v2261"></script>
 <script src="js/financing-pdf.js?v=v2932"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
@@ -3907,7 +3908,8 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3088"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v3093a"></script>
+  <script src="js/object-actions.js?v=v3120"></script>
+  <script src="js/unterlagen-eingang.js?v=v3120"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
   <script src="js/dpsh-score-hero.js?v=v3088"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>
   <script src="js/voice-import.js?v=v3073"></script>
