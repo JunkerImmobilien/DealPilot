@@ -187,16 +187,27 @@
       })
       .replace(/(?:color|oklab|oklch|lab|lch)\([^()]*\)/g, 'rgba(0, 0, 0, 0)');
   }
+  /* v3110d · ERST ALLES LESEN, DANN ALLES SCHREIBEN. Abwechselnd lesen und
+     schreiben ließ den Browser nach jedem setProperty alle Stile neu rechnen —
+     bei dieser Seite fror der Tab ein (gemessen 03.11.2026). Unsichtbare
+     Teilbäume (display:none) werden übersprungen, sie fotografiert niemand. */
+  var FARB_RE = /(?:^|[\s,(])(?:color|oklab|oklch|lab|lch)\(/;
   function farbenGlaetten(doc) {
-    var win = doc.defaultView, alle = doc.querySelectorAll('*');
-    for (var i = 0; i < alle.length; i++) {
-      var el = alle[i], cs;
-      try { cs = win.getComputedStyle(el); } catch (e) { continue; }
-      for (var j = 0; j < FARB_PROPS.length; j++) {
-        var v = cs.getPropertyValue(FARB_PROPS[j]);
-        if (v && /(?:^|[\s,(])(?:color|oklab|oklch|lab|lch)\(/.test(v)) el.style.setProperty(FARB_PROPS[j], zuRgba(v), 'important');
-      }
-    }
+    var win = doc.defaultView, aend = [];
+    var pruefe = function (el) {
+        var cs; try { cs = win.getComputedStyle(el); } catch (e) { return 3; }
+        if (cs.display === 'none') return 2;   /* FILTER_REJECT: ganzen Teilbaum auslassen */
+        for (var j = 0; j < FARB_PROPS.length; j++) {
+          var v = cs.getPropertyValue(FARB_PROPS[j]);
+          if (v && FARB_RE.test(v)) aend.push([el, FARB_PROPS[j], zuRgba(v)]);
+        }
+        return 1;
+    };
+    [doc.documentElement, doc.body].forEach(function (el) { if (el) pruefe(el); });   /* Wurzel und body besucht der TreeWalker nicht */
+    var gang = doc.createTreeWalker(doc.body || doc.documentElement, 1, { acceptNode: pruefe });
+    while (gang.nextNode()) { /* nur sammeln */ }
+    for (var i = 0; i < aend.length; i++) aend[i][0].style.setProperty(aend[i][1], aend[i][2], 'important');
+    return aend.length;
   }
   /* Rückfall: die Bildschirmaufnahme des Browsers (fragt einmal nach, zeigt aber
      genau das, was man sieht — auch den Inhalt von iframes). Braucht einen Klick. */
