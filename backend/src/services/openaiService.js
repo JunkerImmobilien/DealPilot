@@ -4129,6 +4129,9 @@ const _WK_PROMPT =
   /* v3154e · Gegenprobe im Browser: Summe der Positionen gegen den ausgewiesenen Rechnungsbetrag */
   '- "rechnungsbetrag" ist der auf der Seite ausgewiesene Gesamt-/End-/Rechnungsbetrag BRUTTO des Belegs ' +
   '(nicht der bereits gezahlte Teilbetrag), sonst null. Er ist KEINE eigene Position.\n' +
+  /* v3154f · gemessen: „Accommodation -24,00" kam als +24,00 - die Positionen ergaben 48 € zu viel */
+  '- VORZEICHEN: Minusbetraege, Abzuege, Rabatte und Korrekturen ("-24,00") als NEGATIVE Zahl uebernehmen. ' +
+  'Zahlungszeilen (Kartenzahlung, Visa, bar, Anzahlung, Gutschein/Reward als Zahlungsmittel) sind KEINE Position.\n' +
   '- HAUSGELD- ODER NEBENKOSTENABRECHNUNG? Dann NICHT eine Summe zurueckgeben, sondern AUFTEILEN. ' +
   'Solche Abrechnungen weisen die Aufteilung fast immer selbst aus - such nach Spalten oder Abschnitten ' +
   'wie "umlagefaehig"/"umlegbar"/"auf Mieter umlagefaehig" gegen "nicht umlagefaehig"/"nicht umlegbar" ' +
