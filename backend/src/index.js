@@ -380,6 +380,7 @@ app.use('/api/v1/track', rateLimit({ windowMs: 60000, max: 120 }), require('./ro
 app.use('/api/v1/public/stats', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/publicStats'));
 app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
+app.use('/api/v1/dateien', require('./routes/dateien'));  // v3162 · Unterlagen-Ablage (Ordner, Grenzen je Plan, verschluesselt)
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check
 app.use('/api/v1/rnd-request', rndRequestRoutes);  // V186: RND-Wizard-Anfrage
 app.use('/api/v1/passes', passesRoutes);  // qb-shared-pass

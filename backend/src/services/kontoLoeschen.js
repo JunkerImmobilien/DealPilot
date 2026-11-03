@@ -73,6 +73,8 @@ async function loeschen(userId, email) {
   bericht.abo_gekuendigt = await aboKuendigen(userId);
   bericht.marktbericht = await mbLoeschen(userId);
   bericht.tickets = await ticketsLoeschen(userId, email);
+  /* v3162 · die abgelegten Unterlagen vom Laufwerk (die Tabellenzeilen loescht die Kaskade) */
+  try { bericht.dateien = await require('./dateiAblage').kontoLeeren(userId); } catch (e) { bericht.dateien = false; }
   await query('DELETE FROM users WHERE id = $1', [userId]);
   return bericht;
 }

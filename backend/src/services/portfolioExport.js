@@ -759,6 +759,13 @@ async function bauen(userId, opt) {
     objekte.forEach((o) => { if (je[o.id]) o.avm_verlauf = je[o.id]; });
   } catch (e) { avmFehler = String(e && e.message || e).slice(0, 120); }
 
+  /* v3162 · abgelegte Unterlagen je Objekt (nur Liste mit Download-Adresse, kein Inhalt) */
+  try {
+    const dz = await query('SELECT id, object_id, ordner, name, mime, groesse, quelle, created_at FROM dateien WHERE user_id = $1 AND deleted_at IS NULL ORDER BY ordner, name', [userId]);
+    const je = {}; dz.rows.forEach((d) => { if (d.object_id) (je[d.object_id] = je[d.object_id] || []).push(Object.assign({}, d, { download: '/api/v1/dateien/' + d.id })); });
+    objekte.forEach((o) => { if (je[o.id]) o.dateien = je[o.id]; });
+  } catch (e) { /* Tabelle fehlt (Migration 096 noch nicht gelaufen) */ }
+
   /* v3161 · Indexreihen (VPI und Nettokaltmieten, 2020 = 100) fuer Indexmieten § 557b BGB */
   let indexreihen = null;
   try { const ir = await mbHolen('/indexreihen', userId); indexreihen = (ir && !ir.fehler) ? ir : { fehler: ir && ir.fehler }; }
