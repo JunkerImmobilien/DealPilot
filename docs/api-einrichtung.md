@@ -466,6 +466,15 @@ Ziel-/Vergleichs-/Marktmiete, Modernisierung, Leerstand und Maßnahmen (`bewohnt
 Anfragen mit `x-api-key` zählen nicht mehr gegen das IP-Limit für Anonyme (200 je 15 min),
 sondern höchstens 1.800 je 15 min je IP — das entspricht dem Limit des Schlüssels (120/min).
 
+### v3159–v3161
+
+- `daten._soll_einheiten`: je Einheit Ist, Soll, Teil § 558, Umlage § 559, Grenze, verlangbar/wirksam ab, Sperrfrist, Zielbild, Maßnahmen mit **Gewerk** aus dem Katalog.
+- `GET /objects/:id/wissen?jahr=`: Unterlagen, Potenzial im Jahr, To-dos (dieselbe Fassung wie Co-Pilot und Bot).
+- `_mfh.einheiten[].mv_historie`: frühere Mietverträge (neuester zuerst).
+- `_kpis_rs_bindung`, `_kpis_anschl_rate`, `_kpis_bindung_ende`, `_kpis_bsv_luecke`.
+- `objekte[].avm_verlauf[]` (Quelle: unabhängiger Bewertungspartner), Kopf `markt.indexreihen` (VPI, Nettokaltmieten).
+- **OpenAPI:** `/openapi.yaml` (Datei `frontend/openapi.yaml`), 16 Pfade.
+
 ### Noch offen (ehrlich benannt)
 
 - Mietverträge je Einheit nur der aktuelle, ohne Historie.

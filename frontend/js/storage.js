@@ -343,7 +343,13 @@ function collectData() {
           verlangbar_ab: so.verlangbar_ab || te.verlangbar_ab || null, wirksam_ab: so.ab || te.wirksam_ab || null,
           termine_text: so.ab_text || te.text || null, sperre: te.sperre || null, hinweise: so.hinweise || [],
           vertrag: so.vertrag || null, mv_art: w.mv_art || null, letzte: w.letzte || null, letzte_betrag: w.letzte_betrag || null,
-          ziel_monat: w.ziel != null ? w.ziel : null, ziel_qm: w.ziel_qm || null, ziel_wann: w.ziel_wann || null };
+          ziel_monat: w.ziel != null ? w.ziel : null, ziel_qm: w.ziel_qm || null, ziel_wann: w.ziel_wann || null,
+          /* v3161 · Protokoll P2: Massnahmen mit aufgeloestem Gewerk (Katalog potenzial.js) */
+          massnahmen: (Array.isArray(w.massnahmen) ? w.massnahmen : []).map(function (x) {
+            var kk = (x && x.id && window.DpPotenzial.katalog) ? window.DpPotenzial.katalog(x.id) : null;
+            return { id: x.id || null, t: x.t || null, k: x.k != null ? x.k : null, bewohnt: !!x.bewohnt, erh: x.erh != null ? x.erh : null,
+              gewerk: kk ? kk.gewerk : null, gewerk_text: kk ? kk.t : null };
+          }) };
       }) };
     }
   } catch (e) {}

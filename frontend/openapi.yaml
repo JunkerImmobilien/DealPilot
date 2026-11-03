@@ -1,0 +1,250 @@
+openapi: 3.0.3
+# v3161 · DealPilot-Schnittstelle (Stand 03.11.2026). Gepflegt von Hand neben docs/api-einrichtung.md -
+# wer einen Endpunkt aendert, zieht diese Datei nach. Ausfuehrlich mit Beispielen: docs/api-einrichtung.md.
+info:
+  title: DealPilot API
+  version: "1.0.0 (v3161)"
+  description: |
+    Dieselbe REST-API wie die App, angesprochen mit einem API-Schlüssel (Planmerkmal api_access:
+    Pro und Partner). Alle Beträge in Euro, Mieten pro MONAT, Flächen in m². Ein fehlender Wert
+    ist fehlend, nicht null.
+
+    Vertrauensstufen der Wertermittlung (herkunft.stufe, lzs.stufe, sachwert.faktor_stufe):
+    A amtlich, kreisscharf · B amtlich, regional · C eigene Ableitung bzw. amtlich mit dünner
+    Datenbasis · N DealPilot-Formel bzw. Landesmittel · D gesetzlicher Auffangwert § 256 BewG ·
+    E eigene Angabe. indikativ = true heißt: nicht amtlich objektgenau.
+
+    Limits: 120 Aufrufe je Minute und Schlüssel.
+servers:
+  - url: https://app.dealpilot.immo/api/v1
+    description: Produktion
+  - url: https://app.staging.dealpilot.immo/api/v1
+    description: Staging
+security:
+  - apiKey: []
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: "dpk_live_… - einmal beim Anlegen gezeigt (Einstellungen › API-Schlüssel). Rechte: read, write, delete oder crud."
+  parameters:
+    objektId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  schemas:
+    Fehler:
+      type: object
+      properties:
+        error: { type: string }
+    Bauzinsmatrix:
+      type: object
+      properties:
+        stand: { type: string, example: "2026-11-02" }
+        abgerufen: { type: string, format: date-time }
+        quelle: { type: string, enum: [live, db, static, unavailable] }
+        methode: { type: string }
+        einheit: { type: string, example: "Prozent p. a., nominal" }
+        bindungen_jahre: { type: array, items: { type: integer }, example: [5, 10, 15, 20] }
+        beleihungsauslauf_pct: { type: array, items: { type: number }, example: [50, 60, 70, 80, 90, 100, 110] }
+        saetze:
+          type: object
+          description: 'saetze["10"]["80"] = Zins bei 10 Jahren Bindung und 80 % Beleihung'
+          additionalProperties: { type: object, additionalProperties: { type: number, nullable: true } }
+        zuschlag_je_ltv: { type: object, additionalProperties: { type: number } }
+    Herkunft:
+      type: object
+      properties:
+        stufe: { type: string, enum: [A, B, C, N, D, E] }
+        kurz: { type: string }
+        lang: { type: string }
+        ebene: { type: string, nullable: true }
+        unter_a: { type: boolean, nullable: true }
+        weg: { type: string, nullable: true, description: "wie es genauer geht (Ausschuss, Bericht)" }
+        quelle: { type: string, nullable: true }
+        quelle_link: { type: object, nullable: true }
+    Verlaufspunkt:
+      type: object
+      description: ein Marktbericht mit der ganzen Wertermittlung
+      properties:
+        datum: { type: string, format: date-time }
+        bericht_id: { type: integer }
+        wert_stufe: { type: integer, enum: [1, 2, 3], description: "1 Marktpreisindikation · 2 erweitert · 3 Wertermittlung ImmoWertV" }
+        wertermittlungsstichtag: { type: string, nullable: true }
+        marktwert_eur: { type: number, nullable: true }
+        marktwert_von: { type: number, nullable: true }
+        marktwert_bis: { type: number, nullable: true }
+        ertragswert: { type: object, nullable: true }
+        sachwert: { type: object, nullable: true }
+        bodenwert_eur: { type: number, nullable: true }
+        vergleichswert: { type: object, nullable: true }
+        lzs:
+          type: object
+          nullable: true
+          properties:
+            pct: { type: number }
+            stufe: { type: string }
+            zweig: { type: string }
+            jahr: { type: string }
+            aus_register: { type: boolean }
+        rnd_jahre: { type: number, nullable: true }
+        gnd_jahre: { type: number, nullable: true }
+        fuehrend: { type: object, nullable: true, properties: { verfahren: { type: string }, grund: { type: string }, quelle: { type: string } } }
+        indikativ: { type: boolean, nullable: true }
+        herkunft: { $ref: '#/components/schemas/Herkunft' }
+        quellen_nachweis: { type: array, items: { type: object } }
+        quellen_nachweis_markt: { type: array, items: { type: object } }
+        beleihungswert_eur: { type: number, nullable: true }
+    Objekt:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        daten:
+          type: object
+          description: |
+            Der gespeicherte Datensatz: 225 Formularfelder plus Strukturen - _mfh (Einheiten mit allen
+            Mietvertragsfeldern mv_*, mv_historie), _potenzial, _soll_einheiten, _marktdaten,
+            _tax_overrides, _dok_eingang, _dok_auswertung, _kpis_* (u. a. _kpis_rs_bindung,
+            _kpis_anschl_rate, _kpis_bindung_ende). Erklärt im lexikon des Exports.
+        analyse: { type: object, nullable: true }
+        marktbericht:
+          type: object
+          nullable: true
+          properties:
+            stand: { type: object }
+            verlauf: { type: array, items: { $ref: '#/components/schemas/Verlaufspunkt' } }
+            beleihungswert: { type: object, nullable: true }
+        avm_verlauf:
+          type: array
+          items:
+            type: object
+            properties:
+              datum: { type: string, format: date-time }
+              quelle: { type: string, example: "unabhängiger Bewertungspartner" }
+              marktwert_eur: { type: number }
+              von_eur: { type: number }
+              bis_eur: { type: number }
+              marktmiete_eur_monat: { type: number }
+              eur_pro_qm: { type: number }
+              sicherheit: { type: string, nullable: true }
+paths:
+  /objects/portfolio-export:
+    get:
+      summary: Alles in einem Aufruf - alle Objekte, Bewertungsverlauf, Marktdaten, Lexikon, Wissen
+      parameters:
+        - { name: fotos, in: query, schema: { type: string, enum: ["1"] }, description: "1 = Fotos mitliefern (groß)" }
+      responses:
+        "200":
+          description: Export
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dealpilot_export: { type: string, example: portfolio }
+                  format_version: { type: integer, example: 1 }
+                  erzeugt_am: { type: string, format: date-time }
+                  markt:
+                    type: object
+                    properties:
+                      bauzins: { $ref: '#/components/schemas/Bauzinsmatrix' }
+                      indexreihen: { type: object, description: "VPI und Nettokaltmieten, 2020 = 100" }
+                  anzahl_objekte: { type: integer }
+                  objekte_mit_marktbericht: { type: integer }
+                  marktbericht_fehler: { type: string, nullable: true }
+                  lexikon: { type: object }
+                  wissen: { type: object }
+                  objekte: { type: array, items: { $ref: '#/components/schemas/Objekt' } }
+  /objects:
+    get:
+      summary: Liste der Objekte (Kurzform)
+      responses: { "200": { description: Liste } }
+  /objects/{id}:
+    get:
+      summary: Ein Objekt roh
+      parameters: [ { $ref: '#/components/parameters/objektId' } ]
+      responses: { "200": { description: Objekt }, "404": { description: nicht gefunden } }
+  /objects/{id}/wissen:
+    get:
+      summary: Objektwissen - Unterlagen (Risiken, WEG, Anteil), Potenzial im Jahr, To-dos
+      parameters:
+        - { $ref: '#/components/parameters/objektId' }
+        - { name: jahr, in: query, schema: { type: integer, example: 2026 } }
+      responses: { "200": { description: "{ id, adresse, stand, jahr, unterlagen, potenzial, todos, hinweis }" } }
+  /market-rates/bauzins/matrix:
+    get:
+      summary: Bauzinsen als Tabelle Zinsbindung × Beleihungsauslauf
+      security: []
+      parameters:
+        - { name: ltv, in: query, schema: { type: string, example: "60,80,95" }, description: eigene Beleihungsstufen in Prozent }
+      responses:
+        "200": { description: Tabelle, content: { application/json: { schema: { $ref: '#/components/schemas/Bauzinsmatrix' } } } }
+  /market-rates/bauzins:
+    get:
+      summary: Bauzinsen je Zinsbindung, optional für einen Beleihungsauslauf
+      security: []
+      parameters:
+        - { name: ltv, in: query, schema: { type: number, example: 85 } }
+      responses: { "200": { description: "Formel, Sätze je Bindung, fuer_ltv" } }
+  /market-rates/history:
+    get:
+      summary: Zeitreihe der Bundesbank-Zinsen
+      security: []
+      parameters: [ { name: months, in: query, schema: { type: integer, example: 12 } } ]
+      responses: { "200": { description: Zeitreihe } }
+  /marktbericht/objects/history:
+    get:
+      summary: Verlauf aller Marktberichte (roh, ein Eintrag je Bericht)
+      parameters:
+        - { name: key, in: query, schema: { type: string, example: "dp:<objekt-id>" } }
+        - { name: ref, in: query, schema: { type: string } }
+      responses: { "200": { description: "{ count, history[] }" } }
+  /marktbericht/reports/one:
+    get:
+      summary: Ein Marktbericht vollständig
+      parameters: [ { name: id, in: query, required: true, schema: { type: integer } } ]
+      responses: { "200": { description: Bericht } }
+  /marktbericht/potenzial:
+    post:
+      summary: Ertragswert je Stufe live neu rechnen (Bestand, Mieterhöhung § 558, Neuvermietung, Zielbild)
+      responses: { "200": { description: Ergebnis wie daten._potenzial.ergebnis } }
+  /rechenkerne:
+    get:
+      summary: Verzeichnis der Rechenkerne
+      responses: { "200": { description: Verzeichnis } }
+  /rechenkerne/rnd:
+    post:
+      summary: Restnutzungsdauer (Anlage 2 ImmoWertV, technische Gewerke)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                objekt: { type: object, description: "ein DealPilot-Datensatz (objekte[].daten)" }
+                eingabe: { type: object, description: direkt die Kern-Eingabe }
+                zweck: { type: string, enum: [afa] }
+                stichtag: { type: string, example: "2024-01-01" }
+                gnd: { type: number, example: 70 }
+      responses: { "200": { description: Restnutzungsdauer mit Rechenweg } }
+  /rechenkerne/verkehrswert:
+    post:
+      summary: Wertermittlung (Ertrags-, Sach-, Vergleichswert) mit Stufen und Quellennachweis
+      description: rechnet im Marktbericht-Dienst; dauert rund 50 Sekunden und verbraucht ein Kontingent
+      responses: { "200": { description: "volle Antwort inkl. cross_check (Stufen A–E/N, modellversion, quellen_nachweis)" } }
+  /rechenkerne/kontingent:
+    get:
+      summary: Verbleibendes Kontingent für Rechenkern-Aufrufe
+      responses: { "200": { description: Kontingent } }
+  /tax-records:
+    get:
+      summary: Fertige Steuer-Jahresrechnungen (Anlage V) aller Objekte
+      responses: { "200": { description: Liste } }
+  /tax-records/object/{object_id}:
+    get:
+      summary: Steuer-Jahresrechnungen eines Objekts
+      parameters: [ { name: object_id, in: path, required: true, schema: { type: string, format: uuid } } ]
+      responses: { "200": { description: Liste } }
