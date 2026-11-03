@@ -1903,10 +1903,20 @@ window._dpPaNeuZeichnen = function () {
   try {
     var a = window._aiAnalysis;
     if (!a || typeof a !== 'object') return;
+    /* v3154g · gemessen: nach „Zurücknehmen"/„Löschen" im Verlauf sprang die Ansicht auf „Übersicht" -
+       das Neuzeichnen setzt den ersten Unterreiter aktiv. Aktiver Reiter und Scrollstand bleiben jetzt. */
+    var _y = window.scrollY;
     ['ai-content', 'ai-mini-body'].forEach(function (id) {
       var h = document.getElementById(id);
-      if (h && h.querySelector('.dp-pa-wrap')) h.innerHTML = _renderAIServerAnalysis(a);
+      if (!h || !h.querySelector('.dp-pa-wrap')) return;
+      var akt = h.querySelector('.dp-pa-tab.active'), m = akt && String(akt.getAttribute('onclick') || '').match(/_dpPaTab\('([^']+)'/);
+      h.innerHTML = _renderAIServerAnalysis(a);
+      if (m && m[1] !== 'uebersicht' && typeof window._dpPaTab === 'function') {
+        var neu = [].slice.call(h.querySelectorAll('.dp-pa-tab')).filter(function (b) { return String(b.getAttribute('onclick') || '').indexOf("_dpPaTab('" + m[1] + "'") >= 0; })[0];
+        if (neu && neu.style.display !== 'none') { try { window._dpPaTab(m[1], neu); } catch (e) {} }
+      }
     });
+    try { window.scrollTo(0, _y); } catch (e) {}
   } catch (e) {}
 };
 
