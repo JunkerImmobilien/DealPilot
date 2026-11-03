@@ -1,0 +1,579 @@
+<title>DealPilot-Agent</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: Agent-Cockpit. Obsidian-Kopf mit Lagezeile (Takt, letzter Abruf), darunter vier Arbeitsflächen in
+   der Reihenfolge des Ablaufs (Beobachtung, Anfrage, Tracking, Aufstellung), am Ende "Was steckt dahinter".
+   Demo N113, 03.11.2026. Gold immer über --wl-<hex> (Whitelabel-Muster). */
+:root{
+  --bg:#FDFCFA; --tafel:#FFFFFF; --karte:#FBF6E9; --fg:#1d1b19; --mut:#6b6660; --linie:#e8e1d2; --gitter:#efe9dc;
+  --obs:#050505; --obs-fg:#f1ede5; --obs-mut:#a49d92;
+  --gold:var(--wl-c9a84c,#C9A84C); --gold-hi:var(--wl-e8cc7a,#E8CC7A); --gold-lo:var(--wl-b8932f,#b8932f); --gold-text:#8a6d1f;
+  --gruen:#3FA56C; --gruen-bg:#e6f3eb; --gruen-text:#2a7a4d; --rot:#B8625C; --rot-bg:#f6e7e5; --rot-text:#9a4a44; --gelb:#b88a1f; --gelb-bg:#f8efd6;
+  --linie-chart:#b8932f;
+  --f-disp:"Space Grotesk",system-ui,sans-serif; --f-body:Inter,system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --gitter:#221f1a; --obs:#000000;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --gruen-text:#6cc794; --rot-bg:#2e1715; --rot-text:#e0948d; --gelb-bg:#2b2310; --linie-chart:#d9b95c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b0a09; --tafel:#141311; --karte:#1c1914; --fg:#f1ede5; --mut:#a49d92; --linie:#2c2822; --gitter:#221f1a; --obs:#000000;
+  --gold-text:#E8CC7A; --gruen-bg:#13281c; --gruen-text:#6cc794; --rot-bg:#2e1715; --rot-text:#e0948d; --gelb-bg:#2b2310; --linie-chart:#d9b95c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:400 14px/1.55 var(--f-body);margin:0}
+.wrap{max-width:1160px;margin:0 auto;padding-block:20px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+.lbl{font:600 10.5px/1.3 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+h1,h2,h3{font-family:var(--f-disp);text-wrap:balance;margin:0}
+h2{font-size:20px} h3{font-size:15px}
+p{margin:0;max-width:72ch}
+a{color:var(--gold-text)}
+button,input,select{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,label:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.demo-hinweis{font-size:12.5px;color:var(--mut);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.demo-hinweis b{color:var(--fg)}
+
+/* Kopf */
+.kopf{background:var(--obs);color:var(--obs-fg);border-radius:16px;padding:18px 20px;display:grid;gap:14px}
+.kopf-zeile{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.kopf h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.kopf h1 span{color:var(--gold-hi)}
+.kopf p{color:var(--obs-mut);font-size:13.5px}
+.lage{display:flex;gap:8px;flex-wrap:wrap}
+.lage div{border:1px solid #2a2722;border-radius:10px;padding:8px 12px;min-width:120px}
+.lage .lbl{color:var(--obs-mut)}
+.lage b{display:block;font:600 16px var(--f-disp);color:var(--obs-fg)}
+.radar-puls{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gruen);margin-right:6px;box-shadow:0 0 0 0 rgba(63,165,108,.6);animation:puls 2.4s infinite}
+@keyframes puls{0%{box-shadow:0 0 0 0 rgba(63,165,108,.55)}70%{box-shadow:0 0 0 9px rgba(63,165,108,0)}100%{box-shadow:0 0 0 0 rgba(63,165,108,0)}}
+@media (prefers-reduced-motion:reduce){.radar-puls{animation:none}}
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav a{font:500 12.5px var(--f-disp);color:var(--obs-mut);text-decoration:none;border:1px solid #2a2722;border-radius:999px;padding:5px 12px}
+.nav a:hover{color:var(--gold-hi);border-color:var(--gold-lo)}
+
+/* Flächen */
+.flaeche{background:var(--tafel);border:1px solid var(--linie);border-radius:16px;padding:18px;display:grid;gap:16px;scroll-margin-top:12px}
+.fl-kopf{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.fl-kopf .schritt{font:600 11px var(--f-mono);color:var(--gold-text);letter-spacing:.08em}
+.fl-kopf p{color:var(--mut);font-size:13px}
+.zwei{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px}
+.zwei>*{min-width:0}
+@media (max-width:860px){.zwei{grid-template-columns:minmax(0,1fr)}}
+.kasten{border:1px solid var(--linie);border-radius:12px;padding:14px;display:grid;gap:10px;align-content:start}
+.kasten.creme{background:var(--karte);border-color:transparent}
+
+/* Segmentschalter */
+.seg{display:inline-flex;border:1px solid var(--linie);border-radius:10px;padding:3px;gap:3px;background:var(--bg);flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:7px;padding:6px 12px;font:500 13px var(--f-disp);cursor:pointer;color:var(--mut)}
+.seg button[aria-pressed="true"]{background:var(--obs);color:var(--gold-hi)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chk{display:flex;align-items:center;gap:8px;border:1px solid var(--linie);border-radius:10px;padding:7px 10px;cursor:pointer;font-size:13px}
+.chk input{accent-color:var(--gold-lo)}
+.chk small{color:var(--mut);font:500 11px var(--f-mono)}
+.felder{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.feld{display:grid;gap:4px}
+.feld input,.feld select{border:1px solid var(--linie);border-radius:8px;padding:7px 9px;background:var(--bg);width:100%;min-width:0}
+.hinweis{font-size:12.5px;color:var(--mut)}
+.warnung{border-radius:10px;padding:10px 12px;font-size:13px;display:grid;gap:6px}
+.warnung.gelb{background:var(--gelb-bg)}
+.warnung.rot{background:var(--rot-bg)}
+.warnung b{font-family:var(--f-disp)}
+
+/* Pillen */
+.pill{display:inline-flex;align-items:center;gap:4px;font:600 10.5px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 8px;white-space:nowrap}
+.p-neu{background:var(--obs);color:var(--gold-hi)}
+.p-preis{background:var(--gruen-bg);color:var(--gruen-text)}
+.p-reakt{background:var(--gelb-bg);color:var(--gold-text)}
+.p-passt{border:1px solid var(--gruen);color:var(--gruen-text)}
+.p-nein{border:1px solid var(--linie);color:var(--mut)}
+.score{font:700 12px var(--f-mono);border-radius:999px;padding:4px 8px;white-space:nowrap}
+.s-top,.s-green{background:var(--gruen-bg);color:var(--gruen-text)}
+.s-gold{background:var(--gelb-bg);color:var(--gold-text)}
+.s-red{background:var(--rot-bg);color:var(--rot-text)}
+
+/* Trefferliste */
+.treffer{display:grid;gap:8px}
+.tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;border:1px solid var(--linie);border-radius:12px;padding:11px 12px;cursor:pointer;background:var(--tafel);text-align:left;width:100%}
+.tr:hover{border-color:var(--gold-lo)}
+.tr[aria-current="true"]{border-color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}
+.tr.aus{opacity:.62}
+.tr .t{font:600 14px var(--f-disp)}
+.tr .meta{font-size:12.5px;color:var(--mut)}
+.tr .preis{text-align:right;font:600 15px var(--f-disp)}
+.tr .preis s{display:block;font:500 11.5px var(--f-mono);color:var(--mut)}
+.tr .zeile{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tr .grund{font-size:12px;color:var(--mut)}
+
+/* Preisverlauf */
+.chart-box{position:relative}
+.chart-box svg{width:100%;height:auto;display:block;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--obs);color:var(--obs-fg);font:500 12px var(--f-mono);padding:6px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-115%)}
+.verlauf-tab{width:100%;border-collapse:collapse;font-size:12.5px}
+.verlauf-tab td{padding:4px 0;border-top:1px solid var(--gitter)}
+.verlauf-tab td:last-child{text-align:right}
+
+/* Push-Vorschau */
+.push{background:var(--obs);border-radius:14px;padding:12px;display:grid;gap:8px;color:var(--obs-fg)}
+.push .bubble{background:#1b1915;border-radius:12px 12px 12px 4px;padding:10px 12px;font-size:13px;display:grid;gap:4px}
+.push .bubble b{color:var(--gold-hi);font-family:var(--f-disp)}
+.push .knopf{border:1px solid #3a352d;border-radius:8px;text-align:center;padding:6px;font:500 12.5px var(--f-disp);color:var(--gold-hi)}
+.push .kanal{font:600 10.5px var(--f-mono);color:var(--obs-mut);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}
+
+/* Mail */
+.mail{border:1px solid var(--linie);border-radius:12px;overflow:hidden}
+.mail .kopfz{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;padding:10px 12px;background:var(--karte);font-size:13px}
+.mail .kopfz span:nth-child(odd){color:var(--mut);font:500 11.5px var(--f-mono);padding-top:2px}
+.mail .kopfz span{overflow-wrap:anywhere}
+.mail pre{margin:0;padding:12px;white-space:pre-wrap;font:400 13px/1.55 var(--f-body)}
+.knoepfe{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--linie);background:var(--tafel);border-radius:9px;padding:8px 14px;font:500 13px var(--f-disp);cursor:pointer}
+.btn:hover{border-color:var(--gold-lo)}
+.btn.haupt{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));border-color:transparent;color:#1d1b19;font-weight:600}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.konto{display:flex;gap:8px;flex-wrap:wrap}
+.konto span{border:1px solid var(--linie);border-radius:9px;padding:6px 10px;font-size:12.5px}
+.konto span b{color:var(--gruen-text);font-weight:600}
+.toast{min-height:20px;font:500 12.5px var(--f-mono);color:var(--gruen-text)}
+
+/* Tracking */
+.track{display:grid;gap:10px}
+.tk{border:1px solid var(--linie);border-radius:12px;padding:12px;display:grid;gap:10px}
+.tk-kopf{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.stepper{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.stepper button{border:0;background:var(--gitter);border-radius:6px;padding:7px 4px;font:500 11.5px var(--f-disp);color:var(--mut);cursor:pointer;line-height:1.2}
+.stepper button.an{background:var(--obs);color:var(--gold-hi)}
+.stepper button.jetzt{box-shadow:0 0 0 2px var(--gold)}
+.ergebnis{font-size:12.5px;color:var(--mut);display:grid;gap:3px}
+.ergebnis b{color:var(--fg)}
+.log{display:grid;gap:0;font-size:12.5px}
+.log div{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px solid var(--gitter)}
+.log time{font:500 11.5px var(--f-mono);color:var(--mut)}
+
+/* Aufstellung */
+.tab-wrap{overflow-x:auto;border:1px solid var(--linie);border-radius:12px}
+table.auf{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+table.auf th{font:600 10.5px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut);text-align:left;padding:10px 12px;background:var(--karte)}
+table.auf td{padding:10px 12px;border-top:1px solid var(--gitter);vertical-align:top}
+table.auf td.r,table.auf th.r{text-align:right}
+table.auf small{display:block;color:var(--mut);font-size:11.5px}
+.kennz{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kennz div{border:1px solid var(--linie);border-radius:12px;padding:10px 12px}
+.kennz b{display:block;font:600 22px var(--f-disp)}
+
+/* Dahinter */
+.ablauf{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;counter-reset:a}
+.ablauf div{border:1px solid var(--linie);border-radius:12px;padding:12px;display:grid;gap:6px;align-content:start;counter-increment:a}
+.ablauf div::before{content:counter(a);font:700 13px var(--f-mono);color:var(--gold-text)}
+.ablauf p{font-size:12.5px;color:var(--mut)}
+.code{overflow-x:auto;background:var(--karte);border-radius:10px;padding:12px;font:500 12px/1.6 var(--f-mono);white-space:pre;margin:0}
+ul.l{margin:0;padding-left:18px;display:grid;gap:6px;max-width:80ch}
+ul.l li::marker{color:var(--gold-lo)}
+.stufen{display:grid;gap:10px}
+.stufe{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;border:1px solid var(--linie);border-radius:12px;padding:12px}
+.stufe .aufwand{font:600 13px var(--f-mono);color:var(--gold-text);text-align:right;white-space:nowrap}
+.stufe p{font-size:13px;color:var(--mut);grid-column:1/-1}
+.beleg{border-left:3px solid var(--gold);padding:4px 0 4px 12px;font-size:13px;display:grid;gap:3px}
+.beleg q{font-style:italic}
+.beleg small{color:var(--mut)}
+ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
+</style>
+
+<div class="wrap">
+  <div class="demo-hinweis"><span><b>Demo · Vorschlag N113</b> · keine App-Änderung. Alle Objekte, Makler, Adressen und Zahlen sind <b>erfundene Beispiele</b>.</span><span class="num">Stand 03.11.2026</span></div>
+
+  <header class="kopf">
+    <div class="kopf-zeile">
+      <div style="display:grid;gap:4px">
+        <span class="lbl" style="color:var(--obs-mut)"><span class="radar-puls"></span>Co-Pilot im Radarbetrieb</span>
+        <h1>DealPilot-<span>Agent</span></h1>
+        <p>Beobachtet deine gespeicherten ImmoMetrica-Suchen, meldet neue und günstiger gewordene Objekte, bereitet Anfragen vor und rechnet die Unterlagen durch.</p>
+      </div>
+      <div class="lage">
+        <div><span class="lbl">Takt</span><b id="k-takt">stündlich</b></div>
+        <div><span class="lbl">Nächster Abruf</span><b id="k-naechst" class="num">15:00</b></div>
+        <div><span class="lbl">Neu / gesenkt</span><b id="k-neu" class="num">–</b></div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Abschnitte">
+      <a href="#beobachtung">1 · Beobachtung</a><a href="#anfrage">2 · Anfrage</a><a href="#tracking">3 · Tracking</a><a href="#aufstellung">4 · Aufstellung</a><a href="#dahinter">Was steckt dahinter</a>
+    </nav>
+  </header>
+
+  <!-- 1 BEOBACHTUNG -->
+  <section class="flaeche" id="beobachtung">
+    <div class="fl-kopf"><div><span class="schritt">SCHRITT 1</span><h2>Beobachtung</h2></div><p>Abruf der Treffer, Vergleich mit dem letzten gespeicherten Preis je Inserat.</p></div>
+
+    <div class="zwei">
+      <div class="kasten">
+        <span class="lbl">Gespeicherte Suchen in ImmoMetrica</span>
+        <div class="chips" id="suchen"></div>
+        <span class="lbl">Abruf-Takt</span>
+        <div class="seg" role="group" aria-label="Abruf-Takt" id="takt">
+          <button type="button" data-t="tag" aria-pressed="false">täglich 07:00</button>
+          <button type="button" data-t="std" aria-pressed="true">stündlich</button>
+          <button type="button" data-t="m30" aria-pressed="false">alle 30 Minuten</button>
+        </div>
+        <div id="kontingent" class="warnung gelb"></div>
+      </div>
+      <div class="kasten creme">
+        <span class="lbl">Passt zu meinem Profil</span>
+        <div class="felder">
+          <label class="feld"><span class="lbl">Mindestrendite (brutto)</span><select id="f-rendite"><option value="4">4,0 %</option><option value="4.5">4,5 %</option><option value="5" selected>5,0 %</option><option value="5.5">5,5 %</option><option value="6">6,0 %</option></select></label>
+          <label class="feld"><span class="lbl">Lageklasse mindestens</span><select id="f-lage"><option value="A">A</option><option value="B" selected>B</option><option value="C">C</option></select></label>
+          <label class="feld"><span class="lbl">Kaufpreis von</span><input id="f-min" type="number" inputmode="numeric" step="10000" value="100000"></label>
+          <label class="feld"><span class="lbl">Kaufpreis bis</span><input id="f-max" type="number" inputmode="numeric" step="10000" value="900000"></label>
+        </div>
+        <span class="lbl">Region</span>
+        <div class="chips" id="regionen"></div>
+        <p class="hinweis">Mindestrendite und Lageklasse kommen aus dem Investmentprofil. Hier nur zum Ausprobieren änderbar.</p>
+      </div>
+    </div>
+
+    <div class="zwei">
+      <div style="display:grid;gap:10px;align-content:start;min-width:0">
+        <div class="fl-kopf"><span class="lbl">Treffer seit dem letzten Abruf</span>
+          <div class="seg" role="group" aria-label="Treffer filtern" id="ansicht">
+            <button type="button" data-a="alle" aria-pressed="false">alle</button>
+            <button type="button" data-a="passt" aria-pressed="true">nur passende</button>
+          </div></div>
+        <div class="treffer" id="treffer"></div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start;min-width:0">
+        <div class="kasten">
+          <div class="fl-kopf"><span class="lbl">Preisverlauf je Inserat</span><span class="hinweis" id="pv-titel"></span></div>
+          <div class="chart-box" id="chart"></div>
+          <table class="verlauf-tab num" id="pv-tab" aria-label="Preisverlauf als Tabelle"></table>
+        </div>
+        <div class="push" aria-label="Vorschau der Benachrichtigung">
+          <div class="kanal"><span>Vorschau · Telegram / App</span><span id="push-zeit" class="num"></span></div>
+          <div class="bubble" id="push"></div>
+          <div class="knopf">Anfrage-Entwurf öffnen</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ANFRAGE -->
+  <section class="flaeche" id="anfrage">
+    <div class="fl-kopf"><div><span class="schritt">SCHRITT 2</span><h2>Anfrage an den Makler</h2></div><p>Aus deinem eigenen Postfach. Nichts geht ohne deine Freigabe raus.</p></div>
+    <div class="konto"><span>Gmail · investor@beispiel.de · <b>verbunden</b></span><span>Microsoft 365 · nicht verbunden</span></div>
+    <div class="zwei">
+      <div style="display:grid;gap:10px;min-width:0">
+        <div class="mail">
+          <div class="kopfz" id="mail-kopf"></div>
+          <pre id="mail-text"></pre>
+        </div>
+        <div class="knoepfe">
+          <button class="btn haupt" type="button" id="b-frei">Freigeben und senden</button>
+          <button class="btn" type="button" id="b-inserat">Inserat öffnen und selbst anfragen</button>
+        </div>
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+      <div class="kasten">
+        <span class="lbl">Automatik (optional)</span>
+        <label class="chk"><input type="checkbox" id="auto"> Automatisch anfragen, wenn der Preis um mindestens
+          <select id="auto-x" aria-label="Schwelle Preissenkung"><option>3</option><option selected>5</option><option>8</option><option>10</option></select> % sinkt</label>
+        <div class="warnung rot" id="auto-warn" hidden>
+          <b>Bitte bewusst einschalten</b>
+          <span>Der Agent schreibt dann in deinem Namen aus deinem Postfach, ohne dich vorher zu fragen. Er fragt nur Objekte an, die zu deinem Profil passen und deren Inserat eine E-Mail-Adresse nennt. Höchstens eine Anfrage je Inserat, höchstens 3 am Tag. Jede Anfrage steht im Protokoll, die Automatik lässt sich jederzeit abschalten.</span>
+          <label class="chk" style="background:var(--tafel)"><input type="checkbox" id="auto-ok"> Verstanden, Automatik einschalten</label>
+        </div>
+        <div class="hinweis" id="auto-stand">Automatik aus. Jede Anfrage wartet auf deine Freigabe.</div>
+        <span class="lbl">Wer bekommt die Anfrage?</span>
+        <p class="hinweis">Die Such-API liefert in unserer Anbindung keine Kontaktadresse des Anbieters, nur die Links auf die Inserate. Eine E-Mail geht nur raus, wenn das Inserat eine Adresse nennt. Sonst öffnet der Agent das Inserat und du fragst dort selbst an. Kontaktformulare der Portale füllt er nie aus.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 TRACKING -->
+  <section class="flaeche" id="tracking">
+    <div class="fl-kopf"><div><span class="schritt">SCHRITT 3</span><h2>Tracking</h2></div><p>Klick auf einen Schritt setzt den Stand (in der App setzt ihn der Postfach-Eingang).</p></div>
+    <div class="zwei">
+      <div class="track" id="track"></div>
+      <div class="kasten">
+        <span class="lbl">Postfach-Beobachtung · nur Antworten auf Agent-Anfragen</span>
+        <div class="log" id="log"></div>
+        <p class="hinweis">Zugeordnet wird über den Gesprächsverlauf der Anfrage (Kennung im Betreff). Andere Mails liest der Agent nicht.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 AUFSTELLUNG -->
+  <section class="flaeche" id="aufstellung">
+    <div class="fl-kopf"><div><span class="schritt">SCHRITT 4</span><h2>Aufstellung der angefragten Objekte</h2></div><p>Zielkaufpreis aus deiner Zielrendite, Nachlass = nötiger Abschlag auf den Angebotspreis.</p></div>
+    <div class="kennz" id="kennz"></div>
+    <div class="tab-wrap"><table class="auf num" id="auf"></table></div>
+  </section>
+
+  <!-- DAHINTER -->
+  <section class="flaeche" id="dahinter">
+    <div class="fl-kopf"><div><span class="schritt">FÜR MARCEL</span><h2>Was steckt dahinter</h2></div><p>Technik, Leitplanken, Stufenplan und was wir bei ImmoMetrica erfragen müssen.</p></div>
+
+    <h3>Was die ImmoMetrica-Seite verspricht (Recherche 03.11.2026)</h3>
+    <div style="display:grid;gap:10px">
+      <div class="beleg"><q>Suchaufträge mit Sofort- und Tagesbenachrichtigung per E-Mail und Telegram</q><small>und <q>bei neuen Angeboten und Preisänderungen</q> · <a href="https://www.immometrica.de/" target="_blank" rel="noopener">immometrica.de</a>, Funktionen</small></div>
+      <div class="beleg"><q>Sieh, wie sich Preise pro Objekt entwickelt haben.</q><small>und <q>Suche gezielt nach Objekten, die im Preis reduziert wurden.</q> · immometrica.de</small></div>
+      <div class="beleg"><q>API-Zugang, 600 Objekte pro Monat inkl.</q><small>nur im Tarif Investor Pro (49,95 €/Monat jährlich) · immometrica.de, Preise</small></div>
+      <p><b>Befund:</b> In der Oberfläche gibt es Preisverlauf, Preissenkungs-Suche und Benachrichtigung bei neuen Angeboten und Preisänderungen. Ob die Such-API (<code>searchapi/v1/</code>) davon etwas liefert, steht nirgends. Es gibt keine öffentliche API-Doku, Webhooks werden nirgends erwähnt, und App-Push gibt es nur als E-Mail oder Telegram. Unsere Anbindung kennt die Felder <code>online_since</code>, <code>offline_since</code>, <code>last_modified</code> und <code>reactivated_at</code>, aber keinen früheren Preis. Deshalb rechnet der Agent den Unterschied selbst aus: je Inserat den zuletzt gesehenen Preis speichern und vergleichen. Das funktioniert unabhängig davon, was die API liefert.</p>
+    </div>
+
+    <h3>Technischer Ablauf</h3>
+    <div class="ablauf">
+      <div><b>Abruf-Job</b><p>Takt je Kunde im Backend. Ruft <code>searches/</code> und je gewählter Suche <code>searches/&lt;id&gt;/results/</code> mit dem Token des Kunden ab (vorhanden: <code>immometricaService.js</code>).</p></div>
+      <div><b>Speicher je Inserat</b><p>ImmoMetrica-ID, erster und letzter Preis, Preisverlauf mit Datum, zuerst und zuletzt gesehen, Kennzeichen offline/reaktiviert.</p></div>
+      <div><b>Unterschiede</b><p>Unbekannte ID = neu. Preis kleiner als gespeichert = gesenkt (Prozent und Euro). <code>reactivated_at</code> gesetzt = wieder eingestellt.</p></div>
+      <div><b>Profilfilter</b><p>Abbildung über <code>immometricaMapping.js</code>, dann Quick-Check-Kern: Rendite, Lageklasse, Kaufpreisspanne, Region. Nur Passendes löst eine Nachricht aus.</p></div>
+      <div><b>Push</b><p>Telegram-Bot ist vorhanden. App-Hinweis in der Seitenleiste. Bündeln: höchstens eine Nachricht je Abruf.</p></div>
+      <div><b>Postfach per OAuth</b><p>Kunde verbindet Gmail oder Microsoft 365. Senden als Entwurf mit Freigabe, Eingang nur für den Gesprächsverlauf der Anfrage.</p></div>
+      <div><b>Unterlagen</b><p>Anhänge gehen in den vorhandenen Unterlagen-Import, danach Quick-Check und Marktpreisindikation, Ergebnis in die Aufstellung.</p></div>
+    </div>
+    <pre class="code">agent_inserat
+  kunde_id · immometrica_id · suche_id · erster_preis · letzter_preis
+  preisverlauf  [{datum, preis}]       zuerst_gesehen · zuletzt_gesehen
+  offline_seit · reaktiviert_am · passt_profil · grund
+  anfrage_status  (null | angefragt | antwort | unterlagen | ausgewertet)
+  thread_id · objekt_key (sobald als Objekt angelegt)</pre>
+
+    <h3>Leitplanken</h3>
+    <ul class="l">
+      <li><b>Kein Versand ohne Freigabe.</b> Die Automatik ist aus, bis der Kunde sie ausdrücklich einschaltet. Dann gelten Schwelle, Profilfilter, eine Anfrage je Inserat, ein Tageshöchstwert und ein Protokoll. Abschalten geht jederzeit.</li>
+      <li><b>Keine Kontaktformulare der Portale automatisch bedienen.</b> Das verstößt gegen deren Nutzungsbedingungen und den Bot-Schutz. Ohne genannte E-Mail-Adresse öffnet der Agent nur das Inserat.</li>
+      <li><b>Eigenes Postfach, engste Rechte.</b> Senden plus Lesen nur der eigenen Gesprächsverläufe. Für Gmail-Leserechte verlangt Google eine Prüfung der App mit jährlicher Sicherheitsbewertung. Einfacherer Weg für den Eingang: eine eigene Eingangsadresse je Kunde, an die er Antworten weiterleitet oder in Kopie setzt.</li>
+      <li><b>Datenschutz.</b> Maklerdaten sind personenbezogen. Der Kunde ist verantwortlich, DealPilot verarbeitet im Auftrag. Gelesen wird nur, was zur Anfrage gehört, mit Löschfrist für Mails und Anhänge. Kein Weitergeben an Dritte.</li>
+      <li><b>ImmoMetrica-Bedingungen.</b> Jeder Kunde nutzt seinen eigenen API-Zugang. Ob ein Drittanbieter ihn im Namen des Kunden nutzen und den Preisverlauf speichern darf, klären wir vorher schriftlich.</li>
+      <li><b>Takt und Kontingent.</b> ImmoMetrica meldet selbst in unter drei Minuten. Der Agent muss nicht schneller sein, er bewertet. Stündlich reicht, sofern das Kontingent es trägt.</li>
+    </ul>
+
+    <h3>Stufenplan und grober Aufwand</h3>
+    <div class="stufen">
+      <div class="stufe"><b>Stufe 1 · Beobachtung und Push</b><span class="aufwand">4–6 Tage</span><p>Abruf-Job, Tabelle je Inserat mit Preisverlauf, Unterschiede, Profilfilter, Telegram- und App-Hinweis, Ansicht wie oben in Schritt 1. Hängt an der Antwort zum Kontingent.</p></div>
+      <div class="stufe"><b>Stufe 2 · Anfrage als Entwurf</b><span class="aufwand">5–8 Tage + Google-Prüfung</span><p>OAuth Google und Microsoft, Entwurf aus Vorlage, Freigabe mit einem Klick, Protokoll. Zwischenlösung ohne Postfach-Anbindung: Text kopieren und Inserat öffnen (1 Tag). Automatik bei Preissenkung erst nach einer Pilotphase (1–2 Tage).</p></div>
+      <div class="stufe"><b>Stufe 3 · Eingang, Auswertung, Aufstellung</b><span class="aufwand">8–12 Tage</span><p>Eingang über Eingangsadresse oder Postfach, Zuordnung über den Gesprächsverlauf, Anhänge in den Unterlagen-Import, Quick-Check und Marktpreisindikation, Aufstellung mit Status.</p></div>
+    </div>
+
+    <h3>Fragen an den ImmoMetrica-Support</h3>
+    <ol class="fragen">
+      <li>Liefert <code>searches/&lt;id&gt;/results/</code> einen früheren Preis oder einen Preisverlauf je Objekt? Ändert sich <code>last_modified</code> bei einer Preisänderung?</li>
+      <li>Gibt es ein Kennzeichen „neu“ oder „Preis geändert“ seit dem letzten Abruf, oder einen Parameter wie „geändert seit“ bzw. eine Sortierung nach Änderungsdatum?</li>
+      <li>Gibt es Webhooks oder eine andere Benachrichtigung über die API, oder eine maschinenlesbare Form der Suchauftrags-Benachrichtigung?</li>
+      <li>Wie zählt das Kontingent „600 Objekte pro Monat“: je gelieferter Treffer und Abruf, je eindeutigem Objekt im Monat oder nur bei Detailabruf? Zählt ein erneuter Abruf desselben Objekts?</li>
+      <li>Welcher Abruftakt und welche Abruf-Grenzen sind erlaubt (stündlich, alle 30 Minuten)?</li>
+      <li>Enthalten die Treffer Kontaktdaten des Anbieters (E-Mail, Telefon), oder nur die Links auf die Inserate?</li>
+      <li>Darf eine Software wie DealPilot die API im Auftrag ihrer Kunden mit deren Token nutzen, Preisverläufe speichern und anzeigen? Gibt es dafür einen Partner- oder Mehrkunden-Tarif?</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var HEUTE = '2026-11-03';
+  var SUCHEN = [
+    {id:'s-kap', name:'Kapitalanleger ETW', treffer:22, an:true},
+    {id:'s-mfh', name:'Mehrfamilienhäuser OWL', treffer:9, an:true},
+    {id:'s-ruhr', name:'ETW Ruhrgebiet bis 150 T€', treffer:14, an:false}
+  ];
+  var REGIONEN = [{id:'OWL', an:true},{id:'Ruhrgebiet', an:true},{id:'Münsterland', an:false}];
+  var STUFEN = ['angefragt','Antwort da','Unterlagen da','ausgewertet'];
+  // Erfundene Beispielobjekte. preise: Verlauf [Datum, Preis]
+  var OBJ = [
+    {id:'A', titel:'3-Zimmer-ETW, 74 m², Bj. 1972', ort:'Bielefeld-Schildesche (Beispiel)', region:'OWL', suche:'s-kap', lage:'B', rendite:5.2, neu:false, reakt:false,
+     preise:[['2026-08-15',199000],['2026-09-12',189000],['2026-10-28',172000]], makler:'A. Muster · Muster Immobilien (Beispiel)', mail:'anfrage@muster-immobilien.example', status:3, ziel:165000, mpi:[168000,181000], score:72, gelesen:'11 von 12 Feldern', online:'15.08.2026'},
+    {id:'B', titel:'MFH mit 6 Einheiten, 412 m², Bj. 1958', ort:'Herford-Mitte (Beispiel)', region:'OWL', suche:'s-mfh', lage:'B', rendite:6.1, neu:false, reakt:true,
+     preise:[['2026-07-02',690000],['2026-10-30',649000]], makler:'B. Beispiel · Beispielhaus GmbH (Beispiel)', mail:'kontakt@beispielhaus.example', status:2, ziel:610000, mpi:[598000,655000], score:64, gelesen:'9 von 12 Feldern', online:'02.07.2026'},
+    {id:'C', titel:'MFH mit 8 Einheiten, 525 m², Bj. 1964', ort:'Hamm-Heessen (Beispiel)', region:'Ruhrgebiet', suche:'s-mfh', lage:'B', rendite:5.9, neu:true, reakt:false,
+     preise:[['2026-11-03',845000]], makler:'C. Probe · Probe & Partner (Beispiel)', mail:'info@probe-partner.example', status:0, ziel:790000, mpi:null, score:null, gelesen:null, online:'03.11.2026'},
+    {id:'D', titel:'2-Zimmer-ETW, 59 m², Bj. 1969', ort:'Dortmund-Hörde (Beispiel)', region:'Ruhrgebiet', suche:'s-kap', lage:'B', rendite:5.4, neu:false, reakt:false,
+     preise:[['2026-09-20',145000],['2026-11-02',139000]], makler:'privat (Beispiel)', mail:null, status:1, ziel:131000, mpi:null, score:null, gelesen:null, online:'20.09.2026'},
+    {id:'E', titel:'2-Zimmer-ETW, 56 m², Bj. 1961', ort:'Gelsenkirchen-Buer (Beispiel)', region:'Ruhrgebiet', suche:'s-ruhr', lage:'C', rendite:6.4, neu:true, reakt:false,
+     preise:[['2026-11-03',119000]], makler:'D. Fiktiv · Fiktiv Makler (Beispiel)', mail:'buero@fiktiv.example', status:null, ziel:null, mpi:null, score:null, gelesen:null, online:'03.11.2026'},
+    {id:'F', titel:'Einfamilienhaus, 142 m², Bj. 1978', ort:'Detmold-Heiligenkirchen (Beispiel)', region:'OWL', suche:'s-kap', lage:'A', rendite:3.6, neu:false, reakt:false,
+     preise:[['2026-06-10',349000],['2026-10-31',329000]], makler:'E. Platzhalter (Beispiel)', mail:'e.platzhalter@example.org', status:null, ziel:null, mpi:null, score:null, gelesen:null, online:'10.06.2026'},
+    {id:'G', titel:'4-Zimmer-ETW, 96 m², Bj. 1994', ort:'Münster-Kinderhaus (Beispiel)', region:'Münsterland', suche:'s-kap', lage:'A', rendite:4.3, neu:true, reakt:false,
+     preise:[['2026-11-03',298000]], makler:'F. Vorlage (Beispiel)', mail:null, status:null, ziel:null, mpi:null, score:null, gelesen:null, online:'03.11.2026'}
+  ];
+  var LOG = [
+    ['28.10. 18:42','A','Antwort von Muster Immobilien, 4 Anhänge: Exposé, Grundriss, Energieausweis, Hausgeldabrechnung 2025'],
+    ['29.10. 09:10','A','Gelesen: 11 von 12 Feldern übernommen, Quick-Check und Marktpreisindikation gerechnet'],
+    ['31.10. 11:05','B','Antwort von Beispielhaus GmbH, 3 Anhänge: Exposé, Mieterliste, Grundbuchauszug'],
+    ['02.11. 16:20','D','Antwort von privat: Unterlagen folgen nach Besichtigung'],
+    ['03.11. 07:01','C','Anfrage gesendet (freigegeben 03.11. 06:58)']
+  ];
+  var TAKT = {tag:{name:'täglich', proMonat:30, naechst:'morgen 07:00'}, std:{name:'stündlich', proMonat:720, naechst:'15:00'}, m30:{name:'alle 30 Min.', proMonat:1440, naechst:'14:30'}};
+  var st = {takt:'std', ansicht:'passt', sel:'A', auto:false};
+
+  var $ = function(id){return document.getElementById(id);};
+  var eur = function(n){return n.toLocaleString('de-DE')+' €';};
+  var pct = function(n,d){return n.toLocaleString('de-DE',{minimumFractionDigits:d==null?1:d,maximumFractionDigits:d==null?1:d})+' %';};
+  var datum = function(s){var p=s.split('-');return p[2]+'.'+p[1]+'.'+p[0];};
+  var esc = function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+  function preis(o){return o.preise[o.preise.length-1][1];}
+  function senkung(o){ if(o.preise.length<2) return 0; var a=o.preise[o.preise.length-2][1], b=preis(o); return b<a ? (a-b)/a*100 : 0; }
+  function stufe(s){ // Kette aus js/score-tiers.js
+    if(s>=85) return {w:'Sehr gut', c:'s-top'}; if(s>=70) return {w:'Gut', c:'s-green'};
+    if(s>=50) return {w:'Solide', c:'s-gold'}; if(s>=35) return {w:'Schwach', c:'s-red'}; return {w:'Kritisch', c:'s-red'};
+  }
+  var LAGE = {A:3,B:2,C:1};
+  function passt(o){
+    var r=+$('f-rendite').value, l=$('f-lage').value, mn=+$('f-min').value||0, mx=+$('f-max').value||1e12, p=preis(o);
+    var reg = REGIONEN.filter(function(x){return x.an;}).map(function(x){return x.id;});
+    if(reg.indexOf(o.region)<0) return [false,'Region '+o.region+' nicht gewählt'];
+    if(p<mn||p>mx) return [false,'Kaufpreis außerhalb der Spanne'];
+    if(o.rendite<r) return [false,'Rendite '+pct(o.rendite)+' unter '+pct(r)];
+    if(LAGE[o.lage]<LAGE[l]) return [false,'Lageklasse '+o.lage+' unter '+l];
+    return [true,'Rendite '+pct(o.rendite)+' · Lage '+o.lage];
+  }
+  function sichtbar(o){ var s=SUCHEN.filter(function(x){return x.id===o.suche;})[0]; return s && s.an; }
+
+  function renderSuchen(){
+    $('suchen').innerHTML = SUCHEN.map(function(s,i){
+      return '<label class="chk"><input type="checkbox" id="s'+i+'" data-i="'+i+'"'+(s.an?' checked':'')+'> '+esc(s.name)+' <small>'+s.treffer+' Treffer</small></label>';}).join('');
+    $('regionen').innerHTML = REGIONEN.map(function(r,i){
+      return '<label class="chk"><input type="checkbox" id="r'+i+'" data-r="'+i+'"'+(r.an?' checked':'')+'> '+esc(r.id)+'</label>';}).join('');
+  }
+  function renderKontingent(){
+    var t=TAKT[st.takt], tr=SUCHEN.filter(function(s){return s.an;}).reduce(function(a,s){return a+s.treffer;},0);
+    var proMonat = t.proMonat*tr;
+    $('kontingent').innerHTML = '<b>Kontingent prüfen</b><span>'+t.proMonat.toLocaleString('de-DE')+' Abrufe im Monat. Falls jeder gelieferte Treffer zählt, wären das bei '+tr+' Treffern je Abruf <b class="num">'+proMonat.toLocaleString('de-DE')+'</b> Objekte im Monat. Der Tarif Investor Pro enthält 600. Zählt nur jedes Objekt einmal im Monat, reicht es locker. Das ist Frage 4 an den Support.</span>';
+    $('k-takt').textContent = t.name; $('k-naechst').textContent = t.naechst;
+    Array.prototype.forEach.call($('takt').children,function(b){b.setAttribute('aria-pressed', b.dataset.t===st.takt?'true':'false');});
+  }
+  function renderTreffer(){
+    var liste = OBJ.filter(sichtbar), nN=0, nG=0;
+    var html = liste.map(function(o){
+      var ps=passt(o), s=senkung(o); if(o.neu) nN++; if(s>0) nG++;
+      if(st.ansicht==='passt' && !ps[0]) return '';
+      var alt = o.preise.length>1 ? '<s>'+eur(o.preise[o.preise.length-2][1])+'</s>' : '';
+      return '<button type="button" class="tr'+(ps[0]?'':' aus')+'" data-id="'+o.id+'" aria-current="'+(st.sel===o.id)+'">'+
+        '<span style="min-width:0;display:grid"><span class="t">'+esc(o.titel)+'</span><span class="meta">'+esc(o.ort)+' · online seit '+o.online+'</span></span>'+
+        '<span class="preis num">'+alt+eur(preis(o))+'</span>'+
+        '<span class="zeile">'+(o.neu?'<span class="pill p-neu">neu</span>':'')+(s>0?'<span class="pill p-preis">Preis gesenkt −'+pct(s)+'</span>':'')+
+        (o.reakt?'<span class="pill p-reakt">wieder eingestellt</span>':'')+
+        (ps[0]?'<span class="pill p-passt">passt</span>':'<span class="pill p-nein">passt nicht</span>')+'<span class="grund">'+esc(ps[1])+'</span></span></button>';
+    }).join('');
+    $('treffer').innerHTML = html || '<p class="hinweis">Keine passenden Treffer. Schalte auf „alle“ oder lockere das Profil.</p>';
+    $('k-neu').textContent = nN+' / '+nG;
+  }
+  function renderChart(){
+    var o = OBJ.filter(function(x){return x.id===st.sel;})[0]; if(!o) return;
+    $('pv-titel').textContent = o.titel;
+    var W=520,H=190,L=64,R=86,T=14,B=30, pts=o.preise.slice();
+    var t0=new Date(pts[0][0]).getTime(), t1=new Date(HEUTE).getTime(); if(t1-t0<864e5*20) t0=t1-864e5*60;
+    var ps=pts.map(function(p){return p[1];}), lo=Math.min.apply(null,ps), hi=Math.max.apply(null,ps);
+    var pad=Math.max((hi-lo)*0.25, hi*0.03); lo-=pad; hi+=pad;
+    var x=function(d){return L+(new Date(d).getTime()-t0)/(t1-t0)*(W-L-R);}, y=function(v){return T+(hi-v)/(hi-lo)*(H-T-B);};
+    var ticks=[lo+pad, (lo+hi)/2, hi-pad].filter(function(v,i,a){return i===0||Math.abs(v-a[i-1])>1;});
+    var g=ticks.map(function(v){return '<line x1="'+L+'" x2="'+(W-R+20)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--gitter)" stroke-width="1"/>'+
+      '<text x="'+(L-8)+'" y="'+(y(v)+4)+'" text-anchor="end" fill="var(--mut)" font-size="11" font-family="JetBrains Mono,monospace">'+Math.round(v/1000)+' T€</text>';}).join('');
+    var d='M'+x(pts[0][0])+' '+y(pts[0][1]);
+    for(var i=1;i<pts.length;i++){ d+=' H'+x(pts[i][0])+' V'+y(pts[i][1]); }
+    d+=' H'+x(HEUTE);
+    var area=d+' V'+(H-B)+' H'+x(pts[0][0])+' Z';
+    var dots=pts.map(function(p,i){return '<circle cx="'+x(p[0])+'" cy="'+y(p[1])+'" r="5" fill="var(--linie-chart)" stroke="var(--tafel)" stroke-width="2" data-i="'+i+'"/>';}).join('');
+    var last=pts[pts.length-1];
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Preisverlauf '+esc(o.titel)+'">'+g+
+      '<path d="'+area+'" fill="var(--linie-chart)" fill-opacity=".10"/>'+
+      '<path d="'+d+'" fill="none" stroke="var(--linie-chart)" stroke-width="2" stroke-linejoin="round"/>'+dots+
+      '<text x="'+(x(HEUTE)+8)+'" y="'+(y(last[1])+4)+'" fill="var(--fg)" font-size="12" font-weight="600" font-family="Space Grotesk,sans-serif">'+Math.round(last[1]/1000)+' T€</text>'+
+      '<text x="'+L+'" y="'+(H-8)+'" fill="var(--mut)" font-size="11" font-family="JetBrains Mono,monospace">'+datum(new Date(t0).toISOString().slice(0,10))+'</text>'+
+      '<text x="'+x(HEUTE)+'" y="'+(H-8)+'" text-anchor="end" fill="var(--mut)" font-size="11" font-family="JetBrains Mono,monospace">heute</text>'+
+      '<rect x="'+L+'" y="0" width="'+(W-L-R+20)+'" height="'+H+'" fill="transparent" id="hit"/></svg><div class="tip" id="tip" hidden></div>';
+    $('chart').innerHTML=svg;
+    var box=$('chart'), sv=box.querySelector('svg'), tip=$('tip');
+    function zeig(ev){
+      var r=sv.getBoundingClientRect(), mx=(ev.clientX-r.left)/r.width*W, best=0, bd=1e9;
+      pts.forEach(function(p,i){var dd=Math.abs(x(p[0])-mx); if(dd<bd){bd=dd;best=i;}});
+      var p=pts[best], vor=best>0?pts[best-1][1]:null;
+      tip.hidden=false; tip.style.left=(x(p[0])/W*r.width)+'px'; tip.style.top=(y(p[1])/H*r.height)+'px';
+      tip.textContent=datum(p[0])+' · '+eur(p[1])+(vor?'  ('+(p[1]<vor?'−':'+')+pct(Math.abs(p[1]-vor)/vor*100)+')':'');
+    }
+    sv.addEventListener('pointermove',zeig); sv.addEventListener('pointerdown',zeig);
+    sv.addEventListener('pointerleave',function(){tip.hidden=true;});
+    $('pv-tab').innerHTML=pts.map(function(p,i){var v=i?pts[i-1][1]:null;
+      return '<tr><td>'+datum(p[0])+(i===0?' · erstmals gesehen':'')+'</td><td>'+eur(p[1])+(v?' <span style="color:var(--gruen-text)">−'+pct((v-p[1])/v*100)+'</span>':'')+'</td></tr>';}).join('');
+    renderPush(o); renderMail(o);
+  }
+  function renderPush(o){
+    var s=senkung(o), ps=passt(o);
+    var kopf = s>0 ? 'Preis gesenkt −'+pct(s) : (o.neu ? 'Neu in „'+SUCHEN.filter(function(x){return x.id===o.suche;})[0].name+'“' : 'Unverändert');
+    $('push-zeit').textContent = st.takt==='tag'?'07:00':'14:00';
+    $('push').innerHTML='<b>'+esc(kopf)+'</b><span>'+esc(o.titel)+'</span><span>'+esc(o.ort)+'</span><span class="num">'+eur(preis(o))+' · Rendite '+pct(o.rendite)+' · Lage '+o.lage+'</span>'+
+      (o.ziel?'<span class="num">Zielkaufpreis '+eur(o.ziel)+'</span>':'')+
+      '<span style="color:var(--obs-mut)">'+(ps[0]?'Passt zu deinem Profil.':'Passt nicht: '+esc(ps[1])+'. Ohne Profil-Treffer kommt keine Nachricht.')+'</span>';
+  }
+  function renderMail(o){
+    var s=senkung(o);
+    $('mail-kopf').innerHTML='<span>Von</span><span>investor@beispiel.de (Beispiel)</span><span>An</span><span>'+(o.mail?esc(o.mail):'<i>Inserat nennt keine E-Mail-Adresse</i>')+'</span>'+
+      '<span>Betreff</span><span>Anfrage '+esc(o.titel.split(',')[0])+', '+esc(o.ort.replace(' (Beispiel)',''))+' [DP-'+o.id+'7Q]</span>';
+    $('mail-text').textContent='Guten Tag,\n\nich interessiere mich für Ihr Angebot „'+o.titel+'“ in '+o.ort.replace(' (Beispiel)','')+' zum Kaufpreis von '+eur(preis(o))+'.'+
+      (s>0?' Mir ist aufgefallen, dass der Preis kürzlich angepasst wurde.':'')+
+      '\n\nFür eine erste Prüfung bitte ich um folgende Unterlagen:\n· Exposé und Grundrisse\n· Energieausweis\n· Mieterliste mit Kaltmieten und Mietbeginn\n'+
+      (/ETW/.test(o.titel)?'· Teilungserklärung, Wirtschaftsplan, Hausgeldabrechnung, die letzten drei Protokolle der Eigentümerversammlung, Höhe der Erhaltungsrücklage\n':'· Grundbuchauszug, Flurkarte, Aufstellung der Bewirtschaftungskosten, durchgeführte Modernisierungen\n')+
+      '\nGern vereinbare ich danach einen Besichtigungstermin.\n\nMit freundlichen Grüßen\nMax Beispiel';
+    $('b-frei').disabled = !o.mail || o.status!=null;
+    $('b-frei').textContent = o.status!=null ? 'Bereits angefragt' : (o.mail ? 'Freigeben und senden' : 'Keine Adresse im Inserat');
+  }
+  function renderTrack(){
+    var liste=OBJ.filter(function(o){return o.status!=null;});
+    $('track').innerHTML = liste.map(function(o){
+      var erg='';
+      if(o.status>=2) erg+='<span>Unterlagen gelesen: <b>'+(o.gelesen||'8 von 12 Feldern')+'</b></span>';
+      if(o.status>=3 && o.score!=null){ var t=stufe(o.score);
+        erg+='<span>Quick-Check: <span class="score '+t.c+'">'+o.score+' · '+t.w.toUpperCase()+'</span> · Marktpreisindikation <b class="num">'+(o.mpi?eur(o.mpi[0])+' – '+eur(o.mpi[1]):'folgt')+'</b></span>'; }
+      else if(o.status>=3) erg+='<span>Quick-Check wird gerechnet …</span>';
+      return '<div class="tk"><div class="tk-kopf"><b>'+esc(o.titel)+'</b><span class="hinweis">'+esc(o.ort)+'</span></div>'+
+        '<div class="stepper" role="group" aria-label="Stand '+esc(o.titel)+'">'+STUFEN.map(function(n,i){
+          return '<button type="button" data-id="'+o.id+'" data-s="'+i+'" class="'+(i<=o.status?'an':'')+(i===o.status?' jetzt':'')+'" aria-pressed="'+(i===o.status)+'">'+n+'</button>';}).join('')+'</div>'+
+        (erg?'<div class="ergebnis">'+erg+'</div>':'')+'</div>';
+    }).join('') || '<p class="hinweis">Noch keine Anfrage. Gib in Schritt 2 eine frei.</p>';
+    $('log').innerHTML = LOG.map(function(l){return '<div><time>'+l[0]+'</time><span><b>Objekt '+l[1]+'</b> · '+esc(l[2])+'</span></div>';}).join('');
+  }
+  function renderAuf(){
+    var liste=OBJ.filter(function(o){return o.status!=null;});
+    var ausgewertet=liste.filter(function(o){return o.status===3;}).length;
+    var nl=liste.filter(function(o){return o.ziel;}).map(function(o){return (preis(o)-o.ziel)/preis(o)*100;});
+    var mittel = nl.length? nl.reduce(function(a,b){return a+b;},0)/nl.length : 0;
+    $('kennz').innerHTML='<div><span class="lbl">Angefragt</span><b class="num">'+liste.length+'</b></div><div><span class="lbl">Ausgewertet</span><b class="num">'+ausgewertet+'</b></div>'+
+      '<div><span class="lbl">Ø nötiger Nachlass</span><b class="num">'+pct(mittel)+'</b></div><div><span class="lbl">Warten auf Antwort</span><b class="num">'+liste.filter(function(o){return o.status===0;}).length+'</b></div>';
+    $('auf').innerHTML='<thead><tr><th>Objekt</th><th class="r">Angebot</th><th class="r">Zielkaufpreis</th><th class="r">Nachlass</th><th class="r">Marktpreis&shy;indikation</th><th>Score</th><th>Stand</th></tr></thead><tbody>'+
+      liste.map(function(o){ var p=preis(o), s=senkung(o), t=o.score!=null?stufe(o.score):null;
+        return '<tr><td><b>'+esc(o.titel)+'</b><small>'+esc(o.ort)+'</small></td>'+
+          '<td class="r">'+eur(p)+(s>0?'<small>gesenkt −'+pct(s)+'</small>':'')+'</td>'+
+          '<td class="r">'+(o.ziel?eur(o.ziel):'–')+'</td>'+
+          '<td class="r">'+(o.ziel?(p>o.ziel?'−'+pct((p-o.ziel)/p*100):'keiner'):'–')+'<small>'+(o.ziel&&p>o.ziel?eur(p-o.ziel):'')+'</small></td>'+
+          '<td class="r">'+(o.mpi?eur(o.mpi[0])+'<small>bis '+eur(o.mpi[1])+'</small>':'<small>nach Unterlagen</small>')+'</td>'+
+          '<td>'+(t?'<span class="score '+t.c+'">'+o.score+' · '+t.w.toUpperCase()+'</span>':'<small>offen</small>')+'</td>'+
+          '<td>'+STUFEN[o.status]+'</td></tr>';}).join('')+'</tbody>';
+  }
+  function renderAuto(){
+    var x=+$('auto-x').value;
+    $('auto-warn').hidden = !$('auto').checked;
+    if(!$('auto').checked){ $('auto-ok').checked=false; }
+    st.auto = $('auto').checked && $('auto-ok').checked;
+    if(!st.auto){ $('auto-stand').textContent = $('auto').checked ? 'Noch nicht aktiv. Bitte oben bestätigen.' : 'Automatik aus. Jede Anfrage wartet auf deine Freigabe.'; return; }
+    var kand=OBJ.filter(function(o){return sichtbar(o) && senkung(o)>=x && passt(o)[0];});
+    $('auto-stand').innerHTML='<b>Automatik aktiv</b> ab −'+x+' %. Beim nächsten Abruf betroffen: '+(kand.length?kand.map(function(o){
+      return esc(o.titel.split(',')[0])+' (−'+pct(senkung(o))+(o.mail?'':', keine Adresse, nur Hinweis')+(o.status!=null?', schon angefragt':'')+')';}).join('; '):'keine')+'.';
+  }
+  function alles(){ renderKontingent(); renderTreffer(); renderChart(); renderTrack(); renderAuf(); renderAuto(); }
+
+  renderSuchen();
+  $('suchen').addEventListener('change',function(e){ SUCHEN[+e.target.dataset.i].an=e.target.checked; alles(); });
+  $('regionen').addEventListener('change',function(e){ REGIONEN[+e.target.dataset.r].an=e.target.checked; alles(); });
+  ['f-rendite','f-lage','f-min','f-max'].forEach(function(id){ $(id).addEventListener('input',alles); });
+  $('takt').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; st.takt=b.dataset.t; alles(); });
+  $('ansicht').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; st.ansicht=b.dataset.a;
+    Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b?'true':'false');}); renderTreffer(); });
+  $('treffer').addEventListener('click',function(e){ var b=e.target.closest('.tr'); if(!b) return; st.sel=b.dataset.id; $('toast').textContent=''; renderTreffer(); renderChart(); });
+  $('b-frei').addEventListener('click',function(){ var o=OBJ.filter(function(x){return x.id===st.sel;})[0]; if(!o||!o.mail||o.status!=null) return;
+    o.status=0; LOG.push(['03.11. 14:12',o.id,'Anfrage freigegeben (Demo, es wurde nichts versendet)']);
+    $('toast').textContent='Demo: als angefragt markiert. Es wurde nichts versendet.'; alles(); });
+  $('b-inserat').addEventListener('click',function(){ $('toast').textContent='In der App öffnet sich hier das Inserat in einem neuen Fenster. Die Anfrage stellst du dort selbst.'; });
+  $('track').addEventListener('click',function(e){ var b=e.target.closest('button[data-s]'); if(!b) return;
+    var o=OBJ.filter(function(x){return x.id===b.dataset.id;})[0]; o.status=+b.dataset.s;
+    if(o.status===3 && o.score==null){ o.score= o.id==='C'?58:o.id==='D'?67:61; o.mpi=[Math.round(preis(o)*0.9/1000)*1000, Math.round(preis(o)*0.98/1000)*1000]; }
+    renderTrack(); renderAuf(); renderMail(o.id===st.sel?o:OBJ.filter(function(x){return x.id===st.sel;})[0]); });
+  ['auto','auto-ok','auto-x'].forEach(function(id){ $(id).addEventListener('change',renderAuto); });
+  alles();
+})();
+</script>
