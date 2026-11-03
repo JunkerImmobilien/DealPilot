@@ -186,10 +186,24 @@ var Auth = (function() {
       return this.getSession();
     },
     async login(email, password) {
-      var resp = await apiCall('/auth/login', {
-        method: 'POST', noAuth: true,
-        body: { email: email, password: password }
-      });
+      var resp;
+      try {
+        resp = await apiCall('/auth/login', {
+          method: 'POST', noAuth: true,
+          body: { email: email, password: password }
+        });
+      } catch (e) {
+        /* v3153: auf einem anderen Geraet als bei der Registrierung fehlte dem
+           Knopf "Mail erneut senden" die Adresse (nur dp_verify_mail aus der
+           Registrierung oder ji_session) - Sackgasse "bitte melde dich neu an".
+           Die Adresse steht im Anmeldeformular; der Server nennt diesen Fehler
+           erst NACH der Passwortpruefung. */
+        if (e && (e.code === 'VERIFY_EXPIRED' || e.code === 'EMAIL_NOT_VERIFIED')) {
+          try { localStorage.setItem('dp_verify_mail', String(email || '').trim().toLowerCase()); } catch (e2) {}
+          try { if (window.DealPilotVerifyFrist) window.DealPilotVerifyFrist.zeichne(); } catch (e3) {}
+        }
+        throw e;
+      }
       this._storeSession(resp);
       return this.getSession();
     },
