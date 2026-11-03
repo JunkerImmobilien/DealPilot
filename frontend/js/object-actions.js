@@ -2365,7 +2365,7 @@
     if (nAktiv) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px"><b>' + nAktiv + (nAktiv === 1 ? ' Wert' : ' Werte') + ' aus WEG-Unterlagen</b> (Hausgeld, Steuer, Sonderumlage) stehen hier nur zur Ansicht. Hak an, was übernommen werden soll.</div>';
     /* v3120 · erkannte Rechnungen: an den Beleg-Leser (Werbungskosten je Jahr, jede Zeile bestätigen) */
     var _rech = _files.filter(function (f) { return f.type === 'rechnung' && f.file; });
-    if (_rech.length) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid var(--wl-c9a84c,#C9A84C);background:rgba(201,168,76,.08);font-size:12.5px">'
+    if (_rech.length) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid var(--wl-c9a84c,#C9A84C);background:var(--gold-bg, rgba(201,168,76,.08));font-size:12.5px">'
       + '<b>' + _rech.length + (_rech.length === 1 ? ' Rechnung/Beleg' : ' Rechnungen/Belege') + ' erkannt</b> (' + _rech.map(function (f) { return escH(f.name); }).join(', ') + '). Sie werden als Werbungskosten im richtigen Steuerjahr gelesen – du bestätigst jede Zeile. '
       + '<button type="button" class="oabi-btn" id="oabi-belege" style="margin-left:6px">Als Werbungskosten auslesen</button></div>';
     host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
