@@ -1868,6 +1868,7 @@ function _calcImmediate(){
   } catch (_eFs) {}
   var be=_finStart?new Date(_finStart.getTime()):new Date();be.setFullYear(be.getFullYear()+bindj);
   st('bindend',be.toLocaleDateString('de-DE',{month:'2-digit',year:'numeric'}));
+  try { State.bindungsEnde = (be && !isNaN(be.getTime())) ? be.toISOString().slice(0, 7) : null; } catch (e) {}   /* v3161 · Schnittstelle (_kpis_bindung_ende) */
   var vtJ=d1_tm>0?Math.ceil(Math.log(d1_rate_m/d1_tm)/Math.log(1+d1z/12)/12):99;
   st('volltilg',((_finStart?_finStart.getFullYear():new Date().getFullYear())+vtJ).toString());
   var az=v('anschl_z')/100,at=v('anschl_t')/100;State.az=az;State.at=at;
@@ -1885,6 +1886,7 @@ function _calcImmediate(){
   // V357-d1anschl: D1-Anschlussrate respektiert Schieber (durchfinanziert = eigene Annuitaet)
   var ar = d1_anschl_enable ? (rs*(_d1_az_eff+_d1_at_eff)/12) : (d1_rate_m);
   st('anschl_rate',fE(ar,2));
+  State.anschlRate = ar;   /* v3161 · Schnittstelle (_kpis_anschl_rate, Euro pro Monat) */
   // Auto-calc zaer = difference between anschl and current
   var zaer_pct=Math.max(0,v('anschl_z')-v('d1z'));
   var zaer_m=rs*(zaer_pct/100)/12;

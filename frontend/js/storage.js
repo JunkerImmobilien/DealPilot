@@ -479,7 +479,8 @@ function collectData() {
         der FIELDS-Whitelist baut und das Backend `data` als VOLLEN Ersatz
         setzt — ein Feld, das hier fehlt, ist nach dem naechsten Speichern
         eines FREMDEN Objekts weg. */
-     '_kpis_bwk_nul_y','_kpis_bwk_nul_st_y']
+     '_kpis_bwk_nul_y','_kpis_bwk_nul_st_y',
+     /* v3161 */ '_kpis_rs_bindung','_kpis_anschl_rate','_kpis_bindung_ende','_kpis_bsv_luecke']
       .forEach(function (f) {
         if (window._currentObjData && window._currentObjData[f] != null) d[f] = window._currentObjData[f];
       });
@@ -491,6 +492,12 @@ function collectData() {
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_dscr_art = 'netto';         /* v3031: DSCR ist netto (Reinertrag / Kapitaldienst) */
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
+    /* v3161 · Protokoll Portfolio-Strategie 03.11.2026 (P3): Restschuld am Ende der Zinsbindung, Anschlussrate,
+       Bindungsende und Bauspar-Luecke - aus derselben Rechnung wie der Reiter Finanzierung (calc.js). */
+    if (isFinite(State.rs)) d._kpis_rs_bindung = Math.round(State.rs);
+    if (isFinite(State.anschlRate)) d._kpis_anschl_rate = Math.round(State.anschlRate * 100) / 100;
+    if (State.bindungsEnde) d._kpis_bindung_ende = State.bindungsEnde;
+    try { var _lc = State.bsvLifecycle; if (_lc && isFinite(_lc.luecke)) d._kpis_bsv_luecke = Math.round(_lc.luecke); } catch (e) {}
     /* v2931 · Jahresmiete und Nettomietrendite: ankauf.js (KENNZAHLEN), die
        Kartenrueckseite (doppelkarte.js) und der Portfolio-Export lesen beide
        Felder, geschrieben hat sie niemand - gemessen 23.10.2026, im Ankauf-

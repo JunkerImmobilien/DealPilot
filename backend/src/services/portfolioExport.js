@@ -459,6 +459,15 @@ const STRUKTUREN = {
       daten: 'der vollstaendige Datensatz zum Stichtag (ohne Vorschaubild)'
     }
   },
+  _kpis_v3161: {
+    was: 'v3161 · Finanzierung zum Ende der Zinsbindung (aus dem Reiter Finanzierung)',
+    felder: {
+      _kpis_rs_bindung: 'Restschuld am Ende der Zinsbindung in Euro (alle Darlehen)',
+      _kpis_anschl_rate: 'Rate der Anschlussfinanzierung Darlehen 1 in Euro pro MONAT',
+      _kpis_bindung_ende: 'Ende der Zinsbindung (JJJJ-MM)',
+      _kpis_bsv_luecke: 'Luecke zwischen Bauspar-Zuteilung und Bindungsende in Euro (0 = keine)'
+    }
+  },
   _kpis_: {
     was: 'Kennzahlen, gerechnet von den echten Kernen zu ihrer Zeit. '
        + 'Sie werden hier NICHT neu gerechnet - alte Daten mit heutigen Regeln '
@@ -739,6 +748,22 @@ async function bauen(userId, opt) {
     }
   } catch (e) { belwFehler = String(e && e.message || e).slice(0, 120); }
 
+  /* v3161 · AVM-Verlauf je Objekt (Protokoll Portfolio-Strategie P3). Der Anbieter geht NICHT nach aussen
+     (CLAUDE.md Anbieter-Neutralitaet): im Export steht „unabhaengiger Bewertungspartner". */
+  let avmFehler = null;
+  try {
+    const av = await query('SELECT object_id, created_at, marktwert, low, high, marktmiete, eur_per_sqm, confidence FROM avm_valuations WHERE user_id = $1 AND object_id IS NOT NULL ORDER BY created_at', [userId]);
+    const je = {};
+    av.rows.forEach((r) => { (je[r.object_id] = je[r.object_id] || []).push({ datum: r.created_at, quelle: 'unabhängiger Bewertungspartner',
+      marktwert_eur: r.marktwert, von_eur: r.low, bis_eur: r.high, marktmiete_eur_monat: r.marktmiete, eur_pro_qm: r.eur_per_sqm, sicherheit: r.confidence || null }); });
+    objekte.forEach((o) => { if (je[o.id]) o.avm_verlauf = je[o.id]; });
+  } catch (e) { avmFehler = String(e && e.message || e).slice(0, 120); }
+
+  /* v3161 · Indexreihen (VPI und Nettokaltmieten, 2020 = 100) fuer Indexmieten § 557b BGB */
+  let indexreihen = null;
+  try { const ir = await mbHolen('/indexreihen', userId); indexreihen = (ir && !ir.fehler) ? ir : { fehler: ir && ir.fehler }; }
+  catch (e) { indexreihen = { fehler: String(e && e.message || e).slice(0, 120) }; }
+
   /* v3157 · Bauzinsen als Tabelle Zinsbindung × Beleihungsauslauf, mit Stand und Methode */
   let bauzins = null;
   try { const bz = require('./bauzinsService'); bauzins = bz.matrix(await bz.getBauzins()); }
@@ -748,7 +773,8 @@ async function bauen(userId, opt) {
     dealpilot_export: 'portfolio',
     format_version: 1,
     /* v3157 · Marktdaten fuer alle Objekte gleich */
-    markt: { bauzins: bauzins },
+    markt: { bauzins: bauzins, indexreihen: indexreihen },   /* v3161: indexreihen */
+    avm_fehler: avmFehler || undefined,
     beleihungswert_fehler: belwFehler || undefined,
     erzeugt_am: new Date().toISOString(),
     anzahl_objekte: objekte.length,
