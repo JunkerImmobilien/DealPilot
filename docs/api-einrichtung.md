@@ -475,8 +475,15 @@ sondern höchstens 1.800 je 15 min je IP — das entspricht dem Limit des Schlü
 - `objekte[].avm_verlauf[]` (Quelle: unabhängiger Bewertungspartner), Kopf `markt.indexreihen` (VPI, Nettokaltmieten).
 - **OpenAPI:** `/openapi.yaml` (Datei `frontend/openapi.yaml`), 16 Pfade.
 
+### v3162 · Ablage der Unterlagen
+
+- `GET /dateien/speicher` · `GET /dateien?objekt=<id>` · `POST /dateien` (multipart: datei, objekt, ordner) · `GET|PATCH|DELETE /dateien/:id`.
+- Ordner sind Pfade (`Mietverträge/Whg. 1`), Unterordner beliebig (höchstens 8 Ebenen). Gleiche Datei im selben Ordner wird nicht doppelt abgelegt.
+- Grenzen je Plan: Free 100 MB · Starter 500 MB · Investor 2 GB · Pro 10 GB · Partner 25 GB; je Datei höchstens 25 MB (413), Speicher voll = 507.
+- Verschlüsselt (AES-256-GCM) auf dem Server in Deutschland; der Export führt je Objekt `dateien[]` mit `download`.
+
 ### Noch offen (ehrlich benannt)
 
-- Hochgeladene Unterlagen liegen nicht auf dem Server (kein Datei-Endpunkt) — Entscheidung zu Ablageort und Datenschutz offen.
+- Anbindung von Kunden-Clouds (Google Drive, Dropbox, OneDrive) — wartet auf die Entwickler-Konten (`docs/cloud-anbindung-google-drive.md`).
 - `_soll_einheiten` und `_marktdaten` entstehen beim Speichern in der App; ein Objekt, das seit v3159 nicht gespeichert wurde, hat sie noch nicht.
 

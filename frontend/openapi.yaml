@@ -248,3 +248,39 @@ paths:
       summary: Steuer-Jahresrechnungen eines Objekts
       parameters: [ { name: object_id, in: path, required: true, schema: { type: string, format: uuid } } ]
       responses: { "200": { description: Liste } }
+  /dateien/speicher:
+    get:
+      summary: "v3162 · Speicher der Ablage: belegt, Grenze je Plan (Free 100 MB, Starter 500 MB, Investor 2 GB, Pro 10 GB, Partner 25 GB)"
+      responses: { "200": { description: "{ plan, grenze_bytes, belegt_bytes, frei_bytes, anzahl, max_datei_bytes }" } }
+  /dateien:
+    get:
+      summary: Abgelegte Unterlagen (Liste ohne Inhalt) – je Objekt oder ohne Objekt
+      parameters: [ { name: objekt, in: query, schema: { type: string, example: "<objekt-id> | ohne" } } ]
+      responses: { "200": { description: "{ anzahl, dateien[{ id, object_id, ordner, name, mime, groesse, quelle, created_at, download }] }" } }
+    post:
+      summary: Datei ablegen (höchstens 25 MB, verschlüsselt gespeichert)
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [datei]
+              properties:
+                datei: { type: string, format: binary }
+                objekt: { type: string, format: uuid }
+                ordner: { type: string, example: "Mietverträge/Whg. 1" }
+                quelle: { type: string, example: api }
+      responses: { "201": { description: abgelegt }, "200": { description: "schon vorhanden (doppelt: true)" }, "413": { description: zu groß }, "507": { description: Speicher voll } }
+  /dateien/{id}:
+    get:
+      summary: Datei herunterladen
+      parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+      responses: { "200": { description: Inhalt } }
+    patch:
+      summary: Verschieben oder umbenennen ({ ordner, name, objekt })
+      parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+      responses: { "200": { description: geändert } }
+    delete:
+      summary: Datei löschen (auch vom Laufwerk)
+      parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+      responses: { "200": { description: gelöscht } }
