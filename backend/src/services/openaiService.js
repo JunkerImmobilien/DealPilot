@@ -4200,7 +4200,10 @@ async function _extractBelegPage(image, opts, textEbene) {
     quelle = 'textebene';
   } else {
     const content = [{ type: "input_text", text: _prompt }, { type: "input_image", image_url: image }];
-    r = await _callOpenAIVision(content.concat(_var), { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, dokument: true, temperature: 0 });   /* v3089 */
+    /* v3166 · Marcel 04.11.2026: unlesbare Kassenbons (zerknittert, schraeg) - auf ausdruecklichen Klick des Nutzers
+       je Beleg geht das BILD an die KI statt der Texterkennung (die fand nichts). Ohne diesen Klick bleibt es bei v3089. */
+    r = await _callOpenAIVision(content.concat(_var), { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000, dokument: !opts.bildErlaubt, temperature: 0 });   /* v3089 */
+    if (opts.bildErlaubt) quelle = 'bild';
   }
   const parsed = extractJson(r.text);
   if (parsed == null) { throw new Error('JSON-Parse (Antwort evtl. zu dicht/abgeschnitten)'); }

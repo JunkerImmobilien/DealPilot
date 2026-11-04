@@ -2116,7 +2116,7 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
       try {
         /* v3154e · die exakte Textebene je PDF-Seite aus dem Browser (wird im Dienst geschwärzt) */
         const texte = Array.isArray(b.texte) ? b.texte.slice(0, imgs.length).map(function (t) { return typeof t === 'string' ? t.slice(0, 20000) : ''; }) : null;
-        const out = await openaiService.extractBeleg(imgs, { userApiKey, modus: _modus, texte: texte });
+        const out = await openaiService.extractBeleg(imgs, { userApiKey, modus: _modus, texte: texte, bildErlaubt: b.bild === true && belege.length === 1 });   /* v3166 · nur Einzelbeleg auf Klick */
         const positionen = (out && Array.isArray(out.positionen)) ? out.positionen : [];
         results.push({ name: nm, ok: positionen.length > 0, positionen: positionen, pages: (out && out.pages) || imgs.length, diag: (out && out.diag) || '',
           rechnungsbetrag: (out && out.rechnungsbetrag) || null,

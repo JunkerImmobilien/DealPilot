@@ -779,7 +779,12 @@
     var bild = bilder.length ? bilder.slice(0, 12).map(function (src, k) { return '<img src="' + src + '" alt="Seite ' + (k + 1) + '">'; }).join('') : '<div class="bi-k" style="padding:30px;text-align:center">Keine Bildansicht (Tabelle).</div>';
     var rechts;
     if (st0.cls === 'rot') {
-      rechts = '<div class="bi-rot">⚠ Aus dieser Datei konnte nichts gelesen werden' + (st0.grund ? ' (' + _esc(st0.grund) + ')' : '') + '. Auch der zweite Leseversuch ergab keinen Betrag.<br>Sie wird nicht übernommen – bitte links ansehen und die Beträge von Hand im Reiter Steuer eintragen.</div>';
+      rechts = '<div class="bi-rot">⚠ Aus dieser Datei konnte nichts gelesen werden' + (st0.grund ? ' (' + _esc(st0.grund) + ')' : '') + '. Auch der zweite Leseversuch ergab keinen Betrag.<br>Sie wird nicht übernommen – bitte links ansehen und die Beträge von Hand im Reiter Steuer eintragen.</div>'
+        /* v3166 · Marcel 04.11.2026 („ja auf jeden Fall"): auf Klick das Bild dieses einen Belegs an die KI */
+        + ((_bilder[_sel] || []).length ? '<div style="margin-top:12px;padding:12px;border:1px solid #e6e0d2;border-radius:8px;background:#fff;font-size:12.5px;line-height:1.45">'
+          + '<b>Die Texterkennung hat auf dem Bild nichts gefunden</b> (oft bei zerknitterten oder schräg fotografierten Kassenbons). '
+          + 'Du kannst das Bild dieses einen Belegs direkt von der KI lesen lassen. Dabei wird nichts geschwärzt – nur verwenden, wenn auf dem Beleg keine Daten von Mietern stehen.'
+          + '<div style="margin-top:10px"><button type="button" class="btn btn-gold btn-sm" id="bi-bild-knopf" onclick="DealPilotBelegImport._bildLesen(' + _liste.indexOf(_sel) + ',this)">Bild von der KI lesen lassen</button></div></div>' : '');
     } else {
       var idx = []; _rows.forEach(function (r, i) { if (r.name === _sel) idx.push(i); });
       var gp = _gegenprobe(_sel);
@@ -810,6 +815,30 @@
     if (_modus !== 'wk') _sums();
   }
 
+  /* v3166 · Einzelbeleg auf ausdrücklichen Klick als BILD lesen (ohne Texterkennung/Schwärzung) */
+  async function _bildLesen(i, btn) {
+    var nm = _liste[i], imgs = _bilder[nm];
+    if (!nm || !imgs || !imgs.length) return;
+    if (btn) { btn.disabled = true; btn.textContent = 'KI liest das Bild … (bis zu einer Minute)'; }
+    var poss = [], x = null;
+    try {
+      var resp = await fetch('/api/v1/ai/extract-beleg', { method: 'POST', headers: _hdrs(), body: JSON.stringify({ belege: [{ name: nm, images: imgs, bild: true }], modus: _modus, einzeln: true }) });
+      if (resp.ok) { var res = await resp.json(); x = res && res.results && res.results[0]; if (x) poss = Array.isArray(x.positionen) ? x.positionen : []; }
+    } catch (e) {}
+    if (!poss.length) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Bild von der KI lesen lassen'; }
+      try { if (window.toast) window.toast('Auch aus dem Bild ließ sich nichts sicher lesen – bitte die Beträge von Hand eintragen.'); } catch (e) {}
+      return;
+    }
+    if (x.rechnungsbetrag > 0) _betrag[nm] = x.rechnungsbetrag;
+    if (x.sicherheit) { _sicher[nm] = x.sicherheit; _zweit[nm] = x.zweitlesung || null; }
+    var vorher = _rows.length; _pushPositions(nm, poss);
+    for (var z = vorher; z < _rows.length; z++) _rows[z].bild = true;
+    _leer = _leer.filter(function (l) { return l.name !== nm; });
+    _flagRows(); _pruefen();
+    _rows.forEach(function (r) { if (r.bild) r.pruefen.push('direkt aus dem Bild gelesen (Kassenbon) – bitte mit dem Bild links vergleichen'); });
+    _sel = nm; _render();
+  }
   function _keep(i, v) { if (_rows[i]) { _rows[i].keep = !!v; _render(); } }   /* v3155: Leiste, Gegenprobe und Ziel ziehen mit */
   function _kat(i, v)  { if (_rows[i]) { _rows[i].kategorie = v; _render(); } }
   function _betragSetzen(i, v) {   /* v3155b · eigener Name: _betrag ist die Liste der Rechnungsbetraege */
@@ -1157,6 +1186,6 @@
     /* v3120 · der gemeinsame Eingang (unterlagen-eingang.js) übergibt erkannte Rechnungen direkt */
     oeffnenMit: function (files, modus) { open(modus || 'wk'); if (files && files.length) setTimeout(function () { _onPick(files); }, 50); },
     _keep: _keep, _kat: _kat,
-    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle, /* v3156 */ _pruefung: _pruefung, _betragSetzen: _betragSetzen
+    /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle, /* v3156 */ _pruefung: _pruefung, _betragSetzen: _betragSetzen, /* v3166 */ _bildLesen: _bildLesen
   };
 })();
