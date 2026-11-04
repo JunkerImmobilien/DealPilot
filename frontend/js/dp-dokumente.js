@@ -487,8 +487,9 @@
     var an = true; try { if (window.DealPilotPdfWahl && typeof DealPilotPdfWahl.pilotAn === 'function') an = DealPilotPdfWahl.pilotAn(); } catch (e) {}
     if (!(ai || txt) || !an) return '';
     var on = function (t) { try { return typeof window._dpPdfSectionOn !== 'function' || window._dpPdfSectionOn(t); } catch (e) { return true; } };
-    var block = function (t, x) { if (!x || !on(t)) return ''; return '<div class="block"><h3>' + B.esc(t) + '</h3>' + String(x).split(/\n+/).map(function (p) { p = klar(p); return p ? '<p>' + B.esc(p) + '</p>' : ''; }).join('') + '</div>'; };
-    var liste = function (t, arr) { if (!arr || !arr.length || !on(t)) return ''; return '<div class="block"><h3>' + B.esc(t) + '</h3><ul>' + arr.slice(0, kurz ? 3 : 8).map(function (x) { return '<li>' + B.esc(klar(x)) + '</li>'; }).join('') + '</ul></div>'; };
+    /* v3180d · lange Texte duerfen umbrechen (break-inside:avoid liess halbe Seiten leer); Absaetze und Punkte bleiben ganz */
+    var block = function (t, x) { if (!x || !on(t)) return ''; return '<div class="fliess"><h3>' + B.esc(t) + '</h3>' + String(x).split(/\n+/).map(function (p) { p = klar(p); return p ? '<p>' + B.esc(p) + '</p>' : ''; }).join('') + '</div>'; };
+    var liste = function (t, arr) { if (!arr || !arr.length || !on(t)) return ''; return '<div class="fliess"><h3>' + B.esc(t) + '</h3><ul>' + arr.slice(0, kurz ? 3 : 8).map(function (x) { return '<li>' + B.esc(klar(x)) + '</li>'; }).join('') + '</ul></div>'; };
     var qa = function (v) { if (!Array.isArray(v)) return v; return v.map(function (e) { return e && typeof e === 'object' ? (e.frage ? e.frage + '\n' : '') + (e.antwort || '') : String(e || ''); }).filter(Boolean).join('\n\n'); };
     if (!ai) return '<p>' + B.esc(klar(String(txt).replace(/\s+/g, ' ').slice(0, kurz ? 900 : 2400))) + '</p>';
     var h = '', urteil = ai.empfehlung || ai.recommendation || '', off = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung, offBeg = null;
@@ -498,7 +499,8 @@
     if (off && on('Kaufpreis-Offerte')) kz.push({ l: 'Kaufpreis-Offerte', v: typeof off === 'number' ? B.eur(off) : klar(off).slice(0, 40) });
     if (kz.length) h += B.kacheln(kz, true);
     if (!kurz) h += block('Gesamtbewertung', ai.gesamtbewertung || ai.fazit_kurz);
-    h += '<div class="zwei"><div>' + liste('Stärken', ai.staerken || ai.strengths) + '</div><div>' + liste('Risiken', ai.risiken || ai.schwaechen || ai.risks) + '</div></div>';
+    /* v3180d · untereinander statt zweispaltig: im Blocksatz ohne Silbentrennung (Server-Chrome hat kein Trennwoerterbuch) rissen die schmalen Spalten Luecken */
+    h += liste('Stärken', ai.staerken || ai.strengths) + liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
     if (!kurz && !bank && ai.risikoanalyse && typeof ai.risikoanalyse === 'object') {   /* v3180c · Bank: steht in Risiken und Belastungsprobe */
       var ra = ai.risikoanalyse;
       h += liste('Risikoanalyse', [ra.finanzierungsrisiko ? 'Finanzierungsrisiko: ' + ra.finanzierungsrisiko : null, ra.cashflow_stabilitaet ? 'Cashflow-Stabilität: ' + ra.cashflow_stabilitaet : null,
