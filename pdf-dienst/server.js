@@ -159,6 +159,8 @@ async function erzeugen(auftrag) {
         if (u.startsWith('data:') || (u.startsWith(herkunft + '/fonts/') && r.method() === 'GET')) return r.continue();
         spur.blockiert.push(u.slice(0, 120)); r.abort('blockedbyclient');
       });
+      /* Webschriften laden nur gleicher Herkunft (CORS): erst eine Datei der App oeffnen, dann das Dokument setzen */
+      await page.goto(herkunft + '/fonts/dp-fonts.css', { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
       await page.setContent(String(auftrag.html || ''), { waitUntil: 'networkidle0', timeout: 30000 }).catch(() => {});
       schritt('html gesetzt');
       const esc = (t) => String(t || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
