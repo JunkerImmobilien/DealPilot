@@ -196,23 +196,23 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
                    ['1', 'freistehendes Ein-/Zweifamilienhaus'],
                    ['2', 'Doppelhaus / Reihenendhaus'],
                    ['3', 'Reihenmittelhaus']],
-        wenn: function () { return !istWohnung(); },
-        pflichtWenn: function () { return !istWohnung(); } },
+        wenn: function () { return istEinZweifamilien(); },
+        pflichtWenn: function () { return istEinZweifamilien(); } },
       { id: 'nhkGeschosse', label: 'Geschosse und Unterkellerung', typ: 'select',
         opt: [['', '\u2013 keine Angabe \u2013'],
                    ['0', 'Keller- und Erdgeschoss'],
                    ['1', 'Keller-, Erd- und Obergeschoss'],
                    ['2', 'Erdgeschoss, nicht unterkellert'],
                    ['3', 'Erd- und Obergeschoss, nicht unterkellert']],
-        wenn: function () { return !istWohnung(); },
-        pflichtWenn: function () { return !istWohnung(); } },
+        wenn: function () { return istEinZweifamilien(); },
+        pflichtWenn: function () { return istEinZweifamilien(); } },
       { id: 'nhkDach', label: 'Dachausbildung', typ: 'select',
         opt: [['', '\u2013 keine Angabe \u2013'],
                    ['1', 'Dachgeschoss voll ausgebaut'],
                    ['2', 'Dachgeschoss nicht ausgebaut'],
                    ['3', 'Flachdach oder flach geneigtes Dach']],
-        wenn: function () { return !istWohnung(); },
-        pflichtWenn: function () { return !istWohnung(); } },
+        wenn: function () { return istEinZweifamilien(); },
+        pflichtWenn: function () { return istEinZweifamilien(); } },
 
       /* v1067-WSW-5 · Die Stufen 1 und 2 gibt es nur fuer Haeuser. Sie
        * hier anzubieten, wo die Tabelle sie nicht hat, waere eine
@@ -459,6 +459,11 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     return '';
   }
   function istWohnung() { return /wohnung|etw/i.test(wert('ptype')); }
+  /* v3177c · Hausform, Geschosse, Dach (NHK 2010 Typ 1-3) gibt es nur fuer Ein-/Zweifamilien-,
+     Doppel- und Reihenhaeuser. Ein MFH waehlt die NHK ueber die Zahl der Wohnungen (4.1-4.3) -
+     dort war „Hausform (NHK)“ Pflicht, ohne dass eine Auswahl gepasst haette (Westerfeldstr.). */
+  function istEinZweifamilien() { return /^(EFH|ZFH|DHH|RH|haus)$/i.test(String(wert('ptype') || '')); }
+  function brauchtStandardstufe() { return istEinZweifamilien() || /^MFH$/i.test(String(wert('ptype') || '')); }
   function stufe() {
     try { return parseInt(localStorage.getItem(STUFE_KEY), 10) || 1; } catch (e) { return 1; }
   }
@@ -991,6 +996,9 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       garagen_stufe: parseFloat(pWert('garagenStufe')) || null,
       aussenanlagen_pct: parseFloat(pWert('aussenPct')) || null,
       nhk_typ: (function () {
+        /* v3177c · nur fuer Ein-/Zweifamilienhaeuser; ein MFH waehlt 4.1-4.3 im Kern ueber die Wohnungen.
+           Ein stehengebliebener Wert im ausgeblendeten Feld darf keinen EFH-Typ an ein MFH schicken. */
+        if (!istEinZweifamilien()) return null;
         var h = pWert('nhkHaus'), g = pWert('nhkGeschosse'), d = pWert('nhkDach');
         return (h && g && d) ? (h + '.' + g + d) : null;
       })(),

@@ -96,6 +96,11 @@
   function $(id) { return document.getElementById(id); }
   function wert(id) { var e = $(id); return e ? String(e.value || '').trim() : ''; }
   function istWohnung() { return /wohnung|etw/i.test(wert('ptype')); }
+  /* v3177c · Hausform, Geschosse, Dach (NHK 2010 Typ 1-3) gibt es nur fuer Ein-/Zweifamilien-,
+     Doppel- und Reihenhaeuser. Ein MFH waehlt die NHK ueber die Zahl der Wohnungen (4.1-4.3) -
+     dort war „Hausform (NHK)“ Pflicht, ohne dass eine Auswahl gepasst haette (Westerfeldstr.). */
+  function istEinZweifamilien() { return /^(EFH|ZFH|DHH|RH|haus)$/i.test(String(wert('ptype') || '')); }
+  function brauchtStandardstufe() { return istEinZweifamilien() || /^MFH$/i.test(String(wert('ptype') || '')); }
 
   /* ── Was jede Stufe WIRKLICH braucht ───────────────────────────────────
      v1126d · EIGENER FEHLER, ZURUECKGENOMMEN. Ich hatte behauptet, hier
@@ -207,7 +212,8 @@
   function bedarf3() {
     var l = BEDARF[3].slice();
     if (istWohnung()) l.push(['mea', 'Miteigentumsanteil']);   /* v1435, zurueck aus bedarf1 */
-    if (!istWohnung()) { l.push(['standardstufe', 'Standardstufe']); l.push(['nhkHaus', 'Hausform (NHK)']); }
+    if (brauchtStandardstufe()) l.push(['standardstufe', 'Standardstufe']);
+    if (istEinZweifamilien()) l.push(['nhkHaus', 'Hausform (NHK)']);   /* v3177c */
     return l;
   }
   /* v1201 · EINE Stelle, die sagt was eine Stufe braucht. Vorher stand der

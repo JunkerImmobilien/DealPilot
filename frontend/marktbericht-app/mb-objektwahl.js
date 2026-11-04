@@ -588,6 +588,11 @@
       var items = resp.items || resp.objects || [];
       if (!items.length) { host.style.display = 'none'; return; }
       var opts = ['<option value="">\u2014 Objekt aus Bestand w\u00e4hlen \u2014</option>'];
+      /* v3177c · leere Objekte („Unbenannt“, ohne Anschrift) gehoeren nicht in die Auswahl */
+      items = items.filter(function (it) {
+        var n = String(it.name || (it.data && it.data._name) || '').trim();
+        return n && !/^unbenannt$/i.test(n);
+      });
       items.forEach(function (it) {
         var id = it.id || it.key || it.object_key;
         var seq = it.seq_no || it.obj_seq || (it.data && it.data._obj_seq) || '';
