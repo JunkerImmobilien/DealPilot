@@ -31,6 +31,7 @@ const ARTEN = {
   dok_kurz: { name: 'Kurzfassung (einheitlich)', objekt: true },
   dok_kaufpreisaufteilung: { name: 'Kaufpreisaufteilung (einheitlich)', objekt: true },
   dok_finanzamt: { name: 'Werbungskosten (einheitlich)', objekt: true },
+  dok_finanzamt_anlagev: { name: 'Werbungskosten mit Anlage V (einheitlich)', objekt: true },
   dok_trackrecord: { name: 'Track Record (einheitlich)', objekt: false },
   dok_bankexport: { name: 'Bankexport (einheitlich)', objekt: false }
 };
