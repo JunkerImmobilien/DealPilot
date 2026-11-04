@@ -152,7 +152,6 @@ async function erzeugen(auftrag) {
        App. Das HTML kommt von einem angemeldeten Nutzer; ohne Skript und ohne Netz kann es nichts erreichen. */
     if (auftrag.art === 'html') {
       const herkunft = new URL(APP_URL).origin;
-      await page.setJavaScriptEnabled(false);
       await page.setRequestInterception(true);
       page.on('request', (r) => {
         const u = r.url();
@@ -161,7 +160,12 @@ async function erzeugen(auftrag) {
       });
       /* Webschriften laden nur gleicher Herkunft (CORS): erst eine Datei der App oeffnen, dann das Dokument setzen */
       await page.goto(herkunft + '/fonts/dp-fonts.css', { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
-      await page.setContent(String(auftrag.html || ''), { waitUntil: 'networkidle0', timeout: 30000 }).catch(() => {});
+      /* v3183b · setContent braucht JavaScript (mit abgeschaltetem druckte Chrome die CSS-Datei). Stattdessen verbietet
+         eine Content-Security-Policy im Dokument jedes Skript und jede Verbindung ausser Schriften/Bildern der App. */
+      const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline' ${herkunft}; font-src ${herkunft} data:; img-src data: ${herkunft}; connect-src 'none'">`;
+      const html = String(auftrag.html || '').replace(/<head>/i, '<head>' + csp);
+      await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
+      await page.evaluate(() => Promise.race([document.fonts ? document.fonts.ready : null, new Promise((ok) => setTimeout(ok, 8000))])).catch(() => {});
       schritt('html gesetzt');
       const esc = (t) => String(t || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
       const f = Array.isArray(auftrag.fuss) ? auftrag.fuss : [];
@@ -172,7 +176,7 @@ async function erzeugen(auftrag) {
           + '<span>' + esc(f[0]) + '</span><span>' + esc(f[1]) + ' · Seite <span class="pageNumber"></span> von <span class="totalPages"></span></span></div>'
       }));
       schritt('pdf da');
-      log('schritte html: ' + spur.schritte.join(' | ') + (spur.blockiert.length ? ' · blockiert ' + spur.blockiert.length : ''));
+      log('schritte html: ' + spur.schritte.join(' | ') + (spur.blockiert.length ? ' · blockiert ' + spur.blockiert.join(', ').slice(0, 200) : ''));
       return { pdf, dateiname: String(auftrag.titel || 'Dokument').replace(/[^\wäöüÄÖÜß .,-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) + '.pdf' };
     }
     await page.setViewport({ width: 1440, height: 1000 });
