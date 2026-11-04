@@ -93,7 +93,10 @@ Gefunden beim Lindenhof-Abgleich (Pilot-Analyse v3099j): `calc.js` 3702–3711 s
 
 (1) Rund 2.400 alte UK-/IRW-Sperren ohne Feld `zugang` (BW 920, WGFZ 880, NW, NI, SN, HE) — eigener Durchgang mit Kontrolle, nicht automatisch aus Freitext. (2) Südhessen: Flächentabelle nur für Gewerbe ≥ 10.000 m² ohne Anwendungsbeispiel — aufnehmen? (Reihenfolge der Sätze je AGS beachten.) (3) Kern-Formen fehlen für Warendorf (Kreuztabelle), Minden (Mehrfläche gestuft), Viersen (Gartenland zweistufig), Bochum (Stufen ohne Bezugsgröße) — Tabellen liegen unter `formel_vorgemerkt`. (4) NI-WGFZ hängt an der BRW-Zone, nicht an der Gemeinde — Bauaufgabe. (5) BW Fachinformationen 2026 nur einzeln prüfbar.
 
-### N113 · DealPilot-Agent: passende Angebote anfragen, Unterlagen abwarten, automatisch durchrechnen (Marcel 03.11.2026) — Demo liegt vor, Fragen an ImmoMetrica offen
+### N113 · DealPilot-Agent: passende Angebote anfragen, Unterlagen abwarten, automatisch durchrechnen (Marcel 03.11.2026) — Demo überarbeitet 04.11., Schnittstelle v3168, Marcel entscheidet Stufe 1
+
+**Rückmeldung ImmoMetrica-Support (04.11.2026):** kein Preisverlauf und kein Kennzeichen neu/geändert in `results/`; `last_modified` ändert sich bei jeder Änderung. Filter `offer_id_gt`, `last_modified_after`, `offline_date_after`, `reactivated_after` (je Abruf nur ein Zeitstempel-Filter, ein paar Minuten überlappen, über ID entdoppeln). Keine Webhooks. Kontingent: jedes eindeutige Objekt je Monat und Land einmal, Wiederholungen/Blättern/Suchliste frei; erschöpft = HTTP 200, neue Objekte fehlen, Header `X-Limit`/`X-Limit-Used`/`X-Limit-Hidden`, anhebbar bis 2.000 je Land. Bis 5.000 Anfragen/h (429), große Suchen 503 nach 25 s. **Keine Kontaktdaten**, nur `platforms[].url`. Unbeantwortet: Nutzung im Auftrag von Kunden, Speichern von Preisverläufen. Doku `searchapi/v1/docs` nur angemeldet.
+**Gebaut v3168:** Kontingent aus den Headern, klare Meldungen 429/503, Filter mit 5 min Überlappung und ID-Entdoppelung, Route `/immometrica/searches/:id/aenderungen`, `/immometrica/kontingent`. **Folge für das Konzept:** Anfrage läuft über das Inserat (Text kopieren + Inserat öffnen), Automatik „ab −x % selbst anfragen“ entfällt; Stufe 1 jetzt 3–5 Tage, Stufe 2 1–2 Tage.
 
 **Demo** (`ff896e17`, `design/Vorschläge/deal-agent-immometrica.html`, Artifact https://claude.ai/artifact/25BjP98icw63CNpphmme2T): Beobachtung mit Takt (täglich/stündlich/30 min) und Kontingent-Rechnung, neu/Preis gesenkt/wieder eingestellt, Profilfilter, Preisverlauf; Anfrage als Entwurf aus dem eigenen Postfach, Automatik ab −x % nur nach zweiter Bestätigung; Tracking in vier Schritten; Aufstellung; „Was steckt dahinter“ mit Ablauf, Leitplanken, Stufenplan (4–6 / 5–8 + Google-Prüfung / 8–12 Tage). **Recherche:** ImmoMetrica bewirbt Preisverlauf, Suche nach Preissenkungen und Benachrichtigung bei Preisänderungen (E-Mail, Telegram); API-Zugang nur im Tarif Investor Pro mit 600 Objekten/Monat; keine öffentliche API-Doku, keine Webhooks; unsere Treffer enthalten keine Kontaktadresse des Anbieters. **Fragen an den Support** (stehen in der Demo): Preisverlauf/früherer Preis in `results/`, Kennzeichen neu/geändert oder Parameter „geändert seit“, Webhooks, Zählweise der 600, erlaubter Abruftakt, Kontaktdaten in den Treffern, Nutzung im Auftrag von Kunden und Speichern von Preisverläufen. Mobil 390 px nicht nachgemessen.
 
@@ -2126,7 +2129,7 @@ Der Agent gleicht gelesene, ungelesene und abgelegte Mails gegen offene Aufgaben
 
 Bot gebaut (v1791–v1798: eigener Bot je Kunde, Webhook, Einmal-Code, Auskunft, Anlage, Sprachnachricht), Erledigtes s. Fertig. Offen bleibt nur G1:
 
-### G1 · Google Drive — eigenes Thema, noch nicht angefasst
+### G1 · Google Drive — **entfällt (Marcel 04.11.2026: „Google Drive und Cloud-Anbindung nehmen wir raus“)**. Konzept bleibt in docs/cloud-anbindung-google-drive.md, Datei-Ablage v3162 bleibt abgeschaltet.
 
 Marcel ausdrücklich: *„Das wäre aber ein extra Thema."* Was die Anleitung und
 `bau-cockpit/lib/drive.js` (101 Zeilen) dazu hergeben, steht fest:
