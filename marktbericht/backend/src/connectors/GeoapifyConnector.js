@@ -43,9 +43,21 @@ export const GeoapifyConnector = {
     if (!geoEnabled()) return null;
     const url =
       `${cfg.geoapify.base}/v1/geocode/search` +
-      `?text=${encodeURIComponent(address)}&filter=countrycode:de&limit=1&lang=de&apiKey=${cfg.geoapify.key}`;
+      `?text=${encodeURIComponent(address)}&filter=countrycode:de&limit=5&lang=de&apiKey=${cfg.geoapify.key}`;
     const data = await httpJson(url, { timeoutMs: 12000 });
-    const f = data && data.features && data.features[0];
+    /* v3175 · PLZ gegenpruefen (Hauptstr. 51, 49477 Ibbenbueren landete mit limit=1 in der
+       Hauptstrasse des Ortsteils Uffeln, 49479 - Bodenrichtwert aus einer Gewerbezone, 45 statt
+       ~210 EUR/m2). Nennt die Eingabe eine PLZ, gewinnt der erste Treffer mit DIESER PLZ;
+       passt keiner, bleibt der erste Treffer, und `plz_abweichend` reist mit. */
+    const feats = (data && data.features) || [];
+    const plzEin = (String(address).match(/\b(\d{5})\b/) || [])[1] || null;
+    let f = feats[0];
+    let plzAbweichend = false;
+    if (plzEin && feats.length) {
+      const passt = feats.find((x) => x.properties && String(x.properties.postcode || '') === plzEin);
+      if (passt) f = passt;
+      else plzAbweichend = !!(f && f.properties && f.properties.postcode && String(f.properties.postcode) !== plzEin);
+    }
     if (!f) return null;
     const p = f.properties || {};
     return {
@@ -53,6 +65,7 @@ export const GeoapifyConnector = {
       lon: p.lon,
       confidence: (p.rank && p.rank.confidence) || null,
       formatted: p.formatted,
+      plz_abweichend: plzAbweichend,
       components: {
         street: p.street,
         house_number: p.housenumber,

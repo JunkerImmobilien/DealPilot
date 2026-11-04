@@ -9,7 +9,10 @@ export const GeocodingService = {
       'SELECT * FROM mb.addresses WHERE raw = $1 AND lat IS NOT NULL ORDER BY id DESC LIMIT 1',
       [address]
     );
-    if (cached) {
+    /* v3175 · ein Cache-Treffer mit ANDERER PLZ als die Eingabe ist ein alter Fehlgriff
+       (limit=1 ohne PLZ-Abgleich) - neu geocodieren statt ihn weiterzureichen. */
+    const plzEin = (String(address).match(/\b(\d{5})\b/) || [])[1] || null;
+    if (cached && !(plzEin && cached.postcode && String(cached.postcode) !== plzEin)) {
       return {
         lat: cached.lat, lon: cached.lon, confidence: cached.geocode_conf,
         formatted: cached.raw, components: {
