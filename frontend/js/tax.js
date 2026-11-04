@@ -1937,6 +1937,8 @@ function renderYearlyTaxForm() {
         '<button class="ytf-mode-btn ' + (mode === 'quick' ? 'active' : '') + '" onclick="setTaxFormMode(\'quick\')">Quick-Modus</button>' +
         '<button class="ytf-mode-btn ' + (mode === 'detail' ? 'active' : '') + '" onclick="setTaxFormMode(\'detail\')">Detail-Modus</button>' +
       '</div>' +
+      /* v3164 · Jahresansicht: jeder Posten mit den Belegen, aus denen er stammt (unterlagen-eingang.js) */
+      (window.DpEingang && window.DpEingang.jahresAnsicht ? '<button class="btn btn-outline btn-sm" onclick="DpEingang.jahresAnsicht()" style="margin-left:auto" title="Jedes Jahr: welcher Wert aus welcher Rechnung kommt">Belege je Jahr</button>' : '') +
       '<button class="btn btn-outline btn-sm" onclick="resetAllTaxOverrides()" title="Alle manuellen Eingaben zurücksetzen">↺ Vorschläge wiederherstellen</button>' +
     '</div>';
 

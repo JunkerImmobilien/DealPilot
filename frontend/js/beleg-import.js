@@ -824,6 +824,11 @@
       if (/nied|low/i.test(String(r.konfidenz || ''))) g.push('die Lesung war unsicher');
       if (r.brutto > 25000) g.push('ungewöhnlich hoher Betrag');
       if (r.zweiter) g.push('erst im zweiten Leseversuch erkannt');
+      /* v3164 · Übernachtung MIT Frühstück in einem Preis: das Frühstück ist keine Übernachtung, es ist mit der
+         Verpflegungspauschale abgegolten. Üblich ist ein Abzug von 20 % des vollen Tagessatzes (Inland 5,60 €) je
+         Frühstück. Wie viele Nächte es waren, steht nicht sicher auf jeder Rechnung - deshalb benannt, nicht gerechnet. */
+      if (r.kategorie === 'Übernachtung / Hotel' && /fr(ü|ue)hst|breakfast|\binkl\b.*fr|b\s*&\s*b|\bbb\b/i.test(String(r.beschreibung || '')))
+        g.push('Übernachtung inklusive Frühstück: der Frühstücksanteil gehört nicht zu den Übernachtungskosten – üblich 5,60 € je Frühstück abziehen (Betrag anklicken und ändern)');
       r.pruefen = g;
       if (!r.jahr && _modus === 'wk') r.keep = false;
     });
@@ -1065,7 +1070,16 @@
     try {
       var _aend = _E ? _E.txEnde() : [];
       var _gen = {}; _rows.forEach(function (r) { if (r.keep && r.brutto && r.jahr) _gen[r.name] = true; });
-      if (_E) _E.protokoll({ quelle: 'Belege', aenderungen: _aend,
+      /* v3164 · je Position eine Buchung: Marcel 04.11.2026 „welche Werte aus welcher Rechnung … auf jeden einzelnen
+         Posten". Dieselbe Auswahl wie _planWk - was dort nicht zählt, wird hier nicht gebucht. */
+      var _buch = [];
+      _rows.forEach(function (r) {
+        if (!r.keep || !r.brutto || !isFinite(r.brutto) || !r.jahr || !_zaehlt(r)) return;
+        var f = FIELD_MAP_WK[r.kategorie]; if (!f) return;
+        _buch.push({ jahr: Number(r.jahr), feld: f, betrag: Math.round(r.brutto * 100) / 100, datei: r.name, position: r.beschreibung || '',
+          aussteller: r.aussteller && r.aussteller !== '—' ? r.aussteller : '', datum: r.datum || '', kategorie: r.kategorie, hand: r.hand != null });
+      });
+      if (_E) _E.protokoll({ quelle: 'Belege', aenderungen: _aend, buchungen: _buch,
         dokumente: Object.keys(_gen).map(function (nm) { return { name: nm, typ: 'Beleg' }; }),
         uebernommen: p.zeilen.map(function (z) { return 'Steuer ' + z.jahr + ' · ' + z.label + ': ' + (z.override != null ? _fmtEur(z.override) + ' € → ' : '') + _fmtEur(z.neu) + ' € (' + (z.betrag < 0 ? '−' : '+') + _fmtEur(Math.abs(z.betrag)) + ' €)'; }),
         nicht_gelesen: _leer.map(function (x) { return x.name; }) });
