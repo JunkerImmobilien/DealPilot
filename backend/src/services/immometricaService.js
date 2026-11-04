@@ -197,6 +197,49 @@ async function getAenderungen(token, searchId, art, seit) {
   return { art: art, seit: seit, anzahl: items.length, kontingent: kont, items: items };
 }
 function letztesKontingent() { return _letztesKontingent; }
+
+/* === v3169 · SUCHE AUS DEALPILOT ANLEGEN (openapi.json createSearch, gelesen 04.11.2026) ===
+   POST searches/ {name, country, filters:{type, zipcodes[], living_space, rooms, buying_price, rent_cold,
+   construction_year, active}} -> 201 {id, name, url, results}. Spanne {min,max}, beide einschliesslich.
+   Unbekannter Filter / Land / PLZ -> 400 mit dem Feldnamen, angelegt wird nichts. Eine per API angelegte
+   Suche verschickt KEINE E-Mails. Es gilt das Suchen-Limit der Mitgliedschaft (sonst hoechstens 500 je Land). */
+const TYPEN = ['apartmentbuy', 'apartmentrent', 'housebuy', 'houserent'];
+const SPANNEN = ['living_space', 'rooms', 'buying_price', 'rent_cold', 'construction_year'];
+function _spanne(v) {
+  if (v == null) return null;
+  const z = (x) => (x == null || x === '' || !isFinite(Number(x)) ? null : Math.round(Number(x) * 100) / 100);
+  const r = { min: z(v.min), max: z(v.max) };
+  return r.min == null && r.max == null ? null : r;
+}
+function sucheBauen(e) {
+  e = e || {};
+  const fehler = (t) => { const x = new Error(t); x.status = 400; throw x; };
+  if (!e.name || !String(e.name).trim()) fehler('Name der Suche fehlt');
+  if (TYPEN.indexOf(e.type) < 0) fehler('Objektart muss eine von ' + TYPEN.join(', ') + ' sein');
+  const filters = { type: e.type };
+  if (Array.isArray(e.zipcodes) && e.zipcodes.length) filters.zipcodes = e.zipcodes.map(String).filter((z) => /^\d{4,5}$/.test(z)).slice(0, 2000);
+  SPANNEN.forEach((k) => { const s = _spanne(e[k]); if (s) filters[k] = s; });
+  if (typeof e.active === 'boolean') filters.active = e.active;
+  return { name: String(e.name).trim().slice(0, 120), country: String(e.country || 'de').toLowerCase(), filters: filters };
+}
+async function createSearch(token, eingabe) {
+  const body = sucheBauen(eingabe);
+  if (_isStub()) return { id: 'stub-' + Date.now(), name: body.name, url: null, results: null, stub: true, gesendet: body };
+  const res = await fetch(abs('searches/'), { method: 'POST',
+    headers: { Authorization: 'Token ' + token, Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const text = await res.text(); let json = null; try { json = JSON.parse(text); } catch (e) {}
+  if (!res.ok) {
+    const err = new Error(res.status === 400 ? 'ImmoMetrica lehnt die Suche ab: ' + (json ? JSON.stringify(json).slice(0, 300) : text.slice(0, 200)) : 'ImmoMetrica ' + res.status);
+    err.status = res.status; throw err;
+  }
+  return Object.assign({ gesendet: body }, json);
+}
+async function deleteSearch(token, searchId) {
+  if (_isStub()) return { ok: true, stub: true };
+  const res = await fetch(abs('searches/' + encodeURIComponent(searchId) + '/'), { method: 'DELETE', headers: { Authorization: 'Token ' + token } });
+  if (!res.ok && res.status !== 404) { const err = new Error('ImmoMetrica ' + res.status); err.status = res.status; throw err; }
+  return { ok: true };
+}
 async function getFavorites(token, cc) {
   if (_isStub()) return _demoFavorites(cc);
   const url = abs('favorites/' + encodeURIComponent(cc) + '/');
@@ -209,4 +252,4 @@ async function getFavorites(token, cc) {
   };
 }
 
-module.exports = { getSearches, getResults, getFavorites, getAenderungen, letztesKontingent };
+module.exports = { getSearches, getResults, getFavorites, getAenderungen, letztesKontingent, createSearch, deleteSearch, sucheBauen };

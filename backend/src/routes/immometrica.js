@@ -94,6 +94,15 @@ router.get('/searches/:id/aenderungen', authenticate, limiter, async (req, res) 
   try { const t = await tokenOr428(req, res); if (!t) return; res.json(await imo.getAenderungen(t, req.params.id, String(req.query.art || ''), req.query.seit)); }
   catch (e) { res.status(e.status || 502).json({ error: 'ImmoMetrica-Fehler', detail: String(e.message) }); }
 });
+/* v3169 · Suche aus DealPilot anlegen bzw. loeschen (ImmoMetrica createSearch/deleteSearch) */
+router.post('/searches', authenticate, limiter, async (req, res) => {
+  try { const t = await tokenOr428(req, res); if (!t) return; res.status(201).json(await imo.createSearch(t, req.body || {})); }
+  catch (e) { res.status(e.status || 502).json({ error: 'ImmoMetrica-Fehler', detail: String(e.message) }); }
+});
+router.delete('/searches/:id', authenticate, limiter, async (req, res) => {
+  try { const t = await tokenOr428(req, res); if (!t) return; res.json(await imo.deleteSearch(t, req.params.id)); }
+  catch (e) { res.status(e.status || 502).json({ error: 'ImmoMetrica-Fehler', detail: String(e.message) }); }
+});
 /* v3168 · letzter bekannter Kontingent-Stand aus den X-Limit-Headern, ohne eigenen Abruf */
 router.get('/kontingent', authenticate, (req, res) => { res.json({ kontingent: imo.letztesKontingent() }); });
 

@@ -122,6 +122,9 @@ const FIELD_MAP = {
   leasehold:           { target: 'note', label: 'Erbpacht', note: 'B2: eigenes Feld erbpacht + erbbauzins vorgeschlagen' },
   foreclosure:         { target: 'note', label: 'Zwangsversteigerung', note: 'B3: erwerbsart' },
   auction:             { target: 'note', label: 'Bieterverfahren', note: 'B3: erwerbsart' },
+  /* v3169 · aus der Doku openapi.json (04.11.2026, mit Marcels Anmeldung gelesen): einzige Felder, die hier fehlten */
+  auction_court:       { target: 'note', label: 'Versteigerungsgericht' },
+  auction_date:        { target: 'note', label: 'Versteigerungstermin' },
   is_private:          { target: 'note', label: 'Anbieter privat/gewerblich', note: 'B4: anbietertyp' },
   new_building:        { target: 'note', label: 'Neubau', note: 'Hint §7b-Modul' },
   usufruct:            { target: 'note', label: 'Nießbrauch' },
