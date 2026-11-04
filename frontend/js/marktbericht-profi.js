@@ -548,8 +548,8 @@
       + '<div class="zwei">' + (d.karteNah ? '<img class="karte" src="' + d.karteNah + '" alt="Karte Umgebung">' : '') + (d.karteFern ? '<img class="karte" src="' + d.karteFern + '" alt="Karte Region">' : '') + '</div>'
       + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro)));
     /* v3178c · Region und Bewertung gehoeren zur Seite Markt & Region (sonst lief Lage ueber) */
-    var regionHtml = bewertung(p.assessment)
-      + (makro ? '<div class="block"><h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>'
+    var regionHtml = bewertung(p.assessment);
+    var regionTab = (makro ? '<div class="block"><h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>'
       + (z.available ? '<p class="det" style="margin-top:2mm">Zensus 2022 (' + esc((z.gemeinde && z.gemeinde.name) || z.kreis_name || '') + '): Leerstandsquote ' + zahl(z.leerstandsquote, 1) + ' %, Eigentümerquote ' + zahl(z.eigentuemerquote, 1) + ' %.</p>' : '') + '</div>' : '');
 
     /* 5 · Markt */
@@ -570,7 +570,7 @@
       + ((p.valuation && p.valuation.notes || []).length ? '<p class="det" style="margin-top:3mm">' + esc(p.valuation.notes.join(' ')) + '</p>' : '')
       + kennzahlen(p, r) + marktentwicklung(p.market_history) + regionHtml));
     var vgl = vergleichsangebote(p);
-    if (vgl) teile.push(seite(d, 'Vergleichsangebote', '<div class="eyebrow">Abschnitt 3 · Fortsetzung</div><h2>Vergleichsangebote</h2><p class="sub">Vergleichbare Angebote im Umkreis, nach Entfernung.</p>' + vgl.replace(/^<h3>[^<]*<\/h3>/, '')));
+    if (vgl || regionTab) teile.push(seite(d, 'Vergleichsangebote und Region', '<div class="eyebrow">Abschnitt 3 · Fortsetzung</div><h2>Vergleichsangebote und Region</h2><p class="sub">Vergleichbare Angebote im Umkreis, nach Entfernung, und die Kennzahlen der Region.</p>' + regionTab + (vgl || '')));
 
     /* 6 · Bodenwert + Sachwert */
     var bw = c.bodenwert || {}, sw = c.sachwert || {}, lv = p.land_value || {};
