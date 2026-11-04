@@ -457,8 +457,31 @@ async function runReport(req, res) {
   }
 }
 // v557: Read-Hilfen fuer das eingebettete Marktbericht-Frontend (auth, 0 L)
-router.get('/static-map', authenticate, readGet('/static-map'));
-router.get('/streetview', authenticate, readGet('/streetview'));
+/* v3176 · Bilder BINAER durchreichen. readGet las das JPEG mit r.text() und schickte es als
+   JSON {"raw": "..."} - jede Karte, die durch diesen Proxy ging, kam kaputt an (gemessen am
+   Marktbericht Profi: 168 kB JSON statt image/jpeg). Kein JSON-Fehlertext nach aussen ausser
+   beim Fehlschlag. */
+function readBild(path) {
+  return async function (req, res) {
+    try {
+      const r = await fetch(MB_BASE + path + '?' + qstrUser(req));
+      const typ = r.headers.get('content-type') || '';
+      if (!r.ok || !/^image\//.test(typ)) {
+        const t = await r.text().catch(function () { return ''; });
+        let d; try { d = JSON.parse(t); } catch (e) { d = { error: 'kein_bild' }; }
+        return res.status(r.ok ? 502 : r.status).json(d);
+      }
+      const buf = Buffer.from(await r.arrayBuffer());
+      res.set('Content-Type', typ);
+      res.set('Cache-Control', 'private, max-age=86400');
+      res.status(200).send(buf);
+    } catch (e) {
+      res.status(502).json({ error: 'mb_unreachable', message: e.message });
+    }
+  };
+}
+router.get('/static-map', authenticate, readBild('/static-map'));
+router.get('/streetview', authenticate, readBild('/streetview'));
 router.get('/isoline', authenticate, readGet('/isoline'));
 router.get('/geocode/autocomplete', authenticate, readGet('/geocode/autocomplete'));
 router.get('/location-finder/meta', authenticate, readGet('/location-finder/meta'));
