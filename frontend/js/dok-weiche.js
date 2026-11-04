@@ -68,7 +68,7 @@
     if (objekt) { try { if (typeof window.saveObj === 'function') await window.saveObj({ silent: true }); } catch (e) {} }
     var name = NAMEN[art] || 'Dokument';
     if (!objekt || istUuid(key)) {
-      hinweis(name + ' wird erstellt … (rund 30 Sekunden)');
+      hinweis(name + ' wird erstellt … (rund 15 Sekunden)');
       try {
         var t = ''; try { t = localStorage.getItem('ji_token') || ''; } catch (e) {}
         var r = await fetch(basis() + '/rechenkerne/dok-pdf', { method: 'POST',
