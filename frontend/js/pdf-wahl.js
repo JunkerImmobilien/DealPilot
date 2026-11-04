@@ -77,7 +77,8 @@
   /* ── v2900 · Vorgabe ─────────────────────────────────────────────────
      { fassung: '' | id, immer: bool, pilot: bool }. Pilot an ist die Vorgabe:
      die Bankfassung nahm die Pilot-Analyse bis v2892 immer mit. */
-  var vorgabe = { fassung: '', immer: false, pilot: true };
+  /* v3181 · design: 'neu' (einheitliche Dokumente, dp-dokumente.js, Vorgabe) | 'klassisch' (bisherige jsPDF-Fassungen) */
+  var vorgabe = { fassung: '', immer: false, pilot: true, design: 'neu' };
   (function () {
     try {
       var v = JSON.parse(localStorage.getItem(LS_V) || 'null');
@@ -90,7 +91,7 @@
     } catch (e) {}
   })();
   function normal(v) {
-    return { fassung: wahl(v.fassung) ? v.fassung : '', immer: !!v.immer && !!wahl(v.fassung), pilot: v.pilot !== false };
+    return { fassung: wahl(v.fassung) ? v.fassung : '', immer: !!v.immer && !!wahl(v.fassung), pilot: v.pilot !== false, design: v.design === 'klassisch' ? 'klassisch' : 'neu' };
   }
   function api() { return window.Auth && Auth.apiCall && (!Auth.isApiMode || Auth.isApiMode()); }
   function spiegeln() {
@@ -139,7 +140,10 @@
 
   var origBank = null, origVoll = null;
 
+  /* v3181 · im einheitlichen Design gibt es kein Obsidian-Deckblatt - „hell" und „Obsidian" sind dort dasselbe Investment-PDF */
+  function sichtbar() { return WAHLEN.filter(function (w) { return !(vorgabe.design !== 'klassisch' && w.id === 'obsidian'); }); }
   function fuehreAus(w) {
+    if (w.art !== 'profi' && window.DpDokWeiche && window.DpDokWeiche.aktiv()) return window.DpDokWeiche.investment(w.art);
     /* Der Schalter gilt nur für DIESEN Export - danach zurück auf den
        Stand, den der Mandant gesetzt hat. Ein Schalter, der stehen
        bleibt, färbt den nächsten Export mit, den niemand gewählt hat. */
@@ -185,7 +189,7 @@
     ov.id = 'dp-pdf-wahl';
     ov.className = 'dpw-ov';
 
-    var karten = WAHLEN.map(function (w) {
+    var karten = sichtbar().map(function (w) {
       return '<button type="button" class="dpw-k' + (w.id === vorauswahl ? ' dpw-an' : '') + '" data-id="' + w.id + '">'
         + '<span class="dpw-probe dpw-probe-' + (w.hell ? 'hell' : 'dunkel') + '"></span>'
         + '<span class="dpw-tx"><b>' + w.titel + '</b>'
@@ -197,7 +201,7 @@
       '<div class="dpw-kasten" role="dialog" aria-modal="true" aria-label="Welche Fassung?">'
       + '<div class="dpw-kopf"><b>Welche Fassung?</b>'
       + '<button type="button" class="dpw-zu" aria-label="Schliessen">×</button></div>'
-      + '<p class="dpw-vor">Vier Fassungen stehen bereit. Sie unterscheiden sich im Umfang '
+      + '<p class="dpw-vor">' + (sichtbar().length === 3 ? 'Drei' : 'Vier') + ' Fassungen stehen bereit. Sie unterscheiden sich im Umfang '
       + 'und im Deckblatt - die Zahlen sind dieselben.</p>'
       + '<div class="dpw-liste">' + karten + '</div>'
       /* v1733 · hier stand „(änderbar in den Einstellungen)". Das war eine
@@ -253,15 +257,23 @@
       + '<label for="set_pdf_fassung" style="display:block;font-weight:500;color:var(--ch,#2A2727);margin-bottom:6px">Vorausgewählte Fassung</label>'
       + '<select id="set_pdf_fassung" style="' + feld + '" onchange="window.DealPilotPdfWahl.ausEinstellungen()">'
       + '<option value=""' + (vorgabe.fassung ? '' : ' selected') + '>Keine (Bankfassung markiert)</option>'
-      + WAHLEN.map(function (w) { return '<option value="' + w.id + '"' + (vorgabe.fassung === w.id ? ' selected' : '') + '>' + w.titel + '</option>'; }).join('')
+      + sichtbar().map(function (w) { return '<option value="' + w.id + '"' + (vorgabe.fassung === w.id ? ' selected' : '') + '>' + w.titel + '</option>'; }).join('')
       + '</select>'
+      /* v3181 · Marcel 04.11.2026: neue Dokumente überall, die bisherigen als Einstellung zum Auswählen */
+      + '<label for="set_pdf_design" style="display:block;font-weight:500;color:var(--ch,#2A2727);margin:14px 0 6px">Dokument-Design</label>'
+      + '<select id="set_pdf_design" style="' + feld + '" onchange="window.DealPilotPdfWahl.ausEinstellungen()">'
+      + '<option value="neu"' + (vorgabe.design !== 'klassisch' ? ' selected' : '') + '>Einheitlich (empfohlen)</option>'
+      + '<option value="klassisch"' + (vorgabe.design === 'klassisch' ? ' selected' : '') + '>Klassisch (bisherige Fassungen)</option>'
+      + '</select>'
+      + '<span style="display:block;color:var(--muted,#5F5E5A);margin-top:4px;line-height:1.5;font-size:12px">Gilt für Investment-PDF, Bank- und Kurzfassung, Kaufpreisaufteilung, Werbungskosten (mit und ohne Anlage V), Track Record, Bankexport und den Telegram-Bot.</span>'
       + zeile('set_pdf_immer', vorgabe.immer, 'Ohne Rückfrage erzeugen', 'Die vorausgewählte Fassung entsteht sofort, der Dialog kommt nicht mehr. Neben dem PDF-Knopf lässt sich jederzeit neu wählen.')
       + zeile('set_pdf_pilot', vorgabe.pilot, 'Pilot-Analyse ins PDF', 'Gilt für alle Fassungen. Derselbe Schalter steht in der Pilot-Analyse unter dem Knopf „Pilot-Analyse starten".')
       + '</div>';
   }
   function ausEinstellungen() {
-    var f = document.getElementById('set_pdf_fassung'), i = document.getElementById('set_pdf_immer'), p = document.getElementById('set_pdf_pilot');
+    var f = document.getElementById('set_pdf_fassung'), i = document.getElementById('set_pdf_immer'), p = document.getElementById('set_pdf_pilot'), dz = document.getElementById('set_pdf_design');
     var neu = {};
+    if (dz) neu.design = dz.value === 'klassisch' ? 'klassisch' : 'neu';
     if (f) neu.fassung = f.value;
     if (i) neu.immer = !!i.checked;
     if (p) neu.pilot = !!p.checked;

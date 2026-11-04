@@ -408,7 +408,8 @@
       if (PD.bruecke && PZ && typeof PZ.ueberleitungZeilen === 'function') {
         var UZ = PZ.ueberleitungZeilen(PD.bruecke) || [], um = Math.max.apply(null, UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1]));
         var farbe = { bestand: '#2A2727', kosten: 'var(--rot)', soll: 'color-mix(in srgb,var(--gold) 55%,#fff)', ziel: 'var(--gold-d)' };
-        h += '<h3>Wertüberleitung · Ertragswert je Stufe</h3><table><tbody>' + UZ.map(function (z) {
+        /* v3181 · Marcel: Seitenumbruch vor der Wertueberleitung (sie riss sonst zwischen zwei Seiten) */
+        h += '<h3 style="break-before:page;page-break-before:always">Wertüberleitung · Ertragswert je Stufe</h3><table><tbody>' + UZ.map(function (z) {
           var bar = '';
           if (z.schritt) {
             var b = Math.abs(z.w) / um * 48;
@@ -495,10 +496,23 @@
     var h = '', urteil = ai.empfehlung || ai.recommendation || '', off = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung, offBeg = null;
     if (off && typeof off === 'object') { offBeg = off.begruendung || null; off = off.empfohlen || off.betrag || off.wert || null; }
     var kz = [];
-    if (urteil && on('Gesamtbewertung')) kz.push({ l: 'Urteil', v: klar(urteil).slice(0, 40), art: 'hi' });
-    if (off && on('Kaufpreis-Offerte')) kz.push({ l: 'Kaufpreis-Offerte', v: typeof off === 'number' ? B.eur(off) : klar(off).slice(0, 40) });
+    /* v3181 · Marcel 04.11.2026: „im bank pdf steht ein urteil halten das muss raus. das bewerten wir nicht ob wir
+       es halten. im bestand entscheiden wir das selber." Kein Urteil in Bank- und Kurzfassung und nie im Bestand;
+       die Kaufpreis-Offerte (Verhandlungsposition) geht ebenfalls nicht an die Bank. */
+    var bestand = false; try { bestand = !!(window.DpBestand && DpBestand.istBestand()); } catch (e) {}
+    var ohneUrteil = bank || kurz || bestand;
+    if (urteil && !ohneUrteil && on('Gesamtbewertung')) kz.push({ l: 'Urteil', v: klar(urteil).slice(0, 40), art: 'hi' });
+    if (off && !bank && !kurz && !bestand && on('Kaufpreis-Offerte')) kz.push({ l: 'Kaufpreis-Offerte', v: typeof off === 'number' ? B.eur(off) : klar(off).slice(0, 40) });
     if (kz.length) h += B.kacheln(kz, true);
-    if (!kurz) h += block('Gesamtbewertung', ai.gesamtbewertung || ai.fazit_kurz);
+    var gb = ai.gesamtbewertung || ai.fazit_kurz;
+    /* der Urteilssatz steckt auch im Text („sollte im Bestand gehalten werden") - _dpOhneUrteil nimmt ihn heraus (pdf.js v3018a) */
+    if (gb && ohneUrteil && urteil && typeof window._dpOhneUrteil === 'function') gb = window._dpOhneUrteil(gb, urteil);
+    /* auch die Handlungssaetze ohne das Urteilswort (gemessen Westerfeld: „… sollte im Bestand gehalten und stufenweise
+       modernisiert werden") - ein Satz faellt, wenn er eine Handlung (halten, verkaufen, kaufen) mit sollte/empfehlen/geeignet verbindet */
+    if (gb && ohneUrteil) gb = String(gb).split(/(?<=[.!?])\s+/).filter(function (x) {
+      return !(/(halten|gehalten|verkauf|kaufen|gekauft|buy-&-hold|einstieg)/i.test(x) && /(sollte|empfehl|geeignet|lohnt|ratsam)/i.test(x));
+    }).join(' ');
+    if (!kurz) h += block('Gesamtbewertung', gb);
     /* v3180d · untereinander statt zweispaltig: im Blocksatz ohne Silbentrennung (Server-Chrome hat kein Trennwoerterbuch) rissen die schmalen Spalten Luecken */
     h += liste('Stärken', ai.staerken || ai.strengths) + liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
     if (!kurz && !bank && ai.risikoanalyse && typeof ai.risikoanalyse === 'object') {   /* v3180c · Bank: steht in Risiken und Belastungsprobe */
@@ -514,7 +528,7 @@
     if (!kurz) {
       if (!bank) h += block('Exit-Strategien', qa(ai.exit_strategien));   /* v3180c · Anlegerthema (Spekulationsfrist), nicht fuer die Bank */
       h += block('Lage & Markt', [ai.makrolage_recherche ? 'Makrolage: ' + ai.makrolage_recherche : '', ai.mikrolage_recherche ? 'Mikrolage: ' + ai.mikrolage_recherche : '', ai.kaufpreisniveau ? 'Kaufpreisniveau: ' + ai.kaufpreisniveau : ''].filter(Boolean).join('\n'));
-      h += block('Kaufpreis-Offerte', offBeg);
+      if (!bank && !bestand) h += block('Kaufpreis-Offerte', offBeg);
       /* v3180c · Bank: die Begruendung wiederholt die Gesamtbewertung (gemessen Westerfeld: beide beginnen mit Rendite und Cashflow) */
       if (ai.empfehlung_begruendung && !(bank && (ai.gesamtbewertung || ai.fazit_kurz))) h += block('Begründung des Urteils', typeof window._dpOhneUrteil === 'function' ? window._dpOhneUrteil(ai.empfehlung_begruendung, urteil) : ai.empfehlung_begruendung);
     }
@@ -711,8 +725,12 @@
     if (ne.length) h += '<div class="block"><h3>Formularzeilen, die DealPilot nicht führt</h3>' + ne.map(function (n) { return '<p class="det">Zeile ' + n.zeile + ' – ' + B.esc(String(n.text || '').replace(/`/g, '')) + '</p>'; }).join('') + '</div>';
     return h + '<p class="det">Dieselben Zahlen wie die Aufstellung, sortiert nach den Zeilen des amtlichen Formulars Anlage V ' + Q.jahr + '. Keine Steuerberatung.</p>';
   }
-  function finanzamt(jahre, mitAnlageV) {
-    var B = D(), o = objektKopf(), rows = (State.cfRows || []).slice(0, jahre || 3);
+  /* v3181 · opt.jahr = ein Jahr (Index wie fa-pdf-year), opt.alle = alle Jahre (wie „all-years", hoechstens 15) */
+  function finanzamt(jahre, mitAnlageV, opt) {
+    opt = opt || {};
+    var alle = (State.cfRows || []).slice(0, 15);
+    var B = D(), o = objektKopf(), rows = opt.alle ? alle : (Number.isInteger(opt.jahr) && alle[opt.jahr]) ? [alle[opt.jahr]] : alle.slice(0, jahre || 3);
+    var idx0 = (Number.isInteger(opt.jahr) && !opt.alle && alle[opt.jahr]) ? opt.jahr : 0;
     var name = mitAnlageV ? 'Werbungskosten · Anlage V' : 'Werbungskosten · Finanzamt';
     return Promise.all([basis(name), objektInfo(window._currentObjKey, o.adresse)]).then(function (zz) {
       var c = zz[0], info = zz[1]; c.zeile = o.adresse;
@@ -720,7 +738,7 @@
       S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: 'Aufstellung Werbungskosten' + (mitAnlageV ? ' mit Zuordnung zur Anlage V' : ' · Anlage V'), titel: o.adresse, unter: o.art + ' · vermietet',
         meta: [['Veranlagungsjahre', rows.map(function (r) { return r.cal; }).join(', ')], ['Stand', c.stand], ['Eigentümer', feld('halter') && feld('halter') !== 'privat' ? feld('halter') : (c.marke.name || c.marke.company || '')]] }));
       rows.forEach(function (row, i) {
-        var t = _computeYearTotal(row.cal, i) || {}, v = t.values || {};
+        var t = _computeYearTotal(row.cal, i + idx0) || {}, v = t.values || {};
         var ein = (Number(v.einnahmen_km) || 0) + (Number(v.einnahmen_nk) || 0);
         var tab = [['Mieteinnahmen (kalt)', B.eur(v.einnahmen_km, 2)], ['Umlagen / Nebenkosten', B.eur(v.einnahmen_nk, 2)], ['Einnahmen gesamt', B.eur(ein, 2), { art: 'summe' }]];
         var summe = 0;
@@ -745,10 +763,14 @@
   }
 
   /* ── 6 · Track Record (Portfolio) ────────────────────────────────── */
-  function trackRecord() {
+  function nachIds(objs, opt, nurGewonnen) {
+    var ids = opt && Array.isArray(opt.ids) && opt.ids.length ? opt.ids : null;
+    return (objs || []).filter(function (o) { return o && o.data && (ids ? ids.indexOf(o.id) >= 0 : (!nurGewonnen || o.data._deal_won)); });
+  }
+  function trackRecord(opt) {
     var B = D();
     return Promise.all([basis('Track Record'), getAllObjectsData()]).then(function (z) {
-      var c = z[0], objs = (z[1] || []).filter(function (o) { return o.data && o.data._deal_won; });
+      var c = z[0], objs = nachIds(z[1], opt, true);
       c.zeile = 'Portfolio · ' + objs.length + ' Objekte';
       var sum = function (f) { return objs.reduce(function (a, o) { return a + (Number(f(o)) || 0); }, 0); };
       var kp = sum(function (o) { return o.kpis && o.kpis.kp; }), wfl = sum(function (o) { return parseFloat(String(o.data.wfl || '').replace(',', '.')); });
@@ -773,10 +795,10 @@
   }
 
   /* ── 7 · Bankexport (Portfolio, quer) ────────────────────────────── */
-  function bankexport() {
+  function bankexport(opt) {
     var B = D();
     return Promise.all([basis('Bankexport · alle Darlehen'), getAllObjectsData()]).then(function (z) {
-      var c = z[0], objs = (z[1] || []).filter(function (o) { return o.data && o.data._deal_won; });
+      var c = z[0], objs = nachIds(z[1], opt, true);
       var rows = _buildBankExportRows(objs) || [];
       c.zeile = objs.length + ' Objekte · ' + rows.length + ' Darlehen';
       var sumKp = objs.reduce(function (a, o) { return a + (Number(o.kpis && o.kpis.kp) || 0); }, 0);
@@ -798,15 +820,15 @@
   /* ── Einstieg ────────────────────────────────────────────────────── */
   var TYPEN = {
     investment: function () { return investment('voll'); }, bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
-    kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function () { return finanzamt(3, false); }, finanzamt_anlagev: function () { return finanzamt(3, true); }, trackrecord: trackRecord, bankexport: bankexport
+    kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport
   };
-  function dokument(typ) {
+  function dokument(typ, opt) {
     if (!TYPEN[typ]) return Promise.reject(new Error('Unbekanntes Dokument: ' + typ));
     try { if (typeof window.calcNow === 'function' && /investment|bank|kurz|finanzamt|kaufpreis/.test(typ)) window.calcNow(); } catch (e) {}
-    return TYPEN[typ]();
+    return TYPEN[typ](opt || {});
   }
   window.DpDokumente = {
-    VERSION: 'v3180', TYPEN: Object.keys(TYPEN), dokument: dokument,
-    oeffnen: function (typ) { return dokument(typ).then(function (h) { D().vorschau(h, typ); }); }
+    VERSION: 'v3181', TYPEN: Object.keys(TYPEN), dokument: dokument,
+    oeffnen: function (typ, opt) { return dokument(typ, opt).then(function (h) { D().vorschau(h, typ); }); }
   };
 })();

@@ -358,6 +358,38 @@ router.get('/profi-pdf', async function (req, res) {
   }
 });
 
+/* v3181 · POST /rechenkerne/dok-pdf  { art: 'bank'|'kurz'|'investment'|'kaufpreisaufteilung'|'finanzamt'|
+   'finanzamt_anlagev'|'trackrecord'|'bankexport', objekt_id?, optionen? }  ->  application/pdf
+   Die einheitlichen Dokumente als PDF: der PDF-Dienst laedt das GESPEICHERTE Objekt mit der Sitzung des
+   Nutzers und ruft DpDokumente.dokument(art, optionen). optionen sind nur Daten (Jahre, Anlage V, Objekt-IDs),
+   nie HTML - gerendert wird ausschliesslich, was die App selbst baut. */
+const DOK_ARTEN = ['bank', 'kurz', 'investment', 'kaufpreisaufteilung', 'finanzamt', 'finanzamt_anlagev', 'trackrecord', 'bankexport'];
+function _dokOptionen(o) {
+  const x = {};
+  if (!o || typeof o !== 'object') return x;
+  if (o.alle === true) x.alle = true;
+  if (Number.isInteger(o.jahr) && o.jahr >= 0 && o.jahr < 60) x.jahr = o.jahr;
+  if (Array.isArray(o.ids)) x.ids = o.ids.filter((i) => typeof i === 'string' && i.length <= 64).slice(0, 500);
+  return x;
+}
+router.post('/dok-pdf', async function (req, res) {
+  const b = req.body || {};
+  const art = String(b.art || '');
+  const oid = String(b.objekt_id || '');
+  if (DOK_ARTEN.indexOf(art) < 0) return res.status(400).json({ error: 'art unbekannt' });
+  if (oid && !/^[0-9a-f-]{36}$/i.test(oid)) return res.status(400).json({ error: 'objekt_id ist keine UUID' });
+  const pdf = require('../services/telegramPdfService');
+  if (!pdf.verfuegbar()) return res.status(503).json({ error: 'pdf_dienst_fehlt', message: 'Der PDF-Dienst ist hier nicht eingerichtet.' });
+  try {
+    const x = await pdf.erzeugen(req.user.id, 'dok_' + art, oid || null, null, _dokOptionen(b.optionen));
+    res.set('Content-Type', 'application/pdf');
+    res.set('Content-Disposition', "attachment; filename*=UTF-8''" + encodeURIComponent(x.dateiname || ('DealPilot-' + art + '.pdf')));
+    res.send(x.pdf);
+  } catch (e) {
+    res.status(422).json({ error: 'kein_pdf', message: String(e && e.message || e) });
+  }
+});
+
 /* ═══ 3 · WAS KANN DIESE SCHNITTSTELLE? ═════════════════════════════════
    Ein Verzeichnis, damit der aufrufende Dienst nicht raten muss. Es
    nennt auch, was NICHT geht - das spart die Suche danach.

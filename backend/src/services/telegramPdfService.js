@@ -53,7 +53,22 @@ async function _sitzung(userId) {
 
 /** Erzeugt das PDF. Rueckgabe { pdf: Buffer, dateiname, ms, speicherMb }
  *  oder wirft einen Fehler mit .fachlich und ggf. .luecken / .toasts. */
-async function erzeugen(userId, art, objektId, reportId) {
+/* v3181 · Marcel 04.11.2026: „bitte die neuen pdfs an allen stellen ab jetzt benutzen. die anderen in den
+   Einstellungen als einstellungen zum auswählen." Die klassischen Arten (jsPDF der App) werden auf die
+   einheitlichen Dokumente umgelenkt, ausser der Nutzer hat in Einstellungen › PDF-Export „klassisch" gewaehlt
+   (user_settings pdf_vorgabe.design). Gilt fuer den Bot und jeden anderen Aufrufer dieses Dienstes. */
+const NEU_FUER = { investment: 'dok_investment', investment_dunkel: 'dok_investment', bank: 'dok_bank', bank_kurz: 'dok_kurz', bankexport: 'dok_bankexport' };
+async function _design(userId) {
+  try {
+    const r = await query('SELECT wert FROM user_settings WHERE user_id = $1 AND schluessel = $2', [userId, 'pdf_vorgabe']);
+    const w = r.rows[0] && r.rows[0].wert;
+    const v = typeof w === 'string' ? JSON.parse(w) : w;
+    return v && v.design === 'klassisch' ? 'klassisch' : 'neu';
+  } catch (e) { return 'neu'; }
+}
+
+async function erzeugen(userId, art, objektId, reportId, optionen) {
+  if (NEU_FUER[art] && (await _design(userId)) === 'neu') art = NEU_FUER[art];
   if (!ARTEN[art]) throw Object.assign(new Error('Unbekannte PDF-Art: ' + art), { fachlich: true });
   if (!verfuegbar()) {
     throw Object.assign(new Error('Der PDF-Dienst ist hier nicht eingerichtet.'), { fachlich: true, kein_dienst: true });
@@ -71,7 +86,7 @@ async function erzeugen(userId, art, objektId, reportId) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Pdf-Geheimnis': process.env.PDF_DIENST_SECRET },
       body: JSON.stringify({ art: art, objekt_id: objektId || null, report_id: reportId || null,
-        token: token, sitzung: sitzung }),
+        token: token, sitzung: sitzung, optionen: (optionen && typeof optionen === 'object') ? optionen : undefined }),
       signal: ctrl.signal
     });
   } catch (e) {

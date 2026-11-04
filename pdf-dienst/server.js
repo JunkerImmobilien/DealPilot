@@ -288,9 +288,11 @@ async function erzeugen(auftrag) {
           await page.evaluate(() => { try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {} });
           schritt('objekt geladen');
         }
-        dok = await page.evaluate(async (typ) => {
-          try { return { html: await window.DpDokumente.dokument(typ) }; } catch (e) { return { fehler: (e && e.message) || String(e) }; }
-        }, auftrag.art.slice(4));
+        /* v3181 · optionen (Jahre, Anlage V, Objektauswahl) aus der App - nur Daten, kein HTML */
+        const opt = (auftrag.optionen && typeof auftrag.optionen === 'object') ? auftrag.optionen : {};
+        dok = await page.evaluate(async (typ, o) => {
+          try { return { html: await window.DpDokumente.dokument(typ, o) }; } catch (e) { return { fehler: (e && e.message) || String(e) }; }
+        }, auftrag.art.slice(4), opt);
       }
       if (!dok || !dok.html) { const e = new Error((dok && dok.fehler) || 'Kein Dokument.'); e.status = 422; e.code = 'kein_bericht'; throw e; }
       schritt('profi html ' + dok.html.length);
