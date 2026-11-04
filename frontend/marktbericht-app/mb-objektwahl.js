@@ -593,12 +593,21 @@
         var n = String(it.name || (it.data && it.data._name) || '').trim();
         return n && !/^unbenannt$/i.test(n);
       });
+      /* v3178b \u00b7 gleich klingende Eintraege unterscheidbar (Kuerzel, Kaufpreis) und nach Stand
+         gruppiert: Bestand, Pipeline, Verloren - verlorene ans Ende statt zwischen die aktiven. */
+      var _grp = { bestand: [], pipeline: [], verloren: [] };
       items.forEach(function (it) {
         var id = it.id || it.key || it.object_key;
         var seq = it.seq_no || it.obj_seq || (it.data && it.data._obj_seq) || '';
         var name = it.name || (it.data && it.data._name) || id;
-        var label = (seq ? (seq + ' \u00b7 ') : '') + name;
-        opts.push('<option value="' + String(id).replace(/"/g, '&quot;') + '">' + String(label).replace(/</g, '&lt;') + '</option>');
+        var kp = parseFloat(it.kaufpreis);
+        var zus = [it.kuerzel || '', kp > 0 ? Math.round(kp).toLocaleString('de-DE') + ' \u20ac' : ''].filter(Boolean).join(' \u00b7 ');
+        var label = (seq ? (seq + ' \u00b7 ') : '') + name + (zus ? ' (' + zus + ')' : '');
+        var o = '<option value="' + String(id).replace(/"/g, '&quot;') + '">' + String(label).replace(/</g, '&lt;') + '</option>';
+        (it.deal_lost ? _grp.verloren : it.deal_won ? _grp.bestand : _grp.pipeline).push(o);
+      });
+      [['bestand', 'Bestand'], ['pipeline', 'In Pr\u00fcfung'], ['verloren', 'Verloren']].forEach(function (g) {
+        if (_grp[g[0]].length) opts.push('<optgroup label="' + g[1] + ' (' + _grp[g[0]].length + ')">' + _grp[g[0]].join('') + '</optgroup>');
       });
       sel.innerHTML = opts.join('');
       host.style.display = '';  /* v570-dropfast: sichtbar sobald Liste da */

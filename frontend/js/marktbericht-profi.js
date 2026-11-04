@@ -209,6 +209,88 @@
       + (comps.length > e.length ? (comps.length - e.length) + ' doppelt eingestellte Angebote sind nur einmal gezählt.' : '') + '</p>';
   }
 
+  /* ── v3178c · Was der normale Bericht hat und die Profi-Fassung noch nicht ──────── */
+  /* Ausfuehrlicher Text: KI-Abschnitte B-D (A steht schon als Einschaetzung) */
+  function mdInline(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function ausfuehrlich(md) {
+    if (!md) return '';
+    var teile = String(md).replace(/\r/g, '').split(/\n(?=#\s)/).slice(1);
+    if (!teile.length) return '';
+    return teile.map(function (blk) {
+      var zeilen = blk.split('\n'), kopf = zeilen.shift().replace(/^#+\s*/, '').replace(/^[A-Z]\)\s*/, '');
+      var html = '', liste = [];
+      var flush = function () { if (liste.length) { html += '<ul class="md">' + liste.map(function (l) { return '<li>' + mdInline(l) + '</li>'; }).join('') + '</ul>'; liste = []; } };
+      var abs = [];
+      var absFlush = function () { if (abs.length) { html += '<p>' + mdInline(abs.join(' ')) + '</p>'; abs = []; } };
+      zeilen.forEach(function (z) {
+        var t = z.trim();
+        if (!t) { absFlush(); flush(); return; }
+        if (/^#{2,}\s/.test(t)) { absFlush(); flush(); html += '<h4>' + mdInline(t.replace(/^#+\s*/, '')) + '</h4>'; return; }
+        if (/^[-*•]\s+/.test(t)) { absFlush(); liste.push(t.replace(/^[-*•]\s+/, '')); return; }
+        flush(); abs.push(t);
+      });
+      absFlush(); flush();
+      return '<div class="md-blk"><h3>' + esc(kopf) + '</h3>' + html + '</div>';
+    }).join('');
+  }
+  /* Bewertung & Potenzial (assessment) wie im normalen Bericht */
+  var BEW = [['mikrolage', 'Mikrolage'], ['makrolage', 'Makrolage'], ['nachfrage', 'Nachfrage'], ['entwicklung', 'Entwicklung'],
+    ['bevoelkerung', 'Bevölkerung'], ['wertsteigerung', 'Wertsteigerungspotenzial'], ['mietentwicklung', 'Mietentwicklung'], ['mietausfallrisiko', 'Mietausfallrisiko']];
+  function bewertung(a) {
+    if (!a) return '';
+    var z = BEW.filter(function (b) { return a[b[0]]; }).map(function (b) {
+      return '<div><span>' + esc(b[1]) + '</span><b>' + esc(String(a[b[0]]).charAt(0).toUpperCase() + String(a[b[0]]).slice(1)) + '</b></div>';
+    }).join('');
+    return z ? '<h3>Bewertung &amp; Potenzial</h3><div class="bew">' + z + '</div>' : '';
+  }
+  /* Marktentwicklung: Median je Jahr, Kaufpreis und Miete je m² (SVG, massstaeblich) */
+  function verlauf(reihe, titel, nk) {
+    var r = (reihe || []).filter(function (x) { return istZahl(x.median) && istZahl(x.year); });
+    if (r.length < 2) return '';
+    var W = 300, H = 120, L = 34, R = 10, T = 14, B = 22;
+    var min = Math.min.apply(null, r.map(function (x) { return x.median; })), max = Math.max.apply(null, r.map(function (x) { return x.median; }));
+    var pad = (max - min) * 0.15 || max * 0.05; min = Math.max(0, min - pad); max += pad;
+    var x0 = r[0].year, x1 = r[r.length - 1].year;
+    var X = function (y) { return L + (y - x0) / Math.max(1, (x1 - x0)) * (W - L - R); };
+    var Y = function (v) { return T + (1 - (v - min) / (max - min)) * (H - T - B); };
+    var pfad = r.map(function (x, i) { return (i ? 'L' : 'M') + X(x.year).toFixed(1) + ' ' + Y(x.median).toFixed(1); }).join(' ');
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="vl" role="img" aria-label="' + esc(titel) + '">';
+    [min, (min + max) / 2, max].forEach(function (v) {
+      s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" class="g"/>'
+        + '<text x="' + (L - 4) + '" y="' + (Y(v) + 3).toFixed(1) + '" text-anchor="end" class="a">' + zahl(v, nk) + '</text>';
+    });
+    s += '<path d="' + pfad + '" class="l"/>';
+    r.forEach(function (x, i) {
+      s += '<circle cx="' + X(x.year).toFixed(1) + '" cy="' + Y(x.median).toFixed(1) + '" r="' + (i === r.length - 1 ? 3.2 : 2.2) + '" class="' + (i === r.length - 1 ? 'pe' : 'p') + '"/>'
+        + '<text x="' + X(x.year).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" class="a">' + x.year + '</text>';
+    });
+    var e = r[r.length - 1], a0 = r[0];
+    var veraend = a0.median > 0 ? (e.median / a0.median - 1) * 100 : null;
+    return '<div class="vl-box"><div class="vl-t">' + esc(titel) + ' <span class="num">' + zahl(e.median, nk) + '</span>'
+      + (veraend != null ? ' <span class="det">(' + (veraend > 0 ? '+' : '') + zahl(veraend, 0) + ' % seit ' + a0.year + ')</span>' : '') + '</div>' + s + '</svg></div>';
+  }
+  function marktentwicklung(h) {
+    if (!h) return '';
+    var a = verlauf(h.price, 'Angebotspreise €/m² (Median)', 0), b = verlauf(h.rent, 'Angebotsmieten €/m² (Median)', 2);
+    return (a || b) ? '<div class="block"><h3>Marktentwicklung</h3><div class="zwei">' + a + b + '</div></div>' : '';
+  }
+  /* Rendite-Kennzahlen (valuation.yield) */
+  function kennzahlen(p, r) {
+    var y = (p.valuation && p.valuation.yield) || {};
+    var z = [];
+    if (istZahl(r.purchase_price)) z.push(['Kaufpreis', eur(r.purchase_price) + (istZahl(r.living_area) && r.living_area > 0 ? ' · ' + zahl(r.purchase_price / r.living_area, 0) + ' €/m²' : '')]);
+    if (istZahl(y.annual_net_rent)) z.push(['Jahresnettokaltmiete', eur(y.annual_net_rent)]);
+    if (istZahl(y.gross_yield_pct)) z.push(['Bruttorendite', zahl(y.gross_yield_pct, 1) + ' %']);
+    if (istZahl(y.rent_multiplier)) z.push(['Kaufpreisfaktor', zahl(y.rent_multiplier, 1) + '-fach']);
+    return z.length ? '<div class="block"><h3>Kennzahlen</h3><div class="kv">' + z.map(function (k) { return '<div><span>' + esc(k[0]) + '</span><span class="num">' + k[1] + '</span></div>'; }).join('') + '</div></div>' : '';
+  }
+  /* Sachwertfaktor: wo der Wert zu bekommen ist (wenn er fehlt oder zur Quelle) */
+  function swfWeg(sw) {
+    var l = sw && sw.sachwertfaktor_quelle_link;
+    if (!l || !l.satz) return '';
+    return '<div class="hinweis"><b>Sachwertfaktor – Quelle:</b> ' + esc(l.satz) + (l.url ? ' <span class="det">' + esc(l.url) + '</span>' : '') + '</div>';
+  }
+
   /* ── v3177 · Führendes Verfahren, deutlich und begründet ──────────── */
   var VERF_NAME = { sachwert: 'Sachwertverfahren', vergleichswert: 'Vergleichswertverfahren', ertragswert: 'Ertragswertverfahren', angebote: 'Marktpreisindikation aus Angeboten' };
   function fuehrendBox(v) {
@@ -316,6 +398,9 @@
     '.verf .t{font-size:8pt;color:var(--muted)}.verf .v{font:500 14pt/1.3 "JetBrains Mono",monospace;margin:.5mm 0 1mm}',
     '.verf .f{background:var(--gold-l)}',
     '.block{break-inside:avoid}h3{break-after:avoid}',
+    '.bew{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2mm}.bew div{border:.2mm solid var(--line);border-radius:1mm;padding:2mm 2.5mm}.bew span{display:block;font-size:7pt;color:var(--muted)}.bew b{font:600 9.5pt/1.3 "Space Grotesk",Inter,sans-serif}',
+    '.vl-box{break-inside:avoid}.vl-t{font-size:8.4pt;margin-bottom:1mm}.vl{width:100%;height:auto;font-family:"JetBrains Mono",monospace}.vl .g{stroke:var(--line);stroke-width:.6}.vl .a{font-size:7px;fill:#5F5E66}.vl .l{fill:none;stroke:var(--gold);stroke-width:1.6}.vl .p{fill:#fff;stroke:var(--gold);stroke-width:1.2}.vl .pe{fill:var(--gold)}',
+    '.md-blk{break-inside:auto}.md-blk p{font-size:9pt;margin:0 0 2mm}.md-blk h4{font:600 9.2pt/1.3 Inter,sans-serif;margin:3mm 0 1mm}ul.md{margin:0 0 2mm;padding-left:5mm;font-size:9pt}ul.md li{margin-bottom:.8mm}',
     '.verf .qm{font:500 9pt/1.3 "JetBrains Mono",monospace;color:var(--muted);margin:-.5mm 0 1mm}.verf .zus{font-size:7.6pt;color:var(--muted);margin-bottom:1mm}',
     '.tag{display:inline-block;font:6.8pt/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:1mm 1.5mm;border-radius:.8mm;background:var(--soft);color:var(--muted)}',
     '.tag.g{background:var(--obs);color:#fff}',
@@ -461,7 +546,7 @@
     teile.push(seite(d, 'Lage', '<div class="eyebrow">Abschnitt 2</div><h2>Lage</h2>'
       + '<p class="sub">' + esc([r.ortsteil, r.gemeinde].filter(Boolean).join(', ')) + (p.assessment ? ' · Mikrolage ' + esc(p.assessment.mikrolage || '–') + ', Makrolage ' + esc(p.assessment.makrolage || '–') : '') + '</p>'
       + '<div class="zwei">' + (d.karteNah ? '<img class="karte" src="' + d.karteNah + '" alt="Karte Umgebung">' : '') + (d.karteFern ? '<img class="karte" src="' + d.karteFern + '" alt="Karte Region">' : '') + '</div>'
-      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro)
+      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro) + bewertung(p.assessment)
       + (makro ? '<h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>' : '')
       + (z.available ? '<p class="det" style="margin-top:3mm">Zensus 2022 (' + esc((z.gemeinde && z.gemeinde.name) || z.kreis_name || '') + '): Leerstandsquote ' + zahl(z.leerstandsquote, 1) + ' %, Eigentümerquote ' + zahl(z.eigentuemerquote, 1) + ' %.</p>' : '')));
 
@@ -481,6 +566,7 @@
       + '<div><span>Vermarktungsdauer</span><span class="num">' + (p.market_dynamics && istZahl(p.market_dynamics.days_on_market) ? zahl(p.market_dynamics.days_on_market, 0) + ' Tage' : '–') + '</span></div>'
       + '<div><span>Marktpreisindikation</span><span class="num">' + eur(mv.estimated) + (istZahl(mv.low) ? ' (' + eur(mv.low) + ' – ' + eur(mv.high) + ')' : '') + '</span></div></div>'
       + ((p.valuation && p.valuation.notes || []).length ? '<p class="det" style="margin-top:3mm">' + esc(p.valuation.notes.join(' ')) + '</p>' : '')
+      + kennzahlen(p, r) + marktentwicklung(p.market_history)
       + vergleichsangebote(p)));
 
     /* 6 · Bodenwert + Sachwert */
@@ -506,7 +592,8 @@
         + (istZahl(sw.value_eur) ? '<h3>Sachwert</h3>' + staffelTabelle(sw.staffel, swQ)
           + (sw.restnutzungsdauer_herkunft && sw.restnutzungsdauer_herkunft.hinweis ? '<p class="det">' + esc(sw.restnutzungsdauer_herkunft.hinweis) + '</p>' : '')
           + (sw.sachwertfaktor ? '<div class="hinweis">Sachwertfaktor: ' + esc(sw.sachwertfaktor_ausschuss || 'zuständiger Gutachterausschuss') + '. Er ist nach demselben Modell abgeleitet, in dem hier gerechnet wird (NHK 2010, lineare Alterswertminderung, § 10 ImmoWertV).</div>'
-            : '<div class="hinweis">Für diesen Ort liegt kein Sachwertfaktor vor. Ausgewiesen ist der vorläufige Sachwert ohne Marktanpassung; er ist eine Herstellungskostenrechnung, kein Marktwert.</div>') : '')));
+            : '<div class="hinweis">Für diesen Ort liegt kein Sachwertfaktor vor. Ausgewiesen ist der vorläufige Sachwert ohne Marktanpassung; er ist eine Herstellungskostenrechnung, kein Marktwert.</div>') : '')
+        + swfWeg(sw)));
     }
 
     /* 7 · Vergleichswert */
@@ -556,6 +643,10 @@
         + (eb.hinweise || []).map(function (h) { return '<p class="det">' + esc(h) + '</p>'; }).join('')
         + '<p class="det">' + esc(eb.annahmen && eb.annahmen.quelle || '') + '</p>'));
     }
+
+    /* v3178c · Ausfuehrliche Einschaetzung (KI-Abschnitte B-D, wie der normale Bericht) */
+    var ausf = ausfuehrlich(d.md);
+    if (ausf) teile.push(seite(d, 'Ausführliche Einschätzung', '<div class="eyebrow">Anhang</div><h2>Ausführliche Einschätzung</h2><p class="sub">Text der KI-Auswertung auf Grundlage der Zahlen dieses Berichts. Maßgeblich sind die Rechenwege oben.</p>' + ausf));
 
     /* 10 · Quellen */
     var q = [];
