@@ -36,6 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N123 · Marktbericht Profi (Herleitung, nah an IWA) — Demo 04.11.2026
+- Demo: design/Vorschläge/marktbericht-profi-demo.html (Artifact TfoLtXDkLcf3sbQxmceGaY), echte Zahlen Bericht 541. Wartet auf Marcels Abnahme der Gestaltung (sachliche Schriften, keine Serifen — Marcel 04.11.).
+- Danach: als Stufe-3-PDF-Variante „Profi“ bauen (Abschnitte Ergebnis, Angaben/Annahmen, Bodenwert+Sachwert, Vergleichswert, Ertragswert, Quellen), Daten aus cross_check, jede Zeile mit Fundstelle.
+- Mitnehmen aus IWA: Vollständigkeitsprüfung vor dem PDF, „Link teilen“, Kontaktkarte/nächste Schritte als abschaltbarer Makler-Teil.
+
+### N124 · Gewerbeobjekt mit Wohnanteil ohne Miete rechnet keinen Ertragswert
+- Ibbenbüren (GESCH, 402 m² Wohnen ohne Ist-Miete): Bericht 547 empfiehlt „Objektart MFH wählen“. Besser: Wohnteil mit Marktmiete ansetzen und kennzeichnen oder die Aufteilung im Objekt abfragen. Entscheidung Marcel.
+
 ### N116 · Ein Eingang für Belege, Unterlagen, Rechnungen — Stufe 1 ✅ auf Staging (v3120–v3120c, 03.11.2026), Rest offen
 
 Marcel 03.11.2026: „EIN Bereich ‚Belege, Unterlagen, Rechnungen‘, egal was man reinpackt … Mietverträge den Einheiten/Mietern zuordnen, Rechnungen zu Werbungskosten, Wirtschaftspläne auslesen, WEG-Protokolle auslesen, und im Reiter Unterlagen & WEG den Verlauf tracken.“

@@ -1,0 +1,206 @@
+<title>Marktbericht Profi Habighorst</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: ein Bericht im A4-Satzspiegel, links Herleitung, rechts Fundstelle — wie ein Gutachten, aber lesbar */
+:root{
+  --bg:#F3F2EE; --paper:#FFFFFF; --ink:#16161A; --muted:#5F5E66; --line:#E3E1DA;
+  --gold:#B8932F; --gold-soft:#F6EFDC; --obs:#050505; --ok:#3FA56C; --warn:#B8625C;
+  --chip:#F1F0EB;
+  --f-head:"Space Grotesk","Inter",system-ui,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0B0D; --paper:#141417; --ink:#ECEAE4; --muted:#A3A1A9; --line:#2A2A30;
+  --gold:#D9B95E; --gold-soft:#2A2416; --chip:#1D1D22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0B0D; --paper:#141417; --ink:#ECEAE4; --muted:#A3A1A9; --line:#2A2A30;
+  --gold:#D9B95E; --gold-soft:#2A2416; --chip:#1D1D22; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.demo{max-width:900px;margin:0 auto 14px;font:12px/1.4 var(--f-num);color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.demo b{color:var(--gold);font-weight:500;letter-spacing:.08em}
+.doc{max-width:900px;margin:0 auto;display:grid;gap:18px}
+.page{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:40px clamp(18px,5vw,56px)}
+.kopf{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:11px/1.4 var(--f-num);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:28px}
+.kopf .marke{color:var(--ink);font-weight:500}
+.eyebrow{font:11px/1 var(--f-num);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:0 0 8px}
+h1{font:600 clamp(26px,4.4vw,36px)/1.15 var(--f-head);margin:0 0 6px;text-wrap:balance}
+h2{font:600 22px/1.25 var(--f-head);margin:0 0 4px;text-wrap:balance}
+h3{font:600 15px/1.3 var(--f-body);margin:22px 0 8px}
+.sub{color:var(--muted);margin:0 0 22px}
+p{margin:0 0 10px;max-width:68ch}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.ergebnis{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:end;margin:26px 0 8px}
+.ergebnis .wert{font:500 clamp(34px,7vw,52px)/1 var(--f-num);letter-spacing:-.02em}
+.ergebnis .lbl{font:11px/1.4 var(--f-num);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.spanne{height:8px;border-radius:4px;background:var(--chip);position:relative;margin:14px 0 6px}
+.spanne i{position:absolute;top:-4px;width:2px;height:16px;background:var(--muted)}
+.spanne i.f{background:var(--gold);width:3px}
+.spanne span{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--gold-soft)}
+.skala{display:flex;justify-content:space-between;font:11px var(--f-num);color:var(--muted)}
+.verf{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:22px}
+.verf div{background:var(--paper);padding:14px 16px}
+.verf .t{font-size:12px;color:var(--muted)}
+.verf .v{font:500 19px/1.3 var(--f-num);margin:2px 0}
+.tag{display:inline-block;font:10.5px/1 var(--f-num);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:3px;background:var(--chip);color:var(--muted)}
+.tag.a{background:var(--gold-soft);color:var(--gold)}
+.tag.f{background:var(--obs);color:#fff}
+.wrap{overflow-x:auto;margin:6px 0 4px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
+th{font:10.5px/1.3 var(--f-num);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--ink)}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.r,th.r{text-align:right}
+td.op{width:22px;color:var(--muted);font-family:var(--f-num)}
+td.q{color:var(--muted);font-size:12.5px;max-width:260px}
+tr.sum td{font-weight:600;border-bottom:1px solid var(--ink)}
+tr.end td{font-weight:600;background:var(--gold-soft);border-bottom:0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 28px}
+.kv{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:7px 0;font-size:14px}
+.kv span:first-child{color:var(--muted)}
+.hinweis{border-left:3px solid var(--gold);background:var(--gold-soft);padding:12px 14px;margin:14px 0;font-size:13.5px;max-width:none}
+ol.quellen{padding-left:20px;font-size:13px;color:var(--muted)}
+ol.quellen li{margin-bottom:6px}
+.fuss{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:22px}
+@media (max-width:640px){.ergebnis,.grid2{grid-template-columns:1fr}.page{padding-block:28px}}
+</style>
+
+<div class="demo"><b>DEMO</b> Profi-Fassung des Marktberichts · echte Zahlen aus Bericht 541 (Staging, v3175) · Gestaltung zur Abstimmung</div>
+
+<main class="doc">
+
+<!-- 1 Deckblatt + Ergebnis -->
+<section class="page">
+  <div class="kopf"><span class="marke">DealPilot · Marktbericht Profi</span><span>Wertermittlungsstichtag 04.11.2026</span></div>
+  <p class="eyebrow">Wertermittlung mit Herleitung · Einfamilienhaus</p>
+  <h1>Habighorst 17, 32278 Kirchlengern</h1>
+  <p class="sub">Freistehendes Einfamilienhaus, Baujahr 2009, 140 m² Wohnfläche, 650 m² Grundstück, Garage</p>
+
+  <div class="ergebnis">
+    <div>
+      <div class="lbl">Marktwert-Indikation (Sachwertverfahren, führend)</div>
+      <div class="wert num">410.000 €</div>
+      <div class="spanne" aria-label="Spanne der Verfahren 401.000 bis 424.000 Euro">
+        <span style="left:0;width:100%"></span>
+        <i style="left:0%"></i><i class="f" style="left:39.5%"></i><i style="left:100%"></i>
+      </div>
+      <div class="skala num"><span>401.000 Angebote</span><span>424.000 Richtwert</span></div>
+    </div>
+    <div>
+      <p style="margin:0">Drei voneinander unabhängige Wege liegen innerhalb von 6 %. Der Kaufpreis von 420.000 € liegt in dieser Spanne.</p>
+    </div>
+  </div>
+
+  <div class="verf">
+    <div><div class="t">Sachwert · § 35 ImmoWertV</div><div class="v num">410.245 €</div><span class="tag f">führend</span></div>
+    <div><div class="t">Vergleichswert · Immobilienrichtwert</div><div class="v num">423.925 €</div><span class="tag a">amtlich · Stufe A</span></div>
+    <div><div class="t">Angebotspreise, bereinigt</div><div class="v num">401.000 €</div><span class="tag">147 Angebote</span></div>
+    <div><div class="t">Ertragswert · § 27 ImmoWertV</div><div class="v num">298.263 €</div><span class="tag">nachrichtlich</span></div>
+  </div>
+</section>
+
+<!-- 2 Grundlagen -->
+<section class="page">
+  <p class="eyebrow">Abschnitt 1</p>
+  <h2>Objekt, Angaben und Annahmen</h2>
+  <p class="sub">Jede Angabe trägt ihre Herkunft. Annahmen sind als solche benannt und lassen sich im Objekt ändern.</p>
+  <div class="grid2">
+    <div class="kv"><span>Objektart</span><span>EFH, freistehend</span></div>
+    <div class="kv"><span>Baujahr</span><span class="num">2009</span></div>
+    <div class="kv"><span>Wohnfläche</span><span class="num">140 m²</span></div>
+    <div class="kv"><span>Bruttogrundfläche</span><span class="num">190 m²</span></div>
+    <div class="kv"><span>Grundstück</span><span class="num">650 m²</span></div>
+    <div class="kv"><span>Geschosse</span><span>EG + ausgebautes DG, kein Keller</span></div>
+    <div class="kv"><span>Standardstufe</span><span class="num">4</span></div>
+    <div class="kv"><span>Garage</span><span class="num">18 m² BGF</span></div>
+  </div>
+  <h3>Annahmen in diesem Bericht</h3>
+  <div class="wrap"><table>
+    <thead><tr><th>Merkmal</th><th>Angesetzt</th><th>Herkunft</th></tr></thead>
+    <tbody>
+      <tr><td>Modernisierung</td><td>0 Punkte (Restnutzungsdauer); „kleine Modernisierungen“ (Richtwert)</td><td class="q">Keine Angabe. Bei 17 Jahren Gebäudealter DealPilot-Setzung, im Objekt änderbar</td></tr>
+      <tr><td>Bruttogrundfläche</td><td class="num">190 m²</td><td class="q">Angabe im Objekt</td></tr>
+      <tr><td>Marktmiete</td><td class="num">5,80 €/m²</td><td class="q">Ø Miete im Modell des Liegenschaftszinssatzes (Ertragswert nur nachrichtlich)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Verfahrenswahl (§ 6 Abs. 1 ImmoWertV)</h3>
+  <p>Ein- und Zweifamilienhäuser werden überwiegend zur Eigennutzung erworben. Maßgeblich ist deshalb das Sachwertverfahren. Der Immobilienrichtwert des Gutachterausschusses dient als zweiter, unabhängiger Weg. Der Ertragswert wird nur nachrichtlich gezeigt.</p>
+</section>
+
+<!-- 3 Bodenwert + Sachwert -->
+<section class="page">
+  <p class="eyebrow">Abschnitt 2</p>
+  <h2>Bodenwert und Sachwert</h2>
+  <p class="sub">Zeile für Zeile, rechts die Fundstelle jeder Zahl.</p>
+  <div class="wrap"><table>
+    <thead><tr><th></th><th>Position</th><th class="r">Betrag</th><th>Fundstelle</th></tr></thead>
+    <tbody>
+      <tr><td class="op"></td><td>Bodenrichtwert 125 €/m² × 650 m²</td><td class="r num">81.250 €</td><td class="q">BORIS-NRW, Stichtag 01.01.2026, dl-de/zero-2-0</td></tr>
+      <tr class="sum"><td class="op">=</td><td>Bodenwert</td><td class="r num">81.250 €</td><td class="q">§ 40 ImmoWertV</td></tr>
+      <tr><td class="op"></td><td>Normalherstellungskosten 1.215 €/m² × 190 m² BGF</td><td class="r num">230.850 €</td><td class="q">NHK 2010, Anlage 4 ImmoWertV, Standardstufe 4</td></tr>
+      <tr><td class="op">×</td><td>Baupreisindex 2,00 (2010 = 100)</td><td class="r num">461.700 €</td><td class="q">Statistisches Bundesamt, 08/2026</td></tr>
+      <tr><td class="op">−</td><td>Alterswertminderung linear, 17 von 80 Jahren (21,3 %)</td><td class="r num">98.111 €</td><td class="q">§ 38 ImmoWertV; RND 63 J. nach Anlage 2</td></tr>
+      <tr><td class="op">+</td><td>Garage 18 m² × 485 €/m² × 2,00, abzüglich Alterswertminderung</td><td class="r num">12.513 €</td><td class="q">NHK 2010 Typ 14.1, GND 60 J.</td></tr>
+      <tr class="sum"><td class="op">=</td><td>Gebäudesachwert</td><td class="r num">376.102 €</td><td class="q"></td></tr>
+      <tr><td class="op">+</td><td>Bodenwert</td><td class="r num">81.250 €</td><td class="q"></td></tr>
+      <tr class="sum"><td class="op">=</td><td>vorläufiger Sachwert</td><td class="r num">457.352 €</td><td class="q">§ 35 Abs. 2 ImmoWertV</td></tr>
+      <tr><td class="op">×</td><td>Sachwertfaktor 0,897</td><td class="r num"></td><td class="q">Grundstücksmarktbericht 2026 Kreis Herford, Abschn. 5.1.2 · Stufe A</td></tr>
+      <tr class="end"><td class="op">=</td><td>marktangepasster Sachwert</td><td class="r num">410.245 €</td><td class="q">§ 39 ImmoWertV</td></tr>
+    </tbody>
+  </table></div>
+  <p class="hinweis">Modellkonform: Der Sachwertfaktor des Kreises Herford ist aus NHK 2010 mit linearer Alterswertminderung abgeleitet. Er wird nur auf einen Sachwert angewandt, der nach demselben Modell gerechnet ist (§ 10 ImmoWertV).</p>
+</section>
+
+<!-- 4 Vergleichswert -->
+<section class="page">
+  <p class="eyebrow">Abschnitt 3</p>
+  <h2>Vergleichswert aus dem Immobilienrichtwert</h2>
+  <p class="sub">Umrechnung nach den Koeffizienten des Gutachterausschusses für den Kreis Herford.</p>
+  <div class="wrap"><table>
+    <thead><tr><th></th><th>Merkmal</th><th>Objekt · Richtwertobjekt</th><th class="r">Faktor</th></tr></thead>
+    <tbody>
+      <tr><td class="op"></td><td>Immobilienrichtwert, Zone 258072</td><td class="q">Stichtag 01.01.2026</td><td class="r num">1.580 €/m²</td></tr>
+      <tr><td class="op">×</td><td>Baujahr</td><td>ab 2006 · 1961–1970</td><td class="r num">1,470</td></tr>
+      <tr><td class="op">×</td><td>Gebäudestandard</td><td>gehoben · einfach bis mittel</td><td class="r num">1,384</td></tr>
+      <tr><td class="op">×</td><td>Wohnfläche</td><td>126–150 m² · 126–150 m²</td><td class="r num">1,000</td></tr>
+      <tr><td class="op">×</td><td>Modernisierung</td><td>kleine (Annahme) · kleine</td><td class="r num">1,000</td></tr>
+      <tr><td class="op">×</td><td>Keller</td><td>nein · ja</td><td class="r num">0,942</td></tr>
+      <tr><td class="op">×</td><td>Grundstücksfläche, Anbauweise</td><td>wie Richtwertobjekt</td><td class="r num">1,000</td></tr>
+      <tr class="sum"><td class="op">=</td><td>angepasster Richtwert</td><td class="q">Produkt 1,9165</td><td class="r num">3.028 €/m²</td></tr>
+      <tr class="end"><td class="op">×</td><td>Wohnfläche 140 m² = Vergleichswert</td><td></td><td class="r num">423.925 €</td></tr>
+    </tbody>
+  </table></div>
+  <p class="hinweis">Die Garage ist im Richtwertobjekt enthalten (Zeitwert 5.000–15.000 €) und wird nicht gesondert angesetzt.</p>
+</section>
+
+<!-- 5 Ertragswert + Plausibilität -->
+<section class="page">
+  <p class="eyebrow">Abschnitt 4</p>
+  <h2>Ertragswert (nachrichtlich) und Plausibilisierung</h2>
+  <div class="wrap"><table>
+    <thead><tr><th></th><th>Position</th><th class="r">Betrag</th><th>Fundstelle</th></tr></thead>
+    <tbody>
+      <tr><td class="op"></td><td>Rohertrag 140 m² × 5,80 €/m² × 12</td><td class="r num">9.744 €</td><td class="q">marktüblich, Modell des Zinssatzes</td></tr>
+      <tr><td class="op">−</td><td>Bewirtschaftungskosten 25,6 %</td><td class="r num">2.494 €</td><td class="q">Angabe des Gutachterausschusses</td></tr>
+      <tr><td class="op">−</td><td>Bodenwertverzinsung 81.250 € × 1,8 %</td><td class="r num">1.463 €</td><td class="q">Liegenschaftszins 1,8 %, Stufe A</td></tr>
+      <tr><td class="op">×</td><td>Barwertfaktor 37,50 (1,8 %, 63 Jahre)</td><td class="r num">217.013 €</td><td class="q">§ 34 ImmoWertV</td></tr>
+      <tr class="end"><td class="op">+</td><td>Bodenwert = Ertragswert</td><td class="r num">298.263 €</td><td class="q">§ 28 ImmoWertV</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Abgleich der Wege</h3>
+  <p>Sachwert und Vergleichswert liegen 3 % auseinander, die bereinigten Angebote 2 % unter dem Sachwert. Der Ertragswert liegt deutlich darunter, weil ein selbstgenutztes Einfamilienhaus nicht nach seiner Miete gehandelt wird. Er geht deshalb nicht in die Indikation ein.</p>
+
+  <h3>Quellen</h3>
+  <ol class="quellen">
+    <li>Bodenrichtwert und Immobilienrichtwert: BORIS-NRW, Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford, Stichtag 01.01.2026, dl-de/zero-2-0.</li>
+    <li>Sachwertfaktor und Bewirtschaftungskosten: Grundstücksmarktbericht 2026 für den Kreis Herford, Abschnitt 5.1.2.</li>
+    <li>Liegenschaftszinssatz: Grundstücksmarktdaten Nordrhein-Westfalen, Oberer Gutachterausschuss, dl-de/zero-2-0.</li>
+    <li>Normalherstellungskosten: Anlage 4 ImmoWertV (NHK 2010). Baupreisindex: Statistisches Bundesamt.</li>
+  </ol>
+  <p class="fuss">Indikative Wertermittlung auf Grundlage der ImmoWertV 2021, kein Gutachten nach § 194 BauGB. Alle Rechenschritte und Fundstellen sind vollständig wiedergegeben.</p>
+</section>
+
+</main>
