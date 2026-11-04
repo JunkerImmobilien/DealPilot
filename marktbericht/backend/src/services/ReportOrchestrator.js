@@ -112,6 +112,15 @@ export const ReportOrchestrator = {
       geo = await GeocodingService.geocode(input.address);
       step(`geocode: ${geo ? 'ok lat=' + geo.lat + ' lon=' + geo.lon : 'fehlgeschlagen'}`);
     }
+    /* v3175 · Liegt der gefundene Ort in einer ANDEREN PLZ als angegeben (Hauptstr. 51,
+       49477 Ibbenbueren → Hauptstrasse in Uffeln, 49479), sagt der Bericht es - sonst
+       stammen Bodenrichtwert und Lage still aus einem anderen Ortsteil. */
+    const _plzHinweis = (geo && geo.components && geo.components.postcode
+      && (String(input.address || '').match(/\b(\d{5})\b/) || [])[1]
+      && String(geo.components.postcode) !== (String(input.address).match(/\b(\d{5})\b/) || [])[1])
+      ? `Die Anschrift wurde nicht in der angegebenen Postleitzahl gefunden; verortet ist das Objekt in ${geo.components.postcode} ${[geo.components.city, geo.components.district].filter(Boolean).join('-')}. Bodenrichtwert und Lage beziehen sich auf diesen Punkt — bitte die Anschrift prüfen.`
+      : null;
+    if (_plzHinweis) step('geocode: PLZ weicht ab (' + geo.components.postcode + ')');
     const lat = geo?.lat ?? input.lat;
     const lon = geo?.lon ?? input.lon;
     if (lat == null || lon == null) {
@@ -1877,6 +1886,14 @@ export const ReportOrchestrator = {
           + 'und sind in dieser Marktpreisindikation nicht enthalten.',
       };
       step('quercheck: nicht im Umfang (Stufe ' + _stufe + ')');
+    }
+    /* v3175 · PLZ-Abweichung beim Geocoding sichtbar machen (Bewertung und Quercheck) */
+    if (_plzHinweis) {
+      ref.adresse_hinweis = _plzHinweis;
+      try {
+        if (valuation && Array.isArray(valuation.notes)) valuation.notes.unshift(_plzHinweis);
+        if (crossCheck && Array.isArray(crossCheck.notes)) crossCheck.notes.unshift(_plzHinweis);
+      } catch (e) { /* nur Auskunft */ }
     }
 
     /* WKIGEG-3 · Zweitmeinung einholen, wenn eingeschaltet. Faellt sie aus,
