@@ -136,10 +136,10 @@
       + '<text x="' + x(kp) + '" y="11" text-anchor="middle" font-size="10" fill="#16161A">Kaufpreis ' + eur(kp) + '</text>';
     liste.forEach(function (v, i) {
       var y = 52 + i * 26;
-      s += '<circle cx="' + x(v.wert) + '" cy="30" r="' + (v.fuehrend ? 7 : 5) + '" fill="' + (v.fuehrend ? '#B8932F' : '#5F5E66') + '" stroke="#fff" stroke-width="2"/>';
+      s += '<circle cx="' + x(v.wert) + '" cy="30" r="' + (v.fuehrend ? 7 : 5) + '" class="' + (v.fuehrend ? 'pf' : 'pn') + '" stroke="#fff" stroke-width="2"/>';
       s += '<line x1="' + x(v.wert) + '" y1="36" x2="' + x(v.wert) + '" y2="' + (y - 9) + '" stroke="#E3E1DA" stroke-width="1"/>';
       var anker = x(v.wert) > B * 0.7 ? 'end' : x(v.wert) < B * 0.3 ? 'start' : 'middle';
-      s += '<text x="' + x(v.wert) + '" y="' + y + '" text-anchor="' + anker + '" font-size="10.5" fill="' + (v.fuehrend ? '#8A6A12' : '#5F5E66') + '">'
+      s += '<text x="' + x(v.wert) + '" y="' + y + '" text-anchor="' + anker + '" font-size="10.5" class="' + (v.fuehrend ? 'tf' : 'tn') + '">'
         + esc(v.name.replace(/ \(.*\)$/, '')) + ' · ' + eur(v.wert) + '</text>';
     });
     return s + '</svg>';
@@ -227,7 +227,8 @@
   /* ── das Dokument ─────────────────────────────────────────────────── */
   var CSS = [
     '@page{size:A4;margin:13mm 0 17mm}@page:first{margin:0}',
-    ':root{--ink:#16161A;--muted:#5F5E66;--line:#E3E1DA;--soft:#F5F3EE;--gold:#B8932F;--gold-l:#F6EFDC;--obs:#0B0B0D}',
+    ':root{--ink:#16161A;--muted:#5F5E66;--line:#E3E1DA;--soft:#F5F3EE;--gold:var(--wl-b8932f, #b8932f);--gold-l:color-mix(in srgb,var(--gold) 14%,#fff);--obs:#0B0B0D}',
+    '.spanne .pf{fill:var(--gold)}.spanne .pn{fill:#5F5E66}.spanne .tf{fill:color-mix(in srgb,var(--gold) 70%,#000)}.spanne .tn{fill:#5F5E66}',
     '*{box-sizing:border-box}html,body{margin:0;background:#fff;color:var(--ink)}',
     'body{font:9.6pt/1.5 Inter,system-ui,"Segoe UI",sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
     '.seite{width:210mm;padding:3mm 17mm 0;page-break-before:always;break-before:page}',
@@ -291,6 +292,13 @@
     '.lt td,.lt th{padding:1.4mm 2mm}'
   ].join('\n');
 
+  /* Gold der aktiven Marke (Whitelabel setzt --gold am <html>), sonst bleibt der Rueckfall im :root. */
+  function markenGold() {
+    try {
+      var g = getComputedStyle(document.documentElement).getPropertyValue('--gold').trim();
+      return /^(#[0-9a-f]{3,8}|rgb)/i.test(g) ? ':root{--gold:' + g + '}' : '';
+    } catch (e) { return ''; }
+  }
   function kopf(d, titel) {
     var l = d.logo && d.logo.b64 ? '<img src="' + d.logo.b64 + '" alt="">' : '<strong>' + esc(d.marke.company || '') + '</strong>';
     return '<div class="kopf">' + l + '<div class="r">' + esc(titel) + '<br>' + esc((d.p.ref && d.p.ref.address) || '') + '</div></div>';
@@ -482,7 +490,7 @@
 
     var fonts = (location && location.origin ? location.origin : '') + '/fonts/dp-fonts.css';
     return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Marktbericht Profi · ' + esc(r.address || '') + '</title>'
-      + '<link rel="stylesheet" href="' + fonts + '"><style>' + CSS + '</style></head><body>' + teile.join('') + '</body></html>';
+      + '<link rel="stylesheet" href="' + fonts + '"><style>' + CSS + markenGold() + '</style></head><body>' + teile.join('') + '</body></html>';
   }
 
   /* ── in der App: Vorschau mit Druckknopf ──────────────────────────── */
