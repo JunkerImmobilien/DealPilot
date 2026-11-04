@@ -465,7 +465,7 @@
     var zellen = [].slice.call(tmp.querySelectorAll('.bc-matrix-cell')).map(function (c) {
       var v = c.querySelector('.bc-matrix-cell-val');
       return { wert: v ? sb(v.textContent) : '', /* v3180 · fuenf Baender (bank-charts.js _cellCls): s-good ab Gruen-Schwelle, s-ok bis Gelb-Schwelle, darunter s-warn/s-bad/s-critical */
-        stufe: (c.className.match(/s-(good|ok|warn|bad|critical)/) || [])[1] || '', basis: /is-base/.test(c.className) };
+        stufe: (c.className.match(/\bs-(good|ok|warn|bad|critical)\b/) || [])[1] || '', basis: /is-base/.test(c.className) };
     });
     var yr = [].slice.call(tmp.querySelectorAll('.bc-matrix-axis-y-row')).map(function (e) { return sb(e.textContent); });
     tmp.remove();

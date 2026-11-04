@@ -1790,7 +1790,7 @@
         return { wert: v ? sauber(v.textContent) : '', titel: sauber(c.getAttribute('title') || ''),
           /* v3180 · fuenf Baender (bank-charts.js _cellCls): s-ok (1,0 bis Gruen) ist GELB, s-warn/s-bad (unter 1,0) sind ROT -
              bis hier stand s-ok gruen und s-bad ungefaerbt (gemessen Westerfeld: 0,68 weiss, 0,84 gruen). */
-          stufe: /s-good/.test(c.className) ? 'gruen' : (/s-ok/.test(c.className) ? 'gelb' : (/s-(warn|bad|critical)/.test(c.className) ? 'rot' : '')),
+          stufe: /\bs-good\b/.test(c.className) ? 'gruen' : (/\bs-ok\b/.test(c.className) ? 'gelb' : (/\bs-(warn|bad|critical)\b/.test(c.className) ? 'rot' : '')),
           basis: /is-base/.test(c.className) };
       });
       var yr = [].slice.call(tmp.querySelectorAll('.bc-matrix-axis-y-row')).map(function (e) { return sauber(e.textContent); });
