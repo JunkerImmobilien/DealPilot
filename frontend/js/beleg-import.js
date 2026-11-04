@@ -304,6 +304,7 @@
         '#beleg-import-ov .bi-werte td:nth-child(1){grid-row:1/3}#beleg-import-ov .bi-werte td:nth-child(2){grid-column:2/4}' +
         '#beleg-import-ov .bi-werte td:nth-child(3){grid-column:2}#beleg-import-ov .bi-werte td:nth-child(4){grid-column:3;text-align:right}' +
         '#beleg-import-ov .bi-werte td:last-child{grid-column:1/-1;min-width:0}#beleg-import-ov .bi-werte select{min-width:0}' +
+        '#beleg-import-ov .bi-ziel-box{padding:10px}#beleg-import-ov .bi-ziel-box table{font-size:12px;width:100%}#beleg-import-ov .bi-ziel-box th,#beleg-import-ov .bi-ziel-box td{padding:4px 3px;white-space:normal}#beleg-import-ov .bi-ziel-box .num{white-space:nowrap}#beleg-import-ov .bi-ziel-box .bi-k{white-space:normal;font-size:10.5px}' +
         '#beleg-import-ov .bi-bild{max-height:38vh}#beleg-import-ov .bi-bar{padding:10px 12px}#beleg-import-ov .bi-bar .bi-t{font-size:14px}}' +
       '#beleg-import-ov .bi-pr{font-size:11px;color:#8a6d18;margin-top:3px;line-height:1.4}' +
       '#beleg-import-ov .bi-k{font-size:11.5px;color:#888}' +
@@ -687,12 +688,15 @@
   function _dateiStatus(nm) {
     var rs = _rows.filter(function (r) { return r.name === nm; }), lx = _leer.filter(function (x) { return x.name === nm; })[0];
     if (!rs.length) return { cls: 'rot', text: '✗ nicht gelesen', grund: lx && lx.grund };
+    var schon = _schonAlles(nm); if (schon) return { cls: 'gruen', text: '✓ schon übernommen am ' + schon };   /* v3164 */
     var sum = rs.filter(function (r) { return r.keep; }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
     if (_dateiSicher(nm)) return { cls: 'gruen', text: '✓ sicher · ' + _fmtEur(sum) + ' €' };
     if (_geprueft[nm]) return { cls: 'gruen', text: '✓ von dir bestätigt · ' + _fmtEur(sum) + ' €' };
     return { cls: 'gelb', text: '⚠ prüfen und bestätigen · ' + _fmtEur(sum) + ' €' };
   }
   function _sicherheitHtml(nm) {
+    var _sa = _schonAlles(nm);   /* v3164 */
+    if (_sa) return '<div class="bi-gruen" style="font-weight:500"><div style="font-weight:700;margin-bottom:4px">Schon übernommen am ' + _sa + ' – wird nicht noch einmal gebucht</div>Alle Positionen dieses Belegs stehen bereits im Reiter Steuer (Knopf „Belege je Jahr"). Ist es wirklich ein zweiter Beleg, die Positionen unten anhaken.</div>';
     var gp = _gegenprobe(nm), z = _zweit[nm], s = _sicher[nm], h = '';
     var zeile = function (ok, t) { return '<div style="margin:2px 0">' + (ok ? '✓ ' : '✗ ') + t + '</div>'; };
     h += zeile(s === 'doppelt_gleich', s === 'doppelt_gleich' ? 'Zweimal unabhängig gelesen – gleiches Ergebnis'
@@ -878,6 +882,31 @@
         /* v3155 · die Gegenprobe steht frisch gerechnet oben im Prüffenster (_gegenprobe), nicht mehr fest an jeder Zeile */
       });
     });
+    /* v3164 · SCHON ÜBERNOMMEN? Gemessen: dieselbe Hotelrechnung ein zweites Mal eingelesen ergab „bisher 141,20 € –
+       wird addiert → 282,40 €". Jede Position wird gegen die Buchungen des Objekts geprüft (gleiches Jahr, gleicher
+       Posten, gleicher Betrag UND gleiche Datei oder gleiches Datum + Aussteller) und dann abgewählt - nie still. */
+    if (_modus === 'wk') {
+      var buch = [];
+      try { buch = ((window.DpEingang && window.DpEingang.lesen && window.DpEingang.lesen().buchungen) || []).slice(); } catch (e) {}
+      if (buch.length) _rows.forEach(function (r) {
+        var f = FIELD_MAP_WK[r.kategorie];
+        if (!r.keep || !f || !r.jahr || !r.brutto) return;
+        for (var i = 0; i < buch.length; i++) {
+          var b = buch[i];
+          if (Number(b.jahr) !== Number(r.jahr) || b.feld !== f || Math.abs(Number(b.betrag) - r.brutto) >= 0.01) continue;
+          if (b.datei !== r.name && !(b.datum && b.datum === r.datum && b.aussteller && b.aussteller === r.aussteller)) continue;
+          buch.splice(i, 1);
+          r.schon = String(b.am || '').split('-').reverse().join('.');
+          r.keep = false;
+          r.pruefen.push('schon am ' + r.schon + ' übernommen – wird nicht noch einmal gebucht (anhaken, falls es wirklich ein zweiter Beleg ist)');
+          break;
+        }
+      });
+    }
+  }
+  function _schonAlles(nm) {
+    var rs = _rows.filter(function (r) { return r.name === nm; });
+    return rs.length && rs.some(function (r) { return r.schon; }) && !rs.some(function (r) { return r.keep; }) ? rs.filter(function (r) { return r.schon; })[0].schon : null;
   }
   function _werteZeile(r) {
     return [['Datum', r.datum], ['Jahr', r.jahr || '–'], ['Aussteller', r.aussteller], ['Beschreibung', r.beschreibung],
