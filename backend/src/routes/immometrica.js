@@ -83,9 +83,19 @@ router.get('/searches', authenticate, limiter, async (req, res) => {
 });
 
 router.get('/searches/:id/results', authenticate, limiter, async (req, res) => {
-  try { const t = await tokenOr428(req, res); if (!t) return; res.json(await imo.getResults(t, req.params.id, req.query.page)); }
+  try { const t = await tokenOr428(req, res); if (!t) return; res.json(await imo.getResults(t, req.params.id, req.query.page, {   /* v3168 · inkrementelle Filter (Support 04.11.2026) */
+      offer_id_gt: req.query.offer_id_gt, last_modified_after: req.query.last_modified_after,
+      offline_date_after: req.query.offline_date_after, reactivated_after: req.query.reactivated_after })); }
   catch (e) { res.status(e.status || 502).json({ error: 'ImmoMetrica-Fehler', detail: String(e.message) }); }
 });
+
+/* v3168 · was ist seit dem letzten Abruf neu / geaendert / offline / wieder online (art; seit = ID oder ISO-Zeit) */
+router.get('/searches/:id/aenderungen', authenticate, limiter, async (req, res) => {
+  try { const t = await tokenOr428(req, res); if (!t) return; res.json(await imo.getAenderungen(t, req.params.id, String(req.query.art || ''), req.query.seit)); }
+  catch (e) { res.status(e.status || 502).json({ error: 'ImmoMetrica-Fehler', detail: String(e.message) }); }
+});
+/* v3168 · letzter bekannter Kontingent-Stand aus den X-Limit-Headern, ohne eigenen Abruf */
+router.get('/kontingent', authenticate, (req, res) => { res.json({ kontingent: imo.letztesKontingent() }); });
 
 router.get('/favorites/:cc', authenticate, limiter, async (req, res) => {
   try { const t = await tokenOr428(req, res); if (!t) return; res.json(await imo.getFavorites(t, req.params.cc)); }

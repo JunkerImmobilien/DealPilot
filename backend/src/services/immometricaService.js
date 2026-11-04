@@ -108,12 +108,50 @@ function inventarNotieren(items) {
   }
 }
 
-async function call(token, url) {
+/* === v3168 · RUECKMELDUNG DES SUPPORTS (04.11.2026) ===
+   - Kontingent: gezaehlt wird jedes EINDEUTIGE Objekt je Monat und Land; erneut abgerufene kosten nichts,
+     Blaettern/Filtern/Suchliste auch nicht. Erschoepft -> trotzdem HTTP 200, neue Objekte fallen still weg.
+     Das zeigen nur die Header X-Limit, X-Limit-Used, X-Limit-Hidden - deshalb werden sie hier gelesen.
+   - Bis 5.000 Anfragen je Stunde, darueber 429. Grosse Suchen brechen nach 25 s mit 503 ab -> mit offer_id_gt eingrenzen.
+   - Kein Preisverlauf, kein Kennzeichen neu/geaendert, keine Webhooks, keine Kontaktdaten (nur platforms[].url). */
+let _letztesKontingent = null;
+function _kontingent(res) {
+  const n = (h) => { const v = res.headers.get(h); return v == null || v === '' ? null : Number(v); };
+  const k = { limit: n('x-limit'), genutzt: n('x-limit-used'), verborgen: n('x-limit-hidden') };
+  if (k.limit == null && k.genutzt == null && k.verborgen == null) return null;
+  k.am = new Date().toISOString();
+  _letztesKontingent = k;
+  return k;
+}
+async function call(token, url, mitKontingent) {
   const res = await fetch(url, { headers: { Authorization: 'Token ' + token, Accept: 'application/json' } });
   const text = await res.text();
   let json = null; try { json = JSON.parse(text); } catch (e) {}
-  if (!res.ok) { const err = new Error('ImmoMetrica ' + res.status); err.status = res.status; throw err; }
-  return json;
+  const kont = _kontingent(res);
+  if (!res.ok) {
+    const err = new Error(res.status === 429 ? 'ImmoMetrica: zu viele Anfragen (mehr als 5.000 je Stunde) - bitte spaeter erneut'
+      : res.status === 503 ? 'ImmoMetrica: die Suche ist zu gross und brach nach 25 s ab - bitte eingrenzen'
+      : 'ImmoMetrica ' + res.status);
+    err.status = res.status; throw err;
+  }
+  return mitKontingent ? { json: json, kontingent: kont } : json;
+}
+/* Inkrementelle Filter laut Support. Je Abruf hoechstens EIN Zeitstempel-Filter; offer_id_gt darf dazu. */
+const ZEIT_FILTER = ['last_modified_after', 'offline_date_after', 'reactivated_after'];
+function _filterQuery(f) {
+  f = f || {};
+  const q = [];
+  const zeit = ZEIT_FILTER.filter((k) => f[k]);
+  if (zeit.length > 1) { const e = new Error('Nur ein Zeitstempel-Filter je Abruf (' + zeit.join(', ') + ')'); e.status = 400; throw e; }
+  if (f.offer_id_gt != null && f.offer_id_gt !== '') q.push('offer_id_gt=' + encodeURIComponent(String(f.offer_id_gt)));
+  if (zeit.length) {
+    const t = new Date(f[zeit[0]]);
+    if (isNaN(t)) { const e = new Error('Zeitstempel ungueltig: ' + zeit[0]); e.status = 400; throw e; }
+    /* Support: „ein paar Minuten vor dem letzten Zeitstempel ansetzen und Duplikate ueber die ID verwerfen" */
+    t.setMinutes(t.getMinutes() - 5);
+    q.push(zeit[0] + '=' + encodeURIComponent(t.toISOString()));
+  }
+  return q;
 }
 
 async function getSearches(token) {
@@ -125,20 +163,40 @@ async function getSearches(token) {
   return list.map(x => ({ id: x.id, name: x.name, count: x.count != null ? x.count : null, results: x.results }));
 }
 
-async function getResults(token, searchId, page) {
+async function getResults(token, searchId, page, filter) {
   if (_isStub()) return _demoResults(searchId);
   let url = abs('searches/' + encodeURIComponent(searchId) + '/results/');
-  if (page) url += '?page=' + encodeURIComponent(page);
-  const j = await call(token, url);
+  const q = _filterQuery(filter);
+  if (page) q.push('page=' + encodeURIComponent(page));
+  if (q.length) url += '?' + q.join('&');
+  const r = await call(token, url, true), j = r.json;
   const items = Array.isArray(j) ? j : (j && j.results) || [];
   inventarNotieren(items);   /* v1996 */
   return {
     count: j && j.count != null ? j.count : items.length,
     next: (j && j.next) || null,
+    kontingent: r.kontingent,   /* v3168 · X-Limit / -Used / -Hidden */
     items: items.filter(it => !it.fake).map(it => ({ raw: it, dp: mapping.mapToDp(it) })),
   };
 }
-
+/* v3168 · Was hat sich seit dem letzten Abruf getan? Blaettert alle Seiten eines Filters durch (hoechstens 20)
+   und entdoppelt ueber die ID. art: 'neu' (offer_id_gt), 'geaendert' (last_modified_after), 'offline', 'wieder_online'.
+   Ob sich der PREIS geaendert hat, sagt ImmoMetrica nicht - das entscheidet der Vergleich mit dem gespeicherten Preis. */
+async function getAenderungen(token, searchId, art, seit) {
+  const f = art === 'neu' ? { offer_id_gt: seit } : art === 'geaendert' ? { last_modified_after: seit }
+    : art === 'offline' ? { offline_date_after: seit } : art === 'wieder_online' ? { reactivated_after: seit } : null;
+  if (!f) { const e = new Error('art unbekannt: ' + art); e.status = 400; throw e; }
+  if (seit == null || seit === '') { const e = new Error('seit fehlt'); e.status = 400; throw e; }
+  const gesehen = new Set(), items = []; let kont = null, seite = 1, mehr = true;
+  while (mehr && seite <= 20) {
+    const r = await getResults(token, searchId, seite > 1 ? seite : null, f);
+    kont = r.kontingent || kont;
+    (r.items || []).forEach((it) => { const id = it.raw && it.raw.id; if (id != null && gesehen.has(id)) return; if (id != null) gesehen.add(id); items.push(it); });
+    mehr = !!r.next; seite++;
+  }
+  return { art: art, seit: seit, anzahl: items.length, kontingent: kont, items: items };
+}
+function letztesKontingent() { return _letztesKontingent; }
 async function getFavorites(token, cc) {
   if (_isStub()) return _demoFavorites(cc);
   const url = abs('favorites/' + encodeURIComponent(cc) + '/');
@@ -151,4 +209,4 @@ async function getFavorites(token, cc) {
   };
 }
 
-module.exports = { getSearches, getResults, getFavorites };
+module.exports = { getSearches, getResults, getFavorites, getAenderungen, letztesKontingent };
