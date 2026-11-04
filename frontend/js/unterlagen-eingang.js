@@ -556,15 +556,15 @@
       }).join('');
       var hin = z.art ? '<div class="jb-hin' + (z.rest != null && z.rest < -0.5 ? ' jb-warn' : '') + '">' + (z.rest != null && Math.abs(z.rest) >= 0.5 && z.belege.length ? (z.rest > 0 ? 'Übriger Betrag ' + eur2(z.rest) + ': ' : '') : '') + esc(z.art) + '</div>' : '';
       return '<details' + (z.belege.length ? ' open' : '') + '><summary><span class="jb-p">' + esc(z.label)
-        + '<small>' + (z.belege.length ? z.belege.length + (z.belege.length === 1 ? ' Beleg' : ' Belege') : (z.schaetzung ? 'von der App berechnet' : 'ohne Beleg')) + '</small></span>'
+        + '<small>' + (z.belege.length ? (function (n, m) { return n + (n === 1 ? ' Position' : ' Positionen') + ' aus ' + m + (m === 1 ? ' Beleg' : ' Belegen'); })(z.belege.length, Object.keys(z.belege.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length) : (z.schaetzung ? 'von der App berechnet' : 'ohne Beleg')) + '</small></span>'
         + '<span class="jb-z jb-zb">' + (z.belege.length ? eur2(z.summe) + '<small>aus Belegen</small>' : '') + '</span>'
         + '<span class="jb-z"><b>' + eur2(z.wert) + '</b><small>im Jahr ' + jahr + '</small></span></summary>'
         + (liste || hin ? '<div class="jb-liste">' + liste + hin + '</div>' : '') + '</details>';
     }).join('') || '<p style="opacity:.7">Für ' + jahr + ' steht kein Posten.</p>';
     ov.innerHTML = '<div class="jb-k" role="dialog" aria-label="Belege je Steuerjahr">'
       + '<div class="jb-kopf"><b>Werbungskosten ' + jahr + ' – woher jeder Posten kommt</b><button type="button" class="jb-zu" data-zu aria-label="Schließen">×</button></div>'
-      + '<div class="jb-jahre">' + jahre.map(function (j) { return '<button type="button" data-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i>· ' + mitBelegen[j] + '</i>' : '') + '</button>'; }).join('') + '</div>'
-      + '<div class="jb-inhalt"><div class="jb-summe"><span>Werbungskosten ohne AfA<br><b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<br><b>' + eur2(sumBel) + '</b></span><span>Belege in ' + jahr + '<br><b>' + d.buchungen.length + '</b></span></div>'
+      + '<div class="jb-jahre">' + jahre.map(function (j) { return '<button type="button" data-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i title="' + mitBelegen[j] + ' Positionen aus Belegen">●</i>' : '') + '</button>'; }).join('') + '</div>'
+      + '<div class="jb-inhalt"><div class="jb-summe"><span>Werbungskosten ohne AfA<br><b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<br><b>' + eur2(sumBel) + '</b></span><span>Belege in ' + jahr + '<br><b>' + Object.keys(d.buchungen.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length + '</b> (' + d.buchungen.length + ' Positionen)</span></div>'
       + posten + '</div>'
       + '<div class="jb-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 über den Beleg-Leser übernommen wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
       + (d.buchungen.length ? '<button type="button" class="btn btn-outline btn-sm" data-csv>Liste als CSV</button>' : '') + '</div></div>';

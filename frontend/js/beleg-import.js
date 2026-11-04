@@ -295,6 +295,16 @@
       '#beleg-import-ov .bi-bild{background:#efece4;border-radius:8px;padding:8px;max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:8px}' +
       '#beleg-import-ov .bi-bild img{width:100%;height:auto;border-radius:4px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}' +
       '#beleg-import-ov .bi-werte{min-width:0;overflow:auto;max-height:46vh}' +
+      /* v3164 · gemessen bei 390 px: die Positionstabelle war 584 px breit (Kategorie 210 + Spalte 220) und lief seitlich
+         aus dem Fenster. Auf dem Handy wird jede Position eine Karte: Haken + Text, darunter Datum und Betrag, darunter die Kategorie. */
+      '@media (max-width:640px){#beleg-import-ov .bi-werte{max-height:none;overflow:visible}' +
+        '#beleg-import-ov .bi-werte table,#beleg-import-ov .bi-werte tbody{display:block;width:100%}#beleg-import-ov .bi-werte thead{display:none}' +
+        '#beleg-import-ov .bi-werte tr{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:4px 8px;padding:10px 0;border-bottom:1px solid #e6e0d2}' +
+        '#beleg-import-ov .bi-werte td{display:block;padding:0;border:0;min-width:0}' +
+        '#beleg-import-ov .bi-werte td:nth-child(1){grid-row:1/3}#beleg-import-ov .bi-werte td:nth-child(2){grid-column:2/4}' +
+        '#beleg-import-ov .bi-werte td:nth-child(3){grid-column:2}#beleg-import-ov .bi-werte td:nth-child(4){grid-column:3;text-align:right}' +
+        '#beleg-import-ov .bi-werte td:last-child{grid-column:1/-1;min-width:0}#beleg-import-ov .bi-werte select{min-width:0}' +
+        '#beleg-import-ov .bi-bild{max-height:38vh}#beleg-import-ov .bi-bar{padding:10px 12px}#beleg-import-ov .bi-bar .bi-t{font-size:14px}}' +
       '#beleg-import-ov .bi-pr{font-size:11px;color:#8a6d18;margin-top:3px;line-height:1.4}' +
       '#beleg-import-ov .bi-k{font-size:11.5px;color:#888}' +
       '#beleg-import-ov .bi-rot{padding:12px;border-radius:8px;background:rgba(184,98,92,.1);border:1px solid rgba(184,98,92,.5);color:#B8625C;font-weight:600;line-height:1.45}' +
