@@ -487,3 +487,26 @@ sondern höchstens 1.800 je 15 min je IP — das entspricht dem Limit des Schlü
 - Anbindung von Kunden-Clouds (Google Drive, Dropbox, OneDrive) — wartet auf die Entwickler-Konten (`docs/cloud-anbindung-google-drive.md`).
 - `_soll_einheiten` und `_marktdaten` entstehen beim Speichern in der App; ein Objekt, das seit v3159 nicht gespeichert wurde, hat sie noch nicht.
 
+
+## 7 · Marktstatistik je Kreis (v3172, 04.11.2026)
+
+Öffentlich wie `/market-rates/bauzins`, ohne Schlüssel, 60 Abrufe je Minute. Die Werte liegen in der DealPilot-Datenbank (`mb.baustatistik`) und werden monatlich mit der amtlichen Statistik abgeglichen. Eine Anfrage löst keinen Abruf bei der Regionaldatenbank aus.
+
+| Endpunkt | Inhalt |
+|---|---|
+| `GET /api/v1/market-stats/baukosten` | alle Kreise, dazu Länder und Bund |
+| `GET /api/v1/market-stats/baukosten?ags=05770` | ein Kreis (fünfstelliger Kreisschlüssel); unbekannt → 404 |
+| `GET /api/v1/market-stats/index` | Baupreisindex 61261-0002 (Wohngebäude, Bauleistungen am Bauwerk, einschl. USt) |
+
+**Wichtig:** Veranschlagte Baukosten veröffentlicht die amtliche Statistik **nur je Land und Bund** (GENESIS 31111-0100 / 31111-0001), nicht je Kreis. Je Kreis steht deshalb `baukosten: null`. Daneben steht der Landeswert in `land_baukosten`, als solcher gekennzeichnet. Es wird kein Wert erfunden.
+
+Je Kreis:
+- `genehmigt`: Baugenehmigungen 31111-01-02-4 mit Wohnungen, Wohnfläche und Gebäuden, gesamt und `je_gebaeudeart` (1 / 2 / 3+ Wohnungen). `duenn: true` bei weniger als 10 Wohnungen.
+- `fertiggestellt`: Baufertigstellungen 31121-01-02-4, im gleichen Aufbau.
+- `bauland`: 61511-01-03-4 mit `eur_je_qm`, `baureif_eur_je_qm` und Kauffällen. `duenn` bei weniger als 10 baureifen Fällen.
+- `land_baukosten`: `kosten_teur`, `wohnflaeche_qm`, `wohnungen` und `eur_je_qm` (= kosten_teur × 1000 / wohnflaeche_qm, gerundet) des Landes, Neubau-Wohngebäude, Jahreswert.
+- `quelle`, `quelle_urls`, `lizenz` (dl-de/by-2-0, Namensnennung), `abgerufen`.
+
+Kopf: `stand`, `quelle`, `lizenz`, `hinweis`, `baupreisindex` {reihe, wert, basis, monat, vj_pct}, `bund`, `laender` {NW: …}, `anzahl`.
+
+Nur die Kosten des Bauwerks (KG 300+400 DIN 276, inkl. USt), wie in der Statistik. Baunebenkosten, Außenanlagen und Grundstück rechnet das Modul selbst.
