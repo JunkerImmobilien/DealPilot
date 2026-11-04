@@ -44302,3 +44302,37 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `c069cc6c`, Konstanten `b7194e3e`.
 - **Nachweis:** wertermittlung-pruefen RC 0 (B21/B21b nachgezogen, B61 neu), mietpotenzial 104/104, score-ketten, buster sauber. Staging Westerfeld: 740.000 / 760.000 / 795.000 €, RND Mieterhöhung = Bestand 26,3 J.
 - **Rest:** N117 Stufe Neuvermietung (Annahmen Marcel), N118 Scans; Prod nach Marcels Abnahme.
+
+### Nachtrag 04.11.2026 · v3164–v3173 nur in der Tagesdatei
+
+- Belege je Jahr (v3164), Bayern-Bodenrichtwert als Weg (v3165/v3170), Belegbild per KI (v3166), API-Keys (v3167), ImmoMetrica-Schnittstelle (v3168–v3171), Marktstatistik je Kreis (v3172/v3173) stehen mit Nachweis in `wissen/2026-11-04.md` und im Backlog (N109, N113, N121). Hier nicht doppelt.
+
+### v3174–v3175 · RND aus Modernisierungsjahren, IRW junges Gebäude, Erbbaurecht, Geocoding mit PLZ (04.11.2026, Prod)
+
+- **Was:** Modernisierungsjahre (`mod_*`) heben die Gewerke-Bewertung vor dem Rückschluss aus der Energieklasse (Parkstr. 9); Prüfsummen der gespiegelten Kerne. IRW-Vergleichswert: Gebäude < 25 J. ohne Angabe → Stufe 2 „kleine Modernisierungen" als ausgewiesene Annahme (Marcel). Erbbaurecht: eigener angemessener Erbbauzins (`erb_zs_ang`) und Entschädigung (`erb_entsch`) kommen im Bericht an. Geocoder vergleicht die PLZ (limit 5, Treffer mit passender PLZ gewinnt, Cache mit abweichender PLZ wird neu geholt).
+- **Commit:** `6b7e3ba6`, `ab40ae5d`, `c3ed5027`, `149ff055`, `9710dc56`, `977bad79`. Prod 1.0.49/1.0.50.
+- **Nachweis:** `irw-pruefen` neuer Fall „Junges Gebäude (Herford)", `rechenkerne-spiegeln`, Habighorst im Bericht. Entscheidung Marcel: Marktbericht-RND immer nach Anlage 2.
+- **Rest:** keiner.
+
+### v3176–v3178e · Marktbericht Profi, Stufe 3 aufgefüllt, Objektwahl im Marktbericht (04.11.2026, Prod bis v3178)
+
+- **Was:** `frontend/js/marktbericht-profi.js` (DpProfi): Profi-Fassung des Stufe-3-Berichts in HTML/A4 – führendes Verfahren, Spanne und Abschlag, €/m² je Verfahren und Miete, Energieskala, Fotos, Lage mit Umgebung (Mikro/Makro, Nahversorgung), Markt und Region, Vergleichsangebote, Boden-/Sach-/Vergleichs-/Ertragswert mit Rechenweg, Erbbaurecht, ausführliche Einschätzung, Quellen. Knöpfe: Marktbericht-Fenster (`pdfProfiBtn`) und Deal-Aktion je Stufe-3-Verlauf. PDF über PDF-Dienst (`marktbericht_profi`, `GET /rechenkerne/profi-pdf`, `pdf:"profi"` in `/rechenkerne/verkehrswert`). Marktpreisindikation mit Spanne, Abschlag und €/m². Quick-Check: Sanierungsfeld zeigte die E-Mail (Autofill) – Feld ohne Passworttyp, Bereinigung. Marktbericht-Eingabe: Hausform/NHK-Felder nur bei Ein-/Zweifamilienhäusern (Westerfeldstr. meldete „NHK fehlt"); „Objekt aus Bestand laden" übernahm beim Wechsel nichts (`_stand` wurde bei echtem Klick geleert) – behoben, Liste gruppiert (Bestand/In Prüfung/Verloren), leere Objekte raus. Stufe-3-Kontingent: 20 Abrufe auf Staging und Prod gebucht (Freigabe im Chat).
+- **Commit:** `9ace0f3c` … `92ba4ae6` (v3176–v3178e). Prod 1.0.52–1.0.56.
+- **Nachweis:** fünf Profi-PDFs unter `Dateien/Berichte/Marktbericht-Profi/`, gold-audit grün, buster sauber, Objektwahl mit echter Tastatur nachgemessen (Am Markt 9 → Habighorst).
+- **Rest:** Profi ohne „Marktpreise & Wertpotenzial" (braucht eigenen Abruf). Gewerbe mit Wohnanteil ohne Miete → N124.
+
+### v3179–v3181b · Einheitliche Dokumente und Weiche an allen Knöpfen (04.11.2026, nur Staging)
+
+- **Was:** `js/dp-dokument.js` (Gestaltung: Inter/Space Grotesk/JetBrains Mono, hell, Kacheln mit Goldkante, Deckblatt mit Foto oder Lagekarte, Diagramme als SVG, Energieskala, Blocksatz) und `js/dp-dokumente.js` (Inhalte): Investment Case, Bankfassung, Kurzfassung, Kaufpreisaufteilung, Werbungskosten, Werbungskosten mit Anlage V, Track Record, Bankexport. Die Bankfassung führt alle Abschnitte von `pdf-investment-bank.js` aus denselben Quellen (drei Phasen, Kennzahlen je Phase, Cashflow aller Jahre, Vermögensaufbau, Mieterliste, Wert & Zielbild, Wertpotenzial mit Wertüberleitung – eigene Seite, Bank-Cockpit, Belastungsprobe, Pilot-Analyse, Annahmen). Bankfassung ohne Doppeltexte und ohne Urteil/Kaufpreis-Offerte; im Bestand nie ein Urteil (Marcel: „das bewerten wir nicht ob wir es halten"). `js/dok-weiche.js` lenkt alle Exportfunktionen auf die neuen Dokumente (PDF über `POST /rechenkerne/dok-pdf`, Optionen nur als Daten; Rückfall Vorschau), „Klassisch" in Einstellungen › PDF-Export › Dokument-Design (`pdf_vorgabe.design`), Bot über `telegramPdfService NEU_FUER`. Wasserzeichen-Pläne bleiben klassisch.
+- **Gefundene Fehler:** Belastungsprobe färbte auch in der bisherigen Bankfassung falsch (`s-ok` 1,0–1,2 grün, `s-bad` ungefärbt; bank-charts.js hat fünf Bänder). PDF-Dienst: `setContent` behält die JavaScript-Welt der App – ein Zeitgeber setzte den BMF-Dialog als vier Seiten ans Ende; Zeitgeber werden jetzt abgeräumt, Fremdelemente entfernt. Server-Chrome trennt keine Silben → Stärken/Risiken untereinander.
+- **Commit:** `c37ab723` … `653d406d` (v3179–v3181b).
+- **Nachweis:** 15 PDFs für Westerfeldstr./Hermannstr./Habighorst unter `Dateien/Berichte/Einheitliche-Dokumente-Demo/` (Bank 20/17/13 S.), keine Fremdseiten, Urteil 0 Treffer; Weiche im Browser: alle vier Hüllen gesetzt, `dok-pdf` 200 / application/pdf in 31 s. gold-audit auf dem Server grün, buster sauber.
+- **Rest:** Marcels Abnahme, dann Prod (Backend + PDF-Dienst neu bauen – `rollout-prod.ps1` baut den PDF-Dienst NICHT). Bankexport: Abwahl einzelner Darlehenszeilen fehlt. Marktbericht-Standard-PDF ist noch nicht umgestellt (Profi nur bei Stufe 3). „Lage & Markt" in der Bankfassung kürzen? (Frage an Marcel offen).
+
+### Kundenauftrag Kaufpreisaufteilung (04.11.2026, außerhalb des Repos)
+
+- Leerstehendes ZFH mit Scheune, drei Flurstücke, Bauverbot auf dem Scheunengrundstück (Befreiung nur für die Umnutzung). Ergebnis Sachwertverfahren, Gebäudeanteil 34,16 % (Gegenrechnung nur Heizung 28,76 %). Word + PDF nach der Gutachtenvorlage (Deckblatt, Verzeichnis), docx-js + Word-COM. Ablage `Dateien/Gutachten/` (nicht versioniert). Das BMF-Modul kann den Fall nicht abbilden → N125.
+
+### Sitzungsende 04.11.2026 (abends)
+
+- Prod steht auf v3178 (1.0.56). Staging v3181b. Offen zur Abnahme: einheitliche Dokumente.
