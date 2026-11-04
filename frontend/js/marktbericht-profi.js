@@ -111,7 +111,8 @@
     if (irw.verfuegbar && istZahl(irw.vergleichswert_eur)) liste.push({ id: 'vergleichswert', name: 'Vergleichswert (Immobilienrichtwert)', wert: irw.vergleichswert_eur, recht: '§§ 24–26 ImmoWertV', tag: 'amtlich · Stufe ' + (irw.stufe || 'A'), voll: true });
     else if (rvf.verfuegbar && istZahl(rvf.vergleichswert_eur)) liste.push({ id: 'vergleichswert', name: 'Vergleichswert (Vergleichsfaktor)', wert: rvf.vergleichswert_eur, recht: '§ 20 ImmoWertV', tag: 'amtlich', voll: true });
     if (istZahl(ew.value_eur)) liste.push({ id: 'ertragswert', name: 'Ertragswert', wert: ew.value_eur, recht: '§§ 27–34 ImmoWertV', tag: 'Zins Stufe ' + (ew.liegenschaftszins_stufe || '–'), voll: true });
-    if (istZahl(mv.estimated)) liste.push({ id: 'angebote', name: 'Marktpreisindikation aus Angeboten', wert: mv.estimated, recht: 'bereinigt um den Angebotsabschlag', tag: (p.sale && p.sale.sample_size ? p.sale.sample_size + ' Angebote' : 'Angebote'), voll: true, low: mv.low, high: mv.high });
+    if (istZahl(mv.estimated)) liste.push({ id: 'angebote', name: 'Marktpreisindikation aus Angeboten', wert: mv.estimated, recht: 'bereinigt um den Angebotsabschlag', tag: (p.sale && p.sale.sample_size ? p.sale.sample_size + ' Angebote' : 'Angebote'), voll: true, low: mv.low, high: mv.high,
+      abschlag: mv.angebot_abschlag || null });
 
     var vw = c.verfahrenswahl || {};
     var art = String((p.ref && p.ref.property_type) || '').toLowerCase();
@@ -314,6 +315,7 @@
     '.verf>div{padding:3.5mm 4mm;border-bottom:.2mm solid var(--line)}.verf>div:nth-child(odd){border-right:.2mm solid var(--line)}',
     '.verf .t{font-size:8pt;color:var(--muted)}.verf .v{font:500 14pt/1.3 "JetBrains Mono",monospace;margin:.5mm 0 1mm}',
     '.verf .f{background:var(--gold-l)}',
+    '.verf .qm{font:500 9pt/1.3 "JetBrains Mono",monospace;color:var(--muted);margin:-.5mm 0 1mm}.verf .zus{font-size:7.6pt;color:var(--muted);margin-bottom:1mm}',
     '.tag{display:inline-block;font:6.8pt/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:1mm 1.5mm;border-radius:.8mm;background:var(--soft);color:var(--muted)}',
     '.tag.g{background:var(--obs);color:#fff}',
     '.spanne{width:100%;height:auto;margin:3mm 0;font-family:Inter,sans-serif}',
@@ -400,13 +402,38 @@
       + '<div style="text-align:right">Indikative Wertermittlung,<br>kein Gutachten nach § 194 BauGB</div></div></section>');
 
     /* 2 · Ergebnis */
+    /* v3178 · je Verfahren der Preis je m² Wohnfläche; bei der Marktpreisindikation dazu Spanne und
+       Angebotsabschlag (Marcel 04.11.2026) */
+    var wflQm = istZahl(r.living_area) && Number(r.living_area) > 0 ? Number(r.living_area) : null;
     var kacheln = v.liste.map(function (x) {
+      var qm = wflQm ? '<div class="qm num">' + zahl(Number(x.wert) / wflQm, 0) + ' €/m²</div>' : '';
+      var zus = '';
+      if (x.id === 'angebote') {
+        if (istZahl(x.low) && istZahl(x.high)) zus += '<div class="zus">Spanne ' + eur(x.low) + ' – ' + eur(x.high)
+          + (wflQm ? ' · ' + zahl(x.low / wflQm, 0) + '–' + zahl(x.high / wflQm, 0) + ' €/m²' : '') + '</div>';
+        var ab = x.abschlag;
+        if (ab && istZahl(ab.pct)) zus += '<div class="zus">Angebotsabschlag ' + zahl(ab.pct, 1) + ' %'
+          + (ab.roh && istZahl(ab.roh.estimated) ? ' auf ' + eur(ab.roh.estimated) + ' (Angebotsniveau)' : '')
+          + (ab.herkunft ? ' · ' + esc(ab.herkunft) : '') + '</div>';
+      }
       return '<div class="' + (x.fuehrend ? 'f' : '') + '"><div class="t">' + esc(x.name) + ' · ' + esc(x.recht) + '</div><div class="v">' + eur(x.wert) + '</div>'
-        + '<span class="tag' + (x.fuehrend ? ' g' : '') + '">' + (x.fuehrend ? 'führend' : esc(x.tag)) + '</span></div>';
+        + qm + zus + '<span class="tag' + (x.fuehrend ? ' g' : '') + '">' + (x.fuehrend ? 'führend' : esc(x.tag)) + '</span></div>';
     }).join('');
+    /* v3178 · Mieten je m²: Ist, im Ertragswert angesetzt, Band der Marktüblichkeit, Angebote, Zensus */
+    var ewM = c.ertragswert || {}, band = ewM.miete_band || {}, rm = p.rent || {}, zm = p.zensus || {};
+    var mieten = [
+      ['Ist-Miete laut Objekt', ewM.miete_ist_qm != null ? ewM.miete_ist_qm : band.ist_qm, 'eigene Angabe'],
+      ['Im Ertragswert angesetzt', ewM.miete_qm, ewM.miete_modellkonform_grund || (ewM.miete_herkunft && ewM.miete_herkunft.vergleich ? 'marktüblich erzielbar' : 'marktüblich erzielbar')],
+      ['Band der Marktüblichkeit', istZahl(band.unten_qm) && istZahl(band.oben_qm) ? null : undefined, istZahl(band.unten_qm) ? zahl(band.unten_qm, 2) + ' – ' + zahl(band.oben_qm, 2) + ' €/m² (± ' + zahl(band.band_pct, 0) + ' %)' : ''],
+      ['Angebotsmieten (Median)', rm.median_per_sqm, istZahl(rm.q25_per_sqm) ? 'Quartile ' + zahl(rm.q25_per_sqm, 2) + ' – ' + zahl(rm.q75_per_sqm, 2) + ' €/m², ' + zahl(rm.sample_size, 0) + ' Angebote' : ''],
+      ['Bestandsmiete Zensus 2022', zm.nettokaltmiete_qm, zm.available ? 'Gemeinde/Kreis, Stichtag Zensus' : '']
+    ].filter(function (z) { return istZahl(z[1]) || (z[1] === null && z[2]); });
+    var mietTab = mieten.length ? '<h3>Mieten je m² Wohnfläche</h3><table><tbody>' + mieten.map(function (z) {
+      return '<tr><td>' + esc(z[0]) + '</td><td class="r num">' + (istZahl(z[1]) ? zahl(z[1], 2) + ' €/m²' : '') + '</td><td class="q">' + esc(String(z[2] || '').slice(0, 140)) + '</td></tr>';
+    }).join('') + '</tbody></table>' : '';
     teile.push(seite(d, 'Ergebnis', '<div class="eyebrow">Ergebnis</div><h2>Marktwert-Indikation ' + eur(ergebnis) + '</h2>'
       + '<p class="sub">' + esc(v.grund) + (v.grundQuelle ? ' (' + esc(v.grundQuelle) + ')' : '') + '</p>'
-      + fuehrendBox(v) + spanneSvg(v.liste, r.purchase_price) + '<div class="verf">' + kacheln + '</div>'
+      + fuehrendBox(v) + spanneSvg(v.liste, r.purchase_price) + '<div class="verf">' + kacheln + '</div>' + mietTab
       + (d.md ? '<h3>Einschätzung</h3>' + zusammenfassung(d.md) : '')));
 
     /* 3 · Objekt */

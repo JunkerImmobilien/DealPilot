@@ -1077,6 +1077,11 @@
           + '<div class="dab-mb-main"><div class="dab-mb-l1">' + kz + '<span class="dab-mb-addr">' + addr + '</span></div>'
           + '<div class="dab-mb-d">' + ds + '</div></div>' + mv
           + '<button class="dab-doc-btn" onclick="DealActionBoarding.downloadReport(' + (h.report_id | 0) + ')">' + ICO.dl + 'PDF</button>'
+          /* v3178 · Profi-Fassung als zweite Wahl, nur bei Stufe 3 (Wertermittlung) */
+          + (String(h.wert_stufe || '') === '3' && window.DpProfi
+            ? '<button class="dab-doc-btn" title="Marktbericht Profi: Wertermittlung mit Herleitung" onclick="DpProfi.oeffnen('
+              + (/^[0-9a-f-]{36}$/i.test(String(h.external_ref || '')) ? '\'' + h.external_ref + '\'' : 'null') + ',' + (h.report_id | 0) + ')">' + ICO.dl + 'Profi</button>'
+            : '')
           /* v966-delbtn: endgueltiges Loeschen — Rueckfrage in deleteReport(). */
           + '<button class="dab-mb-del" title="Bericht endg\u00fcltig l\u00f6schen" onclick="DealActionBoarding.deleteReport(' + (h.report_id | 0) + ')">\u2715</button></div>';
       };
