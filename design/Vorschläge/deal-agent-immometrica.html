@@ -195,9 +195,31 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
       </div>
     </div>
     <nav class="nav" aria-label="Abschnitte">
-      <a href="#beobachtung">1 · Beobachtung</a><a href="#anfrage">2 · Anfrage</a><a href="#tracking">3 · Tracking</a><a href="#aufstellung">4 · Aufstellung</a><a href="#dahinter">Was steckt dahinter</a>
+      <a href="#mehrwert">Mehrwert</a><a href="#beobachtung">1 · Beobachtung</a><a href="#anfrage">2 · Anfrage</a><a href="#tracking">3 · Tracking</a><a href="#aufstellung">4 · Aufstellung</a><a href="#dahinter">Was steckt dahinter</a>
     </nav>
   </header>
+
+  <!-- MEHRWERT (04.11.2026) -->
+  <section class="flaeche" id="mehrwert">
+    <div class="fl-kopf"><div><span class="schritt">WARUM</span><h2>Mehrwert gegenüber ImmoMetrica allein</h2></div><p>ImmoMetrica findet die Objekte. DealPilot sagt, welche sich lohnen – und bringt sie bis zur Entscheidung.</p></div>
+    <div class="kennz">
+      <div><span class="lbl">Je Treffer gerechnet</span><b class="num">8 Kennzahlen</b><span class="hinweis">Rendite, Cashflow, DSCR, Deal Score, Lageklasse, Zielkaufpreis, nötiger Nachlass, Marktpreisindikation</span></div>
+      <div><span class="lbl">Statt Liste</span><b>nur Passendes</b><span class="hinweis">Profilfilter aus deinem Investmentprofil, Meldung nur bei Treffern</span></div>
+      <div><span class="lbl">Preissenkung</span><b>mit Abstand zum Ziel</b><span class="hinweis">„−6 %, noch 4 % bis zu deinem Zielkaufpreis“</span></div>
+      <div><span class="lbl">Zeit je Objekt</span><b class="num">≈ 2 statt 45 Min.</b><span class="hinweis">Schätzung: Erstprüfung von Hand gegen automatisch gerechnet</span></div>
+    </div>
+    <div class="tab-wrap"><table class="auf" style="min-width:640px">
+      <thead><tr><th>Schritt</th><th>ImmoMetrica allein</th><th>Mit dem DealPilot-Agenten</th></tr></thead>
+      <tbody>
+        <tr><td><b>Finden</b></td><td>Gespeicherte Suche, Liste aller Treffer, E-Mail/Telegram bei neu und Preisänderung</td><td>Dieselben Suchen, aber gefiltert nach deinem Profil; Meldung nur, wenn es rechnerisch passt</td></tr>
+        <tr><td><b>Bewerten</b></td><td>Preis, Fläche, Preis je m², Preisverlauf</td><td>Quick-Check sofort: Rendite, Cashflow nach Finanzierung, Deal Score, Lage, Zielkaufpreis und Nachlass</td></tr>
+        <tr><td><b>Preis beobachten</b></td><td>Preisverlauf in der Oberfläche</td><td>Eigener Verlauf je Inserat; Meldung, wenn der Preis in Reichweite deines Zielkaufpreises fällt</td></tr>
+        <tr><td><b>Anfragen</b></td><td>Inserat öffnen, Text selbst schreiben</td><td>Fertiger Anfragetext mit der richtigen Unterlagen-Liste je Objektart, ein Klick: Text kopiert, Inserat offen, Stand „angefragt“</td></tr>
+        <tr><td><b>Unterlagen</b></td><td>–</td><td>Antwort an deine Eingangsadresse, Unterlagen werden gelesen, Quick-Check mit echten Zahlen neu gerechnet</td></tr>
+        <tr><td><b>Entscheiden</b></td><td>–</td><td>Aufstellung aller angefragten Objekte mit Zielkaufpreis, Nachlass, Marktpreisindikation; Übernahme als Objekt mit einem Klick</td></tr>
+      </tbody></table></div>
+    <p class="hinweis">Die Zeitangabe ist eine Schätzung für die Erstprüfung eines Inserats (Daten abtippen, Finanzierung rechnen, Lage einschätzen) und noch nicht gemessen.</p>
+  </section>
 
   <!-- 1 BEOBACHTUNG -->
   <section class="flaeche" id="beobachtung">
@@ -214,6 +236,9 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
           <button type="button" data-t="m30" aria-pressed="false">alle 30 Minuten</button>
         </div>
         <div id="kontingent" class="warnung gelb"></div>
+        <span class="lbl">Suche aus DealPilot starten</span>
+        <p class="hinweis">Aus deinem Investmentprofil schlägt DealPilot die Suche vor: Objektart, Region, Kaufpreisspanne, Mindestrendite. Am einfachsten ist <b>eine breite Suche in ImmoMetrica</b> (z. B. „Kapitalanlage OWL bis 900 T€“) – das Feinsieben macht DealPilot mit deinem Profil. Ob sich Suchen auch direkt über die Schnittstelle anlegen lassen, steht in der ImmoMetrica-Doku (noch nicht gelesen, nur angemeldet sichtbar).</p>
+        <button class="btn" type="button" id="b-suche">Suchvorschlag aus meinem Profil</button>
       </div>
       <div class="kasten creme">
         <span class="lbl">Passt zu meinem Profil</span>
@@ -362,6 +387,14 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
       <div class="stufe"><b>Stufe 2 · Anfrage über das Inserat</b><span class="aufwand">1–2 Tage</span><p>Die Treffer enthalten keine Kontaktdaten, nur den Link zum Inserat. Deshalb: fertiger Anfragetext (mit Bitte um Unterlagen und Antwort an die Eingangsadresse) zum Kopieren, Inserat öffnen, „angefragt“ mit einem Klick. Keine automatische Bedienung der Portal-Formulare. Die E-Mail aus dem eigenen Postfach (OAuth, 5–8 Tage + Google-Prüfung) lohnt erst für Folgemails, wenn der Makler geantwortet hat und seine Adresse bekannt ist. Die Automatik „ab −x % selbst anfragen“ entfällt damit.</p></div>
       <div class="stufe"><b>Stufe 3 · Eingang, Auswertung, Aufstellung</b><span class="aufwand">8–12 Tage</span><p>Eingang über Eingangsadresse oder Postfach, Zuordnung über den Gesprächsverlauf, Anhänge in den Unterlagen-Import, Quick-Check und Marktpreisindikation, Aufstellung mit Status.</p></div>
     </div>
+
+    <h3>Automatisch anfragen – geht das doch irgendwie?</h3>
+    <ul class="l">
+      <li><b>Links zu den Inseraten: ja.</b> Jeder Treffer bringt <code>platforms[].url</code> mit, DealPilot übernimmt ihn schon heute als „Exposé-Link“.</li>
+      <li><b>Kontaktformulare der Portale automatisch ausfüllen: nein.</b> Die Portale verbieten automatisierte Anfragen in ihren Nutzungsbedingungen und schützen die Formulare gegen Bots. Ein Konto des Kunden könnte gesperrt werden.</li>
+      <li><b>Was geht:</b> ein Klick statt fünf. Text ist fertig und kopiert, das Inserat öffnet sich, der Kunde fügt ein und schickt ab. Antworten laufen an die Eingangsadresse und werden dort automatisch zugeordnet und gelesen.</li>
+      <li><b>Ab der ersten Antwort automatisch:</b> Dann kennt DealPilot die Adresse des Maklers; Nachfragen („Hausgeldabrechnung fehlt noch“) kann der Agent als Entwurf vorbereiten.</li>
+    </ul>
 
     <h3>Noch offen beim ImmoMetrica-Support</h3>
     <ol class="fragen">
@@ -570,6 +603,12 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
     try { if (navigator.clipboard) navigator.clipboard.writeText($('mail-text').textContent); } catch (e) {}
     o.status=0; LOG.push(['04.11. 14:12',o.id,'Anfragetext kopiert, Inserat geöffnet, als angefragt markiert (Demo)']);
     $('toast').textContent='Demo: Text kopiert und als angefragt markiert. In der App öffnet sich jetzt das Inserat, dort fügst du den Text ins Kontaktformular ein.'; alles(); });
+  $('b-suche').addEventListener('click',function(){
+    var reg=REGIONEN.filter(function(r){return r.an;}).map(function(r){return r.id;}).join(', ');
+    $('toast').textContent='';
+    alert0('Suchvorschlag: Wohnungen und Mehrfamilienhäuser · '+(reg||'alle Regionen')+' · '+eur(+$('f-min').value||0)+' bis '+eur(+$('f-max').value||0)+' · Mindestrendite '+pct(+$('f-rendite').value)+' (filtert DealPilot) · Lage ab '+$('f-lage').value+' (filtert DealPilot).');
+  });
+  function alert0(t){ var b=$('b-suche'); var p=b.nextElementSibling; if(!p||!p.classList.contains('vorschlag')){ p=document.createElement('div'); p.className='warnung gelb vorschlag'; b.insertAdjacentElement('afterend',p);} p.innerHTML='<b>Vorschlag für ImmoMetrica</b><span>'+esc(t)+'</span>'; }
   $('b-inserat').addEventListener('click',function(){ $('toast').textContent='In der App öffnet sich hier das Inserat in einem neuen Fenster.'; });
   $('track').addEventListener('click',function(e){ var b=e.target.closest('button[data-s]'); if(!b) return;
     var o=OBJ.filter(function(x){return x.id===b.dataset.id;})[0]; o.status=+b.dataset.s;
