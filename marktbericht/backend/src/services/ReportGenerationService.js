@@ -81,7 +81,7 @@ ${p.marktkontext.segment === 'gewerbe' ? [
 Das Objekt steht auf einem Erbbaurechtsgrundstück. Der Marktwert oben ist ein
 **Volleigentumswert** — kein Bewertungspartner nimmt den Parameter entgegen.
 - Bodenwert (gehört dem Erbbaurechtsgeber): ${fmt(p.erbbaurecht.teile.bodenwert, ' €')}
-- ${p.erbbaurecht.teile.zinsvorteil >= 0 ? 'Vorteil' : 'Nachteil'} aus dem Vertragszins: ${fmt(Math.abs(p.erbbaurecht.teile.zinsvorteil), ' €')} (angemessen ${p.erbbaurecht.annahmen.zinssatzAngemessen} %${p.erbbaurecht.annahmen.zinsQuelle ? `, örtlich erhoben: ${p.erbbaurecht.annahmen.zinsQuelle}` : ''})
+- ${p.erbbaurecht.teile.zinsvorteil >= 0 ? 'Vorteil' : 'Nachteil'} aus dem Vertragszins: ${fmt(Math.abs(p.erbbaurecht.teile.zinsvorteil), ' €')} (angemessen ${p.erbbaurecht.annahmen.zinssatzAngemessen} %${p.erbbaurecht.annahmen.zinsQuelle ? (p.erbbaurecht.annahmen.zinsQuelle === 'eigene Angabe' ? ', eigene Angabe' : `, örtlich erhoben: ${p.erbbaurecht.annahmen.zinsQuelle}`) : ''})
 - Nicht entschädigter Gebäudeanteil bei Zeitablauf: ${fmt(p.erbbaurecht.teile.heimfallabschlag, ' €')}
 - **Erbbaurechtswert: ${fmt(p.erbbaurecht.erbbaurechtswert, ' €')} — Abschlag ${fmt(p.erbbaurecht.abschlag, ' €')} · ${p.erbbaurecht.abschlagPct.toFixed(1)} %**
 ${p.erbbaurecht.markt ? `Am Markt beobachtet bei ${p.erbbaurecht.markt.text}: ${p.erbbaurecht.markt.von}–${p.erbbaurecht.markt.bis} % — die Rechnung liegt ${p.erbbaurecht.markt.imRahmen ? 'darin' : 'daneben'}.` : ''}
@@ -407,7 +407,7 @@ async function callOpenAI(payload, opts = {}) {
         + `der Erbbaurechtswert also ${fmt(eb.erbbaurechtswert, ' EUR')} `
         + `(Bodenwert ${fmt(eb.teile.bodenwert, ' EUR')}, Restlaufzeit ${eb.annahmen.restlaufzeit} Jahre, `
         + `angemessener Erbbauzins ${eb.annahmen.zinssatzAngemessen} %`
-        + `${eb.annahmen.zinsQuelle ? ' (oertlich erhoben)' : ''}). `
+        + `${eb.annahmen.zinsQuelle ? (eb.annahmen.zinsQuelle === 'eigene Angabe' ? ' (eigene Angabe des Nutzers)' : ' (oertlich erhoben)') : ''}). `
         + `DAS MUSS IM TEXT VORKOMMEN — es ist fuer Finanzierung und Wiederverkauf der wichtigste `
         + `Einzelfaktor an diesem Objekt.`
         + (eb.annahmen.restlaufzeit < 30 ? ` Unter 30 Jahren Restlaufzeit finanzieren die meisten Banken nicht mehr voll.` : '');

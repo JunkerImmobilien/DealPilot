@@ -218,6 +218,9 @@ export const ReportOrchestrator = {
       leasehold: input.leasehold === true || input.leasehold === 'true' || false,
       leasehold_rent_year: input.leasehold_rent_year != null ? Number(input.leasehold_rent_year) : null,
       leasehold_years_left: input.leasehold_years_left != null ? Number(input.leasehold_years_left) : null,
+      /* v3175 · eigene Angaben: angemessener Erbbauzinssatz und Entschaedigung bei Zeitablauf */
+      leasehold_rate_pct: input.leasehold_rate_pct != null && Number(input.leasehold_rate_pct) > 0 ? Number(input.leasehold_rate_pct) : null,
+      leasehold_compensation_pct: input.leasehold_compensation_pct != null && Number(input.leasehold_compensation_pct) > 0 ? Number(input.leasehold_compensation_pct) : null,
       mea_pct: input.mea_pct != null ? Number(input.mea_pct) : null,
       /* WREF-1 · Wertermittlung Stufe 2/3. Diese Felder fehlten hier komplett:
        * das Frontend schickte sie, der Orchestrator liess sie fallen. Sichtbar
@@ -1709,6 +1712,12 @@ export const ReportOrchestrator = {
             _zinsHinweis = _e.formel.hinweis || null;
           }
         } catch (e) { /* ohne amtlichen Satz rechnet die Vorgabe weiter */ }
+        /* v3175 · eigene Angabe des Nutzers geht vor (wie bei Zins, Faktor und UK) - die App
+           rechnet damit, der Bericht darf nicht still eine andere Zahl nehmen. */
+        let _zinsEigen = false;
+        if (ref.leasehold_rate_pct != null && ref.leasehold_rate_pct > 0) {
+          _zinsAmtlich = ref.leasehold_rate_pct; _zinsQuelle = 'eigene Angabe'; _zinsHinweis = null; _zinsEigen = true;
+        }
 
         const _mv = (valuation && valuation.market_value && valuation.market_value.estimated != null)
           ? valuation.market_value.estimated : null;
@@ -1748,7 +1757,8 @@ export const ReportOrchestrator = {
           objektart: ref.property_type,
           restnutzungsdauer: _rnd,
           zinssatzAngemessen: _zinsAmtlich,
-          koeffizient: _koeff,                /* v1342 */
+          entschaedigungPct: ref.leasehold_compensation_pct,   /* v3175: eigene Angabe, sonst § 27 ErbbauRG */
+          koeffizient: _koeff,               /* v1342 */
           koeffizientQuelle: _koeffQuelle,
           koeffizientSpanne: _koeffSpanne,
         });
@@ -1756,7 +1766,9 @@ export const ReportOrchestrator = {
         if (erbbau && erbbau.ok && _zinsAmtlich != null) {
           erbbau.annahmen.zinsQuelle = _zinsQuelle;
           erbbau.annahmen.zinsHinweis = _zinsHinweis;
-          erbbau.hinweise.push(`Der angemessene Erbbauzins von ${_zinsAmtlich.toFixed(1).replace('.', ',')} % ist oertlich erhoben (${_zinsQuelle}), nicht die bundesweite Marktmitte.`);
+          erbbau.hinweise.push(_zinsEigen
+            ? `Der angemessene Erbbauzins von ${String(_zinsAmtlich).replace('.', ',')} % ist eine eigene Angabe.`
+            : `Der angemessene Erbbauzins von ${_zinsAmtlich.toFixed(1).replace('.', ',')} % ist oertlich erhoben (${_zinsQuelle}), nicht die bundesweite Marktmitte.`);
         }
         step(erbbau.ok
           ? `Erbbaurecht (${erbbau.weg === 'koeffizient' ? 'Koeffizient ' + _koeff : '\u00a7 50'}): Abschlag ${Math.round(erbbau.abschlag).toLocaleString('de-DE')} EUR (${erbbau.abschlagPct.toFixed(1)} %)`

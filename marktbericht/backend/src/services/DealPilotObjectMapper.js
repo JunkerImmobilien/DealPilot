@@ -513,6 +513,9 @@ export const DealPilotObjectMapper = {
       leasehold: !!pick(d, ['_erbpacht', 'erbpacht']),
       leasehold_rent_year: num(pick(d, ['erbbauzins'])),
       leasehold_years_left: num(pick(d, ['erb_restlz'])),
+      /* v3175 · die App rechnet mit beiden, der Bericht liess sie fallen (Habighorst B, 04.11.2026) */
+      leasehold_rate_pct: num(pick(d, ['erb_zs_ang'])),
+      leasehold_compensation_pct: num(pick(d, ['erb_entsch'])),
       /* v727-equipment: Ausstattungsdetails (fliessen in DealPilot-Marktanalyse ein) */
       heating: pick(d, ['eq_heating']),
       windows: pick(d, ['eq_windows']),
