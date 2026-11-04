@@ -995,7 +995,19 @@ export const BorisRegistry = {
     if (hit.a.code === 'by' && String(process.env.BORIS_BY_WERT || '').toLowerCase() === 'aus') {
       const fb = fallback('wert_selbst_eintragen');
       fb.claimed_land = hit.a.name;
-      fb.portal_url = 'https://www.bodenrichtwerte.bayern.de';
+      /* v3169 · Direktlink in den BayernAtlas AUF DAS OBJEKT (Marcel 04.11.2026): Koordinate in UTM32, Marker,
+         Ebene Bodenrichtwerte. Der Kunde liest den Wert im Portal selbst ab - das ist der erlaubte Weg („mit den
+         Funktionalitaeten des Portals"); DealPilot spart ihm nur das Suchen der Adresse. Die Ebenen-IDs stammen aus
+         Marcels Link (Stichtag 01.01.2026 sichtbar); mit dem naechsten Stichtag (2028) neu holen. Gemessen 04.11.2026:
+         Wuerzburg Sanderstr. 10 -> Marker in Zone „2.000". */
+      let _atlas = 'https://www.bodenrichtwerte.bayern.de';
+      try {
+        const u = wgs84ToUtm32(Number(lat), Number(lon));
+        if (isFinite(u.easting) && isFinite(u.northing)) _atlas = 'https://atlas.bayern.de/?c=' + Math.round(u.easting) + ',' + Math.round(u.northing)
+          + '&z=16&r=0&l=atkis,2da5cc90-9e7d-41ef-9e08-94c4d84f2a24,cabacb47-0421-4e4e-a729-b6bec6ae42e6,46c6ee92-ca65-4b5a-97ce-513aa3587d3e,28305567-09f9-4866-bf80-143944969ecb'
+          + '&l_v=true,false,false,false,true&t=ba&mid=1&crosshair=marker';
+      } catch (e) {}
+      fb.portal_url = _atlas;
       fb.weg = { zone: hit.r.zone || null, stichtag: hit.r.stichtag || null, nutzung: hit.r.nutzung || null };
       if (fb.source === 'dealpilot-eingabe') {
         fb.note = 'Bodenrichtwert vom Kunden aus dem Bodenrichtwert-Portal Bayern eingetragen.';

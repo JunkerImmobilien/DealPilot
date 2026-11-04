@@ -730,7 +730,7 @@
         if (st3) {
           st3.className = 'brw-ai-status';
           st3.innerHTML = 'ⓘ ' + _escHtml(r.fehler) + ' '
-            + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Bodenrichtwert-Portal Bayern öffnen →</a>';
+            + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Im BayernAtlas auf dem Objekt öffnen →</a> (Marker auf dem Objekt, Wert in der Zone ablesen und oben eintragen)';
         }
         if (r.stichtag) { var _stE = _el('brw_stichtag'); if (_stE && !_stE.value && /^d{4}-d{2}-d{2}/.test(String(r.stichtag))) { _stE.value = String(r.stichtag).slice(0, 10); } }
         if (typeof toast === 'function') toast('Bodenrichtwert bitte aus dem Portal eintragen – Zone und Stichtag stehen unter dem Feld');
