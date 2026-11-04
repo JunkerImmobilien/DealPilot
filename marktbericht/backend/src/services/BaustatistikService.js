@@ -18,6 +18,7 @@ import { pool, q } from '../lib/db.js';
 import { DestatisConnector as D } from '../connectors/stubConnectors.js';
 import { destatisEnabled } from '../lib/config.js';
 import { entpackeZip } from '../lib/destatis_reihen.js';
+import { BPI_TABELLE } from '../lib/baupreisindex.js';   /* v3172b */
 
 export const LIZENZ = 'Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)';
 const QUELLE_REGIO = 'Statistische Ämter des Bundes und der Länder, Regionaldatenbank Deutschland';
@@ -232,13 +233,21 @@ function jahrMit(werte, kennzahl) {
   const j = werte.filter((z) => z.kennzahl === kennzahl && z.gruppe === 'insgesamt' && z.wert != null).map((z) => z.jahr);
   return j.length ? Math.max(...j) : null;
 }
+/* v3172b · gemessen 04.11.2026: mb.jahreswerte_abruf (reihe bpi) hielt auf Staging nur vier Werte aus 2020 - der
+   automatische Abruf liest den Index nicht fortlaufend. Massgeblich ist die gepruefte Tabelle lib/baupreisindex.js
+   (dieselbe, mit der die Wertermittlung rechnet); ein neuerer, geprueft aktiver Datenbankwert gewinnt. */
 export async function baupreisindex() {
-  const r = await q("SELECT periode, wert, basis, quelle_url, abgerufen_am FROM mb.jahreswerte_abruf WHERE reihe = 'bpi' AND status = 'aktiv' ORDER BY periode DESC LIMIT 13");
-  if (!r.length) return null;
-  const a = r[0], vj = r.find((x) => x.periode === (Number(a.periode.slice(0, 4)) - 1) + a.periode.slice(4));
-  return { reihe: '61261-0002', wert: Number(a.wert), basis: a.basis, monat: a.periode,
-    vj_pct: vj ? Math.round((Number(a.wert) / Number(vj.wert) - 1) * 1000) / 10 : null,
-    hinweis: 'Wohngebäude, Bauleistungen am Bauwerk, einschl. USt' };
+  const m = BPI_TABELLE.monate, tabelle = Object.keys(m).sort();
+  let monat = tabelle[tabelle.length - 1], wert = m[monat], quelle = BPI_TABELLE.quelle, url = BPI_TABELLE.quelle_url;
+  try {
+    const r = await q("SELECT periode, wert FROM mb.jahreswerte_abruf WHERE reihe = 'bpi' AND status = 'aktiv' AND basis = '2021=100' ORDER BY periode DESC LIMIT 1");
+    if (r[0] && r[0].periode > monat) { monat = r[0].periode; wert = Number(r[0].wert); }
+  } catch (e) { /* Tabelle reicht */ }
+  const vjMonat = (Number(monat.slice(0, 4)) - 1) + monat.slice(4), vj = m[vjMonat];
+  return { reihe: '61261-0002', wert: wert, basis: '2021 = 100', monat: monat,
+    vj_pct: vj ? Math.round((wert / vj - 1) * 1000) / 10 : null,
+    hinweis: 'Neubau Wohngebäude (konventionell), Bauleistungen am Bauwerk, einschl. USt; quartalsweise (Feb/Mai/Aug/Nov)',
+    quelle: quelle, quelle_url: url, stand: BPI_TABELLE.stand };
 }
 export async function baukosten({ ags = null } = {}) {
   const rows = await q('SELECT kennzahl, ags, jahr, gruppe, ebene, gebiet_name, wert, tabelle, abgerufen_am FROM mb.baustatistik'
