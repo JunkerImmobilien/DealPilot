@@ -464,12 +464,13 @@
     var sb = function (t) { return String(t || '').replace(/\s+/g, ' ').trim(); };
     var zellen = [].slice.call(tmp.querySelectorAll('.bc-matrix-cell')).map(function (c) {
       var v = c.querySelector('.bc-matrix-cell-val');
-      return { wert: v ? sb(v.textContent) : '', stufe: /critical/.test(c.className) ? 'rot' : /warn/.test(c.className) ? 'gelb' : /good|ok/.test(c.className) ? 'gruen' : '', basis: /is-base/.test(c.className) };
+      return { wert: v ? sb(v.textContent) : '', /* v3180 · fuenf Baender (bank-charts.js _cellCls): s-good ab Gruen-Schwelle, s-ok bis Gelb-Schwelle, darunter s-warn/s-bad/s-critical */
+        stufe: (c.className.match(/s-(good|ok|warn|bad|critical)/) || [])[1] || '', basis: /is-base/.test(c.className) };
     });
     var yr = [].slice.call(tmp.querySelectorAll('.bc-matrix-axis-y-row')).map(function (e) { return sb(e.textContent); });
     tmp.remove();
     if (zellen.length !== 25 || yr.length !== 5) return '';
-    var BG = { rot: '#F6E7E6', gelb: '#F7F0DC', gruen: '#E6F1EA', '': '#fff' };
+    var BG = { good: '#E6F1EA', ok: '#F7F0DC', warn: '#F6E7E6', bad: '#F0D6D4', critical: '#E8C4C1', '': '#fff' };
     var sw = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { dscrGruen: 1.2, dscrGelb: 1.0 };
     return '<div class="block"><h3>Belastungsprobe · DSCR je Szenario</h3><p class="sub">Jede Zelle ist der DSCR, wenn sich Zins und Miete gleichzeitig ändern. Zeilen: Zinsänderung. Spalten: Mietausfall bzw. Aufwertung. Werte unter 1,0 bedeuten, dass die Miete den Kapitaldienst nicht mehr deckt.</p>'
       + '<table><thead><tr><th>Zinsänderung</th>' + ['Miete −20 %', '−10 %', '±0 %', '+10 %', '+20 %'].map(function (t) { return '<th style="text-align:center">' + t + '</th>'; }).join('') + '</tr></thead><tbody>'
@@ -477,7 +478,7 @@
         return '<tr><td>' + B.esc(n.replace(/\s*(Krise|Stress|Mittel|Heute|Erholung)\s*/, ' · $1')) + '</td>' + zellen.slice(r * 5, r * 5 + 5).map(function (z) {
           return '<td class="num" style="text-align:center;background:' + BG[z.stufe] + ';border:.6mm solid #fff;' + (z.basis ? 'box-shadow:inset 0 0 0 .5mm var(--gold-d);font-weight:600' : '') + '">' + B.esc(z.wert || '–') + '</td>';
         }).join('') + '</tr>';
-      }).join('') + '</tbody></table><p class="det">Grün ab ' + B.zahl(sw.dscrGruen, 2) + ' · Gelb ' + B.zahl(sw.dscrGelb, 2) + ' bis ' + B.zahl(sw.dscrGruen, 2) + ' · Rot unter ' + B.zahl(sw.dscrGelb, 2) + '. Der umrandete Wert ist der Ausgangsfall, gerechnet auf dem ersten vollen Jahr.</p></div>';
+      }).join('') + '</tbody></table><p class="det">Grün ab ' + B.zahl(sw.dscrGruen, 2) + ' · Gelb ' + B.zahl(sw.dscrGelb, 2) + ' bis ' + B.zahl(sw.dscrGruen, 2) + ' · Rot unter ' + B.zahl(sw.dscrGelb, 2) + ' (je dunkler, desto tiefer). Der umrandete Wert ist der Ausgangsfall, gerechnet auf dem ersten vollen Jahr.</p></div>';
   }
   function pilotAnalyse(B, kurz) {
     var ai = window._aiAnalysis || null, txt = window._aiText || '';
