@@ -985,6 +985,32 @@ export const BorisRegistry = {
       return fb;
     }
 
+    /* ═══ v3165 · BAYERN: WERT NICHT AUTOMATISCH (Schalter BORIS_BY_WERT=aus) ═══
+     * Antwort der Geschaeftsstelle des Oberen Gutachterausschusses (03.11.2026, Backlog N109): Abruf nur
+     * mit den Funktionen des Portals, keine mittelbare Vermarktung; gedeckt ist die Darstellung EINZELNER
+     * Richtwerte fuer ein konkretes Objekt. Mit dem Schalter liefert der Dienst nur Zone, Stichtag und
+     * Nutzung (der Weg zum Wert), den Wert traegt der Kunde aus dem Portal ein. Ohne Schalter: wie bisher.
+     * Gemessen 04.11.2026: ohne Schalter kam der Wert automatisch (Wuerzburg 2.000 EUR/m2) - die
+     * Beschreibung in N109 („wird nicht uebernommen") stimmte nicht. */
+    if (hit.a.code === 'by' && String(process.env.BORIS_BY_WERT || '').toLowerCase() === 'aus') {
+      const fb = fallback('wert_selbst_eintragen');
+      fb.claimed_land = hit.a.name;
+      fb.portal_url = 'https://www.bodenrichtwerte.bayern.de';
+      fb.weg = { zone: hit.r.zone || null, stichtag: hit.r.stichtag || null, nutzung: hit.r.nutzung || null };
+      if (fb.source === 'dealpilot-eingabe') {
+        fb.note = 'Bodenrichtwert vom Kunden aus dem Bodenrichtwert-Portal Bayern eingetragen.';
+        fb.quellenvermerk = '© Daten der Gutachterausschüsse für Grundstückswerte ' + (stichtagJahr(hit.r.stichtag) || '')
+          + ', CC BY-ND 4.0, https://www.bodenrichtwerte.bayern.de';
+        fb.stichtag = hit.r.stichtag || null; fb.zone = hit.r.zone || null; fb.nutzung = hit.r.nutzung || null;
+      } else {
+        fb.note = 'In Bayern übernimmt DealPilot den Bodenrichtwert nicht automatisch (Nutzungsbedingungen der '
+          + 'Gutachterausschüsse). Bitte im Bodenrichtwert-Portal Bayern nachsehen und hier eintragen'
+          + (hit.r.zone ? ' – Bodenrichtwertzone ' + hit.r.zone : '')
+          + (hit.r.stichtag ? ', Stichtag ' + hit.r.stichtag : '')
+          + (hit.r.nutzung ? ', Nutzung ' + hit.r.nutzung : '') + '.';
+      }
+      return fb;
+    }
     const out = {
       available: true, source: hit.a.name, license: hit.a.license, verified: hit.a.verified,
       quellenvermerk: hit.a.quellenvermerk || null,   /* v1071-WLIZ-2 */
