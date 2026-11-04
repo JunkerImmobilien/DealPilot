@@ -73,7 +73,7 @@ Marcel 03.11.2026: „EIN Bereich ‚Belege, Unterlagen, Rechnungen‘, egal was
 8. **Steuer-Tabelle erklären:** „Ergebnis Anlage V −1.840 €“ allein sagt nichts — Einnahmen und Werbungskosten nach Gruppen zeigen (tax.js `_computeYearTotal` 1801-1884: Finanzierung, Betriebskosten, Verwaltung, Sonstiges, AfA, Erhaltung/anschaffungsnah), Steuerwirkung dazu.
 **Bestandsaufnahme der heutigen Pilot-Analyse** (Agent, 02.11.2026): Inhalt in `ui.js _renderAIServerAnalysis` 1912-2533; Unterreiter Ankauf: Briefing · Stärken & Risiken · Risiko & Szenarien · [Unterlagen & WEG] · Lage & Markt · [Wert & Marktpreis] · Verhandlung & Offerte · Bank · Steuer · Ankauf/Bestand/Zielbild; Bestand: Briefing · ABZ · [Wert & Marktpreis] · Lage & Markt · Steuer · Anschlussfinanzierung · Exit · Risiko & Szenarien · [Unterlagen & WEG]. KI-Felder: openaiService.js 1793-1891. Marktbericht-Verlauf: `ui.js _dpLoadVerlauf` 3518ff (Chart.js); Löschen von Berichten heute nur im Tab Deal-Aktion (`deal-action-boarding.js` 1081, DELETE /marktbericht/reports/:id). Stress-Test gerechnet: `bank-charts.js` 993-1123.
 
-### N109 · Bodenrichtwerte Bayern: Antwort der Geschäftsstelle des Oberen Gutachterausschusses (03.11.2026) — **entschieden: bleibt wie es ist**
+### N109 · Bodenrichtwerte Bayern: Antwort der Geschäftsstelle des Oberen Gutachterausschusses (03.11.2026) — **neu zu entscheiden (Korrektur 04.11.): Prod holt den Wert automatisch, Schalter BORIS_BY_WERT=aus auf Staging**
 
 **Marcel 03.11.2026:** „in Bayern, dann lassen wir das genau so, wie es ist.“ Der Kunde trägt den Wert selbst ein, wir rufen ihn nicht automatisch ab. Rest nur noch: Quellenvermerk bei Gelegenheit auf den Wortlaut der Metadaten bringen.
 
