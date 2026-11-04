@@ -268,7 +268,11 @@ async function erzeugen(auftrag) {
       && typeof window.exportPDF === 'function' && typeof window.exportPDFBank === 'function'
       && typeof window.jspdf !== 'undefined' && window.Auth && window.Auth.isLoggedIn && window.Auth.isLoggedIn(),
       { timeout: 45000, polling: 250 });
-    await page.waitForNetworkIdle({ idleTime: 700, timeout: 20000 }).catch(() => {});
+    /* v3182 · Marcel 04.11.2026: „die pdfs brauchen sehr lange". Gemessen: 12 s oder 30 s - die 18 s Unterschied
+       waren diese Frist, die bei offen gehaltenen Verbindungen der App voll auslief. Die einheitlichen Dokumente
+       warten danach gezielt auf Objekt und Kennzahlen, sie brauchen die Netzruhe nicht. */
+    if (/^dok_|^marktbericht_profi$/.test(auftrag.art)) await page.waitForNetworkIdle({ idleTime: 400, timeout: 2500 }).catch(() => {});
+    else await page.waitForNetworkIdle({ idleTime: 700, timeout: 20000 }).catch(() => {});
     schritt('app bereit');
 
     if (auftrag.art === 'marktbericht_profi' || /^dok_/.test(auftrag.art)) {
@@ -284,7 +288,8 @@ async function erzeugen(auftrag) {
         if (auftrag.objekt_id) {
           await page.evaluate(async (id) => { await window.loadSaved(id); }, String(auftrag.objekt_id));
           await page.waitForFunction((id) => window._currentObjKey === id && window.State && window.State.kpis, { timeout: 30000, polling: 250 }, String(auftrag.objekt_id));
-          await new Promise((r) => setTimeout(r, 2500));
+          /* v3182 · statt fest 2,5 s: warten, bis die Kennzahlen zur Ruhe kommen (hoechstens 2,5 s) */
+          await page.waitForNetworkIdle({ idleTime: 300, timeout: 2500 }).catch(() => {});
           await page.evaluate(() => { try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {} });
           schritt('objekt geladen');
         }
@@ -323,6 +328,7 @@ async function erzeugen(auftrag) {
       }));
       schritt('pdf da');
       const titel = await page.title().catch(() => '');
+      log('schritte ' + auftrag.art + ': ' + spur.schritte.join(' | '));
       return { pdf, dateiname: (titel || 'Marktbericht Profi').replace(/[^\wäöüÄÖÜß .,-]+/g, ' ').replace(/\s+/g, ' ').trim() + '.pdf' };
     }
 
