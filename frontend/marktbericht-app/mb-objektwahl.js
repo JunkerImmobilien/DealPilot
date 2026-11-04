@@ -645,7 +645,12 @@
       var id = sel.value;
       /* v1333: Ein Klick des Nutzers ist eine Ansage - dann darf alles
          ueberschrieben werden. Der stille Auto-Select aus ?ref nicht. */
-      if (ev && ev.isTrusted) { _angefasst = Object.create(null); _stand = Object.create(null); }
+      /* v3178b · Hier stand `_stand = {}`. setVal() setzt fuer jedes Feld ohne Eintrag den
+         Ausgangswert '' - jedes schon gefuellte Feld galt damit als „vom Nutzer geaendert“ und
+         blieb stehen. Folge (gemessen Staging, echter Klick): Wechsel von Am Markt 9 auf
+         Habighorst liess 11 Felder beim alten Objekt. Richtig ist: der JETZIGE Stand ist die
+         neue Ausgangslage, alles darf ueberschrieben werden. */
+      if (ev && ev.isTrusted) { _angefasst = Object.create(null); _stand = Object.create(null); _standErfassen(document); }
 
       /* v942-publish
          * BUG bis v941: die id wurde nur zum Nachladen der Daten benutzt und
