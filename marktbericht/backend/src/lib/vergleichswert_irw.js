@@ -205,6 +205,22 @@ function eingabeWert(k, m, objekt, ctx = {}) {
     const t = m.punkte_zuordnung.find((z) => p >= z.von && p <= z.bis);
     v = t ? t.wert : '__grenze__';
   }
+  /* v3175 · Junges Gebaeude ohne Modernisierungsangabe (Marcel 04.11.2026, Habighorst Bj 2009):
+     unter 25 Jahren gilt Stufe 2 „kleine Modernisierungen" (Marcels Entscheidung: ein junges Haus steht
+     nicht schlechter als ein Altbau mit kleinen Modernisierungen; streng nach Anlage 2 waeren es
+     0 Punkte = „nicht modernisiert", bei Herford Faktor 0,902 statt 1,000). Im Bericht als Annahme. */
+  /* Fuehrt der Ausschuss selbst eine Regel nach Baujahr (`bedingung`, z. B. Ruhr-Nord „juenger als
+     30 Jahre: mittlere Modernisierung unterstellt"), gilt SEINE Regel — hier wird nichts vorbelegt. */
+  if (k === 'mgrad' && leer(v) && objekt && leer(objekt.modernisierungspunkte) && m.punkte_zuordnung
+      && !(Array.isArray(m.bedingung) && m.bedingung.length)
+      && num(objekt.baujahr) != null && ctx.jahr && ctx.jahr - num(objekt.baujahr) >= 0 && ctx.jahr - num(objekt.baujahr) < 25) {
+    const t = m.punkte_zuordnung.find((z) => Number(z.wert) === 2);
+    if (t) {
+      v = t.wert;
+      if (Array.isArray(ctx.annahmen)) ctx.annahmen.push({ id: m.id, eingabe: 'mgrad', wert: v,
+        text: `Modernisierungsgrad nicht angegeben — bei einem Gebäudealter von ${ctx.jahr - num(objekt.baujahr)} Jahren mit „kleinen Modernisierungen“ (Stufe 2 nach Anlage 2) angesetzt, DealPilot-Setzung. Wer anders modernisiert hat, trägt die Punkte im Reiter Objekt ein.` });
+    }
+  }
   if (typeof v === 'boolean') v = v ? 'ja' : 'nein';
   if (m.runden != null && typeof v === 'number') v = Math.round(v * 10 ** m.runden) / 10 ** m.runden;
   return leer(v) ? null : v;
@@ -633,7 +649,7 @@ export function merkmalFaktor(m, objekt, roh, satzNorm, ctx = {}) {
 export function umrechnen(satz, irwWert, objekt, roh = null) {
   const f = satz.formel || {};
   const faktoren = [], fehler = [];
-  const ctx = { jahr: Number(satz.jahrgang) || null, roh };
+  const ctx = { jahr: Number(satz.jahrgang) || null, roh, annahmen: [] };
   for (const m of f.merkmale || []) {
     const r = merkmalFaktor(m, objekt, roh, f.normobjekt, ctx);
     /* v2660 · `eingabe` und `name` reisen mit: der Bericht nennt, WELCHE Angabe fehlt und wo sie einzutragen ist */
@@ -689,7 +705,7 @@ export function umrechnen(satz, irwWert, objekt, roh = null) {
   wert += summeEur;
   let gerundet = null;
   if (f.rundung_eur_qm) { gerundet = Math.round(wert / f.rundung_eur_qm) * f.rundung_eur_qm; }
-  return { ok: true, faktoren, produkt: prod, produkt_ungerundet: prodRoh, verknuepfung: verk, summe_objekt: summeObjekt, summe_norm: summeNorm,
+  return { ok: true, annahmen: ctx.annahmen, faktoren, produkt: prod, produkt_ungerundet: prodRoh, verknuepfung: verk, summe_objekt: summeObjekt, summe_norm: summeNorm,
     zuschlaege, summe_zuschlaege_eur_qm: summeEur, wert_qm_ungerundet: wert, wert_qm: gerundet != null ? gerundet : wert };
 }
 
@@ -825,6 +841,7 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
         + (garage.eur ? 'Ohne Garage wären nach Angabe des Ausschusses ' + eur(-garage.eur) + ' abzuziehen.' : 'Ein gesonderter Ansatz ist nicht vorgenommen.'));
     } else hinweise.push(f.stellplaetze_hinweis || 'Das Normobjekt enthält Garage oder Stellplatz; ein gesonderter Ansatz entfällt.');
   }
+  for (const a of u.annahmen || []) hinweise.push('Annahme: ' + a.text);
   if (irw.aus_vorjahr) hinweise.push(irw.vorjahr_hinweis);
   if (f.hinweis_ausschuss) hinweise.push(f.hinweis_ausschuss);
 
@@ -855,6 +872,7 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
     quellennachweis: `${satz.gaa_name}: Immobilienrichtwert (BORIS-NRW, Stichtag ${irw.stichtag || satz.stichtag}) und `
       + `Umrechnungskoeffizienten (Örtliche Fachinformationen ${satz.jahrgang}, ${satz.seite || ''}), ${satz.lizenz}`,
     satz_id: `${satz.gasl}/${satz.zweig}/${satz.jahrgang}`,
+    annahmen: u.annahmen || [],   /* v3175: vorbelegte Merkmale (junges Gebaeude → mgrad 0 Punkte) */
     hinweise,
     rechtsgrundlage: '§§ 24–26 ImmoWertV i. V. m. § 20 ImmoWertV (Vergleichsfaktor)',
   };

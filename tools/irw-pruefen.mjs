@@ -370,6 +370,21 @@ if (!NUR_DATEI) {
     if (!neu.ok || Math.abs(neu.uk - 1) > 1e-9 || mitte.ok || mitte.grund !== 'ausserhalb' || ohne.grund !== 'merkmal_fehlt') fehler('Formprobe Bedingung (Bottrop, vorgemerkt): Bj 2000 → neuzeitlich, Bj 1980 baujahrtypisch → kein Wert, ohne Baujahr → merkmal_fehlt erwartet');
     else console.log('  ok Formprobe Bedingung (Bottrop, vorgemerkt): Bj 2000 → neuzeitlich gesetzt, Bj 1980 „baujahrtypisch“ → kein Wert, ohne Baujahr → merkmal_fehlt');
   }
+  /* v3175 · junges Gebaeude ohne Modernisierungsangabe (Marcel 04.11.2026): unter 25 Jahren
+     Stufe 2 „kleine Modernisierungen", als Annahme; ab 25 Jahren weiter merkmal_fehlt. */
+  const hf = alleS.find((s) => s.gasl === '05758' && s.zweig === 'efh_zfh' && s.formel) || alleS.find((s) => /Herford/.test(s.gaa_name || '') && s.zweig === 'efh_zfh' && s.formel);
+  const hm = hf && hf.formel.merkmale.find((m) => m.eingabe === 'mgrad' && m.punkte_zuordnung && !(m.bedingung || []).length);
+  if (hm) {
+    kaFaelle++;
+    const j = Number(hf.jahrgang);
+    const jung = { annahmen: [], jahr: j };
+    const r1 = V.merkmalFaktor(hm, { baujahr: j - 17 }, null, hf.formel.normobjekt, jung);
+    const r2 = V.merkmalFaktor(hm, { baujahr: j - 30 }, null, hf.formel.normobjekt, { annahmen: [], jahr: j });
+    const r3 = V.merkmalFaktor(hm, { baujahr: j - 17, modernisierungspunkte: 0 }, null, hf.formel.normobjekt, { annahmen: [], jahr: j });
+    if (!r1.ok || String(r1.objekt).indexOf('kleine') < 0 || jung.annahmen.length !== 1 || r2.ok || r2.grund !== 'merkmal_fehlt' || !r3.ok || String(r3.objekt).indexOf('nicht') < 0)
+      fehler('Junges Gebäude (Herford): 17 J. ohne Angabe → kleine Modernisierungen mit Annahme, 30 J. → merkmal_fehlt, 0 Punkte angegeben → nicht modernisiert erwartet');
+    else console.log('  ok Junges Gebäude (Herford): 17 J. ohne Angabe → „kleine Modernisierungen“ als Annahme · 30 J. → merkmal_fehlt · eingetragene 0 Punkte gelten');
+  }
 }
 
 /* ── optional: Deckung gegen das Shape ── */
