@@ -173,7 +173,7 @@
   function umgebung(m) {
     var g = m && m.groups; if (!g) return '';
     var bloecke = KAT_ORD.filter(function (k) { return g[k] && (g[k].items || []).length; }).map(function (k) {
-      var it = g[k].items.slice(0, 5).map(function (x) {
+      var it = g[k].items.slice(0, 4).map(function (x) {
         return '<li><span>' + esc(String(x.name || '').split(',')[0]) + '</span><span class="num">' + (istZahl(x.distance_m) ? zahl(x.distance_m, 0) + ' m' : '–') + '</span></li>';
       }).join('');
       return '<div class="umg"><b>' + esc(KAT[k] || k) + (istZahl(g[k].count) ? ' <span>· ' + zahl(g[k].count, 0) + ' im Umkreis</span>' : '') + '</b><ul>' + it + '</ul></div>';
@@ -341,10 +341,10 @@
     '.ek-txt{font-size:8.4pt;margin-top:2mm}',
     'ol.quellen{padding-left:5mm;font-size:8pt;color:var(--muted)}ol.quellen li{margin-bottom:1.6mm}',
     '.lt td,.lt th{padding:1.4mm 2mm}',
-    '.umg-raster{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm 6mm}.umg{break-inside:avoid}',
+    '.umg-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm 6mm}.umg{break-inside:avoid}',
     '.umg b{display:block;font:600 8.6pt/1.3 Inter,sans-serif;border-bottom:.3mm solid var(--ink);padding-bottom:1mm;margin-bottom:1mm}.umg b span{font-weight:400;color:var(--muted)}',
     '.umg ul{list-style:none;margin:0;padding:0;font-size:7.8pt}.umg li{display:flex;justify-content:space-between;gap:2mm;padding:.8mm 0;border-bottom:.2mm solid var(--line)}',
-    '.umg li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    '.umg li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.umg li span.num{white-space:nowrap;flex:0 0 auto}',
     '.fuehrt{border:.3mm solid var(--ink);border-left:1.6mm solid var(--gold);padding:3.5mm 4.5mm;margin:4mm 0 2mm;break-inside:avoid}',
     '.fuehrt-k{font:7pt/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5mm}',
     '.fuehrt-n{font:600 13pt/1.25 "Space Grotesk",Inter,sans-serif;margin-bottom:1.5mm}.fuehrt p{font-size:8.6pt;margin:0 0 1mm}'

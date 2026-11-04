@@ -3743,6 +3743,14 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <label for="qc_san">+ Sanierung (€) <span class="hint" style="font-style:italic">optional</span></label>
         <input type="text" id="qc_san" placeholder="0" inputmode="decimal" autocomplete="off">
         <span class="hint">ohne Nebenkosten · ab 10 % des Kaufpreises begrenzt sie das Urteil</span>
+        <!-- v3177 · Betragsfeld: Text (z. B. eine vom Browser eingesetzte E-Mail) wird geleert -->
+        <script>(function () {
+          var e = document.getElementById('qc_san'); if (!e) return;
+          function rein() { if (/[^\d.,\s€-]/.test(e.value)) { e.value = ''; try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {} } }
+          ['change', 'blur', 'focus'].forEach(function (t) { e.addEventListener(t, rein); });
+          e.addEventListener('input', function () { if (/@/.test(e.value)) rein(); });
+          setTimeout(rein, 1500); setTimeout(rein, 4000);
+        })();</script>
       </div>
     </div>
   </div>
@@ -3851,7 +3859,11 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     </div>
     <div class="modal-body">
       <p>Trage deinen OpenAI API-Key ein (beginnt mit <code style="background:var(--gold-bg);padding:1px 6px;border-radius:3px;font-size:12px">sk-</code>). Der Key wird nur lokal in deinem Browser benutzt.</p>
-      <input type="password" id="api-key-input" placeholder="sk-...">
+      <!-- v3177 · KEIN type=password: Chromes Passwortmanager hielt das Fenster fuer eine Anmeldung und
+           schrieb den gespeicherten Benutzernamen (die E-Mail) in ein Textfeld davor - gemessen im Feld
+           „Sanierung" (qc_san), autocomplete="off" ignoriert er dabei. Verdeckt wird per CSS. -->
+      <input type="text" id="api-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security:disc">
+
     </div>
     <div class="modal-foot">
       <button class="btn" onclick="QcApp.closeApiModal()">Abbrechen</button>
