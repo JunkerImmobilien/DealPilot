@@ -269,8 +269,14 @@ async function erzeugen(auftrag) {
       }, String(auftrag.objekt_id), auftrag.report_id ? Number(auftrag.report_id) : null);
       if (!dok || !dok.html) { const e = new Error((dok && dok.fehler) || 'Kein Dokument.'); e.status = 422; e.code = 'kein_bericht'; throw e; }
       schritt('profi html ' + dok.html.length);
-      await page.setContent(dok.html, { waitUntil: 'networkidle0', timeout: 45000 });
-      await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
+      /* networkidle0 kam nie (gemessen: 5 x Navigation timeout) - die App laesst Verbindungen offen.
+         Also: DOM setzen, dann AUSDRUECKLICH auf Bilder und Schriften warten, mit eigener Frist. */
+      await page.setContent(dok.html, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.evaluate(() => Promise.race([
+        Promise.all([].slice.call(document.images).map((i) => i.complete ? null : new Promise((ok) => { i.onload = i.onerror = ok; })))
+          .then(() => document.fonts && document.fonts.ready),
+        new Promise((ok) => setTimeout(ok, 15000))
+      ])).catch(() => {});
       const pdf = Buffer.from(await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true }));
       schritt('pdf da');
       const titel = await page.title().catch(() => '');
