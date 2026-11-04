@@ -387,7 +387,7 @@
     if (da(kp) !== null) s += '<line x1="' + X(kp).toFixed(1) + '" x2="' + X(kp).toFixed(1) + '" y1="4" y2="' + (H - 18) + '" class="l2"/><text x="' + X(kp).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" class="a">Kaufpreis ' + B.esc(B.zahl(kp / 1000, 0)) + ' T€</text>';
     return s + '</svg>';
   }
-  function wertZielbild(K, B, WZ, PD, kurz) {
+  function wertZielbild(K, B, WZ, PD, kurz, bank) {
     if (!WZ && !PD) return '';
     var h = '', kp = (WZ && WZ.kaufpreis) || K.kp;
     if (WZ && WZ.verfahren && WZ.verfahren.length) {
@@ -430,8 +430,10 @@
       if (WZ.ausblick) h += '<div class="hinweis">' + B.esc(klar(WZ.ausblick)) + '</div>';
       (WZ.stau || []).forEach(function (s) { h += '<p><b>Sanierungsstau ' + B.esc(s.titel) + ':</b> ' + B.esc(klar(s.satz)) + '</p>'; });
       if (WZ.kern && WZ.kern.length) h += '<div class="block"><h3>Kernaussagen</h3>' + B.liste(WZ.kern.map(function (k) { return [k.titel, k.wert_text || '', { det: k.text ? klar(k.text) : '' }]; })) + '</div>';
-      if (!kurz) (WZ.texte || []).forEach(function (t) { h += '<div class="block"><h3>' + B.esc(t.h) + '</h3>' + t.p.map(function (x) { return '<p>' + B.esc(klar(x)) + '</p>'; }).join('') + '</div>'; });
-      if (WZ.hinweis) h += '<p class="det">' + B.esc(klar(WZ.hinweis)) + '</p>';
+      /* v3180c · Bankfassung ohne die Erklaertexte des Marktberichts (Methodik) - die Zahlen stehen in den Tabellen darueber */
+      if (!kurz && !bank) (WZ.texte || []).forEach(function (t) { h += '<div class="block"><h3>' + B.esc(t.h) + '</h3>' + t.p.map(function (x) { return '<p>' + B.esc(klar(x)) + '</p>'; }).join('') + '</div>'; });
+      /* v3180c · die Kennzeichnung steht schon im Fuss der Stufen-Tabelle (PD.fuss) - nicht zweimal */
+      if (WZ.hinweis && !(PD && PD.fuss && !kurz)) h += '<p class="det">' + B.esc(klar(WZ.hinweis)) + '</p>';
     }
     return h;
   }
@@ -480,7 +482,7 @@
         }).join('') + '</tr>';
       }).join('') + '</tbody></table><p class="det">Grün ab ' + B.zahl(sw.dscrGruen, 2) + ' · Gelb ' + B.zahl(sw.dscrGelb, 2) + ' bis ' + B.zahl(sw.dscrGruen, 2) + ' · Rot unter ' + B.zahl(sw.dscrGelb, 2) + ' (je dunkler, desto tiefer). Der umrandete Wert ist der Ausgangsfall, gerechnet auf dem ersten vollen Jahr.</p></div>';
   }
-  function pilotAnalyse(B, kurz) {
+  function pilotAnalyse(B, kurz, bank) {
     var ai = window._aiAnalysis || null, txt = window._aiText || '';
     var an = true; try { if (window.DealPilotPdfWahl && typeof DealPilotPdfWahl.pilotAn === 'function') an = DealPilotPdfWahl.pilotAn(); } catch (e) {}
     if (!(ai || txt) || !an) return '';
@@ -497,20 +499,22 @@
     if (kz.length) h += B.kacheln(kz, true);
     if (!kurz) h += block('Gesamtbewertung', ai.gesamtbewertung || ai.fazit_kurz);
     h += '<div class="zwei"><div>' + liste('Stärken', ai.staerken || ai.strengths) + '</div><div>' + liste('Risiken', ai.risiken || ai.schwaechen || ai.risks) + '</div></div>';
-    if (!kurz && ai.risikoanalyse && typeof ai.risikoanalyse === 'object') {
+    if (!kurz && !bank && ai.risikoanalyse && typeof ai.risikoanalyse === 'object') {   /* v3180c · Bank: steht in Risiken und Belastungsprobe */
       var ra = ai.risikoanalyse;
       h += liste('Risikoanalyse', [ra.finanzierungsrisiko ? 'Finanzierungsrisiko: ' + ra.finanzierungsrisiko : null, ra.cashflow_stabilitaet ? 'Cashflow-Stabilität: ' + ra.cashflow_stabilitaet : null,
         ra.annahmen_abhaengigkeit ? 'Abhängigkeit von Annahmen: ' + ra.annahmen_abhaengigkeit : null, 'Gerechnete Schuldendeckung je Zins- und Mietszenario: siehe Belastungsprobe.'].filter(Boolean));
     }
     var best = false; try { best = !!(window.DpBestand && DpBestand.istBestand()); } catch (e) {}
-    if (!best || kurz) h += liste('Bankargumente', ai.bankargumente);
+    if (!best || kurz || bank) h += liste('Bankargumente', ai.bankargumente);
     var gedeckt = !best && typeof window._dpPdfGedeckt === 'function' && window._dpPdfGedeckt('Anschlussfinanzierung (Ankauf)', { phasen: true });
-    if (!kurz && !gedeckt) h += block('Anschlussfinanzierung', [qa(ai.anschlussfinanzierung), best && ai.bankargumente && ai.bankargumente.length ? 'Argumente für die Bank:\n' + ai.bankargumente.map(function (x) { return '– ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
+    /* v3180c · Bank: die Anschlussfinanzierung steht GERECHNET unter „Finanzierung in drei Phasen“ und „Zinsänderungsrisiko“ */
+    if (!kurz && !bank && !gedeckt) h += block('Anschlussfinanzierung', [qa(ai.anschlussfinanzierung), best && ai.bankargumente && ai.bankargumente.length ? 'Argumente für die Bank:\n' + ai.bankargumente.map(function (x) { return '– ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
     if (!kurz) {
-      h += block('Exit-Strategien', qa(ai.exit_strategien));
+      if (!bank) h += block('Exit-Strategien', qa(ai.exit_strategien));   /* v3180c · Anlegerthema (Spekulationsfrist), nicht fuer die Bank */
       h += block('Lage & Markt', [ai.makrolage_recherche ? 'Makrolage: ' + ai.makrolage_recherche : '', ai.mikrolage_recherche ? 'Mikrolage: ' + ai.mikrolage_recherche : '', ai.kaufpreisniveau ? 'Kaufpreisniveau: ' + ai.kaufpreisniveau : ''].filter(Boolean).join('\n'));
       h += block('Kaufpreis-Offerte', offBeg);
-      if (ai.empfehlung_begruendung) h += block('Begründung des Urteils', typeof window._dpOhneUrteil === 'function' ? window._dpOhneUrteil(ai.empfehlung_begruendung, urteil) : ai.empfehlung_begruendung);
+      /* v3180c · Bank: die Begruendung wiederholt die Gesamtbewertung (gemessen Westerfeld: beide beginnen mit Rendite und Cashflow) */
+      if (ai.empfehlung_begruendung && !(bank && (ai.gesamtbewertung || ai.fazit_kurz))) h += block('Begründung des Urteils', typeof window._dpOhneUrteil === 'function' ? window._dpOhneUrteil(ai.empfehlung_begruendung, urteil) : ai.empfehlung_begruendung);
     }
     if (ai.fazit || ai.summary) { var fz = klar(ai.fazit || ai.summary); if (kurz && fz.length > 600) { var e2 = fz.slice(0, 600).lastIndexOf('. '); fz = e2 > 200 ? fz.slice(0, e2 + 1) : fz.slice(0, 600) + ' …'; } h += '<div class="hinweis">' + B.esc(fz) + '</div>'; }
     return h + '<p class="det">Erzeugt von einem Sprachmodell aus den erfassten Angaben – eine Einschätzung, keine Beratung.</p>';
@@ -577,7 +581,7 @@
       var ml = mieterliste(K, B);
       if (ml) S.push(B.seite(c, 'Einheiten und Zustand', B.abschnitt(ab(), 'Einheiten und Zustand') + ml));
     }
-    var wz = wertZielbild(K, B, WZ, PD, kurz);
+    var wz = wertZielbild(K, B, WZ, PD, kurz, bank);
     if (wz) {
       var mitZiel = WZ ? !WZ.ohneZiel : !!(PD && PD.hat_ziel !== false);
       S.push(B.seite(c, mitZiel ? 'Wert & Zielbild' : 'Wert & Potenzial', B.abschnitt(ab(), mitZiel ? 'Wert & Zielbild' : (PD ? 'Wert & Potenzial' : 'Wert je Verfahren'),
@@ -587,7 +591,7 @@
       var bc = bankCockpit(B, false), sm = stressMatrix(B);
       if (bc || sm) S.push(B.seite(c, 'Bank-Cockpit und Belastungsprobe', B.abschnitt(ab(), 'Bank-Cockpit und Belastungsprobe', 'Schuldendienstdeckung und Beleihungsauslauf im Verlauf, DSCR unter Zins- und Mietstress') + bc + sm));
     }
-    var pa = pilotAnalyse(B, kurz);
+    var pa = pilotAnalyse(B, kurz, bank);
     if (pa) S.push(B.seite(c, 'Pilot-Analyse', B.abschnitt(ab(), 'Pilot-Analyse') + pa));
     S.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, kurz)));
     return B.dokument(name + ' · ' + o.adresse, S);

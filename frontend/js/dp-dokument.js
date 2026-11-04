@@ -71,6 +71,8 @@
     '.kopf img{height:9mm;width:auto}.kopf strong{font:600 11pt "Space Grotesk",sans-serif}.kopf .r{font:7.2pt/1.35 "JetBrains Mono",monospace;color:var(--muted);text-align:right;letter-spacing:.04em;text-transform:uppercase}',
     '.eyebrow{font:7.5pt/1 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2mm}',
     '.sub{color:var(--muted);margin:0 0 5mm}p{margin:0 0 2.5mm}',
+    /* v3180c · Fliesstext im Blocksatz mit Silbentrennung (lang=de) - Marcel 04.11.2026; Tabellen bleiben buendig */
+    'p,li,.hinweis,.zitat{text-align:justify;hyphens:auto;-webkit-hyphens:auto}ul{padding-left:5mm;margin:0 0 2.5mm}li{margin-bottom:1.2mm}',
     '.fuss{margin-top:8mm;display:flex;justify-content:space-between;gap:6mm;font:7pt/1.3 Inter,sans-serif;color:var(--muted);border-top:.2mm solid var(--line);padding-top:2mm;break-inside:avoid}',
     '.block{break-inside:avoid}',
     /* Deckblatt */
