@@ -179,7 +179,7 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
 </style>
 
 <div class="wrap">
-  <div class="demo-hinweis"><span><b>Demo · Vorschlag N113</b> · keine App-Änderung. Alle Objekte, Makler, Adressen und Zahlen sind <b>erfundene Beispiele</b>.</span><span class="num">Stand 03.11.2026</span></div>
+  <div class="demo-hinweis"><span><b>Demo · Vorschlag N113</b> · keine App-Änderung. Alle Objekte, Makler, Adressen und Zahlen sind <b>erfundene Beispiele</b>.</span><span class="num">Stand 04.11.2026 · mit den Antworten des ImmoMetrica-Supports</span></div>
 
   <header class="kopf">
     <div class="kopf-zeile">
@@ -255,8 +255,8 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
 
   <!-- 2 ANFRAGE -->
   <section class="flaeche" id="anfrage">
-    <div class="fl-kopf"><div><span class="schritt">SCHRITT 2</span><h2>Anfrage an den Makler</h2></div><p>Aus deinem eigenen Postfach. Nichts geht ohne deine Freigabe raus.</p></div>
-    <div class="konto"><span>Gmail · investor@beispiel.de · <b>verbunden</b></span><span>Microsoft 365 · nicht verbunden</span></div>
+    <div class="fl-kopf"><div><span class="schritt">SCHRITT 2</span><h2>Anfrage an den Makler</h2></div><p>Über das Inserat: Die Treffer enthalten keine Kontaktdaten (Support 04.11.2026). DealPilot schreibt den Text, du schickst ihn im Portal ab.</p></div>
+    <div class="konto"><span>Antworten an · anfragen-k1042@eingang.dealpilot.immo (Beispiel) · <b>bereit</b></span><span>Postfach-Anbindung · erst für Folgemails</span></div>
     <div class="zwei">
       <div style="display:grid;gap:10px;min-width:0">
         <div class="mail">
@@ -264,23 +264,20 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
           <pre id="mail-text"></pre>
         </div>
         <div class="knoepfe">
-          <button class="btn haupt" type="button" id="b-frei">Freigeben und senden</button>
-          <button class="btn" type="button" id="b-inserat">Inserat öffnen und selbst anfragen</button>
+          <button class="btn haupt" type="button" id="b-frei">Text kopieren und Inserat öffnen</button>
+          <button class="btn" type="button" id="b-inserat">Nur Inserat öffnen</button>
         </div>
         <div class="toast" id="toast" role="status"></div>
       </div>
       <div class="kasten">
-        <span class="lbl">Automatik (optional)</span>
-        <label class="chk"><input type="checkbox" id="auto"> Automatisch anfragen, wenn der Preis um mindestens
-          <select id="auto-x" aria-label="Schwelle Preissenkung"><option>3</option><option selected>5</option><option>8</option><option>10</option></select> % sinkt</label>
-        <div class="warnung rot" id="auto-warn" hidden>
-          <b>Bitte bewusst einschalten</b>
-          <span>Der Agent schreibt dann in deinem Namen aus deinem Postfach, ohne dich vorher zu fragen. Er fragt nur Objekte an, die zu deinem Profil passen und deren Inserat eine E-Mail-Adresse nennt. Höchstens eine Anfrage je Inserat, höchstens 3 am Tag. Jede Anfrage steht im Protokoll, die Automatik lässt sich jederzeit abschalten.</span>
-          <label class="chk" style="background:var(--tafel)"><input type="checkbox" id="auto-ok"> Verstanden, Automatik einschalten</label>
-        </div>
-        <div class="hinweis" id="auto-stand">Automatik aus. Jede Anfrage wartet auf deine Freigabe.</div>
-        <span class="lbl">Wer bekommt die Anfrage?</span>
-        <p class="hinweis">Die Such-API liefert in unserer Anbindung keine Kontaktadresse des Anbieters, nur die Links auf die Inserate. Eine E-Mail geht nur raus, wenn das Inserat eine Adresse nennt. Sonst öffnet der Agent das Inserat und du fragst dort selbst an. Kontaktformulare der Portale füllt er nie aus.</p>
+        <span class="lbl">So läuft die Anfrage</span>
+        <ol class="fragen" style="font-size:13px">
+          <li>„Text kopieren und Inserat öffnen“: der Anfragetext liegt in der Zwischenablage, das Inserat öffnet sich im Portal.</li>
+          <li>Du fügst den Text ins Kontaktformular des Portals ein und schickst ab. DealPilot setzt das Objekt auf „angefragt“.</li>
+          <li>Der Text bittet um Antwort mit Unterlagen an deine DealPilot-Eingangsadresse. Dort ordnet die Kennung im Betreff die Antwort dem Objekt zu.</li>
+        </ol>
+        <span class="lbl">Warum keine Automatik</span>
+        <p class="hinweis">Die Such-API liefert keine Kontaktadresse des Anbieters, nur die Links auf die Inserate (vom Support bestätigt). Kontaktformulare der Portale füllt DealPilot nie selbst aus – das verbieten deren Nutzungsbedingungen. Eine Automatik „ab −x % selbst anfragen“ ist deshalb nicht möglich. Sobald der Makler geantwortet hat, kennt DealPilot seine Adresse; Folgemails aus deinem Postfach sind dann die nächste Ausbaustufe.</p>
       </div>
     </div>
   </section>
@@ -291,7 +288,7 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
     <div class="zwei">
       <div class="track" id="track"></div>
       <div class="kasten">
-        <span class="lbl">Postfach-Beobachtung · nur Antworten auf Agent-Anfragen</span>
+        <span class="lbl">Eingangsadresse · nur Antworten auf Agent-Anfragen</span>
         <div class="log" id="log"></div>
         <p class="hinweis">Zugeordnet wird über den Gesprächsverlauf der Anfrage (Kennung im Betreff). Andere Mails liest der Agent nicht.</p>
       </div>
@@ -307,21 +304,36 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
 
   <!-- DAHINTER -->
   <section class="flaeche" id="dahinter">
-    <div class="fl-kopf"><div><span class="schritt">FÜR MARCEL</span><h2>Was steckt dahinter</h2></div><p>Technik, Leitplanken, Stufenplan und was wir bei ImmoMetrica erfragen müssen.</p></div>
+    <div class="fl-kopf"><div><span class="schritt">FÜR MARCEL</span><h2>Was steckt dahinter</h2></div><p>Technik, Leitplanken, Stufenplan und die Antworten des ImmoMetrica-Supports (04.11.2026).</p></div>
 
     <h3>Was die ImmoMetrica-Seite verspricht (Recherche 03.11.2026)</h3>
     <div style="display:grid;gap:10px">
       <div class="beleg"><q>Suchaufträge mit Sofort- und Tagesbenachrichtigung per E-Mail und Telegram</q><small>und <q>bei neuen Angeboten und Preisänderungen</q> · <a href="https://www.immometrica.de/" target="_blank" rel="noopener">immometrica.de</a>, Funktionen</small></div>
       <div class="beleg"><q>Sieh, wie sich Preise pro Objekt entwickelt haben.</q><small>und <q>Suche gezielt nach Objekten, die im Preis reduziert wurden.</q> · immometrica.de</small></div>
       <div class="beleg"><q>API-Zugang, 600 Objekte pro Monat inkl.</q><small>nur im Tarif Investor Pro (49,95 €/Monat jährlich) · immometrica.de, Preise</small></div>
-      <p><b>Befund:</b> In der Oberfläche gibt es Preisverlauf, Preissenkungs-Suche und Benachrichtigung bei neuen Angeboten und Preisänderungen. Ob die Such-API (<code>searchapi/v1/</code>) davon etwas liefert, steht nirgends. Es gibt keine öffentliche API-Doku, Webhooks werden nirgends erwähnt, und App-Push gibt es nur als E-Mail oder Telegram. Unsere Anbindung kennt die Felder <code>online_since</code>, <code>offline_since</code>, <code>last_modified</code> und <code>reactivated_at</code>, aber keinen früheren Preis. Deshalb rechnet der Agent den Unterschied selbst aus: je Inserat den zuletzt gesehenen Preis speichern und vergleichen. Das funktioniert unabhängig davon, was die API liefert.</p>
+      <p><b>Befund, vom Support bestätigt (04.11.2026):</b> Die Such-API liefert nur den <b>aktuellen</b> Preis, keinen Verlauf und kein Kennzeichen „neu“ oder „Preis geändert“. <code>last_modified</code> ändert sich bei jeder inhaltlichen Änderung, nicht nur beim Preis. Es gibt <b>keine Webhooks</b>, die Benachrichtigungen per E-Mail und Telegram sind für Menschen gedacht. Dafür gibt es <b>vier Filter für „seit dem letzten Abruf“</b>. Der Agent speichert deshalb je Inserat den zuletzt gesehenen Preis und erkennt die Preissenkung selbst – genau so empfiehlt es der Support.</p>
     </div>
+
+    <h3>Antworten des ImmoMetrica-Supports (04.11.2026)</h3>
+    <table class="auf" style="margin-bottom:6px">
+      <thead><tr><th>Frage</th><th>Antwort</th><th>Folge für den Agenten</th></tr></thead>
+      <tbody>
+        <tr><td>Preisverlauf, früherer Preis</td><td>Nein, nur der aktuelle Preis. <code>last_modified</code> ändert sich bei jeder Änderung.</td><td>Preis je Inserat selbst speichern und vergleichen.</td></tr>
+        <tr><td>„Neu“ / „geändert seit“</td><td>Kein Kennzeichen, aber Filter: <code>offer_id_gt</code> (neue IDs), <code>last_modified_after</code>, <code>offline_date_after</code>, <code>reactivated_after</code>. Je Abruf nur ein Zeitstempel-Filter.</td><td>Vier schlanke Abrufe statt der ganzen Suche; 5 Minuten Überlappung, Duplikate über die ID verwerfen. <b>Gebaut (v3168).</b></td></tr>
+        <tr><td>Webhooks</td><td>Gibt es nicht.</td><td>Abruf im Takt (Polling).</td></tr>
+        <tr><td>Kontingent</td><td>Jedes eindeutige Objekt je Monat und Land einmal. Erneuter Abruf, Blättern, Filtern, Suchliste: kostenlos. Erschöpft: trotzdem HTTP 200, neue Objekte fehlen dann – sichtbar in <code>X-Limit</code>, <code>X-Limit-Used</code>, <code>X-Limit-Hidden</code>. Anhebbar bis 2.000 je Land.</td><td>Takt kostet kein Kontingent. Kopfzeilen werden gelesen und gemeldet. <b>Gebaut (v3168).</b></td></tr>
+        <tr><td>Abruftakt</td><td>Bis 5.000 Anfragen je Stunde, darüber 429. Große Suchen brechen nach 25 s mit 503 ab.</td><td>Alle 30 Minuten ist problemlos. Bei 503 mit <code>offer_id_gt</code> eingrenzen. Klare Meldungen gebaut (v3168).</td></tr>
+        <tr><td>Kontaktdaten</td><td>Keine, nur die Links zu den Inseraten (<code>platforms[].url</code>).</td><td><b>Die Anfrage läuft über das Inserat</b>, nicht per E-Mail aus DealPilot – siehe Stufe 2.</td></tr>
+        <tr><td>Nutzung im Auftrag von Kunden, Preisverläufe speichern</td><td><b>Nicht beantwortet.</b></td><td>Vor dem Ausrollen an Kunden schriftlich klären.</td></tr>
+      </tbody>
+    </table>
 
     <h3>Technischer Ablauf</h3>
     <div class="ablauf">
-      <div><b>Abruf-Job</b><p>Takt je Kunde im Backend. Ruft <code>searches/</code> und je gewählter Suche <code>searches/&lt;id&gt;/results/</code> mit dem Token des Kunden ab (vorhanden: <code>immometricaService.js</code>).</p></div>
-      <div><b>Speicher je Inserat</b><p>ImmoMetrica-ID, erster und letzter Preis, Preisverlauf mit Datum, zuerst und zuletzt gesehen, Kennzeichen offline/reaktiviert.</p></div>
-      <div><b>Unterschiede</b><p>Unbekannte ID = neu. Preis kleiner als gespeichert = gesenkt (Prozent und Euro). <code>reactivated_at</code> gesetzt = wieder eingestellt.</p></div>
+      <div><b>Abruf-Job</b><p>Takt je Kunde (30 Min. bis täglich). Je Suche einmal ganz zum Start, danach nur noch die vier Filter: <code>offer_id_gt</code> = höchste gesehene ID, <code>last_modified_after</code>, <code>offline_date_after</code>, <code>reactivated_after</code> = letzter Abruf minus 5 Minuten. Schnittstelle dafür steht (<code>/immometrica/searches/&lt;id&gt;/aenderungen</code>, v3168).</p></div>
+      <div><b>Speicher je Inserat</b><p>ImmoMetrica-ID, erster und letzter Preis, Preisverlauf mit Datum, zuerst und zuletzt gesehen, Kennzeichen offline/reaktiviert. Den Verlauf baut DealPilot selbst auf – die API kennt ihn nicht.</p></div>
+      <div><b>Unterschiede</b><p>Aus <code>offer_id_gt</code> = neu. Aus <code>last_modified_after</code> mit Preis kleiner als gespeichert = gesenkt (Prozent und Euro); anderer Preis gleich = nur Exposé geändert, keine Meldung. Aus <code>reactivated_after</code> = wieder eingestellt, aus <code>offline_date_after</code> = weg.</p></div>
+      <div><b>Kontingent</b><p>Kopfzeilen <code>X-Limit</code>/<code>-Used</code>/<code>-Hidden</code> bei jedem Abruf lesen. Ist <code>X-Limit-Hidden</code> größer 0, fehlen neue Objekte: Hinweis an den Kunden, Obergrenze im ImmoMetrica-Profil anheben.</p></div>
       <div><b>Profilfilter</b><p>Abbildung über <code>immometricaMapping.js</code>, dann Quick-Check-Kern: Rendite, Lageklasse, Kaufpreisspanne, Region. Nur Passendes löst eine Nachricht aus.</p></div>
       <div><b>Push</b><p>Telegram-Bot ist vorhanden. App-Hinweis in der Seitenleiste. Bündeln: höchstens eine Nachricht je Abruf.</p></div>
       <div><b>Postfach per OAuth</b><p>Kunde verbindet Gmail oder Microsoft 365. Senden als Entwurf mit Freigabe, Eingang nur für den Gesprächsverlauf der Anfrage.</p></div>
@@ -341,25 +353,20 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
       <li><b>Eigenes Postfach, engste Rechte.</b> Senden plus Lesen nur der eigenen Gesprächsverläufe. Für Gmail-Leserechte verlangt Google eine Prüfung der App mit jährlicher Sicherheitsbewertung. Einfacherer Weg für den Eingang: eine eigene Eingangsadresse je Kunde, an die er Antworten weiterleitet oder in Kopie setzt.</li>
       <li><b>Datenschutz.</b> Maklerdaten sind personenbezogen. Der Kunde ist verantwortlich, DealPilot verarbeitet im Auftrag. Gelesen wird nur, was zur Anfrage gehört, mit Löschfrist für Mails und Anhänge. Kein Weitergeben an Dritte.</li>
       <li><b>ImmoMetrica-Bedingungen.</b> Jeder Kunde nutzt seinen eigenen API-Zugang. Ob ein Drittanbieter ihn im Namen des Kunden nutzen und den Preisverlauf speichern darf, klären wir vorher schriftlich.</li>
-      <li><b>Takt und Kontingent.</b> ImmoMetrica meldet selbst in unter drei Minuten. Der Agent muss nicht schneller sein, er bewertet. Stündlich reicht, sofern das Kontingent es trägt.</li>
+      <li><b>Takt und Kontingent.</b> ImmoMetrica meldet selbst in unter drei Minuten. Der Agent muss nicht schneller sein, er bewertet. Der Takt kostet kein Kontingent (jedes Objekt zählt einmal im Monat), die Grenze von 5.000 Anfragen je Stunde ist weit weg. Alle 30 Minuten ist also möglich, stündlich reicht.</li>
     </ul>
 
     <h3>Stufenplan und grober Aufwand</h3>
     <div class="stufen">
-      <div class="stufe"><b>Stufe 1 · Beobachtung und Push</b><span class="aufwand">4–6 Tage</span><p>Abruf-Job, Tabelle je Inserat mit Preisverlauf, Unterschiede, Profilfilter, Telegram- und App-Hinweis, Ansicht wie oben in Schritt 1. Hängt an der Antwort zum Kontingent.</p></div>
-      <div class="stufe"><b>Stufe 2 · Anfrage als Entwurf</b><span class="aufwand">5–8 Tage + Google-Prüfung</span><p>OAuth Google und Microsoft, Entwurf aus Vorlage, Freigabe mit einem Klick, Protokoll. Zwischenlösung ohne Postfach-Anbindung: Text kopieren und Inserat öffnen (1 Tag). Automatik bei Preissenkung erst nach einer Pilotphase (1–2 Tage).</p></div>
+      <div class="stufe"><b>Stufe 1 · Beobachtung und Push</b><span class="aufwand">3–5 Tage</span><p>Schnittstelle steht seit v3168 (Filter, Kontingent, Fehler). Offen: Abruf-Job, Tabelle je Inserat mit Preisverlauf, Unterschiede, Profilfilter, Telegram- und App-Hinweis, Ansicht wie oben in Schritt 1. Kontingent ist kein Hindernis mehr.</p></div>
+      <div class="stufe"><b>Stufe 2 · Anfrage über das Inserat</b><span class="aufwand">1–2 Tage</span><p>Die Treffer enthalten keine Kontaktdaten, nur den Link zum Inserat. Deshalb: fertiger Anfragetext (mit Bitte um Unterlagen und Antwort an die Eingangsadresse) zum Kopieren, Inserat öffnen, „angefragt“ mit einem Klick. Keine automatische Bedienung der Portal-Formulare. Die E-Mail aus dem eigenen Postfach (OAuth, 5–8 Tage + Google-Prüfung) lohnt erst für Folgemails, wenn der Makler geantwortet hat und seine Adresse bekannt ist. Die Automatik „ab −x % selbst anfragen“ entfällt damit.</p></div>
       <div class="stufe"><b>Stufe 3 · Eingang, Auswertung, Aufstellung</b><span class="aufwand">8–12 Tage</span><p>Eingang über Eingangsadresse oder Postfach, Zuordnung über den Gesprächsverlauf, Anhänge in den Unterlagen-Import, Quick-Check und Marktpreisindikation, Aufstellung mit Status.</p></div>
     </div>
 
-    <h3>Fragen an den ImmoMetrica-Support</h3>
+    <h3>Noch offen beim ImmoMetrica-Support</h3>
     <ol class="fragen">
-      <li>Liefert <code>searches/&lt;id&gt;/results/</code> einen früheren Preis oder einen Preisverlauf je Objekt? Ändert sich <code>last_modified</code> bei einer Preisänderung?</li>
-      <li>Gibt es ein Kennzeichen „neu“ oder „Preis geändert“ seit dem letzten Abruf, oder einen Parameter wie „geändert seit“ bzw. eine Sortierung nach Änderungsdatum?</li>
-      <li>Gibt es Webhooks oder eine andere Benachrichtigung über die API, oder eine maschinenlesbare Form der Suchauftrags-Benachrichtigung?</li>
-      <li>Wie zählt das Kontingent „600 Objekte pro Monat“: je gelieferter Treffer und Abruf, je eindeutigem Objekt im Monat oder nur bei Detailabruf? Zählt ein erneuter Abruf desselben Objekts?</li>
-      <li>Welcher Abruftakt und welche Abruf-Grenzen sind erlaubt (stündlich, alle 30 Minuten)?</li>
-      <li>Enthalten die Treffer Kontaktdaten des Anbieters (E-Mail, Telefon), oder nur die Links auf die Inserate?</li>
-      <li>Darf eine Software wie DealPilot die API im Auftrag ihrer Kunden mit deren Token nutzen, Preisverläufe speichern und anzeigen? Gibt es dafür einen Partner- oder Mehrkunden-Tarif?</li>
+      <li>Darf eine Software wie DealPilot die API im Auftrag ihrer Kunden mit deren Token nutzen, Preisverläufe speichern und anzeigen? Gibt es dafür einen Partner- oder Mehrkunden-Tarif? <i>(in der Antwort vom 04.11.2026 nicht beantwortet)</i></li>
+      <li>Die Feld-Doku unter <code>searchapi/v1/docs</code> ist nur angemeldet sichtbar. Können wir sie als Datei bekommen, damit unser Feld-Abgleich gegen die echte Liste läuft?</li>
     </ol>
   </section>
 </div>
@@ -397,7 +404,7 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
     ['29.10. 09:10','A','Gelesen: 11 von 12 Feldern übernommen, Quick-Check und Marktpreisindikation gerechnet'],
     ['31.10. 11:05','B','Antwort von Beispielhaus GmbH, 3 Anhänge: Exposé, Mieterliste, Grundbuchauszug'],
     ['02.11. 16:20','D','Antwort von privat: Unterlagen folgen nach Besichtigung'],
-    ['03.11. 07:01','C','Anfrage gesendet (freigegeben 03.11. 06:58)']
+    ['03.11. 07:01','C','Anfrage über das Inserat gestellt (Text kopiert 06:58)']
   ];
   var TAKT = {tag:{name:'täglich', proMonat:30, naechst:'morgen 07:00'}, std:{name:'stündlich', proMonat:720, naechst:'15:00'}, m30:{name:'alle 30 Min.', proMonat:1440, naechst:'14:30'}};
   var st = {takt:'std', ansicht:'passt', sel:'A', auto:false};
@@ -434,7 +441,8 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
   function renderKontingent(){
     var t=TAKT[st.takt], tr=SUCHEN.filter(function(s){return s.an;}).reduce(function(a,s){return a+s.treffer;},0);
     var proMonat = t.proMonat*tr;
-    $('kontingent').innerHTML = '<b>Kontingent prüfen</b><span>'+t.proMonat.toLocaleString('de-DE')+' Abrufe im Monat. Falls jeder gelieferte Treffer zählt, wären das bei '+tr+' Treffern je Abruf <b class="num">'+proMonat.toLocaleString('de-DE')+'</b> Objekte im Monat. Der Tarif Investor Pro enthält 600. Zählt nur jedes Objekt einmal im Monat, reicht es locker. Das ist Frage 4 an den Support.</span>';
+    /* 04.11.2026 · Antwort des Supports: gezählt wird jedes EINDEUTIGE Objekt je Monat und Land, erneute Abrufe sind frei */
+    $('kontingent').innerHTML = '<b>Kontingent</b><span>'+t.proMonat.toLocaleString('de-DE')+' Abrufe im Monat kosten kein zusätzliches Kontingent: gezählt wird jedes Objekt nur <b>einmal je Monat und Land</b>, egal wie oft es kommt. Bei '+tr+' Treffern heute plus den neuen im Laufe des Monats bleibt es weit unter 600 (im Profil bis 2.000 je Land anhebbar). Ist es erschöpft, fallen nur neue Objekte weg – DealPilot liest das aus den Kopfzeilen und warnt.</span>';
     $('k-takt').textContent = t.name; $('k-naechst').textContent = t.naechst;
     Array.prototype.forEach.call($('takt').children,function(b){b.setAttribute('aria-pressed', b.dataset.t===st.takt?'true':'false');});
   }
@@ -503,15 +511,16 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
   }
   function renderMail(o){
     var s=senkung(o);
-    $('mail-kopf').innerHTML='<span>Von</span><span>investor@beispiel.de (Beispiel)</span><span>An</span><span>'+(o.mail?esc(o.mail):'<i>Inserat nennt keine E-Mail-Adresse</i>')+'</span>'+
+    $('mail-kopf').innerHTML='<span>Weg</span><span>Kontaktformular im Inserat (Portal)</span><span>Antwort an</span><span>anfragen-k1042@eingang.dealpilot.immo (Beispiel)</span>'+
       '<span>Betreff</span><span>Anfrage '+esc(o.titel.split(',')[0])+', '+esc(o.ort.replace(' (Beispiel)',''))+' [DP-'+o.id+'7Q]</span>';
     $('mail-text').textContent='Guten Tag,\n\nich interessiere mich für Ihr Angebot „'+o.titel+'“ in '+o.ort.replace(' (Beispiel)','')+' zum Kaufpreis von '+eur(preis(o))+'.'+
       (s>0?' Mir ist aufgefallen, dass der Preis kürzlich angepasst wurde.':'')+
       '\n\nFür eine erste Prüfung bitte ich um folgende Unterlagen:\n· Exposé und Grundrisse\n· Energieausweis\n· Mieterliste mit Kaltmieten und Mietbeginn\n'+
       (/ETW/.test(o.titel)?'· Teilungserklärung, Wirtschaftsplan, Hausgeldabrechnung, die letzten drei Protokolle der Eigentümerversammlung, Höhe der Erhaltungsrücklage\n':'· Grundbuchauszug, Flurkarte, Aufstellung der Bewirtschaftungskosten, durchgeführte Modernisierungen\n')+
+      '\nBitte senden Sie die Unterlagen an anfragen-k1042@eingang.dealpilot.immo (Beispiel) und nennen Sie im Betreff die Kennung DP-'+o.id+'7Q.\n'+
       '\nGern vereinbare ich danach einen Besichtigungstermin.\n\nMit freundlichen Grüßen\nMax Beispiel';
-    $('b-frei').disabled = !o.mail || o.status!=null;
-    $('b-frei').textContent = o.status!=null ? 'Bereits angefragt' : (o.mail ? 'Freigeben und senden' : 'Keine Adresse im Inserat');
+    $('b-frei').disabled = o.status!=null;
+    $('b-frei').textContent = o.status!=null ? 'Bereits angefragt' : 'Text kopieren und Inserat öffnen';
   }
   function renderTrack(){
     var liste=OBJ.filter(function(o){return o.status!=null;});
@@ -545,16 +554,8 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
           '<td>'+(t?'<span class="score '+t.c+'">'+o.score+' · '+t.w.toUpperCase()+'</span>':'<small>offen</small>')+'</td>'+
           '<td>'+STUFEN[o.status]+'</td></tr>';}).join('')+'</tbody>';
   }
-  function renderAuto(){
-    var x=+$('auto-x').value;
-    $('auto-warn').hidden = !$('auto').checked;
-    if(!$('auto').checked){ $('auto-ok').checked=false; }
-    st.auto = $('auto').checked && $('auto-ok').checked;
-    if(!st.auto){ $('auto-stand').textContent = $('auto').checked ? 'Noch nicht aktiv. Bitte oben bestätigen.' : 'Automatik aus. Jede Anfrage wartet auf deine Freigabe.'; return; }
-    var kand=OBJ.filter(function(o){return sichtbar(o) && senkung(o)>=x && passt(o)[0];});
-    $('auto-stand').innerHTML='<b>Automatik aktiv</b> ab −'+x+' %. Beim nächsten Abruf betroffen: '+(kand.length?kand.map(function(o){
-      return esc(o.titel.split(',')[0])+' (−'+pct(senkung(o))+(o.mail?'':', keine Adresse, nur Hinweis')+(o.status!=null?', schon angefragt':'')+')';}).join('; '):'keine')+'.';
-  }
+  /* 04.11.2026 · Automatik entfallen: die Treffer enthalten keine Kontaktdaten (Support) */
+  function renderAuto(){}
   function alles(){ renderKontingent(); renderTreffer(); renderChart(); renderTrack(); renderAuf(); renderAuto(); }
 
   renderSuchen();
@@ -565,15 +566,16 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
   $('ansicht').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; st.ansicht=b.dataset.a;
     Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b?'true':'false');}); renderTreffer(); });
   $('treffer').addEventListener('click',function(e){ var b=e.target.closest('.tr'); if(!b) return; st.sel=b.dataset.id; $('toast').textContent=''; renderTreffer(); renderChart(); });
-  $('b-frei').addEventListener('click',function(){ var o=OBJ.filter(function(x){return x.id===st.sel;})[0]; if(!o||!o.mail||o.status!=null) return;
-    o.status=0; LOG.push(['03.11. 14:12',o.id,'Anfrage freigegeben (Demo, es wurde nichts versendet)']);
-    $('toast').textContent='Demo: als angefragt markiert. Es wurde nichts versendet.'; alles(); });
-  $('b-inserat').addEventListener('click',function(){ $('toast').textContent='In der App öffnet sich hier das Inserat in einem neuen Fenster. Die Anfrage stellst du dort selbst.'; });
+  $('b-frei').addEventListener('click',function(){ var o=OBJ.filter(function(x){return x.id===st.sel;})[0]; if(!o||o.status!=null) return;
+    try { if (navigator.clipboard) navigator.clipboard.writeText($('mail-text').textContent); } catch (e) {}
+    o.status=0; LOG.push(['04.11. 14:12',o.id,'Anfragetext kopiert, Inserat geöffnet, als angefragt markiert (Demo)']);
+    $('toast').textContent='Demo: Text kopiert und als angefragt markiert. In der App öffnet sich jetzt das Inserat, dort fügst du den Text ins Kontaktformular ein.'; alles(); });
+  $('b-inserat').addEventListener('click',function(){ $('toast').textContent='In der App öffnet sich hier das Inserat in einem neuen Fenster.'; });
   $('track').addEventListener('click',function(e){ var b=e.target.closest('button[data-s]'); if(!b) return;
     var o=OBJ.filter(function(x){return x.id===b.dataset.id;})[0]; o.status=+b.dataset.s;
     if(o.status===3 && o.score==null){ o.score= o.id==='C'?58:o.id==='D'?67:61; o.mpi=[Math.round(preis(o)*0.9/1000)*1000, Math.round(preis(o)*0.98/1000)*1000]; }
     renderTrack(); renderAuf(); renderMail(o.id===st.sel?o:OBJ.filter(function(x){return x.id===st.sel;})[0]); });
-  ['auto','auto-ok','auto-x'].forEach(function(id){ $(id).addEventListener('change',renderAuto); });
+  /* Automatik entfallen (04.11.2026) */
   alles();
 })();
 </script>
