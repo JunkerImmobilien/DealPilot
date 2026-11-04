@@ -44337,3 +44337,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 
 - Prod steht auf v3178 (1.0.56). Staging v3181b. Offen zur Abnahme: einheitliche Dokumente.
 - **Nachtrag Prod-Rollout (Marcel: „aber roll gerade noch aus"):** v3179–v3181b auf Produktion, Version 1.0.57 (`b8035395`), Sicherungen `/root/backups/haupt-20261104-1836.sql.gz` und `mb-20261104-1836.sql.gz` (Kopf gelesen). PDF-Dienst auf Prod von Hand neu gebaut. Nachweis: Prod liefert `dok-weiche.js?v=v3181a` (200), Bankfassung Westerfeldstr. über den Prod-PDF-Dienst erzeugt (1,0 MB, 36 s). Die einheitlichen Dokumente sind damit auf Prod die Vorgabe; „Klassisch" in den Einstellungen.
+
+### v3182–v3183c · PDFs in zwei Sekunden (04.11.2026, Prod 1.0.58/1.0.59)
+
+- **Was:** PDF-Dienst wartet für dok_* nicht mehr bis 20 s auf Netzruhe (v3182). Neuer Weg `POST /rechenkerne/html-pdf`: die App baut das einheitliche Dokument selbst, der PDF-Dienst druckt es ohne Login, Netz nur `data:`/Schriften, CSP ohne Skript (v3183–v3183c). `dok-weiche.js` nimmt diesen Weg zuerst, `dok-pdf` bleibt Rückfall.
+- **Commit:** `2daef7e8`, `5280768d` … `80f9bbe` (v3182–v3183c); Prod 1.0.58 (`1b85ab7`), 1.0.59 (`fb12da9`), PDF-Dienst auf Prod jeweils von Hand neu gebaut.
+- **Nachweis:** Staging Kurzfassung Klick→Download 2,5 s, `pdffonts`: Inter, Space Grotesk, JetBrains Mono eingebettet; Prod-Probedruck 1,6 s, Prod liefert `dok-weiche.js?v=v3183`.
+- **Rest:** Kaufpreisaufteilung braucht für ihr HTML rund 7 s (`bmfBereit` wartet fest 3,5 s). Diagnosezeile „html gesetzt ()“ zeigt die Schriften nicht an (`[].map` auf FontFaceSet) – kosmetisch.
