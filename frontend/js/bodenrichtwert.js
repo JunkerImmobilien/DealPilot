@@ -126,7 +126,7 @@
   // ── BORIS-URLs pro Bundesland ────────────────────────────────
   var BORIS_URLS = {
     'BW':    { name: 'Baden-Württemberg', url: 'https://www.gutachterausschuesse-bw.de/borisbw/' },
-    'BY':    { name: 'Bayern',            url: 'https://www.boris-bayern.de/' },
+    'BY':    { name: 'Bayern',            url: 'https://atlas.bayern.de/?l=atkis,2da5cc90-9e7d-41ef-9e08-94c4d84f2a24,cabacb47-0421-4e4e-a729-b6bec6ae42e6,46c6ee92-ca65-4b5a-97ce-513aa3587d3e,28305567-09f9-4866-bf80-143944969ecb&l_v=true,false,false,false,true&t=ba' }   /* v3170 · BayernAtlas mit Ebene Bodenrichtwerte statt boris-bayern.de (Shop) */,
     'BE':    { name: 'Berlin',            url: 'https://fbinter.stadt-berlin.de/boris/' },
     /* v2949 · Links am 25.10.2026 einzeln abgerufen: Brandenburg landete auf einer
        allgemeinen Serviceseite, Bremen und Hamburg antworteten gar nicht, BORIS-Plus
