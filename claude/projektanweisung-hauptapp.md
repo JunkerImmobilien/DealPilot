@@ -44336,3 +44336,4 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 ### Sitzungsende 04.11.2026 (abends)
 
 - Prod steht auf v3178 (1.0.56). Staging v3181b. Offen zur Abnahme: einheitliche Dokumente.
+- **Nachtrag Prod-Rollout (Marcel: „aber roll gerade noch aus"):** v3179–v3181b auf Produktion, Version 1.0.57 (`b8035395`), Sicherungen `/root/backups/haupt-20261104-1836.sql.gz` und `mb-20261104-1836.sql.gz` (Kopf gelesen). PDF-Dienst auf Prod von Hand neu gebaut. Nachweis: Prod liefert `dok-weiche.js?v=v3181a` (200), Bankfassung Westerfeldstr. über den Prod-PDF-Dienst erzeugt (1,0 MB, 36 s). Die einheitlichen Dokumente sind damit auf Prod die Vorgabe; „Klassisch" in den Einstellungen.
