@@ -131,8 +131,8 @@ pre{white-space:pre-wrap;background:var(--bg);border:1px solid var(--linie);bord
     try {
       var j = await api('/searches/' + encodeURIComponent(st.suche) + '/aenderungen?art=neu&seit=' + encodeURIComponent(st.maxId));
       kont(j.kontingent);
-      zeigen(j.items || [], j.anzahl + ' neue seit ID ' + j.seit);
-      meld(j.anzahl ? j.anzahl + ' neue Objekte.' : 'Nichts Neues seit dem letzten Abruf.', true);
+      if (j.anzahl) zeigen(j.items || [], j.anzahl + ' neue seit ID ' + j.seit);   /* ohne Neues bleibt die geladene Liste stehen */
+      meld(j.anzahl ? j.anzahl + ' neue Objekte.' : 'Nichts Neues seit ID ' + j.seit + ' – Liste unverändert.', true);
     } catch (e) { meld(e.message); }
   }
   function anfrage(id) {
