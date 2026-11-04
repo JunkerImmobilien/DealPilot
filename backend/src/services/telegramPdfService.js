@@ -24,7 +24,15 @@ const ARTEN = {
   bank_kurz:  { name: 'Investment Case (Kurzfassung)', objekt: true },
   bankexport: { name: 'Bankexport (alle Darlehen)', objekt: false },
   marktbericht: { name: 'Marktbericht', objekt: true, bericht: true },
-  marktbericht_profi: { name: 'Marktbericht Profi', objekt: true }   /* v3176 · HTML/A4, report_id optional */
+  marktbericht_profi: { name: 'Marktbericht Profi', objekt: true },   /* v3176 · HTML/A4, report_id optional */
+  /* v3179 · einheitliche Dokumente (Demo zur Abnahme durch Marcel) */
+  dok_investment: { name: 'Investment Case (einheitlich)', objekt: true },
+  dok_bank: { name: 'Bankfassung (einheitlich)', objekt: true },
+  dok_kurz: { name: 'Kurzfassung (einheitlich)', objekt: true },
+  dok_kaufpreisaufteilung: { name: 'Kaufpreisaufteilung (einheitlich)', objekt: true },
+  dok_finanzamt: { name: 'Werbungskosten (einheitlich)', objekt: true },
+  dok_trackrecord: { name: 'Track Record (einheitlich)', objekt: false },
+  dok_bankexport: { name: 'Bankexport (einheitlich)', objekt: false }
 };
 
 function verfuegbar() {

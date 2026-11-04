@@ -52,7 +52,15 @@ const ARTEN = {
   marktbericht: { objekt: false, bericht: true, name: 'Marktbericht' },
   /* v3176 · Profi-Fassung: HTML aus der App (DpProfi.dokument), gedruckt von Chrome selbst.
      report_id optional - ohne nimmt die App den neuesten Stufe-3-Bericht des Objekts. */
-  marktbericht_profi: { objekt: false, name: 'Marktbericht Profi', objektOderBericht: true }
+  marktbericht_profi: { objekt: false, name: 'Marktbericht Profi', objektOderBericht: true },
+  /* v3179 · einheitliche Dokumente (Demo zur Abnahme) */
+  dok_investment: { objekt: true, name: 'Investment Case (einheitlich)' },
+  dok_bank: { objekt: true, name: 'Bankfassung (einheitlich)' },
+  dok_kurz: { objekt: true, name: 'Kurzfassung (einheitlich)' },
+  dok_kaufpreisaufteilung: { objekt: true, name: 'Kaufpreisaufteilung (einheitlich)' },
+  dok_finanzamt: { objekt: true, name: 'Werbungskosten (einheitlich)' },
+  dok_trackrecord: { objekt: false, name: 'Track Record (einheitlich)' },
+  dok_bankexport: { objekt: false, name: 'Bankexport (einheitlich)' }
 };
 
 /* Was die App schreiben darf, waehrend wir sie fernsteuern. */
@@ -262,11 +270,27 @@ async function erzeugen(auftrag) {
     await page.waitForNetworkIdle({ idleTime: 700, timeout: 20000 }).catch(() => {});
     schritt('app bereit');
 
-    if (auftrag.art === 'marktbericht_profi') {
-      await page.waitForFunction(() => window.DpProfi && typeof window.DpProfi.dokument === 'function', { timeout: 20000, polling: 250 });
-      const dok = await page.evaluate(async (o, r) => {
-        try { return { html: await window.DpProfi.dokument(o, r) }; } catch (e) { return { fehler: (e && e.message) || String(e) }; }
-      }, auftrag.objekt_id ? String(auftrag.objekt_id) : null, auftrag.report_id ? Number(auftrag.report_id) : null);
+    if (auftrag.art === 'marktbericht_profi' || /^dok_/.test(auftrag.art)) {
+      let dok;
+      if (auftrag.art === 'marktbericht_profi') {
+        await page.waitForFunction(() => window.DpProfi && typeof window.DpProfi.dokument === 'function', { timeout: 20000, polling: 250 });
+        dok = await page.evaluate(async (o, r) => {
+          try { return { html: await window.DpProfi.dokument(o, r) }; } catch (e) { return { fehler: (e && e.message) || String(e) }; }
+        }, auftrag.objekt_id ? String(auftrag.objekt_id) : null, auftrag.report_id ? Number(auftrag.report_id) : null);
+      } else {
+        /* v3179 · einheitliche Dokumente (Demo): Objekt laden und rechnen, dann DpDokumente.dokument(typ) */
+        await page.waitForFunction(() => window.DpDokumente && typeof window.DpDokumente.dokument === 'function', { timeout: 20000, polling: 250 });
+        if (auftrag.objekt_id) {
+          await page.evaluate(async (id) => { await window.loadSaved(id); }, String(auftrag.objekt_id));
+          await page.waitForFunction((id) => window._currentObjKey === id && window.State && window.State.kpis, { timeout: 30000, polling: 250 }, String(auftrag.objekt_id));
+          await new Promise((r) => setTimeout(r, 2500));
+          await page.evaluate(() => { try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {} });
+          schritt('objekt geladen');
+        }
+        dok = await page.evaluate(async (typ) => {
+          try { return { html: await window.DpDokumente.dokument(typ) }; } catch (e) { return { fehler: (e && e.message) || String(e) }; }
+        }, auftrag.art.slice(4));
+      }
       if (!dok || !dok.html) { const e = new Error((dok && dok.fehler) || 'Kein Dokument.'); e.status = 422; e.code = 'kein_bericht'; throw e; }
       schritt('profi html ' + dok.html.length);
       /* networkidle0 kam nie (gemessen: 5 x Navigation timeout) - die App laesst Verbindungen offen.
