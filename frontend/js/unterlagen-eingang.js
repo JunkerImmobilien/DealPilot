@@ -488,7 +488,7 @@
       var bel = B.filter(function (b) { return b.feld === f; }), summe = bel.reduce(function (s, b) { return s + (Number(b.betrag) || 0); }, 0);
       if (!wert && !bel.length) return;
       var rest = Math.round((wert - summe) * 100) / 100, art;
-      if (st.override == null) art = bel.length ? 'Der Posten zeigt die Schätzung der App – die Belege sind darin nicht enthalten.' : 'Schätzung der App (kein eigener Wert eingetragen)';
+      if (st.override == null) art = bel.length ? 'Der Posten zeigt den von der App berechneten Wert – die Belege sind darin nicht enthalten.' : 'von der App berechnet (kein eigener Wert eingetragen)';
       else if (Math.abs(rest) < 0.5) art = bel.length ? '' : 'eingetragen';
       else if (rest < 0) art = 'Der Posten ist um ' + eur2(-rest) + ' kleiner als die Belege – nach der Übernahme von Hand gesenkt?';
       else if (h[f] && h[f].quelle === 'Unterlage') art = 'aus der Unterlage „' + (h[f].dok || '') + '“';
@@ -528,7 +528,7 @@
       + '#dp-jb .jb-fuss{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;border-top:1px solid rgba(0,0,0,.08);font-size:12px}'
       + '#dp-jb .jb-fuss span{flex:1 1 260px;opacity:.7}'
       + '@media (max-width:640px){#dp-jb{padding:0;align-items:stretch}#dp-jb .jb-k{border-radius:0;max-height:none;height:100%}'
-      + '#dp-jb summary{grid-template-columns:minmax(0,1fr) auto}#dp-jb summary .jb-z.jb-zb{grid-column:1/-1;text-align:left}'
+      + '#dp-jb summary{grid-template-columns:minmax(0,1fr) auto}#dp-jb summary .jb-z:not(.jb-zb){grid-column:2;grid-row:1}#dp-jb summary .jb-zb{grid-column:1/-1;grid-row:2;text-align:left}#dp-jb summary .jb-zb:empty{display:none}#dp-jb summary .jb-zb small{display:inline;margin-left:4px}'
       + '#dp-jb .jb-b{grid-template-columns:minmax(0,1fr) auto}#dp-jb .jb-b .jb-d{grid-column:1/-1;order:3}}';
     document.head.appendChild(s);
   }
@@ -556,7 +556,7 @@
       }).join('');
       var hin = z.art ? '<div class="jb-hin' + (z.rest != null && z.rest < -0.5 ? ' jb-warn' : '') + '">' + (z.rest != null && Math.abs(z.rest) >= 0.5 && z.belege.length ? (z.rest > 0 ? 'Übriger Betrag ' + eur2(z.rest) + ': ' : '') : '') + esc(z.art) + '</div>' : '';
       return '<details' + (z.belege.length ? ' open' : '') + '><summary><span class="jb-p">' + esc(z.label)
-        + '<small>' + (z.belege.length ? z.belege.length + (z.belege.length === 1 ? ' Beleg' : ' Belege') : (z.schaetzung ? 'Schätzung der App' : 'ohne Beleg')) + '</small></span>'
+        + '<small>' + (z.belege.length ? z.belege.length + (z.belege.length === 1 ? ' Beleg' : ' Belege') : (z.schaetzung ? 'von der App berechnet' : 'ohne Beleg')) + '</small></span>'
         + '<span class="jb-z jb-zb">' + (z.belege.length ? eur2(z.summe) + '<small>aus Belegen</small>' : '') + '</span>'
         + '<span class="jb-z"><b>' + eur2(z.wert) + '</b><small>im Jahr ' + jahr + '</small></span></summary>'
         + (liste || hin ? '<div class="jb-liste">' + liste + hin + '</div>' : '') + '</details>';
