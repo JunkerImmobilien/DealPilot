@@ -36,7 +36,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N123 · Marktbericht Profi (Herleitung, nah an IWA) — Demo 04.11.2026
+### N123 · Marktbericht Profi — GEBAUT v3176 (Prod 1.0.52, 04.11.2026)
+- Fertig: marktbericht-profi.js, PDF-Dienst-Art marktbericht_profi, Wahl im PDF-Dialog, 5 Beispiel-PDFs unter Dateien/Berichte/Marktbericht-Profi. Offen: Abnahme durch Marcel; Knopf auch im Marktbericht-Fenster; Seitenumbruch bei sehr langen Hinweisen; Energiekennwert (kWh) als Objektfeld fehlt — die Skala zeigt nur die Klasse.
+- (Demo davor:)
 - Demo: design/Vorschläge/marktbericht-profi-demo.html (Artifact TfoLtXDkLcf3sbQxmceGaY), echte Zahlen Bericht 541. Wartet auf Marcels Abnahme der Gestaltung (sachliche Schriften, keine Serifen — Marcel 04.11.).
 - Danach: als Stufe-3-PDF-Variante „Profi“ bauen (Abschnitte Ergebnis, Angaben/Annahmen, Bodenwert+Sachwert, Vergleichswert, Ertragswert, Quellen), Daten aus cross_check, jede Zeile mit Fundstelle.
 - Mitnehmen aus IWA: Vollständigkeitsprüfung vor dem PDF, „Link teilen“, Kontaktkarte/nächste Schritte als abschaltbarer Makler-Teil.
