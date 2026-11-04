@@ -252,9 +252,19 @@
           ['Vorläufiger Ertragswert', B.eur(w('ertragswert'))], ['Maßgebender Verkehrswert', B.eur(w('massgebender_verkehrswert')), { art: 'summe' }],
           ['Grund und Boden (Einzelwert)', B.eur(w('grund_boden_wert')), { art: 'ein' }], ['Gebäude (Einzelwert)', B.eur(w('gebaeude_wert')), { art: 'ein' }],
           ['Gebäudeanteil', B.pct(w('gebaeudeanteil_prozent'), 2), { art: 'ende' }]])
-        + '<h3>Aufteilung des Kaufpreises</h3>' + B.liste([['Kaufpreis', B.eur(z.kp)], ['davon Inventar / Möblierung', B.eur(z.inventar), { art: 'ein' }], ['Kaufpreis Immobilie', B.eur(z.kpImmo), { art: 'summe' }],
-          ['Anteil Grund und Boden', B.eur(w('kaufpreisanteil_grund'))], ['Anteil Gebäude (AfA-Bemessung)', B.eur(w('kaufpreisanteil_gebaeude')), { art: 'ende' }]])
-        + '<div class="hinweis">Text für den Kaufvertrag: „Vom Kaufpreis entfallen ' + B.eur(w('kaufpreisanteil_gebaeude')) + ' auf das Gebäude und ' + B.eur(w('kaufpreisanteil_grund')) + ' auf Grund und Boden.“</div>'));
+        /* v3179b · kaufpreisanteil_* der BMF-Rechnung stehen auf den ANSCHAFFUNGSKOSTEN (Kaufpreis Immobilie +
+           Erwerbsnebenkosten), nicht auf dem Kaufpreis - erster Entwurf nannte sie „Anteile des Kaufpreises“
+           (Westerfeldstr.: 489.828 + 122.763 = 612.591 € gegen 538.000 € Kaufpreis). */
+        + (function () {
+          var akG = Number(w('kaufpreisanteil_grund')) || 0, akB = Number(w('kaufpreisanteil_gebaeude')) || 0, ak = akG + akB;
+          var pct = Number(w('gebaeudeanteil_prozent')) || 0, kpI = Number(z.kpImmo) || 0;
+          var vGeb = kpI * pct / 100, vBod = kpI - vGeb;
+          return '<h3>Aufteilung der Anschaffungskosten</h3>' + B.liste([['Kaufpreis', B.eur(z.kp)], ['davon Inventar / Möblierung', B.eur(z.inventar), { art: 'ein' }], ['Kaufpreis Immobilie', B.eur(kpI), { art: 'summe' }],
+            ['Erwerbsnebenkosten (anteilig)', B.eur(ak - kpI)], ['Anschaffungskosten', B.eur(ak), { art: 'summe' }],
+            ['Anteil Grund und Boden (' + B.zahl(100 - pct, 2) + ' %)', B.eur(akG), { art: 'ein' }], ['Anteil Gebäude (' + B.zahl(pct, 2) + ' %) · AfA-Bemessungsgrundlage', B.eur(akB), { art: 'ende' }]])
+            + '<h3>Aufteilung des Kaufpreises für den Kaufvertrag</h3>' + B.liste([['Grund und Boden', B.eur(vBod)], ['Gebäude', B.eur(vGeb)], ['Kaufpreis Immobilie', B.eur(kpI), { art: 'ende' }]])
+            + '<div class="hinweis">Formulierungsvorschlag: „Vom Kaufpreis entfallen ' + B.eur(vGeb) + ' auf das Gebäude und ' + B.eur(vBod) + ' auf Grund und Boden' + (z.inventar ? '; ' + B.eur(z.inventar) + ' entfallen auf mitverkauftes Inventar' : '') + '.“ Die Aufteilung folgt der Arbeitshilfe des Bundesministeriums der Finanzen; keine Steuerberatung.</div>';
+        })()));
       return B.dokument('Kaufpreisaufteilung · ' + o.adresse, S);
     });
   }
