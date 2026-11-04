@@ -49,7 +49,10 @@ const ARTEN = {
   bank:       { objekt: true, name: 'Investment Case (Bankfassung)' },
   bank_kurz:  { objekt: true, name: 'Investment Case (Kurzfassung)' },
   bankexport: { objekt: false, name: 'Bankexport (alle Darlehen)' },
-  marktbericht: { objekt: false, bericht: true, name: 'Marktbericht' }
+  marktbericht: { objekt: false, bericht: true, name: 'Marktbericht' },
+  /* v3176 · Profi-Fassung: HTML aus der App (DpProfi.dokument), gedruckt von Chrome selbst.
+     report_id optional - ohne nimmt die App den neuesten Stufe-3-Bericht des Objekts. */
+  marktbericht_profi: { objekt: true, name: 'Marktbericht Profi' }
 };
 
 /* Was die App schreiben darf, waehrend wir sie fernsteuern. */
@@ -258,6 +261,21 @@ async function erzeugen(auftrag) {
       { timeout: 45000, polling: 250 });
     await page.waitForNetworkIdle({ idleTime: 700, timeout: 20000 }).catch(() => {});
     schritt('app bereit');
+
+    if (auftrag.art === 'marktbericht_profi') {
+      await page.waitForFunction(() => window.DpProfi && typeof window.DpProfi.dokument === 'function', { timeout: 20000, polling: 250 });
+      const dok = await page.evaluate(async (o, r) => {
+        try { return { html: await window.DpProfi.dokument(o, r) }; } catch (e) { return { fehler: (e && e.message) || String(e) }; }
+      }, String(auftrag.objekt_id), auftrag.report_id ? Number(auftrag.report_id) : null);
+      if (!dok || !dok.html) { const e = new Error((dok && dok.fehler) || 'Kein Dokument.'); e.status = 422; e.code = 'kein_bericht'; throw e; }
+      schritt('profi html ' + dok.html.length);
+      await page.setContent(dok.html, { waitUntil: 'networkidle0', timeout: 45000 });
+      await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
+      const pdf = Buffer.from(await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true }));
+      schritt('pdf da');
+      const titel = await page.title().catch(() => '');
+      return { pdf, dateiname: (titel || 'Marktbericht Profi').replace(/[^wäöüÄÖÜß .,-]+/g, ' ').replace(/s+/g, ' ').trim() + '.pdf' };
+    }
 
     /* Toasts mitschreiben: dort sagt die App, warum sie NICHT druckt
        (Plan-Sperre, fehlender Kaufpreis, Limit erreicht). */

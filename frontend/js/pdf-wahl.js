@@ -66,7 +66,11 @@
     { id: 'hell', titel: 'Investment-PDF · hell', unter: 'Volles Dokument, helles Deckblatt',
       fuer: 'Miteigentümer · Partner · Ausdruck', hell: true, art: 'voll' },
     { id: 'obsidian', titel: 'Investment-PDF · Obsidian', unter: 'Volles Dokument, dunkles Deckblatt',
-      fuer: 'Eigener Gebrauch · Präsentation', hell: false, art: 'voll' }
+      fuer: 'Eigener Gebrauch · Präsentation', hell: false, art: 'voll' },
+    /* v3176 · Marktbericht Profi (marktbericht-profi.js): Wertermittlung mit Herleitung,
+       Fotos, Karte, Energieskala - braucht einen Bericht der Stufe 3 */
+    { id: 'profi', titel: 'Marktbericht Profi', unter: 'Wertermittlung mit Herleitung, Fotos, Lage, Energieskala',
+      fuer: 'Eigentümer · Käufer · Bank', hell: true, art: 'profi' }
   ];
   function wahl(id) { return WAHLEN.filter(function (x) { return x.id === id; })[0] || null; }
 
@@ -143,6 +147,7 @@
     try {
       if (typeof window._dpPdfSetLight === 'function') window._dpPdfSetLight(w.hell);
       else window._dpPdfLight = w.hell;
+      if (w.art === 'profi') { if (window.DpProfi) return window.DpProfi.oeffnen(window._currentObjKey); return; }
       if (w.art === 'bank') { if (origBank) return origBank.call(window, { ohneRueckfrage: true }); }
       else if (w.art === 'kurz') { if (origBank) return origBank.call(window, { ohneRueckfrage: true, kurz: true }); }
       else { if (origVoll) return origVoll.call(window, { ohneRueckfrage: true }); }

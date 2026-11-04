@@ -23,7 +23,8 @@ const ARTEN = {
   bank:       { name: 'Investment Case (Bankfassung)', objekt: true },
   bank_kurz:  { name: 'Investment Case (Kurzfassung)', objekt: true },
   bankexport: { name: 'Bankexport (alle Darlehen)', objekt: false },
-  marktbericht: { name: 'Marktbericht', objekt: true, bericht: true }
+  marktbericht: { name: 'Marktbericht', objekt: true, bericht: true },
+  marktbericht_profi: { name: 'Marktbericht Profi', objekt: true }   /* v3176 · HTML/A4, report_id optional */
 };
 
 function verfuegbar() {
