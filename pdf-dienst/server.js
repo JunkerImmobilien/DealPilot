@@ -165,8 +165,13 @@ async function erzeugen(auftrag) {
       const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline' ${herkunft}; font-src ${herkunft} data:; img-src data: ${herkunft}; connect-src 'none'">`;
       const html = String(auftrag.html || '').replace(/<head>/i, '<head>' + csp);
       await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
-      await page.evaluate(() => Promise.race([document.fonts ? document.fonts.ready : null, new Promise((ok) => setTimeout(ok, 8000))])).catch(() => {});
-      schritt('html gesetzt');
+      /* Schriften ausdruecklich laden: fonts.ready kam frueher, als sie angefragt waren (font-display: swap) */
+      const schriften = await page.evaluate(() => Promise.race([
+        Promise.all(['400 12px Inter', '600 12px Inter', '600 12px "Space Grotesk"', '400 12px "JetBrains Mono"', '500 12px "JetBrains Mono"']
+          .map((f) => document.fonts.load(f).catch(() => null))).then(() => document.fonts.ready),
+        new Promise((ok) => setTimeout(ok, 8000))
+      ]).then(() => [].map.call(document.fonts, (f) => f.family.replace(/"/g, '') + ':' + f.status).filter((x, i, a) => a.indexOf(x) === i).join(','))).catch((e) => 'fehler ' + (e && e.message));
+      schritt('html gesetzt (' + String(schriften).slice(0, 160) + ')');
       const esc = (t) => String(t || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
       const f = Array.isArray(auftrag.fuss) ? auftrag.fuss : [];
       const pdf = Buffer.from(await page.pdf({
