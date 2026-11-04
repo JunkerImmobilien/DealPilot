@@ -47,7 +47,7 @@
   }
   function aktiv() { return design() === 'neu' && !!window.DpDokumente && !wasserzeichen(); }
   function hinweis(t) { try { if (typeof window.toast === 'function') window.toast(t); } catch (e) {} }
-  function basis() { return typeof window.getApiBase === 'function' ? window.getApiBase() : '/api/v1'; }
+  function basis() { try { if (window.Auth && typeof Auth.getApiBase === 'function') return Auth.getApiBase(); } catch (e) {} return typeof window.getApiBase === 'function' ? window.getApiBase() : '/api/v1'; }
   function istUuid(k) { return /^[0-9a-f-]{36}$/i.test(String(k || '')); }
 
   function herunterladen(blob, name) {
