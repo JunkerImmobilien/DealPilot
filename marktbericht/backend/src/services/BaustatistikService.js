@@ -121,13 +121,13 @@ export function genesisZeilen(txt, tabelle) {
   if (unbekannt.size) console.log('[baustatistik] Gebaeudeart nicht zugeordnet: ' + [...unbekannt].join(' | '));
   return out;
 }
-async function holeGenesis(tabelle) {
+async function holeGenesis(tabelle, jahrVon, jahrBis) {
   const tok = process.env.GENESIS_TOKEN || '';
   if (!tok) throw new Error('kein GENESIS_TOKEN');
   const base = process.env.GENESIS_BASE || 'https://genesis.destatis.de/genesisWS/rest/2020';
   const jahr = new Date().getFullYear();
   const body = new URLSearchParams({ name: tabelle, area: 'all', compress: 'false', format: 'ffcsv', language: 'de',
-    startyear: String(jahr - JAHRE), endyear: String(jahr) }).toString();
+    startyear: String(jahrVon || jahr - JAHRE), endyear: String(jahrBis || jahr) }).toString();
   const r = await fetch(base + '/data/tablefile', { method: 'POST', body,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', username: tok, password: process.env.GENESIS_PASSWORD || '' } });
   const buf = Buffer.from(await r.arrayBuffer());
@@ -163,7 +163,7 @@ async function auftrag(a, log) {
   const t0 = Date.now();
   try {
     let zeilen;
-    if (a.art === 'genesis') zeilen = genesisZeilen(await holeGenesis(a.tabelle), a.tabelle);
+    if (a.art === 'genesis') zeilen = genesisZeilen(await holeGenesis(a.tabelle, a.jahr, a.jahr), a.tabelle);
     else {
       const jahr = new Date().getFullYear();
       const txt = await D._fetchTableFfcsv(a.tabelle, null, jahr, a.filter, { timeoutMs: ZEIT_MS, startyear: jahr - JAHRE, endyear: jahr });
@@ -185,7 +185,9 @@ async function auftrag(a, log) {
 }
 export async function importiere({ log = console.log, nur = null } = {}) {
   if (!destatisEnabled()) throw new Error('kein DESTATIS_TOKEN');
-  const auftraege = [{ art: 'genesis', tabelle: '31111-0100' }, { art: 'genesis', tabelle: '31111-0001' }];
+  /* gemessen 04.11.2026: 31111-0100 ueber 6 Jahre ist „zu gross“ (Code 98), ein Jahr je Abruf geht */
+  const jetzt = new Date().getFullYear(), auftraege = [{ art: 'genesis', tabelle: '31111-0001' }];
+  for (let j = jetzt - JAHRE; j < jetzt; j++) auftraege.push   /* das laufende Jahr ist nie vollstaendig */({ art: 'genesis', tabelle: '31111-0100', jahr: j, filter: String(j) });
   for (const l of (nur || LAENDER)) {
     auftraege.push({ art: 'bau', tabelle: '31111-01-02-4', praefix: 'gen', filter: l + '*' });
     auftraege.push({ art: 'bau', tabelle: '31121-01-02-4', praefix: 'fert', filter: l + '*' });
