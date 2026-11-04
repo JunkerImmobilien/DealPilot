@@ -608,6 +608,13 @@
                fehler: bd.note || 'Der Bodenrichtwert liegt vor, wird aber nur gegen Gebühr herausgegeben.',
                link: (_blG && BORIS_URLS[_blG] ? BORIS_URLS[_blG] : BORIS_FALLBACK).url };
     }
+    /* v3165 · Bayern mit Schalter BORIS_BY_WERT=aus: der Wert LIEGT VOR, DealPilot übernimmt ihn nur nicht
+       automatisch (Nutzungsbedingungen, Backlog N109). Zone, Stichtag und Nutzung kommen als Weg mit. */
+    if (bd.reason === 'wert_selbst_eintragen' && !(bd.value_sqm > 0)) {
+      return { ok: false, grund: 'selbst', zone: (bd.weg && bd.weg.zone) || null, stichtag: (bd.weg && bd.weg.stichtag) || null,
+               fehler: bd.note || 'Bitte den Bodenrichtwert im Portal des Landes nachsehen und hier eintragen.',
+               link: bd.portal_url || BORIS_FALLBACK.url };
+    }
     /* v2592 · Ein Dienst, der NICHTS gesagt hat, ist kein „kein Wert".
        Bayern antwortete am 21.10.2026 mit HTTP 403 („aus sicherheits-
        technischen Gründen nicht verfügbar") - hier stand dann „Kein
@@ -718,6 +725,17 @@
     _setStatus('Bodenrichtwert wird abgerufen …', '');
     try {
       var r = await borisHolen({ plz: plz, ort: ort, str: str });
+      if (!r.ok && r.grund === 'selbst') {   /* v3165 */
+        var st3 = _el('brw-ai-status');
+        if (st3) {
+          st3.className = 'brw-ai-status';
+          st3.innerHTML = 'ⓘ ' + _escHtml(r.fehler) + ' '
+            + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Bodenrichtwert-Portal Bayern öffnen →</a>';
+        }
+        if (r.stichtag) { var _stE = _el('brw_stichtag'); if (_stE && !_stE.value && /^d{4}-d{2}-d{2}/.test(String(r.stichtag))) { _stE.value = String(r.stichtag).slice(0, 10); } }
+        if (typeof toast === 'function') toast('Bodenrichtwert bitte aus dem Portal eintragen – Zone und Stichtag stehen unter dem Feld');
+        return;
+      }
       if (!r.ok && r.grund === 'gebuehr') {
         /* v2370 · Hinweis unter dem Feld MIT Link zum Portal, nicht als Fehler. */
         var st = _el('brw-ai-status');
