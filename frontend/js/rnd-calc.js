@@ -1331,6 +1331,32 @@
       grundriss:  fallbackGrad
     };
 
+    /* v3174 · BEFUND PARKSTR. 9 (Portfolio-Modul, 04.11.2026): Heizung und Leitungen „veraltet“ aus Energieklasse G,
+       obwohl `mod_heizung`/`mod_leitungen` „< 5 Jahre“ sagten - technische RND 18,4 statt 32 (Punkteverfahren).
+       Die Modernisierungsjahre sind eine Aussage zum ZUSTAND des Gewerks und gehen deshalb VOR den Rückschluss aus
+       der Energieklasse und vor die Mehrheit: < 5 und 5–10 Jahre -> mindestens „erneuert“, 10–20 Jahre -> mindestens
+       „standard“. Sie heben nur an, nie ab (eine gehobene Stufe aus ausst_* bleibt). */
+    (function () {
+      var rang = { veraltet: 0, standard: 1, erneuert: 2, gehoben: 3 };
+      var ausMod = function (z) {
+        z = String(z || '');
+        if (z.indexOf('< 5') >= 0 || /kernsanier/i.test(z) || z.indexOf('5 - 10') >= 0 || z.indexOf('5-10') >= 0) return 'erneuert';
+        if (z.indexOf('10 - 20') >= 0 || z.indexOf('10-20') >= 0) return 'standard';
+        return null;
+      };
+      var ziel = { dach: ['dach'], fenster: ['fenster'], leitungen: ['leitungen', 'technik'], heizung: ['heizung'],
+        aussenwand: ['aussenwand'], baeder: ['baeder'], innenausbau: ['decken', 'innenwaende', 'fussboeden'] };
+      var quelle = { dach: d.mod_dach, fenster: d.mod_fenster, leitungen: d.mod_leitungen, heizung: d.mod_heizung,
+        aussenwand: d.mod_aussenwand, baeder: d.mod_baeder, innenausbau: d.mod_innenausbau };
+      Object.keys(ziel).forEach(function (k) {
+        var g = ausMod(quelle[k]); if (!g) return;
+        ziel[k].forEach(function (gw) {
+          var ist = gewerkeBewertung[gw];
+          if (!ist || (rang[ist] != null && rang[ist] < rang[g])) gewerkeBewertung[gw] = g;
+        });
+      });
+    })();
+
     // Energetisch kritisch?
     const schaeden = [];
     const energie = String(d.ds2_energie || '').toUpperCase();
