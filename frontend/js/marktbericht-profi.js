@@ -546,9 +546,11 @@
     teile.push(seite(d, 'Lage', '<div class="eyebrow">Abschnitt 2</div><h2>Lage</h2>'
       + '<p class="sub">' + esc([r.ortsteil, r.gemeinde].filter(Boolean).join(', ')) + (p.assessment ? ' · Mikrolage ' + esc(p.assessment.mikrolage || '–') + ', Makrolage ' + esc(p.assessment.makrolage || '–') : '') + '</p>'
       + '<div class="zwei">' + (d.karteNah ? '<img class="karte" src="' + d.karteNah + '" alt="Karte Umgebung">' : '') + (d.karteFern ? '<img class="karte" src="' + d.karteFern + '" alt="Karte Region">' : '') + '</div>'
-      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro) + bewertung(p.assessment)
-      + (makro ? '<h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>' : '')
-      + (z.available ? '<p class="det" style="margin-top:3mm">Zensus 2022 (' + esc((z.gemeinde && z.gemeinde.name) || z.kreis_name || '') + '): Leerstandsquote ' + zahl(z.leerstandsquote, 1) + ' %, Eigentümerquote ' + zahl(z.eigentuemerquote, 1) + ' %.</p>' : '')));
+      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro)));
+    /* v3178c · Region und Bewertung gehoeren zur Seite Markt & Region (sonst lief Lage ueber) */
+    var regionHtml = bewertung(p.assessment)
+      + (makro ? '<div class="block"><h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>'
+      + (z.available ? '<p class="det" style="margin-top:2mm">Zensus 2022 (' + esc((z.gemeinde && z.gemeinde.name) || z.kreis_name || '') + '): Leerstandsquote ' + zahl(z.leerstandsquote, 1) + ' %, Eigentümerquote ' + zahl(z.eigentuemerquote, 1) + ' %.</p>' : '') + '</div>' : '');
 
     /* 5 · Markt */
     var s = p.sale || {}, m = p.rent || {};
@@ -557,7 +559,7 @@
       + (istZahl(m.median_per_sqm) ? '<tr><td>Mieten €/m²</td><td class="r num">' + zahl(m.q25_per_sqm, 2) + '</td><td class="r num">' + zahl(m.median_per_sqm, 2) + '</td><td class="r num">' + zahl(m.q75_per_sqm, 2) + '</td><td class="r num">' + zahl(m.sample_size, 0) + '</td></tr>' : '')
       + '</tbody></table>';
     var mv = (p.valuation && p.valuation.market_value) || {};
-    teile.push(seite(d, 'Markt', '<div class="eyebrow">Abschnitt 3</div><h2>Markt</h2>'
+    teile.push(seite(d, 'Markt und Region', '<div class="eyebrow">Abschnitt 3</div><h2>Markt und Region</h2>'
       + '<p class="sub">Aktueller Marktdurchschnitt vergleichbarer Angebote im Umkreis von ' + zahl((s.used_radius_m || 0) / 1000, 0) + ' km. Angebotspreise sind keine Kaufpreise; sie werden um den Angebotsabschlag bereinigt.</p>'
       + markt
       + '<div class="kv" style="margin-top:4mm">'
@@ -566,8 +568,9 @@
       + '<div><span>Vermarktungsdauer</span><span class="num">' + (p.market_dynamics && istZahl(p.market_dynamics.days_on_market) ? zahl(p.market_dynamics.days_on_market, 0) + ' Tage' : '–') + '</span></div>'
       + '<div><span>Marktpreisindikation</span><span class="num">' + eur(mv.estimated) + (istZahl(mv.low) ? ' (' + eur(mv.low) + ' – ' + eur(mv.high) + ')' : '') + '</span></div></div>'
       + ((p.valuation && p.valuation.notes || []).length ? '<p class="det" style="margin-top:3mm">' + esc(p.valuation.notes.join(' ')) + '</p>' : '')
-      + kennzahlen(p, r) + marktentwicklung(p.market_history)
-      + vergleichsangebote(p)));
+      + kennzahlen(p, r) + marktentwicklung(p.market_history) + regionHtml));
+    var vgl = vergleichsangebote(p);
+    if (vgl) teile.push(seite(d, 'Vergleichsangebote', '<div class="eyebrow">Abschnitt 3 · Fortsetzung</div><h2>Vergleichsangebote</h2><p class="sub">Vergleichbare Angebote im Umkreis, nach Entfernung.</p>' + vgl.replace(/^<h3>[^<]*<\/h3>/, '')));
 
     /* 6 · Bodenwert + Sachwert */
     var bw = c.bodenwert || {}, sw = c.sachwert || {}, lv = p.land_value || {};
