@@ -43,6 +43,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - Danach: als Stufe-3-PDF-Variante „Profi“ bauen (Abschnitte Ergebnis, Angaben/Annahmen, Bodenwert+Sachwert, Vergleichswert, Ertragswert, Quellen), Daten aus cross_check, jede Zeile mit Fundstelle.
 - Mitnehmen aus IWA: Vollständigkeitsprüfung vor dem PDF, „Link teilen“, Kontaktkarte/nächste Schritte als abschaltbarer Makler-Teil.
 
+### N125 · Kaufpreisaufteilung: mehrere Flurstücke, Nebengebäude, Leerstand
+Sonderfall vom 04.11.2026 (leerstehendes ZFH mit Scheune, drei Flurstücke). Das BMF-Modul kennt ein Gebäude und eine Bodenfläche. Fehlt: Flurstücke mit eigenem Bodenansatz (Bauland/Hinterland/Grün), ein zweites Gebäude mit eigener NHK/GND/RND, ein Schalter „leerstehend“ (dann kein Ertragswert-Weg). Mittlere Priorität — selten, aber dann steuerlich viel Geld (AfA-Basis). Hinterland gibt es im Marktbericht schon (Bodenwert 950 × 90 + 828 × 5).
+
 ### N124 · Gewerbeobjekt mit Wohnanteil ohne Miete rechnet keinen Ertragswert
 - Ibbenbüren (GESCH, 402 m² Wohnen ohne Ist-Miete): Bericht 547 empfiehlt „Objektart MFH wählen“. Besser: Wohnteil mit Marktmiete ansetzen und kennzeichnen oder die Aufteilung im Objekt abfragen. Entscheidung Marcel.
 
