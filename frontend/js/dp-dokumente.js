@@ -36,15 +36,33 @@
       wfl: zahlAus('wfl'), bj: zahlAus('baujahr'), gs: zahlAus('gsfl'), seq: (window.State && State._obj_seq) || feld('_obj_seq') || '' };
   }
   function api(p) { return window.Auth.apiCall(p); }
-  function fotosFuer(key) { if (!key) return Promise.resolve([]); return api('/objects/' + encodeURIComponent(key)).then(function (o) { return (o && o.photos) || []; }).catch(function () { return []; }); }
+  /* Objektinfo: Fotos, Nummer; ohne Foto die Lagekarte aus dem neuesten Marktbericht (das Objekt selbst fuehrt keine Koordinaten) */
+  function objektInfo(key) {
+    if (!key) return Promise.resolve({ fotos: [], seq: '', kuerzel: '', karte: null });
+    return api('/objects/' + encodeURIComponent(key)).then(function (o) {
+      var info = { fotos: (o && o.photos) || [], seq: (o && o.data && o.data._obj_seq) || '', kuerzel: (o && o.kuerzel) || '', karte: null };
+      if (info.fotos.length) return info;
+      return api('/marktbericht/objects/history?ref=' + encodeURIComponent(key)).then(function (h) {
+        var r = ((h && h.history) || [])[0]; if (!r) return info;
+        return api('/marktbericht/reports/one?id=' + r.report_id).then(function (rep) {
+          var ref = ((rep && (rep.data || rep.payload)) || {}).ref || {};
+          return D().karte(ref.lat, ref.lon, 16, 1400, 700).then(function (k) { info.karte = k; return info; });
+        });
+      }).catch(function () { return info; });
+    }).catch(function () { return { fotos: [], seq: '', kuerzel: '', karte: null }; });
+  }
+  function fotosFuer(key) { return objektInfo(key).then(function (i) { return i.fotos; }); }
   function basis(dokName) {
     var B = D(), m = B.marke();
     return B.logo(m).then(function (l) { return { marke: m, logo: l, dokument: dokName, stand: B.datum(new Date()) }; });
   }
-  /* Kaufnebenkosten wie im bisherigen PDF: Kaufpreis × Satz */
+  /* Kaufnebenkosten aus dem Kern (DealKpis.nebenkosten): Grunderwerbsteuer ohne Inventar/Moeblierung.
+     v3179 · Erster Entwurf rechnete Kaufpreis × Satz selbst - GrESt 35.425 statt 34.970 €. */
   function nebenkosten(kp) {
-    var s = [['Makler', 'makler_p'], ['Notar', 'notar_p'], ['Grundbuchamt', 'gba_p'], ['Grunderwerbsteuer', 'gest_p'], ['Vermittlung / Beratung', 'ji_p']];
-    return s.map(function (x) { var p = zahlAus(x[1]); return p ? { name: x[0], pct: p, eur: kp * p / 100 } : null; }).filter(Boolean);
+    var e = { kp: kp, inventar: zahlAus('moebl') || 0, makler_p: zahlAus('makler_p'), notar_p: zahlAus('notar_p'), gba_p: zahlAus('gba_p'), gest_p: zahlAus('gest_p'), ji_p: zahlAus('ji_p') };
+    var r = (window.DealKpis && DealKpis.nebenkosten) ? DealKpis.nebenkosten(e) : {};
+    return [['Makler', 'makler', 'makler_p'], ['Notar', 'notar', 'notar_p'], ['Grundbuchamt', 'gba', 'gba_p'], ['Grunderwerbsteuer', 'grest', 'gest_p'], ['Vermittlung / Beratung', 'ji', 'ji_p']]
+      .map(function (x) { return r[x[1]] ? { name: x[0], pct: e[x[2]], eur: r[x[1]] } : null; }).filter(Boolean);
   }
   function darlehen() {
     var l = [], d1 = zahlAus('d1');
@@ -118,7 +136,7 @@
     var sp = function (k, t, cls, w) {
       return '<div class="phase ' + cls + '"><h4>' + t + '</h4><table><tbody>'
         + [['Kaltmiete / Jahr', B.eur(w.nkm)], ['− Bewirtschaftung', B.eur(w.bwk)], ['− Zinsen', B.eur(w.zins)], ['− Tilgung', B.eur(w.tilg)],
-          ['= CF vor Steuern', B.eurS(w.cfop)], ['± Steuern', B.eurS(w.st)], ['= CF nach Steuern', B.eurS(w.cfns)], ['= je Monat', B.eurS(w.cfns / 12)]]
+          ['= CF v. St.', B.eurS(w.cfop)], ['± Steuern', B.eurS(w.st)], ['= CF n. St.', B.eurS(w.cfns)], ['= je Monat', B.eurS(w.cfns / 12)]]
           .map(function (z, i) { return '<tr' + (i >= 4 && i !== 5 ? ' class="summe"' : '') + '><td>' + z[0] + '</td><td class="r num">' + z[1] + '</td></tr>'; }).join('')
         + '</tbody></table></div>';
     };
@@ -152,13 +170,13 @@
       { name: 'Restschuld', klasse: 'l2', werte: r.map(function (z) { return { x: z.cal, y: z.rs }; }) }
     ], { flaeche: [0, 1], titel: 'Vermögensaufbau' });
     var wf = B.wasserfall([
-      { name: 'Tilgung', wert: vz.tilgung_kum, klasse: 'b1' }, { name: 'CF-Überschuss', wert: vz.cf_ueberschuss, klasse: 'b2' },
+      { name: 'Tilgung', wert: vz.tilgung_kum, klasse: 'b1' }, { name: 'CF-Überschuss', wert: vz.cf_ueberschuss_konto, klasse: 'b2' },
       { name: 'Steuervorteil', wert: vz.steuervorteil, klasse: 'b2' }, { name: 'Wertsteigerung', wert: vz.wertsteig_kum, klasse: 'b2' }
     ], 'Zuwachs');
     var letzt = r[r.length - 1] || {};
     return '<div class="block"><h3>Vermögensaufbau über ' + r.length + ' Jahre</h3><p class="sub">Die Fläche zwischen Immobilienwert und Restschuld ist das aufgebaute Eigenkapital: im letzten Jahr ' + B.eur(letzt.eq_y) + '.</p>' + lin + '</div>'
       + '<div class="block"><h3>Vermögenszuwachs</h3>' + wf
-      + B.kacheln([{ l: 'Eingesetztes Eigenkapital', v: B.eur(K.ek) }, { l: 'Vermögenszuwachs', v: B.eurS(vz.verm_zuwachs), art: 'gut' }, { l: 'Equity Multiple', v: B.zahl(vz.em || K.em, 1) + 'x', art: 'hi' }], true) + '</div>';
+      + B.kacheln([{ l: 'Eingesetztes Eigenkapital', v: B.eur(K.ek) }, { l: 'Vermögenszuwachs', v: B.eurS(vz.verm_zuwachs), art: 'gut' }, { l: 'Equity Multiple', v: B.zahl(K.em, 1) + 'x', art: 'hi' }], true) + '</div>';
   }
   function annahmen(K, B) {
     return '<div class="block"><h3>Annahmen</h3>' + B.liste([
@@ -173,10 +191,10 @@
     var kurz = art === 'kurz', bank = art === 'bank';
     var name = kurz ? 'Investment Case · Kurzfassung' : bank ? 'Investment Case · Bankfassung' : 'Investment Case';
     var sc = (window._dpPdfScore && _dpPdfScore(K)) || {};
-    return Promise.all([basis(name), fotosFuer(key)]).then(function (z) {
-      var c = z[0], fotos = z[1]; c.zeile = o.adresse;
+    return Promise.all([basis(name), objektInfo(key)]).then(function (z) {
+      var c = z[0], info = z[1], fotos = info.fotos; c.zeile = o.adresse; o.seq = info.seq || o.seq;
       var S = [];
-      S.push(B.deckblatt(c, { bild: fotos[0] || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : ''].filter(Boolean).join(' · '),
+      S.push(B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : ''].filter(Boolean).join(' · '),
         kz: [{ l: 'Kaufpreis', v: B.eur(K.kp) }, { l: 'Gesamtinvestition', v: B.eur(K.gi) }, { l: 'Eigenkapital', v: B.eur(K.ek) }, { l: 'Bruttomietrendite', v: B.pct(K.bmy, 2), art: 'hi' }],
         meta: [['Objekt-Nr.', o.seq || '–'], ['Stand', c.stand], ['Deal Score', sc.score != null ? B.zahl(sc.score, 0) + ' · ' + (sc.label || '') : '–']],
         zitat: feld('thesis') || '', hinweisRechts: bank ? 'Finanzierungsunterlage' : 'Vertraulich' }));
