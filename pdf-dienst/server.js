@@ -277,10 +277,21 @@ async function erzeugen(auftrag) {
           .then(() => document.fonts && document.fonts.ready),
         new Promise((ok) => setTimeout(ok, 15000))
       ])).catch(() => {});
-      const pdf = Buffer.from(await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true }));
+      /* Fusszeile mit Seitenzahl im Seitenrand (Chrome-Vorlage); die Fusszeilen im Fliesstext
+         braucht es dann nicht - sie stehen nur fuer das Drucken aus dem Browser da. */
+      const fussText = await page.evaluate(() => { const e = document.querySelector('.fuss'); return e ? [].map.call(e.children, (x) => x.textContent).join('|') : ''; }).catch(() => '');
+      await page.addStyleTag({ content: '.fuss{display:none}' }).catch(() => {});
+      const teile = String(fussText || '').split('|');
+      const esc = (t) => String(t || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+      const pdf = Buffer.from(await page.pdf({
+        format: 'A4', printBackground: true, preferCSSPageSize: true, displayHeaderFooter: true,
+        headerTemplate: '<span></span>',
+        footerTemplate: '<div style="width:100%;margin:0 17mm;padding-top:2mm;border-top:0.2mm solid #E3E1DA;display:flex;justify-content:space-between;font-family:Inter,Arial,sans-serif;font-size:7px;color:#5F5E66">'
+          + '<span>' + esc(teile[0]) + '</span><span>' + esc(teile[1]) + ' · Seite <span class="pageNumber"></span> von <span class="totalPages"></span></span></div>'
+      }));
       schritt('pdf da');
       const titel = await page.title().catch(() => '');
-      return { pdf, dateiname: (titel || 'Marktbericht Profi').replace(/[^wäöüÄÖÜß .,-]+/g, ' ').replace(/s+/g, ' ').trim() + '.pdf' };
+      return { pdf, dateiname: (titel || 'Marktbericht Profi').replace(/[^\wäöüÄÖÜß .,-]+/g, ' ').replace(/\s+/g, ' ').trim() + '.pdf' };
     }
 
     /* Toasts mitschreiben: dort sagt die App, warum sie NICHT druckt

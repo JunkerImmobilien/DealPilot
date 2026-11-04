@@ -226,12 +226,12 @@
 
   /* ── das Dokument ─────────────────────────────────────────────────── */
   var CSS = [
-    '@page{size:A4;margin:0}',
+    '@page{size:A4;margin:13mm 0 17mm}@page:first{margin:0}',
     ':root{--ink:#16161A;--muted:#5F5E66;--line:#E3E1DA;--soft:#F5F3EE;--gold:#B8932F;--gold-l:#F6EFDC;--obs:#0B0B0D}',
     '*{box-sizing:border-box}html,body{margin:0;background:#fff;color:var(--ink)}',
     'body{font:9.6pt/1.5 Inter,system-ui,"Segoe UI",sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
-    '.seite{width:210mm;min-height:297mm;padding:16mm 17mm 20mm;position:relative;page-break-after:always;break-after:page}',
-    '.seite:last-child{page-break-after:auto;break-after:auto}',
+    '.seite{width:210mm;padding:3mm 17mm 0;page-break-before:always;break-before:page}',
+    '.seite.deck{page-break-before:auto;break-before:auto}',
     '.num{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}',
     'h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;font-weight:600;margin:0;letter-spacing:-.01em}',
     'h2{font-size:17pt;margin-bottom:2mm}h3{font-size:11pt;margin:6mm 0 2.5mm}',
@@ -240,9 +240,10 @@
     '.eyebrow{font:7.5pt/1 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2mm}',
     '.sub{color:var(--muted);margin:0 0 5mm}',
     'p{margin:0 0 2.5mm}',
-    '.fuss{position:absolute;left:17mm;right:17mm;bottom:9mm;display:flex;justify-content:space-between;font:7pt/1.3 Inter,sans-serif;color:var(--muted);border-top:.2mm solid var(--line);padding-top:2mm}',
+    '.fuss{margin-top:8mm;display:flex;justify-content:space-between;gap:6mm;font:7pt/1.3 Inter,sans-serif;color:var(--muted);border-top:.2mm solid var(--line);padding-top:2mm;break-inside:avoid}',
+    'td.num,.r.num{white-space:nowrap}',
     /* Deckblatt */
-    '.deck{padding:0;display:flex;flex-direction:column}',
+    '.deck{padding:0;display:flex;flex-direction:column;height:297mm;overflow:hidden}',
     '.deck .bild{height:128mm;background:var(--soft) center/cover no-repeat;position:relative}',
     '.deck .bild .logo{position:absolute;top:12mm;left:17mm;background:#fff;padding:3mm 4mm;border-radius:1.5mm}',
     '.deck .bild .logo img{height:11mm;width:auto;display:block}',
@@ -269,7 +270,7 @@
     'th{font:6.8pt/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:1.8mm 2mm;border-bottom:.3mm solid var(--ink)}',
     'td{padding:1.8mm 2mm;border-bottom:.2mm solid var(--line);vertical-align:top}',
     '.r{text-align:right}td.op{width:5mm;color:var(--muted);font-family:"JetBrains Mono",monospace}',
-    'td.q{color:var(--muted);font-size:7.6pt;width:34%}.det{color:var(--muted);font-size:7.6pt;margin-top:.6mm}',
+    'td.q{color:var(--muted);font-size:7.6pt;width:34%}.det{color:var(--muted);font-size:7.6pt;margin-top:.6mm;font-weight:400}',
     'tr.summe td{font-weight:600;border-bottom:.3mm solid var(--ink)}tr.ende td{font-weight:600;background:var(--gold-l);border-bottom:0}',
     '.kv{display:grid;grid-template-columns:1fr 1fr;gap:0 9mm}.kv div{display:flex;justify-content:space-between;gap:4mm;border-bottom:.2mm solid var(--line);padding:1.8mm 0}',
     '.kv span:first-child{color:var(--muted)}',
@@ -308,7 +309,7 @@
     var p = d.p, r = p.ref || {}, c = p.cross_check || {};
     var od = (d.obj && d.obj.data) || {};
     var v = verfahren(p);
-    var stichtag = p.wertermittlungsstichtag || d.erstellt;
+    var stichtag = (p.wertermittlungsstichtag && typeof p.wertermittlungsstichtag === 'object' ? p.wertermittlungsstichtag.datum : p.wertermittlungsstichtag) || (p.ref && p.ref.wertermittlungsstichtag) || d.erstellt;
     var titelbild = d.fotos[0] || d.karteNah || '';
     var ergebnis = v.fuehrend ? v.fuehrend.wert : null;
     var art = OBJART[String(od.objart || r.property_type || '').toLowerCase()] || OBJART[String(r.property_type || '').toLowerCase()] || (od.objart || r.property_type || 'Immobilie');
@@ -340,8 +341,7 @@
     teile.push(seite(d, 'Ergebnis', '<div class="eyebrow">Ergebnis</div><h2>Marktwert-Indikation ' + eur(ergebnis) + '</h2>'
       + '<p class="sub">' + esc(v.grund) + (v.grundQuelle ? ' (' + esc(v.grundQuelle) + ')' : '') + '</p>'
       + spanneSvg(v.liste, r.purchase_price) + '<div class="verf">' + kacheln + '</div>'
-      + (d.md ? '<h3>Einschätzung</h3>' + zusammenfassung(d.md) : '')
-      + ((c.notes || []).length ? '<h3>Hinweise zur Rechnung</h3>' + c.notes.slice(0, 4).map(function (n) { return '<p class="det" style="font-size:8pt">' + esc(n) + '</p>'; }).join('') : '')));
+      + (d.md ? '<h3>Einschätzung</h3>' + zusammenfassung(d.md) : '')));
 
     /* 3 · Objekt */
     var kv = [
@@ -410,7 +410,7 @@
         + (bwRows.length ? '<h3>Bodenwert</h3>' + staffelTabelle(bwRows, bwQ) : '')
         + (istZahl(sw.value_eur) ? '<h3>Sachwert</h3>' + staffelTabelle(sw.staffel, swQ)
           + (sw.restnutzungsdauer_herkunft && sw.restnutzungsdauer_herkunft.hinweis ? '<p class="det">' + esc(sw.restnutzungsdauer_herkunft.hinweis) + '</p>' : '')
-          + (sw.sachwertfaktor ? '<div class="hinweis">Der Sachwertfaktor stammt vom ' + esc(sw.sachwertfaktor_ausschuss || 'zuständigen Gutachterausschuss') + ' und ist nach demselben Modell abgeleitet, in dem hier gerechnet wird (NHK 2010, lineare Alterswertminderung, § 10 ImmoWertV).</div>'
+          + (sw.sachwertfaktor ? '<div class="hinweis">Sachwertfaktor: ' + esc(sw.sachwertfaktor_ausschuss || 'zuständiger Gutachterausschuss') + '. Er ist nach demselben Modell abgeleitet, in dem hier gerechnet wird (NHK 2010, lineare Alterswertminderung, § 10 ImmoWertV).</div>'
             : '<div class="hinweis">Für diesen Ort liegt kein Sachwertfaktor vor. Ausgewiesen ist der vorläufige Sachwert ohne Marktanpassung; er ist eine Herstellungskostenrechnung, kein Marktwert.</div>') : '')));
     }
 
@@ -475,6 +475,7 @@
     var uniq = q.filter(function (x, i) { return x && q.indexOf(x) === i; });
     teile.push(seite(d, 'Quellen', '<div class="eyebrow">Anhang</div><h2>Quellen und Grundlagen</h2>'
       + '<ol class="quellen">' + uniq.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>'
+      + ((c.notes || []).length ? '<h3>Hinweise zur Rechnung</h3>' + c.notes.map(function (n) { return '<p class="det" style="font-size:7.8pt">' + esc(n) + '</p>'; }).join('') : '')
       + '<h3>Zu diesem Bericht</h3><p>Die Wertermittlung folgt der Immobilienwertermittlungsverordnung 2021. Sie ist indikativ und ersetzt kein Verkehrswertgutachten nach § 194 BauGB. Grundlage sind die Angaben zum Objekt; eine Besichtigung hat nicht stattgefunden. Jede Zahl stammt aus einer genannten Quelle oder ist als Annahme gekennzeichnet.</p>'
       + '<p class="det">Erstellt am ' + esc(datum(d.erstellt || new Date())) + ' mit DealPilot · Fassung ' + VERSION + '</p>'));
 
