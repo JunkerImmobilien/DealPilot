@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ImmoMetrica-Test</title>
+<meta name="robots" content="noindex">
+<style>
+/* v3171 · Testseite gegen das LIVE-Konto (Marcel 04.11.2026): Suchen anlegen/loeschen, Treffer, Kontingent,
+   Aenderungen seit dem letzten Abruf, Anfrage vorbereiten. Nur fuer Staging-Tests, nicht verlinkt. */
+:root{--bg:#FDFCFA;--karte:#fff;--fg:#1d1b19;--mut:#6b6660;--linie:#e8e1d2;--gold:var(--wl-c9a84c,#C9A84C);--gold-text:#8a6d1f;--gruen:#2a7a4d;--rot:#9a4a44;--obs:#050505}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0a09;--karte:#141311;--fg:#f1ede5;--mut:#a49d92;--linie:#2c2822;--gold-text:#E8CC7A;--gruen:#6cc794;--rot:#e0948d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 Inter,system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:14px}
+h1{font:700 22px "Space Grotesk",system-ui,sans-serif;margin:0}
+h2{font:600 16px "Space Grotesk",system-ui,sans-serif;margin:0 0 8px}
+.box{background:var(--karte);border:1px solid var(--linie);border-radius:12px;padding:14px}
+.zeile{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.k{font-size:12px;color:var(--mut)}
+input,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--linie);border-radius:8px;padding:6px 8px;min-width:0}
+button{font:inherit;cursor:pointer;border:1px solid var(--linie);background:var(--karte);color:inherit;border-radius:8px;padding:6px 12px}
+button.haupt{background:var(--gold);border-color:var(--gold);color:#050505;font-weight:600}
+button:disabled{opacity:.5;cursor:not-allowed}
+.felder{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.felder label{display:grid;gap:3px;font-size:12px;color:var(--mut)}
+.such{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--linie)}
+.such b{flex:1 1 220px}
+.tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--linie)}
+.tr .p{text-align:right;font-weight:600;white-space:nowrap}
+.tr .l{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.tr a{color:var(--gold-text)}
+.pill{font:600 11px ui-monospace,monospace;border:1px solid var(--linie);border-radius:999px;padding:2px 7px}
+.ok{color:var(--gruen)} .err{color:var(--rot)}
+pre{white-space:pre-wrap;background:var(--bg);border:1px solid var(--linie);border-radius:8px;padding:10px;margin:8px 0 0;font:13px/1.5 Inter,system-ui,sans-serif}
+#meldung{min-height:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div><h1>ImmoMetrica · Test mit dem Live-Konto</h1>
+    <div class="k">Staging-Testseite. Jeder Treffer, der zum ersten Mal in diesem Monat kommt, zählt aufs Kontingent (Blättern, Filtern, Suchliste nicht).</div></div>
+  <div class="box"><div class="zeile"><b>Kontingent:</b> <span id="kont" class="k">noch kein Abruf</span></div><div id="meldung" class="k"></div></div>
+
+  <div class="box">
+    <h2>Neue Suche aus DealPilot anlegen</h2>
+    <div class="felder">
+      <label>Name<input id="n" value="DealPilot · ETW Bad Oeynhausen"></label>
+      <label>Objektart<select id="t"><option value="apartmentbuy">Wohnung kaufen</option><option value="housebuy">Haus kaufen</option><option value="apartmentrent">Wohnung mieten</option><option value="houserent">Haus mieten</option></select></label>
+      <label>Postleitzahlen (Komma)<input id="plz" value="32545, 32547, 32549"></label>
+      <label>Kaufpreis von<input id="pmin" type="number" value="50000"></label>
+      <label>Kaufpreis bis<input id="pmax" type="number" value="250000"></label>
+      <label>Wohnfläche ab (m²)<input id="fmin" type="number"></label>
+      <label>Baujahr ab<input id="bmin" type="number"></label>
+    </div>
+    <div class="zeile" style="margin-top:10px"><button class="haupt" id="anlegen">Suche anlegen</button><span class="k">ImmoMetrica verschickt für per Schnittstelle angelegte Suchen keine E-Mails.</span></div>
+  </div>
+
+  <div class="box"><h2>Meine Suchen</h2><div id="suchen" class="k">lädt …</div></div>
+
+  <div class="box"><h2 id="tr-titel">Treffer</h2>
+    <div class="zeile" id="tr-knoepfe" hidden>
+      <button id="seite1">Erste Seite laden (bis 50)</button>
+      <button id="neu">Nur neue seit dem letzten Abruf</button>
+      <span class="k" id="tr-stand"></span>
+    </div>
+    <div id="treffer"></div>
+  </div>
+
+  <div class="box" id="anfrage-box" hidden><h2>Anfrage vorbereiten</h2>
+    <div class="k">Die Treffer enthalten keine Kontaktdaten. Der Text wird kopiert, das Inserat öffnet sich, dort ins Kontaktformular einfügen.</div>
+    <pre id="anfrage"></pre>
+    <div class="zeile" style="margin-top:8px"><button class="haupt" id="kopieren">Text kopieren und Inserat öffnen</button></div>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  var API = '/api/v1/immometrica';
+  var TOKEN = null; try { TOKEN = localStorage.getItem('ji_token'); } catch (e) {}
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var eur = function (v) { return v == null ? '–' : Math.round(v).toLocaleString('de-DE') + ' €'; };
+  var st = { suche: null, maxId: null, letzte: null, scharf: null, wahl: null };
+  function meld(t, ok) { $('meldung').innerHTML = '<span class="' + (ok ? 'ok' : 'err') + '">' + esc(t) + '</span>'; }
+  async function api(pfad, opt) {
+    opt = opt || {};
+    var r = await fetch(API + pfad, { method: opt.method || 'GET', headers: Object.assign({ Authorization: 'Bearer ' + TOKEN }, opt.body ? { 'Content-Type': 'application/json' } : {}), body: opt.body ? JSON.stringify(opt.body) : undefined });
+    var j = null; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) throw new Error((j && (j.detail || j.error)) || ('Fehler ' + r.status));
+    return j;
+  }
+  function kont(k) { if (!k) return; $('kont').innerHTML = '<b>' + k.genutzt + '</b> von ' + k.limit + ' Objekten in diesem Monat' + (k.verborgen > 0 ? ' · <span class="err">' + k.verborgen + ' wegen des Limits ausgelassen – Limit im ImmoMetrica-Profil anheben</span>' : ''); }
+  async function suchenLaden() {
+    try {
+      var l = await api('/searches');
+      $('suchen').innerHTML = l.length ? l.map(function (s) {
+        var scharf = st.scharf === s.id;
+        return '<div class="such"><b>' + esc(s.name) + '</b><span class="pill">ID ' + esc(s.id) + '</span>'
+          + '<button data-zeig="' + esc(s.id) + '" data-name="' + esc(s.name) + '">Treffer</button>'
+          + '<button data-loesch="' + esc(s.id) + '">' + (scharf ? 'Wirklich löschen?' : 'Löschen') + '</button></div>';
+      }).join('') : 'Keine Suchen.';
+    } catch (e) { $('suchen').textContent = e.message; }
+  }
+  function zeile(it) {
+    var r = it.raw, links = (r.platforms || []).filter(function (p) { return p.url; });
+    var rendite = r.buying_price && (r.rent_cold || r.buy_rent_cold) ? ((r.rent_cold || r.buy_rent_cold) * 12 / r.buying_price * 100) : null;
+    return '<div class="tr"><div><b>' + esc(r.title || 'ohne Titel') + '</b><div class="k">' + esc(r.address_zipcode || '') + ' · ' + (r.living_space ? Math.round(r.living_space) + ' m²' : '–')
+      + (r.rooms ? ' · ' + r.rooms + ' Zi.' : '') + (r.construction_year ? ' · Bj. ' + r.construction_year : '') + (r.rented_out ? ' · vermietet' : '')
+      + (rendite ? ' · Bruttorendite ' + rendite.toFixed(1).replace('.', ',') + ' %' : '') + ' · online seit ' + esc(String(r.online_since || '').slice(0, 10)) + '</div></div>'
+      + '<div class="p">' + eur(r.buying_price) + '<div class="k">' + (r.buying_price_per_sqm ? eur(r.buying_price_per_sqm) + '/m²' : '') + '</div></div>'
+      + '<div class="l">' + links.map(function (p) { return '<a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.platform) + '</a>'; }).join(' · ')
+      + ' <button data-anfrage="' + esc(r.id) + '">Anfrage vorbereiten</button></div></div>';
+  }
+  var _items = {};
+  function zeigen(items, titel) {
+    items.forEach(function (it) { _items[it.raw.id] = it; if (st.maxId == null || it.raw.id > st.maxId) st.maxId = it.raw.id; });
+    $('treffer').innerHTML = items.length ? items.map(zeile).join('') : '<div class="k">Keine Treffer.</div>';
+    $('tr-stand').textContent = titel;
+  }
+  async function seite1() {
+    try {
+      var j = await api('/searches/' + encodeURIComponent(st.suche) + '/results');
+      kont(j.kontingent); st.letzte = new Date().toISOString();
+      zeigen(j.items || [], (j.count || 0) + ' Treffer insgesamt, ' + (j.items || []).length + ' geladen · höchste ID ' + st.maxId);
+      meld('Seite 1 geladen.', true);
+    } catch (e) { meld(e.message); }
+  }
+  async function neu() {
+    if (st.maxId == null) { meld('Erst „Erste Seite laden“, dann merkt sich die Seite die höchste ID.'); return; }
+    try {
+      var j = await api('/searches/' + encodeURIComponent(st.suche) + '/aenderungen?art=neu&seit=' + encodeURIComponent(st.maxId));
+      kont(j.kontingent);
+      zeigen(j.items || [], j.anzahl + ' neue seit ID ' + j.seit);
+      meld(j.anzahl ? j.anzahl + ' neue Objekte.' : 'Nichts Neues seit dem letzten Abruf.', true);
+    } catch (e) { meld(e.message); }
+  }
+  function anfrage(id) {
+    var r = _items[id] && _items[id].raw; if (!r) return;
+    st.wahl = r;
+    $('anfrage').textContent = 'Guten Tag,\n\nich interessiere mich für Ihr Angebot „' + (r.title || '') + '“ (' + (r.address_zipcode || '') + ') zum Kaufpreis von ' + eur(r.buying_price) + '.\n\n'
+      + 'Für eine erste Prüfung bitte ich um: Exposé und Grundrisse, Energieausweis, Mieterliste mit Kaltmieten und Mietbeginn'
+      + (/apartment/.test(String(r.real_estate_type || 'apartment')) ? ', Teilungserklärung, Wirtschaftsplan, Hausgeldabrechnung, die letzten drei Protokolle der Eigentümerversammlung, Höhe der Erhaltungsrücklage.' : ', Grundbuchauszug, Flurkarte, Aufstellung der Bewirtschaftungskosten.')
+      + '\n\nGern vereinbare ich danach einen Besichtigungstermin.\n\nMit freundlichen Grüßen';
+    $('anfrage-box').hidden = false; $('anfrage-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  $('kopieren').addEventListener('click', function () {
+    var r = st.wahl; if (!r) return;
+    try { navigator.clipboard.writeText($('anfrage').textContent); } catch (e) {}
+    var l = (r.platforms || []).filter(function (p) { return p.url && p.active !== false; })[0] || (r.platforms || []).filter(function (p) { return p.url; })[0];
+    if (l) window.open(l.url, '_blank', 'noopener');
+    meld('Text kopiert' + (l ? ', Inserat bei ' + l.platform + ' geöffnet.' : ' – kein Link im Treffer.'), true);
+  });
+  $('anlegen').addEventListener('click', async function () {
+    var b = this; b.disabled = true;
+    try {
+      var z = function (id) { var v = $(id).value; return v === '' ? null : Number(v); };
+      var j = await api('/searches', { method: 'POST', body: { name: $('n').value, type: $('t').value,
+        zipcodes: $('plz').value.split(/[,;\s]+/).filter(Boolean), buying_price: { min: z('pmin'), max: z('pmax') }, living_space: { min: z('fmin') }, construction_year: { min: z('bmin') } } });
+      meld('Suche angelegt: ' + j.name + ' (ID ' + j.id + ').', true); await suchenLaden();
+    } catch (e) { meld(e.message); }
+    b.disabled = false;
+  });
+  $('suchen').addEventListener('click', async function (e) {
+    var z = e.target.closest('[data-zeig]'), l = e.target.closest('[data-loesch]');
+    if (z) { st.suche = z.getAttribute('data-zeig'); st.maxId = null; $('tr-titel').textContent = 'Treffer · ' + z.getAttribute('data-name'); $('tr-knoepfe').hidden = false; $('treffer').innerHTML = '<div class="k">Noch nicht geladen – das Laden zählt neue Objekte aufs Kontingent.</div>'; return; }
+    if (l) {
+      var id = l.getAttribute('data-loesch');
+      if (st.scharf !== id) { st.scharf = id; suchenLaden(); setTimeout(function () { if (st.scharf === id) { st.scharf = null; suchenLaden(); } }, 8000); return; }
+      st.scharf = null;
+      try { await api('/searches/' + encodeURIComponent(id), { method: 'DELETE' }); meld('Suche ' + id + ' gelöscht.', true); } catch (er) { meld(er.message); }
+      suchenLaden();
+    }
+  });
+  $('treffer').addEventListener('click', function (e) { var a = e.target.closest('[data-anfrage]'); if (a) anfrage(Number(a.getAttribute('data-anfrage'))); });
+  $('seite1').addEventListener('click', seite1);
+  $('neu').addEventListener('click', neu);
+  if (!TOKEN) { meld('Nicht angemeldet – bitte erst in DealPilot (Staging) anmelden.'); return; }
+  api('/kontingent').then(function (j) { kont(j.kontingent); }).catch(function () {});
+  suchenLaden();
+})();
+</script>
+</body>
+</html>
