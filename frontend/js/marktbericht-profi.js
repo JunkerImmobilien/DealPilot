@@ -315,6 +315,7 @@
     '.verf>div{padding:3.5mm 4mm;border-bottom:.2mm solid var(--line)}.verf>div:nth-child(odd){border-right:.2mm solid var(--line)}',
     '.verf .t{font-size:8pt;color:var(--muted)}.verf .v{font:500 14pt/1.3 "JetBrains Mono",monospace;margin:.5mm 0 1mm}',
     '.verf .f{background:var(--gold-l)}',
+    '.block{break-inside:avoid}h3{break-after:avoid}',
     '.verf .qm{font:500 9pt/1.3 "JetBrains Mono",monospace;color:var(--muted);margin:-.5mm 0 1mm}.verf .zus{font-size:7.6pt;color:var(--muted);margin-bottom:1mm}',
     '.tag{display:inline-block;font:6.8pt/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:1mm 1.5mm;border-radius:.8mm;background:var(--soft);color:var(--muted)}',
     '.tag.g{background:var(--obs);color:#fff}',
@@ -428,11 +429,11 @@
       ['Angebotsmieten (Median)', rm.median_per_sqm, istZahl(rm.q25_per_sqm) ? 'Quartile ' + zahl(rm.q25_per_sqm, 2) + ' – ' + zahl(rm.q75_per_sqm, 2) + ' €/m², ' + zahl(rm.sample_size, 0) + ' Angebote' : ''],
       ['Bestandsmiete Zensus 2022', zm.nettokaltmiete_qm, zm.available ? 'Gemeinde/Kreis, Stichtag Zensus' : '']
     ].filter(function (z) { return istZahl(z[1]) || (z[1] === null && z[2]); });
-    var mietTab = mieten.length ? '<h3>Mieten je m² Wohnfläche</h3><table><tbody>' + mieten.map(function (z) {
+    var mietTab = mieten.length ? '<div class="block"><h3>Mieten je m² Wohnfläche</h3><table><tbody>' + mieten.map(function (z) {
       return '<tr><td>' + esc(z[0]) + '</td><td class="r num">' + (istZahl(z[1]) ? zahl(z[1], 2) + ' €/m²' : '') + '</td><td class="q">' + esc(String(z[2] || '').slice(0, 140)) + '</td></tr>';
-    }).join('') + '</tbody></table>' : '';
+    }).join('') + '</tbody></table></div>' : '';
     teile.push(seite(d, 'Ergebnis', '<div class="eyebrow">Ergebnis</div><h2>Marktwert-Indikation ' + eur(ergebnis) + '</h2>'
-      + '<p class="sub">' + esc(v.grund) + (v.grundQuelle ? ' (' + esc(v.grundQuelle) + ')' : '') + '</p>'
+      + (v.fuehrend ? '' : '<p class="sub">' + esc(v.grund) + '</p>')   /* v3178: Begruendung steht im Kasten */
       + fuehrendBox(v) + spanneSvg(v.liste, r.purchase_price) + '<div class="verf">' + kacheln + '</div>' + mietTab
       + (d.md ? '<h3>Einschätzung</h3>' + zusammenfassung(d.md) : '')));
 
