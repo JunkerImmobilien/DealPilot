@@ -436,6 +436,18 @@ const STRUKTUREN = {
       vertrag: 'Vertragsart-Auskunft (Staffel/Index schliessen § 558 aus)', ziel_monat: 'Zielbild-Miete pro MONAT nach Massnahmen'
     }
   },
+  markt_baukosten: {   /* v3173 · N121 */
+    was: 'Kopf markt.baukosten: amtliche Bau- und Baulandstatistik fuer die Kreise der Objekte (objekte[].kreis_ags), aus der vorgehaltenen Tabelle, monatlich abgeglichen',
+    felder: {
+      baukosten: 'je Kreis immer null - veranschlagte Baukosten veroeffentlicht die Statistik nur je Land',
+      land_baukosten: 'Landeswert 31111-0100: kosten_teur, wohnflaeche_qm, wohnungen, eur_je_qm (Neubau Wohngebaeude, Jahreswert, KG 300+400 inkl. USt)',
+      genehmigt: 'Baugenehmigungen je Kreis 31111-01-02-4 (Wohnungen, Wohnflaeche, Gebaeude; je_gebaeudeart 1/2/3+ Wohnungen; duenn bei < 10 Wohnungen)',
+      fertiggestellt: 'Baufertigstellungen je Kreis 31121-01-02-4, gleicher Aufbau',
+      bauland: 'Kaufwerte fuer Bauland je Kreis 61511-01-03-4: eur_je_qm, baureif_eur_je_qm, kauffaelle',
+      baupreisindex: '61261-0002, 2021 = 100, Monat und Veraenderung zum Vorjahr',
+      quelle: 'Namensnennung nach dl-de/by-2-0 - unveraendert anzeigen'
+    }
+  },
   _marktdaten: {
     was: 'v3158 · abgerufene Marktdaten am Objekt, je Teil mit Stand (JJJJ-MM-TT): was beim letzten Rechnen galt',
     felder: {
@@ -776,11 +788,45 @@ async function bauen(userId, opt) {
   try { const bz = require('./bauzinsService'); bauzins = bz.matrix(await bz.getBauzins()); }
   catch (e) { bauzins = { fehler: String(e && e.message || e).slice(0, 120) }; }
 
+  /* v3173 · N121 · Kopf markt.baukosten fuer die Kreise der Objekte (Anforderung Portfolio-Modul 04.11.2026).
+     Der Kreis kommt aus dem Objekt: _marktdaten (Kreisschluessel) oder _potenzial.ags (Gemeinde, erste 5 Stellen).
+     Gelesen wird die vorgehaltene Statistik (mb.baustatistik) - kein Live-Abruf. Je Objekt steht der Kreis in
+     objekte[].kreis_ags, damit das Modul zuordnen kann. */
+  let baukosten = null;
+  try {
+    const kreisVon = (d) => {
+      const kand = [];
+      const such = (x, tiefe) => {
+        if (!x || tiefe > 4) return;
+        if (typeof x === 'string') { if (/^\s*[{[]/.test(x)) { try { such(JSON.parse(x), tiefe + 1); } catch (e) {} } return; }
+        if (typeof x !== 'object') return;
+        Object.keys(x).forEach((k) => { const v = x[k]; if (k === 'ags' && /^\d{5}(\d{3})?$/.test(String(v))) kand.push(String(v)); else such(v, tiefe + 1); });
+      };
+      such(d && d._marktdaten, 0); such(d && d._potenzial, 0);
+      return kand.length ? kand[0].slice(0, 5) : null;
+    };
+    objekte.forEach((o) => { const k = kreisVon(o.daten); if (k) o.kreis_ags = k; });
+    const kreise = [...new Set(objekte.map((o) => o.kreis_ags).filter(Boolean))];
+    if (kreise.length) {
+      const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 15000);
+      try {
+        const r = await fetch(MB_BASE + '/market-stats/baukosten', { signal: ctrl.signal });
+        const alle = r.ok ? await r.json() : null;
+        if (alle && Array.isArray(alle.kreise)) {
+          const je = {}; alle.kreise.forEach((k) => { if (kreise.indexOf(k.ags) >= 0) je[k.ags] = k; });
+          baukosten = { stand: alle.stand, quelle: alle.quelle, lizenz: alle.lizenz, hinweis: alle.hinweis, baupreisindex: alle.baupreisindex,
+            bund: alle.bund, kreise: kreise.map((a) => je[a] || { ags: a, fehlt: true }),
+            ohne_kreis: objekte.filter((o) => !o.kreis_ags).length };
+        } else baukosten = { fehler: 'Marktstatistik HTTP ' + r.status };
+      } finally { clearTimeout(t); }
+    } else baukosten = { kreise: [], ohne_kreis: objekte.length, hinweis: 'Kein Objekt traegt einen Kreisschluessel (erst Marktdaten bzw. Potenzial rechnen lassen).' };
+  } catch (e) { baukosten = { fehler: String(e && e.message || e).slice(0, 120) }; }
+
   return {
     dealpilot_export: 'portfolio',
     format_version: 1,
     /* v3157 · Marktdaten fuer alle Objekte gleich */
-    markt: { bauzins: bauzins, indexreihen: indexreihen },   /* v3161: indexreihen */
+    markt: { bauzins: bauzins, indexreihen: indexreihen, baukosten: baukosten },   /* v3161: indexreihen · v3173: baukosten */
     avm_fehler: avmFehler || undefined,
     beleihungswert_fehler: belwFehler || undefined,
     erzeugt_am: new Date().toISOString(),
