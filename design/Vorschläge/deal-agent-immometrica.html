@@ -237,8 +237,8 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
         </div>
         <div id="kontingent" class="warnung gelb"></div>
         <span class="lbl">Suche aus DealPilot starten</span>
-        <p class="hinweis">Aus deinem Investmentprofil schlägt DealPilot die Suche vor: Objektart, Region, Kaufpreisspanne, Mindestrendite. Am einfachsten ist <b>eine breite Suche in ImmoMetrica</b> (z. B. „Kapitalanlage OWL bis 900 T€“) – das Feinsieben macht DealPilot mit deinem Profil. Ob sich Suchen auch direkt über die Schnittstelle anlegen lassen, steht in der ImmoMetrica-Doku (noch nicht gelesen, nur angemeldet sichtbar).</p>
-        <button class="btn" type="button" id="b-suche">Suchvorschlag aus meinem Profil</button>
+        <p class="hinweis">DealPilot legt die Suche <b>direkt in deinem ImmoMetrica-Konto an</b> (Schnittstelle „createSearch“, gebaut v3169): Objektart, Postleitzahlen der Region, Kaufpreis-, Flächen-, Zimmer- und Baujahr-Spanne aus deinem Profil. Rendite und Lageklasse kennt ImmoMetrica nicht – die siebt DealPilot danach. Eine so angelegte Suche schickt keine ImmoMetrica-Mails; die Meldung kommt von DealPilot (Telegram/App).</p>
+        <button class="btn" type="button" id="b-suche">Suche aus meinem Profil anlegen</button>
       </div>
       <div class="kasten creme">
         <span class="lbl">Passt zu meinem Profil</span>
@@ -350,6 +350,7 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
         <tr><td>Abruftakt</td><td>Bis 5.000 Anfragen je Stunde, darüber 429. Große Suchen brechen nach 25 s mit 503 ab.</td><td>Alle 30 Minuten ist problemlos. Bei 503 mit <code>offer_id_gt</code> eingrenzen. Klare Meldungen gebaut (v3168).</td></tr>
         <tr><td>Kontaktdaten</td><td>Keine, nur die Links zu den Inseraten (<code>platforms[].url</code>).</td><td><b>Die Anfrage läuft über das Inserat</b>, nicht per E-Mail aus DealPilot – siehe Stufe 2.</td></tr>
         <tr><td>Nutzung im Auftrag von Kunden, Preisverläufe speichern</td><td><b>Nicht beantwortet.</b></td><td>Vor dem Ausrollen an Kunden schriftlich klären.</td></tr>
+        <tr><td>Doku (selbst gelesen, 04.11.2026)</td><td>Suchen anlegen und löschen per API; Verwaltungsgebiete mit PLZ (nur mit Freischaltung); 50 Treffer je Seite; Felder decken sich mit unserer Zuordnung bis auf Versteigerungsgericht und -termin.</td><td><b>Suche aus DealPilot anlegen gebaut (v3169)</b>, fehlende Felder ergänzt.</td></tr>
       </tbody>
     </table>
 
@@ -399,7 +400,7 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
     <h3>Noch offen beim ImmoMetrica-Support</h3>
     <ol class="fragen">
       <li>Darf eine Software wie DealPilot die API im Auftrag ihrer Kunden mit deren Token nutzen, Preisverläufe speichern und anzeigen? Gibt es dafür einen Partner- oder Mehrkunden-Tarif? <i>(in der Antwort vom 04.11.2026 nicht beantwortet)</i></li>
-      <li>Die Feld-Doku unter <code>searchapi/v1/docs</code> ist nur angemeldet sichtbar. Können wir sie als Datei bekommen, damit unser Feld-Abgleich gegen die echte Liste läuft?</li>
+      <li>Die Liste der Verwaltungsgebiete mit Postleitzahlen (<code>admindivs/</code>, für „Region → PLZ“) ist laut Doku „nur mit Freischaltung“. Können wir sie freischalten lassen?</li>
     </ol>
   </section>
 </div>
@@ -606,9 +607,9 @@ ol.fragen{margin:0;padding-left:20px;display:grid;gap:8px;max-width:84ch}
   $('b-suche').addEventListener('click',function(){
     var reg=REGIONEN.filter(function(r){return r.an;}).map(function(r){return r.id;}).join(', ');
     $('toast').textContent='';
-    alert0('Suchvorschlag: Wohnungen und Mehrfamilienhäuser · '+(reg||'alle Regionen')+' · '+eur(+$('f-min').value||0)+' bis '+eur(+$('f-max').value||0)+' · Mindestrendite '+pct(+$('f-rendite').value)+' (filtert DealPilot) · Lage ab '+$('f-lage').value+' (filtert DealPilot).');
+    alert0('An ImmoMetrica (Demo, nichts gesendet): Name „DealPilot · '+(reg||'alle Regionen')+'“ · Objektart Wohnung kaufen · Postleitzahlen der Regionen '+(reg||'–')+' · Kaufpreis '+eur(+$('f-min').value||0)+' bis '+eur(+$('f-max').value||0)+'. Danach filtert DealPilot: Mindestrendite '+pct(+$('f-rendite').value)+', Lage ab '+$('f-lage').value+'.');
   });
-  function alert0(t){ var b=$('b-suche'); var p=b.nextElementSibling; if(!p||!p.classList.contains('vorschlag')){ p=document.createElement('div'); p.className='warnung gelb vorschlag'; b.insertAdjacentElement('afterend',p);} p.innerHTML='<b>Vorschlag für ImmoMetrica</b><span>'+esc(t)+'</span>'; }
+  function alert0(t){ var b=$('b-suche'); var p=b.nextElementSibling; if(!p||!p.classList.contains('vorschlag')){ p=document.createElement('div'); p.className='warnung gelb vorschlag'; b.insertAdjacentElement('afterend',p);} p.innerHTML='<b>Suche angelegt</b><span>'+esc(t)+'</span>'; }
   $('b-inserat').addEventListener('click',function(){ $('toast').textContent='In der App öffnet sich hier das Inserat in einem neuen Fenster.'; });
   $('track').addEventListener('click',function(e){ var b=e.target.closest('button[data-s]'); if(!b) return;
     var o=OBJ.filter(function(x){return x.id===b.dataset.id;})[0]; o.status=+b.dataset.s;
