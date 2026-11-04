@@ -437,7 +437,7 @@
     if (istZahl(ew.value_eur) && Array.isArray(ew.staffel)) {
       var ewQ = ew.staffel.map(function (x) {
         var t = String(x.pos || '');
-        if (/Rohertrag/.test(t) && !/^=/.test(t)) return 'marktüblich erzielbar' + (istZahl(ew.miete_qm) ? ', ' + zahl(ew.miete_qm, 2) + ' €/m²' : '');
+        if (/^Rohertrag/.test(t)) return 'marktüblich erzielbar' + (istZahl(ew.miete_qm) ? ', ' + zahl(ew.miete_qm, 2) + ' €/m²' : '');
         if (/Bewirtschaftungskosten \(/.test(t)) return 'Anlage 3 ImmoWertV bzw. Modell des Ausschusses';
         if (/Bodenwertverzinsung/.test(t)) return 'Liegenschaftszins ' + zahl(ew.liegenschaftszins_pct, 2) + ' %, Stufe ' + (ew.liegenschaftszins_stufe || '–');
         if (/Barwertfaktor/.test(t)) return '§ 34 ImmoWertV, RND ' + zahl(ew.restnutzungsdauer_jahre, 1) + ' J.';
@@ -468,7 +468,8 @@
     (c.quellen_nachweis || []).forEach(function (x) { q.push((x.kennzahlen ? x.kennzahlen.join(', ') + ': ' : '') + (x.vermerk || '') + (x.url ? ' (' + x.url + ')' : '')); });
     if (sw.sachwertfaktor && sw.sachwertfaktor.quelle) q.push('Sachwertfaktor: ' + sw.sachwertfaktor.quelle);
     if (irw.quellennachweis) q.push('Immobilienrichtwert: ' + irw.quellennachweis);
-    if (p.makro_kennzahlen && p.makro_kennzahlen.quellennachweis) q.push('Regionaldaten: ' + p.makro_kennzahlen.quellennachweis);
+    var mq = p.makro_kennzahlen && p.makro_kennzahlen.quellennachweis;
+    if (mq) q.push('Regionaldaten: ' + (typeof mq === 'object' ? [mq.vermerk, mq.lizenz].filter(Boolean).join(' · ') : mq));
     if (z.available) q.push('Zensus 2022: Statistische Ämter des Bundes und der Länder' + (z.license ? ', ' + z.license : ''));
     q.push('Normalherstellungskosten: Anlage 4 ImmoWertV (NHK 2010). Baupreisindex: Statistisches Bundesamt.');
     q.push('Angebotsdaten: aktueller Marktdurchschnitt vergleichbarer Angebote.');
