@@ -60,6 +60,7 @@ const ARTEN = {
   dok_kaufpreisaufteilung: { objekt: true, name: 'Kaufpreisaufteilung (einheitlich)' },
   dok_finanzamt: { objekt: true, name: 'Werbungskosten (einheitlich)' },
   dok_finanzamt_anlagev: { objekt: true, name: 'Werbungskosten mit Anlage V (einheitlich)' },
+  html: { objekt: false, name: 'Dokument' },   /* v3183 · fertiges HTML aus der App drucken */
   dok_trackrecord: { objekt: false, name: 'Track Record (einheitlich)' },
   dok_bankexport: { objekt: false, name: 'Bankexport (einheitlich)' }
 };
@@ -145,6 +146,33 @@ async function erzeugen(auftrag) {
     });
     schritt('browser');
     const page = await browser.newPage();
+    /* v3183 · Marcel 04.11.2026: „die pdfs laden wirklich lange". Die App im Browser hat das Objekt schon
+       gerechnet und baut das Dokument in rund 0,5 s (gemessen Westerfeld, Bankfassung 790 KB). Hier wird es nur
+       gedruckt: KEIN Login, KEIN Skript (setJavaScriptEnabled false), Netz nur fuer data: und die Schriften der
+       App. Das HTML kommt von einem angemeldeten Nutzer; ohne Skript und ohne Netz kann es nichts erreichen. */
+    if (auftrag.art === 'html') {
+      const herkunft = new URL(APP_URL).origin;
+      await page.setJavaScriptEnabled(false);
+      await page.setRequestInterception(true);
+      page.on('request', (r) => {
+        const u = r.url();
+        if (u.startsWith('data:') || (u.startsWith(herkunft + '/fonts/') && r.method() === 'GET')) return r.continue();
+        spur.blockiert.push(u.slice(0, 120)); r.abort('blockedbyclient');
+      });
+      await page.setContent(String(auftrag.html || ''), { waitUntil: 'networkidle0', timeout: 30000 }).catch(() => {});
+      schritt('html gesetzt');
+      const esc = (t) => String(t || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+      const f = Array.isArray(auftrag.fuss) ? auftrag.fuss : [];
+      const pdf = Buffer.from(await page.pdf({
+        format: 'A4', printBackground: true, preferCSSPageSize: true, displayHeaderFooter: true,
+        headerTemplate: '<span></span>',
+        footerTemplate: '<div style="width:100%;margin:0 17mm;padding-top:2mm;border-top:0.2mm solid #E3E1DA;display:flex;justify-content:space-between;font-family:Inter,Arial,sans-serif;font-size:7pt;color:#5F5E66">'
+          + '<span>' + esc(f[0]) + '</span><span>' + esc(f[1]) + ' · Seite <span class="pageNumber"></span> von <span class="totalPages"></span></span></div>'
+      }));
+      schritt('pdf da');
+      log('schritte html: ' + spur.schritte.join(' | ') + (spur.blockiert.length ? ' · blockiert ' + spur.blockiert.length : ''));
+      return { pdf, dateiname: String(auftrag.titel || 'Dokument').replace(/[^\wäöüÄÖÜß .,-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) + '.pdf' };
+    }
     await page.setViewport({ width: 1440, height: 1000 });
     page.on('console', (m) => {
       const t = m.type();
@@ -475,11 +503,13 @@ const server = http.createServer((req, res) => {
   if (req.method !== 'POST' || req.url !== '/pdf') return json(res, 404, { fehler: 'unbekannt' });
   if (!GEHEIM || req.headers['x-pdf-geheimnis'] !== GEHEIM) return json(res, 401, { fehler: 'nicht berechtigt' });
   let roh = '';
-  req.on('data', (c) => { roh += c; if (roh.length > 20000) req.destroy(); });
+  req.on('data', (c) => { roh += c; if (roh.length > 30000000) req.destroy(); });   /* v3183 · html bis 30 MB, alle anderen pruefen unten */
   req.on('end', async () => {
     let a;
     try { a = JSON.parse(roh || '{}'); } catch (e) { return json(res, 400, { fehler: 'kein JSON' }); }
     if (!ARTEN[a.art]) return json(res, 400, { fehler: 'unbekannte Art', arten: Object.keys(ARTEN) });
+    if (a.art !== 'html' && roh.length > 20000) return json(res, 413, { fehler: 'zu gross' });
+    if (a.art === 'html' && (typeof a.html !== 'string' || !a.html.length)) return json(res, 400, { fehler: 'html fehlt' });
     if (!a.token || !a.sitzung) return json(res, 400, { fehler: 'token und sitzung fehlen' });
     if (ARTEN[a.art].objekt && !/^[0-9a-f-]{8,64}$/i.test(String(a.objekt_id || ''))) {
       return json(res, 400, { fehler: 'objekt_id fehlt' });

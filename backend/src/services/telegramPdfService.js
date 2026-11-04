@@ -33,7 +33,8 @@ const ARTEN = {
   dok_finanzamt: { name: 'Werbungskosten (einheitlich)', objekt: true },
   dok_finanzamt_anlagev: { name: 'Werbungskosten mit Anlage V (einheitlich)', objekt: true },
   dok_trackrecord: { name: 'Track Record (einheitlich)', objekt: false },
-  dok_bankexport: { name: 'Bankexport (einheitlich)', objekt: false }
+  dok_bankexport: { name: 'Bankexport (einheitlich)', objekt: false },
+  html: { name: 'Dokument', objekt: false }   /* v3183 · fertiges HTML der App drucken */
 };
 
 function verfuegbar() {
@@ -86,7 +87,8 @@ async function erzeugen(userId, art, objektId, reportId, optionen) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Pdf-Geheimnis': process.env.PDF_DIENST_SECRET },
       body: JSON.stringify({ art: art, objekt_id: objektId || null, report_id: reportId || null,
-        token: token, sitzung: sitzung, optionen: (optionen && typeof optionen === 'object') ? optionen : undefined }),
+        token: token, sitzung: sitzung, optionen: (optionen && typeof optionen === 'object' && art !== 'html') ? optionen : undefined,
+        html: art === 'html' ? optionen.html : undefined, titel: art === 'html' ? optionen.titel : undefined, fuss: art === 'html' ? optionen.fuss : undefined }),
       signal: ctrl.signal
     });
   } catch (e) {

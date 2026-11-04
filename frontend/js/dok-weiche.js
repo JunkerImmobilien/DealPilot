@@ -61,14 +61,32 @@
     return 'DealPilot-' + art + '.pdf';
   }
 
+  /* v3183 · der schnelle Weg: die App baut das Dokument selbst (rund 0,5 s, Objekt ist schon gerechnet) und der
+     PDF-Dienst druckt es nur (ohne Skript, ohne Netz). Vorher startete er fuer jedes PDF die ganze App neu (12-30 s). */
+  async function schnell(art, opt) {
+    var html = await window.DpDokumente.dokument(art, opt || {});
+    var d = new DOMParser().parseFromString(html, 'text/html'), f = d.querySelector('.fuss');
+    var fuss = f ? [].map.call(f.children, function (x) { return x.textContent; }) : [];
+    var t = ''; try { t = localStorage.getItem('ji_token') || ''; } catch (e) {}
+    var r = await fetch(basis() + '/rechenkerne/html-pdf', { method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, t ? { Authorization: 'Bearer ' + t } : {}),
+      body: JSON.stringify({ html: html.replace('</style>', '.fuss{display:none}</style>'), titel: d.title || NAMEN[art], fuss: fuss }) });
+    if (r.status === 401) { hinweis('Sitzung abgelaufen – bitte neu anmelden.'); return true; }
+    if (!r.ok || !/pdf/.test(r.headers.get('content-type') || '')) return false;
+    herunterladen(await r.blob(), dateiname(r, art));
+    return true;
+  }
+
   /** art: Schlüssel aus DpDokumente.TYPEN; opt: {jahr, alle, ids}; objekt: an das offene Objekt gebunden */
   async function erzeugen(art, opt, objekt) {
     var key = window._currentObjKey;
     if (objekt && !key) { hinweis('Bitte zuerst ein Objekt öffnen.'); return; }
+    hinweis((NAMEN[art] || 'Dokument') + ' wird erstellt …');
+    try { if (await schnell(art, opt)) { hinweis('✓ ' + (NAMEN[art] || 'Dokument') + ' erstellt'); return; } } catch (e) {}
     if (objekt) { try { if (typeof window.saveObj === 'function') await window.saveObj({ silent: true }); } catch (e) {} }
     var name = NAMEN[art] || 'Dokument';
     if (!objekt || istUuid(key)) {
-      hinweis(name + ' wird erstellt … (rund 15 Sekunden)');
+      hinweis(name + ' wird über den PDF-Dienst erstellt …');
       try {
         var t = ''; try { t = localStorage.getItem('ji_token') || ''; } catch (e) {}
         var r = await fetch(basis() + '/rechenkerne/dok-pdf', { method: 'POST',

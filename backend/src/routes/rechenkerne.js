@@ -390,6 +390,26 @@ router.post('/dok-pdf', async function (req, res) {
   }
 });
 
+/* v3183 · POST /rechenkerne/html-pdf  { html, titel, fuss: [links, rechts] }  ->  application/pdf
+   Die App baut das einheitliche Dokument selbst (DpDokumente, rund 0,5 s) und laesst es hier nur drucken.
+   Der PDF-Dienst druckt ohne Skript und ohne Netz (ausser Schriften der App). */
+router.post('/html-pdf', async function (req, res) {
+  const b = req.body || {};
+  const html = typeof b.html === 'string' ? b.html : '';
+  if (!html || html.length > 25000000 || !/^<!doctype html>/i.test(html)) return res.status(400).json({ error: 'html fehlt oder ungueltig' });
+  const pdf = require('../services/telegramPdfService');
+  if (!pdf.verfuegbar()) return res.status(503).json({ error: 'pdf_dienst_fehlt', message: 'Der PDF-Dienst ist hier nicht eingerichtet.' });
+  try {
+    const fuss = Array.isArray(b.fuss) ? b.fuss.slice(0, 2).map((x) => String(x || '').slice(0, 300)) : [];
+    const x = await pdf.erzeugen(req.user.id, 'html', null, null, { html, titel: String(b.titel || 'Dokument').slice(0, 160), fuss });
+    res.set('Content-Type', 'application/pdf');
+    res.set('Content-Disposition', "attachment; filename*=UTF-8''" + encodeURIComponent(x.dateiname || 'DealPilot-Dokument.pdf'));
+    res.send(x.pdf);
+  } catch (e) {
+    res.status(422).json({ error: 'kein_pdf', message: String(e && e.message || e) });
+  }
+});
+
 /* ═══ 3 · WAS KANN DIESE SCHNITTSTELLE? ═════════════════════════════════
    Ein Verzeichnis, damit der aufrufende Dienst nicht raten muss. Es
    nennt auch, was NICHT geht - das spart die Suche danach.
