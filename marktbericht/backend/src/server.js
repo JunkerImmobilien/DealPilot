@@ -9,6 +9,7 @@ import { cfg } from './lib/config.js';
 /* WADM-4 */
 import { starteHarvestScheduler } from './lib/harvestScheduler.js';
 import { starteMakroTakt } from './services/MakroImportService.js';   /* v2172 */
+import { starteBaustatistikTakt } from './services/BaustatistikService.js';   /* v3172 */
 import { starteJahreswerteTakt } from './services/JahreswerteService.js';   /* v3021 */
 import { router } from './routes/api.js';
 
@@ -43,6 +44,7 @@ const server = app.listen(cfg.port, () => {
    * Anfragepfad — ein haengendes Landesportal darf keinen Bericht blockieren. */
   try { starteHarvestScheduler(); } catch (e) { console.log('[harvest] Start fehlgeschlagen:', e.message); }
   try { starteMakroTakt(); } catch (e) { console.log('[makro] Start fehlgeschlagen:', e.message); }
+  try { starteBaustatistikTakt(); } catch (e) { console.log('[baustatistik] Start fehlgeschlagen:', e.message); }   /* v3172 */
   try { starteJahreswerteTakt(); } catch (e) { console.log('[jahreswerte] Start fehlgeschlagen:', e.message); }   /* v3021 */
   /* v1083a-WBOOT · Ausschuss-Register aus mb.param_modell nachladen.
    *

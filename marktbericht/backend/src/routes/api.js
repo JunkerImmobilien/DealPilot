@@ -28,6 +28,7 @@ import { sperreRest, merkeLauf, laufStand } from '../lib/harvestScheduler.js';
 /* v2591 · Deckung des Registers fuer die Admin-Ansicht „Register & Ernte" */
 import { registerDeckung, zellenListe, KZ_NAME as DECKUNG_KZ } from '../lib/register_deckung.js';
 import { q as qMb } from '../lib/db.js';
+import { baukosten as msBaukosten, baupreisindex as msBpi } from '../services/BaustatistikService.js';   /* v3172 */
 import { sperrenAnfrageliste, ANFRAGE_STATUS, STATUS_NAME, GRUND_NAME as ANFRAGE_GRUND_NAME } from '../lib/sperren_anfragen.js';   /* v3020 */
 import { DestatisConnector } from '../connectors/stubConnectors.js';
 import { AgsResolver } from '../connectors/AgsResolver.js';
@@ -659,6 +660,21 @@ router.post('/beleihungswert', async (req, res) => {
     refs.forEach((r) => { if (!je[r]) je[r] = { verfuegbar: false, grund: 'kein Marktbericht mit Ertrags- oder Sachwert (Stufe 3) für dieses Objekt' }; });
     res.json({ objekte: je, stand: new Date().toISOString().slice(0, 10) });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* v3172 · N121 Marktstatistik je Kreis (Portfolio-Modul): liest nur mb.baustatistik, nie live */
+router.get('/market-stats/baukosten', async (req, res) => {
+  try {
+    const ags = req.query.ags ? String(req.query.ags).replace(/[^0-9]/g, '') : null;
+    if (ags && !/^\d{5}$/.test(ags)) return res.status(400).json({ error: 'ags muss der fünfstellige Kreisschlüssel sein' });
+    const d = await msBaukosten({ ags });
+    if (ags && !d.kreise.length) return res.status(404).json(Object.assign({ error: 'Kreis nicht gefunden', ags }, { stand: d.stand }));
+    res.json(d);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.get('/market-stats/index', async (req, res) => {
+  try { res.json({ baupreisindex: await msBpi(), lizenz: 'dl-de/by-2-0', quelle: 'Statistisches Bundesamt (Destatis), GENESIS-Online, 61261-0002' }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // GET /objects/history?key=... (oder ?ref=DealPilot-ID) — zeitlicher Verlauf eines Objekts.

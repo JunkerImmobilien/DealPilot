@@ -374,6 +374,7 @@ app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/tax-records', taxRecordsRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/market-rates', marketRatesRoutes);
+app.use('/api/v1/market-stats', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/marketStats'));   /* v3172 · N121 */
 app.use('/api/v1/beta-signup', betaSignupRoutes);
 app.use('/api/v1/track', rateLimit({ windowMs: 60000, max: 120 }), require('./routes/track')); // v973
 /* v1523: oeffentliche Kennzahlen fuer die Landing - ohne Token, nur Summen. */
