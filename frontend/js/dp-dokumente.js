@@ -37,17 +37,17 @@
   }
   function api(p) { return window.Auth.apiCall(p); }
   /* Objektinfo: Fotos, Nummer; ohne Foto die Lagekarte aus dem neuesten Marktbericht (das Objekt selbst fuehrt keine Koordinaten) */
-  function objektInfo(key) {
+  function objektInfo(key, adresse) {
     if (!key) return Promise.resolve({ fotos: [], seq: '', kuerzel: '', karte: null });
     return api('/objects/' + encodeURIComponent(key)).then(function (o) {
       var info = { fotos: (o && o.photos) || [], seq: (o && o.data && o.data._obj_seq) || '', kuerzel: (o && o.kuerzel) || '', karte: null };
       if (info.fotos.length) return info;
-      return api('/marktbericht/objects/history?ref=' + encodeURIComponent(key)).then(function (h) {
-        var r = ((h && h.history) || [])[0]; if (!r) return info;
-        return api('/marktbericht/reports/one?id=' + r.report_id).then(function (rep) {
-          var ref = ((rep && (rep.data || rep.payload)) || {}).ref || {};
-          return D().karte(ref.lat, ref.lon, 16, 1400, 700).then(function (k) { info.karte = k; return info; });
-        });
+      /* v3179c · Koordinaten ueber die Anschrift (Geocoder des Marktberichts, gecacht) - nicht ueber den
+         Berichtsverlauf: per Schnittstelle erzeugte Berichte tragen keinen Objektbezug. */
+      var adr = adresse || (o && o.name) || '';
+      if (!adr) return info;
+      return api('/marktbericht/geocode?address=' + encodeURIComponent(adr)).then(function (g) {
+        return D().karte(g && g.lat, g && g.lon, 16, 1400, 700).then(function (k) { info.karte = k; return info; });
       }).catch(function () { return info; });
     }).catch(function () { return { fotos: [], seq: '', kuerzel: '', karte: null }; });
   }
@@ -191,7 +191,7 @@
     var kurz = art === 'kurz', bank = art === 'bank';
     var name = kurz ? 'Investment Case · Kurzfassung' : bank ? 'Investment Case · Bankfassung' : 'Investment Case';
     var sc = (window._dpPdfScore && _dpPdfScore(K)) || {};
-    return Promise.all([basis(name), objektInfo(key)]).then(function (z) {
+    return Promise.all([basis(name), objektInfo(key, o.adresse)]).then(function (z) {
       var c = z[0], info = z[1], fotos = info.fotos; c.zeile = o.adresse; o.seq = info.seq || o.seq;
       var S = [];
       S.push(B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : ''].filter(Boolean).join(' · '),
@@ -239,12 +239,12 @@
   }
   function kaufpreisaufteilung() {
     var B = D(), o = objektKopf();
-    return bmfBereit().then(function () { return basis('Kaufpreisaufteilung'); }).then(function (c) {
-      c.zeile = o.adresse;
+    return bmfBereit().then(function () { return Promise.all([basis('Kaufpreisaufteilung'), objektInfo(window._currentObjKey, o.adresse)]); }).then(function (zz) {
+      var c = zz[0], info = zz[1]; c.zeile = o.adresse;
       var r = window._lastBmfResults || {}, w = function (k) { return r[k] && typeof r[k] === 'object' ? r[k].value : r[k]; };
       var z = (window._dpKpaZahlen && _dpKpaZahlen()) || {};
       var S = [];
-      S.push(B.deckblatt(c, { bild: null, eyebrow: 'Kaufpreisaufteilung nach BMF-Arbeitshilfe', titel: o.adresse, unter: o.art + (o.bj ? ' · Baujahr ' + B.jahr(o.bj) : ''),
+      S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: 'Kaufpreisaufteilung nach BMF-Arbeitshilfe', titel: o.adresse, unter: o.art + (o.bj ? ' · Baujahr ' + B.jahr(o.bj) : ''),
         wertLabel: 'Gebäudeanteil', wert: B.pct(w('gebaeudeanteil_prozent'), 2), wertNeben: 'Grund und Boden ' + B.eur(w('kaufpreisanteil_grund')) + '<br>Gebäude ' + B.eur(w('kaufpreisanteil_gebaeude')),
         meta: [['Kaufpreis', B.eur(z.kp)], ['Stand', c.stand], ['Grundlage', 'BMF-Arbeitshilfe']] }));
       S.push(B.seite(c, 'Herleitung', B.abschnitt('Abschnitt 1', 'Herleitung nach der Arbeitshilfe', 'Sach- und Ertragswert nach der Arbeitshilfe des Bundesministeriums der Finanzen; maßgeblich ist der höhere Bezug je Objektart.')
@@ -278,10 +278,10 @@
     ['6. Anschaffungsnahe Herstellkosten / Erhaltung', [['anschaffungsnah', 'Anschaffungsnah'], ['erhaltungsaufwand', 'Erhaltungsaufwand']]]];
   function finanzamt(jahre) {
     var B = D(), o = objektKopf(), rows = (State.cfRows || []).slice(0, jahre || 3);
-    return basis('Werbungskosten · Finanzamt').then(function (c) {
-      c.zeile = o.adresse;
+    return Promise.all([basis('Werbungskosten · Finanzamt'), objektInfo(window._currentObjKey, o.adresse)]).then(function (zz) {
+      var c = zz[0], info = zz[1]; c.zeile = o.adresse;
       var S = [], ges = [];
-      S.push(B.deckblatt(c, { bild: null, eyebrow: 'Aufstellung Werbungskosten · Anlage V', titel: o.adresse, unter: o.art + ' · vermietet',
+      S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: 'Aufstellung Werbungskosten · Anlage V', titel: o.adresse, unter: o.art + ' · vermietet',
         meta: [['Veranlagungsjahre', rows.map(function (r) { return r.cal; }).join(', ')], ['Stand', c.stand], ['Eigentümer', feld('halter') || (c.marke.name || '')]] }));
       rows.forEach(function (row, i) {
         var t = _computeYearTotal(row.cal, i) || {}, v = t.values || {};
