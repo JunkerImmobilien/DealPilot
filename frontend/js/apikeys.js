@@ -68,66 +68,73 @@
     }
   }
 
+  /* v3167 · Marcel 04.11.2026: Keys benennen (wofür), kopieren, widerrufen und widerrufene entfernen.
+     Ein bestehender Key lässt sich NICHT erneut anzeigen - gespeichert ist nur sein Fingerabdruck (sha256). */
+  var _scharf = null;   /* { art, id, bis } - zwei Klicks statt Bestätigungsfenster */
   function _renderBody(host, res) {
     var b = host.querySelector('#dp-apikey-body');
     if (!b) return;
     var html = '';
-    if (res && res.created && res.key && res.key.plain) {
-      html += _newKeyBanner(res.key.plain);
-    }
+    if (res && res.created && res.key && res.key.plain) html += _newKeyBanner(res.key.plain, res.key.name);
     var keys = (res && res.keys) || [];
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12.5px">' +
-      '<thead><tr style="text-align:left;color:var(--muted)">' +
-        '<th style="padding:4px 6px">Key</th><th>Erstellt</th><th>Zuletzt</th><th>Ablauf</th><th></th></tr></thead><tbody>';
-    keys.forEach(function (k) {
-      var rev = !!k.revoked_at;
-      html += '<tr style="border-top:1px solid rgba(0,0,0,.08)' + (rev ? ';opacity:.45' : '') + '">' +
-        '<td style="padding:6px"><code>' + _esc(k.key_prefix) + '\u2026</code>' + (rev ? ' <span style="color:var(--red)">(widerrufen)</span>' : '') + '</td>' +
-        '<td>' + _fmt(k.created_at) + '</td>' +
-        '<td>' + _fmt(k.last_used_at) + '</td>' +
-        '<td>' + (k.expires_at ? _fmt(k.expires_at) : 'unbegrenzt') + '</td>' +
-        '<td style="text-align:right">' + (rev ? '' : '<button type="button" class="btn btn-sm btn-ghost" onclick="DealPilotApiKeys.revoke(\'' + _esc(k.id) + '\')">Widerrufen</button>') + '</td>' +
-        '</tr>';
-    });
-    html += '</tbody></table>';
-    html += '<div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">' +
-      '<button type="button" class="btn btn-sm btn-outline" onclick="DealPilotApiKeys.create()">Neuen Key erzeugen</button>' +
-      '<span style="font-size:11.5px;color:var(--muted)">Header <code>X-API-Key</code> \u00b7 Basis-URL <code>/api/v1</code> \u00b7 voller CRUD</span></div>' +
-      /* v2977 \u00b7 Rechenkerne (RND, Verkehrswert) als Zusatz - Doku fuer die Anbindung */
-      '<div style="margin-top:8px;font-size:11.5px;color:var(--muted)">Restnutzungsdauer und Verkehrswert per Schnittstelle (Zusatz): ' +
-      '<a href="/api-doku.html" target="_blank" rel="noopener">Dokumentation</a></div>';
+    var aktiv = keys.filter(function (k) { return !k.revoked_at; }), weg = keys.filter(function (k) { return !!k.revoked_at; });
+    var zeile = function (k) {
+      var rev = !!k.revoked_at, s = _scharf && _scharf.id === k.id && _scharf.bis > Date.now() ? _scharf.art : null;
+      return '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:8px 0;border-top:1px solid rgba(0,0,0,.08)' + (rev ? ';opacity:.55' : '') + '">'
+        + '<div style="flex:1 1 200px;min-width:0"><b>' + _esc(k.name || 'DealPilot API') + '</b>' + (rev ? ' <span style="color:var(--red)">(widerrufen)</span>' : '')
+        + '<div><code>' + _esc(k.key_prefix) + '…</code></div></div>'
+        + '<div style="font-size:11.5px;color:var(--muted);flex:1 1 220px">erstellt ' + _fmt(k.created_at) + ' · zuletzt genutzt ' + _fmt(k.last_used_at) + ' · ' + (k.expires_at ? 'läuft ab ' + _fmt(k.expires_at) : 'unbegrenzt') + '</div>'
+        + '<div>' + (rev
+          ? '<button type="button" class="btn btn-sm btn-ghost" onclick="DealPilotApiKeys.entfernen(\'' + _esc(k.id) + '\')">' + (s === 'entfernen' ? 'Wirklich entfernen?' : 'Entfernen') + '</button>'
+          : '<button type="button" class="btn btn-sm btn-ghost" onclick="DealPilotApiKeys.revoke(\'' + _esc(k.id) + '\')">' + (s === 'widerrufen' ? 'Wirklich widerrufen? Zugriff endet sofort' : 'Widerrufen') + '</button>') + '</div></div>';
+    };
+    html += aktiv.length ? aktiv.map(zeile).join('') : '<div style="padding:8px 0">Kein aktiver Key.</div>';
+    if (weg.length) html += '<details style="margin-top:6px"><summary style="cursor:pointer;font-size:12px;color:var(--muted)">Widerrufene Keys (' + weg.length + ')</summary>' + weg.map(zeile).join('') + '</details>';
+    html += '<div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+      + '<input id="dp-apikey-name" type="text" maxlength="80" placeholder="Wofür? z. B. Makler-Hub" style="flex:1 1 200px;min-width:0">'
+      + '<button type="button" class="btn btn-sm btn-outline" onclick="DealPilotApiKeys.create()">Neuen Key erzeugen</button></div>'
+      + '<div style="margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.5">Ein Key wird nur beim Erzeugen einmal vollständig angezeigt – danach speichert DealPilot nur noch seinen Fingerabdruck, auch wir können ihn nicht mehr auslesen. '
+      + 'Verloren? Neuen erzeugen und den alten widerrufen. Höchstens 5 aktive Keys.</div>'
+      + '<div style="margin-top:6px;font-size:11.5px;color:var(--muted)">Header <code>X-API-Key</code> · Basis-URL <code>/api/v1</code> · voller CRUD · '
+      /* v2977 · Rechenkerne (RND, Verkehrswert) als Zusatz - Doku fuer die Anbindung */
+      + '<a href="/api-doku.html" target="_blank" rel="noopener">Dokumentation</a></div>';
     b.innerHTML = html;
   }
 
-  function _newKeyBanner(plain) {
+  function _newKeyBanner(plain, name) {
     return '<div style="padding:12px 14px;border:1px solid var(--gold,#C9A84C);border-radius:10px;background:#FAF9F4;margin-bottom:12px">' +
-      '<div style="font-weight:700;margin-bottom:6px">Dein API-Key \u2014 nur jetzt sichtbar, danach nur noch der Anfang:</div>' +
-      '<code style="display:block;word-break:break-all;font-size:12px;background:#050505;color:#E8CC7A;padding:8px 10px;border-radius:6px">' + _esc(plain) + '</code>' +
-      '<button type="button" class="btn btn-sm btn-ghost" style="margin-top:8px" onclick="DealPilotApiKeys.copy(this.getAttribute(\'data-k\'))" data-k="' + _esc(plain) + '">Kopieren</button>' +
+      '<div style="font-weight:700;margin-bottom:6px">' + (name ? 'Neuer Key „' + _esc(name) + '“' : 'Dein API-Key') + ' – nur jetzt sichtbar, bitte gleich kopieren:</div>' +
+      '<code style="display:block;word-break:break-all;font-size:12px;background:#050505;color:var(--wl-e8cc7a, #E8CC7A);padding:8px 10px;border-radius:6px">' + _esc(plain) + '</code>' +
+      '<button type="button" class="btn btn-sm btn-gold" style="margin-top:8px" onclick="DealPilotApiKeys.copy(this.getAttribute(\'data-k\'))" data-k="' + _esc(plain) + '">Kopieren</button>' +
       '</div>';
   }
 
+  async function _neuLaden(extra) {
+    var list = await _api('/', {});
+    var host = document.getElementById(HOST_ID);
+    if (host) _renderBody(host, Object.assign({ keys: list.keys }, extra || {}));
+  }
   async function create() {
     try {
-      var r = await _api('/', { method: 'POST', body: {} });
-      var list = await _api('/', {});
-      var host = document.getElementById(HOST_ID);
-      if (host) _renderBody(host, { created: true, key: r.key, keys: list.keys });
+      var nEl = document.getElementById('dp-apikey-name'), name = nEl && nEl.value.trim();
+      var r = await _api('/', { method: 'POST', body: { name: name || 'DealPilot API' } });
+      await _neuLaden({ created: true, key: r.key });
     } catch (e) {
-      if (window.toast) window.toast('\u26a0 ' + (e && e.message || e));
+      if (window.toast) window.toast('⚠ ' + (e && e.message || e));
     }
   }
-  async function revoke(id) {
-    if (!window.confirm('Diesen API-Key widerrufen? Anwendungen, die ihn nutzen, verlieren sofort den Zugriff.')) return;
-    try {
-      await _api('/' + encodeURIComponent(id), { method: 'DELETE' });
-      var list = await _api('/', {});
-      var host = document.getElementById(HOST_ID);
-      if (host) _renderBody(host, { keys: list.keys });
-    } catch (e) {
-      if (window.toast) window.toast('\u26a0 ' + (e && e.message || e));
+  async function _zweiKlicks(art, id, pfad) {
+    if (!(_scharf && _scharf.art === art && _scharf.id === id && _scharf.bis > Date.now())) {
+      _scharf = { art: art, id: id, bis: Date.now() + 8000 };
+      await _neuLaden(); setTimeout(function () { if (_scharf && _scharf.id === id && _scharf.bis <= Date.now()) { _scharf = null; _neuLaden(); } }, 8100);
+      return;
     }
+    _scharf = null;
+    try { await _api(pfad, { method: 'DELETE' }); await _neuLaden(); }
+    catch (e) { if (window.toast) window.toast('⚠ ' + (e && e.message || e)); }
   }
+  function revoke(id) { return _zweiKlicks('widerrufen', id, '/' + encodeURIComponent(id)); }
+  function entfernen(id) { return _zweiKlicks('entfernen', id, '/' + encodeURIComponent(id) + '?entfernen=1'); }
   function copy(text) {
     try {
       navigator.clipboard.writeText(text);
@@ -152,5 +159,5 @@
     setTimeout(_wireShowSettings, 300);
   }
 
-  window.DealPilotApiKeys = { create: create, revoke: revoke, copy: copy, _mount: _mount };
+  window.DealPilotApiKeys = { create: create, revoke: revoke, entfernen: entfernen, copy: copy, _mount: _mount };
 })();

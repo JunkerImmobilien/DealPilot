@@ -96,8 +96,14 @@ async function adminExtend(id, days) {
   return r.rowCount ? { ok: true, expires_at: r.rows[0].expires_at } : { ok: false };
 }
 
+/* v3167 · Marcel 04.11.2026: widerrufene Keys auch aus der Liste entfernen koennen. Nur WIDERRUFENE Keys
+   (ein aktiver muss erst widerrufen werden) und nur die eigenen. */
+async function entfernen(userId, id) {
+  const r = await query('DELETE FROM api_keys WHERE id=$1 AND user_id=$2 AND revoked_at IS NOT NULL RETURNING id', [id, userId]);
+  return { ok: r.rowCount > 0 };
+}
 module.exports = {
-  createForUser, listForUser, countActive, revoke,
+  createForUser, listForUser, countActive, revoke, entfernen,
   findValidByPlaintext, touchLastUsed,
   adminList, adminCreate, adminRevoke, adminExtend
 };

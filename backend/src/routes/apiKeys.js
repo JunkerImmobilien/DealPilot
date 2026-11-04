@@ -69,7 +69,8 @@ router.post('/', requireJwt, requirePro, async (req, res, next) => {
 });
 
 router.delete('/:id', requireJwt, requirePro, async (req, res, next) => {
-  try { res.json(await apiKeyService.revoke(req.user.id, req.params.id)); }
+  /* v3167 · ?entfernen=1 loescht einen schon WIDERRUFENEN Key aus der Liste */
+  try { res.json(req.query && req.query.entfernen === '1' ? await apiKeyService.entfernen(req.user.id, req.params.id) : await apiKeyService.revoke(req.user.id, req.params.id)); }
   catch (e) { next(e); }
 });
 
