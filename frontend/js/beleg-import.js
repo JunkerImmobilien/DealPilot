@@ -906,7 +906,7 @@
   }
   function _schonAlles(nm) {
     var rs = _rows.filter(function (r) { return r.name === nm; });
-    return rs.length && rs.some(function (r) { return r.schon; }) && !rs.some(function (r) { return r.keep; }) ? rs.filter(function (r) { return r.schon; })[0].schon : null;
+    return rs.length && rs.some(function (r) { return r.schon; }) && !rs.some(function (r) { return r.keep && (_modus !== 'wk' || FIELD_MAP_WK[r.kategorie]); }) ? rs.filter(function (r) { return r.schon; })[0].schon : null;
   }
   function _werteZeile(r) {
     return [['Datum', r.datum], ['Jahr', r.jahr || '–'], ['Aussteller', r.aussteller], ['Beschreibung', r.beschreibung],
