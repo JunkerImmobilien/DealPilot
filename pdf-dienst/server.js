@@ -298,6 +298,10 @@ async function erzeugen(auftrag) {
       schritt('profi html ' + dok.html.length);
       /* networkidle0 kam nie (gemessen: 5 x Navigation timeout) - die App laesst Verbindungen offen.
          Also: DOM setzen, dann AUSDRUECKLICH auf Bilder und Schriften warten, mit eigener Frist. */
+      /* v3181b · gemessen (Westerfeld, Bankfassung): vier Seiten BMF-Dialog hinter den Annahmen. setContent tauscht
+         das Dokument, aber NICHT die JavaScript-Welt der App - ein spaeter Zeitgeber oeffnete den Dialog im neuen
+         Dokument. Vorher alle Zeitgeber abraeumen, nachher alles entfernen, was keine Dokumentseite ist. */
+      await page.evaluate(() => { try { let id = setTimeout(() => {}, 0); while (id > 0) { clearTimeout(id); clearInterval(id); id--; } } catch (e) {} }).catch(() => {});
       await page.setContent(dok.html, { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.evaluate(() => Promise.race([
         Promise.all([].slice.call(document.images).map((i) => i.complete ? null : new Promise((ok) => { i.onload = i.onerror = ok; })))
@@ -306,6 +310,7 @@ async function erzeugen(auftrag) {
       ])).catch(() => {});
       /* Fusszeile mit Seitenzahl im Seitenrand (Chrome-Vorlage); die Fusszeilen im Fliesstext
          braucht es dann nicht - sie stehen nur fuer das Drucken aus dem Browser da. */
+      await page.evaluate(() => { [].forEach.call(document.querySelectorAll('body > :not(section)'), (e) => e.remove()); }).catch(() => {});
       const fussText = await page.evaluate(() => { const e = document.querySelector('.fuss'); return e ? [].map.call(e.children, (x) => x.textContent).join('|') : ''; }).catch(() => '');
       await page.addStyleTag({ content: '.fuss{display:none}' }).catch(() => {});
       const teile = String(fussText || '').split('|');
