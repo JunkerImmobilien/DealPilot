@@ -31,8 +31,8 @@ const filter = arg.includes('--alle') ? '' : arg.includes('--offen')
   ? "WHERE w.status IN ('neu','backlog','arbeit')" : "WHERE w.status = 'neu'";
 
 const sql = `SELECT coalesce(json_agg(x ORDER BY x.id), '[]') FROM (
-  SELECT w.id, w.art, w.titel, w.beschreibung, w.bereich, w.dringlichkeit, w.status, w.backlog_nr, w.antwort,
-         w.kontext, ${mitBildern ? 'w.bilder' : "'[]'::jsonb AS bilder"},
+  SELECT w.id, to_jsonb(w)->>'art' AS art, w.titel, w.beschreibung, w.bereich, w.dringlichkeit, w.status, w.backlog_nr, w.antwort,
+         to_jsonb(w)->'kontext' AS kontext, ${mitBildern ? "coalesce(to_jsonb(w)->'bilder', '[]'::jsonb) AS bilder" : "'[]'::jsonb AS bilder"},   /* v3167 · art/kontext/bilder erst ab Migration 095 - gemessen 04.11.: auf Prod scheiterte die Abfrage und das Werkzeug meldete 0 */
          to_char(w.created_at AT TIME ZONE 'Europe/Berlin', 'DD.MM.YYYY HH24:MI') AS am,
          split_part(u.email, '@', 1) AS von
     FROM umsetzungswuensche w LEFT JOIN users u ON u.id = w.user_id ${filter}) x`;
@@ -44,11 +44,13 @@ for (const [name, host] of Object.entries(SERVER)) {
   let liste;
   try {
     const out = execFileSync('ssh', ['-o', 'BatchMode=yes', host,
-      'docker exec -i dealpilot-postgres psql -U dealpilot -d dealpilot_db -At'],
+      'docker exec -i dealpilot-postgres psql -v ON_ERROR_STOP=1 -U dealpilot -d dealpilot_db -At'],
       { input: sql, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
     liste = JSON.parse(out.trim() || '[]');
   } catch (e) {
-    console.log(`${name}: nicht lesbar (${String(e.message).split('\n')[0]})`);
+    /* v3167 · psql meldete Abfragefehler bisher mit Rueckgabe 0 - das Werkzeug zeigte dann „0 Eintraege" (Prod, 04.11.) */
+    console.log(`${name}: FEHLER, nicht gelesen - das ist NICHT „0 Wünsche" (${String(e.message).split('\n')[0]})`);
+    process.exitCode = 1;
     continue;
   }
   console.log(`\n== ${name}: ${liste.length} Eintrag/Einträge ==`);
