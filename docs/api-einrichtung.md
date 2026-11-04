@@ -510,3 +510,39 @@ Je Kreis:
 Kopf: `stand`, `quelle`, `lizenz`, `hinweis`, `baupreisindex` {reihe, wert, basis, monat, vj_pct}, `bund`, `laender` {NW: …}, `anzahl`.
 
 Nur die Kosten des Bauwerks (KG 300+400 DIN 276, inkl. USt), wie in der Statistik. Baunebenkosten, Außenanlagen und Grundstück rechnet das Modul selbst.
+
+## 8 · Marktbericht Profi als PDF (v3177, 04.11.2026)
+
+Die Profi-Fassung des Marktberichts (Wertermittlung mit Herleitung, Fotos,
+Lagekarten, Energieeffizienzskala, Umgebung, Vergleichsangebote, Quellen) gibt
+es auch über die Schnittstelle — gedruckt vom PDF-Dienst aus **derselben** Seite
+wie der Knopf „Profi-PDF“ im Marktbericht-Fenster.
+
+**a) Eingabe übergeben, rechnen und PDF in einem Aufruf**
+
+```jsonc
+POST /api/v1/rechenkerne/verkehrswert
+{ "objekt": { … }, "wert_stufe": 3, "pdf": "profi",
+  "external_ref": "<Objekt-UUID, optional – dann mit Fotos>" }
+```
+
+Antwort wie bisher (`ergebnis` mit `report_id`, `data.cross_check` …), dazu
+
+```jsonc
+"pdf": { "art": "marktbericht_profi", "dateiname": "Marktbericht Profi Habighorst 17, ….pdf",
+         "bytes": 744004, "base64": "JVBERi0…" }
+```
+
+Scheitert nur das PDF, bleibt die Wertermittlung gültig; der Grund steht dann in
+`pdf.fehler`. Laufzeit: Wertermittlung bis ~60 s plus PDF ~25–30 s — Zeitüberschuss
+am Aufrufer auf mindestens **120 s** setzen.
+
+**b) PDF zu einem vorhandenen Bericht**
+
+```
+GET /api/v1/rechenkerne/profi-pdf?report_id=553[&objekt_id=<uuid>]   →  application/pdf
+```
+
+Rechnet nichts neu und bucht nichts. Der Bericht muss Stufe 3 sein und dem
+Schlüsselinhaber gehören. Ohne `objekt_id` fehlen nur die Objektfotos (Deckblatt
+zeigt dann die Lagekarte). Absender und Logo kommen aus dem Konto des Schlüssels.

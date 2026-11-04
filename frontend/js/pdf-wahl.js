@@ -66,11 +66,11 @@
     { id: 'hell', titel: 'Investment-PDF · hell', unter: 'Volles Dokument, helles Deckblatt',
       fuer: 'Miteigentümer · Partner · Ausdruck', hell: true, art: 'voll' },
     { id: 'obsidian', titel: 'Investment-PDF · Obsidian', unter: 'Volles Dokument, dunkles Deckblatt',
-      fuer: 'Eigener Gebrauch · Präsentation', hell: false, art: 'voll' },
-    /* v3176 · Marktbericht Profi (marktbericht-profi.js): Wertermittlung mit Herleitung,
-       Fotos, Karte, Energieskala - braucht einen Bericht der Stufe 3 */
-    { id: 'profi', titel: 'Marktbericht Profi', unter: 'Wertermittlung mit Herleitung, Fotos, Lage, Energieskala',
-      fuer: 'Eigentümer · Käufer · Bank', hell: true, art: 'profi' }
+      fuer: 'Eigener Gebrauch · Präsentation', hell: false, art: 'voll' }
+    /* v3177 · Der Marktbericht Profi stand hier v3176 als fuenfte Wahl. Raus: er ist ein
+       MARKTBERICHT, kein Investment-PDF - und diese Liste speist auch die Voreinstellung in den
+       Einstellungen, die dann den Investment-Knopf auf einen Marktbericht gelegt haette.
+       Er hat seinen Knopf jetzt im Marktbericht-Fenster (pdfProfiBtn). */
   ];
   function wahl(id) { return WAHLEN.filter(function (x) { return x.id === id; })[0] || null; }
 

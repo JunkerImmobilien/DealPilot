@@ -52,7 +52,7 @@ const ARTEN = {
   marktbericht: { objekt: false, bericht: true, name: 'Marktbericht' },
   /* v3176 · Profi-Fassung: HTML aus der App (DpProfi.dokument), gedruckt von Chrome selbst.
      report_id optional - ohne nimmt die App den neuesten Stufe-3-Bericht des Objekts. */
-  marktbericht_profi: { objekt: true, name: 'Marktbericht Profi' }
+  marktbericht_profi: { objekt: false, name: 'Marktbericht Profi', objektOderBericht: true }
 };
 
 /* Was die App schreiben darf, waehrend wir sie fernsteuern. */
@@ -266,7 +266,7 @@ async function erzeugen(auftrag) {
       await page.waitForFunction(() => window.DpProfi && typeof window.DpProfi.dokument === 'function', { timeout: 20000, polling: 250 });
       const dok = await page.evaluate(async (o, r) => {
         try { return { html: await window.DpProfi.dokument(o, r) }; } catch (e) { return { fehler: (e && e.message) || String(e) }; }
-      }, String(auftrag.objekt_id), auftrag.report_id ? Number(auftrag.report_id) : null);
+      }, auftrag.objekt_id ? String(auftrag.objekt_id) : null, auftrag.report_id ? Number(auftrag.report_id) : null);
       if (!dok || !dok.html) { const e = new Error((dok && dok.fehler) || 'Kein Dokument.'); e.status = 422; e.code = 'kein_bericht'; throw e; }
       schritt('profi html ' + dok.html.length);
       /* networkidle0 kam nie (gemessen: 5 x Navigation timeout) - die App laesst Verbindungen offen.
@@ -448,6 +448,11 @@ const server = http.createServer((req, res) => {
     }
     if (ARTEN[a.art].bericht && !/^\d{1,12}$/.test(String(a.report_id || ''))) {
       return json(res, 400, { fehler: 'report_id fehlt' });
+    }
+    /* v3177 · Profi: Objekt ODER Bericht genuegt (ueber die Schnittstelle oft nur der Bericht) */
+    if (ARTEN[a.art].objektOderBericht && !/^[0-9a-f-]{8,64}$/i.test(String(a.objekt_id || ''))
+        && !/^\d{1,12}$/.test(String(a.report_id || ''))) {
+      return json(res, 400, { fehler: 'objekt_id oder report_id fehlt' });
     }
     if (!APP_URL) return json(res, 500, { fehler: 'APP_URL nicht gesetzt' });
     zaehler.gesamt++;

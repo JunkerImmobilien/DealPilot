@@ -313,14 +313,48 @@ router.post('/verkehrswert', async function (req, res) {
     } finally { clearTimeout(frist); }
 
     rechenkerneLog(req, 'verkehrswert', Date.now() - t0, true);
-    res.json({
+    /* v3177 · Marktbericht Profi gleich mit: { …, "pdf": "profi" } druckt aus DIESEM Bericht das
+       Profi-PDF (PDF-Dienst, dieselbe Seite wie der Knopf in der App) und legt es base64 bei.
+       Scheitert nur das PDF, bleibt die Wertermittlung gueltig - der Fehler steht unter pdf.fehler. */
+    let pdfTeil;
+    if (String(body.pdf || '') === 'profi' && antwort && antwort.report_id) {
+      try {
+        const x = await require('../services/telegramPdfService').erzeugen(req.user.id, 'marktbericht_profi',
+          /^[0-9a-f-]{36}$/i.test(String(body.external_ref || '')) ? String(body.external_ref) : null, antwort.report_id);
+        pdfTeil = { art: 'marktbericht_profi', dateiname: x.dateiname, bytes: x.pdf.length, base64: x.pdf.toString('base64') };
+      } catch (e) {
+        pdfTeil = { art: 'marktbericht_profi', fehler: String(e && e.message || e) };
+      }
+    }
+    res.json(Object.assign({
       kern: 'verkehrswert',
       quelle: 'marktbericht-dienst (Register der Gutachterausschuesse)',
       ergebnis: antwort
-    });
+    }, pdfTeil ? { pdf: pdfTeil } : {}));
   } catch (e) {
     rechenkerneLog(req, 'verkehrswert', Date.now() - t0, false, 502);
     res.status(502).json({ error: 'mb_unreachable', message: String(e && e.message || e) });
+  }
+});
+
+/* ═══ v3177 · Profi-PDF zu einem vorhandenen Bericht (Stufe 3) ═════════
+   GET /rechenkerne/profi-pdf?report_id=553[&objekt_id=<uuid>]  ->  application/pdf
+   Rechnet nichts neu und bucht nichts; der Bericht muss dem Nutzer gehoeren
+   (die App liest ihn mit dessen Sitzung, /reports/one prueft user_id). */
+router.get('/profi-pdf', async function (req, res) {
+  const rid = String(req.query.report_id || '');
+  const oid = String(req.query.objekt_id || '');
+  if (!/^\d{1,12}$/.test(rid)) return res.status(400).json({ error: 'report_id fehlt oder ist keine Zahl' });
+  if (oid && !/^[0-9a-f-]{36}$/i.test(oid)) return res.status(400).json({ error: 'objekt_id ist keine UUID' });
+  const pdf = require('../services/telegramPdfService');
+  if (!pdf.verfuegbar()) return res.status(503).json({ error: 'pdf_dienst_fehlt', message: 'Der PDF-Dienst ist hier nicht eingerichtet.' });
+  try {
+    const x = await pdf.erzeugen(req.user.id, 'marktbericht_profi', oid || null, Number(rid));
+    res.set('Content-Type', 'application/pdf');
+    res.set('Content-Disposition', 'attachment; filename*=UTF-8\'\'' + encodeURIComponent(x.dateiname || ('Marktbericht-Profi-' + rid + '.pdf')));
+    res.send(x.pdf);
+  } catch (e) {
+    res.status(422).json({ error: 'kein_pdf', message: String(e && e.message || e) });
   }
 });
 

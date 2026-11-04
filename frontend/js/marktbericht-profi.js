@@ -168,6 +168,57 @@
     return '<table class="lt"><thead><tr><th>Bereich</th><th style="width:38%">Teilnote</th><th class="r">0–100</th><th>Nächster Ort</th></tr></thead><tbody>' + z + '</tbody></table>';
   }
 
+  /* ── v3177 · Was in der Nähe ist (wie der normale Bericht: je Bereich bis zu fünf Orte) ── */
+  var KAT_ORD = ['einkaufen', 'verkehr', 'gesundheit', 'bildung', 'freizeit', 'gastronomie'];
+  function umgebung(m) {
+    var g = m && m.groups; if (!g) return '';
+    var bloecke = KAT_ORD.filter(function (k) { return g[k] && (g[k].items || []).length; }).map(function (k) {
+      var it = g[k].items.slice(0, 5).map(function (x) {
+        return '<li><span>' + esc(String(x.name || '').split(',')[0]) + '</span><span class="num">' + (istZahl(x.distance_m) ? zahl(x.distance_m, 0) + ' m' : '–') + '</span></li>';
+      }).join('');
+      return '<div class="umg"><b>' + esc(KAT[k] || k) + (istZahl(g[k].count) ? ' <span>· ' + zahl(g[k].count, 0) + ' im Umkreis</span>' : '') + '</b><ul>' + it + '</ul></div>';
+    }).join('');
+    return bloecke ? '<h3>In der Nähe</h3><div class="umg-raster">' + bloecke + '</div>' : '';
+  }
+
+  /* ── v3177 · Vergleichsangebote (entdoppelt wie _mbCompsEindeutig im normalen Bericht) ── */
+  var ARTWORT = { apartment: 'Wohnung', wohnung: 'Wohnung', etw: 'Wohnung', house: 'Haus', haus: 'Haus', efh: 'Haus', mfh: 'Mehrfamilienhaus', multi_family: 'Mehrfamilienhaus' };
+  function vergleichsangebote(p) {
+    var comps = (p.sale && p.sale.comparables) || [];
+    if (!comps.length) return '';
+    var mp = new Map();
+    comps.forEach(function (c) {
+      var k = [c.postcode || '', c.city || '', c.living_area, c.price, c.build_year].join('|');
+      var alt = mp.get(k);
+      if (!alt || (c.distance_m != null && (alt.distance_m == null || c.distance_m < alt.distance_m))) mp.set(k, c);
+    });
+    var e = comps.filter(function (c) { return Array.from(mp.values()).indexOf(c) >= 0; })
+      .sort(function (a, b) { return (a.distance_m == null ? 1e9 : a.distance_m) - (b.distance_m == null ? 1e9 : b.distance_m); });
+    var ges = (p.sale && p.sale.sample_size) || e.length;
+    var zeig = e.slice(0, 14);
+    var z = zeig.map(function (c) {
+      return '<tr><td>' + esc(ARTWORT[String(c.property_type || '').toLowerCase()] || c.property_type || '–') + '</td><td>' + esc([c.postcode, c.city].filter(Boolean).join(' ') || '–') + '</td>'
+        + '<td class="r num">' + (istZahl(c.living_area) ? zahl(c.living_area, 0) + ' m²' : '–') + '</td><td class="r num">' + jahr(c.build_year) + '</td>'
+        + '<td class="r num">' + eur(c.price) + '</td><td class="r num">' + (istZahl(c.price_per_sqm) ? zahl(c.price_per_sqm, 0) : '–') + '</td>'
+        + '<td class="r num">' + (istZahl(c.distance_m) ? zahl(c.distance_m, 0) + ' m' : '–') + '</td></tr>';
+    }).join('');
+    return '<h3>Vergleichsangebote (' + zeig.length + (ges > zeig.length ? ' von ' + zahl(ges, 0) : '') + ')</h3>'
+      + '<table><thead><tr><th>Art</th><th>Ort</th><th class="r">Fläche</th><th class="r">Baujahr</th><th class="r">Angebotspreis</th><th class="r">€/m²</th><th class="r">Entfernung</th></tr></thead><tbody>' + z + '</tbody></table>'
+      + '<p class="det">Angebotspreise, keine Kaufpreise. ' + (ges > zeig.length ? 'Median und Quartile oben stammen aus allen ' + zahl(ges, 0) + ' Angeboten. ' : '')
+      + (comps.length > e.length ? (comps.length - e.length) + ' doppelt eingestellte Angebote sind nur einmal gezählt.' : '') + '</p>';
+  }
+
+  /* ── v3177 · Führendes Verfahren, deutlich und begründet ──────────── */
+  var VERF_NAME = { sachwert: 'Sachwertverfahren', vergleichswert: 'Vergleichswertverfahren', ertragswert: 'Ertragswertverfahren', angebote: 'Marktpreisindikation aus Angeboten' };
+  function fuehrendBox(v) {
+    if (!v.fuehrend) return '';
+    var f = v.fuehrend;
+    var rest = v.liste.filter(function (x) { return !x.fuehrend; }).map(function (x) { return x.name + ' ' + eur(x.wert); });
+    return '<div class="fuehrt"><div class="fuehrt-k">Führendes Verfahren</div><div class="fuehrt-n">' + esc(VERF_NAME[f.id] || f.name) + ' · ' + eur(f.wert) + '</div>'
+      + '<p>' + esc(v.grund || '') + (v.grundQuelle ? ' <span class="det">(' + esc(v.grundQuelle) + ')</span>' : '') + '</p>'
+      + (rest.length ? '<p class="det">Zur Plausibilisierung: ' + esc(rest.join(' · ')) + '.</p>' : '') + '</div>';
+  }
+
   /* ── Daten sammeln ────────────────────────────────────────────────── */
   function api(pfad, opt) { return window.Auth.apiCall(pfad, opt); }
   function alsDataUrl(blob) {
@@ -289,7 +340,14 @@
     '.ek-skala{display:grid;grid-template-columns:repeat(9,1fr);font:6.8pt "JetBrains Mono",monospace;color:var(--muted);margin-top:1.4mm}',
     '.ek-txt{font-size:8.4pt;margin-top:2mm}',
     'ol.quellen{padding-left:5mm;font-size:8pt;color:var(--muted)}ol.quellen li{margin-bottom:1.6mm}',
-    '.lt td,.lt th{padding:1.4mm 2mm}'
+    '.lt td,.lt th{padding:1.4mm 2mm}',
+    '.umg-raster{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm 6mm}.umg{break-inside:avoid}',
+    '.umg b{display:block;font:600 8.6pt/1.3 Inter,sans-serif;border-bottom:.3mm solid var(--ink);padding-bottom:1mm;margin-bottom:1mm}.umg b span{font-weight:400;color:var(--muted)}',
+    '.umg ul{list-style:none;margin:0;padding:0;font-size:7.8pt}.umg li{display:flex;justify-content:space-between;gap:2mm;padding:.8mm 0;border-bottom:.2mm solid var(--line)}',
+    '.umg li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    '.fuehrt{border:.3mm solid var(--ink);border-left:1.6mm solid var(--gold);padding:3.5mm 4.5mm;margin:4mm 0 2mm;break-inside:avoid}',
+    '.fuehrt-k{font:7pt/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5mm}',
+    '.fuehrt-n{font:600 13pt/1.25 "Space Grotesk",Inter,sans-serif;margin-bottom:1.5mm}.fuehrt p{font-size:8.6pt;margin:0 0 1mm}'
   ].join('\n');
 
   /* Gold der aktiven Marke (Whitelabel setzt --gold am <html>), sonst bleibt der Rueckfall im :root. */
@@ -348,7 +406,7 @@
     }).join('');
     teile.push(seite(d, 'Ergebnis', '<div class="eyebrow">Ergebnis</div><h2>Marktwert-Indikation ' + eur(ergebnis) + '</h2>'
       + '<p class="sub">' + esc(v.grund) + (v.grundQuelle ? ' (' + esc(v.grundQuelle) + ')' : '') + '</p>'
-      + spanneSvg(v.liste, r.purchase_price) + '<div class="verf">' + kacheln + '</div>'
+      + fuehrendBox(v) + spanneSvg(v.liste, r.purchase_price) + '<div class="verf">' + kacheln + '</div>'
       + (d.md ? '<h3>Einschätzung</h3>' + zusammenfassung(d.md) : '')));
 
     /* 3 · Objekt */
@@ -375,7 +433,7 @@
     teile.push(seite(d, 'Lage', '<div class="eyebrow">Abschnitt 2</div><h2>Lage</h2>'
       + '<p class="sub">' + esc([r.ortsteil, r.gemeinde].filter(Boolean).join(', ')) + (p.assessment ? ' · Mikrolage ' + esc(p.assessment.mikrolage || '–') + ', Makrolage ' + esc(p.assessment.makrolage || '–') : '') + '</p>'
       + '<div class="zwei">' + (d.karteNah ? '<img class="karte" src="' + d.karteNah + '" alt="Karte Umgebung">' : '') + (d.karteFern ? '<img class="karte" src="' + d.karteFern + '" alt="Karte Region">' : '') + '</div>'
-      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro)
+      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro)
       + (makro ? '<h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>' : '')
       + (z.available ? '<p class="det" style="margin-top:3mm">Zensus 2022 (' + esc((z.gemeinde && z.gemeinde.name) || z.kreis_name || '') + '): Leerstandsquote ' + zahl(z.leerstandsquote, 1) + ' %, Eigentümerquote ' + zahl(z.eigentuemerquote, 1) + ' %.</p>' : '')));
 
@@ -394,7 +452,8 @@
       + '<div><span>Mietentwicklung</span><span class="num">' + (istZahl(p.rent_trend_pct) ? (p.rent_trend_pct > 0 ? '+' : '') + zahl(p.rent_trend_pct, 1) + ' %' : '–') + '</span></div>'
       + '<div><span>Vermarktungsdauer</span><span class="num">' + (p.market_dynamics && istZahl(p.market_dynamics.days_on_market) ? zahl(p.market_dynamics.days_on_market, 0) + ' Tage' : '–') + '</span></div>'
       + '<div><span>Marktpreisindikation</span><span class="num">' + eur(mv.estimated) + (istZahl(mv.low) ? ' (' + eur(mv.low) + ' – ' + eur(mv.high) + ')' : '') + '</span></div></div>'
-      + ((p.valuation && p.valuation.notes || []).length ? '<p class="det" style="margin-top:3mm">' + esc(p.valuation.notes.join(' ')) + '</p>' : '')));
+      + ((p.valuation && p.valuation.notes || []).length ? '<p class="det" style="margin-top:3mm">' + esc(p.valuation.notes.join(' ')) + '</p>' : '')
+      + vergleichsangebote(p)));
 
     /* 6 · Bodenwert + Sachwert */
     var bw = c.bodenwert || {}, sw = c.sachwert || {}, lv = p.land_value || {};
@@ -514,8 +573,10 @@
     });
   }
   function oeffnen(objKey, reportId) {
-    var key = objKey || window._currentObjKey;
-    if (!key) { alertlos('Bitte zuerst ein Objekt öffnen.'); return Promise.resolve(); }
+    /* Mit Bericht-Nummer, aber ohne Objekt: KEIN Rueckgriff auf das offene Objekt - dessen Fotos gehoerten
+       sonst in einen fremden Bericht. Dann eben ohne Fotos. */
+    var key = objKey || (reportId ? null : window._currentObjKey);
+    if (!key && !reportId) { alertlos('Bitte zuerst ein Objekt öffnen.'); return Promise.resolve(); }
     if (typeof window.toast === 'function') window.toast('Marktbericht Profi wird zusammengestellt …');
     return sammeln(key, reportId).then(function (d) { vorschau(html(d), 'Marktbericht Profi · ' + ((d.p.ref && d.p.ref.address) || '')); })
       .catch(function (e) { alertlos(e && e.message ? e.message : 'Der Marktbericht Profi ließ sich nicht erstellen.'); });

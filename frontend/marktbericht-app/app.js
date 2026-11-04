@@ -1675,6 +1675,13 @@ function render(out) {
   try {
     var _st1 = out.ai_mode === 'schnell';
     if ($('pdfBtn')) $('pdfBtn').style.display = _st1 ? 'none' : '';
+    /* v3177 · Profi-PDF nur mit Wertermittlung (Stufe 3) und nur, wo die Haupt-App das Modul hat */
+    if ($('pdfProfiBtn')) {
+      var _cc = out.data && out.data.cross_check;
+      var _profiOk = !!(_cc && _cc.available && !_cc.nicht_im_umfang && out.report_id);
+      var _hat = false; try { _hat = !!(window.parent && window.parent !== window && window.parent.DpProfi); } catch (e) {}
+      $('pdfProfiBtn').style.display = (_profiOk && _hat) ? '' : 'none';
+    }
     if (_st1) $('reportMd').innerHTML = '<p><b>Stufe 1 · Marktpreisindikation.</b> Sie steht auf der Objektkarte in DealPilot. '
       + 'Einen Marktbericht mit Lage, Markt und Text gibt es ab <b>Stufe 2</b>, die Wertermittlung nach ImmoWertV in <b>Stufe 3</b>.</p>';
   } catch (e) {}
@@ -3159,6 +3166,15 @@ $('pdfBtn').addEventListener('click', async () => {
   const btn = $('pdfBtn'); btn.disabled = true; const old = btn.textContent; btn.textContent = 'erstelle PDF…';
   try { await exportPdf(out); } catch (e) { alert('PDF-Fehler: ' + e.message); }
   finally { btn.disabled = false; btn.textContent = old; }
+});
+
+/* v3177 · Profi-PDF: die Haupt-App baut es (marktbericht-profi.js) und zeigt die Vorschau */
+if ($('pdfProfiBtn')) $('pdfProfiBtn').addEventListener('click', function () {
+  var out = window._lastOut; if (!out || !out.report_id) return;
+  var ref = (out.data && out.data.ref) || {};
+  var key = ref.external_ref || String(out.object_key || '').replace(/^dp:/, '') || null;
+  if (key && !/^[0-9a-f-]{36}$/i.test(key)) key = null;
+  try { window.parent.DpProfi.oeffnen(key, out.report_id); } catch (e) { console.warn('[mb] Profi-PDF:', e && e.message); }
 });
 
 // Laedt ein Bild (z.B. Objektkarte) als DataURL fuer die PDF-Einbettung.
