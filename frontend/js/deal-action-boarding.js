@@ -300,6 +300,9 @@
          Marktwert und Knöpfe darunter */
       X + '.dab-mb-main{flex:1 1 calc(100% - 60px) !important;min-width:0 !important}',
       X + '.dab-mb-d{white-space:nowrap}',
+      X + '.dab-mb-row{position:relative}',
+      X + '.dab-mb-row .dab-mb-main{padding-right:40px}',
+      X + '.dab-mb-row .dab-mb-del{position:absolute;top:12px;right:12px;width:28px !important;height:28px !important;margin:0 !important}',
       X + '.dab-mb-mv{flex:1 1 auto;text-align:left !important;margin-left:58px}',
       X + '.dab-mb-row .dab-doc-btn{flex:0 0 auto}',
       /* „In Gesellschaft überführen" (gesellschaft-ueberfuehrung): Abschnittskopf wie die übrigen */
