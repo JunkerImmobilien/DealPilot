@@ -519,6 +519,18 @@
           s('zustand', 'Gesamtzustand', ZUSTAND) +
           (_weg ? f('mea_anteil', 'Miteigentumsanteil (z. B. 125 von 1000)', 'optional', 'decimal') : '') +
         '</div>' +
+        /* v3193 · Marcel 05.11.2026: die Portfoliostrategie fand keine Ausstattungsmerkmale je Wohnung - „zum Aufklappen
+           … dass wir das mit angeben können. Ansonsten können wir das irgendwie ableiten." Leer = in der Schnittstelle aus
+           dem Gebäude abgeleitet (backend services/ausstattung.js) und so gekennzeichnet. */
+        '<details class="mfh-we-ausst"' + ((e.aus_kueche || e.aus_bad || e.aus_boden) ? ' open' : '') + '><summary style="cursor:pointer;font:600 13px Inter,sans-serif;margin:10px 0 6px">Ausstattung der Wohnung</summary>' +
+          '<div class="mfh-we-raster">' +
+            s('aus_kueche', 'Küche', [['', '— (aus dem Gebäude ableiten)'], ['keine', 'keine Einbauküche'], ['ebk_einfach', 'Einbauküche einfach'], ['ebk_hochwertig', 'Einbauküche hochwertig']]) +
+            s('aus_bad', 'Bad', [['', '— (aus dem Gebäude ableiten)'], ['einfach', 'einfach / älter'], ['standard', 'Standard'], ['modern', 'modernisiert / gehoben']]) +
+            f('aus_bad_jahr', 'Bad modernisiert (Jahr)', 'z. B. 2018', 'numeric') +
+            s('aus_boden', 'Bodenbelag', [['', '— (aus dem Gebäude ableiten)'], ['pvc_teppich', 'PVC / Teppich'], ['laminat', 'Laminat / Vinyl'], ['fliesen', 'Fliesen'], ['parkett', 'Parkett / Dielen']]) +
+            s('aus_fbh', 'Fußbodenheizung', [['', '—'], ['ja', 'ja'], ['nein', 'nein']]) +
+            s('aus_barrierearm', 'Barrierearm', [['', '—'], ['ja', 'ja'], ['nein', 'nein']]) +
+          '</div></details>' +
         /* v2210 · erscheint nur, wenn die Einheit Gewerbe ist */
         '<div id="mfh-we-gew-box"><h4>Gewerbe</h4>' +
           '<p class="mfh-we-hint">Die Fläche gilt hier als <b>Nutzfläche</b>. Für den Ertragswert zählt die <b>marktübliche</b> Miete (§ 31 Abs. 2 ImmoWertV). ' +

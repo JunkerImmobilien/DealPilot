@@ -109,6 +109,8 @@ router.get('/:id', validate({ params: idParamSchema }), async (req, res, next) =
       } catch (e) { /* Freigabe-Pfad ist Zusatz, nie blockierend */ }
     }
     if (!obj) throw new HttpError(404, 'Object not found');
+    /* v3193 · Ausstattung lesbar fuer die Schnittstelle (Portfoliostrategie fand sie im Rohdatensatz nicht) */
+    try { let _d = obj.data; if (typeof _d === 'string') _d = JSON.parse(_d); obj = Object.assign({}, obj, { ausstattung: require('../services/ausstattung').ausstattung(_d) }); } catch (_eA) {}
     res.json(obj);
   } catch (err) { next(err); }
 });

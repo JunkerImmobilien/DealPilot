@@ -654,6 +654,7 @@ async function bauen(userId, opt) {
       verloren: daten._deal_lost === true || daten._deal_lost === 'true',
       ankauf_stand: (daten._ankauf && daten._ankauf.stichtag) ? daten._ankauf.stichtag : null,
       daten: schlank,
+      ausstattung: (function () { try { return require('./ausstattung').ausstattung(daten); } catch (e) { return null; } })(),   /* v3193 */
       analyse: analyse,
       fotos_anzahl: fotoZahl,
       fotos: mitFotos && Array.isArray(fotos) ? fotos : undefined

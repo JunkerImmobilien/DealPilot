@@ -108,6 +108,7 @@ nav.inhalt a{color:var(--text);font-size:14px}
 <tr><td><code>kp</code></td><td>nein</td><td>Kaufpreis in €, für den Vergleich</td></tr>
 <tr><td><code>brw</code>, <code>lzs_pct</code>, <code>sachwertfaktor</code></td><td>nein</td><td>eigene Werte, wo kein amtlicher vorliegt (im Ergebnis als „eigene Angabe“)</td></tr>
 </table></div>
+<p><b>Ausstattungsmerkmale (seit v3193):</b> <code>GET /objects/{id}</code> und der Portfolio-Export liefern je Objekt einen Block <code>ausstattung</code> in Klartext: <code>gebaeude</code> (Standardstufe, Zustand, Energieklasse, Modernisierungspunkte, Gewerke mit Art/modernisiert/Standardstufe, Bauteile wie Aufzug, Keller, Bäder, Balkon, Stellplätze) und <code>einheiten[]</code> je Wohnung (Fläche, Zimmer, Etage, Balkon, Keller, Stellplatz, Zustand, Küche, Bad mit Modernisierungsjahr, Bodenbelag, Fußbodenheizung, barrierearm). Merkmale mit <code>quelle: "abgeleitet"</code> sind nicht je Wohnung erfasst, sondern aus dem Gebäude abgeleitet. Die Rohfelder (<code>eq_*</code>, <code>ausst_*</code>, <code>mod_*</code>, <code>_mfh.einheiten</code>) stehen weiter im Datensatz.</p>
 <p>Weitere Felder wie in der App (Ausstattung, Stellplätze, Erbbaurecht, Einheiten des Mehrfamilienhauses) werden ebenfalls gelesen. Optional auf oberster Ebene: <code>wert_stufe</code> (Vorgabe 3 = volle Wertermittlung), <code>external_ref</code>.</p>
 <pre><code>curl -X POST https://app.dealpilot.immo/api/v1/rechenkerne/verkehrswert \
   -H "x-api-key: dpk_live_…" -H "Content-Type: application/json" \

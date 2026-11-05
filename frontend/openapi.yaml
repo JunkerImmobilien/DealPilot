@@ -164,7 +164,7 @@ paths:
       responses: { "200": { description: Liste } }
   /objects/{id}:
     get:
-      summary: Ein Objekt roh
+      summary: Ein Objekt roh, dazu der Block ausstattung (Gebaeude und Einheiten in Klartext, quelle erfasst oder abgeleitet; seit v3193)
       parameters: [ { $ref: '#/components/parameters/objektId' } ]
       responses: { "200": { description: Objekt }, "404": { description: nicht gefunden } }
   /objects/{id}/wissen:
