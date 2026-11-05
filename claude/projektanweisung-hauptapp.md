@@ -44385,3 +44385,15 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `3e1d516` u. a.; Prod 1.0.64 `97c4c99`, Sicherungen `/root/backups/haupt-20261105-1233.sql.gz`, `mb-20261105-1233.sql.gz`.
 - **Nachweis:** Staging 27/33 angeboten, Westerfeldstr. „Bestand“; Deal-Aktion-Kopf zweispaltig; Prod `/hub/pruefen` → nicht eingerichtet, /health 200.
 - **Rest:** Reiter Bewertung kompakter + Charts in den PDFs (Marcel, nächster Auftrag).
+
+### v3192–v3196a · Bewertung kompakt, Ausstattung in der Schnittstelle, Bauzins, Messkabine (05.11.2026, Prod 1.0.65–1.0.69)
+- **Was:** Bewertung in Kennzahl-Kategorien mit EK-Rendite (v3192/a); Block `ausstattung` in API und Export, Ausstattung je Wohnung, Demo-Mietverträge (v3193); Bauzins mit Bundesbank-Wert je Bindung, K 0,41 in allen Spiegelstellen, 5 J als Mitte zweier Reihen (v3194–v3195); zwölf Befunde der Messkabine behoben (v3196/a).
+- **Commit:** `9e6d552` `388cc4e` `2920952` `27b0f27` `134da03` `c63b940` `a5325ed` `a158b2d`; Prod `508e6ea` … `a792cc3`.
+- **Nachweis:** je Tagesdatei `wissen/2026-11-05.md`; 10 J/80 % 4,25 % effektiv, 5 J 4,19 %.
+- **Rest:** BMF Schritt 3/4 mobil, geteilter Deal-Score, Quick-Check mit Ergebnis in der Messkabine nicht messbar (POST-Sperre); Charts der Bewertung in die PDFs.
+
+### v3197 · Eigentum, Darlehensverwendung, Familie, GmbH-Interna (05.11.2026, Prod 1.0.70)
+- **Was:** Objekt › „Eigentum & Erwerb“ (eig_struktur, Anteile eigen/Ehegatte/Dritte, eig_erwerb, eig_erwerb_datum); d1/d2_verwendung; Investmentprofil „Familie & Güterstand“ (Güterstand, Eheschließung, Anfangsvermögen beider); Mandant GmbH Einlagekonto § 27 KStG und Verlustvortrag. Export: je Objekt `eigentum`, `darlehen_verwendung`, `gewerbeanteil_pct`; oben `profil` (Steuer, Familie) und `mandanten`.
+- **Commit:** `0fc538e`; Prod 1.0.70 `4e2f576`, Sicherungen `/root/backups/haupt-20261105-1505.sql.gz`, `mb-20261105-1505.sql.gz`.
+- **Nachweis:** Staging Westerfeldstr. 140: Werte gesetzt → saveObj → Export zeigt struktur ehegatten, 50/50, d1 kauf; danach zurückgesetzt. Profil-Pane enthält alle vier Felder. Buster RC=0, Gold-Audit auf Basislinie.
+- **Rest:** Mandantenfelder nur im Code gegengelesen, nicht im Browser gespeichert.
