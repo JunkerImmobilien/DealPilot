@@ -44351,3 +44351,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `8d9785ac`, `648ab21f` (v3184a), `6880568e` (v3184b); Prod 1.0.60 `c45cf7f`, Sicherungen `/root/backups/haupt-20261105-1027.sql.gz`, `mb-20261105-1027.sql.gz`.
 - **Nachweis:** Staging, Downloads abgefangen: alle sechs Ausgaben 2,7–5,2 s; Jacoby am Ravensberger Weg 38 (79,88 % gegen 74,82 %) bis ins PDF-Deckblatt; Testwert im Reiter Steuer zurückgesetzt. Buster, Gold-Audit grün; Prod liefert `bmf-ausgabe.js?v=v3184b`.
 - **Rest:** Messe-Videos zum BMF-Rechner neu aufnehmen; klassische KPA (jsPDF) ohne Jacoby; Selbstauskunft wartet auf Marcels Vorlage. Einzelheiten `wissen/2026-11-05.md`.
+
+### v3185–v3187b · BMF-Rechner einheitlich, Grenzsteuersatz erklärt, Deal-Aktion seriös (05.11.2026, Prod 1.0.61)
+
+- **Was:** `css/bmf-einheitlich.css` (ein Erscheinungsbild im BMF-Rechner: Felder wie Reiter Steuer, Flächen wie Schritt 5, keine Serifen/Kursiv). Reiter Steuer: Erklärzeile zum Grenzsteuersatz (ESt + Soli-Milderungszone + KiSt, wirksamer Satz für dieses Objekt), ein Popup statt zwei, „Steuer vor Immobilie“ mit Jahr und Basis, Jahreskarten ohne V+V. Deal-Aktion: ohne Flugzeug/Boarding, Status offen/gewonnen/verloren als Karten, Dokumente und Marktberichte als Karten, nur ziehbare Dokumente sichtbar.
+- **Commit:** `39ed0f2f` … `01e1d1b` (v3185–v3187b); Prod 1.0.61 `6c85d88`, Sicherungen `/root/backups/haupt-20261105-1104.sql.gz`, `mb-20261105-1104.sql.gz`.
+- **Nachweis:** Staging Schritt 1–3 nachgesehen; Grenzsatz am Kern 90.000→90.100 € = 47,00 €; Jahreskarten 15× einzeilig; Deal-Aktion ohne Flug-Begriffe (DOM-Suche leer), Ausblenden per simulierter Lücke. Prod liefert `bmf-einheitlich.css?v=v3185b`, `tax.js?v=v3186`, `deal-action-boarding.js?v=v3187b`.
+- **Rest:** Gold-Basislinie für deal-action-pilot.js senken; zvE-Feld 90.000 € gegen Steuerzeitraum 2026 68.000 € bei Marcel. Einzelheiten `wissen/2026-11-05.md`.
