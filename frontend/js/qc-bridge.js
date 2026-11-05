@@ -221,7 +221,7 @@
   }
 
   // ── (qc-save) Übernahme ──
-  function _handleSave(inputs, avm, photos, pendingTargets) {
+  async function _handleSave(inputs, avm, photos, pendingTargets) {
     /* v893f-guard: Doppel-/Dreifach-Anlage verhindern (iframe schickt qc-save teils mehrfach) */
     if (_handleSave._busy) { try { console.warn('[qc-bridge] Speichern läuft bereits \u2014 Doppelauftrag ignoriert (v893f)'); } catch (e) {} return; }
     _handleSave._busy = true;
@@ -239,7 +239,11 @@
       if (typeof window.newObj === 'function') {
         var _oc = window.confirm;
         window.confirm = function () { return true; };
-        try { window.newObj(); } finally { window.confirm = _oc; }
+        /* v3198 · ohne Quellen-Auswahl: das Fenster schob den Reset hinter den Save, der Save brach ab (v1268)
+           und der Quick-Check ging verloren. Und den Reset ABWARTEN: newObj sichert erst das geladene Objekt. */
+        var _nr = null;
+        try { _nr = window.newObj({ ohneAuswahl: true }); } finally { window.confirm = _oc; }
+        if (_nr && typeof _nr.then === 'function') await _nr;
       }
     } catch (e) { console.warn('[qc-bridge] newObj:', e); }
 

@@ -486,7 +486,8 @@ function collectData() {
         setzt — ein Feld, das hier fehlt, ist nach dem naechsten Speichern
         eines FREMDEN Objekts weg. */
      '_kpis_bwk_nul_y','_kpis_bwk_nul_st_y',
-     /* v3161 */ '_kpis_rs_bindung','_kpis_anschl_rate','_kpis_bindung_ende','_kpis_bsv_luecke']
+     /* v3161 */ '_kpis_rs_bindung','_kpis_anschl_rate','_kpis_bindung_ende','_kpis_bsv_luecke',
+     /* v3198 */ '_kpis_afa_geb_basis','_kpis_afa_satz','_kpis_afa_methode']
       .forEach(function (f) {
         if (window._currentObjData && window._currentObjData[f] != null) d[f] = window._currentObjData[f];
       });
@@ -503,6 +504,12 @@ function collectData() {
     if (isFinite(State.rs)) d._kpis_rs_bindung = Math.round(State.rs);
     if (isFinite(State.anschlRate)) d._kpis_anschl_rate = Math.round(State.anschlRate * 100) / 100;
     if (State.bindungsEnde) d._kpis_bindung_ende = State.bindungsEnde;
+    /* v3198 · AfA-Grundlage (Gebaeude) aus calc.js - daraus rechnet der Export den Buchwert */
+    if (State._afaStempel && isFinite(State._afaStempel.geb)) {
+      d._kpis_afa_geb_basis = Math.round(State._afaStempel.geb);
+      d._kpis_afa_satz = State._afaStempel.satz;
+      d._kpis_afa_methode = State._afaStempel.methode || 'linear';
+    }
     try { var _lc = State.bsvLifecycle; if (_lc && isFinite(_lc.luecke)) d._kpis_bsv_luecke = Math.round(_lc.luecke); } catch (e) {}
     /* v2931 · Jahresmiete und Nettomietrendite: ankauf.js (KENNZAHLEN), die
        Kartenrueckseite (doppelkarte.js) und der Portfolio-Export lesen beide
@@ -1365,8 +1372,9 @@ function newObj() {
   try { if (window.dpTabSwitchSave) { _p = window.dpTabSwitchSave(); } } catch (e) {} /* v782-always-save */
   if (_p && typeof _p.then === 'function' && window._currentObjKey) {
     var _weiter = function () { try { _newObjLeeren(); } catch (e) {} };
-    _p.then(_weiter, _weiter);
-    return;
+    /* v3198 · das Promise zurückgeben: wer danach Felder füllt (Quick-Check, Überführung), muss den Reset
+       abwarten - sonst füllt er das noch geladene Objekt, und der verspätete Reset leert alles wieder. */
+    return _p.then(_weiter, _weiter);
   }
   _newObjLeeren();
 }

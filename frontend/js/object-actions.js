@@ -2177,7 +2177,14 @@
     if (we.length && _mvImport.length && window.DpEingang && window.DpEingang.mvFelder) {
       _mvImport.forEach(function (m) {
         var v = window.DpEingang.mvVorschlag(m.ext, we);
-        if (v && v.i >= 0 && (v.sicher || we.length === 1)) { window.DpEingang.mvFelder(we[v.i], m.ext, m.quelle); _mvRein.push('Whg. ' + (we[v.i].nr || (v.i + 1))); }
+        if (v && v.i >= 0 && (v.sicher || we.length === 1)) {
+          /* Der Vertrag nennt die Miete bei Vertragsbeginn (bei Staffel die erste Stufe), die Mieterliste die heutige -
+             gemessen an Lindenallee 14: 3.660 → 3.595 €. Steht in der Liste eine Miete, gilt sie. */
+          var _u = we[v.i], _istListe = numDe(_u.ist) > 0 ? _u.ist : null, _statusListe = _u.status;
+          window.DpEingang.mvFelder(_u, m.ext, m.quelle);
+          if (_istListe != null) { _u.ist = _istListe; _u.status = _statusListe; }
+          _mvRein.push('Whg. ' + (_u.nr || (v.i + 1)));
+        }
         else _mvOffen.push(m.quelle);
       });
       if (_mvOffen.length) _importHinweise.push(_mvOffen.length + ' Mietvertrag/-verträge ohne eindeutige Einheit (' + _mvOffen.join(', ') + ') - nach dem Übernehmen unter „Einheiten erfassen“ zuordnen.');

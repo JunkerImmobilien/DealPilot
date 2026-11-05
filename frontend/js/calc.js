@@ -1379,6 +1379,8 @@ function _calcImmediate(){
   } catch (_e) {}
 
   // V227: § 7b Eligibility prüfen
+  /* v3198 · AfA-Grundlage fuer den Stempel am Objekt (Portfolio-Export: Buchwert je Objekt) - dieselbe Zahl wie im Reiter Steuer */
+  if (window.State) State._afaStempel = { geb: afa_geb_basis, satz: afa_r, methode: afaParsed.methode };
   var sonder7bGueltig = (typeof window.afaSonder7bIsValid === 'function') ? window.afaSonder7bIsValid() : false;
   var sonder7bBasis = 0;
   if (sonder7bGueltig && window.Afa && Afa.sonder7bBasis) {

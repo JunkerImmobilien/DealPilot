@@ -663,6 +663,8 @@ async function bauen(userId, opt) {
       },
       darlehen_verwendung: { d1: daten.d1_verwendung || null, d2: daten.d2_verwendung || null },
       gewerbeanteil_pct: _gewerbeanteil(daten),
+      gewerbeanteil_quelle: _gewerbeanteilQuelle(daten),   /* v3198 · null = nicht erfasst, NICHT „kein Gewerbe“ */
+      buchwert: _buchwert(daten),   /* v3198 */
       analyse: analyse,
       fotos_anzahl: fotoZahl,
       fotos: mitFotos && Array.isArray(fotos) ? fotos : undefined
@@ -901,7 +903,33 @@ async function bauen(userId, opt) {
    sich nicht von "findet nichts" unterscheiden - dieselbe Lehre wie bei
    `deklariertAbsichtlich` in der Messkabine. */
 function _zahl(v) { if (v == null || String(v).trim() === '') return null; const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : null; }
-/* Gewerbeanteil nach Fläche: Einheiten mit art "gewerbe" / alle Einheiten; ohne Einheiten 100 % bei GESCH, sonst 0 */
+/* Gewerbeanteil nach Fläche: Einheiten mit art "gewerbe" / alle Einheiten.
+   v3198 · Ohne Einheiten nur dort eine Zahl, wo die Objektart sie festlegt (reine Wohnart 0, reine Gewerbeart 100);
+   bei MFH, Wohn- und Geschäftshaus oder ohne Objektart null = nicht erfasst (vorher 0 - las sich als „kein Gewerbe“). */
+const _ART_WOHNEN = /^(ETW|EFH|ZFH|DHH|RH)$/, _ART_GEWERBE = /^(GESCH|BUERO|HOTEL|GEW)$/;
+function _gewerbeanteilQuelle(d) {
+  const e = d && d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null;
+  if (e && e.length) return 'einheiten';
+  const a = String((d && d.objart) || '');
+  return (_ART_WOHNEN.test(a) || _ART_GEWERBE.test(a)) ? 'objektart' : null;
+}
+/* v3198 · Buchwert Gebaeude: AfA-Grundlage und Satz aus der Rechnung der App (Stempel _kpis_afa_*), Jahre ab Kaufdatum.
+   Nur linear wird fortgeschrieben; degressiv/7b liefert nur die Grundlage (Rechnung im Reiter Steuer). */
+function _buchwert(d) {
+  const basis = _zahl(d && d._kpis_afa_geb_basis), satz = _zahl(d && d._kpis_afa_satz);
+  if (!basis) return null;
+  const kd = d.kaufdat && /^d{4}-d{2}-d{2}/.test(d.kaufdat) ? new Date(d.kaufdat) : null;
+  const methode = d._kpis_afa_methode || 'linear';
+  let rest = null, jahre = null;
+  if (kd && satz && methode === 'linear') {
+    jahre = Math.max(0, (Date.now() - kd.getTime()) / (365.25 * 864e5));
+    rest = Math.max(0, Math.round(basis * (1 - satz / 100 * jahre)));
+    jahre = Math.round(jahre * 100) / 100;
+  }
+  return { gebaeude_afa_basis: basis, afa_satz_pct: satz, afa_methode: methode, anschaffung: d.kaufdat || null,
+    jahre_seit_anschaffung: jahre, gebaeude_restbuchwert: rest, stand: new Date().toISOString().slice(0, 10),
+    hinweis: rest == null ? (kd ? 'nicht linear - Restbuchwert im Reiter Steuer' : 'Kaufdatum fehlt') : 'linear, zeitanteilig ab Kaufdatum; Boden wird nicht abgeschrieben' };
+}
 function _gewerbeanteil(d) {
   const e = d && d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null;
   if (e && e.length) {
@@ -909,7 +937,8 @@ function _gewerbeanteil(d) {
     e.forEach((u) => { const w = _zahl(u && u.wfl) || 0; alle += w; if (u && u.art === 'gewerbe') gew += w; });
     return alle > 0 ? Math.round(gew / alle * 1000) / 10 : null;
   }
-  return d && d.objart === 'GESCH' ? 100 : 0;
+  const a = String((d && d.objart) || '');
+  return _ART_GEWERBE.test(a) ? 100 : _ART_WOHNEN.test(a) ? 0 : null;
 }
 function _profil(bv) {
   try {

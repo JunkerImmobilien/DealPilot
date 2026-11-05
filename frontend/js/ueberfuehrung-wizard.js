@@ -519,7 +519,7 @@
       try { var _sp = DealPilotMandanten.steuerParameter && DealPilotMandanten.steuerParameter(c._halterId); _erwAktiv = !!(_sp && _sp.erwKuerzung); } catch (e) {}
       _g.kuerzel = (c.privatKuerzel ? c.privatKuerzel + (_erwAktiv ? ' VV' : (_rf() === 'ug' ? ' UG' : ' GmbH')) : '');
       _g._ueberf_link = _privatKey;
-      if (typeof newObj === 'function') newObj();
+      if (typeof newObj === 'function') await newObj({ ohneAuswahl: true });   /* v3198 · sofortiger Reset - sonst laedt loadData in das noch offene Privatobjekt */
       if (typeof loadData === 'function') loadData(_g);
       if (typeof imgs !== 'undefined') { imgs = c.privatImgs.slice(); if (typeof renderImgs === 'function') renderImgs(); }
       window._aiText = c.privatAi;
