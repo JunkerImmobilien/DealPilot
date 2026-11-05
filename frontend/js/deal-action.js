@@ -1443,7 +1443,9 @@ window.DealPilotDealAction = (function() {
   }
 
   // ───────────────────── GUTACHTEN / EXPERTISE ─────────────────────
-  function openExpert() {
+  /* v3188 · opts.typ wählt die Leistung vor, opts.text füllt das Anliegen (BMF-Rechner Schritt 5: Kaufpreisaufteilung) */
+  function openExpert(opts) {
+    opts = (opts && typeof opts === 'object' && !opts.target) ? opts : {};
     var data = collectObjectData();
     if (!data.objekt.adresse) {
       return alert('Bitte zuerst Adresse im Objekt-Tab erfassen.');
@@ -1455,7 +1457,8 @@ window.DealPilotDealAction = (function() {
         renderObjectPreview(data),
         '<div class="da-cmt"><label>Welche Leistung benötigst du?</label>',
         '  <div class="da-opt-grid">',
-        optRadio('expert-type', 'verkehrswert', ico('house', 16) + ' Verkehrswertgutachten', 'Marktwert nach §194 BauGB — gerichtsfest, für Bank/Erbschaft/Verkauf', true),
+        optRadio('expert-type', 'verkehrswert', ico('house', 16) + ' Verkehrswertgutachten', 'Marktwert nach §194 BauGB — gerichtsfest, für Bank/Erbschaft/Verkauf', opts.typ !== 'kaufpreisaufteilung'),
+        optRadio('expert-type', 'kaufpreisaufteilung', ico('fileText', 16) + ' Kaufpreisaufteilung', 'Gutachten zur Aufteilung Grund und Boden / Gebäude fürs Finanzamt — die Berechnung aus dem BMF-Rechner geht als PDF mit', opts.typ === 'kaufpreisaufteilung'),
         optRadio('expert-type', 'rnd',          ico('refresh', 16) + ' Restnutzungsdauer-Gutachten', 'Wizard mit Einschätzung ob es sich lohnt — danach optional anfragen'),
         optRadio('expert-type', 'sanierung',    ico('shield', 16) + ' Sanierungskonzept', 'Konkrete Maßnahmen + Kostenplanung für Bestandsobjekt'),
         optRadio('expert-type', 'projektentw',  ico('building', 16) + ' Projektentwicklung', 'Mehrfamilienhaus / Aufstockung / Umbau — Begleitung A bis Z'),
@@ -1479,6 +1482,7 @@ window.DealPilotDealAction = (function() {
 
     // V144: RND-Radio-Klick öffnet den Wizard direkt (statt nur Radio zu aktivieren)
     setTimeout(function() {
+      try { if (opts.text) { var _ta = document.getElementById('da-expert-msg'); if (_ta && !_ta.value) _ta.value = opts.text; } } catch (_eT) {}
       var rndRadio = document.querySelector('input[name="expert-type"][value="rnd"]');
       if (rndRadio) {
         rndRadio.addEventListener('change', function(e) {
@@ -1525,7 +1529,7 @@ window.DealPilotDealAction = (function() {
     var data   = collectObjectData();
     var c      = cfg();
 
-    var labels = { verkehrswert:'Verkehrswertgutachten', rnd:'Restnutzungsdauer-Gutachten', sanierung:'Sanierungskonzept', projektentw:'Projektentwicklung', sonstiges:'Sonstige Anfrage' };
+    var labels = { kaufpreisaufteilung:'Gutachten Kaufpreisaufteilung', verkehrswert:'Verkehrswertgutachten', rnd:'Restnutzungsdauer-Gutachten', sanierung:'Sanierungskonzept', projektentw:'Projektentwicklung', sonstiges:'Sonstige Anfrage' };
     var subject = (labels[typ] || 'Gutachten-Anfrage') + ' — ' + (data.objekt.adresse || 'Objekt');
 
     var bodyText = buildEmailBody('expert', data, msg) + '\n\n── Anfragetyp ──\n' + (labels[typ] || typ);
@@ -1534,6 +1538,10 @@ window.DealPilotDealAction = (function() {
     var files = {};
     if (photos.length) files.fotos = photos;
 
+    /* v3188 · Kaufpreisaufteilung: die Berechnung des BMF-Rechners als PDF anhängen (derselbe Druckweg wie die Ausgabe) */
+    var _anhang = (typ === 'kaufpreisaufteilung') ? _kpaPdfDatei() : Promise.resolve(null);
+    return _anhang.then(function (pdf) {
+    if (pdf) files.kaufpreisaufteilung = [pdf];
     submitWithFallback({
       kind: 'expert',
       to: c.expert && c.expert.email,
@@ -1545,6 +1553,23 @@ window.DealPilotDealAction = (function() {
       if (success) showSuccess('expert', c.expert.email, mode);
       else alert('Versand fehlgeschlagen.');
     });
+    });
+  }
+
+  /* v3188 · Kaufpreisaufteilung als PDF-Datei für den Anhang - null, wenn es nicht geht (die Anfrage geht dann ohne) */
+  function _kpaPdfDatei() {
+    if (!window.DpDokumente) return Promise.resolve(null);
+    return window.DpDokumente.dokument('kaufpreisaufteilung').then(function (html) {
+      var d = new DOMParser().parseFromString(html, 'text/html'), fu = d.querySelector('.fuss');
+      var fuss = fu ? [].map.call(fu.children, function (x) { return x.textContent; }) : [];
+      var t = ''; try { t = localStorage.getItem('ji_token') || ''; } catch (e) {}
+      var basis = (window.Auth && typeof Auth.getApiBase === 'function') ? Auth.getApiBase() : '/api/v1';
+      return fetch(basis + '/rechenkerne/html-pdf', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, t ? { Authorization: 'Bearer ' + t } : {}),
+        body: JSON.stringify({ html: html.replace('</style>', '.fuss{display:none}</style>'), titel: d.title || 'Kaufpreisaufteilung', fuss: fuss }) });
+    }).then(function (r) { return (r && r.ok) ? r.blob() : null; }).then(function (b) {
+      if (!b) return null;
+      try { return new File([b], 'Kaufpreisaufteilung.pdf', { type: 'application/pdf' }); } catch (e) { b.name = 'Kaufpreisaufteilung.pdf'; return b; }
+    }).catch(function () { return null; });
   }
 
   // V63.77: RND-Modul öffnen (Pro/Business). Free/Starter/Investor sehen Anfrage-Hinweis.

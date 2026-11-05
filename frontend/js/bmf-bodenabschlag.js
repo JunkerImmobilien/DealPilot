@@ -159,7 +159,9 @@
     var j = stEigen && st.response.phase4_bmf && st.response.phase4_bmf.jacoby;
     /* Die Wahl lebt nur im Fenster - der Gebäudeanteil im Reiter Steuer ist das, was gilt. Passt er zu
        einer der Varianten, ist DAS die Auswahl (so druckt auch die Deal-Aktion ohne offenes Fenster richtig). */
-    try {
+    /* v3188 · Marcel: gewählt wird in Schritt 4, übernommen erst in Schritt 5 - eine Wahl im Fenster gilt,
+       auch wenn sie noch nicht im Reiter Steuer steht. Ohne Wahl gilt, was im Reiter Steuer steht. */
+    if (!window._dpBmfTafelWahl) try {
       var gs = zahl(el('geb_ant') && el('geb_ant').value);
       if (gs != null && B.immoKp > 0) {
         var kand = [['amtlich', 0], ['konservativ', 15], ['optimiert', 20]].map(function (x) {
@@ -274,7 +276,10 @@
       ['ah', 'BMF-Arbeitshilfe', 'PDF', 'Das amtliche Formular, mit den Werten dieses Objekts ausgefüllt'],
       ['xlsx', 'BMF-Original', 'XLSX', 'Die Arbeitshilfe (Fassung Juni 2023) als Excel-Datei'],
       ['berater', 'Text für den Berater', 'Kopieren', 'Kurzfassung mit Zahlen und Begründung für den Steuerberater'],
-      ['vertrag', 'Text für den Kaufvertrag', 'Kopieren', 'Der Satz für die Urkunde – Grund und Boden, Gebäude, Inventar']
+      ['vertrag', 'Text für den Kaufvertrag', 'Kopieren', 'Der Satz für die Urkunde – Grund und Boden, Gebäude, Inventar'],
+      /* v3188 · Marcel: „wenn wir hinten bei der Übersicht … eine Anfrage machen … Gutachten“ - geht mit Objekt,
+         Berater-Text und Kaufpreisaufteilung-PDF an DealPilot (deal-action.js openExpert, Leistung kaufpreisaufteilung) */
+      ['gutachten', 'Gutachten anfragen', 'Anfrage', 'Kaufpreisaufteilung durch einen Sachverständigen – Objekt und Berechnung gehen mit']
     ];
     host.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">' +
       K.map(function (k) {
@@ -294,6 +299,13 @@
         if (was === 'xlsx') return A ? A.xlsx() : (window.downloadXlsx && window.downloadXlsx());
         if (was === 'berater') return kopieren(T.berater, 'Text für den Berater');
         if (was === 'vertrag') return kopieren(T.klausel, 'Text für den Kaufvertrag');
+        if (was === 'gutachten') {
+          if (window.DealPilotDealAction && typeof DealPilotDealAction.openExpert === 'function') {
+            try { if (typeof window.closeBMFModal === 'function') window.closeBMFModal(); } catch (e) {}
+            return DealPilotDealAction.openExpert({ typ: 'kaufpreisaufteilung', text: T.berater || '' });
+          }
+          if (window.toast) window.toast('Anfrage nicht geladen.');
+        }
       });
     });
   }
@@ -317,7 +329,11 @@
       'näher bezeichnete Objekt ' + (adr || '[Objektadresse]') + ' entfällt nach übereinstimmender ' +
       'Bewertung wie folgt: Auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das ' +
       'Gebäude einschließlich der wesentlichen Gebäudeteile entfallen ' + eur(gebNeu, 2) +
-      (B.inv > 0 ? ' und auf das mitverkaufte Inventar entfallen ' + eur(B.inv, 2) : '') + '.\n';
+      (B.inv > 0 ? ' und auf das mitverkaufte Inventar entfallen ' + eur(B.inv, 2) : '') + '.\n' +
+      /* v3188 · Marcel 05.11.2026: im Text für den Kaufvertrag „noch mal reinschreiben, dass das damit ermittelt wurde“ */
+      (W.id === 'jacoby' ? 'Die Aufteilung wurde nach der umgekehrten Ertragswertmethode (Jacoby) ermittelt.\n'
+        : W.ab > 0 ? 'Die Aufteilung wurde auf Grundlage der Arbeitshilfe des Bundesministeriums der Finanzen mit einem Abschlag von ' + pct(W.ab, 0) + ' auf den Bodenwert ermittelt.\n'
+        : 'Die Aufteilung wurde nach der Arbeitshilfe des Bundesministeriums der Finanzen ermittelt.\n');
     var hinweis = 'Diese Aufteilung hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne ' +
       'der Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
     /* Begründung je Auswahl - die Punkte werden fortlaufend nummeriert */
@@ -387,7 +403,7 @@
         try { navigator.clipboard.writeText(berater); if (typeof window.toast === 'function') window.toast('✓ Text für den Berater kopiert'); } catch (e) {}
       };
     }
-    window._dpKpaTexte = { klausel: txt, zusatz: zusatz, hinweis: hinweis, berater: berater, wahl: W.id, name: W.name,
+    window._dpKpaTexte = { klausel: txt, zusatz: zusatz, hinweis: hinweis, berater: berater, wahl: W.id, name: W.name, jacoby: W.jacoby || null,
       gebPct: W.gebPctNeu, boden: bodenNeu, geb: gebNeu, basis: X.basisNeu, afa: X.afaNeu, satz: X.satz, grund: grund,
       rndVon: rVon, rndBis: rBis, ab: W.ab, gebPctAmtlich: B.gebPct, bodenAmtlich: B.bodenAmtlich, gebAmtlich: B.gebAmtlich, immoKp: B.immoKp, inv: B.inv, kp: B.kp };
     el('bmf-boden-copy').onclick = function () {
@@ -404,7 +420,7 @@
     function wickeln() {
       if (typeof window.openBMFModal !== 'function' || window.openBMFModal._dpBoden) return false;
       var o = window.openBMFModal;
-      var neu = function () { var r = o.apply(this, arguments); setTimeout(function () { if (einhaengen()) rechnen(); }, 600); return r; };
+      var neu = function () { window._dpBmfTafelWahl = null; /* v3188: jede Sitzung beginnt beim Reiter Steuer */ var r = o.apply(this, arguments); setTimeout(function () { if (einhaengen()) rechnen(); }, 600); return r; };
       for (var k in o) { if (Object.prototype.hasOwnProperty.call(o, k)) neu[k] = o[k]; }
       neu._dpBoden = true; window.openBMFModal = neu; return true;
     }
@@ -912,7 +928,7 @@
         ? '<button type="button" disabled style="min-height:40px;padding:8px 12px;border-radius:10px;border:1px solid #E6E0D3;background:#F7F5F0;color:#8A8272;font:600 13px Inter,sans-serif;cursor:not-allowed">Nicht verfügbar</button>'
         : (an
           ? '<button type="button" data-tafel="' + z.id + '" style="min-height:40px;padding:8px 12px;border-radius:10px;border:none;background:var(--wl-c9a84c, #C9A84C);color:#050505;font:700 13px Inter,sans-serif;cursor:pointer">Gewählt</button>'
-          : '<button type="button" data-tafel="' + z.id + '" style="min-height:40px;padding:8px 12px;border-radius:10px;border:1px solid #CFC9BC;background:#FFFFFF;color:#2A2727;font:600 13px Inter,sans-serif;cursor:pointer">Übernehmen</button>');
+          : '<button type="button" data-tafel="' + z.id + '" style="min-height:40px;padding:8px 12px;border-radius:10px;border:1px solid #CFC9BC;background:#FFFFFF;color:#2A2727;font:600 13px Inter,sans-serif;cursor:pointer">Wählen</button>');
       var name = '<div><div style="font:600 14px/1.3 Inter,sans-serif;color:#1a1814">' + esc(z.name) + '</div>'
         + '<div style="font-size:11.5px;line-height:1.4;color:#6B6356;margin-top:2px"' + (z.quelle ? ' title="' + esc(z.quelle) + '"' : '') + '>' + esc(z.unter) + '</div></div>';
       if (z.fehlt) {
@@ -943,7 +959,7 @@
     host.innerHTML =
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">BMF-Rechner · Schritt 4 von 5</div>' +
       '<h3 style="margin:0 0 6px;font:600 20px/1.3 \'Space Grotesk\',sans-serif;color:#1a1814">Welche Aufteilung soll gelten?</h3>' +
-      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Die amtliche Arbeitshilfe, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby – sie trägt nur bei vermieteten Objekten, sonst ist sie ausgegraut. Eine Zeile übernehmen: der Gebäudeanteil geht in den Reiter Steuer.</p>' +
+      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Die amtliche Arbeitshilfe, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby – sie trägt nur bei vermieteten Objekten, sonst ist sie ausgegraut. Eine Zeile wählen – übernommen in den Reiter Steuer wird in Schritt 5.</p>' +
       '<div style="border:1px solid #E6E0D3;border-radius:12px;overflow:hidden;background:#FFFFFF">' +
         '<div style="overflow-x:auto"><div style="min-width:' + (mitSteuer ? 760 : 600) + 'px">' + kopf + zeilen + '</div></div>' +
       '</div>' +
@@ -971,7 +987,7 @@
     if (kk) kk.onclick = function () { try { navigator.clipboard.writeText(vertrag); if (window.toast) window.toast('✓ Satz für den Kaufvertrag kopiert'); } catch (e) {} };
 
     [].forEach.call(host.querySelectorAll('[data-tafel]'), function (b) {
-      b.addEventListener('click', function () { uebernehmen(b.getAttribute('data-tafel')); });
+      b.addEventListener('click', function () { waehlen(b.getAttribute('data-tafel')); });
     });
   }
 
@@ -998,6 +1014,16 @@
       try { window._v292Apply(); } finally { window.closeBMFModal = zu; }
     }
     zeichnen();
+  }
+
+  /* v3188 · nur wählen (Schritt 4) - der Reiter Steuer bleibt unberührt, bis in Schritt 5 übernommen wird */
+  function waehlen(id) {
+    var st = window._v292State;
+    if (!st || !st.response || !st.response.ok) return;
+    if (id !== 'jacoby' && typeof window._v292SelectVariant === 'function') window._v292SelectVariant(id);
+    window._dpBmfTafelWahl = id;
+    zeichnen();
+    try { if (window.DpBmfBodenabschlag) window.DpBmfBodenabschlag.rechnen(); } catch (e) {}
   }
 
   function jacobySchreiben() {
@@ -1062,5 +1088,5 @@
     }
   })();
 
-  window.DpBmfWahlTafel = { daten: daten, zeichnen: zeichnen, uebernehmen: uebernehmen, VARIANTEN: VARIANTEN };
+  window.DpBmfWahlTafel = { daten: daten, zeichnen: zeichnen, uebernehmen: uebernehmen, waehlen: waehlen, VARIANTEN: VARIANTEN };
 })();

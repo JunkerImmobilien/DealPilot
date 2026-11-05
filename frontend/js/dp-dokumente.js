@@ -635,7 +635,7 @@
       var abw = !!(T && T.wahl && T.wahl !== 'amtlich' && isFinite(T.gebPct));
       var gebPctG = abw ? T.gebPct : Number(w('gebaeudeanteil_prozent'));
       var S = [];
-      S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: 'Kaufpreisaufteilung nach BMF-Arbeitshilfe', titel: o.adresse, unter: o.art + (o.bj ? ' · Baujahr ' + B.jahr(o.bj) : ''),
+      S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: abw && T.wahl === 'jacoby' ? 'Kaufpreisaufteilung nach der umgekehrten Ertragswertmethode (Jacoby)' : 'Kaufpreisaufteilung nach BMF-Arbeitshilfe', titel: o.adresse, unter: o.art + (o.bj ? ' · Baujahr ' + B.jahr(o.bj) : ''),
         wertLabel: 'Gebäudeanteil', wert: B.pct(gebPctG, 2),
         wertNeben: abw ? (B.esc(T.name) + '<br>amtlich ' + B.pct(w('gebaeudeanteil_prozent'), 2)) : ('Grund und Boden ' + B.eur(w('kaufpreisanteil_grund')) + '<br>Gebäude ' + B.eur(w('kaufpreisanteil_gebaeude'))),
         meta: [['Kaufpreis', B.eur(z.kp)], ['Stand', c.stand], ['Grundlage', abw ? 'BMF-Arbeitshilfe · ' + (T.wahl === 'jacoby' ? 'Jacoby' : 'Bodenabschlag') : 'BMF-Arbeitshilfe']] }));
@@ -668,6 +668,17 @@
           + '<tr><td>AfA-Bemessungsgrundlage Gebäude (mit anteiligen Nebenkosten)</td><td class="r num">' + B.eur(basisAlt) + '</td><td class="r num">' + B.eur(T.basis) + '</td><td class="r num">' + d(basisAlt, T.basis) + '</td></tr>'
           + '<tr class="ende"><td>AfA je Jahr bei ' + B.pct(T.satz, 2) + '</td><td class="r num">' + B.eur(basisAlt * T.satz / 100) + '</td><td class="r num">' + B.eur(T.afa) + '</td><td class="r num">' + d(basisAlt * T.satz / 100, T.afa) + '</td></tr>'
           + '</tbody></table>'
+          /* v3188 · Marcel: „wenn wir die umgekehrte Ertragswertmethode nach Jacoby machen … passen wir unser PDF an und
+             können da reinschreiben nach Jacoby die Kaufpreisaufteilung“ - der Rechenweg des Servers (jacobyService) Zeile für Zeile */
+          + (T.wahl === 'jacoby' && T.jacoby ? (function () {
+              var j = T.jacoby, sch = Array.isArray(j.schritte) ? j.schritte : [];
+              var wert = function (x) { var v = Number(x.wert); if (x.einheit === '%') return B.pct(v, 2); if (Math.abs(v) < 100 && /faktor/i.test(String(x.text))) return B.zahl(v, 4); return B.eur(v); };
+              return '<h3>Herleitung nach der umgekehrten Ertragswertmethode (Jacoby)</h3>'
+                + '<p>Liegenschaftszinssatz ' + B.esc(String(j.lzs_pct).replace(".", ",")) + ' %' + (j.lzs_stufe ? ' (Stufe ' + B.esc(j.lzs_stufe) + ')' : '') + (j.ausschuss ? ', ' + B.esc(j.ausschuss) : '')
+                + ' · Restnutzungsdauer ' + B.esc(j.rnd_jahre) + ' Jahre' + (j.gnd_jahre ? ' (Gesamtnutzungsdauer ' + B.esc(j.gnd_jahre) + ' Jahre)' : '') + '.</p>'
+                + (sch.length ? '<table><tbody>' + sch.map(function (x, i) { return '<tr' + (i === sch.length - 1 ? ' class="ende"' : '') + '><td>' + B.esc(x.text) + '</td><td class="r num">' + wert(x) + '</td></tr>'; }).join('') + '</tbody></table>' : '')
+                + '<div class="hinweis">Die umgekehrte Ertragswertmethode ist für vermietete Objekte zulässig (BFH, Urteil vom 20.09.2022, IX R 12/21). Ihre Wahl muss sachlich begründet werden.' + (j.hinweis ? ' ' + B.esc(j.hinweis) : '') + '</div>';
+            })() : '')
           + (T.grund ? '<h3>Begründung</h3><p>' + B.esc(T.grund) + '</p>' : '<div class="hinweis" style="border-left-color:var(--rot)">Für die Abweichung von der Arbeitshilfe ist noch keine Begründung eingetragen. Ohne sie kann das Finanzamt die Aufteilung der Arbeitshilfe ansetzen.</div>')
           + (T.rndVon ? (function () {
               var von = Math.round(T.rndVon), bis = Math.round(T.rndBis || T.rndVon), jj = [];

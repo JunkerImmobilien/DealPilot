@@ -169,3 +169,27 @@
 /* ── Reiterleiste: ein Gold für den aktiven Reiter, sonst gedeckt ─────── */
 #bmfOverlay .bmfmo-tab { font-family: 'JetBrains Mono', monospace !important; font-size: 11.5px !important; color: var(--bmfe-muted) !important; background: #FFFFFF !important; border-color: var(--bmfe-line) !important; }
 #bmfOverlay .bmfmo-tab.active { color: var(--bmfe-ink) !important; background: var(--bmfe-hl) !important; border-color: var(--bmfe-hl-line) !important; }
+
+/* ── v3188 · Vorbelegte Felder sichtbar machen ─────────────────────────────
+   Marcel 05.11.2026: „die Felder, die vorbelegt sind … farblich kennzeichnen oder irgendwie ausgrauen,
+   dass man gleich sieht, da kann man nichts machen." Gemessen: die übernommenen Felder (ak_kp, ak_grest,
+   bmf_bj, bmf_brw, bmf_miete …) SIND gesperrt (readonly) - v3185 hatte sie nur weiß gefärbt wie die
+   freien. Gesperrt = grauer Grund, gedeckte Schrift, Sperr-Zeiger; frei bleibt weiß. */
+#bmfOverlay .bmfmo-pane input[readonly],
+#bmfOverlay .bmfmo-pane input:disabled,
+#bmfOverlay .bmfmo-pane select:disabled {
+  background: #F2F0EA !important;
+  color: #6B6356 !important;
+  cursor: not-allowed !important;
+}
+#bmfOverlay .bmfmo-pane .f .iw:has(input[readonly]),
+#bmfOverlay .bmfmo-pane .f .iw:has(input:disabled),
+#bmfOverlay #p-ak .iw:has(input[readonly]),
+#bmfOverlay #p-bmf .iw:has(input[readonly]) {
+  background: #F2F0EA !important;
+  border-color: #E6E0D3 !important;
+  cursor: not-allowed;
+}
+#bmfOverlay .bmfmo-pane .f .iw:has(input[readonly]) input,
+#bmfOverlay #p-ak .iw:has(input[readonly]) input,
+#bmfOverlay #p-bmf .iw:has(input[readonly]) input { background: transparent !important; }

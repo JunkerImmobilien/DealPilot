@@ -2503,7 +2503,9 @@ function _grenzAutoNachziehen(mitToast) {
   var grenzInput = document.getElementById('grenz');
   if (!auto || !grenzInput) return false;
   if (auto.checked) {
+    /* v3188: dasselbe zvE wie die Jahresrechnung des laufenden Jahres (_dpZveFuerJahr), nicht blind das Feld */
     var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
+    try { var _zj = window._dpZveFuerJahr && window._dpZveFuerJahr(new Date().getFullYear()); if (_zj && _zj.zve > 0 && _zj.quelle !== 'ersatz') zve = _zj.zve; } catch (_eZ) {}
     if (zve > 0) {
       var gss = Tax.grenzsatzGesamt(zve, new Date().getFullYear()) * 100;   /* v2891: inkl. Soli, Kirchensteuer, Splitting; v2892: Jahr, damit ein Steuerzeitraum mit eigener Veranlagung greift */
       var neu = gss.toFixed(2);
@@ -2582,7 +2584,8 @@ function _grenzErklaeren() {
   }
   g.title = '';
   var jahr = new Date().getFullYear();
-  var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
+  var feldZve = parseDe((document.getElementById('zve') || {}).value) || 0, zve = feldZve, zq = null;
+  try { zq = window._dpZveFuerJahr && window._dpZveFuerJahr(jahr); if (zq && zq.zve > 0 && zq.quelle !== 'ersatz') zve = zq.zve; } catch (_eZ) {}
   var o = Tax.optionen ? Tax.optionen(null, jahr) : { splitting: false, kist: 0 };
   var lbl = f.querySelector('label');
   if (lbl && lbl.firstChild && lbl.firstChild.nodeType === 3) {
@@ -2601,8 +2604,12 @@ function _grenzErklaeren() {
   }
   if (o.kist > 0) teile.push('Kirchensteuer ' + Math.round(o.kist * 100) + ' %');
   var t = (document.getElementById('grenz_auto') || {}).checked
-    ? 'Aus dem zvE ' + Math.round(zve).toLocaleString('de-DE') + ' € (' + jahr + (o.splitting ? ', Splitting' : '') + '): ' + teile.join(' + ') + ' = ' + pz(gGes, 1) + ' auf jeden weiteren Euro.'
+    ? 'Aus dem zvE ' + Math.round(zve).toLocaleString('de-DE') + ' € (' + jahr + (zq && zq.quelle === 'steuerzeitraum' ? ', Steuerzeitraum' : '') + (o.splitting ? ', Splitting' : '') + '): ' + teile.join(' + ') + ' = ' + pz(gGes, 1) + ' auf jeden weiteren Euro.'
     : 'Von Hand eingetragen. Aus dem zvE ergäben sich ' + pz(gGes, 1) + ' (' + teile.join(' + ') + ').';
+  /* v3188 · Steuerzeitraum des laufenden Jahres und Feld widersprechen sich: sagen, was gilt */
+  if (zq && zq.quelle === 'steuerzeitraum' && feldZve > 0 && Math.abs(feldZve - zve) >= 1) {
+    t += ' Für ' + jahr + ' ist ein eigener Steuerzeitraum mit ' + Math.round(zve).toLocaleString('de-DE') + ' € hinterlegt – er gilt für dieses Jahr. Das Feld (' + Math.round(feldZve).toLocaleString('de-DE') + ' €) gilt für die folgenden Jahre ohne eigenen Zeitraum.';
+  }
   /* Wo früher gekaufte Objekte das zvE verschieben, wirkt für DIESES Objekt ein anderer Satz */
   try {
     var r = State && State.taxResult;
@@ -2695,14 +2702,20 @@ window._dpBestandAnzahl = function (jahr) {
  * unter null gibt es im Tarif nicht; sie wird auf 0 gesetzt. */
 window._dpZveFuerJahr = function (jahr) {
   var j = (typeof jahr === 'number' && jahr > 1900) ? jahr : new Date().getFullYear();
-  try {
-    var info = _getZveForDateWithFallback(String(j));
-    if (info && info.zve > 0) {
-      return { zve: info.zve, source: info.source, quelle: info.exact ? 'steuerzeitraum' : 'letzter-zeitraum' };
-    }
-  } catch (_e) {}
+  /* v3188 · VORWÄRTS: JEDES JAHR SEIN EIGENES zvE (Jahressteuerprinzip, § 2 Abs. 7 und § 25 Abs. 1 EStG).
+     Marcel 05.11.2026: „Wir machen ja eine Forward-Betrachtung … In welchem Jahr stehen wir? Gilt dieser
+     Steuersatz noch?" Gemessen: Zeiträume 2023–2025 und 2026 je 68.000 €, 01–07/2027 75.000 €, Feld zvE
+     90.000 € - ab 2028 rechnete jedes Jahr mit dem letzten Zeitraum (75.000 €), das Feld kam nie an.
+     Jetzt: 1. Zeitraum, der das Jahr enthält; 2. ab dem laufenden Jahr das aktuelle zvE (Feld);
+     3. für vergangene Lücken der letzte frühere Zeitraum; 4. Ersatz aus dem Grenzsteuersatz. */
   var f = 0;
   try { f = parseDe((document.getElementById('zve') || {}).value) || 0; } catch (_e) { f = 0; }
+  try {
+    var info = _getZveForDateWithFallback(String(j));
+    if (info && info.zve > 0 && info.exact) return { zve: info.zve, source: info.source, quelle: 'steuerzeitraum' };
+    if (f > 0 && j >= new Date().getFullYear()) return { zve: f, source: 'aktuelles zvE (ab ' + new Date().getFullYear() + ', ohne eigenen Steuerzeitraum)', quelle: 'feld-zve' };
+    if (info && info.zve > 0) return { zve: info.zve, source: info.source, quelle: 'letzter-zeitraum' };
+  } catch (_e) {}
   if (f > 0) return { zve: f, source: 'aktueller zvE-Wert', quelle: 'feld-zve' };
   return { zve: window._dpZveErsatz(), source: 'kein zvE hinterlegt - abgeleitet aus dem Grenzsteuersatz', quelle: 'ersatz' };
 };

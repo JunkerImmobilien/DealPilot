@@ -2450,7 +2450,7 @@ function _updateFooterNav(paneId){
   // Weiter: bis Pane 3
   _show('btnBmfNext', !isLast);
   // Übernehmen: auf der Auswahl (Schritt 4) und auf dem Bodenabschlag (Schritt 5) - v3047
-  _show('btnBmfApply', isLast || paneId === 'p-hebel');
+  _show('btnBmfApply', isLast);   /* v3188 · Marcel: übernommen wird erst in Schritt 5 */
   _show('btnBmfPdf', false);   /* v1859: war derselbe Export wie „Kaufpreisaufteilung als PDF" — doppelt, bleibt aus */
   // Abbrechen: immer
   _show('btnBmfCancel', true);
@@ -2462,7 +2462,7 @@ function _updateFooterNav(paneId){
       'p-ak':    '<b>Schritt 1 / 5:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
       'p-bmf':   '<b>Schritt 2 / 5:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
       'p-afa':   '<b>Schritt 3 / 5:</b> Vergleich: Amtlich, Konservativ, Optimiert und die umgekehrte Ertragswertmethode nach Jacoby — gewählt wird in Schritt 4.',
-      'p-hebel': '<b>Schritt 4 / 5:</b> Welche Aufteilung soll gelten? Eine Zeile übernehmen — der Gebäudeanteil geht in den Reiter Steuer. Weiter: Übersicht und Ausgabe.',   /* v3184 */
+      'p-hebel': '<b>Schritt 4 / 5:</b> Welche Aufteilung soll gelten? Eine Zeile wählen — übernommen wird in Schritt 5 (Übersicht und Ausgabe).',   /* v3184 */
       'p-boden': '<b>Schritt 5 / 5:</b> Übersicht der Auswahl, Begründung und alle Ausgaben — Kaufpreisaufteilung, BMF-Arbeitshilfe, BMF-Original, Texte für Vertrag und Berater.'
     }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];
