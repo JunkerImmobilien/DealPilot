@@ -39,3 +39,10 @@
 }
 .bw-cf-z b.positive { color: #2E8455; }
 .bw-cf-z b.negative { color: #B8625C; }
+/* Farben und Schrift: die alten Regeln hängen an #s6 .kpi-grid-eval (style.css) - gleiche Verankerung, damit sie greifen */
+#s6 .bw-kz .kpi-val { font-family: 'Space Grotesk', Inter, sans-serif !important; color: #1a1814 !important; }
+#s6 .bw-kz .kpi-val.gn { color: #2E8455 !important; }
+#s6 .bw-kz .kpi-val.rd { color: #B8625C !important; }
+#s6 .bw-kz .kpi:has(.kpi-val.gn) { border-left: 3px solid #3FA56C !important; }
+#s6 .bw-kz .kpi:has(.kpi-val.rd) { border-left: 3px solid #B8625C !important; }
+#s6 .bw-kz .kpi::before, #s6 .bw-kz .kpi::after { display: none !important; }
