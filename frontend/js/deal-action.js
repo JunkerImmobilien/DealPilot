@@ -2458,6 +2458,9 @@ window.DealPilotDealAction = (function() {
                      : status === 'lost' ? 'Deal als verloren markiert.'
                                          : 'Markiere den Deal als gewonnen oder verloren wenn der Zuschlag entschieden ist.';
     }
+    /* v3187 · der Titel über der Status-Tafel sagt, wo der Deal steht (statt „Bereit zum Abflug“) */
+    var _abt = document.getElementById('dab-abtitle');
+    if (_abt) _abt.textContent = status === 'won' ? 'Gewonnen \u00b7 im Bestand' : status === 'lost' ? 'Verloren \u00b7 nicht zustande gekommen' : 'Abschluss offen';
     // V324-tile-selector: Active-Klassen auf den 3 Tiles (V322 hatte das
     // Markup auf .da-status-tile umgestellt, alter Selektor .da-status-btn
     // matchte nichts mehr).

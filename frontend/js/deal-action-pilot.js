@@ -38,23 +38,23 @@
     window.Auth.apiCall('/passes',{method:'GET'}).then(function(res){
       var items=(res&&res.items)||[], now=Date.now(), m=null;
       for(var i=0;i<items.length;i++){ var p=items[i]; if(p.object_id===objId && !p.revoked_at && new Date(p.expires_at).getTime()>now){ m=p; break; } }
-      var head='<div style="font:700 13px/1.2 \'Space Grotesk\',sans-serif;color:#E8CC7A;margin:0 0 10px;display:flex;align-items:center;gap:7px"><span>\u2708</span> Boarding-Pass teilen</div>';
+      var head='<div style="font:600 15px/1.2 \'Space Grotesk\',sans-serif;color:#1a1814;margin:0 0 8px">Objekt teilen</div>';   /* v3187: ohne Flugzeug, hell (Marcel 05.11.2026) */
       if(m && window.DpQr){
         var url=location.origin+'/pass.html?c='+encodeURIComponent(m.code);
         var qr=window.DpQr.svg(url,{ecc:'M',border:1,dark:'#141210',light:'#fff'});
-        sec.innerHTML='<div style="margin:20px 0 4px;padding:16px;border-radius:14px;background:#0c0c0c;border:1px solid rgba(201,168,76,.28)">'+head+
+        sec.innerHTML='<div style="margin:20px 0 4px;padding:16px;border-radius:14px;background:#FFFFFF;border:1px solid #E6E0D3">'+head+
           '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">'+
             '<a href="'+url+'" target="_blank" rel="noopener" style="flex:0 0 auto;width:96px;height:96px;background:#fff;border-radius:10px;padding:6px;display:block">'+qr+'</a>'+
             '<div style="flex:1 1 180px;min-width:160px">'+
-              '<div style="color:#d8d4cc;font-size:13px;line-height:1.5">Dieses Objekt ist geteilt \u2014 wer Code oder QR hat, sieht den \u00f6ffentlichen Boarding-Pass.</div>'+
-              '<div style="margin-top:8px;font:600 12px/1.4 \'JetBrains Mono\',monospace;color:#E8CC7A">Pass '+esc(m.code)+'</div>'+
-              '<div style="color:#9a8a52;font-size:11.5px">g\u00fcltig noch '+restLabel(m.expires_at)+'</div>'+
+              '<div style="color:#3a352b;font-size:13px;line-height:1.5">Dieses Objekt ist geteilt \u2014 wer Code oder QR hat, sieht die \u00f6ffentliche Objektseite.</div>'+
+              '<div style="margin-top:8px;font:600 12px/1.4 \'JetBrains Mono\',monospace;color:var(--wl-9a7f33,#9a7f33)">Code '+esc(m.code)+'</div>'+
+              '<div style="color:#6B6356;font-size:11.5px">g\u00fcltig noch '+restLabel(m.expires_at)+'</div>'+
               '<button type="button" onclick="window._dpEndShare(\''+esc(m.code)+'\')" style="margin-top:10px;padding:7px 13px;border-radius:9px;border:1px solid rgba(217,104,95,.55);background:transparent;color:#D9685F;font:600 12px/1 \'Space Grotesk\',sans-serif;cursor:pointer">Teilen beenden</button>'+
             '</div>'+
           '</div></div>';
       } else {
-        sec.innerHTML='<div style="margin:20px 0 4px;padding:16px;border-radius:14px;background:#0c0c0c;border:1px solid rgba(201,168,76,.18)">'+head+
-          '<div style="color:#bdb8ae;font-size:13px;line-height:1.5">Dieses Objekt ist noch nicht geteilt. Erzeuge hier direkt einen Link + QR-Code \u2014 oder wie gewohnt \u00fcber den Boarding-Pass im Tab Objekt.</div>'+
+        sec.innerHTML='<div style="margin:20px 0 4px;padding:16px;border-radius:14px;background:#FFFFFF;border:1px solid #E6E0D3">'+head+
+          '<div style="color:#3a352b;font-size:13px;line-height:1.5">Dieses Objekt ist noch nicht geteilt. Erzeuge einen Link mit QR-Code f\u00fcr Bank, Partner oder Miteigent\u00fcmer \u2014 er l\u00e4uft automatisch ab.</div>'+
           '<button type="button" onclick="window._dpStartShare()" style="margin-top:12px;padding:9px 16px;border-radius:10px;border:none;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1508;font:700 13px/1 \'Space Grotesk\',sans-serif;cursor:pointer">\u2708 Jetzt teilen</button></div>';
       }
     }).catch(function(){ sec.innerHTML=''; });

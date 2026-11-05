@@ -59,20 +59,21 @@
   /* ────────────────── Departure-Tafel (Status) ────────────────── */
   function statusTafel() {
     var rows = [
-      ['open', 'Offen', 'Boarding', 'Deal in Pr\u00fcfung'],
-      ['won', 'Gewonnen', 'Abgeflogen', 'Deal gewonnen \u2014 Objekt im Bestand'],
-      ['lost', 'Verloren', 'Gestrichen', 'Deal nicht zustande gekommen']
+      /* v3187 · Marcel: „offen ist halt im Ankauf, gewonnen ist dann Bestand und verloren, dass der Deal nicht zustande gekommen ist“ */
+      ['open', 'Offen', '', 'Im Ankauf \u00b7 Deal in Pr\u00fcfung'],
+      ['won', 'Gewonnen', '', 'Im Bestand \u00b7 Objekt gekauft'],
+      ['lost', 'Verloren', '', 'Deal nicht zustande gekommen']
     ].map(function (d) {
       return '<div class="da-status-tile dab-row" data-status="' + d[0] + '" role="button" tabindex="0"' +
         ' onclick="DealPilotDealAction.setStatus(\'' + d[0] + '\')"' +
         ' onkeydown="if(event.key===\'Enter\'||event.key===\' \')DealPilotDealAction.setStatus(\'' + d[0] + '\')">' +
         '<span class="dab-row-dot"></span>' +
         '<div class="dab-row-x"><div class="dab-row-main">' + d[1] + '</div><div class="dab-row-sub">' + d[3] + '</div></div>' +
-        '<div class="dab-row-flip">' + d[2].toUpperCase() + '</div>' +
+        
         '</div>';
     }).join('');
     return '<div class="dab-tafel">' +
-      '<div class="dab-tafel-bar"><span class="l">DEPARTURES \u00b7 DEAL-STATUS</span><span class="r" id="da-status-sub">Markiere den Deal als gewonnen oder verloren.</span></div>' +
+      '<div class="dab-tafel-bar"><span class="l">DEAL-STATUS</span><span class="r" id="da-status-sub">Markiere den Deal als gewonnen oder verloren.</span></div>' +
       '<div class="dab-tafel-rows">' + rows + '</div>' +
       /* v2030a - der Platz fuer die Ankauf-Frage. Er stand bis hierher
          in `renderWonCard()` (deal-action.js) - und das ist die ALTE,
@@ -126,9 +127,9 @@
       '<div class="dab-cockpit" id="dab-cockpit">' +
         '<div class="dab-strip"><div class="dab-strip-l"><span class="dot"></span>Bereit f\u00fcr die Bank</div><div class="dab-pill" id="dab-ready-pill">\u2013</div></div>' +
         '<div class="dab-body">' +
-          '<div id="dab-readiness-host"><div class="dab-rc-load">Vorflug-Check l\u00e4dt \u2026</div></div>' +
+          '<div id="dab-readiness-host"><div class="dab-rc-load">Grundfelder-Pr\u00fcfung l\u00e4dt \u2026</div></div>' +
           '<div class="dab-perf"></div>' +
-          '<div class="dab-sthead"><div class="dab-route">Objekt \u2192 Abschluss</div><div class="dab-title" id="dab-abtitle">Bereit zum Abflug</div></div>' +
+          '<div class="dab-sthead"><div class="dab-route">Objekt \u2192 Abschluss</div><div class="dab-title" id="dab-abtitle">Abschluss offen</div></div>' +
           '<div class="dab-status-grid">' + statusTafel() + '<div id="dab-share-slot"></div></div>' +
         '</div>' +
       '</div>' +
@@ -147,7 +148,7 @@
       '<div class="dab-panel"><div id="dab-mb-host" class="dab-mb-host"><div class="dab-mb-empty">L\u00e4dt \u2026</div></div></div>' +
       '<div id="dab-uew-slot"></div>' +
 
-      band('doc2', 'Bordkarte &amp; Unterlagen', 'Bankgespr\u00e4ch vorbereiten') +
+      band('doc2', 'Unterlagen f\u00fcrs Bankgespr\u00e4ch', 'Was die Bank sehen will \u2014 und woher es kommt') +
       '<div class="dab-panel">' +
         '<div class="dab-cols">' +
           '<div><div class="dab-ct">Pers\u00f6nliche Unterlagen</div><ul class="dab-list"><li>Personalausweis (Kopie)</li><li>Letzte 3 Gehaltsabrechnungen</li><li>Steuerbescheide 2 Jahre</li><li>SCHUFA-Selbstauskunft</li><li>Verm\u00f6gen &amp; Verbindlichkeiten</li></ul></div>' +
@@ -235,6 +236,90 @@
       : 'Fehlen noch Werte: <b>' + p.fehlt.join(', ') + '</b> — im Objekt eintragen, dann lassen sich die BMF-Ausgaben ziehen.';
   }
 
+  /* ══ v3187 · DEAL-AKTION SERIÖS ═══════════════════════════════════════════
+     Marcel 05.11.2026: „Da kann aber das Flugzeug weg. Das muss halt seriöser aussehen … nicht
+     irgendwie mit Boarding, abgeflogen, gestrichen … Die Dokumente vielleicht auch in Karten
+     darstellen … die Marktberichte vielleicht auch … Partnernetzwerk, da die Karten aber lassen."
+     Eine eigene Stilschicht NACH den bisherigen Regeln, Anker `html body #s8` (eine Stufe
+     spezifischer als `#s8`), damit sie gewinnt, ohne auf Ladereihenfolge zu bauen. */
+  function stilSerioes() {
+    if (document.getElementById('dab-v3187')) return;
+    var X = 'html body #s8 ';
+    var css = [
+      /* Abschnittsköpfe statt goldener Streifenbänder */
+      X + '.dab-band{background:none !important;box-shadow:none !important;border:0 !important;border-bottom:1px solid #E6E0D3 !important;border-radius:0 !important;padding:22px 2px 10px !important;margin:18px 0 12px !important}',
+      X + '.dab-band::before,' + X + '.dab-band::after{display:none !important}',
+      X + '.dab-band-ic{background:#FBF6E9 !important;color:var(--wl-9a7f33, #9a7f33) !important;border:1px solid #EAD9B0 !important;box-shadow:none !important}',
+      X + '.dab-band-t{font-family:\'Space Grotesk\',Inter,sans-serif !important;font-size:17px !important;font-weight:600 !important;letter-spacing:0 !important;text-transform:none !important;color:#1a1814 !important}',
+      X + '.dab-band-s{font-family:Inter,sans-serif !important;font-size:12.5px !important;letter-spacing:0 !important;text-transform:none !important;color:#6B6356 !important}',
+      X + '.dab-panel{background:transparent !important;box-shadow:none !important;border:0 !important;padding:0 !important}',
+      /* Startbahn ohne Flugzeug: ein ruhiger Fortschrittsbalken */
+      X + '.dab-plane,' + X + '.dab-rgate{display:none !important}',
+      X + '.dab-runway{height:12px !important;margin-top:12px !important}',
+      X + '.dab-strip::after{display:none !important}',
+      X + '.dab-rtitle,' + X + '.dab-title{font-family:\'Space Grotesk\',Inter,sans-serif !important;font-size:22px !important;font-weight:600 !important}',
+      /* Status: drei ruhige Karten nebeneinander */
+      X + '.dab-tafel{background:transparent !important;box-shadow:none !important;border-radius:0 !important;overflow:visible !important}',
+      X + '.dab-tafel-bar{background:transparent !important;padding:0 0 8px !important}',
+      X + '.dab-tafel-bar .l{font-family:\'JetBrains Mono\',monospace !important;font-size:10.5px !important;letter-spacing:.08em !important;color:#6B6356 !important}',
+      X + '.dab-tafel-bar .r{color:#6B6356 !important;font-family:Inter,sans-serif !important;font-size:12px !important}',
+      X + '.dab-tafel-rows{display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 !important}',
+      X + '.dab-row{flex-direction:column;align-items:flex-start !important;gap:6px !important;padding:14px 16px !important;border:1px solid #E6E0D3 !important;border-radius:12px !important;background:#FFFFFF !important;box-shadow:none !important;min-height:84px}',
+      X + '.dab-row:hover{border-color:var(--wl-c9a84c, #C9A84C) !important}',
+      X + '.dab-row.active{background:#FBF6E9 !important;border-color:var(--wl-c9a84c, #C9A84C) !important;box-shadow:inset 0 3px 0 var(--wl-c9a84c, #C9A84C) !important}',
+      X + '.dab-row[data-status="won"].active{background:#F3F9F5 !important;border-color:#3FA56C !important;box-shadow:inset 0 3px 0 #3FA56C !important}',
+      X + '.dab-row[data-status="lost"].active{background:#FBF3F2 !important;border-color:#B8625C !important;box-shadow:inset 0 3px 0 #B8625C !important}',
+      X + '.dab-row-flip{display:none !important}',
+      X + '.dab-row-main{font-family:\'Space Grotesk\',Inter,sans-serif !important;font-size:15px !important;font-weight:600 !important;color:#1a1814 !important;text-align:left !important}',
+      X + '.dab-row-sub{font-size:12px !important;color:#6B6356 !important;text-align:left !important}',
+      X + '.dab-row-x{text-align:left !important}',
+      '@media(max-width:700px){' + X + '.dab-tafel-rows{grid-template-columns:1fr}}',
+      /* Dokumente als Karten */
+      X + '.dab-smart-head{display:none !important}',
+      X + '.dab-smart-body{max-height:none !important;overflow:visible !important;display:grid !important;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}',
+      X + '.dab-smart{background:transparent !important;border:0 !important;box-shadow:none !important}',
+      X + '.dab-doc-grp{grid-column:1/-1;margin:8px 2px 0 !important}',
+      X + '.dab-st-fehlt{grid-column:1/-1}',
+      X + '.dab-doc-row{flex-direction:column;align-items:flex-start !important;gap:10px !important;padding:16px !important;border:1px solid #E6E0D3 !important;border-radius:12px !important;background:#FFFFFF !important;margin:0 !important}',
+      X + '.dab-doc-row:first-child{margin-top:0 !important}',
+      X + '.dab-doc-row:hover{border-color:var(--wl-c9a84c, #C9A84C) !important}',
+      X + '.dab-doc-x{width:100%}',
+      X + '.dab-doc-d{min-height:34px}',
+      X + '.dab-doc-act{margin-top:auto;width:100%;flex-wrap:wrap}',
+      X + '.dab-doc-act .dab-doc-btn{flex:1 1 auto;justify-content:center}',
+      X + '.dab-doc-act .dab-fa-year{flex:0 0 auto}',
+      /* Marktberichte als Karten */
+      X + '.dab-mb-host{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;padding:0 !important}',
+      X + '.dab-mb-host > :not(.dab-mb-row):not(.dab-mb-more){grid-column:1/-1}',
+      X + '.dab-mb-more{grid-column:1/-1}',
+      X + '.dab-mb-host.mb-open .dab-mb-more{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}',
+      X + '.dab-mb-row{flex-wrap:wrap;border:1px solid #E6E0D3 !important;border-radius:12px !important;background:#FFFFFF !important;padding:14px 16px !important}',
+      X + '.dab-mb-row:hover{border-color:var(--wl-c9a84c, #C9A84C) !important}',
+      /* Teilen-Karte hell */
+      X + '#dab-share-slot > div{background:#FFFFFF !important;border:1px solid #E6E0D3 !important;border-radius:12px !important}'
+    ].join('\n');
+    var st = document.createElement('style');
+    st.id = 'dab-v3187';
+    st.textContent = css;
+    document.head.appendChild(st);
+  }
+
+  /* v3187 · Marcel: „unter Dokumente und Exporte bitte nur Dokumente anzeigen, die man wirklich runterladen kann.
+     Die nicht gehen, werden nicht angezeigt." Gilt für die Steuer-Ausgaben (Pflichtliste des BMF-Rechners) und
+     das Finanzamt-PDF (braucht Jahreswerte). Eine Gruppe ohne sichtbare Karte verschwindet mit. */
+  function dokSichtbar() {
+    var p = window.DpBmfAusgabe ? window.DpBmfAusgabe.pruefen() : { ok: true };
+    document.querySelectorAll('#s8 [data-steuer]').forEach(function (r) { r.style.display = p.ok ? '' : 'none'; });
+    var fa = document.querySelector('#s8 [data-dok="fa"]');
+    if (fa) fa.style.display = (window.State && State.cfRows && State.cfRows.length) ? '' : 'none';
+    var box = document.getElementById('dab-st-fehlt'); if (box) box.style.display = 'none';
+    document.querySelectorAll('#s8 .dab-doc-grp').forEach(function (g) {
+      var n = g.nextElementSibling, sicht = false;
+      while (n && !n.classList.contains('dab-doc-grp')) { if (n.classList.contains('dab-doc-row') && n.style.display !== 'none') sicht = true; n = n.nextElementSibling; }
+      g.style.display = sicht ? '' : 'none';
+    });
+  }
+
   /* v1733 · immer den Dialog zeigen, auch wenn eine Wahl gemerkt ist */
   function fassungWaehlen() {
     if (!window.DealPilotPdfWahl || typeof window.DealPilotPdfWahl.neuWaehlen !== 'function') {
@@ -245,7 +330,7 @@
 
   /* v854: Finanzamt-PDF = Steuerformular (exportWerbungskostenPDF) mit Jahr-Auswahl */
   function faRow() {
-    return '<div class="dab-doc-row"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/></svg></div>' +
+    return '<div class="dab-doc-row" data-dok="fa"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/></svg></div>' +
       '<div class="dab-doc-x"><div class="dab-doc-n">Finanzamt-PDF (Steuerformular)</div><div class="dab-doc-d">Werbungskosten-Aufschl\u00fcsselung f\u00fcr die Anlage V \u2014 Steuerjahr w\u00e4hlen oder Gesamt\u00fcbersicht \u00fcber alle Jahre.</div></div>' +
       '<div class="dab-doc-act" style="display:flex;gap:8px;align-items:center;flex-shrink:0">' +
       '<select id="dab-fa-year" class="dab-fa-year" onfocus="DealActionBoarding.fillFaYears()" title="Steuerjahr f\u00fcr das Finanzamt-PDF"></select>' +
@@ -299,7 +384,7 @@
           return '<button type="button" class="dab-chip" style="' + chipStyle + '" onclick="DealPilotReadyCheck.jump(\'' + esc(m.key) + '\')"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 4px currentColor;flex-shrink:0"></span>' + esc(m.name) + '</button>';
         }).join('') + '</div>';
     } else {
-      chips = '<div class="dab-allset">\u2713 Alle Grundfelder vollst\u00e4ndig \u2014 startklar f\u00fcr die Bank</div>';
+      chips = '<div class="dab-allset">\u2713 Alle Grundfelder vollst\u00e4ndig \u2014 bereit f\u00fcr die Bank</div>';
     }
     /* v3073 · Detailgrad: ausgeblendete, leere Merkmale sind kein Chip, sondern eine Zeile */
     try { if (window.DealPilotReadyCheck && DealPilotReadyCheck.vorgabeZeile) chips += DealPilotReadyCheck.vorgabeZeile(d); } catch (e) {}
@@ -310,8 +395,8 @@
         '<circle cx="48" cy="48" r="31" fill="none" style="stroke:color-mix(in srgb,var(--gold,#C9A84C) 20%,transparent)" stroke-width="5"/>' +
         '<circle cx="48" cy="48" r="31" fill="none" stroke="var(--dab-gold)" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + c2.toFixed(1) + '" stroke-dashoffset="0"/>' +
       '</svg><div class="dab-donut-v"><b>' + pct + '</b><span>/ 100</span><small>FELDER ' + filled + ' / ' + total + '</small></div></div>' +
-      '<div class="dab-rmain"><div class="dab-kick">Vorflug-Check</div><div class="dab-rtitle">Bereit f\u00fcr die Bank?</div><div class="dab-count"><b>' + filled + '</b> / ' + total + ' Grundfelder bef\u00fcllt</div>' +
-        '<div class="dab-runway"><div class="dab-track">' + segs + '</div><div class="dab-plane" style="left:' + pct + '%">' + ICO.plane + '</div><div class="dab-rgate">' + ICO.gate + '</div></div>' +
+      '<div class="dab-rmain"><div class="dab-kick">Grundfelder-Pr\u00fcfung</div><div class="dab-rtitle">Bereit f\u00fcr die Bank?</div><div class="dab-count"><b>' + filled + '</b> / ' + total + ' Grundfelder bef\u00fcllt</div>' +
+        '<div class="dab-runway"><div class="dab-track">' + segs + '</div></div>'   /* v3187: ohne Flugzeug */ +
       '</div></div>' +
       '<div class="dab-cap"><b>Grundfelder f\u00fcr die Bank-Bewertung</b> \u2014 nur diese Felder z\u00e4hlen in die Readiness. Weitere Angaben (Ausstattung, Historie, Fotos) sind hilfreich, flie\u00dfen aber <b>nicht</b> in diese Bewertung ein.</div>' +
       chips;
@@ -348,12 +433,13 @@
       });
     } catch (e) {}
     var pill = document.getElementById('dab-ready-pill');
-    if (pill) pill.textContent = pct + ' %' + (d.missing && d.missing.length ? '' : ' \u00b7 STARTKLAR \u2713');
+    if (pill) pill.textContent = pct + ' %' + (d.missing && d.missing.length ? '' : ' \u00b7 VOLLST\u00c4NDIG \u2713');
     var ck = document.getElementById('dab-cockpit');
     if (ck) ck.classList.toggle('ready', !(d.missing && d.missing.length));
     // Gates haengen am ReadyCheck -> mit aktualisieren
     try { refreshGates(); } catch (e) {}
     try { steuerStand(); } catch (e) {}   /* v3184 */
+    try { stilSerioes(); dokSichtbar(); } catch (e) {}   /* v3187 */
   }
 
   /* ────────────────── Anforderungs-Gate ────────────────── */
@@ -638,11 +724,11 @@
         '<div class="dab-gatewrap" data-cid="' + (c.id | 0) + '">' + gateHtml(c) + '</div>' +
       '</div>' +
       edgeHtml(c) +
-      '<div class="dab-bp-stub"><div class="dab-bp-code">' + esc((c.kuerzel || 'DP').toUpperCase()) + '</div><div class="dab-bp-barcode"></div><div class="dab-bp-lbl">BOARDING</div></div>' +
+      '<div class="dab-bp-stub"><div class="dab-bp-code">' + esc((c.kuerzel || 'DP').toUpperCase()) + '</div><div class="dab-bp-barcode"></div><div class="dab-bp-lbl">ANFRAGE</div></div>' +
       '</article>';
   }
   function adCard(acc) {
-    return '<article class="dab-bp dab-bp-ad" style="--acc:' + esc(acc) + '"><div class="dab-bp-l"><div class="dab-bp-adbadge">Freier Sitzplatz</div>' +
+    return '<article class="dab-bp dab-bp-ad" style="--acc:' + esc(acc) + '"><div class="dab-bp-l"><div class="dab-bp-adbadge">Freier Platz</div>' +
       '<div class="dab-bp-adic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></div>' +
       '<div class="dab-bp-adt">Ihr Platz vor kaufbereiten Investoren</div><div class="dab-bp-ads">Genau im Moment der Finanzierungs- und Gutachten-Entscheidung. Qualifizierte Leads, keine Streuverluste.</div>' +
       '<button class="dab-bp-cta" type="button" onclick="DealActionBoarding.partnerInterest()"><span class="dab-bp-cta-t">Partner werden</span><span class="dab-bp-cta-s">Konditionen anfragen</span></button></div>' +
@@ -908,6 +994,7 @@
   /* ────────────────── afterRender ────────────────── */
   function afterRender() {
     injectCss();
+    try { stilSerioes(); dokSichtbar(); setTimeout(dokSichtbar, 1500); } catch (e) {}   /* v3187 */
     try { if (window.DealPilotDealAction && window.DealPilotDealAction.initStatusSync) window.DealPilotDealAction.initStatusSync(); } catch (e) {}
     try { if (window.DealPilotReadyCheck && window.DealPilotReadyCheck.getData) renderReadiness(window.DealPilotReadyCheck.getData()); } catch (e) {}
     try { if (window.DealPilotReadyCheck && window.DealPilotReadyCheck.refresh) window.DealPilotReadyCheck.refresh(); } catch (e) {}
