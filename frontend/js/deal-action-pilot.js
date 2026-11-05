@@ -55,7 +55,7 @@
       } else {
         sec.innerHTML='<div style="margin:20px 0 4px;padding:16px;border-radius:14px;background:#FFFFFF;border:1px solid #E6E0D3">'+head+
           '<div style="color:#3a352b;font-size:13px;line-height:1.5">Dieses Objekt ist noch nicht geteilt. Erzeuge einen Link mit QR-Code f\u00fcr Bank, Partner oder Miteigent\u00fcmer \u2014 er l\u00e4uft automatisch ab.</div>'+
-          '<button type="button" onclick="window._dpStartShare()" style="margin-top:12px;padding:9px 16px;border-radius:10px;border:none;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1508;font:700 13px/1 \'Space Grotesk\',sans-serif;cursor:pointer">\u2708 Jetzt teilen</button></div>';
+          '<button type="button" onclick="window._dpStartShare()" style="margin-top:12px;padding:9px 16px;border-radius:10px;border:none;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1508;font:700 13px/1 \'Space Grotesk\',sans-serif;cursor:pointer">Link erzeugen</button></div>';
       }
     }).catch(function(){ sec.innerHTML=''; });
   }

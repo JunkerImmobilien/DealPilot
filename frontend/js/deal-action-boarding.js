@@ -270,6 +270,7 @@
       X + '.dab-row[data-status="won"].active{background:#F3F9F5 !important;border-color:#3FA56C !important;box-shadow:inset 0 3px 0 #3FA56C !important}',
       X + '.dab-row[data-status="lost"].active{background:#FBF3F2 !important;border-color:#B8625C !important;box-shadow:inset 0 3px 0 #B8625C !important}',
       X + '.dab-row-flip{display:none !important}',
+      X + '.dab-row::before{display:none !important}',   /* goldener Verlaufsstreifen auf jeder Karte - nur die gewählte trägt eine Kante */
       X + '.dab-row-main{font-family:\'Space Grotesk\',Inter,sans-serif !important;font-size:15px !important;font-weight:600 !important;color:#1a1814 !important;text-align:left !important}',
       X + '.dab-row-sub{font-size:12px !important;color:#6B6356 !important;text-align:left !important}',
       X + '.dab-row-x{text-align:left !important}',
@@ -295,6 +296,17 @@
       X + '.dab-mb-host.mb-open .dab-mb-more{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}',
       X + '.dab-mb-row{flex-wrap:wrap;border:1px solid #E6E0D3 !important;border-radius:12px !important;background:#FFFFFF !important;padding:14px 16px !important}',
       X + '.dab-mb-row:hover{border-color:var(--wl-c9a84c, #C9A84C) !important}',
+      /* gemessen: .dab-mb-main war 37 px breit - Adresse weg, Datum umgebrochen. Kopf (Symbol + Text) volle Zeile,
+         Marktwert und Knöpfe darunter */
+      X + '.dab-mb-main{flex:1 1 calc(100% - 60px) !important;min-width:0 !important}',
+      X + '.dab-mb-d{white-space:nowrap}',
+      X + '.dab-mb-mv{flex:1 1 auto;text-align:left !important;margin-left:58px}',
+      X + '.dab-mb-row .dab-doc-btn{flex:0 0 auto}',
+      /* „In Gesellschaft überführen" (gesellschaft-ueberfuehrung): Abschnittskopf wie die übrigen */
+      X + '#dpuew-stage .da-stage-head{background:none !important;box-shadow:none !important;border:0 !important;border-bottom:1px solid #E6E0D3 !important;border-radius:0 !important;padding:22px 2px 10px !important}',
+      X + '#dpuew-stage .da-stage-head::before,' + X + '#dpuew-stage .da-stage-head::after{display:none !important}',
+      X + '#dpuew-stage .da-stage-title{font-family:\'Space Grotesk\',Inter,sans-serif !important;font-size:17px !important;font-weight:600 !important;letter-spacing:0 !important;text-transform:none !important;color:#1a1814 !important}',
+      X + '#dpuew-stage .da-stage-head *{color:#6B6356}',
       /* Teilen-Karte hell */
       X + '#dab-share-slot > div{background:#FFFFFF !important;border:1px solid #E6E0D3 !important;border-radius:12px !important}'
     ].join('\n');
