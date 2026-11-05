@@ -105,7 +105,9 @@
       '<div id="bmf-boden-wahl"></div>' +
       '<div id="bmf-boden-out" style="margin-top:12px"></div>' +
       '<div style="' + zwi + '">Begründung und Restnutzungsdauer</div>' +
-      '<div style="display:grid;grid-template-columns:minmax(260px,1fr) 250px;gap:12px 18px;align-items:start">' +
+      /* v3196 · Messkabine 390 px: feste Spalten 260 + 250 px im 288-px-Fenster - „Restnutzungsdauer von / bis“
+         stand bei x 327..577 außerhalb. Jetzt umbrechend. */
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px 18px;align-items:start">' +
         '<label style="font-size:12px;color:#3a352b">Begründung (geht in Vertragstext und Berater-Text)<br>' +
           '<input id="bmf-boden-grund" type="text" value="" placeholder="z. B. Hinterlandanteil, Zuschnitt, Lärmbelastung" style="' + feld + '"></label>' +
         '<label style="font-size:12px;color:#3a352b">Restnutzungsdauer von / bis<br><span style="display:inline-flex;align-items:center;gap:6px;margin-top:4px">' +

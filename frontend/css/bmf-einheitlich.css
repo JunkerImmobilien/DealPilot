@@ -18,6 +18,14 @@
    Regeln nichts außerhalb des Fensters treffen. !important nur dort, wo Inline-Stile aus
    bmf-modal*.js dagegen stehen.
    ═══════════════════════════════════════════════════════════════════════ */
+/* v3196 · Messkabine 390 px: die Fußzeile war 169 px hoch (Schrittbeschreibung 226 px breit, 86 px hoch
+   neben „Zurück“, „Übernehmen“ in eigener Zeile) - ein Viertel des Fensters. Schmal steht die
+   Beschreibung zweizeilig über den Knöpfen, die Knöpfe teilen sich eine Zeile. */
+@media (max-width: 600px) {
+  #bmfOverlay .bmfmo-foot { padding: 10px 14px !important; gap: 8px !important; }
+  #bmfOverlay .bmfmo-foot .left { flex: 1 1 100% !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  #bmfOverlay .bmfmo-foot .btn { flex: 1 1 0; min-width: 0; }
+}
 #bmfOverlay {
   --bmfe-ink: #1a1814;
   --bmfe-text: #2A2727;

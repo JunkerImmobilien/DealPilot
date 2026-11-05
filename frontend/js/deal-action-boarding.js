@@ -330,7 +330,28 @@
       X + '.dab-doc-btn{padding:7px 12px !important;font-size:12px !important}',
       X + '.dab-band{padding:16px 2px 8px !important;margin:12px 0 10px !important}',
       X + 'details.dab-check > summary{cursor:pointer;font:600 13px Inter,sans-serif;color:#1a1814;padding:6px 0}',
-      X + 'details.dab-check[open] > summary{margin-bottom:8px}'
+      X + 'details.dab-check[open] > summary{margin-bottom:8px}',
+      /* v3196 · Messkabine (gemessen 360/390/768/834/1280, Aktenmappe und Heute):
+         (1) Ring: „FELDER 32 / 34“ steht wegen der Hausuntergrenze 8,5 px (style.css) 76 px breit im
+             57-px-Innenkreis und lief über beide Ringe. Dieselbe Zahl steht direkt daneben
+             („32 / 34 Grundfelder befüllt“) - im Ring entfällt sie. */
+      X + '.dab-donut-v small{display:none !important}',
+      /* (2) Dokumentkarten unter 700 px: style.css:18877 setzt .dab-doc-x auf flex 1 1 140px und
+             .dab-doc-act auf 1 1 100% mit flex-wrap - in der Spaltenrichtung der Karte wird daraus HÖHE
+             (Karte 260 px, Text 192 px hoch) und der Knopf rutscht in eine zweite Flex-Spalte. */
+      X + '.dab-doc-row{flex-wrap:nowrap !important}',
+      X + '.dab-doc-x{flex:0 0 auto !important;min-width:0 !important}',
+      X + '.dab-doc-act{flex:0 0 auto !important}',
+      /* (3) Marktbericht-Karten: Marktwert volle Zeile, beide Knöpfe gemeinsam darunter
+             (390 px: „PDF“ neben dem Wert, „Profi“ allein in der nächsten Zeile). */
+      X + '.dab-mb-mv{flex:1 1 100% !important}',
+      X + '.dab-mb-mv + .dab-doc-btn{margin-left:58px}',
+      /* (4) Unter 1000 px stehen Grundfelder-Prüfung und „Objekt → Abschluss“ untereinander:
+             gemessen 0 px Abstand (Chips unten 486 = Kopf oben 486). */
+      '@media(max-width:999px){' + X + '.dab-sthead{margin-top:20px !important}}',
+      /* (5) Schmal: Abschnittskopf zweizeilig statt Titel in Spaltenbreite („Dein / Netzwerk“
+             93 px, 51 px hoch); Unterzeile unter den Titel. Checklisten-Schalter 28 -> 40 px hoch. */
+      '@media(max-width:560px){' + X + '.dab-band{flex-wrap:wrap}' + X + '.dab-band-t{flex:1 1 auto}' + X + '.dab-band-s{flex:1 1 100%;margin:2px 0 0 38px !important}' + X + 'details.dab-check > summary{padding:11px 0}}'
     ].join('\n');
     var st = document.createElement('style');
     st.id = 'dab-v3187';

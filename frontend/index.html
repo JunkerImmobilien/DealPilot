@@ -35,7 +35,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v3186">
+<link rel="stylesheet" href="css/style.css?v=v3196">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -52,8 +52,8 @@
       Object.keys(m).forEach(function(a){var v=f[a]||'';if(m[a].indexOf(v)>=0)r.setAttribute(a,v);});}catch(e){}})();</script>
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=v1500"><!-- V292-modal-refactor -->
-<link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3188"><!-- v3185 -->
-<link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3192a"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
+<link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3196"><!-- v3185 -->
+<link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3196"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=v2132">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -2410,7 +2410,8 @@ label.dp-required.qc-required::after {
       <button type="button" class="btn btn-sm"
               onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open('wk')"
               title="Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen als PDF oder Foto einlesen. Die KI teilt eine Hausgeldabrechnung in umlagefähige und nicht umlagefähige Kosten auf und erkennt die Rücklagenzuführung."
-              style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border:1px solid var(--wl-b8932f, #b8932f);padding:8px 15px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">
+              style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border:1px solid var(--wl-b8932f, #b8932f);padding:8px 15px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:normal;max-width:100%;text-align:left">
+        <!-- v3196 · Messkabine 360/390 px: .btn-sm ist nowrap - 353 px Knopf in 303 px Zeile, von der Steuerkarte (overflow:hidden) 34 px abgeschnitten -->
         📎 Belege, Unterlagen &amp; Rechnungen einlesen (KI)
       </button>
       <span class="hint" style="margin:0;flex:1 1 260px;min-width:220px;font-size:11.5px;line-height:1.45">
@@ -3702,7 +3703,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-investment-bank.js?v=v3180b"></script>
 <script src="js/bmf-modal.js?v=v3188"></script>
 <script src="js/bmf-modal-v292.js?v=v3185b"></script>
-<script src="js/bmf-bodenabschlag.js?v=v3188a"></script>
+<script src="js/bmf-bodenabschlag.js?v=v3196"></script>
 <script src="js/bmf-ausgabe.js?v=v3184b"></script><!-- v3184 · alle Ausgaben des BMF-Rechners an einer Stelle -->
 <script src="js/pdf-kaufpreisaufteilung.js?v=v3018d"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
@@ -3764,7 +3765,7 @@ label.dp-required.qc-required::after {
   <script src="js/modal-boarding-skin.js?v=v3090"></script>
   <script src="js/provider-keys.js?v=v2180"></script>
   <script src="js/ueberfuehrung-kern.js?v=v2984"></script>
-  <script src="js/mandanten.js?v=v3191b"></script>
+  <script src="js/mandanten.js?v=v3196"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v3003a"></script>
   <script src="js/apikeys.js?v=v3167"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
@@ -3886,9 +3887,9 @@ label.dp-required.qc-required::after {
 <script src="js/portfolio-export.js?v=v2180"></script>
 <script src="js/deal-action.js?v=v3191"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
-<script src="js/afa-eigen.js?v=v3045"></script>
+<script src="js/afa-eigen.js?v=v3196"></script>
 <script src="js/deal-action-readycheck.js?v=v3073"></script>
-<script src="js/deal-action-boarding.js?v=v3191b"></script>
+<script src="js/deal-action-boarding.js?v=v3196"></script>
 <script src="js/deal-action-pilot.js?v=v3187a"></script>
 <script src="js/netzwerk-einreichung.js?v=v2200"></script> <!-- v856-einreichung -->
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>

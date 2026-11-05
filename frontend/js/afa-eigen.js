@@ -37,7 +37,9 @@
         '<label style="font-size:12px;grid-column:1/-1">Grundlage<input id="afa_eigen_grundlage" type="text" placeholder="z. B. Restnutzungsdauer-Gutachten vom 03/2026" style="width:100%"></label>' +
       '</div>' +
       '<div class="cf-hint" id="afa-eigen-hinweis" style="margin-top:6px">Eine eingetragene Restnutzungsdauer ergibt den Satz: 100 ÷ RND. Das Finanzamt verlangt dafür einen Nachweis (Gutachten).</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+      /* v3196 · Messkabine 360 px: „Restnutzungsdauer-Gutachten anfragen“ (nowrap) 290 px in 275 px Box,
+         von der Steuerkarte (overflow:hidden) 15 px abgeschnitten - die Knöpfe dürfen umbrechen. */
+      '<div class="afa-rnd-knoepfe" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-ermitteln">Restnutzungsdauer ermitteln</button>' +
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-anfragen">Restnutzungsdauer-Gutachten anfragen</button>' +   /* v3045 */
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-letzte" hidden>Letzte Ermittlung übernehmen</button>' +

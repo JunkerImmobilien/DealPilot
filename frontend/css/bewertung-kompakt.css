@@ -46,3 +46,9 @@
 #s6 .bw-kz .kpi:has(.kpi-val.gn) { border-left: 3px solid #3FA56C !important; }
 #s6 .bw-kz .kpi:has(.kpi-val.rd) { border-left: 3px solid #B8625C !important; }
 #s6 .bw-kz .kpi::before, #s6 .bw-kz .kpi::after { display: none !important; }
+/* v3196 · Messkabine: die Media-Regeln oben (.bw-grid → 3 bzw. 2 Spalten) haben dieselbe Spezifität wie
+   .bw-grid-1 und stehen später - bei 768/834/1180 px stand die EINE Kachel „Faktor“ in einem
+   Dreierraster: 52 px breit, Wert „13,8“ 42/23 px abgeschnitten. Zwei Klassen gewinnen in jeder Breite. */
+.bw-grid.bw-grid-1 { grid-template-columns: minmax(0, 1fr); }
+/* v3196 · „Fremdfinanzierungsquote“ ist ein Wort: bei 360 px 138 px in 133 px Kachel, lief 5 px hinaus. */
+.bw-kz .kpi-sub, .bw-kz .kpi-label { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: anywhere; }

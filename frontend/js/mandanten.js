@@ -818,8 +818,11 @@
            + (_erwAktiv(reg) ? ' \u00b7 erw. K\u00fcrzung' : (reg.erw_kuerzung === true ? ' \u00b7 erw. K\u00fcrzung beantragt, Pr\u00fcfpunkte offen' : '') + (reg.gewst ? ' \u00b7 GewSt-Hebesatz ' + reg.gewst + ' %' : ' \u00b7 Hebesatz fehlt')))
         : (m.rechtsform === 'gbr' ? 'Personengesellschaft \u00b7 transparent (ESt der Gesellschafter)'
                                   : 'Einkommensteuer \u00b7 \u00fcber zvE (Tab Steuer)');
-      return '<div style="border:1px solid #ece7df;border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;background:#fff">'
-        + '<div style="flex:1;min-width:0">'
+      /* v3196 · Messkabine: bei 390 px war die Privat-Karte 475 px breit im 347-px-Raster - drei Knöpfe
+         nebeneinander, der Text auf 110 px gedrückt und „Bearbeiten“ von .pane-wrap (overflow:hidden)
+         abgeschnitten. Jetzt bricht die Karte um: Text mindestens 220 px, Knöpfe darunter. */
+      return '<div style="border:1px solid #ece7df;border-radius:12px;padding:13px 15px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;background:#fff">'
+        + '<div style="flex:1 1 220px;min-width:0">'
         + '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><strong style="font:600 15px/1.2 \'Space Grotesk\',sans-serif">' + esc(m.name) + '</strong>' + _badge(m.rechtsform) + '</div>'
         + '<div style="font-size:12px;color:#7A7370">' + sub + '</div>'
         /* v1234 · Welche Objekte gehoeren diesem Mandanten?
@@ -842,7 +845,7 @@
       + '<p class="hint">Lege fest, wer ein Objekt h\u00e4lt \u2014 Privat oder eine Gesellschaft (GmbH/UG). Jedes Objekt bekommt im Tab "Objektdaten" einen <b>Halter</b>. '
       + 'Privat l\u00e4uft \u00fcber dein zu versteuerndes Einkommen (Tab Steuer). Bei GmbH/UG gibst du das Steuerregime + Buchhaltungs-Stammwerte an \u2014 die werden in einer n\u00e4chsten Ausbaustufe aktiv (eigene Steuerrechnung + GuV/Bilanz-Export). '
       + 'Privat bleibt der Standard.</p>'
-      + '<div style="display:grid;gap:11px;margin:16px 0">' + cards + '</div>'
+      + '<div style="display:grid;grid-template-columns:minmax(0,1fr);gap:11px;margin:16px 0">' + cards + '</div>'
       + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.uiNew()"><span class="ic">+</span> Neuer Mandant</button>'
       /* v3191 · die Überführung steht als Knopf an der Privat-Karte (Auswahlfenster openUeberfuehrung) */
       + '';
@@ -1266,11 +1269,16 @@
       + '<button type="button" id="mand-uew-zu" aria-label="Schließen" style="border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#6B6356">×</button></div>'
       + (corps.length
         ? '<div style="padding:12px 18px 0"><input id="mand-uew-such" type="search" placeholder="Objekt suchen (Straße, Ort, Nummer)" style="width:100%;padding:9px 12px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif"></div>'
-          + '<div id="mand-uew-liste" style="padding:12px 18px 16px;overflow:auto;display:grid;gap:8px"><div style="color:#6B6356;font-size:13px">Objekte laden …</div></div>'
+          + '<div id="mand-uew-liste" style="padding:12px 18px 16px;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:8px"><div style="color:#6B6356;font-size:13px">Objekte laden …</div></div>'
         : '<div style="padding:18px;font-size:13.5px;color:#3a352b;line-height:1.55">Es gibt noch keine Gesellschaft. Lege zuerst unter „Neuer Mandant" eine GmbH oder UG an – dann lassen sich Privatobjekte dorthin überführen.</div>')
       + '</div>';
     document.body.appendChild(ov);
-    function zu() { ov.remove(); }
+    /* v3196 · Messkabine: bei 390 px standen die Zeilen 393 px breit im 358-px-Fenster - die implizite
+       Rasterspalte nahm die max-content-Breite der nowrap-Adresse an, die Ellipse griff nie.
+       Jetzt minmax(0,1fr) am Raster. Dazu schliesst ESC (gemessen: wirkungslos). */
+    function zu() { ov.remove(); document.removeEventListener('keydown', escZu); }
+    function escZu(e) { if (e.key === 'Escape') zu(); }
+    document.addEventListener('keydown', escZu);
     document.getElementById('mand-uew-zu').onclick = zu;
     ov.addEventListener('click', function (e) { if (e.target === ov) zu(); });
     if (!corps.length) return;

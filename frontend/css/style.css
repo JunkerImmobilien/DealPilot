@@ -40169,6 +40169,10 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 .ank-zeile.ank-fehlt{background:rgba(42,39,39,.06);border-color:rgba(42,39,39,.22)}
 @media (max-width:620px){
   .ank-zeile{flex-direction:column;align-items:stretch;gap:10px}
+  /* v3196 · Messkabine 390 px: flex-basis 260px wird in der Spalte zur HÖHE - „Ankauf-Stand
+     festgeschrieben“ stand in einem 260 px hohen Kasten mit einer Zeile Text. */
+  .ank-zeile .ank-txt{flex:0 0 auto}
+  .afa-rnd-knoepfe .btn{white-space:normal;text-align:left;max-width:100%}
   .ank-aktionen{justify-content:flex-end}
 }
 
