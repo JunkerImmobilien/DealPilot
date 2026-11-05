@@ -522,7 +522,7 @@
         /* v3193 · Marcel 05.11.2026: die Portfoliostrategie fand keine Ausstattungsmerkmale je Wohnung - „zum Aufklappen
            … dass wir das mit angeben können. Ansonsten können wir das irgendwie ableiten." Leer = in der Schnittstelle aus
            dem Gebäude abgeleitet (backend services/ausstattung.js) und so gekennzeichnet. */
-        '<details class="mfh-we-ausst"' + ((e.aus_kueche || e.aus_bad || e.aus_boden) ? ' open' : '') + '><summary style="cursor:pointer;font:600 13px Inter,sans-serif;margin:10px 0 6px">Ausstattung der Wohnung</summary>' +
+        '<details class="mfh-we-ausst"' + ((e.aus_kueche || e.aus_bad || e.aus_boden) ? ' open' : '') + '><summary style="cursor:pointer;font:600 13px Inter,sans-serif;margin:4px 0 2px;padding:11px 0">Ausstattung der Wohnung</summary>' +   /* v3196 · Messkabine 390 px: Schalter war 16 px hoch - jetzt rund 38 px treffbar */
           '<div class="mfh-we-raster">' +
             s('aus_kueche', 'Küche', [['', '— (aus dem Gebäude ableiten)'], ['keine', 'keine Einbauküche'], ['ebk_einfach', 'Einbauküche einfach'], ['ebk_hochwertig', 'Einbauküche hochwertig']]) +
             s('aus_bad', 'Bad', [['', '— (aus dem Gebäude ableiten)'], ['einfach', 'einfach / älter'], ['standard', 'Standard'], ['modern', 'modernisiert / gehoben']]) +
