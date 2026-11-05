@@ -43,6 +43,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - Danach: als Stufe-3-PDF-Variante „Profi“ bauen (Abschnitte Ergebnis, Angaben/Annahmen, Bodenwert+Sachwert, Vergleichswert, Ertragswert, Quellen), Daten aus cross_check, jede Zeile mit Fundstelle.
 - Mitnehmen aus IWA: Vollständigkeitsprüfung vor dem PDF, „Link teilen“, Kontaktkarte/nächste Schritte als abschaltbarer Makler-Teil.
 
+### N126 · Reste vom 05.11.2026 (BMF-Rechner, Steuer, Deal-Aktion)
+- Messe-Videos mit dem BMF-Rechner neu aufnehmen: Drehbuch angepasst (Jacoby in Schritt 3, keine Aggressiv-Karte), Szene 5 zielt noch auf die alten Karten `r6BmfKarte` – ungetestet.
+- Klassische Kaufpreisaufteilung (jsPDF, Einstellung „Klassisch“) kennt Jacoby nicht.
+- Gutachten-Anfrage Kaufpreisaufteilung: PDF-Anhang beim echten Versand noch nicht gesehen (nur geöffnet, nicht gesendet).
+- Selbstauskunft ist Demo – Marcel legt ggf. eine Bank-Vorlage in den Ordner.
+- Steuerzeitraum 2026 (68.000 €) gegen Feld zvE (90.000 €) in Marcels Profil: App rechnet nach Regel (v3188), Werte prüft Marcel.
+
 ### N125 · Kaufpreisaufteilung: mehrere Flurstücke, Nebengebäude, Leerstand
 Sonderfall vom 04.11.2026 (leerstehendes ZFH mit Scheune, drei Flurstücke). Das BMF-Modul kennt ein Gebäude und eine Bodenfläche. Fehlt: Flurstücke mit eigenem Bodenansatz (Bauland/Hinterland/Grün), ein zweites Gebäude mit eigener NHK/GND/RND, ein Schalter „leerstehend“ (dann kein Ertragswert-Weg). Mittlere Priorität — selten, aber dann steuerlich viel Geld (AfA-Basis). Hinterland gibt es im Marktbericht schon (Bodenwert 950 × 90 + 828 × 5).
 
@@ -4451,6 +4458,7 @@ Damit es niemand für gemessen hält:
 
 ## Fertig
 
+- **05.11.2026 · v3184–v3189 · BMF-Rechner neu geordnet, Steuer-Reiter, Deal-Aktion seriös** (Prod 1.0.60–1.0.62, `c45cf7f`, `6c85d88`, `d0347d5`): Deal-Aktion Dokumente (zwei Investment-Fassungen, Steuer & Finanzamt, nur ziehbare Dokumente, Selbstauskunft-Demo), BMF-Rechner fünf Schritte mit Übersicht & Ausgabe, Jacoby als vierte Stufe bis ins PDF, Wählen/Übernehmen getrennt, ein Erscheinungsbild (`css/bmf-einheitlich.css`), Grenzsteuersatz erklärt, zvE je Jahr nach Jahressteuerprinzip, Deal-Aktion ohne Flug-Bildsprache. Befunde: `pdf-wahl.vorgabe()` gab `design` nicht heraus (Klassisch wirkte nie); KPA-PDF neuen Designs druckte nur amtlich; PDF-Prüfung sperrte KPA aus der Deal-Aktion; Pipeline-Ergebnis eines anderen Objekts; letzter Steuerzeitraum galt für alle Zukunftsjahre. Einzelheiten `wissen/2026-11-05.md`.
 - **03.11.2026 · v3151/v3151a · Pilot-Analyse: Grafiken in der Bauart des Reiters Steuer, mit Zahlen** (`7a7c95f6`, `e45810df`, nur Staging): Marcel: „schöner, farblich wie Tab Steuern, Zahlen dran“. Gold-Balken mit runden Ecken, Anthrazit-Linie mit weißen Punkten, Fläche unter der Restschuld, Grün/Rot für Cashflow, Zahlen an den Werten (ausgedünnt). Kurztext „Mieterhöhung = Wert zum Stichtag“ nachgezogen.
 - **03.11.2026 · v3150 · Mietername aus dem Mietvertrag ohne KI (N116-Rest)** (`c069cc6c`, nur Staging): Marcel: „Namen des Mieters auslesen, aber nicht an die KI schicken“. `backend/src/services/mieterName.js` liest auf dem rohen Text vor dem Schwärzen (Muster „nachstehend Mieter“, „Mieter: …“, „(Mieter)“), Antwort `extracted.mieter_name`; Prüf-Fenster zeigt ihn, Übernahme füllt `mv_mieter`, Zuordnung zur Einheit auch über den Namen. 8/8 Testfälle mit erfundenen Namen. Scans: N118.
 - **03.11.2026 · v3120–v3120c · Ein Eingang für Belege, Unterlagen, Rechnungen (N116, Stufe 1)** (`b839d89f`, `f3e2c735`, `4b7b0174`, `d6dbe500`, `d84f1b0c`; NICHT Prod): siehe N116.
