@@ -2017,7 +2017,7 @@
     _files.filter(function (f) { return f.type === 'expose' && f.cache.expose && _giltFuerWahl(f); }).forEach(function (f) { mergeExpose(f.cache.expose); });
     _files.filter(function (f) { return f.type === 'market' && f.cache.market && _giltFuerWahl(f); }).forEach(function (f) { mergeMarket(f.cache.market); });
     /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
-    _vergleich = []; _importHinweise = [];
+    _vergleich = []; _importHinweise = []; _mvImport = [];   /* v3198 */
     /* v3029-import · Wirtschaftsplan/Abrechnung ZULETZT: sie brauchen Objektart und MEA, und
        die kommen oft aus demselben Paket (Exposé, Grundbuch). Bis v3028 las _hausgeldBasis das
        Formular - bei einem neuen Objekt war die Objektart leer, und der Gesamtplan der ganzen
@@ -2041,6 +2041,8 @@
     _unterlagenZeilen();   /* v3016 */
   }
   var _vergleich = [], _importHinweise = [];
+  /* v3198 · Mietverträge, die in die Einheiten DIESES Imports gehören (neues Objekt oder Quick-Check) */
+  var _mvImport = [];
   /* v3029-import · Objektart und MEA für die Auslese: erst was gerade eingelesen wird, dann das Formular */
   function _artCode(s) {
     var t = String(s == null ? '' : s).trim(); if (!t) return '';
@@ -2066,7 +2068,13 @@
       /* v3120 · Marcel 03.11.2026: neue Mietverträge im Bestand „mit einem Vorschlag, wohin der Mietvertrag
          zugeordnet wird und der zugehörige Mieter; kann er die Wohnung nicht zuordnen, ordnen wir selbst zu".
          Bis hier schrieb EIN Vertrag seine Kaltmiete in die Objektmiete (nkm) des ganzen Hauses. */
-      if (t.typ === 'mietvertrag' && window.DpEingang && window.DpEingang.einheiten()) {
+      /* v3198 · Marcel 05.11.2026 (Lindenallee 14 im Quick-Check): im Quick-Check entsteht ein NEUES Objekt - die
+         Einheiten des gerade offenen Objekts sind dort fremd, und die Wahl im Prüffenster ist beim Speichern schon
+         weg. Dann (und bei einem Objekt ohne Einheiten) wandert der Vertrag in die Einheiten dieses Imports. */
+      if (t.typ === 'mietvertrag' && (_qcMode || !(window.DpEingang && window.DpEingang.einheiten()))) {
+        _mvImport.push({ ext: t.extracted || {}, quelle: t.label || 'Mietvertrag' });
+      }
+      if (t.typ === 'mietvertrag' && !_qcMode && window.DpEingang && window.DpEingang.einheiten()) {
         var _mx = t.extracted || {}, _mv = window.DpEingang.mvVorschlag(_mx) || { i: -1, sicher: false, grund: '' };
         _merged['mv:' + Object.keys(_merged).length] = { label: 'Mietvertrag → Einheit', value: window.DpEingang.mvText(_mx), raw: _mx, source: t.label || 'Mietvertrag',
           kind: 'mv_einheit', mv: _mv, nurAktiv: !_mv.sicher, herleitung: _mv.grund + ' · überschreibt Miete und Vertragsdaten der Einheit, Fläche/Zimmer nur wenn leer' };
@@ -2146,7 +2154,7 @@
     return best;
   }
   function _unterlagenZeilen() {
-    var U = window.DpUnterlagen; if (!U || _qcMode) return;
+    var U = window.DpUnterlagen; if (!U) return;   /* v3198 · auch im Quick-Check (bis hier fehlten dort Einheiten, Risiken, These, Auswertung) */
     var a = _auswertung;
     if (a && a.risiken_text) {
       var ist = String(($('risiken') || {}).value || '').trim();
@@ -2164,11 +2172,21 @@
       _importHinweise.push('Die Unterlagen listen ' + we.length + ' Einheiten des Hauses. Bei ' + (_artU === 'ETW' ? 'einer Eigentumswohnung' : 'diesem Objekt') + ' werden sie nicht als Einheiten übernommen - die Fläche der Wohnung steht in der Teilungserklärung bzw. im Aufteilungsplan.');
       we = [];
     }
+    /* v3198 · Mietverträge desselben Imports in ihre Einheit schreiben (Vertragsart, Staffel, Kaution, Mieter) */
+    var _mvRein = [], _mvOffen = [];
+    if (we.length && _mvImport.length && window.DpEingang && window.DpEingang.mvFelder) {
+      _mvImport.forEach(function (m) {
+        var v = window.DpEingang.mvVorschlag(m.ext, we);
+        if (v && v.i >= 0 && (v.sicher || we.length === 1)) { window.DpEingang.mvFelder(we[v.i], m.ext, m.quelle); _mvRein.push('Whg. ' + (we[v.i].nr || (v.i + 1))); }
+        else _mvOffen.push(m.quelle);
+      });
+      if (_mvOffen.length) _importHinweise.push(_mvOffen.length + ' Mietvertrag/-verträge ohne eindeutige Einheit (' + _mvOffen.join(', ') + ') - nach dem Übernehmen unter „Einheiten erfassen“ zuordnen.');
+    }
     if (we.length && window.DpMfhEinheiten && typeof window.DpMfhEinheiten.vorbelegen === 'function') {
       var miete = we.reduce(function (s, e) { return s + (numDe(e.ist) || 0); }, 0);
       var stp = numDe(we.stellplatzMiete) || 0;
       /* v3029-import · Abgleich mit der Summe, die die Liste selbst nennt (Wohnen/Gewerbe + Stellplätze) */
-      var herl = 'öffnet nach dem Übernehmen das Fenster „Einheiten erfassen“ — dort prüfen und übernehmen';
+      var herl = 'öffnet nach dem Übernehmen das Fenster „Einheiten erfassen“ — dort prüfen und übernehmen' + (_mvRein.length ? ' · Mietverträge eingearbeitet: ' + _mvRein.join(', ') : '');
       var sl = we._summeListe;
       if (sl > 0) {
         var diff = Math.round((miete + stp - sl) * 100) / 100;

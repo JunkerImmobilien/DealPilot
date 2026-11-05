@@ -96,8 +96,8 @@
       + (e.mv_mieter ? ' · Mieter ' + e.mv_mieter : '') + (e.status === 'leer' ? ' · leer' : '');
   }
   /** Vorschlag: { i, sicher, grund } oder null. Sicher nur bei eindeutiger Nummer oder Lage. */
-  function mvVorschlag(ext) {
-    var E = einheiten(); if (!E) return null;
+  function mvVorschlag(ext, liste) {   /* v3198 · liste: die Einheiten aus DEMSELBEN Import (neues Objekt, Quick-Check) */
+    var E = Array.isArray(liste) ? liste : einheiten(); if (!E || !E.length) return null;
     var lage = String((ext && ext.lage_einheit) || '').trim(), wfl = zahl(ext && ext.wohnflaeche_m2);
     /* v3150 · derselbe Mieter steht schon an einer Einheit (Name ohne KI gelesen, routes/ai.js) */
     var mn = ext && ext.mieter_name && ext.mieter_name.name ? String(ext.mieter_name.name).toLowerCase().replace(/\s+/g, ' ').trim() : '';
@@ -144,7 +144,16 @@
       Vertrag gilt), Fläche/Zimmer nur, wenn leer. Gesamtmiete wie „Einheiten erfassen" (DpMfhEinheiten._summe). */
   function mvUebernehmen(i, ext, quelle) {
     var E = einheiten(); if (!E || !E[i] || !ext) return false;
-    var e = E[i], alt = JSON.parse(JSON.stringify(e)), heute = new Date().toISOString().slice(0, 10);
+    var e = E[i], alt = JSON.parse(JSON.stringify(e));
+    mvFelder(e, ext, quelle);
+    /* Gesamtmiete des Objekts nachziehen - dieselbe Summe wie „Einheiten erfassen" */
+    return _mvNachziehen(E, i, e, alt, quelle);
+  }
+  /** v3198 · schreibt die Vertragsdaten in EINE Einheit (reines Objekt, ohne Formular) - gebraucht von
+      mvUebernehmen (bestehende Einheiten) und vom Import, der die Einheiten selbst mitbringt. */
+  function mvFelder(e, ext, quelle) {
+    if (!e || !ext) return false;
+    var heute = new Date().toISOString().slice(0, 10);
     var setz = function (k, v) { if (v !== null && v !== undefined && v !== '') e[k] = String(v); };
     /* v3120a · ein NEUER Vertrag (anderer Mietbeginn) ersetzt den alten ganz - gemessen: Whg. 1 behielt
        „nächste Anpassung 01.04.2027" des alten Staffelvertrags, obwohl der neue unbefristet ist. Beim neuen
@@ -176,7 +185,10 @@
     }
     if (!zahl(e.wfl)) setz('wfl', zahl(ext.wohnflaeche_m2));
     if (!zahl(e.zimmer)) setz('zimmer', zahl(ext.zimmer));
-    /* Gesamtmiete des Objekts nachziehen - dieselbe Summe wie „Einheiten erfassen" */
+    return true;
+  }
+  function _mvNachziehen(E, i, e, alt, quelle) {
+    var heute = new Date().toISOString().slice(0, 10);
     var nkVor = feldStand('nkm');   /* v3154 */
     try {
       var M = window.DpMfhEinheiten, s = M && M._summe ? M._summe(E) : null, nk = el('nkm');
@@ -592,7 +604,7 @@
   }
 
   window.DpEingang = { VERSION: 'v3164', jahresAnsicht: jahresAnsicht, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
-    einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen,
+    einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
     zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, knopf: knopf, vorschau: vorschau };

@@ -165,7 +165,7 @@ async function create(userId, { data, aiAnalysis, photos }) {
 async function update(userId, objectId, { data, aiAnalysis, photos, expectedVersion }) {
   // Check ownership and version
   const existing = await query(
-    'SELECT user_id, version FROM objects WHERE id = $1',
+    'SELECT user_id, version, seq_no FROM objects WHERE id = $1',
     [objectId]
   );
   if (existing.rowCount === 0) throw new HttpError(404, 'Object not found');
@@ -180,7 +180,11 @@ async function update(userId, objectId, { data, aiAnalysis, photos, expectedVers
   // im Frontend zwar in data._obj_seq gespeichert, aber die seq_no-Spalte (die der
   // Listen-Endpoint zurückgibt) bleibt auf der alten Nummer → Sidebar zeigt alte ID
   // bis zum nächsten Reload.
-  const r = await query(
+  /* v3198 · Marcel 05.11.2026 (Import Lindenallee 14): die Objektnummer des Clients kollidierte mit einem
+     anderen Objekt (der Server hatte beim Anlegen eine andere vergeben, v529). Das UPDATE scheiterte dann an
+     (user_id, seq_no) mit 409 - JEDES weitere Speichern, still, das Objekt blieb leer. Jetzt: bei Kollision
+     behält das Objekt seine Nummer, die Daten werden trotzdem gespeichert. */
+  const _upd = (seqNo, dataObj) => query(
     `UPDATE objects SET
        name = $1, kuerzel = $2, ort = $3, kaufpreis = $4, bmy = $5, cf_ns = $6, dscr = $7,
        seq_no = COALESCE($8, seq_no),
@@ -195,14 +199,24 @@ async function update(userId, objectId, { data, aiAnalysis, photos, expectedVers
       safeNumeric(summary.bmy),
       safeNumeric(summary.cf_ns),
       safeNumeric(summary.dscr),
-      summary.seq_no,
-      JSON.stringify(data || {}),
+      seqNo,
+      JSON.stringify(dataObj || {}),
       aiAnalysis || null,
       JSON.stringify(photos || []),
       objectId,
       userId
     ]
   );
+  let r;
+  try {
+    r = await _upd(summary.seq_no, data);
+  } catch (e) {
+    if (!(e && e.code === '23505' && summary.seq_no)) throw e;
+    const alt = existing.rows[0].seq_no || null;
+    if (data && typeof data === 'object' && alt) data._obj_seq = alt;
+    r = await _upd(null, data);
+    if (r.rows[0]) r.rows[0].seq_kollision = summary.seq_no;
+  }
   return r.rows[0];
 }
 

@@ -1041,6 +1041,13 @@ async function saveObj(opts) {
   if (_currentObjKey !== _ctxKey) {
     try { console.warn('[storage] saveObj: Objektwechsel während des Speicherns -> abgebrochen (v1268)'); } catch (e) {}
     _newObjSaveInflight = false;
+    /* v3198 · kein Wechsel, sondern die EIGENE Anlage: dieser Save begann ohne Kennung, und ein paralleler POST
+       aus diesem Fenster hat das Objekt inzwischen angelegt - mit dem Formularstand von DAMALS (beim Import
+       Lindenallee 14 gemessen: leer). Der Save wird nachgeholt, sonst fehlen die Werte bis zur nächsten Eingabe. */
+    if (_ctxKey === null && _currentObjKey && _currentObjKey === window._dpEigeneAnlageKey) {
+      var _nachKey = _currentObjKey;
+      setTimeout(function () { if (_currentObjKey === _nachKey) { try { saveObj({ silent: true }); } catch (e) {} } }, 400);
+    }
     return;
   }
   /* v2219 · DIE SPERRE MUSS NACH DEM AWAIT NOCH GELTEN. GEMESSEN 14.10.2026 an
@@ -1113,11 +1120,24 @@ async function saveObj(opts) {
             method: 'POST',
             body: { data: data, aiAnalysis: aiText, photos: photos }
           });
-          _currentObjKey = saved.id; _dpFireObjectReady(saved.id); /* v946 */
+          _currentObjKey = saved.id; window._dpEigeneAnlageKey = saved.id; _dpFireObjectReady(saved.id); /* v946 · v3198 */
         } finally {
           _newObjSaveInflight = false;  /* v828-inflight-guard: POST fertig (ok oder Fehler) */
         }
       }
+
+      /* v3198 · die Objektnummer gilt, die der Server vergeben hat (Anlage: v529 zieht bei Kollision eine neue;
+         Update: bei Kollision bleibt die alte). Bis hier behielt der Client seine - und jedes weitere Speichern
+         scheiterte an der doppelten Nummer mit 409, ohne dass es jemand sah. */
+      try {
+        if (saved && saved.seq_no && saved.seq_no !== window._currentObjSeq) {
+          var _seqAlt = window._currentObjSeq;
+          window._currentObjSeq = saved.seq_no; window._objSeqIsPreview = false;
+          if (typeof ObjNumbering !== 'undefined' && ObjNumbering.registerExisting) ObjNumbering.registerExisting(saved.seq_no);
+          if (typeof updHeader === 'function') updHeader();
+          if (_seqAlt && !silent && typeof toast === 'function') toast('Objektnummer ' + _seqAlt + ' war schon vergeben – das Objekt heißt ' + saved.seq_no + '.');
+        }
+      } catch (e) {}
 
       // Persist tax timeline with full detail (Migration 006)
       if (State.taxTimeline && _currentObjKey && typeof _computeYearTotal === 'function') {
