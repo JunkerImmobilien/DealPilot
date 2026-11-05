@@ -60,7 +60,6 @@
 #bmfOverlay .kpi-label,
 #bmfOverlay .afa-tag,
 #bmfOverlay .dvd,
-#bmfOverlay .v292-summary-banner,
 #bmfOverlay .v292-vergleich-tbl th,
 #bmfOverlay .bmfmo-gaa-block .l {
   font-family: 'JetBrains Mono', monospace !important;
@@ -90,7 +89,16 @@
 #bmfOverlay .bmfmo-pane textarea { background: #FBFAF7 !important; }
 /* Übernommene Werte erkennt man am AUTO-Abzeichen - nicht mehr an Creme und Strichlinie */
 #bmfOverlay .from-tab input, #bmfOverlay .iw.from-tab, #bmfOverlay .from-tab .iw { background: #FFFFFF !important; border-style: solid !important; }
-#bmfOverlay .iw { background: transparent !important; border: 0 !important; }
+/* Den Rahmen trägt der Feldrahmen .iw (Präfix € und Einheit liegen darin) - das Feld selbst ist darin randlos.
+   Gemessen: .iw um #bmf_hk hatte einen goldenen Rand aus einer stärkeren Regel, das Feld darin einen zweiten. */
+#bmfOverlay .bmfmo-pane .f .iw, #bmfOverlay #p-ak .iw, #bmfOverlay #p-bmf .iw, #bmfOverlay #p-hebel .iw, #bmfOverlay #p-boden .iw {
+  background: #FFFFFF !important; border: 1px solid var(--bmfe-line) !important; border-radius: 8px !important; box-shadow: none !important; }
+#bmfOverlay .bmfmo-pane .f .iw:focus-within { border-color: var(--wl-c9a84c, #C9A84C) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent) !important; }
+#bmfOverlay .bmfmo-pane .f .iw input, #bmfOverlay #p-ak .iw input, #bmfOverlay #p-bmf .iw input { border: 0 !important; background: transparent !important; box-shadow: none !important; }
+/* Summen in der Aufstellung (fett gesetzte Beträge) */
+#bmfOverlay .bmfmo-pane b, #bmfOverlay .bmfmo-pane strong { font-family: inherit !important; }
+#bmfOverlay .v292-row-result b, #bmfOverlay .v292-row-final b { font-family: Inter, system-ui, sans-serif !important; font-size: 16px !important; font-weight: 700 !important; color: var(--bmfe-ink) !important; font-variant-numeric: tabular-nums; }
+#bmfOverlay .v292-summary-banner { font-family: Inter, sans-serif !important; font-size: 12.5px !important; text-transform: none !important; letter-spacing: 0 !important; color: #3a352b !important; background: #FFFFFF !important; border: 1px solid var(--bmfe-line) !important; border-left: 3px solid var(--wl-c9a84c, #C9A84C) !important; border-radius: 8px !important; }
 #bmfOverlay .pfx, #bmfOverlay .sfx { color: var(--bmfe-muted) !important; font-family: Inter, sans-serif !important; font-size: 12px !important; }
 
 /* ── Hinweise: Inter 11,5 px, gedeckt, gerade ─────────────────────────── */
