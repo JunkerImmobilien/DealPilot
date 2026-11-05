@@ -71,7 +71,8 @@
 
   function verbindenSeite(d) {
     var k = d.konto || {}, p = d.paket || {}, kt = d.kontingent || {};
-    var kz = function (a, n) { var x = kt[a]; return x ? n + ' ' + x.rest + ' von ' + x.limit : null; };
+    /* rest enthält auch nachgekaufte Berichte - „23 von 5" las sich falsch */
+    var kz = function (a, n) { var x = kt[a]; return x ? n + ': ' + x.rest + ' frei' : null; };
     var kont = [kz('mpi', 'Stufe 1'), kz('mpi_plus', 'Stufe 2'), kz('wev', 'Stufe 3')].filter(Boolean).join(' · ');
     var mitHub = !!p.makler_hub;
     ebene('<h2 style="margin:0 0 6px;font:600 19px \'Space Grotesk\',Inter,sans-serif;color:#1a1814">Makler-Hub mit deinem DealPilot-Konto verbinden</h2>'
