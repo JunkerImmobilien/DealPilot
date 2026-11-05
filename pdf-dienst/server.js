@@ -170,7 +170,7 @@ async function erzeugen(auftrag) {
         Promise.all(['400 12px Inter', '600 12px Inter', '600 12px "Space Grotesk"', '400 12px "JetBrains Mono"', '500 12px "JetBrains Mono"']
           .map((f) => document.fonts.load(f).catch(() => null))).then(() => document.fonts.ready),
         new Promise((ok) => setTimeout(ok, 8000))
-      ]).then(() => [].map.call(document.fonts, (f) => f.family.replace(/"/g, '') + ':' + f.status).filter((x, i, a) => a.indexOf(x) === i).join(','))).catch((e) => 'fehler ' + (e && e.message));
+      ]).then(() => Array.from(document.fonts).map((f) => f.family.replace(/"/g, '') + ':' + f.status).filter((x, i, a) => a.indexOf(x) === i).join(','))).catch((e) => 'fehler ' + (e && e.message));
       schritt('html gesetzt (' + String(schriften).slice(0, 160) + ')');
       const esc = (t) => String(t || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
       const f = Array.isArray(auftrag.fuss) ? auftrag.fuss : [];
