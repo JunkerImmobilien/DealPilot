@@ -1,0 +1,162 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   bmf-einheitlich.css · v3185 — EIN Erscheinungsbild für den BMF-Rechner
+
+   Marcel am 05.11.2026: „dass wir da halt auch gleiche Schriftfarben, Schriftgrößen,
+   Felder, Farben, Hintergrundfarben, Formatierung, dass die gleich sind … eher an
+   Übersicht und Ausgabe von dem Farbschema halten. Am Anfang Anschaffungskosten ist
+   recht cremefarbend, auch der Text manchmal geschnörkelt … die Texte ungefähr so wie
+   im Tab Steuer oder im Tab Bewirtschaftung."
+
+   Gemessen vorher: fünf Feldstile (Mono 600 auf Creme gestrichelt, Mono auf weiß,
+   Inter auf weiß …), Beschriftungen Mono 9,5 px in Versalien, Summen und Fenstertitel
+   in Cormorant Garamond, Hinweise kursiv, ein schwarzer Summenbalken, Fensterkörper
+   #FDFCFA. Maßstab: Reiter Steuer (Felder Inter 13 px, Beschriftung Inter, weiß) und
+   Schritt 5 (Flächen weiß, Rand #E6E0D3, Kleinüberschrift Mono 10,5 px, Creme nur als
+   Hervorhebung).
+
+   Liegt NACH bmf-modal.css und bmf-modal-v292.css; alles unter #bmfOverlay, damit die
+   Regeln nichts außerhalb des Fensters treffen. !important nur dort, wo Inline-Stile aus
+   bmf-modal*.js dagegen stehen.
+   ═══════════════════════════════════════════════════════════════════════ */
+#bmfOverlay {
+  --bmfe-ink: #1a1814;
+  --bmfe-text: #2A2727;
+  --bmfe-muted: #6B6356;
+  --bmfe-line: #E6E0D3;
+  --bmfe-line-soft: #EEEAE1;
+  --bmfe-kopf: #F7F5F0;
+  --bmfe-hl: #FBF6E9;
+  --bmfe-hl-line: #EAD9B0;
+}
+
+/* ── Grund: weiß, Inter, keine Serifen- und keine Kursivschrift ───────── */
+#bmfOverlay .bmfmo-body,
+#bmfOverlay .bmfmo-pane { background: #FFFFFF !important; color: var(--bmfe-text); font-family: Inter, system-ui, sans-serif; }
+#bmfOverlay .bmfmo-pane *:not(svg):not(path):not(code) { font-style: normal !important; }
+#bmfOverlay [style*="Cormorant"],
+#bmfOverlay .v292-final-value,
+#bmfOverlay .total-val,
+#bmfOverlay .kpi-value,
+#bmfOverlay .v292-row-result span:last-child,
+#bmfOverlay .v292-row-final span:last-child {
+  font-family: Inter, system-ui, sans-serif !important;
+  font-variant-numeric: tabular-nums;
+}
+/* Fenstertitel: Space Grotesk wie die Überschriften in Schritt 4 und 5 */
+#bmfOverlay .bmfmo-head h2,
+#bmfOverlay h2 { font-family: 'Space Grotesk', Inter, sans-serif !important; font-size: 19px !important; font-weight: 600 !important; letter-spacing: -0.01em; }
+#bmfOverlay .bmfmo-pane h3 { font-family: 'Space Grotesk', Inter, sans-serif !important; color: var(--bmfe-ink); }
+
+/* ── Beschriftungen wie im Reiter Steuer ──────────────────────────────── */
+#bmfOverlay .bmfmo-pane .f > label,
+#bmfOverlay .bmfmo-pane label.l,
+#bmfOverlay .bmfmo-pane .f label:not(.san-tax-checkbox) {
+  font-family: Inter, system-ui, sans-serif !important;
+  font-size: 12px !important; font-weight: 500 !important;
+  letter-spacing: 0 !important; text-transform: none !important;
+  color: #3a352b !important;
+}
+/* Kleinüberschriften (Abschnitte, Kacheln): Mono wie „Ausgabe" in Schritt 5 */
+#bmfOverlay .kpi-label,
+#bmfOverlay .afa-tag,
+#bmfOverlay .dvd,
+#bmfOverlay .v292-summary-banner,
+#bmfOverlay .v292-vergleich-tbl th,
+#bmfOverlay .bmfmo-gaa-block .l {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 10.5px !important; font-weight: 600 !important;
+  letter-spacing: .08em !important; text-transform: uppercase !important;
+  color: var(--bmfe-muted) !important;
+}
+
+/* ── Felder: weiß, durchgezogener Rand, Inter - eins für alle ─────────── */
+#bmfOverlay .bmfmo-pane input[type="text"],
+#bmfOverlay .bmfmo-pane input[type="number"],
+#bmfOverlay .bmfmo-pane input:not([type]),
+#bmfOverlay .bmfmo-pane select,
+#bmfOverlay .bmfmo-pane textarea {
+  font-family: Inter, system-ui, sans-serif !important;
+  font-size: 13px !important; font-weight: 500 !important;
+  color: var(--bmfe-text) !important;
+  background: #FFFFFF !important;
+  border: 1px solid var(--bmfe-line) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  font-variant-numeric: tabular-nums;
+}
+#bmfOverlay .bmfmo-pane input:focus,
+#bmfOverlay .bmfmo-pane select:focus,
+#bmfOverlay .bmfmo-pane textarea:focus { border-color: var(--wl-c9a84c, #C9A84C) !important; outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent) !important; }
+#bmfOverlay .bmfmo-pane textarea { background: #FBFAF7 !important; }
+/* Übernommene Werte erkennt man am AUTO-Abzeichen - nicht mehr an Creme und Strichlinie */
+#bmfOverlay .from-tab input, #bmfOverlay .iw.from-tab, #bmfOverlay .from-tab .iw { background: #FFFFFF !important; border-style: solid !important; }
+#bmfOverlay .iw { background: transparent !important; border: 0 !important; }
+#bmfOverlay .pfx, #bmfOverlay .sfx { color: var(--bmfe-muted) !important; font-family: Inter, sans-serif !important; font-size: 12px !important; }
+
+/* ── Hinweise: Inter 11,5 px, gedeckt, gerade ─────────────────────────── */
+#bmfOverlay .bmfmo-pane .hint,
+#bmfOverlay .bmfmo-pane .cf-hint,
+#bmfOverlay .bmfmo-pane small,
+#bmfOverlay .v292-pane4-hint {
+  font-family: Inter, system-ui, sans-serif !important;
+  font-size: 11.5px !important; color: var(--bmfe-muted) !important; line-height: 1.5;
+}
+
+/* ── Flächen: weiß mit Rand; Creme nur zur Hervorhebung ───────────────── */
+#bmfOverlay .v292-summary-box,
+#bmfOverlay .bmfmo-afa-preview,
+#bmfOverlay .bmfmo-gaa-block,
+#bmfOverlay .bmf-pflicht-box,
+#bmfOverlay .kpi,
+#bmfOverlay #bmfJacobyZeile,
+#bmfOverlay .v292-summary-grid {
+  background: #FFFFFF !important;
+  border: 1px solid var(--bmfe-line) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+#bmfOverlay .kpi.highlight,
+#bmfOverlay .highlight.kpi { background: var(--bmfe-hl) !important; border-color: var(--bmfe-hl-line) !important; }
+#bmfOverlay .kpi-value { color: var(--bmfe-ink) !important; font-weight: 600 !important; font-size: 15px !important; }
+#bmfOverlay .v292-final-value { color: var(--bmfe-ink) !important; font-size: 17px !important; }
+#bmfOverlay .v292-row-final, #bmfOverlay .v292-row-result { color: var(--bmfe-ink) !important; }
+
+/* Hinweisbanner: wie der Hinweis in Schritt 5 - weiß, goldene Kante links */
+#bmfOverlay .bmfmo-pane .banner,
+#bmfOverlay .bmfmo-pane .banner.info,
+#bmfOverlay .bmfmo-pane .p4-info {
+  background: #FFFFFF !important;
+  border: 1px solid var(--bmfe-line) !important;
+  border-left: 3px solid var(--wl-c9a84c, #C9A84C) !important;
+  border-radius: 8px !important;
+  color: #3a352b !important; font-size: 12.5px !important;
+}
+#bmfOverlay .bmfmo-pane .banner.ok { border-left-color: #3FA56C !important; }
+#bmfOverlay .bmfmo-pane .banner.warn, #bmfOverlay .bmfmo-pane .banner.err { border-left-color: #B8625C !important; }
+
+/* Summenbalken „Anschaffungskosten insgesamt": Hervorhebung statt Schwarz */
+#bmfOverlay .total-bar {
+  background: var(--bmfe-hl) !important;
+  border: 1px solid var(--bmfe-hl-line) !important;
+  color: var(--bmfe-ink) !important;
+}
+#bmfOverlay .total-bar * { color: var(--bmfe-ink) !important; }
+#bmfOverlay .total-bar .total-val { font-size: 16px !important; font-weight: 700 !important; }
+
+/* Aufklapper („Verfahren & BMF-Logik", „Modernisierungen", „Weitere Positionen") */
+#bmfOverlay .fold > summary,
+#bmfOverlay details > summary { font-family: Inter, sans-serif !important; font-size: 13px !important; font-weight: 600 !important; color: var(--bmfe-ink) !important; }
+
+/* ── Vergleichstabelle Schritt 3: wie die Tafel in Schritt 4 ──────────── */
+#bmfOverlay .v292-vergleich-tbl { border: 1px solid var(--bmfe-line); border-radius: 12px; border-collapse: separate; border-spacing: 0; overflow: hidden; background: #FFFFFF; width: 100%; }
+#bmfOverlay .v292-vergleich-tbl th { background: var(--bmfe-kopf) !important; border-bottom: 1px solid var(--bmfe-line) !important; padding: 10px 12px !important; text-align: right; }
+#bmfOverlay .v292-vergleich-tbl th:first-child { text-align: left; }
+#bmfOverlay .v292-vergleich-tbl th .v292-th-sub { font-family: Inter, sans-serif !important; font-size: 11px !important; letter-spacing: 0 !important; text-transform: none !important; font-weight: 400 !important; color: var(--bmfe-muted) !important; }
+#bmfOverlay .v292-vergleich-tbl td { font-family: Inter, sans-serif !important; font-size: 13px !important; color: var(--bmfe-ink) !important; background: #FFFFFF !important; border-top: 1px solid var(--bmfe-line-soft) !important; padding: 8px 12px !important; text-align: right; font-variant-numeric: tabular-nums; }
+#bmfOverlay .v292-vergleich-tbl td:first-child { text-align: left; color: #3a352b !important; }
+#bmfOverlay .v292-vergleich-tbl tr.v292-row-bold td { font-weight: 600 !important; }
+#bmfOverlay .v292-vergleich-tbl .v292-risk-cell { text-align: left; vertical-align: top; }
+
+/* ── Reiterleiste: ein Gold für den aktiven Reiter, sonst gedeckt ─────── */
+#bmfOverlay .bmfmo-tab { font-family: 'JetBrains Mono', monospace !important; font-size: 11.5px !important; color: var(--bmfe-muted) !important; background: #FFFFFF !important; border-color: var(--bmfe-line) !important; }
+#bmfOverlay .bmfmo-tab.active { color: var(--bmfe-ink) !important; background: var(--bmfe-hl) !important; border-color: var(--bmfe-hl-line) !important; }
