@@ -861,7 +861,7 @@
       c.zeile = 'Entwurf zum Ergänzen · Stand ' + c.stand;
       var leer = '<td style="border-bottom:1px solid var(--line);height:8mm"></td>';
       var feldTab = function (titel, felder) {
-        return '<h3>' + titel + '</h3><table><thead><tr><th style="width:42%"></th><th>Antragsteller 1</th><th>Antragsteller 2</th></tr></thead><tbody>'
+        return '<h3>' + titel + '</h3><table style="table-layout:fixed"><thead><tr><th style="width:40%"></th><th style="width:30%">Antragsteller 1</th><th style="width:30%">Antragsteller 2</th></tr></thead><tbody>'
           + felder.map(function (f) { return '<tr><td>' + B.esc(f[0]) + '</td>' + (f[1] != null ? '<td class="num">' + B.esc(f[1]) + '</td>' : leer) + leer + '</tr>'; }).join('') + '</tbody></table>';
       };
       var adr = [m.address, ((m.plz || '') + ' ' + (m.city || '')).trim()].filter(Boolean).join(', ');

@@ -39,7 +39,12 @@
   var PFLICHT = [['kp', 'Kaufpreis'], ['baujahr', 'Baujahr'], ['wfl', 'Wohnfläche'], ['gsfl', 'Grundstücksfläche'], ['brw', 'Bodenrichtwert'], ['nkm', 'Kaltmiete']];
   function pruefen() {
     if (!window._currentObjKey) return { ok: false, fehlt: ['geöffnetes Objekt'] };
-    var fehlt = PFLICHT.filter(function (p) { return zahl(p[0]) == null; }).map(function (p) { return p[1]; });
+    /* v3184b · dieselbe Pflichtliste wie das Fenster (bmf-modal.js BMF_PFLICHT/_bmfFehlend) - keine zweite.
+       Dazu die Miete, ohne die das Ertragswertverfahren nicht rechnet (bmfPaneNext prüft sie genauso). */
+    var fehlt = [];
+    if (typeof window._bmfFehlend === 'function') { try { fehlt = window._bmfFehlend().map(function (e) { return e.name; }); } catch (e) {} }
+    else fehlt = PFLICHT.slice(0, 5).filter(function (p) { return zahl(p[0]) == null; }).map(function (p) { return p[1]; });
+    if (zahl('nkm') == null && zahl('bmf_miete') == null && zahl('ds2_marktmiete') == null) fehlt.push('Kaltmiete');
     var plan = true;
     try { plan = !(window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.hasFeature === 'function') || DealPilotConfig.pricing.hasFeature('bmf_calc_export'); } catch (e) {}
     return { ok: !fehlt.length && plan, fehlt: fehlt, plan: plan };
@@ -85,8 +90,14 @@
 
   function kaufpreisaufteilung() {
     if (sperre('Kaufpreisaufteilung')) return;
-    if (typeof window.exportPDFKaufpreisaufteilung === 'function') return window.exportPDFKaufpreisaufteilung();
-    hinweis('Kaufpreisaufteilung-PDF nicht geladen.');
+    /* v3184b · erst rechnen, dann ausgeben: die PDF-Prüfung (pdf-pruefung.js) sperrt ohne Rechenergebnis -
+       gemessen: aus der Deal-Aktion kam „Berechnung der Kaufpreisaufteilung fehlt“, obwohl alle Werte da waren. */
+    if (typeof window.exportPDFKaufpreisaufteilung !== 'function') { hinweis('Kaufpreisaufteilung-PDF nicht geladen.'); return; }
+    if (!aktuell()) hinweis('Kaufpreisaufteilung wird berechnet …');
+    return bereitstellen().then(function () {
+      try { if (window.DpBmfBodenabschlag) { window.DpBmfBodenabschlag.einhaengen(); window.DpBmfBodenabschlag.rechnen(); } } catch (e) {}
+      return window.exportPDFKaufpreisaufteilung();
+    });
   }
 
   function kopf() {

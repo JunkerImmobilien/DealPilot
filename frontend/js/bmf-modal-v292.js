@@ -272,6 +272,7 @@
         throw new Error(data.error || 'Pipeline-Response nicht ok');
       }
       window._v292State.response = data;
+      try { data._fuer = window._currentObjKey || null; } catch (e) {}   /* v3184b: Ergebnis gehoert zu DIESEM Objekt (Schritt 5, Deal-Aktion) */
       window._v292State.isLoading = false;
       window._v292State.lastError = null;
       window._v292RenderAll();

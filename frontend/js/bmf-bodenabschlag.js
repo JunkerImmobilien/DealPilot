@@ -154,7 +154,9 @@
     B = B || basis(); if (!B) return null;
     var st = window._v292State || {};
     var wahl = window._dpBmfTafelWahl || st.selectedVariant || 'amtlich';
-    var j = st.response && st.response.phase4_bmf && st.response.phase4_bmf.jacoby;
+    /* v3184b · ein Pipeline-Ergebnis eines anderen Objekts zaehlt nicht (es bleibt nach dem Objektwechsel stehen, bis Schritt 2 neu rechnet) */
+    var stEigen = !!(st.response && (!st.response._fuer || st.response._fuer === window._currentObjKey));
+    var j = stEigen && st.response.phase4_bmf && st.response.phase4_bmf.jacoby;
     /* Die Wahl lebt nur im Fenster - der Gebäudeanteil im Reiter Steuer ist das, was gilt. Passt er zu
        einer der Varianten, ist DAS die Auswahl (so druckt auch die Deal-Aktion ohne offenes Fenster richtig). */
     try {
@@ -164,8 +166,12 @@
           return [x[0], (B.immoKp - B.bodenAmtlich * (1 - x[1] / 100)) / B.immoKp * 100];
         });
         if (j && j.verfuegbar) kand.push(['jacoby', Number(j.gebaeudeanteil_prozent)]);
-        var treffer = kand.filter(function (x) { return Math.abs(x[1] - gs) < 0.15; })[0];
-        if (treffer) wahl = treffer[0];
+        /* v3184b · Optimiert 79,86 % und Jacoby 79,88 % (Ravensberger Weg) liegen in derselben Toleranz: eine
+           ausdrueckliche Wahl im Fenster geht vor, sonst die naechstgelegene Variante - nicht die erste der Liste. */
+        var nah = kand.filter(function (x) { return Math.abs(x[1] - gs) < 0.15; });
+        var ausdr = nah.filter(function (x) { return x[0] === window._dpBmfTafelWahl; })[0];
+        nah.sort(function (p, q) { return Math.abs(p[1] - gs) - Math.abs(q[1] - gs); });
+        if (ausdr) wahl = ausdr[0]; else if (nah.length) wahl = nah[0][0];
       }
     } catch (e) {}
     if (wahl === 'jacoby' && j && j.verfuegbar && j.gebaeudeanteil_prozent > 0 && j.gebaeudeanteil_prozent < 100) {
