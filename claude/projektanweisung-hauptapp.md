@@ -44358,3 +44358,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `39ed0f2f` … `01e1d1b` (v3185–v3187b); Prod 1.0.61 `6c85d88`, Sicherungen `/root/backups/haupt-20261105-1104.sql.gz`, `mb-20261105-1104.sql.gz`.
 - **Nachweis:** Staging Schritt 1–3 nachgesehen; Grenzsatz am Kern 90.000→90.100 € = 47,00 €; Jahreskarten 15× einzeilig; Deal-Aktion ohne Flug-Begriffe (DOM-Suche leer), Ausblenden per simulierter Lücke. Prod liefert `bmf-einheitlich.css?v=v3185b`, `tax.js?v=v3186`, `deal-action-boarding.js?v=v3187b`.
 - **Rest:** Gold-Basislinie für deal-action-pilot.js senken; zvE-Feld 90.000 € gegen Steuerzeitraum 2026 68.000 € bei Marcel. Einzelheiten `wissen/2026-11-05.md`.
+
+### v3188–v3188a · zvE je Jahr vorwärts, BMF wählen/übernehmen getrennt, Jacoby im PDF, Gutachten-Anfrage (05.11.2026, Prod 1.0.62)
+
+- **Was:** `_dpZveFuerJahr` nach Jahressteuerprinzip (Zeitraum des Jahres → ab laufendem Jahr Feld zvE → frühere Lücken letzter Zeitraum); Grenzsatz aus demselben zvE. BMF: gesperrte Felder grau, Schritt 4 wählt / Schritt 5 übernimmt, Wahl verfällt beim Schließen, Vertragstext nennt das Verfahren, KPA-PDF mit Jacoby-Herleitung, Karte „Gutachten anfragen“ (Leistung Kaufpreisaufteilung, PDF als Anhang an info@dealpilot.immo).
+- **Commit:** v3188 … `af30cbc` (v3188a); Prod 1.0.62 `d0347d5`, Sicherungen `/root/backups/haupt-20261105-1128.sql.gz`, `mb-20261105-1128.sql.gz`.
+- **Nachweis:** Staging: zvE 2025/26 68.000, 2027 75.000, 2028+ 90.000 €; Ravensberger Weg 38: Wählen lässt Reiter Steuer 74,82 %, Schritt 5 Jacoby 79,88 %, PDF-Deckblatt und Rechenweg Jacoby, Anfrage vorbelegt (nicht gesendet), nach Schließen PDF wieder amtlich.
+- **Rest:** Gold-Basislinie senken; Steuerzeitraum 2026 bei Marcel prüfen. Einzelheiten `wissen/2026-11-05.md`.
