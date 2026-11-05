@@ -304,13 +304,22 @@ function berechnen(daten) {
     if (!lt || !lm) { fehlt.push(b); bund[b] = lt ? lt.bund : null; indicativeRates[b] = null; return; }
     bund[b] = lt.bund; bundDatum[b] = lt.datum;
     aufschlag[b] = lm.aufschlag; aufschlagMonat[b] = lm.monat;
+    /* v3195 · Marcel 05.11.2026 („ja setz das um"): die 5-jährige Bindung lag rund 0,3 Punkte unter dem Markt
+       (3,98 % gegen 4,27 % effektiv bei 80 %), weil sie den Aufschlag aus 5-10 J bekam. Der eigene Aufschlag der
+       Reihe „bis 5 J" (MFI minus Bund 5) ist zu hoch - die Klasse mischt teure Kurzläufer ein (v2246: 4,64 %).
+       Deshalb die MITTE zwischen beiden: gemessen 05.11. 0,378 und rund 0,76 -> rund 0,57, 5 J / 80 % rund 4,18 %
+       effektiv. Für 10/15/20 J bleibt der Aufschlag aus 5-10 J. */
+    if (b === 5) {
+      var m5 = daten.monate[5] || [], l5 = m5[m5.length - 1];
+      if (l5 && l5.aufschlag != null && isFinite(l5.aufschlag)) aufschlag[b] = r3(lm.aufschlag + (l5.aufschlag - lm.aufschlag) / 2);
+    }
     /* v3194 · der Bundesbank-Wert (MFI-Effektivzins) stand für ALLE Bindungen als 3,91 % (Reihe 5-10 J) - gemeldet
        von der Portfoliostrategie. Ausgewiesen wird jetzt die Reihe der Bindung (bis 5 J / 5-10 J / über 10 J);
        der Marktaufschlag im Modell bleibt der aus 5-10 J (v2246, Form der Kurve aus den Bund-Laufzeiten). */
     var mb = daten.monate[b] || [], lmb = mb[mb.length - 1];
     mfi[b] = lmb ? lmb.mfi : lm.mfi;
     indicativeRates[b] = {};
-    Object.keys(STUFEN_LTV).forEach(function (s) { indicativeRates[b][s] = zinsFuer(lt.bund, lm.aufschlag, STUFEN_LTV[s]); });
+    Object.keys(STUFEN_LTV).forEach(function (s) { indicativeRates[b][s] = zinsFuer(lt.bund, aufschlag[b], STUFEN_LTV[s]); });   /* v3195: je Bindung */
   });
 
   /* Verlauf fuer die Grafik "Der Aufschlag der Banken waechst":
