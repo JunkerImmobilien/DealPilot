@@ -55,9 +55,13 @@ const MFI_REIHE = { 5: 'I', 10: 'O', 15: 'P', 20: 'P' };
 /* K - KALIBRIERKONSTANTE. Nachkalibrieren: Angebotszins 10 J / 80 %
    gegen Bund 10 (Tag) + Aufschlag (letzter Monat) stellen, die
    Differenz ist das neue K. Datum und Bezug mit fortschreiben. */
+/* v3194 · Nachkalibriert am 05.11.2026 (Marcel: „wir sind 0,15 Prozentpunkte darunter“). Angebotsniveau 10 J / 80 %:
+   4,25 % effektiv = rund 4,17 % nominal (Sollzins, monatliche Zahlung). Modell vorher 4,03 % nominal mit K 0,27
+   -> Differenz 0,14 -> K 0,41. Vorheriger Stand: 0,27 vom 15.10.2026 (4,34 % = 3,51 + 0,56 + 0,27). */
 const K_KALIBRIERUNG = {
-  wert: 0.27,
-  stand: '2026-10-15',
+  wert: 0.41,
+  stand: '2026-11-05',
+  vorher: { wert: 0.27, stand: '2026-10-15' },
   bezug: '10 J Zinsbindung, 80 % Beleihung',
   begruendung: 'Angebotsniveau am 15.10.2026: 4,34 % = Bund 10 (3,51) + Aufschlag 08/2026 (0,56) + K. '
              + 'Der MFI-Zins ist ein Durchschnitt ALLER Abschluesse (auch sehr gute Bonitaeten, '
@@ -299,7 +303,12 @@ function berechnen(daten) {
     var lm = ms[ms.length - 1];
     if (!lt || !lm) { fehlt.push(b); bund[b] = lt ? lt.bund : null; indicativeRates[b] = null; return; }
     bund[b] = lt.bund; bundDatum[b] = lt.datum;
-    aufschlag[b] = lm.aufschlag; aufschlagMonat[b] = lm.monat; mfi[b] = lm.mfi;
+    aufschlag[b] = lm.aufschlag; aufschlagMonat[b] = lm.monat;
+    /* v3194 · der Bundesbank-Wert (MFI-Effektivzins) stand für ALLE Bindungen als 3,91 % (Reihe 5-10 J) - gemeldet
+       von der Portfoliostrategie. Ausgewiesen wird jetzt die Reihe der Bindung (bis 5 J / 5-10 J / über 10 J);
+       der Marktaufschlag im Modell bleibt der aus 5-10 J (v2246, Form der Kurve aus den Bund-Laufzeiten). */
+    var mb = daten.monate[b] || [], lmb = mb[mb.length - 1];
+    mfi[b] = lmb ? lmb.mfi : lm.mfi;
     indicativeRates[b] = {};
     Object.keys(STUFEN_LTV).forEach(function (s) { indicativeRates[b][s] = zinsFuer(lt.bund, lm.aufschlag, STUFEN_LTV[s]); });
   });
@@ -412,6 +421,9 @@ function matrix(d, ltvListe) {
     saetze[b] = {};
     ltvs.forEach(function (l) { saetze[b][l] = (f.bund && f.bund[b] != null && f.aufschlag && f.aufschlag[b] != null) ? zinsFuer(f.bund[b], f.aufschlag[b], l) : null; });
   });
+  /* v3194 · Effektivzins (PAngV, monatliche Zahlung, ohne Nebenkosten) neben dem Sollzins - Vergleichsportale nennen effektiv */
+  var effektiv = {};
+  Object.keys(saetze).forEach(function (b) { effektiv[b] = {}; Object.keys(saetze[b]).forEach(function (l) { var z = saetze[b][l]; effektiv[b][l] = z == null ? null : r2((Math.pow(1 + z / 1200, 12) - 1) * 100); }); });
   return {
     stand: (f.bund_datum && (f.bund_datum['10'] || f.bund_datum[10])) || (d.abgerufen ? String(d.abgerufen).slice(0, 10) : null),
     abgerufen: d.abgerufen || null,
@@ -421,6 +433,8 @@ function matrix(d, ltvListe) {
     bindungen_jahre: (d.maturities || []).map(Number),
     beleihungsauslauf_pct: ltvs,
     saetze: saetze,
+    saetze_effektiv: effektiv,   /* v3194 */
+    bundesbank_mfi_je_bindung: f.mfi || null,   /* v3194: je Bindung eigene Reihe */
     zuschlag_je_ltv: ltvs.reduce(function (a, l) { a[l] = zuschlagLtv(l); return a; }, {}),
     kalibrierung: { k: f.k, stand: f.k_stand, bezug: f.k_bezug },
     fehlt: d.fehlt || []
