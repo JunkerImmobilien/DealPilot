@@ -422,7 +422,7 @@
       var o = window.openBMFModal;
       var neu = function () { window._dpBmfTafelWahl = null; /* v3188: jede Sitzung beginnt beim Reiter Steuer */ var r = o.apply(this, arguments); setTimeout(function () { if (einhaengen()) rechnen(); }, 600); return r; };
       for (var k in o) { if (Object.prototype.hasOwnProperty.call(o, k)) neu[k] = o[k]; }
-      neu._dpBoden = true; window.openBMFModal = neu; return true;
+      neu._dpBoden = true; window.openBMFModal = neu;  /* v3188 · beim Schliessen verfaellt eine nicht uebernommene Wahl - ausserhalb des Fensters gilt der Reiter Steuer */ var zu0 = window.closeBMFModal; if (typeof zu0 === 'function' && !zu0._dpWahl) { var zu1 = function () { window._dpBmfTafelWahl = null; return zu0.apply(this, arguments); }; for (var k2 in zu0) { if (Object.prototype.hasOwnProperty.call(zu0, k2)) zu1[k2] = zu0[k2]; } zu1._dpWahl = true; window.closeBMFModal = zu1; } return true;
     }
     var n2 = 0;
     (function warten() { if (!wickeln() && ++n2 < 60) setTimeout(warten, 500); })();

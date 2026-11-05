@@ -2597,7 +2597,7 @@ function _grenzErklaeren() {
   var basis = Math.max(0, Math.floor(zve) - Math.floor(L.kist || 0));
   var gEst = Tax.calcGrenzsteuersatz(o.splitting ? basis / 2 : basis, jahr);
   var gGes = Tax.grenzsatzGesamt(zve, jahr, o);
-  var teile = [pz(gEst, 0) + ' Einkommensteuer'];
+  var teile = [pz(gEst, 1) + ' Einkommensteuer'];
   if (L.soli > 0) {
     var mild = L.soli < 0.055 * L.est - 0.5;   /* unter dem vollen Satz = Milderungszone (Tax.soli rechnet sie) */
     teile.push('Solidaritätszuschlag' + (mild ? ' in der Milderungszone (er wächst dort mit 11,9 % jeder Mehrsteuer, bis er 5,5 % erreicht)' : ' 5,5 %'));
