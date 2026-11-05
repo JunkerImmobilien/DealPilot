@@ -31,7 +31,7 @@
   'use strict';
   if (window.DpDokWeiche) return;
 
-  var NAMEN = { investment: 'Investment Case', bank: 'Bankfassung', kurz: 'Kurzfassung', kaufpreisaufteilung: 'Kaufpreisaufteilung',
+  var NAMEN = { investment: 'Investment Case', bank: 'Investment Case', selbstauskunft: 'Selbstauskunft', kurz: 'Kurzfassung', kaufpreisaufteilung: 'Kaufpreisaufteilung',
     finanzamt: 'Werbungskosten', finanzamt_anlagev: 'Werbungskosten mit Anlage V', trackrecord: 'Track Record', bankexport: 'Bankexport' };
 
   function design() {
@@ -152,12 +152,15 @@
 
   window.DpDokWeiche = {
     aktiv: aktiv, design: design, erzeugen: erzeugen,
+    selbstauskunft: function () { return erzeugen('selbstauskunft', {}, false); },   /* v3184 · Demo */
     /** für pdf-wahl.js: Investment-Familie (art 'voll'|'bank'|'kurz') */
     investment: function (art) {
       if (art === 'voll') {
         if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
         if (!tor('investment', 'Investment-PDF')) return;
-        return erzeugen('investment', {}, true);
+        /* v3184 · Marcel 05.11.2026: nur noch zwei Fassungen - vollständig und kurz. Die vollständige ist die
+           frühere Bankfassung (18-24 Seiten, ohne Urteil); 'investment' bleibt für Bot und Altaufrufer stehen. */
+        return erzeugen('bank', {}, true);
       }
       if (!tor('investment', art === 'kurz' ? 'Kurzfassung' : 'Bankfassung')) return;
       return erzeugen(art === 'kurz' ? 'kurz' : 'bank', {}, true);

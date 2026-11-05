@@ -2829,15 +2829,10 @@
       },
       async function (s) {   /* 3 · Schritt 2: amtliche Aufteilung */
         await r6BmfWeiter();
-        await warteAuf(function () { return q('#bmfJacobyZeile') && /Jacoby/.test(q('#bmfJacobyZeile').textContent); }, 8000);
+        await warteAuf(function () { return q('#bmfJacobyZeile') && /Jacoby/.test(q('#bmfJacobyZeile').textContent); }, 8000);   /* v3184: steht in Schritt 3 */
         await warte(600);
         await zeigeGruppe(function () { return q('#bmf_gsfl') && q('#bmf_gsfl').closest('div'); }, function () { return q('#bmf_mea') && q('#bmf_mea').closest('div'); }, 6);
         await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Grundstück ' + wert('bmf_gsfl') + ' m², Bodenrichtwert <b>' + wert('bmf_brw') + ' €/m²</b>, Anteil ' + wert('bmf_mea') + ' % — alles aus dem Objekt übernommen.');
-        var jz = q('#bmfJacobyZeile'); if (jz) jz.scrollIntoView({ block: 'center' });
-        await warte(400);
-        var jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(r6Text(q('#bmfJacobyZeile')));
-        await zeige(function () { return q('#bmfJacobyZeile'); }, 8);
-        await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Zum Vergleich rechnet DealPilot die umgekehrte Ertragswertmethode (BFH IX R 12/21) mit: <b>' + (jm ? jm[1] : '–') + ' Gebäude</b>.');
       },
       async function (s) {   /* 4 · Schritt 3: vier Varianten */
         await r6BmfWeiter();
@@ -2848,7 +2843,8 @@
         await zeige(function () { return r6Sichtbar(r6BmfPane(), 'table'); }, 6);
         var tt = r6Inner(r6BmfPane());
         var g = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), a = /AfA Gebäude\/Jahr\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt);
-        await b2oZeile(s, 'Schritt 3 · Amtlich und drei Abweichungen', 'Amtlich <b>' + (g ? g[1] : '–') + '</b> Gebäude — mit Boden −15/−20/−25 % bis ' + (g ? g[4] : '–') + '. AfA ' + (a ? a[1] + ' bis ' + a[4] : '–') + ' im Jahr.');
+        var g3 = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(r6Text(q('#bmfJacobyZeile')));
+        await b2oZeile(s, 'Schritt 3 · Amtlich, zwei Abschläge und Jacoby', 'Amtlich <b>' + (g3 ? g3[1] : '–') + '</b> Gebäude — mit Boden −15/−20 % bis ' + (g3 ? g3[3] : '–') + (jm ? '; nach der umgekehrten Ertragswertmethode (BFH IX R 12/21) <b>' + jm[1] + '</b>' : '') + '.');
       },
       async function (s) {   /* 5 · Schritt 4: Variante wählen */
         await r6BmfWeiter();
@@ -2856,8 +2852,8 @@
         await warte(600);
         r6BmfOben(r6BmfKarte('amtlich'));
         await warte(400);
-        await zeige(function () { var a = r6BmfKarte('amtlich'), b = r6BmfKarte('aggressiv'); return a && b ? b2oHuelle(a, b) : (a || b); }, 6);
-        var zb = r6Beginn(s, 'Schritt 4 · Du wählst', 'Vier Karten, jede mit Risiko-Score — grün ist die Arbeitshilfe, rot kann das Finanzamt beanstanden.');
+        await zeige(function () { var a = r6BmfKarte('amtlich'), b = r6BmfKarte('optimiert');   /* v3184: Aggressiv entfällt */ return a && b ? b2oHuelle(a, b) : (a || b); }, 6);
+        var zb = r6Beginn(s, 'Schritt 4 · Du wählst', 'Amtlich, zwei Abschläge und Jacoby — grün ist die Arbeitshilfe, jede Abweichung braucht eine Begründung.');
         await warte(3200);
         var o = r6BmfKarte('optimiert'); if (o) o.click();
         await warte(900);

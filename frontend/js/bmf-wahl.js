@@ -58,12 +58,14 @@
     },
     {
       id: 'anlage',
-      titel: 'BMF-Anlage als PDF',
+      titel: 'Kaufpreisaufteilung als PDF',
       unter: 'für das Finanzamt',
       fuer: 'Die fertige Anlage: Aufteilung, AfA-Bemessungsgrundlage und ' +
             'Verprobung — als Dokument zum Einreichen.',
       /* Der einzige Weg hier, der etwas voraussetzt. */
       sperre: function () {
+        var p = window.DpBmfAusgabe && DpBmfAusgabe.pruefen();   /* v3184: rechnet bei Bedarf selbst (bmf-ausgabe.js) */
+        if (p) return p.ok ? null : 'Fehlen noch Werte: ' + p.fehlt.join(', ');
         return gerechnet() ? null : 'Erst berechnen — die Anlage druckt das Ergebnis.';
       },
       tun: function () {
@@ -72,18 +74,19 @@
         toast('BMF-Anlage nicht verfügbar.');
       }
     },
+    /* v3184 · Marcel 05.11.2026: „wenn ich auf BMF Anlage gehe, da muss natürlich auch die Belege einlesen raus.“
+       Statt der Belege die beiden übrigen Ausgaben des Rechners - über dieselbe Stelle wie Schritt 5 (bmf-ausgabe.js). */
     {
-      id: 'belege',
-      titel: 'Belege einlesen',
-      unter: 'Anschaffungskosten',
-      fuer: 'Rechnungen und Belege der Anschaffungsnebenkosten erfassen — ' +
-            'KI-gestützt, mehrere je Lauf.',
-      tun: function () {
-        if (window.DealPilotBelegImport && typeof window.DealPilotBelegImport.open === 'function') {
-          return window.DealPilotBelegImport.open('ak');
-        }
-        toast('Beleg-Import nicht geladen.');
-      }
+      id: 'arbeitshilfe', titel: 'BMF-Arbeitshilfe als PDF', unter: 'das amtliche Formular',
+      fuer: 'Die Arbeitshilfe des BMF, mit den Werten des Objekts ausgefüllt.',
+      sperre: function () { var p = window.DpBmfAusgabe && DpBmfAusgabe.pruefen(); return p && !p.ok ? 'Fehlen noch Werte: ' + p.fehlt.join(', ') : null; },
+      tun: function () { if (window.DpBmfAusgabe) return DpBmfAusgabe.arbeitshilfe(); toast('BMF-Ausgabe nicht geladen.'); }
+    },
+    {
+      id: 'xlsx', titel: 'BMF-Original als XLSX', unter: 'Excel-Datei',
+      fuer: 'Die Arbeitshilfe (Fassung Juni 2023) ausgefüllt als Excel-Datei.',
+      sperre: function () { var p = window.DpBmfAusgabe && DpBmfAusgabe.pruefen(); return p && !p.ok ? 'Fehlen noch Werte: ' + p.fehlt.join(', ') : null; },
+      tun: function () { if (window.DpBmfAusgabe) return DpBmfAusgabe.xlsx(); toast('BMF-Ausgabe nicht geladen.'); }
     }
   ];
 
@@ -114,8 +117,7 @@
       '<div class="dpw-kasten" role="dialog" aria-modal="true" aria-label="Kaufpreisaufteilung">' +
       '<div class="dpw-kopf"><b>Kaufpreisaufteilung · BMF</b>' +
       '<button type="button" class="dpw-zu" aria-label="Schliessen">×</button></div>' +
-      '<p class="dpw-vor">Drei Wege führen hier weiter — rechnen, ausgeben, belegen. ' +
-      'Die Anlage lässt sich erst ziehen, wenn gerechnet wurde.</p>' +
+      '<p class="dpw-vor">Rechnen oder ausgeben – die Ausgaben sind aktiv, sobald die Werte des Objekts reichen.</p>' +
       '<div class="dpw-liste">' + karten + '</div>' +
       '</div>';
 

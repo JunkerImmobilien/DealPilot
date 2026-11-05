@@ -141,7 +141,12 @@
   var origBank = null, origVoll = null;
 
   /* v3181 · im einheitlichen Design gibt es kein Obsidian-Deckblatt - „hell" und „Obsidian" sind dort dasselbe Investment-PDF */
-  function sichtbar() { return WAHLEN.filter(function (w) { return !(vorgabe.design !== 'klassisch' && w.id === 'obsidian'); }); }
+  /* v3184 · Marcel 05.11.2026: „Eigentlich brauchen wir ja nur … eine vollumfängliche Version und das Investment PDF
+     als Kurzfassung." Im einheitlichen Design also zwei Wahlen; „hell" führt dort auf dieselbe vollständige Fassung. */
+  function sichtbar() {
+    if (vorgabe.design === 'klassisch') return WAHLEN.slice();
+    return [Object.assign({}, wahl('bank'), { titel: 'Investment-PDF · vollständig', unter: 'Alle Kapitel, 18 bis 24 Seiten', fuer: 'Bank · Partner · Steuerberater' }), wahl('kurz')];
+  }
   function fuehreAus(w) {
     if (w.art !== 'profi' && window.DpDokWeiche && window.DpDokWeiche.aktiv()) return window.DpDokWeiche.investment(w.art);
     /* Der Schalter gilt nur für DIESEN Export - danach zurück auf den
@@ -328,8 +333,10 @@
       zeige(vorauswahl || vorgabe.fassung || 'bank');
     },
     gemerkt: gemerkt,
+    /* v3184 · direkt eine Fassung erzeugen, ohne Dialog (Deal-Aktion: Knöpfe „Vollständig" und „Kurzfassung") */
+    starte: function (id) { var w = wahl(id); if (w) return fuehreAus(w); },
     wahlen: WAHLEN,
-    vorgabe: function () { return { fassung: vorgabe.fassung, immer: vorgabe.immer, pilot: vorgabe.pilot }; },
+    vorgabe: function () { return { fassung: vorgabe.fassung, immer: vorgabe.immer, pilot: vorgabe.pilot, design: vorgabe.design }; },   /* v3184: design fehlte - dok-weiche.js las immer "neu", die Einstellung Klassisch wirkte nie */
     pilotAn: pilotAn,
     einstellungenHtml: einstellungenHtml,
     ausEinstellungen: ausEinstellungen,

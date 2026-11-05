@@ -708,6 +708,7 @@ function runBmf(){
       throw new Error('Unerwartete Antwort vom Backend');
     }
     window._lastBmfResults = data.results;
+    try { data.results._fuer = window._currentObjKey || null; } catch(e) {}   /* v3184: Ergebnis gehoert zu DIESEM Objekt (bmf-ausgabe.js) */
     renderBmfResult(data.results, null);
     if(hint){ hint.textContent = '✓ Berechnung aktualisiert (' + new Date().toLocaleTimeString('de-DE') + ')'; }
     // Persistenz
@@ -853,6 +854,11 @@ function _mockupRenderBmfResult(r, demoLabel){
 }
 
 function bmfAusgabenZeigen(hostEl) {
+  /* v3184 · Marcel 05.11.2026: die Ausgaben gehoeren in Schritt 5 („dass wir dort dann halt alle
+     Exporte machen"), nicht unter das Ergebnis in Reiter 2. Die Leiste wird nicht mehr gebaut;
+     die Wege selbst stehen in bmf-ausgabe.js (DpBmfAusgabe), Schritt 5 und Deal-Aktion rufen sie. */
+  try { var altB = document.getElementById('bmf-ausgaben'); if (altB) altB.remove(); } catch (e) {}
+  if (!hostEl || hostEl !== 'v1859') return;
   /* v1859: Host kann uebergeben werden — die v292-Schicht rendert Reiter 2
      selbst und verdeckt #bmfResult; der Block gehoert unter IHR Ergebnis. */
   var host = (hostEl && hostEl.nodeType === 1) ? hostEl : document.getElementById('bmfResult');
@@ -2455,9 +2461,9 @@ function _updateFooterNav(paneId){
     var hints = {
       'p-ak':    '<b>Schritt 1 / 5:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
       'p-bmf':   '<b>Schritt 2 / 5:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
-      'p-afa':   '<b>Schritt 3 / 5:</b> Vergleich der vier Varianten (Amtlich / Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
-      'p-hebel': '<b>Schritt 4 / 5:</b> Welche Aufteilung soll gelten? Eine Zeile übernehmen — der Gebäudeanteil geht in den Reiter Steuer. Weiter: Szenario Bodenabschlag (optional).',   /* v3051 · N85 */
-      'p-boden': '<b>Schritt 5 / 5:</b> Szenario jenseits der amtlichen Aufteilung — Abschlag auf den Bodenwert, Restnutzungsdauer und Begründung für den Vertragstext.'
+      'p-afa':   '<b>Schritt 3 / 5:</b> Vergleich: Amtlich, Konservativ, Optimiert und die umgekehrte Ertragswertmethode nach Jacoby — gewählt wird in Schritt 4.',
+      'p-hebel': '<b>Schritt 4 / 5:</b> Welche Aufteilung soll gelten? Eine Zeile übernehmen — der Gebäudeanteil geht in den Reiter Steuer. Weiter: Übersicht und Ausgabe.',   /* v3184 */
+      'p-boden': '<b>Schritt 5 / 5:</b> Übersicht der Auswahl, Begründung und alle Ausgaben — Kaufpreisaufteilung, BMF-Arbeitshilfe, BMF-Original, Texte für Vertrag und Berater.'
     }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];
   }

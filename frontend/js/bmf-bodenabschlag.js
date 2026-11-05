@@ -85,7 +85,10 @@
     var bar = leiste.parentNode;
     var b = document.createElement('button');
     b.className = 'bmfmo-tab'; b.id = 'bmf-boden-tab'; b.dataset.pane = PANE;
-    b.textContent = 'Bodenabschlag';
+    /* v3184 · Marcel 05.11.2026: „den Punkt, der nicht nummeriert ist, Bodenabschlag, dass das vielleicht
+       der fünfte Punkt wird, wo wir dann noch mal die Übersicht sehen, was ausgewählt ist und dass wir dort
+       dann halt alle Exporte machen." Der Reiter heißt jetzt Schritt 5 und trägt eine Nummer wie die anderen. */
+    b.innerHTML = '<span class="mtab-num">5</span> Übersicht &amp; Ausgabe';
     b.onclick = function () { if (typeof window.switchPane === 'function') window.switchPane(PANE); rechnen(); };
     bar.appendChild(b);
 
@@ -93,41 +96,32 @@
     if (!vorlage) return false;
     var p = document.createElement('div');
     p.className = 'bmfmo-pane'; p.id = PANE;
+    var feld = 'width:100%;margin-top:4px;padding:8px 10px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif;background:#fff';
+    var zwi = 'font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin:18px 0 8px';
     p.innerHTML =
-      '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">Szenario neben der amtlichen Aufteilung</div>' +
-      '<h3 style="margin:0 0 6px;font:600 19px/1.3 \'Space Grotesk\',sans-serif">Abschlag auf den Grund und Boden</h3>' +
-      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:var(--muted,#6B6356)">Die Arbeitshilfe des BMF bindet das Finanzgericht nicht (BFH IX R 26/19). Wer eine niedrigere Bodenkomponente begründen kann, darf abweichend aufteilen. Dieses Blatt lässt die amtliche Zahl unangetastet und stellt das Szenario daneben.</p>' +
-      /* v1500 · Marcel 21.09.2026: "die Formatierung ist schlecht beim
-         Bodenabschlag. Die Restnutzungsdauer von/bis ist nicht schoen mit den
-         anderen Feldern in einer Reihe. Auch kann man einfach den Abschlag
-         beliebig setzen, da bitte nur die 4 Abstufungen zum Auswaehlen."
-         Gemessen: die Reihe war ein flex mit align-items:flex-end, und die
-         Restnutzungsdauer-Spalte war wegen Hilfetext, Knopf und Infozeile
-         143 px hoch gegen 60 px der Nachbarn - sie begann 83 px weiter oben.
-         Jetzt ein Raster mit drei Spalten und gemeinsamer Oberkante; was
-         Hoehe braucht (Knopf, Infozeile), steht UNTER der Reihe.
-         Der Abschlag ist eine Auswahl mit genau den vier Stufen aus Reiter 4 -
-         eine frei tippbare Zahl war eine Einladung, eine zu waehlen, die
-         nirgends hergeleitet ist. */
-      '<div style="display:grid;grid-template-columns:230px 250px minmax(260px,1fr);gap:14px 18px;align-items:start;margin-bottom:6px">' +
-        '<label style="font-size:12px">Abschlag auf den Bodenwert<br>' +
-          '<select id="bmf-boden-pct" style="width:100%;margin-top:4px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;background:#fff">' +
-            '<option value="0">Amtlich · kein Abschlag</option>' +
-            '<option value="15">Konservativ · 15 %</option>' +
-            '<option value="20" selected>Optimiert · 20 %</option>' +
-            '<option value="25">Aggressiv · 25 %</option>' +
-          '</select></label>' +
-        '<label style="font-size:12px">Restnutzungsdauer von / bis<br><span style="display:inline-flex;align-items:center;gap:5px;margin-top:4px">' +
-          '<input id="bmf-boden-rnd-von" type="text" inputmode="numeric" style="width:62px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right">' +
-          '<b>bis</b><input id="bmf-boden-rnd-bis" type="text" inputmode="numeric" style="width:62px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:14px Inter,sans-serif;text-align:right"><b>Jahre</b></span></label>' +
-        '<label style="font-size:12px">Begründung (kommt in den Vertragstext)<br>' +
-          '<input id="bmf-boden-grund" type="text" value="" placeholder="z. B. Hinterlandanteil, Zuschnitt, Lärmbelastung" style="width:100%;margin-top:4px;padding:7px 8px;border:1px solid #E6E0D3;border-radius:6px;font:13px Inter,sans-serif"></label>' +
+      '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">BMF-Rechner · Schritt 5 von 5</div>' +
+      '<h3 style="margin:0 0 6px;font:600 20px/1.3 \'Space Grotesk\',sans-serif;color:#1a1814">Übersicht und Ausgabe</h3>' +
+      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Was gewählt ist, wie es begründet wird und was du daraus ausgibst – für Finanzamt, Notar und Steuerberater.</p>' +
+      '<div id="bmf-boden-wahl"></div>' +
+      '<div id="bmf-boden-out" style="margin-top:12px"></div>' +
+      '<div style="' + zwi + '">Begründung und Restnutzungsdauer</div>' +
+      '<div style="display:grid;grid-template-columns:minmax(260px,1fr) 250px;gap:12px 18px;align-items:start">' +
+        '<label style="font-size:12px;color:#3a352b">Begründung (geht in Vertragstext und Berater-Text)<br>' +
+          '<input id="bmf-boden-grund" type="text" value="" placeholder="z. B. Hinterlandanteil, Zuschnitt, Lärmbelastung" style="' + feld + '"></label>' +
+        '<label style="font-size:12px;color:#3a352b">Restnutzungsdauer von / bis<br><span style="display:inline-flex;align-items:center;gap:6px;margin-top:4px">' +
+          '<input id="bmf-boden-rnd-von" type="text" inputmode="numeric" style="width:64px;padding:8px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif;text-align:right">' +
+          '<b>bis</b><input id="bmf-boden-rnd-bis" type="text" inputmode="numeric" style="width:64px;padding:8px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif;text-align:right"><b>Jahre</b></span></label>' +
+        /* Der Abschlag wird in Schritt 4 gewählt - das Feld bleibt nur als Träger für den klassischen PDF-Weg */
+        '<label style="display:none">Abschlag<select id="bmf-boden-pct">' +
+          '<option value="0">Amtlich · kein Abschlag</option><option value="15">Konservativ · 15 %</option>' +
+          '<option value="20" selected>Optimiert · 20 %</option><option value="25">25 %</option></select></label>' +
       '</div>' +
-      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">' +
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px">' +
         '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-rnd-rechnen">Restnutzungsdauer berechnen</button>' +
         '<div id="bmf-boden-rnd-info" style="font-size:11.5px;color:#8A8272;line-height:1.45;flex:1 1 320px">Steht eine Spanne, rechnet das PDF jedes Jahr darin einzeln durch.</div>' +
       '</div>' +
-      '<div id="bmf-boden-out"></div>' +
+      '<div style="' + zwi + '">Ausgabe</div>' +
+      '<div id="bmf-boden-ausgabe"></div>' +
       '<div id="bmf-boden-klausel" style="margin-top:14px"></div>' +
       '<div id="bmf-boden-zusatz"></div>';
     vorlage.parentNode.appendChild(p);
@@ -150,18 +144,54 @@
   }
 
   /* ── Rechnen und zeichnen ─────────────────────────────────────────── */
+  /* v3184 · Die Auswahl kommt aus Schritt 4 (Wahl-Tafel), nicht mehr aus einem eigenen Feld.
+     Drei Pipeline-Varianten über den Abschlag auf den Bodenwert, Jacoby über den Gebäudeanteil
+     der umgekehrten Ertragswertmethode. Das versteckte Feld #bmf-boden-pct wird mitgeführt -
+     der klassische PDF-Weg (pdf-kaufpreisaufteilung.js) liest es. */
+  var NAME_WAHL = { amtlich: 'Amtlich (BMF-Arbeitshilfe)', konservativ: 'Konservativ · Boden −15 %', optimiert: 'Optimiert · Boden −20 %',
+    aggressiv: 'Abschlag 25 % auf den Bodenwert', jacoby: 'Umgekehrte Ertragswertmethode nach Jacoby' };
+  function auswahl(B) {
+    B = B || basis(); if (!B) return null;
+    var st = window._v292State || {};
+    var wahl = window._dpBmfTafelWahl || st.selectedVariant || 'amtlich';
+    var j = st.response && st.response.phase4_bmf && st.response.phase4_bmf.jacoby;
+    /* Die Wahl lebt nur im Fenster - der Gebäudeanteil im Reiter Steuer ist das, was gilt. Passt er zu
+       einer der Varianten, ist DAS die Auswahl (so druckt auch die Deal-Aktion ohne offenes Fenster richtig). */
+    try {
+      var gs = zahl(el('geb_ant') && el('geb_ant').value);
+      if (gs != null && B.immoKp > 0) {
+        var kand = [['amtlich', 0], ['konservativ', 15], ['optimiert', 20]].map(function (x) {
+          return [x[0], (B.immoKp - B.bodenAmtlich * (1 - x[1] / 100)) / B.immoKp * 100];
+        });
+        if (j && j.verfuegbar) kand.push(['jacoby', Number(j.gebaeudeanteil_prozent)]);
+        var treffer = kand.filter(function (x) { return Math.abs(x[1] - gs) < 0.15; })[0];
+        if (treffer) wahl = treffer[0];
+      }
+    } catch (e) {}
+    if (wahl === 'jacoby' && j && j.verfuegbar && j.gebaeudeanteil_prozent > 0 && j.gebaeudeanteil_prozent < 100) {
+      var g = Number(Number(j.gebaeudeanteil_prozent).toFixed(2)), gebJ = B.immoKp * g / 100;
+      return { id: 'jacoby', name: NAME_WAHL.jacoby, ab: null, gebNeu: gebJ, bodenNeu: B.immoKp - gebJ, gebPctNeu: g, jacoby: j, spalte: 'Nach Jacoby' };
+    }
+    if (wahl === 'jacoby') wahl = st.selectedVariant || 'amtlich';
+    var ab = ABSCHLAG_JE_VARIANTE[wahl];
+    if (ab == null) ab = Math.min(90, Math.max(0, zahl(el('bmf-boden-pct') && el('bmf-boden-pct').value) || 0));
+    var f = el('bmf-boden-pct'); if (f && String(f.value) !== String(ab)) { window._dpBodenStillsetzen = true; try { f.value = String(ab); } finally { window._dpBodenStillsetzen = false; } }
+    var bodenNeu = B.bodenAmtlich * (1 - ab / 100), gebNeu = B.immoKp - bodenNeu;
+    return { id: wahl, name: NAME_WAHL[wahl] || ('Abschlag ' + ab + ' % auf den Bodenwert'), ab: ab, gebNeu: gebNeu, bodenNeu: bodenNeu,
+      gebPctNeu: B.immoKp > 0 ? gebNeu / B.immoKp * 100 : 0, spalte: ab ? 'Mit ' + pct(ab, 0) + ' Abschlag' : 'Gewählt: amtlich' };
+  }
+
   function rechnen() {
     var out = el('bmf-boden-out'); if (!out) return;
     var B = basis();
     if (!B) {
-      out.innerHTML = '<div class="cf-hint">Zuerst im Reiter „BMF-Aufteilung" die amtliche Berechnung starten — dieses Blatt baut darauf auf.</div>';
-      var k0 = el('bmf-boden-klausel'); if (k0) k0.innerHTML = '';
+      out.innerHTML = '<div class="cf-hint">Zuerst in Schritt 2 die amtliche Berechnung abwarten – diese Übersicht baut darauf auf.</div>';
+      ['bmf-boden-klausel', 'bmf-boden-zusatz', 'bmf-boden-wahl'].forEach(function (i) { var k0 = el(i); if (k0) k0.innerHTML = ''; });
+      ausgabeZeichnen(false);
       return;
     }
-    var ab = Math.min(90, Math.max(0, zahl(el('bmf-boden-pct') && el('bmf-boden-pct').value) || 0));
-    var bodenNeu = B.bodenAmtlich * (1 - ab / 100);
-    var gebNeu = B.immoKp - bodenNeu;
-    var gebPctNeu = B.immoKp > 0 ? gebNeu / B.immoKp * 100 : 0;
+    var W = auswahl(B);
+    var bodenNeu = W.bodenNeu, gebNeu = W.gebNeu, gebPctNeu = W.gebPctNeu;
     /* Nebenkosten teilen sich im jeweiligen Verhaeltnis mit auf. */
     var nkGebAlt = B.nk * B.gebPct / 100, nkGebNeu = B.nk * gebPctNeu / 100;
     var basisAlt = B.gebAmtlich + nkGebAlt, basisNeu = gebNeu + nkGebNeu;
@@ -175,15 +205,15 @@
         '<td style="padding:6px 8px 6px 0;border-bottom:1px solid #F0ECE3">' + label + '</td>' +
         '<td style="padding:6px 8px;text-align:right;border-bottom:1px solid #F0ECE3">' + (o.fmt ? o.fmt(alt) : eur(alt)) + '</td>' +
         '<td style="padding:6px 8px;text-align:right;border-bottom:1px solid #F0ECE3">' + (o.fmt ? o.fmt(neu) : eur(neu)) + '</td>' +
-        '<td style="padding:6px 0;text-align:right;border-bottom:1px solid #F0ECE3;color:' + (d > 0 ? '#2E8455' : (d < 0 ? '#B8625C' : 'inherit')) + '">' +
-          (d == null ? '' : (d > 0 ? '+' : '') + (o.fmt ? o.fmt(d) : eur(d))) + '</td></tr>';
+        '<td style="padding:6px 0;text-align:right;border-bottom:1px solid #F0ECE3;color:' + (d > 0.005 ? '#2E8455' : (d < -0.005 ? '#B8625C' : 'inherit')) + '">' +
+          (d == null || Math.abs(d) < 0.005 ? '' : (d > 0 ? '+' : '') + (o.fmt ? o.fmt(d) : eur(d))) + '</td></tr>';
     }
     out.innerHTML =
       '<table style="width:100%;border-collapse:collapse;font-size:13.5px">' +
       '<thead><tr style="font-size:11px;color:var(--muted,#8A8272);text-transform:uppercase;letter-spacing:.06em">' +
         '<th style="text-align:left;padding-bottom:6px">Position</th>' +
         '<th style="text-align:right;padding-bottom:6px">Amtliche Arbeitshilfe</th>' +
-        '<th style="text-align:right;padding-bottom:6px">Mit ' + pct(ab, 0) + ' Abschlag</th>' +
+        '<th style="text-align:right;padding-bottom:6px">' + W.spalte + '</th>' +
         '<th style="text-align:right;padding-bottom:6px">Unterschied</th></tr></thead><tbody>' +
       zeile('Kaufpreis (ohne Inventar)', B.immoKp, B.immoKp) +
       zeile('davon Grund und Boden', B.bodenAmtlich, bodenNeu) +
@@ -192,25 +222,85 @@
       zeile('Anschaffungsnebenkosten auf das Gebäude', nkGebAlt, nkGebNeu) +
       zeile('AfA-Bemessungsgrundlage', basisAlt, basisNeu, { summe: true }) +
       zeile('AfA pro Jahr bei ' + pct(satz, 2), afaAlt, afaNeu, { summe: true }) +
-      '</tbody></table>' +
-      '<div class="cf-hint" style="margin-top:8px">Die linke Spalte ist das Ergebnis der amtlichen Arbeitshilfe und bleibt unverändert. Der Abschlag verschiebt nur, was auf den Boden entfällt — der Kaufpreis bleibt gleich. Ohne tragfähige Begründung trägt das Finanzamt die Aufteilung der Arbeitshilfe ein.</div>';
+      '</tbody></table>';
 
-    klausel(B, ab, bodenNeu, gebNeu);
+    wahlZeichnen(B, W, { basisNeu: basisNeu, afaNeu: afaNeu, satz: satz });
+    klausel(B, W, bodenNeu, gebNeu, { basisNeu: basisNeu, afaNeu: afaNeu, satz: satz });
+    ausgabeZeichnen(true);
   }
 
-  /* Vertragstext — dieselbe Form wie im Reiter „Hebel", aber mit dem
-     Abschlag und seiner Begruendung. */
-  function klausel(B, ab, bodenNeu, gebNeu) {
+  /* Die Übersicht oben: was gewählt ist und ob es im Reiter Steuer angekommen ist. */
+  function wahlZeichnen(B, W, X) {
+    var host = el('bmf-boden-wahl'); if (!host) return;
+    var g = el('geb_ant'), imReiter = g ? zahl(g.value) : null;
+    var drin = imReiter != null && Math.abs(imReiter - W.gebPctNeu) < 0.06;
+    host.innerHTML =
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px">' +
+        kachel('Gewählt', W.name, W.id === 'amtlich' ? 'ohne Abweichung' : 'Abweichung braucht Begründung') +
+        kachel('Gebäudeanteil', pct(W.gebPctNeu, 2), 'amtlich ' + pct(B.gebPct, 2)) +
+        kachel('AfA je Jahr', eur(X.afaNeu), 'bei ' + pct(X.satz, 2) + ' auf ' + eur(X.basisNeu)) +
+        '<div style="padding:12px 14px;border:1px solid ' + (drin ? '#CFE3D6' : '#EAD9B0') + ';border-radius:10px;background:' + (drin ? '#F3F9F5' : '#FBF6E9') + '">' +
+          '<div style="font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin-bottom:6px">Reiter Steuer</div>' +
+          (drin
+            ? '<div style="font:600 14px/1.35 Inter,sans-serif;color:#2E8455">✓ übernommen</div><div style="font-size:12px;color:#3a352b;margin-top:3px">Gebäudeanteil ' + pct(imReiter, 2) + '</div>'
+            : '<div style="font-size:12.5px;color:#3a352b;line-height:1.45">' + (imReiter != null ? 'Dort stehen ' + pct(imReiter, 2) + '.' : 'Noch nicht übernommen.') + '</div>' +
+              '<button type="button" id="bmf-boden-uebernehmen" class="btn btn-sm" style="margin-top:6px;background:var(--wl-c9a84c, #C9A84C);color:#050505;border:none;font-weight:700">Jetzt übernehmen</button>') +
+        '</div>' +
+      '</div>';
+    var k = el('bmf-boden-uebernehmen');
+    if (k) k.onclick = function () {
+      if (window.DpBmfWahlTafel && typeof DpBmfWahlTafel.uebernehmen === 'function') DpBmfWahlTafel.uebernehmen(W.id);
+      setTimeout(rechnen, 400);
+    };
+    function kachel(t, w, u) {
+      return '<div style="padding:12px 14px;border:1px solid #E6E0D3;border-radius:10px;background:#FFFFFF">' +
+        '<div style="font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin-bottom:6px">' + t + '</div>' +
+        '<div style="font:600 14.5px/1.35 Inter,sans-serif;color:#1a1814">' + w + '</div>' +
+        '<div style="font-size:11.5px;color:#6B6356;margin-top:3px">' + u + '</div></div>';
+    }
+  }
+
+  /* Die Ausgaben als Karten - dieselben Wege wie in der Deal-Aktion (bmf-ausgabe.js). */
+  function ausgabeZeichnen(bereit) {
+    var host = el('bmf-boden-ausgabe'); if (!host) return;
+    var K = [
+      ['kpa', 'Kaufpreisaufteilung', 'PDF', 'Herleitung, gewählte Aufteilung und Vertragstext – Anlage für Finanzamt und Berater'],
+      ['ah', 'BMF-Arbeitshilfe', 'PDF', 'Das amtliche Formular, mit den Werten dieses Objekts ausgefüllt'],
+      ['xlsx', 'BMF-Original', 'XLSX', 'Die Arbeitshilfe (Fassung Juni 2023) als Excel-Datei'],
+      ['berater', 'Text für den Berater', 'Kopieren', 'Kurzfassung mit Zahlen und Begründung für den Steuerberater'],
+      ['vertrag', 'Text für den Kaufvertrag', 'Kopieren', 'Der Satz für die Urkunde – Grund und Boden, Gebäude, Inventar']
+    ];
+    host.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">' +
+      K.map(function (k) {
+        return '<button type="button" data-ausgabe="' + k[0] + '"' + (bereit ? '' : ' disabled') + ' style="text-align:left;padding:12px 14px;border:1px solid #E6E0D3;border-radius:12px;background:' + (bereit ? '#FFFFFF' : '#F7F5F0') + ';cursor:' + (bereit ? 'pointer' : 'not-allowed') + ';display:flex;flex-direction:column;gap:4px;min-height:96px">' +
+          '<span style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font:600 14px/1.3 Inter,sans-serif;color:#1a1814">' + k[1] + '</b>' +
+          '<span style="font:700 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.06em;padding:4px 7px;border-radius:6px;background:' + (bereit ? 'var(--wl-c9a84c, #C9A84C)' : '#E6E0D3') + ';color:#050505">' + k[2] + '</span></span>' +
+          '<span style="font-size:12px;line-height:1.45;color:#6B6356">' + (bereit ? k[3] : 'Fehlen noch Werte – erst Schritt 2 rechnen.') + '</span></button>';
+      }).join('') + '</div>';
+    [].forEach.call(host.querySelectorAll('[data-ausgabe]'), function (b) {
+      b.addEventListener('click', function () {
+        var A = window.DpBmfAusgabe, was = b.getAttribute('data-ausgabe'), T = window._dpKpaTexte || {};
+        function kopieren(t, wort) {
+          try { navigator.clipboard.writeText(t || ''); if (window.toast) window.toast('✓ ' + wort + ' kopiert'); } catch (e) {}
+        }
+        if (was === 'kpa') return A ? A.kaufpreisaufteilung() : (window.exportPDFKaufpreisaufteilung && window.exportPDFKaufpreisaufteilung());
+        if (was === 'ah') return A && A.arbeitshilfe();
+        if (was === 'xlsx') return A ? A.xlsx() : (window.downloadXlsx && window.downloadXlsx());
+        if (was === 'berater') return kopieren(T.berater, 'Text für den Berater');
+        if (was === 'vertrag') return kopieren(T.klausel, 'Text für den Kaufvertrag');
+      });
+    });
+  }
+
+  /* Vertragstext und Berater-Text - der Wortlaut nach Marcels Vorlage vom 21.09.2026 (v1478/v1495). */
+  function klausel(B, W, bodenNeu, gebNeu, X) {
     var host = el('bmf-boden-klausel'); if (!host) return;
     function v(id) { var e = el(id); return e ? String(e.value || '').trim() : ''; }
     var adr = ((v('str') + ' ' + v('hnr')).trim() + ', ' + (v('plz') + ' ' + v('ort')).trim()).replace(/^, |, $/, '');
     var grund = v('bmf-boden-grund');
-    /* v1478 · Wortlaut nach Marcels Vorlage vom 21.09.2026: verbindliche
-       Erklaerung, danach Methode und Begruendung, damit das Finanzamt die
-       Herleitung im Vertrag findet und nicht nachfragen muss. */
-    var stand = new Date().toLocaleDateString('de-DE');
     var rnd = null;
     try { rnd = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd; } catch (e) {}
+    var rVon = zahl(v('bmf-boden-rnd-von')), rBis = zahl(v('bmf-boden-rnd-bis'));
     var verfahren = null;
     try { verfahren = window._lastBmfResults && window._lastBmfResults.ertragswert && window._lastBmfResults.ertragswert.value ? 'Ertragswertverfahren' : 'Sachwertverfahren'; } catch (e) {}
     var brw = zahl(el('bmf_brw') && el('bmf_brw').value) || zahl(el('brw') && el('brw').value);
@@ -219,121 +309,81 @@
       'Hiermit erklären die Vertragsparteien rechtsverbindlich:\n\n' +
       'Der vereinbarte Gesamtkaufpreis in Höhe von ' + eur(B.kp, 2) + ' für das in der Vertragsurkunde ' +
       'näher bezeichnete Objekt ' + (adr || '[Objektadresse]') + ' entfällt nach übereinstimmender ' +
-      /* v1495 · Marcel 21.09.2026: "wir wollten, dass wir die Aufteilung
-         Grund und Boden, Gebaeude inklusive wesentlicher Gebaeudeteile
-         textuell verfassen ... dann ein vollstaendiger Satz."
-         Vorher standen die Betraege als eingerueckte Liste. Eine Liste ist
-         keine Erklaerung - in einer Urkunde steht ein Satz, den man vorlesen
-         kann. */
       'Bewertung wie folgt: Auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das ' +
       'Gebäude einschließlich der wesentlichen Gebäudeteile entfallen ' + eur(gebNeu, 2) +
-      (B.inv > 0 ? ' und auf das mitverkaufte Inventar entfallen ' + eur(B.inv, 2) : '') + '.\n' +
-      /* v1490 · Marcel 21.09.2026: "Diese Aufteilung wurde nach der
-         Arbeitshilfe ... bis Stand - das koennen wir wegmachen, weil wir das
-         spaeter bei Moeglicher Zusatz schon drin haben." Stimmt: Verfahren,
-         Bodenwertabschlag, Bindungswirkung und Restnutzungsdauer stehen im
-         Zusatztext ausfuehrlicher. In die URKUNDE gehoert nur, was die
-         Parteien erklaeren - die Betraege. Die Begruendung ist Beiwerk fuer
-         das Finanzamt und steht dort, wo sie hingehoert.
-         Damit beim Streichen nichts verloren geht, tragen Punkt 1 und 3 des
-         Zusatzes jetzt die konkreten Zahlen und den 80/20-Satz. */
-      '';
-    /* v1495 · Marcel: "das bitte nicht mehr kursiv, sondern einfach als
-       Information darunter." Also raus aus dem Vertragstext - der ist der
-       Wortlaut fuer die Urkunde - und als eigene Zeile darunter. */
+      (B.inv > 0 ? ' und auf das mitverkaufte Inventar entfallen ' + eur(B.inv, 2) : '') + '.\n';
     var hinweis = 'Diese Aufteilung hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne ' +
       'der Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
-    var zusatz =
-      'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +
-      '1. Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023). ' +
+    /* Begründung je Auswahl - die Punkte werden fortlaufend nummeriert */
+    var P = [];
+    P.push('Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023). ' +
       'Maßgeblich ist das ' + (verfahren || 'dort vorgesehene Verfahren') + ', weil es der Grundstücksart entspricht. ' +
       'Der Bodenwert ergibt sich aus Grundstücksfläche und amtlichem Bodenrichtwert, der Gebäudeanteil als ' +
       'Differenz zum maßgebenden Verkehrswert' +
       (brw && gsfl ? '. Angesetzt wurde der lagespezifische Bodenrichtwert von ' + eur(brw, 0) + ' je m² für ' +
-        new Intl.NumberFormat('de-DE').format(gsfl) + ' m² Grundstücksfläche' : '') + '.\n\n' +
-      '2. Bodenwertabschlag. Auf den so ermittelten Bodenwert wurde ein Abschlag von ' + pct(ab, 0) + ' angesetzt' +
-      (grund ? ', begründet mit ' + grund : '') + '. Der Bodenrichtwert gilt für ein Grundstück mit den ' +
-      'Merkmalen des Richtwertgrundstücks; weicht das bewertete Grundstück davon ab, ist der Wert anzupassen ' +
-      '(§ 196 Abs. 1 Satz 3 BauGB in Verbindung mit § 15 ImmoWertV).\n\n' +
-      '3. Bindungswirkung. Die Arbeitshilfe ist ein Schätzhilfsmittel und bindet weder die Beteiligten noch ' +
+        new Intl.NumberFormat('de-DE').format(gsfl) + ' m² Grundstücksfläche' : '') + '.');
+    if (W.id === 'jacoby') {
+      var j = W.jacoby || {};
+      P.push('Umgekehrte Ertragswertmethode. Abweichend von der Arbeitshilfe wurde der Gebäudeanteil nach der ' +
+        'umgekehrten Ertragswertmethode (Jacoby) ermittelt: Vom Kaufpreis wird der Bodenwert abgezogen, der Rest über die ' +
+        'Restnutzungsdauer' + (j.rnd_jahre ? ' von ' + j.rnd_jahre + ' Jahren' : '') + ' mit dem Liegenschaftszinssatz' +
+        (j.lzs_pct != null ? ' von ' + String(j.lzs_pct).replace('.', ',') + ' %' : '') + ' auf den jährlichen Reinertrag ' +
+        'zurückgerechnet und der Bodenrestwert nach Ablauf der Restnutzungsdauer dem Boden zugeschlagen. Der Gebäudeanteil ' +
+        'beträgt danach ' + pct(W.gebPctNeu, 2) + (grund ? '; ergänzend begründet mit ' + grund : '') + '. Die Methode ist für ' +
+        'vermietete Objekte zulässig (BFH, Urteil vom 20.09.2022, IX R 12/21).');
+    } else if (W.ab > 0) {
+      P.push('Bodenwertabschlag. Auf den so ermittelten Bodenwert wurde ein Abschlag von ' + pct(W.ab, 0) + ' angesetzt' +
+        (grund ? ', begründet mit ' + grund : '') + '. Der Bodenrichtwert gilt für ein Grundstück mit den ' +
+        'Merkmalen des Richtwertgrundstücks; weicht das bewertete Grundstück davon ab, ist der Wert anzupassen ' +
+        '(§ 196 Abs. 1 Satz 3 BauGB in Verbindung mit § 15 ImmoWertV).');
+    }
+    P.push('Bindungswirkung. Die Arbeitshilfe ist ein Schätzhilfsmittel und bindet weder die Beteiligten noch ' +
       'die Gerichte (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine vertragliche Aufteilung ist der Besteuerung ' +
       'zugrunde zu legen, solange sie wirtschaftlich vernünftig ist und keine nennenswerten Zweifel an ihrer ' +
       'Angemessenheit bestehen (BFH, Urteil vom 16.09.2015, IX R 12/14). Eine pauschale Aufteilung im ' +
       'Verhältnis 80/20 wäre im konkreten Fall nicht sachgerecht; eine abweichende Wertfeststellung ' +
-      'durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG).\n\n' +
-      (rnd ? '4. Restnutzungsdauer. Für das Gebäude wurde eine Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren ' +
-        'ermittelt; die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte ' +
-        'Berechnung bei.\n\n' : '') +
+      'durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG).');
+    if (rnd) P.push('Restnutzungsdauer. Für das Gebäude wurde eine Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren ' +
+      'ermittelt; die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte Berechnung bei.');
+    var zusatz = 'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +
+      P.map(function (t, i) { return (i + 1) + '. ' + t; }).join('\n\n') + '\n\n' +
       'Die vollständige Herleitung mit allen Eingangswerten ist der beigefügten Kaufpreisaufteilung zu entnehmen.';
+    /* v3184 · Marcel: „Ziel ist halt, dass wir einen Text für den Berater bekommen" */
+    var berater =
+      'Kaufpreisaufteilung ' + (adr || '[Objektadresse]') + '\n\n' +
+      'Gewählt: ' + W.name + '. Gebäudeanteil ' + pct(W.gebPctNeu, 2) + (W.id === 'amtlich' ? '' : ' (amtliche Arbeitshilfe: ' + pct(B.gebPct, 2) + ')') + '.\n' +
+      'Kaufpreis ' + eur(B.immoKp, 2) + ' ohne Inventar: Grund und Boden ' + eur(bodenNeu, 2) + ', Gebäude ' + eur(gebNeu, 2) +
+      (B.inv > 0 ? '; Inventar ' + eur(B.inv, 2) + ' mit eigener AfA' : '') + '.\n' +
+      'AfA-Bemessungsgrundlage Gebäude einschließlich anteiliger Nebenkosten: ' + eur(X.basisNeu, 2) + '; AfA ' + pct(X.satz, 2) + ' = ' + eur(X.afaNeu, 2) + ' je Jahr.\n' +
+      (grund ? 'Begründung: ' + grund + '.\n' : (W.id === 'amtlich' ? '' : 'Begründung: noch einzutragen.\n')) +
+      (rVon ? 'Restnutzungsdauer: ' + rVon + (rBis && rBis !== rVon ? ' bis ' + rBis : '') + ' Jahre.\n' : '') +
+      '\nAnlagen: Kaufpreisaufteilung (PDF) mit Herleitung und Vertragstext, ausgefüllte BMF-Arbeitshilfe. ' +
+      'Bitte prüfen und für die Anlage V übernehmen.\n\n' + zusatz;
+
+    var ta = 'width:100%;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727';
+    var sum = 'cursor:pointer;font:600 13px Inter,sans-serif;color:#1a1814;padding:8px 0';
     host.innerHTML =
-      '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8A8272);margin-bottom:6px">Text für den Kaufvertrag</div>' +
-      '<textarea id="bmf-boden-klausel-text" readonly style="width:100%;min-height:150px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727"></textarea>' +
-      '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-copy">Text kopieren</button>'
-      + '<button type="button" class="btn btn-sm" id="bmf-boden-pdf" style="background:#2A2727;color:#fff;border:none">Kaufpreisaufteilung als PDF</button>'
-      + '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-arbeitshilfe">BMF-Arbeitshilfe als PDF</button>'
-      /* v1859 · Marcel: „dass man da alle PDFs dann rausziehen kann" — die dritte
-         Ausgabe, das amtliche Original als XLSX, steht jetzt auch hier auf der
-         letzten Seite (downloadXlsx aus bmf-modal.js, kein Nachbau). */
-      + '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-xlsx" onclick="if(typeof downloadXlsx===\'function\')downloadXlsx()">BMF-Original als XLSX</button>' +
-      (grund ? '' : '<span class="cf-hint" style="margin-left:10px">Ohne Begründung bleibt der Abschlag angreifbar — sie gehört in den Text.</span>') + '</div>';
+      '<details open style="border-top:1px solid #EEEAE1;padding-top:6px"><summary style="' + sum + '">Text für den Kaufvertrag</summary>' +
+      '<textarea id="bmf-boden-klausel-text" readonly style="' + ta + ';min-height:120px"></textarea>' +
+      '<div id="bmf-boden-hinweis" style="margin-top:6px;font-size:11.5px;color:#6B6356;line-height:1.5"></div>' +
+      '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-copy">Text kopieren</button>' +
+      (grund || W.id === 'amtlich' ? '' : '<span class="cf-hint">Ohne Begründung bleibt die Abweichung angreifbar – sie gehört in den Text.</span>') + '</div></details>';
     el('bmf-boden-klausel-text').value = txt;
-    var hHost = el('bmf-boden-hinweis');
-    if (!hHost) {
-      hHost = document.createElement('div');
-      hHost.id = 'bmf-boden-hinweis';
-      hHost.style.cssText = 'margin-top:6px;font-size:11.5px;color:#6B6356;line-height:1.5';
-      el('bmf-boden-klausel-text').parentNode.insertBefore(hHost, el('bmf-boden-klausel-text').nextSibling);
-    }
-    hHost.textContent = hinweis;
+    el('bmf-boden-hinweis').textContent = hinweis;
     var zHost = el('bmf-boden-zusatz');
     if (zHost) {
       zHost.innerHTML =
-        '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8A8272);margin:14px 0 6px">Zusatztext bei Rückfragen des Finanzamts</div>' +
-        '<textarea id="bmf-boden-zusatz-text" readonly style="width:100%;min-height:170px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727"></textarea>' +
-        '<div style="margin-top:6px"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-zusatz-copy">Zusatztext kopieren</button></div>';
-      el('bmf-boden-zusatz-text').value = zusatz;
+        '<details style="border-top:1px solid #EEEAE1;padding-top:6px;margin-top:10px"><summary style="' + sum + '">Text für den Steuerberater</summary>' +
+        '<textarea id="bmf-boden-zusatz-text" readonly style="' + ta + ';min-height:200px"></textarea>' +
+        '<div style="margin-top:6px"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-zusatz-copy">Text kopieren</button></div></details>';
+      el('bmf-boden-zusatz-text').value = berater;
       el('bmf-boden-zusatz-copy').onclick = function () {
-        try { navigator.clipboard.writeText(zusatz); if (typeof window.toast === 'function') window.toast('+ Zusatztext kopiert'); } catch (e) {}
+        try { navigator.clipboard.writeText(berater); if (typeof window.toast === 'function') window.toast('✓ Text für den Berater kopiert'); } catch (e) {}
       };
     }
-    window._dpKpaTexte = { klausel: txt, zusatz: zusatz, hinweis: hinweis };
-    var ahKnopf = el('bmf-boden-arbeitshilfe');
-    if (ahKnopf) ahKnopf.onclick = function () {
-      /* v1484 · die ausgefuellte BMF-Arbeitshilfe selbst als PDF. Gerechnet wird
-         nichts neu: derselbe Aufruf wie die amtliche Berechnung, nur mit dem
-         Schalter include_pdf - der Server wandelt die ausgefuellte Datei um. */
-      var inputs = window._lastBmfInputs;
-      if (!inputs) { if (window.toast) window.toast('Zuerst die amtliche Berechnung starten'); return; }
-      ahKnopf.disabled = true; var alt = ahKnopf.textContent; ahKnopf.textContent = 'Arbeitshilfe wird erzeugt ...';
-      /* v1484b · gemessen: der Token liegt unter ji_token/auth_token bzw. kommt
-         aus Sub.getToken() - nicht unter dp_token. Dieselbe Funktion nehmen wie
-         das Modal selbst, sonst antwortet der Server mit 401. */
-      var kopf = (typeof window._authHeaders === 'function')
-        ? window._authHeaders()
-        : (function () {
-            var h = { 'Content-Type': 'application/json' };
-            var t = (window.Sub && typeof Sub.getToken === 'function') ? Sub.getToken()
-              : (localStorage.getItem('ji_token') || localStorage.getItem('auth_token') || localStorage.getItem('token'));
-            if (t) h.Authorization = 'Bearer ' + t;
-            return h;
-          })();
-      fetch('/api/v1/bmf/aufteilung', { method: 'POST', headers: kopf, body: JSON.stringify({ inputs: inputs, include_pdf: true }) })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (!d || !d.pdf_base64) throw new Error('keine PDF-Fassung erhalten');
-          var bin = atob(d.pdf_base64), arr = new Uint8Array(bin.length);
-          for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-          var url = URL.createObjectURL(new Blob([arr], { type: 'application/pdf' }));
-          var a2 = document.createElement('a'); a2.href = url; a2.download = d.pdf_name || 'BMF_Arbeitshilfe.pdf';
-          document.body.appendChild(a2); a2.click(); a2.remove();
-          setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-          if (window.toast) window.toast('+ Arbeitshilfe als PDF gespeichert');
-        })
-        .catch(function (e) { if (window.toast) window.toast('Arbeitshilfe als PDF nicht möglich: ' + e.message); })
-        .then(function () { ahKnopf.disabled = false; ahKnopf.textContent = alt; });
-    };
-    var pdfKnopf = el('bmf-boden-pdf');
-    if (pdfKnopf) pdfKnopf.onclick = function () { if (typeof window.exportPDFKaufpreisaufteilung === 'function') window.exportPDFKaufpreisaufteilung(); };
+    window._dpKpaTexte = { klausel: txt, zusatz: zusatz, hinweis: hinweis, berater: berater, wahl: W.id, name: W.name,
+      gebPct: W.gebPctNeu, boden: bodenNeu, geb: gebNeu, basis: X.basisNeu, afa: X.afaNeu, satz: X.satz, grund: grund,
+      rndVon: rVon, rndBis: rBis, ab: W.ab, gebPctAmtlich: B.gebPct, bodenAmtlich: B.bodenAmtlich, gebAmtlich: B.gebAmtlich, immoKp: B.immoKp, inv: B.inv, kp: B.kp };
     el('bmf-boden-copy').onclick = function () {
       try { navigator.clipboard.writeText(txt); if (typeof window.toast === 'function') window.toast('✓ Text kopiert'); } catch (e) {}
     };
@@ -426,7 +476,7 @@
     })();
   })();
 
-  window.DpBmfBodenabschlag = { rechnen: rechnen, einhaengen: einhaengen, _basis: basis };
+  window.DpBmfBodenabschlag = { rechnen: rechnen, einhaengen: einhaengen, _basis: basis, auswahl: function () { return auswahl(); } };
 
   /* v1491 · Marcel 21.09.2026: "auf der letzten Seite, dass wenn man das
      auswaehlt, dass das auch uebernommen wird und man dort nicht einfach eine
@@ -707,8 +757,7 @@
     { id: 'amtlich',     name: 'Amtlich (BMF-Arbeitshilfe)', kurz: 'Amtlich',     unter: 'Arbeitshilfe des BMF, Stand Juni 2023', nachweis: 'keiner nötig' },
     { id: 'konservativ', name: 'Konservativ',  kurz: 'Konservativ', unter: '15 % Abschlag auf den Bodenwert', nachweis: 'kurze Begründung' },
     { id: 'optimiert',   name: 'Optimiert',    kurz: 'Optimiert',   unter: '20 % Abschlag auf den Bodenwert', nachweis: 'Begründung + Belege' },
-    { id: 'aggressiv',   name: 'Aggressiv',    kurz: 'Aggressiv',   unter: '25 % Abschlag auf den Bodenwert', nachweis: 'Gutachten empfohlen' },
-    { id: 'jacoby',      name: 'Umgekehrte Ertragswertmethode', kurz: 'Jacoby', unter: 'nach Jacoby, aus dem Ertragswert', nachweis: 'Herleitung + Gutachten' }
+    { id: 'jacoby',      name: 'Umgekehrte Ertragswertmethode', kurz: 'Jacoby', unter: 'nach Jacoby, aus dem Ertragswert – nur bei vermieteten Objekten', nachweis: 'Herleitung + Begründung' }
   ];
 
   function el(id) { return document.getElementById(id); }
@@ -876,11 +925,16 @@
       ? 'Gebäudeanteil ' + pct(gew.geb, 1) + ' · AfA ' + eur(gew.afa) + ' je Jahr · Nachweis: ' + gew.nachweis
       : '';
     var imReiter = el('geb_ant') ? String(el('geb_ant').value || '').trim() : '';
+    /* v3184 · Marcel 05.11.2026: „Auf jeden Fall den Satz für die Kaufpreisaufteilung dazu" - derselbe
+       Wortlaut wie in Schritt 5 (bmf-bodenabschlag.js klausel), für die gewählte Zeile. */
+    var vertrag = '';
+    try { if (window.DpBmfBodenabschlag && el('p-boden')) { window.DpBmfBodenabschlag.rechnen(); vertrag = (window._dpKpaTexte && window._dpKpaTexte.klausel) || ''; } } catch (e) {}
+    vertrag = vertrag.replace(/^Hiermit erklären die Vertragsparteien rechtsverbindlich:\s*/, '').trim();
 
     host.innerHTML =
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">BMF-Rechner · Schritt 4 von 5</div>' +
       '<h3 style="margin:0 0 6px;font:600 20px/1.3 \'Space Grotesk\',sans-serif;color:#1a1814">Welche Aufteilung soll gelten?</h3>' +
-      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Fünf Wege nebeneinander: die amtliche Arbeitshilfe, drei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode. Eine Variante wählen und übernehmen — sie geht in den Reiter Steuer.</p>' +
+      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Die amtliche Arbeitshilfe, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby – sie trägt nur bei vermieteten Objekten, sonst ist sie ausgegraut. Eine Zeile übernehmen: der Gebäudeanteil geht in den Reiter Steuer.</p>' +
       '<div style="border:1px solid #E6E0D3;border-radius:12px;overflow:hidden;background:#FFFFFF">' +
         '<div style="overflow-x:auto"><div style="min-width:' + (mitSteuer ? 760 : 600) + 'px">' + kopf + zeilen + '</div></div>' +
       '</div>' +
@@ -889,17 +943,23 @@
           '<div style="font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin-bottom:6px">Gewählt</div>' +
           '<div style="font:600 15px/1.35 Inter,sans-serif;color:#1a1814">' + esc(gew ? gew.name : '—') + '</div>' +
           '<div style="font-size:12.5px;color:#3a352b;margin-top:3px">' + esc(steuerZeile) + '</div>' +
-          (imReiter ? '<div style="font-size:11.5px;color:#6B6356;margin-top:5px">Im Reiter Steuer steht heute: ' + esc(imReiter) + ' % Gebäudeanteil</div>' : '') +
+          '<div style="font-size:11.5px;color:#6B6356;margin-top:5px">' + (imReiter ? 'Im Reiter Steuer: ' + esc(imReiter) + ' % Gebäudeanteil · ' : '') + 'AfA-Satz bleibt ' + esc(satzTxt) + '</div>' +
         '</div>' +
         '<div style="padding:12px 14px;border:1px solid #E6E0D3;border-radius:10px;background:#FFFFFF">' +
-          '<div style="font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin-bottom:6px">Was beim Übernehmen passiert</div>' +
-          '<div style="font-size:12.5px;line-height:1.55;color:#3a352b">Der Gebäudeanteil geht in den Reiter Steuer, die Begründung in den Vertragstext. Gerechnet wird dort mit dem eingestellten AfA-Satz (' + esc(satzTxt) + ') — er bleibt, wie er ist; ein eigener Satz aus der Restnutzungsdauer bleibt verknüpft.</div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px"><span style="font:600 10.5px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356">Satz für den Kaufvertrag</span>' +
+            (vertrag ? '<button type="button" id="bmf-tafel-satz-kopieren" style="padding:4px 10px;border-radius:8px;border:1px solid #CFC9BC;background:#fff;font:600 12px Inter,sans-serif;cursor:pointer">Kopieren</button>' : '') + '</div>' +
+          '<div style="font-size:12.5px;line-height:1.55;color:#3a352b">' + (vertrag ? esc(vertrag) : 'Erscheint, sobald die amtliche Berechnung vorliegt.') + '</div>' +
         '</div>' +
       '</div>' +
-      '<div style="margin-top:10px;font-size:11.5px;line-height:1.55;color:#6B6356">AfA auf die Gebäude-Anschaffungskosten einschließlich der anteiligen Nebenkosten, volles Jahr' +
-        (mitSteuer ? '; Steuerwirkung bei ' + pct(D.grenz, 2) + ' Grenzsteuersatz (Vorbelegung des Rechners, ohne Solidaritätszuschlag und Kirchensteuer)' : '') +
-        (D.linear ? '' : '; degressiv sinkt der Betrag jedes Jahr, deshalb keine 10-Jahres-Summe') +
-        '. Abweichungen von der Arbeitshilfe brauchen eine Begründung; das Finanzamt kann sie verwerfen (BFH, Urteil vom 21.07.2020, IX R 26/19). Die umgekehrte Ertragswertmethode ist zulässig (BFH, Urteil vom 20.09.2022, IX R 12/21), ihre Wahl muss aber ebenso sachlich begründet werden.</div>';
+      '<div style="margin-top:10px;font-size:11.5px;line-height:1.55;color:#6B6356">AfA auf die Gebäude-Anschaffungskosten einschließlich anteiliger Nebenkosten, volles Jahr' +
+        (mitSteuer ? '; Steuer bei ' + pct(D.grenz, 2) + ' Grenzsteuersatz' : '') +
+        '. Jede Abweichung von der Arbeitshilfe braucht eine Begründung (BFH IX R 26/19; Jacoby: BFH IX R 12/21) – sie wird in Schritt 5 eingetragen, dort stehen auch alle Ausgaben.</div>';
+
+    /* Alles Übrige im Reiter (Varianten-Karten, 15-%-Grenze, Verteilung, alte Klausel, XLSX-Karte) aus:
+       die Auswahl ist die Tafel, die Ausgaben stehen in Schritt 5. Nicht entfernt - v292 schreibt weiter hinein. */
+    [].forEach.call(pane.children, function (c) { if (c !== host) c.style.display = 'none'; });
+    var kk = el('bmf-tafel-satz-kopieren');
+    if (kk) kk.onclick = function () { try { navigator.clipboard.writeText(vertrag); if (window.toast) window.toast('✓ Satz für den Kaufvertrag kopiert'); } catch (e) {} };
 
     [].forEach.call(host.querySelectorAll('[data-tafel]'), function (b) {
       b.addEventListener('click', function () { uebernehmen(b.getAttribute('data-tafel')); });
@@ -919,6 +979,7 @@
       if (!jacobySchreiben()) { window._dpBmfTafelWahl = null; }
       try { if (typeof window.selectKlausel === 'function') window.selectKlausel('jacoby'); } catch (e) {}
       zeichnen();
+      try { if (window.DpBmfBodenabschlag) window.DpBmfBodenabschlag.rechnen(); } catch (e) {}   /* v3184: Schritt 5 mitziehen */
       return;
     }
     if (typeof window._v292SelectVariant === 'function') window._v292SelectVariant(id);

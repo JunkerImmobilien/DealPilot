@@ -561,7 +561,7 @@
   async function investment(art) {
     var B = D(), K = (window.State && State.kpis) || {}, o = objektKopf(), key = window._currentObjKey;
     var kurz = art === 'kurz', bank = art === 'bank';
-    var name = kurz ? 'Investment Case · Kurzfassung' : bank ? 'Investment Case · Bankfassung' : 'Investment Case';
+    var name = kurz ? 'Investment Case · Kurzfassung' : 'Investment Case';   /* v3184: die vollständige Fassung ist die (frühere) Bankfassung */
     var SC = scoreDaten(K);
     var z = await Promise.all([basis(name), objektInfo(key, o.adresse)]);
     var c = z[0], info = z[1], fotos = info.fotos; c.zeile = o.adresse; o.seq = info.seq || o.seq;
@@ -614,18 +614,13 @@
   }
 
   /* ── 4 · Kaufpreisaufteilung ─────────────────────────────────────── */
+  /* v3184 · der Rechenlauf liegt in bmf-ausgabe.js (dieselbe Stelle wie Arbeitshilfe und XLSX). Die feste
+     Wartezeit von 3,5 s vor dem Lauf entfällt, wenn für DIESES Objekt schon gerechnet ist. */
   function bmfBereit() {
-    if (window._lastBmfResults && window._lastBmfResults._fuer === window._currentObjKey) return Promise.resolve();
-    return new Promise(function (ok) {
-      try { if (typeof window.openBMFModal === 'function') window.openBMFModal(); } catch (e) {}
-      setTimeout(function () {
-        try { if (typeof window.runBmf === 'function') window.runBmf(); } catch (e) {}
-        var t0 = Date.now();
-        (function warte() {
-          if (window._lastBmfResults || Date.now() - t0 > 15000) { try { window.closeBMFModal && window.closeBMFModal(); } catch (e) {} if (window._lastBmfResults) window._lastBmfResults._fuer = window._currentObjKey; return ok(); }
-          setTimeout(warte, 400);
-        })();
-      }, 3500);
+    var fertig = window.DpBmfAusgabe ? window.DpBmfAusgabe.bereitstellen() : Promise.resolve();
+    return fertig.then(function () {
+      /* Schritt 5 rechnet Auswahl, Begründung und Vertragstext - auch wenn das Fenster nie offen war */
+      try { if (window.DpBmfBodenabschlag) { window.DpBmfBodenabschlag.einhaengen(); window.DpBmfBodenabschlag.rechnen(); } } catch (e) {}
     });
   }
   function kaufpreisaufteilung() {
@@ -634,28 +629,61 @@
       var c = zz[0], info = zz[1]; c.zeile = o.adresse;
       var r = window._lastBmfResults || {}, w = function (k) { return r[k] && typeof r[k] === 'object' ? r[k].value : r[k]; };
       var z = (window._dpKpaZahlen && _dpKpaZahlen()) || {};
+      /* v3184 · Marcel 05.11.2026: die gewählte Stufe (amtlich, konservativ, optimiert oder Jacoby) gilt -
+         bis v3183 druckte das neue PDF nur die amtliche Zahl, Auswahl, Begründung und Vertragstext fehlten. */
+      var T = window._dpKpaTexte || null;
+      var abw = !!(T && T.wahl && T.wahl !== 'amtlich' && isFinite(T.gebPct));
+      var gebPctG = abw ? T.gebPct : Number(w('gebaeudeanteil_prozent'));
       var S = [];
       S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: 'Kaufpreisaufteilung nach BMF-Arbeitshilfe', titel: o.adresse, unter: o.art + (o.bj ? ' · Baujahr ' + B.jahr(o.bj) : ''),
-        wertLabel: 'Gebäudeanteil', wert: B.pct(w('gebaeudeanteil_prozent'), 2), wertNeben: 'Grund und Boden ' + B.eur(w('kaufpreisanteil_grund')) + '<br>Gebäude ' + B.eur(w('kaufpreisanteil_gebaeude')),
-        meta: [['Kaufpreis', B.eur(z.kp)], ['Stand', c.stand], ['Grundlage', 'BMF-Arbeitshilfe']] }));
+        wertLabel: 'Gebäudeanteil', wert: B.pct(gebPctG, 2),
+        wertNeben: abw ? (B.esc(T.name) + '<br>amtlich ' + B.pct(w('gebaeudeanteil_prozent'), 2)) : ('Grund und Boden ' + B.eur(w('kaufpreisanteil_grund')) + '<br>Gebäude ' + B.eur(w('kaufpreisanteil_gebaeude'))),
+        meta: [['Kaufpreis', B.eur(z.kp)], ['Stand', c.stand], ['Grundlage', abw ? 'BMF-Arbeitshilfe · ' + (T.wahl === 'jacoby' ? 'Jacoby' : 'Bodenabschlag') : 'BMF-Arbeitshilfe']] }));
       S.push(B.seite(c, 'Herleitung', B.abschnitt('Abschnitt 1', 'Herleitung nach der Arbeitshilfe', 'Sach- und Ertragswert nach der Arbeitshilfe des Bundesministeriums der Finanzen; maßgeblich ist der höhere Bezug je Objektart.')
         + B.liste([['Bodenwert', B.eur(w('bodenwert'))], ['Vorläufiger Sachwert', B.eur(w('sachwert_vorlaeufig'))], ['Marktangepasster Sachwert', B.eur(w('sachwert_marktangepasst'))],
           ['Vorläufiger Ertragswert', B.eur(w('ertragswert'))], ['Maßgebender Verkehrswert', B.eur(w('massgebender_verkehrswert')), { art: 'summe' }],
           ['Grund und Boden (Einzelwert)', B.eur(w('grund_boden_wert')), { art: 'ein' }], ['Gebäude (Einzelwert)', B.eur(w('gebaeude_wert')), { art: 'ein' }],
           ['Gebäudeanteil', B.pct(w('gebaeudeanteil_prozent'), 2), { art: 'ende' }]])
         /* v3179b · kaufpreisanteil_* der BMF-Rechnung stehen auf den ANSCHAFFUNGSKOSTEN (Kaufpreis Immobilie +
-           Erwerbsnebenkosten), nicht auf dem Kaufpreis - erster Entwurf nannte sie „Anteile des Kaufpreises“
-           (Westerfeldstr.: 489.828 + 122.763 = 612.591 € gegen 538.000 € Kaufpreis). */
+           Erwerbsnebenkosten), nicht auf dem Kaufpreis. */
         + (function () {
           var akG = Number(w('kaufpreisanteil_grund')) || 0, akB = Number(w('kaufpreisanteil_gebaeude')) || 0, ak = akG + akB;
           var pct = Number(w('gebaeudeanteil_prozent')) || 0, kpI = Number(z.kpImmo) || 0;
           var vGeb = kpI * pct / 100, vBod = kpI - vGeb;
-          return '<h3>Aufteilung der Anschaffungskosten</h3>' + B.liste([['Kaufpreis', B.eur(z.kp)], ['davon Inventar / Möblierung', B.eur(z.inventar), { art: 'ein' }], ['Kaufpreis Immobilie', B.eur(kpI), { art: 'summe' }],
+          return '<h3>Aufteilung der Anschaffungskosten (amtlich)</h3>' + B.liste([['Kaufpreis', B.eur(z.kp)], ['davon Inventar / Möblierung', B.eur(z.inventar), { art: 'ein' }], ['Kaufpreis Immobilie', B.eur(kpI), { art: 'summe' }],
             ['Erwerbsnebenkosten (anteilig)', B.eur(ak - kpI)], ['Anschaffungskosten', B.eur(ak), { art: 'summe' }],
             ['Anteil Grund und Boden (' + B.zahl(100 - pct, 2) + ' %)', B.eur(akG), { art: 'ein' }], ['Anteil Gebäude (' + B.zahl(pct, 2) + ' %) · AfA-Bemessungsgrundlage', B.eur(akB), { art: 'ende' }]])
-            + '<h3>Aufteilung des Kaufpreises für den Kaufvertrag</h3>' + B.liste([['Grund und Boden', B.eur(vBod)], ['Gebäude', B.eur(vGeb)], ['Kaufpreis Immobilie', B.eur(kpI), { art: 'ende' }]])
-            + '<div class="hinweis">Formulierungsvorschlag: „Vom Kaufpreis entfallen ' + B.eur(vGeb) + ' auf das Gebäude und ' + B.eur(vBod) + ' auf Grund und Boden' + (z.inventar ? '; ' + B.eur(z.inventar) + ' entfallen auf mitverkauftes Inventar' : '') + '.“ Die Aufteilung folgt der Arbeitshilfe des Bundesministeriums der Finanzen; keine Steuerberatung.</div>';
+            + (abw ? '' : '<h3>Aufteilung des Kaufpreises für den Kaufvertrag</h3>' + B.liste([['Grund und Boden', B.eur(vBod)], ['Gebäude', B.eur(vGeb)], ['Kaufpreis Immobilie', B.eur(kpI), { art: 'ende' }]])
+              + '<div class="hinweis">Formulierungsvorschlag: „Vom Kaufpreis entfallen ' + B.eur(vGeb) + ' auf das Gebäude und ' + B.eur(vBod) + ' auf Grund und Boden' + (z.inventar ? '; ' + B.eur(z.inventar) + ' entfallen auf mitverkauftes Inventar' : '') + '." Die Aufteilung folgt der Arbeitshilfe des Bundesministeriums der Finanzen; keine Steuerberatung.</div>');
         })()));
+      if (abw) {
+        var d = function (a, b) { var x = b - a; return Math.abs(x) < 0.5 ? '' : (x > 0 ? '+ ' : '− ') + B.eur(Math.abs(x)); };
+        var basisAlt = T.gebAmtlich + (T.basis - T.geb) * (T.gebPctAmtlich / (T.gebPct || 1));
+        S.push(B.seite(c, 'Gewählte Aufteilung', B.abschnitt('Abschnitt 2', 'Gewählte Aufteilung', T.name + ' – neben dem Ergebnis der Arbeitshilfe, die unverändert bleibt.')
+          + '<table><thead><tr><th>Position</th><th class="r">Arbeitshilfe</th><th class="r">Gewählt</th><th class="r">Unterschied</th></tr></thead><tbody>'
+          + [['Kaufpreis Immobilie (ohne Inventar)', T.immoKp, T.immoKp], ['davon Grund und Boden', T.bodenAmtlich, T.boden], ['davon Gebäude', T.gebAmtlich, T.geb]].map(function (x) {
+            return '<tr><td>' + B.esc(x[0]) + '</td><td class="r num">' + B.eur(x[1]) + '</td><td class="r num">' + B.eur(x[2]) + '</td><td class="r num">' + d(x[1], x[2]) + '</td></tr>';
+          }).join('')
+          + '<tr class="summe"><td>Gebäudeanteil</td><td class="r num">' + B.pct(T.gebPctAmtlich, 2) + '</td><td class="r num">' + B.pct(T.gebPct, 2) + '</td><td class="r num">+ ' + B.zahl(T.gebPct - T.gebPctAmtlich, 2) + ' Pkt.</td></tr>'
+          + '<tr><td>AfA-Bemessungsgrundlage Gebäude (mit anteiligen Nebenkosten)</td><td class="r num">' + B.eur(basisAlt) + '</td><td class="r num">' + B.eur(T.basis) + '</td><td class="r num">' + d(basisAlt, T.basis) + '</td></tr>'
+          + '<tr class="ende"><td>AfA je Jahr bei ' + B.pct(T.satz, 2) + '</td><td class="r num">' + B.eur(basisAlt * T.satz / 100) + '</td><td class="r num">' + B.eur(T.afa) + '</td><td class="r num">' + d(basisAlt * T.satz / 100, T.afa) + '</td></tr>'
+          + '</tbody></table>'
+          + (T.grund ? '<h3>Begründung</h3><p>' + B.esc(T.grund) + '</p>' : '<div class="hinweis" style="border-left-color:var(--rot)">Für die Abweichung von der Arbeitshilfe ist noch keine Begründung eingetragen. Ohne sie kann das Finanzamt die Aufteilung der Arbeitshilfe ansetzen.</div>')
+          + (T.rndVon ? (function () {
+              var von = Math.round(T.rndVon), bis = Math.round(T.rndBis || T.rndVon), jj = [];
+              for (var n = Math.min(von, bis); n <= Math.max(von, bis) && jj.length < 12; n++) jj.push(n);
+              return '<h3>AfA bei nachgewiesener Restnutzungsdauer (§ 7 Abs. 4 Satz 2 EStG)</h3><table><thead><tr><th>Nutzungsdauer</th><th class="r">AfA-Satz</th><th class="r">AfA je Jahr</th></tr></thead><tbody>'
+                + jj.map(function (n, i) { return '<tr' + (i === jj.length - 1 ? ' class="ende"' : '') + '><td>' + n + ' Jahre</td><td class="r num">' + B.pct(100 / n, 2) + '</td><td class="r num">' + B.eur(T.basis / n) + '</td></tr>'; }).join('')
+                + '</tbody></table><div class="hinweis">Eine kürzere als die gesetzliche Nutzungsdauer setzt einen Nachweis voraus, in der Regel ein Gutachten zur Restnutzungsdauer.</div>';
+            })() : '')));
+      }
+      if (T && T.klausel) {
+        S.push(B.seite(c, 'Vertragstext und Begründung', B.abschnitt('Abschnitt ' + (abw ? 3 : 2), 'Text für den Kaufvertrag', 'Wortlaut für die Urkunde; die Begründung darunter ist für Rückfragen des Finanzamts.')
+          + '<div class="zitat" style="white-space:pre-line">' + B.esc(T.klausel.trim()) + '</div>'
+          + (T.hinweis ? '<p class="det">' + B.esc(T.hinweis) + '</p>' : '')
+          + (T.zusatz ? '<h3>Ergänzende Begründung</h3><div class="fliess" style="white-space:pre-line">' + B.esc(T.zusatz.replace(/^Ergänzende Begründung[^\n]*\n+/, '')) + '</div>' : '')
+          + '<div class="hinweis">Keine Steuerberatung. Die Anerkennung der Aufteilung hängt von ihrer wirtschaftlichen Plausibilität und der Prüfung durch das Finanzamt ab.</div>'));
+      }
       return B.dokument('Kaufpreisaufteilung · ' + o.adresse, S);
     });
   }
@@ -817,10 +845,67 @@
     });
   }
 
+  /* ── Selbstauskunft (v3184, Demo) ───────────────────────────────────
+     Marcel 05.11.2026: „ein PDF … wo wir eine Selbstauskunft, die könnten wir ja direkt ausfüllen."
+     Aufbau wie die Selbstauskunft der Banken für eine Immobilienfinanzierung: Person, Beschäftigung,
+     Einnahmen, Ausgaben, Vermögen, Verbindlichkeiten, Erklärung. Vorbefüllt wird nur, was DealPilot
+     belegt weiß: der Immobilienbestand (gewonnene Objekte), seine Darlehen mit Restschuld und Rate,
+     die Mieteinnahmen und das Vorhaben des offenen Objekts. Alles Persönliche bleibt ein leeres Feld -
+     DealPilot führt keine Gehalts-, Ausweis- oder Familiendaten und erfindet keine. */
+  function selbstauskunft(opt) {
+    var B = D();
+    return Promise.all([basis('Selbstauskunft'), getAllObjectsData()]).then(function (z) {
+      var c = z[0], objs = nachIds(z[1], opt, true), m = c.marke || {};
+      var rows = (typeof _buildBankExportRows === 'function' ? _buildBankExportRows(objs) : []) || [];
+      var zahl = function (v) { var n = parseFloat(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
+      c.zeile = 'Entwurf zum Ergänzen · Stand ' + c.stand;
+      var leer = '<td style="border-bottom:1px solid var(--line);height:8mm"></td>';
+      var feldTab = function (titel, felder) {
+        return '<h3>' + titel + '</h3><table><thead><tr><th style="width:42%"></th><th>Antragsteller 1</th><th>Antragsteller 2</th></tr></thead><tbody>'
+          + felder.map(function (f) { return '<tr><td>' + B.esc(f[0]) + '</td>' + (f[1] != null ? '<td class="num">' + B.esc(f[1]) + '</td>' : leer) + leer + '</tr>'; }).join('') + '</tbody></table>';
+      };
+      var adr = [m.address, ((m.plz || '') + ' ' + (m.city || '')).trim()].filter(Boolean).join(', ');
+      var S = [];
+      S.push(B.seite(c, 'Person und Einkommen', B.abschnitt('Selbstauskunft', 'Angaben zur Person', 'Für die Finanzierungsanfrage – bitte vollständig ausfüllen, Nachweise beifügen und unterschreiben.')
+        + '<div class="hinweis">Entwurf aus DealPilot. Vorausgefüllt ist nur, was im Konto belegt ist (Immobilienbestand, Darlehen, Mieten). Alle übrigen Angaben trägst du selbst ein; die Bank verlangt dazu Nachweise.</div>'
+        + feldTab('Person', [['Name, Vorname', m.name || null], ['Geburtsname'], ['Geburtsdatum, Geburtsort'], ['Staatsangehörigkeit'], ['Familienstand, Güterstand'], ['Anschrift', adr || null], ['Wohnhaft dort seit'], ['Telefon, E-Mail', [m.phone, m.email].filter(Boolean).join(' · ') || null], ['Kinder (Anzahl, Alter)'], ['Steuer-ID']])
+        + feldTab('Beschäftigung', [['Beruf'], ['Arbeitgeber'], ['Beschäftigt seit'], ['Befristet / Probezeit'], ['Selbstständig seit (falls zutreffend)']])));
+      var mieteM = objs.reduce(function (a, o) { return a + zahl(o.data && o.data.nkm); }, 0);
+      var rateM = rows.reduce(function (a, r) { return a + (Number(r.kapitaldienst) || 0); }, 0);
+      var restS = rows.reduce(function (a, r) { return a + (Number(r.akt_restschuld) || 0); }, 0);
+      var kpS = objs.reduce(function (a, o) { return a + (Number(o.kpis && o.kpis.kp) || 0); }, 0);
+      S.push(B.seite(c, 'Einnahmen und Ausgaben', B.abschnitt('Selbstauskunft', 'Monatliche Einnahmen und Ausgaben', 'Beträge je Monat in Euro.')
+        + feldTab('Einnahmen', [['Nettoeinkommen aus Beschäftigung'], ['Einkünfte aus Selbstständigkeit (netto)'], ['Mieteinnahmen kalt (Bestand)', mieteM ? B.eur(mieteM) : null], ['Kindergeld'], ['Sonstige Einnahmen']])
+        + feldTab('Ausgaben', [['Miete der eigenen Wohnung'], ['Lebenshaltung'], ['Versicherungen, Altersvorsorge'], ['Raten Immobiliendarlehen (Bestand)', rateM ? B.eur(rateM) : null], ['Raten sonstiger Kredite, Leasing'], ['Unterhaltszahlungen'], ['Sonstige Ausgaben']])));
+      var immo = '<h3>Immobilienvermögen</h3>' + (objs.length
+        ? '<table class="dicht"><thead><tr><th>Objekt</th><th class="r">Wohnfläche</th><th class="r">Kaufpreis</th><th class="r">Verkehrswert heute</th><th class="r">Kaltmiete / Monat</th></tr></thead><tbody>'
+          + objs.map(function (o) { var d = o.data || {};
+              return '<tr><td>' + B.esc([d.str, d.hnr].filter(Boolean).join(' ')) + '<div class="det">' + B.esc([d.plz, d.ort].filter(Boolean).join(' ')) + '</div></td><td class="r num">' + B.zahl(zahl(d.wfl), 0) + ' m²</td><td class="r num">' + B.eur(o.kpis && o.kpis.kp) + '</td>' + leer + '<td class="r num">' + B.eur(zahl(d.nkm)) + '</td></tr>'; }).join('')
+          + '<tr class="ende"><td>Summe</td><td></td><td class="r num">' + B.eur(kpS) + '</td><td></td><td class="r num">' + B.eur(mieteM) + '</td></tr></tbody></table>'
+        : '<p class="det">Kein Objekt im Bestand (gewonnene Deals).</p>');
+      var dar = '<h3>Verbindlichkeiten aus Immobiliendarlehen</h3>' + (rows.length
+        ? '<table class="dicht"><thead><tr><th>Objekt</th><th>Bank</th><th class="r">Ursprungsbetrag</th><th class="r">Restschuld heute</th><th class="r">Rate / Monat</th><th>Zinsbindung bis</th></tr></thead><tbody>'
+          + rows.map(function (r) { return '<tr><td>' + B.esc([r.strasse, r.hnr].filter(function (x) { return x && x !== '–'; }).join(' ')) + '</td><td>' + B.esc(r.bank || '') + '</td><td class="r num">' + B.eur(r.darl_summe) + '</td><td class="r num">' + B.eur(r.akt_restschuld) + '</td><td class="r num">' + B.eur(r.kapitaldienst) + '</td><td class="num">' + B.esc(r.laufzeit || '') + '</td></tr>'; }).join('')
+          + '<tr class="ende"><td>Summe</td><td></td><td></td><td class="r num">' + B.eur(restS) + '</td><td class="r num">' + B.eur(rateM) + '</td><td></td></tr></tbody></table>'
+        : '<p class="det">Keine Darlehen im Bestand erfasst.</p>');
+      S.push(B.seite(c, 'Vermögen und Verbindlichkeiten', B.abschnitt('Selbstauskunft', 'Vermögen und Verbindlichkeiten', 'Bestand aus DealPilot; Verkehrswerte und übriges Vermögen bitte selbst eintragen.')
+        + immo + feldTab('Weiteres Vermögen', [['Bankguthaben, Tagesgeld'], ['Wertpapiere, Depots'], ['Bausparverträge (Guthaben)'], ['Lebens-/Rentenversicherungen (Rückkaufwert)'], ['Sonstiges Vermögen']])
+        + dar + feldTab('Weitere Verbindlichkeiten', [['Ratenkredite (Restschuld)'], ['Dispositionskredit'], ['Bürgschaften'], ['Sonstige Verbindlichkeiten']])));
+      /* Das Vorhaben: das gerade offene Objekt, sofern es nicht schon zum Bestand gehört */
+      var key = window._currentObjKey, imBestand = objs.some(function (o) { return o.id === key; });
+      var kp = zahlAus('kp'), dl = darlehen().reduce(function (a, x) { return a + (x.betrag || 0); }, 0);
+      var vorhaben = (!imBestand && key && kp) ? '<h3>Finanzierungsvorhaben</h3>' + B.liste([['Objekt', objektKopf().adresse], ['Kaufpreis', B.eur(kp)], ['Darlehenswunsch', dl ? B.eur(dl) : '–', { art: 'summe' }]]) : '';
+      S.push(B.seite(c, 'Erklärung', B.abschnitt('Selbstauskunft', 'Vorhaben und Erklärung') + vorhaben
+        + '<h3>Erklärung</h3><p>Ich/Wir versichere(n), dass die vorstehenden Angaben vollständig und richtig sind. Mir/Uns ist bekannt, dass unrichtige oder unvollständige Angaben zur Ablehnung oder Kündigung einer Finanzierung führen können. Gegen mich/uns laufen keine Zwangsvollstreckungsmaßnahmen, eine Vermögensauskunft wurde nicht abgegeben.</p>'
+        + '<table style="margin-top:14mm"><tbody><tr><td style="width:30%;border-top:1px solid var(--ink)">Ort, Datum</td><td style="width:5%"></td><td style="border-top:1px solid var(--ink)">Unterschrift Antragsteller 1</td><td style="width:5%"></td><td style="border-top:1px solid var(--ink)">Unterschrift Antragsteller 2</td></tr></tbody></table>'));
+      return B.dokument('Selbstauskunft · ' + (m.name || m.company || ''), S);
+    });
+  }
+
   /* ── Einstieg ────────────────────────────────────────────────────── */
   var TYPEN = {
     investment: function () { return investment('voll'); }, bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
-    kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport
+    kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft
   };
   function dokument(typ, opt) {
     if (!TYPEN[typ]) return Promise.reject(new Error('Unbekanntes Dokument: ' + typ));
@@ -828,7 +913,7 @@
     return TYPEN[typ](opt || {});
   }
   window.DpDokumente = {
-    VERSION: 'v3181', TYPEN: Object.keys(TYPEN), dokument: dokument,
+    VERSION: 'v3184', TYPEN: Object.keys(TYPEN), dokument: dokument,
     oeffnen: function (typ, opt) { return dokument(typ, opt).then(function (h) { D().vorschau(h, typ); }); }
   };
 })();

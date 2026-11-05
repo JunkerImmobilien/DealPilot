@@ -107,10 +107,20 @@
          > die der Nutzer sich stellt und die niemand beantwortet.
 
          Eine Zeile also — welche Fassung, entscheidet der Dialog. */
-      docRow('invest', 'Investment-PDF', 'Business-Case, bank-fertig: Kaufpreis, Finanzierung, Cashflow, DSCR/LTV, Stress-Test. Beim Klick wird gefragt, welche Fassung: Bankfassung, hell oder Obsidian.', true) +
+      /* v3184 · Marcel 05.11.2026: „egal wo ich draufklicke, ob auf Fassung oder PDF, kommt dasselbe …
+         Eigentlich brauchen wir ja nur … eine vollumfängliche Version und das Investment PDF als
+         Kurzfassung." Zwei benannte Knöpfe statt Dialog. Darunter die Steuer-Ausgaben des BMF-Rechners,
+         die hier bisher fehlten - jede nur aktiv, wenn sie gezogen werden kann. */
+      grp('Investment &amp; Bank') +
+      investRow() +
+      docRow('track', 'Track Record', 'Auswahl-Ansicht öffnen: gewonnene Deals filtern, Einzel- oder Sammel-PDF erzeugen.', false) +
+      docRow('selbst', 'Selbstauskunft <span class="dab-doc-badge" style="background:#EDE8DC;color:#6A6360">Demo</span>', 'Für die Bank: Bestand, Darlehen und Mieten vorausgefüllt, Persönliches zum Ausfüllen.', false) +
+      grp('Steuer &amp; Finanzamt', '<button class="dab-doc-btn dab-doc-btn-neb" onclick="DealActionBoarding.exportDoc(\'bmf_rechner\')">BMF-Rechner öffnen</button>') +
       faRow() +
-      kpaRow() +
-      docRow('track', 'Track Record', 'Auswahl-Ansicht \u00f6ffnen: gewonnene Deals filtern, Einzel- oder Sammel-PDF erzeugen.', false);
+      '<div id="dab-st-fehlt" class="dab-st-fehlt" style="display:none"></div>' +
+      steuerRow('kpa', 'Kaufpreisaufteilung', 'Herleitung, gewählte Aufteilung, Vertragstext — Anlage für Finanzamt und Berater.', 'PDF') +
+      steuerRow('bmf_ah', 'BMF-Arbeitshilfe', 'Das amtliche Formular des BMF, mit den Werten des Objekts ausgefüllt.', 'PDF') +
+      steuerRow('bmf_xlsx', 'BMF-Original', 'Die Arbeitshilfe (Fassung Juni 2023) als Excel-Datei.', 'XLSX');
 
     return '' +
       '<div class="dab-cockpit" id="dab-cockpit">' +
@@ -187,25 +197,42 @@
       ? '<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'
       : which === 'bmf'
         ? '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/>'
-        : '<path d="M12 2l2.5 5 5.5.8-4 3.9 1 5.5L12 15l-5 2.9 1-5.5-4-3.9 5.5-.8z"/>';
-    /* v1733 · DER WEG ZURÜCK, DEN DER DIALOG VERSPRACH UND NICHT HATTE.
-       Gemessen: `DealPilotPdfWahl.vergessen()` hat ausserhalb seiner eigenen
-       Datei NULL Aufrufer — der Dialog schreibt aber unter das Kästchen
-       „Diese Wahl merken" den Zusatz „(änderbar in den Einstellungen)".
-       Wer einmal anhakt, sieht den Dialog nie wieder und kommt an die
-       anderen beiden Fassungen nicht mehr heran.
-
-       > Eine Sackgasse, die sich selbst als änderbar ausgibt, ist schlimmer
-       > als eine, die ehrlich ist: man sucht den Ausgang, den es gibt.
-
-       Der Knopf steht am Ort der Handlung, nicht in den Einstellungen —
-       dort hätte ihn niemand gesucht, der gerade exportieren will. */
-    var zweit = (which === 'invest')
-      ? '<button class="dab-doc-btn dab-doc-btn-neb" onclick="DealActionBoarding.fassungWaehlen()" title="Welche Fassung? Bankfassung, hell oder Obsidian">Fassung</button>'
-      : '';
+        : which === 'selbst'
+          ? '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/>'
+          : '<path d="M12 2l2.5 5 5.5.8-4 3.9 1 5.5L12 15l-5 2.9 1-5.5-4-3.9 5.5-.8z"/>';
     return '<div class="dab-doc-row"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ic + '</svg></div>' +
       '<div class="dab-doc-x"><div class="dab-doc-n">' + name + badge + '</div><div class="dab-doc-d">' + desc + '</div></div>' +
-      '<div class="dab-doc-act">' + zweit + '<button class="dab-doc-btn' + (gold ? ' gold' : '') + '" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + 'PDF</button></div></div>';
+      '<div class="dab-doc-act"><button class="dab-doc-btn' + (gold ? ' gold' : '') + '" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + 'PDF</button></div></div>';
+  }
+  /* v3184 · Gruppenkopf der Dokumentliste */
+  function grp(t, rechts) {
+    return '<div class="dab-doc-grp"><span>' + t + '</span>' + (rechts || '') + '</div>';
+  }
+  /* v3184 · das Investment-PDF: zwei Fassungen, zwei Knöpfe - kein Dialog dazwischen */
+  function investRow() {
+    return '<div class="dab-doc-row"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>' +
+      '<div class="dab-doc-x"><div class="dab-doc-n">Investment-PDF <span class="dab-doc-badge">Empfohlen</span></div>' +
+      '<div class="dab-doc-d">Vollständig: alle Kapitel, bank-fertig (Finanzierung, Cashflow, DSCR/LTV, Wert &amp; Zielbild, Stress-Matrix). Kurzfassung: das Wichtigste auf fünf bis sechs Seiten.</div></div>' +
+      '<div class="dab-doc-act"><button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'invest_kurz\')">' + ICO.dl + 'Kurzfassung</button>' +
+      '<button class="dab-doc-btn gold" onclick="DealActionBoarding.exportDoc(\'invest_voll\')">' + ICO.dl + 'Vollständig</button></div></div>';
+  }
+  /* v3184 · eine Ausgabe des BMF-Rechners; aktiv erst, wenn die Werte reichen (steuerStand) */
+  function steuerRow(which, name, desc, knopf) {
+    return '<div class="dab-doc-row" data-steuer="' + which + '"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>' +
+      '<div class="dab-doc-x"><div class="dab-doc-n">' + name + '</div><div class="dab-doc-d">' + desc + '</div></div>' +
+      '<div class="dab-doc-act"><button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + knopf + '</button></div></div>';
+  }
+  /* v3184 · Marcel: „erst dann immer anzeigen, wenn die wirklich gezogen werden können. Ansonsten kann man
+     sagen: fehlen noch Werte." Gelesen an denselben Pflichtfeldern wie bmf-ausgabe.js. */
+  function steuerStand() {
+    var A = window.DpBmfAusgabe; if (!A) return;
+    var p = A.pruefen(), box = document.getElementById('dab-st-fehlt');
+    document.querySelectorAll('#s8 [data-steuer] .dab-doc-btn').forEach(function (b) { b.disabled = !p.ok; b.title = p.ok ? '' : 'Fehlen noch Werte'; });
+    if (!box) return;
+    if (p.ok) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    box.innerHTML = !p.plan ? 'Die BMF-Ausgaben sind ab dem Investor-Plan verfügbar.'
+      : 'Fehlen noch Werte: <b>' + p.fehlt.join(', ') + '</b> — im Objekt eintragen, dann lassen sich die BMF-Ausgaben ziehen.';
   }
 
   /* v1733 · immer den Dialog zeigen, auch wenn eine Wahl gemerkt ist */
@@ -224,49 +251,8 @@
       '<select id="dab-fa-year" class="dab-fa-year" onfocus="DealActionBoarding.fillFaYears()" title="Steuerjahr f\u00fcr das Finanzamt-PDF"></select>' +
       '<button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'bmf\')">' + ICO.dl + 'PDF</button></div></div>';
   }
-  /* ══ v1731 · DIE KAUFPREISAUFTEILUNG HAT ZWEI WEGE, NICHT EINEN ═══
-     Marcel: „wenn wir auf Kaufpreisaufteilung klicken, das ist nicht
-     richtig. Da müsste dann eher stehen einmal die BMF-Anlage, dass man
-     die Unterlagen laden kann, dann die Anschaffungskosten-PDF, da sind
-     ja mehrere hinterlegt."
-
-     Bisher lag hinter dem einen Knopf eine Verzweigung, die der Nutzer
-     nicht sieht: liegt ein Rechenergebnis vor, kommt das PDF - sonst
-     öffnet sich der Rechner mit dem Hinweis „erst berechnen lassen".
-     Derselbe Klick tat also zweierlei, und welches, entschied ein
-     Zustand, den niemand angezeigt bekommt.
-
-     > Ein Knopf, der je nach unsichtbarem Zustand etwas anderes tut,
-     > ist kein Knopf, sondern ein Würfel.
-
-     GEMESSEN, was es an dieser Stelle wirklich gibt (nicht geraten):
-
-       window.exportBmfPdf()               die fertige BMF-Anlage
-       window.openBMFModal()               der Rechner dahinter
-       DealPilotBelegImport.open('ak')     die Belege der Anschaffungs-
-                                           kosten, KI-gestützt, mehrere
-                                           je Lauf (bis 40)
-
-     Daraus werden zwei benannte Knöpfe statt einer Verzweigung. Der
-     Reihenfolge nach, wie man arbeitet: erst die Belege einlesen, dann
-     die Anlage ziehen. */
-  function kpaRow() {
-    return '<div class="dab-doc-row"><div class="dab-doc-icb">' +
-      '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" ' +
-      'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
-      '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/>' +
-      '</svg></div>' +
-      '<div class="dab-doc-x"><div class="dab-doc-n">Kaufpreisaufteilung (Finanzamt)</div>' +
-      '<div class="dab-doc-d">BMF-Anlage: Aufteilung Grund/Geb\u00e4ude, AfA-Bemessungsgrundlage ' +
-      '&amp; Verprobung der 3 Verfahren. Die Belege der Anschaffungskosten lassen sich ' +
-      'davor einlesen.</div></div>' +
-      '<div class="dab-doc-act" style="display:flex;gap:8px;align-items:center;flex-shrink:0">' +
-      '<button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'kpa_ak\')" ' +
-      'title="Belege f\u00fcr die Anschaffungskosten einlesen">Belege</button>' +
-      '<button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'kpa\')">' +
-      ICO.dl + 'BMF-Anlage</button></div></div>';
-  }
-
+  /* v3184 · kpaRow (Belege | BMF-Anlage) entfällt: Marcel 05.11.2026 „Belege muss raus. Wir sind hier nur bei
+     Dokumente und Exporte.“ Die Kaufpreisaufteilung steht jetzt mit Arbeitshilfe und XLSX unter „Steuer & Finanzamt“. */
   function fillFaYears() {
     var sel = document.getElementById('dab-fa-year');
     if (!sel) return;
@@ -367,6 +353,7 @@
     if (ck) ck.classList.toggle('ready', !(d.missing && d.missing.length));
     // Gates haengen am ReadyCheck -> mit aktualisieren
     try { refreshGates(); } catch (e) {}
+    try { steuerStand(); } catch (e) {}   /* v3184 */
   }
 
   /* ────────────────── Anforderungs-Gate ────────────────── */
@@ -786,6 +773,26 @@
   /* ────────────────── Exporte ────────────────── */
   function exportDoc(which) {
     try {
+      /* v3184 · zwei Fassungen ohne Dialog; im klassischen Design ist die vollständige das helle Investment-PDF */
+      if (which === 'invest_voll' || which === 'invest_kurz') {
+        var W = window.DealPilotPdfWahl;
+        if (!W || typeof W.starte !== 'function') { toast('Investment-PDF noch nicht geladen.'); return; }
+        var klass = W.vorgabe && W.vorgabe().design === 'klassisch';
+        return W.starte(which === 'invest_kurz' ? 'kurz' : (klass ? 'hell' : 'bank'));
+      }
+      if (which === 'selbst') {
+        if (window.DpDokWeiche && typeof DpDokWeiche.selbstauskunft === 'function') return DpDokWeiche.selbstauskunft();
+        toast('Selbstauskunft nicht geladen.'); return;
+      }
+      if (which === 'kpa' || which === 'bmf_ah' || which === 'bmf_xlsx') {
+        var A = window.DpBmfAusgabe;
+        if (!A) { toast('BMF-Ausgabe nicht geladen.'); return; }
+        return which === 'kpa' ? A.kaufpreisaufteilung() : which === 'bmf_ah' ? A.arbeitshilfe() : A.xlsx();
+      }
+      if (which === 'bmf_rechner') {
+        if (typeof window.openBMFModal === 'function') return window.openBMFModal();
+        toast('BMF-Rechner nicht geladen.'); return;
+      }
       if (which === 'invest' && typeof window.exportPDF === 'function') return window.exportPDF();
       if (which === 'invest_bank') {   /* v1436 */
         if (typeof window.exportPDFBank === 'function') return window.exportPDFBank();
@@ -1282,6 +1289,7 @@
     railScroll: railScroll,
     toggleSmart: toggleSmart,
     exportDoc: exportDoc,
+    steuerStand: steuerStand,   /* v3184 */
     fassungWaehlen: fassungWaehlen,   /* v1733 */
     fillFaYears: fillFaYears,
     gutachtenModal: gutachtenModal,
@@ -1424,6 +1432,11 @@
        seltener gebraucht wird - aber sichtbar, weil er sonst denselben
        Zweck verfehlt wie der Satz „änderbar in den Einstellungen". */
     '#s8 .dab-doc-act{display:flex;align-items:center;gap:8px;flex-shrink:0}',
+    /* v3184 · Gruppen und gesperrte Steuer-Ausgaben */
+    '#s8 .dab-doc-grp{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 4px 2px;font:600 10.5px/1 var(--dab-mono,\'JetBrains Mono\',monospace);letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
+    '#s8 .dab-doc-grp:first-child{margin-top:6px}#s8 .dab-doc-grp .dab-doc-btn{text-transform:none;letter-spacing:0;font-size:12px;padding:6px 12px}',
+    '#s8 .dab-doc-btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;border-color:rgba(42,39,39,.1);color:#2A2727}',
+    '#s8 .dab-st-fehlt{margin:10px 4px 0;padding:9px 12px;border-radius:9px;background:#FBF6E9;border:1px solid #EAD9B0;font-size:12.5px;color:#3a352b;line-height:1.5}',
     '#s8 .dab-doc-btn-neb{background:transparent;border-color:rgba(42,39,39,.16);color:#6A6360;font-weight:600;padding:9px 12px}',
     '#s8 .dab-doc-btn-neb:hover{background:#fff;border-color:var(--dab-gold);color:var(--dab-gold3)}',
     '@media(max-width:560px){#s8 .dab-doc-row{flex-wrap:wrap}#s8 .dab-doc-act{gap:6px}#s8 .dab-doc-btn-neb{padding:9px 10px}}',

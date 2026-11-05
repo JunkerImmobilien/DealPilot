@@ -461,13 +461,17 @@
         host.id = 'bmfJacobyZeile';
         host.style.cssText = 'margin-top:8px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);'
           + 'border-radius:8px;font-size:12.5px;line-height:1.55;color:#2A2727;background:#FFFFFF';
-        if (elHint && elHint.parentNode) elHint.parentNode.insertBefore(host, elHint.nextSibling);
+        /* v3184 · Marcel 05.11.2026: die Jacoby-Zeile „gehört da gar nicht hin" (Reiter 2) - sie steht jetzt
+           im Vergleich (Reiter 3), neben den Varianten, gegen die sie antritt. */
+        var pAfa = document.getElementById('p-afa');
+        if (pAfa) pAfa.appendChild(host); else if (elHint && elHint.parentNode) elHint.parentNode.insertBefore(host, elHint.nextSibling);
       }
       /* v1859 · Marcel: „Kaufpreisaufteilung als PDF … BMF-Arbeitshilfe als
          PDF … die Originalvorlage als Excel" — der Ausgabe-Block hängt hier
          unter dem Ergebnis, nicht nur im alten, von dieser Schicht
          verdeckten Render (gemessen: #bmf-ausgaben fehlte in Reiter 2). */
-      try { if (window.bmfAusgabenZeigen && host.parentNode) bmfAusgabenZeigen(host.parentNode); } catch (e) {}
+      /* v3184 · die Ausgabe-Leiste steht nicht mehr in Reiter 2, sondern als Karten in Schritt 5 (bmf-ausgabe.js) */
+      try { var altA = document.getElementById('bmf-ausgaben'); if (altA) altA.remove(); } catch (e) {}
       if (!jz) { host.style.display = 'none'; return; }
       host.style.display = '';
       var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
@@ -518,6 +522,7 @@
     if (!v292Container) {
       // Alte Inhalte ausblenden
       [].forEach.call(paneAfa.children, function(child){
+        if (child.id === 'bmfJacobyZeile') return;   /* v3184 */
         child.style.display = 'none';
       });
       v292Container = document.createElement('div');
@@ -532,18 +537,20 @@
     var p11 = r.phase11_risiko;
 
     var ampelEmoji = { gruen: '🟢', gelb: '🟡', rot: '🔴' };
-    /* v1491: vier Spalten - amtlich plus drei Abweichungen. */
-    var variants = ['amtlich', 'konservativ', 'optimiert', 'aggressiv'];
+    /* v3184 · Marcel 05.11.2026: „erst mal die aggressive Version rausnehmen … die amtliche, die
+       konservative und optimierte Form mit dem Ertragswert nach Jacoby gegenüberstellen".
+       Drei Pipeline-Spalten plus Jacoby; Jacoby ausgegraut mit Grund, wo sie nicht trägt. */
+    var variants = ['amtlich', 'konservativ', 'optimiert'];
     var labels = {
-      amtlich:     { name: 'Amtlich',     sub: '× 1,00 · BMF-Arbeitshilfe' },
-      konservativ: { name: 'Konservativ', sub: '× 0,85 · Boden −15 %' },
-      optimiert:   { name: 'Optimiert',   sub: '× 0,80 · Boden −20 %' },
-      aggressiv:   { name: 'Aggressiv',   sub: '× 0,75 · Boden −25 %' }
+      amtlich:     { name: 'Amtlich',     sub: 'BMF-Arbeitshilfe' },
+      konservativ: { name: 'Konservativ', sub: 'Boden −15 %' },
+      optimiert:   { name: 'Optimiert',   sub: 'Boden −20 %' }
     };
+    var J = _jacobySpalte(r);
 
     var html = '<div class="v292-pane3-header">' +
-      '<div class="banner info"><strong>Die amtliche Aufteilung und drei Abweichungen davon — wählen Sie in Pane 4.</strong> ' +
-      'Alle Werte basieren auf der BMF-Berechnung (' + _fmtPct(r.phase4_bmf.gebaeudeanteil_prozent) + ' Gebäude per Ertragswertverfahren).</div>' +
+      '<div class="banner info"><strong>Amtlich, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby.</strong> ' +
+      'Gewählt wird in Schritt 4. Grundlage ist die BMF-Berechnung (' + _fmtPct(r.phase4_bmf.gebaeudeanteil_prozent) + ' Gebäude).</div>' +
       '</div>' +
       '<table class="v292-vergleich-tbl">' +
       '<thead><tr><th>Kennzahl</th>';
@@ -554,42 +561,69 @@
         ampelEmoji[risk.ampel] + ' ' + labels[name].name +
         '<div class="v292-th-sub">' + labels[name].sub + '</div></th>';
     });
+    html += J.ok
+      ? '<th class="v292-th-gelb">🟡 Jacoby<div class="v292-th-sub">umgekehrte Ertragswertmethode</div></th>'
+      : '<th style="color:#9A9384">Jacoby<div class="v292-th-sub">nicht anwendbar</div></th>';
     html += '</tr></thead><tbody>';
 
-    function _row(label, values, opts){
+    function _row(label, values, jw, opts){
       opts = opts || {};
       var cls = opts.bold ? 'v292-row-bold' : '';
       var s = '<tr class="' + cls + '"><td>' + label + '</td>';
       values.forEach(function(v){ s += '<td>' + v + '</td>'; });
+      s += J.ok ? '<td>' + jw + '</td>' : '<td style="color:#9A9384">' + (opts.grund ? '<small>' + J.grund + '</small>' : '—') + '</td>';
       s += '</tr>';
       return s;
     }
 
-    html += _row('Gebäude %', variants.map(function(n){ return _fmtPct(p5[n].gebaeude_pct); }));
-    html += _row('Boden %', variants.map(function(n){ return _fmtPct(p5[n].boden_pct); }));
-    html += _row('Gebäude im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].gebaeude_eur_vertrag); }));
-    html += _row('Boden im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].boden_eur_vertrag); }));
-    html += _row('Gebäude-AK (mit NK)', variants.map(function(n){ return _fmtEur(p8[n].gebaeude_ak); }), { bold: true });
-    html += _row('15-%-Grenze (max. Sanierung)', variants.map(function(n){ return _fmtEur(p9[n].max); }));
-    html += _row('AfA-Satz', variants.map(function(n){ return _fmtPct(p10[n].afa_satz_pct, 1); }));
-    html += _row('AfA Gebäude/Jahr', variants.map(function(n){ return _fmtEur(p10[n].afa_jahr); }));
-    html += _row('AfA Inventar/Jahr', variants.map(function(n){ return _fmtEur(p10[n].inventar_afa_jahr); }));
-    html += _row('Σ AfA pro Jahr', variants.map(function(n){ return _fmtEur(p10[n].afa_summe_jahr); }), { bold: true });
-    html += _row('Steuerersparnis/Jahr (~40 %)', variants.map(function(n){ return _fmtEur(p10[n].steuerersparnis_jahr); }));
+    html += _row('Gebäude %', variants.map(function(n){ return _fmtPct(p5[n].gebaeude_pct); }), J.ok && _fmtPct(J.geb), { grund: true });
+    html += _row('Boden %', variants.map(function(n){ return _fmtPct(p5[n].boden_pct); }), J.ok && _fmtPct(100 - J.geb));
+    html += _row('Gebäude im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].gebaeude_eur_vertrag); }), J.ok && _fmtEur(J.gebVertrag));
+    html += _row('Boden im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].boden_eur_vertrag); }), J.ok && _fmtEur(J.bodenVertrag));
+    html += _row('Gebäude-AK (mit NK)', variants.map(function(n){ return _fmtEur(p8[n].gebaeude_ak); }), J.ok && _fmtEur(J.gebAk), { bold: true });
+    html += _row('15-%-Grenze (max. Sanierung)', variants.map(function(n){ return _fmtEur(p9[n].max); }), J.ok && _fmtEur(J.gebAk * 0.15));
+    html += _row('AfA-Satz', variants.map(function(n){ return _fmtPct(p10[n].afa_satz_pct, 1); }), J.ok && _fmtPct(J.satz, 1));
+    html += _row('AfA Gebäude/Jahr', variants.map(function(n){ return _fmtEur(p10[n].afa_jahr); }), J.ok && _fmtEur(J.afa));
+    html += _row('AfA Inventar/Jahr', variants.map(function(n){ return _fmtEur(p10[n].inventar_afa_jahr); }), J.ok && _fmtEur(J.inv));
+    html += _row('Σ AfA pro Jahr', variants.map(function(n){ return _fmtEur(p10[n].afa_summe_jahr); }), J.ok && _fmtEur(J.afa + J.inv), { bold: true });
+    html += _row('Steuerersparnis/Jahr (~40 %)', variants.map(function(n){ return _fmtEur(p10[n].steuerersparnis_jahr); }), J.ok && _fmtEur(J.steuer));
 
-    // Risiko-Begründung
     html += '<tr class="v292-row-risiko"><td>Risiko-Begründung</td>';
     variants.forEach(function(name){
       var risk = p11[name];
       html += '<td class="v292-risk-cell"><b>Score ' + risk.score + '</b><br><small>' + risk.begruendungen.join('<br>') + '</small></td>';
     });
+    html += J.ok
+      ? '<td class="v292-risk-cell"><b>Herleitung nötig</b><br><small>Zulässig (BFH IX R 12/21), die Wahl muss sachlich begründet werden; Rechenweg unten.</small></td>'
+      : '<td class="v292-risk-cell" style="color:#9A9384"><small>Nur bei vermieteten Objekten, deren Wert nicht im Boden liegt.</small></td>';
     html += '</tr>';
 
     html += '</tbody></table>' +
-      '<p class="hint" style="margin-top:14px">Bitte beachten: <strong>Amtlich</strong> entspricht exakt dem BMF-Wert und ist FA-konform. ' +
-      '<strong>Aggressiv</strong> kann bei Prüfung beanstandet werden. Empfehlung in Pane 4 wählen.</p>';
+      '<p class="hint" style="margin-top:14px"><strong>Amtlich</strong> entspricht exakt der BMF-Arbeitshilfe. Jede Abweichung braucht eine Begründung – sie geht in Schritt 5 in den Text für Kaufvertrag und Berater.</p>';
 
     v292Container.innerHTML = html;
+    try { var jzH = document.getElementById('bmfJacobyZeile'); if (jzH) paneAfa.appendChild(jzH); } catch (e) {}
+  }
+
+  /* v3184 · Jacoby als vierte Spalte: Gebäude-AK über denselben Kern wie die Wahl-Tafel
+     (DpBmfWahlTafel.daten, mit Gegenprobe an „amtlich"), sonst verhältnisgleich zur Pipeline. */
+  function _jacobySpalte(r){
+    var j = r.phase4_bmf && r.phase4_bmf.jacoby, p5 = r.phase5_varianten, p8 = r.phase8_finale_ak, p10 = r.phase10_afa;
+    if (!j || !j.verfuegbar) return { ok: false, grund: String((j && (j.grund || j.hinweis)) || 'keine Angaben').replace(/[<>&]/g, '') };
+    var g = Number(Number(j.gebaeudeanteil_prozent).toFixed(2));
+    if (!(g > 0 && g < 100)) return { ok: false, grund: 'kein plausibler Gebäudeanteil' };
+    var A = p5.amtlich, kpI = (A.gebaeude_eur_vertrag || 0) + (A.boden_eur_vertrag || 0);
+    var gebAk = null;
+    try {
+      var T = window.DpBmfWahlTafel && DpBmfWahlTafel.daten(r, window._v292State && _v292State.lastInputs,
+        { afa: { methode: 'linear', satzPct: p10.amtlich.afa_satz_pct }, gebaeudeAhk: window.DealKpis && DealKpis.gebaeudeAhk });
+      var z = T && T.zeilen.filter(function (x) { return x.id === 'jacoby'; })[0];
+      if (z && z.gebAk > 0) gebAk = z.gebAk;
+    } catch (e) {}
+    if (gebAk == null) gebAk = A.gebaeude_pct > 0 ? p8.amtlich.gebaeude_ak * g / A.gebaeude_pct : 0;
+    var satz = p10.amtlich.afa_satz_pct, afa = gebAk * satz / 100, inv = p10.amtlich.inventar_afa_jahr || 0;
+    var quote = p10.amtlich.afa_summe_jahr > 0 ? p10.amtlich.steuerersparnis_jahr / p10.amtlich.afa_summe_jahr : 0.4;
+    return { ok: true, geb: g, gebVertrag: kpI * g / 100, bodenVertrag: kpI * (100 - g) / 100, gebAk: gebAk, satz: satz, afa: afa, inv: inv, steuer: (afa + inv) * quote };
   }
 
   // ─── Render: Pane 4 (Variant-Wahl + Übernehmen) ──────────────────────
