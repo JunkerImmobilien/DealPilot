@@ -319,7 +319,7 @@
       X + '.dab-perf:empty{display:none}',
       X + '.dab-cap{display:none !important}',
       X + '.dab-sthead{padding-top:0 !important;margin-top:0 !important;border-top:0 !important}',
-      X + '.dab-status-grid{display:grid !important;grid-template-columns:1fr !important;gap:10px !important}',
+      '@media(max-width:999px){' + X + '.dab-status-grid{display:grid !important;grid-template-columns:1fr !important;gap:10px !important}}',   /* breit: display:contents (Rasterflaechen) - die Regel darf dort nicht gewinnen */
       X + '.dab-row{min-height:0 !important;padding:10px 12px !important}',
       X + '#dab-share-slot > div{margin:0 !important;padding:12px 14px !important}',
       X + '.dab-smart-body{grid-template-columns:repeat(auto-fill,minmax(220px,1fr)) !important;gap:10px !important}',
