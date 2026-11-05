@@ -44397,3 +44397,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `0fc538e`; Prod 1.0.70 `4e2f576`, Sicherungen `/root/backups/haupt-20261105-1505.sql.gz`, `mb-20261105-1505.sql.gz`.
 - **Nachweis:** Staging Westerfeldstr. 140: Werte gesetzt → saveObj → Export zeigt struktur ehegatten, 50/50, d1 kauf; danach zurückgesetzt. Profil-Pane enthält alle vier Felder. Buster RC=0, Gold-Audit auf Basislinie.
 - **Rest:** Mandantenfelder nur im Code gegengelesen, nicht im Browser gespeichert.
+
+### v3198–v3198a · Nummernkollision, Import mit Mietverträgen, Quick-Check (05.11.2026, nur Staging)
+- **Was:** Speichern trotz Nummernkollision; Server-Nummer übernehmen; Mietverträge in importierte Einheiten; Quick-Check-Import vollständig; `newObj` gibt Promise zurück (Quick-Check, Überführung warten); Export Buchwert, Gewerbeanteil null.
+- **Commit:** `150a64c`, `5094ba3` (Staging). **Nicht auf Prod** – Quick-Check speichert weiter leer (N128).
+- **Nachweis:** Kollision per PUT gemessen (200, Nummer bleibt); Prüffenster Quick-Check 52 Zeilen, Verträge Whg. 1/3/6, Summe 3.870 € stimmt; Westerfeld unberührt.
+- **Rest:** N128; Überführung nach v3198a ungetestet; Buchwert/Mandantenfelder im Export nicht im Browser gemessen.

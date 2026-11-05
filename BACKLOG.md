@@ -36,6 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N128 · Quick-Check „Speichern & übernehmen“ legt ein LEERES Objekt an — OFFEN, oberster Punkt (05.11.2026)
+- **Befund (Staging, Satz `Dateien/Testunterlagen/Lindenallee 14`, 13 PDFs):** Import im Quick-Check ist seit v3198 vollständig (52 Zeilen, 8 Einheiten, Mietverträge in Whg. 1/3/6 eingearbeitet, Risiken, These, Auswertung, Summe 3.870 € stimmt). Nach „Speichern & übernehmen“ steht aber ein leeres Objekt (Version 1) auf dem Server, das Formular ist leer. Das zuvor offene Objekt bleibt unberührt.
+- **Drei Anläufe, Ursache noch nicht gefunden:** (1) v1268-Abbruch durch die Quellen-Auswahl von `newObj` → `ohneAuswahl:true`; (2) `newObj` wartet den Sicherungs-Save ab und leert danach → `newObj` gibt das Promise zurück, `_handleSave` wartet (v3198a). Danach kein v1268 mehr, trotzdem leer. **Nächster Schritt: messen, nicht patchen** – `saveObj`, `newObj`, `_newObjLeeren`, `qcSaveAsObject` mit Zeitstempel und Stapel protokollieren, ein Quick-Check OHNE Import (nur Adresse + Kaufpreis) als kleinster Fall, dann mit Import.
+- **Prüfen:** Ist das auf Prod auch so (dann seit wann)? Der Fall ohne Import zeigt es.
+- Erledigt in v3198/v3198a (Staging, NICHT auf Prod): Nummernkollision speichert (Backend + Client übernimmt Server-Nummer), abgebrochener Eigen-Save wird nachgeholt, Mietverträge in importierte Einheiten, Quick-Check-Unterlagenzeilen, Miete der Liste vor Vertragsmiete, Überführung wartet den Reset ab (UNGETESTET), Export `buchwert` + `gewerbeanteil_quelle`, Gewerbeanteil null statt 0.
+- Testobjekte auf Staging (leer bzw. Test, auf „verloren“ setzen oder löschen – Marcel): `0923a10f`, `9e6ff9e0`, `010ce3ba`, `9cb8c1e1` (Kaufpreis 654321), `64084eab` (888000), `3aa7249a`.
+
 ### N127 · Makler-Hub-Anbindung — Stufe 1 auf Staging (v3190, 05.11.2026)
 - Gebaut: OAuth-Anmeldung mit PKCE, Token/Konto/Trennen, Webhook, Verbinden-Ebene; Partner enthält den Makler-Hub (Marcel: gleicher Preis, gleiche Plätze, Partner-Kontingent). Vertrag und Stand: Dateien/Makler-Hub/Anmeldung-Schnittstelle.md.
 - Offen: Geheimnis in den Hub übertragen und echten Durchlauf mit dem Hub testen; Registrierung ?produkt=makler-hub; 402 mit nachkauf_url; Partnertypen (Makler, Steuerberater, Finanzierer, Sonstige) als Module; Prod-Einrichtung (.env).
