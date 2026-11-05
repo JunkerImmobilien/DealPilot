@@ -44344,3 +44344,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `2daef7e8`, `5280768d` … `80f9bbe` (v3182–v3183c); Prod 1.0.58 (`1b85ab7`), 1.0.59 (`fb12da9`), PDF-Dienst auf Prod jeweils von Hand neu gebaut.
 - **Nachweis:** Staging Kurzfassung Klick→Download 2,5 s, `pdffonts`: Inter, Space Grotesk, JetBrains Mono eingebettet; Prod-Probedruck 1,6 s, Prod liefert `dok-weiche.js?v=v3183`.
 - **Rest:** Kaufpreisaufteilung braucht für ihr HTML rund 7 s (`bmfBereit` wartet fest 3,5 s). Diagnosezeile „html gesetzt ()“ zeigt die Schriften nicht an (`[].map` auf FontFaceSet) – kosmetisch.
+
+### v3184–v3184b · BMF-Rechner neu geordnet, Steuer-Ausgaben in der Deal-Aktion, Selbstauskunft (05.11.2026, Prod 1.0.60)
+
+- **Was:** Deal-Aktion › Dokumente: Investment-PDF „Vollständig | Kurzfassung“ ohne Dialog, Belege raus, Gruppe „Steuer & Finanzamt“ (Kaufpreisaufteilung, BMF-Arbeitshilfe, BMF-Original XLSX) mit „Fehlen noch Werte“. BMF-Rechner: Schritt 2 ohne Ausgabe/Jacoby, Schritt 3 Amtlich/Konservativ/Optimiert/Jacoby (Aggressiv raus, AfA-Satz aus Reiter Steuer), Schritt 4 Tafel + Satz für den Kaufvertrag, Schritt 5 „Übersicht & Ausgabe“ mit Ausgabekarten und Text für den Berater. Neu `bmf-ausgabe.js` (eine Stelle für Prüfung, Rechenlauf, Ausgaben). KPA-PDF druckt die gewählte Variante samt Vertragstext. Selbstauskunft (Demo). Behoben: `pdf-wahl.vorgabe()` ohne `design` (Klassisch wirkte nie), PDF-Prüfung sperrte KPA aus der Deal-Aktion, Pipeline-Ergebnis eines anderen Objekts.
+- **Commit:** `8d9785ac`, `648ab21f` (v3184a), `6880568e` (v3184b); Prod 1.0.60 `c45cf7f`, Sicherungen `/root/backups/haupt-20261105-1027.sql.gz`, `mb-20261105-1027.sql.gz`.
+- **Nachweis:** Staging, Downloads abgefangen: alle sechs Ausgaben 2,7–5,2 s; Jacoby am Ravensberger Weg 38 (79,88 % gegen 74,82 %) bis ins PDF-Deckblatt; Testwert im Reiter Steuer zurückgesetzt. Buster, Gold-Audit grün; Prod liefert `bmf-ausgabe.js?v=v3184b`.
+- **Rest:** Messe-Videos zum BMF-Rechner neu aufnehmen; klassische KPA (jsPDF) ohne Jacoby; Selbstauskunft wartet auf Marcels Vorlage. Einzelheiten `wissen/2026-11-05.md`.
