@@ -605,15 +605,7 @@ window.DealPilotDealAction = (function() {
       // V252-01: NEUE REIHENFOLGE — Deal-Status + Bankgespräch ZUERST
       // v852: Boarding-Cockpit (Startbahn-Readiness + Departure-Tafel + Exporte + Bordkarte + Netzwerk)
       (window.DealActionBoarding ? window.DealActionBoarding.buildTop() : (renderWonCard() + renderBankgespraechCard())),
-      /* v816 dpuew-stage: Ueberfuehrungs-Wizard */
-      '<div class="da-stage" id="dpuew-stage">',
-        '<div class="da-stage-head">',
-          '<span class="da-stage-ico">\u21c4</span>',
-          '<div class="da-stage-title">In Gesellschaft \u00fcberf\u00fchren</div>',
-          '<div class="da-stage-sub">Privat-Objekt einfrieren + neues GmbH-Objekt anlegen (Werte, Fotos, KI \u00fcbernommen)</div>',
-        '</div>',
-        '<div style="padding:4px 0 2px"><button type="button" class="da-cta" style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1b1408;border:none;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="if(window.DealPilotUeberfuehrung)DealPilotUeberfuehrung.open()">\u00dcberf\u00fchrung starten</button></div>',
-      '</div>',
+      /* v3191 · Marcel 05.11.2026: die Überführung in eine Gesellschaft gibt es nur noch unter Einstellungen › Mandanten › Privat (Auswahlfenster mit den überführbaren Objekten) */
       
       // v854: Stage 1+2 entfernt - Bankanfrage/Beratung/Gutachten laufen ueber die Netzwerk-Karten
       // V252-01: STAGE 3 (Won-Card + Portfolio-Strategie-Banner) entfernt — Won ist jetzt oben

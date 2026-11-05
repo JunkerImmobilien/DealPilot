@@ -150,10 +150,12 @@
 
       band('doc2', 'Unterlagen f\u00fcrs Bankgespr\u00e4ch', 'Was die Bank sehen will \u2014 und woher es kommt') +
       '<div class="dab-panel">' +
+        /* v3191 · Marcel: kompakter - die Checkliste klappt auf */
+        '<details class="dab-check"><summary>Checkliste anzeigen</summary>' +
         '<div class="dab-cols">' +
           '<div><div class="dab-ct">Pers\u00f6nliche Unterlagen</div><ul class="dab-list"><li>Personalausweis (Kopie)</li><li>Letzte 3 Gehaltsabrechnungen</li><li>Steuerbescheide 2 Jahre</li><li>SCHUFA-Selbstauskunft</li><li>Verm\u00f6gen &amp; Verbindlichkeiten</li></ul></div>' +
           '<div><div class="dab-ct">Objekt-Unterlagen</div><ul class="dab-list"><li>Expos\u00e9 / Verkaufsanzeige</li><li>Aktueller Grundbuchauszug</li><li>Wohnfl\u00e4chenberechnung</li><li>Nebenkostenabrechnungen</li><li>Bei WEG: Teilungserkl\u00e4rung</li></ul></div>' +
-        '</div>' +
+        '</div></details>' +
         /* \u2500\u2500 v1834 \u00b7 DIE LISTE SAGTE, WAS FEHLT \u2014 NICHT, WOHER ES KOMMT \u2500\u2500\u2500
          *
          * Dieses Band listet seit jeher \u201eAktueller Grundbuchauszug" als
@@ -311,7 +313,24 @@
       X + '#dpuew-stage .da-stage-title{font-family:\'Space Grotesk\',Inter,sans-serif !important;font-size:17px !important;font-weight:600 !important;letter-spacing:0 !important;text-transform:none !important;color:#1a1814 !important}',
       X + '#dpuew-stage .da-stage-head *{color:#6B6356}',
       /* Teilen-Karte hell */
-      X + '#dab-share-slot > div{background:#FFFFFF !important;border:1px solid #E6E0D3 !important;border-radius:12px !important}'
+      X + '#dab-share-slot > div{background:#FFFFFF !important;border:1px solid #E6E0D3 !important;border-radius:12px !important}',
+      /* v3191 · Marcel: „cooler, kompakter … einfacher“ - Kopf zweispaltig, Karten kleiner */
+      '@media(min-width:1000px){' + X + '.dab-body{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);column-gap:22px;align-items:start}' + X + '#dab-readiness-host{grid-column:1;grid-row:1 / span 3}' + X + '.dab-sthead,' + X + '.dab-status-grid,' + X + '.dab-perf{grid-column:2}}',
+      X + '.dab-perf:empty{display:none}',
+      X + '.dab-cap{display:none !important}',
+      X + '.dab-sthead{padding-top:0 !important;margin-top:0 !important;border-top:0 !important}',
+      X + '.dab-status-grid{display:grid !important;grid-template-columns:1fr !important;gap:10px !important}',
+      X + '.dab-row{min-height:0 !important;padding:10px 12px !important}',
+      X + '#dab-share-slot > div{margin:0 !important;padding:12px 14px !important}',
+      X + '.dab-smart-body{grid-template-columns:repeat(auto-fill,minmax(220px,1fr)) !important;gap:10px !important}',
+      X + '.dab-doc-row{padding:12px 14px !important;gap:8px !important}',
+      X + '.dab-doc-icb{width:34px !important;height:34px !important;border-radius:9px !important}',
+      X + '.dab-doc-n{font-size:13.5px !important}',
+      X + '.dab-doc-d{min-height:0 !important;font-size:11.5px !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+      X + '.dab-doc-btn{padding:7px 12px !important;font-size:12px !important}',
+      X + '.dab-band{padding:16px 2px 8px !important;margin:12px 0 10px !important}',
+      X + 'details.dab-check > summary{cursor:pointer;font:600 13px Inter,sans-serif;color:#1a1814;padding:6px 0}',
+      X + 'details.dab-check[open] > summary{margin-bottom:8px}'
     ].join('\n');
     var st = document.createElement('style');
     st.id = 'dab-v3187';

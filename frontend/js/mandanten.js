@@ -250,7 +250,7 @@
     var _cb = document.getElementById('mand_ueberf_cb');
     if (checked && !alreadyU) {
       if (_cb) _cb.checked = false;
-      if (typeof toast === 'function') toast('\u00dcberf\u00fchrung bitte \u00fcber \u201eDeal-Aktion \u2192 \u00dcberf\u00fchrung starten\u201c (oder Rechtsklick auf die Objektkarte).');
+      if (typeof toast === 'function') toast('\u00dcberf\u00fchrung bitte \u00fcber Einstellungen \u203a Mandanten \u203a Privat \u203a \u201eIn Gesellschaft \u00fcberf\u00fchren\u201c (oder Rechtsklick auf die Objektkarte).');
       return;
     }
     if (!checked && alreadyU) {
@@ -537,7 +537,7 @@
     }
     if (hasEnde) {
       host.style.display = '';
-      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u2708 \u00dcberf\u00fchrt in Gesellschaft' + (ende ? ' \u00b7 privat bis ' + ende + ' (ab diesem Tag Gesellschaft)' : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrungFromPrivat()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>'
+      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u00dcberf\u00fchrt in Gesellschaft' + (ende ? ' \u00b7 privat bis ' + ende + ' (ab diesem Tag Gesellschaft)' : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrungFromPrivat()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>'
         + _ueberfDetailHtml(_ud, false);
       return;
     }
@@ -800,8 +800,9 @@
             + (eingefroren ? ' <span style="font-size:10.5px;color:#B86250">· eingefroren zum ' + esc(_fmtDe(d.ueberf_ende)) + '</span>' : '')
             + '</div>';
         }).join('');
-        host.innerHTML = '<div style="font:700 10px/1 \'JetBrains Mono\',monospace;letter-spacing:1px;text-transform:uppercase;color:#8a8378;margin:8px 0 4px">'
-          + mine.length + ' Objekt' + (mine.length > 1 ? 'e' : '') + '</div>' + zeilen;
+        /* v3191 · Marcel: „wenn das viele werden, dann ist das dort unübersichtlich“ - zugeklappt, Zahl sichtbar */
+        host.innerHTML = '<details><summary style="cursor:pointer;font:600 12px Inter,sans-serif;color:#3a352b;margin-top:4px">'
+          + mine.length + ' Objekt' + (mine.length > 1 ? 'e' : '') + ' anzeigen</summary><div style="margin-top:4px;max-height:220px;overflow:auto">' + zeilen + '</div></details>';
       });
     }).catch(function () {
       hosts.forEach(function (h) { h.innerHTML = '<span style="color:#B86250">Objekte konnten nicht geladen werden.</span>'; });
@@ -830,6 +831,7 @@
            kommen; bis dahin steht ein ehrliches „lade". */
         + '<div class="mand-objliste" data-mand-obj="' + esc(m.id) + '" style="font-size:12px;color:#5f594f;margin-top:6px">lädt …</div>'
         + '</div>'
+        + (m.id === 'privat' ? '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.openUeberfuehrung()" title="Privatobjekte in eine Gesellschaft überführen">In Gesellschaft überführen</button>' : '')   /* v3191 */
         + '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'' + m.id + '\')">Bearbeiten</button>'
         + (canDel ? '<button type="button" class="btn btn-outline btn-sm" style="color:#B86250;border-color:#e6cbc5" onclick="DealPilotMandanten.uiDelete(\'' + m.id + '\')">L\u00f6schen</button>' : '')
         + '</div>';
@@ -842,11 +844,8 @@
       + 'Privat bleibt der Standard.</p>'
       + '<div style="display:grid;gap:11px;margin:16px 0">' + cards + '</div>'
       + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.uiNew()"><span class="ic">+</span> Neuer Mandant</button>'
-      /* v856-uew: Ueberfuehrung direkt aus den Mandanten heraus (mit Objekt-Auswahl) */
-      + '<hr class="dvd"><h3 class="set-section-h">In Gesellschaft \u00fcberf\u00fchren</h3>'
-      + '<p class="hint">Privat-Objekt einfrieren + neues GmbH-Objekt anlegen (Werte, Fotos, KI \u00fcbernommen). W\u00e4hle zuerst das Objekt.</p>'
-      + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.openUeberfuehrung()">\u2708 \u00dcberf\u00fchrung starten</button>'
-      + '<div id="mand-uew-picker" style="margin-top:12px"></div>';
+      /* v3191 · die Überführung steht als Knopf an der Privat-Karte (Auswahlfenster openUeberfuehrung) */
+      + '';
   }
 
   function _fGrid() { return 'display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin:14px 0'; }
@@ -1242,31 +1241,71 @@
     try { _syncUeberf(); } catch (e) {}        /* sicherstellen: Haken/Kennung/read-only aktuell */
   }
   /* v856-uew-picker: Objekt waehlen -> laden -> Ueberfuehrungs-Wizard oeffnen */
+  /* v3191 · Marcel 05.11.2026: „die Überführung in eine GmbH … nur noch unter Einstellungen … direkt unter dem
+     Mandant … ein Auswahlfenster, welche wir überführen wollen, und da nur die Objekte, die wir überführen können."
+     Überführbar (dieselben Regeln wie die Vorprüfung im Assistenten, ueberfuehrung-wizard.js v1234): Halter privat,
+     nicht selbst Ergebnis einer Überführung, nicht eingefroren; dazu kein verlorener Deal. */
+  function _ueberfuehrbar(o) {
+    var d = o.data || o;
+    var h = (d.halter || o.halter || '').toString().trim() || 'privat';
+    if (h !== 'privat') return false;
+    if (String(d.obj_herkunft || '') === 'ueberfuehrung') return false;
+    if ((d.ueberf_ende || '').toString().trim()) return false;
+    if (d._deal_lost === true || d._deal_lost === 'true') return false;
+    return true;
+  }
   function openUeberfuehrung() {
-    var host = document.getElementById('mand-uew-picker');
-    if (!host) return;
-    if (!window.Auth || typeof window.Auth.apiCall !== 'function') { host.innerHTML = '<div style="color:#B86250;font-size:13px">Bitte neu einloggen.</div>'; return; }
-    host.innerHTML = '<div style="color:#7A7370;font-size:13px">Objekte laden \u2026</div>';
+    var corps = (_state.list || []).filter(function (m) { return isCorp(m.rechtsform); });
+    var alt = document.getElementById('mand-uew-ov'); if (alt) alt.remove();
+    var ov = document.createElement('div');
+    ov.id = 'mand-uew-ov';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(10,10,12,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.innerHTML = '<div role="dialog" aria-modal="true" style="width:100%;max-width:560px;max-height:86vh;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;font-family:Inter,sans-serif">'
+      + '<div style="padding:16px 18px;border-bottom:1px solid #E6E0D3;display:flex;align-items:center;gap:10px"><div style="flex:1"><div style="font:600 17px \'Space Grotesk\',sans-serif;color:#1a1814">In Gesellschaft überführen</div>'
+      + '<div style="font-size:12px;color:#6B6356;margin-top:2px">Das Privatobjekt wird eingefroren, ein neues Objekt der Gesellschaft wird angelegt (Werte, Fotos, KI-Text übernommen).</div></div>'
+      + '<button type="button" id="mand-uew-zu" aria-label="Schließen" style="border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#6B6356">×</button></div>'
+      + (corps.length
+        ? '<div style="padding:12px 18px 0"><input id="mand-uew-such" type="search" placeholder="Objekt suchen (Straße, Ort, Nummer)" style="width:100%;padding:9px 12px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif"></div>'
+          + '<div id="mand-uew-liste" style="padding:12px 18px 16px;overflow:auto;display:grid;gap:8px"><div style="color:#6B6356;font-size:13px">Objekte laden …</div></div>'
+        : '<div style="padding:18px;font-size:13.5px;color:#3a352b;line-height:1.55">Es gibt noch keine Gesellschaft. Lege zuerst unter „Neuer Mandant" eine GmbH oder UG an – dann lassen sich Privatobjekte dorthin überführen.</div>')
+      + '</div>';
+    document.body.appendChild(ov);
+    function zu() { ov.remove(); }
+    document.getElementById('mand-uew-zu').onclick = zu;
+    ov.addEventListener('click', function (e) { if (e.target === ov) zu(); });
+    if (!corps.length) return;
+    var liste = document.getElementById('mand-uew-liste'), such = document.getElementById('mand-uew-such');
+    if (!window.Auth || typeof window.Auth.apiCall !== 'function') { liste.innerHTML = '<div style="color:#B86250;font-size:13px">Bitte neu anmelden.</div>'; return; }
     window.Auth.apiCall('/objects', { method: 'GET' }).then(function (r) {
-      var items = (r && (r.objects || r.items)) || [];
-      if (!items.length) { host.innerHTML = '<div style="color:#7A7370;font-size:13px">Keine Objekte vorhanden.</div>'; return; }
-      /* v857-uew-liste: DealPilot-Stil (Monogramm, Adresse, Ort, Kaufpreis) — INLINE-Styles */
-      host.innerHTML = '<div style="display:grid;gap:8px;max-height:320px;overflow:auto;padding-right:2px">' + items.map(function (o) {
-        var d = o.data || {};
-        var label = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || ('Objekt ' + o.id);
-        var ort = [d.plz, d.ort].filter(Boolean).join(' ');
-        var kp = d.kp ? (String(d.kp) + ' \u20ac') : '';
-        var subline = [ort, kp].filter(Boolean).join(' \u00b7 ');
-        var kz = (d.kuerzel || '').toString().toUpperCase() || label.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || 'OB';
-        return '<button type="button" onclick="DealPilotMandanten._uewPick(\'' + String(o.id).replace(/'/g, '') + '\', this)" '
-          + 'style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 13px;border:1px solid #ece7df;border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s">'
-          + '<span style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-b8932f,#b8932f));color:#1a1508;display:inline-flex;align-items:center;justify-content:center;font:700 12px \'Space Grotesk\',sans-serif;flex-shrink:0;letter-spacing:.5px">' + esc(kz) + '</span>'
-          + '<span style="flex:1;min-width:0"><b style="display:block;font:600 14px/1.25 \'Space Grotesk\',sans-serif;color:#2A2727;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(label) + '</b>'
-          + (subline ? '<span style="font-size:12px;color:#7A7370">' + esc(subline) + '</span>' : '')
-          + '</span>'
-          + '<span style="color:var(--wl-b8932f,#b8932f);font:700 15px sans-serif;flex-shrink:0">\u2192</span></button>';
-      }).join('') + '</div>';
-    }).catch(function () { host.innerHTML = '<div style="color:#B86250;font-size:13px">Objekte konnten nicht geladen werden.</div>'; });
+      var alle = (r && (r.objects || r.items)) || [];
+      var items = alle.filter(_ueberfuehrbar);
+      function zeichnen() {
+        var q = String(such && such.value || '').toLowerCase().trim();
+        var treffer = items.filter(function (o) {
+          if (!q) return true;
+          var d = o.data || {};
+          return [d.str, d.hnr, d.plz, d.ort, o.seq_no, o.name].join(' ').toLowerCase().indexOf(q) >= 0;
+        });
+        if (!items.length) { liste.innerHTML = '<div style="color:#6B6356;font-size:13px;line-height:1.5">Kein Objekt lässt sich überführen. Überführbar sind Objekte mit Halter „Privat“, die nicht schon überführt oder als verloren markiert sind.</div>'; return; }
+        if (!treffer.length) { liste.innerHTML = '<div style="color:#6B6356;font-size:13px">Kein Treffer.</div>'; return; }
+        liste.innerHTML = treffer.map(function (o) {
+          var d = o.data || {};
+          var label = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || ('Objekt ' + o.id);
+          var ort = [d.plz, d.ort].filter(Boolean).join(' ');
+          var status = d._deal_won === true || d._deal_won === 'true' ? 'Bestand' : 'Ankauf';
+          return '<button type="button" data-uew="' + esc(String(o.id)) + '" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border:1px solid #E6E0D3;border-radius:10px;background:#fff;cursor:pointer;font-family:inherit">'
+            + '<span style="font:600 10.5px \'JetBrains Mono\',monospace;color:#6B6356;min-width:68px">' + esc(o.seq_no || '') + '</span>'
+            + '<span style="flex:1;min-width:0"><b style="display:block;font:600 14px/1.25 Inter,sans-serif;color:#1a1814;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(label) + '</b>'
+            + '<span style="font-size:12px;color:#6B6356">' + esc(ort) + ' · ' + status + '</span></span>'
+            + '<span style="font:600 12.5px Inter,sans-serif;color:var(--wl-9a7f33,#9a7f33);flex-shrink:0">Überführen</span></button>';
+        }).join('');
+        [].forEach.call(liste.querySelectorAll('[data-uew]'), function (b) {
+          b.addEventListener('click', function () { zu(); _uewPick(b.getAttribute('data-uew'), null); });
+        });
+      }
+      zeichnen();
+      if (such) { such.addEventListener('input', zeichnen); setTimeout(function () { try { such.focus(); } catch (e) {} }, 50); }
+    }).catch(function () { liste.innerHTML = '<div style="color:#B86250;font-size:13px">Objekte konnten nicht geladen werden.</div>'; });
   }
   function _uewPick(objId, btn) {
     if (btn) { btn.disabled = true; btn.style.opacity = '.6'; }
