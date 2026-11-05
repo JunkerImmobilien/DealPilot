@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-05T13:53:36.796Z",
+ "erzeugt_am": "2026-11-05T14:00:05.266Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "0ff1af101c1632bc",
-  "index-html": "945d2c52959e3670",
+  "storage": "b51290b08eac5e33",
+  "index-html": "718fa032f7cfa010",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -648,6 +648,14 @@
    "eq_walls",
    "eq_roof",
    "eq_elevator",
+   "eig_struktur",
+   "eig_erwerb",
+   "eig_anteil_ich",
+   "eig_anteil_ehegatte",
+   "eig_anteil_dritte",
+   "eig_erwerb_datum",
+   "d1_verwendung",
+   "d2_verwendung",
    "halter",
    "halter_seit",
    "obj_herkunft",
@@ -2241,6 +2249,122 @@
      }
     ],
     "label": "Aufzug"
+   },
+   {
+    "id": "eig_struktur",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "allein",
+      "text": "allein"
+     },
+     {
+      "wert": "ehegatten",
+      "text": "Ehegatten gemeinsam"
+     },
+     {
+      "wert": "gemeinschaft",
+      "text": "mit Dritten (Bruchteils-/Erbengemeinschaft)"
+     }
+    ],
+    "label": "Eigentümer"
+   },
+   {
+    "id": "eig_erwerb",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "kauf",
+      "text": "Kauf"
+     },
+     {
+      "wert": "schenkung",
+      "text": "Schenkung"
+     },
+     {
+      "wert": "erbschaft",
+      "text": "Erbschaft"
+     },
+     {
+      "wert": "ueberfuehrung",
+      "text": "Überführung"
+     }
+    ],
+    "label": "Erwerb"
+   },
+   {
+    "id": "eig_anteil_ich",
+    "kind": "text",
+    "label": "Eigener Anteil (%)"
+   },
+   {
+    "id": "eig_anteil_ehegatte",
+    "kind": "text",
+    "label": "Anteil Ehegatte (%)"
+   },
+   {
+    "id": "eig_anteil_dritte",
+    "kind": "text",
+    "label": "Anteil Dritte (%)"
+   },
+   {
+    "id": "eig_erwerb_datum",
+    "kind": "text",
+    "label": "Anteil erworben am (falls abweichend)"
+   },
+   {
+    "id": "d1_verwendung",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "kauf",
+      "text": "Kauf / Anschaffung"
+     },
+     {
+      "wert": "sanierung",
+      "text": "Sanierung / Modernisierung"
+     },
+     {
+      "wert": "umschuldung",
+      "text": "Umschuldung"
+     },
+     {
+      "wert": "privat",
+      "text": "private Verwendung"
+     },
+     {
+      "wert": "gemischt",
+      "text": "gemischt"
+     }
+    ],
+    "label": "Verwendung"
+   },
+   {
+    "id": "d2_verwendung",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "kauf",
+      "text": "Kauf / Anschaffung"
+     },
+     {
+      "wert": "sanierung",
+      "text": "Sanierung / Modernisierung"
+     },
+     {
+      "wert": "umschuldung",
+      "text": "Umschuldung"
+     },
+     {
+      "wert": "privat",
+      "text": "private Verwendung"
+     },
+     {
+      "wert": "gemischt",
+      "text": "gemischt"
+     }
+    ],
+    "label": "Verwendung"
    },
    {
     "id": "halter",

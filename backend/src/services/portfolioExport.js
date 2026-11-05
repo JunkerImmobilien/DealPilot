@@ -655,6 +655,14 @@ async function bauen(userId, opt) {
       ankauf_stand: (daten._ankauf && daten._ankauf.stichtag) ? daten._ankauf.stichtag : null,
       daten: schlank,
       ausstattung: (function () { try { return require('./ausstattung').ausstattung(daten); } catch (e) { return null; } })(),   /* v3193 */
+      /* v3197 · Eigentum, Darlehensverwendung, Gewerbeanteil (Portfoliostrategie: „fehlt ganz“) */
+      eigentum: {
+        struktur: daten.eig_struktur || null, erwerb: daten.eig_erwerb || null, erwerb_datum: daten.eig_erwerb_datum || null,
+        anteil_eigen_pct: _zahl(daten.eig_anteil_ich), anteil_ehegatte_pct: _zahl(daten.eig_anteil_ehegatte), anteil_dritte_pct: _zahl(daten.eig_anteil_dritte),
+        halter: daten.halter || 'privat'
+      },
+      darlehen_verwendung: { d1: daten.d1_verwendung || null, d2: daten.d2_verwendung || null },
+      gewerbeanteil_pct: _gewerbeanteil(daten),
       analyse: analyse,
       fotos_anzahl: fotoZahl,
       fotos: mitFotos && Array.isArray(fotos) ? fotos : undefined
@@ -682,7 +690,7 @@ async function bauen(userId, opt) {
   try {
     const e = await query(
       'SELECT schluessel, wert, updated_at FROM user_settings WHERE user_id = $1 AND schluessel = ANY($2)',
-      [userId, ['portfolio_analyse', 'lage_profil', 'datenraum']]
+      [userId, ['portfolio_analyse', 'lage_profil', 'datenraum', 'mandanten', 'browser_vorgaben']]   /* v3197: + Mandanten, Profil */
     );
     e.rows.forEach((r) => {
       let w = r.wert;
@@ -870,6 +878,9 @@ async function bauen(userId, opt) {
     },
     /* ── Das Wissen, das die Piloten benutzen ──────────────────────
        Einmal, nicht je Objekt: es gilt fuer alle. */
+    /* v3197 · Profil (Steuer, Familie) und Mandanten mit Stammwerten - lagen nur in den Einstellungen */
+    profil: _profil(einstellungen.browser_vorgaben),
+    mandanten: einstellungen.mandanten ? einstellungen.mandanten.wert : null,
     wissen: {
       projekt: projektwissen.wissen(),
       eigenes: eigenes || null,
@@ -889,4 +900,27 @@ async function bauen(userId, opt) {
    pruefbar ist. Eine Funktion, die nur im Gesamtlauf sichtbar ist, laesst
    sich nicht von "findet nichts" unterscheiden - dieselbe Lehre wie bei
    `deklariertAbsichtlich` in der Messkabine. */
+function _zahl(v) { if (v == null || String(v).trim() === '') return null; const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : null; }
+/* Gewerbeanteil nach Fläche: Einheiten mit art "gewerbe" / alle Einheiten; ohne Einheiten 100 % bei GESCH, sonst 0 */
+function _gewerbeanteil(d) {
+  const e = d && d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null;
+  if (e && e.length) {
+    let alle = 0, gew = 0;
+    e.forEach((u) => { const w = _zahl(u && u.wfl) || 0; alle += w; if (u && u.art === 'gewerbe') gew += w; });
+    return alle > 0 ? Math.round(gew / alle * 1000) / 10 : null;
+  }
+  return d && d.objart === 'GESCH' ? 100 : 0;
+}
+function _profil(bv) {
+  try {
+    const keys = bv && bv.wert && bv.wert.keys; let p = keys && keys.dp_investment_profile;
+    if (typeof p === 'string') p = JSON.parse(p);
+    if (!p || typeof p !== 'object') return null;
+    return {
+      stand: bv.stand || null,
+      steuer: { grenzsteuersatz_pct: _zahl(p.grenzsteuersatz), zusammenveranlagung: p.splitting === true || p.splitting === 'true', kirchensteuer_pct: _zahl(p.kirchensteuer) || 0 },
+      familie: { gueterstand: p.gueterstand || null, eheschliessung: p.heirat_datum || null, anfangsvermoegen_eigen: _zahl(p.anfangsverm_ich), anfangsvermoegen_ehegatte: _zahl(p.anfangsverm_ehegatte) }
+    };
+  } catch (e) { return null; }
+}
 module.exports = { bauen, SCORE_STUFEN, HINWEISE, grestFuer, halterFuer };

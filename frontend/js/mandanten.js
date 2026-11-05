@@ -1053,6 +1053,9 @@
       +     fldH('Er\u00f6ffnung Bank (\u20ac)', inp('mand-f-bank', bh.eb_bank || 0), 'Bankguthaben der Gesellschaft zum Start des Wirtschaftsjahres (Anfangsbestand des Bankkontos).')
       +     fldH('Er\u00f6ffnung Gesellschafterdarlehen (\u20ac)', inp('mand-f-gesdar', bh.eb_gesdar || 0), 'Stand der Darlehen, die du der Gesellschaft als Gesellschafter gegeben hast \u2014 Fremdkapital der GmbH (deine Forderung). Tilgung mindert den Gewinn nicht, nur die Zinsen.')
       +     fldH('Gewinnvortrag (\u20ac)', inp('mand-f-gv', bh.eb_gewinnvortrag || 0), 'Aufgelaufener, noch nicht ausgesch\u00fctteter Gewinn aus Vorjahren (Anfangsbestand). Bei einer neu gegr\u00fcndeten Gesellschaft 0.')
+      /* v3197 · Marcel 05.11.2026: GmbH-Interna fehlten der Portfoliostrategie (Einlagekonto, Verlustvortrag) */
+      +     fldH('Steuerliches Einlagekonto (\u20ac)', inp('mand-f-einlage', bh.einlagekonto || 0), 'Bestand nach \u00a7 27 KStG laut letzter Feststellung - Auszahlungen daraus sind steuerfrei.')
+      +     fldH('Verlustvortrag (\u20ac)', inp('mand-f-vv', bh.verlustvortrag || 0), 'K\u00f6rperschaftsteuerlicher Verlustvortrag laut letztem Bescheid (\u00a7 10d EStG, \u00a7 8 Abs. 1 KStG).')
       +   '</div>'
       /* ═══════════════════════════════════════════════════════════════════
          v1226 · DER AUFWAND, DER KEINEM OBJEKT GEHÖRT.
@@ -1192,7 +1195,9 @@
         stammkapital: _toN(_val('mand-f-sk')),
         eb_bank: _toN(_val('mand-f-bank')),
         eb_gesdar: _toN(_val('mand-f-gesdar')),
-        eb_gewinnvortrag: _toN(_val('mand-f-gv'))
+        eb_gewinnvortrag: _toN(_val('mand-f-gv')),
+        einlagekonto: _toN(_val('mand-f-einlage')),   /* v3197 */
+        verlustvortrag: _toN(_val('mand-f-vv'))
       };
       m.kosten = _kErnte();   /* v1226: Kosten der Gesellschaft, je Jahr */
     } else {

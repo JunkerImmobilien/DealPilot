@@ -187,7 +187,7 @@ var FIELDS = [
   /* v727-ausst: Ausstattungsdetails fuer AVM-Bewertung (Sprengnetter-Enums als Wert) */
   'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator',
   /* mand-fields v803: Mandanten/Halter + Überführung */
-  'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
+  'eig_struktur','eig_erwerb','eig_anteil_ich','eig_anteil_ehegatte','eig_anteil_dritte','eig_erwerb_datum','d1_verwendung','d2_verwendung' /* v3197 */,'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
   /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
   'ueberf_restschuld','ueberf_rest_zins',
   /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */

@@ -340,6 +340,17 @@ window.DealPilotInvestmentProfile = (function() {
       '<p class="hint">Gehört ein Objekt einer <b>GmbH oder UG</b>, rechnet DealPilot mit Körperschaft- und Gewerbesteuer des Halters statt mit diesem Satz. ' +
         '<a href="#" onclick="event.preventDefault();showSettings(\'mandanten\')">Halter und ihre Steuersätze unter Mandanten →</a></p>',
 
+      /* v3197 · Marcel 05.11.2026: Familiendaten fehlten der Portfoliostrategie (Güterstandsschaukel, Zugewinn, Schenkung). */
+      '<h3 class="ip-section">Familie &amp; Güterstand</h3>',
+      '<div class="ip-grid">',
+        '<div class="ip-field"><label for="ip_gueterstand">Güterstand</label><div class="ip-field-row"><select id="ip_gueterstand">' +
+          [['', '—'], ['ledig', 'nicht verheiratet'], ['zugewinn', 'Zugewinngemeinschaft'], ['guetertrennung', 'Gütertrennung'], ['guetergemeinschaft', 'Gütergemeinschaft'], ['modifiziert', 'modifizierte Zugewinngemeinschaft']].map(function (o) {
+            return '<option value="' + o[0] + '"' + (String(p.gueterstand || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></div>' +
+          '<div class="ip-hint">Grundlage für Zugewinnausgleich und Güterstandsschaukel.</div></div>',
+        '<div class="ip-field"><label for="ip_heirat_datum">Eheschließung</label><div class="ip-field-row"><input id="ip_heirat_datum" type="date" value="' + (p.heirat_datum || '') + '"></div><div class="ip-hint">Beginn des Güterstands</div></div>',
+        field('ip_anfangsverm_ich', 'Anfangsvermögen (eigenes)', p.anfangsverm_ich, '€', 'zu Beginn des Güterstands'),
+        field('ip_anfangsverm_ehegatte', 'Anfangsvermögen Ehegatte', p.anfangsverm_ehegatte, '€', 'zu Beginn des Güterstands'),
+      '</div>',
       '<h3 class="ip-section">Standort & Nebenkosten</h3>',
       '<div class="ip-grid">',
         blEl(),
@@ -446,6 +457,10 @@ window.DealPilotInvestmentProfile = (function() {
       min_cashflow_vor_st:    v('ip_min_cashflow_vor_st'),
       max_ltv:                v('ip_max_ltv'),
       grenzsteuersatz:        v('ip_grenzsteuersatz'),
+      gueterstand:            (function(){ var e=document.getElementById('ip_gueterstand'); return e ? (e.value || null) : null; })(),   /* v3197 */
+      heirat_datum:           (function(){ var e=document.getElementById('ip_heirat_datum'); return e ? (e.value || null) : null; })(),
+      anfangsverm_ich:        v('ip_anfangsverm_ich'),
+      anfangsverm_ehegatte:   v('ip_anfangsverm_ehegatte'),
       splitting:              (function(){ var e=document.getElementById('ip_splitting'); return e ? (e.value === '1') : null; })(),   /* v2891 */
       kirchensteuer:          (function(){ var e=document.getElementById('ip_kirchensteuer'); return e ? (parseInt(e.value, 10) || 0) : null; })(),
       notar_pct:              v('ip_notar_pct'),          /* v2261 */

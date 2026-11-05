@@ -1146,6 +1146,18 @@ label.dp-required.qc-required::after {
       <div class="f s2" data-v363-erwerb data-v369-head style="margin-top:16px"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Erwerb &amp; Besitzübergang</div></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><input id="ueberf_daten" type="hidden" value=""><!-- v2984: Ergebnis des Ueberfuehrungs-Assistenten (JSON) --><!-- v816h-field-trl v816i-all-rightalign -->
+      <!-- v3197 · Marcel 05.11.2026: Eigentum je Objekt fehlte (Portfoliostrategie: „wem das Objekt gehört (Ehegatte, Quote) … Ehegattenverkauf, Schenkung, Güterstandsschaukel“). -->
+      <details id="eig-box" style="grid-column:1/-1;margin-top:6px"><summary style="cursor:pointer;font:600 13px Inter,sans-serif;color:#1a1814;padding:4px 0">Eigentum &amp; Erwerb</summary>
+        <div class="g2" style="margin-top:8px">
+          <div class="f"><label>Eigentümer</label><select id="eig_struktur"><option value="">—</option><option value="allein">allein</option><option value="ehegatten">Ehegatten gemeinsam</option><option value="gemeinschaft">mit Dritten (Bruchteils-/Erbengemeinschaft)</option></select></div>
+          <div class="f"><label>Erwerb</label><select id="eig_erwerb"><option value="">—</option><option value="kauf">Kauf</option><option value="schenkung">Schenkung</option><option value="erbschaft">Erbschaft</option><option value="ueberfuehrung">Überführung</option></select></div>
+          <div class="f"><label>Eigener Anteil (%)</label><div class="iw"><input id="eig_anteil_ich" type="text" inputmode="decimal" placeholder="100" class="tr"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Anteil Ehegatte (%)</label><div class="iw"><input id="eig_anteil_ehegatte" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Anteil Dritte (%)</label><div class="iw"><input id="eig_anteil_dritte" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Anteil erworben am (falls abweichend)</label><input id="eig_erwerb_datum" type="date" class="tr"></div>
+        </div>
+        <p class="hint" style="margin-top:4px">Für Gestaltungen wie Ehegattenverkauf, Schenkung oder Güterstandsschaukel. Die Anteile sollten zusammen 100 % ergeben; Güterstand und Anfangsvermögen stehen im Investmentprofil.</p>
+      </details>
     </div></div>
 
     <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Automatisch ermittelt <span class="oe-ct-hint">Wert · Quelle · Stichtag — kein Eingabefeld</span></div>
@@ -2792,6 +2804,7 @@ label.dp-required.qc-required::after {
         </div>
         <div class="g2">
           <div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="d1_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc(); calcD1Volltilgung()"><span class="sfx">J.</span></div></div>
+          <div class="f"><label>Verwendung</label><select id="d1_verwendung"><option value="">—</option><option value="kauf">Kauf / Anschaffung</option><option value="sanierung">Sanierung / Modernisierung</option><option value="umschuldung">Umschuldung</option><option value="privat">private Verwendung</option><option value="gemischt">gemischt</option></select></div><!-- v3197 · Darlehensverwendung (Portfoliostrategie: Zinsen nur abziehbar, soweit fürs Objekt verwendet) -->
           <div class="f"><label>Restschuld Ende Zinsbindung</label><div class="cf" id="restschuld">—</div></div>
         </div>
         <div class="g2">
@@ -2920,6 +2933,7 @@ label.dp-required.qc-required::after {
             </div>
           </div>
           <div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="d2_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
+          <div class="f"><label>Verwendung</label><select id="d2_verwendung"><option value="">—</option><option value="kauf">Kauf / Anschaffung</option><option value="sanierung">Sanierung / Modernisierung</option><option value="umschuldung">Umschuldung</option><option value="privat">private Verwendung</option><option value="gemischt">gemischt</option></select></div><!-- v3197 · Darlehensverwendung (Portfoliostrategie: Zinsen nur abziehbar, soweit fürs Objekt verwendet) -->
           <div class="f"><label>Monatliche Rate</label><div class="cf" id="d2_rate">—</div></div>
           <!-- v358-d2-anschl: Eigene Anschlussfinanzierung fuer Darlehen 2 (analog D1) -->
           <div class="f" style="margin-top:6px"><label class="toggle-slim" style="cursor:pointer"><input type="checkbox" id="d2_anschl_enable" onchange="var f=document.getElementById('d2_anschl_fields'); if(f) f.style.display=this.checked?'':'none'; calc();"> <span>Eigene Anschlussfinanzierung für Darlehen 2</span></label></div>
@@ -3765,7 +3779,7 @@ label.dp-required.qc-required::after {
   <script src="js/modal-boarding-skin.js?v=v3090"></script>
   <script src="js/provider-keys.js?v=v2180"></script>
   <script src="js/ueberfuehrung-kern.js?v=v2984"></script>
-  <script src="js/mandanten.js?v=v3196"></script>
+  <script src="js/mandanten.js?v=v3197"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v3003a"></script>
   <script src="js/apikeys.js?v=v3167"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
@@ -3792,7 +3806,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3154g"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3161a"></script>
+<script src="js/storage.js?v=v3197"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -3916,7 +3930,7 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-wizard.js?v=v3006c"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v3088"></script>
+<script src="js/investment-profile.js?v=v3197"></script>
 <script src="js/bwk-profil.js?v=v3091"></script>
 <script src="js/dashboard.js?v=v3031"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
