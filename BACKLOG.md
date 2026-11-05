@@ -36,7 +36,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N123 · Marktbericht Profi — GEBAUT v3176 (Prod 1.0.52, 04.11.2026)
+### N127 · Makler-Hub-Anbindung — Stufe 1 auf Staging (v3190, 05.11.2026)
+- Gebaut: OAuth-Anmeldung mit PKCE, Token/Konto/Trennen, Webhook, Verbinden-Ebene; Partner enthält den Makler-Hub (Marcel: gleicher Preis, gleiche Plätze, Partner-Kontingent). Vertrag und Stand: Dateien/Makler-Hub/Anmeldung-Schnittstelle.md.
+- Offen: Geheimnis in den Hub übertragen und echten Durchlauf mit dem Hub testen; Registrierung ?produkt=makler-hub; 402 mit nachkauf_url; Partnertypen (Makler, Steuerberater, Finanzierer, Sonstige) als Module; Prod-Einrichtung (.env).
+
+### N123 · Marktbericht Profi — GEBAUT v3176 (Prod 1.0.52, 04.11.2026) — **abgenommen von Marcel 05.11.2026**
 - Fertig: marktbericht-profi.js, PDF-Dienst-Art marktbericht_profi, Wahl im PDF-Dialog, 5 Beispiel-PDFs unter Dateien/Berichte/Marktbericht-Profi. Offen: Abnahme durch Marcel; Knopf auch im Marktbericht-Fenster; Seitenumbruch bei sehr langen Hinweisen; Energiekennwert (kWh) als Objektfeld fehlt — die Skala zeigt nur die Klasse.
 - (Demo davor:)
 - Demo: design/Vorschläge/marktbericht-profi-demo.html (Artifact TfoLtXDkLcf3sbQxmceGaY), echte Zahlen Bericht 541. Wartet auf Marcels Abnahme der Gestaltung (sachliche Schriften, keine Serifen — Marcel 04.11.).
@@ -50,7 +54,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - Selbstauskunft ist Demo – Marcel legt ggf. eine Bank-Vorlage in den Ordner.
 - Steuerzeitraum 2026 (68.000 €) gegen Feld zvE (90.000 €) in Marcels Profil: App rechnet nach Regel (v3188), Werte prüft Marcel.
 
-### N125 · Kaufpreisaufteilung: mehrere Flurstücke, Nebengebäude, Leerstand
+### N125 · Kaufpreisaufteilung: mehrere Flurstücke, Nebengebäude, Leerstand — **wird nicht gebaut (Marcel 05.11.2026: normale Aufteilung reicht)**
 Sonderfall vom 04.11.2026 (leerstehendes ZFH mit Scheune, drei Flurstücke). Das BMF-Modul kennt ein Gebäude und eine Bodenfläche. Fehlt: Flurstücke mit eigenem Bodenansatz (Bauland/Hinterland/Grün), ein zweites Gebäude mit eigener NHK/GND/RND, ein Schalter „leerstehend“ (dann kein Ertragswert-Weg). Mittlere Priorität — selten, aber dann steuerlich viel Geld (AfA-Basis). Hinterland gibt es im Marktbericht schon (Bodenwert 950 × 90 + 828 × 5).
 
 ### N124 · Gewerbeobjekt mit Wohnanteil ohne Miete rechnet keinen Ertragswert

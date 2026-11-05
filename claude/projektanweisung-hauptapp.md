@@ -44372,3 +44372,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `2afd81f2`, `67183eb2`; Prod 1.0.63 `9e5730cc`, PDF-Dienst auf Prod von Hand neu gebaut (läuft, „bereit auf 4100“).
 - **Nachweis:** Staging-Log: „html gesetzt (Inter:loaded, Space Grotesk:loaded, JetBrains Mono:loaded …) @1535ms“, PDF in 1.838 ms.
 - **Rest:** N126 (Videos, klassische KPA ohne Jacoby, Anhang beim echten Versand, Selbstauskunft-Vorlage, Steuerzeitraum 2026).
+
+### v3190–v3190a · Makler-Hub-Anmeldung (05.11.2026, nur Staging)
+
+- **Was:** DealPilot als Anmelde- und Abo-Dienst des Makler-Hubs (OAuth 2.0 Code + PKCE): Migration 097, `maklerHubService.js`, `routes/maklerHub.js` (/api/v1/hub: pruefen, status, code, token, konto, verbindung, meine-verbindung), Webhook mit HMAC und Wiederholungen, Verbinden-Ebene `js/hub-anmelden.js` (Umleiter in index.html). Partner enthält `makler_hub`.
+- **Commit:** `5dd49d72`, `f1690e62`. Staging-.env `MAKLERHUB_*`, Backend neu gebaut, Migration 97 eingespielt.
+- **Nachweis:** Verbinden-Ebene im Browser mit Konto/Paket/Kontingent; Vertragstest 10/10 im Container.
+- **Rest:** Geheimnis in den Hub, Durchlauf mit dem echten Hub, Registrierung mit Produktwahl, 402 mit nachkauf_url, Prod-Einrichtung. Siehe N127.
