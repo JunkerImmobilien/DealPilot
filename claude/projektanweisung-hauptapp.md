@@ -44365,3 +44365,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** v3188 … `af30cbc` (v3188a); Prod 1.0.62 `d0347d5`, Sicherungen `/root/backups/haupt-20261105-1128.sql.gz`, `mb-20261105-1128.sql.gz`.
 - **Nachweis:** Staging: zvE 2025/26 68.000, 2027 75.000, 2028+ 90.000 €; Ravensberger Weg 38: Wählen lässt Reiter Steuer 74,82 %, Schritt 5 Jacoby 79,88 %, PDF-Deckblatt und Rechenweg Jacoby, Anfrage vorbelegt (nicht gesendet), nach Schließen PDF wieder amtlich.
 - **Rest:** Gold-Basislinie senken; Steuerzeitraum 2026 bei Marcel prüfen. Einzelheiten `wissen/2026-11-05.md`.
+
+### v3189 · PDF-Dienst-Diagnose, Gold-Basislinie, Backlog (05.11.2026, Prod 1.0.63)
+
+- **Was:** Schrift-Diagnose im PDF-Dienst mit `Array.from(document.fonts)` (FontFaceSet ist kein Array; `[].map` lieferte leer). Gold-Basislinie 413/53 → 408/52 (deal-action-pilot.js 7 → 3, apikeys.js 1 → 0), CLAUDE.md nachgezogen. Backlog: Reste als N126, v3184–v3189 unter Fertig.
+- **Commit:** `2afd81f2`, `67183eb2`; Prod 1.0.63 `9e5730cc`, PDF-Dienst auf Prod von Hand neu gebaut (läuft, „bereit auf 4100“).
+- **Nachweis:** Staging-Log: „html gesetzt (Inter:loaded, Space Grotesk:loaded, JetBrains Mono:loaded …) @1535ms“, PDF in 1.838 ms.
+- **Rest:** N126 (Videos, klassische KPA ohne Jacoby, Anhang beim echten Versand, Selbstauskunft-Vorlage, Steuerzeitraum 2026).
