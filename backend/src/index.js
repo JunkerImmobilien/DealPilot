@@ -397,6 +397,7 @@ app.use('/api/v1/consent', require('./routes/consent'));  // v2933 - Zustimmunge
 app.use('/api/v1/aktivitaet', rateLimit({ windowMs: 60000, max: 10 }), require('./routes/aktivitaet'));  // v3095 - Online-Dauer je Tag
 app.use('/api/v1/wuensche', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/wuensche'));  // v3097 - Umsetzungswuensche der Entwicklungspartner
 app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
+app.use('/api/v1/hub', require('./routes/maklerHub'));  // v3190 · Makler-Hub-Anmeldung (Dateien/Makler-Hub/Anmeldung-Schnittstelle.md)
 /* v2071 · Die Rechenkerne als Schnittstelle: Restnutzungsdauer (im Image)
    und Verkehrswert (im Marktbericht-Dienst). Eigener Namensraum, damit
    sie spaeter getrennt freigeschaltet und abgerechnet werden koennen. */

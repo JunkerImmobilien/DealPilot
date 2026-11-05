@@ -204,7 +204,9 @@ async function upsertFromStripe({ userId, stripeSubscription, planId, billingInt
       data.stripe_subscription_id, data.stripe_price_id
     ]
   );
+  _hubEreignis(userId);
 }
+function _hubEreignis(userId) { try { require('./maklerHubService').ereignis(userId, 'paket.geaendert'); } catch (e) {} }   /* v3190 · Makler-Hub: Paket geändert */
 
 /**
  * Mark subscription as canceled in our DB (after Stripe confirms).
@@ -213,9 +215,10 @@ async function markCanceled({ stripeSubscriptionId, endedAt }) {
   await query(
     `UPDATE subscriptions
      SET status = 'canceled', ended_at = $2
-     WHERE stripe_subscription_id = $1`,
+     WHERE stripe_subscription_id = $1
+     RETURNING user_id`,
     [stripeSubscriptionId, endedAt || new Date()]
-  );
+  ).then((r) => { if (r && r.rows) r.rows.forEach((z) => _hubEreignis(z.user_id)); return r; });
 }
 
 /**

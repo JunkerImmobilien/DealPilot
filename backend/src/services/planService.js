@@ -110,6 +110,7 @@ async function setUserPlanManual(userId, planId, interval, durationDays) {
        ended_at = NULL`,
     [userId, planId, interval, String(days)]
   );
+  try { require('./maklerHubService').ereignis(userId, 'paket.geaendert'); } catch (e) {}   /* v3190 · Makler-Hub */
   return { userId, planId, interval, durationDays: days };
 }
 
