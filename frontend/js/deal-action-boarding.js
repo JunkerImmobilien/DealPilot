@@ -257,7 +257,7 @@
       X + '.dab-panel{background:transparent !important;box-shadow:none !important;border:0 !important;padding:0 !important}',
       /* Startbahn ohne Flugzeug: ein ruhiger Fortschrittsbalken */
       X + '.dab-plane,' + X + '.dab-rgate{display:none !important}',
-      X + '.dab-runway{height:12px !important;margin-top:12px !important}',
+      X + '.dab-runway{height:34px !important;margin-top:8px !important}',   /* v3191: die Spur sitzt absolut 22 px tief - 12 px Rahmen liess sie in die Chips ragen */
       X + '.dab-strip::after{display:none !important}',
       X + '.dab-rtitle,' + X + '.dab-title{font-family:\'Space Grotesk\',Inter,sans-serif !important;font-size:22px !important;font-weight:600 !important}',
       /* Status: drei ruhige Karten nebeneinander */
@@ -315,7 +315,7 @@
       /* Teilen-Karte hell */
       X + '#dab-share-slot > div{background:#FFFFFF !important;border:1px solid #E6E0D3 !important;border-radius:12px !important}',
       /* v3191 · Marcel: „cooler, kompakter … einfacher“ - Kopf zweispaltig, Karten kleiner */
-      '@media(min-width:1000px){' + X + '.dab-body{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);column-gap:22px;align-items:start}' + X + '#dab-readiness-host{grid-column:1;grid-row:1 / span 3}' + X + '.dab-sthead,' + X + '.dab-status-grid,' + X + '.dab-perf{grid-column:2}}',
+      '@media(min-width:1000px){' + X + '.dab-body{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-areas:"r h" "r t" "s t";column-gap:22px;row-gap:10px;align-items:start}' + X + '#dab-readiness-host{grid-area:r}' + X + '.dab-sthead{grid-area:h}' + X + '.dab-status-grid{display:contents !important}' + X + '.dab-tafel{grid-area:t}' + X + '#dab-share-slot{grid-area:s}' + X + '.dab-perf{display:none}}',
       X + '.dab-perf:empty{display:none}',
       X + '.dab-cap{display:none !important}',
       X + '.dab-sthead{padding-top:0 !important;margin-top:0 !important;border-top:0 !important}',
