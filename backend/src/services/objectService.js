@@ -41,6 +41,10 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
     `SELECT id, name, kuerzel, ort, kaufpreis, bmy, cf_ns, dscr, seq_no,
             version, created_at, updated_at,
             data::jsonb->>'halter' AS halter,  -- v815-halter: Mandanten-Filter Sidebar
+            -- v3191: Ueberfuehrung erkennbar ohne Blob (Mandanten: Objektliste, Auswahlfenster nur ueberfuehrbarer Objekte)
+            data::jsonb->>'obj_herkunft' AS obj_herkunft,
+            data::jsonb->>'ueberf_ende' AS ueberf_ende,
+            data::jsonb->>'str' AS str, data::jsonb->>'hnr' AS hnr, data::jsonb->>'plz' AS plz,
             data::jsonb->>'kaufdat' AS kaufdat,  -- v844-kaufdat: Kaufdatum auf Sidebar-Card
             data::jsonb->>'lageklasse' AS lageklasse,  -- v1982: Sortierung nach A/B/C-Lage
             -- v2030: Ankauf-Stand. NUR die Kurzfassung (neun Zahlen) und der

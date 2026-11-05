@@ -1251,7 +1251,7 @@
     if (h !== 'privat') return false;
     if (String(d.obj_herkunft || '') === 'ueberfuehrung') return false;
     if ((d.ueberf_ende || '').toString().trim()) return false;
-    if (d._deal_lost === true || d._deal_lost === 'true') return false;
+    if (d._deal_lost === true || d._deal_lost === 'true' || o.deal_lost === true) return false;   /* Liste der API: flach, deal_lost */
     return true;
   }
   function openUeberfuehrung() {
@@ -1283,16 +1283,16 @@
         var q = String(such && such.value || '').toLowerCase().trim();
         var treffer = items.filter(function (o) {
           if (!q) return true;
-          var d = o.data || {};
+          var d = o.data || o;
           return [d.str, d.hnr, d.plz, d.ort, o.seq_no, o.name].join(' ').toLowerCase().indexOf(q) >= 0;
         });
         if (!items.length) { liste.innerHTML = '<div style="color:#6B6356;font-size:13px;line-height:1.5">Kein Objekt lässt sich überführen. Überführbar sind Objekte mit Halter „Privat“, die nicht schon überführt oder als verloren markiert sind.</div>'; return; }
         if (!treffer.length) { liste.innerHTML = '<div style="color:#6B6356;font-size:13px">Kein Treffer.</div>'; return; }
         liste.innerHTML = treffer.map(function (o) {
-          var d = o.data || {};
+          var d = o.data || o;
           var label = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || ('Objekt ' + o.id);
           var ort = [d.plz, d.ort].filter(Boolean).join(' ');
-          var status = d._deal_won === true || d._deal_won === 'true' ? 'Bestand' : 'Ankauf';
+          var status = (o.deal_won === true || d._deal_won === true || d._deal_won === 'true') ? 'Bestand' : 'Ankauf';
           return '<button type="button" data-uew="' + esc(String(o.id)) + '" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border:1px solid #E6E0D3;border-radius:10px;background:#fff;cursor:pointer;font-family:inherit">'
             + '<span style="font:600 10.5px \'JetBrains Mono\',monospace;color:#6B6356;min-width:68px">' + esc(o.seq_no || '') + '</span>'
             + '<span style="flex:1;min-width:0"><b style="display:block;font:600 14px/1.25 Inter,sans-serif;color:#1a1814;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(label) + '</b>'
