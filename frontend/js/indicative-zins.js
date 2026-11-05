@@ -32,7 +32,7 @@
     bund:      { '5': 3.23,  '10': 3.51,  '15': 3.70,  '20': 3.80 },
     aufschlag: { '5': 0.558, '10': 0.558, '15': 0.558, '20': 0.558 },   /* v2246 */
     aufschlag_monat: '2026-08',
-    k: 0.27,
+    k: 0.41,   /* v3194 · nachkalibriert 05.11.2026, Spiegel von bauzinsService K_KALIBRIERUNG */
     zuschlaege: [[60, -0.20], [70, -0.10], [80, 0], [90, 0.22], [100, 0.45], [110, 0.95]],
     stufen_ltv: { premium: 60, standard: 80, schwach: 90, voll: 100 }
   };

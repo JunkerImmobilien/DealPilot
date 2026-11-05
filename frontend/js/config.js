@@ -1167,7 +1167,7 @@ window.DealPilotConfig = (function() {
         bund:      { '5': 3.23,  '10': 3.51,  '15': 3.70,  '20': 3.80 },   // Bund-Rendite 14.10.2026
         aufschlag: { '5': 0.558, '10': 0.558, '15': 0.558, '20': 0.558 },  // v2246: EIN Aufschlag (MFI 5-10 J minus Bund 10), 08/2026
         aufschlag_monat: '2026-08',
-        k: 0.27,                       // Kalibrierung 15.10.2026: 10 J / 80 % = 4,34 %
+        k: 0.41,                       // Kalibrierung 05.11.2026 (v3194): 10 J / 80 % = rund 4,17 % nominal (4,25 % effektiv); vorher 0,27 vom 15.10.
         zuschlaege: [[60, -0.20], [70, -0.10], [80, 0], [90, 0.22], [100, 0.45], [110, 0.95]],
         stufen_ltv: { premium: 60, standard: 80, schwach: 90, voll: 100 },   /* v2254: voll */
         asOf: '2026-10-14'
