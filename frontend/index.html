@@ -52,7 +52,8 @@
       Object.keys(m).forEach(function(a){var v=f[a]||'';if(m[a].indexOf(v)>=0)r.setAttribute(a,v);});}catch(e){}})();</script>
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=v1500"><!-- V292-modal-refactor -->
-<link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3188"><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
+<link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3188"><!-- v3185 -->
+<link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3192"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=v2132">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -3328,36 +3329,51 @@ label.dp-required.qc-required::after {
       </div>
     </div>
   </div>
-  <!-- ═══ Cashflow VOR Steuern · 3 Phasen ═══ -->
-  <div class="cf-phase-block">
-    <div class="cf-phase-title">Cashflow VOR Steuern · pro Monat</div>
-    <div class="cf-phase-grid">
-      <div class="cf-phase-card cf-phase-now"><div class="cf-phase-label">Heute</div><div class="cf-phase-val" id="cf-vst-now">—</div><div class="cf-phase-sub">€ / Monat</div></div>
-      <div class="cf-phase-card cf-phase-ezb"><div class="cf-phase-label">Ende Zinsbindung</div><div class="cf-phase-val" id="cf-vst-ezb">—</div><div class="cf-phase-sub">€ / Monat</div></div>
-      <div class="cf-phase-card cf-phase-an"><div class="cf-phase-label">Anschluss</div><div class="cf-phase-val" id="cf-vst-an">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+  <!-- ═══ v3192 · KENNZAHLEN KOMPAKT, IN KATEGORIEN ═══════════════════════════
+       Marcel 05.11.2026: „sobald die Karten kommen: Cashflow vor Steuern, Cashflow nach Steuern, Bruttomietrendite
+       … Break-Even. Die Karten sind sehr groß … kompakter, überschaubarer … die Eigenkapitalrendite … direkt sehen …
+       in Kategorien teilen". Vorher: zwei Cashflow-Blöcke à 183 px + acht Kacheln à 117 px (zusammen rund 870 px).
+       Alle Element-IDs bleiben (calc.js schreibt hinein); neu ist nur kpi-ekr. Gestaltung: css/bewertung-kompakt.css. -->
+  <div class="bw-kz">
+    <div class="bw-kat">
+      <div class="bw-kat-t">Cashflow pro Monat</div>
+      <div class="bw-cf">
+        <div class="bw-cf-row"><span class="bw-cf-n">vor Steuern</span>
+          <span class="bw-cf-z"><small>heute</small><b id="cf-vst-now">—</b></span>
+          <span class="bw-cf-z"><small>Ende Zinsbindung</small><b id="cf-vst-ezb">—</b></span>
+          <span class="bw-cf-z"><small>Anschluss</small><b id="cf-vst-an">—</b></span></div>
+        <div class="bw-cf-row bw-cf-tax"><span class="bw-cf-n">nach Steuern</span>
+          <span class="bw-cf-z"><small>heute</small><b id="cf-nst-now">—</b></span>
+          <span class="bw-cf-z"><small>Ende Zinsbindung</small><b id="cf-nst-ezb">—</b></span>
+          <span class="bw-cf-z"><small>Anschluss</small><b id="cf-nst-an">—</b></span></div>
+      </div>
     </div>
-  </div>
-
-  <div class="cf-phase-block cf-phase-block-tax">
-    <div class="cf-phase-title">Cashflow NACH Steuern · pro Monat</div>
-    <div class="cf-phase-grid">
-      <div class="cf-phase-card cf-phase-now"><div class="cf-phase-label">Heute</div><div class="cf-phase-val" id="cf-nst-now">—</div><div class="cf-phase-sub">€ / Monat</div></div>
-      <div class="cf-phase-card cf-phase-ezb"><div class="cf-phase-label">Ende Zinsbindung</div><div class="cf-phase-val" id="cf-nst-ezb">—</div><div class="cf-phase-sub">€ / Monat</div></div>
-      <div class="cf-phase-card cf-phase-an"><div class="cf-phase-label">Anschluss</div><div class="cf-phase-val" id="cf-nst-an">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+    <div class="bw-kat">
+      <div class="bw-kat-t">Rendite</div>
+      <div class="bw-grid">
+        <div class="kpi bw-hi"><div class="kpi-label">EK-Rendite</div><div class="kpi-val" id="kpi-ekr">—</div><div class="kpi-sub" id="kpi-ekr-sub">p.a. vor Steuern auf EK</div></div>
+        <div class="kpi"><div class="kpi-label">Bruttomietrendite</div><div class="kpi-val gn" id="kpi-bmy">—</div><div class="kpi-sub">p.a. auf Kaufpreis</div></div>
+        <div class="kpi"><div class="kpi-label">Nettomietrendite</div><div class="kpi-val gn" id="kpi-nmy">—</div><div class="kpi-sub">p.a. auf Gesamtinvest</div></div>
+        <div class="kpi"><div class="kpi-label">IRR <button type="button" class="dp-tip" data-tip-id="tab5.irr" tabindex="-1" aria-label="Hilfe zu IRR"></button></div><div class="kpi-val" id="kpi-irr">—</div><div class="kpi-sub">interner Zinsfuß p.a.</div></div>
+        <div class="kpi"><div class="kpi-label">Equity Multiple <button type="button" class="dp-tip" data-tip-id="tab8.equity_multiple" tabindex="-1" aria-label="Hilfe zu Equity Multiple"></button></div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub" id="kpi-em-sub">geschätzt</div></div>
+      </div>
     </div>
-  </div>
-
-  <div class="kpi-grid kpi-grid-eval"><!-- V318-eval -->
-    <div class="kpi"><div class="kpi-label">Bruttomietrendite</div><div class="kpi-val gn" id="kpi-bmy">—</div><div class="kpi-sub">p.a. auf Kaufpreis</div></div>
-    <div class="kpi"><div class="kpi-label">Nettomietrendite</div><div class="kpi-val gn" id="kpi-nmy">—</div><div class="kpi-sub">p.a. auf Gesamtinvest</div></div>
-    <div class="kpi"><div class="kpi-label">LTV <button type="button" class="dp-tip" data-tip-id="tab5.ltv" tabindex="-1" aria-label="Hilfe zu LTV"></button></div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
-    <div class="kpi"><div class="kpi-label">DSCR <button type="button" class="dp-tip" data-tip-id="tab5.dscr" tabindex="-1" aria-label="Hilfe zu DSCR"></button></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
-    <div class="kpi"><div class="kpi-label">Faktor</div><div class="kpi-val" id="kpi-fak">—</div><div class="kpi-sub">Jahresmieten</div></div>
-    <div class="kpi"><div class="kpi-label">Equity Multiple <button type="button" class="dp-tip" data-tip-id="tab8.equity_multiple" tabindex="-1" aria-label="Hilfe zu Equity Multiple"></button></div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub" id="kpi-em-sub">geschätzt</div></div>
-    <!-- v1260: IRR wurde auf der Landingpage beworben und im Glossar erklaert,
-         aber nie gerechnet. Jetzt steht er da, wo er hingehoert. -->
-    <div class="kpi"><div class="kpi-label">IRR <button type="button" class="dp-tip" data-tip-id="tab5.irr" tabindex="-1" aria-label="Hilfe zu IRR"></button></div><div class="kpi-val" id="kpi-irr">—</div><div class="kpi-sub">interner Zinsfuß p.a.</div></div>
-    <div class="kpi"><div class="kpi-label">Break-Even</div><div class="kpi-val" id="kpi-be">—</div><div class="kpi-sub" id="kpi-be-sub">Cashflow positiv</div></div>
+    <div class="bw-kat bw-kat-2">
+      <div>
+        <div class="bw-kat-t">Finanzierung &amp; Risiko</div>
+        <div class="bw-grid bw-grid-3">
+          <div class="kpi"><div class="kpi-label">DSCR <button type="button" class="dp-tip" data-tip-id="tab5.dscr" tabindex="-1" aria-label="Hilfe zu DSCR"></button></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
+          <div class="kpi"><div class="kpi-label">LTV <button type="button" class="dp-tip" data-tip-id="tab5.ltv" tabindex="-1" aria-label="Hilfe zu LTV"></button></div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
+          <div class="kpi"><div class="kpi-label">Break-Even</div><div class="kpi-val" id="kpi-be">—</div><div class="kpi-sub" id="kpi-be-sub">Cashflow positiv</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="bw-kat-t">Preis</div>
+        <div class="bw-grid bw-grid-1">
+          <div class="kpi"><div class="kpi-label">Faktor</div><div class="kpi-val" id="kpi-fak">—</div><div class="kpi-sub">Jahresmieten</div></div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="col2">
     <div class="card">
@@ -3716,7 +3732,7 @@ label.dp-required.qc-required::after {
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3161"></script>
+  <script src="js/calc.js?v=v3192"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>

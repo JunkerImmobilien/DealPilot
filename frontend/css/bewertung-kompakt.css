@@ -1,0 +1,41 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   bewertung-kompakt.css · v3192 — Kennzahlen im Reiter Bewertung, kompakt und in Kategorien
+   Marcel 05.11.2026: „Die Karten sind sehr groß, das könnte man deutlich kompakter, überschaubarer
+   machen … die Eigenkapitalrendite … direkt sehen … in Kategorien teilen". Markup in index.html (.bw-kz).
+   Farben der Werte setzt calc.js (setKpiColor) - hier nur Größe, Raster und Flächen.
+   ═══════════════════════════════════════════════════════════════════════ */
+.bw-kz { display: grid; gap: 14px; margin: 14px 0 18px; }
+.bw-kat-t { font: 600 10.5px/1 'JetBrains Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #6B6356; margin: 0 2px 8px; }
+.bw-kat-2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 14px; }
+
+/* Cashflow: zwei Zeilen, je drei Phasen */
+.bw-cf { border: 1px solid #E6E0D3; border-radius: 12px; background: #FFFFFF; overflow: hidden; }
+.bw-cf-row { display: grid; grid-template-columns: 130px repeat(3, minmax(0, 1fr)); align-items: center; gap: 10px; padding: 10px 16px; }
+.bw-cf-row + .bw-cf-row { border-top: 1px solid #EEEAE1; }
+.bw-cf-n { font: 600 13px Inter, sans-serif; color: #1a1814; }
+.bw-cf-z { display: flex; flex-direction: column; gap: 2px; }
+.bw-cf-z small { font-size: 11px; color: #6B6356; }
+.bw-cf-z b { font: 700 19px/1.15 'Space Grotesk', Inter, sans-serif; font-variant-numeric: tabular-nums; color: #1a1814; }
+.bw-cf-tax { background: #FBFAF7; }
+
+/* Kacheln: klein, mehrere je Zeile */
+.bw-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.bw-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bw-grid-1 { grid-template-columns: 1fr; }
+.bw-kz .kpi { padding: 11px 13px !important; min-height: 0 !important; border: 1px solid #E6E0D3 !important; border-left-width: 1px !important; border-radius: 10px !important; background: #FFFFFF !important; box-shadow: none !important; }
+.bw-kz .kpi-label { font: 600 10.5px/1.2 Inter, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; color: #6B6356 !important; margin-bottom: 4px !important; }
+.bw-kz .kpi-val { font: 700 20px/1.1 'Space Grotesk', Inter, sans-serif !important; font-variant-numeric: tabular-nums; }
+.bw-kz .kpi-sub { font-size: 11px !important; color: #8A8272 !important; margin-top: 2px !important; }
+/* EK-Rendite hervorgehoben */
+.bw-kz .kpi.bw-hi { background: #FBF6E9 !important; border-color: #EAD9B0 !important; }
+.bw-kz .kpi.bw-hi .kpi-val { font-size: 22px !important; }
+
+@media (max-width: 1100px) { .bw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .bw-kat-2 { grid-template-columns: 1fr; }
+  .bw-grid, .bw-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bw-cf-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bw-cf-n { grid-column: 1 / -1; }
+}
+.bw-cf-z b.positive { color: #2E8455; }
+.bw-cf-z b.negative { color: #B8625C; }

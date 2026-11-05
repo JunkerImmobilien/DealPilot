@@ -2834,6 +2834,8 @@ function _calcImmediate(){
      beides falsch. Deshalb wird hier auf `== null` geprüft und nicht mit
      `||` gearbeitet: 0 ist ein gültiger Wert und darf nicht durchfallen. */
   st('kpi-irr', (irr == null) ? '—' : fP(irr, 1));
+  /* v3192 · EK-Rendite als eigene Kachel (Marcel: „die Eigenkapitalrendite ist halt ganz wichtig, dass wir die direkt sehen“) - dieselbe Rechnung wie DealKpis (cf_banker_j / ek) und die Kennzahlen-Bewertung */
+  try { var _ekr = (ekv > 100) ? (cf_op / ekv * 100) : null; st('kpi-ekr', (ekv <= 100) ? '∞' : fP(_ekr, 1)); st('kpi-ekr-sub', (ekv <= 100) ? 'kaum Eigenkapital · max. Hebel' : 'p.a. vor Steuern auf ' + fE(ekv, 0) + ' EK'); if (_ekr != null) setKpiColor('kpi-ekr', _ekr, 8, 4); } catch (_eEk) {}
   if (irr != null) setKpiColor('kpi-irr', irr, 8, 4);   /* ≥8 % grün, 4–8 gold, <4 rot */
   if (be.cf == null) {
     st('kpi-be', '—');
