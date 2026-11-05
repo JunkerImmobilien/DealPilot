@@ -580,7 +580,7 @@
       var cls = opts.bold ? 'v292-row-bold' : '';
       var s = '<tr class="' + cls + '"><td>' + label + '</td>';
       values.forEach(function(v){ s += '<td>' + v + '</td>'; });
-      s += J.ok ? '<td>' + jw + '</td>' : '<td style="color:#9A9384">' + (opts.grund ? '<small>' + J.grund + '</small>' : '—') + '</td>';
+      s += J.ok ? '<td>' + jw + '</td>' : '<td style="color:#9A9384">' + '—' + '</td>';
       s += '</tr>';
       return s;
     }
@@ -608,7 +608,7 @@
     html += '</tr>';
 
     html += '</tbody></table>' +
-      '<p class="hint" style="margin-top:14px"><strong>Amtlich</strong> entspricht exakt der BMF-Arbeitshilfe. Jede Abweichung braucht eine Begründung – sie geht in Schritt 5 in den Text für Kaufvertrag und Berater.</p>';
+      (J.ok ? '' : '<p class="hint" style="margin-top:10px"><strong>Jacoby nicht anwendbar:</strong> ' + J.grund + '</p>') + '<p class="hint" style="margin-top:10px"><strong>Amtlich</strong> entspricht exakt der BMF-Arbeitshilfe. Jede Abweichung braucht eine Begründung – sie geht in Schritt 5 in den Text für Kaufvertrag und Berater.</p>';
 
     v292Container.innerHTML = html;
     try { var jzH = document.getElementById('bmfJacobyZeile'); if (jzH) paneAfa.appendChild(jzH); } catch (e) {}

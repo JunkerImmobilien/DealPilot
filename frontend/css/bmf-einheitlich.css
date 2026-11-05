@@ -71,6 +71,7 @@
 /* ── Felder: weiß, durchgezogener Rand, Inter - eins für alle ─────────── */
 #bmfOverlay .bmfmo-pane input[type="text"],
 #bmfOverlay .bmfmo-pane input[type="number"],
+#bmfOverlay .bmfmo-pane input[type="date"],
 #bmfOverlay .bmfmo-pane input:not([type]),
 #bmfOverlay .bmfmo-pane select,
 #bmfOverlay .bmfmo-pane textarea {

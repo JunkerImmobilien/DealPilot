@@ -1913,7 +1913,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 ═══════════════════════════════════════════════════ */
 .tax-tl-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));   /* v3186: „Nachzahlung“ passt in eine Zeile */
   gap: 6px;
   margin-bottom: 14px;
 }
@@ -1938,12 +1938,14 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   line-height: 1.1;
 }
 .tax-tl-label {
-  font-size: 9.5px;
+  font-size: 10.5px;
   color: var(--muted);
   margin-top: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  overflow-wrap: anywhere;   /* v3042 · ein langes Wort bricht in der Kachel um statt herauszuragen */
+  /* v3186 · Marcel 05.11.2026: „NACHZAHLUN / G“ brach um - Versalien mit Sperrung waren zu breit fuer die Kachel.
+     Normale Schreibung, keine Sperrung, kein Umbruch im Wort. */
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 .tax-tl-total {
   display: flex;

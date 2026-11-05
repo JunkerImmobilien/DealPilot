@@ -1060,12 +1060,25 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
     taxBefore: impact.taxBefore, taxAfter: impact.taxAfter,
     taxDelta: impact.taxDelta, refund: impact.refund,
     grenzsteuersatzAfter: impact.grenzsteuersatzAfter,
-    avgAfter: impact.avgAfter
+    avgAfter: impact.avgAfter,
+    jahr: displayYear, zveOhneBestand: _baseIncomeOrig   /* v3186 */
   };
 
   // EStG view in Persönliche Steuer card
   var estgView = document.getElementById('estg_view');
   if (estgView) estgView.textContent = fE(impact.taxBefore, 0);
+  /* v3186 · Marcel: 47 % Grenzsatz bei 90.000 €, darunter 18.886 € Steuer - gemessen: die Steuer gilt fuer das
+     angezeigte Jahr mit dessen zvE aus den Steuerzeitraeumen plus Saldo frueherer Objekte (71.481 €). Jetzt steht es dabei. */
+  try {
+    var _eh = estgView && estgView.parentNode && estgView.parentNode.querySelector('.hint');
+    if (_eh) {
+      var _dz = baseIncome - _baseIncomeOrig;
+      _eh.textContent = displayYear + ': ESt nach § 32a mit Soli' + (impact.kistSatz > 0 ? ' und Kirchensteuer' : '') + ' auf zvE ' + Math.round(_baseIncomeOrig).toLocaleString('de-DE') + ' €'
+        + (Math.abs(_dz) >= 1 ? ' ' + (_dz > 0 ? '+ ' : '− ') + Math.round(Math.abs(_dz)).toLocaleString('de-DE') + ' € aus früher gekauften Objekten' : '')
+        + (_zveSource && !/aktuell/i.test(_zveSource) ? ' (zvE-Quelle: ' + _zveSource + ')' : '') + '.';
+    }
+    _grenzErklaeren();
+  } catch (_eG) {}
 }
 
 
@@ -1273,8 +1286,7 @@ function renderTaxTimeline() {
          Nachzahlung habe ich". Der Betrag oben war schon die Wirkung DIESES Objekts
          (Steuer ohne − mit, auf zvE + Saldo der vorher gekauften Objekte); jetzt
          steht das V+V-Ergebnis des Objekts darunter. */
-      '<div class="tax-tl-vv" style="margin-top:4px;font-size:11px;color:var(--muted,#7A7370)">V+V ' +
-        (t.immoResult < 0 ? '−' : '+') + ' ' + Math.round(Math.abs(t.immoResult)).toLocaleString('de-DE') + ' €</div>' +
+      /* v3186 · Marcel 05.11.2026: die V+V-Zeile raus - Erstattung bzw. Nachzahlung reicht */
     '</div>';
   });
   html += '</div>';
@@ -2515,7 +2527,8 @@ function _grenzAutoNachziehen(mitToast) {
             (State && State._taxDisplayYear) || new Date().getFullYear()) || 0;
         }
       } catch (_eT) { _salT = 0; }
-      grenzInput.title = 'Wird aus deinem zu versteuernden Einkommen berechnet '
+      grenzInput.title = '';   /* v3186: Erklaerung steht sichtbar unter dem Feld (_grenzErklaeren) - kein zweites Popup */
+      void ('Wird aus deinem zu versteuernden Einkommen berechnet '
         + '(§ 32a EStG). Zum Ändern den Haken darunter entfernen.'
         + (Math.abs(_salT) >= 1
             ? ' — Achtung: das ist dein persönlicher Satz auf das volle zvE. '
@@ -2525,7 +2538,8 @@ function _grenzAutoNachziehen(mitToast) {
               + ' Basis, weil früher gekaufte Bestandsobjekte einfließen. Der '
               + 'tatsächlich wirkende Satz steht im Hinweis „Dein Steuersatz '
               + 'wurde angepasst".'
-            : '');
+            : ''));
+      try { _grenzErklaeren(); } catch (_eE) {}
       if (mitToast && typeof toast === 'function') {
         toast('✓ Grenzsteuersatz aus zvE berechnet: ' + neu + ' %');
       }
@@ -2535,15 +2549,73 @@ function _grenzAutoNachziehen(mitToast) {
        Feld bleibt frei — sonst waere es gesperrt UND leer. */
     grenzInput.disabled = false;
     grenzInput.style.background = '';
-    grenzInput.title = 'Kein zu versteuerndes Einkommen erfasst — der Satz '
-      + 'lässt sich nicht berechnen. Trage ihn selbst ein oder ergänze das zvE.';
+    grenzInput.title = '';
+    try { _grenzErklaeren(); } catch (_eE) {}
     return false;
   }
   grenzInput.disabled = false;
   grenzInput.style.background = '';
   grenzInput.title = '';
+  try { _grenzErklaeren(); } catch (_eE) {}
   return false;
 }
+
+/* ═══ v3186 · DER GRENZSTEUERSATZ ERKLÄRT SICH SELBST ═══════════════════════
+   Marcel 05.11.2026: „persönlicher Grenzsteuersatz 47 Prozent bei Einkommensteuer
+   90.000 Euro. Da frage ich mich: Wie kann das sein? Wenn ich mit der Maus
+   drüberfahre, kommen auf einmal zwei Pop-ups … Dann sollte das auch nur mit einer
+   Checkbox erklärt werden."
+   Gemessen: 47 % stimmen - 42 % Einkommensteuer, und die ESt (26.664 €) liegt knapp
+   über der Soli-Freigrenze, in der Milderungszone: dort wächst der Soli mit 11,9 %
+   jeder Mehrsteuer, 42 % × 1,119 = 47,0 %. Die Erklärung stand nur im title des
+   Feldes (Browser-Popup) über dem ?-Tooltip. Jetzt: eine sichtbare Zeile unter dem
+   Feld, das title entfällt, die Beschriftung sagt, was im Satz steckt. */
+function _grenzErklaeren() {
+  var g = document.getElementById('grenz'); if (!g || !window.Tax) return;
+  var f = g.closest('.f'); if (!f) return;
+  var box = document.getElementById('grenz_erkl');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'grenz_erkl'; box.className = 'hint';
+    box.style.cssText = 'margin-top:4px';
+    f.appendChild(box);
+  }
+  g.title = '';
+  var jahr = new Date().getFullYear();
+  var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
+  var o = Tax.optionen ? Tax.optionen(null, jahr) : { splitting: false, kist: 0 };
+  var lbl = f.querySelector('label');
+  if (lbl && lbl.firstChild && lbl.firstChild.nodeType === 3) {
+    lbl.firstChild.nodeValue = 'Persönl. Grenzsteuersatz ' + (o.kist > 0 ? 'inkl. Soli und Kirchensteuer' : 'inkl. Soli') + ' (%) ';
+  }
+  if (!(zve > 0)) { box.textContent = 'Ohne zvE lässt sich der Satz nicht berechnen – trage ihn selbst ein oder ergänze das zvE.'; return; }
+  var pz = function (x, d) { return (x * 100).toFixed(d == null ? 2 : d).replace('.', ',') + ' %'; };
+  var L = Tax.steuerLast(zve, jahr, o);
+  var basis = Math.max(0, Math.floor(zve) - Math.floor(L.kist || 0));
+  var gEst = Tax.calcGrenzsteuersatz(o.splitting ? basis / 2 : basis, jahr);
+  var gGes = Tax.grenzsatzGesamt(zve, jahr, o);
+  var teile = [pz(gEst, 0) + ' Einkommensteuer'];
+  if (L.soli > 0) {
+    var mild = L.soli < 0.055 * L.est - 0.5;   /* unter dem vollen Satz = Milderungszone (Tax.soli rechnet sie) */
+    teile.push('Solidaritätszuschlag' + (mild ? ' in der Milderungszone (er wächst dort mit 11,9 % jeder Mehrsteuer, bis er 5,5 % erreicht)' : ' 5,5 %'));
+  }
+  if (o.kist > 0) teile.push('Kirchensteuer ' + Math.round(o.kist * 100) + ' %');
+  var t = (document.getElementById('grenz_auto') || {}).checked
+    ? 'Aus dem zvE ' + Math.round(zve).toLocaleString('de-DE') + ' € (' + jahr + (o.splitting ? ', Splitting' : '') + '): ' + teile.join(' + ') + ' = ' + pz(gGes, 1) + ' auf jeden weiteren Euro.'
+    : 'Von Hand eingetragen. Aus dem zvE ergäben sich ' + pz(gGes, 1) + ' (' + teile.join(' + ') + ').';
+  /* Wo früher gekaufte Objekte das zvE verschieben, wirkt für DIESES Objekt ein anderer Satz */
+  try {
+    var r = State && State.taxResult;
+    if (r && r.baseIncome != null && r.zveOhneBestand != null && Math.abs(r.baseIncome - r.zveOhneBestand) >= 1) {
+      var d = r.baseIncome - r.zveOhneBestand, jj = r.jahr || jahr;
+      t += ' Für dieses Objekt wirkt ' + jj + ' ein Satz von ' + pz(Tax.grenzsatzGesamt(r.baseIncome, jj), 1)
+        + ': zvE ' + Math.round(r.zveOhneBestand).toLocaleString('de-DE') + ' € ' + (d > 0 ? '+ ' : '− ') + Math.round(Math.abs(d)).toLocaleString('de-DE')
+        + ' € aus früher gekauften Objekten.';
+    }
+  } catch (e) {}
+  box.textContent = t;
+}
+window._grenzErklaeren = _grenzErklaeren;
 
 function onGrenzAutoToggle() {
   _grenzAutoNachziehen(true);
