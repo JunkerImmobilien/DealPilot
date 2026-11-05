@@ -853,6 +853,9 @@
   }
 
   function wahlJetzt() {
+    /* v3184a · dieselbe Auswahl wie Schritt 5: was im Reiter Steuer gilt, sonst die Wahl im Fenster.
+       Gemessen Westerfeldstr.: Tafel „Amtlich gewählt", Reiter Steuer 32,72 % (Optimiert), Vertragssatz Optimiert. */
+    try { var a = window.DpBmfBodenabschlag && window.DpBmfBodenabschlag.auswahl(); if (a && a.id) return a.id; } catch (e) {}
     var st = window._v292State || {};
     return window._dpBmfTafelWahl || st.selectedVariant || 'amtlich';
   }

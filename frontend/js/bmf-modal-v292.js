@@ -546,7 +546,15 @@
       konservativ: { name: 'Konservativ', sub: 'Boden −15 %' },
       optimiert:   { name: 'Optimiert',   sub: 'Boden −20 %' }
     };
-    var J = _jacobySpalte(r);
+    /* v3184a · AfA-Satz und Steuer wie Schritt 4 und 5: der Satz aus dem Reiter Steuer und der Grenzsteuersatz
+       des Rechners (DpBmfWahlTafel.daten). Vorher rechnete Schritt 3 mit den 2,0 % der Pipeline - Westerfeldstr.:
+       AfA 1.946 € in Schritt 3 gegen 6.083 € in Schritt 4 für dieselbe Variante. */
+    var T = _tafelDaten(r), tz = function (n) { return T ? T.zeilen.filter(function (z) { return z.id === n; })[0] : null; };
+    var afaV = function (n) { var z = tz(n); return z && z.afa != null ? z.afa : p10[n].afa_jahr; };
+    var satzV = function (n) { return T ? T.satz : p10[n].afa_satz_pct; };
+    var grenzQ = T && T.grenz ? T.grenz / 100 : null;
+    var steuerV = function (n) { return grenzQ != null ? (afaV(n) + (p10[n].inventar_afa_jahr || 0)) * grenzQ : p10[n].steuerersparnis_jahr; };
+    var J = _jacobySpalte(r, T);
 
     var html = '<div class="v292-pane3-header">' +
       '<div class="banner info"><strong>Amtlich, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby.</strong> ' +
@@ -582,11 +590,11 @@
     html += _row('Boden im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].boden_eur_vertrag); }), J.ok && _fmtEur(J.bodenVertrag));
     html += _row('Gebäude-AK (mit NK)', variants.map(function(n){ return _fmtEur(p8[n].gebaeude_ak); }), J.ok && _fmtEur(J.gebAk), { bold: true });
     html += _row('15-%-Grenze (max. Sanierung)', variants.map(function(n){ return _fmtEur(p9[n].max); }), J.ok && _fmtEur(J.gebAk * 0.15));
-    html += _row('AfA-Satz', variants.map(function(n){ return _fmtPct(p10[n].afa_satz_pct, 1); }), J.ok && _fmtPct(J.satz, 1));
-    html += _row('AfA Gebäude/Jahr', variants.map(function(n){ return _fmtEur(p10[n].afa_jahr); }), J.ok && _fmtEur(J.afa));
+    html += _row('AfA-Satz' + (T ? ' (Reiter Steuer)' : ''), variants.map(function(n){ return _fmtPct(satzV(n), 2); }), J.ok && _fmtPct(J.satz, 2));
+    html += _row('AfA Gebäude/Jahr', variants.map(function(n){ return _fmtEur(afaV(n)); }), J.ok && _fmtEur(J.afa));
     html += _row('AfA Inventar/Jahr', variants.map(function(n){ return _fmtEur(p10[n].inventar_afa_jahr); }), J.ok && _fmtEur(J.inv));
-    html += _row('Σ AfA pro Jahr', variants.map(function(n){ return _fmtEur(p10[n].afa_summe_jahr); }), J.ok && _fmtEur(J.afa + J.inv), { bold: true });
-    html += _row('Steuerersparnis/Jahr (~40 %)', variants.map(function(n){ return _fmtEur(p10[n].steuerersparnis_jahr); }), J.ok && _fmtEur(J.steuer));
+    html += _row('Σ AfA pro Jahr', variants.map(function(n){ return _fmtEur(afaV(n) + (p10[n].inventar_afa_jahr || 0)); }), J.ok && _fmtEur(J.afa + J.inv), { bold: true });
+    html += _row('Steuerersparnis/Jahr' + (grenzQ != null ? ' (' + _fmtPct(T.grenz, 2) + ')' : ' (~40 %)'), variants.map(function(n){ return _fmtEur(steuerV(n)); }), J.ok && _fmtEur(J.steuer));
 
     html += '<tr class="v292-row-risiko"><td>Risiko-Begründung</td>';
     variants.forEach(function(name){
@@ -607,22 +615,26 @@
 
   /* v3184 · Jacoby als vierte Spalte: Gebäude-AK über denselben Kern wie die Wahl-Tafel
      (DpBmfWahlTafel.daten, mit Gegenprobe an „amtlich"), sonst verhältnisgleich zur Pipeline. */
-  function _jacobySpalte(r){
+  function _tafelDaten(r){
+    try {
+      if (!window.DpBmfWahlTafel) return null;
+      var s = document.getElementById('afa_satz'), v = s ? s.value : '2.0';
+      var afa = (window.Afa && typeof Afa.parseSelectValue === 'function') ? Afa.parseSelectValue(v) : { methode: 'linear', satzPct: parseFloat(String(v).replace(',', '.')) || 2 };
+      var D = window.DealPilotConfig && DealPilotConfig.investmentProfileDefaults, g = D ? Number(D.grenzsteuersatz) : NaN;
+      return DpBmfWahlTafel.daten(r, window._v292State && _v292State.lastInputs, { afa: afa, grenzPct: isFinite(g) && g > 0 ? g : null, gebaeudeAhk: window.DealKpis && DealKpis.gebaeudeAhk });
+    } catch (e) { return null; }
+  }
+  function _jacobySpalte(r, T){
     var j = r.phase4_bmf && r.phase4_bmf.jacoby, p5 = r.phase5_varianten, p8 = r.phase8_finale_ak, p10 = r.phase10_afa;
     if (!j || !j.verfuegbar) return { ok: false, grund: String((j && (j.grund || j.hinweis)) || 'keine Angaben').replace(/[<>&]/g, '') };
     var g = Number(Number(j.gebaeudeanteil_prozent).toFixed(2));
     if (!(g > 0 && g < 100)) return { ok: false, grund: 'kein plausibler Gebäudeanteil' };
     var A = p5.amtlich, kpI = (A.gebaeude_eur_vertrag || 0) + (A.boden_eur_vertrag || 0);
     var gebAk = null;
-    try {
-      var T = window.DpBmfWahlTafel && DpBmfWahlTafel.daten(r, window._v292State && _v292State.lastInputs,
-        { afa: { methode: 'linear', satzPct: p10.amtlich.afa_satz_pct }, gebaeudeAhk: window.DealKpis && DealKpis.gebaeudeAhk });
-      var z = T && T.zeilen.filter(function (x) { return x.id === 'jacoby'; })[0];
-      if (z && z.gebAk > 0) gebAk = z.gebAk;
-    } catch (e) {}
+    try { var z = T && T.zeilen.filter(function (x) { return x.id === 'jacoby'; })[0]; if (z && z.gebAk > 0) gebAk = z.gebAk; } catch (e) {}
     if (gebAk == null) gebAk = A.gebaeude_pct > 0 ? p8.amtlich.gebaeude_ak * g / A.gebaeude_pct : 0;
-    var satz = p10.amtlich.afa_satz_pct, afa = gebAk * satz / 100, inv = p10.amtlich.inventar_afa_jahr || 0;
-    var quote = p10.amtlich.afa_summe_jahr > 0 ? p10.amtlich.steuerersparnis_jahr / p10.amtlich.afa_summe_jahr : 0.4;
+    var satz = T ? T.satz : p10.amtlich.afa_satz_pct, afa = gebAk * satz / 100, inv = p10.amtlich.inventar_afa_jahr || 0;
+    var quote = T && T.grenz ? T.grenz / 100 : (p10.amtlich.afa_summe_jahr > 0 ? p10.amtlich.steuerersparnis_jahr / p10.amtlich.afa_summe_jahr : 0.4);
     return { ok: true, geb: g, gebVertrag: kpI * g / 100, bodenVertrag: kpI * (100 - g) / 100, gebAk: gebAk, satz: satz, afa: afa, inv: inv, steuer: (afa + inv) * quote };
   }
 

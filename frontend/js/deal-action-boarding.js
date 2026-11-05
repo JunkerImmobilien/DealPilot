@@ -1391,7 +1391,7 @@
     '#s8 .dab-smart-ic{width:40px;height:40px;border-radius:11px;background:var(--dab-run);display:flex;align-items:center;justify-content:center;color:#1a1508;flex-shrink:0;box-shadow:0 3px 10px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}',
     '#s8 .dab-smart-t{font-family:var(--dab-fs);font-size:14.5px;font-weight:700}#s8 .dab-smart-s{font-size:11.5px;color:#7A7370;margin-top:1px}',
     '#s8 .dab-smart-chev{margin-left:auto;color:var(--dab-gold3);transition:transform .25s}#s8 .dab-smart.open .dab-smart-chev{transform:rotate(180deg)}',
-    '#s8 .dab-smart-body{max-height:0;overflow:hidden;transition:max-height .35s ease}#s8 .dab-smart.open .dab-smart-body{max-height:560px}',
+    '#s8 .dab-smart-body{max-height:0;overflow:hidden;transition:max-height .35s ease}#s8 .dab-smart.open .dab-smart-body{max-height:1400px}',
     /* v1902 · DIE 560 SIND AM SCHREIBTISCH GEMESSEN, NICHT AM HANDY.
        Das Akkordeon faehrt ueber `max-height` auf, deshalb braucht es eine
        Zahl. Am Schreibtisch passt der Inhalt hinein (gemessen bei 1180 px:
@@ -1417,7 +1417,7 @@
        Der Deckel wird unter 900 px angehoben statt entfernt: ohne Zahl
        faehrt das Akkordeon nicht mehr auf. 1100 px decken die gemessenen
        813 px mit Luft fuer einen laengeren Dateinamen. */
-    '@media (max-width:900px){#s8 .dab-smart.open .dab-smart-body{max-height:1100px}}',
+    '@media (max-width:900px){#s8 .dab-smart.open .dab-smart-body{max-height:2200px}}',
     '#s8 .dab-doc-row{display:flex;align-items:center;gap:14px;padding:14px 4px;border-top:1px solid rgba(42,39,39,.1)}#s8 .dab-doc-row:first-child{margin-top:14px}',
     '#s8 .dab-doc-icb{width:44px;height:44px;border-radius:11px;background:#F8F6F1;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);display:flex;align-items:center;justify-content:center;color:var(--dab-gold3);flex-shrink:0;transition:.2s}',
     '#s8 .dab-doc-row:hover .dab-doc-icb{border-color:var(--dab-gold);box-shadow:0 0 12px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent)}',
