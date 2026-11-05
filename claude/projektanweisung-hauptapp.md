@@ -44379,3 +44379,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `5dd49d72`, `f1690e62`. Staging-.env `MAKLERHUB_*`, Backend neu gebaut, Migration 97 eingespielt.
 - **Nachweis:** Verbinden-Ebene im Browser mit Konto/Paket/Kontingent; Vertragstest 10/10 im Container.
 - **Rest:** Geheimnis in den Hub, Durchlauf mit dem echten Hub, Registrierung mit Produktwahl, 402 mit nachkauf_url, Prod-Einrichtung. Siehe N127.
+
+### v3191–v3191c · Überführung unter Mandanten, Deal-Aktion kompakt (05.11.2026, Prod 1.0.64)
+- **Was:** Überführung nur unter Einstellungen › Mandanten › Privat (Auswahlfenster nur überführbarer Objekte), Deal-Aktion ohne Überführung und kompakter, Objektliste der API mit obj_herkunft/ueberf_ende. Makler-Hub (v3190) mit Migration 097 auf Prod, ohne .env inaktiv.
+- **Commit:** `3e1d516` u. a.; Prod 1.0.64 `97c4c99`, Sicherungen `/root/backups/haupt-20261105-1233.sql.gz`, `mb-20261105-1233.sql.gz`.
+- **Nachweis:** Staging 27/33 angeboten, Westerfeldstr. „Bestand“; Deal-Aktion-Kopf zweispaltig; Prod `/hub/pruefen` → nicht eingerichtet, /health 200.
+- **Rest:** Reiter Bewertung kompakter + Charts in den PDFs (Marcel, nächster Auftrag).
