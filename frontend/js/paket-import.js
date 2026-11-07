@@ -90,9 +90,18 @@
         }).join('') + '</tbody></table>'
       + (P.share_deal ? '<p class="pk-hint"><b>Share Deal:</b> Gekauft werden Gesellschaftsanteile, nicht die Grundstücke. Ob und wie viel Grunderwerbsteuer anfällt, hängt an der erworbenen Beteiligung (§ 1 Abs. 2a, 2b und 3 GrEStG) — die Grunderwerbsteuer in jedem Objekt bitte im Reiter Investition prüfen.</p>' : '')
       + '<p class="pk-hint">Jedes Objekt wird als eigenes Objekt angelegt, mit seinen Einheiten aus der Mieterliste, und trägt den Paketnamen. Im Reiter Objekt siehst du die Summen über das ganze Paket.</p></div>'
-      + '<div class="pk-f"><span id="pk-stand" style="margin-right:auto;color:#625c59"></span><button type="button" id="pk-ab">Abbrechen</button><button type="button" class="p" id="pk-los">Objekte anlegen</button></div>';
+      + '<div class="pk-f"><span id="pk-stand" style="margin-right:auto;color:#625c59"></span><button type="button" id="pk-ab">Abbrechen</button><button type="button" id="pk-qc" title="Die gewählten Häuser zusammen als ein Objekt im Quick-Check prüfen">Im Quick-Check als Ganzes prüfen</button><button type="button" class="p" id="pk-los">Objekte anlegen</button></div>';
     var ov = fenster(html);
     el('pk-ab').onclick = function () { ov.remove(); };
+    /* v3203 · das Paket als EIN Objekt im Quick-Check: Summen der gewählten Häuser. Danach bleibt das Fenster
+       über „Paket-Fenster wieder öffnen" erreichbar, um die Häuser einzeln anzulegen. */
+    el('pk-qc').onclick = function () {
+      var wahl = [].slice.call(ov.querySelectorAll('[data-pk]')).filter(function (c) { return c.checked; }).map(function (c) { return O[parseInt(c.getAttribute('data-pk'), 10)]; });
+      if (!wahl.length) return;
+      window._dpPaketLetztes = r;
+      ov.remove();
+      imQuickCheck(wahl, (el('pk-name') && el('pk-name').value) || P.name || 'Paket');
+    };
     el('pk-los').onclick = function () {
       var wahl = [].slice.call(ov.querySelectorAll('[data-pk]')).filter(function (c) { return c.checked; }).map(function (c) { return O[parseInt(c.getAttribute('data-pk'), 10)]; });
       if (!wahl.length) return;
@@ -149,10 +158,42 @@
       await warte(400);
     }
     window._dpPaketLaeuft = false;
+    if (fertig) { var _pl = el('dp-paket-pille'); if (_pl) _pl.remove(); }   /* v3203 */
     try { if (typeof window.renderSaved === 'function') window.renderSaved(); } catch (x) {}
     if (stand) stand.textContent = fertig + ' von ' + wahl.length + ' Objekten angelegt' + (fehler.length ? ' · Fehler: ' + fehler.join('; ') : '');
     if (los) { los.textContent = 'Schließen'; los.disabled = false; los.onclick = function () { ov.remove(); }; }
     try { if (typeof window.toast === 'function') window.toast('Paket „' + paket.name + '": ' + fertig + ' Objekte angelegt'); } catch (x) {}
+  }
+
+  /* ── v3203 · Paket als Ganzes im Quick-Check ─────────────────────────── */
+  async function imQuickCheck(wahl, name) {
+    var S = { kp: 0, wfl: 0, nkm: 0, we: 0, bjW: 0, bjF: 0 };
+    wahl.forEach(function (o) {
+      S.kp += o.kaufpreis || 0; S.wfl += o.wohnflaeche || 0; S.nkm += mieteJahr(o) / 12;
+      S.we += o.wohneinheiten || o.einheiten.filter(function (e) { return e.art !== 'gewerbe'; }).length || 0;
+      if (o.baujahr && o.wohnflaeche) { S.bjW += o.baujahr * o.wohnflaeche; S.bjF += o.wohnflaeche; }
+    });
+    var bj = S.bjF > 0 ? Math.round(S.bjW / S.bjF) : null;   /* flächengewichtet */
+    if (typeof window.enterQuickCheckMode === 'function') window.enterQuickCheckMode();
+    var fr = null;
+    for (var i = 0; i < 20 && !fr; i++) { fr = [].slice.call(document.querySelectorAll('iframe')).filter(function (x) { return /quickcheck/.test(x.src); })[0] || null; if (!fr || !fr.contentDocument || !fr.contentDocument.getElementById('qc_kp')) { fr = null; await warte(300); } }
+    if (!fr) { try { window.toast && window.toast('Quick-Check nicht geladen - bitte erneut versuchen.'); } catch (x) {} return; }
+    var d = fr.contentDocument, w = fr.contentWindow;
+    var f1 = wahl[0] || {};
+    var setz = function (id, v) { var e = d.getElementById(id); if (!e || v == null || v === '') return; e.value = String(v);
+      try { e.dispatchEvent(new w.Event('input', { bubbles: true })); e.dispatchEvent(new w.Event('change', { bubbles: true })); } catch (x) {} };
+    setz('qc_str', name); setz('qc_hnr', ''); setz('qc_plz', f1.plz); setz('qc_ort', f1.ort);
+    setz('qc_objektart', 'MFH'); setz('qc_kp', Math.round(S.kp)); setz('qc_wfl', String(Math.round(S.wfl * 100) / 100).replace('.', ','));
+    setz('qc_bj', bj); setz('qc_einheiten', S.we);
+    setz('qc_nkm_grund', String(Math.round(S.nkm * 100) / 100).replace('.', ','));
+    try { w.eval('(typeof QcApp!=="undefined")&&(QcApp.mieteAddUp&&QcApp.mieteAddUp(),QcApp.scheduleUpdate&&QcApp.scheduleUpdate())'); } catch (x) {}
+    try { window.toast && window.toast('Paket „' + name + '" mit ' + wahl.length + ' Häusern im Quick-Check (Summen, Baujahr flächengewichtet). Einzeln anlegen: Paket-Fenster erneut öffnen.'); } catch (x) {}
+    var pil = el('dp-paket-pille'); if (pil) pil.remove();
+    pil = document.createElement('button'); pil.id = 'dp-paket-pille'; pil.type = 'button';
+    pil.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:9000;font:600 12.5px Inter,sans-serif;padding:9px 14px;border-radius:999px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);background:#FBF6E9;color:#2A2727;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.12)';
+    pil.textContent = 'Paket „' + name + '": Häuser einzeln anlegen';
+    pil.onclick = function () { if (window.DpPaket) window.DpPaket.erneut(); };
+    document.body.appendChild(pil);
   }
 
   /* ── Hinweis im Reiter Objekt: Teil eines Pakets, mit Übersicht ─────── */
@@ -210,5 +251,7 @@
     starten(t);
   });
   setInterval(function () { try { boxPruefen(); } catch (e) {} }, 1200);
-  window.DpPaket = { erkennen: erkennen, starten: starten, zeigen: zeigen, uebersicht: uebersicht, FELDER: FELDER };
+  window.DpPaket = { erkennen: erkennen, starten: starten, zeigen: zeigen, uebersicht: uebersicht, imQuickCheck: imQuickCheck, FELDER: FELDER,
+    /* v3203 · das zuletzt ausgelesene Paket erneut zeigen (nach dem Quick-Check einzeln anlegen) */
+    erneut: function () { if (window._dpPaketLetztes) zeigen(window._dpPaketLetztes); } };
 })();

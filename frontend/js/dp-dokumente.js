@@ -316,6 +316,15 @@
           + fs(r.cfop_y) + fs(da(r.tax_y) === null ? null : -r.tax_y) + fs(r.cfns_y) + '<td class="r num">' + f(r.rs) + '</td><td class="r num">' + B.zahl(r.ltv_y, 0) + ' %</td></tr>';
       }).join('') + '</tbody></table><p class="det">Beträge in Euro je Jahr. CF v. St. = Kaltmiete − Bewirtschaftung − Zins − ' + (bsv ? 'Tilgung − Bausparrate' : 'Tilgung') + '. Steuer: + Erstattung, − Belastung. CF n. St. = CF v. St. + Steuer.</p>';
   }
+  /* v3203 · Kurzfassung: der Vermögenszuwachs als ein Bild (derselbe Wasserfall wie in der vollständigen Fassung, aus State._vz) */
+  function zuwachsKurz(B) {
+    var S = St(), rows = S.cfRows || [], vz = S._vz || {};
+    if (rows.length < 2 || da(vz.verm_zuwachs) === null || typeof B.wasserfall !== 'function') return '';
+    return '<div class="block"><h3>Vermögenszuwachs über ' + rows.length + ' Jahre</h3>'
+      + B.wasserfall([{ name: 'Tilgung', wert: vz.tilgung_kum, klasse: 'b1' }, { name: 'CF-Überschuss', wert: vz.cf_ueberschuss_konto, klasse: 'b2' },
+        { name: 'Steuervorteil', wert: vz.steuervorteil, klasse: 'b2' }, { name: 'Wertsteigerung', wert: vz.wertsteig_kum, klasse: 'b2' }], 'Zuwachs')
+      + '<p class="det">Wertsteigerung als Annahme aus den Einstellungen, keine Bewertung nach § 194 BauGB.</p></div>';
+  }
   function vermoegenVoll(K, B) {
     var S = St(), rows = S.cfRows || [], vz = S._vz || {};
     if (rows.length < 2) return '<div class="hinweis">Die Projektion endet nach ' + rows.length + ' Jahr' + (rows.length === 1 ? '' : 'en') + '. Vermögensaufbau, Diagramme und Belastungsprobe brauchen mindestens zwei Jahresreihen.</div>';
@@ -589,7 +598,7 @@
     if (galerie || (!kurz && feld('ds2_energie'))) S.push(B.seite(c, 'Ansichten', B.abschnitt(ab(), 'Ansichten und Energie') + galerie + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
     /* Ertrag */
     S.push(B.seite(c, 'Ertrag und Cashflow', B.abschnitt(ab(), 'Von der Warmmiete zum Cashflow', 'Laufendes Jahr') + ertragKette(K, B)
-      + (kurz ? steuerWirkung(K, B) + bankCockpit(B, true) : '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + steuerWirkung(K, B) + '</div></div>')));
+      + (kurz ? steuerWirkung(K, B) + bankCockpit(B, true) + zuwachsKurz(B) : '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + steuerWirkung(K, B) + '</div></div>')));
     if (!kurz) {
       S.push(B.seite(c, 'Drei Phasen', B.abschnitt(ab(), 'Finanzierung in drei Phasen', 'Jahr 1, Ende der Zinsbindung und Anschlussfinanzierung') + dreiPhasen(K, B) + phasenVoll(K, B)));
       S.push(B.seite(c, 'Cashflow je Jahr', B.abschnitt(ab(), 'Cashflow je Jahr', (St().cfRows || []).length + ' Jahre') + cfJahre(B)));
