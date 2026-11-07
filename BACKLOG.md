@@ -36,14 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N129 · Portfolio / Paket aus mehreren Objekten (Marcel 07.11.2026) — OFFEN, Konzept
+### N129 · Portfolio / Paket aus mehreren Objekten (Marcel 07.11.2026) — **GEBAUT v3202, Prod 1.0.73**; offen: Paket als Ganzes im Quick-Check rechnen, Kaufnebenkosten beim Share Deal
 - Exposé Harburg-Portfolio (Dateien/Testunterlagen/Expose): 7 MFH, je Haus Kaufpreis, Eckdaten, Mieterliste; Share Deal (Grunderwerbsteuer-Frage!). Ziel: im Quick-Check als Ganzes bewerten, beim Speichern als 7 Einzelobjekte anlegen, verbunden über eine Paket-Kennung mit Gesamtsicht.
 - Bausteine: Exposé-Auslese liefert objekte[] statt eines Objekts; Import-Fenster „Paket mit N Objekten“; Objekte mit paket{id,name,gesamt_kp}; Paket-Übersicht (Summen, Rendite); Kaufnebenkosten beim Share Deal.
 
-### N130 · Quick-Check-Optik wie Reiter Objekt/Miete (Marcel 07.11.2026) — OFFEN
+### N130 · Quick-Check-Optik wie Reiter Objekt/Miete (Marcel 07.11.2026) — **ERLEDIGT v3201b/c, Prod 1.0.72** (gemessen gegen #s0)
 - Schrift, Schriftgrößen, Farben, Textfelder, Hintergründe, Rahmen einheitlich mit Objekt/Miete. Eigenes Dokument (quickcheck-app.html) – erbt kein CSS.
 
-### N131 · Aufteilerwert: Reste (v3200)
+### N131 · Aufteilerwert: Reste (v3200) — **ERLEDIGT bis auf Vertriebskosten** (HH vermietet, IRW je Wohnung, stützendes Verfahren; Prod 1.0.72)
 - Hamburg vermietete Wohnungen: Umrechnung vermietet/unvermietet (IMB 7.6.3: 0,6578 + 0,0513 × Rendite) maschinenlesbar in den Satz, dann im Auswerter.
 - Immobilienrichtwert (NRW) je Wohnung als zweite amtliche Quelle.
 - Führendes/stützendes Verfahren auch in Ankauf/Bestand/Zielbild und im Marktbericht-PDF ausdrücklich benennen.

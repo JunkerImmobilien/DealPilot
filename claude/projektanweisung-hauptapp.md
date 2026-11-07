@@ -44409,3 +44409,8 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `32dca81`, `022aec8` (Staging, mb-backend neu gebaut).
 - **Nachweis:** QC mit Exposé + Mietaufstellung → 8 Einheiten mit Vertragsart, nkm 3.660, ze 210 auf dem Server; Aufteilerwert Lindenallee 786.500 (Haus 730.000); Hamburg-Testwohnung EG 231.377 €. wertermittlung-pruefen RC=0.
 - **Rest:** Prod-Rollout v3198–v3200 nach Test der Überführung; N129–N131.
+
+### v3200a–v3202b · Überführung getestet, Aufteilerwert-Reste, QC-Optik, Marktbericht aus dem Menü, stützendes Verfahren, Portfolio-Paket (07.11.2026, Prod 1.0.71–1.0.73)
+- **Commit:** Prod `149b6ba` (1.0.71), `727b858` (1.0.72), `63da6da` (1.0.73); Sicherungen `/root/backups/haupt-20261107-1124/1143/1155.sql.gz`, `mb-…` ebenso.
+- **Nachweis:** Überführung Lindenallee → GmbH sauber getrennt; QC-Optik per getComputedStyle = #s0; „Berichte ansehen“ springt in die Deal-Aktion; Paket Harburg (Test, 2 Häuser) angelegt mit 6 + 13 Einheiten, Übersicht 2.550.000 € / 108.503 € p. a.; Erkennung Harburg 7, Einzel-Exposés 0. wertermittlung-pruefen, irw-pruefen, saat-pruefen grün.
+- **Rest:** Paket im Quick-Check als Ganzes rechnen; Share-Deal-Nebenkosten; stützendes Verfahren erst in NEU erzeugten Berichten sichtbar.
