@@ -36,7 +36,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N129 · Portfolio / Paket aus mehreren Objekten (Marcel 07.11.2026) — **GEBAUT v3202, Prod 1.0.73**; offen: Paket als Ganzes im Quick-Check rechnen, Kaufnebenkosten beim Share Deal
+### N129 · Portfolio / Paket aus mehreren Objekten (Marcel 07.11.2026) — **GEBAUT v3202/v3203, Prod 1.0.74** (Quick-Check als Ganzes ✓); offen: Kaufnebenkosten beim Share Deal (Entscheidung Marcel: Beteiligungsquote, Grundbesitzwert)
 - Exposé Harburg-Portfolio (Dateien/Testunterlagen/Expose): 7 MFH, je Haus Kaufpreis, Eckdaten, Mieterliste; Share Deal (Grunderwerbsteuer-Frage!). Ziel: im Quick-Check als Ganzes bewerten, beim Speichern als 7 Einzelobjekte anlegen, verbunden über eine Paket-Kennung mit Gesamtsicht.
 - Bausteine: Exposé-Auslese liefert objekte[] statt eines Objekts; Import-Fenster „Paket mit N Objekten“; Objekte mit paket{id,name,gesamt_kp}; Paket-Übersicht (Summen, Rendite); Kaufnebenkosten beim Share Deal.
 
