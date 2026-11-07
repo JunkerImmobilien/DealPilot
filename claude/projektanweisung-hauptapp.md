@@ -44432,3 +44432,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `002e172e`; Prod `ad7b341` (1.0.78); Sicherungen `/root/backups/haupt-20261107-1851.sql.gz`, `mb-20261107-1851.sql.gz`
 - **Nachweis:** Staging und Prod: Migration 026 OK; gaa_sources Staging 118 aktiv/4 gesperrt, Prod 112/4, 0 portal_defekt; Bayern-Abruf im Staging-Container liefert portal_url für München und Würzburg; wertermittlung, jahreswerte, buster, bauzins, gold-audit grün.
 - **Rest:** Bayern-Link im Browser nicht gesehen (nur Connector-Antwort); Kappung Hessen ab 15.11. erneut prüfen; Leipzig, Erfurt, Darmstadt, Frankfurt ohne portal_url. IWA nutzt für Bodenrichtwerte denselben bundesweiten WMS wie wir (www.wms.nrw.de/boris/wms_de_bodenrichtwerte) – ohne BY und SH; Hessen haben wir darüber schon.
+
+### v3209 · Bodenrichtwertzonen als Kartenebene im Marktbericht (07.11.2026, Prod 1.0.79)
+- **Was:** Nach dem IWA-Abgleich (deren Objektkarte zeigt BRW-Zonen als Flächen): `drawMap()` in `frontend/marktbericht-app/app.js` legt den bundesweiten WMS der Gutachterausschüsse (www.wms.nrw.de/boris/wms_de_bodenrichtwerte, derselbe wie Connector `borisd_wms`) als abschaltbare Ebene „Bodenrichtwertzonen“ über die OSM-Karte, ab Zoom 14, Vermerk dl-de/by-2-0 in der Attribution. v3209a: der App-Stil vergrößerte das Kästchen des Ebenenschalters → eigene Regeln in `index.html`.
+- **Commit:** `462b5bcb`, `6a1a7a4f`; Prod `be4f4fb` (1.0.79); Sicherungen `/root/backups/haupt-20261107-1925.sql.gz`, `mb-20261107-1925.sql.gz`
+- **Nachweis:** Staging im Browser an Minden (Zoom 16): Zonen mit Werten sichtbar, 6 WMS-Kacheln geladen, Kästchen 14 px, Attribution vollständig; Prod liefert app.js mit `tileLayer.wms` und Buster v3209a; buster sauber, gold-audit auf Basislinie.
+- **Rest:** PDF-Karte des Profi-Berichts ohne Zonen; BY/SH leer.
