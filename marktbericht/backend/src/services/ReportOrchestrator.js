@@ -972,7 +972,7 @@ export const ReportOrchestrator = {
           /* v3206 · Faktormodelle (Hamburg: Alters-, Aktualisierungs-, Erstbezugsfaktor) brauchen das
              Kalenderjahr des Wertermittlungsstichtags und den Erstbezug. Erstbezug = Baujahr im Stichtagsjahr
              oder in den drei Jahren davor (Wortlaut des Blattes); ohne Baujahr bleibt er offen. */
-          stichtag: stichtagVon(ref).iso,
+          stichtag: stichtagIso(stichtagVon(ref)),   /* auch wenn er heute ist */
           erstbezug: (function () { const bj = Number(ref.build_year), sj = Number(stichtagJahr(ref));
             return (Number.isFinite(bj) && bj > 1800 && Number.isFinite(sj)) ? (sj - bj >= 0 && sj - bj <= 3) : null; })(),
           /* v2790 · Punkt 5: Wohnungen UND Gewerbeeinheiten -> zuerst der Satz fuer Wohn- und
@@ -1524,7 +1524,10 @@ export const ReportOrchestrator = {
         var _st = Number(ref.wert_stufe) || 1;
         if (_st >= 3) {
           step('wertparameter: LZS ' + _lzs.wert + ' % (Stufe ' + _lzs.stufe + ')'
-               + (_bw && _bw.vollstaendig ? ', Bodenwert ' + _bw.wert + ' EUR' : ', kein Bodenwert'));
+               + (_bw && _bw.vollstaendig ? ', Bodenwert ' + _bw.wert + ' EUR' : ', kein Bodenwert')
+               /* v3206 · warum der Registersatz nicht griff (nur Protokoll, nie Nutztext) */
+               + (_lzs.rueckfrage ? ' | Register: ' + _lzs.rueckfrage.grund + (_lzs.rueckfrage.fehlt ? ' fehlt ' + _lzs.rueckfrage.fehlt : '')
+                  + (_lzs.rueckfrage.hinweis ? ' - ' + String(_lzs.rueckfrage.hinweis).slice(0, 300) : '') : ''));
         } else {
           step('wertparameter: geladen (Stufe ' + _lzs.stufe + ')');
         }

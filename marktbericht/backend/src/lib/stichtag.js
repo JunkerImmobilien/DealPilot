@@ -20,7 +20,9 @@ export function stichtagAus(roh) {
   if (de) s = de[3] + '-' + de[2].padStart(2, '0') + '-' + de[1].padStart(2, '0');
   s = s.slice(0, 10);
   const t = /^\d{4}-\d{2}-\d{2}$/.test(s) ? Date.parse(s + 'T12:00:00Z') : NaN;
-  if (!Number.isFinite(t) || t > Date.now()) return { datum: new Date(), eigen: false, iso: null, verworfen: String(roh) };
+  /* v3206 · Zukunft heisst: nach dem heutigen KALENDERTAG. Bis hier galt 12:00 UTC des Stichtags gegen jetzt -
+     ein Stichtag 'heute' war vor 13 Uhr deutscher Zeit Zukunft und wurde verworfen. */
+  if (!Number.isFinite(t) || s > new Date().toISOString().slice(0, 10)) return { datum: new Date(), eigen: false, iso: null, verworfen: String(roh) };
   return { datum: new Date(t), eigen: true, iso: s, verworfen: null };
 }
 
