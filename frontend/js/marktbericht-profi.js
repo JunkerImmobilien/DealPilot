@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3177';
+  var VERSION = 'v3210';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -322,6 +322,49 @@
       .then(function (r) { return r.ok && /image/.test(r.headers.get('content-type') || '') ? r.blob() : null; })
       .then(function (b) { return b ? alsDataUrl(b) : null; }).catch(function () { return null; });
   }
+  /* v3210 · Bodenrichtwertzonen ueber die Nahkarte (bundesweiter BORIS-D-WMS, derselbe wie in der
+     Web-Ansicht v3209). Der Dienst antwortet mit CORS, also holt der Browser das Bild selbst und
+     malt es auf die Geoapify-Karte. ZONEN_KACHEL ist die Kachelgroesse, in der Geoapify den Zoom
+     rechnet (gemessen, siehe Journal v3210). Faellt der Dienst aus, bleibt die Karte ohne Zonen -
+     nie ohne Karte. In BY und SH liefert der Dienst nichts, dann bleibt das Bild ohne Flaechen. */
+  var BRW_WMS = 'https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte';
+  var BRW_LAYER = 'brw_wohnbauflaeche,brw_gemischte_bauweise,brw_gewerbliche_bauweise,brw_sonderbauflaeche';
+  var BRW_VERMERK = 'Bodenrichtwertzonen \u00a9 Gutachteraussch\u00fcsse f\u00fcr Grundst\u00fcckswerte, dl-de/by-2-0 (bodenrichtwerte-boris.de)';
+  var ZONEN_KACHEL = 256;
+  function zonenBbox(lat, lon, zoom, w, h) {
+    var R = 6378137, x = R * lon * Math.PI / 180, y = R * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+    var res = 2 * Math.PI * R / (ZONEN_KACHEL * Math.pow(2, zoom));
+    return [x - w / 2 * res, y - h / 2 * res, x + w / 2 * res, y + h / 2 * res];
+  }
+  function bildLaden(src) {
+    return new Promise(function (ok) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { ok(null); }; i.src = src; });
+  }
+  function mitZonen(basis, lat, lon, zoom, w, h) {
+    if (!basis || !istZahl(lat) || !istZahl(lon)) return Promise.resolve(basis);
+    var b = zonenBbox(Number(lat), Number(lon), zoom, w, h);
+    var url = BRW_WMS + '?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&STYLES=&CRS=EPSG:3857&FORMAT=image/png&TRANSPARENT=true'
+      + '&LAYERS=' + BRW_LAYER + '&WIDTH=' + w + '&HEIGHT=' + h + '&BBOX=' + b.map(function (v) { return v.toFixed(2); }).join(',');
+    var zeit = new Promise(function (ok) { setTimeout(function () { ok(null); }, 15000); });
+    var holen = fetch(url).then(function (r) { return r.ok && /image\/png/.test(r.headers.get('content-type') || '') ? r.blob() : null; })
+      .then(function (bl) { return bl ? alsDataUrl(bl) : null; }).catch(function () { return null; });
+    return Promise.race([holen, zeit]).then(function (zonen) {
+      if (!zonen) return basis;
+      return Promise.all([bildLaden(basis), bildLaden(zonen)]).then(function (im) {
+        if (!im[0] || !im[1]) return basis;
+        try {
+          var c = document.createElement('canvas'); c.width = w; c.height = h;
+          var g = c.getContext('2d');
+          g.drawImage(im[0], 0, 0, w, h);
+          g.globalAlpha = 0.85; g.drawImage(im[1], 0, 0, w, h); g.globalAlpha = 1;
+          g.font = '15px Inter, Arial, sans-serif';
+          var tw = g.measureText(BRW_VERMERK).width;
+          g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(0, h - 24, tw + 16, 24);
+          g.fillStyle = '#333'; g.fillText(BRW_VERMERK, 8, h - 7);
+          return c.toDataURL('image/jpeg', 0.9);
+        } catch (e) { return basis; }
+      });
+    });
+  }
   function marke() {
     try {
       var b = window.DealPilotConfig && DealPilotConfig.branding;
@@ -354,7 +397,7 @@
         var lat = p.ref && p.ref.lat, lon = p.ref && p.ref.lon;
         var b = marke();
         return Promise.all([
-          karte(lat, lon, 16, 1200, 620),
+          karte(lat, lon, 16, 1200, 620).then(function (k) { return mitZonen(k, lat, lon, 16, 1200, 620); }),
           karte(lat, lon, 12, 1200, 620),
           window.DealPilotPdfLogo ? DealPilotPdfLogo.fuerMarke(b).catch(function () { return null; }) : Promise.resolve(null)
         ]).then(function (z) {
@@ -718,7 +761,7 @@
   }
 
   window.DpProfi = {
-    VERSION: VERSION,
+    VERSION: VERSION, _zonenBbox: zonenBbox, _mitZonen: mitZonen, _setZonenKachel: function (k) { ZONEN_KACHEL = k; },
     oeffnen: oeffnen,
     /** Für den PDF-Dienst: fertiges HTML-Dokument (String). */
     dokument: function (objKey, reportId) { return sammeln(objKey, reportId).then(html); },
