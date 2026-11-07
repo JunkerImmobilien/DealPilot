@@ -132,7 +132,9 @@
         if (o.einheiten && o.einheiten.length) {
           window._dpMfh = { einheiten: o.einheiten.map(function (e, k) {
             return { nr: String(k + 1), lage: e.lage || '', art: e.art === 'gewerbe' ? 'gewerbe' : 'wohnen', wfl: e.wfl != null ? String(e.wfl) : '',
-              ist: e.miete_monat != null ? String(e.miete_monat) : '', status: e.status === 'leer' ? 'leer' : 'vermietet' };
+              ist: e.status !== 'leer' && e.miete_monat != null ? String(e.miete_monat) : '',
+              /* leer: die Miete im Exposé ist eine Zielmiete, keine Ist-Miete */
+              soll: e.status === 'leer' && e.miete_monat != null ? String(e.miete_monat) : '', status: e.status === 'leer' ? 'leer' : 'vermietet' };
           }), gebaeude: {}, aufgeteilt: false, stand: new Date().toISOString().slice(0, 10) };
         }
         setze('paket_id', id); setze('paket_name', paket.name); setze('paket_nr', i + 1); setze('paket_anzahl', wahl.length);
