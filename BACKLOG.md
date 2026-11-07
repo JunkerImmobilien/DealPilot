@@ -36,9 +36,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N135 · Inventur-Befunde und IWA-Objektkarte (07.11.2026) — **ERLEDIGT v3208/v3209, Prod 1.0.79**
+### N135 · Inventur-Befunde und IWA-Objektkarte (07.11.2026) — **ERLEDIGT v3208/v3209/v3210, Prod 1.0.80**
 - **Erledigt:** Bayern-Link in den BayernAtlas ohne Wert (v3208); Harvest-Takt: `portal_defekt` erst nach 3 Fehlschlägen, Neuversuch nach 14 Tagen, Fehler an der Quelle, Läufe in `mb.harvest_laeufe` (Migration 026), 29 Quellen reaktiviert; `laender-registry.js` auf Stand 07.11.; Zins-Rückfallwerte; Schnittstellenliste mit Spalte „Wo verwendet“ (Drive); **Bodenrichtwertzonen als Kartenebene im Marktbericht** (v3209, bundesweiter WMS, ab Zoom 14, abschaltbar).
-- **Offen:** Kappung Hessen ab 15.11. erneut prüfen (Verordnung angekündigt); portal_url fehlt bei Leipzig, Erfurt, Darmstadt, Frankfurt; Zonen auch in die PDF-Karte des Profi-Berichts (heute nur in der Web-Ansicht); Zonen in BY/SH leer (nicht im bundesweiten Dienst, gdi.bayern.de nur „private Nutzung“).
+- **Offen:** Kappung Hessen ab 15.11. erneut prüfen (Verordnung angekündigt); portal_url fehlt bei Leipzig, Erfurt, Darmstadt, Frankfurt; ~~Zonen auch in die PDF-Karte des Profi-Berichts~~ erledigt v3210a (Nahkarte, Prod 1.0.80); Zonen in BY/SH leer (nicht im bundesweiten Dienst, gdi.bayern.de nur „private Nutzung“).
 - **Bewusst NICHT übernommen:** IWA-Objektkarte als Makler-CRM (Status, Lead-Herkunft, Wiedervorlage) – nicht unser Kern. Portfolio-Karte erst, wenn Kunden mit vielen Objekten danach fragen.
 
 ### N134 · Abgleich mit IWA (07.11.2026): was DealPilot besser machen kann
