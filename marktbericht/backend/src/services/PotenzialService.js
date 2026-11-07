@@ -33,7 +33,9 @@ import { MIETBAND } from './CrossCheckService.js';   /* v2988 */
 import { erhoehungspfad558, ausschluss558, kappungFuer } from '../lib/kappung.js';
 import { vergleichsfaktor as regVergleichsfaktor } from '../lib/gutachterausschuss.js';   /* v3200 · Aufteilerwert */
 import { regVfEingabe, regVfErgebnis } from '../lib/vergleichsfaktor_eingabe.js';         /* v3200 */
-import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';      /* v3200 */   /* v3150 */
+import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';      /* v3200 */
+import { IrwConnector } from '../connectors/IrwConnector.js';                            /* v3200c */
+import { vergleichswertIrw, objektAusRef } from '../lib/vergleichswert_irw.js';           /* v3200c */   /* v3150 */
 
 /* ══ v2541 · MARKTPREISINDIKATION JE STUFE UND JE WOHNUNG ═════════════════════
    Marcel 20.10.2026: „dann kann man den Ertragswert sehen, aber auch die
@@ -545,10 +547,11 @@ function wohnungMerkmale(w, auftrag) {
     aufzug: /^(ja|true)$/.test(az) ? 'ja' : (/^(nein|false)$/.test(az) ? 'nein' : null),
   };
 }
-function vergleichWohnung(ref, wb, w, rnd, auftrag) {
+function vergleichWohnung(ref, wb, w, rnd, auftrag, mieteJahr, irwEtw) {
   const wfl = Number(w && w.wfl);
   if (!(wfl > 0)) return null;
-  const lv = (wb && wb.land_value) || null;
+  /* v3200c · die Rohdaten (Gemeinde, Ortsteil, Lageklasse) stehen nur in land_value_roh */
+  const lv = (wb && (wb.land_value_roh || wb.land_value)) || null;
   const brw = lv && lv.available && Number(lv.value_sqm) > 0 ? Number(lv.value_sqm) : null;
   const ags = String(ref.ags || '').replace(/\D/g, '');
   const refW = Object.assign({}, ref, { property_type: 'etw', living_area: wfl,
@@ -563,6 +566,23 @@ function vergleichWohnung(ref, wb, w, rnd, auftrag) {
       if (v && v.verfuegbar && Number(v.wert_eur) > 0) {
         return { wert: Math.round(v.wert_eur), faktor_qm: v.faktor_qm, herkunft: 'amtlich', ausschuss: v.ausschuss || null,
           stufe: v.stufe || null, quellenvermerk: v.quellenvermerk || null, lizenz: v.lizenz || null, merkmale: mk };
+      }
+      /* v3200b · vermietete Wohnung: gibt der Satz eine Umrechnung vermietet/unvermietet (Hamburg IMB 7.6.3,
+         0,6578 + 0,0513 × Rendite), wird der Wert der FREIEN Wohnung damit umgerechnet. Rendite = marktübliche
+         Jahresnettokaltmiete × 100 / Wert unvermietet; Faktor höchstens 1. Nur wenn sonst nichts offen ist. */
+      const offenFelder = v && v.korrekturen_offen ? v.korrekturen_offen.map((x) => x.feld) : [];
+      const korrV = r && r._satz && Array.isArray(r._satz.korrekturen) ? r._satz.korrekturen.find((k) => k && k.feld === 'vermietet' && k.umrechnung) : null;
+      if (v && v.verfuegbar === false && mk.vermietet === 'ja' && korrV && offenFelder.length === 1 && offenFelder[0] === 'vermietet' && Number(mieteJahr) > 0) {
+        const rF = regVergleichsfaktor(regVfEingabe({ ref: refW, landValue: lv, ags, brw, rnd, bgf: null, extra: Object.assign({}, mk, { vermietet: 'nein' }) }));
+        const vF = regVfErgebnis(rF, { ref: refW, bgf: null, hhNorm: null });
+        const u = korrV.umrechnung;
+        if (vF && vF.verfuegbar && Number(vF.wert_eur) > 0 && u.art === 'rendite_linear') {
+          const rendite = Number(mieteJahr) * 100 / Number(vF.wert_eur);
+          const fak = Math.min(Number(u.obergrenze) || 1, Number(u.a) + Number(u.b) * rendite);
+          return { wert: Math.round(vF.wert_eur * fak), wert_frei: Math.round(vF.wert_eur), faktor_qm: vF.faktor_qm, herkunft: 'amtlich',
+            vermietet_umrechnung: { faktor: Math.round(fak * 10000) / 10000, rendite_pct: Math.round(rendite * 100) / 100, fundstelle: u.fundstelle || null },
+            ausschuss: vF.ausschuss || null, stufe: vF.stufe || null, quellenvermerk: vF.quellenvermerk || null, lizenz: vF.lizenz || null, merkmale: mk };
+        }
       }
       if (v && v.verfuegbar === false) gesperrt = { grund: v.grund || null, hinweis: v.hinweis || null,
         offen: v.korrekturen_offen ? v.korrekturen_offen.map((x) => x.bez || x.feld).filter(Boolean) : null, ausschuss: v.ausschuss || null };
@@ -579,6 +599,19 @@ function vergleichWohnung(ref, wb, w, rnd, auftrag) {
       }
     }
   } catch (e) { /* ebenso */ }
+  /* v3200c · NRW: Immobilienrichtwert für Wohnungseigentum (§ 24 ImmoWertV, beurkundete Kaufpreise), umgerechnet
+     auf DIESE Wohnung mit den Umrechnungskoeffizienten des Ausschusses - derselbe Kern wie im Bericht. */
+  if (irwEtw && irwEtw.verfuegbar && irwEtw.roh && typeof irwEtw.roh === 'object') {
+    try {
+      const vi = vergleichswertIrw({ irw: irwEtw, objekt: objektAusRef(refW, { bodenrichtwert: brw }), bog: [] });
+      if (vi && vi.verfuegbar && Number(vi.vergleichswert_eur) > 0) {
+        return { wert: Math.round(vi.vergleichswert_eur), faktor_qm: vi.wert_qm || null, herkunft: 'amtlich', quelle: 'Immobilienrichtwert',
+          ausschuss: vi.quelle ? vi.quelle.ausschuss : null, stufe: vi.stufe || 'A', merkmale: mk };
+      }
+      if (!gesperrt && vi && vi.verfuegbar === false) gesperrt = { grund: vi.grund || 'irw', hinweis: vi.hinweis || null,
+        offen: (vi.gruende || []).filter((g) => g.grund === 'merkmal_fehlt').map((g) => g.name || g.id), ausschuss: null };
+    } catch (e) { /* kein Wert */ }
+  }
   return gesperrt ? Object.assign({ wert: null }, gesperrt) : null;
 }
 
@@ -1025,6 +1058,14 @@ export const PotenzialService = {
       const auf = auftrag.aufteilung || {};
       if (auf.aktiv) {
         const brw = wb.land_value && wb.land_value.available ? wb.land_value.value_sqm : null;
+        /* v3200c · Immobilienrichtwert Wohnungseigentum am Ort, EINMAL je Lauf (nur NRW, nur mit Koordinaten) */
+        let irwEtw = null;
+        try {
+          if (/^05/.test(String(ref.ags || '')) && Number.isFinite(Number(wb.lat)) && Number.isFinite(Number(wb.lon))) {
+            irwEtw = await Promise.race([IrwConnector.hole({ lat: Number(wb.lat), lon: Number(wb.lon), objektart: 'etw', anzahlWe: null }),
+              new Promise((ok) => setTimeout(() => ok(null), 15000))]);
+          }
+        } catch (e) { irwEtw = null; }
         const aOut = { kosten_eur: zahl(auf.kosten_eur) || 0, kosten_herkunft: auf.kosten_herkunft || 'eigene Angabe',
                        je_stufe: {}, zins: {} };
         for (const s of stufenAlle) {
@@ -1057,7 +1098,7 @@ export const PotenzialService = {
             if (wert == null) vollst = false; else summe += wert;
             /* v3200 · führend: Vergleichswert der Wohnung (Merkmale der Wohnung, RND dieser Stufe) */
             r.vergleich_etw = r.vergleich_etw || {};
-            r.vergleich_etw[s] = vergleichWohnung(ref, wb, w, rnd, auftrag);
+            r.vergleich_etw[s] = vergleichWohnung(ref, wb, w, rnd, auftrag, mw, irwEtw);
           });
           const pot = Math.round(summe - aOut.kosten_eur - out.haus[s].wert);
           aOut.je_stufe[s] = { summe: Math.round(summe), vollstaendig: vollst, potenzial: pot,

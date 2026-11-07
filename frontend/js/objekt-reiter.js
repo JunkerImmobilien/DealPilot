@@ -1250,6 +1250,19 @@
       }
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }
       if (e.target.closest('#oe-vw-btn')) { verkehrswertSetzen(); return; }
+      /* v3201 · Marcel 07.11.2026: die gespeicherten Berichte stehen in der Deal-Aktion - Absprung dorthin, Liste aufgeklappt */
+      if (e.target.closest('#oe-mb-liste')) {
+        var host = document.getElementById('dab-mb-host');
+        var sec = host ? host.closest('.sec') : document.getElementById('s8');
+        var tabs = document.querySelectorAll('.tab');
+        for (var ti = 0; ti < tabs.length; ti++) if (sec && tabs[ti].getAttribute('data-target-sec') === sec.id && typeof window.switchTab === 'function') { try { window.switchTab(ti); } catch (x) {} break; }
+        setTimeout(function () {
+          var h = document.getElementById('dab-mb-host');
+          try { if (window._dabMbRefresh) window._dabMbRefresh(); } catch (x) {}
+          if (h) { h.classList.add('mb-open'); try { h.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (x) { h.scrollIntoView(); } }
+        }, 350);
+        return;
+      }
       /* v1855 · Absprung in den Marktbericht (derselbe Weg wie der Kopf-Knopf) */
       if (e.target.closest('#oe-mb-oeffnen')) {
         var mb = [].slice.call(document.querySelectorAll('button,a')).find(function (b) { return /^\s*MARKTBERICHT\s*$/i.test(b.textContent || ''); });

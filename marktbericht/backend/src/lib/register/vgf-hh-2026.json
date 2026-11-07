@@ -2506,7 +2506,16 @@
     "werte": {
      "nein": 1
     },
-    "hinweis": "Der Gebäudefaktor gilt für FREI VERFÜGBARE Wohnungen. Für vermietete: Verkehrswert vermietet / unvermietet = 0,6578 + 0,0513 × Rendite [%], Rendite = marktübliche Jahresnettokaltmiete × 100 / Verkehrswert unvermietet (IMB 7.6.3, S. 177; Abschlag 29 % bei 1 % Rendite bis 0 % bei 6,7 %). Diese Umrechnung braucht Miete und Wert und ist im Auswerter nicht abgebildet — bei vermieteten Wohnungen bleibt sie offen."
+    "hinweis": "Der Gebäudefaktor gilt für FREI VERFÜGBARE Wohnungen. Für vermietete: Verkehrswert vermietet / unvermietet = 0,6578 + 0,0513 × Rendite [%], Rendite = marktübliche Jahresnettokaltmiete × 100 / Verkehrswert unvermietet (IMB 7.6.3, S. 177; Abschlag 29 % bei 1 % Rendite bis 0 % bei 6,7 %). Diese Umrechnung braucht Miete und Wert und ist im Auswerter nicht abgebildet — bei vermieteten Wohnungen bleibt sie offen.",
+    "umrechnung": {
+     "art": "rendite_linear",
+     "a": 0.6578,
+     "b": 0.0513,
+     "obergrenze": 1,
+     "rendite": "marktübliche Jahresnettokaltmiete × 100 / Verkehrswert unvermietet",
+     "fundstelle": "IMB 7.6.3, S. 177",
+     "hinweis": "v3200b · maschinenlesbar aus dem Hinweis oben; angewandt im Aufteilerwert je Wohnung (PotenzialService). Der Auswerter selbst hält vermietete Wohnungen weiter offen."
+    }
    }
   ],
   "modellansaetze": {

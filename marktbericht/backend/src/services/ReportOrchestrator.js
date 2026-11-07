@@ -1667,6 +1667,7 @@ export const ReportOrchestrator = {
     if (NUR_WERT) {
       step('nur-wert-basis: Ende nach dem Quercheck');
       return { nur_wert_basis: true, ref, wert_params: _wertParams, cross_check: crossCheck,
+        lat: Number.isFinite(Number(lat)) ? Number(lat) : null, lon: Number.isFinite(Number(lon)) ? Number(lon) : null,   /* v3200c · Immobilienrichtwert je Wohnung (Aufteilerwert) */
         ertragswert_eingabe: (crossCheck && crossCheck._ertragswertEingabe) || null,
         /* v2988 · Miete nach Modernisierung im Zielbild: Eingabe und Ergebnis der Mietpreisuebersicht */
         amtliche_miete: _amtMiete || null, amtliche_miete_eingabe: _amtMieteEin || null,
