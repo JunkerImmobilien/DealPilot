@@ -36,6 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N134 · Abgleich mit IWA (07.11.2026): was DealPilot besser machen kann
+Gemessen in Marcels IWA-Testzugang, Einzelheiten `Dateien/Wettbewerb/IWA/Analyse-IWA-2026-11-07.md`.
+- **Fehler bei uns (Profi-Bericht):** a) „Sachwertfaktor – Quelle: [object Object]“ — `frontend/js/marktbericht-profi.js:291` gibt `l.satz` (Objekt) aus; b) Miteigentumsanteil „8.5 %“ ohne deutsches Zahlformat — `ErtragswertService.js:224` `${round2(mea)} %`; c) Abschnittskopf „Bodenwert und Sachwert 504.000 €“ bei ETW zeigt den vollen Bodenwert statt des MEA-Anteils (42.840 €) und nennt einen Sachwert, den es nicht gibt; d) Tabelle Vergleichsangebote: Spalten verrutscht, €/m² in eigener Zeile, Baujahr „-“; e) KI-Text widerspricht der Kopfzahl (Westerfeld: Text „Marktwert 875.000 €“, Kopf 735.000 € Ertragswert) — Prüfer `ki_text_pruefung` muss den Kopfwert abgleichen; f) Überlaufseiten mit wenigen Zeilen (Westerfeld S. 3, 11, 13).
+- **Von IWA übernehmen:** Vergleichsobjekte von Hand oder aus Inseraten erfassen, mit Zu-/Abschlägen je Objekt und Streudiagramm „€/m² über Wohnfläche, Ihr Objekt markiert“; Vollständigkeitsprüfung vor dem PDF; Abschnitt „Preisentwicklung“ (bei uns aus Daten statt von Hand).
+- **Rückfrage statt Rückfall bei ETW in Hamburg:** Geschosslage, Einbauküche, Aufzug abfragen, dann amtliche Vergleichsfaktoren statt Angebotsindikation.
+- **Werbung (belegt):** IWA rechnet Altbauten ohne Modernisierungsangaben mit Gebäudewert 0 (Minden 1928: 42.840 € gegen unsere 83.000 €; Harburg-Portfolio nach IWA-Rechenweg 3,59 Mio. € gegen 4,87 Mio. €), schreibt „realisierte Kaufpreise“ bei Angebotspreisen, rundet den Barwertfaktor auf eine Stelle, nimmt im BWK-Prozentfeld keine Nachkommastellen.
+
 ### N132 · Hamburg: Mindest-Restnutzungsdauer 30 Jahre des Zinsmodells anwenden (07.11.2026, gemessen am Harburg-Portfolio)
 - Immobilienmarktbericht Hamburg 2026, Kap. 7.3.3: der MFH-Zins ist mit einer RND von mindestens 30 Jahren abgeleitet („regelhaft unterstellt“). DealPilot rechnet mit Anlage 2 (0 Modernisierungspunkte → 12 bis 21,5 J.) – Modellbruch nach § 10 ImmoWertV. Gemessen (Naeherung): 4 Haeuser mit HH-Zins 2.705 T€ → 3.740 T€ (+38 %).
 - Umsetzung: Mindest-RND als Zahl in `modellansaetze` des Satzes (z. B. `rnd_min_jahre: 30`), CrossCheck/Potenzial lesen sie am Zinssatz (wie `gnd_jahre`). Marcel fragen, ob das so gilt.
