@@ -36,7 +36,15 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N129 · Portfolio / Paket aus mehreren Objekten (Marcel 07.11.2026) — **GEBAUT v3202/v3203, Prod 1.0.74** (Quick-Check als Ganzes ✓); offen: Kaufnebenkosten beim Share Deal (Entscheidung Marcel: Beteiligungsquote, Grundbesitzwert)
+### N132 · Hamburg: Mindest-Restnutzungsdauer 30 Jahre des Zinsmodells anwenden (07.11.2026, gemessen am Harburg-Portfolio)
+- Immobilienmarktbericht Hamburg 2026, Kap. 7.3.3: der MFH-Zins ist mit einer RND von mindestens 30 Jahren abgeleitet („regelhaft unterstellt“). DealPilot rechnet mit Anlage 2 (0 Modernisierungspunkte → 12 bis 21,5 J.) – Modellbruch nach § 10 ImmoWertV. Gemessen (Naeherung): 4 Haeuser mit HH-Zins 2.705 T€ → 3.740 T€ (+38 %).
+- Umsetzung: Mindest-RND als Zahl in `modellansaetze` des Satzes (z. B. `rnd_min_jahre: 30`), CrossCheck/Potenzial lesen sie am Zinssatz (wie `gnd_jahre`). Marcel fragen, ob das so gilt.
+
+### N133 · Zielbild ueber der Bandkante faellt auf die Bandmitte (07.11.2026)
+- Eine Zielmiete ueber der Obergrenze der Marktueblichkeit setzt der Kern (§ 31 Abs. 2) auf die Bandmitte – eine hoehere Zielmiete ergibt dann einen NIEDRIGEREN Ertragswert als das Soll (Bleicherweg: Ziel 11,48 €/m² → 580.000 €, Soll 9,97 €/m² → 630.000 €). Fuer Neuvermietung im Zielbild ist die Bandkante der richtige Deckel. Ausserdem: Frontend-Zielbild „bei Mieterwechsel“ rechnete nicht alle Wohnungen zum Zielwert.
+- Frontend: `DpPotenzial.mietpreisbremse()` meldet in Hamburg „Gemeinde noch nicht ermittelt“ (12-stellige AGS 0200000007xx) – Register fuehrt HH (Bremse bis 2029, Kappung 15 %).
+
+### N129 · Portfolio / Paket aus mehreren Objekten (Marcel 07.11.2026) — **ERLEDIGT v3202–v3204, Prod 1.0.75** (Quick-Check als Ganzes ✓, Share Deal fragt die Beteiligung ab ✓)
 - Exposé Harburg-Portfolio (Dateien/Testunterlagen/Expose): 7 MFH, je Haus Kaufpreis, Eckdaten, Mieterliste; Share Deal (Grunderwerbsteuer-Frage!). Ziel: im Quick-Check als Ganzes bewerten, beim Speichern als 7 Einzelobjekte anlegen, verbunden über eine Paket-Kennung mit Gesamtsicht.
 - Bausteine: Exposé-Auslese liefert objekte[] statt eines Objekts; Import-Fenster „Paket mit N Objekten“; Objekte mit paket{id,name,gesamt_kp}; Paket-Übersicht (Summen, Rendite); Kaufnebenkosten beim Share Deal.
 
