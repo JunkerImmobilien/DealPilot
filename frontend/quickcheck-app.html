@@ -7412,9 +7412,13 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
     if(d.type==="qc-import-result"){
       var im=d.data||{};
       _applyImportData(im);
-      if (d.pending && window.QcApp && QcApp.setPdfPending) { try { QcApp.setPdfPending(d.pending); } catch(_){} }
-      try{ if(window.QcApp&&QcApp.mieteAddUp) QcApp.mieteAddUp(); }catch(_){}
-      try{ if(window.QcApp&&QcApp.scheduleUpdate) QcApp.scheduleUpdate(); }catch(_){}
+      /* v3199 · N128: QcApp ist ein const, KEINE window-Eigenschaft - "window.QcApp &&" war hier immer falsch.
+         Folge: die ausgelesenen Zusatzdaten (Einheiten, Risiken, These, Stellplätze …) kamen nie in die
+         Übernahme-Liste, das neue Objekt bekam nur die Grunddaten. Gemessen 07.11.2026: pending=6 kam an, items=0 ging raus. */
+      var _qa = (typeof QcApp !== "undefined") ? QcApp : null;
+      if (d.pending && _qa && _qa.setPdfPending) { try { _qa.setPdfPending(d.pending); } catch(_){} }
+      try{ if(_qa&&_qa.mieteAddUp) _qa.mieteAddUp(); }catch(_){}
+      try{ if(_qa&&_qa.scheduleUpdate) _qa.scheduleUpdate(); }catch(_){}
       if(window._qcImportResolve){ var r=window._qcImportResolve; window._qcImportResolve=null; r(); }
     }
     if(d.type==="qc-import-photos"){
@@ -7712,7 +7716,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 /* v2571: Mikrobeschriftungen des Boarding-Pass auf die Hausgrenze 8,5 px (v1890) - gemessen 7 bis 8 px an 9 Stellen */
 #qb-bp .hstat{ font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:.06em;color:#0a0a0a;background:rgba(10,10,10,.14);border:1px dashed rgba(10,10,10,.4);border-radius:6px;padding:2px 7px; }
 #qb-bp .contrail{ position:absolute;top:50%;left:12%;right:38%;height:2px;transform:translateY(-50%);z-index:1;background:repeating-linear-gradient(90deg,rgba(255,255,255,.65) 0 5px,transparent 5px 11px); }
-#qb-bp .flyico{ position:absolute;top:50%;color:#070707;transform:translate(-50%,-50%);z-index:1;animation:qbfly 5s ease-in-out infinite; }
+/* v3199 · Marcel 07.11.2026: kein fliegendes Flugzeug in der Quick-Boarding-Karte - Flugzeug und Kondensstreifen aus */
+#qb-bp .flyico, #qb-bp .contrail{ display:none !important; animation:none !important; }
 #qb-bp .flyico svg{ height:17px;width:auto;display:block; }
 @keyframes qbfly{0%{left:12%;opacity:.25}10%{opacity:1}55%{left:62%;opacity:1}55.01%{opacity:0}56%{left:12%}66%{opacity:.25}100%{left:12%;opacity:.25}}
 @media (prefers-reduced-motion: reduce){ #qb-bp .flyico{animation:none} }
