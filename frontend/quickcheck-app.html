@@ -3058,6 +3058,14 @@ body.dp-neue-karte .card .field > .hint {
     padding: 0 10px;
   }
 }
+/* v3201c · nachgemessen 07.11.2026 per getComputedStyle im Reiter Objekt (#s0): Felder und Auswahl Inter 13 px, Radius 2 px;
+ Label rgba(42,39,39,.85); Karte Radius 2 px ohne Schatten; Kartenkopf JetBrains Mono 10 px/700, #6B645A, Sperrung 1,2 px; Hinweis 11,5 px.
+ Die Werte oben (8 px, DM Sans, IBM Plex) stammten aus einer anderen Ansicht der style.css. */
+body.dp-neue-karte .card, body.dp-neue-karte .card:hover { border-radius: 2px; box-shadow: none; }
+body.dp-neue-karte .card .field > input[type="text"], body.dp-neue-karte .card .field > input[type="number"], body.dp-neue-karte .card .field > select { font-family: Inter, system-ui, -apple-system, sans-serif; border-radius: 2px; }
+body.dp-neue-karte .card .field > label { color: rgba(42, 39, 39, .85); }
+body.dp-neue-karte .card > .card-title { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10px; font-weight: 700; color: #6B645A; letter-spacing: 1.2px; }
+body.dp-neue-karte .card .field > .hint { font-size: 11.5px; }
 /* /v3201 */
 </style>
 <style id="qc-app-overrides">
