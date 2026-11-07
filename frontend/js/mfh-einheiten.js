@@ -734,6 +734,19 @@
               + ' · ' + esc(P.KENNZEICHNUNG) + '</p>'
           : '<p class="mfh-we-hint">' + (P.ergebnisVeraltet() ? 'Die Angaben haben sich geändert. ' : '') + 'Der Ertragswert kommt aus demselben Rechenkern wie der Marktbericht Stufe 3 (kein Kontingent).</p>')
         + '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-ew-los">Ertragswerte rechnen</button>';
+      /* v3200 · als Eigentumswohnung führt der Vergleichswert (amtlicher Vergleichsfaktor mit den Merkmalen dieser Wohnung);
+         der Ertragswert darunter ist das stützende Verfahren. */
+      if (_ewArt === 'etw' && we && (we.vergleich_etw || we.fuehrend)) {
+        var _vg = we.vergleich_etw ? we.vergleich_etw.bestand : null, _fv = we.fuehrend ? we.fuehrend.bestand : null;
+        var _vt = { vergleichswert_amtlich: 'Vergleichswert (amtlicher Vergleichsfaktor)', vergleichswert_angebote: 'Vergleichswert aus Angeboten', ertragswert_etw: 'Ertragswert als Eigentumswohnung' };
+        var _box = document.createElement('div');
+        _box.innerHTML = '<div class="mfh-we-kv"><div><span>Führendes Verfahren</span><b>' + esc(_fv && _fv.verfahren ? _vt[_fv.verfahren] || _fv.verfahren : '—') + '</b></div>'
+          + '<div><span>Wert der Wohnung (Bestand)</span><b>' + (_fv && _fv.wert != null ? eur(_fv.wert) : '—') + '</b></div>'
+          + (_vg && _vg.wert ? '<div><span>Vergleichsfaktor</span><b>' + String(Math.round(_vg.faktor_qm)) + ' €/m²' + (_vg.ausschuss ? ' · ' + esc(String(_vg.ausschuss).replace(/^Ders+/, '')) : '') + '</b></div>' : '') + '</div>'
+          + (_vg && !_vg.wert && _vg.offen && _vg.offen.length ? '<p class="mfh-we-hint">Amtlicher Vergleichsfaktor vorhanden, aber für diese Wohnung offen: ' + esc(_vg.offen.join(', ')) + '.</p>' : '')
+          + '<p class="mfh-we-hint">Darunter das stützende Verfahren: Ertragswert mit dem Liegenschaftszins für Wohnungseigentum.</p>';
+        h.insertBefore(_box, h.firstChild);
+      }
       el('mfh-we-ew-los').onclick = function () {
         var b = el('mfh-we-ew-los'); b.disabled = true; b.textContent = 'wird gerechnet …';
         P.rechnen(Object.assign(opts(), { erzwingen: true })).then(function (res) {

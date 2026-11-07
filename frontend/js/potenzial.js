@@ -980,11 +980,14 @@
     if (m.art === 'mfh') {
       body.wohnungen = m.wohnungen.map(function (w) {
         var sm = (w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist;
+        var _e = w.e || {};   /* v3200 · Merkmale der Wohnung für den Vergleichswert (Aufteilerwert) */
         return Object.assign({ nr: w.nr, art: w.art, wfl: w.wfl, mea_pct: w.mea || null,
+          lage: _e.lage || null, zimmer: zahl(_e.zimmer) || null, kueche: _e.aus_kueche || null, leer: _e.status === 'leer',
           miete_jahr: { bestand: Math.round(w.ist * 12), mieterhoehung: Math.round(soll558(w) * 12),
                         zielbild: Math.round((w.ziel != null ? w.ziel : sm) * 12) } }, d558(w), nv(w));   /* v3152 */
       });
       body.aufteilung = { aktiv: !!m.aufgeteilt, kosten_eur: Math.round(m.aufteilungskosten || 0), kosten_herkunft: m.aufteilungskosten_herkunft };
+      body.aufzug = wert('eq_elevator') || null;   /* v3200 · ausdrücklich ja/nein - leer ist keine Aussage */
     } else if (m.wohnungen[0]) body.einzel558 = Object.assign(d558(m.wohnungen[0]), nv(m.wohnungen[0]));   /* v3150, v3152 */
     /* v3152 · N117 · Marcel 03.11.2026: „wir haben ein Feld Leerstand in Prozent, das könnte man nehmen" */
     var _lq = zahl(wert('leerstand'));
@@ -1821,25 +1824,40 @@
     /* v2431 · Herkunft des ETW-Zinses (der oertliche Ausschuss) steht seit v2577 in aufteilungFuss() */
     return '<div class="dp-pot-scroll" style="margin-top:12px"><table><thead><tr><th>Aufteilung</th>' + sc.map(function (c) { return '<th class="' + c.c + '">' + c.t + '</th>'; }).join('') + '</tr></thead><tbody>'
       + z('Haus als Ganzes', function (k) { return H[k] ? eur(H[k].wert) : '—'; })
-      + z(n + ' Eigentumswohnungen (Summe, Zins ' + zi + ')', function (k) { var s = a.je_stufe[k]; return s ? eur(s.summe) + (s.vollstaendig ? '' : '*') : '—'; })
+      /* v3200 · führend der Vergleichswert je Wohnung, stützend der Ertragswert als Eigentumswohnung */
+      + (a.aufteiler ? z(n + ' Wohnungen nach Vergleichswert <small>(führend)</small>', function (k) { var t = a.aufteiler[k]; return t ? eur(t.summe) + (t.vollstaendig ? '' : '*') : '—'; }) : '')
+      + z(n + ' Eigentumswohnungen nach Ertragswert' + (a.aufteiler ? ' <small>(stützend)</small>' : '') + ' (Zins ' + zi + ')', function (k) { var s = a.je_stufe[k]; return s ? eur(s.summe) + (s.vollstaendig ? '' : '*') : '—'; })
       + z('− Kosten der Aufteilung', function () { return eur(-a.kosten_eur); })
+      + (a.aufteiler ? '<tr class="dp-pot-sum"><td>Aufteilerwert</td>' + sc.map(function (c) { var t = a.aufteiler[c.k]; return '<td class="' + c.c + '">' + (t ? eur(t.wert) : '—') + '</td>'; }).join('') + '</tr>' : '')
       /* v2541 · dieselben Wohnungen nach Angebotspreisen für Eigentumswohnungen */
       + (a.mpi_etw && a.mpi_etw.summe_bestand != null ? z(n + ' Eigentumswohnungen nach Angeboten (Summe)', function (k) {
           var v = k === 'zielbild' ? a.mpi_etw.summe_zielbild : a.mpi_etw.summe_bestand; return v != null ? eur(v) : '—'; }) : '')
       /* v2431 · Marcel 19.10.2026: ein negatives Potenzial nicht als Zahl mit Minus
          in Gruen, sondern als „kein Potenzial" mit der Erklaerung darunter */
       + '<tr class="dp-pot-sum"><td>Aufteilungspotenzial</td>' + sc.map(function (c) {
-          var s = a.je_stufe[c.k];
+          var s = a.aufteiler && a.aufteiler[c.k] ? a.aufteiler[c.k] : a.je_stufe[c.k];   /* v3200 · aus dem Aufteilerwert */
           if (s && s.potenzial < 0) return '<td class="dp-pot-neg">kein Potenzial</td>';
           return '<td class="' + c.c + '">' + (s ? '+' + eur(s.potenzial) : '—') + '</td>'; }).join('') + '</tr>'
       + '</tbody></table></div>'
-      + (a.negativ_hinweis ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(a.negativ_hinweis) + '</p>' : '');
+      + (a.negativ_hinweis && !a.aufteiler ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(a.negativ_hinweis) + '</p>' : '')
+      + (a.aufteiler && a.aufteiler.bestand ? '<p class="dp-pot-hin">Führendes Verfahren je Wohnung (Bestand): ' + verfahrenText(a.aufteiler.bestand.zaehl) + '.</p>' : '');
+  }
+  /* v3200 · wie viele Wohnungen nach welchem Verfahren */
+  function verfahrenText(z) {
+    if (!z) return '';
+    var t = [];
+    if (z.amtlich) t.push(z.amtlich + ' × Vergleichswert aus dem amtlichen Vergleichsfaktor');
+    if (z.angebote) t.push(z.angebote + ' × Vergleichswert aus Angeboten (abzüglich Angebotsabschlag)');
+    if (z.ertragswert) t.push(z.ertragswert + ' × Ertragswert als Eigentumswohnung (kein Vergleichswert verfügbar)');
+    if (z.gewerbe) t.push(z.gewerbe + ' × Gewerbe mit Anteil am Haus');
+    if (z.fehlt) t.push(z.fehlt + ' × ohne Wert');
+    return t.join(' · ');
   }
   /* v2577 · der Fußtext der Aufteilung steht jetzt unter „So ist gerechnet" */
   function aufteilungFuss(m, r) {
     var a = r.aufteilung;
     var zA = a.zins && a.zins.bestand && a.zins.bestand.ausschuss ? String(a.zins.bestand.ausschuss).replace(/^Der\s+/, '') : '';
-    return [esc(a.hinweis || '') + (zA ? ' Zins für vermietetes Wohnungseigentum: ' + esc(zA) + '.' : ''),
+    return [a.aufteiler_hinweis ? esc(a.aufteiler_hinweis) : '', esc(a.hinweis || '') + (zA ? ' Zins für vermietetes Wohnungseigentum: ' + esc(zA) + '.' : ''),
       'Kosten der Aufteilung: ' + esc(m.aufteilungskosten_herkunft || a.kosten_herkunft || '') + '.'].filter(function (t) { return t && t !== '.'; });
   }
 
@@ -1939,7 +1957,10 @@
       .map(function (z) { return [z[0]].concat(d.spalten.map(z[1])); });
     if (r && r.verfuegbar && r.aufteilung && r.aufteilung.je_stufe && r.aufteilung.je_stufe.bestand) {
       var n = m.wohnungen.filter(function (w) { return w.art !== 'gewerbe'; }).length;
-      d.kennzahlen.push(['nach Aufteilung (' + n + ' ETW, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(d.spalten.map(function (k) {
+      var AT = r.aufteilung.aufteiler;   /* v3200 · Aufteilerwert (Vergleichswert führend) */
+      if (AT) d.kennzahlen.push(['Aufteilerwert (' + n + ' ETW nach Vergleichswert, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(d.spalten.map(function (k) {
+        var t = AT[k]; return t ? eur(t.wert) : '—'; })));
+      d.kennzahlen.push([(AT ? 'stützend: ' : '') + 'nach Aufteilung als Ertragswert (' + n + ' ETW, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(d.spalten.map(function (k) {
         var s = r.aufteilung.je_stufe[k]; return s ? eur(s.summe - r.aufteilung.kosten_eur) : '—'; })));
       /* v2431 · Aufteilungspotenzial: positiv als Zahl, negativ als Wort - die Erklaerung steht im Fuss */
       /* v2541 · die Wohnungen nach Angebotspreisen für Eigentumswohnungen */
@@ -1947,7 +1968,7 @@
       if (ME && ME.summe_bestand != null) d.kennzahlen.push(['ETW nach Angeboten (Summe)'].concat(d.spalten.map(function (k) {
         var v = k === 'zielbild' ? ME.summe_zielbild : ME.summe_bestand; return v != null ? eur(v) : '—'; })));
       d.kennzahlen.push(['Aufteilungspotenzial'].concat(d.spalten.map(function (k) {
-        var s = r.aufteilung.je_stufe[k]; return !s ? '—' : (s.potenzial < 0 ? 'kein Potenzial' : '+' + eur(s.potenzial)); })));
+        var s = AT && AT[k] ? AT[k] : r.aufteilung.je_stufe[k]; return !s ? '—' : (s.potenzial < 0 ? 'kein Potenzial' : '+' + eur(s.potenzial)); })));
       d.aufteilung_hinweis = r.aufteilung.negativ_hinweis || null;
     }
     d.fuss = KENNZEICHNUNG + ' Der Score rechnet ebenfalls mit dem Bestand.'

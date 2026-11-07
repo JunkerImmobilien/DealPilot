@@ -30,7 +30,10 @@ import { ValuationService } from './ValuationService.js';         /* v2541 */
 import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 */
 import { marktmiete as amtlicheMiete, klasseAusPunkten, KLASSE_TEXT } from '../lib/mietmodell_nrw.js';   /* v2988 */
 import { MIETBAND } from './CrossCheckService.js';   /* v2988 */
-import { erhoehungspfad558, ausschluss558, kappungFuer } from '../lib/kappung.js';   /* v3150 */
+import { erhoehungspfad558, ausschluss558, kappungFuer } from '../lib/kappung.js';
+import { vergleichsfaktor as regVergleichsfaktor } from '../lib/gutachterausschuss.js';   /* v3200 · Aufteilerwert */
+import { regVfEingabe, regVfErgebnis } from '../lib/vergleichsfaktor_eingabe.js';         /* v3200 */
+import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';      /* v3200 */   /* v3150 */
 
 /* ══ v2541 · MARKTPREISINDIKATION JE STUFE UND JE WOHNUNG ═════════════════════
    Marcel 20.10.2026: „dann kann man den Ertragswert sehen, aber auch die
@@ -522,6 +525,63 @@ function stufeNeuvermietung(S558, bb, wlB, kB, leerPct, basisWert) {
 }
 
 /** Zins für Wohnungseigentum aus derselben Kaskade (A–E, N) wie der Bericht. */
+/* ══ v3200 · DER VERGLEICHSWERT EINER WOHNUNG (Aufteilerwert) ════════════════
+   Marcel 07.11.2026: „einzelne Wohnungen sind mehr wert" - eine aufgeteilte Wohnung wird
+   über den Vergleichswert gehandelt, nicht als Anteil am Ertragswert des Hauses. Führend
+   ist der amtliche Vergleichsfaktor (§ 20 ImmoWertV, aus Kaufpreisen), mit den Merkmalen
+   DER WOHNUNG: Fläche, Zimmer, Geschosslage, Einbauküche, vermietet. Dieselbe Eingabe wie
+   der Bericht einer Eigentumswohnung (lib/vergleichsfaktor_eingabe.js) - keine zweite Liste. */
+function wohnungMerkmale(w, auftrag) {
+  const lage = String((w && w.lage) || '');
+  const gl = /\b(EG|Erdgeschoss|Hochparterre|Parterre)\b/i.test(lage) ? 'erdgeschoss'
+    : (/\b(DG|Dachgeschoss|Staffelgeschoss|Spitzboden)/i.test(lage) ? 'dachgeschoss'
+      : (/(\d+\.?\s*OG|Obergeschoss|\bOG\b)/i.test(lage) ? 'obergeschoss' : null));
+  const k = String((w && w.kueche) || '');
+  const az = String((auftrag && auftrag.aufzug) || '').toLowerCase();
+  return {
+    geschosslage: gl,
+    einbaukueche: /^ebk/.test(k) ? 'ja' : (k === 'keine' ? 'nein' : null),
+    vermietet: w && w.leer === true ? 'nein' : (w && w.leer === false ? 'ja' : null),
+    aufzug: /^(ja|true)$/.test(az) ? 'ja' : (/^(nein|false)$/.test(az) ? 'nein' : null),
+  };
+}
+function vergleichWohnung(ref, wb, w, rnd, auftrag) {
+  const wfl = Number(w && w.wfl);
+  if (!(wfl > 0)) return null;
+  const lv = (wb && wb.land_value) || null;
+  const brw = lv && lv.available && Number(lv.value_sqm) > 0 ? Number(lv.value_sqm) : null;
+  const ags = String(ref.ags || '').replace(/\D/g, '');
+  const refW = Object.assign({}, ref, { property_type: 'etw', living_area: wfl,
+    rooms: Number(w.zimmer) > 0 ? Number(w.zimmer) : null, units: null,
+    mea_pct: Number(w.mea_pct) > 0 ? Number(w.mea_pct) : null, garages: null, outdoor_parking: null, vermietungsstand: null });
+  const mk = wohnungMerkmale(w, auftrag);
+  let gesperrt = null;
+  if (ags && brw != null) {
+    try {
+      const r = regVergleichsfaktor(regVfEingabe({ ref: refW, landValue: lv, ags, brw, rnd, bgf: null, extra: mk }));
+      const v = regVfErgebnis(r, { ref: refW, bgf: null, hhNorm: null });
+      if (v && v.verfuegbar && Number(v.wert_eur) > 0) {
+        return { wert: Math.round(v.wert_eur), faktor_qm: v.faktor_qm, herkunft: 'amtlich', ausschuss: v.ausschuss || null,
+          stufe: v.stufe || null, quellenvermerk: v.quellenvermerk || null, lizenz: v.lizenz || null, merkmale: mk };
+      }
+      if (v && v.verfuegbar === false) gesperrt = { grund: v.grund || null, hinweis: v.hinweis || null,
+        offen: v.korrekturen_offen ? v.korrekturen_offen.map((x) => x.bez || x.feld).filter(Boolean) : null, ausschuss: v.ausschuss || null };
+    } catch (e) { /* kein Wert - der Rückfall entscheidet */ }
+  }
+  try {
+    const bp = (lv && lv.properties_raw) || {};
+    const gem = bp.Gemeinde || bp.GENA || ref.gemeinde || null;
+    if (gem && Number(ref.build_year) > 0) {
+      const a = amtlicherVf({ ags: ref.ags || null, objektart: 'etw', gemeinde: gem, baujahr: ref.build_year,
+        wohnflaeche_qm: wfl, wohneinheiten: null, grundstuecksflaeche_qm: null, erstverkauf: false });
+      if (a && a.verfuegbar && a.fuehrend !== false && Number(a.wert_eur) > 0) {
+        return { wert: Math.round(a.wert_eur), faktor_qm: a.faktor_qm, herkunft: 'amtlich', ausschuss: a.ausschuss || null, stufe: 'A', merkmale: mk };
+      }
+    }
+  } catch (e) { /* ebenso */ }
+  return gesperrt ? Object.assign({ wert: null }, gesperrt) : null;
+}
+
 async function etwZins(ref, brwSqm, rnd) {
   try {
     return await WertParameterService.liegenschaftszins({
@@ -995,6 +1055,9 @@ export const PotenzialService = {
             r.als_etw = r.als_etw || {};
             r.als_etw[s] = wert;
             if (wert == null) vollst = false; else summe += wert;
+            /* v3200 · führend: Vergleichswert der Wohnung (Merkmale der Wohnung, RND dieser Stufe) */
+            r.vergleich_etw = r.vergleich_etw || {};
+            r.vergleich_etw[s] = vergleichWohnung(ref, wb, w, rnd, auftrag);
           });
           const pot = Math.round(summe - aOut.kosten_eur - out.haus[s].wert);
           aOut.je_stufe[s] = { summe: Math.round(summe), vollstaendig: vollst, potenzial: pot,
@@ -1053,6 +1116,45 @@ export const PotenzialService = {
           hinweis: 'Je Wohnung: Angebotspreise für Eigentumswohnungen am Ort (gleiches Baujahr, Flächenklasse der Wohnung) × Wohnfläche, Objektfaktoren und Abschlag auf Angebotspreise wie im Bericht; Spanne aus dem unteren und oberen Quartil; Zielbild mit Zustand „modernisiert".' };
         if (out.aufteilung) out.aufteilung.mpi_etw = out.etw_markt;
       } catch (e) { out.etw_markt = { fehler: 'Marktpreisindikation je Wohnung nicht verfügbar' }; }
+
+      /* ══ v3200 · AUFTEILERWERT ════════════════════════════════════════════════
+         Je Wohnung das führende Verfahren: 1. Vergleichswert aus dem amtlichen Vergleichsfaktor,
+         2. sonst Vergleichswert aus Angeboten (Abschlag wie im Bericht, gekennzeichnet),
+         3. sonst der Ertragswert als Eigentumswohnung. Stützend bleibt der Ertragswert als ETW
+         (Summe in je_stufe). Gewerbe geht mit seinem Anteil am Haus ein.
+         Aufteilerwert = Summe − Kosten der Aufteilung; Potenzial = Aufteilerwert − Haus. */
+      if (out.aufteilung) {
+        const A = out.aufteilung; A.aufteiler = {};
+        for (const s of stufenAlle) {
+          if (!A.je_stufe[s] || !out.haus[s]) continue;
+          let sum = 0, voll = true; const zaehl = { amtlich: 0, angebote: 0, ertragswert: 0, gewerbe: 0, fehlt: 0 };
+          out.wohnungen.forEach((r) => {
+            r.fuehrend = r.fuehrend || {};
+            if (r.art === 'gewerbe') {
+              const v = r.anteil_am_haus ? r.anteil_am_haus[s] : null;
+              r.fuehrend[s] = { wert: v, verfahren: 'anteil_haus' };
+              if (v == null) { voll = false; zaehl.fehlt++; } else { sum += v; zaehl.gewerbe++; }
+              return;
+            }
+            const vg = r.vergleich_etw ? r.vergleich_etw[s] : null;
+            const mp = r.mpi_etw ? (s === 'zielbild' ? r.mpi_etw.zielbild : r.mpi_etw.bestand) : null;
+            let v = null, verf = null;
+            if (vg && vg.wert > 0) { v = vg.wert; verf = 'vergleichswert_amtlich'; zaehl.amtlich++; }
+            else if (mp > 0) { v = Math.round(mp); verf = 'vergleichswert_angebote'; zaehl.angebote++; }
+            else if (r.als_etw && r.als_etw[s] > 0) { v = r.als_etw[s]; verf = 'ertragswert_etw'; zaehl.ertragswert++; }
+            else { voll = false; zaehl.fehlt++; }
+            r.fuehrend[s] = { wert: v, verfahren: verf };
+            if (v != null) sum += v;
+          });
+          const wert = Math.round(sum - A.kosten_eur);
+          A.aufteiler[s] = { summe: Math.round(sum), wert, vollstaendig: voll, zaehl,
+            potenzial: Math.round(wert - out.haus[s].wert), negativ: wert < out.haus[s].wert };
+        }
+        A.aufteiler_hinweis = 'Aufteilerwert: je Wohnung das führende Verfahren - Vergleichswert aus dem amtlichen Vergleichsfaktor '
+          + 'des Gutachterausschusses (§ 20 ImmoWertV, Merkmale der Wohnung), sonst aus Angebotspreisen für Eigentumswohnungen '
+          + '(abzüglich Angebotsabschlag), sonst der Ertragswert als Eigentumswohnung. Stützend: der Ertragswert jeder Wohnung '
+          + 'mit dem Liegenschaftszins für Wohnungseigentum. Abgezogen sind die Kosten der Aufteilung.';
+      }
     }
 
     /* ── v2542 · die Marktdaten des Abrufs, vollständig: Kauf €/m² (Haus-Segment),
