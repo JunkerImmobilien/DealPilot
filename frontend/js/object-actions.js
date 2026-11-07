@@ -2393,7 +2393,13 @@
     if (_rech.length) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid var(--wl-c9a84c,#C9A84C);background:var(--gold-bg, rgba(201,168,76,.08));font-size:12.5px">'
       + '<b>' + _rech.length + (_rech.length === 1 ? ' Rechnung/Beleg' : ' Rechnungen/Belege') + ' erkannt</b> (' + _rech.map(function (f) { return escH(f.name); }).join(', ') + '). Sie öffnen sich im Prüffenster der Belege – dort siehst du Bild, Positionen und wohin sie übernommen werden. '
       + '<button type="button" class="oabi-btn" id="oabi-belege" style="margin-left:6px">Prüffenster öffnen</button></div>';
-    host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
+    /* v3202 · Exposé mit mehreren einzeln bepreisten Objekten (Portfolio/Paket) - paket-import.js */
+    var _pkF = window.DpPaket ? _files.filter(function (f) { return f.type === 'expose' && f.text && window.DpPaket.erkennen(f.text) > 1; })[0] : null;
+    window._dpPaketText = _pkF ? _pkF.text : null;
+    var _pkHtml = _pkF ? '<div class="oabi-paket" style="margin:0 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-left:3px solid var(--wl-c9a84c,#C9A84C);background:#FBF6E9;border-radius:2px;font-size:12.5px">'
+      + '<b>Dieses Exposé bietet ' + window.DpPaket.erkennen(_pkF.text) + ' Objekte einzeln an.</b> Statt eines Objekts kannst du das Paket anlegen: jedes Haus als eigenes Objekt mit seinen Einheiten, verbunden über den Paketnamen. '
+      + '<button type="button" id="oabi-paket" class="oabi-btn primary" style="margin-left:6px">Als Paket anlegen</button></div>' : '';
+    host.innerHTML = _pkHtml + addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(_bisherKopf(it)) + escH(_bisherText(it, abw[id])) + '</div>';

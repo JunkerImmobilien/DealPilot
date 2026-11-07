@@ -187,7 +187,7 @@ var FIELDS = [
   /* v727-ausst: Ausstattungsdetails fuer AVM-Bewertung (Sprengnetter-Enums als Wert) */
   'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator',
   /* mand-fields v803: Mandanten/Halter + Überführung */
-  'eig_struktur','eig_erwerb','eig_anteil_ich','eig_anteil_ehegatte','eig_anteil_dritte','eig_erwerb_datum','d1_verwendung','d2_verwendung' /* v3197 */,'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
+  'paket_id','paket_name','paket_nr','paket_anzahl','paket_kp_gesamt','paket_share_deal' /* v3202 */,'eig_struktur','eig_erwerb','eig_anteil_ich','eig_anteil_ehegatte','eig_anteil_dritte','eig_erwerb_datum','d1_verwendung','d2_verwendung' /* v3197 */,'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
   /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
   'ueberf_restschuld','ueberf_rest_zins',
   /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */
@@ -2132,7 +2132,7 @@ async function renderSaved(opts) {
           /* v844-card-kaufdat: Karte zeigt Kaufdatum; updated_at nur noch als Filter-Attribut */
           date: o.kaufdat ? _fmtKaufdat(o.kaufdat) : '',
           dateUpdated: o.updated_at ? new Date(o.updated_at).toLocaleDateString('de-DE') : '',
-          halter: _halterName(o.halter)
+          halter: [_halterName(o.halter), o.paket_name ? 'Paket ' + o.paket_name + (o.paket_nr ? ' · ' + o.paket_nr + '/' + (o.paket_anzahl || '?') : '') : ''].filter(Boolean).join(' · ') || null   /* v3202 */
         });
       }).join('');   /* v1512: der Knopf steht jetzt OBEN */
       _sbLageKoepfeEinsetzen(list);   /* v1982 */

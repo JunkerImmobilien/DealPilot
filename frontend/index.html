@@ -1146,6 +1146,8 @@ label.dp-required.qc-required::after {
         </div>
         <p class="hint" style="margin-top:4px">Für Gestaltungen wie Ehegattenverkauf, Schenkung oder Güterstandsschaukel. Die Anteile sollten zusammen 100 % ergeben; Güterstand und Anfangsvermögen stehen im Investmentprofil.</p>
       </details>
+      <!-- v3202 · Paket aus mehreren Objekten (js/paket-import.js) - unsichtbar, wird mitgespeichert -->
+      <input type="hidden" id="paket_id"><input type="hidden" id="paket_name"><input type="hidden" id="paket_nr"><input type="hidden" id="paket_anzahl"><input type="hidden" id="paket_kp_gesamt"><input type="hidden" id="paket_share_deal">
     </div></div>
 
     <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Automatisch ermittelt <span class="oe-ct-hint">Wert · Quelle · Stichtag — kein Eingabefeld</span></div>
@@ -3794,7 +3796,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3154g"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3198a"></script>
+<script src="js/storage.js?v=v3202"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -3841,6 +3843,7 @@ label.dp-required.qc-required::after {
 <script src="js/data/detailgrad-zuordnung.js?v=v3073"></script>
 <script src="js/detailgrad.js?v=v3080"></script>
 <script src="js/objekt-reiter.js?v=v3201"></script>
+<script src="js/paket-import.js?v=v3202"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
@@ -3930,7 +3933,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3088"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v3198a"></script>
+  <script src="js/object-actions.js?v=v3202"></script>
   <script src="js/unterlagen-eingang.js?v=v3198"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
   <script src="js/dpsh-score-hero.js?v=v3088"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v2932"></script>

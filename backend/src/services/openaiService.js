@@ -3370,6 +3370,57 @@ async function extractExpose(text, opts) {
   return { success: true, model: r.model, extracted: cleaned };
 }
 
+/* ══ v3202 · PAKET-AUSLESE ═════════════════════════════════════════════════════
+   Ein Exposé, das MEHRERE Objekte mit je eigenem Kaufpreis anbietet (Portfolio, Paket, Share
+   Deal). Je Objekt Anschrift, Kaufpreis, Eckdaten und die Einheiten der Mieterliste - KEINE
+   Mieternamen (der Text kommt geschwärzt). Die Zahlen gehen unverändert in DealPilot; was nicht
+   im Text steht, bleibt null. */
+async function extractPaket(text, opts) {
+  const prompt = [
+    'Du bekommst den Text eines deutschen Immobilien-Exposés, das MEHRERE Objekte (Häuser) anbietet, jedes mit eigenem Kaufpreis.',
+    'Gib JEDES Objekt einzeln zurück. Nichts erfinden: was nicht im Text steht, ist null.',
+    '',
+    'Antwort STRIKT als JSON, kein Markdown:',
+    '{ "paket": { "name": "...", "gesamtkaufpreis": 0, "share_deal": true|false, "anzahl_objekte": 0 },',
+    '  "objekte": [ { "strasse": "...", "hausnummer": "...", "plz": "21073", "ort": "Hamburg",',
+    '      "objektart": "Mehrfamilienhaus" | "Wohn- und Geschäftshaus" | ..., "baujahr": 1966, "kaufpreis": 1010000,',
+    '      "wohnflaeche": 429.47, "gewerbeflaeche": null, "grundstuecksflaeche": 365, "wohneinheiten": 6, "gewerbeeinheiten": 0,',
+    '      "garagen": 2, "stellplaetze": 0, "miete_soll_jahr": 52148.64, "miete_ist_jahr": 40464, "energieklasse": "F",',
+    '      "energiewert": 171, "heizungsart": "Öl-Brennwert",',
+    '      "einheiten": [ { "lage": "EG links", "art": "wohnen" | "gewerbe", "wfl": 70.37, "miete_monat": 670, "status": "vermietet" | "leer" } ] } ] }',
+    '',
+    'REGELN:',
+    '  - Zahlen als Number (deutsche Schreibweise richtig lesen: 1.010.000 = 1010000, 429,47 = 429.47); plz als String mit 5 Ziffern.',
+    '  - einheiten: jede Zeile der Mieterliste des Objekts; Garagen/Stellplätze NICHT als Einheit, sondern als garagen/stellplaetze zählen.',
+    '  - miete_monat: Nettokaltmiete der Einheit pro Monat; status "leer", wenn frei/leerstehend/frei übergeben.',
+    '  - share_deal: true, wenn das Exposé einen Share Deal (Anteilskauf) nennt.',
+    '',
+    '─── EXPOSE-TEXT ───',
+    text
+  ].join('\n');
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 16000 }, opts || {}));
+  const parsed = extractJson(r.text);
+  if (!parsed || !Array.isArray(parsed.objekte)) return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.' };
+  const z = (v) => { if (v == null || v === '') return null; if (typeof v === 'number') return isFinite(v) ? v : null;
+    let s = String(v).replace(/[^\d.,-]/g, ''); if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); const n = parseFloat(s); return isFinite(n) ? n : null; };
+  const t = (v) => (v == null || v === '' ? null : String(v).trim());
+  const objekte = parsed.objekte.filter((o) => o && (o.strasse || o.kaufpreis)).map((o) => {
+    let plz = t(o.plz); if (plz && /^\d{4}$/.test(plz)) plz = '0' + plz;
+    return { strasse: t(o.strasse), hausnummer: t(o.hausnummer), plz, ort: t(o.ort), objektart: t(o.objektart),
+      baujahr: z(o.baujahr), kaufpreis: z(o.kaufpreis), wohnflaeche: z(o.wohnflaeche), gewerbeflaeche: z(o.gewerbeflaeche),
+      grundstuecksflaeche: z(o.grundstuecksflaeche), wohneinheiten: z(o.wohneinheiten), gewerbeeinheiten: z(o.gewerbeeinheiten),
+      garagen: z(o.garagen), stellplaetze: z(o.stellplaetze), miete_soll_jahr: z(o.miete_soll_jahr), miete_ist_jahr: z(o.miete_ist_jahr),
+      energieklasse: t(o.energieklasse), energiewert: z(o.energiewert), heizungsart: t(o.heizungsart),
+      einheiten: (Array.isArray(o.einheiten) ? o.einheiten : []).filter((e) => e && z(e.wfl) > 0).map((e) => ({
+        lage: t(e.lage), art: /gewerbe|laden|büro|praxis/i.test(String(e.art || '')) ? 'gewerbe' : 'wohnen',
+        wfl: z(e.wfl), miete_monat: z(e.miete_monat), status: /leer|frei/i.test(String(e.status || '')) ? 'leer' : 'vermietet' })) };
+  });
+  const p = parsed.paket || {};
+  return { success: true, model: r.model, paket: { name: t(p.name), gesamtkaufpreis: z(p.gesamtkaufpreis),
+    share_deal: p.share_deal === true, anzahl_objekte: objekte.length }, objekte };
+}
+
 /**
  * V63.91: extractMarketData
  * ─────────────────────────────────────────────────────────────
@@ -4577,6 +4628,7 @@ module.exports = {
   buildDs2Prompt,     /* v2500 · fuer tools/prompt-lecks-pruefen.mjs */
   suggestQcFields,
   extractExpose,
+  extractPaket,   /* v3202 */
   extractMarketData,
   enrichMarketFields,
   buildPrompt,

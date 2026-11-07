@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-07T10:39:16.707Z",
+ "erzeugt_am": "2026-11-07T10:49:44.539Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "a004fce950be1d02",
-  "index-html": "8e4bc22779c3d8c8",
+  "storage": "61226de61db3f2bc",
+  "index-html": "88ef9d50bdb6bb97",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -648,6 +648,12 @@
    "eq_walls",
    "eq_roof",
    "eq_elevator",
+   "paket_id",
+   "paket_name",
+   "paket_nr",
+   "paket_anzahl",
+   "paket_kp_gesamt",
+   "paket_share_deal",
    "eig_struktur",
    "eig_erwerb",
    "eig_anteil_ich",

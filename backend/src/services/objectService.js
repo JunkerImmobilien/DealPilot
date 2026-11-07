@@ -44,6 +44,9 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             -- v3191: Ueberfuehrung erkennbar ohne Blob (Mandanten: Objektliste, Auswahlfenster nur ueberfuehrbarer Objekte)
             data::jsonb->>'obj_herkunft' AS obj_herkunft,
             data::jsonb->>'ueberf_ende' AS ueberf_ende,
+            -- v3202: Paket aus mehreren Objekten (paket-import.js) - Kartenetikett und Paket-Übersicht
+            data::jsonb->>'paket_id' AS paket_id, data::jsonb->>'paket_name' AS paket_name,
+            data::jsonb->>'paket_nr' AS paket_nr, data::jsonb->>'paket_anzahl' AS paket_anzahl,
             data::jsonb->>'str' AS str, data::jsonb->>'hnr' AS hnr, data::jsonb->>'plz' AS plz,
             data::jsonb->>'kaufdat' AS kaufdat,  -- v844-kaufdat: Kaufdatum auf Sidebar-Card
             data::jsonb->>'lageklasse' AS lageklasse,  -- v1982: Sortierung nach A/B/C-Lage

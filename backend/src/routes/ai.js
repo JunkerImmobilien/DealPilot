@@ -845,6 +845,23 @@ router.post('/extract-expose', authenticate, extractLimiter, async (req, res, ne
   }
 });
 
+/* v3202 · POST /api/v1/ai/extract-paket — Exposé mit mehreren Objekten (Portfolio/Paket), je Objekt
+   mit Einheiten. Kein Credit (Extraktion), Text geschwärzt wie extract-expose. */
+router.post('/extract-paket', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { text: _rohText } = req.body || {};
+    if (!config.openai.apiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfügbar.' });
+    if (!_rohText || typeof _rohText !== 'string' || _rohText.length < 200) return res.status(400).json({ error: 'Body muss "text" enthalten.' });
+    const text = schwaerzen.schwaerze(_rohText.slice(0, 240000)).text;
+    const result = await openaiService.extractPaket(text, {});
+    try { if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') await aiCreditsService.logExtract(req.user.id, 'extract-paket'); } catch (e) {}
+    res.json(result);
+  } catch (err) {
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
 /**
  * v1678: POST /api/v1/ai/extract-dokument
  *
