@@ -969,6 +969,12 @@ export const ReportOrchestrator = {
           lage: ref.lage || null,
           stadtteil: ref.stadtteil || ref.ortsteil || null,
           norm_brw: _hhNorm19 ? _hhNorm19.wert : null,   /* v3205 · Hamburg-Formelwerk */
+          /* v3206 · Faktormodelle (Hamburg: Alters-, Aktualisierungs-, Erstbezugsfaktor) brauchen das
+             Kalenderjahr des Wertermittlungsstichtags und den Erstbezug. Erstbezug = Baujahr im Stichtagsjahr
+             oder in den drei Jahren davor (Wortlaut des Blattes); ohne Baujahr bleibt er offen. */
+          stichtag: stichtagVon(ref).iso,
+          erstbezug: (function () { const bj = Number(ref.build_year), sj = Number(stichtagJahr(ref));
+            return (Number.isFinite(bj) && bj > 1800 && Number.isFinite(sj)) ? (sj - bj >= 0 && sj - bj <= 3) : null; })(),
           /* v2790 · Punkt 5: Wohnungen UND Gewerbeeinheiten -> zuerst der Satz fuer Wohn- und
              Geschaeftshaeuser (lib/zweigwahl.js waehle), nie ein gewogener Zins */
           mischnutzung: !!(ref.gewerbe && Number(ref.gewerbe.wfl_gewerbe) > 0 && Number(ref.gewerbe.n_wohnen) > 0),

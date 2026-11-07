@@ -1010,6 +1010,18 @@ function fwAusTabelle(tab, name, e, stamm, opt = {}) {
     }
     const tag = String(s.wert).slice(0, 10);
     if (!Object.prototype.hasOwnProperty.call(tab, tag)) {
+      /* v3206 · Eine Datumstabelle (Aktualisierungsfaktor zum 1.1./1.7.) gilt vom Datum des Faktors bis zum
+         naechsten veroeffentlichten: massgeblich ist der LETZTE Faktor zum oder vor dem Stichtag. Vor dem
+         ersten Datum der Tabelle wird nichts gerechnet (die Quelle endet dort). */
+      const frueher = schluessel.filter((k) => /^\d{4}-\d{2}-\d{2}$/.test(k) && k <= tag).sort();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(tag) && frueher.length) {
+        const k = frueher[frueher.length - 1];
+        const w2 = holen(tab[k]);
+        if (w2 !== null) {
+          return { status: 'gerechnet', wert: w2,
+            auspraegung: k + ' (letzter veröffentlichter Faktor vor dem Stichtag ' + tag + ')' };
+        }
+      }
       return { status: 'stichtag_ohne_faktor', benoetigt: 'stichtag',
         auswahl: schluessel, gegeben: tag };
     }
