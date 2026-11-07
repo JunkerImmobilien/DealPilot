@@ -2883,6 +2883,182 @@ body::before {
 @media (max-width:480px){
   .subs{ grid-template-columns:repeat(3,1fr) !important; }
 }
+
+/* v3201 · Optik wie Reiter Objekt/Miete (Marcel 07.11.2026)
+   ─────────────────────────────────────────────────────────────────────
+   Die sechs Eingabe-Karten (Adresse, Objektdaten, Mieteinnahmen,
+   Bewirtschaftung, Finanzierung, Objektfotos) tragen jetzt dieselben
+   Werte wie die Karten in #s0 (Objekt) und #s2 (Miete) der Haupt-App.
+   Dieses Dokument laedt css/style.css NICHT - die Werte sind dort
+   ausgelesen (Standardansicht: Skin obsidian, kein data-ui-theme):
+     Karte     .card Z.37 + #s0/#s2 .card Z.27260: #fff, 1px Gold 22 %,
+               Radius 12, Schatten 0 2px 12px .06, Innenabstand 20,
+               Abstand 16; Hover Gold 45 % (Z.27268)
+     Kopf      .ct Z.12103 (+ ::before 3x12 Z.12116) und .ct-pro Z.27170:
+               DM Sans 11,5/700, Versalien, Sperrung 1,4 px, Abstand 14,
+               unten 10; Farbe Z.40984 Gold 60 % auf #120e05
+     Symbol    .ct-pro .ct-ico Z.27193: 22x22, Radius 6, Rand Gold 40 %
+     Feld      .f Z.12125: Spalte, Luecke 5, unten 4; Raster .g2 Luecke 12
+     Label     .f label Z.12131: 11/500, --muted in .main-col = #625c59
+               (Z.40980), Schrift der Seite = Inter (Z.36190, --dp-font)
+     Eingabe   input[type=text] Z.45: 38 hoch, 0 11, 1,5px #E0DBD3,
+               Radius 8, 13 px DM Sans, #2A2727, Fokus Gold + 3px-Ring
+     Auswahl   wie Eingabe, aber Schrift IBM Plex Sans (Z.29558 kommt
+               nach Z.45 bei gleicher Spezifitaet) und nativer Pfeil
+               (css/select-fix.css .card select)
+     Hinweis   .hint Z.43/790/16285: 10,5, kursiv, rgba(42,39,39,.68),
+               oben 3, Zeilenhoehe 1,4
+     Handy     <= 640 px Z.27458 ff.: Eingabe 12,5 px, min. 44 hoch
+               (Z.23097 gewinnt ueber height 36), Label 10,5, Feld Luecke 3
+               unten 6, Karte Innenabstand 14, Kopf 10,5 / Sperrung 1 px,
+               Symbol 20, Linie hinter dem Kopf aus
+   Bewusst NICHT angefasst: Boarding-Pass #qb-bp, Bewertungs-/AVM-/KI-
+   Karten, Pruefmarkierung .qc-missing-hl (traegt !important und gewinnt
+   weiter), Herkunft .has-source (unten nachgezogen), Inline-Zeilen
+   .qc-hg-hint/.qc-ltv-satz, LTV-Knoepfe, Foto-Ablage. */
+body.dp-neue-karte .card {
+  background: var(--white, #fff);
+  border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(42,39,39,0.06), 0 0 0 0 color-mix(in srgb, var(--gold) 0%, transparent);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+body.dp-neue-karte .card:hover {
+  border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+  box-shadow: 0 4px 18px rgba(42,39,39,0.10), 0 0 16px color-mix(in srgb, var(--gold) 10%, transparent);
+}
+body.dp-neue-karte .card > .card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, #120e05);
+  margin-bottom: 14px;
+  padding: 0 0 10px 0;
+  border-bottom: 0;
+  background: transparent;
+}
+/* Der Goldstrich steht in der Haupt-App als Flex-Kind 3x12 VOR dem Symbol,
+   nicht als Balken ueber die ganze Kopfhoehe. */
+body.dp-neue-karte .card > .card-title::before {
+  content: '';
+  position: static;
+  display: block;
+  width: 3px;
+  height: 12px;
+  background: var(--gold);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+body.dp-neue-karte .card > .card-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-soft, #f5ecd0), transparent);
+  margin-left: 8px;
+}
+body.dp-neue-karte .card > .card-title .card-title-ic {
+  width: 22px;
+  height: 22px;
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--gold) 15%, transparent), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+/* Raster: Luecke 12 wie .g2; zwischen zwei Feldzeilen 4 + 12 = 16 px wie
+   in der Haupt-App. Die Inline-Abstaende margin-top:10px der Folgezeilen
+   wuerden das auf 26 px dehnen - sie fallen hier weg. */
+body.dp-neue-karte .card .row {
+  gap: 12px;
+  margin-bottom: 12px;
+}
+body.dp-neue-karte .card > .row[style*="margin-top:10px"],
+body.dp-neue-karte .card > .field[style*="margin-top:10px"] {
+  margin-top: 0 !important;
+}
+body.dp-neue-karte .card > .row:last-child { margin-bottom: 0; }
+body.dp-neue-karte .card .field {
+  gap: 5px;
+  margin-bottom: 4px;
+}
+body.dp-neue-karte .card .field > label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #625c59;
+}
+body.dp-neue-karte .card .field > input[type="text"],
+body.dp-neue-karte .card .field > input[type="number"],
+body.dp-neue-karte .card .field > select {
+  height: 38px;
+  width: 100%;
+  padding: 0 11px;
+  border: 1.5px solid var(--border, #E0DBD3);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text, #2A2727);
+  background-color: var(--white, #fff);
+  outline: none;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+body.dp-neue-karte .card .field > select {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+  background-image: none;
+  padding-right: 11px;
+  cursor: pointer;
+}
+body.dp-neue-karte .card .field > input[type="text"]:focus,
+body.dp-neue-karte .card .field > input[type="number"]:focus,
+body.dp-neue-karte .card .field > select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 12%, transparent);
+}
+/* Herkunft aus dem PDF-Import bleibt sichtbar (eigene QC-Funktion) */
+body.dp-neue-karte .card .field.has-source > input[type="text"],
+body.dp-neue-karte .card .field.has-source > input[type="number"],
+body.dp-neue-karte .card .field.has-source > select {
+  border-color: var(--gold);
+  background-color: #FDF9EF;
+}
+body.dp-neue-karte .card .field > .hint {
+  display: block;
+  font-size: 10.5px;
+  font-style: italic;
+  color: rgba(42,39,39,0.68);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+@media (max-width: 640px) {
+  body.dp-neue-karte .card { padding: 14px; }
+  body.dp-neue-karte .card > .card-title {
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+  body.dp-neue-karte .card > .card-title .card-title-ic { width: 20px; height: 20px; }
+  body.dp-neue-karte .card > .card-title::after { display: none; }
+  body.dp-neue-karte .card .field { gap: 3px; margin-bottom: 6px; }
+  body.dp-neue-karte .card .field > label { font-size: 10.5px; margin-bottom: 3px; }
+  body.dp-neue-karte .card .field > input[type="text"],
+  body.dp-neue-karte .card .field > input[type="number"],
+  body.dp-neue-karte .card .field > select {
+    height: 36px;
+    min-height: 44px;
+    font-size: 12.5px;
+    padding: 0 10px;
+  }
+}
+/* /v3201 */
 </style>
 <style id="qc-app-overrides">
 button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
