@@ -112,5 +112,20 @@ console.log('7) v2990 · Bodenwert nicht angepasst ist nicht „konservativ" (Be
   ok(R2.bodenwertFakten(pl.cross_check).length === 1 && R2.bodenwertFakten({ flaeche: { erheblich: true } }).length === 0, 'bodenwertFakten nur bei nicht angepasstem Bodenwert');
 }
 
+console.log('8) v3207 · „Marktwert" im Text = Kopfzahl des fuehrenden Verfahrens (Bericht 549, Westerfeldstr. 140)');
+{
+  const pw = { ref: { purchase_price: 545000 }, valuation: { market_value: { estimated: 875000 } },
+    cross_check: { verfahrenswahl: { verfahren: 'ertragswert' }, ertragswert: { available: true, value_eur: 735000 } } };
+  const Fw = K.textFakten(pw);
+  ok(Fw.fuehrend === 'ertragswert' && Fw.kopfwert === 735000, 'Kopfzahl = Ertragswert 735.000 €');
+  ok(/nenne sie NIE „Marktwert"/.test(K.faktenAnweisung(Fw)), 'Anweisung trennt Marktwert und Angebotsindikation');
+  const echt = 'Das Mehrfamilienhaus in Bielefeld, Schildesche, mit 390 m² Wohnfläche aus dem Baujahr 1967, wird mit einem Marktwert von 875.000 € geschätzt, dessen Spanne zwischen 755.000 € und 955.000 € liegt.';
+  ok(K.pruefeText(echt, Fw).some((x) => x.art === 'marktwert_bezug'), 'echter Satz aus Bericht 549 -> Befund');
+  ok(!K.pruefeText('Die Marktwert-Indikation beträgt 735.000 € nach dem Ertragswertverfahren.', Fw).some((x) => x.art === 'marktwert_bezug'), 'richtige Kopfzahl -> kein Befund');
+  ok(!K.pruefeText('Die Marktpreisindikation aus Angeboten liegt bei 875.000 €.', Fw).some((x) => x.art === 'marktwert_bezug'), 'richtig benannte Angebotsindikation -> kein Befund');
+  const pm = JSON.parse(JSON.stringify(pw)); pm.cross_check.verfahrenswahl = { verfahren: null };
+  ok(!K.pruefeText(echt, K.textFakten(pm)).some((x) => x.art === 'marktwert_bezug'), 'ohne fuehrendes Verfahren (Kopf = Angebote) -> kein Befund');
+}
+
 console.log((fehler ? 'ROT' : 'GRUEN') + ': ' + (n - fehler) + '/' + n);
 process.exit(fehler ? 1 : 0);

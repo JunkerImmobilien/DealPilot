@@ -287,8 +287,15 @@
   /* Sachwertfaktor: wo der Wert zu bekommen ist (wenn er fehlt oder zur Quelle) */
   function swfWeg(sw) {
     var l = sw && sw.sachwertfaktor_quelle_link;
-    if (!l || !l.satz) return '';
-    return '<div class="hinweis"><b>Sachwertfaktor – Quelle:</b> ' + esc(l.satz) + (l.url ? ' <span class="det">' + esc(l.url) + '</span>' : '') + '</div>';
+    /* v3207 · satz ist ein Objekt {text, warum_kein_wert, kosten, hinweis} wie in der
+       Marktbericht-App (quelleBlock) - hier stand esc(l.satz) und druckte „[object Object]"
+       (Bericht 552). Ohne Sachwert gehoert der Kasten nicht auf die Seite. */
+    if (!l || !l.satz || !istZahl(sw.value_eur)) return '';
+    var s = typeof l.satz === 'string' ? { text: l.satz } : l.satz;
+    var t = [s.text, s.warum_kein_wert, s.kosten].filter(Boolean).join(' ');
+    if (!t) return '';
+    return '<div class="hinweis"><b>Sachwertfaktor – Quelle:</b> ' + esc(t) + (l.url ? ' <span class="det">' + esc(l.url) + '</span>' : '')
+      + (s.hinweis ? '<br><span class="det">' + esc(s.hinweis) + '</span>' : '') + '</div>';
   }
 
   /* ── v3177 · Führendes Verfahren, deutlich und begründet ──────────── */
@@ -590,7 +597,9 @@
       return '';
     });
     if (bwRows.length || istZahl(sw.value_eur)) {
-      teile.push(seite(d, 'Bodenwert und Sachwert', '<div class="eyebrow">Abschnitt 4</div><h2>Bodenwert und Sachwert</h2><p class="sub">Zeile für Zeile, mit der Fundstelle jeder Zahl.</p>'
+      /* v3207 · ohne Sachwert (z. B. Eigentumswohnung) heisst die Seite nur „Bodenwert" */
+      var swTitel = istZahl(sw.value_eur) ? (bwRows.length ? 'Bodenwert und Sachwert' : 'Sachwert') : 'Bodenwert';
+      teile.push(seite(d, swTitel, '<div class="eyebrow">Abschnitt 4</div><h2>' + swTitel + '</h2><p class="sub">Zeile für Zeile, mit der Fundstelle jeder Zahl.</p>'
         + (bwRows.length ? '<h3>Bodenwert</h3>' + staffelTabelle(bwRows, bwQ) : '')
         + (istZahl(sw.value_eur) ? '<h3>Sachwert</h3>' + staffelTabelle(sw.staffel, swQ)
           + (sw.restnutzungsdauer_herkunft && sw.restnutzungsdauer_herkunft.hinweis ? '<p class="det">' + esc(sw.restnutzungsdauer_herkunft.hinweis) + '</p>' : '')

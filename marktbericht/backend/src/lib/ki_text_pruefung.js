@@ -70,7 +70,13 @@ export function textFakten(p) {
   };
   /* v2990 · Bodenwert ohne Groessenanpassung: keine Wertung „konservativ" (s. pruefeText 5) */
   const bodenwert_nicht_angepasst = !!(im && cc.flaeche && cc.flaeche.erheblich && cc.flaeche.bodenwert_nicht_angepasst);
-  return { werte, verhaeltnis, zaehl, ertragswert_im_umfang: !!ew, sachwert_im_umfang: !!sw, bodenwert_nicht_angepasst };
+  /* v3207 · Kopfzahl des Berichts = Wert des fuehrenden Verfahrens. Gemessen an Bericht 549
+     (Westerfeldstr. 140): Kopf „Marktwert-Indikation 735.000 € (Ertragswert)", Text „mit einem
+     Marktwert von 875.000 € geschaetzt" - die KI nannte die Angebotsindikation Marktwert. */
+  const vf = cc.verfahrenswahl && cc.verfahrenswahl.verfahren;
+  const fuehrend = vf && werte[vf] ? vf : null;
+  const kopfwert = fuehrend ? werte[fuehrend] : werte.mpi;
+  return { werte, verhaeltnis, zaehl, ertragswert_im_umfang: !!ew, sachwert_im_umfang: !!sw, bodenwert_nicht_angepasst, fuehrend, kopfwert };
 }
 
 /* Benannte Pruefzahlen fuer den Prompt: kaufpreis_ueber_mpi_pct = 58.6 usw. */
@@ -106,6 +112,10 @@ export function faktenAnweisung(F) {
     if (z.anzahl_ohne_restlaufzeit) t.push(z.anzahl_ohne_restlaufzeit + ' Mietverhältnisse ohne bekannte Restlaufzeit');
     s.push('Zählung: ' + t.join(', ') + '. Leer stehende Wohnungen und Wohnungen mit Miete über dem Band sind VERSCHIEDENE Gruppen.');
     s.push('Der Ertragswert ist in diesem Bericht ENTHALTEN' + (F.sachwert_im_umfang ? ', der Sachwert ebenfalls' : '') + ' - schreibe nie, er sei nicht enthalten.');
+  }
+  if (F.fuehrend && F.fuehrend !== 'mpi' && F.werte.mpi && F.kopfwert && Math.abs(F.werte.mpi / F.kopfwert - 1) > 0.02) {
+    s.push('Die Marktwert-Indikation dieses Berichts ist der ' + NAME[F.fuehrend] + ' mit ' + Math.round(F.kopfwert).toLocaleString('de-DE')
+      + ' € (führendes Verfahren). Die ' + Math.round(F.werte.mpi).toLocaleString('de-DE') + ' € heißen „Marktpreisindikation aus Angeboten" - nenne sie NIE „Marktwert".');
   }
   if (F.bodenwert_nicht_angepasst) s.push('Der Bodenwert ist NICHT an die Grundstücksgröße angepasst - das ist eine offene Prüfung, '
     + 'kein vorsichtiger Ansatz. Nenne ihn nie „konservativ", „vorsichtig" oder „zurückhaltend".');
@@ -206,6 +216,21 @@ export function pruefeText(md, F) {
       && /(konservativ|vorsichtig|zurückhaltend|auf der sicheren Seite|bewusst niedrig)/i.test(t)) {
       befunde.push({ art: 'bodenwert_wertung', satz: t.trim(), zeile: s.zeile, ist: 'Bodenwert als vorsichtig/konservativ gewertet',
         soll: 'nicht an die Grundstücksgröße angepasst, insoweit vorläufig (Richtung offen)' });
+    }
+    /* 6) v3207 · „Marktwert" mit einem Betrag, der nicht die Kopfzahl ist (Bericht 549).
+          Nur wenn die Angebotsindikation von der Kopfzahl abweicht und der Betrag zur
+          Angebotsindikation passt - ein anderer Betrag ist keine sichere Zuordnung. */
+    if (F.fuehrend && F.kopfwert && F.werte && F.werte.mpi && Math.abs(F.werte.mpi / F.kopfwert - 1) > 0.02) {
+      const MW = /Marktwert(?!e|indikation des|-Indikation des)(?!\w)[^.€]{0,60}?(\d{1,3}(?:\.\d{3})+)\s*(?:€|Euro)/gi;
+      let w;
+      while ((w = MW.exec(t))) {
+        const betrag = Number(w[1].replace(/\./g, ''));
+        if (Math.abs(betrag / F.werte.mpi - 1) <= 0.01 && Math.abs(betrag / F.kopfwert - 1) > 0.02) {
+          befunde.push({ art: 'marktwert_bezug', satz: t.trim(), zeile: s.zeile, ist: 'Marktwert ' + w[1] + ' €',
+            soll: 'Marktwert-Indikation ' + Math.round(F.kopfwert).toLocaleString('de-DE') + ' € (' + NAME[F.fuehrend] + '); '
+              + w[1] + ' € ist die Marktpreisindikation aus Angeboten' });
+        }
+      }
     }
     /* 4) Verfahren im Umfang als „nicht enthalten" bezeichnet */
     if (F.ertragswert_im_umfang && /Ertrags/i.test(t) && /(nicht enthalten|nicht Teil|liegen? nicht vor|wurden? nicht ermittelt|nicht ausgewiesen)/i.test(t)) {

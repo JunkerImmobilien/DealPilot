@@ -221,7 +221,8 @@ export const ErtragswertService = {
     }
     if (mea) {
       wert = wert * (mea / 100);
-      out.schritte.push({ pos: 'Miteigentumsanteil', detail: `${round2(mea)} %`, wert: round0(wert) });
+      /* v3207 · deutsches Zahlformat (Bericht 552 druckte „8.5 %") */
+      out.schritte.push({ pos: 'Miteigentumsanteil', detail: `${deZahl(round2(mea))} %`, wert: round0(wert) });
       /* v1140-MEARENT · DER V1026-FIX WAR NUR HALB FERTIG.
        * `wert_rentierlich` wird oben gesetzt — also VOR dieser Kuerzung — und
        * blieb deshalb auf dem vollen Grundstueckswert stehen. Verzinst wird
