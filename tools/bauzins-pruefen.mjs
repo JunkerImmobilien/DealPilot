@@ -26,7 +26,7 @@ const pz = (x) => (x == null ? '–' : x.toFixed(2).replace('.', ','));
 console.log('Formel: Zuschlag Z(LTV) an den Stuetzstellen und dazwischen');
 [[50, -0.20], [60, -0.20], [65, -0.15], [70, -0.10], [80, 0], [85, 0.11], [90, 0.22], [95, 0.335], [100, 0.45], [105, 0.70], [110, 0.95], [130, 0.95]]
   .forEach(([l, soll]) => pruef(Math.abs(bz.zuschlagLtv(l) - soll) < 1e-9, 'Z(' + l + ' %) = ' + bz.zuschlagLtv(l) + ' (soll ' + soll + ')'));
-pruef(bz.zinsFuer(3.51, 0.56, 80) === 4.34, 'Kalibrierpunkt 3,51 + 0,56 + K(0,27) bei 80 % = 4,34');
+pruef(bz.zinsFuer(3.51, 0.56, 80) === 4.48, 'Kalibrierpunkt 3,51 + 0,56 + K(0,41, Stand 05.11.2026 v3194) bei 80 % = 4,48');
 
 function ausgeben(e, titel) {
   console.log('\n' + titel + ' (quelle ' + e.quelle + ')');

@@ -1080,7 +1080,9 @@ function _renderWertverfahren(d) {
       + ' \u00b7 Stichtag ' + (lv.stichtag || '\u2013')
       /* v2592 \u00b7 ein Stichtag vor dem Vorjahr wird gesagt (registry.js) */
       + (lv.stichtag_veraltet ? ' (\u00e4lter als ein Jahr \u2013 neueren Wert beim Gutachterausschuss pr\u00fcfen)' : '')
-    : (lv.dienst_ausfall && lv.note ? lv.note : 'kein amtlicher Bodenrichtwert verf\u00fcgbar');
+    : (lv.dienst_ausfall && lv.note ? lv.note : 'kein amtlicher Bodenrichtwert verf\u00fcgbar')
+      /* v3208 \u00b7 Bayern: der Weg zum Wert (BayernAtlas auf dem Objekt, registry.js bayernAtlasLink) */
+      + (lv.portal_url ? ' \u00b7 <a href="' + esc(lv.portal_url) + '" target="_blank" rel="noopener">Bodenrichtwert im BayernAtlas ansehen \u2192</a>' : '');
   var vw = cc.verfahrenswahl || null;
   var fuehrt = (vw && vw.verfahren) || null;
   var VW_NAME = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren', bodenwert: 'Bodenwert' };

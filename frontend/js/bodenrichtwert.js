@@ -622,10 +622,12 @@
        Ausfall seit v2592 ausdrücklich (dienst_ausfall). */
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0) && bd.dienst_ausfall) {
       return { ok: false, grund: 'ausfall',
-               fehler: bd.note || 'Der Bodenrichtwert-Dienst ist derzeit nicht erreichbar — bitte den Wert selbst eintragen.' };
+               fehler: bd.note || 'Der Bodenrichtwert-Dienst ist derzeit nicht erreichbar — bitte den Wert selbst eintragen.',
+               link: bd.portal_url || null };   /* v3208: Bayern bringt den BayernAtlas-Link auf das Objekt mit */
     }
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
-      return { ok: false, grund: 'kein_wert', fehler: 'Kein amtlicher Bodenrichtwert für diese Lage' };
+      return { ok: false, grund: 'kein_wert', fehler: 'Kein amtlicher Bodenrichtwert für diese Lage',
+               link: bd.portal_url || null };   /* v3208 */
     }
     /* v1838 · Die Nutzungsart reist mit. Sie kam schon immer in der
        Antwort und wurde hier weggeworfen — siehe `_nutzungPruefen`. */
@@ -746,6 +748,18 @@
             + ' — danach den Wert hier eintragen.';
         }
         if (typeof toast === 'function') toast('Bodenrichtwert in diesem Land nur gegen Gebühr — Link unter dem Feld');
+        return;
+      }
+      /* v3208 · Ausfall oder kein Wert MIT Weg (Bayern: BayernAtlas auf dem Objekt) -
+         Hinweis mit Link unter dem Feld statt roter Fehlermeldung ohne Absprung. */
+      if (!r.ok && r.link && (r.grund === 'ausfall' || r.grund === 'kein_wert')) {
+        var st4 = _el('brw-ai-status');
+        if (st4) {
+          st4.className = 'brw-ai-status';
+          st4.innerHTML = 'ⓘ ' + _escHtml(r.fehler) + ' '
+            + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Im BayernAtlas auf dem Objekt öffnen →</a> (Wert in der Zone ablesen und oben eintragen)';
+        }
+        if (typeof toast === 'function') toast('Kein Bodenrichtwert abrufbar – Link zum Portal unter dem Feld');
         return;
       }
       if (!r.ok) {

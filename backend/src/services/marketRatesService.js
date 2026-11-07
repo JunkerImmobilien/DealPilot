@@ -49,15 +49,18 @@ const LABELS = {
   'over10': 'über 10 Jahre'
 };
 
-// V28: Statische Fallback-Werte aus ECB-Pressemitteilung Februar 2026
-// https://www.ecb.europa.eu/press/stats/mfi/html/ecb.mir2604~a265e5863d.en.html
+// V28: Statische Fallback-Werte (nur wenn Bundesbank UND EZB nicht antworten).
+// Jahreswerte-Agent 07.11.2026: Bundesbank BBIM1, Reihen M.DE.B.A2C.{F,I,O,P}.R.A.2250.EUR.N,
+// Berichtsmonat 2026-08 (letzter endgueltiger Wert; 2026-09 ist dort "vorlaeufig"),
+// Datenstand der Bank 02.11.2026, abgerufen 07.11.2026. Vorher: EZB-Pressemitteilung 02/2026
+// (3,48 / 3,37 / 3,55 / 3,26).
 const STATIC_FALLBACK = {
-  'var':    3.48,
-  '1_5':    3.37,
-  '5_10':   3.55,
-  'over10': 3.26
+  'var':    4.40,
+  '1_5':    4.03,
+  '5_10':   3.81,
+  'over10': 4.04
 };
-const STATIC_FALLBACK_AS_OF = '2026-02';
+const STATIC_FALLBACK_AS_OF = '2026-08';
 
 const SOURCE_BUNDESBANK = {
   name: 'Deutsche Bundesbank',
@@ -421,13 +424,15 @@ const PFANDBRIEF_SERIES = {
 // V210: Statischer Fallback für Pfandbrief-Renditen (Stand 05/2026)
 // Quelle: Bundesbank Kapitalmarktstatistik Mai 2026 + FMH-Approximation
 // Marcel pflegt diese monatlich falls API nicht greift.
-const STATIC_PFANDBRIEF = {   // v2242: Tageswerte vom 14.10.2026
-  '5':  3.68,
-  '10': 3.93,
-  '15': 4.05,
-  '20': 4.11
+// Jahreswerte-Agent 07.11.2026: Bundesbank BBSIS D.I.ZAR.ZI.EUR.S122.B.A100.R{05,10,15,20}XX.R.A.A._Z._Z.A,
+// Tageswerte vom 05.11.2026, abgerufen 07.11.2026 (vorher 14.10.2026: 3,68 / 3,93 / 4,05 / 4,11).
+const STATIC_PFANDBRIEF = {
+  '5':  3.55,
+  '10': 3.79,
+  '15': 3.91,
+  '20': 3.98
 };
-const STATIC_PFANDBRIEF_AS_OF = '2026-10';
+const STATIC_PFANDBRIEF_AS_OF = '2026-11';
 
 // Marge-Modell — wird im Frontend wählbar gemacht
 /* v2242 · kalibriert am 15.10.2026: Bauzins 10 J / 80 % Beleihung lag bei
@@ -666,11 +671,15 @@ async function getPfandbriefRates(opts) {
 
 const ECB_FM_BASE = 'https://data-api.ecb.europa.eu/service/data/FM';
 
-// Statische Fallback-Werte (Stand 05/2026) — wenn ECB-API nicht erreichbar
+// Statische Fallback-Werte — wenn ECB-API nicht erreichbar.
+// Jahreswerte-Agent 07.11.2026, EZB Data Portal, abgerufen 07.11.2026:
+//   FM.D.U2.EUR.4F.KR.MRR_FR.LEV   = 2,65 % seit 16.09.2026 (davor 2,40 ab 17.06., 2,15 ab 01.01.2026)
+//   FM.M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA = 2,6347 % Monatsmittel 2026-10
+// Vorher: 2,15 / 2,32, Stand 05/2026.
 const STATIC_MARKET_CONTEXT = {
-  ecb_mrr: 2.15,       // ECB Hauptrefinanzierungssatz (laut Statista Q1 2026)
-  euribor_3m: 2.32,    // 3M-EURIBOR ca. Niveau Mai 2026
-  asOf: '2026-05'
+  ecb_mrr: 2.65,       // EZB Hauptrefinanzierungssatz seit 16.09.2026
+  euribor_3m: 2.63,    // 3M-EURIBOR, Monatsmittel Oktober 2026
+  asOf: '2026-10'
 };
 
 let _marketContextCache = null;

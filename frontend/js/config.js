@@ -1115,13 +1115,15 @@ window.DealPilotConfig = (function() {
     marketRates: {
       // %-Werte (Effektivzinssätze, Neugeschäft, Wohnungsbaukredite DE)
       values: {
-        'var':    3.48,
-        '1_5':    3.37,
-        '5_10':   3.55,
-        'over10': 3.26
+        // Jahreswerte-Agent 07.11.2026: Bundesbank BBIM1, Berichtsmonat 2026-08 (endgueltig),
+        // Spiegel von STATIC_FALLBACK im Backend (vorher 02/2026: 3,48 / 3,37 / 3,55 / 3,26)
+        'var':    4.40,
+        '1_5':    4.03,
+        '5_10':   3.81,
+        'over10': 4.04
       },
       // YYYY-MM des Datenstands
-      asOf: '2026-02',
+      asOf: '2026-08',
       // Quelle für UI-Link
       sourceLabel: 'ECB-Pressemitteilung · Bundesbank-MFI-Statistik',
       sourceUrl:   'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen',
@@ -1137,10 +1139,10 @@ window.DealPilotConfig = (function() {
       //   (Kapitalmarktstatistik-PDF, Tabelle "Zinssatz bei Restlaufzeiten von ... Jahren")
       pfandbrief: {
         yields: {
-          '5':  3.68,   /* v2242: Bundesbank-Tageswerte vom 14.10.2026 */
-          '10': 3.93,
-          '15': 4.05,
-          '20': 4.11
+          '5':  3.55,   /* Jahreswerte-Agent: Bundesbank BBSIS, Tageswerte vom 05.11.2026 (vorher 14.10.: 3,68/3,93/4,05/4,11) */
+          '10': 3.79,
+          '15': 3.91,
+          '20': 3.98
         },
         // Bank-Marge pro Bonitäts-/LTV-Stufe
         // v2245: NUR NOCH RUECKFALL (Pfandbrief + feste Marge), wenn auch
@@ -1151,7 +1153,7 @@ window.DealPilotConfig = (function() {
           schwach:  0.80,   // LTV über 80 % oder Bonität mittel
           voll:     1.03    // v2254: LTV 100 % (Altmodell-Rueckfall, Abstand wie in der Marktformel)
         },
-        asOf: '2026-10',
+        asOf: '2026-11',
         sourceLabel: 'Bundesbank Kapitalmarktstatistik · Pfandbrief-Zinsstruktur',
         sourceUrl: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen/taegliche-zinsstruktur-fuer-pfandbriefe-650734'
       },
@@ -1178,9 +1180,11 @@ window.DealPilotConfig = (function() {
       //   Quelle EZB: https://www.ecb.europa.eu/stats/policy_and_exchange_rates/key_ecb_interest_rates/html/index.en.html
       //   Quelle EURIBOR: https://www.euribor-rates.eu/de/aktuelle-euribor-werte/2/euribor-zinssatz-3-monate/
       marketContext: {
-        ecb_mrr:    2.15,  // EZB Hauptrefinanzierungssatz (Stand 05/2026)
-        euribor_3m: 2.32,  // EURIBOR 3M (Stand 05/2026)
-        asOf: '2026-05'
+        // Jahreswerte-Agent 07.11.2026 aus dem EZB Data Portal (FM.D.U2.EUR.4F.KR.MRR_FR.LEV,
+        // FM.M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA), Spiegel von STATIC_MARKET_CONTEXT im Backend.
+        ecb_mrr:    2.65,  // EZB Hauptrefinanzierungssatz seit 16.09.2026 (vorher 2,15)
+        euribor_3m: 2.63,  // EURIBOR 3M, Monatsmittel 10/2026 (vorher 2,32)
+        asOf: '2026-10'
       }
     },
     dev:      { flags: DEV_FLAGS, isDev: isDev }

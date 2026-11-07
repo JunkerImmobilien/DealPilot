@@ -8,7 +8,9 @@
 // Zahlenwert. Werte entstehen erst durch die Parser (P1..P4), und jeder
 // geparste Wert traegt seine Stufe A..E mit (Parameter-Kaskade).
 //
-// Stand der Pruefung: 02.08.2026. Jeder Eintrag mit verified:false ist eine
+// Stand der Adressen: 02.08.2026, nachgezogen am 07.11.2026 (BW, TH, HB, SL, HE —
+// zusammen mit Migration 026_harvest_quellen.sql). Stand des Registers: siehe
+// REGISTER unten (gemessen 07.11.2026). Jeder Eintrag mit verified:false ist eine
 // ADRESSE, keine Zusage — erst der Probe-Lauf auf dem Server entscheidet.
 // Genau das war die Lehre aus dem Crawler: erst die Adressen pruefen, dann
 // das Werkzeug abschreiben.
@@ -17,6 +19,42 @@
 //   - kostenpflichtige Berichte NIE abrufen (commercial:'gebuehr' => skip)
 //   - Captcha = Ansage, nicht Huerde (commercial:'captcha' => skip)
 //   - ein Abruf je Sekunde, eigene Kennung mit Kontakt (OPENDATA_USER_AGENT)
+
+/* 07.11.2026 · Diese Datei fuehrte BW und TH als „gesperrt" und HB/SL als „Luecke",
+ * waehrend das Register laengst BW 437 und TH 136 Werte trug. Die Landkarte sagt,
+ * WIE man an Daten kommt; was tatsaechlich im Register liegt, sagt nur die Messung.
+ * Deshalb steht die Messung jetzt daneben — mit Datum, damit sie als Stand und
+ * nicht als Dauerzustand gelesen wird.
+ *
+ * Gezaehlt wie tools/messe-schleife-daten.mjs und der Admin-Reiter „Register &
+ * Ernte": registerDeckung() aus lib/register_deckung.js ueber alle Saatdateien
+ * (SAATDATEIEN, 144 Dateien), ohne Datenbank. werte = Saetze mit Zahl, sperren =
+ * Saetze ohne Zahl, je Kennzahl nur die Werte (lzs, swf, vgf = Vergleichsfaktoren,
+ * uk_* = Umrechnungskoeffizienten, irw = Immobilienrichtwert-Tabellen).
+ * ausschuesse_mit_wert = verschiedene Ausschussnamen (normiert) mit mindestens
+ * einem Wert. Summe 6.187 Werte. Nach jeder Ernte neu messen. */
+export const REGISTER = {
+  stand: '2026-11-07',
+  gemessen_mit: 'registerDeckung() (lib/register_deckung.js), wie tools/messe-schleife-daten.mjs',
+  je_land: {
+    SH: { werte: 39, sperren: 154, lzs: 17, swf: 6, vgf: 6, uk_flaeche: 5, uk_wgfz: 5, irw: 0, sonstige: 0, ausschuesse_mit_wert: 9 },
+    HH: { werte: 13, sperren: 7, lzs: 5, swf: 2, vgf: 5, uk_flaeche: 1, uk_wgfz: 0, irw: 0, sonstige: 0, ausschuesse_mit_wert: 1 },
+    NI: { werte: 1447, sperren: 395, lzs: 302, swf: 150, vgf: 903, uk_flaeche: 84, uk_wgfz: 0, irw: 0, sonstige: 8, ausschuesse_mit_wert: 35 },
+    HB: { werte: 2, sperren: 17, lzs: 0, swf: 0, vgf: 0, uk_flaeche: 1, uk_wgfz: 1, irw: 0, sonstige: 0, ausschuesse_mit_wert: 1 },
+    NW: { werte: 2872, sperren: 185, lzs: 1476, swf: 188, vgf: 0, uk_flaeche: 21, uk_wgfz: 32, irw: 135, sonstige: 1020, ausschuesse_mit_wert: 75 },
+    HE: { werte: 579, sperren: 314, lzs: 148, swf: 169, vgf: 236, uk_flaeche: 16, uk_wgfz: 10, irw: 0, sonstige: 0, ausschuesse_mit_wert: 21 },
+    RP: { werte: 30, sperren: 479, lzs: 26, swf: 1, vgf: 0, uk_flaeche: 2, uk_wgfz: 1, irw: 0, sonstige: 0, ausschuesse_mit_wert: 3 },
+    BW: { werte: 437, sperren: 8727, lzs: 242, swf: 148, vgf: 1, uk_flaeche: 1, uk_wgfz: 45, irw: 0, sonstige: 0, ausschuesse_mit_wert: 19 },
+    BY: { werte: 6, sperren: 1166, lzs: 0, swf: 0, vgf: 0, uk_flaeche: 1, uk_wgfz: 5, irw: 0, sonstige: 0, ausschuesse_mit_wert: 3 },
+    SL: { werte: 0, sperren: 91, lzs: 0, swf: 0, vgf: 0, uk_flaeche: 0, uk_wgfz: 0, irw: 0, sonstige: 0, ausschuesse_mit_wert: 0 },
+    BE: { werte: 30, sperren: 14, lzs: 12, swf: 9, vgf: 7, uk_flaeche: 0, uk_wgfz: 2, irw: 0, sonstige: 0, ausschuesse_mit_wert: 1 },
+    BB: { werte: 286, sperren: 150, lzs: 100, swf: 37, vgf: 110, uk_flaeche: 27, uk_wgfz: 12, irw: 0, sonstige: 0, ausschuesse_mit_wert: 17 },
+    MV: { werte: 46, sperren: 101, lzs: 20, swf: 17, vgf: 0, uk_flaeche: 2, uk_wgfz: 0, irw: 0, sonstige: 7, ausschuesse_mit_wert: 4 },
+    SN: { werte: 62, sperren: 111, lzs: 46, swf: 16, vgf: 0, uk_flaeche: 0, uk_wgfz: 0, irw: 0, sonstige: 0, ausschuesse_mit_wert: 2 },
+    ST: { werte: 202, sperren: 81, lzs: 50, swf: 28, vgf: 121, uk_flaeche: 1, uk_wgfz: 2, irw: 0, sonstige: 0, ausschuesse_mit_wert: 1 },
+    TH: { werte: 136, sperren: 139, lzs: 61, swf: 75, vgf: 0, uk_flaeche: 0, uk_wgfz: 0, irw: 0, sonstige: 0, ausschuesse_mit_wert: 9 },
+  },
+};
 
 /** Parser-Typen, die die Registry adressiert. */
 export const PARSER = {
@@ -191,7 +229,7 @@ export const LAENDER = [
     liefert: [K.LZS, K.SWF, K.VGL, K.BRW],
     ebene: 'gaa',
     quellen: {
-      uebersicht: 'https://hvbg.hessen.de/immobilienwertermittlung/immobilienmarktberichte',
+      uebersicht: 'https://hvbg.hessen.de/immobilienwerte',
       downloadcenter: 'https://gds.hessen.de/ (Downloadcenter -> Immobilienwerte -> Immobilienmarktberichte)',
       hinweis: '17 Gutachterausschuesse, Berichte der letzten 10 Jahre kostenfrei; Vergleichsfaktoren separat',
     },
@@ -253,12 +291,18 @@ export const LAENDER = [
   },
   {
     code: 'hb', name: 'Bremen', parser: PARSER.P2_PDF_TABELLE,
-    commercial: 'unbekannt', lizenz: 'zu pruefen', stufe: 'B', indikativ: false,
-    verified: false, status: 'luecke',
+    commercial: 'gemischt', lizenz: 'dl-de/by-2-0 (Umrechnungskoeffizienten); voller Bericht nicht frei', stufe: 'A', indikativ: false,
+    verified: true, status: 'register',
     liefert: [K.PREIS],
     ebene: 'land',
-    quellen: { hinweis: 'Im IMB-DE enthalten (Bremen 40110000, Bremerhaven 40120000). Eigener GMB noch nicht lokalisiert.' },
-    fallen: ['Echte Luecke. Bis zur Klaerung traegt Bremen nur die IMB-DE-Klassen (Stufe C).'],
+    quellen: {
+      marktbericht: 'https://www.gutachterausschuss.bremen.de/marktbericht-1469',
+      gmb_2026: 'https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf',
+    },
+    fallen: [
+      'Lokalisiert (07.11.2026): eigener Grundstuecksmarktbericht. Im Register 2 Werte (UK), LZS und SWF nur',
+      'als Sperren — der volle Bericht ist nicht frei. Der Auftritt weist den Server ab (403), Pflege von Hand.',
+    ],
   },
   {
     code: 'by', name: 'Bayern', parser: PARSER.P2_PDF_TABELLE,
@@ -279,34 +323,55 @@ export const LAENDER = [
   },
   {
     code: 'bw', name: 'Baden-Wuerttemberg', parser: null,
-    commercial: 'gebuehr', lizenz: 'Vermarktung untersagt (siehe boris/registry.js)', stufe: 'D', indikativ: true,
-    verified: true, status: 'gesperrt',
-    liefert: [],
-    ebene: null,
-    quellen: { zgg: 'https://www.zgg-bw.de/Marktberichte/index.html' },
+    commercial: 'gemischt', lizenz: 'je Ausschuss; BORIS-Wertdaten: Vermarktung untersagt (siehe boris/registry.js)', stufe: 'A', indikativ: false,
+    verified: true, status: 'register',
+    liefert: [K.LZS, K.SWF],
+    ebene: 'gaa',
+    quellen: {
+      zgg: 'https://www.zgg-bw.de/Marktberichte/index.html',
+      fachinformationen: 'https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/{jahr}/{ags}-{name}_{jahr}.pdf',
+      beispiel: 'https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08317096-GemeinsamerGutachterausschussOffenburg_2025.pdf',
+    },
     fallen: [
       'Gutachterausschuesse sind in BW bei den Gemeinden gebildet -> hunderte Stellen, kein Landesmodell.',
-      'Berichte ueberwiegend kostenpflichtig, Leseproben frei. NICHT abrufen.',
-      'BW bleibt § 256 BewG, Stufe D, indikativ. Das ist eine Entscheidung, kein Versaeumnis.',
+      'Die oertlichen Fachinformationen (borisfachdaten/lgd) tragen LZS und SWF und liegen frei als PDF —',
+      'daraus stammen die 437 Registerwerte (07.11.2026). Viele Berichte bleiben kostenpflichtig: dort Sperre mit zugang.',
+      'Es gibt kein Verzeichnis der borisfachdaten-PDFs: die Discovery findet sie nicht, Ernte ueber register-ernte.',
+      'BORIS-BW-Wertdaten (Bodenrichtwerte) weiterhin nicht massenhaft abrufen.',
+      'Ueberholt seit 10/2026: „BW bleibt § 256 BewG, Stufe D" — wo das Register einen Satz fuehrt, gilt Stufe A.',
     ],
   },
   {
     code: 'th', name: 'Thueringen', parser: null,
-    commercial: 'captcha', lizenz: '-', stufe: 'D', indikativ: true,
-    verified: true, status: 'gesperrt',
-    liefert: [],
-    ebene: null,
-    quellen: {},
-    fallen: ['Captcha = Ansage, nicht Huerde. Kein automatisierter Abruf. Nur manuelle Pflege.'],
+    commercial: 'captcha', lizenz: 'Wiedergabe nur mit Quellenangabe (je Bericht)', stufe: 'A', indikativ: false,
+    verified: true, status: 'register',
+    liefert: [K.LZS, K.SWF],
+    ebene: 'gaa',
+    quellen: {
+      berichte: 'https://tlbg.thueringen.de/wertermittlung/berichte-zum-grundstuecksmarkt',
+      kontakt: 'https://tlbg.thueringen.de/wertermittlung/kontakt',
+      alt_tot: 'www.gutachterausschuss.thueringen.de (Host existiert nicht mehr, gemessen 07.11.2026)',
+    },
+    fallen: [
+      'Captcha = Ansage, nicht Huerde. Kein automatisierter Abruf (Link11 vor tlbg.thueringen.de,',
+      'vom Staging-Server 403). Nur manuelle Pflege — so sind die 136 Registerwerte (07.11.2026) entstanden.',
+      'Neun Gutachterausschuesse beim TLBG, je fuer mehrere Landkreise.',
+    ],
   },
   {
     code: 'sl', name: 'Saarland', parser: PARSER.P2_PDF_TABELLE,
     commercial: 'unbekannt', lizenz: 'zu pruefen', stufe: 'B', indikativ: false,
-    verified: false, status: 'luecke',
+    verified: true, status: 'nur-sperren',
     liefert: [],
     ebene: 'land',
-    quellen: { hinweis: 'Noch nicht lokalisiert. Einstieg ueber die AK-OGA-Landkarte, nicht ueber Google.' },
-    fallen: ['Echte Luecke. Bis zur Klaerung nur IMB-DE-Klassen (Stufe C).'],
+    quellen: {
+      zgga: 'https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html',
+      gmb_2024: 'https://www.saarland.de/lvgl/DE/service/publikationen/grundstuecksmarktbericht2024.pdf?__blob=publicationFile&v=3',
+    },
+    fallen: [
+      'Lokalisiert (07.11.2026): Zentrale Geschaeftsstelle beim LVGL. Im Register 91 Saetze, KEIN Wert —',
+      'alles Sperren. saarland.de weist den Server ab (403), Pflege von Hand.',
+    ],
   },
 ];
 
@@ -329,8 +394,15 @@ export function abdeckung() {
     nur_landesebene: zaehl('nur-landesebene'),
     luecke: zaehl('luecke'),
     gesperrt: zaehl('gesperrt'),
+    register: zaehl('register'),          // 07.11.2026: Werte im Register, von Hand geerntet
+    nur_sperren: zaehl('nur-sperren'),
     bundesweit_klassiert: BUND.verified,
   };
 }
 
-export default { BUND, LAENDER, PARSER, abrufbar, land, abdeckung };
+/** Gemessener Registerstand eines Landes (Stand REGISTER.stand). */
+export function registerStand(code) {
+  return REGISTER.je_land[String(code || '').toUpperCase()] || null;
+}
+
+export default { BUND, LAENDER, PARSER, REGISTER, abrufbar, land, abdeckung, registerStand };

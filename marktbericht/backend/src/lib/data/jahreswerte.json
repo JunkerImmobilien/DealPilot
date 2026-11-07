@@ -1,6 +1,6 @@
 {
   "version": "v3026",
-  "stand": "2026-10-28",
+  "stand": "2026-11-07",
   "zweck": "Jedes zeit- oder jahresabhaengige Datum im Code: Ort mit allen Spiegelstellen, Stand, Quelle (intern), Turnus, Faelligkeit, Verfahren. Pruefer: tools/jahreswerte-pruefen.mjs (RC=1 bei ueberfaellig oder Spiegel ungleich). Admin: Register & Ernte > Jahreswerte. Pflege: Agent .claude/agents/jahreswerte.md. Wer einen Wert nachzieht, setzt hier stand, erwartet und faellig_am neu.",
   "verfahren_namen": {
     "automatisch": "laeuft im Takt (mb-Backend) - der Wert im Code ist nur Rueckfall",
@@ -26,7 +26,7 @@
         { "datei": "frontend/js/help.js", "bezeichner": "Text \"Tarif 2026\"" },
         { "datei": "frontend/js/tooltip-content.js", "bezeichner": "Grenzsteuer-Beispiele (Z. ~303)" }
       ],
-      "hinweis": "Tarif 2027: Regierungsentwurf Einkommensteuerreformgesetz 2027 (Grundfreibetrag 12.564) - erst nach Verkuendung im BGBl. eintragen. Neuer Jahrgang = neuer Eintrag in TARIFE, Rueckfall in dashboard.js auf den neuesten Jahrgang ziehen, 'erwartet' hier anpassen."
+      "hinweis": "Tarif 2027: Regierungsentwurf Einkommensteuerreformgesetz 2027 (Kabinett 02.09.2026, BT-Drs. 21/8235, 1. Lesung 08.10.2026; Grundfreibetrag 12.564) - Stand 07.11.2026 weder vom Bundestag beschlossen noch im BGBl. verkuendet; erst nach Verkuendung eintragen. Neuer Jahrgang = neuer Eintrag in TARIFE, Rueckfall in dashboard.js auf den neuesten Jahrgang ziehen, 'erwartet' hier anpassen."
     },
     {
       "id": "soli_freigrenze",
@@ -81,6 +81,7 @@
       "turnus": "bei Gesetzesaenderung (Kostenrechtsaenderungsgesetze; naechste geplant zum 01.01.2027)",
       "faellig_am": "2026-12-15",
       "verfahren": "agent",
+      "hinweis": "07.11.2026: gesetze-im-internet.de § 34 Abs. 2 unveraendert (bis 500.000 je 30.000 +50, bis 5 Mio. je 50.000 +80), keine Aenderung mit kuenftigem Inkrafttreten ausgewiesen; ein verkuendetes Kostenrechtsaenderungsgesetz zum 01.01.2027 nicht gefunden.",
       "orte": [
         {
           "datei": "frontend/js/gnotkg.js",
@@ -289,7 +290,7 @@
         { "datei": "marktbericht/backend/src/lib/data/kappungsgrenzen.json", "bezeichner": "stand", "muster": "\"stand\":\\s*\"([\\d-]+)\"" },
         { "datei": "frontend/js/data/kappungsgrenzen.json", "bezeichner": "stand (Spiegel)", "muster": "\"stand\":\\s*\"([\\d-]+)\"" }
       ],
-      "hinweis": "Pruefer im Deploy: tools/kappungsgrenzen-pruefen.mjs (120-Tage-Vorlauf je Verordnung)."
+      "hinweis": "Pruefer im Deploy: tools/kappungsgrenzen-pruefen.mjs (120-Tage-Vorlauf je Verordnung). Stand 07.11.2026: HE - neue Mieterschutzverordnung (Entwurf 24.09.2026, 71 Gemeinden) nicht verkuendet; laut Ministerium (dpa 06.11.2026) Kabinettsbeschluss in KW 46 und Inkrafttreten noch im November geplant - nach Verkuendung im GVBl. HE nachziehen, faellig bleibt 25.11.2026. BW - Neufassung Mietpreisbegrenzungs-/Kappungsgrenzenverordnung ab 01.01.2027 nur zur Anhoerung freigegeben (Ministerrat 22.09.2026, mlw.baden-wuerttemberg.de), nicht im GBl. verkuendet."
     },
     {
       "id": "belwertv_mindestzins",
@@ -389,11 +390,12 @@
       "id": "mfi_ezb_rueckfall",
       "name": "MFI-Effektivzinsen, EZB-Leitzins, EURIBOR, Pfandbrief - Rueckfallwerte",
       "gruppe": "finanzierung",
-      "stand": "MFI 2026-02, EZB/EURIBOR 2026-05, Pfandbrief 2026-10",
-      "erwartet": "2026-02",
-      "quelle": "Bundesbank BBIM1 / EZB MIR (live), EZB-Pressemitteilungen",
-      "turnus": "live per API; Rueckfall monatlich laut Kommentar",
-      "faellig_am": "2026-04-01",
+      "stand": "MFI 2026-08, EZB/EURIBOR 2026-10, Pfandbrief 05.11.2026 (nachgezogen 07.11.2026)",
+      "wert_text": "MFI Wohnungsbau DE 08/2026: var 4,40 / 1-5 J 4,03 / 5-10 J 3,81 / ueber 10 J 4,04 %; EZB-HRG 2,65 % (seit 16.09.2026); EURIBOR 3M 10/2026 2,63 %; Pfandbrief 05.11.2026: 5 J 3,55 / 10 J 3,79 / 15 J 3,91 / 20 J 3,98 %",
+      "erwartet": "2026-08",
+      "quelle": "Bundesbank-API BBIM1 M.DE.B.A2C.{F,I,O,P}.R.A.2250.EUR.N (Berichtsmonat 2026-08 endgueltig, 2026-09 dort vorlaeufig; Datenstand 02.11.2026); Bundesbank-API BBSIS D.I.ZAR.ZI.EUR.S122.B.A100.R{05,10,15,20}XX.R.A.A._Z._Z.A (Tageswert 05.11.2026); EZB Data Portal FM.D.U2.EUR.4F.KR.MRR_FR.LEV und FM.M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA; alle abgerufen 07.11.2026",
+      "turnus": "live per API; Rueckfall quartalsweise auffrischen",
+      "faellig_am": "2027-02-01",
       "verfahren": "automatisch",
       "orte": [
         { "datei": "backend/src/services/marketRatesService.js", "bezeichner": "STATIC_FALLBACK_AS_OF", "muster": "STATIC_FALLBACK_AS_OF = '([\\d-]+)';" },
@@ -401,7 +403,7 @@
         { "datei": "frontend/js/config.js", "bezeichner": "marketContext (EZB/EURIBOR)" },
         { "datei": "backend/src/services/marketRatesService.js", "bezeichner": "STATIC_MARKET_CONTEXT, STATIC_PFANDBRIEF" }
       ],
-      "hinweis": "Die Werte kommen im Betrieb live; ueberfaellig heisst hier nur: der Rueckfall ist alt (Warnung, kein Abbruch)."
+      "hinweis": "Die Werte kommen im Betrieb live; ueberfaellig heisst hier nur: der Rueckfall ist alt (Warnung, kein Abbruch). Spiegel: backend marketRatesService.js (STATIC_FALLBACK, STATIC_PFANDBRIEF, STATIC_MARKET_CONTEXT) = frontend config.js marketRates (values, pfandbrief.yields, marketContext) = market-context.js _frontendFallback(). Backend-Aenderung braucht Rebuild."
     },
     {
       "id": "foerderprogramme",

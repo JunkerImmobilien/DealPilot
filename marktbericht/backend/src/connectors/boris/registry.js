@@ -361,6 +361,21 @@ const ADAPTERS = [
      * `ausfallNote` den Ausfall (er erscheint, wenn KEIN Jahrgang sauber
      * geantwortet hat). Die Gebuehrenauskunft am einzelnen Punkt bleibt
      * eine dritte Sache und kommt aus der Antwort selbst (v1393). */
+    /* ═══ v3208 · DER 403 VOM 21.10.2026 WAR VORUEBERGEHEND ══════════════
+     *
+     * Gemessen 07.11.2026 (curl, Jahrgang 2026 und 2024): GetCapabilities
+     * HTTP 200 mit UND ohne Browser-Kennung/Referer; GetFeatureInfo 200 in
+     * 0,2-0,6 s. Muenchen (Marienplatz, Maxvorstadt, Pasing): Zone,
+     * Gemarkung, Stichtag 01.01.2026, Wert „Information gebuehrenpflichtig“.
+     * Wuerzburg Domstr.: 6.200 EUR/m2, Zone 16170, Stichtag 01.01.2026.
+     * Einen anderen amtlichen, frei nutzbaren Endpunkt gibt es nicht; der
+     * Dienst bleibt deshalb hier, `enabled` bleibt true. Faellt er wieder
+     * aus, kostet das keinen Zeitueberlauf: ein 403 kommt sofort, je
+     * Jahrgang ein Wiederholungsversuch (httpText), die Antwort traegt
+     * `dienst_ausfall`, `ausfallNote` und seit v3208 den BayernAtlas-Link
+     * auf das Objekt (`portal_url`). Nur bei einem DAUERHAFTEN Ausfall auf
+     * `enabled: false` stellen (wie Hessen) - Bayern hat keinen Catch-all,
+     * es bliebe also dieselbe Auskunft, nur ohne Zone und Stichtag. */
     note: 'In Bayern sind die Bodenrichtwerte seit 2024 großteils kostenfrei '
       + 'einsehbar; für die Einbindung in Anwendungen verlangt das Landesamt '
       + 'eine Lizenz. Bitte den Bodenrichtwert im Bodenrichtwert-Portal Bayern '
@@ -554,6 +569,26 @@ function wgs84ToUtm32(lat, lon) {
   const northing = k0 * (M + N * Math.tan(la) * (A ** 2 / 2 + (5 - T + 9 * C + 4 * C ** 2) * A ** 4 / 24
     + (61 - 58 * T + T ** 2 + 600 * C - 330 * ep2) * A ** 6 / 720));
   return { easting, northing };
+}
+
+/* v3169 · Direktlink in den BayernAtlas AUF DAS OBJEKT (Marcel 04.11.2026): Koordinate in UTM32, Marker,
+   Ebene Bodenrichtwerte. Der Kunde liest den Wert im Portal selbst ab - das ist der erlaubte Weg („mit den
+   Funktionalitaeten des Portals"); DealPilot spart ihm nur das Suchen der Adresse. Die Ebenen-IDs stammen aus
+   Marcels Link (Stichtag 01.01.2026 sichtbar); mit dem naechsten Stichtag (2028) neu holen. Gemessen 04.11.2026:
+   Wuerzburg Sanderstr. 10 -> Marker in Zone „2.000". v3208: aus landValue herausgeloest, weil ihn jetzt auch
+   Ausfall, Gebuehr und „kein Wert" in Bayern mitgeben. Rueckfall ohne Koordinate: der Atlas mit der Ebene
+   Bodenrichtwerte, ohne Objekt-Marker. */
+function bayernAtlasLink(lat, lon) {
+  const ebenen = 'l=atkis,2da5cc90-9e7d-41ef-9e08-94c4d84f2a24,cabacb47-0421-4e4e-a729-b6bec6ae42e6,'
+    + '46c6ee92-ca65-4b5a-97ce-513aa3587d3e,28305567-09f9-4866-bf80-143944969ecb&l_v=true,false,false,false,true&t=ba';
+  try {
+    const u = wgs84ToUtm32(Number(lat), Number(lon));
+    if (isFinite(u.easting) && isFinite(u.northing)) {
+      return 'https://atlas.bayern.de/?c=' + Math.round(u.easting) + ',' + Math.round(u.northing)
+        + '&z=16&r=0&' + ebenen + '&mid=1&crosshair=marker';
+    }
+  } catch (e) { /* Rueckfall unten */ }
+  return 'https://atlas.bayern.de/?' + ebenen;
 }
 
 function buildUrl(a, lat, lon, year, layerName) {
@@ -982,6 +1017,14 @@ export const BorisRegistry = {
           + (g.stichtag ? ' Stichtag ' + g.stichtag + '.' : '')
           + (g.ausschuss ? ' Zuständig: ' + g.ausschuss + '.' : '');
       }
+      /* v3208 · BAYERN OHNE WERT BEKOMMT DEN WEG, AUCH BEIM AUSFALL ══════
+       * Bis hier kam der Direktlink in den BayernAtlas nur im Schalter-Zweig
+       * (BORIS_BY_WERT=aus, Wert lag vor). Bei einem Ausfall (21.10.2026:
+       * HTTP 403 „aus sicherheitstechnischen Gruenden“), bei „gebuehren-
+       * pflichtig“ (gemessen 07.11.2026: ganz Muenchen, Zonen 3547/3635/3039)
+       * und bei „kein Wert am Punkt“ stand nur Text da. „Wo kein Wert
+       * vorliegt, bekommt der Kunde den Weg dorthin“ (CLAUDE.md). */
+      if (chain.some((c) => c.code === 'by')) fb.portal_url = bayernAtlasLink(lat, lon);
       return fb;
     }
 
@@ -995,21 +1038,8 @@ export const BorisRegistry = {
     if (hit.a.code === 'by' && String(process.env.BORIS_BY_WERT || '').toLowerCase() === 'aus') {
       const fb = fallback('wert_selbst_eintragen');
       fb.claimed_land = hit.a.name;
-      /* v3169 · Direktlink in den BayernAtlas AUF DAS OBJEKT (Marcel 04.11.2026): Koordinate in UTM32, Marker,
-         Ebene Bodenrichtwerte. Der Kunde liest den Wert im Portal selbst ab - das ist der erlaubte Weg („mit den
-         Funktionalitaeten des Portals"); DealPilot spart ihm nur das Suchen der Adresse. Die Ebenen-IDs stammen aus
-         Marcels Link (Stichtag 01.01.2026 sichtbar); mit dem naechsten Stichtag (2028) neu holen. Gemessen 04.11.2026:
-         Wuerzburg Sanderstr. 10 -> Marker in Zone „2.000". */
-      /* Rueckfall ohne Koordinate (Marcel 04.11.2026): der Atlas mit der Ebene Bodenrichtwerte, ohne Objekt-Marker */
-      let _atlas = 'https://atlas.bayern.de/?l=atkis,2da5cc90-9e7d-41ef-9e08-94c4d84f2a24,cabacb47-0421-4e4e-a729-b6bec6ae42e6,46c6ee92-ca65-4b5a-97ce-513aa3587d3e,28305567-09f9-4866-bf80-143944969ecb'
-        + '&l_v=true,false,false,false,true&t=ba';
-      try {
-        const u = wgs84ToUtm32(Number(lat), Number(lon));
-        if (isFinite(u.easting) && isFinite(u.northing)) _atlas = 'https://atlas.bayern.de/?c=' + Math.round(u.easting) + ',' + Math.round(u.northing)
-          + '&z=16&r=0&l=atkis,2da5cc90-9e7d-41ef-9e08-94c4d84f2a24,cabacb47-0421-4e4e-a729-b6bec6ae42e6,46c6ee92-ca65-4b5a-97ce-513aa3587d3e,28305567-09f9-4866-bf80-143944969ecb'
-          + '&l_v=true,false,false,false,true&t=ba&mid=1&crosshair=marker';
-      } catch (e) {}
-      fb.portal_url = _atlas;
+      /* v3169 · Direktlink in den BayernAtlas auf das Objekt - Erklaerung bei bayernAtlasLink(). */
+      fb.portal_url = bayernAtlasLink(lat, lon);
       fb.weg = { zone: hit.r.zone || null, stichtag: hit.r.stichtag || null, nutzung: hit.r.nutzung || null };
       if (fb.source === 'dealpilot-eingabe') {
         fb.note = 'Bodenrichtwert vom Kunden aus dem Bodenrichtwert-Portal Bayern eingetragen.';

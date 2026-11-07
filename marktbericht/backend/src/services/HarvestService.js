@@ -99,7 +99,12 @@ export const HarvestService = {
    */
   /* WADM-9 · quelleId erlaubt das gezielte Anstossen aus dem Admin. */
   async discover({ limit = 20, land = null, archiv = false, quelleId = null } = {}) {
-    const bed = ["status = 'aktiv'", `zugang NOT IN ('${GESPERRT.join("','")}')`, 'portal_url IS NOT NULL'];
+    /* 026 · portal_defekt war eine Einbahnstrasse: eine einzige Zeitueberschreitung
+     * nahm die Quelle fuer immer aus dem Takt (Staging 07.11.2026: 33 von 122,
+     * 26 davon antworteten laengst wieder mit 200). Defekte Quellen kommen nach
+     * 14 Tagen erneut dran; 'gesperrt' (Captcha, Abwehr) bleibt draussen. */
+    const bed = ["(status = 'aktiv' OR (status = 'portal_defekt' AND letzter_check < now() - interval '14 days'))",
+      `zugang NOT IN ('${GESPERRT.join("','")}')`, 'portal_url IS NOT NULL'];
     const args = [];
     if (land) { args.push(land); bed.push(`bundesland = $${args.length}`); }
     /* WADM-10 */
@@ -123,8 +128,19 @@ export const HarvestService = {
         html = res.text;
       } catch (e) {
         bericht.fehler.push(`${src.name}: ${String(e.message).slice(0, 80)}`);
-        await q('UPDATE mb.gaa_sources SET letzter_check = now(), status = $2 WHERE id = $1',
-          [src.id, 'portal_defekt']).catch(() => {});
+        /* 026 · Die Ursache gehoert an die Quelle, nicht nur ins Log (das
+         * ueberlebt keinen Neustart). portal_defekt erst nach drei
+         * Fehlschlaegen in Folge — einmal nicht erreichbar ist kein Defekt. */
+        const grund = [e.status ? 'HTTP ' + e.status : null,
+          e.cause && (e.cause.code || e.cause.message), e.name === 'AbortError' ? 'Zeitueberschreitung' : null,
+          String(e.message || '').slice(0, 160)].filter(Boolean).join(' · ');
+        await q(`UPDATE mb.gaa_sources
+                    SET letzter_check = now(),
+                        letzter_fehler = $2,
+                        fehler_seit = COALESCE(fehler_seit, now()),
+                        fehler_anzahl = fehler_anzahl + 1,
+                        status = CASE WHEN fehler_anzahl + 1 >= 3 THEN 'portal_defekt' ELSE status END
+                  WHERE id = $1`, [src.id, grund]).catch(() => {});
         await schlafen(PAUSE_MS);
         continue;
       }
@@ -180,7 +196,8 @@ export const HarvestService = {
       await q(`UPDATE mb.gaa_sources
                   SET letzter_check = now(),
                       letzter_fund = CASE WHEN $2 > 0 THEN CURRENT_DATE ELSE letzter_fund END,
-                      status = 'aktiv'
+                      status = 'aktiv',
+                      letzter_fehler = NULL, fehler_seit = NULL, fehler_anzahl = 0
                 WHERE id = $1`, [src.id, neuHier]).catch(() => {});
 
       bericht.quellen.push({ name: src.name, land: src.bundesland, gefunden: gefunden.length, neu: neuHier });

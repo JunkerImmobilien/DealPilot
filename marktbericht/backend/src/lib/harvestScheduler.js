@@ -15,6 +15,7 @@
 // Abschaltbar ueber HARVEST_SCHEDULER=0.
 
 import { HarvestService } from '../services/HarvestService.js';
+import { q } from './db.js';
 
 const AN = () => String(process.env.HARVEST_SCHEDULER || '1') === '1';
 const TAKT_MS = 6 * 60 * 60 * 1000;          // alle 6 Stunden nachsehen
@@ -27,6 +28,23 @@ const zuletzt = new Map();                    // source_id -> Zeitstempel
  * null, und die Ansicht faellt auf max(letzter_check) der Quellen zurueck
  * — das sagt sie dann auch. */
 let _letzterLauf = null;
+
+/* 026 · Der Lauf wird zusaetzlich in mb.harvest_laeufe geschrieben und beim
+ * Start von dort gelesen — sonst stand nach jedem Neustart (also nach jedem
+ * Ausrollen) „kein Lauf" in der Admin-Ansicht, bis zu sechs Stunden lang.
+ * Fehler hier kippen den Takt nie. */
+async function laufSichern(l) {
+  await q(`INSERT INTO mb.harvest_laeufe (beginn, ende, geprueft, neu, fehler, abbruch, fehlerliste)
+           VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    [l.beginn, l.ende, l.geprueft ?? null, l.neu ?? null, l.fehler ?? null, l.abbruch || null,
+     l.fehlerliste || null]).catch(() => {});
+}
+async function laufLaden() {
+  if (_letzterLauf) return;
+  const r = await q(`SELECT beginn, ende, geprueft, neu, fehler, abbruch
+                       FROM mb.harvest_laeufe ORDER BY beginn DESC LIMIT 1`).catch(() => null);
+  if (r && r[0] && !_letzterLauf) _letzterLauf = { ...r[0], aus_datenbank: true };
+}
 export function laufStand() {
   return { an: AN(), takt_stunden: TAKT_MS / 3600000, letzter_lauf: _letzterLauf };
 }
@@ -57,6 +75,7 @@ async function durchgang() {
     const b = await HarvestService.discover({ limit: faelligeAnzahl() });
     _letzterLauf = { beginn, ende: new Date().toISOString(), geprueft: b ? b.geprueft : null,
                      neu: b ? b.neu : null, fehler: b && b.fehler ? b.fehler.length : null };
+    await laufSichern({ ..._letzterLauf, fehlerliste: b && b.fehler ? b.fehler.slice(0, 50) : null });
     if (b && (b.neu || b.fehler.length)) {
       /* v1047-WOUT-2 · Bisher stand nur die Anzahl da. Der Taktgeber laeuft
        * alle sechs Stunden gegen fremde Behoerdenserver — wogegen er
@@ -68,12 +87,14 @@ async function durchgang() {
     }
   } catch (e) {
     _letzterLauf = { beginn, ende: new Date().toISOString(), abbruch: e.message };
+    await laufSichern(_letzterLauf);
     console.log('[harvest] Durchgang fehlgeschlagen:', e.message);
   }
 }
 
 export function starteHarvestScheduler() {
   if (!AN()) { console.log('[harvest] Taktgeber aus (HARVEST_SCHEDULER=0)'); return; }
+  laufLaden();
   // Erster Durchgang mit Verzoegerung: der Start soll nicht davon abhaengen.
   setTimeout(durchgang, 90 * 1000);
   setInterval(durchgang, TAKT_MS);

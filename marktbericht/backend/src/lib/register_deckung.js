@@ -411,7 +411,9 @@ async function ernteEingang(q, laufStand) {
         d.jahrgang, d.status, d.gefunden_am
         FROM mb.gaa_documents d JOIN mb.gaa_sources s ON s.id = d.source_id
        ORDER BY d.gefunden_am DESC LIMIT 40`);
-    out.defekt = await q(`SELECT id, name, bundesland AS land, portal_url, letzter_check, notiz
+    /* 026 · mit Ursache (letzter_fehler) und Zahl der Fehlschlaege in Folge */
+    out.defekt = await q(`SELECT id, name, bundesland AS land, portal_url, letzter_check, notiz,
+        letzter_fehler, fehler_anzahl
         FROM mb.gaa_sources WHERE status = 'portal_defekt' ORDER BY bundesland, name`);
     out.quellen = await q(`SELECT status, count(*)::int AS n, max(letzter_check) AS zuletzt
         FROM mb.gaa_sources GROUP BY status ORDER BY 2 DESC`);

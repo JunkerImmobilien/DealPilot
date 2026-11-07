@@ -31,8 +31,9 @@ var MarketContext = (function() {
 
   function _frontendFallback() {
     return {
-      ecb_mrr:    { value: 2.15, period: '2026-05', trend: 'flat', source: 'static' },
-      euribor_3m: { value: 2.32, period: '2026-05', trend: 'flat', source: 'static' },
+      /* Jahreswerte-Agent 07.11.2026: Spiegel von config.js marketContext (EZB Data Portal) */
+      ecb_mrr:    { value: 2.65, period: '2026-10', trend: 'flat', source: 'static' },
+      euribor_3m: { value: 2.63, period: '2026-10', trend: 'flat', source: 'static' },
       source: 'static',
       sourceInfo: { name: 'Frontend-Fallback', url: '' }
     };
