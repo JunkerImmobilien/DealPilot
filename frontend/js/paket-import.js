@@ -20,7 +20,7 @@
    ════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var FELDER = ['paket_id', 'paket_name', 'paket_nr', 'paket_anzahl', 'paket_kp_gesamt', 'paket_share_deal'];
+  var FELDER = ['paket_id', 'paket_name', 'paket_nr', 'paket_anzahl', 'paket_kp_gesamt', 'paket_share_deal', 'paket_beteiligung'];
 
   function el(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -88,7 +88,9 @@
             + '<td class="r">' + eur(o.kaufpreis) + '</td><td class="r">' + (o.wohnflaeche ? Math.round(o.wohnflaeche) + ' m²' : '—') + '</td>'
             + '<td class="r">' + o.einheiten.length + '</td><td class="r">' + eur(mj) + '</td><td class="r">' + (mj > 0 && o.kaufpreis ? (o.kaufpreis / mj).toFixed(1).replace('.', ',') : '—') + '</td></tr>';
         }).join('') + '</tbody></table>'
-      + (P.share_deal ? '<p class="pk-hint"><b>Share Deal:</b> Gekauft werden Gesellschaftsanteile, nicht die Grundstücke. Ob und wie viel Grunderwerbsteuer anfällt, hängt an der erworbenen Beteiligung (§ 1 Abs. 2a, 2b und 3 GrEStG) — die Grunderwerbsteuer in jedem Objekt bitte im Reiter Investition prüfen.</p>' : '')
+      + (P.share_deal ? '<div class="pk-hint" style="padding:8px 10px;border:1px solid #E7E2DC;border-radius:2px;background:#fff"><b>Share Deal:</b> Gekauft werden Gesellschaftsanteile, nicht die Grundstücke. '
+          + '<label style="display:inline-flex;align-items:center;gap:6px;margin-left:4px">Erworbene Beteiligung <input id="pk-quote" type="text" inputmode="decimal" value="100" style="width:64px;padding:4px 6px;border:1px solid #E0DBD3;border-radius:2px;text-align:right"> %</label>'
+          + '<div style="margin-top:4px">Unter 90 % fällt keine Grunderwerbsteuer an (§ 1 Abs. 2a, 2b, 3 GrEStG; Haltefristen beachten) — DealPilot setzt sie dann auf 0. Ab 90 % fällt sie an, bemessen nach dem Grundbesitzwert statt dem Kaufpreis (§ 8 Abs. 2 GrEStG); DealPilot lässt den Satz des Landes stehen und vermerkt es.</div></div>' : '')
       + '<p class="pk-hint">Jedes Objekt wird als eigenes Objekt angelegt, mit seinen Einheiten aus der Mieterliste, und trägt den Paketnamen. Im Reiter Objekt siehst du die Summen über das ganze Paket.</p></div>'
       + '<div class="pk-f"><span id="pk-stand" style="margin-right:auto;color:#625c59"></span><button type="button" id="pk-ab">Abbrechen</button><button type="button" id="pk-qc" title="Die gewählten Häuser zusammen als ein Objekt im Quick-Check prüfen">Im Quick-Check als Ganzes prüfen</button><button type="button" class="p" id="pk-los">Objekte anlegen</button></div>';
     var ov = fenster(html);
@@ -105,7 +107,8 @@
     el('pk-los').onclick = function () {
       var wahl = [].slice.call(ov.querySelectorAll('[data-pk]')).filter(function (c) { return c.checked; }).map(function (c) { return O[parseInt(c.getAttribute('data-pk'), 10)]; });
       if (!wahl.length) return;
-      anlegen(wahl, { name: (el('pk-name').value || P.name || 'Paket').trim(), share_deal: !!P.share_deal, gesamt: summe, anzahl: O.length }, ov);
+      var q = el('pk-quote') ? zahlDe(el('pk-quote').value) : null;
+      anlegen(wahl, { name: (el('pk-name').value || P.name || 'Paket').trim(), share_deal: !!P.share_deal, quote: q, gesamt: summe, anzahl: O.length }, ov);
     };
   }
 
@@ -149,6 +152,11 @@
         setze('paket_id', id); setze('paket_name', paket.name); setze('paket_nr', i + 1); setze('paket_anzahl', wahl.length);
         setze('paket_kp_gesamt', Math.round(wahl.reduce(function (a, x) { return a + (x.kaufpreis || 0); }, 0)));
         setze('paket_share_deal', paket.share_deal ? 'ja' : '');
+        /* v3204 · Marcel 07.11.2026: Share Deal - die Beteiligung entscheidet die Grunderwerbsteuer */
+        if (paket.share_deal && paket.quote != null) {
+          setze('paket_beteiligung', String(paket.quote).replace('.', ','));
+          if (paket.quote < 90) setze('gest_p', '0');
+        }
         await window.saveObj({ _qcFinal: true, silent: true });
         if (!window._currentObjKey) throw new Error('nicht gespeichert');
         fertig++;
@@ -208,7 +216,7 @@
     css();
     var b = document.createElement('div'); b.id = 'dp-paket-box';
     b.innerHTML = '<span>Teil des Pakets <b>' + esc((el('paket_name') || {}).value || '') + '</b> · Objekt ' + esc((el('paket_nr') || {}).value || '?') + ' von ' + esc((el('paket_anzahl') || {}).value || '?')
-      + ((el('paket_share_deal') || {}).value === 'ja' ? ' · Share Deal' : '') + '</span><button type="button" id="dp-paket-ueb">Paket-Übersicht</button>';
+      + ((el('paket_share_deal') || {}).value === 'ja' ? ' · Share Deal' + (function () { var q = zahlDe((el('paket_beteiligung') || {}).value); return q == null ? '' : ' ' + String(q).replace('.', ',') + ' %' + (q < 90 ? ' (keine Grunderwerbsteuer)' : ' (Grunderwerbsteuer auf den Grundbesitzwert, § 8 Abs. 2 GrEStG)'); })() : '') + '</span><button type="button" id="dp-paket-ueb">Paket-Übersicht</button>';
     ziel.parentNode.insertBefore(b, ziel.nextSibling);
     el('dp-paket-ueb').onclick = function () { uebersicht(id); };
   }

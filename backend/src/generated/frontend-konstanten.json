@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-07T11:10:36.464Z",
+ "erzeugt_am": "2026-11-07T11:20:16.422Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "61226de61db3f2bc",
-  "index-html": "6ffb607d2cc6b850",
+  "storage": "d56b92c524bcdcff",
+  "index-html": "cc878f8e19fb40aa",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -654,6 +654,7 @@
    "paket_anzahl",
    "paket_kp_gesamt",
    "paket_share_deal",
+   "paket_beteiligung",
    "eig_struktur",
    "eig_erwerb",
    "eig_anteil_ich",
