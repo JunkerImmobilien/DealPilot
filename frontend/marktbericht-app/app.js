@@ -3087,6 +3087,21 @@ function drawMap(lat, lon, comps) {
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap-Mitwirkende', maxZoom: 19,
     }).addTo(map);
+    /* v3209 · Bodenrichtwertzonen als Flaechen (Marcel 07.11.2026 nach dem
+       IWA-Abgleich). Bundesweiter WMS der Gutachterausschuesse - derselbe
+       Dienst, den der Connector als Rueckfall abfragt (registry.js,
+       borisd_wms); dl-de/by-2-0 verlangt den Vermerk. Bayern und SH sind
+       dort nicht enthalten - dort bleibt die Ebene leer. Erst ab Zoom 14,
+       darunter waere das Kachelbild nur rote Linien. */
+    try {
+      var brwZonen = L.tileLayer.wms('https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte', {
+        layers: 'brw_wohnbauflaeche,brw_gemischte_bauweise,brw_gewerbliche_bauweise,brw_sonderbauflaeche',
+        format: 'image/png', transparent: true, version: '1.3.0', tileSize: 512,
+        minZoom: 14, maxZoom: 19, opacity: 0.85,
+        attribution: '© Gutachterausschüsse für Grundstückswerte, dl-de/by-2-0 (bodenrichtwerte-boris.de)',
+      }).addTo(map);
+      L.control.layers(null, { 'Bodenrichtwertzonen': brwZonen }, { collapsed: false, position: 'topright' }).addTo(map);
+    } catch (e) { /* ohne Zonen bleibt die Karte wie bisher */ }
     _mbMapTouch(map);
   } else {
     map.setView([lat, lon], 14);
