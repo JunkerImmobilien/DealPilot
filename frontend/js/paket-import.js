@@ -177,7 +177,7 @@
     var liste = [];
     try {
       var l = await Auth.apiCall('/objects', { method: 'GET' });
-      var arr = Array.isArray(l) ? l : (l.objects || l.data || []);
+      var arr = Array.isArray(l) ? l : (l.items || l.objects || l.data || []);   /* /objects liefert { items, count } */
       var kandidaten = arr.filter(function (o) { return o && o.paket_id === id; });
       for (var i = 0; i < kandidaten.length; i++) {
         var r = await Auth.apiCall('/objects/' + kandidaten[i].id, { method: 'GET' });
