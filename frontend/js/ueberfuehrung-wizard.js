@@ -197,7 +197,7 @@
         '<div style="padding:22px" id="dpuew-body">' + _paneHtml() + '</div>' +
         '<div style="display:flex;justify-content:space-between;gap:10px;padding:15px 22px;border-top:1px solid #EDE7DA;background:#FAF9F4">' +
           '<button id="dpuew-back" onclick="DealPilotUeberfuehrung._go(-1)" style="padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #EDE7DA;background:#fff;color:#7A7370;font-family:inherit;visibility:' + (_cur===1?'hidden':'visible') + '">Zur&uuml;ck</button>' +
-          '<button id="dpuew-next" onclick="DealPilotUeberfuehrung._go(1)" style="padding:9px 20px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1b1408;font-family:inherit">' + (_cur===3?'&#9992; &Uuml;berf&uuml;hren':'Weiter &rarr;') + '</button>' +
+          '<button id="dpuew-next" onclick="DealPilotUeberfuehrung._go(1)" style="padding:9px 20px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1b1408;font-family:inherit">' + (_cur===3?'&Uuml;berf&uuml;hren':'Weiter &rarr;') + '</button>' +
         '</div>' +
       '</div>';
     _bind();
@@ -553,7 +553,7 @@
       if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio();
     } catch (err) {
       if (typeof toast === 'function') toast('Fehler bei der Überführung: ' + (err && err.message || err));
-      var nx2 = document.getElementById('dpuew-next'); if (nx2) { nx2.disabled = false; nx2.innerHTML = '&#9992; &Uuml;berf&uuml;hren'; }
+      var nx2 = document.getElementById('dpuew-next'); if (nx2) { nx2.disabled = false; nx2.innerHTML = '&Uuml;berf&uuml;hren'; }
     } finally {
       window._dpEmptyCardSaving = false;
       window._dpUeberfActive = false;
