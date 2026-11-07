@@ -2739,6 +2739,13 @@ export const CrossCheckService = {
       const _st = _folge.find((k) => _da[k]) || null;
       out.verfahrenswahl.stuetzend = _st;
       if (_st) out.notes.push('Stützendes Verfahren: ' + { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren' }[_st] + '.');
+      else {
+        /* v3201f · ohne stützendes Verfahren steht der Grund dabei - keine stille Leerstelle */
+        out.verfahrenswahl.stuetzend_grund = out.sachwert_nicht_massgeblich
+          ? 'Der Sachwert ohne Sachwertfaktor des Gutachterausschusses bildet hier keinen Marktwert ab; ein Vergleichswert aus Kaufpreisen liegt nicht vor.'
+          : 'Kein weiteres Verfahren ist für dieses Objekt mit den vorliegenden Angaben rechenbar.';
+        out.notes.push('Kein stützendes Verfahren. ' + out.verfahrenswahl.stuetzend_grund);
+      }
     }
 
     /* v3010 · Hier stand der DealPilot-Merkmalskatalog zum Zins (angepassterZins, out.zins_anpassung):

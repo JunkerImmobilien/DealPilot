@@ -1089,7 +1089,8 @@ function _renderWertverfahren(d) {
   var fuehrGrund = fuehrt
     ? absatz('<b>Führendes Verfahren:</b> ' + esc(VW_NAME[fuehrt] || fuehrt) + (vw.grund ? ' — ' + esc(vw.grund) : ''))
       /* v3201e · das stützende Verfahren (cross_check.verfahrenswahl.stuetzend) */
-      + (vw.stuetzend ? absatz('<b>Stützendes Verfahren:</b> ' + esc(VW_NAME[vw.stuetzend] || vw.stuetzend)) : '')
+      + (vw.stuetzend ? absatz('<b>Stützendes Verfahren:</b> ' + esc(VW_NAME[vw.stuetzend] || vw.stuetzend))
+        : (vw.stuetzend_grund ? absatz('<b>Stützendes Verfahren:</b> keines — ' + esc(vw.stuetzend_grund)) : ''))
     : '';
 
   var mv = (d.valuation && d.valuation.market_value) || {};
