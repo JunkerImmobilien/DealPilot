@@ -36,6 +36,19 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N129 · Portfolio / Paket aus mehreren Objekten (Marcel 07.11.2026) — OFFEN, Konzept
+- Exposé Harburg-Portfolio (Dateien/Testunterlagen/Expose): 7 MFH, je Haus Kaufpreis, Eckdaten, Mieterliste; Share Deal (Grunderwerbsteuer-Frage!). Ziel: im Quick-Check als Ganzes bewerten, beim Speichern als 7 Einzelobjekte anlegen, verbunden über eine Paket-Kennung mit Gesamtsicht.
+- Bausteine: Exposé-Auslese liefert objekte[] statt eines Objekts; Import-Fenster „Paket mit N Objekten“; Objekte mit paket{id,name,gesamt_kp}; Paket-Übersicht (Summen, Rendite); Kaufnebenkosten beim Share Deal.
+
+### N130 · Quick-Check-Optik wie Reiter Objekt/Miete (Marcel 07.11.2026) — OFFEN
+- Schrift, Schriftgrößen, Farben, Textfelder, Hintergründe, Rahmen einheitlich mit Objekt/Miete. Eigenes Dokument (quickcheck-app.html) – erbt kein CSS.
+
+### N131 · Aufteilerwert: Reste (v3200)
+- Hamburg vermietete Wohnungen: Umrechnung vermietet/unvermietet (IMB 7.6.3: 0,6578 + 0,0513 × Rendite) maschinenlesbar in den Satz, dann im Auswerter.
+- Immobilienrichtwert (NRW) je Wohnung als zweite amtliche Quelle.
+- Führendes/stützendes Verfahren auch in Ankauf/Bestand/Zielbild und im Marktbericht-PDF ausdrücklich benennen.
+- Optional Vertriebskosten/Verkaufsdauer im Aufteilerwert (Marcel: erst mal nur Aufteilungskosten).
+
 ### N128 · Quick-Check „Speichern & übernehmen“ legt ein LEERES Objekt an — **BEHOBEN v3199 (07.11.2026, Staging `32dca81`)**
 - **Ursache:** im QC-iframe ist `QcApp` ein const; der Empfänger des Import-Ergebnisses prüfte `window.QcApp` (immer undefined) → `setPdfPending` lief nie, die Zusatzdaten (Einheiten, Risiken, Stellplätze …) fehlten in der Übernahme-Liste (gemessen: pending=6 rein, items=0 raus). Dazu v3198a (Reset abwarten). Gemessen nach dem Fix: 8 Einheiten mit Vertragsart, nkm 3.660, wfl 518, ze 210 auf dem Server (gespeichert wird wie überall beim Reiterwechsel/Speichern, V47).
 - **Messfehler am 05.11. (zurückgenommen):** das Testskript klickte das ältere Übernahmefenster IM iframe, nicht `#qcpm-ok` im Hauptdokument.

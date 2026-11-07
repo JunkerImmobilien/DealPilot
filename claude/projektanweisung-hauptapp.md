@@ -44403,3 +44403,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `150a64c`, `5094ba3` (Staging). **Nicht auf Prod** – Quick-Check speichert weiter leer (N128).
 - **Nachweis:** Kollision per PUT gemessen (200, Nummer bleibt); Prüffenster Quick-Check 52 Zeilen, Verträge Whg. 1/3/6, Summe 3.870 € stimmt; Westerfeld unberührt.
 - **Rest:** N128; Überführung nach v3198a ungetestet; Buchwert/Mandantenfelder im Export nicht im Browser gemessen.
+
+### v3199–v3200 · Quick-Check übernimmt Zusatzdaten (N128), Aufteilerwert (07.11.2026, nur Staging)
+- **Was:** v3199 `QcApp`-Prüfung im QC-iframe (Zusatzdaten kamen nie in die Übernahme), Flugzeug aus. v3200 Aufteilerwert: Vergleichswert je Wohnung führend, Ertragswert ETW stützend, gemeinsame Bibliothek `lib/vergleichsfaktor_eingabe.js`.
+- **Commit:** `32dca81`, `022aec8` (Staging, mb-backend neu gebaut).
+- **Nachweis:** QC mit Exposé + Mietaufstellung → 8 Einheiten mit Vertragsart, nkm 3.660, ze 210 auf dem Server; Aufteilerwert Lindenallee 786.500 (Haus 730.000); Hamburg-Testwohnung EG 231.377 €. wertermittlung-pruefen RC=0.
+- **Rest:** Prod-Rollout v3198–v3200 nach Test der Überführung; N129–N131.
