@@ -66,6 +66,16 @@ async function _zonen(lat, lon, jahrgang, fristMs) {
 }
 
 /** { normbrw20, normbrw18, zone20, zone18, quelle } - je Wert null, wenn keine passende Zone. */
+/* v3205 · Liegenschaftszins Hamburg (hamburg.json, Zweig mfh): Lagefaktor = (NormBRW19 / 1.100)^-0,2820 -
+   der MFH-Normschichtwert (WGFZ 1,0) zum 31.12.2019. Gleiche Quelle, Jahrgang 2019, sonst wie oben. */
+export async function hhNormBrwMfh(lat, lon, jahrgang = 2019, { fristMs = 6000 } = {}) {
+  if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lon))) return null;
+  const z = await _zonen(lat, lon, jahrgang, fristMs);
+  const mfh = (z || []).filter((x) => /^MFH\b/.test(x.nutzung) && x.normschichtwert != null);
+  if (!mfh.length || new Set(mfh.map((x) => x.normschichtwert)).size !== 1) return null;
+  return { wert: mfh[0].normschichtwert, zone: mfh[0], jahrgang, quelle: HH_NORMBRW_QUELLE };
+}
+
 export async function hhNormBrw(lat, lon, { fristMs = 6000 } = {}) {
   if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lon))) return null;
   const [z20, z18] = await Promise.all([_zonen(lat, lon, 2020, fristMs), _zonen(lat, lon, 2018, fristMs)]);

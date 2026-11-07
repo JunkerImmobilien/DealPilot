@@ -41,7 +41,7 @@ import { MarketInsightsService } from './MarketInsightsService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { IrwConnector, ebeneFuer, IRW_EBENEN } from '../connectors/IrwConnector.js';   /* v2660: ebeneFuer, IRW_EBENEN */
 import { marktmiete as amtlicheMiete, klasseAusPunkten } from '../lib/mietmodell_nrw.js';   /* v1059-WMIET-1; v2988 */
-import { hhNormBrw } from '../lib/hh_normbrw.js';   /* v3008 · normierte BRW Hamburg (Lagefaktor VGF) */
+import { hhNormBrw, hhNormBrwMfh } from '../lib/hh_normbrw.js';   /* v3008 · normierte BRW Hamburg (Lagefaktor VGF) */
 import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';   /* v1060-WVF-1 */   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
@@ -934,6 +934,15 @@ export const ReportOrchestrator = {
       if (!(e && e._abbruch)) _regVf = null;
     }
 
+    /* v3205 · Hamburg: das Zins-Formelwerk (Mehrfamilienhaus) liest den MFH-Normschichtwert 2019 als Lagefaktor.
+       Ohne ihn fiel der Zins auf den gesetzlichen Auffangwert (Stufe D) - gemessen am Harburg-Portfolio, 07.11.2026. */
+    let _hhNorm19 = null;
+    try {
+      if (/^02/.test(String(_agsWert || '')) && Number.isFinite(Number(lat)) && Number.isFinite(Number(lon))) {
+        _hhNorm19 = await hhNormBrwMfh(lat, lon, 2019);
+        step('hh-normbrw19 (MFH, Zins): ' + (_hhNorm19 ? _hhNorm19.wert : 'kein Treffer'));
+      }
+    } catch (e) { _hhNorm19 = null; }
     try {
       const _lzs = await WertParameterService.liegenschaftszins({
         /* v2381 · die genaue Hausart (zfh, dhh, rh, efh) - mit „haus" griff kein Zweig */
@@ -959,6 +968,7 @@ export const ReportOrchestrator = {
           einheiten: ref.units || null,
           lage: ref.lage || null,
           stadtteil: ref.stadtteil || ref.ortsteil || null,
+          norm_brw: _hhNorm19 ? _hhNorm19.wert : null,   /* v3205 · Hamburg-Formelwerk */
           /* v2790 · Punkt 5: Wohnungen UND Gewerbeeinheiten -> zuerst der Satz fuer Wohn- und
              Geschaeftshaeuser (lib/zweigwahl.js waehle), nie ein gewogener Zins */
           mischnutzung: !!(ref.gewerbe && Number(ref.gewerbe.wfl_gewerbe) > 0 && Number(ref.gewerbe.n_wohnen) > 0),
