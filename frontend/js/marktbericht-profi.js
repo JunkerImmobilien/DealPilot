@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3210';
+  var VERSION = 'v3210a';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -325,12 +325,12 @@
   /* v3210 · Bodenrichtwertzonen ueber die Nahkarte (bundesweiter BORIS-D-WMS, derselbe wie in der
      Web-Ansicht v3209). Der Dienst antwortet mit CORS, also holt der Browser das Bild selbst und
      malt es auf die Geoapify-Karte. ZONEN_KACHEL ist die Kachelgroesse, in der Geoapify den Zoom
-     rechnet (gemessen, siehe Journal v3210). Faellt der Dienst aus, bleibt die Karte ohne Zonen -
+     rechnet: 512 (gemessen 07.11. an Minden, 256 traf die Strassen nicht). Faellt der Dienst aus, bleibt die Karte ohne Zonen -
      nie ohne Karte. In BY und SH liefert der Dienst nichts, dann bleibt das Bild ohne Flaechen. */
   var BRW_WMS = 'https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte';
   var BRW_LAYER = 'brw_wohnbauflaeche,brw_gemischte_bauweise,brw_gewerbliche_bauweise,brw_sonderbauflaeche';
   var BRW_VERMERK = 'Bodenrichtwertzonen \u00a9 Gutachteraussch\u00fcsse f\u00fcr Grundst\u00fcckswerte, dl-de/by-2-0 (bodenrichtwerte-boris.de)';
-  var ZONEN_KACHEL = 256;
+  var ZONEN_KACHEL = 512;
   function zonenBbox(lat, lon, zoom, w, h) {
     var R = 6378137, x = R * lon * Math.PI / 180, y = R * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
     var res = 2 * Math.PI * R / (ZONEN_KACHEL * Math.pow(2, zoom));
