@@ -1088,6 +1088,8 @@ function _renderWertverfahren(d) {
   /* v2380 · welches Verfahren führt und warum — jetzt im Aufklapper der führenden Karte */
   var fuehrGrund = fuehrt
     ? absatz('<b>Führendes Verfahren:</b> ' + esc(VW_NAME[fuehrt] || fuehrt) + (vw.grund ? ' — ' + esc(vw.grund) : ''))
+      /* v3201e · das stützende Verfahren (cross_check.verfahrenswahl.stuetzend) */
+      + (vw.stuetzend ? absatz('<b>Stützendes Verfahren:</b> ' + esc(VW_NAME[vw.stuetzend] || vw.stuetzend)) : '')
     : '';
 
   var mv = (d.valuation && d.valuation.market_value) || {};

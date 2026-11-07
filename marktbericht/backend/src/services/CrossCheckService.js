@@ -2721,6 +2721,26 @@ export const CrossCheckService = {
       }
     }
 
+    /* ══ v3201e · DAS STÜTZENDE VERFAHREN (Marcel 07.11.2026: „das führende Verfahren sollten wir immer
+       angeben und auch das stützende") ══════════════════════════════════════════════════════════
+       Steht HINTER v3043: nur ein Verfahren, das in DIESEM Bericht ausgewiesen wird. Reihenfolge nach
+       der Art des Objekts: Ertragswert führt → Sachwert, sonst Vergleichswert; Sachwert führt →
+       Vergleichswert, sonst Ertragswert; Vergleichswert führt → Ertragswert, sonst Sachwert. */
+    if (out.verfahrenswahl && out.verfahrenswahl.verfahren) {
+      const _da = {
+        ertragswert: !!(out.ertragswert && out.ertragswert.available),
+        sachwert: !!(out.sachwert && out.sachwert.available),
+        vergleichswert: !!((out.vergleichswert_irw && out.vergleichswert_irw.verfuegbar)
+          || (p.register_vergleichsfaktor && p.register_vergleichsfaktor.verfuegbar)
+          || (p.amtlicher_vergleichsfaktor && p.amtlicher_vergleichsfaktor.verfuegbar && p.amtlicher_vergleichsfaktor.fuehrend !== false)),
+      };
+      const _folge = { ertragswert: ['sachwert', 'vergleichswert'], sachwert: ['vergleichswert', 'ertragswert'],
+        vergleichswert: ['ertragswert', 'sachwert'] }[out.verfahrenswahl.verfahren] || [];
+      const _st = _folge.find((k) => _da[k]) || null;
+      out.verfahrenswahl.stuetzend = _st;
+      if (_st) out.notes.push('Stützendes Verfahren: ' + { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren' }[_st] + '.');
+    }
+
     /* v3010 · Hier stand der DealPilot-Merkmalskatalog zum Zins (angepassterZins, out.zins_anpassung):
        gesetzte Gewichte, nie gerechnet. ImmoWertA kennt diesen Weg nicht, Marcel 27.10.2026 - gestrichen.
        Die Anpassung nach § 33 rechnet lib/lzs_anpassung.js mit den Koeffizienten des Ausschusses. */
