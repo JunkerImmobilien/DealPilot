@@ -710,7 +710,13 @@ if (!window._wlrgbaH) {
      Haupt-App wirken hier nicht, das Blatt muss ausdruecklich geladen
      werden. VOR app.js, damit window.ScoreTier steht, wenn sie laeuft. -->
 <script src="../js/score-tiers.js?v=v3070"></script>
-<script src="app.js?v=v3209"></script>
+<style>/* v3209a · Ebenenschalter der Karte: App-Stil vergroesserte das Kaestchen */
+#map .leaflet-control-layers{font:500 12px Inter,sans-serif;padding:4px 8px;max-height:none !important;overflow:visible !important}
+#map .leaflet-control-layers-list,#map .leaflet-control-layers-overlays{max-height:none !important;overflow:visible !important}
+#map .leaflet-control-layers label{display:flex;align-items:center;gap:6px;margin:0;cursor:pointer;white-space:nowrap}
+#map .leaflet-control-layers input[type=checkbox]{width:14px !important;height:14px !important;min-width:0 !important;margin:0 !important;padding:0 !important;appearance:auto !important;-webkit-appearance:checkbox !important;transform:none !important}
+</style>
+<script src="app.js?v=v3209a"></script>
 <script src="mb-objektwahl.js?v=v3178c"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
