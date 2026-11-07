@@ -36,9 +36,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N128 · Quick-Check „Speichern & übernehmen“ legt ein LEERES Objekt an — **BEHOBEN v3199 (07.11.2026, Staging )**
-- **Ursache:** im QC-iframe ist  ein const; der Empfänger des Import-Ergebnisses prüfte  (immer undefined) →  lief nie, die Zusatzdaten (Einheiten, Risiken, Stellplätze …) fehlten in der Übernahme-Liste (gemessen: pending=6 rein, items=0 raus). Dazu v3198a (Reset abwarten). Gemessen nach dem Fix: 8 Einheiten mit Vertragsart, nkm 3.660, wfl 518, ze 210 auf dem Server (gespeichert wird wie überall beim Reiterwechsel/Speichern, V47).
-- **Messfehler am 05.11. (zurückgenommen):** das Testskript klickte das ältere Übernahmefenster IM iframe, nicht  im Hauptdokument.
+### N128 · Quick-Check „Speichern & übernehmen“ legt ein LEERES Objekt an — **BEHOBEN v3199 (07.11.2026, Staging `32dca81`)**
+- **Ursache:** im QC-iframe ist `QcApp` ein const; der Empfänger des Import-Ergebnisses prüfte `window.QcApp` (immer undefined) → `setPdfPending` lief nie, die Zusatzdaten (Einheiten, Risiken, Stellplätze …) fehlten in der Übernahme-Liste (gemessen: pending=6 rein, items=0 raus). Dazu v3198a (Reset abwarten). Gemessen nach dem Fix: 8 Einheiten mit Vertragsart, nkm 3.660, wfl 518, ze 210 auf dem Server (gespeichert wird wie überall beim Reiterwechsel/Speichern, V47).
+- **Messfehler am 05.11. (zurückgenommen):** das Testskript klickte das ältere Übernahmefenster IM iframe, nicht `#qcpm-ok` im Hauptdokument.
 - **Befund (Staging, Satz `Dateien/Testunterlagen/Lindenallee 14`, 13 PDFs):** Import im Quick-Check ist seit v3198 vollständig (52 Zeilen, 8 Einheiten, Mietverträge in Whg. 1/3/6 eingearbeitet, Risiken, These, Auswertung, Summe 3.870 € stimmt). Nach „Speichern & übernehmen“ steht aber ein leeres Objekt (Version 1) auf dem Server, das Formular ist leer. Das zuvor offene Objekt bleibt unberührt.
 - **Drei Anläufe, Ursache noch nicht gefunden:** (1) v1268-Abbruch durch die Quellen-Auswahl von `newObj` → `ohneAuswahl:true`; (2) `newObj` wartet den Sicherungs-Save ab und leert danach → `newObj` gibt das Promise zurück, `_handleSave` wartet (v3198a). Danach kein v1268 mehr, trotzdem leer. **Nächster Schritt: messen, nicht patchen** – `saveObj`, `newObj`, `_newObjLeeren`, `qcSaveAsObject` mit Zeitstempel und Stapel protokollieren, ein Quick-Check OHNE Import (nur Adresse + Kaufpreis) als kleinster Fall, dann mit Import.
 - **Prüfen:** Ist das auf Prod auch so (dann seit wann)? Der Fall ohne Import zeigt es.
