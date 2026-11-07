@@ -26,7 +26,7 @@ const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Pro
 /* ── Die Geschichten (von Hand) ─────────────────────────────────────── */
 const STORYS = [
   /* v3016o · Marcel 28.10.2026: „im Storytelling die Lindenallee als Beispiel hinzufügen" */
-  { seq: '2026-1123', titel: 'Was im Kleingedruckten steht', thema: 'Unterlagen einlesen · WEG-Protokolle · Risiken · Investitionsthese',
+  { seq: '2026-1124', titel: 'Was im Kleingedruckten steht', thema: 'Unterlagen einlesen · WEG-Protokolle · Risiken · Investitionsthese',
     geschichte: 'Acht Wohnungen in Herford, Baujahr 1996, nach WEG aufgeteilt, alle im Paket zu verkaufen. Das Exposé klingt gut – „gepflegt“, „Mietpotenzial“. Erst die Unterlagen zeigen, was es verschweigt: die Eigentümerversammlung hat 2025 die Flachdachsanierung für 92.000 € beschlossen, davon 42.000 € als Sonderumlage, und die Fassade wartet. DealPilot liest alle sieben PDFs in einem Zug und legt das auf den Tisch, bevor du ein Angebot abgibst.',
     zeigen: ['Datenaufnahme › Exposé / Dokumente: alle 7 PDFs auf einmal hineinziehen', 'Import-Fenster: ein Reiter je Dokument, „Übernahme“ mit Flur, Flurstück, Energieklasse', 'Reiter „Auswertung“: Risiken mit Quelle (Protokoll 2025, TOP 3), Investitionsthese', 'Übernehmen: Risiken und These stehen in den Feldern, „Einheiten erfassen“ öffnet sich mit 8 Wohnungen samt Miete', 'Pilot-Analyse › Reiter „Unterlagen & WEG“'],
     satz: 'Das Exposé verkauft – die Protokolle erzählen. DealPilot liest beides und sagt dir, was es kostet.' },
@@ -198,7 +198,7 @@ const rundgang = '<section class="seite dicht"><div class="kick">Am Stand · fü
   + '<table class="ueb akte"><tr><th>Akt</th><th>Die Frage des Besuchers</th><th>Objekt</th><th>Was du zeigst</th></tr>'
   + [['1 · Finden', '„Ist das Angebot überhaupt was?“', NAME('2026-999'), 'Quick-Check: Adresse und Preis rein, in Sekunden Score und Marktpreisindikation mit Spanne. Dann „übernehmen“ – das Objekt ist angelegt.'],
      ['2 · Prüfen', '„Würde die Bank das finanzieren?“', NAME('2026-1041'), 'Pilot-Analyse mit Urteil, Stärken, Risiken – dann das Bank-PDF. Als Gegenstück ' + NAME('2026-1051') + ': hier sagt DealPilot „Nein“.'],
-     ['2b · Unterlagen', '„Was steht im Kleingedruckten?“', NAME('2026-1123'), 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung und WEG-Protokolle auf einmal einlesen: Felder gefüllt, Einheiten erfasst, die beschlossene Dachsanierung als Risiko mit Quelle – und eine Investitionsthese.'],
+     ['2b · Unterlagen', '„Was steht im Kleingedruckten?“', NAME('2026-1124'), 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung und WEG-Protokolle auf einmal einlesen: Felder gefüllt, Einheiten erfasst, die beschlossene Dachsanierung als Risiko mit Quelle – und eine Investitionsthese.'],
      ['3 · Bewerten', '„Was ist das Haus wirklich wert?“', NAME('2026-1054'), 'Stufe 3: Ertrags-, Sach- und Vergleichswert nebeneinander, jeder mit Gutachterausschuss, Jahr und Seite. Warum die Verfahren auseinanderliegen.'],
      ['4 · Halten', '„Hat sich die Sanierung gelohnt – und die nächste?“', NAME('2026-1056'), 'Modernisierung nach Anlage 2 verlängert die Restnutzungsdauer. Zielbild: Wertzuwachs nach Kosten – hier ehrlich negativ.'],
      ['5 · Überblick', '„Was ist mein ganzer Bestand wert?“', 'Portfolio-Cockpit', 'Gesamtbewertung in drei Spalten, Bewertung je Objekt, Zeitraum 10/20/30 Jahre, Portfolio-Pilot mit Zahlenprüfung. Zum Schluss: Bankexport im Telegram-Bot.']]

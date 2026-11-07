@@ -65,6 +65,13 @@ Sachwertfaktor (§ 21 Abs. 3) — und für jeden Ausschuss soll **in der Datenba
 stehen, woher die Zahl kommt**: Link, Jahrgang, Lizenz, Stichtag, Seite. Ohne
 diese Liste fängt die jährliche Nachernte jedes Mal bei der Recherche an.
 
+**Stand 07.11.2026, gemessen mit `tools/messe-schleife-daten.mjs`: 144 Dateien,
+18.318 Sätze, 6.187 Werte** — LZS 2.505, SWF 846, UK 277, IRW-Tabellen 135
+(57 Ausschüsse), 201 Ausschüsse, 15 Länder mit Wert (Sätze in allen 16);
+Herkunft (Ausschuss, Jahrgang, Quelle) bei allen 6.187 Werten, Seite bei 6.186;
+Jahrgänge 2018–2026. Staging `mb.param_modell`: 6.187 Zeilen, Satz für Satz
+abgeglichen. Die Zeile darunter ist Geschichte.
+
 **Stand 22.10.2026, gemessen mit `tools/messe-schleife-daten.mjs` (dieselbe
 Zählung wie der Admin-Reiter „Register & Ernte"): 100 Dateien, 10.679 Sätze,
 4.503 Werte** — LZS 2.447, SWF 627, UK 274, IRW-Umrechnungen 114 (alle 71
