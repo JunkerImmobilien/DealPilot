@@ -138,7 +138,9 @@
     n += huelle('exportTrackRecordPDF', function (objects) {
       if (typeof Plan !== 'undefined' && Plan.key && Plan.key() === 'starter') return alt.exportTrackRecordPDF.apply(this, arguments);   /* Sperre der alten Funktion */
       if (!objects || !objects.length) return;
-      return erzeugen('trackrecord', { ids: objects.map(function (o) { return o && o.id; }).filter(Boolean) }, false);
+      /* v3217 · W-20: die Fotowahl aus der Track-Record-Ansicht (storage.js _trFotoStreifen) reist mit */
+      var fw = null; try { fw = window._trFotoWahl || JSON.parse(localStorage.getItem('dp_tr_fotowahl') || 'null'); } catch (e) { fw = null; }
+      return erzeugen('trackrecord', { ids: objects.map(function (o) { return o && o.id; }).filter(Boolean), fotos: fw || null }, false);
     }) ? 1 : 0;
     n += huelle('exportGlobalBankPDF', function () {
       var d = window._bankexportData;

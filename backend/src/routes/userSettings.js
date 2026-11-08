@@ -70,7 +70,9 @@ const { query } = require('../db/pool');
 /* v3040 - `stammdaten`: Name, Firma, Adresse, E-Mail, Logo (dp_user_settings) und der Merker
    „Ersteinrichtung erledigt" (js/konto-stammdaten.js). Marcel 29.10.2026: musste beides bei
    jeder Anmeldung neu eingeben - es lag nur im Browser. */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe', 'browser_vorgaben', 'stammdaten'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
+/* v3217 - `vermoegen`: Vermögensaufstellung, Haushaltsrechnung und gespeicherte Stände (js/vermoegen.js,
+   Umsetzungswunsch W-11). Client-Daten, keine Berechnungsgrundlage - nur Summen fuer Ansicht und Track Record. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe', 'browser_vorgaben', 'stammdaten', 'vermoegen'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {
