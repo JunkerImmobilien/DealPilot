@@ -41553,3 +41553,34 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
 .oe-row.oe-row-gesperrt .oe-k { opacity: .7; }
 .dp-rc-vorgabe { margin-top: 8px; font-size: 11.5px; color: #7a5a12; background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent); border-left: 3px solid var(--wl-c9a84c, #C9A84C); padding: 5px 9px; border-radius: 0 7px 7px 0; }
 .dp-rc-vorgabe-knopf { border: 0; background: none; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; min-height: 0; }
+
+/* ===== v3213 · W-13 (Entwicklungspartner): Kurzbeschreibung je Stufe sichtbar.
+   Bis v3212 stand der Satz nur im title (.oe-q-kompakt display:none, v1868). Der Knopf
+   „was fehlt" ist weg (objekt-reiter.js) - die Pille „n fehlt" und ein Klick auf die
+   Zeile zeigen die Chip-Liste „Für Stufe n fehlt noch". ===== */
+.oe-kopf .oe-abruf-zeilen .oe-row { grid-template-areas: "k a" "w a" "q q" !important; }
+.oe-kopf .oe-abruf-zeilen .oe-q-kompakt { display: block; grid-area: q; font-size: 11px; line-height: 1.35; color: #6b655f; white-space: normal; overflow: visible; }
+.oe-kopf .oe-abruf-zeilen .oe-row > span:last-child:empty { display: none; }
+
+/* ===== v3213 · W-18 (Entwicklungspartner): Reiter Bewirtschaftung kompakter.
+   Umlagefähig und nicht umlagefähig in EINER Karte nebeneinander (index.html .dp-bwk-kosten),
+   je Spalte zwei Felder je Zeile. Unter 900 px untereinander (wie .col2/.g2, style.css Z. 172). ===== */
+#s4 .dp-bwk-zwei { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 0; }
+#s4 .dp-bwk-spalte { min-width: 0; }
+#s4 .dp-bwk-spalte.dp-bwk-ul { padding-right: 22px; }
+#s4 .dp-bwk-spalte.dp-bwk-nul { padding-left: 22px; border-left: 1px solid var(--border-g, #e9dcb3); }
+#s4 .dp-bwk-kopf { font: 600 10.5px/1.3 "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--wl-b8932f, #b8932f); margin: 2px 0 10px; }
+#s4 .dp-bwk-kopf span { text-transform: none; letter-spacing: 0; font: 400 11.5px/1.3 Inter, system-ui, sans-serif; color: #6b655f; }
+#s4 .dp-bwk-felder { gap: 10px 14px; align-items: start; }
+#s4 .dp-bwk-felder > .f { margin-bottom: 0; min-width: 0; }
+#s4 .dp-bwk-felder > .f > label { white-space: normal; line-height: 1.3; min-height: 2.6em; display: flex; align-items: flex-end; flex-wrap: wrap; gap: 3px; }
+#s4 .dp-bwk-summe { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-g, #e9dcb3); }
+@media (max-width: 900px) {
+  #s4 .dp-bwk-zwei { grid-template-columns: 1fr; row-gap: 16px; }
+  #s4 .dp-bwk-spalte.dp-bwk-ul { padding-right: 0; }
+  #s4 .dp-bwk-spalte.dp-bwk-nul { padding-left: 0; border-left: 0; border-top: 1px solid var(--border-g, #e9dcb3); padding-top: 14px; }
+}
+@media (max-width: 520px) {
+  #s4 .dp-bwk-felder { grid-template-columns: 1fr; }
+  #s4 .dp-bwk-felder > .f > label { min-height: 0; }
+}

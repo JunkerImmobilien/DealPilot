@@ -2755,13 +2755,10 @@ label.dp-required.qc-required::after {
             <span>Eigenkapital entspricht den Kaufnebenkosten</span>
           </label>
         </div>
-        <div class="f checkbox-row">
-          <label class="cb-label" title="LTV-Bezugsgröße: AUS = LTV gegen Kaufpreis (Standard-Bankenpraxis, Beleihungsbasis ≈ KP). AN = LTV gegen Gesamtinvestition inkl. Erwerbsnebenkosten (konservativere Sicht — strenger, da KNK nicht als Sicherheit zählen).">
-            <input id="ek_inkl_nk" type="checkbox" onchange="calc()">
-            <span>LTV inkl. Erwerbsnebenkosten berechnen <span class="cf-hint">(strenger, GI-Bezug)</span></span>
-            <span class="info-tag">ℹ</span>
-          </label>
-        </div>
+        <!-- v3213 · W-16: Haken "LTV inkl. Erwerbsnebenkosten (strenger)" entfernt. Er rechnete
+             den LTV gegen die Gesamtinvestition - die ist groesser als der Kaufpreis, der LTV
+             wurde also KLEINER (lockerer), nicht strenger. Bezug bleibt Gutachten/Bankwert ->
+             Bankbewertung -> Kaufpreis (calc.js). -->
         <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div><div class="cf-hint" id="d1-herleitung" style="margin-top:4px"></div></div>
         <!-- v1244 · Testbericht Block F: „Sollte hier die Reihenfolge nicht
              anders sein? Erst eintragen was fuer ein Kredit ich bekomme und
@@ -3112,25 +3109,37 @@ label.dp-required.qc-required::after {
   <!-- v2184: Standardwerte je Objektart (bwk-profil.js) -->
   <div id="bwk-standard-bar"></div>
   <!-- Detail Mode (default) -->
+  <!-- v3213 · W-18 (Entwicklungspartner): umlagefaehige und nicht umlagefaehige Kosten in EINEM
+       Block nebeneinander, Felder je Spalte zu zweit (schmaler). Bis v3212 zwei Karten untereinander
+       in der linken Haelfte (gemessen am Bild W-18: ~1.000 px hoch bei 620 px breiten Feldern).
+       Alle Felder, IDs und Hilfen bleiben; detailgrad.js findet die Karte weiter ueber #hg_ul/#hg_nul. -->
   <div id="bwk-detail-mode" class="col2">
-    <div>
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Umlagefähige Kosten / Jahr</div>
-        <div class="f"><label>Hausgeld (umlagefähig) / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.hg_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Sonstiges umlagefähig / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonstiges_umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab6.sonstiges_umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
-      </div>
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Nicht umlagefähige Kosten / Jahr</div>
-        <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
-        <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Sonderverwaltung / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonderverwaltung" tabindex="-1" aria-label="Hilfe zu tab6.sonderverwaltung"></button></label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <!-- v1312: der Erbbauzins steckt in der Summe darunter, ist aber kein Feld
-             hier - er kommt aus dem Reiter Objekt. Ohne diese Zeile taucht er in den
-             Kosten auf, ohne dass jemand sagen koennte, woher. -->
-        <div class="f"><label>davon Erbbauzins <span class="info-tag" title="Kommt aus dem Reiter Objekt, Grund &amp; Boden. Nicht umlagefähig (§ 2 BetrKV kennt ihn nicht), aber steuerlich abziehbar.">ℹ Objekt</span></label><div class="cf" id="erb_zins_j">—</div></div>
-        <div class="f"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
+    <div class="card dp-bwk-kosten" style="grid-column:1/-1"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Bewirtschaftungskosten / Jahr</div>
+      <div class="dp-bwk-zwei">
+        <div class="dp-bwk-spalte dp-bwk-ul">
+          <div class="dp-bwk-kopf">Umlagefähig <span>· zahlt der Mieter über die Nebenkosten</span></div>
+          <div class="g2 dp-bwk-felder">
+            <div class="f"><label>Hausgeld (umlagefähig) / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.hg_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Sonstiges umlagefähig / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonstiges_umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab6.sonstiges_umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+          </div>
+          <div class="f dp-bwk-summe"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
+        </div>
+        <div class="dp-bwk-spalte dp-bwk-nul">
+          <div class="dp-bwk-kopf">Nicht umlagefähig <span>· trägst du als Eigentümer</span></div>
+          <div class="g2 dp-bwk-felder">
+            <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
+            <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Sonderverwaltung / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonderverwaltung" tabindex="-1" aria-label="Hilfe zu tab6.sonderverwaltung"></button></label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+            <!-- v1312: der Erbbauzins steckt in der Summe darunter, ist aber kein Feld
+                 hier - er kommt aus dem Reiter Objekt. Ohne diese Zeile taucht er in den
+                 Kosten auf, ohne dass jemand sagen koennte, woher. -->
+            <div class="f"><label>davon Erbbauzins <span class="info-tag" title="Kommt aus dem Reiter Objekt, Grund &amp; Boden. Nicht umlagefähig (§ 2 BetrKV kennt ihn nicht), aber steuerlich abziehbar.">ℹ Objekt</span></label><div class="cf" id="erb_zins_j">—</div></div>
+          </div>
+          <div class="f dp-bwk-summe"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
+        </div>
       </div>
     </div>
     <div>
@@ -3154,6 +3163,8 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Bezeichnung</label><input id="kp4l" type="text" placeholder=""></div>
         </div>
       </div>
+    </div>
+    <div>
       <!-- v3092 · N100: Sonderumlagen der WEG - Cashflow im Faelligkeitsjahr, Steuer nur als Vorschlag (sonderumlage.js) -->
       <div class="card" id="weg-su-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Sonderumlagen der WEG</div>
         <input type="hidden" id="weg_su" value="">

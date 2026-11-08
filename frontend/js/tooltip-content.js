@@ -560,10 +560,44 @@
       body: 'DSCR-Werte für 25 Szenarien: 5 Stufen Mietausfall (−20% bis +20%) × 5 Stufen Zinsänderung (−2pp bis +5pp). Grün = Bank-OK (DSCR ≥ 1,2). Gelb = Achtung (1,0-1,2). Rot = Stresszone (< 1,0). Zeigt wie robust dein Deal ist.',
       severity: 'pro'
     },
+  /* v3213 · W-19: Sonderumlage-Eintrag im Reiter Bewirtschaftung (sonderumlage.js) */
+  'tab6.su_modus': {
+    title: 'Gesamtbetrag × MEA oder Anteil direkt',
+    body: 'Eine Sonderumlage beschließt die Eigentümergemeinschaft meist als Betrag für das ganze Haus. Auf deine Wohnung entfällt davon dein Miteigentumsanteil (MEA).<br><br>• <b>Gesamtbetrag der Gemeinschaft × MEA</b>: du trägst den Betrag aus dem Protokoll ein, DealPilot rechnet den Anteil mit dem Miteigentumsanteil aus dem Reiter Objekt.<br>• <b>Anteil der Wohnung direkt</b>: du kennst den Betrag deiner Wohnung schon (z. B. aus der Einzelabrechnung) und trägst ihn selbst ein.<br><br>Gerechnet wird immer mit dem Anteil dieses Objekts.',
+    severity: 'critical'
+  },
+  'tab6.su_anteil': {
+    title: 'Anteil dieses Objekts',
+    body: 'Der Betrag, den DU für dieses Objekt zahlst — nicht der Betrag der ganzen Gemeinschaft. Er geht einmalig im Jahr der Fälligkeit in den Cashflow. Ist die Umlage vor dem wirtschaftlichen Übergang fällig, trägt sie der Verkäufer und steht nicht im Cashflow.',
+    severity: 'critical'
+  },
+  'tab6.su_art': {
+    title: 'Steuer: Art',
+    body: '<b>Erhaltung</b>: die Gemeinschaft repariert oder ersetzt Vorhandenes (Dach neu eindecken, Fassade streichen, Heizung tauschen). Das sind Werbungskosten im Jahr der Verwendung — in den drei Jahren nach dem Kauf zählen sie zur 15-%-Grenze.<br><br><b>Herstellung</b>: es entsteht etwas Neues oder deutlich Besseres (Aufzug anbauen, Dachgeschoss ausbauen). Kein Sofortabzug, die Kosten erhöhen anteilig die AfA-Bemessungsgrundlage.<br><br>Im Zweifel mit dem Steuerberater abstimmen.',
+    paragraph: '§ 9 EStG, § 6 Abs. 1 Nr. 1a EStG',
+    severity: 'critical'
+  },
+  'tab6.su_verw_jahr': {
+    title: 'Steuer: Jahr der Verwendung',
+    body: 'Absetzbar ist eine Sonderumlage erst, wenn die Gemeinschaft das Geld für die Maßnahme AUSGIBT — nicht schon, wenn du zahlst. Vorbelegt ist das Fälligkeitsjahr (die Maßnahme folgt sofort). Liegt die Rechnung der Gemeinschaft später, trag hier das Jahr ein, in dem sie bezahlt wird.',
+    paragraph: 'BFH 14.01.2025, IX R 19/24',
+    severity: 'critical'
+  },
+  /* v3213 · W-7: Haltung im Anlegerprofil (einstellungen-schlank.js) */
+  'profil.risikoneigung': {
+    title: 'Risikoneigung',
+    body: 'Sagt der Pilot-Analyse, wie vorsichtig sie urteilen soll.<br><br>• <b>Konservativ</b>: Sicherheit zuerst — die Analyse betont Risiken (knapper Cashflow, hoher Beleihungsauslauf, Sanierungsstau) und empfiehlt eher Abstand.<br>• <b>Moderat</b>: ausgewogen zwischen Rendite und Risiko.<br>• <b>Chancenorientiert</b>: höhere Rendite ist wichtig — die Analyse nimmt mehr Risiko in Kauf, wenn die Chance es trägt.<br><br><b>Nur die Pilot-Analyse</b> (Text und Empfehlung) richtet sich danach. Kennzahlen, Deal Score und Berechnungen ändern sich nicht.',
+    severity: 'critical'
+  },
+  'profil.strategie': {
+    title: 'Strategie',
+    body: 'Sagt der Pilot-Analyse, worauf du mit dem Objekt hinauswillst.<br><br>• <b>Buy &amp; Hold</b>: langfristig halten, stabile Miete und Tilgung zählen.<br>• <b>Value-Add</b>: aufwerten (Sanierung, Mieterhöhung) und halten.<br>• <b>Cashflow-Fokus</b>: möglichst viel Überschuss jeden Monat.<br>• <b>Wertsteigerungs-Fokus</b>: Lage und Wertentwicklung vor laufendem Ertrag.<br><br><b>Nur die Pilot-Analyse</b> (Text und Empfehlung) richtet sich danach. Kennzahlen, Deal Score und Berechnungen ändern sich nicht.',
+    severity: 'critical'
+  },
   // ─── V235.1: tab8.ltv_basis (rest waren Duplikate) ──────────────
   'tab8.ltv_basis': {
     title: 'LTV — Loan-to-Value',
-    body: 'Das <b>Loan-to-Value</b>-Verhältnis zeigt wie hoch deine Restschuld im Verhältnis zum Immobilien-Wert ist. Die Bank nutzt das als wichtigstes Risikomaß.<br><br><b>Welcher Wert ist die Basis?</b><br>• <b>Wenn Sachverständigenwert vorhanden</b>: dieser wird genutzt<br>• <b>Sonst</b>: Kaufpreis<br>• <b>Optional bei Setup</b>: Gesamtinvestition (KP + Nebenkosten) — strenger<br><br><b>LTV-Stufen:</b><br>• Unter 60 % — Tier 1 (beste Konditionen)<br>• 60-80 % — Standard<br>• 80-95 % — Risikoaufschlag<br>• Über 95 % — Vollfinanzierung, höchste Zinsen<br><br><b>Im Zeitverlauf</b> sinkt der LTV durch Tilgung und Wertsteigerung — wichtig für Anschlussfinanzierung.'
+    body: 'Das <b>Loan-to-Value</b>-Verhältnis zeigt wie hoch deine Restschuld im Verhältnis zum Immobilien-Wert ist. Die Bank nutzt das als wichtigstes Risikomaß.<br><br><b>Welcher Wert ist die Basis?</b><br>• <b>Wenn Sachverständigenwert vorhanden</b>: dieser wird genutzt<br>• <b>Sonst</b>: Bankbewertung, dann Kaufpreis<br><br><b>LTV-Stufen:</b><br>• Unter 60 % — Tier 1 (beste Konditionen)<br>• 60-80 % — Standard<br>• 80-95 % — Risikoaufschlag<br>• Über 95 % — Vollfinanzierung, höchste Zinsen<br><br><b>Im Zeitverlauf</b> sinkt der LTV durch Tilgung und Wertsteigerung — wichtig für Anschlussfinanzierung.'
   },
 
   };

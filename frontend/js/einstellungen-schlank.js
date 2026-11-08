@@ -227,6 +227,17 @@
         var fs = strat.closest('.f'), fr = risk.closest('.f');
         var ls = fs && fs.querySelector('label'), lr = fr && fr.querySelector('label');
         if (ls) ls.textContent = 'Strategie'; if (lr) lr.textContent = 'Risikoneigung';
+        /* v3213 · W-7: Info-Knopf an beiden Feldern (Hilfe-System, tooltip-content.js
+           profil.strategie / profil.risikoneigung) - erklaert die Stufen und dass sie
+           nur die Pilot-Analyse beeinflussen. */
+        function tipKnopf(l, id) {
+          if (!l || l.querySelector('.dp-tip')) return;
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'dp-tip'; b.setAttribute('data-tip-id', id);
+          b.setAttribute('aria-label', 'Erklärung');
+          l.appendChild(document.createTextNode(' ')); l.appendChild(b);
+        }
+        tipKnopf(ls, 'profil.strategie'); tipKnopf(lr, 'profil.risikoneigung');
         if (fs) grid.appendChild(fs); if (fr) grid.appendChild(fr);
         sw.insertBefore(box, host);
         strat.addEventListener('change', function () { profilSchreiben('ai_strat', strat.value); });

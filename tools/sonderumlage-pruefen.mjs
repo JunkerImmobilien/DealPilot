@@ -72,6 +72,20 @@ console.log('Sonderumlage: Import -> Liste -> Cashflow je Jahr');
   melde(p[0] && p[0].zweck === 'Fassade', '1 Zweck ohne Vorsilbe "Sonderumlage fuer"', p[0] && p[0].zweck);
   alleUebernehmen(l);
   melde(gleich(jeJahr(), { 2027: 3400 }), '1 Cashflow: 3.400 EUR in 2027', jeJahr());
+  /* v3213 · W-19: aus Gemeinschaft x MEA uebernommen -> Regler auf „gesamt", Gesamtbetrag gemerkt */
+  const e0 = SU.liste()[0] || {};
+  melde(e0.modus === 'gesamt' && e0.gesamt === 40000 && e0.betrag === 3400, '1 W-19: Eintrag merkt modus gesamt + 40.000 EUR, Anteil bleibt 3.400', e0);
+}
+
+/* 14 · v3213 W-19: Betrag der Wohnung direkt -> kein Regler „gesamt" */
+{
+  neu('01.01.2027');
+  const l = DI.sonderumlagenAus({ art: 'Wirtschaftsplan', jahr: 2026, sonderumlagen: [
+    { zweck: 'Dach', betrag_gesamt_eur: 42000, betrag_einheit_eur: 4956, jahr: 2027, faellig: '' }] }, 'hausgeld', { objart: 'ETW', mea: 11.8 });
+  alleUebernehmen(l);
+  const e0 = SU.liste()[0] || {};
+  melde(e0.betrag === 4956 && e0.modus === undefined, '14 W-19: Betrag der Wohnung laut Plan -> Anteil direkt (kein modus)', e0);
+  melde(gleich(jeJahr(), { 2027: 4956 }), '14 W-19: Cashflow unveraendert 4.956 EUR in 2027', jeJahr());
 }
 
 /* 2 · Raten ueber zwei Jahre (MEA 10 %) */

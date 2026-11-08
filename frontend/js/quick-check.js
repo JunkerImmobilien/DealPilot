@@ -584,7 +584,7 @@
     } catch(e) {}
 
     // V63.35.1: LTV-Bezug aus Haupt-Checkbox übernehmen (Konsistenz Quick-Check ↔ DealPilot Score)
-    var _qc_ekInklNkLtv = !!(document.getElementById('ek_inkl_nk') && document.getElementById('ek_inkl_nk').checked);
+    var _qc_ekInklNkLtv = false;   /* v3213 · W-16: Haken ek_inkl_nk entfernt (rechnete lockerer statt strenger) */
     // V63.36: SVW aus Hauptfeld übernehmen (für 3-stufige LTV-Logik)
     var _qc_svw = 0;
     var svwEl = document.getElementById('svwert');

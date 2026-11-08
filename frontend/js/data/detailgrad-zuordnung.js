@@ -310,7 +310,6 @@ window.DpDetailgradZuordnung = {
      "d1_type",
      "bank_inst",
      "ek_ist_nk",
-     "ek_inkl_nk",
      "d1_anschl_enable",
      "anschl_z",
      "anschl_t",

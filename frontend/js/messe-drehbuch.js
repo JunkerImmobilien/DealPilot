@@ -1693,7 +1693,7 @@
     return liste.map(function (id) { return String(F[id] || id).replace(/\s*\(Reiter[^)]*\)/, ''); });
   }
   function fehlt(s) { try { return DealPilotObjektReiter.fehltFuer(s); } catch (e) { return []; } }
-  function stufeZeile(s) { return function () { var b = q('#oe-stufen [data-oe-stufe="' + s + '"]'); return b && b.closest('.oe-row'); }; }
+  function stufeZeile(s) { return function () { return q('#oe-stufen [data-oe-zeile="' + s + '"]'); }; }   /* v3213: ohne „was fehlt"-Knopf über die Zeile */
   /* nur die Zelle „N frei" - gemessen las der ganze Zeilentext „Stufe 1" + „10 frei" als 110 */
   function kontingentFrei(s) { var r = stufeZeile(s)(), w = r && r.querySelector('.oe-w'); var m = w && /(\d+)\s*frei/.exec(w.textContent); return m ? m[1] : null; }
   function mbKarteH() { try { return DealPilotMB.letzter(); } catch (e) { return null; } }

@@ -1736,7 +1736,10 @@ function _calcImmediate(){
   //                            Wenn kein SVW eingegeben → Fallback Kaufpreis.
   //   Checkbox "ek_inkl_nk":   LTV gegen Gesamtinvestition (KP + KNK + San + Möbl) — strenger.
   // Das deckt sich mit ImmoKalk-Excel: LTV = Darlehen / Immobilienwert (Sachwert).
-  var _ekInklNkLtv = (el('ek_inkl_nk') && el('ek_inkl_nk').checked);
+  /* v3213 · W-16: der Haken ek_inkl_nk ist entfernt (er rechnete gegen die groessere
+     Gesamtinvestition, also LOCKERER statt strenger). Gespeicherte Objekte mit dem Feld
+     aendern den LTV-Bezug nicht mehr. */
+  var _ekInklNkLtv = false;
   var ltv_basis, ltv_basis_label;
   if (_ekInklNkLtv) {
     ltv_basis = gi;

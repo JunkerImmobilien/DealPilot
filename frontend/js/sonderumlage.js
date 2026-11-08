@@ -76,6 +76,22 @@
   }
   function verwJahr(e) { return zahl(e.verw_jahr) || zahl(e.jahr); }
 
+  /* v3213 · W-19 (Entwicklungspartner): Regler „Gesamtbetrag der Gemeinschaft × MEA"
+     gegen „Anteil der Wohnung direkt". Gespeichert wird weiter der ANTEIL (betrag) -
+     jeJahr() und calc.js lesen nur ihn. Dazu optional modus ('gesamt') und gesamt (€ der
+     Gemeinschaft). Der MEA kommt aus dem Feld mea (Reiter Objekt, in Prozent); ändert er
+     sich, rechnen die Einträge im Modus „gesamt" ihren Anteil neu. */
+  function meaPct() { var m = zahl((el('mea') || {}).value); return m > 0 && m <= 100 ? m : null; }
+  function meaText(m) { return String(Math.round(m * 100) / 100).replace('.', ','); }
+  function ausGesamt(e) {
+    var g = zahl(e.gesamt), m = meaPct();
+    if (!(g > 0) || !m) return false;
+    e.betrag = Math.round(g * m / 100);
+    e.wie = Math.round(g).toLocaleString('de-DE') + ' € der Gemeinschaft × Miteigentumsanteil ' + meaText(m) + ' %';
+    return true;
+  }
+  function tip(id) { return ' <button type="button" class="dp-tip" data-tip-id="' + id + '" tabindex="-1" aria-label="Erklärung"></button>'; }
+
   /** Für calc.js: { Kalenderjahr: Betrag } aller Umlagen, die der Käufer zahlt */
   function jeJahr() {
     var aus = {};
@@ -100,8 +116,11 @@
       return !(tagS && tagX && tagS.getTime() !== tagX.getTime());
     })[0];
     if (gleich) { if (!gleich.faellig && s.faellig) { gleich.faellig = s.faellig; speichern(l, true); } return true; }
-    l.push({ zweck: s.zweck || 'Sonderumlage', jahr: zahl(s.jahr), faellig: s.faellig || '', betrag: Math.round(zahl(s.betrag)),
-      wie: s.wie || '', quelle: s.quelle || '', verw_jahr: zahl(s.jahr), art: '' });
+    var neu = { zweck: s.zweck || 'Sonderumlage', jahr: zahl(s.jahr), faellig: s.faellig || '', betrag: Math.round(zahl(s.betrag)),
+      wie: s.wie || '', quelle: s.quelle || '', verw_jahr: zahl(s.jahr), art: '' };
+    /* v3213 · W-19: kam der Anteil aus Gemeinschaft × MEA, steht der Regler auf „gesamt" */
+    if (zahl(s.gesamt) > 0 && /Miteigentumsanteil/.test(s.wie || '')) { neu.modus = 'gesamt'; neu.gesamt = zahl(s.gesamt); }
+    l.push(neu);
     speichern(l, true);
     return true;
   }
@@ -158,16 +177,29 @@
     var l = liste(), gr = grenze15(l);
     if (stand !== _gerendert) {
       _gerendert = stand;
+      var m = meaPct();
       var h = l.map(function (e, i) {
         var id = 'wsu-' + i + '-';
+        var ges = e.modus === 'gesamt';
+        /* v3213 · W-19: Regler und - im Modus „gesamt" - Gesamtbetrag plus errechneter Anteil */
+        var regler = '<div class="f wsu-modus-zeile" style="grid-column:1/-1;margin-bottom:2px"><label class="toggle-slim wsu-modus" style="cursor:pointer;gap:8px">'
+          + '<span class="wsu-modus-a"' + (ges ? '' : ' style="color:var(--text,#2A2727);font-weight:600"') + '>Anteil der Wohnung direkt</span>'
+          + '<input type="checkbox" id="' + id + 'modus" data-wsu="modus"' + (ges ? ' checked' : '') + ' aria-label="Gesamtbetrag der Gemeinschaft mal Miteigentumsanteil">'
+          + '<span class="wsu-modus-g">Gesamtbetrag der Gemeinschaft × MEA</span></label>' + tip('tab6.su_modus') + '</div>';
+        var anteilFeld = ges
+          ? '<div class="f"><label>Gesamtbetrag der Gemeinschaft</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'gesamt" data-wsu="gesamt" type="text" inputmode="decimal" class="trl" value="' + esc(e.gesamt != null ? Math.round(e.gesamt) : '') + '"></div></div>'
+            + '<div class="f"><label>Anteil dieses Objekts' + tip('tab6.su_anteil') + '</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-wsu-anzeige="1" type="text" class="trl" readonly tabindex="-1" style="background:var(--surface2,#F5F2EC)" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div>'
+            + '<div class="hint wsu-mea" style="display:block;margin-top:2px">' + (m ? '= Gesamtbetrag × Miteigentumsanteil ' + meaText(m) + ' % (Reiter Objekt)' : '<span style="color:#B8625C">Miteigentumsanteil fehlt</span> - im Reiter Objekt eintragen, dann rechnet der Anteil sich hier.') + '</div></div>'
+          : '<div class="f"><label>Anteil dieses Objekts' + tip('tab6.su_anteil') + '</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-wsu="betrag" type="text" inputmode="decimal" class="trl" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div></div>';
         return '<div class="wsu-eintrag" data-i="' + i + '" style="border-top:1px solid var(--line,rgba(42,39,39,.12));padding:8px 0">'
           + '<div class="g2">'
+          + regler
           + '<div class="f"><label>Zweck</label><input id="' + id + 'zweck" data-wsu="zweck" type="text" value="' + esc(e.zweck) + '"></div>'
-          + '<div class="f"><label>Anteil dieses Objekts</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-wsu="betrag" type="text" inputmode="decimal" class="trl" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div></div>'
+          + anteilFeld
           + '<div class="f"><label>Fällig im Jahr</label><input id="' + id + 'jahr" data-wsu="jahr" data-zf-aus="1" type="text" inputmode="numeric" value="' + esc(e.jahr || '') + '"></div>'
           + '<div class="f"><label>Fälligkeitstag <span style="color:var(--muted);font-weight:400">· optional</span></label><input id="' + id + 'faellig" data-wsu="faellig" type="text" placeholder="TT.MM.JJJJ" value="' + esc(e.faellig || '') + '"></div>'
-          + '<div class="f"><label>Steuer: Jahr der Verwendung</label><input id="' + id + 'verw_jahr" data-wsu="verw_jahr" data-zf-aus="1" type="text" inputmode="numeric" value="' + esc(e.verw_jahr || e.jahr || '') + '"></div>'
-          + '<div class="f"><label>Steuer: Art</label><select id="' + id + 'art" data-wsu="art"><option value=""' + (!e.art ? ' selected' : '') + '>– bitte wählen –</option><option value="erhaltung"' + (e.art === 'erhaltung' ? ' selected' : '') + '>Erhaltung (sofort absetzbar)</option><option value="herstellung"' + (e.art === 'herstellung' ? ' selected' : '') + '>Herstellung (über die AfA)</option></select></div>'
+          + '<div class="f"><label>Steuer: Jahr der Verwendung' + tip('tab6.su_verw_jahr') + '</label><input id="' + id + 'verw_jahr" data-wsu="verw_jahr" data-zf-aus="1" type="text" inputmode="numeric" value="' + esc(e.verw_jahr || e.jahr || '') + '"></div>'
+          + '<div class="f"><label>Steuer: Art' + tip('tab6.su_art') + '</label><select id="' + id + 'art" data-wsu="art"><option value=""' + (!e.art ? ' selected' : '') + '>– bitte wählen –</option><option value="erhaltung"' + (e.art === 'erhaltung' ? ' selected' : '') + '>Erhaltung (sofort absetzbar)</option><option value="herstellung"' + (e.art === 'herstellung' ? ' selected' : '') + '>Herstellung (über die AfA)</option></select></div>'
           + '</div>'
           + '<div class="hint wsu-cf" style="display:block;margin-top:2px"></div>'
           + '<div class="hint wsu-st" style="display:block;margin-top:4px"></div>'
@@ -216,13 +248,46 @@
     var box = t.closest('.wsu-eintrag'); if (!box) return;
     var l = liste(), e = l[+box.getAttribute('data-i')]; if (!e) return;
     var k = t.getAttribute('data-wsu'), v = String(t.value || '').trim();
+    /* v3213 · W-19: Regler und Gesamtbetrag */
+    if (k === 'modus') {
+      var nachGes = !!t.checked;
+      if (nachGes === (e.modus === 'gesamt')) return;   /* input + change: nur einmal */
+      if (nachGes) {
+        e.modus = 'gesamt';
+        var mm = meaPct();
+        if (!(zahl(e.gesamt) > 0) && zahl(e.betrag) > 0 && mm) e.gesamt = Math.round(zahl(e.betrag) * 100 / mm);
+        ausGesamt(e);
+      } else { e.modus = 'anteil'; if (/Miteigentumsanteil/.test(e.wie || '')) e.wie = 'eigene Angabe'; }
+      speichern(l, true);
+      return;
+    }
+    if (k === 'gesamt') {
+      e.gesamt = zahl(v);
+      if (!ausGesamt(e) && !(e.gesamt > 0)) e.betrag = null;
+      var anz = box.querySelector('[data-wsu-anzeige]');
+      if (anz) anz.value = e.betrag != null ? Math.round(e.betrag) : '';
+      speichern(l, false);
+      return;
+    }
     if (k === 'betrag') e.betrag = zahl(v);
     else if (k === 'jahr') { var alt = zahl(e.jahr); e.jahr = zahl(v); if (!e.verw_jahr || e.verw_jahr === alt) e.verw_jahr = e.jahr; }
     else if (k === 'verw_jahr') e.verw_jahr = zahl(v);
     else e[k] = v;
     speichern(l, k === 'jahr');   /* Jahr ändert die vorbelegte Verwendung → neu zeichnen */
   });
-  /* die Art (select) kommt ueber dasselbe input-Ereignis */
+  /* die Art (select) kommt ueber dasselbe input-Ereignis; der Regler (Checkbox) zur
+     Sicherheit auch über change - der Handler oben nimmt ihn nur einmal */
+  document.addEventListener('change', function (ev) {
+    var t = ev.target; if (!t || !t.getAttribute || t.getAttribute('data-wsu') !== 'modus') return;
+    try { t.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+  });
+  /* v3213 · W-19: MEA im Reiter Objekt geändert → Anteile im Modus „gesamt" neu rechnen */
+  document.addEventListener('input', function (ev) {
+    var t = ev.target; if (!t || t.id !== 'mea') return;
+    var l = liste(), ge = false;
+    l.forEach(function (e) { if (e.modus === 'gesamt' && ausGesamt(e)) ge = true; });
+    if (ge) speichern(l, true);
+  });
   document.addEventListener('click', function (ev) {
     var t = ev.target && ev.target.closest ? ev.target.closest('.wsu-btn') : null; if (!t) return;
     var l = liste();
