@@ -82,8 +82,28 @@
   function steuerAus(l, ctx) {
     ctx = ctx || {};
     var A = zahl(ctx.A), grenze = zahl(ctx.grenze) || 0, satz = zahl(ctx.afaSatz) > 0 ? zahl(ctx.afaSatz) : 2;
+    /* v3223 · Marcel 08.11.2026 „genau auf den Monat“: das 3-Jahres-Fenster des § 6 Abs. 1 Nr. 1a EStG
+       laeuft vom Monat des Uebergangs (Am) bis drei Jahre spaeter. Uebergang am 1. eines Monats -> der
+       Vormonat ist der letzte, sonst zaehlt der Uebergangsmonat des Grenzjahres noch mit (dort endet die
+       Frist am Tag). Ohne Monat des Eintrags im Grenzjahr: zaehlt mit (vorsichtig) und meldet „Monat fehlt“.
+       Ohne Uebergangsmonat: wie bisher Kalenderjahre A bis A+3. */
+    var Am = zahl(ctx.Am), Ad = zahl(ctx.Ad);
+    var monatOk = function (m) { m = zahl(m); return m >= 1 && m <= 12 ? m : null; };
+    var start = (A && Am) ? A * 12 + (Am - 1) : null;
+    var ende = start != null ? start + 36 - (Ad === 1 ? 1 : 0) : null;
+    var grenzfall = function (e) {
+      var J = zahl(e.jahr); if (start == null || monatOk(e.monat)) return false;
+      return J * 12 + 11 >= start && J * 12 <= ende && (J * 12 < start || J * 12 + 11 > ende);
+    };
+    var imFenster = function (e) {
+      var J = zahl(e.jahr); if (!A || e.art !== 'erhaltung') return false;
+      if (start == null) return J >= A && J <= A + 3;
+      var m = monatOk(e.monat);
+      if (!m) return J * 12 + 11 >= start && J * 12 <= ende;   /* Jahr beruehrt das Fenster */
+      var t = J * 12 + (m - 1);
+      return t >= start && t <= ende;
+    };
     var netto = function (b) { return ctx.ust === 'netto' ? b : b / 1.19; };
-    var imFenster = function (e) { var J = zahl(e.jahr); return !!(A && e.art === 'erhaltung' && J >= A && J <= A + 3); };
     var L = gueltig(l);
     var fenster = 0;
     L.forEach(function (e) { if (imFenster(e)) fenster += netto(zahl(e.betrag)); });
@@ -91,24 +111,33 @@
     var ueber = grenze > 0 && fenster > 0 && summe > grenze;
     var jahre = {};
     var add = function (J, k, b) { if (!(b > 0)) return; jahre[J] = jahre[J] || { erh: 0, anah: 0, afa: 0 }; jahre[J][k] += b; };
-    /* Abschreibung mit dem Gebäudesatz: volle Jahre, das letzte nimmt den Rest (wie tax.js v3006b) */
+    /* Abschreibung mit dem Gebaeudesatz, das letzte Jahr nimmt den Rest (wie tax.js v3006b).
+       v3223 · Marcel 08.11.2026 „so, dass es richtig ist“: nachtraegliche und anschaffungsnahe
+       Herstellungskosten werden im Jahr ihres Anfalls so behandelt, als waeren sie zu Beginn des
+       Jahres aufgewendet (R 7.4 Abs. 9 Satz 3 EStR) -> volles Jahr. Ausnahme Anschaffungsjahr: dort
+       laeuft die Gebaeude-AfA selbst erst ab dem Monat des Uebergangs (§ 7 Abs. 1 Satz 4 EStG), die
+       Kosten erhoehen deren Bemessung -> anteilig (13 - Am) / 12. */
     var abschreiben = function (J, b, k) {
       var jb = b * satz / 100, rest = b, i = 0;
-      while (rest > 0.005 && i < 200) { var x = Math.min(jb, rest); add(J + i, k, x); rest -= x; i++; }
-      return Math.ceil(100 / satz - 1e-9);
+      while (rest > 0.005 && i < 200) {
+        var x = Math.min(i === 0 && A && Am && J === A ? jb * (13 - Am) / 12 : jb, rest);
+        add(J + i, k, x); rest -= x; i++;
+      }
+      return i;
     };
     var behandlung = (Array.isArray(l) ? l : []).map(function (e) {
       if (!e || !(zahl(e.jahr) > 0) || !(zahl(e.betrag) > 0)) return { art: 'leer' };
       var J = zahl(e.jahr), b = zahl(e.betrag);
-      if (e.art === 'herstellung') return { art: 'herstellung', jahre: abschreiben(J, b, 'afa'), jaehrlich: b * satz / 100, ab: J };
+      if (e.art === 'herstellung') return { art: 'herstellung', jahre: abschreiben(J, b, 'afa'), jaehrlich: b * satz / 100, ab: J, anteilig: !!(A && Am && J === A && Am > 1) };
       if (e.art !== 'erhaltung') return { art: 'offen' };
       var vert = String(e.vert || 'auto');
-      if (vert === 'auto' && ueber && imFenster(e)) return { art: 'anschaffungsnah', jahre: abschreiben(J, b, 'anah'), jaehrlich: b * satz / 100, ab: J };
+      if (vert === 'auto' && ueber && imFenster(e)) return { art: 'anschaffungsnah', jahre: abschreiben(J, b, 'anah'), jaehrlich: b * satz / 100, ab: J, anteilig: !!(A && Am && J === A && Am > 1), monatFehlt: grenzfall(e) };
       var n = vert === 'auto' ? 1 : Math.max(1, Math.min(5, parseInt(vert, 10) || 1));
       for (var i = 0; i < n; i++) add(J + i, 'erh', b / n);
-      return { art: 'erhaltung', jahre: n, jaehrlich: b / n, ab: J, fenster: imFenster(e), warnung: ueber && imFenster(e) && vert !== 'auto' };
+      return { art: 'erhaltung', jahre: n, jaehrlich: b / n, ab: J, fenster: imFenster(e), warnung: ueber && imFenster(e) && vert !== 'auto', monatFehlt: grenzfall(e) };
     });
-    return { jahre: jahre, fensterNetto: fenster, summeNetto: summe, grenze: grenze, ueber: ueber, A: A, behandlung: behandlung };
+    return { jahre: jahre, fensterNetto: fenster, summeNetto: summe, grenze: grenze, ueber: ueber, A: A, Am: Am || null,
+      fensterEnde: ende != null ? { jahr: Math.floor(ende / 12), monat: ende % 12 + 1 } : null, behandlung: behandlung };
   }
 
   /* ── Anbindung an das Formular ─────────────────────────────────────────── */
@@ -126,8 +155,9 @@
     else render();
   }
   /* Anschaffung = wirtschaftlicher Übergang, sonst Kaufdatum (wie sonderumlage.js) */
+  function anschaffung() { return datum((el('wirtschaftlicher_uebergang') || {}).value) || datum((el('kaufdat') || {}).value); }
   function anschaffungsjahr() {
-    var d = datum((el('wirtschaftlicher_uebergang') || {}).value) || datum((el('kaufdat') || {}).value);
+    var d = anschaffung();
     if (d) return d.getFullYear();
     try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear) { var y = DealPilotAnteilig.getBaseYear(); if (y) return y; } } catch (e) {}
     return null;
@@ -147,7 +177,9 @@
       var pa = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(sel) : { methode: 'linear', satzPct: zahl(sel) || 2 };
       satz = (pa.methode === 'linear' && pa.satzPct > 0) ? pa.satzPct : 3.0;
     }
-    return { A: p.A != null ? p.A : anschaffungsjahr(), grenze: grenze, sanNetto: sanNetto, ust: ust, afaSatz: satz };
+    var d = p.A != null ? null : anschaffung();   /* v3223: Monat und Tag des Uebergangs fuer Fenster und AfA */
+    return { A: p.A != null ? p.A : anschaffungsjahr(), Am: p.Am != null ? p.Am : (d ? d.getMonth() + 1 : null), Ad: p.Ad != null ? p.Ad : (d ? d.getDate() : null),
+      grenze: grenze, sanNetto: sanNetto, ust: ust, afaSatz: satz };
   }
 
   var LEER = { erh: 0, anah: 0, afa: 0 };
@@ -166,12 +198,14 @@
     var J = zahl(e.jahr), betrag = zahl(e.betrag);
     if (!J || !(betrag > 0)) return 'Jahr und Betrag eintragen.';
     var t = 'Cashflow: −' + eur(betrag) + ' einmalig im Jahr ' + J + ' (nicht in der Gesamtinvestition). Steuer: ';
-    if (b.art === 'herstellung') return t + 'Herstellungskosten - AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.';
-    if (b.art === 'anschaffungsnah') return t + '<span style="color:#B8625C;font-weight:600">anschaffungsnahe Herstellungskosten</span> (15-%-Grenze überschritten) - AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.';
+    var mf = b.monatFehlt ? ' <span style="color:#B8625C;font-weight:600">Monat eintragen:</span> ' + J + ' ist das Grenzjahr der 3-Jahres-Frist, ohne Monat zählt der Betrag vorsichtshalber mit.' : '';
+    var ant = b.anteilig ? ' Im Kaufjahr anteilig ab dem Monat des Übergangs, danach volle Jahre.' : ' Im Jahr der Maßnahme volles Jahr (R 7.4 Abs. 9 EStR).';
+    if (b.art === 'herstellung') return t + 'Herstellungskosten, AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant;
+    if (b.art === 'anschaffungsnah') return t + '<span style="color:#B8625C;font-weight:600">anschaffungsnahe Herstellungskosten</span> (15-%-Grenze überschritten), AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant + mf;
     if (b.art === 'erhaltung') {
       t += b.jahre > 1 ? 'Erhaltungsaufwand verteilt auf ' + b.jahre + ' Jahre (' + J + '–' + (J + b.jahre - 1) + '), je ' + eur(b.jaehrlich) + '.' : 'Erhaltungsaufwand, sofort absetzbar ' + J + '.';
       if (b.warnung) t += ' <span style="color:#B8625C;font-weight:600">Achtung:</span> im 3-Jahres-Fenster ist die 15-%-Grenze überschritten - steuerlich wären es anschaffungsnahe Herstellungskosten (Verteilung „automatisch“ rechnet das).';
-      return t;
+      return t + mf;
     }
     return t + 'wähle die Art - ohne Art geht der Betrag nur in den Cashflow.';
   }
@@ -189,6 +223,7 @@
           + '<div class="g2">'
           + '<div class="f"><label for="' + id + 'bez">Bezeichnung</label><input id="' + id + 'bez" data-sp="bez" type="text" list="sp-bez-liste" placeholder="z. B. Küche, Dach, Bad" value="' + esc(e.bez) + '"></div>'
           + '<div class="f"><label for="' + id + 'jahr">Jahr</label><input id="' + id + 'jahr" data-sp="jahr" data-zf-aus="1" type="text" inputmode="numeric" value="' + esc(e.jahr || '') + '"></div>'
+          + '<div class="f"><label for="' + id + 'monat">Monat <span class="dp-tip" data-tip="Nur nötig im Grenzjahr der 3-Jahres-Frist (15-%-Regel): dort entscheidet der Monat, ob die Erhaltung mitzählt.">ⓘ</span></label><select id="' + id + 'monat" data-sp="monat">' + opt('', '–', String(e.monat || '')) + ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'].map(function (n, k) { return opt(String(k + 1), n, String(e.monat || '')); }).join('') + '</select></div>'
           + '<div class="f"><label for="' + id + 'betrag">Betrag</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-sp="betrag" type="text" inputmode="decimal" class="trl" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div></div>'
           + '<div class="f"><label for="' + id + 'art">Art</label><select id="' + id + 'art" data-sp="art">' + opt('', '– bitte wählen –', e.art || '') + opt('erhaltung', 'Erhaltung (Werbungskosten)', e.art) + opt('herstellung', 'Herstellung (über die AfA)', e.art) + '</select></div>'
           + (e.art === 'erhaltung' ? '<div class="f"><label for="' + id + 'vert">Als Werbungskosten verteilt über</label><select id="' + id + 'vert" data-sp="vert">'
@@ -212,7 +247,7 @@
       if (r.fensterNetto > 0 && r.grenze > 0) {
         t += (r.ueber ? '<span style="color:#B8625C;font-weight:600">15-%-Grenze überschritten:</span> ' : '15-%-Grenze: ')
           + 'Sanierung ' + eur(r.summeNetto - r.fensterNetto) + ' + Erhaltung in den drei Jahren nach Kauf ' + eur(r.fensterNetto) + ' = ' + eur(r.summeNetto)
-          + ' netto von ' + eur(r.grenze) + ' (§ 6 Abs. 1 Nr. 1a EStG; im Grenzjahr ' + (r.A + 3) + ' zählt der Tag).'
+          + ' netto von ' + eur(r.grenze) + ' (§ 6 Abs. 1 Nr. 1a EStG' + (r.fensterEnde ? ', Frist bis einschließlich ' + ('0' + r.fensterEnde.monat).slice(-2) + '/' + r.fensterEnde.jahr : '') + ').'
           + (r.ueber ? ' Bei „automatisch“ laufen dann die Sanierungskosten oben und diese Einträge über die AfA. Mit dem Steuerberater abstimmen.' : '');
       }
       /* Abgrenzung Zielbild: dieselbe Arbeit nicht zweimal */
@@ -228,7 +263,7 @@
     var box = t.closest('.sp-eintrag'); if (!box) return;
     var l = liste(), e = l[+box.getAttribute('data-i')]; if (!e) return;
     var k = t.getAttribute('data-sp'), v = String(t.value || '').trim();
-    if (k === 'betrag' || k === 'jahr') e[k] = zahl(v);
+    if (k === 'betrag' || k === 'jahr' || k === 'monat') e[k] = zahl(v);
     else e[k] = v;
     speichern(l, k === 'art');   /* die Art blendet „verteilt über“ ein oder aus → neu zeichnen */
   });
@@ -237,8 +272,8 @@
     var box = t.closest('.sp-eintrag'); if (!box) return;
     var l = liste(), e = l[+box.getAttribute('data-i')]; if (!e) return;
     var k = t.getAttribute('data-sp');
-    if (e[k] === t.value) return;   /* schon über input gekommen */
-    e[k] = t.value; speichern(l, k === 'art');
+    if (String(e[k] == null ? '' : e[k]) === t.value) return;   /* schon über input gekommen */
+    e[k] = k === 'monat' ? zahl(t.value) : t.value; speichern(l, k === 'art');
   });
   document.addEventListener('click', function (ev) {
     var t = ev.target && ev.target.closest ? ev.target.closest('.sp-btn') : null; if (!t) return;

@@ -153,5 +153,27 @@ for (const [san, txt] of [['', 'ohne Sanierung'], ['20000', 'Sanierung 20.000 un
   melde(/var gi=kp\+nk\+v\('san'\);/.test(calcSrc) && !/gi=kp\+nk\+v\('san'\)\s*\+/.test(calcSrc), 'E calc.js: Gesamtinvestition bleibt kp + nk + san (Liste nicht darin)', null);
 }
 
+/* F · v3223 (Marcel 08.11.2026): Frist auf den Monat, AfA im Kaufjahr anteilig */
+{
+  const K = umgebung(true).sb.DpSanierungPlan.kern;
+  const ctx = (Am, Ad) => ({ A: 2026, Am, Ad, grenze: 29700, sanNetto: 0, ust: 'netto', afaSatz: 2 });
+  const fen = (e, Am, Ad) => K.steuerAus([Object.assign({ jahr: 2029, betrag: 10000, art: 'erhaltung', vert: 'auto' }, e)], ctx(Am, Ad)).fensterNetto;
+  melde(nahe(fen({ monat: 6 }, 7, 1), 10000), 'F Uebergang 01.07.2026: Juni 2029 im Fenster', fen({ monat: 6 }, 7, 1));
+  melde(nahe(fen({ monat: 7 }, 7, 1), 0), 'F Uebergang 01.07.2026: Juli 2029 ausserhalb', fen({ monat: 7 }, 7, 1));
+  melde(nahe(fen({ monat: 7 }, 7, 15), 10000), 'F Uebergang 15.07.2026: Juli 2029 zaehlt noch (Frist endet am 15.)', fen({ monat: 7 }, 7, 15));
+  melde(nahe(fen({ monat: 8 }, 7, 15), 0), 'F Uebergang 15.07.2026: August 2029 ausserhalb', fen({ monat: 8 }, 7, 15));
+  const ohne = K.steuerAus([{ jahr: 2029, betrag: 10000, art: 'erhaltung', vert: 'auto' }], ctx(7, 1));
+  melde(nahe(ohne.fensterNetto, 10000) && ohne.behandlung[0].monatFehlt === true, 'F Grenzjahr ohne Monat: zaehlt vorsichtig mit, meldet Monat fehlt', ohne.behandlung[0]);
+  const voll = K.steuerAus([{ jahr: 2028, betrag: 10000, art: 'erhaltung', vert: 'auto' }], ctx(7, 1));
+  melde(voll.behandlung[0].monatFehlt === false, 'F 2028 ganz im Fenster: kein Monat noetig', voll.behandlung[0]);
+  melde(nahe(fen({ monat: 3 }, null, null), 10000) && nahe(fen({ jahr: 2030 }, null, null), 0), 'F ohne Uebergangsmonat: Kalenderjahre 2026 bis 2029 wie bisher', [fen({ monat: 3 }, null, null), fen({ jahr: 2030 }, null, null)]);
+  const h = K.steuerAus([{ jahr: 2026, betrag: 12000, art: 'herstellung' }], ctx(7, 1));
+  melde(nahe(h.jahre[2026].afa, 120) && nahe(h.jahre[2027].afa, 240), 'F Herstellung im Kaufjahr (Uebergang Juli): 2026 6/12 = 120, 2027 volles Jahr 240', [h.jahre[2026], h.jahre[2027]]);
+  const hs = Object.values(h.jahre).reduce((x, j) => x + j.afa, 0);
+  melde(nahe(hs, 12000) && h.behandlung[0].anteilig === true, 'F Summe bleibt 12.000, als anteilig markiert', hs);
+  const h2 = K.steuerAus([{ jahr: 2028, betrag: 12000, art: 'herstellung' }], ctx(7, 1));
+  melde(nahe(h2.jahre[2028].afa, 240) && h2.behandlung[0].anteilig === false, 'F Herstellung nach dem Kaufjahr: volles Jahr (R 7.4 Abs. 9 EStR)', h2.jahre[2028]);
+}
+
 console.log((fehler ? 'ROT' : 'GRUEN') + ': ' + (geprueft - fehler) + '/' + geprueft + ' Pruefungen bestanden');
 process.exit(fehler ? 1 : 0);

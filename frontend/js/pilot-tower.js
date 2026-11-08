@@ -344,8 +344,13 @@
   function einstellungenHtml() {
     var a = ort();
     /* v3218 · W-4: mit der Pilot-Blase gibt es keinen Ruheort mehr zu waehlen */
-    if (window.DealPilotBlase) return '<hr class="dvd"><h3 class="set-section-h">Pilot · Blase und F1</h3>'
-      + '<p class="hint" style="margin-bottom:10px">Der Pilot sitzt als Blase unten rechts, in jeder Ansicht: Fragen, Änderungen per Chat („Miete auf 9 €/m² erhöhen“ – du bestätigst) und Unterlagen über die Klammer. F1 oder ? erklärt das Feld, auf dem du gerade bist.</p>'
+    if (window.DealPilotBlase) return '<hr class="dvd"><h3 class="set-section-h">Pilot</h3>'
+      + '<p class="hint" style="margin-bottom:10px">Der Pilot steht unten rechts, in jeder Ansicht: Fragen, Änderungen per Chat („Miete auf 9 €/m² erhöhen“ – du bestätigst) und Unterlagen über die Klammer. Im Fenster erklärt „Feld erklären“ das Feld, auf dem du gerade bist (auch mit F1), „Hilfe“ öffnet die ganze Hilfe.</p>'
+      /* v3223 · Marcel 08.11.2026: ein- und ausschaltbar; aus = oben über das Fragezeichen */
+      + '<label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;cursor:pointer;font-size:13px;line-height:1.4">'
+      + '<input type="checkbox" id="dp-pilot-blase-an" style="margin-top:2px" ' + (DealPilotBlase.istAn && !DealPilotBlase.istAn() ? '' : 'checked ')
+      + 'onchange="DealPilotBlase.setzeAn && DealPilotBlase.setzeAn(this.checked)">'
+      + '<span><b>Pilot unten rechts anzeigen</b><br><span class="hint" style="color:var(--muted)">Ausgeschaltet rufst du ihn oben über das Fragezeichen. Gilt für dein Konto.</span></span></label>'
       + '<label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;cursor:pointer;font-size:13px;line-height:1.4">'
       + '<input type="checkbox" style="margin-top:2px" ' + (window.DpHinweise && DpHinweise.aus('erklaer') ? '' : 'checked ')
       + 'onchange="window.DpHinweise && DpHinweise.setze(\'erklaer\', !this.checked)">'

@@ -29,6 +29,17 @@
                   wo sie stehen, steigt die Blase ueber sie (platz()).
      unter 641 px die Datenaufnahme-Schublade (.dp-pf-scroll.dp-pf-open,
                   z 1100): offen tritt die Blase zurueck.
+
+   v3223 · Marcel 08.11.2026: „der Pilot soll echt aussehen, den anderen Piloten
+   kannst du rausnehmen. Aus dem Chatfenster kann man den anderen aufrufen und in
+   die Hilfe gelangen. Wenn er ausgeschaltet ist, soll er oben über das Fragezeichen
+   gerufen werden können."
+     · Knopf = die GANZE Figur (pilot-figur.js), stehend, ohne Kreis - wie der
+       Mechaniker des Bordbuchs. Der Tower-Pilot (#dp-pilot) wird nicht mehr gezeigt;
+       der Tower selbst (Feld-Erklärung, Suche, Abläufe) bleibt und ist im Fenster
+       über „Feld erklären“ erreichbar, die Hilfe über „Hilfe“.
+     · Ein/Aus: Einstellungen › Allgemein › Pilot, am Konto (DpHinweise 'pilot_blase',
+       Rückfall localStorage). Aus = keine Figur; das Fragezeichen oben öffnet das Fenster.
    ═════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DealPilotBlase) return;
@@ -43,18 +54,23 @@
     if (el('dp-blase-css')) return;
     var st = document.createElement('style'); st.id = 'dp-blase-css';
     st.textContent = [
-      '#dp-blase-fab{position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:50%;z-index:10055;cursor:pointer;padding:0;overflow:hidden;background:#141210;border:2px solid ' + G + ';box-shadow:0 8px 22px rgba(0,0,0,.38);display:none;transition:transform .15s,bottom .25s}',
+      /* v3223: die ganze Figur, stehend, ohne Kreis (wie der Bordbuch-Mechaniker) */
+      '#dp-blase-fab{position:fixed;right:16px;bottom:12px;width:56px;height:89px;z-index:10055;cursor:pointer;padding:0;border:0;background:transparent;filter:drop-shadow(0 8px 10px rgba(0,0,0,.32));display:none;transition:transform .15s,bottom .25s}',
       '#dp-blase-fab.an{display:block}',
-      '#dp-blase-fab:hover{transform:translateY(-2px)}',
-      '#dp-blase-fab:focus-visible{outline:3px solid ' + GH + ';outline-offset:2px}',
-      '#dp-blase-fab .pf-wrap{display:block;width:92px;height:148px;margin:-4px 0 0 -20px;pointer-events:none}',
-      '#dp-blase-fab .pf-wrap svg{width:100%;height:100%;display:block}',
-      '#dp-blase-fab .pf .schatten{display:none}',
+      '#dp-blase-fab:hover{transform:translateY(-3px)}',
+      '#dp-blase-fab:focus-visible{outline:3px solid ' + GH + ';outline-offset:2px;border-radius:10px}',
+      '#dp-blase-fab .pf-wrap{display:block;width:100%;height:100%;pointer-events:none}',
+      '#dp-blase-fab .pf-wrap svg{width:100%;height:100%;display:block;overflow:visible}',
+      '#dp-blase-fab .dpb-schild{position:absolute;right:0;bottom:calc(100% + 4px);white-space:nowrap;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.04em;background:#141210;color:#f3ead0;border:1px solid ' + G + ';border-radius:6px;padding:3px 7px;opacity:0;transition:opacity .2s;pointer-events:none}',
+      '#dp-blase-fab:hover .dpb-schild,#dp-blase-fab:focus-visible .dpb-schild{opacity:1}',
+      '#dp-blase-fab.auf .dpb-schild{display:none}',
+      /* der Tower-Pilot ist nicht mehr zu sehen - sein Tower bleibt */
+      '#dp-pilot{display:none !important}',
       '#dp-blase-fab .ersatz{display:grid;place-items:center;width:100%;height:100%;color:' + GH + '}',
       '#dp-blase-fab .ersatz svg{width:24px;height:24px}',
-      '#dp-blase-fab.auf{box-shadow:0 0 0 4px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent),0 8px 22px rgba(0,0,0,.38)}',
+      '#dp-blase-fab.auf{filter:drop-shadow(0 0 6px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)) drop-shadow(0 8px 10px rgba(0,0,0,.32))}',
       /* Bordbuch-Mechaniker (nur Entwicklungspartner) rueckt links neben die Blase */
-      '#dp-bb-fab{right:86px !important}',
+      '#dp-bb-fab{right:82px !important}',
       '#dp-blase{position:fixed;right:18px;bottom:86px;z-index:10054;width:min(430px,calc(100vw - 24px));height:min(640px,calc(100vh - 120px));display:none;flex-direction:column;background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45);overflow:hidden;font-family:Inter,system-ui,sans-serif}',
       '#dp-blase.an{display:flex;animation:dpb-auf .22s cubic-bezier(.2,1.2,.4,1)}',
       '@keyframes dpb-auf{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}',
@@ -63,6 +79,9 @@
       '#dp-blase .dpb-t{font:600 14px "Space Grotesk",sans-serif;color:' + GH + '}',
       '#dp-blase .dpb-s{font:500 10.5px "JetBrains Mono",monospace;color:#b9ad8f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '#dp-blase .dpb-f1{border:1px solid ' + G + ';background:transparent;color:' + GH + ';border-radius:7px;padding:4px 8px;font:600 11px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+      '#dp-blase .dpb-hilfe{border:1px solid rgba(243,234,208,.35);background:transparent;color:#f3ead0;border-radius:7px;padding:4px 8px;font:600 11px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+      '#dp-blase .dpb-hilfe:hover,#dp-blase .dpb-f1:hover{background:rgba(243,234,208,.08)}',
+      '#dp-blase.ohne-fab{bottom:18px !important}',
       '#dp-blase .dpb-zu{background:none;border:0;color:#b9ad8f;font-size:22px;line-height:1;cursor:pointer;padding:0 4px}',
       '#dp-blase .dpb-rumpf{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}',
       /* copilot.js baut #dp-cp als Karte (style.css) - im Fenster fuellt er die Hoehe */
@@ -78,9 +97,9 @@
       '#dp-blase.zieht{outline:3px dashed ' + G + ';outline-offset:-6px}',
       '#dp-cp-verweis{margin-top:18px;padding:12px 16px;border:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);border-radius:14px;background:#FBFAF6;font:13px/1.5 Inter,sans-serif;color:#5C554E;display:flex;gap:12px;align-items:center;flex-wrap:wrap}',
       '#dp-cp-verweis button{border:0;border-radius:9px;background:' + G + ';color:#1a1407;font:600 12.5px Inter,sans-serif;padding:7px 12px;cursor:pointer}',
-      '@media (max-width:640px){#dp-blase-fab{right:12px;bottom:12px;width:50px;height:50px}#dp-blase-fab .pf-wrap{width:82px;height:132px;margin:-4px 0 0 -18px}'
+      '@media (max-width:640px){#dp-blase-fab{right:10px;bottom:10px;width:46px;height:73px}'
         + '#dp-blase{left:8px;right:8px !important;bottom:8px !important;width:auto;height:min(80vh,calc(100vh - 70px));z-index:10056}'
-        + '#dp-blase .dp-cp-in{font-size:16px !important}#dp-blase .dpb-f1{display:none}#dp-bb-fab{right:72px !important}}',
+        + '#dp-blase .dp-cp-in{font-size:16px !important}#dp-blase .dpb-f1{display:none}#dp-bb-fab{right:64px !important}}',
       '@media (prefers-reduced-motion:reduce){#dp-blase.an{animation:none}#dp-blase-fab{transition:none}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -95,11 +114,11 @@
     css();
     fab = document.createElement('button');
     fab.type = 'button'; fab.id = 'dp-blase-fab';
-    fab.title = 'Pilot: Fragen und Änderungen per Chat (F1 erklärt das Feld)';
+    fab.title = 'Pilot: Fragen, Änderungen per Chat, Feld-Erklärung und Hilfe';
     fab.setAttribute('aria-label', 'Pilot-Chat öffnen');
     fab.setAttribute('aria-expanded', 'false');
     try {
-      if (window.DealPilotFigur) { DealPilotFigur.css(); fab.innerHTML = '<span class="pf-wrap">' + DealPilotFigur.svg({}) + '</span>'; }
+      if (window.DealPilotFigur) { DealPilotFigur.css(); fab.innerHTML = '<span class="pf-wrap">' + DealPilotFigur.svg({}) + '</span><span class="dpb-schild">Pilot fragen</span>'; }
       else fab.innerHTML = '<span class="ersatz">' + FLIEGER + '</span>';
     } catch (e) { fab.innerHTML = '<span class="ersatz">' + FLIEGER + '</span>'; }
     fab.addEventListener('click', function () { offen ? zu() : auf(); });
@@ -107,12 +126,17 @@
     fenster = document.createElement('div');
     fenster.id = 'dp-blase'; fenster.setAttribute('role', 'dialog'); fenster.setAttribute('aria-label', 'Pilot');
     fenster.innerHTML = '<div class="dpb-k"><div class="dpb-tt"><span class="dpb-t">Pilot</span><span class="dpb-s" id="dp-blase-bezug"></span></div>'
-      + '<button type="button" class="dpb-f1" title="Erklärt das Feld unter Maus oder Cursor - überall auch mit F1 oder ?">Feld erklären · F1</button>'
+      + '<button type="button" class="dpb-f1" title="Erklärt das Feld unter Maus oder Cursor, sucht in Hilfe und Abläufen - überall auch mit F1">Feld erklären · F1</button>'
+      + '<button type="button" class="dpb-hilfe" title="Die ganze Hilfe: Themen, Anleitungen, Abläufe">Hilfe</button>'
       + '<button type="button" class="dpb-zu" aria-label="Schließen">×</button></div>'
       + '<div class="dpb-rumpf" id="dp-blase-rumpf"></div>';
     document.body.appendChild(fenster);
     document.body.appendChild(fab);
     fenster.querySelector('.dpb-zu').addEventListener('click', zu);
+    fenster.querySelector('.dpb-hilfe').addEventListener('click', function () {
+      zu();
+      try { if (typeof window.showHelp === 'function') window.showHelp(); } catch (e) {}
+    });
     fenster.querySelector('.dpb-f1').addEventListener('click', function () {
       zu();
       try { if (window.DealPilotPilot && DealPilotPilot.rufen) DealPilotPilot.rufen(); } catch (e) {}
@@ -215,6 +239,7 @@
     ausstatten();
     bezug();
     offen = true;
+    fenster.classList.toggle('ohne-fab', !istAn());
     fenster.classList.add('an'); fab.classList.add('auf'); fab.setAttribute('aria-expanded', 'true');
     var inp = el('dp-cp-in');
     setTimeout(function () { try { if (inp) inp.focus({ preventScroll: true }); } catch (e) {} }, 60);
@@ -249,10 +274,27 @@
     var r = x.getBoundingClientRect();
     return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
   }
-  var GRUND = 18;
+  /* v3223 · Ein/Aus am Konto (DpHinweise speichert in user_settings), Rueckfall dieses Geraet */
+  function istAn() {
+    try { if (window.DpHinweise && DpHinweise.aus) return !DpHinweise.aus('pilot_blase'); } catch (e) {}
+    try { return localStorage.getItem('dp_pilot_blase') !== 'aus'; } catch (e) { return true; }
+  }
+  function setzeAn(an) {
+    try { localStorage.setItem('dp_pilot_blase', an ? 'an' : 'aus'); } catch (e) {}
+    try { if (window.DpHinweise && DpHinweise.setze) DpHinweise.setze('pilot_blase', !an); } catch (e) {}
+    if (!an && offen) zu();
+    platz();
+    try { if (window.showToast) showToast(an ? 'Pilot unten rechts eingeblendet' : 'Pilot ausgeblendet - oben über das Fragezeichen erreichbar'); } catch (e) {}
+  }
+  /* Fragezeichen in der Kopfleiste: oeffnet das Pilot-Fenster (darin: Feld erklaeren, Hilfe) */
+  function fragezeichen() {
+    if (!angemeldet()) { try { if (typeof window.showHelp === 'function') window.showHelp(); } catch (e) {} return; }
+    offen ? zu() : auf();
+  }
+  var GRUND = 12;
   function platz() {
     if (!fab) return;
-    var an = angemeldet();
+    var an = angemeldet() && istAn();
     /* Handy: offene Datenaufnahme-Schublade (z 1100, von unten) hat Vorrang */
     var schublade = innerWidth <= 640 && document.querySelector('.dp-pf-scroll.dp-pf-open');
     var zeigen = an && !schublade;
@@ -265,10 +307,11 @@
       }
     }
     fab.classList.toggle('an', zeigen);
-    if (!an && offen) zu();
+    if (!angemeldet() && offen) zu();
+    if (fenster) fenster.classList.toggle('ohne-fab', !an);
     if (!zeigen) return;
     /* Werkzeuge unten rechts: die Blase steigt ueber sie */
-    var grund = innerWidth <= 640 ? 12 : GRUND, boden = grund;
+    var grund = innerWidth <= 640 ? 10 : GRUND, boden = grund;
     ['.dpl-schalter', '#dp-kv-panel', '.dp-pf-mtrigger'].forEach(function (sel) {
       var x = document.querySelector(sel);
       if (!x || !sichtbar(x)) return;
@@ -277,7 +320,7 @@
     });
     var px = boden + 'px';
     if (fab.style.bottom !== px) fab.style.bottom = px;
-    if (fenster && innerWidth > 640) { var fb = (boden + 68) + 'px'; if (fenster.style.bottom !== fb) fenster.style.bottom = fb; }
+    if (fenster && innerWidth > 640) { var fb = (boden + 100) + 'px'; if (fenster.style.bottom !== fb) fenster.style.bottom = fb; }
   }
 
   /* ── Tasten ─────────────────────────────────────────────────────────── */
@@ -307,6 +350,6 @@
   bauen();   /* synchron: der Rumpf muss stehen, bevor copilot.js montiert */
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  window.DealPilotBlase = { VERSION: 'v3218', auf: auf, zu: zu, anhaengen: anhaengen, platz: platz,
-    istOffen: function () { return offen; } };
+  window.DealPilotBlase = { VERSION: 'v3223', auf: auf, zu: zu, anhaengen: anhaengen, platz: platz,
+    istOffen: function () { return offen; }, istAn: istAn, setzeAn: setzeAn, fragezeichen: fragezeichen };
 })();
