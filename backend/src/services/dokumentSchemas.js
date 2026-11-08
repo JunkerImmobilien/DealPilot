@@ -298,7 +298,9 @@ const SCHEMATA = {
       '  "verwalter": string,',
       '  "instandhaltungsruecklage_eur": number,',
       '  "hausgeld_monatlich_eur": number,',
-      '  "sonderumlagen_geplant": [{"beschreibung": string, "betrag_eur": number, "jahr": number}],',
+      /* v3211 · Raten, Betrag der Wohnung, Fälligkeit und Status - bis v3210 nur {beschreibung, betrag_eur, jahr};
+         betrag_eur bleibt als Name des Gesamtbetrags, damit alte und neue Auswertungen gleich gelesen werden */
+      '  "sonderumlagen_geplant": [{"beschreibung": string, "betrag_eur": number (Betrag der ganzen Gemeinschaft), "betrag_einheit_eur": number|null (Betrag einer bestimmten Wohnung, nur wenn im Dokument genannt), "jahr": number (Jahr der Faelligkeit), "faellig": string|null DD.MM.JJJJ, "raten": [{"faellig": string|null DD.MM.JJJJ, "jahr": number|null, "betrag_gesamt_eur": number|null, "betrag_einheit_eur": number|null}], "status": "beschlossen"|"angekuendigt"}],',
       '  "beschluesse_wichtig": [string],',
       '  "geplante_sanierungen": [{"gewerk": string, "jahr": number, "kosten_geschaetzt_eur": number}],',
       /* v3016 · Marcel 28.10.2026: „WEG Protokolle sollen ausgewertet werden und die
@@ -313,7 +315,8 @@ const SCHEMATA = {
       '  "hausgeldrueckstaende": string,',
       '  "verwalterwechsel": string,',
       '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}]',
-      '}'
+      '}',
+      'Sonderumlagen: status "beschlossen" nur, wenn die Versammlung die Umlage per Beschluss festgesetzt hat; nur angekuendigt, diskutiert, vertagt oder fuer spaeter in Aussicht gestellt = "angekuendigt". Wird in Raten gezahlt (z. B. "in 2 Raten zum 01.03. und 01.09.2027" oder ueber zwei Jahre), jede Rate einzeln in "raten" mit ihrer Faelligkeit und ihrem Betrag; bei "gleichen Raten" den Gesamtbetrag durch die Zahl der Raten teilen. Ohne Raten bleibt "raten" leer und "faellig" traegt den Termin. Keinen Betrag oder Termin erfinden: was nicht im Dokument steht, ist null.'
     ],
     zahlen: {
       instandhaltungsruecklage_eur: [0, 1e8],
@@ -541,7 +544,7 @@ const SCHEMATA = {
       '  "einzel": null | {"hausgeld_monat_eur": number, "kosten_jahr_eur": number, "umlagefaehig_jahr_eur": number, "nicht_umlagefaehig_jahr_eur": number (OHNE Ruecklagenzufuehrung), "ruecklage_zufuehrung_jahr_eur": number, "verwaltung_jahr_eur": number},',
       '  "ruecklage_stand_eur": number|null (Stand der Erhaltungsruecklage der Gemeinschaft),',
       '  "ruecklage_entnahmen": [{"zweck": string, "betrag_eur": number}] (Entnahmen aus der Ruecklage im Jahr, z. B. fuer Reparaturen),',
-      '  "sonderumlagen": [{"zweck": string, "betrag_gesamt_eur": number, "betrag_einheit_eur": number|null, "jahr": number, "faellig": string|null}],',
+      '  "sonderumlagen": [{"zweck": string, "betrag_gesamt_eur": number, "betrag_einheit_eur": number|null, "jahr": number, "faellig": string|null DD.MM.JJJJ, "raten": [{"faellig": string|null DD.MM.JJJJ, "jahr": number|null, "betrag_gesamt_eur": number|null, "betrag_einheit_eur": number|null}]}] (in Raten faellig: jede Rate einzeln in "raten", sonst "raten" leer; v3211),',
       '  "abrechnungsergebnis_eur": number|null (nur Jahresabrechnung: Nachzahlung positiv, Guthaben negativ),',
       '  "positionen": [{"bezeichnung": string, "betrag_gesamt_eur": number|null, "betrag_einheit_eur": number|null, "umlagefaehig": true|false|null}]',
       '}',

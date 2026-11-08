@@ -91,7 +91,14 @@
   function uebernehmen(s) {
     if (!s || !(zahl(s.betrag) > 0) || !zahl(s.jahr)) return false;
     var l = liste();
-    var gleich = l.filter(function (x) { return zahl(x.jahr) === zahl(s.jahr) && Math.abs((zahl(x.betrag) || 0) - zahl(s.betrag)) <= 1; })[0];
+    /* v3211 · Raten: zwei gleich hohe Raten im selben Jahr mit verschiedenem Fälligkeitstag sind keine
+       Dublette. Gleich ist, was Jahr + Betrag teilt und keinen ABWEICHENDEN Tag trägt. */
+    var tagS = datum(s.faellig);
+    var gleich = l.filter(function (x) {
+      if (zahl(x.jahr) !== zahl(s.jahr) || Math.abs((zahl(x.betrag) || 0) - zahl(s.betrag)) > 1) return false;
+      var tagX = datum(x.faellig);
+      return !(tagS && tagX && tagS.getTime() !== tagX.getTime());
+    })[0];
     if (gleich) { if (!gleich.faellig && s.faellig) { gleich.faellig = s.faellig; speichern(l, true); } return true; }
     l.push({ zweck: s.zweck || 'Sonderumlage', jahr: zahl(s.jahr), faellig: s.faellig || '', betrag: Math.round(zahl(s.betrag)),
       wie: s.wie || '', quelle: s.quelle || '', verw_jahr: zahl(s.jahr), art: '' });
@@ -225,5 +232,6 @@
     if (t.hasAttribute('data-wsu-zurueck')) { var j = +t.getAttribute('data-wsu-zurueck'); if (l[j]) { steuerAbziehen(l[j]); speichern(l, true); } return; }
   });
 
-  window.DpSonderumlage = { liste: liste, jeJahr: jeJahr, uebernehmen: uebernehmen, render: render, grenze15: grenze15 };
+  window.DpSonderumlage = { liste: liste, jeJahr: jeJahr, uebernehmen: uebernehmen, render: render, grenze15: grenze15,
+    _test: { vorUebergang: vorUebergang, datum: datum } };   /* v3211 · für tools/sonderumlage-pruefen.mjs */
 })();

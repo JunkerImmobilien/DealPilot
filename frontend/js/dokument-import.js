@@ -288,23 +288,91 @@
     var meaWie = '';
     if (!(mea > 0) && ext.mea && window.DpUnterlagen && window.DpUnterlagen.meaProzent) { var mp = window.DpUnterlagen.meaProzent(ext.mea); if (mp > 0) { mea = mp; meaWie = ' (laut Plan ' + ext.mea + ')'; } }
     var quelle = typ === 'hausgeld' ? ((ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '')) : ('Protokoll' + (ext.versammlungsdatum ? ' ' + ext.versammlungsdatum : ''));
+    /* v3211 · Raten, Fälligkeit und Status auch aus dem Protokoll (Schema seit v3211: betrag_gesamt_eur/
+       betrag_einheit_eur/faellig/raten/status). Gespeicherte Auswertungen von vorher tragen nur
+       beschreibung/betrag_eur/jahr - die werden weiter gelesen wie bisher (ohne Status = wie beschlossen). */
     var roh = typ === 'hausgeld'
-      ? (ext.sonderumlagen || []).map(function (x) { return { zweck: x.zweck, gesamt: _zahl(x.betrag_gesamt_eur), einheit: _zahl(x.betrag_einheit_eur), jahr: _zahl(x.jahr) || _zahl(ext.jahr), faellig: x.faellig || '' }; })
-      : (ext.sonderumlagen_geplant || []).map(function (x) { return { zweck: String(x.beschreibung || '').replace(/^\s*sonderumlage\s*(für|fuer)?\s*/i, ''), gesamt: _zahl(x.betrag_eur), einheit: null, jahr: _zahl(x.jahr), faellig: '' }; });
+      ? (ext.sonderumlagen || []).map(function (x) { return { zweck: x.zweck, gesamt: _zahl(x.betrag_gesamt_eur), einheit: _zahl(x.betrag_einheit_eur), jahr: _zahl(x.jahr) || _zahl(ext.jahr), faellig: x.faellig || '', raten: x.raten, status: x.status }; })
+      : (ext.sonderumlagen_geplant || []).map(function (x) {
+          var g = _zahl(x.betrag_gesamt_eur); if (g == null) g = _zahl(x.betrag_eur);
+          return { zweck: String(x.beschreibung || x.zweck || '').replace(/^\s*sonderumlage\s*(für|fuer)?\s*/i, ''), gesamt: g, einheit: _zahl(x.betrag_einheit_eur), jahr: _zahl(x.jahr), faellig: x.faellig || '', raten: x.raten, status: x.status };
+        });
+    var meaText = String(Math.round(mea * 100) / 100).replace('.', ',');
+    /* Anteil dieses Objekts an EINEM Betrag (Einmalbetrag oder Rate). gesamtGanz/einheitGanz: die Beträge
+       der ganzen Umlage, damit eine Rate ohne eigenen Wohnungsbetrag anteilig aus dem Wohnungsbetrag der
+       Umlage folgt (gleicher Anteil, keine Schätzung). */
+    function anteil(gesamt, einheit, gesamtGanz, einheitGanz) {
+      if (etw) {
+        if (einheit != null && einheit > 0) return { betrag: einheit, wie: 'Betrag der Wohnung laut ' + quelle };
+        if (gesamt > 0 && mea > 0) return { betrag: gesamt * mea / 100, wie: _fmt(gesamt) + ' € der Gemeinschaft × Miteigentumsanteil ' + meaText + ' %' + meaWie };
+        if (gesamt > 0 && einheitGanz > 0 && gesamtGanz > 0) return { betrag: einheitGanz * gesamt / gesamtGanz, wie: 'Betrag der Wohnung ' + _fmt(einheitGanz) + ' € laut ' + quelle + ', anteilig auf die Rate (' + _fmt(gesamt) + ' von ' + _fmt(gesamtGanz) + ' € der Gemeinschaft)' };
+        if (gesamt > 0) return { ohneMea: true };
+        return null;
+      }
+      if (art) return gesamt > 0 ? { betrag: gesamt, wie: 'Betrag der Gemeinschaft laut ' + quelle + ' (ganzes Haus)' } : null;
+      return einheit > 0 ? { betrag: einheit, wie: 'Betrag der Wohnung laut ' + quelle + ' - Objektart noch offen, bitte prüfen' } : null;
+    }
     var aus = [];
     roh.forEach(function (x) {
-      var betrag = null, wie = '';
-      if (etw) {
-        if (x.einheit != null && x.einheit > 0) { betrag = x.einheit; wie = 'Betrag der Wohnung laut ' + quelle; }
-        else if (x.gesamt > 0 && mea > 0) { betrag = x.gesamt * mea / 100; wie = _fmt(x.gesamt) + ' € der Gemeinschaft × Miteigentumsanteil ' + String(Math.round(mea * 100) / 100).replace('.', ',') + ' %' + meaWie; }
-        else if (x.gesamt > 0) { aus.push({ hinweis: 'Sonderumlage ' + (x.zweck || '') + ' (' + _fmt(x.gesamt) + ' € der Gemeinschaft) nicht übernommen - ohne Miteigentumsanteil ist der Anteil der Wohnung offen. Trag den MEA im Reiter Objekt ein und lies die Unterlage erneut ein.' }); return; }
-      } else if (art) {
-        if (x.gesamt > 0) { betrag = x.gesamt; wie = 'Betrag der Gemeinschaft laut ' + quelle + ' (ganzes Haus)'; }
-      } else if (x.einheit > 0) { betrag = x.einheit; wie = 'Betrag der Wohnung laut ' + quelle + ' - Objektart noch offen, bitte prüfen'; }
-      if (!(betrag > 0) || !x.jahr) return;
-      aus.push({ zweck: String(x.zweck || 'Sonderumlage').trim(), jahr: x.jahr, faellig: String(x.faellig || ''), betrag: Math.round(betrag), gesamt: x.gesamt || null, wie: wie, quelle: quelle });
+      var zweck = String(x.zweck || 'Sonderumlage').trim() || 'Sonderumlage';
+      var f = _datumNorm(x.faellig), jahr = f.jahr || x.jahr;
+      var status = String(x.status || '').toLowerCase();
+      var raten = (Array.isArray(x.raten) ? x.raten : []).filter(function (r) { return r && typeof r === 'object'; }).map(function (r) {
+        var rf = _datumNorm(r.faellig);
+        return { gesamt: _zahl(r.betrag_gesamt_eur), einheit: _zahl(r.betrag_einheit_eur), faellig: rf.text, jahr: rf.jahr || _zahl(r.jahr) };
+      });
+      var nurAngekuendigt = status && status !== 'beschlossen';   /* „angekuendigt", „diskutiert" … */
+      /* Ankündigung: Hinweis mit dem Anteil, wenn er sich rechnen lässt - nie in den Cashflow */
+      if (nurAngekuendigt) {
+        var summe = x.gesamt, summeE = x.einheit;
+        if (!(summe > 0) && raten.length) summe = raten.reduce(function (s, r) { return s + (r.gesamt || 0); }, 0) || null;
+        var a0 = anteil(summe, summeE, null, null);
+        aus.push({ hinweis: 'Sonderumlage ' + zweck + (summe > 0 ? ' (' + _fmt(summe) + ' € der Gemeinschaft' + (jahr ? ', ' + jahr : '') + ')' : (jahr ? ' (' + jahr + ')' : ''))
+          + ' laut ' + quelle + ' nur angekündigt, nicht beschlossen - nicht in den Cashflow übernommen'
+          + (a0 && a0.betrag > 0 ? '; Anteil dieses Objekts rund ' + _fmt(Math.round(a0.betrag)) + ' €' : '')
+          + '. Kommt der Beschluss, trag sie im Reiter Bewirtschaftung unter Sonderumlagen ein.', angekuendigt: true });
+        return;
+      }
+      if (!raten.length) {
+        var a = anteil(x.gesamt, x.einheit, null, null);
+        if (a && a.ohneMea) { aus.push({ hinweis: 'Sonderumlage ' + (x.zweck || '') + ' (' + _fmt(x.gesamt) + ' € der Gemeinschaft) nicht übernommen - ohne Miteigentumsanteil ist der Anteil der Wohnung offen. Trag den MEA im Reiter Objekt ein und lies die Unterlage erneut ein.' }); return; }
+        if (!a || !(a.betrag > 0) || !jahr) return;
+        aus.push({ zweck: zweck, jahr: jahr, faellig: f.text, betrag: Math.round(a.betrag), gesamt: x.gesamt || null, wie: a.wie, quelle: quelle });
+        return;
+      }
+      /* Raten: Summe gegen den Gesamtbetrag prüfen (1 € Rundung je Rate). Passt sie nicht, oder fehlt einer
+         Rate Betrag oder Jahr, kommt ein Hinweis - keine stille Rechnung mit einer der beiden Zahlen. */
+      var n = raten.length, tol = n;
+      var rateText = raten.map(function (r, i) { return 'Rate ' + (i + 1) + ': ' + (r.gesamt != null ? _fmt(r.gesamt) + ' €' : (r.einheit != null ? _fmt(r.einheit) + ' € Wohnung' : 'ohne Betrag')) + (r.faellig ? ' am ' + r.faellig : (r.jahr ? ' ' + r.jahr : ' ohne Termin')); }).join(', ');
+      var problem = '';
+      if (raten.some(function (r) { return !(r.gesamt > 0) && !(r.einheit > 0); })) problem = 'nicht jede Rate hat einen Betrag';
+      else if (raten.some(function (r) { return !r.jahr; })) problem = 'nicht jede Rate hat einen Termin';
+      else {
+        var sG = raten.every(function (r) { return r.gesamt != null; }) ? raten.reduce(function (s, r) { return s + r.gesamt; }, 0) : null;
+        var sE = raten.every(function (r) { return r.einheit != null; }) ? raten.reduce(function (s, r) { return s + r.einheit; }, 0) : null;
+        if (x.gesamt > 0 && sG != null && Math.abs(sG - x.gesamt) > tol) problem = 'die Raten ergeben ' + _fmt(sG) + ' €, der Gesamtbetrag ist ' + _fmt(x.gesamt) + ' €';
+        else if (x.einheit > 0 && sE != null && Math.abs(sE - x.einheit) > tol) problem = 'die Raten der Wohnung ergeben ' + _fmt(sE) + ' €, der Betrag der Wohnung ist ' + _fmt(x.einheit) + ' €';
+      }
+      if (problem) { aus.push({ hinweis: 'Sonderumlage ' + zweck + ' laut ' + quelle + ' nicht übernommen - ' + problem + ' (' + rateText + '). Bitte im Dokument prüfen und die Raten im Reiter Bewirtschaftung unter Sonderumlagen eintragen.' }); return; }
+      var teile = [], ohneMea = false;
+      raten.forEach(function (r, i) {
+        var ar = anteil(r.gesamt, r.einheit, x.gesamt, x.einheit);
+        if (ar && ar.ohneMea) { ohneMea = true; return; }
+        if (!ar || !(ar.betrag > 0)) return;
+        teile.push({ zweck: zweck + ' · Rate ' + (i + 1) + '/' + n, jahr: r.jahr, faellig: r.faellig, betrag: Math.round(ar.betrag), gesamt: r.gesamt || null, wie: ar.wie + ' · Rate ' + (i + 1) + ' von ' + n, quelle: quelle });
+      });
+      if (ohneMea) { aus.push({ hinweis: 'Sonderumlage ' + zweck + ' (' + rateText + ') nicht übernommen - ohne Miteigentumsanteil ist der Anteil der Wohnung offen. Trag den MEA im Reiter Objekt ein und lies die Unterlage erneut ein.' }); return; }
+      if (teile.length !== n) { aus.push({ hinweis: 'Sonderumlage ' + zweck + ' laut ' + quelle + ' nicht übernommen - nicht jede Rate lässt sich diesem Objekt zuordnen (' + rateText + '). Bitte im Reiter Bewirtschaftung unter Sonderumlagen eintragen.' }); return; }
+      teile.forEach(function (t) { aus.push(t); });
     });
     return aus;
+  }
+  /* v3211 · Fälligkeit „1.3.2027" oder „2027-03-01" → „01.03.2027" mit Jahr; anderes bleibt Text ohne Jahr */
+  function _datumNorm(s) {
+    s = String(s == null ? '' : s).trim(); var m;
+    if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return { text: ('0' + m[3]).slice(-2) + '.' + ('0' + m[2]).slice(-2) + '.' + m[1], jahr: +m[1] };
+    if ((m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/))) return { text: ('0' + m[1]).slice(-2) + '.' + ('0' + m[2]).slice(-2) + '.' + m[3], jahr: +m[3] };
+    return { text: s, jahr: null };
   }
   function _abgleich(ext, typ, ktx) {
     if (typ === 'hausgeld') return _abgleichHausgeld(ext, ktx);   /* v3017 · v3029-import: ktx */

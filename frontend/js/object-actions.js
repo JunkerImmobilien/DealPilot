@@ -2101,7 +2101,10 @@
       if (typeof D.sonderumlagenAus === 'function' && window.DpSonderumlage) {
         D.sonderumlagenAus(t.extracted || {}, t.typ, ktx).forEach(function (s) {
           if (s.hinweis) { _importHinweise.push(s.hinweis); return; }
+          /* v3211 · zwei gleich hohe Raten im selben Jahr (01.03. und 01.09.) sind ZWEI Umlagen: tragen
+             beide einen Fälligkeitstag und weichen die Tage ab, bekommt die zweite einen eigenen Schlüssel */
           var key = 'su:' + s.jahr + ':' + s.betrag, alt = _merged[key];
+          if (alt && alt.su && alt.su.faellig && s.faellig && alt.su.faellig !== s.faellig) { key += ':' + s.faellig; alt = _merged[key]; }
           if (alt && alt.su && alt.su.faellig && !s.faellig) return;
           _merged[key] = { nurAktiv: true, label: 'Sonderumlage · ' + s.zweck, value: fmt0(s.betrag) + ' € fällig ' + (s.faellig || s.jahr), raw: String(s.betrag),
             source: t.label || 'Dokument', kind: 'sonderumlage', su: s, ort: 'Bewirtschaftung',

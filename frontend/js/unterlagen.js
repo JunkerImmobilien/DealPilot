@@ -296,13 +296,21 @@
     positionen: 'Positionen', bezeichnung: 'Position', betrag_gesamt_eur: 'Betrag Gemeinschaft', betrag_einheit_eur: 'Betrag Wohnung',
     umlagefaehig: 'umlagefähig', zweck: 'Zweck', faellig: 'fällig', betrag_eur: 'Betrag',
     auskunft_datum: 'Auskunft vom', behoerde: 'Behörde', keine_baulasten: 'keine Baulasten eingetragen', baulasten: 'Baulasten',
-    blatt: 'Blatt', rolle: 'dieses Grundstück', inhalt: 'Inhalt', art: 'Art', jahr: 'Jahr'
+    blatt: 'Blatt', rolle: 'dieses Grundstück', inhalt: 'Inhalt', art: 'Art', jahr: 'Jahr',
+    raten: 'Raten'   /* v3211 */
   };
   var BLOCK = { gesamt: 'Gesamtplan der Gemeinschaft', einzel: 'Einzelplan der Wohnung' };
-  var WORT = { beguenstigt: 'begünstigt', belastet: 'belastet', einzel: 'Einzelplan einer Wohnung', gesamt: 'Gesamtplan der Gemeinschaft', beides: 'Gesamt- und Einzelplan' };
+  var WORT = { beguenstigt: 'begünstigt', belastet: 'belastet', einzel: 'Einzelplan einer Wohnung', gesamt: 'Gesamtplan der Gemeinschaft', beides: 'Gesamt- und Einzelplan',
+    beschlossen: 'beschlossen', angekuendigt: 'angekündigt' };   /* v3211 */
   function name(k) { return NAMEN2[k] || NAMEN[k] || String(k).replace(/_/g, ' '); }
   function wert(k, x) {
     if (x === true) return 'ja'; if (x === false) return 'nein';
+    /* v3211 · Raten einer Sonderumlage: „01.03.2027 6.000 € · 01.09.2027 6.000 €" statt [object Object] */
+    if (Array.isArray(x)) return x.map(function (r) {
+      if (!r || typeof r !== 'object') return String(r);
+      var b = r.betrag_gesamt_eur != null ? eur(r.betrag_gesamt_eur) : (r.betrag_einheit_eur != null ? eur(r.betrag_einheit_eur) + ' (Wohnung)' : '');
+      return [r.faellig || r.jahr || '', b].filter(Boolean).join(' ');
+    }).filter(Boolean).join(' · ');
     /* v3016y · Jahreszahlen und Nummern nie durch toLocaleString („2.026“) */
     if (typeof x === 'number') {
       if (/_eur$/.test(k)) return eur(x);
