@@ -36,6 +36,21 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N137 · Umsetzungswünsche des Entwicklungspartners W-3 bis W-20 (Staging, 06./07.11.2026) — gemessen 08.11., wartet auf Marcels Freigabe
+
+Bestandsaufnahme gegen den Code am 08.11.2026 (nur gelesen). Pakete:
+
+- **P1 Schnell (je < 1 Std):** W-7 Tooltip Risikoneigung (`einstellungen-schlank.js:64`, `ai_risk` ohne `dp-tip`) · W-13 Knopf „was fehlt“ doppelt zur Chip-Liste, Stufen-Kurztext sichtbar machen (`objekt-reiter.js:840-871`, N103) · W-14 Seitenleisten-Umschalter Portfolio/Aktionen als Schieberegler (`layout-varianten.js:1170`, `toggle-slim`) · **W-16 Fehler:** Häkchen `#ek_inkl_nk` rechnet LTV gegen GIK (`calc.js:1741`), GIK > KP → LTV kleiner, also LOCKERER, Beschriftung sagt „strenger“ · W-19 Tooltips im Sonderumlage-Eintrag.
+- **P2 Profil aufräumen:** W-9 Standort/Nebenkosten (genutzt für GrESt-Fallback, Nebenkosten-Übernahme, Makler-Vorgabe) · W-10 Feld unklar (Bild zeigt Lageklassen A·B·C) · W-8 eigenes benanntes Anlegerprofil-Set (`standardwerte-karten.js:23-34`) · W-6 Ziel-Bruttomietrendite gestaffelt nach Jahren (heute je Lageklasse ein Wert).
+- **P3 Bedienung:** W-18 Bewirtschaftung kompakter (umlagefähig/nicht umlagefähig in einen Block, `index.html:3117/3123`), danach Muster für andere Masken · W-19 Regler „Gesamtbetrag × MEA / direkter Anteil“.
+- **P4 Rechenmodell:** W-15 mehrere Sanierungen je Jahr (Muster `weg_su`/`DpSonderumlage.jeJahr`) · W-17 weitere Darlehen (D2 in 13 Frontend-, 7 Backend-Dateien; Umbau auf Liste, N91).
+- **P5 Portfolio-Cockpit:** W-3 KPI-Spalte (CF vor/nach Steuer, Tilgung, GIK, Darlehen, EK, EK-Rendite, Darlehen ↔ Bewertung); „Rendite“ ist die Deal-Score-Kategorie (Brutto 25, Netto 30, CF 25, CoC 20), nicht die Bruttomietrendite. Daten in `dashboard.js aggStats()`; BACKLOG „Offen“ Punkt 6.
+- **P6 Vermögen und Broschüre:** W-11 Vermögensaufstellung/Haushaltsrechnung mit Ständen und Verlauf (BACKLOG „Gesamtvermögensbilanz … USP“) · W-5 Profilfoto, Anhänge, Checkliste · W-20 Vorher/Nachher-Fotos im Track Record (`track-record.js:279` nimmt nur das erste Foto).
+- **P7 Pilot:** W-4 Chat-Blase überall (Co-Pilot nur im Reiter Pilot-Analyse, `pilot-tower.js` global, Änderungen per Chat gibt es schon in `copilot-aenderungen.js`).
+- **P8 Kundenbindung:** W-12 Instagram-Hinweis (klein) und Erinnerung vor möglicher Mieterhöhung (Termine rechnet nur das Frontend, `mietpotenzial-kern.js mhTermine`).
+
+Bilder: `Dateien/Backlog-Bilder/staging-W<n>-*.jpg`; W-10, W-12, W-14 zeigen andere Stellen als der Text.
+
 ### N136 · Marktbericht Variante D und Sonderumlagen in Raten (08.11.2026) — **ERLEDIGT v3211/v3212b, Prod 1.0.81**
 
 Profi-Bericht im Aufbau der Variante D ohne Angebotspreis, Titelbild ganz bzw. Karte, Bodenrichtwerte im Kartenausschnitt; Sonderumlagen aus WEG-Protokollen je Rate im Fälligkeitsjahr. **Offen:** Abnahme Sonderumlage mit echtem Protokoll mit Raten; Variante D auch für den normalen Marktbericht?
