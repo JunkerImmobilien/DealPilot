@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-08T09:55:58.100Z",
+ "erzeugt_am": "2026-11-08T10:11:39.306Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "d56b92c524bcdcff",
-  "index-html": "4049d381bb4fdc4d",
+  "storage": "0784bbcb115c355b",
+  "index-html": "5c5063c85fb9bd6d",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -499,6 +499,7 @@
    "hg_nul",
    "weg_r",
    "weg_su",
+   "san_plan",
    "eigen_r",
    "mietausfall",
    "nul_sonst",
@@ -528,7 +529,6 @@
    "d2_at",
    "d2_vertrag",
    "d2_bspar",
-   "ek_inkl_nk",
    "afa_sonder7b_aktiv",
    "afa_sonder7b_neubau",
    "afa_sonder7b_vermietung",
@@ -1392,11 +1392,6 @@
     "id": "d2_bspar",
     "kind": "text",
     "label": "Bausparvertrag (optional)"
-   },
-   {
-    "id": "ek_inkl_nk",
-    "kind": "bool",
-    "label": "Eigenkapital entspricht den Kaufnebenkosten"
    },
    {
     "id": "afa_sonder7b_aktiv",
@@ -4272,7 +4267,7 @@
      },
      {
       "h": "Standardwerte: deine Annahmen für neue Objekte",
-      "text": "Diese Werte werden bei jedem neuen Objekt vorausgefüllt. Am Objekt kannst du sie jederzeit überschreiben.\n• Finanzierung: Standard-Tilgung, Standard-Zinsbindung (5, 10, 15 oder 20 Jahre), Eigener Zinssatz (leer = indikativer Pfandbrief-Satz der Bindung), Zins-Stufe (Bonität / LTV), Standard-Eigenkapital in % vom Kaufpreis.\n• Bewirtschaftung: umlagefähig und nicht umlagefähig in % der NKM, Kalkulatorischer Mietausfall, Hausgeld-Anteil.\n• Persönliche Mindest-Schwellen: Mindest-DSCR, Mindest-Cashflow / Monat, Maximaler LTV. Sie erscheinen als farbige Marker in den Kennzahlen.\n• Steuer: Grenzsteuersatz.\n• Standort & Nebenkosten: Bundesland (mit Grunderwerbsteuer-Satz), Notar & Grundbuch, Maklergebühr.\n\nUnten sicherst du mit Profil speichern. Mit Auf Defaults zurücksetzen stellst du die Vorgaben wieder her."
+      "text": "Diese Werte werden bei jedem neuen Objekt vorausgefüllt. Am Objekt kannst du sie jederzeit überschreiben.\n• Finanzierung: Standard-Tilgung, Standard-Zinsbindung (5, 10, 15 oder 20 Jahre), Eigener Zinssatz (leer = indikativer Pfandbrief-Satz der Bindung), Zins-Stufe (Bonität / LTV), Standard-Eigenkapital in % vom Kaufpreis.\n• Bewirtschaftung: umlagefähig und nicht umlagefähig in % der NKM, Kalkulatorischer Mietausfall, Hausgeld-Anteil.\n• Persönliche Mindest-Schwellen: Mindest-DSCR, Mindest-Cashflow / Monat, Maximaler LTV. Sie erscheinen als farbige Marker in den Kennzahlen.\n• Steuer: Grenzsteuersatz.\n• Vorbelegung für neue Objekte (früher „Standort & Nebenkosten“): Bundesland (mit Grunderwerbsteuer-Satz), Notar & Grundbuch, Maklergebühr.\n\nUnten sicherst du mit Profil speichern. Mit Auf Defaults zurücksetzen stellst du die Vorgaben wieder her."
      },
      {
       "h": "Lageklassen A · B · C und Bewirtschaftung je Objektart",
@@ -5490,7 +5485,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "3fb54eef6bb69f73",
+  "hilfe": "a8c7800a10cbc53a",
   "bewertung": "f427bd734c0570c3"
  }
 }
