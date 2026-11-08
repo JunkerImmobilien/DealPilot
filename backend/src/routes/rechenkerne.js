@@ -363,7 +363,7 @@ router.get('/profi-pdf', async function (req, res) {
    Die einheitlichen Dokumente als PDF: der PDF-Dienst laedt das GESPEICHERTE Objekt mit der Sitzung des
    Nutzers und ruft DpDokumente.dokument(art, optionen). optionen sind nur Daten (Jahre, Anlage V, Objekt-IDs),
    nie HTML - gerendert wird ausschliesslich, was die App selbst baut. */
-const DOK_ARTEN = ['bank', 'kurz', 'investment', 'kaufpreisaufteilung', 'finanzamt', 'finanzamt_anlagev', 'trackrecord', 'bankexport'];
+const DOK_ARTEN = ['bank', 'kurz', 'investment', 'kaufpreisaufteilung', 'finanzamt', 'finanzamt_anlagev', 'trackrecord', 'bankexport', 'vermoegen'];   /* v3226 · Vermögen & Haushalt */
 function _dokOptionen(o) {
   const x = {};
   if (!o || typeof o !== 'object') return x;

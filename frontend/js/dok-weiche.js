@@ -32,7 +32,8 @@
   if (window.DpDokWeiche) return;
 
   var NAMEN = { investment: 'Investment Case', bank: 'Investment Case', selbstauskunft: 'Selbstauskunft', kurz: 'Kurzfassung', kaufpreisaufteilung: 'Kaufpreisaufteilung',
-    finanzamt: 'Werbungskosten', finanzamt_anlagev: 'Werbungskosten mit Anlage V', trackrecord: 'Track Record', bankexport: 'Bankexport' };
+    finanzamt: 'Werbungskosten', finanzamt_anlagev: 'Werbungskosten mit Anlage V', trackrecord: 'Track Record', bankexport: 'Bankexport',
+    vermoegen: 'Vermögen & Haushalt' };   /* v3226 */
 
   function design() {
     try { var v = window.DealPilotPdfWahl && DealPilotPdfWahl.vorgabe(); return v && v.design === 'klassisch' ? 'klassisch' : 'neu'; } catch (e) { return 'neu'; }

@@ -860,8 +860,10 @@
     return h;
   }
   /* v3217 · W-11: Vermögensaufstellung, Haushaltsrechnung und Verlauf (vermoegen.js) - nur, wenn erfasst */
-  function vermoegenSeiten(B, c, V) {
+  /* v3226 · opt.voll (eigenes PDF „Vermögen & Haushalt“): Verlauf mit Liquide und Überschuss; opt.schluss = HTML ans Ende der letzten Seite */
+  function vermoegenSeiten(B, c, V, opt) {
     if (!V || !V.hatDaten) return [];
+    opt = opt || {};
     var S = V.S, d = V.daten, out = [];
     var P = function (art, kat) { return d.posten.filter(function (p) { return (art === 'schuld' ? p.art === 'schuld' : p.art !== 'schuld') && (!kat || p.kat === kat || (kat === 'sonstiges' && ['bank', 'depot'].indexOf(p.kat) < 0)); }); };
     var ein = function (p) { return [p.name || V.katName(p.art === 'schuld' ? V.KAT_S : V.KAT_V, p.kat), B.eur(V.betrag(p.betrag)), { art: 'ein', det: p.kommentar || '' }]; };
@@ -899,12 +901,54 @@
       var grafik = st.length >= 2 ? B.linien([{ name: 'Brutto-Vermögen', klasse: 'l1', werte: reihe('brutto') }, { name: 'Verbindlichkeiten', klasse: 'l2', werte: reihe('schulden') }, { name: 'Netto-Vermögen', klasse: 'l3', werte: reihe('netto') }],
         { titel: 'Vermögensentwicklung', null: true, xfmt: function (x) { var dt = new Date(x * 86400000); return ('0' + dt.getUTCDate()).slice(-2) + '.' + ('0' + (dt.getUTCMonth() + 1)).slice(-2) + '.' + String(dt.getUTCFullYear()).slice(2); } }) : '';
       verlauf = B.abschnitt('Entwicklung', 'Vermögensentwicklung', st.length + ' gespeicherte Stände · ' + B.datum(st[0].datum) + ' bis ' + B.datum(st[st.length - 1].datum)) + grafik
-        + '<table class="dicht" style="margin-top:3mm"><thead><tr><th>Stand</th><th class="r">Brutto</th><th class="r">Verbindl.</th><th class="r">Netto</th><th>Maßnahmen / Kommentar</th></tr></thead><tbody>'
-        + st.slice().reverse().map(function (x) { var z = x.summen || {}; return '<tr><td class="num">' + B.datum(x.datum) + '</td><td class="r num">' + B.eur(z.brutto) + '</td><td class="r num">' + B.eur(z.schulden) + '</td><td class="r num">' + B.eur(z.netto) + '</td><td>' + B.esc(x.kommentar || '') + '</td></tr>'; }).join('')
+        + '<table class="dicht" style="margin-top:3mm"><thead><tr><th>Stand</th><th class="r">Brutto</th><th class="r">Verbindl.</th><th class="r">Netto</th>' + (opt.voll ? '<th class="r">Liquide</th><th class="r">Überschuss / M.</th>' : '') + '<th>Maßnahmen / Kommentar</th></tr></thead><tbody>'
+        + st.slice().reverse().map(function (x) { var z = x.summen || {}; return '<tr><td class="num">' + B.datum(x.datum) + '</td><td class="r num">' + B.eur(z.brutto) + '</td><td class="r num">' + B.eur(z.schulden) + '</td><td class="r num">' + B.eur(z.netto) + '</td>'
+          + (opt.voll ? '<td class="r num">' + B.eur(z.liquide) + '</td><td class="r num">' + B.eurS(z.ueberschuss) + '</td>' : '') + '<td>' + B.esc(x.kommentar || '') + '</td></tr>'; }).join('')
         + '</tbody></table>';
     }
-    if (haus || verlauf) out.push(B.seite(c, 'Haushalt und Verlauf', haus + (haus && verlauf ? '<div style="height:6mm"></div>' : '') + verlauf));
+    if (haus || verlauf) out.push(B.seite(c, 'Haushalt und Verlauf', haus + (haus && verlauf ? '<div style="height:6mm"></div>' : '') + verlauf + (opt.schluss || '')));
+    else if (opt.schluss) out[out.length - 1] = out[out.length - 1].replace('<div class="fuss">', function () { return opt.schluss + '<div class="fuss">'; });
     return out;
+  }
+
+  /* ── 6b · Vermögen & Haushalt (v3226, eigenes PDF) ───────────────────
+     Marcel 08.11.2026: „gibt es da ein vernünftiges PDF, um das auch runterzuladen, im Design wie die anderen PDFs?“
+     Dieselben Zahlen wie die Ansicht (vermoegen.js fuerDokument → berechnen): hier wird nichts neu gerechnet
+     außer Wert − Restschuld je Objekt, wie die Ansicht es zeigt. Die Seiten Vermögen, Haushalt und Verlauf
+     sind dieselben wie im Track Record (vermoegenSeiten). */
+  function vermoegenDok() {
+    var B = D();
+    var vP = (window.DpVermoegen && typeof DpVermoegen.fuerDokument === 'function') ? DpVermoegen.fuerDokument() : Promise.reject(new Error('Vermögen & Haushalt ist nicht geladen'));
+    return Promise.all([basis('Vermögen & Haushalt'), vP]).then(function (z) {
+      var c = z[0], V = z[1], S = V.S, d = V.daten, m = c.marke || {};
+      var person = V.name || m.name || '';
+      var st = (d.staende || []).slice().sort(function (a, b) { return String(a.datum).localeCompare(String(b.datum)); });
+      var letzter = st.length ? st[st.length - 1] : null;
+      var wa = d.immo.wertansatz === 'marktwert' ? 'Marktwert, wo erfasst (sonst Kaufpreis)' : 'Kaufpreis';
+      c.zeile = 'Eigene Angaben · Stand ' + c.stand;
+      var HINWEIS = 'Eigene Angaben, nicht geprüft. Immobilien aus dem DealPilot-Bestand, bewertet zum ' + wa
+        + ', Restschuld zum heutigen Tag. Keine Anlage-, Steuer- oder Finanzierungsberatung.';
+      var Sx = [];
+      Sx.push(B.deckblatt(c, { bild: null, portrait: V.foto, eyebrow: 'Vermögen & Haushalt', titel: person || m.company || 'Vermögensaufstellung',
+        unter: 'Vermögensaufstellung, Haushaltsrechnung und Entwicklung',
+        kz: [{ l: 'Brutto-Vermögen', v: B.eur(S.brutto), s: 'liquide ' + B.eur(S.liquide) }, { l: 'Verbindlichkeiten', v: B.eur(S.schulden) }, { l: 'Netto-Vermögen', v: B.eur(S.netto), art: 'hi' }, { l: 'Überschuss / Monat', v: B.eurS(S.ueberschuss), art: S.ueberschuss >= 0 ? 'gut' : 'schlecht' }],
+        meta: [['Stand', c.stand], ['Beleihung', S.ltv != null ? B.pct(S.ltv, 1) : '–'], ['Letzter gespeicherter Stand', letzter ? B.datum(letzter.datum) : 'noch keiner']],
+        zitat: HINWEIS }));
+      if (!V.hatDaten) {
+        Sx.push(B.seite(c, 'Vermögen', B.abschnitt('Vermögen & Haushalt', 'Noch keine Angaben erfasst')
+          + '<div class="hinweis">Unter Ansichten › Vermögen &amp; Haushalt trägst du Konten, Depot, weitere Verbindlichkeiten und die Haushaltsrechnung ein. Die Immobilien kommen automatisch aus deinen Objekten im Bestand.</div>'));
+        return B.dokument('Vermögen und Haushalt' + (person ? ' · ' + person : ''), Sx);
+      }
+      if (S.immoListe.length) {
+        Sx.push(B.seite(c, 'Immobilien', B.abschnitt('Vermögensverhältnisse', 'Immobilien im Bestand', 'Wertansatz ' + wa + ' · Restschuld heute')
+          + B.kacheln([{ l: 'Objekte', v: B.zahl(S.immoListe.length, 0) }, { l: 'Immobilienwert', v: B.eur(S.immo) }, { l: 'Restschuld', v: B.eur(S.immoSchuld) }, { l: 'Eigenkapital', v: B.eur(S.immo - S.immoSchuld), art: 'hi' }])
+          + '<table><thead><tr><th>Objekt</th><th>Wertansatz</th><th class="r">Wert</th><th class="r">Restschuld</th><th class="r">Eigenkapital</th></tr></thead><tbody>'
+          + S.immoListe.map(function (x) { return '<tr><td>' + B.esc(x.name || '') + (x.ort ? '<div class="det">' + B.esc(x.ort) + '</div>' : '') + '</td><td>' + B.esc(x.quelle || '') + '</td><td class="r num">' + B.eur(x.wert) + '</td><td class="r num">' + B.eur(x.rest) + '</td><td class="r num">' + B.eur(x.wert - (x.rest || 0)) + '</td></tr>'; }).join('')
+          + '<tr class="ende"><td>Summe Immobilien</td><td></td><td class="r num">' + B.eur(S.immo) + '</td><td class="r num">' + B.eur(S.immoSchuld) + '</td><td class="r num">' + B.eur(S.immo - S.immoSchuld) + '</td></tr></tbody></table>'));
+      }
+      vermoegenSeiten(B, c, V, { voll: true, schluss: '<div class="hinweis">' + B.esc(HINWEIS) + '</div>' }).forEach(function (x) { Sx.push(x); });
+      return B.dokument('Vermögen und Haushalt' + (person ? ' · ' + person : ''), Sx);
+    });
   }
   function trackRecord(opt) {
     var B = D();
@@ -1025,7 +1069,8 @@
   /* ── Einstieg ────────────────────────────────────────────────────── */
   var TYPEN = {
     investment: function () { return investment('voll'); }, bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
-    kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft
+    kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft,
+    vermoegen: vermoegenDok   /* v3226 · Vermögen & Haushalt */
   };
   function dokument(typ, opt) {
     if (!TYPEN[typ]) return Promise.reject(new Error('Unbekanntes Dokument: ' + typ));

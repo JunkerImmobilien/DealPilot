@@ -34,6 +34,7 @@ const ARTEN = {
   dok_finanzamt_anlagev: { name: 'Werbungskosten mit Anlage V (einheitlich)', objekt: true },
   dok_trackrecord: { name: 'Track Record (einheitlich)', objekt: false },
   dok_bankexport: { name: 'Bankexport (einheitlich)', objekt: false },
+  dok_vermoegen: { name: 'Vermögen & Haushalt (einheitlich)', objekt: false },   /* v3226 */
   html: { name: 'Dokument', objekt: false }   /* v3183 · fertiges HTML der App drucken */
 };
 
