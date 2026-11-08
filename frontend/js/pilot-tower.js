@@ -324,6 +324,10 @@
     { id: 'aus', t: 'Nur auf F1', d: 'unsichtbar, bis du ihn rufst' }
   ];
   function ort() {
+    /* v3218 · W-4 · Marcel 08.11.2026: Hilfe-Pilot und Co-Pilot sind EINE Blase unten rechts
+       (pilot-blase.js). Die ruhende Figur waere ein zweiter Knopf - sie ruht deshalb immer
+       unsichtbar und erscheint nur noch auf F1 / ?. Die gespeicherte Wahl bleibt liegen. */
+    if (window.DealPilotBlase) return 'aus';
     try { var o = localStorage.getItem('dp_pilot_ort'); if (ORTE.some(function (x) { return x.id === o; })) return o; } catch (e) {}
     /* v2252 · Marcel am 15.10.2026: „Standardmaessig soll der Pilot
        ausgeschaltet sein." Er bleibt auf F1 / ? erreichbar und laesst sich
@@ -339,6 +343,13 @@
      Knopfform wie dort (.dp-tt-mode-toggle), damit er nicht fremd aussieht. */
   function einstellungenHtml() {
     var a = ort();
+    /* v3218 · W-4: mit der Pilot-Blase gibt es keinen Ruheort mehr zu waehlen */
+    if (window.DealPilotBlase) return '<hr class="dvd"><h3 class="set-section-h">Pilot · Blase und F1</h3>'
+      + '<p class="hint" style="margin-bottom:10px">Der Pilot sitzt als Blase unten rechts, in jeder Ansicht: Fragen, Änderungen per Chat („Miete auf 9 €/m² erhöhen“ – du bestätigst) und Unterlagen über die Klammer. F1 oder ? erklärt das Feld, auf dem du gerade bist.</p>'
+      + '<label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;cursor:pointer;font-size:13px;line-height:1.4">'
+      + '<input type="checkbox" style="margin-top:2px" ' + (window.DpHinweise && DpHinweise.aus('erklaer') ? '' : 'checked ')
+      + 'onchange="window.DpHinweise && DpHinweise.setze(\'erklaer\', !this.checked)">'
+      + '<span><b>Geführte Eingabe: „Erklär mir das“ anbieten</b><br><span class="hint" style="color:var(--muted)">Der Knopf unter jeder Frage. Ausgeschaltet kannst du trotzdem jederzeit „Erklär mir das“ sagen oder tippen. Gilt für dein Konto, auf allen Geräten.</span></span></label>';
     return '<hr class="dvd"><h3 class="set-section-h">Pilot · Hilfe auf F1</h3>'
       + '<p class="hint" style="margin-bottom:10px">Drück F1 oder ? — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Hier stellst du ein, wo er wartet.</p>'
       + '<div class="dp-tt-mode-toggle" style="flex-wrap:wrap">' + ORTE.map(function (o) {

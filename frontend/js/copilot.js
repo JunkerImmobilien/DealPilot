@@ -1,4 +1,4 @@
-/* DealPilot Co-Pilot (v585) — leichter Chat-Agent im Pilot-Analyse-Tab.
+/* DealPilot Co-Pilot (v585) — leichter Chat-Agent, seit v3218 in der Pilot-Blase (pilot-blase.js).
    Arbeitet bevorzugt mit den Objektdaten (window._buildAIPayload). Web-Recherche
    nur wenn der Nutzer den Toggle aktiviert. KEIN Kerosin (server-seitig rate-limited). */
 (function () {
@@ -20,7 +20,11 @@
   }
 
   function mount() {
-    var host = document.getElementById('s5');
+    /* v3218 · W-4 · Marcel 08.11.2026: der Chat sitzt in der Pilot-Blase unten rechts
+       (pilot-blase.js), in jeder Ansicht - nicht mehr nur im Reiter Pilot-Analyse (#s5).
+       Derselbe Chat, derselbe Endpunkt, dieselbe Aenderungs-Logik; nur der Ort wechselt.
+       Ohne Blase (aeltere Seite) bleibt er wie bisher im Reiter. */
+    var host = document.getElementById('dp-blase-rumpf') || document.getElementById('s5');
     if (!host || document.getElementById('dp-cp')) return;
     var box = document.createElement('div');
     box.id = 'dp-cp';

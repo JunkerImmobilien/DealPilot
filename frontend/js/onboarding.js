@@ -741,8 +741,16 @@ window.DealPilotOnboarding = (function () {
   }
   function s6() {
     var an = (_wahl.pilot || _pilotOrt()) !== 'aus';
+    /* v3218 · W-4: Hilfe-Pilot und Co-Pilot sind EINE Blase unten rechts (pilot-blase.js) -
+       es gibt keinen Ruheort mehr zu waehlen, also auch keine Kacheln dafuer. */
+    var blase = !!window.DealPilotBlase;
     return ''
-      + '<p class="dpo-vor">Der <b>Hilfe-Pilot</b> wartet am Rand und erklärt '
+      + (blase
+        ? '<p class="dpo-vor">Der <b>Pilot</b> sitzt als Blase unten rechts, in jeder Ansicht: '
+          + 'Fragen zum Objekt, Änderungen per Chat (du bestätigst jede) und Unterlagen über die Klammer. '
+          + '<b>F1</b> oder <b>?</b> erklärt das Feld, auf dem du gerade bist.</p>'
+        : '')
+      + (blase ? '' : '<p class="dpo-vor">Der <b>Hilfe-Pilot</b> wartet am Rand und erklärt '
       + 'dir das Feld, auf dem du gerade bist, oder beantwortet deine Frage. '
       + 'Gerufen wird er mit <b>F1</b> oder <b>?</b>.</p>'
       + '<div class="dpo-kacheln">'
@@ -754,7 +762,7 @@ window.DealPilotOnboarding = (function () {
       +     '<span class="dpo-k-name">Nein, nur auf F1</span>'
       +     '<span class="dpo-k-unter">Unsichtbar, bis du F1 oder ? drückst.</span>'
       +   '</button>'
-      + '</div>'
+      + '</div>')
       /* v3016l · Marcel 28.10.2026: „fragen, ob man eine Tour möchte, dann startet die nicht
          automatisch". Bis hier war der Haken vorgesetzt - wer nichts tat, bekam die Tour.
          Jetzt eine Frage mit zwei Antworten, vorgewählt ist „Nein“. Der Haken bleibt als
@@ -772,8 +780,9 @@ window.DealPilotOnboarding = (function () {
       +   '</button>'
       + '</div>'
       + '<input type="checkbox" id="dpo_tour" hidden>'
-      + '<p class="dpo-vor dpo-vor-klein">Beides lässt sich später ändern: den Pilot unter '
-      + '<b>Einstellungen › Allgemein</b>, den Rundgang über das Hilfe-Symbol oben.</p>';
+      + (blase ? '<p class="dpo-vor dpo-vor-klein">Den Rundgang startest du jederzeit über das Hilfe-Symbol oben.</p>'
+        : '<p class="dpo-vor dpo-vor-klein">Beides lässt sich später ändern: den Pilot unter '
+        + '<b>Einstellungen › Allgemein</b>, den Rundgang über das Hilfe-Symbol oben.</p>');
   }
 
   /* ══ v3073 · DETAILGRAD · Marcel 02.11.2026: „Die Stufenauswahl mit den
