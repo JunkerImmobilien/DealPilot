@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3212';
+  var VERSION = 'v3212a';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -654,7 +654,7 @@
     var kpis = [];
     kpis.push('<div class="kpi hl"><div class="kl">Marktwert-Indikation</div><div class="kw">' + eur(ergebnis) + '</div><div class="ks">'
       + (istZahl(ergebnis) && istZahl(r.living_area) && Number(r.living_area) > 0 ? zahl(Number(ergebnis) / Number(r.living_area), 0) + ' €/m²' : '')
-      + (v.fuehrend ? (istZahl(r.living_area) ? ' · ' : '') + esc((VERF_NAME[v.fuehrend.id] || v.fuehrend.name).replace(/verfahren$/, '')) : '') + '</div></div>');
+      + (v.fuehrend ? (istZahl(r.living_area) ? ' · ' : '') + esc(({ sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', ertragswert: 'Ertragswert', angebote: 'aus Angeboten' })[v.fuehrend.id] || v.fuehrend.name) : '') + '</div></div>');
     if (werteV.length > 1) kpis.push('<div class="kpi"><div class="kl">Spanne der Verfahren</div><div class="kw">' + tsd(vMin) + '–' + tsd(vMax) + ' T€</div><div class="ks">' + werteV.length + ' Verfahren</div></div>');
     if (istZahl(r.purchase_price)) {
       var abw = istZahl(ergebnis) && Number(ergebnis) > 0 ? (Number(r.purchase_price) / Number(ergebnis) - 1) * 100 : null;
