@@ -294,5 +294,21 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('H10 eigene marktübliche Miete nach Modernisierung geht vor', [P2.zielVorschlaege({ einheiten: EINH }).markt.qm, P2.zielVorschlaege({ einheiten: EINH }).markt.art], [13.5, 'eigen']);
 }
 
+/* ── I · v3213 · W-6 · Ziel-Bruttomietrendite in Stufen (potenzial.js, Stufen als Parameter) ── */
+{
+  const P = await vorschlagLauf({ plz: '52062' });
+  const ST = [{ jahr: 1, pct: 5 }, { jahr: 3, pct: 6 }];
+  gleich('I1 vor der ersten Stufe (Jahr 0): kein Ziel', P.zielBmrAn(ST, 0), null);
+  gleich('I2 Jahr 1 und 2: 5 %', [P.zielBmrAn(ST, 1).pct, P.zielBmrAn(ST, 2).pct], [5, 5]);
+  gleich('I3 ab Jahr 3: 6 %', [P.zielBmrAn(ST, 3).pct, P.zielBmrAn(ST, 10).pct], [6, 6]);
+  const r = JSON.parse(JSON.stringify(P.zielBmrPruefen(ST, 2024, [
+    { k: 'ankauf', jahr: 2024, bmy: 4.5 }, { k: 'bestand', jahr: 2026, bmy: 5.2 }, { k: 'zielbild', jahr: 2027, bmy: 5.9 }, { k: 'mieterhoehung', jahr: null, bmy: 5.5 }])));
+  gleich('I4 Ankauf 2024: keine Stufe, kein Urteil', [r.ankauf.ziel, r.ankauf.erreicht], [null, null]);
+  gleich('I5 Bestand 2026 (Jahr 2): Ziel 5 %, 5,2 % erreicht', [r.bestand.ziel, r.bestand.erreicht], [5, true]);
+  gleich('I6 Zielbild 2027 (Jahr 3): Ziel 6 %, 5,9 % nicht erreicht', [r.zielbild.ziel, r.zielbild.ziel_ab, r.zielbild.erreicht], [6, 3, false]);
+  gleich('I7 Spalte ohne Jahr: keine Auswertung', r.mieterhoehung, undefined);
+  gleich('I8 ohne Stufen oder ohne Kaufjahr: leer', [JSON.stringify(P.zielBmrPruefen([], 2024, [{ k: 'bestand', jahr: 2026, bmy: 5 }])), JSON.stringify(P.zielBmrPruefen(ST, null, [{ k: 'bestand', jahr: 2026, bmy: 5 }]))], ['{}', '{}']);
+}
+
 console.log('mietpotenzial-pruefen (v3075): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

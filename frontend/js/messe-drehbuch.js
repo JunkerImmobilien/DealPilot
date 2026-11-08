@@ -2304,8 +2304,8 @@
       },
       async function (s) {   /* 6 · woher die Standardwerte kommen */
         await r6Einstellungen('standardwerte');
-        await zeige(r6Karte('.settings-modal', /^Standort & Nebenkosten$/), 8);
-        var SN = /^Standort & Nebenkosten$/, bl = r6SwkWert(SN, /^Bundesland$/), no = r6SwkWert(SN, /^Notar$/), gb = r6SwkWert(SN, /^Grundbuch$/), so = r6SwkWert(SN, /^Sonstige$/), mk = r6SwkWert(SN, /^Makler$/);
+        await zeige(r6Karte('.settings-modal', /^Vorbelegung für neue Objekte$/), 8);   /* v3213 · W-9: Karte umbenannt */
+        var SN = /^Vorbelegung für neue Objekte$/, bl = r6SwkWert(SN, /^Bundesland$/), no = r6SwkWert(SN, /^Notar$/), gb = r6SwkWert(SN, /^Grundbuch$/), so = r6SwkWert(SN, /^Sonstige$/), mk = r6SwkWert(SN, /^Makler$/);
         await b2oZeile(s, 'Woher die Vorbelegung kommt', 'Einstellungen › <b>Standardwerte</b>: Notar ' + (no || '–') + ', Grundbuch ' + (gb || '–') + ', Sonstige ' + (so || '–') + ', Makler ' + (mk || '–') + ' — Bundesland ' + (bl || '–') + '. Gilt für jedes neue Objekt.');
         r6EinstellungenZu();
         await warte(700);

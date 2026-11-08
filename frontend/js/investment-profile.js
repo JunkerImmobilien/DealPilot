@@ -254,6 +254,23 @@ window.DealPilotInvestmentProfile = (function() {
         '</div>'
       ].join('');
     }
+    /* v3213 · W-6 (Entwicklungspartner): Ziel-Bruttomietrendite in Stufen nach Jahren
+       (z. B. nach 1 Jahr 5 %, nach 3 Jahren 6 %). Gespeichert als ziel_bmr_stufen
+       [{jahr, pct}] im Profil, sofort bei jeder Änderung (wireZielBmr). Ausgewertet im
+       Zielbild je Objekt (potenzial.js zielBmrPruefen - die Stufen kommen dort als
+       Parameter an, der Kern liest keine Einstellungen). */
+    function zielBmrHtml() {
+      var st = zielBmrStufen();
+      if (!st.length) st = [{ jahr: '', pct: '' }];
+      return [
+        '<h3 class="ip-section">Ziel-Bruttomietrendite nach Jahren</h3>',
+        '<p class="hint">Deine Ziellinie über die Jahre nach dem Kauf, z. B. nach 1 Jahr 5 %, nach 3 Jahren 6 %. Im Zielbild jedes Objekts (Pilot-Analyse › Ankauf · Bestand · Zielbild) steht dann je Spalte, ob die Bruttomietrendite die Stufe dieses Jahres erreicht. Leer lassen = keine Ziellinie.</p>',
+        '<div class="ip-zbmr" id="ip-zbmr-liste">',
+        st.map(zielBmrZeile).join(''),
+        '</div>',
+        '<button type="button" class="btn btn-outline ip-zbmr-neu" style="margin:4px 0 16px">+ Stufe</button>'
+      ].join('');
+    }
     return [
       '<p class="hint" style="margin-bottom:18px">Deine persönlichen Standard-Annahmen. Werden bei jedem neuen Objekt automatisch vor-eingefüllt — du kannst sie pro Objekt jederzeit überschreiben.</p>',
 
@@ -309,6 +326,7 @@ window.DealPilotInvestmentProfile = (function() {
          rechnete. Jetzt ist die Beziehung verdrahtet, und der Hinweis
          zeigt dorthin. */
       lageProfilHtml(),
+      zielBmrHtml(),   /* v3213 · W-6 */
       /* v2184 · Bewirtschaftung je Objektart (bwk-profil.js) */
       (window.DealPilotBwkProfil ? DealPilotBwkProfil.einstellungenHtml() : ''),
 
@@ -351,7 +369,11 @@ window.DealPilotInvestmentProfile = (function() {
         field('ip_anfangsverm_ich', 'Anfangsvermögen (eigenes)', p.anfangsverm_ich, '€', 'zu Beginn des Güterstands'),
         field('ip_anfangsverm_ehegatte', 'Anfangsvermögen Ehegatte', p.anfangsverm_ehegatte, '€', 'zu Beginn des Güterstands'),
       '</div>',
-      '<h3 class="ip-section">Standort & Nebenkosten</h3>',
+      /* v3213 · W-9 (Entwicklungspartner, Marcel: nicht streichen, umbenennen): die Werte
+         gelten nur als Startwert eines NEUEN Objekts (setDefaults/applyToNewObject,
+         GrESt-Rückfall, Makler-Vorgabe) - bestehende Objekte bleiben unberührt. */
+      '<h3 class="ip-section">Vorbelegung für neue Objekte</h3>',
+      '<p class="hint">Mit diesen Kaufnebenkosten und diesem Bundesland startet jedes <b>neue</b> Objekt. Am Objekt änderst du sie im Reiter Investition; bereits angelegte Objekte behalten ihre Werte.</p>',
       '<div class="ip-grid">',
         blEl(),
         field('ip_notar_pct',       'Notar',             get('notar_pct'),       '%', 'inkl. Grundschuld · üblich 0,9–1,2 %'),
@@ -409,7 +431,65 @@ window.DealPilotInvestmentProfile = (function() {
      Jede Änderung geht sofort durch - `DealPilotLageProfil.setze()`
      schreibt lokal und schickt zum Server. Ein leeres Feld wird zu
      `null`, nicht zu 0. */
+  /* ── v3213 · W-6 · Ziel-Bruttomietrendite in Stufen ──────────────────
+     Liste [{jahr, pct}] - jahr = Jahre nach dem Kauf (0–50), pct = % brutto.
+     Unvollständige Zeilen werden nicht gespeichert; nach Jahr sortiert, ein
+     Jahr nur einmal (die letzte Eingabe gilt). */
+  function zielBmrStufen() {
+    var roh = load().ziel_bmr_stufen;
+    if (!Array.isArray(roh)) return [];
+    var nachJahr = {};
+    roh.forEach(function (s) {
+      if (!s) return;
+      var j = parseInt(s.jahr, 10), p = parseFloat(String(s.pct == null ? '' : s.pct).replace(',', '.'));
+      if (isFinite(j) && j >= 0 && j <= 50 && isFinite(p) && p > 0 && p < 100) nachJahr[j] = Math.round(p * 100) / 100;
+    });
+    return Object.keys(nachJahr).map(Number).sort(function (a, b) { return a - b; }).map(function (j) { return { jahr: j, pct: nachJahr[j] }; });
+  }
+  function zielBmrZeile(s) {
+    return '<div class="ip-zbmr-z" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px">'
+      + '<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px">nach <input type="number" min="0" max="50" step="1" class="ip-zbmr-j" style="width:70px" value="' + (s.jahr !== '' && s.jahr != null ? s.jahr : '') + '" placeholder="1"> Jahr(en)</label>'
+      + '<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px"><input type="number" step="any" min="0" class="ip-zbmr-p" style="width:80px" value="' + (s.pct !== '' && s.pct != null ? s.pct : '') + '" placeholder="5"> % brutto</label>'
+      + '<button type="button" class="btn btn-outline ip-zbmr-weg" style="min-height:0;padding:4px 10px" aria-label="Stufe entfernen">×</button>'
+      + '</div>';
+  }
+  function zielBmrAusFormular() {
+    var aus = [];
+    [].forEach.call(document.querySelectorAll('#ip-zbmr-liste .ip-zbmr-z'), function (z) {
+      var j = z.querySelector('.ip-zbmr-j'), p = z.querySelector('.ip-zbmr-p');
+      if (j && p && String(j.value).trim() !== '' && String(p.value).trim() !== '') aus.push({ jahr: j.value, pct: p.value });
+    });
+    return aus;
+  }
+  function zielBmrSpeichern() {
+    var p = load() || {};
+    var neu = zielBmrAusFormular();
+    if (neu.length) p.ziel_bmr_stufen = neu; else delete p.ziel_bmr_stufen;
+    save(p);
+    p.ziel_bmr_stufen = zielBmrStufen();   /* bereinigt zurückschreiben */
+    if (!p.ziel_bmr_stufen.length) delete p.ziel_bmr_stufen;
+    save(p);
+    try { window.dispatchEvent(new CustomEvent('dp:ziel-bmr')); } catch (e) {}
+  }
+  function wireZielBmr() {
+    var box = document.getElementById('ip-zbmr-liste');
+    if (!box || box._v3213) return;
+    box._v3213 = 1;
+    box.addEventListener('change', zielBmrSpeichern);
+    box.addEventListener('click', function (ev) {
+      var w = ev.target.closest && ev.target.closest('.ip-zbmr-weg'); if (!w) return;
+      var z = w.closest('.ip-zbmr-z'); if (z) z.parentNode.removeChild(z);
+      zielBmrSpeichern();
+    });
+    var neu = box.parentNode && box.parentNode.querySelector('.ip-zbmr-neu');
+    if (neu) neu.addEventListener('click', function () {
+      var d = document.createElement('div'); d.innerHTML = zielBmrZeile({ jahr: '', pct: '' });
+      box.appendChild(d.firstChild);
+    });
+  }
+
   function wireLageProfil() {
+    try { wireZielBmr(); } catch (e) {}   /* v3213 · W-6: dieselbe Stelle (settings.js ruft wireLageProfil) */
     var LP = window.DealPilotLageProfil;
     if (!LP) return;
     var stdSel = document.querySelector('.ip-lage-std');
@@ -631,6 +711,7 @@ window.DealPilotInvestmentProfile = (function() {
     getHausgeldEstimate: getHausgeldEstimate,
     renderPaneHtml: renderPaneHtml,
     wireLageProfil: wireLageProfil,   /* v1957 */
+    zielBmrStufen: zielBmrStufen,     /* v3213 · W-6 */
     saveFromForm: saveFromForm,
     resetToDefaults: resetToDefaults
   };
