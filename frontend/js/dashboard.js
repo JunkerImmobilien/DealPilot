@@ -3864,9 +3864,12 @@
     if(!_shItems.length){
       /* v3224 \u00b7 Marcel 08.11.2026: Teilen raus - der Satz verwies auf den Knopf \u201eQuick Boarding teilen\u201c, den es nicht mehr gibt.
          Bestehende P\u00e4sse stehen weiter hier (Verl\u00e4ngern / Beenden). */
-      h.innerHTML='<div class="gempty">Aktuell ist kein Objekt geteilt.</div>';
+      /* v3230: ohne geteilte Objekte verschwindet der ganze Abschnitt 04 (Marcel: Teilen raus) */
+      h.innerHTML=''; h.style.display='none';
+      var _sl=document.querySelector('.sl[data-sek="geteilt"]'); if(_sl) _sl.style.display='none';
       return;
     }
+    h.style.display=''; var _sl2=document.querySelector('.sl[data-sek="geteilt"]'); if(_sl2) _sl2.style.display='';
     var n=_shItems.length;
     var show=(_shView==='all')?_shItems:((_shView==='min')?[]:_shItems.slice(0,3));
     var base=((window.location&&location.origin)?location.origin:'');
