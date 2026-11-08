@@ -130,7 +130,7 @@
           '<div id="dab-readiness-host"><div class="dab-rc-load">Grundfelder-Pr\u00fcfung l\u00e4dt \u2026</div></div>' +
           '<div class="dab-perf"></div>' +
           '<div class="dab-sthead"><div class="dab-route">Objekt \u2192 Abschluss</div><div class="dab-title" id="dab-abtitle">Abschluss offen</div></div>' +
-          '<div class="dab-status-grid">' + statusTafel() + '<div id="dab-share-slot"></div></div>' +
+          '<div class="dab-status-grid">' + statusTafel() + '</div>' +   /* v3224 · Marcel 08.11.2026: Teilen raus (hier stand #dab-share-slot, gefüllt von deal-action-pilot.js) */
         '</div>' +
       '</div>' +
 
@@ -144,7 +144,7 @@
         '<div class="dab-smart-body">' + docs + '</div>' +
       '</div></div>' +
 
-      band('doc', 'Marktberichte', 'Erzeugte Berichte als PDF') +
+      band('doc', 'Marktberichte', 'Gespeicherte Berichte \u2014 ansehen oder als PDF abrufen') +
       '<div class="dab-panel"><div id="dab-mb-host" class="dab-mb-host"><div class="dab-mb-empty">L\u00e4dt \u2026</div></div></div>' +
       '<div id="dab-uew-slot"></div>' +
 
@@ -291,22 +291,31 @@
       X + '.dab-doc-act{margin-top:auto;width:100%;flex-wrap:wrap}',
       X + '.dab-doc-act .dab-doc-btn{flex:1 1 auto;justify-content:center}',
       X + '.dab-doc-act .dab-fa-year{flex:0 0 auto}',
-      /* Marktberichte als Karten */
-      X + '.dab-mb-host{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;padding:0 !important}',
-      X + '.dab-mb-host > :not(.dab-mb-row):not(.dab-mb-more){grid-column:1/-1}',
-      X + '.dab-mb-more{grid-column:1/-1}',
-      X + '.dab-mb-host.mb-open .dab-mb-more{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}',
-      X + '.dab-mb-row{flex-wrap:wrap;border:1px solid #E6E0D3 !important;border-radius:12px !important;background:#FFFFFF !important;padding:14px 16px !important}',
-      X + '.dab-mb-row:hover{border-color:var(--wl-c9a84c, #C9A84C) !important}',
-      /* gemessen: .dab-mb-main war 37 px breit - Adresse weg, Datum umgebrochen. Kopf (Symbol + Text) volle Zeile,
-         Marktwert und Knöpfe darunter */
-      X + '.dab-mb-main{flex:1 1 calc(100% - 60px) !important;min-width:0 !important}',
-      X + '.dab-mb-d{white-space:nowrap}',
-      X + '.dab-mb-row{position:relative}',
-      X + '.dab-mb-row .dab-mb-main{padding-right:40px}',
-      X + '.dab-mb-row .dab-mb-del{position:absolute;top:12px;right:12px;width:28px !important;height:28px !important;margin:0 !important}',
-      X + '.dab-mb-mv{flex:1 1 auto;text-align:left !important;margin-left:58px}',
-      X + '.dab-mb-row .dab-doc-btn{flex:0 0 auto}',
+      /* v3224 · Marcel 08.11.2026: „die Marktberichte bitte als Liste darstellen“ - eine Zeile je Bericht
+         (Datum · Bericht · Marktwert · Bericht ansehen / PDF abrufen), neueste oben. Eigene Klassen (dab-mbl-*),
+         damit die Kartenregeln von v3187/v3196 (.dab-mb-row, .dab-mb-mv mit margin-left 58 px) nicht mitgreifen. */
+      X + '.dab-mb-host{display:block !important;padding:0 !important}',
+      X + '.dab-mbl{border:1px solid #E6E0D3;border-radius:12px;background:#FFFFFF;overflow:hidden}',
+      X + '.dab-mbl-kopf,' + X + '.dab-mbl-z{display:grid;grid-template-columns:132px minmax(0,1fr) 150px auto;align-items:center;column-gap:14px;padding:10px 14px}',
+      X + '.dab-mbl-kopf{padding:8px 14px;background:#FBF6E9;border-bottom:1px solid #E6E0D3;font:600 10px/1.2 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356}',
+      X + '.dab-mbl-kopf .r,' + X + '.dab-mbl-wert{text-align:right}',
+      X + '.dab-mbl-z{border-top:1px solid #EFEAE0}',
+      X + '.dab-mbl-kopf + .dab-mbl-z{border-top:0}',
+      X + '.dab-mbl-z:hover{background:#FDFCFA}',
+      X + '.dab-mbl-dat{font:500 12.5px/1.35 \'JetBrains Mono\',monospace;color:#2A2727;white-space:nowrap}',
+      X + '.dab-mbl-dat small{display:block;font-size:11px;color:#8a8378}',
+      X + '.dab-mbl-art{min-width:0}',
+      X + '.dab-mbl-art b{display:block;font:600 13.5px/1.35 Inter,sans-serif;color:#1a1814}',
+      X + '.dab-mbl-adr{display:block;font-size:11.5px;color:#6B6356;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      X + '.dab-mbl-wert{font:700 14px/1.3 \'JetBrains Mono\',monospace;color:#2A2727;white-space:nowrap}',
+      X + '.dab-mbl-wert small{display:block;font:600 9.5px/1.3 Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#8a8378}',
+      X + '.dab-mbl-wert.nod{font-weight:500;font-size:11.5px;color:#8a8378}',
+      X + '.dab-mbl-akt{display:flex;align-items:center;gap:6px;justify-content:flex-end}',
+      X + '.dab-mbl-akt .dab-doc-btn{padding:6px 11px !important;font-size:12px !important;flex:0 0 auto}',
+      X + '.dab-mbl-akt .dab-mb-del{margin:0 !important;width:30px !important;height:30px !important}',
+      X + '.dab-mbl-mehr{display:none !important}',
+      X + '.dab-mb-host.mb-open .dab-mbl-mehr{display:block !important}',
+      '@media(max-width:760px){' + X + '.dab-mbl-kopf{display:none}' + X + '.dab-mbl-z{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}' + X + '.dab-mbl-art{grid-column:1/-1;grid-row:1}' + X + '.dab-mbl-dat{grid-row:2}' + X + '.dab-mbl-wert{grid-row:2}' + X + '.dab-mbl-akt{grid-column:1/-1;justify-content:flex-start;flex-wrap:wrap}}',
       /* „In Gesellschaft überführen" (gesellschaft-ueberfuehrung): Abschnittskopf wie die übrigen */
       X + '#dpuew-stage .da-stage-head{background:none !important;box-shadow:none !important;border:0 !important;border-bottom:1px solid #E6E0D3 !important;border-radius:0 !important;padding:22px 2px 10px !important}',
       X + '#dpuew-stage .da-stage-head::before,' + X + '#dpuew-stage .da-stage-head::after{display:none !important}',
@@ -315,7 +324,7 @@
       /* Teilen-Karte hell */
       X + '#dab-share-slot > div{background:#FFFFFF !important;border:1px solid #E6E0D3 !important;border-radius:12px !important}',
       /* v3191 · Marcel: „cooler, kompakter … einfacher“ - Kopf zweispaltig, Karten kleiner */
-      '@media(min-width:1000px){' + X + '.dab-body{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-areas:"r h" "r t" "s t";column-gap:22px;row-gap:10px;align-items:start}' + X + '#dab-readiness-host{grid-area:r}' + X + '.dab-sthead{grid-area:h}' + X + '.dab-status-grid{display:contents !important}' + X + '.dab-tafel{grid-area:t}' + X + '#dab-share-slot{grid-area:s}' + X + '.dab-perf{display:none}}',
+      '@media(min-width:1000px){' + X + '.dab-body{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-areas:"r h" "r t";column-gap:22px;row-gap:10px;align-items:start}' + X + '#dab-readiness-host{grid-area:r}' + X + '.dab-sthead{grid-area:h}' + X + '.dab-status-grid{display:contents !important}' + X + '.dab-tafel{grid-area:t}' + X + '.dab-perf{display:none}}',
       X + '.dab-perf:empty{display:none}',
       X + '.dab-cap{display:none !important}',
       X + '.dab-sthead{padding-top:0 !important;margin-top:0 !important;border-top:0 !important}',
@@ -342,10 +351,7 @@
       X + '.dab-doc-row{flex-wrap:nowrap !important}',
       X + '.dab-doc-x{flex:0 0 auto !important;min-width:0 !important}',
       X + '.dab-doc-act{flex:0 0 auto !important}',
-      /* (3) Marktbericht-Karten: Marktwert volle Zeile, beide Knöpfe gemeinsam darunter
-             (390 px: „PDF“ neben dem Wert, „Profi“ allein in der nächsten Zeile). */
-      X + '.dab-mb-mv{flex:1 1 100% !important}',
-      X + '.dab-mb-mv + .dab-doc-btn{margin-left:58px}',
+      /* (3) v3224: die Marktbericht-Karten sind eine Liste geworden (Regeln oben bei „v3224“). */
       /* (4) Unter 1000 px stehen Grundfelder-Prüfung und „Objekt → Abschluss“ untereinander:
              gemessen 0 px Abstand (Chips unten 486 = Kopf oben 486). */
       '@media(max-width:999px){' + X + '.dab-sthead{margin-top:20px !important}}',
@@ -1213,35 +1219,52 @@
        * Zeile davor absteigend sortiert), der Rest liegt gefaltet darunter.
        * Kein Filter, kein Verlust: aufgeklappt ist alles wieder da.
        */
+      /* v3224 · Marcel 08.11.2026: Liste statt Karten, und EIN PDF-Knopf.
+         „Bitte nur noch die Profi-Version nehmen und als ‚PDF abrufen‘ kennzeichnen.“
+         Die Profi-Fassung (DpProfi, marktbericht-profi.js) setzt einen Stufe-3-Bericht voraus
+         (sammeln() bricht sonst ab: „kein Marktbericht der Stufe 3“). Für Berichte der Stufe 1/2
+         gibt es sie nicht - dort führt derselbe Knopf auf das bisherige PDF der Bericht-Engine,
+         sonst hätten diese Berichte gar kein PDF mehr. */
+      var _eur = function (v) { return new Intl.NumberFormat('de-DE').format(Math.round(Number(v))) + ' €'; };
+      var _da = function (v) { return v != null && v !== '' && isFinite(Number(v)); };
       var _row = function (h) {
-        var d = new Date(h.created_at); var ds = d.toLocaleDateString('de-DE') + ' \u00b7 ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-        var kz = h.object_label
-          ? '<span class="dab-mb-kz">' + String(h.object_label).replace(/</g, '&lt;') + '</span>'
-          : '<span class="dab-mb-kz none">ohne Objekt</span>';
-        var addr = String(h.address || 'Adresse unbekannt').replace(/</g, '&lt;');
-        var mv = (h.market_value != null && h.market_value !== '')
-          ? '<div class="dab-mb-mv">' + new Intl.NumberFormat('de-DE').format(Math.round(h.market_value)) + ' \u20ac<small>Marktwert</small></div>'
-          : '<div class="dab-mb-mv nod">keine Daten</div>';
-        return '<div class="dab-mb-row"><span class="dab-mb-icb">' + _DAB_MB_DOC + '</span>'
-          + '<div class="dab-mb-main"><div class="dab-mb-l1">' + kz + '<span class="dab-mb-addr">' + addr + '</span></div>'
-          + '<div class="dab-mb-d">' + ds + '</div></div>' + mv
-          + '<button class="dab-doc-btn" onclick="DealActionBoarding.downloadReport(' + (h.report_id | 0) + ')">' + ICO.dl + 'PDF</button>'
-          /* v3178 · Profi-Fassung als zweite Wahl, nur bei Stufe 3 (Wertermittlung) */
-          + (String(h.wert_stufe || '') === '3' && window.DpProfi
-            ? '<button class="dab-doc-btn" title="Marktbericht Profi: Wertermittlung mit Herleitung" onclick="DpProfi.oeffnen('
-              + (/^[0-9a-f-]{36}$/i.test(String(h.external_ref || '')) ? '\'' + h.external_ref + '\'' : 'null') + ',' + (h.report_id | 0) + ')">' + ICO.dl + 'Profi</button>'
-            : '')
+        var d = new Date(h.created_at);
+        var dat = d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        var uhr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        var st = String(h.wert_stufe || '');
+        var drei = st === '3';
+        var art = drei ? 'Wertermittlung' : 'Marktindikation';
+        if (st) art += ' · Stufe ' + st;
+        var weg = [];
+        if (drei && _da(h.ertragswert_eur)) weg.push('Ertragswert ' + _eur(h.ertragswert_eur));
+        if (drei && _da(h.sachwert_eur)) weg.push('Sachwert ' + _eur(h.sachwert_eur));
+        var adr = String(h.address || 'Adresse unbekannt').replace(/</g, '&lt;');
+        var mv = _da(h.market_value)
+          ? '<div class="dab-mbl-wert">' + _eur(h.market_value) + '<small>Marktwert-Indikation</small></div>'
+          : '<div class="dab-mbl-wert nod">keine Daten</div>';
+        var rid = h.report_id | 0;
+        var pdf = (drei && window.DpProfi)
+          ? 'DpProfi.oeffnen(' + (/^[0-9a-f-]{36}$/i.test(String(h.external_ref || '')) ? '\'' + h.external_ref + '\'' : 'null') + ',' + rid + ')'
+          : 'DealActionBoarding.downloadReport(' + rid + ')';
+        return '<div class="dab-mbl-z">'
+          + '<div class="dab-mbl-dat">' + dat + '<small>' + uhr + ' Uhr</small></div>'
+          + '<div class="dab-mbl-art"><b>' + art + '</b><span class="dab-mbl-adr">' + (weg.length ? weg.join(' · ') : adr) + '</span></div>'
+          + mv
+          + '<div class="dab-mbl-akt">'
+          + '<button type="button" class="dab-doc-btn" onclick="DealActionBoarding.zeigeBericht(' + rid + ')">Bericht ansehen</button>'
+          + '<button type="button" class="dab-doc-btn" title="' + (drei ? 'Marktbericht als PDF (Wertermittlung mit Herleitung)' : 'Marktbericht als PDF') + '" onclick="' + pdf + '">' + ICO.dl + 'PDF abrufen</button>'
           /* v966-delbtn: endgueltiges Loeschen — Rueckfrage in deleteReport(). */
-          + '<button class="dab-mb-del" title="Bericht endg\u00fcltig l\u00f6schen" onclick="DealActionBoarding.deleteReport(' + (h.report_id | 0) + ')">\u2715</button></div>';
+          + '<button type="button" class="dab-mb-del" title="Bericht endgültig löschen" data-adr="' + adr.replace(/"/g, '&quot;') + '" data-dat="' + dat + ' · ' + uhr + '" onclick="DealActionBoarding.deleteReport(' + rid + ')">✕</button>'
+          + '</div></div>';
       };
       /* v965-mbfold-join: 3 offen, Rest in einen eigenen Block. */
       var OFFEN = 3;
       var _head = reps.slice(0, OFFEN).map(_row).join('');
       var _rest = reps.slice(OFFEN);
-      var _tail = '';
+      var _tail = '', _tog = '';
       if (_rest.length) {
-        _tail = '<div class="dab-mb-more">' + _rest.map(_row).join('') + '</div>'
-          + '<button type="button" class="dab-mb-tog" onclick="DealActionBoarding.toggleReports(this)">'
+        _tail = '<div class="dab-mbl-mehr">' + _rest.map(_row).join('') + '</div>';
+        _tog = '<button type="button" class="dab-mb-tog" onclick="DealActionBoarding.toggleReports(this)">'
           + '<span class="lbl-more">' + _rest.length + ' weitere anzeigen</span>'
           + '<span class="lbl-less">weniger anzeigen</span></button>';
       }
@@ -1283,7 +1306,8 @@
           + ' onclick="DealActionBoarding.zeigeVerlauf()">Verlauf ansehen</button></div>';
       }
       host.className = 'dab-mb-host';
-      host.innerHTML = _head + _tail + _spur;
+      var _kopf = '<div class="dab-mbl-kopf"><span>Datum</span><span>Bericht</span><span class="r">Marktwert</span><span></span></div>';
+      host.innerHTML = '<div class="dab-mbl">' + _kopf + _head + _tail + '</div>' + _tog + _spur;
     } catch (e) { host.innerHTML = '<div class="dab-mb-empty">Konnte Marktberichte nicht laden.</div>'; }
   }
   /* v949-realpdf
@@ -1335,13 +1359,13 @@
       try {
         var btns = document.querySelectorAll('#dab-mb-host .dab-mb-del');
         for (var i = 0; i < btns.length; i++) {
-          if ((btns[i].getAttribute('onclick') || '').indexOf('(' + rid + ')') >= 0) { row = btns[i].closest('.dab-mb-row'); break; }
+          if ((btns[i].getAttribute('onclick') || '').indexOf('(' + rid + ')') >= 0) { row = btns[i]; break; }
         }
       } catch (e) {}
       var was = '';
       if (row) {
-        var a = row.querySelector('.dab-mb-addr'); var d = row.querySelector('.dab-mb-d');
-        was = '\n\n' + ((a && a.textContent) || '') + '\n' + ((d && d.textContent) || '');
+        /* v3224: die Listenzeile traegt Adresse und Datum am Loeschknopf (data-adr / data-dat) */
+        was = '\n\n' + (row.getAttribute('data-adr') || '').replace(/&lt;/g, '<').replace(/&quot;/g, '"') + '\n' + (row.getAttribute('data-dat') || '');
       }
       if (!window.confirm('Diesen Marktbericht endg\u00fcltig l\u00f6schen?' + was + '\n\nDas kann nicht r\u00fcckg\u00e4ngig gemacht werden.')) return;
       var t = token();
@@ -1417,6 +1441,30 @@
     }, 100);
   }
 
+  /* v3224 · „Bericht ansehen“: genau DIESEN Bericht im Marktbericht öffnen.
+     Der Marktbericht ist ein eigenes Dokument (iframe #mbv-frame, gleicher Ursprung);
+     dort lädt _mbOpenReport(rid) den gespeicherten Bericht per /reports/one und zeigt
+     ihn an - derselbe Weg wie „Ansehen“ in der Berichtsliste des Marktberichts.
+     Das iframe entsteht erst in openMarktberichtView(), deshalb wird auf
+     _mbOpenReport gewartet (bis 15 s), nicht vorausgesetzt. */
+  function zeigeBericht(rid) {
+    rid = rid | 0; if (!rid) return;
+    if (typeof window.openMarktberichtView !== 'function') { toast('Marktbericht ist gerade nicht verfügbar.'); return; }
+    Promise.resolve(window.openMarktberichtView()).then(function () {
+      var n = 0;
+      var uhr = setInterval(function () {
+        n++;
+        var w = null, ok = false;
+        try {
+          var fr = document.getElementById('mbv-frame'); w = fr && fr.contentWindow;
+          ok = !!(w && typeof w._mbOpenReport === 'function' && w.document && w.document.readyState === 'complete');
+        } catch (e) {}
+        if (ok) { clearInterval(uhr); try { w._mbOpenReport(String(rid), false); } catch (e) {} return; }
+        if (n > 100) { clearInterval(uhr); toast('⚠ Bericht ließ sich nicht öffnen — im Marktbericht unter „Marktberichte“ auswählen.'); }
+      }, 150);
+    });
+  }
+
   function toggleReports(btn) {
     var host = document.getElementById('dab-mb-host');
     if (host) host.classList.toggle('mb-open');
@@ -1424,6 +1472,7 @@
   }
   window.DealActionBoarding = {
     toggleReports: toggleReports,
+    zeigeBericht: zeigeBericht,   /* v3224 */
     linkOut: linkOut,
     buildTop: buildTop,
     afterRender: afterRender,

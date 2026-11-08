@@ -425,7 +425,10 @@
           /* v2218h · die Kachel „Dokumente“ (v2217) ist wieder weg: Dokumente laufen über
              „Exposé / Marktbericht“ mit (Marcel 14.10.2026). */
         '</div></div>' +
-        '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
+        /* v3224 · Marcel 08.11.2026: Teilen raus. Der QR bleibt als Bild der Bordkarte (Link auf DealPilot),
+           trägt aber die id #oab-pf-qr nicht mehr: an ihr hingen das Teilen-Modal (avm-section.js wireShareQr,
+           Nicht-anfassen-Datei) und der Pass-QR (_updateShareQr unten) - beide greifen jetzt ins Leere. */
+        '<a class="dp-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
       /* v1866 · Marcel: „Marktbericht abrufen unten, dann oben nochmal die
          Eingabetiefe … ein bisschen viel." Ein Ort: die Abruf-Box steht
