@@ -44,7 +44,7 @@
 .od-gruppen > .od-raster {
   display: grid;
   gap: 8px 12px;
-  align-items: end;          /* Feld an Feld, auch wenn ein Label umbricht */
+  align-items: start;        /* v3225a: Beschriftungen sind einzeilig, also oben buendig (end schob Felder mit Hinweis darunter nach oben) */
   padding: 10px 0;
   min-width: 0;
 }
@@ -109,3 +109,20 @@ body.dp-dg-2 #s0 .od-gruppen > .od-raster:not(:has(> .f:not([data-dp-dg="3"]))) 
 }
 #oe-vw-diff .oe-vw-diff-liste > li { min-width: 0; overflow-wrap: anywhere; }
 #oe-vw-diff .oe-vw-diff-liste > li > i { font-style: normal; font-size: 11px; color: var(--muted, #7A7370); }
+
+/* v3225a · Marcel 08.11.2026 („kreuz und quer“), nachgemessen an einem MFH (Bismarckstr.):
+   Hinweise IN den Beschriftungen (.dp-oa-warum, .dp-oa-tipp) machten sie 3-5 Zeilen hoch,
+   nicht passende Felder (.dp-oa-aus: Etage, Zimmer beim MFH) standen trotzdem im Raster,
+   und der Einheiten-Kasten trennte Objektart von Nutzungsart. */
+.od-raster > .f.dp-oa-aus { display: none !important; }
+.od-raster > .f > label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.od-raster > .f > label .dp-oa-tipp,
+.od-raster > .f > label .dp-oa-warum { display: none; }
+
+.od-raster > #mff-kasten { order: 9; }
+.od-raster > .f .cf-hint { margin-top: 2px; font-size: 11px; line-height: 1.3; }
+.od-raster > .f > label { display: flex; align-items: center; gap: 5px; height: 20px; margin: 0 0 4px; line-height: 20px; }
+.od-raster > .f > label > * { flex: 0 0 auto; }
+.od-raster > .f .iw,
+.od-raster > .f > input,
+.od-raster > .f > select { width: 100%; max-width: none; box-sizing: border-box; }
