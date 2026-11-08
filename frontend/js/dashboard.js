@@ -403,7 +403,12 @@
            kann alles heissen. Die Rohwerte, die dort zusaetzlich unter dem
            Balken stehen (-103 EUR/Mon, DSCR 1.04), gibt es auf
            Portfolio-Ebene nicht \u2014 sie waeren hier erfunden. */
-        return '<div class="bar"><div class="bt"><span class="n">'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc+'<i>/100</i>')+'</span></div>'
+        /* v3216 · W-3: „Rendite" ist die Deal-Score-KATEGORIE, nicht die
+           Bruttomietrendite - der Tooltip sagt es. Das Info-Zeichen steht als
+           ::after im CSS, damit der Text (Messe-Drehbuch liest ihn per Regex)
+           unveraendert bleibt. */
+        var _tip = c.key === 'rendite' ? _renditeTip() : '';
+        return '<div class="bar"><div class="bt"><span class="n'+(_tip?' hinfo':'')+'"'+(_tip?' tabindex="0" title="'+esc(_tip)+'"':'')+'>'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc+'<i>/100</i>')+'</span></div>'
           + '<div class="track"><div class="fill" data-w="'+sc+'" style="width:0;background:'+catBarColor(sc)+'"></div></div></div>';
       }).join('') : '<div class="bar" style="color:var(--c-pmut);font-family:JetBrains Mono;font-size:11px">Kategorien werden geladen\u2026</div>';
     var cfM=S.cfVsM;
@@ -420,6 +425,7 @@
       + '<div><div class="k">CF/MON</div><div class="v" style="color:'+(cfM>=0?'var(--c-greenl)':'var(--c-redl)')+'">'+(cfM>=0?'+':'')+fmtE(cfM)+'</div></div></div>'
       + '</div>'
       + '<div class="hbars"><div class="ttl">So setzt sich der Score zusammen</div><div id="dp-hero-bars">'+catsHtml+'</div>'+detailsBtn+'</div>'
+      + '<div class="hkz" id="dp-hero-kz">'+_heroKzHtml(S)+'</div>'
       + '</div></div>'
       + '<div class="vperf"></div>'
       + '<div class="hpass"><div class="hp-lab">PORTFOLIO-PASS</div><div class="qb" id="dp-hero-qr"></div>'
@@ -434,6 +440,94 @@
     })();
     var qrEl=$('dp-hero-qr'); if(qrEl){ qrEl.innerHTML=_qrSvg(((window.location&&location.origin)?location.origin:'')+'/?cockpit', 3); }
     setTimeout(function(){ host.querySelectorAll('.fill').forEach(function(f){ if(f.dataset.w!=null) f.style.width=f.dataset.w+'%'; }); },140);
+    /* v3216 · den letzten Marktbericht je Objekt nachladen (GET, kein
+       Kontingent) - derselbe Speicher wie die Gesamtbewertung (_mbHist) */
+    if(_detailsLoaded){ try{ _mbHistLaden(detailArr()); }catch(e){} }
+  }
+
+  /* ══ v3216 · W-3 (Entwicklungspartner): Kennzahl-Spalte im Score-Kopf ══
+     „eingesetztes Kapital gegen Cashflow vor/nach Steuer, Tilgung und das
+     Delta vom ursprünglichen Darlehen zur aktuellen Bewertung".
+     KEINE neue Rechnung: alles aus aggStats() (dieselben Summen wie die
+     Kacheln darunter) bzw. aus den am Objekt gespeicherten Kernwerten.
+     EK-Rendite = dieselbe Definition wie am Objekt (calc.js ekr/ekr_ns,
+     DealKpis ekr: Cashflow nach Tilgung / eingesetztes EK), über den
+     Bestand kapitalgewichtet: Summe Cashflow / Summe EK.
+     Heutiger Wert (Marcel): letzter Marktbericht des Objekts
+     (Marktpreisindikation), sonst Kaufpreis - je Objekt mit Quelle. */
+  function _renditeTip(){
+    var sw = { bruttorendite:25, nettorendite:30, cashflow:25, cashOnCash:20 }, gw = 35;
+    try {
+      var cfg = window.DealScore2 && DealScore2.loadConfig ? DealScore2.loadConfig() : null;
+      if (cfg && cfg.subWeights && cfg.subWeights.rendite) sw = cfg.subWeights.rendite;
+      if (cfg && cfg.weights && cfg.weights.rendite != null) gw = cfg.weights.rendite;
+    } catch (e) {}
+    var n = function(v){ return Math.round(num(v)); };
+    return 'Rendite = Kategorie des Deal-Scores (' + n(gw) + ' % des Gesamt-Scores), NICHT die Bruttomietrendite. '
+      + 'Je Objekt 0–100 Punkte aus vier Kennzahlen: Bruttomietrendite ' + n(sw.bruttorendite) + ' %, Nettomietrendite '
+      + n(sw.nettorendite) + ' %, Cashflow ' + n(sw.cashflow) + ' %, Cash-on-Cash ' + n(sw.cashOnCash)
+      + ' %. Über den Bestand nach Kaufpreis gewichtet.';
+  }
+  function _wertHeuteJeObjekt(arr){
+    return arr.map(function(o){
+      var k = o._key, h = (k && _mbHist[k]) || null, kp = _kpEuro(o);
+      var mw = h && num(h.market_value) > 0 ? num(h.market_value) : null;
+      var darl = num(o.d1) + num(o.d2);   /* wie aggStats().darl: ursprüngliche Darlehenssumme */
+      return { key: k, name: _objName(o), kp: kp, darl: darl,
+        wert: mw != null ? mw : kp,
+        quelle: mw != null ? 'mb' : (k && !(k in _mbHist) ? 'laedt' : 'kp'),
+        stand: h && h.created_at ? _fDat(h.created_at) : '' };
+    });
+  }
+  function _heroKzHtml(S){
+    S = S || aggStats();
+    if (!S || !S.n) return '';
+    var arr = detailArr();
+    var W = _wertHeuteJeObjekt(arr);
+    var wSum = 0, dSum = 0, nMb = 0, nKp = 0, nLaedt = 0;
+    W.forEach(function(x){ wSum += x.wert; dSum += x.darl; if (x.quelle === 'mb') nMb++; else { nKp++; if (x.quelle === 'laedt') nLaedt++; } });
+    var delta = wSum - dSum, deltaP = wSum > 0 ? delta / wSum * 100 : null;
+    var ek = S.ek, ekOk = ek > 100;
+    var r = function(z){ return ekOk ? z / ek * 100 : null; };
+    var ekrVs = r(S.cfVsJ), ekrNs = r(S.cfNsJ), ekrTg = r(S.cfVsJ + S.tilgJ);
+    var ton = function(v){ return v == null ? '' : (v >= 0 ? ' pos' : ' neg'); };
+    var pr = function(v){ return ekOk ? _fPr(v, 1) : '∞'; };
+    var EKt = ekOk ? '' : ' (kaum Eigenkapital eingesetzt)';
+    function z(l, v, cls, tip, sub){
+      return '<div class="kz-r' + (sub && sub.length > 8 ? ' kz-2' : '') + '"' + (tip ? ' title="' + esc(tip) + '"' : '') + '><span class="kz-l">' + l + (sub ? '<small>' + sub + '</small>' : '') + '</span>'
+        + '<span class="kz-v' + (cls || '') + '">' + v + '</span></div>';
+    }
+    var fE = _fEK;
+    var cfVs = (S.cfVsJ >= 0 ? '+' : '') + fE(S.cfVsJ), cfNs = (S.cfNsJ >= 0 ? '+' : '') + fE(S.cfNsJ);
+    var quelleTxt = nMb + '× Marktbericht, ' + nKp + '× Kaufpreis' + (nLaedt ? ' (' + nLaedt + ' wird geladen)' : '');
+    var tipEkr = 'EK-Rendite wie am Objekt (Kennzahlen-Kachel), über den Bestand kapitalgewichtet: Summe Cashflow nach Tilgung ÷ Summe eingesetztes Eigenkapital × 100.';
+    var liste = W.map(function(x){
+      var q = x.quelle === 'mb' ? 'Marktbericht' + (x.stand ? ' vom ' + x.stand : '') : (x.quelle === 'laedt' ? 'Kaufpreis (Marktbericht wird geladen …)' : 'Kaufpreis (kein Marktbericht)');
+      var dd = x.wert - x.darl;
+      return '<li><span class="kz-on">' + esc(x.name) + '<small>' + esc(q) + '</small></span><span class="kz-ow">' + _fE(x.wert)
+        + '<small class="' + (dd >= 0 ? 'pos' : 'neg') + '">' + (dd >= 0 ? '+' : '−') + _fE(Math.abs(dd)).replace(/^−/, '') + ' zum Darlehen</small></span></li>';
+    }).join('');
+    return '<div class="ttl">Kennzahlen p. a.'
+      + (S.stand && S.stand.modus === 'ankauf' ? ' <em>Stand Ankauf</em>' : '') + '</div>'
+      + z('Cashflow v. St.', cfVs, ton(S.cfVsJ), 'Summe Cashflow vor Steuer der Objekte (nach Zins, Tilgung, Bewirtschaftung), je Jahr.')
+      + z('Cashflow n. St.', cfNs, ton(S.cfNsJ), 'Summe Cashflow nach Steuer der Objekte, je Jahr.')
+      + z('Tilgung', fE(S.tilgJ), '', 'Summe Darlehen × anfängliche Tilgung (Darlehen 1 und 2), je Jahr – Vermögensaufbau, der im Cashflow schon abgezogen ist.')
+      + z('EK-Rendite v. St.', pr(ekrVs), ton(ekrVs), tipEkr + ' Cashflow vor Steuer.' + EKt)
+      + z('EK-Rendite n. St.', pr(ekrNs), ton(ekrNs), tipEkr + ' Cashflow nach Steuer.' + EKt)
+      + z('EK-Rendite inkl. Tilgung', pr(ekrTg), ton(ekrTg), '(Cashflow v. St. + Tilgung) ÷ eingesetztes Eigenkapital × 100 – zählt die Tilgung als Ertrag auf das EK mit (Sicht des Entwicklungspartners). Ohne Wertänderung.' + EKt, 'v. St.')
+      + '<div class="kz-sep">Kapital</div>'
+      + z('Gesamtinvestition', fE(S.gi), '', 'Kaufpreise + Nebenkosten + Sanierung/Inventar (wie Kachel „Investition“).', 'GIK')
+      + z('Finanziert', fE(S.darl), '', 'Ursprüngliche Darlehenssumme (Darlehen 1 + 2) beim Ankauf.')
+      + z('Eingesetztes EK', fE(S.ek), '', 'Eigenkapital laut Objekt-Eingabe, Summe.')
+      + z('Darlehen ↔ Wert heute', (delta >= 0 ? '+' : '−') + fE(Math.abs(delta)).replace(/^−/, ''), ton(delta),
+          'Abstand = Wert heute − ursprüngliches Darlehen; Prozent = Abstand ÷ Wert heute. Wert heute je Objekt: letzter Marktbericht (Marktpreisindikation), sonst Kaufpreis.',
+          (deltaP != null ? _fPr(deltaP, 1) + ' des Werts · ' : '') + 'Wert ' + fE(wSum))
+      + '<details class="kz-det"><summary>Wert heute je Objekt · ' + esc(quelleTxt) + '</summary><ul>' + liste + '</ul>'
+      + '<p>EK-Rendite = Cashflow ÷ eingesetztes Eigenkapital (wie am Objekt). Inkl. Tilgung = (Cashflow v. St. + Tilgung) ÷ EK. Abstand = Wert heute − ursprüngliches Darlehen.</p></details>';
+  }
+  function _renderHeroKz(){
+    var el = $('dp-hero-kz'); if (!el) return;
+    try { el.innerHTML = _heroKzHtml(); } catch (e) {}
   }
   function renderKpiCards(){
     var host=$('dp-kpi-grid'); if(!host) return;
@@ -1040,7 +1134,7 @@
         ((j && j.history) || []).forEach(function(h){ if (h && h.market_value != null && (!l || new Date(h.created_at) >= new Date(l.created_at))) l = h; });
         _mbHist[k] = l || false;
       }, function(){ _mbHist[k] = false; });
-    })).then(function(){ _mbHistLaedt = null; renderGesamtbew(); });
+    })).then(function(){ _mbHistLaedt = null; renderGesamtbew(); _renderHeroKz(); /* v3216 */ });
   }
   function _bewertungJeObjekt(arr, A){
     var zb = {}; ((A && A.mit) || []).forEach(function(e){ zb[e.key] = e; });
