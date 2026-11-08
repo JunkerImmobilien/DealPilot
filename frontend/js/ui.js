@@ -568,18 +568,45 @@ window.dpGetImgs = dpGetImgs;
 function renderImgs() {
   var grid = document.getElementById('img-grid');
   if (!grid) return;
+  /* v3217 · W-20: je Foto „vorher“/„nachher“ mit optionalem Datum. Die Angabe reist
+     am Bildeintrag (imgs[i].rolle/.datum) und wird beim Speichern als data._foto_meta
+     neben die Fotos gelegt (storage.js saveObj) - der Track Record zeigt daraus Paare.
+     Die Felder tragen eine id in .sec, damit die Speicheranzeige „geaendert“ sieht. */
+  if (!document.getElementById('dp-img-meta-stil')) {
+    var _st = document.createElement('style'); _st.id = 'dp-img-meta-stil';
+    _st.textContent = '.img-cell{display:flex;flex-direction:column;gap:5px;min-width:0}'
+      + '.img-meta{display:flex;gap:4px;align-items:center}'
+      + '.img-meta select,.img-meta input{flex:1 1 0;min-width:0;font-size:11px;padding:4px 5px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:inherit}'
+      + '.img-rolle-tag{position:absolute;top:5px;left:5px;font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:4px;background:rgba(0,0,0,.65);color:#fff}';
+    document.head.appendChild(_st);
+  }
   grid.innerHTML = imgs.map(function(img, i) {
     var isTitle = (i === 0);
     var lblHtml = isTitle
       ? '<div class="img-lbl img-lbl-title">★ Titelbild · in Liste &amp; PDF</div>'
       : '<div class="img-lbl"><button class="img-set-title" onclick="setTitleImg(' + i + ')" title="Als Titelbild verwenden">☆ Als Titelbild</button></div>';
-    return '<div class="img-thumb' + (isTitle ? ' img-thumb-title' : '') + '">' +
+    var r = img.rolle === 'vorher' || img.rolle === 'nachher' ? img.rolle : '';
+    var dat = /^\d{4}-\d{2}$/.test(img.datum || '') ? img.datum : '';
+    return '<div class="img-cell"><div class="img-thumb' + (isTitle ? ' img-thumb-title' : '') + '">' +
       '<img src="' + img.src + '" alt="Foto ' + (i+1) + '">' +
+      (r ? '<span class="img-rolle-tag">' + (r === 'vorher' ? 'Vorher' : 'Nachher') + '</span>' : '') +
       '<button class="img-del" onclick="delImg(' + i + ')" title="Foto entfernen">×</button>' +
       lblHtml +
-    '</div>';
+    '</div><div class="img-meta">' +
+      '<select id="img-rolle-' + i + '" aria-label="Foto ' + (i+1) + ': vorher oder nachher" onchange="dpImgMeta(' + i + ',\'rolle\',this.value)">' +
+        '<option value=""' + (r ? '' : ' selected') + '>–</option><option value="vorher"' + (r === 'vorher' ? ' selected' : '') + '>Vorher</option><option value="nachher"' + (r === 'nachher' ? ' selected' : '') + '>Nachher</option></select>' +
+      '<input id="img-datum-' + i + '" type="month" value="' + dat + '" title="Aufnahmedatum (optional)" aria-label="Foto ' + (i+1) + ': Aufnahmedatum" onchange="dpImgMeta(' + i + ',\'datum\',this.value)">' +
+    '</div></div>';
   }).join('');
 }
+/* v3217 · W-20 */
+function dpImgMeta(i, feld, wert) {
+  if (!imgs[i]) return;
+  if (feld === 'rolle') imgs[i].rolle = (wert === 'vorher' || wert === 'nachher') ? wert : '';
+  if (feld === 'datum') imgs[i].datum = /^\d{4}-\d{2}$/.test(wert || '') ? wert : '';
+  renderImgs();
+}
+window.dpImgMeta = dpImgMeta;
 function delImg(i) { imgs.splice(i, 1); renderImgs(); }
 
 // V31: Titelbild auswählen — verschiebt das Foto an Position 0.
@@ -2910,6 +2937,7 @@ function bsheetAction(action) {
   setTimeout(function() {
     switch (action) {
       case 'cockpit':       if (typeof setMainView === 'function') setMainView('dashboard'); break; /* v844-cockpit-handler */
+      case 'vermoegen':     if (typeof window.openVermoegen === 'function') window.openVermoegen(); break; /* v3217 · W-11 */
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
@@ -3081,6 +3109,7 @@ function _sbActionsRenderIcons() {
   var map = {
     single: 'house', all: 'folder', quickcheck: 'sparkles', new: 'plus', market: 'fileText',
     trackrec: 'trophy', bankexport: 'bank', cockpit: 'barChart', /* v844-cockpit-icon */
+    vermoegen: 'coins', /* v3217 · W-11 */
     pdf: 'fileText',
     csv: 'fileText',
     settings: 'settings',
@@ -3125,6 +3154,7 @@ function sbActionsAction(action) {
     switch (action) {
       case 'dashboard':   if (typeof setMainView === 'function') setMainView('dashboard'); break;
       case 'cockpit':       if (typeof setMainView === 'function') setMainView('dashboard'); break; /* v844-cockpit-handler */
+      case 'vermoegen':     if (typeof window.openVermoegen === 'function') window.openVermoegen(); break; /* v3217 · W-11 */
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;

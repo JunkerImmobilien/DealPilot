@@ -19,7 +19,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3179';
+  var VERSION = 'v3217';
 
   /* ── Helfer ───────────────────────────────────────────────────────── */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -92,6 +92,9 @@
     '.deck .zitat{margin-top:7mm;font-size:9pt;color:var(--muted);border-left:.8mm solid var(--gold);padding-left:4mm}',
     '.deck .abs{padding:0 17mm 14mm;display:flex;justify-content:space-between;align-items:flex-end;gap:8mm;font-size:8.4pt;color:var(--muted)}',
     '.deck .abs strong{color:var(--ink);font-weight:600}',
+    /* v3217 · W-5: Profilfoto auf dem Deckblatt (Track Record) */
+    '.deck .portrait{float:right;width:34mm;height:34mm;border-radius:50%;object-fit:cover;border:.7mm solid var(--gold);margin:0 0 4mm 6mm}.deck .portrait-n{clear:right}',
+    '.vn{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:3mm 0;break-inside:avoid}.vn figure{margin:0}.vn img{width:100%;height:50mm;object-fit:cover;display:block;border-radius:1mm}.vn figcaption{font:6.8pt/1.3 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:1mm}',
     /* Kennzahl-Kacheln (hell, Goldkante oben) */
     '.kz{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3mm;margin:3mm 0 4mm}.kz.drei{grid-template-columns:repeat(3,minmax(0,1fr))}',
     '.kz>div{border:.2mm solid var(--line);border-top:.8mm solid var(--gold);border-radius:0 0 1mm 1mm;padding:2.6mm 3mm 2.4mm;background:#fff;break-inside:avoid}',
@@ -152,12 +155,12 @@
   function abschnitt(eyebrow, titel, unter) {
     return (eyebrow ? '<div class="eyebrow">' + esc(eyebrow) + '</div>' : '') + '<h2>' + esc(titel) + '</h2>' + (unter ? '<p class="sub">' + esc(unter) + '</p>' : '');
   }
-  /** Deckblatt. o: {bild, eyebrow, titel, unter, wertLabel, wert, wertNeben, meta:[[k,v]], zitat, hinweisRechts} */
+  /** Deckblatt. o: {bild, portrait, eyebrow, titel, unter, wertLabel, wert, wertNeben, meta:[[k,v]], zitat, hinweisRechts} */
   function deckblatt(c, o) {
     var lg = c.logo && c.logo.b64 ? '<img src="' + c.logo.b64 + '" alt="">' : '<strong>' + esc((c.marke && c.marke.company) || '') + '</strong>';
     var z = absenderZeilen(c.marke);
     return '<section class="seite deck"><div class="bild' + (o.bild ? '' : ' ohne') + '"' + (o.bild ? ' style="background-image:url(\'' + o.bild + '\')"' : '') + '><div class="logo">' + lg + '</div></div>'
-      + '<div class="inhalt"><div class="eyebrow">' + esc(o.eyebrow || '') + '</div><h1>' + esc(o.titel || '') + '</h1><div class="adr">' + esc(o.unter || '') + '</div>'
+      + '<div class="inhalt">' + (o.portrait ? '<img class="portrait" src="' + o.portrait + '" alt="">' : '') + '<div class="eyebrow">' + esc(o.eyebrow || '') + '</div><h1>' + esc(o.titel || '') + '</h1><div class="adr">' + esc(o.unter || '') + '</div>'
       + (o.wert != null ? '<div class="wertbox"><div>' + (o.wertLabel ? '<div class="lbl">' + esc(o.wertLabel) + '</div>' : '') + '<div class="wert">' + (o.wert != null ? esc(o.wert) : '') + '</div></div>'
         + '<div style="font-size:8.6pt;color:var(--muted)">' + (o.wertNeben || '') + '</div></div>' : '')
       + (o.kz ? kacheln(o.kz) : '')
@@ -218,7 +221,8 @@
       s += '<path class="' + (r.klasse || 'l1') + '" d="' + w.map(function (p, i) { return (i ? 'L' : 'M') + X(p.x).toFixed(1) + ' ' + Y(p.y).toFixed(1); }).join(' ') + '"/>';
     });
     var schritt = Math.max(1, Math.ceil((x1 - x0) / 7));
-    for (var x = x0; x <= x1; x += schritt) s += '<text x="' + X(x).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" class="a">' + x + '</text>';
+    /* v3217 · opt.xfmt: Beschriftung der x-Achse (z. B. Datum statt Jahreszahl) */
+    for (var x = x0; x <= x1; x += schritt) s += '<text x="' + X(x).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" class="a">' + (opt.xfmt ? esc(opt.xfmt(x)) : x) + '</text>';
     s += '</svg>';
     var leg = '<div class="legende">' + reihen.map(function (r) { return '<span><i style="background:' + (r.klasse === 'l2' ? 'var(--rot)' : r.klasse === 'l3' ? 'var(--gruen)' : 'var(--gold)') + '"></i>' + esc(r.name) + '</span>'; }).join('') + '</div>';
     return s + leg;

@@ -3848,6 +3848,17 @@
     portfolioLaden: function () {
       return loadSummaries().then(function () { return loadDetails(); });
     },
+    /* v3217 · W-11 Vermögensaufstellung (vermoegen.js): die Objekte im Bestand mit
+       denselben Helfern wie die Vermögensbilanz (_kpEuro, _restschuldOf) - keine
+       zweite Rechnung. Marktwert nach DpWertangabe.marktwert (ohne Wert-Anker der
+       Kaufpreis, wie im Track Record). Vorher portfolioLaden() aufrufen. */
+    vermoegenObjekte: function () {
+      return detailArr(true).map(function (o) {
+        var kp = _kpEuro(o), mw = kp, hat = false;
+        try { if (window.DpWertangabe) { var r = window.DpWertangabe.aufloesen(o); hat = !!(r && r.wert && r.herkunft !== 'indikation'); mw = window.DpWertangabe.marktwert(o, kp) || kp; } } catch (e) {}
+        return { key: o._key, name: _objName(o), ort: (o._ort || o.ort || ''), kaufpreis: kp, marktwert: mw, hatMarktwert: hat, rest: _restschuldOf(o) };
+      }).filter(function (x) { return x.kaufpreis > 0 || x.rest > 0; });
+    },
     open: openDashboard, close: closeDashboard,
     setProjYears: setProjYears, setCardView: setCardView,
     steuerMappe: steuerMappe,   /* v1215-mappe */

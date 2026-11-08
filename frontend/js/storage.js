@@ -1088,6 +1088,15 @@ async function saveObj(opts) {
     try { if (window._currentObjData) window._currentObjData._ai = aiText; } catch (e) {}
   }
   var photos = (typeof imgs !== 'undefined') ? imgs.map(function(i){ return i.src; }) : [];
+  /* v3217 · W-20: „vorher“/„nachher“ und Datum je Foto - in derselben Reihenfolge wie photos,
+     weil beide hier aus demselben imgs entstehen. Liegt in data (jsonb), die Fotos in der
+     eigenen Spalte; ohne Angabe faellt der Schluessel weg. */
+  try {
+    if (data && typeof data === 'object' && typeof imgs !== 'undefined') {
+      var _fm = imgs.map(function (i) { return { rolle: (i && (i.rolle === 'vorher' || i.rolle === 'nachher')) ? i.rolle : '', datum: (i && /^\d{4}-\d{2}$/.test(i.datum || '')) ? i.datum : '' }; });
+      if (_fm.some(function (m) { return m.rolle || m.datum; })) data._foto_meta = _fm; else delete data._foto_meta;
+    }
+  } catch (e) {}
   /* v734-resize-on-save: grosse (Alt-)Fotos vor dem Upload verkleinern. v725 resized nur beim
      Upload; Altfotos liegen unkomprimiert (gemessen 3MB) und liessen den PUT timeouten.
      Schwelle 800KB base64 (~580KB Bild); resize auf 1600px/0.82 wie v725 ui.js. */
@@ -1245,6 +1254,7 @@ async function saveObj(opts) {
     var d = collectData();
     d._ai = aiText || '';
     d._photos = photos;
+    if (data && data._foto_meta) d._foto_meta = data._foto_meta; else delete d._foto_meta;   /* v3217 · W-20 */
     var keyPrefix = (typeof Auth !== 'undefined' && Auth.isLoggedIn()) ? Auth.getStorageKey('obj_') : 'ji_';
     var key = _currentObjKey || (keyPrefix + Date.now());
     localStorage.setItem(key, JSON.stringify(d));
@@ -2285,7 +2295,7 @@ async function loadSaved(k) {
       d._ai = obj.ai_analysis || '';
       // Restore photos
       if (typeof imgs !== 'undefined' && obj.photos) {
-        imgs = (obj.photos || []).map(function(src, i){ return { src: src, name: 'photo_' + i + '.jpg' }; });
+        imgs = (obj.photos || []).map(function(src, i){ var _m = (Array.isArray(d._foto_meta) && d._foto_meta[i]) || {}; return { src: src, name: 'photo_' + i + '.jpg', rolle: _m.rolle || '', datum: _m.datum || '' }; /* v3217 · W-20 */ });
         if (typeof renderImgs === 'function') renderImgs();
       }
       /* v1814 · DER SCHLUESSEL ZUERST. Hier stand er NACH loadData —
@@ -2332,7 +2342,7 @@ async function loadSaved(k) {
     var d = {};
     try { d = JSON.parse(localStorage.getItem(k) || '{}'); } catch(e) {}
     if (typeof imgs !== 'undefined' && d._photos) {
-      imgs = d._photos.map(function(src, i){ return { src: src, name: 'photo_' + i + '.jpg' }; });
+      imgs = d._photos.map(function(src, i){ var _m = (Array.isArray(d._foto_meta) && d._foto_meta[i]) || {}; return { src: src, name: 'photo_' + i + '.jpg', rolle: _m.rolle || '', datum: _m.datum || '' }; /* v3217 · W-20 */ });
       if (typeof renderImgs === 'function') renderImgs();
     }
     _currentObjKey = k;                 /* v1814 · Schluessel zuerst */
@@ -4029,10 +4039,52 @@ function _renderTrackRecordCard(o, idx) {
         '<div class="trackrec-card-kpi"><div class="trackrec-card-kpi-l">Bruttorendite</div><div class="trackrec-card-kpi-v">' + (bmr > 0 ? bmr.toFixed(2).replace('.', ',') + ' %' : '—') + '</div></div>' +
         '<div class="trackrec-card-kpi"><div class="trackrec-card-kpi-l">Fotos</div><div class="trackrec-card-kpi-v">' + photoCount + '</div></div>' +
       '</div>' +
+      _trFotoStreifen(o) +
       '<button class="btn btn-outline btn-sm trackrec-card-pdf" onclick="event.stopPropagation();exportTrackRecordOne(' + idx + ')">'+DP_ICO.pdf+' Einzel-PDF</button>' +
     '</div>' +
   '</div>';
 }
+
+/* v3217 · W-20: welche Fotos in den Track Record kommen - Haken je Bild.
+   Ohne eigene Wahl alle Fotos. Die Wahl gilt je Objekt-ID, im Browser gemerkt
+   (dp_tr_fotowahl), und geht als opt.fotos an das Dokument (dok-weiche.js) bzw.
+   an die klassische Fassung (track-record.js _trFotosFuer). */
+function _trFotoWahlLaden() {
+  if (window._trFotoWahl) return window._trFotoWahl;
+  try { window._trFotoWahl = JSON.parse(localStorage.getItem('dp_tr_fotowahl') || '{}') || {}; } catch (e) { window._trFotoWahl = {}; }
+  return window._trFotoWahl;
+}
+function _trFotoStreifen(o) {
+  var d = (o && o.data) || {}, f = Array.isArray(d._photos) ? d._photos : [];
+  if (!f.length || !o.id) return '';
+  var w = _trFotoWahlLaden()[o.id], meta = Array.isArray(d._foto_meta) ? d._foto_meta : [];
+  if (!document.getElementById('dp-tr-foto-stil')) {
+    var st = document.createElement('style'); st.id = 'dp-tr-foto-stil';
+    st.textContent = '.tr-fotos{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}.tr-fotos .l{width:100%;font:600 9.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}'
+      + '.tr-foto{position:relative;width:54px;height:42px;border-radius:5px;overflow:hidden;border:1px solid var(--border);cursor:pointer;display:block}'
+      + '.tr-foto img{width:100%;height:100%;object-fit:cover;display:block}.tr-foto input{position:absolute;top:2px;left:2px;margin:0}'
+      + '.tr-foto.aus img{opacity:.35}.tr-foto i{position:absolute;bottom:0;left:0;right:0;font:600 8.5px/1.4 "JetBrains Mono",monospace;font-style:normal;text-transform:uppercase;text-align:center;background:rgba(0,0,0,.6);color:#fff}';
+    document.head.appendChild(st);
+  }
+  return '<div class="tr-fotos" onclick="event.stopPropagation()"><span class="l">Fotos im PDF</span>' + f.map(function (src, i) {
+    var an = !Array.isArray(w) || w.indexOf(i) >= 0, m = meta[i] || {};
+    var r = m.rolle === 'vorher' ? 'Vorher' : m.rolle === 'nachher' ? 'Nachher' : '';
+    return '<label class="tr-foto' + (an ? '' : ' aus') + '" title="Foto ' + (i + 1) + (r ? ' · ' + r : '') + ' im PDF"><img src="' + _escAttrTr(src) + '" alt="">'
+      + '<input type="checkbox"' + (an ? ' checked' : '') + ' onchange="_trFotoWahlSetzen(\'' + _escAttrTr(o.id) + '\',' + i + ',' + f.length + ',this)">' + (r ? '<i>' + r + '</i>' : '') + '</label>';
+  }).join('') + '</div>';
+}
+function _trFotoWahlSetzen(id, i, n, el) {
+  var W = _trFotoWahlLaden();
+  var w = Array.isArray(W[id]) ? W[id].slice() : Array.apply(null, Array(n)).map(function (_, k) { return k; });
+  var p = w.indexOf(i);
+  if (el.checked && p < 0) w.push(i);
+  if (!el.checked && p >= 0) w.splice(p, 1);
+  w.sort(function (a, b) { return a - b; });
+  W[id] = w;
+  try { localStorage.setItem('dp_tr_fotowahl', JSON.stringify(W)); } catch (e) {}
+  var lab = el.closest && el.closest('.tr-foto'); if (lab) lab.classList.toggle('aus', !el.checked);
+}
+window._trFotoWahlSetzen = _trFotoWahlSetzen;
 
 /**
  * V40: Helper, baut DealScore2-Deal-Objekt aus einem gespeicherten Objekt-Datensatz.

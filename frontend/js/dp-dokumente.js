@@ -815,28 +815,104 @@
     var ids = opt && Array.isArray(opt.ids) && opt.ids.length ? opt.ids : null;
     return (objs || []).filter(function (o) { return o && o.data && (ids ? ids.indexOf(o.id) >= 0 : (!nurGewonnen || o.data._deal_won)); });
   }
+  /* v3217 · W-20: Fotos je Objekt nach der Wahl im Track Record (opt.fotos = {id: [Index …]}),
+     ohne Wahl alle. Mit „vorher“/„nachher“ (data._foto_meta) entstehen Paare. */
+  function trFotos(o, opt) {
+    var d = o.data || {}, f = Array.isArray(d._photos) ? d._photos : [], meta = Array.isArray(d._foto_meta) ? d._foto_meta : [];
+    var w = opt && opt.fotos && Array.isArray(opt.fotos[o.id]) ? opt.fotos[o.id] : null;
+    return f.map(function (src, i) { var m = meta[i] || {}; return { src: src, i: i, rolle: m.rolle || '', datum: m.datum || '' }; })
+      .filter(function (x) { return typeof x.src === 'string' && x.src && (!w || w.indexOf(x.i) >= 0); });
+  }
+  function monatDe(ym) { return /^\d{4}-\d{2}$/.test(ym || '') ? ym.slice(5) + '/' + ym.slice(0, 4) : ''; }
+  function vorherNachher(B, fotos) {
+    var v = fotos.filter(function (x) { return x.rolle === 'vorher'; }), n = fotos.filter(function (x) { return x.rolle === 'nachher'; });
+    var paare = Math.min(v.length, n.length);
+    if (!paare) return '';
+    var h = '<h3>Vorher / Nachher</h3>';
+    for (var i = 0; i < paare; i++) {
+      h += '<div class="vn"><figure><img src="' + v[i].src + '" alt=""><figcaption>Vorher' + (v[i].datum ? ' · ' + monatDe(v[i].datum) : '') + '</figcaption></figure>'
+        + '<figure><img src="' + n[i].src + '" alt=""><figcaption>Nachher' + (n[i].datum ? ' · ' + monatDe(n[i].datum) : '') + '</figcaption></figure></div>';
+    }
+    return h;
+  }
+  /* v3217 · W-11: Vermögensaufstellung, Haushaltsrechnung und Verlauf (vermoegen.js) - nur, wenn erfasst */
+  function vermoegenSeiten(B, c, V) {
+    if (!V || !V.hatDaten) return [];
+    var S = V.S, d = V.daten, out = [];
+    var P = function (art, kat) { return d.posten.filter(function (p) { return (art === 'schuld' ? p.art === 'schuld' : p.art !== 'schuld') && (!kat || p.kat === kat || (kat === 'sonstiges' && ['bank', 'depot'].indexOf(p.kat) < 0)); }); };
+    var ein = function (p) { return [p.name || V.katName(p.art === 'schuld' ? V.KAT_S : V.KAT_V, p.kat), B.eur(V.betrag(p.betrag)), { art: 'ein', det: p.kommentar || '' }]; };
+    var t = [['Liquide Vermögensgegenstände', B.eur(S.liquide), { art: 'summe' }]];
+    P('v', 'bank').concat(P('v', 'depot')).forEach(function (p) { t.push(ein(p)); });
+    t.push(['Nicht-liquide Vermögensgegenstände', B.eur(S.nichtLiquide), { art: 'summe' }]);
+    if (S.immoListe.length) {
+      t.push(['Immobilienvermögen', B.eur(S.immo), { art: 'ein' }]);
+      S.immoListe.forEach(function (x) { t.push([x.name, B.eur(x.wert), { art: 'ein', det: x.quelle + (x.ort ? ' · ' + x.ort : '') }]); });
+    }
+    P('v', 'sonstiges').forEach(function (p) { t.push(ein(p)); });
+    t.push(['Brutto-Vermögen', B.eur(S.brutto), { art: 'ende' }]);
+    var u = [['Immobiliendarlehen (Restschuld heute)', B.eur(S.immoSchuld), { art: 'summe' }]];
+    S.immoListe.forEach(function (x) { if (x.rest > 0) u.push([x.name, B.eur(x.rest), { art: 'ein' }]); });
+    if (P('schuld').length) { u.push(['Weitere Verbindlichkeiten', B.eur(S.schuldenPosten), { art: 'summe' }]); P('schuld').forEach(function (p) { u.push(ein(p)); }); }
+    u.push(['Summe Verbindlichkeiten', B.eur(S.schulden), { art: 'ende' }]);
+    var bilanz = [['Vermögensgegenstände', B.eur(S.brutto)], ['Verbindlichkeiten', B.eurS(-S.schulden)], ['Netto-Vermögen', B.eur(S.netto), { art: 'ende' }]];
+    out.push(B.seite(c, 'Vermögen', B.abschnitt('Vermögensverhältnisse', 'Vermögensaufstellung', 'Stand ' + c.stand + ' · Immobilien aus dem Bestand, bewertet zum ' + (d.immo.wertansatz === 'marktwert' ? 'Marktwert, wo erfasst (sonst Kaufpreis)' : 'Kaufpreis') + ', Restschuld heute')
+      + B.kacheln([{ l: 'Brutto-Vermögen', v: B.eur(S.brutto) }, { l: 'Verbindlichkeiten', v: B.eur(S.schulden) }, { l: 'Netto-Vermögen', v: B.eur(S.netto), art: S.netto >= 0 ? 'gut' : 'schlecht' }, { l: 'Beleihung', v: S.ltv != null ? B.pct(S.ltv, 1) : '–', s: 'Verbindlichkeiten ÷ Brutto' }])
+      + '<div class="zwei"><div><h3>Vermögen</h3>' + B.liste(t) + '</div><div><h3>Verbindlichkeiten</h3>' + B.liste(u) + '<h3>Vermögensaufstellung</h3>' + B.liste(bilanz) + '</div></div>'));
+    var E = d.haushalt.filter(function (p) { return p.art !== 'aus'; }), A = d.haushalt.filter(function (p) { return p.art === 'aus'; });
+    var hz = function (p, liste) { return [p.name || V.katName(liste, p.kat), B.eur(V.betrag(p.betrag)), { art: 'ein', det: [V.katName(liste, p.kat), p.kommentar].filter(Boolean).join(' · ') }]; };
+    var st = (d.staende || []).slice().sort(function (a, b) { return String(a.datum).localeCompare(String(b.datum)); });
+    var haus = '';
+    if (E.length || A.length) {
+      var h = [['Einnahmen', B.eur(S.einnahmen), { art: 'summe' }]].concat(E.map(function (p) { return hz(p, V.KAT_E); }))
+        .concat([['Ausgaben', B.eur(S.ausgaben), { art: 'summe' }]]).concat(A.map(function (p) { return hz(p, V.KAT_A); }))
+        .concat([['Überschuss / Monat', B.eurS(S.ueberschuss), { art: 'ende', farbe: 1 }]]);
+      haus = B.abschnitt('Haushaltsrechnung', 'Einnahmen und Ausgaben je Monat') + B.liste(h);
+    }
+    var verlauf = '';
+    if (st.length) {
+      var tag = function (iso) { return Math.round(Date.parse(String(iso).slice(0, 10)) / 86400000); };
+      var reihe = function (k) { return st.map(function (x) { return { x: tag(x.datum), y: x.summen ? x.summen[k] : null }; }); };
+      var grafik = st.length >= 2 ? B.linien([{ name: 'Brutto-Vermögen', klasse: 'l1', werte: reihe('brutto') }, { name: 'Verbindlichkeiten', klasse: 'l2', werte: reihe('schulden') }, { name: 'Netto-Vermögen', klasse: 'l3', werte: reihe('netto') }],
+        { titel: 'Vermögensentwicklung', null: true, xfmt: function (x) { var dt = new Date(x * 86400000); return ('0' + dt.getUTCDate()).slice(-2) + '.' + ('0' + (dt.getUTCMonth() + 1)).slice(-2) + '.' + String(dt.getUTCFullYear()).slice(2); } }) : '';
+      verlauf = B.abschnitt('Entwicklung', 'Vermögensentwicklung', st.length + ' gespeicherte Stände · ' + B.datum(st[0].datum) + ' bis ' + B.datum(st[st.length - 1].datum)) + grafik
+        + '<table class="dicht" style="margin-top:3mm"><thead><tr><th>Stand</th><th class="r">Brutto</th><th class="r">Verbindl.</th><th class="r">Netto</th><th>Maßnahmen / Kommentar</th></tr></thead><tbody>'
+        + st.slice().reverse().map(function (x) { var z = x.summen || {}; return '<tr><td class="num">' + B.datum(x.datum) + '</td><td class="r num">' + B.eur(z.brutto) + '</td><td class="r num">' + B.eur(z.schulden) + '</td><td class="r num">' + B.eur(z.netto) + '</td><td>' + B.esc(x.kommentar || '') + '</td></tr>'; }).join('')
+        + '</tbody></table>';
+    }
+    if (haus || verlauf) out.push(B.seite(c, 'Haushalt und Verlauf', haus + (haus && verlauf ? '<div style="height:6mm"></div>' : '') + verlauf));
+    return out;
+  }
   function trackRecord(opt) {
     var B = D();
-    return Promise.all([basis('Track Record'), getAllObjectsData()]).then(function (z) {
-      var c = z[0], objs = nachIds(z[1], opt, true);
+    var vP = (window.DpVermoegen && typeof DpVermoegen.fuerDokument === 'function') ? DpVermoegen.fuerDokument().catch(function () { return null; }) : Promise.resolve(null);
+    return Promise.all([basis('Track Record'), getAllObjectsData(), vP]).then(function (z) {
+      var c = z[0], objs = nachIds(z[1], opt, true), V = z[2];
       c.zeile = 'Portfolio · ' + objs.length + ' Objekte';
       var sum = function (f) { return objs.reduce(function (a, o) { return a + (Number(f(o)) || 0); }, 0); };
       var kp = sum(function (o) { return o.kpis && o.kpis.kp; }), wfl = sum(function (o) { return parseFloat(String(o.data.wfl || '').replace(',', '.')); });
       var cf = sum(function (o) { return o.kpis && o.kpis.cf_ns_yearly; }), dl = sum(function (o) { return o.kpis && o.kpis.d_total; });
       var S = [];
-      S.push(B.deckblatt(c, { bild: null, eyebrow: 'Track Record', titel: (c.marke.company || 'Portfolio'), unter: 'Portfolio-Übersicht und Performance',
+      /* v3217 · W-5: Profilfoto und Name auf dem Deckblatt */
+      var person = V && V.name ? V.name : '';
+      S.push(B.deckblatt(c, { bild: null, portrait: V && V.foto, eyebrow: 'Track Record', titel: (c.marke.company || person || 'Portfolio'), unter: (person && person !== (c.marke.company || person) ? person + ' · ' : '') + 'Portfolio-Übersicht und Performance',
         kz: [{ l: 'Objekte', v: B.zahl(objs.length, 0) }, { l: 'Kaufpreise gesamt', v: B.eur(kp) }, { l: 'Wohnfläche', v: B.zahl(wfl, 0) + ' m²' }, { l: 'Cashflow n. St. / Jahr', v: B.eurS(cf), art: 'hi' }],
-        meta: [['Darlehen gesamt', B.eur(dl)], ['Stand', c.stand], ['Ø Bruttorendite', B.pct(objs.length ? sum(function (o) { return o.kpis && o.kpis.bmy; }) / objs.length : null, 2)]] }));
+        meta: [['Darlehen gesamt', B.eur(dl)], ['Stand', c.stand], (V && V.hatDaten ? ['Netto-Vermögen', B.eur(V.S.netto)] : ['Ø Bruttorendite', B.pct(objs.length ? sum(function (o) { return o.kpis && o.kpis.bmy; }) / objs.length : null, 2)])] }));
       S.push(B.seite(c, 'Objekte', B.abschnitt('Übersicht', 'Objekte im Bestand') + '<table><thead><tr><th>Objekt</th><th>Art</th><th class="r">Fläche</th><th class="r">Kaufpreis</th><th class="r">Bruttorendite</th><th class="r">CF n. St./J.</th><th class="r">DSCR</th></tr></thead><tbody>'
         + objs.map(function (o) { var d = o.data, k = o.kpis || {}; return '<tr><td>' + B.esc([d.str, d.hnr].filter(Boolean).join(' ')) + '<div class="det">' + B.esc([d.plz, d.ort].filter(Boolean).join(' ')) + '</div></td><td>' + B.esc(d.objart || '') + '</td><td class="r num">' + B.zahl(parseFloat(String(d.wfl || '').replace(',', '.')), 0) + ' m²</td><td class="r num">' + B.eur(k.kp) + '</td><td class="r num">' + B.pct(k.bmy, 2) + '</td><td class="r num' + ((k.cf_ns_yearly || 0) >= 0 ? ' pos' : ' neg') + '">' + B.eurS(k.cf_ns_yearly) + '</td><td class="r num">' + B.zahl(k.dscr, 2) + '</td></tr>'; }).join('')
         + '</tbody></table>'));
+      vermoegenSeiten(B, c, V).forEach(function (x) { S.push(x); });
       objs.forEach(function (o) {
         var d = o.data, k = o.kpis || {}, adr = [[d.str, d.hnr].filter(Boolean).join(' '), [d.plz, d.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
-        S.push(B.seite(c, adr, '<div class="zwei"><div>' + (d._thumb ? '<img class="karte" src="' + d._thumb + '" alt="" style="height:52mm;object-fit:cover">' : '') + '</div><div>'
+        var F = trFotos(o, opt), haupt = F.length ? F[0].src : (opt && opt.fotos && Array.isArray(opt.fotos[o.id]) ? null : d._thumb);
+        var vn = vorherNachher(B, F);
+        var rest = F.slice(1).filter(function (x) { return !vn || (x.rolle !== 'vorher' && x.rolle !== 'nachher'); }).slice(0, 4);
+        S.push(B.seite(c, adr, '<div class="zwei"><div>' + (haupt ? '<img class="karte" src="' + haupt + '" alt="" style="height:52mm;object-fit:cover">' : '') + '</div><div>'
           + B.abschnitt(d.objart || '', adr) + '<div class="kv" style="grid-template-columns:1fr">' + [['Kaufdatum', B.datum(d.kaufdat) || '–'], ['Wohnfläche', B.zahl(parseFloat(String(d.wfl || '').replace(',', '.')), 0) + ' m²'], ['Baujahr', B.jahr(d.baujahr)], ['Kaufpreis', B.eur(k.kp)], ['Darlehen', B.eur(k.d_total)]]
             .map(function (x) { return '<div><span>' + x[0] + '</span><span class="num">' + x[1] + '</span></div>'; }).join('') + '</div></div></div>'
           + B.kacheln([{ l: 'Bruttorendite', v: B.pct(k.bmy, 2) }, { l: 'CF n. St. / Monat', v: B.eurS(k.cf_ns_monthly), art: (k.cf_ns_monthly || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'DSCR', v: B.zahl(k.dscr, 2) }, { l: 'Rate / Monat', v: B.eur(k.rate_total_m) }])
-          + (d.thesis ? '<h3>Investmentthese</h3><p>' + B.esc(d.thesis) + '</p>' : '')));
+          + (d.thesis ? '<h3>Investmentthese</h3><p>' + B.esc(d.thesis) + '</p>' : '')
+          + vn
+          + (rest.length ? '<div class="galerie">' + rest.map(function (x) { return '<img src="' + x.src + '" alt="">'; }).join('') + '</div>' : '')));
       });
       return B.dokument('Track Record · ' + (c.marke.company || ''), S);
     });

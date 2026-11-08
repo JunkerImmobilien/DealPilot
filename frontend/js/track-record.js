@@ -46,8 +46,13 @@ async function exportTrackRecordPDF(objects) {
   var GREEN = [42, 154, 90];
   var RED = [201, 76, 76];
 
+  /* v3217 · W-11/W-5: Vermögensaufstellung, Haushalt, Verlauf und Profilfoto (vermoegen.js) */
+  var _V = null;
+  try { if (window.DpVermoegen && typeof DpVermoegen.fuerDokument === 'function') _V = await DpVermoegen.fuerDokument(); } catch (e) { _V = null; }
+
   // Render cover page first
-  renderCoverPage(doc, objects, W, H, { GOLD: GOLD, CH: CH, MUTED: MUTED, GREEN: GREEN, RED: RED });
+  renderCoverPage(doc, objects, W, H, { GOLD: GOLD, CH: CH, MUTED: MUTED, GREEN: GREEN, RED: RED }, _V);
+  if (_V && _V.hatDaten) { doc.addPage(); _trVermoegenSeite(doc, _V, W, H, { GOLD: GOLD, CH: CH, MUTED: MUTED, GREEN: GREEN, RED: RED }); }
 
   // Render track record per object
   for (var idx = 0; idx < objects.length; idx++) {
@@ -66,13 +71,22 @@ async function exportTrackRecordPDF(objects) {
 }
 
 
-function renderCoverPage(doc, objects, W, H, C) {
+function renderCoverPage(doc, objects, W, H, C, V) {
   var M = 14;
   var CW = W - 2 * M;
 
   // Full-page charcoal background top half
   doc.setFillColor.apply(doc, C.CH);
   doc.rect(0, 0, W, H * 0.55, 'F');
+
+  /* v3217 · W-5: Profilfoto oben rechts (quadratisch zugeschnitten in vermoegen.js), Name darunter */
+  if (V && V.foto) {
+    try {
+      doc.addImage(V.foto, 'JPEG', W - M - 34, 12, 34, 34);
+      doc.setDrawColor.apply(doc, C.GOLD); doc.setLineWidth(0.6); doc.rect(W - M - 34, 12, 34, 34, 'S');
+      if (V.name) { doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(220, 220, 220); doc.text(String(V.name), W - M - 17, 51, { align: 'center' }); }
+    } catch (e) {}
+  }
 
   // Diagonal gold accent
   doc.setFillColor.apply(doc, C.GOLD);
@@ -276,9 +290,11 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
   var photoH = 60;
   var photoW = 80;
 
-  if (d._photos && d._photos.length > 0) {
+  /* v3217 · W-20: erstes Foto aus der Wahl im Track Record (ohne Wahl wie bisher das Titelbild) */
+  var _fotos = _trFotosFuer(obj);
+  if (_fotos.length > 0) {
     try {
-      doc.addImage(d._photos[0], 'JPEG', M, cy, photoW, photoH);
+      doc.addImage(_fotos[0], 'JPEG', M, cy, photoW, photoH);
     } catch (e) {
       _photoPlaceholder(doc, M, cy, photoW, photoH, C);
     }
@@ -473,6 +489,59 @@ function _trackRecordProjektion(obj, d) {
     });
     return out.length ? out : null;
   } catch (e) { return null; }
+}
+
+/* v3217 · W-20: Fotos eines Objekts nach der Wahl in der Track-Record-Ansicht (storage.js) */
+function _trFotosFuer(obj) {
+  var d = (obj && obj.data) || {}, f = Array.isArray(d._photos) ? d._photos : [];
+  var W = null; try { W = window._trFotoWahl || JSON.parse(localStorage.getItem('dp_tr_fotowahl') || 'null'); } catch (e) { W = null; }
+  var w = W && obj && Array.isArray(W[obj.id]) ? W[obj.id] : null;
+  return f.filter(function (src, i) { return typeof src === 'string' && src && (!w || w.indexOf(i) >= 0); });
+}
+
+/* v3217 · W-11: eine Seite Vermögensaufstellung + Haushaltsrechnung + Stände (klassische Fassung,
+   ohne Grafik - die Grafik steht in der einheitlichen Fassung, dp-dokumente.js) */
+function _trVermoegenSeite(doc, V, W, H, C) {
+  var M = 14, S = V.S, d = V.daten, eu = function (n) { return _fmtKEU(n); };
+  doc.setFillColor.apply(doc, C.CH); doc.rect(0, 0, W, 28, 'F');
+  doc.setFillColor.apply(doc, C.GOLD); doc.rect(0, 28, W, 1.2, 'F');
+  doc.setTextColor.apply(doc, C.GOLD); doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+  doc.text('VERMÖGENSAUFSTELLUNG', M, 14);
+  doc.setTextColor(220, 220, 220); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+  doc.text('Stand ' + new Date().toLocaleDateString('de-DE') + ' · Immobilien aus dem Bestand (' + (d.immo.wertansatz === 'marktwert' ? 'Marktwert, wo erfasst' : 'Kaufpreis') + ', Restschuld heute)', M, 21);
+  var body = [];
+  var posten = function (art, kats) { return d.posten.filter(function (p) { return (art === 'schuld') === (p.art === 'schuld') && (!kats || kats.indexOf(p.kat) >= 0); }); };
+  var zeile = function (p, liste) { return ['   ' + (p.name || V.katName(liste, p.kat)), eu(V.betrag(p.betrag)), p.kommentar || '']; };
+  body.push([{ content: 'Liquide Vermögensgegenstände', styles: { fontStyle: 'bold' } }, { content: eu(S.liquide), styles: { fontStyle: 'bold' } }, '']);
+  posten('v', ['bank', 'depot']).forEach(function (p) { body.push(zeile(p, V.KAT_V)); });
+  body.push([{ content: 'Nicht-liquide Vermögensgegenstände', styles: { fontStyle: 'bold' } }, { content: eu(S.nichtLiquide), styles: { fontStyle: 'bold' } }, '']);
+  S.immoListe.forEach(function (x) { body.push(['   ' + x.name, eu(x.wert), x.quelle]); });
+  d.posten.filter(function (p) { return p.art !== 'schuld' && ['bank', 'depot'].indexOf(p.kat) < 0; }).forEach(function (p) { body.push(zeile(p, V.KAT_V)); });
+  body.push([{ content: 'Brutto-Vermögen', styles: { fontStyle: 'bold' } }, { content: eu(S.brutto), styles: { fontStyle: 'bold' } }, '']);
+  body.push([{ content: 'Verbindlichkeiten', styles: { fontStyle: 'bold' } }, { content: eu(S.schulden), styles: { fontStyle: 'bold' } }, '']);
+  S.immoListe.forEach(function (x) { if (x.rest > 0) body.push(['   ' + x.name + ' (Restschuld)', eu(x.rest), '']); });
+  posten('schuld').forEach(function (p) { body.push(zeile(p, V.KAT_S)); });
+  body.push([{ content: 'Netto-Vermögen', styles: { fontStyle: 'bold' } }, { content: eu(S.netto), styles: { fontStyle: 'bold' } }, '']);
+  var head = { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 9, fontStyle: 'bold' };
+  doc.autoTable({ startY: 38, head: [['Position', 'Betrag', 'Kommentar']], body: body, theme: 'striped', headStyles: head,
+    bodyStyles: { fontSize: 8.5, cellPadding: 1.8 }, alternateRowStyles: { fillColor: [248, 246, 240] }, columnStyles: { 1: { halign: 'right', cellWidth: 34 } }, margin: { left: M, right: M } });
+  var y = doc.lastAutoTable.finalY + 8;
+  if (d.haushalt.length) {
+    var hb = [];
+    d.haushalt.filter(function (p) { return p.art !== 'aus'; }).forEach(function (p) { hb.push([p.name || V.katName(V.KAT_E, p.kat), eu(V.betrag(p.betrag)), 'Einnahme']); });
+    d.haushalt.filter(function (p) { return p.art === 'aus'; }).forEach(function (p) { hb.push([p.name || V.katName(V.KAT_A, p.kat), '-' + eu(V.betrag(p.betrag)), 'Ausgabe']); });
+    hb.push([{ content: 'Überschuss / Monat', styles: { fontStyle: 'bold' } }, { content: eu(S.ueberschuss), styles: { fontStyle: 'bold' } }, '']);
+    doc.autoTable({ startY: y, head: [['Haushaltsrechnung (monatlich)', 'Betrag', '']], body: hb, theme: 'striped', headStyles: head,
+      bodyStyles: { fontSize: 8.5, cellPadding: 1.8 }, alternateRowStyles: { fillColor: [248, 246, 240] }, columnStyles: { 1: { halign: 'right', cellWidth: 34 } }, margin: { left: M, right: M } });
+    y = doc.lastAutoTable.finalY + 8;
+  }
+  var st = (d.staende || []).slice().sort(function (a, b) { return String(b.datum).localeCompare(String(a.datum)); }).slice(0, 24);
+  if (st.length) {
+    doc.autoTable({ startY: y, head: [['Stand', 'Brutto', 'Verbindl.', 'Netto', 'Maßnahmen / Kommentar']],
+      body: st.map(function (x) { var z = x.summen || {}; return [String(x.datum).slice(0, 10).split('-').reverse().join('.'), eu(z.brutto), eu(z.schulden), eu(z.netto), x.kommentar || '']; }),
+      theme: 'striped', headStyles: head, bodyStyles: { fontSize: 8, cellPadding: 1.6 }, alternateRowStyles: { fillColor: [248, 246, 240] },
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } }, margin: { left: M, right: M } });
+  }
 }
 
 function _photoPlaceholder(doc, x, y, w, h, C) {

@@ -63,6 +63,8 @@
     if (JSON.stringify(w).length > GRENZE && st.pdf_logo_b64) {
       delete st.pdf_logo_b64; w.logo_zu_gross = true;
     }
+    /* v3217 · W-5: das Profilfoto (vermoegen.js, 360 px JPEG) faellt als zweites, falls es dann noch nicht passt */
+    if (JSON.stringify(w).length > GRENZE && st.user_foto_b64) { delete st.user_foto_b64; w.foto_zu_gross = true; }
     return w;
   }
   function gleich(a, b) { return JSON.stringify(a || null) === JSON.stringify(b || null); }
@@ -117,6 +119,7 @@
           if (besitzer === uid && lokal) {
             GEHEIM.forEach(function (k) { if (lokal[k]) neu[k] = lokal[k]; });
             if (server.logo_zu_gross && lokal.pdf_logo_b64) neu.pdf_logo_b64 = lokal.pdf_logo_b64;
+            if (server.foto_zu_gross && lokal.user_foto_b64) neu.user_foto_b64 = lokal.user_foto_b64;   /* v3217 */
           }
           if (!gleich(neu, lokal)) _set.call(s, LS_SETTINGS, JSON.stringify(neu));
         }
