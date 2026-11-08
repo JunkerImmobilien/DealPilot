@@ -934,7 +934,8 @@
         kz: [{ l: 'Brutto-Vermögen', v: B.eur(S.brutto), s: 'liquide ' + B.eur(S.liquide) }, { l: 'Verbindlichkeiten', v: B.eur(S.schulden) }, { l: 'Netto-Vermögen', v: B.eur(S.netto), art: 'hi' }, { l: 'Überschuss / Monat', v: B.eurS(S.ueberschuss), art: S.ueberschuss >= 0 ? 'gut' : 'schlecht' }],
         meta: [['Stand', c.stand], ['Beleihung', S.ltv != null ? B.pct(S.ltv, 1) : '–'], ['Letzter gespeicherter Stand', letzter ? B.datum(letzter.datum) : 'noch keiner']],
         zitat: HINWEIS }));
-      if (!V.hatDaten) {
+      /* v3226a: mit Objekten im Bestand ist das PDF nie leer - vorher sagte Seite 2 „Noch keine Angaben“, waehrend das Deckblatt 1 Mio. Netto zeigte */
+      if (!V.hatDaten && !(S.immoListe && S.immoListe.length)) {
         Sx.push(B.seite(c, 'Vermögen', B.abschnitt('Vermögen & Haushalt', 'Noch keine Angaben erfasst')
           + '<div class="hinweis">Unter Ansichten › Vermögen &amp; Haushalt trägst du Konten, Depot, weitere Verbindlichkeiten und die Haushaltsrechnung ein. Die Immobilien kommen automatisch aus deinen Objekten im Bestand.</div>'));
         return B.dokument('Vermögen und Haushalt' + (person ? ' · ' + person : ''), Sx);
