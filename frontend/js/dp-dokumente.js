@@ -69,6 +69,10 @@
     if (d1) l.push({ name: 'Darlehen I · Annuitätendarlehen', betrag: d1, zins: zahlAus('d1z'), tilg: zahlAus('d1t'), bind: zahlAus('d1_bindj') });
     var d2 = zahlAus('d2'); var an = feld('d2_enable');
     if (d2 && an !== false) l.push({ name: 'Darlehen II', betrag: d2, zins: zahlAus('d2z'), tilg: zahlAus('d2t'), bind: zahlAus('d2_bindj') });
+    /* v3215 · W-17: weitere Darlehen (Kern DpDarlehenWeitere, Liste aus dem Feld) */
+    if (window.DpDarlehenWeitere) DpDarlehenWeitere.lesen(feld('darlehen_weitere')).forEach(function (e, i) {
+      l.push({ name: DpDarlehenWeitere.name(e, i), betrag: e.betrag, zins: e.zins, tilg: e.tilg, bind: e.bindj });
+    });
     l.forEach(function (x) { if (x.zins != null && x.tilg != null) x.rate = x.betrag * (x.zins + x.tilg) / 100 / 12; });
     return l;
   }
@@ -164,14 +168,25 @@
     if (d2an) {
       r2 = d2 * ((zahlAus('d2z') || 0) + (zahlAus('d2t') || 0)) / 100 / 12;
       fin.push(['Darlehen II', B.eur(d2)], ['Sollzins · Tilgung', B.pct(zahlAus('d2z'), 2) + ' · ' + B.pct(zahlAus('d2t'), 2), { art: 'ein' }], ['Rate Darlehen II / Monat', B.eur(r2, 2), { art: 'ein' }]);
-      fin.push(['Mischzins (gewichtet)', B.pct(((d1 || 0) * (zahlAus('d1z') || 0) + d2 * (zahlAus('d2z') || 0)) / ((d1 || 0) + d2), 2), { art: 'ein' }]);
-      fin.push(['Gesamtrate / Monat', B.eur((S.d1_rate_monthly || 0) + r2, 2), { art: 'ein' }]);
     }
-    fin.push(['Finanzierung gesamt', B.eur((d1 || 0) + (d2 || 0)), { art: 'summe' }]);
+    /* v3215 · W-17: weitere Darlehen aus dem Rechenlauf (State, Kern DpDarlehenWeitere) */
+    var _W = window.DpDarlehenWeitere, _dwL = _W ? (S.dw_liste || []) : [], _dwSum = S.dw_summe || 0, _dwZj = (S.dw_zm || 0) * 12;
+    _dwL.forEach(function (e, i) {
+      var ab = _W.abKauf(e, S.dw_basisjahr);
+      fin.push([_W.name(e, i) + (ab ? '' : ' (ab ' + e.start_jahr + ')'), B.eur(e.betrag)],
+        ['Sollzins · Tilgung · Bindung', B.pct(e.zins, 2) + ' · ' + (e.art === 'tilgungsaussetzung' ? 'Tilgungsaussetzung' : B.pct(e.tilg, 2)) + ' · ' + (e.bindj ? B.zahl(e.bindj, 0) + ' J.' : '–'), { art: 'ein' }],
+        ['Rate / Monat', B.eur(_W.rateM(e), 2), { art: 'ein' }]);
+    });
+    if (d2an || _dwSum > 0) {
+      var _dS = (d1 || 0) + (d2 || 0) + _dwSum;
+      if (_dS > 0) fin.push(['Mischzins (gewichtet)', B.pct(((d1 || 0) * (zahlAus('d1z') || 0) + (d2 || 0) * (zahlAus('d2z') || 0) + _dwZj * 100) / _dS, 2), { art: 'ein' }]);
+      fin.push(['Gesamtrate / Monat', B.eur((S.d1_rate_monthly || 0) + r2 + (S.dw_rate_m || 0), 2), { art: 'ein' }]);
+    }
+    fin.push(['Finanzierung gesamt', B.eur((d1 || 0) + (d2 || 0) + _dwSum), { art: 'summe' }]);
     fin.push(['Beleihungsauslauf (LTV)', B.pct(K.ltv, 1), { det: S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : '' }]);
     var bis = zellText('r-bindend'); if (bis) fin.push(['Zinsbindung bis', bis]);
     fin.push(['Restschuld am Ende der Zinsbindung', B.eur(S.rs)]);
-    fin.push(['Finanzierungsstruktur', aus ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag') : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen')]);
+    fin.push(['Finanzierungsstruktur', (aus ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag') : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen')) + (_dwL.length ? ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen') : '')]);   /* v3215 */
     var svw = zahlAus('svwert');
     if (svw) {
       fin.push([S.svw_label || 'Wertangabe (Reiter Objekt)', B.eur(svw)]);

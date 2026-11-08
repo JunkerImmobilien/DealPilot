@@ -301,6 +301,11 @@ window.DpDetailgradZuordnung = {
       "titel": "Darlehen II – Zusatzdarlehen"
      },
      {
+      "s": "#dw-card",
+      "art": "karte",
+      "titel": "Weitere Darlehen"
+     },
+     {
       "s": "#bi-dscr",
       "art": "kind",
       "titel": "Bankargumente"

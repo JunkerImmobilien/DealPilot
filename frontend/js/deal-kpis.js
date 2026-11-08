@@ -43,6 +43,8 @@ window.DealKpis = (function() {
    *   bwk_nul     (€/Jahr)   Nicht umlagefähige Bewirtschaftungskosten (Jahr) — Eigentümer-Kosten
    *   d1, d1z, d1t           Darlehen 1 (€, Zins %, Tilgung %)
    *   d2, d2z, d2t           Darlehen 2 (€, Zins %, Tilgung %, default 0)
+   *   darlehen_weitere       v3215: weitere Darlehen (Array oder JSON, DpDarlehenWeitere.lesen)
+   *   basisjahr              v3215: Kalenderjahr von Jahr 1 (fuer Start-Jahr der weiteren Darlehen)
    *   ek          (€)        Eigenkapital
    *   afa         (€/Jahr)   AfA-Betrag (default 0)
    *   grenz       (Prozent)  Grenzsteuersatz in % (default 0)
@@ -135,7 +137,17 @@ window.DealKpis = (function() {
     var d2_zm     = (d2 * d2z) / 12;
     var d2_tm     = d2_rate_m - d2_zm;
 
-    var d_total = d1 + d2;
+    /* v3215 · W-17 · WEITERE DARLEHEN (Darlehen III, IV, …). Der Aufrufer gibt die
+       Liste als `darlehen_weitere` mit (Array oder JSON-Text aus dem Feld), dazu
+       optional `basisjahr` (Darlehen mit spaeterem Start-Jahr zaehlen dann nicht
+       zur Kauffinanzierung). Gerechnet wird im Kern DpDarlehenWeitere
+       (darlehen-weitere.js, mitgespiegelt) - hier steht keine eigene Formel.
+       Ohne Liste oder ohne Kern: 0, die Zahlen bleiben wie bis v3214. */
+    var _dwK = (typeof window !== 'undefined' && window.DpDarlehenWeitere) ? window.DpDarlehenWeitere : null;
+    var dw = (_dwK && i.darlehen_weitere) ? _dwK.anfang(i.darlehen_weitere, { basisJahr: +i.basisjahr || null })
+      : { n: 0, betrag: 0, rate_m: 0, zm: 0, tm: 0 };
+
+    var d_total = d1 + d2 + dw.betrag;
     // V63.36: 3-stufige LTV-Logik
     //   Wenn ekInklNkLtv = true → LTV/GI (konservativ)
     //   Sonst wenn svw > 0       → LTV/SVW (Bankenpraxis, Beleihungswert)
@@ -157,8 +169,8 @@ window.DealKpis = (function() {
     else ltv_basis = kp;
     var ltv = ltv_basis > 0 ? (d_total / ltv_basis * 100) : 0;
 
-    var zins_j = (d1_zm + d2_zm) * 12;
-    var tilg_j = (d1_tm + d2_tm) * 12;
+    var zins_j = (d1_zm + d2_zm + dw.zm) * 12;   /* v3215: + weitere Darlehen */
+    var tilg_j = (d1_tm + d2_tm + dw.tm) * 12;
     var rate_j = zins_j + tilg_j;
     /* v3006 · `bspar_y` war hier nie deklariert: `typeof bspar_y` ergab immer
        'undefined', die Bausparrate ging mit 0 in den DSCR - lautlos, weil typeof
@@ -241,6 +253,7 @@ window.DealKpis = (function() {
       leer_j: leer_j, leer_pct: leer_pct * 100,   /* v3030: Leerstand p.a. (steckt in bwk_nul) */
       // Finanzierung
       d_total: d_total, ltv: ltv,
+      dw_betrag: dw.betrag, dw_rate_m: dw.rate_m, dw_n: dw.n,   /* v3215 */
       zins_j: zins_j, tilg_j: tilg_j, rate_j: rate_j,
       // Cashflow
       cf_op: cf_op, zve_immo: zve_immo, steuer: steuer,

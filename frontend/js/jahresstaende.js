@@ -335,7 +335,8 @@
     try { an = B && B.anschluss ? B.anschluss(datum) : null; } catch (e) { an = null; }
     /* Ankauf */
     var d1 = zahl(ad.d1), d2 = (ad._d2_enabled === true || ad._d2_enabled === 'true') ? zahl(ad.d2) : 0;
-    var dSumme = istZahl(d1) ? d1 + (istZahl(d2) ? d2 : 0) : null;
+    var _dwA = global.DpDarlehenWeitere ? global.DpDarlehenWeitere.ausObjekt(ad).betrag : 0;   /* v3215 · W-17: weitere Darlehen ab Kauf */
+    var dSumme = istZahl(d1) ? d1 + (istZahl(d2) ? d2 : 0) + _dwA : null;
     var planJahr = datum.getFullYear(), planCf = null;
     if (Array.isArray(a.plan)) a.plan.forEach(function (p) { if (p && p.cal === planJahr && istZahl(p.cfop_y)) planCf = p.cfop_y; });
     var ankauf = { nkm: zahl(kurzA.nkm != null ? kurzA.nkm : ad.nkm), d_summe: dSumme, ek: zahl(ad.ek), ltv: zahl(kurzA._kpis_ltv),

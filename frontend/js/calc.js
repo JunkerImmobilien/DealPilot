@@ -1725,12 +1725,25 @@ function _calcImmediate(){
     _d2warn.textContent = 'Hinweis: Darlehen 2 als Tilgungsaussetzung wird ohne Tilgungsträger als reines Zinsdarlehen gerechnet (Restschuld bleibt konstant). Für eine vollständige Bausparvertrags-Abbildung Darlehen 1 nutzen.';
   }
 
+  // ═════ v3215 · W-17: Weitere Darlehen (Darlehen III, IV, …) ═════
+  //   Liste im versteckten Feld #darlehen_weitere, gerechnet NUR ueber den Kern
+  //   DpDarlehenWeitere (js/darlehen-weitere.js). D1/D2 bleiben unberuehrt; die
+  //   Summen kommen ueberall dort dazu, wo D2 dazukommt. Ohne Liste: alles 0.
+  var _dwBy = (function(){ try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear) { var _b = DealPilotAnteilig.getBaseYear(); if (_b) return _b; } } catch(_e){} return new Date().getFullYear(); })();
+  var _dwListe = window.DpDarlehenWeitere ? DpDarlehenWeitere.lesen(g('darlehen_weitere')) : [];
+  var _dwA = (window.DpDarlehenWeitere && _dwListe.length) ? DpDarlehenWeitere.anfang(_dwListe, { basisJahr: _dwBy })
+    : { n: 0, betrag: 0, rate_m: 0, zm: 0, tm: 0, zins_j: 0, tilg_j: 0, liste: [] };
+  var _dwAktiv = _dwListe.length > 0;
+  State.dw_liste = _dwListe; State.dw_n = _dwA.n; State.dw_summe = _dwA.betrag;
+  State.dw_rate_m = _dwA.rate_m; State.dw_zm = _dwA.zm; State.dw_tm = _dwA.tm; State.dw_basisjahr = _dwBy;
+  try { if (typeof window._dwUiSync === 'function') window._dwUiSync(); } catch (_dwE) {}
+
   // ═════ Gesamtfinanzierung: gewichtete Zinsen/Tilgung ═════
-  var d_total = d1 + d2;
+  var d_total = d1 + d2 + _dwA.betrag;   /* v3215: + weitere Darlehen ab Kauf */
   var d1z_effective = d1z;  // Wird weiter unten für Zinsberechnung genutzt
-  var d1_rate_total = d1_rate_m + d2_rate_m;
-  var d_zm_total = d1_zm + d2_zm;
-  var d_tm_total = d1_tm + d2_tm;
+  var d1_rate_total = d1_rate_m + d2_rate_m + _dwA.rate_m;
+  var d_zm_total = d1_zm + d2_zm + _dwA.zm;
+  var d_tm_total = d1_tm + d2_tm + _dwA.tm;
   // V63.36: LTV-Bezugsgröße in 3 Stufen
   //   Standard (Bankenpraxis): LTV gegen Beleihungswert ≈ Sachverständigen-Wert (SVW).
   //                            Wenn kein SVW eingegeben → Fallback Kaufpreis.
@@ -1850,8 +1863,17 @@ function _calcImmediate(){
     rs = _zbR;
   }
   State._zbM1 = _zbM1;
-  var rs_total = rs + rs2;
-  State.rs=rs_total; State.rs1=rs; State.rs2=rs2;
+  /* v3215 · W-17: Restschuld der weiteren Darlehen am Ende der D1-Bindung
+     (Monat Finanzierungsbeginn + bindj x 12, gezaehlt ab Januar des Basisjahres) */
+  var _dwOpt = { basisJahr: _dwBy, monateJahr1: _zbM1 };
+  var rs_dw = _dwAktiv ? DpDarlehenWeitere.restNach(_dwListe, (12 - _zbM1) + bindj * 12, _dwOpt) : 0;
+  /* Plan je Projektionsjahr (Zins, Tilgung, Restschuld) - fuer EZB, Anschluss und cfRows */
+  var _dwPlan = _dwAktiv ? DpDarlehenWeitere.plan(_dwListe, { basisJahr: _dwBy, monateJahr1: _zbM1,
+    jahre: Math.max(parseInt(g('btj') || '20', 10) || 20, bindj + 1) }) : [];
+  function _dwJahr(y) { return (_dwPlan[y - 1]) || { zins: 0, tilg: 0, rs_ende: 0 }; }
+  State.dw_plan = _dwPlan;
+  var rs_total = rs + rs2 + rs_dw;
+  State.rs=rs_total; State.rs1=rs; State.rs2=rs2; State.rs_dw=rs_dw;
   st('restschuld',fE(rs_total,0));
   /* v2850 · Zinsbindungsende ab dem FINANZIERUNGSBEGINN, nicht ab heute.
      Bis hier stand `new Date() + bindj`: jedes Bestandsobjekt zeigte im Reiter
@@ -1896,7 +1918,9 @@ function _calcImmediate(){
   var zd=document.getElementById('zaer_display');
   if(zd)zd.textContent='+'+fP(zaer_pct,2)+' p.a. (Anschluss '+fP(v('anschl_z'),2)+' − Aktuell '+fP(v('d1z'),2)+')';
   st('zaer_m',fE(zaer_m,0)+'/Mon.');
-  st('r-darl', fE(d_total) + (d2_enabled && d2 > 0 ? ' (D1: ' + fE(d1, 0) + ' + D2: ' + fE(d2, 0) + ')' : ''));
+  st('r-darl', fE(d_total) + ((d2_enabled && d2 > 0) || _dwA.betrag > 0
+    ? ' (D1: ' + fE(d1, 0) + (d2_enabled && d2 > 0 ? ' + D2: ' + fE(d2, 0) : '')
+      + (_dwA.betrag > 0 ? ' + weitere: ' + fE(_dwA.betrag, 0) : '') + ')' : ''));   /* v3215 */
   st('r-ek',fE(v('ek')));st('r-ltv',fP(ltv,1));
   // V63.8 + V63.36: LTV-Erklärung live aktualisieren — dynamisch je nach Bezug
   var kpVal = v('kp') || 0;
@@ -1921,11 +1945,11 @@ function _calcImmediate(){
   }
   var hintEl = el('ltv-exp-hint');
   if (hintEl) hintEl.innerHTML = ltvHint;
-  st('r-rate',fE(d1_rate_total,2) + (d2_enabled && d2 > 0 ? ' gesamt' : ''));
+  st('r-rate',fE(d1_rate_total,2) + ((d2_enabled && d2 > 0) || _dwA.betrag > 0 ? ' gesamt' : ''));
   // Zins: Bei zwei Darlehen → effektiver Mischzins
   var zinsDisplay;
-  if (d2_enabled && d2 > 0 && d_total > 0) {
-    var mischzins = (d1 * d1z + d2 * d2z) / d_total * 100;
+  if (((d2_enabled && d2 > 0) || _dwA.betrag > 0) && d_total > 0) {
+    var mischzins = (d1 * d1z + (d2_enabled ? d2 * d2z : 0) + _dwA.zm * 12) / d_total * 100;   /* v3215: + weitere */
     zinsDisplay = fP(mischzins, 2) + ' (Mischzins)';
   } else {
     zinsDisplay = fP(d1z * 100, 2);
@@ -1940,7 +1964,9 @@ function _calcImmediate(){
     else if (d2_anschl_enable) { _ar_d2_m = (_rs2_now * (d2_az + d2_at)) / 12; }
     else { _ar_d2_m = d2_rate_m; }
   }
-  var _ar_total = ar + _ar_d2_m;
+  /* v3215: weitere Darlehen laufen durchfinanziert weiter - ihre Rate im ersten Anschlussjahr */
+  var _ar_dw_m = _dwAktiv ? (_dwJahr(bindj + 1).zins + _dwJahr(bindj + 1).tilg) / 12 : 0;
+  var _ar_total = ar + _ar_d2_m + _ar_dw_m;
   st('r-rs',fE(State.rs,0));st('r-anschl',fE(_ar_total,2));
   // v359-d2-anschl-display: D2-Anschluss-Anzeigefelder (analog D1) befuellen
   if (d2_enabled && d2 > 0) {
@@ -2222,7 +2248,7 @@ function _calcImmediate(){
     return _mtx(base, calYear);
   }
   var _calYearBase = (function(){ try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear){ var _y = DealPilotAnteilig.getBaseYear(); if (_y) return _y; } } catch(_e){} return (new Date()).getFullYear(); })();
-  var zins_j=(d1_zm+d2_zm)*12, tilg_j=(d1_tm+d2_tm)*12;
+  var zins_j=(d1_zm+d2_zm+_dwA.zm)*12, tilg_j=(d1_tm+d2_tm+_dwA.tm)*12;   /* v3215: + weitere Darlehen ab Kauf */
   // V63.49: Bei Tilgungsaussetzung läuft parallel eine Bausparrate als Sparbeitrag.
   // Der ist KEIN steuerlich abziehbarer Aufwand, aber ein Liquiditätsabfluss —
   // ähnlich wie Tilgung. Wir behandeln ihn analog zur Tilgung im CF.
@@ -2687,6 +2713,8 @@ function _calcImmediate(){
       tilg_ezb += (d2_rate_m * 12 - _zins_ezb_d2);
     }
   }
+  /* v3215 · W-17: weitere Darlehen im Jahr bindj aus dem Plan (Kern DpDarlehenWeitere) */
+  if (_dwAktiv) { zins_ezb += _dwJahr(bindj).zins; tilg_ezb += _dwJahr(bindj).tilg; }
   // V63.52: Bei Aussetzung Bauspar-Rate als Liquiditätsabfluss
   var bspar_y_ezb = _d1IsAussetzung ? bspar_y : 0;
   // V63.40: CF v.St. = nach Tilgung (Banker-Sicht)
@@ -2801,6 +2829,8 @@ function _calcImmediate(){
       tilg_an += Math.max(0, d2_rate_m * 12 - _rs2_an * d2z);
     }
   }
+  /* v3215 · W-17: weitere Darlehen im ersten Anschlussjahr (bindj + 1) */
+  if (_dwAktiv) { zins_an += _dwJahr(bindj + 1).zins; tilg_an += _dwJahr(bindj + 1).tilg; }
   var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für CF
   /* v1898: Steuerbemessung ohne Mietausfallwagnis (siehe Block oben). */
   var ster_an = _mtx((nkm_an - nul_st*Math.pow(1+kstg,bindj) - zins_an) - afa, _calYearBase);
@@ -3276,6 +3306,7 @@ function _calcImmediate(){
   State.cfRows=[];var rs3=d1;
   State._zbEzbIdx = null; State._zbAnIdx = null; State._zbRsEzbProj = null;   /* v2852: je Lauf neu, nie vom Vorgaenger */
   var rs3_d2 = (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0) ? d2 : 0;  // V354-rs3d2-init: D2-Restschuld-Strang
+  var rs3_dw = 0;   /* v3215 · W-17: Restschuld der weiteren Darlehen (aus _dwPlan je Jahr) */
   // V268-06: Anzeige-Basisjahr aus Kaufjahr (WU/kaufdat), Fallback heute
   var _v268_baseYear = (function(){
     try {
@@ -3621,16 +3652,21 @@ function _calcImmediate(){
       zy2 += zy2_d2;
       ty2 += ty2_d2;
     }
+    /* v3215 · W-17: weitere Darlehen je Jahr aus dem Plan des Kerns (Zins, Tilgung,
+       Restschuld) - Jahr 1 mit denselben Monaten wie Darlehen I, spaetere
+       Start-Jahre ab Januar. */
+    var _dw_y = _dwAktiv ? _dwJahr(y) : null;
+    if (_dw_y) { zy2 += _dw_y.zins; ty2 += _dw_y.tilg; rs3_dw = _dw_y.rs_ende; }
     // V353-y1-recompute (V354 erweitert): cfop_y/taxEffect_y/cfns_y mit finalen zy2/ty2
     //   neu rechnen, wenn D1-Y1 anteilig ODER D2 aktiv ist.
-    if (_v353_anteilig_hit || _v354_d2_active) {
+    if (_v353_anteilig_hit || _v354_d2_active || _dwAktiv) {
       cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
       zve_op_y        = nkm_y2 - bwk_st_y2 - zy2;   /* v1898 */
       cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
       taxEffect_y     = _mtxYear(zve_op_y - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878 · v1898 */
       cfns_y          = cfop_y - taxEffect_y;
       // eq_y/ltv_y mit aktueller kombinierter RS aktualisieren (rs3_d2 ggf. Y1-reduziert)
-      var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);
+      var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0) + rs3_dw;   /* v3215: + weitere */
       eq_y  = wert_y - _rs_comb2;
       ltv_y = wert_y > 0 ? _rs_comb2 / wert_y * 100 : 0;
     }
@@ -3651,9 +3687,9 @@ function _calcImmediate(){
     }
     var su_y = (_suJahr[cal] > 0) ? _suJahr[cal] : 0;   /* v3092 · N100: nach allen Neuberechnungen oben abziehen */
     if (su_y) { cfop_y -= su_y; cfns_y -= su_y; }
-    var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);  // V354: kombinierte RS fuer Anzeige
+    var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0) + rs3_dw;  // V354: kombinierte RS fuer Anzeige · v3215: + weitere
     var eff_rs = Math.max(0, _rs_push - bspar_kum_proj);
-    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,su_y:su_y,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush,rs_d1:rs3,rs_d2:(typeof rs3_d2==='number'?rs3_d2:null)});  /* v2989: Restschuld je Darlehen fuer die Jahresstaende (jahresstaende.js) - nur mitgefuehrt, nichts neu gerechnet */  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
+    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,su_y:su_y,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush,rs_d1:rs3,rs_d2:(typeof rs3_d2==='number'?rs3_d2:null),rs_dw:(_dwAktiv?rs3_dw:null),zy_dw:(_dw_y?_dw_y.zins:null),ty_dw:(_dw_y?_dw_y.tilg:null)});  /* v2989: Restschuld je Darlehen fuer die Jahresstaende (jahresstaende.js) - nur mitgefuehrt, nichts neu gerechnet */  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
   }
   /* v1898 · WOHER DAS zvE JE JAHR KAM — die Herkunft ist ausweisbar, statt
      dass eine Zahl ohne Vermerk dasteht. 'steuerzeitraum' = aus Marcels
@@ -4600,6 +4636,32 @@ function renderBankTable() {
     });
   }
 
+  /* v3215 · W-17: je weiteres Darlehen eine Zeile (Restschuld am Ende SEINER Bindung, Kern) */
+  (State.dw_liste || []).forEach(function (e, i) {
+    if (!window.DpDarlehenWeitere) return;
+    var _rsE = DpDarlehenWeitere.restBindungsende(e);
+    rows.push({
+      nr: rows.length + 1,
+      plz: g('plz') || '-', ort: g('ort') || '-', str: g('str') || '-', hn: g('hnr') || '-',
+      bez: g('objart') || 'ETW',
+      qm: v('wfl').toFixed(2).replace('.', ','),
+      nkm: fE(nkm_m, 2), qmpreis: fE(nkm_per_qm, 2), nk: fE(nebenkosten_m, 2),
+      bank: '-',
+      art: DpDarlehenWeitere.name(e, i) + (e.art === 'tilgungsaussetzung' ? ' (Tilgungsaussetzung)' : ' (Annuität)'),
+      fin_datum: e.start_jahr && !DpDarlehenWeitere.abKauf(e, State.dw_basisjahr) ? ('ab ' + e.start_jahr) : fin_datum,
+      vertrag: '-',
+      summe: fE(e.betrag, 0),
+      zins: fP(e.zins, 2),
+      tilg: e.art === 'tilgungsaussetzung' ? '—' : fP(e.tilg, 2),
+      rate: fE(DpDarlehenWeitere.rateM(e) * 12, 0) + ' /J',
+      bindung: (e.bindj || '-') + ' J.',
+      restschuld_akt: fE(_rsE, 0),
+      laufzeit: '-',
+      restschuld_ende: fE(_rsE, 0),
+      volltilg: '-'
+    });
+  });
+
   // Row 3: Bausparvertrag (if filled in)
   if (g('d2_bspar')) {
     rows.push({
@@ -4917,8 +4979,9 @@ function renderPhaseTable() {
   var d1z_pct = v('d1z');
   var d2_on = State.d2_enabled && State.d2 > 0;
   var d2z_pct = d2_on ? (State.d2z * 100) : 0;
-  var dT = v('d1') + (d2_on ? State.d2 : 0);
-  var mischzins = dT > 0 ? ((v('d1') * d1z_pct + (d2_on ? State.d2 * d2z_pct : 0)) / dT) : d1z_pct;
+  var _dwS = State.dw_summe || 0, _dwZj = (State.dw_zm || 0) * 12;   /* v3215: weitere Darlehen ab Kauf */
+  var dT = v('d1') + (d2_on ? State.d2 : 0) + _dwS;
+  var mischzins = dT > 0 ? ((v('d1') * d1z_pct + (d2_on ? State.d2 * d2z_pct : 0) + _dwZj * 100) / dT) : d1z_pct;
   var anZins = v('anschl_z');
   _setP('zaer-zins-now', mischzins);
   _setP('zaer-zins-ezb', mischzins);

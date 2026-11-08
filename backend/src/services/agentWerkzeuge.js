@@ -208,6 +208,25 @@ async function bank_uebersicht(ctx, args) {
         + (z.restschuld_eur != null ? ' · Restschuld ' + eur(z.restschuld_eur) : '')
         + (z.rate_monat_eur != null ? ' · Rate ' + eur(z.rate_monat_eur) + '/Monat' : ''));
     });
+    /* v3215 · W-17: je weiteres Darlehen eine Zeile (Eingaben aus dem Feld, bereinigt im Kern) */
+    let _dwL = [];
+    try { if (d.darlehen_weitere && rechenkerne.vorhanden()) _dwL = rechenkerne.weitereDarlehenListe(d.darlehen_weitere); } catch (e) { _dwL = []; }
+    _dwL.forEach((e, i) => {
+      nr++;
+      const art = (e.bez || ('Darlehen ' + ['III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][i])) + (e.art === 'tilgungsaussetzung' ? ' (Tilgungsaussetzung)' : ' (Annuität)');
+      const rateM = rechenkerne.weitereDarlehenRate(e);
+      const z = {
+        nr, objekt_id: o.id, adresse, objektart: d.objart || null, wohnflaeche_qm: num(d.wfl),
+        bank: null, darlehensart: art, vertragsnummer: null, vertragsdatum: null,
+        auszahlung: e.start_jahr ? String(e.start_jahr) : null, kaufdatum: d.kaufdat || null,
+        summe_eur: e.betrag, zins_pct: e.zins, tilgung_pct: e.tilg, bindung_jahre: e.bindj,
+        nkm_monat_eur: null, restschuld_eur: null, rate_monat_eur: Math.round(rateM),
+        zinsbindung_bis: null, spiegel_vorhanden: !!s
+      };
+      zeilen.push(z);
+      text.push(nr + ' · ' + adresse + ' · ' + art + ' ' + eur(e.betrag) + ' · Zins ' + pct(e.zins) + ' / Tilgung ' + pct(e.tilg)
+        + (e.bindj ? ' · Bindung ' + e.bindj + ' J.' : '') + (e.start_jahr ? ' · ab ' + e.start_jahr : '') + ' · Rate ' + eur(rateM) + '/Monat');
+    });
   });
   if (!zeilen.length) {
     return { anzahl: 0, so_sagen: filter
@@ -1314,7 +1333,10 @@ function _hebelFuer(d) {
   /* 1 · Tilgung. Der Cashflow steigt sofort, das Vermögen wächst langsamer
      — beides gehört in denselben Satz. */
   const d1 = _zahl(d.d1), d2 = _zahl(d.d2), t1 = _zahl(d.d1t), t2 = _zahl(d.d2t);
-  const tilgJ = d1 * t1 / 100 + d2 * t2 / 100;
+  /* v3215 · W-17: weitere Darlehen ab Kauf - Summen aus dem gespiegelten Kern */
+  let dw = { betrag: 0, zins_j: 0, tilg_j: 0, n: 0 };
+  try { if (d.darlehen_weitere && rechenkerne.vorhanden()) dw = rechenkerne.weitereDarlehen(d); } catch (e) { /* ohne Kern wie bisher */ }
+  const tilgJ = d1 * t1 / 100 + d2 * t2 / 100 + dw.tilg_j;
   if (tilgJ > 0 && (t1 > 1 || t2 > 1)) {
     const auf1 = d1 * Math.min(t1, 1) / 100 + d2 * Math.min(t2, 1) / 100;
     hebel.push({
@@ -1335,9 +1357,9 @@ function _hebelFuer(d) {
   /* 2 · Zins. Kein Zielzins wird erfunden — die Wirkung steht je halbem
      Prozentpunkt da, und der Nutzer setzt sein eigenes Angebot ein. */
   const z1 = _zahl(d.d1z), z2 = _zahl(d.d2z);
-  const zinsJ = d1 * z1 / 100 + d2 * z2 / 100;
+  const zinsJ = d1 * z1 / 100 + d2 * z2 / 100 + dw.zins_j;   /* v3215 */
   if (zinsJ > 0) {
-    const jeHalb = (d1 + d2) * 0.5 / 100;
+    const jeHalb = (d1 + d2 + dw.betrag) * 0.5 / 100;
     hebel.push({
       hebel: 'Zins senken (Umschuldung, Prolongation)',
       jetzt: 'Zinssatz ' + [z1 ? z1 + ' %' : null, z2 ? z2 + ' %' : null].filter(Boolean).join(' / ')

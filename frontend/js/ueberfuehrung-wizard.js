@@ -133,7 +133,8 @@
     var vor = null, akt = null;
     rows.forEach(function (r) { if (r.cal === y - 1) vor = r.rs; if (r.cal === y) akt = r.rs; });
     var b = _ctx.privatBlob;
-    var start = (_num(b.d1) || 0) + (b.d2_enable ? (_num(b.d2) || 0) : 0);
+    var start = (_num(b.d1) || 0) + (b.d2_enable ? (_num(b.d2) || 0) : 0)
+      + (window.DpDarlehenWeitere ? DpDarlehenWeitere.ausObjekt(b).betrag : 0);   /* v3215 · W-17 */
     if (vor == null) vor = (rows[0] && rows[0].cal === y) ? start : null;
     if (vor == null) return null;
     if (akt == null || m === 1) return vor;
@@ -509,6 +510,7 @@
         _g.d1_auszahl = _sm;
       } else { _g.d1 = '0'; }
       _g.d2 = '0'; _g.d2_enable = false;
+      _g.darlehen_weitere = '';   /* v3215 · W-17: die Restschuld rs enthaelt die weiteren Darlehen schon */
       _g.ueberf_restschuld = rsN != null ? _de0(rsN) : '';
       _g.ueberf_rest_zins = w.zins;                         /* v2984: ungerundet (war toFixed(1)) */
       _g.gesellschafterdarlehen = w.gd != null ? _de0(w.gd) : '';

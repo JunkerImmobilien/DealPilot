@@ -219,10 +219,13 @@
      EINE Stelle fuer die Aggregat-Mathematik. aggStats() ist die Quelle;
      renderOverview UND renderHealth greifen darauf zu. WICHTIG:
      o.kp = Kaufpreis in EURO (String). o._kaufpreis = Kaufpreis in CENT! */
+  /* v3215 · W-17: weitere Darlehen eines gespeicherten Objekts (ab Kauf), nur ueber den Kern */
+  var _DW0 = { betrag: 0, rate_m: 0, zins_j: 0, tilg_j: 0 };
+  function _dwO(o){ try { return (window.DpDarlehenWeitere && o) ? DpDarlehenWeitere.ausObjekt(o.__raw || o) : _DW0; } catch(e){ return _DW0; } }
   function _kpEuro(o){ return num(o && o.kp) || (num(o && o._kaufpreis) / 100) || 0; }
   function _restschuldOf(o){
     var fromKpi = num(o._kpis_restschuld); if(fromKpi > 0) return fromKpi;
-    var D = num(o.d1) + num(o.d2); if(D <= 0) return 0;
+    var D = num(o.d1) + num(o.d2) + _dwO(o).betrag; if(D <= 0) return 0;   /* v3215 */
     var zins = _pct(o.d1z)/100, tilg = _pct(o.d1t)/100; if(zins <= 0 || tilg <= 0) return D;
     var i = zins/12, A = D*(zins+tilg)/12, m = 0;
     var au = (o.d1_auszahl||'').toString().match(/(\d{1,2})[.\/](\d{4})/);
@@ -369,9 +372,9 @@
          v2144 - `Number(null)` waere 0 und damit ein Barkauf, den
          niemand erklaert hat. */
       darlehen: (function(){
-        var a = numN(d.d1), b = numN(d.d2);
-        if (a == null && b == null) return null;
-        return (a || 0) + (b || 0);
+        var a = numN(d.d1), b = numN(d.d2), c = _dwO(d).betrag;   /* v3215: + weitere Darlehen */
+        if (a == null && b == null && !(c > 0)) return null;
+        return (a || 0) + (b || 0) + c;
       })(),
       __raw:d
     };
@@ -544,9 +547,9 @@
     var rest=sum(_restschuldOf);
     var cfNsJ=sum(function(o){return num(o._kpis_cf_ns);});
     var cfVsJ=sum(function(o){var v=o._kpis_cf_vs; return (v!=null&&!isNaN(num(v)))?num(v):num(o._kpis_cf_ns);});
-    var kdSum=sum(function(o){return num(o.d1)*(_pct(o.d1z)+_pct(o.d1t))/100 + num(o.d2)*(_pct(o.d2z)+_pct(o.d2t))/100;});
+    var kdSum=sum(function(o){return num(o.d1)*(_pct(o.d1z)+_pct(o.d1t))/100 + num(o.d2)*(_pct(o.d2z)+_pct(o.d2t))/100 + _dwO(o).rate_m*12;});   /* v3215 */
     var ekSum=sum(function(o){return num(o.ek);});
-    var darlSum=sum(function(o){return num(o.d1)+num(o.d2);});
+    var darlSum=sum(function(o){return num(o.d1)+num(o.d2)+_dwO(o).betrag;});   /* v3215 */
     // Nettomietrendite: IV-gewichtet ueber die kanonische KPI-Engine (window.DealKpis),
     // damit der Portfolio-Wert exakt der Objekt-Berechnung entspricht.
     // Fallback: persistierte _kpis_nmy/_kpis_nmr.
@@ -563,8 +566,8 @@
     /* v1802 · Tilgung und Zins getrennt. `kdSum` fuehrt beide zusammen als
        Kapitaldienst — fuer den DSCR richtig, fuer die Frage "wie hoch ist
        meine Gesamttilgung" nicht. Dieselbe Rechnung, nur einzeln. */
-    var tilgSum=sum(function(o){return num(o.d1)*_pct(o.d1t)/100 + num(o.d2)*_pct(o.d2t)/100;});
-    var zinsSum=sum(function(o){return num(o.d1)*_pct(o.d1z)/100 + num(o.d2)*_pct(o.d2z)/100;});
+    var tilgSum=sum(function(o){return num(o.d1)*_pct(o.d1t)/100 + num(o.d2)*_pct(o.d2t)/100 + _dwO(o).tilg_j;});   /* v3215 */
+    var zinsSum=sum(function(o){return num(o.d1)*_pct(o.d1z)/100 + num(o.d2)*_pct(o.d2z)/100 + _dwO(o).zins_j;});   /* v3215 */
     return {
       n:arr.length, gi:giSum, kp:kpSum, ek:ekSum, darl:darlSum,
       mieteJ:mieteJ, mieteM:mieteJ/12, rest:rest,
@@ -1340,7 +1343,7 @@
     var mietPot=mietPotSum;
     var hasMietPot=mietPotValid;
     // Tilgungsfortschritt: (Anfangsdarlehen - Restschuld)/Anfangsdarlehen
-    var totalDarl=sum(function(o){return num(o.d1)+num(o.d2);});
+    var totalDarl=sum(function(o){return num(o.d1)+num(o.d2)+_dwO(o).betrag;});   /* v3215 */
     var tilgFort=(totalDarl>0)?((1-totalRest/totalDarl)*100):null;
     var hasTilg=totalDarl>0;
     // Energie-Substanz (ESG)
@@ -3709,7 +3712,7 @@
         cashflow_nach_steuer_eur_jahr: _ppZahl(o._kpis_cf_ns),
         cashflow_vor_steuer_eur_jahr: _ppZahl(o._kpis_cf_vs),
         eigenkapital_eur: _ppZahl(o.ek),
-        darlehen_eur: (num(o.d1) + num(o.d2)) || null,
+        darlehen_eur: (num(o.d1) + num(o.d2) + _dwO(o).betrag) || null,   /* v3215 */
         restschuld_eur: Math.round(_restschuldOf(o)) || null,
         zins_prozent: _ppZahl(o.d1z),
         tilgung_prozent: _ppZahl(o.d1t),
@@ -3727,11 +3730,11 @@
            Darlehen werden einzeln genommen, weil sie verschiedene Saetze
            haben koennen. */
         tilgung_eur_jahr: (function () {
-          var t = num(o.d1) * _pct(o.d1t) / 100 + num(o.d2) * _pct(o.d2t) / 100;
+          var t = num(o.d1) * _pct(o.d1t) / 100 + num(o.d2) * _pct(o.d2t) / 100 + _dwO(o).tilg_j;   /* v3215 */
           return t > 0 ? Math.round(t) : null;
         })(),
         zins_eur_jahr: (function () {
-          var z = num(o.d1) * _pct(o.d1z) / 100 + num(o.d2) * _pct(o.d2z) / 100;
+          var z = num(o.d1) * _pct(o.d1z) / 100 + num(o.d2) * _pct(o.d2z) / 100 + _dwO(o).zins_j;   /* v3215 */
           return z > 0 ? Math.round(z) : null;
         })(),
         zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || null,

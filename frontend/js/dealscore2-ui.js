@@ -32,7 +32,7 @@ function _buildDeal2FromState() {
   if (window.State && State.gi) {
     var d1V108 = v('d1');
     var d2V108 = v('d2');
-    var darlV108 = d1V108 + d2V108;
+    var darlV108 = d1V108 + d2V108 + (State.dw_summe || 0);   /* v3215 · W-17: + weitere Darlehen ab Kauf */
     /* v2144: ohne Darlehen entfallen DSCR und LTV im Investor Deal
        Score, statt mit 0 bzw. 85 Punkten zu Buche zu stehen. Die
        Summe steht hier schon — sie wird nur weitergereicht. */

@@ -1677,19 +1677,28 @@ async function _exportPDFInner() {
   var d2 = (State.d2_enabled && State.d2 > 0) ? State.d2 : 0;
   var d2z = State.d2_enabled ? (State.d2z * 100) : 0;
   var d2t = State.d2_enabled ? (State.d2t * 100) : 0;
-  var d_total = d1 + d2;
+  /* v3215 · W-17: weitere Darlehen ab Kauf aus dem Rechenlauf (Kern DpDarlehenWeitere) */
+  var _dwL = window.DpDarlehenWeitere ? (State.dw_liste || []) : [], _dwS = State.dw_summe || 0;
+  var d_total = d1 + d2 + _dwS;
   var d1_rate = d1 * (d1z + d1t) / 100 / 12;
   var d2_rate = State.d2_rate_m || (d2 * (d2z + d2t) / 100 / 12);
-  var totalRate = d1_rate + d2_rate;
-  var mischzins = d_total > 0 ? (d1 * d1z + d2 * d2z) / d_total : d1z;
+  var totalRate = d1_rate + d2_rate + (State.dw_rate_m || 0);
+  var mischzins = d_total > 0 ? (d1 * d1z + d2 * d2z + (State.dw_zm || 0) * 1200) / d_total : d1z;
   var finRows = [];
-  if (d2 > 0) {
+  if (d2 > 0 || _dwL.length) {
     finRows.push(['Darlehen 1 (Hauptdarlehen)', pE(d1)]);
     finRows.push(['  Zinssatz / Tilgung D1', pP(d1z,2) + ' / ' + pP(d1t,2)]);
     finRows.push(['  Rate D1 / Monat', pE(d1_rate, 2)]);
+    if (d2 > 0) {
     finRows.push(['Darlehen 2', pE(d2)]);
     finRows.push(['  Zinssatz / Tilgung D2', pP(d2z,2) + ' / ' + pP(d2t,2)]);
     finRows.push(['  Rate D2 / Monat', pE(d2_rate, 2)]);
+    }
+    _dwL.forEach(function (e, i) {   /* v3215 */
+      var _ab = DpDarlehenWeitere.abKauf(e, State.dw_basisjahr);
+      finRows.push([DpDarlehenWeitere.name(e, i) + (_ab ? '' : ' (ab ' + e.start_jahr + ')'), pE(e.betrag)]);
+      finRows.push(['  Zins / Tilgung / Rate', pP(e.zins, 2) + ' / ' + (e.art === 'tilgungsaussetzung' ? '-' : pP(e.tilg, 2)) + ' / ' + pE(DpDarlehenWeitere.rateM(e), 2)]);
+    });
     finRows.push(['Darlehen gesamt', pE(d_total)]);
     finRows.push(['Mischzins (gewichtet)', pP(mischzins, 2)]);
     finRows.push(['Gesamtrate / Monat', pE(totalRate, 2)]);
@@ -1716,7 +1725,7 @@ async function _exportPDFInner() {
   /* v3029-pdf · hier stand State.rs x (anschl_z + anschl_t): State.rs ist die Restschuld D1 PLUS D2
      (calc.js rs_total) und ignorierte „durchfinanziert" und den Bausparvertrag. Jetzt die Rate aus
      dem Kern (K.rate_an_m, Hauptdarlehen, wie die Bankfassung „Rate nach Anschluss / Monat"). */
-  finRows.push([d2 > 0 ? 'Anschluss Rate D1/Mon.' : 'Anschluss Rate/Mon.', pE(K.rate_an_m)]);
+  finRows.push([(d2 > 0 || _dwL.length) ? 'Anschluss Rate D1/Mon.' : 'Anschluss Rate/Mon.', pE(K.rate_an_m)]);   /* v3215 */
   finRows.push(['Zinsrisiko / Monat', pE(K.zaer_m)]);
   kvT(doc, M + hw3 + 5, y3A + 11, hw3, finRows);
 
@@ -1751,6 +1760,7 @@ async function _exportPDFInner() {
   } else {
     _strukturText = 'Reines Annuitätendarlehen - klassische Finanzierung mit Zins + Tilgung';
   }
+  if (_dwL.length) _strukturText += ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen');   /* v3215 */
   doc.setFillColor.apply(doc, C.SURF2);
   doc.roundedRect(M, cy, CW, 12, 1.8, 1.8, 'F');
   doc.setFillColor.apply(doc, C.GOLD);
