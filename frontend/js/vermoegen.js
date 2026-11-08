@@ -116,7 +116,7 @@
   function speichern() {
     lokalSchreiben();
     clearTimeout(timer);
-    timer = setTimeout(hoch, 900);
+    timer = setTimeout(function () { timer = null; hoch(); }, 900);
     try { window.dispatchEvent(new CustomEvent('dp:vermoegen-geaendert')); } catch (e) {}
   }
 
@@ -193,6 +193,7 @@
     st.textContent = 'html:not([data-vm-offen]) #' + SEC_ID + '{display:none !important}'
       + '#' + SEC_ID + '{padding:18px 22px;max-width:1280px}'
       + '#' + SEC_ID + ' .vm-kicker{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-bottom:4px}'
+      + '#' + SEC_ID + ' .vm-kopfzeile{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}'
       + '#' + SEC_ID + ' .vm-kopf p{max-width:820px;font-size:13.5px;line-height:1.55}'
       + '#' + SEC_ID + ' .vm-kz{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}'
       + '#' + SEC_ID + ' .vm-kz>div{border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;padding:10px 12px;background:var(--white)}'
@@ -295,7 +296,9 @@
 
     var verlauf = daten.staende.slice().sort(function (a, b) { return String(b.datum).localeCompare(String(a.datum)); });
 
-    s.innerHTML = '<div class="vm-kopf"><div class="vm-kicker">Ansicht · Vermögen</div><h2>Vermögen &amp; Haushalt</h2>'
+    /* v3226 · „PDF abrufen“ - einheitliches Dokument-Design (dp-dokumente.js Typ vermoegen) */
+    s.innerHTML = '<div class="vm-kopf"><div class="vm-kopfzeile"><div><div class="vm-kicker">Ansicht · Vermögen</div><h2>Vermögen &amp; Haushalt</h2></div>'
+      + '<button type="button" class="btn btn-outline btn-sm" data-a="pdf" title="Vermögensaufstellung, Haushaltsrechnung und Verlauf als PDF">PDF abrufen</button></div>'
       + '<p>Deine Vermögensaufstellung und Haushaltsrechnung an einer Stelle – so, wie die Bank sie in der Selbstauskunft sehen will. Die Immobilien kommen automatisch aus deinen Objekten im Bestand, alles andere trägst du selbst ein. Mit „Stand speichern“ hältst du den Monat fest; daraus entsteht dein Verlauf.</p></div>'
       + hinweisHtml()
       + '<div data-s="kacheln">' + kacheln(S) + '</div>'
@@ -444,6 +447,7 @@
       speichern(); render();
     }
     else if (a === 'stand') standSpeichern();
+    else if (a === 'pdf') pdfAbrufen();
     else if (a === 'zum-stand') { var k = $('vm-stand-karte'); if (k) k.scrollIntoView({ behavior: 'smooth', block: 'start' }); var c = $('vm-stand-kommentar'); if (c) setTimeout(function () { c.focus(); }, 400); }
   }
   function fokusLetzte(liste) {
@@ -465,6 +469,15 @@
     daten.staende = daten.staende.filter(function (x) { return x.datum !== datum; }).concat([st]);
     speichern(); render();
     toast('✓ Stand vom ' + datumDe(datum) + ' gespeichert');
+  }
+
+  /* v3226 · PDF wie Track Record und Bankexport: App baut das Dokument, der PDF-Dienst druckt es
+     (dok-weiche.js erzeugen). Ohne Weiche die Vorschau mit „Drucken / als PDF speichern“. */
+  function pdfAbrufen() {
+    if (timer) { clearTimeout(timer); timer = null; hoch(); }   /* ausstehende Eingabe sofort sichern (Rückfallweg dok-pdf liest den Server) */
+    if (window.DpDokWeiche && typeof DpDokWeiche.erzeugen === 'function') return DpDokWeiche.erzeugen('vermoegen', {}, false);
+    if (window.DpDokumente && typeof DpDokumente.oeffnen === 'function') return DpDokumente.oeffnen('vermoegen', {});
+    toast('⚠ PDF-Erzeugung ist hier nicht geladen.');
   }
 
   /* ── Hauptansicht öffnen / schließen ─────────────────────────────── */
@@ -600,7 +613,7 @@
 
   window.DpVermoegen = {
     oeffnen: oeffnen, schliessen: schliessen, laden: laden, daten: function () { return daten; },
-    berechnen: berechnen, objekteLaden: objekteLaden, fuerDokument: fuerDokument,
+    berechnen: berechnen, objekteLaden: objekteLaden, fuerDokument: fuerDokument, pdf: pdfAbrufen,
     foto: foto, checkliste: checkliste, standAlt: standAlt, betrag: betrag, katName: katName,
     KAT_V: KAT_V, KAT_S: KAT_S, KAT_E: KAT_E, KAT_A: KAT_A
   };
