@@ -196,7 +196,11 @@
       if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
     }
     /* v3223: wird die Finanzierung trotzdem länger als der Rest der Seite, darf sie umbrechen statt ganz zu springen */
-    var h = '<div class="zwei"><div class="block"><h3>Investition</h3>' + B.liste(inv) + '</div><div class="block"' + (fin.length > 16 ? ' style="break-inside:auto"' : '') + '><h3>Finanzierung</h3>' + B.liste(fin) + '</div></div>';
+    /* v3223a: mit weiteren Darlehen untereinander in voller Breite - nebeneinander brach die Unterzeile in der
+       schmalen Spalte mehrfach um, der Block wurde hoeher als der Rest der Seite und sprang ganz auf die naechste */
+    var h = _dwL.length
+      ? '<div class="block"><h3>Investition</h3>' + B.liste(inv) + '</div><div style="break-inside:auto;margin-top:4mm"><h3>Finanzierung</h3>' + B.liste(fin) + '</div>'
+      : '<div class="zwei"><div class="block"><h3>Investition</h3>' + B.liste(inv) + '</div><div class="block"><h3>Finanzierung</h3>' + B.liste(fin) + '</div></div>';
     if (aus) {
       var bs = S.bsvSummary || {}, bz = [];
       if (feld('bspar_inst')) bz.push(['Bausparkasse', feld('bspar_inst')]);
