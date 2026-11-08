@@ -9558,3 +9558,46 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-lost-ribbon,
 html[data-dp-layout] aside#sidebar .sb-card .sbc-lost-ribbon{
   display:none !important;
 }
+
+/* =====================================================================
+   v3213 · W-14 (Entwicklungspartner): Portfolio/Aktionen als Schieberegler
+   =====================================================================
+   Bis v3212 ein Knopf, dessen Wort zwischen „Portfolio" und „Aktionen"
+   wechselte - man sah nicht, welcher Zustand gerade gilt. Jetzt stehen
+   beide Woerter da, der Regler zeigt, welches gilt. Zustand: html
+   [data-dpl-portfolio="auf"] = Objektliste (Portfolio), sonst Aktionen.
+   Bauart wie label.toggle-slim (style.css), nur ohne Checkbox, weil der
+   Knopf denselben Umschalter bedient wie bisher (portfolio()). */
+.dpl-portfolio-regler .dpl-sr{
+  position:absolute !important; width:1px !important; height:1px !important;
+  overflow:hidden !important; clip:rect(0 0 0 0) !important; white-space:nowrap !important;
+}
+.dpl-portfolio-regler{ position:relative; }
+html[data-dp-layout] .dpl-portfolio-regler::after,
+.dpl-portfolio-regler::after{ content:none !important; display:none !important; }
+.dpl-portfolio-regler .dpl-sw{
+  display:inline-flex; align-items:center; gap:7px; min-width:0;
+  font-size:11.5px; line-height:1;
+}
+.dpl-portfolio-regler .dpl-sw-a,
+.dpl-portfolio-regler .dpl-sw-p{ opacity:.55; transition:opacity .2s, color .2s; white-space:nowrap; }
+.dpl-portfolio-regler .dpl-sw-bahn{
+  position:relative; flex:0 0 auto; width:32px; height:18px; border-radius:99px;
+  background:#3A352E; border:1px solid #57504A; transition:background .2s, border-color .2s;
+}
+.dpl-portfolio-regler .dpl-sw-bahn i{
+  position:absolute; left:2px; top:2px; width:12px; height:12px; border-radius:50%;
+  background:#F5EFE2; transition:transform .2s;
+}
+/* Zustand Aktionen (Vorgabe): Kugel links, linkes Wort hell */
+html:not([data-dpl-portfolio="auf"]) .dpl-portfolio-regler .dpl-sw-a{ opacity:1; font-weight:600; }
+/* Zustand Portfolio: Kugel rechts, Bahn gold, rechtes Wort hell */
+html[data-dpl-portfolio="auf"] .dpl-portfolio-regler .dpl-sw-bahn{
+  background:var(--wl-c9a84c, #C9A84C); border-color:var(--wl-c9a84c, #C9A84C);
+}
+html[data-dpl-portfolio="auf"] .dpl-portfolio-regler .dpl-sw-bahn i{ transform:translateX(14px); background:#050505; }
+html[data-dpl-portfolio="auf"] .dpl-portfolio-regler .dpl-sw-p{ opacity:1; font-weight:600; }
+html[data-dp-layout] .dpl-portfolio-regler .dpl-sw-a,
+html[data-dp-layout] .dpl-portfolio-regler .dpl-sw-p{ color:#BFB7A9; }
+html[data-dp-layout]:not([data-dpl-portfolio="auf"]) .dpl-portfolio-regler .dpl-sw-a,
+html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-portfolio-regler .dpl-sw-p{ color:#F5EFE2; }

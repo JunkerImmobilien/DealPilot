@@ -109,7 +109,10 @@ var FIELDS = [
    * Die Fremdfelder-Rettung weiter unten half hier NICHT: sie bewahrt nur
    * Schluessel, die im gespeicherten Datensatz schon stehen. Da nie etwas
    * diese drei schrieb, konnten sie dort nie stehen. */
-  'd2_vertrag', 'd2_bspar', 'ek_inkl_nk',
+  /* v3213 · W-16: 'ek_inkl_nk' wieder raus - der Haken ist entfernt (rechnete den LTV
+   * gegen die Gesamtinvestition, also lockerer). Ein gespeicherter Wert bleibt ueber die
+   * Fremdfelder-Rettung am Objekt stehen und wird von niemandem mehr gelesen. */
+  'd2_vertrag', 'd2_bspar',
   /* ── v1828 · DREI WEITERE HAKEN, DIE KEIN NEULADEN UEBERLEBEN ──────────
    *
    * In v1815 habe ich `san_tax_active` repariert — und nicht gefragt, ob

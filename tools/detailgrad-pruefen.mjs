@@ -47,7 +47,7 @@ const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FE = path.join(WURZEL, 'frontend');
 const JSON_PFAD = path.join(WURZEL, 'design', 'Vorschläge', 'arbeitsbereich-detailgrad-zuordnung.json');
 const DATEN_PFAD = path.join(FE, 'js', 'data', 'detailgrad-zuordnung.js');
-const SOLL = { 1: 45, 2: 154, 3: 287 };
+const SOLL = { 1: 45, 2: 153, 3: 287 };   /* v3213 · W-16: ek_inkl_nk entfernt (Fortgeschritten 154 -> 153) */
 const STUFEN = [['einsteiger', 1], ['fortgeschritten', 2], ['experte', 3]];
 const NAMEN = { 1: 'Einsteiger', 2: 'Fortgeschritten', 3: 'Experte' };
 

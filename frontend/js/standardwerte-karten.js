@@ -58,13 +58,17 @@
     { an: 'Bewirtschaftung', txt: 'Verwaltung, Instandhaltung und Mietausfall — in Euro je Objektart oder als Prozent der Miete.',
       felder: [['_bwk', 'Rechenweg', ''], ['bwkp_mfh_verw', 'Verwaltung je Wohnung', ' €/Jahr'], ['bwkp_mfh_inst_qm', 'Instandhaltung', ' €/m² · Jahr'], ['bwkp_etw_hg_qm', 'ETW-Hausgeld', ' €/m² · Monat'], ['ip_mietausfall_pct', 'Mietausfall', ' % der Miete']] },
     { an: 'Lageklassen', txt: 'Zielrendite brutto je Lage — der Maßstab der Ampel im Quick-Check.', lage: true },
+    /* v3213 · W-6: Ziellinie der Bruttomietrendite nach Jahren (investment-profile.js) */
+    { an: 'Ziel-Bruttomietrendite', txt: 'Deine Ziellinie über die Jahre nach dem Kauf — ausgewertet im Zielbild jedes Objekts.', zbmr: true },
     { an: 'Persönliche Mindest', txt: 'Deine persönlichen Kaufgrenzen.',
       felder: [['ip_min_dscr', 'DSCR', ''], ['ip_min_cashflow_vor_st', 'Cashflow', ' €/Monat'], ['ip_max_ltv', 'max. LTV', ' %']] },
     { an: 'Marktbewertung', txt: 'Abschlag auf Angebotspreise — so viel unter dem Inseratspreis wird im Schnitt verkauft.',
       felder: [['ip_angebot_abschlag_pct', 'Angebotsabschlag', ' %']] },
     { an: 'Steuer', txt: 'Dein persönlicher Grenzsteuersatz. Gesellschaften rechnen mit dem Satz aus Mandanten.',
       felder: [['ip_grenzsteuersatz', 'Grenzsteuersatz', ' %']] },
-    { an: 'Standort', txt: 'Bundesland und Kaufnebenkosten.',
+    /* v3213 · W-9 (Entwicklungspartner; Marcel: nicht streichen, umbenennen, eingeklappt):
+       bis v3212 „Standort & Nebenkosten" - die Werte sind nur der Start eines NEUEN Objekts. */
+    { an: 'Vorbelegung', txt: 'Bundesland und Kaufnebenkosten, mit denen ein neues Objekt startet. Am Objekt änderst du sie im Reiter Investition; angelegte Objekte behalten ihre Werte.', zu: true,
       felder: [['ip_bundesland', 'Bundesland', ''], ['ip_notar_pct', 'Notar', ' %'], ['ip_grundbuch_pct', 'Grundbuch', ' %'], ['ip_sonstige_nk_pct', 'Sonstige', ' %'], ['ip_maklerkosten', 'Makler', ' %']] }
   ];
   /* Welche Felder ein Set setzt - in den Karten als „Set" bzw. „eigen" markiert. */
@@ -72,7 +76,32 @@
   var LS_SET = 'dp_std_set';
   function setGemerkt() { try { return localStorage.getItem(LS_SET) || 'dp'; } catch (e) { return 'dp'; } }
   function setMerken(id) { try { localStorage.setItem(LS_SET, id); } catch (e) {} }
-  function setVon(id) { return SETS.filter(function (s) { return s.id === id; })[0] || SETS[0]; }
+  /* v3213 · W-8 (Entwicklungspartner): ein viertes, EIGENES Set neben den drei festen.
+     Gespeichert im Browser (dp_std_set_eigen, wie das gewählte Set dp_std_set): die Werte
+     der fünf Set-Felder und die Deal-Score-Vorlage ('custom' = eigene Gewichte, die
+     dealscore.js selbst hält - dann ändert das Set die Gewichte nicht). Erkannt wird
+     eine Abweichung wie bei den festen Sets (setMarkieren, Band). */
+  var LS_EIGEN = 'dp_std_set_eigen';
+  function eigenesSet() {
+    try {
+      var o = JSON.parse(localStorage.getItem(LS_EIGEN) || 'null');
+      if (o && o.werte && typeof o.werte === 'object')
+        return { id: 'eigen', name: 'Eigenes', txt: 'Deine gespeicherten Werte' + (o.am ? ' (Stand ' + String(o.am).slice(8, 10) + '.' + String(o.am).slice(5, 7) + '.' + String(o.am).slice(0, 4) + ')' : '') + '.', ds: o.ds || null, werte: o.werte, eigen: true };
+    } catch (e) {}
+    return null;
+  }
+  function alleSets() { var e = eigenesSet(); return e ? SETS.concat([e]) : SETS.slice(); }
+  function setVon(id) { return alleSets().filter(function (s) { return s.id === id; })[0] || SETS[0]; }
+  function eigenesSpeichern(host) {
+    var werte = {};
+    Object.keys(SET_FELDER).forEach(function (id) { var e = document.getElementById(id); werte[id] = e ? String(e.value == null ? '' : e.value).trim() : ''; });
+    var ds = null;
+    try { if (window.DealScore2 && DealScore2.getActivePreset) ds = DealScore2.getActivePreset(); } catch (e) {}
+    try { localStorage.setItem(LS_EIGEN, JSON.stringify({ werte: werte, ds: ds, am: new Date().toISOString().slice(0, 10) })); } catch (e) { return; }
+    setMerken('eigen');
+    setsZeichnen(host); karteneZeichnen(host); setMarkieren(host);
+    if (typeof window.toast === 'function') window.toast('✓ Als „Eigenes" gespeichert — die Werte selbst übernimmst du wie immer mit „Speichern"');
+  }
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function zahl(v) { return String(v).replace('.', ','); }
@@ -102,7 +131,15 @@
     if (document.getElementById('swk-css')) return;
     var st = document.createElement('style'); st.id = 'swk-css';
     st.textContent = [
-      '#settings-modal .swk-sets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 16px}',
+      '#settings-modal .swk-sets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 16px}',   /* v3213 · W-8: vier Sets */
+      '#settings-modal .swk-set.swk-set-leer{border-style:dashed;background:#fdfcfa}',
+      '#settings-modal .swk-set.swk-set-leer i{display:inline-block;margin-top:6px;font:600 12px Inter,sans-serif;font-style:normal;color:#8a6d1f}',
+      '#settings-modal .swk-band-knopf{border:1px solid var(--wl-c9a84c,#C9A84C);background:#fff;border-radius:7px;padding:3px 9px;margin-left:6px;font:600 11.5px Inter,sans-serif;color:#6b5417;cursor:pointer}',
+      '#settings-modal details.swk-zu{border-top:1px dashed #e6e1d6;padding-top:6px;margin-top:auto}',
+      '#settings-modal details.swk-zu>summary{cursor:pointer;font:600 12px Inter,sans-serif;color:#8a6d1f;list-style:none}',
+      '#settings-modal details.swk-zu>summary::-webkit-details-marker{display:none}',
+      '#settings-modal details.swk-zu .swk-werte{border-top:0;margin-top:6px;padding-top:0}',
+      '@media (max-width:1100px){#settings-modal .swk-sets{grid-template-columns:repeat(2,minmax(0,1fr))}}',
       '#settings-modal .swk-set{border:1px solid #e6e1d6;background:#fff;border-radius:12px;padding:12px;cursor:pointer;text-align:left;font:inherit;color:#1a1714;position:relative}',
       '#settings-modal .swk-set.an{border:1.5px solid var(--wl-c9a84c,#C9A84C);background:#FBF6E9}',
       '#settings-modal .swk-set.an::after{content:"✓ aktiv";position:absolute;top:10px;right:12px;font:600 11px Inter,sans-serif;color:#8a6d1f}',
@@ -199,17 +236,10 @@
     });
     /* 2 · Sets */
     var sets = document.createElement('div'); sets.className = 'swk-sets';
-    SETS.forEach(function (st) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'swk-set'; b.setAttribute('data-set', st.id);
-      b.innerHTML = '<b>' + esc(st.name) + '</b><p>' + esc(st.txt) + '</p><ul>' + SET_ZEILEN.map(function (z) {
-        var sw = st.werte[z[0]];
-        return '<li><span>' + esc(z[1]) + '</span> ' + esc(sw === '' ? 'Ø Markt' : zahl(sw) + z[2]) + '</li>'; }).join('')
-        + '<li><span>Deal Score</span> ' + esc(dsName(st.ds)) + '</li></ul>';
-      b.addEventListener('click', function () { setAnwenden(host, st); });
-      sets.appendChild(b);
-    });
+    host._swkSets = sets;
+    setsZeichnen(host);
     var hin = document.createElement('p'); hin.className = 'swk-hinweis';
-    hin.textContent = 'Dein Anlegerprofil setzt Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR, den Abschlag auf Angebotspreise und die Gewichte des Deal Scores. Die Werte übernimmst du mit „Speichern“ unten, die Score-Gewichte gelten sofort. Feiner justieren: Reiter Deal Score.';
+    hin.textContent = 'Dein Anlegerprofil setzt Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR, den Abschlag auf Angebotspreise und die Gewichte des Deal Scores. Die Werte übernimmst du mit „Speichern“ unten, die Score-Gewichte gelten sofort. Feiner justieren: Reiter Deal Score. Passt keines der drei, stell die Werte ein und speichere sie als „Eigenes“.';
     var kopf = document.createElement('div'); kopf.className = 'swk-kopf'; kopf.textContent = 'Dein Anlegerprofil';
     oben.appendChild(kopf);
     var band = document.createElement('div'); band.className = 'swk-band';   /* v2211 */
@@ -226,13 +256,38 @@
     }
   }
 
+  /* v3213 · W-8: die Set-Kacheln (drei feste + „Eigenes") - neu gezeichnet, wenn das eigene Set gespeichert wird */
+  function setsZeichnen(host) {
+    var sets = host._swkSets; if (!sets) return;
+    sets.innerHTML = '';
+    var eig = eigenesSet();
+    alleSets().forEach(function (st) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'swk-set'; b.setAttribute('data-set', st.id);
+      b.innerHTML = '<b>' + esc(st.name) + '</b><p>' + esc(st.txt) + '</p><ul>' + SET_ZEILEN.map(function (z) {
+        var sw = st.werte[z[0]];
+        return '<li><span>' + esc(z[1]) + '</span> ' + esc(sw === '' || sw == null ? 'Ø Markt' : zahl(sw) + z[2]) + '</li>'; }).join('')
+        + '<li><span>Deal Score</span> ' + esc(st.ds === 'custom' ? 'eigene Gewichte' : dsName(st.ds)) + '</li></ul>';
+      b.addEventListener('click', function () { setAnwenden(host, st); });
+      sets.appendChild(b);
+    });
+    if (!eig) {
+      var l = document.createElement('button'); l.type = 'button'; l.className = 'swk-set swk-set-leer'; l.setAttribute('data-set-eigen-neu', '1');
+      l.innerHTML = '<b>Eigenes</b><p>Noch leer. Stell Tilgung, Eigenkapital, Mietausfall, Min-DSCR und Abschlag unten ein und merk sie dir hier als dein eigenes Set.</p><i>Aktuelle Werte als „Eigenes“ speichern</i>';
+      l.addEventListener('click', function () { eigenesSpeichern(host); });
+      sets.appendChild(l);
+    }
+  }
   function karteneZeichnen(host) {
     var karten = host._swkKarten, teile = host._swkTeile || [];
     karten.innerHTML = '';
     teile.forEach(function (t, i) {
       var k = karteFuer(t.titel) || { ic: '⚙️', txt: '', felder: [] };
       var zeilen = '';
-      if (k.lage) {
+      if (k.zbmr) {   /* v3213 · W-6 */
+        var IP = window.DealPilotInvestmentProfile, st6 = IP && IP.zielBmrStufen ? IP.zielBmrStufen() : [];
+        st6.forEach(function (s) { zeilen += '<span>nach ' + s.jahr + (s.jahr === 1 ? ' Jahr' : ' Jahren') + '</span><b>' + esc(zahl(s.pct) + ' %') + '</b>'; });
+        if (!st6.length) zeilen = '<span>keine Ziellinie</span><b>—</b>';
+      } else if (k.lage) {
         var box = t.el.querySelector('.ip-lage-box');
         [].slice.call(box ? box.children : []).forEach(function (row) {
           var inp = row.querySelector('input'); var n = (row.textContent || '').trim().match(/^[A-D]-Lage/);
@@ -257,8 +312,11 @@
       c.setAttribute('role', 'button');
       c.innerHTML = '<h4>' + esc(k.titel || t.titel) + '</h4>'
         + (k.txt ? '<p>' + esc(k.txt) + '</p>' : '')
-        + (zeilen ? '<div class="swk-werte">' + zeilen + '</div>' : '')
+        /* v3213 · W-9: „zu" = Werte eingeklappt, ein Klick auf „Werte zeigen" öffnet nur die Liste */
+        + (zeilen ? (k.zu ? '<details class="swk-zu"><summary>Werte zeigen ▾</summary><div class="swk-werte">' + zeilen + '</div></details>' : '<div class="swk-werte">' + zeilen + '</div>') : '')
         + '<span class="swk-anpassen">Anpassen ›</span>';
+      var zuS = c.querySelector('details.swk-zu > summary');
+      if (zuS) zuS.addEventListener('click', function (ev) { ev.stopPropagation(); });
       /* v2211: die ganze Karte öffnet - nicht nur der Knopf */
       c.addEventListener('click', function () { oeffne(host, i); });
       c.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); oeffne(host, i); } });
@@ -272,7 +330,11 @@
         if (!gleichWert(e.value, st.werte[id])) eigen++; });
       band.innerHTML = 'Grundlage: <b>' + esc(st.name) + '</b> — die mit <i class="swk-tag">Set</i> markierten Werte kommen aus diesem Set'
         + (eigen ? ', <b>' + eigen + '</b> davon hast du angepasst (<i class="swk-tag eigen">eigen</i>).' : '.')
-        + ' Alle anderen Werte gelten für jedes Set.';
+        + ' Alle anderen Werte gelten für jedes Set.'
+        /* v3213 · W-8: die Abweichung als eigenes Set merken */
+        + (eigen ? ' <button type="button" class="swk-band-knopf" data-swk-eigen="1">' + (st.eigen ? '„Eigenes" mit diesen Werten aktualisieren' : 'Als „Eigenes" speichern') + '</button>' : '');
+      var bk = band.querySelector('[data-swk-eigen]');
+      if (bk) bk.addEventListener('click', function () { eigenesSpeichern(host); });
     }
   }
   function oeffne(host, i) {
@@ -292,7 +354,7 @@
   function setAnwenden(host, st, ohneScore) {
     setMerken(st.id);   /* v2211: das gewählte Set bleibt gemerkt */
     /* v2548 · das Profil setzt auch die Deal-Score-Gewichte */
-    if (!ohneScore && st.ds && typeof window.ds2SetPreset === 'function') { try { window.ds2SetPreset(st.ds, true); } catch (x) {} }
+    if (!ohneScore && st.ds && st.ds !== 'custom' && typeof window.ds2SetPreset === 'function') { try { window.ds2SetPreset(st.ds, true); } catch (x) {} }   /* v3213: 'custom' = eigene Gewichte bleiben */
     Object.keys(st.werte).forEach(function (id) {
       var e = document.getElementById(id); if (!e) return;
       e.value = st.werte[id];
@@ -314,7 +376,7 @@
       var id = b.getAttribute('data-set'), st = setVon(id), an = id === g;
       b.classList.toggle('an', an);
       /* v2548b · auch abweichende Score-Gewichte (Feinjustierung, Benutzerdefiniert) heißen „angepasst“ */
-      var dsAnders = !!(st.ds && window.DealScore2 && DealScore2.getActivePreset && DealScore2.getActivePreset() !== st.ds);
+      var dsAnders = !!(st.ds && window.DealScore2 && DealScore2.getActivePreset && DealScore2.getActivePreset() !== st.ds);   /* v3213: gilt auch für „Eigenes" ('custom') */
       b.classList.toggle('angepasst', an && (!gleich(st) || dsAnders));
     });
   }
@@ -328,5 +390,5 @@
     setAnwenden(host, st, true); return true;
   }
   function profilVonScore(dsKey) { var st = SETS.filter(function (s) { return s.ds === dsKey; })[0]; return st ? st.name : null; }
-  window.DpStandardKarten = { aufbauen: aufbauen, SETS: SETS, perScore: perScore, profilVonScore: profilVonScore };
+  window.DpStandardKarten = { aufbauen: aufbauen, SETS: SETS, alleSets: alleSets, eigenesSet: eigenesSet, perScore: perScore, profilVonScore: profilVonScore };
 })();

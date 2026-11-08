@@ -35,7 +35,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v3196">
+<link rel="stylesheet" href="css/style.css?v=v3213">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -2770,13 +2770,10 @@ label.dp-required.qc-required::after {
             <span>Eigenkapital entspricht den Kaufnebenkosten</span>
           </label>
         </div>
-        <div class="f checkbox-row">
-          <label class="cb-label" title="LTV-Bezugsgröße: AUS = LTV gegen Kaufpreis (Standard-Bankenpraxis, Beleihungsbasis ≈ KP). AN = LTV gegen Gesamtinvestition inkl. Erwerbsnebenkosten (konservativere Sicht — strenger, da KNK nicht als Sicherheit zählen).">
-            <input id="ek_inkl_nk" type="checkbox" onchange="calc()">
-            <span>LTV inkl. Erwerbsnebenkosten berechnen <span class="cf-hint">(strenger, GI-Bezug)</span></span>
-            <span class="info-tag">ℹ</span>
-          </label>
-        </div>
+        <!-- v3213 · W-16: Haken "LTV inkl. Erwerbsnebenkosten (strenger)" entfernt. Er rechnete
+             den LTV gegen die Gesamtinvestition - die ist groesser als der Kaufpreis, der LTV
+             wurde also KLEINER (lockerer), nicht strenger. Bezug bleibt Gutachten/Bankwert ->
+             Bankbewertung -> Kaufpreis (calc.js). -->
         <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div><div class="cf-hint" id="d1-herleitung" style="margin-top:4px"></div></div>
         <!-- v1244 · Testbericht Block F: „Sollte hier die Reihenfolge nicht
              anders sein? Erst eintragen was fuer ein Kredit ich bekomme und
@@ -3127,25 +3124,37 @@ label.dp-required.qc-required::after {
   <!-- v2184: Standardwerte je Objektart (bwk-profil.js) -->
   <div id="bwk-standard-bar"></div>
   <!-- Detail Mode (default) -->
+  <!-- v3213 · W-18 (Entwicklungspartner): umlagefaehige und nicht umlagefaehige Kosten in EINEM
+       Block nebeneinander, Felder je Spalte zu zweit (schmaler). Bis v3212 zwei Karten untereinander
+       in der linken Haelfte (gemessen am Bild W-18: ~1.000 px hoch bei 620 px breiten Feldern).
+       Alle Felder, IDs und Hilfen bleiben; detailgrad.js findet die Karte weiter ueber #hg_ul/#hg_nul. -->
   <div id="bwk-detail-mode" class="col2">
-    <div>
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Umlagefähige Kosten / Jahr</div>
-        <div class="f"><label>Hausgeld (umlagefähig) / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.hg_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Sonstiges umlagefähig / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonstiges_umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab6.sonstiges_umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
-      </div>
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Nicht umlagefähige Kosten / Jahr</div>
-        <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
-        <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Sonderverwaltung / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonderverwaltung" tabindex="-1" aria-label="Hilfe zu tab6.sonderverwaltung"></button></label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <!-- v1312: der Erbbauzins steckt in der Summe darunter, ist aber kein Feld
-             hier - er kommt aus dem Reiter Objekt. Ohne diese Zeile taucht er in den
-             Kosten auf, ohne dass jemand sagen koennte, woher. -->
-        <div class="f"><label>davon Erbbauzins <span class="info-tag" title="Kommt aus dem Reiter Objekt, Grund &amp; Boden. Nicht umlagefähig (§ 2 BetrKV kennt ihn nicht), aber steuerlich abziehbar.">ℹ Objekt</span></label><div class="cf" id="erb_zins_j">—</div></div>
-        <div class="f"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
+    <div class="card dp-bwk-kosten" style="grid-column:1/-1"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Bewirtschaftungskosten / Jahr</div>
+      <div class="dp-bwk-zwei">
+        <div class="dp-bwk-spalte dp-bwk-ul">
+          <div class="dp-bwk-kopf">Umlagefähig <span>· zahlt der Mieter über die Nebenkosten</span></div>
+          <div class="g2 dp-bwk-felder">
+            <div class="f"><label>Hausgeld (umlagefähig) / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.hg_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Sonstiges umlagefähig / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonstiges_umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab6.sonstiges_umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+          </div>
+          <div class="f dp-bwk-summe"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
+        </div>
+        <div class="dp-bwk-spalte dp-bwk-nul">
+          <div class="dp-bwk-kopf">Nicht umlagefähig <span>· trägst du als Eigentümer</span></div>
+          <div class="g2 dp-bwk-felder">
+            <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
+            <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Sonderverwaltung / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonderverwaltung" tabindex="-1" aria-label="Hilfe zu tab6.sonderverwaltung"></button></label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+            <!-- v1312: der Erbbauzins steckt in der Summe darunter, ist aber kein Feld
+                 hier - er kommt aus dem Reiter Objekt. Ohne diese Zeile taucht er in den
+                 Kosten auf, ohne dass jemand sagen koennte, woher. -->
+            <div class="f"><label>davon Erbbauzins <span class="info-tag" title="Kommt aus dem Reiter Objekt, Grund &amp; Boden. Nicht umlagefähig (§ 2 BetrKV kennt ihn nicht), aber steuerlich abziehbar.">ℹ Objekt</span></label><div class="cf" id="erb_zins_j">—</div></div>
+          </div>
+          <div class="f dp-bwk-summe"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
+        </div>
       </div>
     </div>
     <div>
@@ -3169,6 +3178,8 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Bezeichnung</label><input id="kp4l" type="text" placeholder=""></div>
         </div>
       </div>
+    </div>
+    <div>
       <!-- v3092 · N100: Sonderumlagen der WEG - Cashflow im Faelligkeitsjahr, Steuer nur als Vorschlag (sonderumlage.js) -->
       <div class="card" id="weg-su-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Sonderumlagen der WEG</div>
         <input type="hidden" id="weg_su" value="">
@@ -3752,7 +3763,7 @@ label.dp-required.qc-required::after {
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3214"></script>
+  <script src="js/calc.js?v=v3221"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -3777,7 +3788,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-heuristik.js?v=v3085"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v3186"></script>
+<script src="js/tooltip-content.js?v=v3213"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v2421"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
@@ -3789,9 +3800,9 @@ label.dp-required.qc-required::after {
   <script src="js/apikeys.js?v=v3167"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
   <script src="js/unterlagen-modal.js?v=v2920"></script>
-  <script src="js/standardwerte-karten.js?v=v3059"></script>
+  <script src="js/standardwerte-karten.js?v=v3213"></script>
   <script src="js/settings.js?v=v3218"></script>
-  <script src="js/einstellungen-schlank.js?v=v3077a"></script>
+  <script src="js/einstellungen-schlank.js?v=v3213"></script>
 <script src="js/pricing-modal.js?v=v2966e"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
@@ -3811,7 +3822,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3217"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3220"></script>
+<script src="js/storage.js?v=v3221"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -3842,7 +3853,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-import.js?v=v3058"></script>
 <script src="js/dokument-import.js?v=v3211"></script>
 <script src="js/unterlagen.js?v=v3211"></script>
-<script src="js/sonderumlage.js?v=v3214"></script>
+<script src="js/sonderumlage.js?v=v3221"></script>
 <script src="js/sanierung-plan.js?v=v3214"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
 
 <script src="js/beleg-import.js?v=v3166"></script>
@@ -3850,16 +3861,16 @@ label.dp-required.qc-required::after {
 <script src="js/financing-pdf.js?v=v2932"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
-<script src="js/quick-check.js?v=v3075"></script>
+<script src="js/quick-check.js?v=v3213"></script>
 <script src="js/qc-bridge.js?v=v3201c"></script>
 <script src="js/bodenrichtwert.js?v=v3208by"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
-<script src="js/data/detailgrad-zuordnung.js?v=v3073"></script>
+<script src="js/data/detailgrad-zuordnung.js?v=v3213"></script>
 <script src="js/detailgrad.js?v=v3080"></script>
-<script src="js/objekt-reiter.js?v=v3201"></script>
+<script src="js/objekt-reiter.js?v=v3213"></script>
 <script src="js/paket-import.js?v=v3204"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
@@ -3870,7 +3881,7 @@ label.dp-required.qc-required::after {
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
 <script src="js/mietpotenzial-kern.js?v=v3130"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
-<script src="js/potenzial.js?v=v3200"></script>
+<script src="js/potenzial.js?v=v3213"></script>
 <script src="js/mietvertrag-objekt.js?v=v3028b"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3881,12 +3892,12 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v3031"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3120b"></script>
+<script src="js/help.js?v=v3213"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3120b"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2966f"></script>
-<script src="js/messe-drehbuch.js?v=v3184"></script>
+<script src="js/messe-drehbuch.js?v=v3213"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v3218"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
@@ -3938,7 +3949,7 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-wizard.js?v=v3006c"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v3197"></script>
+<script src="js/investment-profile.js?v=v3213"></script>
 <script src="js/bwk-profil.js?v=v3091"></script>
 <script src="js/dashboard.js?v=v3220"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
@@ -4410,7 +4421,7 @@ document.addEventListener('DOMContentLoaded', function(){
          bei gleicher Spezifitaet ueberstimmt; Skript NACH settings.js,
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
     <link rel="stylesheet" href="css/datenaufnahme.css?v=v2547a"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
-    <link rel="stylesheet" href="css/layout-varianten.css?v=v2980a">
+    <link rel="stylesheet" href="css/layout-varianten.css?v=v3213">
     <script src="js/marktbericht-profi.js?v=v3219a"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v3217"></script><!-- v3179 · einheitliches Dokument-Design -->
     <script src="js/dp-dokumente.js?v=v3220"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
@@ -4425,7 +4436,7 @@ document.addEventListener('DOMContentLoaded', function(){
          Co-Pilot darunter Aenderungen im Satz entgegen; zwei Wege zum
          selben Ziel sind einer zuviel. Die Datei bleibt im Repo, falls der
          Sprechlauf dort doch noch gebraucht wird. -->
-    <script src="js/layout-varianten.js?v=v3061"></script>
+    <script src="js/layout-varianten.js?v=v3213"></script>
 <!-- v1714 - die Objektkarten-Entwuerfe zum Umschalten -->
 <script src="js/objektkarten-stil.js?v=v2216c"></script>
     <script src="js/karten-stil.js?v=v2981"></script><!-- v1953 · Trichter (Bordkarte ist raus) -->

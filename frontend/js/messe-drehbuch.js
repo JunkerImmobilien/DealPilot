@@ -1693,7 +1693,7 @@
     return liste.map(function (id) { return String(F[id] || id).replace(/\s*\(Reiter[^)]*\)/, ''); });
   }
   function fehlt(s) { try { return DealPilotObjektReiter.fehltFuer(s); } catch (e) { return []; } }
-  function stufeZeile(s) { return function () { var b = q('#oe-stufen [data-oe-stufe="' + s + '"]'); return b && b.closest('.oe-row'); }; }
+  function stufeZeile(s) { return function () { return q('#oe-stufen [data-oe-zeile="' + s + '"]'); }; }   /* v3213: ohne „was fehlt"-Knopf über die Zeile */
   /* nur die Zelle „N frei" - gemessen las der ganze Zeilentext „Stufe 1" + „10 frei" als 110 */
   function kontingentFrei(s) { var r = stufeZeile(s)(), w = r && r.querySelector('.oe-w'); var m = w && /(\d+)\s*frei/.exec(w.textContent); return m ? m[1] : null; }
   function mbKarteH() { try { return DealPilotMB.letzter(); } catch (e) { return null; } }
@@ -2304,8 +2304,8 @@
       },
       async function (s) {   /* 6 · woher die Standardwerte kommen */
         await r6Einstellungen('standardwerte');
-        await zeige(r6Karte('.settings-modal', /^Standort & Nebenkosten$/), 8);
-        var SN = /^Standort & Nebenkosten$/, bl = r6SwkWert(SN, /^Bundesland$/), no = r6SwkWert(SN, /^Notar$/), gb = r6SwkWert(SN, /^Grundbuch$/), so = r6SwkWert(SN, /^Sonstige$/), mk = r6SwkWert(SN, /^Makler$/);
+        await zeige(r6Karte('.settings-modal', /^Vorbelegung für neue Objekte$/), 8);   /* v3213 · W-9: Karte umbenannt */
+        var SN = /^Vorbelegung für neue Objekte$/, bl = r6SwkWert(SN, /^Bundesland$/), no = r6SwkWert(SN, /^Notar$/), gb = r6SwkWert(SN, /^Grundbuch$/), so = r6SwkWert(SN, /^Sonstige$/), mk = r6SwkWert(SN, /^Makler$/);
         await b2oZeile(s, 'Woher die Vorbelegung kommt', 'Einstellungen › <b>Standardwerte</b>: Notar ' + (no || '–') + ', Grundbuch ' + (gb || '–') + ', Sonstige ' + (so || '–') + ', Makler ' + (mk || '–') + ' — Bundesland ' + (bl || '–') + '. Gilt für jedes neue Objekt.');
         r6EinstellungenZu();
         await warte(700);

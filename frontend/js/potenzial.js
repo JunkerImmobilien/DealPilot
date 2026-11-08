@@ -1085,6 +1085,38 @@
     return { ankauf: ankauf, mieterhoehung: mh, mieterhoehung_herkunft: abs.length ? 'frühestes Wirksamwerden der Soll-Mieten, § 558b/§ 559b BGB' : 'ohne Termin – laufendes Jahr',   /* v3028: Jahr = WIRKSAM, nicht verlangbar */
              zielbild: m.stufen.zielbild && zf >= 1990 && zf <= 2100 ? zf : null };
   }
+  /* ── v3213 · W-6 · Ziel-Bruttomietrendite in Stufen (Entwicklungspartner) ──
+     Die Stufen (z. B. nach 1 Jahr 5 %, nach 3 Jahren 6 %) stehen im Anlegerprofil
+     (investment-profile.js zielBmrStufen) und kommen hier als PARAMETER an - diese
+     beiden Funktionen lesen keine Einstellungen. Gilt in einem Jahr die Stufe mit dem
+     höchsten „nach n Jahren", das schon erreicht ist; vor der ersten Stufe gibt es kein
+     Ziel. Verglichen wird die Bruttomietrendite der Spalte (Ankauf, Bestand = heute,
+     Mieterhöhung, Zielbild) im Jahr der Spalte. */
+  function zielBmrAn(stufen, nachJahren) {
+    if (!Array.isArray(stufen) || typeof nachJahren !== 'number' || !isFinite(nachJahren) || nachJahren < 0) return null;
+    var z = null;
+    stufen.forEach(function (s) {
+      if (!s || typeof s.jahr !== 'number' || typeof s.pct !== 'number' || !isFinite(s.pct)) return;
+      if (s.jahr <= nachJahren && (z === null || s.jahr >= z.jahr)) z = s;
+    });
+    return z;
+  }
+  /* punkte: [{ k, jahr (Kalenderjahr), bmy (%) }] → { k: { jahr, nach, ziel, ziel_ab, bmy, erreicht } } */
+  function zielBmrPruefen(stufen, kaufjahr, punkte) {
+    var aus = {};
+    if (!Array.isArray(stufen) || !stufen.length || typeof kaufjahr !== 'number' || !isFinite(kaufjahr)) return aus;
+    (punkte || []).forEach(function (p) {
+      if (!p || !p.k || typeof p.jahr !== 'number' || !isFinite(p.jahr)) return;
+      var nach = p.jahr - kaufjahr, z = zielBmrAn(stufen, nach);
+      var bmy = (typeof p.bmy === 'number' && isFinite(p.bmy)) ? p.bmy : null;
+      aus[p.k] = { jahr: p.jahr, nach: nach, ziel: z ? z.pct : null, ziel_ab: z ? z.jahr : null, bmy: bmy,
+        erreicht: z && bmy != null ? bmy >= z.pct - 1e-9 : null };
+    });
+    return aus;
+  }
+  function zielBmrStufenAusProfil() {
+    try { var IP = window.DealPilotInvestmentProfile; return IP && IP.zielBmrStufen ? IP.zielBmrStufen() : []; } catch (e) { return []; }
+  }
   /* v2541 · Fußzeilen: woher die Marktpreisindikationen und die Jahre kommen */
   function mpiFuss(M) {
     var t = [];
@@ -1581,10 +1613,22 @@
     var rfDa = !!(MPI && MPI.rohertragsfaktor && MPI.rohertragsfaktor.verfuegbar);
     var kfDa = !!(MPI && MPI.kauffaelle && MPI.kauffaelle.verfuegbar);   /* v3041 · Ø Kaufpreis aus Kauffällen */
     function x(k) { return k === 'ankauf' ? A : kz[k]; }
+    /* v3213 · W-6: Ziel-Bruttomietrendite je Spalte (Stufen als Parameter in den Rechenteil) */
+    var JA6 = jahre(m), ZB6 = zielBmrStufenAusProfil();
+    var ZB = zielBmrPruefen(ZB6, JA6.ankauf, cols.map(function (c) {
+      var j = c.k === 'ankauf' ? JA6.ankauf : c.k === 'bestand' ? new Date().getFullYear() : JA6[c.k];
+      var v = x(c.k); return { k: c.k, jahr: j, bmy: v && v.bmy != null ? Number(v.bmy) : null };
+    }));
     var rows = [
       { gr: 'Miete & Rendite' },
       { t: 'Kaltmiete p. a.', f: function (k) { var v = x(k); return v && v.miete_j != null ? zz(eur(v.miete_j), v.miete_qm ? eur2(v.miete_qm) + '/m²' : '') : null; } },
       { t: 'Bruttomietrendite', u: 'auf Kaufpreis + Maßnahmen', f: function (k) { var v = x(k); return v && v.bmy != null ? pct(v.bmy) : null; } },
+      /* v3213 · W-6: Ziellinie aus dem Anlegerprofil, je Spalte im Jahr der Spalte */
+      { t: 'Ziel-Bruttomietrendite', u: 'Ziellinie im Anlegerprofil', f: function (k) {
+          var e = ZB[k]; if (!e) return null;
+          if (e.ziel == null) return zz('—', e.nach < 0 ? 'vor dem Kauf' : 'noch keine Stufe (Jahr ' + e.nach + ')');
+          var wort = e.erreicht == null ? '' : (e.erreicht ? '<span style="color:#3FA56C;font-weight:600">✓ erreicht</span>' : '<span style="color:#B8625C;font-weight:600">nicht erreicht</span>');
+          return zz(pct(e.ziel, 1) + ' <span class="dp-pot-jahr">ab Jahr ' + e.ziel_ab + '</span>', wort); } },
       { t: 'Cashflow / Monat', u: 'vor Steuer', f: function (k) { var v = x(k); return v && v.cf_m != null ? eur(v.cf_m) : null; } },
       { t: 'DSCR', f: function (k) { var v = x(k); return v && v.dscr != null ? dez(v.dscr, 2) : null; } },
       { t: 'Maßnahmenkosten', f: function (k) { var v = x(k); return k !== 'ankauf' && v && v.kosten ? eur(v.kosten) : null; } },
@@ -1655,6 +1699,9 @@
     if (MPI) { var mf = mpiFuss(MPI); if (mf) li.push(esc(mf)); }
     if (mpiDa && MPI.angebote.abschlag_herkunft && /^örtlich/.test(MPI.angebote.abschlag_herkunft)) li.push('Abschlag auf Angebotspreise ' + esc(MPI.angebote.abschlag_herkunft) + '.');
     li.push(esc(jahreFuss(JA)));
+    /* v3213 · W-6 */
+    if (ZB6.length) li.push(esc('Ziel-Bruttomietrendite aus deinem Anlegerprofil: ' + ZB6.map(function (s) { return 'nach ' + s.jahr + (s.jahr === 1 ? ' Jahr ' : ' Jahren ') + pct(s.pct, 1); }).join(', ')
+      + (JA.ankauf ? ' — gezählt ab dem Kaufjahr ' + JA.ankauf + '; je Spalte gilt die Stufe ihres Jahres (Bestand = heute, Zielbild = „Zielbild fertig (Jahr)").' : ' — ohne Kaufdatum (Reiter Objekt) lässt sich kein Jahr zuordnen.')));
     if (auf) li = li.concat(aufteilungFuss(m, r));
     html += '<details class="dp-pot-mehr"><summary>So ist gerechnet</summary><ul>' + li.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></details>';
     /* v2842 · Knöpfe „Ertragswerte rechnen" und „Stufe 3" stehen jetzt in der Abrufleiste oben */
@@ -2601,6 +2648,7 @@
     herkunft: herkunft, herkunftAusDaten: herkunftAusDaten, herkunftHtml: herkunftHtml, leeren: leeren,   /* v2988 */
     indexmieteFuer: indexmieteFuer, indexmieteHtml: indexmieteHtml, indexmieteDaten: indexmieteDaten,   /* v3026 */
     mhTermine: mhTermine, wirksamNachZugang: wirksamNachZugang, TERMIN_REGEL: TERMIN_REGEL, mmjj: mmjj,   /* v3028 */
+    zielBmrAn: zielBmrAn, zielBmrPruefen: zielBmrPruefen,   /* v3213 · W-6 */
     _hash: hash, _auftrag: auftrag
   };
 })();

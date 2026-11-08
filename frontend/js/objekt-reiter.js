@@ -839,9 +839,10 @@
     var konto = { 1: rest('mpi'), 2: rest('mpi_plus'), 3: rest('wev') };
     /* v1855 · drei Kacheln unten in der Karte „Marktbericht abrufen" */
     var kacheln = {
-      1: { name: 'Einsteiger · Stufe 1', sub: 'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.', art: 'Marktpreisindikation' },
-      2: { name: 'Fortgeschritten · Stufe 2', sub: 'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.', art: 'erweiterte Indikation' },
-      3: { name: 'Experte · Stufe 3', sub: 'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', art: 'Wertermittlung' }
+      /* v3213 · W-13: „kurz" steht sichtbar unter der Kachel (bis v3212 nur im title) */
+      1: { name: 'Einsteiger · Stufe 1', kurz: 'Marktwert, Spanne und Lage aus Adresse, Fläche und Baujahr', sub: 'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.', art: 'Marktpreisindikation' },
+      2: { name: 'Fortgeschritten · Stufe 2', kurz: 'Dazu Rendite und Abschlag zum Markt aus Kaufpreis, Miete und Zustand', sub: 'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.', art: 'erweiterte Indikation' },
+      3: { name: 'Experte · Stufe 3', kurz: 'Boden-, Ertrags- und Sachwert nach ImmoWertV mit amtlichen Werten', sub: 'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', art: 'Wertermittlung' }
     };
     var ab = { 2: 'ab Investor', 3: 'ab Pro' };
     var z = dgStufe(), w = mbWahl();
@@ -860,13 +861,16 @@
       /* v3079 · Marcel: „wenn wir Einsteiger ausgewählt haben, gibt es halt nur
          die Stufe und fertig" — Stufen über dem Detailgrad erscheinen nicht. */
       if (s > z) return '';
-      var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
+      var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : 'abrufen';
       /* v1868 · kompakt: Name, frei, Pille — der Satz dazu steckt im Tooltip */
-      return '<div class="oe-row' + (s === w ? ' on' : '') + '" data-oe-zeile="' + s + '" role="button" tabindex="0" aria-pressed="' + (s === w) + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
+      return '<div class="oe-row' + (s === w ? ' on' : '') + '" data-oe-zeile="' + s + '" role="button" tabindex="0" aria-pressed="' + (s === w) + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + (fehlt ? ' · Klick zeigt die fehlenden Felder' : '') + '">'
         + '<span class="oe-k">' + k.name + '</span>'
         + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + ' ' + (fehlt ? st('x', fehlt + ' fehlt') : st('a', 'bereit')) + '</span>'
-        + '<span class="oe-q oe-q-kompakt">' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '</span>'
-        + '<span><button type="button" class="oe-btn' + (s === w ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">' + (fehlt ? 'was fehlt' : 'abrufen') + '</button></span>'
+        + '<span class="oe-q oe-q-kompakt">' + esc(k.kurz || k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '</span>'
+        /* v3213 · W-13 (Partner): der Knopf „was fehlt" doppelte die Chip-Liste „Für Stufe n
+           fehlt noch" (#oe-fehlt), die ein Klick auf die Zeile ohnehin zeigt. Ohne fehlende
+           Felder steht weiter „abrufen"; mit fehlenden bleibt die Pille „n fehlt". */
+        + '<span>' + (fehlt ? '' : '<button type="button" class="oe-btn' + (s === w ? ' solid' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">abrufen</button>') + '</span>'
         + '</div>';
     }).join('') + '</div>';
     preflightPillen();

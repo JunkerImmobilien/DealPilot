@@ -928,8 +928,14 @@
     if (S.portfolio) {
       var pb = document.createElement('button');
       pb.type = 'button';
-      pb.className = 'dpl-portfolio';
-      pb.innerHTML = '<span class="dpl-i">▣</span><span class="dpl-t">Portfolio</span>'
+      pb.className = 'dpl-portfolio dpl-portfolio-regler';
+      /* v3213 · W-14 (Partner): Schieberegler mit zwei beschrifteten Zustaenden statt
+         eines Knopfs, dessen Wort wechselt. Der Zustand steht an html[data-dpl-portfolio]
+         (auf = Objektliste), die Optik liest ihn dort (layout-varianten.css v3213). .dpl-t
+         bleibt fuer Vorleser und alle, die das Ziel-Wort lesen. */
+      pb.setAttribute('role', 'switch');
+      pb.innerHTML = '<span class="dpl-t dpl-sr">Portfolio</span>'
+        + '<span class="dpl-sw" aria-hidden="true"><span class="dpl-sw-a">Aktionen</span><span class="dpl-sw-bahn"><i></i></span><span class="dpl-sw-p">Portfolio</span></span>'
         + '<span class="dpl-n" id="dpl-obj-zahl"></span>';
       pb.addEventListener('click', function () { portfolio(); });
       schiene.appendChild(pb);
@@ -1173,6 +1179,8 @@
     document.documentElement.setAttribute('data-dpl-portfolio', auf ? 'auf' : 'zu');
     var k = el('.dpl-portfolio');
     if (k) k.setAttribute('aria-expanded', auf ? 'true' : 'false');
+    /* v3213 · W-14: Regler meldet den Zustand (an = Portfolio) */
+    [].forEach.call(document.querySelectorAll('.dpl-portfolio-regler'), function (r) { r.setAttribute('aria-checked', auf ? 'true' : 'false'); });
     /* ── v1666 · DER KNOPF SAGT, WOHIN ER FUEHRT ────────────────────
        Marcel: „man kann oben wechseln, von Portfolio auf Aktionen und
        wieder zurueck — also so ein Umschaltmenü."
@@ -1846,10 +1854,14 @@
       if (!nurAktenmappe()) return;
       var pb = document.createElement('button');
       pb.type = 'button';
-      pb.className = 'dpl-portfolio dpl-portfolio-handy';
+      pb.className = 'dpl-portfolio dpl-portfolio-handy dpl-portfolio-regler';
       var zu = document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf';
-      pb.innerHTML = '<span class="dpl-i">▣</span><span class="dpl-t">'
+      /* v3213 · W-14: derselbe Regler wie in der Schiene */
+      pb.setAttribute('role', 'switch');
+      pb.setAttribute('aria-checked', zu ? 'false' : 'true');
+      pb.innerHTML = '<span class="dpl-t dpl-sr">'
         + (zu ? 'Portfolio' : 'Aktionen') + '</span>'
+        + '<span class="dpl-sw" aria-hidden="true"><span class="dpl-sw-a">Aktionen</span><span class="dpl-sw-bahn"><i></i></span><span class="dpl-sw-p">Portfolio</span></span>'
         + '<span class="dpl-n" id="dpl-obj-zahl-handy"></span>';
       pb.addEventListener('click', function () { portfolio(); });
       sb.insertBefore(pb, sb.firstChild);
