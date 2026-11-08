@@ -352,6 +352,8 @@ async function erzeugen(auftrag) {
           .then(() => document.fonts && document.fonts.ready),
         new Promise((ok) => setTimeout(ok, 15000))
       ])).catch(() => {});
+      /* v3219 · das Dokument passt seine Seiten selbst ein (marktbericht-profi.js EINPASSEN) - darauf warten */
+      await page.evaluate(() => Promise.race([window.__dpFertig || null, new Promise((ok) => setTimeout(ok, 8000))])).catch(() => {});
       /* Fusszeile mit Seitenzahl im Seitenrand (Chrome-Vorlage); die Fusszeilen im Fliesstext
          braucht es dann nicht - sie stehen nur fuer das Drucken aus dem Browser da. */
       await page.evaluate(() => { [].forEach.call(document.querySelectorAll('body > :not(section)'), (e) => e.remove()); }).catch(() => {});

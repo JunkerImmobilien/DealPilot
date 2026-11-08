@@ -420,7 +420,10 @@ async function callOpenAI(payload, opts = {}) {
       /* v895f-kurz */
       'DEUTLICH KUERZER als ueblich \u2014 hoechstens 4-6 Saetze pro Kapitel, insgesamt etwa halb so lang. ' +
       'Jede Aussage nur EINMAL (keine Wiederholungen; jede Ueberschrift nur einmal verwenden). KEINE Stichpunkte, ' +
-      'KEINE Score-Zahlen wie "85/100" im Text, Zahlen in den Text einweben):\n' + headings + extra;
+      'KEINE Score-Zahlen wie "85/100" im Text, Zahlen in den Text einweben. '
+      /* v3219 · Marcel 08.11.2026: normale Saetze mit Punkt und Komma */
+      + 'Normale Saetze mit Punkt und Komma: KEINE Semikolons, KEINE Gedanken- oder Bindestriche als Satzzeichen, '
+      + 'Spannen als "von X bis Y"):\n' + headings + extra;
     const raw = await callOneGroup(userMsg);
     /* v960-chapterguard: die Gruppe liefert, was sie liefert — der Code
      * entscheidet, was davon uebernommen wird. Fremde Kapitel fliegen raus. */

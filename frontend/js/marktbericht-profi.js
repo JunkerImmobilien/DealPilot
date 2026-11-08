@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3212b';
+  var VERSION = 'v3219';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -461,6 +461,47 @@
       + '<p class="det">Abgefragt an ' + z.punkte + ' Punkten der Nahkarte; sehr kleine Zonen dazwischen können fehlen. Entfernung bis zum nächsten abgefragten Punkt der Zone. '
       + (z.liste.length > l.length ? 'Gezeigt die ' + l.length + ' nächsten von ' + z.liste.length + ' Zonen. ' : '') + esc(BRW_VERMERK.replace(/^Bodenrichtwertzonen /, 'Quelle: ')) + '.</p></div>';
   }
+  /* v3219 · Seiten einpassen (Marcel 08.11.2026: "zwei oder drei Zeilen auf ein neues Blatt und der Rest ist
+     leer"; "die ausfuehrliche Einschaetzung maximal eine Seite"). Gemessen wird jeder Abschnitt in mm gegen die
+     Druckhoehe einer Seite (297 - 13 - 17 mm Rand). Laeuft ein Abschnitt nur um ein kurzes Stueck auf eine neue
+     Seite, wird er bis 88 % verkleinert (zoom). Die ausfuehrliche Einschaetzung wird auf eine Seite gebracht:
+     erst kleiner, dann von hinten gekuerzt, mit Hinweis. window.__dpFertig sagt dem PDF-Dienst, wann es fertig ist. */
+  var EINPASSEN = '(' + function () {
+    var MM = 96 / 25.4, SEITE = 262;
+    function hoehe(s) { var f = s.querySelector('.fuss'), h = s.getBoundingClientRect().height; if (f) h -= f.getBoundingClientRect().height + 8 * MM; return h / MM; }
+    function pass(s, ziel) { return hoehe(s) <= ziel * SEITE; }
+    function lauf() {
+      [].forEach.call(document.querySelectorAll('section.seite'), function (s) {
+        if (s.classList.contains('deck')) return;
+        var ausf = !!s.querySelector('.dp-ausf-marke');
+        var n = hoehe(s) / SEITE, voll = Math.floor(n), rest = n - voll;
+        if (ausf) {
+          var z = 1;
+          while (!pass(s, 1) && z > 0.86) { z -= 0.02; s.style.zoom = z; s.style.width = 'calc(210mm / ' + z + ')'; }
+          if (!pass(s, 1)) {
+            var gekuerzt = false, sicher = 400;
+            while (!pass(s, 1) && sicher-- > 0) {
+              var bl = [].slice.call(s.querySelectorAll('.md-blk'));
+              var langer = bl.filter(function (b) { return b.querySelectorAll('p,li').length > 1; }).pop();
+              if (!langer) break;
+              var el = [].slice.call(langer.querySelectorAll('p,li')).pop();
+              (el.parentNode.tagName === 'UL' && el.parentNode.children.length === 1 ? el.parentNode : el).remove();
+              gekuerzt = true;
+            }
+            if (gekuerzt) { var h = document.createElement('p'); h.className = 'det'; h.textContent = 'Auf eine Seite gekürzt. Den vollständigen Text enthält der Marktbericht in der App.'; var l = s.querySelectorAll('.md-blk'); l[l.length - 1].appendChild(h); }
+          }
+          return;
+        }
+        if (voll >= 1 && rest > 0 && rest < 0.22) {
+          var z2 = 1;
+          while (z2 > 0.88 && hoehe(s) / SEITE > voll) { z2 -= 0.02; s.style.zoom = z2; s.style.width = 'calc(210mm / ' + z2 + ')'; }
+          if (hoehe(s) / SEITE > voll) { s.style.zoom = ''; s.style.width = ''; }
+        }
+      });
+    }
+    var bilder = [].slice.call(document.images).map(function (i) { return i.complete ? null : new Promise(function (ok) { i.onload = i.onerror = ok; }); });
+    window.__dpFertig = Promise.all(bilder).then(function () { return document.fonts && document.fonts.ready; }).then(function () { try { lauf(); } catch (e) {} return true; });
+  } + ')();';
   function marke() {
     try {
       var b = window.DealPilotConfig && DealPilotConfig.branding;
@@ -495,7 +536,7 @@
         return Promise.all([
           karte(lat, lon, 16, 1200, 620).then(function (k) { return mitZonen(k, lat, lon, 16, 1200, 620); }),
           karte(lat, lon, 12, 1200, 620),
-          ((obj && obj.photos) || []).length ? Promise.resolve(null) : karte(lat, lon, 15, 1400, 660),
+          ((obj && obj.photos) || []).length ? Promise.resolve(null) : karte(lat, lon, 15, 1000, 800),
           zonenListe(lat, lon, 16, 1200, 620).catch(function () { return null; }),
           window.DealPilotPdfLogo ? DealPilotPdfLogo.fuerMarke(b).catch(function () { return null; }) : Promise.resolve(null)
         ]).then(function (z) {
@@ -528,10 +569,13 @@
     /* Deckblatt */
     '.deck{padding:0;display:flex;flex-direction:column;height:297mm;overflow:hidden}',
     /* v3212 · Variante D: Bild ganz zeigen (contain) ueber einer unscharfen Kopie, Karte fuellt */
-    '.deck .bild{height:100mm;background:#1b1b1d;position:relative;overflow:hidden}',
-    '.deck .bild .bg{position:absolute;inset:-8mm;background:center/cover no-repeat;filter:blur(6mm) brightness(.7)}',
-    '.deck .bild img.vorne{position:relative;display:block;width:100%;height:100%;object-fit:contain}',
-    '.deck .bild.ist-karte img.vorne{object-fit:cover}.deck .bild .logo{z-index:2}',
+    /* v3219 · Marcel 08.11.: Kopf links/rechts sauberer - links Obsidian mit Logo, rechts Foto (kaum angeschnitten) */
+    '.deck .bild{height:100mm;display:grid;grid-template-columns:76mm 1fr;background:#050505}',
+    '.deck .bild .links{position:relative;background:#050505 radial-gradient(ellipse at 20% 0%,color-mix(in srgb,var(--gold) 28%,transparent),transparent 62%);color:#fff;padding:14mm 9mm 10mm 17mm;display:flex;flex-direction:column;justify-content:space-between}',
+    '.deck .bild .rechts{position:relative;overflow:hidden;background:#1b1b1d}.deck .bild .rechts img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}',
+    '.deck .bild .logo{position:static;align-self:flex-start;background:#fff;border-radius:1.6mm;padding:3mm 4mm;display:inline-flex;align-items:center;justify-content:center;max-width:52mm}',
+    '.deck .bild .logo img{display:block;max-height:14mm;max-width:44mm;width:auto;height:auto;object-fit:contain}',
+    '.deck .bild .lk{font:6.8pt/1.5 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A)}.deck .bild .lk b{display:block;font:600 11pt/1.3 "Space Grotesk",Inter,sans-serif;letter-spacing:0;text-transform:none;color:#fff;margin-top:1.5mm}',
     '.kpis{display:grid;gap:3mm;margin:2mm 0 0}.kpi{border:.3mm solid var(--line);border-top:.9mm solid var(--gold);border-radius:1.2mm;padding:2.6mm 3.2mm}.kpi.hl{background:var(--gold-l)}',
     '.kpi .kl{font:6.3pt/1.3 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.kpi .kw{font:600 13pt/1.2 "JetBrains Mono",monospace;margin-top:1mm;white-space:nowrap}.kpi .ks{font-size:7.2pt;color:var(--muted);margin-top:.4mm}',
     '.umf{background:var(--gold-l);border-radius:1.4mm;padding:3mm 4mm;margin-top:6mm}.umk{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5mm;font:600 8pt "Space Grotesk",Inter,sans-serif}.umk .eyebrow{margin:0}',
@@ -543,6 +587,11 @@
     '.vb{display:grid;grid-template-columns:46mm 1fr 30mm;align-items:center;gap:3mm;margin-bottom:2.2mm;break-inside:avoid}.vb .vn{font-size:8.2pt;line-height:1.3}.vb .vn i{font-style:normal;color:color-mix(in srgb,var(--gold) 70%,#000);font-size:6.8pt;display:block}',
     '.vb .vt{position:relative;height:3mm;background:#efece4;border-radius:2mm}.vb .vf{height:100%;border-radius:2mm;background:#d9cfb3}.vb .vf.g{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--gold) 55%,var(--wl-b8932f, #b8932f))}.vb .vm{position:absolute;top:-1mm;width:.6mm;height:5mm;background:var(--ink)}',
     '.vb .vw{font:600 8.4pt/1.3 "JetBrains Mono",monospace;text-align:right}.vb .vw small{display:block;font-weight:400;font-size:7pt;color:var(--muted)}',
+    /* v3219 · Blocksatz, keine Schusterjungen/Hurenkinder, Rechenwege nicht zerreissen */
+    'p,.md-blk li,.hinweis,.fuehrt p,.det{text-align:justify;hyphens:auto;-webkit-hyphens:auto;orphans:3;widows:3}',
+    '.karte.gross{width:100%;margin:0 0 4mm;break-inside:avoid}',
+    'table{break-inside:auto}h2,h3,h4{break-after:avoid}.rw-blk{break-inside:avoid}',
+    '.ausf .md-blk p,.ausf ul.md{font-size:8.6pt;line-height:1.45}.ausf h3{font-size:10pt;margin:3.5mm 0 1.5mm}',
     '.rw-h{font-size:13pt;margin:8mm 0 1mm;padding-top:3mm;border-top:.3mm solid var(--ink)}.rw-h:first-of-type{margin-top:2mm;border-top:0;padding-top:0}',
     '.fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin:2mm 0}.fotos img{width:100%;height:40mm;object-fit:cover;border-radius:1.2mm;display:block}',
     '.deck .bild .logo{position:absolute;top:12mm;left:17mm;background:#fff;padding:3mm 4mm;border-radius:1.5mm}',
@@ -639,7 +688,7 @@
     /* Rechenwege laufen hintereinander auf EINER Strecke statt je einer eigenen Seite */
     var rw = [];
     function rwTeil(dd, titel, innen) {
-      rw.push(String(innen).replace(/<div class="eyebrow">[^<]*<\/div>/, '').replace('<h2>', '<h2 class="rw-h">'));
+      rw.push('<div class="rw-blk">' + String(innen).replace(/<div class="eyebrow">[^<]*<\/div>/, '').replace('<h2>', '<h2 class="rw-h">') + '</div>');
       return '';
     }
 
@@ -663,10 +712,10 @@
     }
     if (istZahl(lvD.value_sqm)) kpis.push('<div class="kpi"><div class="kl">Bodenrichtwert</div><div class="kw">' + zahl(lvD.value_sqm, 0) + ' €/m²</div><div class="ks">' + esc(lvD.stichtag ? 'Stichtag ' + datum(lvD.stichtag) : 'amtlich') + '</div></div>');
     teile.push('<section class="seite deck">'
-      + '<div class="bild' + (istKarte ? ' ist-karte' : '') + '">'
-      + (titelbild && !istKarte ? '<div class="bg" style="background-image:url(\'' + titelbild + '\')"></div>' : '')
-      + (titelbild ? '<img class="vorne" src="' + titelbild + '" alt="">' : '')
-      + (d.logo && d.logo.b64 ? '<div class="logo"><img src="' + d.logo.b64 + '" alt=""></div>' : '') + '</div>'
+      + '<div class="bild"><div class="links">'
+      + (d.logo && d.logo.b64 ? '<div class="logo"><img src="' + d.logo.b64 + '" alt=""></div>' : '<div class="logo" style="font:600 12pt Space Grotesk,sans-serif;color:#111">' + esc(b.company || '') + '</div>')
+      + '<div class="lk">Marktbericht Profi<b>' + esc(r.gemeinde || r.city || '') + '</b></div></div>'
+      + '<div class="rechts">' + (titelbild ? '<img src="' + titelbild + '" alt="' + (istKarte ? 'Karte' : 'Objektfoto') + '">' : '') + '</div></div>'
       + '<div class="inhalt"><div class="eyebrow">Marktbericht Profi · Wertermittlung mit Herleitung</div>'
       + '<h1>' + esc(r.address || '') + '</h1><div class="adr">' + esc(art) + (istZahl(r.living_area) ? ' · ' + zahl(r.living_area, 0) + ' m² Wohnfläche' : '')
       + (istZahl(r.build_year) ? ' · Baujahr ' + jahr(r.build_year) : '') + (istZahl(r.plot_area) ? ' · Grundstück ' + zahl(r.plot_area, 0) + ' m²' : '') + '</div>'
@@ -742,7 +791,7 @@
       + ((p.zensus || {}).available ? '<p class="det" style="margin-top:2mm">Zensus 2022 (' + esc((p.zensus.gemeinde && p.zensus.gemeinde.name) || p.zensus.kreis_name || '') + '): Leerstandsquote ' + zahl(p.zensus.leerstandsquote, 1) + ' %, Eigentümerquote ' + zahl(p.zensus.eigentuemerquote, 1) + ' %.</p>' : '') + '</div>' : '');
     teile.push(seite(d, 'Lage', ab('Lage') + '<h2>Lage</h2>'
       + '<p class="sub">' + esc([r.ortsteil, r.gemeinde].filter(Boolean).join(', ')) + (p.assessment ? ' · Mikrolage ' + esc(p.assessment.mikrolage || '–') + ', Makrolage ' + esc(p.assessment.makrolage || '–') : '') + '</p>'
-      + '<div class="zwei">' + (d.karteNah ? '<img class="karte" src="' + d.karteNah + '" alt="Karte Umgebung">' : '') + (d.karteFern ? '<img class="karte" src="' + d.karteFern + '" alt="Karte Region">' : '') + '</div>'
+      + (d.karteNah ? '<img class="karte gross" src="' + d.karteNah + '" alt="Karte Umgebung">' : '') + (d.karteFern ? '<img class="karte gross" src="' + d.karteFern + '" alt="Karte Region">' : '')
       + zonenTabelle(d.brwZonen)
       + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro) + regionTabL));
     /* v3178c · Region und Bewertung gehoeren zur Seite Markt & Region (sonst lief Lage ueber) */
@@ -852,7 +901,7 @@
 
     /* v3178c · Ausfuehrliche Einschaetzung (KI-Abschnitte B-D, wie der normale Bericht) */
     var ausf = ausfuehrlich(d.md);
-    if (ausf) teile.push(seite(d, 'Ausführliche Einschätzung', ab('Ausführliche Einschätzung') + '<h2>Ausführliche Einschätzung</h2><p class="sub">Text der KI-Auswertung auf Grundlage der Zahlen dieses Berichts. Maßgeblich sind die Rechenwege oben.</p>' + ausf));
+    if (ausf) teile.push(seite(d, 'Ausführliche Einschätzung', '<span class="dp-ausf-marke"></span>' + ab('Ausführliche Einschätzung') + '<h2>Ausführliche Einschätzung</h2><p class="sub">Text der KI-Auswertung auf Grundlage der Zahlen dieses Berichts. Maßgeblich sind die Rechenwege oben.</p>' + ausf));
 
     /* 10 · Quellen */
     var q = [];
@@ -873,12 +922,26 @@
       + '<h3>Zu diesem Bericht</h3><p>Die Wertermittlung folgt der Immobilienwertermittlungsverordnung 2021. Sie ist indikativ und ersetzt kein Verkehrswertgutachten nach § 194 BauGB. Grundlage sind die Angaben zum Objekt; eine Besichtigung hat nicht stattgefunden. Jede Zahl stammt aus einer genannten Quelle oder ist als Annahme gekennzeichnet.</p>'
       + '<p class="det">Erstellt am ' + esc(datum(d.erstellt || new Date())) + ' mit DealPilot · Fassung ' + VERSION + '</p>'));
 
+    /* v3219 · Marcel 08.11.2026: "keine Semikolons oder Bindestriche, normale Werte, normale Saetze mit Punkt
+       und Komma". Gilt fuer jeden Text im Koerper (KI-Text und eigene Saetze), nicht fuer Stil und Attribute.
+       Ein einzelnes "–" als Platzhalter fuer "kein Wert" bleibt. */
+    function satz(t) {
+      return t
+        .replace(/(\d)\s*[–—]\s*(\d)/g, '$1 bis $2')
+        .replace(/(\d\s?(?:€|%|€\/m²|T€|m²))\s*[–—]\s*(\d)/g, '$1 bis $2')
+        .replace(/\s+[–—]\s+/g, ', ')
+        .replace(/\s+-\s+/g, ', ')
+        .replace(/(&[#\w]+;)|;\s*/g, function (m, e) { return e || ', '; })
+        .replace(/,\s*,/g, ',').replace(/,\s*\./g, '.');
+    }
     var toc = '<div class="umf"><div class="umk"><span class="eyebrow">Inhalt</span><span>Stufe 3 · Profi</span></div><div class="toc2">'
       + inhalt.map(function (t, i) { return '<div class="tz"><span class="tn">' + ('0' + (i + 1)).slice(-2) + '</span><span>' + esc(t) + '</span></div>'; }).join('') + '</div></div>';
     teile[0] = teile[0].replace('%%INHALT%%', toc);
     var fonts = (location && location.origin ? location.origin : '') + '/fonts/dp-fonts.css';
+    var koerper = teile.join('').replace(/>([^<]+)</g, function (m, t) { return '>' + satz(t) + '<'; });
     return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Marktbericht Profi · ' + esc(r.address || '') + '</title>'
-      + '<link rel="stylesheet" href="' + fonts + '"><style>' + CSS + markenGold() + '</style></head><body>' + teile.join('') + '</body></html>';
+      + '<link rel="stylesheet" href="' + fonts + '"><style>' + CSS + markenGold() + '</style></head><body>' + koerper
+      + '<script>' + EINPASSEN + '</scr' + 'ipt></body></html>';
   }
 
   /* ── in der App: Vorschau mit Druckknopf ──────────────────────────── */
