@@ -1301,3 +1301,38 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .zb-neu-btn{margin-top:4px;border:0;background:none;color:var(--c-accd-txt);font:600 10.5px Inter,system-ui,sans-serif;cursor:pointer;padding:2px 0;text-decoration:underline;min-height:24px}
 #dashboard-main .zb-o-hin{display:block;font:400 10px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut);margin-top:3px;white-space:normal}
 #dashboard-main .proj.pj-chart-an .dptk-schalter{display:none!important}   /* v2951c: Spalten-Schalter der Tabellen-Karten gehoert zur Tabelle */
+
+/* v3216 · W-3 Entwicklungspartner: Score-Balken kuerzer, rechts eine
+   Kennzahl-Spalte (#dp-hero-kz). Farben nur ueber die Hero-Variablen
+   (--c-ptext/--c-pmut/--c-line, Statusfarben --c-greenl/--c-redl). */
+#dashboard-main .hbars{flex:1 1 0;min-width:0}
+#dashboard-main .hkz{flex:0 0 clamp(250px,36%,340px);min-width:0;border-left:2px dashed var(--c-line);padding-left:18px;display:flex;flex-direction:column;gap:5px;justify-content:center}
+#dashboard-main .hkz .ttl{font-family:var(--head-font);font-weight:600;font-size:13px;color:var(--c-ptext);margin-bottom:3px}
+#dashboard-main .hkz .ttl em{font-style:normal;font-family:'JetBrains Mono';font-size:9px;color:var(--c-pmut);margin-left:6px;text-transform:uppercase;letter-spacing:.06em}
+#dashboard-main .hkz .kz-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-family:'JetBrains Mono';font-size:11px;cursor:help;min-width:0}
+#dashboard-main .hkz .kz-l{color:var(--c-ptext);min-width:0;overflow-wrap:anywhere}
+#dashboard-main .hkz .kz-l small{font-size:9px;color:var(--c-pmut);margin-left:5px}
+#dashboard-main .hkz .kz-r.kz-2 .kz-l small{display:block;margin:1px 0 0}
+#dashboard-main .hkz .kz-v{font-weight:700;color:var(--c-ptext);white-space:nowrap;text-align:right}
+#dashboard-main .hkz .pos{color:var(--c-greenl)}
+#dashboard-main .hkz .neg{color:var(--c-redl)}
+#dashboard-main .hkz .kz-sep{font-family:'JetBrains Mono';font-size:9px;letter-spacing:1.3px;text-transform:uppercase;color:var(--c-pmut);border-top:1px solid var(--c-line);padding-top:6px;margin-top:3px}
+#dashboard-main .hkz .kz-det{margin-top:4px;font-family:Inter,system-ui,sans-serif;font-size:11px;color:var(--c-pmut)}
+#dashboard-main .hkz .kz-det summary{cursor:pointer;font-family:'JetBrains Mono';font-size:9.5px;color:var(--c-accd-txt);overflow-wrap:anywhere}
+#dashboard-main .hkz .kz-det ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
+#dashboard-main .hkz .kz-det li{display:flex;justify-content:space-between;gap:8px;min-width:0}
+#dashboard-main .hkz .kz-on{color:var(--c-ptext);min-width:0;overflow-wrap:anywhere}
+#dashboard-main .hkz .kz-on small,#dashboard-main .hkz .kz-ow small{display:block;font-size:9.5px;color:var(--c-pmut)}
+#dashboard-main .hkz .kz-ow small.pos{color:var(--c-greenl)}
+#dashboard-main .hkz .kz-ow small.neg{color:var(--c-redl)}
+#dashboard-main .hkz .kz-ow{text-align:right;white-space:nowrap;color:var(--c-ptext);font-family:'JetBrains Mono';font-size:10.5px}
+#dashboard-main .hkz .kz-det p{margin:7px 0 0;font-size:10.5px;line-height:1.45}
+#dashboard-main .bar .bt .n.hinfo{cursor:help}
+#dashboard-main .bar .bt .n.hinfo::after{content:'i';display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;margin-left:6px;border-radius:50%;border:1px solid var(--c-pmut);color:var(--c-pmut);font:700 8.5px/1 'JetBrains Mono';vertical-align:1px}
+@media(max-width:880px){
+  #dashboard-main .hkz{flex:1 1 auto;border-left:none;padding-left:0;border-top:2px dashed var(--c-line);padding-top:14px}
+}
+@media(max-width:420px){
+  #dashboard-main .hkz .kz-r{font-size:10.5px;gap:8px}
+  #dashboard-main .hkz .kz-ow{white-space:normal}
+}
