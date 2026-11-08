@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-08T10:11:39.306Z",
+ "erzeugt_am": "2026-11-08T10:15:46.242Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "0784bbcb115c355b",
-  "index-html": "5c5063c85fb9bd6d",
+  "storage": "a427c64cbe052c8d",
+  "index-html": "4e229c829ea27da8",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -527,6 +527,7 @@
    "d2_auszahl",
    "d2_az",
    "d2_at",
+   "darlehen_weitere",
    "d2_vertrag",
    "d2_bspar",
    "afa_sonder7b_aktiv",
