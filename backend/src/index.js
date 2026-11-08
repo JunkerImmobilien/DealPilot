@@ -369,6 +369,8 @@ app.use('/api/v1/users', userRoutes);
    erster Nutzer ist der Datenraum, dessen Links bisher nur im
    localStorage lagen. */
 app.use('/api/v1/user-settings', require('./routes/userSettings'));
+/* v3218 · W-12b: Einwilligung „Erinnerung vor Mieterhöhung" (Standard aus) */
+app.use('/api/v1/erinnerungen', require('./routes/erinnerungen'));
 app.use('/api/v1/plans', planRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/tax-records', taxRecordsRoutes);
@@ -500,6 +502,22 @@ async function start() {
     setTimeout(_runRetention, 60 * 1000);          // erster Lauf 60s nach Start
     setInterval(_runRetention, _RET_INTERVAL_MS);  // danach taeglich
     console.log('✓ Retention-Scheduler aktiv (taeglich)');
+
+    /* v3218 · W-12b · Erinnerung vor moeglicher Mieterhoehung. Nur Nutzer mit Einwilligung
+       (user_settings 'erinnerungen'), je Termin hoechstens eine Mail (retention_log, kind
+       'mieterhoehung'). Die Termine rechnet das Frontend beim Speichern (_soll_einheiten). */
+    try {
+      const mhErinnerung = require('./services/mieterhoehungErinnerung');
+      const _runMh = async () => {
+        try {
+          const r = await mhErinnerung.runOnce({ dryRun: false });
+          console.log('[mieterhoehung] Lauf fertig: Nutzer', r.nutzer, '| Termine', r.termine,
+            '| gesendet', r.gesendet, 'in', r.mails, 'Mails | schon erinnert', r.uebersprungen, '| Fehler', r.fehler);
+        } catch (e) { console.error('[mieterhoehung] Lauf-Fehler:', e.message); }
+      };
+      setTimeout(_runMh, 2 * 60 * 1000);           // erster Lauf 2 min nach Start
+      setInterval(_runMh, _RET_INTERVAL_MS);       // danach taeglich
+    } catch (e) { console.error('[mieterhoehung] init failed:', e && e.message); }
 
     /* ══════════════════════════════════════════════════════════════════
        v1373 (B15) · DAS LOESCHKONZEPT MUSS AUCH LAUFEN

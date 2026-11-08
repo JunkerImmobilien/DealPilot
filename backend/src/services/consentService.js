@@ -8,7 +8,8 @@
  */
 const { query } = require('../db/pool');
 
-const ARTEN = ['hinweise', 'widerruf_verzicht', 'agb', 'datenschutz', 'newsletter'];
+const ARTEN = ['hinweise', 'widerruf_verzicht', 'agb', 'datenschutz', 'newsletter',
+  'erinnerung_mieterhoehung' /* v3218 · W-12b, kontext { an: true|false } - routes/erinnerungen.js */];
 
 /* Der Wortlaut, dem beim Kauf zugestimmt wird. Aendert er sich, steigt die
    Version - das Protokoll sagt dann, welcher Satz galt. Derselbe Text steht

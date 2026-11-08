@@ -954,6 +954,8 @@ function showSettings(initialTab) {
         /* v2900: PDF-Export - Vorauswahl der Fassung und Pilot-Analyse; den
            Abschnitt baut pdf-wahl.js selbst (eine Liste der Fassungen). */
         ((window.DealPilotPdfWahl && typeof window.DealPilotPdfWahl.einstellungenHtml === 'function') ? window.DealPilotPdfWahl.einstellungenHtml() : '') +
+        /* v3218 · W-12b: Erinnerung vor Mieterhöhung (Mail, Standard aus) - Abschnitt aus erinnerung-mieterhoehung.js */
+        ((window.DealPilotErinnerung && typeof window.DealPilotErinnerung.einstellungenHtml === 'function') ? window.DealPilotErinnerung.einstellungenHtml() : '') +
         /* v1719: der zweite Knopf DARSTELLUNG OEFFNEN stand hier. Er ist
            nach oben zur Layout-Wahl gewandert (siehe dort). Zwei Wege zum
            selben Panel in einer Ansicht sind keine Bequemlichkeit, sondern
