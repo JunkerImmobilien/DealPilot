@@ -171,11 +171,14 @@
     }
     /* v3215 · W-17: weitere Darlehen aus dem Rechenlauf (State, Kern DpDarlehenWeitere) */
     var _W = window.DpDarlehenWeitere, _dwL = _W ? (S.dw_liste || []) : [], _dwSum = S.dw_summe || 0, _dwZj = (S.dw_zm || 0) * 12;
+    /* v3223 · Marcel 08.11.2026 „passen die Seitenumbrüche?“: mit drei weiteren Darlehen (je drei Zeilen) wurde
+       der Block zu hoch, rutschte ganz auf die nächste Seite (die davor blieb fast leer) und lief rechts über
+       den Rand (lange Werte ohne Umbruch). Jetzt EINE Zeile je Darlehen, Konditionen als Unterzeile. */
     _dwL.forEach(function (e, i) {
       var ab = _W.abKauf(e, S.dw_basisjahr);
-      fin.push([_W.name(e, i) + (ab ? '' : ' (ab ' + e.start_jahr + ')'), B.eur(e.betrag)],
-        ['Sollzins · Tilgung · Bindung', B.pct(e.zins, 2) + ' · ' + (e.art === 'tilgungsaussetzung' ? 'Tilgungsaussetzung' : B.pct(e.tilg, 2)) + ' · ' + (e.bindj ? B.zahl(e.bindj, 0) + ' J.' : '–'), { art: 'ein' }],
-        ['Rate / Monat', B.eur(_W.rateM(e), 2), { art: 'ein' }]);
+      var kond = 'Zins ' + B.pct(e.zins, 2) + ' · ' + (e.art === 'tilgungsaussetzung' ? 'ohne Tilgung' : 'Tilgung ' + B.pct(e.tilg, 2))
+        + (e.bindj ? ' · Bindung ' + B.zahl(e.bindj, 0) + ' J.' : '') + ' · Rate ' + B.eur(_W.rateM(e), 2) + ' / Monat' + (ab ? '' : ' · ab ' + e.start_jahr + ', nicht in der Summe bei Kauf');
+      fin.push([_W.name(e, i) + (ab ? '' : ' (ab ' + e.start_jahr + ')'), B.eur(e.betrag), { det: kond }]);
     });
     if (d2an || _dwSum > 0) {
       var _dS = (d1 || 0) + (d2 || 0) + _dwSum;
@@ -186,13 +189,14 @@
     fin.push(['Beleihungsauslauf (LTV)', B.pct(K.ltv, 1), { det: S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : '' }]);
     var bis = zellText('r-bindend'); if (bis) fin.push(['Zinsbindung bis', bis]);
     fin.push(['Restschuld am Ende der Zinsbindung', B.eur(S.rs)]);
-    fin.push(['Finanzierungsstruktur', (aus ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag') : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen')) + (_dwL.length ? ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen') : '')]);   /* v3215 */
+    fin.push(['Finanzierungsstruktur', (aus ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag') : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen')) + (_dwL.length ? ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen') : ''), { umbruch: 1 }]);   /* v3215; v3223 Umbruch */
     var svw = zahlAus('svwert');
     if (svw) {
       fin.push([S.svw_label || 'Wertangabe (Reiter Objekt)', B.eur(svw)]);
       if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
     }
-    var h = '<div class="zwei"><div class="block"><h3>Investition</h3>' + B.liste(inv) + '</div><div class="block"><h3>Finanzierung</h3>' + B.liste(fin) + '</div></div>';
+    /* v3223: wird die Finanzierung trotzdem länger als der Rest der Seite, darf sie umbrechen statt ganz zu springen */
+    var h = '<div class="zwei"><div class="block"><h3>Investition</h3>' + B.liste(inv) + '</div><div class="block"' + (fin.length > 16 ? ' style="break-inside:auto"' : '') + '><h3>Finanzierung</h3>' + B.liste(fin) + '</div></div>';
     if (aus) {
       var bs = S.bsvSummary || {}, bz = [];
       if (feld('bspar_inst')) bz.push(['Bausparkasse', feld('bspar_inst')]);

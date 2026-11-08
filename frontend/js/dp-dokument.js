@@ -106,7 +106,7 @@
     'table{border-collapse:collapse;width:100%;font-size:8.6pt;page-break-inside:auto}tr{page-break-inside:avoid}',
     'th{font:6.8pt/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:1.8mm 2mm;border-bottom:.3mm solid var(--ink)}',
     'td{padding:1.7mm 2mm;border-bottom:.2mm solid var(--line);vertical-align:top}',
-    '.r{text-align:right}td.num,.r.num{white-space:nowrap}td.op{width:5mm;color:var(--muted);font-family:"JetBrains Mono",monospace}',
+    '.r{text-align:right}td.num,.r.num{white-space:nowrap}td.num.umbruch{white-space:normal}td.op{width:5mm;color:var(--muted);font-family:"JetBrains Mono",monospace}',
     'td.q{color:var(--muted);font-size:7.6pt;width:34%}.det{color:var(--muted);font-size:7.6pt;margin-top:.6mm;font-weight:400}',
     'tr.ein td:first-child{padding-left:6mm;color:var(--muted)}',
     'tr.summe td{font-weight:600;border-bottom:.3mm solid var(--ink)}tr.ende td{font-weight:600;background:var(--gold-l);border-bottom:0}',
@@ -182,7 +182,7 @@
         var werte = z.slice(1, z.length - (typeof z[z.length - 1] === 'object' && z[z.length - 1] !== null && !Array.isArray(z[z.length - 1]) ? 1 : 0));
         var o = (typeof z[z.length - 1] === 'object' && z[z.length - 1] !== null) ? z[z.length - 1] : {};
         return '<tr class="' + (o.art || '') + '"><td>' + esc(z[0]) + (o.det ? '<div class="det">' + esc(o.det) + '</div>' : '') + '</td>'
-          + werte.map(function (w) { var s = String(w == null ? '–' : w); var cls = o.farbe ? (/^[+]/.test(s) ? ' pos' : /^[−-]/.test(s) ? ' neg' : '') : ''; return '<td class="r num' + cls + '">' + esc(s) + '</td>'; }).join('') + '</tr>';
+          + werte.map(function (w) { var s = String(w == null ? '–' : w); var cls = o.farbe ? (/^[+]/.test(s) ? ' pos' : /^[−-]/.test(s) ? ' neg' : '') : ''; return '<td class="r num' + cls + (o.umbruch ? ' umbruch' : '') + '">' + esc(s) + '</td>'; }).join('') + '</tr>';   /* v3223: {umbruch:1} = langer Text darf umbrechen */
       }).join('') + '</tbody></table>';
   }
   /** Rechenstaffel aus dem Kern ({pos, detail, wert, faktor, summe}) mit Fundstellen */

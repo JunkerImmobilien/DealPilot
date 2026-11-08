@@ -70,7 +70,8 @@
       '#dp-blase-fab .ersatz svg{width:24px;height:24px}',
       '#dp-blase-fab.auf{filter:drop-shadow(0 0 6px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)) drop-shadow(0 8px 10px rgba(0,0,0,.32))}',
       /* Bordbuch-Mechaniker (nur Entwicklungspartner) rueckt links neben die Blase */
-      '#dp-bb-fab{right:82px !important}',
+      'body.dp-blase-an #dp-bb-fab{right:82px !important}',
+      'body.dp-blase-offen #dp-bb-fab{display:none !important}',   /* v3223: offenes Fenster hat Vorrang */
       '#dp-blase{position:fixed;right:18px;bottom:86px;z-index:10054;width:min(430px,calc(100vw - 24px));height:min(640px,calc(100vh - 120px));display:none;flex-direction:column;background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45);overflow:hidden;font-family:Inter,system-ui,sans-serif}',
       '#dp-blase.an{display:flex;animation:dpb-auf .22s cubic-bezier(.2,1.2,.4,1)}',
       '@keyframes dpb-auf{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}',
@@ -99,7 +100,7 @@
       '#dp-cp-verweis button{border:0;border-radius:9px;background:' + G + ';color:#1a1407;font:600 12.5px Inter,sans-serif;padding:7px 12px;cursor:pointer}',
       '@media (max-width:640px){#dp-blase-fab{right:10px;bottom:10px;width:46px;height:73px}'
         + '#dp-blase{left:8px;right:8px !important;bottom:8px !important;width:auto;height:min(80vh,calc(100vh - 70px));z-index:10056}'
-        + '#dp-blase .dp-cp-in{font-size:16px !important}#dp-blase .dpb-f1{display:none}#dp-bb-fab{right:64px !important}}',
+        + '#dp-blase .dp-cp-in{font-size:16px !important}#dp-blase .dpb-f1{display:none}body.dp-blase-an #dp-bb-fab{right:64px !important}}',
       '@media (prefers-reduced-motion:reduce){#dp-blase.an{animation:none}#dp-blase-fab{transition:none}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -241,6 +242,7 @@
     offen = true;
     fenster.classList.toggle('ohne-fab', !istAn());
     fenster.classList.add('an'); fab.classList.add('auf'); fab.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('dp-blase-offen');
     var inp = el('dp-cp-in');
     setTimeout(function () { try { if (inp) inp.focus({ preventScroll: true }); } catch (e) {} }, 60);
     var log = el('dp-cp-log'); if (log) log.scrollTop = log.scrollHeight;
@@ -248,7 +250,7 @@
   function zu() {
     if (!fenster) return;
     offen = false;
-    fenster.classList.remove('an'); if (fab) { fab.classList.remove('auf'); fab.setAttribute('aria-expanded', 'false'); }
+    fenster.classList.remove('an'); document.body.classList.remove('dp-blase-offen'); if (fab) { fab.classList.remove('auf'); fab.setAttribute('aria-expanded', 'false'); }
   }
 
   /* ── Verweis im Reiter Pilot-Analyse: dort stand der Chat bis v3217 ── */
@@ -307,6 +309,7 @@
       }
     }
     fab.classList.toggle('an', zeigen);
+    document.body.classList.toggle('dp-blase-an', zeigen);
     if (!angemeldet() && offen) zu();
     if (fenster) fenster.classList.toggle('ohne-fab', !an);
     if (!zeigen) return;
