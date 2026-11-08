@@ -312,9 +312,10 @@
     var fs = function (v) { if (da(v) === null) return '<td class="r num">–</td>'; return '<td class="r num' + (v > 0.5 ? ' pos' : v < -0.5 ? ' neg' : '') + '">' + B.esc(B.eurS(v).replace(' €', '')) + '</td>'; };
     return '<table class="dicht"><thead><tr><th>Jahr</th><th class="r">Kaltmiete</th><th class="r">Bewirt.</th><th class="r">Zins</th><th class="r">' + (bsv ? 'Tilg.+BSV' : 'Tilgung') + '</th><th class="r">CF v. St.</th><th class="r">Steuer</th><th class="r">CF n. St.</th><th class="r">Restschuld</th><th class="r">LTV</th></tr></thead><tbody>'
       + rows.map(function (r) {
-        return '<tr><td class="num">' + B.esc(r.cal || r.y) + '</td><td class="r num">' + f(r.nkm_y) + '</td><td class="r num">' + f((r.bwk_cf_y != null ? r.bwk_cf_y : r.bwk_y) + (r.su_y || 0)) + '</td><td class="r num">' + f(r.zy) + '</td><td class="r num">' + f(bsv ? (r.ty || 0) + (r.bspar_y || 0) : r.ty) + '</td>'
+        return '<tr><td class="num">' + B.esc(r.cal || r.y) + '</td><td class="r num">' + f(r.nkm_y) + '</td><td class="r num">' + f((r.bwk_cf_y != null ? r.bwk_cf_y : r.bwk_y) + (r.su_y || 0) + (r.san_y || 0) /* v3214 N137 */) + '</td><td class="r num">' + f(r.zy) + '</td><td class="r num">' + f(bsv ? (r.ty || 0) + (r.bspar_y || 0) : r.ty) + '</td>'
           + fs(r.cfop_y) + fs(da(r.tax_y) === null ? null : -r.tax_y) + fs(r.cfns_y) + '<td class="r num">' + f(r.rs) + '</td><td class="r num">' + B.zahl(r.ltv_y, 0) + ' %</td></tr>';
-      }).join('') + '</tbody></table><p class="det">Beträge in Euro je Jahr. CF v. St. = Kaltmiete − Bewirtschaftung − Zins − ' + (bsv ? 'Tilgung − Bausparrate' : 'Tilgung') + '. Steuer: + Erstattung, − Belastung. CF n. St. = CF v. St. + Steuer.</p>';
+      }).join('') + '</tbody></table><p class="det">Beträge in Euro je Jahr. CF v. St. = Kaltmiete − Bewirtschaftung − Zins − ' + (bsv ? 'Tilgung − Bausparrate' : 'Tilgung') + '. Steuer: + Erstattung, − Belastung. CF n. St. = CF v. St. + Steuer.'
+        + B.esc(window.DpSanierungPlan && DpSanierungPlan.einmaligText ? DpSanierungPlan.einmaligText(rows) : '') + '</p>';   /* v3214 N137 */
   }
   /* v3203 · Kurzfassung: der Vermögenszuwachs als ein Bild (derselbe Wasserfall wie in der vollständigen Fassung, aus State._vz) */
   function zuwachsKurz(B) {

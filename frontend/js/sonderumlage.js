@@ -117,7 +117,9 @@
       if (e.art !== 'erhaltung' || !J || vorUebergang(e) || J > A + 3 || J < A) return;
       su += (zahl(e.betrag) || 0) / 1.19;
     });
-    return { A: A, limit: g.limit, san: g.istNetto || 0, su: su, summe: (g.istNetto || 0) + su, ueber: (g.istNetto || 0) + su > g.limit };
+    /* v3214 · N137: „Sanierung" = #san + Erhaltung geplanter Sanierungen im Fenster (sanierung-plan.js) */
+    var san = (g.istNetto || 0) + (g.planNetto || 0);
+    return { A: A, limit: g.limit, san: san, su: su, summe: san + su, ueber: san + su > g.limit };
   }
   function imFenster(e, gr) { var J = verwJahr(e); return gr && J && J >= gr.A && J <= gr.A + 3; }
 

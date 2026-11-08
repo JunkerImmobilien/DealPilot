@@ -1724,6 +1724,14 @@ label.dp-required.qc-required::after {
                 </select>
               </div>
             </div>
+            <!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren (sanierung-plan.js) - Cashflow im Jahr
+                 und Steuer (Erhaltung / Herstellung), NICHT in Gesamtinvestition und Beleihung. -->
+            <div class="f" id="san-plan-wrap" style="margin-top:14px">
+              <label>Weitere Sanierungen <span class="hint" style="font-weight:400">— spätere Jahre, z. B. Küche, Dach, Bad</span></label>
+              <span class="hint" style="display:block">Zählen nicht zur Gesamtinvestition und nicht zur Beleihung, sondern zum Cashflow im jeweiligen Jahr und zur Steuer: Erhaltung als Werbungskosten, Herstellung über die AfA. Erhaltung in den drei Jahren nach dem Kauf zählt mit den Sanierungskosten oben zur 15-%-Grenze. Maßnahmen des Zielbilds gehören nicht hierher.</span>
+              <input type="hidden" id="san_plan" value="">
+              <div id="san-plan-box"></div>
+            </div>
           </div>
           <!-- V309: moebl ist jetzt sichtbares Inventarkosten-Feld in der Inventar-Card -->
           <input type="hidden" id="moebl_tax_active" value="">
@@ -3704,7 +3712,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-anlage-bmf.js?v=v3018c"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v3030"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v3180b"></script>
+<script src="js/pdf-investment-bank.js?v=v3214"></script>
 <script src="js/bmf-modal.js?v=v3188"></script>
 <script src="js/bmf-modal-v292.js?v=v3185b"></script>
 <script src="js/bmf-bodenabschlag.js?v=v3196"></script>
@@ -3737,14 +3745,14 @@ label.dp-required.qc-required::after {
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3198a"></script>
+  <script src="js/calc.js?v=v3214"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3028"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3188a"></script>
+<script src="js/tax.js?v=v3214"></script>
 <script src="js/steuer-verlauf.js?v=v2992"></script>
 <script src="js/pilot-analyse-v4.js?v=v3163"></script><!-- v3099 · Pilot-Analyse Fassung 4 (Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
 <script src="js/config.js?v=v3194jw1107"></script>
@@ -3796,13 +3804,13 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3154g"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3204"></script>
+<script src="js/storage.js?v=v3214"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v3031"></script>
 <script src="js/track-record.js?v=v3029"></script>
-<script src="js/pdf.js?v=v3073"></script>
+<script src="js/pdf.js?v=v3214"></script>
 <script src="js/pdf-pruefung.js?v=v3029"></script><!-- v3018d · EIN Tor vor jedem PDF -->
 <script src="js/auth.js?v=v3153"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
@@ -3827,7 +3835,9 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-import.js?v=v3058"></script>
 <script src="js/dokument-import.js?v=v3211"></script>
 <script src="js/unterlagen.js?v=v3211"></script>
-<script src="js/sonderumlage.js?v=v3211"></script>
+<script src="js/sonderumlage.js?v=v3214"></script>
+<script src="js/sanierung-plan.js?v=v3214"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
+
 <script src="js/beleg-import.js?v=v3166"></script>
 <script src="js/financing.js?v=v2261"></script>
 <script src="js/financing-pdf.js?v=v2932"></script>
@@ -4393,7 +4403,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <link rel="stylesheet" href="css/layout-varianten.css?v=v2980a">
     <script src="js/marktbericht-profi.js?v=v3212b"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v3180d"></script><!-- v3179 · einheitliches Dokument-Design -->
-    <script src="js/dp-dokumente.js?v=v3203"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
+    <script src="js/dp-dokumente.js?v=v3214"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
     <script src="js/pdf-wahl.js?v=v3184"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/hub-anmelden.js?v=v3190a"></script><!-- v3190 · Makler-Hub: Verbinden-Ebene (/hub/anmelden) -->
     <script src="js/dok-weiche.js?v=v3184"></script><!-- v3181 · einheitliche Dokumente an allen Knoepfen, klassisch in den Einstellungen -->
