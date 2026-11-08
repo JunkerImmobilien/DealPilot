@@ -835,6 +835,9 @@
         + '<div class="mand-objliste" data-mand-obj="' + esc(m.id) + '" style="font-size:12px;color:#5f594f;margin-top:6px">lädt …</div>'
         + '</div>'
         + (m.id === 'privat' ? '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.openUeberfuehrung()" title="Privatobjekte in eine Gesellschaft überführen">In Gesellschaft überführen</button>' : '')   /* v3191 */
+        /* v3228 · Marcel 08.11.2026: „Jahresabschluss bitte unter Mandanten zu der jeweiligen Gesellschaft.“
+           Bis v3227 stand er als Abschnitt 09 im Portfolio-Cockpit mit eigener Gesellschaftsauswahl. */
+        + (isCorp(m.rechtsform) ? '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.openJahresabschluss(\'' + esc(m.id) + '\')" title="Bilanz und GuV über alle Objekte dieser Gesellschaft">Jahresabschluss</button>' : '')
         + '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'' + m.id + '\')">Bearbeiten</button>'
         + (canDel ? '<button type="button" class="btn btn-outline btn-sm" style="color:#B86250;border-color:#e6cbc5" onclick="DealPilotMandanten.uiDelete(\'' + m.id + '\')">L\u00f6schen</button>' : '')
         + '</div>';
@@ -843,7 +846,7 @@
     return ''
       + '<h2 class="set-section-h2">Mandanten</h2>'
       + '<p class="hint">Lege fest, wer ein Objekt h\u00e4lt \u2014 Privat oder eine Gesellschaft (GmbH/UG). Jedes Objekt bekommt im Tab "Objektdaten" einen <b>Halter</b>. '
-      + 'Privat l\u00e4uft \u00fcber dein zu versteuerndes Einkommen (Tab Steuer). Bei GmbH/UG gibst du das Steuerregime + Buchhaltungs-Stammwerte an \u2014 die werden in einer n\u00e4chsten Ausbaustufe aktiv (eigene Steuerrechnung + GuV/Bilanz-Export). '
+      + 'Privat l\u00e4uft \u00fcber dein zu versteuerndes Einkommen (Tab Steuer). Bei GmbH/UG gibst du das Steuerregime, die Buchhaltungs-Stammwerte und die Kosten der Gesellschaft an \u2014 der <b>Jahresabschluss</b> (Bilanz und GuV) steht als Knopf an der Karte der Gesellschaft. '
       + 'Privat bleibt der Standard.</p>'
       + '<div style="display:grid;grid-template-columns:minmax(0,1fr);gap:11px;margin:16px 0">' + cards + '</div>'
       + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.uiNew()"><span class="ic">+</span> Neuer Mandant</button>'
@@ -1262,6 +1265,90 @@
     if (d._deal_lost === true || d._deal_lost === 'true' || o.deal_lost === true) return false;   /* Liste der API: flach, deal_lost */
     return true;
   }
+  /* ── v3228 · Jahresabschluss je Gesellschaft ─────────────────────────────
+     Marcel 08.11.2026: „Jahresabschluss bitte unter Mandanten zu der
+     jeweiligen Gesellschaft.“ Der einzige Weg ist jetzt der Knopf an der
+     Karte der GmbH/UG; das Fenster fragt nur noch das Geschaeftsjahr ab.
+     Die Jahresliste kommt aus dem, was WIRKLICH da ist: Objekte mit diesem
+     Halter und deren gespeicherte Steuersaetze (bis v3227 so in
+     dashboard.js _abschlussJahre). Gerechnet und gedruckt wird unveraendert
+     von exportAbschlussPDF() in gesellschaft-abschluss.js - dort sitzt auch
+     die Plan-Sperre (Investor). */
+  function openJahresabschluss(id) {
+    var m = get(id);
+    if (!m || !isCorp(m.rechtsform)) {
+      if (typeof toast === 'function') toast('Jahresabschluss gibt es nur für eine GmbH oder UG.');
+      return;
+    }
+    var alt = document.getElementById('mand-ja-ov'); if (alt) alt.remove();
+    var ov = document.createElement('div');
+    ov.id = 'mand-ja-ov';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(10,10,12,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.innerHTML = '<div role="dialog" aria-modal="true" style="width:100%;max-width:520px;max-height:86vh;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;font-family:Inter,sans-serif">'
+      + '<div style="padding:16px 18px;border-bottom:1px solid #E6E0D3;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div style="font:600 17px \'Space Grotesk\',sans-serif;color:#1a1814">Jahresabschluss</div>'
+      + '<div style="font-size:12px;color:#6B6356;margin-top:2px">' + esc(m.name) + ' · ' + esc(rfLabel(m.rechtsform)) + ' · Bilanz, GuV und Anlagenspiegel über alle Objekte dieser Gesellschaft</div></div>'
+      + '<button type="button" id="mand-ja-zu" aria-label="Schließen" style="border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#6B6356">×</button></div>'
+      + '<div style="padding:16px 18px;overflow:auto">'
+      +   '<label for="mand-ja-jahr" style="display:block;font:600 12px Inter,sans-serif;color:#3a352b;margin-bottom:6px">Geschäftsjahr</label>'
+      +   '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">'
+      +     '<select id="mand-ja-jahr" style="flex:1 1 160px;min-width:0;padding:8px 10px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif"><option value="">lädt …</option></select>'
+      +     '<button type="button" id="mand-ja-los" class="btn btn-gold btn-sm">Jahresabschluss erstellen</button>'
+      +   '</div>'
+      +   '<div style="margin-top:12px;font-size:12px;color:#6B6356;line-height:1.5">Kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als <b>Verrechnungskonto Gesellschafter</b> in der Bilanz, damit sie aufgeht, <b>ohne dass die Lücke verschwindet</b>. Die <b>Kosten der Gesellschaft</b> trägst du unter „Bearbeiten“ dieser Gesellschaft ein; fehlen sie, sagt das PDF es auf der GuV-Seite.</div>'
+      + '</div></div>';
+    document.body.appendChild(ov);
+    function zu() { ov.remove(); document.removeEventListener('keydown', escZu); }
+    function escZu(e) { if (e.key === 'Escape') zu(); }
+    document.addEventListener('keydown', escZu);
+    document.getElementById('mand-ja-zu').onclick = zu;
+    ov.addEventListener('click', function (e) { if (e.target === ov) zu(); });
+
+    var jSel = document.getElementById('mand-ja-jahr');
+    var btn = document.getElementById('mand-ja-los');
+    btn.disabled = true;
+    btn.onclick = function () {
+      var jahr = jSel.value ? parseInt(jSel.value, 10) : 0;
+      if (!jahr) { if (typeof toast === 'function') toast('Bitte ein Geschäftsjahr wählen.'); return; }
+      if (typeof window.exportAbschlussPDF !== 'function') {
+        if (typeof toast === 'function') toast('✗ Abschluss-Modul nicht geladen — Seite neu laden.');
+        return;
+      }
+      var txt = btn.textContent;
+      btn.disabled = true; btn.textContent = 'erstelle …';
+      Promise.resolve().then(function () { return window.exportAbschlussPDF(m.id, jahr); })
+        .catch(function (e) { if (typeof toast === 'function') toast('✗ ' + ((e && e.message) || e)); })
+        .then(function () { btn.disabled = false; btn.textContent = txt; });
+    };
+    if (!window.Auth || typeof window.Auth.apiCall !== 'function') {
+      jSel.innerHTML = '<option value="">bitte neu anmelden</option>';
+      return;
+    }
+    window.Auth.apiCall('/objects', { method: 'GET' }).then(function (lo) {
+      var liste = (lo && (lo.items || lo.objects || lo)) || [];
+      if (!Array.isArray(liste)) liste = [];
+      var meine = liste.filter(function (o) {
+        var d = o.data || o;
+        return String((d.halter || o.halter || '').toString().trim() || 'privat') === String(m.id);
+      }).map(function (o) { return o.id; });
+      if (!meine.length) { jSel.innerHTML = '<option value="">kein Objekt zugeordnet</option>'; return null; }
+      return window.Auth.apiCall('/tax-records?from=1990&to=2100').then(function (r) {
+        var jahre = {};
+        ((r && r.records) || []).forEach(function (s) {
+          if (meine.indexOf(s.object_id) >= 0) jahre[Number(s.year)] = 1;
+        });
+        var js = Object.keys(jahre).map(Number).sort(function (a, b) { return b - a; });
+        if (!js.length) { jSel.innerHTML = '<option value="">keine Steuerdaten erfasst</option>'; return; }
+        jSel.innerHTML = js.map(function (y) { return '<option value="' + y + '">' + y + '</option>'; }).join('');
+        /* Vorgewaehlt ist das Vorjahr, denn erklaert wird rueckwirkend. */
+        var vor = String(new Date().getFullYear() - 1);
+        if (jSel.querySelector('option[value="' + vor + '"]')) jSel.value = vor;
+        btn.disabled = false;
+      });
+    }).catch(function () {
+      jSel.innerHTML = '<option value="">nicht abrufbar</option>';
+    });
+  }
+
   function openUeberfuehrung() {
     var corps = (_state.list || []).filter(function (m) { return isCorp(m.rechtsform); });
     var alt = document.getElementById('mand-uew-ov'); if (alt) alt.remove();
@@ -1376,6 +1463,7 @@
 
   window.DealPilotMandanten = {
     openUeberfuehrung: openUeberfuehrung, _uewPick: _uewPick,  /* v856-uew */
+    openJahresabschluss: openJahresabschluss,  /* v3228 */
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
     setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, steuerParameter: steuerParameter, ueberfDaten: ueberfDaten, sphaere: sphaere, anteil: anteil, istKoerperschaft: istKoerperschaft, wireObjectFields: wireObjectFields,

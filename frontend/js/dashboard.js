@@ -3236,32 +3236,13 @@
          „nicht enthalten". Ein Widerspruch in einer Zeile Abstand. */
       +   '<div class="dp-mappe-h">Die Zeilennummern stammen aus dem <b>amtlichen Formular</b> des jeweiligen Jahres. Für Jahre ohne hinterlegte Zuordnung erscheint die Ansicht nicht — die Nummern ändern sich je Veranlagungsjahr und werden nicht geraten. Positionen, deren Zeile eine steuerfachliche Entscheidung wäre, sind ausgewiesen statt weggelassen.</div>'
       + '</div>'
-      /* ════ v1227 · Jahresabschluss fuer Gesellschaften ════
-         Die Steuer-Mappe darueber ist fuer Privatvermoegen — Anlage V,
-         § 21 EStG. Fuer eine GmbH oder UG gibt es die nicht (§ 8 Abs. 2
-         KStG), sondern Bilanz und GuV. Deshalb ein EIGENER Abschnitt und
-         kein Haken an der Mappe: es sind zwei verschiedene Dokumente fuer
-         zwei verschiedene Steuerarten, nicht zwei Fassungen desselben. */
-      /* v1735 · die Ueberschrift bekommt eine ID, damit sie zusammen mit der
-         Box verschwinden kann — ohne sie bliebe eine Sektionsnummer ohne
-         Inhalt stehen. */
-      + '<div class="sl" id="dp-abschluss-sl" data-sek="abschluss"><span class="e">09</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
-      + '<div class="dp-mappe" id="dp-abschluss-box">'
-      +   '<div class="dp-mappe-t">Für Objekte, die einer <b>GmbH oder UG</b> gehören: Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu ein Anlagenspiegel je Objekt.</div>'
-      +   '<div class="dp-mappe-r" id="dp-abschluss-r">'
-      +     '<label class="dp-mappe-l">Gesellschaft</label>'
-      +     '<select id="dp-abschluss-mand" class="dp-mappe-sel"></select>'
-      +     '<label class="dp-mappe-l">Geschäftsjahr</label>'
-      +     '<select id="dp-abschluss-jahr" class="dp-mappe-sel"></select>'
-      +     '<button class="dp-mappe-btn" onclick="DealPilotDashboard.jahresabschluss()">Jahresabschluss erstellen</button>'
-      +   '</div>'
-      +   '<div class="dp-mappe-h">Kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als <b>Verrechnungskonto Gesellschafter</b> in der Bilanz, damit sie aufgeht, <b>ohne dass die Lücke verschwindet</b>. Die <b>Kosten der Gesellschaft</b> trägst du unter Einstellungen / Mandanten ein; fehlen sie, sagt das PDF es auf der GuV-Seite.</div>'
-      + '</div>'
+      /* v3228 · Abschnitt 09 „Jahresabschluss“ ist nach Einstellungen / Mandanten gewandert
+         (Knopf an der Karte der GmbH/UG, Marcel 08.11.2026). Das Cockpit endet mit 08 Steuer-Mappe. */
       + '</div></div>';
     m.setAttribute('data-dp-built','1');
     /* v1215-mappe: Stil und Jahresliste erst hier — vorher gibt es das
        Dropdown nicht, und die Liste kommt aus echten Saetzen. */
-    try { _mappeCss(); _mappeJahreLaden(); _abschlussInit(); } catch (e) {}
+    try { _mappeCss(); _mappeJahreLaden(); } catch (e) {}
     /* v2951: Abschnitte gruppieren (Einklappen), Ansicht Einfach|Genau setzen */
     try { var _app = m.querySelector('#dp-stage > .app'); if (_app) _sekGruppieren(_app); ansicht(); } catch (e) { console.warn('[v2951] Abschnitte', e); }
     return true;
@@ -3557,121 +3538,11 @@
     finally { if (btn) { btn.disabled = false; btn.textContent = alt; } }
   }
 
-  /* ════ v1227 · Jahresabschluss — Gesellschaften und Jahre laden ════
-     Gefuellt wird aus dem, was WIRKLICH da ist: Mandanten mit Rechtsform
-     GmbH oder UG, und je Gesellschaft die Jahre, fuer die Steuersaetze zu
-     ihren Objekten vorliegen.
-
-     ── v1735 · HIER GALT BIS ZUM 01.10.2026 DAS GEGENTEIL ──────────────
-     Es stand: „Gibt es keine Gesellschaft, verschwindet der Abschnitt
-     NICHT — er sagt, warum er leer ist. Ein verschwundener Abschnitt
-     sieht aus wie ein fehlendes Feature."
-
-     Marcel am 01.10.2026: „Beim Portfolio Cockpit sollte der
-     Jahresabschluss erst erscheinen, wenn wir wirklich eine Gesellschaft
-     haben."
-
-     Das Argument von damals stimmt weiterhin — nur wiegt es hier anders
-     als angenommen. Es greift bei einem Feature, das der Nutzer SUCHEN
-     koennte. Bilanz und GuV nach § 8 Abs. 2 KStG sucht niemand, der
-     privat vermietet: fuer ihn ist der Abschnitt keine Information,
-     sondern eine Zeile, die er jedes Mal ueberliest und die seine
-     Sektionsnummern verschiebt.
-
-     > Ein Hinweis auf etwas, das den Leser nichts angeht, ist kein
-     > Hinweis, sondern Rauschen. Er kostet jeden Blick, den er bekommt,
-     > und zahlt nur an die wenigen zurueck, die ohnehin eine GmbH haben.
-
-     Der Weg dorthin geht nicht verloren: Einstellungen / Mandanten legt
-     die Gesellschaft an, und sobald eine existiert, ist der Abschnitt
-     da — mitsamt Ueberschrift. */
-  async function _abschlussInit() {
-    var box = document.getElementById('dp-abschluss-box');
-    var reihe = document.getElementById('dp-abschluss-r');
-    if (!box || !reihe) return;
-
-    var corps = [];
-    try {
-      corps = (window.DealPilotMandanten ? DealPilotMandanten.getList() : [])
-        .filter(function (m) { return DealPilotMandanten.isCorp(m.rechtsform); });
-    } catch (e) {}
-
-    var sl = document.getElementById('dp-abschluss-sl');
-    if (!corps.length) {
-      /* v1735 · ganz weg, Ueberschrift mit — sonst steht Sektion 09 leer da */
-      box.style.display = 'none';
-      if (sl) sl.style.display = 'none';
-      return;
-    }
-    box.style.display = '';
-    if (sl) sl.style.display = '';
-
-    var mSel = document.getElementById('dp-abschluss-mand');
-    mSel.innerHTML = corps.map(function (m) {
-      return '<option value="' + m.id + '">' + m.name + ' · '
-        + DealPilotMandanten.rfLabel(m.rechtsform) + '</option>';
-    }).join('');
-    mSel.onchange = function () { _abschlussJahre(); };
-    await _abschlussJahre();
-  }
-
-  async function _abschlussJahre() {
-    var mSel = document.getElementById('dp-abschluss-mand');
-    var jSel = document.getElementById('dp-abschluss-jahr');
-    if (!mSel || !jSel) return;
-    var hid = mSel.value;
-    jSel.innerHTML = '<option value="">lädt…</option>';
-    try {
-      var lo = await Auth.apiCall('/objects');
-      var liste = (lo && (lo.items || lo.objects || lo)) || [];
-      if (!Array.isArray(liste)) liste = [];
-      var meine = liste.filter(function (o) { return String(o.halter || 'privat') === String(hid); })
-                       .map(function (o) { return o.id; });
-      if (!meine.length) {
-        jSel.innerHTML = '<option value="">kein Objekt zugeordnet</option>';
-        return;
-      }
-      var r = await Auth.apiCall('/tax-records?from=1990&to=2100');
-      var jahre = {};
-      ((r && r.records) || []).forEach(function (s) {
-        if (meine.indexOf(s.object_id) >= 0) jahre[Number(s.year)] = 1;
-      });
-      var liste2 = Object.keys(jahre).map(Number).sort(function (a, b) { return b - a; });
-      if (!liste2.length) {
-        jSel.innerHTML = '<option value="">keine Steuerdaten erfasst</option>';
-        return;
-      }
-      jSel.innerHTML = liste2.map(function (y) {
-        return '<option value="' + y + '">' + y + '</option>';
-      }).join('');
-      /* Vorgewaehlt ist das Vorjahr, denn erklaert wird rueckwirkend. */
-      var vor = String(new Date().getFullYear() - 1);
-      if (jSel.querySelector('option[value="' + vor + '"]')) jSel.value = vor;
-    } catch (e) {
-      jSel.innerHTML = '<option value="">nicht abrufbar</option>';
-    }
-  }
-
-  async function jahresabschluss() {
-    var mSel = document.getElementById('dp-abschluss-mand');
-    var jSel = document.getElementById('dp-abschluss-jahr');
-    var hid = mSel && mSel.value;
-    var jahr = jSel && jSel.value ? parseInt(jSel.value, 10) : 0;
-    if (!hid || !jahr) {
-      if (typeof toast === 'function') toast('Bitte Gesellschaft und Geschäftsjahr wählen.');
-      return;
-    }
-    if (typeof exportAbschlussPDF !== 'function') {
-      if (typeof toast === 'function') toast('✗ Abschluss-Modul nicht geladen — Seite neu laden.');
-      return;
-    }
-    var btn = document.querySelector('#dp-abschluss-box .dp-mappe-btn');
-    var alt = btn ? btn.textContent : '';
-    if (btn) { btn.disabled = true; btn.textContent = 'erstelle…'; }
-    try { await exportAbschlussPDF(hid, jahr); }
-    catch (e) { if (typeof toast === 'function') toast('✗ ' + (e.message || e)); }
-    finally { if (btn) { btn.disabled = false; btn.textContent = alt; } }
-  }
+  /* v3228 · Hier standen bis v3227 _abschlussInit(), _abschlussJahre() und
+     jahresabschluss() fuer Abschnitt 09 „Jahresabschluss“. Marcel 08.11.2026:
+     „Jahresabschluss bitte unter Mandanten zu der jeweiligen Gesellschaft.“
+     Der einzige Weg ist jetzt der Knopf an der Karte der GmbH/UG unter
+     Einstellungen / Mandanten (mandanten.js openJahresabschluss). */
 
   function _mappeCss() {
     if (document.getElementById('dp-mappe-css')) return;
@@ -3959,7 +3830,7 @@
     open: openDashboard, close: closeDashboard,
     setProjYears: setProjYears, setCardView: setCardView,
     steuerMappe: steuerMappe,   /* v1215-mappe */
-    jahresabschluss: jahresabschluss,   /* v1227 */
+    /* v3228 · jahresabschluss() ist nach Einstellungen / Mandanten gewandert: DealPilotMandanten.openJahresabschluss(id) */
     cardPdf: cardPdf, cardDelete: cardDelete,
     headerTrackRecord: headerTrackRecord, exportPortfolioPdf: exportPortfolioPdf,
     toggleSidebar: toggleSidebar, setTheme: setTheme, applyTheme: applyTheme,
