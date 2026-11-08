@@ -1,0 +1,79 @@
+/* v3232 · Marcel 08.11.2026: „unter Deal-Aktion muss das besser angegeben werden wie im Tab Objekt.
+   Dahinter fehlt auch Weiß, wo das abgegrenzt ist.“
+   Gemessen: #s8 besteht aus Paaren .dab-band (Kopf) + .dab-panel (Inhalt), beide direkt auf dem
+   cremefarbenen Grund, ohne Karte. Im Reiter Objekt sitzt jeder Abschnitt in .card (weiß, Rahmen
+   Gold 22 %, Radius 2 px, Innenabstand 20 px) mit Kopf .ct-pro (Mono 10 px, Versalien, Symbol, Linie).
+   Hier wird aus jedem Paar eine solche Karte. Spezifität über den Regeln von deal-action-boarding.js
+   (Präfix 'html body #s8 '), deshalb #s8.sec. */
+
+html body #s8.sec > .dab-band {
+  background: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;
+  border-bottom: 0 !important;
+  border-radius: 2px 2px 0 0 !important;
+  box-shadow: none !important;
+  margin: 22px 0 0 !important;
+  padding: 18px 20px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  overflow: visible !important;
+}
+html body #s8.sec > .dab-band::before { display: none !important; }
+html body #s8.sec > .dab-band::after {
+  content: "" !important;
+  display: block !important;
+  order: 2;
+  flex: 1 1 auto;
+  height: 1px;
+  margin-left: 4px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent), transparent) !important;
+  position: static !important;
+}
+html body #s8.sec > .dab-band .dab-band-ic {
+  order: 0;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 6px !important;
+  margin: 0 !important;
+  background: #FBF6E9 !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent) !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
+}
+html body #s8.sec > .dab-band .dab-band-ic svg { width: 13px !important; height: 13px !important; }
+html body #s8.sec > .dab-band .dab-band-t {
+  order: 1;
+  font: 700 10px/1.2 "JetBrains Mono", ui-monospace, monospace !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  color: #6B645A !important;
+  white-space: nowrap;
+}
+html body #s8.sec > .dab-band .dab-band-s {
+  order: 3;
+  margin: 0 !important;
+  font: 400 12px/1.3 Inter, sans-serif !important;
+  color: #8A8278 !important;
+  text-align: right;
+}
+html body #s8.sec > .dab-band + .dab-panel,
+html body #s8.sec > .dab-band + #dab-rails-host {
+  background: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 2px 2px !important;
+  box-shadow: none !important;
+  padding: 6px 20px 20px !important;
+  margin: 0 0 4px !important;
+}
+/* Kacheln der Dokumente füllen die Kartenbreite statt fester Spalten */
+html body #s8.sec .dab-smart-body {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+}
+@media (max-width: 640px) {
+  html body #s8.sec > .dab-band { padding: 14px 14px 8px !important; flex-wrap: wrap; }
+  html body #s8.sec > .dab-band::after { display: none !important; }
+  html body #s8.sec > .dab-band .dab-band-s { flex: 1 1 100%; text-align: left; margin-left: 32px !important; }
+  html body #s8.sec > .dab-band + .dab-panel,
+  html body #s8.sec > .dab-band + #dab-rails-host { padding: 4px 14px 16px !important; }
+}
