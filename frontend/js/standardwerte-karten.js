@@ -131,7 +131,9 @@
     if (document.getElementById('swk-css')) return;
     var st = document.createElement('style'); st.id = 'swk-css';
     st.textContent = [
-      '#settings-modal .swk-sets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 16px}',   /* v3213 · W-8: vier Sets */
+      /* v3223b · Marcel 08.11.2026 „Text steht über der Box“: vier Spalten im Einstellungsfenster waren je ~145 px breit,
+         die Zweierliste lief über den Rand. Raster nach der Breite des FENSTERS (auto-fit), Werte einspaltig. */
+      '#settings-modal .swk-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:4px 0 16px}',   /* v3213 · W-8: vier Sets */
       '#settings-modal .swk-set.swk-set-leer{border-style:dashed;background:#fdfcfa}',
       '#settings-modal .swk-set.swk-set-leer i{display:inline-block;margin-top:6px;font:600 12px Inter,sans-serif;font-style:normal;color:#8a6d1f}',
       '#settings-modal .swk-band-knopf{border:1px solid var(--wl-c9a84c,#C9A84C);background:#fff;border-radius:7px;padding:3px 9px;margin-left:6px;font:600 11.5px Inter,sans-serif;color:#6b5417;cursor:pointer}',
@@ -139,13 +141,15 @@
       '#settings-modal details.swk-zu>summary{cursor:pointer;font:600 12px Inter,sans-serif;color:#8a6d1f;list-style:none}',
       '#settings-modal details.swk-zu>summary::-webkit-details-marker{display:none}',
       '#settings-modal details.swk-zu .swk-werte{border-top:0;margin-top:6px;padding-top:0}',
-      '@media (max-width:1100px){#settings-modal .swk-sets{grid-template-columns:repeat(2,minmax(0,1fr))}}',
+
       '#settings-modal .swk-set{border:1px solid #e6e1d6;background:#fff;border-radius:12px;padding:12px;cursor:pointer;text-align:left;font:inherit;color:#1a1714;position:relative}',
       '#settings-modal .swk-set.an{border:1.5px solid var(--wl-c9a84c,#C9A84C);background:#FBF6E9}',
-      '#settings-modal .swk-set.an::after{content:"✓ aktiv";position:absolute;top:10px;right:12px;font:600 11px Inter,sans-serif;color:#8a6d1f}',
+      '#settings-modal .swk-set.an::after{content:"✓ aktiv";position:absolute;top:-9px;right:10px;padding:1px 7px;border:1px solid var(--wl-c9a84c,#C9A84C);border-radius:9px;background:#FBF6E9;font:600 10.5px Inter,sans-serif;color:#8a6d1f;white-space:nowrap}',   /* v3223b: Abzeichen auf dem Rand statt über dem Titel */
       '#settings-modal .swk-set b{display:block;font:600 14px "Space Grotesk",sans-serif}',
       '#settings-modal .swk-set p{margin:3px 0 8px;color:#625c59;font-size:12px}',
-      '#settings-modal .swk-set ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:12px}',
+      '#settings-modal .swk-set ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr;gap:2px;font-size:12px}',
+      '#settings-modal .swk-set li{display:flex;justify-content:space-between;gap:8px;min-width:0;border-top:1px solid #f0ece3;padding-top:2px}',
+      '#settings-modal .swk-set li span{flex:0 0 auto}#settings-modal .swk-set li{overflow-wrap:anywhere;text-align:right}',
       '#settings-modal .swk-set li span{color:#625c59}',
       '#settings-modal .swk-hinweis{font-size:12px;color:#625c59;margin:-8px 0 14px}',
       '#settings-modal .swk-karten{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}',
