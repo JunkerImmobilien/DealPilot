@@ -132,6 +132,7 @@ function _gaRestschuld(d, jahr) {
       d.d1 = d.ueberf_restschuld;
       if (_gaNum(d.ueberf_rest_zins) > 0) d.d1z = d.ueberf_rest_zins;
       d.d2 = 0;
+      d.darlehen_weitere = '';   /* v3215: steckt in der uebernommenen Restschuld */
       d.d1_vertrag = d.halter_seit || d.d1_vertrag;
     }
   }
@@ -154,6 +155,20 @@ function _gaRestschuld(d, jahr) {
     summe += R;
   });
 
+  /* v3215 · W-17: weitere Darlehen - Restschuld zum 31.12. aus dem Kern DpDarlehenWeitere
+     (Monate ab Darlehensbeginn bzw. ab Januar des Start-Jahres, Monat fuer Monat). */
+  if (window.DpDarlehenWeitere && d.darlehen_weitere) {
+    var _dwBy = window.DpDarlehenWeitere.basisJahrAus(d);
+    window.DpDarlehenWeitere.lesen(d.darlehen_weitere).forEach(function (e, i) {
+      var ab = window.DpDarlehenWeitere.abKauf(e, _dwBy);
+      var nW = ab ? n : (jahr - e.start_jahr + 1) * 12;
+      var e0 = Object.assign({}, e, { start_jahr: null });
+      var R = (nW == null) ? e.betrag : (nW <= 0 ? (ab ? e.betrag : 0) : window.DpDarlehenWeitere.restNach([e0], nW, {}));
+      if (!ab && nW <= 0) return;
+      teile.push({ name: window.DpDarlehenWeitere.name(e, i), anfang: e.betrag, zins: e.zins, tilgung: e.tilg, rest: R });
+      summe += R;
+    });
+  }
   if (!start && teile.length) vorbehalt.push('kein Darlehensbeginn hinterlegt');
   if (_gaNum(d.sondertilgung) > 0 || _gaNum(d.st_jahr) > 0) {
     vorbehalt.push('Sondertilgungen sind in dieser Rechnung nicht enthalten');
@@ -191,6 +206,7 @@ function _gaRestschuldProbe(jahr) {
     var d = {
       d1: g('d1'), d1z: g('d1z'), d1t: g('d1t'), d1_type: g('d1_type'), d1_vertrag: g('d1_vertrag'),
       d2: g('d2'), d2z: g('d2z'), d2t: g('d2t'), d2_type: g('d2_type'),
+      darlehen_weitere: g('darlehen_weitere'),   /* v3215 */
       wirtschaftlicher_uebergang: g('wirtschaftlicher_uebergang'), kaufdat: g('kaufdat')
     };
     var eigen = _gaRestschuld(d, jahr).summe;

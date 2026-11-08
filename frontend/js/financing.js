@@ -653,7 +653,10 @@
     var d2 = 0;
     var an = document.getElementById('d2_enable');
     if (an && an.checked) d2 = _zahl('d2');
-    return { d1: d1, d2: d2, summe: d1 + d2 };
+    /* v3215 · W-17: weitere Darlehen ab Kauf (Kern DpDarlehenWeitere, Liste aus dem Feld) */
+    var dw = 0;
+    try { var f = document.getElementById('darlehen_weitere'); if (f && window.DpDarlehenWeitere) dw = DpDarlehenWeitere.anfang(f.value, { basisJahr: (window.State && State.dw_basisjahr) || null }).betrag; } catch (e) {}
+    return { d1: d1, d2: d2, dw: dw, summe: d1 + d2 + dw };
   }
 
   function _gesamtinvestition() {
@@ -703,11 +706,11 @@
   window.dpKapitalDarlehenSetzen = function () {
     var gi = _gesamtinvestition();
     var d = _darlehenSumme();
-    var neu = Math.max(0, gi.wert - _zahl('ek') - d.d2);
+    var neu = Math.max(0, gi.wert - _zahl('ek') - d.d2 - d.dw);   /* v3215 */
     _d1Modus = 'auto';   /* v1433: ab jetzt laeuft das Darlehen wieder mit */
     _setzen('d1', neu);
     if (typeof window.toast === 'function') {
-      window.toast('✓ Darlehen I auf ' + _eur(neu) + ' gesetzt — Gesamtinvestition minus Eigenkapital' + (d.d2 ? ' und Darlehen II' : ''));
+      window.toast('✓ Darlehen I auf ' + _eur(neu) + ' gesetzt — Gesamtinvestition minus Eigenkapital' + (d.d2 ? ' und Darlehen II' : '') + (d.dw ? ' und weitere Darlehen' : ''));
     }
   };
 
@@ -741,6 +744,7 @@
 
     rechnung.textContent = _eur(ek) + ' Eigenkapital + ' + _eur(d.d1) + ' Darlehen I'
       + (d.d2 ? ' + ' + _eur(d.d2) + ' Darlehen II' : '')
+      + (d.dw ? ' + ' + _eur(d.dw) + ' weitere Darlehen' : '')   /* v3215 */
       + ' = ' + _eur(deckung)
       + '  ·  Gesamtinvestition ' + _eur(gi.wert)
       + (gi.sicher ? '' : ' (nur Kaufpreis — noch nicht gerechnet)');
@@ -822,7 +826,7 @@
      calc()-Lauf waehrend des Objektwechsels das gespeicherte Darlehen des
      neuen Objekts mit Werten des alten ueberschreiben. */
   var _d1Modus = null;   /* 'auto' | 'hand' | null = noch nicht bestimmt */
-  var AUSLOESER = { ek:1, kp:1, san:1, moebl:1, d2:1, d2_enable:1, ek_ist_nk:1,
+  var AUSLOESER = { ek:1, kp:1, san:1, moebl:1, d2:1, d2_enable:1, darlehen_weitere:1 /* v3215 */, ek_ist_nk:1,
     makler_p:1, notar_p:1, gba_p:1, gest_p:1, ji_p:1,
     makler_e:1, notar_e:1, gba_e:1, gest_e:1, ji_e:1 };
 
@@ -833,7 +837,7 @@
     var d = _darlehenSumme();
     var ek = _zahl('ek');
     return { gi: gi, kp: kp, nk: nk, san: san, moebl: moebl, ek: ek, d: d,
-             soll: Math.max(0, gi.wert - ek - d.d2) };
+             soll: Math.max(0, gi.wert - ek - d.d2 - d.dw) };   /* v3215 */
   }
   function _modusBestimmen() {
     var t = _teile();
@@ -863,6 +867,7 @@
       /* v2261: Inventar steckt im Kaufpreis - keine eigene Zeile mehr */
       + ' − Eigenkapital ' + _eur(t.ek)
       + (t.d.d2 ? ' − Darlehen II ' + _eur(t.d.d2) : '')
+      + (t.d.dw ? ' − weitere Darlehen ' + _eur(t.d.dw) : '')   /* v3215 */
       + ' = ' + _eur(t.soll);
     var auto = (_d1Modus !== 'hand') && Math.abs(t.d.d1 - t.soll) <= 1;
     h.textContent = auto

@@ -200,6 +200,15 @@
       liste.push(darlehenRechnen({ name: 'Darlehen 2', betrag: s.d2, zins: s.d2z, tilgung: s.d2t, bindj: b2, typ: s.d2_type,
         start: startDatum('d2_auszahl'), restschuld: rs2, rate_m: s.d2_rate_m, zinsen: zinsen(b2, rs2) }, heute));
     }
+    /* v3215 · W-17: weitere Darlehen (ab Kauf) mit Restschuld am Ende IHRER Bindung aus dem Kern */
+    if (global.DpDarlehenWeitere && Array.isArray(s.dw_liste)) {
+      s.dw_liste.forEach(function (e, i) {
+        if (!global.DpDarlehenWeitere.abKauf(e, s.dw_basisjahr)) return;
+        var rsW = global.DpDarlehenWeitere.restBindungsende(e), bW = e.bindj || 10;
+        liste.push(darlehenRechnen({ name: global.DpDarlehenWeitere.name(e, i), betrag: e.betrag, zins: e.zins / 100, tilgung: e.tilg / 100,
+          bindj: bW, typ: e.art, start: startDatum(), restschuld: rsW, rate_m: global.DpDarlehenWeitere.rateM(e), zinsen: zinsen(bW, rsW) }, heute));
+      });
+    }
     liste.forEach(function (e) { e.anschluss.forEach(function (a) { var n = nachAnschluss(a.delta_m); a.cf_m = n.cf_m; a.dscr = n.dscr; }); });
     return { darlehen: liste, cf_heute_m: istZahl(k.cf_m) ? k.cf_m : null, dscr_heute: istZahl(k.dscr) ? k.dscr : null };
   }

@@ -343,6 +343,20 @@ function todos(data, opts) {
     if (monate >= 0 && monate <= 24) L.push({ art: 'Finanzierung', was: name + ': Zinsbindung endet ' + _ymText(_ym(ende)) + ' - Anschlussfinanzierung/Forward-Darlehen vorbereiten' + (d.bank_inst ? ' (' + d.bank_inst + ')' : ''),
       faellig: _ymText(_ym(ende)), quelle: 'Auszahlung ' + d[k + '_auszahl'] + ' + ' + bj + ' Jahre Zinsbindung (Reiter Finanzierung)' });
   });
+  /* v3215 · W-17: weitere Darlehen - Zinsbindung ab Kauf (Auszahlung D1, sonst Kaufdatum) bzw. ab Januar des Start-Jahres */
+  try {
+    const rk = require('./rechenkerne');
+    if (d.darlehen_weitere && rk.vorhanden()) rk.weitereDarlehenListe(d.darlehen_weitere).forEach((e, i) => {
+      if (!(e.bindj > 0)) return;
+      const start = e.start_jahr ? new Date(e.start_jahr, 0, 1) : (_datum(d.d1_auszahl) || _datum(d.kaufdat));
+      if (!start) return;
+      const name = e.bez || ('Darlehen ' + ['III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][i]);
+      const ende = _plusJahre(start, e.bindj);
+      const monate = (ende.getFullYear() - heute.getFullYear()) * 12 + ende.getMonth() - heute.getMonth();
+      if (monate >= 0 && monate <= 24) L.push({ art: 'Finanzierung', was: name + ': Zinsbindung endet ' + _ymText(_ym(ende)) + ' - Anschlussfinanzierung/Forward-Darlehen vorbereiten',
+        faellig: _ymText(_ym(ende)), quelle: (e.start_jahr ? 'Start ' + e.start_jahr : 'Finanzierungsbeginn') + ' + ' + e.bindj + ' Jahre Zinsbindung (Reiter Finanzierung, weitere Darlehen)' });
+    });
+  } catch (e) { /* ohne Kern keine Erinnerung - kein Rechenweg daneben */ }
   const kd = _datum(d.kaufdat);
   if (kd) {
     const ende = _plusJahre(kd, 3);

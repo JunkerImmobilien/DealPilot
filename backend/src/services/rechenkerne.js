@@ -109,6 +109,7 @@ const MANIFEST = path.join(DIR, '_pruefsummen.json');
  * Spiegelung, die einen Kern nicht liefert, ist kaputt und sagt es. */
 const GEBRAUCHT = [
   ['Dscr', 'compute'],
+  ['DpDarlehenWeitere', 'anfang'],   /* v3215 · W-17, vor deal-kpis */
   ['DealKpis', 'compute'],
   ['ScoreTier', 'stufe'],
   ['DealScore', 'computeFromKpis'],
@@ -164,7 +165,7 @@ function _laden() {
       }
     }
     _kerne = {
-      Dscr: ctx.Dscr, DealKpis: ctx.DealKpis, ScoreTier: ctx.ScoreTier,
+      Dscr: ctx.Dscr, DealKpis: ctx.DealKpis, DpDarlehenWeitere: ctx.DpDarlehenWeitere /* v3215 */, ScoreTier: ctx.ScoreTier,
       DealScore: ctx.DealScore, QcHeuristik: ctx.QcHeuristik,
       /* v2071 - der RND-Kern. Die Dateien wurden ueber `reihenfolge` schon
          geladen und `GEBRAUCHT` hat sie geprueft; hier fehlten sie nur in
@@ -207,6 +208,19 @@ function gebaeudeAhk(eingabe) {
 /** v3006c · DealKpis.grestBasis() der App - Kaufpreis ohne ausgewiesenes Inventar. */
 function grestBasis(kp, inventar) {
   return _oder_wirf().DealKpis.grestBasis(kp, inventar);
+}
+
+/** v3215 · W-17 · DpDarlehenWeitere der App: die weiteren Darlehen eines
+ *  gespeicherten Objekts. ausObjekt(d) = Summen ab Kauf { n, betrag, rate_m,
+ *  zins_j, tilg_j, liste }, lesen(raw) = bereinigte Liste. Keine eigene Formel. */
+function weitereDarlehen(daten) {
+  return _oder_wirf().DpDarlehenWeitere.ausObjekt(daten || {});
+}
+function weitereDarlehenListe(raw) {
+  return _oder_wirf().DpDarlehenWeitere.lesen(raw);
+}
+function weitereDarlehenRate(e) {
+  return _oder_wirf().DpDarlehenWeitere.rateM(e);
 }
 
 /** Dscr.compute() der App. */
@@ -307,6 +321,7 @@ module.exports = {
   kpis, dscr, score, stufe, heuristik,
   gebaeudeAhk,                 /* v3006b */
   grestBasis,                  /* v3006c */
+  weitereDarlehen, weitereDarlehenListe, weitereDarlehenRate,   /* v3215 · W-17 */
   heuristikTeil,               /* v1936 — stufensatz / kennzahlenAmpel / kategorien */
   rnd, rndAusObjekt, rndAfaVergleich,   /* v2071 — Restnutzungsdauer */
   vorhanden, herkunft,

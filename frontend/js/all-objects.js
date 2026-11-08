@@ -44,7 +44,9 @@
     var kp = num('kp');
     var nkm = num('nkm') + num('ze');
     var d1 = num('d1'), d2 = num('d2');
-    var d_total = d1 + d2;
+    /* v3215 · W-17: weitere Darlehen ab Kauf, gerechnet im Kern */
+    var _dw = window.DpDarlehenWeitere ? DpDarlehenWeitere.ausObjekt(d) : { betrag: 0, zins_j: 0, tilg_j: 0 };
+    var d_total = d1 + d2 + _dw.betrag;
     var nebenkosten = (window.DealKpis && DealKpis.nebenkosten)   /* v3006c: GrESt ohne Inventar */
       ? DealKpis.nebenkosten({ kp: kp, inventar: Math.max(num('inv_kueche'), num('moebl')), makler_p: num('makler_p'), notar_p: num('notar_p'), gba_p: num('gba_p'), gest_p: num('gest_p'), ji_p: num('ji_p') }).summe
       : (kp * (num('makler_p') + num('notar_p') + num('gba_p') + num('gest_p') + num('ji_p')) / 100);
@@ -52,8 +54,8 @@
     var bmy = kp > 0 ? (nkm * 12 / kp) * 100 : 0;
     var ek = gi - d_total;
     var ltv = gi > 0 ? (d_total / gi) * 100 : 0;
-    var schuldZins = (d1 * num('d1z') + d2 * num('d2z')) / 100;
-    var schuldTilg = (d1 * num('d1t') + d2 * num('d2t')) / 100;
+    var schuldZins = (d1 * num('d1z') + d2 * num('d2z')) / 100 + _dw.zins_j;   /* v3215 */
+    var schuldTilg = (d1 * num('d1t') + d2 * num('d2t')) / 100 + _dw.tilg_j;   /* v3215 */
     /* v3031 · hier stand eine eigene Brutto-Rechnung (Miete / Zins+Tilgung) am Kern vorbei.
        Jetzt der gespeicherte Wert, netto gelesen (Dscr.ausGespeichert), sonst der Kern mit den
        gespeicherten nicht umlagef. Kosten. */

@@ -1,8 +1,9 @@
 {
- "erzeugt_am": "2026-11-04T09:54:58.730Z",
+ "erzeugt_am": "2026-11-08T10:15:38.907Z",
  "hinweis": "Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. Quelle aendern, dann: node tools/rechenkerne-spiegeln.mjs",
  "reihenfolge": [
   "dscr-engine.js",
+  "darlehen-weitere.js",
   "deal-kpis.js",
   "score-tiers.js",
   "dealscore.js",
@@ -12,7 +13,8 @@
  ],
  "quellen": {
   "dscr-engine.js": "a84f6cbd54912d087cc107ac649bb8e530db38495afe3bdd0f48631c4c6ddbba",
-  "deal-kpis.js": "c04052b13e3a320091c4343997ebd18b8d5d897930d2956d0c9031096a45066f",
+  "darlehen-weitere.js": "afdfd975bbc0d8647710899408dd50daaf844c8ddeef794927b135e95eccc67e",
+  "deal-kpis.js": "7de4271d585bc1d358d91c4f8a8e40f829bbdaaeb1e03b5da82a7ff06c16f7ad",
   "score-tiers.js": "9b1cb9d1d9fc3b997804caf24dbe8706f8eca44fa7922d420f1ac346049d6c1e",
   "dealscore.js": "06f3e5e935c33fc712a31a3337ab363fb56db606e4ff6593d5da62173b696705",
   "qc-heuristik.js": "60e207571011287e285282239e0a5a575d7fdbf616dbd3d65e26053dfc909204",

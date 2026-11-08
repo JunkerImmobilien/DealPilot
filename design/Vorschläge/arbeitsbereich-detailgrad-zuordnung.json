@@ -308,6 +308,11 @@
             "art": "kind"
           },
           {
+            "titel": "Weitere Darlehen",
+            "selektor": "#dw-card",
+            "art": "karte"
+          },
+          {
             "titel": "Bankargumente",
             "selektor": "#bi-dscr",
             "art": "kind"

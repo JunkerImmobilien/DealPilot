@@ -437,7 +437,7 @@
     if (!(zahl(K.kp) > 0)) sperren.push({ was: 'Kaufpreis', wo: 'Reiter Investition' });
     if (!(zahl(K.nkm_j) > 0)) sperren.push({ was: 'Mieteinnahme', wo: 'Reiter Objekt' });
 
-    var darlehen = feldZahl('d1_betrag') + feldZahl('d2_betrag');
+    var darlehen = feldZahl('d1_betrag') + feldZahl('d2_betrag') + ((window.State && State.dw_summe) || 0);   /* v3215: + weitere Darlehen */
     var ek = feldZahl('ek');
     if (!(darlehen > 0) && !(ek > 0)) {
       sperren.push({
@@ -971,11 +971,21 @@
       zeile('Sollzins / Tilgung', [pct(num('d2z'), 2), pct(num('d2t'), 2)].join('  ·  '), { einzug: true, klein: true });
       var r2 = (d2 || 0) * ((num('d2z') || 0) + (num('d2t') || 0)) / 100 / 12;
       zeile('Rate Darlehen II / Monat', eur(r2, 2), { einzug: true, klein: true });
-      var sum = (d1 || 0) + (d2 || 0);
-      if (sum > 0) zeile('Mischzins (gewichtet)', pct(((d1 || 0) * (num('d1z') || 0) + (d2 || 0) * (num('d2z') || 0)) / sum, 2), { einzug: true, klein: true });
-      zeile('Gesamtrate / Monat', eur((S.d1_rate_monthly || 0) + r2, 2), { einzug: true, klein: true });
     }
-    zeile('Finanzierung gesamt', eur((d1 || 0) + (d2 || 0)), { summe: true });
+    /* v3215 · W-17: weitere Darlehen aus dem Rechenlauf (State, Kern DpDarlehenWeitere) */
+    var _W = window.DpDarlehenWeitere, _dwL = _W ? (S.dw_liste || []) : [], _dwSum = S.dw_summe || 0, _dwZj = (S.dw_zm || 0) * 12;
+    _dwL.forEach(function (e, i) {
+      var _ab = _W.abKauf(e, S.dw_basisjahr);
+      zeile(_W.name(e, i) + (_ab ? '' : ' (ab ' + e.start_jahr + ')'), eur(e.betrag));
+      zeile('Sollzins / Tilgung / Zinsbindung', [pct(e.zins, 2), e.art === 'tilgungsaussetzung' ? 'Tilgungsaussetzung' : pct(e.tilg, 2), e.bindj ? fmt(e.bindj) + ' Jahre' : '-'].join('  ·  '), { einzug: true, klein: true });
+      zeile('Rate / Monat', eur(_W.rateM(e), 2), { einzug: true, klein: true });
+    });
+    if (d2an || _dwSum > 0) {
+      var sum = (d1 || 0) + (d2 || 0) + _dwSum;
+      if (sum > 0) zeile('Mischzins (gewichtet)', pct(((d1 || 0) * (num('d1z') || 0) + (d2 || 0) * (num('d2z') || 0) + _dwZj * 100) / sum, 2), { einzug: true, klein: true });
+      zeile('Gesamtrate / Monat', eur((S.d1_rate_monthly || 0) + (d2an ? r2 : 0) + (S.dw_rate_m || 0), 2), { einzug: true, klein: true });
+    }
+    zeile('Finanzierung gesamt', eur((d1 || 0) + (d2 || 0) + _dwSum), { summe: true });
     zeile('Beleihungsauslauf (LTV)', pct(K.ltv, 1) + (S.ltv_basis_label ? '  ·  auf ' + S.ltv_basis_label : ''));
     var bindEl = el('r-bindend');
     if (bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '-') zeile('Zinsbindung bis', bindEl.textContent.trim());
@@ -984,6 +994,7 @@
        Wertpuffer gegen einen angegebenen Verkehrswert (dieselben Felder wie pdf.js). */
     var _strukt = aussetzung ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag')
       : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen (Zins und Tilgung)');
+    if (_dwL.length) _strukt += ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen');   /* v3215 */
     zeile('Finanzierungsstruktur', _strukt, { klein: true });   /* v2940 · auch in der Kurzfassung */
     var _svw = num('svwert');
     if (_svw) {   /* v2940 · auch in der Kurzfassung */

@@ -87,6 +87,7 @@ var FIELDS = [
   // V63.49: D1-Typ + Bausparvertrag
   'd1_type', 'd1_auszahl', 'd1_vertrag',
   'd2_auszahl', 'd2_az', 'd2_at',  /* V354-fields: D2 Auszahlung + eigene Anschlussfinanzierung */
+  'darlehen_weitere',  /* v3215 · W-17: weitere Darlehen (Darlehen III …), JSON - js/darlehen-weitere.js */
   /* ── v1828 · DREI FELDER, DIE JEDES SPEICHERN VERWARFEN ────────────────
    *
    * GEMESSEN am 04.10.2026: `d2_vertrag`, `d2_bspar` und `ek_inkl_nk`
@@ -625,6 +626,7 @@ function loadData(d) {
     'weg_r',                                      // WEG-Rücklage (Info)
     'weg_su',                                     // v3092 N100: Sonderumlagen der WEG (sonst erbt Objekt B die Umlage von A)
     'san_plan',                                   // v3214 N137: weitere Sanierungen (sonst erbt Objekt B die Liste von A)
+    'darlehen_weitere',                           // v3215 W-17: weitere Darlehen (sonst erbt Objekt B die Darlehen von A)
     'kp1', 'kp2', 'kp3', 'kp4',                   // Sonderkosten (calc.js Z.545)
     'kp1l', 'kp2l', 'kp3l', 'kp4l',               // Sonderkosten Labels
     /* ── v1237 · Die Ueberfuehrungsfelder, dieselbe Falle zum dritten Mal ──
@@ -3142,7 +3144,9 @@ function extractKpisFromData(d) {
   var d2_zm = d2 > 0 ? (d2 * d2z / 12) : 0;
   var d2_tm = (d._d2_enabled && d.d2_type !== 'tilgungsaussetzung') ? ((d2 * (d2z + (parseFloat(d.d2t) || 0) / 100)) / 12 - d2_zm) : 0;
   var d2_rate_m = d2_zm + d2_tm;
-  var rate_total_m = d1_rate_m + d2_rate_m;
+  /* v3215 · W-17: weitere Darlehen ab Kauf (Kern DpDarlehenWeitere) */
+  var _dw = window.DpDarlehenWeitere ? DpDarlehenWeitere.ausObjekt(d) : { betrag: 0, rate_m: 0 };
+  var rate_total_m = d1_rate_m + d2_rate_m + _dw.rate_m;
   var kd_year = rate_total_m * 12;
 
   // Use stored summary fields if available (from latest save)
@@ -3153,7 +3157,7 @@ function extractKpisFromData(d) {
   return {
     kp: kp,
     nkm_m: nkm_m,
-    d_total: d1 + d2,
+    d_total: d1 + d2 + _dw.betrag,   /* v3215 */
     bmy: stored_bmy,
     cf_ns_yearly: stored_cf_ns,
     cf_ns_monthly: stored_cf_ns / 12,
@@ -4289,6 +4293,39 @@ function _buildBankExportRows(objects) {
         restschuld_ende: ds,  // bleibt voll bis Tilgungsaussetzung endet
         volltilgung: '–'
       }));
+    }
+
+    /* v3215 · W-17: je weiteres Darlehen eine Zeile. Gerechnet im Kern DpDarlehenWeitere:
+       aktuelle Restschuld = Monate seit Auszahlung (Kauf, sonst 1. Januar des Start-Jahres),
+       Restschuld am Ende SEINER Zinsbindung. rowType je Eintrag eindeutig (Auswahl-Schluessel). */
+    if (window.DpDarlehenWeitere) {
+      var _dwBy = DpDarlehenWeitere.basisJahrAus(d);
+      DpDarlehenWeitere.lesen(d.darlehen_weitere).forEach(function (e, i) {
+        rowNr++;
+        var _ab = DpDarlehenWeitere.abKauf(e, _dwBy);
+        var _start = _ab ? (d.kaufdat ? new Date(d.kaufdat) : new Date()) : new Date(e.start_jahr, 0, 1);
+        var _mon = _monthsBetween(_start, new Date());
+        var _e0 = Object.assign({}, e, { start_jahr: null });
+        var _bindEnd = new Date(_start.getTime()); _bindEnd.setFullYear(_bindEnd.getFullYear() + (e.bindj || 10));
+        rows.push(Object.assign({}, commonFields, {
+          nr: rowNr,
+          rowType: 'weitere' + (i + 1),
+          objectId: o.id,
+          bank: '–',
+          art: DpDarlehenWeitere.name(e, i) + (e.art === 'tilgungsaussetzung' ? ' (Tilgungsaussetzung)' : ' (Annuität)'),
+          vertragsnr: '–',
+          fin_datum: _start.toLocaleDateString('de-DE'),
+          darl_summe: e.betrag,
+          zins: e.zins / 100,
+          tilgung: e.tilg / 100,
+          kapitaldienst: DpDarlehenWeitere.rateM(e),
+          zinsbindung: e.bindj || 10,
+          akt_restschuld: _start > new Date() ? 0 : DpDarlehenWeitere.restNach([_e0], _mon, {}),
+          laufzeit: _bindEnd.toLocaleDateString('de-DE'),
+          restschuld_ende: DpDarlehenWeitere.restBindungsende(e),
+          volltilgung: '–'
+        }));
+      });
     }
 
     // V105: Row 4 — Bausparvertrag IMMER als eigene Zeile wenn Bauspar-Card aktiv ist

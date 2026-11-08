@@ -78,6 +78,8 @@ const LADER = path.join(WURZEL, 'backend', 'src', 'services', 'rechenkerne.js');
  * `backend/src/services/rechenkerne.js` und NUR dort. */
 const KERNE = [
   { datei: 'dscr-engine.js', global: 'Dscr' },
+  /* v3215 · W-17: weitere Darlehen - deal-kpis.js liest window.DpDarlehenWeitere */
+  { datei: 'darlehen-weitere.js', global: 'DpDarlehenWeitere' },
   { datei: 'deal-kpis.js', global: 'DealKpis' },
   { datei: 'score-tiers.js', global: 'ScoreTier' },
   { datei: 'dealscore.js', global: 'DealScore' },
@@ -139,6 +141,11 @@ function ladenUndPruefen() {
   const k = rk.kpis({ kp: 200000, nkm: 1000, d1: 180000, d1z: 4, d1t: 2 });
   if (Math.abs(k.bmy - 6) > 1e-9) throw new Error('DealKpis.compute: bmy ' + k.bmy);
   if (Math.abs(k.rate_j - 10800) > 1e-9) throw new Error('DealKpis.compute: rate_j ' + k.rate_j);
+
+  /* v3215 · W-17: ein weiteres Darlehen 50.000 zu 3+2 % -> Rate +2.500, Summe 230.000. */
+  const k3 = rk.kpis({ kp: 200000, nkm: 1000, d1: 180000, d1z: 4, d1t: 2, darlehen_weitere: [{ betrag: 50000, zins: 3, tilg: 2 }] });
+  if (Math.abs(k3.rate_j - 13300) > 1e-9) throw new Error('DealKpis.compute mit weiteren Darlehen: rate_j ' + k3.rate_j);
+  if (k3.d_total !== 230000) throw new Error('DealKpis.compute mit weiteren Darlehen: d_total ' + k3.d_total);
 
   /* STUFE: die Kette aus CLAUDE.md, an jeder Schwelle einmal angefasst. */
   [[85, 'Sehr gut'], [84.9, 'Gut'], [70, 'Gut'], [69.9, 'Solide'], [50, 'Solide'],
