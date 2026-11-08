@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3210a';
+  var VERSION = 'v3212';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -300,6 +300,45 @@
 
   /* ── v3177 · Führendes Verfahren, deutlich und begründet ──────────── */
   var VERF_NAME = { sachwert: 'Sachwertverfahren', vergleichswert: 'Vergleichswertverfahren', ertragswert: 'Ertragswertverfahren', angebote: 'Marktpreisindikation aus Angeboten' };
+  /* v3212 · Wertspanne als Band (Variante D): Marken je Verfahren, fuehrendes Gold, Kaufpreis schwarz;
+     Beschriftung abwechselnd oben/unten, damit nahe Werte sich nicht ueberdecken. */
+  function spanneBand(liste, kp) {
+    var m = liste.map(function (x) { return { t: x.name.replace(/ \(.*\)$/, '').replace(/^Marktpreisindikation aus Angeboten$/, 'Angebote'), w: Number(x.wert), f: !!x.fuehrend }; })
+      .filter(function (x) { return isFinite(x.w) && x.w > 0; });
+    if (istZahl(kp)) m.push({ t: 'Kaufpreis', w: Number(kp), k: true });
+    if (m.length < 2) return '';
+    var lo = Math.min.apply(null, m.map(function (x) { return x.w; })), hi = Math.max.apply(null, m.map(function (x) { return x.w; }));
+    var pad = (hi - lo) * 0.15 || hi * 0.05, a = lo - pad, z = hi + pad;
+    var pos = function (w) { return ((w - a) / (z - a) * 100).toFixed(2); };
+    var vw = m.filter(function (x) { return !x.k; }).map(function (x) { return x.w; });
+    var vLo = Math.min.apply(null, vw), vHi = Math.max.apply(null, vw);
+    var h = '<div class="sp"><div class="sb"></div>' + (vw.length > 1 ? '<div class="sband" style="left:' + pos(vLo) + '%;width:' + (pos(vHi) - pos(vLo)).toFixed(2) + '%"></div>' : '');
+    m.sort(function (x, y) { return x.w - y.w; }).forEach(function (x, i) {
+      var farbe = x.k ? '#050505' : x.f ? 'var(--gold)' : '#8a8478';
+      h += '<div class="sm" style="left:' + pos(x.w) + '%;background:' + farbe + '"></div><div class="st' + (i % 2 ? ' u' : '') + '" style="left:' + pos(x.w) + '%">' + esc(x.t) + '<br><b>' + zahl(Math.round(x.w / 1000), 0) + ' T€</b></div>';
+    });
+    return h + '</div><div class="spl"><span>' + zahl(Math.round(a / 1000), 0) + ' T€</span><span>Spanne der Verfahren ' + zahl(Math.round(vLo / 1000), 0) + '–' + zahl(Math.round(vHi / 1000), 0) + ' T€'
+      + (vLo > 0 && vw.length > 1 ? ' (' + zahl((vHi / vLo - 1) * 100, 1) + ' % auseinander)' : '') + '</span><span>' + zahl(Math.round(z / 1000), 0) + ' T€</span></div>';
+  }
+  /* v3212 · die Verfahren als Balken, senkrechter Strich = Marktwert-Indikation (fuehrendes Verfahren) */
+  function verfahrenBalken(v, wfl) {
+    if (!v.liste.length) return '';
+    var max = Math.max.apply(null, v.liste.map(function (x) { return Number(x.wert) || 0; })) * 1.08;
+    var mw = v.fuehrend ? Number(v.fuehrend.wert) : null;
+    var h = v.liste.map(function (x) {
+      var w = Number(x.wert) || 0, zus = '';
+      if (x.id === 'angebote') {
+        if (istZahl(x.low) && istZahl(x.high)) zus += 'Spanne ' + eur(x.low) + ' – ' + eur(x.high) + '. ';
+        if (x.abschlag && istZahl(x.abschlag.pct)) zus += 'Angebotsabschlag ' + zahl(x.abschlag.pct, 1) + ' %' + (x.abschlag.roh && istZahl(x.abschlag.roh.estimated) ? ' auf ' + eur(x.abschlag.roh.estimated) : '') + '.';
+      }
+      return '<div class="vb"><div class="vn">' + esc(x.name) + '<i>' + (x.fuehrend ? 'führend · ' : '') + esc(x.recht) + ' · ' + esc(x.tag) + '</i></div>'
+        + '<div class="vt"><div class="vf' + (x.fuehrend ? ' g' : '') + '" style="width:' + (w / max * 100).toFixed(1) + '%"></div>'
+        + (mw ? '<div class="vm" style="left:' + (mw / max * 100).toFixed(1) + '%"></div>' : '') + '</div>'
+        + '<div class="vw">' + eur(w) + (wfl ? '<small>' + zahl(w / wfl, 0) + ' €/m²</small>' : '') + '</div></div>'
+        + (zus ? '<p class="det" style="margin:-1mm 0 2mm 49mm">' + esc(zus.trim()) + '</p>' : '');
+    }).join('');
+    return h + (mw ? '<p class="det">Senkrechter Strich: Marktwert-Indikation ' + eur(mw) + '.</p>' : '');
+  }
   function fuehrendBox(v) {
     if (!v.fuehrend) return '';
     var f = v.fuehrend;
@@ -365,6 +404,63 @@
       });
     });
   }
+  /* v3212 · Bodenrichtwerte im Kartenausschnitt (Marcel 08.11.2026: "die Bodenrichtwert-Bereiche
+     auch angeben"). GetFeatureInfo desselben WMS an 15 Punkten (5 x 3) der Nahkarte, die Mitte ist das
+     Objekt. Je Zone der juengste Stichtag. Eine Stichprobe: sehr kleine Zonen zwischen den Punkten
+     koennen fehlen - der Bericht sagt das. */
+  var BRW_NUTZUNG = { brw_wohnbauflaeche: 'Wohnbaufläche', brw_gemischte_bauweise: 'gemischte Baufläche',
+    brw_gewerbliche_bauweise: 'gewerbliche Baufläche', brw_sonderbauflaeche: 'Sonderbaufläche' };
+  function zonenListe(lat, lon, zoom, w, h) {
+    if (!istZahl(lat) || !istZahl(lon)) return Promise.resolve(null);
+    var b = zonenBbox(Number(lat), Number(lon), zoom, w, h);
+    var res = (b[2] - b[0]) / w * Math.cos(Number(lat) * Math.PI / 180);   /* Meter je Pixel am Boden */
+    var punkte = [];
+    [0.17, 0.5, 0.83].forEach(function (fy) { [0.1, 0.3, 0.5, 0.7, 0.9].forEach(function (fx) { punkte.push([Math.round(w * fx), Math.round(h * fy)]); }); });
+    var basis = BRW_WMS + '?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&STYLES=&CRS=EPSG:3857&INFO_FORMAT=application/geo%2Bjson&FEATURE_COUNT=10'
+      + '&LAYERS=' + BRW_LAYER + '&QUERY_LAYERS=' + BRW_LAYER + '&WIDTH=' + w + '&HEIGHT=' + h + '&BBOX=' + b.map(function (v) { return v.toFixed(2); }).join(',');
+    var zonen = {};
+    var abfragen = punkte.map(function (pt) {
+      return fetch(basis + '&I=' + pt[0] + '&J=' + pt[1]).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+        var dist = Math.round(Math.sqrt(Math.pow(pt[0] - w / 2, 2) + Math.pow(pt[1] - h / 2, 2)) * res);
+        ((j && j.features) || []).forEach(function (f) {
+          var q = f.properties || {}, wert = parseFloat(String(q.Bodenrichtwert || '').replace(',', '.'));
+          if (!isFinite(wert)) return;
+          var key = (q.Gutachterausschussnummer || '') + '|' + (q.BodenrichtwertNummer || '') + '|' + (f.layerName || '');
+          var alt = zonen[key];
+          var neu = { wert: wert, stichtag: q.Stichtag || '', nr: q.BodenrichtwertNummer || '', ort: q.ortsteilName || q.Gemeindename || '',
+            nutzung: BRW_NUTZUNG[f.layerName] || 'Bodenrichtwertzone', gfz: q.Geschossflaechenzahl || q['wertrelevante Geschossflaechenzahl'] || '',
+            ausschuss: q.Gutachterausschussname || '', dist: dist, objekt: dist === 0 };
+          if (!alt) { zonen[key] = neu; return; }
+          if (neu.stichtag > alt.stichtag) { neu.dist = Math.min(neu.dist, alt.dist); neu.objekt = neu.objekt || alt.objekt; zonen[key] = neu; }
+          else { alt.dist = Math.min(alt.dist, dist); alt.objekt = alt.objekt || dist === 0; }
+        });
+      }).catch(function () {});
+    });
+    var zeit = new Promise(function (ok) { setTimeout(ok, 15000); });
+    return Promise.race([Promise.all(abfragen), zeit]).then(function () {
+      var l = Object.keys(zonen).map(function (k) { return zonen[k]; });
+      l.sort(function (x, y) { return (y.objekt - x.objekt) || (x.dist - y.dist); });
+      return l.length ? { liste: l, punkte: punkte.length } : null;
+    });
+  }
+  function zonenTabelle(z) {
+    if (!z || !z.liste || !z.liste.length) return '';
+    var l = z.liste.slice(0, 10), werte = z.liste.map(function (x) { return x.wert; });
+    var lo = Math.min.apply(null, werte), hi = Math.max.apply(null, werte);
+    var obj = z.liste.filter(function (x) { return x.objekt; })[0];
+    var st = z.liste.map(function (x) { return x.stichtag; }).sort().pop();
+    return '<div class="block"><h3>Bodenrichtwerte im Kartenausschnitt</h3><p class="det" style="margin:0 0 2mm">'
+      + (obj ? 'Das Objekt liegt in einer Zone mit ' + zahl(obj.wert, 0) + ' €/m² (' + esc(obj.nutzung) + '). ' : '')
+      + 'Im Ausschnitt der Nahkarte ' + (lo === hi ? zahl(lo, 0) + ' €/m²' : zahl(lo, 0) + ' bis ' + zahl(hi, 0) + ' €/m²') + ' in ' + z.liste.length + ' Zone' + (z.liste.length === 1 ? '' : 'n')
+      + (st ? ', Stichtag ' + esc(datum(st)) : '') + '.</p>'
+      + '<table class="lt"><thead><tr><th>Zone</th><th>Nutzung</th><th class="r">€/m²</th><th class="r">Stichtag</th><th class="r">Entfernung</th></tr></thead><tbody>'
+      + l.map(function (x) {
+        return '<tr' + (x.objekt ? ' class="ende"' : '') + '><td>' + (x.objekt ? 'Lage des Objekts' : 'Zone ' + esc(x.nr)) + (x.ort && !x.objekt ? ' · ' + esc(x.ort) : '') + '</td><td>' + esc(x.nutzung) + (x.gfz ? ', GFZ ' + esc(x.gfz) : '') + '</td>'
+          + '<td class="r num">' + zahl(x.wert, 0) + '</td><td class="r num">' + esc(datum(x.stichtag)) + '</td><td class="r num">' + (x.objekt ? '–' : 'ca. ' + zahl(Math.round(x.dist / 10) * 10, 0) + ' m') + '</td></tr>';
+      }).join('') + '</tbody></table>'
+      + '<p class="det">Abgefragt an ' + z.punkte + ' Punkten der Nahkarte; sehr kleine Zonen dazwischen können fehlen. Entfernung bis zum nächsten abgefragten Punkt der Zone. '
+      + (z.liste.length > l.length ? 'Gezeigt die ' + l.length + ' nächsten von ' + z.liste.length + ' Zonen. ' : '') + esc(BRW_VERMERK.replace(/^Bodenrichtwertzonen /, 'Quelle: ')) + '.</p></div>';
+  }
   function marke() {
     try {
       var b = window.DealPilotConfig && DealPilotConfig.branding;
@@ -399,10 +495,12 @@
         return Promise.all([
           karte(lat, lon, 16, 1200, 620).then(function (k) { return mitZonen(k, lat, lon, 16, 1200, 620); }),
           karte(lat, lon, 12, 1200, 620),
+          ((obj && obj.photos) || []).length ? Promise.resolve(null) : karte(lat, lon, 15, 1400, 660),
+          zonenListe(lat, lon, 16, 1200, 620).catch(function () { return null; }),
           window.DealPilotPdfLogo ? DealPilotPdfLogo.fuerMarke(b).catch(function () { return null; }) : Promise.resolve(null)
         ]).then(function (z) {
           return { id: id, p: p, md: rep.report_md || p.report_md || '', erstellt: rep.created_at || null,
-            obj: obj, fotos: (obj && obj.photos) || [], karteNah: z[0], karteFern: z[1], logo: z[2], marke: b };
+            obj: obj, fotos: (obj && obj.photos) || [], karteNah: z[0], karteFern: z[1], karteTitel: z[2], brwZonen: z[3], logo: z[4], marke: b };
         });
       });
     });
@@ -429,16 +527,33 @@
     'td.num,.r.num{white-space:nowrap}',
     /* Deckblatt */
     '.deck{padding:0;display:flex;flex-direction:column;height:297mm;overflow:hidden}',
-    '.deck .bild{height:128mm;background:var(--soft) center/cover no-repeat;position:relative}',
+    /* v3212 · Variante D: Bild ganz zeigen (contain) ueber einer unscharfen Kopie, Karte fuellt */
+    '.deck .bild{height:100mm;background:#1b1b1d;position:relative;overflow:hidden}',
+    '.deck .bild .bg{position:absolute;inset:-8mm;background:center/cover no-repeat;filter:blur(6mm) brightness(.7)}',
+    '.deck .bild img.vorne{position:relative;display:block;width:100%;height:100%;object-fit:contain}',
+    '.deck .bild.ist-karte img.vorne{object-fit:cover}.deck .bild .logo{z-index:2}',
+    '.kpis{display:grid;gap:3mm;margin:2mm 0 0}.kpi{border:.3mm solid var(--line);border-top:.9mm solid var(--gold);border-radius:1.2mm;padding:2.6mm 3.2mm}.kpi.hl{background:var(--gold-l)}',
+    '.kpi .kl{font:6.3pt/1.3 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.kpi .kw{font:600 13pt/1.2 "JetBrains Mono",monospace;margin-top:1mm;white-space:nowrap}.kpi .ks{font-size:7.2pt;color:var(--muted);margin-top:.4mm}',
+    '.umf{background:var(--gold-l);border-radius:1.4mm;padding:3mm 4mm;margin-top:6mm}.umk{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5mm;font:600 8pt "Space Grotesk",Inter,sans-serif}.umk .eyebrow{margin:0}',
+    '.toc2{display:grid;grid-template-columns:1fr 1fr;column-gap:8mm}.tz{display:flex;gap:2.4mm;padding:1.3mm 0;border-bottom:.25mm dotted color-mix(in srgb,var(--gold) 45%,#fff);font-size:8.4pt}.tz .tn{font:600 7pt/1.6 "JetBrains Mono",monospace;color:var(--gold);width:5mm}',
+    '.sp{position:relative;height:17mm;margin:10mm 2mm 0}.sp .sb{position:absolute;left:0;right:0;top:6mm;height:2.4mm;border-radius:2mm;background:#efece4}',
+    '.sp .sband{position:absolute;top:5.2mm;height:4mm;border-radius:2mm;background:linear-gradient(110deg,#E8CC7A,var(--gold) 55%,#b8932f);opacity:.5}',
+    '.sp .sm{position:absolute;top:4.2mm;width:1mm;height:6mm;margin-left:-.5mm;border-radius:.5mm}.sp .st{position:absolute;top:-7.4mm;transform:translateX(-50%);font-size:6.6pt;color:var(--muted);text-align:center;line-height:1.2;white-space:nowrap}',
+    '.sp .st b{font:600 7.2pt "JetBrains Mono",monospace;color:var(--ink)}.sp .st.u{top:11.4mm}.spl{display:flex;justify-content:space-between;font:6.2pt "JetBrains Mono",monospace;color:#888;margin:3mm 2mm 0}',
+    '.vb{display:grid;grid-template-columns:46mm 1fr 30mm;align-items:center;gap:3mm;margin-bottom:2.2mm;break-inside:avoid}.vb .vn{font-size:8.2pt;line-height:1.3}.vb .vn i{font-style:normal;color:color-mix(in srgb,var(--gold) 70%,#000);font-size:6.8pt;display:block}',
+    '.vb .vt{position:relative;height:3mm;background:#efece4;border-radius:2mm}.vb .vf{height:100%;border-radius:2mm;background:#d9cfb3}.vb .vf.g{background:linear-gradient(110deg,#E8CC7A,var(--gold) 55%,#b8932f)}.vb .vm{position:absolute;top:-1mm;width:.6mm;height:5mm;background:var(--ink)}',
+    '.vb .vw{font:600 8.4pt/1.3 "JetBrains Mono",monospace;text-align:right}.vb .vw small{display:block;font-weight:400;font-size:7pt;color:var(--muted)}',
+    '.rw-h{font-size:13pt;margin:8mm 0 1mm;padding-top:3mm;border-top:.3mm solid var(--ink)}.rw-h:first-of-type{margin-top:2mm;border-top:0;padding-top:0}',
+    '.fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin:2mm 0}.fotos img{width:100%;height:40mm;object-fit:cover;border-radius:1.2mm;display:block}',
     '.deck .bild .logo{position:absolute;top:12mm;left:17mm;background:#fff;padding:3mm 4mm;border-radius:1.5mm}',
     '.deck .bild .logo img{height:11mm;width:auto;display:block}',
-    '.deck .inhalt{padding:12mm 17mm 0;flex:1}',
+    '.deck .inhalt{padding:9mm 17mm 0;flex:1}',
     '.deck h1{font-size:25pt;line-height:1.12;margin:2mm 0 2mm}',
-    '.deck .adr{font-size:12pt;color:var(--muted);margin-bottom:9mm}',
+    '.deck .adr{font-size:11pt;color:var(--muted);margin-bottom:5mm}',
     '.deck .wertbox{display:grid;grid-template-columns:1.1fr 1fr;gap:8mm;align-items:end;border-top:.3mm solid var(--ink);border-bottom:.2mm solid var(--line);padding:6mm 0}',
     '.deck .wert{font:500 30pt/1 "JetBrains Mono",monospace;letter-spacing:-.02em}',
     '.deck .lbl{font:7.5pt/1.3 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2.5mm}',
-    '.deck .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;margin-top:7mm;font-size:8.6pt}',
+    '.deck .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;margin-top:5mm;font-size:8.6pt}',
     '.deck .meta b{display:block;font:7pt/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400;margin-bottom:1mm}',
     '.deck .abs{padding:0 17mm 14mm;display:flex;justify-content:space-between;align-items:flex-end;gap:8mm;font-size:8.4pt;color:var(--muted)}',
     '.deck .abs strong{color:var(--ink);font-weight:600}',
@@ -514,24 +629,50 @@
     var od = (d.obj && d.obj.data) || {};
     var v = verfahren(p);
     var stichtag = (p.wertermittlungsstichtag && typeof p.wertermittlungsstichtag === 'object' ? p.wertermittlungsstichtag.datum : p.wertermittlungsstichtag) || (p.ref && p.ref.wertermittlungsstichtag) || d.erstellt;
-    var titelbild = d.fotos[0] || d.karteNah || '';
     var ergebnis = v.fuehrend ? v.fuehrend.wert : null;
     var art = OBJART[String(od.objart || r.property_type || '').toLowerCase()] || OBJART[String(r.property_type || '').toLowerCase()] || (od.objart || r.property_type || 'Immobilie');
     var b = d.marke || {};
     var teile = [];
+    /* v3212 · Variante D (Marcel 08.11.2026): nummerierte Abschnitte, Inhalt auf dem Deckblatt */
+    var inhalt = [];
+    function ab(titel) { inhalt.push(titel); return '<div class="eyebrow">Abschnitt ' + ('0' + inhalt.length).slice(-2) + '</div>'; }
+    /* Rechenwege laufen hintereinander auf EINER Strecke statt je einer eigenen Seite */
+    var rw = [];
+    function rwTeil(dd, titel, innen) {
+      rw.push(String(innen).replace(/<div class="eyebrow">[^<]*<\/div>/, '').replace('<h2>', '<h2 class="rw-h">'));
+      return '';
+    }
 
-    /* 1 · Deckblatt */
+    /* 1 · Deckblatt · v3211 Variante D: Foto ganz (nicht angeschnitten), ohne Foto die Karte (Zoom 15);
+       Kennzahl-Karten OHNE Angebotspreis (Marcel 08.11.: "brauchen wir im Ankauf nicht"), Inhalt */
+    var titelbild = d.fotos[0] || d.karteTitel || d.karteNah || '';
+    var istKarte = !d.fotos[0];
+    var werteV = v.liste.map(function (x) { return Number(x.wert); }).filter(function (x) { return isFinite(x) && x > 0; });
+    var vMin = werteV.length ? Math.min.apply(null, werteV) : null, vMax = werteV.length ? Math.max.apply(null, werteV) : null;
+    var tsd = function (x) { return zahl(Math.round(x / 1000), 0); };
+    var lvD = p.land_value || {};
+    var kpis = [];
+    kpis.push('<div class="kpi hl"><div class="kl">Marktwert-Indikation</div><div class="kw">' + eur(ergebnis) + '</div><div class="ks">'
+      + (istZahl(ergebnis) && istZahl(r.living_area) && Number(r.living_area) > 0 ? zahl(Number(ergebnis) / Number(r.living_area), 0) + ' €/m²' : '')
+      + (v.fuehrend ? (istZahl(r.living_area) ? ' · ' : '') + esc((VERF_NAME[v.fuehrend.id] || v.fuehrend.name).replace(/verfahren$/, '')) : '') + '</div></div>');
+    if (werteV.length > 1) kpis.push('<div class="kpi"><div class="kl">Spanne der Verfahren</div><div class="kw">' + tsd(vMin) + '–' + tsd(vMax) + ' T€</div><div class="ks">' + werteV.length + ' Verfahren</div></div>');
+    if (istZahl(r.purchase_price)) {
+      var abw = istZahl(ergebnis) && Number(ergebnis) > 0 ? (Number(r.purchase_price) / Number(ergebnis) - 1) * 100 : null;
+      kpis.push('<div class="kpi"><div class="kl">Kaufpreis</div><div class="kw">' + eur(r.purchase_price) + '</div><div class="ks">'
+        + (abw == null ? '' : Math.abs(abw) < 0.5 ? 'gleich dem Marktwert' : zahl(Math.abs(abw), 1) + ' % ' + (abw < 0 ? 'unter' : 'über') + ' dem Marktwert') + '</div></div>');
+    }
+    if (istZahl(lvD.value_sqm)) kpis.push('<div class="kpi"><div class="kl">Bodenrichtwert</div><div class="kw">' + zahl(lvD.value_sqm, 0) + ' €/m²</div><div class="ks">' + esc(lvD.stichtag ? 'Stichtag ' + datum(lvD.stichtag) : 'amtlich') + '</div></div>');
     teile.push('<section class="seite deck">'
-      + '<div class="bild" style="background-image:url(\'' + titelbild + '\')">'
+      + '<div class="bild' + (istKarte ? ' ist-karte' : '') + '">'
+      + (titelbild && !istKarte ? '<div class="bg" style="background-image:url(\'' + titelbild + '\')"></div>' : '')
+      + (titelbild ? '<img class="vorne" src="' + titelbild + '" alt="">' : '')
       + (d.logo && d.logo.b64 ? '<div class="logo"><img src="' + d.logo.b64 + '" alt=""></div>' : '') + '</div>'
       + '<div class="inhalt"><div class="eyebrow">Marktbericht Profi · Wertermittlung mit Herleitung</div>'
-      + '<h1>' + esc(r.address || '') + '</h1><div class="adr">' + esc(art) + (istZahl(r.build_year) ? ', Baujahr ' + jahr(r.build_year) : '')
-      + (istZahl(r.living_area) ? ', ' + zahl(r.living_area, 0) + ' m² Wohnfläche' : '') + (istZahl(r.plot_area) ? ', ' + zahl(r.plot_area, 0) + ' m² Grundstück' : '') + '</div>'
-      + '<div class="wertbox"><div><div class="lbl">Marktwert-Indikation' + (v.fuehrend ? ' · ' + esc(v.fuehrend.name) : '') + '</div>'
-      + '<div class="wert">' + eur(ergebnis) + '</div></div>'
-      + '<div style="font-size:8.6pt;color:var(--muted)">' + (istZahl(r.purchase_price) ? 'Kaufpreis ' + eur(r.purchase_price) + ' · ' : '')
-      + (istZahl(ergebnis) && istZahl(r.living_area) ? zahl(Number(ergebnis) / Number(r.living_area), 0) + ' €/m² Wohnfläche' : '') + '</div></div>'
-      + '<div class="meta"><div><b>Wertermittlungsstichtag</b>' + esc(datum(stichtag)) + '</div><div><b>Grundlage</b>ImmoWertV 2021</div><div><b>Bericht</b>Nr. ' + esc(d.id) + '</div></div></div>'
+      + '<h1>' + esc(r.address || '') + '</h1><div class="adr">' + esc(art) + (istZahl(r.living_area) ? ' · ' + zahl(r.living_area, 0) + ' m² Wohnfläche' : '')
+      + (istZahl(r.build_year) ? ' · Baujahr ' + jahr(r.build_year) : '') + (istZahl(r.plot_area) ? ' · Grundstück ' + zahl(r.plot_area, 0) + ' m²' : '') + '</div>'
+      + '<div class="kpis" style="grid-template-columns:repeat(' + kpis.length + ',1fr)">' + kpis.join('') + '</div>'
+      + '<div class="meta"><div><b>Wertermittlungsstichtag</b>' + esc(datum(stichtag)) + '</div><div><b>Grundlage</b>ImmoWertV 2021</div><div><b>Bericht</b>Nr. ' + esc(d.id) + ' · Stufe 3</div></div>'
+      + '%%INHALT%%</div>'
       + '<div class="abs"><div><strong>' + esc(b.company || '') + '</strong>' + (b.name && b.name !== b.company ? '<br>' + esc(b.name) : '')
       + '<br>' + esc([b.address, ((b.plz || '') + ' ' + (b.city || '')).trim()].filter(Boolean).join(', '))
       + '<br>' + esc([b.phone, b.email].filter(Boolean).join(' · ')) + '</div>'
@@ -567,9 +708,11 @@
     var mietTab = mieten.length ? '<div class="block"><h3>Mieten je m² Wohnfläche</h3><table><tbody>' + mieten.map(function (z) {
       return '<tr><td>' + esc(z[0]) + '</td><td class="r num">' + (istZahl(z[1]) ? zahl(z[1], 2) + ' €/m²' : '') + '</td><td class="q">' + esc(String(z[2] || '').slice(0, 140)) + '</td></tr>';
     }).join('') + '</tbody></table></div>' : '';
-    teile.push(seite(d, 'Ergebnis', '<div class="eyebrow">Ergebnis</div><h2>Marktwert-Indikation ' + eur(ergebnis) + '</h2>'
-      + (v.fuehrend ? '' : '<p class="sub">' + esc(v.grund) + '</p>')   /* v3178: Begruendung steht im Kasten */
-      + fuehrendBox(v) + spanneSvg(v.liste, r.purchase_price) + '<div class="verf">' + kacheln + '</div>' + mietTab
+    void kacheln;
+    teile.push(seite(d, 'Ergebnis', ab('Ergebnis') + '<h2>Marktwert-Indikation ' + eur(ergebnis) + '</h2>'
+      + '<p class="sub">' + (istZahl(ergebnis) && wflQm ? zahl(Number(ergebnis) / wflQm, 0) + ' €/m² Wohnfläche' : '')
+      + (p.sale && istZahl(p.sale.sample_size) ? (wflQm ? ' · ' : '') + zahl(p.sale.sample_size, 0) + ' Vergleichsangebote' : '') + (v.fuehrend ? '' : ' · ' + esc(v.grund)) + '</p>'
+      + fuehrendBox(v) + '<h3>Wertspanne</h3>' + spanneBand(v.liste, r.purchase_price) + '<h3>Die Verfahren</h3>' + verfahrenBalken(v, wflQm)
       + (d.md ? '<h3>Einschätzung</h3>' + zusammenfassung(d.md) : '')));
 
     /* 3 · Objekt */
@@ -581,10 +724,12 @@
       ['Modernisierungspunkte', istZahl(r.mod_punkte) ? zahl(r.mod_punkte, 0) + ' (Anlage 2 ImmoWertV)' : 'keine Angabe'],
       ['Garagen / Stellplätze', istZahl(r.garages) ? zahl(r.garages, 0) : (od.garagen || '–')]
     ].map(function (z) { return '<div><span>' + esc(z[0]) + '</span><span>' + esc(z[1]) + '</span></div>'; }).join('');
-    var gal = d.fotos.slice(1, 5).map(function (f) { return '<img src="' + f + '" alt="">'; }).join('');
-    teile.push(seite(d, 'Objekt', '<div class="eyebrow">Abschnitt 1</div><h2>Das Objekt</h2><p class="sub">Angaben zum Objekt, wie sie dem Bericht zugrunde liegen.</p>'
-      + '<div class="kv">' + kv + '</div><h3>Energieeffizienz</h3>' + energieSkala(od.ds2_energie || r.eq_energie, od.endenergie || od.energie_kwh || null)
-      + (gal ? '<h3>Ansichten</h3><div class="galerie">' + gal + '</div>' : '')));
+    var gal = d.fotos.slice(1, 4).map(function (f) { return '<img src="' + f + '" alt="">'; }).join('');
+    teile.push(seite(d, 'Objekt', ab('Das Objekt') + '<h2>Das Objekt</h2><p class="sub">Angaben zum Objekt, wie sie dem Bericht zugrunde liegen.</p>'
+      + '<div class="kv">' + kv + '</div>'
+      + (gal ? '<h3>Objektfotos</h3><div class="fotos">' + gal + '</div>' : '')
+      + '<h3>Energieeffizienz</h3>' + energieSkala(od.ds2_energie || r.eq_energie, od.endenergie || od.energie_kwh || null)
+      + mietTab));
 
     /* 4 · Lage */
     var mk = (p.makro_kennzahlen && p.makro_kennzahlen.werte) || [];
@@ -593,10 +738,13 @@
         + (istZahl(w.wert) ? (w.vorzeichen && Number(w.wert) > 0 ? '+' : '') + zahl(w.wert, istZahl(w.nachkomma) ? w.nachkomma : 1) : '–') + ' ' + esc(w.einheit || '') + '</td><td class="q">' + esc(w.jahr ? 'Stand ' + w.jahr : '') + '</td></tr>';
     }).join('');
     var z = p.zensus || {};
-    teile.push(seite(d, 'Lage', '<div class="eyebrow">Abschnitt 2</div><h2>Lage</h2>'
+    var regionTabL = (mk.length ? '<div class="block"><h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>'
+      + ((p.zensus || {}).available ? '<p class="det" style="margin-top:2mm">Zensus 2022 (' + esc((p.zensus.gemeinde && p.zensus.gemeinde.name) || p.zensus.kreis_name || '') + '): Leerstandsquote ' + zahl(p.zensus.leerstandsquote, 1) + ' %, Eigentümerquote ' + zahl(p.zensus.eigentuemerquote, 1) + ' %.</p>' : '') + '</div>' : '');
+    teile.push(seite(d, 'Lage', ab('Lage') + '<h2>Lage</h2>'
       + '<p class="sub">' + esc([r.ortsteil, r.gemeinde].filter(Boolean).join(', ')) + (p.assessment ? ' · Mikrolage ' + esc(p.assessment.mikrolage || '–') + ', Makrolage ' + esc(p.assessment.makrolage || '–') : '') + '</p>'
       + '<div class="zwei">' + (d.karteNah ? '<img class="karte" src="' + d.karteNah + '" alt="Karte Umgebung">' : '') + (d.karteFern ? '<img class="karte" src="' + d.karteFern + '" alt="Karte Region">' : '') + '</div>'
-      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro)));
+      + zonenTabelle(d.brwZonen)
+      + '<h3>Mikrolage' + (p.micro && istZahl(p.micro.score) ? ' · ' + zahl(p.micro.score, 0) + ' von 100' : '') + '</h3>' + mikrolage(p.micro) + umgebung(p.micro) + regionTabL));
     /* v3178c · Region und Bewertung gehoeren zur Seite Markt & Region (sonst lief Lage ueber) */
     var regionHtml = bewertung(p.assessment);
     var regionTab = (makro ? '<div class="block"><h3>Region</h3><table><thead><tr><th>Kennzahl</th><th>Gebiet</th><th class="r">Wert</th><th></th></tr></thead><tbody>' + makro + '</tbody></table>'
@@ -609,7 +757,7 @@
       + (istZahl(m.median_per_sqm) ? '<tr><td>Mieten €/m²</td><td class="r num">' + zahl(m.q25_per_sqm, 2) + '</td><td class="r num">' + zahl(m.median_per_sqm, 2) + '</td><td class="r num">' + zahl(m.q75_per_sqm, 2) + '</td><td class="r num">' + zahl(m.sample_size, 0) + '</td></tr>' : '')
       + '</tbody></table>';
     var mv = (p.valuation && p.valuation.market_value) || {};
-    teile.push(seite(d, 'Markt und Region', '<div class="eyebrow">Abschnitt 3</div><h2>Markt und Region</h2>'
+    teile.push(seite(d, 'Markt', ab('Markt') + '<h2>Markt</h2>'
       + '<p class="sub">Aktueller Marktdurchschnitt vergleichbarer Angebote im Umkreis von ' + zahl((s.used_radius_m || 0) / 1000, 0) + ' km. Angebotspreise sind keine Kaufpreise; sie werden um den Angebotsabschlag bereinigt.</p>'
       + markt
       + '<div class="kv" style="margin-top:4mm">'
@@ -620,7 +768,8 @@
       + ((p.valuation && p.valuation.notes || []).length ? '<p class="det" style="margin-top:3mm">' + esc(p.valuation.notes.join(' ')) + '</p>' : '')
       + kennzahlen(p, r) + marktentwicklung(p.market_history) + regionHtml));
     var vgl = vergleichsangebote(p);
-    if (vgl || regionTab) teile.push(seite(d, 'Vergleichsangebote und Region', '<div class="eyebrow">Abschnitt 3 · Fortsetzung</div><h2>Vergleichsangebote und Region</h2><p class="sub">Vergleichbare Angebote im Umkreis, nach Entfernung, und die Kennzahlen der Region.</p>' + regionTab + (vgl || '')));
+    void regionTab;
+    if (vgl) teile.push(seite(d, 'Vergleichsangebote', ab('Vergleichsangebote') + '<h2>Vergleichsangebote</h2><p class="sub">Vergleichbare Angebote im Umkreis, nach Entfernung.</p>' + vgl));
 
     /* 6 · Bodenwert + Sachwert */
     var bw = c.bodenwert || {}, sw = c.sachwert || {}, lv = p.land_value || {};
@@ -642,7 +791,7 @@
     if (bwRows.length || istZahl(sw.value_eur)) {
       /* v3207 · ohne Sachwert (z. B. Eigentumswohnung) heisst die Seite nur „Bodenwert" */
       var swTitel = istZahl(sw.value_eur) ? (bwRows.length ? 'Bodenwert und Sachwert' : 'Sachwert') : 'Bodenwert';
-      teile.push(seite(d, swTitel, '<div class="eyebrow">Abschnitt 4</div><h2>' + swTitel + '</h2><p class="sub">Zeile für Zeile, mit der Fundstelle jeder Zahl.</p>'
+      teile.push(rwTeil(d, swTitel, '<div class="eyebrow">Abschnitt 4</div><h2>' + swTitel + '</h2><p class="sub">Zeile für Zeile, mit der Fundstelle jeder Zahl.</p>'
         + (bwRows.length ? '<h3>Bodenwert</h3>' + staffelTabelle(bwRows, bwQ) : '')
         + (istZahl(sw.value_eur) ? '<h3>Sachwert</h3>' + staffelTabelle(sw.staffel, swQ)
           + (sw.restnutzungsdauer_herkunft && sw.restnutzungsdauer_herkunft.hinweis ? '<p class="det">' + esc(sw.restnutzungsdauer_herkunft.hinweis) + '</p>' : '')
@@ -661,12 +810,12 @@
           var w = istZahl(x.faktor) ? zahl(x.faktor, 3) : (istZahl(x.wert) ? (x.einheit === '€/m²' ? zahl(x.wert, 2) + ' €/m²' : eur(x.wert)) : (istZahl(x.zuschlag_prozent) ? zahl(x.zuschlag_prozent, 1) + ' %' : ''));
           return '<tr class="' + (ende ? 'ende' : /^=/.test(x.pos) ? 'summe' : '') + '"><td>' + esc(x.pos) + '</td><td class="q">' + esc(x.detail || '') + '</td><td class="r num">' + w + '</td></tr>';
         }).join('') + '</tbody></table>';
-      teile.push(seite(d, 'Vergleichswert', '<div class="eyebrow">Abschnitt 5</div><h2>Vergleichswert</h2><p class="sub">Immobilienrichtwert des Gutachterausschusses, umgerechnet nach seinen Koeffizienten.</p>'
+      teile.push(rwTeil(d, 'Vergleichswert', '<div class="eyebrow">Abschnitt 5</div><h2>Vergleichswert</h2><p class="sub">Immobilienrichtwert des Gutachterausschusses, umgerechnet nach seinen Koeffizienten.</p>'
         + irwT + (irw.hinweise || []).map(function (h) { return '<p class="det">' + esc(h) + '</p>'; }).join('')
         + (irw.quellennachweis ? '<p class="det">' + esc(irw.quellennachweis) + '</p>' : '')));
       void irwRows;
     } else if (rvf.verfuegbar && rvf.rechenweg) {
-      teile.push(seite(d, 'Vergleichswert', '<div class="eyebrow">Abschnitt 5</div><h2>Vergleichswert</h2><p>' + esc(rvf.rechenweg) + '</p><p class="det">' + esc(rvf.quelle || rvf.hinweis || '') + '</p>'));
+      teile.push(rwTeil(d, 'Vergleichswert', '<div class="eyebrow">Abschnitt 5</div><h2>Vergleichswert</h2><p>' + esc(rvf.rechenweg) + '</p><p class="det">' + esc(rvf.quelle || rvf.hinweis || '') + '</p>'));
     }
 
     /* 8 · Ertragswert */
@@ -681,14 +830,14 @@
         if (/Ertragswert$|vorläufiger Ertragswert/.test(t)) return '§ 28 ImmoWertV';
         return '';
       });
-      teile.push(seite(d, 'Ertragswert', '<div class="eyebrow">Abschnitt 6</div><h2>Ertragswert</h2><p class="sub">Allgemeines Ertragswertverfahren. Liegenschaftszins: ' + esc(ew.liegenschaftszins_quelle || '–') + '.</p>'
+      teile.push(rwTeil(d, 'Ertragswert', '<div class="eyebrow">Abschnitt 6</div><h2>Ertragswert</h2><p class="sub">Allgemeines Ertragswertverfahren. Liegenschaftszins: ' + esc(ew.liegenschaftszins_quelle || '–') + '.</p>'
         + staffelTabelle(ew.staffel, ewQ)));
     }
 
     /* 9 · Erbbaurecht */
     var eb = p.erbbaurecht;
     if (eb && eb.ok) {
-      teile.push(seite(d, 'Erbbaurecht', '<div class="eyebrow">Abschnitt 7</div><h2>Erbbaurecht</h2>'
+      teile.push(rwTeil(d, 'Erbbaurecht', '<div class="eyebrow">Abschnitt 7</div><h2>Erbbaurecht</h2>'
         + '<div class="kv"><div><span>Wert bei Volleigentum</span><span class="num">' + eur((eb.teile && eb.teile.gebaeudeanteil || 0) + (eb.teile && eb.teile.bodenwert || 0)) + '</span></div>'
         + '<div><span>Abschlag nach § 50 ImmoWertV</span><span class="num">' + eur(eb.abschlag) + ' (' + zahl(eb.abschlagPct, 1) + ' %)</span></div>'
         + '<div><span>Erbbauzins vertraglich</span><span class="num">' + eur(eb.teile && eb.teile.zinsVertragEur) + ' / Jahr</span></div>'
@@ -699,15 +848,18 @@
         + '<p class="det">' + esc(eb.annahmen && eb.annahmen.quelle || '') + '</p>'));
     }
 
+    if (rw.length) teile.push(seite(d, 'Rechenwege', ab('Rechenwege') + '<h2>Rechenwege</h2><p class="sub">Jedes Verfahren Zeile für Zeile, mit der Fundstelle jeder Zahl.</p>' + rw.join('')));
+
     /* v3178c · Ausfuehrliche Einschaetzung (KI-Abschnitte B-D, wie der normale Bericht) */
     var ausf = ausfuehrlich(d.md);
-    if (ausf) teile.push(seite(d, 'Ausführliche Einschätzung', '<div class="eyebrow">Anhang</div><h2>Ausführliche Einschätzung</h2><p class="sub">Text der KI-Auswertung auf Grundlage der Zahlen dieses Berichts. Maßgeblich sind die Rechenwege oben.</p>' + ausf));
+    if (ausf) teile.push(seite(d, 'Ausführliche Einschätzung', ab('Ausführliche Einschätzung') + '<h2>Ausführliche Einschätzung</h2><p class="sub">Text der KI-Auswertung auf Grundlage der Zahlen dieses Berichts. Maßgeblich sind die Rechenwege oben.</p>' + ausf));
 
     /* 10 · Quellen */
     var q = [];
     if (lv.source) q.push('Bodenrichtwert: ' + lv.source + (lv.stichtag ? ', Stichtag ' + datum(lv.stichtag) : '') + (lv.quellenvermerk ? ' — ' + lv.quellenvermerk : (lv.license ? ', ' + lv.license : '')));
     (c.quellen_nachweis || []).forEach(function (x) { q.push((x.kennzahlen ? x.kennzahlen.join(', ') + ': ' : '') + (x.vermerk || '') + (x.url ? ' (' + x.url + ')' : '')); });
     if (sw.sachwertfaktor && sw.sachwertfaktor.quelle) q.push('Sachwertfaktor: ' + sw.sachwertfaktor.quelle);
+    if (d.brwZonen) q.push('Bodenrichtwertzonen in Karte und Tabelle: Gutachterausschüsse für Grundstückswerte, BORIS-D, dl-de/by-2-0 (bodenrichtwerte-boris.de)');
     if (irw.quellennachweis) q.push('Immobilienrichtwert: ' + irw.quellennachweis);
     var mq = p.makro_kennzahlen && p.makro_kennzahlen.quellennachweis;
     if (mq) q.push('Regionaldaten: ' + (typeof mq === 'object' ? [mq.vermerk, mq.lizenz].filter(Boolean).join(' · ') : mq));
@@ -715,12 +867,15 @@
     q.push('Normalherstellungskosten: Anlage 4 ImmoWertV (NHK 2010). Baupreisindex: Statistisches Bundesamt.');
     q.push('Angebotsdaten: aktueller Marktdurchschnitt vergleichbarer Angebote.');
     var uniq = q.filter(function (x, i) { return x && q.indexOf(x) === i; });
-    teile.push(seite(d, 'Quellen', '<div class="eyebrow">Anhang</div><h2>Quellen und Grundlagen</h2>'
+    teile.push(seite(d, 'Quellen', ab('Quellen und Grundlagen') + '<h2>Quellen und Grundlagen</h2>'
       + '<ol class="quellen">' + uniq.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>'
       + ((c.notes || []).length ? '<h3>Hinweise zur Rechnung</h3>' + c.notes.map(function (n) { return '<p class="det" style="font-size:7.8pt">' + esc(n) + '</p>'; }).join('') : '')
       + '<h3>Zu diesem Bericht</h3><p>Die Wertermittlung folgt der Immobilienwertermittlungsverordnung 2021. Sie ist indikativ und ersetzt kein Verkehrswertgutachten nach § 194 BauGB. Grundlage sind die Angaben zum Objekt; eine Besichtigung hat nicht stattgefunden. Jede Zahl stammt aus einer genannten Quelle oder ist als Annahme gekennzeichnet.</p>'
       + '<p class="det">Erstellt am ' + esc(datum(d.erstellt || new Date())) + ' mit DealPilot · Fassung ' + VERSION + '</p>'));
 
+    var toc = '<div class="umf"><div class="umk"><span class="eyebrow">Inhalt</span><span>Stufe 3 · Profi</span></div><div class="toc2">'
+      + inhalt.map(function (t, i) { return '<div class="tz"><span class="tn">' + ('0' + (i + 1)).slice(-2) + '</span><span>' + esc(t) + '</span></div>'; }).join('') + '</div></div>';
+    teile[0] = teile[0].replace('%%INHALT%%', toc);
     var fonts = (location && location.origin ? location.origin : '') + '/fonts/dp-fonts.css';
     return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Marktbericht Profi · ' + esc(r.address || '') + '</title>'
       + '<link rel="stylesheet" href="' + fonts + '"><style>' + CSS + markenGold() + '</style></head><body>' + teile.join('') + '</body></html>';
@@ -766,6 +921,6 @@
     /** Für den PDF-Dienst: fertiges HTML-Dokument (String). */
     dokument: function (objKey, reportId) { return sammeln(objKey, reportId).then(html); },
     berichtFuer: berichtFuer,
-    _html: html, _energieSkala: energieSkala, _verfahren: verfahren
+    _html: html, _zonenListe: zonenListe, _energieSkala: energieSkala, _verfahren: verfahren
   };
 })();
