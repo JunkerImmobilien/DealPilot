@@ -1336,3 +1336,122 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   #dashboard-main .hkz .kz-r{font-size:10.5px;gap:8px}
   #dashboard-main .hkz .kz-ow{white-space:normal}
 }
+
+/* ════ v3227 · Portfolio-Cockpit wie der Reiter Objekt ════
+   Marcel 08.11.2026: „Kennzahlen und auch die Gesamtbewertung einfacher
+   darstellen … Bestand und Zielbild … alles im Design und Stil wie im Tab
+   Objekt". Karten wie .card/.ct-pro im Reiter Objekt (weiss, feiner Rahmen,
+   Kopf in kleinen Versalien mit Gold-Linie), Gold nur als Akzent und nur
+   ueber var(--wl-*). Gruen/Rot bleiben Statusfarben (--c-greenl/--c-redl).
+   Zwei IDs im Selektor beim Score, weil die Altregeln der Bordkarte
+   (.stage.fc9 .hero, .hgate, .hbody) ein ID + drei Klassen tragen. */
+#dashboard-main .cpk{background:var(--c-panel);color:var(--c-ptext);border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:18px 20px;box-shadow:0 2px 12px rgba(42,39,39,.08);margin-bottom:14px;min-width:0}
+#dashboard-main .cpk-h{display:flex;align-items:center;gap:10px;font:700 11.5px/1.3 'DM Sans',Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:1.4px;color:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 60%,#120e05);margin:0 0 14px;padding:0 0 10px;min-width:0}
+#dashboard-main .cpk-h::after{content:"";order:1;flex:1 1 24px;height:1px;background:linear-gradient(90deg,var(--wl-f5ecd0, #f5ecd0),transparent);margin-left:4px}
+#dashboard-main .cpk-h em{order:2;font:500 10px/1.3 'JetBrains Mono',monospace;font-style:normal;text-transform:none;letter-spacing:.02em;color:var(--c-pmut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:55%}
+#dashboard-main .cpk-ico{display:inline-flex;align-items:center;justify-content:center;flex:0 0 22px;width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#fff,var(--wl-f5ecd0, #f5ecd0));border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 40%,transparent);color:var(--wl-c9a84c, #C9A84C)}
+#dashboard-main .cpk-ico svg{display:block}
+#dashboard-main .cpk-g{font:600 9.5px/1.3 'JetBrains Mono',monospace;letter-spacing:1.3px;text-transform:uppercase;color:var(--c-pmut);margin:14px 0 6px}
+#dashboard-main .cpk-h + .cpk-g{margin-top:0}
+#dashboard-main .cpk-det{margin-top:12px;border-top:1px solid var(--border,#E0DBD3);padding-top:10px}
+#dashboard-main .cpk-det > summary{cursor:pointer;font:600 10px/1.4 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--c-accd-txt);overflow-wrap:anywhere}
+#dashboard-main .cpk-det > p{margin:8px 0 0;font:400 12px/1.5 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+
+/* 01 · Gesamtbewertung (Score) */
+#dashboard-main #dp-pscore-hero.cp-hero{display:block;background:var(--c-panel);border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:18px 20px;box-shadow:0 2px 12px rgba(42,39,39,.08);overflow:visible;margin-bottom:14px}
+#dashboard-main #dp-pscore-hero.cp-hero .hbody{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;gap:14px 28px;padding:0}
+#dashboard-main #dp-pscore-hero.cp-hero .hbody.cps-leer{display:block;font:400 13px/1.6 Inter,system-ui,sans-serif;color:var(--c-pmut);text-align:center;padding:14px 0}
+#dashboard-main #dp-pscore-hero.cp-hero .hgate{flex:0 1 auto;display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 14px;border:0;padding:0;text-align:left;min-width:0}
+#dashboard-main #dp-pscore-hero .cps-gl{flex:0 0 100%;font:600 9.5px/1.3 'JetBrains Mono',monospace;letter-spacing:1.4px;text-transform:uppercase;color:var(--c-pmut)}
+#dashboard-main #dp-pscore-hero .cps-zahl{display:flex;align-items:baseline;gap:5px}
+#dashboard-main #dp-pscore-hero .cps-zahl b{font:700 46px/1 'Space Grotesk',sans-serif}
+#dashboard-main #dp-pscore-hero .cps-zahl span{font:400 12px 'JetBrains Mono',monospace;color:var(--c-pmut)}
+#dashboard-main #dp-pscore-hero .cps-stufe{font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:1.3px;text-transform:uppercase;padding:6px 13px;border-radius:999px}
+#dashboard-main #dp-pscore-hero .cps-tot{display:flex;gap:26px;margin-left:auto;padding-left:26px;border-left:1px solid var(--border,#E0DBD3)}
+#dashboard-main #dp-pscore-hero .cps-tot div{display:flex;flex-direction:column;gap:3px;min-width:0}
+#dashboard-main #dp-pscore-hero .cps-tot .k{font:600 9.5px 'JetBrains Mono',monospace;letter-spacing:1px;color:var(--c-pmut)}
+#dashboard-main #dp-pscore-hero .cps-tot .v{font:700 16px 'JetBrains Mono',monospace;color:var(--c-ptext);white-space:nowrap}
+#dashboard-main #dp-pscore-hero .cps-auf{margin-top:14px;border-top:1px solid var(--border,#E0DBD3);padding-top:10px}
+#dashboard-main #dp-pscore-hero .cps-auf > summary{cursor:pointer;font:600 10px/1.4 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--c-accd-txt)}
+#dashboard-main #dp-pscore-hero .cps-auf .hbars{display:flex;flex-direction:column;gap:10px;margin-top:12px;max-width:640px}
+#dashboard-main #dp-pscore-hero .cps-pass{display:flex;align-items:center;gap:12px;margin-top:14px;font:400 11px/1.4 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+#dashboard-main #dp-pscore-hero .cps-pass .qb{background:#fff;padding:4px;border-radius:6px;border:1px solid var(--border,#E0DBD3);line-height:0}
+#dashboard-main #dp-pscore-hero .cps-pass .qb svg{width:58px;height:58px;display:block}
+
+/* 02 · Kennzahlen */
+#dashboard-main #dp-overview-strip.cp-kz-wrap{display:block !important;margin-bottom:0}
+#dashboard-main .cpt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
+#dashboard-main .cpt{display:flex;flex-direction:column;gap:3px;min-width:0;padding:10px 12px;border:1px solid var(--border,#E0DBD3);border-radius:10px;background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 3%,var(--c-panel))}
+#dashboard-main .cpt-l{font:600 10px/1.3 Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--c-pmut)}
+#dashboard-main .cpt-v{font:700 17px/1.2 'Space Grotesk',sans-serif;color:var(--c-ptext);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dashboard-main .cpt-v.pos{color:var(--c-greenl)}
+#dashboard-main .cpt-v.neg{color:var(--c-redl)}
+#dashboard-main .cpt-v.mid{color:var(--c-accd-txt)}
+#dashboard-main .cpt-s{font:400 10.5px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut);overflow-wrap:anywhere}
+#dashboard-main .cpt-click{cursor:pointer}
+#dashboard-main .cpt-click:hover,#dashboard-main .cpt-click:focus-visible{border-color:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 55%,transparent);outline:none}
+#dashboard-main .cpt-lock{grid-column:span 2;justify-content:center}
+#dashboard-main .kz-liste{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+#dashboard-main .kz-liste li{display:flex;justify-content:space-between;gap:8px;min-width:0;font:400 12px/1.35 Inter,system-ui,sans-serif}
+#dashboard-main .kz-liste .kz-on{color:var(--c-ptext);min-width:0;overflow-wrap:anywhere}
+#dashboard-main .kz-liste small{display:block;font-size:10px;color:var(--c-pmut)}
+#dashboard-main .kz-liste .kz-ow{text-align:right;white-space:nowrap;color:var(--c-ptext);font:500 11.5px 'JetBrains Mono',monospace}
+#dashboard-main .kz-liste small.pos{color:var(--c-greenl)}
+#dashboard-main .kz-liste small.neg{color:var(--c-redl)}
+#dashboard-main .cp-seit .cp-seit-z{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 20px;width:100%;background:none;border:0;padding:0;text-align:left;cursor:pointer;font:400 13px Inter,system-ui,sans-serif;color:var(--c-ptext)}
+#dashboard-main .cp-seit .cp-seit-z b{font:700 18px 'Space Grotesk',sans-serif;margin-right:3px}
+#dashboard-main .cp-seit .cp-seit-z .pos b{color:var(--c-greenl)}
+#dashboard-main .cp-seit .cp-seit-z .neg b{color:var(--c-redl)}
+#dashboard-main .cp-seit .cp-seit-z small{flex:0 0 100%;font-size:11px;color:var(--c-pmut)}
+#dashboard-main .cp-seit .sa-liste{margin-top:10px}
+
+/* 02 · Gesamtbewertung (Investiert · Bilanz · Bewertung) */
+#dashboard-main .cpk.gb-wrap{border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:18px 20px}
+#dashboard-main .cpk .gb-k{background:transparent;border:1px solid var(--border,#E0DBD3);border-radius:10px;padding:12px 14px}
+#dashboard-main .cpk .gb-hin{display:block;margin:-6px 0 10px;border:0;padding:0}
+#dashboard-main .cpk .gb-pos{color:var(--c-greenl)}
+#dashboard-main .cpk .gb-neg{color:var(--c-redl)}
+
+/* 03 · Bestand & Zielbild */
+#dashboard-main .cpk.zb-card{border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:18px 20px}
+#dashboard-main .zb-card > .zb-zahl{margin:-4px 0 12px}
+#dashboard-main .zb-vgl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#dashboard-main .zb-vgl{width:100%;border-collapse:collapse;font:400 12.5px/1.35 Inter,system-ui,sans-serif;color:var(--c-ptext)}
+#dashboard-main .zb-vgl th,#dashboard-main .zb-vgl td{padding:8px 10px;border-bottom:1px solid var(--border,#E0DBD3);text-align:right;vertical-align:top}
+#dashboard-main .zb-vgl thead th{font:600 9.5px/1.3 'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:var(--c-pmut);border-bottom-color:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 35%,transparent)}
+#dashboard-main .zb-vgl th[scope="row"]{text-align:left;font-weight:600}
+#dashboard-main .zb-vgl th[scope="row"] small{display:block;font-weight:400;font-size:10.5px;color:var(--c-pmut)}
+#dashboard-main .zb-vgl td{font:500 12px 'JetBrains Mono',monospace;white-space:nowrap}
+#dashboard-main .zb-vgl tbody tr:last-child th,#dashboard-main .zb-vgl tbody tr:last-child td{border-bottom:0}
+#dashboard-main .zb-det-satz{margin:8px 0 0;font:400 12px/1.5 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+#dashboard-main .zb-liste{display:flex;flex-direction:column;margin-top:6px}
+#dashboard-main .zb-zl{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.6fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 10%,transparent)}
+#dashboard-main .zb-zl:last-child{border-bottom:0}
+#dashboard-main .zb-det[data-zb="unv"] .zb-zl{grid-template-columns:minmax(0,1fr) auto auto}
+#dashboard-main .zb-zl-kopf{font:600 9px/1.3 'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:var(--c-pmut)}
+#dashboard-main .zb-zl-n{font:600 12.5px/1.3 Inter,system-ui,sans-serif;color:var(--c-ptext);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#dashboard-main .zb-zl-n small{display:block;font-weight:400;font-size:10px;color:var(--c-pmut)}
+#dashboard-main .zb-zl-w,#dashboard-main .zb-zl-z{font:500 11.5px 'JetBrains Mono',monospace;color:var(--c-ptext);min-width:0;overflow-wrap:anywhere}
+#dashboard-main .zb-zl-z{text-align:right}
+#dashboard-main .zb-zl-z.zb-pos{color:var(--c-greenl)}
+#dashboard-main .zb-zl-z.zb-neg{color:var(--c-redl)}
+
+@media(max-width:640px){
+  #dashboard-main .cpk,#dashboard-main #dp-pscore-hero.cp-hero,#dashboard-main .cpk.gb-wrap,#dashboard-main .cpk.zb-card{padding:14px 12px}
+  #dashboard-main .cpk-h em{display:none}
+  #dashboard-main #dp-pscore-hero .cps-tot{margin-left:0;padding-left:0;border-left:0;border-top:1px solid var(--border,#E0DBD3);padding-top:12px;width:100%;justify-content:space-between;gap:12px}
+  #dashboard-main #dp-pscore-hero .cps-zahl b{font-size:40px}
+  #dashboard-main .cpt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #dashboard-main .cpt{padding:9px 10px}
+  #dashboard-main .cpt-v{font-size:15px}
+  #dashboard-main .cpt-lock{grid-column:1/-1}
+  #dashboard-main .zb-vgl th,#dashboard-main .zb-vgl td{padding:7px 5px}
+  #dashboard-main .zb-vgl td{font-size:11px}
+  #dashboard-main .zb-zl,#dashboard-main .zb-det[data-zb="unv"] .zb-zl{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n b" "w z";row-gap:3px}
+  #dashboard-main .zb-zl > :nth-child(1){grid-area:n}
+  #dashboard-main .zb-zl > :nth-child(2){grid-area:w}
+  #dashboard-main .zb-zl > :nth-child(3){grid-area:z}
+  #dashboard-main .zb-zl > :nth-child(4){grid-area:b}
+  #dashboard-main .zb-det[data-zb="unv"] .zb-zl > :nth-child(3){grid-area:b}
+  #dashboard-main .zb-zl-kopf{display:none}
+}

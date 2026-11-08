@@ -4745,6 +4745,9 @@
         await b2oZeile(s, 'Der Portfolio-Score', '<b>' + (sc ? sc[1] + ' · ' + sc[2].trim().charAt(0) + sc[2].trim().slice(1).toLowerCase() : '–') + '</b> über ' + (ob ? ob[1] : '–') + ' Objekte, Volumen ' + (vol ? vol[1] + ' €' : '–') + ', Cashflow ' + (cf ? cf[1] + ' €' : '–') + ' im Monat.');
       },
       async function (s) {   /* 3 · woraus er besteht */
+        /* v3227: die Aufschluesselung liegt eingeklappt unter der Zahl - erst aufklappen, sonst ist .hbars 0 px hoch und ohne Text */
+        try { var auf = r21('#dp-hero-auf'); if (auf) auf.open = true; } catch (e) {}
+        await warte(300);
         await zeige(function () { return r21('#dp-pscore-hero .hbars'); }, 8);
         var t = r21T('#dp-pscore-hero .hbars'), teile = [];
         var re = /(Rendite|Finanzierung|Risiko & Vermietung|Lage & Diversifikation|Upside-Potenzial)\s*\d+\s*KPIs\s*(\d+)\/100/g, m;

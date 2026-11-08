@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-08T15:38:31.981Z",
+ "erzeugt_am": "2026-11-08T15:39:52.390Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
   "storage": "a427c64cbe052c8d",
-  "index-html": "afa1e8db22a3b1f8",
+  "index-html": "03927417f75c0659",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4109,7 +4109,7 @@
      },
      {
       "h": "Zielbild im Portfolio-Cockpit",
-      "text": "Im Portfolio-Cockpit, Abschnitt 03 Bestand & Zielbild, addiert DealPilot Mieterhöhung und Zielbild aller Objekte, für die sie erfasst und gerechnet sind: Kaltmiete, Bruttomietrendite, Maßnahmen und Wertzuwachs nach Kosten, dazu je Objekt die Steigerung der Kaltmiete.\n\nFehlt ein Objekt oder zählt es nur teilweise, steht es unter „Nicht oder nur teilweise enthalten · mit Grund“, zum Beispiel:\n• Noch nicht erfasst — weder Soll-Miete noch Zielbild eingetragen.\n• Ertragswert je Stufe nur mit DealPilot Stufe 3 — Miete und Maßnahmen zählen, der Wert nicht.\n• Ertragswert noch nicht gerechnet — im Objekt unter Bewertung kostenlos rechnen.\n• Die Berechnung ist älter und hat noch keine Stufen — einmal neu rechnen.\n• Nur Mieterhöhung erfasst — zählt mit der Mieterhöhung als höchster Stufe.\n\nDaneben führen Im Objekt öffnen und neu rechnen ↻ (kostenlos) direkt dorthin. Das Cockpit liest die Berechnung, die am Objekt gespeichert ist — nach dem Neurechnen das Cockpit wieder öffnen."
+      "text": "Im Portfolio-Cockpit, Abschnitt 03 Bestand & Zielbild, addiert DealPilot Mieterhöhung und Zielbild aller Objekte, für die sie erfasst und gerechnet sind – als Tabelle Bestand ↔ Zielbild: Kaltmiete, Bruttomietrendite, Maßnahmen, Ertragswert und Wertzuwachs nach Kosten. Darunter klappen „Objekte einzeln“ (eine Zeile je Objekt mit der Steigerung der Kaltmiete) und „Ohne Zielbild“ (Objekte, die wie heute gerechnet werden, mit „Zielbild anlegen“) auf.\n\nFehlt ein Objekt oder zählt es nur teilweise, steht es unter „Nicht oder nur teilweise enthalten · mit Grund“, zum Beispiel:\n• Noch nicht erfasst — weder Soll-Miete noch Zielbild eingetragen.\n• Ertragswert je Stufe nur mit DealPilot Stufe 3 — Miete und Maßnahmen zählen, der Wert nicht.\n• Ertragswert noch nicht gerechnet — im Objekt unter Bewertung kostenlos rechnen.\n• Die Berechnung ist älter und hat noch keine Stufen — einmal neu rechnen.\n• Nur Mieterhöhung erfasst — zählt mit der Mieterhöhung als höchster Stufe.\n\nDaneben führen Im Objekt öffnen und neu rechnen ↻ (kostenlos) direkt dorthin. Das Cockpit liest die Berechnung, die am Objekt gespeichert ist — nach dem Neurechnen das Cockpit wieder öffnen."
      },
      {
       "h": "Wo du es einträgst",
@@ -4144,11 +4144,11 @@
      },
      {
       "h": "Portfolio Score — so wird er berechnet",
-      "text": "Der Portfolio Score fasst nur Objekte mit Status Gewonnen zusammen, für die ein Score gespeichert ist. Gibt es keines, steht dort: „Noch kein gewonnenes Objekt mit berechnetem Score.“\n\nSo wird gerechnet:\n• Je Objekt zählt der gespeicherte Investor Deal Score, sonst der DealPilot Score.\n• Der Gesamtwert ist das nach Kaufpreis gewichtete Mittel — ein großes Objekt zählt mehr als ein kleines.\n• Die fünf Balken darunter (Rendite, Finanzierung, Risiko & Vermietung, Lage & Diversifikation, Upside-Potenzial) entstehen genauso, jeweils von 0 bis 100.\n\nDie Stufe am Ring folgt der festen Kette: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Rechts steht der Portfolio-Pass mit „x / y bewertet“. Im Investor-Plan öffnet „Details & alle KPIs“ die Aufschlüsselung."
+      "text": "Der Portfolio Score fasst nur Objekte mit Status Gewonnen zusammen, für die ein Score gespeichert ist. Gibt es keines, steht dort: „Noch kein gewonnenes Objekt mit berechnetem Score.“\n\nSo wird gerechnet:\n• Je Objekt zählt der gespeicherte Investor Deal Score, sonst der DealPilot Score.\n• Der Gesamtwert ist das nach Kaufpreis gewichtete Mittel — ein großes Objekt zählt mehr als ein kleines.\n• Die fünf Bereiche (Rendite, Finanzierung, Risiko & Vermietung, Lage & Diversifikation, Upside-Potenzial) entstehen genauso, jeweils von 0 bis 100 – sie stehen eingeklappt unter „So setzt sich der Score zusammen“, zusammen mit dem Portfolio-Pass zum Scannen.\n\nDie Stufe neben der Zahl folgt der festen Kette: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Im Kopf der Karte steht „x / y bewertet“. Im Investor-Plan öffnet „Details & alle KPIs“ die Aufschlüsselung."
      },
      {
-      "h": "Kennzahlen: Kacheln mit Umschaltern",
-      "text": "Abschnitt 02 rechnet über deine gewonnenen Objekte. Kacheln mit dem Zeichen ⇄ lassen sich anklicken:\n• Bestand — Objekte und Mieteinnahmen / Monat (netto kalt). Gibt es eingefrorene Ankauf-Stände, schaltet ein Klick auf „Ankauf-Stand“; dann steht dabei, über wie viele Objekte gerechnet wurde.\n• Investition — Gesamtinvestition mit oder ohne Nebenkosten, dazu die Restschuld.\n• Mietrendite — Bruttomietrendite (Jahresmiete / KP) und Nettomietrendite (nach BWK).\n• Cashflow — pro Monat und Jahr, per Klick vor oder nach Steuer.\n• Seit dem Kauf — vergleicht den DealScore jedes Objekts heute mit dem beim Kauf festgeschriebenen Stand: wie viele besser, gleich oder schlechter. Ein Klick zeigt die Objekte einzeln (Score beim Kauf → heute).\n\nAb dem Investor-Plan folgt eine zweite Reihe: Eigenkapital-Rendite (vor Steuer als Cash-on-Cash, nach Steuer als ROE), Ø-Zinssatz bzw. Zinsbindungs-Risiko (Bindung läuft in unter 3 Jahren aus), DSCR (ab 1,2 komfortabel) und Tilgungsfortschritt."
+      "h": "Kennzahlen: eine Karte, drei Gruppen",
+      "text": "Abschnitt 02 rechnet über deine gewonnenen Objekte – eine Karte mit Kacheln in drei Gruppen. Kacheln mit dem Zeichen ⇄ lassen sich anklicken:\n• Ertrag — Objekte (gibt es eingefrorene Ankauf-Stände, schaltet ein Klick auf „Ankauf-Stand“; dann steht dabei, über wie viele Objekte gerechnet wurde), Mieteinnahmen / Monat (netto kalt), Cashflow vor und nach Steuer je Jahr (darunter je Monat) und die Mietrendite (brutto, darunter netto nach BWK).\n• Kapital — Gesamtinvestition (Klick: mit oder ohne Nebenkosten), finanziert, eingesetztes Eigenkapital, Restschuld und der Abstand Darlehen ↔ Wert heute (Wert je Objekt aus dem letzten Marktbericht, sonst Kaufpreis; die Liste je Objekt klappt darunter auf).\n• Rendite & Finanzierung — EK-Rendite vor Steuer (darunter nach Steuer und inkl. Tilgung) und Tilgung je Jahr. Ab dem Investor-Plan dazu Ø-Zinssatz bzw. Zinsbindungs-Risiko (Bindung läuft in unter 3 Jahren aus), DSCR (ab 1,2 komfortabel) und Tilgungsfortschritt.\n• Seit dem Kauf — vergleicht den DealScore jedes Objekts heute mit dem beim Kauf festgeschriebenen Stand: wie viele besser, gleich oder schlechter. Ein Klick zeigt die Objekte einzeln (Score beim Kauf → heute).\n\nDarunter die Gesamtbewertung: was investiert wurde, was es heute in der Bilanz ist und was es nach Bewertung ist – die Erklärung klappt unter „Wie gerechnet?“ auf."
      },
      {
       "h": "Steuer über alle Objekte",
@@ -5486,7 +5486,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "dcd60fa48d8aacc2",
+  "hilfe": "285b87347713b75c",
   "bewertung": "f427bd734c0570c3"
  }
 }
