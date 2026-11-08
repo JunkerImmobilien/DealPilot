@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-08T15:29:23.906Z",
+ "erzeugt_am": "2026-11-08T15:30:05.615Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
   "storage": "a427c64cbe052c8d",
-  "index-html": "aa4de0eadc47f406",
+  "index-html": "2b432c311262d96a",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4140,7 +4140,7 @@
     "abschnitte": [
      {
       "h": "Aufbau: neun Abschnitte von oben nach unten",
-      "text": "Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: 01 Portfolio Score · 02 Kennzahlen · 03 Bestand & Zielbild · 04 Geteilte Objekte · 05 Steuer über alle Objekte · 06 Projektion & Verlauf · 07 Gesamt-Projektion · 08 Steuer-Mappe · 09 Jahresabschluss.\n\nUnter dem Score schaltest du die Ansicht um: Einfach zeigt die Kernaussagen als Kacheln mit je einem Satz (ein Klick springt in die genaue Ansicht), Genau zeigt alle Abschnitte mit Erklärungen. Jeder gelbe Abschnitts-Streifen lässt sich per Klick ein- und ausklappen; DealPilot merkt sich das.\n\nOben rechts wählst du unter Objekt entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n03 Bestand & Zielbild summiert Mieterhöhung und Zielbild aller Objekte, für die sie im Objekt erfasst und gerechnet sind: Kaltmiete, Maßnahmen, Ertragswert und Wertzuwachs nach Kosten, mit Grafik und Auswertung. Objekte ohne Angaben werden genannt, nicht mitgezählt. Die Werte sind ein Ausblick, kein Verkehrswert. Zu jedem fehlenden Objekt steht der Grund mit einem Knopf ins Objekt; dort rechnet DealPilot die Ertragswerte je Stufe kostenlos neu. Darunter erklärt der Portfolio-Pilot die Auswertung auf Knopfdruck ausführlich (KI-Text, kein Kontingent) und prüft danach jede Zahl seines Textes gegen das Cockpit.\n\n04 Geteilte Objekte listet deine Quick-Boarding-Pässe; dort kannst du einen Pass „Verlängern“ oder „Beenden“. Geteilt wird im Objekt über „Quick Boarding teilen“."
+      "text": "Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: 01 Portfolio Score · 02 Kennzahlen · 03 Bestand & Zielbild · 04 Geteilte Objekte · 05 Steuer über alle Objekte · 06 Projektion & Verlauf · 07 Gesamt-Projektion · 08 Steuer-Mappe. Den Jahresabschluss einer GmbH oder UG findest du unter Einstellungen / Mandanten an der Karte der Gesellschaft.\n\nUnter dem Score schaltest du die Ansicht um: Einfach zeigt die Kernaussagen als Kacheln mit je einem Satz (ein Klick springt in die genaue Ansicht), Genau zeigt alle Abschnitte mit Erklärungen. Jeder gelbe Abschnitts-Streifen lässt sich per Klick ein- und ausklappen; DealPilot merkt sich das.\n\nOben rechts wählst du unter Objekt entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n03 Bestand & Zielbild summiert Mieterhöhung und Zielbild aller Objekte, für die sie im Objekt erfasst und gerechnet sind: Kaltmiete, Maßnahmen, Ertragswert und Wertzuwachs nach Kosten, mit Grafik und Auswertung. Objekte ohne Angaben werden genannt, nicht mitgezählt. Die Werte sind ein Ausblick, kein Verkehrswert. Zu jedem fehlenden Objekt steht der Grund mit einem Knopf ins Objekt; dort rechnet DealPilot die Ertragswerte je Stufe kostenlos neu. Darunter erklärt der Portfolio-Pilot die Auswertung auf Knopfdruck ausführlich (KI-Text, kein Kontingent) und prüft danach jede Zahl seines Textes gegen das Cockpit.\n\n04 Geteilte Objekte listet deine Quick-Boarding-Pässe; dort kannst du einen Pass „Verlängern“ oder „Beenden“. Geteilt wird im Objekt über „Quick Boarding teilen“."
      },
      {
       "h": "Portfolio Score — so wird er berechnet",
@@ -4164,7 +4164,7 @@
      },
      {
       "h": "Jahresabschluss für GmbH und UG",
-      "text": "Abschnitt 09 erscheint nur, wenn du unter Einstellungen / Mandanten eine GmbH oder UG angelegt hast. Er erstellt Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu einen Anlagenspiegel je Objekt.\n\nSo geht's:\n1. Unter Gesellschaft die GmbH/UG wählen.\n2. Das Geschäftsjahr wählen.\n3. Auf Jahresabschluss erstellen klicken.\n\nWichtig: Das ist kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als Verrechnungskonto Gesellschafter in der Bilanz. Die Kosten der Gesellschaft trägst du unter Einstellungen / Mandanten ein. Fehlen sie, sagt das PDF es auf der GuV-Seite."
+      "text": "Der Jahresabschluss liegt unter Einstellungen / Mandanten bei der jeweiligen GmbH oder UG. Er erstellt Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu einen Anlagenspiegel je Objekt.\n\nSo geht's:\n1. Unter Einstellungen / Mandanten an der Karte der Gesellschaft auf Jahresabschluss klicken.\n2. Das Geschäftsjahr wählen.\n3. Auf Jahresabschluss erstellen klicken.\n\nWichtig: Das ist kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als Verrechnungskonto Gesellschafter in der Bilanz. Die Kosten der Gesellschaft trägst du unter Einstellungen / Mandanten ein. Fehlen sie, sagt das PDF es auf der GuV-Seite."
      }
     ]
    },
@@ -4280,7 +4280,7 @@
      },
      {
       "h": "Mandanten und Steuerzeiträume",
-      "text": "Unter Mandanten legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den Halter. Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum Pro-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\nSteuerzeiträume (Privat): Klick bei Privat auf Bearbeiten. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\nGesellschaft: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft."
+      "text": "Unter Mandanten legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den Halter. Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum Pro-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\nSteuerzeiträume (Privat): Klick bei Privat auf Bearbeiten. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\nGesellschaft: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Der Knopf Jahresabschluss an der Karte der Gesellschaft erstellt Bilanz und GuV. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft."
      },
      {
       "h": "Telegram-Bot verbinden",
@@ -5486,7 +5486,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "a8c7800a10cbc53a",
+  "hilfe": "afc65a84dca8ecc9",
   "bewertung": "f427bd734c0570c3"
  }
 }
