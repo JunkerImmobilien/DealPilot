@@ -36,6 +36,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N136 · Marktbericht Variante D und Sonderumlagen in Raten (08.11.2026) — **ERLEDIGT v3211/v3212b, Prod 1.0.81**
+
+Profi-Bericht im Aufbau der Variante D ohne Angebotspreis, Titelbild ganz bzw. Karte, Bodenrichtwerte im Kartenausschnitt; Sonderumlagen aus WEG-Protokollen je Rate im Fälligkeitsjahr. **Offen:** Abnahme Sonderumlage mit echtem Protokoll mit Raten; Variante D auch für den normalen Marktbericht?
+
 ### N135 · Inventur-Befunde und IWA-Objektkarte (07.11.2026) — **ERLEDIGT v3208/v3209/v3210, Prod 1.0.80**
 - **Erledigt:** Bayern-Link in den BayernAtlas ohne Wert (v3208); Harvest-Takt: `portal_defekt` erst nach 3 Fehlschlägen, Neuversuch nach 14 Tagen, Fehler an der Quelle, Läufe in `mb.harvest_laeufe` (Migration 026), 29 Quellen reaktiviert; `laender-registry.js` auf Stand 07.11.; Zins-Rückfallwerte; Schnittstellenliste mit Spalte „Wo verwendet“ (Drive); **Bodenrichtwertzonen als Kartenebene im Marktbericht** (v3209, bundesweiter WMS, ab Zoom 14, abschaltbar).
 - **Offen:** Kappung Hessen ab 15.11. erneut prüfen (Verordnung angekündigt); portal_url fehlt bei Leipzig, Erfurt, Darmstadt, Frankfurt; ~~Zonen auch in die PDF-Karte des Profi-Berichts~~ erledigt v3210a (Nahkarte, Prod 1.0.80); Zonen in BY/SH leer (nicht im bundesweiten Dienst, gdi.bayern.de nur „private Nutzung“).
