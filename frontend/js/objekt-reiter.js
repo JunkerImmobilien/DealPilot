@@ -267,16 +267,29 @@
         + _datum(vor.created_at) + '.</span>';
       return;
     }
-    var kopf = '<b>Unterschied zum Bericht vom ' + _datum(vor.created_at) + '</b>';
-    var txt = zeilen.slice(0, 6).map(function (z) {
+    /* v3225 · Marcel 08.11.2026: „Unterschied zum Bericht vom … nimmt viel Platz,
+       und links ist dann sehr viel Weiß". Der Block stand in der dritten Spalte
+       des Wertankers und zog die Zeile in die Höhe. Jetzt steht #oe-vw-diff als
+       eigene, volle Zeile unter dem Raster (index.html), eingeklappt: die
+       Kopfzeile nennt Datum und Zahl der Positionen, aufgeklappt stehen die
+       Zeilen nebeneinander im Raster. Der Auf/Zu-Zustand bleibt beim
+       Umschalten des Berichts stehen (ziel._offen). */
+    var MAX = 12;
+    var pos = zeilen.length === 1 ? '1 Position' : zeilen.length + ' Positionen';
+    var kopf = '<summary><b>Unterschied zum Bericht vom ' + _datum(vor.created_at) + '</b>'
+      + '<span class="oe-q"> · ' + pos + ' im Rechenweg anders</span></summary>';
+    var txt = zeilen.slice(0, MAX).map(function (z) {
       var w = (z.wert == null || z.wert === '') ? '' : deNum(Number(z.wert)) + ' €';
-      if (z.art === 'weg') return '<span class="oe-d-weg">− ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' — damals dabei, jetzt nicht</span>';
-      if (z.art === 'neu') return '<span class="oe-d-neu">+ ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' — jetzt dabei, damals nicht</span>';
-      return '<span class="oe-d-and">' + esc(z.k) + ': ' + deNum(Number(z.alt)) + ' € → ' + w + '</span>';
-    }).join('<br>');
-    ziel.innerHTML = '<div class="oe-q oe-vw-diff-box">' + kopf + '<br>' + txt
-      + (zeilen.length > 6 ? '<br><span class="oe-q">… und ' + (zeilen.length - 6) + ' weitere</span>' : '')
-      + '</div>';
+      if (z.art === 'weg') return '<li class="oe-d-weg" title="damals dabei, jetzt nicht">− ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' <i>damals dabei, jetzt nicht</i></li>';
+      if (z.art === 'neu') return '<li class="oe-d-neu" title="jetzt dabei, damals nicht">+ ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' <i>jetzt dabei, damals nicht</i></li>';
+      return '<li class="oe-d-and">' + esc(z.k) + ': ' + deNum(Number(z.alt)) + ' € → ' + w + '</li>';
+    }).join('');
+    ziel.innerHTML = '<details class="oe-q oe-vw-diff-box"' + (ziel._offen ? ' open' : '') + '>' + kopf
+      + '<ul class="oe-vw-diff-liste">' + txt + '</ul>'
+      + (zeilen.length > MAX ? '<span class="oe-q">… und ' + (zeilen.length - MAX) + ' weitere</span>' : '')
+      + '</details>';
+    var det = ziel.querySelector('details');
+    if (det) det.addEventListener('toggle', function () { ziel._offen = det.open; });
   }
 
   async function automatik() {
@@ -1027,6 +1040,10 @@
   }
   async function verkehrswertUebernahme() {
     var box = $('oe-vw'); if (!box) return;
+    /* v3225: #oe-vw-diff liegt jetzt AUSSERHALB von #oe-vw und wird von
+       box.innerHTML nicht mehr mitgeleert - sonst bliebe der Vergleich des
+       vorigen Objekts stehen. */
+    var _dz = $('oe-vw-diff'); if (_dz) _dz.innerHTML = '';
     var ref = window._currentObjKey; if (!ref) { box.style.display = 'none'; return; }
     var lauf = ++_vwLauf;
     var j = await api('/marktbericht/objects/history?ref=' + encodeURIComponent(ref));
@@ -1116,7 +1133,7 @@
     };
     var _k0 = liste[0].art === 'Marktwert' ? 'Marktwertindikation' : (liste[0].art || 'Marktwertindikation');
     box.innerHTML = (liste.length > 1
-      ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select><div id="oe-vw-diff"></div>'
+      ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select>'   /* v3225: #oe-vw-diff steht als eigene Zeile in index.html */
       : '<span class="oe-q">' + _k0 + ' · '
         + _datum(liste[0].created_at) + ': <b>' + deNum(liste[0].wert) + ' €</b></span>')
       + '<span id="oe-vw-trau"></span>'

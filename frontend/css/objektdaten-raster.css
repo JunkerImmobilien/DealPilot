@@ -1,0 +1,111 @@
+/* ═══════════════════════════════════════════════════════════════
+   frontend/css/objektdaten-raster.css — v3225 · Marcel 08.11.2026
+
+   (1) Reiter Objekt, Karte „Objektdaten": „die Eingabefelder sind
+       teilweise kreuz und quer und mit viel Abstand positioniert, bitte
+       besser anordnen und kompakter."
+
+       Vorher: ein einziges .g2 (zwei Spalten) mit 22 Feldern in
+       Ladereihenfolge — PLZ/Ort vor Straße, Vermietungsstand und
+       Grundstücksfläche hinter der Energieklasse, und je nach Detailgrad
+       rutschten die Nachbarn in andere Spalten. Unter 640 px eine Spalte
+       (style.css .card .g2 !important), also 22 Zeilen untereinander.
+
+       Jetzt fünf Gruppen mit eigenem Raster (index.html .od-gruppen):
+         Adresse     Straße | Nr.  /  PLZ | Ort
+         Objekt      Objektart · Nutzungsart · Vermietungsstand
+         Gebäude     Wohnfläche · Zimmer · Baujahr · Etage · Etagen ·
+                     Einheiten · Grundstück · MEA  (+ #mfh-einstieg)
+         Zustand     Zustand · Standardstufe · Energieklasse
+         Strategie   Kürzel · Exitstrategie / These | Risiken
+       Die Spaltenzahl richtet sich nach der KARTENBREITE (Container-
+       Abfrage), nicht nach dem Fenster: neben „Automatisch ermittelt"
+       ist die Karte halb so breit wie darunter (≤ 900 px eine Spalte).
+
+       Eigene Klassen statt .g2: die vielen .g2-Regeln in style.css
+       (u. a. .body .g2:has(> .f #plz) mit !important) greifen hier
+       absichtlich nicht mehr.
+
+   (2) Wertanker: „Unterschied zum Bericht vom …" stand in der dritten
+       Spalte und zog die Zeile in die Höhe, links blieb Weiß. Jetzt eine
+       eigene volle Zeile (#oe-vw-diff.wa-diff), eingeklappt.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* v3225 · Marcel 08.11.2026 — Behälter misst die Kartenbreite */
+.od-gruppen {
+  container-type: inline-size;
+  container-name: od;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* v3225 · Marcel 08.11.2026 — gemeinsames Raster jeder Gruppe */
+.od-gruppen > .od-raster {
+  display: grid;
+  gap: 8px 12px;
+  align-items: end;          /* Feld an Feld, auch wenn ein Label umbricht */
+  padding: 10px 0;
+  min-width: 0;
+}
+.od-gruppen > .od-raster:first-child { padding-top: 0; }
+.od-gruppen > .od-raster + .od-raster {
+  border-top: 1px solid color-mix(in srgb, var(--border, #E0DBD3) 75%, transparent);
+}
+.od-gruppen > .od-raster > * { min-width: 0; }
+.od-gruppen > .od-raster > .f { margin-bottom: 0; gap: 4px; }
+.od-gruppen > .od-raster > .f.s2 { grid-column: 1 / -1; }   /* #mff-kasten (mfh-felder.js) */
+
+/* v3225 · Marcel 08.11.2026 — Adresse: Straße breit, Nr. schmal; PLZ schmal, Ort breit */
+.od-gruppen > .od-adresse {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-areas: "str str str hnr" "plz ort ort ort";
+}
+.od-adresse > .od-str { grid-area: str; }
+.od-adresse > .od-hnr { grid-area: hnr; }
+.od-adresse > .od-plz { grid-area: plz; }
+.od-adresse > .od-ort { grid-area: ort; }
+
+/* v3225 · Marcel 08.11.2026 — übrige Gruppen füllen nach Platz */
+/* auto-fit statt auto-fill: drei Felder auf breiter Karte füllen die Zeile, statt eine leere Spur zu lassen.
+   Gebäude höchstens vier Spalten - acht Felder = zwei volle Reihen (gemessen 786 px Karte: sonst 6 + 2). */
+.od-gruppen > .od-objekt   { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.od-gruppen > .od-gebaeude { grid-template-columns: repeat(auto-fit, minmax(max(118px, calc((100% - 36px) / 4)), 1fr)); }
+.od-gruppen > .od-zustand  { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.od-gruppen > .od-strategie { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.od-strategie textarea { height: 64px; }
+
+/* v3225 · Marcel 08.11.2026 — Einstieg „Einheiten erfassen" (mfh-einheiten.js knopf()) als eigene Zeile */
+.od-gebaeude > #mfh-einstieg { grid-column: 1 / -1; margin-top: 0 !important; }
+.od-gebaeude > #mfh-einstieg:empty { display: none; }
+
+/* v3225 · Marcel 08.11.2026 — schmale Karte (Handy, Tablet hochkant) */
+@container od (max-width: 460px) {
+  .od-gruppen > .od-adresse { grid-template-areas: "str str str hnr" "plz plz ort ort"; }
+  .od-gruppen > .od-strategie { grid-template-columns: minmax(0, 1fr); }
+  .od-gruppen > .od-objekt,
+  .od-gruppen > .od-zustand { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+}
+
+/* v3225 · Marcel 08.11.2026 — Gruppe ganz ausgeblendet (Detailgrad, detailgrad.js
+   markiert die .f mit data-dp-dg): kein leerer Streifen mit Trennlinie */
+body.dp-dg-1 #s0 .od-gruppen > .od-raster:not(:has(> .f:not([data-dp-dg="2"]):not([data-dp-dg="3"]))),
+body.dp-dg-2 #s0 .od-gruppen > .od-raster:not(:has(> .f:not([data-dp-dg="3"])))  { display: none; }
+
+/* ── (2) Wertanker: Unterschied zum vorigen Bericht ─────────────── */
+/* v3225 · Marcel 08.11.2026 — eigene volle Zeile unter dem Raster, leer = unsichtbar */
+#oe-vw-diff.wa-diff { margin-top: 8px; font-size: 12px; }
+#oe-vw-diff.wa-diff:empty { display: none; }
+#oe-vw-diff .oe-vw-diff-box { margin: 0; padding: 5px 10px; line-height: 1.45; }
+#oe-vw-diff .oe-vw-diff-box > summary { cursor: pointer; padding: 1px 0; }
+#oe-vw-diff .oe-vw-diff-box > summary::marker { color: var(--wl-b8932f, #b8932f); }
+#oe-vw-diff .oe-vw-diff-liste {
+  list-style: none;
+  margin: 5px 0 2px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 2px 18px;
+}
+#oe-vw-diff .oe-vw-diff-liste > li { min-width: 0; overflow-wrap: anywhere; }
+#oe-vw-diff .oe-vw-diff-liste > li > i { font-style: normal; font-size: 11px; color: var(--muted, #7A7370); }
