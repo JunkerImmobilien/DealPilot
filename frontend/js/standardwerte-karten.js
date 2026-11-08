@@ -133,7 +133,7 @@
     st.textContent = [
       /* v3223b · Marcel 08.11.2026 „Text steht über der Box“: vier Spalten im Einstellungsfenster waren je ~145 px breit,
          die Zweierliste lief über den Rand. Raster nach der Breite des FENSTERS (auto-fit), Werte einspaltig. */
-      '#settings-modal .swk-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:4px 0 16px}',   /* v3213 · W-8: vier Sets */
+      '#settings-modal .swk-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 10px;margin:10px 0 16px}',   /* v3213 · W-8: vier Sets */
       '#settings-modal .swk-set.swk-set-leer{border-style:dashed;background:#fdfcfa}',
       '#settings-modal .swk-set.swk-set-leer i{display:inline-block;margin-top:6px;font:600 12px Inter,sans-serif;font-style:normal;color:#8a6d1f}',
       '#settings-modal .swk-band-knopf{border:1px solid var(--wl-c9a84c,#C9A84C);background:#fff;border-radius:7px;padding:3px 9px;margin-left:6px;font:600 11.5px Inter,sans-serif;color:#6b5417;cursor:pointer}',
