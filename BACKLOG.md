@@ -36,7 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N137 · Umsetzungswünsche des Entwicklungspartners W-3 bis W-20 (Staging, 06./07.11.2026) — gemessen 08.11., wartet auf Marcels Freigabe
+### N137 · Umsetzungswünsche des Entwicklungspartners W-3 bis W-20 (Staging, 06./07.11.2026) — **ERLEDIGT 08.11.2026, Prod 1.0.82** außer W-10 (Rückfrage Partner) und W-12a (Instagram, bleibt Backlog)
+
+**Gebaut (Marcel 08.11.: „arbeite alles ab“, offene Fragen nach Claudes Vorschlag):** v3213/a W-6 Ziel-Bruttomietrendite in Stufen im Zielbild, W-7 Tooltips Risikoneigung, W-8 Set „Eigenes“, W-9 „Vorbelegung für neue Objekte“ eingeklappt, W-13 Knopf „was fehlt“ weg + Stufen-Kurztext, W-14 Schieberegler Aktionen/Portfolio, W-16 LTV-Häkchen entfernt (rechnete lockerer statt strenger), W-18 Bewirtschaftung zweispaltig, W-19 Sonderumlage Tooltips + Regler Gesamt × MEA · v3214 W-15 Sanierungsliste (`san_plan`, Cashflow im Jahr, Erhaltung/Herstellung, 15-%-Grenze, nicht in GIK) · v3215 W-17 weitere Darlehen (`darlehen_weitere`, Kern `darlehen-weitere.js` gespiegelt) · v3216 W-3 Cockpit-Kennzahlen · v3217 W-11/W-5/W-20 Vermögen & Haushalt, Profilfoto, Vorher/Nachher im Track Record · v3218 W-4 Pilot-Blase, W-12b Erinnerung vor Mieterhöhung (Einwilligung, Standard aus). Prüfer: darlehen 58/58, sanierung 36/36, sonderumlage 26/26, mietpotenzial 112/112, score-ketten, objekt-mapper, wertermittlung, rnd, prompt-lecks grün.
+
+**Offen:** W-10 beim Partner nachfragen · Datenschutzerklärung: Abschnitt Erinnerungsmail (W-12b) · Importe (voice, immokalk, financing-pdf) kennen nur D1/D2 · Vermögenszuwachs-Schleife calc.js rechnet nur D1 (Altmangel, D2 fehlt dort auch) · W-6 Ziellinie nicht in Jahresständen/Pilot-Payload · `detailgrad-pruefen` rot (2 Altbefunde: `#dpuew-stage`, Experte 295/287) · Steuerfragen W-15: letztes Jahr der 15-%-Frist ganz, Herstellung volles Jahr AfA · PDF-Dienst auf Prod nicht neu gebaut (v3219 `__dpFertig`-Warten fehlt dort).
+
+_Ursprüngliche Bestandsaufnahme:_
 
 Bestandsaufnahme gegen den Code am 08.11.2026 (nur gelesen). Pakete:
 
