@@ -202,5 +202,8 @@
 
   var _obs = new MutationObserver(function () { try { injectBtn(); } catch (e) {} });
   function start() { try { injectBtn(); } catch (e) {} try { _obs.observe(document.body, { childList: true, subtree: true }); } catch (e) {} }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+  /* v3224 · Marcel 08.11.2026: Teilen raus - der Knopf „Quick Boarding teilen“ wird nicht mehr
+     eingehängt (und der MutationObserver auf body läuft nicht mehr). Das Modal bleibt als
+     QuickBoardingShare.open() bestehen, hat aber in der Oberfläche keinen Einstieg mehr. */
+  void start;
 })();

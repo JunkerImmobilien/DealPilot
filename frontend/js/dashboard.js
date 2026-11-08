@@ -4011,7 +4011,9 @@
     var h=host(); if(!h) return;
     _shItems=items||[];
     if(!_shItems.length){
-      h.innerHTML='<div class="gempty">Aktuell ist kein Objekt geteilt. Teile ein Objekt im Objekt-Tab \u00fcber \u201eQuick Boarding teilen\u201c \u2013 der Pass erscheint dann hier.</div>';
+      /* v3224 \u00b7 Marcel 08.11.2026: Teilen raus - der Satz verwies auf den Knopf \u201eQuick Boarding teilen\u201c, den es nicht mehr gibt.
+         Bestehende P\u00e4sse stehen weiter hier (Verl\u00e4ngern / Beenden). */
+      h.innerHTML='<div class="gempty">Aktuell ist kein Objekt geteilt.</div>';
       return;
     }
     var n=_shItems.length;

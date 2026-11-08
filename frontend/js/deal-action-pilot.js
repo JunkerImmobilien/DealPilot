@@ -29,6 +29,11 @@
    Nutzt window.DpQr (v721), window.Auth.apiCall, window._currentObjKey. */
 (function(){
   'use strict';
+  /* v3224 · Marcel 08.11.2026: Teilen raus („Objekte teilen bitte rausnehmen, auch im Tab Deal-Aktion“).
+     Die Kachel „Objekt teilen“ wird nicht mehr gebaut, die 1,2-s-Abfrage läuft nicht mehr.
+     Der Code bleibt stehen; Backend (/passes) und bestehende Pässe sind nicht berührt.
+     Wiederherstellen: diese Zeile entfernen und #dab-share-slot in deal-action-boarding.js zurück. */
+  if (true) return;
   function restLabel(exp){ var ms=new Date(exp).getTime()-Date.now(); if(!isFinite(ms)||ms<=0) return 'abgelaufen';
     var days=ms/86400000; if(days>=1){ var d=Math.round(days); return d+' Tag'+(d===1?'':'e'); } var h=Math.max(1,Math.round(ms/3600000)); return h+' Std'; }
   function esc(s){ return (''+(s||'')).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;'); }

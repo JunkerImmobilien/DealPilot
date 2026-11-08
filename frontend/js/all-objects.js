@@ -265,7 +265,9 @@
     window.Auth.apiCall('/passes', { method: 'GET' }).then(function (res) {
       var items = ((res && res.items) || []).filter(function (p) { return !p.revoked_at && new Date(p.expires_at).getTime() > Date.now(); });
       if (!items.length) {
-        host.innerHTML = HEAD.replace('<SUFFIX>', '') + '<div style="color:#9A9390;font-size:12.5px;padding:8px 12px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);border-radius:9px">Aktuell ist kein Objekt geteilt. Teile ein Objekt \u00fcber \u201eQuick Boarding teilen\u201c.</div>';
+        /* v3224 \u00b7 Marcel 08.11.2026: Teilen raus - ohne aktiven Pass bleibt der Block leer (er warb f\u00fcr
+           \u201eQuick Boarding teilen\u201c, den Knopf gibt es nicht mehr). Bestehende P\u00e4sse stehen weiter da. */
+        host.innerHTML = '';
         return;
       }
       var body = items.map(function (p) {

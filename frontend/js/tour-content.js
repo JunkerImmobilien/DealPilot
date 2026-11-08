@@ -173,18 +173,7 @@
       placement: 'auto'
     },
 
-    {
-      id: 'pass-obj',
-      tab: 's0',
-      selector: '#obj-action-bar, .tab[data-target-sec="s0"]',
-      /* v1747e · der QR selbst, nicht das Wort PASS irgendwo im Dokument */
-      subSelectors: ['#oab-pf-qr', '.dp-pf-qr'],
-      icon: 'i-qr',
-      title: 'Boarding-Pass zum Objekt',
-      body: 'Auch hier im **Tab Objekt** erstellst du jederzeit einen **Boarding-Pass** — und teilst ihn per Link oder QR-Code.',
-      bodyMore: 'Der Boarding-Pass im Überblick:\n\n• **Was drin ist:** Adresse, Objektart, Eckdaten (Kaufpreis, Fläche, Miete), Score — als hübsche Bordkarte aufbereitet\n• **Erstellen:** über „Quick Boarding teilen“ beim Objekt — DealPilot erzeugt Link + QR-Code\n• **Teilen:** Link verschicken oder QR zeigen — der Empfänger braucht **keinen Account**\n• **Kontrolle:** zeitlich begrenzt gültig, jederzeit widerrufbar\n• Der QR-Code erscheint zusätzlich im **Deal-Aktion-Tab** direkt neben dem Deal-Status\n\nPerfekt für Mitinvestoren, Partner oder das Bankgespräch.',
-      placement: 'auto'
-    },
+    /* v3224 · Marcel 08.11.2026: Teilen raus - hier stand der Schritt „pass-obj“ (Boarding-Pass zum Objekt teilen). */
 
     // ═══ Phase 3: 9 Reiter einzeln ══════════════════════════════════════
     
