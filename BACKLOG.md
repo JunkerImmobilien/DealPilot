@@ -42,7 +42,9 @@ W-4 Pilot als ganze Figur, ein/aus (am Konto, DpHinweise `pilot_blase`), aus = F
 
 **W-10 gestrichen** (Marcel 08.11.: „kannst du weg lassen“).
 
-**Offen:** Demo-Verlauf auch auf Prod? (DB-Änderung, Freigabe nötig) · Datenschutzerklärung Abschnitt W-12b (Entwurf liegt vor, Marcel muss ok geben) · Steuer Gesellschaften (Befund 08.11.): GmbH rechnet KSt/GewSt, aber mit der privaten Werbungskosten-Tabelle; GewSt ohne Hinzurechnung § 8 Nr. 1a; GbR-Objekt selbst geht mit 100 % statt Quote ins zvE; keine Feststellung je Gesellschafter · Importe nur D1/D2 (bleibt Backlog) · Quick-Check-Pass mit QR (qc-bridge) und Tour „qb-pass“ noch da — gehört das zu „Teilen raus“?
+**Nachtrag 1.0.84/1.0.85:** Demo-Verlauf auf Prod (Marcel „ja“; fehlende Berichte als Kopien ergänzt, ~1,5 je Jahr, Sicherung `/root/backups/mb-20261108-1630-vor-demoverlauf.sql.gz`) · Datenschutz 1.5 mit Abschnitt 10 (6) Erinnerungsmail · Quick-Check-Pass aus (`qc-bridge.js _handleAutopass`), Tour qb-pass raus · **Vermögen & Haushalt auf Prod gesperrt** bis Marcels Freigabe (`vermoegen.js PROD_GESPERRT`) · v3232 Deal-Aktion in weißen Karten wie Reiter Objekt.
+
+**Offen:** Steuer Gesellschaften (Befund 08.11.): GmbH rechnet KSt/GewSt, aber mit der privaten Werbungskosten-Tabelle; GewSt ohne Hinzurechnung § 8 Nr. 1a; GbR-Objekt selbst geht mit 100 % statt Quote ins zvE; keine Feststellung je Gesellschafter · Importe nur D1/D2 (bleibt Backlog) · Quick-Check-Pass mit QR (qc-bridge) und Tour „qb-pass“ noch da — gehört das zu „Teilen raus“?
 
 ### N137 · Umsetzungswünsche des Entwicklungspartners W-3 bis W-20 (Staging, 06./07.11.2026) — **ERLEDIGT 08.11.2026, Prod 1.0.82** außer W-10 (Rückfrage Partner) und W-12a (Instagram, bleibt Backlog)
 
