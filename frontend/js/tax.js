@@ -1451,6 +1451,12 @@ function _computeAutoForYear(yearIdx, year) {
     ? State._ahk.sanLimit : kp_inp * 0.15;
   var _sanUstT = (document.getElementById('san_ust') || {}).value || 'brutto';
   var san_netto = (_sanUstT === 'netto') ? san_inp : (san_inp / 1.19);
+  /* v3214 · N137 · W-15: geplante Sanierungen späterer Jahre (sanierung-plan.js). Erhaltung in den
+     drei Jahren nach der Anschaffung zählt zur 15-%-Grenze mit #san (netto). Ohne Liste ist _spCtx
+     ohne Wirkung: steuerJahr() liefert 0, fensterNetto 0 - die Rechnung bleibt bitgleich. */
+  var _spCtx = { grenze: sanGrenze15, sanNetto: san_netto, ust: _sanUstT, afaSatz: afa_satz_eff };
+  var _sp = (window.DpSanierungPlan && typeof DpSanierungPlan.steuerJahr === 'function')
+    ? DpSanierungPlan.steuerJahr(year, _spCtx) : { erh: 0, anah: 0, afa: 0, fensterNetto: 0 };
   var sanAnschaffungsnah, sanLaufzeit, sanAfaJaehrlich;
 
   if (!sanActive) {
@@ -1459,7 +1465,7 @@ function _computeAutoForYear(yearIdx, year) {
     sanAfaJaehrlich = 0;
   } else if (sanYearsChoice === 'auto') {
     // Automatik: 15%-Regel (netto gegen die Grenze, abgezogen wird brutto)
-    sanAnschaffungsnah = san_netto > sanGrenze15;
+    sanAnschaffungsnah = (san_netto + (_sp.fensterNetto || 0)) > sanGrenze15;   /* v3214: + Erhaltung im 3-Jahres-Fenster */
     /* v2891: unter der Grenze ist der SOFORTABZUG der gesetzliche Normalfall
        (§ 11 Abs. 2 EStG). Die Verteilung auf 2-5 Jahre (§ 82b EStDV) ist ein
        Wahlrecht und steht in der Auswahl daneben - bis v2890 verteilte die
@@ -1640,9 +1646,10 @@ function _computeAutoForYear(yearIdx, year) {
        _computeYearTotal selbst.) Die Anlage-V-Seite
        braucht sie fuer Zeile 35 gegen Zeile 38. Die Summe oben bleibt exakt
        dieselbe — hier wird nichts umgerechnet. */
-    _afaLinear: afaGebaeude,
+    /* v3214 · N137: + AfA auf nachträgliche Herstellungskosten geplanter Sanierungen (ab ihrem Jahr) */
+    _afaLinear: afaGebaeude + _sp.afa,
     _afaSonder7b: afaSonder7bJahr,
-    afa: afaGebaeude + afaSonder7bJahr,
+    afa: afaGebaeude + afaSonder7bJahr + _sp.afa,
 
     // 6.0 AfA bewegliche Wirtschaftsgüter
     // V31: Möblierung → 10 Jahre AfA
@@ -1651,8 +1658,9 @@ function _computeAutoForYear(yearIdx, year) {
 
     // 6.5 Anschaffungsnahe Herstellkosten / Erhaltungsaufwand
     // V31: Sanierung → je nach 15%-Grenze entweder als anschaffungsnah (AfA) oder als Erhaltungsaufwand (5 Jahre)
-    anschaffungsnah:    sanAnschaffungsnah ? sanThisYear : 0,
-    erhaltungsaufwand: !sanAnschaffungsnah ? sanThisYear : 0,
+    /* v3214 · N137: + geplante Sanierungen dieses Jahres (Erhaltung im Jahr bzw. verteilt; anschaffungsnah über die AfA) */
+    anschaffungsnah:    (sanAnschaffungsnah ? sanThisYear : 0) + _sp.anah,
+    erhaltungsaufwand: (!sanAnschaffungsnah ? sanThisYear : 0) + _sp.erh,
 
     // 7.0 Einnahmen
     einnahmen_km: einnahmen_km,

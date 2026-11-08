@@ -2478,6 +2478,9 @@ async function _exportPDFInner() {
     /* v2463 · lief 9 mm über den rechten Rand, und „ohne Tilgung" stimmte nicht:
        gemessen CF n.St./J 2027 = 7.965 - 388 = 7.577, also nach Tilgung. */
     doc.splitTextToSize('CF v.St./J = NKM - Bewirt. n.uml. - Zinsen - Tilgung (was wirklich am Konto bleibt, vor Steuer)  \u00b7  CF n.St./J = CF v.St./J +/- Steuer', _tblW).forEach(function (z) { doc.text(z, _tblM, cy); cy += 3.5; });
+    /* v3214 \u00b7 N137: Einmalzahlungen (geplante Sanierungen, Sonderumlagen) nennen - die Tabelle hat keine Kostenspalte */
+    var _einmT = (window.DpSanierungPlan && DpSanierungPlan.einmaligText) ? DpSanierungPlan.einmaligText(State.cfRows).trim() : '';
+    if (_einmT) doc.splitTextToSize(_einmT.replace('in Bewirtschaftung und CF', 'in CF v.St. und CF n.St.'), _tblW).forEach(function (z) { doc.text(z, _tblM, cy); cy += 3.5; });
     doc.text('LTV-F\u00e4rbung: gr\u00fcn bis ' + _pdfSw().ltvGruenTxt + ' %  \u00b7  gold ' + _pdfSw().ltvGruenTxt + '-' + _pdfSw().ltvRotTxt + ' %  \u00b7  rot \u00fcber ' + _pdfSw().ltvRotTxt + ' %  \u00b7  Anschluss-Konditionen ab Jahr ' + g('d1_bindj') + ': ' + pP(v('anschl_z'), 1) + ' / ' + pP(v('anschl_t'), 1), _tblM, cy);
     cy += 6;
     console.log('[pdf] V63.99 CF-Projektion 13-Spalten (ohne BWK n.u., ohne Sum-Row), finalY=' + cy);
@@ -3489,7 +3492,7 @@ async function _exportPDFInner() {
       var cumNkm = 0, cumBwk = 0, cumZins = 0, cumTax = 0, cumTilg = 0, cumBspar = 0;
       State.cfRows.forEach(function(r){
         cumNkm += r.nkm_y || 0;
-        cumBwk += r.bwk_cf_y || r.bwk_y || 0;
+        cumBwk += (r.bwk_cf_y || r.bwk_y || 0) + (r.su_y || 0) + (r.san_y || 0);   /* v3214 N137: Einmalzahlungen wie calc.js bwk_kum */
         cumZins+= r.zy || 0;
         cumTax += r.tax_y || 0;
         cumTilg+= r.ty || r.tilg_y || 0;
