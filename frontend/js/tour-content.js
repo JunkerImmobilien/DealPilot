@@ -70,19 +70,7 @@
     },
     
     
-    {
-      id: 'qb-pass',
-      tab: 's-quick',
-      selector: '#qc-tab-host, #s-quick',
-      subTargets: ['Quickboarding Pass'],
-      subClimb: 90,
-      placementHintV866: 1,
-      icon: 'i-qr',
-      title: 'Boarding-Pass — direkt beim Quick-Boarding',
-      body: 'Im Quick-Boarding entsteht nebenbei der **Quickboarding-Pass** — dein teilbarer Kurz-Steckbrief mit QR-Code. Du erkennst ihn am **dunklen Streifen** mit dem Code; je nach Ansicht sitzt er seitlich oder unten.',
-      bodyMore: 'Was der Boarding-Pass ist:\n\n• Eine **öffentliche Kurz-Ansicht** deines Objekts: Adresse, Eckdaten, Score — hübsch aufbereitet wie eine echte Bordkarte\n• Erreichbar über **Link oder QR-Code** — ideal für Partner, Mitinvestoren oder die Bank\n• **Zeitlich begrenzt gültig** und jederzeit widerrufbar — du behältst die Kontrolle\n\n**So entsteht er:**\n• Während du das Quick-Boarding befüllst, baut sich der Pass im **dunklen Streifen** automatisch mit auf\n• Beim **Speichern als Objekt** kannst du ihn direkt **mit übernehmen** — inklusive Link + QR-Code\n• Später erstellst/teilst du ihn jederzeit neu über „Quick Boarding teilen“ beim Objekt\n• Der QR-Code erscheint dann auch im **Deal-Aktion-Tab** direkt neben dem Deal-Status',
-      placement: 'auto'
-    },
+    
 
     {
       id: 'qb-save',

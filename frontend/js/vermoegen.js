@@ -617,6 +617,16 @@
     foto: foto, checkliste: checkliste, standAlt: standAlt, betrag: betrag, katName: katName,
     KAT_V: KAT_V, KAT_S: KAT_S, KAT_E: KAT_E, KAT_A: KAT_A
   };
+  /* v3231 · Marcel 08.11.2026: „Vermögen & Haushalt auf Prod erstmal ausblenden, das möchte ich extra freigeben.“
+     Auf der Produktion (app.dealpilot.immo) kein Eintrag und kein Aufruf; Staging unverändert.
+     FREIGABE: die Zeile PROD_GESPERRT auf false setzen (neue Version, Buster). Profilfoto und Track Record bleiben. */
+  var PROD_GESPERRT = true;
+  var gesperrt = PROD_GESPERRT && /^app\.dealpilot\.immo$/i.test(location.hostname);
+  if (gesperrt) {
+    try { var st = document.createElement('style'); st.textContent = '[data-act="vermoegen"]{display:none !important}'; (document.head || document.documentElement).appendChild(st); } catch (e) {}
+    oeffnen = function () {};
+    window.DpVermoegen.oeffnen = oeffnen; window.DpVermoegen.pdf = function () {};
+  }
   window.openVermoegen = oeffnen;
 
   /* Einhängen: Einstellungen (Mein Profil), Laden nach Anmeldung, Erinnerung */

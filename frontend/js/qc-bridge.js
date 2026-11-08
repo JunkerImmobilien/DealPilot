@@ -40,6 +40,7 @@
   function _bufShareUrl(code){ try{ return window.location.origin+'/pass.html?c='+encodeURIComponent(code); }catch(e){ return '/pass.html?c='+code; } }
   function _bufPostCode(){ if(_bufState.code) _postToFrame({source:'dp-app',type:'qc-autopass-code',code:_bufState.code,url:_bufShareUrl(_bufState.code)}); }
   function _handleAutopass(inputs, photos){   /* qb-buffer-photos */
+    return;   /* v3231 · Marcel 08.11.2026: Teilen raus, auch der automatische Pass im Quick-Check („3. ja erstmal“). Backend /passes bleibt. */
     inputs = inputs || {}; photos = photos || [];
     var _ds2k=''; try { var _pp=(window.ObjectActions&&window.ObjectActions.getQcPending)?window.ObjectActions.getQcPending():null; if(_pp) _ds2k=Object.keys(_pp).sort().join(','); } catch(e){}
     var sig; try { sig = JSON.stringify(inputs) + '|ph:' + photos.length + ':' + photos.map(function(p){return (p||'').slice(0,24);}).join(',') + '|ds2:' + _ds2k; } catch (e) { sig = ''; }
