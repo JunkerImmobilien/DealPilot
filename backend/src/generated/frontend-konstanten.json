@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-08T15:33:45.542Z",
+ "erzeugt_am": "2026-11-08T15:36:09.790Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
   "storage": "a427c64cbe052c8d",
-  "index-html": "525e7df975a9dfd0",
+  "index-html": "01353157759101ce",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4140,7 +4140,7 @@
     "abschnitte": [
      {
       "h": "Aufbau: neun Abschnitte von oben nach unten",
-      "text": "Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: 01 Portfolio Score · 02 Kennzahlen · 03 Bestand & Zielbild · 04 Geteilte Objekte · 05 Steuer über alle Objekte · 06 Projektion & Verlauf · 07 Gesamt-Projektion · 08 Steuer-Mappe. Den Jahresabschluss einer GmbH oder UG findest du unter Einstellungen / Mandanten an der Karte der Gesellschaft.\n\nUnter dem Score schaltest du die Ansicht um: Einfach zeigt die Kernaussagen als Kacheln mit je einem Satz (ein Klick springt in die genaue Ansicht), Genau zeigt alle Abschnitte mit Erklärungen. Jeder gelbe Abschnitts-Streifen lässt sich per Klick ein- und ausklappen; DealPilot merkt sich das.\n\nOben rechts wählst du unter Objekt entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n03 Bestand & Zielbild summiert Mieterhöhung und Zielbild aller Objekte, für die sie im Objekt erfasst und gerechnet sind: Kaltmiete, Maßnahmen, Ertragswert und Wertzuwachs nach Kosten, mit Grafik und Auswertung. Objekte ohne Angaben werden genannt, nicht mitgezählt. Die Werte sind ein Ausblick, kein Verkehrswert. Zu jedem fehlenden Objekt steht der Grund mit einem Knopf ins Objekt; dort rechnet DealPilot die Ertragswerte je Stufe kostenlos neu. Darunter erklärt der Portfolio-Pilot die Auswertung auf Knopfdruck ausführlich (KI-Text, kein Kontingent) und prüft danach jede Zahl seines Textes gegen das Cockpit.\n\n04 Geteilte Objekte listet deine Quick-Boarding-Pässe; dort kannst du einen Pass „Verlängern“ oder „Beenden“. Geteilt wird im Objekt über „Quick Boarding teilen“."
+      "text": "Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: 01 Portfolio Score · 02 Kennzahlen · 03 Bestand & Zielbild · 04 Geteilte Objekte · 05 Steuer über alle Objekte · 06 Projektion & Verlauf · 07 Gesamt-Projektion · 08 Steuer-Mappe. Den Jahresabschluss einer GmbH oder UG findest du unter Einstellungen / Mandanten an der Karte der Gesellschaft.\n\nUnter dem Score schaltest du die Ansicht um: Einfach zeigt die Kernaussagen als Kacheln mit je einem Satz (ein Klick springt in die genaue Ansicht), Genau zeigt alle Abschnitte mit Erklärungen. Jeder gelbe Abschnitts-Streifen lässt sich per Klick ein- und ausklappen; DealPilot merkt sich das.\n\nOben rechts wählst du unter Objekt entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n03 Bestand & Zielbild summiert Mieterhöhung und Zielbild aller Objekte, für die sie im Objekt erfasst und gerechnet sind: Kaltmiete, Maßnahmen, Ertragswert und Wertzuwachs nach Kosten, mit Grafik und Auswertung. Objekte ohne Angaben werden genannt, nicht mitgezählt. Die Werte sind ein Ausblick, kein Verkehrswert. Zu jedem fehlenden Objekt steht der Grund mit einem Knopf ins Objekt; dort rechnet DealPilot die Ertragswerte je Stufe kostenlos neu. Darunter erklärt der Portfolio-Pilot die Auswertung auf Knopfdruck ausführlich (KI-Text, kein Kontingent) und prüft danach jede Zahl seines Textes gegen das Cockpit.\n\n04 Geteilte Objekte listet deine Quick-Boarding-Pässe; dort kannst du einen Pass „Verlängern“ oder „Beenden“."
      },
      {
       "h": "Portfolio Score — so wird er berechnet",
@@ -5486,7 +5486,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "afc65a84dca8ecc9",
+  "hilfe": "dcd60fa48d8aacc2",
   "bewertung": "f427bd734c0570c3"
  }
 }
