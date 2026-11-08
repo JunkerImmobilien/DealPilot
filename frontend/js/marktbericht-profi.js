@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3219';
+  var VERSION = 'v3219a';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -590,12 +590,10 @@
     /* v3219 · Blocksatz, keine Schusterjungen/Hurenkinder, Rechenwege nicht zerreissen */
     'p,.md-blk li,.hinweis,.fuehrt p,.det{text-align:justify;hyphens:auto;-webkit-hyphens:auto;orphans:3;widows:3}',
     '.karte.gross{width:100%;margin:0 0 4mm;break-inside:avoid}',
-    'table{break-inside:auto}h2,h3,h4{break-after:avoid}.rw-blk{break-inside:avoid}',
+    'table{break-inside:auto}h2,h3,h4{break-after:avoid}.rw-blk table{break-before:avoid}',
     '.ausf .md-blk p,.ausf ul.md{font-size:8.6pt;line-height:1.45}.ausf h3{font-size:10pt;margin:3.5mm 0 1.5mm}',
     '.rw-h{font-size:13pt;margin:8mm 0 1mm;padding-top:3mm;border-top:.3mm solid var(--ink)}.rw-h:first-of-type{margin-top:2mm;border-top:0;padding-top:0}',
     '.fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin:2mm 0}.fotos img{width:100%;height:40mm;object-fit:cover;border-radius:1.2mm;display:block}',
-    '.deck .bild .logo{position:absolute;top:12mm;left:17mm;background:#fff;padding:3mm 4mm;border-radius:1.5mm}',
-    '.deck .bild .logo img{height:11mm;width:auto;display:block}',
     '.deck .inhalt{padding:9mm 17mm 0;flex:1}',
     '.deck h1{font-size:25pt;line-height:1.12;margin:2mm 0 2mm}',
     '.deck .adr{font-size:11pt;color:var(--muted);margin-bottom:5mm}',
