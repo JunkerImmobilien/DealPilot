@@ -54,6 +54,7 @@
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=v1500"><!-- V292-modal-refactor -->
 <link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3196"><!-- v3185 -->
 <link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3196"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
+<link rel="stylesheet" href="css/objektdaten-raster.css?v=v3225"><!-- v3225 - Marcel 08.11.2026: Objektdaten in Gruppen, Wertanker-Vergleich als eigene Zeile -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=v2132">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -1088,55 +1089,72 @@ label.dp-required.qc-required::after {
 
   <!-- V53: Top-Reihe — Objektdaten links + Ausstattungsqualität rechts (bündig, gleiche Höhe) -->
   <div class="col2 col2-stretch">
-    <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
-      <div class="f"><label class="dp-required" data-v236-required-set="1">PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Ort</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="calc()" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="calc()" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label>Objektart</label><select id="objart"><!-- v1315c: Bis zum 11.09.2026 gab es KEINE leere Option - ETW war damit an jedem leeren Objekt vorausgewaehlt, ohne dass es jemand gesagt hatte. Seit v1314 waehlt die Objektart auch das Marktsegment bei GeoMap: eine stillschweigende ETW-Annahme misst ein Haus am Wohnungsmarkt. --><option value="">&#8211; bitte w&auml;hlen &#8211;</option><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option>
-              <option value="ZFH">Zweifamilienhaus (ZFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option><option value="GRST">Unbebautes Grundstück</option></select></div><!-- v2241: GRST - Marktbericht bewertet ueber den Bodenwert (BRW x Grundstuecksflaeche) -->
-      <div class="f"><label>Nutzungsart</label><select id="nutzungsart"><option value="kapitalanlage" selected>Vermietet (Kapitalanlage)</option><option value="eigennutzung">Selbst genutzt</option></select></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
-      <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
-      <!-- v445-obj-reorder -->
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr <button type="button" class="dp-tip" data-tip-id="tab1.baujahr" tabindex="-1" aria-label="Hilfe zu Baujahr"></button></label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
-      <div class="f"><label>Etage</label><input id="etage" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
-      <div class="f"><label>Anzahl Etagen</label><input id="etagen_ges" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
-      <div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
-          <select id="ds2_zustand" onchange="if(typeof window._v234OnZustandChange==='function')window._v234OnZustandChange(this);if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
-            <option value="">– bitte wählen –</option>
-            <option value="neubau">Neubau / kernsaniert</option>
-            <option value="gut">Guter Zustand</option>
-            <option value="normal">Normaler Zustand</option>
-            <option value="renovierungsbeduerftig">Renovierungsbedürftig</option>
-            <option value="stark_sanierungsbeduerftig">Stark sanierungsbedürftig</option>
-          </select>
-        </div>
-      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fünf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualität des Gebäudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010) <button type="button" class="dp-tip" data-tip-id="tab1.wert_standardstufe" tabindex="-1" aria-label="Hilfe zu Standardstufe"></button></label><div class="iw"><select id="standardstufe">
-        <option value="">— keine Angabe —</option>
-        <option value="1">1 · sehr einfach (nur Häuser)</option>
-        <option value="2">2 · einfach (nur Häuser)</option>
-        <option value="3">3 · Standard</option>
-        <option value="4">4 · gehoben</option>
-        <option value="5">5 · stark gehoben</option>
-      </select></div></div>
-      <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
-          <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
-            <option value="">– keine Angabe –</option>
-            <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-          </select>
-        </div>
-      <div class="f"><label>Vermietungsstand <button type="button" class="dp-tip" data-tip-id="tab1.vermietungsstand" tabindex="-1" aria-label="Hilfe zu tab1.vermietungsstand"></button></label><select id="vermstand"><option selected>Vollvermietet</option><option>Teilweise leer</option><option>Leer</option></select></div>
-      <div class="f"><label>Grundstücksfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wert_gsfl" tabindex="-1" aria-label="Hilfe zu Grundstücksfläche"></button></label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
-      <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7,06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
+    <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div>
+      <!-- v3225 - Marcel 08.11.2026: "Eingabefelder kreuz und quer und mit viel Abstand" - die Felder stehen jetzt in Gruppen
+           (Adresse, Objekt, Gebaeude und Flaechen, Zustand, Strategie) mit eigenem Raster (.od-raster, css/objektdaten-raster.css).
+           IDs, Namen und Handler unveraendert; #mfh-einstieg steht als eigene Zeile hier, mfh-einheiten.js knopf() nimmt das vorhandene Element. -->
+      <div class="od-gruppen">
+      <div class="od-raster od-adresse">
+        <div class="f od-str"><label class="dp-required" data-v236-required-set="1">Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="calc()" autocomplete="off" data-form-type="other"></div>
+        <div class="f od-hnr"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
+        <div class="f od-plz"><label class="dp-required" data-v236-required-set="1">PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
+        <div class="f od-ort"><label class="dp-required" data-v236-required-set="1">Ort</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="calc()" autocomplete="off" data-form-type="other"></div>
+      </div>
+      <div class="od-raster od-objekt">
+        <div class="f"><label>Objektart</label><select id="objart"><!-- v1315c: Bis zum 11.09.2026 gab es KEINE leere Option - ETW war damit an jedem leeren Objekt vorausgewaehlt, ohne dass es jemand gesagt hatte. Seit v1314 waehlt die Objektart auch das Marktsegment bei GeoMap: eine stillschweigende ETW-Annahme misst ein Haus am Wohnungsmarkt. --><option value="">&#8211; bitte w&auml;hlen &#8211;</option><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option>
+                <option value="ZFH">Zweifamilienhaus (ZFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option><option value="GRST">Unbebautes Grundstück</option></select></div><!-- v2241: GRST - Marktbericht bewertet ueber den Bodenwert (BRW x Grundstuecksflaeche) -->
+        <div class="f"><label>Nutzungsart</label><select id="nutzungsart"><option value="kapitalanlage" selected>Vermietet (Kapitalanlage)</option><option value="eigennutzung">Selbst genutzt</option></select></div>
+        <div class="f"><label>Vermietungsstand <button type="button" class="dp-tip" data-tip-id="tab1.vermietungsstand" tabindex="-1" aria-label="Hilfe zu tab1.vermietungsstand"></button></label><select id="vermstand"><option selected>Vollvermietet</option><option>Teilweise leer</option><option>Leer</option></select></div>
+      </div>
+      <div class="od-raster od-gebaeude">
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+        <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
+        <!-- v445-obj-reorder -->
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr <button type="button" class="dp-tip" data-tip-id="tab1.baujahr" tabindex="-1" aria-label="Hilfe zu Baujahr"></button></label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
+        <div class="f"><label>Etage</label><input id="etage" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
+        <div class="f"><label>Anzahl Etagen</label><input id="etagen_ges" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
+        <div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
+        <div class="f"><label>Grundstücksfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wert_gsfl" tabindex="-1" aria-label="Hilfe zu Grundstücksfläche"></button></label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+        <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7,06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+        <div id="mfh-einstieg" class="od-mfh" style="display:none"></div>
+      </div>
+      <div class="od-raster od-zustand">
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
+            <select id="ds2_zustand" onchange="if(typeof window._v234OnZustandChange==='function')window._v234OnZustandChange(this);if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+              <option value="">– bitte wählen –</option>
+              <option value="neubau">Neubau / kernsaniert</option>
+              <option value="gut">Guter Zustand</option>
+              <option value="normal">Normaler Zustand</option>
+              <option value="renovierungsbeduerftig">Renovierungsbedürftig</option>
+              <option value="stark_sanierungsbeduerftig">Stark sanierungsbedürftig</option>
+            </select>
+          </div>
+        <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fünf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualität des Gebäudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010) <button type="button" class="dp-tip" data-tip-id="tab1.wert_standardstufe" tabindex="-1" aria-label="Hilfe zu Standardstufe"></button></label><div class="iw"><select id="standardstufe">
+          <option value="">— keine Angabe —</option>
+          <option value="1">1 · sehr einfach (nur Häuser)</option>
+          <option value="2">2 · einfach (nur Häuser)</option>
+          <option value="3">3 · Standard</option>
+          <option value="4">4 · gehoben</option>
+          <option value="5">5 · stark gehoben</option>
+        </select></div></div>
+        <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
+            <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+              <option value="">– keine Angabe –</option>
+              <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
+              <option value="C">C</option><option value="D">D</option><option value="E">E</option>
+              <option value="F">F</option><option value="G">G</option><option value="H">H</option>
+            </select>
+          </div>
+      </div>
+      <div class="od-raster od-strategie">
+        <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
+        <div class="f"><label>Exitstrategie <button type="button" class="dp-tip" data-tip-id="tab1.exitstrategie" tabindex="-1" aria-label="Hilfe zu tab1.exitstrategie"></button></label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
+        <div class="f"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
+        <div class="f"><label>Bekannte Risiken <button type="button" class="dp-tip" data-tip-id="tab1.bekannte_risiken" tabindex="-1" aria-label="Hilfe zu tab1.bekannte_risiken"></button></label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
+      </div>
+      </div>
+      <div class="g2">
       <input type="hidden" id="_dp_herkunft">
-      <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
-      <div class="f s2"><label>Bekannte Risiken <button type="button" class="dp-tip" data-tip-id="tab1.bekannte_risiken" tabindex="-1" aria-label="Hilfe zu tab1.bekannte_risiken"></button></label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
-      <div class="f"><label>Exitstrategie <button type="button" class="dp-tip" data-tip-id="tab1.exitstrategie" tabindex="-1" aria-label="Hilfe zu tab1.exitstrategie"></button></label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
       <!-- v363-erwerb: abgesetzte Untergruppe -->
       <div class="f s2" data-v363-erwerb data-v369-head style="margin-top:16px"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Erwerb &amp; Besitzübergang</div></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
@@ -1425,6 +1443,10 @@ label.dp-required.qc-required::after {
       <div class="f wa-herkunft"><label title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB.">Herkunft</label><select id="svw_herkunft" class="svw-herkunft" onchange="calc()" title="Woher stammt der Wert? Nur ein Gutachten ist ein Verkehrswert nach § 194 BauGB; der LTV rechnet nur mit einem Gutachten- oder Bankwert, der Wertpuffer mit jeder Angabe außer der Marktpreisindikation aus Angeboten." style="width:100%"><option value="">Herkunft: automatisch</option><option value="gutachten">Verkehrswertgutachten (§ 194 BauGB)</option><option value="bank">Bankbewertung (Marktwert)</option><option value="marktbericht">DealPilot-Marktbericht (Ertrags-/Sach-/Vergleichswert)</option><option value="indikation">Marktpreisindikation (Angebotspreise)</option><option value="eigene">eigene Schätzung</option></select></div>
       <div class="f wa-bericht"><label title="Werte aus den Marktberichten dieses Objekts — auswählen und übernehmen">Bericht</label><div id="oe-vw" class="oe-vw" style="display:none"></div><span class="cf-hint wa-leer">noch kein Marktbericht</span></div>
         </div>
+        <!-- v3225 - Marcel 08.11.2026: "Unterschied zum Bericht vom ... nimmt viel Platz, links ist sehr viel Weiss". Der Vergleich stand IN der
+             dritten Spalte (Bericht) und zog die ganze Zeile in die Hoehe. Jetzt eine eigene, volle Zeile unter dem Raster, eingeklappt
+             (objekt-reiter.js _unterschiedZeigen schreibt hierher). -->
+        <div id="oe-vw-diff" class="wa-diff"></div>
         <!-- v3003a · Marcel: „Brauchen wir das Feld Bankbewertung überhaupt noch, wenn es die Herkunft gibt?" Nein -
              die Herkunft „Bankbewertung" trägt es. Das Feld bleibt im DOM (gespeichert, nie gelöscht), wertangabe.js überträgt es einmal nach svwert. -->
         <input type="hidden" id="bankval_migriert" value="">
@@ -3882,7 +3904,7 @@ label.dp-required.qc-required::after {
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
 <script src="js/data/detailgrad-zuordnung.js?v=v3222"></script>
 <script src="js/detailgrad.js?v=v3080"></script>
-<script src="js/objekt-reiter.js?v=v3213"></script>
+<script src="js/objekt-reiter.js?v=v3225"></script>
 <script src="js/paket-import.js?v=v3204"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
