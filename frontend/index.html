@@ -56,6 +56,7 @@
 <link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3196"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
 <link rel="stylesheet" href="css/objektdaten-raster.css?v=v3225a"><!-- v3225 - Marcel 08.11.2026: Objektdaten in Gruppen, Wertanker-Vergleich als eigene Zeile -->
 <link rel="stylesheet" href="css/deal-aktion-karten.css?v=v3232"><!-- v3232 · Marcel 08.11.2026: Deal-Aktion in weißen Karten wie Reiter Objekt -->
+<link rel="stylesheet" href="css/objekt-ansichten.css?v=v3237"><!-- v3237 · Marcel 09.11.2026: Reiter Objekt - Lage kompakt, Wertparameter als Kacheln, Bodenrichtwert-Karte -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=v2132">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -1202,6 +1203,10 @@ label.dp-required.qc-required::after {
                 <button type="button" class="btn-brw" id="brw-portal-btn" onclick="DealPilotBrw.openBoris()" title="Öffnet das Bodenrichtwert-Portal des Bundeslandes (nach Adresse)"><!-- v2949: hiess „BORIS-Portal", die Länder nennen ihre Portale verschieden -->
                   <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span> <span data-brw-portal-name>Bodenrichtwert-Portal</span>
                 </button>
+                <!-- v3237 · Marcel 09.11.2026: „ein Button mit Karte" - Zonen der Gutachterausschüsse um die Adresse (js/brw-karte.js) -->
+                <button type="button" class="btn-brw" id="brw-karte-btn" data-brw-karte="1" title="Karte mit den Bodenrichtwertzonen rund um die Adresse">
+                  <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span> Karte
+                </button>
                 <!-- v3030: Knopf „Bodenrichtwert schätzen" (KI) entfernt - Marcel 28.10.2026 -->
                 <span id="brw-ai-status" class="brw-ai-status"></span>
               </div>
@@ -1433,7 +1438,7 @@ label.dp-required.qc-required::after {
         </button>
       </div>
       <div class="ki-lage-body" id="ki-lage-body">
-        <div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — DealPilot misst Makrolage, Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten und stellt die KI-Einschätzung daneben; Wertsteigerung und Entwicklung ergänzt die KI.</div>
+        <div class="ki-lage-empty">Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung — ein Klick, sobald die Adresse steht.</div>
       </div>
     </div>
 <div class="card-title">Wertanker</div>
@@ -3881,8 +3886,8 @@ label.dp-required.qc-required::after {
 <script src="js/konto-stammdaten.js?v=v3217"></script><!-- v3040 · Stammdaten und Ersteinrichtung am Konto (user_settings stammdaten) -->
 <script src="js/dealscore2-ui.js?v=v3215"></script>
 <script src="js/ds2-ai.js?v=v3003a"></script>
-<script src="js/ki-lage.js?v=v3007b"></script>
-<script src="js/ki-miete.js?v=v3086"></script>
+<script src="js/ki-lage.js?v=v3237"></script>
+<script src="js/ki-miete.js?v=v3237"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v3058"></script>
 <script src="js/dokument-import.js?v=v3211"></script>
@@ -3899,13 +3904,14 @@ label.dp-required.qc-required::after {
 <script src="js/quick-check.js?v=v3213"></script>
 <script src="js/qc-bridge.js?v=v3231"></script>
 <script src="js/bodenrichtwert.js?v=v3208by"></script>
+<script src="js/brw-karte.js?v=v3237"></script><!-- v3237 · Bodenrichtwert-Karte -->
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
 <script src="js/data/detailgrad-zuordnung.js?v=v3222"></script>
 <script src="js/detailgrad.js?v=v3080"></script>
-<script src="js/objekt-reiter.js?v=v3225"></script>
+<script src="js/objekt-reiter.js?v=v3237"></script>
 <script src="js/paket-import.js?v=v3204"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
