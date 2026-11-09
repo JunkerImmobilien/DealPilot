@@ -8144,7 +8144,7 @@
     var m = q('.main-col'); if (m) m.scrollTop = 0;
     await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
     var we = wert('einheiten');
-    await b2oZeile(s, 'Objekt ' + nr + ' · ' + rolle, '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Einheiten, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + ', Kaufpreis ' + eur(zahl('kp')) + '.');
+    await b2oZeile(s, 'Objekt ' + nr + ' · ' + rolle, '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (Number(we) > 1 ? we + ' Einheiten, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + ', Kaufpreis ' + eur(zahl('kp')) + '.');
     /* Gesamturteil */
     reiter('s6'); await warte(1200);
     await warteAuf(function () { return q('#s6 .dpz-kopf') && q('#s6 .dpz-score'); }, 6000);
@@ -8156,12 +8156,15 @@
     var a = d3Teil(0), b = d3Teil(1);
     await b2oZeile(s, 'Zwei Teil-Scores', (a ? 'Investment <b>' + a.n + ' · ' + a.wort + '</b>' : 'Investment –') + ', ' + (b ? 'Finanzierung <b>' + b.n + ' · ' + b.wort + '</b>' : 'Finanzierung –') + ' — die Immobilie selbst und die Finanzierung, getrennt bewertet.');
     /* Kennzahlen */
-    var kc = function () { return q('#s6 .kpi-eval-card'); };
+    /* v3270 · gemessen: .kpi-eval-card ist im neuen Reiter ausgeblendet (display:none) -
+       sichtbar sind die Kennzahlen im Block .bw-kz (Cashflow, Rendite, Finanzierung & Risiko) */
+    var kc = function () { return q('#s6 .bw-kz'); };
     var x = kc(); if (x) x.scrollIntoView({ block: 'center' });
     await warte(400);
     await zeige(kc, 8);
-    var dscr = d3Kpi(/^DSCR/), cf = d3Kpi(/^Cashflow nach Steuern/), bmr = d3Kpi(/^Bruttomietrendite/), ltv = d3Kpi(/^LTV/);
-    await b2oZeile(s, 'Die Kennzahlen', [bmr ? 'Bruttorendite <b>' + bmr + '</b>' : '', cf ? 'Cashflow nach Steuern <b>' + cf + '</b> im Monat' : '', dscr ? 'DSCR <b>' + dscr + '</b>' : '', ltv ? 'Beleihung <b>' + ltv + '</b>' : ''].filter(Boolean).join(', ') + '.');
+    var kt = r6Inner(kc()).replace(/\s+/g, ' ');
+    var cf = /nach Steuern heute ([+\-−]?[\d.]+ €)/.exec(kt), bmr = /Bruttomietrendite ([\d,]+ %)/.exec(kt), dscr = /DSCR ([\d,]+)/.exec(kt), ltv = /LTV ([\d,]+ %)/.exec(kt);
+    await b2oZeile(s, 'Die Kennzahlen', [bmr ? 'Bruttorendite <b>' + bmr[1] + '</b>' : '', cf ? 'Cashflow nach Steuern <b>' + cf[1] + '</b> im Monat' : '', dscr ? 'DSCR <b>' + dscr[1] + '</b>' : '', ltv ? 'Beleihung <b>' + ltv[1] + '</b>' : ''].filter(Boolean).join(', ') + '.');
     /* Pilot-Analyse */
     reiter('s5'); await warte(1200);
     await warteAuf(function () { return q('#ai-content .dp-pa-empf'); }, 6000);
@@ -8304,7 +8307,7 @@
     var echt = window.fetch; window.__dpmNach = echt; window.DPM_NACHSPERRE = [];
     window.fetch = function (url, opt) {
       var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
-      if (!lauf && m !== 'GET' && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/)/.test(u)
+      if (!lauf && m !== 'GET' && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/|portfolio-spiegel)/.test(u)
           && !(/\/objects\//.test(u) && (window.DPM_REIHE && DPM_REIHE.angelegt || []).some(function (id) { return u.indexOf(id) >= 0; }))) {
         window.DPM_NACHSPERRE.push(m + ' ' + u.replace(location.origin, ''));
         return Promise.resolve(new Response(JSON.stringify({ ok: true, vorfuehrung: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
