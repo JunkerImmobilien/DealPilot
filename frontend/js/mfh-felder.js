@@ -25,7 +25,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMfhFelder) return;
-  var VERSION = 'v3003';
+  var VERSION = 'v3236';
   var $ = function (id) { return document.getElementById(id); };
   var GESPERRT = ['wfl', 'einheiten', 'nkm', 'vermstand'];   /* zimmer sperrt mfh-einheiten.js selbst */
   var NAMEN = { wfl: 'Wohnfläche', einheiten: 'Wohneinheiten', nkm: 'Nettokaltmiete (Reiter Miete)', zimmer: 'Zimmer', vermstand: 'Vermietungsstand', ds2_zustand: 'Zustand des Gebäudes' };
@@ -64,7 +64,7 @@
       if (e.tagName === 'SELECT') { e.classList.add('mff-gesperrt'); e.setAttribute('tabindex', '-1'); e.setAttribute('aria-readonly', 'true'); }
       else { if (!e.hasAttribute('data-mff-ro')) e.setAttribute('data-mff-ro', e.readOnly ? '1' : '0'); e.readOnly = true; e.classList.add('mff-gesperrt'); }
       e.title = 'Aus den erfassten Einheiten — im Einheiten-Dialog ändern';
-      hinweisIn(id, text || 'aus den Einheiten');
+      hinweisIn(id, ausText(text));   /* v3236 */
     } else {
       if (e.classList.contains('mff-gesperrt')) {
         e.classList.remove('mff-gesperrt'); e.removeAttribute('aria-readonly');
@@ -93,9 +93,15 @@
     k.innerHTML = '<div class="mff-titel">' + (n ? n + ' Einheiten erfasst — diese Felder kommen aus den Einheiten' : 'Mit Einheiten erfasst du jede Wohnung einzeln') + '</div>'
       + '<div class="mff-text">' + (n ? '' : 'Daraus füllen sich ') + '<b>Wohnfläche, Wohneinheiten, Zimmer, Nettokaltmiete, Vermietungsstand</b> und — wo du den Zustand je Einheit angibst — der <b>Zustand des Gebäudes</b>. '
       + 'Nicht nötig beim ganzen Haus: Etage, Badezimmer, Miteigentumsanteil (100 %).'
-      + (n ? ' Ändern im Einheiten-Dialog.' : '') + '</div>'
-      + '<button type="button" class="btn btn-outline btn-sm" id="mff-oeffnen">' + (n ? 'Einheiten bearbeiten' : 'Einheiten erfassen') + '</button>';
+      + (n ? ' Ändern über „Einheiten bearbeiten" unten bei den Flächen.' : ' Den Knopf „Einheiten erfassen" findest du unten bei den Flächen.') + '</div>';
+    /* v3236 · der zweite Knopf (#mff-oeffnen, „Einheiten bearbeiten"/„Einheiten erfassen") ist
+       entfallen: es gibt EINEN Knopf, #mfh-oeffnen in mfh-einheiten.js knopf(). Marcel 09.11.2026. */
   }
+  /* v3236 · Einsteiger: kein Einheiten-Dialog (detailgrad.js blendet Knopf und Kasten aus). Sind aus
+     einer höheren Stufe schon Einheiten erfasst, bleiben die Felder daraus gesperrt - sonst liefen
+     Haus und Einheiten auseinander -, und der Hinweis sagt, wo man sie wieder ändern kann. */
+  function einsteiger() { try { return !!(window.DpDetailgrad && DpDetailgrad.stufe() === 1); } catch (e) { return false; } }
+  function ausText(text) { return (text || 'aus den Einheiten') + (einsteiger() ? ' · ändern ab Detailgrad Fortgeschritten' : ''); }
 
   var _lauf = false;
   function anwenden() {
@@ -137,6 +143,7 @@
   });
   document.addEventListener('change', function (ev) { if (ev.target && ev.target.id === 'objart') spaeter(); }, true);
   window.addEventListener('dp:object-ready', function () { setTimeout(anwenden, 300); });
+  window.addEventListener('dp:detailgrad', spaeter);   /* v3236: Hinweis an gesperrten Feldern je Stufe */
   function start() {
     stil(); anwenden();
     /* mfh-einheiten.js zeichnet #mfh-einstieg nach jedem Übernehmen neu - das ist der Moment, in dem sich die Einheiten geändert haben */

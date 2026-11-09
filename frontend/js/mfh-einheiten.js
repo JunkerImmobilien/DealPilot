@@ -271,8 +271,13 @@
     if (!ARTEN_MIT_EINHEITEN[art]) { k.innerHTML = ''; k.style.display = 'none'; return; }
     var d = daten(), n = d.einheiten.length;
     k.style.display = '';
-    k.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="mfh-oeffnen">▸ Einheiten erfassen'
-      + (n ? ' (' + n + ' erfasst)' : ' — optional') + '</button>'
+    /* v3236 · Marcel 09.11.2026: „Dann haben wir einmal Einheiten bearbeiten und Einheiten
+       erfassen, das können wir … zusammenlegen und den Button umbenennen." Bis hier standen
+       ZWEI Knöpfe für denselben Dialog: dieser („▸ Einheiten erfassen (n erfasst)") und
+       „Einheiten bearbeiten" im Erklärkasten (mfh-felder.js #mff-oeffnen). Es bleibt dieser
+       eine, die Beschriftung folgt dem Bestand. In Einsteiger ausgeblendet (detailgrad.js). */
+    k.innerHTML = '<button type="button" class="btn btn-outline btn-sm" id="mfh-oeffnen">'
+      + (n ? 'Einheiten bearbeiten (' + n + ')' : 'Einheiten erfassen') + '</button>'
       + (n ? '<div class="cf-hint" style="margin-top:4px">Fläche, Einheiten und Ist-Kaltmiete aus ' + n + ' Einheiten übernommen.</div>' : '');
     el('mfh-oeffnen').onclick = function () { oeffnen(0); };
   }

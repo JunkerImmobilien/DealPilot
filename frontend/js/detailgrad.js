@@ -62,6 +62,11 @@
  * nicht in der Zuordnung, galt damit als Experte und war in Einsteiger und
  * Fortgeschritten verschwunden — Marcel: „nur bei Stufe 3 ist die
  * Datenaufnahme-Karte nutzbar".
+ *
+ * v3236 · Marcel 09.11.2026: aufklappbare Abschnitte (<details>) mit Feldern
+ * sind Behälter (keine leere Überschrift mehr); Import füllt nur, was im
+ * Detailgrad sichtbar ist (importErlaubt, RECHENPFLICHT); Einsteiger ohne
+ * Einheiten-Knopf und ohne Moduswahl der Mietentwicklung (stilEinsteiger).
  * ══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -196,6 +201,15 @@
        Feld wird nie von seiner Karte verschluckt. */
     var beh = [].slice.call(sec.querySelectorAll('.card' + (UNIVERSUM[id] ? ', ' + UNIVERSUM[id] : '')));
     expl.forEach(function (L, el) { if (beh.indexOf(el) < 0) beh.push(el); });
+    /* v3236 · Marcel 09.11.2026: „Vertragsdaten der Bank, aber ohne Felder" (Finanzierung) und
+       „Eigentum & Erwerb" (Objekt) standen in Einsteiger als leere Überschrift da. Beides sind
+       aufklappbare Abschnitte (<details>) IN einer Karte: die Feldhüllen darin waren markiert,
+       die Zeile mit der Überschrift nicht. Ein <details> mit Feldern ist jetzt selbst ein
+       Behälter — er erscheint so früh wie sein frühestes Feld. Ohne Felder bleibt er, was er
+       war (Erklärkästen, 15-%-Grenze). */
+    [].slice.call(sec.querySelectorAll('details')).forEach(function (d) {
+      if (beh.indexOf(d) < 0 && felder.some(function (f) { return d.contains(f); })) beh.push(d);
+    });
     beh = beh.filter(function (b) { return !b.closest(NIE) && !b.querySelector('#obj-action-bar'); });
     var soll = new Map();
     beh.forEach(function (b) {
@@ -422,6 +436,70 @@
     return { stufe: s, name: NAMEN[s], mb: MB[s], zeilen: zeilen, neutral: neutral, weitere: weitere };
   }
 
+  /* ── v3236 · Import nach Detailgrad ─────────────────────────────────
+     Marcel 09.11.2026: „Wenn wir PDFs importieren, sollen dort nur die Felder der
+     jeweiligen Stufe gefüllt werden. Nachträglich kann man die Stufe auf Experte
+     stellen, und wenn ich dann dieselben Dokumente nochmal reinlade, sollen auch
+     die neuen Felder gefüllt werden."
+     Leser: object-actions.js (Datenaufnahme: Exposé, Marktbericht, Unterlagen) und
+     dokument-import.js. Maßstab ist, was der Nutzer SIEHT — ebene(el) an der
+     markierten Seite, dieselbe Antwort wie die Ausblendung.
+     RECHENPFLICHT: ausgeblendet, aber eine Rechnung braucht den gelesenen Wert;
+     ohne ihn rechnet sie still mit einer Vorgabe weiter. Diese Felder werden in
+     jeder Stufe übernommen (die Zeile sagt es dazu). Gemessen 09.11.2026: die
+     Importwege schreiben ihre Ziel-ids über addRow (object-actions.js) und ZIEL (
+     dokument-import.js). Kaufpreis, Miete, Hausgeld, Grundsteuer, Eigenkapital,
+     Verkehrswert und (seit v3236) Sanierungskosten sind ohnehin Einsteiger; die
+     übrigen ausgeblendeten (Grundstück, BGF, Flur, Ausstattung, Lage-Merkmale,
+     Marktmiete …) haben eine Vorgabe oder gehen neutral ein. Einzige Ausnahme ist
+     der Miteigentumsanteil: object-actions.js _kontext() rechnet mit ihm den Anteil
+     der Wohnung an Hausgeld und Sonderumlage aus Wirtschaftsplan/Abrechnung — bleibt
+     er leer, ist beim nächsten Einlesen dieser Unterlagen der Anteil offen und die
+     Zeile fällt weg (dokument-import.js „ohne Miteigentumsanteil …"). Der
+     Gebäudeanteil (AfA) wird von keinem Importweg geschrieben. */
+  var RECHENPFLICHT = {
+    mea: 'Miteigentumsanteil – daraus rechnet DealPilot den Anteil der Wohnung an Hausgeld und Sonderumlage'
+  };
+  /* Zeilen ohne eigenes sichtbares Feld: Einheiten (der Dialog ist ab Fortgeschritten),
+     Modus der Mietentwicklung (Einsteiger hat nur die Prognose), Wohnungsliste des Zielbilds */
+  var IMPORT_SONDER = { mfh_einheiten_liste: 2, mfh_wohnungen: 2, me_modus: 2 };
+  /* ab welcher Stufe ein Importziel sichtbar ist; null = kein Feld (Aufrufer entscheidet) */
+  function importEbene(id) {
+    if (IMPORT_SONDER[id]) return IMPORT_SONDER[id];
+    var el = document.getElementById(id); if (!el) return null;
+    var sec = el.closest ? el.closest('.sec') : null;
+    if (!sec || REITER.indexOf(sec.id) < 0) return 1;
+    return ebene(el);
+  }
+  function importErlaubt(id) {
+    if (RECHENPFLICHT[id]) return true;
+    var L = importEbene(id);
+    return L == null || L <= stufe();
+  }
+
+  /* ── v3236 · Einsteiger: was keine Feldmarke trägt ───────────────────
+     (2) „Einheiten bearbeiten" ist für Einsteiger zu viel — MFH wird einfach angegeben:
+         Knopf (#mfh-einstieg, mfh-einheiten.js) und Erklärkasten (#mff-kasten,
+         mfh-felder.js) entfallen.
+     (6) Mietentwicklung: nur die Prognose. Die Moduswahl Prognose/Detail/Aus Wohnungen
+         sind Knöpfe, keine Felder — sie trug keine Marke. Steht ein Objekt auf einem
+         anderen Modus (aus Fortgeschritten oder Import), bleibt dieser eine Knopf
+         sichtbar: er sagt, womit gerechnet wird (Ausblenden ist nur Anzeige).
+         Die Zeile „Erhöhung gilt auch für zusätzliche Einnahmen" ist Experte; ihre
+         Hülle (.me-incze-row) fällt mit dem Haken, statt leer stehen zu bleiben.
+     Als <style> aus diesem Modul, weil es Regeln DIESES Moduls sind. */
+  function stilEinsteiger() {
+    if (document.getElementById('dp-dg-stil-v3236')) return;
+    var s = document.createElement('style'); s.id = 'dp-dg-stil-v3236';
+    s.textContent = [
+      'body.dp-dg-1 #s0 #mfh-einstieg, body.dp-dg-1 #s0 #mff-kasten { display: none !important; }',
+      'body.dp-dg-1 #s2 #me-mode-detail:not(.active), body.dp-dg-1 #s2 #me-mode-einheiten:not(.active) { display: none !important; }',
+      'body.dp-dg-1 #s2 .me-mode-toggle:has(#me-mode-prog.active) { display: none !important; }',
+      'body.dp-dg-1 #s2 .me-incze-row:has(> [data-dp-dg]), body.dp-dg-2 #s2 .me-incze-row:has(> [data-dp-dg="3"]) { display: none !important; }'
+    ].join('\n');
+    (document.head || document.documentElement).appendChild(s);
+  }
+
   function feldZeigen(el) {
     if (!el) return stufe();
     var L = ebene(el);
@@ -477,6 +555,7 @@
   });
 
   function start() {
+    stilEinsteiger();
     ermitteln(window._currentObjKey || null);
     beobachten();
   }
@@ -486,6 +565,9 @@
     stufe: stufe, setzen: setzen, anwenden: anwenden, ebene: ebene,
     ausgeblendet: ausgeblendet, feldZeigen: feldZeigen, NAMEN: NAMEN, MB: MB,
     annahmen: annahmen,   /* Investment-PDF (pdf.js) und Bankfassung (pdf-investment-bank.js) */
+    /* v3236 · Import nach Detailgrad (object-actions.js, dokument-import.js) */
+    importEbene: importEbene, importErlaubt: importErlaubt,
+    rechenpflicht: function (id) { return RECHENPFLICHT[id] || null; },
     /* Ersteinrichtung (onboarding.js): seit v3077 ist das die Stufe des Nutzers */
     vorgabeSetzen: function (n) { n = gueltig(n); if (n) { lsSet(n); anwenden(); } return n; }
   };

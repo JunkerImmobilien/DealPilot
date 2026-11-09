@@ -530,6 +530,19 @@
     }
 
     var abg = _abgleich(ext).filter(function (z) { return !z.hinweis; });   /* v3029-import */
+    /* v3236 · Marcel 09.11.2026: beim Import nur die Felder des gewählten Detailgrads füllen
+       (detailgrad.js importErlaubt). Was ausgeblendet ist, steht als Liste darunter und kommt
+       beim erneuten Einlesen nach höherer Stufe dazu - leere Felder vorgehakt, abweichende nicht. */
+    var _DG = window.DpDetailgrad, _dgAus = [];
+    if (_DG && typeof _DG.importErlaubt === 'function') {
+      abg = abg.filter(function (z) { if (_DG.importErlaubt(z.feld)) return true; _dgAus.push(z); return false; });
+    }
+    if (_dgAus.length) {
+      html += '<div class="dpdi-hinweis" style="border:1px dashed rgba(42,39,39,.25);border-radius:8px;padding:8px 10px;margin:8px 0">'
+        + '<strong>' + _dgAus.length + (_dgAus.length === 1 ? ' Angabe' : ' Angaben') + ' nicht übernommen (Detailgrad ' + _esc(_DG.NAMEN[_DG.stufe()]) + '):</strong> '
+        + _dgAus.map(function (z) { return _esc(z.wort) + ' ' + _esc(z.anzeige); }).join(' · ')
+        + '. Stellst du den Detailgrad in den Einstellungen höher und liest das Dokument erneut ein, werden diese Felder gefüllt, soweit sie noch leer sind.</div>';
+    }
     if (abg.length) {
       var nAbw = abg.filter(function (z) { return z.status === 'abweichung'; }).length;
       var objekt = window._currentObjKey ? 'diesem Objekt' : 'dem offenen Formular';
