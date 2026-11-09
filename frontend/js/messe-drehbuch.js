@@ -1965,7 +1965,7 @@
         await warte(600);
         await zeige(function () { return q('#oe-abruf-box'); }, 8);
         var f = [kontingentFrei(1), kontingentFrei(2), kontingentFrei(3)];
-        await b2oZeile(s, 'Drei Stufen', 'Je tiefer die Stufe, desto mehr Angaben — und desto mehr Ergebnis.' + (f[0] ? ' Frei im Plan: <b>' + f.join(' · ') + '</b>.' : ''));
+        await b2oZeile(s, 'Drei Stufen', 'Je tiefer die Stufe, desto mehr Angaben — und desto mehr Ergebnis.' + (f[0] && f[1] && f[2] ? ' Frei im Plan: <b>' + f.join(' · ') + '</b>.' : ''));
       },
       async function (s) {   /* 2 · Stufe 1 braucht */
         await stufeWaehlen(1);
