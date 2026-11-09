@@ -122,7 +122,7 @@ function _afaSatzFromBaujahr(baujahr) {
 }
 
 // Grenzsteuersatz für Steuerersparnis-Hochrechnung
-const GRENZSTEUER_DEFAULT = 0.4045;
+const GRENZSTEUER_DEFAULT = 0.42;   /* v3269 Marcel 09.11.2026 */
 
 // ─────────────────────────────────────────────────────────────────
 // PHASE 2: Inventar-Trennung

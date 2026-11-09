@@ -340,7 +340,7 @@ window.DealPilotInvestmentProfile = (function() {
 
       '<h3 class="ip-section">Steuer</h3>',
       '<div class="ip-grid">',
-        field('ip_grenzsteuersatz', 'Persönlicher Grenzsteuersatz', p.grenzsteuersatz, '%', 'Vorbelegung 40,45 %. Gilt für Objekte im Privatvermögen, solange im Reiter Steuer kein zu versteuerndes Einkommen steht — mit Einkommen rechnet DealPilot den Satz selbst aus.'),
+        field('ip_grenzsteuersatz', 'Persönlicher Grenzsteuersatz', p.grenzsteuersatz, '%', 'Vorbelegung 42 %. Gilt für Objekte im Privatvermögen, solange im Reiter Steuer kein zu versteuerndes Einkommen steht — mit Einkommen rechnet DealPilot den Satz selbst aus.'),
         /* v2891: dieselben zwei Angaben wie unter dem zvE im Tab Steuern, derselbe Speicher */
         '<div class="ip-field"><label for="ip_splitting">Veranlagung</label><div class="ip-field-row"><select id="ip_splitting">' +
           '<option value="0"' + ((p.splitting === true || p.splitting === 'true') ? '' : ' selected') + '>Einzelveranlagung</option>' +

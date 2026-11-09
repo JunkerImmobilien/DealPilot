@@ -2243,7 +2243,7 @@ label.dp-required.qc-required::after {
   </div>
 </div>
 <div class="f"><label>Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
-      <div class="f"><label>Persönl. Grenzsteuersatz (%) <button type="button" class="dp-tip" data-tip-id="tab4.grenzsteuersatz" tabindex="-1" aria-label="Hilfe zu tab4.grenzsteuersatz"></button></label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="40,45" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+      <div class="f"><label>Persönl. Grenzsteuersatz (%) <button type="button" class="dp-tip" data-tip-id="tab4.grenzsteuersatz" tabindex="-1" aria-label="Hilfe zu tab4.grenzsteuersatz"></button></label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="42" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
       <!-- v2891: Veranlagung und Kirchensteuer gehoeren zum zvE (Marcel 23.10.2026). Gespeichert im Investmentprofil, nicht am Objekt - ein Wert fuer alle Objekte. -->
       <div class="f"><label for="st_splitting">Veranlagung</label><select id="st_splitting" onchange="if(window.DpSteuerAngaben)DpSteuerAngaben.aendern()"><option value="0">Einzelveranlagung (Grundtabelle)</option><option value="1">Zusammenveranlagung (Splitting)</option></select></div>
       <div class="f"><label for="st_kist">Kirchensteuer</label><select id="st_kist" onchange="if(window.DpSteuerAngaben)DpSteuerAngaben.aendern()"><option value="0">keine</option><option value="8">8 % (Bayern, Baden-Württemberg)</option><option value="9">9 % (übrige Länder)</option></select></div>
@@ -3894,7 +3894,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v3030"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
 <script src="js/pdf-investment-bank.js?v=v3222"></script>
-<script src="js/bmf-modal.js?v=v3188"></script>
+<script src="js/bmf-modal.js?v=v3269"></script>
 <script src="js/bmf-modal-v292.js?v=v3185b"></script>
 <script src="js/bmf-bodenabschlag.js?v=v3196"></script>
 <script src="js/bmf-ausgabe.js?v=v3184b"></script><!-- v3184 · alle Ausgaben des BMF-Rechners an einer Stelle -->
@@ -3937,7 +3937,7 @@ label.dp-required.qc-required::after {
 <script src="js/tax.js?v=v3268"></script>
 <script src="js/steuer-verlauf.js?v=v3257"></script>
 <script src="js/pilot-analyse-v4.js?v=v3268"></script><!-- v3099 · Pilot-Analyse Fassung 4 (v3259: eine Kopfzeile + Reiterleiste; Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
-<script src="js/config.js?v=v3246"></script>
+<script src="js/config.js?v=v3269"></script>
 <script src="js/gnotkg.js?v=v3088"></script><!-- v3088 · Notar und Grundbuch nach Gebuehrenordnung -->
 <script src="js/versionsanzeige.js?v=v3035"></script><!-- v3035: Versionsanzeige aus version.json -->
   <script src="js/legal-links.js?v=v1885" defer></script>
@@ -3971,7 +3971,7 @@ label.dp-required.qc-required::after {
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
 <script src="js/stripe-success.js?v=183"></script>
-<script src="js/demo-paywall.js?v=v3003c"></script>
+<script src="js/demo-paywall.js?v=v3269"></script>
 <script src="js/anlage-v-2025.js?v=v1258"></script>
 <script src="js/werbungskosten-pdf.js?v=v3268"></script>
 <script src="js/gesellschaft-abschluss.js?v=v3268"></script>
@@ -4072,7 +4072,7 @@ label.dp-required.qc-required::after {
   <script src="js/tour-engine.js?v=v3045"></script>
   <script src="js/tour-content.js?v=v3231"></script>
   <!-- v1740 � Grund-Setup VOR dem Rundgang (Aussehen, Stammdaten, Rechenwerte) -->
-  <script src="js/onboarding.js?v=v3235"></script>
+  <script src="js/onboarding.js?v=v3269"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
@@ -4116,7 +4116,7 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-wizard.js?v=v3262"></script><!-- v3258 -->
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v3238"></script>
+<script src="js/investment-profile.js?v=v3269"></script>
 <script src="js/bwk-profil.js?v=v3091"></script>
 <script src="js/dashboard.js?v=v3254"></script>
 <script src="js/portfolio-strategie.js?v=v3268"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
@@ -4126,7 +4126,7 @@ label.dp-required.qc-required::after {
 <!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
 <script src="js/portfolio-pilot.js?v=v3248"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=v3238"></script>
+<script src="js/main.js?v=v3269"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=v3236"></script>

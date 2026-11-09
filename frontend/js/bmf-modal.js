@@ -1189,7 +1189,7 @@ function updateAfaPreview(ak_total){
 
   var afa_basis = ak * geb_pct / 100 + _bmfHk();  /* v988: HK 100% Gebaeude */
   var afa_jahr = afa_basis * afa_satz / 100;
-  var grenz = 0.4045;
+  var grenz = 0.42;
   var save = afa_jahr * grenz;
   var save50 = save * 50;
 
@@ -1531,7 +1531,7 @@ function renderVarImpact(){
   var afaSatz = parseDe($('afa_satz').value) || 2.0;
   var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var grenz = 0.4045;
+  var grenz = 0.42;
 
   var _hk988 = _bmfHk();
   var gebAkChosen = _bmfAhk(chosen.gebPct).gebAhk + _hk988;   /* v3006d: Kern */
@@ -1555,7 +1555,7 @@ function renderVarImpact(){
   } else {
     txtEl.innerHTML =
       'Gegenüber BMF: <strong style="color:var(--gold-d)">+' + fmtEur(deltaAfa,0) + ' AfA/Jahr</strong> · ' +
-      'bei 40,45 % Grenzsteuer = <strong style="color:var(--green)">+' + fmtEur(deltaSpar,0) + '/J</strong> · ' +
+      'bei 42 % Grenzsteuer = <strong style="color:var(--green)">+' + fmtEur(deltaSpar,0) + '/J</strong> · ' +
       'kumuliert über ' + rnd + ' Jahre: <strong>~' + fmtEur(deltaTotal,0) + '</strong>.';
   }
 }
@@ -2572,12 +2572,12 @@ function _renderVergleich(){
   // Standard 80/20
   var basis80 = kp * 0.80;
   var afa80 = basis80 * afaSatz / 100;
-  var save80 = afa80 * 0.4045;  // ~40,45 % Grenzsteuersatz
+  var save80 = afa80 * 0.42;  // 42 % Grenzsteuersatz (v3269)
 
   // BMF
   var basisBmf = kp * bmfPct / 100;
   var afaBmf = basisBmf * afaSatz / 100;
-  var saveBmf = afaBmf * 0.4045;
+  var saveBmf = afaBmf * 0.42;
 
   // Diff
   function diff(v1, v2, unit){
