@@ -1,0 +1,492 @@
+{
+  "ags": "05978024",
+  "gemeinde": "Lünen",
+  "art": "qualifiziert",
+  "stand": "2025-12-31",
+  "erhebungsstichtag": "2025-12-31",
+  "gueltig_ab": "2026-07-01",
+  "gueltig_bis": null,
+  "quelle": {
+    "url": "https://www.luenen.de/de-wAssets/docs/PDFs/antraege_wohnen/Mietspiegel-Luenen-2026-Broschuere.pdf",
+    "dokument": "Lüner Mietspiegel für nicht preisgebundenen Wohnraum, gültig ab dem 01.07.2026 (qualifiziert, § 558d Abs. 1 BGB), Mietspiegelrunde Lünen / Stadt Lünen, Abteilung Wohnen und Soziales",
+    "seite": "PDF-S. 4 (Mietwerttabelle, Auf- und Abschläge), PDF-S. 4–5 (Kap. 4 Zu- und Abschläge), PDF-S. 2 (Allgemeines, Stichtag)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Herausgeber Stadt Lünen",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Qualifiziert (§ 558d Abs. 1 BGB), Umfrage zum Stichtag 31.12.2025, gültig ab 01.07.2026, Ende nicht genannt. Die Tabelle weist je Feld EINEN Wert aus (ortsübliche Vergleichsmiete, als mittel erfasst) — keine Spanne im Dokument, unten/oben bleiben leer. Wohnflächenklassen im Dokument ganzzahlig (bis 34 / 35 bis 49 / …), hier als stetige Grenzen. Zu-/Abschläge in €/m² werden addiert, nur für vom Vermieter gestellte Ausstattung (Kap. 4). Ein Lesebeispiel enthält die Broschüre nicht — Prüfbeispiele sind abgelesene Felder.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1924,
+          "label": "bis 1924"
+        },
+        {
+          "von": 1925,
+          "bis": 1949,
+          "label": "1925 bis 1949"
+        },
+        {
+          "von": 1950,
+          "bis": 1979,
+          "label": "1950 bis 1979"
+        },
+        {
+          "von": 1980,
+          "bis": 1994,
+          "label": "1980 bis 1994"
+        },
+        {
+          "von": 1995,
+          "bis": 2004,
+          "label": "1995 bis 2004"
+        },
+        {
+          "von": 2005,
+          "bis": 2014,
+          "label": "2005 bis 2014"
+        },
+        {
+          "von": 2015,
+          "bis": null,
+          "label": "ab 2015"
+        }
+      ],
+      "wfl": [
+        {
+          "von": null,
+          "bis": 34,
+          "label": "bis 34 m²"
+        },
+        {
+          "von": 34,
+          "von_inkl": false,
+          "bis": 49,
+          "label": "35 bis 49 m²"
+        },
+        {
+          "von": 49,
+          "von_inkl": false,
+          "bis": 64,
+          "label": "50 bis 64 m²"
+        },
+        {
+          "von": 64,
+          "von_inkl": false,
+          "bis": 79,
+          "label": "65 bis 79 m²"
+        },
+        {
+          "von": 79,
+          "von_inkl": false,
+          "bis": 94,
+          "label": "80 bis 94 m²"
+        },
+        {
+          "von": 94,
+          "von_inkl": false,
+          "bis": 109,
+          "label": "95 bis 109 m²"
+        },
+        {
+          "von": 109,
+          "von_inkl": false,
+          "bis": null,
+          "label": "ab 110 m²"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "mittel": 6.69,
+        "seite": "4"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 1,
+        "mittel": 6.05,
+        "seite": "4"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 2,
+        "mittel": 5.95,
+        "seite": "4"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 3,
+        "mittel": 5.89,
+        "seite": "4"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 4,
+        "mittel": 5.79,
+        "seite": "4"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 5,
+        "mittel": 5.89,
+        "seite": "4"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 6,
+        "mittel": 5.89,
+        "seite": "4"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "mittel": 6.87,
+        "seite": "4"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 1,
+        "mittel": 6.23,
+        "seite": "4"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 2,
+        "mittel": 6.13,
+        "seite": "4"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 3,
+        "mittel": 6.07,
+        "seite": "4"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 4,
+        "mittel": 5.97,
+        "seite": "4"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 5,
+        "mittel": 6.07,
+        "seite": "4"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 6,
+        "mittel": 6.07,
+        "seite": "4"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "mittel": 7.13,
+        "seite": "4"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 1,
+        "mittel": 6.49,
+        "seite": "4"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 2,
+        "mittel": 6.39,
+        "seite": "4"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 3,
+        "mittel": 6.33,
+        "seite": "4"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 4,
+        "mittel": 6.23,
+        "seite": "4"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 5,
+        "mittel": 6.33,
+        "seite": "4"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 6,
+        "mittel": 6.33,
+        "seite": "4"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "mittel": 7.25,
+        "seite": "4"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 1,
+        "mittel": 6.61,
+        "seite": "4"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 2,
+        "mittel": 6.51,
+        "seite": "4"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 3,
+        "mittel": 6.45,
+        "seite": "4"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 4,
+        "mittel": 6.35,
+        "seite": "4"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 5,
+        "mittel": 6.45,
+        "seite": "4"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 6,
+        "mittel": 6.45,
+        "seite": "4"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "mittel": 7.72,
+        "seite": "4"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 1,
+        "mittel": 7.08,
+        "seite": "4"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 2,
+        "mittel": 6.98,
+        "seite": "4"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 3,
+        "mittel": 6.92,
+        "seite": "4"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 4,
+        "mittel": 6.82,
+        "seite": "4"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 5,
+        "mittel": 6.92,
+        "seite": "4"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 6,
+        "mittel": 6.92,
+        "seite": "4"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "mittel": 8.63,
+        "seite": "4"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 1,
+        "mittel": 7.99,
+        "seite": "4"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 2,
+        "mittel": 7.89,
+        "seite": "4"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 3,
+        "mittel": 7.83,
+        "seite": "4"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 4,
+        "mittel": 7.73,
+        "seite": "4"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 5,
+        "mittel": 7.83,
+        "seite": "4"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 6,
+        "mittel": 7.83,
+        "seite": "4"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "mittel": 9.77,
+        "seite": "4"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 1,
+        "mittel": 9.13,
+        "seite": "4"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 2,
+        "mittel": 9.03,
+        "seite": "4"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 3,
+        "mittel": 8.97,
+        "seite": "4"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 4,
+        "mittel": 8.87,
+        "seite": "4"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 5,
+        "mittel": 8.97,
+        "seite": "4"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 6,
+        "mittel": 8.97,
+        "seite": "4"
+      }
+    ],
+    "zuschlaege": [
+      {
+        "merkmal": "aufzug",
+        "label": "Aufzug (Wohnung vom Erdgeschoss aus erreichbar)",
+        "art": "eur_qm",
+        "wert": 0.2,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "kein_bodenbelag_oder_pvc",
+        "label": "kein Bodenbelag oder PVC (überwiegend / auf mind. 50 %)",
+        "art": "eur_qm",
+        "wert": -0.43,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "hochwertiger_bodenbelag",
+        "label": "hochwertiger Bodenbelag auf mind. 50 % der Bodenfläche",
+        "art": "eur_qm",
+        "wert": 0.26,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "zweites_wc",
+        "label": "zweites WC",
+        "art": "eur_qm",
+        "wert": 0.2,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "balkon",
+        "label": "Balkon (mind. 4 m² Grundfläche)",
+        "art": "eur_qm",
+        "wert": 0.33,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "terrasse",
+        "label": "Terrasse",
+        "art": "eur_qm",
+        "wert": 0.41,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "elektrische_rolllaeden",
+        "label": "elektrische Rollläden (zu 2/3 der Wohnung)",
+        "art": "eur_qm",
+        "wert": 0.17,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "dreifachglasfenster",
+        "label": "Dreifachglasfenster",
+        "art": "eur_qm",
+        "wert": 0.42,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      },
+      {
+        "merkmal": "sicherheitsverriegelte_fenster",
+        "label": "sicherheitsverriegelte Fenster",
+        "art": "eur_qm",
+        "wert": 0.2,
+        "beleg": "PDF-S. 4 (Auf- und Abschläge), Erläuterung Kap. 4 PDF-S. 4–5"
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1970,
+        "wfl": 72
+      },
+      "erwartet": {
+        "mittel": 6.33
+      },
+      "art": "tabellenzelle",
+      "seite": "PDF-S. 4, Baujahr 1950 bis 1979, 65 bis 79 m²"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2016,
+        "wfl": 30,
+        "merkmale": {
+          "balkon": true
+        }
+      },
+      "erwartet": {
+        "mittel": 10.1
+      },
+      "art": "tabellenzelle",
+      "seite": "PDF-S. 4, Baujahr ab 2015, bis 34 m²: 9,77 €/m² + Balkon 0,33 €/m² (Auf-/Abschläge)"
+    }
+  ]
+}
