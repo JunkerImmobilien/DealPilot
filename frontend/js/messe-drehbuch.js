@@ -3220,6 +3220,17 @@
         var p = r12Faktoren(0).slice(0, 3).map(function (y) { return y.name; }), n = r12Faktoren(1).slice(0, 3).map(function (y) { return y.name; });
         await b2oZeile(s, 'Was trägt, was drückt', (p.length ? 'Stark: <b>' + p.join(', ') + '</b>. ' : '') + (n.length ? 'Schwach: <b>' + n.join(', ') + '</b>.' : ''));
       },
+      async function (s) {   /* 6b · Kennzahlen-Bewertung mit Ampel (nur ab Detailgrad Experte sichtbar) */
+        var tb = function () { var k = q('#s6 .kpi-eval-card'); return k && k.offsetHeight ? k : null; };
+        if (!tb()) return;
+        var x = tb(); x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(tb, 8);
+        var d = r12Bewertung(/^DSCR/), c = r12Bewertung(/^Cashflow vor/), b = r12Bewertung(/^Bruttomiet/);
+        function f(y, nm) { return y ? nm + ' <b>' + y.wert + '</b> ' + y.wort.toLowerCase() : ''; }
+        var z = [f(d, 'DSCR'), f(c, 'Cashflow'), f(b, 'Bruttorendite')].filter(Boolean);
+        await b2oZeile(s, 'Jede Kennzahl mit Ampel', (z.length ? z.join(', ') : 'DSCR, Cashflow, Rendite') + ' — lokal gerechnet, mit einem Satz, was das heißt.');
+      },
       async function (s) {   /* 7 · Alle KPIs und Formel */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         var kn = function () { return [].filter.call(document.querySelectorAll('#s6 .dpz-kopf .dpz-knopf'), function (b) { return /Alle KPIs/.test(b.textContent); })[0] || null; };
