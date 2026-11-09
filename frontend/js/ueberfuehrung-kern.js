@@ -18,6 +18,8 @@
  *   § 23 Abs. 1 KStG, §§ 3, 4 SolZG; § 10d EStG (i. V. m. § 8 Abs. 1 KStG)
  *   § 9 Nr. 1 GewStG (S. 1 Fassung JStG 2024 ab EZ 2025), § 10a, § 11 Abs. 1 S. 3, Abs. 2 GewStG
  *   § 32d Abs. 2 Nr. 1 S. 1 Buchst. b EStG; § 5a Abs. 2 S. 2, Abs. 3 GmbHG
+ *   v3268: § 8 Nr. 1 GewStG (Hinzurechnung), § 8 Abs. 2 KStG (Veraeusserung
+ *   im Betriebsvermoegen, keine Zehnjahresfrist)
  */
 (function (root) {
   'use strict';
@@ -268,13 +270,119 @@
      Verlustvortrag § 10a (1 Mio. + 60 %); Abrundung auf volle 100 €
      (§ 11 Abs. 1 S. 3); Messzahl 3,5 % (§ 11 Abs. 2); kein Freibetrag
      fuer Kapitalgesellschaften. Steuern sind keine Betriebsausgabe. */
+  /* ── v3268 · Hinzurechnung § 8 Nr. 1 GewStG ───────────────────────────
+     Marcel 09.11.2026: greift die erweiterte Kuerzung NICHT, werden dem
+     Gewinn 25 % der Summe der Hinzurechnungsbetraege hinzugerechnet, soweit
+     sie den Freibetrag von 200.000 € uebersteigt — je Gesellschaft und
+     Erhebungszeitraum (§ 8 Nr. 1 GewStG; Freibetrag seit EZ 2020, vorher
+     100.000 €). Summanden: Entgelte fuer Schulden voll (Buchst. a), Mieten
+     und Pachten beweglicher Wirtschaftsgueter zu 1/5 (Buchst. d),
+     unbeweglicher zu 1/2 (Buchst. e), Lizenzen zu 1/4 (Buchst. f).
+     DealPilot fuehrt je Objekt nur die Zinsen; die anderen Summanden sind
+     Parameter und werden als „nicht erfasst" gemeldet, wenn sie fehlen.
+     Freibetrag und Satz stehen im Jahreswerte-Register (gewst_hinzurechnung_8_1);
+     diese Zeile ist der Spiegel, den tools/jahreswerte-pruefen.mjs liest. */
+  var HINZURECHNUNG_8_1 = { freibetrag: 200000, satz: 0.25 };
+
+  /* ── v3268 · KSt-Satz je Veranlagungszeitraum (§ 23 Abs. 1 KStG n. F.) ──
+     Gesetz fuer ein steuerliches Investitionssofortprogramm vom 14.07.2025
+     (BGBl. 2025 I Nr. 161): 15 % bis VZ 2027, dann je Jahr ein Punkt weniger
+     bis 10 % ab VZ 2032. Soli 5,5 % darauf bleibt (§ 4 SolZG). Spiegel im
+     Jahreswerte-Register: kst_satz_jahre. Bis v3267 rechnete DealPilot jedes
+     Prognosejahr mit 15,825 %. */
+  var KST_SATZ = { bis2027: 15, 2028: 14, 2029: 13, 2030: 12, 2031: 11, ab2032: 10 };
+  function kstSatzPct(jahr) {
+    var j = Number(jahr) || 0;
+    if (!j || j <= 2027) return KST_SATZ.bis2027;
+    if (j >= 2032) return KST_SATZ.ab2032;
+    return KST_SATZ[j];
+  }
+  function kstSoliPct(jahr) { return Math.round(kstSatzPct(jahr) * 1.055 * 1e6) / 1e6; }
+
+  /* ── v3268 · Einfache Kuerzung § 9 Nr. 1 S. 1 GewStG ────────────────────
+     Ab EZ 2025 (JStG 2024): 0,11 % des Grundsteuerwerts des zum
+     Betriebsvermoegen gehoerenden Grundbesitzes; bis EZ 2024: 1,2 % von
+     140 % des Einheitswerts. Bis v3267 kuerzte DealPilot um den
+     Grundsteuer-BETRAG - das kennt das Gesetz nicht. Der Grundsteuerwert
+     steht im Grundsteuerwertbescheid (Feld `grundsteuerwert` am Objekt);
+     fehlt er, gibt es KEINE Kuerzung (nicht geraten) und einen Hinweis. */
+  var KUERZUNG_9_1 = { satzAb2025: 0.0011, satzBis2024: 0.012, ewFaktor: 1.4 };
+  function einfacheKuerzung(jahr, grundsteuerwert, einheitswert) {
+    var j = Number(jahr) || 0;
+    if (j >= 2025) {
+      var g = _n(grundsteuerwert);
+      return (g != null && g > 0) ? { betrag: g * KUERZUNG_9_1.satzAb2025, basis: 'grundsteuerwert', fehlt: false }
+                                  : { betrag: 0, basis: null, fehlt: 'Grundsteuerwert' };
+    }
+    var e = _n(einheitswert);
+    return (e != null && e > 0) ? { betrag: e * KUERZUNG_9_1.ewFaktor * KUERZUNG_9_1.satzBis2024, basis: 'einheitswert', fehlt: false }
+                                : { betrag: 0, basis: null, fehlt: 'Einheitswert' };
+  }
+
+  /* ── v3268 · UG-Ruecklage § 5a Abs. 3 GmbHG ──────────────────────────────
+     „ein Viertel des um einen Verlustvortrag aus dem Vorjahr geminderten
+     Jahresueberschusses". EINE Stelle fuer Reiter Steuer, Jahresabschluss
+     und ausschuettung(). Bis v3267: 25 % ohne Minderung. */
+  function ugRuecklage(jahresueberschuss, verlustvortragVorjahr) {
+    var jue = _n(jahresueberschuss) || 0, vv = Math.max(0, _n(verlustvortragVorjahr) || 0);
+    return Math.max(0, jue - vv) * 0.25;
+  }
+  function hinzurechnung(entgelte, p) {
+    p = p || {};
+    var fb = (_n(p.freibetrag) != null) ? _n(p.freibetrag) : HINZURECHNUNG_8_1.freibetrag;
+    var satz = (_n(p.satz) != null) ? _n(p.satz) : HINZURECHNUNG_8_1.satz;
+    var z = Math.max(0, _n(entgelte) || 0);
+    var mb = _n(p.mietenBeweglich), mu = _n(p.mietenUnbeweglich), li = _n(p.lizenzen);
+    var summe = z + Math.max(0, mb || 0) / 5 + Math.max(0, mu || 0) / 2 + Math.max(0, li || 0) / 4;
+    var ueber = Math.max(0, summe - fb);
+    return { entgelte: z, summe: summe, freibetrag: fb, satz: satz, ueberFreibetrag: ueber,
+             betrag: ueber * satz, nurZinsen: mb == null && mu == null && li == null };
+  }
+
+  /* ── v3268 · Veraeusserung im Betriebsvermoegen der GmbH/UG ─────────────
+     Die Zehnjahresfrist des § 23 Abs. 1 S. 1 Nr. 1 EStG gilt nur fuer
+     private Veraeusserungsgeschaefte. Eine Kapitalgesellschaft hat nur
+     Einkuenfte aus Gewerbebetrieb (§ 8 Abs. 2 KStG) — der Gewinn ist
+     IMMER steuerpflichtig, gleich nach wie vielen Jahren:
+       Gewinn = Verkaufspreis − Buchwert (AK − kumulierte AfA) − Verkaufskosten
+       KSt + Soli = Gewinn × Satz
+       GewSt = 0 bei erweiterter Kuerzung (die Veraeusserung eigenen
+               Grundbesitzes gehoert zur Verwaltung), SONST und bei
+               schaedlicher Veraeusserung (z. B. gewerblicher Grundstueckshandel,
+               letztes Objekt vor Ende des Erhebungszeitraums verkauft)
+               Gewinn auf volle 100 € abgerundet × 3,5 % × Hebesatz.
+     Isoliert gerechnet: ein Verlustvortrag oder das laufende Ergebnis des
+     Jahres ist nicht verrechnet. */
+  function veraeusserungGesellschaft(p) {
+    p = p || {};
+    var preis = _n(p.preis), ak = _n(p.ak), afa = _n(p.afaKum), vk = _n(p.verkaufskosten) || 0;
+    var fehlt = [];
+    if (preis == null || !(preis > 0)) fehlt.push('Verkaufspreis');
+    if (ak == null || !(ak > 0)) fehlt.push('Anschaffungskosten');
+    if (fehlt.length) return { ok: false, fehlt: fehlt };
+    if (afa == null) afa = 0;
+    var buchwert = Math.max(0, ak - afa);
+    var gewinn = preis - buchwert - vk;
+    var kstSoli = (p.kstNachJahr && _n(p.jahr) != null) ? kstSoliPct(p.jahr) / 100
+      : (_n(p.kstSoliPct) != null ? p.kstSoliPct : 15.825) / 100;
+    var kst = Math.max(0, gewinn) * kstSoli;
+    var heb = _n(p.hebesatz) || 0;
+    var gewFrei = !!p.erwKuerzung && !p.schaedlich;
+    var gewst = gewFrei ? 0 : Math.floor(Math.max(0, gewinn) / 100) * 100 * 0.035 * heb / 100;
+    return { ok: true, preis: preis, ak: ak, afaKum: afa, buchwert: buchwert, verkaufskosten: vk,
+             gewinn: gewinn, kst: kst, gewst: gewst, steuer: kst + gewst, kstSoliPct: kstSoli * 100,
+             gewstFrei: gewFrei, gewstOhneHebesatz: !gewFrei && !(heb > 0), steuerfreiNachFrist: false,
+             hinweis: HINWEIS_VERKAUF_GES };
+  }
+  var HINWEIS_VERKAUF_GES = 'Veräußerungsgewinn immer steuerpflichtig (KSt; GewSt nur ohne erweiterte Kürzung bzw. bei schädlicher Veräußerung) — die 10-Jahres-Frist gilt nur im Privatvermögen.';
+
   function _mindest(erg, vortrag, quote) {
     var grenze = Math.min(erg, 1000000) + Math.max(0, erg - 1000000) * quote;
     return Math.min(vortrag, grenze);
   }
   function steuerReihe(reihe, p) {
     p = p || {};
-    var kstSoli = (_n(p.kstSoliPct) != null ? p.kstSoliPct : 15.825) / 100;
+    var kstSoliFest = (_n(p.kstSoliPct) != null ? p.kstSoliPct : 15.825) / 100;
     var heb = _n(p.hebesatz) || 0;
     var vK = _n(p.vortragKSt) || 0, vG = _n(p.vortragGewSt) || 0;
     return (reihe || []).map(function (r) {
@@ -283,16 +391,25 @@
       var gK = 0, bemK = 0;
       if (erg < 0) vK += -erg;
       else if (erg > 0) { gK = _mindest(erg, vK, (jahr >= 2024 && jahr <= 2027) ? 0.70 : 0.60); vK -= gK; bemK = erg - gK; }
+      /* v3268: p.kstNachJahr (Mandant ohne eigenen Satz) -> Satz des Jahres (§ 23 Abs. 1 KStG n. F.) */
+      var kstSoli = p.kstNachJahr ? kstSoliPct(jahr) / 100 : kstSoliFest;
       var kst = bemK * kstSoli;
       /* GewSt */
-      var kuerz = 0, ge = 0, gG = 0, bemG = 0, gewst = 0;
+      var kuerz = 0, ge = 0, gG = 0, bemG = 0, gewst = 0, hz = 0, kuerzFehlt = false;
       if (p.erwKuerzung) { kuerz = Math.max(0, erg); ge = Math.min(0, erg); }
-      else { kuerz = Math.max(0, Number(r.grundsteuer) || 0); ge = erg - kuerz; }
+      else {
+        /* v3268: einfache Kuerzung aus dem Grundsteuerwert (nicht mehr der Grundsteuerbetrag) */
+        var ek = einfacheKuerzung(jahr, r.grundsteuerwert, r.einheitswert);
+        kuerz = ek.betrag; kuerzFehlt = ek.fehlt;
+        /* v3268: Hinzurechnung § 8 Nr. 1 GewStG (nur ohne erweiterte Kuerzung) */
+        if (Number(r.entgelte) > 0) hz = hinzurechnung(r.entgelte, p).betrag;
+        ge = erg + hz - kuerz;
+      }
       if (ge < 0) vG += -ge;
       else if (ge > 0) { gG = _mindest(ge, vG, 0.60); vG -= gG; bemG = Math.floor((ge - gG) / 100) * 100; }
       gewst = bemG * 0.035 * heb / 100;
-      return { jahr: jahr, erg: erg, genutzt: gK, bemessung: bemK, kst: kst,
-               gewKuerzung: kuerz, gewerbeertrag: bemG, gewGenutzt: gG, gewst: gewst,
+      return { jahr: jahr, erg: erg, genutzt: gK, bemessung: bemK, kst: kst, kstSoliPct: kstSoli * 100, kuerzungFehlt: kuerzFehlt,
+               gewKuerzung: kuerz, hinzurechnung: hz, entgelte: Number(r.entgelte) || 0, gewerbeertrag: bemG, gewGenutzt: gG, gewst: gewst,
                steuer: kst + gewst, vortragNach: vK, vortragGewNach: vG };
     });
   }
@@ -304,11 +421,11 @@
   function tracker(p) {
     var hist = [];
     return {
-      steuer: function (erg, jahr, grundsteuer) {
+      steuer: function (erg, jahr, grundsteuerwert, entgelte) {
         var last = hist.length ? hist[hist.length - 1].jahr : null;
         if (last !== null && jahr === last) hist.pop();          /* dasselbe Jahr neu gerechnet (calc.js V353) */
         else if (last !== null && jahr < last) hist = [];        /* neue Schleife */
-        hist.push({ jahr: jahr, erg: erg, grundsteuer: grundsteuer });
+        hist.push({ jahr: jahr, erg: erg, grundsteuerwert: grundsteuerwert, entgelte: entgelte });
         var r = steuerReihe(hist, p);
         return r[r.length - 1];
       },
@@ -323,7 +440,7 @@
   function ausschuettung(p) {
     var jue = _n(p.jahresueberschuss) || 0;
     if (!(jue > 0)) return { ausschuettbar: 0, ruecklage: 0, kapESt: 0, netto: 0 };
-    var rl = (p.rechtsform === 'ug') ? jue * 0.25 : 0;
+    var rl = (p.rechtsform === 'ug') ? ugRuecklage(jue, p.verlustvortrag) : 0;   /* v3268: § 5a Abs. 3 GmbHG mit Verlustvortrag */
     var aus = jue - rl;
     var kap = aus * 0.26375;
     return { ausschuettbar: aus, ruecklage: rl, kapESt: kap, netto: aus - kap };
@@ -342,7 +459,11 @@
   }
 
   root.DealPilotUeberfuehrungKern = {
-    version: 'v2984',
+    version: 'v3268',
+    HINZURECHNUNG_8_1: HINZURECHNUNG_8_1, hinzurechnung: hinzurechnung,
+    KST_SATZ: KST_SATZ, kstSatzPct: kstSatzPct, kstSoliPct: kstSoliPct,
+    KUERZUNG_9_1: KUERZUNG_9_1, einfacheKuerzung: einfacheKuerzung, ugRuecklage: ugRuecklage,
+    veraeusserungGesellschaft: veraeusserungGesellschaft, HINWEIS_VERKAUF_GES: HINWEIS_VERKAUF_GES,
     ARTEN: ARTEN, PRUEFPUNKTE: PRUEFPUNKTE,
     artZulaessig: artZulaessig, stichtagAnteile: stichtagAnteile,
     grest: grest, wertAnsatz: wertAnsatz, afaSatzGesellschaft: afaSatzGesellschaft,

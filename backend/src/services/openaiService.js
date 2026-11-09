@@ -250,6 +250,15 @@ function _bestandBlock(b) {
     if (Array.isArray(d.fehlt) && d.fehlt.length) z.push('  fehlt: ' + d.fehlt.join(', '));
   });
   if (b.cf_heute_m != null || b.dscr_heute != null) z.push('Heute: Cashflow vor Steuer ' + eur(b.cf_heute_m) + '/Monat, DSCR ' + zahl(b.dscr_heute, 2) + '.');
+  /* v3268 · Halter GmbH/UG: keine Zehnjahresfrist - der Veraeusserungsgewinn ist immer steuerpflichtig */
+  if (b.halter_gesellschaft) {
+    var vg = b.veraeusserung_gesellschaft || {};
+    z.push('Kaufdatum: ' + (b.kaufdatum || '–') + '. Halter ist eine GmbH/UG: die Zehnjahresfrist § 23 EStG gilt NICHT (nur Privatvermoegen). '
+      + (vg.hinweis || 'Veraeusserungsgewinn immer steuerpflichtig.')
+      + (vg.gewinn != null ? ' Veraeusserungsgewinn heute (Marktpreis - Buchwert ' + eur(vg.buchwert) + '): ' + eur(vg.gewinn)
+        + ', KSt + Soli ' + eur(vg.kst_soli) + ', GewSt ' + eur(vg.gewst) + ', zusammen ' + eur(vg.steuer) + '.' : '')
+      + ' Nenne NIE einen steuerfreien Verkauf nach zehn Jahren.');
+  } else
   z.push('Kaufdatum: ' + (b.kaufdatum || '–') + '. Ende der Zehnjahresfrist § 23 EStG: ' + (b.steuerfrei_ab || '–')
     + (b.monate_bis_steuerfrei != null ? (b.monate_bis_steuerfrei > 0 ? ' (noch ' + b.monate_bis_steuerfrei + ' Monate)' : ' (abgelaufen)') : '') + '.');
   z.push('Marktpreisindikation (letzter Marktbericht' + (b.marktwert_stand ? ' vom ' + b.marktwert_stand : '') + '): ' + eur(b.marktwert)
@@ -1786,7 +1795,9 @@ function buildPrompt(payload, opts) {
       + '  Fristende, Marktpreis, Netto-Erloes) - nicht nachrechnen. Steht dort „fehlt", sage das statt zu schaetzen.\n'
       + '  Fragen zur Anschlussfinanzierung, z.B.: „Was kostet mich das Ende der Zinsbindung?", „Lohnt ein Forward-Darlehen\n'
       + '  oder eine Sondertilgung?", „Wie viel Eigenkapital braucht die Anschlussfinanzierung, damit der DSCR traegt?".\n'
-      + '  Fragen zum Exit, z.B.: „Wann kann ich steuerfrei verkaufen?" (Zehnjahresfrist § 23 EStG ab Kaufdatum),\n'
+      + '  Fragen zum Exit, z.B.: „Wann kann ich steuerfrei verkaufen?" (Zehnjahresfrist § 23 EStG ab Kaufdatum;\n'
+      + '  v3268: ist der Halter eine GmbH/UG, gibt es KEINE Frist - frage dann „Was kostet mich ein Verkauf steuerlich?"\n'
+      + '  mit Veraeusserungsgewinn und Steuer aus dem Block),\n'
       + '  „Verkaufen, halten oder beleihen fuer den naechsten Kauf?"; bei einem Mehrfamilienhaus „Lohnt eine Aufteilung in\n'
       + '  Eigentumswohnungen?"; „Lohnt eine Ueberfuehrung in eine Gesellschaft?" - nur als Hinweis auf die Fragen, die zu\n'
       + '  klaeren sind (Grunderwerbsteuer, Frist, laufende Besteuerung), KEINE Steuer- oder Rechtsberatung; verweise auf den Steuerberater.\n' : ''),

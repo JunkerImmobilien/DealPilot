@@ -803,12 +803,18 @@
     var alle = (State.cfRows || []).slice(0, 15);
     var B = D(), o = objektKopf(), rows = opt.alle ? alle : (Number.isInteger(opt.jahr) && alle[opt.jahr]) ? [alle[opt.jahr]] : alle.slice(0, jahre || 3);
     var idx0 = (Number.isInteger(opt.jahr) && !opt.alle && alle[opt.jahr]) ? opt.jahr : 0;
-    var name = mitAnlageV ? 'Werbungskosten · Anlage V' : 'Werbungskosten · Finanzamt';
+    /* v3268 · Halter GmbH/UG: „Betriebsausgaben", keine Anlage V (Einkuenfte aus
+       Gewerbebetrieb, § 8 Abs. 2 KStG). GbR: Werbungskosten plus Feststellung § 180 AO. */
+    var bg = (window._dpBegriff ? window._dpBegriff() : { corp: false, wort: 'Werbungskosten' });
+    if (bg.corp) mitAnlageV = false;
+    var name = bg.corp ? 'Betriebsausgaben · Gesellschaft' : (mitAnlageV ? 'Werbungskosten · Anlage V' : 'Werbungskosten · Finanzamt');
+    var _hId = feld('halter'), _hName = '';
+    try { var _hm = (_hId && _hId !== 'privat' && window.DealPilotMandanten) ? DealPilotMandanten.get(_hId) : null; _hName = (_hm && _hm.id === _hId) ? _hm.name : ''; } catch (_eH) {}
     return Promise.all([basis(name), objektInfo(window._currentObjKey, o.adresse)]).then(function (zz) {
       var c = zz[0], info = zz[1]; c.zeile = o.adresse;
       var S = [], ges = [];
-      S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: 'Aufstellung Werbungskosten' + (mitAnlageV ? ' mit Zuordnung zur Anlage V' : ' · Anlage V'), titel: o.adresse, unter: o.art + ' · vermietet',
-        meta: [['Veranlagungsjahre', rows.map(function (r) { return r.cal; }).join(', ')], ['Stand', c.stand], ['Eigentümer', feld('halter') && feld('halter') !== 'privat' ? feld('halter') : (c.marke.name || c.marke.company || '')]] }));
+      S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: bg.corp ? 'Aufstellung Betriebsausgaben · Objekt in der Gesellschaft' : ('Aufstellung Werbungskosten' + (mitAnlageV ? ' mit Zuordnung zur Anlage V' : ' · Anlage V')), titel: o.adresse, unter: o.art + ' · vermietet',
+        meta: [['Veranlagungsjahre', rows.map(function (r) { return r.cal; }).join(', ')], ['Stand', c.stand], ['Eigentümer', _hName || (_hId && _hId !== 'privat' ? _hId : (c.marke.name || c.marke.company || ''))]] }));
       rows.forEach(function (row, i) {
         var t = _computeYearTotal(row.cal, i + idx0) || {}, v = t.values || {};
         var ein = (Number(v.einnahmen_km) || 0) + (Number(v.einnahmen_nk) || 0);
@@ -820,14 +826,24 @@
           g[1].forEach(function (f) { if (Number(v[f[0]])) tab.push([f[1], B.eur(v[f[0]], 2), { art: 'ein' }]); });
           summe += s;
         });
-        tab.push(['Summe Werbungskosten ' + row.cal, B.eur(summe, 2), { art: 'summe' }]);
-        tab.push(['Einkünfte aus Vermietung und Verpachtung', B.eurS(ein - summe, 2), { art: 'ende', farbe: 1 }]);
-        tab.push(['Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-(row.tax_y || 0), 0), { farbe: 1 }]);
+        tab.push(['Summe ' + bg.wort + ' ' + row.cal, B.eur(summe, 2), { art: 'summe' }]);
+        tab.push([bg.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(ein - summe, 2), { art: 'ende', farbe: 1 }]);
+        tab.push([bg.corp ? 'Ertragsteuer der Gesellschaft (KSt + Soli + GewSt, Belastung −)' : 'Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-(row.tax_y || 0), 0), { farbe: 1 }]);
         ges.push([String(row.cal), B.eur(ein, 2), B.eur(summe, 2), B.eurS(ein - summe, 2)]);
-        S.push(B.seite(c, 'Jahr ' + row.cal, B.abschnitt('Veranlagungsjahr ' + row.cal, 'Einnahmen und Werbungskosten ' + row.cal, o.adresse) + B.liste(tab)));
+        /* v3268 · GbR: gesonderte und einheitliche Feststellung § 180 AO */
+        var _fs = (!bg.corp && window._dpGbrFeststellung) ? window._dpGbrFeststellung(row.cal, ein - summe) : null;
+        var _fsHtml = _fs ? '<h3>Gesonderte und einheitliche Feststellung (§ 180 AO) · ' + B.esc(_fs.name || 'GbR') + '</h3><table><thead><tr><th>Gesellschafter</th><th class="r">Anteil</th><th class="r">Einkünfte</th></tr></thead><tbody>'
+          + '<tr class="summe"><td>Einkünfte der GbR (V+V' + (_fs.objekte > 1 ? ', ' + _fs.objekte + ' Objekte' : '') + ')</td><td class="r num">100 %</td><td class="r num">' + B.eurS(_fs.einkuenfte, 2) + '</td></tr>'
+          + _fs.zeilen.map(function (z) { return '<tr><td>' + B.esc(z.name) + '</td><td class="r num">' + String(Math.round(z.anteilPct * 100) / 100).replace('.', ',') + ' %</td><td class="r num">' + B.eurS(z.betrag, 2) + '</td></tr>'; }).join('')
+          + '</tbody></table><p class="det">In die Einkommensteuer des Nutzers geht nur sein Anteil (' + B.eurS(_fs.eigenerBetrag, 2) + ').'
+          + (_fs.vollstaendig ? '' : ' Die Anteile ergeben zusammen ' + String(Math.round(_fs.summePct * 100) / 100).replace('.', ',') + ' % — bitte die weiteren Gesellschafter im Mandanten ergänzen.')
+          + ' Sonderwerbungskosten und Ergänzungsbilanzen einzelner Gesellschafter sind nicht abgebildet. Keine Steuerberatung.</p>' : '';
+        S.push(B.seite(c, 'Jahr ' + row.cal, B.abschnitt('Veranlagungsjahr ' + row.cal, (bg.corp ? 'Betriebseinnahmen und Betriebsausgaben ' : 'Einnahmen und Werbungskosten ') + row.cal, o.adresse) + B.liste(tab) + _fsHtml
+          + (bg.corp ? '<p class="det" style="margin-top:3mm">Die Kosten der Gesellschaft selbst (Buchführung, Jahresabschluss, IHK, Kontoführung) stehen nicht hier, sondern im Jahresabschluss der Gesellschaft. Eine Anlage V gibt es für eine GmbH/UG nicht. '
+            + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || '') + '</p>' : '')));
         if (mitAnlageV) { var av = anlageVBlatt(B, row.cal, t); if (av) S.push(B.seite(c, 'Anlage V ' + row.cal, B.abschnitt('Anlage V · Zuordnung', 'Veranlagungsjahr ' + row.cal, 'Dieselben Zahlen, sortiert nach den Zeilen des amtlichen Formulars') + av)); }
       });
-      S.push(B.seite(c, 'Übersicht', B.abschnitt('Übersicht', 'Alle Jahre im Vergleich') + '<table><thead><tr><th>Jahr</th><th class="r">Einnahmen</th><th class="r">Werbungskosten</th><th class="r">Einkünfte</th></tr></thead><tbody>'
+      S.push(B.seite(c, 'Übersicht', B.abschnitt('Übersicht', 'Alle Jahre im Vergleich') + '<table><thead><tr><th>Jahr</th><th class="r">Einnahmen</th><th class="r">' + bg.wort + '</th><th class="r">' + (bg.corp ? 'Ergebnis' : 'Einkünfte') + '</th></tr></thead><tbody>'
         + ges.map(function (g) { return '<tr><td class="num">' + g[0] + '</td><td class="r num">' + g[1] + '</td><td class="r num">' + g[2] + '</td><td class="r num">' + g[3] + '</td></tr>'; }).join('') + '</tbody></table>'
         + '<p class="det" style="margin-top:3mm">' + (mitAnlageV ? 'Die Zuordnung zu den Zeilen der Anlage V steht je Jahr auf einem eigenen Blatt.' : 'Zuordnung zur Anlage V nach den Zeilen des jeweiligen Veranlagungsjahres: Fassung „mit Anlage V“.') + ' Keine Steuerberatung.</p>'));
       return B.dokument(name + ' · ' + o.adresse, S);

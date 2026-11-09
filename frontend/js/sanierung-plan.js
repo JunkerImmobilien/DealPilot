@@ -133,8 +133,11 @@
       var vert = String(e.vert || 'auto');
       if (vert === 'auto' && ueber && imFenster(e)) return { art: 'anschaffungsnah', jahre: abschreiben(J, b, 'anah'), jaehrlich: b * satz / 100, ab: J, anteilig: !!(A && Am && J === A && Am > 1), monatFehlt: grenzfall(e) };
       var n = vert === 'auto' ? 1 : Math.max(1, Math.min(5, parseInt(vert, 10) || 1));
+      /* v3268 · § 82b EStDV nur ausserhalb eines Betriebsvermoegens: GmbH/UG -> sofort */
+      var ohne82b = !!ctx.ohne82b && n > 1;
+      if (ctx.ohne82b) n = 1;
       for (var i = 0; i < n; i++) add(J + i, 'erh', b / n);
-      return { art: 'erhaltung', jahre: n, jaehrlich: b / n, ab: J, fenster: imFenster(e), warnung: ueber && imFenster(e) && vert !== 'auto', monatFehlt: grenzfall(e) };
+      return { art: 'erhaltung', jahre: n, jaehrlich: b / n, ab: J, fenster: imFenster(e), warnung: ueber && imFenster(e) && vert !== 'auto', monatFehlt: grenzfall(e), ohne82b: ohne82b };
     });
     return { jahre: jahre, fensterNetto: fenster, summeNetto: summe, grenze: grenze, ueber: ueber, A: A, Am: Am || null,
       fensterEnde: ende != null ? { jahr: Math.floor(ende / 12), monat: ende % 12 + 1 } : null, behandlung: behandlung };
@@ -179,7 +182,9 @@
     }
     var d = p.A != null ? null : anschaffung();   /* v3223: Monat und Tag des Uebergangs fuer Fenster und AfA */
     return { A: p.A != null ? p.A : anschaffungsjahr(), Am: p.Am != null ? p.Am : (d ? d.getMonth() + 1 : null), Ad: p.Ad != null ? p.Ad : (d ? d.getDate() : null),
-      grenze: grenze, sanNetto: sanNetto, ust: ust, afaSatz: satz };
+      grenze: grenze, sanNetto: sanNetto, ust: ust, afaSatz: satz,
+      /* v3268: Halter GmbH/UG -> keine Verteilung nach § 82b EStDV */
+      ohne82b: p.ohne82b != null ? !!p.ohne82b : (function () { try { return !!(window.DealPilotMandanten && DealPilotMandanten.istKoerperschaft && DealPilotMandanten.istKoerperschaft((el('halter') || {}).value || 'privat')); } catch (e) { return false; } })() };
   }
 
   var LEER = { erh: 0, anah: 0, afa: 0 };
@@ -203,7 +208,8 @@
     if (b.art === 'herstellung') return t + 'Herstellungskosten, AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant;
     if (b.art === 'anschaffungsnah') return t + '<span style="color:#B8625C;font-weight:600">anschaffungsnahe Herstellungskosten</span> (15-%-Grenze überschritten), AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant + mf;
     if (b.art === 'erhaltung') {
-      t += b.jahre > 1 ? 'Erhaltungsaufwand verteilt auf ' + b.jahre + ' Jahre (' + J + '–' + (J + b.jahre - 1) + '), je ' + eur(b.jaehrlich) + '.' : 'Erhaltungsaufwand, sofort absetzbar ' + J + '.';
+      if (b.ohne82b) t += 'Betriebsausgabe sofort ' + J + ' - eine Verteilung nach § 82b EStDV gibt es nur im Privatvermögen, nicht in der GmbH/UG. ';
+      else t += b.jahre > 1 ? 'Erhaltungsaufwand verteilt auf ' + b.jahre + ' Jahre (' + J + '–' + (J + b.jahre - 1) + '), je ' + eur(b.jaehrlich) + '.' : 'Erhaltungsaufwand, sofort absetzbar ' + J + '.';
       if (b.warnung) t += ' <span style="color:#B8625C;font-weight:600">Achtung:</span> im 3-Jahres-Fenster ist die 15-%-Grenze überschritten - steuerlich wären es anschaffungsnahe Herstellungskosten (Verteilung „automatisch“ rechnet das).';
       return t + mf;
     }

@@ -323,7 +323,8 @@ async function _gaDaten(halterId, jahr, _ohneVortrag) {
       kumAfaGebaeude: kumGeb,
       kumAfaBwg: kumBwg,
       basisIstVerkehrswert: (basis !== kp),
-      grundsteuerJahr: _gaNum(d.grundsteuer) * 12,
+      /* v3268: Grundsteuerwert lt. Bescheid (einfache Kuerzung § 9 Nr. 1 S. 1 GewStG, 0,11 %) */
+      grundsteuerwert: _gaNum(d.grundsteuerwert),
       gdZins: (_udA && _udA.gd && _gaNum(_udA.gd.betrag) > 0) ? _gaNum(_udA.gd.betrag) * _gaNum(_udA.gd.zinsPct) / 100 : 0,
       restschuld: _gaRestschuld(d, jahr)
     });
@@ -403,7 +404,7 @@ async function _gaVortrag(halterId, jahr, objekte) {
     var e = (r && r.guv && isFinite(r.guv.jahresueberschuss)) ? r.guv.jahresueberschuss : 0;
     var ev = (r && r.guv && isFinite(r.guv.ergebnisVorSteuern)) ? r.guv.ergebnisVorSteuern : 0;
     summe += e;
-    details.push({ jahr: y, ergebnis: e, vorSteuern: ev, grundsteuer: (r && r._grundsteuer) || 0 });
+    details.push({ jahr: y, ergebnis: e, vorSteuern: ev, grundsteuerwert: (r && r._grundsteuerwert) || 0, entgelte: (r && r._entgelte) || 0 });   /* v3268 */
   }
   return { summe: summe, jahre: details, gekappt: gekappt, start: start };
 }
@@ -429,6 +430,13 @@ function _gaRechnen(halterId, jahr, daten) {
   /* ── GuV ── */
   var guv = {}, ohneSatz = [];
   _GA_GUV.forEach(function (p) { guv[p.k] = 0; });
+  /* v3268 · Entgelte fuer Schulden (§ 8 Nr. 1 Buchst. a GewStG) ueber ALLE
+     Objekte der Gesellschaft — der Freibetrag gilt je Gesellschaft und Jahr,
+     nicht je Objekt. Nur die Schuldzinsen (plus Gesellschafterdarlehen unten);
+     Bereitstellungsprovision, Kontofuehrung, Notar und Vermittlung sind keine
+     Entgelte fuer Schulden (R 8.1 Abs. 1 GewStR). Mieten/Pachten (Buchst. d, e)
+     fuehrt DealPilot nicht. */
+  var entgelteSchulden = 0;
 
   daten.objekte.forEach(function (o) {
     if (!o.satz) { ohneSatz.push(o.name); return; }
@@ -438,6 +446,7 @@ function _gaRechnen(halterId, jahr, daten) {
     _GA_GUV.forEach(function (p) {
       p.felder.forEach(function (f) { guv[p.k] += _gaNum(v[f]); });
     });
+    entgelteSchulden += _gaNum(v.schuldzinsen);
   });
 
   /* Die Kosten der Gesellschaft treten hier dazu — Personal getrennt, weil
@@ -447,9 +456,10 @@ function _gaRechnen(halterId, jahr, daten) {
   guv.sonstige += (kosten.summe - gfGehalt);
 
   /* v2984 · Zins eines Gesellschafterdarlehens ist Aufwand der Gesellschaft */
-  var gdZinsSumme = 0, grundsteuerSumme = 0;
-  daten.objekte.forEach(function (o) { gdZinsSumme += o.gdZins || 0; grundsteuerSumme += o.grundsteuerJahr || 0; });
+  var gdZinsSumme = 0, grundsteuerwertSumme = 0, ohneGsw = [];
+  daten.objekte.forEach(function (o) { gdZinsSumme += o.gdZins || 0; grundsteuerwertSumme += o.grundsteuerwert || 0; if (!(o.grundsteuerwert > 0)) ohneGsw.push(o.name); });
   guv.zinsen += gdZinsSumme;
+  entgelteSchulden += gdZinsSumme;
   var ergebnisVorSteuern = guv.umsatz - guv.grundstueck - guv.personal
     - guv.afa - guv.sonstige - guv.zinsen;
 
@@ -476,8 +486,8 @@ function _gaRechnen(halterId, jahr, daten) {
     var _P = (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter(halterId) : null;
     if (_K && _P) {
       var _vj = (daten && daten.vortrag && daten.vortrag.jahre) || [];
-      var _reihe = _vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuer: x.grundsteuer || 0 }; });
-      _reihe.push({ jahr: jahr, erg: ergebnisVorSteuern, grundsteuer: grundsteuerSumme });
+      var _reihe = _vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuerwert: x.grundsteuerwert || 0, entgelte: x.entgelte || 0 }; });
+      _reihe.push({ jahr: jahr, erg: ergebnisVorSteuern, grundsteuerwert: grundsteuerwertSumme, entgelte: entgelteSchulden });
       var _sr = _K.steuerReihe(_reihe, _P);
       steuerDetail = _sr[_sr.length - 1];
       steuern = steuerDetail.steuer;
@@ -489,7 +499,7 @@ function _gaRechnen(halterId, jahr, daten) {
   } catch (e) {}
   var jahresueberschuss = ergebnisVorSteuern - steuern;
   /* UG: gesetzliche Ruecklage 25 % (§ 5a Abs. 3 GmbHG) */
-  var ugRuecklage = (mand && mand.rechtsform === 'ug' && jahresueberschuss > 0) ? jahresueberschuss * 0.25 : 0;
+  var ugRuecklage = 0;   /* v3268: gerechnet unten, nach dem Vortrag (§ 5a Abs. 3 GmbHG) */
 
   /* ── Bilanz ── */
   var akGrund = 0, akGeb = 0, kumGeb = 0, akBwg = 0, kumBwg = 0, darlehen = 0;
@@ -520,6 +530,12 @@ function _gaRechnen(halterId, jahr, daten) {
   var vortragAusVorjahren = (typeof _vortragKorr === 'number' && isFinite(_vortragKorr)) ? _vortragKorr
     : ((daten && daten.vortrag && isFinite(daten.vortrag.summe)) ? daten.vortrag.summe : 0);
   var gewinnvortrag = _gaNum(bh.eb_gewinnvortrag) + vortragAusVorjahren;
+  /* v3268 · UG: ein Viertel des um einen Verlustvortrag aus dem Vorjahr geminderten
+     Jahresueberschusses — derselbe Kern wie Reiter Steuer und ausschuettung(). */
+  if (mand && mand.rechtsform === 'ug' && jahresueberschuss > 0) {
+    var _KUg = window.DealPilotUeberfuehrungKern;
+    ugRuecklage = (_KUg && _KUg.ugRuecklage) ? _KUg.ugRuecklage(jahresueberschuss, Math.max(0, -gewinnvortrag)) : jahresueberschuss * 0.25;
+  }
   var gesdar = _gaNum(bh.eb_gesdar);
   var passivaOhneAusgleich = stammkapital + gewinnvortrag + jahresueberschuss
     + darlehen + gesdar + steuern;
@@ -534,7 +550,8 @@ function _gaRechnen(halterId, jahr, daten) {
     steuersatz: satz, steuerDetail: steuerDetail, vortragSteuerlich: vortragSteuerlich,
     ugRuecklage: ugRuecklage, gdZins: gdZinsSumme,
     erwStatus: (window.DealPilotUeberfuehrungKern ? DealPilotUeberfuehrungKern.erwKuerzungStatus(reg) : { aktiv: false }),
-    _grundsteuer: grundsteuerSumme,
+    _grundsteuerwert: grundsteuerwertSumme, _ohneGrundsteuerwert: ohneGsw,
+    _entgelte: entgelteSchulden,    /* v3268: Entgelte fuer Schulden, Summe aller Objekte */
     guv: {
       umsatz: guv.umsatz, grundstueck: guv.grundstueck, personal: guv.personal,
       afa: guv.afa, sonstige: guv.sonstige, zinsen: guv.zinsen,
@@ -772,10 +789,18 @@ function _gaGuvSeite(doc, jahr, name, rech, W, H, M, CW) {
   pos('14.', 'Steuern vom Einkommen und vom Ertrag', -g.steuern,
     { hinweis: (rech.steuerDetail
         ? 'Körperschaftsteuer + Soli ' + _gaEur(rech.steuerDetail.kst) + ', Gewerbesteuer ' + _gaEur(rech.steuerDetail.gewst)
-          + (rech.erwStatus && rech.erwStatus.aktiv ? ' (erweiterte Kürzung § 9 Nr. 1 S. 2 GewStG)' : ' (nach Kürzung Grundsteuer § 9 Nr. 1 S. 1 GewStG, abgerundet)')
+          + (rech.erwStatus && rech.erwStatus.aktiv ? ' (erweiterte Kürzung § 9 Nr. 1 S. 2 GewStG)'
+              : (rech.steuerDetail.kuerzungFehlt ? ' (ohne Kürzung § 9 Nr. 1 S. 1 GewStG: ' + rech.steuerDetail.kuerzungFehlt + ' fehlt' + (rech._ohneGrundsteuerwert && rech._ohneGrundsteuerwert.length ? ' bei ' + rech._ohneGrundsteuerwert.join(', ') : '') + ', abgerundet)'
+                : ' (nach Kürzung 0,11 % des Grundsteuerwerts § 9 Nr. 1 S. 1 GewStG, abgerundet)'))
+          /* v3268 · Hinzurechnung § 8 Nr. 1 GewStG */
+          + (!(rech.erwStatus && rech.erwStatus.aktiv)
+              ? (rech.steuerDetail.hinzurechnung > 0
+                  ? '; Hinzurechnung § 8 Nr. 1 GewStG ' + _gaEur(rech.steuerDetail.hinzurechnung) + ' (25 % der Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' über dem Freibetrag; nur Zinsen erfasst, Mieten/Pachten nicht)'
+                  : (rech.steuerDetail.entgelte > 0 ? '; Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' unter dem Freibetrag des § 8 Nr. 1 GewStG, keine Hinzurechnung' : ''))
+              : '')
           + (rech.steuerDetail.genutzt > 0 ? '; Verlustvortrag verrechnet ' + _gaEur(rech.steuerDetail.genutzt) : '')
           + (rech.steuerDetail.vortragNach > 0 ? '; verbleibender Verlustvortrag ' + _gaEur(rech.steuerDetail.vortragNach) : '')
-          + (rech.ugRuecklage > 0 ? '. UG: gesetzliche Rücklage 25 % = ' + _gaEur(rech.ugRuecklage) + ' (§ 5a Abs. 3 GmbHG)' : '') + '.'
+          + (rech.ugRuecklage > 0 ? '. UG: gesetzliche Rücklage 25 % des um einen Verlustvortrag geminderten Jahresüberschusses = ' + _gaEur(rech.ugRuecklage) + ' (§ 5a Abs. 3 GmbHG)' : '') + '.'
         : 'Satz ' + (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' % — Körperschaftsteuer und Soli'
           + (rech.erwStatus && rech.erwStatus.aktiv ? ', Gewerbesteuer wegen erweiterter Kürzung mit 0 angesetzt' : ', einschließlich Gewerbesteuer') + '.') });
   strich(true);

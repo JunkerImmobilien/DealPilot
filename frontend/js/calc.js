@@ -914,6 +914,7 @@ function _calcImmediate(){
      drauf; BMF-Rechner und Inventar-Box zogen es dagegen vom Kaufpreis ab. */
   var gi=kp+nk+v('san');
   State.gi=gi;
+  State._akKpNk = kp + nk;   /* v3268: Anschaffungskosten ohne Sanierung - Buchwert beim Verkauf aus der GmbH (bestand-analyse.js) */
   // V35: Euro-Felder sind editable Inputs — value statt textContent setzen,
   //      und nur wenn das Feld nicht aktuell fokussiert ist (User tippt grade).
   _setCostEur('makler_e', m_e);
@@ -1561,6 +1562,14 @@ function _calcImmediate(){
     /* v3238 · #mietausfall zaehlt hier NICHT mehr - er ist seit v3238 der Leerstand in Euro
        und kommt unten als leerJ genau einmal dazu (Block „MIETAUSFALL = LEERSTAND"). */
     nul = v('hg_nul')+v('eigen_r')+v('nul_sonst');
+    /* v3268 · RUECKLAGEN SIND KEINE WERBUNGSKOSTEN / BETRIEBSAUSGABEN.
+       Die eigene Instandhaltungsruecklage ist rein kalkulatorisch; die Zufuehrung
+       zur WEG-Erhaltungsruecklage (im nicht umlagefaehigen Hausgeld enthalten,
+       dokument-import.js) ist erst abziehbar, wenn die WEG sie fuer Erhaltung
+       verausgabt (BFH 26.01.1988, IX R 119/83).
+       Beide bleiben im Cashflow (nul), fallen aber aus der Steuer (nul_st).
+       Der WEG-Anteil ist das Feld weg_r, hoechstens das Hausgeld nicht umlagefaehig. */
+    var _ruecklageSt = v('eigen_r') + Math.max(0, Math.min(v('weg_r'), v('hg_nul')));
     // WEG-Rücklage: nur Info-Anzeige, NICHT summieren (ist bereits Teil des Hausgeldes)
     bwk = ul + nul;
   }
@@ -1687,8 +1696,10 @@ function _calcImmediate(){
      Wagnis mehr in nul: der Mietausfall IST der Leerstand (entgangene Miete, v3030
      mindert er auch die steuerpflichtigen Einnahmen). Bis v3237 stand hier
      v('mietausfall') - das zoege den Leerstand jetzt aus der Steuerzeile heraus. */
-  var _mawSteuer = 0;
+  var _mawSteuer = (typeof _ruecklageSt === 'number' && _ruecklageSt > 0) ? _ruecklageSt : 0;   /* v3268: Ruecklagen nicht steuerlich */
   var nul_st = nul - _mawSteuer;
+  State.ruecklageNichtAbziehbar = _mawSteuer;
+  State.ruecklageTeile = _mawSteuer > 0 ? { eigen: v('eigen_r'), weg: Math.max(0, Math.min(v('weg_r'), v('hg_nul'))) } : { eigen: 0, weg: 0 };
   State.nulSteuer = nul_st;
   State.mietausfallWagnis = _mawSteuer;
   State.bwk=bwk;
@@ -2302,7 +2313,10 @@ function _calcImmediate(){
   var _mandParams = (function(){ try { return (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter() : null; } catch(_e){ return null; } })();
   var _gesK = window.DealPilotUeberfuehrungKern || null;
   var _gesTracker = (_mandParams && _gesK) ? _gesK.tracker(_mandParams) : null;
-  var _gesGrundsteuerJ = v('grundsteuer') * 12;
+  /* v3268 · einfache Kuerzung § 9 Nr. 1 S. 1 GewStG aus dem GRUNDSTEUERWERT (ab EZ 2025
+     0,11 %), nicht mehr aus dem Grundsteuerbetrag (der hier zudem mit × 12 lief, obwohl
+     #grundsteuer ein Jahresbetrag ist). Leer = keine Kuerzung (Kern meldet es). */
+  var _gesGrundsteuerJ = v('grundsteuerwert');
   var _gesGdZins = (function(){
     try {
       var _ud = JSON.parse(g('ueberf_daten') || 'null');
@@ -2312,9 +2326,14 @@ function _calcImmediate(){
     return 0;
   })();
   State._gesGdZins = _gesGdZins;
-  function _mtx(base, jahr){
-    if (_mandRate == null) return _estDelta(base, jahr);
-    if (_gesTracker) return _gesTracker.steuer(base - _gesGdZins, (typeof jahr === 'number' ? jahr : 0), _gesGrundsteuerJ).steuer;
+  /* v3268 · GbR: nur der eigene Anteil des Nutzers geht in seine ESt
+     (mandanten.js anteil(), ueber tax.js _dpGbrAnteil). Privat = 1, dann
+     wird nicht multipliziert. GmbH/UG: die Zinsen des Jahres gehen als
+     Entgelte fuer Schulden in die Hinzurechnung § 8 Nr. 1 GewStG (Kern). */
+  var _gbrAnt = (function(){ try { return (typeof window._dpGbrAnteil === 'function') ? window._dpGbrAnteil() : 1; } catch(_e){ return 1; } })();
+  function _mtx(base, jahr, zinsen){
+    if (_mandRate == null) return _estDelta(_gbrAnt !== 1 ? base * _gbrAnt : base, jahr);
+    if (_gesTracker) return _gesTracker.steuer(base - _gesGdZins, (typeof jahr === 'number' ? jahr : 0), _gesGrundsteuerJ, (Number(zinsen) || 0) + _gesGdZins).steuer;
     return Math.max(0, base) * _mandRate;
   }
   /* v813-3b → v2984: Hier wurde im Stichtagsjahr das Ergebnis des
@@ -2325,14 +2344,14 @@ function _calcImmediate(){
      GmbH-Verlust. Der private Teil gehoert ausschliesslich dem Privatobjekt.
      Jetzt: das Gesellschaftsobjekt kennt nur Gesellschaftssteuer; Jahre vor
      dem Stichtag haben dort kein Ergebnis. */
-  function _mtxYear(base, calYear){
+  function _mtxYear(base, calYear, zinsen){
     try {
       if (g('obj_herkunft') === 'ueberfuehrung' && _mandRate != null) {
         var _hs = g('halter_seit');
         if (_hs && /^\d{4}-\d{2}-\d{2}$/.test(_hs) && typeof calYear === 'number' && calYear < parseInt(_hs.slice(0,4), 10)) return 0;
       }
     } catch (_e) {}
-    return _mtx(base, calYear);
+    return _mtx(base, calYear, zinsen);
   }
   var _calYearBase = (function(){ try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear){ var _y = DealPilotAnteilig.getBaseYear(); if (_y) return _y; } } catch(_e){} return (new Date()).getFullYear(); })();
   var zins_j=(d1_zm+d2_zm+_dwA.zm)*12, tilg_j=(d1_tm+d2_tm+_dwA.tm)*12;   /* v3215: + weitere Darlehen ab Kauf */
@@ -2368,7 +2387,7 @@ function _calcImmediate(){
       if (isFinite(_zwk) && _zwk > 0) zve_immo -= _zwk;
     }
   } catch (_eZ) {}
-  var steuer   = _mtxYear(zve_immo, _calYearBase);
+  var steuer   = _mtxYear(zve_immo, _calYearBase, zins_j);
 
   /* v1379-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.
      Er weicht vom eingegebenen Grenzsteuersatz ab, sobald das Ergebnis den
@@ -2648,7 +2667,7 @@ function _calcImmediate(){
     var _zy_eff = zy * _ef, _afa_eff = afa * _ef;
     var cf_y_op=nkm_y-bwk_cf_y-_zy_eff;
     /* v1898: Steuer auf den Steuer-Abzug, Cashflow auf den Cashflow-Abzug. */
-    var tax_y_loop = _mtxYear((nkm_y-bwk_st_y-_zy_eff)-_afa_eff, _calYearBase + y - 1);
+    var tax_y_loop = _mtxYear((nkm_y-bwk_st_y-_zy_eff)-_afa_eff, _calYearBase + y - 1, _zy_eff);
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     var _su_loop = (_suJahr[_calYearBase + y - 1] > 0) ? _suJahr[_calYearBase + y - 1] : 0;   /* v3092 · N100: Einmalzahlung, wie cfRows */
@@ -2744,6 +2763,24 @@ function _calcImmediate(){
      das — sie ist mit „nicht in Card verwendet" gekennzeichnet und wird
      hier bewusst nicht benutzt.) */
   var _exitErloes = exit_vkp - Math.max(0, rs_loop) + Math.max(0, bspar_guth);
+  /* v3268 · GmbH/UG: der Verkauf nach btj Jahren ist IMMER steuerpflichtig —
+     die Zehnjahresfrist (§ 23 EStG) gilt nur im Privatvermoegen. Bis v3267
+     floss der Erloes auch bei einem Gesellschaftsobjekt steuerfrei in den IRR.
+     Gewinn = Verkaufspreis − Buchwert (Kaufpreis + Nebenkosten − AfA der btj
+     Jahre); Verkaufskosten sind nicht erfasst (0). Steuer aus dem Kern
+     (veraeusserungGesellschaft): KSt + Soli, GewSt nur ohne erweiterte Kuerzung.
+     Privat und GbR unveraendert. */
+  State._exitSteuerGes = null;
+  try {
+    if (_mandParams && _gesK && _gesK.veraeusserungGesellschaft && exit_vkp > 0) {
+      var _afaKumExit = 0;
+      for (var _ye = 1; _ye <= btj; _ye++) _afaKumExit += _afaJahr(_ye);
+      var _vg = _gesK.veraeusserungGesellschaft({ preis: exit_vkp, ak: kp + nk, afaKum: _afaKumExit, verkaufskosten: 0,
+        kstSoliPct: _mandParams.kstSoliPct, kstNachJahr: _mandParams.kstNachJahr, jahr: _calYearBase + btj - 1,
+        hebesatz: _mandParams.hebesatz, erwKuerzung: _mandParams.erwKuerzung });
+      if (_vg && _vg.ok) { _exitErloes -= _vg.steuer; State._exitSteuerGes = _vg; }
+    }
+  } catch (_eVg) {}
   var irr = null, be = { cf: null, kum: null, kumEk: null };
   try {
     if (window.IrrEngine && _cfReihe.length) {
@@ -2813,7 +2850,7 @@ function _calcImmediate(){
   // V63.40: CF v.St. = nach Tilgung (Banker-Sicht)
   var cf_op_ezb_operativ = nkm_ezb - bwk_cf_ezb - zins_ezb;     // intern für CF
   /* v1898: Steuerbemessung ohne Mietausfallwagnis (siehe Block oben). */
-  var ster_ezb = _mtx((nkm_ezb - nul_st*Math.pow(1+kstg,bindj) - zins_ezb) - afa, _calYearBase);
+  var ster_ezb = _mtx((nkm_ezb - nul_st*Math.pow(1+kstg,bindj) - zins_ezb) - afa, _calYearBase, zins_ezb);
   var cf_op_ezb = cf_op_ezb_operativ - tilg_ezb - bspar_y_ezb;  // V63.52: nach Tilg & BSV
   var cf_ns_ezb = cf_op_ezb - ster_ezb;                          // Banker-CF n.St.
   var cf_ezb = cf_ns_ezb;
@@ -2926,7 +2963,7 @@ function _calcImmediate(){
   if (_dwAktiv) { zins_an += _dwJahr(bindj + 1).zins; tilg_an += _dwJahr(bindj + 1).tilg; }
   var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für CF
   /* v1898: Steuerbemessung ohne Mietausfallwagnis (siehe Block oben). */
-  var ster_an = _mtx((nkm_an - nul_st*Math.pow(1+kstg,bindj) - zins_an) - afa, _calYearBase);
+  var ster_an = _mtx((nkm_an - nul_st*Math.pow(1+kstg,bindj) - zins_an) - afa, _calYearBase, zins_an);
   var cf_op_an = cf_op_an_operativ - tilg_an - bspar_y_an;       // V63.52
   var cf_ns_an = cf_op_an - ster_an;                             // Banker-CF n.St.
   // KPI color coding
@@ -3593,7 +3630,7 @@ function _calcImmediate(){
     // Begründung: Vorher griff in der Projektion das Yearly-Total mit potenziell anderen Schuldzinsen
     // (z.B. nach Anschluss-Phase) oder unfertigen cfRows-Daten → produzierte inkonsistente Werte.
     // Nun ist Frontend Cashflow-Vergleich-Heute, Cashflow-Projektion und PDF überall identisch.
-    var taxEffect_y = _mtxYear(zve_op_y - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878: AfA des Jahres y · v1898: ohne Mietausfallwagnis */
+    var taxEffect_y = _mtxYear(zve_op_y - _afaJahr(y), _v268_baseYear + y - 1, zy2);   /* v1878: AfA des Jahres y · v1898: ohne Mietausfallwagnis · v3268: Zinsen fuer § 8 Nr. 1 GewStG */
     var cfns_y = cfop_y - taxEffect_y;                     // V63.40: nach Tilgung, BSV & Steuer
     // V63.65: Wertsteigerung ausgehend vom besten Wert-Anker (svw > bankval > kp)
     // V63.83 KOMMENTAR: wert_y zeigt Stand ANFANG Jahr y → Jahr 1 = heute = ^0
@@ -3756,7 +3793,7 @@ function _calcImmediate(){
       cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
       zve_op_y        = nkm_y2 - bwk_st_y2 - zy2;   /* v1898 */
       cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
-      taxEffect_y     = _mtxYear(zve_op_y - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878 · v1898 */
+      taxEffect_y     = _mtxYear(zve_op_y - _afaJahr(y), _v268_baseYear + y - 1, zy2);   /* v1878 · v1898 · v3268 */
       cfns_y          = cfop_y - taxEffect_y;
       // eq_y/ltv_y mit aktueller kombinierter RS aktualisieren (rs3_d2 ggf. Y1-reduziert)
       var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0) + rs3_dw;   /* v3215: + weitere */
@@ -3775,7 +3812,7 @@ function _calcImmediate(){
       cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
       zve_op_y        = nkm_y2 - bwk_st_y2 - zy2;
       cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
-      taxEffect_y     = _mtxYear(zve_op_y - _afaPush, _v268_baseYear + y - 1);
+      taxEffect_y     = _mtxYear(zve_op_y - _afaPush, _v268_baseYear + y - 1, zy2);
       cfns_y          = cfop_y - taxEffect_y;
     }
     var su_y = (_suJahr[cal] > 0) ? _suJahr[cal] : 0;   /* v3092 · N100: nach allen Neuberechnungen oben abziehen */
@@ -3823,7 +3860,7 @@ function _calcImmediate(){
              Jetzt: Ergebnis des Jahres aus derselben Rechnung, besteuert mit dem
              Halter-Regime (KSt ab Stichtag, keine Erstattung). Privat unveraendert. */
           r.tax_y = (_mandRate != null && typeof totals.ergebnis === 'number' && isFinite(totals.ergebnis))
-            ? _mtxYear(totals.ergebnis, r.cal)
+            ? _mtxYear(totals.ergebnis, r.cal, (totals.values && Number(totals.values.schuldzinsen)) || 0)
             : totals.taxDelta;
           r.cfns_y = r.cfop_y - r.tax_y;
         }

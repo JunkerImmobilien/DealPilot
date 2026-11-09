@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-09T12:20:38.402Z",
+ "erzeugt_am": "2026-11-09T13:03:02.583Z",
  "quellen": {
   "voice-import": "93c6117a13546a53",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "c2e7c9ad8bc3ab23",
-  "index-html": "863b8a678845f9aa",
+  "storage": "437e981bc58f0ac9",
+  "index-html": "b7ace98c6c8e905f",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -495,6 +495,7 @@
    "anschl_bj",
    "hg_ul",
    "grundsteuer",
+   "grundsteuerwert",
    "ul_sonst",
    "hg_nul",
    "weg_r",
@@ -1217,6 +1218,11 @@
     "id": "grundsteuer",
     "kind": "text",
     "label": "Grundsteuer / Jahr"
+   },
+   {
+    "id": "grundsteuerwert",
+    "kind": "text",
+    "label": "Grundsteuerwert lt. Bescheid · nur GmbH/UG"
    },
    {
     "id": "ul_sonst",
@@ -4227,7 +4233,7 @@
      },
      {
       "h": "Jahresabschluss für GmbH und UG",
-      "text": "Der Jahresabschluss liegt unter Einstellungen / Mandanten bei der jeweiligen GmbH oder UG. Er erstellt Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu einen Anlagenspiegel je Objekt.\n\nSo geht's:\n1. Unter Einstellungen / Mandanten an der Karte der Gesellschaft auf Jahresabschluss klicken.\n2. Das Geschäftsjahr wählen.\n3. Auf Jahresabschluss erstellen klicken.\n\nWichtig: Das ist kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als Verrechnungskonto Gesellschafter in der Bilanz. Die Kosten der Gesellschaft trägst du unter Einstellungen / Mandanten ein. Fehlen sie, sagt das PDF es auf der GuV-Seite."
+      "text": "Der Jahresabschluss liegt unter Einstellungen / Mandanten bei der jeweiligen GmbH oder UG. Er erstellt Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu einen Anlagenspiegel je Objekt.\n\nSo geht's:\n1. Unter Einstellungen / Mandanten an der Karte der Gesellschaft auf Jahresabschluss klicken.\n2. Das Geschäftsjahr wählen.\n3. Auf Jahresabschluss erstellen klicken.\n\nWichtig: Das ist kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als Verrechnungskonto Gesellschafter in der Bilanz. Die Kosten der Gesellschaft trägst du unter Einstellungen / Mandanten ein. Fehlen sie, sagt das PDF es auf der GuV-Seite.\n\nBetriebsausgaben statt Werbungskosten: Bei einer GmbH oder UG heißt die Kostentabelle im Reiter Steuer, im Finanzamt-PDF und in der Steuer-Mappe Betriebsausgaben — eine Kapitalgesellschaft hat nur Einkünfte aus Gewerbebetrieb (§ 8 Abs. 2 KStG), keine Anlage V. Kosten der Gesellschaft selbst (Buchführung/Steuerberatung, Jahresabschluss/Offenlegung, IHK-Beitrag, Kontoführung, sonstige Gesellschaftskosten) stehen am Mandanten, nicht am Objekt, und mindern die Steuer der Gesellschaft über alle Objekte.\n\nGewerbesteuer ohne erweiterte Kürzung: Dem Gewinn werden 25 % der Zinsen hinzugerechnet, soweit sie zusammen über alle Objekte 200.000 € im Jahr übersteigen (§ 8 Nr. 1 GewStG). DealPilot erfasst dafür nur Zinsen, keine Miet- und Pachtanteile.\n\nVerkauf: Der Veräußerungsgewinn ist in der GmbH/UG immer steuerpflichtig (KSt; GewSt nur ohne erweiterte Kürzung bzw. bei schädlicher Veräußerung) — die 10-Jahres-Frist gilt nur im Privatvermögen."
      }
     ]
    },
@@ -4343,7 +4349,7 @@
      },
      {
       "h": "Mandanten und Steuerzeiträume",
-      "text": "Unter Mandanten legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den Halter im Reiter Steuer, Karte Halter & Eigentum (Detailgrad Experte; dort stehen auch die Angaben zu Eigentum und Erwerb). Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum Pro-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\nSteuerzeiträume (Privat): Klick bei Privat auf Bearbeiten. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\nGesellschaft: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Der Knopf Jahresabschluss an der Karte der Gesellschaft erstellt Bilanz und GuV. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft."
+      "text": "Unter Mandanten legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den Halter im Reiter Steuer, Karte Halter & Eigentum (Detailgrad Experte; dort stehen auch die Angaben zu Eigentum und Erwerb). Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum Pro-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\nSteuerzeiträume (Privat): Klick bei Privat auf Bearbeiten. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\nGesellschaft: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Der Knopf Jahresabschluss an der Karte der Gesellschaft erstellt Bilanz und GuV. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft.\n\nGbR: Trag deinen Anteil am Ergebnis und die weiteren Gesellschafter mit Anteil ein. In deine Einkommensteuer geht nur dein Anteil, nicht 100 %. Der Reiter Steuer und die Steuer-Mappe zeigen dazu die Übersicht der gesonderten und einheitlichen Feststellung (§ 180 AO): Einkünfte der GbR und je Gesellschafter Anteil und Betrag. Die Kosten heißen bei der GbR weiter Werbungskosten (Einkünfte aus Vermietung und Verpachtung)."
      },
      {
       "h": "Telegram-Bot verbinden",
@@ -5549,7 +5555,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "139329172f441bb6",
+  "hilfe": "7a56de9923e2dc92",
   "bewertung": "f427bd734c0570c3"
  }
 }

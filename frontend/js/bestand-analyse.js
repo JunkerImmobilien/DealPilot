@@ -231,13 +231,34 @@
     for (var i = 0; i < rows.length; i++) if (rows[i] && rows[i].cal === j && istZahl(rows[i].rs)) return { wert: rows[i].rs, jahr: j };
     return null;
   }
+  /* v3268 · Halter GmbH/UG: keine Zehnjahresfrist. Die Rechtsform entscheidet
+     (mandanten.js istKoerperschaft), nicht der Tarif. */
+  function gesellschaft() {
+    try {
+      var M = global.DealPilotMandanten, h = wert('halter') || 'privat';
+      if (!M || !M.istKoerperschaft || !M.istKoerperschaft(h)) return null;
+      return (M.steuerParameter ? M.steuerParameter(h) : null) || { kstSoliPct: 15.825, hebesatz: 0, erwKuerzung: false, name: '' };
+    } catch (e) { return null; }
+  }
+  /* Kumulierte AfA bis Ende des Vorjahres aus der Reihe, die calc.js rechnet
+     (State._afaSeries, Index 0 = Kaufjahr) - keine eigene AfA-Rechnung. */
+  function afaBisVorjahr(kd, heute) {
+    var s = S()._afaSeries;
+    if (!kd || !Array.isArray(s)) return null;
+    var n = heute.getFullYear() - kd.getFullYear(), sum = 0;
+    for (var i = 0; i < n && i < s.length; i++) sum += Number(s[i]) || 0;
+    return sum;
+  }
   function exit(heute) {
     heute = heute || new Date();
     var k = K(), out = { fehlt: [] };
     var kd = isoDatum(wert('kaufdat'));
     out.kaufdatum = kd;
     if (!kd) out.fehlt.push('Kaufdatum (Reiter Objekt)');
-    out.frist_ende = kd ? plusJahre(kd, 10) : null;
+    var ges = gesellschaft();
+    out.gesellschaft = !!ges;
+    /* v3268: im Betriebsvermoegen der GmbH/UG gibt es keine Frist - der Gewinn ist immer steuerpflichtig */
+    out.frist_ende = (kd && !ges) ? plusJahre(kd, 10) : null;
     out.monate_bis_frist = out.frist_ende ? monateBis(heute, out.frist_ende) : null;
     var mb = marktbericht();
     out.marktwert = mb ? mb.wert : null;
@@ -254,6 +275,18 @@
     out.wertzuwachs = out.marktwert != null && out.gesamtinvestition != null ? out.marktwert - out.gesamtinvestition : null;
     /* rechnerisch bei 80 % Beleihung - die Bank setzt ihren eigenen Beleihungswert an */
     out.beleihungsreserve = out.marktwert != null && out.restschuld != null ? Math.max(0, out.marktwert * 0.8 - out.restschuld) : null;
+    /* v3268 · GmbH/UG: Veraeusserungsgewinn und Steuer aus dem Kern */
+    out.veraeusserung = null;
+    if (ges) {
+      var KK = global.DealPilotUeberfuehrungKern;
+      var ak = istZahl(S()._akKpNk) && S()._akKpNk > 0 ? S()._akKpNk : null;
+      var afa = afaBisVorjahr(kd, heute);
+      if (KK && KK.veraeusserungGesellschaft && out.marktwert != null && ak != null) {
+        out.veraeusserung = KK.veraeusserungGesellschaft({ preis: out.marktwert, ak: ak, afaKum: afa || 0, verkaufskosten: 0,
+          kstSoliPct: ges.kstSoliPct, kstNachJahr: ges.kstNachJahr, jahr: heute.getFullYear(), hebesatz: ges.hebesatz, erwKuerzung: ges.erwKuerzung });
+      }
+      out.hinweis_gesellschaft = (KK && KK.HINWEIS_VERKAUF_GES) || 'Veräußerungsgewinn immer steuerpflichtig — die 10-Jahres-Frist gilt nur im Privatvermögen.';
+    }
     return out;
   }
 
@@ -272,6 +305,10 @@
         }),
         cf_heute_m: r2(a.cf_heute_m), dscr_heute: r2(a.dscr_heute),
         kaufdatum: iso(x.kaufdatum), steuerfrei_ab: iso(x.frist_ende), monate_bis_steuerfrei: x.monate_bis_frist,
+        /* v3268: Halter GmbH/UG - keine Zehnjahresfrist, Gewinn immer steuerpflichtig */
+        halter_gesellschaft: x.gesellschaft || null,
+        veraeusserung_gesellschaft: (x.veraeusserung && x.veraeusserung.ok) ? { gewinn: r0(x.veraeusserung.gewinn), buchwert: r0(x.veraeusserung.buchwert),
+          kst_soli: r0(x.veraeusserung.kst), gewst: r0(x.veraeusserung.gewst), steuer: r0(x.veraeusserung.steuer), hinweis: x.veraeusserung.hinweis } : (x.gesellschaft ? { hinweis: x.hinweis_gesellschaft } : null),
         marktwert: r0(x.marktwert), marktwert_stand: iso(x.marktwert_stand),
         kaufpreis: r0(x.kaufpreis), gesamtinvestition: r0(x.gesamtinvestition),
         restschuld_heute: r0(x.restschuld), restschuld_jahr: x.restschuld_jahr,
@@ -316,17 +353,32 @@
     var x = exit(), z = [];
     function zeile(w, v) { z.push('<tr><td class="abw-wort">' + w + '</td><td class="abw-zahl">' + v + '</td></tr>'); }
     zeile('Kaufdatum', x.kaufdatum ? datumDe(x.kaufdatum) : '–');
-    zeile('Ende der Zehnjahresfrist (§ 23 EStG)', x.frist_ende ? '<b>' + datumDe(x.frist_ende) + '</b>' + (x.monate_bis_frist != null ? ' · ' + monateText(x.monate_bis_frist) : '') : '–');
+    if (x.gesellschaft) zeile('Zehnjahresfrist (§ 23 EStG)', '<b>gilt nicht</b> — Objekt im Betriebsvermögen einer GmbH/UG');
+    else zeile('Ende der Zehnjahresfrist (§ 23 EStG)', x.frist_ende ? '<b>' + datumDe(x.frist_ende) + '</b>' + (x.monate_bis_frist != null ? ' · ' + monateText(x.monate_bis_frist) : '') : '–');
     zeile('Marktpreisindikation' + (x.marktwert_stand ? ' (Marktbericht vom ' + datumDe(x.marktwert_stand) + ')' : ''), eur(x.marktwert));
     zeile('Gesamtinvestition (Kaufpreis ' + eur(x.kaufpreis) + ' + Nebenkosten)', eur(x.gesamtinvestition));
     zeile('Wertzuwachs gegen Gesamtinvestition', eurVz(x.wertzuwachs));
     zeile('Restschuld' + (x.restschuld_jahr ? ' Ende ' + x.restschuld_jahr + ' laut Projektion' : ''), eur(x.restschuld));
     zeile('<b>Netto-Erlös vor Steuer</b> (Marktpreis − Restschuld)', '<b>' + eur(x.netto_erloes) + '</b>');
     zeile('Beleihungsspielraum bei 80 % des Marktpreises', eur(x.beleihungsreserve));
+    /* v3268 · GmbH/UG: Veraeusserungsgewinn und Steuer */
+    if (x.veraeusserung && x.veraeusserung.ok) {
+      var vg = x.veraeusserung;
+      zeile('Buchwert (Kaufpreis + Nebenkosten ' + eur(vg.ak) + ' − AfA bis Ende Vorjahr ' + eur(vg.afaKum) + ')', eur(vg.buchwert));
+      zeile('<b>Veräußerungsgewinn</b> (Marktpreis − Buchwert, vor Verkaufskosten)', '<b>' + eurVz(vg.gewinn) + '</b>');
+      zeile('Körperschaftsteuer + Soli (' + String(Math.round(vg.kstSoliPct * 1000) / 1000).replace('.', ',') + ' %)', eur(vg.kst));
+      zeile('Gewerbesteuer', vg.gewstFrei ? '0 € (erweiterte Kürzung)' : (vg.gewstOhneHebesatz ? 'nicht rechenbar — Hebesatz fehlt' : eur(vg.gewst)));
+    } else if (x.gesellschaft) {
+      zeile('Veräußerungsgewinn', 'nicht rechenbar — Marktpreis oder Anschaffungskosten fehlen');
+    }
     return '<div class="dp-pa-card"><table class="abw-tafel"><tbody>' + z.join('') + '</tbody></table>' + fehltZeile(x.fehlt)
-      + '<div class="dp-pa-fuss">Indikativ, vor Verkaufskosten, Vorfälligkeitsentschädigung und Steuer. Verkaufst du vor Ende der Frist, ist der Gewinn als privates '
+      + (x.gesellschaft
+        ? '<div class="dp-pa-fuss">' + esc(x.hinweis_gesellschaft) + ' Gewinn = Verkaufspreis − Buchwert (Anschaffungskosten − kumulierte AfA) − Verkaufskosten; '
+          + 'isoliert gerechnet, ohne Verlustvortrag und ohne das laufende Ergebnis des Jahres. Schädlich für die erweiterte Kürzung kann z. B. gewerblicher Grundstückshandel '
+          + 'oder der Verkauf des letzten Objekts vor Ende des Erhebungszeitraums sein. Keine Steuerberatung: lass es von deinem Steuerberater bestätigen. '
+        : '<div class="dp-pa-fuss">Indikativ, vor Verkaufskosten, Vorfälligkeitsentschädigung und Steuer. Verkaufst du vor Ende der Frist, ist der Gewinn als privates '
       + 'Veräußerungsgeschäft steuerpflichtig; die bisher abgesetzte AfA mindert dabei die Anschaffungskosten. Die Frist läuft ab dem notariellen Kaufvertrag — '
-      + 'als Stichtag gilt hier das Kaufdatum im Objekt. Keine Steuerberatung: lass es von deinem Steuerberater bestätigen. '
+      + 'als Stichtag gilt hier das Kaufdatum im Objekt. Keine Steuerberatung: lass es von deinem Steuerberater bestätigen. ')
       + 'Der Beleihungsspielraum ist rechnerisch; die Bank setzt ihren eigenen Beleihungswert an.</div></div>';
   }
 
@@ -348,8 +400,11 @@
   }
   function exitText() {
     var x = exit(), t = [];
-    t.push('Kaufdatum: ' + (x.kaufdatum ? datumDe(x.kaufdatum) : '-') + ' · Ende der Zehnjahresfrist (§ 23 EStG): '
-      + (x.frist_ende ? datumDe(x.frist_ende) + (x.monate_bis_frist != null ? ' (' + monateText(x.monate_bis_frist) + ')' : '') : '-'));
+    t.push('Kaufdatum: ' + (x.kaufdatum ? datumDe(x.kaufdatum) : '-') + (x.gesellschaft
+      ? ' · Zehnjahresfrist (§ 23 EStG): gilt nicht (GmbH/UG). ' + x.hinweis_gesellschaft
+        + (x.veraeusserung && x.veraeusserung.ok ? ' Veräußerungsgewinn ' + eurVz(x.veraeusserung.gewinn) + ', Steuer ' + eur(x.veraeusserung.steuer) + '.' : '')
+      : ' · Ende der Zehnjahresfrist (§ 23 EStG): '
+      + (x.frist_ende ? datumDe(x.frist_ende) + (x.monate_bis_frist != null ? ' (' + monateText(x.monate_bis_frist) + ')' : '') : '-')));
     t.push('Marktpreisindikation' + (x.marktwert_stand ? ' (Marktbericht vom ' + datumDe(x.marktwert_stand) + ')' : '') + ': ' + eur(x.marktwert)
       + ' · Gesamtinvestition ' + eur(x.gesamtinvestition) + ' · Wertzuwachs ' + eurVz(x.wertzuwachs));
     t.push('Restschuld' + (x.restschuld_jahr ? ' Ende ' + x.restschuld_jahr : '') + ': ' + eur(x.restschuld) + ' · Netto-Erlös vor Steuer: ' + eur(x.netto_erloes)

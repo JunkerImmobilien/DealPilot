@@ -188,6 +188,15 @@ function _wkNeueSeite(doc, M, CW) {
   doc.setFont('helvetica', 'normal'); doc.setTextColor(42, 39, 39);
   return 24;
 }
+/* v3268 · Werbungskosten (privat, GbR) oder Betriebsausgaben (GmbH/UG).
+   Mit `q` (Steuer-Mappe) entscheidet das Regime des Objekts, sonst der
+   Halter des geoeffneten Objekts (mandanten.js kostenBegriff). */
+function _wkWort(q) {
+  var reg = q && q.regime;
+  if (reg) return reg.anlageV === false ? 'Betriebsausgaben' : 'Werbungskosten';
+  try { if (window._dpBegriff) return window._dpBegriff().wort; } catch (e) {}
+  return 'Werbungskosten';
+}
 function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   // ── HEADER ─────────────────────────────────────
   doc.setFillColor(42, 39, 39);
@@ -198,7 +207,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text('AUFSTELLUNG WERBUNGSKOSTEN', M, 13);
+  doc.text('AUFSTELLUNG ' + _wkWort(q).toUpperCase(), M, 13);
 
   doc.setTextColor(220, 220, 220);
   doc.setFont('helvetica', 'normal');
@@ -207,6 +216,8 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
      GmbH stand hier bisher „Anlage V · § 21 EStG" — die falsche Einkunftsart
      ueber richtigen Zahlen. */
   var _reg = (q && q.regime) || null;
+  /* v3268: ohne `q` (Einzel-PDF) zaehlt der Halter des geoeffneten Objekts */
+  if (!_reg && _wkWort(null) === 'Betriebsausgaben') _reg = { anlageV: false };
   doc.text(_reg && !_reg.anlageV
     ? 'Vermietung · Einkünfte aus Gewerbebetrieb · § 8 Abs. 2 KStG · keine Anlage V'
     : 'Vermietung & Verpachtung · Anlage V · § 21 EStG', M, 19);
@@ -230,7 +241,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
              ((g("str") || "") + " " + (g("hnr") || "") + ", " + (g("plz") || "") + " " + (g("ort") || ""));
   var qm = q ? (q.qm || "") : g("wfl");
   var bezeichnung = (q ? q.art : g("objart")) || "ETW";
-  _wkFolge = 'Aufstellung Werbungskosten ' + year + ' · ' + String(addr || name || '').replace(/^[\s,]+|[\s,]+$/g, '') + ' · Fortsetzung';   /* v3018c */
+  _wkFolge = 'Aufstellung ' + _wkWort(q) + ' ' + year + ' · ' + String(addr || name || '').replace(/^[\s,]+|[\s,]+$/g, '') + ' · Fortsetzung';   /* v3018c */
 
   doc.setFillColor(248, 246, 240);
   doc.roundedRect(M, cy, CW, 22, 2, 2, 'F');
@@ -377,7 +388,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text('SUMME WERBUNGSKOSTEN ' + year, M + 6, cy + 8);
+  doc.text('SUMME ' + _wkWort(q).toUpperCase() + ' ' + year, M + 6, cy + 8);
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20);
@@ -589,7 +600,7 @@ function _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW) {
   doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text('GESAMTÜBERSICHT WERBUNGSKOSTEN', M, 13);
+  doc.text('GESAMTÜBERSICHT ' + _wkWort(null).toUpperCase(), M, 13);
   doc.setTextColor(220, 220, 220);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
@@ -975,7 +986,9 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
   doc.setTextColor(122, 115, 112); doc.setFontSize(7.5);
   doc.text('OBJEKT', M, cy);
   doc.text('EINNAHMEN', M + CW - 96, cy, { align: 'right' });
-  doc.text('WERBUNGSKOSTEN', M + CW - 48, cy, { align: 'right' });
+  /* v3268: Privat/GbR Werbungskosten, GmbH/UG Betriebsausgaben - gemischte Mappe nennt beide */
+  var _wkMix = {}; saetze.forEach(function (s) { var st0 = stamm[s.object_id]; _wkMix[_wkWort({ regime: _steuerRegime(st0 && st0.halter) })] = 1; });
+  doc.text(Object.keys(_wkMix).length > 1 ? 'WK / BETRIEBSAUSG.' : (Object.keys(_wkMix)[0] || 'Werbungskosten').toUpperCase(), M + CW - 48, cy, { align: 'right' });
   doc.text('ERGEBNIS', M + CW, cy, { align: 'right' });
   cy += 2;
   doc.setDrawColor(210, 205, 198); doc.setLineWidth(0.3);
@@ -1054,6 +1067,27 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
       + 'sie hier gehalten wurden. Die Summe unten ist deshalb keine Jahressumme eines '
       + 'einzelnen Steuerpflichtigen.');
   }
+  /* v3268 · GbR: gesonderte und einheitliche Feststellung (§ 180 AO) je GbR,
+     aus genau den Saetzen dieser Mappe. Nur der eigene Anteil geht in die ESt. */
+  try {
+    var _gbr = {};
+    saetze.forEach(function (s) {
+      var st1 = stamm[s.object_id], h1 = st1 && st1.halter;
+      if (!h1 || h1 === 'privat' || _steuerRegime(h1).rf !== 'gbr') return;
+      var t1 = _computeYearTotal(jahr, 0, s);
+      _gbr[h1] = _gbr[h1] || { summe: 0, n: 0 };
+      _gbr[h1].summe += t1.ergebnis; _gbr[h1].n++;
+    });
+    Object.keys(_gbr).forEach(function (h2) {
+      var f = (window.DealPilotMandanten && DealPilotMandanten.feststellung) ? DealPilotMandanten.feststellung(h2, _gbr[h2].summe) : null;
+      if (!f) return;
+      hin.push('Gesonderte und einheitliche Feststellung (§ 180 AO) · ' + (f.name || 'GbR') + ': Einkünfte der GbR '
+        + eur(f.einkuenfte) + ' (' + _gbr[h2].n + ' Objekt' + (_gbr[h2].n === 1 ? '' : 'e') + ') · davon '
+        + f.zeilen.map(function (z) { return z.name + ' ' + String(Math.round(z.anteilPct * 100) / 100).replace('.', ',') + ' % = ' + eur(z.betrag); }).join(' · ')
+        + '. In die Einkommensteuer des Nutzers geht nur sein Anteil (' + eur(f.eigenerBetrag) + ').'
+        + (f.vollstaendig ? '' : ' Die Anteile ergeben zusammen ' + String(Math.round(f.summePct * 100) / 100).replace('.', ',') + ' % - bitte die weiteren Gesellschafter im Mandanten ergänzen.'));
+    });
+  } catch (_eF) {}
   if (ohneStamm.length) {
     hin.push('Zu ' + ohneStamm.length + ' Objekt' + (ohneStamm.length === 1 ? '' : 'en')
       + ' liegen keine Stammdaten vor (Adresse, Fläche, Art) — die Seiten tragen nur den Namen: '
