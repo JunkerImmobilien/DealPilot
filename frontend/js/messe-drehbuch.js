@@ -1946,7 +1946,7 @@
       async function (s) {   /* 7 · und die Marktbewertung */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(function () { return q('#oab-dp-stufen') && q('#oab-dp-stufen').closest('.dp-pf-tile'); }, 8);
-        await b2oZeile(s, 'Dazu die Marktbewertung', 'Die DealPilot-Kachel holt Marktwert und Miete — in <b>drei Stufen</b>. Das zeigt Modul 04.');
+        await b2oZeile(s, 'Dazu die Marktbewertung', 'Die DealPilot-Kachel holt Marktwert und Miete — in <b>drei Stufen</b>. Das zeigt Modul 30.');
       }
     ]
   };
@@ -2392,7 +2392,7 @@
       },
       async function (s) {   /* 4 · Marktmiete */
         await zeige(r6Gruppe('ds2_marktmiete'), 10);
-        var zb = r6Beginn(s, 'Die Marktmiete', 'Was eine Neuvermietung heute bringt — aus der Marktbewertung (Modul 04) oder von dir.');
+        var zb = r6Beginn(s, 'Die Marktmiete', 'Was eine Neuvermietung heute bringt — aus der Marktbewertung (Modul 30) oder von dir.');
         var k = window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.mb && DPM_REIHE_DATEN.mb[1];
         var qm = (function () { try { return k.valuation.inputs.market_rent_sqm; } catch (e) { return null; } })();
         if (!(qm > 0)) qm = 8;   /* nur Rückfall, gelesen wird unten aus dem Feld */
