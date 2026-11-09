@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
-   DealPilot · tools/darlehen-pruefen.mjs · v3215
+   DealPilot · tools/darlehen-pruefen.mjs · v3215 · v3261 (Teil D: Darlehen II)
    W-17 (Entwicklungspartner): beliebig viele weitere Darlehen im Reiter
    Finanzierung - Liste im Feld #darlehen_weitere, Kern
    frontend/js/darlehen-weitere.js (DpDarlehenWeitere).
@@ -237,6 +237,50 @@ try {
   melde(sp.kpis.d_total === basis.kpis.d_total && Object.is(sp.kpis.dscr, basis.kpis.dscr), 'D3 ab 2029: Kennzahlen beim Kauf unveraendert', [sp.kpis.d_total, sp.kpis.dscr]);
   melde(sp.rows[2].zy === basis.rows[2].zy && nah(sp.rows[3].zy - basis.rows[3].zy, hand[0].zins), 'D3 ab 2029: 2028 unveraendert, 2029 Zins +' + hand[0].zins.toFixed(2), [sp.rows[2].zy - basis.rows[2].zy, sp.rows[3].zy - basis.rows[3].zy]);
 } catch (e) { melde(false, 'D3 ab 2029: Rechenlauf', e.message); }
+
+/* ══ D · v3261 · Darlehen II: Tilgungs-/Zinsplan und Bank-PDF ═══════════
+   Der Plan von Darlehen II (financing.js openTilgungsplanModal('d2')) liest
+   seine Felder mit dpD2PlanEintrag() und rechnet im Kern (monatsplan). Er muss
+   dieselbe Restschuld am Ende der Zinsbindung zeigen wie calc.js (State.rs2,
+   gleiche Bindung wie Darlehen I) und dieselbe Rate (State.d2_rate_m) - eine
+   Rechnung, zwei Anzeigen. Dazu der Leser financing-pdf.js mit Ziel 'd2'. */
+console.log('D · Darlehen II: Plan aus dem Kern = calc.js, Bank-PDF-Leser');
+function rechneD2(felder) {
+  const q = ['dscr-engine.js', 'darlehen-weitere.js', 'deal-kpis.js', 'anteilig.js', 'calc.js', 'financing.js', 'financing-pdf.js'].map((d) => ({ name: d, code: neuLesen(d) }));
+  const ctx = sandbox(q, Object.assign({}, FORM, felder || {}));
+  ctx.calcNow();
+  return ctx;
+}
+const D2F = { d2_enable: true, d2: '40000', d2z: '3.5', d2t: '1,5', d2_bindj: '10', d2_type: 'annuitaet', d2_auszahl: '06.2026', d2_anschl_enable: false };
+try {
+  const c = rechneD2(D2F);
+  const e = c.dpD2PlanEintrag();
+  melde(!!e && e.betrag === 40000 && nah(e.zins, 3.5) && nah(e.tilg, 1.5) && e.bindj === 10, 'Darlehen II als Eintrag: 40.000 €, Zins "3.5" = 3,5 % (parseDe wie calc.js), Tilgung 1,5 %, 10 J.', e);
+  const mp2 = kern.monatsplan(e, 120);
+  melde(mp2.length === 120 && nah(mp2[0].rate, c.State.d2_rate_m), 'Plan Darlehen II: Rate Monat 1 = calc.js d2_rate_m (' + c.State.d2_rate_m.toFixed(2) + ')', [mp2[0] && mp2[0].rate, c.State.d2_rate_m]);
+  melde(nah(mp2[119].rs, c.State.rs2, 0.01), 'Plan Darlehen II: Restschuld nach 10 J. = calc.js State.rs2 (' + c.State.rs2.toFixed(2) + ')', [mp2[119] && mp2[119].rs, c.State.rs2]);
+  const i2 = 3.5 / 100 / 12, A2 = 40000 * 5 / 100 / 12, q2 = Math.pow(1 + i2, 120);
+  melde(nah(mp2[119].rs, 40000 * q2 - A2 * (q2 - 1) / i2, 0.01), 'Plan Darlehen II: Restschuld nach 10 J. = geschlossene Formel', mp2[119] && mp2[119].rs);
+  melde(e._start && e._start.m === 6 && e._start.y === 2026 && e._nurBindung === false, 'Plan Darlehen II beginnt mit seiner Auszahlung (06.2026), ohne Anschluss 24 Monate Vorschau', [e._start, e._nurBindung]);
+} catch (x) { melde(false, 'Darlehen II Annuitaet: Rechenlauf', x.message); }
+try {
+  const c = rechneD2(Object.assign({}, D2F, { d2_type: 'tilgungsaussetzung', d2_anschl_enable: true }));
+  const e = c.dpD2PlanEintrag();
+  const mp2 = kern.monatsplan(e, 120);
+  melde(e.art === 'tilgungsaussetzung' && mp2.every((x) => x.tilg === 0 && x.rs === 40000), 'Zinsplan Darlehen II (Tilgungsaussetzung): keine Tilgung, Restschuld bleibt 40.000 € = State.rs2', [e.art, c.State.rs2]);
+  melde(c.State.rs2 === 40000 && nah(mp2[0].zins, c.State.d2_rate_m), 'Zinsplan Darlehen II: Zins je Monat = calc.js-Rate (nur Zinsen ' + c.State.d2_rate_m.toFixed(2) + ' €)', [mp2[0].zins, c.State.d2_rate_m]);
+  melde(e._nurBindung === true, 'mit eigener Anschlussfinanzierung zeigt der Plan nur die Bindung', e._nurBindung);
+} catch (x) { melde(false, 'Darlehen II Aussetzung: Rechenlauf', x.message); }
+try {
+  const c = rechneD2(Object.assign({}, D2F, { d2_enable: false }));
+  melde(c.dpD2PlanEintrag() === null, 'Darlehen II aus: kein Plan', c.dpD2PlanEintrag());
+  const txt = 'Vertragsnummer: KfW-998877\nDarlehensbetrag: 50.000,00 EUR\nSollzinssatz von 2,15 %\nanfänglicher Tilgungssatz: 3,00 %\nSollzinsbindung: 10 Jahre\nAuszahlung am: 15.07.2026\nKfW';
+  const r = c.dpFinPdfLesen(txt, 'd2'), f = r.fields || {};
+  melde(f.d2 === 50000 && nah(f.d2z, 2.15) && nah(f.d2t, 3) && f.d2_bindj === 10, 'Bank-PDF Ziel d2: Summe, Zins, Tilgung, Bindung in die Felder von Darlehen II', f);
+  melde(f.d2_vertrag === 'KfW-998877' && f.d2_auszahl === '07.2026' && f.d2_inst === 'KfW' && !('d1' in f) && !('bank_inst' in f), 'Bank-PDF Ziel d2: Vertragsnummer, Auszahlung, Bank - nichts in Darlehen I', f);
+  const r1 = c.dpFinPdfLesen(txt, 'd1');
+  melde(r1.fields.d1 === 50000 && r1.fields.d1_vertrag === 'KfW-998877' && r1.fields.d1_auszahl === '07.2026', 'Bank-PDF Ziel d1 unveraendert: Summe, Vertragsnummer, Auszahlung', r1.fields);
+} catch (x) { melde(false, 'Darlehen II aus / Bank-PDF: Lauf', x.message); }
 
 console.log((fehler ? 'ROT' : 'GRUEN') + ' · ' + (geprueft - fehler) + '/' + geprueft + ' Pruefungen (Referenz ' + REFERENZ + ')');
 process.exit(fehler ? 1 : 0);

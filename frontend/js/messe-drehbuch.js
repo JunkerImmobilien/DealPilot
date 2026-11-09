@@ -1236,7 +1236,8 @@
   function sbKnopf(akt) { return function () { return qs('.sb-act-item[onclick*="\'' + akt + '\'"]'); }; }
   function wert(id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; }
   function zahl(id) { var v = wert(id).replace(/\./g, '').replace(',', '.'); var n = parseFloat(v); return isFinite(n) && v !== '' ? n : null; }
-  function feldVon(id) { return function () { var e = document.getElementById(id); return e && (e.closest('.f,.field,.fg,.form-group') || e.parentElement); }; }
+  /* v3261 · Felder im Reiter Finanzierung stehen in eingeklappten Gruppen (details.fz-gruppe) - vorher aufklappen, sonst zeigt der Kegel ins Leere */
+  function feldVon(id) { return function () { var e = document.getElementById(id); if (e && typeof window.dpFzOeffnen === 'function') { try { window.dpFzOeffnen(e); } catch (x) {} } return e && (e.closest('.f,.field,.fg,.form-group') || e.parentElement); }; }
   function pz(n) { return n == null ? null : String(n).replace('.', ','); }
   async function b2oZeile(s, titel, text, extra) { s.zeile(titel, text); await warte(lies(titel, text) + (extra || 0)); }
   /* Ein Kegel über zwei Knöpfe: ein unsichtbarer Rahmen um beide (nur

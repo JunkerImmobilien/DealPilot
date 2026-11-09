@@ -243,10 +243,11 @@
         /Vertrags(?:nummer|nr)\.?\s*[:\s]+([\w\-\/]+)/i,
         /Darlehens?nr\.?\s*[:\s]+([\w\-]+)/i
       ]);
-      if (vnMatch && target === 'd1') result.fields.d1_vertrag = vnMatch[1].trim();
+      /* v3261 · auch Darlehen II: Vertragsnummer und Auszahlung in seine eigenen Felder */
+      if (vnMatch) result.fields[target === 'd1' ? 'd1_vertrag' : 'd2_vertrag'] = vnMatch[1].trim();
 
       // Auszahlungsdatum
-      if (target === 'd1') {
+      {   /* v3261: fuer d1 und d2 */
         var aMatch = _findFirst(text, [
           /Auszahlung\s*(?:zum|am)?\s*[:\s]+(\d{2}\.\d{2}\.\d{4})/i,
           /Valuta\s*[:\s]+(\d{2}\.\d{2}\.\d{4})/i,
@@ -254,15 +255,15 @@
         ]);
         if (aMatch) {
           var parts = aMatch[1].split('.');
-          result.fields.d1_auszahl = parts[1] + '.' + parts[2];
+          result.fields[target + '_auszahl'] = parts[1] + '.' + parts[2];
         }
       }
 
       // Ableitung Bindungs-Jahre wenn nur Enddatum + Auszahlung
-      if (!result.fields[target + '_bindj'] && result._meta.bind_end_date && result.fields.d1_auszahl) {
+      if (!result.fields[target + '_bindj'] && result._meta.bind_end_date && result.fields[target + '_auszahl']) {
         try {
           var endParts = result._meta.bind_end_date.split('-');
-          var startParts = result.fields.d1_auszahl.split('.');
+          var startParts = result.fields[target + '_auszahl'].split('.');
           var monthsDiff = (parseInt(endParts[0]) - parseInt(startParts[1])) * 12 +
                            (parseInt(endParts[1]) - parseInt(startParts[0]));
           var yrs = Math.round(monthsDiff / 12);
@@ -336,6 +337,7 @@
       d1_type: 'Darlehenstyp', bank_inst: 'Bank', d1_vertrag: 'Vertragsnummer',
       d2: 'Darlehenssumme (€)', d2z: 'Zinssatz nominal (%)', d2t: 'Tilgung (%)',
       d2_bindj: 'Zinsbindung (Jahre)', d2_inst: 'Bank', d2_type: 'Darlehenstyp',
+      d2_vertrag: 'Vertragsnummer', d2_auszahl: 'Auszahlung (MM.YYYY)',   /* v3261 */
       bspar_sum: 'Bausparsumme (€)', bspar_rate: 'Sparrate / Monat (€)',
       bspar_zuteil: 'Zuteilungsdatum', bspar_inst: 'Bausparkasse',
       bspar_vertrag: 'Vertragsnummer', bspar_zins: 'Guthabenzins (%)',
@@ -406,6 +408,13 @@
       return;
     }
     var inputs = document.querySelectorAll('#finpdf-body input[data-field]');
+    /* v3261 · Werte für Darlehen II: ist es noch aus, wird es eingeschaltet - sonst
+       stünden die Werte in versteckten Feldern und rechneten nicht mit */
+    var _d2cb = document.getElementById('d2_enable');
+    if (_d2cb && !_d2cb.checked && [].some.call(inputs, function (inp) { return /^d2(z|t|_|$)/.test(inp.dataset.field || ''); })) {
+      _d2cb.checked = true;
+      if (typeof window.toggleD2 === 'function') { try { window.toggleD2(); } catch (_) {} }
+    }
     inputs.forEach(function(inp) {
       var fieldId = inp.dataset.field;
       var val = inp.value;
@@ -489,5 +498,8 @@
       alert('PDF-Import fehlgeschlagen:\n\n' + err.message + '\n\nBitte Werte manuell eingeben.');
     }
   };
+
+  /* v3261 · der Leser ohne Datei und Dialog - für tools/darlehen-pruefen.mjs (Text → Felder je Ziel) */
+  window.dpFinPdfLesen = _parseFinancingPdf;
 
 })();

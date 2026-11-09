@@ -55,7 +55,7 @@
 <link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3196"><!-- v3185 -->
 <link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3196"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
 <link rel="stylesheet" href="css/objektdaten-raster.css?v=v3225a"><!-- v3225 - Marcel 08.11.2026: Objektdaten in Gruppen, Wertanker-Vergleich als eigene Zeile -->
-<link rel="stylesheet" href="css/finanzierung-raster.css?v=v3256"><!-- v3238 - Marcel 09.11.2026: Reiter Finanzierung in Gruppen, Anschlussfinanzierung als eigener Kasten -->
+<link rel="stylesheet" href="css/finanzierung-raster.css?v=v3261"><!-- v3238 - Marcel 09.11.2026: Reiter Finanzierung in Gruppen, Anschlussfinanzierung als eigener Kasten; v3261: Eckdaten-Kacheln und eingeklappte Gruppen je Darlehen -->
 <link rel="stylesheet" href="css/deal-aktion-karten.css?v=v3253"><!-- v3232 · Marcel 08.11.2026: Deal-Aktion in weißen Karten wie Reiter Objekt -->
 <link rel="stylesheet" href="css/objekt-ansichten.css?v=v3247"><!-- v3237 · Marcel 09.11.2026: Reiter Objekt - Lage kompakt, Wertparameter als Kacheln, Bodenrichtwert-Karte -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
@@ -2793,32 +2793,6 @@ label.dp-required.qc-required::after {
   <div class="col2">
     <div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen I – Hauptdarlehen</div>
-        <!-- v1244 · Testbericht Block F: „Warum muss ich hier zu Bewertung
-             schon die Bank eintragen? Bin ich falsch abgebogen und lege
-             gerade einfach nur ein neues Objekt an? Ich dachte ich wäre im
-             schnellen Onboarding."
-             Berechtigt: Institution und Vertragsnummer gehen in keine
-             Rechnung ein — sie sind Verwaltungsdaten für ein Objekt, das man
-             schon gekauft hat. Sie standen trotzdem als Erstes in der Karte,
-             vor Eigenkapital, Darlehen, Zins und Tilgung. Nicht verschoben,
-             sondern zugeklappt: die Reihenfolge im DOM bleibt, der Weg zur
-             Rendite wird kürzer. -->
-        <details class="dp-erkl" style="margin-bottom:10px">
-          <summary style="cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted)">Vertragsdaten der Bank <span class="cf-hint" style="font-weight:400">— optional, gehen in keine Rechnung ein</span></summary>
-          <div class="g2" style="margin-top:8px">
-            <div class="f"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
-            <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
-          </div>
-          <!-- v1828 · Das Vertragsdatum fehlte. Es gab nur das
-               Auszahlungsdatum — und das ist ein anderer Tag: der Vertrag
-               wird unterschrieben, die Valuta fliesst spaeter. Fuer die
-               Rechnung zaehlt die Auszahlung (anteilig.js), fuer die Akte
-               der Vertrag. -->
-          <div class="g2" style="margin-top:8px">
-            <div class="f"><label>Vertragsdatum</label><input id="d1_vertragsdatum" type="text" placeholder="z.B. 14.03.2025"></div>
-            <div class="f"></div>
-          </div>
-        </details>
         <!-- v3238 · Marcel 09.11.2026: „Anschlussfinanzierung und Position der Felder nicht gut im Tab Finanzierung."
              Vorher: sieben .g2-Paare in Ladereihenfolge (Art|Auszahlung, EK allein, Summe allein, Zins|Tilgung,
              Rate allein, Zinsen|Tilgung, Zinsbindung|Verwendung|Restschuld = drei Felder in zwei Spalten),
@@ -2826,97 +2800,146 @@ label.dp-required.qc-required::after {
              Raster (.fz-gruppen, css/finanzierung-raster.css): Darlehen · Eigenkapital · Konditionen
              (Betrag · Zins · Tilgung · Zinsbindung · Rate) · Verlauf · Werkzeuge · Anschlussfinanzierung als
              abgesetzter Kasten direkt darunter. Keine Feld-ID geaendert. -->
-        <div class="fz-gruppen">
-        <!-- V63.57: Darlehenstyp-Auswahl für D1 -->
-        <div class="fz-raster fz-art">
-          <div class="f fz-s2"><label>Art des Darlehens</label>
-            <select id="d1_type" onchange="onD1TypeChange()">
-              <option value="annuitaet">Annuitätendarlehen</option>
-              <option value="tilgungsaussetzung">Tilgungsaussetzungsdarlehen (mit Bausparvertrag)</option>
-            </select>
-          </div>
-          <div class="f"><label>Auszahlungsdatum</label><input id="d1_auszahl" type="text" placeholder="z.B. 05.2025" oninput="calcD1Volltilgung()"></div>
-          <div class="f"><label>Verwendung</label><select id="d1_verwendung"><option value="">—</option><option value="kauf">Kauf / Anschaffung</option><option value="sanierung">Sanierung / Modernisierung</option><option value="umschuldung">Umschuldung</option><option value="privat">private Verwendung</option><option value="gemischt">gemischt</option></select></div><!-- v3197 · Darlehensverwendung (Portfoliostrategie: Zinsen nur abziehbar, soweit fürs Objekt verwendet) -->
+        <div class="fz-gruppen" id="d1_gruppen">
+
+        <!-- v3261-fz-kopf · Marcel 09.11.2026: „Der Tab Darlehen I ist auch irgendwie unübersichtlich."
+             Eckdaten auf einen Blick (gefüllt von js/finanzierung-kopf.js aus den Feldern und den
+             Rechenwerten von calc.js - keine eigene Rechnung). Ein Klick öffnet „Konditionen bearbeiten". -->
+        <div class="fz-kopf" id="d1_kopf" data-fz-darlehen="d1" aria-label="Eckdaten Darlehen I">
+          <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d1"><span class="fz-k-lbl">Darlehen</span><span class="fz-k-wert" id="d1_k_summe">—</span><span class="fz-k-unter" id="d1_k_summe_u"></span></div>
+          <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d1z"><span class="fz-k-lbl">Zins</span><span class="fz-k-wert" id="d1_k_zins">—</span><span class="fz-k-unter">nominal p.&nbsp;a.</span></div>
+          <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d1t"><span class="fz-k-lbl" id="d1_k_tilg_lbl">Tilgung</span><span class="fz-k-wert" id="d1_k_tilg">—</span><span class="fz-k-unter" id="d1_k_tilg_u">anfänglich p.&nbsp;a.</span></div>
+          <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d1_bindj"><span class="fz-k-lbl">Zinsbindung</span><span class="fz-k-wert" id="d1_k_bind">—</span><span class="fz-k-unter" id="d1_k_bind_u"></span></div>
+          <div class="fz-kachel fz-k-rate" role="button" tabindex="0" data-fz-feld="d1"><span class="fz-k-lbl">Rate / Monat</span><span class="fz-k-wert" id="d1_k_rate">—</span><span class="fz-k-unter" id="d1_k_rate_u"></span></div>
         </div>
-        <!-- v1433 · Backlog v22 Punkt 2: erst Eigenkapital, dann Darlehen -->
-        <div class="fz-raster fz-ek">
-          <div class="f fz-s2"><label>Eigenkapital * <button type="button" class="dp-tip" data-tip-id="tab5.eigenkapital" tabindex="-1" aria-label="Hilfe zu tab5.eigenkapital"></button></label><div class="iw"><span class="pfx">€</span><input id="ek" type="text" inputmode="decimal" placeholder="17905" class="trl" oninput="calc()"></div></div>
-          <div class="f checkbox-row fz-s2 fz-haken" id="ek-ist-nk-row">
-            <label class="cb-label" title="Setzt das Eigenkapital auf die Kaufnebenkosten (Makler, Notar/Grundbuch, Grunderwerbsteuer, weitere). Das Darlehen finanziert dann Kaufpreis, Sanierung und Möblierung.">
-              <input id="ek_ist_nk" type="checkbox">
-              <span>Eigenkapital entspricht den Kaufnebenkosten</span>
-            </label>
-          </div>
-        </div>
-        <!-- v3213 · W-16: Haken "LTV inkl. Erwerbsnebenkosten (strenger)" entfernt. Er rechnete
-             den LTV gegen die Gesamtinvestition - die ist groesser als der Kaufpreis, der LTV
-             wurde also KLEINER (lockerer), nicht strenger. Bezug bleibt Gutachten/Bankwert ->
-             Bankbewertung -> Kaufpreis (calc.js). -->
-        <div class="fz-raster fz-kond">
-          <div class="f fz-s2"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div><div class="cf-hint" id="d1-herleitung" style="margin-top:4px"></div></div>
-          <div class="f"><label class="dp-required" data-v236-required-set="1" title="Zinssatz nominal (% p.a.)">Zinssatz nominal <button type="button" class="dp-tip" data-tip-id="tab5.zinssatz" tabindex="-1" aria-label="Hilfe zu Zinssatz nominal"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1" title="Tilgung (% p.a.)">Tilgung <span class="cf-hint" id="d1t_hint" style="display:none"></span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d1_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc(); calcD1Volltilgung()"><span class="sfx">J.</span></div></div>
-          <div class="f"><label title="Monatliche Rate (berechnet)">Rate / Monat</label><div class="cf" id="d1_rate">—</div></div>
-          <div class="f"><label>davon Zinsen</label><div class="cf" id="d1_zm">—</div></div>
-          <div class="f"><label id="d1_tm_lbl">davon Tilgung</label><div class="cf" id="d1_tm">—</div></div><!-- v3256: bei Tilgungsaussetzung „Sparrate Bausparvertrag" (financing.js _wortwahl) -->
-          <!-- v1244 · Testbericht Block F: „Sollte hier die Reihenfolge nicht
-               anders sein? Erst eintragen was fuer ein Kredit ich bekomme und
-               den EK-Einsatz berechnet er automatisch (wie Immocation Tool)"
-               Gemessen ergab: es gibt gar keine Reihenfolge. Eigenkapital und
-               Darlehen sind voellig unabhaengig — EK auf 99.000 gesetzt liess
-               das Darlehen bei 180.000 stehen, und umgekehrt. Bei Objekt
-               2026-001 standen 20.000 EK + 180.000 Darlehen gegen eine
-               Gesamtinvestition von 220.400 EUR: 20.400 EUR fehlten, ohne dass
-               es irgendwo stand. Die EK-Rendite rechnete trotzdem auf 20.000.
-               Diese Zeile schliesst die Luecke in beide Richtungen. -->
-          <div class="f fz-voll" id="kapital-deckung" style="margin-top:2px">
-            <!-- v3256 · Marcel 09.11.2026: Knoepfe rechts neben den Text, untereinander, Box kleiner
-                 (css/finanzierung-raster.css .kd-knoepfe) -->
-            <div id="kd-box" style="border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.45;display:flex;align-items:center;gap:10px">
-              <div style="flex:1;min-width:0">
-                <div id="kd-zeile"><span class="cf-hint">Kapitaldeckung wird berechnet …</span></div>
-                <div id="kd-rechnung" class="cf-hint" style="margin-top:2px"></div>
-              </div>
-              <div class="kd-knoepfe">
-                <button type="button" class="btn btn-outline btn-sm" id="kd-btn-ek" onclick="dpKapitalEkSetzen()" style="display:none">Eigenkapital passend setzen</button>
-                <button type="button" class="btn btn-outline btn-sm" id="kd-btn-d1" onclick="dpKapitalDarlehenSetzen()" style="display:none">Darlehen passend setzen</button>
-              </div>
+        <!-- v1244 · Testbericht Block F: „Sollte hier die Reihenfolge nicht
+             anders sein? Erst eintragen was fuer ein Kredit ich bekomme und
+             den EK-Einsatz berechnet er automatisch (wie Immocation Tool)"
+             Gemessen ergab: es gibt gar keine Reihenfolge. Eigenkapital und
+             Darlehen sind voellig unabhaengig — EK auf 99.000 gesetzt liess
+             das Darlehen bei 180.000 stehen, und umgekehrt. Bei Objekt
+             2026-001 standen 20.000 EK + 180.000 Darlehen gegen eine
+             Gesamtinvestition von 220.400 EUR: 20.400 EUR fehlten, ohne dass
+             es irgendwo stand. Die EK-Rendite rechnete trotzdem auf 20.000.
+             Diese Zeile schliesst die Luecke in beide Richtungen. -->
+        <div class="fz-deckung" id="kapital-deckung">
+          <!-- v3256 · Marcel 09.11.2026: Knoepfe rechts neben den Text, untereinander, Box kleiner
+               (css/finanzierung-raster.css .kd-knoepfe) -->
+          <div id="kd-box" style="border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.45;display:flex;align-items:center;gap:10px">
+            <div style="flex:1;min-width:0">
+              <div id="kd-zeile"><span class="cf-hint">Kapitaldeckung wird berechnet …</span></div>
+              <div id="kd-rechnung" class="cf-hint" style="margin-top:2px"></div>
+            </div>
+            <div class="kd-knoepfe">
+              <button type="button" class="btn btn-outline btn-sm" id="kd-btn-ek" onclick="dpKapitalEkSetzen()" style="display:none">Eigenkapital passend setzen</button>
+              <button type="button" class="btn btn-outline btn-sm" id="kd-btn-d1" onclick="dpKapitalDarlehenSetzen()" style="display:none">Darlehen passend setzen</button>
             </div>
           </div>
         </div>
-        <div class="fz-raster fz-verlauf">
-          <div class="f fz-s2"><label>Restschuld Ende Zinsbindung</label><div class="cf" id="restschuld">—</div></div>
-          <div class="f"><label>Zinsbindung bis</label><div class="cf" id="bindend">—</div></div>
-          <div class="f"><label id="volltilg_lbl">Volltilgung (ca.)</label><div class="cf" id="volltilg">—</div></div>
-        </div>
-        <!-- V63.57: Tilgungsplan-Anzeige (Modal) und PDF-Import für D1 -->
-        <div class="fz-werkzeuge">
-          <button type="button" class="btn-ghost btn-sm" onclick="openTilgungsplanModal()" id="tilg_toggle_btn">
-            <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg> <span id="tilg_toggle_lbl">Tilgungsplan</span> ansehen & bearbeiten</span>
-          </button>
-          <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('d1')" title="Bankvertrag scannen — Werte werden automatisch übernommen">
-            <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Daten aus Bank-PDF importieren</span>
-          </button>
-        </div>
-        <!-- V357-d1anschl-html: Eigene Anschlussfinanzierung fuer Darlehen 1 (analog D2).
-             v3238: eigener, abgesetzter Kasten direkt unter Darlehen I - Beginn · Zins · Tilgung · Zinsbindung,
-             darunter Rate und Zinsrisiko. -->
-        <div class="fz-anschluss" id="d1_anschl_kasten">
-          <div class="f fz-anschluss-kopf"><label class="toggle-slim" style="cursor:pointer"><input type="checkbox" id="d1_anschl_enable" onchange="var f=document.getElementById('d1_anschl_fields'); if(f) f.style.display=this.checked?'':'none'; calc();"> <span>Eigene Anschlussfinanzierung für Darlehen I</span></label></div>
-          <div id="d1_anschl_fields" class="fz-raster fz-anschl" style="display:none">
-            <p class="hint fz-voll">Konservativ rechnen: z.B. <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b> als Puffer. Diese Werte fließen in die 3-Phasen-Berechnung und Projektion ein.</p>
-            <div class="f"><label title="Beginnt mit dem Ende der Zinsbindung von Darlehen I">Beginn</label><div class="cf" id="anschl_ab">—</div></div>
-            <div class="f"><label title="Zinssatz Anschluss (%)">Anschlusszins</label><div class="iw"><input id="anschl_z" type="text" inputmode="decimal" value="5.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-            <div class="f"><label title="Tilgung Anschluss (%)">Anschlusstilgung</label><div class="iw"><input id="anschl_t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-            <div class="f"><label title="Zinsbindung Anschluss (Jahre)">Bindung Anschluss</label><div class="iw"><input id="anschl_bj" type="text" inputmode="decimal" value="15" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
-            <div class="f"><label title="Rate Anschluss / Monat">Rate / Monat</label><div class="cf" id="anschl_rate">—</div></div>
-            <div class="f fz-s2"><label title="Zinsrisiko (auto berechnet): Anschlusszins minus heutiger Zins">Zinsrisiko</label><div class="cf" id="zaer_display" data-v257-03="1">—</div></div>
-            <div class="f"><label title="Mehrkosten Anschluss / Monat">Mehrkosten / Monat</label><div class="cf" id="zaer_m">—</div></div>
-            <input type="hidden" id="zaer" value="0">
+        <!-- v3261 · darunter eingeklappte Gruppen: Konditionen · Anschlussfinanzierung · Bankdaten · Werkzeuge.
+             Die Knoten sind umgehängt, nicht neu gebaut - jede Feld-ID bleibt (Rechnung, Speichern, Import,
+             Mapper, Prompt). „Konditionen" ist offen, solange keine Darlehenssumme steht (finanzierung-kopf.js). -->
+        <details class="fz-gruppe" id="d1_grp_kond" data-fz-gruppe="kond" open>
+          <summary><span class="fz-g-titel">Konditionen bearbeiten</span><span class="fz-g-stand" id="d1_grp_kond_stand"></span></summary>
+          <div class="fz-gruppe-inhalt">
+          <!-- V63.57: Darlehenstyp-Auswahl für D1 -->
+          <div class="fz-raster fz-art">
+            <div class="f fz-s2"><label>Art des Darlehens</label>
+              <select id="d1_type" onchange="onD1TypeChange()">
+                <option value="annuitaet">Annuitätendarlehen</option>
+                <option value="tilgungsaussetzung">Tilgungsaussetzungsdarlehen (mit Bausparvertrag)</option>
+              </select>
+            </div>
+            <div class="f"><label>Auszahlungsdatum</label><input id="d1_auszahl" type="text" placeholder="z.B. 05.2025" oninput="calcD1Volltilgung()"></div>
+            <div class="f"><label>Verwendung</label><select id="d1_verwendung"><option value="">—</option><option value="kauf">Kauf / Anschaffung</option><option value="sanierung">Sanierung / Modernisierung</option><option value="umschuldung">Umschuldung</option><option value="privat">private Verwendung</option><option value="gemischt">gemischt</option></select></div><!-- v3197 · Darlehensverwendung (Portfoliostrategie: Zinsen nur abziehbar, soweit fürs Objekt verwendet) -->
           </div>
-          <span class="hint fz-anschluss-fuss">Ohne Häkchen läuft Darlehen 1 mit seiner Annuität weiter (durchfinanziert) — keine Anschluss-Annahme.</span>
-        </div>
+          <!-- v1433 · Backlog v22 Punkt 2: erst Eigenkapital, dann Darlehen -->
+          <div class="fz-raster fz-ek">
+            <div class="f fz-s2"><label>Eigenkapital * <button type="button" class="dp-tip" data-tip-id="tab5.eigenkapital" tabindex="-1" aria-label="Hilfe zu tab5.eigenkapital"></button></label><div class="iw"><span class="pfx">€</span><input id="ek" type="text" inputmode="decimal" placeholder="17905" class="trl" oninput="calc()"></div></div>
+            <div class="f checkbox-row fz-s2 fz-haken" id="ek-ist-nk-row">
+              <label class="cb-label" title="Setzt das Eigenkapital auf die Kaufnebenkosten (Makler, Notar/Grundbuch, Grunderwerbsteuer, weitere). Das Darlehen finanziert dann Kaufpreis, Sanierung und Möblierung.">
+                <input id="ek_ist_nk" type="checkbox">
+                <span>Eigenkapital entspricht den Kaufnebenkosten</span>
+              </label>
+            </div>
+          </div>
+          <!-- v3213 · W-16: Haken "LTV inkl. Erwerbsnebenkosten (strenger)" entfernt. Er rechnete
+               den LTV gegen die Gesamtinvestition - die ist groesser als der Kaufpreis, der LTV
+               wurde also KLEINER (lockerer), nicht strenger. Bezug bleibt Gutachten/Bankwert ->
+               Bankbewertung -> Kaufpreis (calc.js). -->
+          <div class="fz-raster fz-kond">
+            <div class="f fz-s2"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div><div class="cf-hint" id="d1-herleitung" style="margin-top:4px"></div></div>
+            <div class="f"><label class="dp-required" data-v236-required-set="1" title="Zinssatz nominal (% p.a.)">Zinssatz nominal <button type="button" class="dp-tip" data-tip-id="tab5.zinssatz" tabindex="-1" aria-label="Hilfe zu Zinssatz nominal"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1" title="Tilgung (% p.a.)">Tilgung <span class="cf-hint" id="d1t_hint" style="display:none"></span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d1_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc(); calcD1Volltilgung()"><span class="sfx">J.</span></div></div>
+            <div class="f"><label title="Monatliche Rate (berechnet)">Rate / Monat</label><div class="cf" id="d1_rate">—</div></div>
+            <div class="f"><label>davon Zinsen</label><div class="cf" id="d1_zm">—</div></div>
+            <div class="f"><label id="d1_tm_lbl">davon Tilgung</label><div class="cf" id="d1_tm">—</div></div><!-- v3256: bei Tilgungsaussetzung „Sparrate Bausparvertrag" (financing.js _wortwahl) -->
+          </div>
+          <div class="fz-raster fz-verlauf">
+            <div class="f fz-s2"><label>Restschuld Ende Zinsbindung</label><div class="cf" id="restschuld">—</div></div>
+            <div class="f"><label>Zinsbindung bis</label><div class="cf" id="bindend">—</div></div>
+            <div class="f"><label id="volltilg_lbl">Volltilgung (ca.)</label><div class="cf" id="volltilg">—</div></div>
+          </div>
+          </div>
+        </details>
+        <details class="fz-gruppe" id="d1_grp_anschl" data-fz-gruppe="anschl">
+          <summary><span class="fz-g-titel">Anschlussfinanzierung</span><span class="fz-g-stand" id="d1_grp_anschl_stand"></span></summary>
+          <div class="fz-gruppe-inhalt">
+          <!-- V357-d1anschl-html: Eigene Anschlussfinanzierung fuer Darlehen 1 (analog D2).
+               v3238: eigener, abgesetzter Kasten direkt unter Darlehen I - Beginn · Zins · Tilgung · Zinsbindung,
+               darunter Rate und Zinsrisiko. -->
+          <div class="fz-anschluss" id="d1_anschl_kasten">
+            <div class="f fz-anschluss-kopf"><label class="toggle-slim" style="cursor:pointer"><input type="checkbox" id="d1_anschl_enable" onchange="var f=document.getElementById('d1_anschl_fields'); if(f) f.style.display=this.checked?'':'none'; calc();"> <span>Eigene Anschlussfinanzierung für Darlehen I</span></label></div>
+            <div id="d1_anschl_fields" class="fz-raster fz-anschl" style="display:none">
+              <p class="hint fz-voll">Konservativ rechnen: z.B. <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b> als Puffer. Diese Werte fließen in die 3-Phasen-Berechnung und Projektion ein.</p>
+              <div class="f"><label title="Beginnt mit dem Ende der Zinsbindung von Darlehen I">Beginn</label><div class="cf" id="anschl_ab">—</div></div>
+              <div class="f"><label title="Zinssatz Anschluss (%)">Anschlusszins</label><div class="iw"><input id="anschl_z" type="text" inputmode="decimal" value="5.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+              <div class="f"><label title="Tilgung Anschluss (%)">Anschlusstilgung</label><div class="iw"><input id="anschl_t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+              <div class="f"><label title="Zinsbindung Anschluss (Jahre)">Bindung Anschluss</label><div class="iw"><input id="anschl_bj" type="text" inputmode="decimal" value="15" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
+              <div class="f"><label title="Rate Anschluss / Monat">Rate / Monat</label><div class="cf" id="anschl_rate">—</div></div>
+              <div class="f fz-s2"><label title="Zinsrisiko (auto berechnet): Anschlusszins minus heutiger Zins">Zinsrisiko</label><div class="cf" id="zaer_display" data-v257-03="1">—</div></div>
+              <div class="f"><label title="Mehrkosten Anschluss / Monat">Mehrkosten / Monat</label><div class="cf" id="zaer_m">—</div></div>
+              <input type="hidden" id="zaer" value="0">
+            </div>
+            <span class="hint fz-anschluss-fuss">Ohne Häkchen läuft Darlehen 1 mit seiner Annuität weiter (durchfinanziert) — keine Anschluss-Annahme.</span>
+          </div>
+          </div>
+        </details>
+          <!-- v1244 · Testbericht Block F: „Warum muss ich hier zu Bewertung
+               schon die Bank eintragen? Bin ich falsch abgebogen und lege
+               gerade einfach nur ein neues Objekt an? Ich dachte ich wäre im
+               schnellen Onboarding."
+               Berechtigt: Institution und Vertragsnummer gehen in keine
+               Rechnung ein — sie sind Verwaltungsdaten für ein Objekt, das man
+               schon gekauft hat. Sie standen trotzdem als Erstes in der Karte,
+               vor Eigenkapital, Darlehen, Zins und Tilgung. Nicht verschoben,
+               sondern zugeklappt: die Reihenfolge im DOM bleibt, der Weg zur
+               Rendite wird kürzer. -->
+        <details class="fz-gruppe" id="d1_grp_bank" data-fz-gruppe="bank">
+          <summary><span class="fz-g-titel">Bankdaten</span><span class="fz-g-stand" id="d1_grp_bank_stand"></span></summary>
+          <div class="fz-gruppe-inhalt">
+          <div class="fz-raster fz-bank">
+            <div class="f fz-s2"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
+            <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
+            <div class="f"><label>Vertragsdatum</label><input id="d1_vertragsdatum" type="text" placeholder="z.B. 14.03.2025"></div>
+          </div>
+          </div>
+        </details>
+        <details class="fz-gruppe" id="d1_grp_werkz" data-fz-gruppe="werkz">
+          <summary><span class="fz-g-titel">Werkzeuge</span><span class="fz-g-stand" id="d1_grp_werkz_stand"></span></summary>
+          <div class="fz-gruppe-inhalt">
+          <!-- V63.57: Tilgungsplan-Anzeige (Modal) und PDF-Import für D1 -->
+          <div class="fz-werkzeuge">
+            <button type="button" class="btn-ghost btn-sm" onclick="openTilgungsplanModal()" id="tilg_toggle_btn">
+              <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg> <span id="tilg_toggle_lbl">Tilgungsplan</span> ansehen & bearbeiten</span>
+            </button>
+            <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('d1')" title="Bankvertrag scannen — Werte werden automatisch übernommen">
+              <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Daten aus Bank-PDF importieren</span>
+            </button>
+          </div>
+          </div>
+        </details>
         </div>
       </div>
 
@@ -2983,48 +3006,90 @@ label.dp-required.qc-required::after {
         </div>
         <div id="d2_content" style="display:none; padding-top:12px">
           <!-- v3238 · dieselben Gruppen wie Darlehen I: Darlehen · Bankdaten · Konditionen · Anschlussfinanzierung -->
-          <div class="fz-gruppen">
-          <div class="fz-raster fz-art">
-            <div class="f fz-s2"><label>Art des Darlehens</label>
-              <select id="d2_type" onchange="calc()">
-                <option value="annuitaet">Annuitätendarlehen</option>
-                <option value="tilgungsaussetzung">Tilgungsaussetzungsdarlehen</option>
-                <option value="kfw">KfW-Darlehen</option>
-              </select>
+          <div class="fz-gruppen" id="d2_gruppen">
+
+          <!-- v3261-fz-kopf · Marcel 09.11.2026: „Der Tab Darlehen I ist auch irgendwie unübersichtlich."
+               Eckdaten auf einen Blick (gefüllt von js/finanzierung-kopf.js aus den Feldern und den
+               Rechenwerten von calc.js - keine eigene Rechnung). Ein Klick öffnet „Konditionen bearbeiten". -->
+          <div class="fz-kopf" id="d2_kopf" data-fz-darlehen="d2" aria-label="Eckdaten Darlehen II">
+            <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d2"><span class="fz-k-lbl">Darlehen</span><span class="fz-k-wert" id="d2_k_summe">—</span><span class="fz-k-unter" id="d2_k_summe_u"></span></div>
+            <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d2z"><span class="fz-k-lbl">Zins</span><span class="fz-k-wert" id="d2_k_zins">—</span><span class="fz-k-unter">nominal p.&nbsp;a.</span></div>
+            <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d2t"><span class="fz-k-lbl" id="d2_k_tilg_lbl">Tilgung</span><span class="fz-k-wert" id="d2_k_tilg">—</span><span class="fz-k-unter" id="d2_k_tilg_u">anfänglich p.&nbsp;a.</span></div>
+            <div class="fz-kachel" role="button" tabindex="0" data-fz-feld="d2_bindj"><span class="fz-k-lbl">Zinsbindung</span><span class="fz-k-wert" id="d2_k_bind">—</span><span class="fz-k-unter" id="d2_k_bind_u"></span></div>
+            <div class="fz-kachel fz-k-rate" role="button" tabindex="0" data-fz-feld="d2"><span class="fz-k-lbl">Rate / Monat</span><span class="fz-k-wert" id="d2_k_rate">—</span><span class="fz-k-unter" id="d2_k_rate_u"></span></div>
+          </div>
+          <details class="fz-gruppe" id="d2_grp_kond" data-fz-gruppe="kond" open>
+            <summary><span class="fz-g-titel">Konditionen bearbeiten</span><span class="fz-g-stand" id="d2_grp_kond_stand"></span></summary>
+            <div class="fz-gruppe-inhalt">
+            <div class="fz-raster fz-art">
+              <div class="f fz-s2"><label>Art des Darlehens</label>
+                <select id="d2_type" onchange="calc()">
+                  <option value="annuitaet">Annuitätendarlehen</option>
+                  <option value="tilgungsaussetzung">Tilgungsaussetzungsdarlehen</option>
+                  <option value="kfw">KfW-Darlehen</option>
+                </select>
+              </div>
+              <div class="f"><label>Auszahlungsdatum</label><input id="d2_auszahl" type="text" placeholder="z.B. 06.2026" oninput="calc()"></div>
+              <div class="f"><label>Verwendung</label><select id="d2_verwendung"><option value="">—</option><option value="kauf">Kauf / Anschaffung</option><option value="sanierung">Sanierung / Modernisierung</option><option value="umschuldung">Umschuldung</option><option value="privat">private Verwendung</option><option value="gemischt">gemischt</option></select></div><!-- v3197 · Darlehensverwendung (Portfoliostrategie: Zinsen nur abziehbar, soweit fürs Objekt verwendet) -->
             </div>
-            <div class="f"><label>Auszahlungsdatum</label><input id="d2_auszahl" type="text" placeholder="z.B. 06.2026" oninput="calc()"></div>
-            <div class="f"><label>Verwendung</label><select id="d2_verwendung"><option value="">—</option><option value="kauf">Kauf / Anschaffung</option><option value="sanierung">Sanierung / Modernisierung</option><option value="umschuldung">Umschuldung</option><option value="privat">private Verwendung</option><option value="gemischt">gemischt</option></select></div><!-- v3197 · Darlehensverwendung (Portfoliostrategie: Zinsen nur abziehbar, soweit fürs Objekt verwendet) -->
-          </div>
-          <div class="fz-raster fz-bank">
-            <div class="f"><label>Institution</label><input id="d2_inst" type="text" placeholder="Bank / KfW" oninput="calc()"></div>
-            <div class="f"><label>Vertragsnummer</label><input id="d2_vertrag" type="text" placeholder="z.B. KfW-1234567"></div>
-            <div class="f"><label>Vertragsdatum</label><input id="d2_vertragsdatum" type="text" placeholder="z.B. 02.06.2026"></div>
-            <div class="f"><label title="Bausparvertrag (optional)">Bausparvertrag</label><input id="d2_bspar" type="text" placeholder="Bausparvertragsnr."></div>
-          </div>
-          <div class="fz-raster fz-kond">
-            <div class="f fz-s2"><label>Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d2" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-            <div class="f"><label title="Zinssatz nominal (%)">Zinssatz nominal</label><div class="iw"><input id="d2z" type="text" inputmode="decimal" value="2.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-            <div class="f"><label>Tilgung</label><div class="iw"><input id="d2t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div>
-              <span class="hint" id="d2t_hint">Bei Tilgungsaussetzung: 0</span>
+            <div class="fz-raster fz-kond">
+              <div class="f fz-s2"><label>Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d2" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+              <div class="f"><label title="Zinssatz nominal (%)">Zinssatz nominal</label><div class="iw"><input id="d2z" type="text" inputmode="decimal" value="2.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+              <div class="f"><label>Tilgung</label><div class="iw"><input id="d2t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div>
+                <span class="hint" id="d2t_hint">Bei Tilgungsaussetzung: 0</span>
+              </div>
+              <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d2_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
+              <div class="f"><label title="Monatliche Rate">Rate / Monat</label><div class="cf" id="d2_rate">—</div></div>
             </div>
-            <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d2_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
-            <div class="f"><label title="Monatliche Rate">Rate / Monat</label><div class="cf" id="d2_rate">—</div></div>
-          </div>
-          <!-- v358-d2-anschl: Eigene Anschlussfinanzierung fuer Darlehen 2 (analog D1).
-               v3238: abgesetzter Kasten wie bei Darlehen I. -->
-          <div class="fz-anschluss" id="d2_anschl_kasten">
-            <div class="f fz-anschluss-kopf"><label class="toggle-slim" style="cursor:pointer"><input type="checkbox" id="d2_anschl_enable" onchange="var f=document.getElementById('d2_anschl_fields'); if(f) f.style.display=this.checked?'':'none'; calc();"> <span>Eigene Anschlussfinanzierung für Darlehen II</span></label></div>
-            <div id="d2_anschl_fields" class="fz-raster fz-anschl" style="display:none">
-              <p class="hint fz-voll">Konservativ rechnen: z.B. <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b> als Puffer. Greift nach Ablauf der oben gesetzten Zinsbindung.</p>
-              <div class="f"><label title="Beginnt nach der Zinsbindung von Darlehen II">Beginn</label><div class="cf" id="d2_anschl_ab">—</div></div>
-              <div class="f"><label title="Zinssatz Anschluss (%)">Anschlusszins</label><div class="iw"><input id="d2_az" type="text" inputmode="decimal" value="5.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-              <div class="f"><label title="Tilgung Anschluss (%)">Anschlusstilgung</label><div class="iw"><input id="d2_at" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-              <div class="f"><label title="Rate Anschluss / Monat">Rate / Monat</label><div class="cf" id="d2_anschl_rate">—</div></div>
-              <div class="f fz-s3"><label title="Zinsrisiko (auto berechnet): Anschlusszins minus heutiger Zins">Zinsrisiko</label><div class="cf" id="d2_zaer_display">—</div></div>
-              <div class="f"><label title="Mehrkosten Anschluss / Monat">Mehrkosten / Monat</label><div class="cf" id="d2_zaer_m">—</div></div>
-              <!-- v359-d2-anschl-display -->
             </div>
-          </div>
+          </details>
+          <details class="fz-gruppe" id="d2_grp_anschl" data-fz-gruppe="anschl">
+            <summary><span class="fz-g-titel">Anschlussfinanzierung</span><span class="fz-g-stand" id="d2_grp_anschl_stand"></span></summary>
+            <div class="fz-gruppe-inhalt">
+            <!-- v358-d2-anschl: Eigene Anschlussfinanzierung fuer Darlehen 2 (analog D1).
+                 v3238: abgesetzter Kasten wie bei Darlehen I. -->
+            <div class="fz-anschluss" id="d2_anschl_kasten">
+              <div class="f fz-anschluss-kopf"><label class="toggle-slim" style="cursor:pointer"><input type="checkbox" id="d2_anschl_enable" onchange="var f=document.getElementById('d2_anschl_fields'); if(f) f.style.display=this.checked?'':'none'; calc();"> <span>Eigene Anschlussfinanzierung für Darlehen II</span></label></div>
+              <div id="d2_anschl_fields" class="fz-raster fz-anschl" style="display:none">
+                <p class="hint fz-voll">Konservativ rechnen: z.B. <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b> als Puffer. Greift nach Ablauf der oben gesetzten Zinsbindung.</p>
+                <div class="f"><label title="Beginnt nach der Zinsbindung von Darlehen II">Beginn</label><div class="cf" id="d2_anschl_ab">—</div></div>
+                <div class="f"><label title="Zinssatz Anschluss (%)">Anschlusszins</label><div class="iw"><input id="d2_az" type="text" inputmode="decimal" value="5.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+                <div class="f"><label title="Tilgung Anschluss (%)">Anschlusstilgung</label><div class="iw"><input id="d2_at" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+                <div class="f"><label title="Rate Anschluss / Monat">Rate / Monat</label><div class="cf" id="d2_anschl_rate">—</div></div>
+                <div class="f fz-s3"><label title="Zinsrisiko (auto berechnet): Anschlusszins minus heutiger Zins">Zinsrisiko</label><div class="cf" id="d2_zaer_display">—</div></div>
+                <div class="f"><label title="Mehrkosten Anschluss / Monat">Mehrkosten / Monat</label><div class="cf" id="d2_zaer_m">—</div></div>
+                <!-- v359-d2-anschl-display -->
+              </div>
+            </div>
+            </div>
+          </details>
+          <details class="fz-gruppe" id="d2_grp_bank" data-fz-gruppe="bank">
+            <summary><span class="fz-g-titel">Bankdaten</span><span class="fz-g-stand" id="d2_grp_bank_stand"></span></summary>
+            <div class="fz-gruppe-inhalt">
+            <div class="fz-raster fz-bank">
+              <div class="f"><label>Institution</label><input id="d2_inst" type="text" placeholder="Bank / KfW" oninput="calc()"></div>
+              <div class="f"><label>Vertragsnummer</label><input id="d2_vertrag" type="text" placeholder="z.B. KfW-1234567"></div>
+              <div class="f"><label>Vertragsdatum</label><input id="d2_vertragsdatum" type="text" placeholder="z.B. 02.06.2026"></div>
+              <div class="f"><label title="Bausparvertrag (optional)">Bausparvertrag</label><input id="d2_bspar" type="text" placeholder="Bausparvertragsnr."></div>
+            </div>
+            </div>
+          </details>
+          <details class="fz-gruppe" id="d2_grp_werkz" data-fz-gruppe="werkz">
+            <summary><span class="fz-g-titel">Werkzeuge</span><span class="fz-g-stand" id="d2_grp_werkz_stand"></span></summary>
+            <div class="fz-gruppe-inhalt">
+            <!-- v3261 · Marcel 09.11.2026: „das Darlehen II muss natürlich auch Import und Tilgungsplan bekommen."
+                 Plan: financing.js openTilgungsplanModal('d2'), gerechnet im Kern DpDarlehenWeitere.monatsplan
+                 (dieselbe Monatsschleife wie calc.js _jahrMonatlich). Bank-PDF: derselbe Leser wie Darlehen I. -->
+            <div class="fz-werkzeuge">
+              <button type="button" class="btn-ghost btn-sm" onclick="openTilgungsplanModal('d2')" id="d2_tilg_btn">
+                <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg> <span id="d2_tilg_btn_lbl">Tilgungsplan</span> ansehen</span>
+              </button>
+              <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('d2')" id="d2_pdf_btn" title="Darlehensvertrag einlesen — die erkannten Werte prüfst du vor dem Übernehmen">
+                <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Daten aus Bank-PDF importieren</span>
+              </button>
+            </div>
+            </div>
+          </details>
           </div>
           <div class="info-box info-blue" id="d2_kfw_box" style="display:none; margin-top:10px">
             <div class="info-box-title"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"/></svg> KfW-Förderprogramme <button type="button" class="dp-tip" data-tip-id="tab5.kfw" tabindex="-1" aria-label="Hilfe zu KfW-Förderdarlehen"></button></div>
@@ -3038,7 +3103,8 @@ label.dp-required.qc-required::after {
           <div class="info-box info-muted" id="d2_tad_box" style="display:none; margin-top:10px">
             <div class="info-box-title"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg> Tilgungsaussetzungsdarlehen</div>
             <div class="info-box-content">
-              <div class="hint">Bei einem Tilgungsaussetzungsdarlehen zahlen Sie während der Laufzeit nur Zinsen. Die Tilgung erfolgt am Ende über einen Tilgungsträger (z.B. Bausparvertrag, Lebensversicherung, Fonds-Sparplan). Steuerlich vorteilhaft, da Zinskosten konstant hoch bleiben (= mehr abzugsfähige Werbungskosten).</div>
+              <!-- v3261 · Hinweis kurz, Erklärung hinter „Mehr" -->
+              <div class="hint">Während der Laufzeit nur Zinsen, die Restschuld wird am Ende über einen Tilgungsträger abgelöst. <details class="fz-mehr"><summary>Mehr</summary>Die Tilgung erfolgt am Ende über einen Tilgungsträger (z.B. Bausparvertrag, Lebensversicherung, Fonds-Sparplan). Steuerlich vorteilhaft, da Zinskosten konstant hoch bleiben (= mehr abzugsfähige Werbungskosten).</details></div>
             </div>
           </div>
         </div>
@@ -3050,7 +3116,8 @@ label.dp-required.qc-required::after {
           <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Weitere Darlehen</div>
         </div>
         <input type="hidden" id="darlehen_weitere" value="">
-        <span class="hint" style="display:block;margin:8px 0 6px">Jedes weitere Darlehen zählt in Darlehenssumme, LTV, Rate, Cashflow, DSCR und Schuldzinsen. Nach der Zinsbindung läuft es mit seiner Rate weiter. Mit Start-Jahr wird es erst ab Januar dieses Jahres ausgezahlt und zählt dann nur in der Projektion.</span>
+        <!-- v3261 · Hinweis kurz, Erklärung hinter „Mehr"; jedes Darlehen wie Darlehen I und II aufgebaut (js/darlehen-weitere-ui.js) -->
+        <div class="hint" style="margin:8px 0 6px">Zählt in Darlehenssumme, LTV, Rate, Cashflow und DSCR. <details class="fz-mehr"><summary>Mehr</summary>Jedes weitere Darlehen zählt in Darlehenssumme, LTV, Rate, Cashflow, DSCR und Schuldzinsen. Nach der Zinsbindung läuft es mit seiner Rate weiter. Mit Start-Jahr wird es erst ab Januar dieses Jahres ausgezahlt und zählt dann nur in der Projektion.</details></div>
         <div id="dw-box"></div>
       </div>
 
@@ -3952,11 +4019,12 @@ label.dp-required.qc-required::after {
 <script src="js/unterlagen.js?v=v3211"></script>
 <script src="js/sonderumlage.js?v=v3221"></script>
 <script src="js/sanierung-plan.js?v=v3223"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
-<script src="js/darlehen-weitere-ui.js?v=v3256"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
+<script src="js/darlehen-weitere-ui.js?v=v3261"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
 
 <script src="js/beleg-import.js?v=v3166"></script>
-<script src="js/financing.js?v=v3256"></script>
-<script src="js/financing-pdf.js?v=v3256"></script>
+<script src="js/financing.js?v=v3261"></script>
+<script src="js/financing-pdf.js?v=v3261"></script>
+<script src="js/finanzierung-kopf.js?v=v3261"></script><!-- v3261 · Reiter Finanzierung: Eckdaten je Darlehen und eingeklappte Gruppen (rechnet nichts) -->
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v3213"></script>
@@ -3996,7 +4064,7 @@ label.dp-required.qc-required::after {
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3234"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2966f"></script>
-<script src="js/messe-drehbuch.js?v=v3257"></script>
+<script src="js/messe-drehbuch.js?v=v3261"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v3223"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->

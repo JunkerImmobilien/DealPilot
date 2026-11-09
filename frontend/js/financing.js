@@ -25,6 +25,9 @@
   function _v(id) {
     var s = _g(id);
     if (!s) return 0;
+    /* v3261 · dieselbe Zahl wie calc.js: parseDe liest „3.50" als 3,5. Bis hier strich
+       diese Zeile jeden Punkt als Tausender - „3.50" (Vorgabe im Zinsfeld) ergab 350. */
+    if (typeof window.parseDe === 'function') return window.parseDe(s);
     var n = parseFloat(s.replace(/\./g, '').replace(',', '.'));
     return isFinite(n) ? n : 0;
   }
@@ -172,16 +175,19 @@
   window.openTilgungsplanModal = function(dwIndex) {
     var existing = document.getElementById('tilgplan-modal');
     if (existing) existing.remove();
+    /* v3261 · 'd2' = Darlehen II: derselbe Dialog zum Ansehen, gerechnet im Kern
+       (DpDarlehenWeitere.monatsplan) mit den Feldern von Darlehen II */
+    var istD2 = dwIndex === 'd2';
     var dw = (typeof dwIndex === 'number' && isFinite(dwIndex) && dwIndex >= 0) ? Math.floor(dwIndex) : null;
-    window._tilgPlanDw = dw;
-    var dwE = dw != null ? _dwEintrag(dw) : null;
-    if (dw != null && !dwE) {
-      if (typeof toast === 'function') toast('Bitte zuerst eine Darlehenssumme für dieses Darlehen eintragen.');
+    window._tilgPlanDw = istD2 ? 'd2' : dw;
+    var dwE = istD2 ? window.dpD2PlanEintrag() : (dw != null ? _dwEintrag(dw) : null);
+    if ((dw != null || istD2) && !dwE) {
+      if (typeof toast === 'function') toast(istD2 ? 'Bitte zuerst eine Darlehenssumme für Darlehen II eintragen.' : 'Bitte zuerst eine Darlehenssumme für dieses Darlehen eintragen.');
       return;
     }
     var aus = dwE ? dwE.art === 'tilgungsaussetzung' : window.dpIsD1Tilgungsaussetzung();
     var titel = (aus ? 'Zinsplan' : 'Tilgungsplan') + ' — '
-      + (dwE ? _esc(window.DpDarlehenWeitere.name(dwE, dw)) : 'Darlehen I');
+      + (istD2 ? 'Darlehen II' : (dwE ? _esc(window.DpDarlehenWeitere.name(dwE, dw)) : 'Darlehen I'));
     var unter = dwE
       ? (aus ? 'Tilgung ausgesetzt: du zahlst je Monat nur die Zinsen, die Restschuld bleibt bis zum Ende stehen und wird über einen Tilgungsträger (Bausparvertrag, Versicherung) abgelöst.'
              : 'Monatliche Raten aus deinen Angaben, gerechnet wie in der Projektion.')
@@ -234,6 +240,26 @@
     _renderTilgPlanTable();
   };
 
+  /* v3261 · Darlehen II als Eintrag für den Kern - dieselben Felder und dieselbe
+     Zahlenlesung (parseDe) wie calc.js: Rate = Summe × (Zins + Tilgung) / 12, bei
+     Tilgungsaussetzung nur Zins; KfW rechnet calc.js wie ein Annuitätendarlehen.
+     Startmonat: Auszahlung Darlehen II, sonst die von Darlehen I. Mit eigener
+     Anschlussfinanzierung zeigt der Plan nur die Bindung (danach andere Konditionen).
+     null, wenn Darlehen II aus ist oder keine Summe hat. */
+  window.dpD2PlanEintrag = function () {
+    var cb = document.getElementById('d2_enable');
+    if (!cb || !cb.checked) return null;
+    var K = window.DpDarlehenWeitere; if (!K) return null;
+    var aus = _g('d2_type') === 'tilgungsaussetzung';
+    var n = K.lesen([{ bez: 'Darlehen II', betrag: _v('d2'), zins: _v('d2z'), tilg: aus ? 0 : _v('d2t'),
+      art: aus ? 'tilgungsaussetzung' : 'annuitaet', bindj: _v('d2_bindj') || 10 }])[0];
+    if (!n) return null;
+    n.nr = 'd2';
+    n._start = _parseMonth(_g('d2_auszahl')) || _parseMonth(_g('d1_auszahl')) || null;
+    n._nurBindung = !!(document.getElementById('d2_anschl_enable') || {}).checked;
+    return n;
+  };
+
   /* v3256 · Eintrag i der Liste #darlehen_weitere, bereinigt vom Kern (null ohne Betrag) */
   function _esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function _dwEintrag(i) {
@@ -256,11 +282,11 @@
     var K = window.DpDarlehenWeitere;
     var aus = e.art === 'tilgungsaussetzung';
     var by = (window.State && window.State.dw_basisjahr) || null;
-    var start = (e.start_jahr && !K.abKauf(e, by))
+    var start = e._start || ((e.start_jahr && !K.abKauf(e, by))   /* v3261: Darlehen II bringt seinen Start mit */
       ? { m: 1, y: e.start_jahr }
-      : (_parseMonth(_g('d1_auszahl')) || { m: (new Date()).getMonth() + 1, y: (new Date()).getFullYear() });
+      : (_parseMonth(_g('d1_auszahl')) || { m: (new Date()).getMonth() + 1, y: (new Date()).getFullYear() }));
     var bindM = Math.round((e.bindj || 10) * 12);
-    var monate = Math.min(bindM + 24, 480);
+    var monate = e._nurBindung ? Math.min(bindM, 480) : Math.min(bindM + 24, 480);
     var zeilen = K.monatsplan(e, monate);
     var eur = function (n) { return Math.round(n).toLocaleString('de-DE') + ' €'; };
     var html =
@@ -292,7 +318,9 @@
         ? 'Tilgung ausgesetzt · Zinsen ' + eur(K.rateM(e)) + ' / Monat · in ' + (e.bindj || 10) + ' J. Zinsbindung zusammen <b>' + eur(zinsBind) + '</b> · Restschuld bleibt <b>' + eur(e.betrag) + '</b>. '
           + 'Eine Sparrate in einen Tilgungsträger rechnet DealPilot für dieses Darlehen nicht mit.'
         : 'Rate ' + eur(K.rateM(e)) + ' / Monat · Zinsen in ' + (e.bindj || 10) + ' J. Zinsbindung <b>' + eur(zinsBind) + '</b> · Restschuld am Ende der Zinsbindung <b>' + eur(rsBind) + '</b>. '
-          + 'Danach läuft die Rate weiter (durchfinanziert).';
+          + (e._nurBindung
+            ? 'Danach eigene Anschlussfinanzierung (' + _g('d2_az').replace('.', ',') + ' % Zins, ' + _g('d2_at').replace('.', ',') + ' % Tilgung) - siehe „Anschlussfinanzierung".'   /* v3261 */
+            : 'Danach läuft die Rate weiter (durchfinanziert).');
     }
   }
 
