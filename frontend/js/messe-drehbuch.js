@@ -2798,7 +2798,7 @@
         kegelHoch(true);
         await warte(900);
         await zeige(function () { var w = r6Wiz(); return w && (w.querySelector('.rnd-wiz-modal,[class*=modal]') || w.firstElementChild); }, 6);
-        await b2oZeile(s, 'Restnutzungsdauer ermitteln', 'Neun Schritte — die Objektdaten sind schon da: ' + wert('str') + ' ' + wert('hnr') + ', Baujahr ' + wert('baujahr') + ', ' + de(zahl('wfl')) + ' m².');
+        await b2oZeile(s, 'Restnutzungsdauer ermitteln', 'Acht Schritte — die Objektdaten sind schon da: ' + wert('str') + ' ' + wert('hnr') + ', Baujahr ' + wert('baujahr') + ', ' + de(zahl('wfl')) + ' m².');
       },
       async function (s) {   /* 6 · durch den Wizard */
         var zb = r6Beginn(s, 'Restnutzungsdauer ermitteln', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — vorbelegt aus dem Objekt.');
@@ -2821,11 +2821,7 @@
         await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' AfA und ' + (spar ? spar[1] : '–') + ' weniger Steuer im Jahr. Netto-Vorteil über die Restnutzungsdauer: <b>' + (net ? net[1] : '–') + '</b>.');
       },
       async function (s) {   /* 8 · Anfrage: nur zeigen (NIE klicken) */
-        function knopf() { var w = r6Wiz(); return w && [].filter.call(w.querySelectorAll('button'), function (b) { return b.offsetWidth && /Anfrage senden/.test(b.textContent); })[0]; }
-        var k = knopf(); if (k) k.scrollIntoView({ block: 'center' });
-        await warte(500);
-        await zeige(knopf, 10);
-        await b2oZeile(s, 'Gutachten anfragen', 'Von hier geht die <b>Anfrage</b> an einen Sachverständigen — mit allen Angaben aus den neun Schritten. Im Video schicken wir sie nicht ab.');
+        /* v3272 · ohne Gutachten-Anfrage (Marcel 09.11.2026: ohne Sachverständigen; der Knopf „Anfrage senden“ steht nicht mehr im Rechner) */
         r6WizZu();
         kegelHoch(false);
         await warte(600);
