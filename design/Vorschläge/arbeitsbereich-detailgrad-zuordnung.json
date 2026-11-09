@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-02",
+  "stand": "2026-11-09",
   "zweck": "Zuordnung Arbeitsbereich zu Detailstufen Einsteiger / Fortgeschritten / Experte. Was hier nicht steht, ist Experte. 'fortgeschritten' listet nur, was zu Einsteiger DAZUKOMMT.",
   "regeln": {
     "karte.art": {
@@ -139,7 +139,8 @@
           "notar_p",
           "gba_p",
           "makler_p",
-          "ji_p"
+          "ji_p",
+          "san"
         ]
       },
       "fortgeschritten": {
@@ -152,6 +153,16 @@
           {
             "titel": "Sanierung · FESH-Kacheln",
             "selektor": "#sanbedarf_body",
+            "art": "block"
+          },
+          {
+            "titel": "Sanierung · steuerliche Verteilung (v3236: in Einsteiger nur die Summe)",
+            "selektor": "#san_tax_years_wrap",
+            "art": "block"
+          },
+          {
+            "titel": "Sanierung · weitere Sanierungen in späteren Jahren",
+            "selektor": "#san-plan-wrap",
             "art": "block"
           },
           {
@@ -189,7 +200,6 @@
           "fesh_k_cost",
           "fesh_o",
           "fesh_o_cost",
-          "san",
           "san_ausgefuehrt",
           "san_ust",
           "san_tax_active",

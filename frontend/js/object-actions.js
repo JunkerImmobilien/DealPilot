@@ -2340,6 +2340,69 @@
     });
     return out.slice(0, 6);
   }
+  /* ══ v3236 · IMPORT NACH DETAILGRAD ═══════════════════════════════════
+     Marcel 09.11.2026: „Wenn wir PDFs importieren, sollen dort nur die Felder der
+     jeweiligen Stufe gefüllt werden. Nachträglich kann man die Stufe auf Experte
+     stellen, und wenn ich dann dieselben Dokumente nochmal reinlade, sollen auch die
+     neuen Felder gefüllt werden."
+     GEMESSEN vorher: applyMerged schrieb jede angehakte Zeile, vorgehakt war alles
+     außer Abweichungen (_abweichungen) und WEG-Zeilen (nurAktiv) — unabhängig davon,
+     ob das Feld im gewählten Detailgrad überhaupt zu sehen war.
+     JETZT: Zeilen, deren Feld im Detailgrad ausgeblendet ist, stehen nicht in der
+     Übernahme-Tabelle (also auch nicht in applyMerged), sondern als Liste darunter.
+     Beim erneuten Einlesen nach höherer Stufe erscheinen sie: leere Felder vorgehakt,
+     abweichende wie bisher NICHT vorgehakt (nichts wird ungefragt überschrieben).
+     Ausnahmen: Rechenpflicht (detailgrad.js RECHENPFLICHT) wird übernommen und sagt
+     es; WEG-Zeilen (nurAktiv), Steuer, Sonderumlage und die Auswertung bleiben, weil
+     sie ohnehin nur auf Haken geschrieben werden bzw. kein Formularfeld sind.
+     Nur für Dokumente (_files) — ein Sprachdiktat ist eine ausdrückliche Angabe und
+     bleibt ungefiltert; der Quick-Check (_qcMode) hat keinen Detailgrad.
+     Einsteiger + Mehrfamilienhaus: „Einheiten erfassen" gibt es dort nicht. Statt der
+     Einheitenliste kommen ihre Summen (Wohnfläche, Wohneinheiten, Ist-Kaltmiete) als
+     einfache Zeilen — wo das Dokument sie nicht schon selbst nennt. */
+  function _dgEinheitenSummen(DG) {
+    var it = _merged.mfh_einheiten_liste;
+    if (!it || !Array.isArray(it.raw) || !it.raw.length || DG.importErlaubt('mfh_einheiten_liste')) return;
+    var we = it.raw, wfl = 0, miete = 0, src = it.source || 'Unterlagen';
+    we.forEach(function (e) { wfl += numDe(e.wfl) || 0; miete += numDe(e.ist) || 0; });
+    var de = function (n) { return (Math.round(n * 100) / 100).toLocaleString('de-DE', { maximumFractionDigits: 2 }); };
+    if (!_merged.einheiten) { addRow('einheiten', 'Wohneinheiten (Summe der Einheitenliste)', String(we.length), String(we.length), src, 'input'); if (_merged.einheiten) _merged.einheiten.dgSumme = 1; }
+    if (!_merged.wfl && wfl > 0) { addRow('wfl', 'Wohnfläche (Summe der Einheitenliste)', de(wfl), String(Math.round(wfl * 100) / 100), src, 'input'); if (_merged.wfl) _merged.wfl.dgSumme = 1; }
+    if (!_merged.nkm && miete > 0) { addRow('nkm', 'Nettokaltmiete / Monat (Summe der Einheitenliste)', de(miete), String(Math.round(miete * 100) / 100), src, 'input'); if (_merged.nkm) _merged.nkm.dgSumme = 1; }
+  }
+  function _detailgradFiltern(keys) {
+    var DG = window.DpDetailgrad, aus = [];
+    if (!DG || typeof DG.importErlaubt !== 'function' || _qcMode || !_files.length) return { keys: keys, html: '' };
+    try { if (typeof DG.anwenden === 'function') DG.anwenden(); } catch (e) {}   /* Marken frisch, bevor gefragt wird */
+    var s = DG.stufe();
+    _dgEinheitenSummen(DG);
+    ['einheiten', 'wfl', 'nkm'].forEach(function (id) { if (_merged[id] && _merged[id].dgSumme && keys.indexOf(id) < 0) keys.push(id); });
+    var ok = keys.filter(function (id) {
+      var it = _merged[id]; if (!it) return true;
+      var erlaubt;
+      if (it.kind === 'mv_einheit') erlaubt = s >= 2;                          /* Mietvertrag → Einheit: Einheiten-Dialog */
+      else if (it.kind === 'einheiten') erlaubt = DG.importErlaubt('mfh_einheiten_liste');
+      else if (it.nurAktiv || it.kind === 'merken' || it.kind === 'steuer' || it.kind === 'sonderumlage') erlaubt = true;
+      else erlaubt = DG.importErlaubt(id);
+      if (!erlaubt) { aus.push(id); return false; }
+      var L = DG.importEbene(id), pf = DG.rechenpflicht ? DG.rechenpflicht(id) : null;
+      if (pf && L != null && L > s && !it.dgPflicht) {
+        it.dgPflicht = 1;
+        it.herleitung = (it.herleitung ? it.herleitung + ' · ' : '') + 'In ' + DG.NAMEN[s] + ' ausgeblendet, wird trotzdem übernommen: ' + pf + '.';
+      }
+      return true;
+    });
+    if (!aus.length) return { keys: ok, html: '' };
+    var stufen = {};
+    aus.forEach(function (id) { var L = DG.importEbene(id); stufen[L && L > s ? L : 3] = 1; });
+    var ziel = stufen[2] ? DG.NAMEN[2] + (stufen[3] ? ' bzw. ' + DG.NAMEN[3] : '') : DG.NAMEN[3];
+    var html = '<div class="oabi-dg" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
+      + '<b>' + aus.length + (aus.length === 1 ? ' weiterer Wert erkannt' : ' weitere Werte erkannt') + ' — nicht übernommen (Detailgrad ' + escH(DG.NAMEN[s]) + ').</b> '
+      + (aus.length === 1 ? 'Er gehört' : 'Sie gehören') + ' zu Feldern, die erst ab ' + escH(ziel) + ' zu sehen sind. '
+      + 'Stellst du den Detailgrad in den Einstellungen höher und liest dieselben Unterlagen erneut ein, werden diese Felder gefüllt, soweit sie noch leer sind.'
+      + '<div style="margin-top:4px;color:#7A7370">' + aus.map(function (id) { var it = _merged[id]; return escH(it ? it.label : id); }).join(' · ') + '</div></div>';
+    return { keys: ok, html: html };
+  }
   function renderMergedTable() {
     var host = $('oabi-result'); if (!host) return;
     var ab = $('oabi-apply');
@@ -2370,8 +2433,9 @@
       var it = _merged[id]; if (!it || _SONDER[it.kind] || id === 'me_modus' || id === 'mfh_wohnungen' || (_qcMode && OBJ2QC[id])) return true;
       return !!document.getElementById(id);
     });
+    var _dg = _detailgradFiltern(keys); keys = _dg.keys;   /* v3236 */
     var hasPhotos = !!(_importPhotos && _importPhotos.length);
-    if (!keys.length && !hasPhotos) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>' + (_importHinweise.length ? '<div class="oabi-hinw" style="font-size:12.5px;margin-top:6px">' + _importHinweise.map(escH).join('<br>') + '</div>' : ''); if (ab) ab.disabled = true; return; }
+    if (!keys.length && !hasPhotos) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>' + _dg.html + (_importHinweise.length ? '<div class="oabi-hinw" style="font-size:12.5px;margin-top:6px">' + _importHinweise.map(escH).join('<br>') + '</div>' : ''); if (ab) ab.disabled = true; return; }
     var photoRow = '';
     if (hasPhotos) {
       /* v2223 · eine Zeile je PDF. Bei einem Adresskonflikt ist nur die Zeile
@@ -2414,6 +2478,7 @@
       if (it.kind === 'anhaengen' && String(it.value).length > 160) valCell = valCell.replace('<b>' + escH(it.value) + '</b>', '<div style="white-space:pre-wrap;font-size:12px;max-height:120px;overflow:auto">' + escH(it.value) + '</div>');
       return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + ((abw[id] !== undefined || it.nurAktiv) ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
     }).join('') + '</tbody></table>'
+      + _dg.html   /* v3236 · was der Detailgrad zurückhält */
       + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
           + '<b>Ergebnis eines fremden Gutachtens — wird nicht übernommen.</b> DealPilot rechnet selbst; die Zahl dient dem Abgleich.'
           + _vergleich.map(function (v) { return '<div style="margin-top:4px">' + escH(v.wort) + ': <b>' + escH(v.wert) + '</b>' + (v.eigen ? ' · DealPilot: ' + escH(v.eigen) : '') + ' <span class="src">(' + escH(v.quelle) + ')</span></div>'; }).join('')

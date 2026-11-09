@@ -1,10 +1,10 @@
 /* frontend/js/data/detailgrad-zuordnung.js — ERZEUGT, nicht von Hand ändern.
-   Quelle: design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json (Stand 2026-11-02)
+   Quelle: design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json (Stand 2026-11-09)
    Neu erzeugen: node tools/detailgrad-pruefen.mjs --schreiben
    Je Reiter und Stufe (1 Einsteiger · 2 Fortgeschritten · 3 Experte): Karten/Bereiche und Feld-ids,
    die AB dieser Stufe erscheinen. Was nicht gelistet ist, ist Experte. Leser: js/detailgrad.js. */
 window.DpDetailgradZuordnung = {
- "stand": "2026-11-02",
+ "stand": "2026-11-09",
  "reiter": {
   "s0": {
    "1": {
@@ -132,7 +132,8 @@ window.DpDetailgradZuordnung = {
      "notar_p",
      "gba_p",
      "makler_p",
-     "ji_p"
+     "ji_p",
+     "san"
     ]
    },
    "2": {
@@ -146,6 +147,16 @@ window.DpDetailgradZuordnung = {
       "s": "#sanbedarf_body",
       "art": "block",
       "titel": "Sanierung · FESH-Kacheln"
+     },
+     {
+      "s": "#san_tax_years_wrap",
+      "art": "block",
+      "titel": "Sanierung · steuerliche Verteilung (v3236: in Einsteiger nur die Summe)"
+     },
+     {
+      "s": "#san-plan-wrap",
+      "art": "block",
+      "titel": "Sanierung · weitere Sanierungen in späteren Jahren"
      },
      {
       "s": "#moebl",
@@ -182,7 +193,6 @@ window.DpDetailgradZuordnung = {
      "fesh_k_cost",
      "fesh_o",
      "fesh_o_cost",
-     "san",
      "san_ausgefuehrt",
      "san_ust",
      "san_tax_active",
