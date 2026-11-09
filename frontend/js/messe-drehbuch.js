@@ -2445,7 +2445,9 @@
         await tippeH('me_soll', vgm, 110);
         await warte(1200);
         await r6Ende(zb);
-        await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (r6Id('me_opp') && r6Id('me_opp') !== '—' ? ', Abstand deiner Miete: ' + r6Id('me_opp') : '') + '.');
+        var opp = r6Id('me_opp'), drueber = opp && /^\+/.test(opp.trim());
+        if (drueber) await b2oZeile(s, 'Oder im Detail', 'Ziel ist die Vergleichsmiete <b>' + wert('me_soll') + ' €/m²</b>. Deine Miete liegt schon <b>' + opp.trim() + '</b> darüber — nach § 558 ist hier keine Erhöhung drin. Die Treppe gilt für Verträge mit Staffel oder Index.');
+        else await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (opp && opp !== '—' ? ', Abstand deiner Miete: ' + opp : '') + '.');
         var p = q('#me-mode-prog'); if (p) p.click();
         await warte(700);
       },
