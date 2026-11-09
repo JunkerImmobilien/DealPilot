@@ -36,6 +36,12 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N139 · Co-Pilot (KI)-Einstellungen ausgeblendet am 09.11.2026 (v3235) — Funktion besteht weiter, **offen**
+
+Marcel 09.11.2026: *„Unter Einstellungen können wir zudem den Co-Pilot (KI) rausnehmen, dürfen aber nicht vergessen, dass wir den noch haben.“* Ausgeblendet ist nur der **Reiter** (`frontend/js/settings.js`, Knopf `data-tab="api"` mit `style="display:none !important"`). Pane, Felder `set_ai_*`, Speichern und Prompt-Aufbau sind unverändert; früher gespeicherte Vorgaben (Länge, Ton, Fokus, eigene Anweisungen, Vorlagen, eigenes Wissen für alle Piloten) gelten weiter. Strategie und Risikoneigung hebt `einstellungen-schlank.js` weiter nach „Mein Profil“.
+- **Wieder einblenden, sobald** Marcel die KI-Vorgaben wieder für Kunden öffnen will oder „Eigenes Wissen“ einen neuen Ort braucht — dazu nur das `style`/`aria-hidden`/`tabindex` am Knopf entfernen und den Hilfetext (`help.js`, Abschnitt „Kontakt & Logo“ und „Die Reiter im Überblick“) zurücknehmen.
+- Bis dahin: **wer „Eigenes Wissen“ ändern will, kommt nicht mehr hin** — das ist der eine Wert, der dort nur einstellbar war. Vor dem nächsten Kundengespräch dazu klären.
+
 ### N138 · Runde 08.11. nachmittags (Prod 1.0.83, v3223–v3230) — **ERLEDIGT**
 
 W-4 Pilot als ganze Figur, ein/aus (am Konto, DpHinweise `pilot_blase`), aus = Fragezeichen oben; Tower-Pilot ausgeblendet, „Feld erklären“ und „Hilfe“ im Fenster · W-15 15-%-Frist auf den Monat, AfA im Kaufjahr anteilig ab Übergangsmonat, danach volles Jahr (R 7.4 Abs. 9 EStR) · W-17 weitere Darlehen im Investment-PDF eine Zeile je Darlehen, mit Darlehen untereinander (vorher Sprung auf Folgeseite und Überlauf rechts) · Marktberichte in Deal-Aktion als Liste, „PDF abrufen“ = Profi (Stufe 1/2 weiter altes PDF, Profi gibt es dort nicht) · Reiter Objekt: „Im Marktbericht öffnen“ raus · Teilen raus (Kachel, Knopf, Tour, QR-Pass; Cockpit-Abschnitt nur mit aktiven Pässen) · Objektdaten in fünf Gruppen, nicht passende Felder aus · Wertanker-Vergleich eingeklappt als eigene Zeile · Vermögen-PDF im Dokument-Design · Cockpit vereinfacht (Score-Karte, Kennzahl-Kacheln, Gesamtbewertung, Bestand↔Zielbild-Tabelle, Listen eingeklappt) · Jahresabschluss unter Mandanten je GmbH/UG · Anlegerprofil-Sets 2×2 ohne Überlauf · Demo-Konto STAGING: ältere Marktberichte von 11 Bestandsobjekten über die Jahre seit Kauf verteilt, Werte vom letzten Bericht mit 2–3 %/Jahr zurückgerechnet (Sicherung `/root/backups/mb-20261108-1526-vor-demoverlauf.sql.gz` auf Staging).

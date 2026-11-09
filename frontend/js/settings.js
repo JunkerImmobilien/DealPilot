@@ -196,7 +196,14 @@ function showSettings(initialTab) {
             '<span class="help-sidebar-item-title">Kontakt &amp; Logo</span></div>' +
           '<span class="help-sidebar-item-desc">PDF-Ersteller, Firmenlogo</span>' +
         '</button>' +
-        '<button class="help-sidebar-item st-tab ms-tab" data-tab="api" onclick="_swSet(this)">' +
+        /* v3235 · Marcel 09.11.2026: „Unter Einstellungen können wir zudem den Co-Pilot (KI)
+           rausnehmen, dürfen aber nicht vergessen, dass wir den noch haben.“ Der Reiter ist nur
+           AUSGEBLENDET (Backlog-Punkt v3235): Pane, Felder set_ai_* und Speichern bleiben, die
+           gespeicherten Vorgaben (Länge, Ton, Fokus, eigene Anweisungen, eigenes Wissen) gelten
+           weiter; Strategie und Risikoneigung hebt einstellungen-schlank.js nach „Mein Profil“.
+           Wieder einblenden: das style-Attribut unten entfernen. (inline !important, weil
+           style.css .st-tab mit display:flex !important setzt.) */
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="api" onclick="_swSet(this)" style="display:none !important" aria-hidden="true" tabindex="-1">' +
           '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-brain"/></svg></span>' +
             '<span class="help-sidebar-item-title">Co-Pilot (KI)</span></div>' +
           '<span class="help-sidebar-item-desc">Tonalit&auml;t, Fokus, Instruktionen</span>' +
@@ -828,7 +835,9 @@ function showSettings(initialTab) {
            aussieht. Von der Flaeche zum Einzelnen. Der Block im Panel bleibt
            - derselbe Schalter an einem feineren Ort, beide lesen denselben
            Merker. */
-        '<div id="dp-kartenstil-wahl-host" style="margin-bottom:12px"></div>' +
+        /* v3235 · Marcel 09.11.2026: „Karte im Objekt ganz raus, es wird nur Button [= Bütten]
+           immer angezeigt.“ Der Host #dp-kartenstil-wahl-host ist weg; karten-stil.js setzt
+           die Datenaufnahme-Karte fest auf „buetten“. */
         /* ── v1719 · DER WEG INS PANEL STEHT BEI DEM, WAS ER FEINER MACHT
            Marcel: „Darstellung oeffnen moechte ich bitte auch in den
            Einstellungen weiter oben bei der Layout auswahl haben."
@@ -898,7 +907,11 @@ function showSettings(initialTab) {
            Die Karten klappen weiter an ihrem eigenen Pfeil; die Vorgabe bleibt zugeklappt. */
         /* v875: Investor-Deal-Score-Leiste Default beim Objekt-Oeffnen */
         /* v3032 · Marcel 29.10.2026: nur bei Darstellung „DealPilot“ - die Score-Leiste gibt es nur dort */
-        ((function () { var th = document.documentElement.getAttribute('data-ui-theme'); return !th || th === 'dealpilot'; })() ? (
+        /* v3235 · Marcel 09.11.2026: „Score-Leiste standard minimiert kann raus unter Darstellung.“
+           Der Abschnitt ist aus (false statt der Theme-Pruefung). Die Leiste startet immer
+           aufgeklappt (dpsh-score-hero.js ignoriert dp_dpsh_min seit v3235) und klappt weiter am
+           eigenen Pfeil. */
+        (false ? (
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Investor Deal Score beim Öffnen</h3>' +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
@@ -953,7 +966,10 @@ function showSettings(initialTab) {
            nicht mehr: marktbericht-view.js mbTheme() gibt immer 'light' zurueck. */
         /* v2900: PDF-Export - Vorauswahl der Fassung und Pilot-Analyse; den
            Abschnitt baut pdf-wahl.js selbst (eine Liste der Fassungen). */
-        ((window.DealPilotPdfWahl && typeof window.DealPilotPdfWahl.einstellungenHtml === 'function') ? window.DealPilotPdfWahl.einstellungenHtml() : '') +
+        /* v3235 · Marcel 09.11.2026: „PDF-Export-Einstellungen können auch raus.“ Der Abschnitt
+           wird nicht mehr eingebaut (einstellungenHtml bleibt in pdf-wahl.js). Damit niemand in
+           einem nicht mehr aenderbaren Zustand haengt, setzt pdf-wahl.js „ohne Rueckfrage“ fest
+           auf aus und das Dokument-Design fest auf „Einheitlich“ (neu). */
         /* v3218 · W-12b: Erinnerung vor Mieterhöhung (Mail, Standard aus) - Abschnitt aus erinnerung-mieterhoehung.js */
         ((window.DealPilotErinnerung && typeof window.DealPilotErinnerung.einstellungenHtml === 'function') ? window.DealPilotErinnerung.einstellungenHtml() : '') +
         /* v1719: der zweite Knopf DARSTELLUNG OEFFNEN stand hier. Er ist

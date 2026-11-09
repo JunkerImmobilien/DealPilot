@@ -64,9 +64,10 @@ window.DealPilotOnboarding = (function () {
     { id: 'v1b', name: 'Aktenmappe', karte: 'bordkarte', standard: true,   /* v2216c: Marcel 14.10. - Auslieferung Aktenmappe mit Bordkarte */
       unter: 'Menü links, Reiter oben im Kopf',
       fuer: 'Wie eine Mappe mit Registern. Ruhig und vertraut.' },
-    { id: '',    name: 'DealPilot',  karte: 'kennzahlen',   /* v2178: Marcels Standard fuer DealPilot */
-      unter: 'Obsidian und Gold, Reiter oben',
-      fuer: 'Dunkel und kompakt, alles auf einem Schirm.' },
+    /* v3235 · Marcel 09.11.2026: „Unter Aussehen fällt DealPilot raus.“ Hier stand
+       { id: '', name: 'DealPilot', karte: 'kennzahlen' } - beides ist nicht mehr waehlbar
+       (layout-varianten.js, objektkarten-stil.js), das Einrichtungsfenster bietet es deshalb
+       auch nicht mehr an. */
     { id: 'v2',  name: 'Kanzlei',    karte: 'bordkarte',
       unter: 'Navigation links, Aktionen rechts',
       fuer: 'Zwei Schienen: links wo du bist, rechts was du tun kannst.' },
