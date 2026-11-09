@@ -572,33 +572,76 @@ function renderImgs() {
      am Bildeintrag (imgs[i].rolle/.datum) und wird beim Speichern als data._foto_meta
      neben die Fotos gelegt (storage.js saveObj) - der Track Record zeigt daraus Paare.
      Die Felder tragen eine id in .sec, damit die Speicheranzeige „geaendert“ sieht. */
+  /* v3257 · Marcel 09.11.2026: „Vorher-Nachher … sieht nicht gut aus, ist auch von der Größe nicht
+     gleich … seitlich so einen kleinen Button, und wenn man da drauf klickt, kommen diese beiden
+     Felder und das ‚als Titelbild' mit Sternchen … kleiner." Die Kachel zeigt nur noch das Foto
+     (alle gleich groß: 4:3, Bild absolut mit object-fit:cover - bis v3256 konnte ein Hochformat-
+     foto die Kachel über aspect-ratio hinaus strecken, weil die Mindesthöhe am Inhalt hing),
+     das × zum Entfernen, den Stern als Marke am Titelbild und die Rolle als kleine Marke.
+     Rolle, Datum und „Als Titelbild" liegen hinter dem Knopf ⋯ in einem kleinen Menü.
+     Datenmodell unverändert (imgs[i].rolle/.datum, Titelbild = imgs[0]); die Felder behalten
+     ihre ids img-rolle-i / img-datum-i und bleiben im DOM, auch wenn das Menü zu ist.
+     Die Knöpfe tragen btn-clean: sonst macht der Sammel-Reset „.sec button:not(...)“
+     (style.css V258-02, !important) aus × und ⋯ weiße Rahmenknöpfe - gemessen am × seit V258. */
   if (!document.getElementById('dp-img-meta-stil')) {
     var _st = document.createElement('style'); _st.id = 'dp-img-meta-stil';
-    _st.textContent = '.img-cell{display:flex;flex-direction:column;gap:5px;min-width:0}'
-      + '.img-meta{display:flex;gap:4px;align-items:center}'
-      + '.img-meta select,.img-meta input{flex:1 1 0;min-width:0;font-size:11px;padding:4px 5px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:inherit}'
-      + '.img-rolle-tag{position:absolute;top:5px;left:5px;font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:4px;background:rgba(0,0,0,.65);color:#fff}';
+    _st.textContent = '.img-cell{position:relative;min-width:0}'
+      + '.img-cell .img-thumb{aspect-ratio:4/3;min-height:0;height:auto}'
+      + '.img-cell .img-thumb>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}'
+      + '.img-rolle-tag{position:absolute;bottom:5px;left:5px;font:600 9px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 5px;border-radius:4px;background:rgba(0,0,0,.62);color:#fff;pointer-events:none}'
+      + '.img-stern{position:absolute;top:5px;left:5px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;background:var(--wl-c9a84c, #C9A84C);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);pointer-events:none}'
+      + '.img-mehr{position:absolute;right:5px;bottom:5px;width:22px;height:22px;min-height:0;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font:700 13px/1 Inter,system-ui,sans-serif;letter-spacing:0;cursor:pointer;display:flex;align-items:center;justify-content:center}'
+      + '.img-mehr:hover,.img-mehr:focus-visible,.img-offen .img-mehr{background:var(--wl-b8932f, #b8932f)}'
+      + '.img-pop{display:none;position:absolute;top:calc(100% + 4px);right:0;z-index:30;width:184px;max-width:calc(100vw - 32px);box-sizing:border-box;padding:8px;gap:6px;background:var(--white,#fff);border:1px solid var(--border,#E6DCC2);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.14)}'
+      + '.img-offen .img-pop{display:grid}'
+      + '.img-grid>.img-cell:nth-child(3n+1) .img-pop{right:auto;left:0}'
+      + '.img-pop-k{font:600 9.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#7A7370)}'
+      + '.img-pop-z{display:flex;gap:4px}'
+      + '.img-pop select,.img-pop input{flex:1 1 0;min-width:0;width:100%;font-size:11px;padding:3px 5px;min-height:0;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:inherit;box-sizing:border-box}'
+      + '.img-pop-titel{border:1px solid var(--border,#E6DCC2);background:transparent;border-radius:6px;padding:4px 6px;font-size:11px;line-height:1.2;min-height:0;cursor:pointer;color:inherit;text-align:left}'
+      + '.img-pop-titel:hover{border-color:var(--wl-c9a84c, #C9A84C)}'
+      + '.img-pop-ist{font-size:11px;color:var(--wl-b8932f, #b8932f);font-weight:600}';
     document.head.appendChild(_st);
   }
+  if (!window._dpImgPopHorcht) {
+    window._dpImgPopHorcht = true;
+    document.addEventListener('click', function (ev) {
+      if (window._dpImgPop == null || window._dpImgPop < 0) return;
+      if (ev.target && ev.target.closest && ev.target.closest('.img-pop, .img-mehr')) return;
+      dpImgPop(-1);
+    }, true);
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && window._dpImgPop >= 0) dpImgPop(-1); });
+  }
+  var offen = (typeof window._dpImgPop === 'number' && window._dpImgPop < imgs.length) ? window._dpImgPop : -1;
   grid.innerHTML = imgs.map(function(img, i) {
     var isTitle = (i === 0);
-    var lblHtml = isTitle
-      ? '<div class="img-lbl img-lbl-title">★ Titelbild · in Liste &amp; PDF</div>'
-      : '<div class="img-lbl"><button class="img-set-title" onclick="setTitleImg(' + i + ')" title="Als Titelbild verwenden">☆ Als Titelbild</button></div>';
     var r = img.rolle === 'vorher' || img.rolle === 'nachher' ? img.rolle : '';
     var dat = /^\d{4}-\d{2}$/.test(img.datum || '') ? img.datum : '';
-    return '<div class="img-cell"><div class="img-thumb' + (isTitle ? ' img-thumb-title' : '') + '">' +
+    return '<div class="img-cell' + (i === offen ? ' img-offen' : '') + '"><div class="img-thumb' + (isTitle ? ' img-thumb-title' : '') + '">' +
       '<img src="' + img.src + '" alt="Foto ' + (i+1) + '">' +
+      (isTitle ? '<span class="img-stern" title="Titelbild · in Liste &amp; PDF" aria-label="Titelbild">★</span>' : '') +
       (r ? '<span class="img-rolle-tag">' + (r === 'vorher' ? 'Vorher' : 'Nachher') + '</span>' : '') +
-      '<button class="img-del" onclick="delImg(' + i + ')" title="Foto entfernen">×</button>' +
-      lblHtml +
-    '</div><div class="img-meta">' +
+      '<button type="button" class="img-del btn-clean" onclick="delImg(' + i + ')" title="Foto entfernen">×</button>' +
+      '<button type="button" class="img-mehr btn-clean" onclick="dpImgPop(' + i + ')" title="Vorher/Nachher, Datum, Titelbild" aria-label="Foto ' + (i+1) + ': Angaben" aria-expanded="' + (i === offen) + '">⋯</button>' +
+    '</div><div class="img-pop" role="group" aria-label="Foto ' + (i+1) + ': Angaben">' +
+      '<span class="img-pop-k">Foto ' + (i+1) + '</span>' +
+      '<div class="img-pop-z">' +
       '<select id="img-rolle-' + i + '" aria-label="Foto ' + (i+1) + ': vorher oder nachher" onchange="dpImgMeta(' + i + ',\'rolle\',this.value)">' +
         '<option value=""' + (r ? '' : ' selected') + '>–</option><option value="vorher"' + (r === 'vorher' ? ' selected' : '') + '>Vorher</option><option value="nachher"' + (r === 'nachher' ? ' selected' : '') + '>Nachher</option></select>' +
       '<input id="img-datum-' + i + '" type="month" value="' + dat + '" title="Aufnahmedatum (optional)" aria-label="Foto ' + (i+1) + ': Aufnahmedatum" onchange="dpImgMeta(' + i + ',\'datum\',this.value)">' +
+      '</div>' +
+      (isTitle
+        ? '<span class="img-pop-ist">★ Titelbild · in Liste &amp; PDF</span>'
+        : '<button type="button" class="img-pop-titel btn-clean" onclick="setTitleImg(' + i + ')" title="Als Titelbild verwenden">☆ Als Titelbild</button>') +
     '</div></div>';
   }).join('');
 }
+/* v3257 · Menü ⋯ je Foto auf-/zuklappen (-1 = alle zu) */
+function dpImgPop(i) {
+  window._dpImgPop = (i >= 0 && window._dpImgPop !== i) ? i : -1;
+  renderImgs();
+}
+window.dpImgPop = dpImgPop;
 /* v3217 · W-20 */
 function dpImgMeta(i, feld, wert) {
   if (!imgs[i]) return;
@@ -607,7 +650,7 @@ function dpImgMeta(i, feld, wert) {
   renderImgs();
 }
 window.dpImgMeta = dpImgMeta;
-function delImg(i) { imgs.splice(i, 1); renderImgs(); }
+function delImg(i) { imgs.splice(i, 1); window._dpImgPop = -1; renderImgs(); }   /* v3257: Menü zu */
 
 // V31: Titelbild auswählen — verschiebt das Foto an Position 0.
 // imgs[0] ist überall die Quelle für Titelbild (Sidebar-Card-Thumbnail + PDF-Cover).
@@ -615,6 +658,7 @@ function setTitleImg(i) {
   if (i <= 0 || i >= imgs.length) return;
   var moved = imgs.splice(i, 1)[0];
   imgs.unshift(moved);
+  window._dpImgPop = -1;   /* v3257: Menü zu, der Index hat sich verschoben */
   renderImgs();
   // Wenn der User Titel ändert, ist das Objekt "dirty" — wir signalisieren das mit einem dezenten Toast
   if (typeof toast === 'function') toast('★ Titelbild gesetzt — beim nächsten Speichern auch in der Sidebar sichtbar');

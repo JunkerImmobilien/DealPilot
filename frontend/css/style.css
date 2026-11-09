@@ -41584,3 +41584,15 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
   #s4 .dp-bwk-felder { grid-template-columns: 1fr; }
   #s4 .dp-bwk-felder > .f > label { min-height: 0; }
 }
+
+/* ===== v3257 · Reiter Bewirtschaftung: Info zur WEG-Rücklage als volle, kompakte Zeile
+   unter der Feldreihe (Marcel 09.11.2026: „dadurch rückt alles relativ weit runter … länglicher
+   machen und darunter setzen"). Bis v3256 stand die Infobox samt Hinweis-Satz IN der Feldspalte
+   und machte die Zeile Hausgeld | WEG-Rücklage rund dreimal so hoch. Titel und Satz laufen in
+   einer Zeile; die Box kommt aus tooltip-engine.js (renderInfoBoxHtml). ===== */
+#s4 .dp-bwk-felder > .dp-bwk-info { grid-column: 1 / -1; margin: -4px 0 2px; padding: 5px 10px; font-size: 11.5px; line-height: 1.4; border-left-width: 2px; }
+#s4 .dp-bwk-info .dp-infobox-header { display: inline; margin: 0 4px 0 0; }
+#s4 .dp-bwk-info .dp-infobox-icon { font-size: 12px; margin-right: 3px; }
+#s4 .dp-bwk-info .dp-infobox-title { font-size: 11.5px; }
+#s4 .dp-bwk-info .dp-infobox-title::after { content: " ·"; color: var(--muted, #5F5E5A); font-weight: 400; }
+#s4 .dp-bwk-info .dp-infobox-body { display: inline; }

@@ -6056,7 +6056,11 @@
     await warte(900);
     var m = q('.main-col'); if (m) m.scrollTop = 0;
   }
-  function r27Host() { var h = q('#tax-verlauf-chart'); return h && h.offsetWidth ? h : null; }
+  function r27Host() { var h = q('#tax-verlauf-chart'); if (!(h && h.offsetWidth)) return null;
+    /* v3257 · das Diagramm im Reiter Steuer ist standardmäßig eingeklappt - für die Aufnahme
+       nur in dieser Sitzung aufklappen (merken=false), die Wahl des Nutzers bleibt unberührt */
+    try { if (h.querySelector('.dp-stv-zu') && window.DpSteuerVerlauf && DpSteuerVerlauf.klappen) DpSteuerVerlauf.klappen(h, true, false); } catch (e) {}
+    return h; }
   function r27PaHost() { var p = r11Panel(); var h = p && p.querySelector('[data-dp-steuerverlauf]'); return h && h.offsetWidth ? h : null; }
   function r27Zahl(i, host) { return function () { var h = (host || r27Host)(); var z = h && h.querySelectorAll('.dp-stv-z'); return z && z[i] || null; }; }
   function r27ZahlW(i, host) { var z = r27Zahl(i, host)(); return z ? { t: r6Text(z.querySelector('span')), w: r6Text(z.querySelector('b')), u: r6Text(z.querySelector('em')) } : { t: '', w: '–', u: '' }; }

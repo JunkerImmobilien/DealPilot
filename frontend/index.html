@@ -35,7 +35,7 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="css/style.css?v=v3213">
+<link rel="stylesheet" href="css/style.css?v=v3257">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -3221,7 +3221,11 @@ label.dp-required.qc-required::after {
           <div class="dp-bwk-kopf">Nicht umlagefähig <span>· trägst du als Eigentümer</span></div>
           <div class="g2 dp-bwk-felder">
             <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
-            <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
+            <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div></div>
+            <!-- v3257 · Marcel 09.11.2026: „dadurch rückt alles relativ weit runter … etwas länglicher machen und darunter setzen" -
+                 die Info zur WEG-Rücklage steht nicht mehr in der Feldspalte, sondern als volle, kompakte Zeile unter
+                 der Feldreihe (style.css .dp-bwk-info). Der doppelte Hinweis-Satz (.hint) ist entfallen. -->
+            <div class="dp-tip-infobox dp-bwk-info" data-tip-id="tab6.weg_ruecklage"></div>
             <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
             <!-- v3238 · Marcel 09.11.2026: das Eingabefeld ist ausgeblendet - calc.js rechnet den Mietausfall aus
                  Jahresnettokaltmiete x Leerstand % (Reiter Miete) und schreibt ihn hierher (Speichern, PDF, Import lesen
@@ -3852,8 +3856,8 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3028"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3214"></script>
-<script src="js/steuer-verlauf.js?v=v2992"></script>
+<script src="js/tax.js?v=v3257"></script>
+<script src="js/steuer-verlauf.js?v=v3257"></script>
 <script src="js/pilot-analyse-v4.js?v=v3163"></script><!-- v3099 · Pilot-Analyse Fassung 4 (Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
 <script src="js/config.js?v=v3246"></script>
 <script src="js/gnotkg.js?v=v3088"></script><!-- v3088 · Notar und Grundbuch nach Gebuehrenordnung -->
@@ -3902,7 +3906,7 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=v3032"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v3253"></script>
+<script src="js/ui.js?v=v3257"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v3249"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
@@ -3981,7 +3985,7 @@ label.dp-required.qc-required::after {
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3234"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2966f"></script>
-<script src="js/messe-drehbuch.js?v=v3254"></script>
+<script src="js/messe-drehbuch.js?v=v3257"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v3223"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
