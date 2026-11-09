@@ -1,0 +1,126 @@
+{
+  "ags": "06413000",
+  "gemeinde": "Offenbach am Main",
+  "art": "einfach",
+  "stand": "2026-01-01",
+  "erhebungsstichtag": null,
+  "gueltig_ab": "2026-01-01",
+  "gueltig_bis": null,
+  "quelle": {
+    "url": "https://www.offenbach.de/vv/produkte/tsabus/mietspiegel_8975575.php.media/225732/Mietspiegel_2026.pdf",
+    "dokument": "Mietspiegel für das Stadtgebiet von Offenbach am Main, Stand 01.01.2026 (Fortschreibung des Mietspiegels vom 01.01.2024); Herausgeber Mieterbund Offenbach e.V., Haus & Grund Offenbach/Main, Magistrat der Stadt Offenbach a. M.",
+    "seite": "4",
+    "lizenz": "keine Lizenzangabe und kein Vervielfältigungsvorbehalt im Dokument; Veröffentlichung auf der Stadtseite (§ 558c Abs. 4 BGB)",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Einfacher Mietspiegel (§ 558c BGB), gilt bis ein neuer veröffentlicht wird; „gueltig_ab“ = Stand 01.01.2026. „mittel“ = der unter der Spanne angegebene Mittelwert (Wohnung mit Standardausstattung ohne wertmindernde/-verbessernde Merkmale). Nur Wohnungen 35–100 m² in Mehrfamilienhäusern; Neubauten ab Baujahr 2020 nicht erfasst. Ab Baujahr 1979 gibt es nur Werte für „mit Bad oder Dusche und mit Heizung“. Wohnflächenklassen laut Dokument in ganzen m² (35–59, 60–79, 80–100). „feld“ = Buchstabe/Spalte der Tabelle.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {"von": null, "bis": 1960, "label": "bis 1960"},
+        {"von": 1961, "bis": 1978, "label": "von 1961 bis 1978"},
+        {"von": 1979, "bis": 1994, "label": "von 1979 bis 1994"},
+        {"von": 1995, "bis": 2007, "label": "von 1995 bis 2007"},
+        {"von": 2008, "bis": 2019, "label": "von 2008 bis 2019"}
+      ],
+      "wfl": [
+        {"von": 35, "bis": 59, "label": "35–59 qm"},
+        {"von": 59, "von_inkl": false, "bis": 79, "label": "60–79 qm"},
+        {"von": 79, "von_inkl": false, "bis": 100, "label": "80–100 qm"}
+      ],
+      "lage": [
+        {"schluessel": "einfach", "label": "einfache Wohnlage"},
+        {"schluessel": "mittel", "label": "mittlere Wohnlage"},
+        {"schluessel": "gut", "label": "gute Wohnlage"}
+      ],
+      "ausstattung": [
+        {"schluessel": "bad_und_heizung", "label": "mit Bad oder Dusche und mit Heizung"},
+        {"schluessel": "bad_oder_heizung", "label": "mit Bad oder Dusche oder Heizung"}
+      ]
+    },
+    "zellen": [
+      {"baujahr": 0, "wfl": 0, "lage": "einfach", "ausstattung": "bad_oder_heizung", "unten": 4.6, "mittel": 6.1, "oben": 7.6, "feld": "a/2"},
+      {"baujahr": 0, "wfl": 0, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 5.55, "mittel": 7.1, "oben": 8.65, "feld": "a/1"},
+      {"baujahr": 0, "wfl": 0, "lage": "gut", "ausstattung": "bad_oder_heizung", "unten": 6.0, "mittel": 7.45, "oben": 8.9, "feld": "a/6"},
+      {"baujahr": 0, "wfl": 0, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 7.1, "mittel": 8.95, "oben": 10.8, "feld": "a/5"},
+      {"baujahr": 0, "wfl": 0, "lage": "mittel", "ausstattung": "bad_oder_heizung", "unten": 4.95, "mittel": 6.45, "oben": 7.95, "feld": "a/4"},
+      {"baujahr": 0, "wfl": 0, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 5.9, "mittel": 7.85, "oben": 9.8, "feld": "a/3"},
+      {"baujahr": 0, "wfl": 1, "lage": "einfach", "ausstattung": "bad_oder_heizung", "unten": 4.6, "mittel": 6.0, "oben": 7.4, "feld": "b/2"},
+      {"baujahr": 0, "wfl": 1, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 5.3, "mittel": 6.95, "oben": 8.6, "feld": "b/1"},
+      {"baujahr": 0, "wfl": 1, "lage": "gut", "ausstattung": "bad_oder_heizung", "unten": 5.95, "mittel": 7.35, "oben": 8.75, "feld": "b/6"},
+      {"baujahr": 0, "wfl": 1, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 7.0, "mittel": 8.8, "oben": 10.6, "feld": "b/5"},
+      {"baujahr": 0, "wfl": 1, "lage": "mittel", "ausstattung": "bad_oder_heizung", "unten": 4.8, "mittel": 6.25, "oben": 7.7, "feld": "b/4"},
+      {"baujahr": 0, "wfl": 1, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 5.9, "mittel": 7.7, "oben": 9.5, "feld": "b/3"},
+      {"baujahr": 0, "wfl": 2, "lage": "einfach", "ausstattung": "bad_oder_heizung", "unten": 4.4, "mittel": 5.85, "oben": 7.3, "feld": "c/2"},
+      {"baujahr": 0, "wfl": 2, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 5.1, "mittel": 6.8, "oben": 8.5, "feld": "c/1"},
+      {"baujahr": 0, "wfl": 2, "lage": "gut", "ausstattung": "bad_oder_heizung", "unten": 5.8, "mittel": 7.3, "oben": 8.8, "feld": "c/6"},
+      {"baujahr": 0, "wfl": 2, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 6.85, "mittel": 8.7, "oben": 10.55, "feld": "c/5"},
+      {"baujahr": 0, "wfl": 2, "lage": "mittel", "ausstattung": "bad_oder_heizung", "unten": 4.6, "mittel": 6.05, "oben": 7.5, "feld": "c/4"},
+      {"baujahr": 0, "wfl": 2, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 5.55, "mittel": 7.65, "oben": 9.75, "feld": "c/3"},
+      {"baujahr": 1, "wfl": 0, "lage": "einfach", "ausstattung": "bad_oder_heizung", "unten": 6.0, "mittel": 6.85, "oben": 7.7, "feld": "d/2"},
+      {"baujahr": 1, "wfl": 0, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 6.35, "mittel": 7.7, "oben": 9.0, "feld": "d/1"},
+      {"baujahr": 1, "wfl": 0, "lage": "gut", "ausstattung": "bad_oder_heizung", "unten": 6.85, "mittel": 8.2, "oben": 9.55, "feld": "d/6"},
+      {"baujahr": 1, "wfl": 0, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 8.0, "mittel": 9.4, "oben": 10.8, "feld": "d/5"},
+      {"baujahr": 1, "wfl": 0, "lage": "mittel", "ausstattung": "bad_oder_heizung", "unten": 6.1, "mittel": 7.5, "oben": 8.9, "feld": "d/4"},
+      {"baujahr": 1, "wfl": 0, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 7.3, "mittel": 9.1, "oben": 10.9, "feld": "d/3"},
+      {"baujahr": 1, "wfl": 1, "lage": "einfach", "ausstattung": "bad_oder_heizung", "unten": 5.75, "mittel": 6.8, "oben": 7.85, "feld": "e/2"},
+      {"baujahr": 1, "wfl": 1, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 6.05, "mittel": 7.45, "oben": 8.85, "feld": "e/1"},
+      {"baujahr": 1, "wfl": 1, "lage": "gut", "ausstattung": "bad_oder_heizung", "unten": 6.7, "mittel": 8.1, "oben": 9.5, "feld": "e/6"},
+      {"baujahr": 1, "wfl": 1, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 7.85, "mittel": 9.15, "oben": 10.45, "feld": "e/5"},
+      {"baujahr": 1, "wfl": 1, "lage": "mittel", "ausstattung": "bad_oder_heizung", "unten": 6.2, "mittel": 7.45, "oben": 8.7, "feld": "e/4"},
+      {"baujahr": 1, "wfl": 1, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 7.15, "mittel": 8.85, "oben": 10.55, "feld": "e/3"},
+      {"baujahr": 1, "wfl": 2, "lage": "einfach", "ausstattung": "bad_oder_heizung", "unten": 5.9, "mittel": 6.7, "oben": 7.5, "feld": "f/2"},
+      {"baujahr": 1, "wfl": 2, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 6.15, "mittel": 7.55, "oben": 8.95, "feld": "f/1"},
+      {"baujahr": 1, "wfl": 2, "lage": "gut", "ausstattung": "bad_oder_heizung", "unten": 6.6, "mittel": 7.8, "oben": 9.0, "feld": "f/6"},
+      {"baujahr": 1, "wfl": 2, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 7.8, "mittel": 9.05, "oben": 10.3, "feld": "f/5"},
+      {"baujahr": 1, "wfl": 2, "lage": "mittel", "ausstattung": "bad_oder_heizung", "unten": 6.0, "mittel": 7.3, "oben": 8.6, "feld": "f/4"},
+      {"baujahr": 1, "wfl": 2, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 7.1, "mittel": 8.75, "oben": 10.4, "feld": "f/3"},
+      {"baujahr": 2, "wfl": 0, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 6.85, "mittel": 8.1, "oben": 9.3, "feld": "g/1"},
+      {"baujahr": 2, "wfl": 0, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 9.45, "mittel": 10.8, "oben": 12.15, "feld": "g/5"},
+      {"baujahr": 2, "wfl": 0, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 8.55, "mittel": 9.75, "oben": 10.95, "feld": "g/3"},
+      {"baujahr": 2, "wfl": 1, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 7.0, "mittel": 8.1, "oben": 9.2, "feld": "h/1"},
+      {"baujahr": 2, "wfl": 1, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 8.9, "mittel": 10.4, "oben": 11.9, "feld": "h/5"},
+      {"baujahr": 2, "wfl": 1, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 8.3, "mittel": 9.55, "oben": 10.8, "feld": "h/3"},
+      {"baujahr": 2, "wfl": 2, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 7.1, "mittel": 8.1, "oben": 9.1, "feld": "i/1"},
+      {"baujahr": 2, "wfl": 2, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 8.65, "mittel": 10.2, "oben": 11.75, "feld": "i/5"},
+      {"baujahr": 2, "wfl": 2, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 8.05, "mittel": 9.35, "oben": 10.65, "feld": "i/3"},
+      {"baujahr": 3, "wfl": 0, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 8.15, "mittel": 9.2, "oben": 10.25, "feld": "k/1"},
+      {"baujahr": 3, "wfl": 0, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 10.05, "mittel": 11.5, "oben": 12.95, "feld": "k/5"},
+      {"baujahr": 3, "wfl": 0, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 9.35, "mittel": 10.6, "oben": 11.85, "feld": "k/3"},
+      {"baujahr": 3, "wfl": 1, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 7.9, "mittel": 9.05, "oben": 10.15, "feld": "l/1"},
+      {"baujahr": 3, "wfl": 1, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 9.9, "mittel": 11.35, "oben": 12.8, "feld": "l/5"},
+      {"baujahr": 3, "wfl": 1, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 9.3, "mittel": 10.5, "oben": 11.7, "feld": "l/3"},
+      {"baujahr": 3, "wfl": 2, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 7.5, "mittel": 8.75, "oben": 10.0, "feld": "m/1"},
+      {"baujahr": 3, "wfl": 2, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 9.8, "mittel": 11.35, "oben": 12.9, "feld": "m/5"},
+      {"baujahr": 3, "wfl": 2, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 9.05, "mittel": 10.3, "oben": 11.55, "feld": "m/3"},
+      {"baujahr": 4, "wfl": 0, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 9.25, "mittel": 10.35, "oben": 11.45, "feld": "n/1"},
+      {"baujahr": 4, "wfl": 0, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 11.85, "mittel": 12.95, "oben": 14.05, "feld": "n/5"},
+      {"baujahr": 4, "wfl": 0, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 11.05, "mittel": 11.85, "oben": 12.65, "feld": "n/3"},
+      {"baujahr": 4, "wfl": 1, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 9.05, "mittel": 10.0, "oben": 10.95, "feld": "o/1"},
+      {"baujahr": 4, "wfl": 1, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 11.1, "mittel": 12.4, "oben": 13.7, "feld": "o/5"},
+      {"baujahr": 4, "wfl": 1, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 10.65, "mittel": 11.75, "oben": 12.85, "feld": "o/3"},
+      {"baujahr": 4, "wfl": 2, "lage": "einfach", "ausstattung": "bad_und_heizung", "unten": 8.9, "mittel": 9.8, "oben": 10.65, "feld": "p/1"},
+      {"baujahr": 4, "wfl": 2, "lage": "gut", "ausstattung": "bad_und_heizung", "unten": 10.9, "mittel": 12.25, "oben": 13.55, "feld": "p/5"},
+      {"baujahr": 4, "wfl": 2, "lage": "mittel", "ausstattung": "bad_und_heizung", "unten": 10.4, "mittel": 11.4, "oben": 12.4, "feld": "p/3"}
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {"baujahr": 1940, "wfl": 70, "lage": "mittel", "ausstattung": "bad_und_heizung"},
+      "erwartet": {"unten": 5.9, "mittel": 7.7, "oben": 9.5},
+      "seite": "2",
+      "hinweis": "Beispiel zu b3 (Modernisierung): 70 qm, Bad und Heizung, bezugsfertig 1940, mittlere Wohnlage — „Vorher 7,70 €, Nachher 5,90 € bis 9,50 €“ = Feld b/3",
+      "art": "anwendungsbeispiel"
+    },
+    {
+      "eingabe": {"baujahr": 2010, "wfl": 90, "lage": "gut", "ausstattung": "bad_und_heizung"},
+      "erwartet": {"unten": 10.9, "mittel": 12.25, "oben": 13.55},
+      "seite": "4",
+      "hinweis": "Feld p/5, abgelesen",
+      "art": "tabellenzelle"
+    }
+  ]
+}

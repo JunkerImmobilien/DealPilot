@@ -1,0 +1,110 @@
+{
+  "ags": "01003000",
+  "gemeinde": "Lübeck",
+  "art": "qualifiziert",
+  "stand": "2025-05-01",
+  "erhebungsstichtag": null,
+  "gueltig_ab": null,
+  "gueltig_bis": null,
+  "quelle": {
+    "url": "https://bekanntmachungen.luebeck.de/dokumente/d/1621/inline",
+    "dokument": "Qualifizierter Mietspiegel 2025 der Hansestadt Lübeck (Fortschreibung des Mietspiegels 2023 per Stichprobe), Kapitel 7 Mietspiegeltabelle, Kapitel 8 Zu- und Abschläge",
+    "seite": "15",
+    "lizenz": "keine Lizenzangabe; amtliche Bekanntmachung der Hansestadt Lübeck (§ 558c Abs. 4 BGB)",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Tabellenwerte gelten für die MITTLERE Wohnlage; gute/einfache Wohnlage über die Zuschläge (vom Tabellenmittelwert). „mittel“ = arithmetisches Mittel, Spanne = 2/3-Werte. Nur Wohnungen mit Bad, Innen-WC und Sammelheizung (vom Vermieter gestellt). Inkrafttreten im Dokument nicht eindeutig gefunden. Leerfeld H/1 (weniger als 10 Mietwerte) fehlt.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {"von": null, "bis": 1918, "label": "bis 1918 (A)"},
+        {"von": 1919, "bis": 1948, "label": "1919–1948 (B)"},
+        {"von": 1949, "bis": 1957, "label": "1949–1957 (C)"},
+        {"von": 1958, "bis": 1968, "label": "1958–1968 (D)"},
+        {"von": 1969, "bis": 1978, "label": "1969–1978 (E)"},
+        {"von": 1979, "bis": 1990, "label": "1979–1990 (F)"},
+        {"von": 1991, "bis": 2001, "label": "1991–2001 (G)"},
+        {"von": 2002, "bis": 2013, "label": "2002–2013 (H)"},
+        {"von": 2014, "bis": 2020, "label": "2014–2020 (I)"},
+        {"von": 2021, "bis": 2025, "label": "2021–4/2025 (J)"}
+      ],
+      "wfl": [
+        {"von": 25, "bis": 45, "bis_inkl": false, "label": "25 bis unter 45 m² (1)"},
+        {"von": 45, "bis": 65, "bis_inkl": false, "label": "45 bis unter 65 m² (2)"},
+        {"von": 65, "bis": 85, "bis_inkl": false, "label": "65 bis unter 85 m² (3)"},
+        {"von": 85, "bis": null, "label": "85 m² und mehr (4)"}
+      ]
+    },
+    "zellen": [
+      {"baujahr": 0, "wfl": 0, "unten": 8.0, "mittel": 10.08, "oben": 12.0},
+      {"baujahr": 0, "wfl": 1, "unten": 7.18, "mittel": 8.94, "oben": 10.7},
+      {"baujahr": 0, "wfl": 2, "unten": 6.95, "mittel": 8.78, "oben": 10.29},
+      {"baujahr": 0, "wfl": 3, "unten": 7.11, "mittel": 8.71, "oben": 10.33},
+      {"baujahr": 1, "wfl": 0, "unten": 7.62, "mittel": 9.46, "oben": 11.5},
+      {"baujahr": 1, "wfl": 1, "unten": 6.9, "mittel": 8.39, "oben": 10.0},
+      {"baujahr": 1, "wfl": 2, "unten": 6.71, "mittel": 8.08, "oben": 9.38},
+      {"baujahr": 1, "wfl": 3, "unten": 7.0, "mittel": 8.42, "oben": 10.14},
+      {"baujahr": 2, "wfl": 0, "unten": 7.23, "mittel": 8.99, "oben": 11.0},
+      {"baujahr": 2, "wfl": 1, "unten": 6.78, "mittel": 8.33, "oben": 10.0},
+      {"baujahr": 2, "wfl": 2, "unten": 6.59, "mittel": 8.35, "oben": 9.96},
+      {"baujahr": 2, "wfl": 3, "unten": 6.28, "mittel": 7.91, "oben": 9.8, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"},
+      {"baujahr": 3, "wfl": 0, "unten": 7.13, "mittel": 8.76, "oben": 10.3},
+      {"baujahr": 3, "wfl": 1, "unten": 6.47, "mittel": 8.01, "oben": 9.66},
+      {"baujahr": 3, "wfl": 2, "unten": 6.27, "mittel": 7.85, "oben": 9.31},
+      {"baujahr": 3, "wfl": 3, "unten": 6.55, "mittel": 8.31, "oben": 10.65},
+      {"baujahr": 4, "wfl": 0, "unten": 7.57, "mittel": 9.25, "oben": 10.89},
+      {"baujahr": 4, "wfl": 1, "unten": 7.2, "mittel": 8.55, "oben": 9.8},
+      {"baujahr": 4, "wfl": 2, "unten": 5.94, "mittel": 7.4, "oben": 8.95},
+      {"baujahr": 4, "wfl": 3, "unten": 6.23, "mittel": 7.47, "oben": 9.08},
+      {"baujahr": 5, "wfl": 0, "unten": 7.76, "mittel": 9.14, "oben": 11.11},
+      {"baujahr": 5, "wfl": 1, "unten": 7.12, "mittel": 8.81, "oben": 10.41},
+      {"baujahr": 5, "wfl": 2, "unten": 6.75, "mittel": 8.02, "oben": 9.85},
+      {"baujahr": 5, "wfl": 3, "unten": 6.71, "mittel": 7.99, "oben": 10.48},
+      {"baujahr": 6, "wfl": 0, "unten": 7.18, "mittel": 9.51, "oben": 11.11},
+      {"baujahr": 6, "wfl": 1, "unten": 7.67, "mittel": 9.49, "oben": 11.56},
+      {"baujahr": 6, "wfl": 2, "unten": 7.49, "mittel": 8.7, "oben": 9.98},
+      {"baujahr": 6, "wfl": 3, "unten": 7.25, "mittel": 8.92, "oben": 10.63, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"},
+      {"baujahr": 7, "wfl": 1, "unten": 8.77, "mittel": 9.84, "oben": 10.69},
+      {"baujahr": 7, "wfl": 2, "unten": 8.0, "mittel": 9.28, "oben": 10.53},
+      {"baujahr": 7, "wfl": 3, "unten": 8.39, "mittel": 10.4, "oben": 13.07, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"},
+      {"baujahr": 8, "wfl": 0, "unten": 11.14, "mittel": 11.56, "oben": 11.9, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"},
+      {"baujahr": 8, "wfl": 1, "unten": 9.78, "mittel": 10.89, "oben": 11.89},
+      {"baujahr": 8, "wfl": 2, "unten": 10.0, "mittel": 12.01, "oben": 13.99},
+      {"baujahr": 8, "wfl": 3, "unten": 10.57, "mittel": 12.01, "oben": 13.72},
+      {"baujahr": 9, "wfl": 0, "unten": 11.05, "mittel": 14.75, "oben": 18.33, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"},
+      {"baujahr": 9, "wfl": 1, "unten": 13.33, "mittel": 14.95, "oben": 16.53, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"},
+      {"baujahr": 9, "wfl": 2, "unten": 12.22, "mittel": 13.31, "oben": 15.08, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"},
+      {"baujahr": 9, "wfl": 3, "unten": 11.96, "mittel": 14.46, "oben": 16.73, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"}
+    ],
+    "zuschlaege": [
+      {"merkmal": "lage:gut", "label": "gute Wohnlage (G) laut Wohnlagenverzeichnis", "art": "eur_qm", "wert": 0.44, "beleg": "Kapitel 8, S. 16: vom Tabellenmittelwert"},
+      {"merkmal": "lage:einfach", "label": "einfache Wohnlage (E) laut Wohnlagenverzeichnis", "art": "eur_qm", "wert": -0.47, "beleg": "Kapitel 8, S. 16: vom Tabellenmittelwert"}
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {"baujahr": 1965, "wfl": 70},
+      "erwartet": {"unten": 6.27, "mittel": 7.85, "oben": 9.31},
+      "seite": "15",
+      "hinweis": "Feld D3, abgelesen (Anleitungshilfe ohne Zahlenbeispiel)",
+      "art": "tabellenzelle"
+    },
+    {
+      "eingabe": {"baujahr": 1965, "wfl": 70, "lage": "gut"},
+      "erwartet": {"mittel": 8.29},
+      "seite": "16",
+      "art": "tabellenzelle",
+      "hinweis": "Feld D3 7,85 + Zuschlag gute Wohnlage 0,44 (Kapitel 8) = 8,29"
+    },
+    {
+      "eingabe": {"baujahr": 2016, "wfl": 30},
+      "erwartet": {"unten": 11.14, "mittel": 11.56, "oben": 11.9},
+      "seite": "15",
+      "hinweis": "Feld I1, abgelesen",
+      "art": "tabellenzelle"
+    }
+  ]
+}
