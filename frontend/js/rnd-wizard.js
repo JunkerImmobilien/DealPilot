@@ -330,7 +330,12 @@
   // ============================================================
   function mountOverlay() {
     overlayEl = document.createElement('div');
-    overlayEl.className = 'rnd-wiz-overlay';
+    /* v3258 · Marcel 09.11.2026: der Inhalt im Stil des Makler Hub
+       („Objektdaten bearbeiten": Schrittleiste mit Nummern, Felder in Karten,
+       Navigation unten). Der Rahmen (Kopf, Größe, Schließen) bleibt. Die alten
+       Klassen bleiben stehen, die neuen kommen dazu (rnd-hub-*) - das
+       Messe-Drehbuch greift über .rnd-wiz-overlay / .rnd-wiz-modal. */
+    overlayEl.className = 'rnd-wiz-overlay rnd-hub';
     overlayEl.innerHTML =
       '<div class="rnd-wiz-modal">' +
         '<div class="rnd-wiz-header">' +
@@ -340,15 +345,15 @@
           '</div>' +
           '<button class="rnd-wiz-close" aria-label="Schließen">&times;</button>' +
         '</div>' +
-        '<div class="rnd-wiz-progress">' +
-          '<div class="rnd-wiz-progress-bar" id="rnd-wiz-progress"></div>' +
-          '<div class="rnd-wiz-steps" id="rnd-wiz-steps"></div>' +
+        '<div class="rnd-wiz-progress rnd-hub-leiste">' +
+          '<div class="rnd-wiz-steps rnd-hub-schritte" id="rnd-wiz-steps"></div>' +
+          '<div class="rnd-hub-balken"><div class="rnd-wiz-progress-bar" id="rnd-wiz-progress"></div></div>' +
         '</div>' +
         '<div class="rnd-wiz-body" id="rnd-wiz-body"></div>' +
-        '<div class="rnd-wiz-footer">' +
-          '<button class="rnd-wiz-btn rnd-wiz-btn-sec" id="rnd-wiz-back">← Zurück</button>' +
+        '<div class="rnd-wiz-footer rnd-hub-nav">' +
+          '<button type="button" class="rnd-wiz-btn rnd-wiz-btn-sec rnd-hub-zurueck" id="rnd-wiz-back">← Zurück</button>' +
           '<div class="rnd-wiz-counter" id="rnd-wiz-counter"></div>' +
-          '<button class="rnd-wiz-btn rnd-wiz-btn-pri" id="rnd-wiz-next">Weiter →</button>' +
+          '<button type="button" class="rnd-wiz-btn rnd-wiz-btn-pri rnd-hub-weiter" id="rnd-wiz-next">Weiter →</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(overlayEl);
@@ -422,21 +427,25 @@
       'Schritt ' + currentStep + ': ' + step.title;
     document.getElementById('rnd-wiz-step-sub').textContent = step.sub;
 
-    // Progress
-    const pct = (currentStep / TOTAL_STEPS) * 100;
+    // Progress (v3258: Balken wie im Makler Hub - Schritt 1 = leer, letzter = voll)
+    const pct = TOTAL_STEPS > 1 ? ((currentStep - 1) / (TOTAL_STEPS - 1)) * 100 : 100;
     document.getElementById('rnd-wiz-progress').style.width = pct + '%';
 
-    // Step-Dots
+    // Schrittleiste (v3258: Nummer im Kreis + Kurzname, wie .wz-schritte im Makler Hub)
     const stepsEl = document.getElementById('rnd-wiz-steps');
     stepsEl.innerHTML = '';
     STEPS.forEach(function (s) {
-      const dot = document.createElement('div');
+      const dot = document.createElement('button');
+      dot.type = 'button';
       const isCurrent = s.num === currentStep;
       const isDone = s.num < currentStep;
-      dot.className = 'rnd-wiz-step'
+      dot.className = 'rnd-wiz-step rnd-hub-schritt'
                     + (isCurrent ? ' active' : '')
-                    + (isDone ? ' done' : '');
-      dot.textContent = isDone ? '✓' : s.num;
+                    + (isDone ? ' done' : '')
+                    + (s.num > currentStep ? ' rnd-hub-offen' : '');
+      dot.innerHTML = '<span class="rnd-hub-nr">' + s.num + '</span>'
+                    + '<em class="rnd-hub-kurz">' + (HUB_KURZ[s.num - 1] || s.title) + '</em>';
+      if (isCurrent) dot.setAttribute('aria-current', 'step');
       dot.title = s.title;
       dot.onclick = function () {
         if (s.num <= currentStep) {
@@ -449,7 +458,7 @@
 
     // Counter + Button-Labels
     document.getElementById('rnd-wiz-counter').textContent =
-      currentStep + ' von ' + TOTAL_STEPS;
+      'Schritt ' + currentStep + ' von ' + TOTAL_STEPS;
     document.getElementById('rnd-wiz-back').style.visibility =
       currentStep > 1 ? 'visible' : 'hidden';
     const nextBtn = document.getElementById('rnd-wiz-next');
@@ -469,11 +478,81 @@
     const body = document.getElementById('rnd-wiz-body');
     body.innerHTML = '';
     step.render(body);
+    _hubKarten(body, currentStep);
 
     // Inputs an State binden
     bindInputs(body);
 
     body.scrollTop = 0;
+  }
+
+  /* ══ v3258 · INHALT IM STIL DES MAKLER HUB ════════════════════════════
+     Marcel 09.11.2026: „die Aufmachung des Modals bleibt, aber das, was drin
+     ist — Eingabefelder und die Strecke — soll so aussehen wie im Makler Hub"
+     (E:\Makler Hub\web\js\aufnahme-kern.js, Objektaufnahme / „Objektdaten
+     bearbeiten"; Gestaltung aus web/app.css .wz-schritte, .wz-h, .field,
+     .input, .mod-zeile, .chip, .punkte, .wz-nav).
+     Hier wird nur UMGEHÄNGT, nicht neu gebaut: die Felder der Schritte bleiben
+     dieselben Elemente mit denselben data-state-Schlüsseln; sie wandern vor
+     bindInputs() in Karten. Jede Abschnittsüberschrift (.rnd-wiz-section mit
+     h3) beginnt eine neue Karte; ein Schritt ohne Überschrift bekommt eine
+     aus HUB_KOPF. Schritt 9 (Ergebnis) bleibt, wie er ist. */
+  const HUB_KURZ = ['Objekt', 'Auftrag', 'Bau', 'Technik', 'Modernisierung', 'Gewerke', 'Mängel', 'Gutachter', 'Ergebnis'];
+  const HUB_KOPF = { 1: 'Objekt und Lage', 3: 'Konstruktion und Ausstattung', 4: 'Haustechnik und Energie',
+    5: 'Letzte Modernisierung je Bauteil', 6: 'Zustand je Gewerk', 7: 'Sichtbare Mängel', 8: 'Angaben für das Gutachten' };
+
+  function _hubKarte(kopfText, kopfEl) {
+    const karte = document.createElement('section');
+    karte.className = 'rnd-hub-karte';
+    if (kopfEl) {
+      kopfEl.classList.add('rnd-hub-kopf');
+      karte.appendChild(kopfEl);
+    } else if (kopfText) {
+      const h = document.createElement('h3');
+      h.className = 'rnd-hub-h';
+      h.textContent = kopfText;
+      karte.appendChild(h);
+    }
+    return karte;
+  }
+
+  function _hubKarten(body, nr) {
+    if (!body) return;
+    body.setAttribute('data-hub-schritt', String(nr));
+    if (nr === TOTAL_STEPS) return;
+    const kinder = Array.prototype.slice.call(body.children);
+    let sammel = null;             /* Karte für Listen und Freitext (Schritte 5-7) */
+    kinder.forEach(function (kind) {
+      const cl = kind.classList;
+      if (cl.contains('rnd-wiz-grid')) {
+        /* Feldraster: an jeder Überschrift aufteilen */
+        const karten = [];
+        let akt = null;
+        Array.prototype.slice.call(kind.children).forEach(function (f) {
+          const istKopf = f.classList.contains('rnd-wiz-section') && f.querySelector('h3');
+          if (istKopf || !akt) {
+            akt = { karte: _hubKarte(istKopf ? null : HUB_KOPF[nr], istKopf ? f : null), felder: null };
+            akt.felder = document.createElement('div');
+            akt.felder.className = 'rnd-wiz-grid rnd-hub-felder';
+            akt.karte.appendChild(akt.felder);
+            karten.push(akt.karte);
+            if (istKopf) return;
+          }
+          akt.felder.appendChild(f);
+        });
+        karten.forEach(function (k) { body.insertBefore(k, kind); });
+        body.removeChild(kind);
+        return;
+      }
+      if (cl.contains('rnd-wiz-info-box')) { cl.add('rnd-hub-hinweis'); return; }
+      if (cl.contains('rnd-wiz-result-bar')) { cl.add('rnd-hub-punkte'); return; }
+      /* Listen (Modernisierung, Gewerke, Mängel) und das Freitextfeld in EINE Karte */
+      if (!sammel) {
+        sammel = _hubKarte(HUB_KOPF[nr], null);
+        body.insertBefore(sammel, kind);
+      }
+      sammel.appendChild(kind);
+    });
   }
 
   function bindInputs(container) {
@@ -1076,16 +1155,22 @@
       + '</div>'
       + '<div class="rnd-wiz-mod-list">';
 
+    /* v3258 · Auswahl als Chips wie im Makler Hub (Schritt „Modernisierung":
+       .mod-zeile mit .chip je Zeitraum). Bis v3257 stand hier je Bauteil ein
+       <select> mit denselben sechs Werten. Jetzt sind es Optionsfelder mit
+       DEMSELBEN data-state="mod.<bauteil>" und denselben Werten - bindInputs()
+       kennt Optionsfelder schon (checked = String(wert) === value). */
     sections.forEach(function (s) {
       const key = s[0];
-      html += '<div class="rnd-wiz-mod-row">'
-        + '<label>' + s[1] + '</label>'
-        + '<select data-state="mod.' + key + '">'
+      html += '<div class="rnd-wiz-mod-row rnd-hub-zeile" role="radiogroup" aria-label="' + s[1] + '">'
+        + '<div class="rnd-hub-zeile-text"><b>' + s[1] + '</b></div>'
+        + '<div class="rnd-hub-chips">'
         + modOptions.map(function (o) {
-            return '<option' + (state.mod[key] === o ? ' selected' : '')
-                 + '>' + o + '</option>';
+            return '<label class="rnd-hub-chip"><input type="radio" name="mod_' + key + '" value="' + o + '"'
+                 + ' data-state="mod.' + key + '"' + (state.mod[key] === o ? ' checked' : '') + '>'
+                 + '<span>' + o.replace(' - ', '–') + '</span></label>';
           }).join('')
-        + '</select>'
+        + '</div>'
         + '</div>';
     });
 
@@ -1119,32 +1204,29 @@
       + '<br><span style="font-size:12px;color:#7A7370">Gewichtet nach den Wägungsanteilen der Normalherstellungskosten 2010 (Anlage 4 ImmoWertV, Tabelle 1); für Eigentumswohnungen und Mehrfamilienhäuser sinngemäß, weil Anlage 4 dort keine eigenen Anteile führt.</span>'
       + '</div>';
 
-    html += '<table class="rnd-wiz-gewerke-tab">'
-      + '<thead><tr>'
-      + '<th>Gewerk</th>'
-      + '<th>Gewicht</th>'
-      + '<th>veraltet</th>'
-      + '<th>zeitgemäß</th>'
-      + '<th>erneuert</th>'
-      + '<th>gehoben</th>'
-      + '</tr></thead><tbody>';
+    /* v3258 · Zeilen mit Chips wie im Makler Hub („Ausstattung je Gewerk":
+       .mod-zeile, Anteil darunter, .chip je Stufe). Bis v3257 eine Tabelle mit
+       Optionsfeldern - dieselben Optionsfelder (name gw_<id>, data-gewerk,
+       Werte veraltet/standard/erneuert/gehoben) stecken jetzt in den Chips. */
+    const GRAD_WORT = { veraltet: 'veraltet', standard: 'zeitgemäß', erneuert: 'erneuert', gehoben: 'gehoben' };
+    html += '<div class="rnd-wiz-gewerke-tab rnd-wiz-mod-list rnd-hub-gewerke">';
 
     gewerke.forEach(function (g) {
       const id = g[0];
       const label = g[1];
       const w = g[2];
       const cur = state.gewerke[id] || 'standard';
-      html += '<tr>'
-        + '<td>' + label + '</td>'
-        + '<td class="center">' + w + '%</td>'
+      html += '<div class="rnd-wiz-mod-row rnd-hub-zeile" role="radiogroup" aria-label="' + label + '">'
+        + '<div class="rnd-hub-zeile-text"><b>' + label + '</b><span>' + w + ' % Anteil</span></div>'
+        + '<div class="rnd-hub-chips">'
         + ['veraltet', 'standard', 'erneuert', 'gehoben'].map(function (grad) {
-            return '<td class="center"><input type="radio" name="gw_' + id + '" value="' + grad
-              + '"' + (cur === grad ? ' checked' : '') + ' data-gewerk="' + id + '"></td>';
+            return '<label class="rnd-hub-chip"><input type="radio" name="gw_' + id + '" value="' + grad
+              + '"' + (cur === grad ? ' checked' : '') + ' data-gewerk="' + id + '"><span>' + GRAD_WORT[grad] + '</span></label>';
           }).join('')
-        + '</tr>';
+        + '</div></div>';
     });
 
-    html += '</tbody></table>';
+    html += '</div>';
     body.innerHTML = html;
 
     // Radio-Buttons binden
