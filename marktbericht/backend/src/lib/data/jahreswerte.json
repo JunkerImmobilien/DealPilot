@@ -439,6 +439,29 @@
         }
       ],
       "hinweis": "Jeder Link muss HTTP 200 liefern (Umlaute prozent-kodiert prüfen). Zinsen nicht übernehmen (KfW-Impressum), nur verlinken."
+    },
+    {
+      "id": "mietspiegel_verzeichnis",
+      "name": "Mietspiegel-Verzeichnis (Art, Stand, Gueltigkeit, Link je Gemeinde ab 50.000 Einwohnern)",
+      "gruppe": "miete",
+      "stand": "Verzeichnis Stand 09.11.2026, 198 Saetze",
+      "erwartet": "2026-11-09",
+      "quelle": "Mietspiegel der Gemeinden (Stadtseite, Amtsblatt, Gutachterausschuss, Mitersteller-Verbaende); § 558c Abs. 4, § 558d Abs. 2 BGB",
+      "turnus": "je Mietspiegel (naechster Ablauf von vermutung_bis/gueltig_bis wird aus dem Verzeichnis gelesen), spaetestens 15.01.2027",
+      "faellig_aus": {
+        "datei": "marktbericht/backend/src/lib/mietspiegel/verzeichnis.json",
+        "muster": "\"(?:vermutung_bis|gueltig_bis)\":\\s*\"(\\d{4}-\\d{2}-\\d{2})\""
+      },
+      "faellig_am": "2027-01-15",
+      "verfahren": "agent",
+      "orte": [
+        {
+          "datei": "marktbericht/backend/src/lib/mietspiegel/verzeichnis.json",
+          "bezeichner": "stand",
+          "muster": "\"stand\":\\s*\"([\\d-]+)\""
+        }
+      ],
+      "hinweis": "tools/mietspiegel-verzeichnis-pruefen.mjs --liste; abgelaufene nachernten (nur amtliche Belege, quelle_geprueft_am setzen), danach stand und erwartet hier nachziehen. Faellig = fruehestes kommendes vermutung_bis/gueltig_bis im Verzeichnis, spaetestens faellig_am (v3250). Gelesen von der Route /mietspiegel und potenzial.js."
     }
   ]
 }

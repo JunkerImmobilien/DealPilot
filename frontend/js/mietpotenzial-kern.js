@@ -565,6 +565,63 @@
         + ', ' + MS_WAHL[genutzt] + (ms.stand ? ', Stand ' + mmjj(ms.stand) : '') + (veraltet ? ', veraltet' : ''),
       hinweise: h };
   }
+  /* ══ v3250 · SATZ DES MIETSPIEGEL-VERZEICHNISSES ALS ANZEIGE ═══════════════════════════════════════
+     satz = Antwort der Route /marktbericht/mietspiegel?ags= (marktbericht/backend/src/lib/mietspiegel/verzeichnis.json):
+     { art: 'qualifiziert'|'einfach'|'keiner'|'unklar'|null, stand, gueltig_bis, vermutung_bis, vermutung_bis_herleitung,
+       url, zugang, preis, gefunden }. Phase 1 führt KEINE Werte - die Zeile sagt nur, ob und welcher Mietspiegel gilt
+       und wo er steht. heute: 'JJJJ-MM-TT' (Parameter; ohne: Uhr). */
+  var MS_REG = {
+    keiner: 'kein Mietspiegel — die Vergleichsmiete mit drei Vergleichswohnungen oder einem Gutachten belegen (§ 558a Abs. 2 BGB) oder mit dem Mietspiegel einer vergleichbaren Gemeinde (§ 558a Abs. 4 BGB)',
+    unklar: 'nicht belegt — ob ein Mietspiegel gilt, ist nicht belegt — bei der Stadt nachfragen',
+    fehlt: 'nicht im Verzeichnis — Pflicht ist ein Mietspiegel erst ab 50.000 Einwohnern (§ 558c Abs. 4 BGB), kleinere Gemeinden haben oft keinen — bei der Stadt nachfragen',
+    werte: 'Werte aus dem Mietspiegel eintragen — sonst rechnet DealPilot mit der Schätzung aus Angebotsmieten'
+  };
+  /** 'JJJJ-MM-TT' -> 'TT.MM.JJJJ', 'JJJJ-MM' -> 'MM/JJJJ', 'JJJJ' -> 'JJJJ' */
+  function msDatum(v) {
+    var s = String(v == null ? '' : v).trim(), m;
+    if ((m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s))) return m[3] + '.' + m[2] + '.' + m[1];
+    if ((m = /^(\d{4})-(\d{2})$/.exec(s))) return m[2] + '/' + m[1];
+    return /^\d{4}$/.test(s) ? s : '';
+  }
+  /** letzter Tag des genannten Zeitraums (JJJJ -> 31.12., JJJJ-MM -> Monatsende), wie der Verzeichnis-Prüfer */
+  function msBisTag(v) {
+    var s = String(v == null ? '' : v).trim(), m;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    if ((m = /^(\d{4})-(\d{2})$/.exec(s))) return new Date(Date.UTC(+m[1], +m[2], 0)).toISOString().slice(0, 10);
+    return /^\d{4}$/.test(s) ? s + '-12-31' : null;
+  }
+  /**
+   * { status: 'qualifiziert'|'einfach'|'veraltet'|'keiner'|'unklar'|'fehlt', art, vorhanden (ein Mietspiegel ist
+   *   bekannt, auch veraltet), veraltet, stand, bis, url, text (ohne Link), werte_hinweis }  - oder null ohne Satz.
+   */
+  function mietspiegelRegister(satz, heute) {
+    if (!satz || typeof satz !== 'object') return null;
+    var h = /^\d{4}-\d{2}-\d{2}/.test(heute || '') ? String(heute).slice(0, 10)
+      : (/^\d{4}-\d{2}$/.test(heute || '') ? heute + '-01' : new Date().toISOString().slice(0, 10));
+    var roh = String(satz.art == null ? '' : satz.art).toLowerCase(), art = msArt(roh);
+    var r = { status: null, art: null, vorhanden: false, veraltet: false, stand: satz.stand || null, bis: null,
+      url: String(satz.url || '').trim() || null, text: '', werte_hinweis: MS_REG.werte };
+    if (!roh) r.status = 'fehlt';
+    else if (art === 'keiner') r.status = 'keiner';
+    else if (art !== 'qualifiziert' && art !== 'einfach') r.status = 'unklar';
+    if (r.status) { r.text = 'Mietspiegel der Gemeinde: ' + MS_REG[r.status]; return r; }
+    r.art = art; r.vorhanden = true;
+    var q = art === 'qualifiziert';
+    var bis = q ? (satz.vermutung_bis || satz.gueltig_bis || null) : (satz.gueltig_bis || null);
+    var bisTag = msBisTag(bis);
+    r.bis = bis; r.veraltet = !!(bisTag && bisTag < h);
+    var t = [q ? 'qualifiziert (§ 558d BGB)' : 'einfach (§ 558c BGB)'];
+    if (msDatum(r.stand)) t.push('Stand ' + msDatum(r.stand));
+    if (r.veraltet) t.push(q ? 'veraltet seit ' + msDatum(bis) + ' — Vermutungswirkung (§ 558d Abs. 2 und 3 BGB) entfällt, nur noch Indiz; neuere Fassung bei der Stadt prüfen'
+      : 'abgelaufen am ' + msDatum(bis) + ' — neuere Fassung bei der Stadt prüfen');
+    else if (bisTag) t.push('gilt bis ' + (q && /^abgeleitet/.test(satz.vermutung_bis_herleitung || '') ? 'voraussichtlich ' : '') + msDatum(bis));
+    if (satz.zugang === 'kostenpflichtig') t.push('kostenpflichtig' + (satz.preis ? ' (' + satz.preis + ')' : ''));
+    else if (satz.zugang === 'online_rechner') t.push('nur als Online-Rechner');
+    else if (satz.zugang === 'auf_anfrage') t.push('auf Anfrage bei der Stadt');
+    r.status = r.veraltet ? 'veraltet' : art;
+    r.text = 'Mietspiegel der Gemeinde: ' + t.join(' · ');
+    return r;
+  }
   /**
    * Stufe des Abschlags Angebotsmiete -> Vergleichsmiete. cfg = DealPilotConfig.mieteAngebotAbschlag
    * (Zahlen stehen NUR dort). lage: { bremse_gilt: true|false|null, kapp_pct, ags, einwohner }.
@@ -609,6 +666,7 @@
   g.DpMietpotenzial = {
     MS_ART: MS_ART, MS_WAHL: MS_WAHL, HW_MS: HW_MS,   /* v3246 */
     ymAus: ymAus, mietspiegelAus: mietspiegelAus, mietspiegelWert: mietspiegelWert, abschlagStufe: abschlagStufe, vglAusAngebot: vglAusAngebot,   /* v3246 */
+    MS_REG: MS_REG, mietspiegelRegister: mietspiegelRegister,   /* v3250 */
     PRAEFIX: PRAEFIX, TERMIN_REGEL: TERMIN_REGEL,
     zahl: zahl, plusMonate: plusMonate, mmjj: mmjj, deDatum: deDatum,
     gemeindeFinden: gemeindeFinden, kappungAus: kappungAus, mietpreisbremseAus: mietpreisbremseAus,

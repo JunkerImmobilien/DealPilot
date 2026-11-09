@@ -488,6 +488,7 @@ router.get('/location-finder/meta', authenticate, readGet('/location-finder/meta
 router.get('/zensus/objekt', authenticate, readGet('/zensus/objekt'));
 router.get('/lage/gemessen', authenticate, readGet('/lage/gemessen'));   /* v2175 · Lage gemessen */
 router.get('/jahreswerte/angebotsabschlag', authenticate, readGet('/jahreswerte/angebotsabschlag'));   /* v3021 · eine Quelle fuer den Marktdurchschnitt */
+router.get('/mietspiegel', authenticate, readGet('/mietspiegel'));   /* v3250 · Mietspiegel-Verzeichnis je AGS (Datei im mb-Image, 0 Kontingent) */
 /* v3026 · Indexreihen (VPI, Nettokaltmieten, Baupreis) fuer die Indexmiete und die Fortschreibung.
    Viele Nutzer, wenig Aenderung (woechentlich): dieser Prozess haelt die Antwort 10 Minuten im
    Speicher und beantwortet If-None-Match mit 304 - ein Nutzerabruf erreicht weder GENESIS noch

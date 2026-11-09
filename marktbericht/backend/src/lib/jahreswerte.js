@@ -55,7 +55,8 @@ export function jahreswerteStatus(reg, heute = new Date()) {
   const grenze = iso(new Date(heute.getTime() + VORLAUF_TAGE * 86400000));
   return (reg.werte || []).map((w) => {
     let faellig = w.faellig_am || null, fehler = null;
-    if (w.faellig_aus) { const f = faelligAus(w.faellig_aus, heute); fehler = f.fehler || null; faellig = f.datum || faellig; }
+    /* v3250: stehen faellig_aus UND faellig_am, gilt das FRUEHERE (faellig_am = „spaetestens") */
+    if (w.faellig_aus) { const f = faelligAus(w.faellig_aus, heute); fehler = f.fehler || null; faellig = (f.datum && (!faellig || f.datum < faellig)) ? f.datum : faellig; }
     let status = 'ohne_termin';
     if (faellig) status = faellig < h ? 'ueberfaellig' : (faellig <= grenze ? 'bald' : 'ok');
     const tage = faellig ? Math.round((Date.parse(faellig) - Date.parse(h)) / 86400000) : null;
