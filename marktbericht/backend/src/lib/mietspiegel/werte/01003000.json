@@ -3,24 +3,24 @@
   "gemeinde": "Lübeck",
   "art": "qualifiziert",
   "stand": "2025-05-01",
+  "erhebungsstichtag": null,
+  "gueltig_ab": null,
+  "gueltig_bis": null,
   "quelle": {
     "url": "https://bekanntmachungen.luebeck.de/dokumente/d/1621/inline",
     "dokument": "Qualifizierter Mietspiegel 2025 der Hansestadt Lübeck (Fortschreibung des Mietspiegels 2023 per Stichprobe), Kapitel 7 Mietspiegeltabelle, Kapitel 8 Zu- und Abschläge",
-    "seite": 15,
+    "seite": "15",
     "lizenz": "keine Lizenzangabe; amtliche Bekanntmachung der Hansestadt Lübeck (§ 558c Abs. 4 BGB)",
     "abgerufen": "2026-11-09"
   },
   "einheit": "eur_qm_nettokalt",
   "form": "tabelle",
+  "rundung": 2,
   "hinweis": "Tabellenwerte gelten für die MITTLERE Wohnlage; gute/einfache Wohnlage über die Zuschläge (vom Tabellenmittelwert). „mittel“ = arithmetisches Mittel, Spanne = 2/3-Werte. Nur Wohnungen mit Bad, Innen-WC und Sammelheizung (vom Vermieter gestellt). Inkrafttreten im Dokument nicht eindeutig gefunden. Leerfeld H/1 (weniger als 10 Mietwerte) fehlt.",
   "tabelle": {
-    "grenzen": {
-      "baujahr": "von und bis einschließlich (Jahre; J bis 4/2025)",
-      "wfl": "von einschließlich, bis ausschließlich (bis unter)"
-    },
     "achsen": {
       "baujahr": [
-        {"bis": 1918, "label": "bis 1918 (A)"},
+        {"von": null, "bis": 1918, "label": "bis 1918 (A)"},
         {"von": 1919, "bis": 1948, "label": "1919–1948 (B)"},
         {"von": 1949, "bis": 1957, "label": "1949–1957 (C)"},
         {"von": 1958, "bis": 1968, "label": "1958–1968 (D)"},
@@ -32,10 +32,10 @@
         {"von": 2021, "bis": 2025, "label": "2021–4/2025 (J)"}
       ],
       "wfl": [
-        {"von": 25, "bis": 45, "label": "25 bis unter 45 m² (1)"},
-        {"von": 45, "bis": 65, "label": "45 bis unter 65 m² (2)"},
-        {"von": 65, "bis": 85, "label": "65 bis unter 85 m² (3)"},
-        {"von": 85, "label": "85 m² und mehr (4)"}
+        {"von": 25, "bis": 45, "bis_inkl": false, "label": "25 bis unter 45 m² (1)"},
+        {"von": 45, "bis": 65, "bis_inkl": false, "label": "45 bis unter 65 m² (2)"},
+        {"von": 65, "bis": 85, "bis_inkl": false, "label": "65 bis unter 85 m² (3)"},
+        {"von": 85, "bis": null, "label": "85 m² und mehr (4)"}
       ]
     },
     "zellen": [
@@ -80,22 +80,31 @@
       {"baujahr": 9, "wfl": 3, "unten": 11.96, "mittel": 14.46, "oben": 16.73, "hinweis": "nur bedingte Aussagekraft (10–29 Mietwerte)"}
     ],
     "zuschlaege": [
-      {"merkmal": "gute Wohnlage (G) laut Wohnlagenverzeichnis", "art": "eur_qm", "wert": 0.44, "beleg": "Kapitel 8, S. 16: vom Tabellenmittelwert"},
-      {"merkmal": "einfache Wohnlage (E) laut Wohnlagenverzeichnis", "art": "eur_qm", "wert": -0.47, "beleg": "Kapitel 8, S. 16: vom Tabellenmittelwert"}
+      {"merkmal": "lage:gut", "label": "gute Wohnlage (G) laut Wohnlagenverzeichnis", "art": "eur_qm", "wert": 0.44, "beleg": "Kapitel 8, S. 16: vom Tabellenmittelwert"},
+      {"merkmal": "lage:einfach", "label": "einfache Wohnlage (E) laut Wohnlagenverzeichnis", "art": "eur_qm", "wert": -0.47, "beleg": "Kapitel 8, S. 16: vom Tabellenmittelwert"}
     ]
   },
   "pruefbeispiele": [
     {
       "eingabe": {"baujahr": 1965, "wfl": 70},
       "erwartet": {"unten": 6.27, "mittel": 7.85, "oben": 9.31},
-      "seite": 15,
-      "hinweis": "Feld D3, abgelesen (Anleitungshilfe ohne Zahlenbeispiel)"
+      "seite": "15",
+      "hinweis": "Feld D3, abgelesen (Anleitungshilfe ohne Zahlenbeispiel)",
+      "art": "tabellenzelle"
+    },
+    {
+      "eingabe": {"baujahr": 1965, "wfl": 70, "lage": "gut"},
+      "erwartet": {"mittel": 8.29},
+      "seite": "16",
+      "art": "tabellenzelle",
+      "hinweis": "Feld D3 7,85 + Zuschlag gute Wohnlage 0,44 (Kapitel 8) = 8,29"
     },
     {
       "eingabe": {"baujahr": 2016, "wfl": 30},
       "erwartet": {"unten": 11.14, "mittel": 11.56, "oben": 11.9},
-      "seite": 15,
-      "hinweis": "Feld I1, abgelesen"
+      "seite": "15",
+      "hinweis": "Feld I1, abgelesen",
+      "art": "tabellenzelle"
     }
   ]
 }

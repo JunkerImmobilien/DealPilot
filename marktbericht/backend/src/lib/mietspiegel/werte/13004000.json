@@ -3,37 +3,36 @@
   "gemeinde": "Schwerin",
   "art": "qualifiziert",
   "stand": "2025-08-31",
+  "erhebungsstichtag": null,
   "gueltig_ab": "2026-01-01",
+  "gueltig_bis": null,
   "quelle": {
     "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Mietspiegel-2026-2027.pdf",
     "dokument": "Qualifizierter Mietspiegel 2026/2027 der Landeshauptstadt Schwerin gemäß § 558d BGB (Arbeitskreis Mietspiegel / Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin), beschlossen 18.12.2025, Tabelle 2 (S. 5), Tabellen 3–5 (S. 6), Beispiel (S. 7)",
-    "seite": 5,
+    "seite": "5",
     "lizenz": "keine Lizenzangabe; Druckausgabe gegen Schutzgebühr 1 €, PDF frei auf der Stadtseite (§ 558c Abs. 4 BGB)",
     "abgerufen": "2026-11-09"
   },
   "einheit": "eur_qm_nettokalt",
   "form": "tabelle",
-  "hinweis": "„stand“ = Ende des Erhebungszeitraums (Mieten 01.09.2019 bis 31.08.2025); ein Erhebungsstichtag wird nicht ausdrücklich genannt. Wirksam ab 01.01.2026. Die Zeile der Tabelle hängt NICHT nur am Baujahr: Dimension „klasse“ = Baualtersklasse des Mietspiegels aus Baujahr, Modernisierungsstand (2.1: nicht modernisiert / modernisiert = mind. drei erneuerte Merkmale / voll modernisiert) und Ausstattungspunkten nach Tabelle 1 (Fenster, Heizung, Sanitär, Küche, Fußböden, je 1–5 bzw. 6 Punkte). „mittel“ = Mittelwert, Spanne = 2/3-Spanne. Felder mit *** (weniger als 10 Datensätze) fehlen. Acht Felder mit unter 30 Datensätzen erfüllen laut Dokument (Nr. 9) nicht die Anforderungen an einen qualifizierten Mietspiegel: 1 A über 100 m², 1 B bis 40 und über 100 m², 2 A bis 40 m², 3 bis 100 m², 4 C bis 40 m², 4 D bis 100 und über 100 m². Altbau bis 1956 ohne Modernisierung ist nicht ausgewiesen. Zuschläge nur für die unter „gilt_fuer.klasse“ genannten Klassen.",
+  "rundung": 2,
+  "hinweis": "„stand“ = Ende des Erhebungszeitraums (Mieten 01.09.2019 bis 31.08.2025); ein Erhebungsstichtag wird nicht ausdrücklich genannt. Wirksam ab 01.01.2026. Die Zeile der Tabelle hängt NICHT nur am Baujahr: Dimension „klasse“ = Baualtersklasse des Mietspiegels aus Baujahr, Modernisierungsstand (2.1: nicht modernisiert / modernisiert = mind. drei erneuerte Merkmale / voll modernisiert) und Ausstattungspunkten nach Tabelle 1 (Fenster, Heizung, Sanitär, Küche, Fußböden, je 1–5 bzw. 6 Punkte). „mittel“ = Mittelwert, Spanne = 2/3-Spanne. Felder mit *** (weniger als 10 Datensätze) fehlen. Acht Felder mit unter 30 Datensätzen erfüllen laut Dokument (Nr. 9) nicht die Anforderungen an einen qualifizierten Mietspiegel: 1 A über 100 m², 1 B bis 40 und über 100 m², 2 A bis 40 m², 3 bis 100 m², 4 C bis 40 m², 4 D bis 100 und über 100 m². Altbau bis 1956 ohne Modernisierung ist nicht ausgewiesen. Die Mietspiegel-Klasse steht in der Achse „ausstattung“ (Schlüssel 1A_bis19 … 4F). Stadtteil-Zuschläge (Tabelle 3) greifen über lage = Stadtteilname und gelten je Baualtersgruppe (bedingung). NICHT abgebildet, weil die Klassen 2 A, 2 B und 3 dasselbe Baujahr 1957–1991 haben und ein Zuschlag dort nur über die Klasse unterscheidbar wäre: Stadtteil-Zuschläge für 2 A/2 B/3 (Altstadt 2B +0,15; Feldstadt 2B +0,15; Paulsstadt 2B +0,05; Schelfstadt 2B +0,30; Werdervorstadt 2B +0,40; Weststadt 2B +0,30; Lankow 2A +0,35, 2B +0,20, 3 -0,10; Großer Dreesch 2B -0,10, 3 +0,15; Krebsförden 3 -0,40; Neu Zippendorf 2A -0,30, 2B -0,30, 3 -0,05; Mueßer Holz 2B -0,35, 3 +0,20) und der Apartment-Zuschlag (bis 30 m²: 2 B +0,25, 3 +0,45 €/m², Tabelle 5) — von Hand zu addieren.",
   "tabelle": {
-    "grenzen": {
-      "baujahr": "von und bis einschließlich (Jahre)",
-      "wfl": "von ausschließlich, bis einschließlich (bis 40 / bis 60 … / über 100 m²)"
-    },
     "achsen": {
       "baujahr": [
         {"von": 2010, "bis": 2025, "label": "Neubau Baujahr 2010 bis 2025 (1 A)"},
         {"von": 1992, "bis": 2009, "label": "Wohnungsbau Baujahr 1992 bis 2009 (1 B)"},
         {"von": 1957, "bis": 1991, "label": "Wohnungsbau Baujahr 1957 bis 1991 (2 A, 2 B, 3)"},
-        {"bis": 1956, "label": "Altbau Baujahr bis 1956, voll modernisiert/modernisiert (4 A – 4 F)"}
+        {"von": null, "bis": 1956, "label": "Altbau Baujahr bis 1956, voll modernisiert/modernisiert (4 A – 4 F)"}
       ],
       "wfl": [
-        {"bis": 40, "label": "bis 40 m²"},
-        {"von": 40, "bis": 60, "label": "bis 60 m²"},
-        {"von": 60, "bis": 80, "label": "bis 80 m²"},
-        {"von": 80, "bis": 100, "label": "bis 100 m²"},
-        {"von": 100, "label": "über 100 m²"}
+        {"von": null, "bis": 40, "label": "bis 40 m²"},
+        {"von": 40, "von_inkl": false, "bis": 60, "label": "bis 60 m²"},
+        {"von": 60, "von_inkl": false, "bis": 80, "label": "bis 80 m²"},
+        {"von": 80, "von_inkl": false, "bis": 100, "label": "bis 100 m²"},
+        {"von": 100, "von_inkl": false, "bis": null, "label": "über 100 m²"}
       ],
-      "klasse": [
+      "ausstattung": [
         {"schluessel": "1A_bis19", "label": "1 A Neubau 2010–2025, Ausstattungspunkte bis 19"},
         {"schluessel": "1A_ueber19", "label": "1 A Neubau 2010–2025, Ausstattungspunkte über 19"},
         {"schluessel": "1B_13_15", "label": "1 B Wohnungsbau 1992–2009, 13 bis 15 Punkte"},
@@ -50,363 +49,195 @@
       ]
     },
     "zellen": [
-      {"baujahr": 0, "wfl": 1, "klasse": "1A_bis19", "unten": 10.21, "mittel": 10.3, "oben": 10.31, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 0, "wfl": 2, "klasse": "1A_bis19", "unten": 9.0, "mittel": 10.2, "oben": 11.01, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 0, "wfl": 3, "klasse": "1A_bis19", "unten": 8.72, "mittel": 9.65, "oben": 10.54, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 0, "wfl": 4, "klasse": "1A_bis19", "unten": 7.7, "mittel": 9.6, "oben": 11.0, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 0, "wfl": 1, "klasse": "1A_ueber19", "unten": 8.0, "mittel": 9.7, "oben": 12.75, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 0, "wfl": 2, "klasse": "1A_ueber19", "unten": 9.4, "mittel": 10.95, "oben": 13.09, "hinweis": "mit Stellplatz (überwiegend Tiefgarage), Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 0, "wfl": 3, "klasse": "1A_ueber19", "unten": 9.3, "mittel": 10.55, "oben": 11.89, "hinweis": "mit Stellplatz (überwiegend Tiefgarage), Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 0, "wfl": 4, "klasse": "1A_ueber19", "unten": 9.65, "mittel": 10.95, "oben": 12.38, "hinweis": "mit Stellplatz (überwiegend Tiefgarage), Balkon/Terrasse und überwiegend mit Aufzug"},
-      {"baujahr": 1, "wfl": 0, "klasse": "1B_13_15", "unten": 5.8, "mittel": 5.95, "oben": 6.6},
-      {"baujahr": 1, "wfl": 1, "klasse": "1B_13_15", "unten": 5.7, "mittel": 6.05, "oben": 6.74},
-      {"baujahr": 1, "wfl": 2, "klasse": "1B_13_15", "unten": 5.55, "mittel": 6.15, "oben": 7.01},
-      {"baujahr": 1, "wfl": 3, "klasse": "1B_13_15", "unten": 6.25, "mittel": 6.4, "oben": 6.72},
-      {"baujahr": 1, "wfl": 0, "klasse": "1B_16_19", "unten": 7.25, "mittel": 8.5, "oben": 10.0},
-      {"baujahr": 1, "wfl": 1, "klasse": "1B_16_19", "unten": 5.8, "mittel": 6.9, "oben": 8.74},
-      {"baujahr": 1, "wfl": 2, "klasse": "1B_16_19", "unten": 6.8, "mittel": 7.4, "oben": 8.4},
-      {"baujahr": 1, "wfl": 3, "klasse": "1B_16_19", "unten": 6.22, "mittel": 6.9, "oben": 7.51},
-      {"baujahr": 1, "wfl": 4, "klasse": "1B_16_19", "unten": 6.22, "mittel": 7.0, "oben": 8.0},
-      {"baujahr": 2, "wfl": 0, "klasse": "2A", "unten": 7.03, "mittel": 8.1, "oben": 9.17},
-      {"baujahr": 2, "wfl": 1, "klasse": "2A", "unten": 6.0, "mittel": 7.55, "oben": 9.12},
-      {"baujahr": 2, "wfl": 2, "klasse": "2A", "unten": 6.09, "mittel": 6.75, "oben": 8.5},
-      {"baujahr": 2, "wfl": 3, "klasse": "2A", "unten": 6.13, "mittel": 8.15, "oben": 9.51},
-      {"baujahr": 2, "wfl": 4, "klasse": "2A", "unten": 7.27, "mittel": 8.85, "oben": 9.51},
-      {"baujahr": 2, "wfl": 0, "klasse": "2B", "unten": 5.21, "mittel": 6.4, "oben": 7.4},
-      {"baujahr": 2, "wfl": 1, "klasse": "2B", "unten": 5.3, "mittel": 5.6, "oben": 6.5},
-      {"baujahr": 2, "wfl": 2, "klasse": "2B", "unten": 5.35, "mittel": 5.75, "oben": 6.62},
-      {"baujahr": 2, "wfl": 3, "klasse": "2B", "unten": 4.9, "mittel": 5.85, "oben": 7.5},
-      {"baujahr": 2, "wfl": 4, "klasse": "2B", "unten": 4.86, "mittel": 5.25, "oben": 6.48},
-      {"baujahr": 2, "wfl": 0, "klasse": "3", "unten": 5.0, "mittel": 5.55, "oben": 6.51},
-      {"baujahr": 2, "wfl": 1, "klasse": "3", "unten": 4.78, "mittel": 5.15, "oben": 6.05},
-      {"baujahr": 2, "wfl": 2, "klasse": "3", "unten": 4.9, "mittel": 5.25, "oben": 6.03},
-      {"baujahr": 2, "wfl": 3, "klasse": "3", "unten": 5.07, "mittel": 5.55, "oben": 6.6},
-      {"baujahr": 2, "wfl": 4, "klasse": "3", "unten": 4.7, "mittel": 4.95, "oben": 6.01},
-      {"baujahr": 3, "wfl": 0, "klasse": "4A", "unten": 6.6, "mittel": 7.25, "oben": 8.33},
-      {"baujahr": 3, "wfl": 1, "klasse": "4A", "unten": 5.95, "mittel": 6.25, "oben": 7.36},
-      {"baujahr": 3, "wfl": 2, "klasse": "4A", "unten": 5.9, "mittel": 6.4, "oben": 7.62},
-      {"baujahr": 3, "wfl": 3, "klasse": "4A", "unten": 6.07, "mittel": 6.7, "oben": 7.87},
-      {"baujahr": 3, "wfl": 4, "klasse": "4A", "unten": 5.36, "mittel": 6.5, "oben": 7.72},
-      {"baujahr": 3, "wfl": 0, "klasse": "4B", "unten": 6.6, "mittel": 7.3, "oben": 8.91},
-      {"baujahr": 3, "wfl": 1, "klasse": "4B", "unten": 6.0, "mittel": 6.9, "oben": 8.5},
-      {"baujahr": 3, "wfl": 2, "klasse": "4B", "unten": 5.9, "mittel": 6.85, "oben": 8.5},
-      {"baujahr": 3, "wfl": 3, "klasse": "4B", "unten": 6.05, "mittel": 6.9, "oben": 8.26},
-      {"baujahr": 3, "wfl": 4, "klasse": "4B", "unten": 6.02, "mittel": 7.25, "oben": 8.89},
-      {"baujahr": 3, "wfl": 0, "klasse": "4C", "unten": 9.22, "mittel": 10.5, "oben": 11.61},
-      {"baujahr": 3, "wfl": 1, "klasse": "4C", "unten": 7.51, "mittel": 8.55, "oben": 10.0},
-      {"baujahr": 3, "wfl": 2, "klasse": "4C", "unten": 7.69, "mittel": 8.5, "oben": 9.38},
-      {"baujahr": 3, "wfl": 3, "klasse": "4C", "unten": 7.48, "mittel": 8.55, "oben": 9.53},
-      {"baujahr": 3, "wfl": 4, "klasse": "4C", "unten": 7.08, "mittel": 8.7, "oben": 9.92},
-      {"baujahr": 3, "wfl": 0, "klasse": "4D", "unten": 6.7, "mittel": 7.65, "oben": 8.7},
-      {"baujahr": 3, "wfl": 1, "klasse": "4D", "unten": 6.5, "mittel": 6.8, "oben": 7.67},
-      {"baujahr": 3, "wfl": 2, "klasse": "4D", "unten": 6.2, "mittel": 6.75, "oben": 8.0},
-      {"baujahr": 3, "wfl": 3, "klasse": "4D", "unten": 6.5, "mittel": 7.35, "oben": 9.0},
-      {"baujahr": 3, "wfl": 4, "klasse": "4D", "unten": 5.44, "mittel": 6.65, "oben": 8.0},
-      {"baujahr": 3, "wfl": 0, "klasse": "4E", "unten": 7.25, "mittel": 8.8, "oben": 10.94},
-      {"baujahr": 3, "wfl": 1, "klasse": "4E", "unten": 6.5, "mittel": 7.25, "oben": 9.17},
-      {"baujahr": 3, "wfl": 2, "klasse": "4E", "unten": 6.48, "mittel": 7.8, "oben": 9.21},
-      {"baujahr": 3, "wfl": 3, "klasse": "4E", "unten": 7.0, "mittel": 8.75, "oben": 10.74},
-      {"baujahr": 3, "wfl": 4, "klasse": "4E", "unten": 6.99, "mittel": 9.1, "oben": 10.88},
-      {"baujahr": 3, "wfl": 0, "klasse": "4F", "unten": 9.69, "mittel": 11.65, "oben": 13.24},
-      {"baujahr": 3, "wfl": 1, "klasse": "4F", "unten": 8.51, "mittel": 9.85, "oben": 11.55},
-      {"baujahr": 3, "wfl": 2, "klasse": "4F", "unten": 7.71, "mittel": 9.2, "oben": 10.63},
-      {"baujahr": 3, "wfl": 3, "klasse": "4F", "unten": 8.5, "mittel": 10.2, "oben": 12.22},
-      {"baujahr": 3, "wfl": 4, "klasse": "4F", "unten": 8.49, "mittel": 9.8, "oben": 11.37}
+      {"baujahr": 0, "wfl": 1, "ausstattung": "1A_bis19", "unten": 10.21, "mittel": 10.3, "oben": 10.31, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 0, "wfl": 1, "ausstattung": "1A_ueber19", "unten": 8.0, "mittel": 9.7, "oben": 12.75, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 0, "wfl": 2, "ausstattung": "1A_bis19", "unten": 9.0, "mittel": 10.2, "oben": 11.01, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 0, "wfl": 2, "ausstattung": "1A_ueber19", "unten": 9.4, "mittel": 10.95, "oben": 13.09, "hinweis": "mit Stellplatz (überwiegend Tiefgarage), Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 0, "wfl": 3, "ausstattung": "1A_bis19", "unten": 8.72, "mittel": 9.65, "oben": 10.54, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 0, "wfl": 3, "ausstattung": "1A_ueber19", "unten": 9.3, "mittel": 10.55, "oben": 11.89, "hinweis": "mit Stellplatz (überwiegend Tiefgarage), Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 0, "wfl": 4, "ausstattung": "1A_bis19", "unten": 7.7, "mittel": 9.6, "oben": 11.0, "hinweis": "mit Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 0, "wfl": 4, "ausstattung": "1A_ueber19", "unten": 9.65, "mittel": 10.95, "oben": 12.38, "hinweis": "mit Stellplatz (überwiegend Tiefgarage), Balkon/Terrasse und überwiegend mit Aufzug"},
+      {"baujahr": 1, "wfl": 0, "ausstattung": "1B_13_15", "unten": 5.8, "mittel": 5.95, "oben": 6.6},
+      {"baujahr": 1, "wfl": 0, "ausstattung": "1B_16_19", "unten": 7.25, "mittel": 8.5, "oben": 10.0},
+      {"baujahr": 1, "wfl": 1, "ausstattung": "1B_13_15", "unten": 5.7, "mittel": 6.05, "oben": 6.74},
+      {"baujahr": 1, "wfl": 1, "ausstattung": "1B_16_19", "unten": 5.8, "mittel": 6.9, "oben": 8.74},
+      {"baujahr": 1, "wfl": 2, "ausstattung": "1B_13_15", "unten": 5.55, "mittel": 6.15, "oben": 7.01},
+      {"baujahr": 1, "wfl": 2, "ausstattung": "1B_16_19", "unten": 6.8, "mittel": 7.4, "oben": 8.4},
+      {"baujahr": 1, "wfl": 3, "ausstattung": "1B_13_15", "unten": 6.25, "mittel": 6.4, "oben": 6.72},
+      {"baujahr": 1, "wfl": 3, "ausstattung": "1B_16_19", "unten": 6.22, "mittel": 6.9, "oben": 7.51},
+      {"baujahr": 1, "wfl": 4, "ausstattung": "1B_16_19", "unten": 6.22, "mittel": 7.0, "oben": 8.0},
+      {"baujahr": 2, "wfl": 0, "ausstattung": "2A", "unten": 7.03, "mittel": 8.1, "oben": 9.17},
+      {"baujahr": 2, "wfl": 0, "ausstattung": "2B", "unten": 5.21, "mittel": 6.4, "oben": 7.4},
+      {"baujahr": 2, "wfl": 0, "ausstattung": "3", "unten": 5.0, "mittel": 5.55, "oben": 6.51},
+      {"baujahr": 2, "wfl": 1, "ausstattung": "2A", "unten": 6.0, "mittel": 7.55, "oben": 9.12},
+      {"baujahr": 2, "wfl": 1, "ausstattung": "2B", "unten": 5.3, "mittel": 5.6, "oben": 6.5},
+      {"baujahr": 2, "wfl": 1, "ausstattung": "3", "unten": 4.78, "mittel": 5.15, "oben": 6.05},
+      {"baujahr": 2, "wfl": 2, "ausstattung": "2A", "unten": 6.09, "mittel": 6.75, "oben": 8.5},
+      {"baujahr": 2, "wfl": 2, "ausstattung": "2B", "unten": 5.35, "mittel": 5.75, "oben": 6.62},
+      {"baujahr": 2, "wfl": 2, "ausstattung": "3", "unten": 4.9, "mittel": 5.25, "oben": 6.03},
+      {"baujahr": 2, "wfl": 3, "ausstattung": "2A", "unten": 6.13, "mittel": 8.15, "oben": 9.51},
+      {"baujahr": 2, "wfl": 3, "ausstattung": "2B", "unten": 4.9, "mittel": 5.85, "oben": 7.5},
+      {"baujahr": 2, "wfl": 3, "ausstattung": "3", "unten": 5.07, "mittel": 5.55, "oben": 6.6},
+      {"baujahr": 2, "wfl": 4, "ausstattung": "2A", "unten": 7.27, "mittel": 8.85, "oben": 9.51},
+      {"baujahr": 2, "wfl": 4, "ausstattung": "2B", "unten": 4.86, "mittel": 5.25, "oben": 6.48},
+      {"baujahr": 2, "wfl": 4, "ausstattung": "3", "unten": 4.7, "mittel": 4.95, "oben": 6.01},
+      {"baujahr": 3, "wfl": 0, "ausstattung": "4A", "unten": 6.6, "mittel": 7.25, "oben": 8.33},
+      {"baujahr": 3, "wfl": 0, "ausstattung": "4B", "unten": 6.6, "mittel": 7.3, "oben": 8.91},
+      {"baujahr": 3, "wfl": 0, "ausstattung": "4C", "unten": 9.22, "mittel": 10.5, "oben": 11.61},
+      {"baujahr": 3, "wfl": 0, "ausstattung": "4D", "unten": 6.7, "mittel": 7.65, "oben": 8.7},
+      {"baujahr": 3, "wfl": 0, "ausstattung": "4E", "unten": 7.25, "mittel": 8.8, "oben": 10.94},
+      {"baujahr": 3, "wfl": 0, "ausstattung": "4F", "unten": 9.69, "mittel": 11.65, "oben": 13.24},
+      {"baujahr": 3, "wfl": 1, "ausstattung": "4A", "unten": 5.95, "mittel": 6.25, "oben": 7.36},
+      {"baujahr": 3, "wfl": 1, "ausstattung": "4B", "unten": 6.0, "mittel": 6.9, "oben": 8.5},
+      {"baujahr": 3, "wfl": 1, "ausstattung": "4C", "unten": 7.51, "mittel": 8.55, "oben": 10.0},
+      {"baujahr": 3, "wfl": 1, "ausstattung": "4D", "unten": 6.5, "mittel": 6.8, "oben": 7.67},
+      {"baujahr": 3, "wfl": 1, "ausstattung": "4E", "unten": 6.5, "mittel": 7.25, "oben": 9.17},
+      {"baujahr": 3, "wfl": 1, "ausstattung": "4F", "unten": 8.51, "mittel": 9.85, "oben": 11.55},
+      {"baujahr": 3, "wfl": 2, "ausstattung": "4A", "unten": 5.9, "mittel": 6.4, "oben": 7.62},
+      {"baujahr": 3, "wfl": 2, "ausstattung": "4B", "unten": 5.9, "mittel": 6.85, "oben": 8.5},
+      {"baujahr": 3, "wfl": 2, "ausstattung": "4C", "unten": 7.69, "mittel": 8.5, "oben": 9.38},
+      {"baujahr": 3, "wfl": 2, "ausstattung": "4D", "unten": 6.2, "mittel": 6.75, "oben": 8.0},
+      {"baujahr": 3, "wfl": 2, "ausstattung": "4E", "unten": 6.48, "mittel": 7.8, "oben": 9.21},
+      {"baujahr": 3, "wfl": 2, "ausstattung": "4F", "unten": 7.71, "mittel": 9.2, "oben": 10.63},
+      {"baujahr": 3, "wfl": 3, "ausstattung": "4A", "unten": 6.07, "mittel": 6.7, "oben": 7.87},
+      {"baujahr": 3, "wfl": 3, "ausstattung": "4B", "unten": 6.05, "mittel": 6.9, "oben": 8.26},
+      {"baujahr": 3, "wfl": 3, "ausstattung": "4C", "unten": 7.48, "mittel": 8.55, "oben": 9.53},
+      {"baujahr": 3, "wfl": 3, "ausstattung": "4D", "unten": 6.5, "mittel": 7.35, "oben": 9.0},
+      {"baujahr": 3, "wfl": 3, "ausstattung": "4E", "unten": 7.0, "mittel": 8.75, "oben": 10.74},
+      {"baujahr": 3, "wfl": 3, "ausstattung": "4F", "unten": 8.5, "mittel": 10.2, "oben": 12.22},
+      {"baujahr": 3, "wfl": 4, "ausstattung": "4A", "unten": 5.36, "mittel": 6.5, "oben": 7.72},
+      {"baujahr": 3, "wfl": 4, "ausstattung": "4B", "unten": 6.02, "mittel": 7.25, "oben": 8.89},
+      {"baujahr": 3, "wfl": 4, "ausstattung": "4C", "unten": 7.08, "mittel": 8.7, "oben": 9.92},
+      {"baujahr": 3, "wfl": 4, "ausstattung": "4D", "unten": 5.44, "mittel": 6.65, "oben": 8.0},
+      {"baujahr": 3, "wfl": 4, "ausstattung": "4E", "unten": 6.99, "mittel": 9.1, "oben": 10.88},
+      {"baujahr": 3, "wfl": 4, "ausstattung": "4F", "unten": 8.49, "mittel": 9.8, "oben": 11.37}
     ],
     "zuschlaege": [
       {
-        "merkmal": "Stadtteil Altstadt",
+        "merkmal": "lage:Altstadt",
+        "label": "Stadtteil Altstadt",
         "art": "eur_qm",
         "wert": 1.05,
-        "gilt_fuer": {
-          "klasse": ["1A_bis19", "1A_ueber19", "1B_13_15", "1B_16_19"]
-        },
+        "bedingung": {"baujahr_von": 1992, "baujahr_bis": null},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 1 A/1 B)"
       },
       {
-        "merkmal": "Stadtteil Altstadt",
-        "art": "eur_qm",
-        "wert": 0.15,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Altstadt",
+        "merkmal": "lage:Altstadt",
+        "label": "Stadtteil Altstadt",
         "art": "eur_qm",
         "wert": 1.05,
-        "gilt_fuer": {
-          "klasse": ["4A", "4B", "4C", "4D", "4E", "4F"]
-        },
+        "bedingung": {"baujahr_von": null, "baujahr_bis": 1956},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 4 A – 4 F)"
       },
       {
-        "merkmal": "Stadtteil Feldstadt",
+        "merkmal": "lage:Feldstadt",
+        "label": "Stadtteil Feldstadt",
         "art": "eur_qm",
         "wert": 0.15,
-        "gilt_fuer": {
-          "klasse": ["1A_bis19", "1A_ueber19", "1B_13_15", "1B_16_19"]
-        },
+        "bedingung": {"baujahr_von": 1992, "baujahr_bis": null},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 1 A/1 B)"
       },
       {
-        "merkmal": "Stadtteil Feldstadt",
+        "merkmal": "lage:Feldstadt",
+        "label": "Stadtteil Feldstadt",
         "art": "eur_qm",
         "wert": 0.15,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Feldstadt",
-        "art": "eur_qm",
-        "wert": 0.15,
-        "gilt_fuer": {
-          "klasse": ["4A", "4B", "4C", "4D", "4E", "4F"]
-        },
+        "bedingung": {"baujahr_von": null, "baujahr_bis": 1956},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 4 A – 4 F)"
       },
       {
-        "merkmal": "Stadtteil Paulsstadt",
+        "merkmal": "lage:Paulsstadt",
+        "label": "Stadtteil Paulsstadt",
         "art": "eur_qm",
         "wert": 0.05,
-        "gilt_fuer": {
-          "klasse": ["1A_bis19", "1A_ueber19", "1B_13_15", "1B_16_19"]
-        },
+        "bedingung": {"baujahr_von": 1992, "baujahr_bis": null},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 1 A/1 B)"
       },
       {
-        "merkmal": "Stadtteil Paulsstadt",
+        "merkmal": "lage:Paulsstadt",
+        "label": "Stadtteil Paulsstadt",
         "art": "eur_qm",
         "wert": 0.05,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Paulsstadt",
-        "art": "eur_qm",
-        "wert": 0.05,
-        "gilt_fuer": {
-          "klasse": ["4A", "4B", "4C", "4D", "4E", "4F"]
-        },
+        "bedingung": {"baujahr_von": null, "baujahr_bis": 1956},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 4 A – 4 F)"
       },
       {
-        "merkmal": "Stadtteil Schelfstadt",
+        "merkmal": "lage:Schelfstadt",
+        "label": "Stadtteil Schelfstadt",
         "art": "eur_qm",
         "wert": 0.3,
-        "gilt_fuer": {
-          "klasse": ["1A_bis19", "1A_ueber19", "1B_13_15", "1B_16_19"]
-        },
+        "bedingung": {"baujahr_von": 1992, "baujahr_bis": null},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 1 A/1 B)"
       },
       {
-        "merkmal": "Stadtteil Schelfstadt",
+        "merkmal": "lage:Schelfstadt",
+        "label": "Stadtteil Schelfstadt",
         "art": "eur_qm",
         "wert": 0.3,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Schelfstadt",
-        "art": "eur_qm",
-        "wert": 0.3,
-        "gilt_fuer": {
-          "klasse": ["4A", "4B", "4C", "4D", "4E", "4F"]
-        },
+        "bedingung": {"baujahr_von": null, "baujahr_bis": 1956},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 4 A – 4 F)"
       },
       {
-        "merkmal": "Stadtteil Werdervorstadt",
+        "merkmal": "lage:Werdervorstadt",
+        "label": "Stadtteil Werdervorstadt",
         "art": "eur_qm",
         "wert": 0.4,
-        "gilt_fuer": {
-          "klasse": ["1A_bis19", "1A_ueber19", "1B_13_15", "1B_16_19"]
-        },
+        "bedingung": {"baujahr_von": 1992, "baujahr_bis": null},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 1 A/1 B)"
       },
       {
-        "merkmal": "Stadtteil Werdervorstadt",
+        "merkmal": "lage:Werdervorstadt",
+        "label": "Stadtteil Werdervorstadt",
         "art": "eur_qm",
         "wert": 0.4,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Werdervorstadt",
-        "art": "eur_qm",
-        "wert": 0.4,
-        "gilt_fuer": {
-          "klasse": ["4A", "4B", "4C", "4D", "4E", "4F"]
-        },
+        "bedingung": {"baujahr_von": null, "baujahr_bis": 1956},
         "beleg": "Tabelle 3, S. 6 (Baualtersklasse 4 A – 4 F)"
       },
       {
-        "merkmal": "Stadtteil Weststadt",
-        "art": "eur_qm",
-        "wert": 0.3,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Lankow",
-        "art": "eur_qm",
-        "wert": 0.35,
-        "gilt_fuer": {
-          "klasse": ["2A"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2A)"
-      },
-      {
-        "merkmal": "Stadtteil Lankow",
-        "art": "eur_qm",
-        "wert": 0.2,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Lankow",
-        "art": "eur_qm",
-        "wert": -0.1,
-        "gilt_fuer": {
-          "klasse": ["3"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 3)"
-      },
-      {
-        "merkmal": "Stadtteil Großer Dreesch",
-        "art": "eur_qm",
-        "wert": -0.1,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Großer Dreesch",
-        "art": "eur_qm",
-        "wert": 0.15,
-        "gilt_fuer": {
-          "klasse": ["3"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 3)"
-      },
-      {
-        "merkmal": "Stadtteil Krebsförden",
-        "art": "eur_qm",
-        "wert": -0.4,
-        "gilt_fuer": {
-          "klasse": ["3"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 3)"
-      },
-      {
-        "merkmal": "Stadtteil Neu Zippendorf",
-        "art": "eur_qm",
-        "wert": -0.3,
-        "gilt_fuer": {
-          "klasse": ["2A"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2A)"
-      },
-      {
-        "merkmal": "Stadtteil Neu Zippendorf",
-        "art": "eur_qm",
-        "wert": -0.3,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Neu Zippendorf",
-        "art": "eur_qm",
-        "wert": -0.05,
-        "gilt_fuer": {
-          "klasse": ["3"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 3)"
-      },
-      {
-        "merkmal": "Stadtteil Mueßer Holz",
-        "art": "eur_qm",
-        "wert": -0.35,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 2B)"
-      },
-      {
-        "merkmal": "Stadtteil Mueßer Holz",
-        "art": "eur_qm",
-        "wert": 0.2,
-        "gilt_fuer": {
-          "klasse": ["3"]
-        },
-        "beleg": "Tabelle 3, S. 6 (Baualtersklasse 3)"
-      },
-      {
-        "merkmal": "Balkon/Terrasse (auch bei Gartenanteilen)",
+        "merkmal": "balkon",
+        "label": "Balkon/Terrasse (auch bei Gartenanteilen)",
         "art": "eur_qm",
         "wert": 0.5,
-        "gilt_fuer": {
-          "klasse": ["1B_13_15", "1B_16_19"]
-        },
+        "bedingung": {"baujahr_von": 1992, "baujahr_bis": 2009},
         "beleg": "Tabelle 4, S. 6 (Baualtersklasse 1 B)"
       },
       {
-        "merkmal": "Balkon/Terrasse (auch bei Gartenanteilen)",
+        "merkmal": "balkon",
+        "label": "Balkon/Terrasse (auch bei Gartenanteilen)",
         "art": "eur_qm",
         "wert": 0.5,
-        "gilt_fuer": {
-          "klasse": ["4A", "4B", "4C", "4D", "4E", "4F"]
-        },
+        "bedingung": {"baujahr_von": null, "baujahr_bis": 1956},
         "beleg": "Tabelle 4, S. 6 (Baualtersklasse 4 A – 4 F)"
-      },
-      {
-        "merkmal": "Apartment (abgeschlossene 1- und 2-Raum-Wohnung bis 30 m², unmöbliert, Küche/Kochnische und Bad)",
-        "art": "eur_qm",
-        "wert": 0.25,
-        "gilt_fuer": {
-          "klasse": ["2B"]
-        },
-        "beleg": "Tabelle 5, S. 6"
-      },
-      {
-        "merkmal": "Apartment (abgeschlossene 1- und 2-Raum-Wohnung bis 30 m², unmöbliert, Küche/Kochnische und Bad)",
-        "art": "eur_qm",
-        "wert": 0.45,
-        "gilt_fuer": {
-          "klasse": ["3"]
-        },
-        "beleg": "Tabelle 5, S. 6"
       }
     ]
   },
   "pruefbeispiele": [
     {
-      "eingabe": {"baujahr": 1920, "wfl": 70, "klasse": "4E"},
-      "erwartet": {"unten": 6.48, "mittel": 7.8, "oben": 9.21},
-      "seite": 7,
+      "eingabe": {
+        "baujahr": 1920,
+        "wfl": 70,
+        "lage": "Feldstadt",
+        "merkmale": {"balkon": true},
+        "ausstattung": "4E"
+      },
+      "erwartet": {"mittel": 8.45},
+      "seite": "7",
+      "art": "anwendungsbeispiel",
       "hinweis": "Beispiel S. 7: Feldstadt, Baujahr 1920, 2008 voll modernisiert, 70 m², Balkon, 18 Ausstattungspunkte → 4 E, bis 80 m²: 7,80 €/m², Spanne 6,48–9,21; + 0,15 (Feldstadt, Tabelle 3) + 0,50 (Balkon, Tabelle 4) = 8,45 €/m²"
     },
     {
-      "eingabe": {"baujahr": 1975, "wfl": 55, "klasse": "2B"},
+      "eingabe": {"baujahr": 1920, "wfl": 70, "ausstattung": "4E"},
+      "erwartet": {"unten": 6.48, "mittel": 7.8, "oben": 9.21},
+      "seite": "7",
+      "art": "anwendungsbeispiel",
+      "hinweis": "Beispiel S. 7, Tabellenfeld 4 E bis 80 m² ohne Zuschläge"
+    },
+    {
+      "eingabe": {"baujahr": 1975, "wfl": 55, "ausstattung": "2B"},
       "erwartet": {"unten": 5.3, "mittel": 5.6, "oben": 6.5},
-      "seite": 5,
-      "hinweis": "Feld 2 B bis 60 m², abgelesen"
+      "seite": "5",
+      "hinweis": "Feld 2 B bis 60 m², abgelesen",
+      "art": "tabellenzelle"
     }
   ]
 }
