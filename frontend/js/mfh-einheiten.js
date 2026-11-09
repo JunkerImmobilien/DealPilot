@@ -348,38 +348,68 @@
       + opts.map(function (o) { return '<option value="' + o[0] + '"' + (String(wert || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>';
   }
 
+  /* ══ v3252 · DAS FENSTER IM DEALPILOT-STIL, KÜRZER ZU LESEN ══════════
+     Marcel am 09.11.2026: „mehr im DealPilot-Stil ausrichten und auch etwas
+     kompakter, und man weiß nicht genau, worauf es hingeht — vielleicht eher
+     ‚gemeinsam vom Haus geerbt' als Tabelle und dann zum Ausfüllen … mit
+     Karten arbeiten, überschaubarer, weniger zu lesen, aber gleicher Inhalt."
+     Jeder Reiter beginnt mit EINEM Satz; der bisherige Langtext steht
+     unverändert hinter „Mehr". Der Inhalt sitzt in weißen Karten (Kopf in
+     Mono-Versalien mit Goldlinie). Feld-IDs, data-Attribute und die Klassen,
+     an denen Speichern, Potenzial und das Messe-Drehbuch hängen (#mfh-body,
+     .mfh-tab, [data-det], .mfh-det, #mfh-weg, #mfh-geb-p, #mfh-haus-mass …),
+     bleiben — Klassen sind nur ERGÄNZT. */
+  function intro(kurz, mehr) {
+    return '<div class="mfh-intro"><span class="mfh-intro-satz">' + kurz + '</span>'
+      + (mehr ? '<button type="button" class="mfh-mehr-k" aria-expanded="false">Mehr</button><div class="mfh-mehr-text" hidden>' + mehr + '</div>' : '') + '</div>';
+  }
+  function blatt(titel, inhalt, zusatz, cls) {
+    return '<section class="mfh-blatt' + (cls ? ' ' + cls : '') + '"><div class="mfh-blatt-k"><span>' + titel + '</span>' + (zusatz ? '<span class="mfh-blatt-z">' + zusatz + '</span>' : '') + '</div>' + inhalt + '</section>';
+  }
+  function stufeText(v) { var s = STUFEN.filter(function (x) { return x[0] === String(v || '0'); })[0]; return s ? s[1] : STUFEN[0][1]; }
+  function gewerkKurz(id) { return labelVon(id).replace(/^(Modernisierung|Verbesserung) (der |des )?/, '').replace(/ \(.*/, '').replace(/ inkl\..*/, ''); }
+
   /* Schritt 1 — Gebaeude */
   function schritt1() {
     function zeile(id, fuerWohnung) {
       /* v3066 · Marcel 02.11.2026: „unter Gebäude steht teilweise zehnmal der gleiche Satz". Der Satz
          steht jetzt EINMAL in der Abschnittsüberschrift; die Zeile trägt nur noch ihr Gewerk. */
       void fuerWohnung;
-      return '<tr><td style="padding:5px 10px 5px 0" title="Anlage 2: maximal ' + maxPunkte(id) + ' von 20 Punkten">' + esc(labelVon(id)) + '</td>'
-        + '<td style="padding:5px 0;text-align:right">' + selHtml('data-geb="' + id + '"', _geb[id], STUFEN) + '</td></tr>';
+      return '<tr><td class="mfh-gw" title="Anlage 2: maximal ' + maxPunkte(id) + ' von 20 Punkten">' + esc(labelVon(id)) + '</td>'
+        + '<td class="mfh-gw-sel">' + selHtml('data-geb="' + id + '"', _geb[id], STUFEN) + '</td>'
+        + '<td class="mfh-gw-max" title="Anlage 2: maximal ' + maxPunkte(id) + ' von 20 Punkten">max. ' + maxPunkte(id) + '</td></tr>';
     }
     var _vor = GEB_IDS.concat(WE_IDS).filter(function (id) { return _objektVorher[id]; }).length;
     var bj = (el('baujahr') && el('baujahr').value) || '—';
-    return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Baujahr ' + esc(bj) + ' · Gesamtnutzungsdauer ' + gnd() + ' Jahre. '
-      + 'Die Kriterien sind die der Anlage 2 ImmoWertV — dieselben wie im Restnutzungsdauer-Assistenten.</div>'
-      + (_vor ? '<div style="font-size:12.5px;color:#6B6356;margin:-4px 0 10px">' + '<b>' + _vor + ' Angaben' + (_vor === 1 ? ' stammt' : ' stammen') + ' aus dem Tab Objekt</b> und sind unten schon gesetzt. Was du hier änderst, geht zurück dorthin.</div>' : '')
-      + '<table style="width:100%;border-collapse:collapse;font-size:13px"><tbody>'
-      + '<tr><td colspan="2" style="padding:8px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Gemeinsam — vom Haus geerbt <span style="text-transform:none;letter-spacing:0;font:400 11.5px Inter,sans-serif">· gilt für das ganze Haus</span></td></tr>'
-      + GEB_IDS.map(function (id) { return zeile(id, false); }).join('')
-      + '<tr><td colspan="2" style="padding:12px 0 4px;font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Vorgabe für die Wohnungen <span style="text-transform:none;letter-spacing:0;font:400 11.5px Inter,sans-serif">· gilt für jede Wohnung, bis sie in ihrem Fenster abweicht</span></td></tr>'
-      + WE_IDS.map(function (id) { return zeile(id, true); }).join('')
-      + '</tbody></table>'
-      /* v2541 · Jahr, in dem das Zielbild erreicht ist - dasselbe Feld wie im Reiter Objekt (zb_fertig_jahr) */
-      + '<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Zielbild fertig (Jahr) '
-        + '<input class="mfh-in mfh-md" id="mfh-zbjahr" inputmode="numeric" maxlength="4" style="width:80px" value="' + esc((el('zb_fertig_jahr') && el('zb_fertig_jahr').value) || '') + '" placeholder="z. B. 2028">'
-        + '<span style="font-size:11.5px;color:#8A8272">für Pilot-Analyse und PDF · leer = offen</span></div>'
-      + '<div class="cf-hint" style="margin-top:8px">Gebäudepunkte: <b id="mfh-geb-p">—</b> von 20 (Anlage 2). Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben.</div>'
+    /* v3252 · oben drei Zahlen statt eines Satzes; die Gewerke als zwei Karten:
+       links, was JEDE Einheit erbt (eine Wohnung kann es nicht abweichend haben),
+       rechts die Vorgabe, von der eine Wohnung in Schritt 3 abweichen darf. */
+    return intro('Was für das ganze Haus gilt. Jede Einheit erbt es — abweichen kann eine Wohnung nur bei Fenstern, Bädern, Innenausbau und Grundriss (Schritt 3).',
+        'Die Kriterien sind die der Anlage 2 ImmoWertV — dieselben wie im Restnutzungsdauer-Assistenten. Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben. '
+        + 'Aus den Punkten entstehen Modernisierungsgrad und Restnutzungsdauer des Hauses (Schritt 4).')
+      + (_vor ? '<div class="mfh-notiz"><b>' + _vor + ' Angaben' + (_vor === 1 ? ' stammt' : ' stammen') + ' aus dem Tab Objekt</b> und sind unten schon gesetzt. Was du hier änderst, geht zurück dorthin.</div>' : '')
+      + '<div class="mfh-fakten">'
+        + '<div><span>Baujahr</span><b>' + esc(bj) + '</b></div>'
+        + '<div><span>Gesamtnutzungsdauer</span><b>' + gnd() + ' Jahre</b></div>'
+        + '<div><span>Gebäudepunkte</span><b><b id="mfh-geb-p">—</b> von 20</b></div>'
+      + '</div>'
+      + '<div class="mfh-raster2">'
+      + blatt('Vom Haus — gilt für alle Einheiten', '<table class="mfh-gw-tab"><tbody>' + GEB_IDS.map(function (id) { return zeile(id, false); }).join('') + '</tbody></table>', 'geerbt', 'mfh-blatt-haus')
+      + blatt('Vorgabe je Wohnung', '<table class="mfh-gw-tab"><tbody>' + WE_IDS.map(function (id) { return zeile(id, true); }).join('') + '</tbody></table>', 'in Schritt 3 je Einheit änderbar')
+      + '</div>'
       /* v2966 · N80 (Marcel 26.10.2026): Massnahmen am GANZEN Haus fuer das Zielbild. Der Zustand oben
          ist heute, die Massnahme hier das Ziel. Kosten nach Wohnflaeche auf die Wohnungen, Punkte fuer jede
          Wohnung (je Gewerk hoechstens einmal, auch neben der Elektrik einer Wohnung). */
-      + '<div class="mfh-haus-mass" style="margin-top:14px;padding:10px 11px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7">'
-        + '<div style="font:600 11px/1.3 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272">Maßnahmen am ganzen Haus · Zielbild <span style="text-transform:none;letter-spacing:0;font-weight:400">kann, nicht muss</span></div>'
-        + '<div style="font-size:11.5px;color:#8A8272;margin:4px 0 8px">Dach, Fassade, Fenster, Heizung oder Leitungen für das ganze Haus — mit Kosten. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung. Was eine einzelne Wohnung bekommt (z. B. ihr Bad), steht unter Einheiten › Details.</div>'
-        + '<div id="mfh-haus-mass"></div><div class="cf-hint" id="mfh-haus-sum" style="margin-top:6px"></div></div>';
+      + blatt('Zielbild am ganzen Haus',
+          /* v2541 · Jahr, in dem das Zielbild erreicht ist - dasselbe Feld wie im Reiter Objekt (zb_fertig_jahr) */
+          '<div class="mfh-feldzeile"><label for="mfh-zbjahr">Zielbild fertig (Jahr)</label>'
+          + '<input class="mfh-in mfh-md mfh-in-gross" id="mfh-zbjahr" inputmode="numeric" maxlength="4" style="width:96px" value="' + esc((el('zb_fertig_jahr') && el('zb_fertig_jahr').value) || '') + '" placeholder="z. B. 2028">'
+          + '<span class="mfh-leise">für Pilot-Analyse und PDF · leer = offen</span></div>'
+          + '<div class="mfh-haus-mass">'
+          + intro('Maßnahmen für das ganze Haus (Dach, Fassade, Fenster, Heizung, Leitungen) mit Kosten.',
+              'Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung. Was eine einzelne Wohnung bekommt (z. B. ihr Bad), steht unter Einheiten › Details.')
+          + '<div id="mfh-haus-mass"></div><div class="cf-hint" id="mfh-haus-sum" style="margin-top:6px"></div></div>',
+          'kann, nicht muss');
   }
 
   /* Schritt 2 — Einheitenliste */
@@ -399,16 +429,22 @@
        und Status. Art, Zustand, Soll-Miete, Zielbild und Massnahmen stehen im
        Wohnungsfenster (\u2026). Die Daten bleiben dieselben Felder. */
     var _plan = (zahl(e.soll) > 0 || zahl(e.ziel_qm) > 0 || (Array.isArray(e.massnahmen) && e.massnahmen.length) || String(e.massnahme || '').trim());
+    /* v3252 · Marcel 09.11.2026: „hinten ‚Details' und ‚Plan' — das fluchtet nicht zusammen mit
+       ‚Duplizieren' und ‚Löschen'". Die vier Aktionen stehen jetzt in EINER bündigen Reihe gleicher
+       Höhe (.mfh-akt-reihe): Details fester Breite (mit oder ohne „Plan"-Marke), dann Duplizieren
+       und Löschen als gleich große Quadrate. data-det/-dup/-del und .mfh-det/.mit-plan bleiben.
+       data-l trägt die Spaltenbeschriftung für die Kartenansicht am Handy. */
     return '<tr>' +
-      '<td>' + inp('nr', 44, String(i + 1)) + (e.art === 'gewerbe' ? '<div class="mfh-tag">Gewerbe</div>' : '') + '</td>' +
-      '<td>' + inp('lage', 86, 'EG links') + '</td>' +
-      '<td>' + inp('wfl', 60, 'm²', 'decimal') + '</td>' +
-      '<td>' + inp('zimmer', 44, '', 'decimal') + '</td>' +
-      '<td>' + inp('ist', 72, '€/Mon', 'decimal') + '</td>' +
-      '<td>' + sel('status', [['vermietet', 'vermietet'], ['leer', 'leer']]) + '</td>' +
-      '<td style="white-space:nowrap"><button type="button" data-det="' + i + '" class="mfh-det' + (_plan ? ' mit-plan' : '') + '" title="Mietvertrag, Soll-Miete, Zielbild und Ertragswert dieser Wohnung">Details' + (_plan ? ' · Plan' : '') + '</button> ' +
-      '<button type="button" data-dup="' + i + '" title="Zeile duplizieren" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer">⧉</button> ' +
-      '<button type="button" data-del="' + i + '" title="Zeile löschen" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:#B8625C">✕</button></td>' +
+      '<td data-l="Nr.">' + inp('nr', 44, String(i + 1)) + (e.art === 'gewerbe' ? '<div class="mfh-tag">Gewerbe</div>' : '') + '</td>' +
+      '<td data-l="Lage">' + inp('lage', 86, 'EG links') + '</td>' +
+      '<td data-l="m²">' + inp('wfl', 60, 'm²', 'decimal') + '</td>' +
+      '<td data-l="Zi.">' + inp('zimmer', 44, '', 'decimal') + '</td>' +
+      '<td data-l="Ist €/Mon">' + inp('ist', 72, '€/Mon', 'decimal') + '</td>' +
+      '<td data-l="Status">' + sel('status', [['vermietet', 'vermietet'], ['leer', 'leer']]) + '</td>' +
+      '<td class="mfh-akt-zelle"><div class="mfh-akt-reihe">' +
+      '<button type="button" data-det="' + i + '" class="mfh-det mfh-akt' + (_plan ? ' mit-plan' : '') + '" title="Mietvertrag, Soll-Miete, Zielbild und Ertragswert dieser Wohnung' + (_plan ? ' — ein Plan (Soll-Miete, Zielbild oder Maßnahme) ist erfasst' : '') + '">Details' + (_plan ? '<span class="mfh-plan-marke">&nbsp;· Plan</span>' : '') + '</button>' +
+      '<button type="button" data-dup="' + i + '" class="mfh-akt mfh-akt-q" title="Zeile duplizieren" aria-label="Zeile duplizieren">⧉</button>' +
+      '<button type="button" data-del="' + i + '" class="mfh-akt mfh-akt-q mfh-akt-del" title="Zeile löschen" aria-label="Zeile löschen">✕</button></div></td>' +
       '</tr>';
   }
   /* ══ v2021 · DAS WOHNUNGSFENSTER ════════════════════════════════
@@ -862,28 +898,47 @@
   }
 
   function schritt2() {
-    return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Hier nur das Nötigste. <b>Details</b> öffnet die Wohnung: Mietvertrag, Soll-Miete (Mieter bleibt), Zielbild mit Maßnahmen und den Ertragswert. Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.</div>'
+    return intro('Eine Zeile je Einheit, nur das Nötigste. Alles Weitere steckt hinter <b>Details</b>.',
+        '<b>Details</b> öffnet die Wohnung: Mietvertrag, Soll-Miete (Mieter bleibt), Zielbild mit Maßnahmen und den Ertragswert. Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.')
       /* v1628 · KEIN min-width - feste Aufteilung in Prozent. v2430: sieben Spalten. */
-      + '<table class="mfh-tab"><colgroup>'
-      + ['9%','22%','11%','8%','14%','14%','22%'].map(function (w) {
+      + '<table class="mfh-tab mfh-liste"><colgroup>'
+      + ['8%','24%','11%','8%','14%','13%','22%'].map(function (w) {
           return '<col style="width:' + w + '">'; }).join('')
       + '</colgroup><thead><tr style="text-align:left;color:#8A8272">'
       + '<th>Nr.</th><th>Lage</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete<br><small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th></th></tr></thead>'
       + '<tbody id="mfh-zeilen">' + _arbeit.map(zeileHtml).join('') + '</tbody></table>'
       + '<div style="margin-top:8px"><button type="button" id="mfh-neu" class="btn btn-outline btn-sm">+ Einheit</button></div>'
       /* v3016s · Marcel 28.10.2026: „unter den Wohneinheiten Checkbox für ‚In Wohneigentum aufgeteilt' und
-         dann erst den Text anzeigen, wenn man es auswählt". Stand bis hier in Schritt 1, Text immer offen. */
-      + '<div style="margin-top:12px;padding:9px 11px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
-        + '<label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="mfh-weg"' + (_weg ? ' checked' : '') + '>'
-        + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)<div id="mfh-weg-text" style="font-size:11.5px;color:#8A8272' + (_weg ? '' : ';display:none') + '">'
-        + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt; das Wertpotenzial (Pilot-Analyse, PDF) zeigt zusätzlich jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung.</div></span></label>'
-        /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
-        + '<div id="mfh-weg-kosten" style="margin:8px 0 0 21px;display:' + (_weg ? 'flex' : 'none') + ';gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Kosten der Aufteilung '
-        + '<input class="mfh-in mfh-md" id="mfh-auftk" inputmode="decimal" style="width:120px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
-        + '<span style="font-size:11.5px;color:#8A8272">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>'
+         dann erst den Text anzeigen, wenn man es auswählt". Stand bis hier in Schritt 1, Text immer offen.
+         v3252 · Marcel 09.11.2026: „beim Drüberfahren sagen, was passiert". Gemessen, was der Haken
+         bewirkt: _dpMfh.aufgeteilt → potenzial.js body.aufteilung (PotenzialService: Summe der
+         Wohnungen als ETW minus Aufteilungskosten minus Hauswert), im Wohnungsfenster der Schalter
+         „als Eigentumswohnung" (sonst gesperrt), das Feld Kosten der Aufteilung (Vorbelegung
+         AUFTEILUNG_JE_WE je Wohnung) und die Zeile „Rechtliche Einheit" in PDF, Bank-PDF und
+         Dokumenten. Score, Cashflow und Miteigentumsanteil im Reiter Objekt bleiben unberührt. */
+      + (function () {
+          var tipp = WEG_TIPP;
+          return blatt('Rechtliche Aufteilung',
+            '<div class="mfh-weg-box"><label class="mfh-weg-zeile" title="' + esc(tipp) + '"><input type="checkbox" id="mfh-weg"' + (_weg ? ' checked' : '') + '>'
+            + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)'
+            + '<span class="mfh-info" tabindex="0" role="img" aria-label="' + esc(tipp) + '" title="' + esc(tipp) + '">i</span>'
+            + '<div id="mfh-weg-text" class="mfh-leise"' + (_weg ? '' : ' style="display:none"') + '>'
+            + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt; das Wertpotenzial (Pilot-Analyse, PDF) zeigt zusätzlich jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung.</div></span></label>'
+            /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
+            + '<div id="mfh-weg-kosten" class="mfh-feldzeile" style="margin:8px 0 0 21px;display:' + (_weg ? 'flex' : 'none') + '"><label for="mfh-auftk">Kosten der Aufteilung</label>'
+            + '<input class="mfh-in mfh-md mfh-in-gross" id="mfh-auftk" inputmode="decimal" style="width:150px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
+            + '<span class="mfh-leise">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>',
+            'optional');
+        })()
       /* v3130 · N115 · Zielmiete nach Sanierung je Wohnung - Vorschlag mit „übernehmen" (potenzial.js zielVorschlagHtml) */
       + '<div id="mfh-zv"></div>';
   }
+  var WEG_TIPP = 'Haken setzen, wenn für das Haus eine Teilungserklärung nach WEG besteht (oder du mit Aufteilung rechnen willst). '
+    + 'Dann: 1) erscheint das Feld „Kosten der Aufteilung“ (leer = 1.800 € je Wohnung, schon aufgeteilt: 0); '
+    + '2) rechnet der Ertragswert im Wohnungsfenster auch „als Eigentumswohnung“; '
+    + '3) zeigt das Wertpotenzial in Pilot-Analyse und PDF jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung, abzüglich der Aufteilungskosten; '
+    + '4) nennen PDF und Bankunterlagen „in Wohnungseigentum aufgeteilt (WEG)“. '
+    + 'Score und Cashflow bleiben unberührt.';
   /* v3130 · N115 · zeichnet den Vorschlag aus dem Arbeitsstand; „übernehmen" setzt ziel_qm (und, wenn leer,
      ziel_wann) der Wohnung im Arbeitsstand - gespeichert wird erst mit „Speichern"/„Übernehmen" wie jede Eingabe. */
   function zvZeichnen() {
@@ -910,8 +965,20 @@
         + WE_IDS.map(function (id) { return '<td style="padding:4px 6px 4px 0">' + selHtml('data-mi="' + i + '" data-mk="' + id + '"', (e.mod && e.mod[id]) || '', opts) + '</td>'; }).join('')
         + '<td style="padding:4px 0;text-align:right;font-weight:600" data-punkte="' + i + '">—</td></tr>';
     }).join('');
-    return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Vorgabe ist „wie Gebäude" — nur abweichende Wohnungen anfassen. Dach, Außenwand, Leitungen und Heizung kommen immer vom Haus.</div>'
-      + '<table class="mfh-tab" style="font-size:12.5px"><thead>' + kopf + '</thead><tbody>' + zeilen + '</tbody></table>';
+    /* v3252 · oben als kleine Tabelle, was die Einheiten vom Haus erben (Schritt 1) — darunter
+       ausfüllen, nur wo eine Wohnung abweicht. Marcel: „gemeinsam vom Haus geerbt als Tabelle
+       und dann zum Ausfüllen". Nur gelesen, keine zweite Eingabe. */
+    var erbe = '<div class="mfh-scroll"><table class="mfh-erbe"><thead><tr>'
+      + GEB_IDS.map(function (id) { return '<th>' + esc(gewerkKurz(id)) + '</th>'; }).join('')
+      + WE_IDS.map(function (id) { return '<th class="mfh-erbe-v">' + esc(gewerkKurz(id)) + '</th>'; }).join('')
+      + '</tr></thead><tbody><tr>'
+      + GEB_IDS.map(function (id) { return '<td>' + esc(stufeText(_geb[id])) + '</td>'; }).join('')
+      + WE_IDS.map(function (id) { return '<td class="mfh-erbe-v">' + esc(stufeText(_geb[id])) + '</td>'; }).join('')
+      + '</tr></tbody></table></div>';
+    return intro('Nur Wohnungen anfassen, die vom Haus abweichen — „wie Gebäude" übernimmt die Vorgabe aus Schritt 1.',
+        'Dach, Außenwand, Leitungen und Heizung kommen immer vom Haus. Fenster, Bäder, Innenausbau und Grundriss stehen auf der Vorgabe des Hauses, bis du sie für eine Einheit änderst; die Punkte je Einheit rechnen sofort mit.')
+      + blatt('Vom Haus geerbt', erbe, 'aus Schritt 1 · Vorgabe hell', 'mfh-blatt-haus')
+      + blatt('Je Einheit ausfüllen', '<div class="mfh-scroll"><table class="mfh-tab mfh-tab-zustand" style="font-size:12.5px"><thead>' + kopf + '</thead><tbody>' + zeilen + '</tbody></table></div>', 'nur Abweichungen');
   }
 
   /* Schritt 4 — Ergebnis */
@@ -1028,8 +1095,12 @@
     }).join('');
     /* v2483 · eine RND fuer das Haus (siehe auswerten) - die Spalte je Einheit ist weg */
     var opt = d.hausPunkte, r = Math.round(d.rndGew);
-    return '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:#8A8272;font-size:11px"><th>Einheit</th><th style="text-align:right">Fläche</th><th style="text-align:right">Anlage 2</th></tr></thead><tbody>' + rows + '</tbody></table>'
-      + '<div style="margin-top:12px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
+    /* v3252 · zwei Karten: je Einheit, dann das Haus mit dem, was ins Objekt geht */
+    return intro('Punkte je Einheit und für das ganze Haus — mit <b>Übernehmen</b> gehen sie ins Objekt.',
+        'Gerechnet mit dem Punktraster der Anlage 2 aus dem RND-Kern (DealPilotRND ' + ((window.DealPilotRND && window.DealPilotRND.VERSION) || '') + '). Die Zahl ist indikativ — den Nachweis fürs Finanzamt liefert ein Gutachten. '
+        + 'Die Punkte des Hauses sind flächengewichtet aus den Einheiten; daraus folgt eine Restnutzungsdauer für das ganze Gebäude.')
+      + blatt('Je Einheit', '<table class="mfh-erg-tab" style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:#8A8272;font-size:11px"><th>Einheit</th><th style="text-align:right">Fläche</th><th style="text-align:right">Anlage 2</th></tr></thead><tbody>' + rows + '</tbody></table>')
+      + blatt('Haus gesamt', '<div class="mfh-erg-haus">'
       + '<b>Gebäude gesamt:</b> ' + d.punkteGew.toFixed(1).replace('.', ',') + ' Punkte flächengewichtet, angesetzt <b>' + opt + ' Punkte</b>'
       + (r > 0 ? ' · Restnutzungsdauer des Gebäudes <b>' + r + ' Jahre</b>' : '')
       + (d.s.hatSoll ? '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">Soll-Miete wirkt ab Jahr '
@@ -1042,7 +1113,7 @@
       + '<div style="margin-top:8px;display:grid;gap:6px">'
       + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b> — gilt dann für Marktbericht, Ertragswert und Wertpotenzial)</label>'
       + (r > 0 ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uer"> Restnutzungsdauer <b>' + r + ' Jahre</b> in die AfA übernehmen (eigener Satz ' + (100 / r).toFixed(2).replace('.', ',') + ' %)</label>' : '')
-      + '</div></div>'
+      + '</div></div>'   /* Ende Haken-Raster und .mfh-erg-haus */
       /* ── v2095a · DIE ZAHL TRÄGT IHREN STICHTAG ──────────────────────
        * Die Restnutzungsdauer hängt am Stichtag: sieben Jahre Unterschied
        * ergeben rund 1,7 Jahre RND (am echten Kern gemessen). Bis v2095
@@ -1064,16 +1135,17 @@
             + (i.kernsaniert ? ' · Kernsanierung angesetzt' : '')
             + '</div>';
         })()
-      + '<div class="cf-hint" style="margin-top:6px">Gerechnet mit dem Punktraster der Anlage 2 aus dem RND-Kern (DealPilotRND ' + ((window.DealPilotRND && window.DealPilotRND.VERSION) || '') + '). Die Zahl ist indikativ — den Nachweis fürs Finanzamt liefert ein Gutachten.</div>';
+      + '</div>', 'geht ins Objekt');   /* v3252 · Ende der Karte „Haus gesamt"; der Satz zum RND-Kern steht unter „Mehr" */
   }
 
   function koerper() { return [schritt1, schritt2, schritt3, schritt4][_schritt](); }
   function zeichnen() {
     var b = el('mfh-body'); if (!b) return;
     b.innerHTML = koerper();
+    /* v3252 · Reiter als Mono-Versalien mit Goldstrich (Klassen statt Inline-Stil); data-s bleibt */
     el('mfh-schritte').innerHTML = SCHRITTE.map(function (t, i) {
-      return '<button type="button" data-s="' + i + '" style="border:none;background:none;cursor:pointer;font:' + (i === _schritt ? '600' : '400') + ' 12.5px Inter,sans-serif;color:' + (i === _schritt ? '#1A1714' : '#8A8272') + ';padding:6px 2px;border-bottom:2px solid ' + (i === _schritt ? 'var(--wl-c9a84c, #C9A84C)' : 'transparent') + '">' + (i + 1) + '. ' + t + '</button>';
-    }).join('<span style="color:#D8D2C6">›</span>');
+      return '<button type="button" data-s="' + i + '" class="mfh-reiter' + (i === _schritt ? ' aktiv' : '') + '"' + (i === _schritt ? ' aria-current="step"' : '') + '><span class="mfh-reiter-n">' + (i + 1) + '</span>' + t + '</button>';
+    }).join('');
     el('mfh-zurueck').style.visibility = _schritt === 0 ? 'hidden' : 'visible';
     el('mfh-weiter').textContent = _schritt === SCHRITTE.length - 1 ? 'Übernehmen' : 'Weiter ›';
     zeichnenSumme(); punkteZeigen(); hausBinden(); zvZeichnen();   /* v3130 */
@@ -1240,6 +1312,108 @@
       '  accent-color:var(--wl-c9a84c, #C9A84C)}',
       '@media(max-width:700px){#mfh-modal .mfh-kopf,#mfh-modal .mfh-body,',
       '  #mfh-modal .mfh-fuss,#mfh-modal .mfh-knoepfe{padding-left:14px;padding-right:14px}}',
+      /* ══ v3252 · DEALPILOT-STIL WIE IM REITER OBJEKT ══════════════════
+         Weiße Karten mit Kopf in Mono-Versalien 10 px über einer Goldlinie,
+         Felder Radius 2 (38 px außerhalb der Tabellen, 32 px in der Zeile),
+         Inter. Kompakter: Fenster 1000 statt 1180 px, engere Polster. Gold
+         nur über var(--wl-…). */
+      '#mfh-modal .mfh-karte{max-width:1000px;background:#FDFCFA}',
+      '#mfh-modal .mfh-kopf{padding:8px 20px 0;border-bottom:1px solid #EFEBE3;background:#fff}',
+      '#mfh-modal .mfh-body{padding:12px 20px 14px}',
+      '#mfh-modal .mfh-fuss{padding:8px 20px;background:#fff}',
+      '#mfh-modal .mfh-knoepfe{padding:10px 20px 14px}',
+      '#mfh-modal #mfh-schritte{gap:2px !important;flex-wrap:nowrap !important;overflow-x:auto;scrollbar-width:none}',
+      '#mfh-modal .mfh-reiter{flex:0 0 auto;border:0;background:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;',
+      '  font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A8272;',
+      '  padding:9px 10px 10px;border-bottom:2px solid transparent;white-space:nowrap}',
+      '#mfh-modal .mfh-reiter:hover{color:#2A2727}',
+      '#mfh-modal .mfh-reiter.aktiv{color:#050505;border-bottom-color:var(--wl-c9a84c, #C9A84C)}',
+      '#mfh-modal .mfh-reiter-n{pointer-events:none;display:inline-grid;place-items:center;width:17px;height:17px;border-radius:2px;',
+      '  border:1px solid #D8D2C6;font-size:9.5px;letter-spacing:0;color:inherit}',
+      '#mfh-modal .mfh-reiter.aktiv .mfh-reiter-n{background:#050505;border-color:#050505;color:var(--wl-e8cc7a, #E8CC7A)}',
+      /* Kurzsatz je Reiter, Langtext hinter „Mehr" */
+      '#mfh-modal .mfh-intro{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:12.5px;line-height:1.5;color:#6B6356;margin:0 0 10px}',
+      '#mfh-modal .mfh-intro-satz{flex:0 1 auto;min-width:0}',
+      '#mfh-modal .mfh-mehr-k{flex:0 0 auto;border:0 !important;background:none !important;box-shadow:none !important;padding:0 !important;margin:0;height:auto;min-height:0;cursor:pointer;',
+      '  font:600 10px/1.5 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);white-space:nowrap}',
+      '#mfh-modal .mfh-mehr-k::after{content:" ▾"}',
+      '#mfh-modal .mfh-mehr-k[aria-expanded="true"]::after{content:" ▴"}',
+      '#mfh-modal .mfh-mehr-text[hidden]{display:none}',
+      '#mfh-modal .mfh-mehr-text{flex:1 1 100%;font-size:12px;color:#6B6356;padding:6px 10px;margin-top:4px;background:#fff;',
+      '  border-left:2px solid var(--wl-c9a84c, #C9A84C)}',
+      '#mfh-modal .mfh-notiz{font-size:12px;color:#6B6356;margin:-4px 0 10px}',
+      '#mfh-modal .mfh-leise{font-size:11.5px;color:#8A8272}',
+      /* Karten */
+      '#mfh-modal .mfh-blatt{background:#fff;border:1px solid #E6E0D3;border-radius:4px;padding:10px 12px 12px;margin:0 0 10px;min-width:0}',
+      '#mfh-modal .mfh-blatt-k{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;',
+      '  font:600 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:#2A2727;',
+      '  padding-bottom:6px;margin-bottom:8px;border-bottom:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent)}',
+      '#mfh-modal .mfh-blatt-z{font:500 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:none;color:#8A8272}',
+      '#mfh-modal .mfh-blatt-haus{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, #fff)}',
+      '#mfh-modal .mfh-raster2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}',
+      '#mfh-modal .mfh-raster2>.mfh-blatt{margin:0}',
+      '#mfh-modal .mfh-raster2+.mfh-blatt{margin-top:10px}',
+      /* Drei Zahlen oben in Schritt 1 */
+      '#mfh-modal .mfh-fakten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 10px}',
+      '#mfh-modal .mfh-fakten>div{background:#fff;border:1px solid #E6E0D3;border-radius:4px;padding:7px 10px;display:grid;gap:2px;min-width:0}',
+      '#mfh-modal .mfh-fakten span{font:600 9.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A8272}',
+      '#mfh-modal .mfh-fakten b{font:600 15px/1.2 "Space Grotesk",sans-serif;color:#050505;font-variant-numeric:tabular-nums}',
+      '#mfh-modal .mfh-fakten b b{font:inherit}',
+      /* Gewerke-Tabellen in Schritt 1 */
+      '#mfh-modal .mfh-gw-tab{width:100%;border-collapse:collapse;font-size:12.5px}',
+      '#mfh-modal .mfh-gw-tab td{padding:3px 6px 3px 0;border-bottom:1px solid #F3EFE7}',
+      '#mfh-modal .mfh-gw-tab tr:last-child td{border-bottom:0}',
+      '#mfh-modal .mfh-gw-tab .mfh-gw{color:#2A2727}',
+      '#mfh-modal .mfh-gw-tab .mfh-gw-sel{width:46%}',
+      '#mfh-modal .mfh-gw-tab .mfh-gw-max{width:44px;text-align:right;padding-right:0;font:500 10px "JetBrains Mono",monospace;color:#8A8272;white-space:nowrap}',
+      /* Erbe-Tabelle in Schritt 3 (nur gelesen) */
+      '#mfh-modal .mfh-scroll{overflow-x:auto;max-width:100%}',
+      '#mfh-modal .mfh-erbe{width:100%;border-collapse:collapse;font-size:12px;min-width:560px}',
+      '#mfh-modal .mfh-erbe th{font:600 9.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.06em;text-align:left;padding:0 6px 4px 0}',
+      '#mfh-modal .mfh-erbe td{padding:3px 6px 0 0;color:#2A2727}',
+      '#mfh-modal .mfh-erbe .mfh-erbe-v{color:#8A8272}',
+      '#mfh-modal .mfh-tab-zustand{min-width:620px}',
+      /* Felder: Radius 2, 32 px in Tabellenzeilen, 38 px frei stehend */
+      '#mfh-modal .mfh-in{border-radius:2px;height:32px;padding:4px 8px}',
+      '#mfh-modal .mfh-in.mfh-in-gross{height:38px}',
+      '#mfh-modal .mfh-feldzeile{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;margin:0 0 8px}',
+      '#mfh-modal .mfh-feldzeile>label{color:#2A2727}',
+      '#mfh-modal .mfh-haus-mass{margin-top:6px;padding-top:8px;border-top:1px dashed #E6E0D3}',
+      /* Einheitenliste: Aktionen in einer bündigen Reihe */
+      '#mfh-modal .mfh-akt-reihe{display:flex;gap:4px;align-items:center;justify-content:flex-end}',
+      '#mfh-modal .mfh-akt{height:32px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;margin:0;',
+      '  border:1px solid #E6E0D3;background:#fff;border-radius:2px;cursor:pointer;font:500 12px/1 Inter,sans-serif;color:#2A2727;padding:0 8px}',
+      '#mfh-modal .mfh-akt:hover{border-color:var(--wl-c9a84c, #C9A84C)}',
+      '#mfh-modal .mfh-akt.mfh-det{flex:1 1 auto;max-width:118px;min-width:0;border-color:var(--wl-c9a84c, #C9A84C);color:var(--wl-9a7f33, #9a7f33);white-space:nowrap;overflow:hidden}',
+      '#mfh-modal .mfh-akt.mfh-det.mit-plan{border-color:#2f7d55;color:#2f7d55}',
+      '#mfh-modal .mfh-plan-marke{pointer-events:none}',
+      '#mfh-modal .mfh-akt-q{flex:0 0 32px;width:32px;padding:0;font-size:13px}',
+      '#mfh-modal .mfh-akt-del{color:#B8625C}',
+      '#mfh-modal .mfh-akt-del:hover{border-color:#B8625C}',
+      /* WEG-Haken mit ⓘ */
+      '#mfh-modal .mfh-weg-zeile{display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer}',
+      '#mfh-modal .mfh-weg-zeile input{margin-top:3px}',
+      '#mfh-modal .mfh-info{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:6px;vertical-align:1px;border-radius:50%;',
+      '  border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-9a7f33, #9a7f33);font:600 9.5px/1 "JetBrains Mono",monospace;cursor:help}',
+      '#mfh-modal .mfh-info:focus{outline:2px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);outline-offset:1px}',
+      '#mfh-modal .mfh-erg-haus{font-size:13px}',
+      /* Handy: Karten untereinander, Einheitenliste als Karte je Zeile */
+      '@media(max-width:700px){',
+      '  #mfh-modal .mfh-raster2{grid-template-columns:minmax(0,1fr)}',
+      '  #mfh-modal .mfh-kopf,#mfh-modal .mfh-body,#mfh-modal .mfh-fuss,#mfh-modal .mfh-knoepfe{padding-left:12px;padding-right:12px}',
+      '  #mfh-modal .mfh-fakten b{font-size:13.5px}',
+      '  #mfh-modal .mfh-reiter{padding:9px 5px 10px;letter-spacing:.03em;font-size:9.5px}',
+      '  #mfh-modal .mfh-tab.mfh-liste,#mfh-modal .mfh-tab.mfh-liste tbody{display:block;width:100%}',
+      '  #mfh-modal .mfh-tab.mfh-liste colgroup,#mfh-modal .mfh-tab.mfh-liste thead{display:none}',
+      '  #mfh-modal .mfh-tab.mfh-liste tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.3fr);gap:4px 6px;',
+      '    background:#fff;border:1px solid #E6E0D3;border-radius:4px;padding:8px;margin:0 0 8px}',
+      '  #mfh-modal .mfh-tab.mfh-liste td{display:block;padding:0;min-width:0}',
+      '  #mfh-modal .mfh-tab.mfh-liste td[data-l]::before{content:attr(data-l);display:block;font:600 9px/1.4 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272}',
+      '  #mfh-modal .mfh-tab.mfh-liste td:nth-child(2){grid-column:2 / -1}',
+      '  #mfh-modal .mfh-tab.mfh-liste td.mfh-akt-zelle{grid-column:1 / -1;padding-top:4px}',
+      '  #mfh-modal .mfh-akt-reihe{justify-content:flex-start}',
+      '  #mfh-modal .mfh-akt.mfh-det{max-width:none}',
+      '}',
     ].join('');
     document.head.appendChild(s);
   }
@@ -1305,6 +1479,15 @@
     m.addEventListener('click', function (ev) {
       var t = ev.target;
       if (t === m) schliessen();
+      /* v3252 · das ⓘ sitzt im Label des WEG-Hakens: es erklärt, es schaltet nicht */
+      if (t.classList && t.classList.contains('mfh-info')) { ev.preventDefault(); return; }
+      /* v3252 · „Mehr" am Kurzsatz eines Reiters klappt den bisherigen Langtext auf */
+      if (t.classList && t.classList.contains('mfh-mehr-k')) {
+        var _mt = t.nextElementSibling, _auf = t.getAttribute('aria-expanded') !== 'true';
+        t.setAttribute('aria-expanded', String(_auf)); t.textContent = _auf ? 'Weniger' : 'Mehr';
+        if (_mt) _mt.hidden = !_auf;
+        return;
+      }
       if (t.id === 'mfh-weg') { _weg = t.checked; var _wt = el('mfh-weg-text'), _wk = el('mfh-weg-kosten'); if (_wt) _wt.style.display = _weg ? '' : 'none'; if (_wk) _wk.style.display = _weg ? 'flex' : 'none'; }
       if (t.dataset && t.dataset.s != null) { _schritt = +t.dataset.s; zeichnen(); }
       if (t.dataset && t.dataset.dup != null) { var i = +t.dataset.dup, c = JSON.parse(JSON.stringify(_arbeit[i])); c.nr = String(_arbeit.length + 1); c.lage = ''; c.bilder = null; c.mv_mieter = ''; /* v2021 */ _arbeit.splice(i + 1, 0, c); zeichnen(); }
