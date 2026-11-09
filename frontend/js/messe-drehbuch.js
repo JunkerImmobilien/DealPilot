@@ -8320,7 +8320,7 @@
         await zeige(function () { return qcSel('.qcb-urteil'); }, 10);
         var c = qcUrteil(), w = qcSatz(c.text, /[^.]*Rendite[^.]*\([^)]*\)\./) || qcSatz(c.text, /^[^.]*\./);
         await b2oZeile(s, 'Das Urteil kippt', '„<b>' + (c.kopf || '–') + '</b>“' + (w ? ' — ' + w : '') + ' Der Score bleibt, das Urteil nicht.');
-        var z = qcSatz(c.text, /Deine Zielrendite[^.]*\./), r = qcSatz(c.text, /Rechnerisch trägt[^.]*?—[^.]*\./) || qcSatz(c.text, /Rechnerisch trägt[^.]*\./);
+        var z = qcSatz(c.text, /Deine Zielrendite.*?€[^.]*\./), r = qcSatz(c.text, /Rechnerisch trägt[^.]*?—[^.]*\./) || qcSatz(c.text, /Rechnerisch trägt[^.]*\./);
         if (z || r) await b2oZeile(s, 'Und was es bräuchte', [z, r].filter(Boolean).join(' '));
       },
       async function (s) {   /* 13 · als Objekt speichern - gezeigt, nicht geklickt */
