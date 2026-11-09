@@ -1,0 +1,304 @@
+{
+ "ags": "16055000",
+ "gemeinde": "Weimar",
+ "art": "einfach",
+ "stand": "2025-12-31",
+ "erhebungsstichtag": "2023-12-31",
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://stadt.weimar.de/datei/anzeigen/id/87907,48/20251231_mietspiegel_weimar_2025.pdf",
+  "dokument": "Weimarer Mietspiegel, angepasst an die Marktentwicklung zum Stichtag 31.12.2025 (+4,1 % auf die Erhebung zum 31.12.2023), Stadt Weimar",
+  "seite": "S. 9 (Mietspiegeltabelle 4.1), S. 11–12 (Anwendungsbeispiel 5.1), S. 5 (Erhebungsstichtag, Anpassung)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Herausgeber Stadt Weimar",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Basismiete = arithmetisches Mittel, Spanne = ¾-Spanne. Mit * markierte Felder (vor 1900 / < 45 m² und 2010 und später / < 45 m²) beruhen auf weniger als 10 Fällen, die Spanne umfasst dort alle Fälle — übernommen. Zeile „2010 und später“: ab 2021 neu errichtete Wohnungen liegen laut Fußnote deutlich höher als ausgewiesen. Einordnung in die Spanne über Wohnwertpunkte (Tabellen A-2 bis A-4, Abb. 1) — von der Rechenfunktion nicht abgebildet. Gilt nur für Wohnungen mit Bad und Sammelheizung (S. 5). Tabelle am gerenderten Bild abgelesen.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1899,
+     "label": "vor 1900"
+    },
+    {
+     "von": 1900,
+     "bis": 1949,
+     "label": "1900 bis 1949"
+    },
+    {
+     "von": 1950,
+     "bis": 1969,
+     "label": "1950 bis 1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1989,
+     "label": "1970 bis 1989"
+    },
+    {
+     "von": 1990,
+     "bis": 2009,
+     "label": "1990 bis 2009"
+    },
+    {
+     "von": 2010,
+     "bis": null,
+     "label": "2010 und später"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "bis_inkl": false,
+     "label": "< 45 m²"
+    },
+    {
+     "von": 45,
+     "bis": 65,
+     "bis_inkl": false,
+     "label": "45 bis < 65 m²"
+    },
+    {
+     "von": 65,
+     "bis": 85,
+     "bis_inkl": false,
+     "label": "65 bis < 85 m²"
+    },
+    {
+     "von": 85,
+     "bis": null,
+     "label": "85 m² und größer"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.73,
+    "mittel": 6.71,
+    "oben": 8.6,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.14,
+    "mittel": 7.78,
+    "oben": 9.54,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.82,
+    "mittel": 7.37,
+    "oben": 9.4,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.48,
+    "mittel": 6.65,
+    "oben": 8.15,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.04,
+    "mittel": 6.83,
+    "oben": 7.92,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.95,
+    "mittel": 6.68,
+    "oben": 7.81,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.73,
+    "mittel": 6.75,
+    "oben": 8.46,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5.37,
+    "mittel": 6.74,
+    "oben": 8.78,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 5.76,
+    "mittel": 7.18,
+    "oben": 8.85,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.8,
+    "mittel": 6.66,
+    "oben": 7.77,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 4.93,
+    "mittel": 6.43,
+    "oben": 8.19,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 7.22,
+    "mittel": 8.09,
+    "oben": 8.74,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 5.31,
+    "mittel": 6.26,
+    "oben": 7.34,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.19,
+    "mittel": 6,
+    "oben": 7.03,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 4.89,
+    "mittel": 5.92,
+    "oben": 7.18,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 4.68,
+    "mittel": 6,
+    "oben": 7.55,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 4.99,
+    "mittel": 6.25,
+    "oben": 8.46,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 5.22,
+    "mittel": 6.65,
+    "oben": 8.22,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 5.09,
+    "mittel": 6.42,
+    "oben": 8.07,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 5.36,
+    "mittel": 7.1,
+    "oben": 8.48,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "unten": 7.56,
+    "mittel": 9.55,
+    "oben": 11.56,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 7.54,
+    "mittel": 9.14,
+    "oben": 9.93,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 7.44,
+    "mittel": 9.43,
+    "oben": 10.02,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 8.36,
+    "mittel": 9.65,
+    "oben": 10.41,
+    "seite": "9"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1909,
+    "wfl": 82.3
+   },
+   "erwartet": {
+    "unten": 5.73,
+    "mittel": 6.75,
+    "oben": 8.46
+   },
+   "seite": "11",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Tabellenfeld des Beispiels; Spanneneinordnung über Wohnwertpunkte (6,75–7,61 €) nicht abgebildet"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 90
+   },
+   "erwartet": {
+    "unten": 7.22,
+    "mittel": 8.09,
+    "oben": 8.74
+   },
+   "seite": "9",
+   "art": "tabellenzelle"
+  }
+ ]
+}

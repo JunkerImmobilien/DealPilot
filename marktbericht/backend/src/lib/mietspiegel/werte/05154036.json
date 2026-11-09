@@ -1,0 +1,369 @@
+{
+ "ags": "05154036",
+ "gemeinde": "Kleve",
+ "art": "einfach",
+ "stand": "2025-08-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-08-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.kleve.de/system/files/2025-08/Mietspiegel%20Stadt%20Kleve%202025.pdf",
+  "dokument": "Mietspiegel für die Stadt Kleve — Richtlinien für die Miete des nicht preisgebundenen Wohnraumes, Stand 01. August 2025, Stadtverwaltung Kleve mit Haus und Grundbesitzerverein Kreis Kleve, Mieterverein Wesel-Bocholt-Kleve und Gutachterausschuss im Kreis Kleve",
+  "seite": "S. 6 von 6 (Tabelle Richtwerte, PDF-S. 7), S. 3–5 (Erläuterungen, Wohnlage, Zu- und Abschläge)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; Herausgeber Stadtverwaltung Kleve",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Tabelle führt je Feld nur einen Richtwert (R) ohne Spanne → nur mittel. Richtwerte gelten für normale Wohnlage; gute Wohnlage = Zuschlag 5 % (Gruppe I) bzw. 3 % (ab Gruppe II); für die einfache Wohnlage nennt das Dokument keinen Betrag → kein Wert. Gilt ab 35 m² (S. 3 A.1; Tabelle „über 35 bis 55 m²“). Zuschläge mit Spannen (EFH 10–25 %, Garten 5–10 %, KfW 40 bis 25 %, Keller 3–5 %, Fahrstuhl 3–5 %) nicht abgebildet; laut Dokument darf durch Zuschläge in Gruppe I–IV keine höhere Miete als in Gruppe V entstehen (von der Rechenfunktion nicht geprüft).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1989,
+     "label": "Gruppe I: bis 31.12.1989"
+    },
+    {
+     "von": 1990,
+     "bis": 1999,
+     "label": "Gruppe II: 1990–1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "label": "Gruppe III: 2000–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2019,
+     "label": "Gruppe IV: 2010–2019"
+    },
+    {
+     "von": 2020,
+     "bis": null,
+     "label": "Gruppe V: ab 2020"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 35,
+     "bis": 55,
+     "von_inkl": false,
+     "label": "A: über 35 bis 55 m²"
+    },
+    {
+     "von": 55,
+     "bis": 75,
+     "von_inkl": false,
+     "label": "B: über 55 bis 75 m²"
+    },
+    {
+     "von": 75,
+     "bis": 95,
+     "von_inkl": false,
+     "label": "C: über 75 bis 95 m²"
+    },
+    {
+     "von": 95,
+     "bis": null,
+     "von_inkl": false,
+     "label": "D: über 95 m²"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "normal",
+     "label": "normale Wohnlage",
+     "standard": true,
+     "aliase": [
+      "mittel",
+      "mittlere Wohnlage",
+      "normale Wohnlage"
+     ]
+    },
+    {
+     "schluessel": "gut",
+     "label": "gute Wohnlage (Zuschlag)",
+     "aliase": [
+      "gute Wohnlage"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "mittel": 6.6,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "mittel": 7.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "mittel": 8.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "mittel": 9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "mittel": 10.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "mittel": 6.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "mittel": 6.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "mittel": 7.8,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "mittel": 8.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "mittel": 9.85,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "mittel": 6.15,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "mittel": 6.6,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "mittel": 7.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "mittel": 8.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "mittel": 9.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "mittel": 6,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "mittel": 6.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "mittel": 7.35,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "mittel": 8.25,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "mittel": 9.25,
+    "seite": "6"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "lage:gut",
+    "art": "pct",
+    "wert": 5,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "gute Wohnlage in Gruppe I",
+    "bedingung": {
+     "baujahr_bis": 1989
+    }
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "pct",
+    "wert": 3,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "gute Wohnlage ab Gruppe II",
+    "bedingung": {
+     "baujahr_von": 1990
+    }
+   },
+   {
+    "merkmal": "passivhaus",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "Passivhaus (Gruppen IV und V)",
+    "bedingung": {
+     "baujahr_von": 2010
+    }
+   },
+   {
+    "merkmal": "waermepumpe",
+    "art": "pct",
+    "wert": 5,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "Wärmepumpe (Gruppen I bis IV)",
+    "bedingung": {
+     "baujahr_bis": 2019
+    }
+   },
+   {
+    "merkmal": "etagenheizung",
+    "art": "pct",
+    "wert": 5,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "Etagenheizung"
+   },
+   {
+    "merkmal": "separate_wasserzaehler",
+    "art": "pct",
+    "wert": 3,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "separate Wasserzähler (Gruppe I)",
+    "bedingung": {
+     "baujahr_bis": 1989
+    }
+   },
+   {
+    "merkmal": "fassadendaemmung",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "Fassadendämmung (Gruppe I)",
+    "bedingung": {
+     "baujahr_bis": 1989
+    }
+   },
+   {
+    "merkmal": "ohne_isolierverglasung",
+    "art": "pct",
+    "wert": -6,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "fehlende Fenster mit Isolierverglasung"
+   },
+   {
+    "merkmal": "ohne_zentralheizung",
+    "art": "pct",
+    "wert": -6,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "fehlende Zentralheizung"
+   },
+   {
+    "merkmal": "ohne_warmwasser",
+    "art": "pct",
+    "wert": -6,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "fehlende Warmwasserversorgung"
+   },
+   {
+    "merkmal": "ohne_bad_wc",
+    "art": "pct",
+    "wert": -10,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "kein Bad und WC in der Wohnung"
+   },
+   {
+    "merkmal": "ohne_dachdaemmung",
+    "art": "pct",
+    "wert": -6,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "fehlende Dachflächen- oder Speicherdämmung"
+   },
+   {
+    "merkmal": "ohne_kellerdaemmung",
+    "art": "pct",
+    "wert": -2,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "fehlende Kellerdämmung"
+   },
+   {
+    "merkmal": "fehlender_abstellraum",
+    "art": "pct",
+    "wert": -5,
+    "beleg": "S. 5–6 Abschnitt E/F",
+    "label": "fehlender Abstellraum"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1995,
+    "wfl": 60
+   },
+   "erwartet": {
+    "mittel": 6.9
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2021,
+    "wfl": 100
+   },
+   "erwartet": {
+    "mittel": 9.25
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 30
+   },
+   "erwartet": null,
+   "seite": "3",
+   "art": "tabellenzelle"
+  }
+ ]
+}
