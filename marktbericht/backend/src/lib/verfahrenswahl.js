@@ -97,8 +97,64 @@
    Sachwertfaktor). Weitere: Brandenburg (Kap. 8.2.3, „hier noch nicht
    erfasst"), Saarpfalz-Kreis, Augsburg. Die Ernte holt sie nach
    (Backlog N50). */
+/* ══ v3242 · ETW OHNE AMTLICHE GRUNDLAGE: DER VERGLEICHSWERT AUS ANGEBOTSPREISEN FUEHRT ════════
+   Entscheidung Marcel 09.11.2026 (DESAG-Sachverstaendiger): „Bei Eigentumswohnungen fuehrt das
+   Vergleichswertverfahren." Liegt keine kaufpreisbasierte amtliche Grundlage vor (Immobilienricht-
+   wert, amtlicher Vergleichsfaktor, Register-Vergleichsfaktor), fuehrt der Vergleichswert aus
+   ANGEBOTSPREISEN MINUS MARKTABSCHLAG - als bewusste Ausnahme von § 25 Abs. 1 ImmoWertV, immer
+   „indikativ, aus Angebotspreisen abgeleitet", mit dem Weg zum Gutachterausschuss.
+   Das ist das Gegenstueck zur LZS-Ausnahme vom 19.10.2026: dort gibt es IMMER einen Zins, damit der
+   Ertragswert rechnet; hier gibt es fuer typisches Wohnungseigentum IMMER ein fuehrendes Verfahren,
+   sobald eine Angebotsindikation mit Abschlag vorliegt. Gerechnet wird hier nichts: die Zahl ist
+   ValuationService.market_value.estimated (Angebotsmedian × Faktoren, minus Abschlag nach der
+   Rangfolge eigene Angabe > oertliche Messung > Marktdurchschnitt, lib/angebot_abschlag.js).
+
+   STUFE M („Markt": aus Angebotspreisen). Warum ein eigener Buchstabe und nicht N:
+     N  = DealPilot-Formel / -Landesmittel, abgeleitet aus AMTLICHEN Werten der Ausschuesse (−25)
+     M  = abgeleitet aus Angebotspreisen, also aus KEINER amtlichen Zahl, aber fuer diesen Ort (−30)
+     D  = gesetzlicher Auffangwert, weder amtlich-oertlich noch marktbezogen (−40)
+   N wuerde eine amtliche Herkunft behaupten, die Angebotspreise nicht haben. Der Abzug liegt deshalb
+   zwischen N und D. Die −30 sind eine DealPilot-Setzung, keine gesetzliche Zahl.
+   Nur typisches Wohnungseigentum (der istWohnung-Zweig unten): EFH/ZFH/MFH und Wohnungen in Objekten
+   mit hoechstens zwei Einheiten (Sachwert) bleiben unveraendert. */
+export const STUFE_ANGEBOT = 'M';
+export const ABZUG_ANGEBOT = 30;
+export const NAME_ANGEBOT = 'indikativ, aus Angebotspreisen abgeleitet';
+
+/** Belastbarkeit des Vergleichswerts aus Angebotspreisen (Stufe M), Schema wie ErtragswertService. */
+export function belastbarkeitAngebot() {
+  const pct = 100 - ABZUG_ANGEBOT;
+  return { pct, label: pct >= 80 ? 'Hoch' : pct >= 60 ? 'Mittel' : pct >= 40 ? 'Niedrig' : 'Sehr niedrig',
+    abzuege: ['Vergleichswert aus Angebotspreisen abgeleitet, nicht aus Kaufpreisen (Stufe M, −' + ABZUG_ANGEBOT + ')'] };
+}
+
+/** Kurzname der Abschlagsherkunft fuer den Kundentext - nie eine Datenquelle (Marcel 14.10.2026). */
+export function abschlagKurz(herkunft) {
+  const h = String(herkunft || '');
+  if (/^eigene/i.test(h)) return 'eigene Angabe';
+  if (/rtlich/.test(h)) return 'örtlich gemessen an den Kauffällen des Gutachterausschusses';
+  return 'aktueller Marktdurchschnitt';
+}
+
+/**
+ * Der Weg zum amtlichen Wert (Stufe M) - EIN Wortlaut fuer Bericht, PDF und KI-Fakten.
+ * @param {{stelle?:string, url?:string, email?:string, kosten?:string}} q  aus quelleFuer()/Kontaktdatei
+ */
+export function wegVergleichsfaktor(q = {}) {
+  const stelle = q.stelle || null;
+  return {
+    ausschuss: stelle, url: q.url || null, email: q.email || null, kosten: q.kosten || null,
+    /* Landestabelle (quelleFuer herkunft 'landestabelle'): die Stelle ist der Einstieg, nicht der Ausschuss selbst */
+    text: 'Genauer geht es mit einem amtlichen Vergleichsfaktor (§ 20 ImmoWertV) oder Immobilienrichtwert des zuständigen '
+      + 'Gutachterausschusses' + (stelle ? (q.landesebene ? ' (Einstieg über: ' + stelle + ')' : ' (' + stelle + ')') : '')
+      + ' — abgeleitet aus tatsächlichen Kaufpreisen. '
+      + 'Liegt er vor, rechnet der Bericht den Vergleichswert damit; eine Auskunft aus der Kaufpreissammlung '
+      + '(§ 195 BauGB) gibt die Geschäftsstelle.',
+  };
+}
+
 export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung = null,
-                                      vergleichsbasis = null }) {
+                                      vergleichsbasis = null, angebotswert = null }) {
   const s = String(objektart || '').toLowerCase();
   const we = Number(wohneinheiten);
   const eigen = /eigen|selbst/i.test(String(nutzung || ''));
@@ -135,6 +191,27 @@ export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung =
   if (istWohnung) {
     /* v1971: Das Vergleichswertverfahren fuehrt nur mit KAUFPREISEN. */
     if (vergleichsbasis !== 'kaufpreise') {
+      /* v3242 · Angebotsindikation MIT Abschlag liegt vor (angebotswert: { abschlag_pct, abschlag_herkunft })
+         -> der Vergleichswert fuehrt, indikativ, Stufe M. Ohne Abschlag (rohe Angebotspreise) nicht. */
+      const ab = angebotswert && typeof angebotswert === 'object' ? angebotswert : null;
+      if (ab && Number.isFinite(Number(ab.abschlag_pct)) && ab.abschlag_pct !== null) {
+        const pct = String(Number(ab.abschlag_pct)).replace('.', ',');
+        return {
+          verfahren: 'vergleichswert',
+          basis: 'angebote',
+          stufe: STUFE_ANGEBOT,
+          indikativ: true,
+          etikett: NAME_ANGEBOT,
+          grund: 'Für typisches Wohnungseigentum ist das Vergleichswertverfahren das richtige Verfahren (§ 6 Abs. 1 ImmoWertV). '
+            + 'Für dieses Objekt liegt kein anwendbarer amtlicher Vergleichsfaktor und kein anwendbarer Immobilienrichtwert des Gutachterausschusses vor. '
+            + 'Der Vergleichswert ist deshalb indikativ aus Angebotspreisen vergleichbarer Wohnungen abgeleitet, abzüglich '
+            + pct + ' % Abschlag zwischen Angebots- und Kaufpreisen (' + abschlagKurz(ab.abschlag_herkunft) + '). '
+            + 'Das ist eine bewusste Ausnahme: § 25 Abs. 1 ImmoWertV verlangt für das Vergleichswertverfahren Kaufpreise.',
+          quelle: '§ 6 Abs. 1, § 24 ImmoWertV · Vergleichspreise abweichend von § 25 Abs. 1 aus Angebotspreisen (Stufe M)',
+          weg: wegVergleichsfaktor().text,
+          belastbarkeit: belastbarkeitAngebot(),
+        };
+      }
       return {
         verfahren: null,
         fehlt: 'vergleichspreise',

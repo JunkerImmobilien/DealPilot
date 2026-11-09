@@ -304,7 +304,8 @@
       var mv = ((B.valuation || {}).market_value || {}).estimated;
       var ber = W[fu] != null ? W[fu] : null;
       var eig = zahl(fv('svwert'));
-      var namen = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' };
+      /* v3242 · Stufe M: der fuehrende Vergleichswert ohne amtliche Grundlage heisst, was er ist */
+      var namen = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: (vf.basis === 'angebote' ? 'Vergleichswert (indikativ, aus Angebotspreisen)' : 'Vergleichswert') };
       var alle = Object.keys(W).filter(function (x) { return W[x] != null; }).map(function (x) { return namen[x] + ' ' + eur(W[x]) + (x === fu ? ' (führend)' : ''); });
       if (zahl(mv) != null) alle.push('Marktpreisindikation ' + eur(zahl(mv)) + ' (Angebotspreise)');
       var a = ampelZahl(eig, ber, 5);
@@ -500,7 +501,7 @@
     /* Verkehrswert */
     var vf = cc.verfahrenswahl || {}, fu = String(vf.verfahren || ''), W = { ertragswert: zahl((cc.ertragswert || {}).value_eur), sachwert: zahl((cc.sachwert || {}).value_eur), vergleichswert: zahl((cc.comparison || {}).vergleichswert_eur) };
     var bW = W[fu], eW = zahl(fv('svwert'));
-    var name = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[fu];
+    var name = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: (vf.basis === 'angebote' ? 'indikativen Vergleichswert' : 'Vergleichswert') }[fu];   /* v3242 */
     if (bW && eW && pct(eW, bW) >= 10) H.push({ satz: 'Dein Markt-/Verkehrswert liegt ' + pct(eW, bW) + ' % ' + (eW > bW ? 'über' : 'unter') + ' dem ' + name + ' des Berichts (' + eur(bW) + ') — Finanzierung und Wertpuffer rechnen mit deinem Wert.' });
     return H;
   }

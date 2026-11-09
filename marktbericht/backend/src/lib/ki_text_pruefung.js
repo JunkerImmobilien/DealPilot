@@ -51,6 +51,14 @@ export function textFakten(p) {
     sachwert: sw ? num(sw.value_eur ?? sw.wert ?? sw.sachwert_eur) : null,
     vergleichswert: vw ? num(vw.vergleichswert_eur) : null,
   };
+  /* v3242 · Stufe M: fuehrt der Vergleichswert aus Angebotspreisen (ETW ohne amtliche Grundlage), ist er
+     dieselbe Zahl wie die Marktpreisindikation - als Vergleichswert benannt, damit Kopfzahl und Text
+     ihn als fuehrenden Wert pruefen. */
+  const _vwa = cc.verfahrenswahl || {};
+  if (im && !werte.vergleichswert && _vwa.verfahren === 'vergleichswert' && _vwa.basis === 'angebote'
+      && cc.comparison && cc.comparison.basis === 'angebote') {
+    werte.vergleichswert = num(cc.comparison.vergleichswert_eur);
+  }
   /* verhaeltnis[a][b] = (a / b - 1) * 100: „a liegt X % ueber/unter b". */
   const verhaeltnis = {};
   const keys = Object.keys(werte).filter((k) => werte[k]);

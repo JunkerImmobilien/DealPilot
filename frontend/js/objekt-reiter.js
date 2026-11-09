@@ -1152,7 +1152,10 @@
          Ausschusses dahintersteht; sonst traegt er den Zusatz
          „Angebotspreise" und wird als Indikation uebernommen. */
       var vg = Number(h.vergleichswert_eur);
-      if (isFinite(vg) && vg > 0) liste.push(Object.assign({}, basis, { wert: vg, art: 'Vergleichswert', amtlich: !!h.vergleichsfaktor_amtlich, fuehrend: fv === 'vergleichswert', trau: h.vergleichsfaktor_amtlich ? 'A' : 'I' }));
+      /* v3242 · Stufe M: fuehrt der Vergleichswert ohne amtliche Grundlage (ETW, aus Angebotspreisen
+         abgeleitet, Marcel 09.11.2026), traegt er Stufe M statt „Indikation" */
+      if (isFinite(vg) && vg > 0) liste.push(Object.assign({}, basis, { wert: vg, art: 'Vergleichswert', amtlich: !!h.vergleichsfaktor_amtlich, fuehrend: fv === 'vergleichswert',
+        trau: h.vergleichsfaktor_amtlich ? 'A' : (fv === 'vergleichswert' ? 'M' : 'I') }));
       /* v2255 · Der Marktwert im Verlauf ist der ROHE Wert aus Angebotspreisen
          (gemessen: Bericht 212, 246.000 €), die Karte zeigt ihn nach Abschlag
          (232.000 €). Hier ging bis v2254 der rohe Wert ins Feld - als
@@ -1190,7 +1193,7 @@
       /* v2255: der Marktwert heisst hier, was er ist - Marktwertindikation,
          mit dem Abschlag dahinter */
       var _art = h.art === 'Marktwert' ? 'Marktwertindikation'
-        : (h.art === 'Vergleichswert' && !h.amtlich ? 'Vergleichswert (Angebotspreise)' : (h.art || 'Marktwertindikation'));
+        : (h.art === 'Vergleichswert' && !h.amtlich ? (h.fuehrend ? 'Vergleichswert (indikativ, aus Angebotspreisen)' : 'Vergleichswert (Angebotspreise)') : (h.art || 'Marktwertindikation'));   /* v3242 */
       var _ab = (h.art === 'Marktwert' && h.abschlag > 0) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
       var _tr = _trauen(h.trau);
       return '<option value="' + i + '"' + _t + '>' + _art + ' · '
@@ -1232,6 +1235,8 @@
     /* v2401 · N zwischen C (Gold) und D (Rot): Statusfarbe, bewusst nicht tokenisiert */
     N: { buchst: 'N', kurz: 'DealPilot-Formel', farbe: '#B87A46', lang: 'Abgeleitet aus der DealPilot-Formel — aus den amtlichen Werten der Gutachterausschüsse gerechnet, nicht amtlich und nicht für diesen Ort ermittelt. Genauer: den Liegenschaftszinssatz des Ausschusses eintragen.' },
     D: { buchst: 'D', kurz: 'Auffangwert', farbe: '#B8625C', lang: 'Gesetzlicher Auffangwert (§ 256 BewG) — kein örtlicher Zins. Nur eine grobe Einordnung: trag den Liegenschaftszinssatz des Ausschusses ein.' },
+    /* v3242 · M zwischen N und D: aus Angebotspreisen, keine amtliche Zahl (Statusfarbe wie N, nicht tokenisiert) */
+    M: { buchst: 'M', kurz: 'aus Angebotspreisen', farbe: '#B87A46', lang: 'Vergleichswert indikativ aus Angebotspreisen vergleichbarer Wohnungen abgeleitet, abzüglich des Abschlags zwischen Angebots- und Kaufpreisen — kein amtlicher Wert. Genauer: mit einem amtlichen Vergleichsfaktor des Gutachterausschusses.' },
     E: { buchst: 'E', kurz: 'eigene Angabe', farbe: '#8a8378', lang: 'Mit deiner eigenen Angabe gerechnet.' },
     V: { buchst: '', kurz: 'vorläufig', farbe: '#B8625C', lang: 'Vorläufig — ohne Sachwertfaktor des Ausschusses (keine Marktanpassung). Trag den Sachwertfaktor ein, wenn du ihn hast.' },
     I: { buchst: '', kurz: 'Indikation', farbe: '#8a8378', lang: 'Indikation aus Angebotspreisen — kein Verfahren nach ImmoWertV.' }
