@@ -1,0 +1,229 @@
+{
+ "ags": "05162022",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet“ (Titelseite) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Meerbusch",
+ "art": "einfach",
+ "stand": "2025-07-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-07-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://hausundgrundddf.de/wp-content/uploads/2025/06/MS-Meerbusch-07-2025-s.pdf",
+  "dokument": "Mietspiegel für nicht preisgebundenen Wohnraum im Stadtgebiet Meerbusch, Stand 1. Juli 2025 (Haus und Grund und Mieterverein)",
+  "seite": "S. 4 (Tabelle IV mittlere Wohnlage), S. 2–3 (Wohnlage, Zu- und Abschläge III.2)",
+  "lizenz": "Titelseite: „Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet.“",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Tabelle nur nach Baujahr (mittlere Wohnlage), Mittelwert + Mietspanne. Zu-/Abschläge laut Dokument „auf den Mittelwert“; die Rechenfunktion wendet sie auf Mittel- und Spannenwerte an. Größe automatisch über wfl_klassen (bis 30 +20 %, bis 40 +15 %, bis 50 +10 %, bis 55 +5 %, ab 120 m² in MFH −5 %, ab 140 m² −10 %). Spannen-Zuschläge (EZFH 5–10 %, regenerative Energie 0,15–0,30 €, Büderich 2–8 %, Ossum-Bösinghoven 2–8 %) nicht abgebildet.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1960,
+     "label": "1949–1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1985,
+     "label": "1961–1985"
+    },
+    {
+     "von": 1986,
+     "bis": 1999,
+     "label": "1986–1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2014,
+     "label": "2000–2014"
+    },
+    {
+     "von": 2015,
+     "bis": null,
+     "label": "ab 2015"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 7.18,
+    "mittel": 9,
+    "oben": 10.82,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "unten": 6.26,
+    "mittel": 9.25,
+    "oben": 12.24,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "unten": 6.45,
+    "mittel": 9.71,
+    "oben": 12.97,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "unten": 7.18,
+    "mittel": 10.09,
+    "oben": 13,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "unten": 8.93,
+    "mittel": 11.92,
+    "oben": 14.91,
+    "seite": "4"
+   },
+   {
+    "baujahr": 5,
+    "unten": 11.15,
+    "mittel": 14.01,
+    "oben": 16.87,
+    "seite": "4"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "art": "pct",
+    "beleg": "S. 3 Nr. III.2 a/b",
+    "label": "Größenzu-/-abschlag",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": 30,
+      "wert": 20
+     },
+     {
+      "von": 30,
+      "von_inkl": false,
+      "bis": 40,
+      "wert": 15
+     },
+     {
+      "von": 40,
+      "von_inkl": false,
+      "bis": 50,
+      "wert": 10
+     },
+     {
+      "von": 50,
+      "von_inkl": false,
+      "bis": 55,
+      "wert": 5
+     },
+     {
+      "von": 120,
+      "bis": 140,
+      "bis_inkl": false,
+      "wert": -5
+     },
+     {
+      "von": 140,
+      "bis": null,
+      "wert": -10
+     }
+    ]
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 3 Nr. III.2",
+    "label": "gute Wohnlage",
+    "aliase": [
+     "gute Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "lage:einfach",
+    "art": "pct",
+    "wert": -10,
+    "beleg": "S. 3 Nr. III.2",
+    "label": "einfache Wohnlage",
+    "aliase": [
+     "einfache Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "uebernormale_sanitaerausstattung",
+    "art": "pct",
+    "wert": 5,
+    "beleg": "S. 3 Nr. III.2",
+    "label": "übernormale Sanitärausstattung"
+   },
+   {
+    "merkmal": "aufzug",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "beleg": "S. 3 Nr. III.2",
+    "label": "Aufzug"
+   },
+   {
+    "merkmal": "untergeschoss",
+    "art": "pct",
+    "wert": -20,
+    "beleg": "S. 3 Nr. III.2",
+    "label": "Untergeschosswohnung (Souterrain)"
+   },
+   {
+    "merkmal": "fehlender_abstellraum",
+    "art": "pct",
+    "wert": -5,
+    "beleg": "S. 3 Nr. III.2",
+    "label": "fehlender Abstellraum außerhalb der Wohnung"
+   },
+   {
+    "merkmal": "ohne_isolierverglasung",
+    "art": "eur_qm",
+    "wert": -0.35,
+    "beleg": "S. 3 Nr. III.2",
+    "label": "Wohnung ohne Isolierglasfenster"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 80
+   },
+   "erwartet": {
+    "unten": 6.45,
+    "mittel": 9.71,
+    "oben": 12.97
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2018,
+    "wfl": 90
+   },
+   "erwartet": {
+    "unten": 11.15,
+    "mittel": 14.01,
+    "oben": 16.87
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  }
+ ]
+}

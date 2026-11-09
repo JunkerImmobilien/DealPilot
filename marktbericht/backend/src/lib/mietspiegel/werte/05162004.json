@@ -1,0 +1,240 @@
+{
+ "ags": "05162004",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet“ (Titelseite) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Dormagen",
+ "art": "einfach",
+ "stand": "2023-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2023-01-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.hausundgrundneuss.de/fileadmin/neuss/media/pdfs/Mietspiegel_Dormagen_2023.pdf",
+  "dokument": "Mietspiegel für nicht preisgebundenen Wohnraum im Stadtgebiet Dormagen, Stand 1. Januar 2023, Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e.V. und Mieterverein",
+  "seite": "S. 4 (Tabelle III mittlere Wohnlage), S. 2–3 (Wohnlage, Zu- und Abschläge)",
+  "lizenz": "Titelseite: „Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet.“",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Stand 1. Januar 2023 — laut Verzeichnis aktuelle Ausgabe; Nachfolger prüfen. Tabelle nur nach Baujahr (mittlere Wohnlage, MFH-Standardwohnung), Mittelwert + Mietspanne. Größenzuschläge (bis 30 m² +20 %, bis 40 +15 %, bis 60 +5 %) und Abschlag über 95 m² in MFH (−7 %) automatisch über wfl_klassen. Lage gut +10 % / einfach −10 %. Zuschläge laut Dokument „in der Regel vom Mittelwert“; die Rechenfunktion wendet % auf Mittel- und Spannenwerte an.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1960,
+     "label": "1949–1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1969,
+     "label": "1961–1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1979,
+     "label": "1970–1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1989,
+     "label": "1980–1989"
+    },
+    {
+     "von": 1990,
+     "bis": 1999,
+     "label": "1990–1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "label": "2000–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2019,
+     "label": "2010–2019"
+    },
+    {
+     "von": 2020,
+     "bis": null,
+     "label": "ab 2020"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 5.9,
+    "mittel": 6.28,
+    "oben": 6.66,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "unten": 6.73,
+    "mittel": 7.38,
+    "oben": 8.03,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "unten": 6.91,
+    "mittel": 7.55,
+    "oben": 8.19,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "unten": 6.91,
+    "mittel": 7.7,
+    "oben": 8.49,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "unten": 7.28,
+    "mittel": 8.1,
+    "oben": 8.92,
+    "seite": "4"
+   },
+   {
+    "baujahr": 5,
+    "unten": 7.52,
+    "mittel": 8.4,
+    "oben": 9.28,
+    "seite": "4"
+   },
+   {
+    "baujahr": 6,
+    "unten": 8.75,
+    "mittel": 9.5,
+    "oben": 10.25,
+    "seite": "4"
+   },
+   {
+    "baujahr": 7,
+    "unten": 9.55,
+    "mittel": 10.34,
+    "oben": 11.13,
+    "seite": "4"
+   },
+   {
+    "baujahr": 8,
+    "unten": 10.19,
+    "mittel": 11,
+    "oben": 11.81,
+    "seite": "4"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "art": "pct",
+    "beleg": "S. 3 Nr. II a/b",
+    "label": "Größenzu-/-abschlag",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": 30,
+      "wert": 20
+     },
+     {
+      "von": 30,
+      "von_inkl": false,
+      "bis": 40,
+      "wert": 15
+     },
+     {
+      "von": 40,
+      "von_inkl": false,
+      "bis": 60,
+      "wert": 5
+     },
+     {
+      "von": 95,
+      "von_inkl": false,
+      "bis": null,
+      "wert": -7
+     }
+    ]
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 3 Nr. II",
+    "label": "gute Wohnlage",
+    "aliase": [
+     "gute Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "lage:einfach",
+    "art": "pct",
+    "wert": -10,
+    "beleg": "S. 3 Nr. II",
+    "label": "einfache Wohnlage",
+    "aliase": [
+     "einfache Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "einfamilienhaus",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 3 Nr. II",
+    "label": "Wohnung in EFH/ZFH"
+   },
+   {
+    "merkmal": "ohne_isolierverglasung",
+    "art": "pct",
+    "wert": -5,
+    "beleg": "S. 3 Nr. II",
+    "label": "ohne isolierverglaste Fenster"
+   },
+   {
+    "merkmal": "untergeschoss",
+    "art": "pct",
+    "wert": -15,
+    "beleg": "S. 3 Nr. II",
+    "label": "Untergeschosswohnung"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 75
+   },
+   "erwartet": {
+    "unten": 6.91,
+    "mittel": 7.7,
+    "oben": 8.49
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 9.55,
+    "mittel": 10.34,
+    "oben": 11.13
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  }
+ ]
+}
