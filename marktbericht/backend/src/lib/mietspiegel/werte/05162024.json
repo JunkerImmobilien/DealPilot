@@ -1,0 +1,283 @@
+{
+ "ags": "05162024",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet“ (Titelseite) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Neuss",
+ "art": "einfach",
+ "stand": "2026-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.mieterverein-duesseldorf.de/fileadmin/user_upload/redaktion/duesseldorf-2025/Downloads/Mietspiegel/Mietspiegel_Neuss_2026.pdf",
+  "dokument": "Mietspiegel für nicht preisgebundenen Wohnraum im Stadtgebiet Neuss, Stand 01.01.2026, Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e.V. und Mieterverein Düsseldorf e.V. (Mieterbüro Neuss)",
+  "seite": "S. 4 (Tabelle III mittlere Wohnlage), S. 2 (Wohnlage ±10 %), S. 3 (Zu- und Abschläge)",
+  "lizenz": "Titelseite: „Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet.“",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Tabelle nur nach Baujahr (mittlere Wohnlage, Bezug 56–119 m²), Mittelwert + Mietspanne. Größenzu-/-abschläge (bis 30 m² +20 %, bis 40 +15 %, bis 50 +10 %, bis 55 +5 %, ab 120 m² −5 %, ab 140 m² −10 % — Abschläge nicht für Einfamilienhäuser) automatisch über wfl_klassen. Lage gut +10 %, einfach −10 % (S. 2). Zuschläge laut Dokument „in der Regel vom Mittelwert“; die Rechenfunktion wendet % auf Mittel- und Spannenwerte an. Spannen-Zuschläge (Einfamilienhaus 5–10 %, Sanitär 1–6 %, regenerative Energie 0,15–0,30 €, Souterrain 0–20 %) nicht abgebildet. PDF-URL aus dem Verzeichnis (Mieterverein Düsseldorf); Herausgeber sind die Vereine, nicht die Stadt.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1959,
+     "label": "1949–1959"
+    },
+    {
+     "von": 1960,
+     "bis": 1974,
+     "label": "1960–1974"
+    },
+    {
+     "von": 1975,
+     "bis": 1984,
+     "label": "1975–1984"
+    },
+    {
+     "von": 1985,
+     "bis": 1989,
+     "label": "1985–1989"
+    },
+    {
+     "von": 1990,
+     "bis": 1999,
+     "label": "1990–1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "label": "2000–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2019,
+     "label": "2010–2019"
+    },
+    {
+     "von": 2020,
+     "bis": null,
+     "label": "ab 2020"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 7.07,
+    "mittel": 7.8,
+    "oben": 8.53,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "unten": 7.3,
+    "mittel": 7.85,
+    "oben": 8.4,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "unten": 7.4,
+    "mittel": 8,
+    "oben": 8.6,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "unten": 7.56,
+    "mittel": 8.3,
+    "oben": 9.04,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "unten": 7.87,
+    "mittel": 8.5,
+    "oben": 9.13,
+    "seite": "4"
+   },
+   {
+    "baujahr": 5,
+    "unten": 8.88,
+    "mittel": 9.67,
+    "oben": 10.46,
+    "seite": "4"
+   },
+   {
+    "baujahr": 6,
+    "unten": 9.03,
+    "mittel": 9.78,
+    "oben": 10.53,
+    "seite": "4"
+   },
+   {
+    "baujahr": 7,
+    "unten": 10.41,
+    "mittel": 11.33,
+    "oben": 12.25,
+    "seite": "4"
+   },
+   {
+    "baujahr": 8,
+    "unten": 11.76,
+    "mittel": 12.66,
+    "oben": 13.56,
+    "seite": "4"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "art": "pct",
+    "beleg": "S. 3 Nr. II.4 a/b",
+    "label": "Größenzu-/-abschlag",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": 30,
+      "wert": 20
+     },
+     {
+      "von": 30,
+      "von_inkl": false,
+      "bis": 40,
+      "wert": 15
+     },
+     {
+      "von": 40,
+      "von_inkl": false,
+      "bis": 50,
+      "wert": 10
+     },
+     {
+      "von": 50,
+      "von_inkl": false,
+      "bis": 55,
+      "wert": 5
+     },
+     {
+      "von": 120,
+      "bis": 140,
+      "bis_inkl": false,
+      "wert": -5
+     },
+     {
+      "von": 140,
+      "bis": null,
+      "wert": -10
+     }
+    ]
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 2 Nr. II.1",
+    "label": "gute Wohnlage",
+    "aliase": [
+     "gute Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "lage:einfach",
+    "art": "pct",
+    "wert": -10,
+    "beleg": "S. 2 Nr. II.1",
+    "label": "einfache Wohnlage",
+    "aliase": [
+     "einfache Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "alleinige_gartennutzung",
+    "art": "pct",
+    "wert": 5,
+    "beleg": "S. 3 Nr. II.4 a",
+    "label": "alleinige Gartennutzung in MFH"
+   },
+   {
+    "merkmal": "aufzug",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "beleg": "S. 3 Nr. II.4 a",
+    "label": "Aufzug"
+   },
+   {
+    "merkmal": "tuersprechanlage",
+    "art": "eur_qm",
+    "wert": 0.05,
+    "beleg": "S. 3 Nr. II.4 a",
+    "label": "Türsprechanlage (bis Baualtersklasse 1960–1974)",
+    "bedingung": {
+     "baujahr_bis": 1974
+    }
+   },
+   {
+    "merkmal": "fehlender_abstellraum",
+    "art": "pct",
+    "wert": -5,
+    "beleg": "S. 3 Nr. II.4 b",
+    "label": "fehlender Abstellraum außerhalb der Wohnung"
+   },
+   {
+    "merkmal": "ohne_beheizung",
+    "art": "eur_qm",
+    "wert": -2,
+    "beleg": "S. 3 Nr. II.4 b",
+    "label": "Wohnung ohne Beheizung"
+   },
+   {
+    "merkmal": "ohne_bad",
+    "art": "eur_qm",
+    "wert": -2,
+    "beleg": "S. 3 Nr. II.4 b",
+    "label": "Wohnung ohne Bad/Dusche"
+   },
+   {
+    "merkmal": "ohne_zentralheizung_und_bad",
+    "art": "eur_qm",
+    "wert": -3.3,
+    "beleg": "S. 3 Nr. II.4 b",
+    "label": "ohne zentrale Heizung und ohne Bad/Dusche"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 75
+   },
+   "erwartet": {
+    "unten": 7.4,
+    "mittel": 8,
+    "oben": 8.6
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2021,
+    "wfl": 90,
+    "lage": "mittel"
+   },
+   "erwartet": {
+    "unten": 11.76,
+    "mittel": 12.66,
+    "oben": 13.56
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  }
+ ]
+}

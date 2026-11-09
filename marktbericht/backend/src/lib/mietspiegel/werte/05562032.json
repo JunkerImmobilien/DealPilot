@@ -1,0 +1,224 @@
+{
+ "ags": "05562032",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Nachdruck, Vervielfältigung oder Wiedergabe jedweder Art, auch auszugsweise, ist nur mit Zustimmung des Herausgebers und unter Angabe des Herkunftsvermerkes gestattet“ (S. 3) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Recklinghausen",
+ "art": "einfach",
+ "stand": "2026-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://bso.gkd-re.de/bsointer320/redirect?mandant=320&netz=4&typ=2&id=11906",
+  "dokument": "Mietspiegel 2026 der Stadt Recklinghausen (Mietwerttabelle Stand 01.01.2026, Fortschreibung des Mietspiegels 2024), Herausgeber Stadt Recklinghausen",
+  "seite": "S. 6 (Mietwerttabelle Stand 01.01.2026), S. 4–5 (Erläuterungen, Zu-/Abschläge), S. 3 (Urheberrechtsvermerk)",
+  "lizenz": "S. 3: Schutz des Urheberrechtsgesetzes; Nachdruck, Vervielfältigung oder Wiedergabe nur mit Zustimmung des Herausgebers und unter Angabe des Herkunftsvermerkes",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Keine Größenklassen; Tabelle nach Baualtersklasse I–XI (mittlere Wohnlage, Ausstattung mit Heizung, Bad/WC und Isolierverglasung), Spanne + Mittelwert. Klassen II, V, VII = „modernisierte Wohnungen“ (Erläuterung S. 5: Bündel von mindestens drei Maßnahmen) → Ausstattung „modernisiert“; für 1981 und später gibt es keine modernisierte Klasse. Klasse I (bis 1947) gilt „mit Heizung und Bad/WC“ (ohne Isolierverglasung). Klasse XII (ab 2021) ohne Wert („Die Miete wird vom Markt geregelt“). Zu-/Abschläge laut S. 4–5 nur als „bis zu“ (Kleinwohnung bis 50 m² bis +5 %, ab 100 m² entsprechender Abschlag, Lage bis ±10 %, Doppelhaus/EFH bis 5/10 %, Barrierebündel bis 8 %) — nicht abgebildet; fest nur barrierefrei nach DIN 18040-2 +10 %.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1947,
+     "label": "I/II: bis 31.12.1947"
+    },
+    {
+     "von": 1948,
+     "bis": 1960,
+     "label": "III/V: 1948–1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1969,
+     "label": "IV/V: 1961–1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1980,
+     "label": "VI/VII: 1970–1980"
+    },
+    {
+     "von": 1981,
+     "bis": 1990,
+     "label": "VIII: 1981–1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2000,
+     "label": "IX: 1991–2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2010,
+     "label": "X: 2001–2010"
+    },
+    {
+     "von": 2011,
+     "bis": 2020,
+     "label": "XI: 2011–2020"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "standard",
+     "label": "nicht modernisiert (Klassen I, III, IV, VI, VIII–XI)",
+     "standard": true
+    },
+    {
+     "schluessel": "modernisiert",
+     "label": "modernisierte Wohnung (Klassen II, V, VII; Erläuterung S. 5)"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "ausstattung": "standard",
+    "unten": 4.95,
+    "mittel": 5.2,
+    "oben": 5.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "standard",
+    "unten": 5.7,
+    "mittel": 6,
+    "oben": 6.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "standard",
+    "unten": 5.85,
+    "mittel": 6.15,
+    "oben": 6.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "standard",
+    "unten": 6.4,
+    "mittel": 6.75,
+    "oben": 7.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "standard",
+    "unten": 6.85,
+    "mittel": 7.2,
+    "oben": 7.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "standard",
+    "unten": 7.05,
+    "mittel": 7.4,
+    "oben": 7.75,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "standard",
+    "unten": 7.65,
+    "mittel": 8.05,
+    "oben": 8.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "ausstattung": "standard",
+    "unten": 9.65,
+    "mittel": 10.15,
+    "oben": 10.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "modernisiert",
+    "unten": 5.8,
+    "mittel": 6.1,
+    "oben": 6.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "modernisiert",
+    "unten": 6.35,
+    "mittel": 6.7,
+    "oben": 7.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "modernisiert",
+    "unten": 6.35,
+    "mittel": 6.7,
+    "oben": 7.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "modernisiert",
+    "unten": 6.95,
+    "mittel": 7.3,
+    "oben": 7.65,
+    "seite": "6"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "barrierefrei_din_18040",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 4 Barrierefreiheit",
+    "label": "barrierefreie Wohnung nach DIN 18040-2"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.85,
+    "mittel": 6.15,
+    "oben": 6.45
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1955,
+    "wfl": 70,
+    "ausstattung": "modernisiert"
+   },
+   "erwartet": {
+    "unten": 6.35,
+    "mittel": 6.7,
+    "oben": 7.05
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2022,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "6",
+   "art": "tabellenzelle"
+  }
+ ]
+}
