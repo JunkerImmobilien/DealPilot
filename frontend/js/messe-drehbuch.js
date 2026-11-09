@@ -2602,7 +2602,7 @@
       async function (s) {   /* 2 · Miete eintragen (Mietausfall kommt nach) */
         reiter('s2'); await warte(600);
         await zeige(r6Gruppe('nkm'), 10);
-        var zb = r6Beginn(s, 'Erst die Miete', 'Im Reiter Miete: 900 € kalt — daran hängt der kalkulatorische Mietausfall.');
+        var zb = r6Beginn(s, 'Erst die Miete', 'Im Reiter Miete: 900 € kalt — daran hängen die Prozent-Werte und der Mietausfall aus dem Leerstand.');
         await tippeH('nkm', '900', 90);
         try { DealPilotInvestmentProfile.nachziehen('nkm'); } catch (e) {}
         await warte(1300);
@@ -2639,10 +2639,13 @@
         await r6Ende(zb);
         await b2oZeile(s, 'Nicht umlagefähig', 'Hausgeld-Anteil <b>' + eur(zahl('hg_nul')) + '</b> — darin steckt die WEG-Rücklage (' + eur(zahl('weg_r')) + ', nur zur Info, nicht doppelt gezählt). Eigene Rücklage für Bad, Küche, Böden: <b>' + eur(zahl('eigen_r')) + '</b>.');
       },
-      async function (s) {   /* 7 · Mietausfall */
-        await zeige(r6Gruppe('mietausfall'), 10);
-        var p = (function () { try { return DealPilotInvestmentProfile.get('mietausfall_pct'); } catch (e) { return null; } })();
-        await b2oZeile(s, 'Kalkulatorischer Mietausfall', '<b>' + eur(zahl('mietausfall')) + '</b> im Jahr' + (p ? ' — ' + r6Pz(p) + ' % der Jahreskaltmiete aus deinen Standardwerten' : '') + '. Eingetragen, sobald die Miete stand.');
+      async function (s) {   /* 7 · v3272: Mietausfall ist kein eigener Posten mehr - er kommt aus dem Leerstand (Reiter Miete) */
+        reiter('s2'); await warte(700);
+        var lg = r6Gruppe('leerstand'); var x = lg(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(lg, 10);
+        await b2oZeile(s, 'Und der Mietausfall?', 'Kein eigener Posten mehr: er kommt aus dem <b>Leerstand</b> im Reiter Miete — hier ' + r6Pz(wert('leerstand')) + ' % der Jahreskaltmiete, einmal in Cashflow und Steuer.');
+        reiter('s4'); await warte(700);
       },
       async function (s) {   /* 8 · Zusammenfassung */
         await zeige(function () { return q('#r-bwk') && q('#r-bwk').closest('.card'); }, 8);
@@ -2660,7 +2663,7 @@
         await r6Einstellungen('standardwerte');
         await zeige(r6Karte('.settings-modal', /^Bewirtschaftung$/), 8);
         var v = r6SwkWert(/^Bewirtschaftung$/, /^Verwaltung je/), i = r6SwkWert(/^Bewirtschaftung$/, /^Instandhaltung$/), h = r6SwkWert(/^Bewirtschaftung$/, /^ETW-Hausgeld$/), m = r6SwkWert(/^Bewirtschaftung$/, /^Mietausfall/);
-        await b2oZeile(s, 'Woher die Vorbelegung kommt', 'Einstellungen › <b>Standardwerte</b>: ETW-Hausgeld ' + (h || '–') + ', Mietausfall ' + (m || '–') + ' — für Häuser Verwaltung ' + (v || '–') + ', Instandhaltung ' + (i || '–') + '.', 600);
+        await b2oZeile(s, 'Woher die Vorbelegung kommt', 'Einstellungen › <b>Standardwerte</b>: ETW-Hausgeld ' + (h || '–') + ' — für Häuser Verwaltung ' + (v || '–') + ', Instandhaltung ' + (i || '–') + '.', 600);
         r6EinstellungenZu();
         await warte(600);
       }
