@@ -525,7 +525,7 @@
     if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
       u: 'zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f) — sonst höchstens ' + eur2(obergrenze) + '/m²' });
     /* v3158 · was hier gilt, am Objekt merken (Schnittstelle) - auch ohne Potenzial-Rechnung; nur fuer das Objekt selbst (i == null) */
-    try { if (!i && window.dpMarktdatenMerken) window.dpMarktdatenMerken({ kappung: kapp ? Object.assign({ ags: agsJetzt() }, kapp) : null, mietpreisbremse: br ? Object.assign({ ags: agsJetzt(), obergrenze_qm: obergrenze || null }, br) : null, vergleichsmiete: vglQm ? { qm: vglQm, herkunft: vglHer || null } : null }); } catch (e) {}
+    try { if (!i && window.dpMarktdatenMerken) window.dpMarktdatenMerken({ kappung: kapp ? Object.assign({ ags: agsJetzt() }, kapp) : null, mietpreisbremse: br ? Object.assign({ ags: agsJetzt(), obergrenze_qm: obergrenze || null }, br) : null, vergleichsmiete_genutzt: vglQm ? { qm: vglQm, herkunft: vglHer || null } : null }); } catch (e) {}   /* v3245: eigener Schluessel - unter 'vergleichsmiete' las objektVgl() die Marktmiete als amtlich zurueck */
     return { zeilen: z, bremse: br, obergrenze: obergrenze, kapp: kapp, vgl_qm: vglQm || null, vgl_herkunft: vglHer || null };   /* v3130: vgl fuer den Zielmiete-Vorschlag */
   }
 
@@ -758,6 +758,9 @@
   function amtlicheVgl() {
     var md = window._dpMarktdaten, v = md && md.vergleichsmiete;
     if (!v || !(zahl(v.qm) > 0)) return null;
+    /* v3245 · nur amtliche Arten (Mietspiegel, Mietpreisuebersicht). Ohne Art stammt der Eintrag aus v3158 (mietrecht()
+       merkte dort die GENUTZTE Vergleichsmiete, oft die Marktmiete) - gemessen 09.11.: Bismarckstr. 10,72 als „amtlich“. */
+    if (!VGL_ART[v.art]) return null;
     if (md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) return null;
     return v;
   }
