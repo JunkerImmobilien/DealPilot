@@ -271,6 +271,20 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
     } else if (f.typ === 'flag') {
       if (!merkmalWahr(objekt, f.merkmal)) continue;
       wert = num(f.werte);
+    } else if (f.typ === 'eingabe') {
+      /* v3261 · Betrag, den der Nutzer selbst aus einem Verzeichnis des Mietspiegels abliest (Rostock: Wohnlage je
+         Adresse in €/m²). merkmal 'lage' liest objekt.lage, sonst objekt.merkmale[merkmal]; Zahl mit Komma oder Punkt.
+         Außerhalb von von/bis (Spannweite des Verzeichnisses) kein Wert; fehlt die Angabe und ist pflicht gesetzt, auch nicht. */
+      const roh = f.merkmal === 'lage' ? objekt.lage : (objekt.merkmale && objekt.merkmale[f.merkmal]);
+      const v = (roh === true || roh === false) ? null : num(roh);
+      if (v === null) {
+        if (f.pflicht) return leer(hinweise.concat((f.label || f.merkmal) + ' nicht angegeben — ' + (f.hinweis_fehlt || 'der Mietspiegel braucht den Betrag, ohne Angabe kein Wert')));
+        continue;
+      }
+      const ev = num(f.von), eb = num(f.bis);
+      if ((ev !== null && v < ev) || (eb !== null && v > eb))
+        return leer(hinweise.concat((f.label || f.merkmal) + ' ' + zahlText(v, 2) + ' liegt außerhalb des Verzeichnisses (' + zahlText(ev, 2) + ' bis ' + zahlText(eb, 2) + ')'));
+      wert = v;
     } else continue;
     if (wert === null) continue;
     if (f.art === 'faktor') { const rb = f.rubrik || f.merkmal; jeRubrik[rb] = (jeRubrik[rb] || 1) * wert; if (wert !== 1) teile.push(was + ' × ' + zahlText(wert, 3)); }
@@ -353,7 +367,11 @@ export function mietspiegelMitWerten(satz, q, ordner) {
   q = q || {};
   if (w && (q.baujahr || q.wfl)) {
     const merkmale = {};
-    String(q.merkmale || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { merkmale[x] = true; });
+    /* 'a,b' setzt Schalter; 'name:wert' (v3261) übergibt eine Auswahl oder einen Betrag (Komma als Dezimalzeichen geht nicht, Punkt nehmen) */
+    String(q.merkmale || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => {
+      const i = x.indexOf(':');
+      if (i > 0) merkmale[x.slice(0, i).trim()] = x.slice(i + 1).trim(); else merkmale[x] = true;
+    });
     satz.werte = mietspiegelWerteFuer(w, { baujahr: q.baujahr, wfl: q.wfl, lage: q.lage || null, ausstattung: q.ausstattung || null, merkmale });
   }
   return satz;

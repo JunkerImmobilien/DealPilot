@@ -275,6 +275,8 @@ schreibt, muss nichts davon kennen.
 | `faktoren[].standard_label` | `regression`, Typ `lage` | Wortlaut des Hinweises „Lage nicht angegeben — … angenommen“ | Detmold „Wohnlage 2 (± 0,00 €)“ |
 | `faktoren[].rubrik`, `rundung_faktor` | `regression` | Produkt je Rubrik und Gesamtfaktor auf n Stellen runden | Leipzig: 3 |
 | `basis.ersatz` | `regression` | `[{ merkmal, eur_qm, label }]` — andere Basis, wenn das Merkmal gesetzt ist | Leipzig Ein-/Zweifamilienhaus 7,05 € |
+| `faktoren[].typ: "eingabe"` (v3261) | `regression` | Betrag (bzw. Prozent), den der Nutzer selbst aus einem Verzeichnis des Mietspiegels abliest; `merkmal: "lage"` liest `objekt.lage`, sonst `objekt.merkmale[merkmal]` (Zahl). Pflicht: `von`/`bis` = Spannweite des Verzeichnisses (außerhalb kein Wert); `pflicht: true` → ohne Angabe kein Wert, Text in `hinweis_fehlt`. Nur `art` `eur_qm`/`pct` | Rostock: Wohnlage je Adresse −1,25 … +2,83 €/m² |
+| Route `merkmale=name:wert` (v3261) | Route | neben Schaltern `a,b` auch `name:wert` für Auswahl-Merkmale und Beträge (Dezimalpunkt) | `merkmale=waermedaemmung:2_seit_2016,aufzug` |
 | `pruefbeispiele[].art` | alle | zusätzlich `rechenweg`: kein Zahlenbeispiel im Dokument, nach seinem Rechenweg aus den Tabellen gerechnet (mit `anmerkung`) | Leipzig |
 
 **Rechenreihenfolge (beide Formen):** Mittelwert = Basis bzw. Zellwert × Gesamtfaktor × (1 + Σ pct/100)
@@ -287,3 +289,8 @@ unten/oben-Werte und keine `spanne`, wird jeder der drei Werte für sich so gere
 **Demo-Orte mit Werten (09.11.2026):** Minden, Herford, Löhne, Hiddenhausen, Bad Oeynhausen (Bild-PDF,
 am Bild abgelesen), Dortmund (Tabelle), Bielefeld (Regression, als Tabelle veröffentlicht), Detmold und
 Leipzig (Regression). Hüllhorst hat keinen Mietspiegel (Verzeichnis `unklar`).
+
+**Regressions-Ernte 09.11.2026 (zweite Runde):** Dresden, Bremen, Mönchengladbach, Rostock (Wohnlage als
+`eingabe`), Gießen und weitere (`ls werte/`). **Speicherverbot im Dokument = keine Datei:** „ohne Genehmigung … in elektronischen Systemen zu speichern“
+(u. a. Stuttgart, Nürnberg, Mannheim, Augsburg, Braunschweig, Kiel, Freiburg, Halle, Chemnitz). Rechtevorbehalt
+ohne Speicherverbot → Datei mit `"freigabe": "gesperrt"`.
