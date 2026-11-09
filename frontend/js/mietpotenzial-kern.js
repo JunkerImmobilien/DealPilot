@@ -620,6 +620,16 @@
     else if (satz.zugang === 'auf_anfrage') t.push('auf Anfrage bei der Stadt');
     r.status = r.veraltet ? 'veraltet' : art;
     r.text = 'Mietspiegel der Gemeinde: ' + t.join(' · ');
+    /* v3266 · Speicherverbot (werte_nutzung 'verboten') bzw. Rechtevorbehalt ('vorbehalt', Werte nicht ausgeliefert):
+       klarer Hinweis statt „Werte eintragen“; bis zur Eingabe rechnet die DealPilot-Näherung, wo die Route sie anbietet. */
+    var bisDahin = satz.naeherung_verfuegbar ? 'DealPilot-Näherung' : 'Schätzung aus Angebotsmieten';
+    if (satz.werte_nutzung === 'verboten' || (satz.werte_nutzung === 'vorbehalt' && satz.werte_gesperrt === true)) {
+      r.nutzung = satz.werte_nutzung;
+      r.werte_hinweis = (satz.werte_nutzung === 'verboten'
+        ? 'Die Werte darf DealPilot nicht vorhalten (' + (satz.werte_nutzung_grund || 'Speicherung nur mit Genehmigung des Herausgebers') + ').'
+        : 'Die Werte darf DealPilot derzeit nicht ausliefern (Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt).')
+        + ' Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der ' + bisDahin + '.';
+    } else if (satz.naeherung_verfuegbar) r.werte_hinweis = 'Werte aus dem Mietspiegel eintragen — sonst rechnet DealPilot mit der DealPilot-Näherung';
     return r;
   }
   /**

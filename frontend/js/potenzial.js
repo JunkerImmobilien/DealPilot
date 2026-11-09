@@ -495,7 +495,7 @@
     var vEig = s.vgl_quelle_art === 'eigen';
     var vMs = vEig ? null : (s.ms || vgO.ms || null);
     var vHw = vEig ? [] : (s.vgl_hinweise || vgO.hinweise || []);
-    var vSchaetz = !vEig && (s.vgl_quelle_art || vgO.quelle_art) === 'angebot_abschlag';
+    var vSchaetz = !vEig && /^(angebot_abschlag|dealpilot_naeherung)$/.test(s.vgl_quelle_art || vgO.quelle_art || '');   /* v3266 */
     if (vglQm > 0) z.push({ k: 'Vergleichsmiete', v: eur2(vglQm) + '/m²' + (vMs ? ' · ' + vMs.wahl_text : ''),
       u: vglHer + (vHw.length ? ' · ' + vHw.join(' · ') : ''),
       warn: vSchaetz || !!(vMs && (vMs.veraltet || vMs.art !== 'qualifiziert' || vMs.genutzt === 'oben')), lang: vHw.join(' · '),
@@ -834,7 +834,7 @@
   }
   function msWerteFuer(wflW) {
     var g = agsJetzt(), reg = msRegister();
-    if (!g || !reg || !reg.werte_verfuegbar) return null;
+    if (!g || !reg || !(reg.werte_verfuegbar || reg.naeherung_verfuegbar)) return null;   /* v3266: auch für die Näherung */
     var bj = parseInt(wert('baujahr'), 10), fl = Math.round(zahl(wflW) * 100) / 100;
     if (!(bj > 1000)) return { unten: null, mittel: null, oben: null, hinweise: ['Baujahr fehlt — der Mietspiegel ordnet nach Baualter'] };
     if (!(fl > 0)) return { unten: null, mittel: null, oben: null, hinweise: ['Wohnfläche fehlt — der Mietspiegel ordnet nach Wohnungsgröße'] };
@@ -843,6 +843,7 @@
     if (!window.Auth || typeof Auth.apiCall !== 'function') return null;
     _msWerte[k] = Auth.apiCall('/marktbericht/mietspiegel?ags=' + encodeURIComponent(g) + '&baujahr=' + bj + '&wfl=' + fl, { method: 'GET' }).then(function (a) {
       _msWerte[k] = a && a.werte ? a.werte : null;
+      _msNz[k] = a && a.naeherung ? a.naeherung : null;   /* v3266 */
       if (agsJetzt() === g) msWerteNachladen();
     }).catch(function () { _msWerte[k] = null; });
     return null;
@@ -875,6 +876,19 @@
     if (ms && ms.quelle === 'register' && mw) ms.werte = mw;   /* Zelle/Rechnung/Hinweise der Register-Werte */
     return ms;
   }
+  /* v3266 · DealPilot-Näherung der ortsüblichen Vergleichsmiete (Rechnung NUR im mb-Backend, lib/mietspiegel/naeherung.js;
+     die Route liefert sie nur ohne verwendbare Mietspiegel-Werte). Nie gegen eine eigene Eingabe (zb_vgl_qm, ms_*). */
+  var _msNz = {};   /* 'ags|baujahr|wfl' -> naeherung | null */
+  function msNaeherung() {
+    var reg = msRegister();
+    if (!reg || reg.werte_verfuegbar || !reg.naeherung_verfuegbar) return null;
+    if (zahl(wert('zb_vgl_qm')) > 0 || zahl(wert('ms_unten')) > 0 || zahl(wert('ms_mittel')) > 0 || zahl(wert('ms_oben')) > 0) return null;
+    var fl = Math.round(zahl(msObjektWfl()) * 100) / 100, bj = parseInt(wert('baujahr'), 10);
+    if (!(bj > 1000) || !(fl > 0)) return null;
+    msWerteFuer(fl);   /* holt einmal je Gemeinde × Baujahr × Fläche */
+    var c = _msNz[agsJetzt() + '|' + bj + '|' + fl];
+    return c && c.qm > 0 ? c : null;
+  }
   function msWahl() { var w = wert('ms_wahl'); return K.MS_WAHL[w] ? w : 'oben'; }
   /* v3246 · Stufe des Abschlags Angebotsmiete -> Vergleichsmiete. Zahlen: config.js mieteAngebotAbschlag (EINE Stelle). */
   function mieteAbschlag() {
@@ -901,6 +915,9 @@
       return { qm: zahl(a.qm), art: a.art || 'amtlich', quelle_art: a.art || 'amtlich', qualifiziert: a.art === 'mietspiegel_qualifiziert', hinweise: [],
         herkunft: t + (a.quelle ? ' — ' + a.quelle : '') + ((a.datum || a.stand) ? ', Stand ' + deDatum(String(a.datum || a.stand).slice(0, 10)) : '') + (a.ausserhalb ? ', außerhalb der Tabelle' : '') };
     }
+    var nz = msNaeherung();   /* v3266 · Stufe N zwischen amtlicher Mietpreisübersicht und Schätzung aus Angebotsmieten */
+    if (nz) return { qm: nz.qm, herkunft: nz.text, art: 'dealpilot_naeherung', quelle_art: 'dealpilot_naeherung', schaetzung: true,
+      naeherung: nz, hinweise: (nz.hinweise || []).slice() };
     v = zahl(wert('ds2_marktmiete'));
     if (v > 0) {
       var s = K.vglAusAngebot(v, mieteAbschlag());
@@ -919,6 +936,7 @@
     if (qa === 'angebot_abschlag') return vg.angebot && vg.angebot.pct != null ? 'Schätzung: Angebotsmiete − ' + String(vg.angebot.pct).replace('.', ',') + ' %' : 'Schätzung aus Angebotsmieten';
     if (qa === 'mietpreisuebersicht') return 'amtliche Mietpreisübersicht';
     if (/^mietspiegel/.test(qa || '')) return 'Mietspiegel';
+    if (qa === 'dealpilot_naeherung') return 'DealPilot-Näherung';   /* v3266 */
     return '';
   }
   /* v3150 · der Teil der Soll-Miete nach § 558 (ohne Modernisierungsumlage § 559).
@@ -2710,7 +2728,7 @@
     var link = zr.url && /^https?:\/\//.test(zr.url) ? ' · <a href="' + esc(zr.url) + '" target="_blank" rel="noopener">Mietspiegel öffnen</a>' : '';
     var reg = msRegister(), regWerte = !!(reg && reg.werte_verfuegbar);   /* v3255: das Register führt die Werte selbst */
     return '<span' + (zr.veraltet || zr.status === 'unklar' ? ' style="color:#B8625C"' : '') + '>' + esc(zr.text) + '</span>' + link
-      + (zr.vorhanden && ohneWerte && !regWerte && !(zahl(wert('zb_vgl_qm')) > 0) ? '<br><b>' + esc(zr.werte_hinweis) + '</b>' : '') + '<br>'
+      + (zr.vorhanden && ohneWerte && !regWerte && !(zahl(wert('zb_vgl_qm')) > 0) ? (zr.nutzung ? ' — ' : '<br>') + '<b>' + esc(zr.werte_hinweis) + '</b>' : '') + '<br>'   /* v3266: Speicherverbot/Vorbehalt hinter dem Link */
       + (regWerte && msRegisterRechnet() ? msWerteHtml() : '');
   }
   /* v3255 · Zeile der Register-Werte: „Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 / 7,70 / 8,93 €/m²
@@ -2747,7 +2765,8 @@
     var a = el('ms_art'), o = a && a.options && a.options[0];
     if (o && o.value === '') o.text = v ? '— laut Verzeichnis: ' + zr.art + ' —' : '— nicht eingetragen —';
     ['ms_unten', 'ms_mittel', 'ms_oben'].forEach(function (id, i) {
-      var f = el(id); if (f && 'placeholder' in f) f.placeholder = v ? 'aus dem Mietspiegel' : ['z. B. 6,80', 'z. B. 7,60', 'z. B. 8,40'][i];
+      var f = el(id); if (f && 'placeholder' in f) f.placeholder = v ? (zr.nutzung ? 'bitte aus dem Mietspiegel eintragen' : 'aus dem Mietspiegel') : ['z. B. 6,80', 'z. B. 7,60', 'z. B. 8,40'][i];
+      if (f && 'title' in f) f.title = v && zr.nutzung ? zr.werte_hinweis : '';   /* v3266 · Fokus-Hinweis bei Speicherverbot/Vorbehalt */
     });
   }
   function msHinweis() {

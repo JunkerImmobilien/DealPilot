@@ -17,6 +17,7 @@ import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js'; 
 import { indexreihen } from '../lib/indexreihen.js';                             /* v3026 */
 import { mietspiegelFuer } from '../lib/mietspiegel/verzeichnis.js';              /* v3250 */
 import { mietspiegelMitWerten } from '../lib/mietspiegel/werte.js';               /* v3255 */
+import { mietspiegelMitNaeherung } from '../lib/mietspiegel/naeherung.js';       /* v3266 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
@@ -1052,13 +1053,20 @@ router.get('/bwk/ansaetze', (req, res) => {
 // Art, Stand, Gültigkeit, Vermutungsfrist, Link. Ohne Satz { art: null, gefunden: false, hinweis } mit dem Weg
 // (§ 558c Abs. 4 BGB: Pflicht ab 50.000 Einwohnern). Nur Datei, keine DB, kein Kontingent.
 // v3255: + werte_verfuegbar; mit &baujahr=&wfl= (&lage=&ausstattung=&merkmale=a,b) + werte { unten, mittel, oben, zelle, rechnung, hinweise }.
-router.get('/mietspiegel', (req, res) => {
+// v3266: + naeherung_verfuegbar; ohne verwendbare Werte mit &baujahr=&wfl= + naeherung { qm, text, rechnung, hinweise, ... }.
+router.get('/mietspiegel', async (req, res) => {
   try {
     const r = mietspiegelFuer(req.query.ags);
     if (!r) return res.status(400).json({ error: 'ags (8-stellig) erforderlich' });
     /* v3255 · Werte (lib/mietspiegel/werte/<ags>.json): werte_verfuegbar immer; mit baujahr und/oder wfl
        zusätzlich werte = mietspiegelWerteFuer(...) für dieses Objekt (außerhalb der Tabelle null mit Hinweis). */
-    res.json(mietspiegelMitWerten(r, req.query));
+    const satz = mietspiegelMitWerten(r, req.query);
+    /* v3266 · DealPilot-Näherung (lib/mietspiegel/naeherung.js) NUR ohne verwendbare Mietspiegel-Werte (keine Datei, gesperrt
+       und nicht ausgeliefert, Speicherverbot, kein/unklarer Mietspiegel) - aus der Zensus-Bestandsmiete der Gemeinde. */
+    await mietspiegelMitNaeherung(satz, req.query, (ags) => q(
+      "SELECT dimension, auspraegung, auspraegung_text, wert, gebiet_name FROM mb.zensus_werte WHERE ebene = 'gemeinde' AND kennzahl = 'nettokaltmiete_qm' AND ags = $1",
+      [ags]));
+    res.json(satz);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

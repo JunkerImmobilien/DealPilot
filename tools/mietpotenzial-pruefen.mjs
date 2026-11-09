@@ -26,6 +26,9 @@
      L  v3250 · Mietspiegel-Verzeichnis: Route-Funktion mietspiegelFuer() (Detmold qualifiziert, ohne Satz der Weg),
         Anzeige mietspiegelRegister() (qualifiziert/veraltet/keiner/unklar/fehlt), Register füllt Art/Stand/Link,
         Eingabe schlägt Register, keiner/ohne Werte -> keine Mietspiegel-Rechnung, fremde Gemeinde ignoriert
+     N  v3266 · DealPilot-Näherung (Zensus-Bestandsmiete, kalibriert an freien Mietspiegeln): Route nur ohne verwendbare
+        Werte; Rangfolge nach amtlicher Mietpreisübersicht, vor der Schätzung aus Angebotsmieten; nie gegen eigene Eingabe;
+        Hinweis bei Speicherverbot/Rechtevorbehalt (#ms-hinweis, Platzhalter der ms_*-Felder)
    RC=0 sauber, RC=1 Abweichung. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -689,5 +692,107 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('M6 Quelle je Wohnung: qualifizierter Mietspiegel', m.wohnungen.map((w) => w.soll && w.soll.vgl_quelle_art), ['mietspiegel_qualifiziert', 'mietspiegel_qualifiziert']);
 }
 
-console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255): ' + (n - fehler) + ' von ' + n + ' ok');
+/* ── N · v3266 · DealPilot-Näherung der Vergleichsmiete (Zensus, kalibriert an freien Mietspiegeln) und Hinweis bei Speicherverbot ── */
+{
+  const imp = (d) => import(new URL('file:///' + path.join(WURZEL, 'marktbericht/backend/src/lib/mietspiegel', d).replace(/\\/g, '/')).href);
+  const { mietspiegelFuer } = await imp('verzeichnis.js');
+  const { mietspiegelMitWerten, werteLaden } = await imp('werte.js');
+  const { mietspiegelMitNaeherung, naeherungFuer, naeherungParameter, naeherungText } = await imp('naeherung.js');
+  const P0 = naeherungParameter();
+  wahr('N0 naeherung.json kalibriert (Modell, Faktor, n, Güte)', P0 && P0.modell && P0.faktor > 0 && P0.n_staedte >= 20 && P0.guete && P0.guete.mape_pct > 0);
+  /* Kalibrierung NUR aus freien Wertedateien: keine gesperrte, keine mit Speicherverbot */
+  const W = werteLaden().jeAgs;
+  const VZ = JSON.parse(fs.readFileSync(path.join(WURZEL, 'marktbericht/backend/src/lib/mietspiegel/verzeichnis.json'), 'utf8')).saetze;
+  const verboten = new Set(VZ.filter((s) => s.werte_nutzung === 'verboten').map((s) => s.ags));
+  wahr('N0 Kalibrierung nur freie Mietspiegel (keine gesperrte Datei, kein Speicherverbot)', P0.kalibrierung.every((k) => W.get(k.ags) && W.get(k.ags).freigabe !== 'gesperrt' && !verboten.has(k.ags)));
+  /* fester Zensus-Ausschnitt (erfunden): gesamt 10,00, Baujahr 1970-1979 9,00, 60-79 m² 11,00 -> Basis 9,90 */
+  const ZEILEN = [{ dimension: 'gesamt', auspraegung: 'INSGESAMT', wert: 10, gebiet_name: 'Prüfstadt' },
+    { dimension: 'baujahr', auspraegung: 'BAU1970B1979', auspraegung_text: '1970 - 1979', wert: 9 },
+    { dimension: 'baujahr', auspraegung: 'BAU2016BXXXX', auspraegung_text: '2016 und später', wert: 14 },
+    { dimension: 'flaeche', auspraegung: 'WFL060B079', auspraegung_text: '60 - 79 m²', wert: 11 }];
+  const soll = Math.round(9 * 11 / 10 * P0.faktor * 100) / 100;
+  const holen = async () => ZEILEN;
+  const route = async (q) => mietspiegelMitNaeherung(mietspiegelMitWerten(mietspiegelFuer(q.ags), q), q, holen);   /* = GET /mietspiegel */
+  let a = await route({ ags: '08111000', baujahr: '1975', wfl: '70' });   /* Stuttgart: Speicherverbot, keine Wertedatei */
+  gleich('N1 Route Speicherverbot (Stuttgart): keine Werte, Näherung = Faktor × 9 × 11 / 10', [a.werte_verfuegbar, a.naeherung_verfuegbar, a.werte_nutzung, a.naeherung.qm, a.naeherung.quelle_art],
+    [false, true, 'verboten', soll, 'dealpilot_naeherung']);
+  wahr('N1 Rechenweg nennt Zensus, Klassen und Faktor', /Zensus 2022 Bestandsmiete der Gemeinde 10,00/.test(a.naeherung.rechnung) && /1970 - 1979: 9,00/.test(a.naeherung.rechnung) && /Kalibrierfaktor/.test(a.naeherung.rechnung));
+  gleich('N1 Wortlaut der Herkunft', a.naeherung.text, 'DealPilot-Näherung der ortsüblichen Vergleichsmiete (aus der Zensus-Bestandsmiete, kalibriert an ' + P0.n_staedte
+    + ' freien Mietspiegeln; mittlere Abweichung ' + P0.guete.mape_pct.toFixed(1).replace('.', ',') + ' %) — nicht der Mietspiegel; für das Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen');
+  wahr('N1 ohne Portal- oder Anbieternamen', !/Scout|Immowelt|immonet|PriceHubble|Sprengnetter|BBSR/i.test(JSON.stringify(a.naeherung)));
+  a = await route({ ags: '05711000', baujahr: '2030', wfl: '70' });   /* Bielefeld: freie Werte, Baujahr außerhalb */
+  gleich('N2 freie Werte (Bielefeld), auch außerhalb der Tabelle: nie Näherung', [a.werte_verfuegbar, a.naeherung_verfuegbar, a.naeherung], [true, false, undefined]);
+  a = await route({ ags: '05770024', baujahr: '1972', wfl: '50' });
+  gleich('N3 gesperrt auf Staging (Werte ausgeliefert): keine Näherung', [a.werte_verfuegbar, a.naeherung_verfuegbar, a.naeherung], [true, false, undefined]);
+  a = await route({ ags: '05770024', baujahr: '1972', wfl: '50', nur_frei: '1' });
+  gleich('N3 gesperrt auf Prod (nur_frei): Näherung, Werte zurückgehalten', [a.werte_verfuegbar, a.werte_gesperrt, a.naeherung_verfuegbar, a.naeherung.qm > 0], [false, true, true, true]);
+  a = await route({ ags: '08111000' });
+  gleich('N3 ohne Baujahr/Fläche: nur naeherung_verfuegbar', [a.naeherung_verfuegbar, a.naeherung], [true, undefined]);
+  let r = naeherungFuer(P0, [], { baujahr: 1975, wfl: 70 });
+  wahr('N4 ohne Zensuswert: kein Wert (nie Kreis, nie Land)', r.qm === null && /keine Zensus-Bestandsmiete/.test(r.hinweise.join(' ')));
+  r = naeherungFuer(P0, ZEILEN, { baujahr: 1955, wfl: 70 });
+  gleich('N4 Baujahresklasse ohne Zensuswert: Miete aller Baujahre, mit Hinweis', [r.qm, r.hinweise.some((h) => /Baujahresklasse keinen Wert/.test(h))], [Math.round(10 * 11 / 10 * P0.faktor * 100) / 100, true]);
+  gleich('N4 Baujahr 2020 in der offenen Klasse „2016 und später“', naeherungFuer(P0, ZEILEN, { baujahr: 2020, wfl: 70 }).qm, Math.round(14 * 11 / 10 * P0.faktor * 100) / 100);
+  gleich('N4 Text-Funktion = Route', naeherungText(P0), naeherungFuer(P0, ZEILEN, { baujahr: 1975, wfl: 70 }).text);
+
+  /* Wirkung in potenzial.js (Rangfolge objektVgl) */
+  const cfgText = fs.readFileSync(JS('config.js'), 'utf8').replace(/\r\n/g, '\n');
+  const cm = /\n    mieteAngebotAbschlag: (\{[\s\S]*?\n    \}),/.exec(cfgText);
+  const CFG = { DealPilotConfig: { mieteAngebotAbschlag: cm ? vm.runInNewContext('(' + cm[1] + ')') : { stufen: {} } } };
+  const rufe = [];
+  async function lauf(feld, ags, q0) {
+    const c = fenster(feld);
+    const satz = await mietspiegelMitNaeherung(mietspiegelMitWerten(mietspiegelFuer(ags), q0 || {}), q0 || {}, holen);
+    Object.assign(c, CFG, { _dpMarktdaten: { mietspiegel_register: { ags, satz } } });
+    c.Auth = { apiCall(url) { rufe.push(url); const q = Object.assign({}, q0 || {}, Object.fromEntries(new URL('http://x' + url).searchParams)); return route(q).then((x) => JSON.parse(JSON.stringify(x))); } };
+    const F = feld || {}, EL = {};
+    c.document.getElementById = (id) => (id in F ? (EL[id] = EL[id] || { value: F[id], innerHTML: '', placeholder: '', title: '', addEventListener() {}, dispatchEvent() {} }) : null);
+    c._dpPotenzial = { ags, plz: F.plz };
+    lade(c, JS('mietpotenzial-kern.js')); lade(c, JS('potenzial.js'));
+    await c.DpPotenzial.kappungLaden();
+    c.DpPotenzial._el = EL;
+    return c.DpPotenzial;
+  }
+  const warte = () => new Promise((res) => setTimeout(res, 0));
+  const EIN1 = [{ nr: '1', wfl: '70', ist: '420', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' }];
+  let P = await lauf({ plz: '70173', baujahr: '1975', wfl: '70', ds2_marktmiete: '14', 'ms-hinweis': '', ms_unten: '', ms_mittel: '', ms_oben: '' }, '08111000');
+  P.modell(); await warte(); await warte();
+  let m = P.modell({ einheiten: EIN1 });
+  gleich('N5 Rangfolge: ohne Mietspiegel-Werte rechnet die Näherung (vor der Schätzung aus Angebotsmieten)', [m.vgl.qm, m.vgl.quelle_art, m.vgl.marktmiete, P.vglKurz(m.vgl)], [soll, 'dealpilot_naeherung', undefined, 'DealPilot-Näherung']);
+  gleich('N5 Herkunft = Wortlaut der Route', m.vgl.herkunft, naeherungText(P0));
+  wahr('N5 Abruf mit Baujahr und Fläche über den Proxy', rufe.some((u) => /^\/marktbericht\/mietspiegel\?ags=08111000&baujahr=1975&wfl=70$/.test(u)));
+  P.msHinweis();
+  const txt = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '').replace(/&nbsp;| /g, ' ');
+  wahr('N6 #ms-hinweis bei Speicherverbot: „… · Mietspiegel öffnen — Die Werte darf DealPilot nicht vorhalten (Speicherung nur mit Genehmigung des Herausgebers). Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung.“',
+    /^Mietspiegel der Gemeinde: qualifiziert \(§ 558d BGB\) · Stand 04\/2024 · gilt bis 31\.12\.2026 · Mietspiegel öffnen — Die Werte darf DealPilot nicht vorhalten \(Speicherung nur mit Genehmigung des Herausgebers\)\. Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(txt));
+  wahr('N6 darunter: „Gerechnet wird mit … — DealPilot-Näherung …“', /Gerechnet wird mit .*\/m² — DealPilot-Näherung der ortsüblichen Vergleichsmiete/.test(txt));
+  gleich('N6 Felder unten/mittel/oben: Platzhalter und Fokus-Hinweis', [P._el.ms_oben.placeholder, /^Die Werte darf DealPilot nicht vorhalten/.test(P._el.ms_oben.title || '')], ['bitte aus dem Mietspiegel eintragen', true]);
+  P = await lauf({ plz: '70173', baujahr: '1975', wfl: '70', ds2_marktmiete: '14', ms_oben: '9,80' }, '08111000');
+  P.modell(); await warte(); await warte();
+  m = P.modell({ einheiten: EIN1 });
+  gleich('N7 eigene Mietspiegel-Eingabe schlägt die Näherung', [m.vgl.qm, m.vgl.quelle_art], [9.8, 'mietspiegel_qualifiziert']);
+  P = await lauf({ plz: '70173', baujahr: '1975', wfl: '70', ds2_marktmiete: '14', zb_vgl_qm: '8,20' }, '08111000');
+  P.modell(); await warte(); await warte();
+  m = P.modell({ einheiten: EIN1 });
+  gleich('N7 eigene Vergleichsmiete schlägt die Näherung', [m.vgl.qm, m.vgl.quelle_art], [8.2, 'eigen']);
+  P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12' }, '05770024');
+  P.modell(); await warte(); await warte();
+  m = P.modell();
+  gleich('N8 freie (bzw. auf Staging ausgelieferte) Werte: Mietspiegel, nie Näherung', [m.vgl.quelle_art, m.vgl.qm], ['mietspiegel_qualifiziert', 8.93]);
+  P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12', 'ms-hinweis': '' }, '05770024', { nur_frei: '1' });
+  P.modell(); await warte(); await warte();
+  m = P.modell();
+  P.msHinweis();
+  const t2 = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '');
+  gleich('N9 Vorbehalt auf Prod (Minden, nur_frei): Näherung rechnet', m.vgl.quelle_art, 'dealpilot_naeherung');
+  wahr('N9 Hinweis Vorbehalt: „Die Werte darf DealPilot derzeit nicht ausliefern (Rechtevorbehalt …) … DealPilot-Näherung.“',
+    /Mietspiegel öffnen — Die Werte darf DealPilot derzeit nicht ausliefern \(Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt\)\. Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(t2));
+  /* Kern: ohne Näherung (Route bietet sie nicht an) bleibt der Rückfall im Text */
+  const z = K.mietspiegelRegister(Object.assign({}, mietspiegelFuer('08111000'), { naeherung_verfuegbar: false }), '2026-11-09');
+  wahr('N10 Speicherverbot ohne Näherung: „bis dahin rechnet DealPilot mit der Schätzung aus Angebotsmieten.“', z.nutzung === 'verboten' && /bis dahin rechnet DealPilot mit der Schätzung aus Angebotsmieten\.$/.test(z.werte_hinweis));
+  const z2 = K.mietspiegelRegister(Object.assign({}, mietspiegelFuer('05770024'), { werte_verfuegbar: true }), '2026-11-09');
+  wahr('N10 Vorbehalt mit ausgelieferten Werten (Staging): kein Nutzungshinweis', !z2.nutzung && z2.werte_hinweis === K.MS_REG.werte);
+}
+
+console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255, v3266): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);
