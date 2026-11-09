@@ -3378,24 +3378,25 @@
         await b2oZeile(s, 'Bereit zum Abflug', 'Der Deal-Status: <b>' + (a ? r6Text(a).replace(/\s*(Deal|BOARDING|ABGEFLOGEN|GESTRICHEN).*$/, '') : 'Offen') + '</b>. Steht der Zuschlag fest: gewonnen oder verloren.');
         await b2oZeile(s, 'Gewonnen heißt: Soll steht fest', 'Bei „Gewonnen“ friert DealPilot den Ankauf-Stand ein — das Soll für den Soll-Ist-Vergleich im Bestand (Modul 14). Im Video bleibt der Deal offen.');
       },
-      async function (s) {   /* 4 · Dokumente und Exporte */
+      async function (s) {   /* 4 · v3272: Dokumente als Kacheln (weiße Karten), Marktberichte nur „PDF abrufen“ */
         await r13Zeige(/^Dokumente/);
-        var n = [].filter.call(document.querySelectorAll('#s8 .dab-panel'), function (p) { return /Investment-PDF/.test(p.textContent); })[0];
-        /* aus dem Text, nicht aus Blattknoten: „Investment-PDF" trägt ein Abzeichen und ist kein Blatt (gemessen: fehlte) */
-        var z = n ? (r6Inner(n).match(/^\s*(Investment-PDF|Finanzamt-PDF|Kaufpreisaufteilung|Track Record)/gm) || []).map(function (x) { return x.trim(); }) : [];
-        await b2oZeile(s, 'Dokumente und Exporte', (z.length ? '<b>' + z.join(', ') + '</b>' : 'Die PDFs') + ' — fertig aus den Daten des Objekts, für Bank, Finanzamt und dich.');
+        var z = [].map.call(document.querySelectorAll('#s8 .dab-doc-row'), function (k) { return (r6Inner(k).split('\n').map(function (y) { return y.trim(); }).filter(Boolean)[0]) || ''; }).filter(Boolean);
+        await b2oZeile(s, 'Dokumente und Exporte', 'Je Dokument eine Kachel: <b>' + (z.slice(0, 4).join(', ') || 'Investment-PDF') + '</b>' + (z.length > 4 ? ' — dazu ' + z.slice(4).join(', ') : '') + '.');
+        var ip = function () { return [].filter.call(document.querySelectorAll('#s8 .dab-doc-row'), function (k) { return /Investment-PDF/.test(k.textContent) && /EMPFOHLEN/i.test(k.textContent); })[0] || null; };
+        if (ip()) { await zeige(ip, 8); await b2oZeile(s, 'Empfohlen: das Investment-PDF', 'Alle Kapitel, bank-fertig — ein Klick auf <b>„PDF abrufen“</b>. Wie es aussieht, zeigt Modul 19.'); }
+        await r13Zeige(/^Marktberichte/i);
+        var leer = /Noch keine Marktberichte/.test(r6Text((function () { var b = [].filter.call(document.querySelectorAll('#s8 .dab-band'), function (x) { return /^Marktberichte/i.test(r6Text(x.querySelector('.dab-band-t') || x)); })[0]; return b && b.nextElementSibling; })()));
+        await b2oZeile(s, 'Marktberichte', 'Jeder gespeicherte Bericht steht hier mit <b>„PDF abrufen“</b> — angesehen wird er als PDF.' + (leer ? ' Diese Kopie hat noch keinen: „Marktbericht erstellen“ führt in den Reiter Objekt (Modul 30).' : ''));
       },
-      async function (s) {   /* 5 · Bordkarte und Unterlagen */
-        await r13Zeige(/^Bordkarte/);
-        var p = [].filter.call(document.querySelectorAll('#s8 .dab-ct'), function (x) { return /Persönliche/.test(x.textContent); })[0], o = [].filter.call(document.querySelectorAll('#s8 .dab-ct'), function (x) { return /Objekt-Unterlagen/.test(x.textContent); })[0];
-        function n(e) { return e && e.parentElement ? e.parentElement.querySelectorAll('li').length || ([].filter.call(e.parentElement.children, function (c) { return c !== e; }).length) : 0; }
-        await b2oZeile(s, 'Bordkarte und Unterlagen', 'Die Checkliste fürs Bankgespräch: <b>' + n(p) + ' persönliche</b> und <b>' + n(o) + ' Objekt-Unterlagen</b> — Ausweis, Gehaltsnachweise, Grundbuch, Wohnflächenberechnung.');
+      async function (s) {   /* 5 · v3272: Unterlagen fürs Bankgespräch */
+        await r13Zeige(/^Unterlagen/i);
+        await b2oZeile(s, 'Unterlagen fürs Bankgespräch', 'Was die Bank sehen will — und woher es kommt. „Checkliste anzeigen“ listet persönliche und Objekt-Unterlagen.');
         var am = function () { return r6Knopf('#s8', /Unterlagen beim Amt anfordern/); };
         await zeige(function () { var b = am(); return b && (b.parentElement || b); }, 8);
         await b2oZeile(s, 'Unterlagen vom Amt', 'Flurkarte, Grundbuch, Baulasten, Altlasten, Bauakte: DealPilot findet die zuständige Stelle und schreibt den Antrag. Abgeschickt wird hier nichts.');
         var dr = function () { var t = q('#s8 .dab-dr-t'); return t && (t.closest('.dab-dr') || t.parentElement.parentElement); };
         await zeige(dr, 8);
-        await b2oZeile(s, 'Der Datenraum', 'Persönlicher und Objekt-Datenraum: einmal hochgeladen, gehen die Unterlagen jeder Bank-Anfrage automatisch mit.');
+        await b2oZeile(s, 'Der Datenraum', 'Persönlicher und Objekt-Datenraum: einmal verknüpft, gehen die Unterlagen jeder Bank-Anfrage automatisch mit.');
       },
       async function (s) {   /* 6 · Netzwerk */
         await r13Zeige(/^Dein Netzwerk/);
