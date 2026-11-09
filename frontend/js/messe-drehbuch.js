@@ -8259,8 +8259,9 @@
         var x = qz(); if (x) x.scrollIntoView({ block: 'center' });
         await warte(400);
         await zeige(qz, 8);
-        var brw = wert('brw');
-        await b2oZeile(s, 'Automatisch ermittelt', 'Wert, Quelle, Stichtag — ohne Eingabe' + (brw ? ': Bodenrichtwert <b>' + brw + ' €/m²</b> vom Gutachterausschuss' : '') + '. Was die Stufen brauchen, holt DealPilot selbst.');
+        /* v3270e · gemessen im Prüflauf: der Bodenrichtwert dieses Beispiels ist in Stufe 3 GETIPPT (190) -
+           „vom Gutachterausschuss, ohne Eingabe“ wäre falsch. Daher ohne Zahl. */
+        await b2oZeile(s, 'Automatisch ermittelt', 'Wert, Quelle, Stichtag — der Kasten zeigt, was DealPilot selbst holt: <b>„Bodenrichtwert abrufen“</b> und der Weg zum amtlichen Portal.');
         var lg = function () { return q('#oe-karte-lage'); };
         if (lg() && lg().offsetHeight) {
           lg().scrollIntoView({ block: 'center' }); await warte(400);
@@ -8278,7 +8279,7 @@
         await warte(900);
         var h = function () { return q('#dab-mb-host'); };
         var hx = h(); if (hx) hx.scrollIntoView({ block: 'center' });
-        await warte(400);
+        await warte(1600);
         await zeige(h, 8);
         var n = (_rh && _rh.berichte && _rh.berichte.length) || 0, pdf = r6Knopf('#dab-mb-host', /PDF/);
         await b2oZeile(s, 'Marktberichte', (n ? '<b>' + n + ' Berichte</b> dieses Objekts, ' : 'Die Berichte des Objekts, ') + 'neuester oben — je Bericht <b>„' + (pdf ? r6Text(pdf) : 'PDF abrufen') + '“</b>. Keine eigene Ansicht mehr: erstellt wird im Reiter Objekt, abgeholt hier.', 1200);
