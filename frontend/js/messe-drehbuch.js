@@ -4908,6 +4908,15 @@
         var t = r21T('#dp-overview-strip'), mi = /MIETEINNAHMEN \/ MONAT\s*([\d.,]+ €)/.exec(t), gi = /GESAMTINVESTITION\s*([\d.,]+ Mio €)/.exec(t), rs = /RESTSCHULD GESAMT\s*([\d.,]+ Mio €)/.exec(t);
         await b2oZeile(s, 'Kennzahlen über alles', 'Mieteinnahmen <b>' + (mi ? mi[1] : '–') + '</b> im Monat, Gesamtinvestition ' + (gi ? gi[1] : '–') + ', Restschuld ' + (rs ? '<b>' + rs[1] + '</b>' : '–') + '. Ein Klick wechselt zwischen Bestand und Ankauf-Stand.');
       },
+      async function (s) {   /* 4b · v3272: Bestand | Soll | Zielbild über alle Objekte */
+        var zb = function () { return r21('#dp-zielbild'); };
+        var x = zb(); if (x) x.scrollIntoView({ block: 'start' }); var mc = q('.main-col'); if (mc) mc.scrollTop -= 60;
+        await warte(500);
+        var tb = function () { var z = zb(); var t = z && z.querySelector('table'); return t || z; };
+        await zeige(tb, 8);
+        var t = r21T('#dp-zielbild'), anz = /(\d+ von \d+ mit Zielbild)/.exec(t), km = /Kaltmiete im Jahr\s+\d+ Objekte\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)\s+([+\-−–]\s?[\d.]+ €)\s*·\s*([+\-−–][\d,]+ %)/.exec(t);
+        await b2oZeile(s, 'Bestand · Soll · Zielbild', 'Über alle Objekte nebeneinander' + (km ? ': Kaltmiete im Jahr <b>' + km[1] + '</b> heute, ' + km[2] + ' nach Mieterhöhung, <b>' + km[3] + '</b> im Zielbild (' + km[5].replace(/\s/g, ' ') + ')' : '') + '.' + (anz ? ' ' + anz[1] + '.' : ''));
+      },
       async function (s) {   /* 5 · Steuer über alle Objekte */
         var k = function () { return r21('#dp-steuerkette'); };
         var x = k(); if (x) x.scrollIntoView({ block: 'start' });
@@ -4923,39 +4932,24 @@
         await zeigeGruppe(p, function () { var c = r21('#dp-charts-sec .charts'); return c && (c.firstElementChild || c); }, 8);
         await b2oZeile(s, 'Die Projektion', 'Restschuld, Eigenkapital, Cashflow über 10, 20 oder 30 Jahre — eine vereinfachte Modellrechnung über den ganzen Bestand.');
       },
-      async function (s) {   /* 7 · der Portfolio-Pilot */
+      async function (s) {   /* 7 · v3272: der Portfolio-Pilot - ohne neue Analyse (die gespeicherte ist älter als der Bestand) */
         var pp = function () { return q('#dp-pp'); };
         var x = pp(); if (x) x.scrollIntoView({ block: 'start' });
         await warte(500);
-        await zeige(function () { return q('#dp-pp .dp-pp-head') || pp(); }, 8);
-        await b2oZeile(s, 'Der Portfolio-Pilot', 'Er kennt die Vermögensbilanz und jedes Objekt darin. Ein Klick: die Analyse über alles.');
+        await zeige(pp, 8);
+        var alt = /Letzte Portfolio-Analyse:\s*([\d.]+)/.exec(r6Inner(pp()) || '');
+        await b2oZeile(s, 'Der Portfolio-Pilot', 'Er kennt die Vermögensbilanz und jedes Objekt darin.' + (alt ? ' Die letzte Analyse ist vom <b>' + alt[1] + '</b> — seitdem hat sich der Bestand geändert, und das sagt er dir.' : ''));
       },
-      async function (s) {   /* 8 · die Analyse (Mitschnitt) */
-        var D = window.DPM_REIHE_DATEN;
-        if (!(D && D.portfolioPilot)) { await b2oZeile(s, 'Die Analyse', 'Hier läuft die Portfolio-Analyse.'); return; }
-        var g = q('#dp-pp-go');
-        await zeige(function () { return q('#dp-pp-go'); }, 10);
-        var zb = r6Beginn(s, 'Die Analyse', 'Vermögensbilanz, Ertrag, die einzelnen Objekte, Klumpenrisiken, Entwicklung — und was als Nächstes zu tun ist.');
-        if (g) g.click();
-        await warteAuf(function () { var l = q('#dp-pp-log'); return l && l.querySelectorAll('[class*=msg]').length >= 2 && !/denkt|analysiert/i.test(l.lastElementChild ? l.lastElementChild.textContent.slice(0, 40) : ''); }, 15000);
-        await warte(900);
-        await r6Ende(zb);
-        var log = function () { return q('#dp-pp-log'); };
-        var l = log(); if (l) l.scrollTop = 0;
-        await zeige(log, 6);
-        /* v2395 · vorher nur die Überschriften („1. Vermögensbilanz heute: · 2. Ertragslage: ·") - unter
-           „mit Zahlen" stand keine Zahl. Jetzt je Abschnitt Überschrift + erster Posten, aus der Antwort gelesen. */
-        var txt = (D.portfolioPilot.reply || ''), ab = txt.split(/^\s*(?:#+\s*)?\d\.\s+/m).slice(1, 3), h = ab.map(function (a) {
-          var kopf = /^\**([^*\n:]{3,50})\**:?/.exec(a), p = /^\s*[-•]\s*\**([^*\n:]{3,40})\**:\s*([^\n(]{2,40})/m.exec(a);
-          return kopf && p ? kopf[1].trim() + ': <b>' + p[1].trim() + ' ' + p[2].trim().replace(/\s*EUR\b/g, ' €') + '</b>' : null;
-        }).filter(Boolean);
-        await b2oZeile(s, 'Gegliedert, mit Zahlen', (h.length ? h.join(' · ') : 'Vermögensbilanz · Ertragslage · die Objekte') + ' — gerechnet mit den Zahlen des Cockpits, nichts erfunden.');
-        if (l) { l.scrollTop = l.scrollHeight * 0.45; await warte(500); }
-        await b2oZeile(s, 'Die Objekte beim Namen', 'Welche tragen, welche belasten — mit Objekt und Zahl. Am Ende drei konkrete Schritte, priorisiert.');
+      async function (s) {   /* 8 · Pilot fragen */
+        var ch = function () { return q('#dp-pp-chips'); };
+        await zeige(ch, 8);
+        var c = [].map.call(document.querySelectorAll('#dp-pp-chips button, #dp-pp-chips [class*=chip]'), function (b) { return r6Text(b).replace(/\s*›\s*$/, ''); }).filter(Boolean);
+        c = c.filter(function (y, i) { return c.indexOf(y) === i; });
+        await b2oZeile(s, 'Pilot fragen', (c.length ? c.length + ' Schnellfragen: <b>' + c.slice(0, 3).join('</b>, <b>') + '</b> …' : 'Schnellfragen') + ' — ein Klick genügt.');
       },
-      async function (s) {   /* 9 · Fragen */
-        await zeige(function () { return q('#dp-pp-chips'); }, 8);
-        await b2oZeile(s, 'Und dann fragen', 'Schnellfragen oder eigene: „Welches Objekt zieht den Schnitt runter?“ — der Pilot antwortet zu jedem Objekt und zum Ganzen.', 600);
+      async function (s) {   /* 9 · eigene Frage */
+        await zeige(function () { var i = q('#dp-pp-in'); return i && (i.parentElement || i); }, 8);
+        await b2oZeile(s, 'Oder eigene Fragen', '„Welches Objekt zieht den Schnitt runter?“ — der Pilot antwortet zu jedem Objekt und zum Ganzen. Im Video fragen wir nicht: das ist ein Abruf.', 600);
       }
     ]
   };
