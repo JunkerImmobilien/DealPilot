@@ -8165,7 +8165,7 @@
     await warte(400);
     await zeige(kc, 8);
     var kt = r6Inner(kc()).replace(/\s+/g, ' ');
-    var cf = /nach Steuern heute ([+\-−]?[\d.]+ €)/.exec(kt), bmr = /Bruttomietrendite ([\d,]+ %)/.exec(kt), dscr = /DSCR ([\d,]+)/.exec(kt), ltv = /LTV ([\d,]+ %)/.exec(kt);
+    var cf = /nach Steuern\s+heute\s+([+\-−]?[\d.]+ €)/i.exec(kt), bmr = /Bruttomietrendite ([\d,]+ %)/.exec(kt), dscr = /DSCR ([\d,]+)/.exec(kt), ltv = /LTV ([\d,]+ %)/.exec(kt);
     await b2oZeile(s, 'Die Kennzahlen', [bmr ? 'Bruttorendite <b>' + bmr[1] + '</b>' : '', cf ? 'Cashflow nach Steuern <b>' + cf[1] + '</b> im Monat' : '', dscr ? 'DSCR <b>' + dscr[1] + '</b>' : '', ltv ? 'Beleihung <b>' + ltv[1] + '</b>' : ''].filter(Boolean).join(', ') + '.');
     /* Pilot-Analyse */
     reiter('s5'); await warte(1200);
@@ -8282,6 +8282,50 @@
         await zeige(h, 8);
         var n = (_rh && _rh.berichte && _rh.berichte.length) || 0, pdf = r6Knopf('#dab-mb-host', /PDF/);
         await b2oZeile(s, 'Marktberichte', (n ? '<b>' + n + ' Berichte</b> dieses Objekts, ' : 'Die Berichte des Objekts, ') + 'neuester oben — je Bericht <b>„' + (pdf ? r6Text(pdf) : 'PDF abrufen') + '“</b>. Keine eigene Ansicht mehr: erstellt wird im Reiter Objekt, abgeholt hier.', 1200);
+      }
+    ])
+  };
+
+  /* ═══ VIDEOREIHE · ÜBERBLICK 1 NEU · QUICK-CHECK (v3270) ═══════════════════════
+     Marcel 09.11.2026: den Quick-Check ausdrücklich neu. Gemessen am Prüflauf von
+     quickcheck-rundgang: Szenen 1-11 tragen weiter, aber das Urteil steht seit v3201 im
+     Kasten .qcb-urteil (#ai-verdict ist leer), die Pilot-Analyse im Kasten .qcb-ki - und der
+     Mitschnitt KI_RUNDGANG nennt alte Zahlen (Score 60, DSCR 1,29 gegen heute 64 / 1,05).
+     Deshalb: Lage-Szene neu gegen .qcb-urteil (gerechnet, keine KI), keine KI-Szene, und
+     „Als Objekt speichern“ erst ins Bild holen (lag 3.500 px tiefer im Fenster). */
+  function qcUrteil() { var u = qcSel('.qcb-urteil'); var l = u ? u.innerText.split('\n').map(function (x) { return x.trim(); }).filter(Boolean) : []; return { kopf: l[2] || '', text: l[3] || '' }; }
+  function qcSatz(t, re) { var m = re.exec(t || ''); return m ? m[0].replace(/\s+$/, '') : ''; }
+  async function qcHole(el) { try { if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center' }); } catch (e) {} await warte(400); }
+  DREHBUECHER['reihe-quickcheck'] = {
+    titel: 'Quick-Check', unterzeile: 'Vom Exposé zum ersten Urteil — in wenigen Minuten', objekt: null,
+    aufraeumen: DREHBUECHER.quickcheck.aufraeumen,
+    abspann: DREHBUECHER.quickcheck.abspann,
+    szenen: DREHBUECHER['quickcheck-rundgang'].szenen.slice(0, 11).concat([
+      async function (s) {   /* 12 · gegen deine Lage - das gerechnete Urteil */
+        qcSetze('qc_lageklasse', 'B');
+        await warte(1400);
+        await qcHole(qcSel('.qcb-urteil'));
+        await zeige(function () { return qcSel('.qcb-urteil'); }, 10);
+        var b = qcUrteil();
+        await b2oZeile(s, 'Gegen deine Lage', 'In der <b>B-Lage</b>: „' + (b.kopf || '–') + '“.');
+        var lf = function () { var e = qcEl('qc_lageklasse'); return e && (e.closest('.field,.f,.fg') || e.parentElement); };
+        await qcHole(lf());
+        await zeige(lf, 8);
+        s.zeile('Gegen deine Lage', 'Dieselbe Wohnung — aber du stufst die Lage als <b>C</b> ein …');
+        await warte(2200);
+        qcSetze('qc_lageklasse', 'C');
+        await warte(1400);
+        await qcHole(qcSel('.qcb-urteil'));
+        await zeige(function () { return qcSel('.qcb-urteil'); }, 10);
+        var c = qcUrteil(), w = qcSatz(c.text, /[^.]*Rendite[^.]*\([^)]*\)\./) || qcSatz(c.text, /^[^.]*\./);
+        await b2oZeile(s, 'Das Urteil kippt', '„<b>' + (c.kopf || '–') + '</b>“' + (w ? ' — ' + w : '') + ' Der Score bleibt, das Urteil nicht.');
+        var z = qcSatz(c.text, /Deine Zielrendite[^.]*\./), r = qcSatz(c.text, /Rechnerisch trägt[^.]*?—[^.]*\./) || qcSatz(c.text, /Rechnerisch trägt[^.]*\./);
+        if (z || r) await b2oZeile(s, 'Und was es bräuchte', [z, r].filter(Boolean).join(' '));
+      },
+      async function (s) {   /* 13 · als Objekt speichern - gezeigt, nicht geklickt */
+        await qcHole(qcEl('save-btn'));
+        await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
+        await b2oZeile(s, 'Als Objekt speichern', 'Passt er zu dir? <b>Ein Klick</b> — als Objekt gespeichert, mit allen Werten und Quellen.', 600);
       }
     ])
   };
