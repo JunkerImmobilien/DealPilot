@@ -9,7 +9,7 @@
 
    Was hier liegt (ui.js _renderAIServerAnalysis ruft es, ohne diese Datei bleibt
    der Reiter wie bisher):
-     huelle()          Kopfzeile (Phase, PDF, Einfach | Detail), Unterreiter, Inhalt
+     huelle()          Kopfzeile (Phase, Stand, Neu abrufen, PDF), Reiterleiste mit Einfach | Detail (v3259), Inhalt
      uebersicht()      Briefing + Kennzahlen + Worauf es ankommt (Einfach)
                        Gesamtstatement in Abschnitten (Detail)
      risiko()          Stärken, Risiken, Risikoanalyse, Worst · Plan · Best
@@ -91,17 +91,57 @@
       '.dp-pa-wrap[data-dp-pa-v4] .dp-si-um{display:none !important}',
       /* Hülle: Fassung 4 hat die Unterreiter waagrecht oben (die bisherige Hülle ist ein Raster mit senkrechter Leiste) */
       '.dp-pa-wrap[data-dp-pa-v4]{display:block !important}',
-      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-stand{margin:0 0 10px}',
-      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-rail{display:flex !important;flex-direction:row !important;flex-wrap:nowrap !important;gap:2px !important;overflow-x:auto !important;overflow-y:hidden !important;border:0 !important;border-bottom:1px solid #E6DCC2 !important;margin:0 0 14px !important;padding:0 !important;position:static !important;width:auto !important;height:auto !important;background:transparent !important;box-shadow:none !important;scrollbar-width:thin}',
-      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-rail .dp-pa-tab{flex:0 0 auto !important;width:auto !important;min-width:0 !important;border:0 !important;border-bottom:2px solid transparent !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important;padding:9px 11px !important;margin:0 0 -1px !important;font:600 13px "Space Grotesk",Inter,sans-serif !important;color:#7A7370 !important;white-space:nowrap !important;text-align:center !important}',
-      '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-rail .dp-pa-tab.active{color:#2A2727 !important;border-bottom-color:var(--wl-c9a84c,#C9A84C) !important}',
+      /* v3259 · Marcel 09.11.2026: „man sieht überhaupt nicht die Reiter … darüber steht einfach zu viel".
+         Gemessen vorher (Westerfeldstr. 140, Bestand, 1568 px): Stand-Kasten 58 px, „Analyse neu abrufen" 30 px,
+         Phase/Info/PDF/Einfach|Detail 36 px, Kurzfassung-Zeile 20 px - die Reiter begannen 182 px unter dem
+         Panelanfang, grau (#7A7370) auf weiß, aktive Marke 2 px. Jetzt: EINE Kopfzeile (Phase · Stand einzeilig ·
+         Neu abrufen · PDF), darunter die Reiterleiste als eigene Fläche mit Einfach|Detail rechts. */
+      '#s5:has(.dp-pa-wrap[data-dp-pa-v4]) > .sec-desc{display:none !important}',
+      '.dp-pa4-kopf{display:flex;align-items:center;gap:8px;margin:0 0 8px;min-width:0}',
+      '.dp-pa4-kopf > .dp-pa4-phase{flex:0 0 auto}',
+      '.dp-pa4-stand-host{flex:1 1 auto;min-width:0;display:flex}',
+      /* der Stand-Kasten (ui.js, Klassen setzt ui.js nachträglich neu - deshalb über den Host gestaltet) einzeilig, Tipp öffnet ihn */
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-stand-host > .dp-pa-stand{margin:0 !important;padding:5px 30px 5px 10px !important;width:100%;min-width:0;box-sizing:border-box;font-size:12px !important;line-height:1.45 !important;border-radius:8px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;position:relative}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-stand-host > .dp-pa-stand::after{content:"▾";position:absolute;right:10px;top:5px;font-size:11px;opacity:.8}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-stand-host.auf > .dp-pa-stand{white-space:normal}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-stand-host.auf > .dp-pa-stand::after{content:"▴"}',
+      '.dp-pa4-aktionen{display:flex;gap:6px;align-items:center;flex:0 0 auto}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-akt{display:inline-flex !important;align-items:center;gap:6px;border:1px solid #E6DCC2 !important;background:#fff !important;color:#2A2727 !important;border-radius:9px !important;padding:6px 11px !important;font:600 12.5px "Space Grotesk",Inter,sans-serif !important;cursor:pointer;box-shadow:none !important;min-height:0 !important;white-space:nowrap}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-akt:hover{border-color:var(--wl-c9a84c,#C9A84C) !important}',
+      '.dp-pa4-akt svg{width:14px;height:14px;flex:0 0 auto}',
+      /* Reiterleiste: eigene Fläche, Schrift und Kontrast wie die Hauptreiter, aktive Marke Gold 3 px */
+      '.dp-pa4-leiste{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:0 8px 0 0;background:#fff;border:1px solid #E6DCC2;border-radius:12px;position:relative;min-width:0}',
+      '.dp-pa4-rail-box{position:relative;flex:1 1 auto;min-width:0;display:flex}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-rail-box > .dp-pa-rail{flex:1 1 auto;display:flex !important;flex-direction:row !important;flex-wrap:nowrap !important;gap:0 !important;overflow-x:auto !important;overflow-y:hidden !important;border:0 !important;margin:0 !important;padding:0 4px !important;position:static !important;width:auto !important;min-width:0 !important;height:auto !important;background:transparent !important;box-shadow:none !important;scrollbar-width:none;scroll-behavior:smooth}',
+      '.dp-pa4-rail-box > .dp-pa-rail::-webkit-scrollbar{display:none}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-rail-box > .dp-pa-rail .dp-pa-tab{flex:0 0 auto !important;width:auto !important;min-width:0 !important;border:0 !important;border-bottom:3px solid transparent !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important;padding:12px 13px 10px !important;margin:0 !important;font:600 14px "Space Grotesk",Inter,sans-serif !important;color:#4A4542 !important;white-space:nowrap !important;text-align:center !important;min-height:0 !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-rail-box > .dp-pa-rail .dp-pa-tab:hover{color:#050505 !important;background:#FBF6E9 !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-rail-box > .dp-pa-rail .dp-pa-tab.active{color:#050505 !important;border-bottom-color:var(--wl-c9a84c,#C9A84C) !important;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent) !important}',
+      /* Hinweis auf weitere Reiter: Verlauf an der Kante plus Pfeilknopf, nur wenn dort wirklich mehr liegt (leisteMessen) */
+      '.dp-pa4-mehr-r,.dp-pa4-mehr-l{display:none;position:absolute;top:0;bottom:0;width:38px;border:0 !important;padding:0 !important;margin:0 !important;cursor:pointer;font:700 18px/1 "Space Grotesk",Inter,sans-serif !important;color:#2A2727 !important;box-shadow:none !important;min-height:0 !important;z-index:2}',
+      '.dp-pa4-mehr-r{right:0;justify-content:flex-end;padding-right:4px !important;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 60%) !important}',
+      '.dp-pa4-mehr-l{left:0;justify-content:flex-start;padding-left:4px !important;background:linear-gradient(270deg,rgba(255,255,255,0),#fff 60%) !important}',
+      '.dp-pa4-rail-box[data-mehr-r="1"] > .dp-pa4-mehr-r,.dp-pa4-rail-box[data-mehr-l="1"] > .dp-pa4-mehr-l{display:flex;align-items:center}',
+      '.dp-pa4-leiste > .dp-pa4-seg{flex:0 0 auto}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-kopf > .dp-pa4-seg{display:none !important}',
+      '@media (max-width:640px){'
+        + '.dp-pa4-kopf{flex-wrap:wrap}'
+        + '.dp-pa4-stand-host{order:5;flex-basis:100%}'
+                + '.dp-pa4-akt .dp-pa4-akt-t{display:none}'
+        + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-akt{padding:7px 9px !important}'
+        + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-kopf > .dp-pa4-seg{display:inline-flex !important;margin-left:auto}'
+        + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-leiste > .dp-pa4-seg{display:none !important}'
+        + '.dp-pa4-leiste{padding:0}'
+        + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-rail-box > .dp-pa-rail .dp-pa-tab{padding:12px 11px 10px !important;font-size:13.5px !important}'
+        + '.dp-pa4-phase small{display:none}'
+      + '}',
       '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-content{width:auto !important;min-width:0 !important}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-mt{margin-top:12px}',
       /* gemessen bei 390 px: die Tafel der Zielerreichung (jahresstaende.js) stand 78 px über den Rand - quer scrollen wie die übrigen Tafeln */
       '.dp-pa-wrap[data-dp-pa-v4] .dp-ziel{overflow-x:auto;max-width:100%}',
-      '.dp-pa4-kopf{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}',
       '.dp-pa4-reihe{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}',
-      '.dp-pa4-phase{font:600 12px "Space Grotesk",Inter,sans-serif;padding:6px 12px;border-radius:8px;background:#FBF6E9;color:#2A2727;white-space:nowrap}',
+      '.dp-pa4-phase{font:600 12px "Space Grotesk",Inter,sans-serif;padding:6px 11px;border-radius:8px;background:#FBF6E9;color:#2A2727;white-space:nowrap;cursor:default}',
+      '.dp-pa4-phase small{font:400 11px Inter,sans-serif;color:#7A7370;margin-left:6px}',
       '.dp-pa4-info{font:400 12px Inter,system-ui,sans-serif;color:#7A7370}',
       /* v3099e/g · Marcel: „man sieht nicht, wo man ist" - gemessen: der gedrückte Knopf hatte background none;
          die Regel .sec button:not(…)×8 (style.css, Spezifität 0,9,1) nimmt .btn-clean aus - alle Knöpfe hier tragen sie.
@@ -109,16 +149,11 @@
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg{display:inline-flex !important;border:1px solid #E6DCC2 !important;border-radius:10px !important;padding:3px !important;background:#fff !important;gap:2px}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg button{border:0 !important;background:transparent !important;color:#7A7370 !important;font:600 12.5px "Space Grotesk",Inter,sans-serif !important;padding:6px 14px !important;border-radius:7px !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg button[aria-pressed="true"]{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f)) !important;color:#050505 !important}',
-      '.dp-pa4-modus-zeile{display:flex;align-items:center;gap:8px;margin:0 0 10px;font:500 12px Inter,sans-serif;color:#6B645A}',
-      '.dp-pa4-modus-zeile b{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:#2A2727;color:#FDFCFA}',
-      '.dp-pa-wrap[data-dp-pa-modus="detail"] .dp-pa4-modus-zeile b{background:var(--wl-c9a84c,#C9A84C);color:#050505}',
+      /* v3259 · die Zeile „Kurzfassung … / Ausführlich …" ist gefallen - der Text steht als Tooltip am Umschalter */
       '.dp-pa-wrap[data-dp-pa-v4][data-dp-pa-modus="detail"] > .dp-pa-content{border-left:3px solid var(--wl-c9a84c,#C9A84C);padding-left:12px}',
       /* „Pilot-Analyse starten" stand über allem - jetzt „Neu abrufen" unter der Stand-Zeile; PDF-Bausteine auf Knopfdruck */
       '#s5 .ai-box:has(#ai-content .dp-pa-wrap[data-dp-pa-v4]) > #ai-btn{display:none !important}',
       '#s5 .ai-box:has(#ai-content .dp-pa-wrap[data-dp-pa-v4]):not(.dp-pa4-pdf-offen) > .ai-pdf-toggle{display:none !important}',
-      '.dp-pa4-neu{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-4px 0 12px}',
-      '.dp-pa4-neu button{border:1px solid #E6DCC2;background:#fff;color:#2A2727;border-radius:9px;padding:6px 12px;font:600 12.5px "Space Grotesk",Inter,sans-serif;cursor:pointer}',
-      '.dp-pa4-neu span{font:400 11.5px Inter,sans-serif;color:#7A7370}',
       /* eigene Schalter anderer Module folgen dem Kopf */
       '.dp-pa-wrap[data-dp-pa-v4] .dpu-umschalter{display:none !important}',
       '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-stv-fuss,.dp-pa-wrap[data-dp-pa-modus="einfach"] #dp-pa-wert-body{display:none !important}',
@@ -823,28 +858,63 @@
       add('steuer', 'Steuer', o.steuer);
       add('unterlagen', 'Unterlagen &amp; WEG', unterlagenPanel(o.unterlagen));
     }
-    var phase = bestand ? 'Bestand' : 'Ankauf', info = '';
+    var phase = bestand ? 'Bestand' : 'Ankauf', info = '', seit = '';
     try {
       var AK = window.DealPilotAnkauf, st = AK && AK.stand ? AK.stand() : null;
-      if (bestand && st && st.stichtag) info = 'Ankauf-Stand vom ' + String(st.stichtag).split('-').reverse().join('.') + ' · Fragen und Reiter für das Halten';
+      if (bestand && st && st.stichtag) { seit = String(st.stichtag).split('-').reverse().join('.'); info = 'Ankauf-Stand vom ' + seit + ' · Fragen und Reiter für das Halten'; }
       else info = bestand ? 'Fragen und Reiter für das Halten' : 'Fragen und Reiter für die Kaufentscheidung';
     } catch (e) {}
-    var kopf = '<div class="dp-pa4-kopf"><div class="dp-pa4-reihe"><span class="dp-pa4-phase">' + phase + '</span><span class="dp-pa4-info">' + esc(info) + '</span></div>'
-      + '<div class="dp-pa4-reihe"><button type="button" class="btn-clean dp-pa4-pdf" data-dp-pa4-pdf="1" aria-controls="ai-pdf-sections">PDF zusammenstellen</button>'
-      + '<div class="dp-pa4-seg" role="group" aria-label="Darstellung"><button type="button" class="btn-clean" data-dp-pa-modus-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
-      + '<button type="button" class="btn-clean" data-dp-pa-modus-knopf="detail" aria-pressed="' + (m === 'detail') + '">Detail</button></div></div></div>';
+    /* v3259 · EINE Kopfzeile. Wo vorher was stand (Bericht v3259):
+       Stand-Kasten (ui.js)          eigener Kasten, 2-3 Zeilen  -> einzeilig in der Kopfzeile, Tipp klappt ihn auf
+       „↻ Analyse neu abrufen"       eigene Zeile                -> Knopf „Neu abrufen" rechts (runAI, unverändert)
+       Phase + Info                  Pille + grauer Satz         -> Pille, Ankauf-Stand klein darin, Satz als Tooltip
+       „PDF zusammenstellen"         rechts in Zeile 3           -> Knopf „PDF" rechts (data-dp-pa4-pdf, unverändert)
+       Einfach | Detail              rechts in Zeile 3           -> rechts in der Reiterleiste (am Handy in der Kopfzeile)
+       Kurzfassung-/Ausführlich-Zeile eigene Zeile               -> Tooltip am Umschalter */
+    var seg = function () {
+      return '<div class="dp-pa4-seg" role="group" aria-label="Darstellung">'
+        + '<button type="button" class="btn-clean" data-dp-pa-modus-knopf="einfach" aria-pressed="' + (m === 'einfach') + '" title="Kurzfassung: das Wichtigste mit kleinen Grafiken">Einfach</button>'
+        + '<button type="button" class="btn-clean" data-dp-pa-modus-knopf="detail" aria-pressed="' + (m === 'detail') + '" title="Ausführlich: alle Zahlen, Tafeln und Texte der Analyse">Detail</button></div>';
+    };
+    var IC_NEU = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>';
+    var IC_PDF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 15h6"/></svg>';
+    var kopf = '<div class="dp-pa4-kopf">'
+      + '<span class="dp-pa4-phase" title="' + esc(info) + '">' + phase + (seit ? '<small>Ankauf ' + esc(seit) + '</small>' : '') + '</span>'
+      + (o.kopf ? '<div class="dp-pa4-stand-host" title="Antippen: ganzen Hinweis zeigen">' + o.kopf + '</div>' : '<span class="dp-pa4-stand-host"></span>')
+      + seg()
+      + '<div class="dp-pa4-aktionen">'
+      /* v3099e · Marcel: „Pilot-Analyse starten“ oben drüber gefällt nicht - als „Neu abrufen“ in den Kopf */
+      + '<button type="button" class="btn-clean dp-pa4-akt dp-pa4-neu" title="Analyse neu abrufen - beschreibt den heutigen Stand dieses Objekts" aria-label="Analyse neu abrufen" onclick="if(typeof runAI===\'function\')runAI()">' + IC_NEU + '<span class="dp-pa4-akt-t">Neu abrufen</span></button>'
+      + '<button type="button" class="btn-clean dp-pa4-akt dp-pa4-pdf" data-dp-pa4-pdf="1" aria-controls="ai-pdf-sections" title="PDF zusammenstellen: Bausteine wählen" aria-label="PDF zusammenstellen">' + IC_PDF + '<span class="dp-pa4-akt-t">PDF</span></button>'
+      + '</div></div>';
+    var leiste = '<div class="dp-pa4-leiste"><div class="dp-pa4-rail-box">'
+      + '<button type="button" class="btn-clean dp-pa4-mehr-l" data-dp-pa4-blaettern="-1" aria-label="Vorherige Reiter" tabindex="-1">‹</button>'
+      + '<nav class="dp-pa-rail" aria-label="Reiter der Pilot-Analyse">' + reiter.join('') + '</nav>'
+      + '<button type="button" class="btn-clean dp-pa4-mehr-r" data-dp-pa4-blaettern="1" aria-label="Weitere Reiter" tabindex="-1">›</button>'
+      + '</div>' + seg() + '</div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
-    try { setTimeout(function () { minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); }, function () {}); }, 0); } catch (e) {}
+    try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); }, function () {}); }, 0); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
-      + (o.kopf || '')
-      /* v3099e · Marcel: „Pilot-Analyse starten“ oben drüber gefällt nicht - als „Neu abrufen“ unter den Stand */
-      + '<div class="dp-pa4-neu"><button type="button" class="btn-clean" onclick="if(typeof runAI===\'function\')runAI()">↻ Analyse neu abrufen</button><span>beschreibt den heutigen Stand dieses Objekts</span></div>'
-      + kopf
-      + '<div class="dp-pa4-modus-zeile"><b class="dp-pa-e">Kurzfassung</b><span class="dp-pa-e">Das Wichtigste mit kleinen Grafiken – „Detail“ zeigt alle Zahlen und Texte.</span>'
-      + '<b class="dp-pa-d">Ausführlich</b><span class="dp-pa-d">Alle Zahlen, Tafeln und Texte der Analyse – „Einfach“ zeigt die Kurzfassung.</span></div>'
-      + '<nav class="dp-pa-rail">' + reiter.join('') + '</nav>'
+      + kopf + leiste
       + '<div class="dp-pa-content">' + inhalt.join('') + '</div></div>';
   }
+
+  /* v3259 · Reiterleiste: zeigt Verlauf + Pfeil nur dort, wo wirklich weitere Reiter liegen */
+  function leisteMessen() {
+    Array.prototype.forEach.call(document.querySelectorAll('.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-rail-box'), function (box) {
+      var r = box.querySelector('.dp-pa-rail'); if (!r) return;
+      var rest = r.scrollWidth - r.clientWidth - r.scrollLeft;
+      box.setAttribute('data-mehr-r', rest > 4 ? '1' : '0');
+      box.setAttribute('data-mehr-l', r.scrollLeft > 4 ? '1' : '0');
+      if (window.ResizeObserver && !box._dpRo) { try { box._dpRo = new ResizeObserver(function () { leisteMessen(); }); box._dpRo.observe(r);
+        /* „Wert & Verlauf" wird erst später sichtbar (ui.js _dpLoadVerlauf) - die Leiste wird dann breiter als ihr Kasten */
+        Array.prototype.forEach.call(r.children, function (b) { box._dpRo.observe(b); }); } catch (e) {} }
+    });
+  }
+  document.addEventListener('scroll', function (ev) {
+    var t = ev.target; if (t && t.classList && t.classList.contains('dp-pa-rail') && t.closest('.dp-pa4-rail-box')) leisteMessen();
+  }, true);
+  window.addEventListener('resize', function () { try { leisteMessen(); } catch (e) {} });
 
   /* Klicks: Modus, „Ausführlich lesen", PDF (eine Stelle für alle Hüllen) */
   document.addEventListener('click', function (ev) {
@@ -854,6 +924,18 @@
     /* v3099g · „Alle Zahlen zeigen (Genau)" in Ankauf · Bestand · Zielbild (wert-zielbild.js) schaltet den ganzen Reiter */
     var sk = t.closest('[data-dp-si-knopf]');
     if (sk && sk.closest('.dp-pa-wrap[data-dp-pa-v4]')) { var mm = sk.getAttribute('data-dp-si-knopf') === 'genau' ? 'detail' : 'einfach'; setTimeout(function () { setzeModus(mm); }, 0); }
+    /* v3259 · Kopfzeile und Reiterleiste */
+    var sh = t.closest('.dp-pa4-stand-host');
+    if (sh && sh.closest('.dp-pa-wrap[data-dp-pa-v4]') && !t.closest('a,button')) { sh.classList.toggle('auf'); return; }
+    var bl = t.closest('[data-dp-pa4-blaettern]');
+    if (bl) {
+      ev.preventDefault();
+      var rl = bl.parentNode && bl.parentNode.querySelector('.dp-pa-rail');
+      if (rl) { var w = Math.max(120, rl.clientWidth * 0.7) * Number(bl.getAttribute('data-dp-pa4-blaettern')); try { rl.scrollBy({ left: w, behavior: 'smooth' }); } catch (e) { rl.scrollLeft += w; } }
+      return;
+    }
+    var rt = t.closest('.dp-pa4-rail-box .dp-pa-tab');
+    if (rt) { setTimeout(function () { try { rt.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); } catch (e) {} leisteMessen(); }, 0); }
     var p = t.closest('[data-dp-pa4-pdf]');
     if (p) {
       ev.preventDefault();
@@ -864,6 +946,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3099', huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3259', leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();
