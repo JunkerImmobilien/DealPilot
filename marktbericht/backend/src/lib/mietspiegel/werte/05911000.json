@@ -1,0 +1,485 @@
+{
+  "ags": "05911000",
+  "gemeinde": "Bochum",
+  "art": "qualifiziert",
+  "stand": null,
+  "gueltig_ab": "2025-04-01",
+  "gueltig_bis": "2027-03-31",
+  "quelle": {
+    "url": "https://www.bochum.de/C125830C0042AB74/vwContentByKey/W2DF7CV7419BOCMDE/$FILE/Mietspiegel_Bochum_2025_27.pdf",
+    "dokument": "Bochumer Mietspiegel für nicht preisgebundenen Wohnraum, gültig vom 01.04.2025 bis maximal 31.03.2027 (mit klarstellender Ergänzung zu 6.1.3 vom 17.10.2025), Arbeitskreis Mietspiegel / Stadt Bochum",
+    "seite": "S. 8 (Mietpreistabelle), S. 7 (Zu- und Abschläge, Kap. 7.3)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Urheberrecht der Herausgeber (Arbeitskreis Mietspiegel Bochum)",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1924,
+          "label": "bis 1924"
+        },
+        {
+          "von": 1925,
+          "bis": 1949,
+          "label": "1925 - 1949"
+        },
+        {
+          "von": 1950,
+          "bis": 1964,
+          "label": "1950 - 1964"
+        },
+        {
+          "von": 1965,
+          "bis": 1979,
+          "label": "1965 - 1979"
+        },
+        {
+          "von": 1980,
+          "bis": 1994,
+          "label": "1980 - 1994"
+        },
+        {
+          "von": 1995,
+          "bis": 2009,
+          "label": "1995 - 2009"
+        },
+        {
+          "von": 2010,
+          "bis": 2019,
+          "label": "2010 - 2019"
+        },
+        {
+          "von": 2020,
+          "bis": null,
+          "label": "ab 2020"
+        }
+      ],
+      "wfl": [
+        {
+          "von": null,
+          "bis": 34,
+          "label": "bis 34 qm"
+        },
+        {
+          "von": 35,
+          "bis": 49,
+          "label": "35 bis 49 qm"
+        },
+        {
+          "von": 50,
+          "bis": 64,
+          "label": "50 bis 64 qm"
+        },
+        {
+          "von": 65,
+          "bis": 109,
+          "label": "65 bis 109 qm"
+        },
+        {
+          "von": 110,
+          "bis": null,
+          "label": "ab 110 qm"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "unten": 7.84,
+        "mittel": 8,
+        "oben": 8.15
+      },
+      {
+        "baujahr": 0,
+        "wfl": 1,
+        "unten": 6.91,
+        "mittel": 7.01,
+        "oben": 7.1
+      },
+      {
+        "baujahr": 0,
+        "wfl": 2,
+        "unten": 6.46,
+        "mittel": 6.54,
+        "oben": 6.63
+      },
+      {
+        "baujahr": 0,
+        "wfl": 3,
+        "unten": 6.28,
+        "mittel": 6.33,
+        "oben": 6.38
+      },
+      {
+        "baujahr": 0,
+        "wfl": 4,
+        "unten": 5.86,
+        "mittel": 6.01,
+        "oben": 6.15
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "unten": 7.57,
+        "mittel": 7.77,
+        "oben": 7.97
+      },
+      {
+        "baujahr": 1,
+        "wfl": 1,
+        "unten": 6.64,
+        "mittel": 6.78,
+        "oben": 6.93
+      },
+      {
+        "baujahr": 1,
+        "wfl": 2,
+        "unten": 6.18,
+        "mittel": 6.32,
+        "oben": 6.45
+      },
+      {
+        "baujahr": 1,
+        "wfl": 3,
+        "unten": 6.01,
+        "mittel": 6.1,
+        "oben": 6.2
+      },
+      {
+        "baujahr": 1,
+        "wfl": 4,
+        "unten": 5.59,
+        "mittel": 5.78,
+        "oben": 5.98
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "unten": 7.84,
+        "mittel": 8,
+        "oben": 8.15
+      },
+      {
+        "baujahr": 2,
+        "wfl": 1,
+        "unten": 6.91,
+        "mittel": 7.01,
+        "oben": 7.1
+      },
+      {
+        "baujahr": 2,
+        "wfl": 2,
+        "unten": 6.46,
+        "mittel": 6.54,
+        "oben": 6.63
+      },
+      {
+        "baujahr": 2,
+        "wfl": 3,
+        "unten": 6.28,
+        "mittel": 6.33,
+        "oben": 6.38
+      },
+      {
+        "baujahr": 2,
+        "wfl": 4,
+        "unten": 5.86,
+        "mittel": 6.01,
+        "oben": 6.15
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "unten": 7.48,
+        "mittel": 7.67,
+        "oben": 7.87
+      },
+      {
+        "baujahr": 3,
+        "wfl": 1,
+        "unten": 6.54,
+        "mittel": 6.68,
+        "oben": 6.82
+      },
+      {
+        "baujahr": 3,
+        "wfl": 2,
+        "unten": 6.09,
+        "mittel": 6.22,
+        "oben": 6.35
+      },
+      {
+        "baujahr": 3,
+        "wfl": 3,
+        "unten": 5.92,
+        "mittel": 6.01,
+        "oben": 6.1
+      },
+      {
+        "baujahr": 3,
+        "wfl": 4,
+        "unten": 5.5,
+        "mittel": 5.69,
+        "oben": 5.88
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "unten": 7.84,
+        "mittel": 8,
+        "oben": 8.15
+      },
+      {
+        "baujahr": 4,
+        "wfl": 1,
+        "unten": 6.91,
+        "mittel": 7.01,
+        "oben": 7.1
+      },
+      {
+        "baujahr": 4,
+        "wfl": 2,
+        "unten": 6.46,
+        "mittel": 6.54,
+        "oben": 6.63
+      },
+      {
+        "baujahr": 4,
+        "wfl": 3,
+        "unten": 6.28,
+        "mittel": 6.33,
+        "oben": 6.38
+      },
+      {
+        "baujahr": 4,
+        "wfl": 4,
+        "unten": 5.86,
+        "mittel": 6.01,
+        "oben": 6.15
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "unten": 8.4,
+        "mittel": 8.68,
+        "oben": 8.97
+      },
+      {
+        "baujahr": 5,
+        "wfl": 1,
+        "unten": 7.46,
+        "mittel": 7.7,
+        "oben": 7.93
+      },
+      {
+        "baujahr": 5,
+        "wfl": 2,
+        "unten": 7.01,
+        "mittel": 7.23,
+        "oben": 7.45
+      },
+      {
+        "baujahr": 5,
+        "wfl": 3,
+        "unten": 6.84,
+        "mittel": 7.02,
+        "oben": 7.2
+      },
+      {
+        "baujahr": 5,
+        "wfl": 4,
+        "unten": 6.42,
+        "mittel": 6.7,
+        "oben": 6.98
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "unten": 8.96,
+        "mittel": 9.3,
+        "oben": 9.63
+      },
+      {
+        "baujahr": 6,
+        "wfl": 1,
+        "unten": 8.03,
+        "mittel": 8.31,
+        "oben": 8.59
+      },
+      {
+        "baujahr": 6,
+        "wfl": 2,
+        "unten": 7.58,
+        "mittel": 7.85,
+        "oben": 8.12
+      },
+      {
+        "baujahr": 6,
+        "wfl": 3,
+        "unten": 7.4,
+        "mittel": 7.63,
+        "oben": 7.86
+      },
+      {
+        "baujahr": 6,
+        "wfl": 4,
+        "unten": 6.98,
+        "mittel": 7.31,
+        "oben": 7.64
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "unten": 10.42,
+        "mittel": 10.77,
+        "oben": 11.12
+      },
+      {
+        "baujahr": 7,
+        "wfl": 1,
+        "unten": 9.49,
+        "mittel": 9.78,
+        "oben": 10.08
+      },
+      {
+        "baujahr": 7,
+        "wfl": 2,
+        "unten": 9.04,
+        "mittel": 9.32,
+        "oben": 9.6
+      },
+      {
+        "baujahr": 7,
+        "wfl": 3,
+        "unten": 8.86,
+        "mittel": 9.11,
+        "oben": 9.35
+      },
+      {
+        "baujahr": 7,
+        "wfl": 4,
+        "unten": 8.44,
+        "mittel": 8.79,
+        "oben": 9.13
+      }
+    ],
+    "zuschlaege": [
+      {
+        "merkmal": "Endenergiewert unter 50 kWh/(m²a) (Effizienzklasse A/A+)",
+        "art": "eur_qm",
+        "wert": 0.66,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "Endenergiewert 50 bis unter 75 kWh/(m²a) (Effizienzklasse B)",
+        "art": "eur_qm",
+        "wert": 0.28,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "hochwertiger Bodenbelag",
+        "art": "eur_qm",
+        "wert": 0.89,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "gehoben ausgestattetes Bad",
+        "art": "eur_qm",
+        "wert": 0.54,
+        "beleg": "S. 7, Kap. 7.3 (Ergänzung zu 6.1.3)"
+      },
+      {
+        "merkmal": "zweites Badezimmer",
+        "art": "eur_qm",
+        "wert": 0.33,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "Balkon",
+        "art": "eur_qm",
+        "wert": 0.44,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "Terrasse",
+        "art": "eur_qm",
+        "wert": 0.51,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "alleinige Gartennutzung",
+        "art": "eur_qm",
+        "wert": 0.28,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "Gegensprechanlage ohne Video",
+        "art": "eur_qm",
+        "wert": 0.18,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "Gegensprechanlage mit Video",
+        "art": "eur_qm",
+        "wert": 0.46,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "elektrische Rollläden",
+        "art": "eur_qm",
+        "wert": 0.42,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "Elektrospeicherheizung, Nachtspeicher oder Einzelöfen",
+        "art": "eur_qm",
+        "wert": -0.6,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "kein Bodenbelag oder PVC",
+        "art": "eur_qm",
+        "wert": -0.59,
+        "beleg": "S. 7, Kap. 7.3"
+      },
+      {
+        "merkmal": "Elektroinstallation nicht ausreichend",
+        "art": "eur_qm",
+        "wert": -0.83,
+        "beleg": "S. 7, Kap. 7.3"
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1958,
+        "wfl": 72
+      },
+      "erwartet": {
+        "unten": 6.28,
+        "mittel": 6.33,
+        "oben": 6.38
+      },
+      "seite": "S. 8, Zeile 1950 - 1964, Spalte 65 bis 109 qm"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2021,
+        "wfl": 40
+      },
+      "erwartet": {
+        "unten": 9.49,
+        "mittel": 9.78,
+        "oben": 10.08
+      },
+      "seite": "S. 8, Zeile ab 2020, Spalte 35 bis 49 qm"
+    }
+  ],
+  "hinweis": "Erhebungsstichtag nennt das Dokument nicht (stand = null). Die Tabelle weist je Zelle einen Mittelwert und eine Spanne aus; Basis ist laut Kap. 7.1 der Mittelwert. Keine Wohnlagen (Kap. 5: keine klaren Preisunterschiede). Wohnflächenklassen wie gedruckt in ganzen qm (bis 34 / 35 bis 49 / …). Kein Lesebeispiel im Dokument — Prüfbeispiele sind zwei abgelesene Zellen."
+}

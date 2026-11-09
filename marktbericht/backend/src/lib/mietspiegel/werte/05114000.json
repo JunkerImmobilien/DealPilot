@@ -1,0 +1,449 @@
+{
+  "ags": "05114000",
+  "gemeinde": "Krefeld",
+  "art": "einfach",
+  "stand": "2025-08",
+  "gueltig_ab": "2025-08-01",
+  "gueltig_bis": null,
+  "quelle": {
+    "url": "https://www.krefeld.de/system/files/2025-08/Mietspiegel%20Krefeld%202025.pdf",
+    "dokument": "Mietspiegel 2025 Stadt Krefeld, zum 01.08.2025 (Mietrichtwerttabelle), Arbeitskreis Mietspiegel 2025: Stadt Krefeld FB Vermessung, Kataster und Liegenschaften, Haus & Grund Krefeld und Niederrhein, Mieterverband Niederrhein; Mitwirkung Gutachterausschuss",
+    "seite": "S. 10–11 (Richtwerte nach Wohnlage A–D und Baualtersklasse), S. 4–5 (Wohnlagen), S. 6–7 (Zu- und Abschläge)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Urheberrecht der Herausgeber (Arbeitskreis Mietspiegel Krefeld)",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1947,
+          "label": "vor 1948"
+        },
+        {
+          "von": 1948,
+          "bis": 1957,
+          "label": "1948–1957"
+        },
+        {
+          "von": 1958,
+          "bis": 1969,
+          "label": "1958–1969"
+        },
+        {
+          "von": 1970,
+          "bis": 1976,
+          "label": "1970–1976"
+        },
+        {
+          "von": 1977,
+          "bis": 1985,
+          "label": "1977–1985"
+        },
+        {
+          "von": 1986,
+          "bis": 1992,
+          "label": "1986–1992"
+        },
+        {
+          "von": 1993,
+          "bis": 2000,
+          "label": "1993–2000"
+        },
+        {
+          "von": 2001,
+          "bis": 2008,
+          "label": "2001–2008"
+        },
+        {
+          "von": 2009,
+          "bis": 2015,
+          "label": "2009–2015"
+        },
+        {
+          "von": 2016,
+          "bis": null,
+          "label": "ab 2016"
+        }
+      ],
+      "wfl": [
+        {
+          "von": 55,
+          "bis": 100,
+          "label": "Bezugswohnung circa 55–100 qm (andere Größen nur über %-Zu-/Abschläge)"
+        }
+      ],
+      "lage": [
+        {
+          "schluessel": "A",
+          "label": "Wohnlage A (zentral/Hauptzentren, ruhig-durchgrünt nahe Hauptzentren, gehobenes Wohnumfeld)"
+        },
+        {
+          "schluessel": "B",
+          "label": "Wohnlage B (Wohngebiete anschließend an Hauptzentren, gute Anbindung)"
+        },
+        {
+          "schluessel": "C",
+          "label": "Wohnlage C (Wohn-/Mischgebiete mit ausreichender Anbindung)"
+        },
+        {
+          "schluessel": "D",
+          "label": "Wohnlage D (Randlagen mit schwächerer Anbindung)"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 6.9,
+        "mittel": 7.3,
+        "oben": 7.6
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 7.3,
+        "mittel": 7.6,
+        "oben": 7.9
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 7.5,
+        "mittel": 7.8,
+        "oben": 8.1
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 8.2,
+        "mittel": 8.6,
+        "oben": 8.9
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 8.6,
+        "mittel": 8.9,
+        "oben": 9.2
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 8.9,
+        "mittel": 9.2,
+        "oben": 9.6
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 9.5,
+        "mittel": 9.8,
+        "oben": 10.1
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 10.1,
+        "mittel": 10.4,
+        "oben": 10.8
+      },
+      {
+        "baujahr": 8,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 10.9,
+        "mittel": 11.2,
+        "oben": 11.6
+      },
+      {
+        "baujahr": 9,
+        "wfl": 0,
+        "lage": "A",
+        "unten": 11.4,
+        "mittel": 11.8,
+        "oben": 12.1
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 6.9,
+        "mittel": 7.3,
+        "oben": 7.6
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 7.2,
+        "mittel": 7.5,
+        "oben": 7.8
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 7.5,
+        "mittel": 7.8,
+        "oben": 8.1
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 7.6,
+        "mittel": 7.9,
+        "oben": 8.2
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 8.1,
+        "mittel": 8.5,
+        "oben": 8.8
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 8.4,
+        "mittel": 8.7,
+        "oben": 9
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 9.1,
+        "mittel": 9.5,
+        "oben": 9.8
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 10.1,
+        "mittel": 10.4,
+        "oben": 10.8
+      },
+      {
+        "baujahr": 8,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 10.4,
+        "mittel": 10.8,
+        "oben": 11.1
+      },
+      {
+        "baujahr": 9,
+        "wfl": 0,
+        "lage": "B",
+        "unten": 11.1,
+        "mittel": 11.4,
+        "oben": 11.8
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 6.6,
+        "mittel": 6.9,
+        "oben": 7.3
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 6.8,
+        "mittel": 7.2,
+        "oben": 7.5
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 7.2,
+        "mittel": 7.5,
+        "oben": 7.8
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 7.5,
+        "mittel": 7.8,
+        "oben": 8.1
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 7.9,
+        "mittel": 8.2,
+        "oben": 8.6
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 8.4,
+        "mittel": 8.7,
+        "oben": 9
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 9,
+        "mittel": 9.4,
+        "oben": 9.7
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 9.6,
+        "mittel": 9.9,
+        "oben": 10.2
+      },
+      {
+        "baujahr": 8,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 10.1,
+        "mittel": 10.4,
+        "oben": 10.8
+      },
+      {
+        "baujahr": 9,
+        "wfl": 0,
+        "lage": "C",
+        "unten": 10.4,
+        "mittel": 10.8,
+        "oben": 11.1
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 5.7,
+        "mittel": 6.1,
+        "oben": 6.4
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 6.1,
+        "mittel": 6.4,
+        "oben": 6.7
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 6.8,
+        "mittel": 7.2,
+        "oben": 7.5
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 7.2,
+        "mittel": 7.5,
+        "oben": 7.8
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 7.4,
+        "mittel": 7.7,
+        "oben": 8
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 7.7,
+        "mittel": 8,
+        "oben": 8.4
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 7.9,
+        "mittel": 8.2,
+        "oben": 8.6
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 8.4,
+        "mittel": 8.7,
+        "oben": 9
+      },
+      {
+        "baujahr": 8,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 8.8,
+        "mittel": 9.1,
+        "oben": 9.5
+      },
+      {
+        "baujahr": 9,
+        "wfl": 0,
+        "lage": "D",
+        "unten": 9.1,
+        "mittel": 9.5,
+        "oben": 9.8
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1965,
+        "wfl": 70,
+        "lage": "B"
+      },
+      "erwartet": {
+        "unten": 7.5,
+        "mittel": 7.8,
+        "oben": 8.1
+      },
+      "seite": "S. 10, Wohnlage B, Baualtersklasse 1958–1969"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2010,
+        "wfl": 80,
+        "lage": "D"
+      },
+      "erwartet": {
+        "unten": 8.8,
+        "mittel": 9.1,
+        "oben": 9.5
+      },
+      "seite": "S. 11, Wohnlage D, Baualtersklasse 2009–2015"
+    }
+  ],
+  "hinweis": "Richtwerte „nach dem Stand von August 2025“ (S. 9), Durchschnitt der letzten sechs Jahre; Art „einfach“ (§ 558c) laut Dokumentation der Stadt (Verzeichnis-Beleg); ein Ende nennt der Mietspiegel nicht (nächster laut Dokumentation zum 01.08.2027). Die Tabelle hat KEINE Größenachse: sie gilt für Wohnungen mit Küche und 2–4 Zimmern von circa 55–100 qm in Zwei- und Mehrfamilienhäusern (S. 6); die wfl-Achse bildet nur diesen Geltungsbereich ab. Kleinere und größere Wohnungen, Appartements, Einfamilienhäuser (oberer Spannenwert) und alle übrigen Zu-/Abschläge sind im Dokument als SPANNEN in Prozent angegeben (z. B. Kleinwohnung 49–40 m² +5 bis 10 %, übergroß 111–120 m² −5 bis −10 %, Aufzug 0,26–0,31 €/m²) — ohne Einzelwert, daher nicht als zuschlaege übernommen. Mittelwert = Fettdruck der Richtwerttabelle (S. 9). Modernisierte Wohnungen: Anhebung der Altersklasse (Voll: Modernisierungsjahr −10, Teil: −20 Jahre, S. 6–7). Wohnlage A–D nach Beschreibung S. 4–5 (keine Karte im Dokument). Kein Lesebeispiel — Prüfbeispiele sind zwei abgelesene Zellen."
+}
