@@ -405,19 +405,43 @@
     try {
       var z = D2._zweiScores(cats, D2.loadConfig(), buildDealFromData(d), null);
       if (!z || !z.investment || !z.finanzierung || z.investment.score == null || z.finanzierung.score == null) return null;
-      return { inv: z.investment.score, fin: z.finanzierung.score };
+      return { inv: z.investment.score, fin: z.finanzierung.score,
+        invG: z.investment.gruppen || [], finG: z.finanzierung.gruppen || [] };   /* v3248 */
     } catch (e) { return null; }
+  }
+  /* v3248 \u00b7 Marcel 09.11.2026: \u201eim Portfolio-Cockpit genauso aufteilen, auch von den KPIs
+     wie im Tab Bewertung beim Investor-Deal-Score". Die Gruppen (Name, Kennzahlen, Anteil)
+     kommen fertig aus DealScore2._zweiScores() je Objekt - dieselbe Zuordnung
+     (DealScore2.ZWEI_ZUORDNUNG) und dieselben Namen wie in der Bewertung
+     (dpsh-score-hero.js zKarte/zBalken). Hier wird nur ueber das Portfolio nach
+     Kaufpreis gewichtet, wie die Teil-Scores selbst (_zweiAgg). */
+  function _zweiGruppenSammeln(acc, gruppen, w){
+    (gruppen || []).forEach(function(g, i){
+      if (!g || g.score == null || !isFinite(g.score)) return;
+      var a = acc[g.key];
+      if (!a) a = acc[g.key] = { key: g.key, name: g.name, pos: i, s: 0, w: 0, an: 0, kpis: g.kpis || [], total: 0, n: 0 };
+      a.s += g.score * w; a.an += (Number(g.anteil) || 0) * w; a.w += w; a.n++;
+      a.total = Math.max(a.total, g.totalKpis || 0);
+      if ((g.kpis || []).length > a.kpis.length) a.kpis = g.kpis;
+    });
+  }
+  function _zweiGruppenListe(acc){
+    return Object.keys(acc).map(function(k){ return acc[k]; }).sort(function(a, b){ return a.pos - b.pos; })
+      .map(function(a){ return { key: a.key, name: a.name, score: Math.round(a.s / a.w), anteil: Math.round(a.an / a.w * 10) / 10,
+        kpis: a.kpis, total: a.total, n: a.n }; });
   }
   function _zweiAgg(){
     if (!_detailsLoaded) return { n: 0, von: wonList().length, laedt: true };
-    var arr = detailArr(), tw = 0, si = 0, sf = 0, n = 0;
+    var arr = detailArr(), tw = 0, si = 0, sf = 0, n = 0, gI = {}, gF = {};
     arr.forEach(function(d){
       var z = _zweiJeObjekt(d); if (!z) return;
       var w = num(d._kaufpreis) || 1;
       tw += w; si += z.inv * w; sf += z.fin * w; n++;
+      _zweiGruppenSammeln(gI, z.invG, w); _zweiGruppenSammeln(gF, z.finG, w);   /* v3248 */
     });
     if (!n) return { n: 0, von: arr.length };
-    return { n: n, von: arr.length, inv: Math.round(si / tw), fin: Math.round(sf / tw) };
+    return { n: n, von: arr.length, inv: Math.round(si / tw), fin: Math.round(sf / tw),
+      invG: _zweiGruppenListe(gI), finG: _zweiGruppenListe(gF) };
   }
   /* Ring wie die Bordkarte (116 px) bzw. klein fuer die zwei Teil-Scores. Farben als
      style, nicht als Attribut - var() greift in SVG-Praesentationsattributen nicht. */
@@ -483,6 +507,24 @@
         return '<div class="bar"><div class="bt"><span class="n'+(_tip?' hinfo':'')+'"'+(_tip?' tabindex="0" title="'+esc(_tip)+'"':'')+'>'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc+'<i>/100</i>')+'</span></div>'
           + '<div class="track"><div class="fill" data-w="'+sc+'" style="width:0;background:'+catBarColor(sc)+'"></div></div></div>';
       }).join('') : '<div class="bar" style="color:var(--c-pmut);font-family:JetBrains Mono;font-size:11px">Kategorien werden geladen\u2026</div>';
+    /* v3248 \u00b7 Zwei Scores mit Investor-Plan: die Bereiche wie im Reiter Bewertung in zwei
+       Gruppen (Investment | Finanzierung), Namen, Kennzahlen und Anteile aus dem Kern. Ohne
+       Plan, ohne Zwei-Score-Ansicht oder solange keine Aufteilung gespeichert ist: die
+       zusammenfassende Darstellung wie vor v3234 (ein Score, f\u00fcnf Bereiche, catsHtml). */
+    var zweiBars = '';
+    if (Z2 && Z2.n && Z2.invG && Z2.finG && (Z2.invG.length || Z2.finG.length)) {
+      var zBar = function(g){
+        var sc = Math.max(0, Math.min(100, g.score));
+        return '<div class="bar hz-bar"><div class="bt"><span class="n">' + esc(g.name) + '<em>' + String(g.anteil).replace('.', ',') + '\u00a0% \u00b7 ' + g.total + ' KPIs</em></span><span class="v">' + g.score + '<i>/100</i></span></div>'
+          + '<div class="track"><div class="fill" data-w="' + sc + '" style="width:0;background:' + catBarColor(sc) + '"></div></div>'
+          + '<div class="hz-m">' + esc((g.kpis || []).join(' \u00b7 ')) + (g.n < Z2.n ? ' \u2014 ' + g.n + ' von ' + Z2.n + ' Objekten' : '') + '</div></div>';
+      };
+      var zBlock = function(titel, sc, L){
+        /* die Zahl selbst steht schon im Ring darueber - hier nur der Name der Gruppe */
+        return '<div class="hz-gr"><div class="hz-gr-t">' + esc(titel) + '</div>' + L.map(zBar).join('') + '</div>';
+      };
+      zweiBars = zBlock('Investment-Score', Z2.inv, Z2.invG) + zBlock('Finanzierungs-Score', Z2.fin, Z2.finG);
+    }
     var cfM=S.cfVsM;
     /* v3234 \u00b7 Zwei Scores: Investment und Finanzierung unter dem Gesamtscore. Der Block
        steht VOR \u201eSo setzt sich der Score zusammen\u201c in der rechten Spalte und NACH den
@@ -509,7 +551,9 @@
       + '<div><div class="k">VOL.</div><div class="v">'+fmtKEU(S.kp)+'</div></div>'
       + '<div><div class="k">CF/MON</div><div class="v" style="color:'+(cfM>=0?'var(--c-greenl)':'var(--c-redl)')+'">'+(cfM>=0?'+':'')+fmtE(cfM)+'</div></div></div>'
       + '</div>'
-      + '<div class="hbars">' + zweiHtml + '<div class="ttl">So setzt sich der Score zusammen</div><div id="dp-hero-bars">'+catsHtml+'</div>'+detailsBtn+'</div>'
+      + '<div class="hbars">' + zweiHtml + (zweiBars
+          ? '<div class="ttl">So setzen sich die zwei Scores zusammen<em class="hz-ttl-em">wie im Reiter Bewertung \u00b7 je Bereich nach Kaufpreis gewichtet</em></div><div id="dp-hero-bars" class="hz-bars">' + zweiBars + '</div>'
+          : '<div class="ttl">So setzt sich der Score zusammen</div><div id="dp-hero-bars">'+catsHtml+'</div>') + detailsBtn + '</div>'
       + '</div></div>'
       + '<div class="vperf"></div>'
       + '<div class="hpass"><div class="hp-lab">PORTFOLIO-PASS</div><div class="qb" id="dp-hero-qr"></div>'
@@ -1054,6 +1098,14 @@
      (Mieterhoehung) · Zielbild als Spalten, dazu die Abweichung Bestand → Zielbild.
      Alle Werte aus _zielbildAgg (gespeicherter Lauf je Objekt, zielbildFuer); die
      Summenzeile nimmt die Summen von dort - dieselben wie Tabelle oben und Saetze. */
+  /* v3248 \u00b7 Ertragswert Soll ueber dieselben Objekte wie A.ewB/A.ewZ (beide Werte da) - bis
+     v3247 in der Summenzeile von _zbObjTabelle, jetzt fuer die Zusammenfassung oben. Nur
+     addiert, was zielbildFuer() je Objekt gespeichert hat; fehlt es bei einem, kein Wert. */
+  function _zbEwSoll(A){
+    var mitEw = (A.mit || []).filter(function(e){ return !e.unveraendert && e.zuw != null; });
+    if (!mitEw.length || !mitEw.every(function(e){ return e.ewM != null; })) return null;
+    return mitEw.reduce(function(t, e){ return t + e.ewM; }, 0);
+  }
   function _zbObjTabelle(A){
     var E = _fE, VZ = _fVZ, P = _fP, dat = _fDat;
     function td(v, cls, klein){ return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + v + (klein ? '<small>' + klein + '</small>' : '') + '</td>'; }
@@ -1094,20 +1146,14 @@
         + td(E(uS)) + td(E(uS), 'zb-ot-gl') + td(E(uS), 'zb-ot-gl') + td('±0 €', 'zb-ot-abw')
         + td('keine') + td('–') + td('–') + td('–') + td('–', 'zb-ot-abw') + td('–') + td('–') + '<td></td></tr>';
     }
-    /* Ertragswert-Summen ueber dieselben Objekte wie A.ewB/A.ewZ (beide Werte da) */
-    var mitEw = mit.filter(function(e){ return e.zuw != null; });
-    var ewMs = mitEw.every(function(e){ return e.ewM != null; }) ? mitEw.reduce(function(t, e){ return t + e.ewM; }, 0) : null;
-    var nMit = A.mit.length, dmS = A.mieteZ - A.mieteB, dwS = A.ewN ? A.ewZ - A.ewB : null;
-    var ewKl = A.ewN ? A.ewN + ' von ' + nMit + ' Obj.' : '';
-    var summe = '<tr class="zb-ot-sum"><th scope="row">Summe · ' + nMit + ' Objekt' + (nMit === 1 ? '' : 'e') + '</th>'
-      + td(E(A.mieteB)) + td(E(A.mieteM)) + td(E(A.mieteZ))
-      + td(VZ(dmS), 'zb-ot-abw ' + ton(dmS), P(pz(A.mieteZ, A.mieteB)))
-      + td(A.kosten ? E(A.kosten) : 'keine')
-      + td(A.ewN ? E(A.ewB) : '–', '', ewKl) + td(A.ewN && ewMs != null ? E(ewMs) : '–', '', A.ewN ? ewKl : '') + td(A.ewN ? E(A.ewZ) : '–', '', ewKl)
-      + (dwS == null ? td('–', 'zb-ot-abw') : td(VZ(dwS), 'zb-ot-abw ' + ton(dwS), P(pz(A.ewZ, A.ewB))))
-      + td(A.mpiN ? E(A.mpiB) : '–', '', A.mpiN ? A.mpiN + ' Obj.' : '')
-      + td(A.ewN ? '<b>' + VZ(A.zuw) + '</b>' : '–', A.ewN ? ton(A.zuw) : '', A.ewN ? 'nach ' + E(A.ewKosten) + ' Maßnahmen' : '')
-      + '<td></td></tr>';
+    /* v3248 \u00b7 Marcel 09.11.2026: \u201eIst das nicht dasselbe? Nicht, dass wir was doppelt drin
+       haben." Gemessen: die Summenzeile hier wiederholte die Tabelle darueber (Kaltmiete
+       Bestand/Zielbild, Abweichung, Massnahmen, Ertragswert Bestand/Zielbild, Wertzuwachs;
+       Kaltmiete Soll stand dort als \u201edavon ohne Mieterwechsel"). Sie ist raus - die Summen
+       stehen EINMAL in der Zusammenfassung oben (Spalten Bestand | Soll | Zielbild), auch die
+       drei Werte, die nur hier standen (Ertragswert Soll, Marktpreisindikation, Massnahmen der
+       Objekte mit Ertragswert). */
+    var nMit = A.mit.length;
     return '<div class="zb-ot">'
       + '<div class="zb-ot-t">Je Objekt · Bestand → Soll → Zielbild<em>wie die Tabelle der Pilot-Analyse, für alle Objekte</em></div>'
       + '<div class="zb-ot-scroll"><table class="zb-ot-tab"><thead>'
@@ -1115,8 +1161,8 @@
       +   '<th colspan="4" scope="colgroup">Ertragswert</th><th rowspan="2" scope="col">Marktpreis&shy;indikation<small>Bestand</small></th><th rowspan="2" scope="col">Wertzuwachs<small>nach Kosten</small></th><th rowspan="2" scope="col"></th></tr>'
       +   '<tr><th scope="col">Bestand</th><th scope="col">Soll</th><th scope="col">Zielbild</th><th scope="col" class="zb-ot-abw">Abw.</th>'
       +   '<th scope="col">Bestand</th><th scope="col">Soll</th><th scope="col">Zielbild</th><th scope="col" class="zb-ot-abw">Abw.</th></tr>'
-      + '</thead><tbody>' + rows + '</tbody><tfoot>' + summe + '</tfoot></table></div>'
-      + '<p class="zb-det-satz">Soll = Mieterhöhung bei gleichen Mietern bis zur Vergleichsmiete. Abw. = Zielbild gegen Bestand. Ertragswert-Summen nur über die Objekte, für die beide Stufen gerechnet sind (' + (A.ewN || 0) + ' von ' + nMit + '); Wertzuwachs = Ertragswert-Plus − Maßnahmen. Ausblick, kein Verkehrswert.</p>'
+      + '</thead><tbody>' + rows + '</tbody></table></div>'
+      + '<p class="zb-det-satz"><b>Die Summen über alle Objekte stehen oben in der Zusammenfassung.</b> Soll = Mieterhöhung bei gleichen Mietern bis zur Vergleichsmiete. Abw. = Zielbild gegen Bestand. Wertzuwachs = Ertragswert-Plus − Maßnahmen. Ausblick, kein Verkehrswert.</p>'
       + '</div>';
   }
 
@@ -1171,18 +1217,25 @@
     var mehrM = A.mieteM - A.mieteB, mehrZ = A.mieteZ - A.mieteB;
     var bmyB = A.kpMit > 0 ? A.mieteB / A.kpMit * 100 : null, bmyZ = (A.kpMit + A.kosten) > 0 ? A.mieteZ / (A.kpMit + A.kosten) * 100 : null;
     function tonV(v){ return v == null ? '' : (v >= 0 ? ' class="zb-pos"' : ' class="zb-neg"'); }
-    function zeile(l, b, z, d, dv, sub){
-      return '<tr><th scope="row">' + l + (sub ? '<small>' + sub + '</small>' : '') + '</th><td>' + b + '</td><td>' + z + '</td><td' + tonV(dv) + '>' + d + '</td></tr>';
+    /* v3248 \u00b7 DIE Zusammenfassung: Bestand | Soll | Zielbild | Veraenderung (Zielbild gegen
+       Bestand). Soll = Stufe Mieterhoehung aus _zielbildAgg (A.mieteM, A.kostenM) - nichts neu
+       gerechnet. Die Tabelle je Objekt darunter fuehrt keine eigene Summenzeile mehr. */
+    function zeile(l, b, m, z, d, dv, sub){
+      return '<tr><th scope="row">' + l + (sub ? '<small>' + sub + '</small>' : '') + '</th><td>' + b + '</td><td>' + m + '</td><td>' + z + '</td><td' + tonV(dv) + '>' + d + '</td></tr>';
     }
     var bmyD = (bmyB != null && bmyZ != null) ? bmyZ - bmyB : null;
-    var tab = '<div class="zb-vgl-scroll"><table class="zb-vgl"><thead><tr><th></th><th>Bestand</th><th>Zielbild</th><th>Veränderung</th></tr></thead><tbody>'
-      + zeile('Kaltmiete im Jahr', EK(A.mieteB), EK(A.mieteZ), VZ(mehrZ) + ' · ' + P(A.mieteB ? mehrZ / A.mieteB * 100 : null), mehrZ, nMit + ' Objekte')
-      + (Math.abs(mehrM) >= 1 || A.nMh ? zeile('davon ohne Mieterwechsel', '–', EK(A.mieteM), VZ(mehrM), mehrM, 'Mieterhöhung bis Vergleichsmiete') : '')
-      + zeile('Bruttomietrendite', _fPr(bmyB, 2), _fPr(bmyZ, 2), bmyD == null ? '–' : (bmyD >= 0 ? '+' : '−') + Math.abs(bmyD).toFixed(2).replace('.', ',') + ' Pkt.', bmyD, 'Zielbild: ÷ (Kaufpreis + Maßnahmen)')
-      + zeile('Maßnahmen', '–', A.kosten ? EK(A.kosten) : 'keine', A.kosten ? VZ(-A.kosten) : '–', A.kosten ? -1 : null, 'bis zum Zielbild, ohne Finanzierung')
-      + (A.ewN ? zeile('Ertragswert', EK(A.ewB), EK(A.ewZ), VZ(A.ewZ - A.ewB), A.ewZ - A.ewB, A.ewN + ' von ' + A.n + ' Objekten')
-               + zeile('<b>Wertzuwachs nach Kosten</b>', '', '', '<b>' + VZ(A.zuw) + '</b>', A.zuw, 'Ertragswert-Plus − Maßnahmen')
-               : zeile('Ertragswert', 'noch keiner', '', '–', null, 'je Objekt unter Bewertung rechnen'))
+    var bmyM = (A.kpMit + A.kostenM) > 0 ? A.mieteM / (A.kpMit + A.kostenM) * 100 : null;
+    var ewMs = A.ewN ? _zbEwSoll(A) : null;
+    var tab = '<div class="zb-vgl-scroll"><table class="zb-vgl zb-vgl-4"><thead><tr><th></th><th>Bestand</th><th>Soll<small>Mieterhöhung</small></th><th>Zielbild</th><th>Veränderung<small>Zielbild − Bestand</small></th></tr></thead><tbody>'
+      + zeile('Kaltmiete im Jahr', EK(A.mieteB), EK(A.mieteM), EK(A.mieteZ), VZ(mehrZ) + ' · ' + P(A.mieteB ? mehrZ / A.mieteB * 100 : null), mehrZ, nMit + ' Objekte')
+      + (Math.abs(mehrM) >= 1 || A.nMh ? zeile('davon ohne Mieterwechsel', '–', '–', '–', VZ(mehrM), mehrM, 'Mieterhöhung bis Vergleichsmiete (Bestand → Soll)')
+          + zeile('davon Umbau oder Neuvermietung', '–', '–', '–', VZ(A.mieteZ - A.mieteM), A.mieteZ - A.mieteM, 'Soll → Zielbild') : '')
+      + zeile('Bruttomietrendite', _fPr(bmyB, 2), _fPr(bmyM, 2), _fPr(bmyZ, 2), bmyD == null ? '–' : (bmyD >= 0 ? '+' : '−') + Math.abs(bmyD).toFixed(2).replace('.', ',') + ' Pkt.', bmyD, 'Soll/Zielbild: ÷ (Kaufpreis + Maßnahmen der Stufe)')
+      + zeile('Maßnahmen', '–', A.kostenM ? EK(A.kostenM) : 'keine', A.kosten ? EK(A.kosten) : 'keine', A.kosten ? VZ(-A.kosten) : '–', A.kosten ? -1 : null, 'bis zur Stufe, ohne Finanzierung')
+      + (A.ewN ? zeile('Ertragswert', EK(A.ewB), ewMs != null ? EK(ewMs) : '–', EK(A.ewZ), VZ(A.ewZ - A.ewB) + ' · ' + P(A.ewB ? (A.ewZ - A.ewB) / A.ewB * 100 : null), A.ewZ - A.ewB, A.ewN + ' von ' + A.n + ' Objekten (beide Stufen gerechnet)')
+               + zeile('<b>Wertzuwachs nach Kosten</b>', '', '', '', '<b>' + VZ(A.zuw) + '</b>', A.zuw, 'Ertragswert-Plus − ' + EK(A.ewKosten) + ' Maßnahmen dieser Objekte')
+               : zeile('Ertragswert', 'noch keiner', '', '', '–', null, 'je Objekt unter Bewertung rechnen'))
+      + (A.mpiN ? zeile('Marktpreisindikation', EK(A.mpiB), '', '', '–', null, A.mpiN + ' von ' + A.n + ' Objekten · nur Bestand') : '')
       + '</tbody></table></div>';
 
     /* v3234 · Marcel 09.11.2026: „Zielbild-Tabelle wie unter Pilot-Analyse mit der Tabelle,
@@ -1202,16 +1255,17 @@
     var lesart = '<p class="zb-det-satz">Je Objekt drei Stände aus dem Modul „Mieterhöhung und Zielbild“ – <b>Bestand</b> (heutige Mieten), <b>Mieterhöhung</b> (gleiche Mieter, bis zur Vergleichsmiete) und <b>Zielbild</b> (nach Umbau oder Neuvermietung) –, über alle Objekte addiert. Der Ertragswert je Stufe kommt aus der Wertermittlung (ImmoWertV), nicht aus einer Schätzung.'
       + (A.ewN && A.kpEw ? ' Zum Vergleich: dieselben ' + A.ewN + ' Objekte haben zusammen ' + EK(A.kpEw) + ' gekostet – der Ertragswert Bestand liegt ' + P((A.ewB / A.kpEw - 1) * 100) + ' daneben.' : '') + '</p>';
 
-    var t = _zbSaetze(A);   /* v2951b: dieselben Saetze gehen an den Portfolio-Piloten */
 
     host.innerHTML = '<div class="cpk zb-card">' + kopf
       + tab
       + gruendeHtml
       + objTab + unvHtml
       + det('wie', 'Wie wird gerechnet?', lesart + abgl + neuSatz)
-      + '<div class="zb-ausw"><div class="zb-ausw-t">Auswertung</div>' + t.map(function(s){ return '<p>' + esc(s) + '</p>'; }).join('')
-      +   '<div class="zb-ausw-pp"><button type="button" class="zb-btn zb-btn-gold" onclick="DealPilotDashboard.pilotZielbild()">Vom Portfolio-Piloten ausführlich erklären lassen ›</button>'
-      +   '</div></div>'   /* v2955 · KI-Hinweistext raus (Marcel 25.10.2026) */
+      /* v3248 \u00b7 Marcel 09.11.2026: \u201eDie Auswertung - also die Gesamtauswertung fuers Portfolio -
+         die muss da nicht hin. Die koennten wir im Portfolio-Cockpit erfragen." Der Block
+         \u201eAuswertung" (die Saetze aus _zbSaetze und der Knopf \u201eVom Portfolio-Piloten ausfuehrlich
+         erklaeren lassen") ist raus. Die Saetze gehen weiter als Fakten an den Piloten
+         (_zbPayload); fragen laesst es sich in der Liste \u201ePilot fragen" darunter (portfolio-pilot.js). */
       + '<div class="zb-fuss">' + esc(KZ) + '</div>'
       + '</div>';
   }
@@ -1349,7 +1403,7 @@
     var v = _ansicht();
     st.classList.toggle('cp-einfach', v === 'einfach'); st.classList.toggle('cp-genau', v === 'genau');
     [].forEach.call(st.querySelectorAll('.cp-ans-sw button'), function(b){ b.classList.toggle('on', b.getAttribute('data-a') === v); b.setAttribute('aria-pressed', b.getAttribute('data-a') === v ? 'true' : 'false'); });
-    if (v === 'genau' && _detailsLoaded) { try { destroyCharts(); buildCharts(); } catch (e) {} }
+    if (v === 'genau' && _detailsLoaded) { try { destroyCharts(); buildCharts(); } catch (e) {} try { renderSteuerKette(); } catch (e) {} }   /* v3248: auch die Steuerkette */
     if (sprung) { var z = st.querySelector('.cp-sek[data-sek="' + sprung + '"]'); if (z) { z.classList.remove('cp-zu'); _zuMerken(); setTimeout(function(){ z.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80); } }
   }
   function renderEinfach(){
@@ -1380,6 +1434,21 @@
     } else {
       K.push(k('Zielbild', 'noch keins', null, A.n + ' Objekte ohne Angaben', 'Soll-Miete und Zielbild trägst du im Objekt unter Bewertung ein – dann rechnet DealPilot den Ausblick.', 'zielbild'));
     }
+    /* v3248 \u00b7 Steuer ueber alle Objekte hatte in der Ansicht Einfach keine Kachel - der
+       Abschnitt 04 ist dort ausgeblendet (data-cp="genau") und war so nur ueber \u201eGenau" zu finden.
+       Zahl aus steuerKette() - derselben Rechnung wie Abschnitt 04, nichts neu gerechnet. */
+    try {
+      var _sk = steuerKette(_kettenJahr());
+      if (!_sk.geladen) _ketteNachladen();
+      if (_sk.geladen && _sk.toepfe.length) {
+        var _skS = 0, _skN = 0, _skBez = true;
+        _sk.toepfe.forEach(function(tp){ _skN += tp.schritte.length; if (tp.estPflichtig || tp.satz != null) _skS += tp.summe; else _skBez = false; });
+        K.push(k('Steuer · Wirkung ' + _kettenJahr(), (_skS >= 0 ? '+' : '−') + _fE(Math.abs(_skS)), _skS >= 0 ? 'pos' : 'neg', _skN + ' Objekt' + (_skN === 1 ? '' : 'e') + ' · ' + _sk.toepfe.length + ' Steuer' + (_sk.toepfe.length === 1 ? 'topf' : 'töpfe'),
+          (_skS >= 0 ? 'So viel Steuer sparen deine Objekte zusammen' : 'So viel Steuer kosten deine Objekte zusammen') + ' – aus den echten Ergebnissen im Reiter Steuern, mit Progression.' + (_skBez ? '' : ' Für eine Gesellschaft ist kein Steuersatz hinterlegt.'), 'steuer'));
+      } else if (_sk.geladen) {
+        K.push(k('Steuer über alle Objekte', 'noch keine', null, 'kein Objekt mit Ergebnis ' + _kettenJahr(), 'Sobald ein Objekt im Reiter Steuern gerechnet und gespeichert ist, steht hier die Wirkung über alle Objekte.', 'steuer'));
+      }
+    } catch (e) {}
     if (L.eq != null) K.push(k('Entwicklung · Eigenkapital ' + L.yr, _fEK(L.eq), 'gold', _fVZ(L.eq - H.ek) + ' in ' + PR.length + ' Jahren',
       'Modellprojektion: Schulden werden getilgt, die Objekte gewinnen 2 % im Jahr an Wert. Ein Trend, keine Zusage.', 'projektion'));
     if (_seitListe.length) K.push(k('Seit dem Kauf · DealScore', seit.b + ' besser · ' + seit.g + ' gleich · ' + seit.s + ' schlechter', null, _seitListe.length + ' Objekte mit Ankauf-Stand',
@@ -2217,6 +2286,14 @@
     var alle;
     try { alle = DealPilotWKAggregator.getAllObjectsWithWK(); } catch (e) { return erg; }
     if (!Array.isArray(alle)) return erg;
+    /* v3248 \u00b7 Marcel 09.11.2026: \u201eIrgendwie ist die Steuer ueber alle Objekte raus."
+       Gemessen: getAllObjectsWithWK() (wk-aggregator.js) gibt [] zurueck, solange NIEMAND
+       loadAll() gerufen hat - nicht null. Bis v3247 galt [] hier als \u201egeladen, leer": der
+       Abschnitt zeigte \u201eNoch keine gespeicherten Bestandsobjekte \u2026" und lud nie nach
+       (_ketteNachladen lief nur bei !geladen). Gefuellt war er nur, wenn vorher calc.js
+       (offenes Objekt, Reiter Steuern) den Aggregator geladen hatte. Jetzt: leer und noch
+       nicht nachgeladen = noch nicht geladen. */
+    if (!alle.length && !_ketteNachgeladen) return erg;
     erg.geladen = true;
     if (!alle.length) return erg;
 
@@ -2341,14 +2418,19 @@
 
   /* Einmal nachladen, wenn der Aggregator noch nichts hat — derselbe
      Merker-Gedanke wie in calc.js v1398: genau ein Anlauf, keine Schleife. */
-  var _ketteNachgeladen = false;
+  /* v3248 · _ketteNachgeladen heisst jetzt: der eine Anlauf ist FERTIG (auch erfolglos) -
+     erst dann gilt eine leere Liste in steuerKette() als „wirklich leer". _ketteLaeuft
+     verhindert den zweiten Anlauf waehrend des ersten. */
+  var _ketteNachgeladen = false, _ketteLaeuft = false;
   function _ketteNachladen() {
-    if (_ketteNachgeladen) return;
-    if (!window.DealPilotWKAggregator || typeof DealPilotWKAggregator.loadAll !== 'function') return;
-    _ketteNachgeladen = true;
-    DealPilotWKAggregator.loadAll(false).then(function () {
-      setTimeout(function () { try { renderSteuerKette(); } catch (e) {} }, 120);
-    }).catch(function () {});
+    if (_ketteNachgeladen || _ketteLaeuft) return;
+    if (!window.DealPilotWKAggregator || typeof DealPilotWKAggregator.loadAll !== 'function') { _ketteNachgeladen = true; return; }
+    _ketteLaeuft = true;
+    var fertig = function () {
+      _ketteLaeuft = false; _ketteNachgeladen = true;
+      setTimeout(function () { try { renderSteuerKette(); } catch (e) {} try { renderEinfach(); } catch (e) {} }, 120);
+    };
+    DealPilotWKAggregator.loadAll(false).then(fertig, fertig);
   }
 
   /* ═══ v1400 · Die Steuerkette zeichnen ═══════════════════════════════════

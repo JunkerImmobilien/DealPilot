@@ -1496,3 +1496,21 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   #dashboard-main .zb-ot-tab th,#dashboard-main .zb-ot-tab td{padding:6px 7px}
   #dashboard-main .zb-ot-tab tr.zb-ot-g > th:first-child,#dashboard-main .zb-ot-tab tbody th,#dashboard-main .zb-ot-tab tfoot th{min-width:118px;max-width:140px}
 }
+
+/* v3248 · Portfolio-Cockpit: zwei Scores mit Bereichen wie im Reiter Bewertung, Zusammenfassung
+   Bestand | Soll | Zielbild, Liste „Pilot fragen“. Gold nur über var(--wl-*). */
+#dashboard-main .hbars .ttl .hz-ttl-em{display:block;font:400 9.5px/1.4 'JetBrains Mono',monospace;font-style:normal;letter-spacing:.04em;color:var(--c-pmut);margin-top:2px}
+#dashboard-main .hz-bars{display:flex;flex-direction:column;gap:12px}
+#dashboard-main .hz-gr{display:flex;flex-direction:column;gap:9px}
+#dashboard-main .hz-gr + .hz-gr{padding-top:10px;border-top:1px solid var(--c-line)}
+#dashboard-main .hz-gr-t{font:700 10px/1.2 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--c-accd-txt, var(--wl-b8932f, #b8932f))}
+#dashboard-main .hz-bar .hz-m{font:400 10px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut);margin-top:3px}
+#dashboard-main .zb-vgl thead th small{display:block;font-size:8.5px;letter-spacing:.04em;text-transform:none;font-weight:400}
+#dashboard-main .dp-pp-fragen{padding:0 16px 12px}
+#dashboard-main .dp-pp-fragen-t{font:700 10px/1.2 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--c-pmut);margin:2px 0 6px}
+#dashboard-main .dp-pp-fragen ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px}
+#dashboard-main .dp-pp-frage{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--c-line, #E7E4DC);background:none;color:var(--c-ptext, #2A2826);font:500 12.5px/1.35 Inter,system-ui,sans-serif;padding:7px 2px;cursor:pointer}
+#dashboard-main .dp-pp-frage span{color:var(--wl-c9a84c, #C9A84C);font-weight:700}
+#dashboard-main .dp-pp-frage:hover{color:var(--wl-b8932f, #b8932f)}
+#dashboard-main .dp-pp-frage:disabled{opacity:.5;cursor:default}
+@media (max-width:640px){#dashboard-main .dp-pp-fragen ul{grid-template-columns:1fr}}

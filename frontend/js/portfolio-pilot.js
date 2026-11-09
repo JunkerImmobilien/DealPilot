@@ -82,6 +82,52 @@
           + 'Miss das an meiner Gesamtinvestition und nenne Prozentwerte.' }
   ];
 
+  /* ── v3248 · PILOT FRAGEN ─────────────────────────────────────────
+     Marcel 09.11.2026: „Die Gesamtauswertung fürs Portfolio muss da nicht hin
+     [Bestand & Zielbild]. Die könnten wir im Portfolio-Cockpit erfragen - eine
+     neue Liste mit Dingen, die wir fragen können." Der Block „Auswertung" im
+     Abschnitt Bestand & Zielbild ist raus (dashboard.js); hier steht die Liste.
+     KEIN neuer KI-Weg: jede Frage geht über senden() an /ai/copilot mit dem
+     Portfolio-Kontext (kontextArt 'portfolio') - Tageslimit (429) und
+     Zahlenprüfung wie bei jeder anderen Frage. Die zwei Knöpfe im Kopf
+     („Portfolio-Analyse starten", „Bestand & Zielbild erklären") sind in der
+     Liste aufgegangen (art 'analyse' / 'zielbild'), sonst stünden sie doppelt.
+     Jede Frage nennt die Felder, in denen die Antwort steht - wie v1705d: eine
+     Frage, deren Antwort nicht in den Daten steht, lädt zum Erfinden ein. */
+  var LISTE = [
+    { art: 'analyse', kurz: 'Gesamtauswertung meines Portfolios' },
+    { art: 'zielbild', kurz: 'Bestand & Zielbild ausführlich erklären' },
+    { kurz: 'Welches Objekt hat das größte Mietpotenzial?',
+      lang: 'Welches meiner Objekte hat das größte Mietpotenzial? Nimm context.bestand_zielbild.je_objekt '
+          + '(mehr_miete, mehr_miete_prozent, massnahmen, wertzuwachs_nach_kosten) und nenne die drei stärksten mit Namen und Zahl. '
+          + 'Objekte ohne Zielbild nenne getrennt.' },
+    { kurz: 'Wo droht ein Zinsrisiko bei der Anschlussfinanzierung?',
+      lang: 'Wo droht mir ein Zinsrisiko bei der Anschlussfinanzierung? Nimm je Objekt zinsbindung_bis, restschuld_eur, '
+          + 'zins_prozent und dscr: welche Bindung läuft als Nächstes aus, welche Restschuld hängt daran, und was hiesse ein '
+          + 'Zins von 1 Prozentpunkt mehr für den Kapitaldienst? Fehlt eine Zinsbindung, sag das.' },
+    { kurz: 'Welche Objekte liegen unter DSCR 1,2?',
+      lang: 'Welche meiner Objekte liegen unter einem DSCR von 1,2? Nenne sie mit Namen, DSCR, Cashflow vor Steuer und '
+          + 'Kapitaldienst aus den Objektdaten, sortiert vom niedrigsten DSCR. Liegt keines darunter, sag das.' },
+    { kurz: 'Wie entwickelt sich mein Vermögen in 10 Jahren?',
+      lang: 'Wie entwickelt sich mein Vermögen in den nächsten zehn Jahren? Nimm die Projektion (Restschuld, Eigenkapital, '
+          + 'Cashflow nach Steuer) und sag klar dazu, welche Annahmen darin stecken.' },
+    { kurz: 'Wo lohnt eine Modernisierung nach § 559 BGB?',
+      lang: 'Bei welchen Objekten könnte sich eine Modernisierung mit Mieterhöhung nach § 559 BGB lohnen? Nutze Baujahr, '
+          + 'Energieklasse, Zustand und die Maßnahmen und Mieten in context.bestand_zielbild. Nenne Kandidaten mit Begründung '
+          + 'und sag ausdrücklich, welche Angaben für eine echte Rechnung fehlen (Modernisierungskosten je Einheit, Kappung). '
+          + 'Rechne keine Umlage aus, die nicht in den Daten steht.' },
+    FRAGEN[0], FRAGEN[3]
+  ];
+  function listeFragen(i) {
+    var f = LISTE[i];
+    if (!f) return;
+    var lg = el('dp-pp-log');
+    if (lg && lg.scrollIntoView) { try { lg.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {} }
+    if (f.art === 'analyse') { analyse(); return; }
+    if (f.art === 'zielbild') { zielbildErklaeren(); return; }
+    senden(f.lang, f.kurz);
+  }
+
   /* ── Aufbau ──────────────────────────────────────────────────────── */
   function mount() {
     var host = el(HOST);
@@ -105,8 +151,6 @@
         '</div>' +
         '<label class="dp-pp-web" title="Erlaubt dem Portfolio-Piloten, für aktuelle Marktdaten im Web zu recherchieren">' +
           '<input type="checkbox" id="dp-pp-web"><span>Web-Recherche</span></label>' +
-        '<button type="button" class="dp-pp-go dp-pp-zb" id="dp-pp-zb">Bestand &amp; Zielbild erklären</button>' +
-        '<button type="button" class="dp-pp-go" id="dp-pp-go">Portfolio-Analyse starten</button>' +
       '</div>' +
       /* v2955 · der Hinweis „KI-Text · kein Kontingent … 10 bis 300 Antworten“ ist raus (Marcel
          25.10.2026); das Limit steht jetzt je Plan unter Einstellungen › Plan und auf der Preisseite. */
@@ -116,18 +160,19 @@
       '<div class="dp-pp-log" id="dp-pp-log">' +
         '<div class="dp-pp-hint">Ich kenne deine Vermögensbilanz — Gesamtinvestition, Eigenkapital, Restschuld, ' +
         'Cashflow und die Entwicklung der nächsten zehn Jahre — und jedes einzelne Objekt darin. ' +
-        'Starte die Analyse oder frag direkt.</div>' +
+        'Wähl eine Frage aus der Liste oder frag direkt.</div>' +
       '</div>' +
       /* v1705d: Schnellfragen. Ein leeres Eingabefeld ist eine Huerde -
          wer nicht weiss, was das Werkzeug kann, fragt es nicht. Die vier
          Fragen sind die, die das Portfolio wirklich beantworten kann,
          weil die Daten dafuer im Payload stehen: Cashflow je Objekt,
          Zinsbindung, Projektion, Klumpen. */
-      '<div class="dp-pp-chips" id="dp-pp-chips">' +
-        FRAGEN.map(function (f, i) {
-          return '<button type="button" class="dp-pp-chip" data-frage="' + i + '">' + esc(f.kurz) + '</button>';
+      /* v3248 · statt der vier Chips die Liste „Pilot fragen" (LISTE) */
+      '<div class="dp-pp-fragen" id="dp-pp-chips"><div class="dp-pp-fragen-t">Pilot fragen</div><ul>' +
+        LISTE.map(function (f, i) {
+          return '<li><button type="button" class="dp-pp-frage" data-frage="' + i + '">' + esc(f.kurz) + '<span aria-hidden="true">›</span></button></li>';
         }).join('') +
-      '</div>' +
+      '</ul></div>' +
       '<div class="dp-pp-bar">' +
         '<textarea id="dp-pp-in" class="dp-pp-in" rows="1" placeholder="Frage zum Portfolio oder zu einem Objekt…"></textarea>' +
         '<button id="dp-pp-send" class="dp-pp-send" type="button">Senden</button>' +
@@ -147,10 +192,9 @@
        vier Stellen, an denen man einen vergessen kann. */
     var ch = el('dp-pp-chips');
     if (ch) ch.addEventListener('click', function (e) {
-      var b = e.target.closest ? e.target.closest('.dp-pp-chip') : null;
+      var b = e.target.closest ? e.target.closest('.dp-pp-frage') : null;
       if (!b) return;
-      var f = FRAGEN[+b.getAttribute('data-frage')];
-      if (f) senden(f.lang, f.kurz);
+      listeFragen(+b.getAttribute('data-frage'));   /* v3248 */
     });
     var s = el('dp-pp-send');
     if (s) s.addEventListener('click', function () { frage(); });
@@ -233,6 +277,7 @@
     var gknopf = el('dp-pp-go'), sknopf = el('dp-pp-send'), zknopf = el('dp-pp-zb');
     if (zknopf) zknopf.disabled = true;
     if (gknopf) gknopf.disabled = true;
+    [].forEach.call(document.querySelectorAll('#dp-pp .dp-pp-frage'), function (x) { x.disabled = true; });   /* v3248 */
     if (sknopf) sknopf.disabled = true;
 
     if (sichtbar) { addMsg('user', sichtbar); }
@@ -321,6 +366,7 @@
       var a = el('dp-pp-go'), b = el('dp-pp-send'), zb2 = el('dp-pp-zb');
       if (zb2) zb2.disabled = false;
       if (a) a.disabled = false;
+      [].forEach.call(document.querySelectorAll('#dp-pp .dp-pp-frage'), function (x) { x.disabled = false; });   /* v3248 */
       if (b) b.disabled = false;
     });
   }
@@ -560,7 +606,7 @@
     history = [];
     var log = el('dp-pp-log');
     if (log) log.innerHTML = '';
-    senden(ANALYSE_AUFTRAG, 'Portfolio-Analyse starten', true);   /* v2012 */
+    senden(ANALYSE_AUFTRAG, 'Gesamtauswertung meines Portfolios', true);   /* v2012 · v3248: Text wie in der Liste */
   }
 
   function frage() {
@@ -590,5 +636,6 @@
   else beobachten();
 
   window.DealPilotPortfolioPilot = { mount: mount, analyse: analyse, _kontext: kontext,
-    zielbildErklaeren: zielbildErklaeren, _zahlenPruefen: zahlenPruefen };   /* v2951 */
+    zielbildErklaeren: zielbildErklaeren, _zahlenPruefen: zahlenPruefen,   /* v2951 */
+    fragen: listeFragen, _liste: LISTE };   /* v3248 */
 })();
