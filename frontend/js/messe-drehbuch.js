@@ -4547,7 +4547,10 @@
         await b2oZeile(s, 'Den Rechner öffnen', 'Reiter Steuer, „eigener Satz“, <b>Restnutzungsdauer ermitteln</b>. Die Objektdaten sind schon eingetragen.');
       },
       async function (s) {   /* 4 · die Schritte */
-        var zb = r6Beginn(s, 'Neun Schritte', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — jeder Schritt ist vorbelegt, du korrigierst nur.');
+        /* v3272 · acht Schritte (Objekt … Ergebnis), Namen aus der Schrittleiste */
+        var sn = r6Wiz() ? [].map.call(r6Wiz().querySelectorAll('.rnd-wiz-modal *'), function (e) { return e.children.length ? '' : r6Text(e); }).filter(function (x) { return /^(Objekt|Auftrag|Bau|Technik|Modernisierung|Gewerke|Mängel|Ergebnis)$/.test(x); }) : [];
+        sn = sn.filter(function (x, i) { return sn.indexOf(x) === i; });
+        var zb = r6Beginn(s, (sn.length || 8) === 8 ? 'Acht Schritte' : sn.length + ' Schritte', (sn.length ? sn.join(', ') : 'Objekt, Auftrag, Bau, Technik, Modernisierung, Gewerke, Mängel, Ergebnis') + ' — jeder Schritt ist vorbelegt, du korrigierst nur.');
         for (var i = 0; i < 8 && !/Schritt 8 von 8/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1300); }
         await warteAuf(function () { return /Schritt 8 von 8/.test(r6WizTitel()); }, 4000);
         await r6Ende(zb);
@@ -4556,7 +4559,7 @@
         await warte(700);
         await zeige(r10cKarte, 8);
         var E = r10cErgebnis();
-        await b2oZeile(s, 'Das Ergebnis', '<b>' + (E.spanne || '–') + ' Jahre</b> — ganze Jahre, als Spanne: Modellwert ' + (E.mitte || '–') + ' Jahre, ± 2. Eine einzelne Zahl täte genauer, als eine Ersteinschätzung ist.');
+        await b2oZeile(s, 'Das Ergebnis', '<b>' + (E.spanne || '–') + ' Jahre</b> — ganze Jahre, als Spanne: Modellwert ' + (E.mitte || '–') + ' Jahre, ± 2. Eine einzelne Zahl behauptete mehr Genauigkeit, als eine Ersteinschätzung hat.');
       },
       async function (s) {   /* 6 · übernehmen -> eigener AfA-Satz, vorher/nachher */
         var k = function () { return q('#rnd-uebernehmen'); };
@@ -4587,30 +4590,10 @@
         await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa-eigen-box') || q('#afa_kalk'); }, 8);
         await b2oZeile(s, 'Im Reiter Steuer', 'Eigener Satz aus <b>' + (wert('afa_rnd_jahre') || '–') + ' Jahren</b> — AfA ' + (r6Id('afa_kalk') || '–') + ' im Jahr. Die Grundlage steht dabei: ' + (wert('afa_eigen_grundlage') || '–') + '.');
       },
-      async function (s) {   /* 9 · ein Altbau */
-        await r10cZweiteKopie(R11_PARK);   /* Prüflauf: eigene Zeile während des Kopierens hatte keinen Kegel - die vorige bleibt stehen */
-        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
-        var alter = new Date().getFullYear() - Number(wert('baujahr'));
-        await b2oZeile(s, 'Und ein Altbau?', 'Baujahr ' + wert('baujahr') + ': <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + alter + ' Jahre alt, älter als die Gesamtnutzungsdauer von 80 Jahren.');
-      },
-      async function (s) {   /* 10 · Plateau */
-        await r10cRechnerAuf();
-        var zb = r6Beginn(s, 'Derselbe Rechner', 'Gleiche Schritte, vorbelegt aus dem Objekt.');
-        await r10cDurch();
-        await r6Ende(zb);
-        await zeige(r10cKarte, 8);
-        var E = r10cErgebnis();
-        await b2oZeile(s, 'Alter höchstens die GND', '<b>' + (E.spanne || '–') + ' Jahre</b>. Ist das Haus älter als seine Gesamtnutzungsdauer, setzt DealPilot wie die ImmoWertA als Alter die Gesamtnutzungsdauer an.');   /* v2939 · bis v2938 „Am Scheitel gehalten" */
-        var p = function () { return q('#rnd-pruefpflicht'); };
-        var x = p(); if (x) x.scrollIntoView({ block: 'center' });
-        await warte(500);
-        await zeigeGruppe(p, function () { return q('#rnd-uebernehmen') || p(); }, 8);
-        var gs = q('#rnd-uebernehmen'), gesperrt = gs && gs.disabled;
-        await b2oZeile(s, 'Sachverständig zu würdigen', p() ? 'So steht es da, mit Begründung' + (gesperrt ? ' — und die Übernahme als AfA-Satz ist <b>gesperrt</b>, bis ein Sachverständiger urteilt.' : '.') : 'Die Kennzeichnung fehlt hier.');
-      },
+      /* v3272 · Szenen 9-10 (Altbau, „sachverständig zu würdigen“) entfallen - Marcel 09.11.2026: 10c ohne Sachverständigen */
       async function (s) {   /* 11 · Schluss */
-        await zeige(r10cKarte, 8);
-        await b2oZeile(s, 'Ersteinschätzung in Minuten', 'Wie viele Jahre bleiben, was es steuerlich bringt — und wo die Rechnung endet. Für die Erklärung zählt das Gutachten.', 600);
+        await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa-eigen-box') || q('#afa_kalk'); }, 8);   /* v3272: der Rechner ist hier schon zu */
+        await b2oZeile(s, 'Ersteinschätzung in Minuten', 'Wie viele Jahre bleiben und was es steuerlich bringt. Für die Steuererklärung zählt das Gutachten.', 600);
         r6WizZu(); kegelHoch(false);
       }
     ]
