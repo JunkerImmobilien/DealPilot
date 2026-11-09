@@ -106,6 +106,71 @@
     return zeile('Bodenrichtwert', brw ? esc(brw) + ' €/m²' : '—', q, knopf(manuell ? 'ändern' : 'eintragen', 'brw_manuell'));
   }
 
+  /* ══ v3237 · DIE PARAMETER ALS KACHELN ═══════════════════════════════
+
+     Marcel am 09.11.2026: „Die Parameter der Verkehrswertermittlung
+     könnten auf Karten einfach dargestellt werden und erst unter ‚genau'
+     so erscheinen wie jetzt."
+
+     Die Zeilen (zeile(), oben) bleiben die Quelle und werden NICHT
+     umgebaut: dieselbe HTML-Kette steht unverändert in <details
+     class="oe-genau">. Die Kacheln darüber lesen sie nur ab — Bezeichnung
+     (.oe-k), Wert (.oe-w), die Marken der Herkunft (.oe-st: Stufe A–E/N,
+     Anlage 2, Standard …) und den Knopf. Keine Zahl entsteht hier neu.
+     „indikativ" steht dabei, wo die Stufe es ist (B, C, N — Tooltip der
+     Pille sagt dasselbe), D heisst „Auffangwert". Ohne Marke steht der
+     Herkunftssatz zweizeilig gekürzt da, ganz im Tooltip.
+     Ein Klick auf die Kachel klappt „Genau ansehen" auf und springt zur
+     Zeile. */
+  var _genauOffen = false;
+  function kachelnSetzen(box, html) {
+    box.classList.add('oe-mit-kacheln');
+    var tmp = document.createElement('div'); tmp.innerHTML = html;
+    var rows = Array.prototype.filter.call(tmp.children, function (c) { return c.classList && c.classList.contains('oe-row'); });
+    if (!rows.length) { box.innerHTML = html; return; }
+    var kacheln = rows.map(function (r, i) {
+      r.setAttribute('data-oe-kachel-ziel', String(i));
+      var kEl = r.querySelector('.oe-k'), wEl = r.querySelector('.oe-w'), qEl = r.querySelector('.oe-q');
+      var aEl = r.lastElementChild && r.lastElementChild !== qEl ? r.lastElementChild : null;
+      var k = kEl ? kEl.textContent.trim() : '';
+      var w = wEl ? wEl.textContent.trim() : '—';
+      var marken = qEl ? Array.prototype.slice.call(qEl.querySelectorAll('.oe-st')).slice(0, 2) : [];
+      var ind = '';
+      marken.forEach(function (m) {
+        var t = String(m.textContent || '').trim();
+        if (/^Stufe [BCN]$/.test(t)) ind = 'indikativ';
+        else if (/^Stufe D$/.test(t) && !ind) ind = 'Auffangwert';
+      });
+      var qText = '';
+      if (qEl) { var qc = qEl.cloneNode(true); Array.prototype.forEach.call(qc.querySelectorAll('.oe-st,.oe-chips,br'), function (x) { x.parentNode.removeChild(x); }); qText = String(qc.textContent || '').replace(/\s+/g, ' ').trim(); }
+      var karte = /^Bodenrichtwert$/.test(k) ? '<button type="button" class="oe-kachel-karte" data-brw-karte="1" title="Karte mit den Bodenrichtwertzonen rund um die Adresse">Karte</button>' : '';
+      return '<div class="oe-kachel" data-oe-kachel="' + i + '" role="button" tabindex="0" title="' + esc(qText ? k + ' — ' + qText : k) + '">'
+        + '<span class="oe-kachel-k">' + esc(k) + '</span>'
+        + '<span class="oe-kachel-w' + (w.length > 11 ? ' lang' : '') + '">' + esc(w) + '</span>'
+        + (marken.length || ind ? '<span class="oe-kachel-m">' + marken.map(function (m) { return m.outerHTML; }).join('') + (ind ? '<span class="oe-kachel-ind">' + ind + '</span>' : '') + '</span>' : '')
+        + (!marken.length && qText ? '<span class="oe-kachel-q">' + esc(qText) + '</span>' : '')
+        + ((aEl && aEl.innerHTML.trim()) || karte ? '<span class="oe-kachel-a">' + (aEl ? aEl.innerHTML : '') + karte + '</span>' : '')
+        + '</div>';
+    }).join('');
+    box.innerHTML = '<div class="oe-kacheln">' + kacheln + '</div>'
+      + '<details class="oe-genau"' + (_genauOffen ? ' open' : '') + '><summary><span class="oe-genau-k">Genau ansehen</span>'
+      + '<span class="oe-genau-h">Herkunft, Quellen und Stufen je Parameter</span></summary>' + tmp.innerHTML + '</details>';
+    if (!box._oeKachelnVerdrahtet) {
+      box._oeKachelnVerdrahtet = true;
+      box.addEventListener('toggle', function (e) { if (e.target && e.target.classList && e.target.classList.contains('oe-genau')) _genauOffen = e.target.open; }, true);
+      var springen = function (e) {
+        if (e.target.closest('button,a,[data-oe-feld]')) return;
+        var kk = e.target.closest('[data-oe-kachel]'); if (!kk) return;
+        var det = box.querySelector('.oe-genau'); if (!det) return;
+        det.open = true; _genauOffen = true;
+        var z = det.querySelector('[data-oe-kachel-ziel="' + kk.getAttribute('data-oe-kachel') + '"]');
+        if (z) { try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) {} z.classList.add('oe-kachel-blitz'); setTimeout(function () { z.classList.remove('oe-kachel-blitz'); }, 1600); }
+      };
+      box.addEventListener('click', springen);
+      box.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[data-oe-kachel]')) { e.preventDefault(); springen(e); } });
+    }
+  }
+
   /* ══ v1972 · DER WEG ZUR ANLAGE 2 ════════════════════════════════════
 
      Marcel am 08.10.2026: „das brauchst du nicht weiter anzeigen, also
@@ -356,11 +421,11 @@
     }
     var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {
-      box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
-        + zeile('Sachwertfaktor', '—', 'PLZ eintragen', '') + zeile('GND / RND', '—', 'Baujahr und Objektart eintragen', '') + mpZeile;
+      kachelnSetzen(box, brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
+        + zeile('Sachwertfaktor', '—', 'PLZ eintragen', '') + zeile('GND / RND', '—', 'Baujahr und Objektart eintragen', '') + mpZeile);   /* v3237 */
       return;
     }
-    box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '…', 'wird aus dem Register gelesen', '') + mpZeile;
+    kachelnSetzen(box, brwZeile() + zeile('Liegenschaftszins', '…', 'wird aus dem Register gelesen', '') + mpZeile);   /* v3237 */
     var r = await api('/marktbericht/wertparameter/zinssatz', { object: o });
     if (lauf !== _autoLauf) return;
     /* v3002 · der Abgleich mit dem Marktbericht (mb-abgleich.js) liest denselben Abruf, keinen zweiten */
@@ -496,7 +561,7 @@
     }
     html += mpZeile;
     html += RND_HINWEIS + LEGENDE;   /* v1967 + v1865 */
-    box.innerHTML = html;
+    kachelnSetzen(box, html);   /* v3237 · Kacheln oben, die Zeilen unverändert unter „Genau ansehen" */
     /* v1855 · was der Anfragen-Block wissen muss: fehlt der Zins, fehlt der Faktor? */
     /* v1865 · Stufe D ist der gesetzliche Auffangwert (§ 256 BewG) — ein Wert,
        aber keiner aus dem Register. Der Anfragen-Block muss das wissen, sonst

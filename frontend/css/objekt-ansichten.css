@@ -1,0 +1,196 @@
+/* ═══════════════════════════════════════════════════════════════
+   frontend/css/objekt-ansichten.css — v3237 · Marcel 09.11.2026
+   Reiter Objekt, vier Ansichten (Spracheingabe):
+
+   (1) „Die Pilot-Lage-Bewertung darf gerne kompakter dargestellt werden,
+       vor allem wenn noch kein Aufruf passiert ist."
+       Vor dem Aufruf steht im Körper nur .ki-lage-empty — dann wird die
+       Box ein Streifen: Kopf mit Knopf, darunter eine Zeile Text.
+       Danach weniger Abstände; der Abgleich ist schon ein <details>.
+       Spezifität über object-actions.js (#ki-lage-box.ki-lage-box mit
+       !important, eingespritzt) — deshalb html body … !important.
+
+   (2) „Die Parameter der Verkehrswertermittlung könnten auf Karten
+       einfach dargestellt werden und erst unter ‚genau' so erscheinen
+       wie jetzt." — Kacheln aus objekt-reiter.js kachelnSetzen(), die
+       Zeilen unverändert in <details class="oe-genau">.
+
+   (3) Bodenrichtwert-Karte (js/brw-karte.js): Fenster mit Leaflet und
+       den Zonen des bundesweiten Dienstes der Gutachterausschüsse.
+
+   (4) „Einklappen" der Pilot-Mietpreis-Analyse: in ki-miete.js selbst.
+
+   Optik wie Reiter Objekt: weiß, Rahmen Gold 22 %, Radius 2 px, Köpfe
+   in Mono 10 px Versalien. Gold nur als var(--wl-<hex>, #<hex>).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── (1) Pilot-Lage-Bewertung ─────────────────────────────────── */
+html body #ki-lage-box.ki-lage-box {
+  background: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;
+  border-radius: 2px !important;
+  padding: 10px 14px !important;
+}
+html body #ki-lage-box .ki-lage-header { margin-bottom: 0 !important; gap: 8px 12px; }
+html body #ki-lage-box .ki-lage-body { margin-top: 8px; }
+/* vor dem ersten Aufruf: ein Streifen */
+html body #ki-lage-box.ki-lage-box:has(> #ki-lage-body > .ki-lage-empty:only-child) { padding: 7px 12px !important; }
+html body #ki-lage-box:has(> #ki-lage-body > .ki-lage-empty:only-child) .ki-lage-body { margin-top: 2px; }
+html body #ki-lage-box:has(> #ki-lage-body > .ki-lage-empty:only-child) .ki-lage-title { font-size: 12.5px; }
+html body #ki-lage-box .ki-lage-empty {
+  margin: 0 !important; padding: 0 !important;
+  font-size: 11.5px !important; line-height: 1.35 !important; font-style: normal;
+  color: var(--muted, #7A7370);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* nach dem Aufruf: dichter */
+html body #ki-lage-box .ki-lage-vergleich { padding: 8px 10px; margin: 0 0 8px; border-radius: 2px; }
+html body #ki-lage-box .lv-kopf { margin-bottom: 4px; font-size: 10px; }
+html body #ki-lage-box .lv-tab td { padding: 4px 6px; }
+html body #ki-lage-box .lv-abgl { margin-top: 6px; border-radius: 2px; border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent); }
+html body #ki-lage-box .lv-abgl > summary { padding: 7px 0; }
+html body #ki-lage-box .lv-sk { font-size: 10px; }
+html body #ki-lage-box .lv-fuss { font-size: 11px; }
+@media (max-width: 640px) {
+  html body #ki-lage-box .ki-lage-empty { white-space: normal; }
+  html body #ki-lage-box:has(> #ki-lage-body > .ki-lage-empty:only-child) .ki-lage-tag { display: none; }
+}
+
+/* ── (2) Parameter der Verkehrswertermittlung als Kacheln ─────── */
+#oe-auto.oe-auto.oe-mit-kacheln { border: 0; background: transparent; border-radius: 0; overflow: visible; }
+.oe-kacheln {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+.oe-kachel {
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 0;
+  padding: 9px 10px 8px;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.oe-kachel:hover, .oe-kachel:focus-visible { border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent); outline: none; }
+.oe-kachel-k {
+  font: 500 10px/1.25 "JetBrains Mono", monospace;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted, #7A7370);
+  overflow-wrap: anywhere;
+}
+.oe-kachel-w {
+  font: 600 19px/1.15 "Space Grotesk", Inter, sans-serif;
+  color: var(--ch, #2A2727);
+  overflow-wrap: anywhere;
+}
+.oe-kachel-w.lang { font-size: 13.5px; line-height: 1.25; }
+.oe-kachel-m { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.oe-auto .oe-kachel-m .oe-st { margin: 0; min-width: 0; }
+.oe-kachel-ind {
+  font: 500 9.5px/1.2 "JetBrains Mono", monospace;
+  letter-spacing: .05em; text-transform: uppercase;
+  color: var(--muted, #7A7370);
+}
+.oe-kachel-q {
+  font-size: 11px; line-height: 1.3; color: var(--muted, #7A7370);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.oe-kachel-a { margin-top: auto; padding-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+html body .oe-auto .oe-kachel-a .oe-btn,
+html body .oe-kachel-a .oe-kachel-karte {
+  width: auto !important; min-height: 0;
+  padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important;
+  font: 500 10px/1.4 "JetBrains Mono", monospace !important;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--wl-b8932f, #b8932f) !important;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+/* „Genau ansehen" — darin die bisherigen Zeilen, unverändert */
+.oe-genau {
+  margin-top: 8px;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.oe-genau > summary {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px;
+  padding: 8px 12px;
+  cursor: pointer; list-style: none;
+}
+.oe-genau > summary::-webkit-details-marker { display: none; }
+.oe-genau > summary::before { content: "▸"; color: var(--wl-b8932f, #b8932f); font-size: 10px; }
+.oe-genau[open] > summary::before { content: "▾"; }
+.oe-genau-k {
+  font: 600 10px/1.3 "JetBrains Mono", monospace;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--wl-b8932f, #b8932f);
+}
+.oe-genau-h { font-size: 11px; color: var(--muted, #7A7370); }
+.oe-auto .oe-genau .oe-row.oe-kachel-blitz { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent); transition: background .3s; }
+@media (max-width: 420px) {
+  .oe-kacheln { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .oe-kachel { padding: 8px; }
+  .oe-kachel-w { font-size: 16px; }
+  .oe-kachel-w.lang { font-size: 12.5px; }
+}
+
+/* ── (3) Bodenrichtwert-Karte ──────────────────────────────────── */
+.brw-karte-ov {
+  position: fixed; inset: 0; z-index: 10050;
+  background: rgba(5, 5, 5, .55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.brw-karte-dlg {
+  width: min(960px, 100%); height: min(680px, calc(100vh - 32px)); height: min(680px, calc(100dvh - 32px));
+  display: flex; flex-direction: column; min-width: 0;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
+  border-radius: 2px;
+  box-shadow: 0 18px 48px rgba(5, 5, 5, .35);
+  overflow: hidden;
+}
+.brw-karte-kopf {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
+}
+.brw-karte-titel {
+  font: 600 10px/1.3 "JetBrains Mono", monospace;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--wl-9a7f33, #9a7f33);
+}
+.brw-karte-adr { flex: 1 1 auto; min-width: 0; font-size: 12px; color: var(--ch, #2A2727); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.brw-karte-zu {
+  margin-left: auto; width: 28px; height: 28px; flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent); border-radius: 2px;
+  background: #fff; color: var(--ch, #2A2727); font-size: 18px; line-height: 1; cursor: pointer;
+}
+.brw-karte-hinweis { padding: 6px 14px; font-size: 11.5px; line-height: 1.4; color: var(--muted, #7A7370); }
+.brw-karte-hinweis a { color: var(--wl-b8932f, #b8932f); }
+.brw-karte-map { flex: 1 1 auto; min-height: 0; background: #f2efe8; }
+.brw-karte-fuss {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
+  padding: 8px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
+  font-size: 11.5px; color: var(--muted, #7A7370);
+}
+.brw-karte-portal {
+  margin-left: auto;
+  padding: 4px 10px; border-radius: 2px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);
+  background: #fff; color: var(--wl-9a7f33, #9a7f33);
+  font: 500 10px/1.4 "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase;
+}
+.brw-karte-pop { font: 12px/1.45 Inter, sans-serif; color: #2A2727; }
+.brw-karte-pop + .brw-karte-pop { margin-top: 6px; padding-top: 6px; border-top: 1px solid #eee; }
+@media (max-width: 640px) {
+  .brw-karte-ov { padding: 8px; }
+  .brw-karte-dlg { height: calc(100vh - 16px); height: calc(100dvh - 16px); }
+  .brw-karte-adr { flex-basis: 100%; order: 3; white-space: normal; }
+  .brw-karte-portal { margin-left: 0; }
+}

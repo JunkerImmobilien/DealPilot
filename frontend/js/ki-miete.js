@@ -357,7 +357,12 @@ function kiMieteRechtUmschalten(btn) {
   function setzen(zu) {
     var b = box(); if (!b) return;
     b.classList.toggle('kmu-zu', zu);
-    var k = b.querySelector('.kmu-klapp'); if (k) { k.textContent = zu ? 'aufklappen' : 'einklappen'; k.setAttribute('aria-expanded', String(!zu)); }
+    var k = b.querySelector('.kmu-klapp'); if (k) {
+      /* v3237 · Marcel 09.11.2026: „der Button ‚Einklappen' kann dezent dargestellt werden" -
+         Textknopf mit Chevron statt Rahmenknopf (Stil unten in einbauen()) */
+      k.innerHTML = '<span class="kmu-klapp-t">' + (zu ? 'aufklappen' : 'einklappen') + '</span><span class="kmu-klapp-c" aria-hidden="true">' + (zu ? '▾' : '▴') + '</span>';
+      k.title = zu ? 'Pilot-Mietpreis-Analyse aufklappen' : 'Pilot-Mietpreis-Analyse einklappen';
+      k.setAttribute('aria-expanded', String(!zu)); }
     try { localStorage.setItem(LS, zu ? '1' : '0'); } catch (e) {}
   }
   function einbauen() {
@@ -366,7 +371,10 @@ function kiMieteRechtUmschalten(btn) {
     var st = document.getElementById('kmu-klapp-stil');
     if (!st) { st = document.createElement('style'); st.id = 'kmu-klapp-stil';
       st.textContent = '#ki-miete-box.kmu-zu #ki-miete-body{display:none}'
-        + '.kmu-klapp{border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 45%,transparent);background:transparent;color:inherit;border-radius:8px;padding:5px 10px;font:500 12px Inter,sans-serif;cursor:pointer;margin-left:8px}';
+        /* v3237 · dezent: kein Rahmen, gedeckte Schrift, Gold erst beim Darüberfahren */
+        + '#ki-miete-box .kmu-klapp{display:inline-flex;align-items:center;gap:4px;border:0 !important;background:transparent !important;box-shadow:none !important;color:var(--muted,#7A7370);border-radius:2px;padding:2px 4px;font:500 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-left:6px;width:auto;min-height:0}'
+        + '#ki-miete-box .kmu-klapp:hover,#ki-miete-box .kmu-klapp:focus-visible{color:var(--wl-b8932f,#b8932f)}'
+        + '#ki-miete-box .kmu-klapp-c{font-size:11px;line-height:1}';
       document.head.appendChild(st); }
     var k = document.createElement('button'); k.type = 'button'; k.className = 'kmu-klapp';
     k.addEventListener('click', function () { setzen(!box().classList.contains('kmu-zu')); });

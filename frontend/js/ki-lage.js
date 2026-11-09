@@ -696,15 +696,13 @@ window.runKiLage = runKiLage;
       textColor = '#5f5e5a';
     }
     
+    /* v3237 · kompakt: Titel und Satz in einer Zeile, weniger Abstand */
     return (
-      '<div style="background:' + bgColor + ';border:0.5px solid ' + borderColor + ';' +
-      'border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;display:flex;' +
-      'gap:8px;align-items:flex-start;color:' + textColor + ';">' +
-        '<div style="font-size:14px;line-height:1;margin-top:2px">' + icon + '</div>' +
-        '<div>' +
-          '<div style="font-weight:600;margin-bottom:2px">' + title + '</div>' +
-          '<div style="line-height:1.4">' + text + '</div>' +
-        '</div>' +
+      '<div class="ki-lage-genau" style="background:' + bgColor + ';border:0.5px solid ' + borderColor + ';' +
+      'border-radius:2px;padding:5px 10px;margin-bottom:8px;font-size:11.5px;display:flex;' +
+      'gap:6px;align-items:baseline;color:' + textColor + ';line-height:1.4">' +
+        '<span style="font-size:12px;line-height:1">' + icon + '</span>' +
+        '<span><b style="font-weight:600">' + title + '</b> · ' + text + '</span>' +
       '</div>'
     );
   }
@@ -716,8 +714,10 @@ window.runKiLage = runKiLage;
       var body = _getBody();
       var btn = _getBtn();
       if (body) {
-        body.innerHTML = '<div class="ki-lage-empty" style="color:#888780;font-size:13px;padding:14px 0">' +
-          'Klicke "Lage analysieren" für eine KI-gestützte Makro- und Mikrolagen-Bewertung.' +
+        /* v3237 · Marcel 09.11.2026: „kompakter, vor allem wenn noch kein Aufruf passiert ist" -
+           eine Zeile, die Box schrumpft dann per CSS (objekt-ansichten.css) auf einen Streifen */
+        body.innerHTML = '<div class="ki-lage-empty">' +
+          'Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung — ein Klick, sobald die Adresse steht.' +
         '</div>';
       }
       if (btn) {
@@ -896,7 +896,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       if (tag) tag.textContent = '4 gemessen · 2 KI';
       if (body.getAttribute('data-aus-bericht')) {
         body.removeAttribute('data-aus-bericht');
-        body.innerHTML = '<div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — DealPilot misst Makrolage, Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten und stellt die KI-Einschätzung daneben; Wertsteigerung und Entwicklung ergänzt die KI.</div>';
+        body.innerHTML = '<div class="ki-lage-empty">Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung — ein Klick, sobald die Adresse steht.</div>';
       }
       return;
     }
