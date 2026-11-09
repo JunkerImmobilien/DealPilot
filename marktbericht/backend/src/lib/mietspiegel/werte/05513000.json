@@ -3,6 +3,7 @@
   "gemeinde": "Gelsenkirchen",
   "art": "einfach",
   "stand": "2026-01-01",
+  "erhebungsstichtag": null,
   "gueltig_ab": "2026-01-01",
   "gueltig_bis": "2027-12-31",
   "quelle": {
@@ -14,6 +15,8 @@
   },
   "einheit": "eur_qm_nettokalt",
   "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Das Dokument nennt „Stand 01.01.2026“ und „gültig ab 01.01.2026“, aber weder Erhebungsstichtag noch Ende; gueltig_bis 31.12.2027 aus der Pressemeldung der Stadt (Verzeichnis-Beleg), nicht aus dem Mietspiegel. Art „einfach“ aus dem Verzeichnis, das Dokument selbst nennt keine Art. Datenbasis Mieten aus sechs Jahren. Mittelwert und Spanne je Zelle laut Dokument; Zu-/Abschläge gelten für Mittelwert UND Spannengrenzen (Kap. 6). Die Tabelle gilt für das Normobjekt (Kap. 4.3) in den REGE-Bezirken ohne Lageanpassung; Lage geht als Zu-/Abschlag je REGE-Bezirk ein (Kap. 6.10). Wohnflächenklassen „> 40 bis 60“ usw. — Untergrenze ausschließlich. Lage: objekt.lage = Name des REGE-Bezirks (z. B. „Buer-Ost“); Bezirke ohne Anpassung brauchen keine Angabe.",
   "tabelle": {
     "achsen": {
       "baujahr": [
@@ -66,16 +69,19 @@
         },
         {
           "von": 40,
+          "von_inkl": false,
           "bis": 60,
           "label": "B: > 40 m² bis 60 m²"
         },
         {
           "von": 60,
+          "von_inkl": false,
           "bis": 100,
           "label": "C: > 60 m² bis 100 m²"
         },
         {
           "von": 100,
+          "von_inkl": false,
           "bis": null,
           "label": "D: > 100 m²"
         }
@@ -309,265 +315,309 @@
     ],
     "zuschlaege": [
       {
-        "merkmal": "kein Balkon/Loggia/Terrasse",
+        "merkmal": "kein_balkon_loggia_terrasse",
         "art": "eur_qm",
         "wert": -0.33,
-        "beleg": "S. 5, Kap. 6.1"
+        "beleg": "S. 5, Kap. 6.1",
+        "label": "kein Balkon/Loggia/Terrasse"
       },
       {
-        "merkmal": "Erdgeschoss",
+        "merkmal": "erdgeschoss",
         "art": "eur_qm",
         "wert": -0.06,
-        "beleg": "S. 5, Kap. 6.2"
+        "beleg": "S. 5, Kap. 6.2",
+        "label": "Erdgeschoss"
       },
       {
-        "merkmal": "3.-4. Obergeschoss",
+        "merkmal": "3_4_obergeschoss",
         "art": "eur_qm",
         "wert": -0.21,
-        "beleg": "S. 5, Kap. 6.2"
+        "beleg": "S. 5, Kap. 6.2",
+        "label": "3.-4. Obergeschoss"
       },
       {
-        "merkmal": "ab dem 5. Obergeschoss",
+        "merkmal": "ab_dem_5_obergeschoss",
         "art": "eur_qm",
         "wert": -0.35,
-        "beleg": "S. 5, Kap. 6.2"
+        "beleg": "S. 5, Kap. 6.2",
+        "label": "ab dem 5. Obergeschoss"
       },
       {
-        "merkmal": "Dachgeschoss",
+        "merkmal": "dachgeschoss",
         "art": "eur_qm",
         "wert": 0.08,
-        "beleg": "S. 5, Kap. 6.2"
+        "beleg": "S. 5, Kap. 6.2",
+        "label": "Dachgeschoss"
       },
       {
-        "merkmal": "Innenliegendes Bad ohne Fenster",
+        "merkmal": "innenliegendes_bad_ohne_fenster",
         "art": "eur_qm",
         "wert": -0.46,
-        "beleg": "S. 5, Kap. 6.3"
+        "beleg": "S. 5, Kap. 6.3",
+        "label": "Innenliegendes Bad ohne Fenster"
       },
       {
-        "merkmal": "Bodenbeläge in überwiegend hochwertiger Qualität",
+        "merkmal": "bodenbelaege_in_ueberwiegend_hochwertiger_qualitaet",
         "art": "eur_qm",
         "wert": 0.34,
-        "beleg": "S. 6, Kap. 6.4"
+        "beleg": "S. 6, Kap. 6.4",
+        "label": "Bodenbeläge in überwiegend hochwertiger Qualität"
       },
       {
-        "merkmal": "stufenfreier Zugang und barrierefreie Dusche/Badewanne",
+        "merkmal": "stufenfreier_zugang_und_barrierefreie_dusche_badewanne",
         "art": "eur_qm",
         "wert": 0.48,
-        "beleg": "S. 6, Kap. 6.5"
+        "beleg": "S. 6, Kap. 6.5",
+        "label": "stufenfreier Zugang und barrierefreie Dusche/Badewanne"
       },
       {
-        "merkmal": "Fenster in den letzten 10 Jahren modernisiert",
+        "merkmal": "fenster_in_den_letzten_10_jahren_modernisiert",
         "art": "eur_qm",
         "wert": 0.3,
-        "beleg": "S. 6, Kap. 6.6"
+        "beleg": "S. 6, Kap. 6.6",
+        "label": "Fenster in den letzten 10 Jahren modernisiert"
       },
       {
-        "merkmal": "Fenster in den letzten 30 Jahren modernisiert",
+        "merkmal": "fenster_in_den_letzten_30_jahren_modernisiert",
         "art": "eur_qm",
         "wert": 0.06,
-        "beleg": "S. 6, Kap. 6.6"
+        "beleg": "S. 6, Kap. 6.6",
+        "label": "Fenster in den letzten 30 Jahren modernisiert"
       },
       {
-        "merkmal": "Wärmedämmung der Außenwände in den letzten 30 Jahren modernisiert",
+        "merkmal": "waermedaemmung_der_aussenwaende_in_den_letzten_30_jahren_moderni",
         "art": "eur_qm",
         "wert": 0.16,
-        "beleg": "S. 6, Kap. 6.7"
+        "beleg": "S. 6, Kap. 6.7",
+        "label": "Wärmedämmung der Außenwände in den letzten 30 Jahren modernisiert"
       },
       {
-        "merkmal": "Bad in den letzten 10 Jahren modernisiert",
+        "merkmal": "bad_in_den_letzten_10_jahren_modernisiert",
         "art": "eur_qm",
         "wert": 0.82,
-        "beleg": "S. 7, Kap. 6.8"
+        "beleg": "S. 7, Kap. 6.8",
+        "label": "Bad in den letzten 10 Jahren modernisiert"
       },
       {
-        "merkmal": "Bad in den letzten 30 Jahren modernisiert",
+        "merkmal": "bad_in_den_letzten_30_jahren_modernisiert",
         "art": "eur_qm",
         "wert": 0.3,
-        "beleg": "S. 7, Kap. 6.8"
+        "beleg": "S. 7, Kap. 6.8",
+        "label": "Bad in den letzten 30 Jahren modernisiert"
       },
       {
-        "merkmal": "Heizungsanlage in den letzten 10 Jahren modernisiert",
+        "merkmal": "heizungsanlage_in_den_letzten_10_jahren_modernisiert",
         "art": "eur_qm",
         "wert": 0.31,
-        "beleg": "S. 7, Kap. 6.9"
+        "beleg": "S. 7, Kap. 6.9",
+        "label": "Heizungsanlage in den letzten 10 Jahren modernisiert"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Altstadt",
+        "merkmal": "lage:altstadt",
+        "label": "Lage REGE-Bezirk Altstadt",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Beckhausen-Nordwest",
+        "merkmal": "lage:beckhausen-nordwest",
+        "label": "Lage REGE-Bezirk Beckhausen-Nordwest",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Beckhausen-Ost",
+        "merkmal": "lage:beckhausen-ost",
+        "label": "Lage REGE-Bezirk Beckhausen-Ost",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Beckhausen-West",
+        "merkmal": "lage:beckhausen-west",
+        "label": "Lage REGE-Bezirk Beckhausen-West",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Bismarck-Ost",
+        "merkmal": "lage:bismarck-ost",
+        "label": "Lage REGE-Bezirk Bismarck-Ost",
         "art": "eur_qm",
         "wert": 0.15,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Bismarck-West",
+        "merkmal": "lage:bismarck-west",
+        "label": "Lage REGE-Bezirk Bismarck-West",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Buer-Nord",
+        "merkmal": "lage:buer-nord",
+        "label": "Lage REGE-Bezirk Buer-Nord",
         "art": "eur_qm",
         "wert": 0.2,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Buer-Ost",
+        "merkmal": "lage:buer-ost",
+        "label": "Lage REGE-Bezirk Buer-Ost",
         "art": "eur_qm",
         "wert": 0.5,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Buer-Süd",
+        "merkmal": "lage:buer-süd",
+        "label": "Lage REGE-Bezirk Buer-Süd",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Buer-Süd/West",
+        "merkmal": "lage:buer-süd/west",
+        "label": "Lage REGE-Bezirk Buer-Süd/West",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Buer-Zentrum",
+        "merkmal": "lage:buer-zentrum",
+        "label": "Lage REGE-Bezirk Buer-Zentrum",
         "art": "eur_qm",
         "wert": 0.4,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Bulmke-Hüllen-Nord",
+        "merkmal": "lage:bulmke-hüllen-nord",
+        "label": "Lage REGE-Bezirk Bulmke-Hüllen-Nord",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Bulmke-Hüllen-Süd",
+        "merkmal": "lage:bulmke-hüllen-süd",
+        "label": "Lage REGE-Bezirk Bulmke-Hüllen-Süd",
         "art": "eur_qm",
         "wert": -0.25,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Erle-Nord",
+        "merkmal": "lage:erle-nord",
+        "label": "Lage REGE-Bezirk Erle-Nord",
         "art": "eur_qm",
         "wert": 0.25,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Feldmark-West",
+        "merkmal": "lage:feldmark-west",
+        "label": "Lage REGE-Bezirk Feldmark-West",
         "art": "eur_qm",
         "wert": 0.2,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Hassel-Nord",
+        "merkmal": "lage:hassel-nord",
+        "label": "Lage REGE-Bezirk Hassel-Nord",
         "art": "eur_qm",
         "wert": 0.25,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Heßler",
+        "merkmal": "lage:heßler",
+        "label": "Lage REGE-Bezirk Heßler",
         "art": "eur_qm",
         "wert": 0.15,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Horst-Nord",
+        "merkmal": "lage:horst-nord",
+        "label": "Lage REGE-Bezirk Horst-Nord",
         "art": "eur_qm",
         "wert": 0.15,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Horst-Süd",
+        "merkmal": "lage:horst-süd",
+        "label": "Lage REGE-Bezirk Horst-Süd",
         "art": "eur_qm",
         "wert": 0.15,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Neustadt",
+        "merkmal": "lage:neustadt",
+        "label": "Lage REGE-Bezirk Neustadt",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Resse-Ost",
+        "merkmal": "lage:resse-ost",
+        "label": "Lage REGE-Bezirk Resse-Ost",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Resse-West",
+        "merkmal": "lage:resse-west",
+        "label": "Lage REGE-Bezirk Resse-West",
         "art": "eur_qm",
         "wert": 0.2,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Rotthausen-Ost",
+        "merkmal": "lage:rotthausen-ost",
+        "label": "Lage REGE-Bezirk Rotthausen-Ost",
         "art": "eur_qm",
         "wert": 0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Schalke-Nord",
+        "merkmal": "lage:schalke-nord",
+        "label": "Lage REGE-Bezirk Schalke-Nord",
         "art": "eur_qm",
         "wert": -0.25,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Schalke-West",
+        "merkmal": "lage:schalke-west",
+        "label": "Lage REGE-Bezirk Schalke-West",
         "art": "eur_qm",
         "wert": -0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Scholven-Nord",
+        "merkmal": "lage:scholven-nord",
+        "label": "Lage REGE-Bezirk Scholven-Nord",
         "art": "eur_qm",
         "wert": -0.35,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Scholven-Süd",
+        "merkmal": "lage:scholven-süd",
+        "label": "Lage REGE-Bezirk Scholven-Süd",
         "art": "eur_qm",
         "wert": 0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Ückendorf-Nord",
+        "merkmal": "lage:ückendorf-nord",
+        "label": "Lage REGE-Bezirk Ückendorf-Nord",
         "art": "eur_qm",
         "wert": -0.25,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Ückendorf-Süd/Ost",
+        "merkmal": "lage:ückendorf-süd/ost",
+        "label": "Lage REGE-Bezirk Ückendorf-Süd/Ost",
         "art": "eur_qm",
         "wert": 0.1,
         "beleg": "S. 8, Kap. 6.10"
       },
       {
-        "merkmal": "Lage REGE-Bezirk Ückendorf-West",
+        "merkmal": "lage:ückendorf-west",
+        "label": "Lage REGE-Bezirk Ückendorf-West",
         "art": "eur_qm",
         "wert": 0.1,
         "beleg": "S. 8, Kap. 6.10"
@@ -578,6 +628,25 @@
     {
       "eingabe": {
         "baujahr": 1975,
+        "wfl": 85,
+        "lage": "Bismarck-West",
+        "merkmale": {
+          "ab_dem_5_obergeschoss": true,
+          "fenster_in_den_letzten_10_jahren_modernisiert": true,
+          "bad_in_den_letzten_10_jahren_modernisiert": true
+        }
+      },
+      "erwartet": {
+        "unten": 6.24,
+        "mittel": 6.87,
+        "oben": 7.51
+      },
+      "art": "anwendungsbeispiel",
+      "seite": "S. 10, Kap. 7 Beispielrechnung (Baujahr 1975, 85 m²): Tabellenwert 5,57 / 6,20 / 6,84 €/m², Zu-/Abschläge −0,35 (5. OG) +0,30 (Fenster 10 J.) +0,82 (Bad 10 J.) −0,10 (REGE-Bezirk „Bismark-West“, so im Dokument) = +0,67 €/m², Ergebnis 6,24 / 6,87 / 7,51 €/m²"
+    },
+    {
+      "eingabe": {
+        "baujahr": 1975,
         "wfl": 85
       },
       "erwartet": {
@@ -585,8 +654,8 @@
         "mittel": 6.2,
         "oben": 6.84
       },
-      "seite": "S. 10, Kap. 7 Beispielrechnung (Baujahr 1975, 85 m²), Tabellenwert; mit Zu-/Abschlägen +0,67 €/m² (5. OG, Fenster und Bad in 10 J. modernisiert, REGE Bismarck-West) Ergebnis 6,24 / 6,87 / 7,51 €/m²"
+      "art": "anwendungsbeispiel",
+      "seite": "S. 10, Kap. 7 Beispielrechnung, Miete laut Mietspiegeltabelle"
     }
-  ],
-  "hinweis": "Das Dokument nennt „Stand 01.01.2026“ und „gültig ab 01.01.2026“, aber weder Erhebungsstichtag noch Ende; gueltig_bis 31.12.2027 aus der Pressemeldung der Stadt (Verzeichnis-Beleg), nicht aus dem Mietspiegel. Art „einfach“ aus dem Verzeichnis, das Dokument selbst nennt keine Art. Datenbasis Mieten aus sechs Jahren. Mittelwert und Spanne je Zelle laut Dokument; Zu-/Abschläge gelten für Mittelwert UND Spannengrenzen (Kap. 6). Die Tabelle gilt für das Normobjekt (Kap. 4.3) in den REGE-Bezirken ohne Lageanpassung; Lage geht als Zu-/Abschlag je REGE-Bezirk ein (Kap. 6.10). Wohnflächenklassen „> 40 bis 60“ usw. — Untergrenze ausschließlich."
+  ]
 }

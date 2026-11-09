@@ -1,0 +1,275 @@
+{
+  "ags": "05334032",
+  "gemeinde": "Stolberg (Rhld.)",
+  "art": "einfach",
+  "stand": "2026-01-01",
+  "erhebungsstichtag": null,
+  "gueltig_ab": "2026-01-01",
+  "gueltig_bis": "2027-12-31",
+  "quelle": {
+    "url": "https://www.stolberg.de/Mietspiegel-2026.pdf",
+    "dokument": "Mietspiegel für freifinanzierte Wohnungen, steuerbegünstigte Wohnungen und Altbauten im Stadtgebiet Stolberg (Rhld.) für die Zeit ab 01.01.2026, Herausgeber Kupferstadt Stolberg (Rhld.), mit Haus- und Grundeigentümerverein Stolberg und Mieterschutzverein für Aachen und Umgegend",
+    "seite": "S. 1–2 (Tabelle Baujahr × Wohnlage), S. 2–3 (Lagemerkmale, Wohnungsgröße, Eigenheime, Modernisierung), S. 4–5 (Allgemeines, Geltung bis 31.12.2027)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Herausgeber Kupferstadt Stolberg (Rhld.)",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Gültig ab 01.01.2026, Mietsätze „vorbehaltlich außergewöhnlicher Änderungen zunächst bis zum 31.12.2027“; kein Erhebungsstichtag; Art im Dokument nicht genannt, ohne Bezug auf § 558d als einfacher Mietspiegel geführt (Verzeichnis: „unklar“). Die Tabelle weist NUR Spannen aus, keinen Mittelwert — „mittel“ fehlt und wird nicht gebildet. Keine Größenachse: Normalwohnungen 45–90 m² (Kap. 5). Kleinwohnungen: Zuschlag im Einzelfall möglich (bis 25 m² 30 %, über 25 bis 35 m² 20 %, über 35 bis unter 45 m² 10 %); größere: Abschläge möglich (91–100 m² −10 %, 101–110 m² −20 %, über 110 m² −30 %), aber NUR auf die über 90 m² hinausgehende Fläche — als bedingte Regel nicht in zuschlaege übernommen. Ab Baujahr 2021: „Es gilt die auf dem Wohnungsmarkt erzielbare Miete“ — keine Zelle. Wohnungen ohne eigenes Bad/Dusche oder Heizung höchstens „bis 1960, einfache Wohnlage“. Eigenheime Zuschlag bis zu 15 % (Kap. 6, Höchstwert, nicht übernommen). Modernisierung: Höherstufung (Kap. 7). Kein Lesebeispiel — Prüfbeispiele sind zwei abgelesene Zellen.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1960,
+          "label": "Baujahr bis 1960"
+        },
+        {
+          "von": 1961,
+          "bis": 1970,
+          "label": "Baujahr von 1961 - 1970"
+        },
+        {
+          "von": 1971,
+          "bis": 1980,
+          "label": "Baujahr von 1971 - 1980"
+        },
+        {
+          "von": 1981,
+          "bis": 1990,
+          "label": "Baujahr von 1981 - 1990"
+        },
+        {
+          "von": 1991,
+          "bis": 2000,
+          "label": "Baujahr 1991 - 2000"
+        },
+        {
+          "von": 2001,
+          "bis": 2010,
+          "label": "Baujahr 2001 - 2010"
+        },
+        {
+          "von": 2011,
+          "bis": 2020,
+          "label": "Baujahr 2011 - 2020"
+        },
+        {
+          "von": 2021,
+          "bis": null,
+          "label": "Baujahr ab 2021 (erzielbare Marktmiete, keine Werte)"
+        }
+      ],
+      "wfl": [
+        {
+          "von": 45,
+          "bis": 90,
+          "label": "Normalwohnung 45–90 m² (andere Größen über Kap. 5)"
+        }
+      ],
+      "lage": [
+        {
+          "schluessel": "einfach",
+          "label": "einfache Wohnlage"
+        },
+        {
+          "schluessel": "mittel",
+          "label": "mittlere Wohnlage",
+          "standard": true
+        },
+        {
+          "schluessel": "gut",
+          "label": "gute Wohnlage"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 3.95,
+        "oben": 4.9
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 4.15,
+        "oben": 5.3
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 4.8,
+        "oben": 5.6
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 4.6,
+        "oben": 5.7
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 4.7,
+        "oben": 6
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 4.8,
+        "oben": 6.2
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 5,
+        "oben": 6.5
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 5.2,
+        "oben": 6.9
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 5.3,
+        "oben": 7.1
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 5.2,
+        "oben": 6.65
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 5.8,
+        "oben": 7.35
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 6,
+        "oben": 7.6
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 6.5,
+        "oben": 8
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 7.2,
+        "oben": 8.4
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 7.7,
+        "oben": 9.2
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 6.8,
+        "oben": 8.1
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 7.8,
+        "oben": 9.3
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 8.5,
+        "oben": 9.7
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 7,
+        "oben": 8.2
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 8.1,
+        "oben": 9.9
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 8.6,
+        "oben": 11.1
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1975,
+        "wfl": 70,
+        "lage": "mittel"
+      },
+      "erwartet": {
+        "unten": 5.2,
+        "oben": 6.9
+      },
+      "art": "tabellenzelle",
+      "seite": "S. 1, Baujahr von 1971 - 1980, mittlere Wohnlage"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2015,
+        "wfl": 80,
+        "lage": "gut"
+      },
+      "erwartet": {
+        "unten": 8.6,
+        "oben": 11.1
+      },
+      "art": "tabellenzelle",
+      "seite": "S. 1–2, Baujahr 2011 - 2020, gute Wohnlage"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2022,
+        "wfl": 70,
+        "lage": "mittel"
+      },
+      "erwartet": null,
+      "art": "tabellenzelle",
+      "seite": "S. 1, Baujahr ab 2021: „Es gilt die auf dem Wohnungsmarkt erzielbare Miete.“ — kein Wert"
+    }
+  ]
+}

@@ -2,7 +2,8 @@
   "ags": "05124000",
   "gemeinde": "Wuppertal",
   "art": "qualifiziert",
-  "stand": "2024-04-01",
+  "stand": "2024-11",
+  "erhebungsstichtag": "2024-04-01",
   "gueltig_ab": "2024-12-01",
   "gueltig_bis": "2026-11-30",
   "quelle": {
@@ -14,6 +15,8 @@
   },
   "einheit": "eur_qm_nettokalt",
   "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Stand = Ausgabe November 2024 (Rückseite der Broschüre); Erhebungsstichtag 01.04.2024 aus dem Methodenbericht der Stadt (Verzeichnis-Beleg), nicht aus der Broschüre. Mittelwert = arithmetisches Mittel laut Dokument, Spanne = Zwei-Drittel-Spanne. Zu-/Abschläge gelten für Mittelwert UND Spannengrenzen (Kap. 6). Gilt für 17,5–150 m² in Gebäuden mit 3+ Wohnungen, nicht für Neubau ab 01.01.2024. Felder VII A und VIII A (17,5–50 m², ab 2014) ohne Aussage — weggelassen. Laufzeit bis 30.11.2026: Nachfolger prüfen. Wohnlage geht als Zu-/Abschlag ein (Wohnlagenkarte des Gutachterausschusses), nicht als Tabellenachse; mittlere Wohnlage = ohne Zu-/Abschlag (objekt.lage einfach | gut | exklusiv).",
   "tabelle": {
     "achsen": {
       "baujahr": [
@@ -66,11 +69,13 @@
         },
         {
           "von": 50,
+          "von_inkl": false,
           "bis": 90,
           "label": "B: über 50 m² bis 90 m²"
         },
         {
           "von": 90,
+          "von_inkl": false,
           "bis": 150,
           "label": "C: über 90 m² bis 150 m²"
         }
@@ -234,121 +239,141 @@
     ],
     "zuschlaege": [
       {
-        "merkmal": "Maisonette- oder Galerie-Wohnung",
+        "merkmal": "maisonette_oder_galerie_wohnung",
         "art": "eur_qm",
         "wert": 0.22,
-        "beleg": "Kap. 6.1"
+        "beleg": "Kap. 6.1",
+        "label": "Maisonette- oder Galerie-Wohnung"
       },
       {
-        "merkmal": "Dusche in zweitem Badezimmer und/oder Gäste-WC",
+        "merkmal": "dusche_in_zweitem_badezimmer_und_oder_gaeste_wc",
         "art": "eur_qm",
         "wert": 0.14,
-        "beleg": "Kap. 6.2"
+        "beleg": "Kap. 6.2",
+        "label": "Dusche in zweitem Badezimmer und/oder Gäste-WC"
       },
       {
-        "merkmal": "Badezimmer mit Badewanne und separater Dusche",
+        "merkmal": "badezimmer_mit_badewanne_und_separater_dusche",
         "art": "eur_qm",
         "wert": 0.16,
-        "beleg": "Kap. 6.2"
+        "beleg": "Kap. 6.2",
+        "label": "Badezimmer mit Badewanne und separater Dusche"
       },
       {
-        "merkmal": "Hochwertiger Bodenbelag (Fliesen, Kork)",
+        "merkmal": "bodenbelag_fliesen_kork",
+        "label": "Hochwertiger Bodenbelag (Fliesen, Kork)",
         "art": "eur_qm",
         "wert": 0.11,
         "beleg": "Kap. 6.3"
       },
       {
-        "merkmal": "Hochwertiger Bodenbelag (Holz, Parkett, Stein)",
+        "merkmal": "bodenbelag_holz_parkett_stein",
+        "label": "Hochwertiger Bodenbelag (Holz, Parkett, Stein)",
         "art": "eur_qm",
         "wert": 0.42,
         "beleg": "Kap. 6.3"
       },
       {
-        "merkmal": "Nachtstromspeicherheizung",
+        "merkmal": "nachtstromspeicherheizung",
         "art": "eur_qm",
         "wert": -0.77,
-        "beleg": "Kap. 6.4"
+        "beleg": "Kap. 6.4",
+        "label": "Nachtstromspeicherheizung"
       },
       {
-        "merkmal": "Fußbodenheizung",
+        "merkmal": "fussbodenheizung",
         "art": "eur_qm",
         "wert": 0.35,
-        "beleg": "Kap. 6.4"
+        "beleg": "Kap. 6.4",
+        "label": "Fußbodenheizung"
       },
       {
-        "merkmal": "Großer Balkon/Loggia (mind. 7,5 m² oder mind. 2 m Tiefe)",
+        "merkmal": "grosser_balkon_loggia",
         "art": "eur_qm",
         "wert": 0.18,
-        "beleg": "Kap. 6.5"
+        "beleg": "Kap. 6.5",
+        "label": "Großer Balkon/Loggia (mind. 7,5 m² oder mind. 2 m Tiefe)"
       },
       {
-        "merkmal": "Terrasse oder Dachterrasse (mind. 5 m² oder mind. 1,5 m Tiefe)",
+        "merkmal": "terrasse_oder_dachterrasse",
         "art": "eur_qm",
         "wert": 0.21,
-        "beleg": "Kap. 6.5"
+        "beleg": "Kap. 6.5",
+        "label": "Terrasse oder Dachterrasse (mind. 5 m² oder mind. 1,5 m Tiefe)"
       },
       {
-        "merkmal": "Garten zur alleinigen Nutzung und/oder große Terrasse/Dachterrasse (mind. 7,5 m² oder 2 m Tiefe)",
+        "merkmal": "garten_zur_alleinigen_nutzung_und_oder_grosse_terrasse_dachterra",
         "art": "eur_qm",
         "wert": 0.25,
-        "beleg": "Kap. 6.5"
+        "beleg": "Kap. 6.5",
+        "label": "Garten zur alleinigen Nutzung und/oder große Terrasse/Dachterrasse (mind. 7,5 m² oder 2 m Tiefe)"
       },
       {
-        "merkmal": "barrierefrei mit Rollator oder Rollstuhl erreichbar oder barrierearm erstellt/modernisiert",
+        "merkmal": "barrierefrei_mit_rollator_oder_rollstuhl_erreichbar_oder_barrier",
         "art": "eur_qm",
         "wert": 0.1,
-        "beleg": "Kap. 6.6"
+        "beleg": "Kap. 6.6",
+        "label": "barrierefrei mit Rollator oder Rollstuhl erreichbar oder barrierearm erstellt/modernisiert"
       },
       {
-        "merkmal": "Rollläden/Fensterläden an allen Fenstern",
+        "merkmal": "rolllaeden_fensterlaeden_an_allen_fenstern",
         "art": "eur_qm",
         "wert": 0.11,
-        "beleg": "Kap. 6.7"
+        "beleg": "Kap. 6.7",
+        "label": "Rollläden/Fensterläden an allen Fenstern"
       },
       {
-        "merkmal": "Wohnung über einen Aufzug erreichbar",
+        "merkmal": "wohnung_ueber_einen_aufzug_erreichbar",
         "art": "eur_qm",
         "wert": 0.29,
-        "beleg": "Kap. 6.7"
+        "beleg": "Kap. 6.7",
+        "label": "Wohnung über einen Aufzug erreichbar"
       },
       {
-        "merkmal": "Einbauküche gehobener Qualität (inklusive Elektrogeräte)",
+        "merkmal": "einbaukueche_gehobener_qualitaet",
         "art": "eur_qm",
         "wert": 0.41,
-        "beleg": "Kap. 6.7"
+        "beleg": "Kap. 6.7",
+        "label": "Einbauküche gehobener Qualität (inklusive Elektrogeräte)"
       },
       {
-        "merkmal": "Erneuerung der gesamten Heizungsanlage seit 1994",
+        "merkmal": "erneuerung_der_gesamten_heizungsanlage_seit_1994",
         "art": "eur_qm",
         "wert": 0.08,
-        "beleg": "Kap. 6.8"
+        "beleg": "Kap. 6.8",
+        "label": "Erneuerung der gesamten Heizungsanlage seit 1994"
       },
       {
-        "merkmal": "Baderneuerung/-modernisierung (mind. alle Sanitärteile) seit 1989",
+        "merkmal": "baderneuerung_modernisierung_seit_1989",
         "art": "eur_qm",
         "wert": 0.1,
-        "beleg": "Kap. 6.8"
+        "beleg": "Kap. 6.8",
+        "label": "Baderneuerung/-modernisierung (mind. alle Sanitärteile) seit 1989"
       },
       {
-        "merkmal": "Einbau einer Wärmepumpe",
+        "merkmal": "einbau_einer_waermepumpe",
         "art": "eur_qm",
         "wert": 0.19,
-        "beleg": "Kap. 6.8"
+        "beleg": "Kap. 6.8",
+        "label": "Einbau einer Wärmepumpe"
       },
       {
-        "merkmal": "Einfache Wohnlage",
+        "merkmal": "lage:einfach",
+        "label": "Einfache Wohnlage",
         "art": "eur_qm",
         "wert": -0.16,
         "beleg": "Kap. 6.9"
       },
       {
-        "merkmal": "Gute Wohnlage",
+        "merkmal": "lage:gut",
+        "label": "Gute Wohnlage",
         "art": "eur_qm",
         "wert": 0.38,
         "beleg": "Kap. 6.9"
       },
       {
-        "merkmal": "Exklusive Wohnlage",
+        "merkmal": "lage:exklusiv",
+        "label": "Exklusive Wohnlage",
         "art": "eur_qm",
         "wert": 1.08,
         "beleg": "Kap. 6.9"
@@ -359,6 +384,25 @@
     {
       "eingabe": {
         "baujahr": 1995,
+        "wfl": 85,
+        "lage": "einfach",
+        "merkmale": {
+          "badezimmer_mit_badewanne_und_separater_dusche": true,
+          "bodenbelag_holz_parkett_stein": true,
+          "einbaukueche_gehobener_qualitaet": true
+        }
+      },
+      "erwartet": {
+        "unten": 7.19,
+        "mittel": 8.16,
+        "oben": 8.84
+      },
+      "art": "anwendungsbeispiel",
+      "seite": "Broschüre S. 14–15, Kap. 7 Beispiel-Wohnung (Baujahr 1995, 85 m²): Basismiete 6,36 / 7,33 / 8,01 €/m², Zu-/Abschläge +0,16 (Bad mit Wanne und separater Dusche) +0,42 (Parkett) +0,41 (Einbauküche gehoben) −0,16 (einfache Wohnlage) = +0,83 €/m², Ergebnis 7,19 / 8,16 / 8,84 €/m²"
+    },
+    {
+      "eingabe": {
+        "baujahr": 1995,
         "wfl": 85
       },
       "erwartet": {
@@ -366,8 +410,8 @@
         "mittel": 7.33,
         "oben": 8.01
       },
-      "seite": "Kap. 7 Beispiel-Wohnung (Baujahr 1995, 85 m²), Basismiete I.; mit Zu-/Abschlägen +0,83 €/m² (Bad mit Wanne und Dusche, Parkett, Einbauküche gehoben, einfache Wohnlage) Ergebnis 7,19 / 8,16 / 8,84 €/m²"
+      "art": "anwendungsbeispiel",
+      "seite": "Broschüre S. 14–15, Kap. 7 Beispiel-Wohnung, Schritt I. Basismiete laut Mietspiegeltabelle"
     }
-  ],
-  "hinweis": "Erhebungsstichtag 01.04.2024 aus dem Methodenbericht der Stadt (Verzeichnis-Beleg), nicht aus der Broschüre. Mittelwert = arithmetisches Mittel laut Dokument, Spanne = Zwei-Drittel-Spanne. Zu-/Abschläge gelten für Mittelwert UND Spannengrenzen (Kap. 6). Gilt für 17,5–150 m² in Gebäuden mit 3+ Wohnungen, nicht für Neubau ab 01.01.2024. Felder VII A und VIII A (17,5–50 m², ab 2014) ohne Aussage — weggelassen. Laufzeit bis 30.11.2026: Nachfolger prüfen. Wohnlage geht als Zu-/Abschlag ein (Wohnlagenkarte des Gutachterausschusses), nicht als Tabellenachse."
+  ]
 }

@@ -3,6 +3,7 @@
   "gemeinde": "Oberhausen",
   "art": "qualifiziert",
   "stand": "2025-03-01",
+  "erhebungsstichtag": null,
   "gueltig_ab": "2025-03-01",
   "gueltig_bis": null,
   "quelle": {
@@ -14,6 +15,8 @@
   },
   "einheit": "eur_qm_nettokalt",
   "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Stand = Bezugszeitpunkt der Angaben laut Kap. 1 (1. März 2025); ein Ende der Geltung nennt das Dokument nicht. Qualifiziert laut Kap. 1 (§ 558d BGB). Mittelwert und 2/3-Spanne je Zelle laut Kap. 2. Werte gelten für mittlere Wohnlage; Gruppen I/II ohne Balkon, III–VI mit Balkon (Standardwohnung Kap. 2.1). Wohnlage: einfache Lage Abschlag BIS ZU 0,59 €/m², gute Lage Zuschlag BIS ZU 0,52 €/m² (Kap. 3.1, Übergänge fließend) — Höchstwerte ohne festen Betrag, deshalb nicht als Zuschlag übernommen; gerechnet wird die mittlere Lage. Die übrigen Zu-/Abschläge sind Durchschnittswerte, bei teilweisem Zutreffen Teilbeträge (Kap. 3.2). Interpolation zwischen Gruppen und Größenklassen laut Kap. 3 zulässig (Mitte der Klassen: 40/75/110 m²). Kein Lesebeispiel im Dokument — Prüfbeispiele sind zwei abgelesene Zellen.",
   "tabelle": {
     "achsen": {
       "baujahr": [
@@ -51,12 +54,14 @@
       "wfl": [
         {
           "von": 20,
-          "bis": 59.99,
+          "bis": 60,
+          "bis_inkl": false,
           "label": "A: 20 m² bis unter 60 m² (im Mittel 40 m²)"
         },
         {
           "von": 60,
-          "bis": 89.99,
+          "bis": 90,
+          "bis_inkl": false,
           "label": "B: 60 m² bis unter 90 m² (im Mittel 75 m²)"
         },
         {
@@ -196,220 +201,242 @@
     ],
     "zuschlaege": [
       {
-        "merkmal": "Einfache Wohnlage (Abschlag bis zu)",
-        "art": "eur_qm",
-        "wert": -0.59,
-        "beleg": "S. 2, Kap. 3.1"
-      },
-      {
-        "merkmal": "Gute Wohnlage (Zuschlag bis zu)",
-        "art": "eur_qm",
-        "wert": 0.52,
-        "beleg": "S. 2, Kap. 3.1"
-      },
-      {
-        "merkmal": "Fassade in sehr gutem Zustand / restaurierte Stuck-/Ornamentputzfassade",
+        "merkmal": "fassade_in_sehr_gutem_zustand_restaurierte_stuck_ornamentputzfas",
         "art": "eur_qm",
         "wert": 0.26,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Fassade in sehr gutem Zustand / restaurierte Stuck-/Ornamentputzfassade"
       },
       {
-        "merkmal": "Dämmung mind. zwei Außenwände und/oder Dach (Bj. 1950–1995), gedämmt 1995–2014",
+        "merkmal": "daemmung_mind_zwei_aussenwaende_und_oder_dach_gedaemmt_1995_2014",
         "art": "eur_qm",
         "wert": 0.45,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Dämmung mind. zwei Außenwände und/oder Dach (Bj. 1950–1995), gedämmt 1995–2014"
       },
       {
-        "merkmal": "Dämmung mind. zwei Außenwände und/oder Dach (Bj. 1950–1995), gedämmt nach 2015",
+        "merkmal": "daemmung_mind_zwei_aussenwaende_und_oder_dach_gedaemmt_nach_2015",
         "art": "eur_qm",
         "wert": 0.65,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Dämmung mind. zwei Außenwände und/oder Dach (Bj. 1950–1995), gedämmt nach 2015"
       },
       {
-        "merkmal": "sehr gepflegtes, repräsentatives Treppenhaus mit hochwertigen Bodenbelägen",
+        "merkmal": "sehr_gepflegtes_repraesentatives_treppenhaus_mit_hochwertigen_bo",
         "art": "eur_qm",
         "wert": 0.25,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "sehr gepflegtes, repräsentatives Treppenhaus mit hochwertigen Bodenbelägen"
       },
       {
-        "merkmal": "Gebäudezugang barrierefrei",
+        "merkmal": "gebaeudezugang_barrierefrei",
         "art": "eur_qm",
         "wert": 0.07,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Gebäudezugang barrierefrei"
       },
       {
-        "merkmal": "Wohnung barrierefrei",
+        "merkmal": "wohnung_barrierefrei",
         "art": "eur_qm",
         "wert": 0.16,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Wohnung barrierefrei"
       },
       {
-        "merkmal": "Wohnung mit Balkon, Gebäude bis Baujahr 1964",
+        "merkmal": "wohnung_mit_balkon_gebaeude_bis_baujahr_1964",
         "art": "eur_qm",
         "wert": 0.51,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Wohnung mit Balkon, Gebäude bis Baujahr 1964"
       },
       {
-        "merkmal": "Isolierverglasung (2-fach), Gebäude Bj. vor 2005, eingebaut 2005–2014",
+        "merkmal": "isolierverglasung_gebaeude_bj_vor_2005_eingebaut_2005_2014",
         "art": "eur_qm",
         "wert": 0.21,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Isolierverglasung (2-fach), Gebäude Bj. vor 2005, eingebaut 2005–2014"
       },
       {
-        "merkmal": "Isolierverglasung (2-fach), Gebäude Bj. vor 2015, eingebaut nach 2015",
+        "merkmal": "isolierverglasung_gebaeude_bj_vor_2015_eingebaut_nach_2015",
         "art": "eur_qm",
         "wert": 0.31,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Isolierverglasung (2-fach), Gebäude Bj. vor 2015, eingebaut nach 2015"
       },
       {
-        "merkmal": "Dreifachverglasung",
+        "merkmal": "dreifachverglasung",
         "art": "eur_qm",
         "wert": 0.31,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Dreifachverglasung"
       },
       {
-        "merkmal": "Rollladen vorhanden",
+        "merkmal": "rollladen_vorhanden",
         "art": "eur_qm",
         "wert": 0.18,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Rollladen vorhanden"
       },
       {
-        "merkmal": "Böden überwiegend Parkett, Marmor",
+        "merkmal": "boeden_ueberwiegend_parkett_marmor",
         "art": "eur_qm",
         "wert": 0.29,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Böden überwiegend Parkett, Marmor"
       },
       {
-        "merkmal": "Bad modernisiert 2005–2014 (Gebäude Bj. vor 2005)",
+        "merkmal": "bad_modernisiert_2005_2014",
         "art": "eur_qm",
         "wert": 0.35,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Bad modernisiert 2005–2014 (Gebäude Bj. vor 2005)"
       },
       {
-        "merkmal": "Bad modernisiert nach 2015 (Gebäude Bj. vor 2015)",
+        "merkmal": "bad_modernisiert_nach_2015",
         "art": "eur_qm",
         "wert": 0.53,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Bad modernisiert nach 2015 (Gebäude Bj. vor 2015)"
       },
       {
-        "merkmal": "Elektroinstallation modernisiert 2005–2014 (Gebäude Bj. vor 2005)",
+        "merkmal": "elektroinstallation_modernisiert_2005_2014",
         "art": "eur_qm",
         "wert": 0.31,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Elektroinstallation modernisiert 2005–2014 (Gebäude Bj. vor 2005)"
       },
       {
-        "merkmal": "Elektroinstallation modernisiert nach 2015 (Gebäude Bj. vor 2015)",
+        "merkmal": "elektroinstallation_modernisiert_nach_2015",
         "art": "eur_qm",
         "wert": 0.47,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Elektroinstallation modernisiert nach 2015 (Gebäude Bj. vor 2015)"
       },
       {
-        "merkmal": "anspruchsvolle Elektroinstallation (nicht bei Errichtung/Modernisierung nach 2015)",
+        "merkmal": "anspruchsvolle_elektroinstallation",
         "art": "eur_qm",
         "wert": 0.18,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "anspruchsvolle Elektroinstallation (nicht bei Errichtung/Modernisierung nach 2015)"
       },
       {
-        "merkmal": "Heizungsanlage modernisiert nach 2015 oder Fernwärmeanschluss (Gebäude Bj. vor 2015)",
+        "merkmal": "heizungsanlage_modernisiert_nach_2015_oder_fernwaermeanschluss",
         "art": "eur_qm",
         "wert": 0.36,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Heizungsanlage modernisiert nach 2015 oder Fernwärmeanschluss (Gebäude Bj. vor 2015)"
       },
       {
-        "merkmal": "andere Modernisierungen 2005–2014 (Gebäude Bj. vor 2005)",
+        "merkmal": "andere_modernisierungen_2005_2014",
         "art": "eur_qm",
         "wert": 0.11,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "andere Modernisierungen 2005–2014 (Gebäude Bj. vor 2005)"
       },
       {
-        "merkmal": "andere Modernisierungen nach 2015 (Gebäude Bj. vor 2015)",
+        "merkmal": "andere_modernisierungen_nach_2015",
         "art": "eur_qm",
         "wert": 0.17,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "andere Modernisierungen nach 2015 (Gebäude Bj. vor 2015)"
       },
       {
-        "merkmal": "Aufzug (nicht für Wohnungen ohne objektiven Nutzen)",
+        "merkmal": "aufzug",
         "art": "eur_qm",
         "wert": 0.75,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Aufzug (nicht für Wohnungen ohne objektiven Nutzen)"
       },
       {
-        "merkmal": "vorinstallierte Netzwerke",
+        "merkmal": "vorinstallierte_netzwerke",
         "art": "eur_qm",
         "wert": 0.14,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "vorinstallierte Netzwerke"
       },
       {
-        "merkmal": "Gäste-WC/zweites Bad vorhanden",
+        "merkmal": "gaeste_wc_zweites_bad_vorhanden",
         "art": "eur_qm",
         "wert": 0.4,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Gäste-WC/zweites Bad vorhanden"
       },
       {
-        "merkmal": "Klimaanlage",
+        "merkmal": "klimaanlage",
         "art": "eur_qm",
         "wert": 0.19,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Klimaanlage"
       },
       {
-        "merkmal": "überwiegend Fußbodenheizung",
+        "merkmal": "ueberwiegend_fussbodenheizung",
         "art": "eur_qm",
         "wert": 0.87,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "überwiegend Fußbodenheizung"
       },
       {
-        "merkmal": "Fassade ungepflegt/schadhaft",
+        "merkmal": "fassade_ungepflegt_schadhaft",
         "art": "eur_qm",
         "wert": -0.27,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Fassade ungepflegt/schadhaft"
       },
       {
-        "merkmal": "Dämmung nicht vorhanden bzw. nur eine Außenwand (Gebäude ab Bj. 1950)",
+        "merkmal": "daemmung_nicht_vorhanden_bzw_nur_eine_aussenwand",
         "art": "eur_qm",
         "wert": -0.1,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Dämmung nicht vorhanden bzw. nur eine Außenwand (Gebäude ab Bj. 1950)"
       },
       {
-        "merkmal": "Treppenhaus ungepflegt/abgenutzt",
+        "merkmal": "treppenhaus_ungepflegt_abgenutzt",
         "art": "eur_qm",
         "wert": -0.27,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Treppenhaus ungepflegt/abgenutzt"
       },
       {
-        "merkmal": "Wohnung ohne Balkon, Gebäude ab Baujahr 1965",
+        "merkmal": "wohnung_ohne_balkon_gebaeude_ab_baujahr_1965",
         "art": "eur_qm",
         "wert": -0.44,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Wohnung ohne Balkon, Gebäude ab Baujahr 1965"
       },
       {
-        "merkmal": "Einfachverglasung",
+        "merkmal": "einfachverglasung",
         "art": "eur_qm",
         "wert": -0.35,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Einfachverglasung"
       },
       {
-        "merkmal": "überwiegend ohne nutzbare Oberböden (Gebäude ab Bj. 1995)",
+        "merkmal": "ueberwiegend_ohne_nutzbare_oberboeden",
         "art": "eur_qm",
         "wert": -0.38,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "überwiegend ohne nutzbare Oberböden (Gebäude ab Bj. 1995)"
       },
       {
-        "merkmal": "Bad nicht umlaufend gefliest (nicht für Bäder nach 2005)",
+        "merkmal": "bad_nicht_umlaufend_gefliest",
         "art": "eur_qm",
         "wert": -0.39,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Bad nicht umlaufend gefliest (nicht für Bäder nach 2005)"
       },
       {
-        "merkmal": "geringe Elektroinstallation",
+        "merkmal": "geringe_elektroinstallation",
         "art": "eur_qm",
         "wert": -0.27,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "geringe Elektroinstallation"
       },
       {
-        "merkmal": "Heizungsanlage vor 1995 (kein Abschlag bei Fernwärme)",
+        "merkmal": "heizungsanlage_vor_1995",
         "art": "eur_qm",
         "wert": -0.27,
-        "beleg": "S. 3, Kap. 3.2"
+        "beleg": "S. 3, Kap. 3.2",
+        "label": "Heizungsanlage vor 1995 (kein Abschlag bei Fernwärme)"
       }
     ]
   },
@@ -424,6 +451,7 @@
         "mittel": 5.66,
         "oben": 6.97
       },
+      "art": "tabellenzelle",
       "seite": "S. 4, Gruppe II, Größenklasse B"
     },
     {
@@ -436,8 +464,8 @@
         "mittel": 7.97,
         "oben": 9.42
       },
+      "art": "tabellenzelle",
       "seite": "S. 4, Gruppe VI, Größenklasse C"
     }
-  ],
-  "hinweis": "Stand = Bezugszeitpunkt der Angaben laut Kap. 1 (1. März 2025); ein Ende der Geltung nennt das Dokument nicht. Qualifiziert laut Kap. 1 (§ 558d BGB). Mittelwert und 2/3-Spanne je Zelle laut Kap. 2. Werte gelten für mittlere Wohnlage; Gruppen I/II ohne Balkon, III–VI mit Balkon (Standardwohnung Kap. 2.1). Wohnlage-Zu-/Abschläge sind HÖCHSTwerte („bis zu“), Kap. 3.2: Teilbeträge bei teilweisem Zutreffen. Interpolation zwischen Gruppen und Größenklassen laut Kap. 3 zulässig (Mitte der Klassen: 40/75/110 m²). Kein Lesebeispiel im Dokument — Prüfbeispiele sind zwei abgelesene Zellen."
+  ]
 }

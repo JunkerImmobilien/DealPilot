@@ -3,6 +3,7 @@
   "gemeinde": "Krefeld",
   "art": "einfach",
   "stand": "2025-08",
+  "erhebungsstichtag": null,
   "gueltig_ab": "2025-08-01",
   "gueltig_bis": null,
   "quelle": {
@@ -14,6 +15,8 @@
   },
   "einheit": "eur_qm_nettokalt",
   "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Richtwerte „nach dem Stand von August 2025“ (S. 9), Durchschnitt der letzten sechs Jahre; Art „einfach“ (§ 558c) laut Dokumentation der Stadt (Verzeichnis-Beleg); ein Ende nennt der Mietspiegel nicht (nächster laut Dokumentation zum 01.08.2027). Die Tabelle hat KEINE Größenachse: sie gilt für Wohnungen mit Küche und 2–4 Zimmern von circa 55–100 qm in Zwei- und Mehrfamilienhäusern (S. 6); die wfl-Achse bildet nur diesen Geltungsbereich ab. Kleinere und größere Wohnungen, Appartements, Einfamilienhäuser (oberer Spannenwert) und alle übrigen Zu-/Abschläge sind im Dokument als SPANNEN in Prozent angegeben (z. B. Kleinwohnung 49–40 m² +5 bis 10 %, übergroß 111–120 m² −5 bis −10 %, Aufzug 0,26–0,31 €/m²) — ohne Einzelwert, daher nicht als zuschlaege übernommen. Mittelwert = Fettdruck der Richtwerttabelle (S. 9). Modernisierte Wohnungen: Anhebung der Altersklasse (Voll: Modernisierungsjahr −10, Teil: −20 Jahre, S. 6–7). Wohnlage A–D nach Beschreibung S. 4–5 (keine Karte im Dokument). Kein Lesebeispiel — Prüfbeispiele sind zwei abgelesene Zellen.",
   "tabelle": {
     "achsen": {
       "baujahr": [
@@ -429,6 +432,7 @@
         "mittel": 7.8,
         "oben": 8.1
       },
+      "art": "tabellenzelle",
       "seite": "S. 10, Wohnlage B, Baualtersklasse 1958–1969"
     },
     {
@@ -442,8 +446,8 @@
         "mittel": 9.1,
         "oben": 9.5
       },
+      "art": "tabellenzelle",
       "seite": "S. 11, Wohnlage D, Baualtersklasse 2009–2015"
     }
-  ],
-  "hinweis": "Richtwerte „nach dem Stand von August 2025“ (S. 9), Durchschnitt der letzten sechs Jahre; Art „einfach“ (§ 558c) laut Dokumentation der Stadt (Verzeichnis-Beleg); ein Ende nennt der Mietspiegel nicht (nächster laut Dokumentation zum 01.08.2027). Die Tabelle hat KEINE Größenachse: sie gilt für Wohnungen mit Küche und 2–4 Zimmern von circa 55–100 qm in Zwei- und Mehrfamilienhäusern (S. 6); die wfl-Achse bildet nur diesen Geltungsbereich ab. Kleinere und größere Wohnungen, Appartements, Einfamilienhäuser (oberer Spannenwert) und alle übrigen Zu-/Abschläge sind im Dokument als SPANNEN in Prozent angegeben (z. B. Kleinwohnung 49–40 m² +5 bis 10 %, übergroß 111–120 m² −5 bis −10 %, Aufzug 0,26–0,31 €/m²) — ohne Einzelwert, daher nicht als zuschlaege übernommen. Mittelwert = Fettdruck der Richtwerttabelle (S. 9). Modernisierte Wohnungen: Anhebung der Altersklasse (Voll: Modernisierungsjahr −10, Teil: −20 Jahre, S. 6–7). Wohnlage A–D nach Beschreibung S. 4–5 (keine Karte im Dokument). Kein Lesebeispiel — Prüfbeispiele sind zwei abgelesene Zellen."
+  ]
 }

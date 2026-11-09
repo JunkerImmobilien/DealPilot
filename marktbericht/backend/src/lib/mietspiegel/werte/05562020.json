@@ -1,0 +1,214 @@
+{
+  "ags": "05562020",
+  "gemeinde": "Herten",
+  "art": "einfach",
+  "stand": "2025-08-01",
+  "erhebungsstichtag": null,
+  "gueltig_ab": "2025-08-01",
+  "gueltig_bis": null,
+  "quelle": {
+    "url": "https://www.herten.de/fileadmin/user_upload/citkoBuerger/Sozialamt/Mietspiegel_2025_2027.pdf",
+    "dokument": "Mietspiegel 2025/2027 für nicht preisgebundene Wohnungen in Herten, gültig ab dem 1. August 2025 (Erläuterungen Stand 1. August 2025, Veröffentlichung Juli 2025), Herausgeber Stadt Herten, Fachstelle Wohnen",
+    "seite": "PDF-Seite 1 (Mietrichtwerttabelle, Wohnlagen, Gebäudetyp), PDF-Seite 2 (Erläuterungen: Größe, Barrierefreiheit)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Herausgeber Stadt Herten",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Art: das Dokument nennt keine Art; ohne Hinweis auf § 558d und ohne wissenschaftliche Erhebung als einfacher Mietspiegel geführt (Verzeichnis: „unklar“). Titel „2025/2027“, ein Enddatum steht nicht im Dokument. Mietrichtwerte je Baualtersgruppe mit Spanne und Mittelwert, ohne Größenklassen (Kleinwohnung bis 50 m² Zuschlag bis zu 5 %, ab 100 m² entsprechender Abschlag — kein fester Wert). Modernisierte Wohnungen (Bündel aus mind. 3 Maßnahmen) als eigene Gruppen 2/4/6 → Achse „ausstattung“. Gruppe 11 (ab 2014): „Marktwerte, frei verhandelbar“ — keine Zelle. Werte für mittlere (normale) Wohnlage; einfache/gute Wohnlage, Einfamilienhaus, DHH/REH, Garten und Barrierenreduzierung sind HÖCHSTwerte („bis zu“: einfach −10 %, gut +10 %, EFH +10 %, DHH/REH +5 %, Garten +3 %, Barrierenreduzierung +8 %) und deshalb NICHT als Zuschlag übernommen; nur die Barrierefreiheit nach DIN 18040-2 ist mit festen 10 % angegeben und erfasst. Kein Lesebeispiel — Prüfbeispiele sind zwei abgelesene Zellen.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1947,
+          "label": "bis 1947 (Gruppen 1/2)"
+        },
+        {
+          "von": 1948,
+          "bis": 1960,
+          "label": "1948 - 1960 (Gruppen 3/4)"
+        },
+        {
+          "von": 1961,
+          "bis": 1970,
+          "label": "1961 - 1970 (Gruppen 5/6)"
+        },
+        {
+          "von": 1971,
+          "bis": 1980,
+          "label": "1971 - 1980 (Gruppe 7)"
+        },
+        {
+          "von": 1981,
+          "bis": 1990,
+          "label": "1981 - 1990 (Gruppe 8)"
+        },
+        {
+          "von": 1991,
+          "bis": 2000,
+          "label": "1991 - 2000 (Gruppe 9)"
+        },
+        {
+          "von": 2001,
+          "bis": 2013,
+          "label": "2001 - 2013 (Gruppe 10)"
+        },
+        {
+          "von": 2014,
+          "bis": null,
+          "label": "ab 2014 (Gruppe 11: Marktwerte, frei verhandelbar)"
+        }
+      ],
+      "wfl": [
+        {
+          "von": null,
+          "bis": null,
+          "label": "alle Größen (keine Größenklassen)"
+        }
+      ],
+      "ausstattung": [
+        {
+          "schluessel": "standard",
+          "label": "nicht modernisiert (Gruppen 1, 3, 5, 7–10)",
+          "standard": true
+        },
+        {
+          "schluessel": "modernisiert",
+          "label": "modernisiert, Bündel aus mind. 3 Maßnahmen (Gruppen 2, 4, 6)"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "ausstattung": "standard",
+        "unten": 3.94,
+        "mittel": 4.13,
+        "oben": 4.33
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "ausstattung": "modernisiert",
+        "unten": 4.96,
+        "mittel": 5.23,
+        "oben": 5.5
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "ausstattung": "standard",
+        "unten": 4.85,
+        "mittel": 5.13,
+        "oben": 5.4
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "ausstattung": "modernisiert",
+        "unten": 5.75,
+        "mittel": 6.05,
+        "oben": 6.34
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "ausstattung": "standard",
+        "unten": 5.33,
+        "mittel": 5.6,
+        "oben": 5.86
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "ausstattung": "modernisiert",
+        "unten": 5.84,
+        "mittel": 6.35,
+        "oben": 6.86
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "ausstattung": "standard",
+        "unten": 6.1,
+        "mittel": 6.43,
+        "oben": 6.76
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "ausstattung": "standard",
+        "unten": 6.35,
+        "mittel": 6.67,
+        "oben": 6.99
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "ausstattung": "standard",
+        "unten": 7.43,
+        "mittel": 7.83,
+        "oben": 8.23
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "ausstattung": "standard",
+        "unten": 8.14,
+        "mittel": 8.59,
+        "oben": 9.03
+      }
+    ],
+    "zuschlaege": [
+      {
+        "merkmal": "barrierefreie_wohnung_gemaess_din_18040_2",
+        "art": "pct",
+        "wert": 10,
+        "beleg": "PDF-Seite 2, Barrierefreiheit",
+        "label": "barrierefreie Wohnung gemäß DIN 18040-2"
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1955,
+        "wfl": 70,
+        "ausstattung": "modernisiert"
+      },
+      "erwartet": {
+        "unten": 5.75,
+        "mittel": 6.05,
+        "oben": 6.34
+      },
+      "art": "tabellenzelle",
+      "seite": "PDF-Seite 1, Gruppe 4 (1948 - 1960 modernisiert)"
+    },
+    {
+      "eingabe": {
+        "baujahr": 1995,
+        "wfl": 80,
+        "ausstattung": "standard"
+      },
+      "erwartet": {
+        "unten": 7.43,
+        "mittel": 7.83,
+        "oben": 8.23
+      },
+      "art": "tabellenzelle",
+      "seite": "PDF-Seite 1, Gruppe 9 (1991 - 2000)"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2016,
+        "wfl": 80
+      },
+      "erwartet": null,
+      "art": "tabellenzelle",
+      "seite": "PDF-Seite 1, Gruppe 11 (ab 2014): Marktwerte, frei verhandelbar — kein Wert"
+    }
+  ]
+}
