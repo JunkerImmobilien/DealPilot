@@ -6,6 +6,7 @@
 // - URL vorhanden außer bei art 'keiner' (bei 'unklar' nur Hinweis)
 // - vermutung_bis abgelaufen -> "veraltet" (gezählt und ausgegeben)
 // - einfacher Mietspiegel, Stand älter als 2 Jahre -> "Anpassung überfällig" (§ 558c Abs. 3, Soll)
+// - v3266: werte_nutzung verboten|vorbehalt mit Beleg (Zitat + Seite oder „laut Impressum“) und Kurzgrund; verboten = keine Wertedatei, vorbehalt = Wertedatei gesperrt
 // RC=0 sauber, RC=1 Formfehler. Veraltete Sätze sind KEIN Formfehler (die Welt altert), nur Ausgabe.
 // Aufruf: node tools/mietspiegel-verzeichnis-pruefen.mjs [--heute=JJJJ-MM-TT] [--liste]
 import fs from 'node:fs';
@@ -39,7 +40,14 @@ const anpassungFaellig = [];
 const agsGesehen = new Set();
 const jeArt = {};
 const jeZugang = {};
+const nutzung = {};
 let pflicht50 = 0;
+/* v3266 · Wertedateien daneben (werte/<ags>.json), für werte_nutzung */
+const WERTE = new Map();
+try {
+  const o = path.join(path.dirname(DATEI), 'werte');
+  for (const f of fs.readdirSync(o)) if (/^\d{8}\.json$/.test(f)) WERTE.set(f.slice(0, 8), JSON.parse(fs.readFileSync(path.join(o, f), 'utf8')));
+} catch (e) { /* ohne Ordner prüft der Abschnitt nur die Form */ }
 
 for (const [i, s] of saetze.entries()) {
   const id = `#${i} ${s.ags || '?'} ${s.gemeinde || '?'}`;
@@ -68,6 +76,23 @@ for (const [i, s] of saetze.entries()) {
   if (s.art !== 'qualifiziert' && s.vermutung_bis) fehler.push(`${id}: vermutung_bis nur bei qualifiziert`);
   if (s.art === 'unklar' && !s.hinweis) fehler.push(`${id}: unklar ohne hinweis`);
 
+  /* v3266 · werte_nutzung: 'verboten' (Speicher-/Abdruckverbot im Dokument -> nie eine Wertedatei) | 'vorbehalt'
+     (Rechtevorbehalt -> Wertedatei mit freigabe 'gesperrt', nur Staging). Beleg ist Pflicht; ohne bekanntes Zitat
+     steht dort „laut Impressum“ - nie ein erfundenes Zitat (ein Zitat steht in „…“ mit Seite). */
+  if ('werte_nutzung' in s) {
+    nutzung[s.werte_nutzung] = (nutzung[s.werte_nutzung] || 0) + 1;
+    if (!['verboten', 'vorbehalt'].includes(s.werte_nutzung)) fehler.push(`${id}: werte_nutzung ungültig: ${s.werte_nutzung}`);
+    const b = String(s.werte_nutzung_beleg || '');
+    if (!b) fehler.push(`${id}: werte_nutzung ohne werte_nutzung_beleg`);
+    else if (s.werte_nutzung === 'vorbehalt') { if (!b.includes(`werte/${s.ags}.json`)) fehler.push(`${id}: vorbehalt-Beleg nennt die Wertedatei nicht (dort steht freigabe_grund)`); }
+    else if (!/^laut Impressum/.test(b) && !(/„[^“]{12,}“/.test(b) && /Seite \d+/.test(b))) fehler.push(`${id}: werte_nutzung_beleg ohne Zitat mit Seite und nicht „laut Impressum“`);
+    if (!s.werte_nutzung_grund) fehler.push(`${id}: werte_nutzung ohne werte_nutzung_grund (Kurzgrund für den Hinweis)`);
+    const w = WERTE.get(s.ags);
+    if (s.werte_nutzung === 'verboten' && w) fehler.push(`${id}: Speicherverbot, aber Wertedatei werte/${s.ags}.json vorhanden`);
+    if (s.werte_nutzung === 'vorbehalt' && !(w && w.freigabe === 'gesperrt')) fehler.push(`${id}: vorbehalt ohne Wertedatei mit freigabe gesperrt`);
+  } else if (s.werte_nutzung_beleg || s.werte_nutzung_grund) fehler.push(`${id}: werte_nutzung_beleg/-grund ohne werte_nutzung`);
+  { const w = WERTE.get(s.ags); if (w && w.freigabe === 'gesperrt' && s.werte_nutzung !== 'vorbehalt') fehler.push(`${id}: Wertedatei gesperrt, aber werte_nutzung nicht 'vorbehalt'`); }
+
   jeArt[s.art] = (jeArt[s.art] || 0) + 1;
   if (s.art === 'qualifiziert' || s.art === 'einfach') jeZugang[s.zugang] = (jeZugang[s.zugang] || 0) + 1;
   if (s.einwohner_ca >= 50000) pflicht50++;
@@ -91,6 +116,7 @@ const n = saetze.length;
 console.log(`Mietspiegel-Verzeichnis: ${n} Sätze, davon ${pflicht50} Gemeinden ab 50.000 EW (Stichtag Prüfung ${HEUTE})`);
 console.log('je art:   ' + ART.map((a) => `${a} ${jeArt[a] || 0}`).join(' · '));
 console.log('Zugang (qualifiziert+einfach): ' + Object.entries(jeZugang).map(([k, v]) => `${k} ${v}`).join(' · '));
+console.log('werte_nutzung (v3266): ' + (Object.entries(nutzung).map(([k, v]) => `${k} ${v}`).join(' · ') || 'keine'));
 console.log(`veraltet (vermutung_bis abgelaufen): ${veraltet.length}`);
 for (const s of veraltet) console.log(`  ${s.ags} ${s.gemeinde} (${s.land}) vermutung_bis ${s.vermutung_bis} [${s.vermutung_bis_herleitung}]`);
 console.log(`einfach, Anpassung überfällig (Stand + 2 J., § 558c Abs. 3 Soll): ${anpassungFaellig.length}`);

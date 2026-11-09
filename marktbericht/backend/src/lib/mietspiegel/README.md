@@ -298,3 +298,25 @@ Aachen, Düren, Ibbenbüren, Regensburg (gesperrt), Wolfsburg. Wohnlage je Adres
 Lüneburg, Sankt Augustin. **Speicherverbot im Dokument = keine Datei:** „ohne Genehmigung … in elektronischen Systemen zu speichern“
 (u. a. Stuttgart, Nürnberg, Mannheim, Augsburg, Braunschweig, Kiel, Freiburg, Halle, Chemnitz). Rechtevorbehalt
 ohne Speicherverbot → Datei mit `"freigabe": "gesperrt"`.
+
+## Speicherverbot, Rechtevorbehalt und DealPilot-Näherung (v3266)
+
+**`werte_nutzung` im Verzeichnis:** `verboten` = das Dokument untersagt Speicherung/Abdruck ohne Genehmigung
+(„Vervielfältigung … und Speicherung in elektronische Systeme nur mit ausdrücklicher Genehmigung“) — dann gibt
+es **nie** eine Wertedatei; `vorbehalt` = Rechtevorbehalt ohne ausdrückliches Speicherverbot, Wertedatei mit
+`"freigabe": "gesperrt"` (nur Staging). `werte_nutzung_beleg` trägt das Zitat mit PDF-Seite (aus den
+Ernte-Texten) bzw. bei `vorbehalt` den Verweis auf die Wertedatei (dort `freigabe_grund`); ohne bekanntes Zitat
+steht „laut Impressum“ — nie ein erfundenes Zitat. `werte_nutzung_grund` ist der Kurzgrund im Hinweis.
+Prüfer: `tools/mietspiegel-verzeichnis-pruefen.mjs`.
+
+**Hinweis am Objekt (#ms-hinweis):** „Mietspiegel der Gemeinde: qualifiziert · Stand … · Mietspiegel öffnen — Die
+Werte darf DealPilot nicht vorhalten (Speicherung nur mit Genehmigung des Herausgebers). Bitte die Spanne aus dem
+Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung.“ (Kern `mietspiegelRegister`).
+
+**DealPilot-Näherung (`naeherung.js`, Parameter `naeherung.json`):** Faktor × Zensus-2022-Bestandsmiete der
+Gemeinde nach Baujahresklasse × nach Größenklasse / gesamt (mb.zensus_werte). Kalibriert **nur** an den freien
+Wertedateien — keine Formel, die gesperrte oder verbotene Tabellen nachbildet. Nie amtlich, nie „der Mietspiegel“.
+Die Route liefert sie nur ohne verwendbare Werte (`naeherung_verfuegbar`, mit Baujahr/Fläche `naeherung`); in
+`objektVgl()` steht sie zwischen amtlicher Mietpreisübersicht und Schätzung aus Angebotsmieten, nie gegen eine
+eigene Eingabe. **Nach jeder Ernte** `node tools/mietspiegel-naeherung-ableiten.mjs` (Leave-one-Stadt-out-Güte,
+schreibt `naeherung.json`; `--holen` liest den Zensus-Ausschnitt `naeherung-zensus.json` neu von Staging).

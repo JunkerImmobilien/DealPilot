@@ -1,0 +1,601 @@
+{
+ "titel": "DealPilot-Näherung der ortsüblichen Vergleichsmiete (nie amtlich, nicht der Mietspiegel)",
+ "version": "v3266",
+ "stand": "2026-11-09",
+ "erzeugt_von": "tools/mietspiegel-naeherung-ableiten.mjs",
+ "methode": "Mittelwert ≈ Faktor × Zensus-2022-Bestandsmiete der Gemeinde nach Baujahresklasse × nach Größenklasse / gesamt (Form klassen_faktor) bzw. Faktor × gesamt (gesamt_faktor); Faktor = Median der Quotienten Mietspiegel-Mittelwert / Zensus über alle Rasterpunkte der freien Mietspiegel. Kalibriert nur an freien Wertedateien (freigabe ≠ gesperrt); Mietspiegel mit Speicherverbot sind nicht im Register und gehen nie ein.",
+ "modell": "klassen_faktor",
+ "faktor": 1.109,
+ "n_staedte": 59,
+ "n_punkte": 1062,
+ "guete": {
+  "verfahren": "Leave-one-Stadt-out über das Raster (Baujahr 1955–2005 × 50/70/90 m²)",
+  "mape_pct": 7.5,
+  "mae_eur": 0.56,
+  "anteil_5_pct": 40,
+  "anteil_10_pct": 74,
+  "median_pct": 6.3,
+  "n": 1062
+ },
+ "guete_normwohnung": {
+  "objekt": "Baujahr 1975, 70 m²",
+  "mape_pct": 6,
+  "mae_eur": 0.42,
+  "anteil_5_pct": 51,
+  "anteil_10_pct": 85,
+  "median_pct": 4.8,
+  "n": 59
+ },
+ "vergleich": {
+  "zensus_roh": {
+   "raster_mape_pct": 10.4,
+   "raster_10_pct": 58,
+   "norm_mape_pct": 7.1
+  },
+  "gesamt_faktor": {
+   "raster_mape_pct": 9.3,
+   "raster_10_pct": 61,
+   "norm_mape_pct": 9.2
+  },
+  "klassen_faktor": {
+   "raster_mape_pct": 7.5,
+   "raster_10_pct": 74,
+   "norm_mape_pct": 6
+  },
+  "klassen_faktor_marktlage": {
+   "raster_mape_pct": 7.6,
+   "raster_10_pct": 73,
+   "norm_mape_pct": 6.1
+  },
+  "vpi_fortschreibung": {
+   "raster_mape_pct": 7.7,
+   "raster_10_pct": 70,
+   "norm_mape_pct": 6.7
+  },
+  "rueckfall_angebot_abschlag": "nicht messbar: DealPilot führt keine Angebotsmiete je Gemeinde (sie kommt je Objekt von außen)"
+ },
+ "vpi_fortschreibung_faktor": 1.09,
+ "vpi_monat": "2026-09",
+ "zensus": {
+  "stichtag": "2022-05-15",
+  "tabellen": "4000W-0004/-0005/-0009",
+  "lizenz": "© Statistische Ämter des Bundes und der Länder, Zensus 2022, Datenlizenz Deutschland – Namensnennung – 2.0",
+  "ausschnitt": "naeherung-zensus.json"
+ },
+ "geltung": "nur Gemeinden ohne verwendbare Mietspiegel-Werte (keine Wertedatei, gesperrt und nicht ausgeliefert, Speicherverbot, kein oder unklarer Mietspiegel); nie neben freien Werten, nie gegen eine eigene Eingabe",
+ "kalibrierung": [
+  {
+   "ags": "01003000",
+   "gemeinde": "Lübeck",
+   "land": "SH",
+   "stand": "2025-05-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.199
+  },
+  {
+   "ags": "01056015",
+   "gemeinde": "Elmshorn",
+   "land": "SH",
+   "stand": "2026-08-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.093
+  },
+  {
+   "ags": "01060063",
+   "gemeinde": "Norderstedt",
+   "land": "SH",
+   "stand": "2025-03-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.079
+  },
+  {
+   "ags": "02000000",
+   "gemeinde": "Hamburg",
+   "land": "HH",
+   "stand": "2025-04-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "lage": "normal",
+   "quotient_median": 1.042
+  },
+  {
+   "ags": "03103000",
+   "gemeinde": "Wolfsburg",
+   "land": "NI",
+   "stand": "2026-01-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 0.994
+  },
+  {
+   "ags": "03157006",
+   "gemeinde": "Peine",
+   "land": "NI",
+   "stand": "2026-03-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.067
+  },
+  {
+   "ags": "03241001",
+   "gemeinde": "Hannover",
+   "land": "NI",
+   "stand": "2025-04-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "lage": "normal",
+   "quotient_median": 1.154
+  },
+  {
+   "ags": "03241005",
+   "gemeinde": "Garbsen",
+   "land": "NI",
+   "stand": "2025-04-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.252
+  },
+  {
+   "ags": "03241010",
+   "gemeinde": "Langenhagen",
+   "land": "NI",
+   "stand": "2025-04-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.192
+  },
+  {
+   "ags": "03403000",
+   "gemeinde": "Oldenburg (Oldenburg)",
+   "land": "NI",
+   "stand": "2025-10-11",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.074
+  },
+  {
+   "ags": "03404000",
+   "gemeinde": "Osnabrück",
+   "land": "NI",
+   "stand": "2025-08",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.078
+  },
+  {
+   "ags": "03405000",
+   "gemeinde": "Wilhelmshaven",
+   "land": "NI",
+   "stand": "2026-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.012
+  },
+  {
+   "ags": "03454032",
+   "gemeinde": "Lingen (Ems)",
+   "land": "NI",
+   "stand": "2026-04-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.108
+  },
+  {
+   "ags": "04011000",
+   "gemeinde": "Bremen",
+   "land": "HB",
+   "stand": "2026-01-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 0.934
+  },
+  {
+   "ags": "05117000",
+   "gemeinde": "Mülheim an der Ruhr",
+   "land": "NW",
+   "stand": "2026-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 0.984
+  },
+  {
+   "ags": "05119000",
+   "gemeinde": "Oberhausen",
+   "land": "NW",
+   "stand": "2025-03-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.14
+  },
+  {
+   "ags": "05124000",
+   "gemeinde": "Wuppertal",
+   "land": "NW",
+   "stand": "2024-11",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.136
+  },
+  {
+   "ags": "05154036",
+   "gemeinde": "Kleve",
+   "land": "NW",
+   "stand": "2025-08-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.062
+  },
+  {
+   "ags": "05158020",
+   "gemeinde": "Langenfeld (Rheinland)",
+   "land": "NW",
+   "stand": "2025-10-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.095
+  },
+  {
+   "ags": "05170008",
+   "gemeinde": "Dinslaken",
+   "land": "NW",
+   "stand": "2026-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.149
+  },
+  {
+   "ags": "05170024",
+   "gemeinde": "Moers",
+   "land": "NW",
+   "stand": "2025-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.134
+  },
+  {
+   "ags": "05334002",
+   "gemeinde": "Aachen",
+   "land": "NW",
+   "stand": "2026-01-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.155
+  },
+  {
+   "ags": "05358008",
+   "gemeinde": "Düren",
+   "land": "NW",
+   "stand": "2025-01-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.06
+  },
+  {
+   "ags": "05382068",
+   "gemeinde": "Troisdorf",
+   "land": "NW",
+   "stand": "2025-10-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.151
+  },
+  {
+   "ags": "05513000",
+   "gemeinde": "Gelsenkirchen",
+   "land": "NW",
+   "stand": "2026-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.168
+  },
+  {
+   "ags": "05554008",
+   "gemeinde": "Bocholt",
+   "land": "NW",
+   "stand": "2026-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.069
+  },
+  {
+   "ags": "05562024",
+   "gemeinde": "Marl",
+   "land": "NW",
+   "stand": "2026-04-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.226
+  },
+  {
+   "ags": "05566028",
+   "gemeinde": "Ibbenbüren",
+   "land": "NW",
+   "stand": "2025-08-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.24
+  },
+  {
+   "ags": "05570004",
+   "gemeinde": "Ahlen",
+   "land": "NW",
+   "stand": "2025-06",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.221
+  },
+  {
+   "ags": "05711000",
+   "gemeinde": "Bielefeld",
+   "land": "NW",
+   "stand": "2026-03",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.152
+  },
+  {
+   "ags": "05754008",
+   "gemeinde": "Gütersloh",
+   "land": "NW",
+   "stand": "2026-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.173
+  },
+  {
+   "ags": "05758012",
+   "gemeinde": "Herford",
+   "land": "NW",
+   "stand": "2025-10",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.221
+  },
+  {
+   "ags": "05758016",
+   "gemeinde": "Hiddenhausen",
+   "land": "NW",
+   "stand": "2025-11",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.175
+  },
+  {
+   "ags": "05758024",
+   "gemeinde": "Löhne",
+   "land": "NW",
+   "stand": "2025-11",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.088
+  },
+  {
+   "ags": "05770004",
+   "gemeinde": "Bad Oeynhausen",
+   "land": "NW",
+   "stand": "2026-01-20",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.232
+  },
+  {
+   "ags": "05774032",
+   "gemeinde": "Paderborn",
+   "land": "NW",
+   "stand": "2025-04-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.047
+  },
+  {
+   "ags": "05911000",
+   "gemeinde": "Bochum",
+   "land": "NW",
+   "stand": "2025",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.039
+  },
+  {
+   "ags": "05913000",
+   "gemeinde": "Dortmund",
+   "land": "NW",
+   "stand": "2024-05",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.05
+  },
+  {
+   "ags": "05954036",
+   "gemeinde": "Witten",
+   "land": "NW",
+   "stand": "2025-07-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.052
+  },
+  {
+   "ags": "05962024",
+   "gemeinde": "Iserlohn",
+   "land": "NW",
+   "stand": "2026-04-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.091
+  },
+  {
+   "ags": "05962032",
+   "gemeinde": "Lüdenscheid",
+   "land": "NW",
+   "stand": "2026-04-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.063
+  },
+  {
+   "ags": "05962040",
+   "gemeinde": "Menden (Sauerland)",
+   "land": "NW",
+   "stand": "2026-04-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.133
+  },
+  {
+   "ags": "05974028",
+   "gemeinde": "Lippstadt",
+   "land": "NW",
+   "stand": "2025-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.062
+  },
+  {
+   "ags": "05978024",
+   "gemeinde": "Lünen",
+   "land": "NW",
+   "stand": "2025-12-31",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.153
+  },
+  {
+   "ags": "06433012",
+   "gemeinde": "Rüsselsheim am Main",
+   "land": "HE",
+   "stand": "2025-07-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.107
+  },
+  {
+   "ags": "06434001",
+   "gemeinde": "Bad Homburg v. d. Höhe",
+   "land": "HE",
+   "stand": "2026-01-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.041
+  },
+  {
+   "ags": "06435014",
+   "gemeinde": "Hanau",
+   "land": "HE",
+   "stand": "2026-09-15",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.124
+  },
+  {
+   "ags": "06531005",
+   "gemeinde": "Gießen",
+   "land": "HE",
+   "stand": "2026-07-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.044
+  },
+  {
+   "ags": "06532023",
+   "gemeinde": "Wetzlar",
+   "land": "HE",
+   "stand": "2026-06-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 0.985
+  },
+  {
+   "ags": "06534014",
+   "gemeinde": "Marburg",
+   "land": "HE",
+   "stand": "2026-09-16",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.291
+  },
+  {
+   "ags": "06611000",
+   "gemeinde": "Kassel",
+   "land": "HE",
+   "stand": "2026-01-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.195
+  },
+  {
+   "ags": "07211000",
+   "gemeinde": "Trier",
+   "land": "RP",
+   "stand": "2025-12-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.149
+  },
+  {
+   "ags": "07315000",
+   "gemeinde": "Mainz",
+   "land": "RP",
+   "stand": "2025-04",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.156
+  },
+  {
+   "ags": "09763000",
+   "gemeinde": "Kempten (Allgäu)",
+   "land": "BY",
+   "stand": "2025-06-01",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.115
+  },
+  {
+   "ags": "12053000",
+   "gemeinde": "Frankfurt (Oder)",
+   "land": "BB",
+   "stand": "2026-02-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.038
+  },
+  {
+   "ags": "14612000",
+   "gemeinde": "Dresden",
+   "land": "SN",
+   "stand": "2024-12",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.033
+  },
+  {
+   "ags": "14626110",
+   "gemeinde": "Görlitz",
+   "land": "SN",
+   "stand": "2024-11-01",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.058
+  },
+  {
+   "ags": "16053000",
+   "gemeinde": "Jena",
+   "land": "TH",
+   "stand": "2026-09-07",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.125
+  },
+  {
+   "ags": "16055000",
+   "gemeinde": "Weimar",
+   "land": "TH",
+   "stand": "2025-12-31",
+   "marktlage": "mittel",
+   "punkte": 18,
+   "quotient_median": 1.073
+  }
+ ]
+}
