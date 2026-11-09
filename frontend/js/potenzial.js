@@ -250,6 +250,8 @@
       var eigenS = /^eigene Angabe/.test(so.herkunft || ''), wirk = so.termine && so.termine.wirksam_ab;
       z.push({ c: 'soll', t: 'Mieterhöhung', v: 'auf ' + eur(so.miete) + '/Monat' + qm(so.miete),
         u: (so.termine ? so.termine.text : '') + (so.grenze ? ' · Grenze ' + so.grenze : '')
+          + (so.vgl_qm > 0 && !eigenS ? ' · Vergleichsmiete ' + eur2(so.vgl_qm) + '/m²' + (vglKurz(so) ? ' (' + vglKurz(so) + ')' : '') : '')   /* v3246 */
+          + (so.ueber_kappung > 0 ? ' · eigene Soll ' + eur(so.eigen_soll) + ' über der Kappungsgrenze — ' + eur(so.ueber_kappung) + '/Monat sind keine Erhöhung nach § 558' : '')   /* v3246 */
           + (so.umlage559 && so.umlage559.monat > 0 ? ' · darin Umlage § 559 ' + eur(so.umlage559.monat) : '')
           + (so.termine && so.termine.letzte_fehlt ? ' · letzte Erhöhung nicht eingetragen' : ''),
         tag: eigenS ? 'eigene Angabe' : 'DealPilot rechnet vor',
@@ -487,6 +489,18 @@
       u: kapp.herkunft === 'verordnung' ? (kapp.verordnung || 'Landesverordnung') : kapp.herkunft === 'eigen' ? 'eigene Angabe'
         : kapp.herkunft === 'gesetz' ? 'gesetzlich (§ 558 Abs. 3 BGB)' : 'bitte prüfen',
       warn: !!kapp.pruefen, lang: kapp.text });
+    /* v3246 · 1b · die Vergleichsmiete, an der § 558 endet - mit Quelle und den Hinweisen der Quelle
+       (Spannenwert, Vermutungswirkung, Schätzung aus Angebotsmieten) */
+    var vgO = (m && m.vgl) || {};
+    var vEig = s.vgl_quelle_art === 'eigen';
+    var vMs = vEig ? null : (s.ms || vgO.ms || null);
+    var vHw = vEig ? [] : (s.vgl_hinweise || vgO.hinweise || []);
+    var vSchaetz = !vEig && (s.vgl_quelle_art || vgO.quelle_art) === 'angebot_abschlag';
+    if (vglQm > 0) z.push({ k: 'Vergleichsmiete', v: eur2(vglQm) + '/m²' + (vMs ? ' · ' + vMs.wahl_text : ''),
+      u: vglHer + (vHw.length ? ' · ' + vHw.join(' · ') : ''),
+      warn: vSchaetz || !!(vMs && (vMs.veraltet || vMs.art !== 'qualifiziert' || vMs.genutzt === 'oben')), lang: vHw.join(' · '),
+      ms: vMs, quelle_art: vEig ? 'eigen' : (s.vgl_quelle_art || vgO.quelle_art || null) });
+    else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Mietspiegel der Stadt eintragen (Tab Investition, Karte Mieterhöhung und Zielbild) oder eine belegte Vergleichsmiete', warn: true });
     /* 2 · Nächste Erhöhung (§ 558) — aus sollFuer, nichts nachgerechnet */
     if (w) {
       var ist = zahl(w.ist), wfl = zahl(w.wfl);
@@ -511,14 +525,14 @@
     }
     /* 3 · Mietpreisbremse bei Neuvermietung */
     var obergrenze = (br.gilt && vglQm > 0) ? Math.round(vglQm * 1.1 * 100) / 100 : null;
-    var markt = /Marktmiete/i.test(vglHer);
+    var markt = vSchaetz || /Marktmiete/i.test(vglHer);   /* v3246: die Schätzung heißt nicht mehr „Marktmiete" */
     z.push({ k: 'Mietpreisbremse', v: br.gilt === true ? 'gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') : br.gilt === false ? 'gilt hier nicht' : 'bitte prüfen',
       u: br.gilt === true
         ? (obergrenze ? 'bei Neuvermietung höchstens ' + eur2(obergrenze) + '/m² (Vergleichsmiete ' + eur2(vglQm) + ' + 10 %'
             + (vglHer ? ', ' + vglHer : '') + ')' : 'Vergleichsmiete eintragen — dann rechnet DealPilot die Obergrenze')
         : br.gilt === false ? 'Neuvermietung ohne Obergrenze nach § 556d' : '',
       warn: br.gilt === null || !!br.pruefen || (br.gilt === true && markt), lang: br.text
-        + (br.gilt === true && markt ? ' Die Obergrenze ist auf der Marktmiete gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
+        + (br.gilt === true && markt ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
         + (br.gilt === true ? ' Ausnahmen: höhere Vormiete (§ 556e BGB), erste Vermietung nach umfassender Modernisierung oder Neubau (§ 556f BGB).' : '') });
     /* 4 · Zielmiete gegen die Bremse */
     var zq = zahl(w && w.ziel_qm);
@@ -764,18 +778,65 @@
     if (md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) return null;
     return v;
   }
+  /* v3246 · NEUE RANGFOLGE (Marcel 09.11.2026, DESAG):
+       1 eigene belegte Vergleichsmiete (zb_vgl_qm)
+       2 Mietspiegel: Eingabe am Objekt (ms_art, ms_unten, ms_mittel, ms_oben, ms_stand, ms_url), gerechnet mit
+         dem OBEREN Spannenwert, umschaltbar je Objekt (ms_wahl: '' = oben | 'mittel' | 'unten'); später füllt
+         das Register (_dpMarktdaten.mietspiegel, Mietspiegel-Verzeichnis) dieselbe Struktur - Kern mietspiegelAus()
+       3 amtliche Vergleichsmiete am Objekt (_dpMarktdaten.vergleichsmiete, wie v3244/v3245)
+       4 Schätzung aus der Marktmiete (ds2_marktmiete) MINUS Abschlag nach Marktlage
+         (DealPilotConfig.mieteAngebotAbschlag, Stufe im Kern abschlagStufe) - weiter als marktmiete: true
+         markiert: der Wertkern nimmt dann seine marktübliche Miete (PotenzialService stufe558) */
+  function mietspiegelObjekt() {
+    var md = window._dpMarktdaten;
+    var reg = md && md.mietspiegel && !(md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) ? md.mietspiegel : null;
+    return K.mietspiegelAus(reg, { art: wert('ms_art'), unten: wert('ms_unten'), mittel: wert('ms_mittel'), oben: wert('ms_oben'),
+      stand: wert('ms_stand'), url: wert('ms_url') });
+  }
+  function msWahl() { var w = wert('ms_wahl'); return K.MS_WAHL[w] ? w : 'oben'; }
+  /* v3246 · Stufe des Abschlags Angebotsmiete -> Vergleichsmiete. Zahlen: config.js mieteAngebotAbschlag (EINE Stelle). */
+  function mieteAbschlag() {
+    var C = window.DealPilotConfig, cfg = C && C.mieteAngebotAbschlag;
+    if (!cfg) return null;
+    var ags = agsJetzt(), br = null, kp = null;
+    try { br = mietpreisbremse(ags); } catch (e) {}
+    try { kp = kappung(ags); } catch (e) {}
+    var md = window._dpMarktdaten, z = md && md.zensus;
+    /* Einwohnerzahl: Stand 09.11.2026 liefert keine Quelle sie ans Objekt - die Stufe „entspannt" greift nur, wenn sie da ist */
+    var ew = z && (z.einwohner != null ? z.einwohner : (z.gemeinde && z.gemeinde.einwohner));
+    return K.abschlagStufe(cfg, { bremse_gilt: br ? br.gilt : null, kapp_pct: kp ? kp.pct : null, ags: ags, einwohner: ew != null ? ew : null });
+  }
   function objektVgl() {
     var v = zahl(wert('zb_vgl_qm'));
-    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)', art: 'eigen' };
+    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)', art: 'eigen', quelle_art: 'eigen', hinweise: [] };
+    var ms = mietspiegelObjekt(), mw = ms ? K.mietspiegelWert(ms, msWahl()) : null;
+    if (mw && mw.qm > 0) return { qm: mw.qm, art: 'mietspiegel_' + mw.art, quelle_art: 'mietspiegel_' + mw.art, qualifiziert: mw.qualifiziert,
+      mietspiegel: true, ms: mw, herkunft: mw.herkunft, hinweise: mw.hinweise.slice() };
     var a = amtlicheVgl();
     if (a) {
       var t = VGL_ART[a.art] || 'amtliche Vergleichsmiete';
-      return { qm: zahl(a.qm), art: a.art || 'amtlich', qualifiziert: a.art === 'mietspiegel_qualifiziert',
+      return { qm: zahl(a.qm), art: a.art || 'amtlich', quelle_art: a.art || 'amtlich', qualifiziert: a.art === 'mietspiegel_qualifiziert', hinweise: [],
         herkunft: t + (a.quelle ? ' — ' + a.quelle : '') + ((a.datum || a.stand) ? ', Stand ' + deDatum(String(a.datum || a.stand).slice(0, 10)) : '') + (a.ausserhalb ? ', außerhalb der Tabelle' : '') };
     }
     v = zahl(wert('ds2_marktmiete'));
-    if (v > 0) return { qm: v, herkunft: 'Marktmiete (Tab Miete) — Ersatz, keine ortsübliche Vergleichsmiete', marktmiete: true, art: 'marktmiete' };
-    return { qm: 0, herkunft: null };
+    if (v > 0) {
+      var s = K.vglAusAngebot(v, mieteAbschlag());
+      return { qm: s.qm, herkunft: s.text, marktmiete: true, art: 'marktmiete', quelle_art: 'angebot_abschlag', angebot: s,
+        warnung: s.warnung, hinweise: s.warnung ? [s.warnung] : [] };
+    }
+    return { qm: 0, herkunft: null, hinweise: [] };
+  }
+  /* v3246 · kurze Herkunft für Leiter und Zeilen */
+  function vglKurz(vg) {
+    if (!vg) return '';
+    if (vg.quelle_art === 'eigen' || vg.vgl_quelle_art === 'eigen') return 'eigene Angabe';
+    var ms = vg.ms;
+    if (ms) return (ms.art === 'qualifiziert' ? 'qualifizierter' : 'einfacher') + ' Mietspiegel, ' + ms.wahl_text + (ms.veraltet ? ', veraltet' : '');
+    var qa = vg.quelle_art || vg.vgl_quelle_art;
+    if (qa === 'angebot_abschlag') return vg.angebot && vg.angebot.pct != null ? 'Schätzung: Angebotsmiete − ' + String(vg.angebot.pct).replace('.', ',') + ' %' : 'Schätzung aus Angebotsmieten';
+    if (qa === 'mietpreisuebersicht') return 'amtliche Mietpreisübersicht';
+    if (/^mietspiegel/.test(qa || '')) return 'Mietspiegel';
+    return '';
   }
   /* v3150 · der Teil der Soll-Miete nach § 558 (ohne Modernisierungsumlage § 559).
      v3244 · Rechnung im Kern (teil558): bei Staffel/Index/Gewerbe ist er Ist. */
@@ -805,7 +866,8 @@
     var ags = agsJetzt();
     var kapp = kappung(ags);
     var vg = objektVgl();
-    var ctx = { kapp: kapp, vgl_qm: vg.qm, vgl_herkunft: vg.herkunft };
+    var ctx = { kapp: kapp, vgl_qm: vg.qm, vgl_herkunft: vg.herkunft,
+      vgl_art: vg.quelle_art || null, vgl_hinweise: vg.hinweise || [], vgl_ms: vg.ms || null };   /* v3246 */
     var D = window._dpMfh || {};
     var liste = opts.einheiten || (artMitEinheiten() && Array.isArray(D.einheiten) ? D.einheiten : null);
     var geb = opts.gebaeude || D.gebaeude || {};
@@ -2019,7 +2081,7 @@
       : 'Drei Stufen der Mietentwicklung mit Ertragswert je Stufe' + (r && r.aufteilung ? ' und der Wirkung einer Aufteilung in Eigentumswohnungen.' : '.');
     d.wohnungen = m.wohnungen.map(function (w) {
       return { we: (w.nr ? w.nr + ' ' : '') + (w.lage || ''), wfl: w.wfl, ist: w.ist > 0 ? eur(w.ist) : (w.status === 'leer' ? 'leer' : '—'),
-        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.vertrag ? ' · nach Vertrag (' + K.teilVertrag(w.soll, w.ist).norm + '), nicht § 558' : '') + (w.soll.termine ? ' · verlangbar ' + (w.soll.termine.verlangbar_sofort ? 'sofort' : 'ab ' + mmjj(w.soll.termine.verlangbar_ab)) + ' · wirksam ab ' + mmjj(w.soll.termine.wirksam_ab) : '') : '—',   /* v2430a: lange Termintexte liefen in die Nachbarspalten; v3028: beide Termine, die Spalte bricht in beiden PDFs um (pdf.js _tab, pdf-investment-bank.js 'w') */
+        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.ueber_kappung > 0 ? ' · eigene Angabe ' + eur(w.soll.eigen_soll) + ' auf die Kappungsgrenze begrenzt' : '') /* v3246 */ + (w.soll.vertrag ? ' · nach Vertrag (' + K.teilVertrag(w.soll, w.ist).norm + '), nicht § 558' : '') + (w.soll.termine ? ' · verlangbar ' + (w.soll.termine.verlangbar_sofort ? 'sofort' : 'ab ' + mmjj(w.soll.termine.verlangbar_ab)) + ' · wirksam ab ' + mmjj(w.soll.termine.wirksam_ab) : '') : '—',   /* v2430a: lange Termintexte liefen in die Nachbarspalten; v3028: beide Termine, die Spalte bricht in beiden PDFs um (pdf.js _tab, pdf-investment-bank.js 'w') */
         ziel: w.ziel != null ? eur(w.ziel) : '—',
         massnahmen: w.massnahmen.map(function (x) { return x.t; }).join(', ') || '—' };
     });
@@ -2069,7 +2131,9 @@
         + (r.basis.bestandsbasis && r.basis.bestandsbasis.hinweis ? ' ' + r.basis.bestandsbasis.hinweis : '')   /* v2488 */
         : (zu ? ' ' + GESPERRT_KURZ + ' (Wertermittlung nach ImmoWertV).' : ' Ertragswerte nicht gerechnet.'))
       + ' ' + m.kappung.text
+      + (m.vgl && m.vgl.qm > 0 ? ' Vergleichsmiete ' + eur2(m.vgl.qm) + '/m²: ' + m.vgl.herkunft + ((m.vgl.hinweise || []).length ? ' (' + m.vgl.hinweise.join('; ') + ')' : '') + '.' : '')   /* v3246 */
       + (r && r.verfuegbar && r.mpi && !zu ? ' ' + mpiFuss(r.mpi) : '') + ' ' + jahreFuss(JA);   /* v2541 */
+    d.vergleichsmiete = m.vgl && m.vgl.qm > 0 ? { qm: m.vgl.qm, herkunft: m.vgl.herkunft, quelle_art: m.vgl.quelle_art || null, hinweise: m.vgl.hinweise || [] } : null;   /* v3246 */
     if (d.aufteilung_hinweis) d.fuss = 'Aufteilung: ' + d.aufteilung_hinweis + ' ' + d.fuss;
     d.gerechnet = !!(r && r.verfuegbar);
     /* v2460 · Wertbrücke und Ertragswert-Kacheln - dieselben Zahlen für den
@@ -2492,6 +2556,7 @@
     if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { objektSumme(); } catch (e) {} try { mietrechtKarte(); } catch (e) {} } });
     var mfh = artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length;
     var sumHost = el('zb-mfh-summe'), einzel = el('zb-einzel');
+    try { msHinweis(); } catch (e) {}   /* v3246 */
     if (mfh) {
       if (einzel) einzel.style.display = 'none';
       if (sumHost) {
@@ -2521,6 +2586,7 @@
     objektSumme();
   }
   function objektSumme() {
+    try { msHinweis(); } catch (e) {}   /* v3246 */
     var host = el('zb-summe'); if (!host) return;
     var m = modell(), w = m.wohnungen[0] || {};
     if (m.art !== 'mfh') { try { objektLeiter(m); } catch (e) { console.warn('[leiter]', e); } }   /* v3067 */
@@ -2541,7 +2607,21 @@
     try { feshBinden(); } catch (e) {}
     try { mietrechtKarte(); } catch (e) { console.warn('[mietrecht]', e); }   /* v3062 */
   }
+  /* v3246 · unter der Mietspiegel-Eingabe: womit § 558 gerade rechnet, mit den Hinweisen der Quelle */
+  function msHinweis() {
+    var h = el('ms-hinweis'); if (!h) return;
+    var vg = objektVgl();
+    if (!(vg.qm > 0)) { h.innerHTML = 'Keine Vergleichsmiete: Mietspiegel der Stadt eintragen — sonst rechnet DealPilot nur mit der Kappungsgrenze.'; return; }
+    h.innerHTML = 'Gerechnet wird mit <b>' + esc(eur2(vg.qm)) + '/m²</b> — ' + esc(vg.herkunft)
+      + ((vg.hinweise || []).length ? '<br><span style="color:#B8625C">Hinweis: ' + esc(vg.hinweise.join(' · ')) + '</span>' : '')
+      + (vg.quelle_art === 'eigen' && mietspiegelObjekt() ? '<br>Die eigene Vergleichsmiete (oben) geht dem Mietspiegel vor.' : '');
+  }
   function bindeObjektFelder() {
+    /* v3246 · Mietspiegel am Objekt: neu zeichnen, auch beim MFH (Summe und Mietrecht-Karte) */
+    ['ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl'].forEach(function (id) {
+      var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
+      e.addEventListener('change', function () { try { objektKarte(); } catch (x) {} try { msHinweis(); } catch (x) {} });
+    });
     ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'zb_markt_qm', 'san', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_art', 'mv_beginn'].forEach(function (id) {   /* v3026: mv_art, mv_beginn */
       var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
       e.addEventListener('input', function () { objektSumme(); });
@@ -2686,6 +2766,7 @@
     katalog: katalog,   /* v3161 · Gewerk je Massnahme fuer die Schnittstelle (storage.js _soll_einheiten) */
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,
     soll558: soll558, sollVertrag: sollVertrag, objektVgl: objektVgl,   /* v3244 */
+    mietspiegelObjekt: mietspiegelObjekt, mieteAbschlag: mieteAbschlag, vglKurz: vglKurz, msHinweis: msHinweis,   /* v3246 */
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
     brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml, stufenWerte: stufenWerte, KURZ_AUSBLICK: KURZ_AUSBLICK,

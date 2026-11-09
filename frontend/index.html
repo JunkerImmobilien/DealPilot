@@ -1911,11 +1911,27 @@ label.dp-required.qc-required::after {
     <div class="g3" id="zb-jahr-zeile" style="margin:0 0 10px"><div class="f"><label title="In welchem Jahr ist das Zielbild erreicht (Umbau fertig, neu vermietet)? Leer: in Pilot-Analyse und PDF steht das Jahr als offen.">Zielbild fertig (Jahr)</label><div class="iw"><input id="zb_fertig_jahr" type="text" inputmode="numeric" maxlength="4" placeholder="z. B. 2028"></div></div>
       <!-- v2988: eigene marktuebliche Miete NACH den Massnahmen (Zielbild-Ertragswert, im Bericht „eigene Angabe") -->
       <div class="f s2"><label title="Die marktübliche Miete der Wohnungen NACH den Maßnahmen (€/m², nicht die Wunschmiete). Leer: DealPilot nimmt sie aus der amtlichen Mietübersicht, wo diese nach Modernisierung staffelt (Minden-Lübbecke: Klasse nach Modernisierungspunkten); sonst bleibt der Ertragswert beim Mietband des Bestands. Im Bericht als „eigene Angabe“.">Marktübliche Miete nach Modernisierung (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_markt_qm" type="text" inputmode="decimal" placeholder="leer = amtlich bzw. Bestand" class="trl"></div></div></div>
+    <!-- v3246 · MIETSPIEGEL AM OBJEKT (Marcel 09.11.2026): das Register führt noch keine Mietspiegel-WERTE.
+         Die Eingabe ist Quelle „Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)" und steht in der
+         Rangfolge hinter der eigenen Vergleichsmiete und vor der Schätzung aus Angebotsmieten (potenzial.js
+         objektVgl, Kern mietspiegelAus/mietspiegelWert). Gerechnet wird mit dem OBEREN Spannenwert, je Objekt
+         umschaltbar (ms_wahl). Für ETW und MFH - deshalb ausserhalb von #zb-einzel. Felder in storage.js. -->
+    <div class="card-title" style="margin-top:4px">Mietspiegel <span class="oe-ct-hint">für die Mieterhöhung nach § 558 BGB · Werte aus dem Mietspiegel der Stadt</span></div>
+    <div class="g3" id="ms-zeile" style="margin:0 0 4px">
+      <div class="f"><label title="Qualifiziert (§ 558d BGB): anerkannt nach wissenschaftlichen Grundsätzen, Vermutungswirkung zwei Jahre. Einfach (§ 558c BGB): ohne diese Vermutung.">Art des Mietspiegels</label><div class="iw"><select id="ms_art"><option value="">— nicht eingetragen —</option><option value="qualifiziert">qualifiziert (§ 558d BGB)</option><option value="einfach">einfach (§ 558c BGB)</option></select></div></div>
+      <div class="f"><label title="Unterer Wert der Spanne für diese Wohnung (Baujahr, Größe, Lage).">Spanne unten (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="ms_unten" type="text" inputmode="decimal" placeholder="z. B. 6,80" class="trl"></div></div>
+      <div class="f"><label title="Mittelwert des Mietspiegelfelds.">Mittelwert (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="ms_mittel" type="text" inputmode="decimal" placeholder="z. B. 7,60" class="trl"></div></div>
+      <div class="f"><label title="Oberer Wert der Spanne - trägt nur, wenn Ausstattung und Merkmale der Wohnung ihn rechtfertigen.">Spanne oben (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="ms_oben" type="text" inputmode="decimal" placeholder="z. B. 8,40" class="trl"></div></div>
+      <div class="f"><label title="Stand des Mietspiegels (Monat/Jahr). Ein qualifizierter Mietspiegel, der älter als zwei Jahre ist, hat keine Vermutungswirkung mehr (§ 558d Abs. 2 und 3 BGB).">Stand</label><div class="iw"><input id="ms_stand" type="month"></div></div>
+      <div class="f"><label title="Standard: oberer Spannenwert. Mittel- oder Unterwert wählen, wenn Ausstattung und Merkmale den oberen Wert nicht tragen.">Gerechnet mit</label><div class="iw"><select id="ms_wahl"><option value="">oberem Spannenwert (Standard)</option><option value="mittel">Mittelwert</option><option value="unten">unterem Spannenwert</option></select></div></div>
+      <div class="f s2"><label>Link zum Mietspiegel (optional)</label><div class="iw"><input id="ms_url" type="url" placeholder="https://…"></div></div>
+    </div>
+    <div class="cf-hint" id="ms-hinweis" style="margin:0 0 12px"></div>
     <div id="zb-einzel">
       <!-- v3067 · oben steht die Mietleiter (potenzial.js objektLeiter); der Satz darunter bleibt als Erklärung -->
       <p class="sec-desc" style="margin:0 0 12px;font-size:12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
       <div class="g3">
-        <div class="f"><label title="Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.">Vergleichsmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="aus Tab Miete" class="trl"></div></div>
+        <div class="f"><label title="Eine belegte ortsübliche Vergleichsmiete (Gutachten, drei Vergleichswohnungen; § 558a BGB) - geht dem Mietspiegel oben vor. Leer: der Mietspiegel, sonst eine Schätzung aus der Marktmiete im Tab Miete abzüglich Abschlag (v3246).">Vergleichsmiete, belegt (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="leer = Mietspiegel" class="trl"></div></div>
         <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
         <div class="f"><label title="Leer: DealPilot rechnet verlangbar ab (ein Jahr nach der letzten Erhöhung, § 558 Abs. 1 BGB) und wirksam ab (Beginn des dritten Kalendermonats nach Zugang, § 558b Abs. 1 BGB).">Soll wirksam ab</label><div class="iw"><input id="zb_soll_ab" type="month"></div></div>
         <div class="f"><label title="Was nach Umbau oder Neuvermietung erzielbar ist.">Zielmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_ziel_qm" type="text" inputmode="decimal" placeholder="z. B. 9,20" class="trl"></div></div>
@@ -3834,7 +3850,7 @@ label.dp-required.qc-required::after {
 <script src="js/tax.js?v=v3214"></script>
 <script src="js/steuer-verlauf.js?v=v2992"></script>
 <script src="js/pilot-analyse-v4.js?v=v3163"></script><!-- v3099 · Pilot-Analyse Fassung 4 (Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
-<script src="js/config.js?v=v3194jw1107"></script>
+<script src="js/config.js?v=v3246"></script>
 <script src="js/gnotkg.js?v=v3088"></script><!-- v3088 · Notar und Grundbuch nach Gebuehrenordnung -->
 <script src="js/versionsanzeige.js?v=v3035"></script><!-- v3035: Versionsanzeige aus version.json -->
   <script src="js/legal-links.js?v=v1885" defer></script>
@@ -3883,7 +3899,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3217"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3244"></script>
+<script src="js/storage.js?v=v3246"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -3938,13 +3954,13 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3244"></script>
+<script src="js/mfh-einheiten.js?v=v3246"></script>
 <script src="js/mfh-felder.js?v=v3236"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
-<script src="js/mietpotenzial-kern.js?v=v3244"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
-<script src="js/potenzial.js?v=v3245"></script>
+<script src="js/mietpotenzial-kern.js?v=v3246"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
+<script src="js/potenzial.js?v=v3246"></script>
 <script src="js/mietvertrag-objekt.js?v=v3028b"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>

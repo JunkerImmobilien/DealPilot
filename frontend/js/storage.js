@@ -167,6 +167,7 @@ var FIELDS = [
   /* v2430 · Mieterhoehung und Zielbild am Objekt (ETW/EFH/ZFH; beim MFH je Wohnung in _mfh) */
   'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen','zb_fertig_jahr',   /* v2541 */
   'zb_markt_qm', 'san_ausgefuehrt',   /* v2988 · marktuebliche Miete nach Modernisierung; Sanierung ausgefuehrt am */
+  'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl',   /* v3246 · Mietspiegel am Objekt (potenzial.js objektVgl) */
   /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
      Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
      nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
@@ -348,6 +349,12 @@ function collectData() {
           soll_vertrag_monat: so.vertrag && so.vertrag_monat > 0 ? so.vertrag_monat : null,
           vertrag_text: so.vertrag ? (so.vertrag_text || so.grund || null) : null,
           vgl_qm: so.vgl_qm || null, vgl_herkunft: so.vgl_herkunft || null,
+          /* v3246 · Art der Quelle ('eigen' | 'mietspiegel_qualifiziert' | 'mietspiegel_einfach' | 'mietpreisuebersicht' |
+             'angebot_abschlag'), ihre Hinweise, der Mietspiegel mit Spanne und Wahl; eigene Soll über der Kappungsgrenze */
+          vgl_quelle_art: so.vgl_quelle_art || null, vgl_hinweise: so.vgl_hinweise || [],
+          ms: so.ms ? { art: so.ms.art, unten: so.ms.unten, mittel: so.ms.mittel, oben: so.ms.oben, wahl: so.ms.wahl, genutzt: so.ms.genutzt,
+            stand: so.ms.stand, gueltig_bis: so.ms.gueltig_bis, veraltet: !!so.ms.veraltet, url: so.ms.url, quelle: so.ms.quelle } : null,
+          eigen_soll_monat: so.eigen_soll || null, ueber_kappung_monat: so.ueber_kappung || null,
           umlage559: u, grenze: so.grenze || null, herkunft: so.herkunft || null,
           verlangbar_ab: so.verlangbar_ab || te.verlangbar_ab || null, wirksam_ab: so.ab || te.wirksam_ab || null,
           termine_text: so.ab_text || te.text || null, sperre: te.sperre || null, hinweise: so.hinweise || [],
@@ -655,6 +662,7 @@ function loadData(d) {
     /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
     'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr',
     'zb_markt_qm', 'san_ausgefuehrt',   /* v2988: sonst erbt Objekt B das Ausfuehrungsdatum von A */
+    'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl',   /* v3246: sonst erbt Objekt B den Mietspiegel von A */
     /* v2660: der Mietvertrag am Objekt - fehlte er im geladenen Objekt, erbte B Vertragsart,
        Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
     'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',

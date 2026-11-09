@@ -693,7 +693,10 @@
               /* v3244 · Staffel/Index/Gewerbe: die Soll-Miete ist die vertragliche Erhöhung, keine nach § 558 */
               + (so.vertrag ? '<p class="mfh-we-hint">Nach Vertrag (' + esc(P.sollVertrag({ soll: so, ist: ist }).norm) + ') — keine Erhöhung nach § 558 BGB. Die Soll-Miete zählt als vertragliche Erhöhung, nicht als Mieterhöhung bis zur Vergleichsmiete.</p>' : '')
               + (so.hinweise && so.hinweise.length ? '<p class="mfh-we-hint" style="color:#B8625C">Hinweis: ' + esc(so.hinweise.join(', ')) + '.</p>' : '')
-            : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier oder die Marktmiete im Tab Miete lässt DealPilot vorrechnen.</p>')
+            : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier, der Mietspiegel (Tab Investition) oder die Marktmiete im Tab Miete lässt DealPilot vorrechnen.</p>')
+          /* v3246 · woher die Vergleichsmiete stammt und was für sie gilt (Mietspiegel-Spanne, Vermutungswirkung, Schätzung) */
+          + (so && so.vgl_qm > 0 ? '<p class="mfh-we-hint">Vergleichsmiete ' + esc(String(so.vgl_qm.toFixed(2)).replace('.', ',')) + ' €/m² — ' + esc(so.vgl_herkunft || '')
+              + (so.vgl_hinweise && so.vgl_hinweise.length ? '<br><span style="color:#B8625C">' + esc(so.vgl_hinweise.join(' · ')) + '</span>' : '') + '</p>' : '')
           /* v3062 · statt eines langen Satzes die Mietrecht-Zeilen dieser Wohnung (Kappung,
              nächste Erhöhung, Mietpreisbremse, Zielmiete gegen die Bremse) - potenzial.js */
           + '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>';

@@ -1020,6 +1020,37 @@ window.DealPilotConfig = (function() {
        Quelle und Link der Recherche bleiben im Backend (nie nach aussen). */
     angebotAbschlagMarkt: null,
 
+    /* v3246 · ABSCHLAG ANGEBOTSMIETE -> ORTSÜBLICHE VERGLEICHSMIETE (Marcel 09.11.2026, § 558 BGB).
+       Greift NUR, wenn weder eine eigene Vergleichsmiete noch ein Mietspiegel (Eingabe/Register) noch eine
+       amtliche Mietpreisübersicht vorliegt: dann schätzt potenzial.js objektVgl() die Vergleichsmiete aus
+       der Marktmiete (ds2_marktmiete) MINUS diesen Abschlag. EINZIGE Stelle der Zahlen; die Regel
+       (welche Stufe) steht im Kern mietpotenzial-kern.js abschlagStufe(), der Kern liest diese Datei nie
+       (potenzial.js reicht das Objekt als Parameter durch).
+       Stufen:
+         angespannt = Mietpreisbremse (§ 556d BGB) gilt ODER Kappungsgrenze 15 % (Landesverordnung)
+         entspannt  = Gemeinde unter `entspannt_unter_einwohner` - NUR wenn die Einwohnerzahl am Objekt
+                      bekannt ist; Stand 09.11.2026 kennt die App sie nicht, die Stufe greift also nie
+         mittel     = alles übrige
+       Berlin: gerechnet, aber mit Warnung (Angebot > 40 % über Vergleichsmiete).
+       Herkunft INTERN (nie nach außen, kein Portalname im Kundentext):
+         - BBSR-Hintergrundpapier „Aktuelle Mietenentwicklung und ortsübliche Vergleichsmiete“ (Daten 2012,
+           S. 5-6): teure Städte Median Angebot +23 % über Vergleichsmiete (= rund 19 % Abschlag), mittlere
+           +5 %, günstige rund 0
+         - Wohngeld- und Mietenbericht 2024, BT-Drs. 21/2170, S. 13 und 43: Verträge ab 2017 gegen Angebot
+           2022 rund 9 %
+         - München: Mietspiegel 2025 15,38 €/m² gegen BBSR-Angebotsmiete 2025 21,01 €/m² (rund 27 %)
+       Jährliche Pflege: Jahreswerte-Register marktbericht/backend/src/lib/data/jahreswerte.json,
+       Eintrag `miete_angebot_abschlag` (tools/jahreswerte-pruefen.mjs liest die drei Zahlen hier). */
+    mieteAngebotAbschlag: {
+      stufen: { angespannt: 22, mittel: 10, entspannt: 5 },
+      entspannt_unter_einwohner: 20000,
+      berlin_ags: '11000000',
+      berlin_warnung: 'Angebotsmieten liegen hier über 40 % über der Vergleichsmiete — Schätzung nicht belastbar, Mietspiegel eintragen',
+      stand: '2026-11-09',
+      quelle_intern: 'BBSR-Hintergrundpapier Mietenentwicklung/ortsübliche Vergleichsmiete (Daten 2012, S. 5-6); Wohngeld- und Mietenbericht 2024, BT-Drs. 21/2170, S. 13/43; München Mietspiegel 2025 gegen BBSR-Angebotsmiete 2025',
+      herkunft: 'DealPilot-Ansatz nach Marktlage, nicht amtlich'
+    },
+
     /* v2630 · Marktparameter des indikativen Beleihungswert-Checks (Bank-Export).
        Der Kern (marktbericht/backend/src/lib/beleihungswert.js) liest sie nicht
        selbst - storage.js schickt sie mit. Jaehrlich nach dem 30.11. pruefen.

@@ -217,6 +217,21 @@
       "hinweis": "Ist nach dem 15.01. kein Segment aktiv (zu wenig Messungen), die Recherche erneuern (Agent jahreswerte) und RECHERCHE + 'erwartet' ziehen."
     },
     {
+      "id": "miete_angebot_abschlag",
+      "name": "Abschlag Angebotsmiete -> ortsuebliche Vergleichsmiete (Schaetzung § 558 ohne Mietspiegel, v3246)",
+      "gruppe": "mietrecht",
+      "stand": "09.11.2026: angespannt (Mietpreisbremse oder Kappung 15 %) 22 %, mittel 10 %, entspannt (< 20.000 Einwohner, nur bei bekannter Einwohnerzahl) 5 %; Berlin mit Warnung",
+      "erwartet": "22,10,5",
+      "quelle": "intern: BBSR-Hintergrundpapier Aktuelle Mietenentwicklung und ortsuebliche Vergleichsmiete (Daten 2012, S. 5-6); Wohngeld- und Mietenbericht 2024, BT-Drs. 21/2170, S. 13 und 43; Muenchen Mietspiegel 2025 gegen BBSR-Angebotsmiete 2025",
+      "turnus": "jaehrlich (neuer Wohngeld- und Mietenbericht, BBSR-Angebotsmieten, Mietspiegel der Grossstaedte)",
+      "faellig_am": "2027-06-30",
+      "verfahren": "agent",
+      "orte": [
+        { "datei": "frontend/js/config.js", "bezeichner": "mieteAngebotAbschlag.stufen (einzige Stelle)", "block": "    mieteAngebotAbschlag: {", "muster": "stufen: \\{ angespannt: ([\\d.]+), mittel: ([\\d.]+), entspannt: ([\\d.]+) \\}" }
+      ],
+      "hinweis": "Nach aussen nie eine Quelle nennen; Kundentext 'DealPilot-Ansatz nach Marktlage, nicht amtlich'. Regel (welche Stufe) im Kern frontend/js/mietpotenzial-kern.js abschlagStufe(); Pruefer tools/mietpotenzial-pruefen.mjs Abschnitt K."
+    },
+    {
       "id": "baupreisindex",
       "name": "Baupreisindex Neubau Wohngebaeude (Sachwert, § 36 Abs. 2 ImmoWertV)",
       "gruppe": "wertermittlung",
