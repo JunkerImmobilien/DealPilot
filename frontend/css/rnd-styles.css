@@ -1516,3 +1516,453 @@
   .rnd-wiz-footer .rnd-wiz-btn { min-width: 0 !important; flex: 1 1 0 !important; padding: 10px 10px !important; }
   .rnd-wiz-counter { flex: 0 0 auto !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v3258 · RND-Assistent: INHALT IM STIL DES MAKLER HUB
+   Marcel 09.11.2026: „die Aufmachung des Modals bleibt, aber das, was drin
+   ist — Eingabefelder und die Strecke — soll so aussehen wie im Makler Hub
+   … wenn wir auf ‚Objektdaten bearbeiten' gehen."
+   Übernommen (Gestaltung, nicht Code) aus E:\Makler Hub\web\app.css:
+     .wz-schritte / .wz-balken  → .rnd-hub-schritte / .rnd-hub-balken
+     .wz-h                      → .rnd-hub-h, .rnd-hub-kopf h3
+     .field / .input / .hint    → .rnd-wiz-field (Feld 36 px, Radius 7 px)
+     .mod-zeile / .chip         → .rnd-hub-zeile / .rnd-hub-chip
+     .punkte                    → .rnd-hub-punkte
+     .wz-nav / .btn.primary     → .rnd-hub-nav / .rnd-hub-weiter
+   Neu gegenüber dem Makler Hub: die Felder stehen in weißen Karten
+   (.rnd-hub-karte) auf Papiergrund — Marcels „Felder gruppiert".
+   Vorher → nachher:
+     Schrittpunkte 18 px ohne Namen, grün bei erledigt → Kreis 26 px mit
+       Nummer und Kurzname, erledigt Goldgrund, aktiv Obsidian mit Gold
+     Fortschritt 3 px Gold oben → 3 px Runway-Verlauf unter der Leiste
+     Felder Radius 2 px (einheitlich.css), 13 px → 36 px hoch, Radius 7 px,
+       Rahmen #E0DBD3, Beschriftung 13 px / 500
+     Modernisierung je Bauteil <select> → Chips; Gewerke-Tabelle → Chips
+     „Weiter" Gold mit weißer Schrift → Obsidian mit Gold-Schrift
+   Spezifität: html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub … schlägt die
+   Fensterregeln in einheitlich.css (html[data-dp-layout]:not(#dp-nie) body
+   .rnd-wiz-field …), die als letztes Stylesheet geladen werden.
+   Gold nur über var(--wl-…); Grautöne bewusst nicht „goldig" (gold-audit).
+   ═══════════════════════════════════════════════════════════════════════ */
+.rnd-wiz-overlay.rnd-hub {
+  --hub-paper: #F6F4EF;
+  --hub-surface: #FFFFFF;
+  --hub-sunk: #EFEBE3;
+  --hub-ink: #1A1814;
+  --hub-muted: #6B6660;
+  --hub-faint: #96918A;
+  --hub-line: #E0DBD3;
+  --hub-line-soft: #ECE7DE;
+  --hub-ob: var(--obsidian, #050505);
+  --hub-gold: var(--wl-c9a84c, #C9A84C);
+  --hub-gold-hi: var(--wl-e8cc7a, #E8CC7A);
+  --hub-gold-lo: var(--wl-b8932f, #b8932f);
+  --hub-gold-text: var(--wl-9a7f33, #9a7f33);
+  --hub-gold-bg: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, #FFFFFF);
+  --hub-runway: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));
+  --hub-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --hub-body: 'Inter', system-ui, sans-serif;
+}
+
+/* ── Schrittleiste (Makler Hub .wz-schritte) ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-progress {
+  padding: 14px 28px 0 !important;
+  background: var(--hub-surface) !important;
+  border-bottom: 1px solid var(--hub-line-soft) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-steps {
+  display: flex !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: none;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-steps::before { display: none !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: normal !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 2px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--hub-faint) !important;
+  font: 400 11.5px/1.3 var(--hub-body) !important;
+  cursor: pointer !important;
+  transition: none !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step.rnd-hub-offen { cursor: default !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step .rnd-hub-nr {
+  display: grid !important;
+  place-items: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--hub-line);
+  background: var(--hub-surface);
+  color: var(--hub-faint);
+  font: 600 12px/1 var(--hub-display);
+  font-variant-numeric: tabular-nums;
+  box-sizing: border-box;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step .rnd-hub-kurz {
+  display: block;
+  font-style: normal;
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step.done { color: var(--hub-muted) !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step.done .rnd-hub-nr {
+  background: var(--hub-gold-bg);
+  border-color: var(--hub-gold);
+  color: var(--hub-gold-text);
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step.active { color: var(--hub-ink) !important; font-weight: 600 !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step.active .rnd-hub-nr {
+  background: var(--hub-ob);
+  border-color: var(--hub-ob);
+  color: var(--hub-gold-hi);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step.done:hover .rnd-hub-nr { border-color: var(--hub-gold-lo); }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step:focus-visible {
+  outline: 2px solid var(--hub-gold) !important;
+  outline-offset: 1px;
+}
+/* Makler Hub .wz-balken: 3 px, Runway-Verlauf, unter der Leiste */
+.rnd-wiz-overlay.rnd-hub .rnd-hub-balken {
+  position: relative;
+  height: 3px;
+  margin: 0 -28px;
+  background: var(--hub-sunk);
+  overflow: hidden;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-progress-bar {
+  position: absolute !important;
+  top: 0 !important; left: 0 !important;
+  height: 100% !important;
+  background: var(--hub-runway) !important;
+  transition: width .25s ease !important;
+}
+
+/* ── Inhalt: Papiergrund, Karten ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-body {
+  background: var(--hub-paper) !important;
+  padding: 18px 28px 22px !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-body:not([data-hub-schritt="9"]) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;   /* v2274 setzte align-items:start fürs Raster - in der Spalte schrumpften die Karten */
+  gap: 14px !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-body > * { flex: 0 0 auto; min-width: 0; }
+.rnd-wiz-overlay.rnd-hub .rnd-hub-karte {
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-line);
+  border-radius: 10px;
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+/* Makler Hub .wz-h: 600 13 px Space Grotesk, Versalien, Gold-Text */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-h,
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-kopf h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  display: block !important;
+  font: 600 13px/1.3 var(--hub-display) !important;
+  letter-spacing: .06em !important;
+  text-transform: uppercase !important;
+  color: var(--hub-gold-text) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-kopf h3::before { display: none !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-kopf {
+  padding: 0 !important; margin: 0 !important; border: 0 !important;
+}
+/* Feldraster in der Karte: zwei Spalten (Makler Hub .grid2: 14 px / 18 px) */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-felder {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px 18px !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-felder > .rnd-wiz-col-2,
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-felder > .rnd-wiz-section { grid-column: 1 / -1 !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-felder > .rnd-wiz-section {
+  padding: 2px 0 0 !important; margin: 0 !important; border: 0 !important;
+}
+
+/* ── Felder (Makler Hub .field / .input / .hint) ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  margin: 0 !important;
+  min-width: 0;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field > label {
+  margin: 0 !important;
+  font: 500 13px/1.4 var(--hub-body) !important;
+  color: var(--hub-ink) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub :is(.rnd-wiz-hint, .rnd-wiz-hint-inline) {
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+  color: var(--hub-muted) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field
+  :is(input[type=text], input[type=number], input[type=email], input[type=date], input:not([type]), select) {
+  width: 100% !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 11px !important;
+  box-sizing: border-box !important;
+  border: 1px solid var(--hub-line) !important;
+  border-radius: 7px !important;
+  background-color: var(--hub-surface) !important;
+  color: var(--hub-ink) !important;
+  font: 400 14px/1.4 var(--hub-body) !important;
+  box-shadow: none !important;
+  min-width: 0;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field textarea {
+  width: 100% !important;
+  min-height: 84px !important;
+  padding: 9px 11px !important;
+  box-sizing: border-box !important;
+  border: 1px solid var(--hub-line) !important;
+  border-radius: 7px !important;
+  background: var(--hub-surface) !important;
+  color: var(--hub-ink) !important;
+  font: 400 14px/1.45 var(--hub-body) !important;
+  resize: vertical;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field :is(input, select, textarea):hover { border-color: var(--hub-faint) !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field :is(input, select, textarea):focus {
+  outline: none !important;
+  border-color: var(--hub-gold) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;
+}
+/* Pflichtfeld fehlt: bleibt rot, auch gegen die Feldregel oben */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field :is(input, select, textarea).rnd-wiz-error {
+  border-color: #c62d2d !important;
+  background-color: #fef5f5 !important;
+  box-shadow: 0 0 0 2px rgba(198, 45, 45, .12) !important;
+}
+/* Haken (Makler Hub .check) */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-checkbox {
+  display: flex !important; align-items: flex-start !important; gap: 9px !important;
+  font: 400 14px/1.45 var(--hub-body) !important;
+  color: var(--hub-ink) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-checkbox input {
+  flex: none; width: 16px !important; height: 16px !important; margin: 2px 0 0 !important;
+  accent-color: var(--hub-ob);
+}
+
+/* ── Hinweis oben im Schritt ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-hinweis {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  background: var(--hub-gold-bg) !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent) !important;
+  border-left: 3px solid var(--hub-gold) !important;
+  border-radius: 9px !important;
+  font: 400 13px/1.55 var(--hub-body) !important;
+  color: var(--hub-muted) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-hinweis strong {
+  color: var(--hub-ink) !important;
+  font-weight: 600 !important;
+}
+
+/* ── Zeilen mit Chips (Makler Hub .mod-zeile / .chip) ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-mod-list {
+  display: flex !important; flex-direction: column !important; gap: 0 !important;
+  width: 100%; font-size: inherit;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-zeile {
+  display: grid !important;
+  grid-template-columns: minmax(170px, 1fr) auto !important;
+  gap: 12px !important;
+  align-items: center !important;
+  padding: 10px 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid var(--hub-line-soft) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-zeile:last-child { border-bottom: 0 !important; }
+.rnd-wiz-overlay.rnd-hub .rnd-hub-zeile-text { display: flex; flex-direction: column; min-width: 0; }
+.rnd-wiz-overlay.rnd-hub .rnd-hub-zeile-text b { font: 600 14px/1.35 var(--hub-body); color: var(--hub-ink); }
+.rnd-wiz-overlay.rnd-hub .rnd-hub-zeile-text span { font-size: 12.5px; color: var(--hub-muted); }
+.rnd-wiz-overlay.rnd-hub .rnd-hub-chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; min-width: 0; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-chip {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  margin: 0 !important;
+  padding: 4px 11px !important;
+  border: 1px solid var(--hub-line) !important;
+  border-radius: 99px !important;
+  background: var(--hub-surface) !important;
+  color: var(--hub-muted) !important;
+  font: 400 12.5px/1.4 var(--hub-body) !important;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.rnd-wiz-overlay.rnd-hub .rnd-hub-chip input {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important; height: 100% !important;
+  margin: 0 !important;
+  opacity: 0;
+  cursor: pointer;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-chip:hover { border-color: var(--hub-gold) !important; color: var(--hub-ink) !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-chip:has(input:checked) {
+  background: var(--hub-ob) !important;
+  border-color: var(--hub-ob) !important;
+  color: var(--hub-gold-hi) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-chip:has(input:focus-visible) {
+  outline: 2px solid var(--hub-gold);
+  outline-offset: 1px;
+}
+
+/* ── Punktzahl (Makler Hub .punkte: Obsidian, Zahl in Gold) ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-punkte {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 9px !important;
+  background: var(--hub-ob) !important;
+  color: #ECE6D6 !important;
+  font: 400 13.5px/1.4 var(--hub-body) !important;
+  text-align: left !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-punkte strong {
+  font: 700 17px/1 var(--hub-display) !important;
+  color: var(--hub-gold-hi) !important;
+}
+
+/* ── Mängel: Haken als Kacheln in der Karte ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-schaden-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-schaden-row {
+  display: flex !important; align-items: flex-start !important; gap: 9px !important;
+  padding: 9px 11px !important;
+  border: 1px solid var(--hub-line) !important;
+  border-radius: 8px !important;
+  background: var(--hub-surface) !important;
+  font: 400 13.5px/1.45 var(--hub-body) !important;
+  color: var(--hub-ink) !important;
+  min-width: 0;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-schaden-row:hover { border-color: var(--hub-gold) !important; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-schaden-row:has(input:checked) {
+  border-color: var(--hub-ob) !important;
+  background: var(--hub-gold-bg) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-schaden-row input {
+  flex: none; width: 16px !important; height: 16px !important; margin: 2px 0 0 !important;
+  accent-color: var(--hub-ob);
+}
+.rnd-wiz-overlay.rnd-hub .rnd-wiz-schaden-label { min-width: 0; overflow-wrap: anywhere; }
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-karte > .rnd-wiz-field { margin-top: 4px !important; }
+
+/* ── Navigation unten (Makler Hub .wz-nav, .btn.ghost, .btn.primary) ── */
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding: 12px 28px !important;
+  background: var(--hub-surface) !important;
+  border-top: 1px solid var(--hub-line-soft) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-counter {
+  flex: 1 1 auto !important;
+  text-align: center !important;
+  font: 400 13px/1.3 var(--hub-body) !important;
+  color: var(--hub-muted) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer .rnd-wiz-btn {
+  height: 36px !important;
+  min-width: 0 !important;
+  padding: 0 16px !important;
+  border-radius: 7px !important;
+  font: 500 14px/1 var(--hub-body) !important;
+  letter-spacing: normal !important;
+  box-shadow: none !important;
+  transform: none !important;
+  white-space: nowrap;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer .rnd-wiz-btn-sec {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--hub-muted) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer .rnd-wiz-btn-sec:hover:not(:disabled) {
+  background: var(--hub-sunk) !important;
+  color: var(--hub-ink) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer .rnd-wiz-btn-pri {
+  background: var(--hub-ob) !important;
+  border: 1px solid var(--hub-ob) !important;
+  color: var(--hub-gold-hi) !important;
+  font-weight: 600 !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer .rnd-wiz-btn-pri:hover:not(:disabled) {
+  background: var(--hub-ob) !important;
+  border-color: var(--hub-gold) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent) !important;
+}
+html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-error-banner { margin: 0 !important; border-radius: 0 !important; }
+
+/* ── Handy ── */
+@media (max-width: 640px) {
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-progress { padding: 10px 14px 0 !important; }
+  .rnd-wiz-overlay.rnd-hub .rnd-hub-balken { margin: 0 -14px; }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step { gap: 0 !important; }
+  /* Neun Schritte auf 360 px: nur die Nummern, der Name steht im Kopf */
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-step .rnd-hub-kurz { display: none !important; }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-body { padding: 14px !important; }
+  .rnd-wiz-overlay.rnd-hub .rnd-hub-karte { padding: 14px; }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-felder,
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-schaden-list { grid-template-columns: minmax(0, 1fr) !important; }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-hub-zeile { grid-template-columns: minmax(0, 1fr) !important; gap: 8px !important; }
+  .rnd-wiz-overlay.rnd-hub .rnd-hub-chips { justify-content: flex-start; }
+  /* iOS zoomt unter 16 px; 44 px Fingerfläche wie im Reiter Objekt */
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field
+    :is(input[type=text], input[type=number], input[type=email], input[type=date], input:not([type]), select) {
+    height: 44px !important; min-height: 44px !important; font-size: 16px !important;
+  }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field textarea { font-size: 16px !important; }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer { padding: 10px 14px !important; gap: 8px !important; }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-footer .rnd-wiz-btn { flex: 0 1 auto !important; padding: 0 12px !important; height: 40px !important; }
+  html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-counter { flex: 1 1 auto !important; font-size: 12px !important; }
+}
