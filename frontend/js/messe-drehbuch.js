@@ -1474,6 +1474,9 @@
   var RH_PDF_NAMEN = /Junker|info@|Marcel|scout|immowelt|wohnungsboerse|immonet|kleinanzeig|sprengnetter|pricehubble|openai|geoapify/gi;
   window.DPM_REIHE = { angelegt: [], gesperrt: [], gespielt: [], geloescht: [], abrufe: [], fertig: null };
   var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
+  /* v3272 · seit v3077 gilt der Detailgrad je Nutzer (Merker dp_detailgrad_zuletzt, im Demo-Konto Einsteiger).
+     Die Reihen zeigen die volle Oberfläche: Experte FLÜCHTIG - fällt beim nächsten Laden eines Objekts weg. */
+  function rhExperte() { try { if (window.DpDetailgrad) DpDetailgrad.setzen(3, { fluechtig: true }); } catch (e) {} }
   function rhLaden() {
     return new Promise(function (ok) {
       if (window.DPM_REIHE_DATEN) { ok(true); return; }
@@ -2248,6 +2251,7 @@
   async function r6Start(opt) {
     opt = opt || {};
     await rhStart(0);
+    rhExperte();
     [['plz', '32052'], ['ort', 'Herford'], ['str', 'Sachsenstraße'], ['hnr', '18'], ['objart', 'ETW'],
      ['wfl', '100'], ['baujahr', '1998'], ['zimmer', '3'], ['etage', '1']].forEach(function (x) { r6Setz(x[0], x[1]); });
     if (opt.kaufdat) r6Setz('kaufdat', '2026-11-02');
@@ -2655,6 +2659,7 @@
     if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
     if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
     await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+    rhExperte();   /* v3272: Detailgrad je Nutzer (v3077) - im Lauf flüchtig Experte, der Merker bleibt */
     await warte(900);
     var m = q('.main-col'); if (m) m.scrollTop = 0;
   }
@@ -4440,6 +4445,7 @@
     if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
     if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
     await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+    rhExperte();   /* v3272: Detailgrad je Nutzer (v3077) - im Lauf flüchtig Experte, der Merker bleibt */
     await warte(900);
     var m = q('.main-col'); if (m) m.scrollTop = 0;
   }
@@ -8202,6 +8208,7 @@
     if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
     if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
     await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+    rhExperte();   /* v3272: Detailgrad je Nutzer (v3077) - im Lauf flüchtig Experte, der Merker bleibt */
     await warte(900);
     var m = q('.main-col'); if (m) m.scrollTop = 0;
   }
