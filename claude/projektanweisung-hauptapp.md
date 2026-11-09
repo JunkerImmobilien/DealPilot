@@ -44488,3 +44488,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `82448f19`, `73e2e9e8`, `1fbf5dfc`, `c7a55887`
 - **Nachweis:** Videoreihe/Modul 28 (5:16), Modul 29 (4:26), Modul 30 (5:38), Ueberblick 1 - Quick-Check (3:54), je stumm und „(Sprecher)“; Stichbilder geprüft; nach jedem Lauf Kopien gelöscht, Konto 54 Objekte; Modul 28 ohne einen Live-Abruf. Alte 04/16/18 und Ü1 „Quick Boarding“ in `alt-vor-v3264/`.
 - **Rest:** Teil 3 (11, 12, 15 neu; 08, 13, 10c, 21, 07, 09, 10a, 06, 26, 24, 25, Ü2, 02 anpassen; 03, 05, 14 neu aufnehmen; 10b prüfen). Zwei Abbrüche heute: Aufnahme über einer Videokonferenz und über einem Terminal - beide Rohdateien sofort gelöscht.
+
+### v3271–v3271b · Messe-Videos: Werkzeuge nach tools/messe, Modul 03 neu (09.11.2026, nur Staging)
+- **Was:** `tools/messe/` (tab-holen, oben, stichbild, mischen, tts2, LIESMICH); Studio-Verweise auf die abgelösten Module 04/16/18 auf 30/17/19/05 umgestellt; Modul 03 und 07 nennen Modul 30 statt 04; Modul 28 schließt am Ende das Einheiten-Fenster (nicht neu aufgenommen).
+- **Commit:** `2c448120`, `507f049e`, `bb60dc58`
+- **Nachweis:** Modul 03 neu aufgenommen und vertont (Videoreihe/Modul 03 - Datenaufnahme vier Wege/, 3:55), Stichbilder geprüft, Konto 54 Objekte; alte Fassung in `alt-vor-v3264/`.
+- **Rest:** Teil 3: 11, 12, 15 neu schreiben; 08, 13, 10c, 21, 07, 09, 10a, 06, 26, 24, 25, Ü2, 02 anpassen; 05, 14 neu aufnehmen; 10b prüfen; Modul 28 neu aufnehmen (Fenster-Fix).
