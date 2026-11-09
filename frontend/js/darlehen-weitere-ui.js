@@ -41,11 +41,17 @@
     var n = k.lesen([e])[0];
     if (!n) return 'Betrag eintragen, dann rechnet das Darlehen mit.';
     var r = k.rateM(n);
-    var t = (n.art === 'tilgungsaussetzung' ? 'Zinsrate ' : 'Rate ') + eur(r, 2) + ' / Monat';
+    var aus = n.art === 'tilgungsaussetzung';
+    /* v3256 · Wortwahl bei Tilgungsaussetzung: Zinsen, keine Tilgung, Restschuld bleibt */
+    var t = aus ? 'Zinsen ' + eur(r, 2) + ' / Monat · Tilgung ausgesetzt' : 'Rate ' + eur(r, 2) + ' / Monat';
     var by = (window.State && State.dw_basisjahr) || null;
     if (n.start_jahr && !k.abKauf(n, by)) t += ' · ab ' + n.start_jahr + ' (nicht in Darlehenssumme und LTV beim Kauf)';
-    var rs = k.restBindungsende(n);
-    t += ' · Restschuld nach ' + (n.bindj || 10) + ' J. ' + eur(rs, 0);
+    if (aus) {
+      t += ' · Restschuld bleibt ' + eur(n.betrag, 0) + ' (Ablösung über Tilgungsträger, z. B. Bausparvertrag oder Versicherung)';
+    } else {
+      var rs = k.restBindungsende(n);
+      t += ' · Restschuld nach ' + (n.bindj || 10) + ' J. ' + eur(rs, 0);
+    }
     return t;
   }
 
@@ -67,14 +73,24 @@
           + '<div class="f"><label>Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-dw="betrag" type="text" inputmode="decimal" class="trl" placeholder="0" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div></div>'
           + '<div class="g2">'
           + '<div class="f"><label>Zinssatz nominal (%)</label><div class="iw"><input id="' + id + 'zins" data-dw="zins" type="text" inputmode="decimal" class="tr" value="' + esc(zahlText(e.zins)) + '"><span class="sfx">%</span></div></div>'
-          + '<div class="f"><label>Tilgung (%)</label><div class="iw"><input id="' + id + 'tilg" data-dw="tilg" type="text" inputmode="decimal" class="tr" value="' + esc(aus ? '0' : zahlText(e.tilg)) + '"' + (aus ? ' disabled' : '') + '><span class="sfx">%</span></div></div>'
+          /* v3256 · bei Tilgungsaussetzung kein Tilgungsfeld mit 0 %, sondern „ausgesetzt" */
+          + (aus
+            ? '<div class="f"><label>Tilgung</label><div class="cf" id="' + id + 'tilg-aus" title="Tilgungsaussetzung: während der Laufzeit nur Zinsen, die Restschuld wird am Ende über einen Tilgungsträger abgelöst">ausgesetzt · nur Zinsen</div></div>'
+            : '<div class="f"><label>Tilgung (%)</label><div class="iw"><input id="' + id + 'tilg" data-dw="tilg" type="text" inputmode="decimal" class="tr" value="' + esc(zahlText(e.tilg)) + '"><span class="sfx">%</span></div></div>')
           + '</div>'
           + '<div class="g2">'
           + '<div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="' + id + 'bindj" data-dw="bindj" type="text" inputmode="numeric" class="tr" value="' + esc(e.bindj != null ? e.bindj : '') + '"><span class="sfx">J.</span></div></div>'
           + '<div class="f"><label>Start-Jahr <span style="color:var(--muted);font-weight:400">· optional</span></label><input id="' + id + 'start_jahr" data-dw="start_jahr" data-zf-aus="1" type="text" inputmode="numeric" placeholder="mit dem Kauf" value="' + esc(e.start_jahr || '') + '"></div>'
           + '</div>'
           + '<div class="hint dw-rate" style="display:block;margin-top:2px"></div>'
-          + '<button type="button" class="btn btn-sm dw-btn" data-dw-weg="' + i + '" style="margin-top:6px">Entfernen</button>'
+          /* v3256 · Marcel 09.11.2026: dieselben Werkzeuge wie Darlehen I - Plan ansehen
+             (financing.js openTilgungsplanModal(i), gerechnet im Kern) und Bank-PDF
+             (financing.js triggerPdfImportTo('dw:i'), Leser financing-pdf.js) */
+          + '<div class="dw-werkzeuge" style="display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:6px">'
+          + '<button type="button" class="btn-ghost btn-sm" data-dw-plan="' + i + '">' + (aus ? 'Zinsplan' : 'Tilgungsplan') + ' ansehen</button>'
+          + '<button type="button" class="btn-ghost btn-sm" data-dw-pdf="' + i + '" title="Darlehensvertrag einlesen — die erkannten Werte prüfst du vor dem Übernehmen">Daten aus Bank-PDF importieren</button>'
+          + '<button type="button" class="btn btn-sm dw-btn" data-dw-weg="' + i + '">Entfernen</button>'
+          + '</div>'
           + '</div>';
       }).join('');
       host.innerHTML = (l.length ? h : '<div class="hint" style="display:block">Kein weiteres Darlehen erfasst.</div>')
@@ -108,6 +124,16 @@
     speichern(l, true);
   });
   document.addEventListener('click', function (ev) {
+    /* v3256 · Plan und Bank-PDF je Eintrag */
+    var w = ev.target && ev.target.closest ? ev.target.closest('[data-dw-plan],[data-dw-pdf]') : null;
+    if (w) {
+      if (w.hasAttribute('data-dw-plan')) {
+        if (typeof window.openTilgungsplanModal === 'function') window.openTilgungsplanModal(+w.getAttribute('data-dw-plan'));
+      } else if (typeof window.triggerPdfImportTo === 'function') {
+        window.triggerPdfImportTo('dw:' + (+w.getAttribute('data-dw-pdf')));
+      }
+      return;
+    }
     var t = ev.target && ev.target.closest ? ev.target.closest('.dw-btn') : null; if (!t) return;
     var l = roh();
     if (t.hasAttribute('data-dw-neu')) {
@@ -119,8 +145,28 @@
     }
   });
 
+  /* v3256 · Werte aus dem Bank-PDF (financing-pdf.js applyFinPdfValues) in Eintrag i.
+     w: { betrag, zins, tilg, bindj, art, bez } als Text aus dem Prüfdialog; leere
+     Felder lassen den Eintrag unverändert, die Bezeichnung nur, wenn noch keine da ist. */
+  function uebernehmen(i, w) {
+    var l = roh(), e = l[i]; if (!e || !w) return false;
+    var zahl = K() ? K().zahl : function (x) { var n = parseFloat(String(x).replace(',', '.')); return isFinite(n) ? n : null; };
+    ['betrag', 'zins', 'tilg', 'bindj'].forEach(function (k) {
+      if (w[k] == null || String(w[k]).trim() === '') return;
+      var n = zahl(w[k]); if (n != null && n >= 0) e[k] = n;
+    });
+    if (w.art) e.art = String(w.art).trim() === 'tilgungsaussetzung' ? 'tilgungsaussetzung' : 'annuitaet';
+    /* Vertrag nennt eine Tilgung > 0 und keine Aussetzung: es ist ein Annuitätendarlehen
+       (gemessen: sonst setzte ein Eintrag mit Aussetzung die gelesene Tilgung still auf 0) */
+    else if (zahl(w.tilg) > 0) e.art = 'annuitaet';
+    if (e.art === 'tilgungsaussetzung') e.tilg = 0;
+    if (w.bez && !String(e.bez || '').trim()) e.bez = String(w.bez).trim().slice(0, 60);
+    speichern(l, true);
+    return true;
+  }
+
   window._dwUiSync = render;
-  window.DpDarlehenWeitereUi = { render: render, roh: roh };
+  window.DpDarlehenWeitereUi = { render: render, roh: roh, uebernehmen: uebernehmen };
   if (document.readyState !== 'loading') render();
   else document.addEventListener('DOMContentLoaded', render);
 })();

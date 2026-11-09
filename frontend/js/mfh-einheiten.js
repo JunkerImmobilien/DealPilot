@@ -1695,9 +1695,14 @@
   }
 
   /* ── Kennzahlen Ist gegen Soll (Stufe 2) ─────────────────────────── */
+  /* v3256 · Marcel 09.11.2026: „was hat das dort zu suchen?" - bis v3255 haengte sich
+     die Karte hinter #r-sanfin, also in die Uebersicht des Reiters FINANZIERUNG (seit
+     v1451). Sie vergleicht Kennzahlen (Kaltmiete, Bruttomietrendite, DSCR) - jetzt eine
+     eigene Karte #mfh-istsoll im Reiter Bewertung unter „Alle Kennzahlen" (index.html).
+     Kein Rueckfall auf den alten Ort: fehlt die Karte, wird nichts gezeichnet. */
   function istSoll() {
     var host = el('mfh-istsoll');
-    if (!host) { var a = el('r-sanfin'); if (!a) return; host = document.createElement('div'); host.id = 'mfh-istsoll'; host.style.cssText = 'margin-top:10px'; a.parentNode.insertBefore(host, a.nextSibling); }
+    if (!host) return;
     var d = daten(), s = summe(d.einheiten || []), K = (window.State && window.State.kpis) || {};
     if (!ARTEN_MIT_EINHEITEN[(el('objart') && el('objart').value) || ''] || !s.hatSoll || !(K.kp > 0)) { host.style.display = 'none'; return; }
     var ist_j = (K.nkm_j || 0), ze_j = zahl(el('ze') && el('ze').value) * 12, soll_j = s.soll * 12 + ze_j;
@@ -1709,7 +1714,8 @@
     function f(n) { return (n == null || !isFinite(n)) ? '—' : n.toFixed(2).replace('.', ','); }
     function z(l, a, b) { return '<tr><td style="padding:4px 0;color:var(--muted,#6B6356)">' + l + '</td><td style="text-align:right;padding:4px 8px">' + a + '</td><td style="text-align:right;padding:4px 0;font-weight:600">' + b + '</td></tr>'; }
     host.style.display = '';
-    host.innerHTML = '<hr class="dvd"><div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Ist gegen Soll · ' + d.einheiten.length + ' Einheiten</div>' +
+    /* v3256 · Kopf wie die Nachbarkarten im Reiter Bewertung (.ct ct-pro) */
+    host.innerHTML = '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-gauge"/></svg></span>Ist gegen Soll · ' + d.einheiten.length + ' Einheiten</div>' +
       '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="font-size:11px;color:var(--muted,#8A8272)"><td></td><td style="text-align:right;padding:0 8px">Ist (heute)</td><td style="text-align:right">Soll</td></tr>' +
       z('Kaltmiete p. a.', eur(ist_j), eur(soll_j)) +
       /* v2410 - beide Spalten auf DERSELBEN Basis. Hier stand Ist = K.bmy

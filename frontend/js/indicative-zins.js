@@ -151,6 +151,22 @@
   }
   function _pz(x) { return x.toFixed(2).replace('.', ','); }
 
+  /* v3256 · Marcel 09.11.2026: „… 4,23 % und dann ‚übernehmen‘ ist nicht richtig
+     formatiert, das Prozent rückt in die nächste Zeile. Das ‚Übernehmen‘ könnten wir
+     einfach unter das Eingabefeld von Tilgung machen, so kann der Rest wieder höher
+     rutschen." Jetzt: unter dem Zinsfeld nur die kurze Zeile „Marktzins bei LTV 87 %:
+     4,23 %" (Zahl und % untrennbar, Bindung und Formel im title), der Knopf „Marktzins
+     übernehmen" in der Nachbarspalte unter dem Tilgungsfeld (#d1z-marktzins-knopf), auf
+     derselben Höhe - beide Spalten wachsen gleich, die Zeile darunter rückt nicht weiter.
+     Gestaltung: css/finanzierung-raster.css. */
+  var NB = ' ';
+  function _uebernehmen(inp, b) {
+    var q = Number(b.getAttribute('data-zins'));
+    if (!isFinite(q) || q <= 0) return;
+    inp.value = _pz(q);                       // nur auf ausdruecklichen Klick
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+  }
   function hinweis() {
     var inp = document.getElementById('d1z');
     if (!inp) return;
@@ -161,36 +177,50 @@
       box = document.createElement('div');
       box.id = 'd1z-marktzins';
       box.className = 'cf-hint dp-marktzins-hint';
-      box.style.marginTop = '3px';
       feld.appendChild(box);
       box.addEventListener('click', function (e) {
         var b = e.target && e.target.closest ? e.target.closest('.dp-mz-uebernehmen') : null;
-        if (!b) return;
-        var q = Number(b.getAttribute('data-zins'));
-        if (!isFinite(q) || q <= 0) return;
-        inp.value = _pz(q);                       // nur auf ausdruecklichen Klick
-        inp.dispatchEvent(new Event('input', { bubbles: true }));
-        inp.dispatchEvent(new Event('change', { bubbles: true }));
+        if (b) _uebernehmen(inp, b);
       });
     }
+    /* Knopfzeile unter dem Tilgungsfeld; ohne Tilgungsfeld bleibt der Knopf im Hinweis */
+    var tFeld = document.getElementById('d1t_field');
+    var zeile = document.getElementById('d1z-marktzins-knopf');
+    if (!zeile && tFeld) {
+      zeile = document.createElement('div');
+      zeile.id = 'd1z-marktzins-knopf';
+      zeile.className = 'dp-mz-knopf-zeile';
+      tFeld.appendChild(zeile);
+      zeile.addEventListener('click', function (e) {
+        var b = e.target && e.target.closest ? e.target.closest('.dp-mz-uebernehmen') : null;
+        if (b) _uebernehmen(inp, b);
+      });
+    }
+    function aus() { box.style.display = 'none'; if (zeile) zeile.style.display = 'none'; }
     var K = window.State && window.State.kpis;
     var ltv = K && typeof K.ltv === 'number' && isFinite(K.ltv) ? K.ltv : null;
-    if (ltv == null || ltv <= 0) { box.style.display = 'none'; return; }
+    if (ltv == null || ltv <= 0) { aus(); return; }
     var bEl = document.getElementById('d1_bindj');
     var bind = Math.round(_pd(bEl ? bEl.value : 10)) || 10;
     var f = _formel();
     var q = rechnen(f, bind, ltv);
-    if (q == null) { box.style.display = 'none'; return; }
+    if (q == null) { aus(); return; }
     var bk = _nearestBinding(f.bund, bind);
     var ist = _pd(inp.value);
     var gleich = Math.abs(ist - q) < 0.005;
+    var knopf = '<button type="button" class="btn btn-outline btn-sm dp-mz-uebernehmen" data-zins="' + q
+      + '" title="Marktzins ' + _pz(q) + NB + '% in das Zinsfeld übernehmen">Marktzins übernehmen</button>';
     box.style.display = '';
-    box.innerHTML = 'Marktzins für deinen LTV ' + Math.round(ltv) + ' % (Bindung ' + bind + ' J'
-      + (String(bind) !== bk ? ', gerechnet mit ' + bk + ' J' : '') + '): <strong>' + _pz(q) + ' %</strong>'
-      + (gleich ? ' · entspricht deinem Zins'
-        : ' <button type="button" class="btn btn-outline btn-sm dp-mz-uebernehmen" data-zins="' + q
-          + '" style="padding:1px 8px;margin-left:6px;font-size:11px">übernehmen</button>');
-    box.title = 'Bundesanleihe ' + _pz(f.bund[bk]) + ' % + Marktaufschlag ' + _pz(f.aufschlag[bk])
+    box.innerHTML = '<span>Marktzins bei LTV' + NB + Math.round(ltv) + NB + '%:</span>'
+      + '<span class="dp-mz-wert"><strong>' + _pz(q) + NB + '%</strong>' + (gleich ? ' ✓' : '') + '</span>'
+      + (!gleich && !zeile ? knopf : '');
+    if (zeile) {
+      zeile.style.display = gleich ? 'none' : '';
+      zeile.innerHTML = gleich ? '' : knopf;
+    }
+    box.title = 'Bindung ' + bind + ' J.' + (String(bind) !== bk ? ' (gerechnet mit ' + bk + ' J.)' : '')
+      + (gleich ? ' · entspricht deinem Zins' : '') + '\n'
+      + 'Bundesanleihe ' + _pz(f.bund[bk]) + ' % + Marktaufschlag ' + _pz(f.aufschlag[bk])
       + (f.aufschlag_monat ? ' (Stand ' + f.aufschlag_monat + ')' : '') + ' + ' + _pz(f.k)
       + ' + Zuschlag nach Beleihung ' + _pz(zuschlag(ltv, f.zuschlaege));
   }

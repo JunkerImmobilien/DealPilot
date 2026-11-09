@@ -91,10 +91,63 @@
 .fz-anschluss > .fz-raster { padding: 10px 0 2px; }
 .fz-anschluss > .fz-anschluss-fuss { display: block; margin-top: 6px; }
 
+/* v3256 · Kapitaldeckung („Es fehlen …"): die beiden Knöpfe rechts neben dem Text,
+   untereinander, gleich breit; kein leerer Platz, wenn beide verborgen sind */
+#kd-box .kd-knoepfe {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+#kd-box .kd-knoepfe:not(:has(> button:not([style*="display:none"]):not([style*="display: none"]))) { display: none; }
+/* Gegen .sec .btn-outline (style.css, 10px 16px !important) - gemessen 09.11.: 39 px hoch */
+#s3 #kd-box .kd-knoepfe > .btn { padding: 4px 10px !important; font-size: 11.5px !important; line-height: 1.3 !important; min-height: 0 !important; white-space: nowrap; }
+
+/* v3256 · Marktzins-Hinweis unter dem Zinsfeld (js/indicative-zins.js): eine kompakte
+   Zeile, Zahl und Prozentzeichen nie getrennt; der Knopf „Marktzins übernehmen" steht in
+   der Nachbarspalte unter dem Tilgungsfeld auf derselben Höhe */
+.fz-gruppen .fz-raster > .f > .dp-marktzins-hint {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 4px;
+}
+.dp-marktzins-hint .dp-mz-wert { white-space: nowrap; }
+.fz-gruppen .fz-raster > .f > .dp-mz-knopf-zeile {
+  margin-top: 3px;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+}
+/* zwei IDs: schlägt einheitlich.css „html[data-dp-layout] body .body :is(#s3 …) .btn.btn-sm"
+   (min-height 38px, 13px !important; Spezifität 1,4,2) - gemessen 09.11. */
+#s3 #d1t_field .dp-mz-knopf-zeile > .btn.dp-mz-uebernehmen {
+  padding: 2px 8px !important;   /* gegen .sec .btn-outline 10px 16px !important */
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  min-height: 0 !important;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* v3238 · schmale Karte (Handy, Tablet hochkant): zwei Spalten */
 @container fz (max-width: 480px) {
   .fz-gruppen .fz-raster { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fz-gruppen .fz-raster > .fz-s3 { grid-column: 1 / -1; }
+}
+/* v3256 · schmale Karte: Kapitaldeckung untereinander, Knöpfe nebeneinander darunter */
+@container fz (max-width: 480px) {
+  #kd-box { flex-wrap: wrap; }
+  #kd-box > div:first-child { flex-basis: 100% !important; }
+  #kd-box .kd-knoepfe { flex: 1 1 100%; min-width: 0; }   /* untereinander, volle Breite */
+  #s3 #kd-box .kd-knoepfe > .btn { white-space: normal; }
 }
 
 /* v3238 · Gruppe ganz ausgeblendet (Detailgrad markiert die .f mit data-dp-dg):

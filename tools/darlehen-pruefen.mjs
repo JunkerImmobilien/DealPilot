@@ -135,6 +135,18 @@ const gelesen = kern.lesen(JSON.stringify([{ betrag: '50.000', zins: '3,5', tilg
 melde(gelesen.length === 1 && gelesen[0].betrag === 50000 && gelesen[0].zins === 3.5, 'lesen: "50.000" / "3,5", leere Eintraege raus', gelesen);
 melde(kern.lesen('').length === 0 && kern.lesen('kaputt').length === 0, 'lesen: leer oder kaputt -> keine Darlehen', null);
 
+/* v3256 · Monatsplan eines Eintrags (Dialog „Tilgungsplan / Zinsplan ansehen"):
+   dieselbe Schleife wie plan() - Restschuld gegen die geschlossene Formel,
+   Jahressummen gegen plan(), Tilgungsaussetzung ohne Tilgung. */
+const mp = kern.monatsplan(D3[0], 36);
+melde(mp.length === 36 && nah(mp[0].zins, D * i) && nah(mp[0].rate, A), 'Monatsplan: 36 Monate, Monat 1 Zins ' + (D * i).toFixed(2) + ', Rate ' + A.toFixed(2), mp[0]);
+melde(nah(mp[11].rs, R(12)) && nah(mp[35].rs, R(36)), 'Monatsplan: Restschuld nach 12 und 36 Monaten = Formel', [mp[11].rs, mp[35].rs]);
+const mpJ2 = mp.slice(12, 24).reduce((s, x) => ({ zins: s.zins + x.zins, tilg: s.tilg + x.tilg }), { zins: 0, tilg: 0 });
+melde(nah(mpJ2.zins, plan[1].zins) && nah(mpJ2.tilg, plan[1].tilg), 'Monatsplan: Monate 13-24 summiert = plan() Jahr 2', mpJ2);
+const mpTA = kern.monatsplan(TA[0], 24);
+melde(mpTA.every((x) => x.tilg === 0 && x.rs === 40000 && nah(x.zins, 100)), 'Monatsplan Tilgungsaussetzung: 100 € Zins je Monat, keine Tilgung, Restschuld bleibt', mpTA[23]);
+melde(kern.monatsplan({ betrag: '' }, 12).length === 0, 'Monatsplan: ohne Betrag kein Plan', null);
+
 /* ══ B · DealKpis.compute ═══════════════════════════════════════════════ */
 console.log('B · DealKpis.compute alt gegen neu');
 let altKpis = null, altCalc = null, altDscr = null, altAnteilig = null;

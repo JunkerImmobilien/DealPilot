@@ -161,9 +161,32 @@
   // Storage für manuelle Overrides — Schlüssel: "monthIdx" → { rate?, zins?, tilg? }
   window._tilgPlanOverrides = window._tilgPlanOverrides || {};
 
-  window.openTilgungsplanModal = function() {
+  /* v3256 · Marcel 09.11.2026: „Bekommen die anderen Darlehen auch die Möglichkeit …
+     den Tilgungsplan oder Zinsplan anzuschauen?" Derselbe Dialog für ein weiteres
+     Darlehen: openTilgungsplanModal(i) mit dem Index in der Liste #darlehen_weitere.
+     Gerechnet wird dort NUR im Kern (DpDarlehenWeitere.monatsplan), angezeigt ohne
+     Bearbeiten - die Überschreibungen gehören zu Darlehen I. Bei Tilgungsaussetzung
+     heißt er „Zinsplan" und hat keine Tilgungsspalte. */
+  window._tilgPlanDw = null;
+
+  window.openTilgungsplanModal = function(dwIndex) {
     var existing = document.getElementById('tilgplan-modal');
     if (existing) existing.remove();
+    var dw = (typeof dwIndex === 'number' && isFinite(dwIndex) && dwIndex >= 0) ? Math.floor(dwIndex) : null;
+    window._tilgPlanDw = dw;
+    var dwE = dw != null ? _dwEintrag(dw) : null;
+    if (dw != null && !dwE) {
+      if (typeof toast === 'function') toast('Bitte zuerst eine Darlehenssumme für dieses Darlehen eintragen.');
+      return;
+    }
+    var aus = dwE ? dwE.art === 'tilgungsaussetzung' : window.dpIsD1Tilgungsaussetzung();
+    var titel = (aus ? 'Zinsplan' : 'Tilgungsplan') + ' — '
+      + (dwE ? _esc(window.DpDarlehenWeitere.name(dwE, dw)) : 'Darlehen I');
+    var unter = dwE
+      ? (aus ? 'Tilgung ausgesetzt: du zahlst je Monat nur die Zinsen, die Restschuld bleibt bis zum Ende stehen und wird über einen Tilgungsträger (Bausparvertrag, Versicherung) abgelöst.'
+             : 'Monatliche Raten aus deinen Angaben, gerechnet wie in der Projektion.')
+      : (aus ? 'Tilgung ausgesetzt: je Monat Zinsen aufs Darlehen plus Sparrate in den Bausparvertrag. Du kannst einzelne Werte überschreiben.'
+             : 'Übersicht und Bearbeitung der monatlichen Raten. Du kannst einzelne Werte überschreiben — z.B. wenn deine Bank Sondertilgungen oder abweichende Raten vereinbart hat.');
 
     var ov = document.createElement('div');
     ov.id = 'tilgplan-modal';
@@ -172,9 +195,8 @@
       '<div class="iexp-modal tilgplan-modal" style="max-width:980px; max-height:92vh">' +
         '<div class="iexp-header">' +
           '<div class="iexp-h-text">' +
-            '<h2>📋 Tilgungsplan — Darlehen 1</h2>' +
-            '<p>Übersicht und Bearbeitung der monatlichen Raten. ' +
-            'Du kannst einzelne Werte überschreiben — z.B. wenn deine Bank Sondertilgungen oder abweichende Raten vereinbart hat.</p>' +
+            '<h2>📋 ' + titel + '</h2>' +
+            '<p>' + unter + '</p>' +
           '</div>' +
           '<button class="iexp-close" type="button" onclick="closeTilgplanModal()" aria-label="Schließen">' +
             '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">' +
@@ -198,8 +220,81 @@
     document.body.appendChild(ov);
     ov.addEventListener('click', function(e) { if (e.target === ov) closeTilgplanModal(); });
     document.addEventListener('keydown', _tilgPlanEsc);
+    if (dwE) {
+      /* v3256 · weiteres Darlehen: nur ansehen, kein Zurücksetzen */
+      var bar = document.getElementById('tilgplan-statusbar');
+      if (bar) {
+        bar.style.background = 'color-mix(in srgb, var(--wl-c9a84c, #c9a84c) 8%, transparent)';
+        bar.innerHTML = '<div id="tilgplan-status-text" style="font-size:13px; flex:1"></div>'
+          + '<button type="button" class="btn-primary btn-sm" onclick="closeTilgplanModal()">Schließen</button>';
+      }
+      _renderDwPlanTable(dwE);
+      return;
+    }
     _renderTilgPlanTable();
   };
+
+  /* v3256 · Eintrag i der Liste #darlehen_weitere, bereinigt vom Kern (null ohne Betrag) */
+  function _esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function _dwEintrag(i) {
+    var K = window.DpDarlehenWeitere; if (!K) return null;
+    var f = document.getElementById('darlehen_weitere');
+    var roh = [];
+    try { roh = JSON.parse((f && f.value) || '[]'); } catch (e) { roh = []; }
+    if (!Array.isArray(roh) || !roh[i]) return null;
+    var n = K.lesen([roh[i]])[0];
+    if (n) n.nr = i;
+    return n || null;
+  }
+
+  /* v3256 · Plan eines weiteren Darlehens: Monate aus DpDarlehenWeitere.monatsplan,
+     Startmonat wie im Kern - Start-Jahr später als der Kauf: Januar des Start-Jahres,
+     sonst die Auszahlung von Darlehen I (dieselben Monate wie in der Projektion). */
+  function _renderDwPlanTable(e) {
+    var box = document.getElementById('tilgplan-table-wrap');
+    if (!box) return;
+    var K = window.DpDarlehenWeitere;
+    var aus = e.art === 'tilgungsaussetzung';
+    var by = (window.State && window.State.dw_basisjahr) || null;
+    var start = (e.start_jahr && !K.abKauf(e, by))
+      ? { m: 1, y: e.start_jahr }
+      : (_parseMonth(_g('d1_auszahl')) || { m: (new Date()).getMonth() + 1, y: (new Date()).getFullYear() });
+    var bindM = Math.round((e.bindj || 10) * 12);
+    var monate = Math.min(bindM + 24, 480);
+    var zeilen = K.monatsplan(e, monate);
+    var eur = function (n) { return Math.round(n).toLocaleString('de-DE') + ' €'; };
+    var html =
+      '<table class="phase-table tilgplan-table" style="width:100%; font-size:12.5px">' +
+      '<thead style="position:sticky; top:0; z-index:5"><tr>' +
+        '<th style="text-align:left; width:42px">#</th>' +
+        '<th style="text-align:left; width:90px">Datum</th>' +
+        (aus ? '<th class="num">Zinsen (= Rate)</th>'
+             : '<th class="num">Rate</th><th class="num">Zinsen</th><th class="num">Tilgung</th>') +
+        '<th class="num">Restschuld</th>' +
+      '</tr></thead><tbody>';
+    zeilen.forEach(function (z, k) {
+      var ezb = k === bindM - 1;
+      html += '<tr' + (ezb ? ' style="background:color-mix(in srgb, var(--wl-c9a84c, #c9a84c) 12%, transparent)"' : '') + '>' +
+        '<td>' + (k + 1) + '</td>' +
+        '<td>' + _fmtMonth(_addMonths(start, k)) + (ezb ? ' <span style="font-size:9px; color:var(--wl-c9a84c, #C9A84C); font-weight:700" title="Ende der Zinsbindung">EZB</span>' : '') + '</td>' +
+        (aus ? '<td class="num" style="color:#B8625C">' + eur(z.zins) + '</td>'
+             : '<td class="num">' + eur(z.rate) + '</td><td class="num" style="color:#B8625C">' + eur(z.zins) + '</td><td class="num" style="color:#3FA56C">' + eur(z.tilg) + '</td>') +
+        '<td class="num" style="font-weight:600">' + eur(z.rs) + '</td>' +
+      '</tr>';
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+    var st = document.getElementById('tilgplan-status-text');
+    if (st) {
+      var zinsBind = zeilen.slice(0, bindM).reduce(function (s, z) { return s + z.zins; }, 0);
+      var rsBind = zeilen.length >= bindM ? zeilen[bindM - 1].rs : e.betrag;
+      st.innerHTML = aus
+        ? 'Tilgung ausgesetzt · Zinsen ' + eur(K.rateM(e)) + ' / Monat · in ' + (e.bindj || 10) + ' J. Zinsbindung zusammen <b>' + eur(zinsBind) + '</b> · Restschuld bleibt <b>' + eur(e.betrag) + '</b>. '
+          + 'Eine Sparrate in einen Tilgungsträger rechnet DealPilot für dieses Darlehen nicht mit.'
+        : 'Rate ' + eur(K.rateM(e)) + ' / Monat · Zinsen in ' + (e.bindj || 10) + ' J. Zinsbindung <b>' + eur(zinsBind) + '</b> · Restschuld am Ende der Zinsbindung <b>' + eur(rsBind) + '</b>. '
+          + 'Danach läuft die Rate weiter (durchfinanziert).';
+    }
+  }
 
   function _tilgPlanEsc(e) {
     if (e.key === 'Escape') closeTilgplanModal();
@@ -250,9 +345,9 @@
           '<th style="text-align:left; width:90px">Datum</th>' +
           '<th class="num" style="width:130px">Rate</th>' +
           '<th class="num" style="width:130px">Zinsen</th>' +
-          '<th class="num" style="width:130px">Tilgung</th>' +
+          '<th class="num" style="width:130px">' + (isAussetzung ? 'Tilgung (ausgesetzt)' : 'Tilgung') + '</th>' +   /* v3256 */
           '<th class="num" style="width:140px">Restschuld</th>' +
-          (isAussetzung ? '<th class="num" style="width:130px">BSV-Rate</th><th class="num" style="width:130px">BSV-Guth.</th>' : '') +
+          (isAussetzung ? '<th class="num" style="width:130px">Sparrate BSV</th><th class="num" style="width:130px">BSV-Guthaben</th>' : '') +
         '</tr>' +
       '</thead><tbody>';
 
@@ -560,10 +655,33 @@
     if (rateEl) rateEl.textContent = lc.darRateM > 0 ? fmtE(lc.darRateM) + ' / Mon' : '—';
   }
 
+  /* v3256 · Marcel 09.11.2026: „Wortwahl ist dort auch nicht richtig, wenn es ein
+     Tilgungsaussetzungsdarlehen ist." Darlehen I mit Aussetzung: es gibt keine
+     Tilgung, sondern Zinsen plus Sparrate in den Bausparvertrag (calc.js
+     bsparRate_m, State.bsparRate_m) - also heissen die Felder auch so. */
+  function _wortwahl() {
+    var aus = window.dpIsD1Tilgungsaussetzung();
+    /* Text des Hinweises nur hier, nicht im HTML: tools/frontend-konstanten.mjs liest
+       die Beschriftung aus dem <label> - dort soll „Tilgung" stehen, nicht der Zustand */
+    var h = document.getElementById('d1t_hint');
+    if (h) h.textContent = aus ? 'ausgesetzt' : '';
+    var l = document.getElementById('d1_tm_lbl');
+    if (l) l.textContent = aus ? 'Sparrate Bausparvertrag' : 'davon Tilgung';
+    if (aus) {
+      var sr = window.State && window.State.bsparRate_m;
+      _set('d1_tm', sr > 0 ? sr.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '— (keine Sparrate)');
+    }
+    var vl = document.getElementById('volltilg_lbl');
+    if (vl) vl.textContent = aus ? 'Ablösung (ca.)' : 'Volltilgung (ca.)';
+    var tb = document.getElementById('tilg_toggle_lbl');
+    if (tb) tb.textContent = aus ? 'Zinsplan' : 'Tilgungsplan';
+  }
+
   window.dpFinancingRefresh = function() {
     window.calcD1Volltilgung();
     _renderRecommendations();
     _renderBsvLifecycleUI();
+    try { _wortwahl(); } catch (e) {}   /* v3256 */
   };
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -764,7 +882,7 @@
       box.style.border = '1px solid color-mix(in srgb, var(--red, #B8625C) 32%, transparent)';
       zeile.innerHTML = '<b style="color:var(--red,#B8625C)">Es fehlen ' + _eur(-diff) + '.</b> '
                       + 'Eigenkapital und Darlehen decken die Gesamtinvestition nicht — '
-                      + 'die EK-Rendite rechnet dann auf zu wenig eingesetztes Kapital und sieht zu gut aus.';
+                      + 'die EK-Rendite sähe zu gut aus.';   /* v3256: kürzer, Box kleiner */
     } else {
       box.style.background = 'color-mix(in srgb, var(--gold) 8%, transparent)';
       box.style.border = '1px solid color-mix(in srgb, var(--gold) 32%, transparent)';
