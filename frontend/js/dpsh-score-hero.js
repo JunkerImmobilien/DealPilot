@@ -611,7 +611,10 @@
     var header = card.querySelector('.kpi-eval-header');
     if (!header) return;
     card.setAttribute('data-dpsh-coll', '1');
-    try { if (localStorage.getItem('dp_dpsh_min') === '1') card.classList.add('dpsh-collapsed'); } catch (e) {}
+    /* v3235 · Marcel 09.11.2026: die Einstellung „Score-Leiste standardmäßig minimiert“ ist raus.
+       Hier stand: dp_dpsh_min === '1' -> dpsh-collapsed. Ein gespeichertes '1' haette die Leiste
+       sonst bei jedem Oeffnen zugeklappt, ohne dass es sich noch abschalten laesst. Die Leiste
+       startet jetzt immer aufgeklappt (der Standard), der Pfeil klappt sie weiter zu. */
     var chev = document.createElement('span');
     chev.className = 'dpsh-coll-chev';
     chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';

@@ -56,15 +56,21 @@
     return Array.prototype.slice.call(document.querySelectorAll('#' + HOST + ', .' + HOST));
   }
 
+  /* v3235 · Marcel 09.11.2026: „Bei Objektkarten fällt Aktenreiter, Ampel, Minimal und
+     Kennzahlen raus.“ Hier standen zusaetzlich:
+       ''          Aktenreiter  · Lasche mit Objektnummer
+       ampel       Ampel        · Ein Punkt sagt die Stufe
+       kennzahlen  Kennzahlen   · Preis, Rendite, Cashflow (v2178)
+       minimal     Minimal      · Nur Adresse und Ring
+     Ihre CSS-Regeln bleiben liegen - ohne Eintrag hier wird das Attribut nie gesetzt. Wer einen
+     davon gemerkt hatte, faellt in start() auf den Rueckfall (Bordkarte), der Merker wird geraeumt. */
   var STILE = {
-    '':          { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer' },
-    bordkarte:   { name: 'Bordkarte',   sub: 'Abriss links, Nummer hochkant' },
+    bordkarte:   { name: 'Bordkarte',   sub: 'Abriss links, Nummer hochkant · Standard' },
     kante:       { name: 'Score-Kante', sub: 'Farbiger Strich statt Ring' },
-    datenzeile:  { name: 'Datenzeile',  sub: 'Mono, eine Zeile, bündig' },
-    ampel:       { name: 'Ampel',       sub: 'Ein Punkt sagt die Stufe' },
-    kennzahlen:  { name: 'Kennzahlen',  sub: 'Preis, Rendite, Cashflow · Standard' },   /* v2178 */
-    minimal:     { name: 'Minimal',     sub: 'Nur Adresse und Ring' }
+    datenzeile:  { name: 'Datenzeile',  sub: 'Mono, eine Zeile, bündig' }
   };
+  var RUECKFALL = 'bordkarte';   /* v3235 */
+  function bekannt(s) { return !!(s && Object.prototype.hasOwnProperty.call(STILE, s)); }
 
   var aktuell = '';
 
@@ -135,13 +141,21 @@
     /* v2216c · Marcel 14.10.2026: „unter Anzeige … ist der Auslieferungszustand
        immer Aktenmappe mit Boardkarte." Damit gilt wieder v1915 statt v2083a
        (Datenzeile). Das Onboarding setzt dasselbe (onboarding.js). */
-    return layoutAktiv() ? 'bordkarte' : 'kennzahlen';
+    /* v3235: die Kennzahlen-Karte ist raus - ohne eigene Wahl gilt ueberall die Bordkarte. */
+    return RUECKFALL;
   }
 
-  /* Eine eigene Wahl. Sie wird gemerkt UND angewandt. */
+  /* Eine eigene Wahl. Sie wird gemerkt UND angewandt.
+     v3235: ein unbekannter Stil (auch '' = Aktenreiter, ampel, kennzahlen, minimal) ist keine
+     Wahl mehr - der Merker wird geraeumt, und es gilt der Rueckfall. */
   function setze(stil) {
-    gewaehlt = (stil && STILE[stil]) ? stil : '';
-    try { localStorage.setItem(LS, gewaehlt); } catch (e) {}
+    if (bekannt(stil)) {
+      gewaehlt = stil;
+      try { localStorage.setItem(LS, gewaehlt); } catch (e) {}
+    } else {
+      gewaehlt = null;
+      try { localStorage.removeItem(LS); } catch (e) {}
+    }
     anwenden();
   }
 
@@ -156,7 +170,7 @@
    * `zeige()` setzt das Attribut und laesst den Speicher in Ruhe;
    * `zurueck()` stellt den gemerkten Stand wieder her. */
   function zeige(stil) {
-    var s = (stil && STILE[stil]) ? stil : '';
+    var s = bekannt(stil) ? stil : RUECKFALL;   /* v3235: war '' (Aktenreiter) */
     var h = document.documentElement;
     if (s) h.setAttribute(ATTR, s); else h.removeAttribute(ATTR);
     aktuell = s;
@@ -196,8 +210,10 @@
            normale Ansicht bleibt, wie sie ist." Das stimmte, war aber
            genau der Defekt. Ein Hinweis, der einen Fehler beschreibt,
            laesst ihn wie eine Absicht aussehen. */
+        /* v3235: hier stand „Ohne eigene Wahl zeigt die Ansicht DealPilot die
+           Kennzahlen-Karte.“ - beide gibt es nicht mehr. */
         '<div class="dp-okw-fuss">Wirkt in allen Ansichten. Ohne eigene ' +
-        'Wahl zeigt die Ansicht DealPilot die Kennzahlen-Karte.' +
+        'Wahl gilt die Bordkarte.' +
         '</div>' +
       '</div>';
     host.addEventListener('click', function (e) {
@@ -253,9 +269,14 @@
        setze("bordkarte"), was den Rueckfall sofort als eigene Wahl in den
        Speicher schrieb; danach war er nicht mehr von einer echten
        Entscheidung zu unterscheiden. */
+    /* v3235: ein gemerkter Stil, den es nicht mehr gibt ('' Aktenreiter, ampel, kennzahlen,
+       minimal), wird geraeumt - dann gilt der Rueckfall Bordkarte. */
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
-    else if (hatMerker) { gewaehlt = gemerkt; anwenden(); }
-    else anwenden();
+    else if (hatMerker && bekannt(gemerkt)) { gewaehlt = gemerkt; anwenden(); }
+    else {
+      if (hatMerker) { try { localStorage.removeItem(LS); } catch (e) {} }
+      anwenden();
+    }
 
     /* v1715: der Merker des alten Schwebefensters wird abgeräumt. Wer ihn
        noch trägt, bekäme sonst nie etwas zu sehen und wüsste nicht,

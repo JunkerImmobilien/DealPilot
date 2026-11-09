@@ -66,6 +66,8 @@
   var LS = 'dp_karten_stil';
   /* v2981 · beim LADEN gelesen: der Beobachter unten kann setze() schon vor start() rufen und
      den Merker schreiben - danach saehe „nie gewaehlt“ falsch aus. */
+  /* v3235 · Marcel 09.11.2026: die Karte im Objekt ist nicht mehr waehlbar, sie ist immer Bütten. */
+  var FEST = 'buetten';
   var NIE_GEWAEHLT = (function () { try { return localStorage.getItem(LS) === null; } catch (e) { return false; } })();
   /* v1706c: Trichter und Bordkarte sind raus.
 
@@ -512,6 +514,9 @@
      in derselben Markup-Sprache des Darstellungs-Panels. */
   var panelWache = null;
   function inPanel() {
+    /* v3235 · Marcel 09.11.2026: „Karte im Objekt ganz raus, es wird nur Button [Bütten] immer
+       angezeigt.“ Keine Wahl mehr - weder in den Einstellungen noch im Darstellungs-Panel. */
+    if (FEST) return;
     var panel = document.getElementById('dpuv-b');
     if (!panel || document.getElementById('dpk-sek')) return;
 
@@ -570,6 +575,7 @@
      > nach, sonst zeigt der eine eine Wahl, die der andere schon geaendert
      > hat. */
   function inEinstellungen() {
+    if (FEST) return;   /* v3235: die Wahl ist raus, settings.js legt den Host nicht mehr an */
     var host = document.getElementById('dp-kartenstil-wahl-host');
     if (!host || host.getAttribute('data-gebaut') === '1') return;
     host.setAttribute('data-gebaut', '1');
@@ -697,7 +703,11 @@
        zurueckkommen - seine Regeln sind weg, er saehe kaputt aus. */
     if (ausUrl === 'bordkarte') ausUrl = 'aus';
     if (ausUrl === 'trichter') ausUrl = 'aus';   /* v1985 */
+    /* v3235 · die Datenaufnahme-Karte steht FEST auf Bütten - auch fuer alle, die „Automatisch“,
+       „Zeile“ oder „Kartei“ gemerkt hatten. Nur ?karte= (Pruef- und Drehbuch-Weg) setzt fuer
+       diese Sitzung etwas anderes. */
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
+    else if (FEST) setze(FEST);
     else setze(gemerkt || (nieGewaehlt ? 'buetten' : ''));
     /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die
        Bordkarte ueber die CSS-Regel

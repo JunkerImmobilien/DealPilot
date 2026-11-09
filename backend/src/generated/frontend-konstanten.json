@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-08T16:33:30.438Z",
+ "erzeugt_am": "2026-11-09T07:00:27.622Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
   "storage": "a427c64cbe052c8d",
-  "index-html": "f0282354bfe67a8e",
+  "index-html": "a7d2113e556bff9d",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4252,15 +4252,15 @@
     "abschnitte": [
      {
       "h": "Die Reiter im Überblick",
-      "text": "Links findest du die Reiter:\n• Account & Sicherheit — Login, Passwort, Zwei-Faktor, Account löschen, Telegram-Bot\n• Kontakt & Logo — Kontaktdaten und eigenes Logo für PDFs\n• Co-Pilot (KI) — Tonalität, Fokus, Instruktionen\n• Deal Score — Gewichtung, Schwellenwerte\n• Standardwerte — Vorgaben, die in jede Kalkulation einfließen\n• Darstellung — was angezeigt wird und wie es aussieht; ändert keine Zahl\n• Datenraum — geteilte Objekte und Portfolio-Pässe\n• Mandanten — Halter, Steuerregime, Steuerzeiträume\n• Plan — Abo, Kontingent, Abrechnung\n• Rechtliches und Hilfe\n\nUnten steht „Auto-Save aktiv · Änderungen werden direkt übernommen“. Mit Speichern sicherst du ausdrücklich, Abbrechen oder Esc schließt das Fenster."
+      "text": "Links findest du die Reiter:\n• Account & Sicherheit — Login, Passwort, Zwei-Faktor, Account löschen, Telegram-Bot\n• Kontakt & Logo — Kontaktdaten und eigenes Logo für PDFs\n• Deal Score — Gewichtung, Schwellenwerte\n• Standardwerte — Vorgaben, die in jede Kalkulation einfließen\n• Darstellung — was angezeigt wird und wie es aussieht; ändert keine Zahl\n• Datenraum — geteilte Objekte und Portfolio-Pässe\n• Mandanten — Halter, Steuerregime, Steuerzeiträume\n• Plan — Abo, Kontingent, Abrechnung\n• Rechtliches und Hilfe\n\nUnten steht „Auto-Save aktiv · Änderungen werden direkt übernommen“. Mit Speichern sicherst du ausdrücklich, Abbrechen oder Esc schließt das Fenster."
      },
      {
       "h": "Die schlanke Fassung und der Detailgrad",
-      "text": "Die Einstellungen stehen in der schlanken Fassung — gelöscht ist nichts, gespeicherte Werte bleiben. Die frühere volle Fassung öffnest du mit ?einstellungen=voll hinter der Adresse (gilt für diesen Browser-Tab), dauerhaft mit ?einstellungen=voll&merken, zurück mit ?einstellungen=schlank.\n\n• Mein Profil (bisher Standardwerte) steht direkt nach Account. Ganz oben der Detailgrad der Eingabe, darunter Strategie und Risikoneigung.\n• Deal Score steht direkt dahinter: ein oder zwei Scores, Gewichtung und Bewertungsprofil.\n• Co-Pilot (KI) zeigt nur Länge und Ton; Fokus, eigene Anweisungen, Vorlagen und eigenes Wissen liegen unter „Für Profis“.\n• Marktphase und Verkäuferbereitschaft gibt es nicht mehr als Einstellung, und sie gehen nicht in die Pilot-Analyse.\n• Datenraum erscheint, wenn du ihn nutzt oder ab Investor, Mandanten ab Pro oder sobald du eine Gesellschaft angelegt hast.\n\nDetailgrad der Eingabe — wie viele Felder die Reiter zeigen, für alle Objekte:\n• Einsteiger — die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben.\n• Fortgeschritten — dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II.\n• Experte — alle Felder, dazu Bauteile und Sach- und Ertragswert.\nAusgeblendete Felder behalten ihre Werte und rechnen weiter. Der Detailgrad gibt außerdem frei, welche Marktbericht-Stufen du im Reiter Objekt wählen kannst: Einsteiger Stufe 1, Fortgeschritten Stufe 1 und 2, Experte alle drei. Welche davon du abrufst, wählst du dort selbst — die Stufe ändert den Detailgrad nicht."
+      "text": "Die Einstellungen stehen in der schlanken Fassung — gelöscht ist nichts, gespeicherte Werte bleiben. Die frühere volle Fassung öffnest du mit ?einstellungen=voll hinter der Adresse (gilt für diesen Browser-Tab), dauerhaft mit ?einstellungen=voll&merken, zurück mit ?einstellungen=schlank.\n\n• Mein Profil (bisher Standardwerte) steht direkt nach Account. Ganz oben der Detailgrad der Eingabe, darunter Strategie und Risikoneigung.\n• Deal Score steht direkt dahinter: ein oder zwei Scores, Gewichtung und Bewertungsprofil.\n• Marktphase und Verkäuferbereitschaft gibt es nicht mehr als Einstellung, und sie gehen nicht in die Pilot-Analyse.\n• Datenraum erscheint, wenn du ihn nutzt oder ab Investor, Mandanten ab Pro oder sobald du eine Gesellschaft angelegt hast.\n\nDetailgrad der Eingabe — wie viele Felder die Reiter zeigen, für alle Objekte:\n• Einsteiger — die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben.\n• Fortgeschritten — dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II.\n• Experte — alle Felder, dazu Bauteile und Sach- und Ertragswert.\nAusgeblendete Felder behalten ihre Werte und rechnen weiter. Der Detailgrad gibt außerdem frei, welche Marktbericht-Stufen du im Reiter Objekt wählen kannst: Einsteiger Stufe 1, Fortgeschritten Stufe 1 und 2, Experte alle drei. Welche davon du abrufst, wählst du dort selbst — die Stufe ändert den Detailgrad nicht."
      },
      {
-      "h": "Co-Pilot (KI) und Kontakt & Logo",
-      "text": "Unter Co-Pilot (KI) legst du fest, wie die Pilot-Analysen schreiben (KI-Lage, Quick-Check, Investor Deal Score AI):\n• Detailgrad: kurz, mittel oder ausführlich\n• Tonalität: sachlich, beratend oder kritisch (Risiken zuerst)\n• Fokus-Schwerpunkte und Eigene Anweisungen\n• Eigenes Wissen für alle Piloten: geht an Pilot-Analyse, Portfolio-Pilot und Telegram-Bot. Trag dort keine Zahlen ein, die sich ändern — die holt die KI aus der echten Quelle.\n• Standard-Analyseparameter wie Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und aktuelle Marktphase. Sie gelten für alle Objekte.\n\nUnter Kontakt & Logo stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen ab dem Investor-Plan im Kopf bzw. Footer deiner PDFs und auf Track-Records; in Free und Starter tragen die PDFs keinen Absender. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (ab Investor, empfohlen: PNG, 300×100 px). Im Deal-Aktion-Banner und auf den Anfrage-Karten erscheinen deine Daten ab Pro."
+      "h": "Kontakt & Logo",
+      "text": "Wie die Pilot-Analysen schreiben, stellst du nicht mehr in den Einstellungen ein: früher gespeicherte Vorgaben (Länge, Ton, Fokus, eigene Anweisungen, eigenes Wissen) gelten weiter. Strategie und Risikoneigung stehen unter Mein Profil.\n\nUnter Kontakt & Logo stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen ab dem Investor-Plan im Kopf bzw. Footer deiner PDFs und auf Track-Records; in Free und Starter tragen die PDFs keinen Absender. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (ab Investor, empfohlen: PNG, 300×100 px). Im Deal-Aktion-Banner und auf den Anfrage-Karten erscheinen deine Daten ab Pro."
      },
      {
       "h": "Deal Score: Gewichtung und Bewertungsprofile",
@@ -4276,7 +4276,7 @@
      },
      {
       "h": "Darstellung und Tooltip-Hilfe",
-      "text": "Der Reiter Darstellung ändert keine Zahl, nur die Ansicht.\n• Aussehen: Seitenaufteilung, Objektkarten und Kartenstil wählen. „Zurücksetzen“ stellt Aufteilung, Darstellung und Marke auf den Auslieferungszustand.\n• Markt-Daten im Tab Finanzierung: Markt-Daten-Cards standardmäßig zugeklappt.\n• Investor Deal Score beim Öffnen: Score-Leiste standardmäßig minimiert.\n• Quickboarding — Auto-Übernahme: Standard-Quelle, z. B. „Konsens (Ø aller aktiven)“. Sie bestimmt, welcher Marktwert automatisch in die Grundmiete übernommen wird.\n• Bilder in Sicherung & Netzwerk: Objektfotos einbeziehen.\n• Marktbericht-Design: Hell oder Dunkel.\n\nTooltip-Hilfe steuert die i-Symbole: Aus (keine Tooltips), Profi (nur wichtige — kritische Hinweise wie § 7b bleiben) oder Anfänger (alle anzeigen, Standard)."
+      "text": "Der Reiter Darstellung ändert keine Zahl, nur die Ansicht.\n• Aussehen: Seitenaufteilung (Aktenmappe, Kanzlei, Tower) und Objektkarten in der Liste (Bordkarte, Score-Kante, Datenzeile). Die Karte im Objekt (Datenaufnahme) steht immer in Bütten. „Zurücksetzen“ stellt Aufteilung, Darstellung und Marke auf den Auslieferungszustand (Aktenmappe mit Bordkarte).\n• Bilder in Sicherung & Netzwerk: Objektfotos einbeziehen.\n\nTooltip-Hilfe steuert die i-Symbole: Aus (keine Tooltips), Profi (nur wichtige — kritische Hinweise wie § 7b bleiben) oder Anfänger (alle anzeigen, Standard)."
      },
      {
       "h": "Mandanten und Steuerzeiträume",
@@ -5486,7 +5486,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "285b87347713b75c",
+  "hilfe": "f804f10e0431bae9",
   "bewertung": "f427bd734c0570c3"
  }
 }

@@ -86,13 +86,27 @@
       else {
         /* Altbestand: „Diese Wahl merken" lag nur in dp_pdf_wahl */
         var g = localStorage.getItem(LS) || '';
-        if (wahl(g)) vorgabe = { fassung: g, immer: true, pilot: true };
+        if (wahl(g)) vorgabe = normal({ fassung: g, immer: true, pilot: true });   /* v3235: normal() */
       }
+      /* v3235: der lokale Merker „ohne Rueckfrage“ wird geraeumt - frage() liest ihn direkt */
+      localStorage.removeItem(LS);
+      if (v && weichtAb(v)) localStorage.setItem(LS_V, JSON.stringify(vorgabe));
     } catch (e) {}
   })();
+  /* v3235 · Marcel 09.11.2026: „PDF-Export-Einstellungen können auch raus.“ Der Abschnitt in den
+     Einstellungen ist weg (settings.js). Zwei Werte liessen sich NUR dort zuruecknehmen und werden
+     deshalb fest auf den Standard gesetzt:
+       immer   -> false   (sonst kaeme der Fassungsdialog nie wieder: der Knopf „Fassung waehlen“,
+                           DealActionBoarding.fassungWaehlen, hat gemessen keinen Aufrufer)
+       design  -> 'neu'   (Einheitlich; „Klassisch“ war nur in den Einstellungen waehlbar)
+     fassung (nur die Vorauswahl im Dialog) und pilot (Haken in der Pilot-Analyse) bleiben, beide
+     sind ohne die Einstellungen aenderbar bzw. harmlos. War hier: immer = !!v.immer && …,
+     design = v.design === 'klassisch' ? 'klassisch' : 'neu'. */
   function normal(v) {
-    return { fassung: wahl(v.fassung) ? v.fassung : '', immer: !!v.immer && !!wahl(v.fassung), pilot: v.pilot !== false, design: v.design === 'klassisch' ? 'klassisch' : 'neu' };
+    return { fassung: wahl(v.fassung) ? v.fassung : '', immer: false, pilot: v.pilot !== false, design: 'neu' };
   }
+  /* v3235: Stand vom Server/aus dem Speicher, der von der festen Vorgabe abweicht */
+  function weichtAb(v) { return !!(v && (v.immer || v.design === 'klassisch')); }
   function api() { return window.Auth && Auth.apiCall && (!Auth.isApiMode || Auth.isApiMode()); }
   function spiegeln() {
     try {
@@ -111,7 +125,10 @@
     try {
       if (!api()) return;
       Auth.apiCall('/user-settings/' + SCHLUESSEL).then(function (r) {
-        if (r && r.wert && typeof r.wert === 'object') { vorgabe = normal(r.wert); spiegeln(); }
+        /* v3235: weicht der Kontostand von der festen Vorgabe ab (ohne Rueckfrage / Klassisch),
+           wird der bereinigte Stand zurueckgeschrieben - sonst druckte der Telegram-Bot
+           (telegramPdfService liest pdf_vorgabe.design) weiter klassisch. */
+        if (r && r.wert && typeof r.wert === 'object') { vorgabe = normal(r.wert); if (weichtAb(r.wert)) sichern(); else spiegeln(); }
         else if (vorgabe.fassung || vorgabe.pilot === false) sichern();
       }).catch(function () {});
     } catch (e) {}
@@ -206,7 +223,9 @@
       '<div class="dpw-kasten" role="dialog" aria-modal="true" aria-label="Welche Fassung?">'
       + '<div class="dpw-kopf"><b>Welche Fassung?</b>'
       + '<button type="button" class="dpw-zu" aria-label="Schliessen">×</button></div>'
-      + '<p class="dpw-vor">' + (sichtbar().length === 3 ? 'Drei' : 'Vier') + ' Fassungen stehen bereit. Sie unterscheiden sich im Umfang '
+      /* v3235: das einheitliche Design zeigt ZWEI Fassungen - hier stand „=== 3 ? Drei : Vier“,
+         und bei zwei Karten hiess es „Vier Fassungen“. */
+      + '<p class="dpw-vor">' + (['Keine', 'Eine', 'Zwei', 'Drei', 'Vier'][sichtbar().length] || sichtbar().length) + ' Fassungen stehen bereit. Sie unterscheiden sich im Umfang '
       + 'und im Deckblatt - die Zahlen sind dieselben.</p>'
       + '<div class="dpw-liste">' + karten + '</div>'
       /* v1733 · hier stand „(änderbar in den Einstellungen)". Das war eine
@@ -215,8 +234,9 @@
          wo der Weg wirklich liegt — neben dem PDF-Knopf in der Ausgabe.
          v2900 · jetzt gibt es den Weg in den Einstellungen wirklich
          (Darstellung › PDF-Export, einstellungenHtml unten). */
-      + '<label class="dpw-merk"><input type="checkbox" id="dpw-merken"> '
-      + 'Diese Wahl merken <span>(änderbar unter Einstellungen › Darstellung › PDF-Export)</span></label>'
+      /* v3235: hier stand der Haken „Diese Wahl merken (änderbar unter Einstellungen ›
+         Darstellung › PDF-Export)“. Den Abschnitt gibt es nicht mehr, und ein gemerktes
+         „ohne Rueckfrage“ liesse sich nirgends zuruecknehmen - der Haken ist deshalb raus. */
       + '</div>';
 
     document.body.appendChild(ov);
@@ -232,7 +252,7 @@
       k.addEventListener('click', function () {
         var w = wahl(k.dataset.id);
         if (!w) return;
-        if (ov.querySelector('#dpw-merken').checked) setze({ fassung: w.id, immer: true });
+        /* v3235: der Haken #dpw-merken ist raus - hier stand setze({ fassung, immer: true }) */
         zu();
         fuehreAus(w);
       });

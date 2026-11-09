@@ -1392,7 +1392,9 @@
          mit den Objektkarten Kennzahlen." Wer auf DealPilot wechselt,
          bekommt die Kennzahlen-Karte; aendern laesst sie sich danach
          in den Einstellungen wie jede andere. */
-      try { if (window.DealPilotObjektkarte && typeof DealPilotObjektkarte.setze === 'function') DealPilotObjektkarte.setze('kennzahlen'); } catch (e) {}
+      /* v3235 · Die Kennzahlen-Karte ist raus (Marcel 09.11.2026); hier stand
+         DealPilotObjektkarte.setze('kennzahlen'). Ohne Aufruf bleibt die eigene Wahl stehen,
+         sonst gilt der Rueckfall Bordkarte (objektkarten-stil.js effektiv()). */
       schalterNachziehen();
       return;
     }
@@ -1607,7 +1609,7 @@
        Namen — die Nummer half niemandem und stand zwischen ihm und dem
        Wort, das er sucht. Eine Reihenfolge braucht keine Nummer, wenn
        die Reihenfolge schon sichtbar ist. */
-    var kacheln = [{ key: '', name: markenName(), sub: 'Unveränderte Ansicht' }].concat(
+    var kacheln = [].concat(   /* v3235: Kachel '' (DealPilot) raus, siehe inEinstellungen() */
       /* ── v1892 · DIE AUSBLENDUNG AUS v1880 IST ZURUECKGENOMMEN ──────
          Hier stand `.filter(k => k === 'v1b')` mit dem Vermerk „nur
          Heute und Aktenmappe zur Wahl; Kanzlei und Tower bleiben im
@@ -1734,7 +1736,10 @@
     if (!host || host.getAttribute('data-gefuellt') === '1') return;
     host.setAttribute('data-gefuellt', '1');
 
-    var kacheln = [{ key: '', name: markenName(), sub: 'Unveränderte Ansicht' }].concat(
+    /* v3235 · Marcel 09.11.2026: „Unter Aussehen fällt DealPilot raus.“ Die Kachel '' (Ansicht
+       ohne Layout, Name = Marke) steht nicht mehr zur Wahl - hier nicht und im Panel nicht.
+       Wer sie gemerkt hatte, landet ueber start() auf der Aktenmappe (v1b). */
+    var kacheln = [].concat(
       /* v1892 · Zweite Stelle derselben Ausblendung - zurueckgenommen wie
          oben in `inPanel()`. Marcel am 06.10.2026 will Tower und Kanzlei
          zurueck in der Wahl. */
@@ -1818,8 +1823,10 @@
     } else {
       /* v1880 · Marcel: "defaultmaessig wird dann die Aktenmappe genommen" - wer nie gewaehlt hat,
          bekommt die Aktenmappe; "Heute" bleibt waehlbar (dp_layout_gewaehlt merkt die Wahl). */
-      var _gew = ''; try { _gew = localStorage.getItem('dp_layout_gewaehlt') || ''; } catch (e) {}
-      if (!_gew) setze('v1b');
+      /* v3235 · Die Ansicht DealPilot ('') ist nicht mehr waehlbar (Marcel 09.11.2026). Wer sie
+         bewusst gewaehlt hatte (dp_layout_gewaehlt, Merker leer), bekommt jetzt ebenfalls die
+         Aktenmappe - sonst saesse er in einer Ansicht, die in keiner Wahl mehr auftaucht. ?layout=aus bleibt als Pruefweg fuer eine Sitzung. */
+      setze('v1b');
     }
 
     /* ── v1893 · DAS ABZEICHEN GEHOERT AUCH IN „HEUTE" IN DEN KOPF ──────────
