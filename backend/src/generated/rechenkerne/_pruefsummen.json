@@ -1,5 +1,5 @@
 {
- "erzeugt_am": "2026-11-08T10:15:38.907Z",
+ "erzeugt_am": "2026-11-09T09:47:23.402Z",
  "hinweis": "Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. Quelle aendern, dann: node tools/rechenkerne-spiegeln.mjs",
  "reihenfolge": [
   "dscr-engine.js",
@@ -15,8 +15,8 @@
   "dscr-engine.js": "a84f6cbd54912d087cc107ac649bb8e530db38495afe3bdd0f48631c4c6ddbba",
   "darlehen-weitere.js": "afdfd975bbc0d8647710899408dd50daaf844c8ddeef794927b135e95eccc67e",
   "deal-kpis.js": "7de4271d585bc1d358d91c4f8a8e40f829bbdaaeb1e03b5da82a7ff06c16f7ad",
-  "score-tiers.js": "9b1cb9d1d9fc3b997804caf24dbe8706f8eca44fa7922d420f1ac346049d6c1e",
-  "dealscore.js": "06f3e5e935c33fc712a31a3337ab363fb56db606e4ff6593d5da62173b696705",
+  "score-tiers.js": "add25852858dedb26fa8ba5946c3d794cc02d52d45c784f17c384762760ec873",
+  "dealscore.js": "3f923953bd50c5e82b6016d847513c62c4e721ed07aff09c7e7840089cb10ce3",
   "qc-heuristik.js": "60e207571011287e285282239e0a5a575d7fdbf616dbd3d65e26053dfc909204",
   "rnd-gnd-table.js": "ed1df0eab13887a1c971f26e129924063b2665e0d33d249843c11f9cac206fb0",
   "rnd-calc.js": "1070ddc2c6479e694b8ca34d8a8e2f7134a487b617d2569ab27e0340b1a8663d"

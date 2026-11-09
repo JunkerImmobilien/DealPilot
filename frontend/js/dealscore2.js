@@ -769,7 +769,8 @@ window.DealScore2 = (function() {
       categories: cats,
       positives: positives,
       negatives: negatives,
-      explanation: (_dk && scoreOhneDeckel > _dk.max ? 'Begrenzt auf höchstens ' + _dk.max + ': ' + deckel + ' (ohne Grenze ' + Math.round(scoreOhneDeckel) + '). ' : '') + explanation,
+      /* v3254 · die Grenze als verständlicher Satz aus score-tiers.js (ScoreTier.deckelSatz) */
+      explanation: (_dk && scoreOhneDeckel > _dk.max ? ((window.ScoreTier && window.ScoreTier.deckelSatz) ? window.ScoreTier.deckelSatz(_dk, Math.round(scoreOhneDeckel)) : 'Begrenzt auf höchstens ' + _dk.max + ': ' + deckel + ' (ohne Grenze ' + Math.round(scoreOhneDeckel) + ').') + ' ' : '') + explanation,
       configUsed: cfg,
       // V59: Vollständigkeit ausweisen — Konsumenten (UI) können Score "ausgrauen" wenn zu wenig Daten
       dataCompleteness: completeness,
