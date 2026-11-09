@@ -1,0 +1,324 @@
+{
+ "ags": "05974028",
+ "gemeinde": "Lippstadt",
+ "art": "einfach",
+ "stand": "2025-01-01",
+ "erhebungsstichtag": "2024-12-31",
+ "gueltig_ab": "2025-01-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.lippstadt.de/fileadmin/user_upload/Mietspiegel_2025.pdf",
+  "dokument": "Mietspiegel 2025 der Stadt Lippstadt (einfacher Mietspiegel), gültig ab 01. Januar 2025, Stichtag zur Auswertung 31.12.2024",
+  "seite": "Broschüre S. 4 (Tabelle 1 Basismiete, PDF-S. 5), S. 5–6 (Tabelle 2 Objektpunkte, Umrechnung in %), S. 6 (Tabelle 3 Übergröße), S. 7 (Tabelle 4 Lage), S. 8–9 (Rechenschema, Spanne ±20 %)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; Herausgeber Stadt Lippstadt",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Tabelle 1 führt je Feld nur den Mittelwert (Ø); grau hinterlegte Felder (1996–2009 und ab 2010 bei 25–50 m², 1996–2009/ab 2010 bei über 95 m²) mit höchstens 30 Datensätzen, Aussage eingeschränkt. Spanne = Mittelwert ×0,80 / ×1,20 (S. 9). Objektpunkte (Tabelle 2) als Merkmal je Punktklasse (objektpunkte_plus_1_2 … — nur EINES setzen); bei > 8 Punkten und Endenergie < 90 kWh die Baualtersklasse ab 2010 wählen (nicht automatisch). Übergröße ab 121 m² −1 % (nicht bei EFH) automatisch über wfl_klassen. Einfamilienhaus +10 % (S. 4 Hinweis 3, max. 160 m²). Lage einfach −0,30 / gut +0,40 €/m². Tabelle 1 am gerenderten Bild abgelesen (Textschicht ohne Zahlen).",
+ "tabelle": {
+  "geltung": {
+   "wfl_von": 25,
+   "wfl_bis": 160
+  },
+  "spanne": {
+   "unten_pct": -20,
+   "oben_pct": 20
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1954,
+     "label": "vor 1955"
+    },
+    {
+     "von": 1955,
+     "bis": 1977,
+     "label": "1955–1977"
+    },
+    {
+     "von": 1978,
+     "bis": 1995,
+     "label": "1978–1995"
+    },
+    {
+     "von": 1996,
+     "bis": 2009,
+     "label": "1996–2009"
+    },
+    {
+     "von": 2010,
+     "bis": null,
+     "label": "ab 2010"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 25,
+     "bis": 50,
+     "label": "25–50 m²"
+    },
+    {
+     "von": 50,
+     "bis": 75,
+     "von_inkl": false,
+     "label": "über 50–75 m²"
+    },
+    {
+     "von": 75,
+     "bis": 95,
+     "von_inkl": false,
+     "label": "über 75–95 m²"
+    },
+    {
+     "von": 95,
+     "bis": 160,
+     "von_inkl": false,
+     "label": "über 95–160 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "mittel": 5.9,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "mittel": 6.3,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "mittel": 7,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "mittel": 7.2,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "mittel": 8.3,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "mittel": 5.7,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "mittel": 5.8,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "mittel": 6.1,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "mittel": 7,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "mittel": 8.8,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "mittel": 5.9,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "mittel": 5.9,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "mittel": 6.1,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "mittel": 6.4,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "mittel": 7.8,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "mittel": 5.5,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "mittel": 5.9,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "mittel": 6.1,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "mittel": 6.2,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "mittel": 7.7,
+    "seite": "4"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "einfamilienhaus",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 4 Hinweis 3 / S. 8",
+    "label": "Einfamilienhaus"
+   },
+   {
+    "merkmal": "objektpunkte_plus_6",
+    "art": "pct",
+    "wert": 15,
+    "beleg": "S. 6",
+    "label": "mehr als 5 Objektpunkte"
+   },
+   {
+    "merkmal": "objektpunkte_plus_3_4",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 6",
+    "label": "+3 und +4 Objektpunkte"
+   },
+   {
+    "merkmal": "objektpunkte_plus_1_2",
+    "art": "pct",
+    "wert": 5,
+    "beleg": "S. 6",
+    "label": "+1 und +2 Objektpunkte"
+   },
+   {
+    "merkmal": "objektpunkte_minus_1_2",
+    "art": "pct",
+    "wert": -5,
+    "beleg": "S. 6",
+    "label": "−1 und −2 Objektpunkte"
+   },
+   {
+    "merkmal": "objektpunkte_minus_3",
+    "art": "pct",
+    "wert": -10,
+    "beleg": "S. 6",
+    "label": "weniger als −2 Objektpunkte („< −3“ laut Dokument)"
+   },
+   {
+    "merkmal": "uebergroesse",
+    "art": "pct",
+    "beleg": "S. 6 Tabelle 3",
+    "label": "Übergröße 121–160 m² (nicht bei Einfamilienhäusern)",
+    "wfl_klassen": [
+     {
+      "von": 120,
+      "von_inkl": false,
+      "bis": 160,
+      "wert": -1
+     }
+    ]
+   },
+   {
+    "merkmal": "lage:einfach",
+    "art": "eur_qm",
+    "wert": -0.3,
+    "beleg": "S. 7 Tabelle 4",
+    "label": "einfache Wohnlage",
+    "aliase": [
+     "einfache Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "eur_qm",
+    "wert": 0.4,
+    "beleg": "S. 7 Tabelle 4",
+    "label": "gute Wohnlage",
+    "aliase": [
+     "gute Wohnlage"
+    ]
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 60
+   },
+   "erwartet": {
+    "unten": 4.64,
+    "mittel": 5.8,
+    "oben": 6.96
+   },
+   "seite": "4, 9",
+   "art": "rechenweg",
+   "anmerkung": "Tabelle 1 Ø 5,80; Spanne ×0,80/×1,20 nach S. 9"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 30
+   },
+   "erwartet": {
+    "mittel": 8.3
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1990,
+    "wfl": 130,
+    "lage": "gut"
+   },
+   "erwartet": {
+    "mittel": 6.44
+   },
+   "seite": "4, 6, 7",
+   "art": "rechenweg",
+   "anmerkung": "6,10 × (1 − 1 %) + 0,40 = 6,439 → 6,44"
+  }
+ ]
+}

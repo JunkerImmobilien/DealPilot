@@ -1,0 +1,407 @@
+{
+ "ags": "05954036",
+ "gemeinde": "Witten",
+ "art": "qualifiziert",
+ "stand": "2025-07-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-07-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.witten.de/medien/dokumente/mietspiegel_2025.pdf",
+  "dokument": "Wittener Mietspiegel 2025 (qualifiziert, Indexfortschreibung auf Oktober 2024 der Erhebung Oktober 2022), Stadt Witten",
+  "seite": "S. 8 (Tabelle 1 Grundtabelle), S. 9–11 (Tabellen 2–11 Zu-/Abschläge), S. 7 (Anwendungsbereich 20 bis unter 150 m²), S. 2–3 (gültig ab 1. Juli 2025)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Stadt Witten",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Grundtabelle nur nach Baualter (Basismiete + Spanne), Wohnungsgröße als Zuschlag (Tabelle 2) automatisch über wfl_klassen. Zu-/Abschläge in €/m² werden zu Basismiete UND Spannenwerten gerechnet (S. 8). Datenstand Oktober 2022, per VPI auf Oktober 2024 fortgeschrieben (S. 7). Gilt 20 bis unter 150 m² in Gebäuden mit 3+ Wohnungen, Baujahre bis 2018. Modernisierungszuschläge nur bei Baujahr vor 1995. Lageabschläge (Zentralität 3, Umweltbelastung 3) als Merkmale; Wohnlagenkataster S. 6 ff. Kein Zahlenbeispiel im Dokument.",
+ "tabelle": {
+  "geltung": {
+   "wfl_von": 20,
+   "wfl_bis": 149.99,
+   "baujahr_bis": 2018
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1907,
+     "label": "1: bis 1907"
+    },
+    {
+     "von": 1908,
+     "bis": 1929,
+     "label": "2: 1908 bis 1929"
+    },
+    {
+     "von": 1930,
+     "bis": 1949,
+     "label": "3: 1930 bis 1949"
+    },
+    {
+     "von": 1950,
+     "bis": 1964,
+     "label": "4: 1950 bis 1964"
+    },
+    {
+     "von": 1965,
+     "bis": 1979,
+     "label": "5: 1965 bis 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1989,
+     "label": "6: 1980 bis 1989"
+    },
+    {
+     "von": 1990,
+     "bis": 2018,
+     "label": "7: 1990 bis 2018"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 4.87,
+    "mittel": 5.85,
+    "oben": 6.9,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "unten": 4.85,
+    "mittel": 5.75,
+    "oben": 6.53,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "unten": 5.2,
+    "mittel": 5.88,
+    "oben": 6.56,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "unten": 5.22,
+    "mittel": 6.04,
+    "oben": 6.81,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "unten": 5.16,
+    "mittel": 5.91,
+    "oben": 6.78,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "unten": 5.28,
+    "mittel": 6.04,
+    "oben": 6.85,
+    "seite": "8"
+   },
+   {
+    "baujahr": 6,
+    "unten": 5.77,
+    "mittel": 6.75,
+    "oben": 7.81,
+    "seite": "8"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "art": "eur_qm",
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Zuschlag Wohnungsgröße",
+    "wfl_klassen": [
+     {
+      "von": 20,
+      "bis": 35,
+      "bis_inkl": false,
+      "wert": 1.46
+     },
+     {
+      "von": 35,
+      "bis": 45,
+      "bis_inkl": false,
+      "wert": 0.58
+     },
+     {
+      "von": 45,
+      "bis": 55,
+      "bis_inkl": false,
+      "wert": 0.14
+     }
+    ]
+   },
+   {
+    "merkmal": "apartment",
+    "art": "eur_qm",
+    "wert": 1.18,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Apartment (abgeschlossene Einzimmerwohnung bis 50 m² mit Bad/Dusche)"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "beleg": "S. 9 Tabelle 3",
+    "label": "zusätzliches Gäste-WC (Wohnungen ab 100 m²)"
+   },
+   {
+    "merkmal": "warmwasser_boiler_bad",
+    "art": "eur_qm",
+    "wert": -0.12,
+    "beleg": "S. 9 Tabelle 3",
+    "label": "Warmwasser über Boiler/Warmwasserspeicher im Bad"
+   },
+   {
+    "merkmal": "waermeschutzverglasung",
+    "art": "eur_qm",
+    "wert": 0.08,
+    "beleg": "S. 9 Tabelle 4",
+    "label": "Wärmeschutzverglasung (U-Wert ca. 1,1 bis 1,9)"
+   },
+   {
+    "merkmal": "etagenheizung",
+    "art": "eur_qm",
+    "wert": -0.13,
+    "beleg": "S. 10 Tabelle 5",
+    "label": "Etagenheizung"
+   },
+   {
+    "merkmal": "fernwaerme",
+    "art": "eur_qm",
+    "wert": -0.18,
+    "beleg": "S. 10 Tabelle 5",
+    "label": "Fernwärme"
+   },
+   {
+    "merkmal": "balkon",
+    "art": "eur_qm",
+    "wert": 0.07,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "Standard-Balkon/Loggia bis 8 m² oder mind. 1,5 m Tiefe"
+   },
+   {
+    "merkmal": "balkon_gross",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "großer Balkon/Loggia ab 8 m² oder mind. 2 m Tiefe"
+   },
+   {
+    "merkmal": "terrasse",
+    "art": "eur_qm",
+    "wert": 0.33,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "Terrasse oder Dachterrasse ab 8 m²"
+   },
+   {
+    "merkmal": "barrierefrei_erreichbar",
+    "art": "eur_qm",
+    "wert": 0.19,
+    "beleg": "S. 10 Tabelle 7",
+    "label": "Wohnung und Zuwegung barrierefrei erreichbar"
+   },
+   {
+    "merkmal": "barrierearm",
+    "art": "eur_qm",
+    "wert": 0.31,
+    "beleg": "S. 10 Tabelle 7",
+    "label": "gesamte Wohnung barrierearm erstellt/modernisiert"
+   },
+   {
+    "merkmal": "ohne_oberboden",
+    "art": "eur_qm",
+    "wert": -0.24,
+    "beleg": "S. 10 Tabelle 8",
+    "label": "ohne Oberböden vermietet"
+   },
+   {
+    "merkmal": "hochwertiger_bodenbelag",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "beleg": "S. 10 Tabelle 8",
+    "label": "hochwertiger Bodenbelag"
+   },
+   {
+    "merkmal": "aufzug",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "beleg": "S. 11 Tabelle 9",
+    "label": "Wohnung über Aufzug erreichbar"
+   },
+   {
+    "merkmal": "gegensprechanlage",
+    "art": "eur_qm",
+    "wert": 0.17,
+    "beleg": "S. 11 Tabelle 9",
+    "label": "Gegensprechanlage mit Türöffner"
+   },
+   {
+    "merkmal": "videogegensprechanlage",
+    "art": "eur_qm",
+    "wert": 0.61,
+    "beleg": "S. 11 Tabelle 9",
+    "label": "videounterstützte Gegensprechanlage mit Türöffner"
+   },
+   {
+    "merkmal": "rolllaeden",
+    "art": "eur_qm",
+    "wert": 0.11,
+    "beleg": "S. 11 Tabelle 9",
+    "label": "manuelle Außen-Rollläden an allen Fenstern"
+   },
+   {
+    "merkmal": "elektrische_rolllaeden",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "beleg": "S. 11 Tabelle 9",
+    "label": "elektrische Außen-Rollläden an allen Fenstern"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "art": "eur_qm",
+    "wert": 0.41,
+    "beleg": "S. 11 Tabelle 9",
+    "label": "Einbauküche gehobener Qualität"
+   },
+   {
+    "merkmal": "fussbodenheizung",
+    "art": "eur_qm",
+    "wert": 0.4,
+    "beleg": "S. 11 Tabelle 9",
+    "label": "Fußbodenheizung"
+   },
+   {
+    "merkmal": "bad_ersteinbau_seit_2002",
+    "art": "eur_qm",
+    "wert": 0.7,
+    "beleg": "S. 11 Tabelle 10",
+    "label": "erstmaliger Dusch- oder Badeinbau seit 2002",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   },
+   {
+    "merkmal": "bad_modernisiert_seit_2002",
+    "art": "eur_qm",
+    "wert": 0.13,
+    "beleg": "S. 11 Tabelle 10",
+    "label": "Baderneuerung seit 2002",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   },
+   {
+    "merkmal": "fenster_erneuert_seit_2012",
+    "art": "eur_qm",
+    "wert": 0.29,
+    "beleg": "S. 11 Tabelle 10",
+    "label": "Erneuerung aller Fenster seit 2012",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   },
+   {
+    "merkmal": "kellerdeckendaemmung_seit_2012",
+    "art": "eur_qm",
+    "wert": 0.29,
+    "beleg": "S. 11 Tabelle 10",
+    "label": "Dämmung der gesamten Kellerdecke seit 2012",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   },
+   {
+    "merkmal": "aussenwanddaemmung_seit_2002",
+    "art": "eur_qm",
+    "wert": 0.14,
+    "beleg": "S. 11 Tabelle 10",
+    "label": "Dämmung aller Außenwände über 8 cm seit 2002",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   },
+   {
+    "merkmal": "elektro_erneuert_seit_2008",
+    "art": "eur_qm",
+    "wert": 0.11,
+    "beleg": "S. 11 Tabelle 10",
+    "label": "vollständige Erneuerung der Elektroinstallation seit 2008",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   },
+   {
+    "merkmal": "wasserleitungen_erneuert_seit_2015",
+    "art": "eur_qm",
+    "wert": 0.23,
+    "beleg": "S. 11 Tabelle 10",
+    "label": "komplette Erneuerung der Wasserleitungen seit 2015",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   },
+   {
+    "merkmal": "zentralitaet_3",
+    "art": "eur_qm",
+    "wert": -0.26,
+    "beleg": "S. 11 Tabelle 11",
+    "label": "Lage mit unterdurchschnittlicher Zentralität (Zentralität 3)"
+   },
+   {
+    "merkmal": "umweltbelastung_3",
+    "art": "eur_qm",
+    "wert": -0.16,
+    "beleg": "S. 11 Tabelle 11",
+    "label": "besonders starke Umweltbelastung (Umweltbelastung 3)"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.16,
+    "mittel": 5.91,
+    "oben": 6.78
+   },
+   "seite": "8",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 40
+   },
+   "erwartet": {
+    "unten": 6.35,
+    "mittel": 7.33,
+    "oben": 8.39
+   },
+   "seite": "8–9",
+   "art": "rechenweg",
+   "anmerkung": "Baualtersklasse 7 (5,77/6,75/7,81) + Größenzuschlag 35 bis unter 45 m² +0,58 €"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2020,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "8",
+   "art": "tabellenzelle"
+  }
+ ]
+}

@@ -1,0 +1,269 @@
+{
+ "ags": "12053000",
+ "gemeinde": "Frankfurt (Oder)",
+ "art": "qualifiziert",
+ "stand": "2026-02-01",
+ "erhebungsstichtag": "2025-09-01",
+ "gueltig_ab": "2026-02-01",
+ "gueltig_bis": "2028-01-31",
+ "quelle": {
+  "url": "https://www.frankfurt-oder.de/loadDocument.phtml?FID=4071.1217.1&Ext=PDF",
+  "dokument": "Qualifizierter Mietspiegel Frankfurt (Oder) 2026, Stadt Frankfurt (Oder), Stichtag 01.09.2025, gültig 01.02.2026 bis 31.01.2028",
+  "seite": "S. 11 (Mietspiegeltabelle), S. 2 (Gültigkeit), S. 4 (Stichtag), S. 13–15 (Orientierungshilfe, Berechnungsbeispiele)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Stadt Frankfurt (Oder)",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Mittelwert und 3/4-Spanne, freifinanzierter Geschosswohnungsbau mit WC, Bad/Duschbad und Sammelheizung. Feld A4 (unter 40 m², 1991–2009) mit * — laut Fußnote keine genügende Anzahl von Mietwerten für eine verlässliche Aussage → weggelassen, obwohl ein Wert (6,18 / 5,42–7,12) gedruckt ist. Einordnung in die Spanne über Punkte der Orientierungshilfe (S. 13) — nicht abgebildet. Die Berechnungsbeispiele S. 14–15 bestätigen die Felder C1 (4,89/6,02/7,05) und B3 (4,74/5,30/6,00). Am gerenderten Bild abgelesen und mit der Textschicht abgeglichen.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1949,
+     "label": "1: bis 1949"
+    },
+    {
+     "von": 1950,
+     "bis": 1969,
+     "label": "2: 1950 bis 1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1990,
+     "label": "3: 1970 bis 1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2009,
+     "label": "4: 1991 bis 2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2025,
+     "label": "5: 2010 bis 2025"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 40,
+     "bis_inkl": false,
+     "label": "A: unter 40 m²"
+    },
+    {
+     "von": 40,
+     "bis": 60,
+     "bis_inkl": false,
+     "label": "B: 40 bis unter 60 m²"
+    },
+    {
+     "von": 60,
+     "bis": 90,
+     "bis_inkl": false,
+     "label": "C: 60 bis unter 90 m²"
+    },
+    {
+     "von": 90,
+     "bis": null,
+     "label": "D: 90 m² und mehr"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 4.71,
+    "mittel": 6.28,
+    "oben": 9.22,
+    "seite": "11"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.04,
+    "mittel": 6.58,
+    "oben": 7.5,
+    "seite": "11"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 4.95,
+    "mittel": 5.91,
+    "oben": 7.4,
+    "seite": "11"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 6.6,
+    "mittel": 8.06,
+    "oben": 11,
+    "seite": "11"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 4.93,
+    "mittel": 5.64,
+    "oben": 6.99,
+    "seite": "11"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.55,
+    "mittel": 6.26,
+    "oben": 7.8,
+    "seite": "11"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 4.74,
+    "mittel": 5.3,
+    "oben": 6,
+    "seite": "11"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 6.08,
+    "mittel": 6.26,
+    "oben": 6.77,
+    "seite": "11"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 6.5,
+    "mittel": 8.24,
+    "oben": 10.49,
+    "seite": "11"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 4.89,
+    "mittel": 6.02,
+    "oben": 7.05,
+    "seite": "11"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.5,
+    "mittel": 6,
+    "oben": 6.7,
+    "seite": "11"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 4.53,
+    "mittel": 5.08,
+    "oben": 5.98,
+    "seite": "11"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.94,
+    "mittel": 6.39,
+    "oben": 7.5,
+    "seite": "11"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 6.53,
+    "mittel": 7.63,
+    "oben": 9.05,
+    "seite": "11"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 4.65,
+    "mittel": 5.6,
+    "oben": 6.5,
+    "seite": "11"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 6.24,
+    "mittel": 6.33,
+    "oben": 6.5,
+    "seite": "11"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 4.9,
+    "mittel": 5.84,
+    "oben": 7.25,
+    "seite": "11"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.52,
+    "mittel": 6,
+    "oben": 6.46,
+    "seite": "11"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 6.46,
+    "mittel": 7.32,
+    "oben": 8.5,
+    "seite": "11"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1930,
+    "wfl": 75
+   },
+   "erwartet": {
+    "unten": 4.89,
+    "mittel": 6.02,
+    "oben": 7.05
+   },
+   "seite": "14",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Berechnungsbeispiel Feld C1 (Tabellenwerte; Spanneneinordnung −20 % → 5,79 € nicht abgebildet)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 50
+   },
+   "erwartet": {
+    "unten": 4.74,
+    "mittel": 5.3,
+    "oben": 6
+   },
+   "seite": "14–15",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Berechnungsbeispiel Feld B3 (Tabellenwerte)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 35
+   },
+   "erwartet": null,
+   "seite": "11",
+   "art": "tabellenzelle"
+  }
+ ]
+}

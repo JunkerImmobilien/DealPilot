@@ -1,0 +1,340 @@
+{
+ "ags": "13071107",
+ "gemeinde": "Neubrandenburg",
+ "art": "qualifiziert",
+ "stand": "2025-07-01",
+ "erhebungsstichtag": "2024-10-31",
+ "gueltig_ab": "2025-07-01",
+ "gueltig_bis": "2027-06-30",
+ "quelle": {
+  "url": "https://www.neubrandenburg.de/media/custom/3330_7534_1.PDF?1751262492",
+  "dokument": "Qualifizierter Mietspiegel der Vier-Tore-Stadt Neubrandenburg, gültig vom 1. Juli 2025 bis 30. Juni 2027, Stichtag der Vermieterbefragung 31. Oktober 2024",
+  "seite": "Broschüre S. 27 (Tabelle „Vier-Tore-Stadt Neubrandenburg“, PDF-S. 28), S. 6 (Ausstattungsmerkmale a–n), PDF-S. 2 (Gültigkeit, Stichtag)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Vier-Tore-Stadt Neubrandenburg",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Gesamtstädtische Tabelle (S. 27): Mietzinsspanne (2/3 der Mieten) und Mittelwert in Klammern, nach Ausstattung × Wohnungsgröße × Baujahr. Ausstattung ergibt sich aus der Zahl der erfüllten Merkmale a–n (S. 6): 0–3 einfach, 4–8 gut, 9–14 sehr gut — das Dokument nennt keinen Standard, ohne Angabe daher kein Wert. Die zehn Stadtgebiets-Tabellen (S. 16–26, Stadtgebiet aus dem Straßenverzeichnis) sind NICHT übernommen; wo sie „xxx“ zeigen, gilt laut Dokument ohnehin die gesamtstädtische Tabelle. Felder „xxx“ (keine ausreichende Anzahl) weggelassen. Am gerenderten Bild abgelesen und mit der Textschicht abgeglichen.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1970,
+     "label": "bis 1970"
+    },
+    {
+     "von": 1971,
+     "bis": 1990,
+     "label": "1971 bis 1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2013,
+     "label": "1991 bis 2013"
+    },
+    {
+     "von": 2014,
+     "bis": null,
+     "label": "ab 2014"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 40,
+     "bis_inkl": false,
+     "label": "unter 40 m²"
+    },
+    {
+     "von": 40,
+     "bis": 70,
+     "label": "40 m² bis 70 m²"
+    },
+    {
+     "von": 70,
+     "bis": null,
+     "von_inkl": false,
+     "label": "über 70 m²"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "einfach",
+     "label": "einfache Ausstattung (0–3 Merkmale)"
+    },
+    {
+     "schluessel": "gut",
+     "label": "gute Ausstattung (4–8 Merkmale)"
+    },
+    {
+     "schluessel": "sehr_gut",
+     "label": "sehr gute Ausstattung (9–14 Merkmale)",
+     "aliase": [
+      "sehr gut"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "einfach",
+    "unten": 6.1,
+    "mittel": 6.97,
+    "oben": 7.68,
+    "seite": "27"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "einfach",
+    "unten": 5.5,
+    "mittel": 6.31,
+    "oben": 6.78,
+    "seite": "27"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "einfach",
+    "unten": 5.3,
+    "mittel": 5.83,
+    "oben": 7,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "einfach",
+    "unten": 5,
+    "mittel": 5.35,
+    "oben": 5.83,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "einfach",
+    "unten": 3.8,
+    "mittel": 4.54,
+    "oben": 5.32,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "einfach",
+    "unten": 3.96,
+    "mittel": 4.45,
+    "oben": 4.94,
+    "seite": "27"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "gut",
+    "unten": 6.87,
+    "mittel": 7.69,
+    "oben": 9.66,
+    "seite": "27"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "gut",
+    "unten": 6.03,
+    "mittel": 6.5,
+    "oben": 7.23,
+    "seite": "27"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "gut",
+    "unten": 5.78,
+    "mittel": 6.5,
+    "oben": 7.3,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "gut",
+    "unten": 5.07,
+    "mittel": 5.8,
+    "oben": 6.42,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "gut",
+    "unten": 4.37,
+    "mittel": 5.25,
+    "oben": 5.91,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "gut",
+    "unten": 4.29,
+    "mittel": 4.98,
+    "oben": 5.55,
+    "seite": "27"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "gut",
+    "unten": 9.5,
+    "mittel": 9.97,
+    "oben": 10,
+    "seite": "27"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "gut",
+    "unten": 6.71,
+    "mittel": 7.39,
+    "oben": 8.07,
+    "seite": "27"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "gut",
+    "unten": 6.54,
+    "mittel": 7.25,
+    "oben": 8,
+    "seite": "27"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "sehr_gut",
+    "unten": 6.47,
+    "mittel": 7.75,
+    "oben": 10.2,
+    "seite": "27"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "sehr_gut",
+    "unten": 6.15,
+    "mittel": 8.26,
+    "oben": 10.03,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "sehr_gut",
+    "unten": 5.63,
+    "mittel": 5.97,
+    "oben": 6.37,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "sehr_gut",
+    "unten": 5.24,
+    "mittel": 5.66,
+    "oben": 6.03,
+    "seite": "27"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "sehr_gut",
+    "unten": 5.01,
+    "mittel": 5.39,
+    "oben": 5.74,
+    "seite": "27"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "sehr_gut",
+    "unten": 7,
+    "mittel": 7.93,
+    "oben": 9.52,
+    "seite": "27"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "sehr_gut",
+    "unten": 6.77,
+    "mittel": 7.57,
+    "oben": 8.82,
+    "seite": "27"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "sehr_gut",
+    "unten": 8.43,
+    "mittel": 9.14,
+    "oben": 10.66,
+    "seite": "27"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "sehr_gut",
+    "unten": 7.8,
+    "mittel": 8.74,
+    "oben": 10,
+    "seite": "27"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 55,
+    "ausstattung": "gut"
+   },
+   "erwartet": {
+    "unten": 4.37,
+    "mittel": 5.25,
+    "oben": 5.91
+   },
+   "seite": "27",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2016,
+    "wfl": 80,
+    "ausstattung": "sehr_gut"
+   },
+   "erwartet": {
+    "unten": 7.8,
+    "mittel": 8.74,
+    "oben": 10
+   },
+   "seite": "27",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2016,
+    "wfl": 80,
+    "ausstattung": "einfach"
+   },
+   "erwartet": null,
+   "seite": "27",
+   "art": "tabellenzelle"
+  }
+ ]
+}

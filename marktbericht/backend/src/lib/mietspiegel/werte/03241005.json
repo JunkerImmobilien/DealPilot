@@ -1,0 +1,284 @@
+{
+ "ags": "03241005",
+ "gemeinde": "Garbsen",
+ "art": "qualifiziert",
+ "stand": "2025-04-01",
+ "erhebungsstichtag": "2025-04-01",
+ "gueltig_ab": "2025-12-08",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.hannover.de/content/download/644659/file/Mietspiegel_Garbsen_2025.pdf",
+  "dokument": "Mietspiegel der Stadt Garbsen 2025 (qualifiziert, vom Rat der Stadt Garbsen anerkannt), Tabelle 5.1, Berechnungsbeispiel Feld B2",
+  "seite": "S. 9 (Tabelle 5.1 und Berechnungsbeispiel Feld B2), S. 5 (Stichtag 1. April 2025, gilt ab Anerkennung)",
+  "lizenz": "keine Lizenzangabe; amtliche Veröffentlichung (§ 558c Abs. 4 BGB)",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Erhebungsstichtag 1. April 2025; gilt ab dem Tag der Anerkennung durch den Rat — „gueltig_ab“ aus dem Mietspiegel-Verzeichnis (08.12.2025). Mittelwert = arithmetisches Mittel, Spanne = 4/5-Spanne. Keine Wohnlagen-Gliederung. Grau hinterlegte Felder (10–29 Datensätze, Qualität eines einfachen Mietspiegels) übernommen: A1, E2, F2, E3, E4. Leerfelder (E1, F1) weggelassen. Spanneneinordnung über Ausstattungspunkte (S. 8–9) nicht abgebildet. Tabelle am gerenderten Bild abgelesen.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "A: bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1967,
+     "label": "B: 1961 bis 1967"
+    },
+    {
+     "von": 1968,
+     "bis": 1994,
+     "label": "C: 1968 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2014,
+     "label": "D: 1995 bis 2014"
+    },
+    {
+     "von": 2015,
+     "bis": 2020,
+     "label": "E: 2015 bis 2020"
+    },
+    {
+     "von": 2021,
+     "bis": 2025,
+     "label": "F: 2021 bis 03/2025"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "bis_inkl": false,
+     "label": "1: unter 45 m²"
+    },
+    {
+     "von": 45,
+     "bis": 65,
+     "bis_inkl": false,
+     "label": "2: 45 m² bis unter 65 m²"
+    },
+    {
+     "von": 65,
+     "bis": 85,
+     "bis_inkl": false,
+     "label": "3: 65 m² bis unter 85 m²"
+    },
+    {
+     "von": 85,
+     "bis": null,
+     "label": "4: 85 m² und mehr"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 6.15,
+    "mittel": 7.68,
+    "oben": 9.52,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.87,
+    "mittel": 8,
+    "oben": 9.36,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6.97,
+    "mittel": 8.61,
+    "oben": 10.56,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 8.72,
+    "mittel": 9.24,
+    "oben": 10.15,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.13,
+    "mittel": 7.15,
+    "oben": 8.54,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 6.5,
+    "mittel": 7.68,
+    "oben": 8.78,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 6.44,
+    "mittel": 7.99,
+    "oben": 9.99,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 6.96,
+    "mittel": 8.85,
+    "oben": 10.77,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 7.94,
+    "mittel": 9.97,
+    "oben": 11.32,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 11.09,
+    "mittel": 13.53,
+    "oben": 16.88,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 6.09,
+    "mittel": 7.5,
+    "oben": 9.05,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 6.28,
+    "mittel": 7.47,
+    "oben": 8.73,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 6.62,
+    "mittel": 8.02,
+    "oben": 9.61,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 6.74,
+    "mittel": 8.49,
+    "oben": 10.36,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 8.99,
+    "mittel": 10.28,
+    "oben": 12.02,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 11.08,
+    "mittel": 12.75,
+    "oben": 14.22,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.83,
+    "mittel": 7.21,
+    "oben": 8.48,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 6.18,
+    "mittel": 7.68,
+    "oben": 9.38,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 6.35,
+    "mittel": 7.8,
+    "oben": 9.41,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 6.96,
+    "mittel": 8.33,
+    "oben": 9.69,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 9.08,
+    "mittel": 10.43,
+    "oben": 11.79,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 10.98,
+    "mittel": 11.91,
+    "oben": 13.53,
+    "seite": "9"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 55
+   },
+   "erwartet": {
+    "unten": 6.5,
+    "mittel": 7.68,
+    "oben": 8.78
+   },
+   "seite": "9",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Berechnungsbeispiel Feld B2"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2018,
+    "wfl": 40
+   },
+   "erwartet": null,
+   "seite": "9",
+   "art": "tabellenzelle"
+  }
+ ]
+}
