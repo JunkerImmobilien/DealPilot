@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-09T10:12:37.418Z",
+ "erzeugt_am": "2026-11-09T10:13:33.858Z",
  "quellen": {
   "voice-import": "93c6117a13546a53",
   "objektart-felder": "f7d9212555982a97",
   "storage": "c2e7c9ad8bc3ab23",
-  "index-html": "4273b8534a1a82b1",
+  "index-html": "11ce6cbc65c7706a",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -1186,7 +1186,7 @@
    {
     "id": "d1t",
     "kind": "text",
-    "label": "Tilgung — bei Aussetzung deaktiviert"
+    "label": "Tilgung"
    },
    {
     "id": "d1_bindj",

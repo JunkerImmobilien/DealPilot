@@ -515,6 +515,12 @@ window.DpDetailgradZuordnung = {
       "art": "karte",
       "js": "wert-zielbild.js",
       "titel": "Wert & Zielbild"
+     },
+     {
+      "s": "#mfh-istsoll",
+      "art": "karte",
+      "js": "mfh-einheiten.js",
+      "titel": "Ist gegen Soll · Einheiten"
      }
     ],
     "felder": []

@@ -122,7 +122,22 @@
   }
 
   // ── Parser ──────────────────────────────────────────────────────
+  /* v3256 · Ziel 'dw:<i>' = Eintrag i der Liste „Weitere Darlehen" (#darlehen_weitere).
+     Gelesen wird mit DENSELBEN Mustern wie Darlehen II (kein Auszahlungsdatum, keine
+     Vertragsnummer), danach auf die Felder des Eintrags umgeschrieben:
+     betrag · zins · tilg · bindj · art · bez (Bank als Bezeichnung). */
   function _parseFinancingPdf(text, target) {
+    var dwM = /^dw:(\d+)$/.exec(String(target || ''));
+    if (dwM) {
+      var r2 = _parseFinancingPdf(text, 'd2'), f2 = r2.fields || {}, fw = {};
+      if (f2.d2 != null) fw.dw_betrag = f2.d2;
+      if (f2.d2z != null) fw.dw_zins = f2.d2z;
+      if (f2.d2t != null) fw.dw_tilg = f2.d2t;
+      if (f2.d2_bindj != null) fw.dw_bindj = f2.d2_bindj;
+      if (f2.d2_type) fw.dw_art = f2.d2_type;
+      if (f2.d2_inst) fw.dw_bez = f2.d2_inst;
+      return { _target: 'dw', _dwIndex: +dwM[1], _detectedType: 'dw', fields: fw, _meta: r2._meta };
+    }
     var lower = text.toLowerCase();
     var result = { _target: target, _detectedType: null, fields: {}, _meta: {} };
 
@@ -305,8 +320,15 @@
   function _showResultDialog(result) {
     var existing = document.getElementById('finpdf-modal'); if (existing) existing.remove();
     var target = result._target;
-    var labelMap = { d1: 'Darlehen 1', d2: 'Darlehen 2', bspar: 'Bausparvertrag' };
+    var labelMap = { d1: 'Darlehen I', d2: 'Darlehen II', bspar: 'Bausparvertrag' };
     var typeName = labelMap[target] || target;
+    /* v3256 · weiteres Darlehen: Name wie in der Liste (Darlehen III, IV, … oder Bezeichnung) */
+    if (target === 'dw') {
+      var _dwK = window.DpDarlehenWeitere, _dwRoh = (window.DpDarlehenWeitereUi && window.DpDarlehenWeitereUi.roh()) || [];
+      var _dwE = _dwRoh[result._dwIndex] || {};
+      typeName = _dwK ? _dwK.name({ bez: String(_dwE.bez || '').trim(), nr: result._dwIndex }, result._dwIndex)
+        : ('weiteres Darlehen ' + (result._dwIndex + 1));
+    }
 
     var fieldLabels = {
       d1: 'Darlehenssumme (€)', d1z: 'Zinssatz nominal (%)', d1t: 'Tilgung (%)',
@@ -316,7 +338,9 @@
       d2_bindj: 'Zinsbindung (Jahre)', d2_inst: 'Bank', d2_type: 'Darlehenstyp',
       bspar_sum: 'Bausparsumme (€)', bspar_rate: 'Sparrate / Monat (€)',
       bspar_zuteil: 'Zuteilungsdatum', bspar_inst: 'Bausparkasse',
-      bspar_vertrag: 'Vertragsnummer', bspar_zins: 'Guthabenzins (%)'
+      bspar_vertrag: 'Vertragsnummer', bspar_zins: 'Guthabenzins (%)',
+      dw_betrag: 'Darlehenssumme (€)', dw_zins: 'Zinssatz nominal (%)', dw_tilg: 'Tilgung (%)',
+      dw_bindj: 'Zinsbindung (Jahre)', dw_art: 'Darlehensart', dw_bez: 'Bezeichnung (Bank)'   /* v3256 */
     };
 
     var fields = result.fields || {};
@@ -338,7 +362,7 @@
             '</svg>' +
           '</button>' +
         '</div>' +
-        '<div class="iexp-body" id="finpdf-body">' +
+        '<div class="iexp-body" id="finpdf-body"' + (target === 'dw' ? ' data-dw="' + result._dwIndex + '"' : '') + '>' +
           (!keys.length ?
             '<div style="padding:20px; text-align:center; color:#7A7370">' +
             '⚠ Keine Werte erkannt. Bitte manuell eingeben.</div>' :
@@ -368,6 +392,19 @@
   };
 
   window.applyFinPdfValues = function() {
+    /* v3256 · weiteres Darlehen: in den Listeneintrag schreiben, nicht in Formularfelder */
+    var _body = document.getElementById('finpdf-body');
+    if (_body && _body.hasAttribute('data-dw')) {
+      var _w = {};
+      [].forEach.call(document.querySelectorAll('#finpdf-body input[data-field]'), function (inp) {
+        _w[inp.dataset.field.replace(/^dw_/, '')] = inp.value;
+      });
+      var _ok = !!(window.DpDarlehenWeitereUi && typeof window.DpDarlehenWeitereUi.uebernehmen === 'function'
+        && window.DpDarlehenWeitereUi.uebernehmen(+_body.getAttribute('data-dw'), _w));
+      closeFinPdfModal();
+      if (typeof toast === 'function') toast(_ok ? '✓ Werte übernommen' : '⚠ Darlehen nicht gefunden — Werte bitte von Hand eintragen');
+      return;
+    }
     var inputs = document.querySelectorAll('#finpdf-body input[data-field]');
     inputs.forEach(function(inp) {
       var fieldId = inp.dataset.field;

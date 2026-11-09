@@ -176,9 +176,22 @@ window.DpDarlehenWeitere = (function () {
     return laufen(n, 0, (n.bindj || 10) * 12);
   }
 
+  /* v3256 · Monatsplan EINES Eintrags ab Auszahlung (Monat 0) fuer den Dialog
+     „Tilgungsplan / Zinsplan ansehen" je weiterem Darlehen. Dieselbe Schleife
+     laufen() wie plan() und restNach() - keine zweite Rechnung.
+     Liefert [{ m, rate, zins, tilg, rs }]; rs = Restschuld nach dem Monat. */
+  function monatsplan(e, monate) {
+    var n = lesen([e])[0]; if (!n) return [];
+    var bis = Math.max(0, Math.min(1200, Math.round(monate || 0)));
+    var aus = [];
+    laufen(n, 0, bis, function (m, zm, tm, rs) { aus.push({ m: m, rate: zm + tm, zins: zm, tilg: tm, rs: rs }); });
+    return aus;
+  }
+
   return {
-    version: 'v3215',
+    version: 'v3256',
     lesen: lesen, anfang: anfang, plan: plan, restNach: restNach, ausObjekt: ausObjekt, basisJahrAus: basisJahrAus,
-    restBindungsende: restBindungsende, rateM: rateM, abKauf: abKauf, name: name, zahl: zahl
+    restBindungsende: restBindungsende, rateM: rateM, abKauf: abKauf, name: name, zahl: zahl,
+    monatsplan: monatsplan
   };
 })();

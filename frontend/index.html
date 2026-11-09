@@ -55,7 +55,7 @@
 <link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3196"><!-- v3185 -->
 <link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3196"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
 <link rel="stylesheet" href="css/objektdaten-raster.css?v=v3225a"><!-- v3225 - Marcel 08.11.2026: Objektdaten in Gruppen, Wertanker-Vergleich als eigene Zeile -->
-<link rel="stylesheet" href="css/finanzierung-raster.css?v=v3238"><!-- v3238 - Marcel 09.11.2026: Reiter Finanzierung in Gruppen, Anschlussfinanzierung als eigener Kasten -->
+<link rel="stylesheet" href="css/finanzierung-raster.css?v=v3256"><!-- v3238 - Marcel 09.11.2026: Reiter Finanzierung in Gruppen, Anschlussfinanzierung als eigener Kasten -->
 <link rel="stylesheet" href="css/deal-aktion-karten.css?v=v3253"><!-- v3232 · Marcel 08.11.2026: Deal-Aktion in weißen Karten wie Reiter Objekt -->
 <link rel="stylesheet" href="css/objekt-ansichten.css?v=v3247"><!-- v3237 · Marcel 09.11.2026: Reiter Objekt - Lage kompakt, Wertparameter als Kacheln, Bodenrichtwert-Karte -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
@@ -2855,11 +2855,11 @@ label.dp-required.qc-required::after {
         <div class="fz-raster fz-kond">
           <div class="f fz-s2"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div><div class="cf-hint" id="d1-herleitung" style="margin-top:4px"></div></div>
           <div class="f"><label class="dp-required" data-v236-required-set="1" title="Zinssatz nominal (% p.a.)">Zinssatz nominal <button type="button" class="dp-tip" data-tip-id="tab5.zinssatz" tabindex="-1" aria-label="Hilfe zu Zinssatz nominal"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1" title="Tilgung (% p.a.)">Tilgung <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1" title="Tilgung (% p.a.)">Tilgung <span class="cf-hint" id="d1t_hint" style="display:none"></span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
           <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d1_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc(); calcD1Volltilgung()"><span class="sfx">J.</span></div></div>
           <div class="f"><label title="Monatliche Rate (berechnet)">Rate / Monat</label><div class="cf" id="d1_rate">—</div></div>
           <div class="f"><label>davon Zinsen</label><div class="cf" id="d1_zm">—</div></div>
-          <div class="f"><label>davon Tilgung</label><div class="cf" id="d1_tm">—</div></div>
+          <div class="f"><label id="d1_tm_lbl">davon Tilgung</label><div class="cf" id="d1_tm">—</div></div><!-- v3256: bei Tilgungsaussetzung „Sparrate Bausparvertrag" (financing.js _wortwahl) -->
           <!-- v1244 · Testbericht Block F: „Sollte hier die Reihenfolge nicht
                anders sein? Erst eintragen was fuer ein Kredit ich bekomme und
                den EK-Einsatz berechnet er automatisch (wie Immocation Tool)"
@@ -2871,25 +2871,29 @@ label.dp-required.qc-required::after {
                es irgendwo stand. Die EK-Rendite rechnete trotzdem auf 20.000.
                Diese Zeile schliesst die Luecke in beide Richtungen. -->
           <div class="f fz-voll" id="kapital-deckung" style="margin-top:2px">
-            <div id="kd-box" style="border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.55;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-              <div style="flex:1;min-width:230px">
+            <!-- v3256 · Marcel 09.11.2026: Knoepfe rechts neben den Text, untereinander, Box kleiner
+                 (css/finanzierung-raster.css .kd-knoepfe) -->
+            <div id="kd-box" style="border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.45;display:flex;align-items:center;gap:10px">
+              <div style="flex:1;min-width:0">
                 <div id="kd-zeile"><span class="cf-hint">Kapitaldeckung wird berechnet …</span></div>
-                <div id="kd-rechnung" class="cf-hint" style="margin-top:3px"></div>
+                <div id="kd-rechnung" class="cf-hint" style="margin-top:2px"></div>
               </div>
-              <button type="button" class="btn btn-outline btn-sm" id="kd-btn-ek" onclick="dpKapitalEkSetzen()" style="display:none">Eigenkapital passend setzen</button>
-              <button type="button" class="btn btn-outline btn-sm" id="kd-btn-d1" onclick="dpKapitalDarlehenSetzen()" style="display:none">Darlehen passend setzen</button>
+              <div class="kd-knoepfe">
+                <button type="button" class="btn btn-outline btn-sm" id="kd-btn-ek" onclick="dpKapitalEkSetzen()" style="display:none">Eigenkapital passend setzen</button>
+                <button type="button" class="btn btn-outline btn-sm" id="kd-btn-d1" onclick="dpKapitalDarlehenSetzen()" style="display:none">Darlehen passend setzen</button>
+              </div>
             </div>
           </div>
         </div>
         <div class="fz-raster fz-verlauf">
           <div class="f fz-s2"><label>Restschuld Ende Zinsbindung</label><div class="cf" id="restschuld">—</div></div>
           <div class="f"><label>Zinsbindung bis</label><div class="cf" id="bindend">—</div></div>
-          <div class="f"><label>Volltilgung (ca.)</label><div class="cf" id="volltilg">—</div></div>
+          <div class="f"><label id="volltilg_lbl">Volltilgung (ca.)</label><div class="cf" id="volltilg">—</div></div>
         </div>
         <!-- V63.57: Tilgungsplan-Anzeige (Modal) und PDF-Import für D1 -->
         <div class="fz-werkzeuge">
           <button type="button" class="btn-ghost btn-sm" onclick="openTilgungsplanModal()" id="tilg_toggle_btn">
-            <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg> Tilgungsplan ansehen & bearbeiten</span>
+            <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg> <span id="tilg_toggle_lbl">Tilgungsplan</span> ansehen & bearbeiten</span>
           </button>
           <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('d1')" title="Bankvertrag scannen — Werte werden automatisch übernommen">
             <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Daten aus Bank-PDF importieren</span>
@@ -3543,6 +3547,13 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
+  <!-- v3256 · Marcel 09.11.2026: „Woher kommt das Ist gegen Soll mit den sechs Einheiten im Tab
+       Finanzierung? … was hat das dort zu suchen?" Die Karte (v1451, MFH Stufe 2) vergleicht
+       Kaltmiete, Bruttomietrendite und DSCR heute gegen die Soll-Mieten der Einheiten - das sind
+       Kennzahlen, also steht sie jetzt hier unter „Alle Kennzahlen". Gefuellt von
+       js/mfh-einheiten.js istSoll(); nur sichtbar bei Objektart mit Einheiten und Soll-Mieten. -->
+  <div class="card" id="mfh-istsoll" style="display:none"></div>
+
   <!-- V63.57: Vermögenszuwachs-Aufschlüsselung (wie Excel ImmoKalk) -->
   <!-- V63.57: Bausparvertrag-Übersicht (nur bei Tilgungsaussetzung sichtbar) -->
   <div class="card" id="bsv-summary-card" style="display:none">
@@ -3828,7 +3839,7 @@ label.dp-required.qc-required::after {
 <script src="js/schwellen.js?v=v2240"></script><!-- v2240 · EINE Quelle fuer die Ampel-Schwellen (DSCR/LTV/Cashflow) aus den Einstellungen -->
 <script src="js/dp-qr.js?v=v2180"></script>
 <script src="js/hausgeld-engine.js?v=v2191a"></script>
-<script src="js/darlehen-weitere.js?v=v3215"></script><!-- v3215 · W-17: Kern weitere Darlehen, VOR deal-kpis.js und calc.js -->
+<script src="js/darlehen-weitere.js?v=v3256"></script><!-- v3215 · W-17: Kern weitere Darlehen, VOR deal-kpis.js und calc.js -->
 <script src="js/deal-kpis.js?v=v3215"></script>
 <script src="js/afa-engine.js?v=v3006"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
@@ -3900,7 +3911,7 @@ label.dp-required.qc-required::after {
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=v2247d"></script>
 <script src="js/market-rates-pf.js?v=v2254"></script>
-<script src="js/indicative-zins.js?v=v3194"></script>
+<script src="js/indicative-zins.js?v=v3256"></script>
 <script src="js/market-context.js?v=jw1107"></script>
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=v3032"></script>
@@ -3941,11 +3952,11 @@ label.dp-required.qc-required::after {
 <script src="js/unterlagen.js?v=v3211"></script>
 <script src="js/sonderumlage.js?v=v3221"></script>
 <script src="js/sanierung-plan.js?v=v3223"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
-<script src="js/darlehen-weitere-ui.js?v=v3215"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
+<script src="js/darlehen-weitere-ui.js?v=v3256"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
 
 <script src="js/beleg-import.js?v=v3166"></script>
-<script src="js/financing.js?v=v3215"></script>
-<script src="js/financing-pdf.js?v=v2932"></script>
+<script src="js/financing.js?v=v3256"></script>
+<script src="js/financing-pdf.js?v=v3256"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v3213"></script>
@@ -3956,14 +3967,14 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
-<script src="js/data/detailgrad-zuordnung.js?v=v3243"></script>
+<script src="js/data/detailgrad-zuordnung.js?v=v3256"></script>
 <script src="js/detailgrad.js?v=v3243"></script>
 <script src="js/objekt-reiter.js?v=v3252"></script>
 <script src="js/paket-import.js?v=v3204"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3252"></script>
+<script src="js/mfh-einheiten.js?v=v3256"></script>
 <script src="js/mfh-felder.js?v=v3247"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->

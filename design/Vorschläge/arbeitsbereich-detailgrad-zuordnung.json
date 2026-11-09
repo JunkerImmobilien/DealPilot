@@ -521,6 +521,12 @@
             "selektor": "#card-wert-zielbild",
             "art": "karte",
             "js": "wert-zielbild.js"
+          },
+          {
+            "titel": "Ist gegen Soll · Einheiten",
+            "selektor": "#mfh-istsoll",
+            "art": "karte",
+            "js": "mfh-einheiten.js"
           }
         ],
         "felder": []
