@@ -12,7 +12,7 @@
   },
   "einheit": "eur_qm_nettokalt",
   "form": "tabelle",
-  "hinweis": "„mittel“ ist laut Tabelle der Median (erstmals 2025). Alle Felder gelten nur für Wohnungen mit Bad und Sammelheizung. Gültigkeitsbeginn im Dokument nicht genannt. Die Wohnflächenklassen unterscheiden sich je Wohnlage: Index 3 (ab 91 m²) nur normale, Index 4 und 5 nur gute Wohnlage — die Zelle wird über Baujahr, Fläche UND Lage gesucht. Baualtersgrenze 1948 liegt im Jahr (F bis 20.6.1948, H ab 21.6.1948). Leerfelder (zu geringe Datenbasis) fehlen: 5/P und 9/I. „feld“ = Zeilennummer/Baualtersbuchstabe der Tabelle. Wohnlage aus dem Wohnlagenverzeichnis der Stadt.",
+  "hinweis": "„mittel“ ist laut Tabelle der Median (erstmals 2025). Alle Felder gelten nur für Wohnungen mit Bad und Sammelheizung. Gültigkeitsbeginn im Dokument nicht genannt. Die Wohnflächenklassen unterscheiden sich je Wohnlage: Index 3 (ab 91 m²) nur normale, Index 4 und 5 nur gute Wohnlage — die Zelle wird über Baujahr, Fläche UND Lage gesucht. Baualtersgrenze 1948 liegt im Jahr (F bis 20.6.1948, H ab 21.6.1948): Baujahr 1948 ist nur mit Datum eindeutig (bis_datum/von_datum an der Achse); mit Jahreszahl allein treffen zwei Felder. Leerfelder (zu geringe Datenbasis) fehlen: 5/P und 9/I. „feld“ = Zeilennummer/Baualtersbuchstabe der Tabelle. Wohnlage aus dem Wohnlagenverzeichnis der Stadt.",
   "tabelle": {
     "grenzen": {
       "baujahr": "von und bis einschließlich (Jahre)",
@@ -21,8 +21,8 @@
     "achsen": {
       "baujahr": [
         {"bis": 1918, "label": "bis 31.12.1918 (C)"},
-        {"von": 1919, "bis": 1948, "label": "1.1.1919 bis 20.6.1948 (F)"},
-        {"von": 1948, "bis": 1960, "label": "21.6.1948 bis 1960 (H)"},
+        {"von": 1919, "bis": 1948, "label": "1.1.1919 bis 20.6.1948 (F)", "bis_datum": "1948-06-20"},
+        {"von": 1948, "bis": 1960, "label": "21.6.1948 bis 1960 (H)", "von_datum": "1948-06-21"},
         {"von": 1961, "bis": 1967, "label": "1961 bis 1967 (I)"},
         {"von": 1968, "bis": 1977, "label": "1968 bis 1977 (K)"},
         {"von": 1978, "bis": 1993, "label": "1978 bis 1993 (L)"},
