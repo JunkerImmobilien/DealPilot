@@ -331,7 +331,8 @@ var DealScore = (function() {
       color: color,
       label: label,
       breakdown: components,
-      interpretation: (_dk && scoreOhneDeckel > _dk.max ? 'Begrenzt auf höchstens ' + _dk.max + ': ' + deckel + ' (ohne Grenze ' + scoreOhneDeckel + '). ' : '') + _interpret(score, components, K),
+      /* v3254 · die Grenze als verständlicher Satz aus score-tiers.js (ScoreTier.deckelSatz) */
+      interpretation: (_dk && scoreOhneDeckel > _dk.max ? ((window.ScoreTier && window.ScoreTier.deckelSatz) ? window.ScoreTier.deckelSatz(_dk, scoreOhneDeckel) : 'Begrenzt auf höchstens ' + _dk.max + ': ' + deckel + ' (ohne Grenze ' + scoreOhneDeckel + ').') + ' ' : '') + _interpret(score, components, K),
       weights: weights,
       deckel: deckel,   /* v3069 */
       zustand_deckel: _zd ? _zd.grund : null,   /* v3075 */

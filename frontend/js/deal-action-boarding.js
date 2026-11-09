@@ -112,16 +112,23 @@
          Eigentlich brauchen wir ja nur … eine vollumfängliche Version und das Investment PDF als
          Kurzfassung." Zwei benannte Knöpfe statt Dialog. Darunter die Steuer-Ausgaben des BMF-Rechners,
          die hier bisher fehlten - jede nur aktiv, wenn sie gezogen werden kann. */
-      grp('Investment &amp; Bank') +
-      investRow() +
-      docRow('track', 'Track Record', 'Auswahl-Ansicht öffnen: gewonnene Deals filtern, Einzel- oder Sammel-PDF erzeugen.', false) +
-      docRow('selbst', 'Selbstauskunft <span class="dab-doc-badge" style="background:#EDE8DC;color:#6A6360">Demo</span>', 'Für die Bank: Bestand, Darlehen und Mieten vorausgefüllt, Persönliches zum Ausfüllen.', false) +
-      grp('Steuer &amp; Finanzamt', '<button class="dab-doc-btn dab-doc-btn-neb" onclick="DealActionBoarding.exportDoc(\'bmf_rechner\')">BMF-Rechner öffnen</button>') +
-      faRow() +
+      /* v3253 · Marcel 09.11.2026: „Die Karten für Dokumente und Exporte … einfacher. Den Absprung in
+         den BMF-Rechner nehmen wir raus. Das bitte kompakter und schöner darstellen.“
+         Jede Ausgabe ist jetzt EINE gleich große Kachel: Symbol, Titel, eine Zeile Nutzen, ein Knopf.
+         Die Gruppenköpfe fallen, der Knopf „BMF-Rechner öffnen“ auch (das Modul bmf-modal-v292.js
+         bleibt - nur der Absprung aus der Deal-Aktion ist weg). Das Investment-PDF wird zu zwei
+         Kacheln (Vollständig / Kurzfassung) statt einer Kachel mit zwei Knöpfen.
+         Klassen .dab-doc-row/.dab-doc-n/.dab-doc-btn und exportDoc('…') im onclick bleiben:
+         deal-action-pdf-gate.js sperrt darüber die Plan-Knöpfe, tour-content.js zeigt darauf. */
+      kachel('invest_voll', IC_CHART, 'Investment-PDF <span class="dab-doc-badge">Empfohlen</span>', 'Alle Kapitel, bank-fertig.', 'PDF abrufen', { gold: true }) +
+      kachel('invest_kurz', IC_CHART, 'Investment-Kurzfassung', 'Das Wichtigste auf fünf bis sechs Seiten.', 'PDF abrufen') +
+      kachel('track', IC_STERN, 'Track Record', 'Gewonnene Deals als Einzel- oder Sammel-PDF.', 'Auswählen') +
+      kachel('selbst', IC_PERSON, 'Selbstauskunft <span class="dab-doc-badge" style="background:#EDE8DC;color:#6A6360">Demo</span>', 'Für die Bank, Bestand und Darlehen vorausgefüllt.', 'PDF abrufen') +
+      kachel('bmf', IC_FA, 'Finanzamt-PDF', 'Werbungskosten für die Anlage V, je Steuerjahr.', 'PDF', { attr: ' data-dok="fa"', jahr: true }) +
       '<div id="dab-st-fehlt" class="dab-st-fehlt" style="display:none"></div>' +
-      steuerRow('kpa', 'Kaufpreisaufteilung', 'Herleitung, gewählte Aufteilung, Vertragstext — Anlage für Finanzamt und Berater.', 'PDF') +
-      steuerRow('bmf_ah', 'BMF-Arbeitshilfe', 'Das amtliche Formular des BMF, mit den Werten des Objekts ausgefüllt.', 'PDF') +
-      steuerRow('bmf_xlsx', 'BMF-Original', 'Die Arbeitshilfe (Fassung Juni 2023) als Excel-Datei.', 'XLSX');
+      kachel('kpa', IC_BLATT, 'Kaufpreisaufteilung', 'Herleitung und Aufteilung für Finanzamt und Berater.', 'PDF abrufen', { attr: ' data-steuer="kpa"' }) +
+      kachel('bmf_ah', IC_BLATT, 'BMF-Arbeitshilfe', 'Das amtliche Formular, mit den Objektwerten ausgefüllt.', 'PDF abrufen', { attr: ' data-steuer="bmf_ah"' }) +
+      kachel('bmf_xlsx', IC_BLATT, 'BMF-Original', 'Die Arbeitshilfe (Juni 2023) als Excel-Datei.', 'XLSX laden', { attr: ' data-steuer="bmf_xlsx"' });
 
     return '' +
       '<div class="dab-cockpit" id="dab-cockpit">' +
@@ -144,7 +151,7 @@
         '<div class="dab-smart-body">' + docs + '</div>' +
       '</div></div>' +
 
-      band('doc', 'Marktberichte', 'Gespeicherte Berichte \u2014 ansehen oder als PDF abrufen') +
+      band('doc', 'Marktberichte', 'Gespeicherte Berichte als PDF') +   /* v3253 \u00b7 Marcel 09.11.2026: kein Absprung mehr in die Marktbericht-Ansicht, nur noch das PDF */
       '<div class="dab-panel"><div id="dab-mb-host" class="dab-mb-host"><div class="dab-mb-empty">L\u00e4dt \u2026</div></div></div>' +
       '<div id="dab-uew-slot"></div>' +
 
@@ -194,36 +201,23 @@
     return '<div class="dab-band"><div class="dab-band-ic"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + (icons[ic] || '') + '</svg></div><div class="dab-band-t">' + t + '</div><div class="dab-band-s">' + s + '</div></div>';
   }
 
-  function docRow(which, name, desc, gold) {
-    var badge = gold ? ' <span class="dab-doc-badge">Empfohlen</span>' : '';
-    var ic = (which === 'invest' || which === 'invest_bank')   /* v1436 */
-      ? '<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'
-      : which === 'bmf'
-        ? '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/>'
-        : which === 'selbst'
-          ? '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/>'
-          : '<path d="M12 2l2.5 5 5.5.8-4 3.9 1 5.5L12 15l-5 2.9 1-5.5-4-3.9 5.5-.8z"/>';
-    return '<div class="dab-doc-row"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ic + '</svg></div>' +
-      '<div class="dab-doc-x"><div class="dab-doc-n">' + name + badge + '</div><div class="dab-doc-d">' + desc + '</div></div>' +
-      '<div class="dab-doc-act"><button class="dab-doc-btn' + (gold ? ' gold' : '') + '" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + 'PDF</button></div></div>';
-  }
-  /* v3184 · Gruppenkopf der Dokumentliste */
-  function grp(t, rechts) {
-    return '<div class="dab-doc-grp"><span>' + t + '</span>' + (rechts || '') + '</div>';
-  }
-  /* v3184 · das Investment-PDF: zwei Fassungen, zwei Knöpfe - kein Dialog dazwischen */
-  function investRow() {
-    return '<div class="dab-doc-row"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>' +
-      '<div class="dab-doc-x"><div class="dab-doc-n">Investment-PDF <span class="dab-doc-badge">Empfohlen</span></div>' +
-      '<div class="dab-doc-d">Vollständig: alle Kapitel, bank-fertig (Finanzierung, Cashflow, DSCR/LTV, Wert &amp; Zielbild, Stress-Matrix). Kurzfassung: das Wichtigste auf fünf bis sechs Seiten.</div></div>' +
-      '<div class="dab-doc-act"><button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'invest_kurz\')">' + ICO.dl + 'Kurzfassung</button>' +
-      '<button class="dab-doc-btn gold" onclick="DealActionBoarding.exportDoc(\'invest_voll\')">' + ICO.dl + 'Vollständig</button></div></div>';
-  }
-  /* v3184 · eine Ausgabe des BMF-Rechners; aktiv erst, wenn die Werte reichen (steuerStand) */
-  function steuerRow(which, name, desc, knopf) {
-    return '<div class="dab-doc-row" data-steuer="' + which + '"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>' +
-      '<div class="dab-doc-x"><div class="dab-doc-n">' + name + '</div><div class="dab-doc-d">' + desc + '</div></div>' +
-      '<div class="dab-doc-act"><button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + knopf + '</button></div></div>';
+  /* v3253 · eine Kachel je Ausgabe (ersetzt docRow, grp, investRow, steuerRow und faRow).
+     o.gold: goldener Knopf · o.attr: data-steuer / data-dok für steuerStand() und dokSichtbar()
+     o.jahr: Steuerjahr-Auswahl (#dab-fa-year) vor dem Knopf - nur beim Finanzamt-PDF. */
+  var IC_CHART = '<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>';
+  var IC_STERN = '<path d="M12 2l2.5 5 5.5.8-4 3.9 1 5.5L12 15l-5 2.9 1-5.5-4-3.9 5.5-.8z"/>';
+  var IC_PERSON = '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/>';
+  var IC_FA = '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/>';
+  var IC_BLATT = '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>';
+  function kachel(which, ic, name, nutzen, knopf, o) {
+    o = o || {};
+    return '<div class="dab-doc-row dab-kachel"' + (o.attr || '') + '>' +
+      '<div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ic + '</svg></div>' +
+      '<div class="dab-doc-x"><div class="dab-doc-n">' + name + '</div><div class="dab-doc-d">' + nutzen + '</div></div>' +
+      '<div class="dab-doc-act">' +
+        (o.jahr ? '<select id="dab-fa-year" class="dab-fa-year" onfocus="DealActionBoarding.fillFaYears()" title="Steuerjahr für das Finanzamt-PDF"></select>' : '') +
+        '<button type="button" class="dab-doc-btn' + (o.gold ? ' gold' : '') + '" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + knopf + '</button>' +
+      '</div></div>';
   }
   /* v3184 · Marcel: „erst dann immer anzeigen, wenn die wirklich gezogen werden können. Ansonsten kann man
      sagen: fehlen noch Werte." Gelesen an denselben Pflichtfeldern wie bmf-ausgabe.js. */
@@ -390,13 +384,7 @@
   }
 
   /* v854: Finanzamt-PDF = Steuerformular (exportWerbungskostenPDF) mit Jahr-Auswahl */
-  function faRow() {
-    return '<div class="dab-doc-row" data-dok="fa"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/></svg></div>' +
-      '<div class="dab-doc-x"><div class="dab-doc-n">Finanzamt-PDF (Steuerformular)</div><div class="dab-doc-d">Werbungskosten-Aufschl\u00fcsselung f\u00fcr die Anlage V \u2014 Steuerjahr w\u00e4hlen oder Gesamt\u00fcbersicht \u00fcber alle Jahre.</div></div>' +
-      '<div class="dab-doc-act" style="display:flex;gap:8px;align-items:center;flex-shrink:0">' +
-      '<select id="dab-fa-year" class="dab-fa-year" onfocus="DealActionBoarding.fillFaYears()" title="Steuerjahr f\u00fcr das Finanzamt-PDF"></select>' +
-      '<button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'bmf\')">' + ICO.dl + 'PDF</button></div></div>';
-  }
+  /* v3253 - faRow() ist in kachel('bmf', ..., { jahr: true }) aufgegangen. */
   /* v3184 · kpaRow (Belege | BMF-Anlage) entfällt: Marcel 05.11.2026 „Belege muss raus. Wir sind hier nur bei
      Dokumente und Exporte.“ Die Kaufpreisaufteilung steht jetzt mit Arbeitshilfe und XLSX unter „Steuer & Finanzamt“. */
   function fillFaYears() {
@@ -1201,8 +1189,9 @@
        * gehen kann. */
       if (!reps.length) {
         host.innerHTML = '<div class="dab-mb-empty">Noch keine Marktberichte f\u00fcr dieses Objekt.'
+          /* v3253 · erstellt wird im Reiter Objekt (Box „Marktbericht abrufen“), nicht in der Marktbericht-Ansicht */
           + '<button type="button" class="dab-mb-tog" style="margin-left:10px"'
-          + ' onclick="if(typeof openMarktberichtView===\'function\')openMarktberichtView()">'
+          + ' onclick="if(typeof dpMbAbrufZeigen===\'function\')dpMbAbrufZeigen()">'
           + 'Marktbericht erstellen</button></div>';
         return;
       }
@@ -1251,7 +1240,7 @@
           + '<div class="dab-mbl-art"><b>' + art + '</b><span class="dab-mbl-adr">' + (weg.length ? weg.join(' · ') : adr) + '</span></div>'
           + mv
           + '<div class="dab-mbl-akt">'
-          + '<button type="button" class="dab-doc-btn" onclick="DealActionBoarding.zeigeBericht(' + rid + ')">Bericht ansehen</button>'
+          /* v3253 · Marcel 09.11.2026: „Bericht ansehen“ raus - das Marktbericht-Modul läuft nur im Hintergrund */
           + '<button type="button" class="dab-doc-btn" title="' + (drei ? 'Marktbericht als PDF (Wertermittlung mit Herleitung)' : 'Marktbericht als PDF') + '" onclick="' + pdf + '">' + ICO.dl + 'PDF abrufen</button>'
           /* v966-delbtn: endgueltiges Loeschen — Rueckfrage in deleteReport(). */
           + '<button type="button" class="dab-mb-del" title="Bericht endgültig löschen" data-adr="' + adr.replace(/"/g, '&quot;') + '" data-dat="' + dat + ' · ' + uhr + '" onclick="DealActionBoarding.deleteReport(' + rid + ')">✕</button>'
@@ -1441,29 +1430,10 @@
     }, 100);
   }
 
-  /* v3224 · „Bericht ansehen“: genau DIESEN Bericht im Marktbericht öffnen.
-     Der Marktbericht ist ein eigenes Dokument (iframe #mbv-frame, gleicher Ursprung);
-     dort lädt _mbOpenReport(rid) den gespeicherten Bericht per /reports/one und zeigt
-     ihn an - derselbe Weg wie „Ansehen“ in der Berichtsliste des Marktberichts.
-     Das iframe entsteht erst in openMarktberichtView(), deshalb wird auf
-     _mbOpenReport gewartet (bis 15 s), nicht vorausgesetzt. */
-  function zeigeBericht(rid) {
-    rid = rid | 0; if (!rid) return;
-    if (typeof window.openMarktberichtView !== 'function') { toast('Marktbericht ist gerade nicht verfügbar.'); return; }
-    Promise.resolve(window.openMarktberichtView()).then(function () {
-      var n = 0;
-      var uhr = setInterval(function () {
-        n++;
-        var w = null, ok = false;
-        try {
-          var fr = document.getElementById('mbv-frame'); w = fr && fr.contentWindow;
-          ok = !!(w && typeof w._mbOpenReport === 'function' && w.document && w.document.readyState === 'complete');
-        } catch (e) {}
-        if (ok) { clearInterval(uhr); try { w._mbOpenReport(String(rid), false); } catch (e) {} return; }
-        if (n > 100) { clearInterval(uhr); toast('⚠ Bericht ließ sich nicht öffnen — im Marktbericht unter „Marktberichte“ auswählen.'); }
-      }, 150);
-    });
-  }
+  /* v3253 · Hier stand zeigeBericht(rid) (v3224): öffnete DIESEN Bericht in der
+     Marktbericht-Ansicht (iframe #mbv-frame). Marcel 09.11.2026: „das Marktbericht-Modul,
+     das ist ja nur im Hintergrund, das heißt kein Absprung mehr da rein“ - entfernt.
+     Geblieben ist „PDF abrufen“ je Zeile. */
 
   function toggleReports(btn) {
     var host = document.getElementById('dab-mb-host');
@@ -1472,7 +1442,6 @@
   }
   window.DealActionBoarding = {
     toggleReports: toggleReports,
-    zeigeBericht: zeigeBericht,   /* v3224 */
     linkOut: linkOut,
     buildTop: buildTop,
     afterRender: afterRender,

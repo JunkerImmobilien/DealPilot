@@ -77,3 +77,178 @@ html body #s8.sec .dab-smart-body {
   html body #s8.sec > .dab-band + .dab-panel,
   html body #s8.sec > .dab-band + #dab-rails-host { padding: 4px 14px 16px !important; }
 }
+
+/* ═══ v3253 · Marcel 09.11.2026 ═══════════════════════════════════════════
+   (A) Dokumente & Exporte: „einfacher … kompakter und schöner“, BMF-Rechner-Absprung raus.
+       Jede Ausgabe ist eine gleich große Kachel (kachel() in deal-action-boarding.js):
+       Symbol + Titel oben, eine Zeile Nutzen, ein Knopf unten. Raster auto-fit, alle Zeilen
+       gleich hoch (grid-auto-rows 1fr). Unter 561 px eine Zeile je Ausgabe: Symbol | Text | Knopf.
+   (B) Schrift wie im Reiter Objekt (Referenz, gemessen lokal 1280 px, getComputedStyle):
+       Abschnittstitel Space Grotesk 24/700 · Kartenkopf JetBrains Mono 10/700 Versalien 1,2 px
+       #6B645A · Titel in Karten Inter 13/600 #2A2727 · Text Inter 12/400 #625C59 ·
+       Knöpfe Inter 13/500, 38 px · Zahlen Inter 600 tabular-nums.
+       Deal-Aktion stand dagegen mit Space Grotesk in Karten (Kacheltitel 13,5/700, Statuskarten
+       15/600, „Abschluss offen“ 22/600, Kicker 10–11 Versalien) und Mono für Datum/Marktwert.
+       Die Variable --dab-fs (32 Regeln in deal-action-boarding.js, u. a. Partner-Karten,
+       Badges, Datenraum) zeigte auf Space Grotesk - sie zeigt jetzt auf Inter. */
+
+html body #s8.sec {
+  --dab-fs: var(--dpl-body, 'Inter', system-ui, sans-serif);
+  --dab-fd: var(--dpl-body, 'Inter', system-ui, sans-serif);
+}
+
+/* (A) Kacheln */
+html body #s8.sec .dab-smart-body {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  grid-auto-rows: 1fr;
+  gap: 10px !important;
+}
+html body #s8.sec .dab-smart-body > .dab-st-fehlt { grid-column: 1 / -1; }
+html body #s8.sec .dab-doc-row.dab-kachel {
+  display: grid !important;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-areas: "ic x" "act act";
+  grid-template-rows: 1fr auto;
+  align-items: start !important;
+  column-gap: 10px !important;
+  row-gap: 12px !important;
+  padding: 14px !important;
+  margin: 0 !important;
+  border: 1px solid #E6E1D6 !important;
+  border-radius: 2px !important;
+  background: #FFFFFF !important;
+  box-shadow: none !important;
+  min-width: 0;
+}
+/* dokSichtbar() blendet nicht ziehbare Ausgaben per style.display='none' aus - das !important oben darf das nicht überstimmen */
+html body #s8.sec .dab-doc-row.dab-kachel[style*="display: none"],
+html body #s8.sec .dab-doc-row.dab-kachel[style*="display:none"] { display: none !important; }
+html body #s8.sec .dab-doc-row.dab-kachel:hover { border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important; }
+html body #s8.sec .dab-kachel .dab-doc-icb {
+  grid-area: ic;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 2px !important;
+  margin: 0 !important;
+  background: #FBF6E9 !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent) !important;
+  color: var(--wl-9a7f33, #9a7f33) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none !important;
+}
+html body #s8.sec .dab-kachel .dab-doc-x { grid-area: x; width: auto !important; flex: none !important; min-width: 0 !important; }
+html body #s8.sec .dab-kachel .dab-doc-n { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 0 !important; }
+html body #s8.sec .dab-kachel .dab-doc-d {
+  margin-top: 3px !important;
+  min-height: 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+html body #s8.sec .dab-kachel .dab-doc-act {
+  grid-area: act;
+  display: flex !important;
+  align-items: center;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  flex: none !important;
+}
+html body #s8.sec .dab-kachel .dab-doc-act .dab-doc-btn { flex: 1 1 auto !important; justify-content: center; }
+html body #s8.sec .dab-kachel .dab-fa-year { flex: 0 0 96px; min-width: 0 !important; }
+html body #s8.sec .dab-doc-badge,
+html body #s8.sec .dab-pg-badge {
+  font: 700 9px/1.4 var(--dpl-body, 'Inter', sans-serif) !important;
+  letter-spacing: .06em !important;
+  padding: 1px 6px !important;
+  border-radius: 2px !important;
+  margin: 0 !important;
+  vertical-align: middle;
+}
+@media (max-width: 560px) {
+  html body #s8.sec .dab-smart-body { grid-template-columns: 1fr !important; grid-auto-rows: auto; gap: 8px !important; }
+  html body #s8.sec .dab-doc-row.dab-kachel {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-areas: "ic x act";
+    grid-template-rows: auto;
+    align-items: center !important;
+    padding: 10px 12px !important;
+  }
+  html body #s8.sec .dab-kachel .dab-doc-act { width: auto !important; }
+  html body #s8.sec .dab-kachel .dab-doc-d { -webkit-line-clamp: 1; }
+  html body #s8.sec .dab-kachel .dab-doc-act .dab-doc-btn { padding: 0 12px !important; min-height: 44px !important; }
+  html body #s8.sec .dab-kachel .dab-doc-act .dab-doc-btn svg { display: none; }
+  html body #s8.sec .dab-kachel[data-dok="fa"] { grid-template-areas: "ic x" "act act"; grid-template-columns: 30px minmax(0, 1fr); }
+  html body #s8.sec .dab-kachel[data-dok="fa"] .dab-doc-act { width: 100% !important; }
+}
+
+/* (B) Schrift wie im Reiter Objekt */
+html body #s8.sec .sec-title { font-weight: 700 !important; }
+html body #s8.sec > .dab-band .dab-band-t { line-height: 15px !important; }
+/* Titel in Karten: Space Grotesk 13,5–15 → Inter 13/600 */
+html body #s8.sec :is(.dab-doc-n, .dab-row-main, .dab-dr-t, .dp-rc-title, .da-card-title, .da-status-label, .da-stat-lbl, .dab-mbl-art b) {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+  color: #2A2727 !important;
+}
+/* Zwischentitel „Bereit für die Bank“ / „Abschluss offen“: Space Grotesk 22/600 → Inter 16/600 */
+html body #s8.sec :is(.dab-rtitle, .dab-title) {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  color: #2A2727 !important;
+}
+/* Text: 11,5–12 px in drei Grautönen → Inter 12/400 #625C59 */
+html body #s8.sec :is(.dab-doc-d, .dab-row-sub, .dab-dr-s, .dab-tafel-bar .r) {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  color: #625C59 !important;
+}
+/* Kleine Köpfe und Kicker: Space Grotesk / Inter / Mono 400 gemischt → Mono 10/700 Versalien wie .ct */
+html body #s8.sec :is(.dab-tafel-bar .l, .dab-strip-l, .dab-kick, .dab-ct, .dab-route, .dab-mbl-kopf) {
+  font-family: var(--dpl-mono, 'JetBrains Mono', ui-monospace, monospace) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  color: #6B645A !important;
+}
+/* Knöpfe: 12 px → 13/500, 38 px hoch wie .btn */
+html body #s8.sec .dab-doc-btn,
+html body #s8.sec .dab-dr-btn {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 8px !important;
+  line-height: 1.2 !important;
+}
+html body #s8.sec .dab-doc-btn.gold { font-weight: 600 !important; }
+html body #s8.sec .dab-mbl-akt .dab-doc-btn { min-height: 34px !important; }
+html body #s8.sec details.dab-check > summary { color: #2A2727 !important; }
+/* Zahlen: Mono → Inter 600 mit Tabellenziffern (wie .cf im Reiter Objekt) */
+html body #s8.sec .dab-mbl-wert {
+  font: 600 13px/1.35 var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-variant-numeric: tabular-nums !important;
+  color: #2A2727 !important;
+}
+html body #s8.sec .dab-mbl-wert small { font-weight: 500 !important; letter-spacing: 0 !important; text-transform: none !important; font-size: 11px !important; color: #625C59 !important; }
+html body #s8.sec .dab-mbl-dat {
+  font: 500 12.5px/1.35 var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-variant-numeric: tabular-nums !important;
+  color: #2A2727 !important;
+}
+html body #s8.sec .dab-mbl-dat small,
+html body #s8.sec .dab-mbl-adr { font-size: 11.5px !important; color: #625C59 !important; }
+html body #s8.sec :is(.dab-count, .dab-pill) { font-variant-numeric: tabular-nums !important; }
+html body #s8.sec .dab-net-load { font: 400 12px/1.45 var(--dpl-body, 'Inter', system-ui, sans-serif) !important; color: #625C59 !important; }

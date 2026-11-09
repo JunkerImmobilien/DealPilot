@@ -1,0 +1,220 @@
+{
+ "ags": "05770004",
+ "gemeinde": "Bad Oeynhausen",
+ "art": "einfach",
+ "stand": "2026-01-20",
+ "erhebungsstichtag": null,
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.badoeynhausen.de/fileadmin/user_upload/Stadt/Sonstiges/Merkblaetter/Mietspiegel_BO_2026_Final.pdf",
+  "dokument": "Mietspiegel 2026 Bad Oeynhausen (Faltblatt; Bekanntmachung vom 20.01.2026)",
+  "seite": "1",
+  "lizenz": "keine Angabe im Dokument (Stadt Bad Oeynhausen)",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Bild-PDF ohne Textschicht: die Tabelle ist am gerenderten Bild abgelesen (zwei Auflösungen verglichen). Größenklassen „bis 60 / 60–80 / ab 80“ überlappen an 60 und 80 m²; hier gilt 60 m² als „bis 60“ und 80 m² als „60–80“. Die Spanne heißt im Dokument „Preisspanne je nach Ausstattung und Lage“.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1980,
+     "label": "1961–1980"
+    },
+    {
+     "von": 1981,
+     "bis": 2000,
+     "label": "1981–2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2020,
+     "label": "2001–2020"
+    },
+    {
+     "von": 2021,
+     "bis": null,
+     "label": "ab 2021"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 60,
+     "label": "bis 60 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 80,
+     "label": "60–80 m²"
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": null,
+     "label": "ab 80 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 6,
+    "mittel": 6.38,
+    "oben": 6.76,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.21,
+    "mittel": 6.61,
+    "oben": 7.01,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.81,
+    "mittel": 6.18,
+    "oben": 6.55,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.26,
+    "mittel": 6.66,
+    "oben": 7.06,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 6.41,
+    "mittel": 6.82,
+    "oben": 7.23,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 6.19,
+    "mittel": 6.59,
+    "oben": 6.99,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 7.2,
+    "mittel": 7.66,
+    "oben": 8.12,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 7.13,
+    "mittel": 7.48,
+    "oben": 7.93,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 6.79,
+    "mittel": 7.22,
+    "oben": 7.65,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 9.16,
+    "mittel": 9.74,
+    "oben": 10.32,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 8.65,
+    "mittel": 9.2,
+    "oben": 9.75,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 8.07,
+    "mittel": 8.59,
+    "oben": 9.11,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 9.75,
+    "mittel": 10.37,
+    "oben": 10.99,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 9.47,
+    "mittel": 10.07,
+    "oben": 10.67,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 9.45,
+    "mittel": 10.05,
+    "oben": 10.65,
+    "seite": "1"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 72
+   },
+   "erwartet": {
+    "unten": 6.41,
+    "mittel": 6.82,
+    "oben": 7.23
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1958,
+    "wfl": 60
+   },
+   "erwartet": {
+    "unten": 6,
+    "mittel": 6.38,
+    "oben": 6.76
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  }
+ ]
+}

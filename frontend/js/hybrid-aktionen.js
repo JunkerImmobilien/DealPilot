@@ -31,7 +31,8 @@
     /* v1733 · hier standen zwei Zeilen, die seit v1636 im selben Dialog
        endeten (pdf-wahl.js umhuellt beide Exportfunktionen). Eine reicht. */
     ['Investment-PDF', '', function () { if (window.exportPDF) window.exportPDF(); }],
-    ['Marktbericht', '', function () { if (window.openMarktberichtView) window.openMarktberichtView(); }],
+    /* v3253 · Marcel 09.11.2026: kein Absprung mehr in die Marktbericht-Ansicht - nur das PDF (Liste in Deal-Aktion) */
+    ['Marktbericht-PDF', '', function () { if (window.dpMbBerichteZeigen) window.dpMbBerichteZeigen(); }],
     ['Finanzamt-PDF', '', function () { if (window.exportWerbungskostenPDF) window.exportWerbungskostenPDF('0'); }]
   ];
 

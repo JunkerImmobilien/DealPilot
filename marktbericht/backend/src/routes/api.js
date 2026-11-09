@@ -16,6 +16,7 @@ import { oeffentlich as abschlagOeffentlich, RECHERCHE as ABSCHLAG_RECHERCHE, ak
 import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js';   /* v3021 */
 import { indexreihen } from '../lib/indexreihen.js';                             /* v3026 */
 import { mietspiegelFuer } from '../lib/mietspiegel/verzeichnis.js';              /* v3250 */
+import { mietspiegelMitWerten } from '../lib/mietspiegel/werte.js';               /* v3255 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
@@ -803,6 +804,14 @@ router.get('/objects/history', async (req, res) => {
               data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'bezugsgroesse_qm'          AS uk_bezug_qm,
               data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'bodenwert_eur_qm'          AS uk_bw_qm,
               data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'quelle_art'                AS uk_quelle_art,
+              /* v3252 · Marcel 09.11.2026: „Bei Umrechnung WGFZ steht nur Tabelle vorhanden -
+                 koennen wir den Wert dort nicht angeben?" Der Bericht rechnet die WGFZ-Umrechnung
+                 (ReportOrchestrator, umrechnung_wgfz.js) und legt sie unter cross_check.flaeche.wgfz
+                 ab (Faktor, Koeffizient Objekt/Zone, WGFZ Objekt/Zone, Grund, Hinweis). Die Zeile
+                 im Rechenweg des Bodenwerts (pos GFZ-Umrechnung) steht auch dann da, wenn flaeche
+                 fehlt. Beides nur gelesen, nichts neu gerechnet. Keine Backticks hier. */
+              data->'cross_check'->'flaeche'->'wgfz' AS wgfz_angewandt,
+              jsonb_path_query_first(data, '$.cross_check.bodenwert.schritte[*] ? (@.pos == "GFZ-Umrechnung").detail') #>> '{}' AS wgfz_schritt,
               CASE WHEN (data->'cross_check'->'vergleichswert_irw'->>'verfuegbar') = 'true'
                    THEN (data->'cross_check'->'vergleichswert_irw'->>'vergleichswert_eur')::numeric END AS irw_vergleichswert_eur,
               /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
@@ -1042,11 +1051,14 @@ router.get('/bwk/ansaetze', (req, res) => {
 // GET /mietspiegel?ags=05766020 — v3250 · Satz des Mietspiegel-Verzeichnisses (lib/mietspiegel/verzeichnis.json):
 // Art, Stand, Gültigkeit, Vermutungsfrist, Link. Ohne Satz { art: null, gefunden: false, hinweis } mit dem Weg
 // (§ 558c Abs. 4 BGB: Pflicht ab 50.000 Einwohnern). Nur Datei, keine DB, kein Kontingent.
+// v3255: + werte_verfuegbar; mit &baujahr=&wfl= (&lage=&ausstattung=&merkmale=a,b) + werte { unten, mittel, oben, zelle, rechnung, hinweise }.
 router.get('/mietspiegel', (req, res) => {
   try {
     const r = mietspiegelFuer(req.query.ags);
     if (!r) return res.status(400).json({ error: 'ags (8-stellig) erforderlich' });
-    res.json(r);
+    /* v3255 · Werte (lib/mietspiegel/werte/<ags>.json): werte_verfuegbar immer; mit baujahr und/oder wfl
+       zusätzlich werte = mietspiegelWerteFuer(...) für dieses Objekt (außerhalb der Tabelle null mit Hinweis). */
+    res.json(mietspiegelMitWerten(r, req.query));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

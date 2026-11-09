@@ -56,10 +56,10 @@
    "url": "https://www.cottbus.de/verwaltung/gb-3/dz-3-1/fb-33-buergerservice/mietspiegel-2024-der-kreisfreien-stadt-cottbus-chosebuz/",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.cottbus.de/verwaltung/gb-3/dz-3-1/fb-33-buergerservice/mietspiegel-2024-der-kreisfreien-stadt-cottbus-chosebuz/ (qualifiziert § 558d, Stichtag 01.03.2024, Beschluss III.1-009/24); https://www.cottbus.de/mietspiegel (Mietspiegel 2026 voraussichtlich Ende 2026)",
-   "hinweis": "Qualifizierter Mietspiegel 2026 in Erarbeitung, laut Stadt voraussichtlich Ende 2026; Gültigkeitszeitraum 2024 nicht genannt"
+   "beleg": "https://www.cottbus.de/verwaltung/gb-3/dz-3-1/fb-33-buergerservice/mietspiegel-2024-der-kreisfreien-stadt-cottbus-chosebuz/ (qualifiziert § 558d, Stichtag 01.03.2024, Beschluss III.1-009/24); Mietspiegel-PDF https://cottbus.de/download/13826/mietspiegel/109407/cottbuser-mietspiegel-2024-anlage-a.pdf S. 8 Abschnitt 3.3 'Stichtag (01.03.2024)', S. 16 Abschnitt 6.1 'Das für die Wohnung in Betracht kommende Tabellenfeld des Mietspiegels finden Sie …' (Wohnungsgröße, Baualter, Energieeffizienzklasse, Modernisierungsgrad; Spanne und Mittelwert je Feld); https://www.cottbus.de/mietspiegel ('Der neue Mietspiegel wird voraussichtlich Ende 2026 zur Verfügung stehen.' 'Die Datenerhebung zum Mietspiegel endete zum 31.05.2026.')",
+   "hinweis": "Qualifizierter Mietspiegel 2026 in Erarbeitung, laut Stadt voraussichtlich Ende 2026 (Datenerhebung endete 31.05.2026); noch nicht veröffentlicht, Stand geprüft am 2026-11-09. Gültigkeitszeitraum 2024 weder auf Stadtseite noch im PDF genannt. Tabellenmietspiegel (Felder nach Größe, Baualter, Energieeffizienzklasse, Modernisierung) mit Orientierungshilfe für Zu-/Abschläge innerhalb der Spanne."
   },
   {
    "ags": "12051000",
@@ -147,7 +147,7 @@
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://stuttgart.de/medien/ibs/mietspiegel_2025_2026.pdf, Impressum/Einleitung ('Regressionsmietspiegel', Gemeinderat anerkannt 6.12.2024, Stichprobe April 2024); https://www.stuttgart.de/pressemitteilungen/2024/dezember/neuer-mietspiegel-2025-2026-liegt-vor (gilt Januar 2025 bis Dezember 2026)",
-   "hinweis": "Mietspiegel 2025/2026; Nachfolger für 2027 zu erwarten (zweijährlich), auf Stadtseite noch nicht gefunden"
+   "hinweis": "Mietspiegel 2025/2026 (gilt 01.01.2025–31.12.2026, Erhebungsmonat April 2024); Nachfolger 2027/2028 zu erwarten (Wohnungsmarktbefragung alle zwei Jahre), auf https://www.stuttgart.de/service/statistik-und-wahlen/mietspiegel/ weder veröffentlicht noch mit Datum angekündigt — Stand geprüft am 2026-11-09."
   },
   {
    "ags": "08222000",
@@ -191,7 +191,7 @@
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://web1.karlsruhe.de/service/Buergerdienste/leistung.php?id=6002637 (gültig 01.01.2025–31.12.2026, PDF frei); https://web6.karlsruhe.de/Stadtentwicklung/statistik/pdf/mietspiegel/karlsruher-mietspiegel-2025-dokumentation.pdf Kap. 1 (qualifiziert § 558d Abs. 1), Kap. 4 Regressionsanalyse mit Punktekatalog Lage/Ausstattung",
-   "hinweis": "Tabellen mit Punktesystem für Lage und Ausstattung aus Regressionsmodell; auch Einfamilienhäuser enthalten"
+   "hinweis": "Tabellen mit Punktesystem für Lage und Ausstattung aus Regressionsmodell; auch Einfamilienhäuser enthalten. Fortschreibung zum 01.01.2027 rechtlich fällig (Anpassung nach zwei Jahren); im Ratsinformationssystem und auf der Stadtseite keine Vorlage oder Veröffentlichung gefunden — Stand geprüft am 2026-11-09 (frühere Fortschreibungen jeweils im Spätjahr vom Gemeinderat behandelt)."
   },
   {
    "ags": "08311000",
@@ -210,10 +210,10 @@
    "url": "https://www.freiburg.de/pb/229416.html",
    "zugang": "frei",
    "preis": "7,50 € gedruckte Broschüre (bei Abholung); PDF und Online-Rechner kostenlos",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.freiburg.de/pb/229416.html (Mietspiegel 2025/2026 qualifiziert, gültig 01.01.2025–31.12.2026); PDF https://www.freiburg.de/servicebw/Mietspiegel_2025_2026.pdf",
-   "hinweis": "Mietspiegel 2025/2026; Erhebung 2024"
+   "beleg": "https://www.freiburg.de/pb/229416.html (Mietspiegel 2025/2026 qualifiziert, gültig 01.01.2025–31.12.2026; 'Für die Jahre 2025/2026 wurde der qualifizierte Freiburger Mietspiegel durch eine Befragung neu erhoben'); PDF https://www.freiburg.de/servicebw/Mietspiegel_2025_2026.pdf S. 7 ('1. Es wird das durchschnittliche Nettomietniveau (= Basis-Nettomiete) für eine Wohnung je nach Wohnungsgröße und Baujahr bestimmt (Tabelle 1). 2. Besonderheiten … werden über prozentuale Zu- bzw. Abschläge … durch Punktwerte berücksichtigt (Tabelle 2)'), S. 8 Tabelle 1 Basis-Nettomiete",
+   "hinweis": "Mietspiegel 2025/2026; Erhebung 2024. Basis-Nettomiete nach Wohnfläche und Baujahr plus prozentuale Zu-/Abschläge über Punktwerte (Regressionsaufbau). Läuft am 31.12.2026 aus; Nachfolger 2027/2028 auf Stadtseite noch nicht veröffentlicht oder angekündigt — Stand geprüft am 2026-11-09."
   },
   {
    "ags": "08221000",
@@ -232,9 +232,9 @@
    "url": "https://www.heidelberg.de/HD/Rathaus/Mietspiegel.html",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.heidelberg.de/HD/Rathaus/Mietspiegel.html (gültig 01.10.2025–30.09.2027, Broschüre-PDF, Rechner); https://www.heidelberg.de/HD/Presse/08_09_2025+neuer+mietspiegel+gilt+ab+1_+oktober.html (qualifiziert, Fortschreibung per VPI, Neuerhebung 2027)",
+   "beleg": "https://www.heidelberg.de/HD/Rathaus/Mietspiegel.html (gültig 01.10.2025–30.09.2027, Broschüre-PDF, Rechner); https://www.heidelberg.de/HD/Presse/08_09_2025+neuer+mietspiegel+gilt+ab+1_+oktober.html (qualifiziert, Fortschreibung per VPI, Neuerhebung 2027); Form: https://www.heidelberg.de/site/Heidelberg2021/get/documents_E1590746314/heidelberg/Objektdatenbank/61/12/PDF/Statistik/Mietspiegel/12_pdf_Mietspiegel_2025.pdf, PDF-S. 8 ('Die Nettokaltmiete errechnet sich aus der Basismietpreistabelle (Tabelle 1) und aus den in Tabelle 2 aufgeführten prozentualen Zu- und Abschlägen'; Tabelle 1 nach Wohnungsgröße und Baualter, PDF-S. 10–13), Berechnungsbogen PDF-S. 32–33; Dokumentation https://www.heidelberg.de/site/Heidelberg2021/get/documents_E2082351520/heidelberg/Objektdatenbank/61/12/PDF/Statistik/Mietspiegel/12_pdf_Mietspiegel_2025_Dokumentation.pdf, PDF-S. 4 ('Als Auswertungsmethodik wurde die Regressionsmethode verwendet') → regression",
    "hinweis": "Fortschreibung des Mietspiegels 2023 per Verbraucherpreisindex; Neuerhebung für 2027 vorgesehen; Online-Rechner"
   },
   {
@@ -276,9 +276,9 @@
    "url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/bauen_wohnen/wohnen/mietspiegel/2026-06-02-Mietspiegelbroschuere_HN_2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/bauen_wohnen/wohnen/mietspiegel/2026-06-02-Mietspiegelbroschuere_HN_2026.pdf (fortgeschriebener Mietspiegel 2026, qualifiziert, gültig 01.08.2026–31.07.2028) — Angaben aus Suchauszug des PDFs",
+   "beleg": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/bauen_wohnen/wohnen/mietspiegel/2026-06-02-Mietspiegelbroschuere_HN_2026.pdf (fortgeschriebener Mietspiegel 2026, qualifiziert, gültig 01.08.2026–31.07.2028) — Angaben aus Suchauszug des PDFs; Form: PDF-S. 12 Kap. 8 Mietspiegeltabelle ('unterteilt die Wohnungen in acht Baujahresklassen und fünf Wohnungsgrößenklassen', Median und 2/3-Spanne); Ausstattungspunkte PDF-S. 11/16 nur zur Einordnung innerhalb der Spanne (nichtqualifizierter Teil) → tabelle",
    "hinweis": "Fortschreibung des Mietspiegels 2024; Online-Rechner unter heilbronn.de/mietspiegel"
   },
   {
@@ -298,9 +298,9 @@
    "url": "https://nu.neu-ulm.de/buerger-service/leben-in-neu-ulm/bauen-und-wohnen/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://nu.neu-ulm.de/buerger-service/leben-in-neu-ulm/bauen-und-wohnen/mietspiegel (qualifizierter Mietspiegel 2025, gilt 'ab dem 12.11.2025 für zwei Jahre', Fortschreibung per Preisindex); Vorgänger: https://Ulm.de/-/media/ulm/zdv/downloads/oeffentliche-bekanntmachungen/2023/november-2023/2023_11_11_mietspiegel_signed.pdf",
+   "beleg": "https://nu.neu-ulm.de/buerger-service/leben-in-neu-ulm/bauen-und-wohnen/mietspiegel (qualifizierter Mietspiegel 2025, gilt 'ab dem 12.11.2025 für zwei Jahre', Fortschreibung per Preisindex); Vorgänger: https://Ulm.de/-/media/ulm/zdv/downloads/oeffentliche-bekanntmachungen/2023/november-2023/2023_11_11_mietspiegel_signed.pdf; Form: regression · Beleg nur mittelbar: Dokumentation des Mietspiegels 2023 https://www.ulm.de/-/media/ulm/sub/sub-i/dokumentation-mietspiegel-ulm-neu-ulm-2023.pdf (laut Suchindex: Basis-Nettomiete als erster Faktor des Regressionsmodells); der Mietspiegel 2025 ist laut Stadtseite Neu-Ulm eine Preisindex-Fortschreibung des Mietspiegels 2023 durch das EMA-Institut",
    "hinweis": "Gemeinsamer Mietspiegel Ulm/Neu-Ulm, Indexfortschreibung des Mietspiegels 2023; Beleg auf der Seite der Stadt Neu-Ulm (ulm.de lieferte 403); gueltig_bis aus 'zwei Jahre' errechnet; Online-Rechner"
   },
   {
@@ -320,10 +320,10 @@
    "url": "https://www.reutlingen.de/de/Leben/Bauen-Wohnen/Mietspiegel/Mietspiegel-2025",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.reutlingen.de/de/Leben/Bauen-Wohnen/Mietspiegel/Mietspiegel-2025 (qualifiziert § 558d, gültig 01.02.2025–31.01.2027)",
-   "hinweis": "Stichprobenfortschreibung (Erhebung 2024); Stadtseite führt bereits einen Eintrag 'Mietspiegel 2027' (Inhalt nicht lesbar); Online-Rechner; gilt als Grundlage auch für Nachbarorte (z. B. Pfullingen, Eningen)"
+   "beleg": "https://www.reutlingen.de/de/Leben/Bauen-Wohnen/Mietspiegel/Mietspiegel-2025 (qualifiziert § 558d, gültig 01.02.2025–31.01.2027); Form: Mietspiegel 2025 https://www.reutlingen.de/ceasy/resource/?id=64990&download=1, PDF-S. 9 (Basis-Nettomiete je nach Wohnfläche und Baujahr, Besonderheiten 'über Punktwerte (= prozentuale Zu- bzw. Abschläge)'), Tabelle 2 PDF-S. 12, Berechnungsschema Tabelle 3 PDF-S. 15; Dokumentation https://www.reutlingen.de/ceasy/resource/?id=63786&download=1, PDF-S. 8 ('Als Auswertungsmethodik wurde die Regressions[methode]') → regression",
+   "hinweis": "Stichprobenfortschreibung (Erhebung 2024); Stadtseite führt bereits einen Eintrag 'Mietspiegel 2027' (Inhalt nicht lesbar); Online-Rechner; gilt als Grundlage auch für Nachbarorte (z. B. Pfullingen, Eningen); Tabelle 1 der Basis-Nettomiete ist nach Wohnfläche UND Baujahr gegliedert, Zu-/Abschläge als Prozent-Punktwerte"
   },
   {
    "ags": "08116019",
@@ -342,9 +342,9 @@
    "url": "https://www.esslingen.de/mietspiegel",
    "zugang": "frei",
    "preis": "5,00 € Schutzgebühr Druckfassung; PDF kostenlos",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.esslingen.de/site/Esslingen_Layout_2022/get/params_E412816035/20586326/Stadt%20Esslingen%20Qualifizierter%20Mietspiegel%202026.pdf Titelseite ('Qualifizierter Mietspiegel · Gültig ab 1. Januar 2026', Schutzgebühr 5,– €)",
+   "beleg": "https://www.esslingen.de/site/Esslingen_Layout_2022/get/params_E412816035/20586326/Stadt%20Esslingen%20Qualifizierter%20Mietspiegel%202026.pdf Titelseite ('Qualifizierter Mietspiegel · Gültig ab 1. Januar 2026', Schutzgebühr 5,– €); Form: PDF-S. 3 ('regressionsanalytische Auswertungsverfahren'), PDF-S. 8 (Tabelle 1 'Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche', Tabelle 2 Zu- und Abschläge, Tabelle 3 Berechnung), PDF-S. 10 Tabelle 2 'Punktesystem' (Punktwerte = prozentuale Zu-/Abschläge) → regression",
    "hinweis": "Online-Rechner bei Dritten verlinkt; Enddatum nicht genannt"
   },
   {
@@ -389,7 +389,7 @@
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://tuebingen.de/verwaltung/formular/760.pdf S. 10 'Anwendungsbereich und Gültigkeit' (gilt ab 01.12.2024 für zwei Jahre bis 30.11.2026, danach fortzuschreiben); https://www.tuebingen.de/verwaltung/formular/685.pdf (Dokumentation: Regressionsmietspiegel)",
-   "hinweis": "Läuft am 30.11.2026 aus; Fortschreibung ab 01.12.2026 zu erwarten, auf Stadtseite nicht geprüft; Basismiete-Tabelle + Zu-/Abschläge; Zugang PDF als frei angenommen (Formular-PDF auf tuebingen.de)"
+   "hinweis": "Läuft am 30.11.2026 aus; Fortschreibung ab 01.12.2026 laut Mietspiegel S. 10 vorgesehen ('danach fortzuschreiben'), auf https://www.tuebingen.de/mietspiegel aber noch nicht veröffentlicht (dort nur Mietspiegel 2024 und frühere) — Stand geprüft am 2026-11-09. Basismiete-Tabelle + Zu-/Abschläge; Zugang PDF frei (Download auf tuebingen.de, Druckfassung 5 €)."
   },
   {
    "ags": "08326074",
@@ -411,7 +411,7 @@
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://www.villingen-schwenningen.de/fileadmin/VS/06_Bauen_Wohnen/Stadtplanung/Statistik/Dokumentation_Mietspiegel_2024_gesamt.pdf Titelseite ('gültig vom 01.12.2024 bis 30.11.2026'), Einleitung (qualifiziert seit 2011, Indexfortschreibung des Mietspiegels 2022, VPI Juli 2022–Juli 2024)",
-   "hinweis": "Läuft am 30.11.2026 aus; Nachfolger (2026) auf Stadtseite noch nicht gefunden; Mietpreiszonen mit Straßenverzeichnis; Impressum nennt eine Schutzgebühr (Betrag nicht ausgelesen)"
+   "hinweis": "Läuft am 30.11.2026 aus; Nachfolger (2026) auf der Stadtseite Wohnungswesen nicht veröffentlicht (dort weiter 'Der neue Mietspiegel 2024 für Villingen-Schwenningen ist da!'), keine Ankündigung gefunden — Stand geprüft am 2026-11-09. Mietpreiszonen mit Straßenverzeichnis; Impressum nennt eine Schutzgebühr (Betrag nicht ausgelesen)."
   },
   {
    "ags": "08335043",
@@ -474,10 +474,10 @@
    "url": "https://www.schwaebisch-gmuend.de/qualifizierter-mietspiegel.html",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.schwaebisch-gmuend.de/qualifizierter-mietspiegel.html (Qualifizierter Mietspiegel 2024 'rückwirkend ab 1. Juli 2024 für zwei Jahre', veröffentlicht 01.12.2024; Neuerstellung 2026–2028, Erhebung ab 23.07.2026)",
-   "hinweis": "Mietspiegel 2024 nach Zweijahresfrist abgelaufen (gueltig_bis errechnet); neuer qualifizierter Mietspiegel 2026–2028 in Erhebung, gemeinsam mit Lorch, Mutlangen, Waldstetten u. a."
+   "beleg": "https://www.schwaebisch-gmuend.de/qualifizierter-mietspiegel.html (Qualifizierter Mietspiegel 2024 'rückwirkend ab 1. Juli 2024 für zwei Jahre', veröffentlicht 01.12.2024; 'läuft aktuell die Neuerstellung des qualifizierten Mietspiegel 2026 - 2028', Befragung ab 23.07.2026 durch EMA-Institut); PDF https://www.schwaebisch-gmuend.de/qualifizierter-mietspiegel.html?file=files/upload/INTERN/04_LEBEN/Wohnen%20Bauen%20Stadtentwicklung/Qualifizierter%20Mietspiegel%202024.pdf&cid=134213 S. 6 ('regressionsanalytische Auswertungsverfahren'; 'Er tritt rückwirkend am 1. Juli 2024 in Kraft mit einer Gültigkeit von zwei Jahren'), Abschnitt 3: Basis-Nettomiete nach Wohnungsgröße und Baualter (Tabelle 1) + Punktwerte als prozentuale Zu-/Abschläge (Tabelle 2)",
+   "hinweis": "Mietspiegel 2024 nach Zweijahresfrist am 30.06.2026 abgelaufen; neuer qualifizierter Mietspiegel 2026–2028 in Erhebung (ab 23.07.2026, gemeinsam mit Lorch, Mutlangen, Waldstetten u. a.), noch nicht veröffentlicht — Stand geprüft am 2026-11-09."
   },
   {
    "ags": "08317096",
@@ -496,9 +496,9 @@
    "url": "https://www.offenburg.de/de/leben-in-offenburg/buergerservice/qualifizierter-mietspiegel-offenburg-2026/",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.offenburg.de/de/leben-in-offenburg/buergerservice/qualifizierter-mietspiegel-offenburg-2026/ (gültig ab 1. Juni 2026, Fortschreibung); Broschüre https://www.offenburg.de/media/download/integration/102448/mietspiegel_offenburg_2026_broschuere.pdf",
+   "beleg": "https://www.offenburg.de/de/leben-in-offenburg/buergerservice/qualifizierter-mietspiegel-offenburg-2026/ (gültig ab 1. Juni 2026, Fortschreibung); Broschüre https://www.offenburg.de/media/download/integration/102448/mietspiegel_offenburg_2026_broschuere.pdf; Form: Broschüre https://www.offenburg.de/media/download/integration/102448/mietspiegel_offenburg_2026_broschuere.pdf, PDF-S. 5 ('regressionsanalytisches Auswertungsverfahren'), PDF-S. 8 (Schritt 1 Basis-Nettomiete nach Wohnfläche, Tabelle 1; Schritt 2/3 'prozentualen Zu- und Abschläge', Tabellen 2 und 3), PDF-S. 11 Tabelle 2 'Zu-/Abschläge für Wohnwertmerkmale in %' → regression",
    "hinweis": "Fortschreibung des Mietspiegels 2024 (Neuerhebung); kostenloser Online-Rechner"
   },
   {
@@ -540,10 +540,10 @@
    "url": "https://www.sindelfingen.de/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.sindelfingen.de/mietspiegel (qualifizierter Mietspiegel 2026, gültig ab 01.08.2026, Fortschreibung 2024 per VPI, Neuerstellung nach zwei Jahren)",
-   "hinweis": "Gemeinsamer Mietspiegel Sindelfingen/Böblingen; Fortschreibung per Verbraucherpreisindex; Online-Rechner"
+   "beleg": "https://www.sindelfingen.de/mietspiegel (qualifizierter Mietspiegel 2026, gültig ab 01.08.2026, Fortschreibung 2024 per VPI, Neuerstellung nach zwei Jahren); Form: Mietspiegel https://www.sindelfingen.de/fileadmin/Website/01_Sindelfingen/Dateien/Bauen__Wirtschaft__Verkehr/Mieten/Mietspiegel_2026_klein.pdf, PDF-S. 6 (Basis-Nettokaltmiete, Besonderheiten 'über Punktwerte … als prozentuale Zu- bzw. Abschläge'), PDF-S. 7 Tabelle 1 'Monatliche Nettokaltmiete pro Quadratmeter in Abhängigkeit von Wohnfläche und Baujahr', PDF-S. 8 Tabelle 2, PDF-S. 12 Tabelle 3 Berechnungsschema; Dokumentation https://www.sindelfingen.de/fileadmin/Website/01_Sindelfingen/Dateien/Bauen__Wirtschaft__Verkehr/Mieten/Sindelfingen_B%C3%B6blingen_2026_Dokumentation.pdf, PDF-S. 5 ('Als Auswertungsmethodik wurde die Regressionsmethode verwendet') → regression",
+   "hinweis": "Gemeinsamer Mietspiegel Sindelfingen/Böblingen; Fortschreibung per Verbraucherpreisindex; Online-Rechner; Tabelle 1 der Basis-Nettokaltmiete ist nach Wohnfläche UND Baujahr gegliedert, Zu-/Abschläge als Prozent-Punktwerte"
   },
   {
    "ags": "08117026",
@@ -562,9 +562,9 @@
    "url": "https://www.goeppingen.de/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.goeppingen.de/mietspiegel (qualifizierter Mietspiegel 2025, gültig 01.03.2025–28.02.2027, Befragung Juli–Sept. 2024)",
+   "beleg": "https://www.goeppingen.de/mietspiegel (qualifizierter Mietspiegel 2025, gültig 01.03.2025–28.02.2027, Befragung Juli–Sept. 2024); Form: https://www.goeppingen.de/mietspiegel (Mietspiegel beruht auf einem 'regressionsanalytischen Auswertungsverfahren', EMA-Institut) → regression",
    "hinweis": "Druckexemplar kostenlos (Rückumschlag); Online-Rechner"
   },
   {
@@ -584,9 +584,9 @@
    "url": "https://www.waiblingen.de/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.waiblingen.de/mietspiegel (Mietspiegel 2025 qualifiziert, gültig 01.02.2025–31.01.2027)",
+   "beleg": "https://www.waiblingen.de/mietspiegel (Mietspiegel 2025 qualifiziert, gültig 01.02.2025–31.01.2027); Form: Mietspiegel 2025 (Stand 2026) https://www.waiblingen.de/ceasy/resource/?id=32139&download=1, PDF-S. 6 (Tabelle 1 'Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche'), PDF-S. 8/10 Tabelle 2 'Zu- oder Abschläge zur Basis-Nettokaltmiete in Form von Punktwerten' ('Punktesystem'), PDF-S. 12–13 Berechnungsschema (Punktedifferenz in %) → regression",
    "hinweis": "Gemeinsam mit Korb; Download als 'Stand 2026' bezeichnet; Online-Rechner"
   },
   {
@@ -606,10 +606,10 @@
    "url": "https://www.baden-baden.de/buerger-und-service/serviceportal/dienstleistungen/mietspiegelauskunft",
    "zugang": "frei",
    "preis": "10,00 € Broschüre, 12,00 € Dokumentation; PDF kostenlos",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.baden-baden.de/buerger-und-service/serviceportal/dienstleistungen/mietspiegelauskunft ('Die Qualifizierung des Mietspiegels ist nach vier Jahren zum 30. November 2025 ausgelaufen'; gilt bis zur Neuerstellung als einfacher Mietspiegel weiter)",
-   "hinweis": "Fortschreibung 2023 des qualifizierten Mietspiegels 2021; Qualifizierung am 30.11.2025 ausgelaufen, neuer qualifizierter Mietspiegel in Vorbereitung; Online-Rechner"
+   "beleg": "https://www.baden-baden.de/buerger-und-service/serviceportal/dienstleistungen/mietspiegelauskunft ('Die Qualifizierung des Mietspiegels ist nach vier Jahren zum 30. November 2025 ausgelaufen. Ein neuer qualifizierter Mietspiegel für die Stadt Baden-Baden wird derzeit vorbereitet. Bis dahin gilt der Mietspiegel Baden-Baden 2023 als einfacher Mietspiegel fort.'); PDF https://www.baden-baden.de/site/Baden-Baden/get/params_E1486883200_Dattachment/3850934/Mietspiegel%20f%C3%BCr%20nicht%20preisgebundene%20Wohnungen%20-%20Fortschreibung%202023.pdf S. 6 ('regressionsanalytischen Auswertung'), S. 7 'Tabelle 1: Durchschnittliche Basis-Nettokaltmiete … nach Wohnungsgröße und Baualter' + Zu-/Abschläge in €/m²",
+   "hinweis": "Fortschreibung 2023 des qualifizierten Mietspiegels 2021; Qualifizierung am 30.11.2025 ausgelaufen, gilt als einfacher Mietspiegel fort. Neuer qualifizierter Mietspiegel laut Stadt 'derzeit vorbereitet', noch nicht veröffentlicht, kein Termin genannt — Stand geprüft am 2026-11-09. Online-Rechner."
   },
   {
    "ags": "08115003",
@@ -628,10 +628,10 @@
    "url": "https://www.boeblingen.de/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.boeblingen.de/mietspiegel (qualifizierter Mietspiegel Böblingen und Sindelfingen 2026, ab 01.08.2026, Fortschreibung 2024 per VPI)",
-   "hinweis": "Gemeinsamer Mietspiegel mit Sindelfingen; Online-Rechner"
+   "beleg": "https://www.boeblingen.de/mietspiegel (qualifizierter Mietspiegel Böblingen und Sindelfingen 2026, ab 01.08.2026, Fortschreibung 2024 per VPI); Form: gemeinsamer Mietspiegel Böblingen/Sindelfingen https://www.sindelfingen.de/fileadmin/Website/01_Sindelfingen/Dateien/Bauen__Wirtschaft__Verkehr/Mieten/Mietspiegel_2026_klein.pdf, PDF-S. 6–8 (Tabelle 1 Basis-Nettokaltmiete nach Wohnfläche und Baujahr, Tabelle 2 Punktwerte als prozentuale Zu-/Abschläge), PDF-S. 12 Berechnungsschema; Dokumentation https://www.sindelfingen.de/fileadmin/Website/01_Sindelfingen/Dateien/Bauen__Wirtschaft__Verkehr/Mieten/Sindelfingen_B%C3%B6blingen_2026_Dokumentation.pdf, PDF-S. 5 ('Regressionsmethode') → regression",
+   "hinweis": "Gemeinsamer Mietspiegel mit Sindelfingen; Online-Rechner; Tabelle 1 der Basis-Nettokaltmiete ist nach Wohnfläche UND Baujahr gegliedert, Zu-/Abschläge als Prozent-Punktwerte"
   },
   {
    "ags": "08336050",
@@ -674,8 +674,8 @@
    "preis": null,
    "form": "unbekannt",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.lahr.de/50-000-einwohner-marke-geknackt.226347.htm (Pressemitteilung 15.02.2024: 'Zudem ist ein Mietspiegel zu erstellen.'); alte Stadtseite http://alt.lahr.de/startseite/buergerservice/lebenslagen.67741.1,4,84516.htm: kein offizieller Mietspiegel",
-   "hinweis": "Kein Mietspiegel auf lahr.de gefunden; Pflicht zur Erstellung seit Überschreiten von 50.000 Einwohnern (2024) von der Stadt benannt; Stand der Erstellung unbekannt; nur Portalangaben gefunden"
+   "beleg": "https://www.lahr.de/50-000-einwohner-marke-geknackt.226347.htm (Pressemitteilung der Stadt 15.02.2024, nachgelesen 09.11.2026: 'Zudem ist ein Mietspiegel zu erstellen.'); https://www.lahr.de/merkblatt-sozialwohnungsquote.281384.htm (Merkblatt Sozialwohnungsquote: 'Für die Mietbindung hat die Stadt die ortsübliche Vergleichsmiete zu ermitteln' – kein Mietspiegel genannt); https://www.lahr.de/oertliche-fachinformationen-gemeinsamer-gutachterausschuss-lahr.269079.htm (Fachinformationen Gemeinsamer Gutachterausschuss Lahr, nur Bodenrichtwerte, kein Mietspiegel); alte Stadtseite http://alt.lahr.de/startseite/buergerservice/lebenslagen.67741.1,4,84516.htm: kein offizieller Mietspiegel",
+   "hinweis": "Kein Mietspiegel auf lahr.de gefunden (Stand 09.11.2026); Pflicht zur Erstellung seit Überschreiten von 50.000 Einwohnern (2024) von der Stadt selbst benannt; Stand der Erstellung unbekannt. Weder Gemeinderatsbeschluss noch Erhebung oder Veröffentlichung auffindbar. Die Stadt sagt aber nicht ausdrücklich, dass es keinen gibt – daher weiter 'unklar'."
   },
   {
    "ags": "08216043",
@@ -694,10 +694,10 @@
    "url": "https://www.rastatt.de/mietspiegel",
    "zugang": "frei",
    "preis": "Broschüre kostenlos im Bürgerbüro",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.rastatt.de/mietspiegel (Rastatter Mietspiegel 2025/2026, qualifiziert, gültig 1. April 2025 bis 31. Dezember 2026; Vermieterbefragung 2024)",
-   "hinweis": "Online-Rechner mit Download www.mietspiegel-rastatt.de"
+   "beleg": "https://www.rastatt.de/mietspiegel (Rastatter Mietspiegel 2025/2026, qualifiziert, 'gilt vom 1. April 2025 bis zum 31. Dezember 2026'; Vermieterbefragung 2024); Rechner/Download (von der Stadtseite verlinkt) https://www.mietspiegel-rastatt.de/ ('Die ortsübliche Vergleichsmiete ergibt sich aus der von der Fläche und dem Baujahr einer Wohnung abhängigen \"Basismiete\", und einem prozentualen Auf- oder Abschlag zur Basismiete gemäß dem \"Punktwert\"'); PDF https://www.mietspiegel-rastatt.de/Mietspiegel_Rastatt_2025_2026.pdf S. 12–15 Tabelle 1 Basismiete, Tabelle 2 Punktwerte",
+   "hinweis": "Online-Rechner mit Download www.mietspiegel-rastatt.de. Läuft am 31.12.2026 aus; Fortschreibung auf Stadtseite noch nicht veröffentlicht oder angekündigt — Stand geprüft am 2026-11-09."
   },
   {
    "ags": "08436064",
@@ -716,10 +716,10 @@
    "url": "https://www.ravensburg.de/rv-wAssets/pdf/buergerservice-verwaltung/Mietspiegel-RV_2026_Einzelseiten.pdf",
    "zugang": "frei",
    "preis": "7,50 € Ausdruck (Bürgeramt/Ortsverwaltungen); PDF kostenlos",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.ravensburg.de/mietspiegel (qualifizierter Mietspiegel 2026, Bereitstellung ab 1. Oktober 2026)",
-   "hinweis": "gueltig_ab = auf der Stadtseite genannter Bereitstellungstermin, nicht ausdrücklich Inkrafttreten; Dokumentation gemeinsam mit Nachbargemeinden; Online-Rechner"
+   "beleg": "https://www.ravensburg.de/mietspiegel (qualifizierter Mietspiegel 2026, Bereitstellung ab 1. Oktober 2026); Form: PDF-S. 4 ('mit Hilfe der Regressionsmethode errechnet'), PDF-S. 7 (Tabelle 1 Basis-Nettomiete in Abhängigkeit von Wohnfläche und Baualter), PDF-S. 8 'Tabelle 2: Prozentuale Zu- und Abschläge auf die Basis-Nettomiete' (Punktwerte) → regression",
+   "hinweis": "gueltig_ab = auf der Stadtseite genannter Bereitstellungstermin, nicht ausdrücklich Inkrafttreten; Dokumentation gemeinsam mit Nachbargemeinden; Online-Rechner; Tabelle 1 der Basis-Nettomiete ist nach Wohnfläche UND Baualter gegliedert, Zu-/Abschläge als Prozent-Punktwerte"
   },
   {
    "ags": "08135019",
@@ -740,8 +740,8 @@
    "preis": null,
    "form": "unbekannt",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "Städtisches Dokument auf heidenheim.de (Suchauszug, vermutlich ISEK, Anlage GR 106/2023): 'Einen qualifizierten Mietspiegel gibt es für die Stadt Heidenheim nicht'",
-   "hinweis": "Kein Mietspiegel auf heidenheim.de gefunden; Aussage nur zum qualifizierten Mietspiegel und aus 2023; ob ein einfacher existiert, unbelegt; nur Portalangaben gefunden"
+   "beleg": "Früherer Suchauszug eines städtischen Dokuments auf heidenheim.de (ISEK, Anlage GR 106/2023): 'Einen qualifizierten Mietspiegel gibt es für die Stadt Heidenheim nicht'. Nachgeprüft 09.11.2026: die unter https://www.heidenheim.de/site/Heidenheim/get/params_E-1908627137_Dattachment/833730/Integriertes%20Stadtentwicklungskonzept.pdf liegende Datei ist inzwischen die 'Fortschreibung 2026' des ISEK und enthält das Wort 'Mietspiegel' nicht mehr – der Satz ist damit am heutigen Dokument nicht mehr belegbar.",
+   "hinweis": "Kein Mietspiegel auf heidenheim.de gefunden; die frühere Aussage betraf nur den qualifizierten Mietspiegel und stammt aus 2023, die heutige Fassung des zitierten Dokuments enthält sie nicht mehr. Ob ein einfacher Mietspiegel existiert, ist unbelegt. Stadt knapp über 50.000 EW (Pflicht nach § 558c Abs. 4 BGB)."
   },
   {
    "ags": "09162000",
@@ -826,9 +826,9 @@
    "url": "https://www.regensburg.de/fm/RBG_INTER1S_VM.a.253.de/r_upload/mietspiegel-2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.regensburg.de/fm/121/dokumentation-mietspiegel-2026.pdf ('Der Mietspiegel ist ab dem 1. März 2026 gültig', qualifiziert § 558d Abs. 1, Primärdatenerhebung Sommer 2025) — Angaben aus Suchauszug, regensburg.de lieferte beim Abruf 503",
+   "beleg": "https://www.regensburg.de/fm/121/dokumentation-mietspiegel-2026.pdf ('Der Mietspiegel ist ab dem 1. März 2026 gültig', qualifiziert § 558d Abs. 1, Primärdatenerhebung Sommer 2025) — Angaben aus Suchauszug, regensburg.de lieferte beim Abruf 503; Form: Mietspiegel-PDF, Tabellenverzeichnis PDF-S. 5 und PDF-S. 10 ('Tabelle 1: Basismiete einer durchschnittlichen Wohnung in Abhängigkeit von der Wohnfläche', Tabellen 2–8 'Zu- und Abschläge in Prozent der Basismiete' nach Baujahr, Wohnlage, Ausstattung, Modernisierung); Dokumentation PDF-S. 4 ('erneut als Regressionsmietspiegel erstellt') → regression",
    "hinweis": "Neuerstellung 2026 (Befragung Sommer 2025); löst Mietspiegel 2024 ab (gültig bis Ende Januar 2026)"
   },
   {
@@ -870,10 +870,10 @@
    "url": "https://www.wuerzburg.de/media/www.wuerzburg.de/org/med_516999/583625_mietspiegel_2025_digital.pdf",
    "zugang": "frei",
    "preis": "Broschüre kostenfrei im Rathaus",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.wuerzburg.de/media/www.wuerzburg.de/org/med_516999/583625_mietspiegel_2025_digital.pdf Titel ('Qualifizierter Mietspiegel Fortschreibung 2025') und Kap. 2 ('Gültigkeit ... vom 1. September 2025 bis zum 31. August 2027')",
-   "hinweis": "Fortschreibung des Mietspiegels 2023 (Erhebung Jan.–Feb. 2023); Online-Rechner"
+   "beleg": "https://www.wuerzburg.de/media/www.wuerzburg.de/org/med_516999/583625_mietspiegel_2025_digital.pdf Titel ('Qualifizierter Mietspiegel Fortschreibung 2025') und Kap. 2 ('Gültigkeit ... vom 1. September 2025 bis zum 31. August 2027'); Form: PDF-S. 7–8 (Tabelle 1 'Basis-Nettomiete einer durchschnittlichen Wohnung in Abhängigkeit von der Wohnfläche und dem Baualter'; Tabelle 2 'prozentuale Zu- bzw. Abschläge … mit Punktwerten'; Tabelle 3 Berechnung); Dokumentation 2025 https://www.wuerzburg.de/media/www.wuerzburg.de/org/med_516999/594383_wuerzburg_2025_dokumentation_v1_clean.pdf, PDF-S. 5 ('Als Auswertungsmethodik wurde die Regressionsmethode verwendet') → regression",
+   "hinweis": "Fortschreibung des Mietspiegels 2023 (Erhebung Jan.–Feb. 2023); Online-Rechner; Tabelle 1 der Basis-Nettomiete ist nach Wohnfläche UND Baualter gegliedert, Zu-/Abschläge als Prozent-Punktwerte"
   },
   {
    "ags": "09563000",
@@ -936,9 +936,9 @@
    "url": "https://www.stadt.bamberg.de/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.stadt.bamberg.de/mietspiegel (qualifiziert, gültig 01.04.2026–31.03.2028); PDF https://www.stadt.bamberg.de/media/custom/3481_8944_1.PDF",
+   "beleg": "https://www.stadt.bamberg.de/mietspiegel (qualifiziert, gültig 01.04.2026–31.03.2028); PDF https://www.stadt.bamberg.de/media/custom/3481_8944_1.PDF; Form: PDF https://www.stadt.bamberg.de/media/custom/3481_8944_1.PDF, PDF-S. 1 'Tabelle: Monatliche Basis-Nettokaltmiete in Abhängigkeit von der Wohnfläche', PDF-S. 2 'Tabelle: Zu- und Abschläge', PDF-S. 3 ('nach der Regressionsformel errechneten Mieten', Spanne ±14 %) → regression",
    "hinweis": "zusätzlich Mietspiegel-Rechner 2026; Vorgänger 2024 Stichprobenfortschreibung, Mitwirkung Haus & Grund und Mieterverein Bamberg"
   },
   {
@@ -958,9 +958,9 @@
    "url": "https://www.aschaffenburg.de/loadDocument.phtml?FID=4173.3006.1&Ext=PDF",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.aschaffenburg.de/Buerger-in-Aschaffenburg/Planen-Bauen-und-Wohnen/Mietspiegel/ (Mietspiegel 2024/2026, Indexfortschreibung, gilt ab 14.05.2026 für weitere zwei Jahre)",
+   "beleg": "https://www.aschaffenburg.de/Buerger-in-Aschaffenburg/Planen-Bauen-und-Wohnen/Mietspiegel/ (Mietspiegel 2024/2026, Indexfortschreibung, gilt ab 14.05.2026 für weitere zwei Jahre); Form: PDF-S. 5 ('wissenschaftlich anerkannten Regressionsmethode'), PDF-S. 9 (Schritt 1 Basismiete nach Wohnungsgröße, Schritt 2 Zu- und Abschläge), PDF-S. 11 'Tabelle IV-3: Tabelle der Basismieten nach Wohnungsgröße', PDF-S. 12–14 Prozentpunkte der Zu-/Abschläge → regression",
    "hinweis": "Indexfortschreibung des Mietspiegels 2024 (Stadtrat 13.05.2024); 'für weitere zwei Jahre' ohne Enddatum genannt"
   },
   {
@@ -980,9 +980,9 @@
    "url": "https://www.bayreuth.de/wp-content/uploads/2026/04/Bayreuther-Mietspiegelbroschuere-2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.bayreuth.de/wp-content/uploads/2026/04/Bayreuther-Mietspiegelbroschuere-2026.pdf, Titel (qualifiziert nach § 558d, gültig 01.05.2026–30.04.2028); Dokumentation https://www.bayreuth.de/wp-content/uploads/2026/04/Mietspiegeldokumentation-Bayreuth-2026.pdf",
+   "beleg": "https://www.bayreuth.de/wp-content/uploads/2026/04/Bayreuther-Mietspiegelbroschuere-2026.pdf, Titel (qualifiziert nach § 558d, gültig 01.05.2026–30.04.2028); Dokumentation https://www.bayreuth.de/wp-content/uploads/2026/04/Mietspiegeldokumentation-Bayreuth-2026.pdf; Form: Dokumentation https://www.bayreuth.de/wp-content/uploads/2026/04/Mietspiegeldokumentation-Bayreuth-2026.pdf, PDF-S. 5 ('mittels Regressionsanalyse erstellt'), PDF-S. 19 '7.3 Regressionsmodell', PDF-S. 23 'Tab. 5: Monatliche Basis-Nettokaltmiete pro m² in Abhängigkeit von der Wohnfläche', PDF-S. 24 ('ganze prozentuale Zu- und Abschläge') → regression",
    "hinweis": "Neuerstellung 2026; Vorgänger 2024 Indexfortschreibung"
   },
   {
@@ -1002,9 +1002,9 @@
    "url": "https://landshut.de/news/bauenentwicklung/neuer-mietspiegel-ab-sofort-erhaeltlich",
    "zugang": null,
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://landshut.de/news/bauenentwicklung/neuer-mietspiegel-ab-sofort-erhaeltlich (qualifiziert, Erhebung 1.200 Haushalte Sommer 2024, gültig 01.03.2025–28.02.2027)",
+   "beleg": "https://landshut.de/news/bauenentwicklung/neuer-mietspiegel-ab-sofort-erhaeltlich (qualifiziert, Erhebung 1.200 Haushalte Sommer 2024, gültig 01.03.2025–28.02.2027); Form: Mietspiegel 2025 https://landshut.de/sites/default/files/filemanager/Benutzerdaten/La7/Mietspiegel/Mietspiegel_2025.pdf, PDF-S. 7 (Schritt 1 Basis-Nettomiete, Tabelle 1), PDF-S. 8–9 'Tabelle 2: Zu- / Abschläge auf Tabelle 1 in %', PDF-S. 10 'Tabelle 3: Berechnungsschema' (A aus Tabelle 1: Basis-Nettomiete in Abhängigkeit von der Wohnfläche) → regression",
    "hinweis": "Angaben aus Suchauszug der Stadtmeldung; laut Dokument 4 Jahre Laufzeit mit Fortschreibung nach 2 Jahren"
   },
   {
@@ -1024,9 +1024,9 @@
    "url": "https://kempten.de/file/Mietspiegelbrosch%c3%bcre%202025.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://kempten.de/mietspiegel-31829.html (qualifiziert, Indexfortschreibung Stichtag 01.11.2024, gültig 01.06.2025–31.05.2027)",
+   "beleg": "https://kempten.de/mietspiegel-31829.html (qualifiziert, Indexfortschreibung Stichtag 01.11.2024, gültig 01.06.2025–31.05.2027); Form: PDF-S. 3 ('übersichtliche und klare Struktur des Tabellenmietspiegels'), PDF-S. 10 Baujahresklassen, PDF-S. 11 'Mietspiegeltabelle' ('Aus den Merkmalen Wohnfläche und Baujahr ergibt sich das anzuwendende Mietspiegelfeld'), PDF-S. 12 Mittelwert (Median) und Spanne → tabelle",
    "hinweis": "Indexfortschreibung (VPI +5,5 %) des ersten qualifizierten Mietspiegels 2023; Druckexemplare kostenlos"
   },
   {
@@ -1046,9 +1046,9 @@
    "url": "https://www.rosenheim.de/fileadmin/Buergerservice/Planen_und_Bauen/Mietspiegel/Mietspiegeldokumentation_Rosenheim_2025.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.rosenheim.de/fileadmin/Buergerservice/Planen_und_Bauen/Mietspiegel/Mietspiegeldokumentation_Rosenheim_2025.pdf (Fortschreibung, ab 01.08.2025 für zwei Jahre qualifiziert)",
+   "beleg": "https://www.rosenheim.de/fileadmin/Buergerservice/Planen_und_Bauen/Mietspiegel/Mietspiegeldokumentation_Rosenheim_2025.pdf (Fortschreibung, ab 01.08.2025 für zwei Jahre qualifiziert); Form: Dokumentation PDF-S. 16 'Tab. 3: Monatliche Basis-Nettokaltmiete in Abhängigkeit von der Wohnfläche', PDF-S. 17 'Tab. 4: Übersicht Ergebnisse der Zu- und Abschläge' (Koeffizienten), PDF-S. 18–19 weitere Zu-/Abschläge, PDF-S. 20 Verweis auf das Regressionsmodell → regression",
    "hinweis": "Fortschreibung des ersten qualifizierten Mietspiegels vom 01.08.2023; 'für zwei Jahre' ohne Enddatum"
   },
   {
@@ -1068,9 +1068,9 @@
    "url": "https://nu.neu-ulm.de/buerger-service/leben-in-neu-ulm/bauen-und-wohnen/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://nu.neu-ulm.de/buerger-service/leben-in-neu-ulm/bauen-und-wohnen/mietspiegel (gemeinsamer qualifizierter Mietspiegel Ulm/Neu-Ulm, gültig 12.11.2025–11.11.2027, PDF und Online-Rechner)",
+   "beleg": "https://nu.neu-ulm.de/buerger-service/leben-in-neu-ulm/bauen-und-wohnen/mietspiegel (gemeinsamer qualifizierter Mietspiegel Ulm/Neu-Ulm, gültig 12.11.2025–11.11.2027, PDF und Online-Rechner); Form: regression · Beleg nur mittelbar: Dokumentation des Mietspiegels 2023 https://www.ulm.de/-/media/ulm/sub/sub-i/dokumentation-mietspiegel-ulm-neu-ulm-2023.pdf (laut Suchindex: Basis-Nettomiete als erster Faktor des Regressionsmodells); der Mietspiegel 2025 ist laut Stadtseite Neu-Ulm eine Preisindex-Fortschreibung des Mietspiegels 2023 durch das EMA-Institut",
    "hinweis": "gemeinsamer Mietspiegel Ulm/Neu-Ulm; zusätzlich Online-Rechner"
   },
   {
@@ -1112,10 +1112,10 @@
    "url": "https://www.passau.de/bauen-umwelt/bauen-wohnen/mietspiegel/",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.passau.de/bauen-umwelt/bauen-wohnen/mietspiegel/ (qualifizierter Mietspiegel, Erhebung 2024, per VPI +4,25 % zum 01.01.2026 für zwei Jahre fortgeschrieben); Rechner https://mietspiegel.passau.de/",
-   "hinweis": "Indexfortschreibung des Mietspiegels 2024; zusätzlich Online-Rechner der Stadt; Form nicht geprüft"
+   "beleg": "https://www.passau.de/bauen-umwelt/bauen-wohnen/mietspiegel/ (qualifizierter Mietspiegel, Erhebung 2024, per VPI +4,25 % zum 01.01.2026 für zwei Jahre fortgeschrieben); Rechner https://mietspiegel.passau.de/; Form: https://www.passau.de/bauen-umwelt/bauen-wohnen/mietspiegel/ (Mitwirkung der Universität Passau 'an der Erstellung eines neuen Regressionsmietspiegels') → regression",
+   "hinweis": "Indexfortschreibung des Mietspiegels 2024; zusätzlich Online-Rechner der Stadt; Mietspiegel-PDF https://www.passau.de/fileadmin/user_upload/Mietspiegel_2026.pdf ist ein Bild-PDF ohne Textebene"
   },
   {
    "ags": "04011000",
@@ -1134,9 +1134,9 @@
    "url": "https://www.bab-bremen.de/sixcms/media.php/49/Broschuere_Mietspiegel_2026_Web.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.bab-bremen.de/de/page/programm/mietspiegel (1. Fortschreibung des qualifizierten Mietspiegels 2024, gültig 01.01.2026–31.12.2027, VPI-Fortschreibung); Broschüre 2026 S. 3–4 ('weiterhin ein qualifizierter Mietspiegel')",
+   "beleg": "https://www.bab-bremen.de/de/page/programm/mietspiegel (1. Fortschreibung des qualifizierten Mietspiegels 2024, gültig 01.01.2026–31.12.2027, VPI-Fortschreibung); Broschüre 2026 S. 3–4 ('weiterhin ein qualifizierter Mietspiegel'); Form: Broschüre PDF-S. 10 'Tabelle 1: Grundtabelle' (Basismiete nach Wohnfläche), PDF-S. 11 (Grundtabelle sowie Katalog von Zu-/Abschlägen), PDF-S. 12–17 Tabellen 3–12 Zu-/Abschläge in % (Baujahr, Gebäudeart, Ausstattung, Modernisierung, Lage), PDF-S. 21 Tabelle 14 Berechnung → regression",
    "hinweis": "Indexfortschreibung des ersten qualifizierten Mietspiegels 2024; Online-Rechner zusätzlich; Ausschreibung für Neuerstellung läuft (Stand Juli 2026); gilt nicht für Bremerhaven"
   },
   {
@@ -1178,9 +1178,9 @@
    "url": "https://frankfurt.de/-/media/frankfurtde/service-und-rathaus/verwaltung/aemter-und-institutionen/amt-fuer-wohnungswesen/pdf/64_s1/64_s1_frankfurter_mietspiegel_2026.pdf?dmc=1",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://frankfurt.de/themen/planen-bauen-und-wohnen/wohnen/informationen-zum-wohnungsmarkt/mietspiegel (Suchauszug: qualifiziert, anerkannt 25.06.2026, Laufzeit bis 31.05.2028; Vorgänger 2024 bis 31.05.2026, übergangsweise bis 24.06.2026 als einfacher Mietspiegel)",
+   "beleg": "https://frankfurt.de/themen/planen-bauen-und-wohnen/wohnen/informationen-zum-wohnungsmarkt/mietspiegel (Suchauszug: qualifiziert, anerkannt 25.06.2026, Laufzeit bis 31.05.2028; Vorgänger 2024 bis 31.05.2026, übergangsweise bis 24.06.2026 als einfacher Mietspiegel); Form: Mietspiegel 2026 (laut Suchindex-Auszug der frankfurt.de-PDFs: 'Der Mietspiegel Frankfurt 2026 wird mit der Regressionsmethode ermittelt'; Tabelle 1 Basismiete nach Wohnfläche, Tabelle 2 Zu- und Abschläge in €/m², Berechnungsbogen; Dokumentation https://frankfurt.de/-/media/frankfurtde/service-und-rathaus/verwaltung/aemter-und-institutionen/amt-fuer-wohnungswesen/pdf/64_s1/64_s1_frankfurter_mietspiegel_2026_dokumentation.pdf?dmc=1) → regression",
    "hinweis": "Seiten der Stadt blockten den Abruf (403), Angaben aus Suchauszügen; Inkrafttreten nach Beschluss 25.06.2026, genaues Datum nicht bestätigt; Neuerhebung nach zwei Jahren beschlossen"
   },
   {
@@ -1200,9 +1200,9 @@
    "url": "https://www.wiesbaden.de/medien/downloads/leben-wohnen/amt-66/Mietspiegel-01012025-neu.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.wiesbaden.de/mietspiegel (14. Fortschreibung, Stand 01.01.2025, Magistrat Kenntnisnahme 17.06.2025); PDF bezeichnet sich als einfacher Mietspiegel (Suchauszug)",
+   "beleg": "https://www.wiesbaden.de/mietspiegel (14. Fortschreibung, Stand 01.01.2025, Magistrat Kenntnisnahme 17.06.2025); PDF bezeichnet sich als einfacher Mietspiegel (Suchauszug); Form: PDF-S. 2 ('Die Tabelle enthält RICHTWERTE … gegliedert nach der Größe der Wohnungen, der Ausstattung, dem Zeitpunkt der Bezugsfertigkeit und der Wohnlage'), PDF-S. 3 prozentuale Zu-/Abschläge auf den Mittelwert in besonderen Fällen, PDF-S. 5 Mietpreistabelle (Ausstattung × Wohnlage × Baualtersklasse) → tabelle",
    "hinweis": "14. Fortschreibung; Inkrafttreten mit Kenntnisnahme durch Magistrat 17.06.2025, Datum nicht ausdrücklich"
   },
   {
@@ -1222,10 +1222,10 @@
    "url": "https://www.kassel.de/bauen-und-wohnen/Mietspiegel_Broschuere_2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.kassel.de/bauen-und-wohnen/Mietspiegel_Broschuere_2026.pdf, Einleitung (anerkannt 08.12.2025, in Kraft 01.01.2026, Laufzeit bis 31.12.2027); https://www.kassel.de/mietspiegel",
-   "hinweis": "Indexfortschreibung (+4,07 %) des qualifizierten Mietspiegels 2024; zusätzlich Online-Rechner"
+   "beleg": "https://www.kassel.de/bauen-und-wohnen/Mietspiegel_Broschuere_2026.pdf, Einleitung (anerkannt 08.12.2025, in Kraft 01.01.2026, Laufzeit bis 31.12.2027); https://www.kassel.de/mietspiegel; Form: PDF-S. 8 Kap. 3.1 ('In den Tabellen 1 bis 4 werden die sogenannten Basismieten für die Wohnfläche, das Baujahr/die Baualtersklasse und die Wohnlage ausgewiesen'; Tabellen 5–7 Zu- und Abschläge), PDF-S. 9 Kap. 3.5 Basismiettabellen je Wohnlage, PDF-S. 10–18 Tabellen 1–4 (Wohnfläche × acht Baualtersklassen), PDF-S. 26 Tabelle 5 prozentuale Zuschläge, PDF-S. 29 Spanne ±17 % → tabelle",
+   "hinweis": "Indexfortschreibung (+4,07 %) des qualifizierten Mietspiegels 2024; zusätzlich Online-Rechner; Tabellenmietspiegel mit prozentualen Zu-/Abschlägen auf die Basismiete (Tabellen 5–7)"
   },
   {
    "ags": "06411000",
@@ -1244,10 +1244,10 @@
    "url": "https://www.darmstadt.de/fileadmin/Dateistruktur2024/03_STANDORT/08_Wohnort/Downloads/Mietspiegel_2026_WEB.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.darmstadt.de/fileadmin/Dateistruktur2024/03_STANDORT/08_Wohnort/Downloads/Mietspiegel_2026_WEB.pdf, Titel und Vorwort ('Qualifizierter Mietspiegel ... 2026', Stichprobe Stichtag 01.11.2025); https://digitales-rathaus.darmstadt.de/kategorien/aemter-und-einrichtungen/mietspiegelberatung",
-   "hinweis": "Neuerstellung 2026 (Stichprobe); Gültigkeitsbeginn in den gelesenen Seiten nicht gefunden"
+   "beleg": "https://www.darmstadt.de/fileadmin/Dateistruktur2024/03_STANDORT/08_Wohnort/Downloads/Mietspiegel_2026_WEB.pdf, Titel und Vorwort ('Qualifizierter Mietspiegel ... 2026', Stichprobe Stichtag 01.11.2025); https://digitales-rathaus.darmstadt.de/kategorien/aemter-und-einrichtungen/mietspiegelberatung; Form: PDF-S. 6–7 (Basis-Nettomiete nach Baujahr und Wohnfläche aus Tabelle 1, Zu-/Abschläge 'in Prozent von der Basis-Nettomiete' nach Tabelle 2), PDF-S. 8 'Tabelle 1: Durchschnittliche Nettomieten in Euro/m² nach Baujahresklassen und Wohnfläche', PDF-S. 10–12 'Tabelle 2: Zuschläge und Abschläge', PDF-S. 13 Tabelle 3 Berechnung; Methode: IWU-Gutachten zum Mietspiegel 2022 https://rathaus.darmstadt.de/public/getfile.php?iID=5361&cHash=b9e2f924a0112abd43552d82c2e20d23, PDF-S. 6 ('mittels eines regressionsanalytischen Ansatzes berechnet') → regression",
+   "hinweis": "Neuerstellung 2026 (Stichprobe); Gültigkeitsbeginn in den gelesenen Seiten nicht gefunden; Tabelle 1 der Basis-Nettomiete ist nach Baujahresklasse UND Wohnfläche gegliedert, Zu-/Abschläge in Prozent"
   },
   {
    "ags": "06413000",
@@ -1310,10 +1310,10 @@
    "url": "https://www.giessen.de/media/custom/2874_15358_1.PDF",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.giessen.de/media/custom/2874_15358_1.PDF, S. 2 Titelei ('Als qualifizierter Mietspiegel nach § 558d BGB anerkannt ... Gültig ab 01.07.2026')",
-   "hinweis": "Indexfortschreibung (VPI) des qualifizierten Mietspiegels 2024; Anerkennung Stadtverordnetenversammlung 25.06.2026"
+   "beleg": "https://www.giessen.de/media/custom/2874_15358_1.PDF, S. 2 Titelei ('Als qualifizierter Mietspiegel nach § 558d BGB anerkannt ... Gültig ab 01.07.2026'); Form: PDF-S. 8 ('In Tabelle 1 wird das Nettokaltmietniveau (= Basis-Nettokaltmiete) in Abhängigkeit von [der Wohnfläche]'), PDF-S. 9 'Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche', PDF-S. 10–11 'Tabelle 2: Zu-/Abschläge für den Mietpreis beeinflussende Wohnwertmerkmale' (in €/m², u. a. Baujahr, Wohnlage, Sanitärpunkte), PDF-S. 14 Tabelle 3 Berechnungsschema → regression",
+   "hinweis": "Indexfortschreibung (VPI) des qualifizierten Mietspiegels 2024; Anerkennung Stadtverordnetenversammlung 25.06.2026; Zu-/Abschläge in €/m² (additiv), nicht in Prozent"
   },
   {
    "ags": "06534014",
@@ -1332,10 +1332,10 @@
    "url": "https://www.marburg.de/medien/dokumente/mietspiegelbroschuere_marburg_2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.marburg.de/medien/dokumente/mietspiegelbroschuere_marburg_2026.pdf, S. 2 Titelei ('qualifizierter Mietspiegel nach § 558d', VPI-Anpassung 2026, 'Gültig ab 16. September 2026'); https://www.marburg.de/buergerservice/dienstleistungen/mietspiegel-erhalten-und-durchsehen-900000422-0.html",
-   "hinweis": "Indexfortschreibung des ersten qualifizierten Mietspiegels 2024"
+   "beleg": "https://www.marburg.de/medien/dokumente/mietspiegelbroschuere_marburg_2026.pdf, S. 2 Titelei ('qualifizierter Mietspiegel nach § 558d', VPI-Anpassung 2026, 'Gültig ab 16. September 2026'); https://www.marburg.de/buergerservice/dienstleistungen/mietspiegel-erhalten-und-durchsehen-900000422-0.html; Form: PDF-S. 8 ('Die erhobenen Daten wurden mittels Regressionsanalyse ausgewertet'), PDF-S. 10 'Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von [der Wohnfläche]', PDF-S. 13–14 'Tabelle 2: Zu-/Abschläge für den Mietpreis beeinflussende [Wohnwertmerkmale]' (in €/m²), PDF-S. 16 Tabelle 3 Berechnungsschema → regression",
+   "hinweis": "Indexfortschreibung des ersten qualifizierten Mietspiegels 2024; Zu-/Abschläge in €/m² (additiv), nicht in Prozent"
   },
   {
    "ags": "06433012",
@@ -1354,9 +1354,9 @@
    "url": "https://www.ruesselsheim.de/vv/produkte/lokale-leistungen/mietspiegel.php.media/21599/Mietspiegelbroschuere-Ruesselsheim-2025_1015.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.ruesselsheim.de/vv/produkte/lokale-leistungen/mietspiegel.php.media/21599/Mietspiegelbroschuere-Ruesselsheim-2025_1015.pdf, S. 2 Titelei ('Qualifizierter Mietpreisspiegel 2025', 'Gültig ab 01.07.2025'); https://www.ruesselsheim.de/vv/produkte/lokale-leistungen/mietspiegel.php",
+   "beleg": "https://www.ruesselsheim.de/vv/produkte/lokale-leistungen/mietspiegel.php.media/21599/Mietspiegelbroschuere-Ruesselsheim-2025_1015.pdf, S. 2 Titelei ('Qualifizierter Mietpreisspiegel 2025', 'Gültig ab 01.07.2025'); https://www.ruesselsheim.de/vv/produkte/lokale-leistungen/mietspiegel.php; Form: PDF-S. 8 (Ermittlung der Basismiete nach Wohnungsgröße), PDF-S. 9 'Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von der Wohn[fläche]', PDF-S. 10–11 'prozentuale Zu-/Abschläge', 'Tabelle 3: Zu-/Abschläge für den Mietpreis beeinflussende Wohnwertmerkmale', PDF-S. 13 Tabelle 4 Berechnungsschema (Gesamtfaktor) → regression",
    "hinweis": "Fortschreibung des qualifizierten Mietspiegels 2023 (Stichprobe 2023); gemeinsam mit Gemeinde Nauheim erstellt; zusätzlich Online-Rechner"
   },
   {
@@ -1376,9 +1376,9 @@
    "url": "https://www.fulda.de/d67/15_Buergerbuero/Statistik/Statistik/Mietspiegel/Mietspiegelbroschuere_Fulda_2026-2027.pdf",
    "zugang": "frei",
    "preis": "3,00 € Druckexemplar im Bürgerbüro (PDF kostenlos)",
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.fulda.de/stadt-politik/information/mietspiegel-mietspiegel-rechner (qualifiziert nach § 558d, gültig 01.01.2026–31.12.2027)",
+   "beleg": "https://www.fulda.de/stadt-politik/information/mietspiegel-mietspiegel-rechner (qualifiziert nach § 558d, gültig 01.01.2026–31.12.2027); Form: Mietspiegelbroschüre Fulda 2026–2027 (URL im Feld url), PDF-S. 7 „Tabelle 1: Basis-Nettomiete einer durchschnittlichen Wohnung in Abhängigkeit von der Wohnfläche und dem Baujahr“ (Wohnflächenklassen × 9 Baujahrsklassen), PDF-S. 8 „Tabelle 2: Zu- / Abschläge auf Tabelle 1 in %“, PDF-S. 11 „Tabelle 3: Berechnungsschema“ → tabelle (Baualter × Größe mit prozentualen Zu-/Abschlägen)",
    "hinweis": "Titel 2026–2027; zusätzlich Online-Rechner"
   },
   {
@@ -1398,9 +1398,9 @@
    "url": "https://www.bad-homburg.de/leben/ueber-unsere-stadt/Mietspiegelbrosch%C3%BCre_Bad_Homburg_2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.bad-homburg.de/leben/ueber-unsere-stadt/Mietspiegelbrosch%C3%BCre_Bad_Homburg_2026.pdf, S. 2 Titelei ('qualifizierter Mietspiegel nach § 558d', 'Gültig ab 01.01.2026'); https://www.bad-homburg.de/de/leben/ueber-unsere-stadt/qualifizierter_mietspiegel",
+   "beleg": "https://www.bad-homburg.de/leben/ueber-unsere-stadt/Mietspiegelbrosch%C3%BCre_Bad_Homburg_2026.pdf, S. 2 Titelei ('qualifizierter Mietspiegel nach § 558d', 'Gültig ab 01.01.2026'); https://www.bad-homburg.de/de/leben/ueber-unsere-stadt/qualifizierter_mietspiegel; Form: Mietspiegelbroschüre Bad Homburg 2026 (URL im Feld url), PDF-S. 8 „Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche“, PDF-S. 9–10 „4.2 Ermittlung von Zu- und Abschlägen zur Basismiete“ / „Tabelle 2: Zu-/Abschläge für den Mietpreis beeinflussende Wohnwertmerkmale“ (absolute Zu-/Abschläge in €/m², u. a. Baujahr), PDF-S. 12 Tabelle 3 Berechnungsschema → regression",
    "hinweis": "VPI-Fortschreibung des qualifizierten Mietspiegels 2024; zusätzlich Online-Rechner"
   },
   {
@@ -1420,9 +1420,9 @@
    "url": "https://www.wetzlar.de/medien/bindata/aktuelleDateien/2026/Broschuere-Mietspiegel-Wetzlar-Fortschreibung-2026-Stand-01.06.2026.pdf",
    "zugang": "frei",
    "preis": "5,00 € Druckexemplar im Stadtbüro (PDF kostenlos)",
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.wetzlar.de/medien/bindata/aktuelleDateien/2026/Broschuere-Mietspiegel-Wetzlar-Fortschreibung-2026-Stand-01.06.2026.pdf, Titelseite ('Gültigkeit des fortgeschriebenen qualifizierten Mietspiegels von 2024: 01. Juni 2026 bis 31. Mai 2028'); https://www.wetzlar.de/leben-in-wetzlar/planenbauenwohnen/mietspiegel.php",
+   "beleg": "https://www.wetzlar.de/medien/bindata/aktuelleDateien/2026/Broschuere-Mietspiegel-Wetzlar-Fortschreibung-2026-Stand-01.06.2026.pdf, Titelseite ('Gültigkeit des fortgeschriebenen qualifizierten Mietspiegels von 2024: 01. Juni 2026 bis 31. Mai 2028'); https://www.wetzlar.de/leben-in-wetzlar/planenbauenwohnen/mietspiegel.php; Form: Broschüre Wetzlar 2026 (URL im Feld url), PDF-S. 10 „7. Mietspiegeltabelle“ (Nettokaltmiete normale Wohnlage, 6 Baualtersklassen × 5 Wohnflächenklassen A–E, Mittelwert und Spanne; Zuschlag 0,52 €/m² für Ein-/Zweifamilienhäuser), Wohnlagen über Zu-/Abschläge (PDF-S. 9) → tabelle",
    "hinweis": "Fortschreibung des qualifizierten Mietspiegels 2024"
   },
   {
@@ -1464,10 +1464,10 @@
    "url": "https://rathaus.rostock.de/de/wirtschaft_verkehr/wohnen/mietspiegel/249767",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://rathaus.rostock.de/de/wirtschaft_verkehr/wohnen/mietspiegel/249767 (qualifizierter Mietspiegel 2026, gültig 01.05.2026–30.04.2028)",
-   "hinweis": "Broschüre und Dokumentation als PDF auf der Stadtseite; Online-Rechner https://mietspiegel-berechnen.de/rostock2026/"
+   "beleg": "https://rathaus.rostock.de/de/wirtschaft_verkehr/wohnen/mietspiegel/249767 (qualifizierter Mietspiegel 2026, gültig 01.05.2026–30.04.2028); Form: Broschüre https://rathaus.rostock.de/sixcms/media.php/rostock_01.a.4984.de/datei/Qualifizierter%20Mietspiegel%20der%20Hanse-und%20Universit%C3%A4tsstadt%20Rostock%202026.232418.PDF, PDF-S. 7 („mittels Regressionsanalyse ausgewertet“), PDF-S. 9 „Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche“, PDF-S. 11 „Tabelle 2: Zu-/Abschläge für den Mietpreis beeinflussende Wohnwertmerkmale“, PDF-S. 14 Tabelle 3 Berechnungsschema → regression",
+   "hinweis": "Broschüre und Dokumentation als PDF auf der Stadtseite; Online-Rechner https://mietspiegel-berechnen.de/rostock2026/; Mietspiegel 2026 ist laut Broschüre (PDF-S. 2–4) eine Fortschreibung des qualifizierten Mietspiegels 2024 auf Grundlage einer Stichprobenerhebung."
   },
   {
    "ags": "13004000",
@@ -1520,7 +1520,7 @@
    "einwohner_ca": 56092,
    "art": "qualifiziert",
    "stand": "2026",
-   "erhebungsstichtag": null,
+   "erhebungsstichtag": "2025-08-01",
    "gueltig_ab": "2026-03-01",
    "gueltig_bis": "2028-02-29",
    "naechste_anpassung": "2028",
@@ -1530,9 +1530,9 @@
    "url": "https://www.greifswald.de/de/.galleries/dokumente/Pressestelle-Dokumente/2026-04-14-BV-V_08_0261-Mietspiegelbroschuere-Greifswald-2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.greifswald.de/de/mein-greifswald/wohnen/mietspiegel-heizspiegel/mietspiegel/ (erster qualifizierter Mietspiegel, rückwirkend ab 01.03.2026); Beschlussvorlage https://www.greifswald.de/de/.galleries/Beschluesse/0261-02.pdf, Abschnitt 'Geltungsbereich und Gültigkeit' ('tritt am 01. März 2026 in Kraft, gilt bis zum 29. Februar 2028')",
+   "beleg": "https://www.greifswald.de/de/mein-greifswald/wohnen/mietspiegel-heizspiegel/mietspiegel/ (erster qualifizierter Mietspiegel, rückwirkend ab 01.03.2026); Beschlussvorlage https://www.greifswald.de/de/.galleries/Beschluesse/0261-02.pdf, Abschnitt 'Geltungsbereich und Gültigkeit' ('tritt am 01. März 2026 in Kraft, gilt bis zum 29. Februar 2028'); Form: Mietspiegelbroschüre Greifswald 2026 (URL im Feld url), PDF-S. 7 „Schritt 1 – Ermittlung der Basismiete“ / „Tabelle 1: Basisnettomiete in €/m² - Stichtag: 01. August 2025“ (je m² Wohnfläche), PDF-S. 8 „Tabelle 2: Zuschläge in Prozent der Basismiete je nach Baujahr des Gebäudes“, PDF-S. 9 Schritt 3/4 weitere Zu- und Abschläge → regression",
    "hinweis": "erster qualifizierter Mietspiegel, ersetzt einfachen Mietspiegel 2024; danach einmalige Fortschreibung für weitere zwei Jahre; Online-Rechner"
   },
   {
@@ -1552,9 +1552,9 @@
    "url": "https://service.stralsund.de/dienstleistungen/-/egov-bis-detail/dienstleistung/23498/show",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://service.stralsund.de/dienstleistungen/-/egov-bis-detail/dienstleistung/23498/show ('Der aktuelle Mietspiegel gilt rückwirkend zum 01.01.2026 bis zum 31.12.2027', VPI-Fortschreibung des qualifizierten Mietspiegels 2024/2025)",
+   "beleg": "https://service.stralsund.de/dienstleistungen/-/egov-bis-detail/dienstleistung/23498/show ('Der aktuelle Mietspiegel gilt rückwirkend zum 01.01.2026 bis zum 31.12.2027', VPI-Fortschreibung des qualifizierten Mietspiegels 2024/2025); Form: Mietspiegel 2026 https://service.stralsund.de/dienstleistungen/-/egov-bis-detail/dokument/255695/download, PDF-S. 7 „Tabelle 1: Basis-Nettomiete einer durchschnittlichen Wohnung in Abhängigkeit von der Wohnfläche und dem Baujahr“, PDF-S. 8 Tabelle 2 Zu-/Abschläge in %, Tabelle 4 Berechnungsschema → tabelle (Baualter × Größe mit prozentualen Zu-/Abschlägen)",
    "hinweis": "Mietspiegel 2026/2027, Indexfortschreibung; Druckexemplare u. a. beim Mieterverein Stralsund-Rügen; Online-Rechner"
   },
   {
@@ -1574,10 +1574,10 @@
    "url": "https://www.hannover.de/content/download/957295/file/31.20.05-2024004253%20-%20Mietspiegel%202025%20-%20Hannover-final.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.hannover.de/content/download/957295/file/31.20.05-2024004253%20-%20Mietspiegel%202025%20-%20Hannover-final.pdf, Einleitung (Stichtag 01.04.2025, 'gilt ab dem Tag seiner Anerkennung'); https://www.hannover.de/Leben-in-der-Region-Hannover/Planen,-Bauen,-Wohnen/Wohnen-Immobilien/Mietspiegel (Ratsbeschluss 18.12.2025, qualifiziert nach § 558d)",
-   "hinweis": "Mietspiegel 2025, löst Mietspiegel 2023 ab; Region Hannover erstellt qualifizierte Mietspiegel für alle 21 Kommunen"
+   "beleg": "https://www.hannover.de/content/download/957295/file/31.20.05-2024004253%20-%20Mietspiegel%202025%20-%20Hannover-final.pdf, Einleitung (Stichtag 01.04.2025, 'gilt ab dem Tag seiner Anerkennung'); https://www.hannover.de/Leben-in-der-Region-Hannover/Planen,-Bauen,-Wohnen/Wohnen-Immobilien/Mietspiegel (Ratsbeschluss 18.12.2025, qualifiziert nach § 558d); Form: Mietspiegel 2025 Hannover (URL im Feld url), PDF-S. 5 Abschnitt Wohnwertmerkmale („Aus den drei Merkmalen Wohnungsgröße, Baualter und Wohnlage ergibt sich in der Mietspiegeltabelle das Feld“), PDF-S. 6 sechs Größenklassen, PDF-S. 9 Tabellenfelder mit Mittelwert und 4/5-Spanne → tabelle",
+   "hinweis": "Mietspiegel 2025, löst Mietspiegel 2023 ab; Region Hannover erstellt qualifizierte Mietspiegel für alle 21 Kommunen; Die Orientierungshilfe zur Spanneneinordnung (Ausstattungsmerkmale) hat laut Broschüre PDF-S. 7 nur „die Qualität eines einfachen Mietspiegels“."
   },
   {
    "ags": "03101000",
@@ -1618,9 +1618,9 @@
    "url": "https://serviceportal.oldenburg.de/medien/dokumente/mietspielgelbroschuere_2025.pdf",
    "zugang": "frei",
    "preis": "24,00 € gedruckte Broschüre, 21,00 € Dokumentation (digitale Broschüre kostenlos)",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://serviceportal.oldenburg.de/medien/dokumente/mietspielgelbroschuere_2025.pdf, Titelei ('qualifizierter Mietspiegel nach § 558d', 'Gültig ab: 11. Oktober 2025'); https://serviceportal.oldenburg.de/buergerservice/dienstleistungen/mietspiegel-900001065-0.html",
+   "beleg": "https://serviceportal.oldenburg.de/medien/dokumente/mietspielgelbroschuere_2025.pdf, Titelei ('qualifizierter Mietspiegel nach § 558d', 'Gültig ab: 11. Oktober 2025'); https://serviceportal.oldenburg.de/buergerservice/dienstleistungen/mietspiegel-900001065-0.html; Form: Broschüre Oldenburg 2025 (URL im Feld url), PDF-S. 9 („mittels Regressionsanalyse“, „4.1 Ermittlung der Basismiete nach Wohnungsgröße“), PDF-S. 10 „Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche“, PDF-S. 4 Inhalt „Ermittlung von Zu- und Abschlägen zur Basismiete“ → regression",
    "hinweis": "Fortschreibung des qualifizierten Mietspiegels 2023 (gültig bis 10.10.2025)"
   },
   {
@@ -1640,10 +1640,10 @@
    "url": "https://www.osnabrueck.de/fileadmin/global/OSaktuell/Mietspiegel_2025_2026_online_gedreht.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.osnabrueck.de/mietspiegel/ (Download 'Mietspiegel 2025/2026'; Abschnitt 'Qualifizierter Mietspiegel 2027 – Erhebungsphase ist beendet': qualifizierter Mietspiegel soll ab Januar 2027 den bisherigen einfachen Mietspiegel ablösen)",
-   "hinweis": "Mietspiegel 2025/2026 einfach; qualifizierter Mietspiegel ab Januar 2027 angekündigt; PDF selbst nicht geöffnet (Abruf blockiert)"
+   "beleg": "https://www.osnabrueck.de/mietspiegel/ (Download 'Mietspiegel 2025/2026'; Abschnitt 'Qualifizierter Mietspiegel 2027 – Erhebungsphase ist beendet': qualifizierter Mietspiegel soll ab Januar 2027 den bisherigen einfachen Mietspiegel ablösen); Form/Art: Mietspiegel 2025/2026 (URL im Feld url), PDF-S. 4 („Der einfache Mietspiegel für die Stadt …“), PDF-S. 2 („basiert auf einer Regressionsanalyse zu den erfassten Bestandsdaten … 2019–2024“), PDF-S. 7 Tabelle Nettomonatsmiete je qm nach Größe (5 Klassen) × Fertigstellung (8 Klassen), PDF-S. 5 Zu-/Abschlagsmerkmale → tabelle",
+   "hinweis": "Mietspiegel 2025/2026 einfach (im PDF selbst so bezeichnet, S. 4); Werte per Regressionsanalyse aus Bestandsdaten 2019–2024 abgeleitet, als Tabelle ausgewiesen; qualifizierter Mietspiegel ab Januar 2027 angekündigt"
   },
   {
    "ags": "03103000",
@@ -1684,9 +1684,9 @@
    "url": "https://www.goettingen.de/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.goettingen.de/mietspiegel (Stand 01.05.2025, VPI-Fortschreibung des Mietspiegels 2023; Download 'Einfacher Mietspiegel für nicht preisgebundenen Wohnraum')",
+   "beleg": "https://www.goettingen.de/mietspiegel (Stand 01.05.2025, VPI-Fortschreibung des Mietspiegels 2023; Download 'Einfacher Mietspiegel für nicht preisgebundenen Wohnraum'); Form: „Einfacher Mietspiegel“ (PDF über https://www.goettingen.de/mietspiegel, Download „Einfacher Mietspiegel für nicht preisgebundenen Wohnraum“), PDF-S. 7 „Mietspiegeltabelle Stadt Göttingen 2025“ („wird durch die Wohnwertmerkmale Wohnungsgröße und Baujahr …“), PDF-S. 7–8 Plus-/Minus-Wohnwertpunkte nur zur Einordnung in die Spanne → tabelle",
    "hinweis": "Fortschreibung per Verbraucherpreisindex; Online-Rechner; Art nur aus dem Dokumenttitel 'Einfacher Mietspiegel'"
   },
   {
@@ -1694,22 +1694,22 @@
    "gemeinde": "Salzgitter",
    "land": "NI",
    "einwohner_ca": 104970,
-   "art": "unklar",
-   "stand": null,
-   "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "art": "einfach",
+   "stand": "2025-05-27",
+   "erhebungsstichtag": "2022-12-01",
+   "gueltig_ab": "2025-06-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": null,
-   "zugang": null,
+   "ersteller": "Stadt Salzgitter (Referat 17 Wirtschafts- und Europaangelegenheiten), Auswertung DOMUS Consult Wirtschaftsberatungsgesellschaft mbH; anerkannt vom DMB Mieterverein Braunschweig und Umgebung e. V. und den Interessenvertretern der Vermieter",
+   "url": "https://www.salzgitter.de/rathaus/mietspiegel/Mietspiegel.php",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.salzgitter.de/leben/mietangebote und https://www.salzgitter.de/leben/bauen geprüft – kein Mietspiegel genannt; https://www.salzgitter.de/mietspiegel 404",
-   "hinweis": "auf der Stadtseite kein Mietspiegel gefunden; Websuche-Kontingent war erschöpft, keine weitere Recherche möglich"
+   "beleg": "https://www.salzgitter.de/rathaus/mietspiegel/Mietspiegel.php (Stadtseite: 'Informationen über den einfachen Mietspiegel der Stadt Salzgitter'; 'Es handelt sich um einen einfachen Mietspiegel gemäß der §§ 3-5 Mietspiegelverordnung (MsV). Der Erhebungsstichtag war der 01.12.2022'; Fortschreibung über VPI Dez. 2022–Dez. 2024); Broschüre https://www.salzgitter.de/rathaus/MSP-Salzgitter-2025-Broschuere-vom-27.05.2025.pdf (Titel 'Einfacher Mietspiegel 2025'; S. 2: 'Der Mietspiegel 2025 ist eine Fortschreibung des Mietspiegels 2023 auf Basis des Verbraucherpreisindex und tritt am 01.06.2025 in Kraft'; Abschnitt Mietspiegeltabelle S. 6: Baualtersklassen × Wohnungsgrößen, Mittelwert und 2/3-Spanne; Impressum: Herausgeber Stadt Salzgitter); Methodenbericht https://www.salzgitter.de/rathaus/einfacher-MSP-Salzgitter-2025-Methodenbericht-Fortschreibung.pdf",
+   "hinweis": "Einfacher Mietspiegel 2023 (in Kraft 01.06.2023, Rat zur Kenntnis 24.05.2023), 2025 per Verbraucherpreisindex fortgeschrieben (in Kraft 01.06.2025). Tabelle Baualter × Wohnungsgröße, Einordnung in die Spanne über Wohnwertmerkmale (Plus-/Minuspunkte). Laut Stadtseite wird das Fortschreibungsverfahren 2026/2027 nicht erneut angewandt; die Neuerstellung mit neuer Datenerhebung wird voraussichtlich ab Dezember 2026 durchgeführt."
   },
   {
    "ags": "03254021",
@@ -2039,7 +2039,7 @@
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://www.dortmund.de/themen/wohnen/mietspiegel/ ('qualifizierten Mietspiegel im Sinne des § 558d', veröffentlicht in den Dortmunder Bekanntmachungen am 20.12.2024, 'Laufzeit bis zum 31.12.2026'); PDF https://www.dortmund.de/dortmund/projekte/rathaus/verwaltung/amt-fuer-wohnen/downloads/mietspiegel/mietspiegel-dortmund-2025_2026.pdf S. 1 '(Fortschreibung des Mietspiegels 2023/2024)', S. 6 Abschnitt 6 Laufzeit 'gilt ab dem 01.01.2025 … bis zum 31.12.2026', S. 3 ff. Zu-/Abschläge",
-   "hinweis": "Fortschreibung des Mietspiegels 2023/2024; die Stadt hat die Befragung für den Nachfolger gestartet, der am 01.01.2027 in Kraft treten soll (Pressemitteilung dortmund.de). Läuft in diesem Verzeichnis zum 31.12.2026 aus — Anfang 2027 nachernten."
+   "hinweis": "Fortschreibung des Mietspiegels 2023/2024. Nachfolger: neuer qualifizierter Mietspiegel, Befragung gestartet laut Pressemitteilung der Stadt vom 08.06.2026 (https://www.dortmund.de/newsroom/nachrichten-dortmund.de/befragungen-fuer-den-neuen-mietspiegel-starten-jetzt.html: 'Mit dem 1. Januar des kommenden Jahres' in Kraft, Geltung zwei Jahre, Auswertung EMA-Institut). Auf der Mietspiegelseite am 2026-11-09 noch nicht veröffentlicht. Läuft in diesem Verzeichnis zum 31.12.2026 aus — Anfang 2027 nachernten."
   },
   {
    "ags": "05113000",
@@ -2117,7 +2117,7 @@
    "erhebungsstichtag": null,
    "gueltig_ab": "2024-12-01",
    "gueltig_bis": "2026-11-30",
-   "naechste_anpassung": "2026",
+   "naechste_anpassung": "2026-12-01",
    "vermutung_bis": "2026-11-30",
    "vermutung_bis_herleitung": "angegeben",
    "ersteller": "Stadt Wuppertal, Erhebung FUB IGES",
@@ -2126,8 +2126,8 @@
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "Methodenbericht https://wuppertal.de/vv/produkte/105/102370100000364921.php.media/535423/Methodenbericht-zum-Mietspiegel-Wuppertal-2024.pdf (qualifiziert, Stichtag 01.04.2024)",
-   "hinweis": "Gültigkeit 01.12.2024–30.11.2026 und Fortschreibung 2026 nur aus Sekundärquelle; Stadtseite antwortet 403 – läuft in drei Wochen aus, Nachfolger prüfen"
+   "beleg": "Mietspiegel-PDF https://wuppertal.de/vv/produkte/105/102370100000364921.php.media/535422/Mietspiegel.pdf S. 2 ('als „qualifizierter Mietspiegel“ auf Basis einer Stichprobe gemäß § 558 d Abs. 2 BGB neu erstellt'), S. 3 Übersicht der 'am 1. April 2024 üblicherweise gezahlten Mieten', Tabelle nach Baualters- und Größenklassen; Methodenbericht https://wuppertal.de/vv/produkte/105/102370100000364921.php.media/535423/Methodenbericht-zum-Mietspiegel-Wuppertal-2024.pdf; Stadtseite https://www.wuppertal.de/vv/produkte/105/102370100000364921.php ('Der Mietspiegel 2024 ist gültig für die Zeit vom 01.12.2024 bis zum 30.11.2026'), Pressemitteilung März 2026 https://www.wuppertal.de/presse/meldungen/meldungen-2026/maerz/mietspiegel.php (Vermieterbefragung für die Fortschreibung, IGES), Newsletter vom 06.11.2026 https://www.wuppertal.de/newsletter/newsletter_ob/2026-11-06-newsletter-ob.php (neuer qualifizierter Mietspiegel ab 1. Dezember 2026 auf der Internetseite) — die drei Stadtseiten antworten auf direkten Abruf mit 403, Wortlaut aus dem Suchindex",
+   "hinweis": "Neuer qualifizierter Mietspiegel (Fortschreibung über lokalen Mietpreisindex, Vermieterbefragung März–Mai 2026, IGES) laut Stadt-Newsletter vom 06.11.2026 ab 01.12.2026 auf wuppertal.de — Satz ab Dezember 2026 auf die neue Ausgabe heben. Mietspiegel 2024 gültig 01.12.2024–30.11.2026."
   },
   {
    "ags": "05711000",
@@ -2136,7 +2136,7 @@
    "einwohner_ca": 331605,
    "art": "qualifiziert",
    "stand": "2026-03",
-   "erhebungsstichtag": null,
+   "erhebungsstichtag": "2026-02-01",
    "gueltig_ab": "2026-07-01",
    "gueltig_bis": "2028-06-30",
    "naechste_anpassung": null,
@@ -2148,8 +2148,8 @@
    "preis": null,
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "Broschüre https://www.bielefeld.de/sites/default/files/datei/2026/20260629_Broschuere_Mietspiegel_A5-B-1.pdf S. 3 'Er gilt zwei Jahre ab Inkrafttreten und ist ein qualifizierter Mietspiegel', S. 5 Regressionsmodell (Spanne −15 %/+16 %), S. 20 'Stand Mietspiegel: März 2026'; Inkrafttreten 1. Juli 2026 laut Mitersteller Haus & Grund Bielefeld (https://www.hausundgrund.de/verein/bielefeld/leistungen/bielefelder-mietspiegel-2026)",
-   "hinweis": "gueltig_bis aus 'zwei Jahre ab Inkrafttreten' gerechnet. Online-Mietpreisrechner der Stadt; Methodenbericht 2026 als PDF. Das Inkrafttreten-Datum steht nicht auf der Stadtseite, nur beim Mitersteller."
+   "beleg": "Broschüre https://www.bielefeld.de/sites/default/files/datei/2026/20260629_Broschuere_Mietspiegel_A5-B-1.pdf S. 3 'Er gilt zwei Jahre ab Inkrafttreten und ist ein qualifizierter Mietspiegel', S. 5 Regressionsmodell (Spanne −15 %/+16 %), S. 20 'Stand Mietspiegel: März 2026'; Dokumentation https://www.bielefeld.de/sites/default/files/datei/2026/20260701_Mietspiegeldokumentation-Stadt-Bielefeld-2026-1.pdf S. 5 ('am 1. Februar 2026, dem Stichtag der Erhebung'; qualifiziert § 558d), S. 7 ('von allen Teilnehmern des Arbeitskreises Mietspiegel am 27. Mai 2026 anerkannt'), Kap. 6.3 Regressionsmodell, Kap. 6.5 Tabellen des Mietspiegels; Inkrafttreten 1. Juli 2026 nur laut Mitersteller Haus & Grund Bielefeld (https://www.hausundgrund.de/verein/bielefeld/leistungen/bielefelder-mietspiegel-2026)",
+   "hinweis": "gueltig_bis aus 'zwei Jahre ab Inkrafttreten' gerechnet. Online-Mietpreisrechner der Stadt; Methodenbericht 2026 als PDF. Das Inkrafttreten-Datum steht weder auf https://www.bielefeld.de/mietspiegel noch in Broschüre/Dokumentation der Stadt, nur beim Mitersteller. Aufbau: Tabellen nach Baualter × Größe, getrennt für normale und gute Wohnlage, Werte aus zweistufigem Regressionsmodell."
   },
   {
    "ags": "05314000",
@@ -2222,22 +2222,22 @@
    "gemeinde": "Mönchengladbach",
    "land": "NW",
    "einwohner_ca": 267213,
-   "art": "unklar",
-   "stand": "2026",
-   "erhebungsstichtag": null,
+   "art": "einfach",
+   "stand": "2026-05-01",
+   "erhebungsstichtag": "2024-10-01",
    "gueltig_ab": "2026-05-01",
    "gueltig_bis": null,
-   "naechste_anpassung": null,
+   "naechste_anpassung": "2028",
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
    "ersteller": "ArGe Mietspiegel MG: Stadt Mönchengladbach (FB Geoinformation 62), Mieterverband Niederrhein, Haus & Grund Mönchengladbach, Gutachterausschuss",
-   "url": "https://www.moenchengladbach.de/rathaus/buergerinfo-a-z/planen-bauen-mobilitaet-umwelt-dezernat-vi/fachbereich-geoinformation-62/mietspiegel",
+   "url": "https://www.moenchengladbach.de/fileadmin/user_upload/FB62/Mietspiegel/Mietspiegel_2026_Download.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.moenchengladbach.de/.../fachbereich-geoinformation-62/mietspiegel (Mietspiegel 2026, in Kraft 01.05.2026, PDF kostenfrei, Online-Mietwertrechner)",
-   "hinweis": "Amtlicher Mietspiegel vorhanden; ob qualifiziert oder einfach auf der Seite nicht bestätigt"
+   "beleg": "https://www.moenchengladbach.de/fileadmin/user_upload/FB62/Mietspiegel/Mietspiegel_2026_Download.pdf, S. 5: \"Auch wenn der vorliegende Mietspiegel nicht als qualifizierter Mietspiegel im Sinne der gesetzlichen Bestimmungen gilt ...\"; \"Die angewandte Methode macht diesen Mietspiegel zu einem Regressionsmietspiegel\"; \"am 16. April 2026 anerkannt. Er tritt am 01. Mai 2026 in Kraft\"; \"den nächsten Mietspiegel für das Jahr 2028 zu erarbeiten. Bis zur Veröffentlichung des nächsten Mietspiegel behält dieser Mietspiegel seine Gültigkeit\"; S. 6: \"Instrument zur Ermittlung der ortsüblichen Vergleichsmiete gemäß § 558c BGB\"; Dokumentationsteil: \"Der Stichtag für die Mietverhältnisse wurde auf den 01. Oktober 2024 festgelegt\", Standardmietwert 7,01 €/m² aus multipler Regressionsanalyse. Stadtseite https://www.moenchengladbach.de/rathaus/buergerinfo-a-z/planen-bauen-mobilitaet-umwelt-dezernat-vi/fachbereich-geoinformation-62/mietspiegel (in Kraft 01.05.2026, ArGe Mietspiegel MG, Online-Mietwertrechner)",
+   "hinweis": "Einfacher Mietspiegel (§ 558c), ausdrücklich nicht qualifiziert, obwohl per Erhebung und Regression erstellt; Standardmietwert mit Einflussfaktoren (Zu-/Abschläge), dazu Online-Mietwertrechner der Stadt; kein festes Enddatum, gilt bis zum nächsten Mietspiegel (angestrebt 2028)"
   },
   {
    "ags": "05334002",
@@ -2256,9 +2256,9 @@
    "url": "https://serviceportal.aachen.de/suche/-/vr-bis-detail/dienstleistung/3218/show",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.aachen.de/services/presse/pressemitteilungen/2025/dezember/101225-mietspiegel (fortgeschriebener qualifizierter Mietspiegel tritt zum 01.01.2026 in Kraft); https://serviceportal.aachen.de/suche/-/vr-bis-detail/dokument/8201673/download (Mietspiegel 2026, 26.11.2025)",
+   "beleg": "https://www.aachen.de/services/presse/pressemitteilungen/2025/dezember/101225-mietspiegel (fortgeschriebener qualifizierter Mietspiegel tritt zum 01.01.2026 in Kraft); https://serviceportal.aachen.de/suche/-/vr-bis-detail/dokument/8201673/download (Mietspiegel 2026, 26.11.2025); Form: Methodenbericht Fortschreibung 2026 (https://serviceportal.aachen.de/suche/-/vr-bis-detail/dokument/8201673/download), PDF-S. 8 Abschnitt 4.2 (Fortschreibungsindex auf „die im Mietspiegel 2024 ausgewiesenen Basismieten“, Zu- und Abschläge übernommen), Tabellenverzeichnis „Tabelle 6 Netto-Kaltmiete in Abhängigkeit von der Wohnfläche“, „Tabelle 7 Zu- und Abschläge für Wohnwertmerkmale“ → regression",
    "hinweis": "Fortschreibung des Mietspiegels 2024 per Stichprobe (Stichtag 01.06.2025, +6,3 %); gilt für 15–140 m² in Mehrfamilienhäusern; Online-Rechner"
   },
   {
@@ -2322,9 +2322,9 @@
    "url": "https://www.hagen.de/dateien/aus-dem-rathaus/fachbereiche-und-aemter/a-z/fachbereich-geoinformation-und-liegenschaftskataster/mietspiegel-2025-hagen.pdf",
    "zugang": "frei",
    "preis": "10,00 € gedruckt",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "Mietspiegel-PDF 2025 (gültig 01.10.2025–30.09.2027); Amtsblatt https://www.hagen.de/dateien/hagen-aktuell/amtsblatt/2025/28-31-10.pdf (qualifiziert § 558d)",
+   "beleg": "Mietspiegel-PDF 2025 (gültig 01.10.2025–30.09.2027); Amtsblatt https://www.hagen.de/dateien/hagen-aktuell/amtsblatt/2025/28-31-10.pdf (qualifiziert § 558d); Form: Mietspiegel 2025 Hagen (URL im Feld url), PDF-S. 3 und S. 7 „qualifizierter Mietspiegel (Regressionsmietspiegel)“, PDF-S. 10 (Druckseite 8) Tabelle 1 Nettokaltmiete Standardwohnung nach Baujahresklasse und Ausstattungszustand, danach „Zu- und Abschläge der Tabelle 2 (Wohnlage, Wohnfläche, Wohnungstyp, Besonderheiten)“; Ausstattungsklasse über Ausstattungspunkte (PDF-S. 9) → regression",
    "hinweis": "Mietenerhebung Januar 2025, beschlossen 24.09.2025; Download frei, Druck 10 €"
   },
   {
@@ -2366,9 +2366,9 @@
    "url": "https://cms.muelheim-ruhr.de/sites/default/files/2026-01/Mietspiegel-2026_.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://cms.muelheim-ruhr.de/leben-in-muelheim/wohnen/mietspiegel-2026-neue-mietpreisuebersicht-in-kraft (gültig 01.01.2026–31.12.2027, qualifiziert)",
+   "beleg": "https://cms.muelheim-ruhr.de/leben-in-muelheim/wohnen/mietspiegel-2026-neue-mietpreisuebersicht-in-kraft (gültig 01.01.2026–31.12.2027, qualifiziert); Form: Mietspiegel 2026 Mülheim (URL im Feld url), PDF-S. 3 „3.1 Baualters- und Wohnungsgrößenklassen“ („weist … sechs Baualtersklassen und sieben Wohnungsgrößenklassen aus“), PDF-S. 4 „4. Mietspiegeltabelle“, PDF-S. 5 „5. Durchschnittliche Zu- und Abschläge“ → tabelle",
    "hinweis": "Indexfortschreibung des Mietspiegels 2024 (+4,55 %); Wohnlagenabfrage online"
   },
   {
@@ -2398,22 +2398,22 @@
    "gemeinde": "Solingen",
    "land": "NW",
    "einwohner_ca": 165626,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2025",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": "https://solingen.de/inhalt/verzeichnis/product/1058",
-   "zugang": null,
+   "ersteller": "Mieterbund Rheinisch-Bergisches Land e.V., Haus- und Grundeigentümerverein Solingen e.V., Haus- und Grundeigentümerverein Solingen-Ohligs e.V.",
+   "url": "https://www.mieterbundrbl.de/wp-content/uploads/2025/01/Mietspiegel_2025.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://solingen.de/inhalt/verzeichnis/product/1058 (Leistungsseite 'Mietspiegel' der Stadt, Inhalt nicht abrufbar)",
-   "hinweis": "Stadt führt eine Mietspiegel-Leistungsseite; Inhalt (Jahr, Art) nicht lesbar. Nur Sekundärangabe: Mietspiegel der Verbände (Mieterbund Rheinisch-Bergisches Land, Haus & Grund Solingen, Haus & Grund Solingen-Ohligs), 2024 mit unveränderter Fortführung 2025 – nicht amtlich bestätigt"
+   "beleg": "https://www.mieterbundrbl.de/wp-content/uploads/2025/01/Mietspiegel_2025.pdf (Titel: \"Mietspiegel für Solingen 2025, vereinbart zwischen Mieterbund Rheinisch-Bergisches Land e.V., Haus- und Grundeigentümerverein Solingen e.V., Haus- und Grundeigentümerverein Solingen-Ohligs e.V.\"; Vorwort: \"Der veröffentlichte Mietspiegel 2025 ist in den Werten identisch mit dem Mietspiegel 2024. Dessen Dokumentation gilt unverändert fort\"; Dokumentation Abschnitt 1: \"Der vorliegende einfache Mietspiegel 2024 (§ 558 c BGB, § 1 MsV) ... am 4.3.2024 vom Arbeitskreis Mietspiegel einvernehmlich beschlossen\"; Abschnitt 5: Mietwertspannen, Fortschreibung des Mietspiegels 2023 inflationsbedingt nach § 558c Abs. 3 BGB). PDF liegt auf der Seite des Miterstellers Mieterbund RBL (https://www.mieterbundrbl.de/)",
+   "hinweis": "Verbände-Mietspiegel, einfach (§ 558c); Werte 2025 = Mietspiegel 2024, dieser wiederum Fortschreibung des Mietspiegels 2023; Tabelle A nach Baujahr und Wohnungsgröße (bis 50 / 50–80 / über 80 m²) mit Zu- und Abschlägen (Tabelle B u. a. Wärmedämmung); kostenloser Download beim Mieterbund RBL; Leistungsseite der Stadt (https://solingen.de/inhalt/verzeichnis/product/1058) lieferte keinen lesbaren Inhalt"
   },
   {
    "ags": "05774032",
@@ -2444,7 +2444,7 @@
    "einwohner_ca": 155851,
    "art": "qualifiziert",
    "stand": "2025",
-   "erhebungsstichtag": null,
+   "erhebungsstichtag": "2024-01-01",
    "gueltig_ab": "2025-01-01",
    "gueltig_bis": "2026-12-31",
    "naechste_anpassung": null,
@@ -2454,32 +2454,32 @@
    "url": "https://www.herne.de/Wirtschaft-und-Infrastruktur/Bauen-und-Wohnen/Wohnen/Mietspiegel/",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://serviceportal.herne.de/detail/-/vr-bis-detail/dokument/1188449/download (Qualifizierter Mietspiegel 2025, Laufzeit bis 31.12.2026)",
-   "hinweis": "nur Mehrfamilienhäuser ab 3 Wohnungen; Spanne −13,4 %/+13,8 %; läuft Ende 2026 aus"
+   "beleg": "https://serviceportal.herne.de/detail/-/vr-bis-detail/dokument/1188449/download (identisch https://herne.de/PDF/mietspiegel/mietspiegel.pdf): Titel 'Qualifizierter Mietspiegel 2025 … Gültig ab 1. Januar 2025, Erhebungsstand: 1. Januar 2024', S. 3 'entspricht den Anforderungen der Mietspiegelverordnung (MsV) für die Erstellung von Regressionsmietspiegeln … qualifizierten Mietspiegel (§ 558d Abs. 1 …)', S. 4 'Laufzeit bis zum 31. Dezember 2026', S. 6 Tabelle 1 Basistabelle (Baualter × Wohnungsgröße) + Zu-/Abschläge",
+   "hinweis": "nur Mehrfamilienhäuser ab 3 Wohnungen; Spanne −13,4 %/+13,8 %; Basistabelle + Zu-/Abschläge, Wohnlagenzuschläge. Läuft Ende 2026 aus; Nachfolger auf Stadtseite/Serviceportal weder veröffentlicht noch angekündigt — Stand geprüft am 2026-11-09."
   },
   {
    "ags": "05162024",
    "gemeinde": "Neuss",
    "land": "NW",
    "einwohner_ca": 154317,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2026-01-01",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2026-01-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "laut Stadt: H&G Neuss und Mieterbund Neuss im Mieterverein Düsseldorf e. V.",
-   "url": "https://www.neuss.de/fileadmin/Pressedienst/pdf/20231121-0.pdf",
-   "zugang": null,
+   "ersteller": "Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e.V. und Mieterverein Düsseldorf e.V. (Mieterbüro Neuss) im Deutschen Mieterbund",
+   "url": "https://www.mieterverein-duesseldorf.de/fileadmin/user_upload/redaktion/duesseldorf-2025/Downloads/Mietspiegel/Mietspiegel_Neuss_2026.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.neuss.de/fileadmin/Pressedienst/pdf/20231121-0.pdf (21.11.2023: Stadt lässt erstmals qualifizierten Mietspiegel durch ALP Institut erstellen); Sozialmonitoring Neuss 2025, Abschnitt 4.4.1 (Mietspiegel von H&G und Mieterbund)",
-   "hinweis": "Fertigstellung/Gültigkeit des qualifizierten Mietspiegels amtlich nicht gefunden; Sekundärangabe: einfacher Mietspiegel Stand 01.01.2023"
+   "beleg": "Dokumentation https://www.mieterverein-duesseldorf.de/fileadmin/user_upload/redaktion/duesseldorf-2025/Downloads/Mietspiegel/MS_Neuss_2026_Dokumentation.pdf, S. 1: \"Stand: 01.01.2026\", \"Herausgegeben von: Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e.V. / Mieterbüro Neuss, Mieterverein Düsseldorf e.V. im Deutschen Mieterbund\"; \"Der Mietspiegel (Stand 01.01.2026) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB für das Stadtgebiet Neuss (einfacher Mietspiegel)\"; \"von den Vorständen der beteiligten Vereine anerkannt und am 01.01.2026 veröffentlicht\". Mietspiegel-PDF (Mietspiegel_Neuss_2026.pdf): Abschnitt III Vergleichsmieten mittlere Wohnlage nach Baujahr (Spanne + Mittelwert), Zu-/Abschläge für Lage und Ausstattung. Download-Seite des Miterstellers: https://www.mieterverein-duesseldorf.de/mieterservice/mietspiegel-fuer-duesseldorf-und-umgebung. Ältere Pressemitteilung der Stadt: https://www.neuss.de/fileadmin/Pressedienst/pdf/20231121-0.pdf (21.11.2023: Stadt lässt erstmals qualifizierten Mietspiegel durch ALP Institut erstellen)",
+   "hinweis": "Verbände-Mietspiegel, ausdrücklich einfach (§ 558c), Stand 01.01.2026; der 2023 angekündigte qualifizierte Mietspiegel der Stadt ist amtlich nicht als erschienen belegt; Download kostenlos, Weiterveröffentlichung laut Mieterverein untersagt; Mieterverein führt den Mietspiegel auch für Kaarst, Korschenbroich, Meerbusch und Neuss; Tabelle nach Baujahr mit Zu-/Abschlägen"
   },
   {
    "ags": "05512000",
@@ -2508,22 +2508,22 @@
    "gemeinde": "Recklinghausen",
    "land": "NW",
    "einwohner_ca": 115344,
-   "art": "unklar",
-   "stand": "2026",
+   "art": "einfach",
+   "stand": "2026-01-01",
    "erhebungsstichtag": null,
    "gueltig_ab": "2026-01-01",
    "gueltig_bis": "2027-12-31",
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Recklinghausen (Bewertungsstelle/Geschäftsstelle Gutachterausschuss), DMB Mieterverein Recklinghausen, Mieterschutzbund Recklinghausen, AG der Wohnungswirtschaft Emscher-Lippe",
-   "url": "https://www.recklinghausen.de/Inhalte/Startseite/_details.asp?form=detail&db=513&id=31509",
+   "ersteller": "Stadt Recklinghausen (Herausgeber; Städtische Bewertungsstelle) mit Arbeitskreis Mietspiegel 2026: Deutscher Mieterbund Mieterverein Recklinghausen e.V., Mieterschutzbund e.V. Recklinghausen, Arbeitsgemeinschaft der Wohnungswirtschaft Emscher-Lippe",
+   "url": "https://bso.gkd-re.de/bsointer320/redirect?mandant=320&netz=4&typ=2&id=11906",
    "zugang": "frei",
    "preis": "gedruckt kostenlos im Bürgerbüro",
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.recklinghausen.de/Inhalte/Startseite/_details.asp?form=detail&db=513&id=31509 (Mietspiegel 2026, gültig 01.01.2026–31.12.2027, Fortschreibung)",
-   "hinweis": "Stadt nennt keine Einstufung, nur 'Richtlinie'; Verbände-Mietspiegel ohne Hinweis auf § 558d, vermutlich einfach, nicht belegt; VPI-Fortschreibung des Mietspiegels 2024"
+   "beleg": "Dokumentation zum Mietspiegel 2026 https://bso.gkd-re.de/bsointer320/redirect?mandant=320&netz=4&typ=2&id=11907 (1 Seite, Stand 01.01.2026): \"ART: Der Mietspiegel 2026 ist ein Mietspiegel gemäß § 558c BGB\"; \"Für den Mietspiegel 2026 wurden keine Mietdatensätze erhoben. Es handelt sich um eine Fortschreibung. ... mittels Verbraucherpreisindex für Deutschland\"; \"in seiner Sitzung am 03.11.2025 beschlossen/anerkannt\". Mietspiegel 2026 https://bso.gkd-re.de/bsointer320/redirect?mandant=320&netz=4&typ=2&id=11906, S. 1: \"Herausgeber: Stadt Recklinghausen\"; Allgemeine Erläuterungen: \"Der Mietspiegel gemäß § 558 c ... Die Angaben des Mietspiegels beziehen sich auf den Zeitraum 01.01.2026 bis 31.12.2027\". Bürgerservice-Seite der Stadt: https://www.recklinghausen.de/Inhalte/Startseite/Rathaus_Politik/Buergerservice/Buergerservice/_bso.asp?seite=angebot&id=5254",
+   "hinweis": "Einfacher Mietspiegel (§ 558c) laut Dokumentation; VPI-Fortschreibung des Mietspiegels 2024 ohne neue Erhebung; Mietwerttabelle nach Bezugsbaujahr der Altersklasse mit Zu-/Abschlägen; gedruckt kostenlos im Bürgerbüro"
   },
   {
    "ags": "05120000",
@@ -2574,44 +2574,44 @@
    "gemeinde": "Siegen",
    "land": "NW",
    "einwohner_ca": 102685,
-   "art": "unklar",
-   "stand": "2026",
+   "art": "einfach",
+   "stand": "2026-05-01",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2026-05-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Deutscher Mieterbund Siegerland und Umgebung e.V. (Herausgeber laut Stadt)",
-   "url": "https://www.mieterbund-siegerland.de/infos/mietspiegel",
+   "ersteller": "Deutscher Mieterbund Siegerland und Umgebung e.V. mit den örtlichen Haus- und Grundeigentümervereinen",
+   "url": "https://www.mieterbund-siegerland.de/images/download/mietspiegel/Mietspiegel_Altkreis_Siegen_2026.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "punkte",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.siegen.de/rathaus-politik/stadtverwaltung/dienstleistungen-a-bis-z/detailseite/mietspiegel (Stadt verweist auf Mieterbund); https://www.mieterbund-siegerland.de/infos/mietspiegel ('Mietspiegel Altkreis Siegen 2026', kostenfrei)",
-   "hinweis": "gilt für Altkreis Siegen (ohne Wittgenstein); Art nicht angegeben, Mieterbund nennt 'qualifiziert' nur für Kreis Olpe – vermutlich einfach; Mitbezug über Haus & Grund Siegen und Hüttental"
+   "beleg": "https://www.mieterbund-siegerland.de/images/download/mietspiegel/Mietspiegel_Altkreis_Siegen_2026.pdf, S. 1: \"... dem Deutschen Mieterbund Siegerland und Umgebung e.V. und den örtlichen Haus- und Grundeigentümervereinen erstellt und zum 01.05.2026 herausgegeben\"; \"Der Mietspiegel wurde folgend den Anforderungen des § 558c BGB erstellt. Es handelt sich nicht um einen qualifizierten Mietspiegel im Sinne des § 558d BGB\"; Verfahren: \"1. Bestimmung der Wohnqualität nach einem Punktesystem ... 3. Ermittlung einer Mietpreisspanne basierend auf der Baujahrgruppe und der Wohnqualität 4. Berechnung der Vergleichsmiete anhand der Mietpreisspanne und der Wohnqualitäts-Punkte\". Seite des Miterstellers: https://www.mieterbund-siegerland.de/mietspiegel-altkreis-siegen-2026 (ersetzt den Mietspiegel vom 01.01.2023, kostenfrei). Stadt verweist auf den Mieterbund: https://www.siegen.de/rathaus-politik/stadtverwaltung/dienstleistungen-a-bis-z/detailseite/mietspiegel",
+   "hinweis": "Gilt für den Altkreis Siegen (ohne Wittgenstein); einfacher Mietspiegel, ausdrücklich nicht § 558d; Punktesystem für Wohnqualität plus Preisspannen nach Baujahrgruppe; ersetzt die Ausgabe vom 01.01.2023; kostenloser Download beim Mieterbund Siegerland"
   },
   {
    "ags": "05170024",
    "gemeinde": "Moers",
    "land": "NW",
    "einwohner_ca": 101503,
-   "art": "unklar",
+   "art": "einfach",
    "stand": "2025-01-01",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2025-01-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Haus & Grund Grafschaft Moers e. V. mit Mieterbund Rhein-Ruhr (Ortsgruppe Moers)",
-   "url": "https://www.moers.de/rathaus-politik/rathaus/dienstleistungen/mietspiegel",
-   "zugang": "auf_anfrage",
+   "ersteller": "Haus & Grund Grafschaft Moers e.V. und Mieterbund Rhein-Ruhr e.V. (DMB, Moers)",
+   "url": "https://www.hausundgrund-moers.de/fileadmin/moers/media/downloads/Mietspiegel_Moers_2025_download.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.moers.de/rathaus-politik/rathaus/dienstleistungen/mietspiegel (Stadt verweist auf Herausgeber Haus & Grund und Mieterbund, 'Richtlinie'); Stand 01.01.2025 nur aus Sekundärangaben",
-   "hinweis": "Verbände-Mietspiegel; Stadt nennt keine Einstufung, Sekundärquellen: einfach, kein qualifizierter Mietspiegel; Bezug über die Verbände; Stadtseite für Abruf gesperrt (403)"
+   "beleg": "https://www.hausundgrund-moers.de/fileadmin/moers/media/downloads/Mietspiegel_Moers_2025_download.pdf, S. 1: \"Mietspiegel 2025 Stand: 01.01.2025\"; Erläuterungen A.1: \"Der 'Mietspiegel für nicht preisgebundene Wohnungen' dient als Richtlinie zur Ermittlung ortsüblicher Mieten ... der Sinn eines einfachen Mietspiegels besteht darin, Transparenz und Orientierung im Mietwohnungsmarkt zu schaffen. Ein einfacher Mietspiegel ist ein wichtiges Instrument ...\"; S. 2: \"Netto-Mietspiegel 2025\" Gruppen I–VI nach Baujahr × Größe (bis 50/70/90/über 90 m²) × Lage normal/gut. Seite des Miterstellers: https://www.hausundgrund-moers.de/service/mietspiegel/ und Meldung https://www.hausundgrund-moers.de/aktuelles/einzelansicht/vorstellung-des-mietspiegels-2025-fuer-11-kommunen-am-niederrhein/ (\"Der ab Januar 2025 gültige Mietspiegel\"). Stadtseite https://www.moers.de/rathaus-politik/rathaus/dienstleistungen/mietspiegel: \"Gemeinsam mit dem Deutschen Mieterbund Moers e.V. veröffentlichen Haus & Grund, Grafschaft Moers diverse Mietspiegel ... dienen als Richtlinie zur Ermittlung ortsüblicher Mieten\"",
+   "hinweis": "Verbände-Mietspiegel, bezeichnet sich selbst als einfacher Mietspiegel; ohne neue Zufallserhebung, aus Neuvertrags- und Anpassungsdaten der Verbände entwickelt; Tabelle Baujahr × Wohnfläche × Lage mit Zu-/Abschlägen; Download kostenlos bei Haus & Grund Grafschaft Moers, Druck gegen Schutzgebühr; dieselben Verbände geben Mietspiegel 2025 für zehn weitere Kommunen am Niederrhein heraus"
   },
   {
    "ags": "05754008",
@@ -2652,10 +2652,10 @@
    "url": "https://www.dueren.de/leben-wohnen/bauen-wohnen/wohnen/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.dueren.de/leben-wohnen/bauen-wohnen/wohnen/mietspiegel (Qualifizierter Mietspiegel 2025, tritt zum 01.01.2025 in Kraft, vier Jahre gültig, Stichprobenüberprüfung zum 01.01.2027); Broschüre https://www.dueren.de/assets/userfiles/pdf_bereich_lebenundwohnen/mietspiegel/qMSP_Dueren_Broschuere_2025.pdf",
-   "hinweis": "erster qualifizierter Mietspiegel Dürens, Stichtag 01.08.2024; Broschüre nennt laut Sekundärangabe Laufzeit bis 31.12.2026 (widersprüchlich), naechste_anpassung = Stichprobenprüfung; Online-Rechner"
+   "beleg": "https://www.dueren.de/leben-wohnen/bauen-wohnen/wohnen/mietspiegel (Qualifizierter Mietspiegel 2025, tritt zum 01.01.2025 in Kraft, vier Jahre gültig, Stichprobenüberprüfung zum 01.01.2027); Broschüre https://www.dueren.de/assets/userfiles/pdf_bereich_lebenundwohnen/mietspiegel/qMSP_Dueren_Broschuere_2025.pdf; Form: Broschüre Düren 2025 (https://www.dueren.de/assets/userfiles/pdf_bereich_lebenundwohnen/mietspiegel/qMSP_Dueren_Broschuere_2025.pdf), PDF-S. 4 „4. Erläuterungen zu den Mietspiegeltabellen“, PDF-S. 5 „Tabelle 1: Basismiete (Nettokaltmiete) in Abhängigkeit von der Wohnfläche in m²“, PDF-S. 6 „Tabelle 2: Zu- und Abschläge in Prozent der Basismiete je nach Baualter des Gebäudes“, PDF-S. 7 Tabelle 3 weitere prozentuale Zu-/Abschläge → regression",
+   "hinweis": "erster qualifizierter Mietspiegel Dürens, Stichtag 01.08.2024; Broschüre PDF-S. 10 Abschnitt „11. Laufzeit“: „Er hat eine Laufzeit bis zum 31.12.2026“ (Widerspruch zur Stadtseite: vier Jahre gültig mit Stichprobenprüfung zum 01.01.2027), naechste_anpassung = Stichprobenprüfung; Online-Rechner"
   },
   {
    "ags": "05962024",
@@ -2696,9 +2696,9 @@
    "url": "https://www.witten.de/medien/dokumente/mietspiegel_2025.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.witten.de/portal/pressemitteilungen/qualifizierter-mietspiegel-900002708-37500.html (vom Rat als qualifiziert anerkannt, in Kraft 01.07.2025; Neuerhebung, neuer qualifizierter Mietspiegel ab 01.07.2027); Dokumentation https://www.witten.de/medien/dokumente/mietspiegel_2025_dokumentation.pdf",
+   "beleg": "https://www.witten.de/portal/pressemitteilungen/qualifizierter-mietspiegel-900002708-37500.html (vom Rat als qualifiziert anerkannt, in Kraft 01.07.2025; Neuerhebung, neuer qualifizierter Mietspiegel ab 01.07.2027); Dokumentation https://www.witten.de/medien/dokumente/mietspiegel_2025_dokumentation.pdf; Form: Mietspiegel 2025 Witten (URL im Feld url), PDF-S. 8 „5. Aufbau des Mietspiegels …“ („besteht aus einer Grundtabelle sowie einem Katalog von Zu- und Abschlagsmerkmalen“), „Tabelle 1: Grundtabelle“ Basismiete und Spanne je Baualtersklasse (7 Klassen), PDF-S. 9 „Tabelle 2: Zuschläge für die Größe und Art einer Wohnung“ (€/m²), PDF-S. 10 Tabellen 3–4 → tabelle (Grundtabelle nach Baualter mit Zu-/Abschlägen in €)",
    "hinweis": "Erhebungsstand 10/2022, indexiert auf 10/2024; 20 bis unter 150 m² in Mehrfamilienhäusern"
   },
   {
@@ -2706,66 +2706,66 @@
    "gemeinde": "Ratingen",
    "land": "NW",
    "einwohner_ca": 89368,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2026-08-01",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2026-08-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": null,
-   "zugang": null,
+   "ersteller": "Haus und Grund Düsseldorf und Umgebung e.V. und Mieterverein Düsseldorf e.V.",
+   "url": "https://www.mieterverein-duesseldorf.de/fileadmin/user_upload/redaktion/duesseldorf/Mietspiegel/Mietspiegel-Ratingen-08-2026.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "keine amtliche Fundstelle gefunden (siehe hinweis)",
-   "hinweis": "auf stadt-ratingen.de kein Mietspiegel gefunden (nur Menüverweis); nur Portalangaben und IHK-Gewerbemietspiegel gefunden – Pflicht nach § 558c Abs. 4 (> 50.000 EW) besteht, Recherche wegen Suchkontingent abgebrochen"
+   "beleg": "https://www.mieterverein-duesseldorf.de/fileadmin/user_upload/redaktion/duesseldorf/Mietspiegel/Mietspiegel-Ratingen-08-2026.pdf, Deckblatt: \"Mietspiegel Stadt Ratingen gültig ab 1. August 2026, erstellt von Haus und Grund Düsseldorf und Umgebung e. V. / Mieterverein Düsseldorf e. V.\"; I. Allgemeines: \"Der Mietspiegel für Ratingen ist eine Orientierungshilfe nach § 558 ff. BGB\" (kein Hinweis auf § 558d, keine Anerkennung durch die Stadt); II.: \"In der senkrechten Gliederung sind das Baujahr und die Wohnlage und in der waagerechten Gliederung die Ausstattung und Beschaffenheit erfasst\"; Zu-/Abschläge u. a. einfache Wohnlage −10 %. Einstufung 'nicht qualifiziert' amtlich für die Reihe belegt: Grundstücksmarktbericht 2019 des Gutachterausschusses für Grundstückswerte in der Stadt Ratingen (https://e-pflicht.ulb.hhu.de/download/pdf/278486), Vorwort: \"Ratingen verfügt seit 2018 über einen Mietspiegel. Zwar ist dies kein qualifizierter Mietspiegel i.S.d. § 558d BGB\". Download-Seite des Miterstellers: https://www.mieterverein-duesseldorf.de/mieterservice/mietspiegel-fuer-duesseldorf-und-umgebung",
+   "hinweis": "Verbände-Mietspiegel (Haus & Grund Düsseldorf und Mieterverein Düsseldorf), gültig ab 01.08.2026; Einstufung 'einfach' begründet: das Dokument nennt sich Orientierungshilfe nach § 558 ff. BGB ohne § 558d, ist nur von Verbänden erstellt, und der Gutachterausschuss Ratingen stuft die seit 2018 bestehende Mietspiegel-Reihe ausdrücklich als nicht qualifiziert (§ 558d) ein; auf stadt-ratingen.de keine Mietspiegel-Seite; Download kostenlos, Weiterveröffentlichung laut Mieterverein untersagt"
   },
   {
    "ags": "05562024",
    "gemeinde": "Marl",
    "land": "NW",
    "einwohner_ca": 86766,
-   "art": "unklar",
-   "stand": "2026",
+   "art": "einfach",
+   "stand": "2026-04-01",
    "erhebungsstichtag": null,
    "gueltig_ab": "2026-04-01",
    "gueltig_bis": "2028-03-31",
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Marl, Amt für Stadtplanung und integrierte Quartiersentwicklung (Bodenordnung, Vermessung)",
-   "url": "https://marl.de/leben-wohnen/planen-bauen/mietspiegel",
+   "ersteller": "Mietspiegelgremium: Haus- und Grundeigentümerverein Marl, Hüls und Umgegend e.V., Deutscher Mieterbund - Mieterschutzverein Marl und Umgebung e.V., Arbeitsgemeinschaft der Wohnungswirtschaft Emscher-Lippe, Stadt Marl (Amt für Stadtplanung und integrierte Quartiersentwicklung, Bodenordnung und Vermessung)",
+   "url": "https://www.marl.de/fileadmin/user_upload/Dokumente/Amt_61/Mietspiegel_2026.pdf",
    "zugang": "frei",
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://marl.de/leben-wohnen/planen-bauen/mietspiegel (\"Der Mietspiegel gilt vom 01.04.2026 bis zum 31.03.2028\", PDF + Dokumentation zum Mietspiegel 2026)",
-   "hinweis": "Stadt nennt keine Einstufung (nur 'Richtlinie'); Mietwerttabelle nach Baujahr/Wohnlage mit Zu-/Abschlägen (Systematik Ausgabe 2024)"
+   "beleg": "Dokumentation https://www.marl.de/fileadmin/user_upload/Dokumente/Amt_61/Dokumentation_zum_Mietspiegel_2026.pdf (1 Seite, Stand 01.04.2026): \"Bei dem Mietspiegel der Stadt Marl handelt es sich um einen Mietspiegel gem. § 558 c Bürgerliches Gesetzbuch (BGB). Es sind die Vorschriften der §§ 3-5 der Mietspiegelverordnung ... anzuwenden\" (Erstellung, Dokumentation, Veröffentlichung eines einfachen Mietspiegels); \"Die Anpassung der Mieten erfolgte anhand des Verbraucherpreisindex für Nordrhein-Westfalen\". Mietspiegel https://www.marl.de/fileadmin/user_upload/Dokumente/Amt_61/Mietspiegel_2026.pdf, S. 1: \"Stand 01.04.2026 (gültig bis 31.03.2028)\", \"Das Mietspiegelgremium hat am 04.03.2026 den Mietspiegel 2026 beschlossen ... Wird keine Einigung über eine Fortschreibung erzielt, bleibt der Mietspiegel bis zum 30.06.2028 gültig\"; letzte Seite: \"Der Mietspiegel wurde aufgestellt durch\" (Verbände), \"27. überarbeitete Fassung gültig vom 1. April 2026 bis 31. März 2028\". Stadtseite https://marl.de/leben-wohnen/planen-bauen/mietspiegel",
+   "hinweis": "Einfacher Mietspiegel (§ 558c, MsV Abschnitt 2 einfacher Mietspiegel); VPI-NRW-Fortschreibung des Mietspiegels 2024 (Zeitraum Dez. 2023 bis Jan. 2026); Mietwerttabelle nach Bezugsbaujahr/Wohnlage mit Zu-/Abschlägen; ohne Einigung über Fortschreibung gilt er bis 30.06.2028 weiter; für Baualtersklasse 2022 und später keine Werte"
   },
   {
    "ags": "05978024",
    "gemeinde": "Lünen",
    "land": "NW",
    "einwohner_ca": 86163,
-   "art": "unklar",
+   "art": "qualifiziert",
    "stand": "2025-12-31",
-   "erhebungsstichtag": null,
+   "erhebungsstichtag": "2025-12-31",
    "gueltig_ab": "2026-07-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
-   "vermutung_bis": null,
-   "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Lünen (Mietspiegelrunde Lünen)",
-   "url": "https://www.luenen.de/de/mein-luenen/bauen/wohnen/mietspiegelrechner.php",
+   "vermutung_bis": "2028-06-30",
+   "vermutung_bis_herleitung": "abgeleitet_gueltig_ab_plus_2",
+   "ersteller": "Mietspiegelrunde Lünen: DMB Mieterbund Dortmund e.V. (Mieterschutzverein, Geschäftsstelle Lünen), Haus-, Wohnungs- und Grundeigentümerverein Lünen e.V., Arbeitsgemeinschaft der Lüner Wohnungsunternehmen, Stadt Lünen (Abteilung Wohnen und Soziales)",
+   "url": "https://www.luenen.de/de-wAssets/docs/PDFs/antraege_wohnen/Mietspiegel-Luenen-2026-Broschuere.pdf",
    "zugang": "frei",
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.luenen.de/de/aktuelles/meldungen/2026-07-01_neuer_mietspiegel.php (gilt ab 01.07.2026, Stichtag 31.12.2025); Dokumentation https://www.luenen.de/de-wAssets/docs/PDFs/antraege_wohnen/Mietspiegeldokumentation-Luenen-2026.pdf",
-   "hinweis": "Vorgänger 2024 (01.01.2024–31.12.2025) war qualifiziert (§ 558d), Tabelle nach Baujahr/Fläche mit Zu-/Abschlägen inkl. Energie; Art der Ausgabe 2026 nicht bestätigt (PDF nicht lesbar); Online-Rechner"
+   "beleg": "Broschüre https://www.luenen.de/de-wAssets/docs/PDFs/antraege_wohnen/Mietspiegel-Luenen-2026-Broschuere.pdf, S. 1–2: \"Gültig ab dem 01.07.2026\"; \"Umfrage, die auf dem Lüner Wohnungsmarkt zum Stichtag 31.12.2025 durchgeführt ... Der Mietspiegel wurde nach wissenschaftlichen Grundsätzen gemäß § 558d I Bürgerliches Gesetzbuch gemeinsam erstellt von ...\"; \"Der Mietspiegel wurde von sämtlichen oben genannten Interessensvertreter:innen als qualifizierter Mietspiegel anerkannt. Der Lüner Mietspiegel erfüllt somit die Anforderungen eines qualifizierten Mietspiegels gemäß § 558d I\"; Abschnitt 3: Mietwerttabelle Baujahr × Wohnungsgröße als Tabellenmietspiegel plus Auf- und Abschläge. Dokumentation https://www.luenen.de/de-wAssets/docs/PDFs/antraege_wohnen/Mietspiegeldokumentation-Luenen-2026.pdf, Abschnitt 1 und 3: \"Mietspiegelfortschreibung 2026 (Stichtag 31.12.2025)\", 1.571 auswertbare Wohnungen, Mietpreisindex 7,41 % auf die Regressions-Mietpreistabelle 2023. Meldung https://www.luenen.de/de/aktuelles/meldungen/2026-07-01_neuer_mietspiegel.php",
+   "hinweis": "Qualifizierter Mietspiegel (§ 558d), anerkannt von allen Beteiligten; Ausgabe 2026 ist eine Fortschreibung der Regressionstabelle 2023 über einen aus Stichprobe (Stichtag 31.12.2025) ermittelten Mietpreisindex; Tabelle Baujahr × Wohnungsgröße mit Zu-/Abschlägen (u. a. energetisch); zusätzlich Online-Mietspiegelrechner; Vorgänger 2024 gültig 01.01.2024–31.12.2025"
   },
   {
    "ags": "05770024",
@@ -2797,7 +2797,7 @@
    "art": "einfach",
    "stand": "2025-01-01",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2025-01-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
@@ -2806,9 +2806,9 @@
    "url": "https://serviceportal.velbert.de/detail/-/vr-bis-detail/dienstleistung/569921/show",
    "zugang": "frei",
    "preis": "gedruckt beim Mieterverein, Schutzgebühr 3,00 € (Angabe evtl. veraltet)",
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://serviceportal.velbert.de/detail/-/vr-bis-detail/dienstleistung/569921/show (\"Der Mietspiegel vom 1. Januar 2025 ist von der Stadt Velbert anerkannt\", Schlagwort 'Einfacher Mietspiegel', Verweis § 558c BGB)",
+   "beleg": "https://serviceportal.velbert.de/detail/-/vr-bis-detail/dienstleistung/569921/show (\"Der Mietspiegel vom 1. Januar 2025 ist von der Stadt Velbert anerkannt\", Schlagwort 'Einfacher Mietspiegel', Verweis § 558c BGB); Form: Mietspiegel Velbert vom 01.01.2025 (Download https://serviceportal.velbert.de/detail/-/vr-bis-detail/dokument/570630/download), PDF-S. 3 Tabelle Wohnungsgröße A–D (bis 40 / 40–70 / 70–90 / über 90 qm) × Baualtersgruppen × Wohnlagen, PDF-S. 4 „Gültigkeit ab 01.01.2025“, PDF-S. 5 Anerkennung „als einfacher Mietspiegel für die Stadt Velbert“ → tabelle",
    "hinweis": null
   },
   {
@@ -2872,9 +2872,9 @@
    "url": "https://www.troisdorf.de/de/rathaus-service/buergerservice/wohnungsamt/mietspiegel/",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.troisdorf.de/de/rathaus-service/aktuell/pressemeldungen/2025/oktober/neuer-qualifizierter-mietspiegel-2025-fuer-troisdorf-veroeffentlicht/ (qualifiziert, ab 01.10.2025); Methodenbericht mietspiegel-troisdorf-2025-methodenbericht.pdf (Stichtag 01.03.2025)",
+   "beleg": "https://www.troisdorf.de/de/rathaus-service/aktuell/pressemeldungen/2025/oktober/neuer-qualifizierter-mietspiegel-2025-fuer-troisdorf-veroeffentlicht/ (qualifiziert, ab 01.10.2025); Methodenbericht mietspiegel-troisdorf-2025-methodenbericht.pdf (Stichtag 01.03.2025); Form: Broschüre https://www.troisdorf.de/de/rathaus-service/buergerservice/wohnungsamt/mietspiegel/mietspiegel-2025.pdf, PDF-S. 6 („mit Hilfe der Regressionsmethode errechnet“), PDF-S. 10 Tabelle 1 Basis-Nettokaltmiete je Wohnfläche 25–150 m², Zu- und Abschläge auf die Basismiete (Tabelle 2) → regression",
    "hinweis": "Online-Rechner zusätzlich (externer Anbieter); Befragung mit Auskunftspflicht"
   },
   {
@@ -2904,22 +2904,22 @@
    "gemeinde": "Dorsten",
    "land": "NW",
    "einwohner_ca": 75277,
-   "art": "unklar",
-   "stand": "2025",
+   "art": "einfach",
+   "stand": "2025-07-01",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Dorsten, Gladbeck und Marl",
+   "ersteller": "Arbeitskreis Mietspiegel: Haus-, Wohnungs- und Grundeigentümerverein Dorsten e.V., Mieterverein Dorsten und Umgebung e.V., Mieterschutzbund e.V., Arbeitsgemeinschaft der Wohnungswirtschaft Emscher-Lippe; Organisation: Stadt Dorsten (Geschäftsstelle des Gutachterausschusses)",
    "url": "https://www.dorsten.de/_Resources/Persistent/a/e/7/8/ae78abd0ae4e1507b519961960184be7e6e454e3/Dorsten_Mietspiegel_2025_150725.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "tabelle",
+   "form": "punkte",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.dorsten.de/wirtschaft-und-wohnen/bauen-and-wohnen/mietspiegel; Pressemitteilung https://www.dorsten.de/rathaus-stadt/verwaltung/pressestelle/pressemitteilungen-juni-2025/mietspiegel-2025-fuer-dorsten",
-   "hinweis": "Fortschreibung 2023 um +2,6 % nach Mietenindex NRW; Art (einfach/qualifiziert) nicht angegeben – Indexanpassung spricht eher für einfach; Druckexemplare in Stadtagentur/Bürgerbüro"
+   "beleg": "https://www.dorsten.de/_Resources/Persistent/a/e/7/8/ae78abd0ae4e1507b519961960184be7e6e454e3/Dorsten_Mietspiegel_2025_150725.pdf, S. 1: \"Mietspiegel ... im Stadtgebiet Dorsten nach dem Stand vom 01. Juli 2025\"; S. 3 (A. Allgemeines): \"Die Angaben im Mietspiegel beziehen sich auf den 1. Juli 2025 und stellen die ortsübliche Vergleichsmiete im Sinne des § 558c BGB ... dar\"; \"Der Mietspiegel 2025 ist eine zweite Fortschreibung und beinhaltet eine Anpassung der Mieten entsprechend der allgemeinen konjunkturellen Entwicklung. Er gilt bis zum Erscheinen eines neuen Mietspiegels. Er wurde von Mieter- und Vermietervertretern (Arbeitskreis Mietspiegel) anerkannt\"; Berechnungsschema S. 7: Grundmiete nach Baujahr plus \"Punkte Gesamt x 0,15 €/Punkt\"; letzte Seite: \"Der Mietspiegel 2025 wurde aufgestellt durch\" (Verbände), Organisation Stadt Dorsten. Stadtseite https://www.dorsten.de/wirtschaft-und-wohnen/bauen-and-wohnen/mietspiegel; Pressemitteilung https://www.dorsten.de/rathaus-stadt/verwaltung/pressestelle/pressemitteilungen-juni-2025/mietspiegel-2025-fuer-dorsten",
+   "hinweis": "Einstufung 'einfach' begründet: das Dokument beruft sich allein auf § 558c BGB, nennt kein § 558d und keine qualifizierte Erstellung; zweite Fortschreibung der Erhebung zum Mietspiegel 2021 nach konjunktureller Entwicklung (+2,6 % nach Mietenindex NRW laut Stadt); Ermittlung über Grundmiete nach Baujahr und Merkmalspunkte (0,15 €/m² je Punkt); gilt bis zum Erscheinen eines neuen Mietspiegels; Druckexemplare in Stadtagentur/Bürgerbüro, digital kostenlos"
   },
   {
    "ags": "05958004",
@@ -2962,30 +2962,30 @@
    "preis": null,
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "Broschüre Mietspiegel Detmold 2025 (vom Mitersteller Haus & Grund Detmold bereitgestellt: https://www.hausundgrund.de/verein/detmold/sites/default/files/downloads/mietspiegelbroschure-detmold-2025_0.pdf) S. 2 'Als qualifizierter Mietspiegel nach § 558d BGB anerkannt … Gültig ab 04.04.2025', S. 7 'Stichtag der Befragung war der 1. Oktober 2024 … Regressionsanalyse', Tabelle 1 Basis-Nettokaltmiete + Tabelle 2 Zu-/Abschläge",
-   "hinweis": "Städtische Seite stadtdetmold.de/mietspiegel liefert ein ungültiges Zertifikat; Link der Stadt über das Serviceportal. PDF liegt beim Mitersteller."
+   "beleg": "Serviceportal der Stadt https://serviceportal-detmold.de/detail/-/vr-bis-detail/dienstleistung/11822/show (qualifiziert nach § 558d BGB, gültig ab 04.04.2025); Broschüre Mietspiegel Detmold 2025 von der Stadt: https://serviceportal-detmold.de/detail/-/vr-bis-detail/dokument/660964/download S. 2 'Als qualifizierter Mietspiegel nach § 558d BGB anerkannt durch die Interessenvertretungen der Mieter und Vermieter in der Stadt Detmold Gültig ab 04.04.2025', S. 7 'Der Stichtag der Befragung war der 1. Oktober 2024. Die erhobenen Daten wurden mittels Regressionsanalyse ausgewertet', Tabelle 1 Basis-Nettokaltmiete + Tabelle 2 Zu-/Abschläge; Dokumentation https://serviceportal-detmold.de/detail/-/vr-bis-detail/dokument/706753/download",
+   "hinweis": "Städtische Seite stadtdetmold.de/mietspiegel liefert ein ungültiges Zertifikat; Mietspiegel und Dokumentation liegen im Serviceportal der Stadt. Online-Mietpreiskalkulator im Geoportal der Stadt. Gültigkeitsende nicht genannt."
   },
   {
    "ags": "05562004",
    "gemeinde": "Castrop-Rauxel",
    "land": "NW",
    "einwohner_ca": 73282,
-   "art": "unklar",
+   "art": "einfach",
    "stand": "2025-04-01",
-   "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "erhebungsstichtag": "2020-04-01",
+   "gueltig_ab": "2025-04-01",
    "gueltig_bis": null,
    "naechste_anpassung": "2026",
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Arbeitskreis Mietspiegel: Stadt Castrop-Rauxel (Vermessung und Geoinformation), Haus- und Grundeigentümervereine, Mieterverein Dortmund, DMB Mieterbund Dortmund",
+   "ersteller": "Arbeitskreis Mietspiegel Castrop-Rauxel 2025: Haus-, Grund- und Wohnungseigentümerverein Castrop-Rauxel und Umgebung e.V., Haus und Grund Eigentümerverein Castrop-Rauxel e.V., Mieterverein Dortmund und Umgebung e.V., DMB Mieterbund Dortmund e.V., Stadt Castrop-Rauxel (Vermessung und Geoinformation, Herausgeberin)",
    "url": "https://www.castrop-rauxel.de/sites/default/files/2025-04/Mietspiegel%20und%20Dokumentation%202025.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.castrop-rauxel.de/wohnen/mietspiegel (Mietspiegel und Dokumentation 2025, kostenlos; Erhebungsbogen Mietspiegel 2026)",
-   "hinweis": "Vorgänger qualifiziert (2021, Fortschreibung 2023 gültig 01.04.2023–31.03.2025); für 2025 nur Suchauszug '§ 558c' (einfach), auf Stadtseite nicht bestätigt; Erhebung für Mietspiegel 2026 läuft"
+   "beleg": "https://www.castrop-rauxel.de/sites/default/files/2025-04/Mietspiegel%20und%20Dokumentation%202025.pdf, S. 1 (Dokumentation, Stand 01.04.2025): \"Der Mietspiegel Castrop-Rauxel zum Stand 01.04.2025 ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB ... Er wird in der Form eines einfachen Mietspiegels veröffentlicht\"; \"Fortführung des qualifizierten Mietspiegels als einfacher Mietspiegel 2025 ... qualifizierter Mietspiegel mit Erhebungsstichtag 01.04.2020 ... Fortschreibung auf Basis des Verbraucherpreisindizes zum Stichtag 01.04.2022. Dieser fortgeschriebene qualifizierte Mietspiegel 2023 wird nun unverändert in Form eines einfachen Mietspiegels fortgeführt\"; Anerkennungen am 07.03., 20.03. und 27.03.2025, Veröffentlichung zum 01.04.2025; angehängter Mietspiegeltext S. 2: \"nach anerkannten wissenschaftlichen Grundsätzen erstellt und mit Hilfe der Regressionsmethode errechnet\". Stadtseite https://www.castrop-rauxel.de/wohnen/mietspiegel (Mietspiegel und Dokumentation 2025; Erhebungsbogen Mietspiegel 2026)",
+   "hinweis": "Einfacher Mietspiegel: Werte des qualifizierten Mietspiegels 2023 (Regressionsmodell, Basismiete × Faktoren, Erhebungsstichtag 01.04.2020, VPI-Fortschreibung 2022) unverändert als einfacher Mietspiegel ab 01.04.2025 fortgeführt; Vorgänger qualifiziert (2021, Fortschreibung 2023, gültig 01.04.2023–31.03.2025); Erhebung für einen neuen Mietspiegel 2026 läuft (Erhebungsbogen auf der Stadtseite), Erscheinen noch nicht belegt; kostenloser Download, Online-Rechner"
   },
   {
    "ags": "05554008",
@@ -3036,7 +3036,7 @@
    "gemeinde": "Lippstadt",
    "land": "NW",
    "einwohner_ca": 68739,
-   "art": "unklar",
+   "art": "einfach",
    "stand": "2025",
    "erhebungsstichtag": null,
    "gueltig_ab": "2025-01-01",
@@ -3044,14 +3044,14 @@
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Lippstadt (Gutachterausschuss)",
+   "ersteller": "Stadt Lippstadt (Bewertungsstelle, Datenerhebung) mit Mieterbund Ostwestfalen-Lippe e.V. und Haus und Grund Lippstadt e.V. (gemeinsame Herausgeber)",
    "url": "https://www.lippstadt.de/fileadmin/user_upload/Mietspiegel_2025.pdf",
    "zugang": "frei",
    "preis": "gedruckt in der Bürgerberatung erhältlich",
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.lippstadt.de/leben-in-lippstadt/wohnen/mietspiegel/ ; https://www.lippstadt.de/fileadmin/user_upload/Mietspiegel_2025.pdf (Titel: Mietspiegel 2025 für freifinanzierte Wohnungen, gültig ab 01. Januar 2025)",
-   "hinweis": "Einstufung qualifiziert/einfach nicht gefunden; 3.651 Datensätze 2019–2024, Baualtersklasse/Größe/Wohnlage; 25–160 m²"
+   "beleg": "https://www.lippstadt.de/fileadmin/user_upload/Mietspiegel_2025.pdf — Deckblatt: 'Mietspiegel 2025 für freifinanzierte Wohnungen, Gültig ab 01. Januar 2025'; S. 2, Abschnitt 1.1: 'Der Mietspiegel wurde vom Mieterbund Ostwestfalen-Lippe e.V., Haus- und Grund Lippstadt e.V. sowie der Stadt Lippstadt als einfacher Mietspiegel beraten und beschlossen.' Datengrundlage S. 2: 3.651 Datensätze 01.01.2019–31.12.2024, Datenerhebung durch die Bewertungsstelle der Stadt; S. 14 Kontakte: gemeinsam herausgegeben von Mieterbund OWL, Haus und Grund Lippstadt und Stadt Lippstadt. Stadtseite: https://www.lippstadt.de/leben-in-lippstadt/wohnen/mietspiegel/",
+   "hinweis": "Einfacher Mietspiegel (§ 558c), ausdrücklich so bezeichnet. Aufbau: Basismiete-Tabelle nach Wohnungsgröße und Baualtersklasse, dazu Punktesystem für Ausstattung/Beschaffenheit, Zuschlag für übergroße Wohnfläche > 120 m², Lagezu-/-abschlag (Wohnlagenkarte und Adressenverzeichnis); 25–160 m². Gesonderte Hinweise für Anröchte, Erwitte, Geseke und Rüthen (Abschnitt 1.3.6). Kein Gültigkeitsende im Dokument genannt."
   },
   {
    "ags": "05758012",
@@ -3080,44 +3080,44 @@
    "gemeinde": "Dinslaken",
    "land": "NW",
    "einwohner_ca": 66993,
-   "art": "unklar",
-   "stand": "2026",
+   "art": "einfach",
+   "stand": "2026-01-01",
    "erhebungsstichtag": null,
    "gueltig_ab": "2026-01-01",
    "gueltig_bis": "2027-12-31",
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Dinslaken mit Haus-, Wohnungs- und Grundeigentümerverband Dinslaken e.V. und Mieterverein Dinslaken e.V. (laut Ausgabe 2022)",
-   "url": "https://www.dinslaken.de/stadt-buergerservice/dienstleistungen/mietspiegel",
+   "ersteller": "Haus-, Wohnungs- und Grundeigentümerverband Dinslaken e. V. und Mieterverein Dinslaken e. V. in Zusammenarbeit mit der Stadtverwaltung Dinslaken",
+   "url": "https://www.dinslaken.de/system/files/2025-12/Mietspiegel%202026-2027.pdf",
    "zugang": "frei",
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.dinslaken.de/stadt-buergerservice/dienstleistungen/mietspiegel (Suchauszug: Mietspiegel 01.01.2026–31.12.2027 als PDF, kostenlos im Bürgerbüro); Seite antwortet 403",
-   "hinweis": "Art nicht angegeben, Aufbau (Tabelle, ±10 % Lage) spricht für einfach; Ersteller aus Ausgabe 2022"
+   "beleg": "https://www.dinslaken.de/system/files/2025-12/Mietspiegel%202026-2027.pdf — Deckblatt (S. 1): 'Stand: 1. Januar 2026'; 'Dieser Mietspiegel wurde erstellt von dem Haus-, Wohnungs- und Grundeigentümerverband Dinslaken e. V. und dem Mieterverein Dinslaken e. V. in Zusammenarbeit mit der Stadtverwaltung Dinslaken und kann gemäß § 558c BGB in der zurzeit geltenden Fassung als Übersicht über die üblichen Entgelte … dienen.'; 'Dieser Mietspiegel ist gültig bis zum 31.12.2027'. S. 2: 'Die Angaben des Mietspiegels geben die Verhältnisse vom 1. Januar 2026 wieder.' Stadtseite https://www.dinslaken.de/stadt-buergerservice/dienstleistungen/mietspiegel (Download 'Mietspiegel 01.01.2026 - 31.12.2027', kostenlos im Bürgerbüro).",
+   "hinweis": "Einfacher Mietspiegel nach § 558c (Deckblatt). PDF ist ein Bild-PDF ohne Textebene (Seiten gescannt), Angaben vom Seitenbild abgelesen. Lagezu-/-abschläge über Wohnlagenbeschreibung (einfach/mittel/gut), keine Wohnlageneinstufung durch die Stadt. Vorgänger: 01.01.2024–31.12.2025, 2022/2023."
   },
   {
    "ags": "05362032",
    "gemeinde": "Kerpen",
    "land": "NW",
    "einwohner_ca": 66585,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2024-11-01",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Rheinische Immobilienbörse e. V. mit Stadt Kerpen, Mieterverein Köln, Kölner Haus- und Grundbesitzerverein, Haus- und Grundeigentümerverein Kerpen (Sekundärangabe)",
-   "url": "https://www.stadt-kerpen.de/vv/produkte/mietspiegel.php",
-   "zugang": "kostenpflichtig",
-   "preis": "3,50 € Schutzgebühr",
-   "form": "unbekannt",
+   "ersteller": "Arbeitskreis Mietspiegel bei der Rheinischen Immobilienbörse e.V.: Mieterverein Köln e.V., Kolpingstadt Kerpen, Kölner Haus- und Grundbesitzerverein von 1888, Haus-, Wohnungs- und Grundeigentümerverein Kerpen und Umgebung e.V., Rheinische Immobilienbörse e.V.",
+   "url": "https://web.rheinische-immobilienboerse.de/upload/Kerpen_2024_1571.pdf",
+   "zugang": "frei",
+   "preis": null,
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.stadt-kerpen.de/vv/produkte/mietspiegel.php (Richtlinie nach § 558 BGB, Aktualisierung i. d. R. alle zwei Jahre, Schutzgebühr 3,50 €, Bezug Rheinische Immobilienbörse/Rathaus)",
-   "hinweis": "aktuelle Ausgabe und Einstufung nicht gefunden; Stadtseite beim Abruf weitergeleitet (302); Datenerhebung für Neuausgabe gemeldet"
+   "beleg": "https://web.rheinische-immobilienboerse.de/upload/2024_Dokumentation_Kerpen_1604.pdf — Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand November 2024) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) für das Stadtgebiet Kerpen …'; 'am 5. November 2024 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen'; Beteiligte ebd. Mietspiegel selbst https://web.rheinische-immobilienboerse.de/upload/Kerpen_2024_1571.pdf, Kopf: 'Stand 01.11.2024', 'Zusammengestellt bei der Rheinische Immobilienbörse e.V.'. Übersicht https://web.rheinische-immobilienboerse.de/Mietspiegel_Kerpen_2024.AxCMS. Stadtseite https://www.stadt-kerpen.de/vv/produkte/mietspiegel.php ('Richtlinie … (§ 558 BGB)', 'i.d.R. alle 2 Jahre aktualisiert').",
+   "hinweis": "Einfacher Mietspiegel (§ 558c), Tabelle Baualtersgruppe × Wohnungsgröße × Wohnlage. Stadtseite nennt noch eine Schutzgebühr von 3,50 € bei der Rheinischen Immobilienbörse; das PDF war am 09.11.2026 dort ohne Anmeldung frei abrufbar. Laut Stadtseite läuft die Datenerhebung für eine Neuausgabe; im Archiv der Rheinischen Immobilienbörse ist für Kerpen noch keine Ausgabe 2026 gelistet (Bergheim und Hürth dort mit Stand 05.2026)."
   },
   {
    "ags": "05162008",
@@ -3139,73 +3139,73 @@
    "form": "unbekannt",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://grevenbroich.de/rathaus-buergerservice/dienstleistungen-a-z/dienstleistung/mietspiegel (Leistungsseite ohne lesbaren Inhalt); Terminvergabe Bürgerbüro nennt 'Mietspiegel kaufen'",
-   "hinweis": "Stadt verkauft einen Mietspiegel im Bürgerbüro (Preis unbekannt); Jahr und Art nicht gefunden, sonst nur Portalangaben"
+   "hinweis": "Stadt verkauft einen Mietspiegel im Bürgerbüro (Preis unbekannt); Dokument, Art und Ersteller nicht gefunden. Haus & Grund Neuss (https://www.hausundgrundneuss.de/mietspiegel/, Tabelle 'alle Mietspiegel im Rhein-Kreis Neuss') führt Grevenbroich mit 'Stand 01.01.2024', 'ohne unsere Beteiligung', und vermerkt für Jüchen ('laut MS Grevenbroich ist dieser anwendbar abzgl. 4 %') und Rommerskirchen ('abzgl. 6 %') — das ist eine Verbandsangabe, nicht der Ersteller; Stand deshalb nicht übernommen."
   },
   {
    "ags": "05162004",
    "gemeinde": "Dormagen",
    "land": "NW",
    "einwohner_ca": 63799,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2023-01-01",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": "https://www.dormagen.de/fileadmin/civserv/pdf-dateien/fachbereich_5/Mietspiegel_Dormagen_2010.pdf",
-   "zugang": null,
+   "ersteller": "Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e.V., Kölner Haus- und Grundbesitzerverein von 1888 e.V., Mieterverein Dormagen und Umgebung e.V., im Einvernehmen mit der Stadt Dormagen",
+   "url": "https://www.hausundgrundneuss.de/fileadmin/neuss/media/pdfs/Mietspiegel_Dormagen_2023.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.dormagen.de/fileadmin/civserv/pdf-dateien/fachbereich_5/Mietspiegel_Dormagen_2010.pdf (letzte auf der Stadtseite gefundene Ausgabe 2010)",
-   "hinweis": "aktueller Mietspiegel nicht gefunden, sonst nur Portalangaben; evtl. Verbände-Mietrichtwerttabelle wie in Meerbusch/Neuss"
+   "beleg": "https://www.hausundgrundneuss.de/fileadmin/neuss/media/pdfs/MS_Dormagen_2023_Dokumentation.pdf — Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand 01.01.2023) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB für das Stadtgebiet Dormagen (einfacher Mietspiegel)'; Beteiligte: Haus & Grund Neuss, Kölner Haus- und Grundbesitzerverein, Mieterverein Dormagen, Stadt Dormagen; Datenerhebung Mai–November 2022. Mietspiegel https://www.hausundgrundneuss.de/fileadmin/neuss/media/pdfs/Mietspiegel_Dormagen_2023.pdf (Deckblatt 'Stand 1. Januar 2023', 'im Einvernehmen mit der Stadt Dormagen erstellt'). Seite des Miterstellers https://www.hausundgrundneuss.de/mietspiegel/ (kostenfreier Download; 'Bis zum Erscheinen der neuen Mietspiegel bleiben die aktuellen Mietspiegel (Stand 01.01.2023) selbstverständlich weiterhin gültig').",
+   "hinweis": "Einfacher Mietspiegel (§ 558c). Tabelle nach Baujahr mit Spanne und Mittelwert, ±10 % für gute/einfache Wohnlage, Verjüngung bei Modernisierung. Laut Haus & Grund Neuss laufen Erhebungen zur Fortschreibung (Erhebungsbogen 2026); bis dahin gilt Stand 01.01.2023. Auf dormagen.de liegt nur noch die Ausgabe 2010."
   },
   {
    "ags": "05362028",
    "gemeinde": "Hürth",
    "land": "NW",
    "einwohner_ca": 62160,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2026-05",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": null,
-   "zugang": null,
+   "ersteller": "Arbeitskreis Mietspiegel bei der Rheinischen Immobilienbörse e.V.: Mieterverein Köln e.V., Kölner Haus- und Grundbesitzerverein, Haus-, Wohnungs- und Grundeigentümerverein Hürth e.V., Stadtverwaltung Hürth, Rheinische Immobilienbörse e.V.",
+   "url": "https://web.rheinische-immobilienboerse.de/upload/Huerth_2026_1736.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "keine amtliche Fundstelle gefunden (siehe hinweis)",
-   "hinweis": "auf huerth.de kein Mietspiegel gefunden; nur Portalangaben (u. a. Hinweis auf Fassung vom 01.04.2024, nicht amtlich belegt)"
+   "beleg": "https://web.rheinische-immobilienboerse.de/upload/2026_Dokumentation_Hu_rth_1737.pdf — Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand Mai 2026) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) für nicht preisgebundenen Wohnraum für das Stadtgebiet Hürth'; 'am 21. Mai 2026 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen und wird im Einvernehmen mit der Stadt Hürth veröffentlicht'; Fragebogenrücklauf bis 28.02.2026. Mietspiegel https://web.rheinische-immobilienboerse.de/upload/Huerth_2026_1736.pdf (Kopf 'Stand 05.2026'). Übersicht https://web.rheinische-immobilienboerse.de/Mietspiegel_Huerth_2026.AxCMS",
+   "hinweis": "Einfacher Mietspiegel (§ 558c), Tabelle Baualtersgruppe × Wohnungsgröße × Wohnlage mit Spannen. Auf huerth.de selbst kein Mietspiegel gefunden; Dokument liegt bei der Rheinischen Immobilienbörse (Miterstellerin), frei abrufbar. Gültigkeitsende nicht genannt."
   },
   {
    "ags": "05362008",
    "gemeinde": "Bergheim",
    "land": "NW",
    "einwohner_ca": 61611,
-   "art": "unklar",
-   "stand": "2024-04",
+   "art": "einfach",
+   "stand": "2026-05",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
    "gueltig_bis": null,
-   "naechste_anpassung": "2026-04",
+   "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Bergheim (Abt. Wohnen und Bürgerhilfen als Ansprechpartner)",
-   "url": "https://www.bergheim.de/stadtraum/wohnen-und-bauen.php",
-   "zugang": "auf_anfrage",
+   "ersteller": "Arbeitskreis Mietspiegel bei der Rheinischen Immobilienbörse e.V.: Mieterverein Köln e.V., Kreisstadt Bergheim, Haus und Grund Bergheim e.V., Kölner Haus- und Grundbesitzerverein von 1888, Eigentümer- und Vermieterverein Bedburg und Umgebung, Erftland Kommunale Wohnungsgesellschaft mbH, Rheinische Immobilienbörse e.V.",
+   "url": "https://web.rheinische-immobilienboerse.de/upload/Bergheim_2026_1721.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.bergheim.de/stadtraum/wohnen-und-bauen.php (Veröffentlichung April 2024, löst Stand 03/2022 ab, voraussichtlich im April 2026 erneut abgelöst; Ausgabe im Einwohnermeldewesen)",
-   "hinweis": "Einstufung nicht gefunden; ob die angekündigte Ausgabe 2026 erschienen ist, nicht belegt"
+   "beleg": "https://web.rheinische-immobilienboerse.de/upload/2026_Dokumentation_Bergheim_1731.pdf — Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand Mai 2026) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) … für das Stadtgebiet Bergheim'; 'am 21. Mai 2026 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen'. Mietspiegel https://web.rheinische-immobilienboerse.de/upload/Bergheim_2026_1721.pdf (Kopf 'Stand 05.2026', 'Richtlinie … (§ 558c BGB)'). Stadtseite https://www.bergheim.de/vv/produkte/mietspiegel.php: 'Die Veröffentlichung des aktuellen Mietspiegels erfolgte im Mai 2026. Er löst damit den bisher gültigen Mietspiegel Stand 04/2024 ab. Er wird alle zwei Jahre aktualisiert.'; Download im Portal der Rheinischen Immobilienbörse, kein Postversand mehr.",
+   "hinweis": "Einfacher Mietspiegel (§ 558c), Tabelle Baualtersgruppe × Wohnungsgröße × Wohnlage mit Spannen. Die für April 2026 angekündigte Ausgabe ist im Mai 2026 erschienen; Aktualisierung laut Stadt alle zwei Jahre (kein Datum genannt). Vorgänger Stand 04/2024."
   },
   {
    "ags": "05562020",
@@ -3220,58 +3220,58 @@
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Herten (Sozialamt, Fachstelle Wohnen) mit Beteiligten",
+   "ersteller": "Stadt Herten (Dezernat 3 Bildung und Soziales, Fachstelle Wohnen) als Herausgeber; mitgewirkt: Arbeitsgemeinschaft Wohnungswirtschaft Emscher-Lippe, HGW Herner Gesellschaft für Wohnungsbau mbH, Deutscher Mieterbund Mieterverein Recklinghausen e. V., Haus- und Grundeigentümerverein Recklinghausen e. V., Haus-, Wohnungs- und Grundeigentümerverein Buer-Horst-Westerholt e. V.",
    "url": "https://www.herten.de/fileadmin/user_upload/citkoBuerger/Sozialamt/Mietspiegel_2025_2027.pdf",
    "zugang": "frei",
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.herten.de/buergerservice/dienstleistungen-a-z/detailseite/mietspiegel ('Fortschreibung … ab dem 01.08.2025'); Pressemeldung https://www.herten.de/buergerservice/pressemeldungen/meldung/mietspiegel-fuer-herten-aktualisiert-flyer-ab-sofort-erhaeltlich",
-   "hinweis": "Titel 'Mietspiegel 2025/2027' (Ende 2027 nicht ausdrücklich bestätigt); Art nicht angegeben, 'Orientierungshilfe' und Baualterstabelle sprechen für einfach; Flyer kostenlos"
+   "beleg": "https://www.herten.de/fileadmin/user_upload/citkoBuerger/Sozialamt/Mietspiegel_2025_2027.pdf (Flyer: 'MIETSPIEGEL 2025/2027 für nicht preisgebundene Wohnungen in Herten, gültig ab dem 1. August 2025'; 'Erläuterungen zur Mietrichtwerttabelle (Stand: 1. August 2025)'; 'Er bietet den Mietparteien eine Orientierungshilfe …'; 'Der Mietspiegel wird von den Beteiligten alle 2 Jahre überprüft und bei Bedarf fortgeschrieben'; 'An der Erstellung haben mitgewirkt …'; Impressum: Herausgeber Stadt Herten, Veröffentlichung Juli 2025). Stadtseite https://www.herten.de/buergerservice/dienstleistungen-a-z/detailseite/mietspiegel; Pressemeldung 04.08.2025 https://www.herten.de/buergerservice/pressemeldungen/meldung/mietspiegel-fuer-herten-aktualisiert-flyer-ab-sofort-erhaeltlich ('Die Verwaltung hat den Mietspiegel unter Beteiligung der Wohnungswirtschaft und Mieter-/Eigentümerverbände erarbeitet').",
+   "hinweis": "Weder Flyer noch Pressemeldung nennen § 558c/§ 558d oder 'einfach'/'qualifiziert'. Für einfach spricht: Mietrichtwerttabelle nach Baualtersgruppen 1–11 (ab 2014 'Marktwerte, frei verhandelbar'), Lage ±10 %, 'Orientierungshilfe', Überprüfung 'bei Bedarf' — kein Hinweis auf wissenschaftliche Erhebung oder Anerkennung. Ende 2027 nur aus dem Titel '2025/2027', nicht ausdrücklich als Gültigkeitsende. Flyer kostenlos."
   },
   {
    "ags": "05170048",
    "gemeinde": "Wesel",
    "land": "NW",
    "einwohner_ca": 60785,
-   "art": "unklar",
+   "art": "einfach",
    "stand": "2025",
-   "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "erhebungsstichtag": "2023-09-01",
+   "gueltig_ab": "2025-01-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Wesel",
-   "url": "https://www.wesel.de/mietspiegel",
+   "ersteller": "Stadt Wesel (Fachbereich Soziales, Integration und Wohnen), erstellt durch FUB IGES Wohnen+Immobilien+Umwelt GmbH unter Mitwirkung des Arbeitskreises Mietspiegel (Haus- und Grundbesitzerverein Wesel e.V., Mieterverein Wesel-Bocholt-Kleve und Umgebung e.V., Mieterschutzbund e.V. – Mieterbund-Niederrhein e.V., Bauverein Wesel AG, Wohnungsbaugenossenschaft Wesel eG)",
+   "url": "https://www.wesel.de/system/files/2025-02/Mietspiegel%20Wesel%202025.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.wesel.de/rathaus-online/aktuelles/stadt-wesel-veroeffentlicht-neuen-mietspiegel (Meldung 07.03.2025, repräsentative Erhebung); https://www.wesel.de/mietspiegel (Mietspiegel 2025 + Methodenbericht + Online-Rechner)",
-   "hinweis": "Vorgänger 2021 war einfacher Mietspiegel (§ 558c); Ausgabe 2025 mit repräsentativer Erhebung und Methodenbericht, Einstufung als qualifiziert aber nicht belegt; Stadtseiten für Abruf gesperrt (403)"
+   "beleg": "Methodenbericht https://www.wesel.de/system/files/2025-01/Methodenbericht%20Mietspiegel%20Wesel%202025.pdf, S. 5, Abschnitt 1 Vorbemerkung: 'Der Mietspiegel Wesel ist ein einfacher Mietspiegel, der nach anerkannten wissenschaftlichen Methoden gemäß § 558d BGB erstellt wurde, welche der Gesetzgeber auch bei der Erstellung qualifizierter Mietspiegel fordert.'; 'Der Mietspiegel tritt rückwirkend zum 01.01.2025 in Kraft'; Erhebungsstichtag 1. September 2023; Abschnitt 7.1: 'basiert auf einer multiplen Regressionsanalyse'. Mietspiegel https://www.wesel.de/system/files/2025-02/Mietspiegel%20Wesel%202025.pdf (Deckblatt 'Gültig ab Januar 2025, Aktualisierte Fassung'; S. 5 Arbeitskreis-Mitglieder). Stadtseite https://www.wesel.de/mietspiegel (Mietspiegel 2025, Methodenbericht, Online-Mietspiegelrechner); Meldung 07.03.2025 https://www.wesel.de/rathaus-online/aktuelles/stadt-wesel-veroeffentlicht-neuen-mietspiegel",
+   "hinweis": "Einfacher Mietspiegel (§ 558c), obwohl nach wissenschaftlichen Methoden auf repräsentativer Stichprobe erstellt — der Methodenbericht bezeichnet ihn ausdrücklich als 'einfachen' Mietspiegel, nicht als qualifiziert. Basismiettabellen nach Wohnfläche und Baualter plus Zu-/Abschläge (Ausstattung, Modernisierung, Wohnlage), dazu ein Online-Rechner. Vorgänger 01.12.2021 (einfach, auf Angebotsmieten). Gültigkeitsende nicht genannt."
   },
   {
    "ags": "05366016",
    "gemeinde": "Euskirchen",
    "land": "NW",
    "einwohner_ca": 60021,
-   "art": "unklar",
-   "stand": "2026",
+   "art": "einfach",
+   "stand": "2026-10-01",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2026-10-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Euskirchen (Wohnungswesen) mit Mieterverein Köln und Haus & Grund Euskirchen (laut Ausgabe 2024)",
+   "ersteller": "Stadt Euskirchen mit Mieterverein Köln e.V. (Zweigstelle Euskirchen) und Haus & Grund, Eigentümerverein Euskirchen und Umgebung e.V. (beratend: Euskirchener Baugesellschaft mbH)",
    "url": "https://www.euskirchen.de/fileadmin/user_upload/PDF/service/Mietspiegel_2026.pdf",
    "zugang": "frei",
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.euskirchen.de/service/leistungen-und-informationen/wohnungswesen (Mietspiegel_2026.pdf und Dokumentation_zum_Mietspiegel_2026.pdf)",
-   "hinweis": "Art nicht angegeben (PDF nicht lesbar), Vorgänger als unverbindliche Spannentabelle eher einfach; Ausgabe 2022 galt auch für Weilerswist"
+   "beleg": "Dokumentation https://www.euskirchen.de/fileadmin/user_upload/PDF/service/Dokumentation_zum_Mietspiegel_2026.pdf (Stand 30.09.2026), S. 1: 'Die Veröffentlichung des neuen Mietspiegels erfolgt zum 01.10.2026 und löst damit den Mietspiegel mit Stand vom 01.10.2024 ab.'; Abschnitt I: 'Der Mietspiegel (Stand: Oktober 2026) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) …'; S. 2 Abschnitt III: Fortschreibung des Mietspiegels 2024 um 5 % (Gruppe I), 6 % (II), 7,5 % (III), 8 % (IV–VI). Mietspiegel https://www.euskirchen.de/fileadmin/user_upload/PDF/service/Mietspiegel_2026.pdf (Kopf 'Stand: 01.10.2026', 'Zusammengestellt durch' Mieterverein Köln, Haus & Grund Euskirchen, Stadt Euskirchen). Stadtseite https://www.euskirchen.de/service/leistungen-und-informationen/wohnungswesen",
+   "hinweis": "Einfacher Mietspiegel (§ 558c), ausdrücklich so bezeichnet; Fortschreibung des Stands 01.10.2024 über prozentuale Anpassung je Baualtersgruppe (keine neue Erhebung). Tabelle Baualtersgruppe I–VI × Ausstattung A/B/C × Größe (um 40/60/80/100 m²) × mittlere/gute Wohnlage; einfache Lagen und Randlagen bis −10 %. Mieterverein und Haus & Grund erklären, dass der Mietspiegel auch für das Gemeindegebiet Weilerswist uneingeschränkt gilt (Mietspiegel, letzter Absatz)."
   },
   {
    "ags": "05158020",
@@ -3290,9 +3290,9 @@
    "url": "https://service.langenfeld.de/detail/-/vr-bis-detail/dienstleistung/768900/show",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.langenfeld.de/Aktuelles/Fortschreibung-des-Mietspiegels-der-Stadt-Langenfeld-ab-1-Oktober-gueltig.html (Ratsbeschluss 09.09.2025, gültig ab 01.10.2025; erster qualifizierter Mietspiegel 2023 ab 01.10.2023)",
+   "beleg": "https://www.langenfeld.de/Aktuelles/Fortschreibung-des-Mietspiegels-der-Stadt-Langenfeld-ab-1-Oktober-gueltig.html (Ratsbeschluss 09.09.2025, gültig ab 01.10.2025; erster qualifizierter Mietspiegel 2023 ab 01.10.2023); Form: Broschüre Mietspiegel 2025 (https://www.langenfeld.de/city_info/display/dokument/show.cfm?region_id=138&id=415707), PDF-S. 2 „Gültig ab: 1. Oktober 2025“, PDF-S. 7 („besteht aus einer Grundtabelle sowie einem Katalog von Zu- und Abschlagsmerkmalen“, „Tabelle 1: Grundtabelle“ nach Baualter), PDF-S. 8 „Berücksichtigung von Zu- und Abschlägen“ → tabelle (Grundtabelle nach Baualter mit Zu-/Abschlägen)",
    "hinweis": "VPI-Fortschreibung des qualifizierten Mietspiegels 2023; Straßenverzeichnis und Rechner"
   },
   {
@@ -3330,21 +3330,21 @@
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Stolberg mit Grundeigentümer-Verein Stolberg und Mieterschutzverein Aachen",
+   "ersteller": "Kupferstadt Stolberg (Rhld.) als Herausgeber, in Zusammenarbeit mit dem Verein der Haus-, Wohnungs- und Grundeigentümer e. V. (Stolberg) und dem Mieterschutzverein für Aachen und Umgegend e. V.",
    "url": "https://www.stolberg.de/Mietspiegel-2026.pdf",
    "zugang": "frei",
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.stolberg.de/Mietspiegel-2026.pdf (Mietspiegel 2026, in Kraft 01.01.2026, Tabellenwerte vorerst bis 31.12.2027)",
-   "hinweis": "Einstufung nicht genannt (vermutlich einfach); Spannen nach Baujahr und Wohnlage"
+   "beleg": "https://www.stolberg.de/Mietspiegel-2026.pdf — S. 1: 'Mietspiegel für freifinanzierte Wohnungen, steuerbegünstigte Wohnungen und Altbauten im Stadtgebiet Stolberg (Rhld.) für die Zeit ab 01.01.2026', 'Herausgeber: Kupferstadt Stolberg (Rhld.)', erstellt in Zusammenarbeit mit dem Verein der Haus-, Wohnungs- und Grundeigentümer e. V. und dem Mieterschutzverein für Aachen und Umgegend e. V.; Abschnitt 9 Allgemeines: 'Der Mietspiegel dient als Richtlinie zur Festlegung ortsüblicher Vergleichsmieten …', 'Orientierungsmöglichkeit'; letzte Seite: 'Die in der Tabelle genannten Mietsätze gelten vorbehaltlich außergewöhnlicher Änderungen zunächst bis zum 31.12.2027.'",
+   "hinweis": "Das Dokument nennt weder § 558c/§ 558d noch 'einfach'/'qualifiziert'; nur 'Richtlinie' und 'Orientierungsmöglichkeit' (reicht nach den Regeln nicht für 'einfach'). Für einfach spricht: Spannentabelle nach Baujahr und Wohnlage ohne Methodik- oder Erhebungsangaben, gemeinsam mit den Verbänden erstellt. Ab Baujahr 2021: 'Es gilt die auf dem Wohnungsmarkt erzielbare Miete.' PDF nur mit Browser-Kennung abrufbar (sonst Weiterleitung)."
   },
   {
    "ags": "05334012",
    "gemeinde": "Eschweiler",
    "land": "NW",
    "einwohner_ca": 57534,
-   "art": "unklar",
+   "art": "einfach",
    "stand": "2026",
    "erhebungsstichtag": null,
    "gueltig_ab": "2026-01-01",
@@ -3352,21 +3352,21 @@
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Stadt Eschweiler (Moderation, Abt. Wohnraumentwicklung und Wohnraumversorgung), Haus- und Grundbesitzer-Verein Eschweiler, Mieterschutzverein für Aachen und Umgebung",
+   "ersteller": "Haus-, Wohnungs- und Grundeigentümerverein Eschweiler e. V. und Mieterschutzverein für Aachen und Umgebung e. V., unter Mitwirkung (Moderation) der Stadt Eschweiler (Abt. 501 Wohnraumentwicklung und Wohnraumversorgung)",
    "url": "https://service.eschweiler.de/detail/-/vr-bis-detail/dienstleistung/957080/show",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://service.eschweiler.de/detail/-/vr-bis-detail/dienstleistung/957080/show (Download 'Mietspiegel Eschweiler 2026-2027'); Ratsvorlage https://rat.eschweiler.de/bi/vo0050.php?__kvonr=12479 (Gültigkeit zwei Jahre)",
-   "hinweis": "Gültigkeit aus Titel 2026-2027 und Ratsvorlage; Art nicht angegeben, Verhandlungsverfahren der Verbände spricht für einfach"
+   "beleg": "https://service.eschweiler.de/detail/-/vr-bis-detail/dienstleistung/957080/show (Download 'Mietspiegel Eschweiler 2026-2027'); Ratsvorlage 402/25 https://rat.eschweiler.de/bi/vo0050.php?__kvonr=12479 (Kenntnisgabe Rat 17.12.2025; Sitzungsvorlage https://rat.eschweiler.de/bi/getfile.php?id=100259&type=do, Sachverhalt: 'Aus diesem Grund hat die Stadt Eschweiler daher zum 01.01.2023 den „einfachen“ Mietspiegel von Haus & Grund bzw. dem Mieterschutzverein … gemäß § 5 Mietspiegelverordnung (MSV) veröffentlicht. Der Mietspiegel hat eine Gültigkeit von zwei Jahren … Da sich das Verfahren bewährt hat, wurde nun auch der neue Mietspiegel entsprechend festgelegt.'); Mietspiegel-PDF (Anlage) https://rat.eschweiler.de/bi/getfile.php?id=100365&type=do, Deckblatt: 'MIETSPIEGEL für freifinanzierte Wohnungen im Stadtgebiet Eschweiler für den Zeitraum 01.01.2026 bis 31.12.2027, erstellt durch: Haus-, Wohnungs- und Grundeigentümerverein Eschweiler e. V. und Mieterschutzverein für Aachen und Umgebung e. V. unter Mitwirkung der Stadt Eschweiler'; Tabelle Baujahresgruppen × Wohnlage (einfach/mittel/gut) × Ausstattung (A/B)",
+   "hinweis": "Gültigkeit 01.01.2026–31.12.2027 laut Deckblatt und Ratsvorlage. Art: Das Dokument selbst nennt keine Art und beruft sich nicht auf § 558d; die Ratsvorlage ordnet die Reihe ausdrücklich als 'einfachen' Mietspiegel (Veröffentlichung nach § 5 MsV) ein und sagt, der neue sei im selben Verfahren (verhandelt zwischen den Verbänden, Stadt als Moderator) festgelegt worden – daher 'einfach'. Tabelle mit Mietspannen je Baujahresgruppe, Wohnlage und Ausstattung."
   },
   {
    "ags": "05162022",
    "gemeinde": "Meerbusch",
    "land": "NW",
    "einwohner_ca": 57078,
-   "art": "unklar",
+   "art": "einfach",
    "stand": "2025-07-01",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
@@ -3375,13 +3375,13 @@
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
    "ersteller": "Mieterverein Düsseldorf e. V., Haus und Grund Düsseldorf und Umgebung e. V., Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e. V.",
-   "url": "https://meerbusch.kommunalportal.nrw/detail/-/vr-bis-detail/dienstleistung/13744/show",
-   "zugang": "auf_anfrage",
+   "url": "https://hausundgrundddf.de/wp-content/uploads/2025/06/MS-Meerbusch-07-2025-s.pdf",
+   "zugang": "frei",
    "preis": null,
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://meerbusch.kommunalportal.nrw/detail/-/vr-bis-detail/dienstleistung/13744/show (\"Die Meerbuscher Mietrichtwerttabelle vom 01.07.2025\", Bezug bei den Herausgebern)",
-   "hinweis": "Verbände-Mietrichtwerttabelle, Einstufung nicht genannt (vermutlich einfach)"
+   "beleg": "https://meerbusch.kommunalportal.nrw/detail/-/vr-bis-detail/dienstleistung/13744/show (Stadt Meerbusch, 'Mietspiegel in Meerbusch': 'Die Meerbuscher Mietrichtwerttabelle vom 01.07.2025 wird herausgegeben vom Mieterverein Düsseldorf e.V., Haus und Grund Düsseldorf und Umgebung e.V. und Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e.V'); Dokument auf der Seite des Miterstellers https://hausundgrundddf.de/mietspiegel/aktuelle-mietspiegel/mietspiegel-fuer-meerbusch/ → PDF https://hausundgrundddf.de/wp-content/uploads/2025/06/MS-Meerbusch-07-2025-s.pdf, S. 1: 'Mietspiegel für nicht preisgebundenen Wohnraum im Stadtgebiet Meerbusch, Stand 1. Juli 2025'; Abschnitt I. Allgemeines: 'Dieser Mietspiegel ist eine Orientierungshilfe für die ortsübliche Vergleichsmiete gemäß § 558c BGB im Stadtgebiet Meerbusch'; Abschnitt IV: Tabelle nach Baujahr (Spanne, Mittelwert) für mittlere Wohnlage, Zu-/Abschläge nach Ziffer III",
+   "hinweis": "Verbände-Mietspiegel (Mieterverein Düsseldorf, Haus und Grund Düsseldorf, Haus & Grund Neuss); bezeichnet sich selbst als Mietspiegel gemäß § 558c BGB, also einfach; keine Berufung auf § 558d. Die Stadt verweist auf die Herausgeber. Tabelle nach Baujahresgruppen für die mittlere Wohnlage, Zu-/Abschläge für einfache/gute Lage und Ausstattung. Das PDF liegt frei auf der Seite von Haus und Grund Düsseldorf; die Stadtseite nennt Bezug bei den Herausgebern."
   },
   {
    "ags": "05382056",
@@ -3392,17 +3392,17 @@
    "stand": "2026",
    "erhebungsstichtag": null,
    "gueltig_ab": "2026-01-01",
-   "gueltig_bis": null,
+   "gueltig_bis": "2027-12-31",
    "naechste_anpassung": null,
    "vermutung_bis": "2027-12-31",
-   "vermutung_bis_herleitung": "abgeleitet_gueltig_ab_plus_2",
+   "vermutung_bis_herleitung": "angegeben",
    "ersteller": "Stadt Sankt Augustin (FB Soziales und Wohnen), ALP Institut Hamburg; anerkannt von Deutschem Mieterbund Bonn/Rhein-Sieg/Ahr und Haus-, Wohnungs- und Grundeigentümerverein Bonn/Rhein-Sieg",
    "url": "https://www.sankt-augustin.de/fortschreibung-des-qualifizierten-mietspiegels-liegt-vor/",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.sankt-augustin.de/fortschreibung-des-qualifizierten-mietspiegels-liegt-vor/ (Fortschreibung ab 01.01.2026, anerkannt § 558d)",
+   "beleg": "https://www.sankt-augustin.de/fortschreibung-des-qualifizierten-mietspiegels-liegt-vor/ (Fortschreibung ab 01.01.2026, anerkannt § 558d); Form: Broschüre Qualifizierter Mietspiegel 2026 (https://serviceportal.sankt-augustin.de/detail/-/vr-bis-detail/dokument/83844/download), PDF-S. 2 „Gültig ab 01.01.2026“, PDF-S. 3 („gilt ab dem 01.01.2026 und ist bis zum 31.12.2027 …“), PDF-S. 6 „Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche“ + Zu-/Abschläge; Dokumentation 2024 (https://serviceportal.sankt-augustin.de/detail/-/vr-bis-detail/dokument/93242/download) S. 17 „einstufiges Regressionsmodell“ → regression",
    "hinweis": "Indexfortschreibung (VPI) des qualifizierten Mietspiegels 2024; Broschüre, Dokumentation und Online-Rechner im Serviceportal kostenfrei"
   },
   {
@@ -3410,7 +3410,7 @@
    "gemeinde": "Pulheim",
    "land": "NW",
    "einwohner_ca": 56150,
-   "art": "unklar",
+   "art": "einfach",
    "stand": "2024-04",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
@@ -3418,14 +3418,14 @@
    "naechste_anpassung": "2026",
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": "Rheinische Immobilienbörse e. V. im Auftrag der Stadt Pulheim",
-   "url": "https://www.pulheim.de/aktuelles/meldungen-2026/mietspiegel-datenerhebung.php",
+   "ersteller": "Arbeitskreis Mietspiegel bei der Rheinischen Immobilienbörse e. V.: Kölner Haus- und Grundbesitzerverein, Mieterverein Köln e. V., Stadtverwaltung Pulheim",
+   "url": "https://www.rheinische-immobilienboerse.de/Mietspiegel_Pulheim_2024.AxCMS",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.pulheim.de/aktuelles/meldungen-2026/mietspiegel-datenerhebung.php (aktueller Mietspiegel Stand April 2024, Datenerhebung für neuen Mietspiegel 2026 bis Ende September 2026, Download bei der Rheinischen Immobilienbörse)",
-   "hinweis": "Einstufung nicht genannt (vermutlich einfach wie andere RIB-Mietspiegel); neue Ausgabe 2026 in Arbeit"
+   "beleg": "https://www.pulheim.de/aktuelles/meldungen-2026/mietspiegel-datenerhebung.php (Pressemitteilung der Stadt 09.07.2026: 'Der derzeitige Mietspiegel wurde im April 2024 veröffentlicht'; Rheinische Immobilienbörse mit Erhebung eines aktuellen Mietspiegels beauftragt, Online-Umfrage bis Ende September 2026; 'Der Mietspiegel Pulheim 2024 ist kostenfrei abrufbar unter www.rheinische-immobilienboerse.de'); Seite des Miterstellers https://www.rheinische-immobilienboerse.de/Mietspiegel_Pulheim_2024.AxCMS ('Aktueller Stand: April 2024 … Aktualisierung: alle zwei Jahre', Preis 0,00 €); Dokumentation https://www.rheinische-immobilienboerse.de/upload/2024_Dokumentation_Pulheim_1533.pdf, Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand April 2024) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) … Er wurde am 19. März 2024 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen und wird im Einvernehmen mit der Stadt Pulheim veröffentlicht.'; Mietspiegel-PDF https://www.rheinische-immobilienboerse.de/upload/Pulheim_2024_1502.pdf",
+   "hinweis": "Einfacher Mietspiegel (§ 558c BGB), Stand April 2024, Beschluss im Arbeitskreis 19.03.2024. Tabelle mit Mietpreisspannen; Abschläge um 10 % u. a. für einfache Lagen/Wohnungen ohne Heizung oder Bad genannt. Neue Ausgabe 2026 in Arbeit (Datenerhebung bis Ende September 2026)."
   },
   {
    "ags": "05158016",
@@ -3466,10 +3466,10 @@
    "url": "https://www.stadt-bad-salzuflen.de/wirtschaft-und-mobilitaet/wirtschaftsstandort/online-mietspiegelrechner",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.stadt-bad-salzuflen.de/wirtschaft-und-mobilitaet/wirtschaftsstandort/online-mietspiegelrechner ('Qualifizierter Mietspiegel der Stadt Bad Salzuflen 2026 für nicht preisgebundene Wohnungen', PDF-Download und Online-Rechner); Gültig ab 01.04.2026 laut Mietspiegelliste Haus & Grund-Verband OWL (https://www.hausundgrund.de/verband/owl/leistungen-services/vermieten-verwalten/ihk-mietpreisatlas-ostwestfalen-gewerberaum)",
-   "hinweis": "Gültigkeitsbeginn nur aus der Verbandsliste, nicht auf der Stadtseite; PDF ließ sich nicht automatisch lesen — Form in Phase 2 prüfen. Vorgänger 2024 war qualifiziert (Stichprobe, Stichtag 01.09.2023)."
+   "beleg": "https://www.stadt-bad-salzuflen.de/wirtschaft-und-mobilitaet/wirtschaftsstandort/online-mietspiegelrechner ('Qualifizierter Mietspiegel der Stadt Bad Salzuflen 2026 für nicht preisgebundene Wohnungen', Online-Rechner); PDF der Stadt https://www.stadt-bad-salzuflen.de/action/download?id=%7B51727589-ce89-8ad4-08fb-c68120b96573%7D Titel 'Gültig ab 04.2026', S. 3 (Anpassung des qualifizierten Mietspiegels 2024 nach § 558d Abs. 2 BGB über den Verbraucherpreisindex; von Mieter- und Vermieterseite am 08. Januar 2026 anerkannt; Übersicht der 'am 1. September 2025 üblicherweise gezahlten Mieten'), S. 7 Tabelle 1 (Tabelle des Mietspiegels) nach Wohnungsgröße und Baualtersklasse",
+   "hinweis": "Indexfortschreibung (VPI) des qualifizierten Mietspiegels 2024 (Vorgänger: Stichprobe, Stichtag 01.09.2023); Mietstand 01.09.2025, anerkannt 08.01.2026. Stadt-PDF nennt nur 'Gültig ab 04.2026' (Monat); Tag 01.04.2026 aus der Mietspiegelliste des Haus & Grund-Verbands OWL. Tabellenmietspiegel (Wohnungsgröße × Baualter)."
   },
   {
    "ags": "05954016",
@@ -3498,22 +3498,22 @@
    "gemeinde": "Kleve",
    "land": "NW",
    "einwohner_ca": 53028,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2025-08-01",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2025-08-01",
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": null,
-   "zugang": null,
+   "ersteller": "Stadtverwaltung Kleve (Herausgeber) in Zusammenarbeit mit Haus und Grundbesitzerverein Kreis Kleve e. V. und Mieterverein Wesel-Bocholt-Kleve e. V.; Datenauswertung Gutachterausschuss für Grundstückswerte im Kreis Kleve",
+   "url": "https://www.kleve.de/system/files/2025-08/Mietspiegel%20Stadt%20Kleve%202025.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "kleve.de beim Abruf gesperrt (403); Suche ohne amtlichen Treffer",
-   "hinweis": "Pflichtgemeinde ohne gefundenen Mietspiegel. Im Kreis Kleve geben Haus & Grund und Mieterverein Wesel-Bocholt-Kleve mit dem Gutachterausschuss für den Kreis Kleve Mietrichtlinien für einzelne Städte heraus (z. B. Rees, Straelen, Goch) — ob es eine für Kleve gibt, ist nicht belegt. Bei Stadt oder Gutachterausschuss Kreis Kleve nachfragen."
+   "beleg": "Stadtseite https://www.kleve.de/stadt-kleve/service/soziales/sozialleistungen/wohngeld/mietspiegel ('Der \"Mietspiegel für nicht preisgebundene Wohnungen\" dient als Richtlinie zur Ermittlung ortsüblicher Mieten … Der Mietspiegel soll im Abstand von zwei Jahren der Marktentwicklung angepasst werden'); Dokumentation https://www.kleve.de/system/files/2025-08/Dokumentation%20Mietspiegel%20Stadt%20Kleve%202025.pdf (Titel: 'Einfacher Mietspiegel Stadt Kleve – Dokumentation im Sinne des § 4 der Mietspiegelverordnung (MsV)'; Richtwerte aus Auswertung von Angebotsmieten Mai 2019–Mai 2025 des Gutachterausschusses des Kreises Kleve; 'die neuen Richtwerte ab August 2025'; beraten und festgelegt in Sitzung am 02.06.2025); Mietspiegel-PDF https://www.kleve.de/system/files/2025-08/Mietspiegel%20Stadt%20Kleve%202025.pdf, Deckblatt: 'Mietspiegel für die Stadt Kleve – Richtlinien für die Miete des nicht preisgebundenen Wohnraumes – Stand: 01. August 2025', Herausgeber Stadtverwaltung Kleve",
+   "hinweis": "Einfacher Mietspiegel (Dokumentation nach § 4 MsV nennt ihn so). Tabelle mit Mietrichtwerten nach Baujahresgruppen und Wohnlage. Datengrundlage sind Angebotsmieten (Auswertung des Gutachterausschusses Kreis Kleve), festgelegt mit Haus und Grund Kreis Kleve und Mieterverein Wesel-Bocholt-Kleve. Anpassung laut Stadtseite im Abstand von zwei Jahren."
   },
   {
    "ags": "05570004",
@@ -3542,22 +3542,22 @@
    "gemeinde": "Frechen",
    "land": "NW",
    "einwohner_ca": 52309,
-   "art": "unklar",
-   "stand": null,
+   "art": "einfach",
+   "stand": "2024-11-01",
    "erhebungsstichtag": null,
    "gueltig_ab": null,
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": null,
-   "zugang": null,
+   "ersteller": "Arbeitskreis Mietspiegel bei der Rheinischen Immobilienbörse e. V.: Mieterverein Köln e. V., Kölner Haus- und Grundbesitzerverein von 1888, Stadt Frechen, Rheinische Immobilienbörse e. V. (unter Mitarbeit der Erftland Kommunale Wohnungsgesellschaft mbH)",
+   "url": "https://www.rheinische-immobilienboerse.de/Mietspiegel_Frechen_2024.AxCMS",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "stadt-frechen.de beim Abruf weitergeleitet (302); Suche ohne amtlichen Treffer",
-   "hinweis": "Pflichtgemeinde. Im Rhein-Erft-Kreis erstellt meist die Rheinische Immobilienbörse mit den Verbänden den Mietspiegel; Frechen-Ausgabe, Art und Stand amtlich nicht belegt. Nachholen."
+   "beleg": "Seite des Miterstellers https://www.rheinische-immobilienboerse.de/Mietspiegel_Frechen_2024.AxCMS ('Mietspiegel für frei finanzierte Wohnungen im Stadtgebiet Frechen, Aktueller Stand: November 2024 … Aktualisierung: alle zwei Jahre', Mitersteller u. a. Stadt Frechen, Preis 0,00 €); Dokumentation https://www.rheinische-immobilienboerse.de/upload/2024_Dokumentation_Frechen_1602.pdf, Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand November 2024) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) für das Stadtgebiet Frechen … Er wurde am 5. November 2024 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen'; Mietspiegel-PDF https://www.rheinische-immobilienboerse.de/upload/Frechen_2024_1591.pdf ('Mietspiegel Stand 01.11.2024', Baualtersgruppen bis 1960 / 1961–1975 / 1976–1989 / 1990–2004 / …)",
+   "hinweis": "Einfacher Mietspiegel (§ 558c BGB) des Arbeitskreises bei der Rheinischen Immobilienbörse mit der Stadt Frechen; Tabelle nach Baualtersgruppen mit Spannen. Aktualisierung alle zwei Jahre – eine Ausgabe 2026 war am 09.11.2026 bei der Rheinischen Immobilienbörse nicht auffindbar. Die Stadtseite stadt-frechen.de war maschinell nicht abrufbar."
   },
   {
    "ags": "05962040",
@@ -3609,21 +3609,21 @@
    "land": "NW",
    "einwohner_ca": 51290,
    "art": "einfach",
-   "stand": null,
+   "stand": "2025",
    "erhebungsstichtag": null,
-   "gueltig_ab": null,
+   "gueltig_ab": "2025-10-01",
    "gueltig_bis": null,
-   "naechste_anpassung": null,
+   "naechste_anpassung": "2027-10-01",
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
    "ersteller": "Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis",
-   "url": "https://www.gummersbach.de/de/hier-zu-hause/bauen-und-wohnen/mietspiegel-des-obk.html",
+   "url": "https://rio.obk.de/omix/omix.php",
    "zugang": "online_rechner",
    "preis": null,
-   "form": "unbekannt",
+   "form": "online_rechner",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.gummersbach.de/de/hier-zu-hause/bauen-und-wohnen/mietspiegel-des-obk.html (Suchauszug: 'derzeit gültigen einfachen Mietspiegel', Portal rio.obk.de/omix)",
-   "hinweis": "Mietspiegel des Oberbergischen Kreises über Kreisportal; Stand/Jahr nicht gefunden; Zugang als Portal angenommen"
+   "beleg": "https://www.gummersbach.de/de/hier-zu-hause/bauen-und-wohnen/mietspiegel-des-obk.html (Suchauszug: 'derzeit gültigen einfachen Mietspiegel', Portal rio.obk.de/omix); Form/Stand: Mietspiegel-Portal des Kreises https://rio.obk.de/omix/omix.php („Mietspiegel 2025, Oberbergischer Kreis“, Erläuterungen „gültig ab 1. Oktober 2025“, „als einfacher Mietspiegel anerkannt … nach § 558c“, Aktualisierung voraussichtlich zum 1. Oktober 2027; Ermittlung nur über „Mietpreisberechnung beginnen“, keine Tabelle, kein PDF) → online_rechner",
+   "hinweis": "Mietspiegel des Oberbergischen Kreises über Kreisportal; Stand/Jahr nicht gefunden; Zugang als Portal angenommen; Mietspiegel 2025 des Oberbergischen Kreises nur als Online-Rechner im Kreisportal; Grundlage Umfrage 2020–2025 (rund 5.100 Datensätze); Spanne ±20 %."
   },
   {
    "ags": "05770004",
@@ -3666,8 +3666,8 @@
    "preis": null,
    "form": "unbekannt",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.gronau.de/leben-in-gronau/wohnen-und-bauen/ (kein Mietspiegel verlinkt); Suche ohne amtlichen Treffer",
-   "hinweis": "Pflichtgemeinde (knapp über 50.000 EW) ohne gefundenen Mietspiegel; Stadt sagt nicht ausdrücklich, dass es keinen gibt. Bei der Stadt nachfragen."
+   "beleg": "https://www.gronau.de/leben-in-gronau/wohnen-und-bauen/ (kein Mietspiegel verlinkt, nachgeprüft 09.11.2026); Grundstücksmarktbericht 2026 des Gutachterausschusses für Grundstückswerte im Kreis Borken (zuständig u. a. für Gronau) https://gutachterausschuss.kreis-borken.de/fileadmin/user_upload/GMB_30200_2026.pdf, Abschnitt 9.1 Mietwertrahmen (S. 194 lt. Inhaltsverzeichnis): 'Einen Mietspiegel (für nicht preisgebundenen Wohnraum) gibt es im Zuständigkeitsbereich des Gutachterausschusses für Grundstückswerte im Kreis Borken nur in der Stadt Ahaus (aktueller Mietspiegel mit Stand 01.04.2023).'",
+   "hinweis": "Pflichtgemeinde (knapp über 50.000 EW). Laut amtlichem Grundstücksmarktbericht 2026 des Gutachterausschusses Kreis Borken gibt es in dessen Zuständigkeitsbereich (einschließlich Gronau) nur in Ahaus einen Mietspiegel – also keinen für Gronau. Der Gutachterausschuss veröffentlicht stattdessen Mietwertrahmen (Abschnitt 9.1) für die Wertermittlung; das ist kein Mietspiegel. Eine eigene Aussage der Stadt Gronau fehlt, daher nach den Regeln noch 'unklar' statt 'keiner'. Ohne eigenen Mietspiegel kann der Mietspiegel einer vergleichbaren Gemeinde herangezogen werden (§ 558a Abs. 4 Satz 2 BGB)."
   },
   {
    "ags": "05758024",
@@ -3752,9 +3752,9 @@
    "url": "https://www.mainz.de/en/vv/produkte/soziale_leistungen/mietspiegel-anfordern",
    "zugang": "frei",
    "preis": "online kostenlos, Druckfassung 3,50 €",
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.mainz.de/medien/internet/downloads/mietspiegel/qualifizierter-mietspiegel-mainz-2025-methodenbericht.pdf (Fortschreibung nach § 558d Abs. 2 BGB per VPI, Faktor 1,0590; 'Qualifizierter Mietspiegel Mainz 2025'); Seite mietspiegel-anfordern (Druck 3,50 €, online kostenlos); Stand 04/2025 laut Broschüre",
+   "beleg": "https://www.mainz.de/medien/internet/downloads/mietspiegel/qualifizierter-mietspiegel-mainz-2025-methodenbericht.pdf (Fortschreibung nach § 558d Abs. 2 BGB per VPI, Faktor 1,0590; 'Qualifizierter Mietspiegel Mainz 2025'); Seite mietspiegel-anfordern (Druck 3,50 €, online kostenlos); Stand 04/2025 laut Broschüre; Form: Methodenbericht 2025 (URL am Anfang dieses Belegs), PDF-S. 2 „2.1 Tabellenaufbau“, PDF-S. 3 „Mietspiegeltabelle 2025“ Baujahr (Klassen) × Wohnungsgröße (bis 40 / 40–60 / 60–80 / 80+ m²), Median und 2/3-Spannweite, „Zu- und Abschläge für Wohnlage“ → tabelle",
    "hinweis": "Indexfortschreibung 2025 des qualifizierten Mietspiegels 2023; Mietspiegel 2023 verlor laut Stadt am 09.04.2025 seine Gültigkeit (Beginn 2025 damit vermutlich April 2025, nicht wörtlich belegt); Neuerstellung nach vier Jahren fällig (2027)"
   },
   {
@@ -3928,9 +3928,9 @@
    "url": "https://www.neustadt.eu/Planen-Bauen-Wohnen/Wohnen-Mieten/Mietspiegel/",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.neustadt.eu/Planen-Bauen-Wohnen/Wohnen-Mieten/Mietspiegel/ ('Der einfache Mietspiegel der Stadt Neustadt an der Weinstraße wurde zum 01.05.2025 fortgeschrieben'); PDF Fortschreibung 2025: https://www.neustadt.eu/output/download.php?fid=2636.23424.1.",
+   "beleg": "https://www.neustadt.eu/Planen-Bauen-Wohnen/Wohnen-Mieten/Mietspiegel/ ('Der einfache Mietspiegel der Stadt Neustadt an der Weinstraße wurde zum 01.05.2025 fortgeschrieben'); PDF Fortschreibung 2025: https://www.neustadt.eu/output/download.php?fid=2636.23424.1.; Form: Fortschreibung 2025 (https://www.neustadt.eu/output/download.php?fid=2636.23424.1.), PDF-S. 1 „Einfacher Mietspiegel“, PDF-S. 4 („wurde als Tabellenmietspiegel …“), PDF-S. 7 „Mietspiegeltabelle“ („wird durch die Wohnwertmerkmale Wohnungsgröße und Baujahr …“) → tabelle",
    "hinweis": "Fortschreibung 2025 des einfachen Mietspiegels 2023; Methodenbericht und Online-Orientierungshilfe vorhanden"
   },
   {
@@ -4052,17 +4052,17 @@
    "stand": "2026",
    "erhebungsstichtag": null,
    "gueltig_ab": "2026-08-01",
-   "gueltig_bis": null,
+   "gueltig_bis": "2028-07-31",
    "naechste_anpassung": null,
    "vermutung_bis": "2028-07-31",
-   "vermutung_bis_herleitung": "abgeleitet_gueltig_ab_plus_2",
+   "vermutung_bis_herleitung": "angegeben",
    "ersteller": "Stadt Elmshorn (Amt für Stadtentwicklung und Umwelt), ALP Institut für Wohnen und Stadtentwicklung GmbH; anerkannt von den Interessenvertretungen",
    "url": "https://www.elmshorn.de/media/custom/3302_15145_1.PDF?1782900522",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.elmshorn.de/Stadtportr%C3%A4t/Leben-in-Elmshorn/Wohnen/Mietspiegel/ ('Ab dem 1. August 2026 tritt die Fortschreibung des qualifizierten Mietspiegels auf Grundlage ... Verbraucherpreisindexes ... in Kraft', ALP Institut)",
+   "beleg": "https://www.elmshorn.de/Stadtportr%C3%A4t/Leben-in-Elmshorn/Wohnen/Mietspiegel/ ('Ab dem 1. August 2026 tritt die Fortschreibung des qualifizierten Mietspiegels auf Grundlage ... Verbraucherpreisindexes ... in Kraft', ALP Institut); Form: Broschüre Elmshorn 2026 (URL im Feld url), PDF-S. 1 „Gültig vom 01.08.2026 - 31.07.2028“, PDF-S. 4 („mittels Regressionsanalyse ausgewertet“), PDF-S. 5 „Tabelle 1: Monatliche Basis-Nettokaltmiete nur in Abhängigkeit von der Wohnfläche“, PDF-S. 6 „Tabelle 2: Zu-/Abschläge für den Mietpreis beeinflussende Wohnwertmerkmale“ → regression",
    "hinweis": "VPI-Fortschreibung 2026; Mietspiegelrechner verlinkt"
   },
   {
@@ -4082,9 +4082,9 @@
    "url": "https://www.saarbruecken.de/media/download-6a7ac2f4d9bb1",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/mietspiegel (Abschnitte 'Fortschreibung des Saarbrücker Mietspiegels zum 1. Januar 2026', 'Welche Methodik' (VPI-Fortschreibung des Mietspiegels 2024), 'Wer war an der Erstellung beteiligt')",
+   "beleg": "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/mietspiegel (Abschnitte 'Fortschreibung des Saarbrücker Mietspiegels zum 1. Januar 2026', 'Welche Methodik' (VPI-Fortschreibung des Mietspiegels 2024), 'Wer war an der Erstellung beteiligt'); Form: Mietspiegel 2026 (URL im Feld url; Textschicht teilweise fehlerhaft kodiert), PDF-S. 7 „3.5 Basismiettabellen“ („Die Basistabellen 1 bis 3 geben getrennt die Basismieten für die einfache, mittlere und gute Wohnlage“), PDF-S. 8 „Tabelle 1: Monatliche Nettokaltmiete für Wohnungen in einfacher Wohnlage“ (je m² Wohnfläche × 5 Baualtersklassen), PDF-S. 11 Tabelle 2 mittlere Wohnlage, PDF-S. 20–21 Berechnung Basismiete plus Zu- und Abschläge → tabelle",
    "hinweis": "VPI-Fortschreibung 2026 des qualifizierten Mietspiegels 2024; Online-Rechner"
   },
   {
@@ -4126,9 +4126,9 @@
    "url": "https://www.dresden.de/media/pdf/sozialamt/Mietspiegel_Dresden_2025.pdf",
    "zugang": "frei",
    "preis": "PDF frei; Broschüre Schutzgebühr 2,00 €",
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.dresden.de/de/leben/wohnen/wohnungsmarkt/mietspiegel.php (Abschnitt 'Mietspiegel 2025': qualifiziert, Mietdaten April 2024, 'gilt vom 1. Januar 2025 bis zum 31. Dezember 2026. Ab 2027 wird ein neuer Mietspiegel veröffentlicht'; Schutzgebühr 2,00 €; Abschnitt 'Wer erstellt')",
+   "beleg": "https://www.dresden.de/de/leben/wohnen/wohnungsmarkt/mietspiegel.php (Abschnitt 'Mietspiegel 2025': qualifiziert, Mietdaten April 2024, 'gilt vom 1. Januar 2025 bis zum 31. Dezember 2026. Ab 2027 wird ein neuer Mietspiegel veröffentlicht'; Schutzgebühr 2,00 €; Abschnitt 'Wer erstellt'); Form: Mietspiegel Dresden 2025 (URL im Feld url), PDF-S. 3 „Arbeitsschritt 1: Ermittlung der Basismiete“ / „Arbeitsschritt 2: Ermittlung von Zu- und Abschlägen zur Basismiete“, PDF-S. 9 „Tabelle 1: Basismiete (BM) in Abhängigkeit von der Wohnfläche (Wfl)“, PDF-S. 10 „Tabelle 2/3: Faktoren für Zu- und Abschläge …“ → regression",
    "hinweis": "Online-Mietspiegel der Stadt; Dokumentation unter https://www.dresden.de/media/pdf/sozialamt/mietspiegel-dokumentation-2025.pdf"
   },
   {
@@ -4148,9 +4148,9 @@
    "url": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/mietspiegel",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/mietspiegel ('Am 1. Juli 2025 trat der neue Qualifizierte Mietspiegel der Stadt Chemnitz in Kraft', Arbeitsgruppe, Erstellung im ersten Halbjahr 2025)",
+   "beleg": "https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/mietspiegel ('Am 1. Juli 2025 trat der neue Qualifizierte Mietspiegel der Stadt Chemnitz in Kraft', Arbeitsgruppe, Erstellung im ersten Halbjahr 2025); Form: Mietspiegeldokumentation 2025 (URL im hinweis), PDF-S. 2 Inhalt „2.3 Beschreibung des Regressionsverfahrens“, „4.3.1 Erste Stufe (Basismieten)“, „4.3.2 Zweite Stufe (Zu- und Abschläge)“, PDF-S. 13 kombiniertes Regressionsmodell „in Anlehnung an das Regensburger Modell“ → regression",
    "hinweis": "Neuerstellung 2025; Online-Rechner und Broschüre auf der Stadtseite; Dokumentation https://d2vw8mc5mcb3gm.cloudfront.net/fileadmin/chemnitz/media/leben-in-chemnitz/lebenssituationen/Bauen_und_Wohnen/2025_Mietspiegeldokumentation.pdf"
   },
   {
@@ -4217,7 +4217,7 @@
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://www.goerlitz.de/uploads/02-Buerger-Dokumente/Mietspiegelbroschuere_Goerlitz_2024.pdf Titelseite ('Als qualifizierter Mietspiegel nach § 558d BGB anerkannt durch Görlitzer Stadtrat. Gültig ab 1. November 2024.'); Seite https://www.goerlitz.de/Mietspiegel.html",
-   "hinweis": "Erster qualifizierter Mietspiegel 2024; Basismiete plus Zu-/Abschläge; Fortschreibung zum Herbst 2026 fällig, auf der Stadtseite noch nicht gefunden"
+   "hinweis": "Erster qualifizierter Mietspiegel 2024; Basismiete plus Zu-/Abschläge. Fortschreibung zum Herbst 2026 fällig; auf https://www.goerlitz.de/Mietspiegel.html weiterhin nur Broschüre und Dokumentation 2024, Neuauflage/Fortschreibung nicht gefunden — Stand geprüft am 2026-11-09."
   },
   {
    "ags": "15003000",
@@ -4324,9 +4324,9 @@
    "url": "https://service.jena.de/system/files/2026-09/Brosch%C3%BCre_2026_layout.pdf",
    "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://service.jena.de/de/mietspiegel-fuer-wohnraummieten ('Der Mietspiegel aus dem Jahr 2023 wurde mit dem Verbraucherpreisindex für die Nettokaltmieten für Thüringen fortgeschrieben und kann seit dem 07.09.2026 als einfacher Mietspiegel ... herangezogen werden'); Methodenbericht 'Fortschreibung_Einfacher MSP Jena 2026'",
+   "beleg": "https://service.jena.de/de/mietspiegel-fuer-wohnraummieten ('Der Mietspiegel aus dem Jahr 2023 wurde mit dem Verbraucherpreisindex für die Nettokaltmieten für Thüringen fortgeschrieben und kann seit dem 07.09.2026 als einfacher Mietspiegel ... herangezogen werden'); Methodenbericht 'Fortschreibung_Einfacher MSP Jena 2026'; Form: Broschüre 2026 (URL im Feld url), PDF-S. 3 („Fortschreibung trat zum 07.09.2026 in Kraft … wird zu einem einfachen Mietspiegel“), PDF-S. 10 Abschnitt „5 Anwendung“ („Die Jenaer Mietspiegeltabelle wird durch die drei Wohnwertmerkmale Wohnungsgröße, Baujahr und Wohnlage der Wohnung gebildet“) → tabelle",
    "hinweis": "Indexfortschreibung (Nettokaltmieten-Index Thüringen) des Mietspiegels 2023; früher qualifiziert (2023 laut Methodenbericht), jetzt ausdrücklich einfach; Online-Berechnung (jena.de/mietspiegel-online)"
   },
   {
@@ -4356,22 +4356,22 @@
    "gemeinde": "Weimar",
    "land": "TH",
    "einwohner_ca": 65954,
-   "art": "unklar",
-   "stand": null,
-   "erhebungsstichtag": null,
+   "art": "einfach",
+   "stand": "2025-12-31",
+   "erhebungsstichtag": "2023-12-31",
    "gueltig_ab": null,
    "gueltig_bis": null,
    "naechste_anpassung": null,
    "vermutung_bis": null,
    "vermutung_bis_herleitung": null,
-   "ersteller": null,
-   "url": null,
-   "zugang": null,
+   "ersteller": "Stadt Weimar, Stadtentwicklungsamt (Abt. Stadtentwicklung und Stadtforschung, Kommunale Statistikstelle/Informationsmanagement); anerkannt von den Interessenvertretern der Vermieter und der Mieter",
+   "url": "https://stadt.weimar.de/datei/anzeigen/id/87907,48/20251231_mietspiegel_weimar_2025.pdf",
+   "zugang": "frei",
    "preis": null,
-   "form": "unbekannt",
+   "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
-   "beleg": "https://stadt.weimar.de/leben/einkaufen-wohnen-und-verkehr/wohnen/ (keine Mietspiegel-Seite verlinkt); Stadtsuche nur per JavaScript, nicht auswertbar",
-   "hinweis": "Keine amtliche Mietspiegelseite gefunden; Websuche-Kontingent der Sitzung war erschöpft, daher nicht weiter recherchiert - nachprüfen"
+   "beleg": "https://stadt.weimar.de/datei/anzeigen/id/87907,48/20251231_mietspiegel_weimar_2025.pdf – Deckblatt: 'Mietspiegel Weimar 2025 – Angepasst an die Marktentwicklung zum Stichtag 31.12.2025 – Stadtentwicklungsamt Weimar'; Abschnitt 1 (S. 3): 'Vor dem o.g. Hintergrund ist die Stadt Weimar verpflichtet, für ihr Gemeindegebiet einen Mietspiegel zu erstellen. Dies geschieht in Form eines einfachen Mietspiegels gemäß § 558c Abs. 1 BGB.'; S. 4: 'Der Mietspiegel basiert auf dem Erhebungsstichtag 31.12.2023 … Die vorliegende Fassung des Mietspiegels enthält eine Anpassung an die Marktentwicklung zum Stichtag 31.12.2025 von 4,1%' (VPI tatsächliche Nettokaltmiete); Abschnitt 4 (S. 9): Mietspiegeltabelle nach Größen- und Baualtersklassen mit Basismiete und Spanne; Anlage 'Erstellungsprozess und Datengrundlage': 6 Baualtersklassen × 4 Größenklassen, 'von den Interessenvertretern der Vermieter als auch der Mieter anerkannt'",
+   "hinweis": "Einfacher Mietspiegel (§ 558c Abs. 1 BGB), Datengrundlage rd. 10.800 Datensätze lokaler Wohnungsunternehmen, Erhebungsstichtag 31.12.2023, per VPI (tatsächliche Nettokaltmiete) um 4,1 % angepasst zum 31.12.2025. Tabelle 6 Baualters- × 4 Größenklassen mit Basismiete und 3/4-Spanne; Einordnung in die Spanne über Wohnwertpunkte (Tab. A-2 bis A-4: Ausstattung, Lage). Anpassung laut Dokument alle zwei Jahre. Das PDF ist kennwortgeschützt gegen Bearbeitung, aber lesbar."
   }
  ]
 }
