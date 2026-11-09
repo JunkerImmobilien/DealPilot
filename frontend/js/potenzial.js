@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════
-   potenzial.js · v2430 — MIETERHÖHUNG UND ZIELBILD
+   potenzial.js · v2430 (v3255: Mietspiegel-Werte aus dem Register) — MIETERHÖHUNG UND ZIELBILD
    ════════════════════════════════════════════════════════════════════
    Marcel 19.10.2026: „Der Investor zeigt der Bank das versteckte Kapital
    im Haus." Je Wohnung bis zu drei Mieten:
@@ -822,11 +822,58 @@
       try { msHinweis(); } catch (e) {}
     }).catch(function () { _msReg[g] = null; });
   }
-  function mietspiegelObjekt() {
+  /* v3255 · MIETSPIEGEL-WERTE aus dem Register (mb-Backend lib/mietspiegel/werte/<ags>.json, Rechnung NUR dort:
+     mietspiegelWerteFuer). Je Gemeinde × Baujahr × Wohnfläche EINMAL je Sitzung über die Route
+     /marktbericht/mietspiegel?ags=&baujahr=&wfl= geholt. Lage: DealPilot kennt die Wohnlage des Mietspiegels nicht
+     (die Lageklasse A/B/C ist eine andere) - die Route rechnet dann mit dem Standard des Dokuments und sagt es im Hinweis.
+     Eingabe am Objekt (ms_unten/ms_mittel/ms_oben) und die eigene Vergleichsmiete gehen weiter vor. */
+  var _msWerte = {};   /* 'ags|baujahr|wfl' -> Promise (läuft) | werte (Antwort .werte) | null */
+  function msWerteNachladen() {
+    try { if (artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length) objektKarte(); else objektSumme(); } catch (e) {}
+    try { msHinweis(); } catch (e) {}
+  }
+  function msWerteFuer(wflW) {
+    var g = agsJetzt(), reg = msRegister();
+    if (!g || !reg || !reg.werte_verfuegbar) return null;
+    var bj = parseInt(wert('baujahr'), 10), fl = Math.round(zahl(wflW) * 100) / 100;
+    if (!(bj > 1000)) return { unten: null, mittel: null, oben: null, hinweise: ['Baujahr fehlt — der Mietspiegel ordnet nach Baualter'] };
+    if (!(fl > 0)) return { unten: null, mittel: null, oben: null, hinweise: ['Wohnfläche fehlt — der Mietspiegel ordnet nach Wohnungsgröße'] };
+    var k = g + '|' + bj + '|' + fl;
+    if (k in _msWerte) { var c = _msWerte[k]; return c && typeof c.then !== 'function' ? c : null; }
+    if (!window.Auth || typeof Auth.apiCall !== 'function') return null;
+    _msWerte[k] = Auth.apiCall('/marktbericht/mietspiegel?ags=' + encodeURIComponent(g) + '&baujahr=' + bj + '&wfl=' + fl, { method: 'GET' }).then(function (a) {
+      _msWerte[k] = a && a.werte ? a.werte : null;
+      if (agsJetzt() === g) msWerteNachladen();
+    }).catch(function () { _msWerte[k] = null; });
+    return null;
+  }
+  /* Wohnfläche für die Objektzeile: Einzelobjekt wfl, MFH die mittlere Wohnungsgröße (je Wohnung rechnet modell() selbst) */
+  function msObjektWfl() {
+    var D = window._dpMfh;
+    if (artMitEinheiten() && D && Array.isArray(D.einheiten) && D.einheiten.length) {
+      var l = D.einheiten.filter(function (e) { return e && zahl(e.wfl) > 0 && e.art !== 'gewerbe'; });
+      if (l.length) return l.reduce(function (a, e) { return a + zahl(e.wfl); }, 0) / l.length;
+    }
+    return zahl(wert('wfl'));
+  }
+  /* rechnet die Vergleichsmiete aus den Register-Werten? (keine eigene Vergleichsmiete, keine Mietspiegel-Eingabe) */
+  function msRegisterRechnet() {
+    var reg = msRegister();
+    return !!(reg && reg.werte_verfuegbar && !(zahl(wert('zb_vgl_qm')) > 0)
+      && !(zahl(wert('ms_unten')) > 0 || zahl(wert('ms_mittel')) > 0 || zahl(wert('ms_oben')) > 0));
+  }
+  function mietspiegelObjekt(wflW) {
     var md = window._dpMarktdaten;
     var reg = msRegister() || (md && md.mietspiegel && !(md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) ? md.mietspiegel : null);
-    return K.mietspiegelAus(reg, { art: wert('ms_art'), unten: wert('ms_unten'), mittel: wert('ms_mittel'), oben: wert('ms_oben'),
+    var mw = null;
+    if (reg && reg.werte_verfuegbar) {
+      mw = msWerteFuer(wflW != null ? wflW : msObjektWfl());
+      if (mw && (mw.unten > 0 || mw.mittel > 0 || mw.oben > 0)) reg = Object.assign({}, reg, { unten: mw.unten, mittel: mw.mittel, oben: mw.oben });
+    }
+    var ms = K.mietspiegelAus(reg, { art: wert('ms_art'), unten: wert('ms_unten'), mittel: wert('ms_mittel'), oben: wert('ms_oben'),
       stand: wert('ms_stand'), url: wert('ms_url') });
+    if (ms && ms.quelle === 'register' && mw) ms.werte = mw;   /* Zelle/Rechnung/Hinweise der Register-Werte */
+    return ms;
   }
   function msWahl() { var w = wert('ms_wahl'); return K.MS_WAHL[w] ? w : 'oben'; }
   /* v3246 · Stufe des Abschlags Angebotsmiete -> Vergleichsmiete. Zahlen: config.js mieteAngebotAbschlag (EINE Stelle). */
@@ -846,7 +893,8 @@
     if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)', art: 'eigen', quelle_art: 'eigen', hinweise: [] };
     var ms = mietspiegelObjekt(), mw = ms ? K.mietspiegelWert(ms, msWahl()) : null;
     if (mw && mw.qm > 0) return { qm: mw.qm, art: 'mietspiegel_' + mw.art, quelle_art: 'mietspiegel_' + mw.art, qualifiziert: mw.qualifiziert,
-      mietspiegel: true, ms: mw, herkunft: mw.herkunft, hinweise: mw.hinweise.slice() };
+      mietspiegel: true, ms: mw, herkunft: mw.herkunft, werte: ms.werte || null,   /* v3255 */
+      hinweise: mw.hinweise.concat(ms.werte && ms.werte.hinweise ? ms.werte.hinweise : []) };
     var a = amtlicheVgl();
     if (a) {
       var t = VGL_ART[a.art] || 'amtliche Vergleichsmiete';
@@ -925,7 +973,16 @@
         var anteil = flAll > 0 ? wfl / flAll : 0;
         var mlEigen = massnahmenVon(e);
         var ml = mlEigen.concat(hausL.map(function (m) { return { id: m.id, t: m.t, k: zahl(m.k) * anteil, bewohnt: !!m.bewohnt, erh: zahl(m.erh), haus: true }; }));
-        var s = sollFuer(hausL.length ? Object.assign({}, e, { massnahmen: ml }) : e, ctx);
+        /* v3255 · MFH: je Wohnung die EIGENE Zelle des Mietspiegels (Wohnungsgröße!), wenn die Register-Werte rechnen.
+           Über den ctx, nicht über e.vgl_qm - das ist im Kern die eigene Angabe. Ohne Wert für diese Größe bleibt der
+           Objektwert (mittlere Wohnungsgröße). */
+        var ctxW = ctx;
+        if (wfl > 0 && e.art !== 'gewerbe' && msRegisterRechnet()) {
+          var msW = mietspiegelObjekt(wfl), mwW = msW && msW.quelle === 'register' ? K.mietspiegelWert(msW, msWahl()) : null;
+          if (mwW && mwW.qm > 0) ctxW = Object.assign({}, ctx, { vgl_qm: mwW.qm, vgl_herkunft: mwW.herkunft, vgl_art: 'mietspiegel_' + mwW.art,
+            vgl_hinweise: mwW.hinweise.concat(msW.werte && msW.werte.hinweise ? msW.werte.hinweise : []), vgl_ms: mwW });
+        }
+        var s = sollFuer(hausL.length ? Object.assign({}, e, { massnahmen: ml }) : e, ctxW);
         var zielQm = zahl(e.ziel_qm);
         var zielM = zielQm > 0 && wfl > 0 ? zielQm * wfl : 0;
         var kAlle = ml.reduce(function (a, m) { return a + zahl(m.k); }, 0);
@@ -2651,8 +2708,36 @@
     if (!zr) return '';
     var ohneWerte = !(zahl(wert('ms_unten')) > 0 || zahl(wert('ms_mittel')) > 0 || zahl(wert('ms_oben')) > 0);
     var link = zr.url && /^https?:\/\//.test(zr.url) ? ' · <a href="' + esc(zr.url) + '" target="_blank" rel="noopener">Mietspiegel öffnen</a>' : '';
+    var reg = msRegister(), regWerte = !!(reg && reg.werte_verfuegbar);   /* v3255: das Register führt die Werte selbst */
     return '<span' + (zr.veraltet || zr.status === 'unklar' ? ' style="color:#B8625C"' : '') + '>' + esc(zr.text) + '</span>' + link
-      + (zr.vorhanden && ohneWerte && !(zahl(wert('zb_vgl_qm')) > 0) ? '<br><b>' + esc(zr.werte_hinweis) + '</b>' : '') + '<br>';
+      + (zr.vorhanden && ohneWerte && !regWerte && !(zahl(wert('zb_vgl_qm')) > 0) ? '<br><b>' + esc(zr.werte_hinweis) + '</b>' : '') + '<br>'
+      + (regWerte && msRegisterRechnet() ? msWerteHtml() : '');
+  }
+  /* v3255 · Zeile der Register-Werte: „Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 / 7,70 / 8,93 €/m²
+     · gerechnet mit oberem Wert". Beim MFH je Wohnung (eigene Zelle nach Wohnungsgröße). */
+  var MS_WAHL_DATIV = { oben: 'oberem Wert', mittel: 'Mittelwert', unten: 'unterem Wert' };
+  function msWerteText(mw) {
+    return [mw.unten, mw.mittel, mw.oben].map(function (v) { return v > 0 ? eur2(v).replace(/\s*€$/, '') : '–'; }).join(' / ') + ' €/m²';
+  }
+  function msWerteHtml() {
+    var reg = msRegister() || {}, bj = parseInt(wert('baujahr'), 10);
+    var kopf = 'Mietspiegel der Gemeinde ' + esc(reg.gemeinde || '') + ' · Werte für Baujahr ' + (bj > 1000 ? bj : '–');
+    var wahl = 'gerechnet mit ' + MS_WAHL_DATIV[msWahl()];
+    var D = window._dpMfh, mfh = artMitEinheiten() && D && Array.isArray(D.einheiten) && D.einheiten.length;
+    if (!mfh) {
+      var fl = zahl(wert('wfl')), mw = msWerteFuer(fl);
+      if (!mw) return '<span style="color:var(--muted)">' + kopf + ': Werte werden geladen …</span><br>';
+      if (!(mw.mittel > 0 || mw.oben > 0 || mw.unten > 0)) return '<span style="color:#B8625C">' + kopf + ', ' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²: kein Wert — ' + esc((mw.hinweise || []).join(' · ')) + '</span><br>';
+      return kopf + ', ' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²: <b>' + esc(msWerteText(mw)) + '</b> · ' + wahl
+        + (mw.zelle || mw.rechnung ? '<br><small style="color:var(--muted)">' + esc(mw.zelle ? 'Tabellenfeld ' + mw.zelle : mw.rechnung) + (mw.seite ? ' (S. ' + esc(mw.seite) + ')' : '') + '</small>' : '') + '<br>';
+    }
+    var zeilen = D.einheiten.map(function (e, i) { return { e: e, i: i }; }).filter(function (o) { return o.e && zahl(o.e.wfl) > 0 && o.e.art !== 'gewerbe'; }).slice(0, 12).map(function (o) {
+      var fl = zahl(o.e.wfl), mw = msWerteFuer(fl), name = 'Whg ' + esc(String(o.e.nr || (o.i + 1)));
+      if (!mw) return name + ' (' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²): …';
+      if (!(mw.mittel > 0 || mw.oben > 0 || mw.unten > 0)) return name + ' (' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²): kein Wert';
+      return name + ' (' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²): ' + esc(msWerteText(mw));
+    });
+    return kopf + ', je Wohnung nach Größe · ' + wahl + '<br><small>' + zeilen.join(' · ') + '</small><br>';
   }
   /* v3250 · Platzhalter der ms_*-Felder: zeigen, was das Verzeichnis einsetzt, solange das Feld leer ist */
   function msPlatzhalter(zr) {

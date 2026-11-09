@@ -1,0 +1,609 @@
+{
+ "ags": "05913000",
+ "gemeinde": "Dortmund",
+ "art": "qualifiziert",
+ "stand": "2024-05",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-01-01",
+ "gueltig_bis": "2026-12-31",
+ "quelle": {
+  "url": "https://www.dortmund.de/dortmund/projekte/rathaus/verwaltung/amt-fuer-wohnen/downloads/mietspiegel/mietspiegel-dortmund-2025_2026.pdf",
+  "dokument": "Mietspiegel Dortmund 2025/2026 (Fortschreibung des Mietspiegels 2023/2024), Dortmunder Bekanntmachungen Nr. 53 vom 20.12.2024, Sonderdruck",
+  "seite": "2",
+  "lizenz": "amtliche Bekanntmachung (Amtsblatt der Stadt Dortmund); keine Lizenzangabe",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "„Angaben entsprechen dem Stand Mai 2024“ (S. 1). Die Tabelle gilt für 60,01–80 m²; die Wohnungsgröße wirkt als Zu-/Abschlag (S. 3). Nur 20–145 m², Baujahr bis 2019, keine Ein- und Zweifamilienhäuser. Im Anwendungsbeispiel (S. 7–8) steht einmal „Summe … 0,77 €/m²“, gerechnet wird dort mit 0,81 — die Einzelwerte ergeben 0,81.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1909,
+     "label": "bis 1909"
+    },
+    {
+     "von": 1910,
+     "bis": 1934,
+     "label": "1910–1934"
+    },
+    {
+     "von": 1935,
+     "bis": 1959,
+     "label": "1935–1959"
+    },
+    {
+     "von": 1960,
+     "bis": 1969,
+     "label": "1960–1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1981,
+     "label": "1970–1981"
+    },
+    {
+     "von": 1982,
+     "bis": 1994,
+     "label": "1982–1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2009,
+     "label": "1995–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2014,
+     "label": "2010–2014"
+    },
+    {
+     "von": 2015,
+     "bis": 2019,
+     "label": "2015–2019"
+    }
+   ]
+  },
+  "geltung": {
+   "wfl_von": 20,
+   "wfl_bis": 145,
+   "baujahr_bis": 2019
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 4.73,
+    "mittel": 5.9,
+    "oben": 7.16,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "unten": 4.61,
+    "mittel": 5.73,
+    "oben": 6.83,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "unten": 5.23,
+    "mittel": 6.29,
+    "oben": 7.41,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "unten": 5.43,
+    "mittel": 6.3,
+    "oben": 7.18,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "unten": 4.98,
+    "mittel": 6,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "unten": 5.45,
+    "mittel": 6.5,
+    "oben": 7.68,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "unten": 5.72,
+    "mittel": 6.83,
+    "oben": 7.94,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "unten": 5.8,
+    "mittel": 7.37,
+    "oben": 8.99,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "unten": 8.1,
+    "mittel": 10.19,
+    "oben": 12.67,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "label": "Wohnungsgröße",
+    "art": "eur_qm",
+    "beleg": "S. 3 Abschnitt 5.1 Wohnungsgröße",
+    "wfl_klassen": [
+     {
+      "von": 20,
+      "bis": 25,
+      "wert": 1.74
+     },
+     {
+      "von": 25,
+      "von_inkl": false,
+      "bis": 30,
+      "wert": 1.29
+     },
+     {
+      "von": 30,
+      "von_inkl": false,
+      "bis": 35,
+      "wert": 1.28
+     },
+     {
+      "von": 35,
+      "von_inkl": false,
+      "bis": 40,
+      "wert": 0.92
+     },
+     {
+      "von": 40,
+      "von_inkl": false,
+      "bis": 45,
+      "wert": 0.57
+     },
+     {
+      "von": 45,
+      "von_inkl": false,
+      "bis": 50,
+      "wert": 0.44
+     },
+     {
+      "von": 50,
+      "von_inkl": false,
+      "bis": 60,
+      "wert": 0.2
+     },
+     {
+      "von": 60,
+      "von_inkl": false,
+      "bis": 80,
+      "wert": 0
+     },
+     {
+      "von": 80,
+      "von_inkl": false,
+      "bis": 110,
+      "wert": -0.05
+     },
+     {
+      "von": 110,
+      "von_inkl": false,
+      "bis": 145,
+      "wert": -0.13
+     }
+    ]
+   },
+   {
+    "merkmal": "appartement",
+    "label": "Appartement (bis 50 m²)",
+    "art": "eur_qm",
+    "wert": 0.54,
+    "beleg": "S. 3 Wohnungstyp"
+   },
+   {
+    "merkmal": "maisonette",
+    "label": "Maisonette-/Galerie-Wohnung",
+    "art": "eur_qm",
+    "wert": 0.07,
+    "beleg": "S. 3 Wohnungstyp"
+   },
+   {
+    "merkmal": "dachgeschoss",
+    "label": "Dachgeschoss-Wohnung",
+    "art": "eur_qm",
+    "wert": 0.05,
+    "beleg": "S. 3 Wohnungstyp"
+   },
+   {
+    "merkmal": "souterrain",
+    "label": "Souterrain-Wohnung",
+    "art": "eur_qm",
+    "wert": -0.09,
+    "beleg": "S. 3 Wohnungstyp"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "label": "zweites WC (Gäste-WC)",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "beleg": "S. 3 Abschnitt 5.2"
+   },
+   {
+    "merkmal": "dusche",
+    "label": "Badezimmer mit Dusche",
+    "art": "eur_qm",
+    "wert": 0.16,
+    "beleg": "S. 3 Abschnitt 5.2"
+   },
+   {
+    "merkmal": "zweites_bad",
+    "label": "zweites Badezimmer mit WC",
+    "art": "eur_qm",
+    "wert": 0.29,
+    "beleg": "S. 3 Abschnitt 5.2"
+   },
+   {
+    "merkmal": "kein_bad",
+    "label": "kein Badezimmer",
+    "art": "eur_qm",
+    "wert": -0.7,
+    "beleg": "S. 3 Abschnitt 5.2"
+   },
+   {
+    "merkmal": "parkett",
+    "label": "Parkett/aufgearbeitete Hobeldielen",
+    "art": "eur_qm",
+    "wert": 0.54,
+    "beleg": "S. 4 Abschnitt 5.3"
+   },
+   {
+    "merkmal": "keramik_naturstein",
+    "label": "Keramik-/Natursteinboden",
+    "art": "eur_qm",
+    "wert": 0.17,
+    "beleg": "S. 4 Abschnitt 5.3"
+   },
+   {
+    "merkmal": "pvc_hochwertig",
+    "label": "hochwertiger PVC-/Designboden",
+    "art": "eur_qm",
+    "wert": 0.21,
+    "beleg": "S. 4 Abschnitt 5.3"
+   },
+   {
+    "merkmal": "ohne_oberboeden",
+    "label": "ohne Oberböden vermietet",
+    "art": "eur_qm",
+    "wert": -0.11,
+    "beleg": "S. 4 Abschnitt 5.3"
+   },
+   {
+    "merkmal": "etagenheizung",
+    "label": "Etagenheizung",
+    "art": "eur_qm",
+    "wert": 0.03,
+    "beleg": "S. 4 Abschnitt 5.4"
+   },
+   {
+    "merkmal": "fernwaerme",
+    "label": "Fernwärmeheizung",
+    "art": "eur_qm",
+    "wert": -0.07,
+    "beleg": "S. 4 Abschnitt 5.4"
+   },
+   {
+    "merkmal": "einzeloefen",
+    "label": "Einzelöfen / Heizung nicht vom Vermieter",
+    "art": "eur_qm",
+    "wert": -0.51,
+    "beleg": "S. 4 Abschnitt 5.4"
+   },
+   {
+    "merkmal": "doppelkastenfenster",
+    "label": "Doppelkastenfenster",
+    "art": "eur_qm",
+    "wert": -0.18,
+    "beleg": "S. 4 Abschnitt 5.5"
+   },
+   {
+    "merkmal": "waermeschutzverglasung",
+    "label": "Wärmeschutzverglasung",
+    "art": "eur_qm",
+    "wert": 0.03,
+    "beleg": "S. 4 Abschnitt 5.5"
+   },
+   {
+    "merkmal": "waermeschutzverglasung_hoeherwertig",
+    "label": "höherwertige Wärmeschutzverglasung",
+    "art": "eur_qm",
+    "wert": 0.42,
+    "beleg": "S. 4 Abschnitt 5.5"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "label": "kein Balkon/keine Loggia/Terrasse",
+    "art": "eur_qm",
+    "wert": -0.04,
+    "beleg": "S. 4 Außenflächen"
+   },
+   {
+    "merkmal": "garten",
+    "label": "Garten zur alleinigen Nutzung",
+    "art": "eur_qm",
+    "wert": 0.44,
+    "beleg": "S. 4 Außenflächen"
+   },
+   {
+    "merkmal": "aufzug",
+    "label": "Aufzug (bis 5 Geschosse)",
+    "art": "eur_qm",
+    "wert": 0.23,
+    "beleg": "S. 4 Aufzug und Barrierefreiheit"
+   },
+   {
+    "merkmal": "barrierearm",
+    "label": "barrierearme Erstellung/Modernisierung",
+    "art": "eur_qm",
+    "wert": 0.43,
+    "beleg": "S. 4 Aufzug und Barrierefreiheit"
+   },
+   {
+    "merkmal": "fussbodenheizung",
+    "label": "Fußbodenheizung",
+    "art": "eur_qm",
+    "wert": 0.12,
+    "beleg": "S. 5 weitere Merkmale"
+   },
+   {
+    "merkmal": "elektrische_rolllaeden",
+    "label": "elektrische Rollläden",
+    "art": "eur_qm",
+    "wert": 0.34,
+    "beleg": "S. 5 weitere Merkmale"
+   },
+   {
+    "merkmal": "offene_kueche",
+    "label": "offene Küche",
+    "art": "eur_qm",
+    "wert": 0.08,
+    "beleg": "S. 5 weitere Merkmale"
+   },
+   {
+    "merkmal": "gefangene_raeume",
+    "label": "gefangene Räume/Durchgangszimmer",
+    "art": "eur_qm",
+    "wert": -0.09,
+    "beleg": "S. 5 weitere Merkmale"
+   },
+   {
+    "merkmal": "keine_gegensprechanlage",
+    "label": "keine Gegensprechanlage mit Türöffner",
+    "art": "eur_qm",
+    "wert": -0.13,
+    "beleg": "S. 5 weitere Merkmale"
+   },
+   {
+    "merkmal": "warmwasser_dezentral",
+    "label": "Warmwasser zusätzlich über Boiler/Durchlauferhitzer",
+    "art": "eur_qm",
+    "wert": -0.08,
+    "beleg": "S. 5 weitere Merkmale"
+   },
+   {
+    "merkmal": "mod_heizung_ab_2009",
+    "label": "Erneuerung Heizungsanlage ab 2009",
+    "art": "eur_qm",
+    "wert": 0.34,
+    "beleg": "S. 5 Abschnitt 5.6 (Gebäude vor 1980)",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "mod_bad_2009_2014",
+    "label": "Baderneuerung 2009–2014",
+    "art": "eur_qm",
+    "wert": 0.08,
+    "beleg": "S. 5 Abschnitt 5.6",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "mod_bad_ab_2015",
+    "label": "Baderneuerung ab 2015",
+    "art": "eur_qm",
+    "wert": 0.18,
+    "beleg": "S. 5 Abschnitt 5.6",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "mod_fenster_ab_2015",
+    "label": "Fenster erneuert ab 2015",
+    "art": "eur_qm",
+    "wert": 0.13,
+    "beleg": "S. 5 Abschnitt 5.6",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "mod_elektro_ab_2009",
+    "label": "Elektroinstallation erneuert ab 2009",
+    "art": "eur_qm",
+    "wert": 0.07,
+    "beleg": "S. 5 Abschnitt 5.6",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "mod_boden_ab_2009",
+    "label": "Fußbodenbelag erneuert ab 2009",
+    "art": "eur_qm",
+    "wert": 0.04,
+    "beleg": "S. 5 Abschnitt 5.6",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "mod_daemmung_1995_2014",
+    "label": "Dämmung 1995–2014",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "beleg": "S. 5 Abschnitt 5.6",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "mod_daemmung_ab_2015",
+    "label": "Dämmung ab 2015",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "beleg": "S. 5 Abschnitt 5.6",
+    "bedingung": {
+     "baujahr_bis": 1979
+    }
+   },
+   {
+    "merkmal": "lage:innenstadt-mitte",
+    "label": "Innenstadt-Mitte (1)",
+    "art": "eur_qm",
+    "wert": 0.91,
+    "beleg": "S. 6 Abschnitt 5.7 Gebietseinteilung",
+    "aliase": [
+     "1",
+     "gebiet 1"
+    ]
+   },
+   {
+    "merkmal": "lage:innenstadt-nord",
+    "label": "Innenstadt-Nord (2)",
+    "art": "eur_qm",
+    "wert": 0.09,
+    "beleg": "S. 6 Abschnitt 5.7 Gebietseinteilung",
+    "aliase": [
+     "2",
+     "gebiet 2"
+    ]
+   },
+   {
+    "merkmal": "lage:dortmund-west",
+    "label": "Dortmund-West (3)",
+    "art": "eur_qm",
+    "wert": 0,
+    "beleg": "S. 6 Abschnitt 5.7 Gebietseinteilung",
+    "aliase": [
+     "3",
+     "gebiet 3"
+    ]
+   },
+   {
+    "merkmal": "lage:dortmund-nord",
+    "label": "Dortmund-Nord (4)",
+    "art": "eur_qm",
+    "wert": 0.04,
+    "beleg": "S. 6 Abschnitt 5.7 Gebietseinteilung",
+    "aliase": [
+     "4",
+     "gebiet 4"
+    ]
+   },
+   {
+    "merkmal": "lage:dortmund-ost",
+    "label": "Dortmund-Ost (5)",
+    "art": "eur_qm",
+    "wert": 0.28,
+    "beleg": "S. 6 Abschnitt 5.7 Gebietseinteilung",
+    "aliase": [
+     "5",
+     "gebiet 5"
+    ]
+   },
+   {
+    "merkmal": "lage:dortmund-sued",
+    "label": "Dortmund-Süd (6)",
+    "art": "eur_qm",
+    "wert": 0.65,
+    "beleg": "S. 6 Abschnitt 5.7 Gebietseinteilung",
+    "aliase": [
+     "6",
+     "gebiet 6"
+    ]
+   },
+   {
+    "merkmal": "lage:hoerde",
+    "label": "Hörde (7)",
+    "art": "eur_qm",
+    "wert": 0.64,
+    "beleg": "S. 6 Abschnitt 5.7 Gebietseinteilung",
+    "aliase": [
+     "7",
+     "gebiet 7"
+    ]
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1950,
+    "wfl": 63,
+    "lage": "innenstadt-nord",
+    "merkmale": {
+     "waermeschutzverglasung": true,
+     "aufzug": true,
+     "dusche": true,
+     "pvc_hochwertig": true,
+     "gefangene_raeume": true,
+     "mod_bad_ab_2015": true
+    }
+   },
+   "erwartet": {
+    "unten": 6.04,
+    "mittel": 7.1,
+    "oben": 8.22
+   },
+   "seite": "6–8",
+   "art": "anwendungsbeispiel"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 72
+   },
+   "erwartet": {
+    "unten": 5.43,
+    "mittel": 6.3,
+    "oben": 7.18
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 150
+   },
+   "erwartet": null,
+   "seite": "3",
+   "art": "tabellenzelle"
+  }
+ ]
+}

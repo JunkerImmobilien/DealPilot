@@ -126,3 +126,164 @@ Kandidaten sind Sätze mit `art` `qualifiziert`/`einfach`, `zugang: "frei"` und 
 `regression` mit einer textlesbaren PDF. Für jede Tabelle gilt dieselbe Herkunftspflicht wie im
 Register (Quelle, Stand, Seite, Lizenz) und der Prüfmaßstab ist das **Anwendungsbeispiel** des
 Mietspiegels selbst.
+
+## Werte (Phase 2, seit v3255)
+
+Eine Datei je Gemeinde: **`werte/<ags>.json`** (8-stellige AGS wie im Verzeichnis). Dateien, deren
+Name mit `_` beginnt, sind Vorlagen und werden nicht geladen. Gerechnet wird ausschließlich mit
+`mietspiegelWerteFuer(werte, objekt)` aus `werte.js` (daneben) — kein Einstellungszugriff, alles als
+Parameter. Prüfer: `node tools/mietspiegel-werte-pruefen.mjs` (RC≠0 bei jedem Fehler).
+
+**Grundsätze:** nur aus dem amtlichen Dokument (Stadt, Gutachterausschuss, Mitersteller-Verband), nie
+von einem Portal. Jede Zahl mit Seite. Bild-PDF ohne lesbaren Text → **keine Datei**, im Bericht nennen,
+nicht raten. Wo die Tabelle endet (Baujahr, Wohnfläche, leeres Feld „*“/„—“), endet die Rechnung: die
+Funktion gibt `null` mit Hinweis, sie extrapoliert nie.
+
+### Kopf (Pflicht)
+
+```jsonc
+{
+  "ags": "05758016",                 // = Verzeichnis
+  "gemeinde": "Hiddenhausen",
+  "art": "einfach",                  // = art im Verzeichnis (qualifiziert | einfach)
+  "stand": "2025-11",                // Stand laut Dokument (JJJJ, JJJJ-MM, JJJJ-MM-TT)
+  "erhebungsstichtag": null,         // wo genannt (JJJJ-MM-TT), sonst null
+  "gueltig_ab": "2025-12-01",        // laut Dokument, sonst null
+  "gueltig_bis": null,               // laut Dokument, sonst null
+  "quelle": { "url": "<PDF-Link>", "dokument": "Mietspiegel Hiddenhausen 2025", "seite": "2",
+              "lizenz": "so wie im Dokument belegt, sonst \"unbekannt\"", "abgerufen": "2026-11-09" },
+  "einheit": "eur_qm_nettokalt",     // immer so: Nettokaltmiete €/m² Wohnfläche monatlich
+  "form": "tabelle",                 // tabelle | regression | punkte
+  "rundung": 2,                      // Nachkommastellen des Ergebnisses (Standard 2)
+  "hinweis": null,                   // Besonderheiten (Fortschreibung +7 %, Geltungsbereich, Ausschlüsse)
+  "pruefbeispiele": [ … ]            // mindestens eines, siehe unten
+}
+```
+
+### `form: "tabelle"` (Baualter × Wohnfläche, ggf. Lage/Ausstattung, Zu-/Abschläge)
+
+```jsonc
+"tabelle": {
+  "achsen": {
+    "baujahr": [ { "von": null, "bis": 1948, "label": "bis 1948" },
+                 { "von": 1949, "bis": 1977, "label": "1949–1977" } ],
+    "wfl":     [ { "von": null, "bis": 40, "label": "bis 40 m²" },
+                 { "von": 40, "von_inkl": false, "bis": 60, "label": "über 40 bis 60 m²" } ],
+    "lage":        [ { "schluessel": "einfach", "label": "einfache Lage" },
+                     { "schluessel": "mittel", "label": "mittlere Lage", "standard": true } ],   // optional
+    "ausstattung": [ { "schluessel": "standard", "label": "…", "standard": true } ]             // optional
+  },
+  "zellen": [ { "baujahr": 0, "wfl": 0, "unten": 5.10, "mittel": 5.80, "oben": 6.50, "seite": "2" }, … ],
+  "zuschlaege": [ { "merkmal": "lage:gut", "art": "eur_qm", "wert": 0.30, "beleg": "S. 3 Lagentabelle" },
+                  { "merkmal": "einbaukueche", "art": "pct", "wert": 5, "beleg": "S. 3 Nr. 4" } ]
+}
+```
+
+- **Klassen:** `von`/`bis` sind Zahlen oder `null` (offen). Beide Grenzen gelten **einschließlich**,
+  außer `von_inkl: false` bzw. `bis_inkl: false` („über 40“ = `von: 40, von_inkl: false`; „unter 60“ =
+  `bis: 60, bis_inkl: false`). Treffen zwei Klassen, gilt die **erste** der Liste. Ganzzahlige
+  Klassen der Tabelle („41–60 m²“) als stetige Grenzen eintragen (`von: 40, von_inkl: false`), sonst
+  fällt 40,5 m² durch.
+- **Zellen** verweisen auf die Achsen per **Index** (0-basiert) — bei `lage`/`ausstattung` geht auch der
+  `schluessel` als Text. Fehlt eine Achse in der Zelle, gilt die Zelle für alle ihre Klassen.
+  Ein leeres Tabellenfeld (Stern, Strich, „zu wenig Fälle“) wird **nicht** eingetragen → `null` mit
+  Hinweis. Steht nur ein Mittelwert ohne Spanne im Dokument: nur `mittel`.
+- **Lage/Ausstattung:** fehlt die Angabe am Objekt, gilt der Eintrag mit `standard: true` (Hinweis
+  „Lage nicht angegeben — mittlere Lage angenommen“); gibt es keinen Standard → `null` mit Hinweis.
+- **Zu-/Abschläge** (optional): `merkmal` greift, wenn `objekt.merkmale[merkmal]` wahr ist;
+  Sonderform `lage:<schluessel>` greift bei der Lage des Objekts (für Mietspiegel, die die Lage als
+  Zuschlag statt als Achse führen). `art: "pct"` wirkt auf den Zellwert, `eur_qm` wird addiert:
+  `wert = zelle × (1 + Σ pct / 100) + Σ eur_qm`, auf `unten`, `mittel`, `oben` gleich.
+  Abschläge negativ.
+
+### `form: "regression"` (Basismiete × Zu-/Abschläge)
+
+```jsonc
+"regression": {
+  "basis": { "typ": "wfl_tabelle", "werte": [ { "von": 25, "bis": 30, "eur_qm": 9.12 }, … ], "beleg": "S. 8 Tabelle 1" },
+                                   // oder "basis_eur_qm": 7.45 (eine Zahl für alle)
+  "verknuepfung": "summe",         // summe | produkt (nur Beschreibung): gerechnet wird immer Basis × Π faktor × (1 + Σ pct/100) + Σ eur_qm
+  "faktoren": [
+    { "merkmal": "baujahr", "typ": "baujahr_klasse", "art": "pct",
+      "werte": [ { "von": null, "bis": 1918, "wert": 0 }, { "von": 1919, "bis": 1948, "wert": -4 } ], "beleg": "S. 9" },
+    { "merkmal": "wfl", "typ": "wfl_kurve", "art": "eur_qm", "werte": [ { "von": 0, "bis": 50, "wert": 0.2 } ], "beleg": "…" },
+    { "merkmal": "lage", "typ": "lage", "art": "pct", "werte": { "einfach": -3, "mittel": 0, "gut": 4 },
+      "standard": "mittel", "beleg": "S. 10" },
+    { "merkmal": "einbaukueche", "typ": "flag", "art": "pct", "werte": 3, "beleg": "S. 10 Nr. 2" }
+  ],
+  "spanne": { "unten_pct": -15, "oben_pct": 16 },   // oder { "unten_abs": -0.80, "oben_abs": 0.80 }
+  "geltung": { "baujahr_von": null, "baujahr_bis": null, "wfl_von": 25, "wfl_bis": 160 },
+  "beleg": "S. 7 Rechenweg"
+}
+```
+
+- `typ`: `wfl_kurve` / `baujahr_klasse` = Klassen wie bei der Tabelle (`von`, `bis`, `von_inkl`,
+  `bis_inkl`, `wert`); `lage` = Schlüssel → Wert, mit `standard`; `flag` = ein Wert, greift bei
+  `objekt.merkmale[merkmal]`. `art`: `pct` (Prozent auf die Basis) oder `eur_qm` (Betrag). Ein Merkmal
+  ohne passende Klasse → `null` mit Hinweis (keine Extrapolation); `geltung` begrenzt zusätzlich.
+- `rundung_basis` (optional): Nachkommastellen, auf die das Dokument die Basis vor den Zuschlägen rundet.
+- Ist die Spanne eines Dokuments **nicht symmetrisch auf den Mittelwert** gerechnet, im `hinweis` sagen.
+
+### `form: "punkte"`
+
+Frei beschrieben unter `punkte: { …, beleg }`. Die Rechenfunktion kennt Punkte-Mietspiegel noch nicht
+und gibt `null` mit Hinweis — die Datei hält trotzdem die Herkunft fest.
+
+### Prüfbeispiele (Pflicht, mindestens eines)
+
+```jsonc
+"pruefbeispiele": [
+  { "eingabe": { "baujahr": 1965, "wfl": 72, "lage": "mittel", "merkmale": { "einbaukueche": true } },
+    "erwartet": { "unten": 5.60, "mittel": 6.30, "oben": 7.00 },
+    "seite": "2", "art": "anwendungsbeispiel" }      // anwendungsbeispiel | lesebeispiel | tabellenzelle
+]
+```
+
+Vorrang hat das **Anwendungs- oder Lesebeispiel des Dokuments**; gibt es keines, eine **eindeutig
+ablesbare Tabellenzelle** (`art: "tabellenzelle"`). Der Prüfer rechnet jedes Beispiel mit
+`mietspiegelWerteFuer` nach (± 0,01 €/m²). Ein Beispiel darf auch `null` erwarten
+(`"erwartet": null`), um eine Grenze festzuhalten.
+
+### Ergebnis der Rechenfunktion
+
+`mietspiegelWerteFuer(werte, { baujahr, wfl, lage?, ausstattung?, merkmale? })` →
+`{ unten, mittel, oben, zelle, rechnung, hinweise[] }` — `zelle` (Tabelle: „Baujahr 1949–1977 · über
+40 bis 60 m²“) bzw. `rechnung` (Regression: Rechenweg in Worten); ohne rechenbaren Wert
+`{ unten: null, mittel: null, oben: null, hinweise: [Grund] }`.
+
+Route: GET `/mietspiegel?ags=` liefert zusätzlich `werte_verfuegbar` (true/false);
+mit `&baujahr=&wfl=` (optional `&lage=&ausstattung=`) zusätzlich `werte: { … Ergebnis … }`.
+
+### Erweiterungen aus den Demo-Mietspiegeln (v3255, alle optional, abwärtskompatibel)
+
+Gefunden an Minden, Dortmund, Bielefeld, Detmold, Leipzig — wer eine Datei nach dem Grundformat oben
+schreibt, muss nichts davon kennen.
+
+| Feld | wo | Bedeutung | Beispiel |
+|---|---|---|---|
+| `wfl_runden` | `tabelle`, `regression` | Wohnfläche vor dem Nachschlagen auf n Stellen kaufmännisch runden („auf volle m² runden“) | Minden, Detmold, Leipzig: `0` |
+| `geltung` | `tabelle` (wie bei `regression`) | `{ baujahr_von, baujahr_bis, wfl_von, wfl_bis }` — außerhalb kein Wert | Dortmund 20–145 m² |
+| `spanne` | `tabelle` | Zellen führen nur `mittel`; unten/oben = Mittelwert **nach** Zuschlägen (auf `rundung` gerundet) × (1 + pct/100) bzw. + abs | Minden −15/+16 % |
+| `spanne.baujahr_klassen` | beide | Spanne je Baualter: `[{ von, bis, unten_abs, oben_abs }]` (oder `_pct`) | Leipzig |
+| `zuschlaege[].wfl_klassen` | `tabelle` | Zuschlag nach Wohnfläche: `[{ von, bis, von_inkl?, wert }]` statt `merkmal`-Schalter | Dortmund Wohnungsgröße |
+| `zuschlaege[].bedingung` | `tabelle`, `regression.faktoren[]` | `{ baujahr_von, baujahr_bis }` — greift nur in diesem Baualter | Energetische Vollmodernisierung bis 1990 |
+| `zuschlaege[].aliase`, `achsen.lage[].aliase` | `tabelle` | weitere Namen, unter denen die Lage am Objekt ankommt (Ortsteile, „mittel“ für „normal“) | Herford, Bielefeld |
+| `zuschlaege[].label`, `faktoren[].label` | beide | Wortlaut für den Rechenweg | — |
+| `faktoren[].art: "faktor"` | `regression` | multiplikativer Faktor (1,044 …) | Leipzig |
+| `faktoren[].typ: "auswahl"` | `regression` | wie `lage`, aber Wert aus `objekt.merkmale[merkmal]` (Schlüssel als Text); ohne Angabe neutral | Detmold Sanitär, Leipzig Bodenbelag |
+| `faktoren[].aliase` | `regression`, Typ `lage`/`auswahl` | `{ schluessel: [weitere Namen] }` | Leipzig |
+| `faktoren[].standard_label` | `regression`, Typ `lage` | Wortlaut des Hinweises „Lage nicht angegeben — … angenommen“ | Detmold „Wohnlage 2 (± 0,00 €)“ |
+| `faktoren[].rubrik`, `rundung_faktor` | `regression` | Produkt je Rubrik und Gesamtfaktor auf n Stellen runden | Leipzig: 3 |
+| `basis.ersatz` | `regression` | `[{ merkmal, eur_qm, label }]` — andere Basis, wenn das Merkmal gesetzt ist | Leipzig Ein-/Zweifamilienhaus 7,05 € |
+| `pruefbeispiele[].art` | alle | zusätzlich `rechenweg`: kein Zahlenbeispiel im Dokument, nach seinem Rechenweg aus den Tabellen gerechnet (mit `anmerkung`) | Leipzig |
+
+**Rechenreihenfolge (beide Formen):** Mittelwert = Basis bzw. Zellwert × Gesamtfaktor × (1 + Σ pct/100)
++ Σ €/m², auf `rundung` gerundet; danach die Spanne auf diesen Mittelwert. Hat die Tabelle eigene
+unten/oben-Werte und keine `spanne`, wird jeder der drei Werte für sich so gerechnet.
+
+`hinweis` der Datei ist eine **Arbeitsnotiz der Ernte** (Ablesung, Besonderheiten) und kommt als
+`hinweis_quelle` zurück, nicht unter den Kundenhinweisen.
+
+**Demo-Orte mit Werten (09.11.2026):** Minden, Herford, Löhne, Hiddenhausen, Bad Oeynhausen (Bild-PDF,
+am Bild abgelesen), Dortmund (Tabelle), Bielefeld (Regression, als Tabelle veröffentlicht), Detmold und
+Leipzig (Regression). Hüllhorst hat keinen Mietspiegel (Verzeichnis `unklar`).
