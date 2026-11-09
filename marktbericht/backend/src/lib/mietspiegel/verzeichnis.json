@@ -760,10 +760,10 @@
    "url": "https://stadt.muenchen.de/infos/mietspiegel.html",
    "zugang": "frei",
    "preis": "Broschüre kostenlos",
-   "form": "tabelle",
+   "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://stadt.muenchen.de/infos/mietspiegel.html (Mietspiegel 2025, vom Stadtrat am 26.03.2025 als qualifiziert anerkannt; Erstellung alle zwei Jahre)",
-   "hinweis": "Gültigkeitsbeginn auf Seite nicht genannt; nächste Ausgabe aus Zweijahresrhythmus abgeleitet; Online-Rechner mietspiegel-muenchen.de; Tabellen mit Zu-/Abschlägen"
+   "hinweis": "Gültigkeitsbeginn auf Seite nicht genannt; nächste Ausgabe aus Zweijahresrhythmus abgeleitet; Online-Rechner mietspiegel-muenchen.de; Tabellen mit Zu-/Abschlägen; Form: Regression (Basismiete × Faktoren), korrigiert 09.11.2026 bei der Werte-Ernte"
   },
   {
    "ags": "09564000",
