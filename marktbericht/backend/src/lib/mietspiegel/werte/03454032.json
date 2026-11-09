@@ -1,0 +1,721 @@
+{
+ "ags": "03454032",
+ "gemeinde": "Lingen (Ems)",
+ "art": "qualifiziert",
+ "stand": "2026-04-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-04-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.lingen.de/pdf_files/mietspiegel-2026_14309_1.pdf",
+  "dokument": "Qualifizierter Mietspiegel 2026 der Stadt Lingen (Ems) (Broschüre)",
+  "seite": "6–7, 10–11",
+  "lizenz": "keine Lizenzangabe; kein Rechtevorbehalt im Dokument",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Im Verzeichnis als Regression geführt; veröffentlicht als Tabelle Wohnfläche × Baualtersklasse mit Durchschnittsmieten (Tabelle 1, S. 6) und prozentualen Zu-/Abschlägen (Tabelle 2, S. 6), Rechenweg Anlage B (S. 10–11): Basismiete × (1 + Σ %). Keine Spanne im Dokument — nur Mittelwert. Baualtersklasse nach dem WERTRELEVANTEN Baujahr (Modernisierungspunkte Tabelle 3, Umrechnung Tabelle 4, S. 7, GND 70) — die Rechnung nimmt das übergebene Baujahr als wertrelevantes Baujahr. Wohnlage laut Straßenverzeichnis (Innenstadtbereich +4 %, Stadtgebiet ± 0 %, Ortsteile −5 %); ohne Angabe ohne Lagezu-/-abschlag. Gilt für Wohnungen in Mehrfamilienhäusern ab drei Wohneinheiten (S. 6). Kein Zahlenbeispiel im Dokument.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1979,
+     "label": "bis 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1989,
+     "label": "1980 bis 1989"
+    },
+    {
+     "von": 1990,
+     "bis": 1999,
+     "label": "1990 bis 1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "label": "2000 bis 2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2019,
+     "label": "2010 bis 2019"
+    },
+    {
+     "von": 2020,
+     "bis": null,
+     "label": "ab 2020"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 40,
+     "label": "bis 40 m²"
+    },
+    {
+     "von": 40,
+     "von_inkl": false,
+     "bis": 45,
+     "label": "41 bis 45 m²"
+    },
+    {
+     "von": 45,
+     "von_inkl": false,
+     "bis": 50,
+     "label": "46 bis 50 m²"
+    },
+    {
+     "von": 50,
+     "von_inkl": false,
+     "bis": 55,
+     "label": "51 bis 55 m²"
+    },
+    {
+     "von": 55,
+     "von_inkl": false,
+     "bis": 60,
+     "label": "56 bis 60 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 65,
+     "label": "61 bis 65 m²"
+    },
+    {
+     "von": 65,
+     "von_inkl": false,
+     "bis": 70,
+     "label": "66 bis 70 m²"
+    },
+    {
+     "von": 70,
+     "von_inkl": false,
+     "bis": 75,
+     "label": "71 bis 75 m²"
+    },
+    {
+     "von": 75,
+     "von_inkl": false,
+     "bis": 80,
+     "label": "76 bis 80 m²"
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": 85,
+     "label": "81 bis 85 m²"
+    },
+    {
+     "von": 85,
+     "von_inkl": false,
+     "bis": 90,
+     "label": "86 bis 90 m²"
+    },
+    {
+     "von": 90,
+     "von_inkl": false,
+     "bis": 95,
+     "label": "91 bis 95 m²"
+    },
+    {
+     "von": 95,
+     "von_inkl": false,
+     "bis": 100,
+     "label": "96 bis 100 m²"
+    },
+    {
+     "von": 100,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 100 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "mittel": 7.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "mittel": 8.2,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "mittel": 9.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "mittel": 9.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "mittel": 10.8,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "mittel": 11.7,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "mittel": 6.85,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "mittel": 7.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "mittel": 8.25,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "mittel": 9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "mittel": 9.75,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "mittel": 10.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "mittel": 6.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "mittel": 7.25,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "mittel": 7.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "mittel": 8.61,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "mittel": 9.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "mittel": 10.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "mittel": 6.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "mittel": 7.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "mittel": 7.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "mittel": 8.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "mittel": 9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "mittel": 9.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "mittel": 6.35,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "mittel": 6.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "mittel": 7.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "mittel": 8.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "mittel": 8.7,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "mittel": 9.35,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 5,
+    "mittel": 6.25,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 5,
+    "mittel": 6.8,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 5,
+    "mittel": 7.35,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 5,
+    "mittel": 7.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 5,
+    "mittel": 8.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 5,
+    "mittel": 9.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 6,
+    "mittel": 6.2,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 6,
+    "mittel": 6.7,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 6,
+    "mittel": 7.2,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 6,
+    "mittel": 7.75,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 6,
+    "mittel": 8.35,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 6,
+    "mittel": 8.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 7,
+    "mittel": 6.15,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 7,
+    "mittel": 6.6,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 7,
+    "mittel": 7.15,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 7,
+    "mittel": 7.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 7,
+    "mittel": 8.2,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 7,
+    "mittel": 8.75,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 8,
+    "mittel": 6.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 8,
+    "mittel": 6.6,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 8,
+    "mittel": 7.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 8,
+    "mittel": 7.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 8,
+    "mittel": 8.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 8,
+    "mittel": 8.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 9,
+    "mittel": 6.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 9,
+    "mittel": 6.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 9,
+    "mittel": 7,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 9,
+    "mittel": 7.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 9,
+    "mittel": 8,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 9,
+    "mittel": 8.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 10,
+    "mittel": 6.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 10,
+    "mittel": 6.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 10,
+    "mittel": 7,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 10,
+    "mittel": 7.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 10,
+    "mittel": 7.95,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 10,
+    "mittel": 8.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 11,
+    "mittel": 6.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 11,
+    "mittel": 6.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 11,
+    "mittel": 7,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 11,
+    "mittel": 7.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 11,
+    "mittel": 7.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 11,
+    "mittel": 8.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 12,
+    "mittel": 6.1,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 12,
+    "mittel": 6.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 12,
+    "mittel": 6.95,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 12,
+    "mittel": 7.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 12,
+    "mittel": 7.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 12,
+    "mittel": 8.35,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 13,
+    "mittel": 6.2,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 13,
+    "mittel": 6.6,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 13,
+    "mittel": 7,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 13,
+    "mittel": 7.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 13,
+    "mittel": 7.85,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 13,
+    "mittel": 8.3,
+    "seite": "6"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "lage:innenstadtbereich",
+    "label": "Wohnlage Innenstadtbereich",
+    "art": "pct",
+    "wert": 4,
+    "aliase": [
+     "innenstadt"
+    ],
+    "beleg": "S. 6 Tabelle 2"
+   },
+   {
+    "merkmal": "lage:stadtgebiet",
+    "label": "Wohnlage Stadtgebiet",
+    "art": "pct",
+    "wert": 0,
+    "beleg": "S. 6 Tabelle 2"
+   },
+   {
+    "merkmal": "lage:ortsteile",
+    "label": "Wohnlage Ortsteile",
+    "art": "pct",
+    "wert": -5,
+    "aliase": [
+     "ortsteil"
+    ],
+    "beleg": "S. 6 Tabelle 2"
+   },
+   {
+    "merkmal": "aufzug",
+    "label": "Fahrstuhl im Haus",
+    "art": "pct",
+    "wert": 5,
+    "beleg": "S. 6 Tabelle 2"
+   },
+   {
+    "merkmal": "penthouse",
+    "label": "Penthousewohnung",
+    "art": "pct",
+    "wert": 8,
+    "beleg": "S. 6 Tabelle 2"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 70,
+    "lage": "stadtgebiet"
+   },
+   "erwartet": {
+    "mittel": 6.2
+   },
+   "seite": "6",
+   "art": "tabellenzelle",
+   "anmerkung": "bis 1979, 66 bis 70 m² = 6,20 €; Stadtgebiet ± 0 %"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1985,
+    "wfl": 70,
+    "lage": "innenstadtbereich",
+    "merkmale": {
+     "aufzug": true
+    }
+   },
+   "erwartet": {
+    "mittel": 7.3
+   },
+   "seite": "6, 11",
+   "art": "rechenweg",
+   "anmerkung": "Anlage B Schritt 2–4: 6,70 € (1980 bis 1989, 66 bis 70 m²) × (1 + 4 % + 5 %) = 7,303 → 7,30 €"
+  }
+ ]
+}
