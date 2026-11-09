@@ -114,8 +114,15 @@ for (const f of liste) {
       if (!['pct', 'eur_qm', 'faktor'].includes(f.art)) F(d, 'faktoren[' + i + '].art unbekannt: ' + f.art);
       if (!f.beleg) F(d, 'faktoren[' + i + '].beleg fehlt');
       if (f.art === 'faktor') {
-        const ws = f.typ === 'flag' ? [f.werte] : Array.isArray(f.werte) ? f.werte.map(x => x.wert) : Object.values(f.werte || {});
-        ws.forEach(x => { if (!isNum(x) || x < 0.5 || x > 1.6) F(d, 'faktoren[' + i + '] Faktor ' + x + ' unplausibel'); });
+        /* v3261 · ein Faktor darf { wert, unten, oben } sein (Konfidenzgrenzen, Ibbenbüren) — unten ≤ wert ≤ oben */
+        const roh = f.typ === 'flag' ? [f.werte] : Array.isArray(f.werte) ? f.werte : Object.values(f.werte || {});
+        roh.forEach(v => {
+          const x = v && typeof v === 'object' ? v.wert : v;
+          if (!isNum(x) || x < 0.5 || x > 1.6) F(d, 'faktoren[' + i + '] Faktor ' + x + ' unplausibel');
+          if (v && typeof v === 'object' && (v.unten != null || v.oben != null)) {
+            if (!isNum(v.unten) || !isNum(v.oben) || v.unten > x || x > v.oben) F(d, 'faktoren[' + i + '] Grenzen ' + v.unten + ' ≤ ' + x + ' ≤ ' + v.oben + ' verletzt');
+          }
+        });
       }
     });
     if (!R.spanne) warn.push(d + ': regression ohne spanne');

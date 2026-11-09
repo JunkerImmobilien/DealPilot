@@ -1,0 +1,420 @@
+{
+ "ags": "05566028",
+ "gemeinde": "Ibbenbüren",
+ "art": "qualifiziert",
+ "stand": "2025-08-01",
+ "erhebungsstichtag": "2025-08-01",
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.ibbenbueren.de/media/custom/3030_9012_1.PDF",
+  "dokument": "Qualifizierter Mietspiegel Ibbenbüren 2025",
+  "seite": "11–13",
+  "lizenz": "keine Lizenzangabe; kein Rechtevorbehalt im Dokument",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Basismiete 6,49 €/m² × Umrechnungskoeffizienten (Baujahr, Modernisierungsgrad, Wohnfläche, räumliche Lage, Ausstattung; S. 12); die Spanne entsteht je Grenze aus dem Produkt der Konfidenzgrenzen der Koeffizienten (Beispiel S. 12: 7,35 € [6,59 – 8,01]). Modernisierungsgrad (Stufe 1–5, Punkte S. 7) und Ausstattungsklasse (Punkte S. 9) bestimmt der Nutzer; Kernsanierung älter als 20 Jahre: Jahr der Sanierung minus 10 als Baujahr (S. 11). Ohne Angabe: Modernisierung Stufe 1, Lage Ibbenbüren-Stadtlage (Normklassen, je 1,00 [1,00 – 1,00]); Ausstattung ohne Angabe NEUTRAL (1,00 ohne eigene Grenzen) — so rechnet die „Vereinfachte Mietwerttabelle“ des Dokuments (S. 13) das Normobjekt, obwohl Tabelle S. 12 für „Standard“ die Grenzen 0,99 – 1,06 nennt; wer „standard“ ausdrücklich wählt, bekommt diese Grenzen. Wohnfläche 20 bis unter 160 m².",
+ "regression": {
+  "basis_eur_qm": 6.49,
+  "verknuepfung": "produkt",
+  "faktoren": [
+   {
+    "merkmal": "baujahr",
+    "label": "Baujahr",
+    "typ": "baujahr_klasse",
+    "art": "faktor",
+    "werte": [
+     {
+      "von": null,
+      "bis": 1944,
+      "label": "bis vor 1945",
+      "wert": 1,
+      "unten": 0.99,
+      "oben": 1.01
+     },
+     {
+      "von": 1945,
+      "bis": 1989,
+      "label": "1945 bis vor 1990",
+      "wert": 1,
+      "unten": 0.99,
+      "oben": 1.01
+     },
+     {
+      "von": 1990,
+      "bis": 2001,
+      "label": "1990 bis vor 2002",
+      "wert": 1.05,
+      "unten": 1.02,
+      "oben": 1.07
+     },
+     {
+      "von": 2002,
+      "bis": 2008,
+      "label": "2002 bis vor 2009",
+      "wert": 1.1,
+      "unten": 1.08,
+      "oben": 1.12
+     },
+     {
+      "von": 2009,
+      "bis": 2013,
+      "label": "2009 bis vor 2014",
+      "wert": 1.19,
+      "unten": 1.13,
+      "oben": 1.26
+     },
+     {
+      "von": 2014,
+      "bis": 2020,
+      "label": "2014 bis vor 2021",
+      "wert": 1.35,
+      "unten": 1.27,
+      "oben": 1.43
+     },
+     {
+      "von": 2021,
+      "bis": null,
+      "label": "2021 und später",
+      "wert": 1.55,
+      "unten": 1.44,
+      "oben": 1.65
+     }
+    ],
+    "beleg": "S. 12 Baujahr"
+   },
+   {
+    "merkmal": "modernisierungsgrad",
+    "label": "Modernisierungsgrad",
+    "typ": "auswahl",
+    "art": "faktor",
+    "standard": "1",
+    "werte": {
+     "1": {
+      "wert": 1,
+      "unten": 1,
+      "oben": 1
+     },
+     "2": {
+      "wert": 1.04,
+      "unten": 1.01,
+      "oben": 1.05
+     },
+     "3": {
+      "wert": 1.08,
+      "unten": 1.06,
+      "oben": 1.1
+     },
+     "4": {
+      "wert": 1.15,
+      "unten": 1.11,
+      "oben": 1.2
+     },
+     "5": {
+      "wert": 1.28,
+      "unten": 1.21,
+      "oben": 1.33
+     }
+    },
+    "aliase": {
+     "1": [
+      "stufe 1"
+     ],
+     "2": [
+      "stufe 2"
+     ],
+     "3": [
+      "stufe 3"
+     ],
+     "4": [
+      "stufe 4"
+     ],
+     "5": [
+      "stufe 5"
+     ]
+    },
+    "beleg": "S. 12 Modernisierungsgrad (Punkte S. 7)"
+   },
+   {
+    "merkmal": "wfl",
+    "label": "Wohnfläche",
+    "typ": "wfl_kurve",
+    "art": "faktor",
+    "werte": [
+     {
+      "von": 20,
+      "bis": 40,
+      "bis_inkl": false,
+      "label": "20 bis unter 40 m²",
+      "wert": 1.25,
+      "unten": 1.2,
+      "oben": 1.32
+     },
+     {
+      "von": 40,
+      "bis": 50,
+      "bis_inkl": false,
+      "label": "40 bis unter 50 m²",
+      "wert": 1.15,
+      "unten": 1.13,
+      "oben": 1.19
+     },
+     {
+      "von": 50,
+      "bis": 60,
+      "bis_inkl": false,
+      "label": "50 bis unter 60 m²",
+      "wert": 1.1,
+      "unten": 1.07,
+      "oben": 1.12
+     },
+     {
+      "von": 60,
+      "bis": 80,
+      "bis_inkl": false,
+      "label": "60 bis unter 80 m²",
+      "wert": 1.05,
+      "unten": 1.03,
+      "oben": 1.06
+     },
+     {
+      "von": 80,
+      "bis": 120,
+      "bis_inkl": false,
+      "label": "80 bis unter 120 m²",
+      "wert": 1,
+      "unten": 0.98,
+      "oben": 1.02
+     },
+     {
+      "von": 120,
+      "bis": 160,
+      "bis_inkl": false,
+      "label": "120 bis unter 160 m²",
+      "wert": 0.94,
+      "unten": 0.91,
+      "oben": 0.97
+     }
+    ],
+    "beleg": "S. 12 Wohnfläche"
+   },
+   {
+    "merkmal": "lage",
+    "label": "räumliche Lage",
+    "typ": "lage",
+    "art": "faktor",
+    "werte": {
+     "stadtlage": {
+      "wert": 1,
+      "unten": 1,
+      "oben": 1
+     },
+     "innenstadt": {
+      "wert": 1.04,
+      "unten": 1.01,
+      "oben": 1.08
+     },
+     "alstedde": {
+      "wert": 0.96,
+      "unten": 0.92,
+      "oben": 1
+     },
+     "bockraden": {
+      "wert": 0.96,
+      "unten": 0.92,
+      "oben": 1
+     },
+     "dickenberg": {
+      "wert": 0.9,
+      "unten": 0.85,
+      "oben": 0.94
+     },
+     "doerenthe": {
+      "wert": 0.87,
+      "unten": 0.81,
+      "oben": 0.93
+     },
+     "laggenbeck": {
+      "wert": 0.98,
+      "unten": 0.96,
+      "oben": 1.01
+     },
+     "lehen": {
+      "wert": 0.96,
+      "unten": 0.92,
+      "oben": 1
+     },
+     "osterledde": {
+      "wert": 0.95,
+      "unten": 0.91,
+      "oben": 0.99
+     },
+     "puesselbueren": {
+      "wert": 0.9,
+      "unten": 0.85,
+      "oben": 0.92
+     },
+     "schafberg": {
+      "wert": 0.96,
+      "unten": 0.92,
+      "oben": 1
+     },
+     "schierloh": {
+      "wert": 0.96,
+      "unten": 0.92,
+      "oben": 1
+     },
+     "uffeln": {
+      "wert": 0.8,
+      "unten": 0.62,
+      "oben": 0.91
+     }
+    },
+    "aliase": {
+     "stadtlage": [
+      "ibbenbüren-stadtlage",
+      "ibbenbüren",
+      "stadt"
+     ],
+     "innenstadt": [
+      "ibbenbüren-innenstadt",
+      "ibbenbueren-innenstadt"
+     ],
+     "alstedde": [
+      "alstedde"
+     ],
+     "bockraden": [
+      "bockraden"
+     ],
+     "dickenberg": [
+      "dickenberg"
+     ],
+     "doerenthe": [
+      "dörenthe",
+      "dörenthe"
+     ],
+     "laggenbeck": [
+      "laggenbeck"
+     ],
+     "lehen": [
+      "lehen"
+     ],
+     "osterledde": [
+      "osterledde"
+     ],
+     "puesselbueren": [
+      "püsselbüren",
+      "püsselbüren"
+     ],
+     "schafberg": [
+      "schafberg"
+     ],
+     "schierloh": [
+      "schierloh"
+     ],
+     "uffeln": [
+      "uffeln"
+     ]
+    },
+    "standard": "stadtlage",
+    "standard_label": "Ibbenbüren-Stadtlage (Normklasse 1,00)",
+    "beleg": "S. 12 Räumliche Lage (Karte S. 8)"
+   },
+   {
+    "merkmal": "ausstattung",
+    "label": "Ausstattungsklasse",
+    "typ": "auswahl",
+    "art": "faktor",
+    "werte": {
+     "basis": {
+      "wert": 0.92,
+      "unten": 0.9,
+      "oben": 0.94
+     },
+     "einfach": {
+      "wert": 0.97,
+      "unten": 0.95,
+      "oben": 0.98
+     },
+     "standard": {
+      "wert": 1,
+      "unten": 0.99,
+      "oben": 1.06
+     },
+     "hochwertig": {
+      "wert": 1.13,
+      "unten": 1.07,
+      "oben": 1.16
+     }
+    },
+    "beleg": "S. 12 Ausstattung (Punkte S. 9)"
+   }
+  ],
+  "spanne": {
+   "typ": "faktor_grenzen"
+  },
+  "beleg": "S. 11–12 Schritte 1–7"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1995,
+    "wfl": 72,
+    "lage": "Laggenbeck",
+    "merkmale": {
+     "modernisierungsgrad": "3",
+     "ausstattung": "einfach"
+    }
+   },
+   "erwartet": {
+    "unten": 6.59,
+    "mittel": 7.35,
+    "oben": 8.01
+   },
+   "seite": "12",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "6,49 × 1,05 × 1,08 × 1,05 × 0,98 × 0,97 = 7,35; Spanne 6,59 – 8,01 (529,20 € [474,48 – 576,72 €] bei 72 m²)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1995,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 6.82,
+    "mittel": 7.16,
+    "oben": 7.36
+   },
+   "seite": "13",
+   "art": "tabellenzelle",
+   "anmerkung": "Vereinfachte Mietwerttabelle (Normobjekt): 1990 bis vor 2002, 60 bis unter 80 m² = 7,16 [6,82 – 7,36]"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1930,
+    "wfl": 130
+   },
+   "erwartet": {
+    "unten": 5.85,
+    "mittel": 6.1,
+    "oben": 6.36
+   },
+   "seite": "13",
+   "art": "tabellenzelle",
+   "anmerkung": "Vereinfachte Mietwerttabelle: bis vor 1945, 120 bis unter 160 m² = 6,10 [5,85 – 6,36]"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1995,
+    "wfl": 160
+   },
+   "erwartet": null,
+   "seite": "12",
+   "art": "tabellenzelle",
+   "anmerkung": "ab 160 m² keine Klasse"
+  }
+ ]
+}
