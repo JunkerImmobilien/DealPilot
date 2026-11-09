@@ -292,7 +292,9 @@ unten/oben-Werte und keine `spanne`, wird jeder der drei Werte für sich so gere
 am Bild abgelesen), Dortmund (Tabelle), Bielefeld (Regression, als Tabelle veröffentlicht), Detmold und
 Leipzig (Regression). Hüllhorst hat keinen Mietspiegel (Verzeichnis `unklar`).
 
-**Regressions-Ernte 09.11.2026 (zweite Runde):** Dresden, Bremen, Mönchengladbach, Rostock (Wohnlage als
-`eingabe`), Gießen und weitere (`ls werte/`). **Speicherverbot im Dokument = keine Datei:** „ohne Genehmigung … in elektronischen Systemen zu speichern“
+**Regressions-Ernte 09.11.2026 (zweite Runde, 20 Dateien):** Dresden, Bremen, Mönchengladbach, Rostock, Gießen,
+Wilhelmshaven, Marburg, Rüsselsheim, Bad Homburg, Elmshorn, Lingen, Oldenburg, Troisdorf, Lüneburg, Sankt Augustin,
+Aachen, Düren, Ibbenbüren, Regensburg (gesperrt), Wolfsburg. Wohnlage je Adresse als Betrag (`eingabe`): Rostock,
+Lüneburg, Sankt Augustin. **Speicherverbot im Dokument = keine Datei:** „ohne Genehmigung … in elektronischen Systemen zu speichern“
 (u. a. Stuttgart, Nürnberg, Mannheim, Augsburg, Braunschweig, Kiel, Freiburg, Halle, Chemnitz). Rechtevorbehalt
 ohne Speicherverbot → Datei mit `"freigabe": "gesperrt"`.
