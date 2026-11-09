@@ -1,0 +1,367 @@
+{
+ "ags": "03404000",
+ "gemeinde": "Osnabrück",
+ "art": "einfach",
+ "stand": "2025-08",
+ "erhebungsstichtag": null,
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.osnabrueck.de/fileadmin/global/OSaktuell/Mietspiegel_2025_2026_online_gedreht.pdf",
+  "dokument": "Mietspiegel 2025/2026 der Stadt Osnabrück (einfacher Mietspiegel), Stadt Osnabrück, Sachgebiet Statistik, Stadtforschung und Wahlen, Veröffentlichung August 2025",
+  "seite": "S. 7 (Tabelle Nettomonatsmiete je qm, Bandbreite ±15 %), S. 2–5 (Erläuterungen), S. 8 (Herausgeber, Veröffentlichung)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt (nur Bildnachweise); veröffentlicht nach § 558c Abs. 4 BGB, Herausgeber Stadt Osnabrück",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Tabelle führt je Feld nur die durchschnittliche ortsübliche Vergleichsmiete; laut S. 7 liegen zwei Drittel der Mieten innerhalb ±15 % um diesen Wert → spanne ±15 %. Gilt für Wohnungen mit Sammelheizung und Bad/Duschraum. Zu-/Abschlagsmerkmale nur verbal (S. 4–5), keine Beträge. Von den Verbänden am 21.08.2025 anerkannt; Gültigkeit 2025/2026 laut Titel, kein Datum.",
+ "tabelle": {
+  "spanne": {
+   "unten_pct": -15,
+   "oben_pct": 15
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1965,
+     "label": "bis 1965"
+    },
+    {
+     "von": 1966,
+     "bis": 1971,
+     "label": "1966–1971"
+    },
+    {
+     "von": 1972,
+     "bis": 1979,
+     "label": "1972–1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1989,
+     "label": "1980–1989"
+    },
+    {
+     "von": 1990,
+     "bis": 1999,
+     "label": "1990–1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "label": "2000–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2014,
+     "label": "2010–2014"
+    },
+    {
+     "von": 2015,
+     "bis": null,
+     "label": "ab 2015"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 40,
+     "label": "bis 40 qm"
+    },
+    {
+     "von": 40,
+     "bis": 60,
+     "von_inkl": false,
+     "label": "über 40 bis 60 qm"
+    },
+    {
+     "von": 60,
+     "bis": 80,
+     "von_inkl": false,
+     "label": "über 60 bis 80 qm"
+    },
+    {
+     "von": 80,
+     "bis": 100,
+     "von_inkl": false,
+     "label": "über 80 bis 100 qm"
+    },
+    {
+     "von": 100,
+     "bis": null,
+     "von_inkl": false,
+     "label": "über 100 qm"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "mittel": 8.74,
+    "seite": "7"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "mittel": 8.75,
+    "seite": "7"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "mittel": 9.14,
+    "seite": "7"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "mittel": 9.71,
+    "seite": "7"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "mittel": 10.34,
+    "seite": "7"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "mittel": 10.97,
+    "seite": "7"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "mittel": 11.38,
+    "seite": "7"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 0,
+    "mittel": 12.78,
+    "seite": "7"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "mittel": 7.37,
+    "seite": "7"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "mittel": 7.62,
+    "seite": "7"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "mittel": 7.89,
+    "seite": "7"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "mittel": 8.23,
+    "seite": "7"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "mittel": 8.62,
+    "seite": "7"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "mittel": 9,
+    "seite": "7"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "mittel": 10.53,
+    "seite": "7"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "mittel": 11.41,
+    "seite": "7"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "mittel": 6.9,
+    "seite": "7"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "mittel": 7.12,
+    "seite": "7"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "mittel": 7.31,
+    "seite": "7"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "mittel": 7.56,
+    "seite": "7"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "mittel": 7.83,
+    "seite": "7"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "mittel": 8.49,
+    "seite": "7"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "mittel": 10.14,
+    "seite": "7"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "mittel": 10.76,
+    "seite": "7"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "mittel": 6.67,
+    "seite": "7"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "mittel": 6.84,
+    "seite": "7"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "mittel": 6.99,
+    "seite": "7"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "mittel": 7.21,
+    "seite": "7"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "mittel": 7.39,
+    "seite": "7"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "mittel": 8.1,
+    "seite": "7"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "mittel": 9.79,
+    "seite": "7"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 3,
+    "mittel": 10.39,
+    "seite": "7"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "mittel": 6.52,
+    "seite": "7"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "mittel": 6.66,
+    "seite": "7"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "mittel": 6.78,
+    "seite": "7"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "mittel": 7.04,
+    "seite": "7"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "mittel": 7.34,
+    "seite": "7"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "mittel": 7.75,
+    "seite": "7"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 4,
+    "mittel": 9.47,
+    "seite": "7"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 4,
+    "mittel": 10.16,
+    "seite": "7"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 70
+   },
+   "erwartet": {
+    "mittel": 7.31
+   },
+   "seite": "7",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2016,
+    "wfl": 40
+   },
+   "erwartet": {
+    "mittel": 12.78
+   },
+   "seite": "7",
+   "art": "tabellenzelle"
+  }
+ ]
+}

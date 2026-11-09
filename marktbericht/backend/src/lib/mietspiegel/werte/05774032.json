@@ -1,0 +1,395 @@
+{
+ "ags": "05774032",
+ "gemeinde": "Paderborn",
+ "art": "qualifiziert",
+ "stand": "2025-04-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-04-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.paderborn.de/wohnen-soziales/bauen-wohnen/mietspiegel.php.media/297832/Mietspiegel_25_Web.pdf",
+  "dokument": "Qualifizierter Mietspiegel der Stadt Paderborn 2025, Stadt Paderborn (Amt für Vermessung und Geoinformation), Haus- & Grundeigentümerverein Paderborn, Mieterbund OWL",
+  "seite": "Broschüre S. 5 (Tabelle 1 Basis-Nettokaltmiete), S. 9–11 (Tabelle 2 Zu-/Abschläge), S. 12 (Tabelle 3 Rechenschema), S. 14 (Anwendungsbeispiel), S. 2 (gültig ab 01.04.2025)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Stadt Paderborn",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Aufbau wie ein Regressionsmietspiegel: Tabelle 1 Basismiete nur nach Wohnfläche (kaufmännisch gerundet) mit Mittelwert und 2/3-Spanne, Baujahr und alle Merkmale als €/m²-Zu-/Abschläge (Tabelle 2), die auf Mittel- UND Spannenwerte addiert werden (Tabelle 3). Baujahr-Zuschlag hier automatisch über wfl_klassen + bedingung abgebildet. Mietpreiszone 1–6 als Lage (objekt.lage „1“…„6“, Zone 3 = Basis); Sanitär-Punktsumme als merkmale sanitaer_1_punkt … sanitaer_4_punkte (nur EINES setzen). Energiekennwert: energie_unter_75 (+0,22) bzw. energie_ab_150 (−0,22). Baujahre nach 2022 nicht erfasst. Wohnfläche bis 140 m².",
+ "tabelle": {
+  "wfl_runden": 0,
+  "geltung": {
+   "wfl_bis": 140,
+   "baujahr_bis": 2022
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 2022,
+     "label": "alle Baujahre bis 2022 (Baujahr als Zuschlag)"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 35,
+     "label": "bis 35 m²"
+    },
+    {
+     "von": 36,
+     "bis": 50,
+     "label": "36–50 m²"
+    },
+    {
+     "von": 51,
+     "bis": 65,
+     "label": "51–65 m²"
+    },
+    {
+     "von": 66,
+     "bis": 80,
+     "label": "66–80 m²"
+    },
+    {
+     "von": 81,
+     "bis": 105,
+     "label": "81–105 m²"
+    },
+    {
+     "von": 106,
+     "bis": 140,
+     "label": "106–140 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 7.28,
+    "mittel": 8.74,
+    "oben": 10.43,
+    "seite": "5"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5.95,
+    "mittel": 7.39,
+    "oben": 8.65,
+    "seite": "5"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.55,
+    "mittel": 6.6,
+    "oben": 7.44,
+    "seite": "5"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.39,
+    "mittel": 6.27,
+    "oben": 7.14,
+    "seite": "5"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "unten": 5.31,
+    "mittel": 6.17,
+    "oben": 7.15,
+    "seite": "5"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 5,
+    "unten": 4.57,
+    "mittel": 6.02,
+    "oben": 6.77,
+    "seite": "5"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "lage:1",
+    "art": "eur_qm",
+    "wert": 0.53,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Mietpreiszone 1 – Innenstadt-Zentrum",
+    "aliase": [
+     "Zone 1",
+     "Mietpreiszone 1"
+    ]
+   },
+   {
+    "merkmal": "lage:2",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Mietpreiszone 2 – Kernstadt, innerer Ring",
+    "aliase": [
+     "Zone 2",
+     "Mietpreiszone 2"
+    ]
+   },
+   {
+    "merkmal": "lage:4",
+    "art": "eur_qm",
+    "wert": -0.35,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Mietpreiszone 4 – Elsen, Schloß Neuhaus etc.",
+    "aliase": [
+     "Zone 4",
+     "Mietpreiszone 4"
+    ]
+   },
+   {
+    "merkmal": "lage:5",
+    "art": "eur_qm",
+    "wert": -0.39,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Mietpreiszone 5 – Wewer, Sande, Sennelager, Marienloh etc.",
+    "aliase": [
+     "Zone 5",
+     "Mietpreiszone 5"
+    ]
+   },
+   {
+    "merkmal": "lage:6",
+    "art": "eur_qm",
+    "wert": -1.05,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Mietpreiszone 6 – Benhausen, Neuenbeken, Dahl",
+    "aliase": [
+     "Zone 6",
+     "Mietpreiszone 6"
+    ]
+   },
+   {
+    "merkmal": "sanitaer_1_punkt",
+    "art": "eur_qm",
+    "wert": 0.17,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Sanitärausstattung 1 Punkt"
+   },
+   {
+    "merkmal": "sanitaer_2_punkte",
+    "art": "eur_qm",
+    "wert": 0.35,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Sanitärausstattung 2 Punkte"
+   },
+   {
+    "merkmal": "sanitaer_3_punkte",
+    "art": "eur_qm",
+    "wert": 0.52,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Sanitärausstattung 3 Punkte"
+   },
+   {
+    "merkmal": "sanitaer_4_punkte",
+    "art": "eur_qm",
+    "wert": 0.7,
+    "beleg": "S. 9 Tabelle 2",
+    "label": "Sanitärausstattung 4 oder mehr Punkte"
+   },
+   {
+    "merkmal": "souterrain",
+    "art": "eur_qm",
+    "wert": -0.84,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "Wohnung im Keller/Souterrain/Untergeschoss"
+   },
+   {
+    "merkmal": "einzeloefen",
+    "art": "eur_qm",
+    "wert": -0.28,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "Einzelöfen (Gas oder Strom)"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "art": "eur_qm",
+    "wert": -0.17,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "kein Balkon/Terrasse/Loggia mit Platz für Tisch/Stühle"
+   },
+   {
+    "merkmal": "penthouse_maisonette",
+    "art": "eur_qm",
+    "wert": 0.65,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "Penthouse- oder Maisonette-Wohnung"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "art": "eur_qm",
+    "wert": 0.34,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "komplette Einbauküche"
+   },
+   {
+    "merkmal": "offene_kueche",
+    "art": "eur_qm",
+    "wert": 0.32,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "offene Küche"
+   },
+   {
+    "merkmal": "hochwertiger_bodenbelag",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "hochwertiger Fußbodenbelag in mindestens der Hälfte der Räume"
+   },
+   {
+    "merkmal": "fussbodenheizung",
+    "art": "eur_qm",
+    "wert": 0.37,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "Fußbodenheizung in mindestens der Hälfte der Räume"
+   },
+   {
+    "merkmal": "barrierearm",
+    "art": "eur_qm",
+    "wert": 0.4,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "barrierearme Wohnung"
+   },
+   {
+    "merkmal": "garten",
+    "art": "eur_qm",
+    "wert": 0.31,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "Garten zur alleinigen Nutzung"
+   },
+   {
+    "merkmal": "stellplatz",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "beleg": "S. 10 Tabelle 2",
+    "label": "Stellplatz in Tief-/Einzel-/Doppelgarage oder Carport"
+   },
+   {
+    "merkmal": "baujahr",
+    "art": "eur_qm",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": null,
+      "wert": 0.31
+     }
+    ],
+    "bedingung": {
+     "baujahr_von": 1995,
+     "baujahr_bis": 2001
+    },
+    "beleg": "S. 11 Tabelle 2 (Baujahr)",
+    "label": "Baujahr 1995 bis 2001"
+   },
+   {
+    "merkmal": "baujahr",
+    "art": "eur_qm",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": null,
+      "wert": 0.83
+     }
+    ],
+    "bedingung": {
+     "baujahr_von": 2002,
+     "baujahr_bis": 2015
+    },
+    "beleg": "S. 11 Tabelle 2 (Baujahr)",
+    "label": "Baujahr 2002 bis 2015"
+   },
+   {
+    "merkmal": "baujahr",
+    "art": "eur_qm",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": null,
+      "wert": 1.84
+     }
+    ],
+    "bedingung": {
+     "baujahr_von": 2016,
+     "baujahr_bis": 2022
+    },
+    "beleg": "S. 11 Tabelle 2 (Baujahr)",
+    "label": "Baujahr 2016 bis 2022"
+   },
+   {
+    "merkmal": "elektro_modernisiert_ab_2010",
+    "art": "eur_qm",
+    "wert": 0.17,
+    "beleg": "S. 11 Tabelle 2",
+    "label": "Elektroinstallation seit 1.1.2010 modernisiert"
+   },
+   {
+    "merkmal": "sanitaer_modernisiert_ab_2010",
+    "art": "eur_qm",
+    "wert": 0.17,
+    "beleg": "S. 11 Tabelle 2",
+    "label": "Sanitäreinrichtungen seit 1.1.2010 modernisiert"
+   },
+   {
+    "merkmal": "energie_unter_75",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "beleg": "S. 11 Tabelle 2",
+    "label": "Energiekennwert < 75 kWh/m²a"
+   },
+   {
+    "merkmal": "energie_ab_150",
+    "art": "eur_qm",
+    "wert": -0.22,
+    "beleg": "S. 11 Tabelle 2",
+    "label": "Energiekennwert ≥ 150 kWh/m²a"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 60,
+    "lage": "3",
+    "merkmale": {
+     "einbaukueche": true,
+     "hochwertiger_bodenbelag": true,
+     "energie_ab_150": true
+    }
+   },
+   "erwartet": {
+    "unten": 5.91,
+    "mittel": 6.96,
+    "oben": 7.8
+   },
+   "seite": "14",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Beispiel nennt kein Baujahr; Baujahr bis 1994 = ±0"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 30
+   },
+   "erwartet": {
+    "unten": 8.11,
+    "mittel": 9.57,
+    "oben": 11.26
+   },
+   "seite": "5",
+   "art": "rechenweg",
+   "anmerkung": "Tabelle 1 bis 35 m² (7,28/8,74/10,43) + Baujahr 2002–2015 +0,83 nach Tabelle 3"
+  }
+ ]
+}
