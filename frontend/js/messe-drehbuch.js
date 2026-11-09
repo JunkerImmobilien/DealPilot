@@ -8475,6 +8475,11 @@
         await warteAuf(function () { return !q('#oabi-ov .oabi-modal'); }, 8000);
         kegelHoch(false);
         await warte(1600);
+        /* v3271 · gemessen in der Aufnahme: die Übernahme öffnet „Einheiten und Zustand erfassen“ - es stand
+           bis zum Abspann im Bild. Für das Video schließen (die Einheiten sind übernommen, gelesen aus dem Feld). */
+        await warte(1200);
+        ['#mfh-we-ov', '#mfh-modal'].forEach(function (sel) { var x = q(sel); if (x && x.parentNode) x.parentNode.removeChild(x); });
+        await warte(500);
       },
       async function (s) {   /* 7 · Ergebnis */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
