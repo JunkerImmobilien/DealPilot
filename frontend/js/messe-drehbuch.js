@@ -2971,102 +2971,132 @@
   function r11Kurz(t, n) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
 
   /* ── MODUL 11 · PILOT-ANALYSE IM DETAIL ──────────────────────────── */
+  /* v3272 · Modul 11 neu (Marcel 09.11.2026): die Pilot-Analyse hat seit v3233-v3264 EINE Kopfzeile
+     (Phase, Stand, Einfach/Detail, Neu abrufen, PDF) und eine Reiterleiste (.dp-pa-rail) mit acht
+     Reitern. Beispiel ist jetzt die Kopie von Parkstr. 9 mit der Analyse aus Modul 29 (DPM_DREI.park,
+     einmal echt am 09.11.2026 an einer Kopie) - sie passt zum heutigen Stand („Zahlen nicht geändert“).
+     Die alte Westerfeld-Analyse vom 15.10. widersprach den Kacheln (DSCR 1,67 im Text, 1,18 daneben).
+     Nichts wird abgerufen: „Neu rechnen“, „Marktpreise abrufen“ und „Neu abrufen“ werden nur gezeigt. */
+  function r11Pa() { return [].filter.call(document.querySelectorAll('#ai-content'), function (e) { return e.offsetWidth; })[0] || null; }
+  function r11In(sel) { return function () { var a = r11Pa(); return a && a.querySelector(sel); }; }
+  function r11PanelSel(sel) { return function () { var p = r11Panel(); return p && p.querySelector(sel); }; }
+  function r11Modus(m) { var a = r11Pa(), b = a && a.querySelector('[data-dp-pa-modus-knopf="' + m + '"]'); if (b && b.getAttribute('aria-pressed') !== 'true') b.click(); }
+  var _r11Modus = null;
   DREHBUECHER['reihe-pilot'] = {
-    titel: 'Pilot-Analyse im Detail', unterzeile: 'Die KI-Einschätzung Abschnitt für Abschnitt', objekt: null,
-    abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: rhAufraeumen,
+    titel: 'Pilot-Analyse im Detail', unterzeile: 'Die KI-Einschätzung Reiter für Reiter', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () {
+      try { r11Modus('detail'); } catch (e) {}
+      try { if (_r11Modus === null) localStorage.removeItem('dp_pa_modus'); else localStorage.setItem('dp_pa_modus', _r11Modus); } catch (e) {}
+      rhAufraeumen();
+    },
     szenen: [
       async function (s) {   /* 1 · das Beispiel */
-        await rhLaden();
-        var pa = (window.DPM_REIHE_DATEN || {}).pilot; if (!pa) throw new Error('Mitschnitt pilot fehlt - die gespeicherte Analyse nennt Portale');
-        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true, analyse: pa });
+        try { _r11Modus = localStorage.getItem('dp_pa_modus'); } catch (e) { _r11Modus = null; }
+        await d3Laden();
+        if (!window.DPM_DREI || !DPM_DREI.park) throw new Error('Mitschnitt DPM_DREI.park fehlt');
+        await d3Kopie(R11_PARK, DPM_DREI.park);
         await r11Beispiel(s, ' Heute: die <b>Pilot-Analyse</b>.');
       },
-      async function (s) {   /* 2 · Aufruf und was sie liest */
+      async function (s) {   /* 2 · Kopfzeile */
         reiter('s5'); await warte(1200);
-        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 6000);
-        var n = [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return b.offsetWidth; }).length;
-        await zeige(function () { var t = q('#ai-content .dp-pa-tab'); return t && t.parentElement; }, 8);
-        await b2oZeile(s, 'Was der Pilot liest', 'Alle Reiter auf einmal: Objekt, Miete, Finanzierung, Steuer, Marktbewertung und Lage. Heraus kommen <b>' + n + ' Abschnitte</b>.');
+        await warteAuf(r11In('.dp-pa4-kopf'), 6000);
+        r11Modus('detail'); await warte(400);
+        await zeige(r11In('.dp-pa4-kopf'), 8);
+        var st = r6Text(r11In('.dp-pa-stand')()), d = /Stand ([\d.]+)/.exec(st), ph = r6Text(r11In('.dp-pa4-phase')());
+        await b2oZeile(s, 'Eine Kopfzeile', (ph ? 'Phase <b>' + ph + '</b>, ' : '') + 'Stand <b>' + (d ? d[1] : '–') + '</b>' + (/nicht geändert/.test(st) ? ' — die Zahlen haben sich seitdem nicht geändert' : '') + '. Rechts: Einfach oder Detail, Neu abrufen und PDF.');
+        await b2oZeile(s, 'Ändert sich etwas?', 'Ändern sich danach Miete, Kaufpreis oder Finanzierung, nennt die Kopfzeile die Felder — alte Sätze gelten dann nicht stillschweigend weiter.');
       },
-      async function (s) {   /* 3 · Stand */
-        await zeige(function () { return q('#ai-content .dp-pa-stand'); }, 8);
-        var st = r6Text(q('#ai-content .dp-pa-stand')), d = /Stand ([\d.]+)/.exec(st), ab = /seitdem (?:hat|haben) sich (.+?) geändert/.exec(st);
-        await b2oZeile(s, 'Der Stand', 'Die Analyse ist vom <b>' + (d ? d[1] : '–') + '</b>. ' + (ab ? 'Seitdem geändert: <b>' + ab[1] + '</b> — der Pilot sagt es dir, statt alte Sätze als aktuell zu verkaufen.' : 'Ändern sich die Zahlen, sagt der Pilot es dir hier.'));
+      async function (s) {   /* 3 · Reiterleiste */
+        await zeige(r11In('.dp-pa-rail'), 8);
+        var n = [].filter.call((r11In('.dp-pa-rail')() || document.createElement('i')).querySelectorAll('.dp-pa-tab'), function (b) { return b.offsetWidth; }).map(function (b) { return r6Text(b); });
+        await b2oZeile(s, 'Die Reiter', '<b>' + n.length + ' Reiter</b>: ' + n.join(' · ') + '.', 800);
       },
-      async function (s) {   /* 4 · Gesamturteil */
-        await r11PaTab(/^Briefing$/);
-        var urteil = r6Text(q('#ai-content .dp-pa-empf-row'));
-        await zeige(function () { return q('#ai-content .dp-pa-empf-row') && q('#ai-content .dp-pa-empf-row').closest('.dp-pa-card'); }, 8);
-        await b2oZeile(s, 'Das Gesamturteil', 'Ganz oben die Empfehlung: <b>' + (urteil || '–') + '</b>. Darunter Gesamtbewertung und Begründung — in ganzen Sätzen, mit deinen Zahlen.');
-        await zeige(r11Karte(/^SCORE-VERGLEICH$/), 8);
-        await b2oZeile(s, 'Score-Vergleich und Investor-Fit', 'Warum DealScore und Investor-DealScore auseinanderliegen — und ob das Objekt zu deinen Zielen passt.');
+      async function (s) {   /* 4 · Übersicht: Urteil und Zahlen */
+        await r11PaTab(/^Übersicht/);
+        await zeige(r11PanelSel('.dp-pa4-urteil'), 8);
+        var e = r6Text(r11PanelSel('.dp-pa4-urteil .dp-pa-empf')()), z = r6Text(r11PanelSel('.dp-pa4-urteil .z')());
+        await b2oZeile(s, 'Das Urteil', 'Ganz oben: <b>' + (e ? e.charAt(0) + e.slice(1).toLowerCase() : '–') + '</b> bei Investor Deal Score <b>' + (z || '–') + '</b>. Daneben die Begründung — in ganzen Sätzen, mit deinen Zahlen.');
+        await zeige(r11PanelSel('.dp-pa4-zahlen'), 8);
+        var zz = [].map.call((r11PanelSel('.dp-pa4-zahlen')() || document.createElement('i')).querySelectorAll('.dp-pa4-z'), function (k) { return { n: r6Text(k.querySelector('span')), w: r6Text(k.querySelector('b')) }; });
+        var f = function (re) { var x = zz.filter(function (k) { return re.test(k.n); })[0]; return x ? x.w : null; };
+        var cf = f(/^Cashflow/i), ds = f(/^DSCR/i), kp = f(/^Kaufpreis/i);
+        await b2oZeile(s, 'Die Zahlen dazu', [kp ? 'Kaufpreis <b>' + kp + '</b>' : '', cf ? 'Cashflow vor Steuer <b>' + cf + '</b>' : '', ds ? 'DSCR <b>' + ds + '</b>' : ''].filter(Boolean).join(', ') + ' — gerechnet von DealPilot, nicht vom Pilot.');
       },
-      async function (s) {   /* 5 · Stärken und Risiken */
-        await r11PaTab(/^Stärken/);
-        var k = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-cols'); };
-        await zeige(k, 8);
-        var c = k(), ns = c ? c.children[0].querySelectorAll('li').length : 0, nr = c && c.children[1] ? c.children[1].querySelectorAll('li').length : 0;
-        await b2oZeile(s, 'Stärken und Risiken', '<b>' + ns + ' Stärken</b>, <b>' + nr + ' Risiken</b> — jeweils kurz begründet, nebeneinander zum Abwägen.');
-        var f = r11Karte(/^OPTISCHER EINDRUCK/);
-        if (f()) { await zeige(f, 8); await b2oZeile(s, 'Der Blick auf die Fotos', 'Liegen Fotos am Objekt, schaut der Pilot hin: Zustand, Pflege, was ins Auge fällt.'); }
+      async function (s) {   /* 5 · Ankauf · Soll · Zielbild */
+        await r11PaTab(/^Ankauf/);
+        var t = r11PanelSel('table');
+        await warteAuf(t, 4000);
+        await zeige(function () { var x = t(); return x && (x.closest('.dp-pot-scroll') || x); }, 8);
+        var zeileT = function (re) { var x = t(); var r = x && [].filter.call(x.rows, function (y) { return y.cells[0] && re.test(r6Text(y.cells[0])); })[0]; return r ? [].map.call(r.cells, function (c) { return r6Inner(c).split('\n')[0].trim(); }) : null; };
+        var km = zeileT(/^Kaltmiete/), cf = zeileT(/^Cashflow/);
+        await b2oZeile(s, 'Ankauf · Soll · Zielbild', 'Drei Spalten: <b>Bestand</b>, <b>Mieterhöhung</b>, <b>Zielbild</b>.' + (km && km.length > 3 ? ' Kaltmiete im Jahr ' + km[1] + ' → ' + km[3] : '') + (cf && cf.length > 3 ? ', Cashflow im Monat ' + cf[1] + ' → ' + cf[3] : '') + '.', 600);
+        await b2oZeile(s, 'Wer rechnet hier?', 'Die Tabelle rechnet DealPilot. „Neu rechnen“ und „Marktpreise abrufen“ holen frische Werte — das zeigen wir in Modul 26.');
       },
-      async function (s) {   /* 6 · Risiko und Szenarien */
-        await r11PaTab(/^Risiko/);
-        await zeige(r11Karte(/^ANSCHLUSSFINANZIERUNG$/), 8);
-        await b2oZeile(s, 'Anschlussfinanzierung', 'Was passiert nach der Zinsbindung, wenn der Zins steigt? Der Pilot rechnet es durch.');
-        var w = function () { var p = r11Panel(); var c = p && [].filter.call(p.querySelectorAll('.dp-pa-cols'), function (x) { return /WORST CASE/.test(x.textContent); })[0]; return c || null; };
-        await zeige(w, 8);
-        /* v2266 · die Unterzeile der Karte (.dp-pa-kv-sub) per textContent - innerText
-           lieferte sie in Versalien („MIETE -10%") */
-        var sub = function (re) { var c = w(); var k = c && [].filter.call(c.querySelectorAll('.dp-pa-card'), function (x) { return re.test(r6Text(x.querySelector('.dp-pa-sec') || x)); })[0]; var u = k && k.querySelector('.dp-pa-kv-sub'); return u ? u.textContent.trim().replace(/(\d)%/g, '$1 %') : null; };
-        var wc = sub(/WORST CASE/i) || r11Text(/WORST CASE\s*\n\s*([^\n]+)/), bc = sub(/BEST CASE/i) || r11Text(/BEST CASE\s*\n\s*([^\n]+)/);
-        await b2oZeile(s, 'Worst Case und Best Case', 'Zwei Szenarien' + (wc ? ': schlecht <b>' + wc + '</b>' : '') + (bc ? ', gut <b>' + bc + '</b>' : '') + ' — mit dem, was dann vom Cashflow bleibt.');
-      },
-      async function (s) {   /* 7 · Lage und Markt (ohne die Portal-Quellen) */
+      async function (s) {   /* 6 · Lage & Markt */
         await r11PaTab(/^Lage/);
         var k1 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-card'); };
         await zeige(k1, 8);
-        await r11Unten(k1);
         if (!r11VerbotenImBild()) await b2oZeile(s, 'Lage und Markt', 'Makro- und Mikrolage recherchiert: Einwohner, Arbeitsmarkt, Nachfrage, Umfeld der Straße.');
-        /* v2266 · der Abgleich steht nur, wenn ein Marktbericht vorlag (an der Kopie
-           der Westerfeldstr. nicht) - dann die Gegenüberstellung je Merkmal */
-        var k2 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-abgl'); };
-        var k3 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-ggs'); };
-        if (k2()) {
-          await zeige(k2, 8);
-          await r11Unten(k2);
-          if (!r11VerbotenImBild()) await b2oZeile(s, 'Abgleich mit dem Marktbericht', 'Wo die Recherche dem Marktbericht zustimmt — und wo sie abweicht. Abweichungen nennt der Pilot ausdrücklich.');
-        } else if (k3()) {
+        var k3 = r11PanelSel('.dp-pa-ggs');
+        if (k3()) {
           await zeige(k3, 8);
-          await r11Unten(k3);
-          if (!r11VerbotenImBild()) await b2oZeile(s, 'Gegenüberstellung', 'Je Merkmal deine Angabe neben der Recherche — mit Quelle und Urteil. Wo es nicht passt, sagt der Pilot es.');
+          if (!r11VerbotenImBild()) await b2oZeile(s, 'Gegenüberstellung', 'Je Merkmal deine Angabe neben Marktbericht und Recherche — mit Urteil. Wo es nicht passt, sagt der Pilot es.');
         }
       },
-      async function (s) {   /* 8 · Verhandlung */
-        await r11PaTab(/^Verhandlung/);
+      async function (s) {   /* 7 · Risiken & Szenarien */
+        await r11PaTab(/^Risiken/);
+        await zeige(r11PanelSel('.dp-pa-cols'), 8);
+        await b2oZeile(s, 'Stärken und Risiken', 'Links die Stärken, rechts die Risiken — jeweils kurz begründet, nebeneinander zum Abwägen.');
+        var sz = r11Karte(/^Szenarien/i);
+        if (sz()) {
+          await zeige(sz, 8);
+          var tx = r6Inner(sz()), wc = /Worst Case\s*\n\s*([^\n]+)/.exec(tx), bc = /Best Case\s*\n\s*([^\n]+)/.exec(tx);
+          await b2oZeile(s, 'Worst, Plan, Best', 'Drei Szenarien' + (wc ? ': schlecht <b>' + wc[1].trim() + '</b>' : '') + (bc ? ', gut <b>' + bc[1].trim() + '</b>' : '') + ' — mit dem, was dann vom Cashflow bleibt.');
+        }
+        var af = function () { var p = r11Panel(); return p && [].filter.call(p.children, function (c) { return /ANSCHLUSSFINANZIERUNG/i.test(r6Text(c.querySelector('.dp-pa-sec') || c)); })[0]; };
+        if (af()) { await zeige(af, 8); await b2oZeile(s, 'Anschlussfinanzierung', 'Was passiert nach der Zinsbindung, wenn der Zins steigt? Der Pilot rechnet es durch.'); }
+      },
+      async function (s) {   /* 8 · Kaufpreis & Offerte */
+        await r11PaTab(/^Kaufpreis/);
         await zeige(r11Karte(/^VERHANDLUNGSEMPFEHLUNG$/), 8);
         await b2oZeile(s, 'Verhandlungsempfehlung', 'Wo du ansetzen kannst — mit den Argumenten aus deinen Zahlen und dem Marktbericht.');
-        var o = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-offerte'); };
+        var o = r11PanelSel('.dp-pa-offerte');
         await zeige(o, 8);
-        var off = r11Text(/KAUFPREIS-OFFERTE\s*\n\s*([\d.]+ €)/), kp = zahl('kp'), on = off ? Number(off.replace(/\D/g, '')) : null;
+        var off = (/([\d.]+ €)/.exec(r6Inner(o()) || '') || [])[1] || null, kp = zahl('kp'), on = off ? Number(off.replace(/\D/g, '')) : null;
         var ab = (on && kp) ? Math.round((1 - on / kp) * 1000) / 10 : null;
-        await b2oZeile(s, 'Die Kaufpreis-Offerte', 'Empfohlen: <b>' + (off || '–') + '</b> statt ' + eur(kp) + (ab != null && ab > 0 ? ' — ' + String(ab).replace('.', ',') + ' % darunter' : '') + '. Mit Begründung, die du dem Verkäufer nennen kannst.');
-        var m = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-offmail'); };
-        await zeige(m, 8);
-        await b2oZeile(s, 'Offerte als E-Mail', 'Fertig formuliert — als E-Mail öffnen oder kopieren. Abgeschickt wird nur, was du selbst abschickst.');
+        await b2oZeile(s, 'Die Kaufpreis-Offerte', 'Empfohlen: <b>' + (off || '–') + '</b>' + (ab != null && ab > 0 ? ' statt ' + eur(kp) + ' — ' + String(ab).replace('.', ',') + ' % darunter' : (on && kp && on === kp ? ' — genau der Kaufpreis' : '')) + '. Mit Begründung, die du dem Verkäufer nennen kannst.');
+        var m = r11PanelSel('.dp-pa-offmail');
+        if (m()) { await zeige(m, 8); await b2oZeile(s, 'Offerte als E-Mail', 'Fertig formuliert — als E-Mail öffnen oder kopieren. Abgeschickt wird nur, was du selbst abschickst.'); }
       },
-      async function (s) {   /* 9 · Bank und Steuer */
-        await r11PaTab(/^Bank$/);
+      async function (s) {   /* 9 · Finanzierung & Bank */
+        await r11PaTab(/^Finanzierung/);
         await zeige(r11Karte(/^BANKARGUMENTE$/), 8);
         await b2oZeile(s, 'Bankargumente', 'Was du im Bankgespräch sagst: Kapitaldienst, Beleihung, Sicherheiten — kurz und belastbar.');
-        await r11PaTab(/^Steuer$/);
-        await zeige(function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-card'); }, 8);
-        await b2oZeile(s, 'Steuerliche Zusammenfassung', 'Was die Abschreibung und die Werbungskosten im Jahr bringen. Keine Steuerberatung — der Pilot sagt das auch dazu.');
       },
-      async function (s) {   /* 10 · was sie NICHT tut */
-        await r11PaTab(/^Briefing$/);
+      async function (s) {   /* 10 · Steuer */
+        await r11PaTab(/^Steuer$/);
+        var sv = r11Karte(/^STEUERVERLAUF/i);
+        await zeige(sv, 8);
+        var tx = r6Inner(sv()).replace(/\s+/g, ' '), ab = /DAUERHAFT POSITIV AB (\d{4})/i.exec(tx);
+        await b2oZeile(s, 'Steuer', (ab ? 'Steuerlich dauerhaft positiv ab <b>' + ab[1] + '</b>. ' : '') + 'Darunter Zusammenfassung, Belege und die Werbungskosten je Jahr. Keine Steuerberatung — der Pilot sagt das auch dazu.');
+      },
+      async function (s) {   /* 11 · Unterlagen & WEG */
+        await r11PaTab(/^Unterlagen/);
+        await zeige(function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-card, .dp-pa-d') || p; }, 8);
+        await b2oZeile(s, 'Unterlagen & WEG', 'Liegen Wirtschaftsplan, Protokolle oder Mietverträge vor, wertet der Pilot sie hier aus. Wie das Einlesen geht, zeigt Modul 28.');
+      },
+      async function (s) {   /* 12 · Einfach */
+        await r11PaTab(/^Übersicht/);
+        r11Modus('einfach'); await warte(900);
         var m = q('.main-col'); if (m) m.scrollTop = 0;
-        await zeige(function () { return q('#ai-content .dp-pa-stand'); }, 8);
+        await zeige(function () { var p = r11Panel(); return p; }, 8);
+        await b2oZeile(s, 'Einfach statt Detail', 'Ein Klick oben rechts: die <b>Kurzfassung</b> — Urteil, Kernzahlen und kurze Sätze. Detail bringt alles zurück.');
+        r11Modus('detail'); await warte(600);
+      },
+      async function (s) {   /* 13 · was sie NICHT tut */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(r11In('.dp-pa4-kopf'), 8);
         await b2oZeile(s, 'Was der Pilot nicht tut', 'Kennzahlen und Scores kommen aus DealPilot, der Pilot ordnet sie ein. Er ersetzt kein Gutachten und keine Steuerberatung — und er kauft nichts für dich.', 600);
       }
     ]
@@ -8569,8 +8599,10 @@
     var echt = window.fetch; window.__dpmNach = echt; window.DPM_NACHSPERRE = [];
     window.fetch = function (url, opt) {
       var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
-      if (!lauf && m !== 'GET' && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/|portfolio-spiegel)/.test(u)
-          && !(/\/objects\//.test(u) && (window.DPM_REIHE && DPM_REIHE.angelegt || []).some(function (id) { return u.indexOf(id) >= 0; }))) {
+      /* v3272 · auch IM Lauf: kein Schreibweg an Objekt/Steuer/Spiegel außer an die Kopien des Laufs
+         (KI-Abrufe regelt im Lauf rhSpion mit Mitschnitt bzw. RH_SPERRE) */
+      if (m !== 'GET' && (!lauf || !/\/api\/v1\/ai\//.test(u)) && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/|portfolio-spiegel)/.test(u)
+          && !((window.DPM_REIHE && DPM_REIHE.angelegt || []).some(function (id) { return u.indexOf(id) >= 0; }))) {
         window.DPM_NACHSPERRE.push(m + ' ' + u.replace(location.origin, ''));
         return Promise.resolve(new Response(JSON.stringify({ ok: true, vorfuehrung: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
       }
