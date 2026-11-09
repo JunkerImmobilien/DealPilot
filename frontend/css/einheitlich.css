@@ -1,0 +1,330 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   einheitlich.css · v3239 — Felder, Karten und Schrift wie im Reiter Objekt
+
+   Marcel am 09.11.2026 (Spracheingabe): „Mir ist aufgefallen, dass die
+   Schriftarten und Farben und Formen der App nicht überall gleich sind.
+   Bitte überall einheitlich so wie im Tab Objekt. Dann sind die
+   Eingabefelder teilweise unterschiedlich in den Tabs. Das ist mir
+   aufgefallen, als ich auf dem Handy die App ausführen wollte."
+
+   ── REFERENZ: Reiter Objekt (#s0), gemessen mit getComputedStyle ────────
+   (lokal, Standard-Layout html[data-dp-layout="v1b"], data-bg="white",
+   Breite 1280 px und 390 px; Quelle der Regel in Klammern)
+
+   | Teil                 | Desktop (> 768 px)                     | Handy (≤ 640 px)            |
+   |----------------------|----------------------------------------|-----------------------------|
+   | Feld Schrift         | Inter 13 px / 400 (style.css:44,       | Inter 16 px / 400           |
+   |                      |  layout-varianten.css:680)             |  (style.css @640/@768)      |
+   | Feld Farbe           | #2A2727 (--text)                       | gleich                      |
+   | Feld Höhe            | 38 px                                  | 44 px (height 36 +          |
+   |                      |                                        |  min-height 44, style.css)  |
+   | Feld Rahmen          | 1 px solid #E6E1D6 (--dpl-linie)       | gleich                      |
+   | Feld Radius          | 2 px (layout-varianten.css:798)        | gleich                      |
+   | Feld Grund           | #FFFFFF (--dpl-flaeche)                | gleich                      |
+   | Feld Innenabstand    | 0 11 px (mit € 26 px, mit Einheit      | 0 10 px                     |
+   |                      |  rechts 38/46 px — .iw .pfx/.sfx)      |                             |
+   | Fokus-Ring           | Rand --dpl-gold, 0 0 0 2px Gold 16 %   | gleich                      |
+   | Placeholder          | rgba(42,39,39,.40), nicht kursiv       | gleich                      |
+   | Pflichtfeld fehlt    | Rand #B8625C (inline !important, JS)   | gleich — bleibt unberührt   |
+   | Textfeld (textarea)  | Inter 13 px, Radius 2 px, 1 px Rand    | 16 px                       |
+   | Beschriftung .f>label| Inter 11 px / 500, rgba(42,39,39,.85), | 10,5 px                     |
+   |                      |  keine Versalien                       |                             |
+   | Einheit .pfx / .sfx  | 12 px / 11 px, 500, #625C59            | gleich                      |
+   | Hinweis .hint        | Inter 10,5 px kursiv, rgba(42,39,39,.68)| gleich                     |
+   | Karte .card          | #FFFFFF, 1 px Gold 22 %, Radius 2 px,  | Innenabstand 14 px          |
+   |                      |  kein Schatten, Innenabstand 20 px     |                             |
+   | Kartenkopf .ct-pro   | JetBrains Mono 10 px / 700, Versalien, | gleich                      |
+   |                      |  Sperrung 1,2 px, #6B645A              |                             |
+   | Knopf .btn           | Inter 13 px / 500, Radius 8 px, 38 px  | gleich                      |
+
+   ── GELTUNGSBEREICH ────────────────────────────────────────────────────
+   * Nur `html[data-dp-layout]` — der Auslieferungszustand ohne Layout
+     („Heute", Obsidian) hat ein eigenes, gewachsenes Bild und bleibt, wie
+     layout-varianten.css es auch hält. Ausnahme: die 16-px-Untergrenze
+     gegen den iOS-Zoom (Abschnitt 1) gilt in JEDEM Zustand.
+   * Reiter Objekt (#s0) selbst wird NICHT angefasst — er ist der Maßstab,
+     und an seinen Lage-/Verkehrswert-Karten arbeitet ein paralleles Paket.
+   * Cockpit (#dashboard-main), Quick-Check- und Marktbericht-iframes sind
+     eigene Pakete bzw. eigene Dokumente und bleiben draußen.
+   * Der Inhaltsbereich ist in jedem Skin hell (der dunkle Skin färbt nur
+     Kopf, Reiterleiste und Seitenleiste). Gefärbt wird über die Tokens
+     --dpl-*, die layout-varianten.css am <html> setzt — so folgt jede
+     Variante, die sie umbiegt.
+   * Inline-Stile MIT !important (z. B. der rote Pflichtrand aus JS) schlägt
+     keine Regel hier; sie bleiben bewusst stehen.
+
+   ── SPEZIFITÄT ─────────────────────────────────────────────────────────
+   Reiter-Präfix  html[data-dp-layout] body .body :is(#s1,…,#s8)  = (1,2,2)
+   + Feld-:is()   (0,1,1)  → (1,3,3) und mehr durch die :not()-Ausnahmen.
+   Das schlägt layout-varianten.css (1,3,2), `#s8 .dab-fa-year` (1,1,0),
+   `#d1_type` (1,0,0, select-fix.css) und `.body select#d1_type` (1,1,1).
+   Wo ein Gegner ZWEI IDs führt (#bmfOverlay #p-ak .iw = 2,1,0), hebt
+   `:not(#dp-nie)` bewusst auf zwei IDs — es gibt kein Element #dp-nie.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══ 1 · iOS-Zoom: kein Eingabefeld unter 16 px auf dem Handy ══════════
+   Safari auf dem iPhone zoomt beim Antippen in jedes Feld mit Schrift unter
+   16 px und bleibt gezoomt. style.css setzt 16 px nur mit (0,1,1); jede
+   Modulregel mit Klasse oder ID und !important schlug das. Gemessen bzw. im
+   Code gefunden: BMF-Rechner 13 px (#bmfOverlay, bmf-einheitlich.css:77),
+   RND-Assistent 14 px (rnd-styles.css:1317), Kalender-Monatsfeld
+   #zb_soll_ab 13,3 px, Cockpit-Objektwahl 12,5 px.
+   Zwei :not(#…) heben auf (2,1,4) — damit liegt die Untergrenze über jeder
+   Ein-ID-Regel. Gilt ohne data-dp-layout, weil der Zoom kein Stilmittel ist. */
+@media (max-width: 768px) {
+  html:not(#dp-nie):not(#dp-nie-2) body
+    :is(input[type=text], input[type=number], input[type=date], input[type=month],
+        input[type=datetime-local], input[type=time], input[type=email],
+        input[type=password], input[type=search], input[type=tel], input[type=url],
+        input:not([type]), select, textarea) {
+    font-size: 16px !important;
+  }
+}
+
+
+/* ═══ 2 · Eingabefelder in den Reitern s1 … s8 ═══════════════════════════
+   Ausnahmen (bewusst kompakt, keine Formularfelder):
+   - Felder in Tabellenzellen (Jahres-Steuerformular .ytf-*, 45 Felder)
+   - die Kostenfelder in den Sanierungskacheln (.fesh-cost)
+   - die Gewichtsfelder der Score-Herleitung (.ds-/.ds2-metric-input, .ds-row-input)
+   - schreibgeschützte und gesperrte Felder (eigene Optik = „nicht änderbar")
+
+   Vorher → nachher (Desktop):
+   - Miete › Annahmen (.ass-inp: #mietstg, #wertstg, #kostenstg): 12 px, 32 px hoch → 13 px, 38 px
+   - Investition › Sanierung (#san_tax_years, #inv_tax_years): 12 px → 13 px
+   - Deal-Aktion › Finanzamt-PDF (#dab-fa-year): 12,5 px / 600 → 13 px / 400
+   - Steuer › Finanzamt-PDF (#fa-pdf-year, inline 13 px, Radius 8 px, Polster 7 px) → 38 px hoch, Radius 2 px */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  :is(input[type=text], input[type=number], input[type=date], input[type=month],
+      input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]),
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  :is(input[type=text], input[type=number], input[type=date], input[type=month],
+      input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled])::placeholder {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+}
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  :is(input[type=text], input[type=number], input[type=date], input[type=month],
+      input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  color: var(--text, #2A2727) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-radius: 2px !important;
+}
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  :is(input[type=text], input[type=number], input[type=date], input[type=month],
+      input[type=email], input[type=tel], input[type=url], input:not([type]), select):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
+  height: 38px !important;
+  min-height: 38px !important;
+  box-sizing: border-box !important;
+}
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  :is(input, select, textarea)::placeholder {
+  color: rgba(42, 39, 39, .40) !important;
+  font-style: normal !important;
+  opacity: 1 !important;
+}
+/* Fokus wie im Reiter Objekt — auch für die Felder mit Inline-Rahmen (#tp-*, #zve-*) */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  :is(input[type=text], input[type=number], input[type=date], input[type=month],
+      input[type=email], input:not([type]), select, textarea):focus {
+  outline: none !important;
+  border-color: var(--dpl-gold, var(--wl-c9a84c, #C9A84C)) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent) !important;
+}
+
+/* Handy: 44 px wie im Reiter Objekt. Gemessen: #d1_type (Finanzierung ›
+   Darlehen 1 › Art) stand bei 38 px, weil `#d1_type{min-height:38px}` aus
+   select-fix.css mit ID-Spezifität die 44 px aus style.css schlug. */
+@media (max-width: 640px) {
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+    :is(input[type=text], input[type=number], input[type=date], input[type=month],
+        input[type=email], input[type=tel], input[type=url], input:not([type]), select):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+    textarea:not(td *):not([readonly]):not([disabled]) {
+    font-size: 16px !important;
+  }
+}
+@media (min-width: 641px) and (max-width: 768px) {
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+    :is(input[type=text], input[type=number], input[type=date], input[type=month],
+        input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
+    font-size: 16px !important;
+  }
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+    :is(input[type=text], input[type=number], input[type=date], input[type=month],
+        input[type=email], input[type=tel], input[type=url], input:not([type]), select):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+}
+
+
+/* ═══ 3 · Karten, Kartenköpfe, Hinweise, Knöpfe in s1 … s8 ═══════════════
+   Vorher → nachher:
+   - Finanzierung › Marktzinsen (.mr-ctx-card): Verlauf Mint #F0F5F4→#E5EEED → weiß
+   - Finanzierung › Zins-Karten (.mr-v209-card, .mr-pf-card): Verlauf Creme → weiß
+   - Finanzierung › Zinsübersicht (.v10-zins-compact): #FAF9F4, 16 px Abstand → weiß, 20 px
+   - Steuer › Module (.tax-module-card, .tax-timeline-card): Verlauf #FAFCFD→weiß → weiß
+   - Kennzahlen › Deal-Score (.dealscore-card, .ds2-card): Verlauf weiß→#F8F6F1 → weiß
+   - Kennzahlen › KI-Kurzfazit (.ai-mini-card): Goldschleier 4 % → weiß
+   Die Kartenränder (1 px Gold 22 %, Radius 2 px) waren schon überall gleich. */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  .card:is(.market-rates-card, .mr-ctx-card, .mr-v209-card, .mr-pf-card, .v10-zins-compact,
+           .tax-module-card, .tax-timeline-card, .dealscore-card, .ds2-card, .ai-mini-card) {
+  background: var(--dpl-flaeche, #FFFFFF) !important;
+}
+@media (min-width: 641px) {
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .card.v10-zins-compact {
+    padding: 20px !important;
+  }
+}
+
+/* Kartenkopf: Steuer › „.ct" ohne .ct-pro stand mit 600 statt 700. */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .card > .ct {
+  font-weight: 700 !important;
+}
+
+/* Hinweise: 9,5 / 10 / 10,92 / 11 px und zwei Grautöne (#625C59 in
+   Kennzahlen) → 10,5 px, rgba(42,39,39,.68), kursiv wie im Reiter Objekt.
+   Ausgenommen: Hinweise, die inline als Versal-Zwischenüberschrift
+   gesetzt sind (Investition › Sanierung) — das ist eine andere Rolle. */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  .hint:not([style*="uppercase"]) {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-size: 10.5px !important;
+  font-style: italic !important;
+  color: rgba(42, 39, 39, .68) !important;
+}
+
+/* Feldbeschriftung: in s1 … s8 gemessen schon gleich (Inter 11 / 500,
+   rgba .85; Handy 10,5). Festgeschrieben, damit nachgeladene Module
+   (Finanzierung-Tranchen, Steuer-Zeiträume) nicht abweichen. */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .f > label {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Knöpfe: Steuer › „.btn.btn-sm" 12 px / 34 px gegen 13 px / 38 px in
+   Investition und Finanzierung. */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .btn.btn-sm {
+  font-size: 13px !important;
+  min-height: 38px !important;
+}
+
+
+/* ═══ 4 · Fenster: Einstellungen, BMF-Rechner, RND-Assistent, Datenraum ═══
+   Vorher → nachher (Desktop):
+   - Einstellungen (#settings-modal): Felder Radius 7–8 px, Rahmen #E8E2D4 /
+     #E0DBD3, Fokus 3 px 18 % → 2 px, #E6E1D6, Fokus 2 px 16 %;
+     PDF-Auswahl (#set_pdf_fassung, #set_pdf_design) 14 px → 13 px;
+     Beschriftungen 11 px / 600 VERSALIEN, Sperrung .6 px → 11 px / 500,
+     normal, rgba(42,39,39,.85)
+   - BMF-Rechner (#bmfOverlay): Felder und Feldrahmen .iw Radius 8 px,
+     Gewicht 500, Fokus 3 px 18 % → 2 px, 400, 2 px 16 %
+   - RND-Assistent (.rnd-wiz-field): 14 px, Rahmen 1,5 px Gold 30 %,
+     Radius 6–8 px → 13 px, 1 px #E6E1D6, 2 px
+   - Datenraum (.dr-input): 13,5 px, Radius 4 px → 13 px, 2 px
+   - Steuer-Zeiträume (#tp-*, tax-periods.js), zvE-Verlauf (#zve-*,
+     zve-manager.js/zve-smart.js), Wirtschaftlicher Übergang (#wu-prompt-date):
+     inline 1,5 px Gold 30 %, Radius 7–8 px, 34–36 px → 1 px #E6E1D6, 2 px, 38 px
+   Schreibgeschützte Felder (Creme-Grund) bleiben, wie sie sind. */
+html[data-dp-layout] body :is(#tp-from, #tp-to, #tp-zve, #tp-reason, #tp-note,
+  #zve-profile-current, #zve-history-amount, #zve-history-from,
+  #zve-sync-from, #zve-sync-to, #wu-prompt-date) {
+  height: 38px !important;
+  padding: 0 11px !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 640px) {
+  html[data-dp-layout] body :is(#tp-from, #tp-to, #tp-zve, #tp-reason, #tp-note,
+    #zve-profile-current, #zve-history-amount, #zve-history-from,
+    #zve-sync-from, #zve-sync-to, #wu-prompt-date) {
+    height: 44px !important;
+  }
+}
+html[data-dp-layout] body #settings-modal
+  :is(input[type=text], input[type=number], input[type=date], input[type=email],
+      input[type=password], input[type=url], input:not([type]), select, textarea):not([id^="pm-"]):not([class*="pm-menge"]),
+html[data-dp-layout] body #bmfOverlay:not(#dp-nie)
+  :is(input[type=text], input[type=number], input[type=date], input:not([type]), select, textarea):not(.iw *):not(td *),
+html[data-dp-layout]:not(#dp-nie) body .rnd-wiz-field
+  :is(input[type=text], input[type=number], input[type=email], input[type=date], select, textarea),
+html[data-dp-layout] body .dr-input,
+html[data-dp-layout] body :is(#tp-from, #tp-to, #tp-zve, #tp-reason, #tp-note,
+  #zve-profile-current, #zve-history-amount, #zve-history-from,
+  #zve-sync-from, #zve-sync-to, #wu-prompt-date) {
+  border-radius: 2px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: var(--dpl-linie, #E6E1D6) !important;
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-weight: 400 !important;
+}
+html[data-dp-layout] body #settings-modal
+  :is(input[type=text], input[type=number], input[type=date], input[type=email],
+      input[type=password], input[type=url], input:not([type]), select, textarea):not([id^="pm-"]):not([class*="pm-menge"])[readonly] {
+  font-weight: 600 !important; /* „nicht änderbar" bleibt erkennbar */
+}
+html[data-dp-layout] body #bmfOverlay:not(#dp-nie) .iw {
+  border-radius: 2px !important;
+  border-color: var(--dpl-linie, #E6E1D6) !important;
+}
+@media (min-width: 769px) {
+  html[data-dp-layout] body #settings-modal :is(#set_pdf_fassung, #set_pdf_design),
+  html[data-dp-layout]:not(#dp-nie) body .rnd-wiz-field
+    :is(input[type=text], input[type=number], input[type=email], input[type=date], select, textarea),
+  html[data-dp-layout] body .dr-input {
+    font-size: 13px !important;
+  }
+}
+html[data-dp-layout] body #settings-modal
+  :is(input[type=text], input[type=number], input[type=date], input[type=email],
+      input[type=password], input[type=url], input:not([type]), select, textarea):focus,
+html[data-dp-layout] body #bmfOverlay:not(#dp-nie)
+  :is(input[type=text], input[type=number], input[type=date], input:not([type]), select, textarea):focus,
+html[data-dp-layout] body #bmfOverlay:not(#dp-nie) .iw:focus-within,
+html[data-dp-layout]:not(#dp-nie) body .rnd-wiz-field :is(input, select, textarea):focus,
+html[data-dp-layout] body .dr-input:focus {
+  outline: none !important;
+  border-color: var(--dpl-gold, var(--wl-c9a84c, #C9A84C)) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent) !important;
+}
+/* Felder im Feldrahmen .iw des BMF-Rechners bleiben randlos — den Rahmen trägt .iw. */
+html[data-dp-layout] body #bmfOverlay:not(#dp-nie) .iw :is(input, select):focus {
+  box-shadow: none !important;
+}
+
+/* Beschriftungen in den Einstellungen wie .f > label im Reiter Objekt.
+   Die Haken-Beschriftungen (v3166, style.css ~Z. 40871) sind schon normal gesetzt. */
+html[data-dp-layout] body #settings-modal .pane-wrap :is(.f, .field) > label {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  color: rgba(42, 39, 39, .85) !important;
+}
+
+/* Handy: Fensterfelder 44 px wie im Reiter Objekt (Schrift 16 px kommt aus Abschnitt 1). */
+@media (max-width: 640px) {
+  html[data-dp-layout] body #bmfOverlay:not(#dp-nie)
+    :is(input[type=text], input[type=number], input[type=date], input:not([type]), select):not(td *),
+  html[data-dp-layout]:not(#dp-nie) body .rnd-wiz-field
+    :is(input[type=text], input[type=number], input[type=email], input[type=date], select),
+  html[data-dp-layout] body .dr-input:not(textarea) {
+    min-height: 44px !important;
+  }
+  html[data-dp-layout] body #settings-modal .pane-wrap :is(.f, .field) > label {
+    font-size: 10.5px !important;
+  }
+}
