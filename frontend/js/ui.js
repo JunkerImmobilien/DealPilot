@@ -2931,6 +2931,41 @@ function _bsheetSyncActive() {
   });
 }
 
+/* v3253 · Marcel 09.11.2026: „Generell das Marktbericht-Modul, das ist ja nur im Hintergrund,
+   das heißt kein Absprung mehr da rein … nur noch, dass wir das PDF abrufen können.“
+   Zwei Ziele statt der Marktbericht-Ansicht (openMarktberichtView bleibt als Modul bestehen):
+   - dpMbAbrufZeigen():    Reiter Objekt, Box „Marktbericht abrufen“ (#oe-abruf-box) - ERSTELLEN
+   - dpMbBerichteZeigen(): Reiter Deal-Aktion, Liste „Marktberichte“ (#dab-mb-host) - PDF ABRUFEN */
+function _dpReiterZu(secId) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) {
+    if (tabs[i].getAttribute('data-target-sec') === secId && typeof window.switchTab === 'function') { try { window.switchTab(i); } catch (e) {} return true; }
+  }
+  return false;
+}
+function dpMbAbrufZeigen() {
+  try { if (document.body.classList.contains('mb-standalone-active') && typeof window._mbLeiseSchliessen === 'function') window._mbLeiseSchliessen(); } catch (e) {}
+  if (typeof setMainView === 'function') { try { setMainView('single'); } catch (e) {} }
+  _dpReiterZu('s0');
+  setTimeout(function () {
+    var b = document.getElementById('oe-abruf-box') || document.getElementById('oe-stufen');
+    if (b) { try { b.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { b.scrollIntoView(); } }
+  }, 350);
+}
+function dpMbBerichteZeigen() {
+  try { if (document.body.classList.contains('mb-standalone-active') && typeof window._mbLeiseSchliessen === 'function') window._mbLeiseSchliessen(); } catch (e) {}
+  if (typeof setMainView === 'function') { try { setMainView('single'); } catch (e) {} }
+  var host = document.getElementById('dab-mb-host');
+  _dpReiterZu(host && host.closest('.sec') ? host.closest('.sec').id : 's8');
+  setTimeout(function () {
+    var h = document.getElementById('dab-mb-host');
+    try { if (window._dabMbRefresh) window._dabMbRefresh(); } catch (e) {}
+    if (h) { h.classList.add('mb-open'); try { h.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { h.scrollIntoView(); } }
+  }, 350);
+}
+window.dpMbAbrufZeigen = dpMbAbrufZeigen;
+window.dpMbBerichteZeigen = dpMbBerichteZeigen;
+
 function bsheetAction(action) {
   // Erst Sheet zumachen, dann Aktion ausführen
   bsheetToggle();
@@ -2941,7 +2976,7 @@ function bsheetAction(action) {
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
-      case 'marktbericht':  if (typeof openMarktberichtView === 'function') openMarktberichtView(); break;
+      case 'marktbericht':  dpMbAbrufZeigen(); break;   /* v3253 · statt openMarktberichtView: kein Absprung in die Marktbericht-Ansicht, Abruf im Reiter Objekt */
       case 'new':           if (typeof newObj === 'function') newObj(); break;
       case 'trackrec':      if (typeof showTrackRecordView === 'function') showTrackRecordView(); break;
       case 'portfolio-strategy': if (typeof showPortfolioStrategyView === 'function') showPortfolioStrategyView(); break;
@@ -3145,7 +3180,7 @@ function sbActionsAction(action) {
        Aktion, die eine Ansicht wechselt, wird er deshalb leise geschlossen;
        Fenster wie Einstellungen oder Import lassen ihn stehen. */
     try {
-      var _nurFenster = ['marktbericht', 'settings', 'help', 'feedback', 'hub-import', 'hub-export', 'pdf', 'csv', 'export-csv', 'import-excel', 'import-json', 'export-json'];
+      var _nurFenster = ['settings',   /* v3253: 'marktbericht' raus - führt jetzt in den Reiter Objekt */ 'help', 'feedback', 'hub-import', 'hub-export', 'pdf', 'csv', 'export-csv', 'import-excel', 'import-json', 'export-json'];
       if (_nurFenster.indexOf(action) < 0 && document.body.classList.contains('mb-standalone-active') && typeof window._mbLeiseSchliessen === 'function') {
         window._mbLeiseSchliessen();
         if (action === 'new' && typeof setMainView === 'function') setMainView('single');
@@ -3158,7 +3193,7 @@ function sbActionsAction(action) {
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
-      case 'marktbericht':  if (typeof openMarktberichtView === 'function') openMarktberichtView(); break;
+      case 'marktbericht':  dpMbAbrufZeigen(); break;   /* v3253 · statt openMarktberichtView: kein Absprung in die Marktbericht-Ansicht, Abruf im Reiter Objekt */
       case 'new':           if (typeof newObj === 'function') newObj(); break;
       case 'trackrec':      if (typeof showTrackRecordView === 'function') showTrackRecordView(); break;
       case 'portfolio-strategy': if (typeof showPortfolioStrategyView === 'function') showPortfolioStrategyView(); break;
