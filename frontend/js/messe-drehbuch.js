@@ -2406,23 +2406,30 @@
         await r6Ende(zb);
         await b2oZeile(s, 'Die Marktmiete', 'Marktmiete <b>' + wert('ds2_marktmiete') + ' €/m²</b> gegen deine ' + r6Id('miete_qm') + ' — der Abstand fließt in den Investor Deal Score.');
       },
-      async function (s) {   /* 5 · Mietausfall-Risiko (v2481h: ohne Zensus-Kasten) */
-        await zeige(r6Gruppe('ds2_mietausfall'), 10);
-        await b2oZeile(s, 'Mietausfall-Risiko', 'Die Stufe übernimmst du per Klick aus der Pilot-Mietpreis-Analyse — oder wählst sie selbst' + (wert('ds2_mietausfall') ? ': hier <b>' + r6Optionstext('ds2_mietausfall') + '</b>' : ' — hier noch offen') + '.');
+      async function (s) {   /* 5 · v3272: Leerstand statt Mietausfall-Posten (seit v3233 ein Posten: Kaltmiete × Leerstand %) */
+        await zeige(r6Gruppe('leerstand'), 10);
+        await b2oZeile(s, 'Leerstand statt Mietausfall', 'Leerstand <b>' + r6Pz(wert('leerstand')) + ' %</b> im Jahr, aus deinen Standardwerten. Daraus rechnet DealPilot den Mietausfall — Jahreskaltmiete × Leerstand, einmal in Cashflow und Steuer.');
       },
-      async function (s) {   /* 6 · Mietvertrag */
+      async function (s) {   /* 6 · Mietvertrag (v3272: unbefristet - bei Index/Staffel gilt § 558 nicht) */
         await zeigeGruppe(feldVon('mv_art'), feldVon('mv_letzte_erhoehung'), 8);
         var zb = r6Beginn(s, 'Der Mietvertrag', 'Vertragsart, Beginn und letzte Erhöhung — für jede Objektart.');
         await warte(1500);
         var sel = document.getElementById('mv_art');
-        var idx = sel ? [].findIndex.call(sel.options, function (o) { return /Index/i.test(o.textContent); }) : -1;
-        if (idx >= 0) { sel.selectedIndex = idx; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+        if (sel && sel.value !== 'unbefristet') { sel.value = 'unbefristet'; sel.dispatchEvent(new Event('change', { bubbles: true })); }
         await warte(800);
         r6Setz('mv_beginn', '2019-04-01'); await warte(600);
         r6Setz('mv_letzte_erhoehung', '2024-04-01'); await warte(900);
         var n = sel ? sel.options.length : 0;
         await r6Ende(zb);
-        await b2oZeile(s, 'Der Mietvertrag', '<b>' + r6Optionstext('mv_art') + '</b> seit 04/2019, zuletzt erhöht 04/2024' + (n ? ' — ' + (n - 1) + ' Vertragsarten zur Auswahl' : '') + '.');
+        await b2oZeile(s, 'Der Mietvertrag', '<b>' + r6Optionstext('mv_art') + '</b> seit 04/2019, zuletzt erhöht 04/2024' + (n ? ' — ' + (n - 1) + ' Vertragsarten zur Auswahl. Bei Staffel- und Indexmiete gilt § 558 nicht.' : '.'));
+      },
+      async function (s) {   /* 6b · v3272: Mietrecht an dieser Adresse, § 558 mit der Mietspiegel-Zeile */
+        var mr = function () { return q('#dp-mietrecht-karte'); };
+        var x = mr(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeige(mr, 8);
+        var t = r6Inner(mr()).replace(/\s+/g, ' '), kg = /KAPPUNGSGRENZE\s+([\d,]+ % in \d+ Jahren)/i.exec(t), vm = /VERGLEICHSMIETE\s+([\d,]+ €\/m²)/i.exec(t), mb = /MIETPREISBREMSE\s+(gilt hier nicht|gilt[^|.]*?)(?=\s+[A-ZÄÖÜ]|\s*$)/.exec(t);
+        await b2oZeile(s, 'Mietrecht an dieser Adresse', '§ 558 BGB: Kappungsgrenze <b>' + (kg ? kg[1] : '–') + '</b>, Vergleichsmiete <b>' + (vm ? vm[1] : '–') + '</b> aus der Mietspiegel-Zeile, oberer Spannenwert' + (mb ? '. Mietpreisbremse: ' + mb[1] : '') + '.');
       },
       async function (s) {   /* 7 · Mietentwicklung: Prognose */
         await zeige(function () { return q('#me-block-prog') && q('#me-block-prog').closest('.card'); }, 8);
@@ -2432,11 +2439,13 @@
         var b = q('#me-mode-detail'); if (b) b.click();
         await warte(900);
         await zeige(function () { return q('#me-block-detail .g2'); }, 8);
-        var zb = r6Beginn(s, 'Oder im Detail', 'Einzelne Erhöhungen, z. B. bei Staffel- oder Indexmiete — gegen den Mietspiegel.');
-        await tippeH('me_soll', '8,50', 110);
+        var zb = r6Beginn(s, 'Oder im Detail', 'Einzelne Erhöhungen bis zur Vergleichsmiete der Mietspiegel-Zeile — höchstens bis zur Kappungsgrenze.');
+        /* v3272 · der Zielwert ist die Vergleichsmiete aus der Mietspiegel-Zeile (§ 558), nicht ein Angebotsniveau */
+        var vgm = (/VERGLEICHSMIETE\s+([\d,]+) €\/m²/i.exec(r6Inner(q('#dp-mietrecht-karte')).replace(/\s+/g, ' ')) || [])[1] || '8,50';
+        await tippeH('me_soll', vgm, 110);
         await warte(1200);
         await r6Ende(zb);
-        await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Soll-Mietspiegel ' + wert('me_soll') + ' €/m²' + (r6Id('me_opp') && r6Id('me_opp') !== '—' ? ', Abstand deiner Miete: ' + r6Id('me_opp') : '') + '.');
+        await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (r6Id('me_opp') && r6Id('me_opp') !== '—' ? ', Abstand deiner Miete: ' + r6Id('me_opp') : '') + '.');
         var p = q('#me-mode-prog'); if (p) p.click();
         await warte(700);
       },
