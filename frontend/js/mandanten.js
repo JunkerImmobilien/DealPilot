@@ -386,6 +386,10 @@
     return {
       id: m.id, name: m.name, rechtsform: m.rechtsform,
       kstSoliPct: (reg.kst != null && isFinite(Number(reg.kst))) ? Number(reg.kst) : 15.825,
+      /* v3268 · Steht der Satz auf der Vorgabe (oder fehlt), rechnet der Kern je Jahr mit
+         § 23 Abs. 1 KStG n. F. (15 % bis 2027, dann 14/13/12/11, ab 2032 10 % + Soli).
+         Ein abweichend eingetragener Satz gilt fest fuer alle Jahre. */
+      kstNachJahr: !(reg.kst != null && isFinite(Number(reg.kst)) && Math.abs(Number(reg.kst) - 15.825) > 1e-9),
       hebesatz: (reg.gewst != null && isFinite(Number(reg.gewst))) ? Number(reg.gewst) : 0,
       erwKuerzung: st.aktiv, erwStatus: st,
       stammkapital: (m.bh && Number(m.bh.stammkapital)) || 0
@@ -864,17 +868,26 @@
      der Entwurf hält alle Jahre, bis gespeichert wird — sonst verliert ein
      Jahreswechsel im Formular die Eingaben des vorigen.
      ═══════════════════════════════════════════════════════════════════════ */
+  /* v3268 · Marcel 09.11.2026: die Kosten der Gesellschaft gehoeren der
+     GESELLSCHAFT, nicht dem Objekt. Deshalb stehen sie hier am Mandanten
+     und werden in der Steuer der Gesellschaft (ueber alle Objekte) und im
+     Jahresabschluss abgezogen — je Objekt erscheinen sie hoechstens als
+     anteilige Auskunft. „Jahresabschluss / Offenlegung" ist neu und vom
+     Steuerberater-Honorar getrennt (Bundesanzeiger/Unternehmensregister,
+     Transparenzregister); alte Saetze mit allem in `steuerber` bleiben gueltig. */
   var KOSTENARTEN = [
-    { f: 'steuerber', t: 'Steuerberatung / Jahresabschluss',
-      h: 'Honorar für Buchführung, Jahresabschluss und Erklärungen der Gesellschaft. Nicht die Steuerberatung, die ein einzelnes Objekt betrifft — die steht im Objekt.' },
-    { f: 'kammer', t: 'IHK, Handelsregister, Notar',
+    { f: 'steuerber', t: 'Buchführung / Steuerberatung',
+      h: 'Honorar für Buchführung, Lohnabrechnung und die Steuererklärungen der Gesellschaft (KSt, GewSt). Nicht die Steuerberatung, die ein einzelnes Objekt betrifft — die steht im Objekt.' },
+    { f: 'abschluss', t: 'Jahresabschluss / Offenlegung',
+      h: 'Erstellung des Jahresabschlusses, Offenlegung im Unternehmensregister (§ 325 HGB), Transparenzregister.' },
+    { f: 'kammer', t: 'IHK-Beitrag, Handelsregister, Notar',
       h: 'Kammerbeitrag, Eintragungen im Handelsregister, Notarkosten für Gesellschafterbeschlüsse.' },
     { f: 'bank', t: 'Kontoführung der Gesellschaft',
       h: 'Gebühren des Geschäftskontos. Kontoführung, die zu einem Objektdarlehen gehört, steht beim Objekt.' },
     { f: 'gf', t: 'Geschäftsführergehalt',
       h: 'Bruttogehalt einschließlich Arbeitgeberanteil. Bei 0 wird unentgeltlich geführt — dann bitte mit dem Steuerberater klären, ob das so gewollt ist.' },
-    { f: 'sonst', t: 'Sonstiges',
-      h: 'Versicherungen der Gesellschaft, Software, Porto, Beiträge — alles ohne Objektbezug.' }
+    { f: 'sonst', t: 'Sonstige Gesellschaftskosten',
+      h: 'Versicherungen der Gesellschaft (D&O, Haftpflicht), Software, Porto, Beiträge — alles ohne Objektbezug.' }
   ];
 
   var _kDraft = {};    /* Jahr -> { steuerber, kammer, bank, gf, sonst } */
@@ -971,6 +984,56 @@
     };
   }
 
+  /* ═══ v3268 · WERBUNGSKOSTEN ODER BETRIEBSAUSGABEN ═════════════════════
+     Marcel 09.11.2026: bei einer GmbH/UG heisst die Tabelle „Betriebsausgaben"
+     — eine Kapitalgesellschaft hat nur Einkuenfte aus Gewerbebetrieb (§ 8
+     Abs. 2 KStG), keine Anlage V. Die GbR bleibt bei „Werbungskosten"
+     (Einkuenfte aus Vermietung und Verpachtung, § 21 EStG). EINE Stelle fuer
+     das Wort; Reiter Steuer, Steuer-Mappe, PDF und Hilfe fragen hier. */
+  function kostenBegriff(halterId) {
+    var id = (halterId == null) ? (function () { var s = document.getElementById('halter'); return s ? s.value : 'privat'; })() : halterId;
+    var corp = istKoerperschaft(id);
+    return corp
+      ? { corp: true, wort: 'Betriebsausgaben', einnahmen: 'Betriebseinnahmen', ergebnis: 'Ergebnis vor Steuern', einkunftsart: 'Einkünfte aus Gewerbebetrieb (§ 8 Abs. 2 KStG)' }
+      : { corp: false, wort: 'Werbungskosten', einnahmen: 'Einnahmen', ergebnis: 'Überschuss / Verlust V+V', einkunftsart: 'Einkünfte aus Vermietung und Verpachtung (§ 21 EStG)' };
+  }
+
+  /* ═══ v3268 · GESELLSCHAFTER DER GbR UND DIE FESTSTELLUNG (§ 180 AO) ════
+     Die Einkuenfte der GbR werden gesondert und einheitlich festgestellt
+     (§ 180 Abs. 1 S. 1 Nr. 2 Buchst. a AO) und den Gesellschaftern nach dem
+     Gewinnverteilungsschluessel zugerechnet. Der eigene Anteil ist `quote`
+     (v1404); die uebrigen Gesellschafter stehen in `gesellschafter`
+     [{ name, anteil }]. Nur der EIGENE Anteil geht in die ESt des Nutzers. */
+  function _gesListe(m) {
+    return (Array.isArray(m && m.gesellschafter) ? m.gesellschafter : []).filter(function (g) {
+      return g && String(g.name || '').trim() && Number(g.anteil) > 0;
+    }).map(function (g) { return { name: String(g.name).trim(), anteil: Number(g.anteil) }; });
+  }
+  function feststellung(halterId, einkuenfte) {
+    var id = String(halterId || 'privat');
+    var m = _getStreng(id);
+    if (!m || m.rechtsform !== 'gbr') return null;
+    var e = Number(einkuenfte) || 0;
+    var ich = anteil(id) * 100;
+    var zeilen = [{ name: 'Du (eigener Anteil)', anteilPct: ich, betrag: e * ich / 100, ich: true }];
+    _gesListe(m).forEach(function (g) { zeilen.push({ name: g.name, anteilPct: g.anteil, betrag: e * g.anteil / 100, ich: false }); });
+    var summe = zeilen.reduce(function (s, z) { return s + z.anteilPct; }, 0);
+    return { name: m.name, einkuenfte: e, zeilen: zeilen, summePct: summe,
+             vollstaendig: Math.abs(summe - 100) < 0.01, eigenerBetrag: e * ich / 100 };
+  }
+  function _gesText(m) {
+    return _gesListe(m).map(function (g) { return g.name + '; ' + String(g.anteil).replace('.', ','); }).join('\n');
+  }
+  function _gesParse(t) {
+    return String(t || '').split(/\n+/).map(function (z) {
+      var p = z.split(/[;:\t]/);
+      if (p.length < 2) return null;
+      var a = _toN(p[p.length - 1]);
+      var n = p.slice(0, -1).join(' ').trim();
+      return (n && a > 0) ? { name: n, anteil: Math.min(100, a) } : null;
+    }).filter(Boolean);
+  }
+
   function _renderForm() {
     var isNew = _editing === 'NEW';
     var m = isNew ? { rechtsform: 'gmbh', regime: {}, bh: {} } : (get(_editing) || { regime: {}, bh: {} });
@@ -1022,7 +1085,7 @@
       +   '<hr class="dvd" style="margin:18px 0 6px">'
       +   '<h3 class="set-section-h">Steuerregime <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 rechnet in Steuer und Jahresabschluss</span></h3>'   /* v2208: hier stand "wird in Stufe 2 aktiv" - effRate() (Z. 328) und gesellschaft-abschluss.js rechnen laengst damit */
       +   '<div style="' + _fGrid() + '">'
-      +     fldH('K\u00f6rperschaftsteuer + Soli (%)', inp('mand-f-kst', reg.kst != null ? reg.kst : 15.825), 'Satz, mit dem der Gewinn der Gesellschaft besteuert wird: 15 % K\u00f6rperschaftsteuer + 5,5 % Solidarit\u00e4tszuschlag darauf = 15,825 %.')
+      +     fldH('K\u00f6rperschaftsteuer + Soli (%)', inp('mand-f-kst', reg.kst != null ? reg.kst : 15.825), 'Satz, mit dem der Gewinn der Gesellschaft besteuert wird: 15 % K\u00f6rperschaftsteuer + 5,5 % Solidarit\u00e4tszuschlag darauf = 15,825 %. Bleibt die Vorgabe stehen, rechnet DealPilot ab 2028 mit der gesetzlichen Senkung (\u00a7 23 Abs. 1 KStG: 14 % 2028, 13 % 2029, 12 % 2030, 11 % 2031, 10 % ab 2032, jeweils + Soli). Ein anderer Wert gilt fest f\u00fcr alle Jahre.')
       +     fldH('Gewerbesteuer-Hebesatz (%)', inp('mand-f-gewst', reg.gewst != null ? reg.gewst : 0), 'Hebesatz deiner Gemeinde (z.B. 400). Nur relevant, wenn die erweiterte K\u00fcrzung NICHT greift. Bei reiner Vermietung mit K\u00fcrzung 0 lassen.')
       +   '</div>'
       +   '<div style="' + _fGrid() + '">'
@@ -1119,6 +1182,13 @@
              + '<b>Was hier nicht abgebildet ist:</b> Sonderbetriebsausgaben und '
              + 'Ergänzungsbilanzen — die kennt nur die einheitliche und gesonderte '
              + 'Feststellung deines Steuerberaters.')
+      /* v3268 · die anderen Gesellschafter — fuer die Uebersicht
+         „Gesonderte und einheitliche Feststellung (§ 180 AO)" */
+      +   fldH('Weitere Gesellschafter (je Zeile: Name; Anteil %)',
+             '<textarea id="mand-f-ges" rows="3" style="width:100%;font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid #e6e0d3;border-radius:8px" placeholder="Anna Beispiel; 50">'
+             + esc(_gesText(m)) + '</textarea>',
+             'Nur für die Übersicht der <b>gesonderten und einheitlichen Feststellung</b> (§ 180 AO) im Reiter Steuer und in der Steuer-Mappe. '
+             + 'Gerechnet wird bei dir nur mit <b>deinem</b> Anteil oben. Zusammen sollten alle Anteile 100 % ergeben.')
       + '</div>';
 
     return ''
@@ -1187,6 +1257,9 @@
       if (!isFinite(_q) || _q <= 0) _q = 100;
       if (_q > 100) _q = 100;
       m.quote = _q;
+      /* v3268: weitere Gesellschafter (nur Uebersicht § 180 AO) */
+      var _gl = _gesParse(_val('mand-f-ges'));
+      if (_gl.length) m.gesellschafter = _gl;
     }
     if (isCorp(rf)) {
       m.regime = { kst: _toN(_val('mand-f-kst')), gewst: _toN(_val('mand-f-gewst')), erw_kuerzung: _chk('mand-f-kuerz') };
@@ -1472,6 +1545,9 @@
     uiSaveIfOpen: uiSaveIfOpen,   /* v826 (dedup) */
     kostenJahr: kostenJahr,        /* v1226: Jahreswechsel im Kostenblock */
     kostenFuer: kostenFuer,        /* v1226: Auskunft fuer GuV und Bilanz */
+    kostenBegriff: kostenBegriff,  /* v3268: Werbungskosten (privat, GbR) oder Betriebsausgaben (GmbH/UG) */
+    feststellung: feststellung,    /* v3268: § 180 AO - Einkuenfte der GbR je Gesellschafter */
+    KOSTENARTEN: KOSTENARTEN,
     uiNew: uiNew, uiEdit: uiEdit, uiCancel: uiCancel, uiSave: uiSave, uiDelete: uiDelete, uiToggleRf: uiToggleRf
   };
 })();

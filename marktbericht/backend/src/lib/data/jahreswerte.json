@@ -156,7 +156,52 @@
         { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "0.15825" },
         { "datei": "frontend/js/gesellschaft-abschluss.js", "bezeichner": "0.15825" }
       ],
-      "hinweis": "Zu pruefen: stufenweise Senkung des KSt-Satzes ab VZ 2028 (Gesetz fuer ein steuerliches Investitionssofortprogramm 2025) - mit Fundstelle im BGBl. belegen, dann jahrgangsabhaengig machen."
+      "hinweis": "v3268: Rueckfall fuer Anzeigen (effRate) und fuer einen von Hand gesetzten Satz. Steht der Mandant auf der Vorgabe, rechnet der Kern je Jahr nach kst_satz_jahre (Senkung ab VZ 2028)."
+    },
+    {
+      "id": "kst_satz_jahre",
+      "name": "Koerperschaftsteuersatz je Veranlagungszeitraum (§ 23 Abs. 1 KStG n. F.)",
+      "gruppe": "steuer",
+      "stand": "15 % bis VZ 2027, 14 % 2028, 13 % 2029, 12 % 2030, 11 % 2031, 10 % ab 2032 (jeweils zzgl. 5,5 % Soli)",
+      "erwartet": "15,14,13,12,11,10",
+      "quelle": "§ 23 Abs. 1 KStG i. d. F. des Gesetzes fuer ein steuerliches Investitionssofortprogramm vom 14.07.2025 (BGBl. 2025 I Nr. 161)",
+      "turnus": "bei Gesetzesaenderung",
+      "faellig_am": "2027-10-01",
+      "verfahren": "durchsicht",
+      "orte": [
+        { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "KST_SATZ", "muster": "KST_SATZ = \\{ bis2027: (\\d+), 2028: (\\d+), 2029: (\\d+), 2030: (\\d+), 2031: (\\d+), ab2032: (\\d+) \\}" }
+      ],
+      "hinweis": "v3268: Fundstelle (BGBl.-Nummer) vom Bearbeiter nicht online gegengeprueft - beim naechsten Lauf des Agenten jahreswerte belegen."
+    },
+    {
+      "id": "gewst_kuerzung_9_1",
+      "name": "Einfache Kuerzung § 9 Nr. 1 S. 1 GewStG (Grundbesitz im Betriebsvermoegen)",
+      "gruppe": "steuer",
+      "stand": "ab EZ 2025: 0,11 % des Grundsteuerwerts; bis EZ 2024: 1,2 % von 140 % des Einheitswerts",
+      "erwartet": "0.0011,0.012,1.4",
+      "quelle": "§ 9 Nr. 1 S. 1 GewStG i. d. F. des Jahressteuergesetzes 2024; § 121a BewG (140 %)",
+      "turnus": "bei Gesetzesaenderung",
+      "faellig_am": "2027-10-01",
+      "verfahren": "durchsicht",
+      "orte": [
+        { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "KUERZUNG_9_1", "muster": "KUERZUNG_9_1 = \\{ satzAb2025: ([\\d.]+), satzBis2024: ([\\d.]+), ewFaktor: ([\\d.]+) \\}" }
+      ],
+      "hinweis": "v3268: Grundsteuerwert lt. Bescheid ist das Feld grundsteuerwert am Objekt; ohne ihn keine Kuerzung (keine Naeherung - Steuermesszahl und Grundsteuer-Hebesatz fuehrt DealPilot nicht)."
+    },
+    {
+      "id": "gewst_hinzurechnung_8_1",
+      "name": "Gewerbesteuer-Hinzurechnung § 8 Nr. 1 GewStG (Freibetrag, Satz) - GmbH/UG ohne erweiterte Kuerzung",
+      "gruppe": "steuer",
+      "stand": "Freibetrag 200.000 EUR je Gesellschaft und Erhebungszeitraum (seit EZ 2020, vorher 100.000), Satz 25 % der uebersteigenden Summe",
+      "erwartet": "200000,0.25",
+      "quelle": "§ 8 Nr. 1 GewStG (Freibetrag i. d. F. des Zweiten Corona-Steuerhilfegesetzes vom 29.06.2020, BGBl. I S. 1512; § 36 Abs. 4b GewStG ab EZ 2020)",
+      "turnus": "bei Gesetzesaenderung",
+      "faellig_am": "2027-10-01",
+      "verfahren": "durchsicht",
+      "orte": [
+        { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "HINZURECHNUNG_8_1", "muster": "HINZURECHNUNG_8_1 = \\{ freibetrag: (\\d+), satz: ([\\d.]+) \\}" }
+      ],
+      "hinweis": "v3268: Summanden Buchst. a (Entgelte fuer Schulden, voll), d (Mieten bewegl. 1/5), e (Mieten unbewegl. 1/2), f (Lizenzen 1/4). DealPilot erfasst je Objekt nur die Zinsen; die anderen Summanden sind Parameter des Kerns."
     },
     {
       "id": "grenzsteuer_vorgabe",
@@ -164,7 +209,7 @@
       "gruppe": "steuer",
       "stand": "40,45 %",
       "erwartet": "40.45",
-      "quelle": "Annahme (42 % x 1,055 Soli ohne Kirchensteuer, gerundet) - Produktvorgabe",
+      "quelle": "Produktvorgabe ohne Herleitung: Altwert aus V1.0 (Initial 13.05.2026, Feld grenz value=40.45), in V226 (B4.2) als 'Marcel-spezifisch' bezeichnet, in v1257 als Profil-Default uebernommen. NICHT '42 % x 1,055' - das waeren 44,31 % (v3268 korrigiert, Wert unveraendert, Entscheidung offen)",
       "turnus": "bei Tarifwechsel durchsehen",
       "faellig_am": "2027-01-15",
       "verfahren": "durchsicht",
@@ -172,7 +217,8 @@
         { "datei": "frontend/js/config.js", "bezeichner": "investmentProfileDefaults.grenzsteuersatz", "muster": "grenzsteuersatz:\\s+([\\d.]+),", "nimm": "erster" },
         { "datei": "frontend/js/bmf-modal.js", "bezeichner": "var grenz", "muster": "var grenz = ([\\d.]+);", "nimm": "alle", "faktor": 100 },
         { "datei": "backend/src/services/bmfPipelineService.js", "bezeichner": "GRENZSTEUER_DEFAULT", "muster": "GRENZSTEUER_DEFAULT = ([\\d.]+);", "faktor": 100 }
-      ]
+      ],
+      "hinweis": "v3268: Zur Entscheidung (Marcel): 40,45 % behalten (Altwert) oder ableiten - z. B. 42 % + Soli 5,5 % = 44,31 %, oder 42 % ohne Soli (Soli-Freigrenze greift bei den meisten Anlegern). Bei aktivem Haken 'Grenzsteuersatz automatisch aus zvE' wirkt die Vorgabe ohnehin nicht."
     },
     {
       "id": "anlage_v",

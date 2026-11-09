@@ -175,7 +175,11 @@ soll('AfA im Kaufjahr (Kauf 03/2026, Stichtag 07/2026)', K.afaBisStichtag({ seri
   const mit = { kstSoliPct: 15.825, hebesatz: 450, erwKuerzung: true };
   const ohne = { kstSoliPct: 15.825, hebesatz: 450, erwKuerzung: false };
   soll('C mit erw. Kuerzung', K.steuerReihe([{ jahr: 2026, erg: 5730 }], mit)[0].steuer, 906.77, 0.01);
-  const c2 = K.steuerReihe([{ jahr: 2026, erg: 5730, grundsteuer: 275 }], ohne)[0];
+  /* v3268: die einfache Kuerzung § 9 Nr. 1 S. 1 GewStG ist ab EZ 2025 0,11 % des
+     GRUNDSTEUERWERTS, nicht der Grundsteuerbetrag. 0,11 % x 250.000 = 275 € -> dieselben
+     Sollwerte wie bisher; ein Grundsteuerbetrag allein kuerzt nichts mehr. */
+  const c2 = K.steuerReihe([{ jahr: 2026, erg: 5730, grundsteuerwert: 250000 }], ohne)[0];
+  soll('C ohne Grundsteuerwert keine Kuerzung (v3268)', K.steuerReihe([{ jahr: 2026, erg: 5730, grundsteuer: 275 }], ohne)[0].gewerbeertrag, 5700);
   soll('C ohne Kuerzung: Gewerbeertrag abgerundet', c2.gewerbeertrag, 5400);
   soll('C ohne Kuerzung: GewSt', c2.gewst, 850.5, 0.01);
   soll('C ohne Kuerzung: gesamt', c2.steuer, 1757.27, 0.01);

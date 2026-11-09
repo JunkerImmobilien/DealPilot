@@ -477,8 +477,13 @@
 
   /** Unterreiter Steuer: Verlauf wie im Reiter Steuer, Text, im Detail die Tabelle */
   function steuer(a, bestand) {
+    /* v3268 · Halter GmbH/UG: Betriebsausgaben statt Werbungskosten, und KEIN steuerfreier Verkauf nach zehn Jahren */
+    var _bg = (window._dpBegriff ? window._dpBegriff() : { corp: false, wort: 'Werbungskosten' });
     var h = karte(kopfzeile('Steuerverlauf · wann das Objekt steuerlich positiv wird') + '<div data-dp-steuerverlauf="1"></div>'
-      + erkl('<b>So liest du die Grafik:</b> Die Balken zeigen je Jahr das Ergebnis der Anlage V (Einnahmen minus Werbungskosten). Grün ist ein Verlust, der deine Steuer senkt, Gold ein Gewinn, auf den Steuer fällig wird. '
+      + erkl(_bg.corp
+        ? '<b>So liest du die Grafik:</b> Die Balken zeigen je Jahr das Ergebnis des Objekts in der Gesellschaft (Betriebseinnahmen minus Betriebsausgaben). '
+          + 'Die Linie ist der Cashflow nach Steuern. Eine Zehnjahresfrist gibt es in der GmbH/UG nicht: ' + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || 'ein Veräußerungsgewinn ist immer steuerpflichtig.') + ' Es ist dieselbe Rechnung wie im Reiter Steuer.'
+        : '<b>So liest du die Grafik:</b> Die Balken zeigen je Jahr das Ergebnis der Anlage V (Einnahmen minus Werbungskosten). Grün ist ein Verlust, der deine Steuer senkt, Gold ein Gewinn, auf den Steuer fällig wird. '
         + 'Die Linie ist der Cashflow nach Steuern. Markiert sind der Wendepunkt, das Ende der Zinsbindung und das Datum, ab dem ein Verkauf nach § 23 EStG steuerfrei ist. Es ist dieselbe Rechnung wie im Reiter Steuer.'));
     h += karte(kopfzeile('Steuerliche Zusammenfassung')
       + (has(a.steuer_zusammenfassung)
@@ -486,7 +491,7 @@
         : '<div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div>')
       + '<div class="dp-pa-fuss dp-pa-d">Eine Einordnung aus deinen Eingaben im Reiter Steuer – keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
     h += belegeHtml(bestand);
-    h += '<div class="dp-pa-d">' + karte(kopfzeile('Einnahmen und Werbungskosten nach Gruppen') + '<div class="dp-pa4-tab" data-dp-pa4-steuertab="1"></div>'
+    h += '<div class="dp-pa-d">' + karte(kopfzeile((_bg.corp ? 'Betriebseinnahmen und Betriebsausgaben' : 'Einnahmen und Werbungskosten') + ' nach Gruppen') + '<div class="dp-pa4-tab" data-dp-pa4-steuertab="1"></div>'
       + erkl('Die Gruppen sind die des Reiters Steuer: <b>Finanzierung</b> (Zinsen und Finanzierungskosten), <b>Betriebskosten</b> (umgelegt und nicht umlagefähig), <b>Verwaltung</b>, <b>Sonstiges</b>, <b>AfA</b> sowie <b>Erhaltung und anschaffungsnaher Aufwand</b>. '
         + 'Umgelegte Nebenkosten stehen bei den Einnahmen und bei den Betriebskosten, sie heben sich auf. Die Zuführung zur Erhaltungsrücklage ist nicht abziehbar und fehlt deshalb. Steuerwirkung ist der Unterschied der Steuer mit und ohne dieses Objekt (Plus = Erstattung).'), 'dp-pa4-mt') + '</div>';
     try { setTimeout(steuerTabelleAlle, 0); } catch (e) {}

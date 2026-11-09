@@ -767,6 +767,9 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       '<div class="tax-item tax-result" style="grid-column:auto;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:12px 16px"><div class="tax-label">' + refundLabel + ' durch dieses Objekt</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div>' +
         '<div class="tax-label" style="font-weight:400;font-size:12px">' + (impact.refund >= 0 ? 'so viel weniger Steuer zahlst du mit diesem Objekt' : 'so viel mehr Steuer zahlst du mit diesem Objekt') + '</div></div>' +
     '</div>' +
+    /* v3268 · GbR: Feststellung § 180 AO - nur dein Anteil geht in deine ESt */
+    (function () { var _f = _dpGbrFeststellung(displayYear, totals.ergebnis); return _f ? '<div class="tax-grid" style="margin-top:10px">' + _dpGbrFeststellungHtml(_f) + '</div>' : ''; })() +
+    (function () { var _r = _dpRuecklageHinweis(); return _r ? '<div class="tax-grid" style="margin-top:10px">' + _r + '</div>' : ''; })() +
     '<details class="tax-rechenweg" style="margin-top:12px"' + (_rwOffen ? ' open' : '') + ' ontoggle="try{localStorage.setItem(\'dp_tax_rechenweg\',this.open?\'1\':\'0\')}catch(e){}">' +
     '<summary style="cursor:pointer;font-size:13px;font-weight:600;padding:6px 0">Rechenweg — mit deinem Einkommen und den vorher gekauften Objekten</summary>' +
     /* V283b: Neues Layout — LINKS=OHNE Immobilie, RECHTS=MIT Immobilie */
@@ -862,7 +865,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       /* ─── LINKS: zvE ohne Immobilie ─── */
       '<div class="tax-item"><div class="tax-label">zvE ohne Immobilie (mit aktuellem Bestand)</div><div class="tax-val">' + fE(baseIncome, 0) + '</div></div>' +
       /* ─── RECHTS: zvE mit Immobilie ─── */
-      '<div class="tax-item"><div class="tax-label">zvE mit dieser Immobilie</div><div class="tax-val">' + fE(baseIncome + totals.ergebnis, 0) + '</div></div>' +
+      '<div class="tax-item"><div class="tax-label">zvE mit dieser Immobilie' + (totals.gbrAnteil !== 1 ? ' (dein Anteil ' + String(Math.round(totals.gbrAnteil * 10000) / 100).replace('.', ',') + ' %)' : '') + '</div><div class="tax-val">' + fE(baseIncome + totals.ergebnisAnteil, 0) + '</div></div>' +
       /* ─── LINKS/RECHTS: Steuerlast ohne/mit (v2891: ESt + Soli + Kirchensteuer) ─── */
       (function () {
         function _auf(L) {
@@ -898,9 +901,9 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       var reihe = [];
       for (var _ki = 0; _ki < yearIdx && State.cfRows && _ki < State.cfRows.length; _ki++) {
         var _kr = State.cfRows[_ki];
-        if (_kr && typeof _kr.cal === 'number') reihe.push({ jahr: _kr.cal, erg: _vvRoh(_kr.cal, _ki).ergebnis });
+        if (_kr && typeof _kr.cal === 'number') { var _vr = _vvRoh(_kr.cal, _ki); reihe.push({ jahr: _kr.cal, erg: _vr.ergebnis, entgelte: _vr.zinsen }); }
       }
-      reihe.push({ jahr: displayYear, erg: _erg });
+      reihe.push({ jahr: displayYear, erg: _erg, entgelte: (totals.values && Number(totals.values.schuldzinsen)) || 0 });   /* v3268 */
       return _kstMitVortrag(reihe, _mandRate);
     })();
     var _kstJ = _kstR[_kstR.length - 1];
@@ -912,12 +915,35 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
         '<div class="tax-item" style="grid-column:1/-1;background:#1b1408;border-color:var(--gold-d)"><div class="tax-label" style="color:var(--gold-h)">Halter \u00b7 ' + (_mandName || 'Gesellschaft') + '</div><div class="tax-val" style="color:var(--gold-h)">K\u00f6rperschaftsteuer-Regime \u00b7 ' + _rateTxt + '</div></div>' +
         /* v814-B */ '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,0.15)"><div class="tax-label" style="font-size:12px;color:var(--muted)">Halter wechseln</div><div class="tax-val" style="font-size:12px"><a href="#" onclick="if(typeof showSettings===&quot;function&quot;)showSettings();return false" style="color:var(--gold-d);text-decoration:underline">In den Einstellungen &rarr;</a></div></div>' +
         '<div class="tax-item"><div class="tax-label">Betriebseinnahmen (Miete)</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
-        '<div class="tax-item"><div class="tax-label">Betriebsausgaben gesamt</div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
+        '<div class="tax-item"><div class="tax-label">Betriebsausgaben gesamt <span class="tax-info" title="Dieselben Posten wie die Werbungskosten im Privatvermögen (Zinsen, Bewirtschaftung, Verwaltung, AfA, Erhaltung). Bei einer GmbH/UG heißen sie Betriebsausgaben — Einkünfte aus Gewerbebetrieb, § 8 Abs. 2 KStG.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
+        _dpRuecklageHinweis() +
+        /* v3268 · Kosten der GESELLSCHAFT (Buchfuehrung, Abschluss, IHK, Konto …)
+           gehoeren nicht dem Objekt: sie stehen am Mandanten und werden unten in
+           der Steuer der Gesellschaft abgezogen. Hier nur als anteilige Auskunft. */
+        (function () {
+          try {
+            var _hId = (document.getElementById('halter') || {}).value;
+            var _kf = (window.DealPilotMandanten && DealPilotMandanten.kostenFuer) ? DealPilotMandanten.kostenFuer(_hId, displayYear) : null;
+            var _nObj = 1;
+            try { var _al = DealPilotWKAggregator.getAllObjectsWithWK() || []; var _c = 0, _cur = (window._currentObjId || (window.State && State.currentObjectId) || window._currentObjKey || null), _drin = false;
+              _al.forEach(function (o) { if (o && String(o.halter || 'privat') === String(_hId)) { _c++; if (o.id === _cur) _drin = true; } }); _nObj = Math.max(1, _c + (_drin ? 0 : 1)); } catch (_eN) {}
+            if (!_kf || !_kf.erfasst || !(_kf.summe > 0)) {
+              return '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Kosten der Gesellschaft ' + displayYear + '</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.45">Nicht erfasst. Buchführung/Steuerberatung, Jahresabschluss/Offenlegung, IHK-Beitrag und Kontoführung der Gesellschaft gehören <b>nicht ins Objekt</b>, sondern an den Mandanten (Einstellungen &rsaquo; Mandanten &rsaquo; Kosten der Gesellschaft). Dort mindern sie die Körperschaftsteuer über alle Objekte.</div></div>';
+            }
+            return '<div class="tax-item" style="grid-column:1/-1;opacity:.92"><div class="tax-label">Kosten der Gesellschaft ' + displayYear + ' &middot; anteilig (1/' + _nObj + ')</div><div class="tax-val" style="font-size:12.5px;font-weight:400;line-height:1.45">' + fE(_kf.summe / _nObj, 0) + ' von ' + fE(_kf.summe, 0)
+              + ' &mdash; nur zur Auskunft. Abgezogen werden sie einmal in der Steuer der Gesellschaft (Mandanten-Steuerakte unten, Jahresabschluss), nicht im Ergebnis dieses Objekts.</div></div>';
+          } catch (_eK) { return ''; }
+        })() +
         '<div class="tax-item tax-highlight" style="grid-column:1/-1"><div class="tax-label">Beitrag zum GmbH-Ergebnis (' + displayYear + ')</div><div class="tax-val" style="color:' + _ergCol + '">' + fE(_erg, 0, true) + '</div></div>' +
-        '<div class="tax-item"><div class="tax-label">K\u00f6rperschaftsteuer-Satz</div><div class="tax-val">' + _rateTxt + '</div></div>' +
+        /* v3268: Satz DIESES Jahres aus dem Kern (§ 23 Abs. 1 KStG n. F.), nicht der Anzeigesatz */
+        '<div class="tax-item"><div class="tax-label">K\u00f6rperschaftsteuer + Soli ' + displayYear + '</div><div class="tax-val">' + ((_kstJ && _kstJ.kstSoliPct) ? (Math.round(_kstJ.kstSoliPct * 1000) / 1000).toString().replace('.', ',') + ' %' : _rateTxt) + '</div></div>' +
         '<div class="tax-item tax-result"><div class="tax-label">Ertragsteuer KSt + Soli + GewSt (dieses Objekt)</div><div class="tax-val" style="color:' + (_erg >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_erg >= 0 ? '\u2212' + fE(_kst, 0) : '0 \u20ac') + '</div></div>' +
         (_erg < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlust</div><div class="tax-val" style="color:var(--green)">keine Erstattung \u00b7 Verlustvortrag ins Folgejahr (Stand ' + fE(_kstJ.vortragNach, 0) + ')</div></div>' : '') +
         _gesDetailHtml(_kstJ) +
+        /* v3268 · Verkauf aus der Gesellschaft: keine Zehnjahresfrist */
+        '<div class="tax-item" style="grid-column:1/-1;opacity:.92"><div class="tax-label">Verkauf</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.45">'
+          + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || 'Veräußerungsgewinn immer steuerpflichtig — die 10-Jahres-Frist gilt nur im Privatvermögen.')
+          + ' Gewinn = Verkaufspreis − Buchwert (Anschaffungskosten − bisherige AfA) − Verkaufskosten.</div></div>' +
         (_kstJ.genutzt > 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlustvortrag verrechnet (\u00a7 10d EStG)</div><div class="tax-val" style="color:var(--green)">' + fE(_kstJ.genutzt, 0) + ' aus den Vorjahren \u00b7 Rest ' + fE(_kstJ.vortragNach, 0) + '</div></div>' : '') +
         (function(){  /* v813-3c: echte Mandanten-Steuerakte (KSt ueber alle Objekte der Gesellschaft) */
           try {
@@ -938,6 +964,10 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
               _sum += _vv; _n++;
             });
             if (!_curInList) { _sum += _erg; _n++; }
+            /* v3268 · Kosten der Gesellschaft (am Mandanten, je Jahr) einmal abziehen */
+            var _kostenG = function (j) { try { var k = DealPilotMandanten.kostenFuer(_curHalter, j); return (k && k.erfasst) ? (Number(k.summe) || 0) : 0; } catch (_eKG) { return 0; } };
+            var _kgJahr = _kostenG(displayYear);
+            _sum -= _kgJahr;
             /* v2891: KSt der Gesellschaft nach Verlustvortrag - die Summen
                aller Vorjahre aus den gespeicherten Jahresergebnissen. */
             var _jahre = {};
@@ -952,21 +982,25 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
               var _cj = State.cfRows[_ki2] && State.cfRows[_ki2].cal;
               if (typeof _cj === 'number' && _cj < displayYear) _jahre[_cj] = (_jahre[_cj] || 0) + _vvRoh(_cj, _ki2).ergebnis;
             }
+            Object.keys(_jahre).forEach(function (k) { _jahre[k] -= _kostenG(Number(k)); });
             var _reiheG = Object.keys(_jahre).map(Number).sort(function (a, b) { return a - b; })
               .map(function (j) { return { jahr: j, erg: _jahre[j] }; });
-            _reiheG.push({ jahr: displayYear, erg: _sum });
+            /* v3268: Zinsen kennt DealPilot hier nur fuer DIESES Objekt (die anderen liefern nur ihr Ergebnis) */
+            _reiheG.push({ jahr: displayYear, erg: _sum, entgelte: (totals.values && Number(totals.values.schuldzinsen)) || 0 });
             var _kG = _kstMitVortrag(_reiheG, _mandRate);
             var _kstGes = _kG[_kG.length - 1].kst;
             var _sumCol = _sum >= 0 ? 'var(--gold-d)' : 'var(--green)';
             return '<div class="tax-item" style="grid-column:1/-1;background:#140f06;border-color:var(--gold-d)">'
                  +   '<div class="tax-label" style="color:var(--gold-h)">Mandanten-Steuerakte &middot; ' + (_mandName || 'Gesellschaft') + ' (' + _n + ' Objekt' + (_n === 1 ? '' : 'e') + ', ' + displayYear + ')</div>'
                  +   '<div class="tax-val" style="color:' + _sumCol + '">Gesamt-Ergebnis ' + fE(_sum, 0, true) + '</div>'
+                 + (_kgJahr > 0 ? '<div class="tax-label" style="font-weight:400;font-size:11.5px;grid-column:1/-1">nach Kosten der Gesellschaft ' + fE(_kgJahr, 0) + ' (Mandant, nicht je Objekt)</div>' : '')
                  + '</div>'
                  + '<div class="tax-item tax-result" style="grid-column:1/-1">'
                  +   '<div class="tax-label">K&ouml;rperschaftsteuer der Gesellschaft (' + displayYear + ')</div>'
                  +   '<div class="tax-val" style="color:' + (_sum >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_sum >= 0 ? '&minus;' + fE(_kstGes, 0) : '0 &euro;') + '</div>'
                  + '</div>'
-                 + (_sum < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Gesellschaft im Verlust</div><div class="tax-val" style="color:var(--green)">keine KSt &middot; Verlustvortrag</div></div>' : '');
+                 + (_sum < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Gesellschaft im Verlust</div><div class="tax-val" style="color:var(--green)">keine KSt &middot; Verlustvortrag</div></div>' : '')
+                 + '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Hinzurechnung &sect; 8 Nr. 1 GewStG</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.45">Hier nur mit den Zinsen dieses Objekts gerechnet. Der Freibetrag gilt je Gesellschaft &mdash; die Summe der Zinsen aller Objekte steht im Jahresabschluss der Gesellschaft.</div></div>';
           } catch(_e) { return ''; }
         })() +
         /* ═══════════════════════════════════════════════════════════════
@@ -993,7 +1027,14 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
             if (!(_erg > 0)) return '';
             var _nachKSt = _erg - _kst;
             /* v2984: UG — 25 % in die gesetzliche Ruecklage (§ 5a Abs. 3 GmbHG), nur der Rest ist ausschuettbar */
-            var _ugRl = ((_gesSteuerParams() || {}).rechtsform === 'ug') ? _nachKSt * 0.25 : 0;
+            /* v3268 · § 5a Abs. 3 GmbHG: ein Viertel des um den Verlustvortrag aus dem Vorjahr
+               geminderten Jahresueberschusses (Kern ugRuecklage). Verlustvortrag hier = Summe der
+               Jahresergebnisse (nach Steuern) dieses Objekts in den Vorjahren, soweit negativ. */
+            var _vvUg = 0;
+            for (var _ui = 0; _ui < _kstR.length - 1; _ui++) _vvUg += (_kstR[_ui].erg || 0) - (_kstR[_ui].kst || 0);
+            _vvUg = Math.max(0, -_vvUg);
+            var _KU = window.DealPilotUeberfuehrungKern;
+            var _ugRl = ((_gesSteuerParams() || {}).rechtsform === 'ug') ? (_KU && _KU.ugRuecklage ? _KU.ugRuecklage(_nachKSt, _vvUg) : _nachKSt * 0.25) : 0;
             _nachKSt -= _ugRl;
             var _kap = _nachKSt * 0.26375;          /* 25 % KapESt + 5,5 % Soli darauf */
             var _beim = _nachKSt - _kap;
@@ -1001,7 +1042,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
             return '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,.22)">'
                  +   '<div class="tax-label" style="color:var(--gold-h)">Wenn ausgesch&uuml;ttet wird &middot; zweite Steuerebene</div>'
                  +   '<div class="tax-val" style="font-size:13px;color:var(--muted);line-height:1.5">'
-                 +     (_ugRl > 0 ? 'UG-Pflichtr&uuml;cklage 25 % (&sect; 5a Abs. 3 GmbHG) ' + fE(_ugRl, 0) + ' &middot; ' : '')
+                 +     (_ugRl > 0 ? 'UG-Pflichtr&uuml;cklage 25 % (&sect; 5a Abs. 3 GmbHG' + (_vvUg > 0 ? ', nach Verlustvortrag ' + fE(_vvUg, 0) : '') + ') ' + fE(_ugRl, 0) + ' &middot; ' : '')
                  +     'Aussch&uuml;ttbar nach Steuern ' + fE(_nachKSt, 0)
                  +     ' &middot; abz&uuml;glich Kapitalertragsteuer 26,375 % ' + fE(_kap, 0)
                  +   '</div>'
@@ -1172,6 +1213,7 @@ function renderTaxTimeline() {
       einnahmen: totals.einnahmen,
       werbungskosten: totals.werbungskosten,
       immoResult: totals.ergebnis,
+      zinsen: (totals.values && Number(totals.values.schuldzinsen)) || 0,   /* v3268: Entgelte § 8 Nr. 1 GewStG */
       taxDelta: totals.taxDelta,
       refund: totals.refund,
       erh: totals.values ? (Number(totals.values.erhaltungsaufwand) || 0) : 0   /* v2992 */
@@ -1220,7 +1262,7 @@ function renderTaxTimeline() {
     var chtml = '<div class="tax-tl-grid">';
     var sumKst = 0;
     /* v2891: KSt je Jahr nach Verlustvortrag aus den Vorjahren */
-    var _kstTl = _kstMitVortrag(timeline.map(function (t) { return { jahr: t.year, erg: t.immoResult }; }), _tlRate);
+    var _kstTl = _kstMitVortrag(timeline.map(function (t) { return { jahr: t.year, erg: t.immoResult, entgelte: t.zinsen }; }), _tlRate);
     timeline.forEach(function(t, _ti){
       var kst = _kstTl[_ti].kst;
       sumKst += kst;
@@ -1415,6 +1457,14 @@ function _computeAutoForYear(yearIdx, year) {
     ? (!!_invCb.checked || (document.getElementById('moebl_tax_active') || {}).checked === true)
     : ((document.getElementById('moebl_tax_active') || {}).checked !== false);
   var sanYearsChoice = (document.getElementById('san_tax_years') || {}).value || 'auto';
+  /* v3268 · § 82b EStDV (Verteilung auf 2-5 Jahre) gilt nur fuer Gebaeude, die NICHT zu
+     einem Betriebsvermoegen gehoeren. Bei Halter GmbH/UG ist Erhaltungsaufwand sofort
+     Betriebsausgabe - die Verteilung wird nicht angeboten und nicht gerechnet. */
+  var _ohne82b = false;
+  try { _ohne82b = !!(window.DealPilotMandanten && DealPilotMandanten.istKoerperschaft && DealPilotMandanten.istKoerperschaft((document.getElementById('halter') || {}).value || 'privat')); } catch (_e82) {}
+  if (_ohne82b && /^[2-5]$/.test(String(sanYearsChoice))) sanYearsChoice = '1';
+  try { if (window.State) State._ohne82b = _ohne82b; } catch (_e82b) {}
+  try { var _selS = document.getElementById('san_tax_years'); if (_selS && _selS.options) [].forEach.call(_selS.options, function (o) { if (/^[2-5]$/.test(o.value)) { o.disabled = _ohne82b; o.title = _ohne82b ? '§ 82b EStDV gilt nur im Privatvermögen' : ''; } }); } catch (_e82c) {}
   var moeblYearsChoice = parseInt(((document.getElementById('inv_tax_years') || {}).value)
     || (document.getElementById('moebl_tax_years') || {}).value || '10');   /* v2261: sichtbare Auswahl zuerst */
 
@@ -1456,7 +1506,7 @@ function _computeAutoForYear(yearIdx, year) {
   /* v3214 · N137 · W-15: geplante Sanierungen späterer Jahre (sanierung-plan.js). Erhaltung in den
      drei Jahren nach der Anschaffung zählt zur 15-%-Grenze mit #san (netto). Ohne Liste ist _spCtx
      ohne Wirkung: steuerJahr() liefert 0, fensterNetto 0 - die Rechnung bleibt bitgleich. */
-  var _spCtx = { grenze: sanGrenze15, sanNetto: san_netto, ust: _sanUstT, afaSatz: afa_satz_eff };
+  var _spCtx = { grenze: sanGrenze15, sanNetto: san_netto, ust: _sanUstT, afaSatz: afa_satz_eff, ohne82b: _ohne82b };   /* v3268 */
   var _sp = (window.DpSanierungPlan && typeof DpSanierungPlan.steuerJahr === 'function')
     ? DpSanierungPlan.steuerJahr(year, _spCtx) : { erh: 0, anah: 0, afa: 0, fensterNetto: 0 };
   var sanAnschaffungsnah, sanLaufzeit, sanAfaJaehrlich;
@@ -1743,7 +1793,9 @@ function _gesDetailHtml(j) {
           ? (P.hebesatz > 0 ? fE(j.gewst || 0, 0) + ' bis zur Bestätigung (ohne erweiterte K&uuml;rzung, Hebesatz ' + String(P.hebesatz).replace('.', ',') + ' %)' : 'bis zur Best&auml;tigung nicht rechenbar')
             + ' &middot; <b style="color:var(--red)">erweiterte K&uuml;rzung beantragt &mdash; ' + ((st.offen && st.offen.length) || 'die') + ' Pr&uuml;fpunkte im Mandanten best&auml;tigen, dann 0 &euro;</b>'
           : (P.hebesatz > 0
-              ? fE(j.gewst || 0, 0) + ' (Gewerbeertrag ' + fE(j.gewerbeertrag || 0, 0) + ' nach K&uuml;rzung Grundsteuer ' + fE(j.gewKuerzung || 0, 0) + ', &times; 3,5 % &times; ' + String(P.hebesatz).replace('.', ',') + ' %)'
+              ? fE(j.gewst || 0, 0) + ' (Gewerbeertrag ' + fE(j.gewerbeertrag || 0, 0) + (j.kuerzungFehlt ? ' ohne K&uuml;rzung &sect; 9 Nr. 1 S. 1 GewStG &mdash; <b>' + j.kuerzungFehlt + ' eintragen</b> (Reiter Steuer, Halter &amp; Eigentum)' : ' nach K&uuml;rzung 0,11 % des Grundsteuerwerts ' + fE(j.gewKuerzung || 0, 0))
+                + (j.hinzurechnung > 0 ? ' und Hinzurechnung &sect; 8 Nr. 1 GewStG ' + fE(j.hinzurechnung, 0) : '') + ', &times; 3,5 % &times; ' + String(P.hebesatz).replace('.', ',') + ' %)'
+                + _hinzHinweis(j)
               : 'nicht rechenbar &middot; <b style="color:var(--red)">Hebesatz fehlt &mdash; bitte im Mandanten erg&auml;nzen</b>'));
     var moebl = parseDe((document.getElementById('moebl') || {}).value) || 0;
     var h = '<div class="tax-item" style="grid-column:1/-1;opacity:.92"><div class="tax-label">davon K&ouml;rperschaftsteuer + Soli ' + fE(j.kstSoli || 0, 0) + ' &middot; Gewerbesteuer</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.5">' + gew + '</div></div>';
@@ -1758,6 +1810,20 @@ function _gesDetailHtml(j) {
     return h;
   } catch (e) { return ''; }
 }
+/* v3268 · Hinzurechnung § 8 Nr. 1 GewStG: Freibetrag je GESELLSCHAFT. Hier
+   (je Objekt) zaehlen nur die Zinsen dieses Objekts; die Summe aller Objekte
+   rechnet der Jahresabschluss der Gesellschaft. Freibetrag und Satz aus dem
+   Kern (Spiegel des Jahreswerte-Registers), nicht hart im Code. */
+function _hinzHinweis(j) {
+  try {
+    var H = (window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINZURECHNUNG_8_1) || null;
+    if (!H) return '';
+    var fb = fE(H.freibetrag, 0), pz = String(H.satz * 100).replace('.', ',') + ' %';
+    return '<br><span style="opacity:.85">Hinzurechnung &sect; 8 Nr. 1 GewStG: ' + pz + ' der Zinsen (Entgelte f&uuml;r Schulden), soweit sie zusammen mit denen der anderen Objekte der Gesellschaft ' + fb + ' im Jahr &uuml;bersteigen'
+      + (j && j.entgelte > 0 ? ' &mdash; dieses Objekt: ' + fE(j.entgelte, 0) + (j.hinzurechnung > 0 ? ' &rarr; ' + fE(j.hinzurechnung, 0) : ', keine Hinzurechnung') : '')
+      + '. Erfasst sind nur Zinsen, keine Miet-/Pachtanteile. Die Summe &uuml;ber alle Objekte rechnet der Jahresabschluss.</span>';
+  } catch (e) { return ''; }
+}
 function _gesSteuerParams() {
   try { return (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter() : null; } catch (e) { return null; }
 }
@@ -1765,11 +1831,13 @@ function _kstMitVortrag(reihe, rate, opt) {
   var K = window.DealPilotUeberfuehrungKern, P = _gesSteuerParams();
   if (K && P) {
     opt = opt || {};
-    var gs = (opt.grundsteuer != null) ? opt.grundsteuer : ((parseDe((document.getElementById('grundsteuer') || {}).value) || 0) * 12);
+    /* v3268: Grundsteuerwert lt. Bescheid fuer die einfache Kuerzung § 9 Nr. 1 S. 1 GewStG (nicht der Grundsteuerbetrag) */
+    var gs = (opt.grundsteuerwert != null) ? opt.grundsteuerwert : (parseDe((document.getElementById('grundsteuerwert') || {}).value) || 0);
     var gd = (opt.gdZins != null) ? opt.gdZins : ((window.State && State._gesGdZins) || 0);
-    return K.steuerReihe((reihe || []).map(function (r) { return { jahr: r.jahr, erg: (Number(r.erg) || 0) - gd, grundsteuer: gs }; }), P)
+    /* v3268: Entgelte fuer Schulden (§ 8 Nr. 1 GewStG) = Schuldzinsen der Zeile + Gesellschafterdarlehen */
+    return K.steuerReihe((reihe || []).map(function (r) { return { jahr: r.jahr, erg: (Number(r.erg) || 0) - gd, grundsteuerwert: gs, entgelte: (Number(r.entgelte) || 0) + gd }; }), P)
       .map(function (x) { return { jahr: x.jahr, erg: x.erg, genutzt: x.genutzt, bemessung: x.bemessung, kst: x.steuer, kstSoli: x.kst, gewst: x.gewst,
-        gewKuerzung: x.gewKuerzung, gewerbeertrag: x.gewerbeertrag, vortragNach: x.vortragNach, vortragGewNach: x.vortragGewNach, gdZins: gd }; });
+        gewKuerzung: x.gewKuerzung, kuerzungFehlt: x.kuerzungFehlt, kstSoliPct: x.kstSoliPct, hinzurechnung: x.hinzurechnung, entgelte: x.entgelte, gewerbeertrag: x.gewerbeertrag, vortragNach: x.vortragNach, vortragGewNach: x.vortragGewNach, gdZins: gd }; });
   }
   return _kstMitVortragAlt(reihe, rate);
 }
@@ -1801,7 +1869,9 @@ function _vvRoh(year, idx) {
   var k = year + '|' + idx;
   if (_vvMerk && _vvMerk[k]) return _vvMerk[k];
   var t = _computeYearTotal(year, idx, undefined, true);
-  var r = { ergebnis: t.ergebnis, basis: t.zve };
+  var r = { ergebnis: t.ergebnis, basis: t.zve,
+            ergebnisAnteil: (t.ergebnisAnteil != null ? t.ergebnisAnteil : t.ergebnis),      /* v3268 */
+            zinsen: (t.values && Number(t.values.schuldzinsen)) || 0 };
   if (_vvMerk) _vvMerk[k] = r;
   return r;
 }
@@ -1812,13 +1882,88 @@ function _dpVerlustvortragBis(yearIdx) {
     var row = State.cfRows[i];
     if (!row || typeof row.cal !== 'number') continue;
     var r = _vvRoh(row.cal, i);
-    var gesamt = r.basis + r.ergebnis;
+    var gesamt = r.basis + r.ergebnisAnteil;   /* v3268: GbR nur dein Anteil */
     if (gesamt < 0) vortrag += -gesamt;
     else if (vortrag > 0) vortrag -= Math.min(vortrag, gesamt);
   }
   return vortrag;
 }
 window._dpVerlustvortragBis = _dpVerlustvortragBis;
+
+/* v3268 · Anteil des Nutzers am Ergebnis, wenn das Objekt einer GbR gehoert.
+   Quelle ist mandanten.js anteil() (eine Stelle). Privat/GmbH/UG -> 1. */
+function _dpGbrAnteil() {
+  try {
+    var h = String((document.getElementById('halter') || {}).value || 'privat');
+    if (h === 'privat') return 1;
+    if (window.DealPilotMandanten && DealPilotMandanten.anteil) {
+      var a = DealPilotMandanten.anteil(h);
+      return (typeof a === 'number' && isFinite(a) && a > 0 && a <= 1) ? a : 1;
+    }
+  } catch (e) {}
+  return 1;
+}
+window._dpGbrAnteil = _dpGbrAnteil;
+/* v3268 · Werbungskosten (privat, GbR) oder Betriebsausgaben (GmbH/UG) */
+function _dpBegriff(halterId) {
+  try { if (window.DealPilotMandanten && DealPilotMandanten.kostenBegriff) return DealPilotMandanten.kostenBegriff(halterId); } catch (e) {}
+  return { corp: false, wort: 'Werbungskosten', einnahmen: 'Einnahmen', ergebnis: 'Überschuss / Verlust V+V' };
+}
+window._dpBegriff = _dpBegriff;
+/* v3268 · Uebersicht „Gesonderte und einheitliche Feststellung (§ 180 AO)":
+   Einkuenfte der GbR (alle ihre Objekte im Jahr, aus den gespeicherten
+   Jahresergebnissen; dieses Objekt mit dem aktuellen Wert) und je
+   Gesellschafter Anteil und Betrag (mandanten.js feststellung()). */
+function _dpGbrFeststellung(jahr, ergebnisDiesesObjekt) {
+  try {
+    var h = String((document.getElementById('halter') || {}).value || 'privat');
+    var M = window.DealPilotMandanten;
+    if (h === 'privat' || !M || !M.get || !M.feststellung) return null;
+    var m = M.get(h);
+    if (!m || m.id !== h || m.rechtsform !== 'gbr') return null;
+    var curId = (window._currentObjId || (window.State && State.currentObjectId) || window._currentObjKey || null);
+    var sum = Number(ergebnisDiesesObjekt) || 0, n = 1;
+    var all = (window.DealPilotWKAggregator && DealPilotWKAggregator.getAllObjectsWithWK) ? DealPilotWKAggregator.getAllObjectsWithWK() : [];
+    (Array.isArray(all) ? all : []).forEach(function (o) {
+      if (!o || o.id === curId || String(o.halter || 'privat') !== h) return;
+      var v = o.wk_per_year && o.wk_per_year[String(jahr)];
+      if (typeof v === 'number' && isFinite(v)) { sum += v; n++; }
+    });
+    var f = M.feststellung(h, sum);
+    if (f) { f.objekte = n; f.jahr = jahr; f.diesesObjekt = Number(ergebnisDiesesObjekt) || 0; }
+    return f;
+  } catch (e) { return null; }
+}
+window._dpGbrFeststellung = _dpGbrFeststellung;
+/* v3268 · Ruecklagen sind nicht abgezogen (calc.js nul_st) - das sagen, statt still */
+function _dpRuecklageHinweis() {
+  try {
+    var t = (window.State && State.ruecklageTeile) || null;
+    if (!t || !((t.eigen || 0) + (t.weg || 0) > 0)) return '';
+    var w = _dpBegriff().wort;
+    return '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Nicht als ' + w + ' abgezogen</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.45">'
+      + (t.eigen > 0 ? 'Eigene Instandhaltungsrücklage ' + fE(t.eigen, 0) + ' (rein kalkulatorisch)' : '')
+      + (t.eigen > 0 && t.weg > 0 ? ' · ' : '')
+      + (t.weg > 0 ? 'Rücklagenanteil des Hausgelds ' + fE(t.weg, 0) + ' — erst bei Verausgabung für Erhaltung abziehbar' : '')
+      + '. Im Cashflow bleiben beide enthalten.</div></div>';
+  } catch (e) { return ''; }
+}
+function _dpGbrFeststellungHtml(f) {
+  if (!f) return '';
+  var rows = f.zeilen.map(function (z) {
+    return '<div class="tax-bestand-row"><span class="tax-bestand-name">' + String(z.name).replace(/&/g, '&amp;').replace(/</g, '&lt;') + (z.ich ? ' <b>&middot; geht in deine ESt</b>' : '') + '</span>'
+      + '<span class="tax-bestand-date">' + String(Math.round(z.anteilPct * 100) / 100).replace('.', ',') + ' %</span>'
+      + '<span class="tax-bestand-val">' + fE(z.betrag, 0, true) + '</span></div>';
+  }).join('');
+  return '<div class="tax-item" style="grid-column:1/-1;flex-direction:column;align-items:stretch;gap:6px">'
+    + '<div class="tax-label">Gesonderte und einheitliche Feststellung (&sect; 180 AO) &middot; ' + String(f.name || 'GbR').replace(/</g, '&lt;') + ' &middot; ' + f.jahr + '</div>'
+    + '<div class="tax-val" style="font-size:13px;font-weight:400">Einkünfte der GbR (V+V' + (f.objekte > 1 ? ', ' + f.objekte + ' Objekte' : ', dieses Objekt') + '): <b>' + fE(f.einkuenfte, 0, true) + '</b></div>'
+    + '<div class="tax-bestand-list tax-bestand-list-inline">' + rows + '</div>'
+    + '<div class="tax-label" style="font-weight:400;font-size:11.5px;line-height:1.45">In deine Einkommensteuer geht nur <b>dein Anteil</b> (' + fE(f.eigenerBetrag, 0, true) + ') — nicht 100 %. '
+    + (f.vollstaendig ? '' : '<b style="color:var(--red)">Die Anteile ergeben zusammen ' + String(Math.round(f.summePct * 100) / 100).replace('.', ',') + ' % statt 100 % — die weiteren Gesellschafter bitte im Mandanten ergänzen.</b> ')
+    + 'Sonderwerbungskosten und Ergänzungsbilanzen einzelner Gesellschafter sind nicht abgebildet.</div>'
+    + '</div>';
+}
 
 function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
   var auto = vorgabe ? {} : _computeAutoForYear(yearIdx, year);
@@ -1892,9 +2037,19 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
   /* v2891: Steuerlast des Jahres (Splitting, Soli, Kirchensteuer aus den
      Steuerangaben) und ein Verlustvortrag aus den Vorjahren dieses Objekts. */
   var _vortrag = (vorgabe || ohneVortrag) ? 0 : _dpVerlustvortragBis(yearIdx);
+  /* v3268 · GbR: nur DEIN Anteil geht in dein zvE (Marcel 09.11.2026). Die
+     Einkuenfte der GbR werden gesondert und einheitlich festgestellt (§ 180
+     Abs. 1 S. 1 Nr. 2 Buchst. a AO) und nach dem Gewinnverteilungsschluessel
+     zugerechnet. `ergebnis` bleibt das GANZE Ergebnis des Objekts (Anzeige,
+     wk_per_year-Snapshot — _getBestandLossesForYear rechnet den Anteil dort
+     selbst), `ergebnisAnteil` ist dein Teil. Privat und GmbH: Anteil 1, dann
+     wird nicht multipliziert (bit-gleich). Fuer ein fremdes Objekt (vorgabe,
+     Steuer-Mappe) ist der Halter hier nicht bekannt -> 1. */
+  var _gbrAnt = vorgabe ? 1 : _dpGbrAnteil();
+  var ergebnisAnteil = (_gbrAnt !== 1) ? ergebnis * _gbrAnt : ergebnis;
   var _genutzt = 0;
-  if (_vortrag > 0) _genutzt = Math.min(_vortrag, Math.max(0, baseIncome + ergebnis));
-  var impact = Tax.calcImmoTaxImpact(baseIncome, ergebnis - _genutzt, year);
+  if (_vortrag > 0) _genutzt = Math.min(_vortrag, Math.max(0, baseIncome + ergebnisAnteil));
+  var impact = Tax.calcImmoTaxImpact(baseIncome, ergebnisAnteil - _genutzt, year);
   impact.vortragGenutzt = _genutzt;
   impact.vortragVorhanden = _vortrag;
 
@@ -1904,6 +2059,8 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
     werbungskosten: werbungskosten,
     einnahmen: einnahmen,
     ergebnis: ergebnis,
+    ergebnisAnteil: ergebnisAnteil,   /* v3268: dein Anteil (GbR), sonst = ergebnis */
+    gbrAnteil: _gbrAnt,
     /* v1225 · DIE AfA IST EINE ZAHL, ABER ZWEI FORMULARZEILEN.
        Zeile 35 der Anlage V heisst woertlich „Absetzung fuer Abnutzung fuer
        Gebaeude (OHNE Betraege in den Zeilen 36 bis 41)"; die Sonderab-
@@ -2062,9 +2219,9 @@ function _renderQuickForm(years) {
 
   html += '</tbody></table></div>' +
     '<p class="hint" style="margin-top:8px">' +
-      '💡 Klicke ein Feld an, um den App-Vorschlag manuell zu überschreiben (z.B. tatsächliche Werbungskosten lt. Steuerbescheid). ' +
+      '💡 Klicke ein Feld an, um den App-Vorschlag manuell zu überschreiben (z.B. tatsächliche ' + _dpBegriff().wort + ' lt. ' + (_dpBegriff().corp ? 'Buchhaltung' : 'Steuerbescheid') + '). ' +
       'Der Pfeil ↺ neben einem überschriebenen Wert setzt ihn auf den Vorschlag zurück. ' +
-      'Umlagefähige Nebenkosten sind Einnahme und Werbungskosten zugleich und heben sich auf — sie stehen nur im Detail-Modus.' +
+      'Umlagefähige Nebenkosten sind Einnahme und ' + _dpBegriff().wort + ' zugleich und heben sich auf — sie stehen nur im Detail-Modus.' +
     '</p>';
 
   return html;
@@ -2273,7 +2430,7 @@ function _renderDetailForm(years) {
   // Summary box
   var refundColor = totals.refund >= 0 ? 'var(--green)' : 'var(--red)';
   html += '<div class="ytf-summary">' +
-    '<div class="ytf-sum-row"><span>Werbungskosten gesamt:</span><span class="num">' +
+    '<div class="ytf-sum-row"><span>' + _dpBegriff().wort + ' gesamt:</span><span class="num">' +
       Math.round(totals.werbungskosten).toLocaleString('de-DE') + ' €</span></div>' +
     '<div class="ytf-sum-row"><span>Einnahmen V+V:</span><span class="num">' +
       Math.round(totals.einnahmen).toLocaleString('de-DE') + ' €</span></div>' +

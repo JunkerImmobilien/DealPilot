@@ -93,6 +93,8 @@
         var adr = o.name || ([d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + d.ort : ''));
         var halter = d.halter || o.halter || '–';
         var spek = fr.spekulation_rest_tage == null ? '–' : (fr.spekulation_rest_tage <= 0 ? 'frei' : Math.ceil(fr.spekulation_rest_tage / 30.44) + ' Mon.');
+        /* v3268 · GmbH/UG: keine Zehnjahresfrist - der Verkauf ist immer steuerpflichtig */
+        try { if (window.DealPilotMandanten && DealPilotMandanten.istKoerperschaft && DealPilotMandanten.istKoerperschaft(d.halter || o.halter || 'privat')) spek = 'keine (GmbH/UG, stets steuerpflichtig)'; } catch (_eK) {}
         var san = fr.san_rest_tage == null ? '–' : (fr.san_rest_tage <= 0 ? 'abgelaufen' : Math.ceil(fr.san_rest_tage / 30.44) + ' Mon.');
         var quote = fr.san_quote == null ? '–' : (Math.round(fr.san_quote * 1000) / 10).toFixed(1).replace('.', ',') + ' %';
         var warn = (fr.san_quote != null && fr.san_quote > 0.15 && fr.san_rest_tage > 0) ? ' pst-warn' : '';

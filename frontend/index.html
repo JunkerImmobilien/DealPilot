@@ -2280,7 +2280,7 @@ label.dp-required.qc-required::after {
     <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-key"/></svg></span>Halter &amp; Eigentum</div>
     <p class="hint">Wer das Objekt hält, entscheidet die Steuerrechnung: Privat mit deinem Grenzsteuersatz, eine Gesellschaft (Pro) mit ihrem Körperschaftsteuersatz. Die Angaben zum Eigentum rechnen nicht mit — sie halten fest, wem das Objekt gehört.</p>
     <div class="g2">
-      <!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><input id="ueberf_daten" type="hidden" value=""><!-- v2984: Ergebnis des Ueberfuehrungs-Assistenten (JSON) --><!-- v816h-field-trl v816i-all-rightalign -->
+      <!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><!-- v3268 · Grundsteuerwert fuer die einfache Kuerzung § 9 Nr. 1 S. 1 GewStG (ab EZ 2025: 0,11 %), nur GmbH/UG ohne erweiterte Kuerzung --><div class="f" data-mand><label>Grundsteuerwert lt. Bescheid <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· nur GmbH/UG</span></label><div class="iw"><span class="pfx">€</span><input id="grundsteuerwert" type="text" inputmode="decimal" placeholder="z. B. 180000" class="trl" oninput="calc()"></div><span class="hint">Aus dem Grundsteuerwertbescheid. Ohne erweiterte Kürzung kürzt die Gewerbesteuer um 0,11 % davon (§ 9 Nr. 1 S. 1 GewStG ab 2025). Leer = keine Kürzung.</span></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><input id="ueberf_daten" type="hidden" value=""><!-- v2984: Ergebnis des Ueberfuehrungs-Assistenten (JSON) --><!-- v816h-field-trl v816i-all-rightalign -->
     <!-- v3197 · Marcel 05.11.2026: Eigentum je Objekt fehlte (Portfoliostrategie: „wem das Objekt gehört (Ehegatte, Quote) … Ehegattenverkauf, Schenkung, Güterstandsschaukel“). -->
     <details id="eig-box" style="grid-column:1/-1;margin-top:6px"><summary style="cursor:pointer;font:600 13px Inter,sans-serif;color:inherit;padding:4px 0">Eigentum &amp; Erwerb</summary>
       <div class="g2" style="margin-top:8px">
@@ -3927,16 +3927,16 @@ label.dp-required.qc-required::after {
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3238"></script>
+  <script src="js/calc.js?v=v3268"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3028"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3257"></script>
+<script src="js/tax.js?v=v3268"></script>
 <script src="js/steuer-verlauf.js?v=v3257"></script>
-<script src="js/pilot-analyse-v4.js?v=v3259"></script><!-- v3099 · Pilot-Analyse Fassung 4 (v3259: eine Kopfzeile + Reiterleiste; Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
+<script src="js/pilot-analyse-v4.js?v=v3268"></script><!-- v3099 · Pilot-Analyse Fassung 4 (v3259: eine Kopfzeile + Reiterleiste; Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
 <script src="js/config.js?v=v3246"></script>
 <script src="js/gnotkg.js?v=v3088"></script><!-- v3088 · Notar und Grundbuch nach Gebuehrenordnung -->
 <script src="js/versionsanzeige.js?v=v3035"></script><!-- v3035: Versionsanzeige aus version.json -->
@@ -3958,8 +3958,8 @@ label.dp-required.qc-required::after {
   <script src="js/immometrica-qc.js?v=v2199"></script>
   <script src="js/modal-boarding-skin.js?v=v3090"></script>
   <script src="js/provider-keys.js?v=v2180"></script>
-  <script src="js/ueberfuehrung-kern.js?v=v2984"></script>
-  <script src="js/mandanten.js?v=v3243"></script>
+  <script src="js/ueberfuehrung-kern.js?v=v3268"></script>
+  <script src="js/mandanten.js?v=v3268"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v3215"></script>
   <script src="js/apikeys.js?v=v3167"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
@@ -3973,8 +3973,8 @@ label.dp-required.qc-required::after {
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=v3003c"></script>
 <script src="js/anlage-v-2025.js?v=v1258"></script>
-<script src="js/werbungskosten-pdf.js?v=v3018d"></script>
-<script src="js/gesellschaft-abschluss.js?v=v3215"></script>
+<script src="js/werbungskosten-pdf.js?v=v3268"></script>
+<script src="js/gesellschaft-abschluss.js?v=v3268"></script>
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=v2247d"></script>
 <script src="js/market-rates-pf.js?v=v2254"></script>
@@ -3986,7 +3986,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3257"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3249"></script>
+<script src="js/storage.js?v=v3268"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4018,7 +4018,7 @@ label.dp-required.qc-required::after {
 <script src="js/dokument-import.js?v=v3236"></script>
 <script src="js/unterlagen.js?v=v3211"></script>
 <script src="js/sonderumlage.js?v=v3221"></script>
-<script src="js/sanierung-plan.js?v=v3223"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
+<script src="js/sanierung-plan.js?v=v3268"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
 <script src="js/darlehen-weitere-ui.js?v=v3261"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
 
 <script src="js/beleg-import.js?v=v3166"></script>
@@ -4059,7 +4059,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v3031"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3265"></script>
+<script src="js/help.js?v=v3268"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3234"></script>
@@ -4101,7 +4101,7 @@ label.dp-required.qc-required::after {
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v3043"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2999"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
-<script src="js/bestand-analyse.js?v=v3215"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
+<script src="js/bestand-analyse.js?v=v3268"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
 <script src="js/jahresstaende.js?v=v3215"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/wert-zielbild.js?v=v3151"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3130"></script>
@@ -4119,7 +4119,7 @@ label.dp-required.qc-required::after {
 <script src="js/investment-profile.js?v=v3238"></script>
 <script src="js/bwk-profil.js?v=v3091"></script>
 <script src="js/dashboard.js?v=v3254"></script>
-<script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
+<script src="js/portfolio-strategie.js?v=v3268"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/vermoegen.js?v=v3233"></script><!-- v3217 · W-11 Vermögen & Haushalt, W-5 Profilfoto (user_settings vermoegen) -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
@@ -4592,7 +4592,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <link rel="stylesheet" href="css/einheitlich.css?v=v3253"><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
     <script src="js/marktbericht-profi.js?v=v3242"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v3223"></script><!-- v3179 · einheitliches Dokument-Design -->
-    <script src="js/dp-dokumente.js?v=v3226a"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
+    <script src="js/dp-dokumente.js?v=v3268"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
     <script src="js/pdf-wahl.js?v=v3235"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/hub-anmelden.js?v=v3190a"></script><!-- v3190 · Makler-Hub: Verbinden-Ebene (/hub/anmelden) -->
     <script src="js/dok-weiche.js?v=v3226"></script><!-- v3181 · einheitliche Dokumente an allen Knoepfen, klassisch in den Einstellungen -->

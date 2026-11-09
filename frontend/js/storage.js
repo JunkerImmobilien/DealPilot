@@ -80,7 +80,7 @@ var FIELDS = [
   'brw','mea','gsfl','mietstg','wertstg','kostenstg','leerstand',
   'btj','exit_bmy','nkm','ze','umlagef','afa_satz','afa_eigen','afa_eigen_grundlage','afa_rnd_jahre','geb_ant','zve','grenz',
   'ek','d1','d1z','d1t','d1_bindj','anschl_z','anschl_t','anschl_bj',
-  'hg_ul','grundsteuer','ul_sonst','hg_nul','weg_r','weg_su' /* v3092 N100: Sonderumlagen, JSON */,'san_plan' /* v3214 N137: weitere Sanierungen, JSON */,'eigen_r',
+  'hg_ul','grundsteuer','grundsteuerwert' /* v3268: § 9 Nr. 1 S. 1 GewStG */,'ul_sonst','hg_nul','weg_r','weg_su' /* v3092 N100: Sonderumlagen, JSON */,'san_plan' /* v3214 N137: weitere Sanierungen, JSON */,'eigen_r',
   'mietausfall','mietausfall_alt' /* v3238: alter eigener Mietausfall (Euro), wenn Leerstand Vorrang bekam */,'nul_sonst','kp1','kp1l','kp2','kp2l','kp3','kp3l','kp4','kp4l',
   'bank_inst',   /* v3059: ai_strat/ai_verk/ai_risk/ai_markt raus - kein Eingabefeld mehr, die Werte stehen im Investmentprofil */
   'd2','d2z','d2t','d2_bindj','d2_inst','d2_type','bwk_ul_pct','bwk_nul_pct','bwk_kp_pct',
