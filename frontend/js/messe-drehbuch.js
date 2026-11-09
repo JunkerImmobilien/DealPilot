@@ -2769,8 +2769,9 @@
         /* gemessen: die Zeilen sind DIVs mit display:grid (keine Tabelle) */
         await zeige(function () { var z = r6TaxZeilen(), h2 = q('#mand-tax-periods-host'); return z.length && h2 ? b2oHuelle(h2.firstElementChild || h2, z[z.length - 1]) : h2; }, 8);
         var zl = r6TaxZeilen().slice(0, 2).map(function (r) {
-          var c = [].map.call(r.children, function (x) { return r6Text(x); });
-          return c[0] + '–' + c[1] + ': <b>' + c[2] + '</b>' + (c[3] && c[3] !== '–' ? ' (' + c[3] + ')' : '');
+          /* v3272 · gemessen: die Veranlagungs-Spalte ist ein select - textContent las alle Optionen mit */
+          var c = [].map.call(r.children, function (x) { var se = x.querySelector('select'); return se ? (se.options[se.selectedIndex] || {}).text || '' : r6Text(x); });
+          return c[0] + '–' + c[1] + ': <b>' + c[2] + '</b>' + (c[3] && c[3] !== '–' && !/^wie Profil/i.test(c[3]) ? ' (' + c[3] + ')' : '');
         });
         await b2oZeile(s, 'Steuerzeiträume', 'Dein Einkommen je Zeitraum' + (zl.length ? ' — ' + zl.join(', ') : '') + '. Jedes Objekt bekommt automatisch den passenden.');
         r6EinstellungenZu();
