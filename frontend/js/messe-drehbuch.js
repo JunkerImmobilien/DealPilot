@@ -4736,10 +4736,19 @@
         await zeige(function () { return qs('.sb-act-item[onclick*="cockpit"]'); }, 10);
         await b2oZeile(s, 'Das Portfolio-Cockpit', 'Links unter den Aktionen. Hier steht nicht ein Objekt, sondern <b>alle</b>.');
         try { sbActionsAction('cockpit'); } catch (e) {}
-        await warteAuf(function () { return r21('#dp-pscore-hero .hbody'); }, 10000);
+        await warteAuf(function () { return r21('#dp-pscore-hero .hbody') || r21('#dp-pscore-hero .dpz'); }, 10000);   /* v3254: oder die Zwei-Score-Ansicht */
         await warte(1200);
       },
       async function (s) {   /* 2 · der Portfolio-Score */
+        /* v3254 · Einstellung „Zwei Scores" mit Investor-Plan: das Cockpit zeigt dieselbe Ansicht wie der
+           Reiter Bewertung (.dpz: Gesamturteil, darunter Investment- und Finanzierungs-Karte) statt .hbody. */
+        if (r21('#dp-pscore-hero .dpz')) {
+          await zeige(function () { return r21('#dp-pscore-hero .dpz-kopf'); }, 8);
+          var wz = /^(.+?)\s+(\d+)\s*\/\s*100/.exec(r21T('#dp-pscore-hero .dpz-wort')), te = r21T('#dp-pscore-hero .dpz-eck'),
+              obz = /OBJEKTE\s*(\d+)/.exec(te), volz = /VOL\.\s*([\d,]+ Mio)/.exec(te), cfz = /CF\/MON\s*([+−\-]?[\d.]+)/.exec(te);
+          await b2oZeile(s, 'Der Portfolio-Score', '<b>' + (wz ? wz[2] + ' · ' + wz[1] : '–') + '</b> über ' + (obz ? obz[1] : '–') + ' Objekte, Volumen ' + (volz ? volz[1] + ' €' : '–') + ', Cashflow ' + (cfz ? cfz[1] + ' €' : '–') + ' im Monat.');
+          return;
+        }
         await zeige(function () { return r21('#dp-pscore-hero .hgate') || r21('#dp-pscore-hero'); }, 8);
         var t = r21T('#dp-pscore-hero .hbody'), sc = /SCORE\s*(\d+)\s*\/\s*100\s*([A-ZÄÖÜ ]+?)\s*OBJEKTE/.exec(t), ob = /OBJEKTE\s*(\d+)/.exec(t), vol = /VOL\.\s*([\d,]+ Mio)/.exec(t), cf = /CF\/MON\s*([+−\-]?[\d.]+)/.exec(t);
         await b2oZeile(s, 'Der Portfolio-Score', '<b>' + (sc ? sc[1] + ' · ' + sc[2].trim().charAt(0) + sc[2].trim().slice(1).toLowerCase() : '–') + '</b> über ' + (ob ? ob[1] : '–') + ' Objekte, Volumen ' + (vol ? vol[1] + ' €' : '–') + ', Cashflow ' + (cf ? cf[1] + ' €' : '–') + ' im Monat.');
@@ -4748,6 +4757,16 @@
         /* v3227: die Aufschluesselung liegt eingeklappt unter der Zahl - erst aufklappen, sonst ist .hbars 0 px hoch und ohne Text */
         try { var auf = r21('#dp-hero-auf'); if (auf) auf.open = true; } catch (e) {}
         await warte(300);
+        /* v3254 · Zwei-Score-Ansicht: die zwei Karten statt der fuenf Bereiche */
+        if (r21('#dp-pscore-hero .dpz-zwei')) {
+          await zeige(function () { return r21('#dp-pscore-hero .dpz-zwei'); }, 8);
+          var kz = [].slice.call(document.querySelectorAll('#dp-stage #dp-pscore-hero .dpz-zwei .dpz-karte')).map(function (k) {
+            var n = k.querySelector('.dpz-n'), h = k.querySelector('.dpz-h3');
+            return (h ? r6Inner(h) : '') + ' <b>' + (n ? r6Inner(n) : '–') + '</b>';
+          });
+          await b2oZeile(s, 'Zwei Scores', (kz.join(', ') || '–') + ' — dieselbe Aufteilung wie im einzelnen Objekt, nach Kaufpreis gewichtet über den Bestand.');
+          return;
+        }
         await zeige(function () { return r21('#dp-pscore-hero .hbars'); }, 8);
         var t = r21T('#dp-pscore-hero .hbars'), teile = [];
         var re = /(Rendite|Finanzierung|Risiko & Vermietung|Lage & Diversifikation|Upside-Potenzial)\s*\d+\s*KPIs\s*(\d+)\/100/g, m;

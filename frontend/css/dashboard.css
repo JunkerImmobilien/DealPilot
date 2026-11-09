@@ -1442,18 +1442,11 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
    gerechnet?", 03 Zielbild-Tabelle je Objekt. Gold nur ueber var(--wl-*),
    Gruen/Rot sind Statusfarben (--c-greenl/--c-redl). */
 
-/* 01 · Zwei Scores (Einstellung „Zwei Scores: Investment + Finanzierung") */
-#dashboard-main .hzwei{margin:0 0 6px;padding:0 0 12px;border-bottom:2px dashed var(--c-line)}
-#dashboard-main .hzwei .hz-kopf{font-family:var(--head-font);font-weight:600;font-size:13px;color:var(--c-ptext);margin-bottom:8px}
-#dashboard-main .hzwei .hz-kopf em{display:block;font:400 9.5px/1.4 'JetBrains Mono',monospace;font-style:normal;letter-spacing:.04em;color:var(--c-pmut);margin-top:2px}
-#dashboard-main .hzwei .hz-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-#dashboard-main .hzwei .hz-k{display:flex;align-items:center;gap:10px;min-width:0;padding:8px 10px;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 28%,transparent);border-radius:10px;background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 4%,var(--c-panel))}
-#dashboard-main .hzwei .hz-ring{flex:0 0 58px;line-height:0}
-#dashboard-main .hzwei .hz-txt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
-#dashboard-main .hzwei .hz-t{font:600 12.5px/1.25 'Space Grotesk',sans-serif;color:var(--c-ptext)}
-#dashboard-main .hzwei .hz-pill{font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:20px}
-#dashboard-main .hzwei .hz-f{font:400 10.5px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut)}
-#dashboard-main .hzwei.hz-leer{font:400 11.5px/1.45 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+/* 01 · Zwei Scores (Einstellung „Zwei Scores: Investment + Finanzierung")
+   v3254: Hier standen die Regeln .hzwei/.hz-* (v3234 Kleinringe, v3248 Bereichsbalken). Die
+   Zwei-Score-Ansicht kommt jetzt aus dpsh-score-hero.js (DealPilotScoreHero.zweiAnsicht, CSS .dpz-*
+   dort) - dieselbe wie im Reiter Bewertung. Der Kartenrahmen der Bordkarte entfaellt dann. */
+#dashboard-main #dp-pscore-hero.hz-dpz{display:block;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
 
 /* 02 · Gesamtbewertung: Tabelle je Objekt jetzt im eingeklappten Block */
 #dashboard-main .gb-wie > summary{font-weight:500;color:var(--c-pmut)}
@@ -1487,9 +1480,6 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .zb-ot-tab td.zb-ot-akt .zb-neu-btn{white-space:nowrap}
 #dashboard-main .zb-ot-tab tbody tr:hover th,#dashboard-main .zb-ot-tab tbody tr:hover td{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 7%,var(--c-panel))}
 
-@media(max-width:880px){
-  #dashboard-main .hzwei .hz-grid{grid-template-columns:1fr}
-}
 @media(max-width:640px){
   #dashboard-main .zb-ot-t em{display:block;margin:2px 0 0}
   #dashboard-main .zb-ot-tab{font-size:11px}
@@ -1499,12 +1489,6 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 
 /* v3248 · Portfolio-Cockpit: zwei Scores mit Bereichen wie im Reiter Bewertung, Zusammenfassung
    Bestand | Soll | Zielbild, Liste „Pilot fragen“. Gold nur über var(--wl-*). */
-#dashboard-main .hbars .ttl .hz-ttl-em{display:block;font:400 9.5px/1.4 'JetBrains Mono',monospace;font-style:normal;letter-spacing:.04em;color:var(--c-pmut);margin-top:2px}
-#dashboard-main .hz-bars{display:flex;flex-direction:column;gap:12px}
-#dashboard-main .hz-gr{display:flex;flex-direction:column;gap:9px}
-#dashboard-main .hz-gr + .hz-gr{padding-top:10px;border-top:1px solid var(--c-line)}
-#dashboard-main .hz-gr-t{font:700 10px/1.2 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--c-accd-txt, var(--wl-b8932f, #b8932f))}
-#dashboard-main .hz-bar .hz-m{font:400 10px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut);margin-top:3px}
 #dashboard-main .zb-vgl thead th small{display:block;font-size:8.5px;letter-spacing:.04em;text-transform:none;font-weight:400}
 #dashboard-main .dp-pp-fragen{padding:0 16px 12px}
 #dashboard-main .dp-pp-fragen-t{font:700 10px/1.2 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--c-pmut);margin:2px 0 6px}

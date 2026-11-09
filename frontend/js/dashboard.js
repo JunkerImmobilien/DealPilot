@@ -406,7 +406,9 @@
       var z = D2._zweiScores(cats, D2.loadConfig(), buildDealFromData(d), null);
       if (!z || !z.investment || !z.finanzierung || z.investment.score == null || z.finanzierung.score == null) return null;
       return { inv: z.investment.score, fin: z.finanzierung.score,
-        invG: z.investment.gruppen || [], finG: z.finanzierung.gruppen || [] };   /* v3248 */
+        invG: z.investment.gruppen || [], finG: z.finanzierung.gruppen || [],   /* v3248 */
+        invA: Number(z.investment.anteil) || 0, finA: Number(z.finanzierung.anteil) || 0,   /* v3254 */
+        dscrGrenze: !!z.finanzierung.deckel };   /* v3254 · DSCR unter 1,2: die Staffel begrenzt dieses Objekt */
     } catch (e) { return null; }
   }
   /* v3248 \u00b7 Marcel 09.11.2026: \u201eim Portfolio-Cockpit genauso aufteilen, auch von den KPIs
@@ -432,16 +434,18 @@
   }
   function _zweiAgg(){
     if (!_detailsLoaded) return { n: 0, von: wonList().length, laedt: true };
-    var arr = detailArr(), tw = 0, si = 0, sf = 0, n = 0, gI = {}, gF = {};
+    var arr = detailArr(), tw = 0, si = 0, sf = 0, n = 0, gI = {}, gF = {}, sa = 0, sb = 0, nGrenze = 0;
     arr.forEach(function(d){
       var z = _zweiJeObjekt(d); if (!z) return;
       var w = num(d._kaufpreis) || 1;
       tw += w; si += z.inv * w; sf += z.fin * w; n++;
+      sa += z.invA * w; sb += z.finA * w; if (z.dscrGrenze) nGrenze++;   /* v3254 */
       _zweiGruppenSammeln(gI, z.invG, w); _zweiGruppenSammeln(gF, z.finG, w);   /* v3248 */
     });
     if (!n) return { n: 0, von: arr.length };
     return { n: n, von: arr.length, inv: Math.round(si / tw), fin: Math.round(sf / tw),
-      invG: _zweiGruppenListe(gI), finG: _zweiGruppenListe(gF) };
+      invG: _zweiGruppenListe(gI), finG: _zweiGruppenListe(gF),
+      invA: Math.round(sa / tw * 10) / 10, finA: Math.round(sb / tw * 10) / 10, nGrenze: nGrenze };   /* v3254 */
   }
   /* Ring wie die Bordkarte (116 px) bzw. klein fuer die zwei Teil-Scores. Farben als
      style, nicht als Attribut - var() greift in SVG-Praesentationsattributen nicht. */
@@ -453,12 +457,51 @@
       + '<text x="58" y="56" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="34" style="fill:' + col + '">' + sc + '</text>'
       + '<text x="58" y="73" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#9a948a">/ 100</text></svg>';
   }
-  function _zweiKarte(titel, frage, sc){
-    var t = tierOf(sc);
-    return '<div class="hz-k"><div class="hz-ring">' + _ringSvg(sc, t.col, 58) + '</div>'
-      + '<div class="hz-txt"><span class="hz-t">' + esc(titel) + '</span>'
-      + '<span class="hz-pill" style="background:' + _tierBg(t.t) + ';color:' + t.col + '">' + esc(t.l) + '</span>'
-      + '<span class="hz-f">' + esc(frage) + '</span></div></div>';
+  /* v3254 · Marcel 09.11.2026: „So wie wir im Reiter Bewertung den Investment-Score und
+     Finanzierungs-Score aufgebaut haben, so wollte ich das eigentlich auch im Portfolio-Cockpit
+     haben. Also auf zwei getrennten Karten mit dem Gesamturteil auch vom Gesamtportfolio.“
+     Hier standen _zweiKarte (v3234, zwei kleine Ringe) und darunter die Bereichsbalken (v3248).
+     Beides ist ersetzt durch DIESELBE Ansicht wie im Reiter Bewertung:
+     DealPilotScoreHero.zweiAnsicht(r2, opt) aus dpsh-score-hero.js - ein Markup fuer beide
+     Stellen. Hier wird nur das Datenobjekt gebaut: Teil-Scores, Anteile und Bereiche je Objekt
+     aus DealScore2._zweiScores(), nach Kaufpreis gewichtet (_zweiAgg); das Gesamturteil ist der
+     Portfolio-Score (aggregateScore, die gespeicherten Investor Deal Scores), das Wort aus
+     ScoreTier. Eine Empfehlung (Kaufen/Verhandeln) gibt es fuer den Bestand nicht. */
+  function _zweiPortfolioHtml(Z2, ag, S){
+    var SH = window.DealPilotScoreHero;
+    if (!SH || typeof SH.zweiAnsicht !== 'function') return '';
+    var stufe = function(x){ return (window.ScoreTier && ScoreTier.stufe) ? ScoreTier.stufe(x).wort : tierOf(x).l; };
+    var gr = function(L){ return (L || []).map(function(g){
+      return { name: g.name, anteil: g.anteil, score: g.score, kpis: g.kpis, totalKpis: g.total, availableKpis: null,
+        hinweis: g.n < Z2.n ? g.n + ' von ' + Z2.n + ' Objekten' : null };
+    }); };
+    var r2 = {
+      investment:   { score: Z2.inv, stufe: stufe(Z2.inv), anteil: Z2.invA, gruppen: gr(Z2.invG) },
+      finanzierung: { score: Z2.fin, stufe: stufe(Z2.fin), anteil: Z2.finA, gruppen: gr(Z2.finG) },
+      gesamt:       { score: ag.total, stufe: stufe(ag.total) }
+    };
+    var obj = Z2.n + ' von ' + Z2.von + ' Objekt' + (Z2.von === 1 ? '' : 'en');
+    var cfM = S.cfVsM;
+    var eck = '<div class="dpz-eck"><div><span class="k">OBJEKTE</span><span class="v">' + ag.n + '</span></div>'
+      + '<div><span class="k">VOL.</span><span class="v">' + fmtKEU(S.kp) + '</span></div>'
+      + '<div><span class="k">CF/MON</span><span class="v" style="color:' + (cfM >= 0 ? 'var(--c-greenl)' : 'var(--c-redl)') + '">' + (cfM >= 0 ? '+' : '') + fmtE(cfM) + '</span></div></div>';
+    var wie = ['Je Objekt teilt der Kern den Investor Deal Score in Investment und Finanzierung auf \u2013 dieselbe Rechnung wie im Reiter Bewertung. '
+      + '\u00dcber das Portfolio z\u00e4hlt jedes Objekt mit seinem Kaufpreis (' + esc(obj) + ' mit gespeicherter Aufteilung).'];
+    if (Z2.nGrenze) wie.push('Bei ' + Z2.nGrenze + ' Objekt' + (Z2.nGrenze === 1 ? '' : 'en') + ' deckt die Miete den Kapitaldienst nur knapp oder nicht; f\u00fcr sie gilt die Grenze unten. Ob sie den Score dort wirklich senkt, steht im Reiter Bewertung des Objekts.');
+    return SH.zweiAnsicht(r2, {
+      lbl: 'Gesamturteil \u00b7 Investor Portfolio Score',
+      warum: 'Gesamt aus Investment <b>' + Z2.inv + '</b> (' + String(Z2.invA).replace('.', ',') + '\u00a0%) und Finanzierung <b>' + Z2.fin + '</b> ('
+        + String(Z2.finA).replace('.', ',') + '\u00a0%) \u2013 ' + esc(obj) + ', nach Kaufpreis gewichtet.',
+      kopfZusatz: eck,
+      knoepfe: '<button class="dpz-knopf" type="button" onclick="DealPilotDashboard.showScoreDetails()">Details &amp; alle KPIs</button>'
+        + '<button class="dpz-knopf" type="button" onclick="DealPilotScoreHero.action(\'classic\')" title="Einstellungen \u203a Deal Score \u203a Bewertung als">Ansicht</button>',
+      invFrage: 'Wie gut sind die Immobilien, egal wie sie finanziert sind?',
+      finFrage: 'Tr\u00e4gt die Finanzierung den Bestand?',
+      invFuss: 'Z\u00e4hlt ' + String(Z2.invA).replace('.', ',') + '\u00a0% \u2013 gemittelt \u00fcber die Objekte.',
+      finFuss: 'Z\u00e4hlt ' + String(Z2.finA).replace('.', ',') + '\u00a0% \u2013 gemittelt \u00fcber die Objekte.',
+      faktoren: false,
+      wie: wie
+    });
   }
 
   /* ════ RENDER: Score-Hero ════ */
@@ -478,7 +521,7 @@
        Neu: ist in den Einstellungen \u201eZwei Scores\u201c gew\u00e4hlt (Merker dp_score_ansicht, wie
        im Objekt), stehen Investment- und Finanzierungs-Score unter dem Gesamtscore
        (_zweiAgg, aus dem Kern DealScore2._zweiScores). */
-    host.classList.remove('cp-hero');
+    host.classList.remove('cp-hero'); host.classList.remove('hz-dpz');   /* v3254 */
     if(!ag.hasData){
       host.innerHTML = '<div class="hmain"><div class="hpre"><span class="led"></span><span class="t">Pre-Flight \u00b7 Portfolio Score</span><span class="cls">Boarding</span></div>'
         + '<div class="hbody" style="display:block;text-align:center;color:var(--c-pmut);font-family:Inter,sans-serif;font-size:13px;line-height:1.6;padding:30px 22px">'
@@ -488,6 +531,16 @@
     var t = tierOf(ag.total);
     var S = aggStats();
     var Z2 = (P.full && _zweiAnsicht() === 'zwei') ? _zweiAgg() : null;
+    /* v3254 · Zwei Scores (Einstellung) UND Investor-Plan UND mindestens ein Objekt mit gespeicherter
+       Aufteilung: dieselbe Ansicht wie im Reiter Bewertung. Sonst - auch solange die Details laden -
+       die normale Portfolio-Score-Karte wie vor v3234. */
+    var zweiAns = (Z2 && Z2.n) ? _zweiPortfolioHtml(Z2, ag, S) : '';
+    host.classList.toggle('hz-dpz', !!zweiAns);
+    if (zweiAns) {
+      host.innerHTML = zweiAns;
+      if(_detailsLoaded){ try{ _mbHistLaden(detailArr()); }catch(e){} }
+      return;
+    }
     var detailsBtn = P.full
       ? '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreDetails()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4-4M11 8v6M8 11h6"/></svg> Details &amp; alle KPIs</button>'
       : '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreUpgrade()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Volle 24-KPI-Analyse</button>';
@@ -507,53 +560,23 @@
         return '<div class="bar"><div class="bt"><span class="n'+(_tip?' hinfo':'')+'"'+(_tip?' tabindex="0" title="'+esc(_tip)+'"':'')+'>'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc+'<i>/100</i>')+'</span></div>'
           + '<div class="track"><div class="fill" data-w="'+sc+'" style="width:0;background:'+catBarColor(sc)+'"></div></div></div>';
       }).join('') : '<div class="bar" style="color:var(--c-pmut);font-family:JetBrains Mono;font-size:11px">Kategorien werden geladen\u2026</div>';
-    /* v3248 \u00b7 Zwei Scores mit Investor-Plan: die Bereiche wie im Reiter Bewertung in zwei
-       Gruppen (Investment | Finanzierung), Namen, Kennzahlen und Anteile aus dem Kern. Ohne
-       Plan, ohne Zwei-Score-Ansicht oder solange keine Aufteilung gespeichert ist: die
-       zusammenfassende Darstellung wie vor v3234 (ein Score, f\u00fcnf Bereiche, catsHtml). */
-    var zweiBars = '';
-    if (Z2 && Z2.n && Z2.invG && Z2.finG && (Z2.invG.length || Z2.finG.length)) {
-      var zBar = function(g){
-        var sc = Math.max(0, Math.min(100, g.score));
-        return '<div class="bar hz-bar"><div class="bt"><span class="n">' + esc(g.name) + '<em>' + String(g.anteil).replace('.', ',') + '\u00a0% \u00b7 ' + g.total + ' KPIs</em></span><span class="v">' + g.score + '<i>/100</i></span></div>'
-          + '<div class="track"><div class="fill" data-w="' + sc + '" style="width:0;background:' + catBarColor(sc) + '"></div></div>'
-          + '<div class="hz-m">' + esc((g.kpis || []).join(' \u00b7 ')) + (g.n < Z2.n ? ' \u2014 ' + g.n + ' von ' + Z2.n + ' Objekten' : '') + '</div></div>';
-      };
-      var zBlock = function(titel, sc, L){
-        /* die Zahl selbst steht schon im Ring darueber - hier nur der Name der Gruppe */
-        return '<div class="hz-gr"><div class="hz-gr-t">' + esc(titel) + '</div>' + L.map(zBar).join('') + '</div>';
-      };
-      zweiBars = zBlock('Investment-Score', Z2.inv, Z2.invG) + zBlock('Finanzierungs-Score', Z2.fin, Z2.finG);
-    }
+    /* v3254 · hier standen die v3248-Bereichsbalken (zweiBars) und die v3234-Kleinringe (zweiHtml)
+       - beides steckt jetzt in der Zwei-Score-Ansicht oben (_zweiPortfolioHtml). */
     var cfM=S.cfVsM;
-    /* v3234 \u00b7 Zwei Scores: Investment und Finanzierung unter dem Gesamtscore. Der Block
-       steht VOR \u201eSo setzt sich der Score zusammen\u201c in der rechten Spalte und NACH den
-       Eckdaten im Text - das Messe-Drehbuch liest \u201eSCORE nn / 100 STUFE OBJEKTE \u2026\u201c aus
-       .hbody und \u201eFinanzierung n KPIs nn/100\u201c aus .hbars (hier: Finanzierungs-Score). */
-    var zweiHtml = '';
-    if (Z2) {
-      zweiHtml = Z2.laedt ? '<div class="hzwei hz-leer">Investment- und Finanzierungs-Score werden geladen…</div>' : Z2.n ? '<div class="hzwei">'
-          + '<div class="hz-kopf">Gesamtscore aus zwei Teilen<em>'+Z2.n+' von '+Z2.von+' Objekt'+(Z2.von===1?'':'en')+' \u00b7 nach Kaufpreis gewichtet</em></div>'
-          + '<div class="hz-grid">' + _zweiKarte('Investment-Score', 'das Objekt, egal wie finanziert', Z2.inv)
-          +   _zweiKarte('Finanzierungs-Score', 'tr\u00e4gt die Finanzierung', Z2.fin) + '</div></div>'
-        : '<div class="hzwei hz-leer">Zwei Scores: f\u00fcr noch kein Objekt gespeichert \u2013 ein Objekt einmal \u00f6ffnen und speichern, dann steht die Aufteilung hier.</div>';
-    }
     var ringCol = t.col;
     host.innerHTML =
       '<div class="hmain">'
       + '<div class="hpre"><span class="led"></span><span class="t">Pre-Flight \u00b7 '+(P.full?'Investor':'DealPilot')+' Portfolio Score</span><span class="cls">Boarding</span></div>'
       + '<div class="hbody">'
       + '<div class="hgate">'
-      + '<div class="gl">'+(Z2 ? 'Gesamtscore' : esc(title))+'</div>'
+      + '<div class="gl">'+esc(title)+'</div>'
       + '<div id="dp-hero-ring"></div>'
       + '<div class="gt" style="background:'+_tierBg(t.t)+';color:'+t.col+'">'+t.l+'</div>'
       + '<div class="tot"><div><div class="k">OBJEKTE</div><div class="v">'+ag.n+'</div></div>'
       + '<div><div class="k">VOL.</div><div class="v">'+fmtKEU(S.kp)+'</div></div>'
       + '<div><div class="k">CF/MON</div><div class="v" style="color:'+(cfM>=0?'var(--c-greenl)':'var(--c-redl)')+'">'+(cfM>=0?'+':'')+fmtE(cfM)+'</div></div></div>'
       + '</div>'
-      + '<div class="hbars">' + zweiHtml + (zweiBars
-          ? '<div class="ttl">So setzen sich die zwei Scores zusammen<em class="hz-ttl-em">wie im Reiter Bewertung \u00b7 je Bereich nach Kaufpreis gewichtet</em></div><div id="dp-hero-bars" class="hz-bars">' + zweiBars + '</div>'
-          : '<div class="ttl">So setzt sich der Score zusammen</div><div id="dp-hero-bars">'+catsHtml+'</div>') + detailsBtn + '</div>'
+      + '<div class="hbars"><div class="ttl">So setzt sich der Score zusammen</div><div id="dp-hero-bars">'+catsHtml+'</div>' + detailsBtn + '</div>'
       + '</div></div>'
       + '<div class="vperf"></div>'
       + '<div class="hpass"><div class="hp-lab">PORTFOLIO-PASS</div><div class="qb" id="dp-hero-qr"></div>'

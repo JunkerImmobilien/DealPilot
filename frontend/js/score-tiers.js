@@ -106,10 +106,45 @@
     if (ueberMarktwert === true) return { max: SCHWACH - 1, grund: 'DSCR ' + d + ' unter 0,8 und Darlehen über dem Marktwert' };
     return { max: GOLD - 1, grund: 'DSCR ' + d + ' unter 0,8 — die Miete deckt den Kapitaldienst deutlich nicht' };
   }
+  /* v3254 · Marcel 09.11.2026 (Westerfeldstr.): „Unter dem Gesamturteil steht ‚DSCR-Grenze
+     greift, höchstens 84‘. Das verstehe ich nicht." Die Grenze als EIN verständlicher Satz,
+     an einer Stelle für alle Anzeigen (Bewertung, Cockpit, Erklärtext der Kerne, PDF).
+     Nur Text - gerechnet wird die Grenze weiter von dscrDeckel() und dem Zustands-Deckel
+     in dealscore.js. deckel: {max, grund} (grund mit „; " verkettet, wenn zwei greifen);
+     ohne: Score ohne Grenze (Zahl oder null); was: Subjekt, Vorgabe „der Score". */
+  function deckelSatz(deckel, ohne, was) {
+    if (!deckel || deckel.max == null) return '';
+    was = was || 'der Score';
+    var warum = [];
+    String(deckel.grund || '').split(/;\s*/).forEach(function (g) {
+      if (!g) return;
+      var m = /^DSCR\s+(\d+),(\d+)/.exec(g);
+      if (m) {
+        var v = parseFloat(m[1] + '.' + m[2]);
+        var z = (m[1] + ',' + m[2]).replace(/(,\d)0$/, '$1');
+        var wie = v >= 1.0 ? 'nur knapp deckt' : v >= 0.8 ? 'nicht ganz deckt' : 'deutlich nicht deckt';
+        warum.push('die Miete den Kapitaldienst ' + wie + ' (DSCR ' + z + ')' + (/Marktwert/.test(g) ? ' und das Darlehen über dem Marktwert liegt' : ''));
+        return;
+      }
+      var kern = g.replace(/\s+—.*$/, '');
+      var zu = /^Zustand\s+(\S+)\s*(.*)$/.exec(kern);
+      if (zu) { warum.push('das Objekt ' + zu[1] + ' ist' + (zu[2] ? ' ' + zu[2] : '')); return; }
+      var sa = /^Sanierung\s+(.*)$/.exec(kern);
+      if (sa) { warum.push('die Sanierung ' + sa[1] + ' kostet'); return; }
+      warum.push(kern);
+    });
+    if (!warum.length) return '';
+    var o = (typeof ohne === 'number' && isFinite(ohne)) ? Math.round(ohne) : null;
+    if (o !== null && o <= deckel.max)
+      return 'Weil ' + warum.join(' und ') + ', wäre ' + was + ' auf höchstens ' + deckel.max + ' begrenzt – mit ' + o + ' liegt er ohnehin darunter.';
+    return 'Weil ' + warum.join(' und ') + ', ist ' + was + ' auf höchstens ' + deckel.max + ' begrenzt' +
+      (o !== null ? ' (ohne diese Grenze ' + o + ').' : '.');
+  }
   var API = {
     classify: classify,
     stufe: stufe,
     dscrDeckel: dscrDeckel,   /* v3070 */
+    deckelSatz: deckelSatz,   /* v3254 */
     TOP: TOP,
     GREEN: GREEN,
     GOLD: GOLD,
