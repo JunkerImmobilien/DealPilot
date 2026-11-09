@@ -1558,7 +1558,9 @@ function _calcImmediate(){
     }
   } else {
     ul = v('hg_ul')+v('grundsteuer')+v('ul_sonst')+v('kp1')+v('kp2')+v('kp3')+v('kp4');
-    nul = v('hg_nul')+v('eigen_r')+v('mietausfall')+v('nul_sonst');
+    /* v3238 · #mietausfall zaehlt hier NICHT mehr - er ist seit v3238 der Leerstand in Euro
+       und kommt unten als leerJ genau einmal dazu (Block „MIETAUSFALL = LEERSTAND"). */
+    nul = v('hg_nul')+v('eigen_r')+v('nul_sonst');
     // WEG-Rücklage: nur Info-Anzeige, NICHT summieren (ist bereits Teil des Hausgeldes)
     bwk = ul + nul;
   }
@@ -1587,11 +1589,75 @@ function _calcImmediate(){
      DealKpis.compute({leerstand_pct}). In der Jahresschleife waechst er wie alle Kosten
      mit kstg statt mit der Miete - bei 2 % und 0,5 Punkten Unterschied sind das nach
      15 Jahren rund 0,15 % der Miete, bewusst in Kauf genommen statt neun Stellen. */
+  /* ═══ v3238 · MIETAUSFALL = LEERSTAND (Marcel 09.11.2026) ═══════════════
+     „Feld ‚Kalkulatorischer Mietausfall / Jahr' kann da ausgeblendet werden.
+     Zudem kann er immer mit dem angegebenen Prozentwert unter Tab Miete
+     Leerstand berechnet und vorbelegt werden."
+
+     GEMESSEN vor v3238: im Detail-Modus standen BEIDE in nul - #mietausfall
+     (Euro, beim neuen Objekt aus dem Profil 1 % der NKM) UND leerJ (Leerstand
+     %, Profil 2 %). Ein neues Objekt rechnete den Cashflow also mit 3 % Ausfall,
+     davon 1 % doppelt fuer dasselbe Risiko (entgangene Miete). Jetzt:
+       Kalkulatorischer Mietausfall = Jahresnettokaltmiete x Leerstand %
+     Er zaehlt EINMAL (als leerJ), #mietausfall bleibt im DOM (Speichern, PDF,
+     Import lesen ihn) und traegt nur noch diesen Euro-Betrag.
+
+     ALTE OBJEKTE mit eigenem Euro-Wert - nichts wird still verworfen:
+       - Leerstand leer/0, Mietausfall > 0: der Euro-Wert wird in Prozent der
+         Jahresnettokaltmiete umgerechnet und ins Leerstand-Feld uebernommen
+         (Cashflow bleibt gleich).
+       - Leerstand > 0 und abweichender Mietausfall: Leerstand hat Vorrang; der
+         alte Euro-Wert bleibt in #mietausfall_alt gespeichert und steht als
+         Hinweis unter dem Leerstand-Feld (mit seinem Prozentsatz zum Uebernehmen).
+     Erkannt wird „von aussen gesetzt" daran, dass der Feldwert nicht der ist,
+     den calc() zuletzt selbst geschrieben hat (data-v3238-berechnet). */
+  (function () {
+    var maEl = el('mietausfall'), leEl = el('leerstand');
+    if (!maEl || !leEl) return;
+    var roh = String(maEl.value == null ? '' : maEl.value).trim();
+    if (roh === '' || roh === maEl.getAttribute('data-v3238-berechnet')) return;
+    var alt = parseDe(roh), lp = parseDe(leEl.value);
+    if (!(alt > 0)) return;
+    if (!(lp > 0) && nkm_j > 0) {
+      leEl.value = (alt / nkm_j * 100).toFixed(2);
+      return;
+    }
+    /* ohne Miete laesst sich nichts umrechnen - dann den Euro-Wert ebenfalls aufheben */
+    if (!(nkm_j > 0) || Math.abs(alt - nkm_j * lp / 100) > 1) {
+      var altEl = el('mietausfall_alt');
+      if (altEl && String(altEl.value || '').trim() === '') altEl.value = String(Math.round(alt));
+    }
+  })();
   var leerJ = 0;
   (function () { var lp = v('leerstand'); if (lp > 0 && isFinite(lp)) leerJ = nkm_j * lp / 100; })();
   if (leerJ > 0) { nul += leerJ; bwk += leerJ; }
   State.leerstandJ = leerJ;
-  st('r-leer-j', leerJ > 0 ? '= ' + fE(leerJ) + ' / Jahr' : '');
+  st('r-leer-j', leerJ > 0 ? '= ' + fE(leerJ) + ' Mietausfall / Jahr' : '');
+  /* v3238 · #mietausfall traegt den berechneten Betrag (ausgeblendet im Reiter Bewirtschaftung) */
+  (function () {
+    var maEl = el('mietausfall');
+    var w = leerJ > 0 ? String(Math.round(leerJ)) : '';
+    if (maEl) { maEl.value = w; maEl.setAttribute('data-v3238-berechnet', w); }
+    var _lpV = v('leerstand');
+    var lpTxt = fN(_lpV, Math.abs(_lpV * 10 - Math.round(_lpV * 10)) > 1e-9 ? 2 : 1);
+    var herkunft = 'Kalkulatorischer Mietausfall = Jahresnettokaltmiete ' + fE(nkm_j) + ' × Leerstand ' + lpTxt + ' % aus Reiter Miete';
+    st('r-mietausfall-j', leerJ > 0 ? fE(leerJ) : '–');
+    var zeile = el('r-mietausfall-j'); if (zeile) zeile.title = herkunft;
+    var hj = el('r-leer-j'); if (hj) hj.title = herkunft;
+    var hinw = el('r-leer-alt'), altEl = el('mietausfall_alt');
+    var altW = altEl ? parseDe(altEl.value) : 0;
+    if (hinw) {
+      if (altW > 0 && Math.abs(altW - leerJ) > 1) {
+        /* bis v3237 zaehlten beide (im Detail-Modus): wer den bisherigen Gesamtausfall
+           behalten will, traegt Leerstand + alten Anteil ein */
+        hinw.textContent = 'Bis v3238 stand im Reiter Bewirtschaftung zusätzlich ein eigener Mietausfall von ' + fE(altW) + ' / Jahr'
+          + (nkm_j > 0 ? ' (' + fN(altW / nkm_j * 100, 2) + ' % der Jahresnettokaltmiete)' : '')
+          + '. Jetzt zählt der Mietausfall genau einmal, berechnet aus dem Leerstand.'
+          + (nkm_j > 0 ? ' Für Leerstand plus bisherigen Mietausfall ' + fN(_lpV + altW / nkm_j * 100, 2) + ' % eintragen.' : '');
+        hinw.style.display = '';
+      } else { hinw.textContent = ''; hinw.style.display = 'none'; }
+    }
+  })();
   st('erb_zins_j', erbZins > 0 ? fE(erbZins) : '–');st('r-erb-zins', erbZins > 0 ? fE(erbZins) : '–');
   /* ═══ v1898 · DAS MIETAUSFALLWAGNIS IST KEIN WERBUNGSKOSTENABZUG ═══════
    *
@@ -1617,7 +1683,11 @@ function _calcImmediate(){
    * `bwk_anteil_default` (config.js:1005ff) — die Quote ist also die
    * Bewirtschaftung ohne Wagnis, und es gibt nichts herauszurechnen.
    */
-  var _mawSteuer = (bwkMode === 'detail') ? v('mietausfall') : 0;
+  /* v3238 · Seit dem Block „MIETAUSFALL = LEERSTAND" gibt es kein getrenntes
+     Wagnis mehr in nul: der Mietausfall IST der Leerstand (entgangene Miete, v3030
+     mindert er auch die steuerpflichtigen Einnahmen). Bis v3237 stand hier
+     v('mietausfall') - das zoege den Leerstand jetzt aus der Steuerzeile heraus. */
+  var _mawSteuer = 0;
   var nul_st = nul - _mawSteuer;
   State.nulSteuer = nul_st;
   State.mietausfallWagnis = _mawSteuer;
@@ -1896,6 +1966,7 @@ function _calcImmediate(){
   } catch (_eFs) {}
   var be=_finStart?new Date(_finStart.getTime()):new Date();be.setFullYear(be.getFullYear()+bindj);
   st('bindend',be.toLocaleDateString('de-DE',{month:'2-digit',year:'numeric'}));
+  st('anschl_ab','ab '+be.toLocaleDateString('de-DE',{month:'2-digit',year:'numeric'}));   /* v3238 · Beginn im Anschluss-Kasten (Reiter Finanzierung) */
   try { State.bindungsEnde = (be && !isNaN(be.getTime())) ? be.toISOString().slice(0, 7) : null; } catch (e) {}   /* v3161 · Schnittstelle (_kpis_bindung_ende) */
   var vtJ=d1_tm>0?Math.ceil(Math.log(d1_rate_m/d1_tm)/Math.log(1+d1z/12)/12):99;
   st('volltilg',((_finStart?_finStart.getFullYear():new Date().getFullYear())+vtJ).toString());
@@ -1973,6 +2044,18 @@ function _calcImmediate(){
   var _ar_total = ar + _ar_d2_m + _ar_dw_m;
   st('r-rs',fE(State.rs,0));st('r-anschl',fE(_ar_total,2));
   // v359-d2-anschl-display: D2-Anschluss-Anzeigefelder (analog D1) befuellen
+  /* v3238 · Beginn der Anschlussfinanzierung von Darlehen II: Auszahlung (MM.JJJJ oder
+     TT.MM.JJJJ) plus eigene Zinsbindung; ohne Datum ab Finanzierungsbeginn wie bei D1. */
+  (function () {
+    var t = '—';
+    if (d2_enabled && d2 > 0) {
+      var m2 = String(g('d2_auszahl') || '').match(/(?:^|\D)(\d{1,2})\.(\d{4})\s*$/);
+      var b2 = m2 ? new Date(parseInt(m2[2], 10), parseInt(m2[1], 10) - 1, 1)
+                  : (_finStart ? new Date(_finStart.getTime()) : new Date());
+      if (!isNaN(b2.getTime())) { b2.setFullYear(b2.getFullYear() + d2_bindj); t = 'ab ' + b2.toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' }); }
+    }
+    st('d2_anschl_ab', t);
+  })();
   if (d2_enabled && d2 > 0) {
     st('d2_anschl_rate', fE(_ar_d2_m, 2));
     var _d2_zaer_pct = Math.max(0, (d2_anschl_enable ? (d2_az * 100) : v('d2z')) - v('d2z'));
