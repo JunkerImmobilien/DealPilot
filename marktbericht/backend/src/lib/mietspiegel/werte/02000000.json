@@ -149,15 +149,15 @@
       "eingabe": {"baujahr": 1925, "wfl": 55, "lage": "normal"},
       "erwartet": {"unten": 7.95, "mittel": 9.34, "oben": 12.41},
       "seite": "1",
-      "hinweis": "Feld 2/F, abgelesen (kein Lesebeispiel im Dokument)",
-      "art": "lesebeispiel"
+      "art": "tabellenzelle",
+      "hinweis": "Feld 2/F, abgelesen (kein Lesebeispiel im Dokument)"
     },
     {
       "eingabe": {"baujahr": 2022, "wfl": 140, "lage": "gut"},
       "erwartet": {"unten": 17.43, "mittel": 22.34, "oben": 25.46},
       "seite": "1",
-      "hinweis": "Feld 9/P, abgelesen (kein Lesebeispiel im Dokument)",
-      "art": "lesebeispiel"
+      "art": "tabellenzelle",
+      "hinweis": "Feld 9/P, abgelesen (kein Lesebeispiel im Dokument)"
     }
   ]
 }
