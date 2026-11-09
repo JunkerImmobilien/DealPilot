@@ -1,0 +1,230 @@
+{
+  "ags": "05570004",
+  "gemeinde": "Ahlen",
+  "art": "qualifiziert",
+  "stand": "2025-06",
+  "erhebungsstichtag": "2023-06-01",
+  "gueltig_ab": "2026-01-01",
+  "gueltig_bis": null,
+  "quelle": {
+    "url": "https://serviceportal.ahlen.de/detail/-/vr-bis-detail/dokument/128442/download",
+    "dokument": "Qualifizierter Mietspiegel Ahlen, Fortschreibung 2026 (Mietspiegel 2024, per VPI Juni 2023 → Juni 2025 fortgeschrieben, +4,28 %), Gültigkeit ab 01.01.2026, Stadt Ahlen, Fachbereich Jugend, Soziales und Integration",
+    "seite": "PDF-S. 10 (Tabelle „Mietspiegel Ahlen 2024 – Fortschreibung 2025“ und Zuschlag gute Wohnlage), PDF-S. 9 (Anwendung), PDF-S. 14–15 (Berechnungsbeispiele Feld B1 und A3)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Herausgeber Stadt Ahlen",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Qualifiziert (§ 558d BGB). Erhebungsstichtag der Grunddaten 01.06.2023, fortgeschrieben mit dem VPI bis Juni 2025 (stand), gültig ab 01.01.2026, Ende nicht genannt. Die Tabellenüberschrift im Dokument lautet „Fortschreibung 2025“, das Heft „Fortschreibung 2026“ — es ist dieselbe Tabelle. Nur Geschosswohnungsbau (3+ Wohnungen) mit WC in der Wohnung, Bad/Duschbad und Sammelheizung. Mittelwert und Spanne je Feld; mit * markierte Felder (A4, C2, C3, C4, C5) haben bedingte Aussagekraft (15–29 Mietwerte). Gute Wohnlage (Wohnlagenverzeichnis, nur Adressen der guten Lage) +0,29 €/m² auf alle Tabellenwerte; normale Lage ohne Zuschlag (objekt.lage „gut“). Die „Orientierungshilfe zur Spanneneinordnung“ (Punkte) ist laut Dokument NICHT Bestandteil des qualifizierten Mietspiegels und nicht erfasst.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1949,
+          "label": "1: bis 1949"
+        },
+        {
+          "von": 1950,
+          "bis": 1960,
+          "label": "2: 1950-1960"
+        },
+        {
+          "von": 1961,
+          "bis": 1974,
+          "label": "3: 1961-1974"
+        },
+        {
+          "von": 1975,
+          "bis": 2000,
+          "label": "4: 1975-2000"
+        },
+        {
+          "von": 2001,
+          "bis": null,
+          "label": "5: 2001 und jünger"
+        }
+      ],
+      "wfl": [
+        {
+          "von": null,
+          "bis": 60,
+          "bis_inkl": false,
+          "label": "A: unter 60 m²"
+        },
+        {
+          "von": 60,
+          "bis": 85,
+          "bis_inkl": false,
+          "label": "B: 60 bis unter 85 m²"
+        },
+        {
+          "von": 85,
+          "bis": null,
+          "label": "C: 85 m² und größer"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "unten": 4.79,
+        "mittel": 6.24,
+        "oben": 8.18,
+        "seite": "10"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 1,
+        "unten": 4.9,
+        "mittel": 5.64,
+        "oben": 6.75,
+        "seite": "10"
+      },
+      {
+        "baujahr": 0,
+        "wfl": 2,
+        "unten": 4.88,
+        "mittel": 5.65,
+        "oben": 6.68,
+        "seite": "10"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "unten": 5.02,
+        "mittel": 6.6,
+        "oben": 7.44,
+        "seite": "10"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 1,
+        "unten": 4.71,
+        "mittel": 6.29,
+        "oben": 7.47,
+        "seite": "10"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 2,
+        "unten": 3.76,
+        "mittel": 6.13,
+        "oben": 7.34,
+        "seite": "10"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "unten": 6,
+        "mittel": 6.74,
+        "oben": 7.5,
+        "seite": "10"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 1,
+        "unten": 5.84,
+        "mittel": 6.48,
+        "oben": 7.36,
+        "seite": "10"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 2,
+        "unten": 4.57,
+        "mittel": 6.13,
+        "oben": 7.43,
+        "seite": "10"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "unten": 5.78,
+        "mittel": 7.31,
+        "oben": 8.34,
+        "seite": "10"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 1,
+        "unten": 5.87,
+        "mittel": 7.09,
+        "oben": 8.34,
+        "seite": "10"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 2,
+        "unten": 5.23,
+        "mittel": 6.5,
+        "oben": 7.94,
+        "seite": "10"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "unten": 7.74,
+        "mittel": 9.34,
+        "oben": 9.93,
+        "seite": "10"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 1,
+        "unten": 7.8,
+        "mittel": 9.07,
+        "oben": 9.6,
+        "seite": "10"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 2,
+        "unten": 7.03,
+        "mittel": 8.23,
+        "oben": 10.43,
+        "seite": "10"
+      }
+    ],
+    "zuschlaege": [
+      {
+        "merkmal": "lage:gut",
+        "label": "gute Wohnlage (Wohnlagenverzeichnis)",
+        "art": "eur_qm",
+        "wert": 0.29,
+        "beleg": "PDF-S. 9 (Kap. 6) und PDF-S. 10"
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1930,
+        "wfl": 70
+      },
+      "erwartet": {
+        "unten": 4.9,
+        "mittel": 5.64,
+        "oben": 6.75
+      },
+      "art": "anwendungsbeispiel",
+      "seite": "PDF-S. 14, Kap. 10 Berechnungsbeispiel „Feld B1, Baujahr bis 1949, 60 bis unter 85 m²“: Spannenunterwert 4,90, Mittelwert 5,64, Spannenoberwert 6,75 €/m² (Einordnung per Orientierungshilfe nicht erfasst)"
+    },
+    {
+      "eingabe": {
+        "baujahr": 1970,
+        "wfl": 50,
+        "lage": "gut"
+      },
+      "erwartet": {
+        "unten": 6.29,
+        "mittel": 7.03,
+        "oben": 7.79
+      },
+      "art": "anwendungsbeispiel",
+      "seite": "PDF-S. 14–15, Berechnungsbeispiel „Feld A3, Baujahr 1961 bis 1974, unter 60 m²“: 6,00 / 6,74 / 7,50 €/m², gute Wohnlage +0,29 €/m² (Satz am Ende des Beispiels)"
+    }
+  ]
+}

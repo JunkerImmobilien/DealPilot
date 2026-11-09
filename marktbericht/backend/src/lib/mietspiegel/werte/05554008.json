@@ -1,0 +1,402 @@
+{
+  "ags": "05554008",
+  "gemeinde": "Bocholt",
+  "art": "qualifiziert",
+  "stand": "2026-01-01",
+  "erhebungsstichtag": "2025-05-01",
+  "gueltig_ab": "2026-01-01",
+  "gueltig_bis": "2027-12-31",
+  "quelle": {
+    "url": "https://www.bocholt.de/bocholt_media/fachbereiche/gutachterausschuss/mietspiegel-stadt-bocholt-2026.pdf",
+    "dokument": "Mietspiegel 2026 für nicht preisgebundene Wohnungen Stadt Bocholt, gültig ab 1. Januar 2026 (qualifiziert, § 558d Abs. 1 BGB), Erhebungsstand 1. Mai 2025, Stadt Bocholt mit Arbeitskreis Mietspiegel",
+    "seite": "S. 9 (Tabelle 1 Grundtabelle), S. 10–14 (Tabellen 2–6 Zu- und Abschläge), S. 6–7 (Anwendungsbereich, statistische Grundlagen), S. 20–21 (Vordruck)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Herausgeber Stadt Bocholt",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Qualifiziert (§ 558d Abs. 1 BGB), Vollerhebung zum Stand Mai 2025 („Erhebungsstand: 1. Mai 2025“), „zwei Jahre ab dem 01.01.2026 gültig“ (S. 7) — gueltig_bis 31.12.2027 daraus gerechnet. Grundtabelle nur nach Baualter (Mittelwert = arithm. Mittel, Spanne Unter-/Obergrenze); Wohnfläche geht als Zu-/Abschlag in €/m² ein (Tabelle 2, Referenz 65 bis unter 85 m²) und wird automatisch angewandt. Anwendungsbereich 24–180 m², Baujahr 1900 bis Mai 2025 (geltung); außerhalb nur Orientierung. Lage: Zone II = Standard; objekt.lage „Zone I“, „Zone III“ oder „Zone IV“ (Karte zur Gebietseinteilung im Dokument). Garten zur alleinigen Nutzung nicht mit dem Einfamilienhaus-Zuschlag kombinierbar. Modernisierungszuschläge (Tabelle 5) nur bei Gebäuden mit Baujahr vor 1985. Zu-/Abschläge gelten für Mittelwert und Spannengrenzen (5.2). Kein Rechenbeispiel mit Zahlen im Dokument (nur Vordruck) — Prüfbeispiele sind abgelesene Felder, eines mit dem Größenzuschlag aus Tabelle 2.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": 1900,
+          "bis": 1979,
+          "label": "1900 bis 1979"
+        },
+        {
+          "von": 1980,
+          "bis": 1994,
+          "label": "1980 bis 1994"
+        },
+        {
+          "von": 1995,
+          "bis": 2008,
+          "label": "1995 bis 2008"
+        },
+        {
+          "von": 2009,
+          "bis": 2014,
+          "label": "2009 bis 2014"
+        },
+        {
+          "von": 2015,
+          "bis": 2021,
+          "label": "2015 bis 2021"
+        },
+        {
+          "von": 2022,
+          "bis": 2025,
+          "label": "2022 und jünger (bis Mai 2025)"
+        }
+      ],
+      "wfl": [
+        {
+          "von": 24,
+          "bis": 180,
+          "label": "24 bis 180 m² (Größe über Zu-/Abschläge Tabelle 2)"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "unten": 5.51,
+        "mittel": 6.44,
+        "oben": 7.34,
+        "seite": "9"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "unten": 5.93,
+        "mittel": 6.93,
+        "oben": 7.89,
+        "seite": "9"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "unten": 6.14,
+        "mittel": 7.18,
+        "oben": 8.18,
+        "seite": "9"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "unten": 6.54,
+        "mittel": 7.65,
+        "oben": 8.72,
+        "seite": "9"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "unten": 6.92,
+        "mittel": 8.09,
+        "oben": 9.22,
+        "seite": "9"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "unten": 8.28,
+        "mittel": 9.68,
+        "oben": 11.03,
+        "seite": "9"
+      }
+    ],
+    "geltung": {
+      "baujahr_von": 1900,
+      "baujahr_bis": 2025,
+      "wfl_von": 24,
+      "wfl_bis": 180
+    },
+    "zuschlaege": [
+      {
+        "merkmal": "wohnflaeche",
+        "label": "Wohnfläche (Tabelle 2)",
+        "art": "eur_qm",
+        "beleg": "S. 10, Tabelle 2",
+        "wfl_klassen": [
+          {
+            "von": 24,
+            "bis": 35,
+            "bis_inkl": false,
+            "wert": 1.86
+          },
+          {
+            "von": 35,
+            "bis": 45,
+            "bis_inkl": false,
+            "wert": 0.96
+          },
+          {
+            "von": 45,
+            "bis": 65,
+            "bis_inkl": false,
+            "wert": 0.43
+          },
+          {
+            "von": 65,
+            "bis": 85,
+            "bis_inkl": false,
+            "wert": 0
+          },
+          {
+            "von": 85,
+            "bis": 115,
+            "bis_inkl": false,
+            "wert": -0.23
+          },
+          {
+            "von": 115,
+            "bis": 125,
+            "bis_inkl": false,
+            "wert": -0.46
+          },
+          {
+            "von": 125,
+            "bis": 150,
+            "bis_inkl": false,
+            "wert": -0.93
+          },
+          {
+            "von": 150,
+            "bis": null,
+            "wert": -1.43
+          }
+        ]
+      },
+      {
+        "merkmal": "efh_terrasse_oder_garten",
+        "label": "Einfamilienhaus mit Terrasse oder Garten",
+        "art": "eur_qm",
+        "wert": 0.24,
+        "beleg": "S. 11, Tabelle 2"
+      },
+      {
+        "merkmal": "efh_terrasse_und_garten",
+        "label": "Einfamilienhaus mit Terrasse und Garten",
+        "art": "eur_qm",
+        "wert": 0.51,
+        "beleg": "S. 11, Tabelle 2"
+      },
+      {
+        "merkmal": "dachgeschosswohnung",
+        "label": "Dachgeschosswohnung (mit Schrägen)",
+        "art": "eur_qm",
+        "wert": -0.1,
+        "beleg": "S. 11, Tabelle 2"
+      },
+      {
+        "merkmal": "garten_alleinige_nutzung",
+        "label": "Garten zur alleinigen Nutzung durch die Mietpartei (nur Mehrfamilienhaus, nicht mit EFH-Zuschlag)",
+        "art": "eur_qm",
+        "wert": 0.23,
+        "beleg": "S. 10, Tabelle 3"
+      },
+      {
+        "merkmal": "bad_separate_dusche",
+        "label": "Badezimmer mit separater Dusche (mit oder ohne Badewanne)",
+        "art": "eur_qm",
+        "wert": 0.14,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "offene_kueche",
+        "label": "Offene Küche",
+        "art": "eur_qm",
+        "wert": 0.13,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "einbaukueche",
+        "label": "Einbauküche vom Vermieter gestellt (mind. ein Elektrogerät)",
+        "art": "eur_qm",
+        "wert": 0.29,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "einfachverglasung",
+        "label": "Einfachverglasung bei sämtlichen Fenstern und Außentüren",
+        "art": "eur_qm",
+        "wert": -0.34,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "schallschutzfenster",
+        "label": "Schallschutzfenster (zur Lärmquelle)",
+        "art": "eur_qm",
+        "wert": 0.47,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "etagenheizung",
+        "label": "Etagenheizung",
+        "art": "eur_qm",
+        "wert": -0.1,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "blockheizkraftwerk",
+        "label": "Blockheizkraftwerk (Nahwärme)",
+        "art": "eur_qm",
+        "wert": 0.22,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "separate_warmwasserbereitung",
+        "label": "Separate Art der Warmwasserbereitung für Küche und Bad",
+        "art": "eur_qm",
+        "wert": -0.18,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "fussbodenheizung",
+        "label": "Fußbodenheizung in allen Aufenthaltsräumen",
+        "art": "eur_qm",
+        "wert": 0.51,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "aufzug",
+        "label": "Wohnung ist über einen Aufzug erreichbar",
+        "art": "eur_qm",
+        "wert": 0.28,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "hochwertiger_bodenbelag",
+        "label": "Hochwertiger Bodenbelag (z. B. Echtholzparkett, Naturstein, Design-Vinyl)",
+        "art": "eur_qm",
+        "wert": 0.2,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "gefangene_raeume",
+        "label": "Ein oder mehrere „gefangene“ Räume bzw. Durchgangsräume",
+        "art": "eur_qm",
+        "wert": -0.17,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "video_gegensprechanlage",
+        "label": "Videounterstützte Gegensprechanlage mit Türöffner",
+        "art": "eur_qm",
+        "wert": 0.37,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "elektrische_rolllaeden",
+        "label": "Elektrische Rollläden/Fensterläden an allen Fenstern",
+        "art": "eur_qm",
+        "wert": 0.23,
+        "beleg": "S. 12, Tabelle 4"
+      },
+      {
+        "merkmal": "baderneuerung_ab_2012",
+        "label": "Baderneuerung/-sanierung ab dem Jahr 2012 (Gebäude Baujahr vor 1985)",
+        "art": "eur_qm",
+        "wert": 0.25,
+        "beleg": "S. 13, Tabelle 5",
+        "bedingung": {
+          "baujahr_bis": 1984
+        }
+      },
+      {
+        "merkmal": "elektro_erneuert_ab_2010",
+        "label": "Vollständige Erneuerung der Elektroinstallationen ab 2010 (Gebäude Baujahr vor 1985)",
+        "art": "eur_qm",
+        "wert": 0.52,
+        "beleg": "S. 13, Tabelle 5",
+        "bedingung": {
+          "baujahr_bis": 1984
+        }
+      },
+      {
+        "merkmal": "innenausbau_erneuert_ab_2002",
+        "label": "Umfangreiche Erneuerung des Innenausbaus ab 2002 (Gebäude Baujahr vor 1985)",
+        "art": "eur_qm",
+        "wert": 0.37,
+        "beleg": "S. 13, Tabelle 5",
+        "bedingung": {
+          "baujahr_bis": 1984
+        }
+      },
+      {
+        "merkmal": "lage:zone i",
+        "label": "Lage im Stadtgebiet Zone I",
+        "art": "eur_qm",
+        "wert": 0.71,
+        "beleg": "S. 14, Tabelle 6",
+        "aliase": [
+          "zone 1",
+          "I"
+        ]
+      },
+      {
+        "merkmal": "lage:zone iii",
+        "label": "Lage im Stadtgebiet Zone III",
+        "art": "eur_qm",
+        "wert": -0.1,
+        "beleg": "S. 14, Tabelle 6",
+        "aliase": [
+          "zone 3",
+          "III"
+        ]
+      },
+      {
+        "merkmal": "lage:zone iv",
+        "label": "Lage im Stadtgebiet Zone IV (Ortslagen und Außenbereiche)",
+        "art": "eur_qm",
+        "wert": -0.7,
+        "beleg": "S. 14, Tabelle 6",
+        "aliase": [
+          "zone 4",
+          "IV"
+        ]
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1970,
+        "wfl": 70
+      },
+      "erwartet": {
+        "unten": 5.51,
+        "mittel": 6.44,
+        "oben": 7.34
+      },
+      "art": "tabellenzelle",
+      "seite": "S. 9, Grundtabelle 1900 bis 1979; Wohnfläche 65 bis unter 85 m² = Referenzwert (S. 10)"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2018,
+        "wfl": 50
+      },
+      "erwartet": {
+        "unten": 7.35,
+        "mittel": 8.52,
+        "oben": 9.65
+      },
+      "art": "tabellenzelle",
+      "seite": "S. 9, Grundtabelle 2015 bis 2021: 6,92 / 8,09 / 9,22 €/m² zuzüglich Wohnfläche 45 bis unter 65 m² +0,43 €/m² (S. 10, Tabelle 2)"
+    },
+    {
+      "eingabe": {
+        "baujahr": 1899,
+        "wfl": 70
+      },
+      "erwartet": null,
+      "art": "tabellenzelle",
+      "seite": "S. 6/9: Mietspiegel umfasst Baujahre ab 1900"
+    }
+  ]
+}

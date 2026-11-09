@@ -1,0 +1,219 @@
+{
+  "ags": "05562024",
+  "gemeinde": "Marl",
+  "art": "einfach",
+  "stand": "2026-04-01",
+  "erhebungsstichtag": null,
+  "gueltig_ab": "2026-04-01",
+  "gueltig_bis": "2028-03-31",
+  "quelle": {
+    "url": "https://marl.de/fileadmin/user_upload/Dokumente/Amt_61/Mietspiegel_2026.pdf",
+    "dokument": "Mietspiegel für frei finanzierte Wohnungen in der Stadt Marl, Stand 01.04.2026 (gültig bis 31.03.2028), 27. überarbeitete Fassung, beschlossen vom Mietspiegelgremium am 04.03.2026 (Haus- und Grundeigentümerverein Marl, Hüls und Umgegend; Mieterschutzverein Marl; Arbeitsgemeinschaft der Wohnungswirtschaft Emscher-Lippe; Stadt Marl)",
+    "seite": "PDF-S. 5 (Mietspiegeltabelle 2026, Zu- und Abschläge), PDF-S. 2–4 (Allgemeines, Aufbau, Wohnlage)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Ersteller Mietspiegelgremium Marl",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Art im Dokument nicht genannt; ohne Bezug auf § 558d als einfacher Mietspiegel geführt (Verzeichnis: „unklar“). Gültig 01.04.2026 bis 31.03.2028 (ohne Einigung über Fortschreibung bis 30.06.2028). Tabelle nach Baualter mit Spanne und Mittelwert für Standardwohnungen (WC/Bad, Heizung) in Gebäuden mit mehr als zwei Wohnungen, über 40 bis 100 m², normale Wohnlage. Größen außerhalb (bis 40 m² Zuschlag BIS 5 %, 100–120 m² Abschlag BIS 2,5 %, über 120 m² BIS 5 %), Wohnlage (einfach/gut BIS 10 %) und Barrierenreduzierung (BIS 8 %) sind Höchstwerte und nicht übernommen. Gebäudeart-Zuschläge: Spalten „Mehrwert der Wohnung“ und „Sonderzuschlag Garten“ als feste Prozentsätze erfasst (Summe = „Zuschlag maximal“); Zweifamilien-/Einfamilienhaus-Wohnungen sind von der Größentabelle ausgenommen. Gruppe IX (2022 und später): keine ausreichenden Daten, „Die Miethöhe wird vom Markt geregelt“ — keine Zelle. Kein Lesebeispiel — Prüfbeispiele sind abgelesene Felder.",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1948,
+          "label": "I: bis 1948"
+        },
+        {
+          "von": 1949,
+          "bis": 1960,
+          "label": "II: 1949 - 1960"
+        },
+        {
+          "von": 1961,
+          "bis": 1971,
+          "label": "III: 1961 - 1971"
+        },
+        {
+          "von": 1972,
+          "bis": 1981,
+          "label": "IV: 1972 - 1981"
+        },
+        {
+          "von": 1982,
+          "bis": 1991,
+          "label": "V: 1982 - 1991"
+        },
+        {
+          "von": 1992,
+          "bis": 2001,
+          "label": "VI: 1992 - 2001"
+        },
+        {
+          "von": 2002,
+          "bis": 2011,
+          "label": "VII: 2002 - 2011"
+        },
+        {
+          "von": 2012,
+          "bis": 2021,
+          "label": "VIII: 2012 - 2021"
+        },
+        {
+          "von": 2022,
+          "bis": null,
+          "label": "IX: 2022 und später (keine Werte)"
+        }
+      ],
+      "wfl": [
+        {
+          "von": 40,
+          "von_inkl": false,
+          "bis": 100,
+          "label": "Standardgrößenspanne über 40 m² bis 100 m²"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "unten": 5.3,
+        "mittel": 5.85,
+        "oben": 6.35,
+        "seite": "5"
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "unten": 5.85,
+        "mittel": 6.35,
+        "oben": 6.8,
+        "seite": "5"
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "unten": 6.2,
+        "mittel": 6.7,
+        "oben": 7.15,
+        "seite": "5"
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "unten": 6.45,
+        "mittel": 7.05,
+        "oben": 7.65,
+        "seite": "5"
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "unten": 7.3,
+        "mittel": 7.9,
+        "oben": 8.5,
+        "seite": "5"
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "unten": 7.65,
+        "mittel": 8.3,
+        "oben": 8.95,
+        "seite": "5"
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "unten": 8.25,
+        "mittel": 9,
+        "oben": 9.75,
+        "seite": "5"
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "unten": 9.55,
+        "mittel": 10.25,
+        "oben": 10.9,
+        "seite": "5"
+      }
+    ],
+    "zuschlaege": [
+      {
+        "merkmal": "zweifamilienhaus",
+        "label": "Wohnung in einem Zweifamilienhaus (Mehrwert der Wohnung)",
+        "art": "pct",
+        "wert": 2.5,
+        "beleg": "PDF-S. 5, Zuschläge aufgrund der Gebäudeart / besonderer Ausstattung"
+      },
+      {
+        "merkmal": "einfamilienhaus",
+        "label": "Einfamilienhaus, auch DHH/Reihenhaus ohne gemeinschaftliche Einrichtungen (Mehrwert der Wohnung)",
+        "art": "pct",
+        "wert": 5,
+        "beleg": "PDF-S. 5, Zuschläge aufgrund der Gebäudeart / besonderer Ausstattung"
+      },
+      {
+        "merkmal": "garten_mfh_oder_zfh",
+        "label": "Sonderzuschlag Garten (alleinige Nutzung) bei typischer Mietwohnung im Mehrfamilienhaus oder Zweifamilienhaus",
+        "art": "pct",
+        "wert": 2.5,
+        "beleg": "PDF-S. 5, Zuschläge aufgrund der Gebäudeart / besonderer Ausstattung"
+      },
+      {
+        "merkmal": "garten_efh",
+        "label": "Sonderzuschlag Garten bei Einfamilienhaus",
+        "art": "pct",
+        "wert": 5,
+        "beleg": "PDF-S. 5, Zuschläge aufgrund der Gebäudeart / besonderer Ausstattung"
+      },
+      {
+        "merkmal": "barrierefrei_din_18040_2",
+        "label": "barrierefreie Ausstattung (DIN 18040-2)",
+        "art": "pct",
+        "wert": 10,
+        "beleg": "PDF-S. 5, Zuschläge aufgrund der Gebäudeart / besonderer Ausstattung"
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1965,
+        "wfl": 70
+      },
+      "erwartet": {
+        "unten": 6.2,
+        "mittel": 6.7,
+        "oben": 7.15
+      },
+      "art": "tabellenzelle",
+      "seite": "PDF-S. 5, Gruppe III 1961 - 1971"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2015,
+        "wfl": 85
+      },
+      "erwartet": {
+        "unten": 9.55,
+        "mittel": 10.25,
+        "oben": 10.9
+      },
+      "art": "tabellenzelle",
+      "seite": "PDF-S. 5, Gruppe VIII 2012 - 2021"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2023,
+        "wfl": 85
+      },
+      "erwartet": null,
+      "art": "tabellenzelle",
+      "seite": "PDF-S. 5, Gruppe IX: keine ausreichenden Daten"
+    }
+  ]
+}
