@@ -282,7 +282,7 @@
     },
     'tab3.leerstand': {
       title: 'Leerstand p.a.',
-      body: 'Anteil der Monate pro Jahr ohne Miete. Bei langjährigen Mietern: 0%. Mit gelegentlichem Mieterwechsel: 2-5%. In strukturschwachen Lagen ggf. 10%+. Wird von der Miete abgezogen: mindert Cashflow, Nettomietrendite und die steuerpflichtigen Einnahmen. Die Bruttomietrendite bleibt auf der vollen Miete.',   /* v3030 */
+      body: 'Anteil der Monate pro Jahr ohne Miete. Bei langjährigen Mietern: 0%. Mit gelegentlichem Mieterwechsel: 2-5%. In strukturschwachen Lagen ggf. 10%+. Wird von der Miete abgezogen: mindert Cashflow, Nettomietrendite und die steuerpflichtigen Einnahmen. Die Bruttomietrendite bleibt auf der vollen Miete. Daraus entsteht der kalkulatorische Mietausfall im Reiter Bewirtschaftung: Jahresnettokaltmiete × Leerstand % — er zählt genau einmal.',   /* v3030 · v3238 */
       severity: 'beginner'
     },
     'tab3.btj': {
@@ -477,7 +477,7 @@
     },
     'tab6.kalkulat_mietausfall': {
       title: 'Kalkulatorischer Mietausfall',
-      body: 'Konservativer Puffer für Mieterwechsel, Leerstand und Zahlungsausfälle. Bei stabilem Mieter: 0. Bei normalem Risiko: 1-2 Monatsmieten p.a. Bei strukturschwacher Lage: 3-4 Monate. Wird je nach DS2-Mietausfall-Risiko (Tab Miete) auto-vorbefüllt.',
+      body: 'Kalkulatorischer Mietausfall = Jahresnettokaltmiete × Leerstand % aus dem Reiter Miete. Er wird nicht mehr eingetragen, sondern immer aus dem Leerstand berechnet und zählt genau einmal: er mindert Cashflow, Nettomietrendite und die steuerpflichtigen Einnahmen. Ändern über das Feld Leerstand p.a. im Reiter Miete.',   /* v3238 */
       severity: 'pro'
     },
     'tab6.sonstiges_umlagefaehig': {

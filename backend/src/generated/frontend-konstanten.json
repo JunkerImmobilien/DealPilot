@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-09T07:04:04.832Z",
+ "erzeugt_am": "2026-11-09T07:05:30.769Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "a427c64cbe052c8d",
-  "index-html": "9b8d300f2217d274",
+  "storage": "e62305c682199615",
+  "index-html": "da9e57cc13ce819a",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -502,6 +502,7 @@
    "san_plan",
    "eigen_r",
    "mietausfall",
+   "mietausfall_alt",
    "nul_sonst",
    "kp1",
    "kp1l",
@@ -1173,32 +1174,32 @@
    {
     "id": "d1z",
     "kind": "text",
-    "label": "Zinssatz nominal (% p.a.)"
+    "label": "Zinssatz nominal"
    },
    {
     "id": "d1t",
     "kind": "text",
-    "label": "Tilgung (% p.a.) — bei Aussetzung deaktiviert"
+    "label": "Tilgung — bei Aussetzung deaktiviert"
    },
    {
     "id": "d1_bindj",
     "kind": "text",
-    "label": "Zinsbindung (Jahre)"
+    "label": "Zinsbindung"
    },
    {
     "id": "anschl_z",
     "kind": "text",
-    "label": "Zinssatz Anschluss (%)"
+    "label": "Anschlusszins"
    },
    {
     "id": "anschl_t",
     "kind": "text",
-    "label": "Tilgung Anschluss (%)"
+    "label": "Anschlusstilgung"
    },
    {
     "id": "anschl_bj",
     "kind": "text",
-    "label": "Zinsbindung Anschluss (J.)"
+    "label": "Bindung Anschluss"
    },
    {
     "id": "hg_ul",
@@ -1293,17 +1294,17 @@
    {
     "id": "d2z",
     "kind": "text",
-    "label": "Zinssatz nominal (%)"
+    "label": "Zinssatz nominal"
    },
    {
     "id": "d2t",
     "kind": "text",
-    "label": "Tilgung (%)"
+    "label": "Tilgung"
    },
    {
     "id": "d2_bindj",
     "kind": "text",
-    "label": "Zinsbindung (Jahre)"
+    "label": "Zinsbindung"
    },
    {
     "id": "d2_inst",
@@ -1377,12 +1378,12 @@
    {
     "id": "d2_az",
     "kind": "text",
-    "label": "Zinssatz Anschluss (%)"
+    "label": "Anschlusszins"
    },
    {
     "id": "d2_at",
     "kind": "text",
-    "label": "Tilgung Anschluss (%)"
+    "label": "Anschlusstilgung"
    },
    {
     "id": "d2_vertrag",
@@ -1392,7 +1393,7 @@
    {
     "id": "d2_bspar",
     "kind": "text",
-    "label": "Bausparvertrag (optional)"
+    "label": "Bausparvertrag"
    },
    {
     "id": "afa_sonder7b_aktiv",

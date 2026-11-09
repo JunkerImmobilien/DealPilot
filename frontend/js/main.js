@@ -256,14 +256,10 @@ function setDefaults() {
      führt ihn als Prozentsatz der Jahres-Nettokaltmiete. Ohne Miete gibt
      es nichts zu rechnen — dann bleibt das Feld leer, statt eine Null zu
      behaupten. */
-  (function () {
-    var pct = _dpProfilWert('mietausfall_pct', 0);
-    var nkmEl = document.getElementById('nkm');
-    var nkm = nkmEl ? parseFloat(String(nkmEl.value || '').replace(/\./g, '').replace(',', '.')) : 0;
-    if (pct > 0 && isFinite(nkm) && nkm > 0) {
-      sv('mietausfall', Math.round(nkm * 12 * pct / 100));
-    }
-  })();
+  /* v3238 · Marcel 09.11.2026: der kalkulatorische Mietausfall wird jetzt IMMER aus
+     dem Leerstand % (Reiter Miete, oben aus leerstand_pct vorbelegt) berechnet -
+     calc.js, Block „MIETAUSFALL = LEERSTAND". Hier stand die Vorbelegung aus
+     mietausfall_pct; sie zaehlte NEBEN dem Leerstand ein zweites Mal. */
   sv('btj', '15');
 }
 

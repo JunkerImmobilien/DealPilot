@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════════════════════
+   frontend/css/finanzierung-raster.css — v3238 · Marcel 09.11.2026
+
+   Reiter Finanzierung, Karten „Darlehen I" und „Darlehen II":
+   „Anschlussfinanzierung und Position der Felder nicht gut im Tab
+   Finanzierung."
+
+   Vorher: sieben .g2-Paare in Ladereihenfolge — Eigenkapital und
+   Darlehenssumme je allein in einer Zeile, die Rate allein, drei Felder
+   (Zinsbindung · Verwendung · Restschuld) in einem Zwei-Spalten-Raster,
+   also eines umgebrochen; die Anschlussfinanzierung als Schalter
+   zwischen den Import-Knöpfen, ihre Felder in drei .g2 mit Leerzelle.
+
+   Jetzt Gruppen mit eigenem Raster (index.html .fz-gruppen), Vorbild
+   css/objektdaten-raster.css (v3225):
+     Darlehen       Art (2) · Auszahlung · Verwendung
+     Eigenkapital   Eigenkapital (2) · Haken „= Kaufnebenkosten" (2)
+     Konditionen    Betrag (2) · Zins · Tilgung /
+                    Zinsbindung · Rate · davon Zinsen · davon Tilgung /
+                    Kapitaldeckung (volle Breite)
+     Verlauf        Restschuld Ende Zinsbindung (2) · bis · Volltilgung
+     Anschluss      eigener, abgesetzter Kasten direkt darunter:
+                    Beginn · Anschlusszins · Anschlusstilgung · Zinsbindung /
+                    Rate · Zinsrisiko (2) · Mehrkosten
+   Vier Spalten, unter 480 px Kartenbreite zwei (Container-Abfrage, nicht
+   Fenster). Beschriftungen einzeilig, Felder volle Breite, oben bündig.
+   Eigene Klassen statt .g2: die .g2-Regeln in style.css greifen hier
+   absichtlich nicht.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* v3238 · Behälter misst die Kartenbreite */
+.fz-gruppen {
+  container-type: inline-size;
+  container-name: fz;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* v3238 · gemeinsames Raster jeder Gruppe: vier gleiche Spalten */
+.fz-gruppen .fz-raster {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 12px;
+  align-items: start;
+  padding: 10px 0;
+  min-width: 0;
+}
+.fz-gruppen > .fz-raster:first-child { padding-top: 0; }
+.fz-gruppen > .fz-raster + .fz-raster {
+  border-top: 1px solid color-mix(in srgb, var(--border, #E0DBD3) 75%, transparent);
+}
+.fz-gruppen .fz-raster > * { min-width: 0; }
+.fz-gruppen .fz-raster > .f { margin: 0; gap: 4px; }
+.fz-gruppen .fz-raster > .fz-s2 { grid-column: span 2; }
+.fz-gruppen .fz-raster > .fz-s3 { grid-column: span 3; }
+.fz-gruppen .fz-raster > .fz-voll { grid-column: 1 / -1; }
+
+/* v3238 · Beschriftungen einzeilig, Ausgabefelder ohne Umbruch */
+.fz-gruppen .fz-raster > .f > label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fz-gruppen .fz-raster > .f > .cf { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fz-gruppen .fz-raster > .f > .iw,
+.fz-gruppen .fz-raster > .f > input,
+.fz-gruppen .fz-raster > .f > select { width: 100%; min-width: 0; }
+.fz-gruppen .fz-raster > p.hint { margin: 0; }
+
+/* v3238 · Haken „Eigenkapital = Kaufnebenkosten" auf Höhe des Eingabefelds */
+.fz-gruppen .fz-ek > .fz-haken { align-self: end; min-height: 38px; display: flex; align-items: center; }
+.fz-gruppen .fz-ek > .fz-haken .cb-label { white-space: normal; }
+
+/* v3238 · Werkzeuge (Tilgungsplan, Bank-PDF) als eine Zeile */
+.fz-gruppen > .fz-werkzeuge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 10px 0;
+  border-top: 1px solid color-mix(in srgb, var(--border, #E0DBD3) 75%, transparent);
+}
+
+/* v3238 · Anschlussfinanzierung: abgesetzter Kasten direkt unter dem Darlehen */
+.fz-gruppen > .fz-anschluss {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--border, #E0DBD3) 90%, transparent);
+  border-left: 3px solid var(--wl-c9a84c, #c9a84c);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--wl-c9a84c, #c9a84c) 5%, transparent);
+}
+.fz-anschluss > .fz-anschluss-kopf { margin: 0; }
+.fz-anschluss > .fz-anschluss-kopf .toggle-slim > span { font-weight: 600; }
+.fz-anschluss > .fz-raster { padding: 10px 0 2px; }
+.fz-anschluss > .fz-anschluss-fuss { display: block; margin-top: 6px; }
+
+/* v3238 · schmale Karte (Handy, Tablet hochkant): zwei Spalten */
+@container fz (max-width: 480px) {
+  .fz-gruppen .fz-raster { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fz-gruppen .fz-raster > .fz-s3 { grid-column: 1 / -1; }
+}
+
+/* v3238 · Gruppe ganz ausgeblendet (Detailgrad markiert die .f mit data-dp-dg):
+   kein leerer Streifen mit Trennlinie, kein leerer Anschluss-Kasten */
+body.dp-dg-1 #s3 .fz-gruppen > .fz-raster:not(:has(> .f:not([data-dp-dg="2"]):not([data-dp-dg="3"]))),
+body.dp-dg-2 #s3 .fz-gruppen > .fz-raster:not(:has(> .f:not([data-dp-dg="3"]))),
+body.dp-dg-1 #s3 .fz-gruppen > .fz-anschluss:not(:has(.f:not([data-dp-dg="2"]):not([data-dp-dg="3"]))),
+body.dp-dg-2 #s3 .fz-gruppen > .fz-anschluss:not(:has(.f:not([data-dp-dg="3"])))  { display: none; }

@@ -686,10 +686,8 @@ window.DealPilotInvestmentProfile = (function() {
       /* das Darlehen laeuft mit (financing.js), wie nach einer eigenen Eingabe */
       if (gesetzt.length && typeof window.dpDarlehenNachziehen === 'function') setTimeout(window.dpDarlehenNachziehen, 420);
     }
-    if (quelle === 'nkm') {
-      var nkm = _zahlFeld('nkm'), m = pct('mietausfall_pct');
-      if (nkm > 0 && m) setzeLeer('mietausfall', nkm * 12 * m / 100);
-    }
+    /* v3238 · der Mietausfall wird nicht mehr aus mietausfall_pct nachgezogen: calc.js
+       rechnet ihn immer aus dem Leerstand % (Reiter Miete). Sonst zaehlte er doppelt. */
     if (gesetzt.length && typeof window.calc === 'function') { try { window.calc(); } catch (x) {} }
     return gesetzt;
   }
