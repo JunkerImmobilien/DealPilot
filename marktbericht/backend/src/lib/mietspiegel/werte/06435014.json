@@ -1,0 +1,131 @@
+{
+  "ags": "06435014",
+  "gemeinde": "Hanau",
+  "art": "einfach",
+  "stand": "2026-09-15",
+  "gueltig_bis": "2028-09-30",
+  "quelle": {
+    "url": "https://www.hanau.de/mam/formulare/mietspiegel_hanau_2026.pdf",
+    "dokument": "Mietspiegel für Hanau, Bruchköbel, Erlensee, Großkrotzenburg, Schöneck, Langenselbold, Rodenbach und Nidderau (Mieterbund Hanau e.V., Haus & Grund Hanau e.V., Haus & Grund Großauheim e.V.), beschlossen Hanau, 15.09.2026, Geltungsdauer bis 30.09.2028; Tabelle 1 (S. 3), Tabelle 2 Zu-/Abschläge (S. 4–7), Tabelle 3 Wohnlage (S. 7/8)",
+    "seite": 3,
+    "lizenz": "keine Lizenzangabe; laut Dokument über die Homepages der Vereine zum Download erhältlich, zusätzlich auf der Stadtseite veröffentlicht",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "hinweis": "Einfacher Mietspiegel der Verbände (§ 558c Abs. 1 BGB). „stand“ = Datum des Beschlusses (15.09.2026), kein Erhebungsstichtag genannt; Beginn der Geltung im Dokument nicht genannt. Tabelle 1 nennt je Feld nur einen Durchschnittswert („mittel“), KEINE Spanne. Ortsübliche Vergleichsmiete = Tabelle 1 + Saldo der Zu-/Abschläge (Tabelle 2) + Wohnlage (Tabelle 3), alle in €/m². Gilt nur mit Bad/Dusche und Sammel-/Etagenheizung; auch für Ein- und Reihenhäuser (Zuschlag 1a). Gleiche Werte gelten für Bruchköbel, Erlensee, Großkrotzenburg, Schöneck, Langenselbold, Rodenbach und Nidderau (hier nur Hanau abgelegt). Wohnflächenklassen: 25–45 m², dann „über … bis …“.",
+  "tabelle": {
+    "grenzen": {
+      "baujahr": "von und bis einschließlich (Jahre)",
+      "wfl": "von ausschließlich (über), bis einschließlich; erste Klasse ab 25 m² einschließlich"
+    },
+    "achsen": {
+      "baujahr": [
+        {"bis": 1948, "label": "bis 1948"},
+        {"von": 1949, "bis": 1964, "label": "1949 - 1964"},
+        {"von": 1965, "bis": 1980, "label": "1965 - 1980"},
+        {"von": 1981, "bis": 1990, "label": "1981 - 1990"},
+        {"von": 1991, "bis": 2005, "label": "1991 - 2005"},
+        {"von": 2006, "bis": 2015, "label": "2006 - 2015"},
+        {"von": 2016, "bis": 2021, "label": "2016 - 2021"},
+        {"von": 2022, "label": "ab 2022"}
+      ],
+      "wfl": [
+        {"von": 25, "bis": 45, "label": "25 - 45 m²"},
+        {"von": 45, "bis": 65, "label": "über 45 - 65 m²"},
+        {"von": 65, "bis": 85, "label": "über 65 - 85 m²"},
+        {"von": 85, "bis": 105, "label": "über 85 - 105 m²"},
+        {"von": 105, "label": "über 105 m²"}
+      ]
+    },
+    "zellen": [
+      {"baujahr": 0, "wfl": 0, "mittel": 7.36},
+      {"baujahr": 0, "wfl": 1, "mittel": 6.98},
+      {"baujahr": 0, "wfl": 2, "mittel": 6.62},
+      {"baujahr": 0, "wfl": 3, "mittel": 6.43},
+      {"baujahr": 0, "wfl": 4, "mittel": 6.18},
+      {"baujahr": 1, "wfl": 0, "mittel": 8.17},
+      {"baujahr": 1, "wfl": 1, "mittel": 7.86},
+      {"baujahr": 1, "wfl": 2, "mittel": 7.42},
+      {"baujahr": 1, "wfl": 3, "mittel": 7.11},
+      {"baujahr": 1, "wfl": 4, "mittel": 6.8},
+      {"baujahr": 2, "wfl": 0, "mittel": 8.97},
+      {"baujahr": 2, "wfl": 1, "mittel": 8.35},
+      {"baujahr": 2, "wfl": 2, "mittel": 7.91},
+      {"baujahr": 2, "wfl": 3, "mittel": 7.23},
+      {"baujahr": 2, "wfl": 4, "mittel": 6.93},
+      {"baujahr": 3, "wfl": 0, "mittel": 10.33},
+      {"baujahr": 3, "wfl": 1, "mittel": 9.77},
+      {"baujahr": 3, "wfl": 2, "mittel": 9.15},
+      {"baujahr": 3, "wfl": 3, "mittel": 8.35},
+      {"baujahr": 3, "wfl": 4, "mittel": 7.99},
+      {"baujahr": 4, "wfl": 0, "mittel": 10.82},
+      {"baujahr": 4, "wfl": 1, "mittel": 10.26},
+      {"baujahr": 4, "wfl": 2, "mittel": 9.77},
+      {"baujahr": 4, "wfl": 3, "mittel": 9.1},
+      {"baujahr": 4, "wfl": 4, "mittel": 8.47},
+      {"baujahr": 5, "wfl": 0, "mittel": 11.06},
+      {"baujahr": 5, "wfl": 1, "mittel": 10.58},
+      {"baujahr": 5, "wfl": 2, "mittel": 10.03},
+      {"baujahr": 5, "wfl": 3, "mittel": 9.28},
+      {"baujahr": 5, "wfl": 4, "mittel": 8.54},
+      {"baujahr": 6, "wfl": 0, "mittel": 11.81},
+      {"baujahr": 6, "wfl": 1, "mittel": 11.3},
+      {"baujahr": 6, "wfl": 2, "mittel": 10.69},
+      {"baujahr": 6, "wfl": 3, "mittel": 9.91},
+      {"baujahr": 6, "wfl": 4, "mittel": 9.12},
+      {"baujahr": 7, "wfl": 0, "mittel": 12.99},
+      {"baujahr": 7, "wfl": 1, "mittel": 12.37},
+      {"baujahr": 7, "wfl": 2, "mittel": 11.76},
+      {"baujahr": 7, "wfl": 3, "mittel": 10.9},
+      {"baujahr": 7, "wfl": 4, "mittel": 10.08}
+    ],
+    "zuschlaege": [
+      {"merkmal": "Gebäudetyp: freistehendes Einfamilienhaus oder Doppel-/Reihenhaus", "art": "eur_qm", "wert": 2.2, "beleg": "Tabelle 2, Ziff. 1a, S. 4"},
+      {"merkmal": "Balkon/Loggia/Terrasse/Freisitz (Tiefe mind. 1 m bzw. Freisitz mind. 4 m²; nur einmal; entfällt bei Ein-/Doppel-/Reihenhäusern)", "art": "eur_qm", "wert": 0.4, "beleg": "Tabelle 2, Ziff. 2a, S. 4"},
+      {"merkmal": "Wintergarten", "art": "eur_qm", "wert": 0.6, "beleg": "Tabelle 2, Ziff. 2b, S. 4"},
+      {"merkmal": "Garten zur alleinigen Nutzung, mind. 30 m² (nur Wohnungen)", "art": "eur_qm", "wert": 0.6, "beleg": "Tabelle 2, Ziff. 2c, S. 4"},
+      {"merkmal": "Fehlender Wohnungsabschluss", "art": "eur_qm", "wert": -1.5, "beleg": "Tabelle 2, Ziff. 3, S. 5"},
+      {"merkmal": "Isolierverglasung (Zweifachverglasung) aller Fenster — entfällt ab Baualtersklasse 1981", "art": "eur_qm", "wert": 0.35, "beleg": "Tabelle 2, Ziff. 4a, S. 5"},
+      {"merkmal": "3-fach Wärmeschutzverglasung aller Fenster — entfällt ab Baualtersklasse 2016", "art": "eur_qm", "wert": 0.45, "beleg": "Tabelle 2, Ziff. 4b, S. 5"},
+      {"merkmal": "Erhöhte Wärmedämmung aller Außenwände ODER Dach bzw. oberster Geschossdecke", "art": "eur_qm", "wert": 0.35, "beleg": "Tabelle 2, Ziff. 4c, S. 5"},
+      {"merkmal": "Erhöhte Wärmedämmung aller Außenwände UND Dach bzw. oberster Geschossdecke", "art": "eur_qm", "wert": 0.45, "beleg": "Tabelle 2, Ziff. 4d, S. 5"},
+      {"merkmal": "Wärmepumpe — entfällt ab Baualter 2022", "art": "eur_qm", "wert": 0.5, "beleg": "Tabelle 2, Ziff. 4e, S. 5"},
+      {"merkmal": "Fußbodenheizung (mind. 50 % der Wohnfläche) — entfällt ab Baualter 2022", "art": "eur_qm", "wert": 0.25, "beleg": "Tabelle 2, Ziff. 4f, S. 5"},
+      {"merkmal": "Klimaanlage ((Multi-)Splitgeräte, mind. Schlafzimmer und Wohnzimmer)", "art": "eur_qm", "wert": 0.2, "beleg": "Tabelle 2, Ziff. 4g, S. 5/6"},
+      {"merkmal": "Mehrere Badezimmer und/oder mehrere Toiletten", "art": "eur_qm", "wert": 0.35, "beleg": "Tabelle 2, Ziff. 5a, S. 6"},
+      {"merkmal": "Kein ausreichender Spritzschutz", "art": "eur_qm", "wert": -0.35, "beleg": "Tabelle 2, Ziff. 5b, S. 6"},
+      {"merkmal": "Warmwasserversorgung nicht an allen Zapfstellen", "art": "eur_qm", "wert": -0.15, "beleg": "Tabelle 2, Ziff. 5c, S. 6"},
+      {"merkmal": "Toilette außerhalb der Wohnung", "art": "eur_qm", "wert": -0.35, "beleg": "Tabelle 2, Ziff. 5d, S. 6"},
+      {"merkmal": "Modernisiertes Bad und/oder modernisierte Installationen nach dem 01.01.2011 (insgesamt einmal)", "art": "eur_qm", "wert": 0.5, "beleg": "Tabelle 2, Ziff. 5e, S. 6"},
+      {"merkmal": "Leitungen auf Putz", "art": "eur_qm", "wert": -0.25, "beleg": "Tabelle 2, Ziff. 5f, S. 6"},
+      {"merkmal": "Einbauküche und/oder Einbauschränke (insgesamt einmal)", "art": "eur_qm", "wert": 0.35, "beleg": "Tabelle 2, Ziff. 6, S. 6"},
+      {"merkmal": "Hochwertiger Fußbodenbelag in allen Wohn-/Schlafräumen", "art": "eur_qm", "wert": 0.35, "beleg": "Tabelle 2, Ziff. 7a, S. 6/7"},
+      {"merkmal": "Kein Fußbodenbelag (nicht in allen Räumen gestellt)", "art": "eur_qm", "wert": -0.35, "beleg": "Tabelle 2, Ziff. 7b, S. 7"},
+      {"merkmal": "Barrierearme oder barrierefreie Wohnung", "art": "eur_qm", "wert": 0.3, "beleg": "Tabelle 2, Ziff. 8a, S. 7"},
+      {"merkmal": "Überwiegend elektrische Rollläden (mehr als 50 % der Fenster)", "art": "eur_qm", "wert": 0.3, "beleg": "Tabelle 2, Ziff. 8b, S. 7"},
+      {"merkmal": "Videogegensprechanlage", "art": "eur_qm", "wert": 0.15, "beleg": "Tabelle 2, Ziff. 8c, S. 7"},
+      {"merkmal": "Erhöhter Einbruchschutz (RC2 N und/oder Alarmanlage)", "art": "eur_qm", "wert": 0.1, "beleg": "Tabelle 2, Ziff. 8d, S. 7"},
+      {"merkmal": "Massivholztüren", "art": "eur_qm", "wert": 0.15, "beleg": "Tabelle 2, Ziff. 8e, S. 7"},
+      {"merkmal": "Wallbox zum Laden elektrisch betriebener Kfz", "art": "eur_qm", "wert": 0.2, "beleg": "Tabelle 2, Ziff. 8f, S. 7"},
+      {"merkmal": "Kaminofen oder offener Kamin", "art": "eur_qm", "wert": 0.15, "beleg": "Tabelle 2, Ziff. 8g, S. 7"},
+      {"merkmal": "Einfache Wohnlage", "art": "eur_qm", "wert": -1.0, "beleg": "Tabelle 3, Ziff. 1, S. 7/8"},
+      {"merkmal": "Mittlere Wohnlage", "art": "eur_qm", "wert": 0.0, "beleg": "Tabelle 3, Ziff. 2, S. 8"},
+      {"merkmal": "Gute Wohnlage", "art": "eur_qm", "wert": 1.0, "beleg": "Tabelle 3, Ziff. 3, S. 8"}
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {"baujahr": 1970, "wfl": 70},
+      "erwartet": {"mittel": 7.91},
+      "seite": 3,
+      "hinweis": "1965 - 1980, über 65 - 85 m², abgelesen (kein Rechenbeispiel im Dokument)"
+    },
+    {
+      "eingabe": {"baujahr": 2023, "wfl": 40},
+      "erwartet": {"mittel": 12.99},
+      "seite": 3,
+      "hinweis": "ab 2022, 25 - 45 m², abgelesen"
+    }
+  ]
+}
