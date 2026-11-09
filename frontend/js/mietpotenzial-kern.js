@@ -295,6 +295,25 @@
         r.hinweise.push('eigene Soll-Miete ' + eur2(eigen) + ' liegt über der Kappungsgrenze (' + ctx.kapp.pct + ' % in 3 Jahren) — als Erhöhung nach § 558 BGB höchstens '
           + eur2(kcR) + '; der Teil darüber (' + eur2(r.ueber_kappung) + '/Monat) ist keine Erhöhung nach § 558');
       }
+      /* v3249 · § 558 endet an der ortsüblichen Vergleichsmiete. Liegt eine BELEGTE Vergleichsmiete vor (eigene
+         Angabe, Mietspiegel, amtliche Mietpreisübersicht), ist auch die eigene Soll-Miete darauf begrenzt
+         (gemessen Staging 09.11.: Bismarckstr. Whg 1 eigene Soll 1.010 € über Mietspiegel × Fläche).
+         Bei der Schätzung aus Angebotsmieten nur ein Hinweis - die eigene Angabe kann genauer sein. */
+      var vglE = zahl(e.vgl_qm) || zahl(ctx.vgl_qm);
+      var artE = zahl(e.vgl_qm) ? 'eigen' : (ctx.vgl_art || '');
+      if (vglE > 0 && wfl > 0 && r.miete > Math.max(ist, vglE * wfl + u.monat) + 0.5) {
+        var vgR = Math.round(Math.max(ist, vglE * wfl + u.monat) * 100) / 100;
+        if (artE && artE !== 'angebot_abschlag' && artE !== 'marktmiete') {
+          if (r.eigen_soll == null) r.eigen_soll = eigen;
+          r.ueber_vergleichsmiete = Math.round((r.miete - vgR) * 100) / 100;
+          r.miete = vgR; r.herkunft = 'eigene Angabe, auf die Vergleichsmiete begrenzt'; r.grenze = 'Vergleichsmiete';
+          if (u.monat > 0) r.umlage559 = u;
+          r.hinweise.push('eigene Soll-Miete ' + eur2(eigen) + ' liegt über der ortsüblichen Vergleichsmiete ('
+            + eur2(vglE) + '/m²) — als Erhöhung nach § 558 BGB höchstens ' + eur2(vgR) + '; darüber nur mit Gutachten oder drei Vergleichswohnungen');
+        } else if (artE === 'angebot_abschlag' || artE === 'marktmiete') {   /* ohne Art (alte Aufrufer): unverändert */
+          r.hinweise.push('eigene Soll-Miete liegt über der geschätzten Vergleichsmiete (' + eur2(vglE) + '/m², aus Angebotsmieten) — mit Mietspiegel, Vergleichswohnungen oder Gutachten belegen');
+        }
+      }
       return r;
     }
     var vgl = zahl(e.vgl_qm) || zahl(ctx.vgl_qm);

@@ -526,6 +526,13 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   P = await lauf({ plz: '52062' });
   m = P.modell({ einheiten: [{ nr: '1', wfl: '60', ist: '500', status: 'vermietet', soll: '640', mv_letzte_erhoehung: '2023-01-01' }] });
   gleich('K21 Stufe Mieterhöhung (Aachen 15 %): 575 statt 640', [P.soll558(m.wohnungen[0]), m.stufen.mieterhoehung.miete_m, m.wohnungen[0].soll.ueber_kappung], [575, 575, 65]);
+  /* v3249 · eigene Soll über einer BELEGTEN Vergleichsmiete: auf Vergleichsmiete × Fläche begrenzt; bei Schätzung nur Hinweis */
+  s = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', soll: 580, mv_letzte_erhoehung: '2023-01-01' }, { kapp: { pct: 20 }, vgl_qm: 9, vgl_art: 'mietspiegel_qualifiziert', heute: HEUTE });
+  gleich('K22 Mietspiegel 9 €/m² × 60 = 540: eigene Soll 580 → 540', [s.miete, s.eigen_soll, s.ueber_vergleichsmiete, s.grenze], [540, 580, 40, 'Vergleichsmiete']);
+  s = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', soll: 580, mv_letzte_erhoehung: '2023-01-01' }, { kapp: { pct: 20 }, vgl_qm: 9, vgl_art: 'angebot_abschlag', heute: HEUTE });
+  gleich('K23 Schätzung aus Angebot: eigene Soll bleibt 580, mit Hinweis', [s.miete, s.hinweise.some((h) => /geschätzten Vergleichsmiete/.test(h))], [580, true]);
+  s = K.sollFuer({ ist: 600, wfl: 60, status: 'vermietet', soll: 650, mv_letzte_erhoehung: '2023-01-01' }, { kapp: { pct: 20 }, vgl_qm: 9, vgl_art: 'mietspiegel_einfach', heute: HEUTE });
+  gleich('K24 Ist schon über Vergleichsmiete: § 558 bleibt Ist 600', [s.miete], [600]);
 }
 
 console.log('mietpotenzial-pruefen (v3075, v3244, v3246): ' + (n - fehler) + ' von ' + n + ' ok');

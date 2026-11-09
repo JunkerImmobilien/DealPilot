@@ -354,7 +354,7 @@ function collectData() {
           vgl_quelle_art: so.vgl_quelle_art || null, vgl_hinweise: so.vgl_hinweise || [],
           ms: so.ms ? { art: so.ms.art, unten: so.ms.unten, mittel: so.ms.mittel, oben: so.ms.oben, wahl: so.ms.wahl, genutzt: so.ms.genutzt,
             stand: so.ms.stand, gueltig_bis: so.ms.gueltig_bis, veraltet: !!so.ms.veraltet, url: so.ms.url, quelle: so.ms.quelle } : null,
-          eigen_soll_monat: so.eigen_soll || null, ueber_kappung_monat: so.ueber_kappung || null,
+          eigen_soll_monat: so.eigen_soll || null, ueber_kappung_monat: so.ueber_kappung || null, ueber_vergleichsmiete_monat: so.ueber_vergleichsmiete || null,   /* v3249 */
           umlage559: u, grenze: so.grenze || null, herkunft: so.herkunft || null,
           verlangbar_ab: so.verlangbar_ab || te.verlangbar_ab || null, wirksam_ab: so.ab || te.wirksam_ab || null,
           termine_text: so.ab_text || te.text || null, sperre: te.sperre || null, hinweise: so.hinweise || [],
