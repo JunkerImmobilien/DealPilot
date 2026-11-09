@@ -1161,19 +1161,7 @@ label.dp-required.qc-required::after {
       <!-- v363-erwerb: abgesetzte Untergruppe -->
       <div class="f s2" data-v363-erwerb data-v369-head style="margin-top:16px"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Erwerb &amp; Besitzübergang</div></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><input id="ueberf_daten" type="hidden" value=""><!-- v2984: Ergebnis des Ueberfuehrungs-Assistenten (JSON) --><!-- v816h-field-trl v816i-all-rightalign -->
-      <!-- v3197 · Marcel 05.11.2026: Eigentum je Objekt fehlte (Portfoliostrategie: „wem das Objekt gehört (Ehegatte, Quote) … Ehegattenverkauf, Schenkung, Güterstandsschaukel“). -->
-      <details id="eig-box" style="grid-column:1/-1;margin-top:6px"><summary style="cursor:pointer;font:600 13px Inter,sans-serif;color:#1a1814;padding:4px 0">Eigentum &amp; Erwerb</summary>
-        <div class="g2" style="margin-top:8px">
-          <div class="f"><label>Eigentümer</label><select id="eig_struktur"><option value="">—</option><option value="allein">allein</option><option value="ehegatten">Ehegatten gemeinsam</option><option value="gemeinschaft">mit Dritten (Bruchteils-/Erbengemeinschaft)</option></select></div>
-          <div class="f"><label>Erwerb</label><select id="eig_erwerb"><option value="">—</option><option value="kauf">Kauf</option><option value="schenkung">Schenkung</option><option value="erbschaft">Erbschaft</option><option value="ueberfuehrung">Überführung</option></select></div>
-          <div class="f"><label>Eigener Anteil (%)</label><div class="iw"><input id="eig_anteil_ich" type="text" inputmode="decimal" placeholder="100" class="tr"><span class="sfx">%</span></div></div>
-          <div class="f"><label>Anteil Ehegatte (%)</label><div class="iw"><input id="eig_anteil_ehegatte" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">%</span></div></div>
-          <div class="f"><label>Anteil Dritte (%)</label><div class="iw"><input id="eig_anteil_dritte" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">%</span></div></div>
-          <div class="f"><label>Anteil erworben am (falls abweichend)</label><input id="eig_erwerb_datum" type="date" class="tr"></div>
-        </div>
-        <p class="hint" style="margin-top:4px">Für Gestaltungen wie Ehegattenverkauf, Schenkung oder Güterstandsschaukel. Die Anteile sollten zusammen 100 % ergeben; Güterstand und Anfangsvermögen stehen im Investmentprofil.</p>
-      </details>
+      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- v3243: Halter + Ueberfuehrung umgezogen in den Reiter Steuer, Karte #tax-halter-card -->
       <!-- v3202 · Paket aus mehreren Objekten (js/paket-import.js) - unsichtbar, wird mitgespeichert -->
       <input type="hidden" id="paket_id"><input type="hidden" id="paket_name"><input type="hidden" id="paket_nr"><input type="hidden" id="paket_anzahl"><input type="hidden" id="paket_kp_gesamt"><input type="hidden" id="paket_share_deal"><input type="hidden" id="paket_beteiligung">
     </div></div>
@@ -1759,6 +1747,10 @@ label.dp-required.qc-required::after {
                   <option value="50">Über AfA-Nutzungsdauer (anschaffungsnahe HK)</option>
                 </select>
               </div>
+              <!-- v3243 · Marcel 09.11.2026: Haken auch bei Einsteiger. Brutto/netto (#san_ust) und die Verteilung
+                   (#san_tax_years_wrap) bleiben ab Fortgeschritten; Einsteiger rechnet mit ihren Vorgaben (brutto,
+                   automatisch nach der 15-%-Regel, tax.js). Dieser Satz steht nur in Einsteiger (detailgrad.js stilEinsteiger). -->
+              <span class="hint" id="san_tax_einst_hint">Vorgabe: Betrag brutto (inkl. USt), verteilt nach der 15-%-Grenze — darunter sofort als Werbungskosten, darüber über die Nutzungsdauer (AfA).</span>
             </div>
             <!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren (sanierung-plan.js) - Cashflow im Jahr
                  und Steuer (Erhaltung / Herstellung), NICHT in Gesamtinvestition und Beleihung. -->
@@ -2255,6 +2247,31 @@ label.dp-required.qc-required::after {
         </div>
         <span class="hint">ELSTER für die Steuererklärung · BMF/Lohn-Info zum Vergleich</span>
       </div>
+    </div>
+  </div>
+
+  <!-- v3243 · Marcel 09.11.2026: „Eigentum & Erwerb“ und der Halter wandern gemeinsam aus dem Reiter Objekt hierher,
+       sichtbar nur bei Detailgrad Experte (nicht in der Zuordnung gelistet = Experte, so wie der Halter schon vorher).
+       Die DOM-Knoten sind VERSCHOBEN, nicht neu gebaut: alle ids (halter, mand_ueberf_cb, verkehrswert_ueberf …, eig_*)
+       bleiben, Speichern/Import/Mapper/Prompt hängen an ihnen. Der Halter ist zusätzlich an den Pro-Plan gebunden
+       (mandanten.js _applyGate blendet [data-mand] aus). -->
+  <div class="card" id="tax-halter-card" style="margin-top:14px">
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-key"/></svg></span>Halter &amp; Eigentum</div>
+    <p class="hint">Wer das Objekt hält, entscheidet die Steuerrechnung: Privat mit deinem Grenzsteuersatz, eine Gesellschaft (Pro) mit ihrem Körperschaftsteuersatz. Die Angaben zum Eigentum rechnen nicht mit — sie halten fest, wem das Objekt gehört.</p>
+    <div class="g2">
+      <!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><input id="ueberf_daten" type="hidden" value=""><!-- v2984: Ergebnis des Ueberfuehrungs-Assistenten (JSON) --><!-- v816h-field-trl v816i-all-rightalign -->
+    <!-- v3197 · Marcel 05.11.2026: Eigentum je Objekt fehlte (Portfoliostrategie: „wem das Objekt gehört (Ehegatte, Quote) … Ehegattenverkauf, Schenkung, Güterstandsschaukel“). -->
+    <details id="eig-box" style="grid-column:1/-1;margin-top:6px"><summary style="cursor:pointer;font:600 13px Inter,sans-serif;color:inherit;padding:4px 0">Eigentum &amp; Erwerb</summary>
+      <div class="g2" style="margin-top:8px">
+        <div class="f"><label>Eigentümer</label><select id="eig_struktur"><option value="">—</option><option value="allein">allein</option><option value="ehegatten">Ehegatten gemeinsam</option><option value="gemeinschaft">mit Dritten (Bruchteils-/Erbengemeinschaft)</option></select></div>
+        <div class="f"><label>Erwerb</label><select id="eig_erwerb"><option value="">—</option><option value="kauf">Kauf</option><option value="schenkung">Schenkung</option><option value="erbschaft">Erbschaft</option><option value="ueberfuehrung">Überführung</option></select></div>
+        <div class="f"><label>Eigener Anteil (%)</label><div class="iw"><input id="eig_anteil_ich" type="text" inputmode="decimal" placeholder="100" class="tr"><span class="sfx">%</span></div></div>
+        <div class="f"><label>Anteil Ehegatte (%)</label><div class="iw"><input id="eig_anteil_ehegatte" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">%</span></div></div>
+        <div class="f"><label>Anteil Dritte (%)</label><div class="iw"><input id="eig_anteil_dritte" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">%</span></div></div>
+        <div class="f"><label>Anteil erworben am (falls abweichend)</label><input id="eig_erwerb_datum" type="date" class="tr"></div>
+      </div>
+      <p class="hint" style="margin-top:4px">Für Gestaltungen wie Ehegattenverkauf, Schenkung oder Güterstandsschaukel. Die Anteile sollten zusammen 100 % ergeben; Güterstand und Anfangsvermögen stehen im Investmentprofil.</p>
+    </details>
     </div>
   </div>
 
@@ -3839,7 +3856,7 @@ label.dp-required.qc-required::after {
   <script src="js/modal-boarding-skin.js?v=v3090"></script>
   <script src="js/provider-keys.js?v=v2180"></script>
   <script src="js/ueberfuehrung-kern.js?v=v2984"></script>
-  <script src="js/mandanten.js?v=v3228"></script>
+  <script src="js/mandanten.js?v=v3243"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v3215"></script>
   <script src="js/apikeys.js?v=v3167"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
@@ -3914,8 +3931,8 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
-<script src="js/data/detailgrad-zuordnung.js?v=v3236"></script>
-<script src="js/detailgrad.js?v=v3236"></script>
+<script src="js/data/detailgrad-zuordnung.js?v=v3243"></script>
+<script src="js/detailgrad.js?v=v3243"></script>
 <script src="js/objekt-reiter.js?v=v3237"></script>
 <script src="js/paket-import.js?v=v3204"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
@@ -3938,7 +3955,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v3031"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3240"></script>
+<script src="js/help.js?v=v3243"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3234"></script>

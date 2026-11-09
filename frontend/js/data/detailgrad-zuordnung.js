@@ -133,7 +133,8 @@ window.DpDetailgradZuordnung = {
      "gba_p",
      "makler_p",
      "ji_p",
-     "san"
+     "san",
+     "san_tax_active"
     ]
    },
    "2": {
@@ -151,7 +152,7 @@ window.DpDetailgradZuordnung = {
      {
       "s": "#san_tax_years_wrap",
       "art": "block",
-      "titel": "Sanierung · steuerliche Verteilung (v3236: in Einsteiger nur die Summe)"
+      "titel": "Sanierung · steuerliche Verteilung (v3236: in Einsteiger nur die Summe; v3243: der Haken san_tax_active ab Einsteiger, Verteilung und brutto/netto weiter ab hier)"
      },
      {
       "s": "#san-plan-wrap",
@@ -195,7 +196,6 @@ window.DpDetailgradZuordnung = {
      "fesh_o_cost",
      "san_ausgefuehrt",
      "san_ust",
-     "san_tax_active",
      "san_tax_years",
      "moebl",
      "zb_fertig_jahr",
@@ -447,6 +447,16 @@ window.DpDetailgradZuordnung = {
      "afa_satz",
      "geb_ant"
     ]
+   },
+   "3": {
+    "karten": [
+     {
+      "s": "#tax-halter-card",
+      "art": "karte",
+      "titel": "Halter & Eigentum (v3243, aus dem Reiter Objekt: Halter/Überführung + Eigentum & Erwerb; Halter war schon vorher nicht gelistet = Experte)"
+     }
+    ],
+    "felder": []
    }
   },
   "s5": {

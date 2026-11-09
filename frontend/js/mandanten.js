@@ -845,7 +845,7 @@
 
     return ''
       + '<h2 class="set-section-h2">Mandanten</h2>'
-      + '<p class="hint">Lege fest, wer ein Objekt h\u00e4lt \u2014 Privat oder eine Gesellschaft (GmbH/UG). Jedes Objekt bekommt im Tab "Objektdaten" einen <b>Halter</b>. '
+      + '<p class="hint">Lege fest, wer ein Objekt h\u00e4lt \u2014 Privat oder eine Gesellschaft (GmbH/UG). Jedes Objekt bekommt im Tab Steuer (Karte „Halter & Eigentum“, Detailgrad Experte) einen <b>Halter</b>. '   /* v3243: Ort nachgezogen */
       + 'Privat l\u00e4uft \u00fcber dein zu versteuerndes Einkommen (Tab Steuer). Bei GmbH/UG gibst du das Steuerregime, die Buchhaltungs-Stammwerte und die Kosten der Gesellschaft an \u2014 der <b>Jahresabschluss</b> (Bilanz und GuV) steht als Knopf an der Karte der Gesellschaft. '
       + 'Privat bleibt der Standard.</p>'
       + '<div style="display:grid;grid-template-columns:minmax(0,1fr);gap:11px;margin:16px 0">' + cards + '</div>'

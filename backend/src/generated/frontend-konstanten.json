@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-09T07:09:47.499Z",
+ "erzeugt_am": "2026-11-09T07:58:33.793Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
   "storage": "e62305c682199615",
-  "index-html": "7fdaeae5fe88baec",
+  "index-html": "0dd70bff3e67b6ad",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4281,7 +4281,7 @@
      },
      {
       "h": "Mandanten und Steuerzeiträume",
-      "text": "Unter Mandanten legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den Halter. Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum Pro-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\nSteuerzeiträume (Privat): Klick bei Privat auf Bearbeiten. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\nGesellschaft: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Der Knopf Jahresabschluss an der Karte der Gesellschaft erstellt Bilanz und GuV. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft."
+      "text": "Unter Mandanten legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den Halter im Reiter Steuer, Karte Halter & Eigentum (Detailgrad Experte; dort stehen auch die Angaben zu Eigentum und Erwerb). Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum Pro-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\nSteuerzeiträume (Privat): Klick bei Privat auf Bearbeiten. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\nGesellschaft: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Der Knopf Jahresabschluss an der Karte der Gesellschaft erstellt Bilanz und GuV. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft."
      },
      {
       "h": "Telegram-Bot verbinden",
@@ -5487,7 +5487,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "3bc1bea839bd2f6b",
+  "hilfe": "09ed55c6e3da78cf",
   "bewertung": "f427bd734c0570c3"
  }
 }

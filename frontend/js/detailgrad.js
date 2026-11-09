@@ -495,7 +495,11 @@
       'body.dp-dg-1 #s0 #mfh-einstieg, body.dp-dg-1 #s0 #mff-kasten { display: none !important; }',
       'body.dp-dg-1 #s2 #me-mode-detail:not(.active), body.dp-dg-1 #s2 #me-mode-einheiten:not(.active) { display: none !important; }',
       'body.dp-dg-1 #s2 .me-mode-toggle:has(#me-mode-prog.active) { display: none !important; }',
-      'body.dp-dg-1 #s2 .me-incze-row:has(> [data-dp-dg]), body.dp-dg-2 #s2 .me-incze-row:has(> [data-dp-dg="3"]) { display: none !important; }'
+      'body.dp-dg-1 #s2 .me-incze-row:has(> [data-dp-dg]), body.dp-dg-2 #s2 .me-incze-row:has(> [data-dp-dg="3"]) { display: none !important; }',
+      /* v3243 · der Haken „In Steuer-Werbungskosten übernehmen" ist ab Einsteiger sichtbar; der Satz zu
+         seinen Vorgaben (brutto, Verteilung nach der 15-%-Grenze) nur dort - ab Fortgeschritten stehen
+         die beiden Auswahlfelder selbst da. */
+      'body:not(.dp-dg-1) #s1 #san_tax_einst_hint { display: none !important; }'
     ].join('\n');
     (document.head || document.documentElement).appendChild(s);
   }
