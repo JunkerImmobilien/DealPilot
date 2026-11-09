@@ -1,0 +1,507 @@
+{
+  "ags": "05962040",
+  "gemeinde": "Menden (Sauerland)",
+  "art": "einfach",
+  "stand": "2026-04-01",
+  "erhebungsstichtag": null,
+  "gueltig_ab": "2026-04-01",
+  "gueltig_bis": null,
+  "quelle": {
+    "url": "https://www.menden.de/fileadmin/user_upload/Leben_in_Menden/Mietspiegel/mietspiegel_hsk_mk_01.04.2026.pdf",
+    "dokument": "Mietspiegel für freifinanzierten nichtpreisgebundenen Wohnraum des Hochsauerland- und Märkischen Kreises sowie der Stadt Schwerte (mit Ausnahme der Stadt Arnsberg), gemeinsam erstellt gemäß § 558c BGB durch den Landesverband Haus & Grund Westfalen e.V. und die Mietervereine, gültig ab 01.04.2026",
+    "seite": "S. 2 (Tabelle Baujahr × Wohnlage, Geltungsbereich, Stadtzuschlag Iserlohn/Lüdenscheid/Menden/Schwerte), S. 3 (Zu-/Abschläge), S. 4 (Wohnlagen)",
+    "lizenz": "keine Nutzungsbedingungen im Dokument genannt; Urheberrecht der Herausgeber (Haus & Grund Westfalen e.V. und Mietervereine)",
+    "abgerufen": "2026-11-09"
+  },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": "Kreisweiter einfacher Mietspiegel (§ 558c BGB), gilt für Menden (Sauerland) gemeinsam mit den übrigen Gemeinden von HSK und MK sowie Schwerte; „gültig ab 01.04.2026“ ist zugleich stand (Erhebungsstichtag nicht genannt), Ende nicht genannt. Die Tabelle hat KEINE Größenachse: Werte gelten für 46 bis 100 qm (S. 2); bis 45 qm +5 %, größer als 100 qm −5 %, größer als 120 qm −10 % (S. 3) — als automatischer Größenzuschlag (wfl_klassen) erfasst, „größer als 120“ als Ersatz, nicht zusätzlich zu „größer als 100“ gelesen. FÜR MENDEN (SAUERLAND) GILT ZUSÄTZLICH IMMER der Stadtzuschlag je m² nach Baujahr (S. 2: bis 1976 0,28 €, 1977–1985 0,30 €, ab 1986 0,33 €) — automatisch über bedingung/wfl_klassen; die Reihenfolge Prozent vor Euro-Betrag legt das Dokument nicht fest (gerechnet: Zelle × (1 + Σ %) + Σ €). „Ländliche Lage −10 %“ ist ein Merkmal, keine Lageklasse. Zuschlag „zusätzliche Toilette / Gäste-WC 4–8 %“ ist eine Spanne ohne Einzelwert und deshalb nicht übernommen; Komfortwohnungen bis maximal 10 % (S. 4) ebenso. Modernisierte Wohnungen können in eine höhere Baujahresgruppe eingestuft werden (S. 4). Mittelwert „M“ laut Tabelle. Kein Lesebeispiel — Prüfbeispiele sind zwei abgelesene Zellen (ohne Stadtzuschlag).",
+  "tabelle": {
+    "achsen": {
+      "baujahr": [
+        {
+          "von": null,
+          "bis": 1964,
+          "label": "bis 1964"
+        },
+        {
+          "von": 1965,
+          "bis": 1970,
+          "label": "1965 - 1970"
+        },
+        {
+          "von": 1971,
+          "bis": 1976,
+          "label": "1971 - 1976"
+        },
+        {
+          "von": 1977,
+          "bis": 1985,
+          "label": "1977 - 1985"
+        },
+        {
+          "von": 1986,
+          "bis": 1994,
+          "label": "1986 - 1994"
+        },
+        {
+          "von": 1995,
+          "bis": 2001,
+          "label": "1995 - 2001"
+        },
+        {
+          "von": 2002,
+          "bis": 2010,
+          "label": "2002 - 2010"
+        },
+        {
+          "von": 2011,
+          "bis": null,
+          "label": "ab 2011"
+        }
+      ],
+      "wfl": [
+        {
+          "von": null,
+          "bis": null,
+          "label": "alle Größen (Tabellenwerte für 46 bis 100 qm; andere Größen über %-Zu-/Abschläge)"
+        }
+      ],
+      "lage": [
+        {
+          "schluessel": "einfach",
+          "label": "einfache Wohnlage"
+        },
+        {
+          "schluessel": "mittel",
+          "label": "mittlere Wohnlage",
+          "standard": true
+        },
+        {
+          "schluessel": "gut",
+          "label": "gute Wohnlage"
+        }
+      ]
+    },
+    "zellen": [
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 4.28,
+        "mittel": 4.51,
+        "oben": 4.73
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 4.84,
+        "mittel": 5.06,
+        "oben": 5.28
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 5.35,
+        "mittel": 5.56,
+        "oben": 5.78
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 5.45,
+        "mittel": 5.68,
+        "oben": 5.9
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 6.23,
+        "mittel": 6.46,
+        "oben": 6.68
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 6.29,
+        "mittel": 6.51,
+        "oben": 6.73
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 6.46,
+        "mittel": 6.68,
+        "oben": 6.9
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "lage": "einfach",
+        "unten": 6.9,
+        "mittel": 7.12,
+        "oben": 7.34
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 4.45,
+        "mittel": 4.68,
+        "oben": 4.9
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 5,
+        "mittel": 5.23,
+        "oben": 5.45
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 5.45,
+        "mittel": 5.68,
+        "oben": 5.9
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 5.73,
+        "mittel": 5.95,
+        "oben": 6.17
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 6.56,
+        "mittel": 6.79,
+        "oben": 7.01
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 6.73,
+        "mittel": 6.96,
+        "oben": 7.18
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 6.9,
+        "mittel": 7.12,
+        "oben": 7.34
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "lage": "mittel",
+        "unten": 7.34,
+        "mittel": 7.57,
+        "oben": 7.79
+      },
+      {
+        "baujahr": 0,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 4.62,
+        "mittel": 4.86,
+        "oben": 5.06
+      },
+      {
+        "baujahr": 1,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 5.18,
+        "mittel": 5.4,
+        "oben": 5.62
+      },
+      {
+        "baujahr": 2,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 5.56,
+        "mittel": 5.79,
+        "oben": 6.01
+      },
+      {
+        "baujahr": 3,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 6.01,
+        "mittel": 6.24,
+        "oben": 6.46
+      },
+      {
+        "baujahr": 4,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 6.9,
+        "mittel": 7.12,
+        "oben": 7.34
+      },
+      {
+        "baujahr": 5,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 7.18,
+        "mittel": 7.4,
+        "oben": 7.62
+      },
+      {
+        "baujahr": 6,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 7.34,
+        "mittel": 7.57,
+        "oben": 7.79
+      },
+      {
+        "baujahr": 7,
+        "wfl": 0,
+        "lage": "gut",
+        "unten": 7.79,
+        "mittel": 8.02,
+        "oben": 8.24
+      }
+    ],
+    "zuschlaege": [
+      {
+        "merkmal": "stadtzuschlag_bis_1976",
+        "label": "Stadtzuschlag Menden (Sauerland), Baujahre bis 1976",
+        "art": "eur_qm",
+        "wfl_klassen": [
+          {
+            "von": null,
+            "bis": null,
+            "wert": 0.28
+          }
+        ],
+        "bedingung": {
+          "baujahr_bis": 1976
+        },
+        "beleg": "S. 2"
+      },
+      {
+        "merkmal": "stadtzuschlag_1977_1985",
+        "label": "Stadtzuschlag Menden (Sauerland), Baujahre 1977-1985",
+        "art": "eur_qm",
+        "wfl_klassen": [
+          {
+            "von": null,
+            "bis": null,
+            "wert": 0.3
+          }
+        ],
+        "bedingung": {
+          "baujahr_von": 1977,
+          "baujahr_bis": 1985
+        },
+        "beleg": "S. 2"
+      },
+      {
+        "merkmal": "stadtzuschlag_ab_1986",
+        "label": "Stadtzuschlag Menden (Sauerland), Baujahre ab 1986",
+        "art": "eur_qm",
+        "wfl_klassen": [
+          {
+            "von": null,
+            "bis": null,
+            "wert": 0.33
+          }
+        ],
+        "bedingung": {
+          "baujahr_von": 1986
+        },
+        "beleg": "S. 2"
+      },
+      {
+        "merkmal": "wohnflaeche",
+        "label": "Wohnfläche (bis 45 qm +5 %, größer als 100 qm −5 %, größer als 120 qm −10 %)",
+        "art": "pct",
+        "wfl_klassen": [
+          {
+            "von": null,
+            "bis": 45,
+            "wert": 5
+          },
+          {
+            "von": 100,
+            "von_inkl": false,
+            "bis": 120,
+            "wert": -5
+          },
+          {
+            "von": 120,
+            "von_inkl": false,
+            "bis": null,
+            "wert": -10
+          }
+        ],
+        "beleg": "S. 3 (Zuschläge/Abschläge)"
+      },
+      {
+        "merkmal": "alleinige_gartennutzung",
+        "art": "pct",
+        "wert": 5,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "alleinige Gartennutzung"
+      },
+      {
+        "merkmal": "balkon_oder_terrasse_mindestens_6_quadratmeter",
+        "art": "pct",
+        "wert": 5,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "Balkon oder Terrasse mindestens 6 Quadratmeter"
+      },
+      {
+        "merkmal": "dusche_und_badewanne_getrennt_voneinander",
+        "art": "pct",
+        "wert": 2,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "Dusche und Badewanne getrennt voneinander"
+      },
+      {
+        "merkmal": "ueberwiegend_parkettfussboden_oder_hochwertige_bodenfliesen",
+        "art": "pct",
+        "wert": 3,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "überwiegend Parkettfußboden oder hochwertige Bodenfliesen"
+      },
+      {
+        "merkmal": "3_fach_verglaste_isolierfenster",
+        "art": "pct",
+        "wert": 6,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "3-fach verglaste Isolierfenster (soweit keine Modernisierungsmieterhöhung § 559 BGB)"
+      },
+      {
+        "merkmal": "fassadendaemmung",
+        "art": "pct",
+        "wert": 6,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "Fassadendämmung (soweit keine Modernisierungsmieterhöhung § 559 BGB)"
+      },
+      {
+        "merkmal": "daemmung_des_daches_ab_2014",
+        "art": "pct",
+        "wert": 6,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "Dämmung des Daches ab 2014 (soweit keine Modernisierungsmieterhöhung § 559 BGB)"
+      },
+      {
+        "merkmal": "daemmung_der_oberen_geschossdecke",
+        "art": "pct",
+        "wert": 4,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "Dämmung der oberen Geschossdecke"
+      },
+      {
+        "merkmal": "barrierefreiheit_innerhalb_der_wohnung_und_oder_aufzug",
+        "art": "pct",
+        "wert": 5,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "Barrierefreiheit innerhalb der Wohnung und/oder Aufzug"
+      },
+      {
+        "merkmal": "fehlende_beheizung",
+        "art": "pct",
+        "wert": -40,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "fehlende Beheizung"
+      },
+      {
+        "merkmal": "einziges_wc_ausserhalb_der_wohnung",
+        "art": "pct",
+        "wert": -25,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "einziges WC außerhalb der Wohnung"
+      },
+      {
+        "merkmal": "laendliche_lage",
+        "art": "pct",
+        "wert": -10,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "ländliche Lage"
+      },
+      {
+        "merkmal": "einfache_verglasung",
+        "art": "pct",
+        "wert": -5,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "einfache Verglasung"
+      },
+      {
+        "merkmal": "fehlender_kellerraum_oder_abstellraum",
+        "art": "pct",
+        "wert": -3,
+        "beleg": "S. 3 (Zuschläge/Abschläge)",
+        "label": "fehlender Kellerraum oder Abstellraum"
+      },
+      {
+        "merkmal": "gewerbliche_waermelieferung_in_form_des_contractings",
+        "art": "eur_qm",
+        "wert": -0.15,
+        "beleg": "S. 3 (Abschläge)",
+        "label": "gewerbliche Wärmelieferung in Form des Contractings"
+      }
+    ]
+  },
+  "pruefbeispiele": [
+    {
+      "eingabe": {
+        "baujahr": 1975,
+        "wfl": 70,
+        "lage": "mittel"
+      },
+      "erwartet": {
+        "unten": 5.73,
+        "mittel": 5.96,
+        "oben": 6.18
+      },
+      "art": "tabellenzelle",
+      "seite": "S. 2, Feld 1971 - 1976 / mittlere Wohnlage 5,45 – 5,90, M 5,68 €, zuzüglich Stadtzuschlag Baujahre bis 1976 0,28 € (S. 2)"
+    },
+    {
+      "eingabe": {
+        "baujahr": 2015,
+        "wfl": 90,
+        "lage": "gut"
+      },
+      "erwartet": {
+        "unten": 8.12,
+        "mittel": 8.35,
+        "oben": 8.57
+      },
+      "art": "tabellenzelle",
+      "seite": "S. 2, Feld ab 2011 / gute Wohnlage 7,79 – 8,24, M 8,02 €, zuzüglich Stadtzuschlag Baujahre ab 1986 0,33 € (S. 2)"
+    },
+    {
+      "eingabe": {
+        "baujahr": 1960,
+        "wfl": 40,
+        "lage": "einfach"
+      },
+      "erwartet": {
+        "unten": 4.77,
+        "mittel": 5.02,
+        "oben": 5.25
+      },
+      "art": "tabellenzelle",
+      "seite": "S. 2, Feld bis 1964 / einfache Wohnlage 4,28 – 4,73, M 4,51 € × 1,05 (Wohnfläche bis 45 qm, S. 3) + Stadtzuschlag 0,28 € (S. 2): 4,774 / 5,016 / 5,247"
+    }
+  ]
+}
