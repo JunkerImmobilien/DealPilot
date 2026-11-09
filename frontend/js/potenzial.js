@@ -2070,7 +2070,8 @@
     return '<div class="dp-pot-scroll" style="margin-top:12px"><table><thead><tr><th>Aufteilung</th>' + sc.map(function (c) { return '<th class="' + c.c + '">' + c.t + '</th>'; }).join('') + '</tr></thead><tbody>'
       + z('Haus als Ganzes', function (k) { return H[k] ? eur(H[k].wert) : '—'; })
       /* v3200 · führend der Vergleichswert je Wohnung, stützend der Ertragswert als Eigentumswohnung */
-      + (a.aufteiler ? z(n + ' Wohnungen nach Vergleichswert <small>(führend)</small>', function (k) { var t = a.aufteiler[k]; return t ? eur(t.summe) + (t.vollstaendig ? '' : '*') : '—'; }) : '')
+      /* v3265 · die Zeile trägt den Namen ihres führenden Verfahrens (PotenzialService aufteilerBezeichnung) */
+      + (a.aufteiler ? z('Summe nach Aufteilung · ' + n + ' Wohnungen, ' + esc((a.aufteiler.bestand && a.aufteiler.bestand.bezeichnung) || 'Vergleichswert') + ' <small>(führend)</small>', function (k) { var t = a.aufteiler[k]; return t ? eur(t.summe) + (t.vollstaendig ? '' : '*') : '—'; }) : '')
       + z(n + ' Eigentumswohnungen nach Ertragswert' + (a.aufteiler ? ' <small>(stützend)</small>' : '') + ' (Zins ' + zi + ')', function (k) { var s = a.je_stufe[k]; return s ? eur(s.summe) + (s.vollstaendig ? '' : '*') : '—'; })
       + z('− Kosten der Aufteilung', function () { return eur(-a.kosten_eur); })
       + (a.aufteiler ? '<tr class="dp-pot-sum"><td>Aufteilerwert</td>' + sc.map(function (c) { var t = a.aufteiler[c.k]; return '<td class="' + c.c + '">' + (t ? eur(t.wert) : '—') + '</td>'; }).join('') + '</tr>' : '')
@@ -2085,15 +2086,16 @@
           return '<td class="' + c.c + '">' + (s ? '+' + eur(s.potenzial) : '—') + '</td>'; }).join('') + '</tr>'
       + '</tbody></table></div>'
       + (a.negativ_hinweis && !a.aufteiler ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(a.negativ_hinweis) + '</p>' : '')
-      + (a.aufteiler && a.aufteiler.bestand ? '<p class="dp-pot-hin">Führendes Verfahren je Wohnung (Bestand): ' + verfahrenText(a.aufteiler.bestand.zaehl) + '.</p>' : '');
+      + (a.aufteiler && a.aufteiler.bestand ? '<p class="dp-pot-hin">Führendes Verfahren je Wohnung (Bestand): ' + verfahrenText(a.aufteiler.bestand.zaehl) + '.</p>' : '')
+      + (a.aufteiler_gesperrt ? '<p class="dp-pot-hin">' + esc(a.aufteiler_gesperrt.grund) + '</p>' : '');   /* v3265 */
   }
   /* v3200 · wie viele Wohnungen nach welchem Verfahren */
   function verfahrenText(z) {
     if (!z) return '';
     var t = [];
     if (z.amtlich) t.push(z.amtlich + ' × Vergleichswert aus dem amtlichen Vergleichsfaktor');
-    if (z.angebote) t.push(z.angebote + ' × Vergleichswert aus Angeboten (abzüglich Angebotsabschlag)');
-    if (z.ertragswert) t.push(z.ertragswert + ' × Ertragswert als Eigentumswohnung (kein Vergleichswert verfügbar)');
+    if (z.angebote) t.push(z.angebote + ' × Vergleichswert aus Angebotspreisen (abzüglich Angebotsabschlag, indikativ)');
+    if (z.ertragswert) t.push(z.ertragswert + ' × Ertragswert als Eigentumswohnung ersatzweise (kein Vergleichswert verfügbar)');
     if (z.gewerbe) t.push(z.gewerbe + ' × Gewerbe mit Anteil am Haus');
     if (z.fehlt) t.push(z.fehlt + ' × ohne Wert');
     return t.join(' · ');
@@ -2203,7 +2205,7 @@
     if (r && r.verfuegbar && r.aufteilung && r.aufteilung.je_stufe && r.aufteilung.je_stufe.bestand) {
       var n = m.wohnungen.filter(function (w) { return w.art !== 'gewerbe'; }).length;
       var AT = r.aufteilung.aufteiler;   /* v3200 · Aufteilerwert (Vergleichswert führend) */
-      if (AT) d.kennzahlen.push(['Aufteilerwert (' + n + ' ETW nach Vergleichswert, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(d.spalten.map(function (k) {
+      if (AT) d.kennzahlen.push(['Aufteilerwert (' + n + ' ETW, ' + ((AT.bestand && AT.bestand.bezeichnung) || 'Vergleichswert') + ' führend, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(   /* v3265 */d.spalten.map(function (k) {
         var t = AT[k]; return t ? eur(t.wert) : '—'; })));
       d.kennzahlen.push([(AT ? 'stützend: ' : '') + 'nach Aufteilung als Ertragswert (' + n + ' ETW, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(d.spalten.map(function (k) {
         var s = r.aufteilung.je_stufe[k]; return s ? eur(s.summe - r.aufteilung.kosten_eur) : '—'; })));

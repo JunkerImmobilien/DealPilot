@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
    DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v3265: B63 - MFH aufgeteilt: Wert je Wohnung aus dem Angebotsniveau des letzten Abrufs (derselbe Kern, mit Abschlag), Name des fuehrenden Verfahrens.
    v3242: B60 - ETW ohne amtliche Grundlage: Vergleichswert aus Angebotspreisen fuehrt (Stufe M), amtlich geht vor, MFH/ZFH unveraendert.
    v2854: Sanierungsstau in den Potenzial-Stufen nicht doppelt (B54, PotenzialService geladen).
    v2825: GEW - Einheit ohne Nutzungsart wird nachgefragt (B53 angepasst).
@@ -1500,6 +1501,39 @@ fallB('B60', () => {
   pruefe('B', 'B60', 'KI-Fakten: führend = vergleichswert, Kopfzahl = Angebotsindikation nach Abschlag',
     Fk.fuehrend === 'vergleichswert' && Fk.kopfwert === C.faelle.etw.argumente[3].market_value.estimated, JSON.stringify({ f: Fk.fuehrend, k: Fk.kopfwert }));
 }
+
+/* ══ v3265 · B63 WERT JE WOHNUNG BEI AUFTEILUNG AUS DEM LETZTEN ABRUF „MARKTPREISE" ═══════════
+   Marcel 09.11.2026: aufgeteilt → je Wohnung das Vergleichswertverfahren (Angebotspreise minus
+   Abschlag, indikativ), der Ertragswert stützend. Ohne abgerechneten Abruf nimmt der freie Lauf
+   das Angebotsniveau der Flächenklasse aus dem letzten gespeicherten Abruf (mb.potenzial_abrufe)
+   und rechnet es durch DENSELBEN Kern (ValuationService, Abschlag lib/angebot_abschlag.js).
+   Erfundenes Niveau (Prüfer): Bielefeld-Demo, Abruf 62 m² → 2.400 €/m² (Q 2.100/2.700, 31 Angebote). */
+fallB('B63', () => {
+  if (!PSM || typeof PSM._etwAusAbruf !== 'function') return pruefe('B', 'B63', 'PotenzialService._etwAusAbruf geladen', false, psGrund || 'fehlt');
+  if (!VS) return pruefe('B', 'B63', 'ValuationService geladen', false, 'nicht geladen');
+  const ref = klon(C.faelle.demo.argumente[0]);
+  const abruf = { abgerufen_am: '2026-11-01T10:00:00Z', wohnungen: [
+    { nr: 'G', art: 'gewerbe', wfl: 64, mpi_etw: { median_qm: 9999 } },
+    { nr: '1', art: 'wohnen', wfl: 62, mpi_etw: { median_qm: 2400, q25_qm: 2100, q75_qm: 2700, stichprobe: 31 } }] };
+  const m = PSM._etwAusAbruf({ rent: null }, ref, { art: 'wohnen', wfl: 64 }, abruf, true);
+  const refW = Object.assign({}, ref, { property_type: 'etw', living_area: 64, units: 1, plot_area: null, garden_area: null,
+    garages: 0, outdoor_parking: 0, purchase_price: null, monthly_net_rent: null, bom_eur: null, bom_grund: null, floor: null, vacancy: false });
+  const dir = VS.compute(refW, { median_per_sqm: 2400, q25_per_sqm: 2100, q75_per_sqm: 2700, sample_size: 31 }, null, null).market_value;
+  pruefe('B', 'B63', 'Wohnung 64 m² trifft die Flächenklasse des Abrufs (62 m²), Gewerbezeile zählt nicht', !!m && m.median_qm === 2400 && m.quelle === 'abruf',
+    m ? JSON.stringify({ b: m.bestand, ab: m.abschlag_pct, roh: m.roh }) : 'kein Wert');
+  wert('B', 'B63', 'Wert = derselbe Kern wie der Abruf (ValuationService ETW, mit Abschlag)', m ? m.bestand : null, dir.estimated, 0);
+  pruefe('B', 'B63', 'Abschlag auf Angebotspreise angewandt (> 0 %), Wert unter dem Angebotsniveau', !!m && m.abschlag_pct > 0 && m.roh > m.bestand,
+    m ? m.abschlag_pct + ' % · roh ' + m.roh + ' · ' + m.bestand + ' · ' + (m.abschlag_herkunft || '') : '');
+  pruefe('B', 'B63', 'Zielbild über dem Bestand (Zustand modernisiert)', !!m && m.zielbild > m.bestand, m ? String(m.zielbild) : '');
+  pruefe('B', 'B63', 'andere Flächenklasse (80 m²) → kein Wert, nie ein Nachbarniveau', PSM._etwAusAbruf({ rent: null }, ref, { art: 'wohnen', wfl: 80 }, abruf, false) === null);
+  pruefe('B', 'B63', 'ohne Abruf → kein Wert', PSM._etwAusAbruf({ rent: null }, ref, { art: 'wohnen', wfl: 64 }, null, false) === null);
+  const B = PSM._aufteilerBezeichnung;
+  pruefe('B', 'B63', 'Summe nach Aufteilung benennt das führende Verfahren',
+    B({ angebote: 3 }) === 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)'
+      && B({ amtlich: 2 }) === 'Vergleichswert (amtlicher Vergleichsfaktor)'
+      && B({ angebote: 2, ertragswert: 1 }) === 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet), 1 × Ertragswert ersatzweise'
+      && /^Ertragswert als Eigentumswohnung \(ersatzweise/.test(B({ ertragswert: 3 })), B({ angebote: 2, ertragswert: 1 }));
+});
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {

@@ -1961,7 +1961,19 @@ router.post('/potenzial', async (req, res) => {
     if (!obj || typeof obj !== 'object') return res.status(400).json({ verfuegbar: false, grund: 'Kein Objekt im Aufruf.' });
     const wb = await runLimited(() => ReportOrchestrator.generate(
       { dealpilot: obj, wert_stufe: 3, user_id: _uidAus(req) || null }, { nurWertBasis: true }));
-    const out = await PotenzialService.rechne(wb, body);
+    /* v3265 · aufgeteilt: das Angebotsniveau für Wohnungen aus dem jüngsten Abruf „Marktpreise"
+       DIESES Nutzers für DIESES Objekt (serverseitig gelesen, nicht vom Aufrufer übernommen).
+       markt bleibt hier immer false - der abgerechnete Abruf läuft nur über /potenzial/markt
+       (bis v3264 konnte ein Aufrufer markt: true mitschicken und den Abruf ohne Buchung auslösen). */
+    let _etwAbruf = null;
+    try {
+      const _uid = _uidAus(req), _ext = body.external_ref ? String(body.external_ref).slice(0, 80) : null;
+      if (_uid && _ext && body.aufteilung && body.aufteilung.aktiv) {
+        const z = await q('SELECT abgerufen_am, daten FROM mb.potenzial_abrufe WHERE user_id = $1 AND external_ref = $2 ORDER BY abgerufen_am DESC LIMIT 1', [_uid, _ext]);
+        if (z && z[0] && z[0].daten && Array.isArray(z[0].daten.wohnungen)) _etwAbruf = { abgerufen_am: z[0].abgerufen_am, wohnungen: z[0].daten.wohnungen };
+      }
+    } catch (e) { _etwAbruf = null; }
+    const out = await PotenzialService.rechne(wb, Object.assign({}, body, { markt: false, _etw_abruf: _etwAbruf }));
     out.took_ms = Date.now() - t0;
     console.log('[req] POST /potenzial ' + (out.verfuegbar ? 'EW ' + (out.haus && out.haus.bestand && out.haus.bestand.wert) : 'nicht verfuegbar') + ' in ' + out.took_ms + 'ms');
     res.json(out);
