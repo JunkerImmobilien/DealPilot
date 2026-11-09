@@ -87,6 +87,39 @@ Die Zahlen schreibt der Prüfer; hier nur die Methode:
   sind aus diesem Grund offen, nicht weil es keinen Mietspiegel gäbe.
 - Viele PDFs sind Bild-PDFs ohne Textschicht; dann steht `form: "unbekannt"` und der Hinweis dazu.
 
+### Nachrecherche 09.11.2026 (zweite Runde, 109 Sätze angefasst)
+
+Gemessen mit dem Prüfer, vorher → nachher:
+
+| | vorher | nachher |
+|---|---:|---:|
+| qualifiziert | 129 | 130 |
+| einfach | 35 | 60 |
+| keiner | 1 | 1 |
+| unklar | 33 | 7 |
+| form `unbekannt` | 90 | 9 |
+| form tabelle / regression / punkte / online_rechner | 67 / 33 / 7 / 1 | 100 / 78 / 9 / 2 |
+
+- **26 von 33 `unklar` geklärt**, jede Einstufung am Wortlaut (Mietspiegel-PDF, Dokumentation nach § 4 MsV,
+  Ratsvorlage). Lünen ist qualifiziert, alle übrigen sind einfach — die meisten NRW-Verbände-Mietspiegel und
+  die Arbeitskreis-Mietspiegel im Rhein-Erft-Kreis (Kerpen, Hürth, Bergheim, Frechen, Pulheim) sagen selbst
+  „§ 558c BGB (einfacher Mietspiegel)“. **Offen bleiben 7:** Lahr, Heidenheim (keine Aussage der Stadt, weder
+  Mietspiegel noch Verneinung), Grevenbroich (Dokument nur im Bürgerbüro), Herten und Stolberg (Dokument nennt
+  weder § 558c noch § 558d), Gronau (nur der Grundstücksmarktbericht des Kreises sagt, im Kreis gebe es nur in
+  Ahaus einen Mietspiegel — eine Aussage der Stadt fehlt, deshalb nicht `keiner`), Hüllhorst (keine Pflicht,
+  keine Aussage).
+- **Ratingen, Dorsten, Eschweiler** sind einfach mit Begründung statt Selbstbezeichnung (siehe `hinweis`).
+- **Abgelaufene:** für Cottbus, Schwäbisch Gmünd, Görlitz und Baden-Baden ist noch keine Neuausgabe
+  veröffentlicht; Stand geprüft und vermerkt. **Ende 2026 fällig:** Wuppertal (neu ab 01.12.2026 angekündigt)
+  und Dortmund (01.01.2027) mit Datum, die übrigen ohne Ankündigung.
+- **Abgrenzung `tabelle` / `regression`:** `regression`, wenn die Quelle das Regressionsverfahren nennt oder die
+  Basismiete nur nach Wohnfläche ausweist und alles Weitere über Zu-/Abschläge geht; eine Grundtabelle nach
+  Größe **und** Baujahr ohne Nennung der Regression ist `tabelle`. Ulm/Neu-Ulm und Frankfurt sind nur mittelbar
+  belegt (Stadtseiten verweigerten den Abruf), steht im `beleg`.
+- Bielefeld: Inkrafttreten 01.07.2026 weiter nur in der Liste des Vermieterverbands; Erhebungsstichtag und
+  Anerkennung jetzt aus der Dokumentation der Stadt. Bad Salzuflen: Stadt-PDF gelesen („Gültig ab 04.2026“),
+  der Tag 01.04. nur beim Verband. Detmold: ganz auf das Serviceportal der Stadt umbelegt.
+
 ## Phase 2 (Werte ins Register)
 
 Kandidaten sind Sätze mit `art` `qualifiziert`/`einfach`, `zugang: "frei"` und `form` `tabelle` oder
