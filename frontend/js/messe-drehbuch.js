@@ -8165,7 +8165,8 @@
     await warte(400);
     await zeige(kc, 8);
     var kt = r6Inner(kc()).replace(/\s+/g, ' ');
-    var cf = /nach Steuern\s+heute\s+([+\-−]?[\d.]+ €)/i.exec(kt), bmr = /Bruttomietrendite ([\d,]+ %)/.exec(kt), dscr = /DSCR ([\d,]+)/.exec(kt), ltv = /LTV ([\d,]+ %)/.exec(kt);
+    /* v3270h · gemessen: negative Beträge tragen den Halbgeviertstrich (U+2013), nicht das Minus */
+    var cf = /nach Steuern\s+heute\s+([+\-−–]?[\d.]+ €)/i.exec(kt), bmr = /Bruttomietrendite ([\d,]+ %)/.exec(kt), dscr = /DSCR ([\d,]+)/.exec(kt), ltv = /LTV ([\d,]+ %)/.exec(kt);
     await b2oZeile(s, 'Die Kennzahlen', [bmr ? 'Bruttorendite <b>' + bmr[1] + '</b>' : '', cf ? 'Cashflow nach Steuern <b>' + cf[1] + '</b> im Monat' : '', dscr ? 'DSCR <b>' + dscr[1] + '</b>' : '', ltv ? 'Beleihung <b>' + ltv[1] + '</b>' : ''].filter(Boolean).join(', ') + '.');
     /* Pilot-Analyse */
     reiter('s5'); await warte(1200);
