@@ -108,7 +108,8 @@ gleich('C1 kein nacktes „sofort"', /^sofort/.test(s.ab_text), false);
 s = P.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', mv_letzte_erhoehung: '2026-01-01' }, { kapp: { pct: 20 }, vgl_qm: 10 });
 gleich('C2 letzte 01/2026', s.ab_text, 'verlangbar ab 01/2027 · wirksam ab 04/2027');
 s = P.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', soll: '640', soll_ab: '2027-05', mv_letzte_erhoehung: '2025-03-01' }, { kapp: { pct: 20 }, vgl_qm: 10 });
-gleich('C3 eigene Soll-Miete und eigener Termin', [s.miete, s.ab, s.termine.verlangbar_sofort], [640, '2027-05', true]);
+/* v3246 · gewollt: die eigene Soll 640 liegt über der Kappungsgrenze (500 × 1,2 = 600) und wird als § 558-Wert auf 600 begrenzt (Marcel 09.11.2026); Termin bleibt die eigene Angabe */
+gleich('C3 eigene Soll-Miete (über der Kappung: auf 600 begrenzt) und eigener Termin', [s.miete, s.ueber_kappung, s.ab, s.termine.verlangbar_sofort], [600, 40, '2027-05', true]);
 
 /* ── D · objektWissen liest die gespeicherten Felder ─────────────────── */
 const OW = require(path.join(WURZEL, 'backend/src/services/objektWissen.js'));

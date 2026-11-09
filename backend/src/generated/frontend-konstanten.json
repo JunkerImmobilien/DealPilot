@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-09T08:10:30.357Z",
+ "erzeugt_am": "2026-11-09T08:42:43.566Z",
  "quellen": {
   "voice-import": "0112d1d0dbf27772",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "9f4f83a5f346165b",
-  "index-html": "ab5f7e6a03b81bbf",
+  "storage": "cda12b5bbdf115d2",
+  "index-html": "88e07b6a355fabf3",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -585,6 +585,13 @@
    "zb_fertig_jahr",
    "zb_markt_qm",
    "san_ausgefuehrt",
+   "ms_art",
+   "ms_unten",
+   "ms_mittel",
+   "ms_oben",
+   "ms_stand",
+   "ms_url",
+   "ms_wahl",
    "mv_art",
    "mv_beginn",
    "mv_letzte_erhoehung",
@@ -1635,7 +1642,7 @@
    {
     "id": "zb_vgl_qm",
     "kind": "text",
-    "label": "Vergleichsmiete (€/m²)"
+    "label": "Vergleichsmiete, belegt (€/m²)"
    },
    {
     "id": "zb_ziel_qm",
@@ -1661,6 +1668,61 @@
     "id": "san_ausgefuehrt",
     "kind": "text",
     "label": "Sanierung ausgeführt am — optional"
+   },
+   {
+    "id": "ms_art",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "qualifiziert",
+      "text": "qualifiziert (§ 558d BGB)"
+     },
+     {
+      "wert": "einfach",
+      "text": "einfach (§ 558c BGB)"
+     }
+    ],
+    "label": "Art des Mietspiegels"
+   },
+   {
+    "id": "ms_unten",
+    "kind": "text",
+    "label": "Spanne unten (€/m²)"
+   },
+   {
+    "id": "ms_mittel",
+    "kind": "text",
+    "label": "Mittelwert (€/m²)"
+   },
+   {
+    "id": "ms_oben",
+    "kind": "text",
+    "label": "Spanne oben (€/m²)"
+   },
+   {
+    "id": "ms_stand",
+    "kind": "text",
+    "label": "Stand"
+   },
+   {
+    "id": "ms_url",
+    "kind": "text",
+    "label": "Link zum Mietspiegel (optional)"
+   },
+   {
+    "id": "ms_wahl",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "mittel",
+      "text": "Mittelwert"
+     },
+     {
+      "wert": "unten",
+      "text": "unterem Spannenwert"
+     }
+    ],
+    "label": "Gerechnet mit"
    },
    {
     "id": "mv_art",

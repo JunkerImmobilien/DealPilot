@@ -18,6 +18,8 @@
      F  dealscore.js: Mietpotenzial-Bonus (statt nie erreichbarem mstg 1,5), Zustand-Grenze,
         Haupt-App unverändert; Benchmark Fall D nicht mehr „Sehr gut"
      G  qc-heuristik.js kategorien(): der Rechenweg nennt die Kurven, die die Punkte vergeben
+     K  v3246 · Mietspiegel (Eingabe/Register, oberer Spannenwert, Schalter ms_wahl), veraltet/einfach/qualifiziert,
+        Schätzung Angebotsmiete minus Abschlag nach Marktlage (22/10/5 %, Berlin-Warnung), eigene Soll gekappt
      J  v3244 · § 558 nur, wo § 558 gilt: Staffel/Index/Gewerbe -> § 558-Anteil = Ist, die eigene Soll-Angabe
         ist ein eigener Posten (teil558/teilVertrag); Vergleichsmiete eigene -> amtliche (qualifizierter
         Mietspiegel geht jeder Marktmiete vor) -> Marktmiete markiert; me_soll zählt nicht mehr
@@ -187,34 +189,50 @@ const SUMME = crypto.createHash('sha256').update(JSON.stringify(neu)).digest('he
    5.812 Fällen (mit Liste) anders = Ist 500/820 × Staffel/Index × Soll 640 × alle übrigen Achsen (2·2·320), JEDER
    nur in genau diesen drei Feldern.
    Die alte Summe bleibt als Gegenprobe E0: das Raster, um genau diese drei Felder zurückgebaut, muss sie
-   weiter treffen - so ist bewiesen, dass sich sonst nichts bewegt hat. */
+   weiter treffen - so ist bewiesen, dass sich sonst nichts bewegt hat.
+   v3246 (09.11.2026) · GEWOLLT GEÄNDERT (Marcel: eigene Soll-Miete bei normalem Vertrag als § 558-Wert auf die
+   Kappungsgrenze begrenzen): gemessen mit --alt=<potenzial.js v3245> --alt-kern=<Kern v3245>: 208 von 5.812 Fällen
+   anders = Ist 500 × normaler Vertrag × Soll 640 über der Kappungsgrenze, JEDER nur in miete, herkunft, grenze,
+   hinweise, eigen_soll, ueber_kappung (208) und umlage559 (48, wo Maßnahmen bewohnt umgelegt werden).
+   E0 baut v3244 und v3246 zurück und trifft weiter die Summe v3075-v3241. */
 const SUMME_V3075 = '852a5a0654d9af4af90892e410605866cf92a32fcd135ea2cea455d2c7496a1f';   /* 5796 Fälle, ohne Liste, Stand v3075-v3241 */
-const SUMME_SOLL = 'a9db170e6570fd942e85302c17b79c4ce7a48c0a0babee818ef50d5dbddf0b64';   /* 5796 Fälle, ohne Liste, seit v3244 */
-gleich('E Raster ' + neu.length + ' Fälle: Prüfsumme seit v3244 (bei Abweichung: --alt=<alte potenzial.js> --alt-kern=<alter Kern>)', SUMME, SUMME_SOLL);
-const zurueck = (x) => {
+const SUMME_SOLL = '6895c24aa427c5cffa20918b7f2f5ff31360386b52bd0ee9508b6cd88bd202e7';   /* 5796 Fälle, ohne Liste, seit v3246 (v3244-v3245: a9db170e…) */
+gleich('E Raster ' + neu.length + ' Fälle: Prüfsumme seit v3246 (bei Abweichung: --alt=<alte potenzial.js> --alt-kern=<alter Kern>)', SUMME, SUMME_SOLL);
+/* v3246 · eigene Soll über der Kappungsgrenze wird begrenzt: miete = Kappungsgrenze, dazu eigen_soll, ueber_kappung,
+   grenze, (umlage559) und ein neuer Hinweistext. zurueck3246 baut genau das auf den Stand v3245 zurück. */
+const zurueck3246 = (x) => {
+  if (!x || typeof x !== 'object' || !('eigen_soll' in x)) return x;
+  const y = Object.assign({}, x);
+  y.miete = y.eigen_soll; y.herkunft = 'eigene Angabe'; y.grenze = null;
+  delete y.eigen_soll; delete y.ueber_kappung; delete y.umlage559;
+  y.hinweise = (y.hinweise || []).map((h) => { const m = /^eigene Soll-Miete .* liegt über der Kappungsgrenze \((\d+) % in 3 Jahren\)/.exec(h); return m ? 'liegt über der Kappungsgrenze (' + m[1] + ' % in 3 Jahren)' : h; });
+  return y;
+};
+const zurueck3244 = (x) => {
   if (!x || typeof x !== 'object' || !('vertrag_monat' in x || 'vertrag_text' in x)) return x;
   const y = Object.assign({}, x); delete y.vertrag_monat; delete y.vertrag_text;
   if (/^eigene Angabe \(/.test(y.herkunft || '')) y.herkunft = 'eigene Angabe';
   return y;
 };
+const zurueck = (x) => zurueck3244(zurueck3246(x));
 const SUMME_ZURUECK = crypto.createHash('sha256').update(JSON.stringify(neu.map(zurueck))).digest('hex');
-gleich('E0 Gegenprobe: ohne die drei v3244-Felder dieselbe Summe wie v3075-v3241 (sonst hat sich mehr bewegt)', SUMME_ZURUECK, SUMME_V3075);
+gleich('E0 Gegenprobe: ohne die v3244- und v3246-Felder (zurückgebaut) dieselbe Summe wie v3075-v3241 (sonst hat sich mehr bewegt)', SUMME_ZURUECK, SUMME_V3075);
 if (ARG.summe) console.log('Prüfsumme Raster: ' + SUMME + ' (' + neu.length + ' Fälle), zurückgebaut ' + SUMME_ZURUECK);
 if (typeof ARG.alt === 'string') {
   const A = await potenzialLaden(path.resolve(ARG.alt), typeof ARG['alt-kern'] === 'string' ? ARG['alt-kern'] : false);
   const alt = raster(A, true), neuL = raster(P, true);
   let ab = 0;
-  /* v3244 · Abweichungen nach Feldern zählen; erlaubt sind nur die drei v3244-Felder (vertrag_monat, vertrag_text, herkunft) */
+  /* v3244 · Abweichungen nach Feldern zählen; erlaubt sind nur die v3244-Felder (vertrag_monat, vertrag_text, herkunft) und die v3246-Felder (miete, herkunft, grenze, hinweise, eigen_soll, ueber_kappung, umlage559 bei eigener Soll über der Kappung) */
   const felder = {}; let fremd = 0;
   alt.forEach((x, i) => {
     if (JSON.stringify(x) === JSON.stringify(neuL[i])) return;
     ab++;
     const y = neuL[i] || {}, ks = new Set(Object.keys(x || {}).concat(Object.keys(y)));
     ks.forEach((k) => { if (JSON.stringify((x || {})[k]) !== JSON.stringify(y[k])) felder[k] = (felder[k] || 0) + 1; });
-    if (JSON.stringify(x) !== JSON.stringify(zurueck(y))) { fremd++; if (fremd <= 5) console.log('  ABWEICHUNG Fall ' + i + ':\n    alt ' + JSON.stringify(x) + '\n    neu ' + JSON.stringify(y)); }
+    if (JSON.stringify(zurueck(x)) !== JSON.stringify(zurueck(y))) { fremd++; if (fremd <= 5) console.log('  ABWEICHUNG Fall ' + i + ':\n    alt ' + JSON.stringify(x) + '\n    neu ' + JSON.stringify(y)); }
   });
   console.log('  --alt: ' + ab + ' von ' + alt.length + ' Fällen anders, Felder: ' + JSON.stringify(felder));
-  gleich('E --alt: ' + alt.length + ' Fälle gleich bis auf die drei v3244-Felder', fremd, 0);
+  gleich('E --alt: ' + alt.length + ' Fälle gleich bis auf die v3244- und v3246-Felder', fremd, 0);
 }
 for (const ags of AGS) {
   gleich('E kappung(' + (ags || 'leer') + ') = Kern', P.kappung(ags), JSON.parse(JSON.stringify(K.kappungAus(KAPP, { ags }))));
@@ -387,7 +405,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('J14 nur me_soll (Einheiten-Soll im Tab Miete): keine Vergleichsmiete, § 558 = Ist', [m.vgl.qm, P.soll558(m.wohnungen[0])], [0, 500]);
   P = await vorschlagLauf({ plz: '52062', me_soll: '20', ds2_marktmiete: '10' });
   m = P.modell({ einheiten: EIN });
-  wahr('J15 ohne amtliche Quelle: Marktmiete nur als markierter Ersatz', m.vgl.qm === 10 && m.vgl.marktmiete === true && /Ersatz/.test(m.vgl.herkunft));
+  wahr('J15 ohne amtliche Quelle: Marktmiete nur als markierte Schätzung (v3246: ohne Abschlagsatz im Fenster unverändert 10,00, „Abschlag nicht bekannt“)', m.vgl.qm === 10 && m.vgl.marktmiete === true && /Schätzung aus Angebotsmieten, Abschlag nicht bekannt/.test(m.vgl.herkunft));
   P = await vorschlagLauf({ plz: '52062', zb_vgl_qm: '8' }, { _dpMarktdaten: MS_Q });
   m = P.modell({ einheiten: EIN });
   gleich('J16 eigene Vergleichsmiete geht vor', [m.vgl.qm, m.vgl.art], [8, 'eigen']);
@@ -395,5 +413,120 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('J17 Marktdaten eines anderen Objekts zählen nicht', P.modell({ einheiten: EIN }).vgl.qm, 0);
 }
 
-console.log('mietpotenzial-pruefen (v3075, v3244): ' + (n - fehler) + ' von ' + n + ' ok');
+/* ── K · v3246 · Mietspiegel mit Spanne, Schätzung aus Angebotsmieten nach Marktlage, eigene Soll gekappt ── */
+{
+  /* der Abschlag kommt aus der ECHTEN config.js (Objektliteral mieteAngebotAbschlag, ohne den Rest der Datei) */
+  const cfgText = fs.readFileSync(JS('config.js'), 'utf8').replace(/\r\n/g, '\n');
+  const cm = /\n    mieteAngebotAbschlag: (\{[\s\S]*?\n    \}),/.exec(cfgText);
+  wahr('K0 config.js führt mieteAngebotAbschlag', !!cm);
+  const ABS = cm ? vm.runInNewContext('(' + cm[1] + ')') : { stufen: {} };
+  gleich('K0 Stufen 22 / 10 / 5 (Recherche 09.11.2026)', [ABS.stufen.angespannt, ABS.stufen.mittel, ABS.stufen.entspannt], [22, 10, 5]);
+  const CFG = { DealPilotConfig: { mieteAngebotAbschlag: ABS } };
+  async function lauf(feld, extra, ags) {
+    const c = fenster(feld);
+    Object.assign(c, CFG, extra || {});
+    const F = feld || {};
+    c.document.getElementById = (id) => (id in F ? { value: F[id], addEventListener() {}, dispatchEvent() {} } : null);
+    c._dpPotenzial = { ags: ags || '05334002', plz: F.plz || '52062' };   /* agsJetzt() verlangt dieselbe PLZ */
+    lade(c, JS('mietpotenzial-kern.js')); lade(c, JS('potenzial.js'));
+    await c.DpPotenzial.kappungLaden();
+    return c.DpPotenzial;
+  }
+  const H26 = '2026-10';
+  /* Kern: Struktur und Wert */
+  const MSQ = { art: 'qualifiziert', unten: '6,80', mittel: '7,60', oben: '8,40', stand: '2025-03' };
+  const msq = K.mietspiegelAus(null, MSQ);
+  gleich('K1 Struktur aus der Eingabe', [msq.art, msq.unten, msq.mittel, msq.oben, msq.stand, msq.gueltig_bis, msq.quelle], ['qualifiziert', 6.8, 7.6, 8.4, '2025-03', '2027-03', 'eingabe']);
+  wahr('K1 Herkunft „Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)“', msq.herkunft === 'Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)');
+  let w = K.mietspiegelWert(msq, 'oben', H26);
+  gleich('K2 Standard oben: 8,40, qualifiziert gültig', [w.qm, w.genutzt, w.qualifiziert, w.veraltet], [8.4, 'oben', true, false]);
+  wahr('K2 Hinweis oberer Spannenwert + § 558a Abs. 3', w.hinweise.some((h) => /oberer Spannenwert — trägt nur, wenn Ausstattung und Merkmale/.test(h) && /sonst Mittelwert/.test(h)) && w.hinweise.some((h) => /§ 558a Abs\. 3/.test(h) && /Gutachten oder Vergleichswohnungen/.test(h)));
+  w = K.mietspiegelWert(msq, 'mittel', H26);
+  gleich('K3 Schalter Mittelwert: 7,60, kein Oben-Hinweis', [w.qm, w.hinweise.some((h) => /oberer Spannenwert/.test(h))], [7.6, false]);
+  gleich('K3 Schalter Unterwert: 6,80', K.mietspiegelWert(msq, 'unten', H26).qm, 6.8);
+  gleich('K3 Mittelwert fehlt: nächster Wert unten, gesagt', [K.mietspiegelWert(K.mietspiegelAus(null, { art: 'einfach', unten: 7, oben: 9 }), 'mittel', H26).qm,
+    K.mietspiegelWert(K.mietspiegelAus(null, { art: 'einfach', unten: 7, oben: 9 }), 'mittel', H26).hinweise.some((h) => /eingetragen nur der unterer Spannenwert/.test(h))], [7, true]);
+  w = K.mietspiegelWert(K.mietspiegelAus(null, Object.assign({}, MSQ, { stand: '2024-05' })), 'oben', H26);
+  gleich('K4 qualifiziert, Stand 05/2024 (älter als 2 Jahre): veraltet, keine Vermutung', [w.veraltet, w.qualifiziert, w.qm], [true, false, 8.4]);
+  wahr('K4 Hinweis „veraltet — nur noch Indiz“ mit § 558d', w.hinweise.some((h) => /veraltet — nur noch Indiz/.test(h) && /§ 558d Abs\. 2 und 3/.test(h)) && /veraltet/.test(w.herkunft));
+  w = K.mietspiegelWert(K.mietspiegelAus(null, Object.assign({}, MSQ, { stand: '' })), 'oben', H26);
+  wahr('K4 qualifiziert ohne Stand: Hinweis Stand fehlt', w.hinweise.some((h) => /Stand des Mietspiegels fehlt/.test(h)) && w.qualifiziert === false);
+  w = K.mietspiegelWert(K.mietspiegelAus(null, { art: 'einfach', unten: 7, mittel: 7.5, oben: 8, stand: '05/2026' }), 'oben', H26);
+  wahr('K5 einfacher Mietspiegel: Hinweis drei Vergleichswohnungen § 558a Abs. 2 Nr. 4', w.hinweise.some((h) => /mit drei Vergleichswohnungen absichern \(§ 558a Abs\. 2 Nr\. 4 BGB\)/.test(h)) && w.qualifiziert === false && w.stand === '2026-05');
+  /* Register füllt dieselbe Struktur; die Eingabe geht vor, die Vermutungsfrist des Registers gilt nur für denselben Stand */
+  const REG = { art: 'qualifiziert', stand: '2025-03', vermutung_bis: '2026-12-31', url: 'https://example.org/ms' };
+  gleich('K6 Register ohne Werte + Eingabe: Werte der Eingabe, Frist und Link vom Register', [K.mietspiegelAus(REG, { unten: 6, oben: 8 }).gueltig_bis, K.mietspiegelAus(REG, { unten: 6, oben: 8 }).url, K.mietspiegelAus(REG, { unten: 6, oben: 8 }).art], ['2026-12', 'https://example.org/ms', 'qualifiziert']);
+  gleich('K6 Register ohne Werte allein: kein Mietspiegelwert', K.mietspiegelAus(REG, {}), null);
+  gleich('K6 Register mit Werten: Herkunft Register', K.mietspiegelAus(Object.assign({ unten: 6, mittel: 7, oben: 8 }, REG), {}).quelle, 'register');
+  gleich('K6 Register „keiner“: null', K.mietspiegelAus({ art: 'keiner', unten: 6 }, {}), null);
+
+  /* Abschlag nach Marktlage (Kern, Zahlen aus config.js) */
+  gleich('K7 angespannt: Mietpreisbremse -> 22 %', [K.abschlagStufe(ABS, { bremse_gilt: true, kapp_pct: 20 }).pct, K.abschlagStufe(ABS, { bremse_gilt: true }).stufe], [22, 'angespannt']);
+  gleich('K7 angespannt: Kappung 15 % ohne Bremse -> 22 %', K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 15 }).pct, 22);
+  gleich('K7 mittel: weder Bremse noch 15 % -> 10 %', K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20 }).pct, 10);
+  gleich('K7 entspannt nur mit bekannter Einwohnerzahl < 20.000 -> 5 %', [K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20, einwohner: 15000 }).pct, K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20, einwohner: null }).pct, K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20, einwohner: 25000 }).pct], [5, 10, 10]);
+  gleich('K7 Bremse schlägt kleine Gemeinde', K.abschlagStufe(ABS, { bremse_gilt: true, einwohner: 15000 }).pct, 22);
+  wahr('K7 Berlin: Warnung', /über 40 % über der Vergleichsmiete — Schätzung nicht belastbar, Mietspiegel eintragen/.test(K.abschlagStufe(ABS, { bremse_gilt: true, ags: '11000000' }).warnung || '') && K.abschlagStufe(ABS, { bremse_gilt: true, ags: '09162000' }).warnung === null);
+  const s22 = K.vglAusAngebot(10, { pct: 22, stufe: 'angespannt' });
+  gleich('K8 Schätzung 10,00 − 22 % = 7,80', [s22.qm, s22.pct], [7.8, 22]);
+  wahr('K8 Kennzeichnung im Wortlaut, ohne Quellennamen', /^Schätzung aus Angebotsmieten abzüglich 22 % \(DealPilot-Ansatz nach Marktlage, nicht amtlich\) — für das Erhöhungsverlangen mit Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen$/.test(s22.text)
+    && !/BBSR|Scout|Immowelt|PriceHubble|Sprengnetter|Wohngeld/i.test(s22.text));
+
+  /* potenzial.js: Rangfolge und Wirkung am Modell (Aachen: Kappung 15 %, Bremse gilt) */
+  const EIN1 = [{ nr: '1', wfl: '60', ist: '450', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' }];
+  const MSF = { ms_art: 'qualifiziert', ms_unten: '6,80', ms_mittel: '7,60', ms_oben: '8,40', ms_stand: '2025-03' };
+  let P = await lauf(Object.assign({ plz: '52062', ds2_marktmiete: '14' }, MSF));
+  let m = P.modell({ einheiten: EIN1 });
+  gleich('K9 Mietspiegel-Eingabe (Standard oben) vor der Marktmiete: 8,40, § 558 bis 504', [m.vgl.qm, m.vgl.quelle_art, !!m.vgl.marktmiete, P.soll558(m.wohnungen[0])], [8.4, 'mietspiegel_qualifiziert', false, 504]);
+  gleich('K9 an der Einheit: Quelle, Mietspiegel und Hinweise', [m.wohnungen[0].soll.vgl_quelle_art, m.wohnungen[0].soll.ms.genutzt, m.wohnungen[0].soll.vgl_hinweise.length > 0], ['mietspiegel_qualifiziert', 'oben', true]);
+  let zv = P.mietrechtDaten(m, 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
+  wahr('K9 Mietrecht-Zeile „Vergleichsmiete“: 8,40 €/m² · oberer Spannenwert, Quelle und § 558a Abs. 3', zv && /8,40/.test(zv.v) && /oberer Spannenwert/.test(zv.v) && /eigene Eingabe aus dem Mietspiegel der Stadt/.test(zv.u) && /§ 558a Abs\. 3/.test(zv.u));
+  P = await lauf(Object.assign({ plz: '52062', ms_wahl: 'mittel' }, MSF));
+  m = P.modell({ einheiten: EIN1 });
+  gleich('K10 Schalter ms_wahl = mittel: 7,60, § 558 bis 456', [m.vgl.qm, P.soll558(m.wohnungen[0])], [7.6, 456]);
+  P = await lauf(Object.assign({ plz: '52062', ms_wahl: 'unten' }, MSF));
+  m = P.modell({ einheiten: EIN1 });
+  gleich('K10 Schalter ms_wahl = unten: 6,80 unter Ist 7,50 - kein Spielraum, § 558 = Ist', [m.vgl.qm, P.soll558(m.wohnungen[0])], [6.8, 450]);
+  P = await lauf(Object.assign({ plz: '52062', zb_vgl_qm: '8' }, MSF));
+  m = P.modell({ einheiten: EIN1 });
+  gleich('K11 eigene belegte Vergleichsmiete schlägt den Mietspiegel', [m.vgl.qm, m.vgl.quelle_art, m.wohnungen[0].soll.ms === undefined], [8, 'eigen', true]);
+  P = await lauf(Object.assign({ plz: '52062' }, MSF), { _dpMarktdaten: { vergleichsmiete: { qm: 9.5, art: 'mietpreisuebersicht', quelle: 'Gutachterausschuss Muster' } } });
+  gleich('K12 Mietspiegel-Eingabe vor der amtlichen Mietpreisübersicht', [P.modell({ einheiten: EIN1 }).vgl.qm, P.modell({ einheiten: EIN1 }).vgl.quelle_art], [8.4, 'mietspiegel_qualifiziert']);
+  P = await lauf(Object.assign({ plz: '52062', ms_art: 'qualifiziert', ms_oben: '8,40', ms_unten: '6,80', ms_stand: '2024-05' }));
+  zv = P.mietrechtDaten(P.modell({ einheiten: EIN1 }), 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
+  wahr('K13 veralteter qualifizierter Mietspiegel: Zeile warnt „veraltet — nur noch Indiz“', zv && zv.warn && /veraltet — nur noch Indiz/.test(zv.u));
+  P = await lauf(Object.assign({ plz: '52062', ms_art: 'einfach', ms_oben: '8,40', ms_stand: '2026-01' }));
+  zv = P.mietrechtDaten(P.modell({ einheiten: EIN1 }), 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
+  wahr('K13 einfacher Mietspiegel: Zeile nennt drei Vergleichswohnungen', zv && /drei Vergleichswohnungen/.test(zv.u));
+
+  /* kein Mietspiegel, keine eigene Vergleichsmiete: Marktmiete minus Abschlag nach Marktlage */
+  P = await lauf({ plz: '52062', ds2_marktmiete: '10' }, null, '05334002');   /* Aachen: Bremse -> angespannt */
+  m = P.modell({ einheiten: EIN1 });
+  gleich('K14 angespannt (Aachen): 10,00 − 22 % = 7,80, markiert', [m.vgl.qm, m.vgl.marktmiete, m.vgl.quelle_art, m.vgl.angebot.stufe], [7.8, true, 'angebot_abschlag', 'angespannt']);
+  wahr('K14 Herkunft „abzüglich 22 % (DealPilot-Ansatz nach Marktlage, nicht amtlich)“', /abzüglich 22 % \(DealPilot-Ansatz nach Marktlage, nicht amtlich\)/.test(m.vgl.herkunft) && /Gutachten belegen/.test(m.vgl.herkunft));
+  zv = P.mietrechtDaten(m, 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
+  wahr('K14 Mietrecht-Zeile warnt bei Schätzung', zv && zv.warn && zv.quelle_art === 'angebot_abschlag');
+  P = await lauf({ plz: '32609', ds2_marktmiete: '10' }, null, '05758016');   /* weder Bremse noch 15 % -> mittel */
+  m = P.modell({ einheiten: EIN1 });
+  gleich('K15 mittel (Gemeinde ermittelt: 20 % Gesetz, keine Bremse): 10,00 − 10 % = 9,00', [m.vgl.qm, m.vgl.angebot.stufe, m.kappung.herkunft], [9, 'mittel', 'gesetz']);
+  P = await lauf({ plz: '32609', ds2_marktmiete: '10' }, { _dpMarktdaten: { zensus: { einwohner: 13000 } } }, '05758016');
+  gleich('K16 entspannt nur mit bekannter Einwohnerzahl (13.000): 10,00 − 5 % = 9,50', [P.modell({ einheiten: EIN1 }).vgl.qm, P.modell({ einheiten: EIN1 }).vgl.angebot.stufe], [9.5, 'entspannt']);
+  P = await lauf({ plz: '10115', ds2_marktmiete: '10' }, null, '11000000');
+  m = P.modell({ einheiten: EIN1 });
+  wahr('K17 Berlin: gerechnet (7,80) mit Warnung in Hinweisen und an der Einheit', m.vgl.qm === 7.8 && m.vgl.hinweise.some((h) => /über 40 %/.test(h)) && m.wohnungen[0].soll.vgl_hinweise.some((h) => /Mietspiegel eintragen/.test(h)));
+
+  /* eigene Soll-Miete über der Kappungsgrenze (normaler Vertrag): als § 558-Wert gekappt */
+  let s = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', soll: 640, mv_letzte_erhoehung: '2023-01-01' }, { kapp: { pct: 20 }, vgl_qm: 12, heute: HEUTE });
+  gleich('K18 eigene Soll 640 über Kappung 20 % (600): gekappt auf 600, Rest 40', [s.miete, s.eigen_soll, s.ueber_kappung, K.teil558(s, 500), s.grenze], [600, 640, 40, 600, 'Kappungsgrenze 20 %']);
+  wahr('K18 Hinweis: der Teil darüber ist keine Erhöhung nach § 558', s.hinweise.some((h) => /eigene Soll-Miete 640,00 € liegt über der Kappungsgrenze \(20 % in 3 Jahren\)/.test(h) && /keine Erhöhung nach § 558/.test(h)) && /^eigene Angabe/.test(s.herkunft));
+  s = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', soll: 590, mv_letzte_erhoehung: '2023-01-01' }, { kapp: { pct: 20 }, vgl_qm: 12, heute: HEUTE });
+  gleich('K19 eigene Soll 590 unter der Kappung: unverändert', [s.miete, s.eigen_soll, s.herkunft], [590, undefined, 'eigene Angabe']);
+  s = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', soll: 640, mv_art: 'staffel' }, { kapp: { pct: 20 }, vgl_qm: 12, heute: HEUTE });
+  gleich('K20 Staffel bleibt wie v3244 (nicht gekappt)', [s.miete, s.eigen_soll], [640, undefined]);
+  P = await lauf({ plz: '52062' });
+  m = P.modell({ einheiten: [{ nr: '1', wfl: '60', ist: '500', status: 'vermietet', soll: '640', mv_letzte_erhoehung: '2023-01-01' }] });
+  gleich('K21 Stufe Mieterhöhung (Aachen 15 %): 575 statt 640', [P.soll558(m.wohnungen[0]), m.stufen.mieterhoehung.miete_m, m.wohnungen[0].soll.ueber_kappung], [575, 575, 65]);
+}
+
+console.log('mietpotenzial-pruefen (v3075, v3244, v3246): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

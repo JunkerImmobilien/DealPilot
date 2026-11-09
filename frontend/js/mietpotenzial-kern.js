@@ -1,6 +1,6 @@
 'use strict';
 /* ════════════════════════════════════════════════════════════════════
-   mietpotenzial-kern.js · v3075 / v3244 — DIE ZULÄSSIGE MIETE, OHNE DOM
+   mietpotenzial-kern.js · v3075 / v3244 / v3246 — DIE ZULÄSSIGE MIETE, OHNE DOM
    ════════════════════════════════════════════════════════════════════
    Marcel 02.11.2026 (P1.1–P1.3, „setz das alles um"): der Quick-Check soll
    die rechtlich zulässige Miete nach drei Jahren zeigen — Kappungsgrenze,
@@ -283,7 +283,18 @@
     if (eigen > 0) {
       r.miete = eigen; r.herkunft = 'eigene Angabe';
       var kc = ctx.kapp && ctx.kapp.pct ? basisK * (1 + ctx.kapp.pct / 100) + u.monat : null;
-      if (kc && eigen > kc + 0.5) r.hinweise.push('liegt über der Kappungsgrenze (' + ctx.kapp.pct + ' % in 3 Jahren)');
+      /* v3246 · Marcel 09.11.2026: die eigene Soll-Miete bei normalem Vertrag ist als § 558-Wert auf die
+         Kappungsgrenze BEGRENZT (bis v3245 nur ein Hinweis, gerechnet wurde mit der vollen Angabe).
+         Der Teil darüber ist keine Erhöhung nach § 558 - er steht als ueber_kappung an der Einheit. */
+      if (kc && eigen > kc + 0.5) {
+        var kcR = Math.max(ist, Math.round(kc * 100) / 100);
+        r.miete = kcR; r.herkunft = 'eigene Angabe, auf die Kappungsgrenze begrenzt';
+        r.eigen_soll = eigen; r.ueber_kappung = Math.round((eigen - kcR) * 100) / 100;
+        r.grenze = 'Kappungsgrenze ' + ctx.kapp.pct + ' %' + (r.kapp_angerechnet ? ' (letzte Erhöhung angerechnet)' : '');
+        if (u.monat > 0) r.umlage559 = u;
+        r.hinweise.push('eigene Soll-Miete ' + eur2(eigen) + ' liegt über der Kappungsgrenze (' + ctx.kapp.pct + ' % in 3 Jahren) — als Erhöhung nach § 558 BGB höchstens '
+          + eur2(kcR) + '; der Teil darüber (' + eur2(r.ueber_kappung) + '/Monat) ist keine Erhöhung nach § 558');
+      }
       return r;
     }
     var vgl = zahl(e.vgl_qm) || zahl(ctx.vgl_qm);
@@ -294,6 +305,14 @@
       m558 = Math.max(ist, Math.min(ziel, kappe));
       r.grenze = (kappe < ziel) ? 'Kappungsgrenze ' + ((ctx.kapp && ctx.kapp.pct) || 20) + ' %' + (r.kapp_angerechnet ? ' (letzte Erhöhung angerechnet)' : '') : 'Vergleichsmiete';
       r.vgl_qm = vgl; r.vgl_herkunft = zahl(e.vgl_qm) ? 'eigene Angabe' : (ctx.vgl_herkunft || 'am Objekt');
+      /* v3246 · Art der Quelle und ihre Hinweise (Mietspiegel-Spanne, Vermutungswirkung, Schätzung aus
+         Angebotsmieten) - nur gesetzt, wenn der Aufrufer sie kennt; die Prüfsumme der übrigen bleibt */
+      if (zahl(e.vgl_qm)) r.vgl_quelle_art = 'eigen';
+      else {
+        if (ctx.vgl_art) r.vgl_quelle_art = ctx.vgl_art;
+        if (ctx.vgl_hinweise && ctx.vgl_hinweise.length) r.vgl_hinweise = ctx.vgl_hinweise.slice();
+        if (ctx.vgl_ms) r.ms = ctx.vgl_ms;
+      }
     }
     if (m558 <= ist + 0.01 && !(u.monat > 0)) {
       r.grund = !(vgl > 0) ? 'Keine Vergleichsmiete eingetragen.'
@@ -442,7 +461,135 @@
     };
   }
 
+  /* ══ v3246 · MIETSPIEGEL UND SCHÄTZUNG DER VERGLEICHSMIETE (Marcel 09.11.2026, § 558 BGB) ══════════
+     Rangfolge der Vergleichsmiete (potenzial.js objektVgl): eigene belegte Vergleichsmiete -> Mietspiegel
+     (Eingabe am Objekt, später dieselben Felder aus dem Register) -> amtliche Mietpreisübersicht ->
+     Schätzung aus Angebotsmieten minus Abschlag. Hier stehen nur die reinen Regeln; Zahlen und Felder
+     reicht der Aufrufer herein. */
+  var MS_ART = { qualifiziert: 'qualifizierter Mietspiegel (§ 558d BGB)', einfach: 'einfacher Mietspiegel (§ 558c BGB)' };
+  var MS_WAHL = { oben: 'oberer Spannenwert', mittel: 'Mittelwert', unten: 'unterer Spannenwert' };
+  var MS_FOLGE = { oben: ['oben', 'mittel', 'unten'], mittel: ['mittel', 'unten', 'oben'], unten: ['unten', 'mittel', 'oben'] };
+  var MS_EINGABE = 'Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)';
+  var MS_REGISTER = 'Mietspiegel der Gemeinde (DealPilot-Verzeichnis)';
+  var HW_MS = {
+    oben: 'oberer Spannenwert — trägt nur, wenn Ausstattung und Merkmale der Wohnung ihn rechtfertigen, sonst Mittelwert',
+    veraltet: 'veraltet — nur noch Indiz: der qualifizierte Mietspiegel ist älter als zwei Jahre, die Vermutungswirkung (§ 558d Abs. 2 und 3 BGB) entfällt',
+    qualifiziert: 'qualifizierter Mietspiegel: nach oben abweichen nur mit Gutachten oder Vergleichswohnungen; die Mietspiegelwerte sind im Erhöhungsverlangen zu nennen (§ 558a Abs. 3 BGB)',
+    einfach: 'einfacher Mietspiegel — mit drei Vergleichswohnungen absichern (§ 558a Abs. 2 Nr. 4 BGB)',
+    ohne_stand: 'Stand des Mietspiegels fehlt — ob die Vermutungswirkung noch gilt (zwei Jahre, § 558d Abs. 2 BGB), ist nicht geprüft',
+    ohne_art: 'Art des Mietspiegels nicht angegeben — gewertet wie ein einfacher Mietspiegel'
+  };
+  /** 'JJJJ-MM' aus 'JJJJ-MM', 'JJJJ-MM-TT', 'MM/JJJJ', 'MM.JJJJ' oder 'JJJJ' (dann Januar), sonst null */
+  function ymAus(v) {
+    var s = String(v == null ? '' : v).trim(), m;
+    if ((m = /^(\d{4})-(\d{2})/.exec(s))) return m[1] + '-' + m[2];
+    if ((m = /^(\d{1,2})[./](\d{4})$/.exec(s))) return m[2] + '-' + String(+m[1]).padStart(2, '0');
+    if ((m = /^(\d{4})$/.exec(s))) return m[1] + '-01';
+    return null;
+  }
+  function msArt(a) { a = String(a || '').toLowerCase(); return /qualif/.test(a) ? 'qualifiziert' : /einfach/.test(a) ? 'einfach' : /kein/.test(a) ? 'keiner' : ''; }
+  function msZahl(o, k) { var n = zahl(o && o[k]); return n > 0 ? Math.round(n * 100) / 100 : null; }
+  /**
+   * Mietspiegel des Objekts als EINE Struktur, gleich ob aus dem Register oder aus der Eingabe am Objekt:
+   *   { art: 'qualifiziert'|'einfach', unten, mittel, oben (€/m² oder null), stand: 'JJJJ-MM'|null,
+   *     gueltig_bis: 'JJJJ-MM'|null, url, herkunft, quelle: 'eingabe'|'register', art_fehlt }
+   * register: Eintrag des Mietspiegel-Verzeichnisses { art, stand, vermutung_bis, url, (unten, mittel, oben) };
+   * eingabe:  Felder am Objekt { art, unten, mittel, oben, stand, url }. Die Eingabe geht vor (sie trägt die
+   * Werte); Art, Stand und Link füllt das Register auf. Ohne einen einzigen Wert: null.
+   */
+  function mietspiegelAus(register, eingabe) {
+    var R = register || {}, E = eingabe || {};
+    var hat = function (o) { return !!(msZahl(o, 'unten') || msZahl(o, 'mittel') || msZahl(o, 'oben')); };
+    var vonE = hat(E), vonR = !vonE && hat(R) && msArt(R.art) !== 'keiner';
+    if (!vonE && !vonR) return null;
+    var Q = vonE ? E : R, A = vonE ? R : {};
+    var artQ = msArt(Q.art), artA = msArt(A.art);
+    var art = artQ && artQ !== 'keiner' ? artQ : (artA && artA !== 'keiner' ? artA : '');
+    var stand = ymAus(Q.stand) || ymAus(A.stand);
+    /* die Vermutungsfrist des Registers gilt nur für DENSELBEN Mietspiegel (gleicher Stand oder keiner eingetragen) */
+    var regBis = ymAus(R.vermutung_bis);
+    var gleicherMs = !vonE || !ymAus(E.stand) || ymAus(E.stand) === ymAus(R.stand);
+    var bis = art === 'qualifiziert' ? ((regBis && gleicherMs) ? regBis : (stand ? plusMonate(stand, 24) : null)) : null;
+    return { art: art || 'einfach', unten: msZahl(Q, 'unten'), mittel: msZahl(Q, 'mittel'), oben: msZahl(Q, 'oben'),
+      stand: stand, gueltig_bis: bis, url: String(Q.url || A.url || '').trim() || null,
+      herkunft: vonE ? MS_EINGABE : MS_REGISTER, quelle: vonE ? 'eingabe' : 'register', art_fehlt: !art };
+  }
+  /**
+   * Der Wert, mit dem § 558 rechnet. wahl: 'oben' (Standard, Marcel 09.11.2026) | 'mittel' | 'unten'.
+   * Fehlt der gewählte Wert, der nächste in MS_FOLGE (gesagt in den Hinweisen). heute: 'JJJJ-MM'.
+   * { qm, wahl, genutzt, wahl_text, art, qualifiziert (mit Vermutungswirkung), veraltet, stand, gueltig_bis,
+   *   url, herkunft, hinweise[] }
+   */
+  function mietspiegelWert(ms, wahl, heute) {
+    if (!ms) return null;
+    wahl = MS_WAHL[wahl] ? wahl : 'oben';
+    var genutzt = null;
+    MS_FOLGE[wahl].some(function (k) { if (ms[k] > 0) { genutzt = k; return true; } return false; });
+    if (!genutzt) return null;
+    var hm = /^\d{4}-\d{2}/.test(heute || '') ? String(heute).slice(0, 7) : heuteYm();
+    var h = [];
+    var spanne = !!(ms.unten > 0 || (genutzt !== 'mittel' && ms.mittel > 0));
+    if (genutzt === 'oben' && spanne) h.push(HW_MS.oben);
+    if (genutzt !== wahl) h.push('gewählt ist der ' + MS_WAHL[wahl] + ', eingetragen nur der ' + MS_WAHL[genutzt]);
+    if (ms.art_fehlt) h.push(HW_MS.ohne_art);
+    var veraltet = false;
+    if (ms.art === 'qualifiziert') {
+      if (!ms.stand) h.push(HW_MS.ohne_stand);
+      else if (ms.gueltig_bis && hm > ms.gueltig_bis) { veraltet = true; h.push('Stand ' + mmjj(ms.stand) + ': ' + HW_MS.veraltet); }
+      else h.push(HW_MS.qualifiziert);
+    } else h.push(HW_MS.einfach);
+    return { qm: ms[genutzt], wahl: wahl, genutzt: genutzt, wahl_text: MS_WAHL[genutzt], art: ms.art,
+      qualifiziert: ms.art === 'qualifiziert' && !veraltet && !!ms.stand, veraltet: veraltet,
+      stand: ms.stand || null, gueltig_bis: ms.gueltig_bis || null, url: ms.url || null, quelle: ms.quelle,
+      unten: ms.unten, mittel: ms.mittel, oben: ms.oben,
+      herkunft: ms.herkunft + ' — ' + (ms.art === 'qualifiziert' ? 'qualifiziert (§ 558d BGB)' : 'einfach (§ 558c BGB)')
+        + ', ' + MS_WAHL[genutzt] + (ms.stand ? ', Stand ' + mmjj(ms.stand) : '') + (veraltet ? ', veraltet' : ''),
+      hinweise: h };
+  }
+  /**
+   * Stufe des Abschlags Angebotsmiete -> Vergleichsmiete. cfg = DealPilotConfig.mieteAngebotAbschlag
+   * (Zahlen stehen NUR dort). lage: { bremse_gilt: true|false|null, kapp_pct, ags, einwohner }.
+   * angespannt: Mietpreisbremse gilt oder Kappung 15 %; entspannt: nur bei BEKANNTER Einwohnerzahl unter
+   * der Schwelle; sonst mittel. Berlin: Warnung. Ergebnis { pct, stufe, warnung, grund } oder null ohne cfg.
+   */
+  function abschlagStufe(cfg, lage) {
+    var S = cfg && cfg.stufen; if (!S) return null;
+    lage = lage || {};
+    var ew = Number(lage.einwohner), unter = Number(cfg.entspannt_unter_einwohner);
+    var stufe, grund;
+    if (lage.bremse_gilt === true || Number(lage.kapp_pct) === 15) {
+      stufe = 'angespannt'; grund = lage.bremse_gilt === true ? 'Mietpreisbremse gilt' : 'Kappungsgrenze 15 %';
+    } else if (lage.einwohner != null && lage.einwohner !== '' && isFinite(ew) && ew > 0 && isFinite(unter) && ew < unter && S.entspannt != null) {
+      stufe = 'entspannt'; grund = 'Gemeinde unter ' + unter.toLocaleString('de-DE') + ' Einwohnern';
+    } else {
+      stufe = 'mittel'; grund = 'weder Mietpreisbremse noch Kappungsgrenze 15 %';
+    }
+    var pct = Number(S[stufe]);
+    if (!isFinite(pct)) return null;
+    var berlin = cfg.berlin_ags && String(lage.ags || '').replace(/\D/g, '') === String(cfg.berlin_ags);
+    return { pct: pct, stufe: stufe, grund: grund, warnung: berlin ? (cfg.berlin_warnung || null) : null, stand: cfg.stand || null };
+  }
+  /**
+   * Vergleichsmiete geschätzt aus der Angebots-/Marktmiete. ab = Ergebnis von abschlagStufe() (oder { pct }).
+   * Ohne Satz: die Marktmiete unverändert, ausdrücklich „Abschlag nicht bekannt“.
+   */
+  function vglAusAngebot(markt_qm, ab) {
+    var mq = zahl(markt_qm); if (!(mq > 0)) return null;
+    var p = ab && ab.pct != null && ab.pct !== '' ? Number(ab.pct) : NaN;
+    var ok = isFinite(p) && p >= 0 && p < 60;
+    var pT = ok ? String(Math.round(p * 10) / 10).replace('.', ',') : null;
+    var beleg = ' — für das Erhöhungsverlangen mit Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen';
+    var r = { qm: ok ? Math.round(mq * (1 - p / 100) * 100) / 100 : mq, markt_qm: mq, pct: ok ? p : null,
+      stufe: ok && ab.stufe ? ab.stufe : null, ohne_abschlag: !ok, warnung: (ab && ab.warnung) || null,
+      text: ok ? 'Schätzung aus Angebotsmieten abzüglich ' + pT + ' % (DealPilot-Ansatz nach Marktlage, nicht amtlich)' + beleg
+        : 'Schätzung aus Angebotsmieten, Abschlag nicht bekannt (DealPilot-Ansatz, nicht amtlich)' + beleg };
+    r.hinweise = [r.text].concat(r.warnung ? [r.warnung] : []);
+    return r;
+  }
+
   g.DpMietpotenzial = {
+    MS_ART: MS_ART, MS_WAHL: MS_WAHL, HW_MS: HW_MS,   /* v3246 */
+    ymAus: ymAus, mietspiegelAus: mietspiegelAus, mietspiegelWert: mietspiegelWert, abschlagStufe: abschlagStufe, vglAusAngebot: vglAusAngebot,   /* v3246 */
     PRAEFIX: PRAEFIX, TERMIN_REGEL: TERMIN_REGEL,
     zahl: zahl, plusMonate: plusMonate, mmjj: mmjj, deDatum: deDatum,
     gemeindeFinden: gemeindeFinden, kappungAus: kappungAus, mietpreisbremseAus: mietpreisbremseAus,
