@@ -621,7 +621,10 @@
      Auf der Produktion (app.dealpilot.immo) kein Eintrag und kein Aufruf; Staging unverändert.
      FREIGABE: die Zeile PROD_GESPERRT auf false setzen (neue Version, Buster). Profilfoto und Track Record bleiben. */
   var PROD_GESPERRT = true;
-  var gesperrt = PROD_GESPERRT && /^app\.dealpilot\.immo$/i.test(location.hostname);
+  /* v3233 · Marcel 09.11.: am Handy trotzdem sichtbar. Prod laeuft unter ZWEI Adressen (APP_DOMAIN:
+     app.dealpilot.immo und app.dealpilot.junker-immobilien.io), die Sperre kannte nur die erste.
+     Jetzt umgekehrt: gesperrt ueberall ausser Staging und lokal. */
+  var gesperrt = PROD_GESPERRT && !/staging|localhost|127\.0\.0\.1|\.test$/i.test(location.hostname);
   if (gesperrt) {
     try { var st = document.createElement('style'); st.textContent = '[data-act="vermoegen"]{display:none !important}'; (document.head || document.documentElement).appendChild(st); } catch (e) {}
     oeffnen = function () {};

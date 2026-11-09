@@ -175,11 +175,13 @@
   }
 
   /* Menüpunkt nur für freigeschaltete Konten */
+  /* v3233 · Marcel 09.11.: am Handy auf Prod gesehen - versteckt jetzt per Klasse, nicht nur per Inline-Stil */
+  try { var st0 = document.createElement('style'); st0.textContent = '.sb-act-wuensche:not(.dpw-frei){display:none !important}'; (document.head || document.documentElement).appendChild(st0); } catch (e) {}
   function pruefeZugang() {
     try {
       if (!(window.Auth && Auth.isApiMode && Auth.isApiMode() && Auth.isLoggedIn())) return;
       Auth.apiCall('/wuensche/zugang').then(function (r) {
-        document.querySelectorAll('.sb-act-wuensche').forEach(function (el) { el.style.display = (r && r.ok) ? '' : 'none'; });
+        document.querySelectorAll('.sb-act-wuensche').forEach(function (el) { el.style.display = (r && r.ok) ? '' : 'none'; el.classList.toggle('dpw-frei', !!(r && r.ok)); });
       }).catch(function () {});
     } catch (e) { /* still */ }
   }
