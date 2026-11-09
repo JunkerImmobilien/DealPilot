@@ -107,12 +107,22 @@ for (const f of liste) {
     (B.werte || []).forEach((b, i) => { zellenZahl++; if (!plausibel(b.eur_qm)) F(d, 'basis.werte[' + i + '].eur_qm ' + b.eur_qm + ' außerhalb 3–30'); });
     if (isNum(R.basis_eur_qm) && !plausibel(R.basis_eur_qm)) F(d, 'basis_eur_qm außerhalb 3–30');
     (R.faktoren || []).forEach((f, i) => {
-      if (!['wfl_kurve', 'baujahr_klasse', 'flag', 'lage', 'auswahl'].includes(f.typ)) F(d, 'faktoren[' + i + '].typ unbekannt: ' + f.typ);
+      if (!['wfl_kurve', 'baujahr_klasse', 'flag', 'lage', 'auswahl', 'eingabe'].includes(f.typ)) F(d, 'faktoren[' + i + '].typ unbekannt: ' + f.typ);
+      /* v3261 · eingabe: Betrag vom Nutzer (Rostock Wohnlage je Adresse) - Spannweite des Verzeichnisses ist Pflicht */
+      if (f.typ === 'eingabe' && (!isNum(f.von) || !isNum(f.bis) || f.von > f.bis)) F(d, 'faktoren[' + i + '] eingabe braucht von ≤ bis (Spannweite des Verzeichnisses)');
+      if (f.typ === 'eingabe' && f.art === 'faktor') F(d, 'faktoren[' + i + '] eingabe nur mit art pct oder eur_qm');
       if (!['pct', 'eur_qm', 'faktor'].includes(f.art)) F(d, 'faktoren[' + i + '].art unbekannt: ' + f.art);
       if (!f.beleg) F(d, 'faktoren[' + i + '].beleg fehlt');
       if (f.art === 'faktor') {
-        const ws = f.typ === 'flag' ? [f.werte] : Array.isArray(f.werte) ? f.werte.map(x => x.wert) : Object.values(f.werte || {});
-        ws.forEach(x => { if (!isNum(x) || x < 0.5 || x > 1.6) F(d, 'faktoren[' + i + '] Faktor ' + x + ' unplausibel'); });
+        /* v3261 · ein Faktor darf { wert, unten, oben } sein (Konfidenzgrenzen, Ibbenbüren) — unten ≤ wert ≤ oben */
+        const roh = f.typ === 'flag' ? [f.werte] : Array.isArray(f.werte) ? f.werte : Object.values(f.werte || {});
+        roh.forEach(v => {
+          const x = v && typeof v === 'object' ? v.wert : v;
+          if (!isNum(x) || x < 0.5 || x > 1.6) F(d, 'faktoren[' + i + '] Faktor ' + x + ' unplausibel');
+          if (v && typeof v === 'object' && (v.unten != null || v.oben != null)) {
+            if (!isNum(v.unten) || !isNum(v.oben) || v.unten > x || x > v.oben) F(d, 'faktoren[' + i + '] Grenzen ' + v.unten + ' ≤ ' + x + ' ≤ ' + v.oben + ' verletzt');
+          }
+        });
       }
     });
     if (!R.spanne) warn.push(d + ': regression ohne spanne');

@@ -113,10 +113,13 @@ function merkmalWahr(objekt, name) {
 }
 
 /** Spanne auf einen (gerundeten) Mittelwert: { unten_pct, oben_pct } | { unten_abs, oben_abs } | { baujahr_klassen: [...] } */
-function spanneAnwenden(sp, mittel, bj, n, hinweise) {
+function spanneAnwenden(sp, mittel, bj, n, hinweise, objekt) {
   let s = sp;
   if (sp && Array.isArray(sp.baujahr_klassen)) {
-    const i = klasseFinden(sp.baujahr_klassen, bj);
+    /* v3261 · eine Klasse darf an ein Merkmal gebunden sein ({ …, merkmal: 'denkmalschutz' }, Wolfsburg): sie zählt nur,
+       wenn objekt.merkmale[merkmal] wahr ist; sonst die nächste passende Klasse (Reihenfolge der Liste) */
+    const liste = sp.baujahr_klassen.map(k => (k && k.merkmal && !merkmalWahr(objekt, k.merkmal)) ? null : k);
+    const i = klasseFinden(liste, bj);
     if (i < 0) { hinweise.push('keine Spanne für Baujahr ' + bj + ' im Mietspiegel'); return { unten: null, oben: null, text: '' }; }
     s = sp.baujahr_klassen[i];
   }
@@ -208,7 +211,7 @@ function tabelleRechnen(w, objekt, bj, wfl, n, hinweise) {
   if (T.spanne) {
     mittel = f(zelle.mittel);
     if (mittel === null) return leer(hinweise.concat('Tabellenfeld ohne Mittelwert'), { zelle: zelleText });
-    const sp = spanneAnwenden(T.spanne, mittel, bj, n, hinweise);
+    const sp = spanneAnwenden(T.spanne, mittel, bj, n, hinweise, objekt);
     unten = sp.unten; oben = sp.oben; spText = sp.text;
   } else {
     unten = f(zelle.unten); mittel = f(zelle.mittel); oben = f(zelle.oben);
@@ -241,16 +244,22 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
   if (basis === null) return leer(hinweise.concat('Mietspiegel ohne Basismiete — nicht rechenbar'));
 
   let pct = 0, eurSumme = 0, prod = 1; const teile = [], jeRubrik = {};
+  /* v3261 · Faktoren mit eigenen Konfidenzgrenzen (Ibbenbüren: UK 1,05 [1,02 – 1,07]): Wert als Zahl ODER { wert, unten, oben }.
+     Die Grenzen wirken nur mit spanne.typ 'faktor_grenzen' (untere Spanne = Basis × Π unten, obere = Basis × Π oben). */
+  const jeRubrikU = {}, jeRubrikO = {};
+  const drei = (v) => (v && typeof v === 'object')
+    ? { w: num(v.wert), u: num(v.unten) !== null ? num(v.unten) : num(v.wert), o: num(v.oben) !== null ? num(v.oben) : num(v.wert) }
+    : { w: num(v), u: num(v), o: num(v) };
   const rf = num(R.rundung_faktor);
   for (const f of (R.faktoren || [])) {
     if (!bedingungErfuellt(f.bedingung, bj)) continue;
-    let wert = null, was = f.label || f.merkmal;
+    let wert = null, wu = null, wo = null, was = f.label || f.merkmal;
     if (f.typ === 'baujahr_klasse' || f.typ === 'wfl_kurve') {
       const x = f.typ === 'baujahr_klasse' ? bj : wflR;
       if (x === null) return leer(hinweise.concat((f.typ === 'baujahr_klasse' ? 'Baujahr' : 'Wohnfläche') + ' fehlt — der Mietspiegel braucht es für „' + was + '“'));
       const i = klasseFinden(f.werte, x);
       if (i < 0) return leer(hinweise.concat((f.typ === 'baujahr_klasse' ? 'Baujahr ' + x : 'Wohnfläche ' + x + ' m²') + ' liegt außerhalb der Klassen für „' + was + '“ — dort endet die Rechnung'));
-      wert = num(f.werte[i].wert); was = was + ' ' + klasseText(f.werte[i]);
+      { const d = drei(f.werte[i]); wert = d.w; wu = d.u; wo = d.o; } was = was + ' ' + klasseText(f.werte[i]);
     } else if (f.typ === 'lage' || f.typ === 'auswahl') {
       const angabe = f.typ === 'lage' ? objekt.lage : (objekt.merkmale && objekt.merkmale[f.merkmal]);
       const W = f.werte || {};
@@ -267,13 +276,31 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
       } else if (f.typ === 'lage') {
         return leer(hinweise.concat('Lage nicht angegeben — der Mietspiegel unterscheidet sie, ohne Angabe kein Wert'));
       } else continue;
-      wert = num(W[k]); was = was + ' ' + k;
+      { const d = drei(W[k]); wert = d.w; wu = d.u; wo = d.o; } was = was + ' ' + k;
     } else if (f.typ === 'flag') {
       if (!merkmalWahr(objekt, f.merkmal)) continue;
-      wert = num(f.werte);
+      { const d = drei(f.werte); wert = d.w; wu = d.u; wo = d.o; }
+    } else if (f.typ === 'eingabe') {
+      /* v3261 · Betrag, den der Nutzer selbst aus einem Verzeichnis des Mietspiegels abliest (Rostock: Wohnlage je
+         Adresse in €/m²). merkmal 'lage' liest objekt.lage, sonst objekt.merkmale[merkmal]; Zahl mit Komma oder Punkt.
+         Außerhalb von von/bis (Spannweite des Verzeichnisses) kein Wert; fehlt die Angabe und ist pflicht gesetzt, auch nicht. */
+      const roh = f.merkmal === 'lage' ? objekt.lage : (objekt.merkmale && objekt.merkmale[f.merkmal]);
+      const v = (roh === true || roh === false) ? null : num(roh);
+      if (v === null) {
+        if (f.pflicht) return leer(hinweise.concat((f.label || f.merkmal) + ' nicht angegeben — ' + (f.hinweis_fehlt || 'der Mietspiegel braucht den Betrag, ohne Angabe kein Wert')));
+        continue;
+      }
+      const ev = num(f.von), eb = num(f.bis);
+      if ((ev !== null && v < ev) || (eb !== null && v > eb))
+        return leer(hinweise.concat((f.label || f.merkmal) + ' ' + zahlText(v, 2) + ' liegt außerhalb des Verzeichnisses (' + zahlText(ev, 2) + ' bis ' + zahlText(eb, 2) + ')'));
+      wert = v;
     } else continue;
     if (wert === null) continue;
-    if (f.art === 'faktor') { const rb = f.rubrik || f.merkmal; jeRubrik[rb] = (jeRubrik[rb] || 1) * wert; if (wert !== 1) teile.push(was + ' × ' + zahlText(wert, 3)); }
+    if (f.art === 'faktor') {
+      const rb = f.rubrik || f.merkmal; jeRubrik[rb] = (jeRubrik[rb] || 1) * wert;
+      jeRubrikU[rb] = (jeRubrikU[rb] || 1) * (wu !== null ? wu : wert); jeRubrikO[rb] = (jeRubrikO[rb] || 1) * (wo !== null ? wo : wert);
+      if (wert !== 1) teile.push(was + ' × ' + zahlText(wert, 3));
+    }
     else if (f.art === 'pct') { pct += wert; if (wert) teile.push(was + ' ' + (wert > 0 ? '+' : '') + zahlText(wert, 1) + ' %'); }
     else { eurSumme += wert; if (wert) teile.push(was + ' ' + (wert > 0 ? '+' : '') + eur(wert) + ' €'); }
   }
@@ -283,7 +310,12 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
   /* summe und produkt: Basis × Gesamtfaktor × (1 + Σ pct/100) + Σ €/m² — Faktoren (art faktor) multiplizieren, Prozente addieren */
   const mittelRoh = basis * prod * (1 + pct / 100) + eurSumme;
   const mittel = runden(mittelRoh, n);
-  const sp = spanneAnwenden(R.spanne, mittel, bj, n, hinweise);
+  let sp;
+  if (R.spanne && R.spanne.typ === 'faktor_grenzen') {
+    /* v3261 · Spanne aus den Konfidenzgrenzen der Faktoren, je Grenze eigenes Produkt (gleiche Rundung wie der Mittelwert) */
+    const grenze = (je) => { let p = 1; for (const rb of Object.keys(je)) p *= rf !== null ? runden(je[rb], rf) : je[rb]; if (rf !== null) p = runden(p, rf); return runden(basis * p * (1 + pct / 100) + eurSumme, n); };
+    sp = { unten: grenze(jeRubrikU), oben: grenze(jeRubrikO), text: 'Spanne aus den Konfidenzgrenzen der Faktoren' };
+  } else sp = spanneAnwenden(R.spanne, mittel, bj, n, hinweise, objekt);
   const rechnung = basisText + (teile.length ? ' · ' + teile.join(', ') : '')
     + (prod !== 1 ? ' · Gesamtfaktor ' + zahlText(prod, 3) : '') + ' → Mittelwert ' + eur(mittel) + ' €/m²' + (sp.text ? ' · ' + sp.text : '');
   return { unten: sp.unten, mittel, oben: sp.oben, zelle: null, rechnung, hinweise };
@@ -353,7 +385,11 @@ export function mietspiegelMitWerten(satz, q, ordner) {
   q = q || {};
   if (w && (q.baujahr || q.wfl)) {
     const merkmale = {};
-    String(q.merkmale || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { merkmale[x] = true; });
+    /* 'a,b' setzt Schalter; 'name:wert' (v3261) übergibt eine Auswahl oder einen Betrag (Komma als Dezimalzeichen geht nicht, Punkt nehmen) */
+    String(q.merkmale || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => {
+      const i = x.indexOf(':');
+      if (i > 0) merkmale[x.slice(0, i).trim()] = x.slice(i + 1).trim(); else merkmale[x] = true;
+    });
     satz.werte = mietspiegelWerteFuer(w, { baujahr: q.baujahr, wfl: q.wfl, lage: q.lage || null, ausstattung: q.ausstattung || null, merkmale });
   }
   return satz;
