@@ -41,7 +41,13 @@
   var $ = function (id) { return document.getElementById(id); };
   var _v = function (id) { var e = $(id); return e ? String(e.value || '').trim() : ''; };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-  var gold = function () { try { return window._wlc ? window._wlc('#C9A84C') : '#C9A84C'; } catch (e) { return '#C9A84C'; } };   /* var() greift in Leaflet nicht */
+  /* var() greift in Leaflet nicht - v3241: Farbe ueber ein Messelement mit dem Whitelabel-Token auslesen (gold-audit) */
+  var gold = function () {
+    try {
+      var m = document.createElement('span'); m.style.color = 'var(--wl-c9a84c, #C9A84C)'; m.style.display = 'none';
+      document.body.appendChild(m); var c = getComputedStyle(m).color; m.remove(); return c;
+    } catch (e) { return 'goldenrod'; }
+  };
 
   var _leaflet = null;
   function leafletLaden() {
