@@ -1476,7 +1476,7 @@
   var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
   /* v3272 · seit v3077 gilt der Detailgrad je Nutzer (Merker dp_detailgrad_zuletzt, im Demo-Konto Einsteiger).
      Die Reihen zeigen die volle Oberfläche: Experte FLÜCHTIG - fällt beim nächsten Laden eines Objekts weg. */
-  function rhExperte() { try { if (window.DpDetailgrad) DpDetailgrad.setzen(3, { fluechtig: true }); } catch (e) {} }
+  function rhExperte() { try { if (window.DpDetailgrad) DpDetailgrad.setzen(3, { fluechtig: true, still: true }); } catch (e) {} }
   function rhLaden() {
     return new Promise(function (ok) {
       if (window.DPM_REIHE_DATEN) { ok(true); return; }
@@ -3725,7 +3725,7 @@
     szenen: [
       async function (s) {   /* 1 · das Objekt */
         await r6KopieStart(R11_PARK, { behalte: true });
-        try { DpDetailgrad.setzen(3, { fluechtig: true }); } catch (e) {}
+        try { DpDetailgrad.setzen(3, { fluechtig: true, still: true }); } catch (e) {}
         await warte(600);
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
