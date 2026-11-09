@@ -170,7 +170,7 @@ export const ABLAEUFE = [
     schritte: [
       { t: 'Reiter **Steuer**, Karte **AfA-Konfiguration**, Feld **AfA-Satz**: den Eintrag **Eigenen Satz / Restnutzungsdauer eingeben …** wählen.',
         belege: [[IX, 'AfA-Konfiguration'], [J('afa-eigen.js'), 'Eigenen Satz / Restnutzungsdauer eingeben …']] },
-      { t: 'Auf **Restnutzungsdauer ermitteln** klicken. Der Assistent hat neun Schritte: Objekt-Basis · Auftraggeber & Stichtag · Bauliche Anlagen · Gebäudetechnik · Modernisierungen · Zustand der Gewerke · Schäden & Mängel · Sachverständiger · Ergebnis & Empfehlung. Was im Objekt schon steht, ist vorausgefüllt.',
+      { t: 'Auf **Restnutzungsdauer ermitteln** klicken. Der Assistent hat acht Schritte: Objekt-Basis · Auftraggeber & Stichtag · Bauliche Anlagen · Gebäudetechnik · Modernisierungen · Zustand der Gewerke · Schäden & Mängel · Ergebnis & Empfehlung. Was im Objekt schon steht, ist vorausgefüllt.',
         belege: [[J('afa-eigen.js'), '>Restnutzungsdauer ermitteln<'], [J('rnd-wizard.js'), "title: 'Objekt-Basis'"], [J('rnd-wizard.js'), "title: 'Schäden & Mängel'"], [J('rnd-wizard.js'), "title: 'Ergebnis & Empfehlung'"], [J('deal-action.js'), 'var prefill = _getRndPrefill();']] },
       { t: 'Mit **Weiter →** durch die Schritte; in Schritt 8 heißt der Knopf **Berechnen →**.',
         belege: [[J('rnd-wizard.js'), "'Weiter →'"], [J('rnd-wizard.js'), "'Berechnen →'"]] },

@@ -27,7 +27,7 @@
   }
 
   let currentStep = 1;
-  const TOTAL_STEPS = 9;
+  const TOTAL_STEPS = 8;   /* v3262 · Marcel 09.11.2026: Schritt „Sachverständiger“ raus - es gibt eine Einschätzung, keine Angaben zum Gutachter */
   let state = null;
   let onCompleteCb = null;
   let modus = 'anfrage';   /* v1506: 'anfrage' | 'uebernehmen' */
@@ -98,28 +98,7 @@
     { num: 7, title: 'Schäden & Mängel',
       sub: 'Erfassen Sie sichtbare Mängel (optional)', render: renderStep7,
       validate: function () { return []; } /* optional */ },
-    { num: 8, title: 'Sachverständiger',
-      sub: 'Wer erstellt das Gutachten?', render: renderStep8,
-      validate: function () {
-        const e = [];
-        /* v1507 · gemessen beim Durchklicken: hier verlangt der Wizard Name,
-           E-Mail und Erstellungsort des Sachverständigen - 'erforderlich für
-           den Versand'. Im Uebernahme-Modus wird aber nichts versendet; dort
-           will der Nutzer nur eine Zahl. Eine Pflichtangabe fuer einen
-           Vorgang, den es nicht gibt, haelt genau die Arbeit auf, fuer die
-           der Knopf da ist. */
-        if (modus === 'uebernehmen') return e;
-        if (!state.sv_name || !state.sv_name.trim())
-          e.push(['sv_name', 'Name des Sachverständigen fehlt']);
-        if (!state.sv_email || !state.sv_email.trim())
-          e.push(['sv_email', 'E-Mail ist erforderlich für den Versand']);
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.sv_email))
-          e.push(['sv_email', 'Bitte gültige E-Mail-Adresse eingeben']);
-        if (!state.erstellungsort || !state.erstellungsort.trim())
-          e.push(['erstellungsort', 'Erstellungsort fehlt']);
-        return e;
-      } },
-    { num: 9, title: 'Ergebnis & Empfehlung',
+    { num: 8, title: 'Ergebnis & Empfehlung',
       /* v1970a: hier stand „Export oder direkt übernehmen". Einen Export
          gibt es in der App seit V194 nicht mehr, und seit v1970 auch die
          Module nicht — der Untertitel versprach einen Knopf, den niemand
@@ -462,7 +441,7 @@
     document.getElementById('rnd-wiz-back').style.visibility =
       currentStep > 1 ? 'visible' : 'hidden';
     const nextBtn = document.getElementById('rnd-wiz-next');
-    if (currentStep === 8) {
+    if (currentStep === TOTAL_STEPS - 1) {   /* v3262: vorletzter Schritt rechnet */
       nextBtn.textContent = 'Berechnen →';
     } else if (currentStep === TOTAL_STEPS) {
       // V194: "In Editor übernehmen" raus — direkt zum Anfrage-Versand
@@ -497,7 +476,7 @@
      bindInputs() in Karten. Jede Abschnittsüberschrift (.rnd-wiz-section mit
      h3) beginnt eine neue Karte; ein Schritt ohne Überschrift bekommt eine
      aus HUB_KOPF. Schritt 9 (Ergebnis) bleibt, wie er ist. */
-  const HUB_KURZ = ['Objekt', 'Auftrag', 'Bau', 'Technik', 'Modernisierung', 'Gewerke', 'Mängel', 'Gutachter', 'Ergebnis'];
+  const HUB_KURZ = ['Objekt', 'Auftrag', 'Bau', 'Technik', 'Modernisierung', 'Gewerke', 'Mängel', 'Ergebnis'];
   const HUB_KOPF = { 1: 'Objekt und Lage', 3: 'Konstruktion und Ausstattung', 4: 'Haustechnik und Energie',
     5: 'Letzte Modernisierung je Bauteil', 6: 'Zustand je Gewerk', 7: 'Sichtbare Mängel', 8: 'Angaben für das Gutachten' };
 

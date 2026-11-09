@@ -1764,7 +1764,7 @@ window.DealPilotDealAction = (function() {
   }
 
   // V142: RND-Wizard öffnen (statt direkter Expert-Anfrage)
-  // Der Wizard führt durch 9 Schritte, rechnet automatisch RND + AfA-Vergleich,
+  // Der Wizard führt durch 8 Schritte (v3262: Sachverständiger raus), rechnet automatisch RND + AfA-Vergleich,
   // zeigt das Ergebnis mit "Lohnt sich"-Bewertung und bietet danach Optionen:
   //   - Vollständiges Gutachten anfragen (Expert-Maske)
   //   - PDF/DOCX direkt exportieren

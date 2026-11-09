@@ -2735,8 +2735,8 @@
       },
       async function (s) {   /* 6 · durch den Wizard */
         var zb = r6Beginn(s, 'Restnutzungsdauer ermitteln', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — vorbelegt aus dem Objekt.');
-        for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1100); }
-        await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
+        for (var i = 0; i < 8 && !/Schritt 8 von 8/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1100); }
+        await warteAuf(function () { return /Schritt 8 von 8/.test(r6WizTitel()); }, 4000);
         await warte(700);
         var t = r6Inner(r6Wiz());
         /* v2258 (Hauptsitzung): die Spanne steht jetzt mit Komma („30,8–34,8 Jahre") */
@@ -4373,8 +4373,8 @@
     await warte(700);
   }
   async function r10cDurch() {
-    for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(900); }
-    await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
+    for (var i = 0; i < 8 && !/Schritt 8 von 8/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(900); }
+    await warteAuf(function () { return /Schritt 8 von 8/.test(r6WizTitel()); }, 4000);
     await warte(900);
   }
   function r10cErgebnis() {
@@ -4404,8 +4404,8 @@
       },
       async function (s) {   /* 4 · die Schritte */
         var zb = r6Beginn(s, 'Neun Schritte', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — jeder Schritt ist vorbelegt, du korrigierst nur.');
-        for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1300); }
-        await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
+        for (var i = 0; i < 8 && !/Schritt 8 von 8/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1300); }
+        await warteAuf(function () { return /Schritt 8 von 8/.test(r6WizTitel()); }, 4000);
         await r6Ende(zb);
       },
       async function (s) {   /* 5 · Ergebnis in ganzen Jahren */
