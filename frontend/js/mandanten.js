@@ -4,6 +4,7 @@
  *  v804 : effRate() liefert den Halter-Steuersatz fuer den calc.js-Fork (Stufe 2a).
  *  v806 : PRO-GATE — Mandanten nur fuer Plan 'pro'.
  *  v809 : Feld-Erklaerungen (Steuerregime + Buchhaltung) als kurze Hinweis-Texte.
+ *  v3270: Gesellschaften nur bei Detailgrad Experte (gesellschaftenSichtbar, hinweisHtml, steuerHinweis).
  *  - Mandanten-Liste (localStorage 'dp_mandanten'), CRUD im Settings-Reiter
  *  - Halter-Dropdown am Objekt (#halter), Cockpit-Filter-Chips (#dp-halter-filter)
  *  - Regime/Buchhaltung werden GESPEICHERT, aber erst Stufe 2/3 aktiv.
@@ -49,6 +50,107 @@
     }
     if (!pro) { var hsel = document.getElementById('halter'); if (hsel) { try { hsel.value = 'privat'; } catch (e) {} } }
   }
+
+  /* ===== v3270 · GESELLSCHAFTEN NUR BEI DETAILGRAD EXPERTE =====
+     Marcel 09.11.2026: „Ich würde sagen, dass es GmbHs und Gesellschaften nur in
+     Stufe 3 gibt." Anlass: im Demo-Konto (Einsteiger) zeigte der Reiter Steuer bei
+     einem GmbH-Objekt nur den Körperschaftsteuer-Verlauf - Steuerformular,
+     Betriebsausgaben und Kosten der Gesellschaft waren per Detailgrad weg, ohne
+     ein Wort warum.
+     Unter Experte (Stufe 1 und 2) sind deshalb AUS DER ANSICHT genommen: der Reiter
+     Einstellungen › Mandanten (nur die private Verwaltung mit Steuerzeiträumen
+     bleibt über „Steuerzeiträume verwalten" erreichbar), die Halter-Filter in
+     Seitenleiste und Cockpit, Überführung und Jahresabschluss.
+     NUR ANZEIGE: Halter, Rechtsform und Steuersphäre eines Objekts bleiben, wie sie
+     sind - ein GmbH-Objekt rechnet in jeder Stufe mit der Körperschaftsteuer,
+     nichts fällt still auf privat zurück. Wo ein solches Objekt erscheint, sagt eine
+     Karte, wem es gehört und dass die Einzelheiten ab Experte zu sehen sind
+     (hinweisHtml). Die Plan-Sperre (Pro, _isPro) gilt zusätzlich. */
+  function gesellschaftenSichtbar() {
+    try { if (window.DpDetailgrad && typeof DpDetailgrad.stufe === 'function') return DpDetailgrad.stufe() >= 3; } catch (e) {}
+    return true;   /* ohne Detailgrad-Modul (andere Dokumente): wie bisher */
+  }
+  function _kurzRf(rf) { return rf === 'gmbh' ? 'GmbH' : rf === 'ug' ? 'UG' : rf === 'gbr' ? 'GbR' : ''; }
+  /** Die Hinweiskarte für ein Gesellschaftsobjekt unter Experte, sonst ''.
+   *  halterId: leer = #halter des geöffneten Objekts. ort: 'steuer' | 'pilot' | 'cockpit'. */
+  function hinweisHtml(halterId, ort) {
+    try {
+      if (gesellschaftenSichtbar()) return '';
+      var id = halterId;
+      if (id == null || id === '') { var sel = document.getElementById('halter'); id = sel ? sel.value : 'privat'; }
+      id = String(id || 'privat');
+      if (id === 'privat') return '';
+      var m = _getStreng(id);
+      if (!m || !m.rechtsform || m.rechtsform === 'privat') return '';
+      var kurz = _kurzRf(m.rechtsform), name = String(m.name || '').trim() || 'Gesellschaft';
+      var wer = esc(name) + (kurz && name.toLowerCase().indexOf(kurz.toLowerCase()) < 0 ? ' (' + kurz + ')' : '');
+      var stufe = 1; try { stufe = DpDetailgrad.stufe(); } catch (e) {}
+      var corp = isCorp(m.rechtsform), satz, rechnung;
+      if (ort === 'cockpit') {
+        satz = 'Steuerregime, Kosten und Jahresabschluss der ' + wer + ' bearbeitest du ab Detailgrad Experte.';
+        rechnung = '';
+      } else if (corp) {
+        satz = (stufe === 2 ? 'Betriebsausgaben je Jahr, Halter und Kosten der Gesellschaft' : 'Steuer, Betriebsausgaben und Kosten der Gesellschaft') + ' siehst du ab Detailgrad Experte.';
+        rechnung = 'Gerechnet wird weiter mit der Steuer der Gesellschaft (Körperschaftsteuer), nicht mit deiner Einkommensteuer.';
+      } else {
+        satz = 'Feststellung, Anteile der Gesellschafter und Kosten der Gesellschaft siehst du ab Detailgrad Experte.';
+        var q = anteil(id);
+        rechnung = 'In deine Einkommensteuer geht nur dein Anteil am Ergebnis' + (q < 1 ? ' (' + String(Math.round(q * 10000) / 100).replace('.', ',') + ' %)' : '') + '.';
+      }
+      return '<div class="dp-ges-hinweis" data-dp-ges-hinweis="' + esc(ort || 'steuer') + '" role="note">'
+        + '<div class="dp-ges-h-text">' + (ort === 'cockpit' ? '' : '<b>Dieses Objekt gehört der ' + wer + '.</b> ') + satz
+        + (rechnung ? '<span class="dp-ges-h-sub">' + rechnung + '</span>' : '') + '</div>'
+        + '<button type="button" class="btn btn-gold btn-sm dp-ges-h-knopf" data-dp-dg-setzen="3">Auf Experte umstellen</button>'
+        + '</div>';
+    } catch (e) { return ''; }
+  }
+  /** Reiter Steuer: die Karte oben (unter Titel und Beschreibung). Gerufen aus
+   *  tax.js renderTaxModule und bei jedem Detailgrad-Wechsel. Kein .card: der
+   *  Detailgrad markiert jede .card ohne gelistetes Feld als Experte. */
+  function steuerHinweis() {
+    var sec = document.getElementById('s3-tax'); if (!sec) return;
+    var html = hinweisHtml(null, 'steuer');
+    var k = document.getElementById('dp-ges-hinweis-steuer');
+    if (!html) { if (k) k.remove(); return; }
+    if (!k) {
+      k = document.createElement('div'); k.id = 'dp-ges-hinweis-steuer';
+      var nach = sec.querySelector(':scope > .sec-desc') || sec.querySelector(':scope > .sec-title');
+      if (nach && nach.nextSibling) sec.insertBefore(k, nach.nextSibling); else sec.insertBefore(k, sec.firstChild);
+    }
+    if (k.innerHTML !== html) k.innerHTML = html;
+  }
+  function _gesStil() {
+    if (document.getElementById('dp-ges-stil-v3270')) return;
+    var s = document.createElement('style'); s.id = 'dp-ges-stil-v3270';
+    var U = 'body.dp-dg-1 ', V = 'body.dp-dg-2 ';
+    s.textContent = [
+      /* Reiter Mandanten und die Halter-Filter: nur Experte (Anzeige; Steuerzeiträume bleiben über den Link im Reiter Steuer erreichbar) */
+      U + '#settings-modal .st-tab[data-tab="mandanten"],' + V + '#settings-modal .st-tab[data-tab="mandanten"],'
+        + U + '#sb-mand-filter,' + V + '#sb-mand-filter,' + U + '#dp-halter-filter,' + V + '#dp-halter-filter{display:none !important}',
+      /* die Hinweiskarte: in Experte nie (statische Ausgaben wie Pilot-Analyse und Cockpit bauen sich nicht bei jedem Wechsel neu) */
+      'body.dp-dg-3 .dp-ges-hinweis{display:none !important}',
+      '.dp-ges-hinweis{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:12px 0 4px;padding:12px 16px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-left:4px solid var(--wl-c9a84c, #C9A84C);border-radius:10px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);font-size:13.5px;line-height:1.5}',
+      '.dp-ges-h-text{flex:1 1 260px;min-width:0}',
+      '.dp-ges-h-sub{display:block;margin-top:3px;font-size:12px;opacity:.8}',
+      '.dp-ges-h-knopf{flex:0 0 auto}'
+    ].join('\n');
+    (document.head || document.documentElement).appendChild(s);
+  }
+  /* Detailgrad-Wechsel: Filter, Karte und offener Einstellungsreiter ziehen nach */
+  window.addEventListener('dp:detailgrad', function () {
+    try {
+      if (!gesellschaftenSichtbar() && window._dpHalterFilter && window._dpHalterFilter !== '__all__') setFilter('__all__');
+      else { renderHalterChips(); renderSidebarChips(); }
+    } catch (e) {}
+    try { steuerHinweis(); } catch (e) {}
+    try {
+      /* ein offenes Formular einer Gesellschaft nicht wegwerfen: erst speichern */
+      if (document.getElementById('mand-settings-host')) {
+        if (!gesellschaftenSichtbar() && _editing && _editing !== 'privat') { try { uiSaveIfOpen(); } catch (_) {} _editing = null; }
+        _rerender();
+      }
+    } catch (e) {}
+  });
 
   function _privat() {
     return {
@@ -154,7 +256,7 @@
   /* ===== Cockpit-Filter-Chips (#dp-halter-filter) ===== */
   function renderHalterChips() {
     var host = document.getElementById('dp-halter-filter'); if (!host) return;
-    if (!_isPro()) { host.innerHTML = ''; return; }
+    if (!_isPro() || !gesellschaftenSichtbar()) { host.innerHTML = ''; return; }   /* v3270: nur Experte */
     var active = window._dpHalterFilter || '__all__';
     var chips = [{ id: '__all__', name: 'Alle' }].concat(_state.list);
     host.innerHTML = chips.map(function (c) {
@@ -172,7 +274,7 @@
   }
   function renderSidebarChips() {
     var host = document.getElementById('sb-mand-filter'); if (!host) return;
-    if (!_isPro() || !_state.list || _state.list.length <= 1) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    if (!_isPro() || !gesellschaftenSichtbar() || !_state.list || _state.list.length <= 1) {   /* v3270: nur Experte */ host.innerHTML = ''; host.style.display = 'none'; return; }
     host.style.display = '';
     var active = window._dpHalterFilter || '__all__';
     var items = [{ id: '__all__', name: 'Alle', rechtsform: '__all__' }].concat(_state.list);
@@ -270,6 +372,7 @@
   function filterByHalter(arr) {
     var f = window._dpHalterFilter;
     if (!f || f === '__all__') return arr;
+    if (!gesellschaftenSichtbar()) return arr;   /* v3270: unter Experte ist der Filter unsichtbar - er darf keine Objekte verstecken */
     return (arr || []).filter(function (o) { var h = (o && o.halter) ? o.halter : 'privat'; return h === f; });
   }
 
@@ -716,13 +819,35 @@
        beiden Aufrufstellen: sonst haette die eine ihn und die andere nicht,
        und genau so entstehen zwei Wahrheiten. */
     try { setTimeout(function () { try { _objekteJeMandant(); } catch (e) {} }, 0); } catch (e) {}
-    if (!_isPro()) {
+    /* v3270 · unter Detailgrad Experte dieselbe schlanke Fassung wie ohne Pro:
+       nur Privat mit den Steuerzeitraeumen (erreichbar ueber „Steuerzeitraeume
+       verwalten" im Reiter Steuer), Gesellschaften ab Experte. */
+    var _expSperre = _isPro() && !gesellschaftenSichtbar();
+    if (!_isPro() || _expSperre) {
       /* v865-privat-frei: Der PRIVATE Halter (inkl. Steuerzeitraeume) bleibt fuer
          ALLE Plaene bearbeitbar — nur Gesellschaften (GmbH/UG) sind Pro. */
       if (_editing === 'privat') {
         return '<h2 class="set-section-h2">Mandanten</h2>' + _renderForm();
       }
       var _priv = get('privat') || { id: 'privat', name: 'Privat', rechtsform: 'privat', regime: {} };
+      var _nGes = (_state.list || []).filter(function (m) { return m && m.id !== 'privat'; }).length;
+      if (_expSperre) return ''
+        + '<h2 class="set-section-h2">Mandanten</h2>'
+        + '<p class="hint">Dein privater Halter — inklusive <b>Steuerzeiträumen</b> — ist in jedem Detailgrad da. <b>Gesellschaften (GmbH, UG, GbR) gibt es ab Detailgrad Experte.</b></p>'
+        + '<div style="border:1px solid #ece7df;border-radius:12px;padding:13px 15px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;background:#fff;margin:14px 0">'
+        +   '<div style="flex:1 1 220px;min-width:0">'
+        +   '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><strong style="font:600 15px/1.2 \'Space Grotesk\',sans-serif">' + esc(_priv.name || 'Privat') + '</strong>' + _badge('privat') + '</div>'
+        +   '<div style="font-size:12px;color:#7A7370">Einkommensteuer · über zvE (Tab Steuer) · Steuerzeiträume verwalten</div>'
+        +   '</div>'
+        +   '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'privat\')">Bearbeiten</button>'
+        + '</div>'
+        + '<div class="dp-ges-sperre" style="margin-top:14px;padding:20px 22px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:14px;background:#FAF9F4">'
+        +   '<div style="font:700 13px/1 \'DM Sans\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:8px">Ab Detailgrad Experte</div>'
+        +   '<p style="margin:0 0 14px;color:#2A2727;font-size:14px;line-height:1.55">Mit <b>Mandanten</b> hältst du Objekte privat <i>oder</i> in einer Gesellschaft (GmbH, UG, GbR) — mit eigener Steuerrechnung, Kosten der Gesellschaft, Jahresabschluss und Überführung. '
+        +     (_nGes ? 'Du hast ' + (_nGes === 1 ? 'eine Gesellschaft' : _nGes + ' Gesellschaften') + ' angelegt; ihre Objekte rechnen in jedem Detailgrad weiter mit ihrer Steuer.' : 'Der Detailgrad gilt für alle Objekte und ist nur Anzeige — nichts wird gelöscht.')
+        +   '</p>'
+        +   '<button type="button" class="btn btn-gold" data-dp-dg-setzen="3">Auf Experte umstellen</button>'
+        + '</div>';
       return ''
         + '<h2 class="set-section-h2">Mandanten</h2>'
         + '<p class="hint">Dein privater Halter — inklusive <b>Steuerzeitr\u00e4umen</b> — ist in allen Pl\u00e4nen verf\u00fcgbar. Weitere Gesellschaften (GmbH/UG) mit eigenem Steuerregime sind Teil des <b>Pro</b>-Plans.</p>'
@@ -1303,6 +1428,7 @@
 
   /* ===== Init ===== */
   function init() {
+    _gesStil();   /* v3270 */
     renderHalterOptions();
     wireObjectFields();
     _applyGate();
@@ -1347,7 +1473,13 @@
      dashboard.js _abschlussJahre). Gerechnet und gedruckt wird unveraendert
      von exportAbschlussPDF() in gesellschaft-abschluss.js - dort sitzt auch
      die Plan-Sperre (Investor). */
+  function _expertePflicht(was) {
+    if (gesellschaftenSichtbar()) return false;
+    if (typeof toast === 'function') toast(was + ' gibt es ab Detailgrad Experte — umstellen unter Einstellungen › Mein Profil.');
+    return true;
+  }
   function openJahresabschluss(id) {
+    if (_expertePflicht('Den Jahresabschluss')) return;   /* v3270 */
     var m = get(id);
     if (!m || !isCorp(m.rechtsform)) {
       if (typeof toast === 'function') toast('Jahresabschluss gibt es nur für eine GmbH oder UG.');
@@ -1423,6 +1555,7 @@
   }
 
   function openUeberfuehrung() {
+    if (_expertePflicht('Die Überführung in eine Gesellschaft')) return;   /* v3270 */
     var corps = (_state.list || []).filter(function (m) { return isCorp(m.rechtsform); });
     var alt = document.getElementById('mand-uew-ov'); if (alt) alt.remove();
     var ov = document.createElement('div');
@@ -1537,6 +1670,7 @@
   window.DealPilotMandanten = {
     openUeberfuehrung: openUeberfuehrung, _uewPick: _uewPick,  /* v856-uew */
     openJahresabschluss: openJahresabschluss,  /* v3228 */
+    gesellschaftenSichtbar: gesellschaftenSichtbar, hinweisHtml: hinweisHtml, steuerHinweis: steuerHinweis,  /* v3270: Gesellschaften nur bei Detailgrad Experte */
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
     setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, steuerParameter: steuerParameter, ueberfDaten: ueberfDaten, sphaere: sphaere, anteil: anteil, istKoerperschaft: istKoerperschaft, wireObjectFields: wireObjectFields,

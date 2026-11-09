@@ -2747,7 +2747,7 @@
           + (t.satz == null
               ? '<div class="sk-fuss">Für diese Gesellschaft ist <b>kein Steuersatz hinterlegt</b> — '
                 + 'Körperschaftsteuer und Gewerbesteuer-Hebesatz stehen unter '
-                + '<b>Einstellungen / Mandanten</b>. Das Ergebnis der Objekte ist oben trotzdem '
+                + '<b>Einstellungen / Mandanten</b> (ab Detailgrad Experte). Das Ergebnis der Objekte ist oben trotzdem '
                 + 'richtig; nur die Steuer darauf lässt sich ohne Satz nicht beziffern.</div>'
               : '');
       }
@@ -2788,7 +2788,9 @@
       } else {
         html += '<div class="sk-fuss">Die Gesellschaft rechnet <b>getrennt von deinem privaten Einkommen</b>. '
           + 'Ihr Satz ist proportional — es gibt keine Progression und keinen Verlustrücktrag auf dein zvE. '
-          + 'Ein Verlust mindert hier nur das Ergebnis der Gesellschaft.</div>';
+          + 'Ein Verlust mindert hier nur das Ergebnis der Gesellschaft.</div>'
+          /* v3270 · unter Detailgrad Experte: die Gesellschaft selbst ist ab Experte bearbeitbar */
+          + (function () { try { return (window.DealPilotMandanten && DealPilotMandanten.hinweisHtml) ? DealPilotMandanten.hinweisHtml(t.halter, 'cockpit') : ''; } catch (e) { return ''; } })();
       }
       html += '</div>';
     });

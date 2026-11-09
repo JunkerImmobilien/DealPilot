@@ -479,7 +479,9 @@
   function steuer(a, bestand) {
     /* v3268 · Halter GmbH/UG: Betriebsausgaben statt Werbungskosten, und KEIN steuerfreier Verkauf nach zehn Jahren */
     var _bg = (window._dpBegriff ? window._dpBegriff() : { corp: false, wort: 'Werbungskosten' });
-    var h = karte(kopfzeile('Steuerverlauf · wann das Objekt steuerlich positiv wird') + '<div data-dp-steuerverlauf="1"></div>'
+    /* v3270 · Gesellschaftsobjekt unter Detailgrad Experte: wem es gehört, und dass die Einzelheiten ab Experte stehen */
+    var _gesH = ''; try { _gesH = (window.DealPilotMandanten && DealPilotMandanten.hinweisHtml) ? DealPilotMandanten.hinweisHtml(null, 'pilot') : ''; } catch (e) { _gesH = ''; }
+    var h = _gesH + karte(kopfzeile('Steuerverlauf · wann das Objekt steuerlich positiv wird') + '<div data-dp-steuerverlauf="1"></div>'
       + erkl(_bg.corp
         ? '<b>So liest du die Grafik:</b> Die Balken zeigen je Jahr das Ergebnis des Objekts in der Gesellschaft (Betriebseinnahmen minus Betriebsausgaben). '
           + 'Die Linie ist der Cashflow nach Steuern. Eine Zehnjahresfrist gibt es in der GmbH/UG nicht: ' + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || 'ein Veräußerungsgewinn ist immer steuerpflichtig.') + ' Es ist dieselbe Rechnung wie im Reiter Steuer.'

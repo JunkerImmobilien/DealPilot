@@ -5274,6 +5274,8 @@ document.addEventListener('contextmenu', function(e){
     if (!card) return;
     var key = card.getAttribute('data-key'); if (!key) return;
     if (!window.DealPilotUeberfuehrung) return;
+    /* v3270 · die Überführung gibt es nur bei Detailgrad Experte - sonst bleibt das Browsermenü */
+    if (window.DealPilotMandanten && DealPilotMandanten.gesellschaftenSichtbar && !DealPilotMandanten.gesellschaftenSichtbar()) return;
     e.preventDefault();
     var _doOpen = function(){ if (window.DealPilotUeberfuehrung) DealPilotUeberfuehrung.open(); };
     if (typeof loadSaved === 'function') { Promise.resolve(loadSaved(key)).then(function(){ setTimeout(_doOpen, 150); }); }
