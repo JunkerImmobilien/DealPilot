@@ -1508,7 +1508,9 @@
         market_value: mv.estimated != null ? String(mv.estimated) : null,
         ertragswert_eur: (cc.ertragswert && cc.ertragswert.value_eur) || null, sachwert_eur: (cc.sachwert && cc.sachwert.value_eur) || null,
         ertrag_weg: weg(cc.ertragswert), sachwert_weg: weg(cc.sachwert),
-        fuehrend: vw.verfahren || null, fuehrend_grund: vw.grund || null, fuehrend_quelle: vw.quelle || null };
+        fuehrend: vw.verfahren || null, fuehrend_grund: vw.grund || null, fuehrend_quelle: vw.quelle || null,
+        /* v3270 · Modul 30: die Liste „Marktberichte“ der Deal-Aktion zeigt nur Einträge mit report_id */
+        report_id: (_rh && _rh.mbListe) ? 990000 + i : null };
     });
   }
   function rhAntwort(u, m, opt) {
@@ -7669,7 +7671,7 @@
       p.then(function (r) { var st = r.status; return r.clone().text().then(function (t) { DPM_KU.mitschnitt.push({ k: k, status: st, text: t }); }); }).catch(function () {});
       return p;
     }
-    var D = (window.DPM_KU_DATEN && window.DPM_KU_DATEN.antworten) || [];
+    var D = _ku.daten || (window.DPM_KU_DATEN && window.DPM_KU_DATEN.antworten) || [];   /* v3270 · Modul 28 bringt eigene Daten mit */
     _ku.benutzt = _ku.benutzt || {};
     var alle = D.map(function (e, i) { return { e: e, i: i }; });
     var kand = alle.filter(function (x) { return x.e.k === k; });
@@ -8225,6 +8227,215 @@
         await zeige(function () { return d3Tafel(true); }, 6);
         await b2oZeile(s, 'Nebeneinander', 'Dieselbe Rechnung für jedes Objekt — ' + _d3.erg.map(function (e) { return '<b>' + (e.score || '–') + '</b> ' + (e.wort || ''); }).join(', ') + '. Gerechnet, nicht geraten.', 1500);
         d3Tafel(false);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · MODUL 30 · MARKTBEWERTUNG IM REITER OBJEKT (v3270) ═══════════
+     Marcel 09.11.2026: „Den Marktbericht als eigene Ansicht gibt es nicht mehr … direkt im
+     Reiter Objekt angestoßen und erzeugt; danach nur PDF abrufen.“ Ersetzt die Module 04, 16
+     und 18. Die Stufen 1-3 laufen wie in reihe-stufen (Sachsenstraße 18, Mitschnitte der
+     Berichte 211-213, nichts wird abgerufen); dazu der Kasten „Automatisch ermittelt“
+     (Bodenrichtwert mit Quelle) und am Ende die Liste „Marktberichte“ der Deal-Aktion mit
+     „PDF abrufen“ (gezeigt, nicht geklickt - die gespielten Berichte haben kein PDF). */
+  var _r30 = { vorher: null };
+  DREHBUECHER['reihe-marktbewertung'] = {
+    titel: 'Marktbewertung im Reiter Objekt', unterzeile: 'Drei Stufen, ein Ort — und danach das PDF', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · drei Stufen (wie Modul 04) */
+        try { var l0 = await Auth.apiCall('/objects'); _r30.vorher = ((l0 && l0.items) || []).map(function (o) { return o.id; }); } catch (e) { _r30.vorher = null; }
+        await DREHBUECHER['reihe-stufen'].szenen[0](s);
+        /* gemessen 09.11.: die Kennung des neuen Objekts kam nicht in DPM_REIHE.angelegt - es blieb stehen */
+        var k = window._currentObjKey;
+        if (k && DPM_REIHE.angelegt.indexOf(k) < 0 && _r30.vorher && _r30.vorher.indexOf(k) < 0) DPM_REIHE.angelegt.push(k);
+        if (_rh) _rh.mbListe = true;
+      }
+    ].concat(DREHBUECHER['reihe-stufen'].szenen.slice(1)).concat([
+      async function (s) {   /* 9 · Automatisch ermittelt: Bodenrichtwert mit Quelle */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var qz = function () { return q('#qz-card'); };
+        var x = qz(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(qz, 8);
+        var brw = wert('brw');
+        await b2oZeile(s, 'Automatisch ermittelt', 'Wert, Quelle, Stichtag — ohne Eingabe' + (brw ? ': Bodenrichtwert <b>' + brw + ' €/m²</b> vom Gutachterausschuss' : '') + '. Was die Stufen brauchen, holt DealPilot selbst.');
+        var lg = function () { return q('#oe-karte-lage'); };
+        if (lg() && lg().offsetHeight) {
+          lg().scrollIntoView({ block: 'center' }); await warte(400);
+          await zeige(lg, 8);
+          await b2oZeile(s, 'Die Lage', 'Darunter die Lage-Bewertung aus dem Marktbericht — Mikro- und Makrolage, Nachfrage, Entwicklung.');
+        }
+      },
+      async function (s) {   /* 10 · Berichte ansehen -> Deal-Aktion, PDF abrufen */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var b = function () { return q('#oe-mb-liste'); };
+        await zeige(b, 10);
+        await b2oZeile(s, 'Und das PDF?', 'Jeder Abruf landet im Verlauf. <b>„Berichte ansehen“</b> führt zur Liste in der Deal-Aktion.');
+        try { if (typeof window.dpMbBerichteZeigen === 'function') window.dpMbBerichteZeigen(); else reiter('s8'); } catch (e) {}
+        await warteAuf(function () { var h = q('#dab-mb-host'); return h && !/geladen/.test(h.textContent) && h.offsetHeight; }, 8000);
+        await warte(900);
+        var h = function () { return q('#dab-mb-host'); };
+        var hx = h(); if (hx) hx.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(h, 8);
+        var n = (_rh && _rh.berichte && _rh.berichte.length) || 0, pdf = r6Knopf('#dab-mb-host', /PDF/);
+        await b2oZeile(s, 'Marktberichte', (n ? '<b>' + n + ' Berichte</b> dieses Objekts, ' : 'Die Berichte des Objekts, ') + 'neuester oben — je Bericht <b>„' + (pdf ? r6Text(pdf) : 'PDF abrufen') + '“</b>. Keine eigene Ansicht mehr: erstellt wird im Reiter Objekt, abgeholt hier.', 1200);
+      }
+    ])
+  };
+
+  /* ═══ VIDEOREIHE · MODUL 28 · ALLE UNTERLAGEN REINLADEN (v3270) ═════════════════
+     Marcel 09.11.2026: „man lädt alle Dokumente auf einmal hoch … DealPilot liest alles aus,
+     zeigt die Übernahme (auch Werte, die im aktuellen Detailgrad nicht übernommen werden —
+     höher stellen und erneut einlesen), und später werden die Daten ins Objekt übertragen.“
+     Dreizehn Muster-Unterlagen (Lindenallee 14, fiktiv, als Testdokument gekennzeichnet) aus
+     messe-dateien/unterlagen-13/ - liegen NUR auf Staging (scp, nicht im Repo, Marcel 09.11.).
+     Die Auslese ist EINMAL echt erzeugt (?messe=reihe-unterlagen&kumit, Freigabe Marcel) und
+     liegt in js/messe-unterlagen-daten.js; sonst spielt kuAbruf sie ab (Schlüssel je Abruf).
+     Ein neues Objekt (rhStart), beim Aufräumen gelöscht. Detailgrad erst Einsteiger, dann
+     Experte - zurückgesetzt von rhAufraeumen. */
+  var UL_PFAD = 'messe-dateien/unterlagen-13/';
+  var UL_DATEIEN = ['01-expose-lindenallee-14.pdf', '02-mietaufstellung-lindenallee-14.pdf', '03-grundbuchauszug-blatt-20412.pdf', '04-teilungserklaerung-2014.pdf',
+    '05-energieausweis-und-flurkarte.pdf', '06-protokoll-eigentuemerversammlung-2024.pdf', '07-protokoll-eigentuemerversammlung-2025.pdf', '08-wirtschaftsplan-2026.pdf',
+    '09-baulastenauskunft.pdf', '10-marktbericht-lindenallee-14.pdf', '11-mietvertrag-we-1.pdf', '12-mietvertrag-we-3.pdf', '13-mietvertrag-we-6.pdf'];
+  var UL_BUSTER = 'v3270';
+  function ulLaden() {
+    return new Promise(function (ok) {
+      if (window.DPM_UL_DATEN) { ok(true); return; }
+      var s = document.createElement('script'); s.src = 'js/messe-unterlagen-daten.js?v=' + UL_BUSTER;
+      s.onload = function () { ok(!!window.DPM_UL_DATEN); }; s.onerror = function () { ok(false); };
+      document.head.appendChild(s);
+    });
+  }
+  function ulStufe(name) { var D = window.DpDetailgrad; if (!D || !D.NAMEN) return null; for (var k in D.NAMEN) { if (D.NAMEN[k] === name) return Number(k); } return null; }
+  function ulDetailgrad(name) { var st = ulStufe(name); if (st == null) return; try { DpDetailgrad.setzen(st, { still: true }); } catch (e) {} try { DpDetailgrad.anwenden(); } catch (e) {} }
+  var UL_WARTEN = [
+    ['Jede Datei einzeln', 'DealPilot öffnet jede PDF und liest ihren Text — ist eine Seite nur ein <b>Scan</b>, Seite für Seite.'],
+    ['Die Art erkennen', 'Exposé, Mieterliste, Grundbuch, Teilungserklärung, Protokoll, Mietvertrag — erkannt am <b>Kopf</b> des Dokuments.'],
+    ['Personendaten geschwärzt', 'Namen von Mietern, Eigentümern und Ansprechpartnern werden <b>vor</b> der Auswertung entfernt.'],
+    ['Nur was dasteht', 'Jeder Wert trägt seine <b>Quelle</b>. Was in keinem Dokument steht, bleibt leer.'],
+    ['Alles zusammen', 'Zum Schluss werden alle Unterlagen <b>gemeinsam</b> ausgewertet: Risiken, Eigentümergemeinschaft, Investitionsthese.']
+  ];
+  async function ulLesen(s, n) {
+    var t0 = Date.now(), MAX = 8 * 60 * 1000;
+    for (var i = 0; ; i++) {
+      var neu = i < UL_WARTEN.length;
+      if (!neu && (kuFertig(n) || Date.now() - t0 > MAX)) break;
+      var w = UL_WARTEN[Math.min(i, UL_WARTEN.length - 1)], g = luGelesen().length;
+      var stand = g < n ? ' <span style="opacity:.75">· ' + g + ' von ' + n + ' gelesen</span>' : (kuFertig(n) ? '' : ' <span style="opacity:.75">· Auswertung läuft</span>');
+      await zeige(function () { return q('#oabi-files') || q('#oabi-ov .oabi-modal'); }, 8);
+      s.zeile(w[0], w[1] + stand);
+      var bis = Date.now() + (neu ? lies(w[0], w[1]) * TEMPO : 2500);
+      while (Date.now() < bis && (neu || !kuFertig(n))) await warte(400);
+    }
+  }
+  async function ulEinlesen(s, erst) {
+    await new Promise(function (ok) { ObjectActions.openImport(function () {}); setTimeout(ok, 50); });
+    await warteAuf(function () { return q('#oabi-ov .oabi-modal'); }, 5000);
+    kegelHoch(true);
+    await zeige(function () { return q('#oabi-drop'); }, 10);
+    if (erst) await b2oZeile(s, 'Alles auf einmal', 'Hineinziehen oder auswählen — <b>alle Unterlagen</b> eines Objekts in einem Schritt.');
+    kuEinlegen(UL_DATEIEN, _ku.bl);
+    await warteAuf(function () { return luDateiZeilen().length >= UL_DATEIEN.length; }, 8000);
+    if (erst) {
+      await zeige(function () { return q('#oabi-files'); }, 8);
+      await b2oZeile(s, UL_DATEIEN.length + ' Dateien', 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, Energieausweis, zwei Protokolle, Wirtschaftsplan, Baulasten, Marktbericht und <b>drei Mietverträge</b>.');
+      await ulLesen(s, UL_DATEIEN.length);
+    } else {
+      s.zeile('Erneut einlesen', 'Dieselben ' + UL_DATEIEN.length + ' Dateien — jetzt mit Detailgrad <b>Experte</b>.');
+      var t0 = Date.now(); while (!kuFertig(UL_DATEIEN.length) && Date.now() - t0 < 5 * 60 * 1000) await warte(400);
+    }
+  }
+  function ulApply() { return q('#oabi-apply'); }
+  DREHBUECHER['reihe-unterlagen'] = {
+    titel: 'Alle Unterlagen reinladen', unterzeile: 'Dreizehn PDFs, eine Übernahme — und was der Detailgrad damit macht', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { kuAufraeumen(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · leeres Objekt, Einsteiger */
+        _ku = { benutzt: {} }; DPM_KU.gespielt = []; DPM_KU.fehlt = []; DPM_KU.unscharf = []; DPM_KU.live = [];
+        if (kuMit()) DPM_KU.mitschnitt = [];
+        else { if (!(await ulLaden())) throw new Error('Mitschnitt messe-unterlagen-daten.js fehlt'); _ku.daten = window.DPM_UL_DATEN.antworten; }
+        var vorab = Promise.all(UL_DATEIEN.map(function (n) { return fetch(UL_PFAD + n + '?v=' + UL_BUSTER).then(function (r) { return r.blob(); }); }));
+        await rhStart(0);
+        ulDetailgrad('Einsteiger');
+        _rh.ku = true;
+        _ku.bl = await vorab;
+        await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
+        await b2oZeile(s, 'Ein leeres Objekt', 'Kein Feld getippt — alles, was gleich im Objekt steht, kommt aus den <b>Unterlagen</b>. Detailgrad: <b>Einsteiger</b>.');
+        var kachel = rhKachel('import');
+        if (kachel()) { await zeige(kachel, 10); await b2oZeile(s, 'Exposé / Dokumente', 'In der Datenaufnahme die Kachel <b>„' + rhNameKachel('import') + '“</b> — für jedes PDF eines Objekts.'); }
+      },
+      async function (s) {   /* 2 · dreizehn Dateien lesen */
+        await ulEinlesen(s, true);
+        var arten = luDateiZeilen().map(luArt).filter(Boolean), zaehl = {};
+        arten.forEach(function (a) { zaehl[a] = (zaehl[a] || 0) + 1; });
+        var liste = Object.keys(zaehl).map(function (a) { return a + (zaehl[a] > 1 ? ' ×' + zaehl[a] : ''); });
+        await zeige(function () { return q('#oabi-files'); }, 8);
+        await b2oZeile(s, 'Erkannt', liste.length ? '<b>' + liste.join(' · ') + '</b>.' : 'Alle Dateien sind gelesen.');
+      },
+      async function (s) {   /* 3 · Übernahme mit Quelle */
+        var ueb = luReiter(/^Übernahme/)(); if (ueb) ueb.click(); await warte(700);
+        await zeige(function () { return q('#oabi-reiter'); }, 8);
+        var nR = [].filter.call(document.querySelectorAll('#oabi-reiter .dpu-tab'), function (b) { return b.offsetWidth; }).length;
+        await b2oZeile(s, 'Die Reiter', '<b>' + nR + ' Reiter</b>: die Übernahme, je Dokument einer, dazu die gemeinsame Auswertung.');
+        var fl = luZeile(/^Flur/);
+        if (fl()) { await luZeige(fl, 8); var flQ = luQuelle(fl()); await b2oZeile(s, 'Jeder Wert mit Quelle', luKurz(r6Text(fl().cells[1]), 40) + ' <b>' + luKurz(luWert(fl()), 40) + '</b>' + (flQ ? ' — Quelle: ' + flQ : '') + '.'); }
+        var kp = luZeile(/^Kaufpreis/);
+        if (kp()) { await luZeige(kp, 8); var kQ = luQuelle(kp()); await b2oZeile(s, 'Aus dem Exposé', 'Kaufpreis <b>' + luKurz(luWert(kp()), 30) + '</b>' + (kQ ? ' — Quelle: ' + kQ : '') + '. Was du nicht willst, wählst du ab.'); }
+      },
+      async function (s) {   /* 4 · nicht übernommen wegen Detailgrad */
+        var dg = function () { return q('#oabi-ov .oabi-dg'); };
+        if (dg()) {
+          await luZeige(dg, 8);
+          var t = r6Text(dg()), n = /^(\d+)/.exec(t);
+          await b2oZeile(s, 'Erkannt, aber nicht übernommen', '<b>' + (n ? n[1] + ' weitere Werte' : 'Weitere Werte') + '</b> gehören zu Feldern, die Einsteiger nicht sehen — etwa die einzelnen Wohnungen. Detailgrad höher stellen und <b>erneut einlesen</b>.', 1200);
+        } else {
+          await b2oZeile(s, 'Alles im Detailgrad', 'Alle erkannten Werte passen zum gewählten Detailgrad.');
+        }
+        var au = luReiter(/^Auswertung/)();
+        if (au) {
+          au.click(); await warte(800);
+          await zeige(function () { return luPanel(); }, 8);
+          var nRi = luPanel() ? luPanel().querySelectorAll('.dpu-risiko').length : 0;
+          await b2oZeile(s, 'Die Auswertung', (nRi ? '<b>' + nRi + ' Risiken</b> mit Betrag und Quelle' : 'Risiken mit Betrag und Quelle') + ', die Lage der Eigentümergemeinschaft und eine Investitionsthese — aus allen Unterlagen zusammen.');
+        }
+      },
+      async function (s) {   /* 5 · übernehmen */
+        await zeige(ulApply, 10);
+        await b2oZeile(s, 'Übernehmen', 'Ein Klick — die Werte gehen ins Objekt.');
+        var b = ulApply(); if (b) b.click();
+        await warteAuf(function () { return !q('#oabi-ov .oabi-modal'); }, 8000);
+        kegelHoch(false);
+        await warte(1400);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('str'), feldVon('baujahr'), 8);
+        await b2oZeile(s, 'Im Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('plz') + ' ' + wert('ort') + (wert('baujahr') ? ', Baujahr ' + wert('baujahr') : '') + (zahl('wfl') ? ', ' + de(zahl('wfl')) + ' m²' : '') + ' — gelesen, nicht getippt.');
+      },
+      async function (s) {   /* 6 · Detailgrad höher, erneut einlesen */
+        ulDetailgrad('Experte');
+        await warte(900);
+        var k = function () { return q('#oe-ziel') || q('#oe-kopf'); };
+        await zeige(k, 8);
+        await b2oZeile(s, 'Detailgrad höher', 'Jetzt <b>Experte</b> — mehr Felder sichtbar, also mehr zu übernehmen.');
+        await ulEinlesen(s, false);
+        var ueb = luReiter(/^Übernahme/)(); if (ueb) ueb.click(); await warte(700);
+        var mv = luZeile(/Mietvertrag|Einheit/);
+        await luZeige(function () { return mv() || q('#oabi-result'); }, 8);
+        await b2oZeile(s, 'Jetzt auch die Wohnungen', 'Die Einheitenliste und die <b>Mietverträge je Wohnung</b> stehen jetzt in der Übernahme — gefüllt wird nur, was noch leer ist.');
+        var b = ulApply(); if (b) b.click();
+        await warteAuf(function () { return !q('#oabi-ov .oabi-modal'); }, 8000);
+        kegelHoch(false);
+        await warte(1600);
+      },
+      async function (s) {   /* 7 · Ergebnis */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var e = function () { return feldVon('einheiten')() || q('#oe-kopf'); };
+        await zeige(e, 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Fertig übertragen', (we ? '<b>' + we + ' Einheiten</b>, ' : '') + 'Grundbuch, Energie, Hausgeld und Risiken — aus ' + UL_DATEIEN.length + ' Unterlagen, jeder Wert mit Quelle.', 1200);
       }
     ]
   };
