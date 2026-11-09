@@ -2995,7 +2995,7 @@
         try { _r11Modus = localStorage.getItem('dp_pa_modus'); } catch (e) { _r11Modus = null; }
         await d3Laden();
         if (!window.DPM_DREI || !DPM_DREI.park) throw new Error('Mitschnitt DPM_DREI.park fehlt');
-        await d3Kopie(R11_PARK, DPM_DREI.park);
+        await r6KopieStart(R11_PARK, { ohneAnkauf: true, analyse: DPM_DREI.park });   /* setzt _rh - nur so löscht rhAufraeumen die Kopie */
         await r11Beispiel(s, ' Heute: die <b>Pilot-Analyse</b>.');
       },
       async function (s) {   /* 2 · Kopfzeile */
@@ -3010,7 +3010,7 @@
       async function (s) {   /* 3 · Reiterleiste */
         await zeige(r11In('.dp-pa-rail'), 8);
         var n = [].filter.call((r11In('.dp-pa-rail')() || document.createElement('i')).querySelectorAll('.dp-pa-tab'), function (b) { return b.offsetWidth; }).map(function (b) { return r6Text(b); });
-        await b2oZeile(s, 'Die Reiter', '<b>' + n.length + ' Reiter</b>: ' + n.join(' · ') + '.', 800);
+        await b2oZeile(s, 'Die Reiter', '<b>' + n.length + ' Reiter</b>: ' + n.map(function (x) { return '„' + x + '“'; }).join(', ') + '.', 800);
       },
       async function (s) {   /* 4 · Übersicht: Urteil und Zahlen */
         await r11PaTab(/^Übersicht/);
@@ -3052,7 +3052,7 @@
         if (sz()) {
           await zeige(sz, 8);
           var tx = r6Inner(sz()), wc = /Worst Case\s*\n\s*([^\n]+)/.exec(tx), bc = /Best Case\s*\n\s*([^\n]+)/.exec(tx);
-          await b2oZeile(s, 'Worst, Plan, Best', 'Drei Szenarien' + (wc ? ': schlecht <b>' + wc[1].trim() + '</b>' : '') + (bc ? ', gut <b>' + bc[1].trim() + '</b>' : '') + ' — mit dem, was dann vom Cashflow bleibt.');
+          await b2oZeile(s, 'Worst, Plan, Best', 'Drei Szenarien. ' + (wc ? 'Worst Case: <b>' + wc[1].trim() + '</b>. ' : '') + (bc ? 'Best Case: <b>' + bc[1].trim() + '</b>. ' : '') + 'Dazu, was dann vom Cashflow bleibt.');
         }
         var af = function () { var p = r11Panel(); return p && [].filter.call(p.children, function (c) { return /ANSCHLUSSFINANZIERUNG/i.test(r6Text(c.querySelector('.dp-pa-sec') || c)); })[0]; };
         if (af()) { await zeige(af, 8); await b2oZeile(s, 'Anschlussfinanzierung', 'Was passiert nach der Zinsbindung, wenn der Zins steigt? Der Pilot rechnet es durch.'); }
@@ -3067,7 +3067,7 @@
         var ab = (on && kp) ? Math.round((1 - on / kp) * 1000) / 10 : null;
         await b2oZeile(s, 'Die Kaufpreis-Offerte', 'Empfohlen: <b>' + (off || '–') + '</b>' + (ab != null && ab > 0 ? ' statt ' + eur(kp) + ' — ' + String(ab).replace('.', ',') + ' % darunter' : (on && kp && on === kp ? ' — genau der Kaufpreis' : '')) + '. Mit Begründung, die du dem Verkäufer nennen kannst.');
         var m = r11PanelSel('.dp-pa-offmail');
-        if (m()) { await zeige(m, 8); await b2oZeile(s, 'Offerte als E-Mail', 'Fertig formuliert — als E-Mail öffnen oder kopieren. Abgeschickt wird nur, was du selbst abschickst.'); }
+        if (m() && m().offsetHeight) { await zeige(m, 8); await b2oZeile(s, 'Offerte als E-Mail', 'Fertig formuliert — als E-Mail öffnen oder kopieren. Abgeschickt wird nur, was du selbst abschickst.'); }
       },
       async function (s) {   /* 9 · Finanzierung & Bank */
         await r11PaTab(/^Finanzierung/);
@@ -3145,49 +3145,112 @@
     try { if (window._SetDraft) window._SetDraft.dirty = false; } catch (e) {}
     r6EinstellungenZu();
   }
+  /* v3272 · Modul 12 neu (Marcel 09.11.2026): der Reiter Bewertung zeigt seit v3233-v3264 oben das
+     Gesamturteil (.dpz-kopf, mit „Wie wird gerechnet?“), darunter zwei Karten Investment/Finanzierung
+     (.dpz-zwei .dpz-karte), die Faktoren (.dpz-fakt) und die Kennzahlen (.bw-kz). Die alten Karten
+     DealPilot Score / Investor Deal Score (.dpsh-body) und .kpi-eval-card sind ausgeblendet. */
+  function r12Kopftext() { return r6Inner(q('#s6 .dpz-kopf')).replace(/\s+/g, ' '); }
+  function r12ZKarte(i) { return function () { return document.querySelectorAll('#s6 .dpz-zwei .dpz-karte')[i] || null; }; }
+  function r12Gruppen(i) {   /* [{name, gewicht, punkte}] je Gruppe einer Teil-Karte */
+    var k = r12ZKarte(i)(); if (!k) return [];
+    return [].map.call(k.querySelectorAll('.dpz-kz'), function (z) {
+      var l = r6Inner(z).split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+      var m = /^(.+?)\s+([\d,]+ %)$/.exec(l[0] || ''), p = /(\d+)\s*\/\s*100/.exec(l[1] || '');
+      return { name: m ? m[1] : (l[0] || ''), gewicht: m ? m[2] : '', punkte: p ? p[1] : '' };
+    });
+  }
+  function r12Frage(i) { var k = r12ZKarte(i)(); var m = k && /([^\n]*\?)/.exec(r6Inner(k)); return m ? m[1].trim() : ''; }
+  function r12Faktoren(i) {   /* Namen der positiven (0) / negativen (1) Faktoren */
+    var k = document.querySelectorAll('#s6 .dpz-fakt .dpz-karte')[i]; if (!k) return [];
+    var l = r6Inner(k).split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(1), out = [];
+    for (var j = 0; j + 1 < l.length; j += 2) { var p = /(\d+)\s*\/\s*100/.exec(l[j + 1]); out.push({ name: l[j], punkte: p ? p[1] : '' }); }
+    return out;
+  }
   DREHBUECHER['reihe-bewertung'] = {
-    titel: 'Bewertung und KPIs', unterzeile: 'Kennzahlen, Ampeln, DealScore und Investor-DealScore', objekt: null,
-    abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: function () { r12Zu(); rhAufraeumen(); },
+    titel: 'Bewertung und KPIs', unterzeile: 'Gesamturteil, Investment und Finanzierung, jede Kennzahl', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { try { var d = q('#s6 details.dpz-wie'); if (d) d.open = false; } catch (e) {} r12Zu(); rhAufraeumen(); },
     szenen: [
       async function (s) {   /* 1 · das Beispiel */
-        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true });
+        await r6KopieStart(R11_PARK, { ohneAnkauf: true });
         await r11Beispiel(s, ' Heute: der Reiter <b>Bewertung</b>.');
       },
-      async function (s) {   /* 2 · Kennzahlen mit Ampel */
+      async function (s) {   /* 2 · Gesamturteil */
         reiter('s6'); await warte(1400);
-        var tb = function () { return q('#s6 .kpi-eval-card'); };
-        await warteAuf(tb, 6000);
-        await zeige(tb, 8);
-        var d = r12Bewertung(/^DSCR/), c = r12Bewertung(/^Cashflow vor/), b = r12Bewertung(/^Bruttomiet/), n = r12Bewertung(/^Nettomiet/), e = r12Bewertung(/^EK-Rendite/), l = r12Bewertung(/^LTV/);
-        function f(x, nm) { return x ? nm + ' <b>' + x.wert + '</b> ' + x.wort.toLowerCase() : ''; }
-        await b2oZeile(s, 'Jede Kennzahl mit Ampel', [f(d, 'DSCR'), f(c, 'Cashflow'), f(b, 'Bruttorendite')].filter(Boolean).join(', ') + '.');
-        await b2oZeile(s, 'Jede Kennzahl mit Ampel', [f(n, 'Nettorendite'), f(e, 'EK-Rendite'), f(l, 'LTV')].filter(Boolean).join(', ') + ' — mit einem Satz, was das heißt.');
+        await warteAuf(function () { return q('#s6 .dpz-kopf') && q('#s6 .dpz-score'); }, 6000);
+        await zeige(function () { return q('#s6 .dpz-kopf'); }, 8);
+        var K = d3Kopf(), t = r12Kopftext(), g = /Gesamt aus Investment (\d+) \(([\d,]+ %)\) und Finanzierung (\d+) \(([\d,]+ %)\)/.exec(t);
+        await b2oZeile(s, 'Das Gesamturteil', 'Ganz oben: Investor Deal Score <b>' + (K.score || '–') + ' · ' + (K.wort || '–') + '</b>' + (K.empf ? ', Empfehlung <b>' + K.empf.charAt(0) + K.empf.slice(1).toLowerCase() + '</b>' : '') + '.'
+          + (g ? ' Gewichtet aus Investment ' + g[1] + ' (' + g[2] + ') und Finanzierung ' + g[3] + ' (' + g[4] + ').' : ''));
+        var sw = /Empfehlung nach Schwellen: ([^.]+)\.\s*([^.]+)\./.exec(t);
+        if (sw) await b2oZeile(s, 'Die Empfehlung', 'Nach festen Schwellen: <b>' + sw[1] + '</b>. ' + sw[2] + '.');
       },
-      async function (s) {   /* 3 · Formel und Zielwert */
-        try { DealPilotScoreHero.openKpi(); } catch (e) {}
+      async function (s) {   /* 3 · Wie wird gerechnet? */
+        var d = function () { return q('#s6 details.dpz-wie'); };
+        if (d()) {
+          d().open = true; await warte(600);
+          await zeige(d, 8);
+          var tx = r6Inner(d()).replace(/^\s*WIE WIRD GERECHNET\?\s*/i, '').replace(/\s+/g, ' ');
+          await b2oZeile(s, 'Wie wird gerechnet?', 'Ein Klick klappt den Rechenweg auf: „' + d3Satz(tx, 170) + '“', 800);
+          d().open = false; await warte(500);
+        }
+      },
+      async function (s) {   /* 4 · Investment */
+        await zeige(r12ZKarte(0), 8);
+        var a = d3Teil(0), gr = r12Gruppen(0);
+        await b2oZeile(s, 'Investment', (a ? '<b>' + a.n + ' · ' + a.wort + '</b> — ' : '') + '„' + r12Frage(0) + '“');
+        await b2oZeile(s, 'Vier Gruppen', gr.map(function (x) { return x.name + ' <b>' + x.punkte + '</b>'; }).join(' · ') + ' — jede mit ihrem Gewicht.');
+      },
+      async function (s) {   /* 5 · Finanzierung */
+        await zeige(r12ZKarte(1), 8);
+        var b = d3Teil(1), gr = r12Gruppen(1);
+        await b2oZeile(s, 'Finanzierung', (b ? '<b>' + b.n + ' · ' + b.wort + '</b> — ' : '') + '„' + r12Frage(1) + '“ ' + gr.map(function (x) { return x.name + ' <b>' + x.punkte + '</b>'; }).join(' · ') + '.');
+      },
+      async function (s) {   /* 6 · Faktoren */
+        var f = function () { return q('#s6 .dpz-fakt'); };
+        var x = f(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(f, 8);
+        var p = r12Faktoren(0).slice(0, 3).map(function (y) { return y.name; }), n = r12Faktoren(1).slice(0, 3).map(function (y) { return y.name; });
+        await b2oZeile(s, 'Was trägt, was drückt', (p.length ? 'Stark: <b>' + p.join(', ') + '</b>. ' : '') + (n.length ? 'Schwach: <b>' + n.join(', ') + '</b>.' : ''));
+      },
+      async function (s) {   /* 7 · Alle KPIs und Formel */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var kn = function () { return [].filter.call(document.querySelectorAll('#s6 .dpz-kopf .dpz-knopf'), function (b) { return /Alle KPIs/.test(b.textContent); })[0] || null; };
+        await zeige(kn, 10);
+        var zb = r6Beginn(s, 'Alle KPIs', 'Oben im Urteil: <b>„Alle KPIs“</b> — jede Kennzahl mit Wert, Punkten und Maßstab.');
+        await warte(1500);
+        if (kn()) kn().click(); else { try { DealPilotScoreHero.openKpi(); } catch (e) {} }
         await warteAuf(function () { return q('.dpshm-overlay .dpshm-kpi'); }, 5000);
+        await r6Ende(zb);
         kegelHoch(true); await warte(800);
         var br = function () { return r12Kpi(/^Bruttorendite/); };
         await zeige(br, 6);
         var h = br() ? r6Inner(br()).split('\n').map(function (x) { return x.trim(); }).filter(Boolean) : [];
-        await b2oZeile(s, 'Zielwert je Kennzahl', 'Bruttorendite <b>' + (h[2] || '–') + '</b>, ' + String(h[3] || '').replace(/\/100$/, '') + ' von 100 Punkten. Daneben der Maßstab: „' + (h[1] || '') + '“');
-        var zb = r6Beginn(s, 'Die Formel', 'Ein Klick auf die Kennzahl zeigt, wie sie gerechnet wird — und welche Felder einfließen.');
+        var n = document.querySelectorAll('.dpshm-overlay .dpshm-kpi').length;
+        await b2oZeile(s, 'Zielwert je Kennzahl', '<b>' + n + ' Kennzahlen</b>. Bruttorendite <b>' + (h[2] || '–') + '</b>, ' + String(h[3] || '').replace(/\/100$/, '') + ' von 100 Punkten — Maßstab: „' + (h[1] || '') + '“');
+        var zf = r6Beginn(s, 'Die Formel', 'Ein Klick auf die Kennzahl zeigt, wie sie gerechnet wird — und welche Felder einfließen.');
         await warte(1500);
         if (br()) br().click();
         await warteAuf(function () { return q('#dpsh-parts-overlay .dpshp-formula'); }, 4000);
-        await r6Ende(zb);
+        await r6Ende(zf);
         await zeige(function () { return q('#dpsh-parts-overlay .dpshp-modal'); }, 6);
         await b2oZeile(s, 'Die Formel', 'Bruttorendite = <b>' + r6Text(q('#dpsh-parts-overlay .dpshp-formula')).replace(/^FORMEL\s*/i, '') + '</b>. Jedes Feld darunter springt direkt in seinen Reiter.');
         try { DealPilotScoreHero.closeParts(); } catch (e) {}
         await warte(700);
-        var ds = function () { return r12Kpi(/^DSCR/); };
-        await zeige(ds, 6);
-        var hd = ds() ? r6Inner(ds()).split('\n').map(function (x) { return x.trim(); }).filter(Boolean) : [];
-        await b2oZeile(s, 'Und so für jede Kennzahl', 'DSCR <b>' + (hd[2] || '–') + '</b>: „' + (hd[1] || '') + '“ — Rendite, Finanzierung, Risiko, Lage, Potenzial.');
         try { DealPilotScoreHero.closeKpi(); } catch (e) {}
         kegelHoch(false); await warte(700);
       },
-      async function (s) {   /* 4 · eigene Schwellen */
+      async function (s) {   /* 8 · Kennzahlen im Reiter */
+        var kc = function () { return q('#s6 .bw-kz'); };
+        var x = kc(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(kc, 8);
+        var kt = r6Inner(kc()).replace(/\s+/g, ' ');
+        var h = /vor Steuern\s+heute\s+([+\-−–]?[\d.]+ €)/i.exec(kt), e = /Ende Zinsbindung\s+([+\-−–]?[\d.]+ €)/i.exec(kt), dscr = /DSCR ([\d,]+)/.exec(kt), ltv = /LTV ([\d,]+ %)/.exec(kt);
+        await b2oZeile(s, 'Die Kennzahlen', [h ? 'Cashflow vor Steuern heute <b>' + h[1] + '</b> im Monat' : '', e ? 'nach Ende der Zinsbindung <b>' + e[1] + '</b>' : '', dscr ? 'DSCR <b>' + dscr[1] + '</b>' : '', ltv ? 'Beleihung <b>' + ltv[1] + '</b>' : ''].filter(Boolean).join(', ') + '.');
+      },
+      async function (s) {   /* 9 · eigene Schwellen */
         await r6Einstellungen('standardwerte');
         var K = /^Persönliche Mindest/;
         await zeige(r6Karte('.settings-modal', K), 8);
@@ -3197,46 +3260,19 @@
         await b2oZeile(s, 'Deine eigenen Grenzen', 'Einstellungen › Standardwerte: ' + (gz.length ? gz.join(', ') : 'Mindest-DSCR, Mindest-Cashflow, höchster LTV') + ' — als Marker an den Kennzahlen.');
         r6EinstellungenZu(); await warte(700);
       },
-      async function (s) {   /* 5 · DealPilot Score */
-        reiter('s6'); await warte(1000);
-        await zeige(function () { var k = r12Karte(0)(); return k && k.querySelector('.dpsh-mainrow'); }, 8);
-        var h = r12Kopf(0), st = [85, 70, 50, 35, 34].map(function (x) { try { return ScoreTier.stufe(x).wort; } catch (e) { return null; } });
-        await b2oZeile(s, 'Der DealPilot Score', '<b>' + (h.score || '–') + ' von 100 · ' + r12Wort(h.wort) + '</b>. Die Stufen: ab 85 ' + st[0] + ', ab 70 ' + st[1] + ', ab 50 ' + st[2] + ', ab 35 ' + st[3] + ', darunter ' + st[4] + '.');
-      },
-      async function (s) {   /* 6 · Teilnoten und Gewichte */
-        await zeige(function () { var k = r12Karte(0)(); var b = k && k.querySelectorAll('.dpsh-cbar'); return b && b.length ? b2oHuelle(b[0], b[b.length - 1]) : null; }, 8);
-        var t = r12Teile(0);
-        await b2oZeile(s, 'Teilnoten und Gewichte', t.map(function (x) { return x.name.replace(/\s*\(.*\)$/, '') + ' ' + x.gewicht + ': <b>' + x.note + '</b>'; }).join(' · ') + '.');
-      },
-      async function (s) {   /* 7 · Gewichte und Grenzwerte in den Einstellungen */
+      async function (s) {   /* 10 · Bewertungsprofil */
         await r6Einstellungen('dealscore');
-        await warteAuf(function () { return q('#set-ds-cashflow'); }, 5000);
-        await zeigeGruppe(function () { return q('#set-ds-cashflow') && q('#set-ds-cashflow').closest('div'); }, function () { return q('#set-ds-potenzial') && q('#set-ds-potenzial').closest('div'); }, 8);
-        await b2oZeile(s, 'Die Gewichte stellst du ein', 'Einstellungen › Deal Score: Cashflow ' + wert('set-ds-cashflow') + ' %, Rendite ' + wert('set-ds-rendite') + ' %, LTV ' + wert('set-ds-ltv') + ' %, DSCR ' + wert('set-ds-risiko') + ' %, Potenzial ' + wert('set-ds-potenzial') + ' %.');
-        var g = function () { return r12SetFeld(/^DSCR$/, true); };
-        await zeige(function () { var e = g(); return e && e.closest('div'); }, 10);
-        await b2oZeile(s, 'Punkte je Wert', 'Wie viele Punkte ein Wert bringt, steht als Treppe: DSCR <b>' + r12Punkte(g() && g().value) + '</b>.');
-      },
-      async function (s) {   /* 8 · Investor-Profile */
         function pc(i) { return function () { var a = document.querySelectorAll('.settings-modal .ds2-preset-card'); return a.length ? a[i < 0 ? a.length - 1 : i] : null; }; }
-        await zeigeGruppe(pc(0), pc(-1), 8);   /* GEMESSEN: die Hülle allein scrollte das Fenster nicht, Kegel 0 % */
+        await zeigeGruppe(pc(0), pc(-1), 8);
         var namen = [].map.call(document.querySelectorAll('.settings-modal .ds2-preset-card .ds2-preset-label'), function (x) { return r6Text(x); }).filter(Boolean);
         var akt = q('.settings-modal .ds2-preset-card.ds2-preset-active .ds2-preset-label');
-        await b2oZeile(s, 'Investor-DealScore: dein Profil', namen.slice(0, 6).join(', ') + ' — oder eigene Gewichte. In diesem Konto aktiv: <b>' + (akt ? r6Text(akt) : '–') + '</b>.');
+        await b2oZeile(s, 'Dein Bewertungsprofil', namen.slice(0, 6).join(', ') + ' — oder eigene Gewichte. In diesem Konto aktiv: <b>' + (akt ? r6Text(akt) : '–') + '</b>.');
         r12Zu(); await warte(700);
       },
-      async function (s) {   /* 9 · Investor-DealScore */
+      async function (s) {   /* 11 · zwei Teil-Scores, ein Urteil */
         reiter('s6'); await warte(900);
-        await zeige(r12Karte(1), 8);
-        var h = r12Kopf(1), t = r12Teile(1), kp = /(\d+\s*\/\s*\d+)\s*\n\s*DATENTIEFE\s*\n/i.exec(r6Inner(r12Karte(1)()));   /* GEMESSEN: „ALLE KPIS" steht auch im Kopf, davor griff das Muster den Score (74/100) */
-        await b2oZeile(s, 'Der Investor-DealScore', '<b>' + (h.score || '–') + ' von 100 · ' + r12Wort(h.wort) + '</b> aus ' + (kp ? kp[1].replace(/\s/g, '') : '–') + ' Kennzahlen — ' + t.map(function (x) { return x.name + ' ' + x.gewicht; }).join(', ') + '.');
-        var lk = wert('lageklasse');
-        await b2oZeile(s, 'Lage zählt mit', 'Lage & Markt: Teilnote <b>' + ((t.filter(function (x) { return /^Lage/.test(x.name); })[0] || {}).note || '–') + '</b>' + (lk ? ', das Objekt steht in Lageklasse <b>' + lk + '</b>' : '') + ' — Mikrolage, Nachfrage, Bevölkerung, Marktmiete gegen Ist.');
-      },
-      async function (s) {   /* 10 · warum zwei Scores */
-        function kopf(i) { return function () { var k = r12Karte(i)(); return k && k.querySelector('.dpsh-headrow'); }; }
-        await zeigeGruppe(kopf(0), kopf(1), 6);   /* beide Karten zusammen sind höher als das Bild (gemessen Kegel 69 %) */
-        await b2oZeile(s, 'Warum zwei Scores', 'Der <b>DealPilot Score</b> braucht nur fünf Kennzahlen — wie im Quick Boarding. Der <b>Investor-DealScore</b> wiegt alles, auch Lage und Zustand.', 600);
+        await zeige(function () { return q('#s6 .dpz-zwei'); }, 8);
+        await b2oZeile(s, 'Warum zwei Teil-Scores', 'Eine gute Immobilie kann schlecht finanziert sein — und umgekehrt. Deshalb getrennt: <b>Investment</b> und <b>Finanzierung</b>, oben zu einem Urteil verbunden.', 600);
       }
     ]
   };
@@ -3650,55 +3686,107 @@
     return [new File([a], 'Rechnung-Dachrinne-2025.png', { type: 'image/png' }), new File([b], 'Wohngebaeudeversicherung-2025.png', { type: 'image/png' })];
   }
   var R15_JAHR = 2025;   /* das erste volle Jahr im Bestand (Kauf 23.12.2024) */
+  /* v3272 · Modul 15 neu (Marcel 09.11.2026): der Reiter Steuer seit v3233-v3264 - Persönliche
+     Steuer, Halter & Eigentum (nur Experte), AfA-Konfiguration, Steuer-Modul, Steuerverlauf mit
+     eingeklapptem Diagramm, Steuerformular pro Jahr. Der Detailgrad gilt je Nutzer - das Drehbuch
+     setzt Experte FLÜCHTIG (DpDetailgrad.setzen(3, {fluechtig})), der Merker bleibt unberührt.
+     Belege einlesen läuft heute über das gemeinsame Eingangsfenster (DpEingang) - gezeigt in Modul 28,
+     hier nur der Knopf. Die Spalten der Jahreszeile: Jahr, Einnahmen, Zinsen, AfA, Bewirtschaftung,
+     Sonstige WK, Erhaltung/Sanierung, Ergebnis, Steuer-Effekt - Ergebnis und Effekt von hinten gelesen. */
+  function r15Karte(id) { return function () { return document.getElementById(id); }; }
+  function r15KarteText(re) { return function () { return [].filter.call(document.querySelectorAll('#s3-tax .card'), function (c) { return c.offsetHeight && re.test(r6Inner(c).slice(0, 80)); })[0] || null; }; }
+  function r15Diagramm() { var t = document.getElementById('tax-timeline-card'); return t ? [].filter.call(t.querySelectorAll('button'), function (b) { return /Diagramm (auf|ein)klappen/.test(b.textContent); })[0] || null : null; }
   DREHBUECHER['reihe-steuer-bestand'] = {
-    titel: 'Steuer im Bestand', unterzeile: 'Soll und Ist, das Steuerformular pro Jahr, Belege', objekt: null,
+    titel: 'Steuer im Bestand', unterzeile: 'Halter, AfA, Steuerverlauf und das Steuerformular pro Jahr', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { r15BiZu(); rhAufraeumen(); },
+    aufraeumen: function () {
+      try { var k = r15Diagramm(); if (k && /einklappen/.test(k.textContent)) k.click(); } catch (e) {}
+      try { r15Modus(0); } catch (e) {}
+      rhAufraeumen();
+      try { if (window.DpDetailgrad) DpDetailgrad.anwenden(); } catch (e) {}
+    },
     szenen: [
       async function (s) {   /* 1 · das Objekt */
         await r6KopieStart(R11_PARK, { behalte: true });
+        try { DpDetailgrad.setzen(3, { fluechtig: true }); } catch (e) {}
+        await warte(600);
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         var we = wert('einheiten');
-        await b2oZeile(s, 'Das Beispiel', 'Im Bestand: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + 'Baujahr ' + wert('baujahr') + ', gekauft am ' + datum(wert('kaufdat')) + '. Heute: die <b>Steuer</b> nach dem Kauf.');
+        await b2oZeile(s, 'Das Beispiel', 'Im Bestand: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (Number(we) > 1 ? we + ' Wohnungen, ' : '') + 'Baujahr ' + wert('baujahr') + ', gekauft am ' + datum(wert('kaufdat')) + '. Heute: der Reiter <b>Steuer</b>, Detailgrad Experte.');
       },
-      async function (s) {   /* 2 · Soll gegen Ist: die Steuer-Zeilen der Tafel */
-        reiter('s5'); await warte(1200);
-        await r11PaTab(/Soll\/Ist/);
-        await warteAuf(function () { return q('#ai-content .abw-tafel'); }, 6000);
-        var grp = function () { return [].filter.call(document.querySelectorAll('#ai-content .abw-tafel tr.abw-gruppe'), function (t) { return /^Steuer$/.test(r6Text(t)); })[0] || null; };
-        var letzte = function () { var g = grp(), t = g, l = null; while (t && (t = t.nextElementSibling) && !t.classList.contains('abw-gruppe')) l = t; return l; };
-        r15Oben(grp()); await warte(400);
-        await zeigeGruppe(grp, letzte, 6);
-        var a = null; try { a = DealPilotAnkauf.abweichung(); } catch (e) {}
-        function z(w) { return a && a.zeilen.filter(function (x) { return x.wort === w; })[0]; }
-        var sw = z('Steuerwirkung p. a.'), ga = z('Gebäudeanteil (AfA-Basis)');
-        await b2oZeile(s, 'Soll gegen Ist · Steuer', 'Steuerwirkung im Jahr: geplant <b>' + (sw ? eur(sw.ankauf) : '–') + '</b>, heute <b>' + (sw ? eur(sw.bestand) : '–') + '</b>.' + (ga ? ' Gebäudeanteil ' + de(ga.bestand, 2) + ' % und AfA-Satz bleiben, wie beim Kauf.' : ''));
-        var nk = z('Nettokaltmiete'), cf = z('Cashflow n. Steuer');
-        if (nk && cf) await b2oZeile(s, 'Warum weniger Erstattung?', 'Nettokaltmiete <b>' + eur(nk.ankauf) + ' → ' + eur(nk.bestand) + '</b> im Monat: mehr Überschuss, weniger Erstattung. Unterm Strich: Cashflow nach Steuer <b>' + eur(cf.ankauf) + ' → ' + eur(cf.bestand) + '</b> im Jahr.');
+      async function (s) {   /* 2 · Persönliche Steuer */
+        reiter('s3-tax'); await warte(1200);
+        var pc = r15Karte('tax-personal-card');
+        await warteAuf(pc, 5000);
+        await zeige(pc, 8);
+        var g = wert('grenz'), z = zahl('zve');
+        await b2oZeile(s, 'Persönliche Steuer', (z ? 'Zu versteuerndes Einkommen <b>' + eur(z) + '</b>, ' : '') + 'Grenzsteuersatz <b>' + (g ? pz(Number(g).toFixed(2)) + ' %' : '–') + '</b> — aus dem Tarif gerechnet, mit Soli. Das gilt für alle Objekte.');
       },
-      async function (s) {   /* 3 · das Steuerformular pro Jahr (Quick) */
-        reiter('s3-tax'); await warte(1100);
+      async function (s) {   /* 3 · Halter & Eigentum */
+        var hc = r15Karte('tax-halter-card');
+        var x = hc(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(hc, 8);
+        var h = document.getElementById('halter'), opt = h ? [].map.call(h.options, function (o) { return o.text; }) : [];
+        await b2oZeile(s, 'Halter & Eigentum', 'Wer hält das Objekt? Hier <b>' + (h && h.selectedIndex >= 0 ? h.options[h.selectedIndex].text : '–') + '</b>' + (opt.length > 1 ? ' — oder eine Gesellschaft wie <b>' + opt[1] + '</b>, dann rechnet die Körperschaftsteuer' : '') + '. Eigentum und Erwerb halten fest, wem es gehört.');
+      },
+      async function (s) {   /* 4 · AfA */
+        var ak = r15KarteText(/AFA-KONFIGURATION/i);
+        var x = ak(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(ak, 8);
+        var sa = document.getElementById('afa_satz'), sat = sa && sa.selectedIndex >= 0 ? sa.options[sa.selectedIndex].text.split('—')[0].trim() : null, ga = wert('geb_ant');
+        await b2oZeile(s, 'Die AfA', (sat ? 'AfA <b>' + sat + '</b>' : 'AfA-Satz') + (ga ? ' auf einen Gebäudeanteil von <b>' + ga + ' %</b>' : '') + '. Den Gebäudeanteil rechnet auf Wunsch der <b>BMF-Rechner</b> — Knopf oben rechts.');
+      },
+      async function (s) {   /* 5 · Steuer-Modul */
+        var mk = r15KarteText(/STEUER-MODUL/i);
+        var x = mk(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(mk, 8);
+        var t = r6Inner(mk()).replace(/\s+/g, ' '), j = /Ergebnis V\+V dieses Objekts (\d{4}) ([+\-−–]?\s?[\d.]+ €)/.exec(t), w = /Steuer-(Nachzahlung|Erstattung) durch dieses Objekt ([\d.]+ €)/.exec(t);
+        await b2oZeile(s, 'Das Steuer-Modul', 'Echte Progression nach dem Tarif' + (j ? ': Ergebnis V+V ' + j[1] + ' <b>' + j[2] + '</b>' : '') + (w ? ', ' + w[1] + ' durch dieses Objekt <b>' + w[2] + '</b>' : '') + '.');
+      },
+      async function (s) {   /* 6 · Steuerverlauf mit eingeklapptem Diagramm */
+        var tc = r15Karte('tax-timeline-card');
+        var x = tc(); if (x) { x.scrollIntoView({ block: 'start' }); var mc = q('.main-col'); if (mc) mc.scrollTop -= 90; }
+        await warte(400);
+        var ch = function () { return document.getElementById('tax-verlauf-chart'); };
+        await zeige(ch, 8);
+        var t = r6Inner(ch()).replace(/\s+/g, ' '), ab = /DAUERHAFT POSITIV AB (\d{4})/i.exec(t), nv = /nach (\d+) Verlustjahren/i.exec(t);
+        await b2oZeile(s, 'Steuerverlauf', (ab ? 'Steuerlich dauerhaft positiv ab <b>' + ab[1] + '</b>' + (nv ? ', nach ' + nv[1] + ' Verlustjahren' : '') + '. ' : '') + 'Jahr für Jahr: Erstattung oder Nachzahlung allein durch dieses Objekt.');
+        var k = r15Diagramm();
+        if (k) {
+          await zeige(r15Diagramm, 10);
+          var zb = r6Beginn(s, 'Das Diagramm', 'Das Diagramm ist eingeklappt — ein Klick klappt es auf.');
+          await warte(1500);
+          if (r15Diagramm() && /aufklappen/.test(r15Diagramm().textContent)) r15Diagramm().click();
+          await warte(900);
+          await r6Ende(zb);
+          await zeige(tc, 8);
+          await b2oZeile(s, 'Das Diagramm', 'Balken je Jahr: Verlust oder Überschuss, darüber die Steuerwirkung — der Wendepunkt auf einen Blick. Modul 27 geht ihn genauer durch.');
+          if (r15Diagramm() && /einklappen/.test(r15Diagramm().textContent)) r15Diagramm().click();
+          await warte(600);
+        }
+      },
+      async function (s) {   /* 7 · das Steuerformular pro Jahr (Quick) */
         r15Modus(0); await warte(600);
         var kopf = function () { var b = r15Box(); return b && b.closest('.card'); };
         r15Oben(kopf()); await warte(400);
-        await zeige(function () { var k = kopf(); return k && k.querySelector('.ct-row'); }, 8);
-        await b2oZeile(s, 'Steuerformular pro Jahr', 'Eine Zeile je Jahr: Einnahmen, Schuldzinsen, AfA, Bewirtschaftung, sonstige Werbungskosten — und was davon bei der Steuer ankommt.');
+        await zeige(function () { var k = kopf(); return k && k.querySelector('.ct-row, .ct'); }, 8);
+        await b2oZeile(s, 'Steuerformular pro Jahr', 'Eine Zeile je Jahr: Einnahmen, Schuldzinsen, AfA, Bewirtschaftung, sonstige Werbungskosten, Erhaltung — und was davon bei der Steuer ankommt.');
         var zl = function () { return r15Zeile(R15_JAHR); };
+        r15Oben(zl()); await warte(400);
         await zeige(zl, 6);
-        var c = r15Zellen(R15_JAHR);
-        /* v2395 · die Spalte heißt „Einnahmen V+V", trägt aber nur die KALTMIETE (tax.js _renderQuickForm:
-           einnahmen_km; die umlagefähigen NK fehlen dort auf beiden Seiten). Der Detail-Modus nennt als
-           „Einnahmen V+V" Kaltmiete + NK - im Video standen so 39.652 und 41.396 € bei gleichem Ergebnis. */
-        await b2oZeile(s, 'Das Jahr ' + R15_JAHR, 'Kaltmiete <b>' + (c[1] || '–') + '</b>, Schuldzinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + ' — Ergebnis <b>' + (c[6] || '–') + '</b>, Steuer-Effekt <b>' + (c[7] || '–') + '</b>.');
+        var c = r15Zellen(R15_JAHR), n = c.length;
+        await b2oZeile(s, 'Das Jahr ' + R15_JAHR, 'Kaltmiete <b>' + (c[1] || '–') + '</b>, Schuldzinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + (n > 8 ? ', Erhaltung ' + c[n - 3] : '') + ' — Ergebnis <b>' + (c[n - 2] || '–') + '</b>, Steuer-Effekt <b>' + (c[n - 1] || '–') + '</b>.');
       },
-      async function (s) {   /* 4 · was man einträgt */
-        var f = function () { var t = r15Zeile(R15_JAHR); return t && t.querySelector('input'); };
+      async function (s) {   /* 8 · was man einträgt */
         await zeige(function () { var t = r15Zeile(R15_JAHR), i = t ? t.querySelectorAll('input') : []; return i.length ? b2oHuelle(i[0], i[i.length - 1]) : t; }, 8);
         await b2oZeile(s, 'Was du einträgst', 'Die App schlägt jede Zahl vor. Liegt die Erklärung vor, trägst du die echten ein: <b>Mieteinnahmen</b> aus der Anlage V, <b>Schuldzinsen</b> aus der Zinsbescheinigung der Bank.');
-        await b2oZeile(s, 'Was du einträgst', 'Die <b>AfA</b> so, wie sie im Steuerbescheid anerkannt ist. Der Pfeil ↺ neben einem Feld setzt es auf den Vorschlag zurück.');
+        await b2oZeile(s, 'Was du einträgst', 'Die <b>AfA</b> so, wie sie im Steuerbescheid anerkannt ist. „Vorschläge wiederherstellen“ setzt alles auf die Rechnung der App zurück.');
       },
-      async function (s) {   /* 5 · Detail-Modus */
+      async function (s) {   /* 9 · Detail-Modus */
         r15Modus(1); await warte(900);
         await r15Jahr(R15_JAHR);
         var kopf = function () { var b = r15Box(); return b && b.querySelector('select'); };
@@ -3713,71 +3801,29 @@
         r15Oben(vw()); await warte(400);
         await zeigeGruppe(vw, vwE, 6);
         var teile = [['Steuerberatung', /^Steuerberatung$/], ['Fahrten zum Objekt', /^Fahrtkosten zur Immobilie$/], ['Inserate', /^Inseratskosten$/], ['Telefon', /^Telefon\/Internet$/]].map(function (x) { var w = r15DetWert(x[1]); return w ? x[0] + ' ' + w : null; }).filter(Boolean);
-        await b2oZeile(s, 'Verwaltung und Sonstiges', 'Was oft vergessen wird: ' + (teile.join(', ') || '–') + '. Eingetragene Werte tragen das ↺.');
+        await b2oZeile(s, 'Verwaltung und Sonstiges', 'Was oft vergessen wird: ' + (teile.join(', ') || '–') + '.');
       },
-      async function (s) {   /* 6 · Erhaltung und was es im Jahr bedeutet */
+      async function (s) {   /* 10 · Erhaltung und was es im Jahr bedeutet */
         var er = function () { return r15Det(/^Erhaltungsaufwendungen/); };
         r15Oben(er()); await warte(400);
         await zeige(er, 8);
-        await b2oZeile(s, 'Erhaltungsaufwand', 'In ' + R15_JAHR + ' eingetragen: <b>' + (r15DetWert(/^Erhaltungsaufwendungen/) || '–') + '</b> für Reparaturen. In den ersten drei Jahren nach dem Kauf zählt dabei die 15-%-Grenze — Modul 10b zeigt sie.');
-        /* v2395 · Einnahmen im Detail: Kaltmiete + umlagefähige NK (durchlaufender Posten, auch als Kosten) */
-        var km = function () { return r15Det(/^Kaltmiete$/); }, nkr = function () { return r15Det(/^Nebenkosten \(umlagefähig\)$/); };
-        var kmW = r15DetFest(/^Kaltmiete$/), nkW = r15DetFest(/^Nebenkosten \(umlagefähig\)$/), einW = r15Summe(/Einnahmen V\+V:\s*([^\n]+)/);
-        if (km() && kmW && nkW && einW) {
-          r15Oben(km()); await warte(400);
-          await zeigeGruppe(km, nkr, 6);
-          await b2oZeile(s, 'Die Einnahmen', 'Einnahmen V+V <b>' + einW + '</b>: Kaltmiete ' + kmW + ' plus umlagefähige Nebenkosten ' + nkW + ' — die gehen als Kosten wieder ab. Die Jahreszeile zeigt nur die Kaltmiete.');
-        }
+        await b2oZeile(s, 'Erhaltungsaufwand', 'In ' + R15_JAHR + ' eingetragen: <b>' + (r15DetWert(/^Erhaltungsaufwendungen/) || '–') + '</b> für Reparaturen. In den ersten drei Jahren nach dem Kauf zählt die 15-%-Grenze — Modul 23 zeigt sie.');
         var sm = function () { return rhIm(r15Box(), /^Werbungskosten gesamt:?$/); };
         var sb = function () { var e = sm(); return e && (e.closest('div[style*=grid],div[class]') || e.parentElement); };
         r15Oben(sb()); await warte(400);
         await zeige(sb, 8);
         var wk = r15Summe(/Werbungskosten gesamt:\s*([^\n]+)/), ein = r15Summe(/Einnahmen V\+V:\s*([^\n]+)/), erg = r15Summe(/Verlust\/Überschuss V\+V:\s*([^\n]+)/), eff = r15Summe(/Steuer-Effekt:\s*([^\n]+)/);
-        await b2oZeile(s, 'Was das im Jahr bedeutet', 'Werbungskosten <b>' + (wk || '–') + '</b> gegen Einnahmen ' + (ein || '–') + ': Ergebnis <b>' + (erg || '–') + '</b>. Mit deiner Progression: <b>' + (eff || '–') + '</b> Erstattung.');
+        var ef = eff && /^\+/.test(eff) ? 'Erstattung' : 'Nachzahlung';
+        await b2oZeile(s, 'Was das im Jahr bedeutet', 'Werbungskosten <b>' + (wk || '–') + '</b> gegen Einnahmen ' + (ein || '–') + ': Ergebnis <b>' + (erg || '–') + '</b>. Mit deiner Progression: <b>' + (eff ? eff.replace(/^[+\-−–]\s*/, '') : '–') + '</b> ' + ef + '.');
+        r15Modus(0); await warte(500);
       },
-      async function (s) {   /* 7 · Belege einlesen (Mitschnitt) */
-        var kn = function () { return r6Knopf(r15Box() && r15Box().closest('.card'), /Belege & Abrechnungen einlesen/); };
+      async function (s) {   /* 11 · Belege */
+        var kn = function () { return r6Knopf(r15Box() && r15Box().closest('.card'), /Belege, Unterlagen/); };
         r15Oben(kn()); await warte(400);
         await zeige(kn, 10);
-        await b2oZeile(s, 'Belege einlesen', 'Statt abzutippen: Rechnungen, Hausgeld- und Nebenkostenabrechnungen als PDF oder Foto. Die KI liest Datum, Betrag, Steuer, Aussteller.');
-        r15Modus(0); await warte(500);
-        var vor = r15Zellen(R15_JAHR);
-        try { DealPilotBelegImport.open('wk'); } catch (e) {}
-        await warteAuf(function () { return q('#bi-files'); }, 3000);
-        try {
-          var fs = await r15Belege(), dt = new DataTransfer(); fs.forEach(function (f) { dt.items.add(f); });
-          var inp = q('#bi-files'); inp.files = dt.files; inp.dispatchEvent(new Event('change'));
-        } catch (e) {}
-        kegelHoch(true);
-        await warteAuf(function () { return q('#bi-review table') || q('#bi-review tr'); }, 15000);
-        await warte(700);
-        await zeige(function () { var t = q('#bi-review table'); return t || q('#bi-review'); }, 6);
-        var R = [].filter.call(document.querySelectorAll('#bi-review tbody tr'), function (t) { return t.offsetWidth && t.querySelector('input[type=checkbox]'); });
-        var zt = R.map(function (t) { var c = [].map.call(t.children, r6Text); var br = c.filter(function (x) { return /€/.test(x); }); var sel = t.querySelector('select'); return '<b>' + (br[2] || br[br.length - 1] || '–') + '</b> ' + (sel ? sel.value : ''); });
-        await b2oZeile(s, 'Zwei Belege gelesen', (zt.join(' und ') || '–') + ' — beide für ' + R15_JAHR + '. Jede Zeile prüfst du, bevor etwas übernommen wird.');
-        _r15Vor = vor;
+        await b2oZeile(s, 'Belege einlesen', 'Statt abzutippen: Rechnungen, Hausgeld- und Nebenkostenabrechnungen als PDF oder Foto. Die KI liest sie, du prüfst jede Zeile — Modul 28 zeigt es.');
       },
-      async function (s) {   /* 8 · übernehmen -> das Jahr bewegt sich */
-        var tk = function () { return q('#bi-take'); };
-        await zeige(tk, 10);
-        var zb = r6Beginn(s, 'Übernehmen', 'Ein Klick — die Beträge gehen in das Jahr ' + R15_JAHR + ' dieses Objekts.');
-        await warte(2400);
-        var oc = window.confirm; window.confirm = function () { return true; };
-        try { DealPilotBelegImport.apply(); } catch (e) {} finally { window.confirm = oc; }
-        await warteAuf(function () { return !q('#beleg-import-ov'); }, 4000);
-        kegelHoch(false);
-        await warte(1200);
-        if (!q('#s3-tax.active')) reiter('s3-tax');
-        r15Modus(0); await warte(700);
-        /* GEMESSEN (Prüflauf 15): der Knopf verschwindet mit dem Fenster - erst die Zeile zeigen, dann die Restzeit (Kegel 50 %) */
-        var zl = function () { return r15Zeile(R15_JAHR); };
-        r15Oben(zl()); await warte(400);
-        await zeige(zl, 6);
-        await r6Ende(zb);
-        var v = _r15Vor || [], n = r15Zellen(R15_JAHR);
-        await b2oZeile(s, 'Das Jahr ' + R15_JAHR + ' danach', 'Bewirtschaftung <b>' + (n[4] || '–') + '</b> statt ' + (v[4] || '–') + ', Ergebnis ' + (n[6] || '–') + ' — Steuer-Effekt <b>' + (n[7] || '–') + '</b> statt ' + (v[7] || '–') + '.');
-      },
-      async function (s) {   /* 9 · Finanzamt-PDF (nur zeigen) */
+      async function (s) {   /* 12 · Finanzamt-PDF (nur zeigen) */
         var k = function () { var b = r15Box(); return b && b.closest('.card').querySelector('.fa-pdf-ctrl'); };
         r15Oben(k()); await warte(400);
         await zeige(k, 8);
@@ -3785,6 +3831,7 @@
       }
     ]
   };
+
   var _r15Vor = null;
 
   /* ═══ VIDEOREIHE · SPEZIALMODUL 16 · STUFE 3 GENAUER (v2276) ═════════════
