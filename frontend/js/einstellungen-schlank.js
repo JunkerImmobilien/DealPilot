@@ -214,6 +214,7 @@
         dg.innerHTML = '<h3 class="ip-section">Detailgrad der Eingabe</h3>' +
           '<p class="hint">Wie viele Felder du in den Reitern siehst — gilt für alle Objekte. Einsteiger: die wichtigsten Felder, Marktbericht Stufe 1. ' +
           'Fortgeschritten: dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II, Stufe 2. Experte: alle Felder und die Wertermittlung nach ImmoWertV, Stufe 3. ' +
+          'Gesellschaften (GmbH, UG, GbR) gibt es ab Experte — Mandanten, Halter, Überführung und Jahresabschluss; Objekte einer Gesellschaft rechnen in jeder Stufe mit ihrer Steuer. ' +   /* v3270 */
           'Ausgeblendete Felder behalten ihre Werte und rechnen weiter.</p>' +
           '<div class="dp-dg-host" data-dp-detailgrad="einstellungen"></div>';
         sw.insertBefore(dg, host);

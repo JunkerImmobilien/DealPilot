@@ -453,7 +453,7 @@ window.DpDetailgradZuordnung = {
      {
       "s": "#tax-halter-card",
       "art": "karte",
-      "titel": "Halter & Eigentum (v3243, aus dem Reiter Objekt: Halter/Überführung + Eigentum & Erwerb; Halter war schon vorher nicht gelistet = Experte)"
+      "titel": "Halter & Eigentum (v3243, aus dem Reiter Objekt: Halter/Überführung + Eigentum & Erwerb; Halter war schon vorher nicht gelistet = Experte; v3270: Gesellschaften nur ab Experte)"
      }
     ],
     "felder": []

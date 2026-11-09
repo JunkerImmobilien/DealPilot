@@ -731,6 +731,9 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
     var _persCard = document.getElementById('tax-personal-card');
     if (_persCard) _persCard.style.display = _mandCorp ? 'none' : '';
   } catch (_e814) {}
+  /* v3270 · Gesellschaftsobjekt unter Detailgrad Experte: Karte oben „Dieses Objekt gehört der …"
+     (mandanten.js steuerHinweis). Die Rechnung oben und unten bleibt die der Gesellschaft. */
+  try { if (window.DealPilotMandanten && DealPilotMandanten.steuerHinweis) DealPilotMandanten.steuerHinweis(); } catch (_e3270) {}
 
   var refundColor = impact.refund > 0 ? 'var(--green)' : 'var(--red)';
   var refundLabel = impact.refund > 0 ? 'Steuer-Erstattung' : 'Steuer-Nachzahlung';
