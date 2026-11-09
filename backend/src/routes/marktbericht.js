@@ -488,7 +488,21 @@ router.get('/location-finder/meta', authenticate, readGet('/location-finder/meta
 router.get('/zensus/objekt', authenticate, readGet('/zensus/objekt'));
 router.get('/lage/gemessen', authenticate, readGet('/lage/gemessen'));   /* v2175 · Lage gemessen */
 router.get('/jahreswerte/angebotsabschlag', authenticate, readGet('/jahreswerte/angebotsabschlag'));   /* v3021 · eine Quelle fuer den Marktdurchschnitt */
-router.get('/mietspiegel', authenticate, readGet('/mietspiegel'));   /* v3250 · Mietspiegel-Verzeichnis je AGS (Datei im mb-Image, 0 Kontingent) */
+/* v3260 · ausserhalb von Staging nur freigegebene Mietspiegel-Werte (Datei-Feld freigabe: 'gesperrt' = Rechtevorbehalt,
+   Marcel 09.11.2026: bis zur Klaerung nicht auf Prod). Erkannt an APP_URL/APP_DOMAIN des Haupt-Backends. */
+router.get('/mietspiegel', authenticate, async function (req, res) {
+  try {
+    const p = new URLSearchParams(req.query || {});
+    p.set('user_id', String(req.user.id));
+    p.delete('nur_frei');
+    const staging = /staging|localhost|127\.0\.0\.1/i.test(String(process.env.APP_URL || '') + ' ' + String(process.env.APP_DOMAIN || ''));
+    if (!staging) p.set('nur_frei', '1');
+    const out = await forward('GET', '/mietspiegel', { query: p.toString() });
+    res.status(out.status).json(out.data);
+  } catch (e) {
+    res.status(502).json({ error: 'mb_unreachable', message: e.message });
+  }
+});   /* v3250 · Mietspiegel-Verzeichnis je AGS (Datei im mb-Image, 0 Kontingent) */
 /* v3026 · Indexreihen (VPI, Nettokaltmieten, Baupreis) fuer die Indexmiete und die Fortschreibung.
    Viele Nutzer, wenig Aenderung (woechentlich): dieser Prozess haelt die Antwort 10 Minuten im
    Speicher und beantwortet If-None-Match mit 304 - ein Nutzerabruf erreicht weder GENESIS noch

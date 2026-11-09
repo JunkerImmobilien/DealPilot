@@ -344,7 +344,11 @@ export function werteFuer(ags, ordner) {
  */
 export function mietspiegelMitWerten(satz, q, ordner) {
   if (!satz) return satz;
-  const w = werteFuer(satz.ags, ordner);
+  let w = werteFuer(satz.ags, ordner);
+  /* v3260 · Marcel 09.11.2026: Mietspiegel mit Rechtevorbehalt (Datei-Feld freigabe: 'gesperrt') nicht auf Prod,
+     bis geklaert ist, ob die Werte genutzt werden duerfen. Der Proxy der Haupt-App setzt nur_frei=1 ausserhalb
+     von Staging (backend/src/routes/marktbericht.js). */
+  if (w && w.freigabe === 'gesperrt' && q && String(q.nur_frei) === '1') { w = null; satz.werte_gesperrt = true; }
   satz.werte_verfuegbar = !!w;
   q = q || {};
   if (w && (q.baujahr || q.wfl)) {
