@@ -1,6 +1,6 @@
 'use strict';
 /* ════════════════════════════════════════════════════════════════════
-   mietpotenzial-kern.js · v3075 — DIE ZULÄSSIGE MIETE, OHNE DOM
+   mietpotenzial-kern.js · v3075 / v3244 — DIE ZULÄSSIGE MIETE, OHNE DOM
    ════════════════════════════════════════════════════════════════════
    Marcel 02.11.2026 (P1.1–P1.3, „setz das alles um"): der Quick-Check soll
    die rechtlich zulässige Miete nach drei Jahren zeigen — Kappungsgrenze,
@@ -250,7 +250,10 @@
     if (!vg.s559 && mVon(e).some(function (m) { return m.bewohnt; })) r.hinweise.push('Umlage nicht eingerechnet – ' + vg.text);
     if (!vg.s558) {
       var eig = zahl(e.soll);
-      if (eig > 0) { r.miete = eig; r.herkunft = 'eigene Angabe'; r.vertrag = vg.art; return r; }
+      /* v3244 · die eigene Soll-Angabe ist hier die VERTRAGLICHE Erhöhung (Staffel, Index, Gewerbe),
+         keine nach § 558 BGB. miete bleibt die Gesamt-Soll-Miete (Zielbild, Summen); der § 558-Anteil
+         ist Ist. teil558() und teilVertrag() trennen beides an EINER Stelle für alle Aufrufer. */
+      if (eig > 0) { r.miete = eig; r.herkunft = 'eigene Angabe (' + (VERTRAG_NORM[vg.art] || 'Vertrag') + ')'; r.vertrag = vg.art; r.vertrag_monat = eig; r.vertrag_text = vg.text; return r; }
       r.grund = vg.text; r.vertrag = vg.art; return r;
     }
     var letzte = String(e.mv_letzte_erhoehung || '');
@@ -304,6 +307,26 @@
     /* v3028 · nur Modernisierungsumlage: keine Jahressperre, wirksam nach § 559b Abs. 2 */
     if (u.monat > 0 && !(m558 > ist)) termineSetzen('559');
     return r;
+  }
+
+  /* v3244 · DIE SOLL-MIETE IN IHRE TEILE (Prüfer-Befund 09.11.2026: soll558 beachtete die Vertragsart
+     nicht - Gohliser Str. 42 Whg 2, 3, 7, 8, 12 und Parkstr. 9 Whg 1 wiesen eine Staffel-/Index-
+     erhöhung als § 558 aus, obwohl § 557a Abs. 2 / § 557b Abs. 2 BGB ihn ausschließen).
+     s = Ergebnis von sollFuer(), ist = Ist-Miete €/Monat.
+     teil558:     Miete nach § 558 BGB ohne Umlage § 559 - bei Staffel/Index/Gewerbe IMMER Ist.
+     teilVertrag: die vertragliche Erhöhung (eigene Soll-Angabe) als eigener Posten; null ohne Vertragsart. */
+  function teil558(s, ist) {
+    ist = zahl(ist);
+    if (!s || s.miete == null || s.vertrag) return ist;
+    var u = s.umlage559 && s.umlage559.monat > 0 ? s.umlage559.monat : 0;
+    return Math.max(ist, s.miete - u);
+  }
+  var VERTRAG_NORM = { staffel: 'Staffelmiete, § 557a BGB', index: 'Indexmiete, § 557b BGB', gewerbe: 'Gewerbemietvertrag' };
+  function teilVertrag(s, ist) {
+    if (!s || !s.vertrag) return null;
+    var m = zahl(s.vertrag_monat);
+    return { art: s.vertrag, monat: m > 0 ? m : null, plus: m > zahl(ist) ? Math.round((m - zahl(ist)) * 100) / 100 : 0,
+      norm: VERTRAG_NORM[s.vertrag] || 'Mietvertrag', text: s.vertrag_text || s.grund || vertragGrenzen({ mv_art: s.vertrag }).text };
   }
 
   /**
@@ -425,6 +448,7 @@
     gemeindeFinden: gemeindeFinden, kappungAus: kappungAus, mietpreisbremseAus: mietpreisbremseAus,
     wirksamNachZugang: wirksamNachZugang, mhTermine: mhTermine, umlage559: umlage559, vertragGrenzen: vertragGrenzen,
     sollFuer: sollFuer, zulaessig: zulaessig, neuvermietung: neuvermietung,
+    teil558: teil558, teilVertrag: teilVertrag,   /* v3244 */
     zielmieteVorschlag: zielmieteVorschlag   /* v3130 · N115 */
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpMietpotenzial;

@@ -18,6 +18,9 @@
      F  dealscore.js: Mietpotenzial-Bonus (statt nie erreichbarem mstg 1,5), Zustand-Grenze,
         Haupt-App unverändert; Benchmark Fall D nicht mehr „Sehr gut"
      G  qc-heuristik.js kategorien(): der Rechenweg nennt die Kurven, die die Punkte vergeben
+     J  v3244 · § 558 nur, wo § 558 gilt: Staffel/Index/Gewerbe -> § 558-Anteil = Ist, die eigene Soll-Angabe
+        ist ein eigener Posten (teil558/teilVertrag); Vergleichsmiete eigene -> amtliche (qualifizierter
+        Mietspiegel geht jeder Marktmiete vor) -> Marktmiete markiert; me_soll zählt nicht mehr
    RC=0 sauber, RC=1 Abweichung. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -150,7 +153,8 @@ gleich('D9 Köln (Umlaut) per Ortsname', koeln.pct, 15);
 /* ── E · potenzial.js rechnet mit dem Kern - dieselben Ergebnisse wie vorher ── */
 async function potenzialLaden(datei, mitKern) {
   const c = fenster();
-  if (mitKern) lade(c, JS('mietpotenzial-kern.js'));
+  if (typeof mitKern === 'string') lade(c, path.resolve(mitKern), 'mietpotenzial-kern.js');   /* v3244 · --alt-kern */
+  else if (mitKern) lade(c, JS('mietpotenzial-kern.js'));
   lade(c, datei, 'potenzial.js');
   await c.DpPotenzial.kappungLaden();
   return c.DpPotenzial;
@@ -176,16 +180,41 @@ const P = await potenzialLaden(JS('potenzial.js'), true);
 const neu = raster(P, false);
 const SUMME = crypto.createHash('sha256').update(JSON.stringify(neu)).digest('hex');
 /* Eingefroren am 02.11.2026 gegen den Stand VOR v3075 (git HEAD f376887a, potenzial.js ohne Kern):
-   node tools/mietpotenzial-pruefen.mjs --alt=<alte potenzial.js> meldete alle Fälle gleich. */
-const SUMME_SOLL = '852a5a0654d9af4af90892e410605866cf92a32fcd135ea2cea455d2c7496a1f';   /* 5796 Fälle, ohne Liste */
-gleich('E Raster ' + neu.length + ' Fälle: Prüfsumme wie vor v3075 (bei Abweichung: --alt=<alte potenzial.js>)', SUMME, SUMME_SOLL);
-if (ARG.summe) console.log('Prüfsumme Raster: ' + SUMME + ' (' + neu.length + ' Fälle)');
+   node tools/mietpotenzial-pruefen.mjs --alt=<alte potenzial.js> meldete alle Fälle gleich.
+   v3244 (09.11.2026) · GEWOLLT GEÄNDERT: sollFuer() trägt bei Staffel-/Index-/Gewerbevertrag mit eigener
+   Soll-Angabe zwei Felder mehr (vertrag_monat, vertrag_text) und die Herkunft „eigene Angabe (Staffelmiete,
+   § 557a BGB)" statt „eigene Angabe". Gemessen mit --alt=<potenzial.js v3241> --alt-kern=<Kern v3241>: 1.280 von
+   5.812 Fällen (mit Liste) anders = Ist 500/820 × Staffel/Index × Soll 640 × alle übrigen Achsen (2·2·320), JEDER
+   nur in genau diesen drei Feldern.
+   Die alte Summe bleibt als Gegenprobe E0: das Raster, um genau diese drei Felder zurückgebaut, muss sie
+   weiter treffen - so ist bewiesen, dass sich sonst nichts bewegt hat. */
+const SUMME_V3075 = '852a5a0654d9af4af90892e410605866cf92a32fcd135ea2cea455d2c7496a1f';   /* 5796 Fälle, ohne Liste, Stand v3075-v3241 */
+const SUMME_SOLL = 'a9db170e6570fd942e85302c17b79c4ce7a48c0a0babee818ef50d5dbddf0b64';   /* 5796 Fälle, ohne Liste, seit v3244 */
+gleich('E Raster ' + neu.length + ' Fälle: Prüfsumme seit v3244 (bei Abweichung: --alt=<alte potenzial.js> --alt-kern=<alter Kern>)', SUMME, SUMME_SOLL);
+const zurueck = (x) => {
+  if (!x || typeof x !== 'object' || !('vertrag_monat' in x || 'vertrag_text' in x)) return x;
+  const y = Object.assign({}, x); delete y.vertrag_monat; delete y.vertrag_text;
+  if (/^eigene Angabe \(/.test(y.herkunft || '')) y.herkunft = 'eigene Angabe';
+  return y;
+};
+const SUMME_ZURUECK = crypto.createHash('sha256').update(JSON.stringify(neu.map(zurueck))).digest('hex');
+gleich('E0 Gegenprobe: ohne die drei v3244-Felder dieselbe Summe wie v3075-v3241 (sonst hat sich mehr bewegt)', SUMME_ZURUECK, SUMME_V3075);
+if (ARG.summe) console.log('Prüfsumme Raster: ' + SUMME + ' (' + neu.length + ' Fälle), zurückgebaut ' + SUMME_ZURUECK);
 if (typeof ARG.alt === 'string') {
-  const A = await potenzialLaden(path.resolve(ARG.alt), false);
+  const A = await potenzialLaden(path.resolve(ARG.alt), typeof ARG['alt-kern'] === 'string' ? ARG['alt-kern'] : false);
   const alt = raster(A, true), neuL = raster(P, true);
   let ab = 0;
-  alt.forEach((x, i) => { if (JSON.stringify(x) !== JSON.stringify(neuL[i])) { ab++; if (ab <= 5) console.log('  ABWEICHUNG Fall ' + i + ':\n    alt ' + JSON.stringify(x) + '\n    neu ' + JSON.stringify(neuL[i])); } });
-  gleich('E --alt: ' + alt.length + ' Fälle Fall für Fall gleich', ab, 0);
+  /* v3244 · Abweichungen nach Feldern zählen; erlaubt sind nur die drei v3244-Felder (vertrag_monat, vertrag_text, herkunft) */
+  const felder = {}; let fremd = 0;
+  alt.forEach((x, i) => {
+    if (JSON.stringify(x) === JSON.stringify(neuL[i])) return;
+    ab++;
+    const y = neuL[i] || {}, ks = new Set(Object.keys(x || {}).concat(Object.keys(y)));
+    ks.forEach((k) => { if (JSON.stringify((x || {})[k]) !== JSON.stringify(y[k])) felder[k] = (felder[k] || 0) + 1; });
+    if (JSON.stringify(x) !== JSON.stringify(zurueck(y))) { fremd++; if (fremd <= 5) console.log('  ABWEICHUNG Fall ' + i + ':\n    alt ' + JSON.stringify(x) + '\n    neu ' + JSON.stringify(y)); }
+  });
+  console.log('  --alt: ' + ab + ' von ' + alt.length + ' Fällen anders, Felder: ' + JSON.stringify(felder));
+  gleich('E --alt: ' + alt.length + ' Fälle gleich bis auf die drei v3244-Felder', fremd, 0);
 }
 for (const ags of AGS) {
   gleich('E kappung(' + (ags || 'leer') + ') = Kern', P.kappung(ags), JSON.parse(JSON.stringify(K.kappungAus(KAPP, { ags }))));
@@ -256,8 +285,9 @@ gleich('G6 Stützstellen aus dem Text = Punkte des Kerns (CF 0 € = 50, NMR 3,5
   [pb.cashflow, pb.rendite, pb.ltv, pb.risiko, pb.potenzial], [50, 50, 50, 80, 70]);
 
 /* ── H · v3130 · N115 · Zielmiete-Vorschlag je Wohnung in potenzial.js (echte Datei, Kern darunter) ── */
-async function vorschlagLauf(feld) {
+async function vorschlagLauf(feld, extra) {
   const c = fenster(feld);
+  if (extra) Object.assign(c, extra);   /* v3244 · z. B. _dpMarktdaten */
   const F = feld || {};
   c.document.getElementById = (id) => (id in F ? { value: F[id], addEventListener() {}, dispatchEvent() {} } : null);
   c._dpPotenzial = { ags: '05334002', plz: '52062' };   /* Aachen: Mietpreisbremse gilt (Liste) */
@@ -310,5 +340,60 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('I8 ohne Stufen oder ohne Kaufjahr: leer', [JSON.stringify(P.zielBmrPruefen([], 2024, [{ k: 'bestand', jahr: 2026, bmy: 5 }])), JSON.stringify(P.zielBmrPruefen(ST, null, [{ k: 'bestand', jahr: 2026, bmy: 5 }]))], ['{}', '{}']);
 }
 
-console.log('mietpotenzial-pruefen (v3075): ' + (n - fehler) + ' von ' + n + ' ok');
+/* ── J · v3244 · § 558 nur, wo § 558 gilt; Vergleichsmiete ohne Angebotsniveau ─────────────────── */
+{
+  const ctx = { kapp: { pct: 20 }, vgl_qm: 12, heute: HEUTE };
+  for (const [art, norm] of [['staffel', '557a'], ['index', '557b']]) {
+    const s = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', soll: 640, mv_art: art }, ctx);
+    const v = K.teilVertrag(s, 500);
+    gleich('J1 ' + art + ' mit eigener Soll 640: § 558-Anteil = Ist 500', K.teil558(s, 500), 500);
+    gleich('J1 ' + art + ': Vertragsposten 640 (+140), Gesamt-Soll bleibt 640', [v.art, v.monat, v.plus, s.miete], [art, 640, 140, 640]);
+    wahr('J1 ' + art + ': Norm ' + norm + ', Text nennt den Ausschluss', new RegExp(norm).test(v.norm) && /ausgeschlossen|keine Erhöhung bis zur Vergleichsmiete/.test(v.text));
+    const o = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', mv_art: art }, ctx);
+    gleich('J2 ' + art + ' ohne eigene Soll: kein Posten-Betrag, § 558 = Ist', [K.teil558(o, 500), K.teilVertrag(o, 500).monat, o.miete], [500, null, null]);
+  }
+  const sg = K.sollFuer({ ist: 900, wfl: 80, status: 'vermietet', art: 'gewerbe', soll: 1000 }, ctx);
+  gleich('J3 Gewerbe: § 558 = Ist, Posten 1.000', [K.teil558(sg, 900), K.teilVertrag(sg, 900).monat, K.teilVertrag(sg, 900).art], [900, 1000, 'gewerbe']);
+  /* normale Wohnung: bis zur Vergleichsmiete bzw. Kappung, mit Umlage § 559 getrennt */
+  let sw = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' }, { kapp: { pct: 20 }, vgl_qm: 9, heute: HEUTE });
+  gleich('J4 Wohnung, Vergleichsmiete 9,00: § 558 bis 540', [K.teil558(sw, 500), K.teilVertrag(sw, 500), sw.grenze], [540, null, 'Vergleichsmiete']);
+  sw = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' }, { kapp: { pct: 15 }, vgl_qm: 10, heute: HEUTE });
+  gleich('J5 Wohnung, Kappung 15 %: § 558 bis 575', [K.teil558(sw, 500), sw.grenze], [575, 'Kappungsgrenze 15 %']);
+  sw = K.sollFuer({ ist: 500, wfl: 60, status: 'vermietet', mv_letzte_erhoehung: '2023-01-01', massnahmen: [{ id: 'bad', t: 'Bad', k: 12000, bewohnt: true }] }, { kapp: { pct: 20 }, vgl_qm: 9, heute: HEUTE });
+  gleich('J6 mit Umlage § 559 80 €: § 558-Anteil ohne Umlage 540, Gesamt 620', [K.teil558(sw, 500), sw.miete], [540, 620]);
+
+  /* potenzial.js: Rangfolge der Vergleichsmiete und die Stufe Mieterhöhung */
+  const EIN = [{ nr: '1', wfl: '60', ist: '500', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' },
+               { nr: '2', wfl: '60', ist: '500', status: 'vermietet', soll: '640', mv_art: 'staffel' }];
+  const MS_Q = { vergleichsmiete: { qm: 9, art: 'mietspiegel_qualifiziert', quelle: 'Mietspiegel Musterstadt 2025' } };
+  const MS_A = { vergleichsmiete: { qm: 9, art: 'mietpreisuebersicht', quelle: 'Gutachterausschuss Muster', datum: '2026-10-01' } };
+  let P = await vorschlagLauf({ plz: '52062', me_soll: '20' }, { _dpMarktdaten: MS_Q });
+  let m = P.modell({ einheiten: EIN });
+  wahr('J7 qualifizierter Mietspiegel: Vergleichsmiete 9,00, Herkunft sagt es', m.vgl.qm === 9 && m.vgl.qualifiziert === true && /qualifizierter Mietspiegel/.test(m.vgl.herkunft));
+  const k = m.kappung.pct, z1 = Math.min(540, 500 * (1 + k / 100));
+  gleich('J8 Wohnung 1: § 558 bis Mietspiegel/Kappung (' + z1 + '), me_soll 20,00 wirkt nicht', P.soll558(m.wohnungen[0]), z1);
+  gleich('J9 Staffelwohnung: § 558 = Ist, Posten 640', [P.soll558(m.wohnungen[1]), P.sollVertrag(m.wohnungen[1]).monat], [500, 640]);
+  gleich('J10 Stufe Mieterhöhung: § 558 plus Vertrag, getrennt ausgewiesen',
+    [m.stufen.mieterhoehung.miete_m, m.stufen.mieterhoehung.plus558_m, m.stufen.mieterhoehung.vertrag_m], [z1 + 640, z1 - 500, 140]);
+  wahr('J11 Zielbild behält die Staffel (Gesamt-Soll nicht still kleiner)', m.stufen.zielbild == null || m.stufen.zielbild.miete_m >= z1 + 640 - 0.01);
+  P = await vorschlagLauf({ plz: '52062', ds2_marktmiete: '14' }, { _dpMarktdaten: MS_Q });
+  m = P.modell({ einheiten: EIN });
+  gleich('J12 qualifizierter Mietspiegel + Marktmiete 14,00: es gilt der Mietspiegel, kein Angebotswert', [m.vgl.qm, !!m.vgl.marktmiete], [9, false]);
+  P = await vorschlagLauf({ plz: '52062', ds2_marktmiete: '14' }, { _dpMarktdaten: MS_A });
+  m = P.modell({ einheiten: EIN });
+  wahr('J13 amtliche Mietpreisübersicht geht der Marktmiete vor, mit Stand', m.vgl.qm === 9 && /Mietpreisübersicht/.test(m.vgl.herkunft) && /01\.10\.2026/.test(m.vgl.herkunft));
+  P = await vorschlagLauf({ plz: '52062', me_soll: '20' });
+  m = P.modell({ einheiten: EIN });
+  gleich('J14 nur me_soll (Einheiten-Soll im Tab Miete): keine Vergleichsmiete, § 558 = Ist', [m.vgl.qm, P.soll558(m.wohnungen[0])], [0, 500]);
+  P = await vorschlagLauf({ plz: '52062', me_soll: '20', ds2_marktmiete: '10' });
+  m = P.modell({ einheiten: EIN });
+  wahr('J15 ohne amtliche Quelle: Marktmiete nur als markierter Ersatz', m.vgl.qm === 10 && m.vgl.marktmiete === true && /Ersatz/.test(m.vgl.herkunft));
+  P = await vorschlagLauf({ plz: '52062', zb_vgl_qm: '8' }, { _dpMarktdaten: MS_Q });
+  m = P.modell({ einheiten: EIN });
+  gleich('J16 eigene Vergleichsmiete geht vor', [m.vgl.qm, m.vgl.art], [8, 'eigen']);
+  P = await vorschlagLauf({ plz: '52062' }, { _dpMarktdaten: Object.assign({ fuer: 'a' }, MS_Q), _currentObjKey: 'b' });
+  gleich('J17 Marktdaten eines anderen Objekts zählen nicht', P.modell({ einheiten: EIN }).vgl.qm, 0);
+}
+
+console.log('mietpotenzial-pruefen (v3075, v3244): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);
