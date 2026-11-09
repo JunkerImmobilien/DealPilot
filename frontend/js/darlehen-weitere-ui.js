@@ -55,42 +55,93 @@
     return t;
   }
 
+  /* v3261 · Marcel 09.11.2026: „Darlehen I, II und weitere gleich aufgebaut" - je Eintrag
+     der Kopf mit fünf Kacheln (Summe · Zins · Tilgung · Zinsbindung · Rate, Werte aus dem
+     Kern) und darunter eingeklappte Gruppen „Konditionen bearbeiten" und „Werkzeuge"
+     (css/finanzierung-raster.css .fz-kopf/.fz-gruppe). Feld-IDs (dw-<i>-…) und data-dw
+     bleiben. Offen/zu überlebt das Neuzeichnen; ein neuer Eintrag ohne Betrag steht offen. */
+  function kachel(feld, lbl, cls) {
+    return '<div class="fz-kachel" role="button" tabindex="0" data-fz-feld="' + feld + '"><span class="fz-k-lbl">' + lbl + '</span>'
+      + '<span class="fz-k-wert ' + cls + '">—</span><span class="fz-k-unter ' + cls + '-u"></span></div>';
+  }
+  function gruppe(art, titel, inhalt, offen) {
+    return '<details class="fz-gruppe" data-fz-gruppe="' + art + '"' + (offen ? ' open' : '') + '>'
+      + '<summary><span class="fz-g-titel">' + titel + '</span><span class="fz-g-stand dw-stand-' + art + '"></span></summary>'
+      + '<div class="fz-gruppe-inhalt">' + inhalt + '</div></details>';
+  }
+  function kopfFuellen(box, e, i) {
+    var k = K(); if (!k) return;
+    var n = k.lesen([e])[0], aus = e.art === 'tilgungsaussetzung';
+    function s(cls, t) { var x = box.querySelector('.' + cls); if (x && x.textContent !== t) x.textContent = t; }
+    var pz = function (v) { return (v == null || v === '') ? '—' : Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %'; };
+    var by = (window.State && State.dw_basisjahr) || null;
+    s('dw-name', k.name({ bez: String(e.bez || '').trim(), nr: i }, i));
+    s('dw-k-summe', n ? eur(n.betrag, 0) : '—');
+    s('dw-k-summe-u', n && n.start_jahr && !k.abKauf(n, by) ? 'ab ' + n.start_jahr : (aus ? 'Tilgungsaussetzung' : 'Annuitätendarlehen'));
+    s('dw-k-zins', pz(e.zins));
+    s('dw-k-zins-u', 'nominal p. a.');
+    s('dw-k-tilg', aus ? 'ausgesetzt' : pz(e.tilg));
+    s('dw-k-tilg-u', aus ? 'nur Zinsen' : 'anfänglich p. a.');
+    var bj = (n && n.bindj) || (e.bindj > 0 ? e.bindj : 10);
+    s('dw-k-bind', bj.toLocaleString('de-DE') + ' Jahre');
+    s('dw-k-bind-u', n ? (aus ? 'Restschuld bleibt' : 'Rest ' + eur(k.restBindungsende(n), 0)) : '');
+    s('dw-k-rate', n ? eur(k.rateM(n), 2) : '—');
+    s('dw-k-rate-u', n ? (aus ? 'nur Zinsen' : 'Zins + Tilgung') : 'Betrag fehlt');
+    s('dw-stand-kond', (aus ? 'Tilgungsaussetzung' : 'Annuitätendarlehen') + (n ? '' : ' · Betrag eintragen'));
+    s('dw-stand-werkz', (aus ? 'Zinsplan' : 'Tilgungsplan') + ' · Bank-PDF · Entfernen');
+  }
+
   function render() {
     var host = el('dw-box'); if (!host) return;
     var f = el(FELD), stand = f ? f.value : '';
     var l = roh();
     if (stand !== _gerendert) {
       _gerendert = stand;
+      /* Offen/zu je Eintrag merken, bevor neu gezeichnet wird */
+      var offen = {};
+      [].forEach.call(host.querySelectorAll('.dw-eintrag'), function (b) {
+        var o = {}; [].forEach.call(b.querySelectorAll('details.fz-gruppe'), function (d) { o[d.getAttribute('data-fz-gruppe')] = d.open; });
+        offen[b.getAttribute('data-i')] = o;
+      });
       var h = l.map(function (e, i) {
         var id = 'dw-' + i + '-', aus = e.art === 'tilgungsaussetzung';
-        return '<div class="dw-eintrag" data-i="' + i + '" style="border-top:1px solid var(--line,rgba(42,39,39,.12));padding:10px 0">'
-          + '<div class="g2">'
-          + '<div class="f"><label>Bezeichnung</label><input id="' + id + 'bez" data-dw="bez" type="text" placeholder="Darlehen ' + (['III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][i] || (i + 3)) + ' · z. B. KfW 261" value="' + esc(e.bez) + '"></div>'
-          + '<div class="f"><label>Art des Darlehens</label><select id="' + id + 'art" data-dw="art">'
+        var o = offen[String(i)] || {};
+        var kondOffen = (o.kond != null) ? o.kond : !(K() && K().lesen([e])[0]);
+        var konditionen =
+            '<div class="fz-raster">'
+          + '<div class="f fz-s2"><label>Bezeichnung</label><input id="' + id + 'bez" data-dw="bez" type="text" placeholder="Darlehen ' + (['III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][i] || (i + 3)) + ' · z. B. KfW 261" value="' + esc(e.bez) + '"></div>'
+          + '<div class="f fz-s2"><label>Art des Darlehens</label><select id="' + id + 'art" data-dw="art">'
           + '<option value="annuitaet"' + (!aus ? ' selected' : '') + '>Annuitätendarlehen</option>'
           + '<option value="tilgungsaussetzung"' + (aus ? ' selected' : '') + '>Tilgungsaussetzung (nur Zins)</option></select></div>'
-          + '</div>'
-          + '<div class="f"><label>Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-dw="betrag" type="text" inputmode="decimal" class="trl" placeholder="0" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div></div>'
-          + '<div class="g2">'
-          + '<div class="f"><label>Zinssatz nominal (%)</label><div class="iw"><input id="' + id + 'zins" data-dw="zins" type="text" inputmode="decimal" class="tr" value="' + esc(zahlText(e.zins)) + '"><span class="sfx">%</span></div></div>'
+          + '<div class="f fz-s2"><label>Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-dw="betrag" type="text" inputmode="decimal" class="trl" placeholder="0" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div></div>'
+          + '<div class="f"><label>Zinssatz nominal</label><div class="iw"><input id="' + id + 'zins" data-dw="zins" type="text" inputmode="decimal" class="tr" value="' + esc(zahlText(e.zins)) + '"><span class="sfx">%</span></div></div>'
           /* v3256 · bei Tilgungsaussetzung kein Tilgungsfeld mit 0 %, sondern „ausgesetzt" */
           + (aus
             ? '<div class="f"><label>Tilgung</label><div class="cf" id="' + id + 'tilg-aus" title="Tilgungsaussetzung: während der Laufzeit nur Zinsen, die Restschuld wird am Ende über einen Tilgungsträger abgelöst">ausgesetzt · nur Zinsen</div></div>'
-            : '<div class="f"><label>Tilgung (%)</label><div class="iw"><input id="' + id + 'tilg" data-dw="tilg" type="text" inputmode="decimal" class="tr" value="' + esc(zahlText(e.tilg)) + '"><span class="sfx">%</span></div></div>')
-          + '</div>'
-          + '<div class="g2">'
-          + '<div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="' + id + 'bindj" data-dw="bindj" type="text" inputmode="numeric" class="tr" value="' + esc(e.bindj != null ? e.bindj : '') + '"><span class="sfx">J.</span></div></div>'
+            : '<div class="f"><label>Tilgung</label><div class="iw"><input id="' + id + 'tilg" data-dw="tilg" type="text" inputmode="decimal" class="tr" value="' + esc(zahlText(e.tilg)) + '"><span class="sfx">%</span></div></div>')
+          + '<div class="f"><label>Zinsbindung</label><div class="iw"><input id="' + id + 'bindj" data-dw="bindj" type="text" inputmode="numeric" class="tr" value="' + esc(e.bindj != null ? e.bindj : '') + '"><span class="sfx">J.</span></div></div>'
           + '<div class="f"><label>Start-Jahr <span style="color:var(--muted);font-weight:400">· optional</span></label><input id="' + id + 'start_jahr" data-dw="start_jahr" data-zf-aus="1" type="text" inputmode="numeric" placeholder="mit dem Kauf" value="' + esc(e.start_jahr || '') + '"></div>'
           + '</div>'
-          + '<div class="hint dw-rate" style="display:block;margin-top:2px"></div>'
-          /* v3256 · Marcel 09.11.2026: dieselben Werkzeuge wie Darlehen I - Plan ansehen
-             (financing.js openTilgungsplanModal(i), gerechnet im Kern) und Bank-PDF
-             (financing.js triggerPdfImportTo('dw:i'), Leser financing-pdf.js) */
-          + '<div class="dw-werkzeuge" style="display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:6px">'
+          + '<div class="hint dw-rate" style="display:block;margin-top:6px"></div>';
+        /* v3256 · Marcel 09.11.2026: dieselben Werkzeuge wie Darlehen I - Plan ansehen
+           (financing.js openTilgungsplanModal(i), gerechnet im Kern) und Bank-PDF
+           (financing.js triggerPdfImportTo('dw:i'), Leser financing-pdf.js) */
+        var werkzeuge = '<div class="fz-werkzeuge dw-werkzeuge">'
           + '<button type="button" class="btn-ghost btn-sm" data-dw-plan="' + i + '">' + (aus ? 'Zinsplan' : 'Tilgungsplan') + ' ansehen</button>'
           + '<button type="button" class="btn-ghost btn-sm" data-dw-pdf="' + i + '" title="Darlehensvertrag einlesen — die erkannten Werte prüfst du vor dem Übernehmen">Daten aus Bank-PDF importieren</button>'
           + '<button type="button" class="btn btn-sm dw-btn" data-dw-weg="' + i + '">Entfernen</button>'
+          + '</div>';
+        return '<div class="dw-eintrag fz-gruppen" data-i="' + i + '">'
+          + '<div class="dw-titel"><span class="dw-name"></span></div>'
+          + '<div class="fz-kopf" aria-label="Eckdaten">'
+          + kachel(id + 'betrag', 'Darlehen', 'dw-k-summe')
+          + kachel(id + 'zins', 'Zins', 'dw-k-zins')
+          + kachel(aus ? id + 'betrag' : id + 'tilg', 'Tilgung', 'dw-k-tilg')
+          + kachel(id + 'bindj', 'Zinsbindung', 'dw-k-bind')
+          + kachel(id + 'betrag', 'Rate / Monat', 'dw-k-rate')
           + '</div>'
+          + gruppe('kond', 'Konditionen bearbeiten', konditionen, kondOffen)
+          + gruppe('werkz', 'Werkzeuge', werkzeuge, !!o.werkz)
           + '</div>';
       }).join('');
       host.innerHTML = (l.length ? h : '<div class="hint" style="display:block">Kein weiteres Darlehen erfasst.</div>')
@@ -99,6 +150,7 @@
     [].forEach.call(host.querySelectorAll('.dw-eintrag'), function (box) {
       var i = +box.getAttribute('data-i'), e = l[i]; if (!e) return;
       var r = box.querySelector('.dw-rate'); if (r) r.textContent = rateZeile(e, i);
+      try { kopfFuellen(box, e, i); } catch (x) {}
     });
   }
 

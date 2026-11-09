@@ -46,8 +46,9 @@
   padding: 10px 0;
   min-width: 0;
 }
-.fz-gruppen > .fz-raster:first-child { padding-top: 0; }
-.fz-gruppen > .fz-raster + .fz-raster {
+/* v3261: die Raster stehen jetzt in .fz-gruppe-inhalt (eingeklappte Gruppen) */
+.fz-gruppe-inhalt > .fz-raster:first-child { padding-top: 0; }
+.fz-gruppe-inhalt > .fz-raster + .fz-raster {
   border-top: 1px solid color-mix(in srgb, var(--border, #E0DBD3) 75%, transparent);
 }
 .fz-gruppen .fz-raster > * { min-width: 0; }
@@ -69,16 +70,15 @@
 .fz-gruppen .fz-ek > .fz-haken .cb-label { white-space: normal; }
 
 /* v3238 · Werkzeuge (Tilgungsplan, Bank-PDF) als eine Zeile */
-.fz-gruppen > .fz-werkzeuge {
+.fz-gruppen .fz-werkzeuge {   /* v3261: in der Gruppe „Werkzeuge" */
   display: flex;
   flex-wrap: wrap;
   gap: 6px 10px;
-  padding: 10px 0;
-  border-top: 1px solid color-mix(in srgb, var(--border, #E0DBD3) 75%, transparent);
+  padding: 0;
 }
 
 /* v3238 · Anschlussfinanzierung: abgesetzter Kasten direkt unter dem Darlehen */
-.fz-gruppen > .fz-anschluss {
+.fz-gruppen .fz-anschluss {   /* v3261: in der Gruppe „Anschlussfinanzierung", Rahmen trägt die Gruppe (unten) */
   margin-top: 6px;
   padding: 10px 12px;
   border: 1px solid color-mix(in srgb, var(--border, #E0DBD3) 90%, transparent);
@@ -152,7 +152,149 @@
 
 /* v3238 · Gruppe ganz ausgeblendet (Detailgrad markiert die .f mit data-dp-dg):
    kein leerer Streifen mit Trennlinie, kein leerer Anschluss-Kasten */
-body.dp-dg-1 #s3 .fz-gruppen > .fz-raster:not(:has(> .f:not([data-dp-dg="2"]):not([data-dp-dg="3"]))),
-body.dp-dg-2 #s3 .fz-gruppen > .fz-raster:not(:has(> .f:not([data-dp-dg="3"]))),
-body.dp-dg-1 #s3 .fz-gruppen > .fz-anschluss:not(:has(.f:not([data-dp-dg="2"]):not([data-dp-dg="3"]))),
-body.dp-dg-2 #s3 .fz-gruppen > .fz-anschluss:not(:has(.f:not([data-dp-dg="3"])))  { display: none; }
+body.dp-dg-1 #s3 .fz-gruppen .fz-raster:not(:has(> .f:not([data-dp-dg="2"]):not([data-dp-dg="3"]))),
+body.dp-dg-2 #s3 .fz-gruppen .fz-raster:not(:has(> .f:not([data-dp-dg="3"]))),
+body.dp-dg-1 #s3 .fz-gruppen .fz-anschluss:not(:has(.f:not([data-dp-dg="2"]):not([data-dp-dg="3"]))),
+body.dp-dg-2 #s3 .fz-gruppen .fz-anschluss:not(:has(.f:not([data-dp-dg="3"])))  { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════
+   v3261 · Marcel 09.11.2026: „Der Tab Darlehen I ist auch irgendwie
+   unübersichtlich." Je Darlehen (I, II, jedes weitere) gleich gebaut:
+     Kopf     fünf Kacheln mit den Eckdaten (js/finanzierung-kopf.js,
+              bei weiteren Darlehen js/darlehen-weitere-ui.js)
+     Gruppen  <details class="fz-gruppe"> Konditionen bearbeiten ·
+              Anschlussfinanzierung · Bankdaten · Werkzeuge
+   Optik wie Reiter Objekt: weiße Karten, Kopf in Mono-Versalien 10 px,
+   geöffnet über einer Goldlinie. Gold nur über var(--wl-…).
+   ═══════════════════════════════════════════════════════════════ */
+.fz-kopf {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 8px;
+  min-width: 0;
+}
+.fz-kachel {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 0;
+  padding: 7px 9px 8px;
+  background: #fff;
+  border: 1px solid #EFEBE3;
+  border-top: 2px solid var(--wl-c9a84c, #C9A84C);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.fz-kachel:hover { border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, #EFEBE3); border-top-color: var(--wl-c9a84c, #C9A84C); }
+.fz-kachel:focus-visible { outline: 2px solid var(--wl-c9a84c, #C9A84C); outline-offset: 1px; }
+.fz-k-lbl {
+  font: 500 9.5px/1.25 "JetBrains Mono", monospace;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: #8A8272;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fz-k-wert {
+  font: 600 15px/1.25 "Space Grotesk", Inter, system-ui, sans-serif;
+  color: #050505;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fz-k-unter {
+  font: 400 10.5px/1.3 Inter, system-ui, sans-serif;
+  color: #8A8272;
+  min-height: 14px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* leerer Auszahlungs-Hinweis (v269) hielt die Zeile „Art · Auszahlung · Verwendung" 22 px höher - gemessen 09.11. */
+#v269-d1auszahl-hint:empty { display: none; }
+
+/* Kapitaldeckung zwischen Kopf und Gruppen (vorher volle Zeile im Konditionen-Raster) */
+.fz-gruppen > .fz-deckung { margin: 0 0 2px; min-width: 0; }
+
+/* Gruppen */
+.fz-gruppe {
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid #EFEBE3;
+  border-radius: 2px;
+  min-width: 0;
+}
+.fz-gruppe > summary {
+  list-style: none;
+  display: flex; align-items: center; gap: 10px;
+  min-height: 34px;
+  padding: 7px 12px;
+  cursor: pointer;
+  user-select: none;
+  font: 600 10px/1.3 "JetBrains Mono", monospace;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #2A2727;
+}
+.fz-gruppe > summary::-webkit-details-marker { display: none; }
+.fz-gruppe > summary::marker { content: ''; }
+.fz-gruppe > summary::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 6px; height: 6px;
+  border-right: 1.5px solid var(--wl-c9a84c, #C9A84C);
+  border-bottom: 1.5px solid var(--wl-c9a84c, #C9A84C);
+  transform: rotate(-45deg);
+  transition: transform .15s;
+}
+.fz-gruppe[open] > summary::before { transform: rotate(45deg) translate(-1px, -1px); }
+.fz-gruppe[open] > summary { border-bottom: 1px solid var(--wl-c9a84c, #C9A84C); }
+.fz-gruppe > summary:hover { color: #050505; }
+.fz-gruppe > summary:focus-visible { outline: 2px solid var(--wl-c9a84c, #C9A84C); outline-offset: -2px; }
+.fz-g-titel { flex: 0 0 auto; white-space: nowrap; }
+.fz-g-stand {
+  flex: 1 1 auto; min-width: 0;
+  text-align: right;
+  font: 400 11.5px/1.35 Inter, system-ui, sans-serif;
+  letter-spacing: 0; text-transform: none;
+  color: #8A8272;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fz-gruppe-inhalt { padding: 10px 12px; min-width: 0; }
+
+/* Anschluss-Kasten in seiner Gruppe: kein zweiter Rahmen */
+.fz-gruppe .fz-anschluss {
+  margin: 0; padding: 0;
+  border: 0; border-radius: 0;
+  background: none;
+}
+
+/* „Mehr" in einem Hinweis: Langtext eingeklappt */
+details.fz-mehr { display: inline; }
+details.fz-mehr > summary {
+  display: inline; list-style: none; cursor: pointer;
+  font: 600 10px/1.5 "JetBrains Mono", monospace;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--wl-9a7f33, #9a7f33);
+}
+details.fz-mehr > summary::-webkit-details-marker { display: none; }
+details.fz-mehr > summary::after { content: " ▾"; }
+details.fz-mehr[open] > summary::after { content: " ▴"; }
+details.fz-mehr[open] { display: block; margin-top: 4px; padding: 6px 10px; background: #fff; border-left: 2px solid var(--wl-c9a84c, #C9A84C); }
+
+/* Weitere Darlehen: jeder Eintrag wie Darlehen I und II */
+#dw-box > .dw-eintrag { padding: 10px 0 12px; border-top: 1px solid #EFEBE3; }
+#dw-box > .dw-eintrag > .dw-titel {
+  margin: 0 0 6px;
+  font: 600 10px/1.3 "JetBrains Mono", monospace;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #2A2727;
+}
+#dw-box .dw-werkzeuge { margin-top: 0; }
+
+/* schmale Karte (Handy): drei Kacheln je Zeile, Stand der Gruppe unter dem Titel */
+@container fz (max-width: 480px) {
+  .fz-kopf { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fz-gruppe > summary { flex-wrap: wrap; row-gap: 2px; }
+  .fz-g-stand { flex-basis: 100%; text-align: left; padding-left: 16px; }
+  .fz-gruppe-inhalt { padding: 10px; }
+}
+@container fz (max-width: 330px) {
+  .fz-kopf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fz-kopf > .fz-kachel:last-child:nth-child(odd) { grid-column: 1 / -1; }   /* die Rate allein: volle Breite */
+}
