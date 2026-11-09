@@ -115,6 +115,12 @@
       abschlag: mv.angebot_abschlag || null });
 
     var vw = c.verfahrenswahl || {};
+    /* v3242 · Stufe M: ETW ohne amtliche Grundlage - die Angebotszahl IST der fuehrende Vergleichswert, indikativ */
+    if (vw.verfahren === 'vergleichswert' && vw.basis === 'angebote') {
+      liste.forEach(function (x) {
+        if (x.id === 'angebote') { x.name = 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)'; x.recht = '§ 24 ImmoWertV, Ausnahme von § 25 Abs. 1'; x.tag = 'Stufe ' + (vw.stufe || 'M') + ' · ' + x.tag; }
+      });
+    }
     var art = String((p.ref && p.ref.property_type) || '').toLowerCase();
     var soll = vw.verfahren || (/etw|wohnung/.test(art) ? 'vergleichswert' : /haus|efh|zfh|dhh|reihen/.test(art) ? 'sachwert' : 'ertragswert');
     var fuehrend = liste.filter(function (x) { return x.id === soll && x.voll; })[0]

@@ -570,8 +570,17 @@ const _wQm = (x) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: 2
    Die Marktpreisindikation aus Angeboten bleibt ein eigener Begriff. */
 function vergleichswertFakten(cc) {
   const v = cc && cc.vergleichswert_irw;
+  const wahl = (cc && cc.verfahrenswahl) || {};
+  /* v3242 · Stufe M: ETW ohne amtliche Grundlage - der Vergleichswert aus Angebotspreisen fuehrt (Marcel 09.11.2026) */
+  if (wahl.verfahren === 'vergleichswert' && wahl.basis === 'angebote' && cc.comparison && Number(cc.comparison.vergleichswert_eur) > 0) {
+    return ['Führendes Verfahren ist das Vergleichswertverfahren, indikativ aus Angebotspreisen abgeleitet (Stufe M): '
+      + Math.round(cc.comparison.vergleichswert_eur).toLocaleString('de-DE') + ' €. Für diese Eigentumswohnung liegt kein anwendbarer amtlicher '
+      + 'Vergleichsfaktor und kein Immobilienrichtwert vor; die Zahl stammt aus Angebotspreisen vergleichbarer Wohnungen abzüglich des Abschlags '
+      + 'zwischen Angebots- und Kaufpreisen. Nenne sie „Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)", nie amtlich und nie „aus Kaufpreisen", '
+      + 'und sage, dass es mit einem amtlichen Vergleichsfaktor des zuständigen Gutachterausschusses genauer geht. Nenne keine Datenquelle und kein Portal, '
+      + 'sondern „Angebotspreise vergleichbarer Wohnungen" bzw. „aktueller Marktdurchschnitt".'];
+  }
   if (!v) return [];
-  const wahl = cc.verfahrenswahl || {};
   if (v.verfuegbar) {
     const rolle = wahl.verfahren === 'vergleichswert' ? 'Er ist das führende Verfahren.'
       : ((wahl.weitere || []).includes('vergleichswert') ? 'Er steht als zweites Verfahren neben dem führenden.' : '');

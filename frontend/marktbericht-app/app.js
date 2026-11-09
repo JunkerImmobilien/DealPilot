@@ -1089,7 +1089,10 @@ function _renderWertverfahren(d) {
   var VW_KURZ = { sachwert: 'Sachwert', ertragswert: 'Ertragswert', vergleichswert: 'Vergleichswert', bodenwert: 'Bodenwert' };
   /* v2380 · welches Verfahren führt und warum — jetzt im Aufklapper der führenden Karte */
   var fuehrGrund = fuehrt
-    ? absatz('<b>Führendes Verfahren:</b> ' + esc(VW_NAME[fuehrt] || fuehrt) + (vw.grund ? ' — ' + esc(vw.grund) : ''))
+    ? absatz('<b>Führendes Verfahren:</b> ' + esc(VW_NAME[fuehrt] || fuehrt)
+        /* v3242 · Stufe M am Namen */
+        + (vw.basis === 'angebote' && fuehrt === 'vergleichswert' ? ' (indikativ, aus Angebotspreisen abgeleitet)' : '')
+        + (vw.grund ? ' — ' + esc(vw.grund) : ''))
       /* v3201e · das stützende Verfahren (cross_check.verfahrenswahl.stuetzend) */
       + (vw.stuetzend ? absatz('<b>Stützendes Verfahren:</b> ' + esc(VW_NAME[vw.stuetzend] || vw.stuetzend))
         : (vw.stuetzend_grund ? absatz('<b>Stützendes Verfahren:</b> keines — ' + esc(vw.stuetzend_grund)) : ''))
@@ -1182,9 +1185,26 @@ function _renderWertverfahren(d) {
         ? 'aus ' + deEur(ab.roh.estimated) + ' Angebotsniveau, minus ' + deZahl(ab.pct) + ' %'
         : 'Angebotspreise, keine Kaufpreise');
   var vglFuehrt = fuehrt === 'vergleichswert' && !(vi && vi.verfuegbar);
+  /* v3242 · Stufe M: ETW ohne amtliche Grundlage - der Vergleichswert aus Angebotspreisen führt,
+     gekennzeichnet „indikativ, aus Angebotspreisen abgeleitet", mit dem Weg zum Ausschuss (sichtbar). */
+  var vglM = vglFuehrt && vw && vw.basis === 'angebote' && !vglKaufpreise;
+  var wM = vglM ? (vw.weg_quelle || null) : null;
+  var vglMWeg = vglM
+    ? '<div class="wv-quelle"><b>Vergleichswert indikativ.</b> '
+      + esc((wM && wM.text) || vw.weg || '')
+      + (wM && wM.kosten ? ' ' + esc(wM.kosten) : '')
+      + (wM && wM.url ? ' <a href="' + esc(wM.url) + '" target="_blank" rel="noopener">zum Gutachterausschuss</a>' : '')
+      + (wM && wM.email ? ' · <a href="mailto:' + esc(wM.email) + '">' + esc(wM.email) + '</a>' : '')
+      + '</div>'
+    : '';
   karten.push(karte({
     titel: vglTitel, wert: eur(v), herkunft: vglHerkunft, fuehrend: vglFuehrt,
+    marken: vglM ? ['indikativ, aus Angebotspreisen abgeleitet', 'Stufe ' + esc(vw.stufe || 'M')
+      + (vw.belastbarkeit ? ' · Belastbarkeit ' + esc(vw.belastbarkeit.label) + ' (' + vw.belastbarkeit.pct + ' %)' : '')] : null,
+    sichtbar: vglMWeg,
     inhalt: absatz(vglKaufpreise ? 'Amtlicher Vergleichsfaktor · § 20, § 25 ImmoWertV.'
+          : vglM ? 'Angebotspreise vergleichbarer Wohnungen, keine Kaufpreise — weil keine amtliche Grundlage vorliegt, '
+            + 'als Vergleichswert indikativ angesetzt (Ausnahme von § 25 Abs. 1 ImmoWertV, Stufe M).'
           /* v2380 · Angebotspreise heißen so, auch wenn irgendwo eine amtliche Grundlage existiert */
           : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV).')
       /* v3041 · der Wert vor Abschlag steht davor */
@@ -1327,7 +1347,8 @@ function _renderWertverfahren(d) {
       })
     : '';
   var fuehrPill = fuehrt
-    ? '<span class="wv-pill" title="' + esc(vw.grund || '') + '">Führend: ' + esc(VW_KURZ[fuehrt] || fuehrt) + '</span>'
+    ? '<span class="wv-pill" title="' + esc(vw.grund || '') + '">Führend: ' + esc(VW_KURZ[fuehrt] || fuehrt)
+      + (vw.basis === 'angebote' && fuehrt === 'vergleichswert' ? ' · indikativ' : '') + '</span>'   /* v3242 */
     : '';
 
   box.innerHTML =
@@ -4541,7 +4562,9 @@ async function exportPdf(out) {
        die Marktpreisindikation steht als Zahl daneben, unter ihrem Namen. */
     const _vi = cc.vergleichswert_irw || null;
     const _irwV = !!(_amtV && _amtV.art === 'immobilienrichtwert' && _vi && _vi.verfuegbar);
-    const _vglTitel = _irwV ? 'VERGLEICHSWERT · § 24 · IRW' : (_vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN');
+    /* v3242 · Stufe M: ETW ohne amtliche Grundlage - der Vergleichswert aus Angebotspreisen führt, indikativ */
+    const _vglM = !_irwV && !_vglAmtlich && !!(_vw && _vw.verfahren === 'vergleichswert' && _vw.basis === 'angebote');
+    const _vglTitel = _irwV ? 'VERGLEICHSWERT · § 24 · IRW' : (_vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : (_vglM ? 'VERGLEICHSWERT · INDIKATIV' : 'MARKTPREIS AUS ANGEBOTEN'));
     card3(M, _vglTitel, cc.comparison.vergleichswert_eur, _irwV ? [
       _amtV.rechnung || null,
       'Stufe A · Koeffizienten des Gutachterausschusses (§§ 24–26 ImmoWertV)',
@@ -4551,6 +4574,8 @@ async function exportPdf(out) {
       'Amtlicher Vergleichsfaktor aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)',
       (cc.comparison.angebotswert_eur ? 'zum Vergleich Angebotspreise: ' + Math.round(cc.comparison.angebotswert_eur).toLocaleString('de-DE') + ' €' : null),
     ] : [
+      _vglM ? 'indikativ, aus Angebotspreisen abgeleitet · Stufe ' + (_vw.stufe || 'M')
+        + (_vw.belastbarkeit ? ' · Belastbarkeit ' + _vw.belastbarkeit.label + ' (' + _vw.belastbarkeit.pct + ' %)' : '') : null,
       mv.basis_median_sqm ? Math.round(mv.basis_median_sqm).toLocaleString('de-DE') + ' €/m² Median' : null,
       (d.sale && d.sale.sample_size) ? d.sale.sample_size + ' Vergleichsangebote' : null,
       /* v2367 · Abschlag und amtliche Gegenprobe auch im PDF */
@@ -4665,14 +4690,18 @@ async function exportPdf(out) {
       const _vwName = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
         vergleichswert: 'Vergleichswertverfahren' }[_vw.verfahren] || _vw.verfahren;
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setCharSpace(0);
+      /* v3242 · Stufe M: der Weg zum Ausschuss (Text, Link, Postfach) steht im Kasten */
+      const _wq = (_vw.basis === 'angebote' && _vw.verfahren === 'vergleichswert') ? (_vw.weg_quelle || { text: _vw.weg || '' }) : null;
       const _vwT = doc.splitTextToSize(String(_vw.grund || '')
-        + (_vw.quelle ? '  (' + _vw.quelle + ')' : ''), blockW - 10);
+        + (_vw.quelle ? '  (' + _vw.quelle + ')' : '')
+        + (_wq && _wq.text ? ' ' + _wq.text + (_wq.url ? ' ' + _wq.url : '') + (_wq.email ? ' · ' + _wq.email : '') : ''), blockW - 10);
       const _vwH = 8.5 + _vwT.length * 3.1;
       need(_vwH + 4);
       doc.setFillColor(247, 243, 233); doc.roundedRect(M, y, blockW, _vwH, 2, 2, 'F');
       doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, _vwH, 0.8, 0.8, 'F');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
-      doc.text('Führendes Verfahren: ' + _vwName, M + 5, y + 5);
+      doc.text('Führendes Verfahren: ' + _vwName + (_vw.basis === 'angebote' && _vw.verfahren === 'vergleichswert'
+        ? ' (indikativ, aus Angebotspreisen abgeleitet)' : ''), M + 5, y + 5);   /* v3242 */
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...MUT);
       doc.text(_vwT, M + 5, y + 9.8);
       y += _vwH + 4;

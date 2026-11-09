@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
    DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v3242: B60 - ETW ohne amtliche Grundlage: Vergleichswert aus Angebotspreisen fuehrt (Stufe M), amtlich geht vor, MFH/ZFH unveraendert.
    v2854: Sanierungsstau in den Potenzial-Stufen nicht doppelt (B54, PotenzialService geladen).
    v2825: GEW - Einheit ohne Nutzungsart wird nachgefragt (B53 angepasst).
    v2824: Gewerbe-/Industriegebaeude (GEW) mit Einheiten, Kette Mapper -> Kern (B53).
@@ -1445,6 +1446,59 @@ fallB('B62', () => {
   const m2 = CCS.mietabweichungBog([{ nr: 1, differenz_jahr: 1200, befristet_bis: '2026-06-01' }], 3, 40, new Date('2026-06-01T12:00:00Z'));
   pruefe('B', 'B59', 'Mietabweichung: Restlaufzeit ab Stichtag (2 Jahre ab 01.06.2024, 0 ab 01.06.2026)',
     !!m1 && !!m2 && m1.zeilen[0].jahre === 2 && m2.zeilen[0].jahre === 0, JSON.stringify(m1 && m1.zeilen && m1.zeilen[0] && m1.zeilen[0].jahre) + '/' + JSON.stringify(m2 && m2.zeilen && m2.zeilen[0] && m2.zeilen[0].jahre));
+}
+
+/* ══ v3242 · B60 ETW OHNE AMTLICHE GRUNDLAGE: VERGLEICHSWERT AUS ANGEBOTSPREISEN FUEHRT ══════════
+   Marcel 09.11.2026: bei Eigentumswohnungen fuehrt das Vergleichswertverfahren; ohne Immobilienricht-
+   wert, amtlichen oder Register-Vergleichsfaktor der Vergleichswert aus Angebotspreisen MINUS Abschlag,
+   indikativ, Stufe M, Belastbarkeit −30, mit dem Weg zum Ausschuss. Amtliche Grundlage geht vor;
+   MFH und Wohnungen in Objekten mit hoechstens zwei Einheiten bleiben unveraendert. Gerechnet am
+   ECHTEN CrossCheckService mit den Ebene-C-Eingaben (etw = Bielefeld, Teutoburger Str. 60). */
+fallB('B60', () => {
+  const r = ccFall('etw');
+  const vw = (r && r.verfahrenswahl) || {}, c = (r && r.comparison) || {};
+  const mv = klon(C.faelle.etw.argumente[3].market_value);
+  pruefe('B', 'B60', 'ETW ohne amtliche Grundlage: Vergleichswert führt, Basis Angebote, Stufe M, indikativ',
+    vw.verfahren === 'vergleichswert' && vw.basis === 'angebote' && vw.stufe === 'M' && vw.indikativ === true && !vw.nicht_gerechnet,
+    JSON.stringify({ v: vw.verfahren, b: vw.basis, s: vw.stufe }));
+  wert('B', 'B60', 'führender Wert = Angebotsindikation nach Abschlag (kein zweiter Abschlag)', c.vergleichswert_eur ?? null, mv.estimated, 0);
+  pruefe('B', 'B60', 'Bezeichnung „Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)", Basis bleibt angebote',
+    c.bezeichnung === 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)' && c.basis === 'angebote' && c.stufe === 'M', c.bezeichnung);
+  wert('B', 'B60', 'Belastbarkeit 100 − 30 (Stufe M)', vw.belastbarkeit ? vw.belastbarkeit.pct : null, 70, 0);
+  pruefe('B', 'B60', 'Grund nennt Abschlag (5,8 %, aktueller Marktdurchschnitt) und Ausnahme von § 25 Abs. 1, keine Datenquelle',
+    /abzüglich 5,8 % Abschlag/.test(vw.grund || '') && /aktueller Marktdurchschnitt/.test(vw.grund || '') && /§ 25 Abs\. 1/.test(vw.grund || '')
+      && !/ImmoScout|Immowelt|Portal|ImmoMetrica/i.test(JSON.stringify(vw)), vw.grund);
+  pruefe('B', 'B60', 'Weg: genauer mit amtlichem Vergleichsfaktor, Stelle und Link',
+    /Genauer geht es mit einem amtlichen Vergleichsfaktor/.test(vw.weg || '') && !!(vw.weg_quelle && vw.weg_quelle.url && vw.weg_quelle.ausschuss), JSON.stringify(vw.weg_quelle || null).slice(0, 120));
+  pruefe('B', 'B60', 'Notiz „Führendes Verfahren: Vergleichswertverfahren (indikativ, aus Angebotspreisen abgeleitet, Stufe M)"',
+    (r.notes || []).some((n) => /^Führendes Verfahren: Vergleichswertverfahren \(indikativ, aus Angebotspreisen abgeleitet, Stufe M\)\./.test(n)));
+  /* ohne Abschlag (rohe Angebotspreise) fuehrt nichts - wie bisher */
+  const roh = ccFall('etw', (a) => { delete a[3].market_value.angebot_abschlag; });
+  pruefe('B', 'B60', 'ohne Abschlagsangabe: kein führendes Verfahren (wie bis v3241)',
+    !!roh && !(roh.verfahrenswahl && roh.verfahrenswahl.verfahren) && (!roh.comparison || roh.comparison.bezeichnung === 'Marktpreisindikation aus Angebotspreisen'),
+    roh && roh.verfahrenswahl ? String(roh.verfahrenswahl.verfahren) : 'keine Wahl');
+  /* amtliche Grundlage geht vor: Register-Vergleichsfaktor */
+  const amt = ccFall('etw', (a) => { a[4].register_vergleichsfaktor = { verfuegbar: true, wert_eur: 182500, faktor_qm: 2500,
+    rechenweg: 'Prüfer', ausschuss: 'Prüfer-Ausschuss' }; });
+  pruefe('B', 'B60', 'ETW mit Register-Vergleichsfaktor: amtlich führt (Basis Kaufpreise, keine Stufe M)',
+    !!amt && amt.verfahrenswahl.verfahren === 'vergleichswert' && amt.verfahrenswahl.basis === 'kaufpreise' && !amt.verfahrenswahl.stufe
+      && amt.comparison.vergleichswert_eur === 182500 && amt.comparison.bezeichnung === 'Vergleichswert (amtlicher Vergleichsfaktor)',
+    amt ? JSON.stringify({ b: amt.verfahrenswahl.basis, w: amt.comparison.vergleichswert_eur }) : '');
+  /* MFH und Wohnung im Zweifamilienhaus unveraendert */
+  const mfh = ccFall('demo');
+  pruefe('B', 'B60', 'MFH (demo): Ertragswert führt, Angebotszahl bleibt Marktpreisindikation',
+    !!mfh && mfh.verfahrenswahl.verfahren === 'ertragswert' && mfh.comparison.bezeichnung === 'Marktpreisindikation aus Angebotspreisen' && !mfh.comparison.stufe);
+  const zfh = ccFall('huellhorst');
+  pruefe('B', 'B60', 'Wohnung im Objekt mit ≤ 2 WE (Hüllhorst): unverändert (wäre Sachwert)',
+    !!zfh && zfh.verfahrenswahl.waere === 'sachwert' && zfh.comparison.bezeichnung === 'Marktpreisindikation aus Angebotspreisen');
+});
+/* B60b · KI-Text: der fuehrende Vergleichswert (Stufe M) ist die Kopfzahl */
+{
+  const KI = await lade('lib/ki_text_pruefung.js');
+  const r = ccFall('etw');
+  const Fk = KI.textFakten({ ref: C.faelle.etw.argumente[0], valuation: C.faelle.etw.argumente[3], cross_check: r });
+  pruefe('B', 'B60', 'KI-Fakten: führend = vergleichswert, Kopfzahl = Angebotsindikation nach Abschlag',
+    Fk.fuehrend === 'vergleichswert' && Fk.kopfwert === C.faelle.etw.argumente[3].market_value.estimated, JSON.stringify({ f: Fk.fuehrend, k: Fk.kopfwert }));
 }
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */

@@ -44,6 +44,20 @@ import { sachwertfaktor as swfNachTabelle } from '../lib/gutachterausschuss.js';
 import { istGewerbe, istGrundstueck, gewerbeArt, gewerbeAnlage3, gewerbeGndSchluessel } from '../lib/marktsegment.js';
 import { gnd as gndNachArt, GND_TABELLE, gndNachAnlage1Belegt } from '../lib/immowertv.js';
 import { schaetzung as rndSchaetzung } from '../lib/rnd-einheitlich.js';
+/* v3242 · Stufe M (ETW ohne amtliche Grundlage): Kennzeichnung, Weg, Kontakt der Geschaeftsstelle */
+import { STUFE_ANGEBOT, NAME_ANGEBOT, abschlagKurz, wegVergleichsfaktor } from '../lib/verfahrenswahl.js';
+import { ladeKontakte, schluesselVon } from '../lib/sperren_anfragen.js';
+import { LC as LAND_KURZ } from '../lib/register_deckung.js';
+let _kontakte = null;
+/** Belegtes Funktionspostfach des Ausschusses (ausschuss_kontakte.json), sonst null - nie geraten. */
+function kontaktMail(ags, stelle) {
+  try {
+    if (!_kontakte) _kontakte = ladeKontakte();
+    const land = LAND_KURZ[String(ags || '').replace(/\D/g, '').slice(0, 2)];
+    const t = land ? _kontakte.index.get(schluesselVon(land, stelle)) : null;
+    return (t && t.kontakt && (t.kontakt.email || t.kontakt.email_obere_stelle)) || null;
+  } catch (e) { return null; }
+}
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
 const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
@@ -2491,7 +2505,17 @@ export const CrossCheckService = {
     const _vglAmtlichDa = !!((p.register_vergleichsfaktor && p.register_vergleichsfaktor.verfuegbar)
       || (p.amtlicher_vergleichsfaktor && p.amtlicher_vergleichsfaktor.verfuegbar)
       || (p.irw && p.irw.verfuegbar));
-    if (out.sachwert.available || out.ertragswert.available || _vglAmtlichDa) {
+    /* v3242 · ETW ohne amtliche Grundlage: der Vergleichswert aus Angebotspreisen MINUS ABSCHLAG fuehrt
+       (Marcel 09.11.2026, lib/verfahrenswahl.js, Stufe M). Die Zahl ist market_value.estimated - der
+       Abschlag ist dort schon abgezogen (ValuationService v2367/v3021), hier wird nichts gerechnet.
+       Ohne Abschlagsangabe (rohe Angebotspreise) fuehrt sie nicht. Die Wahl selbst trifft
+       fuehrendesVerfahren(); sie oeffnet den Block auch, wenn weder Ertrags- noch Sachwert rechnen. */
+    const _ab = (valuation && valuation.market_value && valuation.market_value.angebot_abschlag) || null;
+    const _vglAngebot = (Number(vgl) > 0 && _ab && _ab.pct != null && Number.isFinite(Number(_ab.pct)))
+      ? { abschlag_pct: Number(_ab.pct), abschlag_herkunft: _ab.herkunft || null } : null;
+    const _etwAngebot = !!_vglAngebot && fuehrendesVerfahren({ objektart: ref.property_type, wohneinheiten: ref.units,
+      nutzung: ref.usage_type, vergleichsbasis: null, angebotswert: _vglAngebot }).basis === 'angebote';
+    if (out.sachwert.available || out.ertragswert.available || _vglAmtlichDa || _etwAngebot) {
       /* v1049-WFLA-3 · Der Flaechenbefund gehoert in den Bericht, nicht nur
      * ins Log. Eine stille Annahme ueber den Bodenwert ist dieselbe Sorte
      * Fehler wie die stille Standardstufe 3. */
@@ -2632,7 +2656,23 @@ export const CrossCheckService = {
     out.verfahrenswahl = fuehrendesVerfahren({
       objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
       vergleichsbasis: _vglKaufpreise ? 'kaufpreise' : null,
+      angebotswert: _vglAngebot,   /* v3242 · nur ohne Kaufpreisbasis wirksam (Stufe M) */
     });
+    /* v3242 · Stufe M: der Weg zum zustaendigen Ausschuss - Link (quellen_links.js) und, wo belegt,
+       das Funktionspostfach der Geschaeftsstelle (ausschuss_kontakte.json). */
+    if (out.verfahrenswahl && out.verfahrenswahl.basis === 'angebote') {
+      let _q = null, _mail = null;
+      try {
+        const _ags = (p && p.ags) || ref.ags || null;
+        _q = _ags ? quelleFuer(_ags) : null;
+        if (_q && _q.stelle) _mail = kontaktMail(_ags, _q.stelle);
+      } catch (e) { _q = null; }
+      const _w = wegVergleichsfaktor({ stelle: _q && _q.stelle, url: _q && _q.url, email: _mail,
+        landesebene: !!(_q && _q.herkunft === 'landestabelle'),
+        kosten: _q ? (quellenSatz(_q, 'Vergleichsfaktoren') || {}).kosten || null : null });
+      out.verfahrenswahl.weg = _w.text;
+      out.verfahrenswahl.weg_quelle = _w;
+    }
     /* v2660 · E7 · Mit dem Vergleichswert aus dem Immobilienrichtwert waehlt verfahrenMitIrw
        (verfahrenswahl.js, v2620): ETW -> Vergleichswert fuehrt; EFH/ZFH mit amtlichem
        Sachwertfaktor -> Sachwert fuehrt, Vergleichswert zweites Verfahren; EFH ohne
@@ -2657,7 +2697,7 @@ export const CrossCheckService = {
       /* v2390 · der Pauschal-Sachwert fuehrt nicht - er ist kein Sachwert nach NHK 2010. */
       const _gerechnet = _vk === 'sachwert' ? !!(out.sachwert && out.sachwert.available && !out.sachwert.pauschal)
         : _vk === 'ertragswert' ? !!(out.ertragswert && out.ertragswert.available)
-          : _vk === 'vergleichswert' ? _vglKaufpreise : true;
+          : _vk === 'vergleichswert' ? (_vglKaufpreise || (out.verfahrenswahl.basis === 'angebote' && !!_vglAngebot)) : true;   /* v3242 */
       if (!_gerechnet) {
         const _gGrund = String((_vk === 'sachwert' ? (out.sachwert && out.sachwert.grund)
           : (out.ertragswert && out.ertragswert.grund)) || '').trim();
@@ -2691,8 +2731,11 @@ export const CrossCheckService = {
          aussah. */
       const _vn = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
         vergleichswert: 'Vergleichswertverfahren' }[out.verfahrenswahl.verfahren];
+      /* v3242 · Stufe M: Kennzeichnung am Namen, der Weg zum Ausschuss gleich dahinter */
+      const _vwM = out.verfahrenswahl.basis === 'angebote';
       out.notes.push(_vn
-        ? 'Führendes Verfahren: ' + _vn + '. ' + out.verfahrenswahl.grund
+        ? 'Führendes Verfahren: ' + _vn + (_vwM ? ' (' + NAME_ANGEBOT + ', Stufe ' + STUFE_ANGEBOT + ')' : '') + '. '
+          + out.verfahrenswahl.grund + (_vwM && out.verfahrenswahl.weg ? ' ' + out.verfahrenswahl.weg : '')
         : 'Kein führendes Verfahren ausgewiesen. ' + out.verfahrenswahl.grund
           + (out.verfahrenswahl.weg ? ' ' + out.verfahrenswahl.weg : ''));
     }
@@ -2856,15 +2899,27 @@ export const CrossCheckService = {
          > wird korrigiert, der Schluessel bleibt. */
       /* v2380: liegt ein amtlicher Vergleichsfaktor im Anwendungsbereich vor,
          IST die Zahl der amtliche Wert; der Angebotswert bleibt daneben stehen. */
+      /* v3242 · Stufe M: fuehrt der Vergleichswert aus Angebotspreisen (ETW ohne amtliche Grundlage),
+         heisst die Zahl so - dieselbe Zahl, kein zweiter Abschlag. Bei EFH/ZFH/MFH bleibt sie die
+         Marktpreisindikation. */
+      const _vglM = !_vglKaufpreise && !!(out.verfahrenswahl && out.verfahrenswahl.verfahren === 'vergleichswert'
+        && out.verfahrenswahl.basis === 'angebote');
       out.comparison = {
         vergleichswert_eur: _amtVgl ? _amtVgl.wert_eur : vgl,
         basis: _vglKaufpreise ? 'kaufpreise' : 'angebote',
         /* v2660 · E7: der Vergleichswert aus dem Immobilienrichtwert heisst so, wie er gerechnet ist */
         bezeichnung: (_amtVgl && _amtVgl.art === 'immobilienrichtwert') ? 'Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)'
           : _vglKaufpreise ? 'Vergleichswert (amtlicher Vergleichsfaktor)'
+          : _vglM ? 'Vergleichswert (' + NAME_ANGEBOT + ')'
           : 'Marktpreisindikation aus Angebotspreisen',
         basis_art: _amtVgl ? _amtVgl.art : 'angebote',
-        basis_hinweis: (_amtVgl && _amtVgl.art === 'immobilienrichtwert')
+        ...(_vglM ? { stufe: STUFE_ANGEBOT, indikativ: true, fuehrend_indikativ: true,
+          belastbarkeit: out.verfahrenswahl.belastbarkeit || null, weg: out.verfahrenswahl.weg_quelle || null } : {}),
+        basis_hinweis: _vglM
+          ? 'Angebotspreise vergleichbarer Wohnungen, abzüglich ' + String(_vglAngebot.abschlag_pct).replace('.', ',')
+            + ' % Abschlag zwischen Angebots- und Kaufpreisen (' + abschlagKurz(_vglAngebot.abschlag_herkunft) + ') — keine Kaufpreise. '
+            + 'Weil keine amtliche Grundlage vorliegt, als Vergleichswert indikativ angesetzt (Ausnahme von § 25 Abs. 1 ImmoWertV, Stufe M).'
+          : (_amtVgl && _amtVgl.art === 'immobilienrichtwert')
           ? 'Immobilienrichtwert des Gutachterausschusses (§ 20 ImmoWertV, aus der Kaufpreissammlung), mit seinen '
             + 'Umrechnungskoeffizienten auf das Objekt angepasst (§§ 24–26 ImmoWertV): ' + _amtVgl.rechnung + '.'
           : _vglKaufpreise
