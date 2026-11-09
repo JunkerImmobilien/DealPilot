@@ -1,0 +1,362 @@
+{
+ "ags": "03103000",
+ "gemeinde": "Wolfsburg",
+ "art": "qualifiziert",
+ "stand": "2026-01-01",
+ "erhebungsstichtag": "2025-03-01",
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": "2027-12-31",
+ "quelle": {
+  "url": "https://statistik.stadt.wolfsburg.de/Informationsportal_15/Upload/Veroeffentlichungen/PDF/StadtWolfsburg_Mietspiegelbroschuere2026.pdf",
+  "dokument": "Fortschreibung des Qualifizierten Mietspiegels 2024 der Stadt Wolfsburg (gültig 2026–2027, Broschüre)",
+  "seite": "7, 9–18",
+  "lizenz": "Creative Commons Namensnennung 3.0 Deutschland (CC BY 3.0 DE), „falls nicht anders bezeichnet“ (Impressum S. 2); Abbildungen teils CC BY-ND 3.0 DE",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Grundbetrag 6,62 €/m² + Zu-/Abschläge in €/m² (Baujahr und Größe S. 10, Ausstattung S. 12, Beschaffenheit S. 14, Lage S. 15; Rechenweg S. 16). Spanne: unterer/oberer Spannenwert je Baualter (S. 18) anstelle des Grundbetrags, plus dieselben Zu-/Abschläge — hier als Abstand zum Grundbetrag (z. B. 1961–1999: 5,87 − 6,62 = −0,75 / 6,85 − 6,62 = +0,23). Baujahr vor 1961 unter Denkmalschutz: eigene Spanne 5,72/7,31 und +0,19 €. Gilt nur für Mehrfamilienhäuser mit mindestens 3 Wohnungen am Hauseingang, 26–175 m² (S. 7). Offene Küche nur Baujahr vor 2000, Video-Gegensprechanlage nur ab 2010; Wohnungen ab Baujahr 2013 mit vermieterseitigem Boden fallen automatisch in „seit 2013“ (S. 11). Zentrum = Hauptzentrum Stadtmitte oder Subzentren Fallersleben/Vorsfelde laut Anlage II. Kein Zahlenbeispiel im Dokument.",
+ "regression": {
+  "geltung": {
+   "wfl_von": 26,
+   "wfl_bis": 175
+  },
+  "basis_eur_qm": 6.62,
+  "verknuepfung": "summe",
+  "faktoren": [
+   {
+    "merkmal": "baujahr",
+    "label": "Baujahr",
+    "typ": "baujahr_klasse",
+    "art": "eur_qm",
+    "werte": [
+     {
+      "von": null,
+      "bis": 1960,
+      "wert": 0,
+      "label": "vor 1961"
+     },
+     {
+      "von": 1961,
+      "bis": 1999,
+      "wert": 0,
+      "label": "1961 bis 1999"
+     },
+     {
+      "von": 2000,
+      "bis": null,
+      "wert": 1.57,
+      "label": "ab 2000"
+     }
+    ],
+    "beleg": "S. 10 Baujahr"
+   },
+   {
+    "merkmal": "denkmalschutz",
+    "label": "Baujahr vor 1961 und Gebäude unter Denkmalschutz",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.19,
+    "beleg": "S. 10 Baujahr",
+    "bedingung": {
+     "baujahr_bis": 1960
+    }
+   },
+   {
+    "merkmal": "wfl",
+    "label": "Wohnfläche",
+    "typ": "wfl_kurve",
+    "art": "eur_qm",
+    "werte": [
+     {
+      "von": null,
+      "bis": 45,
+      "bis_inkl": false,
+      "wert": 0.79,
+      "label": "unter 45 m²"
+     },
+     {
+      "von": 45,
+      "bis": 60,
+      "bis_inkl": false,
+      "wert": 0.2,
+      "label": "45 bis unter 60 m²"
+     },
+     {
+      "von": 60,
+      "bis": 90,
+      "bis_inkl": false,
+      "wert": 0,
+      "label": "60 bis unter 90 m²"
+     },
+     {
+      "von": 90,
+      "bis": 105,
+      "bis_inkl": false,
+      "wert": -0.34,
+      "label": "90 bis unter 105 m²"
+     },
+     {
+      "von": 105,
+      "bis": null,
+      "wert": -0.46,
+      "label": "105 oder mehr m²"
+     }
+    ],
+    "beleg": "S. 10 Wohnfläche"
+   },
+   {
+    "merkmal": "haenge_wc",
+    "label": "Hänge-WC",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.23,
+    "beleg": "S. 12 Badausstattung"
+   },
+   {
+    "merkmal": "bodengleiche_dusche",
+    "label": "bodengleiche/ebenerdige Dusche",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.32,
+    "beleg": "S. 12 Badausstattung"
+   },
+   {
+    "merkmal": "handtuchheizkoerper",
+    "label": "Handtuchheizkörper",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.32,
+    "beleg": "S. 12 Badausstattung"
+   },
+   {
+    "merkmal": "bad_fenster",
+    "label": "Fenster zur Lüftung im Bad",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.18,
+    "beleg": "S. 12 Badausstattung"
+   },
+   {
+    "merkmal": "offene_kueche",
+    "label": "offene Küche (Baujahr vor 2000)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.18,
+    "beleg": "S. 12 Küche",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "kueche_10qm",
+    "label": "Küchenraum mit 10 oder mehr m²",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.14,
+    "beleg": "S. 12 Küche"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "label": "Einbauküche vom Vermieter (keine Mini-/Pantryküche)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.64,
+    "beleg": "S. 12 Küche"
+   },
+   {
+    "merkmal": "fussboden",
+    "label": "Fußbodenbelag in Wohn- und Schlafräumen (überwiegend)",
+    "typ": "auswahl",
+    "art": "eur_qm",
+    "werte": {
+     "kein": 0,
+     "vor_2013": 0.11,
+     "seit_2013": 0.56
+    },
+    "beleg": "S. 12 Fußböden"
+   },
+   {
+    "merkmal": "balkon",
+    "label": "Balkon/Loggia mit mind. 2 m Tiefe",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 12 Freisitze"
+   },
+   {
+    "merkmal": "dachterrasse",
+    "label": "Dachterrasse",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.65,
+    "beleg": "S. 12 Freisitze"
+   },
+   {
+    "merkmal": "video_gegensprechanlage",
+    "label": "Gegensprechanlage mit Video (Baujahr ab 2010)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 1.09,
+    "beleg": "S. 12 Sonstige Ausstattung",
+    "bedingung": {
+     "baujahr_von": 2010
+    }
+   },
+   {
+    "merkmal": "barrierefrei",
+    "label": "Wohnungseingangstür ohne Stufen/Schwellen vom Gehweg erreichbar",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.15,
+    "beleg": "S. 14 Barrierefreiheit"
+   },
+   {
+    "merkmal": "dreifachverglasung",
+    "label": "überwiegend Fenster mit Dreifachverglasung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.39,
+    "beleg": "S. 14 Fenster"
+   },
+   {
+    "merkmal": "sanitaer_seit_2013",
+    "label": "Sanitärbereich seit 2013 erneuert",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.18,
+    "beleg": "S. 14 Modernisierung"
+   },
+   {
+    "merkmal": "daemmung_aussenwaende_2010",
+    "label": "nachträgliche Dämmung sämtlicher Außenwände 2010 oder später",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.19,
+    "beleg": "S. 14 Modernisierung"
+   },
+   {
+    "merkmal": "warmwasser_dezentral",
+    "label": "überwiegend dezentrale Warmwasserversorgung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.21,
+    "beleg": "S. 14 Leitungen und Warmwasser"
+   },
+   {
+    "merkmal": "leitungen_auf_putz",
+    "label": "Leitungen in Küche, Bad oder Wohnräumen über Putz",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.24,
+    "beleg": "S. 14 Leitungen und Warmwasser"
+   },
+   {
+    "merkmal": "zentrum",
+    "label": "Lage im Hauptzentrum (Stadtmitte) oder Subzentrum Fallersleben/Vorsfelde",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.17,
+    "beleg": "S. 15 Lage"
+   }
+  ],
+  "spanne": {
+   "baujahr_klassen": [
+    {
+     "von": null,
+     "bis": 1960,
+     "merkmal": "denkmalschutz",
+     "label": "vor 1961, Denkmalschutz",
+     "unten_abs": -0.9,
+     "oben_abs": 0.69
+    },
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "vor 1961",
+     "unten_abs": -0.75,
+     "oben_abs": 0.23
+    },
+    {
+     "von": 1961,
+     "bis": 1999,
+     "label": "1961 bis 1999",
+     "unten_abs": -0.75,
+     "oben_abs": 0.23
+    },
+    {
+     "von": 2000,
+     "bis": null,
+     "label": "ab 2000",
+     "unten_abs": -1.44,
+     "oben_abs": 1.14
+    }
+   ]
+  },
+  "beleg": "S. 9–18"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.87,
+    "mittel": 6.62,
+    "oben": 6.85
+   },
+   "seite": "9, 18",
+   "art": "tabellenzelle",
+   "anmerkung": "keine Zu-/Abschläge: Grundbetrag 6,62; Spannenwerte 1961–1999 5,87 / 6,85"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1955,
+    "wfl": 50,
+    "merkmale": {
+     "denkmalschutz": true,
+     "einbaukueche": true,
+     "balkon": true,
+     "leitungen_auf_putz": true
+    }
+   },
+   "erwartet": {
+    "unten": 6.71,
+    "mittel": 7.61,
+    "oben": 8.3
+   },
+   "seite": "10–18",
+   "art": "rechenweg",
+   "anmerkung": "C = 0,19 + 0,20 (45 bis unter 60 m²) + 0,64 + 0,20 − 0,24 = 0,99; 6,62 + 0,99 = 7,61; Spanne Denkmal 5,72 + 0,99 = 6,71 / 7,31 + 0,99 = 8,30"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 95,
+    "merkmale": {
+     "zentrum": true
+    }
+   },
+   "erwartet": {
+    "unten": 6.58,
+    "mittel": 8.02,
+    "oben": 9.16
+   },
+   "seite": "10–18",
+   "art": "rechenweg",
+   "anmerkung": "C = 1,57 − 0,34 + 0,17 = 1,40; 6,62 + 1,40 = 8,02; Spanne ab 2000: 5,18 + 1,40 = 6,58 / 7,76 + 1,40 = 9,16"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 25
+   },
+   "erwartet": null,
+   "seite": "7",
+   "art": "tabellenzelle",
+   "anmerkung": "unter 26 m² nicht im Geltungsbereich"
+  }
+ ]
+}

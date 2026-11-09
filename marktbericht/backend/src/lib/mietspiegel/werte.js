@@ -113,10 +113,13 @@ function merkmalWahr(objekt, name) {
 }
 
 /** Spanne auf einen (gerundeten) Mittelwert: { unten_pct, oben_pct } | { unten_abs, oben_abs } | { baujahr_klassen: [...] } */
-function spanneAnwenden(sp, mittel, bj, n, hinweise) {
+function spanneAnwenden(sp, mittel, bj, n, hinweise, objekt) {
   let s = sp;
   if (sp && Array.isArray(sp.baujahr_klassen)) {
-    const i = klasseFinden(sp.baujahr_klassen, bj);
+    /* v3261 · eine Klasse darf an ein Merkmal gebunden sein ({ …, merkmal: 'denkmalschutz' }, Wolfsburg): sie zählt nur,
+       wenn objekt.merkmale[merkmal] wahr ist; sonst die nächste passende Klasse (Reihenfolge der Liste) */
+    const liste = sp.baujahr_klassen.map(k => (k && k.merkmal && !merkmalWahr(objekt, k.merkmal)) ? null : k);
+    const i = klasseFinden(liste, bj);
     if (i < 0) { hinweise.push('keine Spanne für Baujahr ' + bj + ' im Mietspiegel'); return { unten: null, oben: null, text: '' }; }
     s = sp.baujahr_klassen[i];
   }
@@ -208,7 +211,7 @@ function tabelleRechnen(w, objekt, bj, wfl, n, hinweise) {
   if (T.spanne) {
     mittel = f(zelle.mittel);
     if (mittel === null) return leer(hinweise.concat('Tabellenfeld ohne Mittelwert'), { zelle: zelleText });
-    const sp = spanneAnwenden(T.spanne, mittel, bj, n, hinweise);
+    const sp = spanneAnwenden(T.spanne, mittel, bj, n, hinweise, objekt);
     unten = sp.unten; oben = sp.oben; spText = sp.text;
   } else {
     unten = f(zelle.unten); mittel = f(zelle.mittel); oben = f(zelle.oben);
@@ -312,7 +315,7 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
     /* v3261 · Spanne aus den Konfidenzgrenzen der Faktoren, je Grenze eigenes Produkt (gleiche Rundung wie der Mittelwert) */
     const grenze = (je) => { let p = 1; for (const rb of Object.keys(je)) p *= rf !== null ? runden(je[rb], rf) : je[rb]; if (rf !== null) p = runden(p, rf); return runden(basis * p * (1 + pct / 100) + eurSumme, n); };
     sp = { unten: grenze(jeRubrikU), oben: grenze(jeRubrikO), text: 'Spanne aus den Konfidenzgrenzen der Faktoren' };
-  } else sp = spanneAnwenden(R.spanne, mittel, bj, n, hinweise);
+  } else sp = spanneAnwenden(R.spanne, mittel, bj, n, hinweise, objekt);
   const rechnung = basisText + (teile.length ? ' · ' + teile.join(', ') : '')
     + (prod !== 1 ? ' · Gesamtfaktor ' + zahlText(prod, 3) : '') + ' → Mittelwert ' + eur(mittel) + ' €/m²' + (sp.text ? ' · ' + sp.text : '');
   return { unten: sp.unten, mittel, oben: sp.oben, zelle: null, rechnung, hinweise };
