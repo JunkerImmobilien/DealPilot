@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-09T09:52:07.965Z",
+ "erzeugt_am": "2026-11-09T09:53:05.479Z",
  "quellen": {
-  "voice-import": "0112d1d0dbf27772",
+  "voice-import": "93c6117a13546a53",
   "objektart-felder": "f7d9212555982a97",
   "storage": "c2e7c9ad8bc3ab23",
-  "index-html": "7a0b78030edcd420",
+  "index-html": "c6aaf003b81c2b57",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4047,7 +4047,7 @@
      },
      {
       "h": "Alte Berichte wiederfinden",
-      "text": "Jeder Abruf landet im Verlauf des Objekts. Du findest ihn an drei Stellen:\n\n• Deal-Aktion → Abschnitt Marktberichte („Erzeugte Berichte als PDF“): neueste zuerst, mit Datum, Uhrzeit und Marktwert. PDF lädt den Bericht herunter, ✕ löscht ihn endgültig. Drei stehen offen, der Rest hinter „… weitere anzeigen“. Ab zwei Berichten zeigt eine Zeile die Entwicklung des Marktwerts und den Knopf Verlauf ansehen.\n• Pilot-Analyse → Unter-Reiter Marktbericht-Verlauf. Er erscheint erst, wenn mindestens zwei Berichte mit Marktwert vorliegen.\n• Im Marktbericht selbst die Grafik Marktwert-Verlauf dieses Objekts mit Marktwert und Deal-Score über die Zeit. Beim ersten Bericht steht dort „Erster gespeicherter Stand“.\n\nNoch kein Bericht da? In Deal-Aktion führt Marktbericht erstellen direkt hin."
+      "text": "Jeder Abruf landet im Verlauf des Objekts. Du findest ihn an zwei Stellen:\n\n• Deal-Aktion → Abschnitt Marktberichte („Gespeicherte Berichte als PDF“): neueste zuerst, mit Datum, Uhrzeit und Marktwert. PDF abrufen lädt den Bericht herunter, ✕ löscht ihn endgültig. Drei stehen offen, der Rest hinter „… weitere anzeigen“. Ab zwei Berichten zeigt eine Zeile die Entwicklung des Marktwerts und den Knopf Verlauf ansehen.\n• Pilot-Analyse → Unter-Reiter Marktbericht-Verlauf. Er erscheint erst, wenn mindestens zwei Berichte mit Marktwert vorliegen.\n\nNoch kein Bericht da? In Deal-Aktion führt Marktbericht erstellen in den Reiter Objekt zur Box Marktbericht abrufen."
      },
      {
       "h": "Verkehrswert ins Objekt übernehmen",
@@ -5549,7 +5549,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "09ed55c6e3da78cf",
+  "hilfe": "748ac17065ce32d2",
   "bewertung": "f427bd734c0570c3"
  }
 }

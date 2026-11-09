@@ -9476,9 +9476,10 @@
         '<div class="vi-sc-annahmen" style="margin-top:8px">'
       + '<b>Der vollständige Marktbericht ist erstellt.</b> Er führt zusätzlich '
       + 'Zensusdaten, Bevölkerungs- und Preisentwicklung, Vergleichsobjekte und die '
-      + 'ausformulierte Einordnung — und dort liegt auch das PDF. '
+      + 'ausformulierte Einordnung. Als PDF liegt er in Deal-Aktion unter „Marktberichte“. '
+      /* v3253 · Marcel 09.11.2026: kein Absprung mehr in die Marktbericht-Ansicht, nur das PDF */
       + '<button type="button" class="vi-rf-abruf-btn" id="vi-rf-zum-mb" '
-      + 'style="margin-top:6px">Marktbericht öffnen</button>'
+      + 'style="margin-top:6px">PDF abrufen</button>'
       + '</div>';
     }
 
@@ -9518,8 +9519,9 @@
         try { if (window.OA && typeof OA.setMode === 'function') OA.setMode(false, null); } catch (e) {}
         setTimeout(function () {
           try {
-            if (typeof window.openMarktberichtView === 'function') window.openMarktberichtView();
-            else if (typeof toast === 'function') toast('Marktbericht-Ansicht nicht verfügbar.');
+            /* v3253 · statt openMarktberichtView: Berichtsliste in Deal-Aktion */
+            if (typeof window.dpMbBerichteZeigen === 'function') window.dpMbBerichteZeigen();
+            else if (typeof toast === 'function') toast('Den Bericht findest du in Deal-Aktion unter „Marktberichte“.');
           } catch (e) {}
         }, 160);
       });

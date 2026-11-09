@@ -196,8 +196,9 @@
       if (a.payload && global.DealPilotMB && DealPilotMB.uebernehmen(a.payload)) { a.angewandt = true; zurKarte(); return; }
       /* Ergebnis nicht mehr im Speicher (Seite neu geladen): es liegt im
          Marktbericht-Verlauf dieses Objekts. */
-      if (typeof global.openMarktberichtView === 'function') global.openMarktberichtView();
-      else if (typeof global.toast === 'function') toast('Der Bericht liegt im Marktbericht-Verlauf dieses Objekts.');
+      /* v3253 · statt openMarktberichtView: die Berichtsliste in Deal-Aktion (PDF abrufen) */
+      if (typeof global.dpMbBerichteZeigen === 'function') global.dpMbBerichteZeigen();
+      else if (typeof global.toast === 'function') toast('Der Bericht liegt in Deal-Aktion unter „Marktberichte“.');
     }
     if (global._currentObjKey === a.key) { uebernehmen(); return; }
     if (typeof global.loadSaved !== 'function' || !a.key) return;
