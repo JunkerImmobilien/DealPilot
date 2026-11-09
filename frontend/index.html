@@ -57,7 +57,7 @@
 <link rel="stylesheet" href="css/objektdaten-raster.css?v=v3225a"><!-- v3225 - Marcel 08.11.2026: Objektdaten in Gruppen, Wertanker-Vergleich als eigene Zeile -->
 <link rel="stylesheet" href="css/finanzierung-raster.css?v=v3238"><!-- v3238 - Marcel 09.11.2026: Reiter Finanzierung in Gruppen, Anschlussfinanzierung als eigener Kasten -->
 <link rel="stylesheet" href="css/deal-aktion-karten.css?v=v3232"><!-- v3232 · Marcel 08.11.2026: Deal-Aktion in weißen Karten wie Reiter Objekt -->
-<link rel="stylesheet" href="css/objekt-ansichten.css?v=v3237"><!-- v3237 · Marcel 09.11.2026: Reiter Objekt - Lage kompakt, Wertparameter als Kacheln, Bodenrichtwert-Karte -->
+<link rel="stylesheet" href="css/objekt-ansichten.css?v=v3247"><!-- v3237 · Marcel 09.11.2026: Reiter Objekt - Lage kompakt, Wertparameter als Kacheln, Bodenrichtwert-Karte -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=v2132">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -1359,6 +1359,24 @@ label.dp-required.qc-required::after {
         </div>
 </div>
 <div class="card oe-karte" id="oe-karte-lage"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage &amp; Einschätzung <span class="oe-ct-hint">geht in den Investor Deal Score — immer sichtbar</span></div>
+        <!-- v3247 · Marcel 09.11.2026: „die Pilot-Lagebewertung bei Lage & Einschätzung über die Lageklasse setzen,
+             und neben dem Minimierungsbutton auch den Aufruf starten". Die Box steht jetzt VOR den Feldern; der
+             Knopf #ki-lage-btn bleibt der eine Aufrufweg (ki-lage.js), der Pfeil daneben setzt object-actions.js. -->
+        <div class="ki-lage-box ki-lage-box-bottom ki-lage-oben" id="ki-lage-box">
+      <div class="ki-lage-header">
+        <div class="ki-lage-title">
+          <span id="ki-lage-icon" class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
+          <span>Pilot-Lage-Bewertung</span>
+          <span class="ki-lage-tag" title="Vier Lage-Felder werden aus amtlichen Daten gemessen, zwei ergänzt die KI">4 gemessen · 2 KI</span>
+        </div>
+        <button class="btn btn-gold btn-sm" id="ki-lage-btn" onclick="runKiLage()" type="button" title="Lage aus amtlichen Daten messen und von der KI ergänzen lassen">
+          <span data-ico="sparkles" data-ico-size="14"></span> Lage analysieren
+        </button>
+      </div>
+      <div class="ki-lage-body" id="ki-lage-body">
+        <div class="ki-lage-empty">Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung — ein Klick, sobald die Adresse steht.</div>
+      </div>
+    </div>
 <div class="g3">
           <!-- v1958b: die Lageklasse A/B/C. Sie steht VOR Makro- und
                Mikrolage, weil sie etwas anderes ist: Makro- und Mikrolage
@@ -1415,21 +1433,8 @@ label.dp-required.qc-required::after {
       </div>
         </div>
         <div id="oe-lage-vergleich" class="oe-lage-vergleich" style="display:none"></div>
-        <div class="ki-lage-box ki-lage-box-bottom" id="ki-lage-box">
-      <div class="ki-lage-header">
-        <div class="ki-lage-title">
-          <span id="ki-lage-icon" class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
-          <span>Pilot-Lage-Bewertung</span>
-          <span class="ki-lage-tag" title="Vier Lage-Felder werden aus amtlichen Daten gemessen, zwei ergänzt die KI">4 gemessen · 2 KI</span>
-        </div>
-        <button class="btn btn-gold btn-sm" id="ki-lage-btn" onclick="runKiLage()" type="button">
-          <span data-ico="sparkles" data-ico-size="14"></span> Komplette Lage analysieren
-        </button>
-      </div>
-      <div class="ki-lage-body" id="ki-lage-body">
-        <div class="ki-lage-empty">Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung — ein Klick, sobald die Adresse steht.</div>
-      </div>
-    </div>
+        <!-- v3247 · hier stand die Pilot-Lage-Bewertung; sie steht jetzt oben in der Karte. Am Ende der Lage-Karte
+             haengt mb-abgleich.js die eingeklappte Zeile „Abweichungen zum Marktbericht“ ein (#mba-objekt, nach #oe-lage-vergleich). -->
 <div class="card-title">Wertanker</div>
         <!-- v3003 · Marcel 27.10.2026: „Marktwert/Verkehrswert, Herkunft und welcher Bericht in EINE Zeile, darunter Bankbewertung und Wert nach Sanierung."
              Feld-IDs unverändert; eigenes Raster (wa-raster), weil .g3 unter 900 px einspaltig fällt. -->
@@ -3924,7 +3929,7 @@ label.dp-required.qc-required::after {
 <script src="js/konto-stammdaten.js?v=v3217"></script><!-- v3040 · Stammdaten und Ersteinrichtung am Konto (user_settings stammdaten) -->
 <script src="js/dealscore2-ui.js?v=v3215"></script>
 <script src="js/ds2-ai.js?v=v3003a"></script>
-<script src="js/ki-lage.js?v=v3237"></script>
+<script src="js/ki-lage.js?v=v3247"></script>
 <script src="js/ki-miete.js?v=v3244"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v3058"></script>
@@ -3949,13 +3954,13 @@ label.dp-required.qc-required::after {
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
 <script src="js/data/detailgrad-zuordnung.js?v=v3243"></script>
 <script src="js/detailgrad.js?v=v3243"></script>
-<script src="js/objekt-reiter.js?v=v3242"></script>
+<script src="js/objekt-reiter.js?v=v3247"></script>
 <script src="js/paket-import.js?v=v3204"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v3246"></script>
-<script src="js/mfh-felder.js?v=v3236"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
+<script src="js/mfh-felder.js?v=v3247"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
@@ -4017,7 +4022,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresstaende.js?v=v3215"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/wert-zielbild.js?v=v3151"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3130"></script>
-<script src="js/mb-abgleich.js?v=v3245"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
+<script src="js/mb-abgleich.js?v=v3247"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v3223"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->

@@ -102,8 +102,36 @@
     var manuell = _v('brw_manuell');
     var q = status ? esc(status) : (brw ? 'gespeicherter Wert — Herkunft nicht vermerkt (Abruf oder Eingabe)' : 'noch nicht abgerufen — Knopf „Bodenrichtwert abrufen" oben');
     if (stich) q += ' · Stichtag ' + esc(stich);
-    if (manuell) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(manuell) + ' €/m² — ' + q;
-    return zeile('Bodenrichtwert', brw ? esc(brw) + ' €/m²' : '—', q, knopf(manuell ? 'ändern' : 'eintragen', 'brw_manuell'));
+    if (manuell) q = st('b', 'abweichend') + 'eigener Ansatz ' + deEin(manuell) + ' €/m² — ' + q;
+    return zeile('Bodenrichtwert', brw ? deEin(brw) + ' €/m²' : '—', q, knopf(manuell ? 'ändern' : 'eintragen', 'brw_manuell'));   /* v3247 · Tausenderpunkt */
+  }
+  /* v3247 · Marcel 09.11.2026: „die Werte besser formatieren". Eingaben stehen roh im Feld
+     („1200", „1.200", „3,5", „3.5"); hier wird daraus eine Zahl. Ein Punkt ist nur dann ein
+     Tausenderpunkt, wenn danach genau drei Ziffern folgen (1.200) — „3.5" bleibt 3,5. */
+  function zahlDe(s) {
+    var t = String(s == null ? '' : s).replace(/[\s €%]/g, '').replace(/m²$/, '');
+    if (!t) return null;
+    if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, '').replace(',', '.');
+    else t = t.replace(',', '.');
+    var n = Number(t);
+    return isFinite(n) ? n : null;
+  }
+  /* eine Eingabe deutsch formatiert, dMin..dMax Nachkommastellen; nicht lesbar → roh */
+  function deEin(s, dMin, dMax) {
+    var n = zahlDe(s); if (n == null) return esc(s);
+    try { return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dMin || 0, maximumFractionDigits: dMax == null ? 2 : dMax }).format(n); } catch (e) { return esc(s); }
+  }
+  /* v3247 · Wert einer Kachel in Zahl und Einheit zerlegen: die Zahl groß, die Einheit klein
+     dahinter („180 €/m²", „2,45 %", „80 / 34 J.", „8 von 20", „× 0,93"). Text bleibt Text.
+     Kein „undefined"/„NaN" auf einer Kachel — das wird zum Gedankenstrich. */
+  function wertTeile(w) {
+    var t = String(w == null ? '' : w).replace(/\s+/g, ' ').trim();
+    if (!t || /undefined|NaN|null|Infinity/.test(t)) return { z: '—', e: '' };
+    var m = t.match(/^((?:× ?)?(?:[−-]?[\d.,]+|—)(?: \/ (?:[\d.,]+|—))?)(?: (.+))?$/);
+    if (!m) return { z: t, e: '', text: t !== '—' && t !== '…' };
+    var e = m[2] || '';
+    if (/^J\.?$/.test(e)) e = 'Jahre';
+    return { z: m[1], e: e };
   }
 
   /* ══ v3237 · DIE PARAMETER ALS KACHELN ═══════════════════════════════
@@ -143,13 +171,20 @@
       });
       var qText = '';
       if (qEl) { var qc = qEl.cloneNode(true); Array.prototype.forEach.call(qc.querySelectorAll('.oe-st,.oe-chips,br'), function (x) { x.parentNode.removeChild(x); }); qText = String(qc.textContent || '').replace(/\s+/g, ' ').trim(); }
-      var karte = /^Bodenrichtwert$/.test(k) ? '<button type="button" class="oe-kachel-karte" data-brw-karte="1" title="Karte mit den Bodenrichtwertzonen rund um die Adresse">Karte</button>' : '';
-      return '<div class="oe-kachel" data-oe-kachel="' + i + '" role="button" tabindex="0" title="' + esc(qText ? k + ' — ' + qText : k) + '">'
+      /* v3247 · Marcel 09.11.2026: „bei Bodenrichtwert auf der Karte den Punkt Karte rausnehmen
+         und dort nur Eintragen anzeigen". Die Karte bleibt am Knopf neben „Bodenrichtwert abrufen". */
+      var wt = wertTeile(w);
+      var leer = wt.z === '—' || wt.z === '…';
+      return '<div class="oe-kachel' + (leer ? ' leer' : '') + '" data-oe-kachel="' + i + '" role="button" tabindex="0" title="' + esc(qText ? k + ' — ' + qText : k) + '">'
         + '<span class="oe-kachel-k">' + esc(k) + '</span>'
-        + '<span class="oe-kachel-w' + (w.length > 11 ? ' lang' : '') + '">' + esc(w) + '</span>'
+        + '<span class="oe-kachel-w' + (wt.text && wt.z.length > 11 ? ' lang' : '') + (wt.text ? ' text' : '') + '"><span class="oe-kachel-z">' + esc(wt.z) + '</span>'
+        + (wt.e ? '<span class="oe-kachel-e">' + esc(wt.e) + '</span>' : '') + '</span>'
         + (marken.length || ind ? '<span class="oe-kachel-m">' + marken.map(function (m) { return m.outerHTML; }).join('') + (ind ? '<span class="oe-kachel-ind">' + ind + '</span>' : '') + '</span>' : '')
         + (!marken.length && qText ? '<span class="oe-kachel-q">' + esc(qText) + '</span>' : '')
-        + ((aEl && aEl.innerHTML.trim()) || karte ? '<span class="oe-kachel-a">' + (aEl ? aEl.innerHTML : '') + karte + '</span>' : '')
+        /* btn-clean: nimmt die Knöpfe aus der Sammelregel .sec button:not(…) (style.css, !important, 9 Klassen
+           Spezifität) — sonst wird „eintragen" auf der Kachel ein weißer Kasten (gemessen v3247) */
+        + (aEl && aEl.innerHTML.trim() ? '<span class="oe-kachel-a">' + aEl.innerHTML.replace(/class="oe-btn"/g, 'class="oe-btn btn-clean"') + '</span>' : '')
+        + '<span class="oe-kachel-skala" aria-hidden="true"></span>'
         + '</div>';
     }).join('');
     box.innerHTML = '<div class="oe-kacheln">' + kacheln + '</div>'
@@ -469,11 +504,11 @@
           + (_zw && _zw.url ? ' (<a href="' + esc(_zw.url) + '" target="_blank" rel="noopener">' + esc(String(_zw.ausschuss || 'Ausschuss').split(',')[0]) + '</a>)' : '');
       }
       var eigen = _v('lzs_pct');
-      if (eigen) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(eigen) + ' % — amtlich ' + q;
-      html += zeile('Liegenschaftszins', deNum(r.wert_pct, 2) + ' %', q, knopf(eigen ? 'ändern' : 'eintragen', 'lzs_pct'));
+      if (eigen) q = st('b', 'abweichend') + 'eigener Ansatz ' + deEin(eigen, 2, 2) + ' % — amtlich ' + q;
+      html += zeile('Liegenschaftszins', r.wert_pct == null || !isFinite(Number(r.wert_pct)) ? '—' : deNum(r.wert_pct, 2) + ' %', q,   /* v3247 · kein „NaN %" */ knopf(eigen ? 'ändern' : 'eintragen', 'lzs_pct'));
       var sq = r.sachwertfaktor_quelle;
       var swfEigen = _v('sachwertfaktor');
-      if (swfEigen) html += zeile('Sachwertfaktor', esc(swfEigen), st('b', 'eigener Ansatz') + 'statt der Tabelle des Ausschusses', knopf('ändern', 'sachwertfaktor'));
+      if (swfEigen) html += zeile('Sachwertfaktor', deEin(swfEigen, 2, 3), st('b', 'eigener Ansatz') + 'statt der Tabelle des Ausschusses', knopf('ändern', 'sachwertfaktor'));
       /* v1852 · Marcel an der Bismarckstraße: „steht ‚im Bericht' — was ist
          damit gemeint?" Jetzt steht da, WAS der Ausschuss führt: eine
          Tabelle (dann wird der Faktor im Bericht aus dem vorläufigen
@@ -500,7 +535,7 @@
       var _istWhg = /ETW|WOHN/.test(_v('objart').toUpperCase());
       if (!_istWhg && uq) {
         var _ukQ = uq.quelle_url ? ' · <a href="' + esc(uq.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '';
-        if (ukEigen) html += zeile('Umrechnung Grundstücksgröße', esc(ukEigen), st('b', 'eigener Ansatz') + (uq.verfuegbar ? 'statt des Werts des Ausschusses' : 'eigene Angabe') + _ukQ, knopf('ändern', 'uk_flaeche'));
+        if (ukEigen) html += zeile('Umrechnung Grundstücksgröße', deEin(ukEigen, 2, 4), st('b', 'eigener Ansatz') + (uq.verfuegbar ? 'statt des Werts des Ausschusses' : 'eigene Angabe') + _ukQ, knopf('ändern', 'uk_flaeche'));
         else if (uq.verfuegbar && uq.anwendbar) html += zeile('Umrechnung Grundstücksgröße', uq.form_text || 'Tabelle vorhanden', st('a', uq.ebene === 'land' ? 'Landeswert' : 'Ausschuss') + '<span title="' + esc(uq.ausschuss || '') + '">' + esc(String(uq.ausschuss || '').split(',')[0]) + '</span>' + (uq.jahrgang ? ' · ' + esc(uq.jahrgang) : '') + _ukQ + ' — im Bericht aus Fläche und Bezugsgröße des Richtwertgrundstücks', '');
         /* v2358 · Greift im Bericht die DealPilot-Formel, sagt der Reiter es auch. */
         /* v2987 · Marcel 27.10.2026: „DealPilot-Formel - aber wie ist der Wert? Können wir den dort hinschreiben?"
@@ -526,7 +561,7 @@
       var wq = r.wgfz_quelle, wEigen = _v('wgfz_objekt');
       if (!_istWhg && wq && wq.verfuegbar) {
         var _wQ = wq.quelle_url ? ' · <a href="' + esc(wq.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '';
-        html += zeile('Umrechnung WGFZ', wEigen ? 'WGFZ ' + esc(wEigen) : 'Tabelle vorhanden',
+        html += zeile('Umrechnung WGFZ', wEigen ? 'WGFZ ' + deEin(wEigen, 1, 2) : 'Tabelle vorhanden',
           st('a', 'Ausschuss') + esc(String(wq.ausschuss || '').split(',')[0]) + (wq.seite ? ' · ' + esc(wq.seite) : '') + _wQ
           + (wEigen ? ' Greift, wenn die Bodenrichtwertzone eine GFZ nennt.' : ' Trag die WGFZ des Objekts ein — sonst bleibt der Bodenwert insoweit unangepasst.'),
           knopf(wEigen ? 'ändern' : 'eintragen', 'wgfz_objekt'));
