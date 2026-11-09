@@ -602,5 +602,92 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('L11 Satz einer anderen Gemeinde wird nicht gelesen', [P.msRegister(), m.vgl.quelle_art, m.vgl.ms.url, m.vgl.ms.gueltig_bis], [null, 'mietspiegel_einfach', null, null]);
 }
 
-console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250): ' + (n - fehler) + ' von ' + n + ' ok');
+/* ── M · v3255 · Mietspiegel-WERTE: Route (echte Funktionen, ohne DB), Wirkung in potenzial.js, MFH je Wohnung ── */
+{
+  const imp = (d) => import(new URL('file:///' + path.join(WURZEL, 'marktbericht/backend/src/lib/mietspiegel', d).replace(/\\/g, '/')).href);
+  const { mietspiegelFuer } = await imp('verzeichnis.js');
+  const { mietspiegelMitWerten, mietspiegelWerteFuer, werteFuer } = await imp('werte.js');
+  const route = (q) => mietspiegelMitWerten(mietspiegelFuer(q.ags), q);   /* = GET /mietspiegel (routes/api.js) */
+  let a = route({ ags: '05770024', baujahr: '1972', wfl: '50.3' });
+  gleich('M1 Tabelle Minden 1972, 50,3 m² (gerundet 50): 6,55 / 7,70 / 8,93, Zelle genannt', [a.werte_verfuegbar, a.werte.unten, a.werte.mittel, a.werte.oben, a.werte.zelle],
+    [true, 6.55, 7.7, 8.93, 'Baujahr 1961 bis 1977 · 50 m²']);
+  a = route({ ags: '05770024', baujahr: '1972', wfl: '50.3', merkmale: 'balkon,gegensprechanlage' });
+  gleich('M1 Anwendungsbeispiel Minden S. 15 (Balkon + Gegensprechanlage): 7,12 / 8,38 / 9,72', [a.werte.unten, a.werte.mittel, a.werte.oben], [7.12, 8.38, 9.72]);
+  a = route({ ags: '14713000', baujahr: '1965', wfl: '70' });
+  gleich('M2 Regression Leipzig 1965, 70 m²: 5,98 × 0,869 = 5,20; −0,60 / +0,52', [a.werte.unten, a.werte.mittel, a.werte.oben], [4.6, 5.2, 5.72]);
+  wahr('M2 Rechenweg nennt Basis und Faktor, Lage-Annahme als Hinweis', /Basis 5,98/.test(a.werte.rechnung) && /0,869/.test(a.werte.rechnung) && a.werte.hinweise.some((h) => /Lage nicht angegeben/.test(h)));
+  a = route({ ags: '05766020', baujahr: '1965', wfl: '70', lage: '1', merkmale: 'gefangener_raum,hochwertiger_boden,strassenlaerm' });
+  gleich('M2 Detmold ohne Sanitär-Auswahl (Query kennt nur Schalter): 6,12 + 0,57 − 0,32 + 0,44 − 0,27 = 6,54', a.werte.mittel, 6.54);
+  a = route({ ags: '05770024', baujahr: '1972', wfl: '170' });
+  wahr('M3 außerhalb (Minden 170 m², Geltung bis 160): null mit Hinweis, keine Verlängerung', a.werte.mittel === null && a.werte.unten === null && a.werte.hinweise.some((h) => /außerhalb/.test(h)));
+  a = route({ ags: '05758016', baujahr: '2024', wfl: '70' });
+  wahr('M3 außerhalb (Hiddenhausen Baujahr 2024, Tabelle bis 2022): null', a.werte.mittel === null && /Baujahr 2024/.test(a.werte.hinweise.join(' ')));
+  a = route({ ags: '05770016' });
+  gleich('M3 Gemeinde ohne Werte (Hüllhorst): werte_verfuegbar false, keine Werte', [a.werte_verfuegbar, a.werte], [false, undefined]);
+  a = route({ ags: '05766020' });
+  gleich('M3 ohne Baujahr/Fläche: nur werte_verfuegbar', [a.werte_verfuegbar, a.werte], [true, undefined]);
+  gleich('M3 Kern ohne Fläche: null mit Grund', mietspiegelWerteFuer(werteFuer('05770024'), { baujahr: 1972 }).hinweise, ['Wohnfläche fehlt — der Mietspiegel ordnet nach Wohnungsgröße']);
+
+  /* Wirkung: potenzial.js holt die Werte über Auth.apiCall (hier: dieselbe Routenfunktion) */
+  const cfgText = fs.readFileSync(JS('config.js'), 'utf8').replace(/\r\n/g, '\n');
+  const cm = /\n    mieteAngebotAbschlag: (\{[\s\S]*?\n    \}),/.exec(cfgText);
+  const CFG = { DealPilotConfig: { mieteAngebotAbschlag: cm ? vm.runInNewContext('(' + cm[1] + ')') : { stufen: {} } } };
+  const rufe = [];
+  async function lauf(feld, ags, mfh) {
+    const c = fenster(feld);
+    const satz = mietspiegelMitWerten(mietspiegelFuer(ags), {});
+    Object.assign(c, CFG, { _dpMarktdaten: { mietspiegel_register: { ags, satz } } });
+    c.Auth = { apiCall(url) { rufe.push(url); const q = Object.fromEntries(new URL('http://x' + url).searchParams); return Promise.resolve(JSON.parse(JSON.stringify(route(Object.assign(q, { ags: q.ags }))))); } };
+    if (mfh) { c._dpMfh = { einheiten: mfh }; c.DpMfhEinheiten = { artMitEinheiten: () => true }; }
+    const F = feld || {}, EL = {};
+    c.document.getElementById = (id) => (id in F ? (EL[id] = EL[id] || { value: F[id], innerHTML: '', addEventListener() {}, dispatchEvent() {} }) : null);
+    c._dpPotenzial = { ags, plz: F.plz };
+    lade(c, JS('mietpotenzial-kern.js')); lade(c, JS('potenzial.js'));
+    await c.DpPotenzial.kappungLaden();
+    c.DpPotenzial._el = EL;
+    return c.DpPotenzial;
+  }
+  const warte = () => new Promise((r) => setImmediate(r));
+  let P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12' }, '05770024');
+  P.modell(); await warte(); await warte();
+  let m = P.modell();
+  gleich('M4 Einzelobjekt Minden: Register-Werte rechnen, oberer Wert 8,93 (Standard), qualifiziert, Quelle Register',
+    [m.vgl.qm, m.vgl.quelle_art, m.vgl.ms.quelle, m.vgl.ms.unten, m.vgl.ms.mittel, m.vgl.werte && m.vgl.werte.zelle], [8.93, 'mietspiegel_qualifiziert', 'register', 6.55, 7.7, 'Baujahr 1961 bis 1977 · 50 m²']);
+  wahr('M4 Abruf mit Baujahr und Fläche über den Proxy', rufe.some((u) => /^\/marktbericht\/mietspiegel\?ags=05770024&baujahr=1972&wfl=50$/.test(u)));
+  P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12', 'ms-hinweis': '' }, '05770024');
+  P.modell(); await warte(); await warte();
+  P.msHinweis && P.msHinweis();
+  const txt = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '').replace(/&nbsp;| /g, ' ');
+  wahr('M7 Anzeige #ms-hinweis: „Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 / 7,70 / 8,93 €/m² · gerechnet mit oberem Wert“',
+    /Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 \/ 7,70 \/ 8,93 €\/m² · gerechnet mit oberem Wert/.test(txt));
+  wahr('M7 kein „Werte eintragen“, wenn das Register sie führt', !/Werte aus dem Mietspiegel eintragen/.test(txt));
+  P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ms_wahl: 'mittel', ds2_marktmiete: '12' }, '05770024');
+  P.modell(); await warte(); await warte();
+  gleich('M4 Wahl Mittelwert: 7,70', P.modell().vgl.qm, 7.7);
+  P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ms_oben: '9,50', ds2_marktmiete: '12' }, '05770024');
+  P.modell(); await warte(); await warte();
+  m = P.modell();
+  gleich('M5 Eingabe am Objekt schlägt Register-Werte', [m.vgl.qm, m.vgl.ms.quelle], [9.5, 'eingabe']);
+  P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', zb_vgl_qm: '7,10', ds2_marktmiete: '12' }, '05770024');
+  P.modell(); await warte(); await warte();
+  gleich('M5 eigene Vergleichsmiete schlägt Register-Werte', [P.modell().vgl.qm, P.modell().vgl.quelle_art], [7.1, 'eigen']);
+  P = await lauf({ plz: '32423', baujahr: '1972', wfl: '170', ds2_marktmiete: '12' }, '05770024');
+  P.modell(); await warte(); await warte();
+  m = P.modell();
+  gleich('M3 außerhalb der Tabelle: kein Mietspiegelwert, Schätzung bleibt', m.vgl.quelle_art, 'angebot_abschlag');
+  /* MFH: je Wohnung die eigene Zelle (Wohnungsgröße) */
+  const W = werteFuer('05770024');
+  const soll = (fl) => mietspiegelWerteFuer(W, { baujahr: 1972, wfl: fl }).oben;
+  const EIN = [{ nr: '1', wfl: '35', ist: '250', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' },
+    { nr: '2', wfl: '95', ist: '500', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' }];
+  P = await lauf({ plz: '32423', baujahr: '1972', ds2_marktmiete: '12' }, '05770024', EIN);
+  P.modell({ einheiten: EIN }); await warte(); await warte();
+  m = P.modell({ einheiten: EIN });
+  const vq = m.wohnungen.map((w) => w.soll && w.soll.vgl_qm);
+  gleich('M6 MFH: je Wohnung eigene Zelle — 35 m² und 95 m² (oberer Wert)', vq, [soll(35), soll(95)]);
+  wahr('M6 die beiden Zellen unterscheiden sich (Wohnungsgröße zählt)', vq[0] > vq[1]);
+  gleich('M6 Quelle je Wohnung: qualifizierter Mietspiegel', m.wohnungen.map((w) => w.soll && w.soll.vgl_quelle_art), ['mietspiegel_qualifiziert', 'mietspiegel_qualifiziert']);
+}
+
+console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

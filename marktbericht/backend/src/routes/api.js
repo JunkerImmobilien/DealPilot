@@ -16,7 +16,7 @@ import { oeffentlich as abschlagOeffentlich, RECHERCHE as ABSCHLAG_RECHERCHE, ak
 import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js';   /* v3021 */
 import { indexreihen } from '../lib/indexreihen.js';                             /* v3026 */
 import { mietspiegelFuer } from '../lib/mietspiegel/verzeichnis.js';              /* v3250 */
-import { werteFuer, mietspiegelWerteFuer } from '../lib/mietspiegel/werte.js';   /* v3255 */
+import { mietspiegelMitWerten } from '../lib/mietspiegel/werte.js';               /* v3255 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
@@ -1050,15 +1050,7 @@ router.get('/mietspiegel', (req, res) => {
     if (!r) return res.status(400).json({ error: 'ags (8-stellig) erforderlich' });
     /* v3255 · Werte (lib/mietspiegel/werte/<ags>.json): werte_verfuegbar immer; mit baujahr und/oder wfl
        zusätzlich werte = mietspiegelWerteFuer(...) für dieses Objekt (außerhalb der Tabelle null mit Hinweis). */
-    const w = werteFuer(r.ags);
-    r.werte_verfuegbar = !!w;
-    const q = req.query || {};
-    if (w && (q.baujahr || q.wfl)) {
-      const merkmale = {};
-      String(q.merkmale || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { merkmale[x] = true; });
-      r.werte = mietspiegelWerteFuer(w, { baujahr: q.baujahr, wfl: q.wfl, lage: q.lage || null, ausstattung: q.ausstattung || null, merkmale });
-    }
-    res.json(r);
+    res.json(mietspiegelMitWerten(r, req.query));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

@@ -335,3 +335,22 @@ export function werteFuer(ags, ordner) {
   const a = String(ags == null ? '' : ags).replace(/\D/g, '');
   return werteLaden(ordner).jeAgs.get(a.length === 7 ? '0' + a : a) || null;
 }
+
+/**
+ * Antwort der Route GET /mietspiegel (routes/api.js) um die Werte ergänzen - hier, damit Route und Prüfer
+ * (tools/mietpotenzial-pruefen.mjs, Abschnitt M) DIESELBE Stelle rufen.
+ * satz: Ergebnis von mietspiegelFuer(ags) (verzeichnis.js); q: Query { baujahr, wfl, lage, ausstattung, merkmale: 'a,b' }.
+ * Setzt satz.werte_verfuegbar immer; mit baujahr oder wfl zusätzlich satz.werte.
+ */
+export function mietspiegelMitWerten(satz, q, ordner) {
+  if (!satz) return satz;
+  const w = werteFuer(satz.ags, ordner);
+  satz.werte_verfuegbar = !!w;
+  q = q || {};
+  if (w && (q.baujahr || q.wfl)) {
+    const merkmale = {};
+    String(q.merkmale || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => { merkmale[x] = true; });
+    satz.werte = mietspiegelWerteFuer(w, { baujahr: q.baujahr, wfl: q.wfl, lage: q.lage || null, ausstattung: q.ausstattung || null, merkmale });
+  }
+  return satz;
+}
