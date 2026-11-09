@@ -547,7 +547,9 @@
         + '<span class="mfh-we-unter" id="mfh-we-unter"></span></div>'
         + '<button type="button" id="mfh-we-zu" aria-label="Schließen">✕</button></div>' +
       '<div class="mfh-we-leib">' +
-        blk('', 'Stammdaten', '<div class="mfh-we-raster">' +
+        /* v3265 · Kennzahlen der Wohnung als kleine Kacheln oben: Fläche · Ist · Mieterhöhung · Zielbild · Wert */
+        '<div class="mfh-we-fakten" id="mfh-we-fakten"></div>' +
+        blk('stamm', 'Stammdaten', '<div class="mfh-we-raster">' +
           f('nr', 'Nummer', String(i + 1)) +
           f('lage', 'Lage im Haus', 'EG links') +
           s('art', 'Art', [['wohnen', 'Wohnen'], ['gewerbe', 'Gewerbe']]) +
@@ -563,7 +565,7 @@
         /* v3193 · Marcel 05.11.2026: die Portfoliostrategie fand keine Ausstattungsmerkmale je Wohnung - „zum Aufklappen
            … dass wir das mit angeben können. Ansonsten können wir das irgendwie ableiten." Leer = in der Schnittstelle aus
            dem Gebäude abgeleitet (backend services/ausstattung.js) und so gekennzeichnet. */
-        '<details class="mfh-we-ausst"' + ((e.aus_kueche || e.aus_bad || e.aus_boden) ? ' open' : '') + '><summary style="cursor:pointer;font:600 13px Inter,sans-serif;margin:4px 0 2px;padding:11px 0">Ausstattung der Wohnung</summary>' +   /* v3196 · Messkabine 390 px: Schalter war 16 px hoch - jetzt rund 38 px treffbar */
+        '<details class="mfh-we-ausst"' + ((e.aus_kueche || e.aus_bad || e.aus_boden) ? ' open' : '') + '><summary class="mfh-we-sum">Ausstattung der Wohnung</summary>' +   /* v3196 · Messkabine 390 px: Schalter war 16 px hoch - jetzt rund 38 px treffbar */
           '<div class="mfh-we-raster">' +
             s('aus_kueche', 'Küche', [['', '— (aus dem Gebäude ableiten)'], ['keine', 'keine Einbauküche'], ['ebk_einfach', 'Einbauküche einfach'], ['ebk_hochwertig', 'Einbauküche hochwertig']]) +
             s('aus_bad', 'Bad', [['', '— (aus dem Gebäude ableiten)'], ['einfach', 'einfach / älter'], ['standard', 'Standard'], ['modern', 'modernisiert / gehoben']]) +
@@ -580,7 +582,7 @@
             s('nutzung_gew', 'Nutzungsart', GEWERBE_NUTZUNG) +
             f('markt_qm', 'Marktübliche Miete (€/m² · Monat)', 'optional', 'decimal') +
           '</div></div>') +
-        blk('', 'Mietvertrag · Ist',
+        blk('ist', 'Mietvertrag · Ist',
           '<div class="mfh-we-raster">' +
             f('ist', 'Ist-Kaltmiete (€/Monat)', '', 'decimal') +
             s('status', 'Status', [['vermietet', 'vermietet'], ['leer', 'leer']]) +
@@ -658,15 +660,20 @@
             f('ziel_qm', 'Zielmiete (€/m²)', 'z. B. 9,20', 'decimal') +
             f('ziel_wann', 'Wann', 'z. B. bei Mieterwechsel') +
           '</div><div class="mfh-we-ergebnis" id="mfh-we-ziel"></div>') +
-        blk('ew', 'Ertragswert dieser Wohnung',
-          '<div class="mfh-we-schalter" role="group" aria-label="Bewertungsart">'
+        /* v3265 · Marcel 09.11.2026: aufgeteilt → je Wohnung das Vergleichswertverfahren, der Ertragswert
+           nur noch stützend. Oben (#mfh-we-vw) das führende Verfahren, darunter unverändert der Ertragswert
+           (#mfh-we-ew - Drehbuch Modul 26 liest dort Kacheln und Zins). Ohne Aufteilung bleibt nur der
+           Ertragswert, wie bisher. */
+        blk('ew', (_weg ? 'Wert dieser Wohnung · Vergleichswert führend' : 'Ertragswert dieser Wohnung'),
+          '<div id="mfh-we-vw"></div>'
+            + '<div class="mfh-we-unterkopf" id="mfh-we-ew-kopf"' + (_weg ? '' : ' hidden') + '>Ertragswert <span id="mfh-we-ew-rolle">stützend</span></div>'
+            + '<div class="mfh-we-schalter" role="group" aria-label="Bewertungsart">'
             + '<button type="button" data-ewart="etw">als Eigentumswohnung</button><button type="button" data-ewart="haus">Anteil am Haus</button></div>'
             + '<div id="mfh-we-ew"></div>') +
-        '<h4>Bilder</h4>' +
-        '<p class="mfh-we-hint">Höchstens ' + WOHNUNG_FOTOS_MAX + ' Bilder je Wohnung, automatisch verkleinert.</p>' +
-        '<div id="mfh-we-bilder" class="mfh-we-bilder"></div>' +
-        '<input type="file" id="mfh-we-datei" accept="image/*" multiple style="display:none">' +
-        '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-bild-neu">Bilder hinzufügen</button>' +
+        blk('bild', 'Bilder <span class="mfh-we-kann mfh-we-kann-leise">höchstens ' + WOHNUNG_FOTOS_MAX + ', automatisch verkleinert</span>',
+          '<div id="mfh-we-bilder" class="mfh-we-bilder"></div>' +
+          '<input type="file" id="mfh-we-datei" accept="image/*" multiple style="display:none">' +
+          '<div><button type="button" class="btn btn-outline btn-sm" id="mfh-we-bild-neu">Bilder hinzufügen</button></div>') +
       '</div>' +
       '<div class="mfh-we-fuss"><button type="button" class="btn" id="mfh-we-ok">Fertig</button></div>' +
     '</div>';
@@ -750,6 +757,84 @@
           + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus: Maßnahmen dafür trägst du im Schritt Gebäude unter „Maßnahmen am ganzen Haus“ ein — ihr Kostenanteil und ihre Punkte sind hier schon enthalten. Die Zielmiete fließt nicht in die Mietentwicklung — nur in Pilot-Analyse und PDF.</p>';
       }
       ewZeichnen(m);
+      faktenZeichnen(m, w);
+    }
+    /* v3265 · die Kennzahlen oben: nichts gerechnet, nur gelesen (modell und gespeichertes Ergebnis) */
+    function faktenZeichnen(m, w) {
+      var h = el('mfh-we-fakten'); if (!h) return;
+      var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist);
+      var qm = function (v) { return wfl > 0 && v > 0 ? (v / wfl).toFixed(2).replace('.', ',') + ' €/m²' : ''; };
+      var kachel = function (t, v, z, cls) { return '<div class="' + (cls || '') + '"><span>' + t + '</span><b>' + v + '</b>' + (z ? '<small>' + z + '</small>' : '') + '</div>'; };
+      var so = w && w.soll && w.soll.miete != null && w.soll.miete > ist ? w.soll.miete : null;
+      var r = P.ergebnis(opts()), we = r ? P.wohnungErgebnis(r, m, i) : null;
+      var fv = we && we.fuehrend ? we.fuehrend.bestand : null;
+      var ewB = we && we[_weg ? 'als_etw' : 'anteil_am_haus'] ? we[_weg ? 'als_etw' : 'anteil_am_haus'].bestand : null;
+      var wertK = fv && fv.wert != null
+        ? kachel('Wert heute', eur(fv.wert), fv.verfahren === 'ertragswert_etw' ? 'Ertragswert ersatzweise' : (fv.verfahren === 'vergleichswert_amtlich' ? 'Vergleichswert amtlich' : 'Vergleichswert indikativ'), 'k-wert')
+        : kachel(_weg ? 'Wert heute' : 'Ertragswert heute', ewB != null ? eur(ewB) : '—', ewB != null ? (_weg ? 'Ertragswert' : 'Anteil am Haus') : 'noch nicht gerechnet', 'k-wert');
+      h.innerHTML = kachel('Fläche', wfl > 0 ? Math.round(wfl) + ' m²' : '—', zahl(e.zimmer) ? String(e.zimmer).replace('.', ',') + ' Zimmer' : '')
+        + kachel('Ist-Miete', e.status === 'leer' ? 'leer' : (ist > 0 ? eur(ist) : '—'), e.status === 'leer' ? '' : qm(ist))
+        + kachel('Mieterhöhung', so != null ? eur(so) : '—', so != null ? qm(so) : 'keine', 'k-soll')
+        + kachel('Zielbild', w && w.ziel != null ? eur(w.ziel) : '—', w && w.ziel != null ? qm(w.ziel) : 'nicht geplant', 'k-ziel')
+        + wertK;
+    }
+    /* v3265 · WERT JE WOHNUNG BEI AUFTEILUNG. Führend das Vergleichswertverfahren - amtlicher
+       Vergleichsfaktor bzw. Immobilienrichtwert, sonst Angebotspreise für Wohnungen am Ort minus
+       Abschlag (indikativ, Stufe-M-Logik). Gerechnet im Marktbericht-Dienst (PotenzialService,
+       Aufteilerwert); hier nur gezeigt. Ohne Angebotsniveau: der Weg dorthin, Ertragswert ersatzweise. */
+    function vwZeichnen(m, r, we) {
+      var h = el('mfh-we-vw'), kopf = el('mfh-we-ew-kopf'), rolle = el('mfh-we-ew-rolle');
+      if (!h) return;
+      if (kopf) kopf.hidden = !_weg;
+      if (!_weg) { h.innerHTML = ''; return; }
+      var A = r && r.aufteilung;
+      /* dieselbe Menge wie der Dienst: Wohnungen des Modells (Fläche oder Ist-Miete erfasst) ohne Fläche - eine leere Zeile zählt nicht */
+      var ohneFl = (m && m.wohnungen ? m.wohnungen : []).filter(function (x) { return x.art !== 'gewerbe' && !(zahl(x.wfl) > 0); });
+      if (ohneFl.length) {
+        h.innerHTML = '<p class="mfh-we-hint mfh-we-hint-offen">Der Vergleichswert je Wohnung führt erst, wenn <b>alle Wohnungen eine Wohnfläche</b> haben — offen: '
+          + esc(ohneFl.map(function (x) { return 'Nr. ' + (x.nr || '?'); }).join(', ')) + '. Bis dahin gilt der Ertragswert.</p>';
+        if (rolle) rolle.textContent = 'bis dahin führend';
+        return;
+      }
+      if (!r || !r.verfuegbar || !we) {
+        h.innerHTML = '<p class="mfh-we-hint">Vergleichswert und Ertragswert dieser Wohnung kommen mit „Ertragswerte rechnen“ (Marktbericht-Dienst, kein Kontingent).</p>';
+        if (rolle) rolle.textContent = 'stützend';
+        return;
+      }
+      var fv = we.fuehrend ? we.fuehrend.bestand : null, fz = we.fuehrend ? we.fuehrend.zielbild : null;
+      var vg = we.vergleich_etw ? we.vergleich_etw.bestand : null, mp = we.mpi_etw || null;
+      var eurN = function (v) { return v != null && isFinite(v) ? eur(v) : '—'; };
+      var ausschuss = function (s) { return String(s || '').replace(/^Der\s+/, ''); };
+      var dat = function (s) { var d = s ? new Date(s) : null; return d && !isNaN(d) ? d.toLocaleDateString('de-DE') : ''; };
+      var verf = fv && fv.verfahren;
+      var html = '';
+      if (verf === 'vergleichswert_amtlich' || verf === 'vergleichswert_angebote') {
+        var amt = verf === 'vergleichswert_amtlich';
+        html += '<div class="mfh-we-wert">'
+          + '<div class="mfh-we-wert-haupt"><span>Vergleichswert · führend</span><b>' + eurN(fv.wert) + '</b>'
+          + '<small>' + (amt ? 'amtlicher Vergleichsfaktor' : 'indikativ, aus Angebotspreisen abgeleitet') + '</small></div>'
+          + '<div class="mfh-we-kv">'
+          + (amt
+              ? '<div><span>Vergleichsfaktor</span><b>' + (vg && vg.faktor_qm ? Math.round(vg.faktor_qm).toLocaleString('de-DE') + ' €/m²' : '—') + '</b></div>'
+                + '<div><span>Herkunft</span><b>' + esc((vg && (vg.quelle || 'Vergleichsfaktor')) + (vg && vg.ausschuss ? ' · ' + ausschuss(vg.ausschuss) : '')) + (vg && vg.stufe ? ' · Stufe ' + esc(vg.stufe) : '') + '</b></div>'
+              : '<div><span>Angebotsniveau Wohnungen</span><b>' + (mp && mp.median_qm ? Math.round(mp.median_qm).toLocaleString('de-DE') + ' €/m²' : '—') + '</b></div>'
+                + '<div><span>× Wohnfläche</span><b>' + Math.round(zahl(e.wfl)) + ' m²</b></div>'
+                + '<div><span>Abschlag auf Angebote</span><b>' + (mp && mp.abschlag_pct != null ? '− ' + String(mp.abschlag_pct).replace('.', ',') + ' %' : '—') + '</b></div>')
+          + (fz && fz.wert != null ? '<div><span>Zielbild</span><b class="c-ziel">' + eurN(fz.wert) + '</b></div>' : '')
+          + '</div></div>'
+          + (amt ? '' : '<p class="mfh-we-hint">Angebotspreise für Eigentumswohnungen am Ort (Flächenklasse dieser Wohnung'
+              + (mp && mp.stichprobe ? ', ' + mp.stichprobe + ' Angebote' : '') + ') × Wohnfläche mit den Objektfaktoren, abzüglich '
+              + (mp && mp.abschlag_pct != null ? String(mp.abschlag_pct).replace('.', ',') + ' %' : 'des') + ' Abschlag auf Angebotspreise'
+              + (mp && mp.quelle === 'abruf' && mp.abgerufen_am ? ' · Angebotsniveau aus dem Abruf „Marktpreise“ vom ' + esc(dat(mp.abgerufen_am)) : '')
+              + '. Angebotspreise sind keine Kaufpreise (§ 25 Abs. 1 ImmoWertV): genauer geht es mit einem amtlichen Vergleichsfaktor des Gutachterausschusses.</p>');
+        if (rolle) rolle.textContent = 'stützend';
+      } else {
+        html += '<p class="mfh-we-hint mfh-we-hint-offen"><b>Vergleichswert: kein Angebotsniveau für Wohnungen an diesem Ort</b> — die Marktpreise in der Pilot-Analyse unter „Abrufe“ abrufen (Marktbericht-Dienst, 1 × erweiterte Marktpreisindikation), danach „Ertragswerte rechnen“. '
+          + (vg && !vg.wert && vg.offen && vg.offen.length ? 'Ein amtlicher Vergleichsfaktor liegt vor, für diese Wohnung fehlt: ' + esc(vg.offen.join(', ')) + '. ' : '')
+          + 'Bis dahin steht der Ertragswert <b>ersatzweise</b>.</p>';
+        if (rolle) rolle.textContent = 'ersatzweise';
+      }
+      h.innerHTML = html;
     }
     function ewZeichnen(m) {
       var h = el('mfh-we-ew'); if (!h || !P) return;
@@ -757,7 +842,7 @@
         b.setAttribute('aria-pressed', b.getAttribute('data-ewart') === _ewArt ? 'true' : 'false');
         if (b.getAttribute('data-ewart') === 'etw') { b.disabled = !_weg; b.title = _weg ? '' : 'Nur mit dem Haken „In Wohnungseigentum aufgeteilt“ unter den Einheiten (Schritt 2)'; }
       });
-      if (!m.aktiv) { h.innerHTML = '<p class="mfh-we-hint">Erst eine Soll-Miete oder ein Zielbild eintragen — dann rechnet DealPilot den Ertragswert je Stufe.</p>'; return; }
+      if (!m.aktiv) { h.innerHTML = '<p class="mfh-we-hint">Erst eine Soll-Miete oder ein Zielbild eintragen — dann rechnet DealPilot den Ertragswert' + (_weg ? ' und den Vergleichswert' : '') + ' je Stufe.</p>'; var _v0 = el('mfh-we-vw'); if (_v0) _v0.innerHTML = ''; return; }
       var r = P.ergebnis(opts()), we = r ? P.wohnungErgebnis(r, m, i) : null;
       var feld = _ewArt === 'etw' ? 'als_etw' : 'anteil_am_haus';
       var werte = we && we[feld] ? we[feld] : null;
@@ -780,19 +865,11 @@
               + ' · ' + esc(P.KENNZEICHNUNG) + '</p>'
           : '<p class="mfh-we-hint">' + (P.ergebnisVeraltet() ? 'Die Angaben haben sich geändert. ' : '') + 'Der Ertragswert kommt aus demselben Rechenkern wie der Marktbericht Stufe 3 (kein Kontingent).</p>')
         + '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-ew-los">Ertragswerte rechnen</button>';
-      /* v3200 · als Eigentumswohnung führt der Vergleichswert (amtlicher Vergleichsfaktor mit den Merkmalen dieser Wohnung);
-         der Ertragswert darunter ist das stützende Verfahren. */
-      if (_ewArt === 'etw' && we && (we.vergleich_etw || we.fuehrend)) {
-        var _vg = we.vergleich_etw ? we.vergleich_etw.bestand : null, _fv = we.fuehrend ? we.fuehrend.bestand : null;
-        var _vt = { vergleichswert_amtlich: 'Vergleichswert (amtlicher Vergleichsfaktor)', vergleichswert_angebote: 'Vergleichswert aus Angeboten', ertragswert_etw: 'Ertragswert als Eigentumswohnung' };
-        var _box = document.createElement('div');
-        _box.innerHTML = '<div class="mfh-we-kv"><div><span>Führendes Verfahren</span><b>' + esc(_fv && _fv.verfahren ? _vt[_fv.verfahren] || _fv.verfahren : '—') + '</b></div>'
-          + '<div><span>Wert der Wohnung (Bestand)</span><b>' + (_fv && _fv.wert != null ? eur(_fv.wert) : '—') + '</b></div>'
-          + (_vg && _vg.wert ? '<div><span>Vergleichsfaktor</span><b>' + String(Math.round(_vg.faktor_qm)) + ' €/m²' + (_vg.ausschuss ? ' · ' + esc(String(_vg.ausschuss).replace(/^Ders+/, '')) : '') + '</b></div>' : '') + '</div>'
-          + (_vg && !_vg.wert && _vg.offen && _vg.offen.length ? '<p class="mfh-we-hint">Amtlicher Vergleichsfaktor vorhanden, aber für diese Wohnung offen: ' + esc(_vg.offen.join(', ')) + '.</p>' : '')
-          + '<p class="mfh-we-hint">Darunter das stützende Verfahren: Ertragswert mit dem Liegenschaftszins für Wohnungseigentum.</p>';
-        h.insertBefore(_box, h.firstChild);
-      }
+      /* v3265 · das führende Verfahren steht jetzt in einem eigenen Feld darüber (#mfh-we-vw, vwZeichnen) -
+         bis hier wurde es VOR die Ertragswert-Kacheln in #mfh-we-ew eingeschoben, und der erste Hinweis dort
+         war nicht mehr der mit dem Zins (Drehbuch Modul 26). Dabei fiel ein Regex ohne Backslash auf
+         (/^Ders+/ statt /^Der\s+/: „Der Gutachterausschuss“ blieb stehen). */
+      vwZeichnen(m, r, we);
       el('mfh-we-ew-los').onclick = function () {
         var b = el('mfh-we-ew-los'); b.disabled = true; b.textContent = 'wird gerechnet …';
         P.rechnen(Object.assign(opts(), { erzwingen: true })).then(function (res) {
@@ -923,7 +1000,7 @@
             + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)'
             + '<span class="mfh-info" tabindex="0" role="img" aria-label="' + esc(tipp) + '" title="' + esc(tipp) + '">i</span>'
             + '<div id="mfh-weg-text" class="mfh-leise"' + (_weg ? '' : ' style="display:none"') + '>'
-            + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt; das Wertpotenzial (Pilot-Analyse, PDF) zeigt zusätzlich jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung.</div></span></label>'
+            + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt. Je Wohnung führt dann der Vergleichswert (Ertragswert stützend); Reiter Ergebnis, Pilot-Analyse und PDF zeigen die Summe nach Aufteilung.</div></span></label>'
             /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
             + '<div id="mfh-weg-kosten" class="mfh-feldzeile" style="margin:8px 0 0 21px;display:' + (_weg ? 'flex' : 'none') + '"><label for="mfh-auftk">Kosten der Aufteilung</label>'
             + '<input class="mfh-in mfh-md mfh-in-gross" id="mfh-auftk" inputmode="decimal" style="width:150px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
@@ -935,8 +1012,8 @@
   }
   var WEG_TIPP = 'Haken setzen, wenn für das Haus eine Teilungserklärung nach WEG besteht (oder du mit Aufteilung rechnen willst). '
     + 'Dann: 1) erscheint das Feld „Kosten der Aufteilung“ (leer = 1.800 € je Wohnung, schon aufgeteilt: 0); '
-    + '2) rechnet der Ertragswert im Wohnungsfenster auch „als Eigentumswohnung“; '
-    + '3) zeigt das Wertpotenzial in Pilot-Analyse und PDF jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung, abzüglich der Aufteilungskosten; '
+    + '2) führt im Wohnungsfenster je Wohnung das Vergleichswertverfahren — amtlicher Vergleichsfaktor, sonst Angebotspreise für Wohnungen am Ort minus Abschlag (indikativ), sobald alle Wohnungen eine Wohnfläche haben; der Ertragswert „als Eigentumswohnung“ steht stützend daneben; '
+    + '3) zeigen Reiter Ergebnis, Pilot-Analyse und PDF die Summe nach Aufteilung mit ihrem führenden Verfahren, abzüglich der Aufteilungskosten; '
     + '4) nennen PDF und Bankunterlagen „in Wohnungseigentum aufgeteilt (WEG)“. '
     + 'Score und Cashflow bleiben unberührt.';
   /* v3130 · N115 · zeichnet den Vorschlag aus dem Arbeitsstand; „übernehmen" setzt ziel_qm (und, wenn leer,
@@ -960,24 +1037,36 @@
     var kopf = '<tr style="text-align:left;color:#8A8272"><th style="min-width:140px">Einheit</th>'
       + WE_IDS.map(function (id) { return '<th>' + esc(labelVon(id).replace(/^Modernisierung /, '').replace(/ \(.*/, '').replace(/^Verbesserung /, '')) + '</th>'; }).join('') + '<th style="text-align:right">Punkte</th></tr>';
     var zeilen = _arbeit.map(function (e, i) {
-      var opts = [['', 'wie Gebäude']].concat(STUFEN);
       return '<tr><td style="padding:6px 8px 6px 0">' + esc((e.nr ? 'Nr. ' + e.nr : '#' + (i + 1)) + (e.lage ? ' · ' + e.lage : '')) + '</td>'
-        + WE_IDS.map(function (id) { return '<td style="padding:4px 6px 4px 0">' + selHtml('data-mi="' + i + '" data-mk="' + id + '"', (e.mod && e.mod[id]) || '', opts) + '</td>'; }).join('')
+        + WE_IDS.map(function (id) {
+            /* v3265 · die leere Wahl nennt, WAS sie erbt („wie Haus: teilweise erneuert"), grau und kursiv;
+               eine eigene Angabe steht normal - so sieht man die Abweichungen ohne die Tabelle darüber */
+            var v = (e.mod && e.mod[id]) || '';
+            var opts = [['', 'wie Haus: ' + stufeText(_geb[id])]].concat(STUFEN);
+            return '<td style="padding:4px 6px 4px 0">' + selHtml('data-mi="' + i + '" data-mk="' + id + '"', v, opts).replace('class="mfh-in mfh-sel"', 'class="mfh-in mfh-sel ' + (v ? 'mfh-eigen' : 'mfh-erbt') + '"') + '</td>';
+          }).join('')
         + '<td style="padding:4px 0;text-align:right;font-weight:600" data-punkte="' + i + '">—</td></tr>';
     }).join('');
-    /* v3252 · oben als kleine Tabelle, was die Einheiten vom Haus erben (Schritt 1) — darunter
-       ausfüllen, nur wo eine Wohnung abweicht. Marcel: „gemeinsam vom Haus geerbt als Tabelle
-       und dann zum Ausfüllen". Nur gelesen, keine zweite Eingabe. */
-    var erbe = '<div class="mfh-scroll"><table class="mfh-erbe"><thead><tr>'
+    /* v3265 · Marcel 09.11.2026: „im Zustand ‚vom Haus geerbt' könnte oben besser aussehen, einfacher
+       dargestellt. Muss das da überhaupt hin oder ist das sonst schon ersichtlich?" Gemessen: die
+       Tabelle (v3252) wiederholte nur die Auswahl aus dem Reiter Gebäude, acht Spalten, auf dem Handy
+       quer zu scrollen. Entschieden: EINE Zeile („vom Haus: Dach teilweise · … · 8 Punkte") mit „Details"
+       zum Aufklappen; je Einheit nennt die leere Wahl den geerbten Wert selbst. Nur gelesen. */
+    var _gp = 0; GEB_IDS.concat(WE_IDS).forEach(function (id) { _gp += punkteVon(id, _geb[id] || '0'); });
+    var _kurz = function (id) { var v = String(_geb[id] || '0'); return gewerkKurz(id) + ' ' + (v === 'v' ? 'erneuert' : (v === 'h' ? 'teilweise' : 'nicht mod.')); };
+    var erbe = '<details class="mfh-erbe-kurz"><summary><span class="mfh-erbe-zeile"><b>Vom Haus:</b> '
+      + esc(GEB_IDS.map(_kurz).join(' · ')) + ' <span class="mfh-leise">· Vorgabe je Wohnung: ' + esc(WE_IDS.map(_kurz).join(' · ')) + '</span>'
+      + ' · <b>' + Math.min(20, _gp) + ' Punkte</b></span><span class="mfh-erbe-mehr">Details</span></summary>'
+      + '<div class="mfh-scroll"><table class="mfh-erbe"><thead><tr>'
       + GEB_IDS.map(function (id) { return '<th>' + esc(gewerkKurz(id)) + '</th>'; }).join('')
       + WE_IDS.map(function (id) { return '<th class="mfh-erbe-v">' + esc(gewerkKurz(id)) + '</th>'; }).join('')
       + '</tr></thead><tbody><tr>'
       + GEB_IDS.map(function (id) { return '<td>' + esc(stufeText(_geb[id])) + '</td>'; }).join('')
       + WE_IDS.map(function (id) { return '<td class="mfh-erbe-v">' + esc(stufeText(_geb[id])) + '</td>'; }).join('')
-      + '</tr></tbody></table></div>';
-    return intro('Nur Wohnungen anfassen, die vom Haus abweichen — „wie Gebäude" übernimmt die Vorgabe aus Schritt 1.',
+      + '</tr></tbody></table></div><p class="mfh-leise" style="margin:6px 0 0">Ändern im Reiter <b>Gebäude</b>. Dach, Außenwand, Leitungen und Heizung gelten immer für alle Einheiten; die Vorgabe je Wohnung gilt, bis du sie unten änderst.</p></details>';
+    return intro('Nur Wohnungen anfassen, die vom Haus abweichen — grau und kursiv steht, was vom Haus kommt.',
         'Dach, Außenwand, Leitungen und Heizung kommen immer vom Haus. Fenster, Bäder, Innenausbau und Grundriss stehen auf der Vorgabe des Hauses, bis du sie für eine Einheit änderst; die Punkte je Einheit rechnen sofort mit.')
-      + blatt('Vom Haus geerbt', erbe, 'aus Schritt 1 · Vorgabe hell', 'mfh-blatt-haus')
+      + erbe
       + blatt('Je Einheit ausfüllen', '<div class="mfh-scroll"><table class="mfh-tab mfh-tab-zustand" style="font-size:12.5px"><thead>' + kopf + '</thead><tbody>' + zeilen + '</tbody></table></div>', 'nur Abweichungen');
   }
 
@@ -1135,7 +1224,40 @@
             + (i.kernsaniert ? ' · Kernsanierung angesetzt' : '')
             + '</div>';
         })()
-      + '</div>', 'geht ins Objekt');   /* v3252 · Ende der Karte „Haus gesamt"; der Satz zum RND-Kern steht unter „Mehr" */
+      , 'geht ins Objekt')   /* v3265 · hier stand ein '</div>' zu viel (die Karte schliesst blatt() selbst; gemessen mit der DOM-Attrappe: 6 auf, 7 zu) · v3252 · Ende der Karte „Haus gesamt"; der Satz zum RND-Kern steht unter „Mehr" */
+      + aufteilungKarte();   /* v3265 */
+  }
+  /* v3265 · SUMME NACH AUFTEILUNG im Reiter Ergebnis, mit führendem Verfahren benannt. Nur gezeigt:
+     gerechnet hat der Marktbericht-Dienst (PotenzialService, Aufteilerwert) - dieselbe Zahl wie in
+     Pilot-Analyse und PDF. Nur mit dem Haken „In Wohnungseigentum aufgeteilt". */
+  function aufteilungKarte() {
+    if (!_weg) return '';
+    var P = window.DpPotenzial;
+    if (!P || typeof P.ergebnis !== 'function') return '';
+    var o = { einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM };
+    var r = null; try { r = P.ergebnis(o); } catch (x) { r = null; }
+    var A = r && r.verfuegbar ? r.aufteilung : null;
+    var knopf = '<button type="button" class="btn btn-outline btn-sm" id="mfh-erg-rechnen">Werte rechnen</button>';
+    if (!A || !A.je_stufe || !A.je_stufe.bestand) {
+      return blatt('Wert nach Aufteilung', '<p class="mfh-leise" style="margin:0 0 8px">'
+        + (P.ergebnisVeraltet && P.ergebnisVeraltet() ? 'Die Angaben haben sich geändert. ' : '')
+        + 'Je Wohnung der Vergleichswert (führend) und der Ertragswert als Eigentumswohnung (stützend), summiert gegen das Haus als Ganzes — gerechnet vom Marktbericht-Dienst wie Bericht Stufe 3 (kein Kontingent). Braucht eine Soll-Miete oder ein Zielbild an mindestens einer Wohnung.</p>' + knopf, 'Bestand');
+    }
+    var T = A.aufteiler && A.aufteiler.bestand, S = A.je_stufe.bestand, H = r.haus && r.haus.bestand;
+    var e0 = function (v) { return v != null && isFinite(v) ? eur(v) : '—'; };
+    var zl = function (t, v, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + t + '</td><td class="mfh-zahl">' + v + '</td></tr>'; };
+    var pot = T || S;
+    return blatt('Wert nach Aufteilung', '<table class="mfh-erg-tab mfh-auft-tab"><tbody>'
+      + zl('Haus als Ganzes (Ertragswert)', e0(H && H.wert))
+      + (T ? zl('Summe nach Aufteilung · <b>' + esc(T.bezeichnung || 'Vergleichswert') + '</b> <small>führend</small>', e0(T.summe) + (T.vollstaendig ? '' : '*')) : '')
+      + zl('Summe der Ertragswerte als Eigentumswohnung <small>' + (T ? 'stützend' : 'führend') + '</small>', e0(S.summe) + (S.vollstaendig ? '' : '*'))
+      + zl('− Kosten der Aufteilung', e0(-A.kosten_eur))
+      + zl(T ? 'Aufteilerwert' : 'Summe nach Aufteilung', e0(T ? T.wert : S.summe - A.kosten_eur), 'mfh-summe-z')
+      + zl('Aufteilungspotenzial', pot.potenzial < 0 ? 'kein Potenzial' : '+' + e0(pot.potenzial), 'mfh-summe-z')
+      + '</tbody></table>'
+      + (A.aufteiler_gesperrt ? '<p class="mfh-leise" style="margin:6px 0 0;color:#B8625C">' + esc(A.aufteiler_gesperrt.grund) + '</p>' : '')
+      + ((T && !T.vollstaendig) || !S.vollstaendig ? '<p class="mfh-leise" style="margin:6px 0 0">* nicht für jede Wohnung ein Wert.</p>' : '')
+      + '<p class="mfh-leise" style="margin:6px 0 8px">Stufe Bestand. Mieterhöhung und Zielbild, je Wohnung und mit Herkunft: Pilot-Analyse › Wertpotenzial und PDF.</p>' + knopf, 'Bestand');
   }
 
   function koerper() { return [schritt1, schritt2, schritt3, schritt4][_schritt](); }
@@ -1414,6 +1536,96 @@
       '  #mfh-modal .mfh-akt-reihe{justify-content:flex-start}',
       '  #mfh-modal .mfh-akt.mfh-det{max-width:none}',
       '}',
+      /* ══ v3265 · WOHNUNGSFENSTER WIE DER REITER OBJEKT ═══════════════════
+         Maßstab: Kopf-Tabelle in frontend/css/einheitlich.css (getComputedStyle im Reiter Objekt).
+         Vorher → nachher (im Code gelesen, Browser-Abnahme offen):
+           Feld        Radius 8 · Rahmen #E6E0D3 · Polster 7/9 · ca. 31 px hoch · kein Fokusring
+                    →  Radius 2 · Rahmen #E6E1D6 · Polster 0 11 · 38 px (Handy 44 px, 16 px Schrift) · Ring Gold 16 %
+           Beschrift.  Inter 11,5 px / 400 #6B6356   →  Inter 11 px / 500 rgba(42,39,39,.85) (Handy 10,5)
+           Hinweis     Inter 11,5 px #8A8272 gerade  →  Inter 10,5 px kursiv rgba(42,39,39,.68)
+           Blockkopf   Mono 11,5 px / 600, farbig, ohne Linie → Mono 10 px / 700 Versalien #6B645A über Goldlinie
+           Block       Radius 12 · Rahmen #EFE7D6 / blau / grün, Grund weiß auf weiß
+                    →  Radius 2 · 1 px Gold 22 %, weiße Karte auf Creme #FDFCFA
+           Zwischenkopf h4  Space Grotesk 12 px Gold → Mono 10 px / 700 Versalien #6B645A
+           Kennzahlen  Text untereinander (Inter 14 px) → Kacheln (Mono-Etikett 9,5 px, Wert 14 px)
+         Gold nur über var(--wl-…); Statusfarben (blau/grün/rot) bleiben. */
+      '#mfh-we-ov .mfh-we-leib{background:#FDFCFA}',
+      '#mfh-we-ov .mfh-we-kopf>div>b{font:600 16px/1.3 "Space Grotesk",sans-serif;color:#050505}',
+      '#mfh-we-ov .mfh-we-blk{background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);border-radius:2px;padding:12px 16px 14px;gap:10px;min-width:0}',
+      '#mfh-we-ov .mfh-we-blk.soll,#mfh-we-ov .mfh-we-blk.ziel{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)}',
+      '#mfh-we-ov .mfh-we-blk-t{font:700 10px/1.3 "JetBrains Mono",monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A;',
+      '  padding-bottom:7px;border-bottom:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);flex-wrap:wrap}',
+      '#mfh-we-ov .mfh-we-blk-t::before{width:6px;height:6px}',
+      '#mfh-we-ov .mfh-we-blk.soll .mfh-we-blk-t,#mfh-we-ov .mfh-we-blk.ziel .mfh-we-blk-t,#mfh-we-ov .mfh-we-blk.ew .mfh-we-blk-t{color:#6B645A}',
+      '#mfh-we-ov .mfh-we-blk.stamm .mfh-we-blk-t::before,#mfh-we-ov .mfh-we-blk.ist .mfh-we-blk-t::before,#mfh-we-ov .mfh-we-blk.bild .mfh-we-blk-t::before{background:#B9B2A4}',
+      '#mfh-we-ov .mfh-we-kann-leise{color:#8A8272;border-color:#D8D2C6}',
+      '#mfh-we-ov h4{font:700 10px/1.3 "JetBrains Mono",monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A;margin:12px 0 6px}',
+      '#mfh-we-ov .mfh-we-f{gap:5px;font-size:13px}',
+      '#mfh-we-ov .mfh-we-f span{font:500 11px/1.3 Inter,sans-serif;color:rgba(42,39,39,.85)}',
+      '#mfh-we-ov .mfh-we-f input,#mfh-we-ov .mfh-we-f select{height:38px;padding:0 11px;font:400 13px/1.2 Inter,sans-serif;color:#2A2727;',
+      '  background:#fff;border:1px solid #E6E1D6;border-radius:2px;box-shadow:none}',
+      '#mfh-we-ov .mfh-we-f input:focus,#mfh-we-ov .mfh-we-f select:focus{outline:0;border-color:var(--wl-c9a84c, #C9A84C);',
+      '  box-shadow:0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent)}',
+      '#mfh-we-ov .mfh-we-f input::placeholder{color:rgba(42,39,39,.40);font-style:normal}',
+      '#mfh-we-ov .mfh-we-hint{font:italic 400 10.5px/1.5 Inter,sans-serif;color:rgba(42,39,39,.68)}',
+      '#mfh-we-ov .mfh-we-hint b{font-style:normal;color:#2A2727}',
+      '#mfh-we-ov .mfh-we-hint-offen{font-style:normal;color:#4a4436;background:#FDFCFA;border-left:2px solid var(--wl-c9a84c, #C9A84C);padding:7px 10px;font-size:11.5px}',
+      '#mfh-we-ov .mfh-we-sum,#mfh-we-ov details.mfh-we-eigen>summary{cursor:pointer;font:700 10px/1.3 "JetBrains Mono",monospace;letter-spacing:1.2px;text-transform:uppercase;',
+      '  color:var(--wl-9a7f33, #9a7f33);padding:12px 0;margin:2px 0}',
+      /* Kennzahlen als Kacheln (die Struktur span/b bleibt - Drehbuch Modul 26 liest sie) */
+      '#mfh-we-ov .mfh-we-kv{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}',
+      '#mfh-we-ov .mfh-we-kv>div{background:#FDFCFA;border:1px solid #E6E1D6;border-radius:2px;padding:7px 10px;gap:3px;min-width:0}',
+      '#mfh-we-ov .mfh-we-kv>div>span,#mfh-we-ov .mfh-we-ew3>div>span{font:600 9.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272}',
+      '#mfh-we-ov .mfh-we-kv>div>b{font:500 13.5px/1.35 Inter,sans-serif;overflow-wrap:anywhere}',
+      '#mfh-we-ov .mfh-we-ew3>div{border-color:#E6E1D6;border-radius:2px;background:#FDFCFA}',
+      '#mfh-we-ov .mfh-we-fakten{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin:0 0 12px}',
+      '#mfh-we-ov .mfh-we-fakten:empty{display:none}',
+      '#mfh-we-ov .mfh-we-fakten>div{background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);border-radius:2px;padding:8px 10px;display:grid;gap:2px;min-width:0}',
+      '#mfh-we-ov .mfh-we-fakten span{font:600 9.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A8272}',
+      '#mfh-we-ov .mfh-we-fakten b{font:600 15px/1.2 "Space Grotesk",sans-serif;color:#050505;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '#mfh-we-ov .mfh-we-fakten small{font:400 10.5px/1.3 Inter,sans-serif;color:#8A8272}',
+      '#mfh-we-ov .mfh-we-fakten .k-soll b{color:#3d6fa8}#mfh-we-ov .mfh-we-fakten .k-ziel b{color:#2f7d55}',
+      '#mfh-we-ov .mfh-we-fakten .k-wert{border-left:2px solid var(--wl-c9a84c, #C9A84C)}',
+      /* Wert dieser Wohnung: führend oben, stützend darunter */
+      '#mfh-we-ov .mfh-we-wert{display:grid;gap:8px}',
+      '#mfh-we-ov .mfh-we-wert-haupt{display:grid;gap:2px;padding:10px 12px;border-radius:2px;',
+      '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, #fff);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}',
+      '#mfh-we-ov .mfh-we-wert-haupt span{font:700 10px/1.3 "JetBrains Mono",monospace;letter-spacing:1.2px;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)}',
+      '#mfh-we-ov .mfh-we-wert-haupt b{font:600 20px/1.2 "Space Grotesk",sans-serif;color:#050505;font-variant-numeric:tabular-nums}',
+      '#mfh-we-ov .mfh-we-wert-haupt small{font:italic 400 10.5px/1.4 Inter,sans-serif;color:rgba(42,39,39,.68)}',
+      '#mfh-we-ov .mfh-we-unterkopf{font:700 10px/1.3 "JetBrains Mono",monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A;',
+      '  border-top:1px dashed #E6E1D6;padding-top:10px}',
+      '#mfh-we-ov .mfh-we-unterkopf[hidden]{display:none}',
+      '#mfh-we-ov .mfh-we-unterkopf span{color:#8A8272;font-weight:600}',
+      '#mfh-we-ov .mfh-we-schalter button{min-height:32px}',
+      '#mfh-we-ov .mfh-we-bilder:empty{display:none}',
+      '@media(max-width:640px){',
+      '  #mfh-we-ov{padding:6px !important}',
+      '  #mfh-we-ov .mfh-we-leib{padding:12px}',
+      '  #mfh-we-ov .mfh-we-blk{padding:10px 12px 12px}',
+      '  #mfh-we-ov .mfh-we-f input,#mfh-we-ov .mfh-we-f select{font-size:16px;min-height:44px;padding:0 10px}',
+      '  #mfh-we-ov .mfh-we-f span{font-size:10.5px}',
+      '  #mfh-we-ov .mfh-we-fakten{grid-template-columns:repeat(2,minmax(0,1fr))}',
+      '  #mfh-we-ov .mfh-we-fakten .k-wert{grid-column:1 / -1}',
+      '  #mfh-we-ov .mfh-we-schalter button{min-height:44px}',
+      '}',
+      /* Reiter Zustand: eine Zeile statt der Erbe-Tabelle, geerbt grau/kursiv */
+      '#mfh-modal .mfh-erbe-kurz{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, #fff);border:1px solid #E6E0D3;border-radius:4px;padding:0 12px;margin:0 0 10px}',
+      '#mfh-modal .mfh-erbe-kurz>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;padding:6px 0;font-size:12.5px;color:#2A2727}',
+      '#mfh-modal .mfh-erbe-kurz>summary::-webkit-details-marker{display:none}',
+      '#mfh-modal .mfh-erbe-kurz[open]{padding-bottom:10px}',
+      '#mfh-modal .mfh-erbe-zeile{min-width:0}',
+      '#mfh-modal .mfh-erbe-mehr{flex:0 0 auto;font:600 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)}',
+      '#mfh-modal .mfh-erbe-mehr::after{content:" ▾"}#mfh-modal .mfh-erbe-kurz[open] .mfh-erbe-mehr::after{content:" ▴"}',
+      '#mfh-modal select.mfh-erbt{color:#8A8272;font-style:italic}',
+      '#mfh-modal select.mfh-eigen{color:#2A2727;font-style:normal;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent)}',
+      '#mfh-modal select.mfh-erbt option,#mfh-modal select.mfh-eigen option{color:#2A2727;font-style:normal}',
+      /* Reiter Ergebnis: Wert nach Aufteilung */
+      '#mfh-modal .mfh-auft-tab{width:100%;border-collapse:collapse;font-size:13px;margin:0 0 4px}',
+      '#mfh-modal .mfh-auft-tab td{padding:5px 0;border-bottom:1px solid #F3EFE7;vertical-align:baseline}',
+      '#mfh-modal .mfh-auft-tab td small{font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#8A8272;margin-left:4px}',
+      '#mfh-modal .mfh-auft-tab .mfh-zahl{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;padding-left:12px}',
+      '#mfh-modal .mfh-auft-tab .mfh-summe-z td{font-weight:600;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent)}',
     ].join('');
     document.head.appendChild(s);
   }
@@ -1473,12 +1685,20 @@
         if (t.dataset.k === 'art') { zeichnen(); return; }   /* v2210: Nutzungsart erscheint/verschwindet */
         if (t.dataset.k === 'status') zvZeichnen(); }   /* v3130 */
       if (t.dataset.geb) { _geb[t.dataset.geb] = t.value; }
-      if (t.dataset.mk) { var e = _arbeit[+t.dataset.mi]; e.mod = e.mod || {}; e.mod[t.dataset.mk] = t.value; }
+      if (t.dataset.mk) { var e = _arbeit[+t.dataset.mi]; e.mod = e.mod || {}; e.mod[t.dataset.mk] = t.value;
+        t.classList.toggle('mfh-erbt', !t.value); t.classList.toggle('mfh-eigen', !!t.value); }   /* v3265 · geerbt grau, eigen normal */
       punkteZeigen();
     });
     m.addEventListener('click', function (ev) {
       var t = ev.target;
       if (t === m) schliessen();
+      if (t.id === 'mfh-erg-rechnen' && window.DpPotenzial && typeof DpPotenzial.rechnen === 'function') {   /* v3265 */
+        t.disabled = true; t.textContent = 'wird gerechnet …';
+        DpPotenzial.rechnen({ einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM, erzwingen: true })
+          .then(function (res) { if (res && !res.verfuegbar && typeof window.toast === 'function') window.toast('Wert: ' + (res.grund || 'nicht verfügbar')); if (_schritt === 3) zeichnen(); },
+                function () { if (_schritt === 3) zeichnen(); });
+        return;
+      }
       /* v3252 · das ⓘ sitzt im Label des WEG-Hakens: es erklärt, es schaltet nicht */
       if (t.classList && t.classList.contains('mfh-info')) { ev.preventDefault(); return; }
       /* v3252 · „Mehr" am Kurzsatz eines Reiters klappt den bisherigen Langtext auf */

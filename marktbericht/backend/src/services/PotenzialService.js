@@ -848,6 +848,57 @@ function vergleichBestand(wb, out, bestand) {
   };
 }
 
+/* ══ v3265 · WERT JE WOHNUNG BEI AUFTEILUNG: DIE BAUSTEINE ═══════════════════
+   refWohnungEtw: die Referenz einer Wohnung für den Angebotskern - dieselbe wie im
+   abgerechneten Abruf (v2541), deshalb hier einmal statt zweimal.
+   etwAusAbruf: das Angebotsniveau der Flächenklasse aus dem letzten Abruf „Marktpreise"
+   (gespeichert in mb.potenzial_abrufe) durch DENSELBEN Kern wie dort - ValuationService
+   mit dem Abschlag auf Angebotspreise (lib/angebot_abschlag.js). Keine Zahl ohne Abruf:
+   fehlt die Flächenklasse, gibt es keinen Wert. */
+function refWohnungEtw(fl) {
+  return { property_type: 'etw', living_area: fl, units: 1, plot_area: null, garden_area: null,
+    garages: 0, outdoor_parking: 0, purchase_price: null, monthly_net_rent: null, bom_eur: null, bom_grund: null, floor: null, vacancy: false };
+}
+function etwNiveauAusAbruf(abruf, wfl) {
+  const liste = abruf && Array.isArray(abruf.wohnungen) ? abruf.wohnungen : [];
+  const key = Math.round(Math.round(Number(wfl)) / 10);
+  if (!(Number(wfl) > 0)) return null;
+  const t = liste.find((x) => x && x.art !== 'gewerbe' && x.mpi_etw && Number(x.mpi_etw.median_qm) > 0
+    && Math.round(Math.round(Number(x.wfl)) / 10) === key);
+  if (!t) return null;
+  const e = t.mpi_etw, z = (v) => (v == null || !Number.isFinite(Number(v)) ? null : Number(v));
+  return { median_per_sqm: Number(e.median_qm), q25_per_sqm: z(e.q25_qm), q75_per_sqm: z(e.q75_qm), sample_size: z(e.stichprobe) };
+}
+function etwAusAbruf(wb, ref, r, abruf, mitZiel) {
+  const fl = Math.round(Number(r && r.wfl));
+  const sale = etwNiveauAusAbruf(abruf, fl);
+  if (!sale) return null;
+  const wbW = { ref: Object.assign({}, ref, refWohnungEtw(fl)), sale, rent: wb ? wb.rent : null, land_value_roh: null };
+  const b = mpiAngebote(wbW, null);
+  if (!b) return null;
+  const z = mitZiel ? mpiAngebote(wbW, ZIELBILD_REF()) : null;
+  return { bestand: b.wert, low: b.low, high: b.high, zielbild: z ? z.wert : null,
+    median_qm: Math.round(sale.median_per_sqm), q25_qm: sale.q25_per_sqm != null ? Math.round(sale.q25_per_sqm) : null,
+    q75_qm: sale.q75_per_sqm != null ? Math.round(sale.q75_per_sqm) : null,
+    abschlag_pct: b.abschlag_pct, abschlag_herkunft: b.abschlag_herkunft || null, stichprobe: sale.sample_size,
+    roh: b.roh ? b.roh.wert : null,
+    quelle: 'abruf', abgerufen_am: abruf.abgerufen_am || null };
+}
+const VERFAHREN_TEXT = {
+  vergleichswert_amtlich: 'Vergleichswert (amtlicher Vergleichsfaktor)',
+  vergleichswert_angebote: 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)',
+  ertragswert_etw: 'Ertragswert als Eigentumswohnung (ersatzweise)',
+  anteil_haus: 'Anteil am Haus (Gewerbe)' };
+/* v3265 · die Summe nach Aufteilung trägt den Namen ihres führenden Verfahrens */
+function aufteilerBezeichnung(z) {
+  if (!z) return null;
+  const vg = (z.amtlich || 0) + (z.angebote || 0);
+  if (!vg) return z.ertragswert ? 'Ertragswert als Eigentumswohnung (ersatzweise, kein Vergleichswert verfügbar)' : null;
+  const art = z.amtlich && !z.angebote ? 'Vergleichswert (amtlicher Vergleichsfaktor)'
+    : (!z.amtlich ? 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)' : 'Vergleichswert (amtlich und aus Angebotspreisen)');
+  return art + (z.ertragswert ? ', ' + z.ertragswert + ' × Ertragswert ersatzweise' : '');
+}
+
 export const PotenzialService = {
   KENNZEICHNUNG,
 
@@ -1129,8 +1180,7 @@ export const PotenzialService = {
           const r = out.wohnungen[i];
           if (r.art === 'gewerbe') continue;
           const fl = Math.round(Number(r.wfl));
-          const refW = { property_type: 'etw', living_area: fl, units: 1, plot_area: null, garden_area: null,
-            garages: 0, outdoor_parking: 0, purchase_price: null, monthly_net_rent: null, bom_eur: null, bom_grund: null, floor: null, vacancy: false };
+          const refW = refWohnungEtw(fl);   /* v3265 · dieselbe Wohnungs-Referenz wie der Weg aus dem letzten Abruf */
           const key = String(Math.round(fl / 10));
           if (!(key in cache)) {
             cache[key] = await mit(MarketAnalysisService.saleLevel(Object.assign({}, ref, refW)).catch(() => null), 20000);
@@ -1158,13 +1208,44 @@ export const PotenzialService = {
         if (out.aufteilung) out.aufteilung.mpi_etw = out.etw_markt;
       } catch (e) { out.etw_markt = { fehler: 'Marktpreisindikation je Wohnung nicht verfügbar' }; }
 
+      /* ══ v3265 · ANGEBOTSNIVEAU FÜR WOHNUNGEN AUS DEM LETZTEN ABRUF ═══════════
+         Marcel 09.11.2026: „wenn aufgeteilt, nach Angebotspreisen die einzelnen Wohnungen
+         bewerten … nach dem Vergleichswertverfahren, der Ertragswert nur noch stützend".
+         Ohne abgerechneten Abruf (auftrag.markt) gab es bis hier keinen Angebotswert je
+         Wohnung - der Aufteilerwert fiel auf den Ertragswert zurück, obwohl für dasselbe
+         Objekt ein Abruf „Marktpreise" mit dem Angebotsniveau für Wohnungen am Ort vorlag.
+         KEINE NEUE DATENQUELLE: die Route liest den jüngsten Abruf dieses Nutzers für dieses
+         Objekt (mb.potenzial_abrufe, Feld wohnungen[].mpi_etw: Median, Quartile, Zahl der
+         Angebote je Flächenklasse) und gibt ihn als auftrag._etw_abruf mit. Gerechnet wird
+         mit DEMSELBEN Kern wie im Abruf (ValuationService.compute, Abschlag nach
+         lib/angebot_abschlag.js) - nur die Flächenklasse der Wohnung muss zum Abruf passen
+         (± 5 m² wie dort, round(Fläche/10)); sonst kein Wert und der Ertragswert ersatzweise. */
+      if (auftrag.markt !== true && out.aufteilung && auftrag._etw_abruf) {
+        for (const r of out.wohnungen) {
+          if (r.art === 'gewerbe' || r.mpi_etw) continue;
+          const m = etwAusAbruf(wb, ref, r, auftrag._etw_abruf, !!out.haus.zielbild);
+          if (m) r.mpi_etw = m;
+        }
+        out.aufteilung.etw_abruf = { abgerufen_am: auftrag._etw_abruf.abgerufen_am || null,
+          wohnungen: out.wohnungen.filter((r) => r.mpi_etw && r.mpi_etw.quelle === 'abruf').length };
+      }
+
       /* ══ v3200 · AUFTEILERWERT ════════════════════════════════════════════════
          Je Wohnung das führende Verfahren: 1. Vergleichswert aus dem amtlichen Vergleichsfaktor,
          2. sonst Vergleichswert aus Angeboten (Abschlag wie im Bericht, gekennzeichnet),
          3. sonst der Ertragswert als Eigentumswohnung. Stützend bleibt der Ertragswert als ETW
          (Summe in je_stufe). Gewerbe geht mit seinem Anteil am Haus ein.
          Aufteilerwert = Summe − Kosten der Aufteilung; Potenzial = Aufteilerwert − Haus. */
-      if (out.aufteilung) {
+      /* v3265 · der Vergleichswert je Wohnung führt nur, wenn ALLE Wohnungen eine Wohnfläche haben
+         (Marcel: „nur wenn alle Wohnungen angegeben sind") - eine Summe über einen Teil der Wohnungen
+         wäre kein Aufteilerwert. Dann bleibt es bei der Summe der Ertragswerte (wie ohne Vergleichswert). */
+      const ohneFl = (Array.isArray(auftrag.wohnungen) ? auftrag.wohnungen : [])
+        .filter((w) => w && w.art !== 'gewerbe' && !(Number(w.wfl) > 0)).length;
+      if (out.aufteilung && ohneFl > 0) {
+        out.aufteilung.aufteiler_gesperrt = { ohne_flaeche: ohneFl,
+          grund: (ohneFl === 1 ? 'Eine Wohnung hat' : ohneFl + ' Wohnungen haben') + ' keine Wohnfläche — der Vergleichswert je Wohnung führt erst, wenn alle Wohnungen eine Wohnfläche haben.' };
+      }
+      if (out.aufteilung && ohneFl === 0) {
         const A = out.aufteilung; A.aufteiler = {};
         for (const s of stufenAlle) {
           if (!A.je_stufe[s] || !out.haus[s]) continue;
@@ -1179,21 +1260,31 @@ export const PotenzialService = {
             }
             const vg = r.vergleich_etw ? r.vergleich_etw[s] : null;
             const mp = r.mpi_etw ? (s === 'zielbild' ? r.mpi_etw.zielbild : r.mpi_etw.bestand) : null;
+            /* v3265 · wie Stufe M (v3242): Angebotspreise führen nur MIT Abschlag - ohne ihn sind es
+               Angebots-, keine Kaufpreise (§ 25 Abs. 1 ImmoWertV) */
+            const mpAb = r.mpi_etw && Number(r.mpi_etw.abschlag_pct) > 0;
+            const stz = r.als_etw && r.als_etw[s] > 0 ? r.als_etw[s] : null;
             let v = null, verf = null;
             if (vg && vg.wert > 0) { v = vg.wert; verf = 'vergleichswert_amtlich'; zaehl.amtlich++; }
-            else if (mp > 0) { v = Math.round(mp); verf = 'vergleichswert_angebote'; zaehl.angebote++; }
-            else if (r.als_etw && r.als_etw[s] > 0) { v = r.als_etw[s]; verf = 'ertragswert_etw'; zaehl.ertragswert++; }
+            else if (mp > 0 && mpAb) { v = Math.round(mp); verf = 'vergleichswert_angebote'; zaehl.angebote++; }
+            else if (stz) { v = stz; verf = 'ertragswert_etw'; zaehl.ertragswert++; }
             else { voll = false; zaehl.fehlt++; }
-            r.fuehrend[s] = { wert: v, verfahren: verf };
+            /* v3265 · am Ergebnis je Wohnung: was führt, was stützt, und ob der Ertragswert nur ersatzweise steht */
+            r.fuehrend[s] = { wert: v, verfahren: verf,
+              bezeichnung: verf ? VERFAHREN_TEXT[verf] : null,
+              indikativ: verf === 'vergleichswert_angebote',
+              quelle: verf === 'vergleichswert_angebote' ? (r.mpi_etw.quelle || 'markt') : null,
+              stuetzend: verf && verf !== 'ertragswert_etw' ? stz : null,
+              ersatzweise: verf === 'ertragswert_etw' };
             if (v != null) sum += v;
           });
           const wert = Math.round(sum - A.kosten_eur);
-          A.aufteiler[s] = { summe: Math.round(sum), wert, vollstaendig: voll, zaehl,
+          A.aufteiler[s] = { summe: Math.round(sum), wert, vollstaendig: voll, zaehl, bezeichnung: aufteilerBezeichnung(zaehl),
             potenzial: Math.round(wert - out.haus[s].wert), negativ: wert < out.haus[s].wert };
         }
         A.aufteiler_hinweis = 'Aufteilerwert: je Wohnung das führende Verfahren - Vergleichswert aus dem amtlichen Vergleichsfaktor '
           + 'des Gutachterausschusses (§ 20 ImmoWertV, Merkmale der Wohnung), sonst aus Angebotspreisen für Eigentumswohnungen '
-          + '(abzüglich Angebotsabschlag), sonst der Ertragswert als Eigentumswohnung. Stützend: der Ertragswert jeder Wohnung '
+          + '(abzüglich Angebotsabschlag; indikativ, aus Angebotspreisen abgeleitet), sonst ersatzweise der Ertragswert als Eigentumswohnung. Stützend: der Ertragswert jeder Wohnung '
           + 'mit dem Liegenschaftszins für Wohnungseigentum. Abgezogen sind die Kosten der Aufteilung.';
       }
     }
@@ -1225,5 +1316,6 @@ export default PotenzialService;
 export { eineStufe as _eineStufe };
 export { stufe558 as _stufe558 };   /* v3150 · Pruefer B61 */
 export { stufeNeuvermietung as _stufeNeuvermietung };   /* v3152 · Pruefer B62 */
+export { etwAusAbruf as _etwAusAbruf, etwNiveauAusAbruf as _etwNiveauAusAbruf, aufteilerBezeichnung as _aufteilerBezeichnung };   /* v3265 · Pruefer B63 */
 /* v2988 · fuer Knotenprobe und Pruefer: Miete nach Modernisierung, Stufenmiete, Bestandsbasis */
 export { mieteNachModernisierung as _mieteNachModernisierung, stufenMiete as _stufenMiete, bestandsBasis as _bestandsBasis };

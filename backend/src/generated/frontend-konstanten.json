@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-09T11:35:25.882Z",
+ "erzeugt_am": "2026-11-09T12:06:43.651Z",
  "quellen": {
   "voice-import": "93c6117a13546a53",
   "objektart-felder": "f7d9212555982a97",
   "storage": "c2e7c9ad8bc3ab23",
-  "index-html": "45b3808222fde294",
+  "index-html": "11de6bcab0dda400",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4188,7 +4188,7 @@
      },
      {
       "h": "Ertragswert je Stufe und Aufteilung",
-      "text": "DealPilot rechnet den Ertragswert für Bestand, Mieterhöhung und Zielbild mit demselben Rechenkern und denselben Ansätzen wie der Marktbericht Stufe 3 (Liegenschaftszins, Bewirtschaftung, Bodenwert); je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent. Beim MFH zusätzlich je Wohnung — als Anteil am Haus oder, mit dem Haken „aufgeteilt“, als Eigentumswohnung mit dem Zins für Wohnungseigentum. Die Summe nach Aufteilung steht dem Haus als Ganzes gegenüber, abzüglich der Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe möglich). Alles ist ein Ausblick: Die Werte unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind, und sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand."
+      "text": "DealPilot rechnet den Ertragswert für Bestand, Mieterhöhung und Zielbild mit demselben Rechenkern und denselben Ansätzen wie der Marktbericht Stufe 3 (Liegenschaftszins, Bewirtschaftung, Bodenwert); je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent. Beim MFH zusätzlich je Wohnung — als Anteil am Haus oder, mit dem Haken „aufgeteilt“, als Eigentumswohnung. Dann führt je Wohnung das Vergleichswertverfahren (amtlicher Vergleichsfaktor, sonst Angebotspreise für Wohnungen am Ort abzüglich Abschlag, indikativ — sobald alle Wohnungen eine Wohnfläche haben); der Ertragswert mit dem Zins für Wohnungseigentum steht stützend daneben, ohne Vergleichswert ersatzweise. Die Summe nach Aufteilung trägt den Namen ihres führenden Verfahrens und steht dem Haus als Ganzes gegenüber, abzüglich der Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe möglich). Alles ist ein Ausblick: Die Werte unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind, und sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand."
      },
      {
       "h": "Wo es erscheint — und wo nicht",
@@ -5549,7 +5549,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "748ac17065ce32d2",
+  "hilfe": "139329172f441bb6",
   "bewertung": "f427bd734c0570c3"
  }
 }
