@@ -43,7 +43,7 @@
   var STUDIO = (function () { try { return new URLSearchParams(location.search).has('studio') && window.parent !== window; } catch (e) { return false; } })();
   /* v2235d · Marcel: „den Pilot musst du ausblenden!" - im Studio ab dem
      ersten Laden, nicht erst ab start() (vorher stand er gemessen links unten) */
-  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .sb-user-name,html.dpm-studio .sb-user-avatar,html.dpm-studio .settings-modal .ms-foot .ml,html.dpm-studio .settings-modal .ms-foot .nm,html.dpm-studio .settings-modal .ms-foot .av{visibility:hidden!important}'; document.head.appendChild(_ps); } catch (e) {} }
+  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .sb-user-name,html.dpm-studio .sb-user-avatar,html.dpm-studio .settings-modal .ms-foot .ml,html.dpm-studio .settings-modal .ms-foot .nm,html.dpm-studio .settings-modal .ms-foot .av{visibility:hidden!important}html.dpm-studio .sb-act-item[data-act="vermoegen"],html.dpm-studio #card-vermoegen-zuwachs{display:none!important}'; document.head.appendChild(_ps); } catch (e) {} }
   function anStudio(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
@@ -59,6 +59,8 @@
     st.textContent = [
       '#dpm-kegel{position:fixed;z-index:10070;pointer-events:none;border-radius:14px;box-shadow:0 0 0 9999px rgba(5,5,5,.58),0 0 0 3px ' + GH + ',0 0 40px 6px ' + mix(GH, 45) + ';transition:all .7s cubic-bezier(.5,0,.2,1);opacity:0}',
       '#dpm-kegel.an{opacity:1}',
+      /* v3270 · „Vermögen & Haushalt“ ist auf Prod gesperrt (v3231) - in keinem Video zeigen */
+      'html.dpm-laeuft .sb-act-item[data-act="vermoegen"],html.dpm-studio .sb-act-item[data-act="vermoegen"],html.dpm-laeuft #card-vermoegen-zuwachs{display:none!important}',
       /* v2481k · die gewählte Option sichtbar markiert halten (Modul 26, „Aus Wohnungen") */
       /* v2481l · gemessen am Prüflauf: nur ein Rahmen ging im Goldrand des Kegels unter, der Knopf
          blieb weiß wie seine Nachbarn - jetzt zusätzlich gefüllt (Gold, dunkle Schrift) */
@@ -8085,6 +8087,145 @@
     ].map(function (f, i) { return async function (s) { await kmHalt(i); return f(s); }; })
   };
 
+  /* ═══ VIDEOREIHE · MODUL 29 · DREI OBJEKTE, DREI URTEILE (v3270) ═══════════════
+     Marcel 09.11.2026: „drei Demo-Objekte … eine klare Kaufempfehlung, eine dazwischen,
+     eine Absage — jeweils Score/Urteil, die zwei Teil-Scores, die wichtigsten KPIs und der
+     Satz der Pilot-Analyse.“ Gemessen an Kopien (09.11.2026):
+       Parkstr. 9 (DEMO-BO6)        Gesamturteil Gut 78 · KAUFEN, Investment 74, Finanzierung 84
+       Am Markt 18 (DEMO-KK2)       Solide 65 · VERHANDELN, Investment 62, Finanzierung 70
+       Lindenhof 14 (DEMO-HH1)      Schwach 38 · NICHT KAUFEN, Investment 41, Finanzierung 35
+     Je Objekt eine KOPIE (r6KopieStart / d3Kopie), beim Aufräumen gelöscht. Die Pilot-Analysen
+     sind EINMAL echt an genau diesen Kopien erzeugt (09.11.2026, Freigabe Marcel) und liegen als
+     Mitschnitt in js/messe-drei-daten.js - im Lauf wird nichts abgerufen. Jede Zahl im Text liest
+     das Drehbuch aus der Oberfläche (Kopf der Bewertung, Score-Karten, Kennzahlen-Tabelle,
+     Pilot-Analyse); fehlt sie, fällt der Satzteil weg. */
+  var D3_IDS = { park: R11_PARK, km18: 'ca230cc1-f8b2-4050-84db-cc84611293e8', lh14: 'd886be6c-1ea8-42ab-9f53-d316c1854816' };
+  var D3_BUSTER = 'v3270';
+  var _d3 = { erg: [] };
+  function d3Laden() {
+    return new Promise(function (ok) {
+      if (window.DPM_DREI) { ok(true); return; }
+      var s = document.createElement('script'); s.src = 'js/messe-drei-daten.js?v=' + D3_BUSTER;
+      s.onload = function () { ok(!!window.DPM_DREI); }; s.onerror = function () { ok(false); };
+      document.head.appendChild(s);
+    });
+  }
+  /* wie r10cZweiteKopie, aber MIT dem Analyse-Mitschnitt */
+  async function d3Kopie(id, analyse) {
+    var o = await Auth.apiCall('/objects/' + id);
+    var d = JSON.parse(JSON.stringify((o && o.data) || {}));
+    ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost', '_ankauf'].forEach(function (k) { delete d[k]; });
+    var ai = analyse ? JSON.parse(JSON.stringify(analyse)) : null;
+    if (ai && ai._fuer) delete ai._fuer.objekt_id;
+    var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: ai ? JSON.stringify(ai) : null, photos: o.photos || [] } });
+    var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
+    if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
+    if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
+    await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+    await warte(900);
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+  }
+  function d3Kopf() {   /* Gesamturteil im Kopf der Bewertung */
+    var k = q('#s6 .dpz-kopf'), t = k ? r6Inner(k).replace(/\s+/g, ' ') : '';
+    var w = /Score\s+(Sehr gut|Gut|Solide|Schwach|Kritisch)\s+(\d+)\s*\/\s*100/i.exec(t), e = q('#s6 .dpz-empf');
+    return { wort: w ? w[1] : null, score: w ? w[2] : null, empf: e ? r6Text(e) : null };
+  }
+  function d3Teil(i) {   /* Investment- und Finanzierungs-Score */
+    var c = document.querySelectorAll('#s6 .dpz-score')[i]; if (!c) return null;
+    var t = r6Inner(c).replace(/\s+/g, ' ').trim(), m = /^(\d+)\s+(Investment|Finanzierungs)-Score\s+(SEHR GUT|GUT|SOLIDE|SCHWACH|KRITISCH)/i.exec(t);
+    return m ? { n: m[1], name: m[2] === 'Investment' ? 'Investment' : 'Finanzierung', wort: m[3].charAt(0) + m[3].slice(1).toLowerCase() } : null;
+  }
+  function d3Kpi(re) { var b = r12Bewertung(re); return b ? b.wert : null; }
+  function d3Satz(t, n) {   /* erster Satz, höchstens n Zeichen */
+    t = String(t || '').replace(/\s+/g, ' ').trim(); var m = /^(.+?[.!?])(\s|$)/.exec(t); t = m ? m[1] : t;
+    return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t;
+  }
+  async function d3Objekt(s, nr, rolle) {
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+    await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+    var we = wert('einheiten');
+    await b2oZeile(s, 'Objekt ' + nr + ' · ' + rolle, '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Einheiten, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + ', Kaufpreis ' + eur(zahl('kp')) + '.');
+    /* Gesamturteil */
+    reiter('s6'); await warte(1200);
+    await warteAuf(function () { return q('#s6 .dpz-kopf') && q('#s6 .dpz-score'); }, 6000);
+    await zeige(function () { return q('#s6 .dpz-kopf'); }, 8);
+    var K = d3Kopf();
+    await b2oZeile(s, 'Das Gesamturteil', 'Investor Deal Score <b>' + (K.score || '–') + ' · ' + (K.wort || '–') + '</b>' + (K.empf ? ' — Empfehlung: <b>' + K.empf.charAt(0) + K.empf.slice(1).toLowerCase() + '</b>' : '') + '.');
+    /* zwei Teil-Scores */
+    await zeige(function () { return q('#s6 .dpz-zwei'); }, 8);
+    var a = d3Teil(0), b = d3Teil(1);
+    await b2oZeile(s, 'Zwei Teil-Scores', (a ? 'Investment <b>' + a.n + ' · ' + a.wort + '</b>' : 'Investment –') + ', ' + (b ? 'Finanzierung <b>' + b.n + ' · ' + b.wort + '</b>' : 'Finanzierung –') + ' — die Immobilie selbst und die Finanzierung, getrennt bewertet.');
+    /* Kennzahlen */
+    var kc = function () { return q('#s6 .kpi-eval-card'); };
+    var x = kc(); if (x) x.scrollIntoView({ block: 'center' });
+    await warte(400);
+    await zeige(kc, 8);
+    var dscr = d3Kpi(/^DSCR/), cf = d3Kpi(/^Cashflow nach Steuern/), bmr = d3Kpi(/^Bruttomietrendite/), ltv = d3Kpi(/^LTV/);
+    await b2oZeile(s, 'Die Kennzahlen', [bmr ? 'Bruttorendite <b>' + bmr + '</b>' : '', cf ? 'Cashflow nach Steuern <b>' + cf + '</b> im Monat' : '', dscr ? 'DSCR <b>' + dscr + '</b>' : '', ltv ? 'Beleihung <b>' + ltv + '</b>' : ''].filter(Boolean).join(', ') + '.');
+    /* Pilot-Analyse */
+    reiter('s5'); await warte(1200);
+    await warteAuf(function () { return q('#ai-content .dp-pa-empf'); }, 6000);
+    var ai = (window.DPM_DREI && _d3.schluessel && window.DPM_DREI[_d3.schluessel]) || {};
+    var satz = d3Satz(ai.dealpilot_insight || ai.empfehlung_begruendung || ai.gesamtbewertung, 190);
+    /* die Karte, in der der Satz steht (sonst die Gesamtbewertung) */
+    var anf = satz.slice(0, 40);
+    var gb = function () {
+      var k = [].filter.call(document.querySelectorAll('#ai-content .dp-pa-card'), function (x) { return x.offsetWidth; });
+      return k.filter(function (x) { return r6Text(x).indexOf(anf) >= 0; })[0] || k.filter(function (x) { return /GESAMTBEWERTUNG/i.test(r6Inner(x)); })[0] || q('#ai-content .dp-pa-empf');
+    };
+    var gx = gb(); if (gx && gx.scrollIntoView) { gx.scrollIntoView({ block: 'center' }); await warte(300); }
+    await zeige(gb, 8);
+    var empf = r6Text(q('#ai-content .dp-pa-empf'));
+    await b2oZeile(s, 'Der Pilot sagt', (empf ? '<b>' + empf.charAt(0) + empf.slice(1).toLowerCase() + '</b> — ' : '') + '„' + satz + '“', 1200);
+    _d3.erg.push({ rolle: rolle, adr: wert('str') + ' ' + wert('hnr') + ', ' + wert('ort'), score: K.score, wort: K.wort, empf: K.empf, inv: a, fin: b, pilot: empf });
+  }
+  function d3Tafel(an) {
+    var t = q('#dpm-drei'); if (!an) { if (t) t.remove(); return; }
+    t = el('dpm-drei');
+    t.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10073;display:flex;gap:22px;pointer-events:none';
+    t.innerHTML = _d3.erg.map(function (e) {
+      var f = /nicht/i.test(e.empf || '') ? '#B8625C' : (/kaufen/i.test(e.empf || '') ? '#3FA56C' : 'var(--wl-c9a84c, #C9A84C)');
+      return '<div style="width:300px;padding:22px 24px;border-radius:16px;background:rgba(10,9,7,.95);border:1px solid ' + f + ';box-shadow:0 20px 60px rgba(0,0,0,.6);color:#FDFCFA;font-family:Inter,sans-serif">'
+        + '<div style="font:600 11px JetBrains Mono,monospace;letter-spacing:.18em;text-transform:uppercase;color:' + f + '">' + e.rolle + '</div>'
+        + '<div style="font:600 18px Space Grotesk,sans-serif;margin:8px 0 14px">' + e.adr + '</div>'
+        + '<div style="font:700 44px Space Grotesk,sans-serif;line-height:1">' + (e.score || '–') + '<span style="font-size:18px;opacity:.6"> / 100</span></div>'
+        + '<div style="font:600 15px Inter,sans-serif;margin:6px 0 12px;color:' + f + '">' + (e.wort || '') + (e.empf ? ' · ' + e.empf : '') + '</div>'
+        + '<div style="font-size:14px;opacity:.85">Investment ' + (e.inv ? e.inv.n : '–') + ' · Finanzierung ' + (e.fin ? e.fin.n : '–') + '</div>'
+        + '<div style="font-size:14px;opacity:.85;margin-top:4px">Pilot: ' + (e.pilot || '–') + '</div></div>';
+    }).join('');
+    return t;
+  }
+  DREHBUECHER['reihe-drei'] = {
+    titel: 'Drei Objekte, drei Urteile', unterzeile: 'Kaufen, verhandeln, Finger weg — und warum', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { d3Tafel(false); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Objekt 1: Kaufempfehlung */
+        _d3 = { erg: [] };
+        if (!(await d3Laden())) throw new Error('Mitschnitt messe-drei-daten.js fehlt');
+        _d3.schluessel = 'park';
+        await r6KopieStart(D3_IDS.park, { ohneAnkauf: true, analyse: window.DPM_DREI.park });
+        await d3Objekt(s, 1, 'Kaufempfehlung');
+      },
+      async function (s) {   /* 2 · Objekt 2: dazwischen */
+        _d3.schluessel = 'km18';
+        await d3Kopie(D3_IDS.km18, window.DPM_DREI.km18);
+        await d3Objekt(s, 2, 'Mit Bedingungen');
+      },
+      async function (s) {   /* 3 · Objekt 3: Absage */
+        _d3.schluessel = 'lh14';
+        await d3Kopie(D3_IDS.lh14, window.DPM_DREI.lh14);
+        await d3Objekt(s, 3, 'Absage');
+      },
+      async function (s) {   /* 4 · nebeneinander */
+        reiter('s6'); await warte(600);
+        await zeige(function () { return d3Tafel(true); }, 6);
+        await b2oZeile(s, 'Nebeneinander', 'Dieselbe Rechnung für jedes Objekt — ' + _d3.erg.map(function (e) { return '<b>' + (e.score || '–') + '</b> ' + (e.wort || ''); }).join(', ') + '. Gerechnet, nicht geraten.', 1500);
+        d3Tafel(false);
+      }
+    ]
+  };
+
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {
@@ -8152,9 +8293,29 @@
     laeuft: function () { return !!lauf; },
     kiAntwort: function () { return lauf ? _kiFrei : null; } };   /* v2225: aufgenommene Analyse, nur im Lauf */   /* v2221: qc-ai-bridge setzt die KI-Bewertung so lange aus */
 
+  /* v3270 · NACHSPERRE. Gemessen am 09.11.2026: nach einem abgebrochenen Lauf löschte das
+     Aufräumen die Kopie, die App lud das nächste Objekt der Liste (ein echtes Demo-Objekt), und
+     in der Lücke ohne Lauf ging eine echte Pilot-Analyse hinaus und überschrieb dessen Analyse.
+     Auf einer Seite, die per ?messe= oder als Studio gestartet wurde, ist deshalb AUSSERHALB eines
+     Laufs jeder Schreibweg an Objekte/Steuer (außer an den Kopien des Laufs) und jeder KI-Abruf
+     gesperrt - bis die Seite neu geladen wird. Notiert in DPM_NACHSPERRE. */
+  function nachsperreAn() {
+    if (window.__dpmNach) return;
+    var echt = window.fetch; window.__dpmNach = echt; window.DPM_NACHSPERRE = [];
+    window.fetch = function (url, opt) {
+      var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
+      if (!lauf && m !== 'GET' && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/)/.test(u)
+          && !(/\/objects\//.test(u) && (window.DPM_REIHE && DPM_REIHE.angelegt || []).some(function (id) { return u.indexOf(id) >= 0; }))) {
+        window.DPM_NACHSPERRE.push(m + ' ' + u.replace(location.origin, ''));
+        return Promise.resolve(new Response(JSON.stringify({ ok: true, vorfuehrung: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+      }
+      return echt.apply(this, arguments);
+    };
+  }
   /* ?messe=<name>[&schleife] — erst nach Anmeldung und geladenem Plan */
   try {
     var p = new URLSearchParams(location.search), name = p.get('messe');
+    if (name || STUDIO) nachsperreAn();
     if (name) {
       var los = function () { setTimeout(function () { start(name, { schleife: p.has('schleife') }); }, 1500); };
       var bereit = function () { return window.Auth && Auth.isLoggedIn && Auth.isLoggedIn() && !document.getElementById('auth-modal') && typeof window.loadSaved === 'function'; };
