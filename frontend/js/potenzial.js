@@ -526,13 +526,16 @@
     /* 3 · Mietpreisbremse bei Neuvermietung */
     var obergrenze = (br.gilt && vglQm > 0) ? Math.round(vglQm * 1.1 * 100) / 100 : null;
     var markt = vSchaetz || /Marktmiete/i.test(vglHer);   /* v3246: die Schätzung heißt nicht mehr „Marktmiete" */
+    /* v3267 · Marcel 09.11.2026: die DealPilot-Näherung zählt für die Bremse - „ja, aber mit Begründung“ */
+    var naeh = !vEig && (s && s.vgl_quelle_art || vgO.quelle_art || '') === 'dealpilot_naeherung';
     z.push({ k: 'Mietpreisbremse', v: br.gilt === true ? 'gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') : br.gilt === false ? 'gilt hier nicht' : 'bitte prüfen',
       u: br.gilt === true
         ? (obergrenze ? 'bei Neuvermietung höchstens ' + eur2(obergrenze) + '/m² (Vergleichsmiete ' + eur2(vglQm) + ' + 10 %'
             + (vglHer ? ', ' + vglHer : '') + ')' : 'Vergleichsmiete eintragen — dann rechnet DealPilot die Obergrenze')
         : br.gilt === false ? 'Neuvermietung ohne Obergrenze nach § 556d' : '',
       warn: br.gilt === null || !!br.pruefen || (br.gilt === true && markt), lang: br.text
-        + (br.gilt === true && markt ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
+        + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der DealPilot-Näherung der ortsüblichen Vergleichsmiete gerechnet: sie leitet die Vergleichsmiete aus der amtlichen Zensus-Bestandsmiete ab und ist an den freien Mietspiegeln kalibriert (mittlere Abweichung rund 7,5 %). Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel — liegt sie niedriger, ist auch die zulässige Miete niedriger; vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
+        + (br.gilt === true && markt && !naeh ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
         + (br.gilt === true ? ' Ausnahmen: höhere Vormiete (§ 556e BGB), erste Vermietung nach umfassender Modernisierung oder Neubau (§ 556f BGB).' : '') });
     /* 4 · Zielmiete gegen die Bremse */
     var zq = zahl(w && w.ziel_qm);
