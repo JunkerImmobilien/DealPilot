@@ -1,0 +1,451 @@
+{
+ "ags": "05758012",
+ "gemeinde": "Herford",
+ "art": "einfach",
+ "stand": "2025-10",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-11-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.herford.de/loadDocument.phtml?FID=4041.465.1&Ext=PDF",
+  "dokument": "Herforder Mietspiegel für frei finanzierte Wohnungen, 01.11.2025 (Stand 10/2025)",
+  "seite": "1",
+  "lizenz": "keine Angabe im Dokument (Herausgeberin Hansestadt Herford)",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Ortslage-Abschlag Randbereich (Diebrock, Laar, Eickum, Falkendiek, Schwarzenmoor) −0,63 €/m² auf alle drei Werte. Ohne Einfamilienhäuser.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1970,
+     "label": "1961 bis 1970"
+    },
+    {
+     "von": 1971,
+     "bis": 1980,
+     "label": "1971 bis 1980"
+    },
+    {
+     "von": 1981,
+     "bis": 1990,
+     "label": "1981 bis 1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2000,
+     "label": "1991 bis 2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2010,
+     "label": "2001 bis 2010"
+    },
+    {
+     "von": 2011,
+     "bis": 2024,
+     "label": "2011 bis 2024"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 40,
+     "label": "bis 40 m²"
+    },
+    {
+     "von": 40,
+     "von_inkl": false,
+     "bis": 60,
+     "label": "über 40 bis 60 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 80,
+     "label": "über 60 bis 80 m²"
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": 100,
+     "label": "über 80 bis 100 m²"
+    },
+    {
+     "von": 100,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 100 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.4,
+    "mittel": 7.52,
+    "oben": 8.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5,
+    "mittel": 6.56,
+    "oben": 8.2,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.5,
+    "mittel": 6.46,
+    "oben": 8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.1,
+    "mittel": 6.49,
+    "oben": 7.4,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "unten": 4.6,
+    "mittel": 6.32,
+    "oben": 7.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.4,
+    "mittel": 7.18,
+    "oben": 9.2,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.6,
+    "mittel": 6.22,
+    "oben": 7.3,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.5,
+    "mittel": 6.12,
+    "oben": 7.3,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5.5,
+    "mittel": 6.15,
+    "oben": 7.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "unten": 5.1,
+    "mittel": 5.98,
+    "oben": 7.1,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6.5,
+    "mittel": 7.53,
+    "oben": 9.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.3,
+    "mittel": 6.57,
+    "oben": 8.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.2,
+    "mittel": 6.47,
+    "oben": 7.4,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5.4,
+    "mittel": 6.5,
+    "oben": 7.2,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "unten": 5.2,
+    "mittel": 6.33,
+    "oben": 7.8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 7,
+    "mittel": 8.24,
+    "oben": 10.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.3,
+    "mittel": 7.28,
+    "oben": 10.6,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.7,
+    "mittel": 7.18,
+    "oben": 8.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.7,
+    "mittel": 7.21,
+    "oben": 8.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "unten": 5.7,
+    "mittel": 7.04,
+    "oben": 8.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 7,
+    "mittel": 8.01,
+    "oben": 10.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 5.9,
+    "mittel": 7.05,
+    "oben": 7.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 6.3,
+    "mittel": 6.95,
+    "oben": 8.4,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 6,
+    "mittel": 6.98,
+    "oben": 7.8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "unten": 4.7,
+    "mittel": 6.81,
+    "oben": 8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "unten": 8,
+    "mittel": 8.74,
+    "oben": 11,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 7.1,
+    "mittel": 7.78,
+    "oben": 10.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 6.6,
+    "mittel": 7.68,
+    "oben": 8.6,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 6.9,
+    "mittel": 7.71,
+    "oben": 9.1,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "unten": 6.1,
+    "mittel": 7.54,
+    "oben": 8.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "unten": 9,
+    "mittel": 10.72,
+    "oben": 12,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "unten": 8.4,
+    "mittel": 9.76,
+    "oben": 10.6,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "unten": 8.8,
+    "mittel": 9.66,
+    "oben": 10.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "unten": 7.7,
+    "mittel": 9.69,
+    "oben": 11.6,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 4,
+    "unten": 8.4,
+    "mittel": 9.52,
+    "oben": 12.4,
+    "seite": "1"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "lage:kerngebiet",
+    "aliase": [
+     "herford-stadt",
+     "herringhausen",
+     "stedefreund",
+     "elverdissen"
+    ],
+    "label": "Kerngebiet",
+    "art": "eur_qm",
+    "wert": 0,
+    "beleg": "S. 1 Ortslage „Keine Anpassung“"
+   },
+   {
+    "merkmal": "lage:randbereich",
+    "aliase": [
+     "diebrock",
+     "laar",
+     "eickum",
+     "falkendiek",
+     "schwarzenmoor"
+    ],
+    "label": "Randbereich",
+    "art": "eur_qm",
+    "wert": -0.63,
+    "beleg": "S. 1 Ortslage Randbereich −0,63 €"
+   },
+   {
+    "merkmal": "energetische_vollmodernisierung",
+    "label": "energetische Vollmodernisierung (Höchstwert)",
+    "art": "eur_qm",
+    "wert": 1.1,
+    "bedingung": {
+     "baujahr_bis": 1990
+    },
+    "beleg": "S. 1/2 „Zuschlag von bis zu 1,10 €/m²“, Baujahr bis einschließlich 1990, alle vier Maßnahmen"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 72
+   },
+   "erwartet": {
+    "unten": 5.5,
+    "mittel": 6.12,
+    "oben": 7.3
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 72,
+    "lage": "randbereich"
+   },
+   "erwartet": {
+    "unten": 4.87,
+    "mittel": 5.49,
+    "oben": 6.67
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2025,
+    "wfl": 72
+   },
+   "erwartet": null,
+   "seite": "1",
+   "art": "tabellenzelle"
+  }
+ ]
+}

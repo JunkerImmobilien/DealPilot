@@ -169,7 +169,7 @@ Funktion gibt `null` mit Hinweis, sie extrapoliert nie.
 "regression": {
   "basis": { "typ": "wfl_tabelle", "werte": [ { "von": 25, "bis": 30, "eur_qm": 9.12 }, … ], "beleg": "S. 8 Tabelle 1" },
                                    // oder "basis_eur_qm": 7.45 (eine Zahl für alle)
-  "verknuepfung": "summe",         // summe: Basis × (1 + Σ pct/100) + Σ eur_qm  ·  produkt: Basis × Π (1 + pct/100) + Σ eur_qm
+  "verknuepfung": "summe",         // summe | produkt (nur Beschreibung): gerechnet wird immer Basis × Π faktor × (1 + Σ pct/100) + Σ eur_qm
   "faktoren": [
     { "merkmal": "baujahr", "typ": "baujahr_klasse", "art": "pct",
       "werte": [ { "von": null, "bis": 1918, "wert": 0 }, { "von": 1919, "bis": 1948, "wert": -4 } ], "beleg": "S. 9" },
@@ -220,3 +220,37 @@ ablesbare Tabellenzelle** (`art: "tabellenzelle"`). Der Prüfer rechnet jedes Be
 
 Route: GET `/mietspiegel?ags=` liefert zusätzlich `werte_verfuegbar` (true/false);
 mit `&baujahr=&wfl=` (optional `&lage=&ausstattung=`) zusätzlich `werte: { … Ergebnis … }`.
+
+### Erweiterungen aus den Demo-Mietspiegeln (v3255, alle optional, abwärtskompatibel)
+
+Gefunden an Minden, Dortmund, Bielefeld, Detmold, Leipzig — wer eine Datei nach dem Grundformat oben
+schreibt, muss nichts davon kennen.
+
+| Feld | wo | Bedeutung | Beispiel |
+|---|---|---|---|
+| `wfl_runden` | `tabelle`, `regression` | Wohnfläche vor dem Nachschlagen auf n Stellen kaufmännisch runden („auf volle m² runden“) | Minden, Detmold, Leipzig: `0` |
+| `geltung` | `tabelle` (wie bei `regression`) | `{ baujahr_von, baujahr_bis, wfl_von, wfl_bis }` — außerhalb kein Wert | Dortmund 20–145 m² |
+| `spanne` | `tabelle` | Zellen führen nur `mittel`; unten/oben = Mittelwert **nach** Zuschlägen (auf `rundung` gerundet) × (1 + pct/100) bzw. + abs | Minden −15/+16 % |
+| `spanne.baujahr_klassen` | beide | Spanne je Baualter: `[{ von, bis, unten_abs, oben_abs }]` (oder `_pct`) | Leipzig |
+| `zuschlaege[].wfl_klassen` | `tabelle` | Zuschlag nach Wohnfläche: `[{ von, bis, von_inkl?, wert }]` statt `merkmal`-Schalter | Dortmund Wohnungsgröße |
+| `zuschlaege[].bedingung` | `tabelle`, `regression.faktoren[]` | `{ baujahr_von, baujahr_bis }` — greift nur in diesem Baualter | Energetische Vollmodernisierung bis 1990 |
+| `zuschlaege[].aliase`, `achsen.lage[].aliase` | `tabelle` | weitere Namen, unter denen die Lage am Objekt ankommt (Ortsteile, „mittel“ für „normal“) | Herford, Bielefeld |
+| `zuschlaege[].label`, `faktoren[].label` | beide | Wortlaut für den Rechenweg | — |
+| `faktoren[].art: "faktor"` | `regression` | multiplikativer Faktor (1,044 …) | Leipzig |
+| `faktoren[].typ: "auswahl"` | `regression` | wie `lage`, aber Wert aus `objekt.merkmale[merkmal]` (Schlüssel als Text); ohne Angabe neutral | Detmold Sanitär, Leipzig Bodenbelag |
+| `faktoren[].aliase` | `regression`, Typ `lage`/`auswahl` | `{ schluessel: [weitere Namen] }` | Leipzig |
+| `faktoren[].standard_label` | `regression`, Typ `lage` | Wortlaut des Hinweises „Lage nicht angegeben — … angenommen“ | Detmold „Wohnlage 2 (± 0,00 €)“ |
+| `faktoren[].rubrik`, `rundung_faktor` | `regression` | Produkt je Rubrik und Gesamtfaktor auf n Stellen runden | Leipzig: 3 |
+| `basis.ersatz` | `regression` | `[{ merkmal, eur_qm, label }]` — andere Basis, wenn das Merkmal gesetzt ist | Leipzig Ein-/Zweifamilienhaus 7,05 € |
+| `pruefbeispiele[].art` | alle | zusätzlich `rechenweg`: kein Zahlenbeispiel im Dokument, nach seinem Rechenweg aus den Tabellen gerechnet (mit `anmerkung`) | Leipzig |
+
+**Rechenreihenfolge (beide Formen):** Mittelwert = Basis bzw. Zellwert × Gesamtfaktor × (1 + Σ pct/100)
++ Σ €/m², auf `rundung` gerundet; danach die Spanne auf diesen Mittelwert. Hat die Tabelle eigene
+unten/oben-Werte und keine `spanne`, wird jeder der drei Werte für sich so gerechnet.
+
+`hinweis` der Datei ist eine **Arbeitsnotiz der Ernte** (Ablesung, Besonderheiten) und kommt als
+`hinweis_quelle` zurück, nicht unter den Kundenhinweisen.
+
+**Demo-Orte mit Werten (09.11.2026):** Minden, Herford, Löhne, Hiddenhausen, Bad Oeynhausen (Bild-PDF,
+am Bild abgelesen), Dortmund (Tabelle), Bielefeld (Regression, als Tabelle veröffentlicht), Detmold und
+Leipzig (Regression). Hüllhorst hat keinen Mietspiegel (Verzeichnis `unklar`).
