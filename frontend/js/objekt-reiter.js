@@ -392,6 +392,21 @@
     if (det) det.addEventListener('toggle', function () { ziel._offen = det.open; });
   }
 
+  /* ══ v3252 · WERT STATT STATUS ═══════════════════════════════════════
+     Marcel am 09.11.2026: „Bei Umrechnung WGFZ steht nur ‚Tabelle
+     vorhanden'. Können wir den Wert dort nicht angeben?"
+     Gemessen: die Kachel liest den Text der Zeile, und die Zeile setzte für
+     WGFZ, Sachwertfaktor und Grundstücksgröße (amtlich) einen festen
+     Status — der Abruf /wertparameter/zinssatz sagt nur, OB der Ausschuss
+     eine Tabelle führt. Die Zahl entsteht erst im Marktbericht (Zone, GFZ,
+     vorläufiger Sachwert). Liegt einer vor, liest die Zeile sie aus dem
+     Verlauf (DpWertZielbild.bericht(): sw_faktor, uk_k_*, wgfz_angewandt,
+     wgfz_schritt). Nichts wird hier neu gerechnet. */
+  function _berV() { try { return window.DpWertZielbild && DpWertZielbild.bericht ? DpWertZielbild.bericht() : null; } catch (e) { return null; } }
+  function _berDatum(b) { try { return b && b.created_at ? new Date(b.created_at).toLocaleDateString('de-DE') : ''; } catch (e) { return ''; } }
+  function _de(n, d) { var x = Number(n); return (n != null && n !== '' && isFinite(x)) ? x.toLocaleString('de-DE', { minimumFractionDigits: d == null ? 2 : Math.min(d, 2), maximumFractionDigits: d == null ? 4 : d }) : '—'; }
+  var _berNachladen = false;
+
   async function automatik() {
     var box = $('oe-auto'); if (!box) return;
     var lauf = ++_autoLauf;
@@ -515,7 +530,15 @@
          Sachwert abgelesen, § 21 Abs. 3 — vorher gibt es ihn nicht) oder
          eben keine für diese Objektart (Lippe: nur EZFH). Eintragen geht
          immer, als eigener Ansatz. */
-      else if (sq && sq.verfuegbar) html += zeile('Sachwertfaktor', 'Tabelle vorhanden', st('a', 'Ausschuss') + '<span title="' + esc(sq.ausschuss || '') + '">' + esc((sq.ausschuss || r.ausschuss || '').split(',')[0]) + '</span>' + ' — der Faktor wird im Bericht aus dem vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eintragen', 'sachwertfaktor'));
+      else if (sq && sq.verfuegbar) {
+        /* v3252 · liegt ein Bericht vor, steht der dort abgelesene Faktor da, nicht „Tabelle vorhanden" */
+        var _swB = _berV(), _swF = _swB && _swB.sw_faktor != null && isFinite(Number(_swB.sw_faktor)) ? Number(_swB.sw_faktor) : null;
+        var _swA = st('a', 'Ausschuss') + '<span title="' + esc(sq.ausschuss || '') + '">' + esc((sq.ausschuss || r.ausschuss || '').split(',')[0]) + '</span>';
+        html += _swF != null
+          ? zeile('Sachwertfaktor', _de(_swF, 2), _swA + ' — im Marktbericht vom ' + _berDatum(_swB) + ' aus der Tabelle abgelesen (§ 21 Abs. 3, am vorläufigen Sachwert)'
+              + (_swB.swf_stufe ? ' · Stufe ' + esc(_swB.swf_stufe) : '') + '. Ändern sich Fläche, Baujahr oder Ausstattung, liest ein neuer Bericht neu ab.', knopf('eintragen', 'sachwertfaktor'))
+          : zeile('Sachwertfaktor', 'folgt im Bericht', _swA + ' — der Ausschuss führt eine Tabelle; der Faktor wird im Marktbericht am vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eintragen', 'sachwertfaktor'));
+      }
       else {
         /* v1867 · Marcel: „dass der fehlt, aber auch warum und dass man den nicht
            braucht … und mit welchem Standardwert gerechnet wird". Der Bericht
@@ -536,7 +559,17 @@
       if (!_istWhg && uq) {
         var _ukQ = uq.quelle_url ? ' · <a href="' + esc(uq.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '';
         if (ukEigen) html += zeile('Umrechnung Grundstücksgröße', deEin(ukEigen, 2, 4), st('b', 'eigener Ansatz') + (uq.verfuegbar ? 'statt des Werts des Ausschusses' : 'eigene Angabe') + _ukQ, knopf('ändern', 'uk_flaeche'));
-        else if (uq.verfuegbar && uq.anwendbar) html += zeile('Umrechnung Grundstücksgröße', uq.form_text || 'Tabelle vorhanden', st('a', uq.ebene === 'land' ? 'Landeswert' : 'Ausschuss') + '<span title="' + esc(uq.ausschuss || '') + '">' + esc(String(uq.ausschuss || '').split(',')[0]) + '</span>' + (uq.jahrgang ? ' · ' + esc(uq.jahrgang) : '') + _ukQ + ' — im Bericht aus Fläche und Bezugsgröße des Richtwertgrundstücks', '');
+        else if (uq.verfuegbar && uq.anwendbar) {
+          /* v3252 · wie bei der Näherung (v2987): hat ein Bericht den Koeffizienten angewandt, steht er da */
+          var _uaB = _berV(), _uaK = _uaB && _uaB.uk_k_bauland != null && Number(_uaB.uk_k_bezug) > 0 ? Number(_uaB.uk_k_bauland) / Number(_uaB.uk_k_bezug) : null;
+          var _uaHat = _uaK != null && isFinite(_uaK);
+          var _uaW = _uaHat ? '× ' + _de(_uaK) : (uq.form_text === 'kein Einfluss (1,00)' ? '1,00' : 'folgt im Bericht');
+          html += zeile('Umrechnung Grundstücksgröße', _uaW, st('a', uq.ebene === 'land' ? 'Landeswert' : 'Ausschuss') + '<span title="' + esc(uq.ausschuss || '') + '">' + esc(String(uq.ausschuss || '').split(',')[0]) + '</span>' + (uq.jahrgang ? ' · ' + esc(uq.jahrgang) : '') + _ukQ
+            + (_uaHat ? ' — im Marktbericht vom ' + _berDatum(_uaB) + ' angewandt (Koeffizient Objekt ' + _de(_uaB.uk_k_bauland) + ' / Richtwertgrundstück ' + _de(_uaB.uk_k_bezug)
+                + (_uaB.uk_bezug_qm ? ', Bezugsgröße ' + _de(_uaB.uk_bezug_qm, 0) + ' m²' : '') + ')'
+                + (_uaB.uk_bw_qm ? ', angepasster Bodenwert ' + _de(_uaB.uk_bw_qm, 2) + ' €/m²' : '')
+              : ' — ' + esc(uq.form_text || 'Tabelle vorhanden') + '; der Koeffizient entsteht im Bericht aus Fläche und Bezugsgröße des Richtwertgrundstücks'), '');
+        }
         /* v2358 · Greift im Bericht die DealPilot-Formel, sagt der Reiter es auch. */
         /* v2987 · Marcel 27.10.2026: „DealPilot-Formel - aber wie ist der Wert? Können wir den dort hinschreiben?"
            Der Koeffizient haengt an der Bezugsgroesse der Bodenrichtwertzone, die erst der Marktbericht kennt.
@@ -561,10 +594,40 @@
       var wq = r.wgfz_quelle, wEigen = _v('wgfz_objekt');
       if (!_istWhg && wq && wq.verfuegbar) {
         var _wQ = wq.quelle_url ? ' · <a href="' + esc(wq.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '';
-        html += zeile('Umrechnung WGFZ', wEigen ? 'WGFZ ' + deEin(wEigen, 1, 2) : 'Tabelle vorhanden',
-          st('a', 'Ausschuss') + esc(String(wq.ausschuss || '').split(',')[0]) + (wq.seite ? ' · ' + esc(wq.seite) : '') + _wQ
-          + (wEigen ? ' Greift, wenn die Bodenrichtwertzone eine GFZ nennt.' : ' Trag die WGFZ des Objekts ein — sonst bleibt der Bodenwert insoweit unangepasst.'),
-          knopf(wEigen ? 'ändern' : 'eintragen', 'wgfz_objekt'));
+        /* v3252 · Wert statt „Tabelle vorhanden": gerechnet → Faktor mit Kurzform
+           (× Faktor WGFZ Zone → Objekt), ohne WGFZ des Objekts → „WGFZ fehlt — eintragen",
+           sonst sagt die Zeile, warum der Bericht nicht umgerechnet hat. wgfz_angewandt und
+           wgfz_schritt liefert der Verlauf erst ab v3252 (marktbericht api.js) — fehlen die
+           Spalten (älteres mb-Image), bleibt es beim Text von vorher. */
+        var _wB = _berV(), _wA = _wB ? _wB.wgfz_angewandt : null, _wS = _wB ? _wB.wgfz_schritt : null;
+        var _wObjN = zahlDe(wEigen);
+        var _wPasst = !!(_wA && _wA.wgfz_objekt != null && _wObjN != null && Math.abs(Number(_wA.wgfz_objekt) - _wObjN) < 0.005);
+        var _wWert, _wText;
+        var _wKopf = st('a', 'Ausschuss') + esc(String(wq.ausschuss || '').split(',')[0]) + (wq.seite ? ' · ' + esc(wq.seite) : '') + _wQ;
+        if (!wEigen) {
+          _wWert = 'WGFZ fehlt — eintragen';
+          _wText = ' Der Ausschuss führt eine Umrechnung nach der WGFZ. Trag die WGFZ des Objekts ein (oberirdische Geschossfläche / Grundstück) — sonst bleibt der Bodenwert insoweit unangepasst.';
+        } else if (_wA && _wA.verfuegbar && _wPasst && _wA.faktor != null) {
+          _wWert = '× ' + _de(_wA.faktor) + ' WGFZ ' + _de(_wA.wgfz_zone, 2) + ' → ' + _de(_wA.wgfz_objekt, 2);
+          _wText = ' — im Marktbericht vom ' + _berDatum(_wB) + ' angewandt' + (_wA.naeherung ? ' (abgeleitet aus der DealPilot-Formel)' : '')
+            + ': Koeffizient Objekt ' + _de(_wA.uk_objekt) + ' / Zone ' + _de(_wA.uk_zone)
+            + (_wA.bodenwert_eur_qm != null ? ', angepasster Bodenwert ' + _de(_wA.bodenwert_eur_qm, 2) + ' €/m²' : '') + (_wA.begrenzt ? ' (begrenzt)' : '') + '.';
+        } else if (_wS && !_wA) {
+          _wWert = 'WGFZ ' + deEin(wEigen, 1, 2) + ' · umgerechnet';
+          _wText = ' — im Marktbericht vom ' + _berDatum(_wB) + ' angewandt: ' + esc(_wS) + '.';
+        } else if (_wA && !_wA.verfuegbar && _wPasst) {
+          _wWert = 'WGFZ ' + deEin(wEigen, 1, 2) + ' · nicht umgerechnet';
+          _wText = ' — ' + esc(_wA.hinweis || ('Der Marktbericht vom ' + _berDatum(_wB) + ' hat nicht umgerechnet (' + (_wA.grund || 'ohne Grund') + ').'));
+        } else if (_wB && ('wgfz_angewandt' in _wB) && !_wA && !_wS) {
+          _wWert = 'WGFZ ' + deEin(wEigen, 1, 2) + ' · nicht umgerechnet';
+          _wText = ' — im Marktbericht vom ' + _berDatum(_wB) + ' keine Umrechnung: entweder nennt die Bodenrichtwertzone keine GFZ, oder der Bericht lief vor der Eingabe. Ein neuer Bericht klärt es.';
+        } else {
+          _wWert = 'WGFZ ' + deEin(wEigen, 1, 2);
+          _wText = _wA && !_wPasst && _wA.wgfz_objekt != null
+            ? ' — der Marktbericht vom ' + _berDatum(_wB) + ' rechnete mit WGFZ ' + _de(_wA.wgfz_objekt, 2) + '; ein neuer Bericht rechnet mit der eingetragenen.'
+            : ' Greift, wenn die Bodenrichtwertzone eine GFZ nennt — der Faktor entsteht im Marktbericht.';
+        }
+        html += zeile('Umrechnung WGFZ', _wWert, _wKopf + _wText, knopf(wEigen ? 'ändern' : 'eintragen', 'wgfz_objekt'));
       }
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
       /* ══ v1965 · DIE RESTNUTZUNGSDAUER MIT IHRER HERKUNFT ════════════
@@ -597,6 +660,12 @@
     html += mpZeile;
     html += RND_HINWEIS + LEGENDE;   /* v1967 + v1865 */
     kachelnSetzen(box, html);   /* v3237 · Kacheln oben, die Zeilen unverändert unter „Genau ansehen" */
+    /* v3252 · der Verlauf lädt unabhängig (wert-zielbild.js). War er beim Zeichnen noch nicht da,
+       einmal nachziehen, sobald er es ist — nur wenn danach wirklich ein Bericht vorliegt (keine Schleife). */
+    if (!_berV() && !_berNachladen && window.DpWertZielbild && typeof DpWertZielbild.laden === 'function') {
+      _berNachladen = true;
+      try { DpWertZielbild.laden().then(function () { _berNachladen = false; if (lauf === _autoLauf && _berV()) automatik(); }, function () { _berNachladen = false; }); } catch (e) { _berNachladen = false; }
+    }
     /* v1855 · was der Anfragen-Block wissen muss: fehlt der Zins, fehlt der Faktor? */
     /* v1865 · Stufe D ist der gesetzliche Auffangwert (§ 256 BewG) — ein Wert,
        aber keiner aus dem Register. Der Anfragen-Block muss das wissen, sonst

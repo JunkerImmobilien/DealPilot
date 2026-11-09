@@ -803,6 +803,14 @@ router.get('/objects/history', async (req, res) => {
               data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'bezugsgroesse_qm'          AS uk_bezug_qm,
               data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'bodenwert_eur_qm'          AS uk_bw_qm,
               data->'cross_check'->'bodenwert'->'flaechenaufteilung'->>'quelle_art'                AS uk_quelle_art,
+              /* v3252 · Marcel 09.11.2026: „Bei Umrechnung WGFZ steht nur Tabelle vorhanden -
+                 koennen wir den Wert dort nicht angeben?" Der Bericht rechnet die WGFZ-Umrechnung
+                 (ReportOrchestrator, umrechnung_wgfz.js) und legt sie unter cross_check.flaeche.wgfz
+                 ab (Faktor, Koeffizient Objekt/Zone, WGFZ Objekt/Zone, Grund, Hinweis). Die Zeile
+                 im Rechenweg des Bodenwerts (pos GFZ-Umrechnung) steht auch dann da, wenn flaeche
+                 fehlt. Beides nur gelesen, nichts neu gerechnet. Keine Backticks hier. */
+              data->'cross_check'->'flaeche'->'wgfz' AS wgfz_angewandt,
+              jsonb_path_query_first(data, '$.cross_check.bodenwert.schritte[*] ? (@.pos == "GFZ-Umrechnung").detail') #>> '{}' AS wgfz_schritt,
               CASE WHEN (data->'cross_check'->'vergleichswert_irw'->>'verfuegbar') = 'true'
                    THEN (data->'cross_check'->'vergleichswert_irw'->>'vergleichswert_eur')::numeric END AS irw_vergleichswert_eur,
               /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
