@@ -1357,26 +1357,8 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .cpk-det > summary{cursor:pointer;font:600 10px/1.4 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--c-accd-txt);overflow-wrap:anywhere}
 #dashboard-main .cpk-det > p{margin:8px 0 0;font:400 12px/1.5 Inter,system-ui,sans-serif;color:var(--c-pmut)}
 
-/* 01 · Gesamtbewertung (Score) */
-#dashboard-main #dp-pscore-hero.cp-hero{display:block;background:var(--c-panel);border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:18px 20px;box-shadow:0 2px 12px rgba(42,39,39,.08);overflow:visible;margin-bottom:14px}
-#dashboard-main #dp-pscore-hero.cp-hero .hbody{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;gap:14px 28px;padding:0}
-#dashboard-main #dp-pscore-hero.cp-hero .hbody.cps-leer{display:block;font:400 13px/1.6 Inter,system-ui,sans-serif;color:var(--c-pmut);text-align:center;padding:14px 0}
-#dashboard-main #dp-pscore-hero.cp-hero .hgate{flex:0 1 auto;display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 14px;border:0;padding:0;text-align:left;min-width:0}
-#dashboard-main #dp-pscore-hero .cps-gl{flex:0 0 100%;font:600 9.5px/1.3 'JetBrains Mono',monospace;letter-spacing:1.4px;text-transform:uppercase;color:var(--c-pmut)}
-#dashboard-main #dp-pscore-hero .cps-zahl{display:flex;align-items:baseline;gap:5px}
-#dashboard-main #dp-pscore-hero .cps-zahl b{font:700 46px/1 'Space Grotesk',sans-serif}
-#dashboard-main #dp-pscore-hero .cps-zahl span{font:400 12px 'JetBrains Mono',monospace;color:var(--c-pmut)}
-#dashboard-main #dp-pscore-hero .cps-stufe{font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:1.3px;text-transform:uppercase;padding:6px 13px;border-radius:999px}
-#dashboard-main #dp-pscore-hero .cps-tot{display:flex;gap:26px;margin-left:auto;padding-left:26px;border-left:1px solid var(--border,#E0DBD3)}
-#dashboard-main #dp-pscore-hero .cps-tot div{display:flex;flex-direction:column;gap:3px;min-width:0}
-#dashboard-main #dp-pscore-hero .cps-tot .k{font:600 9.5px 'JetBrains Mono',monospace;letter-spacing:1px;color:var(--c-pmut)}
-#dashboard-main #dp-pscore-hero .cps-tot .v{font:700 16px 'JetBrains Mono',monospace;color:var(--c-ptext);white-space:nowrap}
-#dashboard-main #dp-pscore-hero .cps-auf{margin-top:14px;border-top:1px solid var(--border,#E0DBD3);padding-top:10px}
-#dashboard-main #dp-pscore-hero .cps-auf > summary{cursor:pointer;font:600 10px/1.4 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--c-accd-txt)}
-#dashboard-main #dp-pscore-hero .cps-auf .hbars{display:flex;flex-direction:column;gap:10px;margin-top:12px;max-width:640px}
-#dashboard-main #dp-pscore-hero .cps-pass{display:flex;align-items:center;gap:12px;margin-top:14px;font:400 11px/1.4 Inter,system-ui,sans-serif;color:var(--c-pmut)}
-#dashboard-main #dp-pscore-hero .cps-pass .qb{background:#fff;padding:4px;border-radius:6px;border:1px solid var(--border,#E0DBD3);line-height:0}
-#dashboard-main #dp-pscore-hero .cps-pass .qb svg{width:58px;height:58px;display:block}
+/* 01 · Portfolio Score: v3234 zurueck zur Bordkarte von vor v3227 (Regeln oben,
+   .hero/.hgate/.hbars/.hpass). Hier stand die schlichte Karte .cp-hero/.cps-*. */
 
 /* 02 · Kennzahlen */
 #dashboard-main #dp-overview-strip.cp-kz-wrap{display:block !important;margin-bottom:0}
@@ -1437,10 +1419,8 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .zb-zl-z.zb-neg{color:var(--c-redl)}
 
 @media(max-width:640px){
-  #dashboard-main .cpk,#dashboard-main #dp-pscore-hero.cp-hero,#dashboard-main .cpk.gb-wrap,#dashboard-main .cpk.zb-card{padding:14px 12px}
+  #dashboard-main .cpk,#dashboard-main .cpk.gb-wrap,#dashboard-main .cpk.zb-card{padding:14px 12px}
   #dashboard-main .cpk-h em{display:none}
-  #dashboard-main #dp-pscore-hero .cps-tot{margin-left:0;padding-left:0;border-left:0;border-top:1px solid var(--border,#E0DBD3);padding-top:12px;width:100%;justify-content:space-between;gap:12px}
-  #dashboard-main #dp-pscore-hero .cps-zahl b{font-size:40px}
   #dashboard-main .cpt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   #dashboard-main .cpt{padding:9px 10px}
   #dashboard-main .cpt-v{font-size:15px}
@@ -1454,4 +1434,65 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   #dashboard-main .zb-zl > :nth-child(4){grid-area:b}
   #dashboard-main .zb-det[data-zb="unv"] .zb-zl > :nth-child(3){grid-area:b}
   #dashboard-main .zb-zl-kopf{display:none}
+}
+
+/* ════ v3234 · Portfolio-Cockpit (Marcel 09.11.2026) ════
+   Bordkarte des Scores wie vor v3227 (Regeln oben); hier nur, was neu ist:
+   01 zwei Scores unter dem Gesamtscore, 02 Tabelle je Objekt in „Wie wird
+   gerechnet?", 03 Zielbild-Tabelle je Objekt. Gold nur ueber var(--wl-*),
+   Gruen/Rot sind Statusfarben (--c-greenl/--c-redl). */
+
+/* 01 · Zwei Scores (Einstellung „Zwei Scores: Investment + Finanzierung") */
+#dashboard-main .hzwei{margin:0 0 6px;padding:0 0 12px;border-bottom:2px dashed var(--c-line)}
+#dashboard-main .hzwei .hz-kopf{font-family:var(--head-font);font-weight:600;font-size:13px;color:var(--c-ptext);margin-bottom:8px}
+#dashboard-main .hzwei .hz-kopf em{display:block;font:400 9.5px/1.4 'JetBrains Mono',monospace;font-style:normal;letter-spacing:.04em;color:var(--c-pmut);margin-top:2px}
+#dashboard-main .hzwei .hz-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#dashboard-main .hzwei .hz-k{display:flex;align-items:center;gap:10px;min-width:0;padding:8px 10px;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 28%,transparent);border-radius:10px;background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 4%,var(--c-panel))}
+#dashboard-main .hzwei .hz-ring{flex:0 0 58px;line-height:0}
+#dashboard-main .hzwei .hz-txt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+#dashboard-main .hzwei .hz-t{font:600 12.5px/1.25 'Space Grotesk',sans-serif;color:var(--c-ptext)}
+#dashboard-main .hzwei .hz-pill{font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+#dashboard-main .hzwei .hz-f{font:400 10.5px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+#dashboard-main .hzwei.hz-leer{font:400 11.5px/1.45 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+
+/* 02 · Gesamtbewertung: Tabelle je Objekt jetzt im eingeklappten Block */
+#dashboard-main .gb-wie > summary{font-weight:500;color:var(--c-pmut)}
+#dashboard-main .gb-wie[open] > summary{color:var(--c-accd-txt)}
+#dashboard-main .gb-wie .gb-tab{margin-top:10px}
+#dashboard-main .gb-tab-t{font:700 10px 'JetBrains Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--c-accd-txt)}
+
+/* 03 · Zielbild je Objekt (Vorbild: Tafel der Pilot-Analyse, Reiter-Objekt-Optik) */
+#dashboard-main .zb-ot{margin-top:16px;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 35%,transparent)}
+#dashboard-main .zb-ot-t{font:600 10px/1.3 'JetBrains Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;color:var(--c-ptext);margin-bottom:8px}
+#dashboard-main .zb-ot-t em{font-style:normal;font-weight:400;text-transform:none;letter-spacing:.02em;color:var(--c-pmut);margin-left:8px}
+#dashboard-main .zb-ot-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+#dashboard-main .zb-ot-tab{width:100%;min-width:1080px;border-collapse:separate;border-spacing:0;font:500 12px/1.35 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--c-ptext)}
+#dashboard-main .zb-ot-tab th,#dashboard-main .zb-ot-tab td{padding:7px 9px;text-align:right;white-space:nowrap;vertical-align:top;border-bottom:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,transparent)}
+#dashboard-main .zb-ot-tab thead th{font:600 10px/1.3 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--c-pmut);vertical-align:bottom;border-bottom:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 45%,transparent)}
+#dashboard-main .zb-ot-tab thead tr.zb-ot-g th[colspan]{text-align:center;color:var(--c-ptext);border-bottom:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 60%,transparent)}
+#dashboard-main .zb-ot-tab thead th small{display:block;font-weight:400;letter-spacing:.02em;text-transform:none;font-size:10px}
+#dashboard-main .zb-ot-tab tr.zb-ot-g > th:first-child,#dashboard-main .zb-ot-tab tbody th,#dashboard-main .zb-ot-tab tfoot th{position:sticky;left:0;z-index:1;background:var(--c-panel);text-align:left;white-space:normal;min-width:150px;max-width:220px;box-shadow:1px 0 0 color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 20%,transparent)}
+#dashboard-main .zb-ot-tab tbody th,#dashboard-main .zb-ot-tab tfoot th{font:600 12.5px/1.3 Inter,system-ui,sans-serif;color:var(--c-ptext)}
+#dashboard-main .zb-ot-tab tbody th small,#dashboard-main .zb-ot-tab tfoot th small{display:block;font-weight:400;font-size:10.5px;color:var(--c-pmut)}
+#dashboard-main .zb-ot-tab td small{display:block;font:400 10px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+#dashboard-main .zb-ot-tab td.zb-ot-gl{color:var(--c-pmut)}
+#dashboard-main .zb-ot-tab .zb-ot-abw{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 5%,transparent)}
+#dashboard-main .zb-ot-tab td.zb-pos{color:var(--c-greenl)}
+#dashboard-main .zb-ot-tab td.zb-neg{color:var(--c-redl)}
+#dashboard-main .zb-ot-tab td.zb-pos small,#dashboard-main .zb-ot-tab td.zb-neg small{color:inherit;opacity:.85}
+#dashboard-main .zb-ot-tab tr.zb-ot-unv th,#dashboard-main .zb-ot-tab tr.zb-ot-unv td{color:var(--c-pmut);font-style:italic}
+#dashboard-main .zb-ot-tab tfoot th,#dashboard-main .zb-ot-tab tfoot td{font-weight:700;border-top:1.5px solid var(--c-ptext);border-bottom:0}
+#dashboard-main .zb-ot-tab tfoot td small{font-weight:400}
+#dashboard-main .zb-ot-tab td.zb-ot-akt{padding-top:2px}
+#dashboard-main .zb-ot-tab td.zb-ot-akt .zb-neu-btn{white-space:nowrap}
+#dashboard-main .zb-ot-tab tbody tr:hover th,#dashboard-main .zb-ot-tab tbody tr:hover td{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 7%,var(--c-panel))}
+
+@media(max-width:880px){
+  #dashboard-main .hzwei .hz-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  #dashboard-main .zb-ot-t em{display:block;margin:2px 0 0}
+  #dashboard-main .zb-ot-tab{font-size:11px}
+  #dashboard-main .zb-ot-tab th,#dashboard-main .zb-ot-tab td{padding:6px 7px}
+  #dashboard-main .zb-ot-tab tr.zb-ot-g > th:first-child,#dashboard-main .zb-ot-tab tbody th,#dashboard-main .zb-ot-tab tfoot th{min-width:118px;max-width:140px}
 }

@@ -381,33 +381,89 @@
   }
   function numN(v){ return (v==null||v==='')?null:num(v); }
 
+  /* ════ v3234 · ZWEI SCORES IM COCKPIT ════
+     Marcel 09.11.2026: „den Score auch aufteilen wie beim Investor Dealscore? Wenn
+     in den Einstellungen dieser getrennt ist, dann auch im Portfolio Cockpit."
+     Anzeige-Merker wie im Objekt (dealscore2-ui.js window._dpScoreAnsicht,
+     dpsh-score-hero.js scoreAnsicht). KEINE eigene Rechnung: je Objekt teilt
+     DealScore2._zweiScores() (derselbe Kern wie DealScore2.compute im Objekt) die am
+     Objekt gespeicherten Kategorien (_ds2_categories, beim Speichern aus
+     DealScore2.compute) mit dem aktiven Bewertungsprofil auf. Ueber das Portfolio
+     dann nach Kaufpreis gewichtet - wie aggregateCategories(). Objekte ohne
+     belastbar gespeicherten Investor Deal Score (_ds2_score) zaehlen nicht mit. */
+  function _zweiAnsicht(){
+    if (typeof window._dpScoreAnsicht === 'function') { try { return window._dpScoreAnsicht(); } catch (e) {} }
+    try { return localStorage.getItem('dp_score_ansicht') === 'zwei' ? 'zwei' : 'eins'; } catch (e) { return 'eins'; }
+  }
+  function _zweiJeObjekt(d){
+    var D2 = window.DealScore2;
+    if (!d || d._ds2_score == null || !D2 || typeof D2._zweiScores !== 'function' || typeof D2.loadConfig !== 'function') return null;
+    var cats = d._ds2_categories;
+    if (typeof cats === 'string') { try { cats = JSON.parse(cats); } catch (e) { cats = null; } }
+    if (!cats || typeof cats !== 'object' || Array.isArray(cats)) return null;
+    if (!Object.keys(cats).some(function(k){ return cats[k] && Array.isArray(cats[k].breakdown); })) return null;
+    try {
+      var z = D2._zweiScores(cats, D2.loadConfig(), buildDealFromData(d), null);
+      if (!z || !z.investment || !z.finanzierung || z.investment.score == null || z.finanzierung.score == null) return null;
+      return { inv: z.investment.score, fin: z.finanzierung.score };
+    } catch (e) { return null; }
+  }
+  function _zweiAgg(){
+    if (!_detailsLoaded) return { n: 0, von: wonList().length, laedt: true };
+    var arr = detailArr(), tw = 0, si = 0, sf = 0, n = 0;
+    arr.forEach(function(d){
+      var z = _zweiJeObjekt(d); if (!z) return;
+      var w = num(d._kaufpreis) || 1;
+      tw += w; si += z.inv * w; sf += z.fin * w; n++;
+    });
+    if (!n) return { n: 0, von: arr.length };
+    return { n: n, von: arr.length, inv: Math.round(si / tw), fin: Math.round(sf / tw) };
+  }
+  /* Ring wie die Bordkarte (116 px) bzw. klein fuer die zwei Teil-Scores. Farben als
+     style, nicht als Attribut - var() greift in SVG-Praesentationsattributen nicht. */
+  function _ringSvg(sc, col, px){
+    var r = 46, C = 2 * Math.PI * r, d = Math.max(0, Math.min(100, sc)) / 100 * C;
+    return '<svg viewBox="0 0 116 116" width="' + px + '" height="' + px + '" aria-hidden="true">'
+      + '<circle cx="58" cy="58" r="' + r + '" fill="none" stroke="rgba(140,140,140,.18)" stroke-width="9"/>'
+      + '<circle cx="58" cy="58" r="' + r + '" fill="none" style="stroke:' + col + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + d.toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 58 58)"/>'
+      + '<text x="58" y="56" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="34" style="fill:' + col + '">' + sc + '</text>'
+      + '<text x="58" y="73" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#9a948a">/ 100</text></svg>';
+  }
+  function _zweiKarte(titel, frage, sc){
+    var t = tierOf(sc);
+    return '<div class="hz-k"><div class="hz-ring">' + _ringSvg(sc, t.col, 58) + '</div>'
+      + '<div class="hz-txt"><span class="hz-t">' + esc(titel) + '</span>'
+      + '<span class="hz-pill" style="background:' + _tierBg(t.t) + ';color:' + t.col + '">' + esc(t.l) + '</span>'
+      + '<span class="hz-f">' + esc(frage) + '</span></div></div>';
+  }
+
   /* ════ RENDER: Score-Hero ════ */
   function renderScoreHero(){
     var host = $('dp-pscore-hero'); if(!host) return;
     var P = plan();
     var ag = aggregateScore();
     var title = P.full ? 'Investor Portfolio Score' : 'DealPilot Portfolio Score';
-    /* v3227 \u00b7 Marcel 08.11.2026: \u201edie Gesamtbewertung einfacher darstellen \u2026
-       alles im Design und Stil wie im Tab Objekt". Statt Bordkarte mit Ring,
-       Balken, Kennzahl-Spalte und Portfolio-Pass jetzt EINE Karte wie im
-       Reiter Objekt: eine Zahl, die Stufe aus ScoreTier.stufe(), drei
-       Eckdaten; die Aufschluesselung der fuenf Bereiche (und der Pass) liegt
-       eingeklappt darunter. Die Kennzahlen p. a. (v3216, W-3) stehen jetzt in
-       der Kachelreihe in Abschnitt 02. Gerechnet wird nichts neu.
+    /* v3227 (bis v3233) machte hieraus eine schlichte Karte ohne Ring und mit
+       eingeklappten Bereichen - auf Marcels Wunsch v3234 zurueckgenommen, s. u.
        Haken fuer das Messe-Drehbuch bleiben: .hbody, .hgate, .hbars und der
        Text \u201e\u2026 SCORE nn / 100 STUFE OBJEKTE n VOL. \u2026 CF/MON \u2026". */
-    host.classList.add('cp-hero');
-    var _hIco = '<span class="cpk-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>';
+    /* v3234 \u00b7 Marcel 09.11.2026: \u201eBitte auch die Optik der Karte wieder zur\u00fcck, du hast
+       den irgendwie umgebaut." Die Bordkarte von vor v3227 ist zur\u00fcck (Pre-Flight-Kopf,
+       Ring, Stufe, Eckdaten, f\u00fcnf Bereiche, Portfolio-Pass). Die Kennzahlen p. a. bleiben in
+       Abschnitt 02 (v3227) - die Kennzahl-Spalte .hkz kommt nicht zur\u00fcck.
+       Neu: ist in den Einstellungen \u201eZwei Scores\u201c gew\u00e4hlt (Merker dp_score_ansicht, wie
+       im Objekt), stehen Investment- und Finanzierungs-Score unter dem Gesamtscore
+       (_zweiAgg, aus dem Kern DealScore2._zweiScores). */
+    host.classList.remove('cp-hero');
     if(!ag.hasData){
-      host.innerHTML = '<div class="cpk-h">'+_hIco+'<span>Gesamtbewertung</span></div>'
-        + '<div class="hbody cps-leer">'
-        + 'Noch kein gewonnenes Objekt mit berechnetem Score.<br>Sobald du ein Objekt auf \u201eGewonnen\u201c setzt und der DealScore berechnet ist, erscheint hier dein Portfolio-Score.</div>';
+      host.innerHTML = '<div class="hmain"><div class="hpre"><span class="led"></span><span class="t">Pre-Flight \u00b7 Portfolio Score</span><span class="cls">Boarding</span></div>'
+        + '<div class="hbody" style="display:block;text-align:center;color:var(--c-pmut);font-family:Inter,sans-serif;font-size:13px;line-height:1.6;padding:30px 22px">'
+        + 'Noch kein gewonnenes Objekt mit berechnetem Score.<br>Sobald du ein Objekt auf \u201eGewonnen\u201c setzt und der DealScore berechnet ist, erscheint hier dein Portfolio-Score.</div></div>';
       return;
     }
     var t = tierOf(ag.total);
-    var _st = (window.ScoreTier && ScoreTier.stufe) ? ScoreTier.stufe(ag.total) : null;
-    var versal = (_st && _st.versal) ? _st.versal : String(t.l).toUpperCase();
     var S = aggStats();
+    var Z2 = (P.full && _zweiAnsicht() === 'zwei') ? _zweiAgg() : null;
     var detailsBtn = P.full
       ? '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreDetails()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4-4M11 8v6M8 11h6"/></svg> Details &amp; alle KPIs</button>'
       : '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreUpgrade()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Volle 24-KPI-Analyse</button>';
@@ -428,25 +484,39 @@
           + '<div class="track"><div class="fill" data-w="'+sc+'" style="width:0;background:'+catBarColor(sc)+'"></div></div></div>';
       }).join('') : '<div class="bar" style="color:var(--c-pmut);font-family:JetBrains Mono;font-size:11px">Kategorien werden geladen\u2026</div>';
     var cfM=S.cfVsM;
-    var _auf = $('dp-hero-auf'), _aufOffen = !!(_auf && _auf.open);   /* aufgeklappt bleibt aufgeklappt */
+    /* v3234 \u00b7 Zwei Scores: Investment und Finanzierung unter dem Gesamtscore. Der Block
+       steht VOR \u201eSo setzt sich der Score zusammen\u201c in der rechten Spalte und NACH den
+       Eckdaten im Text - das Messe-Drehbuch liest \u201eSCORE nn / 100 STUFE OBJEKTE \u2026\u201c aus
+       .hbody und \u201eFinanzierung n KPIs nn/100\u201c aus .hbars (hier: Finanzierungs-Score). */
+    var zweiHtml = '';
+    if (Z2) {
+      zweiHtml = Z2.laedt ? '<div class="hzwei hz-leer">Investment- und Finanzierungs-Score werden geladen…</div>' : Z2.n ? '<div class="hzwei">'
+          + '<div class="hz-kopf">Gesamtscore aus zwei Teilen<em>'+Z2.n+' von '+Z2.von+' Objekt'+(Z2.von===1?'':'en')+' \u00b7 nach Kaufpreis gewichtet</em></div>'
+          + '<div class="hz-grid">' + _zweiKarte('Investment-Score', 'das Objekt, egal wie finanziert', Z2.inv)
+          +   _zweiKarte('Finanzierungs-Score', 'tr\u00e4gt die Finanzierung', Z2.fin) + '</div></div>'
+        : '<div class="hzwei hz-leer">Zwei Scores: f\u00fcr noch kein Objekt gespeichert \u2013 ein Objekt einmal \u00f6ffnen und speichern, dann steht die Aufteilung hier.</div>';
+    }
+    var ringCol = t.col;
     host.innerHTML =
-      '<div class="cpk-h">'+_hIco+'<span>Gesamtbewertung</span><em>'+ag.scored+' / '+ag.n+' bewertet \u00b7 Stand '+_heute()+'</em></div>'
-      + '<div class="hbody cps">'
-      +   '<div class="hgate cps-score">'
-      +     '<div class="cps-gl">'+esc(title)+'</div>'
-      +     '<div class="cps-zahl"><b style="color:'+t.col+'">'+ag.total+'</b><span>/ 100</span></div>'
-      +     '<div class="cps-stufe" style="background:'+_tierBg(t.t)+';color:'+t.col+'">'+esc(versal)+'</div>'
-      +   '</div>'
-      +   '<div class="cps-tot">'
-      +     '<div><span class="k">OBJEKTE</span><span class="v">'+ag.n+'</span></div>'
-      +     '<div><span class="k">VOL.</span><span class="v">'+fmtKEU(S.kp)+'</span></div>'
-      +     '<div><span class="k">CF/MON</span><span class="v" style="color:'+(cfM>=0?'var(--c-greenl)':'var(--c-redl)')+'">'+(cfM>=0?'+':'')+fmtE(cfM)+'</span></div>'
-      +   '</div>'
+      '<div class="hmain">'
+      + '<div class="hpre"><span class="led"></span><span class="t">Pre-Flight \u00b7 '+(P.full?'Investor':'DealPilot')+' Portfolio Score</span><span class="cls">Boarding</span></div>'
+      + '<div class="hbody">'
+      + '<div class="hgate">'
+      + '<div class="gl">'+(Z2 ? 'Gesamtscore' : esc(title))+'</div>'
+      + '<div id="dp-hero-ring"></div>'
+      + '<div class="gt" style="background:'+_tierBg(t.t)+';color:'+t.col+'">'+t.l+'</div>'
+      + '<div class="tot"><div><div class="k">OBJEKTE</div><div class="v">'+ag.n+'</div></div>'
+      + '<div><div class="k">VOL.</div><div class="v">'+fmtKEU(S.kp)+'</div></div>'
+      + '<div><div class="k">CF/MON</div><div class="v" style="color:'+(cfM>=0?'var(--c-greenl)':'var(--c-redl)')+'">'+(cfM>=0?'+':'')+fmtE(cfM)+'</div></div></div>'
       + '</div>'
-      + '<details class="cps-auf" id="dp-hero-auf"'+(_aufOffen?' open':'')+'><summary>So setzt sich der Score zusammen \u00b7 '+(ag.cats?ag.cats.length:5)+' Bereiche</summary>'
-      +   '<div class="hbars"><div id="dp-hero-bars">'+catsHtml+'</div>'+detailsBtn+'</div>'
-      +   '<div class="cps-pass"><div class="qb" id="dp-hero-qr"></div><span>Portfolio-Pass \u00b7 mit dem Handy scannen \u00f6ffnet das Cockpit</span></div>'
-      + '</details>';
+      + '<div class="hbars">' + zweiHtml + '<div class="ttl">So setzt sich der Score zusammen</div><div id="dp-hero-bars">'+catsHtml+'</div>'+detailsBtn+'</div>'
+      + '</div></div>'
+      + '<div class="vperf"></div>'
+      + '<div class="hpass"><div class="hp-lab">PORTFOLIO-PASS</div><div class="qb" id="dp-hero-qr"></div>'
+      + '<div class="hp-code">PORTFOLIO</div><div class="hp-sub">'+ag.scored+' / '+ag.n+' bewertet<br>Stand '+_heute()+'</div></div>';
+    /* v3234 \u00b7 Ring wie vor v3227 - Farbe jetzt als style statt als SVG-Attribut: t.col ist
+       ein var(), und var() greift in Praesentationsattributen nicht (CLAUDE.md, CSS). */
+    var ring=$('dp-hero-ring'); if(ring) ring.innerHTML=_ringSvg(ag.total, ringCol, 116);
     var qrEl=$('dp-hero-qr'); if(qrEl){ qrEl.innerHTML=_qrSvg(((window.location&&location.origin)?location.origin:'')+'/?cockpit', 3); }
     setTimeout(function(){ host.querySelectorAll('.fill').forEach(function(f){ if(f.dataset.w!=null) f.style.width=f.dataset.w+'%'; }); },140);
     /* v3216 · den letzten Marktbericht je Objekt nachladen (GET, kein
@@ -894,7 +964,10 @@
       var zw = z.wertzuwachs_nach_kosten[z.top];
       var e = { name: basis.name, key: o._key, kp: basis.kp, top: z.top, stand: z.stand, mB: B.miete_jahr, mM: M.miete_jahr, mZ: T.miete_jahr,
         kosten: T.kosten || 0, ewB: B.ertragswert, ewZ: T.ertragswert, zuw: zw, gesperrt: z.ertragswert_gesperrt,
-        mpiB: B.marktpreisindikation, rndB: B.rnd, rndZ: T.rnd, grund: g ? g.text : null, code: g ? g.code : null };
+        mpiB: B.marktpreisindikation, rndB: B.rnd, rndZ: T.rnd, grund: g ? g.text : null, code: g ? g.code : null,
+        /* v3234 · fuer die Objekt-Tabelle (_zbObjTabelle): Soll-Stufe und Herkunft der Spalten, nur gelesen */
+        ewM: M.ertragswert, mpiM: M.marktpreisindikation, mpiZ: T.marktpreisindikation, kostenM: (S.mieterhoehung ? S.mieterhoehung.kosten : 0) || 0,
+        hatMh: !!S.mieterhoehung, hatZb: !!S.zielbild };
       /* v2988 · woher das Zielbild kommt, und ob es von der Investition (san) abweicht */
       try { e.herk = (window.DpPotenzial && DpPotenzial.herkunftAusDaten) ? DpPotenzial.herkunftAusDaten(o) : null; } catch (x) { e.herk = null; }
       if (zw != null && B.ertragswert != null && T.ertragswert != null) {
@@ -974,6 +1047,79 @@
 
     return t;
   }
+  /* ════ v3234 · ZIELBILD JE OBJEKT ALS TABELLE ════
+     Vorbild: die Tafel „Ankauf · Bestand · Zielbild" der Pilot-Analyse
+     (wert-zielbild.js zielTafel - Kennzahlen als Zeilen, Stufen als Spalten). Im
+     Cockpit stehen die Objekte als Zeilen, je Kennzahl die Stufen Bestand · Soll
+     (Mieterhoehung) · Zielbild als Spalten, dazu die Abweichung Bestand → Zielbild.
+     Alle Werte aus _zielbildAgg (gespeicherter Lauf je Objekt, zielbildFuer); die
+     Summenzeile nimmt die Summen von dort - dieselben wie Tabelle oben und Saetze. */
+  function _zbObjTabelle(A){
+    var E = _fE, VZ = _fVZ, P = _fP, dat = _fDat;
+    function td(v, cls, klein){ return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + v + (klein ? '<small>' + klein + '</small>' : '') + '</td>'; }
+    function ton(v){ return v == null ? '' : (v >= 0 ? 'zb-pos' : 'zb-neg'); }
+    function abw(z, b){ return (z != null && b != null) ? z - b : null; }
+    function pz(z, b){ return (z != null && b) ? (z - b) / b * 100 : null; }
+    function rnd(v){ return v != null ? 'RND ' + Math.round(v) + ' J.' : ''; }
+    var mit = A.mit.filter(function(e){ return !e.unveraendert; })
+      .sort(function(a,b){ return ((b.mZ-b.mB)/(b.mB||1)) - ((a.mZ-a.mB)/(a.mB||1)); });
+    var unv = A.unv || [];
+    var rows = mit.map(function(e){
+      var art = e.top === 'zielbild' ? (e.hatMh ? 'Soll und Zielbild' : 'Zielbild') : 'nur Mieterhöhung';
+      var tip = art + (e.stand ? ' · gerechnet am ' + dat(e.stand) : '')
+        + (e.herk && e.herk.text ? ' · ' + e.herk.text + (e.herk.san > 0 && e.kosten && Math.abs(e.herk.san - e.kosten) >= 1 ? ' (Investition ' + E(e.herk.san) + ', Zielbild-Maßnahmen ' + E(e.kosten) + ')' : '') : '')
+        + (e.ewB != null && e.ewZ === e.ewB && e.mZ > e.mB ? ' · Mehrmiete liegt über der marktüblichen Miete – im Ertragswert nicht angesetzt' : '');
+      var dm = abw(e.mZ, e.mB), dw = abw(e.ewZ, e.ewB);
+      var ewFehlt = e.ewB == null || e.ewZ == null;
+      var ewGrund = e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet';
+      return '<tr title="' + esc(tip) + '">'
+        + '<th scope="row">' + esc(e.name) + '<small>' + esc(art) + (e.stand ? ' · ' + esc(dat(e.stand)) : '') + '</small></th>'
+        + td(E(e.mB))
+        + td(E(e.mM), e.hatMh ? '' : 'zb-ot-gl', e.hatMh ? '' : 'wie Bestand')
+        + td(E(e.mZ), e.hatZb ? '' : 'zb-ot-gl', e.hatZb ? '' : 'wie Soll')
+        + td(VZ(dm), 'zb-ot-abw ' + ton(dm), P(pz(e.mZ, e.mB)))
+        + td(e.kosten ? E(e.kosten) : 'keine', '', e.kostenM ? 'davon Soll ' + E(e.kostenM) : '')
+        + td(e.ewB != null ? E(e.ewB) : '–', '', rnd(e.rndB))
+        + td(e.ewM != null ? E(e.ewM) : '–', e.hatMh ? '' : 'zb-ot-gl', e.hatMh || e.ewM == null ? '' : 'wie Bestand')
+        + td(e.ewZ != null ? E(e.ewZ) : '–', '', rnd(e.rndZ))
+        + (ewFehlt ? td('–', 'zb-ot-abw', ewGrund) : td(VZ(dw), 'zb-ot-abw ' + ton(dw), P(pz(e.ewZ, e.ewB))))
+        + td(e.mpiB != null ? E(e.mpiB) : '–')
+        + (e.zuw == null ? td('–', '', ewGrund) : td('<b>' + VZ(e.zuw) + '</b>', ton(e.zuw)))
+        + '<td class="zb-ot-akt"><button type="button" class="zb-neu-btn" title="Öffnet das Objekt, rechnet die Ertragswerte je Stufe neu (kostenlos, kein Kontingent) und speichert" onclick="DealPilotDashboard.zumZielbild(\'' + esc(e.key) + '\',true)">neu rechnen ↻</button></td>'
+        + '</tr>';
+    }).join('');
+    if (unv.length) {
+      var uS = unv.reduce(function(t, x){ return t + (x.mB || 0); }, 0);
+      rows += '<tr class="zb-ot-unv"><th scope="row">Ohne Zielbild · ' + unv.length + ' Objekt' + (unv.length === 1 ? '' : 'e') + '<small>gerechnet wie heute – Liste darunter</small></th>'
+        + td(E(uS)) + td(E(uS), 'zb-ot-gl') + td(E(uS), 'zb-ot-gl') + td('±0 €', 'zb-ot-abw')
+        + td('keine') + td('–') + td('–') + td('–') + td('–', 'zb-ot-abw') + td('–') + td('–') + '<td></td></tr>';
+    }
+    /* Ertragswert-Summen ueber dieselben Objekte wie A.ewB/A.ewZ (beide Werte da) */
+    var mitEw = mit.filter(function(e){ return e.zuw != null; });
+    var ewMs = mitEw.every(function(e){ return e.ewM != null; }) ? mitEw.reduce(function(t, e){ return t + e.ewM; }, 0) : null;
+    var nMit = A.mit.length, dmS = A.mieteZ - A.mieteB, dwS = A.ewN ? A.ewZ - A.ewB : null;
+    var ewKl = A.ewN ? A.ewN + ' von ' + nMit + ' Obj.' : '';
+    var summe = '<tr class="zb-ot-sum"><th scope="row">Summe · ' + nMit + ' Objekt' + (nMit === 1 ? '' : 'e') + '</th>'
+      + td(E(A.mieteB)) + td(E(A.mieteM)) + td(E(A.mieteZ))
+      + td(VZ(dmS), 'zb-ot-abw ' + ton(dmS), P(pz(A.mieteZ, A.mieteB)))
+      + td(A.kosten ? E(A.kosten) : 'keine')
+      + td(A.ewN ? E(A.ewB) : '–', '', ewKl) + td(A.ewN && ewMs != null ? E(ewMs) : '–', '', A.ewN ? ewKl : '') + td(A.ewN ? E(A.ewZ) : '–', '', ewKl)
+      + (dwS == null ? td('–', 'zb-ot-abw') : td(VZ(dwS), 'zb-ot-abw ' + ton(dwS), P(pz(A.ewZ, A.ewB))))
+      + td(A.mpiN ? E(A.mpiB) : '–', '', A.mpiN ? A.mpiN + ' Obj.' : '')
+      + td(A.ewN ? '<b>' + VZ(A.zuw) + '</b>' : '–', A.ewN ? ton(A.zuw) : '', A.ewN ? 'nach ' + E(A.ewKosten) + ' Maßnahmen' : '')
+      + '<td></td></tr>';
+    return '<div class="zb-ot">'
+      + '<div class="zb-ot-t">Je Objekt · Bestand → Soll → Zielbild<em>wie die Tabelle der Pilot-Analyse, für alle Objekte</em></div>'
+      + '<div class="zb-ot-scroll"><table class="zb-ot-tab"><thead>'
+      +   '<tr class="zb-ot-g"><th rowspan="2" scope="col">Objekt</th><th colspan="4" scope="colgroup">Kaltmiete p. a.</th><th rowspan="2" scope="col">Maßnahmen<small>bis zum Zielbild</small></th>'
+      +   '<th colspan="4" scope="colgroup">Ertragswert</th><th rowspan="2" scope="col">Marktpreis&shy;indikation<small>Bestand</small></th><th rowspan="2" scope="col">Wertzuwachs<small>nach Kosten</small></th><th rowspan="2" scope="col"></th></tr>'
+      +   '<tr><th scope="col">Bestand</th><th scope="col">Soll</th><th scope="col">Zielbild</th><th scope="col" class="zb-ot-abw">Abw.</th>'
+      +   '<th scope="col">Bestand</th><th scope="col">Soll</th><th scope="col">Zielbild</th><th scope="col" class="zb-ot-abw">Abw.</th></tr>'
+      + '</thead><tbody>' + rows + '</tbody><tfoot>' + summe + '</tfoot></table></div>'
+      + '<p class="zb-det-satz">Soll = Mieterhöhung bei gleichen Mietern bis zur Vergleichsmiete. Abw. = Zielbild gegen Bestand. Ertragswert-Summen nur über die Objekte, für die beide Stufen gerechnet sind (' + (A.ewN || 0) + ' von ' + nMit + '); Wertzuwachs = Ertragswert-Plus − Maßnahmen. Ausblick, kein Verkehrswert.</p>'
+      + '</div>';
+  }
+
   /* v3227 · Marcel 08.11.2026: „auch den Bestand und das Zielbild [einfacher]?
      Die Einheiten ohne Zielbild angeben, aber kompakter und zum Einblenden.
      Alles im Design und Stil wie im Tab Objekt." Statt Kacheln, zwei
@@ -1019,7 +1165,7 @@
     if (!nMit) {
       host.innerHTML = '<div class="cpk zb-card">' + kopf
         + '<p class="zb-text">Für keines der ' + A.n + ' Objekte sind Mieterhöhung oder Zielbild erfasst. Eintragen lässt es sich im Objekt im Reiter Objekt, Karte „Mieterhöhung und Zielbild“.</p>'
-        + gruendeHtml + unvHtml + det('wie', 'Wie gerechnet?', neuSatz) + '</div>';
+        + gruendeHtml + unvHtml + det('wie', 'Wie wird gerechnet?', neuSatz) + '</div>';
       return;
     }
     var mehrM = A.mieteM - A.mieteB, mehrZ = A.mieteZ - A.mieteB;
@@ -1039,25 +1185,15 @@
                : zeile('Ertragswert', 'noch keiner', '', '–', null, 'je Objekt unter Bewertung rechnen'))
       + '</tbody></table></div>';
 
-    /* je Objekt: eine Zeile, sortiert nach Steigerung, eingeklappt */
-    var objRows = A.mit.slice().sort(function(a,b){ return ((b.mZ-b.mB)/(b.mB||1)) - ((a.mZ-a.mB)/(a.mB||1)); }).map(function(e){
-      var pz = e.mB ? ((e.mZ - e.mB) / e.mB * 100) : null;
-      var art = e.unveraendert ? 'ohne Zielbild' : (e.top === 'zielbild' ? 'Zielbild' : 'nur Mieterhöhung');
-      var tip = art + (e.stand ? ' · gerechnet am ' + dat(e.stand) : '')
-        + (e.ewB != null && e.ewZ != null ? ' · Ertragswert ' + EK(e.ewB) + ' → ' + EK(e.ewZ) : '')
-        + (e.kosten ? ' · Maßnahmen ' + EK(e.kosten) : ' · ohne Maßnahmen')
-        + (e.herk && e.herk.text ? ' · ' + e.herk.text + (e.herk.san > 0 && e.kosten && Math.abs(e.herk.san - e.kosten) >= 1 ? ' (Investition ' + EK(e.herk.san) + ', Zielbild-Maßnahmen ' + EK(e.kosten) + ')' : '') : '')
-        + (e.ewB != null && e.ewZ === e.ewB && e.mZ > e.mB ? ' · Mehrmiete liegt über der marktüblichen Miete – im Ertragswert nicht angesetzt' : '');
-      var wz = e.zuw == null ? (e.unveraendert ? 'unverändert' : (e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet')) : VZ(e.zuw);
-      return '<div class="zb-zl" title="' + esc(tip) + '">'
-        + '<span class="zb-zl-n">' + esc(e.name) + '<small>' + esc(art) + '</small></span>'
-        + '<span class="zb-zl-w">' + EK(e.mB) + ' → ' + EK(e.mZ) + ' <b' + tonV(pz) + '>' + P(pz) + '</b></span>'
-        + '<span class="zb-zl-z' + (e.zuw == null ? '' : (e.zuw >= 0 ? ' zb-pos' : ' zb-neg')) + '">' + wz + '</span>'
-        + '<button type="button" class="zb-neu-btn" title="Öffnet das Objekt, rechnet die Ertragswerte je Stufe neu (kostenlos, kein Kontingent) und speichert" onclick="DealPilotDashboard.zumZielbild(\''+esc(e.key)+'\',true)">neu rechnen ↻</button>'
-        + '</div>';
-    }).join('');
-    var objHtml = det('obj', 'Objekte einzeln · anzeigen (' + nMit + ')',
-      '<div class="zb-liste"><div class="zb-zl zb-zl-kopf"><span>Objekt</span><span>Kaltmiete Bestand → Zielbild</span><span>Wertzuwachs n. K.</span><span></span></div>' + objRows + '</div>');
+    /* v3234 · Marcel 09.11.2026: „Zielbild-Tabelle wie unter Pilot-Analyse mit der Tabelle,
+       nur für alle Objekte … darf gerne noch genauer." Die Tafel der Pilot-Analyse
+       (wert-zielbild.js zielTafel: Kaltmiete p. a., Maßnahmen, Ertragswert, Markt-
+       preisindikation, Wertzuwachs nach Kosten je Stufe) jetzt als EINE Zeile je Objekt,
+       Spalten Bestand · Soll · Zielbild, dazu die Abweichung Bestand → Zielbild und eine
+       Summenzeile. Gelesen wird dieselbe Quelle wie dort, nur gespeichert:
+       DpWertZielbild.zielbildFuer(o) über _zielbildAgg() - nichts neu gerechnet; die
+       Summen sind die von _zielbildAgg (A.mieteB/M/Z, A.kosten, A.ewB/ewZ, A.zuw, A.mpiB). */
+    var objTab = _zbObjTabelle(A);
 
     /* Basis-Abgleich mit den Kennzahlen (Marcel: „das muss ja auch valide sein") */
     var abgl = '<p class="zb-det-satz"><b>Abgleich mit den Kennzahlen oben:</b> Die Kennzahlen in Abschnitt 02 rechnen über <b>alle ' + A.n + ' Objekte</b>, dieser Vergleich nur über die <b>' + nMit + ' mit Angaben</b>. '
@@ -1071,8 +1207,8 @@
     host.innerHTML = '<div class="cpk zb-card">' + kopf
       + tab
       + gruendeHtml
-      + objHtml + unvHtml
-      + det('wie', 'Wie gerechnet?', lesart + abgl + neuSatz)
+      + objTab + unvHtml
+      + det('wie', 'Wie wird gerechnet?', lesart + abgl + neuSatz)
       + '<div class="zb-ausw"><div class="zb-ausw-t">Auswertung</div>' + t.map(function(s){ return '<p>' + esc(s) + '</p>'; }).join('')
       +   '<div class="zb-ausw-pp"><button type="button" class="zb-btn zb-btn-gold" onclick="DealPilotDashboard.pilotZielbild()">Vom Portfolio-Piloten ausführlich erklären lassen ›</button>'
       +   '</div></div>'   /* v2955 · KI-Hinweistext raus (Marcel 25.10.2026) */
@@ -1141,9 +1277,11 @@
         + '<td>' + (x.ew != null ? _fE(x.ew) + '<small class="' + ton(x.ew, x.kp) + '">' + P(x.ew, x.kp) + '</small>' : '<b class="gb-neg">fehlt</b>') + '</td>'
         + '<td>' + esc(x.stand || '') + '</td></tr>';
     }).join('');
-    return '<details class="gb-tab"' + (B.some(function(x){ return x.ew == null; }) ? ' open' : '') + '><summary>Bewertung je Objekt – Kaufpreis, Marktpreisindikation, Vergleichswert, Ertragswert</summary>'
+    /* v3234 · steht jetzt eingeklappt unter „Wie wird gerechnet?" (renderGesamtbew) -
+       kein eigenes details mehr, das bei fehlendem Ertragswert von selbst aufging */
+    return '<div class="gb-tab"><div class="gb-tab-t">Bewertung je Objekt – Kaufpreis, Marktpreisindikation, Vergleichswert, Ertragswert</div>'
       + '<div class="gb-tab-scroll"><table><thead><tr><th>Objekt</th><th>Kaufpreis</th><th>Marktpreisindikation</th><th>Vergleichswert (amtlich)</th><th>Ertragswert</th><th>Bericht vom</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
-      + '<p class="cp-erkl">Prozent = Abstand zum Kaufpreis. Marktpreisindikation = Angebotspreise nach Abschlag; Vergleichswert = Vergleichsfaktor bzw. Immobilienrichtwert des Gutachterausschusses aus Kaufpreisen (§ 20, § 24 ImmoWertV), nur wo er vorliegt. Ertragswert aus dem Zielbild-Lauf des Objekts, sonst aus dem letzten Marktbericht. Werte so, wie der Bericht sie ausweist – nichts nachträglich verändert.</p></details>';
+      + '<p class="cp-erkl">Prozent = Abstand zum Kaufpreis. Marktpreisindikation = Angebotspreise nach Abschlag; Vergleichswert = Vergleichsfaktor bzw. Immobilienrichtwert des Gutachterausschusses aus Kaufpreisen (§ 20, § 24 ImmoWertV), nur wo er vorliegt. Ertragswert aus dem Zielbild-Lauf des Objekts, sonst aus dem letzten Marktbericht. Werte so, wie der Bericht sie ausweist – nichts nachträglich verändert.</p></div>';
   }
   function renderGesamtbew(){
     var host = $('dp-gesamtbew'); if (!host || !_detailsLoaded) return;
@@ -1154,7 +1292,7 @@
     /* v3227 · Marcel 08.11.2026: „die Gesamtbewertung einfacher darstellen".
        Dieselben drei Bloecke (investiert · Bilanz heute · nach Bewertung) mit
        denselben Zahlen, aber als schlichte Zeilen in einer Karte wie im Reiter
-       Objekt; die Erklaerungen liegen eingeklappt unter „Wie gerechnet?". */
+       Objekt; die Erklaerungen liegen eingeklappt unter „Wie wird gerechnet?" (v3234 mit der Tabelle). */
     function z(l, v, cls, sub){ return '<div class="gb-z'+(cls?' '+cls:'')+'"><span class="gb-l">'+l+(sub?'<small>'+sub+'</small>':'')+'</span><span class="gb-v">'+v+'</span></div>'; }
     var b1 = '<div class="gb-k"><div class="gb-t"><span>1</span>Investiert</div>'
       + z('Kaufpreise', EK(s.kp), '', G.n + ' Objekte')
@@ -1185,15 +1323,18 @@
       + (mitMpi.length ? z('Marktpreisindikation', EK(mpiS), '', mitMpi.length + ' von ' + G.n + ' Objekten') + z('Abstand zu deren Kaufpreisen', _fP(kpMpiS ? (mpiS / kpMpiS - 1) * 100 : null), 'gb-sub') : '')
       + '</div>';
     var fehlt = ohneEw.length ? '<div class="gb-fehlt-box"><b>' + ohneEw.length + ' von ' + G.n + ' Objekten ohne Ertragswert</b> – nicht in der Summe: '
-          + ohneEw.map(function(x){ return esc(x.name); }).join(' · ') + '. Gründe in der Tabelle unten.</div>' : '';
+          + ohneEw.map(function(x){ return esc(x.name); }).join(' · ') + '. Die Gründe stehen je Objekt unter „Wie wird gerechnet?“.</div>' : '';
     var _wg = host.querySelector('details.gb-wie'), _wgOffen = !!(_wg && _wg.open);
-    var wie = '<details class="cpk-det gb-wie"' + (_wgOffen ? ' open' : '') + '><summary>Wie gerechnet?</summary>'
+    /* v3234 · Marcel 09.11.2026: „Bei der Gesamtbewertung darf es gerne unter ‚wie wird
+       gerechnet' auch eingeklappt werden." Erklaerung UND die Tabelle „Bewertung je Objekt"
+       liegen in einem eingeklappten Block; offen nur, wenn der Nutzer ihn aufgeklappt hat. */
+    var wie = '<details class="cpk-det gb-wie"' + (_wgOffen ? ' open' : '') + '><summary>Wie wird gerechnet? · Bewertung je Objekt</summary>'
       + '<p><b>Investiert:</b> das Geld, das in die Objekte geflossen ist. Nebenkosten (Grunderwerbsteuer, Notar, Makler) sind bezahlt, aber kein Vermögenswert – sie stecken in keinem Wert daneben. Die Gesamtinvestition ist dieselbe wie in der Kachel oben.</p>'
-      + '<p><b>Bilanz heute:</b> Eigenkapital ist, was nach Abzug der Restschuld vom Wert übrig bleibt (wie die Vermögensbilanz in Abschnitt 06). Als Wert steht der Kaufpreis – nicht die Gesamtinvestition und kein Gutachten.</p>'
-      + '<p><b>Nach Bewertung:</b> verglichen wird mit den Kaufpreisen <b>derselben</b> Objekte, nicht mit der Gesamtinvestition von ' + EK(s.gi) + '. Der Ertragswert ist der Wert aus den Mieten nach ImmoWertV, die Marktpreisindikation der Wert aus Angebotspreisen vergleichbarer Objekte, abzüglich des üblichen Verhandlungsabschlags.</p></details>';
+      + '<p><b>Bilanz heute:</b> Eigenkapital ist, was nach Abzug der Restschuld vom Wert übrig bleibt (wie die Vermögensbilanz in Abschnitt 05). Als Wert steht der Kaufpreis – nicht die Gesamtinvestition und kein Gutachten.</p>'
+      + '<p><b>Nach Bewertung:</b> verglichen wird mit den Kaufpreisen <b>derselben</b> Objekte, nicht mit der Gesamtinvestition von ' + EK(s.gi) + '. Der Ertragswert ist der Wert aus den Mieten nach ImmoWertV, die Marktpreisindikation der Wert aus Angebotspreisen vergleichbarer Objekte, abzüglich des üblichen Verhandlungsabschlags.</p>' + _bewertungTabelle(BW) + '</details>';
     host.innerHTML = '<div class="cpk gb-wrap"><div class="cpk-h"><span class="cpk-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V9h4v12M13 21V5h4v16"/></svg></span><span>Gesamtbewertung</span><em>Investition · Bilanz · Bewertung</em></div>'
       + (imAnkauf ? '<div class="gb-hin">Kacheln oben im Ankauf-Stand – die Bilanz rechnet mit heute</div>' : '')
-      + '<div class="gb-grid">' + b1 + b2 + b3 + '</div>' + fehlt + wie + _bewertungTabelle(BW) + '</div>';
+      + '<div class="gb-grid">' + b1 + b2 + b3 + '</div>' + fehlt + wie + '</div>';
   }
 
   /* ════ v2951 · EINFACH | GENAU ════
@@ -3169,17 +3310,20 @@
       + '<div class="sl"><span class="e">03</span><h2>Objekte</h2><span class="tag">Kanban \u00b7 Karte antippen = aufklappen</span><span class="rule"></span></div>'
       + '<div class="gates" id="dp-board"></div>'
       */
-      + '<div class="sl" data-sek="geteilt"><span class="e">04</span><h2>Geteilte Objekte</h2><span class="tag">Quick Boarding</span><span class="rule"></span></div>'
-      + '<div id="dp-shared-passes" style="margin:0 0 4px"></div>'
+      /* v3234 \u00b7 Marcel 09.11.2026: \u201eIm Portfolio Cockpit bitte geteilte Objekte rausnehmen.\u201c
+         Der Abschnitt 04 \u201eGeteilte Objekte\u201c (#dp-shared-passes) ist raus, auch wenn noch
+         P\u00e4sse bestehen; der Lader unten (dpfk-f3-dash-v1) findet keinen Platz mehr und
+         kehrt sofort zur\u00fcck. Die Abschnitte dahinter r\u00fccken eine Nummer auf
+         (04 Steuer \u2026 07 Steuer-Mappe; help.js und prozess-atlas.js mitgezogen). */
       /* v1400 · Abschnitt 05 — die ECHTEN Zahlen, nicht die Modellprojektion.
          Deshalb steht er VOR „Projektion & Verlauf" und traegt kein
          „vereinfacht": er rechnet mit den steuerlichen Ergebnissen, die
          jedes Objekt selbst hinterlegt hat. */
-      + '<div class="sl" data-sek="steuer" data-cp="genau"><span class="e">05</span><h2>Steuer \u00fcber alle Objekte</h2>'
+      + '<div class="sl" data-sek="steuer" data-cp="genau"><span class="e">04</span><h2>Steuer \u00fcber alle Objekte</h2>'
       +   '<span class="tag" title="Rechnet mit den ECHTEN steuerlichen Ergebnissen deiner Objekte (Tab Steuern), nicht mit den pauschalen Annahmen der Modellprojektion.\n\nDie Objekte stehen in der Reihenfolge ihres Kaufs \u2014 jedes trifft auf das Einkommen, das die vorherigen bereits verschoben haben.\n\nGesellschaften werden getrennt gef\u00fchrt: K\u00f6rperschaftsteuer ist proportional und wirkt nicht auf dein privates Einkommen.">Echte Objektdaten \u00b7 \u00a7 32a / \u00a7 8 KStG</span>'
       +   '<span class="rule"></span></div>'
       + '<div id="dp-steuerkette" class="sk-wrap"></div>'
-      + '<details id="dp-charts-sec" data-sek="projektion" data-cp="genau" open><summary class="sl dp-charts-summary"><span class="e">06</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
+      + '<details id="dp-charts-sec" data-sek="projektion" data-cp="genau" open><summary class="sl dp-charts-summary"><span class="e">05</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
       /* v2950 \u00b7 Vermoegensbericht statt sieben Diagrammen (buildCharts) */
       + '<div class="charts vb-charts">'
       + '<div id="dp-vb-strip" class="vb-strip"></div>'
@@ -3188,9 +3332,9 @@
       + chartCard('dpc-vb-eq','M3 17l6-6 4 4 8-8','Eigenkapital-Entwicklung','Restschuld + Eigenkapital = Objektwert','Modell',true,'Die ganze Fl\u00e4che ist der Objektwert. Unten der Teil der Bank (Restschuld), oben dein Teil (Eigenkapital). Mit jeder Tilgung schrumpft der dunkle Teil, mit jeder Wertsteigerung w\u00e4chst der goldene \u2013 die Achse beginnt bei null.')
       + chartCard('dpc-vb-quellen','M4 20V10M10 20V4M16 20v-7M22 20H2','Woraus das Verm\u00f6gen w\u00e4chst','je Jahr: Schuldenabbau, Wertsteigerung, \u00dcberschuss','\u20ac/Jahr',true,'Jede S\u00e4ule ist der Verm\u00f6genszuwachs eines Jahres aus drei Quellen: <b>Schuldenabbau</b> (Tilgung \u2013 die Mieter zahlen deinen Kredit ab), <b>Wertsteigerung</b> der Objekte (Modell +2 % im Jahr; im ersten Jahr steht der Wert noch auf dem Kaufpreis) und der <b>\u00dcberschuss nach Steuer</b>, der dir bar bleibt. Ein negativer Teil unter null hei\u00dft: in dem Jahr musst du zuschie\u00dfen.')
       + htmlCard('dp-vb-objekte','M12 2a10 10 0 1 0 10 10H12z','Verm\u00f6gen nach Objekt','Objektwert = Restschuld + Eigenkapital \u00b7 Verteilung nach Lage','Struktur','Je Objekt ein Balken: dunkel der Teil der Bank, gold dein Eigenkapital. Darunter, wie sich die Objektwerte auf die Orte verteilen \u2013 ein Ort mit gro\u00dfem Anteil ist ein Klumpen: entwickelt sich dieser Markt schlecht, trifft es einen gro\u00dfen Teil des Verm\u00f6gens.')
-      + '<div class="vb-fuss">Wertansatz der Objekte ist der Kaufpreis; die Entwicklung folgt der Modellprojektion (Wert +2,0 % p.a., Miete +1,5 % p.a., Zins rund 3,5 %). Kein Verkehrswert. Die Zahlen Jahr f\u00fcr Jahr stehen in der Tabelle 07.</div>'
+      + '<div class="vb-fuss">Wertansatz der Objekte ist der Kaufpreis; die Entwicklung folgt der Modellprojektion (Wert +2,0 % p.a., Miete +1,5 % p.a., Zins rund 3,5 %). Kein Verkehrswert. Die Zahlen Jahr f\u00fcr Jahr stehen in der Tabelle 06.</div>'
       + '</div></details>'
-      + '<div class="sl" data-sek="gesamtproj" data-cp="genau"><span class="e">07</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
+      + '<div class="sl" data-sek="gesamtproj" data-cp="genau"><span class="e">06</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
       + '<div class="proj" id="dp-proj-box"><div class="ph"><span class="t">Cashflow &amp; Verm\u00f6gensaufbau</span><span class="tag">Modellprojektion</span>'
       +   '<span class="pj-sw" role="group" aria-label="Darstellung"><button type="button" data-a="tabelle" class="on" onclick="DealPilotDashboard.projAnsicht(\'tabelle\')">Tabelle</button><button type="button" data-a="chart" onclick="DealPilotDashboard.projAnsicht(\'chart\')">Chart</button></span></div>'
       + '<div class="pw"><table class="pt" id="dp-proj-table"></table></div>'
@@ -3201,7 +3345,7 @@
          dem Jahr. Die Objektauswahl kann der Export bereits (opts.objectIds),
          die Oberflaeche dafuer fehlt noch — deshalb steht hier, dass ALLE
          Objekte des Jahres genommen werden, statt es offenzulassen. */
-      + '<div class="sl" data-sek="mappe"><span class="e">08</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
+      + '<div class="sl" data-sek="mappe"><span class="e">07</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
       + '<div class="dp-mappe">'
       +   '<div class="dp-mappe-t">Ein PDF über <b>alle</b> Objekte mit erfassten Steuerdaten — je Objekt eine Aufstellung der Werbungskosten, am Ende eine Zusammenfassung mit Summe.</div>'
       +   '<div class="dp-mappe-r">'
