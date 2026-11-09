@@ -368,7 +368,7 @@
     return '<div class="dpz-kz"><span class="dpz-t">' + esc(g.name) + ' <span class="dpz-anteil">' + zZahl(g.anteil) + '\u00a0%</span></span>' +
       '<span class="dpz-p">' + g.score + ' / 100</span>' +
       '<span class="dpz-bar"><i style="width:' + Math.max(0, Math.min(100, g.score)) + '%;background:' + zFarbe(g.score) + '"></i></span>' +
-      '<span class="dpz-m">' + esc((g.kpis || []).join(' \u00b7 ')) + ' \u2014 ' + g.availableKpis + '/' + g.totalKpis + ' KPIs' +
+      '<span class="dpz-m">' + esc((g.kpis || []).join(' \u00b7 ')) + ' \u2014 ' + (g.availableKpis != null ? g.availableKpis + '/' : '') + g.totalKpis + ' KPIs' +   /* v3254: ohne availableKpis (Portfolio) nur die Zahl */
       (g.hinweis ? ' \u00b7 ' + esc(g.hinweis) : '') + '</span></div>';
   }
   function zKarte(titel, frage, t, fuss) {
@@ -390,42 +390,71 @@
     if (li.length) return li.join('');
     return '<li class="dpz-leer">' + (art === 'positives' ? 'Noch keine ausgepr\u00e4gten St\u00e4rken bewertbar.' : 'Keine kritischen Schw\u00e4chen.') + '</li>';
   }
-  function zweiHtml(d) {
-    var r2 = d.r2, inv = r2.investment, fin = r2.finanzierung, ges = r2.gesamt, em = ges.empfehlung || { fehlt: [] };
-    var deckel = ges.deckel
-      ? '<span class="dpz-deckel">DSCR-Grenze greift \u00b7 h\u00f6chstens ' + ges.deckel.max + (ges.gedeckelt ? ' (ohne Grenze ' + ges.score_ohne_deckel + ')' : '') + '</span>'
-      : '';
-    /* v3088: der Gesamtscore ist das gewichtete Mittel, die Empfehlung kommt aus den zwei Schwellen. */
-    var warum = 'Gesamt aus Investment <b>' + inv.score + '</b> (' + zZahl(inv.anteil) + '\u00a0%) und Finanzierung <b>' + fin.score + '</b> (' + zZahl(fin.anteil) + '\u00a0%). ' +
-      'Empfehlung nach Schwellen: Investment ab ' + inv.schwelle + ', Finanzierung ab ' + fin.schwelle + '. ' +
-      ((em.fehlt && em.fehlt.length) ? 'Nicht erreicht: ' + listDe(em.fehlt) + '.' : 'Beide Schwellen erreicht.') +
-      (ges.deckel ? ' ' + esc(ges.deckel.grund) + '.' : '');
+  /* v3254 · Marcel 09.11.2026: „So wie wir im Reiter Bewertung den Investment-Score und
+     Finanzierungs-Score aufgebaut haben, so wollte ich das auch im Portfolio-Cockpit haben."
+     Die Ansicht nimmt deshalb ein DATENOBJEKT statt des geladenen Objekts:
+       r2  = { investment, finanzierung, gesamt } in der Form von DealScore2.compute()
+       opt = { lbl, warum, knoepfe, invFrage, finFrage, invFuss, finFuss, faktoren, wie, kopfZusatz }
+     Reiter Bewertung (zweiHtml) und Portfolio-Cockpit (dashboard.js renderScoreHero) rufen
+     dieselbe Funktion - ein Markup, keine zweite Kopie. Gerechnet wird hier nichts.
+     Hier stand unter dem Gesamturteil die Plakette „DSCR-Grenze greift · höchstens 84".
+     Marcel: „Das verstehe ich nicht. Ich glaube auch, das kann raus." Die Grenze bleibt
+     in der Rechnung; erklärt wird sie nur noch unter „Wie wird gerechnet?" in einem
+     Satz aus ScoreTier.deckelSatz() (score-tiers.js). */
+  function deckelSatz(deckel, ohne, was) {
+    if (!deckel) return '';
+    if (window.ScoreTier && typeof window.ScoreTier.deckelSatz === 'function') return window.ScoreTier.deckelSatz(deckel, ohne, was);
+    return 'Der Score ist auf h\u00f6chstens ' + deckel.max + ' begrenzt: ' + (deckel.grund || '') + '.';
+  }
+  var STAFFEL_SATZ = 'Die Grenze richtet sich danach, wie gut die Miete nach den laufenden Kosten Zins und Tilgung deckt (DSCR): unter 1,2 h\u00f6chstens 84, unter 1,0 h\u00f6chstens 69, unter 0,8 h\u00f6chstens 49. Beim Barkauf gibt es keine Grenze.';
+  function zweiAnsichtHtml(r2, opt) {
+    opt = opt || {};
+    var inv = r2.investment || {}, fin = r2.finanzierung || {}, ges = r2.gesamt || {}, em = ges.empfehlung || null;
+    var warum = (opt.warum != null) ? opt.warum :
+      'Gesamt aus Investment <b>' + inv.score + '</b> (' + zZahl(inv.anteil) + '\u00a0%) und Finanzierung <b>' + fin.score + '</b> (' + zZahl(fin.anteil) + '\u00a0%). ' +
+      (em ? 'Empfehlung nach Schwellen: Investment ab ' + inv.schwelle + ', Finanzierung ab ' + fin.schwelle + '. ' +
+        ((em.fehlt && em.fehlt.length) ? 'Nicht erreicht: ' + listDe(em.fehlt) + '.' : 'Beide Schwellen erreicht.') : '');
+    /* „Wie wird gerechnet?": die Grenze in Worten, nur wo sie vorkommt */
+    var wie = opt.wie ? opt.wie.slice() : [];
+    if (!opt.wie) {
+      if (ges.deckel) wie.push(esc(deckelSatz(ges.deckel, ges.score_ohne_deckel, 'der Gesamtscore')));
+      if (fin.deckel && fin.gedeckelt && ges.deckel) wie.push(esc(deckelSatz({ max: ges.deckel.max, grund: fin.deckel }, fin.score_ohne_deckel, 'der Finanzierungs-Score')));
+    }
+    wie.push('Der Gesamtscore ist das gewichtete Mittel aus Investment und Finanzierung. ' + STAFFEL_SATZ);
     var kopf = '<div class="dpz-kopf">' +
-      '<div class="dpz-kopf-l"><div class="dpz-lbl">Gesamturteil \u00b7 Investor Deal Score</div>' +
-        '<div class="dpz-wort">' + esc(ges.stufe) + ' <span class="dpz-wert">' + ges.score + ' / 100</span></div>' + deckel + '</div>' +
-      '<span class="dpz-empf dpz-empf-' + esc(em.art || 'halb') + '">' + esc(em.text || '') + '</span>' +
+      '<div class="dpz-kopf-l"><div class="dpz-lbl">' + esc(opt.lbl || 'Gesamturteil \u00b7 Investor Deal Score') + '</div>' +
+        '<div class="dpz-wort">' + esc(ges.stufe) + ' <span class="dpz-wert">' + ges.score + ' / 100</span></div></div>' +
+      (em ? '<span class="dpz-empf dpz-empf-' + esc(em.art || 'halb') + '">' + esc(em.text || '') + '</span>' : '') +
+      (opt.kopfZusatz || '') +
       '<div class="dpz-warum">' + warum + '</div>' +
-      '<div class="dpz-knoepfe">' +
-        '<button class="dpz-knopf" type="button" onclick="DealPilotScoreHero.action(\'investor\')">' + IC.list + 'Alle KPIs</button>' +
-        '<button class="dpz-knopf" type="button" onclick="DealPilotScoreHero.action(\'classic\')" title="Einstellungen \u203a Deal Score \u203a Bewertung als">' + IC.sliders + 'Ansicht</button>' +
-      '</div>' +
+      (opt.knoepfe ? '<div class="dpz-knoepfe">' + opt.knoepfe + '</div>' : '') +
+      '<details class="dpz-wie"><summary>Wie wird gerechnet?</summary>' + wie.map(function (p) { return '<p>' + p + '</p>'; }).join('') + '</details>' +
     '</div>';
-    var finFuss;
-    if (fin.barkauf) finFuss = 'Barkauf \u2014 ohne Kapitaldienst gilt die Finanzierung als erf\u00fcllt.';
-    else if (fin.gedeckelt) finFuss = 'Ohne Grenze ' + fin.score_ohne_deckel + ' \u2192 begrenzt auf ' + fin.score + ': ' + esc(fin.deckel) + '.';
-    else if (fin.deckel) finFuss = 'DSCR-Grenze (h\u00f6chstens ' + ges.deckel.max + ') \u00e4ndert hier nichts: ' + esc(fin.deckel) + '.';
-    else finFuss = 'DSCR ab 1,2 \u2014 keine Grenze.';
-    var invFuss = 'Zählt ' + zZahl(inv.anteil) + '\u00a0% zum Gesamtscore ' + ges.score + '.';
+    var finFuss = opt.finFuss;
+    if (finFuss == null) {
+      if (fin.barkauf) finFuss = 'Barkauf \u2014 ohne Kapitaldienst gilt die Finanzierung als erf\u00fcllt.';
+      else finFuss = 'Z\u00e4hlt ' + zZahl(fin.anteil) + '\u00a0% zum Gesamtscore ' + ges.score + '.' +
+        (fin.gedeckelt ? ' Begrenzt, weil die Miete den Kapitaldienst nicht voll deckt \u2014 siehe \u201eWie wird gerechnet?\u201c.' : '');
+    }
+    var invFuss = opt.invFuss != null ? opt.invFuss : 'Z\u00e4hlt ' + zZahl(inv.anteil) + '\u00a0% zum Gesamtscore ' + ges.score + '.';
     return '<div class="dpz">' + kopf +
       '<div class="dpz-zwei">' +
-        zKarte('Investment-Score', 'Wie gut ist die Immobilie, egal wie sie finanziert wird?', inv, invFuss) +
-        zKarte('Finanzierungs-Score', 'Tr\u00e4gt die geplante Finanzierung dieses Objekt?', fin, finFuss) +
+        zKarte('Investment-Score', opt.invFrage || 'Wie gut ist die Immobilie, egal wie sie finanziert wird?', inv, invFuss) +
+        zKarte('Finanzierungs-Score', opt.finFrage || 'Tr\u00e4gt die geplante Finanzierung dieses Objekt?', fin, finFuss) +
       '</div>' +
+      (opt.faktoren === false ? '' :
       '<div class="dpz-fakt">' +
         '<div class="dpz-karte"><div class="dpz-pad"><h3 class="dpz-h3">Positive Faktoren</h3><ul class="dpz-plus">' + zFaktoren(r2, 'positives') + '</ul></div></div>' +
         '<div class="dpz-karte"><div class="dpz-pad"><h3 class="dpz-h3">Negative Faktoren</h3><ul class="dpz-minus">' + zFaktoren(r2, 'negatives') + '</ul></div></div>' +
-      '</div>' +
+      '</div>') +
     '</div>';
+  }
+  function zweiHtml(d) {
+    return zweiAnsichtHtml(d.r2, {
+      knoepfe:
+        '<button class="dpz-knopf" type="button" onclick="DealPilotScoreHero.action(\'investor\')">' + IC.list + 'Alle KPIs</button>' +
+        '<button class="dpz-knopf" type="button" onclick="DealPilotScoreHero.action(\'classic\')" title="Einstellungen \u203a Deal Score \u203a Bewertung als">' + IC.sliders + 'Ansicht</button>'
+    });
   }
 
   /* ---------- Boarding-KPI-Modal (eigenes, isoliert) ---------- */
@@ -652,6 +681,7 @@
       if (clickOriginal('#dealscore-box', 'Gewicht')) return;
       if (clickOriginal('#dealscore-card', 'Gewicht')) return;
     },
+    zweiAnsicht: zweiAnsichtHtml,   /* v3254 · Zwei-Score-Ansicht fuer jedes Datenobjekt (Bewertung + Portfolio-Cockpit) */
     _debug: { classicData: classicData, investorData: investorData, zweiHtml: zweiHtml }   /* v3076: zweiHtml fuer den Rauchtest */
   };
 
@@ -666,7 +696,15 @@
 '.dpz-lbl{font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px}',
 '.dpz-wort{font:700 22px/1.1 "Space Grotesk",sans-serif;color:#f6f2e8}',
 '.dpz-wert{font:600 13px/1 "JetBrains Mono",monospace;color:rgba(255,255,255,.6);margin-left:6px}',
-'.dpz-deckel{display:inline-block;margin-top:6px;font:700 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#f0a59d;border:1px solid rgba(216,86,76,.5);border-radius:6px;padding:4px 7px}',
+/* v3254 · .dpz-deckel (Plakette „DSCR-Grenze greift") entfernt - die Erklaerung steht in .dpz-wie */
+'.dpz-wie{flex:1 1 100%;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.72)}',
+'.dpz-wie summary{cursor:pointer;font:600 10.5px/1.4 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55)}',
+'.dpz-wie summary:hover{color:var(--wl-e8cc7a, #E8CC7A)}',
+'.dpz-wie p{margin:6px 0 0}',
+'.dpz-eck{display:flex;gap:14px;flex-wrap:wrap}',
+'.dpz-eck div{display:flex;flex-direction:column;gap:3px}',
+'.dpz-eck .k{font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;color:rgba(255,255,255,.5)}',
+'.dpz-eck .v{font:700 14px/1 "Space Grotesk",sans-serif;color:#f6f2e8}',
 '.dpz-empf{font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;padding:7px 10px;border-radius:999px}',
 '.dpz-empf-ja{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1508}',
 '.dpz-empf-halb{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);color:var(--wl-e8cc7a, #E8CC7A)}',
@@ -674,9 +712,9 @@
 '.dpz-warum{flex:1 1 280px;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.72)}',
 '.dpz-warum b{color:#fff}',
 '.dpz-knoepfe{display:flex;gap:6px;flex-wrap:wrap}',
-'#dpsh-mount .dpz-knopf{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;background:transparent;color:#b3ada2;border:1px solid rgba(255,255,255,.18);font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.4px;text-transform:uppercase;cursor:pointer}',
-'#dpsh-mount .dpz-knopf:hover{color:var(--wl-e8cc7a, #E8CC7A);border-color:var(--wl-c9a84c, #C9A84C)}',
-'#dpsh-mount .dpz-knopf svg{width:14px;height:14px}',
+'#dpsh-mount .dpz-knopf,#dp-pscore-hero .dpz-knopf{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;background:transparent;color:#b3ada2;border:1px solid rgba(255,255,255,.18);font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.4px;text-transform:uppercase;cursor:pointer}',
+'#dpsh-mount .dpz-knopf:hover,#dp-pscore-hero .dpz-knopf:hover{color:var(--wl-e8cc7a, #E8CC7A);border-color:var(--wl-c9a84c, #C9A84C)}',
+'#dpsh-mount .dpz-knopf svg,#dp-pscore-hero .dpz-knopf svg{width:14px;height:14px}',
 '.dpz-zwei,.dpz-fakt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}',
 '@media(max-width:820px){.dpz-zwei,.dpz-fakt{grid-template-columns:1fr}}',
 '.dpz-karte{background:#fff;border:1px solid #e6dfcf;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.03);min-width:0}',

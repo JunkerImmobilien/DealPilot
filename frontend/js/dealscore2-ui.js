@@ -359,7 +359,7 @@ function _ds2ZweiKompakt(r) {
     zeile('Investment-Score', r.investment.score, r.investment.stufe) +
     zeile('Finanzierungs-Score', r.finanzierung.score, r.finanzierung.stufe) +
     zeile('Gesamturteil', ge.score, ge.stufe) +
-    '<div style="margin-top:4px">Empfehlung: <b>' + _escDs2(em.text || '') + '</b>' + (ge.deckel ? ' · ' + _escDs2(ge.deckel.grund) : '') + '</div>' +
+    '<div style="margin-top:4px">Empfehlung: <b>' + _escDs2(em.text || '') + '</b>' + (ge.deckel ? ' · ' + _escDs2((window.ScoreTier && window.ScoreTier.deckelSatz) ? window.ScoreTier.deckelSatz(ge.deckel, ge.score_ohne_deckel, 'der Gesamtscore') : ge.deckel.grund) : '') + '</div>' +   /* v3254: Grenze als Satz */
   '</div>';
 }
 

@@ -1,0 +1,266 @@
+{
+ "ags": "05758016",
+ "gemeinde": "Hiddenhausen",
+ "art": "einfach",
+ "stand": "2025-11",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-12-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.hiddenhausen.de/loadDocument.phtml?ObjSvrID=2483&ObjID=6109&ObjLa=1&Ext=PDF",
+  "dokument": "Mietspiegel Gemeinde Hiddenhausen 2025 (Faltblatt, Stand November 2025)",
+  "seite": "2",
+  "lizenz": "keine Angabe im Dokument (Herausgeber Gemeinde Hiddenhausen)",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Fortschreibung des Mietspiegels November 2023, linear um 7 % angehoben. In der Baualtersklasse 2001–2022 führt die Tabelle „bis 80 m²“ als ein Feld (hier für bis 60 und über 60–80 m² gleich eingetragen). Ohne Einfamilienhäuser.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1980,
+     "label": "1961 bis 1980"
+    },
+    {
+     "von": 1981,
+     "bis": 2000,
+     "label": "1981 bis 2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2022,
+     "label": "2001 bis 2022"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 60,
+     "label": "bis 60 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 80,
+     "label": "über 60–80 m²"
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": 100,
+     "label": "über 80–100 m²"
+    },
+    {
+     "von": 100,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 100 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 4.82,
+    "mittel": 6.12,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 4.82,
+    "mittel": 5.63,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 4.28,
+    "mittel": 5.63,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 4.28,
+    "mittel": 5.8,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 5.89,
+    "mittel": 6.52,
+    "oben": 7.49,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.35,
+    "mittel": 5.91,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 4.82,
+    "mittel": 5.71,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 4.82,
+    "mittel": 5.89,
+    "oben": 6.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6.42,
+    "mittel": 7.54,
+    "oben": 8.56,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.89,
+    "mittel": 6.9,
+    "oben": 7.49,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.35,
+    "mittel": 6.26,
+    "oben": 7.49,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5.35,
+    "mittel": 6.24,
+    "oben": 7.49,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 5.35,
+    "mittel": 7.39,
+    "oben": 10.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.35,
+    "mittel": 7.39,
+    "oben": 10.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.35,
+    "mittel": 7.97,
+    "oben": 10.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.35,
+    "mittel": 7.47,
+    "oben": 9.63,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "energetische_vollmodernisierung",
+    "label": "energetische Vollmodernisierung",
+    "art": "eur_qm",
+    "wert": 1,
+    "bedingung": {
+     "baujahr_bis": 1990
+    },
+    "beleg": "S. 2 „Energetische Vollmodernisierung … Mietzuschlag 1,00 €/m² … nur für Gebäude mit einem Baujahr bis 1990“; bei nur einzelnen Maßnahmen anteilig"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 72
+   },
+   "erwartet": {
+    "unten": 5.35,
+    "mittel": 5.91,
+    "oben": 6.96
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 72,
+    "merkmale": {
+     "energetische_vollmodernisierung": true
+    }
+   },
+   "erwartet": {
+    "unten": 6.35,
+    "mittel": 6.91,
+    "oben": 7.96
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.35,
+    "mittel": 7.39,
+    "oben": 10.7
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2024,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle"
+  }
+ ]
+}

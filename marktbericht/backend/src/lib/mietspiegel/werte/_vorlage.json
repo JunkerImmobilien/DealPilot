@@ -1,0 +1,33 @@
+{
+  "_hinweis": "VORLAGE - erfundene Zahlen, wird nicht geladen (Name beginnt mit _). Aufbau: README.md Abschnitt Werte.",
+  "ags": "00000000",
+  "gemeinde": "Musterstadt",
+  "art": "einfach",
+  "stand": "2025-11",
+  "erhebungsstichtag": null,
+  "gueltig_ab": "2025-12-01",
+  "gueltig_bis": null,
+  "quelle": { "url": "https://www.musterstadt.example/mietspiegel.pdf", "dokument": "Mietspiegel Musterstadt 2025", "seite": "2", "lizenz": "unbekannt", "abgerufen": "2026-11-09" },
+  "einheit": "eur_qm_nettokalt",
+  "form": "tabelle",
+  "rundung": 2,
+  "hinweis": null,
+  "tabelle": {
+    "achsen": {
+      "baujahr": [ { "von": null, "bis": 1960, "label": "bis 1960" }, { "von": 1961, "bis": 2000, "label": "1961–2000" } ],
+      "wfl": [ { "von": null, "bis": 60, "label": "bis 60 m²" }, { "von": 60, "von_inkl": false, "bis": 100, "label": "über 60 bis 100 m²" } ]
+    },
+    "zellen": [
+      { "baujahr": 0, "wfl": 0, "unten": 5.00, "mittel": 5.50, "oben": 6.00, "seite": "2" },
+      { "baujahr": 0, "wfl": 1, "unten": 4.80, "mittel": 5.30, "oben": 5.80, "seite": "2" },
+      { "baujahr": 1, "wfl": 0, "unten": 5.40, "mittel": 6.00, "oben": 6.60, "seite": "2" },
+      { "baujahr": 1, "wfl": 1, "unten": 5.20, "mittel": 5.70, "oben": 6.20, "seite": "2" }
+    ],
+    "zuschlaege": [ { "merkmal": "lage:gut", "art": "eur_qm", "wert": 0.30, "beleg": "S. 3" } ]
+  },
+  "pruefbeispiele": [
+    { "eingabe": { "baujahr": 1965, "wfl": 72 }, "erwartet": { "unten": 5.20, "mittel": 5.70, "oben": 6.20 }, "seite": "2", "art": "tabellenzelle" },
+    { "eingabe": { "baujahr": 1965, "wfl": 72, "lage": "gut" }, "erwartet": { "unten": 5.50, "mittel": 6.00, "oben": 6.50 }, "seite": "3", "art": "tabellenzelle" },
+    { "eingabe": { "baujahr": 1965, "wfl": 140 }, "erwartet": null, "seite": "2", "art": "tabellenzelle" }
+  ]
+}

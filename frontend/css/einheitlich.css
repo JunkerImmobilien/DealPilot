@@ -329,5 +329,21 @@ html[data-dp-layout] body #settings-modal .pane-wrap :is(.f, .field) > label {
   }
 }
 
+/* v3253 · Abgleich Schrift mit Reiter Objekt (Marcel 09.11.2026: „die Schriftart passt irgendwie
+   nicht richtig“), gemessen lokal mit getComputedStyle:
+   - Kartenkopf mit Titel in einem <span> ohne Klasse (Investition › Sanierung und Inventar,
+     Bewertung › Kennzahlen-Bewertung): layout-varianten.css:765 `html[data-dp-layout] .body span`
+     setzt Inter - der Kopf stand dadurch Inter 10/700 statt JetBrains Mono 10/700 wie jeder
+     andere .ct. Nur Kinder OHNE Klasse; Hinweise (.oe-ct-hint, .v213-card-sub) und Marken
+     (.info-tag, .ds2-tag) bleiben Inter.
+   - Investition › Preis je m² (.qm-price-val) 12,5/700 → 13/600 wie die übrigen Werte (.cf). */
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .card > .ct > span:not([class]) {
+  font-family: var(--dpl-mono, 'JetBrains Mono', ui-monospace, monospace) !important;
+}
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .qm-price-val {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
 /* v3241 · Nachzug nach dem Zusammenfuehren: Ausreisser im Reiter Objekt selbst (Bericht v3239) */
 html body #s0 .oe-vw select { border-radius: 2px; }
