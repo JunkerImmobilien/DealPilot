@@ -2497,9 +2497,11 @@
         kegelHoch(false);
         await warte(700);
       },
-      async function (s) {   /* 5 · Zins, Tilgung, Zinsbindung im Darlehen */
+      async function (s) {   /* 5 · v3272: je Darlehen eine Karte mit Kacheln, darunter Gruppen */
+        await zeigeGruppe(function () { var g = q('#d1_grp_kond'); return g && g.querySelector('summary'); }, function () { var g = q('#d1_grp_werkz'); return g && g.querySelector('summary'); }, 8);
+        await b2oZeile(s, 'Gruppen zum Aufklappen', 'Darunter vier Gruppen: <b>Konditionen</b>, Anschlussfinanzierung, Bankdaten und Werkzeuge — offen ist nur, was du gerade brauchst.');
         await zeigeGruppe(feldVon('d1z'), feldVon('d1_bindj'), 8);
-        await b2oZeile(s, 'Im Darlehen', 'Zins <b>' + r6Pz(wert('d1z')) + ' %</b> — schon eingetragen: der indikative Satz deiner Zinsbindung. Tilgung <b>' + r6Pz(wert('d1t')) + ' %</b>, Zinsbindung <b>' + wert('d1_bindj') + ' Jahre</b>.');
+        await b2oZeile(s, 'Die Konditionen', 'Zins <b>' + r6Pz(wert('d1z')) + ' %</b> — vorbelegt mit dem Marktzins aus deinen Standardwerten. Tilgung <b>' + r6Pz(wert('d1t')) + ' %</b>, Zinsbindung <b>' + wert('d1_bindj') + ' Jahre</b>.');
       },
       async function (s) {   /* 6 · Kaufpreis -> Eigenkapital -> Darlehen */
         reiter('s1'); await warte(600);
@@ -2522,6 +2524,47 @@
         await b2oZeile(s, 'Rate und Restschuld', 'Monatliche Rate <b>' + r6Id('d1_rate') + '</b>. Nach ' + wert('d1_bindj') + ' Jahren stehen noch <b>' + r6Id('restschuld') + '</b> offen.');
         await zeige(function () { return q('#r-ltv') && q('#r-ltv').closest('.card'); }, 8);
         await b2oZeile(s, 'Die Beleihung', 'Beleihungsauslauf <b>' + r6Id('r-ltv') + '</b> — den passenden Zins dazu zeigt die Konditionen-Karte oben (Knopf 100 %). Den Satz im Darlehen bestimmst du.');
+      },
+      async function (s) {   /* 7b · v3272: Werkzeuge - Tilgungsplan, Bank-PDF; Darlehen II */
+        var kd = function () { var k = q('#s3 .fz-kachel'); return k && k.closest('.card'); };
+        var x = kd(); if (x) { x.scrollIntoView({ block: 'start' }); var mc = q('.main-col'); if (mc) mc.scrollTop -= 90; }
+        await warte(500);
+        await zeige(function () { var k = document.querySelectorAll('#s3 .fz-kachel'); return k.length ? b2oHuelle(k[0], k[k.length - 1]) : kd(); }, 8);
+        var kz = [].map.call(document.querySelectorAll('#s3 .fz-kachel'), function (k) { var l = r6Inner(k).split('\n').map(function (y) { return y.trim(); }).filter(Boolean); return { n: l[0] || '', w: l[1] || '' }; });
+        var f = function (re) { var y = kz.filter(function (k) { return re.test(k.n); })[0]; return y ? y.w : '–'; };
+        await b2oZeile(s, 'Je Darlehen eine Karte', 'Oben die Kacheln: Darlehen <b>' + f(/^DARLEHEN/i) + '</b>, Zins ' + f(/^ZINS$/i) + ', Tilgung ' + f(/^TILGUNG/i) + ', Zinsbindung ' + f(/^ZINSBINDUNG/i) + ' — Rate <b>' + f(/^RATE/i) + '</b> im Monat.');
+        var wg = q('#d1_grp_werkz'); if (wg) wg.open = true;
+        await warte(400);
+        var x = q('#d1_grp_werkz'); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(function () { return q('#d1_grp_werkz'); }, 8);
+        var zb = r6Beginn(s, 'Werkzeuge', '<b>Tilgungsplan</b> und <b>Daten aus Bank-PDF importieren</b> — der Plan öffnet sich mit einem Klick.');
+        await warte(1600);
+        try { window.openTilgungsplanModal('d1'); } catch (e) {}
+        await warteAuf(function () { return q('#tilgplan-modal .tilgplan-modal'); }, 4000);
+        kegelHoch(true); await warte(600);
+        await r6Ende(zb);
+        await zeige(function () { return q('#tilgplan-modal .tilgplan-modal'); }, 6);
+        var n = document.querySelectorAll('#tilgplan-modal tbody tr').length;
+        await b2oZeile(s, 'Der Tilgungsplan', (n ? '<b>' + n + ' Monatsraten</b> — ' : '') + 'Datum, Rate, Zinsen, Tilgung, Restschuld. Weicht deine Bank ab, etwa mit Sondertilgungen, überschreibst du einzelne Werte.');
+        try { window.closeTilgplanModal(); } catch (e) { var m = q('#tilgplan-modal'); if (m) m.remove(); }
+        kegelHoch(false); await warte(600);
+        await zeige(function () { var g = q('#d1_grp_werkz'); return g && r6Knopf(g, /Bank-PDF/); }, 10);
+        await b2oZeile(s, 'Aus dem Bank-PDF', 'Liegt der Darlehensvertrag als PDF vor, liest DealPilot Summe, Zins, Tilgung und Bindung aus — im Video nicht, das ist ein Abruf.');
+        if (wg) wg.open = false;
+        var d2 = function () { var e = q('#d2_enable'); return e && e.closest('.card'); };
+        var y = d2(); if (y) y.scrollIntoView({ block: 'start' }); var mc = q('.main-col'); if (mc) mc.scrollTop -= 90;
+        await warte(400);
+        await zeige(d2, 8);
+        var zb2 = r6Beginn(s, 'Darlehen II', 'Ein zweites Darlehen, etwa von der KfW: <b>„Hinzufügen“</b>.');
+        await warte(1500);
+        var cb = q('#d2_enable'); if (cb && !cb.checked) { cb.click(); }
+        await warte(900);
+        await r6Ende(zb2);
+        await zeige(d2, 8);
+        await b2oZeile(s, 'Darlehen II', 'Dieselben Felder, eigene Anschlussfinanzierung — und auch hier <b>Tilgungsplan</b> und <b>Bank-PDF</b>. Weitere Darlehen kommen darunter dazu.');
+        cb = q('#d2_enable'); if (cb && cb.checked) cb.click();
+        await warte(700);
       },
       async function (s) {   /* 8 · Standardwerte in den Einstellungen */
         await r6Einstellungen('standardwerte');
