@@ -601,7 +601,12 @@ eine selbst ausgerechnete Zahl.
   wo es per Leave-one-Ausschuss-out genauer ist als § 256 und die Formel;
   dieselben Sperren wie die Formel, im Bericht „DealPilot-Landesmittel aus n
   amtlichen Zinssätzen (Land, Objektart, Jahrgänge)". Für SWF/UK nie.
-- Jede Zahl trägt Herkunft: Stufe A–E und N, Modellvermerk, `indikativ`, Ausschuss.
+- **Stufe M · Vergleichswert aus Angebotspreisen (seit v3242, Marcel 09.11.2026)** — nur
+  typisches Wohnungseigentum ohne amtliche Kaufpreisbasis (IRW, Vergleichsfaktor): dann FÜHRT der
+  Angebotswert minus Abschlag (lib/angebot_abschlag.js), bewusste Ausnahme von § 25 Abs. 1
+  ImmoWertV, im Bericht immer „indikativ, aus Angebotspreisen abgeleitet“ mit Weg zum Ausschuss,
+  Belastbarkeit −30. Ohne Abschlagsangabe kein führendes Verfahren. Prüfer: wertermittlung-pruefen B60.
+- Jede Zahl trägt Herkunft: Stufe A–E, M und N, Modellvermerk, `indikativ`, Ausschuss.
 - Eine Restnutzungsdauer für alle Verfahren.
 - BWK-Quoten stehen auf dem **gesamten** Rohertrag inklusive Stellplätzen.
 - Verwaltungskosten je **bewerteter** Einheit.
