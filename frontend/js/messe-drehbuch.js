@@ -1463,7 +1463,7 @@
   var RH_BUSTER = 'v2481q';   /* v2481q: zielbild26-Analyse neu mit Kaufdatum und Ankauf-Stand; v2481n: zielbild26 nach v2540-v2543 mit Marktpreisen; v2481j: zielbild26 nach v2520; v2481g: Modul 26 Mieterhoehung und Zielbild (zielbild26); v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
-  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage|\/marktbericht\/potenzial/i;
+  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage|\/marktbericht\/potenzial|\/user-settings\/|\/api-keys\//i;   /* v3272: Einstellungen öffnen schrieb Stammdaten (PUT user-settings/stammdaten) */
   /* v2263 · dazu Netzwerk-Einreichung, Partner-Anfrage, Ämter-Anfragen (Modul 13) und
      der Portfolio-Spiegel: eine gewonnene KOPIE (Modul 14) ginge sonst als zweites
      Objekt in die Zahlen des Telegram-Bots (gemessen: 12 statt 11 Objekte). */
@@ -3162,9 +3162,10 @@
   function r12Frage(i) { var k = r12ZKarte(i)(); var m = k && /([^\n]*\?)/.exec(r6Inner(k)); return m ? m[1].trim() : ''; }
   function r12Faktoren(i) {   /* Namen der positiven (0) / negativen (1) Faktoren */
     var k = document.querySelectorAll('#s6 .dpz-fakt .dpz-karte')[i]; if (!k) return [];
-    var l = r6Inner(k).split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(1), out = [];
-    for (var j = 0; j + 1 < l.length; j += 2) { var p = /(\d+)\s*\/\s*100/.exec(l[j + 1]); out.push({ name: l[j], punkte: p ? p[1] : '' }); }
-    return out;
+    /* gemessen: je Faktor EINE Zeile „Bruttorendite Investment · 100/100“ */
+    return r6Inner(k).split('\n').map(function (x) { return x.trim(); }).filter(function (x) { return /\d+\s*\/\s*100/.test(x); }).map(function (x) {
+      var p = /(\d+)\s*\/\s*100/.exec(x); return { name: x.replace(/\s+(Investment|Finanzierung)\s*·.*$/, '').trim(), punkte: p ? p[1] : '' };
+    });
   }
   DREHBUECHER['reihe-bewertung'] = {
     titel: 'Bewertung und KPIs', unterzeile: 'Gesamturteil, Investment und Finanzierung, jede Kennzahl', objekt: null,
@@ -3254,7 +3255,7 @@
         await r6Einstellungen('standardwerte');
         var K = /^Persönliche Mindest/;
         await zeige(r6Karte('.settings-modal', K), 8);
-        var dm = r6SwkWert(K, /^DSCR$/), cm = r6SwkWert(K, /^Cashflow$/), lm = r6SwkWert(K, /^max\. LTV$/);
+        var dm = r6SwkWert(K, /^DSCR(SET)?$/), cm = r6SwkWert(K, /^Cashflow(SET)?$/), lm = r6SwkWert(K, /^max\. LTV(SET)?$/);   /* v3272: Kennzeichen „SET“ hängt am Namen */
         function da(x) { return x && !/^[–—-]$/.test(x.trim()); }
         var gz = [da(dm) ? 'Mindest-DSCR <b>' + dm + '</b>' : '', da(cm) ? 'Mindest-Cashflow <b>' + cm + '</b>' : '', da(lm) ? 'höchstens <b>' + lm + '</b> LTV' : ''].filter(Boolean);
         await b2oZeile(s, 'Deine eigenen Grenzen', 'Einstellungen › Standardwerte: ' + (gz.length ? gz.join(', ') : 'Mindest-DSCR, Mindest-Cashflow, höchster LTV') + ' — als Marker an den Kennzahlen.');
