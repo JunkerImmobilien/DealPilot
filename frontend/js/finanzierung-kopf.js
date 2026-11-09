@@ -125,10 +125,10 @@
     }, 30);
   }
 
-  /* Konditionen offen, solange keine Darlehenssumme steht */
+  /* v3264 · Marcel 09.11.2026: „dann öffnen“ - Konditionen beim Laden immer offen (vorher zu, sobald eine Summe stand) */
   function vorgabe(p) {
     var d = el(p + '_grp_kond'); if (!d) return;
-    d.open = !(zahl(p) > 0);
+    d.open = true;
   }
   function vorgabeAlle() { vorgabe('d1'); vorgabe('d2'); fuellen(); }
 
