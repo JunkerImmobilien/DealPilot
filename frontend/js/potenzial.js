@@ -623,7 +623,11 @@
      Auflösung PLZ → Gemeinde wie im Bericht) und reist mit dem Ergebnis im
      Objekt, damit die Kappungsgrenze beim nächsten Öffnen ohne Abruf steht. */
   var _agsLauf = {};
-  function agsJetzt() { var p = window._dpPotenzial; return (p && p.ags && p.plz === wert('plz')) ? p.ags : null; }
+  /* v3251 · eigener Zwischenspeicher PLZ -> AGS: loadData stellt window._dpPotenzial aus dem gespeicherten Objekt
+     wieder her und warf die frisch geholte Gemeinde weg; _agsLauf liefert danach nur das Versprechen zurueck,
+     setzte sie aber nicht neu - die Gemeinde blieb fuer die ganze Sitzung unbekannt (Mietspiegel-Verzeichnis, Kappung). */
+  var _agsFest = {};
+  function agsJetzt() { var p = window._dpPotenzial, z = wert('plz'); if (p && p.ags && String(p.plz) === String(z)) return p.ags; return (z && _agsFest[z]) || null; }
   function agsHolen() {
     var plz = wert('plz');
     if (!plz) return Promise.resolve(null);
@@ -634,7 +638,7 @@
       body: { object: { plz: plz, ort: wert('ort'), objart: wert('objart'), baujahr: wert('baujahr'), einheiten: wert('einheiten'), wfl: wert('wfl') } } })
       .then(function (r) {
         var a = r && r.ags ? String(r.ags) : null;
-        if (a) { window._dpPotenzial = Object.assign({}, window._dpPotenzial || {}, { ags: a, plz: plz }); }
+        if (a) { _agsFest[plz] = a; window._dpPotenzial = Object.assign({}, window._dpPotenzial || {}, { ags: a, plz: plz }); }
         return a;
       }).catch(function () { return null; });
     return _agsLauf[plz];
@@ -2805,6 +2809,12 @@
 
   /* v3026 · kommt die VPI-Reihe nach dem ersten Zeichnen, die Indexmiete nachziehen */
   window.addEventListener('dp:indexreihen', function () { try { objektKarte(); } catch (e) {} });
+  /* v3251 · Hinweis zur Vergleichsmiete nachziehen, wenn Objekt geladen ist bzw. die Marktmiete nachkommt
+     (gemessen Staging 09.11.: „Keine Vergleichsmiete“ stehen geblieben, obwohl die Marktmiete später ankam) */
+  ['dp:object-ready', 'dp:ki-miete'].forEach(function (ev) {
+    window.addEventListener(ev, function () { setTimeout(function () { try { msRegisterHolen(); } catch (e) {} try { msHinweis(); } catch (e) {} }, 400); });
+  });
+  document.addEventListener('input', function (e) { if (e && e.target && e.target.id === 'ds2_marktmiete') { try { msHinweis(); } catch (x) {} } });
 
   window.DpPotenzial = {
     mietpreisbremse: mietpreisbremse, mietrechtDaten: mietrechtDaten, mietrechtHtml: mietrechtHtml, mietrechtKarte: mietrechtKarte,   /* v3062 */
