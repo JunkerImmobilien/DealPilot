@@ -1257,6 +1257,8 @@ function renderTaxTimeline() {
       var _vor = box.previousElementSibling && /hint/.test(box.previousElementSibling.className || '') ? box.previousElementSibling : box;
       box.parentNode.insertBefore(_stvH, _vor);
     }
+    /* v3257 · im Reiter Steuer ist das Diagramm einklappbar, standardmäßig zu (steuer-verlauf.js) */
+    if (_stvH) _stvH.setAttribute('data-dp-stv-klappbar', '1');
     if (_stvH && window.DpSteuerVerlauf) window.DpSteuerVerlauf.mount(_stvH);
   } catch (_stvE) {}
   // Render as visual timeline

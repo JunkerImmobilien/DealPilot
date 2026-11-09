@@ -106,9 +106,45 @@
       '.dp-stv-tip{position:absolute;pointer-events:none;background:#fff;border:1px solid #E6DCC2;border-radius:8px;padding:7px 10px;font:400 12px Inter,sans-serif;color:#2A2727;box-shadow:0 6px 18px rgba(0,0,0,.12);min-width:200px;display:none;font-variant-numeric:tabular-nums;z-index:3}',
       '.dp-stv-tip b{display:block;font:700 13px "Space Grotesk",Inter,sans-serif;margin-bottom:3px}',
       '.dp-stv-tip div{display:flex;justify-content:space-between;gap:12px}',
-      '.dp-stv-fuss{font-size:11px;color:var(--muted,#8A8272);margin:0}'
+      '.dp-stv-fuss{font-size:11px;color:var(--muted,#8A8272);margin:0}',
+      /* v3257 · Reiter Steuer: Diagramm einklappbar (Knopf seitlich, dezent wie v3237 ki-miete.js) */
+      '.dp-stv-klapp{display:flex;justify-content:flex-end;margin:-6px 0 -4px}',
+      '.dp-stv-klapp button{display:inline-flex;align-items:center;gap:4px;border:0 !important;background:transparent !important;box-shadow:none !important;color:var(--muted,#7A7370);border-radius:2px;padding:2px 4px;font:500 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;width:auto;min-height:0}',
+      '.dp-stv-klapp button:hover,.dp-stv-klapp button:focus-visible{color:var(--wl-b8932f, #b8932f)}',
+      '.dp-stv-klapp i{font-style:normal;font-size:11px;line-height:1}',
+      '.dp-stv-diag{display:grid;gap:12px}',
+      '.dp-stv-zu .dp-stv-diag{display:none}'
     ].join('');
     document.head.appendChild(s);
+  }
+
+  /* v3257 · Marcel 09.11.2026: „erst mal standardmäßig das Diagramm minimieren … seitlich so ein
+     kleines Minimierungsding, das kann man dann aufklappen". Nur wo der Host data-dp-stv-klappbar
+     trägt (Reiter Steuer, tax.js) - die Pilot-Analyse zeigt die Grafik weiter offen. Zustand je
+     Browser in localStorage (Standard: zu); Kacheln und Satz bleiben sichtbar, eingeklappt werden
+     Legende, Diagramm und Fußnote. Die Grafik ist SVG mit viewBox - beim Aufklappen braucht sie
+     kein resize, sie nimmt die Breite des Hosts. */
+  var LS_OFFEN = 'dp_stv_diagramm_offen', offenSitzung = null;
+  function istOffen() {
+    if (offenSitzung != null) return offenSitzung;
+    try { return localStorage.getItem(LS_OFFEN) === '1'; } catch (e) { return false; }
+  }
+  function anwenden(host, offen) {
+    var wurzel = host && host.querySelector('.dp-stv'); if (!wurzel) return;
+    wurzel.classList.toggle('dp-stv-zu', !offen);
+    var k = wurzel.querySelector('.dp-stv-klapp button');
+    if (k) {
+      k.innerHTML = (offen ? 'Diagramm einklappen' : 'Diagramm aufklappen') + ' <i aria-hidden="true">' + (offen ? '▴' : '▾') + '</i>';
+      k.title = offen ? 'Diagramm einklappen' : 'Diagramm Steuerverlauf aufklappen';
+      k.setAttribute('aria-expanded', String(!!offen));
+    }
+  }
+  /** merken === false: nur für diese Sitzung (Messe-Drehbuch), sonst in localStorage. */
+  function klappen(host, offen, merken) {
+    offen = !!offen;
+    if (merken === false) offenSitzung = offen;
+    else { offenSitzung = null; try { localStorage.setItem(LS_OFFEN, offen ? '1' : '0'); } catch (e) {} }
+    anwenden(host, offen);
   }
 
   /** Baut die Grafik in `host`. Gibt false zurück, wenn es nichts zu zeigen gibt. */
@@ -117,6 +153,7 @@
     var R = reihe();
     if (!R || R.length < 2) { host.innerHTML = ''; return false; }
     stilEinhaengen();
+    var klappbar = host.hasAttribute('data-dp-stv-klappbar');   /* v3257 */
     var A = auswerten(R), E = ereignisse(R), w = A.wende, n = R.length;
     var zahlen = [
       [A.dauerhaft ? 'Dauerhaft positiv ab' : 'Steuerlich positiv ab', A.jahr ? String(A.jahr) : 'nicht im Zeitraum', w === 0 ? 'vom ersten Jahr an' : (w > 0 ? 'nach ' + A.verluste + ' Verlustjahr' + (A.verluste === 1 ? '' : 'en') : R[0].jahr + '–' + R[n - 1].jahr), C.marke],
@@ -159,11 +196,19 @@
     host.innerHTML = '<div class="dp-stv">'
       + '<div class="dp-stv-zahlen">' + zahlen.map(function (z) { return '<div class="dp-stv-z" style="--c:' + z[3] + '"><span>' + esc(z[0]) + '</span><b>' + esc(z[1]) + '</b><em>' + esc(z[2]) + '</em></div>'; }).join('') + '</div>'
       + '<p class="dp-stv-satz">' + satz + '</p>'
+      + (klappbar ? '<div class="dp-stv-klapp"><button type="button" class="btn-clean" aria-controls="dp-stv-diag"></button></div>' : '')
+      + '<div class="dp-stv-diag"' + (klappbar ? ' id="dp-stv-diag"' : '') + '>'
       + '<div class="dp-stv-leg"><span><i style="background:' + C.verlust + '"></i>Verlust · Steuererstattung</span><span><i style="background:' + C.gewinn + '"></i>Gewinn · Steuer fällig</span>'
       + (pkt.length > 1 ? '<span><i class="l" style="background:' + C.linie + '"></i>Cashflow nach Steuern</span>' : '') + (w > 0 ? '<span><i class="l" style="background:' + C.marke + '"></i>Wendepunkt</span>' : '') + '</div>'
       + '<div class="dp-stv-ch"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Steuerverlauf über ' + n + ' Jahre' + (A.jahr ? ', steuerlich positiv ab ' + A.jahr : '') + '">' + s + '</svg><div class="dp-stv-tip"></div></div>'
       + '<p class="dp-stv-fuss">Ergebnis aus V+V = Einnahmen minus Werbungskosten (Zinsen, AfA, Bewirtschaftung, Werbungskosten im Detail) – dieselbe Rechnung wie das Steuerformular. Steuerwirkung als Unterschied der Steuer mit und ohne dieses Objekt: Einkommensteuer nach § 32a EStG (Grund- oder Splittingtabelle laut deinen Steuerangaben), Solidaritätszuschlag und, wenn angegeben, Kirchensteuer – saldiert mit deinen früher gekauften Objekten, ein Verlust über dein Einkommen hinaus als Vortrag ins Folgejahr. Keine Steuerberatung.</p>'
-      + '</div>';
+      + '</div></div>';
+    if (klappbar) {
+      anwenden(host, istOffen());
+      host.querySelector('.dp-stv-klapp button').addEventListener('click', function () {
+        var w = host.querySelector('.dp-stv'); klappen(host, !!(w && w.classList.contains('dp-stv-zu')));
+      });
+    }
     var ch = host.querySelector('.dp-stv-ch'), tip = host.querySelector('.dp-stv-tip');
     Array.prototype.forEach.call(host.querySelectorAll('.hit'), function (h) {
       h.addEventListener('mousemove', function (ev) {
@@ -180,5 +225,7 @@
     return true;
   }
   function mountAll() { Array.prototype.forEach.call(document.querySelectorAll('[data-dp-steuerverlauf]'), function (h) { try { mount(h); } catch (e) {} }); }
-  window.DpSteuerVerlauf = { mount: mount, mountAll: mountAll, reihe: reihe, auswerten: auswerten };
+  window.DpSteuerVerlauf = { mount: mount, mountAll: mountAll, reihe: reihe, auswerten: auswerten,
+    /* v3257 · Auf-/Zuklappen von außen (Messe-Drehbuch: merken=false, nur für diese Sitzung) */
+    klappen: klappen };
 })();
