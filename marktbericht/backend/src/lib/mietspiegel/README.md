@@ -5,7 +5,10 @@ herausgibt, wie lange er gilt und **wo er steht**. Tabellenwerte (Mieten je m²)
 das ist Phase 2. Das Verzeichnis ist das Gegenstück zur Doktrin „Wo kein Wert vorliegt, bekommt der
 Kunde den Weg dorthin“: auch ohne Werte kann der Bericht sagen, welcher Mietspiegel gilt und wo er liegt.
 
-Erzeugt am 09.11.2026. Keine Datenbank, kein Code liest die Datei bisher.
+Erzeugt am 09.11.2026. Keine Datenbank. **Seit v3250 gelesen** von `verzeichnis.js` (daneben) → Route
+GET `/mietspiegel?ags=` (mb-Backend `routes/api.js`, in der Haupt-App über den Proxy `/marktbericht/mietspiegel`)
+→ `frontend/js/potenzial.js` (`_dpMarktdaten.mietspiegel_register`, Kern `mietspiegelAus`/`mietspiegelRegister`).
+Jahrespflege: Jahreswerte-Register, Eintrag `mietspiegel_verzeichnis`.
 
 ## Rechtsgrundlage (gemessen am Wortlaut, 09.11.2026)
 
@@ -57,7 +60,7 @@ Die abgeleiteten Daten sind deshalb eher zu spät als zu früh — für den Hinw
 nicht mehr qualifiziert“ genügt das, für eine Rechtsaussage nicht. Bei `stand` nur als Jahr wird der
 31.12. angesetzt.
 
-## Was der Kunde davon hat (Absicht, noch nicht gebaut)
+## Was der Kunde davon hat (v3250: Zeile im Reiter Investition, Karte „Mieterhöhung und Zielbild“)
 
 - Gemeinde mit Mietspiegel: Name, Art, Gültigkeit, Link — „hier steht die ortsübliche Vergleichsmiete“.
 - `vermutung_bis` abgelaufen: Hinweis, dass die Vermutung des § 558d Abs. 3 nicht mehr greifen könnte.

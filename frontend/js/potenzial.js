@@ -782,14 +782,45 @@
        1 eigene belegte Vergleichsmiete (zb_vgl_qm)
        2 Mietspiegel: Eingabe am Objekt (ms_art, ms_unten, ms_mittel, ms_oben, ms_stand, ms_url), gerechnet mit
          dem OBEREN Spannenwert, umschaltbar je Objekt (ms_wahl: '' = oben | 'mittel' | 'unten'); später füllt
-         das Register (_dpMarktdaten.mietspiegel, Mietspiegel-Verzeichnis) dieselbe Struktur - Kern mietspiegelAus()
+         das Register (seit v3250 _dpMarktdaten.mietspiegel_register.satz, Mietspiegel-Verzeichnis) dieselbe Struktur - Kern mietspiegelAus()
        3 amtliche Vergleichsmiete am Objekt (_dpMarktdaten.vergleichsmiete, wie v3244/v3245)
        4 Schätzung aus der Marktmiete (ds2_marktmiete) MINUS Abschlag nach Marktlage
          (DealPilotConfig.mieteAngebotAbschlag, Stufe im Kern abschlagStufe) - weiter als marktmiete: true
          markiert: der Wertkern nimmt dann seine marktübliche Miete (PotenzialService stufe558) */
+  /* v3250 · MIETSPIEGEL-VERZEICHNIS der Gemeinde (Route /marktbericht/mietspiegel?ags=, Datei im mb-Image):
+     je Gemeinde EINMAL je Sitzung geholt und am Objekt gemerkt (_dpMarktdaten.mietspiegel_register = { ags, satz }).
+     Der Satz füllt im Kern mietspiegelAus() Art, Stand, Vermutungsfrist und Link, solange die Eingabe sie nicht
+     selbst trägt; die Werte (unten/mittel/oben) bleiben Eingabe - Phase 1 des Verzeichnisses führt keine. */
+  var _msReg = {};   /* ags -> Promise (läuft) | Antwort | null (Fehler, in dieser Sitzung nicht erneut) */
+  function msRegister() {
+    var g = agsJetzt(), md = window._dpMarktdaten, r = md && md.mietspiegel_register;
+    if (r && r.satz && !(md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) && (!g || !r.ags || r.ags === g)) return r.satz;
+    var c = g ? _msReg[g] : null;
+    return c && typeof c.then !== 'function' ? c : null;
+  }
+  function msRegisterHolen() {
+    var g = agsJetzt(); if (!g) return;
+    var merken = function (satz) {
+      try { if (satz && window.dpMarktdatenMerken) window.dpMarktdatenMerken({ mietspiegel_register: { ags: g, satz: satz } }); } catch (e) {}
+    };
+    if (g in _msReg) {
+      var c = _msReg[g], md = window._dpMarktdaten, r = md && md.mietspiegel_register;
+      if (c && typeof c.then !== 'function' && !(r && r.ags === g && md.fuer === window._currentObjKey)) merken(c);
+      return;
+    }
+    if (!window.Auth || typeof Auth.apiCall !== 'function') return;
+    _msReg[g] = Auth.apiCall('/marktbericht/mietspiegel?ags=' + encodeURIComponent(g), { method: 'GET' }).then(function (a) {
+      if (!a || a.error || !('art' in a)) { _msReg[g] = null; return; }
+      _msReg[g] = a;
+      if (agsJetzt() !== g) return;
+      merken(a);
+      try { objektSumme(); } catch (e) {}
+      try { msHinweis(); } catch (e) {}
+    }).catch(function () { _msReg[g] = null; });
+  }
   function mietspiegelObjekt() {
     var md = window._dpMarktdaten;
-    var reg = md && md.mietspiegel && !(md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) ? md.mietspiegel : null;
+    var reg = msRegister() || (md && md.mietspiegel && !(md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) ? md.mietspiegel : null);
     return K.mietspiegelAus(reg, { art: wert('ms_art'), unten: wert('ms_unten'), mittel: wert('ms_mittel'), oben: wert('ms_oben'),
       stand: wert('ms_stand'), url: wert('ms_url') });
   }
@@ -2553,7 +2584,8 @@
     var karte = el('zb-karte'); if (!karte) return;
     /* v2430b · die Gemeinde gleich holen (Leseroute, kein Kontingent) - sonst
        stand bis zum ersten Rechnen „20 %, Gemeinde noch nicht ermittelt". */
-    if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { objektSumme(); } catch (e) {} try { mietrechtKarte(); } catch (e) {} } });
+    if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { msRegisterHolen(); } catch (e) {} try { objektSumme(); } catch (e) {} try { mietrechtKarte(); } catch (e) {} } });
+    else try { msRegisterHolen(); } catch (e) {}   /* v3250 · Mietspiegel-Verzeichnis der Gemeinde */
     var mfh = artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length;
     var sumHost = el('zb-mfh-summe'), einzel = el('zb-einzel');
     try { msHinweis(); } catch (e) {}   /* v3246 */
@@ -2608,11 +2640,33 @@
     try { mietrechtKarte(); } catch (e) { console.warn('[mietrecht]', e); }   /* v3062 */
   }
   /* v3246 · unter der Mietspiegel-Eingabe: womit § 558 gerade rechnet, mit den Hinweisen der Quelle */
+  /* v3250 · Zeile aus dem Mietspiegel-Verzeichnis über dem Satz „Gerechnet wird mit …" (Kern mietspiegelRegister) */
+  function msRegisterHtml() {
+    var zr = K.mietspiegelRegister ? K.mietspiegelRegister(msRegister()) : null;
+    msPlatzhalter(zr);
+    if (!zr) return '';
+    var ohneWerte = !(zahl(wert('ms_unten')) > 0 || zahl(wert('ms_mittel')) > 0 || zahl(wert('ms_oben')) > 0);
+    var link = zr.url && /^https?:\/\//.test(zr.url) ? ' · <a href="' + esc(zr.url) + '" target="_blank" rel="noopener">Mietspiegel öffnen</a>' : '';
+    return '<span' + (zr.veraltet || zr.status === 'unklar' ? ' style="color:#B8625C"' : '') + '>' + esc(zr.text) + '</span>' + link
+      + (zr.vorhanden && ohneWerte && !(zahl(wert('zb_vgl_qm')) > 0) ? '<br><b>' + esc(zr.werte_hinweis) + '</b>' : '') + '<br>';
+  }
+  /* v3250 · Platzhalter der ms_*-Felder: zeigen, was das Verzeichnis einsetzt, solange das Feld leer ist */
+  function msPlatzhalter(zr) {
+    var v = zr && zr.vorhanden;
+    var s = el('ms_stand'); if (s && 'placeholder' in s) s.placeholder = v && zr.stand ? 'laut Verzeichnis ' + String(zr.stand).replace(/^(\d{4})-(\d{2}).*$/, '$2/$1') : '';
+    var u = el('ms_url'); if (u && 'placeholder' in u) u.placeholder = v && zr.url ? 'laut Verzeichnis: ' + zr.url : 'https://…';
+    var a = el('ms_art'), o = a && a.options && a.options[0];
+    if (o && o.value === '') o.text = v ? '— laut Verzeichnis: ' + zr.art + ' —' : '— nicht eingetragen —';
+    ['ms_unten', 'ms_mittel', 'ms_oben'].forEach(function (id, i) {
+      var f = el(id); if (f && 'placeholder' in f) f.placeholder = v ? 'aus dem Mietspiegel' : ['z. B. 6,80', 'z. B. 7,60', 'z. B. 8,40'][i];
+    });
+  }
   function msHinweis() {
     var h = el('ms-hinweis'); if (!h) return;
-    var vg = objektVgl();
-    if (!(vg.qm > 0)) { h.innerHTML = 'Keine Vergleichsmiete: Mietspiegel der Stadt eintragen — sonst rechnet DealPilot nur mit der Kappungsgrenze.'; return; }
-    h.innerHTML = 'Gerechnet wird mit <b>' + esc(eur2(vg.qm)) + '/m²</b> — ' + esc(vg.herkunft)
+    var vg = objektVgl(), rz = '';
+    try { rz = msRegisterHtml(); } catch (e) {}
+    if (!(vg.qm > 0)) { h.innerHTML = rz + 'Keine Vergleichsmiete: Mietspiegel der Stadt eintragen — sonst rechnet DealPilot nur mit der Kappungsgrenze.'; return; }
+    h.innerHTML = rz + 'Gerechnet wird mit <b>' + esc(eur2(vg.qm)) + '/m²</b> — ' + esc(vg.herkunft)
       + ((vg.hinweise || []).length ? '<br><span style="color:#B8625C">Hinweis: ' + esc(vg.hinweise.join(' · ')) + '</span>' : '')
       + (vg.quelle_art === 'eigen' && mietspiegelObjekt() ? '<br>Die eigene Vergleichsmiete (oben) geht dem Mietspiegel vor.' : '');
   }
@@ -2755,6 +2809,7 @@
   window.DpPotenzial = {
     mietpreisbremse: mietpreisbremse, mietrechtDaten: mietrechtDaten, mietrechtHtml: mietrechtHtml, mietrechtKarte: mietrechtKarte,   /* v3062 */
     mietrechtOrt: function () { var g = agsJetzt(); return { ags: g, kapp: kappung(g), bremse: mietpreisbremse(g) }; },   /* v3082: fuer die Pilot-Mietpreis-Analyse */
+    msRegister: msRegister, msRegisterHolen: msRegisterHolen,   /* v3250 · Mietspiegel-Verzeichnis der Gemeinde */
     standardhebung: standardhebung, standardhebungHtml: standardhebungHtml, feshBinden: feshBinden,   /* v3064 */
     leiterZeilen: leiterZeilen, leiterHtml: leiterHtml, leiterBinden: leiterBinden,   /* v3067 */
     marktSaniert: marktSaniert, vorschlagFuer: vorschlagFuer, zielVorschlaege: zielVorschlaege, zielVorschlagHtml: zielVorschlagHtml,   /* v3130 · N115 */

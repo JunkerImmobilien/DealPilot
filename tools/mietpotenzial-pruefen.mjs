@@ -23,6 +23,9 @@
      J  v3244 · § 558 nur, wo § 558 gilt: Staffel/Index/Gewerbe -> § 558-Anteil = Ist, die eigene Soll-Angabe
         ist ein eigener Posten (teil558/teilVertrag); Vergleichsmiete eigene -> amtliche (qualifizierter
         Mietspiegel geht jeder Marktmiete vor) -> Marktmiete markiert; me_soll zählt nicht mehr
+     L  v3250 · Mietspiegel-Verzeichnis: Route-Funktion mietspiegelFuer() (Detmold qualifiziert, ohne Satz der Weg),
+        Anzeige mietspiegelRegister() (qualifiziert/veraltet/keiner/unklar/fehlt), Register füllt Art/Stand/Link,
+        Eingabe schlägt Register, keiner/ohne Werte -> keine Mietspiegel-Rechnung, fremde Gemeinde ignoriert
    RC=0 sauber, RC=1 Abweichung. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -535,5 +538,69 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('K24 Ist schon über Vergleichsmiete: § 558 bleibt Ist 600', [s.miete], [600]);
 }
 
-console.log('mietpotenzial-pruefen (v3075, v3244, v3246): ' + (n - fehler) + ' von ' + n + ' ok');
+/* ── L · v3250 · Mietspiegel-Verzeichnis: Route (echte Funktion, ohne DB), Anzeige (Kern), Wirkung (potenzial.js) ── */
+{
+  const { mietspiegelFuer } = await import(new URL('file:///' + path.join(WURZEL, 'marktbericht/backend/src/lib/mietspiegel/verzeichnis.js').replace(/\\/g, '/')).href);
+  const det = mietspiegelFuer('05766020');
+  gleich('L1 Route Detmold (05766020): qualifiziert, gefunden, Stand, Vermutung, Link', [det.art, det.gefunden, det.stand, det.vermutung_bis, /^https:\/\//.test(det.url)], ['qualifiziert', true, '2025-04-04', '2027-04-03', true]);
+  const ohne = mietspiegelFuer('01001999');
+  wahr('L1 Route Gemeinde ohne Satz: art null mit Weg (§ 558c Abs. 4, 50.000 Einwohner)', ohne.art === null && ohne.gefunden === false && /50\.000 Einwohnern/.test(ohne.hinweis) && /§ 558c Abs\. 4/.test(ohne.hinweis));
+  gleich('L1 Route ohne gültigen AGS: null (Route antwortet 400)', [mietspiegelFuer('abc'), mietspiegelFuer('')], [null, null]);
+  wahr('L1 Route ohne Portal- oder Quellennamen im Weg', !/Scout|Immowelt|immonet|PriceHubble|Sprengnetter|BBSR/i.test(ohne.hinweis));
+  const loer = mietspiegelFuer('08336050'), unkl = mietspiegelFuer('08317065');
+  gleich('L1 Verzeichnis: Lörrach „keiner“, Lahr „unklar“', [loer.art, unkl.art], ['keiner', 'unklar']);
+
+  /* Anzeige: Kern mietspiegelRegister(satz, heute) */
+  let z = K.mietspiegelRegister(det, '2026-11-09');
+  gleich('L2 qualifiziert: Status, vorhanden, nicht veraltet', [z.status, z.vorhanden, z.veraltet, z.url === det.url], ['qualifiziert', true, false, true]);
+  gleich('L2 Wortlaut', z.text, 'Mietspiegel der Gemeinde: qualifiziert (§ 558d BGB) · Stand 04.04.2025 · gilt bis voraussichtlich 03.04.2027');
+  gleich('L2 Hinweis ohne Werte', z.werte_hinweis, 'Werte aus dem Mietspiegel eintragen — sonst rechnet DealPilot mit der Schätzung aus Angebotsmieten');
+  z = K.mietspiegelRegister(det, '2027-05-01');
+  wahr('L3 Register veraltet (vermutung_bis < heute): „veraltet seit 03.04.2027“, § 558d', z.status === 'veraltet' && z.veraltet && z.vorhanden && /veraltet seit 03\.04\.2027 — Vermutungswirkung \(§ 558d Abs\. 2 und 3 BGB\) entfällt, nur noch Indiz/.test(z.text));
+  z = K.mietspiegelRegister(loer, '2026-11-09');
+  wahr('L4 keiner: „kein Mietspiegel“, nicht vorhanden', z.status === 'keiner' && !z.vorhanden && /^Mietspiegel der Gemeinde: kein Mietspiegel/.test(z.text));
+  z = K.mietspiegelRegister(unkl, '2026-11-09');
+  wahr('L5 unklar: „ob ein Mietspiegel gilt, ist nicht belegt — bei der Stadt nachfragen“', z.status === 'unklar' && !z.vorhanden && /nicht belegt — ob ein Mietspiegel gilt, ist nicht belegt — bei der Stadt nachfragen/.test(z.text));
+  z = K.mietspiegelRegister(ohne, '2026-11-09');
+  wahr('L6 nicht im Verzeichnis: Weg mit 50.000 Einwohnern', z.status === 'fehlt' && /nicht im Verzeichnis/.test(z.text) && /50\.000 Einwohnern/.test(z.text));
+  z = K.mietspiegelRegister({ art: 'einfach', stand: '2023', gueltig_bis: '2025-12-31', url: 'https://example.org/e' }, '2026-11-09');
+  wahr('L6 einfach, gültig_bis vorbei: „abgelaufen am 31.12.2025“, Stand als Jahr', z.status === 'veraltet' && /einfach \(§ 558c BGB\) · Stand 2023 · abgelaufen am 31\.12\.2025/.test(z.text));
+  gleich('L6 ohne Satz: null', K.mietspiegelRegister(null), null);
+
+  /* Wirkung in potenzial.js: _dpMarktdaten.mietspiegel_register = { ags, satz } (dpMarktdatenMerken) */
+  const cfgText = fs.readFileSync(JS('config.js'), 'utf8').replace(/\r\n/g, '\n');
+  const cm = /\n    mieteAngebotAbschlag: (\{[\s\S]*?\n    \}),/.exec(cfgText);
+  const CFG = { DealPilotConfig: { mieteAngebotAbschlag: cm ? vm.runInNewContext('(' + cm[1] + ')') : { stufen: {} } } };
+  async function lauf(feld, satz, ags, regAgs) {
+    const c = fenster(feld);
+    Object.assign(c, CFG, satz ? { _dpMarktdaten: { mietspiegel_register: { ags: regAgs || ags, satz } } } : {});
+    const F = feld || {};
+    c.document.getElementById = (id) => (id in F ? { value: F[id], addEventListener() {}, dispatchEvent() {} } : null);
+    c._dpPotenzial = { ags, plz: F.plz };
+    lade(c, JS('mietpotenzial-kern.js')); lade(c, JS('potenzial.js'));
+    await c.DpPotenzial.kappungLaden();
+    return c.DpPotenzial;
+  }
+  const EIN1 = [{ nr: '1', wfl: '60', ist: '420', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' }];
+  let P = await lauf({ plz: '32756', ms_unten: '6,20', ms_oben: '8,10', ds2_marktmiete: '10' }, det, '05766020');
+  let m = P.modell({ einheiten: EIN1 });
+  gleich('L7 Register qualifiziert füllt Art, Stand, Frist und Link (Werte aus der Eingabe)', [m.vgl.qm, m.vgl.quelle_art, m.vgl.ms.stand, m.vgl.ms.gueltig_bis, m.vgl.ms.url === det.url, m.vgl.ms.qualifiziert],
+    [8.1, 'mietspiegel_qualifiziert', '2025-04', '2027-04', true, true]);
+  P = await lauf({ plz: '32756', ms_art: 'einfach', ms_stand: '2026-01', ms_url: 'https://example.org/eigen', ms_oben: '8,10', ds2_marktmiete: '10' }, det, '05766020');
+  m = P.modell({ einheiten: EIN1 });
+  gleich('L8 Eingabe schlägt Register (Art, Stand, Link)', [m.vgl.quelle_art, m.vgl.ms.stand, m.vgl.ms.url, m.vgl.ms.gueltig_bis], ['mietspiegel_einfach', '2026-01', 'https://example.org/eigen', null]);
+  P = await lauf({ plz: '32756', ds2_marktmiete: '10' }, det, '05766020');
+  m = P.modell({ einheiten: EIN1 });
+  wahr('L9 Register ohne Werte: keine Mietspiegel-Rechnung, Schätzung bleibt; Satz am Objekt lesbar', m.vgl.quelle_art === 'angebot_abschlag' && P.msRegister() && P.msRegister().art === 'qualifiziert');
+  P = await lauf({ plz: '79539', ms_oben: '8,10', ds2_marktmiete: '10' }, loer, '08336050');
+  m = P.modell({ einheiten: EIN1 });
+  gleich('L10 Register „keiner“, Wert eingetragen: die Eingabe trägt, Art fehlt (wie einfach, mit Hinweis)', [m.vgl.quelle_art, m.vgl.hinweise.some((h) => /Art des Mietspiegels nicht angegeben/.test(h))], ['mietspiegel_einfach', true]);
+  P = await lauf({ plz: '79539', ds2_marktmiete: '10' }, loer, '08336050');
+  gleich('L10 Register „keiner“ ohne Eingabe: keine Mietspiegel-Rechnung', P.modell({ einheiten: EIN1 }).vgl.quelle_art, 'angebot_abschlag');
+  P = await lauf({ plz: '32756', ms_oben: '8,10', ds2_marktmiete: '10' }, det, '05766020', '05758016');
+  m = P.modell({ einheiten: EIN1 });
+  gleich('L11 Satz einer anderen Gemeinde wird nicht gelesen', [P.msRegister(), m.vgl.quelle_art, m.vgl.ms.url, m.vgl.ms.gueltig_bis], [null, 'mietspiegel_einfach', null, null]);
+}
+
+console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

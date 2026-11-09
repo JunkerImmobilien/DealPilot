@@ -15,6 +15,7 @@ import * as Jahreswerte from '../services/JahreswerteService.js';   /* v3021 */
 import { oeffentlich as abschlagOeffentlich, RECHERCHE as ABSCHLAG_RECHERCHE, aktive as abschlagAktive } from '../lib/angebot_abschlag.js';   /* v3021 */
 import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js';   /* v3021 */
 import { indexreihen } from '../lib/indexreihen.js';                             /* v3026 */
+import { mietspiegelFuer } from '../lib/mietspiegel/verzeichnis.js';              /* v3250 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
@@ -1036,6 +1037,17 @@ router.get('/lage/gemessen', async (req, res) => {
 // je Objektart, mit Quelle. Eine Quelle fuer Ertragswert UND Haupt-App (bwk-profil.js).
 router.get('/bwk/ansaetze', (req, res) => {
   try { res.json(bwkAnsaetze(req.query.jahr)); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /mietspiegel?ags=05766020 — v3250 · Satz des Mietspiegel-Verzeichnisses (lib/mietspiegel/verzeichnis.json):
+// Art, Stand, Gültigkeit, Vermutungsfrist, Link. Ohne Satz { art: null, gefunden: false, hinweis } mit dem Weg
+// (§ 558c Abs. 4 BGB: Pflicht ab 50.000 Einwohnern). Nur Datei, keine DB, kein Kontingent.
+router.get('/mietspiegel', (req, res) => {
+  try {
+    const r = mietspiegelFuer(req.query.ags);
+    if (!r) return res.status(400).json({ error: 'ags (8-stellig) erforderlich' });
+    res.json(r);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // v3021 · JAHRESWERTE. Marcel 28.10.2026: „jedes Jahr automatisch neu ermitteln, und das
