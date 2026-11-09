@@ -25,7 +25,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMfhFelder) return;
-  var VERSION = 'v3236';
+  var VERSION = 'v3247';
   var $ = function (id) { return document.getElementById(id); };
   var GESPERRT = ['wfl', 'einheiten', 'nkm', 'vermstand'];   /* zimmer sperrt mfh-einheiten.js selbst */
   var NAMEN = { wfl: 'Wohnfläche', einheiten: 'Wohneinheiten', nkm: 'Nettokaltmiete (Reiter Miete)', zimmer: 'Zimmer', vermstand: 'Vermietungsstand', ds2_zustand: 'Zustand des Gebäudes' };
@@ -87,13 +87,28 @@
   function kasten(L) {
     var o = $('objart'); var f = o && o.closest ? o.closest('.f') : null; if (!f || !f.parentNode) return;
     var k = $('mff-kasten');
+    /* v3247 · Marcel 09.11.2026: „‚n Einheiten erfasst' — diese Felder kommen aus den Einheiten —
+       dass wir auf die Karte da hinsetzen ‚Einheiten bearbeiten'. Der Knopf ist jetzt weiter unten."
+       Der EINE Knopf (#mfh-einstieg mit #mfh-oeffnen, gezeichnet von mfh-einheiten.js knopf())
+       wird in den Kopf dieses Kastens umgehängt — kein zweiter Knopf. Vor jedem Neuzeichnen des
+       Kastens wird er herausgenommen (innerHTML würde ihn sonst zerstören), fällt der Kasten weg,
+       geht er an seinen Platz in index.html (.od-gebaeude) zurück. Einsteiger: detailgrad.js
+       blendet #mfh-einstieg und #mff-kasten weiterhin aus (v3236). */
+    var ein = $('mfh-einstieg');
+    if (ein && !ein._mffHeim) ein._mffHeim = { p: ein.parentNode, n: ein.nextSibling };
+    if (ein && k && k.contains(ein)) {
+      var H = ein._mffHeim;
+      if (H && H.p && H.p.isConnected) H.p.insertBefore(ein, H.n && H.n.parentNode === H.p ? H.n : null); else k.parentNode.insertBefore(ein, k.nextSibling);
+    }
     if (!mitEinheiten()) { if (k) k.remove(); return; }
     if (!k) { k = document.createElement('div'); k.id = 'mff-kasten'; k.className = 'f s2 mff-kasten'; f.parentNode.insertBefore(k, f.nextSibling); }
     var n = L.length;
-    k.innerHTML = '<div class="mff-titel">' + (n ? n + ' Einheiten erfasst — diese Felder kommen aus den Einheiten' : 'Mit Einheiten erfasst du jede Wohnung einzeln') + '</div>'
+    k.innerHTML = '<div class="mff-kopf"><div class="mff-titel">' + (n ? n + ' Einheiten erfasst — diese Felder kommen aus den Einheiten' : 'Mit Einheiten erfasst du jede Wohnung einzeln') + '</div>'
+      + '<div class="mff-knopf-platz"></div></div>'
       + '<div class="mff-text">' + (n ? '' : 'Daraus füllen sich ') + '<b>Wohnfläche, Wohneinheiten, Zimmer, Nettokaltmiete, Vermietungsstand</b> und — wo du den Zustand je Einheit angibst — der <b>Zustand des Gebäudes</b>. '
-      + 'Nicht nötig beim ganzen Haus: Etage, Badezimmer, Miteigentumsanteil (100 %).'
-      + (n ? ' Ändern über „Einheiten bearbeiten" unten bei den Flächen.' : ' Den Knopf „Einheiten erfassen" findest du unten bei den Flächen.') + '</div>';
+      + 'Nicht nötig beim ganzen Haus: Etage, Badezimmer, Miteigentumsanteil (100 %).' + '</div>';
+    var platz = k.querySelector('.mff-knopf-platz');
+    if (ein && platz) platz.appendChild(ein);
     /* v3236 · der zweite Knopf (#mff-oeffnen, „Einheiten bearbeiten"/„Einheiten erfassen") ist
        entfallen: es gibt EINEN Knopf, #mfh-oeffnen in mfh-einheiten.js knopf(). Marcel 09.11.2026. */
   }
@@ -127,6 +142,14 @@
     s.textContent = [
       '.mff-kasten{padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-radius:8px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);font:400 12.5px/1.5 Inter,system-ui,sans-serif}',
       '.mff-titel{font-weight:600;margin-bottom:2px}',
+      /* v3247 · Kopf: Titel links, „Einheiten bearbeiten (n)" rechts daneben; am Handy darunter */
+      '.mff-kopf{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;margin-bottom:4px}',
+      '.mff-kopf>.mff-titel{flex:1 1 220px;min-width:0;margin:0}',
+      '.mff-knopf-platz{flex:0 0 auto;max-width:100%}',
+      '.mff-knopf-platz:empty{display:none}',
+      '#mff-kasten #mfh-einstieg{margin:0 !important}',
+      '#mff-kasten #mfh-einstieg .cf-hint{display:none}',
+      '#mff-kasten #mfh-oeffnen{white-space:nowrap}',
       '.mff-text{margin-bottom:8px}',
       'input.mff-gesperrt,select.mff-gesperrt{opacity:.75;cursor:not-allowed}',
       'select.mff-gesperrt{pointer-events:none}',

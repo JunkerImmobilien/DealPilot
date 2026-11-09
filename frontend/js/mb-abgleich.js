@@ -33,7 +33,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMbAbgleich) return;
-  var VERSION = 'v3002d';
+  var VERSION = 'v3247';   /* v3247 · Abweichungen zum Marktbericht, leise */
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function fmt(n, d) {
@@ -470,18 +470,21 @@
   function paramHinweise(liste) {
     var ref = (S.bericht || {}).ref || {}, H = [];
     var mp = null; try { mp = window.DealPilotObjektReiter && DealPilotObjektReiter.modPunkte ? DealPilotObjektReiter.modPunkte() : null; } catch (e) {}
+    /* v3247 · je Hinweis zusätzlich k (Kennzahl), reiter (was im Reiter steht), bericht (was der Bericht nahm) */
     var P = {
-      wfl: ['Deine Wohnfläche', zahl(fv('wfl')), zahl(ref.living_area), ' m²', 0],
-      baujahr: ['Dein Baujahr', zahl(fv('baujahr')), zahl(ref.build_year), '', 0],
-      gsfl: ['Deine Grundstücksfläche', zahl(fv('gsfl')), zahl(ref.plot_area), ' m²', 0],
-      einheiten: ['Die Zahl der Einheiten', zahl(fv('einheiten')), zahl(ref.units), '', 0],
-      mod: ['Deine Modernisierungspunkte', mp ? mp.total : null, zahl(ref.mod_punkte), ' Punkten', 0],
-      nkm: ['Deine Nettokaltmiete', zahl(fv('nkm')), zahl(ref.monthly_net_rent), ' € im Monat', 0]
+      wfl: ['Deine Wohnfläche', zahl(fv('wfl')), zahl(ref.living_area), ' m²', 0, 'Wohnfläche'],
+      baujahr: ['Dein Baujahr', zahl(fv('baujahr')), zahl(ref.build_year), '', 0, 'Baujahr'],
+      gsfl: ['Deine Grundstücksfläche', zahl(fv('gsfl')), zahl(ref.plot_area), ' m²', 0, 'Grundstücksfläche'],
+      einheiten: ['Die Zahl der Einheiten', zahl(fv('einheiten')), zahl(ref.units), '', 0, 'Einheiten'],
+      mod: ['Deine Modernisierungspunkte', mp ? mp.total : null, zahl(ref.mod_punkte), ' Punkten', 0, 'Modernisierungspunkte'],
+      nkm: ['Deine Nettokaltmiete', zahl(fv('nkm')), zahl(ref.monthly_net_rent), ' € im Monat', 0, 'Nettokaltmiete']
     };
     liste.forEach(function (k) {
       var p = P[k]; if (!p || p[1] == null || p[2] == null) return;
       if (Math.abs(p[1] - p[2]) < 0.5) return;
-      H.push({ satz: p[0] + ' hat sich seit dem Bericht geändert — der Bericht rechnet noch mit ' + (k === 'baujahr' ? p[2] : fmt(p[2], 0)) + p[3] + '. Ein neuer Bericht bringt die Werte auf den aktuellen Stand.', stufe3: true });
+      var w = function (v) { return (k === 'baujahr' ? String(v) : fmt(v, 0)) + (k === 'mod' ? ' Punkte' : k === 'nkm' ? ' €/Monat' : p[3]); };
+      H.push({ satz: p[0] + ' hat sich seit dem Bericht geändert — der Bericht rechnet noch mit ' + (k === 'baujahr' ? p[2] : fmt(p[2], 0)) + p[3] + '. Ein neuer Bericht bringt die Werte auf den aktuellen Stand.', stufe3: true,
+        k: p[5], reiter: w(p[1]), bericht: w(p[2]) });
     });
     return H;
   }
@@ -497,21 +500,26 @@
       if (!eig || !b || !b.stufe || lageHerkunft(x[0]) !== 'eigene Angabe') return;
       var d = stufenAbstand(x[0], eig, b.stufe); if (Math.abs(d) < 2) return;
       H.push({ satz: 'Deine Einschätzung der ' + x[2] + ' („' + wortVon(x[0], eig) + '") liegt deutlich ' + (d > 0 ? 'unter' : 'über') + ' der Messung im Bericht („' + (b.wort || wortVon(x[0], b.stufe)) + '") — das ' + (d > 0 ? 'senkt' : 'hebt') + ' deinen Deal Score; bitte prüfen.',
-        ueb: { id: x[0], wert: norm(b.stufe), text: 'Messung übernehmen' } });
+        ueb: { id: x[0], wert: norm(b.stufe), text: 'Messung übernehmen' },
+        k: x[2], reiter: wortVon(x[0], eig) + ' (eigene Angabe)', bericht: (b.wort || wortVon(x[0], b.stufe)) + ' (gemessen)' });
     });
     /* Bodenrichtwert */
     var lv = B.land_value || {}, bBrw = lv.available ? zahl(lv.value_sqm) : null, eBrw = zahl(fv('brw_manuell')) != null ? zahl(fv('brw_manuell')) : zahl(fv('brw'));
-    if (bBrw && eBrw && pct(eBrw, bBrw) >= 5) H.push({ satz: 'Dein Bodenrichtwert (' + qm(eBrw) + ') weicht vom amtlichen Wert im Bericht ab (' + qm(bBrw) + (lv.stichtag ? ', Stand ' + datum(lv.stichtag) : '') + ') — bitte Stand und Lage prüfen.' });
+    if (bBrw && eBrw && pct(eBrw, bBrw) >= 5) H.push({ satz: 'Dein Bodenrichtwert (' + qm(eBrw) + ') weicht vom amtlichen Wert im Bericht ab (' + qm(bBrw) + (lv.stichtag ? ', Stand ' + datum(lv.stichtag) : '') + ') — bitte Stand und Lage prüfen.',
+      k: 'Bodenrichtwert', reiter: qm(eBrw), bericht: qm(bBrw) + (lv.stichtag ? ' (Stand ' + datum(lv.stichtag) + ')' : '') });
     /* Liegenschaftszins: neuer Jahrgang oder eigener Ansatz */
     var r = zinsAbruf(), bZ = zahl(ass.liegenschaftszins_pct_effektiv), eZ = zahl(fv('lzs_pct'));
-    if (eZ != null && bZ != null && Math.abs(eZ - bZ) >= 0.25) H.push({ satz: 'Dein eigener Liegenschaftszins (' + fmt(eZ, 2) + ' %) weicht vom Satz des Gutachterausschusses ab (' + fmt(bZ, 2) + ' %) — er verändert den Ertragswert spürbar.' });
+    if (eZ != null && bZ != null && Math.abs(eZ - bZ) >= 0.25) H.push({ satz: 'Dein eigener Liegenschaftszins (' + fmt(eZ, 2) + ' %) weicht vom Satz des Gutachterausschusses ab (' + fmt(bZ, 2) + ' %) — er verändert den Ertragswert spürbar.',
+      k: 'Liegenschaftszins', reiter: fmt(eZ, 2) + ' % (eigener Ansatz)', bericht: fmt(bZ, 2) + ' %' });
     else if (eZ == null && r && r.verfuegbar && bZ != null && r.berichtsjahr && ass.liegenschaftszins_berichtsjahr && String(r.berichtsjahr) !== String(ass.liegenschaftszins_berichtsjahr) && Math.abs(zahl(r.wert_pct) - bZ) >= 0.05)
-      H.push({ satz: 'Der Gutachterausschuss hat einen neuen Liegenschaftszins veröffentlicht (' + fmt(zahl(r.wert_pct), 2) + ' % statt ' + fmt(bZ, 2) + ' %) — ein neuer Bericht rechnet damit.', stufe3: true });
+      H.push({ satz: 'Der Gutachterausschuss hat einen neuen Liegenschaftszins veröffentlicht (' + fmt(zahl(r.wert_pct), 2) + ' % statt ' + fmt(bZ, 2) + ' %) — ein neuer Bericht rechnet damit.', stufe3: true,
+        k: 'Liegenschaftszins', reiter: fmt(zahl(r.wert_pct), 2) + ' % (Jahrgang ' + r.berichtsjahr + ')', bericht: fmt(bZ, 2) + ' % (Jahrgang ' + ass.liegenschaftszins_berichtsjahr + ')' });
     /* Verkehrswert */
     var vf = cc.verfahrenswahl || {}, fu = String(vf.verfahren || ''), W = { ertragswert: zahl((cc.ertragswert || {}).value_eur), sachwert: zahl((cc.sachwert || {}).value_eur), vergleichswert: zahl((cc.comparison || {}).vergleichswert_eur) };
     var bW = W[fu], eW = zahl(fv('svwert'));
     var name = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: (vf.basis === 'angebote' ? 'indikativen Vergleichswert' : 'Vergleichswert') }[fu];   /* v3242 */
-    if (bW && eW && pct(eW, bW) >= 10) H.push({ satz: 'Dein Markt-/Verkehrswert liegt ' + pct(eW, bW) + ' % ' + (eW > bW ? 'über' : 'unter') + ' dem ' + name + ' des Berichts (' + eur(bW) + ') — Finanzierung und Wertpuffer rechnen mit deinem Wert.' });
+    if (bW && eW && pct(eW, bW) >= 10) H.push({ satz: 'Dein Markt-/Verkehrswert liegt ' + pct(eW, bW) + ' % ' + (eW > bW ? 'über' : 'unter') + ' dem ' + name + ' des Berichts (' + eur(bW) + ') — Finanzierung und Wertpuffer rechnen mit deinem Wert.',
+      k: 'Markt-/Verkehrswert', reiter: eur(eW), bericht: eur(bW) + ' (' + name + ')' });
     return H;
   }
 
@@ -523,16 +531,20 @@
     var quelle = (ms && ms.code === 'amtlich') ? 'des Gutachterausschusses' : (ms && ms.code === 'zensus') ? 'laut Zensus' : 'im Bericht';
     if (ist != null && anker) {
       var oben = band ? zahl(band.oben_qm) : null, unten = band ? zahl(band.unten_qm) : null;
-      if (unten != null && ist < unten) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt ' + pct(ist, anker) + ' % unter der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ') — Mieterhöhung prüfen.' });
-      else if (oben != null && ist > oben) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt über dem, was der Bericht als marktüblich ansieht (bis ' + qm(oben) + ') — bei einem Mieterwechsel ist diese Miete womöglich nicht wieder zu erzielen.' });
+      if (unten != null && ist < unten) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt ' + pct(ist, anker) + ' % unter der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ') — Mieterhöhung prüfen.',
+        k: 'Ist-Miete', reiter: qm(ist), bericht: 'marktüblich ' + qm(anker) });
+      else if (oben != null && ist > oben) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt über dem, was der Bericht als marktüblich ansieht (bis ' + qm(oben) + ') — bei einem Mieterwechsel ist diese Miete womöglich nicht wieder zu erzielen.',
+        k: 'Ist-Miete', reiter: qm(ist), bericht: 'marktüblich bis ' + qm(oben) });
     }
     var mm = zahl(fv('ds2_marktmiete'));
-    if (mm && anker && pct(mm, anker) >= 15) H.push({ satz: 'Deine Marktmiete (' + qm(mm) + ') liegt ' + pct(mm, anker) + ' % ' + (mm > anker ? 'über' : 'unter') + ' der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ')' + (mm > anker ? ' — Angebotsmieten liegen meist über dem, was im Bestand gezahlt wird, und dein Deal Score rechnet damit ein höheres Mietpotenzial.' : '.') });
+    if (mm && anker && pct(mm, anker) >= 15) H.push({ satz: 'Deine Marktmiete (' + qm(mm) + ') liegt ' + pct(mm, anker) + ' % ' + (mm > anker ? 'über' : 'unter') + ' der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ')' + (mm > anker ? ' — Angebotsmieten liegen meist über dem, was im Bestand gezahlt wird, und dein Deal Score rechnet damit ein höheres Mietpotenzial.' : '.'),
+      k: 'Marktmiete', reiter: qm(mm), bericht: 'marktüblich ' + qm(anker) });
     var st = (B.assessment_stufen || {}).mietausfallrisiko, ea = fv('ds2_mietausfall');
     if (st && st.stufe && ea && lageHerkunft('ds2_mietausfall') === 'eigene Angabe') {
       var d = stufenAbstand('ds2_mietausfall', ea, st.stufe);
       if (Math.abs(d) >= 2) H.push({ satz: 'Dein Mietausfallrisiko („' + wortVon('ds2_mietausfall', ea) + '") weicht deutlich vom gemessenen Leerstand ab („' + (st.wort || st.stufe) + '", ' + String(st.wert).replace('.', ',') + ' % laut Zensus 2022) — bitte prüfen.',
-        ueb: { id: 'ds2_mietausfall', wert: norm(st.stufe), text: 'Messung übernehmen' } });
+        ueb: { id: 'ds2_mietausfall', wert: norm(st.stufe), text: 'Messung übernehmen' },
+        k: 'Mietausfallrisiko', reiter: wortVon('ds2_mietausfall', ea) + ' (eigene Angabe)', bericht: (st.wort || st.stufe) + ' (gemessen)' });
     }
     return H;
   }
@@ -550,20 +562,30 @@
     var d = datum(S.zeile && S.zeile.created_at);
     var H = art === 'objekt' ? hinweiseObjekt() : hinweiseMiete();
     if (!H.length) return '<div class="mba-zeile mba-passt"><span class="mba-ok">✓</span> Passt zum Marktbericht vom ' + esc(d) + '.</div>';
+    /* v3247 · Marcel 09.11.2026: „Wofür brauchen wir die Hinweise aus dem Marktbericht?" — sie zeigen,
+       wo der Reiter heute etwas anderes sagt als der letzte Bericht. Jetzt unaufdringlich: eine
+       schmale, eingeklappte Zeile „Abweichungen zum Marktbericht vom …" mit Zahl; aufgeklappt je
+       Abweichung die Kennzahl, was im Reiter steht und was im Bericht, darunter der Satz zur Folge. */
     var offen = istOffen(art);
-    var o = '<button type="button" class="mba-kopf" data-mba-auf="' + art + '" aria-expanded="' + offen + '">'
-      + '<span class="mba-dot"></span><span class="mba-titel">' + H.length + (H.length === 1 ? ' Hinweis' : ' Hinweise') + ' aus dem Marktbericht vom ' + esc(d) + '</span>'
-      + '<span class="mba-chev" aria-hidden="true">' + (offen ? '▾' : '▸') + '</span></button>';
+    var o = '<button type="button" class="mba-kopf btn-clean" data-mba-auf="' + art + '" aria-expanded="' + offen + '" title="Wo die Angaben im Reiter heute vom letzten Marktbericht abweichen">'
+      + '<span class="mba-chev" aria-hidden="true">' + (offen ? '▾' : '▸') + '</span>'
+      + '<span class="mba-titel">Abweichungen zum Marktbericht vom ' + esc(d) + '</span>'
+      + '<span class="mba-zahl">' + H.length + '</span></button>';
     if (!offen) return o;
     var neu = H.some(function (h) { return h.stufe3; });
     return o + '<ul class="mba-liste">' + H.map(function (h) {
-      return '<li>' + esc(h.satz) + (h.ueb ? ' <button type="button" class="btn btn-outline btn-sm mba-btn" data-mba-ueb="' + esc(h.ueb.id) + '" data-mba-wert="' + esc(h.ueb.wert) + '">' + esc(h.ueb.text) + '</button>' : '') + '</li>';
+      var vgl = h.k ? '<div class="mba-a"><span class="mba-a-k">' + esc(h.k) + '</span>'
+        + '<span class="mba-a-w"><i>Reiter</i> ' + esc(h.reiter || '—') + '</span>'
+        + '<span class="mba-a-w"><i>Bericht</i> ' + esc(h.bericht || '—') + '</span></div>' : '';
+      return '<li>' + vgl + '<div class="mba-satz">' + esc(h.satz) + (h.ueb ? ' <button type="button" class="btn btn-outline btn-sm mba-btn" data-mba-ueb="' + esc(h.ueb.id) + '" data-mba-wert="' + esc(h.ueb.wert) + '">' + esc(h.ueb.text) + '</button>' : '') + '</div></li>';
     }).join('') + '</ul>' + (neu ? '<div class="mba-fuss">' + knopfStufe3('Neuen Marktbericht erstellen') + '</div>' : '');
   }
   function host(art) {
     var id = art === 'objekt' ? 'mba-objekt' : 'mba-miete';
     var h = $(id); if (h) return h;
-    var nach = $(art === 'objekt' ? 'ki-lage-box' : 'ki-miete-box'); if (!nach || !nach.parentNode) return null;
+    /* v3247 · Objekt: ans Ende des Lage-Teils (nach #oe-lage-vergleich), nicht mehr hinter die
+       Pilot-Lage-Bewertung — die steht seit v3247 oben in der Karte. */
+    var nach = art === 'objekt' ? ($('oe-lage-vergleich') || $('ki-lage-box')) : $('ki-miete-box'); if (!nach || !nach.parentNode) return null;
     h = document.createElement('div'); h.id = id; h.className = 'mba-card'; h.setAttribute('data-mba', art);
     nach.parentNode.insertBefore(h, nach.nextSibling);
     return h;
@@ -645,12 +667,21 @@
       '.mba-zeile>span{flex:1 1 220px;min-width:0}',
       '.mba-leise{opacity:.6}',
       '.mba-passt .mba-ok{color:#3FA56C;font-weight:700;flex:0 0 auto}',
-      '.mba-kopf{display:flex;width:100%;align-items:center;gap:8px;padding:8px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:8px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);color:inherit;font:600 12.5px/1.4 Inter,system-ui,sans-serif;text-align:left;cursor:pointer}',
-      '.mba-kopf .mba-titel{flex:1 1 auto;min-width:0}',
-      '.mba-dot{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:var(--wl-c9a84c, #C9A84C)}',
-      '.mba-chev{flex:0 0 auto;opacity:.7}',
-      '.mba-liste{margin:6px 0 0;padding:0 0 0 18px}',
-      '.mba-liste li{margin:0 0 8px}',
+      /* v3247 · leise Zeile statt goldenem Kasten: Mono-Versalien, feine Linie oben, Zahl als kleine Marke */
+      '.mba-kopf{display:flex;width:100%;align-items:center;gap:8px;padding:7px 2px 3px;border:0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);border-radius:0;background:transparent;color:var(--muted,#7A7370);font:500 10px/1.4 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;text-align:left;cursor:pointer;box-shadow:none}',
+      '.mba-kopf:hover{color:var(--wl-b8932f, #b8932f)}',
+      '.mba-kopf .mba-titel{flex:0 1 auto;min-width:0}',
+      '.mba-zahl{flex:0 0 auto;min-width:16px;padding:0 5px;border-radius:8px;text-align:center;font-size:9.5px;line-height:15px;color:var(--wl-9a7f33, #9a7f33);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}',
+      '.mba-chev{flex:0 0 auto;color:var(--wl-b8932f, #b8932f);font-size:10px}',
+      '.mba-liste{margin:4px 0 0;padding:0;list-style:none}',
+      '.mba-liste li{margin:0;padding:7px 0;border-top:1px dashed color-mix(in srgb, currentColor 12%, transparent)}',
+      '.mba-liste li:first-child{border-top:0}',
+      '.mba-a{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;margin-bottom:2px}',
+      '.mba-a-k{flex:0 0 100%;font:600 10px/1.4 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase}',
+      '.mba-a-w{min-width:0;font-size:12.5px;font-variant-numeric:tabular-nums}',
+      '.mba-a-w>i{font-style:normal;font:500 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#7A7370);margin-right:4px}',
+      '.mba-satz{font-size:11.5px;line-height:1.45;color:var(--muted,#7A7370)}',
+      '@media (min-width:641px){.mba-a-k{flex:0 0 190px}}',
       '.mba-liste .mba-btn{margin-left:6px;vertical-align:middle}',
       '.mba-fuss{margin-top:4px}'
     ].join('');

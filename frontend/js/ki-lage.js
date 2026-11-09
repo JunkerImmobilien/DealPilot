@@ -885,6 +885,25 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
     if (D.trendRaw != null) z.push(['ds2_wertsteigerung', 'Wertsteigerung', S.wert ? S.wert(D.trendRaw) : null, fz(D.trendRaw, 1) + ' %/Jahr Preisentwicklung']);   /* v3007: Stufe wie autoLage */
     return z;
   }
+  /* v3247 · der EINE Kopfknopf in zwei Lagen: ohne Bericht „Lage analysieren" (runKiLage()),
+     mit Bericht „Web-Recherche" (runKiLage({ergaenzen:true})). Läuft gerade ein Aufruf
+     (disabled), bleibt die Beschriftung von runKiLage stehen. */
+  function kopfKnopf(btn, modus) {
+    if (!btn || btn.disabled) return;
+    var alt = btn.getAttribute('data-kopf') || '';
+    if (modus === 'bericht') {
+      btn.style.removeProperty('display');
+      btn.setAttribute('data-kopf', 'bericht');
+      if (btn.getAttribute('onclick') !== 'runKiLage({ergaenzen:true})') btn.setAttribute('onclick', 'runKiLage({ergaenzen:true})');
+      btn.title = 'Wertsteigerung und Entwicklung per Web-Recherche ergänzen — die übrigen Lagewerte kommen aus dem Marktbericht';
+      if (String(btn.textContent || '').trim() !== 'Web-Recherche') btn.textContent = 'Web-Recherche';
+    } else if (alt === 'bericht') {
+      btn.removeAttribute('data-kopf');
+      btn.setAttribute('onclick', 'runKiLage()');
+      btn.title = 'Lage aus amtlichen Daten messen und von der KI ergänzen lassen';
+      btn.textContent = 'Lage analysieren';
+    }
+  }
   function zeichnen() {
     var body = document.getElementById('ki-lage-body');
     var btn = document.getElementById('ki-lage-btn');
@@ -893,6 +912,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
     var D = bericht();
     if (!D) {
       if (btn) btn.style.removeProperty('display');
+      kopfKnopf(btn, null);   /* v3247 */
       if (tag) tag.textContent = '4 gemessen · 2 KI';
       if (body.getAttribute('data-aus-bericht')) {
         body.removeAttribute('data-aus-bericht');
@@ -900,8 +920,12 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       }
       return;
     }
-    /* !important: eine Regel setzt .btn auf display:flex !important (gemessen) */
-    if (btn) btn.style.setProperty('display', 'none', 'important');
+    /* v3247 · Marcel 09.11.2026: „neben dem Minimierungsbutton auch den Aufruf starten". Bis hier
+       wurde der Kopfknopf bei vorliegendem Marktbericht ausgeblendet — der Aufruf lag dann nur im
+       zugeklappten Körper („per Web-Recherche ergänzen"). Jetzt bleibt er im Kopf und ruft genau
+       das: runKiLage({ergaenzen:true}), derselbe Weg, dieselben Plan-/Kontingent-Sperren
+       (subscription.js sperrt #ki-lage-btn und [onclick*="runKiLage"], runKiLage prüft Paywall/Plan). */
+    kopfKnopf(btn, 'bericht');
     if (tag) tag.textContent = 'aus dem Marktbericht';
     /* v2177a · Ein Stufe-1-Bericht misst nur die Mikrolage (gemessen an
        Bismarckstr.: Makro, Bevoelkerung, Nachfrage fehlten). Was er nicht

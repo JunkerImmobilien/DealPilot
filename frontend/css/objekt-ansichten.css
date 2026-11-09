@@ -55,59 +55,130 @@ html body #ki-lage-box .lv-fuss { font-size: 11px; }
   html body #ki-lage-box .ki-lage-empty { white-space: normal; }
   html body #ki-lage-box:has(> #ki-lage-body > .ki-lage-empty:only-child) .ki-lage-tag { display: none; }
 }
+/* v3247 · Marcel 09.11.2026: die Box steht oben in „Lage & Einschätzung" (über der Lageklasse),
+   der Aufruf sitzt im Kopf direkt neben dem Auf-/Zuklapp-Pfeil (#ki-lage-min, object-actions.js) —
+   auch am Handy in EINER Zeile (style.css (7) legte den Knopf dort in eine zweite, volle Zeile). */
+html body #ki-lage-box.ki-lage-oben { margin: 2px 0 12px !important; }
+html body #ki-lage-box .ki-lage-header > #ki-lage-btn { margin-left: auto; white-space: nowrap; }
+html body #ki-lage-box .ki-lage-header > #ki-lage-min { margin-left: 6px; flex: 0 0 auto; }
+@media (max-width: 640px) {
+  html body #ki-lage-box .ki-lage-header { grid-template-columns: minmax(0, 1fr) auto auto !important; gap: 8px !important; }
+  html body #ki-lage-box .ki-lage-header > #ki-lage-btn { grid-column: 2; grid-row: 1; width: auto; margin: 0; padding-left: 10px; padding-right: 10px; }
+  html body #ki-lage-box .ki-lage-header > #ki-lage-min { grid-column: 3; grid-row: 1; margin: 0; }
+}
 
 /* ── (2) Parameter der Verkehrswertermittlung als Kacheln ─────── */
+/* v3247 · Marcel 09.11.2026: „die Karten ein bisschen cooler in Szene setzen, dass sie
+   zur Pilot-Optik passen." Die Kachel wird ein Instrument: Obsidian-Grund, Goldkante,
+   oben die Runway-Linie, Beschriftung in Mono-Versalien mit Kontrollleuchte, die Zahl
+   groß in Creme, die Einheit klein in Gold dahinter, unten eine feine Skala. Die
+   Herkunftsmarken (Stufe A–E/N …) bleiben, auf dem dunklen Grund mit eigenem Hof. */
 #oe-auto.oe-auto.oe-mit-kacheln { border: 0; background: transparent; border-radius: 0; overflow: visible; }
 .oe-kacheln {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
   gap: 8px;
   min-width: 0;
 }
 .oe-kachel {
-  display: flex; flex-direction: column; gap: 4px;
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; flex-direction: column; gap: 5px;
   min-width: 0;
-  padding: 9px 10px 8px;
-  background: #fff;
-  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
-  border-radius: 2px;
+  padding: 11px 11px 14px;
+  background:
+    radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent), transparent 60%),
+    linear-gradient(165deg, #1a1712 0%, #0d0c0a 48%, var(--obsidian, #050505) 100%);
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 1px 3px rgba(5, 5, 5, .18);
+  color: #FDFCFA;
   cursor: pointer;
-  transition: border-color .15s;
+  transition: border-color .15s, box-shadow .15s;
 }
-.oe-kachel:hover, .oe-kachel:focus-visible { border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent); outline: none; }
+/* Runway-Linie oben */
+.oe-kachel::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; z-index: -1;
+  background: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));
+  opacity: .9;
+}
+.oe-kachel.leer::before { opacity: .35; }
+.oe-kachel:hover, .oe-kachel:focus-visible {
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 75%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 0 0 1px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent), 0 4px 14px rgba(5, 5, 5, .22);
+  outline: none;
+}
+/* Instrumenten-Skala am Fuß */
+.oe-kachel-skala {
+  position: absolute; left: 11px; right: 11px; bottom: 4px; height: 5px; z-index: -1;
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) 0 1px, transparent 1px 7px) bottom / 100% 3px no-repeat,
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 75%, transparent) 0 1px, transparent 1px 35px) bottom / 100% 5px no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  opacity: .55;
+  pointer-events: none;
+}
 .oe-kachel-k {
-  font: 500 10px/1.25 "JetBrains Mono", monospace;
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--muted, #7A7370);
-  overflow-wrap: anywhere;
+  display: flex; align-items: center; gap: 6px;
+  font: 500 9.5px/1.25 "JetBrains Mono", monospace;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--wl-e8cc7a, #E8CC7A) 85%, #FDFCFA);
+  overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto;   /* „Modernisierungs-punkte" trennt an der Silbe */
 }
+/* Kontrollleuchte: Gold, wenn ein Wert anliegt, sonst aus */
+.oe-kachel-k::before {
+  content: ""; flex: 0 0 auto; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--wl-e8cc7a, #E8CC7A);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--wl-e8cc7a, #E8CC7A) 80%, transparent);
+}
+.oe-kachel.leer .oe-kachel-k::before { background: rgba(253, 252, 250, .22); box-shadow: none; }
 .oe-kachel-w {
-  font: 600 19px/1.15 "Space Grotesk", Inter, sans-serif;
-  color: var(--ch, #2A2727);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 5px;
+  min-width: 0;
+  color: #FDFCFA;
+}
+.oe-kachel-z {
+  min-width: 0;
+  font: 600 22px/1.1 "Space Grotesk", Inter, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
   overflow-wrap: anywhere;
 }
-.oe-kachel-w.lang { font-size: 13.5px; line-height: 1.25; }
+.oe-kachel-e {
+  font: 500 10.5px/1.2 "JetBrains Mono", monospace;
+  letter-spacing: .04em;
+  color: var(--wl-e8cc7a, #E8CC7A);
+  white-space: nowrap;
+}
+.oe-kachel-w.text .oe-kachel-z { font-size: 15px; line-height: 1.25; letter-spacing: 0; }
+.oe-kachel-w.lang .oe-kachel-z { font-size: 13.5px; }
+.oe-kachel.leer .oe-kachel-z { color: rgba(253, 252, 250, .45); }
 .oe-kachel-m { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-.oe-auto .oe-kachel-m .oe-st { margin: 0; min-width: 0; }
+/* Herkunftsmarken auf dem dunklen Grund: Statusfarben bleiben (nie tokenisiert), dazu ein Hof */
+html body .oe-auto .oe-kachel-m .oe-st { margin: 0; min-width: 0; padding: 1px 6px; border-radius: 3px; font-size: 9.5px; background: rgba(253, 252, 250, .05); }
+html body .oe-auto .oe-kachel-m .oe-st.a { color: #5DBE88; border-color: #3FA56C; background: rgba(63, 165, 108, .14); }
+html body .oe-auto .oe-kachel-m .oe-st.b { color: var(--wl-e8cc7a, #E8CC7A); border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent); background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent); }
+html body .oe-auto .oe-kachel-m .oe-st.x { color: #E58A82; border-color: #D8564C; background: rgba(216, 86, 76, .14); }
+html body .oe-auto .oe-kachel-m .oe-st.n { color: #D9A06E; border-color: #B87A46; background: rgba(184, 122, 70, .16); }
 .oe-kachel-ind {
-  font: 500 9.5px/1.2 "JetBrains Mono", monospace;
-  letter-spacing: .05em; text-transform: uppercase;
-  color: var(--muted, #7A7370);
+  font: 500 9px/1.2 "JetBrains Mono", monospace;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: rgba(253, 252, 250, .55);
 }
 .oe-kachel-q {
-  font-size: 11px; line-height: 1.3; color: var(--muted, #7A7370);
+  font-size: 11px; line-height: 1.3; color: rgba(253, 252, 250, .62);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.oe-kachel-a { margin-top: auto; padding-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
-html body .oe-auto .oe-kachel-a .oe-btn,
-html body .oe-kachel-a .oe-kachel-karte {
+.oe-kachel-a { margin-top: auto; padding-top: 3px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+html body .oe-auto .oe-kachel-a .oe-btn {
   width: auto !important; min-height: 0;
   padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important;
   font: 500 10px/1.4 "JetBrains Mono", monospace !important;
-  letter-spacing: .06em; text-transform: uppercase;
-  color: var(--wl-b8932f, #b8932f) !important;
-  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--wl-e8cc7a, #E8CC7A) !important;
+  cursor: pointer; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--wl-e8cc7a, #E8CC7A) 45%, transparent); text-underline-offset: 3px;
 }
+html body .oe-auto .oe-kachel-a .oe-btn:hover { color: #FDFCFA !important; }
 /* „Genau ansehen" — darin die bisherigen Zeilen, unverändert */
 .oe-genau {
   margin-top: 8px;
@@ -133,9 +204,11 @@ html body .oe-kachel-a .oe-kachel-karte {
 .oe-auto .oe-genau .oe-row.oe-kachel-blitz { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent); transition: background .3s; }
 @media (max-width: 420px) {
   .oe-kacheln { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-  .oe-kachel { padding: 8px; }
-  .oe-kachel-w { font-size: 16px; }
-  .oe-kachel-w.lang { font-size: 12.5px; }
+  .oe-kachel { padding: 9px 8px 13px; }
+  .oe-kachel-skala { left: 8px; right: 8px; }
+  .oe-kachel-z { font-size: 18px; }
+  .oe-kachel-w.text .oe-kachel-z, .oe-kachel-w.lang .oe-kachel-z { font-size: 12.5px; }
+  .oe-kachel-k { font-size: 9px; letter-spacing: .07em; }
 }
 
 /* ── (3) Bodenrichtwert-Karte ──────────────────────────────────── */
