@@ -1,0 +1,343 @@
+{
+ "ags": "05158020",
+ "gemeinde": "Langenfeld (Rheinland)",
+ "art": "qualifiziert",
+ "stand": "2025-10-01",
+ "erhebungsstichtag": "2023-01-01",
+ "gueltig_ab": "2025-10-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.langenfeld.de/city_info/display/dokument/show.cfm?region_id=138&id=415707",
+  "dokument": "Langenfelder Mietspiegel 2025 (qualifiziert, Indexfortschreibung auf Januar 2025 der Erhebung zum 1. Januar 2023), Stadt Langenfeld (Rheinland), gültig ab 1. Oktober 2025",
+  "seite": "S. 7 (Tabelle 1 Grundtabelle), S. 8–11 (Tabellen 2–8 Zu-/Abschläge), S. 2 (gültig ab)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Stadt Langenfeld (Rheinland)",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Grundtabelle nur nach Baualter (Mittelwert + Spanne), Größe als €/m²-Zu-/Abschlag (Tabelle 2) automatisch über wfl_klassen (24 bis unter 150 m²). Zu-/Abschläge werden zu Mittelwert UND Spannenwerten gerechnet (S. 8). Baujahre bis 2019 (danach nur Orientierung). Modernisierungszuschläge nur für Gebäude vor 1990. Wohnlage einfach −0,95 / gut +0,18 €/m² (Wohnlagenkarte nach Bodenrichtwert); Peripherie ohne Wohnlage nicht Teil des Mietspiegels. Kein Zahlenbeispiel im Dokument.",
+ "tabelle": {
+  "geltung": {
+   "wfl_von": 24,
+   "wfl_bis": 149.99,
+   "baujahr_bis": 2019
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1973,
+     "label": "bis 1973"
+    },
+    {
+     "von": 1974,
+     "bis": 2000,
+     "label": "1974 bis 2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2011,
+     "label": "2001 bis 2011"
+    },
+    {
+     "von": 2012,
+     "bis": 2019,
+     "label": "2012 bis 2019"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 6.89,
+    "mittel": 8.06,
+    "oben": 9.17,
+    "seite": "7"
+   },
+   {
+    "baujahr": 1,
+    "unten": 7.26,
+    "mittel": 8.39,
+    "oben": 9.54,
+    "seite": "7"
+   },
+   {
+    "baujahr": 2,
+    "unten": 7.64,
+    "mittel": 8.83,
+    "oben": 10.04,
+    "seite": "7"
+   },
+   {
+    "baujahr": 3,
+    "unten": 8.47,
+    "mittel": 9.79,
+    "oben": 11.13,
+    "seite": "7"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "art": "eur_qm",
+    "beleg": "S. 8 Tabelle 2",
+    "label": "Zu-/Abschlag Wohnfläche",
+    "wfl_klassen": [
+     {
+      "von": 24,
+      "bis": 29,
+      "bis_inkl": false,
+      "wert": 2.21
+     },
+     {
+      "von": 29,
+      "bis": 34,
+      "bis_inkl": false,
+      "wert": 1.45
+     },
+     {
+      "von": 34,
+      "bis": 39,
+      "bis_inkl": false,
+      "wert": 1.3
+     },
+     {
+      "von": 39,
+      "bis": 49,
+      "bis_inkl": false,
+      "wert": 0.6
+     },
+     {
+      "von": 49,
+      "bis": 59,
+      "bis_inkl": false,
+      "wert": 0.35
+     },
+     {
+      "von": 89,
+      "bis": 130,
+      "bis_inkl": false,
+      "wert": -0.22
+     },
+     {
+      "von": 130,
+      "bis": 150,
+      "bis_inkl": false,
+      "wert": -0.83
+     }
+    ]
+   },
+   {
+    "merkmal": "penthouse",
+    "art": "eur_qm",
+    "wert": 0.97,
+    "beleg": "S. 8 Tabelle 2",
+    "label": "Penthouse/Staffelgeschoss"
+   },
+   {
+    "merkmal": "souterrain",
+    "art": "eur_qm",
+    "wert": -0.38,
+    "beleg": "S. 8 Tabelle 2",
+    "label": "Souterrain-Wohnung"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "art": "eur_qm",
+    "wert": -0.34,
+    "beleg": "S. 9 Tabelle 3",
+    "label": "kein Balkon oder keine Loggia"
+   },
+   {
+    "merkmal": "terrasse",
+    "art": "eur_qm",
+    "wert": 0.54,
+    "beleg": "S. 9 Tabelle 3",
+    "label": "ebenerdige Terrasse (alleinige Nutzung)"
+   },
+   {
+    "merkmal": "dachterrasse",
+    "art": "eur_qm",
+    "wert": 0.54,
+    "beleg": "S. 9 Tabelle 3",
+    "label": "Dachterrasse (alleinige Nutzung)"
+   },
+   {
+    "merkmal": "garten",
+    "art": "eur_qm",
+    "wert": 0.68,
+    "beleg": "S. 9 Tabelle 3",
+    "label": "Garten zur alleinigen Nutzung"
+   },
+   {
+    "merkmal": "ohne_oberboden",
+    "art": "eur_qm",
+    "wert": -0.23,
+    "beleg": "S. 9 Tabelle 4",
+    "label": "ohne Oberboden vermietet"
+   },
+   {
+    "merkmal": "hochwertiger_bodenbelag",
+    "art": "eur_qm",
+    "wert": 0.55,
+    "beleg": "S. 9 Tabelle 4",
+    "label": "hochwertige Bodenbeläge"
+   },
+   {
+    "merkmal": "autogeyser",
+    "art": "eur_qm",
+    "wert": -0.85,
+    "beleg": "S. 10 Tabelle 5",
+    "label": "Warmwasser über nicht verbundene Autogeyser (Gas)"
+   },
+   {
+    "merkmal": "contracting",
+    "art": "eur_qm",
+    "wert": -0.15,
+    "beleg": "S. 10 Tabelle 5",
+    "label": "Wärmeliefervertrag (Contracting)"
+   },
+   {
+    "merkmal": "fussbodenheizung",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "beleg": "S. 10 Tabelle 5",
+    "label": "Fußbodenheizung"
+   },
+   {
+    "merkmal": "aufzug",
+    "art": "eur_qm",
+    "wert": 0.28,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "Aufzug (Gebäude bis fünf Geschosse)"
+   },
+   {
+    "merkmal": "badewanne_und_dusche",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "Badewanne und separate Dusche"
+   },
+   {
+    "merkmal": "waermeschutzverglasung",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "Wärmeschutzverglasung an allen Fenstern und Außentüren"
+   },
+   {
+    "merkmal": "gefangener_raum",
+    "art": "eur_qm",
+    "wert": -0.44,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "gefangene Räume / Durchgangsräume"
+   },
+   {
+    "merkmal": "elektrische_rolllaeden",
+    "art": "eur_qm",
+    "wert": 0.18,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "elektrische Roll- oder Fensterläden"
+   },
+   {
+    "merkmal": "videogegensprechanlage",
+    "art": "eur_qm",
+    "wert": 0.23,
+    "beleg": "S. 10 Tabelle 6",
+    "label": "videogestützte Gegensprechanlage mit Türöffner"
+   },
+   {
+    "merkmal": "fenster_erneuert_ab_2012",
+    "art": "eur_qm",
+    "wert": 0.21,
+    "beleg": "S. 11 Tabelle 7",
+    "label": "Erneuerung aller Fenster ab 2012",
+    "bedingung": {
+     "baujahr_bis": 1989
+    }
+   },
+   {
+    "merkmal": "dachdaemmung_ab_2012",
+    "art": "eur_qm",
+    "wert": 0.31,
+    "beleg": "S. 11 Tabelle 7",
+    "label": "Dämmung des Daches ab 2012",
+    "bedingung": {
+     "baujahr_bis": 1989
+    }
+   },
+   {
+    "merkmal": "aussenwanddaemmung_ab_2014",
+    "art": "eur_qm",
+    "wert": 0.56,
+    "beleg": "S. 11 Tabelle 7",
+    "label": "Dämmung aller Außenwände ab 2014",
+    "bedingung": {
+     "baujahr_bis": 1989
+    }
+   },
+   {
+    "merkmal": "bodenbelag_erneuert_ab_2012",
+    "art": "eur_qm",
+    "wert": 0.28,
+    "beleg": "S. 11 Tabelle 7",
+    "label": "Erneuerung/Aufbereitung Fußbodenbelag ab 2012",
+    "bedingung": {
+     "baujahr_bis": 1989
+    }
+   },
+   {
+    "merkmal": "lage:einfach",
+    "art": "eur_qm",
+    "wert": -0.95,
+    "beleg": "S. 11 Tabelle 8",
+    "label": "einfache Wohnlage",
+    "aliase": [
+     "einfache Wohnlage"
+    ]
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "eur_qm",
+    "wert": 0.18,
+    "beleg": "S. 11 Tabelle 8",
+    "label": "gute Wohnlage",
+    "aliase": [
+     "gute Wohnlage"
+    ]
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1985,
+    "wfl": 70,
+    "lage": "mittel"
+   },
+   "erwartet": {
+    "unten": 7.26,
+    "mittel": 8.39,
+    "oben": 9.54
+   },
+   "seite": "7",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 30,
+    "lage": "gut"
+   },
+   "erwartet": {
+    "unten": 10.1,
+    "mittel": 11.42,
+    "oben": 12.76
+   },
+   "seite": "7–11",
+   "art": "rechenweg",
+   "anmerkung": "8,47/9,79/11,13 + 1,45 (29 bis unter 34 m²) + 0,18 (gute Wohnlage)"
+  }
+ ]
+}

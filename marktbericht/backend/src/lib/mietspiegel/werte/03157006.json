@@ -1,0 +1,293 @@
+{
+ "ags": "03157006",
+ "gemeinde": "Peine",
+ "art": "qualifiziert",
+ "stand": "2026-03-01",
+ "erhebungsstichtag": "2023-10-01",
+ "gueltig_ab": "2026-03-01",
+ "gueltig_bis": "2028-02-28",
+ "quelle": {
+  "url": "https://www.peine.de/de-wAssets/docs/mediadaten_stadt/eigene_daten/Hochbau/Bauleitplaene-Stadtplanung/Laufende/Broschuere-Mietspiegel-2026-Fortschreibung_ohne_leere_Seite.pdf",
+  "dokument": "Mietspiegel Peine 2026 Fortschreibung (qualifiziert, VPI-Fortschreibung +4,41 % des Mietspiegels 2024), Stadt Peine",
+  "seite": "S. 10 (Mietspiegeltabelle), S. 2 (Gültigkeit 01.03.2026 bis 28.02.2028), S. 4 (Stichtag 01.10.2023), S. 14–15 (Berechnungsbeispiele)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Stadt Peine",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Mittelwert sowie untere und obere Spanne, freifinanzierter Geschosswohnungsbau mit WC in der Wohnung, Bad/Duschbad und Sammelheizung. Ein- und Zweifamilienhäuser +1,03 €/m² (Tabellenkopf). Felder A6 und D4 „-*“ (keine ausreichende Fallzahl) weggelassen; Felder mit ** (15–29 Mietwerte, bedingte Aussagekraft) übernommen: A5, D2, D5. Einordnung in die Spanne über Orientierungshilfe (S. 13–14) nicht abgebildet. Am gerenderten Bild abgelesen und mit der Textschicht abgeglichen.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1949,
+     "label": "1: bis 1949"
+    },
+    {
+     "von": 1950,
+     "bis": 1960,
+     "label": "2: 1950–1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1973,
+     "label": "3: 1961–1973"
+    },
+    {
+     "von": 1974,
+     "bis": 1990,
+     "label": "4: 1974–1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2007,
+     "label": "5: 1991–2007"
+    },
+    {
+     "von": 2008,
+     "bis": null,
+     "label": "6: 2008 u. jünger"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "label": "A: bis 45 m²"
+    },
+    {
+     "von": 45,
+     "bis": 65,
+     "von_inkl": false,
+     "label": "B: über 45 bis 65 m²"
+    },
+    {
+     "von": 65,
+     "bis": 90,
+     "von_inkl": false,
+     "label": "C: über 65 bis 90 m²"
+    },
+    {
+     "von": 90,
+     "bis": null,
+     "von_inkl": false,
+     "label": "D: über 90 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.6,
+    "mittel": 6.49,
+    "oben": 7.77,
+    "seite": "10"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 5.74,
+    "mittel": 6.34,
+    "oben": 7.4,
+    "seite": "10"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6.37,
+    "mittel": 7.7,
+    "oben": 9.81,
+    "seite": "10"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 6.56,
+    "mittel": 9.3,
+    "oben": 11.16,
+    "seite": "10"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 6.16,
+    "mittel": 6.81,
+    "oben": 7.85,
+    "seite": "10"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5.59,
+    "mittel": 6.14,
+    "oben": 7.04,
+    "seite": "10"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.53,
+    "mittel": 6.07,
+    "oben": 6.79,
+    "seite": "10"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.97,
+    "mittel": 6.44,
+    "oben": 6.97,
+    "seite": "10"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 6.1,
+    "mittel": 7.18,
+    "oben": 8.29,
+    "seite": "10"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 5.87,
+    "mittel": 6.7,
+    "oben": 7.35,
+    "seite": "10"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 7.31,
+    "mittel": 8.53,
+    "oben": 10.18,
+    "seite": "10"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.36,
+    "mittel": 6.38,
+    "oben": 7.52,
+    "seite": "10"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.25,
+    "mittel": 5.91,
+    "oben": 6.79,
+    "seite": "10"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.61,
+    "mittel": 6.15,
+    "oben": 6.79,
+    "seite": "10"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.54,
+    "mittel": 6.66,
+    "oben": 8.3,
+    "seite": "10"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 5.97,
+    "mittel": 6.71,
+    "oben": 7.55,
+    "seite": "10"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 7.84,
+    "mittel": 9.26,
+    "oben": 11.15,
+    "seite": "10"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.07,
+    "mittel": 6.18,
+    "oben": 7.52,
+    "seite": "10"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 4.58,
+    "mittel": 6.09,
+    "oben": 7.88,
+    "seite": "10"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5.4,
+    "mittel": 5.84,
+    "oben": 6.62,
+    "seite": "10"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 5.44,
+    "mittel": 6.65,
+    "oben": 7.65,
+    "seite": "10"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 7.32,
+    "mittel": 8.53,
+    "oben": 9.56,
+    "seite": "10"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "einfamilienhaus",
+    "art": "eur_qm",
+    "wert": 1.03,
+    "beleg": "S. 10 Tabellenkopf",
+    "label": "Ein- oder Zweifamilienhaus"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1930,
+    "wfl": 55
+   },
+   "erwartet": {
+    "unten": 5.59,
+    "mittel": 6.14,
+    "oben": 7.04
+   },
+   "seite": "14",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Berechnungsbeispiel Feld B1 (Tabellenwerte; Spanneneinordnung −20 % → 6,03 € nicht abgebildet)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 40
+   },
+   "erwartet": null,
+   "seite": "10",
+   "art": "tabellenzelle"
+  }
+ ]
+}

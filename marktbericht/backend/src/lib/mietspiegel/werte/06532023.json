@@ -1,0 +1,378 @@
+{
+ "ags": "06532023",
+ "gemeinde": "Wetzlar",
+ "art": "qualifiziert",
+ "stand": "2026-06-01",
+ "erhebungsstichtag": "2023-11-01",
+ "gueltig_ab": "2026-06-01",
+ "gueltig_bis": "2028-05-31",
+ "quelle": {
+  "url": "https://www.wetzlar.de/medien/bindata/aktuelleDateien/2026/Broschuere-Mietspiegel-Wetzlar-Fortschreibung-2026-Stand-01.06.2026.pdf",
+  "dokument": "Mietspiegel Wetzlar 2026 Fortschreibung (qualifiziert, VPI-Fortschreibung +4,60 % des Mietspiegels 2024), Stadt Wetzlar",
+  "seite": "S. 9 (Mietspiegeltabelle, PDF-S. 10), S. 2 (Gültigkeit), S. 4 (Stichtag 01.11.2023)",
+  "lizenz": "keine Nutzungsbedingungen im Dokument genannt; veröffentlicht nach § 558c Abs. 4 BGB, Stadt Wetzlar",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Mittelwert sowie untere und obere Spanne im freifinanzierten Geschosswohnungsbau in der NORMALEN Wohnlage (Tabellenkopf), Mindestausstattung WC in der Wohnung, Bad/Duschbad und Sammelheizung. Andere Wohnlagen nennt die Tabelle nicht → kein Wert. Ein- und Zweifamilienhäuser +0,52 €/m² (Tabellenkopf). Einordnung in die Spanne über Orientierungshilfe (S. 11 ff.) nicht abgebildet. Am gerenderten Bild abgelesen und mit der Textschicht abgeglichen (z. B. „7,8“, „5,5“, „9“ so gedruckt).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1949,
+     "label": "1: bis 1949"
+    },
+    {
+     "von": 1950,
+     "bis": 1960,
+     "label": "2: 1950–1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1977,
+     "label": "3: 1961–1977"
+    },
+    {
+     "von": 1978,
+     "bis": 1993,
+     "label": "4: 1978–1993"
+    },
+    {
+     "von": 1994,
+     "bis": 2010,
+     "label": "5: 1994–2010"
+    },
+    {
+     "von": 2011,
+     "bis": null,
+     "label": "6: 2011 u. jünger"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "label": "A: bis 45 m²"
+    },
+    {
+     "von": 45,
+     "bis": 65,
+     "von_inkl": false,
+     "label": "B: über 45 bis 65 m²"
+    },
+    {
+     "von": 65,
+     "bis": 80,
+     "von_inkl": false,
+     "label": "C: über 65 bis 80 m²"
+    },
+    {
+     "von": 80,
+     "bis": 95,
+     "von_inkl": false,
+     "label": "D: über 80 bis 95 m²"
+    },
+    {
+     "von": 95,
+     "bis": null,
+     "von_inkl": false,
+     "label": "E: über 95 m²"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "normal",
+     "label": "normale Wohnlage",
+     "standard": true,
+     "aliase": [
+      "mittel",
+      "mittlere Wohnlage",
+      "normale Wohnlage"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.75,
+    "mittel": 6.74,
+    "oben": 8.11,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.12,
+    "mittel": 6.57,
+    "oben": 7.22,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 5.75,
+    "mittel": 6.91,
+    "oben": 8.11,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 6.28,
+    "mittel": 8.42,
+    "oben": 10.76,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 7.8,
+    "mittel": 9.39,
+    "oben": 11.82,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "unten": 9.36,
+    "mittel": 11.54,
+    "oben": 13.51,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5.54,
+    "mittel": 6.5,
+    "oben": 7.85,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.99,
+    "mittel": 6.69,
+    "oben": 7.64,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.75,
+    "mittel": 6.78,
+    "oben": 8.05,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.5,
+    "mittel": 6.81,
+    "oben": 8.42,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 6.84,
+    "mittel": 8.56,
+    "oben": 10.97,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 8.54,
+    "mittel": 9.62,
+    "oben": 10.98,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.54,
+    "mittel": 6.46,
+    "oben": 7.94,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.91,
+    "mittel": 6.8,
+    "oben": 7.85,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.75,
+    "mittel": 6.72,
+    "oben": 7.78,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.52,
+    "mittel": 6.94,
+    "oben": 8.43,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 6.85,
+    "mittel": 8.05,
+    "oben": 9.46,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 9.15,
+    "mittel": 9.58,
+    "oben": 10.14,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.58,
+    "mittel": 6.34,
+    "oben": 7.32,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5.85,
+    "mittel": 6.69,
+    "oben": 7.75,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5.75,
+    "mittel": 6.58,
+    "oben": 7.32,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.55,
+    "mittel": 6.64,
+    "oben": 8.18,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 6.24,
+    "mittel": 7.47,
+    "oben": 9,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 8.89,
+    "mittel": 9.53,
+    "oben": 10.67,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "unten": 5.24,
+    "mittel": 6.53,
+    "oben": 7.73,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "unten": 6.08,
+    "mittel": 7.02,
+    "oben": 8.01,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "unten": 5.6,
+    "mittel": 6.7,
+    "oben": 7.92,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "unten": 5.94,
+    "mittel": 7.15,
+    "oben": 9.27,
+    "seite": "9"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "unten": 6.52,
+    "mittel": 7.63,
+    "oben": 9.22,
+    "seite": "9"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "unten": 7.59,
+    "mittel": 9.49,
+    "oben": 11.39,
+    "seite": "9"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "einfamilienhaus",
+    "art": "eur_qm",
+    "wert": 0.52,
+    "beleg": "S. 9 Tabellenkopf",
+    "label": "Ein- oder Zweifamilienhaus"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.75,
+    "mittel": 6.72,
+    "oben": 7.78
+   },
+   "seite": "9",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 50
+   },
+   "erwartet": {
+    "unten": 8.54,
+    "mittel": 9.62,
+    "oben": 10.98
+   },
+   "seite": "9",
+   "art": "tabellenzelle"
+  }
+ ]
+}
