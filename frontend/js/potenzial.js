@@ -245,9 +245,9 @@
     z.push({ c: 'heute', t: 'Heute', v: ist > 0 ? eur(ist) + '/Monat' + qm(ist) : 'leer',
       u: f.mv_beginn ? 'Mietvertrag seit ' + deDatum(String(f.mv_beginn).slice(0, 10)) : '' });
     if (!(ist > 0)) z.push({ c: 'soll', t: 'Mieterhöhung', v: '—', u: 'nicht vermietet — es zählt die Neuvermietung' });
-    else if (so.vertrag) z.push({ c: 'soll', t: 'Mieterhöhung', v: 'nach Vertrag', u: so.grund || '' });
+    else if (so.vertrag) z.push({ c: 'soll', t: 'Mieterhöhung', v: vertragZeileV(so, ist, qm), u: vertragZeileU(so) });   /* v3244 */
     else if (so.miete != null && so.miete > ist + 0.01) {
-      var eigenS = so.herkunft === 'eigene Angabe', wirk = so.termine && so.termine.wirksam_ab;
+      var eigenS = /^eigene Angabe/.test(so.herkunft || ''), wirk = so.termine && so.termine.wirksam_ab;
       z.push({ c: 'soll', t: 'Mieterhöhung', v: 'auf ' + eur(so.miete) + '/Monat' + qm(so.miete),
         u: (so.termine ? so.termine.text : '') + (so.grenze ? ' · Grenze ' + so.grenze : '')
           + (so.umlage559 && so.umlage559.monat > 0 ? ' · darin Umlage § 559 ' + eur(so.umlage559.monat) : '')
@@ -490,7 +490,7 @@
     /* 2 · Nächste Erhöhung (§ 558) — aus sollFuer, nichts nachgerechnet */
     if (w) {
       var ist = zahl(w.ist), wfl = zahl(w.wfl);
-      if (s.vertrag) z.push({ k: 'Nächste Erhöhung', v: 'nach Vertrag', u: s.grund || '' });
+      if (s.vertrag) z.push({ k: 'Nächste Erhöhung', v: vertragZeileV(s, ist, function (x) { return wfl ? ' (' + eur2(x / wfl) + '/m²)' : ''; }), u: vertragZeileU(s) });   /* v3244 */
       else if (!(ist > 0)) z.push({ k: 'Nächste Erhöhung', v: '—', u: 'nicht vermietet' });
       else if (s.miete != null && s.miete > ist + 0.01) z.push({ k: 'Nächste Erhöhung',
         v: 'auf ' + eur(s.miete) + '/Monat' + (wfl ? ' (' + eur2(s.miete / wfl) + '/m²)' : ''),
@@ -499,7 +499,7 @@
         u: (s.termine ? s.termine.text : '') + (s.grenze ? ' · Grenze § 558: ' + s.grenze : '')
           + (s.umlage559 && s.umlage559.monat > 0 ? ' · darin Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat'
               + (s.umlage559.ohne_erh ? ' (Erhaltungsanteil nicht eingetragen — 0 % abgezogen)' : '') : '')
-          + (s.herkunft === 'eigene Angabe' ? ' · eigene Angabe' : ''),
+          + (/^eigene Angabe/.test(s.herkunft || '') ? ' · eigene Angabe' : ''),
         warn: !!(s.termine && s.termine.letzte_fehlt) || !!(s.hinweise && s.hinweise.length),
         lang: [s.termine && s.termine.sperre, (s.hinweise || []).join(', ')].filter(Boolean).join(' · ') });
       else {
@@ -742,21 +742,52 @@
      VERGLEICHSMIETE, nicht an der Neuvermietungsmiete. Deshalb der Mietspiegel VOR der Marktmiete;
      die Marktmiete bleibt nur Ersatz und ist markiert (marktmiete: true) - der Wertkern nimmt dann
      die marktübliche Miete der Wertermittlung statt ihrer (PotenzialService stufe558). */
+  /* v3244 · NEUE RANGFOLGE (Prüfer-Befund 09.11.2026, Bismarckstr. 27 Detmold):
+       1 eigene Vergleichsmiete (zb_vgl_qm)
+       2 amtliche ortsübliche Vergleichsmiete am Objekt (_dpMarktdaten.vergleichsmiete, gemerkt aus dem
+         Marktbericht bzw. der Pilot-Recherche: Mietpreisübersicht des Gutachterausschusses, oder ein
+         Mietspiegel mit art 'mietspiegel_qualifiziert' | 'mietspiegel_einfach', sobald eine Quelle das liefert)
+       3 Marktmiete (ds2_marktmiete) nur als markierter Ersatz - und NIE, wenn ein qualifizierter
+         Mietspiegel vorliegt (dann zählt dessen Wert, ein Angebotswert ist kein Begründungsmittel).
+     me_soll („Soll-Mietspiegel", Tab Miete) ist RAUS: das Einheitenfenster schreibt dort den Durchschnitt
+     der eigenen Soll-Mieten hinein (mfh-einheiten.js uebernehmen), also Angebots-/Zielniveau - die Erhöhung
+     maß sich damit an sich selbst. Ob der Wert von Hand oder vom Fenster stammt, ist am Feld nicht zu
+     erkennen; deshalb zählt er für § 558 gar nicht mehr. Er bleibt Eingabe der Mietentwicklung (Detail). */
+  var VGL_ART = { mietspiegel_qualifiziert: 'qualifizierter Mietspiegel (§ 558d BGB)', mietspiegel_einfach: 'einfacher Mietspiegel (§ 558c BGB)',
+    mietpreisuebersicht: 'amtliche Mietpreisübersicht des Gutachterausschusses' };
+  function amtlicheVgl() {
+    var md = window._dpMarktdaten, v = md && md.vergleichsmiete;
+    if (!v || !(zahl(v.qm) > 0)) return null;
+    if (md.fuer && window._currentObjKey && md.fuer !== window._currentObjKey) return null;
+    return v;
+  }
   function objektVgl() {
     var v = zahl(wert('zb_vgl_qm'));
-    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)' };
-    v = zahl(wert('me_soll'));
-    if (v > 0) return { qm: v, herkunft: 'Soll-Mietspiegel (Tab Miete)' };
+    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)', art: 'eigen' };
+    var a = amtlicheVgl();
+    if (a) {
+      var t = VGL_ART[a.art] || 'amtliche Vergleichsmiete';
+      return { qm: zahl(a.qm), art: a.art || 'amtlich', qualifiziert: a.art === 'mietspiegel_qualifiziert',
+        herkunft: t + (a.quelle ? ' — ' + a.quelle : '') + ((a.datum || a.stand) ? ', Stand ' + deDatum(String(a.datum || a.stand).slice(0, 10)) : '') + (a.ausserhalb ? ', außerhalb der Tabelle' : '') };
+    }
     v = zahl(wert('ds2_marktmiete'));
-    if (v > 0) return { qm: v, herkunft: 'Marktmiete (Tab Miete)', marktmiete: true };
+    if (v > 0) return { qm: v, herkunft: 'Marktmiete (Tab Miete) — Ersatz, keine ortsübliche Vergleichsmiete', marktmiete: true, art: 'marktmiete' };
     return { qm: 0, herkunft: null };
   }
-  /* v3150 · der Teil der Soll-Miete nach § 558 (ohne Modernisierungsumlage § 559) */
-  function soll558(w) {
-    var sm = w && w.soll && w.soll.miete != null ? w.soll.miete : null;
-    if (sm == null) return w ? w.ist : 0;
-    var u = w.soll.umlage559 && w.soll.umlage559.monat > 0 ? w.soll.umlage559.monat : 0;
-    return Math.max(w.ist, sm - u);
+  /* v3150 · der Teil der Soll-Miete nach § 558 (ohne Modernisierungsumlage § 559).
+     v3244 · Rechnung im Kern (teil558): bei Staffel/Index/Gewerbe ist er Ist. */
+  function soll558(w) { return w ? K.teil558(w.soll, w.ist) : 0; }
+  /* v3244 · die vertragliche Erhöhung (Staffel/Index/Gewerbe, eigene Soll-Angabe) als eigener Posten */
+  function sollVertrag(w) { return w ? K.teilVertrag(w.soll, w.ist) : null; }
+  /* v3244 · Miete der Stufe Mieterhöhung je Wohnung: § 558-Anteil plus vertragliche Erhöhung */
+  function mhMiete(w) { var v = sollVertrag(w); return soll558(w) + (v ? v.plus : 0); }
+  function vertragZeileV(so, ist, qm) {
+    var v = K.teilVertrag(so, ist);
+    return v && v.plus > 0 ? 'nach Vertrag auf ' + eur(v.monat) + '/Monat' + (qm ? qm(v.monat) : '') : 'nach Vertrag';
+  }
+  function vertragZeileU(so) {
+    var v = K.teilVertrag(so, 0);
+    return v ? v.norm + ' — keine Erhöhung nach § 558 BGB' + (v.monat ? ' · Betrag: eigene Angabe' : ' · ' + (so.grund || v.text)) : (so.grund || '');
   }
   function artMitEinheiten() { return !!(M().artMitEinheiten && M().artMitEinheiten()); }
   function objektMassnahmen() { try { var l = JSON.parse(wert('zb_massnahmen') || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
@@ -845,12 +876,16 @@
     var istS = W.reduce(function (a, w) { return a + w.ist; }, 0);
     /* v3150 · N114 Punkt 1: die Stufe Mieterhöhung ist der Bestand mit den Erhöhungen nach § 558 BGB -
        geplante Modernisierungen (Kosten, Umlage § 559, Punkte und damit eine längere RND) gehören ins Zielbild */
-    var sollS = W.reduce(function (a, w) { return a + soll558(w); }, 0);
-    var hat558 = W.some(function (w) { return soll558(w) > w.ist + 0.005; });
+    /* v3244 · § 558 nur, wo § 558 gilt; die vertragliche Erhöhung (Staffel/Index/Gewerbe) steht als eigener
+       Posten in derselben Stufe (Mieter bleibt), damit die Summe nicht still kleiner wird */
+    var s558 = W.reduce(function (a, w) { return a + soll558(w); }, 0);
+    var sVer = W.reduce(function (a, w) { var v = sollVertrag(w); return a + (v ? v.plus : 0); }, 0);
+    var sollS = s558 + sVer;
+    var hat558 = W.some(function (w) { return mhMiete(w) > w.ist + 0.005; });
     var zielS = W.reduce(function (a, w) { return a + (w.ziel != null ? w.ziel : ((w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist)); }, 0);
     out.stufen = {
       bestand: { miete_m: istS, kosten: 0, plus: 0 },
-      mieterhoehung: hat558 ? { miete_m: sollS, kosten: 0, plus: 0 } : null,   /* v3150 */
+      mieterhoehung: hat558 ? { miete_m: sollS, kosten: 0, plus: 0, plus558_m: Math.round((s558 - istS) * 100) / 100, vertrag_m: Math.round(sVer * 100) / 100 } : null,   /* v3150, v3244 */
       zielbild: out.hat_ziel ? { miete_m: zielS, kosten: W.reduce(function (a, w) { return a + w.kosten; }, 0),
         plus: Math.round(gew('plus_ziel') * 10) / 10 } : null
     };
@@ -928,7 +963,7 @@
       return m.wohnungen.reduce(function (a, w) {
         if (!istW(w)) return a;
         var x = k === 'bestand' ? w.ist : (k === 'mieterhoehung'
-          ? soll558(w)   /* v3150 */
+          ? mhMiete(w)   /* v3150, v3244: § 558 plus vertragliche Erhöhung, wie die Stufe */
           : (w.ziel != null ? w.ziel : ((w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist)));
         return a + x;
       }, 0) * 12;
@@ -973,9 +1008,13 @@
       var vq = w.soll && w.soll.vgl_qm > 0 ? w.soll.vgl_qm : 0;
       var vh = w.soll ? w.soll.vgl_herkunft || null : null;
       var e = w.e || {};
-      return { vgl_jahr: vq > 0 && w.wfl > 0 ? Math.round(vq * w.wfl * 12) : null, vgl_herkunft: vh,
+      var vt = sollVertrag(w);
+      var o = { vgl_jahr: vq > 0 && w.wfl > 0 ? Math.round(vq * w.wfl * 12) : null, vgl_herkunft: vh,
         vgl_marktmiete: !!(vq > 0 && vh && vh === m.vgl.herkunft && m.vgl.marktmiete),
         soll558_jahr: Math.round(soll558(w) * 12), letzte: w.letzte || null, letzte_betrag: w.letzte_betrag || null, mv_art: w.mv_art || null };
+      /* v3244 · nur gesetzt bei Staffel/Index/Gewerbe mit eigener Soll-Angabe - der Prüfwert der übrigen bleibt */
+      if (vt && vt.monat) o.soll_vertrag_jahr = Math.round(vt.monat * 12);
+      return o;
     };
     if (m.art === 'mfh') {
       body.wohnungen = m.wohnungen.map(function (w) {
@@ -983,7 +1022,7 @@
         var _e = w.e || {};   /* v3200 · Merkmale der Wohnung für den Vergleichswert (Aufteilerwert) */
         return Object.assign({ nr: w.nr, art: w.art, wfl: w.wfl, mea_pct: w.mea || null,
           lage: _e.lage || null, zimmer: zahl(_e.zimmer) || null, kueche: _e.aus_kueche || null, leer: _e.status === 'leer',
-          miete_jahr: { bestand: Math.round(w.ist * 12), mieterhoehung: Math.round(soll558(w) * 12),
+          miete_jahr: { bestand: Math.round(w.ist * 12), mieterhoehung: Math.round(mhMiete(w) * 12),
                         zielbild: Math.round((w.ziel != null ? w.ziel : sm) * 12) } }, d558(w), nv(w));   /* v3152 */
       });
       body.aufteilung = { aktiv: !!m.aufgeteilt, kosten_eur: Math.round(m.aufteilungskosten || 0), kosten_herkunft: m.aufteilungskosten_herkunft };
@@ -1316,6 +1355,8 @@
         soll_wirksam_ab: w.soll && w.soll.termine ? w.soll.termine.wirksam_ab : null,
         soll_termin: w.soll && w.soll.termine ? w.soll.termine.text_lang : null,
         soll_herkunft: w.soll ? w.soll.herkunft : null, ziel: w.ziel != null ? Math.round(w.ziel) : null, ziel_wann: w.ziel_wann || null,
+        /* v3244 · getrennt: Teil nach § 558 BGB und vertragliche Erhöhung (Staffel/Index/Gewerbe) */
+        soll558: Math.round(soll558(w)), soll_vertrag: (function () { var v = sollVertrag(w); return v ? { art: v.art, monat: v.monat != null ? Math.round(v.monat) : null, norm: v.norm, text: v.text } : null; })(),
         massnahmen: w.massnahmen.map(function (x) { return x.t + (zahl(x.k) ? ' ' + Math.round(zahl(x.k)) + ' €' : '') + (x.bewohnt ? ' (umgelegt nach § 559 BGB' + (zahl(x.erh) ? ', davon ' + zahl(x.erh) + ' % Erhaltung' : '') + ')' : ''); }).join(', ') || null,
         kosten: Math.round(w.kosten) || 0,
         /* v3025 · die nächste Indexanpassung (v3026, js/indexmiete.js) mit dem Objekt speichern - sonst
@@ -1975,7 +2016,7 @@
       : 'Drei Stufen der Mietentwicklung mit Ertragswert je Stufe' + (r && r.aufteilung ? ' und der Wirkung einer Aufteilung in Eigentumswohnungen.' : '.');
     d.wohnungen = m.wohnungen.map(function (w) {
       return { we: (w.nr ? w.nr + ' ' : '') + (w.lage || ''), wfl: w.wfl, ist: w.ist > 0 ? eur(w.ist) : (w.status === 'leer' ? 'leer' : '—'),
-        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.termine ? ' · verlangbar ' + (w.soll.termine.verlangbar_sofort ? 'sofort' : 'ab ' + mmjj(w.soll.termine.verlangbar_ab)) + ' · wirksam ab ' + mmjj(w.soll.termine.wirksam_ab) : '') : '—',   /* v2430a: lange Termintexte liefen in die Nachbarspalten; v3028: beide Termine, die Spalte bricht in beiden PDFs um (pdf.js _tab, pdf-investment-bank.js 'w') */
+        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.vertrag ? ' · nach Vertrag (' + K.teilVertrag(w.soll, w.ist).norm + '), nicht § 558' : '') + (w.soll.termine ? ' · verlangbar ' + (w.soll.termine.verlangbar_sofort ? 'sofort' : 'ab ' + mmjj(w.soll.termine.verlangbar_ab)) + ' · wirksam ab ' + mmjj(w.soll.termine.wirksam_ab) : '') : '—',   /* v2430a: lange Termintexte liefen in die Nachbarspalten; v3028: beide Termine, die Spalte bricht in beiden PDFs um (pdf.js _tab, pdf-investment-bank.js 'w') */
         ziel: w.ziel != null ? eur(w.ziel) : '—',
         massnahmen: w.massnahmen.map(function (x) { return x.t; }).join(', ') || '—' };
     });
@@ -2455,7 +2496,7 @@
         sumHost.style.display = '';
         sumHost.innerHTML = '<p class="sec-desc" style="margin:0 0 8px">Beim Mehrfamilienhaus stehen Soll-Miete und Zielbild je Wohnung — hier nur die Summe <b>aus den Wohnungen</b>. Ändern im Fenster „Einheiten erfassen" (Wohnung anklicken).</p>'
           + '<div class="dp-zb-sum">Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
-          + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' : '')
+          + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' + (m.stufen.mieterhoehung.vertrag_m > 0 ? ' (darin nach Vertrag, Staffel/Index — nicht § 558: ' + eur(m.stufen.mieterhoehung.vertrag_m) + ')' : '') : '')
           + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '')
           + (m.aktiv ? '' : ' · noch keine Soll-Miete oder kein Zielbild eingetragen') + '</div>'
           + herkunftHtml()   /* v2988 */
@@ -2482,12 +2523,12 @@
     if (m.art !== 'mfh') { try { objektLeiter(m); } catch (e) { console.warn('[leiter]', e); } }   /* v3067 */
     var s = w.soll || {};
     var vor = el('zb-soll-vorschlag');
-    if (vor) vor.innerHTML = s.herkunft && s.herkunft !== 'eigene Angabe' && s.miete
+    if (vor) vor.innerHTML = s.herkunft && !/^eigene Angabe/.test(s.herkunft) && s.miete   /* v3244: auch „eigene Angabe (Staffelmiete …)" */
       ? 'DealPilot rechnet vor: <b>' + eur2(s.miete / (m.wfl || 1)) + '/m²</b> (' + esc(s.grenze || s.herkunft) + ')' + (s.termine ? ', ' + esc(s.termine.text_lang) : '')   /* v3028: verlangbar ab · wirksam ab */ + '. Eigene Angabe überschreibt.' + (s.hinweise && s.hinweise.length ? ' Hinweis: ' + esc(s.hinweise.join(', ')) + '.' : '')
       : (s.grund && s.grund !== 'leer' ? esc(s.grund) : (s.hinweise && s.hinweise.length ? 'Hinweis: ' + esc(s.hinweise.join(', ')) : ''));
     host.innerHTML = !m.aktiv ? 'Ohne Angaben bleibt alles beim Bestand.'
       : 'Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
-        + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' : '')
+        + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' + (m.stufen.mieterhoehung.vertrag_m > 0 ? ' (darin nach Vertrag, Staffel/Index — nicht § 558: ' + eur(m.stufen.mieterhoehung.vertrag_m) + ')' : '') : '')
         + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat' + (m.stufen.zielbild.kosten ? ' · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '') + (m.stufen.zielbild.plus ? ' · +' + dez(m.stufen.zielbild.plus, 1).replace(',0', '') + ' Modernisierungspunkte' : '') : '')
         + '<br>' + esc(m.kappung.text) + ' Die Ertragswerte stehen in der Pilot-Analyse (Reiter „Ankauf · Bestand · Zielbild") und in beiden PDFs.';
     if (m.aktiv) host.innerHTML += herkunftHtml();   /* v2988 */
@@ -2641,6 +2682,7 @@
     massnahmenVon: massnahmenVon, massnahmenSpiegeln: massnahmenSpiegeln, massnahmenBinden: massnahmenBinden,
     katalog: katalog,   /* v3161 · Gewerk je Massnahme fuer die Schnittstelle (storage.js _soll_einheiten) */
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,
+    soll558: soll558, sollVertrag: sollVertrag, objektVgl: objektVgl,   /* v3244 */
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
     brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml, stufenWerte: stufenWerte, KURZ_AUSBLICK: KURZ_AUSBLICK,

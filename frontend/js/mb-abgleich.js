@@ -107,6 +107,15 @@
         if (wahl >= 0) {
           S.bericht = ones[wahl].data; S.zeile = kand[wahl];
           S.stufe = Number(S.bericht.ref && S.bericht.ref.wert_stufe) || null;
+          /* v3244 · die amtliche Vergleichsmiete des Berichts am Objekt merken: § 558 rechnet damit, wenn keine
+             eigene Vergleichsmiete eingetragen ist (potenzial.js objektVgl), statt mit einem Angebotswert */
+          try {
+            var _am = S.bericht.cross_check && S.bericht.cross_check.amtliche_miete;
+            if (S.stufe === 3 && _am && _am.verfuegbar && zahl(_am.miete_qm) > 0 && window.dpMarktdatenMerken)
+              window.dpMarktdatenMerken({ vergleichsmiete: { qm: Math.round(zahl(_am.miete_qm) * 100) / 100, art: 'mietpreisuebersicht',
+                quelle: _am.quelle || _am.ausschuss || null, ausschuss: _am.ausschuss || null, ausserhalb: !!_am.ausserhalb_tabelle,
+                datum: S.zeile && S.zeile.created_at ? String(S.zeile.created_at).slice(0, 10) : null, woher: 'Marktbericht Stufe 3' } });
+          } catch (e) {}
         }
         return null;
       });

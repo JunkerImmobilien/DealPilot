@@ -144,6 +144,15 @@ async function runKiMiete() {
     /* v3002 · der Abgleich mit dem Marktbericht (mb-abgleich.js) stellt die Recherche neben den Bericht */
     try { window._lastKiMiete = { key: window._currentObjKey || null, markt_qm: (marktVal != null && isFinite(marktVal)) ? marktVal : null, ausfall: ausfallVal, belege: belege, zeit: Date.now() };
           window.dispatchEvent(new CustomEvent('dp:ki-miete', { detail: {} })); } catch (e) {}
+    /* v3244 · amtliche Vergleichsmiete (Mietpreisübersicht des Ausschusses, aus dem Marktbericht) am Objekt merken -
+       § 558 rechnet damit statt mit einem Angebotswert (potenzial.js objektVgl) */
+    try {
+      var _ba = belege && belege.amtlich;
+      if (_ba && !_ba.fehlt && Number(_ba.wert_qm) > 0 && window.dpMarktdatenMerken)
+        window.dpMarktdatenMerken({ vergleichsmiete: { qm: Math.round(Number(_ba.wert_qm) * 100) / 100, art: 'mietpreisuebersicht',
+          quelle: _ba.quelle || _ba.ausschuss || null, ausschuss: _ba.ausschuss || null, ausserhalb: !!_ba.ausserhalb,
+          datum: _ba.stand ? String(_ba.stand).slice(0, 10) : null, woher: 'Pilot-Recherche (aus dem Marktbericht)' } });
+    } catch (e) {}
 
     var ausfallMap = {
       sehr_niedrig: { label: 'Sehr niedrig', col: '#3FA56C' },

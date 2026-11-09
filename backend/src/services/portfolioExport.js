@@ -429,7 +429,10 @@ const STRUKTUREN = {
     was: 'v3159 · Soll-Miete je Einheit, wie die App sie rechnet (Stand beim letzten Speichern)',
     felder: {
       ist_monat: 'heutige Kaltmiete pro MONAT in Euro', soll_monat: 'Soll-Miete pro MONAT inklusive Umlage § 559',
-      soll558_monat: 'Teil nach § 558 BGB (Vergleichsmiete, Kappungsgrenze) ohne Umlage', umlage559: 'Modernisierungsumlage § 559 BGB {monat, ...}',
+      soll558_monat: 'Teil nach § 558 BGB (Vergleichsmiete, Kappungsgrenze) ohne Umlage; bei Staffel-, Index- und Gewerbevertrag = ist_monat (v3244)',
+      soll_vertrag_monat: 'vertragliche Erhoehung pro MONAT (Staffel § 557a, Index § 557b, Gewerbe; eigene Angabe), keine nach § 558 (v3244)',
+      vertrag_text: 'warum § 558/§ 559 hier nicht gelten (Gesetzestext)', vgl_qm: 'ortsuebliche Vergleichsmiete EUR/m2, mit der § 558 gerechnet hat', vgl_herkunft: 'woher sie stammt (eigene Angabe, amtlich, Marktmiete als Ersatz)',
+      umlage559: 'Modernisierungsumlage § 559 BGB {monat, ...}',
       grenze: 'was die Erhoehung begrenzt (Kappung, Vergleichsmiete)', herkunft: 'woher die Soll-Miete stammt',
       verlangbar_ab: 'ab wann die Erhoehung verlangt werden kann (JJJJ-MM)', wirksam_ab: 'ab wann sie wirkt (§ 558b BGB, JJJJ-MM)',
       sperre: 'Hinweis zur Sperrfrist § 558 Abs. 1 BGB, z. B. letzte Erhoehung fehlt',

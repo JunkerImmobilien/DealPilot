@@ -342,7 +342,12 @@ function collectData() {
         return { nr: w.nr || null, lage: w.lage || null, art: w.art || null, wfl: w.wfl || null, status: w.status || null,
           ist_monat: w.ist != null ? w.ist : null,
           soll_monat: so.miete != null ? so.miete : null,
-          soll558_monat: so.miete != null ? Math.max(w.ist || 0, so.miete - um) : null,
+          /* v3244 · § 558 nur, wo § 558 gilt (Kern teil558): bei Staffel/Index/Gewerbe = Ist; die vertragliche
+             Erhöhung steht getrennt in soll_vertrag_monat (Prüfer-Befund 09.11.2026, Gohliser Str. 42, Parkstr. 9) */
+          soll558_monat: so.miete != null ? (window.DpPotenzial.soll558 ? window.DpPotenzial.soll558(w) : Math.max(w.ist || 0, so.miete - um)) : null,
+          soll_vertrag_monat: so.vertrag && so.vertrag_monat > 0 ? so.vertrag_monat : null,
+          vertrag_text: so.vertrag ? (so.vertrag_text || so.grund || null) : null,
+          vgl_qm: so.vgl_qm || null, vgl_herkunft: so.vgl_herkunft || null,
           umlage559: u, grenze: so.grenze || null, herkunft: so.herkunft || null,
           verlangbar_ab: so.verlangbar_ab || te.verlangbar_ab || null, wirksam_ab: so.ab || te.wirksam_ab || null,
           termine_text: so.ab_text || te.text || null, sperre: te.sperre || null, hinweise: so.hinweise || [],
