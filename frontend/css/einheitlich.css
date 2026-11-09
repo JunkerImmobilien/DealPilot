@@ -328,3 +328,6 @@ html[data-dp-layout] body #settings-modal .pane-wrap :is(.f, .field) > label {
     font-size: 10.5px !important;
   }
 }
+
+/* v3241 · Nachzug nach dem Zusammenfuehren: Ausreisser im Reiter Objekt selbst (Bericht v3239) */
+html body #s0 .oe-vw select { border-radius: 2px; }
