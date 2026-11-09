@@ -1,0 +1,489 @@
+{
+ "ags": "05116000",
+ "gemeinde": "Mönchengladbach",
+ "art": "einfach",
+ "stand": "2026-05-01",
+ "erhebungsstichtag": "2024-10-01",
+ "gueltig_ab": "2026-05-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.moenchengladbach.de/fileadmin/user_upload/FB62/Mietspiegel/Mietspiegel_2026_Download.pdf",
+  "dokument": "Mietspiegel 2026 mit Dokumentation für nicht preisgebundene Wohnungen und Einfamilienhäuser in Mönchengladbach (Arbeitsgemeinschaft Mietspiegel Mönchengladbach)",
+  "seite": "7–14",
+  "lizenz": "Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0); Quellenvermerk: © Daten der Arbeitsgemeinschaft Mietspiegel Mönchengladbach 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://stadt.mg/mietspiegel (S. 2)",
+  "abgerufen": "2026-11-09"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Einfacher Regressionsmietspiegel (S. 5): Standardmietwert 7,01 €/m² × alle zutreffenden Einflussfaktoren (ungerundetes Produkt, S. 12–14) = mittlere ortsübliche Vergleichsmiete; Spanne ± 14,3 % (S. 8, 14). Die Baujahresklasse richtet sich nach dem BAUJAHRESZUSTAND (fiktives Baujahr aus Modernisierungspunkten bzw. Kernsanierung, GND 80, S. 9–11) — die Rechnung nimmt das übergebene Baujahr als Baujahreszustand. Lage = Stadtteil laut Straßenverzeichnis (Anhang); ohne Stadtteil kein Wert. Balkon und Terrasse zugleich: Faktor Terrasse (S. 13). Gilt auch für Einfamilienhäuser (Faktor 1,11).",
+ "regression": {
+  "basis_eur_qm": 7.01,
+  "verknuepfung": "produkt",
+  "faktoren": [
+   {
+    "merkmal": "lage",
+    "label": "Stadtteil",
+    "typ": "lage",
+    "art": "faktor",
+    "werte": {
+     "am wasserturm": 1.07,
+     "bettrath hoven": 1,
+     "bonnenbroich geneicken schloss rheydt": 0.9,
+     "bungt harderbroich pesch": 0.98,
+     "dahl": 1.05,
+     "eicken": 1,
+     "geistenbeck": 0.98,
+     "giesenkirchen mitte": 1,
+     "giesenkirchen nord": 1.04,
+     "gladbach aussenbereich": 1.09,
+     "gladbach innenbereich": 1.02,
+     "grenzlandstadion": 0.98,
+     "hardt mitte hardter wald": 0.93,
+     "hehn": 0.95,
+     "heyden": 0.98,
+     "luerrip": 1.02,
+     "muelfort": 0.98,
+     "neuwerk mitte": 0.98,
+     "odenkirchen mitte sasserath": 0.98,
+     "odenkirchen west": 0.94,
+     "ohler holt": 0.99,
+     "pongs hockstein": 1.08,
+     "rheindahlen land": 0.98,
+     "rheindahlen mitte": 0.98,
+     "rheydt aussenbereich": 1.02,
+     "rheydt innenbereich": 0.95,
+     "schelsen": 0.93,
+     "schmoelderpark": 1,
+     "schrievers": 1.02,
+     "uedding flughafen": 0.93,
+     "venn": 1.01,
+     "waldhausen": 1.02,
+     "westend": 1.03,
+     "wickrath mitte": 0.99,
+     "wickrathberg wickrath west wanlo": 0.91,
+     "windberg": 1.08
+    },
+    "aliase": {
+     "am wasserturm": [],
+     "bettrath hoven": [
+      "bettrath, hoven"
+     ],
+     "bonnenbroich geneicken schloss rheydt": [
+      "bonnenbroich, geneicken / schloss rheydt"
+     ],
+     "bungt harderbroich pesch": [
+      "bungt / harderbroich, pesch"
+     ],
+     "dahl": [],
+     "eicken": [],
+     "geistenbeck": [],
+     "giesenkirchen mitte": [
+      "giesenkirchen-mitte"
+     ],
+     "giesenkirchen nord": [
+      "giesenkirchen-nord"
+     ],
+     "gladbach aussenbereich": [
+      "gladbach-außenbereich",
+      "gladbach-aussenbereich"
+     ],
+     "gladbach innenbereich": [
+      "gladbach-innenbereich"
+     ],
+     "grenzlandstadion": [],
+     "hardt mitte hardter wald": [
+      "hardt-mitte / hardter wald",
+      "hardt-mitte hardter wald"
+     ],
+     "hehn": [],
+     "heyden": [],
+     "luerrip": [
+      "lürrip"
+     ],
+     "muelfort": [
+      "mülfort"
+     ],
+     "neuwerk mitte": [
+      "neuwerk-mitte"
+     ],
+     "odenkirchen mitte sasserath": [
+      "odenkirchen-mitte / sasserath",
+      "odenkirchen-mitte sasserath"
+     ],
+     "odenkirchen west": [
+      "odenkirchen-west"
+     ],
+     "ohler holt": [
+      "ohler / holt"
+     ],
+     "pongs hockstein": [
+      "pongs / hockstein"
+     ],
+     "rheindahlen land": [
+      "rheindahlen-land"
+     ],
+     "rheindahlen mitte": [
+      "rheindahlen-mitte"
+     ],
+     "rheydt aussenbereich": [
+      "rheydt-außenbereich",
+      "rheydt-aussenbereich"
+     ],
+     "rheydt innenbereich": [
+      "rheydt-innenbereich"
+     ],
+     "schelsen": [],
+     "schmoelderpark": [
+      "schmölderpark"
+     ],
+     "schrievers": [],
+     "uedding flughafen": [
+      "uedding / flughafen"
+     ],
+     "venn": [],
+     "waldhausen": [],
+     "westend": [],
+     "wickrath mitte": [
+      "wickrath-mitte"
+     ],
+     "wickrathberg wickrath west wanlo": [
+      "wickrathberg / wickrath-west / wanlo",
+      "wickrathberg wickrath-west wanlo"
+     ],
+     "windberg": []
+    },
+    "beleg": "S. 12 Nr. 1 Stadtteile"
+   },
+   {
+    "merkmal": "baujahr",
+    "label": "Baujahresklasse (Baujahreszustand)",
+    "typ": "baujahr_klasse",
+    "art": "faktor",
+    "werte": [
+     {
+      "von": null,
+      "bis": 1970,
+      "wert": 1,
+      "label": "bis 1970"
+     },
+     {
+      "von": 1971,
+      "bis": 1982,
+      "wert": 1.06,
+      "label": "1971 bis 1982"
+     },
+     {
+      "von": 1983,
+      "bis": 1995,
+      "wert": 1.08,
+      "label": "1983 bis 1995"
+     },
+     {
+      "von": 1996,
+      "bis": 2010,
+      "wert": 1.12,
+      "label": "1996 bis 2010"
+     },
+     {
+      "von": 2011,
+      "bis": 2017,
+      "wert": 1.27,
+      "label": "2011 bis 2017"
+     },
+     {
+      "von": 2018,
+      "bis": 2022,
+      "wert": 1.46,
+      "label": "2018 bis 2022"
+     },
+     {
+      "von": 2023,
+      "bis": null,
+      "wert": 1.53,
+      "label": "ab 2023"
+     }
+    ],
+    "beleg": "S. 12 Nr. 2"
+   },
+   {
+    "merkmal": "wfl",
+    "label": "Größe der Wohnfläche",
+    "typ": "wfl_kurve",
+    "art": "faktor",
+    "werte": [
+     {
+      "von": null,
+      "bis": 25,
+      "wert": 1.23,
+      "label": "bis 25 m²"
+     },
+     {
+      "von": 25,
+      "von_inkl": false,
+      "bis": 35,
+      "wert": 1.17,
+      "label": "über 25 bis 35 m²"
+     },
+     {
+      "von": 35,
+      "von_inkl": false,
+      "bis": 45,
+      "wert": 1.08,
+      "label": "über 35 bis 45 m²"
+     },
+     {
+      "von": 45,
+      "von_inkl": false,
+      "bis": 55,
+      "wert": 1.04,
+      "label": "über 45 bis 55 m²"
+     },
+     {
+      "von": 55,
+      "von_inkl": false,
+      "bis": 65,
+      "wert": 1,
+      "label": "über 55 bis 65 m²"
+     },
+     {
+      "von": 65,
+      "von_inkl": false,
+      "bis": 80,
+      "wert": 1,
+      "label": "über 65 bis 80 m²"
+     },
+     {
+      "von": 80,
+      "von_inkl": false,
+      "bis": 95,
+      "wert": 0.98,
+      "label": "über 80 bis 95 m²"
+     },
+     {
+      "von": 95,
+      "von_inkl": false,
+      "bis": 110,
+      "wert": 0.97,
+      "label": "über 95 bis 110 m²"
+     },
+     {
+      "von": 110,
+      "von_inkl": false,
+      "bis": 130,
+      "wert": 0.92,
+      "label": "über 110 bis 130 m²"
+     },
+     {
+      "von": 130,
+      "von_inkl": false,
+      "bis": 150,
+      "wert": 0.91,
+      "label": "über 130 bis 150 m²"
+     },
+     {
+      "von": 150,
+      "von_inkl": false,
+      "bis": null,
+      "wert": 0.9,
+      "label": "über 150 m²"
+     }
+    ],
+    "beleg": "S. 12 Nr. 3"
+   },
+   {
+    "merkmal": "einfamilienhaus",
+    "label": "Einfamilienhaus",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.11,
+    "beleg": "S. 13 Nr. 4"
+   },
+   {
+    "merkmal": "geschosszahl",
+    "label": "Geschosszahl des Hauses (inkl. Keller- und Dachgeschoss)",
+    "typ": "auswahl",
+    "art": "faktor",
+    "werte": {
+     "1-2": 1.01,
+     "3-5": 1,
+     "6+": 0.99
+    },
+    "beleg": "S. 13 Nr. 5"
+   },
+   {
+    "merkmal": "wohneinheiten",
+    "label": "Anzahl der Wohneinheiten im Gebäude",
+    "typ": "auswahl",
+    "art": "faktor",
+    "werte": {
+     "1-6": 1,
+     "7-11": 0.99,
+     "12+": 0.98
+    },
+    "beleg": "S. 13 Nr. 6"
+   },
+   {
+    "merkmal": "geschosslage",
+    "label": "Geschosslage der Wohneinheit (Eingangstür)",
+    "typ": "auswahl",
+    "art": "faktor",
+    "werte": {
+     "eg-2og": 1,
+     "3-5og": 0.99,
+     "ab_6og": 0.98,
+     "keller": 0.92
+    },
+    "beleg": "S. 13 Nr. 7"
+   },
+   {
+    "merkmal": "aufzug",
+    "label": "Aufzug vorhanden",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.03,
+    "beleg": "S. 13 Nr. 8"
+   },
+   {
+    "merkmal": "garten",
+    "label": "Garten zur alleinigen Nutzung",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.05,
+    "beleg": "S. 13 Nr. 9"
+   },
+   {
+    "merkmal": "aussenflaeche",
+    "label": "Balkon oder Terrasse",
+    "typ": "auswahl",
+    "art": "faktor",
+    "werte": {
+     "balkon": 1,
+     "terrasse": 1.03,
+     "keine": 0.97
+    },
+    "beleg": "S. 13 Nr. 10 (Balkon und Terrasse: Terrasse)"
+   },
+   {
+    "merkmal": "barrierefrei",
+    "label": "barrierefrei nach DIN 18040-2",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.08,
+    "beleg": "S. 13 Nr. 11"
+   },
+   {
+    "merkmal": "kueche_integriert",
+    "label": "Küche im Wohnraum integriert",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.02,
+    "beleg": "S. 13 Nr. 12"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "label": "mitvermietete Einbauküche",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.1,
+    "beleg": "S. 13 Nr. 13"
+   },
+   {
+    "merkmal": "wasserabrechnung",
+    "label": "verbrauchsabhängige Wasserabrechnung",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.03,
+    "beleg": "S. 13 Nr. 14"
+   },
+   {
+    "merkmal": "bad_ueberdurchschnittlich",
+    "label": "überdurchschnittliches Badausstattungsniveau",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.03,
+    "beleg": "S. 13 Nr. 15"
+   },
+   {
+    "merkmal": "separates_wc",
+    "label": "zusätzliches, separates WC",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.03,
+    "beleg": "S. 13 Nr. 16"
+   },
+   {
+    "merkmal": "zweites_bad",
+    "label": "zweites Badezimmer",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.05,
+    "beleg": "S. 13 Nr. 17"
+   },
+   {
+    "merkmal": "fussbodenheizung",
+    "label": "Fußbodenheizung",
+    "typ": "flag",
+    "art": "faktor",
+    "werte": 1.04,
+    "beleg": "S. 13 Nr. 18"
+   }
+  ],
+  "spanne": {
+   "unten_pct": -14.3,
+   "oben_pct": 14.3
+  },
+  "beleg": "S. 7–8, 12–14"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1999,
+    "wfl": 87,
+    "lage": "Dahl",
+    "merkmale": {
+     "geschosszahl": "6+",
+     "wohneinheiten": "12+",
+     "geschosslage": "3-5og",
+     "aufzug": true,
+     "aussenflaeche": "terrasse",
+     "einbaukueche": true,
+     "wasserabrechnung": true
+    }
+   },
+   "erwartet": {
+    "unten": 8,
+    "mittel": 9.33,
+    "oben": 10.66
+   },
+   "seite": "14",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Berechnungsbeispiel: 7,01 × 1,05 × 1,12 × 0,98 × 0,99 × 0,98 × 0,99 × 1,03 × 1,03 × 1,10 × 1,03 = 9,33; ± 14,3 % (1,33) = 8,00 / 10,66. Baujahreszustand 1999 (Baujahr 1956, Kernsanierung 2007)."
+  },
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 70,
+    "lage": "Eicken"
+   },
+   "erwartet": {
+    "unten": 6.01,
+    "mittel": 7.01,
+    "oben": 8.01
+   },
+   "seite": "12",
+   "art": "tabellenzelle",
+   "anmerkung": "alle Faktoren 1,00: Standardmietwert 7,01 €; ± 14,3 %"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "12",
+   "art": "tabellenzelle",
+   "anmerkung": "ohne Stadtteil kein Wert"
+  }
+ ]
+}
