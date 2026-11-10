@@ -4731,7 +4731,7 @@
   DREHBUECHER['reihe-brw-unterlagen'] = {
     titel: 'Bodenrichtwert und Unterlagen', unterzeile: 'BORIS, die zuständigen Ämter — und was DealPilot nicht verschickt', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { r24UlZu(); rhAufraeumen(); },
+    aufraeumen: function () { try { if (window.DpBrwKarte) DpBrwKarte.schliessen(); } catch (e) {} r24UlZu(); rhAufraeumen(); },
     szenen: [
       async function (s) {   /* 1 · das Beispiel */
         await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true, ohneAnalyse: true });
@@ -4764,6 +4764,29 @@
         var p = function () { return [].filter.call(document.querySelectorAll('.btn-brw'), function (x) { return x.offsetWidth && /Bodenrichtwert-Portal|BORIS-Portal/.test(x.textContent); })[0] || null; };
         await zeige(p, 10);
         await b2oZeile(s, 'Zum Nachsehen', 'Der Knopf daneben öffnet das <b>Bodenrichtwert-Portal</b> des Bundeslands — mit Karte, Zone und Stichtag.');
+      },
+      async function (s) {   /* 4b · v3276: Wertkacheln und Bodenrichtwert-Karte (Geokodierung gespielt aus _rh.geo, Karte und Zonen freie GETs) */
+        var ks = function () { return [].filter.call(document.querySelectorAll('.oe-kachel'), function (k) { return k.offsetWidth; }); };
+        var x = ks()[0]; if (x) x.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeige(function () { var k = ks(); return k.length ? b2oHuelle(k[0], k[k.length - 1]) : null; }, 8);
+        var kz = ks().slice(0, 3).map(function (k) { var a = k.querySelector('.oe-kachel-k'), w = k.querySelector('.oe-kachel-w'); return a && w ? r6Text(a) + ' <b>' + r6Text(w) + '</b>' : ''; }).filter(Boolean);
+        await b2oZeile(s, 'Die Wertkacheln', (kz.length ? kz.join(', ') : 'Bodenrichtwert, Zins, Faktor') + ' — jede Kachel mit Herkunft. Ein Klick zeigt die Zeile dahinter.');
+        var kb = function () { var b = q('[data-brw-karte]'); return b && b.offsetWidth ? b : null; };
+        if (kb()) {
+          await zeige(kb, 10);
+          var zb = r6Beginn(s, 'Die Bodenrichtwert-Karte', 'Ein Klick auf <b>„Karte“</b> zeigt die Zonen rund um das Objekt.');
+          await warte(1500);
+          try { await window.DpBrwKarte.oeffnen(); } catch (e) {}
+          await warteAuf(function () { return q('#brw-karte-ov .leaflet-tile-loaded'); }, 8000);
+          await warte(1800);
+          kegelHoch(true);
+          await r6Ende(zb);
+          await zeige(function () { return q('#brw-karte-ov .brw-karte-dlg'); }, 6);
+          await b2oZeile(s, 'Die Bodenrichtwert-Karte', 'Rote Linien: die Zonen, blaue Zahlen: der Bodenrichtwert in €/m², gold: das Objekt. Ein Klick in eine Zone zeigt Wert und Stichtag.');
+          try { window.DpBrwKarte.schliessen(); } catch (e) {}
+          kegelHoch(false); await warte(600);
+        }
       },
       async function (s) {   /* 5 · Unterlagen beim Amt */
         reiter('s8'); await warte(1200);
