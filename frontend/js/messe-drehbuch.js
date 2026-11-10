@@ -2910,22 +2910,25 @@
         var g3 = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(r6Text(q('#bmfJacobyZeile')));
         await b2oZeile(s, 'Schritt 3 · Amtlich, zwei Abschläge und Jacoby', 'Amtlich <b>' + (g3 ? g3[1] : '–') + '</b> Gebäude — mit Boden −15/−20 % bis ' + (g3 ? g3[3] : '–') + (jm ? '; nach der umgekehrten Ertragswertmethode (BFH IX R 12/21) <b>' + jm[1] + '</b>' : '') + '.');
       },
-      async function (s) {   /* 5 · Schritt 4: Variante wählen */
+      async function (s) {   /* 5 · Schritt 4: Variante wählen - v3276: die Wahl-Tafel #bmf-wahl-tafel (die alten Karten sind verdeckt) */
         await r6BmfWeiter();
-        await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-hebel' && r6BmfKarte('amtlich'); }, 6000);
+        var tafel = function () { var h = q('#bmf-wahl-tafel'); return h && h.offsetHeight ? h : null; };
+        var tab = function () { var h = tafel(); return h && h.querySelector('div[style*="border-radius:12px"]'); };
+        var zeileVon = function (id) { var b = q('#bmf-wahl-tafel [data-tafel="' + id + '"]'); return b && b.closest('div[style*="grid-template-columns"]'); };
+        await warteAuf(function () { return tab() && zeileVon('amtlich'); }, 6000);
         await warte(600);
-        r6BmfOben(r6BmfKarte('amtlich'));
+        r6BmfOben(tafel());
         await warte(400);
-        await zeige(function () { var a = r6BmfKarte('amtlich'), b = r6BmfKarte('optimiert');   /* v3184: Aggressiv entfällt */ return a && b ? b2oHuelle(a, b) : (a || b); }, 6);
-        var zb = r6Beginn(s, 'Schritt 4 · Du wählst', 'Amtlich, zwei Abschläge und Jacoby — grün ist die Arbeitshilfe, jede Abweichung braucht eine Begründung.');
+        await zeige(tab, 6);
+        var zb = r6Beginn(s, 'Schritt 4 · Du wählst', 'Amtlich, zwei Abschläge und Jacoby — eine Zeile je Variante: Gebäudeanteil, AfA, Steuer, Nachweis.');
         await warte(3200);
-        var o = r6BmfKarte('optimiert'); if (o) o.click();
-        await warte(900);
+        var ob = q('#bmf-wahl-tafel [data-tafel="optimiert"]'); if (ob) ob.click();
+        await warte(1100);
         await r6Ende(zb);
-        await zeige(function () { return r6BmfKarte('optimiert'); }, 8);
-        var kt = r6Text(r6BmfKarte('optimiert'));
-        var gp = /Gebäude\s*([\d,]+ %)/.exec(kt), af = /AfA Gebäude \/ Jahr\s*([\d.]+ €)/.exec(kt), sc = /Risiko Score (\d)/.exec(kt), se = /Steuerersparnis\s*~?\s*([\d.]+ €)/.exec(kt);
-        await b2oZeile(s, 'Optimiert · Boden −20 %', 'Gebäude <b>' + (gp ? gp[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr' + (se ? ', rund ' + se[1] + ' Steuerersparnis' : '') + (sc ? ' — Risiko-Score ' + sc[1] + ', gelb' : '') + '.');
+        await zeige(function () { return zeileVon('optimiert'); }, 6);
+        var zz = zeileVon('optimiert'), c = zz ? [].map.call(zz.children, function (x) { return r6Text(x); }) : [];
+        var name = zz ? r6Text(zz.firstElementChild && zz.firstElementChild.firstElementChild) : '';
+        await b2oZeile(s, (name || 'Optimiert'), 'Gebäude <b>' + (c[1] || '–') + '</b>, AfA <b>' + (c[2] || '–') + '</b> im Jahr' + (c.length > 5 && /€/.test(c[3]) ? ', Steuer ' + c[3] + ' im Jahr' : '') + '. Die Abweichung von der Arbeitshilfe braucht eine Begründung.');
       },
       async function (s) {   /* 6 · Bodenabschlag: 20 % */
         var t = q('#bmf-boden-tab'); if (t) t.click();
@@ -2951,8 +2954,8 @@
         await b2oZeile(s, 'Die Absprünge', '<b>Restnutzungsdauer berechnen</b> öffnet den Rechner aus Modul 10c. Dazu PDF der Aufteilung, die ausgefüllte BMF-Arbeitshilfe und das Original als Excel.');
       },
       async function (s) {   /* 9 · Übernehmen -> Reiter Steuer */
-        var tb = q('#bmfOverlay .bmfmo-tab[data-pane="p-hebel"]'); if (tb) tb.click();
-        await warte(1000);
+        /* v3276 · übernommen wird in Schritt 5 (v3188) - kein Rücksprung auf Schritt 4 mehr */
+        await warte(600);
         await zeige(function () { return q('#btnBmfApply') || r6Knopf('#bmfOverlay', /Übernehmen/); }, 10);
         var zb = r6Beginn(s, 'Übernehmen', 'Ein Klick — der Gebäudeanteil der gewählten Variante geht in den Reiter Steuer.');
         await warte(2600);
