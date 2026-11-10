@@ -159,8 +159,15 @@
       [A.dauerhaft ? 'Dauerhaft positiv ab' : 'Steuerlich positiv ab', A.jahr ? String(A.jahr) : 'nicht im Zeitraum', w === 0 ? 'vom ersten Jahr an' : (w > 0 ? 'nach ' + A.verluste + ' Verlustjahr' + (A.verluste === 1 ? '' : 'en') : R[0].jahr + '–' + R[n - 1].jahr), C.marke],
       (A.vorherSteuer < 0 && w > 0)
         ? ['Steuerwirkung bis dahin', sgn(A.netto), 'Erstattung ' + sgn(A.erstattung) + ' · Steuer ' + eur(A.vorherSteuer), C.verlust]
-        : ['Erstattungen bis dahin', w > 0 ? sgn(A.erstattung) : '0 €', w > 0 ? R[0].jahr + '–' + R[w - 1].jahr : 'keine Verlustjahre', C.verlust],
-      ['Steuern ab dem Wendepunkt', w >= 0 ? eur(A.steuer) : '0 €', w >= 0 ? R[w].jahr + '–' + R[n - 1].jahr : '—', C.gewinn],
+        /* v3273 · Marcel 10.11.2026 (Ravensberger Weg 38): ohne Wendepunkt (w < 0) sind ALLE Jahre
+           Verlustjahre - bis v3272 stand hier „0 € · keine Verlustjahre" und „Steuern ab dem
+           Wendepunkt 0 € · —", obwohl der Satz darunter die Erstattung über den Zeitraum nannte. */
+        : (w < 0
+          ? ['Erstattungen im Zeitraum', sgn(A.erstattung), R[0].jahr + '–' + R[n - 1].jahr, C.verlust]
+          : ['Erstattungen bis dahin', w > 0 ? sgn(A.erstattung) : '0 €', w > 0 ? R[0].jahr + '–' + R[w - 1].jahr : 'keine Verlustjahre', C.verlust]),
+      w >= 0
+        ? ['Steuern ab dem Wendepunkt', eur(A.steuer), R[w].jahr + '–' + R[n - 1].jahr, C.gewinn]
+        : ['Steuern auf das Objekt', '0 €', 'kein Wendepunkt bis ' + R[n - 1].jahr, C.gewinn],
       ['Ergebnis V+V im letzten Jahr', sgn(R[n - 1].erg), String(R[n - 1].jahr), '#E6DCC2']
     ];
     var satz = w > 0
