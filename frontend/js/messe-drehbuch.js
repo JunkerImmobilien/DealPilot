@@ -3833,8 +3833,12 @@
         await warte(400);
         var ch = function () { return document.getElementById('tax-verlauf-chart'); };
         await zeige(ch, 8);
-        var t = r6Inner(ch()).replace(/\s+/g, ' '), ab = /DAUERHAFT POSITIV AB (\d{4})/i.exec(t), nv = /nach (\d+) Verlustjahren/i.exec(t);
-        await b2oZeile(s, 'Steuerverlauf', (ab ? 'Steuerlich dauerhaft positiv ab <b>' + ab[1] + '</b>' + (nv ? ', nach ' + nv[1] + ' Verlustjahren' : '') + '. ' : '') + 'Jahr für Jahr: Erstattung oder Nachzahlung allein durch dieses Objekt.');
+        /* v3276n · seit v3273a heißen die Kacheln ohne dauerhaften Wendepunkt „Steuerwirkung im Zeitraum“ und
+           „Steuern in Gewinnjahren“ - die Zeile liest jetzt die drei Kacheln selbst (Titel, Wert, Zusatz), statt
+           „Dauerhaft positiv ab“ zu erwarten. */
+        var zz = [0, 1, 2].map(function (i) { return r27ZahlW(i, ch); }), kz = function (z, u) { return z.t ? z.t + ' <b>' + z.w + '</b>' + (u && z.u ? ' (' + z.u + ')' : '') : ''; };
+        var zt = zz[0].t ? kz(zz[0], true) + '. ' + [kz(zz[1], true), kz(zz[2], true)].filter(Boolean).join(', ') + '.' : 'Jahr für Jahr: Erstattung oder Nachzahlung allein durch dieses Objekt.';
+        await b2oZeile(s, 'Steuerverlauf', zt);
         var k = r15Diagramm();
         if (k) {
           await zeige(r15Diagramm, 10);
@@ -3844,7 +3848,7 @@
           await warte(900);
           await r6Ende(zb);
           await zeige(tc, 8);
-          await b2oZeile(s, 'Das Diagramm', 'Balken je Jahr: Verlust oder Überschuss, darüber die Steuerwirkung — der Wendepunkt auf einen Blick. Modul 27 geht ihn genauer durch.');
+          await b2oZeile(s, 'Das Diagramm', 'Balken je Jahr: Verlust oder Überschuss, darüber die Steuerwirkung je Jahr. Modul 27 geht den Verlauf genauer durch.');
           if (r15Diagramm() && /einklappen/.test(r15Diagramm().textContent)) r15Diagramm().click();
           await warte(600);
         }
