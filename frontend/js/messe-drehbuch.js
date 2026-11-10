@@ -1460,7 +1460,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2481q';   /* v2481q: zielbild26-Analyse neu mit Kaufdatum und Ankauf-Stand; v2481n: zielbild26 nach v2540-v2543 mit Marktpreisen; v2481j: zielbild26 nach v2520; v2481g: Modul 26 Mieterhoehung und Zielbild (zielbild26); v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v3276r';   /* v3276r: zielbild26-Ertragswerte neu (26pot); v2481q: zielbild26-Analyse neu mit Kaufdatum und Ankauf-Stand; v2481n: zielbild26 nach v2540-v2543 mit Marktpreisen; v2481j: zielbild26 nach v2520; v2481g: Modul 26 Mieterhoehung und Zielbild (zielbild26); v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage|\/marktbericht\/potenzial|\/user-settings\/|\/api-keys\//i;   /* v3272: Einstellungen öffnen schrieb Stammdaten (PUT user-settings/stammdaten) */
@@ -6058,7 +6058,9 @@
           await b2oZeile(s, 'Nach der Aufteilung', neg ? 'Jede Wohnung als Eigentumswohnung, die Summe gegen das Haus — hier <b>kein Potenzial</b>, und DealPilot sagt warum.' : 'Jede Wohnung als Eigentumswohnung, die Summe nach Aufteilungskosten gegen den Wert des Hauses.');
         }
         var pt = function () { var p = r11Panel(); var e = p && rhIm(p, /^\s*PILOT: WAS IM HAUS STECKT\s*$/); return e && (e.closest('div[style*="margin-top:12px"]') || e.parentElement); };
-        if (pt()) {
+        /* v3276r · der Pilot-Absatz stammt aus dem Analyse-Mitschnitt v2481q und nennt noch 770.000 EUR im Zielbild -
+           die Ertragswerte sind seit v3276r neu (670.000 EUR). Bis zu einer neuen Analyse wird er nicht gezeigt. */
+        if (pt() && !(window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.zielbild26 && /770\.000/.test(JSON.stringify(DPM_REIHE_DATEN.zielbild26.analyse || '')))) {
           await zeige(pt, 6);
           await b2oZeile(s, 'Der Pilot dazu', 'Ein Absatz in ganzen Sätzen: was im Haus steckt, welche Wohnung den größten Hebel hat — und was davon nur Plan ist.', 1200);
         }
