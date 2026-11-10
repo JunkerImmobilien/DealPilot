@@ -1564,7 +1564,7 @@
        Pilot-Analyse - einmal echt (?mitschnitt=26), hier gespielt. Fehlt ein Schlüssel, sperrt RH_SPERRE. */
     if (m === 'POST' && D.zielbild26 && !_rh.mitschnitt26 && _aktiv === DREHBUECHER['reihe-zielbild']) {
       var p26 = u.split('?')[0];
-      if (/\/marktbericht\/potenzial$/.test(p26)) { var k26 = r26Schluessel(body), a26 = k26 && D.zielbild26.potenzial && D.zielbild26.potenzial[k26]; if (a26) return rhJ(JSON.parse(JSON.stringify(a26))); }
+      if (/\/marktbericht\/potenzial$/.test(p26)) { var k26 = r26Schluessel(body), a26 = k26 && D.zielbild26.potenzial && D.zielbild26.potenzial[k26]; if (a26) return rhJ(JSON.parse(JSON.stringify(a26))); try { (DPM_REIHE.r26fehl = DPM_REIHE.r26fehl || []).push(k26); } catch (e) {} }
       /* v2481p · Mitschnitt-Lauf ?mitschnitt=26ki: NUR die Pilot-Analyse geht echt hinaus (Ertragswerte und Marktpreise gespielt) */
       if (/\/ai\/analyze$/.test(p26) && D.zielbild26.analyse && !_rh.mitschnitt26ki) return rhJ(JSON.parse(JSON.stringify(D.zielbild26.analyse)));
       /* v2481m · Marktpreise (v2542): der Abruf bucht 1 × erweiterte Marktpreisindikation - nur gespielt */
@@ -5750,6 +5750,7 @@
     szenen: [
       async function (s) {   /* 1 · das Haus */
         await rhStart(0);
+        rhExperte();   /* v3276p · Einsteiger blendet den Knopf „Einheiten erfassen“ aus (detailgrad.js, v3236) */
         try { _rh.mitschnitt26 = new URLSearchParams(location.search).get('mitschnitt') === '26'; } catch (e) {}
         try { _rh.mitschnitt26ki = new URLSearchParams(location.search).get('mitschnitt') === '26ki'; } catch (e) {}   /* v2481p */
         if (_rh.mitschnitt26 || _rh.mitschnitt26ki) DPM_REIHE.mitschnitt26 = { potenzial: {}, analyse: null };
