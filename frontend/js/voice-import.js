@@ -3007,7 +3007,10 @@
       frage: 'Wie ist das Gebäude ausgestattet? Die Normalherstellungskosten 2010 kennen '
            + 'fünf Standardstufen: 1 sehr einfach, 2 einfach, 3 Standard, 4 gehoben, '
            + '5 stark gehoben. Es geht um die Qualität der Ausstattung — nicht um den '
-           + 'Zustand, der steckt im Modernisierungsgrad.' },
+           + 'Zustand, der steckt im Modernisierungsgrad. Zur Orientierung: 2 heißt einfache '
+           + 'Fenster, Einzelöfen oder alte Heizung, ein schlichtes Bad. 3 heißt Isolierglas, '
+           + 'Zentralheizung, Bad mit Fliesen, Wanne oder Dusche. 4 heißt Dreifachglas, '
+           + 'Fußbodenheizung, zweites Bad oder Gäste-WC, Parkett. Im Zweifel ist es die 3.' },  /* v3279 */
     { et: 7, ids: ['gsfl', 'brw'], rang: 3, wert: 1,
       frage: 'Wie groß ist das Grundstück, und welcher Bodenrichtwert gilt? '
            + 'Den Bodenrichtwert hole ich dir auch ab.' },
@@ -3039,7 +3042,10 @@
       frage: 'Wie ist das Gebäude ausgestattet? Die Normalherstellungskosten 2010 kennen '
            + 'fünf Standardstufen: 1 sehr einfach, 2 einfach, 3 Standard, 4 gehoben, '
            + '5 stark gehoben. Es geht um die Qualität der Ausstattung — nicht um den '
-           + 'Zustand, der steckt im Modernisierungsgrad.' },
+           + 'Zustand, der steckt im Modernisierungsgrad. Zur Orientierung: 2 heißt einfache '
+           + 'Fenster, Einzelöfen oder alte Heizung, ein schlichtes Bad. 3 heißt Isolierglas, '
+           + 'Zentralheizung, Bad mit Fliesen, Wanne oder Dusche. 4 heißt Dreifachglas, '
+           + 'Fußbodenheizung, zweites Bad oder Gäste-WC, Parkett. Im Zweifel ist es die 3.' },  /* v3279 */
     { et: 7, ids: ['etage'], rang: 2, stufe: 2,
       frage: 'In welchem Stockwerk liegt die Wohnung? Erdgeschoss ist 0.' },
     { et: 7, ids: ['nutzungsart'], rang: 3, stufe: 3, skalen: 1,
@@ -6249,7 +6255,7 @@
     deal.zustand       = _rfFeld('ds2_zustand') || null;
     deal.energieKlasse = _rfFeld('ds2_energie') || null;
     deal.mietausfallRisiko = _rfFeld('ds2_mietausfall') || null;
-    if (wfl != null && wfl > 0) deal.istMieteEurQm = (Z.nkm + Z.ze) / wfl;
+    if (wfl != null && wfl > 0 && Z.nkm > 0) deal.istMieteEurQm = Z.nkm / wfl;   /* v3279 · ohne Zuschläge, wie dealscore2-ui.js */
     deal.marktmieteEurQm = _rfNum(_rfFeld('ds2_marktmiete'));
     if (deal.marktmieteEurQm == null && _rf && _rf.markt && _rf.markt.mietSqm) deal.marktmieteEurQm = _rf.markt.mietSqm;
     deal.mietwachstumPct = _rfNum(_rfFeld('mietstg'));
@@ -11004,11 +11010,43 @@
         + '. In der Übersicht steht an jeder Zeile, woher sie kommt.</div>'
       : '';
 
+    /* v3279 · GETRENNTER SCORE (Marcel 10.11.2026: „geht die geführte Eingabe darauf ein?“).
+       Ist in den Einstellungen „Zwei Scores“ gewählt (dp_score_ansicht), zeigt der Abschluss
+       dieselbe Aufteilung wie die App: Investment-Score (das Objekt), Finanzierungs-Score
+       (trägt die geplante Finanzierung) und Gesamturteil mit Empfehlung. Gerechnet wird nichts
+       neu, es ist R.investment / R.finanzierung / R.gesamt aus DealScore2.compute(). */
+    var zweiKarte = '';
+    try {
+      var _zw = (typeof window._dpScoreAnsicht === 'function') ? window._dpScoreAnsicht() : 'eins';
+      var _s2 = (_zw === 'zwei') ? _rfScore2() : null;
+      var _R = _s2 && _s2.R;
+      if (_R && _R.investment && _R.finanzierung && _R.gesamt) {
+        var _zl = function (t, o, u) {
+          return '<div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0"><span>' + t
+            + (u ? '<br><span style="opacity:.7;font-size:11.5px">' + u + '</span>' : '') + '</span><b>'
+            + o.score + ' / 100 · ' + escH(o.stufe || '') + '</b></div>';
+        };
+        var _em = _R.gesamt.empfehlung || {};
+        var _nurFin = _em.fehlt && _em.fehlt.length === 1 && _em.fehlt[0] === 'Finanzierung';
+        zweiKarte = '<div class="vi-sc-annahmen" style="margin-top:12px"><b>Getrennt bewertet</b> (so ist es in deinen Einstellungen gewählt):'
+          + _zl('Investment-Score', _R.investment, 'das Objekt selbst: Rendite, Zustand, Lage, Potenzial')
+          + _zl('Finanzierungs-Score', _R.finanzierung, _R.finanzierung.barkauf
+              ? 'Barkauf, die Finanzierung gilt als erfüllt'
+              : 'trägt deine geplante Finanzierung: Kapitaldienst, Beleihung, Cashflow')
+          + _zl('Gesamturteil', _R.gesamt, '')
+          + '<div style="margin-top:4px">Empfehlung: <b>' + escH(_em.text || '') + '</b>'
+          + (_em.fehlt && _em.fehlt.length ? ' · noch nicht erfüllt: ' + escH(_em.fehlt.join(' und ')) : '')
+          + '</div>'
+          + (_nurFin ? '<div style="margin-top:4px">Das Objekt passt. Gedreht wird an der Finanzierung: mehr Eigenkapital, ein anderer Zins oder eine andere Tilgung.</div>' : '')
+          + '</div>';
+      }
+    } catch (e) { zweiKarte = ''; }
+
     _rfBlase('co',
       '<b>Das ist der Stand.</b> Beide Scores rechnen mit dem, was du gesagt hast — ' +
       'nichts davon steht schon im Objekt; das entscheidest du gleich in der Übersicht.' +
       berichtZeile +
-      (k1 || '') + (k2 || '') +
+      (k1 || '') + (k2 || '') + zweiKarte +
       (fehlt.length
         ? '<div class="vi-sc-annahmen" style="margin-top:12px"><b>Was ich nicht weiß:</b> ' +
           escH(fehlt.slice(0, 8).join(', ')) +

@@ -183,7 +183,7 @@
     },
     'tab2.notar': {
       title: 'Notarkosten',
-      body: 'Notar- und Grundbuchgebühren nach GNotKG-Tabelle. Üblich: 1,5-2,0% des Kaufpreises. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung. Die Bestellung der Grundschuld ist kein Teil der Anschaffungskosten, sondern Finanzierungskosten (sofort abziehbar): im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ eintragen, dann fällt sie aus der AfA-Basis.',
+      body: 'Notar- und Grundbuchgebühren. DealPilot rechnet sie für neue Objekte nach der Gebührenordnung (GNotKG) aus Kaufpreis und Darlehen, bei 150.000 € rund 1,2 % Notar, bei 500.000 € rund 0,9 %, dazu rund 0,5 % Grundbuch. Umstellen auf feste Sätze: Einstellungen › Investmentprofil › Vorbelegung für neue Objekte. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung. Die Bestellung der Grundschuld ist kein Teil der Anschaffungskosten, sondern Finanzierungskosten (sofort abziehbar): im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ eintragen, dann fällt sie aus der AfA-Basis.',
       paragraph: 'GNotKG',
       severity: 'beginner'
     },
@@ -266,7 +266,7 @@
     },
     'tab3.mietsteigerung': {
       title: 'Mietsteigerung p.a.',
-      body: 'Erwartete jährliche Mietsteigerung. Historisch in Deutschland 2-3% p.a. Bei Mietpreisbremse (Berlin, München etc.) maximal 15% in 3 Jahren erlaubt. Konservative Investoren rechnen mit 1,5-2,0%.',
+      body: 'Erwartete jährliche Mietsteigerung. Historisch in Deutschland 2-3% p.a. Bestandsmieten steigen nach § 558 BGB höchstens um 20 % in 3 Jahren, in Gebieten mit abgesenkter Kappungsgrenze um 15 %. Konservative Investoren rechnen mit 1,5-2,0%.',
       paragraph: '§ 558 BGB (Mieterhöhung)',
       severity: 'beginner'
     },

@@ -471,6 +471,36 @@
     });
   }
 
+  /* v3279 · ADRESSE DES DOKUMENTS GEGEN DAS OBJEKT (Marcel 10.11.2026). Die Schemata für
+     Kaufvertrag, Gutachten, RND-Gutachten, Mietvertrag und Mietaufstellung lesen die Anschrift
+     schon aus (objekt.adresse, objekt_adresse, adresse) - bis v3278 wurde sie nirgends
+     verglichen. Abweichung = Straße, Hausnummer oder PLZ des Objekts stehen nicht im Dokument.
+     Ohne Anschrift im Dokument oder ohne Straße im Objekt: kein Urteil (null). */
+  function _adresseDok(ext) {
+    ext = ext || {};
+    var o = (ext.objekt && typeof ext.objekt === 'object') ? ext.objekt : {};
+    var a = o.adresse || ext.objekt_adresse || ext.adresse || '';
+    return typeof a === 'string' ? a.trim() : '';
+  }
+  function _adresseObjekt() {
+    var g = function (id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; };
+    return { str: g('str'), hnr: g('hnr'), plz: g('plz'), ort: g('ort') };
+  }
+  function adresseAbweichung(ext) {
+    var d = _adresseDok(ext); if (!d) return null;
+    var o = _adresseObjekt(); if (!o.str) return null;
+    var n = function (x) { return String(x || '').toLowerCase().replace(/stra(ss|ß)e/g, 'str').replace(/str\./g, 'str').replace(/[^a-z0-9äöüß]/g, ''); };
+    var strOk = n(d).indexOf(n(o.str)) >= 0;
+    var hd = (o.hnr.match(/\d+/) || [])[0];
+    var hnrOk = !hd || new RegExp('(^|\\D)' + hd + '(\\D|$)').test(d);
+    var dp = (d.match(/(^|\D)(\d{5})(\D|$)/) || [])[2];
+    var plzOk = !dp || !o.plz || dp === o.plz;
+    if (strOk && hnrOk && plzOk) return null;
+    var objText = ((o.str + ' ' + o.hnr).trim() + (o.plz || o.ort ? ', ' + (o.plz + ' ' + o.ort).trim() : ''));
+    return { dok: d, obj: objText };
+  }
+  var _adrBestaetigt = {};   /* Dokument-Anschrift -> 1, wenn der Nutzer „gehört dazu" gesagt hat */
+
   function _zeigeErgebnis(a, file) {
     var res = document.getElementById('dpdi-result');
     if (!res) return;
@@ -513,6 +543,14 @@
     });
 
     var html = '';
+    var _adr = adresseAbweichung(ext), _adrOffen = !!(_adr && !_adrBestaetigt[_adr.dok]);
+    if (_adrOffen) {
+      html += '<div class="dpdi-warn" id="dpdi-adr" style="border-color:#B8625C"><strong>\u26A0 Andere Adresse als im Objekt</strong><br>'
+        + 'Im Objekt: <b>' + _esc(_adr.obj) + '</b><br>Im Dokument: <b>' + _esc(_adr.dok) + '</b><br>'
+        + 'Gehört das Dokument zu diesem Objekt? Bis du antwortest, ist nichts angehakt.'
+        + '<div style="margin-top:8px"><button type="button" class="dpdi-btn dpdi-btn-sec" id="dpdi-adr-nein">Nein, abbrechen</button> '
+        + '<button type="button" class="dpdi-btn" id="dpdi-adr-ja">Ja, trotzdem übernehmen</button></div></div>';
+    }
 
     if (!a.rechenbar && (a.fehlende_pflichtfelder || []).length) {
       html += '<div class="dpdi-warn"><strong>Fehlende Pflichtangaben:</strong> '
@@ -583,6 +621,13 @@
     res.innerHTML = html;
 
     var ub = document.getElementById('dpdi-uebernehmen');
+    if (_adrOffen) {   /* v3279 · Rückfrage offen: nichts angehakt, Übernehmen gesperrt */
+      Array.prototype.forEach.call(res.querySelectorAll('#dpdi-abgleich input[type="checkbox"]'), function (cb) { cb.checked = false; });
+      if (ub) ub.disabled = true;
+      var _aj = document.getElementById('dpdi-adr-ja'), _an = document.getElementById('dpdi-adr-nein');
+      if (_aj) _aj.addEventListener('click', function () { _adrBestaetigt[_adr.dok] = 1; _zeigeErgebnis(a, file); });
+      if (_an) _an.addEventListener('click', function () { res.innerHTML = ''; res.hidden = true; _status('Abgebrochen: das Dokument gehört nicht zu diesem Objekt. Nichts übernommen.', 'warn'); });
+    }
     if (ub) ub.addEventListener('click', function () {
       var n = _uebernehmen(abg);
       ub.disabled = true; ub.textContent = n ? ('✓ ' + n + ' übernommen') : 'Nichts ausgewählt';
@@ -630,7 +675,8 @@
     abgleich: _abgleich,
     steuerVorschlaege: steuerVorschlaege,   /* v3017 */
     sonderumlagenAus: sonderumlagenAus,     /* v3092 · N100 */
-    vergleich: vergleich
+    vergleich: vergleich,
+    adresseAbweichung: adresseAbweichung   /* v3279 */
   };
 
 })();

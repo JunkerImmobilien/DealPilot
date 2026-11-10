@@ -138,7 +138,10 @@ function _buildDeal2FromState() {
 
   // Lage
   var wfl = v('wfl');
-  if ((nkm + ze) > 0 && wfl > 0) deal.istMieteEurQm = (nkm + ze) / wfl;  // v481: Gesamt-Ist-Kaltmiete (nkm+ze), konsistent mit "Aktuelle Miete pro m2" + deal-kpis.js
+  /* v3279 · Ist-Miete je m² OHNE Zuschläge (Stellplatz, Küche): verglichen wird mit der Marktmiete
+     der Wohnfläche. v481 rechnete nkm+ze und liess die Miete über dem Markt erscheinen, obwohl
+     Stellplatz und Küche extra vermietet sind (Marcel 10.11.2026). */
+  if (nkm > 0 && wfl > 0) deal.istMieteEurQm = nkm / wfl;
   deal.marktmieteEurQm      = v('ds2_marktmiete') || null;
   deal.mietwachstumPct      = v('mietstg');
   deal.bevoelkerung         = g('ds2_bevoelkerung') || null;

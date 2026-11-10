@@ -1795,6 +1795,7 @@
   /* ── Merge (Zeilen mit kind: input|select|star) ── */
   var _merged = {};   // id -> { label, value(display), raw, source, kind, emptyOnly, range? }
   var _addrChoice = null;
+  var _addrOkSig = null;   /* v3279 · bestätigte Dokument-Adresse (Signatur), siehe renderMergedTable */
   /* v2376 · Zahlen in der Uebernahme-Tabelle lesbar: „Kaltmiete 4321" stand ohne
      Einheit und ohne Tausenderpunkt (Marcel 19.10.2026: „das wird bei allen
      Uebergaben so sein"). EINE Stelle fuer alle Wege (Expose, Sprache, ImmoMetrica,
@@ -2453,6 +2454,38 @@
        steht; weicht es ab, ist die Zeile markiert und NICHT vorgehakt. */
     var abw = _qcMode ? {} : _abweichungen(keys);
     var nAbw = Object.keys(abw).length;
+    /* v3279 · ANDERE ADRESSE ALS IM OBJEKT (Marcel 10.11.2026: „wenn die nicht passt und vom
+       Objekt abweicht, dass man es direkt nennt und fragt“). Bis v3278 war nur die Adresszeile
+       nicht vorgehakt, Kaufpreis, Fläche und Miete eines fremden Dokuments blieben vorgehakt.
+       Jetzt: Rückfrage wie beim ImmoMetrica-Import, bis zur Antwort ist nichts angehakt und
+       Übernehmen gesperrt. Die Antwort gilt für genau diese Dokument-Adresse. */
+    var _ADR = ['str', 'hnr', 'plz', 'ort'];
+    var _adrAbw = _qcMode ? [] : _ADR.filter(function (id) { return abw[id] !== undefined; });
+    var _adrSig = _ADR.map(function (id) { return _merged[id] ? String(_merged[id].value) : ''; }).join('|');
+    /* Dokumente (Kaufvertrag, Gutachten, Mietvertrag …) tragen ihre Anschrift im Ergebnis der
+       Auslese, nicht als Zeile str/plz - dieselbe Rückfrage über DokumentImport.adresseAbweichung */
+    var _dokAdr = [];
+    if (!_qcMode && window.DokumentImport && typeof window.DokumentImport.adresseAbweichung === 'function') {
+      _files.forEach(function (f) {
+        var d = f.cache && f.cache.dokument; if (!d || !d.success) return;
+        var x = window.DokumentImport.adresseAbweichung(d.extracted); if (x) _dokAdr.push({ name: f.name, dok: x.dok });
+      });
+    }
+    _adrSig += '|' + _dokAdr.map(function (x) { return x.dok; }).join('|');
+    var _adrOffen = (_adrAbw.length > 0 || _dokAdr.length > 0) && _addrOkSig !== _adrSig;
+    var _adrText = function (werte) { var w = werte; return ((w.str || '') + ' ' + (w.hnr || '')).trim() + (w.plz || w.ort ? ', ' + ((w.plz || '') + ' ' + (w.ort || '')).trim() : ''); };
+    var _adrObj = {}, _adrDok = {};
+    _ADR.forEach(function (id) { _adrObj[id] = _istText(id); _adrDok[id] = _merged[id] ? String(_merged[id].value) : _istText(id); });
+    var adrFrage = _adrOffen
+      ? '<div class="oabi-adr-frage" style="margin:8px 0;padding:10px 12px;border-radius:8px;border:1px solid #B8625C;background:rgba(184,98,92,.10);font-size:13px">'
+        + '<b>\u26A0 Andere Adresse als im Objekt</b>'
+        + '<div style="margin-top:4px">Im Objekt: <b>' + escH(_adrText(_adrObj)) + '</b>'
+        + (_adrAbw.length ? '<br>Im Dokument: <b>' + escH(_adrText(_adrDok)) + '</b>' : '')
+        + _dokAdr.map(function (x) { return '<br>In ' + escH(x.name) + ': <b>' + escH(x.dok) + '</b>'; }).join('') + '</div>'
+        + '<div style="margin-top:6px">Gehört das Dokument zu diesem Objekt? Bis du antwortest, ist nichts angehakt.</div>'
+        + '<div style="margin-top:8px"><button type="button" class="oabi-btn" id="oabi-adr-nein">Nein, abbrechen</button> '
+        + '<button type="button" class="oabi-btn primary" id="oabi-adr-ja">Ja, trotzdem übernehmen</button></div></div>'
+      : ((_adrAbw.length || _dokAdr.length) ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px">Du hast bestätigt, dass das Dokument zu diesem Objekt gehört. Die Adresszeilen übernimmst du nur, wenn du sie anhakst.</div>' : '');
     var abwKopf = nAbw ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
       + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '';
     /* v3088a · Hinweis, wenn Zeilen aus Wirtschaftsplan/Abrechnung bewusst nicht vorgehakt sind */
@@ -2469,7 +2502,7 @@
     var _pkHtml = _pkF ? '<div class="oabi-paket" style="margin:0 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-left:3px solid var(--wl-c9a84c,#C9A84C);background:#FBF6E9;border-radius:2px;font-size:12.5px">'
       + '<b>Dieses Exposé bietet ' + window.DpPaket.erkennen(_pkF.text) + ' Objekte einzeln an.</b> Statt eines Objekts kannst du das Paket anlegen: jedes Haus als eigenes Objekt mit seinen Einheiten, verbunden über den Paketnamen. '
       + '<button type="button" id="oabi-paket" class="oabi-btn primary" style="margin-left:6px">Als Paket anlegen</button></div>' : '';
-    host.innerHTML = _pkHtml + addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
+    host.innerHTML = _pkHtml + addrHtml + adrFrage + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(_bisherKopf(it)) + escH(_bisherText(it, abw[id])) + '</div>';
@@ -2488,6 +2521,13 @@
           + _importHinweise.filter(function (h, i, a) { return a.indexOf(h) === i; }).map(function (h) { return '<div style="margin-top:2px">' + escH(h) + '</div>'; }).join('') + '</div>' : '');
     _reiterEinbauen(host);   /* v3016 */
     if (ab) ab.disabled = false;
+    if (_adrOffen) {   /* v3279 · Rückfrage offen: nichts angehakt, Übernehmen gesperrt */
+      host.querySelectorAll('.oabi-tbl input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
+      if (ab) ab.disabled = true;
+      var _aj = host.querySelector('#oabi-adr-ja'), _an = host.querySelector('#oabi-adr-nein');
+      if (_aj) _aj.addEventListener('click', function () { _addrOkSig = _adrSig; renderMergedTable(); });
+      if (_an) _an.addEventListener('click', function () { var c = $('oabi-cancel'); if (c) c.click(); });
+    }
     /* v3120 · Einheit gewählt = Zeile angehakt; Rechnungen an den Beleg-Leser */
     host.querySelectorAll('select[data-mv]').forEach(function (sl) {
       sl.addEventListener('change', function () { var cb = sl.closest('tr') && sl.closest('tr').querySelector('input[type="checkbox"]'); if (cb) cb.checked = sl.value !== ''; });

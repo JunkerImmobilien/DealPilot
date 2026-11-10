@@ -322,8 +322,11 @@ window.MietEntwicklung = (function() {
     var ze_m = _v('ze', 0);
     var wfl = _v('wfl', 0);
     var soll = _v('me_soll', 0);
-    // Aktuelle Miete pro qm/Monat (inkl. zE)
-    var ist_qm = wfl > 0 ? (nkm_m + ze_m) / wfl : 0;
+    /* v3279 · Miete je m² NUR aus der Nettokaltmiete der Wohnung. Zuschläge (Stellplatz,
+       Küche, Möblierung) gehören nicht zur Wohnfläche und nicht zur ortsüblichen
+       Vergleichsmiete (§ 558 BGB) — mit ihnen lag die Ist-Miete scheinbar über dem Mietspiegel
+       (Marcel 10.11.2026, Beispiel 900 € + 40 € Stellplatz auf 100 m²: 9,40 statt 9,00 €/m²). */
+    var ist_qm = wfl > 0 ? nkm_m / wfl : 0;
     var opp_pct = (soll > 0 && ist_qm > 0) ? (ist_qm / soll - 1) : 0;
 
     var rows = [];
@@ -339,7 +342,7 @@ window.MietEntwicklung = (function() {
       var nkm_grown = nkm_m * 12 * f;
       var ze_grown = ze_m * 12 * (includesZE ? f : 1.0);
       var nkm_y = nkm_grown + ze_grown;
-      var qm = wfl > 0 ? (nkm_y / 12) / wfl : 0;
+      var qm = wfl > 0 ? (nkm_grown / 12) / wfl : 0;   /* v3279 · je m² ohne Zuschläge */
       var isHike = (mode === 'detail') &&
                    (y % intv === 0) &&
                    (y / intv <= anz);
