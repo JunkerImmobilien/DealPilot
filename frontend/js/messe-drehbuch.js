@@ -5525,7 +5525,7 @@
         var zb = r6Beginn(s, 'Etappe 4 · Feinschliff', 'Die Bewirtschaftungskosten im Jahr — und wie viel davon nicht umlagefähig ist.');
         await r25Antwort(R25.bwk);
         await r6Ende(zb);
-        var HZ = /^\s*✓?\s*(Hausgeld|Bewirtschaftung\w*)/;
+        var HZ = /^\s*✓?\s*(Hausgeld|Bewirtschaftung[a-zäöüß]*)/;   /* v3276: \w* fraß die erste Ziffer des Betrags */
         var hz = function () { return r25StandZeile(HZ); };
         await zeige(function () { return hz() || q('#vi-rf-stand'); }, 8);
         /* seit v2368 trägt die Liste die Einheit selbst - der Wert wird so gezeigt, wie er dort steht */
@@ -5534,7 +5534,7 @@
         /* v2388 · GEMESSEN: ohne eigene Zeile stand „Umlagefähig und eigener Teil" 40 s über drei
            ganz anderen Antworten */
         await zeige(r25Bereich, 6);
-        var zb1 = r6Beginn(s, 'Annahmen und Standort', 'Mietsteigerung, Wertsteigerung, Leerstand, Mietausfall — und wie sich der Ort entwickelt.');
+        var zb1 = r6Beginn(s, 'Annahmen und Standort', 'Mietsteigerung, Wertsteigerung, Leerstand — und wie sich der Ort entwickelt.');
         await r25Reihe([R25.langfrist, R25.ausfall, R25.ort]);
         await r6Ende(zb1);
         await zeige(r25Bereich, 6);
