@@ -4770,7 +4770,7 @@
         var x = ks()[0]; if (x) x.scrollIntoView({ block: 'center' });
         await warte(500);
         await zeige(function () { var k = ks(); return k.length ? b2oHuelle(k[0], k[k.length - 1]) : null; }, 8);
-        var kz = ks().slice(0, 3).map(function (k) { var a = k.querySelector('.oe-kachel-k'), w = k.querySelector('.oe-kachel-w'); return a && w ? r6Text(a) + ' <b>' + r6Text(w) + '</b>' : ''; }).filter(Boolean);
+        var kz = ks().slice(0, 3).map(function (k) { var a = k.querySelector('.oe-kachel-k'), w = k.querySelector('.oe-kachel-w'); return a && w ? r6Text(a) + ' <b>' + r6Text(w).replace(/(d)(€|%)/, '$1 $2') + '</b>' : ''; }).filter(Boolean);
         await b2oZeile(s, 'Die Wertkacheln', (kz.length ? kz.join(', ') : 'Bodenrichtwert, Zins, Faktor') + ' — jede Kachel mit Herkunft. Ein Klick zeigt die Zeile dahinter.');
         var kb = function () { var b = q('[data-brw-karte]'); return b && b.offsetWidth ? b : null; };
         if (kb()) {
