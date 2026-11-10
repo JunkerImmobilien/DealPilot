@@ -5616,47 +5616,16 @@
         var we = wert('einheiten');
         await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Miete, Finanzierung und Bewirtschaftung stehen in ihren Reitern.', 600);
       },
-      async function (s) {   /* 13 · Reiter Bewertung: zwei Scores, zwei Gewichtungen */
-        /* v2373 · Marcel 19.10.2026: das Video endet im Reiter Bewertung, beide Scores groß im
-           Bild, und eine sachliche Szene, warum dasselbe Objekt einmal SOLIDE und einmal GUT ist.
-           Alle Zahlen aus den Karten (r12Kopf, r12Teile) - Gewichte eingeschlossen. */
+      async function (s) {   /* 13 · v3276: Reiter Bewertung - Gesamturteil und zwei Teil-Scores (die Karten Deal Score / Investor Deal Score sind seit v3264 verdeckt) */
         reiter('s6'); await warte(1300);
-        await warteAuf(function () { return r12Karte(1)() && r12Kopf(1).score; }, 8000);
+        await warteAuf(function () { return q('#s6 .dpz-kopf') && d3Kopf().score; }, 8000);
         await warte(600);
-        /* v2388 · GEMESSEN im Prüflauf (Studio, 653 px App-Höhe): die beiden Köpfe (.dpsh-mainrow,
-           mit allen fünf Balken) sind zusammen höher als das Bild - der Ring des Deal Score lag
-           oben ausserhalb, die Zahl 60 war in „Zwei Scores" nicht zu sehen. Jetzt je Score der
-           Ring (.dpsh-colring: Ring + Stufe) einzeln; zusammen nur, wenn beide ins Bild passen. */
-        var ring = function (i) { return function () { var k = r12Karte(i)(); return k && (k.querySelector('.dpsh-colring') || k.querySelector('.dpsh-mainrow') || k.querySelector('.dpsh-headrow')); }; };
-        var passt = function (fa, fb) { var x = fa(), y = fb(); if (!x || !y) return false; var ra = rect(x), rb = rect(y); return Math.max(ra.bottom, rb.bottom) - Math.min(ra.top, rb.top) <= innerHeight - unten() - 70 - 24; };
-        var a = r12Kopf(0), b = r12Kopf(1), t1 = r12Teile(0), t2 = r12Teile(1);
-        DPM_REIHE.r25scores = { deal: a, investor: b, passt: passt(ring(0), ring(1)) };
-        await zeige(ring(0), 10);
-        await b2oZeile(s, 'Der Deal Score', 'Deal Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b> — gerechnet aus ' + (t1.length || 'den') + ' Kennzahlen des Objekts.', 800);
-        var such = function (t, re) { return t.filter(function (x) { return re.test(x.name); })[0] || null; };
-        var cf = such(t1, /^Cashflow/i), nr = such(t1, /Rendite/i);
-        var balken = function (i) { return function () { var k = r12Karte(i)(), bb = k && k.querySelectorAll('.dpsh-cbar'); return bb && bb.length ? b2oHuelle(bb[0], bb[bb.length - 1]) : null; }; };
-        await zeige(balken(0), 8);
-        var gw = function (x) { return x && x.gewicht ? ' (' + x.gewicht + ')' : ''; };
-        /* v2374 · GEMESSEN im Demo-Konto: die Gewichte sind dort NICHT die ab Werk (30/25/15/15/15),
-           sondern 20/22/14/14/30 - Potenzial wiegt am meisten. „Vor allem Cashflow und Rendite"
-           sagt die Zeile deshalb nur, wenn die beiden wirklich vorn liegen; sonst alle fünf. */
-        var gn = function (x) { var m = /([\d,.]+)/.exec((x && x.gewicht) || ''); return m ? parseFloat(m[1].replace(',', '.')) : 0; };
-        var vorn = t1.slice().sort(function (p, q2) { return gn(q2) - gn(p); }).slice(0, 2);
-        var cfNr = cf && nr && vorn.indexOf(cf) >= 0 && vorn.indexOf(nr) >= 0;
-        await b2oZeile(s, 'Seine Gewichte', cfNr
-          ? 'Er schaut vor allem auf <b>Cashflow' + gw(cf) + '</b> und <b>Nettorendite' + gw(nr) + '</b> — hier ' + cf.note + ' und ' + nr.note + ' von 100 Punkten.'
-          : 'Fünf Kennzahlen, deine Gewichte: ' + t1.map(function (x) { return x.name.replace(/\s*\(.*\)$/, '') + ' ' + x.gewicht + ': <b>' + x.note + '</b>'; }).join(' · ') + '.');
-        var weitere = ['Finanzierung', 'Risiko', 'Lage', 'Upside'].map(function (nm) { var x = such(t2, new RegExp('^' + nm, 'i')); return x ? nm + ' <b>' + x.note + '</b>' : nm; });
-        await zeige(ring(1), 10);
-        await b2oZeile(s, 'Der Investor Deal Score', 'Investor Deal Score <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b> — dasselbe Objekt, andere Gewichtung.', 800);
-        await zeige(balken(1), 8);
-        await b2oZeile(s, 'Was er zusätzlich bewertet', 'Neben der Rendite auch Finanzierung, Risiko, Lage und Upside — hier ' + weitere.join(' · ') + '.');
-        /* beide Zahlen zum Schluss: zusammen, wenn sie ins Bild passen - sonst Urteil des Deal Score
-           (Stufe in der Zeile darunter) und der Ring des Investor Deal Score */
-        if (passt(ring(0), ring(1))) await zeigeGruppe(ring(0), ring(1), 10);
-        else await zeigeGruppe(function () { var k = r12Karte(0)(); return k && (k.querySelector('.dpsh-verdictbar') || k.querySelector('.dpsh-statstrip')); }, ring(1), 10);
-        await b2oZeile(s, 'Von ' + r12Wort(a.wort) + ' zu ' + r12Wort(b.wort), 'Gleiche Zahlen, andere Gewichte: <b>' + (a.score || '–') + '</b> im Deal Score, <b>' + (b.score || '–') + '</b> im Investor Deal Score.', 1500);
+        var K = d3Kopf(), a = d3Teil(0), b = d3Teil(1);
+        DPM_REIHE.r25scores = { kopf: K, investment: a, finanzierung: b };
+        await zeige(function () { return q('#s6 .dpz-kopf'); }, 8);
+        await b2oZeile(s, 'Das Ergebnis', 'Im Reiter Bewertung: Investor Deal Score <b>' + (K.score || '–') + ' · ' + (K.wort || '–') + '</b>' + (K.empf ? ', Empfehlung <b>' + K.empf.charAt(0) + K.empf.slice(1).toLowerCase() + '</b>' : '') + '.', 800);
+        await zeige(function () { return q('#s6 .dpz-zwei'); }, 8);
+        await b2oZeile(s, 'Zwei Teil-Scores', (a ? 'Investment <b>' + a.n + ' · ' + a.wort + '</b>' : 'Investment –') + ', ' + (b ? 'Finanzierung <b>' + b.n + ' · ' + b.wort + '</b>' : 'Finanzierung –') + ' — die Immobilie und ihre Finanzierung getrennt bewertet. Modul 12 geht sie im Einzelnen durch.', 1500);
       }
     ].map(function (f) { return function (s) { _r25s = s; return f(s); }; })
   };
