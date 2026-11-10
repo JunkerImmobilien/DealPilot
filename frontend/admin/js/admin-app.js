@@ -830,11 +830,16 @@
               </div>
             </div>
 
-            <div class="action-section">
-              <h4>KI-Credits gutschreiben</h4>
-              <div class="action-row">
-                <input type="number" id="action-credits" placeholder="Anzahl (z.B. 10)" min="1" max="10000">
-                <button class="btn btn-primary btn-sm" data-action="grant-credits">Gutschreiben</button>
+            <div class="action-section" id="kont-sec">
+              <!-- v3274 · Marcel 10.11.2026: die drei Berichtsarten je Nutzer frei einstellen (ersetzt „KI-Credits gutschreiben") -->
+              <h4>Berichte-Kontingent</h4>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Monatskontingent kommt aus dem Plan. Hier setzt du das <b>Guthaben je Berichtsart</b> – es kommt obendrauf und verfällt nie.</p>
+              <div id="kont-stand" style="font-size:0.85em;margin:0 0 8px 0;">lädt …</div>
+              <div class="action-row" style="flex-wrap:wrap;gap:6px">
+                <label style="font-size:0.85em">Stufe 1 · Marktpreis <input type="number" id="kont-mpi" min="0" max="1000" style="width:70px"></label>
+                <label style="font-size:0.85em">Stufe 2 · Erweitert <input type="number" id="kont-mpi_plus" min="0" max="1000" style="width:70px"></label>
+                <label style="font-size:0.85em">Stufe 3 · Wertermittlung <input type="number" id="kont-wev" min="0" max="1000" style="width:70px"></label>
+                <button class="btn btn-primary btn-sm" data-action="kont-setzen">Guthaben setzen</button>
               </div>
             </div>
 
@@ -909,7 +914,8 @@
       `;
 
       $$('[data-action="change-plan"]')[0].addEventListener('click', () => handleChangePlan(id));
-      $$('[data-action="grant-credits"]')[0].addEventListener('click', () => handleGrantCredits(id));
+      $$('[data-action="kont-setzen"]')[0].addEventListener('click', () => handleKontSetzen(id));
+      ladeKont(id);
       $$('[data-action="toggle-test"]')[0].addEventListener('click', () => handleToggleTest(id, u.is_test_user, u.email));
       $$('[data-action="reset-password"]')[0].addEventListener('click', () => handleResetPassword(id, u.email));
       $$('[data-action="toggle-active"]')[0].addEventListener('click', () => handleToggleActive(id, u.is_active, u.email));
@@ -936,6 +942,37 @@
     } catch (err) {
       toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
     }
+  }
+
+  /* v3274 · Berichte-Kontingent je Nutzer */
+  const KONT_ARTEN = [['mpi', 'Stufe 1'], ['mpi_plus', 'Stufe 2'], ['wev', 'Stufe 3']];
+  function kontZeigen(s) {
+    const el = $('#kont-stand'); if (!el || !s || !s.arten) return;
+    el.innerHTML = KONT_ARTEN.map(([a, n]) => {
+      const x = s.arten[a] || {};
+      const inp = $('#kont-' + a); if (inp) inp.value = x.bank || 0;
+      return '<div><b>' + n + ':</b> Monat ' + (x.used || 0) + ' / ' + (x.limit || 0) + ' verbraucht · Guthaben ' + (x.bank || 0)
+        + (x.testphase ? ' · Testphase ' + x.testphase : '') + ' · <b>noch ' + (x.rest || 0) + '</b></div>';
+    }).join('') + '<div style="color:var(--text-muted)">Plan ' + (s.plan || '?') + ' · neuer Monat ab ' + (s.period_reset_at || '?') + '</div>';
+  }
+  async function ladeKont(id) {
+    try { kontZeigen(await API.getKontingent(id)); }
+    catch (err) { const el = $('#kont-stand'); if (el) el.textContent = 'Fehler: ' + (err.message || 'unbekannt'); }
+  }
+  async function handleKontSetzen(id) {
+    const werte = {};
+    for (const [a] of KONT_ARTEN) {
+      const v = ($('#kont-' + a) || {}).value;
+      if (v === '' || v == null) continue;
+      const n = Number(v);
+      if (!Number.isInteger(n) || n < 0 || n > 1000) { toast('Bitte ganze Zahl von 0 bis 1000', 'error'); return; }
+      werte[a] = n;
+    }
+    try {
+      const r = await API.setKontingent(id, werte);
+      kontZeigen(r.status);
+      toast('✓ Guthaben gesetzt', 'success');
+    } catch (err) { toast('Fehler: ' + (err.message || 'unbekannt'), 'error'); }
   }
 
   async function handleGrantCredits(id) {

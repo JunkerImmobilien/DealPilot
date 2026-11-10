@@ -1096,6 +1096,41 @@ router.post('/users/:id/change-plan', requireAdmin, requireRole('owner', 'suppor
   }
 });
 
+/* v3274 · Marcel 10.11.2026: „die 3 berichte für jeden user frei einzustellen". Die drei
+   Berichtsarten (Stufe 1 mpi · Stufe 2 mpi_plus · Stufe 3 wev) haben je ein Monatskontingent
+   aus dem Plan (aiCreditsService KONTINGENT) und eine Bank, die nie verfaellt. Der Admin SETZT
+   die Bank je Art auf einen Wert (nicht addieren) - das Monatskontingent bleibt Sache des Plans.
+   Auskunft ueber dieselbe getStatus()-Rechnung wie im Nutzerkonto. */
+router.get('/users/:id/kontingent', requireAdmin, async (req, res) => {
+  try { res.json(await require('../services/aiCreditsService').getStatus(req.params.id)); }
+  catch (err) { res.status(500).json({ error: 'server_error', message: err.message }); }
+});
+router.post('/users/:id/kontingent', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const b = req.body || {}, werte = {};
+  for (const art of ['mpi', 'mpi_plus', 'wev']) {
+    if (b[art] === undefined || b[art] === null || b[art] === '') continue;
+    const n = Number(b[art]);
+    if (!Number.isInteger(n) || n < 0 || n > 1000) return res.status(400).json({ error: 'invalid_value', art });
+    werte[art] = n;
+  }
+  if (!Object.keys(werte).length) return res.status(400).json({ error: 'nothing_to_set' });
+  try {
+    const aiCredits = require('../services/aiCreditsService');
+    const vorher = await aiCredits.getStatus(req.params.id);   /* legt die Zeile an, falls sie fehlt */
+    const sets = Object.keys(werte).map((art, i) => art + '_bank = $' + (i + 2)).join(', ');
+    await db.query('UPDATE ai_credits_user SET ' + sets + ', updated_at = NOW() WHERE user_id = $1',
+      [req.params.id].concat(Object.keys(werte).map(a => werte[a])));
+    const alt = {}; Object.keys(werte).forEach(a => { alt[a] = vorher.arten[a] ? vorher.arten[a].bank : null; });
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.kontingent_set', 'user', req.params.id,
+                { vorher: alt, nachher: werte, reason: String(b.reason || '').slice(0, 200) }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, status: await aiCredits.getStatus(req.params.id) });
+  } catch (err) {
+    console.error('[admin/users/kontingent] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
 router.post('/users/:id/grant-credits', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
   const db = req.app.get('db');
   const { amount, reason = '' } = req.body || {};

@@ -60,6 +60,8 @@ const API = (function() {
   function marktberichtCosts() { return call('GET', '/marktbericht-costs'); }
 
 return {
+    /* v3274 · admin-apikeys.js (API & Pro-Test) ruft API.call - fehlte im Rueckgabeobjekt, Meldung "API fehlt" (Marcel 10.11.2026) */
+    call,
     credits, marktberichtCosts,
     fetchAttachmentUrl,
     feedbackPeriod: (period) => call('GET', '/feedback?period=' + encodeURIComponent(period || 'all')),
@@ -137,6 +139,9 @@ return {
       call('POST', '/users', { email, name, plan_id, is_test_user: !!is_test_user }),
     changePlan: (id, plan_id, billing_interval, reason) =>
       call('POST', `/users/${id}/change-plan`, { plan_id, billing_interval, reason }),
+    // v3274: Berichte-Kontingent je Nutzer (Guthaben je Stufe setzen)
+    getKontingent: (id) => call('GET', `/users/${id}/kontingent`),
+    setKontingent: (id, werte) => call('POST', `/users/${id}/kontingent`, werte),
     grantCredits: (id, amount, reason) =>
       call('POST', `/users/${id}/grant-credits`, { amount, reason }),
     resetPassword: (id, reason) =>
