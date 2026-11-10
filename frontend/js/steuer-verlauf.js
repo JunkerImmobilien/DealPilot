@@ -163,11 +163,15 @@
            Verlustjahre - bis v3272 stand hier „0 € · keine Verlustjahre" und „Steuern ab dem
            Wendepunkt 0 € · —", obwohl der Satz darunter die Erstattung über den Zeitraum nannte. */
         : (w < 0
-          ? ['Erstattungen im Zeitraum', sgn(A.erstattung), R[0].jahr + '–' + R[n - 1].jahr, C.verlust]
+          ? (A.vorherSteuer < 0
+            ? ['Steuerwirkung im Zeitraum', sgn(A.netto), 'Erstattung ' + sgn(A.erstattung) + ' · Steuer ' + eur(A.vorherSteuer), C.verlust]
+            : ['Erstattungen im Zeitraum', sgn(A.erstattung), R[0].jahr + '–' + R[n - 1].jahr, C.verlust])
           : ['Erstattungen bis dahin', w > 0 ? sgn(A.erstattung) : '0 €', w > 0 ? R[0].jahr + '–' + R[w - 1].jahr : 'keine Verlustjahre', C.verlust]),
       w >= 0
         ? ['Steuern ab dem Wendepunkt', eur(A.steuer), R[w].jahr + '–' + R[n - 1].jahr, C.gewinn]
-        : ['Steuern auf das Objekt', '0 €', 'kein Wendepunkt bis ' + R[n - 1].jahr, C.gewinn],
+        : (A.vorherSteuer < 0
+          ? ['Steuern in Gewinnjahren', eur(A.vorherSteuer), 'kein Wendepunkt bis ' + R[n - 1].jahr, C.gewinn]
+          : ['Steuern auf das Objekt', '0 €', 'kein Wendepunkt bis ' + R[n - 1].jahr, C.gewinn]),
       ['Ergebnis V+V im letzten Jahr', sgn(R[n - 1].erg), String(R[n - 1].jahr), '#E6DCC2']
     ];
     var satz = w > 0
@@ -176,7 +180,18 @@
           : ' senkt das Objekt deine Steuer (Erstattungen ' + sgn(A.erstattung) + '). <b>Ab ' + A.jahr + ' wird das Ergebnis positiv</b>')
         + ' – ab hier zahlst du auf dieses Objekt Steuern. Das ist der Zeitpunkt, an dem ein weiteres Investment mit Anfangsverlusten (Zinsen, AfA, Sanierung) die Steuerlast wieder ausgleichen kann.'
       : (w === 0 ? 'Dieses Objekt ist <b>vom ersten Jahr an steuerlich positiv</b> – es bringt keine Erstattung, die Steuer steigt mit der Miete (' + R[0].jahr + ': ' + eur(Math.max(0, -R[0].steuer)) + ', ' + R[n - 1].jahr + ': ' + eur(Math.max(0, -R[n - 1].steuer)) + ' im Jahr). Ein Objekt mit Anfangsverlusten daneben würde die Last senken.'
-        : 'Das Objekt bleibt im Betrachtungszeitraum steuerlich negativ – es senkt deine Steuer in jedem Jahr (zusammen ' + sgn(R.reduce(function (a, r) { return a + Math.max(0, r.steuer); }, 0)) + ').');
+        : (function () {
+            /* v3273 · Ravensberger Weg 38: 2026–2029 positiv, ab 2030 (Anschluss 5 % statt 4 %) wieder
+               Verlust bis zum Ende. „senkt deine Steuer in jedem Jahr" stimmte nicht - jetzt nennt der
+               Satz die Gewinnjahre und, wenn sie zusammenfällt, das Ende der Zinsbindung. */
+            var plus = R.filter(function (r) { return r.erg > 0; });
+            if (!plus.length) return 'Das Objekt bleibt im Betrachtungszeitraum steuerlich negativ – es senkt deine Steuer in jedem Jahr (zusammen ' + sgn(A.erstattung) + ').';
+            var letzt = plus[plus.length - 1].jahr, danach = letzt + 1;
+            var bind = E.filter(function (e) { return e[1] === 'Zinsbindung endet'; })[0];
+            var grund = bind && bind[0] === danach ? ' – mit dem Ende der Zinsbindung ' + danach + ' rechnet die Anschlussfinanzierung höhere Zinsen' : '';
+            return 'Das Objekt ist nur zeitweise steuerlich positiv (' + (plus.length === 1 ? plus[0].jahr : plus[0].jahr + '–' + letzt) + '). Ab ' + danach + ' entstehen wieder Verluste' + grund
+              + '. Im Betrachtungszeitraum gibt es <b>kein Jahr, ab dem es dauerhaft positiv bleibt</b> (Erstattungen ' + sgn(A.erstattung) + ', Steuer ' + eur(A.vorherSteuer) + ', zusammen ' + sgn(A.netto) + ').';
+          })());
     /* Diagramm */
     var W = 900, H = 320, L = 62, Rr = 14, T = 46, U = 36;
     var vs = []; R.forEach(function (r) { vs.push(r.erg); if (r.cf != null) vs.push(r.cf); });
