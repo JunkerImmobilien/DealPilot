@@ -8700,7 +8700,7 @@
       /* v3272 · auch IM Lauf: kein Schreibweg an Objekt/Steuer/Spiegel außer an die Kopien des Laufs
          (KI-Abrufe regelt im Lauf rhSpion mit Mitschnitt bzw. RH_SPERRE) */
       if (m !== 'GET' && (!lauf || !/\/api\/v1\/ai\//.test(u)) && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/|portfolio-spiegel)/.test(u)
-          && !((window.DPM_REIHE && DPM_REIHE.angelegt || []).some(function (id) { return u.indexOf(id) >= 0; }))) {
+          && !((window.DPM_REIHE && DPM_REIHE.angelegt || []).concat(window.DPM_B2O && DPM_B2O.angelegt || []).some(function (id) { return u.indexOf(id) >= 0; }))) {   /* v3276: Modul 02 führt seine Objekte in DPM_B2O - deren Löschen fiel sonst in die Sperre */
         window.DPM_NACHSPERRE.push(m + ' ' + u.replace(location.origin, ''));
         return Promise.resolve(new Response(JSON.stringify({ ok: true, vorfuehrung: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
       }
