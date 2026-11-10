@@ -2300,7 +2300,7 @@
         await zeigeGruppe(feldVon('notar_p'), feldVon('gba_e'), 8);
         await b2oZeile(s, 'Notar und Grundbuch', 'Notar <b>' + r6Pz(wert('notar_p')) + ' %</b> = ' + eur(zahl('notar_e')) + ', Grundbuchamt <b>' + r6Pz(wert('gba_p')) + ' %</b> = ' + eur(zahl('gba_e')) + ' — beide aus deinen Standardwerten.');
         await zeigeGruppe(feldVon('ji_p'), feldVon('ji_e'), 8);
-        await b2oZeile(s, 'Sonstige Kosten', '<b>' + r6Pz(wert('ji_p')) + ' %</b> = ' + eur(zahl('ji_e')) + ' für Bausachverständigen, Anfahrt, Gutachten — ebenfalls vorbelegt, jederzeit änderbar.');
+        await b2oZeile(s, 'Sonstige Kosten', '<b>' + r6Pz(wert('ji_p')) + ' %</b> = ' + (eur(zahl('ji_e')) || '0 €') + ' für Bausachverständigen, Anfahrt, Gutachten — ebenfalls vorbelegt, jederzeit änderbar.');
       },
       async function (s) {   /* 4 · Grunderwerbsteuer nach PLZ */
         await zeigeGruppe(feldVon('gest_p'), feldVon('gest_e'), 8);
