@@ -1202,7 +1202,7 @@
      Antwort auf POST /objects und löscht genau diese beim Aufräumen - auch
      bei Esc. Der lokale Nummernzähler (seq_<Jahr>) wird zurückgesetzt. */
   var MB_SACHSEN = {"area":100,"rating":"Sehr attraktiv","conf":{"label":"Mittel","pct":64},"mikro":"Sehr gut · 9,5","makro":"Durchschnittlich · 5,9","microRaw":95,"macroRaw":59,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Herford, Hansestadt","leer":4,"eig":42.1,"miete":5.56},"brw":{"wert":190,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":204000,"med":244000,"high":284000,"sqm":"2.440 €/m²"},"mm":{"low":633,"med":802,"high":922,"sqm":"8,02 €/m² kalt"}};
-  var B2O_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes/i;
+  var B2O_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/user-settings\/|\/api-keys\//i;   /* v3276: Modul 02 schrieb browser_vorgaben (zve_history) */
   var _b2o = null;
   window.DPM_B2O = { angelegt: [], gesperrt: [], geloescht: [] };
   function b2oSpion(w) {
@@ -8699,7 +8699,7 @@
       var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
       /* v3272 · auch IM Lauf: kein Schreibweg an Objekt/Steuer/Spiegel außer an die Kopien des Laufs
          (KI-Abrufe regelt im Lauf rhSpion mit Mitschnitt bzw. RH_SPERRE) */
-      if (m !== 'GET' && (!lauf || !/\/api\/v1\/ai\//.test(u)) && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/|portfolio-spiegel)/.test(u)
+      if (m !== 'GET' && (!lauf || !/\/api\/v1\/ai\//.test(u)) && /\/api\/v1\/(objects\/[0-9a-f-]{36}|tax-records|tax-snapshots|tax-periods|ai\/|portfolio-spiegel|user-settings\/)/.test(u)
           && !((window.DPM_REIHE && DPM_REIHE.angelegt || []).concat(window.DPM_B2O && DPM_B2O.angelegt || []).some(function (id) { return u.indexOf(id) >= 0; }))) {   /* v3276: Modul 02 führt seine Objekte in DPM_B2O - deren Löschen fiel sonst in die Sperre */
         window.DPM_NACHSPERRE.push(m + ' ' + u.replace(location.origin, ''));
         return Promise.resolve(new Response(JSON.stringify({ ok: true, vorfuehrung: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
