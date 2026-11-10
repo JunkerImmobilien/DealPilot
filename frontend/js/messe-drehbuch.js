@@ -3667,10 +3667,12 @@
         function f(re, nm) { var x = r12Bewertung(re); return x ? nm + ' <b>' + x.wert + '</b> ' + x.wort.toLowerCase() : ''; }
         await b2oZeile(s, 'Kennzahlen mit Ampel', [f(/^Cashflow vor/, 'Cashflow'), f(/^DSCR/, 'DSCR'), f(/^Nettomiet/, 'Nettorendite'), f(/^LTV/, 'LTV')].filter(Boolean).join(', ') + '.');
       },
-      async function (s) {   /* 9 · DealScore und Investor-DealScore */
-        await zeigeGruppe(function () { var k = r12Karte(0)(); return k && k.querySelector('.dpsh-headrow'); }, function () { var k = r12Karte(1)(); return k && k.querySelector('.dpsh-headrow'); }, 6);
-        var a = r12Kopf(0), b = r12Kopf(1);
-        await b2oZeile(s, 'Das Urteil', 'DealPilot Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b>, Investor-DealScore <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b> — Modul 12 zeigt, wie sie entstehen.');
+      async function (s) {   /* 9 · v3276: das Urteil im neuen Kopf des Reiters Bewertung (Gesamturteil + zwei Teil-Scores) */
+        var k = q('#s6 .dpz-kopf'); if (k) k.scrollIntoView({ block: 'start' }); var mc = q('.main-col'); if (mc) mc.scrollTop -= 80;
+        await warte(500);
+        await zeigeGruppe(function () { return q('#s6 .dpz-kopf'); }, function () { return q('#s6 .dpz-zwei'); }, 6);
+        var K = d3Kopf(), a = d3Teil(0), b = d3Teil(1);
+        await b2oZeile(s, 'Das Urteil', 'Investor Deal Score <b>' + (K.score || '–') + ' · ' + (K.wort || '–') + '</b>' + (a && b ? ' — Investment ' + a.n + ', Finanzierung ' + b.n : '') + '. Modul 12 zeigt, wie es entsteht.');
       },
       async function (s) {   /* 10 · Investment-PDF */
         reiter('s8'); await warte(1300);
