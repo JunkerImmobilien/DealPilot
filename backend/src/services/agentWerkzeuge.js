@@ -3097,7 +3097,8 @@ async function felder_aendern(ctx, args) {
   }
 
   const neu = Object.assign({}, o.daten, geprueft);
-  await query(`UPDATE objects SET data = $3::jsonb, updated_at = now()
+  /* v3275 · Version hochzaehlen: ein offener Tab soll die Aenderung des Agenten nicht still ueberschreiben (409 statt Verlust) */
+  await query(`UPDATE objects SET data = $3::jsonb, updated_at = now(), version = version + 1
                 WHERE id = $1 AND user_id = $2`,
     [id, ctx.userId, JSON.stringify(neu)]);
   ctx.merkeObjekt(id);
