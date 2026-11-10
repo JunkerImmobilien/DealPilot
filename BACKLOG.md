@@ -36,6 +36,17 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N146 · v3279 auf Staging (10.11.2026) — Staging-Abnahme offen, dann Prod
+Gebaut und auf Staging ausgerollt (fe30f51d, 660a76c7): Miete je m² ohne Zuschläge (Mietentwicklung und DS2-Kennzahl Ist-/Marktmiete), Rückfrage bei abweichender Adresse (Datenaufnahme und Dokument-Einlesen), getrennter Score im Abschluss der geführten Eingabe, Beispiele zur Standardstufe, Infotexte Notar (GNotKG) und Kappungsgrenze. Nachgemessen: Buster v3279 geladen, 900 + 40 € auf 100 m² ergibt 9,00 €/m², Adressvergleich im Knoten getestet. **Noch nicht im Browser bedient:** die Rückfrage mit einem echten PDF fremder Adresse und der Abschluss der geführten Eingabe mit „Zwei Scores“. Danach Prod.
+- Offen dazu: Rechnungen (Beleg-Leser) lesen keine Objektanschrift, dort gibt es weiter keinen Abgleich.
+- Offen dazu: `tools/handbuch-erzeugen.mjs` ist rot (14 Belege in `tools/handbuch-ablaeufe.mjs` veraltet), das Handbuch trägt deshalb noch den alten Notar-Text.
+
+### N147 · Video Sachsenstraße 18 (Modul 07) neu: Miete unter Vergleichsmiete (10.11.2026)
+Marcel: Beispiel schlecht gewählt, die Miete lag über dem Mietspiegel und der Stellplatz zählte mit. Kaltmiete im Drehbuch unter 7,80 €/m² setzen (z. B. 700 €), damit die Erhöhungstreppe mit Kappungsgrenze zu sehen ist, Stellplatz erkennbar extra. Außerdem Modul 26 Wohnung 1 prüfen: die errechnete Mieterhöhung liegt unter der Bestandsmiete.
+
+### N148 · Demo-Objekte: 90 Felder in keinem der 54 Objekte gefüllt (10.11.2026, gemessen auf Staging)
+Unter anderem Inventar (inv_kueche, inv_stellplatz …), Sonderumlage weg_su, Kaufpreisraten kp2–kp4, Darlehen II und Bausparvertrag, § 7b, Mietspiegel ms_*, Zielbild zb_*, Mietvertrag mv_*, Eigentum eig_*, Gesellschafterdarlehen, Erbbaurecht, Sanierungsplan. Vorschlag: ein eigenes Prüfobjekt „Vollausstattung“ im Demo-Konto. Entscheidung Marcel offen (Storybook und Videos zählen 54 Objekte).
+
 ### N145 · Videothek auf die neuen Messe-Videos (10.11.2026) — **BLOCKIERT: Stimme**
 **BLOCKIERT:** Die Landing-Videothek spielt mit Ton Marcels Stimmklon (ElevenLabs, ~0,3 Credits je Zeile). Die 21 heute neu aufgenommenen Videos (Ü1, Ü2, 02, 03, 05–09, 10a–c, 11–15 ohne 04, 21, 24, 25, 26) haben nur onyx. Neu mit Marcels Stimme: **405 Zeilen, ~49.000 Zeichen, rund 120 Credits** – braucht Marcels Freigabe. Ohne sie passt die alte Sprecherspur nicht mehr zum neuen Bild.
 - Marcel entscheidet: (a) Marcels Stimme neu (Credits), (b) onyx-Fassungen nehmen, (c) neu nur stumm (`datei_ton` weg).
