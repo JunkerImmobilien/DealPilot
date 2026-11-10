@@ -2928,7 +2928,7 @@
         await zeige(function () { return zeileVon('optimiert'); }, 6);
         var zz = zeileVon('optimiert'), c = zz ? [].map.call(zz.children, function (x) { return r6Text(x); }) : [];
         var name = zz ? r6Text(zz.firstElementChild && zz.firstElementChild.firstElementChild) : '';
-        await b2oZeile(s, (name || 'Optimiert'), 'Gebäude <b>' + (c[1] || '–') + '</b>, AfA <b>' + (c[2] || '–') + '</b> im Jahr' + (c.length > 5 && /€/.test(c[3]) ? ', Steuer ' + c[3] + ' im Jahr' : '') + '. Die Abweichung von der Arbeitshilfe braucht eine Begründung.');
+        await b2oZeile(s, (name || 'Optimiert'), 'Gebäude <b>' + (c[1] || '–') + '</b>, AfA <b>' + (c[2] || '–') + '</b> im Jahr' + '. Die Abweichung von der Arbeitshilfe braucht eine Begründung.');
       },
       async function (s) {   /* 6 · Bodenabschlag: 20 % */
         var t = q('#bmf-boden-tab'); if (t) t.click();
