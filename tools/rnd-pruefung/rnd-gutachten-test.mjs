@@ -313,6 +313,45 @@ console.log('\n4 · DIE GESAMTNUTZUNGSDAUER IN DER PRAXIS\n');
   });
 }
 
+/* =====================================================================
+   5. Fliederstraße, Minden — MFH (26HOE03330, VALOREM, 10.11.2026)
+   =====================================================================
+   Gutachten eines nach DIN EN ISO/IEC 17024 zertifizierten Gutachters,
+   Baujahr 1980, Stichtag 16.10.2026, GND 80, 4 Modernisierungspunkte.
+   Es rechnet drei Wege und nimmt am Ende den MITTELWERT aus technisch
+   und wirtschaftlich (Kap. 5): (22 + 36) / 2 = 29 Jahre.
+       linear              34 Jahre
+       Punktraster (PRM)   36 Jahre (Koeffizienten gerundet 0,73/1,58/1,11)
+       technisch           22 Jahre (Bauteilanalyse mit Referenz-Lebensdauern)
+   Die technische Rechnung ist eine ANDERE Methode als unsere Gewerke-
+   Stufen. Abgebildet: Dach 2006 sowie Leitungen und Innenausbau 2011
+   (15 bis 20 Jahre zurück) als `standard`, alles andere `veraltet` -
+   das ergibt 22,39, also die 22 des Gutachtens. Diese Zuordnung ist
+   unsere Lesart, kein Wert aus dem Gutachten.
+   Bewusst NICHT angeglichen: Unser Leitwert lässt das technische Verfahren
+   führen (Regel aus Am Markt 18) und käme auf 22; dieses Gutachten mittelt
+   und kommt auf 29. Beide Regeln stehen in unterschriebenen Gutachten. */
+console.log('\n5 · FLIEDERSTRASSE, MINDEN — MFH   (26HOE03330)');
+console.log('    MFH, Baujahr 1980, Stichtag 16.10.2026, GND 80, 4 Punkte\n');
+{
+  const r = K.calcAll({
+    baujahr: 1980, stichtag: '2026-10-16', gnd: 80, modPoints: 4,
+    gewerkeBewertung: gew('veraltet', { dach: 'standard', leitungen: 'standard', decken: 'standard' })
+  });
+  pruef('Alter am Stichtag = 46 Jahre', r.input.alter === 46, r.input.alter);
+  pruef('linear = 34 Jahre wie im Gutachten', n2(r.methods.linear.restnutzungsdauer) === 34,
+        r.methods.linear.restnutzungsdauer);
+  pruef('Anlage 2 anwendbar (57,5 % über Schwelle 40 %)', r.methods.punktraster.anwendbar === true,
+        n2(r.methods.punktraster.relatives_alter_pct) + ' %');
+  pruef('Anlage 2 ergibt gerundet die 36 Jahre des Gutachtens',
+        Math.round(r.methods.punktraster.restnutzungsdauer) === 36, n2(r.methods.punktraster.restnutzungsdauer));
+  pruef('technisch gerundet 22 Jahre wie die Bauteilanalyse',
+        Math.round(r.methods.technisch.restnutzungsdauer) === 22, n2(r.methods.technisch.restnutzungsdauer));
+  pruef('Mittel aus technisch und Anlage 2 = 29 wie im Gutachten',
+        Math.round((Math.round(r.methods.technisch.restnutzungsdauer) + Math.round(r.methods.punktraster.restnutzungsdauer)) / 2) === 29,
+        'unser Leitwert: ' + S.leitwertAn(r, false).verfahren + ' ' + n2(S.leitwertAn(r, false).final_rnd));
+}
+
 console.log('\n' + (fehler
   ? 'FEHLER: ' + fehler
   : 'Unser Rechenkern liefert dieselben Zahlen wie die Gutachten.'));
