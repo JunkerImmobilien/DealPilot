@@ -3527,7 +3527,9 @@
       },
       async function (s) {   /* 8 · die Tafel */
         await zeige(function () { return q('#ai-content .abw-tafel'); }, 6);
-        var t = r6Inner(q('#ai-content .abw-tafel')), nk = /Nettokaltmiete\s+([\d.]+ €)\s+([\d.]+ €)/.exec(t), mq = /Miete je m²\s+([\d,]+ €\/m²)\s+([\d,]+ €\/m²)/.exec(t);
+        /* v3276 · die Tafel schreibt die Werte anders als bis v3264 - gelesen wird jetzt aus derselben Abweichungsrechnung wie in Szene 7 */
+        var a8 = null; try { a8 = DealPilotAnkauf.abweichung(); } catch (e) {}
+        var nz = a8 && a8.zeilen.filter(function (x) { return x.wort === 'Nettokaltmiete'; })[0], nk = nz && nz.ankauf != null && nz.bestand != null ? [null, eur(nz.ankauf), eur(nz.bestand)] : null, mq = null;
         await b2oZeile(s, 'Kennzahl für Kennzahl', 'Ertrag, Kosten, Finanzierung, Steuer, Ergebnis — z. B. Nettokaltmiete <b>' + (nk ? nk[1] + ' → ' + nk[2] : '–') + '</b>' + (mq ? ', je m² ' + mq[1] + ' → ' + mq[2] : '') + '. Was nicht vorlag, wird nicht geschätzt.');
       },
       async function (s) {   /* 9 · Entwicklung in der Pilot-Analyse */
