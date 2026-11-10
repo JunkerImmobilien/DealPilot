@@ -3695,9 +3695,10 @@
         await ue2PdfSeite(1);
         await b2oZeile(s, 'Deckblatt', 'Objekt, Kaufpreis, Eckdaten — in deiner Marke oder als neutrale Bankfassung.');
         await ue2PdfSeite(2);
-        await b2oZeile(s, 'Die Kennzahlen', 'Executive Summary: Rendite, Cashflow, DSCR, LTV — mit denselben Ampeln wie in der App.');
+        /* v3276 · gemessen: Seite 2 sind heute die Objektfotos, Seite 4 Objekt & Finanzierung */
+        await b2oZeile(s, 'Die Objektfotos', 'Gleich auf Seite 2: die Fotos des Objekts — die Bank sieht, was sie finanziert.');
         await ue2PdfSeite(4);
-        await b2oZeile(s, 'Der Cashflow in drei Phasen', 'Heute, am Ende der Zinsbindung und in der Anschlussfinanzierung — das will die Bank sehen.', 600);
+        await b2oZeile(s, 'Objekt und Finanzierung', 'Kaufpreis und Nebenkosten neben Darlehen, Zins, Rate, Restschuld und Anschluss — das will die Bank sehen.', 600);
       }
     ]
   };
