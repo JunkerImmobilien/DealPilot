@@ -3837,7 +3837,7 @@
            „Steuern in Gewinnjahren“ - die Zeile liest jetzt die drei Kacheln selbst (Titel, Wert, Zusatz), statt
            „Dauerhaft positiv ab“ zu erwarten. */
         var zz = [0, 1, 2].map(function (i) { return r27ZahlW(i, ch); }), kz = function (z, u) { return z.t ? z.t + ' <b>' + z.w + '</b>' + (u && z.u ? ' (' + z.u + ')' : '') : ''; };
-        var zt = zz[0].t ? kz(zz[0], true) + '. ' + [kz(zz[1], true), kz(zz[2], true)].filter(Boolean).join(', ') + '.' : 'Jahr für Jahr: Erstattung oder Nachzahlung allein durch dieses Objekt.';
+        var zt = zz[0].t ? kz(zz[0], true) + '. ' + [kz(zz[1]), kz(zz[2])].filter(Boolean).join(', ') + '.' : 'Jahr für Jahr: Erstattung oder Nachzahlung allein durch dieses Objekt.';
         await b2oZeile(s, 'Steuerverlauf', zt);
         var k = r15Diagramm();
         if (k) {
