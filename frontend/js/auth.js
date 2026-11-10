@@ -93,6 +93,17 @@ var Auth = (function() {
       error.code = (data && data.code) || null;   /* v2137 */
       throw error;
     }
+    /* v3275 · Versionsschutz (Marcel 10.11.2026: ein alter Tab überschrieb Westerfeld und
+       Ravensberger mit seinem veralteten Stand). Jede SCHREIBENDE Antwort dieses Tabs auf ein
+       Objekt merkt die neue Version - storage.js schickt sie beim nächsten PUT als expectedVersion.
+       GET merkt bewusst NICHT (nur loadSaved): ein GET eines Nebenwegs würde den Stand des Tabs
+       sonst als aktuell ausgeben, obwohl sein Formular alt ist. */
+    try {
+      var _vm = /^\/objects\/([0-9a-f-]{36})(\/steuer-snapshot)?(\?|$)/.exec(path);
+      if (_vm && fetchOpts.method !== 'GET' && data && typeof data.version === 'number') {
+        (window._dpObjVer = window._dpObjVer || {})[_vm[1]] = data.version;
+      }
+    } catch (e) {}
     return data;
   }
 

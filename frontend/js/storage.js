@@ -990,6 +990,28 @@ window.dpMarktdatenMerken = function (teil) {
   } catch (e) {}
 };
 
+/* v3275 · Marcel 10.11.2026: „nein ich war das nicht" - um 06:11 UTC überschrieb ein ALTER Tab
+   Westerfeldstr. 140 und Ravensberger Weg 38 auf Staging mit seinem Stand (weitere Darlehen,
+   Mietspiegel-Felder und Grundsteuerwert weg, Detailgrad 3 -> 1). Der Server kennt seit jeher
+   expectedVersion (objectService.update, 409 „Version conflict"), der Client schickte sie nie.
+   Jetzt: Version beim Laden und nach jedem eigenen Schreiben merken (auth.js), beim PUT mitschicken,
+   bei 409 nicht überschreiben, sondern ein Band mit „Neu laden" zeigen. */
+function _dpKonfliktZeigen(k) {
+  try {
+    if (document.getElementById('dp-konflikt-band')) return;
+    var b = document.createElement('div'); b.id = 'dp-konflikt-band'; b.setAttribute('role', 'alert');
+    b.style.cssText = 'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:100000;max-width:min(560px,calc(100vw - 32px));background:#FBF6E9;color:#2A2727;border:1px solid #B8625C;border-left:4px solid #B8625C;border-radius:8px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.18);font:400 13px/1.45 Inter,system-ui,sans-serif;display:flex;gap:12px;align-items:center;flex-wrap:wrap';
+    b.innerHTML = '<span style="flex:1 1 260px"><b>Nicht gespeichert.</b> Dieses Objekt wurde inzwischen in einem anderen Fenster oder auf einem anderen Gerät geändert. Damit nichts überschrieben wird, lade den aktuellen Stand neu.</span>'
+      + '<button type="button" class="btn-clean" style="border:1px solid #2A2727;background:#2A2727;color:#FDFCFA;border-radius:6px;padding:6px 12px;font:600 12px Inter,sans-serif;cursor:pointer">Neu laden</button>';
+    b.querySelector('button').addEventListener('click', function () {
+      try { if (window._dpObjKonflikt) delete window._dpObjKonflikt[k]; } catch (e) {}
+      try { localStorage.setItem('dp_konflikt_oeffnen', k); } catch (e) {}
+      location.reload();
+    });
+    document.body.appendChild(b);
+  } catch (e) {}
+}
+
 async function saveObj(opts) {
   opts = opts || {};
   /* v1268-kontext: Mit welchem Objekt hat dieser Save angefangen? Zwischen
@@ -1143,11 +1165,26 @@ async function saveObj(opts) {
     try {
       var saved;
       if (_currentObjKey) {
+        /* v3275 · Versionsschutz: ein Tab, der einen Konflikt hatte, schreibt dieses Objekt nicht
+           mehr, bis es neu geladen ist - sonst überschreibt sein alter Stand den neueren. */
+        if (window._dpObjKonflikt && window._dpObjKonflikt[_currentObjKey]) { _dpKonfliktZeigen(_currentObjKey); return; }
+        var _ev = window._dpObjVer && window._dpObjVer[_currentObjKey];
+        var _putBody = { data: data, aiAnalysis: aiText, photos: photos };
+        if (typeof _ev === 'number' && _ev > 0) _putBody.expectedVersion = _ev;
         // Update existing
-        saved = await Auth.apiCall('/objects/' + _currentObjKey, {
-          method: 'PUT',
-          body: { data: data, aiAnalysis: aiText, photos: photos }
-        });
+        try {
+          saved = await Auth.apiCall('/objects/' + _currentObjKey, {
+            method: 'PUT',
+            body: _putBody
+          });
+        } catch (_pe) {
+          if (_pe && _pe.status === 409 && /version/i.test(String(_pe.message || ''))) {
+            (window._dpObjKonflikt = window._dpObjKonflikt || {})[_currentObjKey] = true;
+            _dpKonfliktZeigen(_currentObjKey);
+            return;
+          }
+          throw _pe;
+        }
       } else {
         _newObjSaveInflight = true;  /* v828-inflight-guard: Neu-Anlage-POST startet */
         try {
@@ -1155,7 +1192,8 @@ async function saveObj(opts) {
             method: 'POST',
             body: { data: data, aiAnalysis: aiText, photos: photos }
           });
-          _currentObjKey = saved.id; window._dpEigeneAnlageKey = saved.id; _dpFireObjectReady(saved.id); /* v946 · v3198 */
+          _currentObjKey = saved.id; window._dpEigeneAnlageKey = saved.id;
+          try { if (saved && typeof saved.version === 'number') (window._dpObjVer = window._dpObjVer || {})[saved.id] = saved.version; } catch (e) {}   /* v3275 */ _dpFireObjectReady(saved.id); /* v946 · v3198 */
         } finally {
           _newObjSaveInflight = false;  /* v828-inflight-guard: POST fertig (ok oder Fehler) */
         }
@@ -2312,6 +2350,12 @@ async function loadSaved(k) {
       var obj = await Auth.apiCall('/objects/' + k);
       var d = obj.data || {};
       d._ai = obj.ai_analysis || '';
+      /* v3275 · Versionsschutz: der geladene Stand ist die Basis fürs nächste Speichern */
+      try {
+        if (typeof obj.version === 'number') (window._dpObjVer = window._dpObjVer || {})[k] = obj.version;
+        if (window._dpObjKonflikt) delete window._dpObjKonflikt[k];
+        var _kb = document.getElementById('dp-konflikt-band'); if (_kb) _kb.remove();
+      } catch (e) {}
       // Restore photos
       if (typeof imgs !== 'undefined' && obj.photos) {
         imgs = (obj.photos || []).map(function(src, i){ var _m = (Array.isArray(d._foto_meta) && d._foto_meta[i]) || {}; return { src: src, name: 'photo_' + i + '.jpg', rolle: _m.rolle || '', datum: _m.datum || '' }; /* v3217 · W-20 */ });
