@@ -96,6 +96,42 @@
     try { if (bereit && this === ls() && KEYS.indexOf(String(k)) >= 0) vorgemerkt(); } catch (e) {}
   };
 
+  /* ══ v3292 · VOM HUB ANGELEGT: ZUSAMMENFUEHREN STATT ERSETZEN ══════════
+     Der Makler-Hub (PUT /api/v1/flow/profil, services/flowProfil.js) kann browser_vorgaben fuer ein
+     Konto anlegen, das noch keine hat - dann steht dort NUR das Investmentprofil mit dem Flow-Block,
+     markiert mit `flow_angelegt: { felder }`. Der Zweig „Server gewinnt" unten haette mit
+     setzen(server) jeden lokalen Schluessel entfernt, der auf dem Server fehlt (Bewertungsvorlage,
+     DS-Gewichte, Anlegerprofil-Set), und das lokale Investmentprofil ersetzt.
+     Deshalb hier: die lokalen Vorgaben bleiben, vom Server kommen nur der Flow-Block und die Felder,
+     die der Hub gesetzt hat (felder). Danach wird der vollstaendige Satz hochgeschrieben - die Marke
+     faellt damit weg, und ab da gilt wieder „Server gewinnt". */
+  function _jp(t) { try { var o = JSON.parse(t); return (o && typeof o === 'object') ? o : null; } catch (e) { return null; } }
+  function zusammenfuehren(wert, lokal) {
+    var keys = (wert && wert.keys) || {};
+    var felder = (wert && wert.flow_angelegt && Array.isArray(wert.flow_angelegt.felder)) ? wert.flow_angelegt.felder : [];
+    var o = {};
+    KEYS.forEach(function (k) {
+      if (lokal && lokal[k] != null) o[k] = lokal[k];
+      else if (keys[k] != null) o[k] = keys[k];
+    });
+    var sIp = _jp(keys.dp_investment_profile) || {};
+    var lIp = lokal && lokal.dp_investment_profile != null ? _jp(lokal.dp_investment_profile) : null;
+    if (lIp) {
+      felder.forEach(function (f) { if (f in sIp) lIp[f] = sIp[f]; else delete lIp[f]; });
+      if (sIp.flow) lIp.flow = sIp.flow;
+      o.dp_investment_profile = JSON.stringify(lIp);
+    }
+    return o;
+  }
+  /* Der eigene Browserstand dieses Kontos: lokal, wenn er ihm gehoert, sonst seine Ablage (wie bei leerem Server). */
+  function eigenerStand(s, lokal, besitzer) {
+    if (!besitzer || besitzer === uid) return lokal;
+    try { _set.call(s, 'dp_vorgaben_ablage_' + besitzer, JSON.stringify(lokal)); } catch (e) {}
+    var ablage = s.getItem('dp_vorgaben_ablage_' + uid);
+    if (ablage == null) { ablage = s.getItem('dp_vorgaben_ablage_ohne'); if (ablage != null) _rem.call(s, 'dp_vorgaben_ablage_ohne'); }
+    return _jp(ablage || '{}') || {};
+  }
+
   function neuLaden() {
     try {
       var ss = window.sessionStorage;
@@ -119,6 +155,15 @@
       var lokal = stand();
       var besitzer = s.getItem(LS_NUTZER);
       var server = (r && r.wert && typeof r.wert === 'object' && r.wert.keys && typeof r.wert.keys === 'object') ? r.wert.keys : null;
+      if (server && r.wert.flow_angelegt) {   /* v3292 · vom Hub angelegt: zusammenfuehren */
+        var eigen0 = eigenerStand(s, lokal, besitzer);
+        var zus = zusammenfuehren(r.wert, eigen0);
+        _set.call(s, LS_NUTZER, uid);
+        bereit = true;
+        hoch(zus);
+        if (!gleich(zus, lokal)) { setzen(zus); neuLaden(); }
+        return;
+      }
       if (server) {
         /* Der bisherige Browserstand wird beiseitegelegt, bevor der Server ihn ersetzt -
            ohne bekannten Besitzer (erster Lauf nach v3024) unter „ohne": er gehört dann
@@ -151,7 +196,7 @@
     }).catch(function () { /* kein Server - der Browser rechnet wie bisher */ });
   }
 
-  window.DpVorgabenSync = { start: start, KEYS: KEYS, stand: stand };
+  window.DpVorgabenSync = { start: start, KEYS: KEYS, stand: stand, zusammenfuehren: zusammenfuehren /* v3292 */ };
   try { start(); } catch (e) {}
   /* Nach einer Anmeldung ohne Neuladen (Login-Fenster) kommt der Plan nach. */
   window.addEventListener('dp:plan-ready', function () { try { start(); } catch (e) {} });

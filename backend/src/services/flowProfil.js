@@ -165,7 +165,9 @@ function pruefen(body, altIp, altLage, von) {
   const jetzt = new Date().toISOString();
   const bekannt = ['investment', 'lage', 'ziele', 'alarme', 'freigaben'];
   Object.keys(b).forEach((k) => { if (bekannt.indexOf(k) < 0) fehler.push('unbekannter Block: ' + k); });
+  const ipFelder = [];   /* v3292 · welche Felder des Investmentprofils dieser Aufruf setzt (fuer flow_angelegt) */
   const setze = (ziel, k, roh, min, max, was) => {
+    if (ziel === ip) ipFelder.push(k);
     if (roh === null || roh === '') { delete ziel[k]; return; }
     const n = _zahl(roh);
     if (n == null || n < min || n > max) { fehler.push(was + ' muss eine Zahl von ' + min + ' bis ' + max + ' sein'); return; }
@@ -238,7 +240,7 @@ function pruefen(body, altIp, altLage, von) {
       if ('ziel_bmr' in e) setze(lage.klassen[k], 'ziel_bmr', e.ziel_bmr, 0.1, 30, 'lage.klassen.' + k + '.ziel_bmr');
     });
   }
-  return { ip: ip, lage: lage, fehler: fehler, lageGeaendert: b.lage !== undefined };
+  return { ip: ip, lage: lage, fehler: fehler, lageGeaendert: b.lage !== undefined, ipFelder: ipFelder };
 }
 
 /** PUT /flow/profil. Schreibt in browser_vorgaben (Investmentprofil) und lage_profil - keine dritte Ablage. */
@@ -251,10 +253,7 @@ async function setzen(userId, body, von) {
   const p = pruefen(body, altIp, altLage, von);
   if (p.fehler.length) return { ok: false, fehler: p.fehler };
   /* Den Blob so weiterschreiben, wie der Browser ihn kennt: keys bleiben, nur dp_investment_profile neu. */
-  const neuBv = Object.assign({}, bv || { nutzer: userId }, {
-    keys: Object.assign({}, (bv && bv.keys) || {}, { dp_investment_profile: JSON.stringify(p.ip) }),
-    stand: new Date().toISOString()
-  });
+  const neuBv = blobNeu(bv, p, userId);
   await query(
     `INSERT INTO user_settings (user_id, schluessel, wert, updated_at) VALUES ($1, 'browser_vorgaben', $2::jsonb, NOW())
      ON CONFLICT (user_id, schluessel) DO UPDATE SET wert = $2::jsonb, updated_at = NOW()`,
@@ -266,6 +265,26 @@ async function setzen(userId, body, von) {
       [userId, JSON.stringify(p.lage)]);
   }
   return { ok: true };
+}
+
+/**
+ * v3292 · blobNeu(bv, p, userId) — rein. Der neue browser_vorgaben-Blob nach einem PUT /flow/profil.
+ * Hat das Konto noch KEINEN Blob (oder einen, den der Hub angelegt hat und den der Browser noch nicht
+ * zusammengefuehrt hat), traegt er die Marke flow_angelegt { am, felder }. vorgaben-sync.js fuehrt dann
+ * beim ersten Laden zusammen, statt die lokalen Vorgaben zu ersetzen (Ursache: dort entfernt setzen(server)
+ * jeden lokalen Schluessel, der auf dem Server fehlt). Ein vom Browser geschriebener Blob hat keine Marke.
+ */
+function blobNeu(bv, p, userId) {
+  const neu = Object.assign({}, bv || { nutzer: userId }, {
+    keys: Object.assign({}, (bv && bv.keys) || {}, { dp_investment_profile: JSON.stringify(p.ip) }),
+    stand: new Date().toISOString()
+  });
+  if (!bv || bv.flow_angelegt) {
+    const alt = (bv && bv.flow_angelegt) || {};
+    const felder = Array.from(new Set((alt.felder || []).concat(p.ipFelder || [])));
+    neu.flow_angelegt = { am: alt.am || neu.stand, felder: felder };
+  }
+  return neu;
 }
 
 /**
@@ -289,5 +308,5 @@ function flowBewahren(neuWert, altWert) {
   } catch (e) { return neuWert; }
 }
 
-module.exports = { lesen, setzen, pruefen, ansicht, profilAus, flowTeile, flowBewahren,
+module.exports = { lesen, setzen, pruefen, ansicht, profilAus, flowTeile, flowBewahren, blobNeu,   /* v3292: blobNeu */
   PROFIL_NAME, IP_FELDER, ZIELE, STUFEN };

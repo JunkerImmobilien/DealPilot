@@ -312,7 +312,41 @@ const e4 = (name, ok, ist) => { e4n++; if (!ok) { e4Fehler++; console.log('  \x1
   e4('ohne Ziele: keine Liste, Zielpreis aus dem Kern', bOhne.ergebnis.quickcheck.ziele.length === 0 && bOhne.ergebnis.quickcheck.ziele_erfuellt === null
     && /Quick-Check|Kaufpreis erfuellt/.test(bOhne.ergebnis.quickcheck.zielpreis_grund || '') && bOhne.ergebnis.quickcheck.zielpreis === Math.round(bOhne.R.kp <= (bOhne.ergebnis.quickcheck.zielpreis) ? bOhne.R.kp : bOhne.ergebnis.quickcheck.zielpreis), bOhne.ergebnis.quickcheck.zielpreis_grund);
 }
-console.log('  E4 Profil und Ziele: ' + (e4n - e4Fehler) + ' von ' + e4n + ' gruen');
+/* ── E5 · Vom Hub angelegte Vorgaben verdraengen die des Browsers nicht (v3292) ───
+ * Ursache (vorgaben-sync.js, Zweig „Server gewinnt"): setzen(server) entfernt jeden lokalen
+ * Schluessel, der auf dem Server fehlt. Legt PUT /flow/profil den Blob neu an, traegt er die Marke
+ * flow_angelegt; der Browser fuehrt dann zusammen (DpVorgabenSync.zusammenfuehren - die ECHTE Datei). */
+{
+  const f = { console, JSON };
+  f.window = f; f.self = f;
+  f.Storage = function () {}; f.Storage.prototype = { setItem() {}, removeItem() {} };
+  f.addEventListener = () => {};
+  const ctxV = vm.createContext(f);
+  new vm.Script(fs.readFileSync(path.join(ROOT, 'frontend/js/vorgaben-sync.js'), 'utf8'), { filename: 'vorgaben-sync.js' }).runInContext(ctxV);
+  const VS = ctxV.DpVorgabenSync;
+  const p1 = flowProfil.pruefen({ ziele: { min_dscr: 1.3, max_faktor: 20 }, investment: { tilgung_default: 2 } }, {}, {}, 'api:k');
+  const blob = flowProfil.blobNeu(null, p1, 'u1');
+  e4('E5 neuer Blob traegt flow_angelegt mit den gesetzten Feldern', blob.flow_angelegt && blob.flow_angelegt.felder.indexOf('min_dscr') >= 0
+    && blob.flow_angelegt.felder.indexOf('tilgung_default') >= 0, blob.flow_angelegt);
+  const p2 = flowProfil.pruefen({ investment: { tilgung_default: null } }, p1.ip, {}, 'api:k');
+  const blob2 = flowProfil.blobNeu(blob, p2, 'u1');
+  e4('E5 zweiter PUT vor dem Browser: Marke bleibt, Felder vereinigt', blob2.flow_angelegt && blob2.flow_angelegt.am === blob.flow_angelegt.am
+    && blob2.flow_angelegt.felder.indexOf('min_dscr') >= 0, blob2.flow_angelegt);
+  const lokal = { dp_dealscore2_preset: 'conservative', dp_dealscore_weights: '{"cashflow":30}', dp_std_set: 'b',
+    dp_investment_profile: JSON.stringify({ tilgung_default: 1.5, min_dscr: 1.1, ai_risk: 'Konservativ', ek_quote_default: 20 }) };
+  const z = VS.zusammenfuehren(JSON.parse(JSON.stringify(blob2)), lokal);
+  const zip = JSON.parse(z.dp_investment_profile);
+  e4('E5 Browser-Vorlagen bleiben (Vorlage, Gewichte, Set)', z.dp_dealscore2_preset === 'conservative' && z.dp_dealscore_weights === lokal.dp_dealscore_weights && z.dp_std_set === 'b', z);
+  e4('E5 Investmentprofil: lokale Felder bleiben, Hub-Felder und Flow-Block kommen', zip.ai_risk === 'Konservativ' && zip.ek_quote_default === 20
+    && zip.min_dscr === 1.3 && !('tilgung_default' in zip) && zip.flow && zip.flow.ziele.max_faktor === 20, zip);
+  const zLeer = VS.zusammenfuehren(JSON.parse(JSON.stringify(blob2)), {});
+  e4('E5 neuer Browser ohne eigenen Stand: der Server-Stand', JSON.parse(zLeer.dp_investment_profile).min_dscr === 1.3 && Object.keys(zLeer).length === 1, zLeer);
+  const vomBrowser = { keys: { dp_dealscore2_preset: 'lage', dp_investment_profile: '{}' }, nutzer: 'u1', stand: 'x' };
+  e4('E5 Blob des Browsers bekommt keine Marke', !flowProfil.blobNeu(vomBrowser, p1, 'u1').flow_angelegt
+    && flowProfil.blobNeu(vomBrowser, p1, 'u1').keys.dp_dealscore2_preset === 'lage');
+}
+
+console.log('  E4/E5 Profil, Ziele, Zusammenfuehren: ' + (e4n - e4Fehler) + ' von ' + e4n + ' gruen');
 
 /* ── Basislinie ────────────────────────────────────────────────────────── */
 let rc = (e1Fehler || e4Fehler) ? 1 : 0;
