@@ -327,17 +327,19 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- ══ DEAL-CHECK ════════════════════════════════════════════════════
      landing-kern-2 · Marcel 11.11.2026: öffentlicher Mini-Deal-Check ohne Anmeldung.
      Rechnet mit den ECHTEN Kernen der App (DealKpis, Dscr, DealScore, ScoreTier) -
-     dp2-dealcheck.js bildet nur die Eingaben ab. Keine Übergabe in die App: dafür gibt
-     es dort noch keinen Weg (geprüft 11.11.2026), der Knopf führt in die Registrierung. -->
+     dp2-dealcheck.js bildet nur die Eingaben ab.
+     landing-kern-3 · der Knopf trägt die fünf Zahlen als Fragment (#dc=1&kp=…) in die App;
+     dort nimmt js/dealcheck-uebernahme.js sie an und legt nach der Anmeldung auf Nachfrage
+     ein Objekt an. Vorbelegung 150.000 € / 880 € (Begründung in dp2-dealcheck.js). -->
 <section class="sec sec-cream dealcheck" id="dealcheck"><div class="wrap">
   <div class="head ctr rv"><div class="eye ctr">Deal-Check · ohne Anmeldung</div>
     <h2>Rechnet sich das Objekt? <span class="ac">Prüf es jetzt.</span></h2>
     <p>Kaufpreis und Kaltmiete eintragen – DealPilot rechnet mit denselben Kernen wie in der App.</p></div>
   <div class="dc-g rv">
     <form class="dc-ein" onsubmit="return false" autocomplete="off">
-      <label><span>Kaufpreis</span><input id="dcKp" inputmode="decimal" value="200.000"><i>€</i></label>
-      <label><span>Nettokaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="1.100"><i>€</i></label>
-      <label><span>Eigenkapital</span><input id="dcEk" inputmode="decimal" placeholder="20.000"><i>€</i><small>leer = 10 % des Kaufpreises</small></label>
+      <label><span>Kaufpreis</span><input id="dcKp" inputmode="decimal" value="150.000"><i>€</i></label>
+      <label><span>Nettokaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="880"><i>€</i></label>
+      <label><span>Eigenkapital</span><input id="dcEk" inputmode="decimal" placeholder="15.000"><i>€</i><small>leer = 10 % des Kaufpreises</small></label>
       <label><span>Zins</span><input id="dcZins" inputmode="decimal" value="4,0"><i>%</i><small id="dcZinsHinweis">Sollzins, 10 Jahre</small></label>
       <label><span>Nebenkosten</span><input id="dcNk" inputmode="decimal" value="10"><i>%</i><small>Grunderwerbsteuer, Notar, Makler</small></label>
     </form>
@@ -353,8 +355,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <div><span>DSCR</span><b id="dcDscr">–</b></div>
       </div>
       <p class="dc-annahme" id="dcAnnahme"></p>
-      <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Ganz rechnen — 4 Wochen Pro kostenlos</a>
-      <p class="cta-haken dc-haken"><span>Keine Zahlungsdaten</span><span>Lage, Steuer, Wert und Bankunterlage in der App</span></p>
+      <a class="btn-p" id="dcLos" href="https://app.dealpilot.immo/?register=1">Ganz rechnen — 4 Wochen Pro kostenlos</a>
+      <p class="cta-haken dc-haken"><span>Deine Zahlen kommen mit</span><span>Keine Zahlungsdaten</span><span>Lage, Steuer, Wert und Bankunterlage in der App</span></p>
       <p class="dc-hinweis">Indikative Vorab-Rechnung, keine Finanzierungs- oder Steuerberatung.</p>
     </div>
   </div>
@@ -594,7 +596,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script>(function () {
   var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
-  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-kern-2']
+  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-kern-3']
     .forEach(function (s) { var e = document.createElement('script'); e.src = (s.indexOf('js/') === 0 ? app : '') + s; e.async = false; document.body.appendChild(e); });
 })();</script>
 <script src="dp2-live.js?v=landing-videothek-9"></script><!-- landing-videothek-1 -->

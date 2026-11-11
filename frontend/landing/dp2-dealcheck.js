@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   dp2-dealcheck.js · landing-kern-2 (11.11.2026)
+   dp2-dealcheck.js · landing-kern-2 (11.11.2026), landing-kern-3 (Vorbelegung, Übergabe)
    Der öffentliche Deal-Check auf der Startseite — ohne Anmeldung.
 
    Marcel 11.11.2026 (Runde 2): Mini-Deal-Check bauen, mit den ECHTEN Kernen.
@@ -20,6 +20,26 @@
    Der Zins kommt indikativ (10 Jahre, 80 % Beleihung) vom selben Endpunkt
    wie die Live-Marktzinsen, solange niemand ihn selbst einträgt.
    Ergebnis ist eine VORAB-Einstufung; der Text sagt das.
+
+   landing-kern-3 · VORBELEGUNG 150.000 € / 880 € (Marcel 11.11.2026: „ja alles
+   fertig machen" — freundlicheres, aber ehrliches Beispiel). Bisher 200.000 / 1.100
+   (Faktor 15,2): mit dem Live-Zins 4,10 % −20 €/Monat, 56 · Solide.
+   Jetzt: Bestands-ETW, 3 Zimmer, rund 75 m² in einer Mittelstadt mit günstigem
+   Einstieg (Ruhrgebiet, Südwestfalen, Teile Niedersachsens): 2.000 €/m², 11,70 €/m²
+   kalt — Faktor 14,2, Bruttorendite 7,0 %. Das ist der obere Rand dessen, was solche
+   Wohnungen heute bringen, keine Ausnahme. Mehr geht ehrlich nicht: bei Zins 4,1 %,
+   1,5 % Tilgung und Darlehen = Kaufpreis + Nebenkosten − 10 % EK kippt der Cashflow
+   ab Faktor ~14,8 ins Minus — wer teurer kauft, sieht hier zu Recht ein Minus.
+   Gemessen mit den echten Kernen in Node (11.11.2026):
+     Zins 3,6 %: CF +93 €, DSCR 1,15, 69 · Solide
+     Zins 4,1 %: CF +30 €, DSCR 1,04, 62 · Solide   (Live-Zins heute)
+     Zins 4,6 %: CF −32 €, DSCR 0,96, 53 · Solide
+   Eigenkapital und Nebenkosten wie bisher (10 % / 10 %).
+
+   landing-kern-3 · ÜBERGABE IN DIE APP: der Knopf #dcLos trägt die fünf Zahlen
+   als Fragment (#dc=1&kp=…&nkm=…&ek=…&zins=…&nk=…) — es geht an keinen Server,
+   personenbezogen ist nichts daran. Die App (js/dealcheck-uebernahme.js) nimmt es
+   an und bietet nach Registrierung oder Anmeldung an, ein Objekt anzulegen.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -79,6 +99,14 @@
     var ring = $('dcRing');
     ring.setAttribute('data-farbe', st.farbe);
     ring.style.setProperty('--dc-p', Math.max(0, Math.min(100, ds.score)));
+    /* landing-kern-3 · die Eingaben reisen mit dem Knopf (nur das Fragment ändern —
+       umgebung.js schreibt den Host um, das bleibt so erhalten) */
+    var los = $('dcLos');
+    if (los) {
+      var basis = String(los.getAttribute('href') || '').split('#')[0];
+      los.setAttribute('href', basis + '#dc=1&kp=' + Math.round(kp) + '&nkm=' + Math.round(nkm) + '&ek=' + Math.round(ek)
+        + '&zins=' + (Math.round(zins * 100) / 100) + '&nk=' + (Math.round(nkPct * 100) / 100));
+    }
     setze('dcAnnahme', 'Gerechnet mit ' + eur(ek) + ' Eigenkapital, ' + eur(nk) + ' Nebenkosten, Darlehen '
       + eur(darlehen) + ' zu ' + pct(zins) + ' und ' + pct(VORGABE.tilg) + ' Tilgung, nicht umlagefähigen Kosten von '
       + VORGABE.nul_pct + ' % der Kaltmiete.');

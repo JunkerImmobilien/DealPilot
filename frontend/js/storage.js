@@ -477,7 +477,8 @@ function collectData() {
     if (window._currentObjData._deal_won_at) d._deal_won_at = window._currentObjData._deal_won_at;
   }
   // Summary fields for backend indexing
-  d._name = [g('str'), g('hnr'), g('ort')].filter(Boolean).join(' ') || 'Unbenannt';
+  /* v3313 · ohne Adresse traegt das Kuerzel den Namen (Deal-Check vom TT.MM., dealcheck-uebernahme.js) */
+  d._name = [g('str'), g('hnr'), g('ort')].filter(Boolean).join(' ') || String(g('kuerzel') || '').trim() || 'Unbenannt';
   d._at = new Date().toISOString();
   d._v = '9.0';
   // Snapshot key KPIs for backend indexing
