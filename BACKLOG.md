@@ -43,7 +43,7 @@ Gebaut und auf Staging ausgerollt (fe30f51d, 660a76c7): Miete je m² ohne Zuschl
 
 ### N147 · Video Sachsenstraße 18 (Modul 07) neu: Miete unter Vergleichsmiete (10.11.2026)
 Marcel: Beispiel schlecht gewählt, die Miete lag über dem Mietspiegel und der Stellplatz zählte mit. Kaltmiete im Drehbuch unter 7,80 €/m² setzen (z. B. 700 €), damit die Erhöhungstreppe mit Kappungsgrenze zu sehen ist, Stellplatz erkennbar extra. Außerdem Modul 26 Wohnung 1 prüfen: die errechnete Mieterhöhung liegt unter der Bestandsmiete.
-- **Stand 11.11.2026 (v3281–v3281b, 2c1d9482):** Drehbuch auf 600 € umgebaut, Prüflauf sauber (Treppe, Kappung, verlangbar/wirksam ab). Aufnahme wartet auf Marcels Freigabe.
+- **Stand 11.11.2026 (v3281–v3281b, 2c1d9482):** Drehbuch auf 600 € umgebaut, Prüflauf sauber (Treppe, Kappung, verlangbar/wirksam ab). Aufgenommen 11.11.: stumm und onyx, 4:20, in Videoreihe/Modul 07; Stimme Marcel offen (N145).
 - Gefunden dabei: `calc.js` Z. 4164 „Aktuelle Miete pro m²“ zählt den Stellplatz weiter mit (Rest von v3279, App-Fehler, offen).
 - Modul 26 Wohnung 1: App-Logik, kein Drehbuchfehler – Bestand rechnet die untermarktliche Ist-Miete (6,00 €/m², Band ab 6,16) mit der marktüblichen 7,70 €/m², die Mieterhöhung mit der Soll-Miete 469 € ab Wirksamkeit → 106.000 statt 107.000 €. **Behoben 11.11.2026 in v3283 (`2ad90286`, nur Staging):** Marcel „nimm das, was richtig ist“ — ImmoWertA 31 c: Mindermiete je Wohnung als boG auch im Bestand, Anteil am Haus aus dem Ertragswert der Wohnung; jetzt ETW 105.000 / 106.000 €, Anteil 111.711 / 112.749 €. Offen: neuer Mitschnitt `zielbild26` und Neuaufnahme Video 26, Browser-Abnahme Detailansicht, Prod.
 
