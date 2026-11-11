@@ -489,9 +489,16 @@
   var MS_WAHL = { oben: 'oberer Spannenwert', mittel: 'Mittelwert', unten: 'unterer Spannenwert' };
   var MS_FOLGE = { oben: ['oben', 'mittel', 'unten'], mittel: ['mittel', 'unten', 'oben'], unten: ['unten', 'mittel', 'oben'] };
   var MS_EINGABE = 'Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)';
-  var MS_REGISTER = 'Mietspiegel der Gemeinde (DealPilot-Verzeichnis)';
+  var MS_REGISTER = 'Mietspiegel der Gemeinde';
+  /* v3302 · Marcel 11.11.2026 („Was ist das DealPilot-Verzeichnis? Gibt es keine Quelle?“): die Herkunft nennt den
+     Mietspiegel selbst (Dokument, Seite; sonst Gemeinde), nie ein internes Verzeichnis. */
+  function msRegHerkunft(R) {
+    var dok = String((R && R.dokument) || '').trim(), s = String((R && R.seite) || '').trim(), g = String((R && R.gemeinde) || '').trim();
+    if (dok) return dok + (s ? ', S. ' + s : '');
+    return g ? 'Mietspiegel ' + g : MS_REGISTER;
+  }
   var HW_MS = {
-    oben: 'oberer Spannenwert — trägt nur, wenn Ausstattung und Merkmale der Wohnung ihn rechtfertigen, sonst Mittelwert',
+    oben: 'der obere Spannenwert trägt nur, wenn Ausstattung und Merkmale der Wohnung ihn rechtfertigen, sonst Mittelwert',
     veraltet: 'veraltet — nur noch Indiz: der qualifizierte Mietspiegel ist älter als zwei Jahre, die Vermutungswirkung (§ 558d Abs. 2 und 3 BGB) entfällt',
     qualifiziert: 'qualifizierter Mietspiegel: nach oben abweichen nur mit Gutachten oder Vergleichswohnungen; die Mietspiegelwerte sind im Erhöhungsverlangen zu nennen (§ 558a Abs. 3 BGB)',
     einfach: 'einfacher Mietspiegel — mit drei Vergleichswohnungen absichern (§ 558a Abs. 2 Nr. 4 BGB)',
@@ -531,7 +538,7 @@
     var bis = art === 'qualifiziert' ? ((regBis && gleicherMs) ? regBis : (stand ? plusMonate(stand, 24) : null)) : null;
     return { art: art || 'einfach', unten: msZahl(Q, 'unten'), mittel: msZahl(Q, 'mittel'), oben: msZahl(Q, 'oben'),
       stand: stand, gueltig_bis: bis, url: String(Q.url || A.url || '').trim() || null,
-      herkunft: vonE ? MS_EINGABE : MS_REGISTER, quelle: vonE ? 'eingabe' : 'register', art_fehlt: !art };
+      herkunft: vonE ? MS_EINGABE : msRegHerkunft(R), quelle: vonE ? 'eingabe' : 'register', art_fehlt: !art };
   }
   /**
    * Der Wert, mit dem § 558 rechnet. wahl: 'oben' (Standard, Marcel 09.11.2026) | 'mittel' | 'unten'.

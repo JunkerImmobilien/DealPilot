@@ -15,7 +15,7 @@ export const VERZEICHNIS_DATEI = path.join(path.dirname(fileURLToPath(import.met
 
 /* Weg, wenn das Verzeichnis die Gemeinde nicht führt (§ 558c Abs. 4 Satz 2 BGB: Pflicht erst ab
    50.000 Einwohnern - das Verzeichnis führt alle Pflichtgemeinden). Ohne Portal- oder Quellennamen. */
-export const HINWEIS_OHNE_SATZ = 'Für diese Gemeinde führt das DealPilot-Verzeichnis keinen Mietspiegel. '
+export const HINWEIS_OHNE_SATZ = 'Für diese Gemeinde ist uns kein Mietspiegel bekannt. '
   + 'Pflicht ist ein Mietspiegel erst ab 50.000 Einwohnern (§ 558c Abs. 4 BGB); kleinere Gemeinden haben oft keinen. '
   + 'Ob es einen gibt, weiß die Stadt- oder Gemeindeverwaltung. Ohne Mietspiegel belegen drei Vergleichswohnungen '
   + 'oder ein Gutachten die Vergleichsmiete (§ 558a Abs. 2 BGB), auch der Mietspiegel einer vergleichbaren Gemeinde (§ 558a Abs. 4 BGB).';

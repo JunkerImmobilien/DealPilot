@@ -446,7 +446,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   wahr('K1 Herkunft „Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)“', msq.herkunft === 'Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)');
   let w = K.mietspiegelWert(msq, 'oben', H26);
   gleich('K2 Standard oben: 8,40, qualifiziert gültig', [w.qm, w.genutzt, w.qualifiziert, w.veraltet], [8.4, 'oben', true, false]);
-  wahr('K2 Hinweis oberer Spannenwert + § 558a Abs. 3', w.hinweise.some((h) => /oberer Spannenwert — trägt nur, wenn Ausstattung und Merkmale/.test(h) && /sonst Mittelwert/.test(h)) && w.hinweise.some((h) => /§ 558a Abs\. 3/.test(h) && /Gutachten oder Vergleichswohnungen/.test(h)));
+  wahr('K2 Hinweis oberer Spannenwert + § 558a Abs. 3', w.hinweise.some((h) => /obere Spannenwert trägt nur, wenn Ausstattung und Merkmale/.test(h) && /sonst Mittelwert/.test(h)) && w.hinweise.some((h) => /§ 558a Abs\. 3/.test(h) && /Gutachten oder Vergleichswohnungen/.test(h)));
   w = K.mietspiegelWert(msq, 'mittel', H26);
   gleich('K3 Schalter Mittelwert: 7,60, kein Oben-Hinweis', [w.qm, w.hinweise.some((h) => /oberer Spannenwert/.test(h))], [7.6, false]);
   gleich('K3 Schalter Unterwert: 6,80', K.mietspiegelWert(msq, 'unten', H26).qm, 6.8);

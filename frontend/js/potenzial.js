@@ -916,7 +916,8 @@
     var mw = null;
     if (reg && reg.werte_verfuegbar) {
       mw = msWerteFuer(wflW != null ? wflW : msObjektWfl());
-      if (mw && (mw.unten > 0 || mw.mittel > 0 || mw.oben > 0)) reg = Object.assign({}, reg, { unten: mw.unten, mittel: mw.mittel, oben: mw.oben });
+      if (mw && (mw.unten > 0 || mw.mittel > 0 || mw.oben > 0)) reg = Object.assign({}, reg, { unten: mw.unten, mittel: mw.mittel, oben: mw.oben,
+        dokument: mw.dokument || null, seite: mw.seite || null, gemeinde: mw.gemeinde || reg.gemeinde || null });   /* v3302: Quelle nennen */
     }
     var ms = K.mietspiegelAus(reg, { art: wert('ms_art'), unten: wert('ms_unten'), mittel: wert('ms_mittel'), oben: wert('ms_oben'),
       stand: wert('ms_stand'), url: wert('ms_url') });
