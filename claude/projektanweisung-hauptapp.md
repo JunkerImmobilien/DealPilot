@@ -44581,3 +44581,33 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `21ec8499`
 - **Nachweis:** `uk-wgfz-pruefen` RC 0 (115 Beispiele, ABLEITUNG 12/12), `wertermittlung-pruefen` RC 0 (Ebene C unverändert, friert CrossCheck-Eingaben ein — nicht neu eingefroren), `buster-ebenen` sauber. Häufigkeit (82 Staging-Berichte je Anschrift): Reiter „fehlt“ 6 → 1, Zonen mit WGFZ 8, Bericht `wgfz_objekt_fehlt` 7 (5 ETW, bleiben) → 1 Objekt neu umgerechnet. Staging (mb-Rebuild, Sicherung angesehen): Detmold Bismarckstr. 27 Bodenwert 476.000 → 371.566 €, Ertragswert 900.000 → 865.000 €.
 - **Rest:** Browser-Abnahme Reiter Objekt; Prod; Entscheidung Marcel zur ETW über MEA (Bremer Formel).
+
+### Demo-Konto Staging → Prod: VOLL-A/B angelegt, Rest zurückgestellt (11.11.2026)
+- **Auftrag:** Marcel: „ja, Demo-Objekte auch auf Prod“. Demo-Konto info@, Prod 1.0.101 (v3294).
+- **Was:**
+  - **Neu auf Prod:** VOLL-A 2026-1157 (`e3f18694`) und VOLL-B 2026-1158 (`d2168c6b`), per SQL in einer Transaktion (`jsonb_populate_record`, `user_id` Prod, gleiche id). Vorher geprüft: id, Nummer und Kürzel frei. Vor dem COMMIT `md5(data)` gegen Staging geprüft.
+  - **Keine Aktualisierung.** 17 der 19 gemeinsamen Objekte hat Prod seit dem Spiegel vom 28.10. selbst gespeichert: Neuabruf 29.10., Prod-Schleife Soll-Miete/Marktdaten 04.11., Westerfeld und Hölderlin am 09.11. um 15:14 UTC. Geändert sind dort nur Rechenfelder (`_potenzial`, `_marktdaten`, `_soll_einheiten`, Kennzahlen, Scores), keine Eingabe.
+  - 2026-004 Bäckerstr. 7 und 2026-1002 sind auf Prod unverändert. Trotzdem zurückgestellt: der Staging-Stand von Bäckerstr. 7 kippt den Deal Score von 56 SOLIDE auf 27 KRITISCH und ist mit der Staging-Gewichtung entstanden.
+  - Nichts gelöscht, kein Marktbericht gespiegelt. Liste: `Dateien/Messe/Demo-Konto-Stand-2026-11-11.md`.
+- **Befund Gewichtung:**
+  - Prod `browser_vorgaben`: Lage-Fokus (`lage`, 20/22/14/14/30, Stand 29.10.).
+  - Staging: `balanced` + `dp_dealscore_eigen=1` + Gewichte 35/15/20/20/10, also die Werte von „Vorsichtig“ als eigene Regler (Stand 09.11. 11:41 UTC).
+  - Das erklärt „Vorsichtig 20 von 24“. Woher der Wechsel kam, ist nicht gefunden. Nicht geändert.
+- **Feld-Diff:**
+  - Bezug ist die Objekttabelle der Prod-Sicherung `haupt-20261028-2042`. Sie wurde in einen Wegwerf-Postgres ohne Netz auf dem Prod-Host geladen und danach entfernt.
+  - Auf Staging fehlt kein Feld, das Prod hat. Die Einsteiger-Verluste vom 10.11. sind behoben.
+  - Staging-Eingaben ändern die Geschichte bei Parkstr. 9 (Wert 453.000 Indikation, Lagen), Bismarckstr. 27 (725.000) und Westerfeldstr. 140 (EK, Leerstand 10, `mietausfall` 3942?, Sanierung, KfW).
+- **Sicherungen (angesehen):**
+  - Prod `/root/backups/haupt-20261111-0859-vor-demo-spiegel.sql.gz` (22 MB, 82 COPY, dump complete).
+  - Prod `mb-20261111-0859-vor-demo-spiegel.sql.gz` (31 MB, 49 COPY).
+  - Zeilenabzüge `demo-objekte-prod-20261111-0859-vor-spiegel.json.gz` (21) und Staging `demo-objekte-staging-20261111-0859-vor-prod-spiegel.json.gz` (56), dazu die `demo-settings-*` beider Server.
+- **Nachweis:**
+  - Prod-Inventar vorher = nachher für alle 21 alten Objekte.
+  - VOLL-A/B `md5(data)` 3d34813f… / bc3e7a8d… auf beiden Servern gleich.
+  - Prod-API mit Kurz-Token: Liste 200 mit 23 Objekten, beide Objekte 200 (347/346 Felder). Halter `mmv7q18g379` steht in der Prod-Mandantenliste.
+- **Rest (Marcel):**
+  - Gewichtung der Demo festlegen. Danach Staging einmal neu speichern und spiegeln. Damit fielen die Prod-Neuabrufe vom 29.10. und 04.11. weg.
+  - Lindenallee 14: Prod 2026-1123 gegen die Staging-Kopien.
+  - Speicherung auf Prod am 09.11. um 15:14 UTC klären.
+  - VOLL-A/B tragen Staging-Scores (DS 25/23). Auf Prod erst B öffnen oder neu laden (Tilgung-Falle, siehe Kopf von `tools/demo-vollausstattung.mjs`).
+  - Die nächste Prod-Objektnummer ist 2026-1159.
