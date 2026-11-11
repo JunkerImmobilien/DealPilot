@@ -1138,36 +1138,38 @@
 
     /* ── Ertragsrechnung ─────────────────────────────────────── */
     if (KURZ) neueSeite('Ertrag und Cashflow', (adr || 'Objekt') + ' · Kurzfassung');
+    /* v3314a · N157: im Bestand ist das laufende Jahr die Zeile des Steuerjahres (calc.js State.kpis.heute) */
+    var KH = (typeof window._dpKpisHeute === 'function') ? window._dpKpisHeute(K) : K;
     platz(46, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
     abschnitt('Von der Warmmiete zum Cashflow');
     /* v2484 · EINE Warmmiete in beiden PDFs und der App: Nettokaltmiete +
        Nebenkostenvorauszahlungen der Mieter (calc.js warm_j). Zusatzeinnahmen
-       (Stellplatz, Garage) stehen getrennt. Hier stand K.wm_j = NKM + ZE + Umlagen
+       (Stellplatz, Garage) stehen getrennt. Hier stand KH.wm_j = NKM + ZE + Umlagen
        (Westerfeld 41.147 €), im Investment-PDF NKM + ZE + umlagefaehige Kosten
        (39.756 €). Die Kette endet unveraendert bei der Kaltmiete inkl. Zuschlaege. */
-    var _warm = da(K.warm_j) !== null ? K.warm_j : null;
+    var _warm = da(KH.warm_j) !== null ? KH.warm_j : null;
     zeile('Warmmiete / Jahr (NKM + NK-Vorauszahlungen)', eur(_warm));
-    /* v2273 · hier stand „abzüglich umlagefähiger Bewirtschaftung“ (K.bwk_ul) - die Kette ging
+    /* v2273 · hier stand „abzüglich umlagefähiger Bewirtschaftung“ (KH.bwk_ul) - die Kette ging
        nicht auf: Westerfeldstr. 140 Warmmiete 41.147 − 336 ≠ Kaltmiete 39.420. Die Warmmiete
        enthält die Umlagen der Mieter (calc.js wm_m = nkm + ze + uf), abgezogen werden also
        diese; die umlagefähigen Kosten stehen weiter unten im Block Bewirtschaftung. */
-    zeile('abzüglich NK-Vorauszahlungen der Mieter', da(K.nk_vz_j) === null ? '-' : '- ' + eur(K.nk_vz_j), { einzug: true });
-    zeile('Nettokaltmiete / Jahr', eur(K.nkm_netto_j));
-    if (da(K.ze_j) && K.ze_j > 0) zeile('zuzüglich Zusatzeinnahmen (Stellplatz, Garage)', '+ ' + eur(K.ze_j), { einzug: true });
-    zeile('Kaltmiete inkl. Zusatzeinnahmen / Jahr', eur(K.nkm_j), { fett: true });
-    zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '-' : '- ' + eur(K.bwk_cf), { einzug: true });
-    zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '-' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
-    zeile('abzüglich Zinsen', da(K.zins_j) === null ? '-' : '- ' + eur(K.zins_j), { einzug: true });
-    if (da(K.bspar_j) && K.bspar_j > 0) zeile('abzüglich Bausparrate', '- ' + eur(K.bspar_j), { einzug: true });
-    zeile('abzüglich Tilgung', da(K.tilg_j) === null ? '-' : '- ' + eur(K.tilg_j), { einzug: true });
-    zeile('Cashflow vor Steuern / Jahr', eur(K.cf_op), { summe: true });
+    zeile('abzüglich NK-Vorauszahlungen der Mieter', da(KH.nk_vz_j) === null ? '-' : '- ' + eur(KH.nk_vz_j), { einzug: true });
+    zeile('Nettokaltmiete / Jahr', eur(KH.nkm_netto_j));
+    if (da(KH.ze_j) && KH.ze_j > 0) zeile('zuzüglich Zusatzeinnahmen (Stellplatz, Garage)', '+ ' + eur(KH.ze_j), { einzug: true });
+    zeile('Kaltmiete inkl. Zusatzeinnahmen / Jahr', eur(KH.nkm_j), { fett: true });
+    zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(KH.bwk_cf) === null ? '-' : '- ' + eur(KH.bwk_cf), { einzug: true });
+    zeile('Betriebsergebnis (NOI)', da(KH.nkm_j) === null ? '-' : eur(KH.nkm_j - (KH.bwk_cf || 0)), { fett: true });
+    zeile('abzüglich Zinsen', da(KH.zins_j) === null ? '-' : '- ' + eur(KH.zins_j), { einzug: true });
+    if (da(KH.bspar_j) && KH.bspar_j > 0) zeile('abzüglich Bausparrate', '- ' + eur(KH.bspar_j), { einzug: true });
+    zeile('abzüglich Tilgung', da(KH.tilg_j) === null ? '-' : '- ' + eur(KH.tilg_j), { einzug: true });
+    zeile('Cashflow vor Steuern / Jahr', eur(KH.cf_op), { summe: true });
     /* v2461 · Steuer als Differenz der beiden Cashflows (wie die App, calc.js
-       V352): K.steuer ist das anteilige erste Jahr, die Cashflows sind Volljahre -
+       V352): KH.steuer ist das anteilige erste Jahr, die Cashflows sind Volljahre -
        gemessen stand „+ 771 €" zwischen zwei gleichen Cashflows von 8.119 €. */
-    var _stH = (da(K.cf_op) === null || da(K.cf_ns) === null) ? null : K.cf_ns - K.cf_op;
-    zeile('Steuern (Belastung -, Erstattung +)' + (K.steuerjahr ? ' ' + K.steuerjahr + (K.steuerjahr_art === 'laufend' ? ', laufendes Jahr' : ', Kaufjahr') : ''), _stH === null   /* v3314 · N157 */ ? '-' : (_stH > 0.5 ? '+ ' : (_stH < -0.5 ? '- ' : '')) + eur(Math.abs(_stH)), { einzug: true });
-    zeile('Cashflow nach Steuern / Jahr', eur(K.cf_ns), { summe: true });
-    zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '-' : eur(K.cf_ns / 12, 2), { fett: true });
+    var _stH = (da(KH.cf_op) === null || da(KH.cf_ns) === null) ? null : KH.cf_ns - KH.cf_op;
+    zeile('Steuern (Belastung -, Erstattung +)' + (KH.steuerjahr ? ' ' + KH.steuerjahr + (KH.steuerjahr_art === 'laufend' ? ', laufendes Jahr' : ', Kaufjahr') : ''), _stH === null   /* v3314 · N157 */ ? '-' : (_stH > 0.5 ? '+ ' : (_stH < -0.5 ? '- ' : '')) + eur(Math.abs(_stH)), { einzug: true });
+    zeile('Cashflow nach Steuern / Jahr', eur(KH.cf_ns), { summe: true });
+    zeile('Cashflow nach Steuern / Monat', da(KH.cf_ns) === null ? '-' : eur(KH.cf_ns / 12, 2), { fett: true });
     y += 2;
 
     if (!KURZ) {   /* v2900 · Kurzfassung ohne Bewirtschaftung im Einzelnen */
@@ -1240,21 +1242,22 @@
       einleitung(_j1 + ' · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung mit dem angenommenen Zins.');
       function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
       function stD(vor, nach) { if (da(vor) === null || da(nach) === null) return '-'; var d = nach - vor; return (d > 0.5 ? '+ ' : (d < -0.5 ? '- ' : '')) + eur(Math.abs(d)); }
+      var _KH2 = (typeof window._dpKpisHeute === 'function') ? window._dpKpisHeute(K) : K;   /* v3314a · N157 */
       tabelle(
         [['', 46], [_j1, 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
         [
           /* v2461 · Kaltmiete statt Warmmiete: nur so geht die Spalte bis zum
              Cashflow auf (die Umlagen laufen durch). */
-          ph('Kaltmiete / Jahr', eur(K.nkm_j), eur(K.nkm_ezb), eur(K.nkm_an)),
-          ph('Bewirtschaftung (nicht umlagef.)', eur(K.bwk_cf), eur(K.bwk_cf_ezb), eur(K.bwk_cf_an)),
-          ph('Zinsen', eur(K.zins_j), eur(K.zins_ezb), eur(K.zins_an)),
-          ph('Tilgung', eur(K.tilg_j), eur(K.tilg_ezb), eur(K.tilg_an))
+          ph('Kaltmiete / Jahr', eur(_KH2.nkm_j), eur(K.nkm_ezb), eur(K.nkm_an)),
+          ph('Bewirtschaftung (nicht umlagef.)', eur(_KH2.bwk_cf), eur(K.bwk_cf_ezb), eur(K.bwk_cf_an)),
+          ph('Zinsen', eur(_KH2.zins_j), eur(K.zins_ezb), eur(K.zins_an)),
+          ph('Tilgung', eur(_KH2.tilg_j), eur(K.tilg_ezb), eur(K.tilg_an))
         ].concat(
           /* v3029-pdf · calc.js zieht in cf_op / cf_op_ezb / cf_op_an auch die Bausparrate ab
              (bspar_y, bspar_y_ezb, bspar_y_an) - die Zeile fehlte, die Spalte ging bei
              Tilgungsaussetzung nicht auf. Nur, wenn in einer Phase eine Rate laeuft. */
-          ((K.bspar_j || 0) > 0.5 || (K.bspar_ezb || 0) > 0.5 || (K.bspar_an || 0) > 0.5)
-            ? [ph('Bausparrate', eur(K.bspar_j || 0), eur(K.bspar_ezb || 0), eur(K.bspar_an || 0))] : []
+          ((_KH2.bspar_j || 0) > 0.5 || (K.bspar_ezb || 0) > 0.5 || (K.bspar_an || 0) > 0.5)
+            ? [ph('Bausparrate', eur(_KH2.bspar_j || 0), eur(K.bspar_ezb || 0), eur(K.bspar_an || 0))] : []
         ).concat([
           { werte: ['Cashflow vor Steuern', eur(K.cf_op), eur(K.cf_op_ezb), eur(K.cf_op_an)], fett: true },
           ph('Steuern (Belastung -, Erstattung +)', stD(K.cf_op, K.cf_ns), stD(K.cf_op_ezb, K.cf_ns_ezb), stD(K.cf_op_an, K.cf_ns_an)),

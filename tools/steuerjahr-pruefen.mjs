@@ -129,5 +129,32 @@ ok(/addEventListener\('dp:steuer-grundlagen'/.test(calc), 'C calc.js rechnet nac
 ok(/DpSteuerGrundlagen\.warten\(\)/.test(storage), 'C storage.js saveObj wartet');
 ok(/_stVorl && _altO\._kpis_cf_ns != null && !_altO\._steuer_vorlaeufig/.test(storage), 'C storage.js laesst _kpis_cf_ns stehen');
 
+/* ── D (v3314a) · im Bestand kommt der GANZE Heute-Wert aus dem Steuerjahr ───────────
+   Koordination 11.11.2026: Steuer 2026 mit Erhaltung 2025 ist widerspruechlich. Gemessen
+   an der Westerfeldstr.: Erhaltung 10.000 nur 2025, 2026 keine. */
+ok(/State\.kpis\.steuerjahr_art === 'laufend'[\s\S]{0,120}State\.kpis\.steuerjahr - State\.cfRows\[0\]\.cal/.test(calc), 'D Zeile des Steuerjahres = Steuerjahr - erstes Kalenderjahr');
+ok(/var _hR = \(_hIdx >= 1\) \? State\.cfRows\[_hIdx\] : null;/.test(calc), 'D nur ab dem zweiten Jahr (Kaufjahr bleibt eingeschwungen)');
+ok(/State\.kpis\.cf_op = _hR\.cfop_y;\s*State\.kpis\.cf_ns = _hR\.cfns_y;/.test(calc), 'D CF v. St. und CF n. St. aus derselben Zeile');
+ok(/if\(mode === 'heute' && K\.heute\)/.test(calc), 'D Cashflow-Box heute liest State.kpis.heute');
+ok(/if \(K\.heute\) \{\s*nowVals\.wm = K\.heute\.nkm/.test(calc), 'D Phasentabelle Spalte heute geht in sich auf');
+ok(/_dpKpisHeute\(K\)/.test(js('pdf-investment-bank.js')) && /_dpKpisHeute\(K\)/.test(js('dp-dokumente.js')), 'D Bank-PDF und Dokumente nehmen den Heute-Wert');
+{
+  /* _dpKpisHeute an der echten Funktion: Kette Kaltmiete - BWK - Zins - Tilgung - Bauspar = CF v. St. */
+  const m = calc.match(/window\._dpKpisHeute = function \(K\) \{[\s\S]*?\n\};/);
+  ok(!!m, 'D _dpKpisHeute gefunden');
+  if (m) {
+    const c = { window: {}, Object };
+    vm.createContext(c); vm.runInContext(m[0], c);
+    const f = c.window._dpKpisHeute;
+    const K = { nkm_j: 39000, bwk_cf: 10000, zins_j: 19000, tilg_j: 6000, cf_op: 4000, cf_ns: 7000, ze_j: 600, nk_vz_j: 1700, bmy: 7.3,
+      heute: { nkm: 39420, bwk: 11000, bwk_cf: 10824, zins: 18897, tilg: 6100, bspar: 0, cf_op: 3599, steuer: -1500, cf_ns: 5099, afa: 12481, zve: -2781 } };
+    const h = f(K);
+    ok(h.nkm_j - h.bwk_cf - h.zins_j - h.tilg_j - h.bspar_j === h.cf_op, 'D Kette geht auf: ' + (h.nkm_j - h.bwk_cf - h.zins_j - h.tilg_j) + ' = ' + h.cf_op);
+    ok(h.cf_op - K.heute.steuer === h.cf_ns, 'D CF n. St. = CF v. St. - Steuer im selben Jahr');
+    ok(h.bmy === 7.3 && K.nkm_j === 39000, 'D Kennzahlen und Original unveraendert');
+    ok(f({ nkm_j: 1 }).nkm_j === 1, 'D ohne heute (Ankauf) unveraendert');
+  }
+}
+
 console.log(`steuerjahr-pruefen: ${gruen} gruen, ${rot} rot`);
 process.exit(rot ? 1 : 0);

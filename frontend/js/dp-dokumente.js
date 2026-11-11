@@ -279,6 +279,7 @@
       ['Persönlicher Grenzsteuersatz', B.pct(zahlAus('grenz'), 2)]]) + '</div>';
   }
   function phasenVoll(K, B) {
+    K = (typeof window._dpKpisHeute === 'function') ? window._dpKpisHeute(K) : K;   /* v3314a · N157: Spalte heute = Steuerjahr */
     var S = St(), j1 = typeof window._dpPdfJahr1 === 'function' ? window._dpPdfJahr1(false) : 'Jahr 1', bindj = zahlAus('d1_bindj');
     var kopf = ['', j1, 'Ende Zinsbindung', 'Anschluss'];
     var stD = function (v, n) { return (da(v) === null || da(n) === null) ? null : B.eurS(n - v); };

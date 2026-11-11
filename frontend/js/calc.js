@@ -3912,6 +3912,31 @@ function _calcImmediate(){
         State.kpis.steuer = State.cfRows[0].tax_y;   // Y1-Steuer (anteilig) — für Steuerverlauf/-modul
         State.kpis.cf_ns  = _v351_cfns_full;          // Volljahr statt cfRows[0].cfns_y
         State.kpis.cf_m   = _v351_cfm_full;           // Volljahr statt cfRows[0].cfop_y/12
+        /* v3314a · N157 · IM BESTAND KOMMT DER GANZE HEUTE-WERT AUS DEM STEUERJAHR.
+           Koordination 11.11.2026: „Steuer 2026 mit Erhaltung 2025 ist in sich widerspruechlich."
+           Bis v3314 rechnete heute die Steuer 2026 auf das Ergebnis des ERSTEN Jahres
+           (Westerfeldstr.: Erhaltung 10.000 aus 2025, Konstanz 38.000). Jetzt: ist das Steuerjahr
+           ein spaeteres Jahr als das Kaufjahr (Bestand), sind Miete, Bewirtschaftung, Zins,
+           Tilgung, Einmalkosten, AfA, Steuer und beide Cashflows die Zeile DIESES Jahres der
+           Projektion (volles Jahr, Steuer aus _computeYearTotal mit zvE und Saldo des Jahres).
+           CF n. St. = CF v. St. - Steuer bleibt damit im selben Jahr. Ankauf (Kaufjahr) wie bisher:
+           das eingeschwungene volle erste Jahr. Projektion und Phasen EZB/Anschluss unberuehrt. */
+        State.kpis.heute = null;
+        var _hIdx = (State.kpis.steuerjahr_art === 'laufend' && State.cfRows[0] && State.kpis.steuerjahr)
+          ? (State.kpis.steuerjahr - State.cfRows[0].cal) : 0;
+        var _hR = (_hIdx >= 1) ? State.cfRows[_hIdx] : null;
+        if (_hR && isFinite(_hR.cfop_y) && isFinite(_hR.cfns_y)) {
+          State.kpis.heute = { jahr: _hR.cal, idx: _hIdx, nkm: _hR.nkm_y, bwk: _hR.bwk_y, bwk_cf: _hR.bwk_cf_y,
+            zins: _hR.zy, tilg: _hR.ty, bspar: _hR.bspar_y || 0, su: _hR.su_y || 0, cf_op: _hR.cfop_y,
+            steuer: _hR.tax_y, cf_ns: _hR.cfns_y, afa: _hR.afa_y, zve: _hR.zve_y };
+          State.kpis.cf_op = _hR.cfop_y;
+          State.kpis.cf_ns = _hR.cfns_y;
+          State.kpis.cf_m  = _hR.cfop_y / 12;
+          try {
+            st('steuer_j', fE(-_hR.tax_y, 0) + (_hR.tax_y < 0 ? ' (Erstattung)' : ' (Belastung)'));
+            st('sc-today', fE(_hR.cfns_y, 0, true));
+          } catch (_eH) {}
+        }
       }
 
       // (3) State.kpis.ster_ezb (Year bindj) für CF-Vergleich-Ende-Zinsbindung
@@ -4373,7 +4398,16 @@ function renderCFCalc(mode){
     ref.parentNode.insertBefore(z1, ref); ref.parentNode.insertBefore(z2, ref);
   }
   var data;
-  if(mode === 'heute'){
+  if(mode === 'heute' && K.heute){
+    /* v3314a · N157: Bestand - die Zeile des Steuerjahres (siehe State.kpis.heute) */
+    var _KH = K.heute, _wmFakH = (K.nkm_j > 0 && K.wm_j) ? K.wm_j / K.nkm_j : 1;
+    data = {
+      wm: _KH.nkm * _wmFakH, bwk: _KH.bwk, nkm: _KH.nkm, bwk_cf: _KH.bwk_cf,
+      zins: _KH.zins, tilg: _KH.tilg,   /* Bausparrate setzt der Block unten selbst */
+      cf_op: _KH.cf_op, steuer: _KH.steuer, cf_ns: _KH.cf_ns, cf_m: _KH.cf_ns/12,
+      afa: _KH.afa, zve: _KH.zve
+    };
+  } else if(mode === 'heute'){
     data = {
       wm: K.wm_j, bwk: K.bwk, nkm: K.nkm_j, bwk_cf: K.bwk_cf,
       zins: K.zins_j, tilg: K.tilg_j,
@@ -4950,6 +4984,14 @@ function renderPhaseTable() {
     // V63.67: Heute-Wert ist wert_basis (Verkehrswert / Bankbewertung / Kaufpreis)
     rs: K.d1, wert: wert_basis_ph, eq: wert_basis_ph - K.d1
   };
+  /* v3314a · N157: im Bestand ist „heute" das Steuerjahr - Spalte muss in sich aufgehen
+     (Miete - BWK - Zins - Tilgung = CF v. St., CF n. St. = CF v. St. - Steuer). Kennzahlen
+     (Renditen, DSCR, LTV) bleiben die des eingeschwungenen ersten Jahres. */
+  if (K.heute) {
+    nowVals.wm = K.heute.nkm; nowVals.bwk = K.heute.bwk_cf; nowVals.zins = K.heute.zins;
+    nowVals.tilg = K.heute.tilg;
+    nowVals.cfvst = K.heute.cf_op; nowVals.ster = K.heute.steuer; nowVals.cfns = K.heute.cf_ns;
+  }
 
   // V63.57: BSV-Sparrate je Phase als wirtschaftlicher Tilgungsersatz im DSCR
   var _bspY = (K.bspar_j || 0);          // Heute: BSV läuft
@@ -5233,6 +5275,17 @@ function updateAllValues() {
 // Expose globally
 window.updateAllValues = updateAllValues;
 window.calcNow = calcNow;
+/* v3314a · N157 · Kennzahlen mit dem Heute-Wert des Steuerjahres (nur Kopie, fuer die Spalte
+   „heute"/„laufendes Jahr" der PDFs). Ohne State.kpis.heute (Ankauf) unveraendert. */
+window._dpKpisHeute = function (K) {
+  if (!K || !K.heute) return K;
+  var c = {}; Object.keys(K).forEach(function (k) { c[k] = K[k]; });
+  var h = K.heute;
+  c.nkm_j = h.nkm; c.bwk_cf = h.bwk_cf; c.zins_j = h.zins; c.tilg_j = h.tilg; c.bspar_j = h.bspar || 0;
+  c.nkm_netto_j = h.nkm - (K.ze_j || 0); c.warm_j = c.nkm_netto_j + (K.nk_vz_j || 0);
+  c.afa = h.afa; c.zve_immo = h.zve; c.cf_op = h.cf_op; c.cf_ns = h.cf_ns;
+  return c;
+};
 /* v3314 · N157 · Steuerzeitraeume und Snapshots sind da (oder endgueltig gescheitert):
    die Steuer neu rechnen, damit keine vorlaeufige Zahl stehen bleibt. Das Ereignis kommt nur
    beim Wechsel des Gesamtstands (wk-aggregator.js) - keine Schleife mit dem Snapshot-POST. */
