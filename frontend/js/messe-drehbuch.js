@@ -5713,6 +5713,7 @@
       5: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2020-11-01', vgl_qm: '8,20' }
     }
   };
+  function r26Heute() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function r26Mfh(sel) { return q('#mfh-modal ' + sel); }
   function r26We(sel) { return q('#mfh-we-ov ' + sel); }
   function r26Zelle(i, k) { return r26Mfh('[data-i="' + i + '"][data-k="' + k + '"]'); }
@@ -5794,6 +5795,12 @@
          ['baujahr', R26.baujahr], ['gsfl', R26.gsfl], ['etagen_ges', R26.etagen], ['kaufdat', R26.kaufdat]].forEach(function (x) { r6Setz(x[0], x[1]); });
         r6Setz('kp', R26.kp); try { DealPilotInvestmentProfile.nachziehen('kp'); } catch (e) {}
         await warte(900);
+        /* v3288 · Marcel 11.11.2026: „Bestand heute" rechnet zum HEUTIGEN Stichtag. Ohne Eintrag setzt die App den
+           Wertermittlungsstichtag auf den Übergang (objekt-bloecke.js stichtag(), v3034) = Kaufdatum 01.01.2025, und das
+           Register nimmt den Jahrgang 2024. Ein eingetragener Stichtag, der nicht dem Übergang folgt, bleibt stehen. */
+        r6Setz('wertermittlungsstichtag', r26Heute());
+        await warte(400);
+        DPM_REIHE.r26stichtag = [wert('wertermittlungsstichtag')];
         try { if (typeof window.dpDarlehenNachziehen === 'function') window.dpDarlehenNachziehen(); } catch (e) {}
         try { DealPilotBwkProfil.einsetzen(false); } catch (e) {}
         try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
@@ -5896,6 +5903,7 @@
         var zb = r6Beginn(s, 'Ertragswert dieser Wohnung', 'Derselbe Rechenkern wie der Marktbericht Stufe 3 — je Stufe: Bestand, Mieterhöhung, Zielbild.');
         await r26Ertragswert();
         await r6Ende(zb);
+        try { DPM_REIHE.r26stichtag.push(wert('wertermittlungsstichtag')); } catch (e) {}
         var gesp = !r26We('.mfh-we-ew3');
         DPM_REIHE.r26ew = (DPM_REIHE.r26ew || []).concat([{ we: 1, gesperrt: gesp, text: r6Text(r26We('#mfh-we-ew')).slice(0, 200) }]);
         if (gesp) { await b2oZeile(s, 'Ertragswert mit Stufe 3', 'Der Ertragswert gehört zur Wertermittlung (Stufe 3) — ohne sie bleibt es bei Mieten, Kosten und Rendite.'); await r26WohnungZu(); return; }
@@ -6048,6 +6056,7 @@
         if (_rh && (_rh.mitschnitt26 || _rh.mitschnitt26ki || _rh.mitschnitt26pot)) {
           var r0 = null; try { r0 = await window.DpPotenzial.rechnen(); } catch (e) {}
           var H = (r0 && r0.haus) || {}, w3 = ['bestand', 'mieterhoehung', 'zielbild'].map(function (k) { return H[k] ? H[k].wert : null; });
+          try { DPM_REIHE.r26stichtag.push(wert('wertermittlungsstichtag')); } catch (e) {}
           DPM_REIHE.r26halt = { werte: w3, ok: w3[0] != null && w3[1] != null && w3[2] != null && w3[0] < w3[1] && w3[1] < w3[2] };
           if (!DPM_REIHE.r26halt.ok) { stopp(); throw 'stopp'; }
         }
@@ -6091,9 +6100,17 @@
           await b2oZeile(s, 'Nach der Aufteilung', neg ? 'Jede Wohnung als Eigentumswohnung, die Summe gegen das Haus — hier <b>kein Potenzial</b>, und DealPilot sagt warum.' : 'Jede Wohnung als Eigentumswohnung, die Summe nach Aufteilungskosten gegen den Wert des Hauses.');
         }
         var pt = function () { var p = r11Panel(); var e = p && rhIm(p, /^\s*PILOT: WAS IM HAUS STECKT\s*$/); return e && (e.closest('div[style*="margin-top:12px"]') || e.parentElement); };
-        /* v3276r · der Pilot-Absatz stammt aus dem Analyse-Mitschnitt v2481q und nennt noch 770.000 EUR im Zielbild -
-           die Ertragswerte sind seit v3276r neu (670.000 EUR). Bis zu einer neuen Analyse wird er nicht gezeigt. */
-        if (pt() && !(window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.zielbild26 && /770\.000/.test(JSON.stringify(DPM_REIHE_DATEN.zielbild26.analyse || '')))) {
+        /* v3288 · statt der festen Sperre /770\.000/ (v3276r, alter Analyse-Mitschnitt): der Absatz wird nur gezeigt,
+           wenn jeder Euro-Betrag ab 100.000, den er nennt, auch sonst im Reiter steht (Tafel, Aufteilung) oder der
+           Kaufpreis ist - passt der Mitschnitt nicht mehr zu den Ertragswerten, bleibt er draußen. Ergebnis in DPM_REIHE.r26pilot. */
+        var ptOk = (function () {
+          var e = pt(); if (!e) return false;
+          var tx = r6Text(e), tafel = r6Text(r11Panel()).split(tx).join(' ') + ' ' + eur(zahl('kp'));
+          var bt = (tx.match(/\d{3}\.\d{3}(?:\.\d{3})?/g) || []).filter(function (x) { return tafel.indexOf(x) < 0; });
+          DPM_REIHE.r26pilot = { fremd: bt, text: tx.slice(0, 400) };
+          return bt.length === 0;
+        })();
+        if (ptOk) {
           await zeige(pt, 6);
           await b2oZeile(s, 'Der Pilot dazu', 'Ein Absatz in ganzen Sätzen: was im Haus steckt, welche Wohnung den größten Hebel hat — und was davon nur Plan ist.', 1200);
         }
