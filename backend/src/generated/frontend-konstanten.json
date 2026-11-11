@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-11T14:39:01.619Z",
+ "erzeugt_am": "2026-11-11T14:40:23.524Z",
  "quellen": {
   "voice-import": "e66c4689fd6498d0",
   "objektart-felder": "f7d9212555982a97",
   "storage": "3d87a5e74624f206",
-  "index-html": "b23e4cc2bcbccce1",
+  "index-html": "1c418c98e1081250",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4148,7 +4148,7 @@
      },
      {
       "h": "Die Mietleiter: was geht und wann",
-      "text": "Oben in der Karte Mieterhöhung und Zielbild (Reiter Investition; beim Mehrfamilienhaus je Wohnung unter „Einheiten erfassen“ › Details, Block „Miete — was geht und wann“) steht die Mietleiter, eine Zeile je Schritt:\n\n• Heute — die Ist-Miete, mit Beginn des Mietvertrags.\n• Mieterhöhung — die nächste zulässige Erhöhung mit Betrag, „verlangbar ab“ und „wirksam ab“ und der Grenze, die greift (Vergleichsmiete oder Kappungsgrenze). übernehmen trägt sie als Soll-Miete ein. Bei Staffel- oder Indexmiete steht „nach Vertrag“, ohne Spielraum „kein Spielraum“ mit Grund.\n• Bei Neuvermietung — wo die Mietpreisbremse gilt, die Obergrenze Vergleichsmiete + 10 % (als Zielmiete übernehmbar), sonst „frei“ oder „bitte prüfen“.\n• Zielbild — deine Zielmiete. Liegt sie über der Mietpreisbremse, ist sie rot markiert: erlaubt nur mit höherer Vormiete (§ 556e BGB) oder nach umfassender Modernisierung (§ 556f BGB).\n\nDarüber zeigen Balken Ist, nach Mieterhöhung und Zielbild. Gerechnet wird nur, was das Mietrecht erlaubt — die Angebotsmiete ist nie die Bestandsmiete."
+      "text": "Oben in der Karte Mieterhöhung und Zielbild (Reiter Investition; beim Mehrfamilienhaus je Wohnung unter „Einheiten erfassen“ › Details, Block „Miete — was geht und wann“) steht die Mietleiter, eine Zeile je Schritt:\n\n• Heute — die Ist-Miete, mit Beginn des Mietvertrags.\n• Mieterhöhung — die nächste zulässige Erhöhung mit Betrag, „verlangbar ab“ und „wirksam ab“ und der Grenze, die greift (Vergleichsmiete oder Kappungsgrenze). übernehmen trägt sie als Soll-Miete ein. Bei Staffel- oder Indexmiete steht „nach Vertrag“, ohne Spielraum „kein Spielraum“ mit Grund.\n• Bei Neuvermietung — wo die Mietpreisbremse gilt, die Obergrenze Vergleichsmiete + 10 % (als Zielmiete übernehmbar), sonst „frei“ oder „bitte prüfen“.\n• Zielbild — deine Zielmiete. Liegt sie über der Mietpreisbremse, setzt DealPilot sie auf die Obergrenze (Vergleichsmiete + 10 %) und sagt es in der Zeile: „eingetragen … → …“. Höher geht nur mit höherer Vormiete (§ 556e BGB) oder bei der ersten Vermietung nach umfassender Modernisierung (§ 556f BGB) — dann im Feld „Ausnahme Mietpreisbremse“ eintragen, und die Zielmiete bleibt stehen.\n\nDarüber zeigen Balken Ist, nach Mieterhöhung und Zielbild. Gerechnet wird nur, was das Mietrecht erlaubt — die Angebotsmiete ist nie die Bestandsmiete."
      },
      {
       "h": "Mietrecht an dieser Adresse",
@@ -5557,7 +5557,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "18962df5dcbfd429",
+  "hilfe": "4300cb70fe29cbfc",
   "bewertung": "f427bd734c0570c3"
  }
 }
