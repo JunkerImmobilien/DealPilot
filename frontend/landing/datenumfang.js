@@ -1,4 +1,4 @@
-/* datenumfang-messen.mjs · erzeugt 2026-11-11T14:13:24.181Z — NICHT von Hand ändern.
+/* datenumfang-messen.mjs · erzeugt 2026-11-11T14:16:52.028Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/datenumfang-messen.mjs */
 window.DPS_UMFANG = {
  "stand": "2026-11-11",
@@ -63,6 +63,7 @@ window.DPS_UMFANG = {
  "kopf": {
   "amtlich_gesamt": 1099779,
   "amtlich_rund": "über 1 Million",
+  "amtlich_rund_gross": "Über 1 Million",
   "register_werte": 6187,
   "ausschuesse": 201,
   "zensus": 894880,

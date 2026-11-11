@@ -46,7 +46,7 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
 <link rel="stylesheet" href="dp2-live.css?v=landing-makler-hub-3">
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
-<link rel="stylesheet" href="dp2-kern.css?v=landing-kern-1">
+<link rel="stylesheet" href="dp2-kern.css?v=landing-kern-1a">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -212,22 +212,6 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
   <span>◆ SERVER IN DEUTSCHLAND · DSGVO-KONFORM</span>
 </div></div>
 
-<!-- ══ VERTRAUEN — direkt unter dem Laufband, wie in der Fassung davor ══ -->
-<div class="tband"><div class="wrap"><div class="tband-in">
-  <div><svg class="ico"><use href="#i-server"/></svg>
-    <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
-  <div><svg class="ico"><use href="#i-pokal"/></svg>
-    <div><b>Aus der Gutachtenpraxis</b><span>DESAG-geprüfter Sachverständiger</span></div></div>
-  <div><svg class="ico"><use href="#i-schild"/></svg>
-    <div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
-  <div><svg class="ico"><use href="#i-globus"/></svg>
-    <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
-  <!-- v1873 · FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage (BSFZ) — Marcel: "ergänze das auf der Landingpage" -->
-  <div class="tband-siegel"><a href="forschung.html" aria-label="Forschung und Entwicklung"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="64" height="64" loading="lazy">
-    <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
-</div></div></div>
-
-
 <!-- ══ PREISE (kompakt) ═══════════════════════════════════════════════
      landing-kern-1 · Marcel 11.11.2026: „Die Preisstufen müssen auf die Startseite und schnell zu finden sein."
      Gleiches Markup wie auf preise.html (.tkg/.tk-price[data-m]), damit Jahrespreis-Umschalter und
@@ -321,6 +305,22 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 </div></section>
 
 <!-- landing-videos-1 · Marcel 27.10.2026: "wo sind eigentlich auf der Landingpage meine videos geblieben? Das muss direkt auf der Hauptseite nach dem Hero-Bereich richtig cool in Szene gesetzt werden." Seit v2968 war der Abschnitt unsichtbar: dp2-live.js warf (bild is not a function, lokale Variable ueberdeckte die Funktion) und der catch blendete die Section aus. Jetzt direkt hinter Hero, Laufband und Vertrauensband. -->
+<!-- ══ VERTRAUEN — direkt unter dem Laufband, wie in der Fassung davor ══ -->
+<div class="tband"><div class="wrap"><div class="tband-in">
+  <div><svg class="ico"><use href="#i-server"/></svg>
+    <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
+  <div><svg class="ico"><use href="#i-pokal"/></svg>
+    <div><b>Aus der Gutachtenpraxis</b><span>DESAG-geprüfter Sachverständiger</span></div></div>
+  <div><svg class="ico"><use href="#i-schild"/></svg>
+    <div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
+  <div><svg class="ico"><use href="#i-globus"/></svg>
+    <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
+  <!-- v1873 · FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage (BSFZ) — Marcel: "ergänze das auf der Landingpage" -->
+  <div class="tband-siegel"><a href="forschung.html" aria-label="Forschung und Entwicklung"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="64" height="64" loading="lazy">
+    <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
+</div></div></div>
+<!-- landing-kern-1 · Vertrauensband hinter die Tarife gerückt, damit die Preise auch auf dem Handy in den ersten zwei Bildschirmhöhen stehen -->
+
 <!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
      landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
      direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
@@ -405,7 +405,7 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
      Bewusst NICHT hier: wie gerechnet wird (Marcel: „nicht zeigen, WIE wir rechnen"). ════════ -->
 <section class="sec sec-cream daten" id="daten"><div class="wrap">
   <div class="head ctr rv"><div class="eye ctr">Datenbasis</div>
-    <h2><span data-umfang="amtlich_rund">über 1 Million</span> amtliche Datenpunkte. <span class="ac">Laufend abgeglichen.</span></h2>
+    <h2><span data-umfang="amtlich_rund_gross">Über 1 Million</span> amtliche Datenpunkte. <span class="ac">Laufend abgeglichen.</span></h2>
     <p>DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden –
       in eigenen Datenbanken, regelmäßig abgeglichen und mit Herkunft je Wert.</p></div>
 

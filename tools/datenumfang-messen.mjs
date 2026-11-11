@@ -169,6 +169,7 @@ const U = {
   kopf: {
     amtlich_gesamt: amtlich,
     amtlich_rund: rund,
+    amtlich_rund_gross: rund.charAt(0).toUpperCase() + rund.slice(1),
     register_werte: register,
     ausschuesse: REG.kopf.ausschuesse,
     zensus: DB.zensus, zensus_tabellen: DB.zensus_tabellen, zensus_gebiete: DB.zensus_gebiete,
