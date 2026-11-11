@@ -1265,10 +1265,14 @@
   }
 
   /* ── v1111 · Bin ich Mandant eines Partners? ─────────────────────────
-     dp_wl_cache existiert AUSSCHLIESSLICH bei einem reseller_client — das
-     Backend liefert es fuer Owner null (mandant-branding.js:230). Es ist
-     damit das gecachte Kennzeichen "Mandant eines Partners", und die
-     Handy-Sperre nutzt es bereits genau so. */
+     Hier stand bis v3300 "dp_wl_cache existiert AUSSCHLIESSLICH bei einem
+     reseller_client — das Backend liefert es fuer Owner null". Seit v3301
+     bekommt auch der PARTNER selbst seine Marke (rolle 'partner'), also
+     liegt dp_wl_cache auch bei ihm. Das Kennzeichen heisst damit: "die
+     Marke kommt aus einem Partner-Datensatz". Fuer die drei Aufrufer passt
+     das: gateSetzen prueft istPartner() ZUERST (Partner bleibt frei),
+     markenfarbenBooten laesst die Marke gewinnen, und das Zuruecksetzen
+     holt sie per reapply() zurueck (beim Partner Akzent + Logo). */
   function istMandant() {
     try {
       var v = localStorage.getItem('dp_wl_cache');

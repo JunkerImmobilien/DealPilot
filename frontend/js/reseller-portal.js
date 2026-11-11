@@ -777,8 +777,17 @@ if (!window._pdfGold) {
         '<p class="rp-label" style="margin-top:22px">Vorschau (Einladungs-Mail)</p><div id="rp-b-preview"></div>' +
         /* W6-preview: Der Owner sieht sein eigenes Whitelabel sonst NIE — /my-branding
            liefert nur fuer reseller_clients etwas. Ohne das muesste er sich als Mandant
-           einloggen, um sein eigenes Branding zu pruefen. */
-        '<div class="rp-panel" style="margin-top:18px">' +
+           einloggen, um sein eigenes Branding zu pruefen.
+           v3301: das gilt nicht mehr - /my-branding liefert die Marke jetzt auch dem
+           Partner selbst (rolle 'partner', Marcel 11.11.2026). Der Haken bleibt nur
+           fuer Admins mit Test-Reseller; beim Partner steht stattdessen ein Hinweis. */
+        (_partnerSiehtMarke()
+          ? '<div class="rp-panel" style="margin-top:18px;font-size:13px;line-height:1.55">' +
+              '<b>Deine App zeigt deine Marke.</b> Sobald Whitelabel aktiv ist, siehst du Logo, Farben, ' +
+              'PDFs, Quick-Check und Marktbericht genauso wie deine Mandanten — auch, wenn du den ' +
+              'Bildschirm zum Kunden drehst.</div>'
+          : '') +
+        '<div class="rp-panel" style="margin-top:18px' + (_partnerSiehtMarke() ? ';display:none' : '') + '">' +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
             '<span><b>Ansicht meiner Mandanten</b> — die App in meinem Branding anzeigen</span></label>' +
@@ -911,7 +920,17 @@ if (!window._pdfGold) {
   }
   /* W7-livepreview: las vorher das beim Tab-Oeffnen geladene Objekt -> ein
      Farbwechsel im Waehler kam nie an (W6-Bug). Jetzt LIVE aus dem Formular. */
-  function _previewOn() { var el = $('rp-b-prev'); return !!(el && el.checked); }
+  /* v3301 · Partner sieht seine Marke selbst (mandant-branding.js, rolle 'partner') */
+  function _partnerSiehtMarke() {
+    try { return !!(window.DealPilotMandantBranding && DealPilotMandantBranding.rolle &&
+                    DealPilotMandantBranding.rolle() === 'partner'); } catch (e) { return false; }
+  }
+  function _previewOn() {
+    var el = $('rp-b-prev');
+    /* v3301 · beim Partner laeuft die Live-Vorschau immer, solange Whitelabel an ist */
+    if (_partnerSiehtMarke()) { var wl = $('rp-b-wl'); return !!(wl && wl.checked); }
+    return !!(el && el.checked);
+  }
   /* v1114: reichte NUR accent und obsidian durch — von fuenf Werten zwei.
      Die drei anderen Aufrufer derselben API geben alles mit
      (mandant-branding.js:57 und :240, _ownerBoot unten in dieser Datei).

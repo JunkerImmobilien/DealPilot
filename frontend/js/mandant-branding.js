@@ -5,7 +5,11 @@
  * Resellers geladen und angewandt:
  *   - App-Menü: zentrale Gold-Variablen (--gold*) auf die Akzentfarbe
  *   - PDFs: DealPilotConfig.branding.get() um Firma + Logo erweitern
- * Owner/normale User sind nicht betroffen (Backend liefert dann null).
+ * v3301: auch der PARTNER selbst (Owner/Teammitglied, kein Admin) bekommt seine
+ * Marke - Backend liefert rolle 'partner'. Beim Partner gilt nur die MARKE
+ * (Farben, Logo, Name, PDFs, Tab-Titel); seine Darstellung "fuer mich" bleibt
+ * seine, die Vorgabe fuer Mandanten (brand_display) wird bei ihm NICHT angewandt.
+ * Normale User und Admins sind nicht betroffen (Backend liefert dann null).
  */
 (function () {
   var _b = null;
@@ -157,6 +161,11 @@
   function applyResellerDisplay() {
     try {
       if (!_b) return;
+      /* v3301 · Beim Partner selbst nicht: brand_display ist SEINE Vorgabe fuer
+         die Mandanten. Ihm bei jedem Laden die eigene Darstellung damit zu
+         ueberschreiben, hiesse, seine "fuer mich"-Wahl wegzunehmen
+         (darstellung-reseller.js fotografiert sie beim Moduswechsel). */
+      if (_b.rolle === 'partner') return;
       var d = _b.brand_display;
       if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { return; } }
       if (!d || typeof d !== 'object' || !Object.keys(d).length) return;
@@ -364,5 +373,10 @@
   window.DealPilotMandantBranding = window.DealPilotMandantBranding || {};
   window.DealPilotMandantBranding.reapply = function () {
     try { applyResellerDisplay(); } catch (e) {}
+    /* v3301 · Partner: Zuruecksetzen setzt den Akzent auf Gold - die Marke
+       gleich wieder anlegen (beim Mandanten erledigt das brand_display). */
+    try { if (_b && _b.rolle === 'partner') { applyAccent(); replaceWordmark(); } } catch (e) {}
   };
+  /* v3301 · 'mandant' | 'partner' | null - fuer das Partner-Portal */
+  window.DealPilotMandantBranding.rolle = function () { return (_b && _b.rolle) || null; };
 })();

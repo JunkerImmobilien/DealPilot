@@ -13,25 +13,50 @@ const reseller = require('../services/resellerService');
 
 const router = express.Router();
 
-// Branding des Resellers, dem der eingeloggte User als MANDANT gehört
-// (nicht für den Owner — dessen eigene App soll sich nicht umfärben).
-router.get('/my-branding', authenticate, async (req, res, next) => {
-  try {
-    const { query } = require('../db/pool');
-    const r = await query(
-      /* W1a-contact: Kontaktdaten mitliefern, sonst faellt der PDF-Footer auf JUNKER_DEFAULTS zurueck */
-      `SELECT rs.whitelabel_enabled, rs.brand_name, rs.brand_logo_b64,
+// Branding des Resellers fuer den eingeloggten User.
+// v3301 (Marcel 11.11.2026: "Er stellt sich das ein fuer seine Firma und sieht
+// das selber auch. Das muss auf beiden Seiten so sein."): nicht mehr nur fuer
+// den MANDANTEN, sondern auch fuer den Partner selbst (Owner und Teammitglieder
+// aus reseller_members) - der dreht den Bildschirm zum Kunden.
+// Hier stand bis v3299 "nicht für den Owner — dessen eigene App soll sich
+// nicht umfärben". Admins bleiben ausgenommen (info@ fuehrt einen Test-Reseller).
+// rolle: 'mandant' | 'partner' - das Frontend wendet beim Partner nur die
+// MARKE an, nicht die Darstellungs-Vorgabe fuer Mandanten (brand_display).
+const BRANDING_SPALTEN = `rs.whitelabel_enabled, rs.brand_name, rs.brand_logo_b64,
               rs.brand_accent, rs.brand_accent_hi, rs.brand_accent_lo, rs.brand_obsidian,
               rs.brand_company, rs.brand_address, rs.brand_plz, rs.brand_city,
               rs.brand_phone, rs.brand_email, rs.brand_website, rs.brand_tagline,
-              rs.brand_pdf_light, rs.brand_display /*W12-pdflight W20-display*/,
-              rs.brand_logo_dark_b64, rs.brand_logo_auf_dunkel, rs.brand_logo_auf_hell /*v3299 Logo-Kontrast*/
-         FROM reseller_clients rc JOIN resellers rs ON rs.id = rc.reseller_id
-        WHERE rc.user_id = $1
-        LIMIT 1`, [req.user.id]);
-    const b = r.rows[0];
+              rs.brand_pdf_light, rs.brand_display,
+              rs.brand_logo_dark_b64, rs.brand_logo_auf_dunkel, rs.brand_logo_auf_hell`;
+router.get('/my-branding', authenticate, async (req, res, next) => {
+  try {
+    const { query } = require('../db/pool');
+    /* W1a-contact: Kontaktdaten mitliefern, sonst faellt der PDF-Footer auf JUNKER_DEFAULTS zurueck;
+       W12-pdflight, W20-display, v3299 Logo-Kontrast - alles in BRANDING_SPALTEN. */
+    const r = await query(
+      'SELECT ' + BRANDING_SPALTEN +
+      ' FROM reseller_clients rc JOIN resellers rs ON rs.id = rc.reseller_id' +
+      ' WHERE rc.user_id = $1 LIMIT 1', [req.user.id]);
+    let b = r.rows[0];
+    if (b) {
+      if (!b.whitelabel_enabled) return res.json({ branding: null });
+      return res.json({ branding: Object.assign({}, b, { rolle: 'mandant' }) });
+    }
+    /* v3301 · Partner selbst: Owner oder Mitglied, gleiche Rangfolge wie
+       resellerService.getResellerForUser (Owner zuerst, dann der mit dem Pool). */
+    const p = await query(
+      'SELECT ' + BRANDING_SPALTEN +
+      ' FROM resellers rs JOIN users u ON u.id = $1' +
+      " WHERE u.role IS DISTINCT FROM 'admin'" +
+      '   AND (rs.owner_user_id = $1' +
+      '        OR rs.id IN (SELECT reseller_id FROM reseller_members WHERE user_id = $1))' +
+      ' ORDER BY (rs.owner_user_id = $1) DESC,' +
+      '          (SELECT COUNT(*) FROM licenses l WHERE l.reseller_id = rs.id) DESC,' +
+      '          rs.created_at ASC' +
+      ' LIMIT 1', [req.user.id]);
+    b = p.rows[0];
     if (!b || !b.whitelabel_enabled) return res.json({ branding: null });
-    res.json({ branding: b });
+    res.json({ branding: Object.assign({}, b, { rolle: 'partner' }) });
   } catch (e) { next(e); }
 });
 
