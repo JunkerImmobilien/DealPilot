@@ -4161,8 +4161,9 @@ function _calcImmediate(){
     var nkm_m_val = v('nkm');
     var ze_m_val = v('ze');
     var nk_m_val = v('umlagef') || v('nk');
-    var pqm = (nkm_m_val + ze_m_val) / wfl;
-    var pqmw = (nkm_m_val + ze_m_val + nk_m_val) / wfl;
+    /* v3282: Zuschlaege (Stellplatz, Kueche, Moeblierung) zaehlen nicht in die Miete je m2 Wohnflaeche (Regel v3279, Marcel 10.11.2026) */
+    var pqm = nkm_m_val / wfl;
+    var pqmw = (nkm_m_val + nk_m_val) / wfl;
     if (el('miete_qm')) el('miete_qm').textContent = pqm.toFixed(2).replace('.', ',') + ' €/m²';
     if (el('miete_qm_warm')) el('miete_qm_warm').textContent = pqmw.toFixed(2).replace('.', ',') + ' €/m²';
     var ms = v('mietspiegel');
