@@ -42,6 +42,8 @@ const FLOW_ROUTEN = [
   ['GET',  new RegExp('^/api/v1/dateien/speicher/?$')],
   ['GET',  new RegExp('^/api/v1/dateien/' + UUID + '/?$')],
   ['POST', new RegExp('^/api/v1/dateien/?$')],
+  /* v3298 · Punkt 4: ImmoMetrica-Ereignisse */
+  ['GET',  new RegExp('^/api/v1/immometrica/ereignisse/?$')],
   /* v3297 · Punkt 5: Co-Pilot */
   ['POST', new RegExp('^/api/v1/agent/(frage|bestaetigen|verwerfen)/?$')],
   /* v3296 · Punkt 6: Freigabe und Marktbericht mit kosten_token */

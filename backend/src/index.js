@@ -575,6 +575,8 @@ async function start() {
     setTimeout(_secAufraeumen, 90 * 1000);
     setInterval(_secAufraeumen, _SEC_LOESCH_MS);
     console.log('✓ Sicherheits-Loeschlauf aktiv (90 Tage / 3 Jahre)');
+    /* v3298 · Flow Investor Punkt 4: ImmoMetrica-Abruf - AUS, bis FLOW_IMMOMETRICA_JOB=an (Freigabe Marcel) */
+    try { require('./services/immometricaFlow').starten(); } catch (eImo) { console.warn('[immometrica-flow] ' + eImo.message); }
 
   } catch (e) {
     console.error('✗ Retention-Scheduler konnte nicht starten:', e.message);

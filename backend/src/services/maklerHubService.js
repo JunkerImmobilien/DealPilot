@@ -230,7 +230,10 @@ async function verbunden(userId) {
 /* ── 6. Webhook DealPilot → Hub ────────────────────────────────────────
    Nur für Nutzer mit Verbindung (oder beim Trennen). Signatur HMAC-SHA256(body, client_secret),
    bis zu fünf Wiederholungen mit wachsendem Abstand. Läuft im Hintergrund, blockiert nie den Aufrufer. */
-function ereignis(userId, art) {
+/* v3298 · daten (optional): Nutzlast des Ereignisses, z. B. die ImmoMetrica-Ereignisse aus Punkt 4
+   ({ art, suche_id, offer_id, objekt_id, titel, link, preis_alt, preis_neu, senkung_pct, zielpreis, at }) -
+   flach in den Rumpf gemischt, damit der Hub `art` usw. oben findet. Signatur wie bisher ueber den ganzen Rumpf. */
+function ereignis(userId, art, daten) {
   const e = einstellungen();
   if (!e.webhook || !bereit() || !userId) return;
   (async () => {
@@ -238,7 +241,7 @@ function ereignis(userId, art) {
       const v = await query('SELECT 1 FROM hub_verbindungen WHERE user_id=$1 AND revoked_at IS NULL LIMIT 1', [userId]).catch(() => ({ rowCount: 0 }));
       if (!v.rowCount) return;
     }
-    const body = JSON.stringify({ ereignis: art, konto_id: userId, zeit: new Date().toISOString() });
+    const body = JSON.stringify(Object.assign({}, daten || {}, { ereignis: art, konto_id: userId, zeit: new Date().toISOString() }));
     const sig = 'sha256=' + crypto.createHmac('sha256', e.secret).update(body).digest('hex');
     for (let versuch = 0; versuch < 6; versuch++) {
       try {

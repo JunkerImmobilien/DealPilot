@@ -104,6 +104,12 @@ router.delete('/searches/:id', authenticate, limiter, async (req, res) => {
   catch (e) { res.status(e.status || 502).json({ error: 'ImmoMetrica-Fehler', detail: String(e.message) }); }
 });
 /* v3168 · letzter bekannter Kontingent-Stand aus den X-Limit-Headern, ohne eigenen Abruf */
+/* v3298 · Flow Investor Punkt 4: Ereignisse (neu, preis_gesenkt, unter_zielpreis, offline, wieder_online) zum
+   Nachholen fuer den Hub; seit = ISO-Zeit oder Ereignis-Id (Vorgabe: 7 Tage). Linie investor. */
+router.get('/ereignisse', authenticate, require('../middleware/flow').requireFlowLinie('investor'), async (req, res, next) => {
+  try { res.set('Cache-Control', 'no-store'); res.json({ ereignisse: await require('../services/immometricaFlow').ereignisse(uid(req), req.query.seit) }); }
+  catch (e) { if (e.statusCode === 400) return res.status(400).json({ error: e.message }); next(e); }
+});
 router.get('/kontingent', authenticate, (req, res) => { res.json({ kontingent: imo.letztesKontingent() }); });
 
 router.get('/favorites/:cc', authenticate, limiter, async (req, res) => {

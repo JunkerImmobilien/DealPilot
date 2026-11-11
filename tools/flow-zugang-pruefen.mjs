@@ -160,6 +160,7 @@ pruef('Z6 ohne Linie: nichts', r6.bereich === null && !r6.api_key && LAGE.verbKe
 pruef('Z3 POST /objects/:id/offerte ist Flow-Route', flow.istFlowRoute('POST', '/api/v1/objects/' + ID + '/offerte'));
 pruef('Z3 POST /kosten/anfrage und Marktbericht mit Token sind Flow-Routen', flow.istFlowRoute('POST', '/api/v1/kosten/anfrage') && flow.istFlowRoute('POST', '/api/v1/marktbericht/reports/from-dealpilot') && !flow.istFlowRoute('POST', '/api/v1/marktbericht/reports/generate'));
 pruef('Z3 POST /agent/frage und /agent/bestaetigen sind Flow-Routen', flow.istFlowRoute('POST', '/api/v1/agent/frage') && flow.istFlowRoute('POST', '/api/v1/agent/bestaetigen') && !flow.istFlowRoute('POST', '/api/v1/ai/copilot'));
+pruef('Z3 GET /immometrica/ereignisse ist Flow-Route, die Suchen nicht', flow.istFlowRoute('GET', '/api/v1/immometrica/ereignisse?seit=1') && !flow.istFlowRoute('GET', '/api/v1/immometrica/searches'));
 pruef('Z3 GET/PUT /flow/profil ist Flow-Route', flow.istFlowRoute('GET', '/api/v1/flow/profil') && flow.istFlowRoute('PUT', '/api/v1/flow/profil'));
 
 console.log('flow-zugang-pruefen: ' + (n - fehler) + ' von ' + n + ' gruen');
