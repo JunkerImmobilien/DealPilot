@@ -98,6 +98,11 @@ pruef('I3 Webhook mit den Feldern des Auftrags', HUB.length === 2 && HUB.every((
 const ev2 = await IF.verarbeiten('u1', 's1', [{ raw: Object.assign({}, raw, { id: 9002, buying_price: 99000 }) }], { profil });
 pruef('I3 neuer Treffer nach dem Grundstand: neu (Zielpreis ohne Objekt und ohne max_kaufpreis: keiner)', ev2.map((e) => e.art).join(',') === 'neu' && ev2[0].objekt_id === null, ev2);
 
+const ev3 = await IF.verarbeiten('u1', 's1', [{ raw: Object.assign({}, raw, { id: 9003, buying_price: 90000 }) }], { profil, nurNeuMelden: true });
+pruef('I3 Treffer ohne Stand aus dem Aenderungs-Filter: still nachgetragen (v3298a)', ev3.length === 0 && ST.has('s1|9003'), ev3);
+const ev4 = await IF.verarbeiten('u1', 's1', [{ raw: Object.assign({}, raw, { id: 9004, buying_price: 90000 }), _echtNeu: true }], { profil, nurNeuMelden: true });
+pruef('I3 Treffer aus dem Filter neu: Ereignis neu', ev4.map((e) => e.art).join(',') === 'neu', ev4);
+
 /* I4 */
 console.log = () => {};
 const an = IF.starten();

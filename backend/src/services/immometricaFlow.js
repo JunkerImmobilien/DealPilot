@@ -105,7 +105,9 @@ async function verarbeiten(userId, sucheId, items, opt) {
     const r = await query('SELECT preis, online, objekt_id FROM immometrica_staende WHERE user_id=$1 AND suche_id=$2 AND offer_id=$3', [userId, sucheId, s.offer_id]);
     const alt = r.rowCount ? { preis: _zahl(r.rows[0].preis), online: r.rows[0].online } : null;
     const zp = await _zielpreisFuer(userId, s.offer_id, opt.profil);
-    const ev = erkennen(alt, s, { alarme: opt.profil && opt.profil.alarme, zielpreis: zp.zielpreis, grundstand: opt.grundstand });
+    /* ohne Stand nur dann „neu“, wenn der Treffer aus dem Filter neu (offer_id_gt) kommt - sonst still nachtragen */
+    const ev = erkennen(alt, s, { alarme: opt.profil && opt.profil.alarme, zielpreis: zp.zielpreis,
+      grundstand: opt.grundstand || (!alt && opt.nurNeuMelden && !it._echtNeu) });
     await query(
       `INSERT INTO immometrica_staende (user_id, suche_id, offer_id, preis, flaeche, titel, link, online, objekt_id, preis_geaendert_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, NULL)
@@ -135,18 +137,23 @@ async function lauf(userId) {
     const start = new Date().toISOString();
     let items = [], hoechste = zust.rowCount ? zust.rows[0].hoechste_offer_id : null, grundstand = !zust.rowCount;
     if (grundstand) {
+      /* v3298a · GEMESSEN 11.11.2026 auf Staging (ein Abruf, Demo-Konto): Kontingent 600 je Monat, 158 genutzt, eine
+         Suche hat 1.495 Treffer. Ein voller Grundstand (alle Seiten) haette das Monatskontingent allein gesprengt.
+         Deshalb nur die ersten Seiten (FLOW_IMMOMETRICA_GRUNDSTAND_SEITEN, Vorgabe 1 = 50 Treffer); was spaeter ueber
+         die Aenderungs-Filter auftaucht und noch keinen Stand hat, wird still nachgetragen (kein Ereignis). */
+      const maxSeiten = Math.max(1, Math.min(20, Number(process.env.FLOW_IMMOMETRICA_GRUNDSTAND_SEITEN) || 1));
       let seite = 1, mehr = true;
-      while (mehr && seite <= 20) { const r = await imo.getResults(token, sid, seite > 1 ? seite : null); bericht.kontingent = r.kontingent || bericht.kontingent; items = items.concat(r.items || []); mehr = !!r.next; seite++; }
+      while (mehr && seite <= maxSeiten) { const r = await imo.getResults(token, sid, seite > 1 ? seite : null); bericht.kontingent = r.kontingent || bericht.kontingent; items = items.concat(r.items || []); mehr = !!r.next; seite++; }
     } else {
       const seit = zust.rows[0].letzter_lauf_at ? new Date(zust.rows[0].letzter_lauf_at).toISOString() : null;
       const teile = [];
       if (hoechste) teile.push(await imo.getAenderungen(token, sid, 'neu', hoechste));
       if (seit) for (const art of ['geaendert', 'offline', 'wieder_online']) teile.push(await imo.getAenderungen(token, sid, art, seit));
       const gesehen = new Set();
-      teile.forEach((t) => { bericht.kontingent = t.kontingent || bericht.kontingent; (t.items || []).forEach((it) => { const id = it.raw && it.raw.id; if (id != null && gesehen.has(id)) return; if (id != null) gesehen.add(id); items.push(it); }); });
+      teile.forEach((t) => { bericht.kontingent = t.kontingent || bericht.kontingent; (t.items || []).forEach((it) => { const id = it.raw && it.raw.id; if (id != null && gesehen.has(id)) return; if (id != null) gesehen.add(id); it._echtNeu = t.art === 'neu'; items.push(it); }); });
     }
     items.forEach((it) => { const id = it.raw && it.raw.id; if (id != null && (hoechste == null || Number(id) > Number(hoechste))) hoechste = String(id); });
-    const ev = await verarbeiten(userId, sid, items, { profil: profil, grundstand: grundstand });
+    const ev = await verarbeiten(userId, sid, items, { profil: profil, grundstand: grundstand, nurNeuMelden: !grundstand });
     await query(
       `INSERT INTO immometrica_abruf (user_id, suche_id, letzter_lauf_at, hoechste_offer_id, kontingent) VALUES ($1,$2,$3,$4,$5::jsonb)
        ON CONFLICT (user_id, suche_id) DO UPDATE SET letzter_lauf_at=EXCLUDED.letzter_lauf_at, hoechste_offer_id=EXCLUDED.hoechste_offer_id, kontingent=EXCLUDED.kontingent`,
