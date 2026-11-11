@@ -22,6 +22,7 @@ const express = require('express');
 const { authenticate, requireVerified } = require('../middleware/auth');   /* v2138 */
 const aiCreditsService = require('../services/aiCreditsService');
 const creditAlert = require('../services/creditAlert'); // v554
+const _kosten = require('../services/kostenFreigabe');   /* v3296 · Flow Punkt 6 */
 
 const router = express.Router();
 
@@ -361,6 +362,19 @@ async function runReport(req, res) {
       }
     }
     /* v942-userbind: Besitzer + Kuerzel wandern mit in den Snapshot. */
+    /* v3296 · Flow Investor Punkt 6: kostet der Abruf etwas, braucht ein Schluessel mit Bereich flow (Makler-Hub)
+       einen eingeloesten kosten_token - sonst 402 mit Weg. Der Telegram-Bot schickt seinen Token selbst mit.
+       Der Browser (Sitzung) bestaetigt in der Oberflaeche und bleibt wie bisher. */
+    const _kt = body.kosten_token || req.headers['x-kosten-token'] || null;
+    delete body.kosten_token;
+    if (stufe > 0 && _kosten.tokenPflicht(req, _kt)) {
+      const _ein = await _kosten.einloesen(req.user.id, _kt, { stufe: stufe, objekt_ref: externalRef });
+      if (!_ein.ok) {
+        return res.status(402).json({ error: 'kosten_freigabe_fehlt', code: _ein.code, message: _ein.meldung,
+          stufe: stufe, art: aiCreditsService.STUFE_ART[stufe], objekt_id: externalRef || null });
+      }
+      req._kostenFreigabeId = _ein.id;
+    }
     const _lm = await labelMap(req, [externalRef]);
     const objectLabel = (externalRef && _lm[String(externalRef)]) || null;
     let out;
@@ -390,6 +404,7 @@ async function runReport(req, res) {
     }
 
     if (out.status >= 400) {
+      if (req._kostenFreigabeId) await _kosten.zurueck(req._kostenFreigabeId);   /* v3296: nichts abgebucht -> Token wieder frei */
       return res.status(out.status).json(out.data);
     }
 
@@ -403,6 +418,7 @@ async function runReport(req, res) {
     var _bal = (typeof _c.geomap_balance_eur === 'number') ? _c.geomap_balance_eur : null;
 
     if (!_hasValue) {
+      if (req._kostenFreigabeId) await _kosten.zurueck(req._kostenFreigabeId);   /* v3296: keine Daten, nichts abgebucht */
       // Kosten-Log (ohne Kerosin), ok=false
       try {
         const db = req.app.get('db');
@@ -453,6 +469,7 @@ async function runReport(req, res) {
     var _resp = Object.assign({}, out.data, { _kontingent: { charged: stufe ? 1 : 0, art: stufe ? aiCreditsService.STUFE_ART[stufe] : null, mode: (fast ? 'fast' : 'full') } });
     res.status(200).json(_resp);
   } catch (e) {
+    if (req._kostenFreigabeId) await _kosten.zurueck(req._kostenFreigabeId);   /* v3296 */
     res.status(502).json({ error: 'mb_unreachable', message: e.message });
   }
 }

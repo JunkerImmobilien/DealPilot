@@ -42,6 +42,10 @@ const FLOW_ROUTEN = [
   ['GET',  new RegExp('^/api/v1/dateien/speicher/?$')],
   ['GET',  new RegExp('^/api/v1/dateien/' + UUID + '/?$')],
   ['POST', new RegExp('^/api/v1/dateien/?$')],
+  /* v3296 · Punkt 6: Freigabe und Marktbericht mit kosten_token */
+  ['POST', new RegExp('^/api/v1/kosten/(anfrage|freigeben|ablehnen)/?$')],
+  ['GET',  new RegExp('^/api/v1/marktbericht/stufenpreis/?$')],
+  ['POST', new RegExp('^/api/v1/marktbericht/reports/from-dealpilot/?$')],
   /* v3290 · Punkt 3: Richtwerte und Ziele */
   ['GET',  new RegExp('^/api/v1/flow/profil/?$')],
   ['PUT',  new RegExp('^/api/v1/flow/profil/?$')]

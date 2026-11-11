@@ -273,6 +273,33 @@ const SOLL_IST = [
 /* v3003a · EINE Wertangabe: Marktwert/Verkehrswert (svwert) mit Herkunft (svw_herkunft). Dieselbe Regel
    wie frontend/js/wertangabe.js aufloesen(): bankval ist keine eigene Quelle mehr, sondern gilt nur,
    solange das Objekt noch nicht im Formular uebertragen ist (bankval_migriert). */
+/* v3296 · Flow Investor Punkt 6: der Kosten-Token fuer einen Abruf. API (ctx.kanal 'api'): nur, was der
+   Hub freigegeben hat (ctx.kostenToken). Telegram: das Ja ist die Freigabe - Anfrage, freigeben, einloesen. */
+const kosten = require('./kostenFreigabe');
+async function _kostenToken(ctx, stufe, objektRef) {
+  if (ctx.kostenToken) return { token: ctx.kostenToken };
+  if (ctx.kanal === 'api') return { fehlt: true };
+  try {
+    const a = await kosten.anfrage(ctx.userId, { stufe: stufe, objekt_id: objektRef, kanal: 'telegram' });
+    if (!a.ok) return { fehler: a.fehler };
+    if (a.status === 'gesperrt') return { gesperrt: a.grund };
+    if (a.status === 'kontingent_leer') return { leer: true };
+    if (a.token && a.freigabe_noetig) await kosten.freigeben(ctx.userId, a.token, 'telegram');
+    return { token: a.token };
+  } catch (e) { return { fehler: String(e && e.message || e) }; }
+}
+function _kostenNein(k, adr, stufe) {
+  if (k.gesperrt) return { ok: false, gesperrt: true, abgerufen_fuer: adr, stufe: stufe,
+    hinweis: 'Nicht abgerufen, nichts verbraucht: in den Freigaben des Nutzers steht diese Stufe auf „nie“. Sag das so.' };
+  if (k.leer) return { ok: false, kontingent_leer: true, abgerufen_fuer: adr, stufe: stufe,
+    hinweis: 'Das Kontingent fuer diese Bewertung ist aufgebraucht. Nichts abgerufen.' };
+  if (k.fehlt) return { ok: false, kosten_freigabe_fehlt: true, abgerufen_fuer: adr, stufe: stufe,
+    hinweis: 'Nicht abgerufen: ueber die Schnittstelle braucht dieser Abruf einen kosten_token aus POST /kosten/anfrage '
+      + '(und die Freigabe des Nutzers). Nenne Stufe und Preis und sag, dass der Abruf freigegeben werden muss.' };
+  return { ok: false, abgerufen_fuer: adr, stufe: stufe, fehler: k.fehler || 'Freigabe nicht moeglich',
+    hinweis: 'Nicht abgerufen, nichts verbraucht. Sag dem Nutzer, dass die Freigabe gerade nicht ging.' };
+}
+
 /* v3289 · wertangabe() steht jetzt in objektRechnung.js - eine Stelle fuer Bot und Flow */
 const wertangabe = objektRechnung.wertangabe;
 
@@ -3588,8 +3615,12 @@ async function marktbericht_abrufen(ctx, args) {
   /* Ein Angebot traegt genau EINEN Abruf. Ein zweiter Aufruf im selben
      Lauf findet es nicht mehr. */
   ctx.angebotObjekt = null; ctx.angebotStufe = null;
+  /* v3296 · Punkt 6: derselbe Freigabe-Weg wie der Hub (kostenFreigabe). Telegram: das Ja des Nutzers ist
+     die Freigabe; steht das Profil auf „nie", wird nicht abgerufen. API-Agent (Punkt 5): nur mit kosten_token. */
+  const _kt = await _kostenToken(ctx, stufe, id);
+  if (!_kt.token) return _kostenNein(_kt, _adrVon(o), stufe);
   try {
-    const r = await markt.abrufen(ctx.userId, o, stufe);
+    const r = await markt.abrufen(ctx.userId, o, stufe, { kosten_token: _kt.token });
     ctx.merkeObjekt(id);
     if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
     if (r && r.no_data) {
@@ -4547,8 +4578,10 @@ async function marktpreis_ohne_objekt_abrufen(ctx) {
   }
   const adr = _freiAdresse(frei);
   ctx.angebotFrei = null; ctx.angebotObjekt = null; ctx.angebotStufe = null;
+  const _kt = await _kostenToken(ctx, 1, null);   /* v3296 · Punkt 6, ohne Objekt */
+  if (!_kt.token) return _kostenNein(_kt, adr, 1);
   try {
-    const r = await markt.abrufenFrei(ctx.userId, frei);
+    const r = await markt.abrufenFrei(ctx.userId, frei, { kosten_token: _kt.token });
     if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
     if (r && r.no_data) {
       return { ok: false, keine_daten: true, abgerufen_fuer: adr,

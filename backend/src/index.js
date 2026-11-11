@@ -400,7 +400,8 @@ app.use('/api/v1/aktivitaet', rateLimit({ windowMs: 60000, max: 10 }), require('
 app.use('/api/v1/wuensche', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/wuensche'));  // v3097 - Umsetzungswuensche der Entwicklungspartner
 app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
 app.use('/api/v1/hub', require('./routes/maklerHub'));
-app.use('/api/v1/flow', require('./routes/flow'));  // v3290 · DealPilot Flow: GET/PUT /flow/profil (Flow-Investor-Schnittstelle Punkt 3)  // v3190 · Makler-Hub-Anmeldung (Dateien/Makler-Hub/Anmeldung-Schnittstelle.md)
+app.use('/api/v1/flow', require('./routes/flow'));
+app.use('/api/v1/kosten', require('./routes/kosten'));  // v3296 · DealPilot Flow Punkt 6: Freigabe kostenpflichtiger Stufen  // v3290 · DealPilot Flow: GET/PUT /flow/profil (Flow-Investor-Schnittstelle Punkt 3)  // v3190 · Makler-Hub-Anmeldung (Dateien/Makler-Hub/Anmeldung-Schnittstelle.md)
 /* v2071 · Die Rechenkerne als Schnittstelle: Restnutzungsdauer (im Image)
    und Verkehrswert (im Marktbericht-Dienst). Eigener Namensraum, damit
    sie spaeter getrennt freigeschaltet und abgerechnet werden koennen. */

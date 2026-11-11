@@ -274,7 +274,8 @@ async function abrufen(userId, objekt, stufe, opts) {
       external_ref: objekt.objekt_id,
       wert_stufe: s,            /* NIE weglassen — der Default waere 2 */
       /* v2960a · dieselben Felder wie der Browser, nicht zwoelf */
-      object: objektNutzlast(objekt)
+      object: objektNutzlast(objekt),
+      kosten_token: (opts && opts.kosten_token) || undefined   /* v3296 · Flow Punkt 6 */
     }
   });
 
@@ -319,14 +320,14 @@ function berichtPdfLink(reportId) {
  * Route bucht genau einmal —, nur ohne `external_ref`: die Nutzlast traegt die
  * sechs Pflichtangaben der Stufe 1 (Strasse, PLZ, Ort, Objektart, Wohnflaeche,
  * Baujahr) wie ein Objekt ohne Kennung. Immer Stufe 1, immer schnell. */
-async function abrufenFrei(userId, frei) {
+async function abrufenFrei(userId, frei, opts) {
   const f = frei || {};
   const o = { str: f.str, plz: f.plz, ort: f.ort, objart: f.objart, objektart: f.objart,
     wfl: f.wfl, baujahr: f.baujahr };
   const r = await ruf(userId, '/marktbericht/reports/from-dealpilot', {
     method: 'POST',
     timeoutMs: 120000,
-    body: { fast: true, wert_stufe: 1, object: o }   /* wert_stufe NIE weglassen - der Default waere 2 */
+    body: { fast: true, wert_stufe: 1, object: o, kosten_token: (opts && opts.kosten_token) || undefined }   /* wert_stufe NIE weglassen - der Default waere 2; v3296 kosten_token */
   });
   if (r.status === 402) {
     const e = new Error((r.body && r.body.message) || 'Dein Kontingent für diese Bewertung ist aufgebraucht.');
