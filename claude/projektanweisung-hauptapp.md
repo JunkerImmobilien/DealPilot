@@ -44563,3 +44563,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `c469647a`
 - **Nachweis:** `flow-berechnen-pruefen` RC 0 (E1 57/57, E2 37/45 wie Basislinie, E4 17/17), `flow-zugang-pruefen` 42/42 (Z6 Bereich nachziehen), Bot Vorher/Nachher: 16 alte Fälle unverändert, mit Profil Vorsichtig Score 76 → 70 (Gewichte 35/15/20/20/10), `rechenkerne-spiegeln --pruefen`, `score-ketten`, `zwei-scores`, `barkauf-score`, `buster-ebenen` grün.
 - **Rest:** nicht ausgerollt. Ausrollen mit v3289 zusammen (Backend-Rebuild wegen Migration 098). Staging-Abnahme: PUT /flow/profil gegen echte DB, App zeigt die Werte, Bot rechnet damit; Hub-Konto mit neuer Linie → Bereich im Protokoll.
+
+### v3291 · Videothek Modul 26 auf die Aufnahme v3288b (N145, landing-videothek-9, 11.11.2026, nur Staging)
+- **Was:** Eintrag 26: Dauer 861 s, 16 Kapitel aus der Aufnahme (Stichworte aus texte.json, ohne Straßen/Orte), Poster bei 4:40, Ton Marcels Stimme; Buster v3291; Schleifendaten neu. Story/Unterzeile ohne Zahlen, unverändert.
+- **Commit:** `cc14d70b` (push + git pull von Hand; deploy-staging bricht an fremden offenen Änderungen ab)
+- **Nachweis:** Server-Dateien 34.439.275 / 46.486.637 Byte = lokal, alte 26 in `alt-vor-v3276/`; im Browser 861,2 s stumm und mit Ton, Kapitel 261 → 263,8 s, 560 → 562,3 s.
+- **Rest:** Prod (zusammen mit v3285: 42 MP4s).
